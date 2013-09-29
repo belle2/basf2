@@ -68,7 +68,6 @@ namespace Belle2 {
           }
         }
       }
-      double dx = MUID_ReducedChiSquaredLimit / MUID_MaxReducedChiSquared;   // bin size
       std::vector<double> reducedChiSquaredPDF = outcomeContent.getArray("TransversePDF");
       if (reducedChiSquaredPDF.size() != MUID_MaxReducedChiSquared) {
         B2ERROR("muid::MuidPar::fillPDFs(): TransversePDF vector for hypothesis " << hypothesisName << "  outcome " << outcome
@@ -78,6 +77,7 @@ namespace Belle2 {
         for (int i = 0; i < MUID_MaxReducedChiSquared; ++i) {
           m_ReducedChiSquaredPDF[outcome - 1][i] = reducedChiSquaredPDF[i];
         }
+        double dx = MUID_ReducedChiSquaredLimit / MUID_MaxReducedChiSquared;   // bin size
         spline(MUID_MaxReducedChiSquared, dx, &m_ReducedChiSquaredPDF[outcome - 1][0], &m_ReducedChiSquaredD1[outcome - 1][0],
                &m_ReducedChiSquaredD2[outcome - 1][0], &m_ReducedChiSquaredD3[outcome - 1][0]);
       }

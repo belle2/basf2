@@ -787,7 +787,7 @@ bool MuidModule::createHit(G4ErrorFreeTrajState* state, int trackID, int pdgCode
     p.covariance = HepSymMatrix(6, 0);
 
     vector<G4VPhysicalVolume*>::iterator j;
-    for (j = m_enter->begin(); (j != m_enter->end()) && (*j != preVol); j++) {}
+    for (j = m_enter->begin(); (j != m_enter->end()) && (*j != preVol); ++j) {}
     if (j != m_enter->end()) {        // entered a KLM sensitive volume?
 
       p.enteredSensitiveVolume = true;

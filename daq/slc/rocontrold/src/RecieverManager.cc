@@ -14,8 +14,6 @@ using namespace B2DAQ;
 
 void RecieverManager::run() throw()
 {
-  //${BELLE2_LOCAL_DIR}/daq/eventbuilder/evb0/eb0 -n 2 cpr006 cpr007 -D -b
-  //${BELLE2_LOCAL_DIR}/daq/copper/daq_scripts/RecvStream1.sh
   if (_node != NULL) {
     const char* belle2_path = getenv("BELLE2_LOCAL_DIR");
     if (belle2_path == NULL) {

@@ -36,6 +36,8 @@ bool TemplateCallback::load() throw()
 bool TemplateCallback::start() throw()
 {
   B2DAQ::debug("START");
+  B2DAQ::debug("Exp no: %d", (int)getMessage().getParam(0));
+  B2DAQ::debug("Run no: %d", (int)getMessage().getParam(1));
   sleep(3);
   return true;
 }

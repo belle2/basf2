@@ -2,6 +2,7 @@ package b2daq.java.io;
 
 //import java.io.BufferedInputStream;
 import java.io.DataInputStream;
+import java.io.EOFException;
 import java.io.InputStream;
 
 import b2daq.core.Reader;
@@ -48,6 +49,7 @@ public class DataReader extends Reader {
 
 	@Override
 	public int readInt() throws Exception {
+		while ( _stream.available() == 0 ) {}
 		return _stream.readInt();
 	}
 

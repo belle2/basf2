@@ -141,6 +141,7 @@ void NodeLoader::loadNodes(XMLElement* el)
           (*hslb_new) = (*hslb);
           hslb_new->setID(_system.getHSLBs().size());
           hslb_new->setVersion(_version);
+          std::cout << hslb_new->isUsed() << " " << hslb->isUsed() << std::endl;
           _system.addHSLB(hslb_new);
           copper->setHSLB(slot, hslb_new);
           if (hslb->getFEEModule() != NULL) {

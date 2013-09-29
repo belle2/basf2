@@ -1,3 +1,4 @@
+
 #include "COPPERNode.hh"
 
 #include "DataSender.hh"
@@ -6,6 +7,7 @@
 #include "FEEModule.hh"
 
 #include <util/StringUtil.hh>
+#include <util/Debugger.hh>
 
 #include <sstream>
 
@@ -63,11 +65,13 @@ int COPPERNode::getParams(const Command& command, unsigned int* pars,
   int npar = 0;
   std::stringstream ss; ss.str("");
   if (command == Command::BOOT) {
+    pars[npar++] = getID();
+    ss << _sender->getHost() << " "
+       << _sender->getScript();
     pars[npar++] = 0;
-    ss << _sender->getHost();
     for (size_t i = 0; i < MAX_HSLBS; i++) {
       if (_hslb_v[i] != NULL) {
-        pars[0] |= _hslb_v[i]->isUsed();
+        pars[1] |= _hslb_v[i]->isUsed();
         ss << " " << _hslb_v[i]->getFirmware();
         FEEModule* module = _hslb_v[i]->getFEEModule();
         if (module != NULL) {
@@ -114,7 +118,9 @@ void COPPERNode::setParams(const Command& command,
   if (command == Command::BOOT) {
     par_i = 1;
     std::vector<std::string> str_v = B2DAQ::split(datap, ' ');
+    setID(pars[0]);
     _sender->setHost(str_v[0]);
+    _sender->setScript(str_v[1]);
     for (size_t i = 0; i < MAX_HSLBS; i++) {
       if (_hslb_v[i] == NULL) {
         _hslb_v[i] = new HSLB();
@@ -122,7 +128,7 @@ void COPPERNode::setParams(const Command& command,
       }
       _hslb_v[i]->setUsed((pars[1] >> i) & 0x01);
       FEEModule* module = _hslb_v[i]->getFEEModule();
-      _hslb_v[i]->setFirmware(str_v[i + 1]);
+      _hslb_v[i]->setFirmware(str_v[i + 2]);
       size_t nreg = pars[par_i++];
       for (size_t i = 0; i < nreg; i++) {
         FEEModule::Register reg;

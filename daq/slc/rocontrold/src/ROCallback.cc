@@ -1,5 +1,6 @@
 #include "ROCallback.hh"
 
+#include "ProcessListener.hh"
 #include "RecieverManager.hh"
 #include "EventBuilderManager.hh"
 
@@ -34,7 +35,7 @@ ROCallback::~ROCallback() throw()
 
 bool ROCallback::boot() throw()
 {
-  ///*
+  /*
   FILE* file = popen("cd /home/usr/tkonno/cdc;/home/xilinx/ise12.4/ISE/bin/lin/impact -batch cdc41b2l011-impact.cmd", "r");
   char str[102400];
   memset(str, '\0', 102400);
@@ -42,7 +43,7 @@ bool ROCallback::boot() throw()
   pclose(file);
   std::string s = str;
   std::cout << s << std::endl;
-  //*/
+  */
   if (_buf_config == NULL) {
     _buf_config = openBuffer(4, "/ropc_config");
     if (_buf_config == NULL) {
@@ -61,18 +62,19 @@ bool ROCallback::boot() throw()
     }
     memset(_buf_status, 0, sizeof(int) * 4);
   }
-
   return true;
 }
 
 bool ROCallback::load() throw()
 {
-  system("killall basf2");
-  system("killall eb0");
+  //system("killall basf2");
+  //system("killall eb0");
   _fork_v[0].cancel();
   _fork_v[1].cancel();
   _fork_v[0] = Fork(new EventBuilderManager(_node));
   _fork_v[1] = Fork(new RecieverManager(_node));
+  _thread_v[0] = PThread(new ProcessListener(this, _fork_v[0], "Event builder 0"));
+  _thread_v[1] = PThread(new ProcessListener(this, _fork_v[1], "Serializer"));
   return true;
 }
 
@@ -84,13 +86,15 @@ bool ROCallback::start() throw()
     (int)getMessage().getParam(1),//RunNumber
     0
   };
-  memcpy(_buf_config, input, sizeof(int) * 4);
+  if (_buf_config != NULL)
+    memcpy(_buf_config, input, sizeof(int) * 4);
   return true;
 }
 
 bool ROCallback::stop() throw()
 {
-  memset(_buf_config, 0, sizeof(int) * 4);
+  if (_buf_config != NULL)
+    memset(_buf_config, 0, sizeof(int) * 4);
   return true;
 }
 
@@ -106,6 +110,10 @@ bool ROCallback::pause() throw()
 
 bool ROCallback::abort() throw()
 {
+  if (_buf_config != NULL)
+    memset(_buf_config, 0, sizeof(int) * 4);
+  _fork_v[0].cancel();
+  _fork_v[1].cancel();
   return true;
 }
 

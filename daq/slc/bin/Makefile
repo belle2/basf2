@@ -1,6 +1,6 @@
 
 all:
-	@ rm -f *d nsmd2
+	@ rm -f *d nsmd2 *.h
 	@ ln -s $(B2SLC_PATH)/nsm2/daemon/nsmd2
 	@ ln -s $(B2SLC_PATH)/dqmserver/bin/dqmservd
 	@ ln -s $(B2SLC_PATH)/runcontrold/bin/runcontrold
@@ -8,6 +8,7 @@ all:
 	@ ln -s $(B2SLC_PATH)/ttdcontrold/bin/ttdcontrold
 	@ ln -s $(B2SLC_PATH)/rocontrold/bin/rocontrold
 	@ ln -s $(B2SLC_PATH)/templated/bin/tempd
+	@ ln -s $(B2SLC_PATH)/include/nsm/*.h .
 
 clean:
-	@ rm -f *d nsmd2
+	@ rm -f *d nsmd2 *.h

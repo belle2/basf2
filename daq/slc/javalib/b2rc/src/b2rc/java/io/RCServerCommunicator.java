@@ -43,7 +43,7 @@ public class RCServerCommunicator {
 		RunControlMessage msg = new RunControlMessage();
 		_system.getRunControlNode().setConnection(RCConnection.ONLINE);
 		_system.getRunControlNode().setState(RCState.UNKNOWN);
-		_socket_writer.writeObject(new RunControlMessage(RCCommand.STATECHECK));
+		_socket_writer.writeObject(new RunControlMessage(RCCommand.STATECHECK, -1));
 		while (true) {
 			_socket_reader.readObject(msg);
 			RCCommand cmd = msg.getCommand();
@@ -69,6 +69,30 @@ public class RCServerCommunicator {
 									+ state.getAlias() + "</span>", LogLevel.INFO));
 						}
 						_main_panel.update();
+						if ( msg.getNParams() > 3 ) {
+							int version = msg.getParam(3);
+							int exp_no = msg.getParam(4);
+							int run_no = msg.getParam(5);
+							int start_time = msg.getParam(6);
+							_system.setVersion(version);
+							_system.setExpNumber(exp_no);
+							_system.setRunNumber(run_no);
+							_system.setStartTime(start_time);
+							if ( msg.getNParams() > 7 ) {
+								int end_time = msg.getParam(7);
+								_system.setEndTime(end_time);
+							}
+							String [] str_v = msg.getData().split("\n");
+							if ( str_v.length > 0 ) {
+								String run_type = str_v[0];
+								_system.setRunType(run_type);
+							}
+							if ( str_v.length > 1 ) {
+								String operators = str_v[1];
+								_main_panel.getControlSummaryPanel().getConfigurationPanel().setOperators(operators);
+								_system.setOperators(operators);
+							}
+						}
 						if ( state_org.equals(RCState.UNKNOWN) ) {
 							_main_panel.addLog(new Log("Current run configuration:<br/>"
 									+ "<span style='color:blue;font-weight:bold;'>"
@@ -105,28 +129,6 @@ public class RCServerCommunicator {
 									" got <span style='color:blue;font-weight:bold;'>ERRPR</span> <br/>" +
 									"Message = " + msg.getData() , LogLevel.ERROR));
 						}
-					}
-					if ( msg.getNParams() > 3 ) {
-						int version = msg.getParam(3);
-						int exp_no = msg.getParam(4);
-						int run_no = msg.getParam(5);
-						int start_time = msg.getParam(6);
-						_system.setVersion(version);
-						_system.setExpNumber(exp_no);
-						_system.setRunNumber(run_no);
-						_system.setStartTime(start_time);
-						if ( msg.getNParams() > 7 ) {
-							int end_time = msg.getParam(7);
-							_system.setEndTime(end_time);
-						}
-						String [] str_v = msg.getData().split("\n");
-						String run_type = str_v[0];
-						if ( str_v.length > 1 ) {
-							String operators = str_v[1];
-							_main_panel.getControlSummaryPanel().getConfigurationPanel().setOperators(operators);
-							_system.setOperators(operators);
-						}
-						_system.setRunType(run_type);
 					}
 					_main_panel.update();
 				}

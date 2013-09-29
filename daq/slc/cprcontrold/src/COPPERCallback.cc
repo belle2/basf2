@@ -26,9 +26,6 @@ using namespace B2DAQ;
 COPPERCallback::COPPERCallback(COPPERNode* node)
   : RCCallback(node), _node(node)
 {
-  for (int slot = 0; slot < 4; slot++) {
-    _hslbcon_v[slot].setHSLB(slot, node->getHSLB(slot));
-  }
   _buf_config = NULL;
   _buf_status = NULL;
   _listener = NULL;
@@ -43,7 +40,7 @@ bool COPPERCallback::boot() throw()
   if (_buf_config == NULL) {
     _buf_config = openBuffer(4, "/cpr_config");
     if (_buf_config == NULL) {
-      B2DAQ::debug("Failed to open buffer for config");
+      B2DAQ::debug("[ERROR] Failed to open buffer /cpr_config");
       setReply("Failed to open buffer for config");
       return false;
     }
@@ -52,24 +49,28 @@ bool COPPERCallback::boot() throw()
   if (_buf_status == NULL) {
     _buf_status = openBuffer(4, "/cpr_status");
     if (_buf_status == NULL) {
-      B2DAQ::debug("Failed to open buffer for status");
+      B2DAQ::debug("[ERROR] Failed to open buffer /cpr_status");
       setReply("Failed to open buffer for status");
       return false;
     }
     memset(_buf_status, 0, sizeof(int) * 4);
   }
-
+  for (int slot = 0; slot < 4; slot++) {
+    _hslbcon_v[slot].setHSLB(slot, _node->getHSLB(slot));
+  }
+  /*
   FILE* file = popen("${B2SLC_PATH}/cprcontrold/ttrx/bootrx ${B2SLC_PATH}/cprcontrold/ttrx/tt4r009.bit", "r");
   char str[4096];
   memset(str, '\0', 4096);
   fread(str, 1, 4096 - 1, file);
   pclose(file);
   std::cout << str << std::endl;
+  */
 
   for (int slot = 0; slot < 4; slot++) {
     if (!(_hslbcon_v[slot].reset() &&
           _hslbcon_v[slot].boot())) {
-      B2DAQ::debug("Failed to boot HSLB:%c", (char)(slot + 'a'));
+      B2DAQ::debug("[ERROR] Failed to boot HSLB:%c", (char)(slot + 'a'));
       setReply(B2DAQ::form("Failed to boot HSLB:%c", (char)(slot + 'a')));
       return false;
     }
@@ -81,7 +82,7 @@ bool COPPERCallback::load() throw()
 {
   for (size_t slot = 0; slot < 4; slot++) {
     if (!_hslbcon_v[slot].load()) {
-      B2DAQ::debug("Failed to load HSLB:%c", (char)(slot + 'a'));
+      B2DAQ::debug("[ERROR] Failed to load HSLB:%c", (char)(slot + 'a'));
       return false;
     }
   }
@@ -90,7 +91,7 @@ bool COPPERCallback::load() throw()
     _listener = NULL;
     _thread.cancel();
   }
-  system("killall basf2");
+
   _fork.cancel();
   _fork = Fork(new SenderManager(_node));
   _listener = new ProcessListener(this, _fork);
@@ -128,7 +129,8 @@ bool COPPERCallback::stop() throw()
     }
   }
   */
-  memset(_buf_config, 0, sizeof(int) * 4);
+  if (_buf_config != NULL)
+    memset(_buf_config, 0, sizeof(int) * 4);
   return true;
 }
 
@@ -144,6 +146,9 @@ bool COPPERCallback::pause() throw()
 
 bool COPPERCallback::abort() throw()
 {
+  if (_buf_config != NULL)
+    memset(_buf_config, 0, sizeof(int) * 4);
+  _fork.cancel();
   return true;
 }
 

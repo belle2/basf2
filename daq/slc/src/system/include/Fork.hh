@@ -15,6 +15,7 @@ namespace B2DAQ {
     template <class WORKER>
     static void __handler_exit(int sig, void* worker) {
       delete (WORKER*)worker;
+      exit(0);
     }
 
     static void __handler_int(int sig) {
@@ -33,6 +34,7 @@ namespace B2DAQ {
 	  on_exit(__handler_exit<WORKER>, (void*)worker);
 	}
 	worker->run();
+	exit(0);
       } else if ( detached ) {
 	delete worker;
       }

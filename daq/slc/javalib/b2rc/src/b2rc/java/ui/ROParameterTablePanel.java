@@ -18,7 +18,7 @@ public class ROParameterTablePanel extends ParameterTablePanel {
 	private ArrayList<RONode> _recv_v; 
 	
 	public ROParameterTablePanel(EditorMainPanel editor_panel,VersionControlPanel version_panel, RCNodeSystem system) {
-		super(editor_panel, version_panel, system, "reciever_node", "ROPC");
+		super(editor_panel, version_panel, system, "ro_node", "ROPC");
 		_recv_v = system.getReceiverNodes();
 		DefaultTableModel model = (DefaultTableModel)getModel();
 		model.addColumn("NSM name");

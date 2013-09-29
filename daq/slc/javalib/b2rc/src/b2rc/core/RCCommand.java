@@ -43,7 +43,8 @@ public class RCCommand extends RCEnum {
 		else if (msg.equals(ABORT.getLabel())) copy(ABORT);
 		else if (msg.equals(STATECHECK.getLabel())) copy(STATECHECK);
 		else {
-			throw new RCIllegalCommandException("Illegal command = " + msg);
+			copy(UNKNOWN);
+			//throw new RCIllegalCommandException("Illegal command = " + msg);
 		}
 	}
 

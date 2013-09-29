@@ -12,6 +12,7 @@
 #include <system/Mutex.hh>
 #include <system/TCPSocketWriter.hh>
 #include <system/TCPSocketReader.hh>
+#include <system/BufferedWriter.hh>
 
 namespace B2DAQ {
 
@@ -37,6 +38,7 @@ namespace B2DAQ {
     TCPSocket _socket;
     TCPSocketWriter _writer;
     TCPSocketReader _reader;
+    BufferedWriter _buf;
     Mutex _mutex;
 
   };

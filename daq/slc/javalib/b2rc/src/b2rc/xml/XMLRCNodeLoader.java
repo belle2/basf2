@@ -344,6 +344,7 @@ public class XMLRCNodeLoader {
 					Element elc = (Element) el_v.item(i);
 					if (elc.getTagName() == "hslb") {
 						HSLB hslb = new HSLB();
+						hslb.setUsed(elc.getAttribute("used")!="false");
 						hslb.setFirmware(elc.getAttribute("firmware"));
 						hslb.setFEEModule(_module_m.get(elc.getAttribute("type")));
 						copper.setHSLB((elc.getAttribute("slot").codePointAt(0) - 'a'),hslb);

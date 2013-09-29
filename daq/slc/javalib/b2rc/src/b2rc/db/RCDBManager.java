@@ -114,7 +114,7 @@ public class RCDBManager {
 			readHostTable(ver_m.get("hosts_ver"));
 			readCOPPERNodeTable(ver_m.get("copper_node_ver"));
 			readHSLBTable(ver_m.get("hslb_ver"));
-			readRONodeTable(ver_m.get("reciever_node_ver"));
+			readRONodeTable(ver_m.get("ro_node_ver"));
 			for (String label : _system.getModuleLists().keySet()) {
 				readFEEModuleTable(label, _system.getModuleLists().get(label), ver_m.get(label + "_ver"));
 			}
@@ -141,17 +141,9 @@ public class RCDBManager {
 			ftsw.setUsed(results.getBoolean("used"));
 			ftsw.setProductID(results.getInt("product_id"));
 			ftsw.setLocation(results.getString("location"));
-			int mode = results.getInt("trigger_mode");
-			ftsw.setTriggerMode(mode);
-			ftsw.clearModules();
-			for (int slot = 0; slot < 10; slot++) {
-				String module_type = results.getString("module_type_" + slot);
-				int module_id = results.getInt("module_id_" + slot);
-				ArrayList<FEEModule> module_v = _system.getModules(module_type);
-				if (module_v != null && module_id >= 0
-						&& module_id < (int) module_v.size())
-					ftsw.addFEEModule(module_v.get(module_id));
-			}
+			ftsw.setTriggerMode(results.getInt("trigger_mode"));
+			ftsw.setDummyRate(results.getInt("dummy_rate"));
+			ftsw.setTriggerLimit(results.getInt("trigger_limit"));
 		}
 	}
 

@@ -43,7 +43,7 @@ int main(int argc, char** argv)
   using namespace B2DAQ;
 
   if (argc < 2) {
-    std::cerr << "Usage : ./runcontrold <hostname>"
+    std::cerr << "Usage : ./runcontrold <server ip for GUI>"
               << std::endl;
     return 1;
   }
@@ -75,7 +75,7 @@ int main(int argc, char** argv)
   try {
     comm->init();
   } catch (const NSMHandlerException& e) {
-    B2DAQ::debug("TTD daemon : Failed to connect NSM network. Terminate process...");
+    B2DAQ::debug("[DEBUG] Failed to connect NSM network. Terminate process...");
     return 1;
   }
   data->allocateRunConfig();
@@ -90,7 +90,7 @@ int main(int argc, char** argv)
   db->init();
   db->connect(db_host, db_name, db_user, db_password, db_port);
   try {
-    db->execute("select version, run_no, exp_no from run_config order by start_time desc limit 1;");
+    db->execute("select * from run_config order by start_time desc limit 1;");
     std::vector<DBRecord>& record_v(db->loadRecords());
     if (record_v.size() > 0) {
       data->getRunConfig()->setVersion(record_v[0].getFieldValueInt("version"));
@@ -100,7 +100,8 @@ int main(int argc, char** argv)
       try {
         config.readTables(data->getRunConfig()->getVersion());
       } catch (const IOException& e) {
-        B2DAQ::debug("Error on loading system configuration.:%s", e.what());
+        B2DAQ::debug("[FATAL] Error on loading system configuration.:%s", e.what());
+        return 1;
       }
     } else {
       data->getRunConfig()->setVersion(0);

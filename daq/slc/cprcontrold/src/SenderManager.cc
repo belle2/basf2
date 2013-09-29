@@ -26,12 +26,11 @@ std::string SenderManager::run_script(const std::string& cmd)
 
 void SenderManager::run() throw()
 {
-  B2DAQ::debug("Try to start basf2 script");
   if (_node != NULL) {
     const char* belle2_path = getenv("BELLE2_LOCAL_DIR");
     const char* belle2_sub = getenv("BELLE2_SUBDIR");
     if (belle2_path == NULL) {
-      B2DAQ::debug("env BELLE2_LOCAL_DIR is not avaiable.");
+      B2DAQ::debug("[DEBUG] env BELLE2_LOCAL_DIR is not avaiable.");
       return ;
     }
     char path[128];
@@ -40,7 +39,7 @@ void SenderManager::run() throw()
     sprintf(script_c, "%s/daq/rawdata/examples/%s",
             belle2_path, _node->getSender()->getScript().c_str());
     char hostname_c[64];
-    std::string hostname = run_script("hostname");
+    std::string hostname = _node->getSender()->getHost();
     sprintf(hostname_c, "%s", hostname.c_str());
     char id_c[32];
     sprintf(id_c, "%d", (int)_node->getID());
@@ -61,13 +60,13 @@ void SenderManager::run() throw()
     argv[i++] = id_c;
     argv[i++] = slots_c;
     argv[i++] = NULL;
-    B2DAQ::debug("%s %s %s %s %s",
+    B2DAQ::debug("[BUDEG] Executing : %s %s %s %s %s",
                  argv[0], argv[1], argv[2], argv[3], argv[4]);
     if (execvp(path, argv) == -1) {
-      B2DAQ::debug("Faield to start receiver basf2 script");
+      B2DAQ::debug("[ERROR] Faield to start receiver basf2 script");
     }
   } else {
-    B2DAQ::debug("No NSM node was registered");
+    B2DAQ::debug("[DEBUG] No NSM node was registered");
   }
 }
 

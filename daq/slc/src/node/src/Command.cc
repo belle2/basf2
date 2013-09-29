@@ -74,6 +74,6 @@ State Command::nextState() const throw()
   else if (*this == STOP) return State::READY_S;
   else if (*this == RESUME) return State::RUNNING_S;
   else if (*this == PAUSE) return State::PAUSED_S;
-  else if (*this == ABORT) return State::READY_S;
+  else if (*this == ABORT) return State::INITIAL_S;
   else return UNKNOWN;
 }

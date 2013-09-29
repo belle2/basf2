@@ -1,5 +1,7 @@
 package b2rc.java.io;
 
+import java.io.IOException;
+
 import b2daq.core.Reader;
 import b2daq.core.SerializableObject;
 import b2daq.core.Writer;
@@ -90,14 +92,20 @@ public class RunControlMessage implements SerializableObject {
 	}
 
 	public void readObject(Reader reader) throws Exception {
-		String str = reader.readString();
-		_command.copy(str);
-		int npar = reader.readInt();
-		setNParams(npar);
-		for (int i = 0; i < _pars.length; i++) {
-			_pars[i] = reader.readInt();
-		}
-		_data = reader.readString();
+		//try {
+			
+			String str = reader.readString();
+			_command.copy(str);
+			int npar = reader.readInt();
+			setNParams(npar);
+			//System.out.println(npar);
+			for (int i = 0; i < _pars.length; i++) {
+				_pars[i] = reader.readInt();
+			}
+			_data = reader.readString();
+		//} catch (Exception e) {
+		//	e.printStackTrace();
+		//}
 	}
 
 	public void writeObject(Writer writer) throws Exception {

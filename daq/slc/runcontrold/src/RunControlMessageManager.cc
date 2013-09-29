@@ -12,6 +12,8 @@
 
 #include <unistd.h>
 
+#include <iostream>
+
 using namespace B2DAQ;
 
 void RunControlMessageManager::run()
@@ -24,6 +26,8 @@ void RunControlMessageManager::run()
       _node_used_v.push_back(node->isUsed());
     }
   }
+  downloadConfig(Command::UNKNOWN,
+                 _data_man->getRunConfig()->getVersion());
   int index_seq = -1;
   Command cmd_seq;
   while (true) {
@@ -32,7 +36,8 @@ void RunControlMessageManager::run()
     Command cmd = msg.getCommand();
     const NSMMessage& nsm(msg.getMessage());
     if (msg.getId() == RunControlMessage::GUI) {
-      if (nsm.getParam(0) > 0) {
+      if (nsm.getParam(0) != (unsigned int) - 1) {
+        index_seq = -1;
         NSMNode* node = _node_system->getNodes()[nsm.getParam(0)];
         if (cmd.isAvailable(node->getState())) {
           State state_next = getNextState(cmd);
@@ -60,7 +65,11 @@ void RunControlMessageManager::run()
         } else if (cmd == Command::STOP) {
           uploadRunResult();
         } else if (cmd == Command::STATECHECK) {
-          reportRCStatus();
+          std::vector<NSMNode*>& node_v(_node_system->getNodes());
+          for (size_t i = 0; i < node_v.size(); i++) {
+            reportState(node_v[i]);
+          }
+          continue;
         }
         reportRCStatus();
         std::vector<NSMNode*>& node_v(_node_system->getNodes());
@@ -75,8 +84,7 @@ void RunControlMessageManager::run()
       if (index_seq < 0 && cmd == Command::STATECHECK) {
         std::vector<NSMNode*>& node_v(_node_system->getNodes());
         for (size_t i = 0; i < node_v.size(); i++) {
-          if (node_v[i]->isUsed())
-            send(node_v[i], cmd);
+          if (node_v[i]->isUsed()) send(node_v[i], cmd);
         }
       } else {
         int id = nsm.getNodeId();
@@ -118,7 +126,7 @@ NSMNode* RunControlMessageManager::findNode(int id) throw()
     std::string nodename = _comm->getMessage().getNodeName();
     node = getNodeByName(nodename);
     if (node == NULL) {
-      B2DAQ::debug("Unexcepted node id: %d", id);
+      B2DAQ::debug("[DEBUG] Unexcepted node id: %d", id);
       return NULL;
     }
   }
@@ -236,7 +244,7 @@ bool RunControlMessageManager::send(NSMNode* node, const Command& command) throw
       reportState(node);
     }
   } catch (const IOException& e) {
-    B2DAQ::debug("%s:%d : %s", __FILE__, __LINE__, e.what());
+    B2DAQ::debug("[DEBUG] %s:%d : %s", __FILE__, __LINE__, e.what());
   }
   if (_rc_node->getState() != State::ERROR_ES) {
     _rc_node->setState(State::ERROR_ES);
@@ -258,7 +266,7 @@ bool RunControlMessageManager::reportState(NSMNode* node, const std::string& dat
   try {
     _ui_comm->sendMessage(msg);
   } catch (const IOException& e) {
-    B2DAQ::debug("%s:%d error=%s", __FILE__, __LINE__, e.what());
+    B2DAQ::debug("[DEBUG] %s:%d error=%s", __FILE__, __LINE__, e.what());
   }
   if (node != _rc_node && node->getState() == State::ERROR_ES) {
     _rc_node->setState(State::ERROR_ES);
@@ -278,7 +286,7 @@ bool RunControlMessageManager::reportError(NSMNode* node, const std::string& dat
   try {
     _ui_comm->sendMessage(msg);
   } catch (const IOException& e) {
-    B2DAQ::debug("%s:%d error=%s", __FILE__, __LINE__, e.what());
+    B2DAQ::debug("[DEBUG] %s:%d error=%s", __FILE__, __LINE__, e.what());
   }
   return true;
 }
@@ -303,7 +311,7 @@ bool RunControlMessageManager::reportRCStatus() throw()
   try {
     _ui_comm->sendMessage(msg);
   } catch (const IOException& e) {
-    B2DAQ::debug("%s:%d error=%s", __FILE__, __LINE__, e.what());
+    B2DAQ::debug("[DEBUG] %s:%d error=%s", __FILE__, __LINE__, e.what());
   }
   return true;
 }
@@ -314,15 +322,17 @@ void RunControlMessageManager::downloadConfig(const Command& cmd, int version) t
   try {
     config.readTables(version);
   } catch (const IOException& e) {
-    B2DAQ::debug("Error on loading system configuration.:%s", e.what());
+    B2DAQ::debug("[DEBUG] Error on loading system configuration.:%s", e.what());
   }
-  std::vector<NSMNode*>& node_v(_node_system->getNodes());
-  for (size_t i = 0; i < node_v.size(); i++) {
-    NSMNode* node(node_v[i]);
-    bool used = _node_used_v[i];
-    _node_used_v[i] = node->isUsed();
-    if (node->isUsed() && !used) {
-      _comm->sendRequest(node, Command::BOOT);
+  if (cmd == Command::BOOT || cmd == Command::LOAD) {
+    std::vector<NSMNode*>& node_v(_node_system->getNodes());
+    for (size_t i = 0; i < node_v.size(); i++) {
+      NSMNode* node(node_v[i]);
+      bool used = _node_used_v[i];
+      _node_used_v[i] = node->isUsed();
+      if (node->isUsed() && !used) {
+        _comm->sendRequest(node, Command::BOOT);
+      }
     }
   }
 }
@@ -337,7 +347,7 @@ void RunControlMessageManager::uploadRunConfig() throw()
     _data_man->writeRunStatus();
     _data_man->writeRunConfig();
   } catch (const IOException& e) {
-    B2DAQ::debug("Error on writing run configuration to NSM.:%s", e.what());
+    B2DAQ::debug("[DEBUG] Error on writing run configuration to NSM.:%s", e.what());
   }
   DBRunInfoHandler handler(_db, status, config);
   try {
@@ -346,7 +356,7 @@ void RunControlMessageManager::uploadRunConfig() throw()
   try {
     handler.writeRunConfigTable();
   } catch (const IOException& e) {
-    B2DAQ::debug("Error on uploading run configuration.:%s", e.what());
+    B2DAQ::debug("[DEBUG] Error on uploading run configuration.:%s", e.what());
   }
 
 }
@@ -360,7 +370,7 @@ void RunControlMessageManager::uploadRunResult() throw()
     _data_man->writeRunStatus();
     _data_man->writeRunConfig();
   } catch (const IOException& e) {
-    B2DAQ::debug("Error on writing run configuration to NSM.:%s", e.what());
+    B2DAQ::debug("[DEBUG] Error on writing run configuration to NSM.:%s", e.what());
   }
   DBRunInfoHandler handler(_db, status, config);
   try {
@@ -369,6 +379,6 @@ void RunControlMessageManager::uploadRunResult() throw()
   try {
     handler.writeRunStatusTable();
   } catch (const IOException& e) {
-    B2DAQ::debug("Error on uploading run status.:%s", e.what());
+    B2DAQ::debug("[DEBUG] Error on uploading run status.:%s", e.what());
   }
 }

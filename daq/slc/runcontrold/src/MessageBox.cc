@@ -12,7 +12,6 @@ RunControlMessage MessageBox::pop() throw()
   while (_message_v.empty()) {
     _cond.wait(_mutex);
   }
-  //std::cerr << __FILE__ << ":" << __LINE__ << " size = " << _message_v.size() << std::endl;
   RunControlMessage message = _message_v.front();
   _message_v.pop();
   _mutex.unlock();

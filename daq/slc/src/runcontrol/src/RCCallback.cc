@@ -28,6 +28,7 @@ bool RCCallback::perform(NSMMessage& msg) throw(NSMHandlerException)
   setReply("");
   State state_org = _node->getState();
   bool result = false;
+  NSMCommunicator* com = getCommunicator();
   if (cmd == Command::BOOT) {
     result = boot();
   } else if (cmd == Command::LOAD) {
@@ -42,8 +43,10 @@ bool RCCallback::perform(NSMMessage& msg) throw(NSMHandlerException)
     result = pause();
   } else if (cmd == Command::ABORT) {
     result = abort();
+  } else if (cmd == Command::STATECHECK) {
+    com->replyOK(_node, "");
+    return true;
   }
-  NSMCommunicator* com = getCommunicator();
   if (result) {
     if (cmd != Command::STATECHECK &&
         _node->getState() == state_org) {
@@ -69,4 +72,5 @@ RCCallback::RCCallback(NSMNode* node) throw()
   add(Command::RESUME);
   add(Command::PAUSE);
   add(Command::ABORT);
+  add(Command::STATECHECK);
 }

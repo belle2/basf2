@@ -2,6 +2,8 @@
 
 #include "Serializable.hh"
 
+#include <iostream>
+
 #define __ENDIAN_L__
 
 using namespace B2DAQ;
@@ -97,10 +99,6 @@ void Writer::writeDouble(double v) throw(IOException)
 
 void Writer::writeString(const std::string& v) throw(IOException)
 {
-  //for ( size_t n = 0; n < v.size(); n++ ) {
-  //  writeChar(v.at(n));
-  //}
-  //writeChar('\n');
   writeInt((int)v.size());
   write(v.data(), v.size());
 }

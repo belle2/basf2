@@ -85,6 +85,9 @@ void RONode::setParams(const Command& command, int npar,
     _sender_i = pars[par_i++];
     _script = str_v[0];
     for (size_t i = 0; i < _sender_i; i++) {
+      if (_sender_v[i] == NULL) {
+        _sender_v[i] = new DataSender();
+      }
       _sender_v[i]->setHost(str_v[i + 1]);
     }
   } else if (command == Command::LOAD) {

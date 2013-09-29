@@ -3,6 +3,7 @@
 #include "NSMCallback.hh"
 
 #include <util/StringUtil.hh>
+#include <util/Debugger.hh>
 
 extern "C" {
 #include <nsmlib2.h>

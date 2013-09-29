@@ -25,8 +25,8 @@ public class FTSWParameterTablePanel extends ParameterTablePanel {
 		model.addColumn("Channel");
 		model.addColumn("Firmware");
 		model.addColumn("Trigger mode");
-		model.addColumn("FEEModule type");
-		model.addColumn("FEEModule ID");
+		model.addColumn("Dummy rate");
+		model.addColumn("Trigger limit");
 		_table.getModel().addTableModelListener(new TableModelListener() {
 			public void tableChanged(TableModelEvent e) {
 				int row = e.getFirstRow();
@@ -63,6 +63,16 @@ public class FTSWParameterTablePanel extends ParameterTablePanel {
 						else if ( mode_s == "ONCE" ) mode = FTSW.TRIG_ONCE;
 						else if ( mode_s == "STOP" ) mode = FTSW.TRIG_STOP;
 						ftsw.setTriggerMode(mode);
+						break;
+					}
+					case 6: {
+						int rate = Integer.parseInt(model2.getValueAt(row, col).toString());
+						ftsw.setDummyRate(rate);
+						break;
+					}
+					case 7: {
+						int limit = Integer.parseInt(model2.getValueAt(row, col).toString());
+						ftsw.setTriggerLimit(limit);
 						break;
 					}
 					}
@@ -114,6 +124,8 @@ public class FTSWParameterTablePanel extends ParameterTablePanel {
 			case FTSW.TRIG_STOP:param_v.add("STOP");break;
 			default : param_v.add("NORMAL");break;
 			}
+			param_v.add(ftsw.getDummyRate());
+			param_v.add(ftsw.getTriggerLimit());
 			model.addRow(param_v);
 		}
 		if ( _ttd_panel != null ) _ttd_panel.update();

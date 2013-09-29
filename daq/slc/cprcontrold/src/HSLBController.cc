@@ -19,6 +19,7 @@ HSLBController::~HSLBController() throw() {}
 
 bool HSLBController::boot() throw()
 {
+  B2DAQ::debug("hslb == %s", _hslb == NULL ? "null" : "not null");
   if (_hslb == NULL) return true;
   int board_type, firmware, hardware;
   if (_hslb->isUsed()) {
@@ -26,6 +27,8 @@ bool HSLBController::boot() throw()
     if (firmware_path == NULL) return false;
     const std::string path = B2DAQ::form("%s/%s", firmware_path,
                                          _hslb->getFirmware().c_str());
+    B2DAQ::debug("[DEBUG] Firmware path = %s", path.c_str());
+    return true;
     _mgt = mgt_boot(_slot, path.c_str(),
                     &board_type, &firmware, &hardware);
     if (_mgt == NULL) return false;
@@ -35,6 +38,7 @@ bool HSLBController::boot() throw()
 
 bool HSLBController::reset() throw()
 {
+  return true;
   if (_mgt != NULL) {
     mgt_execute(_mgt, CTL_RESET_LINK);
     mgt_close(_mgt);
@@ -47,7 +51,7 @@ bool HSLBController::reset() throw()
 
 bool HSLBController::load() throw()
 {
-  if (_hslb == NULL || _mgt == NULL) return true;
+  if (_hslb == NULL /*|| _mgt == NULL*/) return true;
   FEEModule* module = _hslb->getFEEModule();
   if (module != NULL) {
     mgt_execute(_mgt, CTL_VERBOSE);
@@ -57,14 +61,16 @@ bool HSLBController::load() throw()
       for (size_t ch = 0; ch < reg.length(); ch++) {
         if (reg.getValue(ch) < 0) continue;
         int address = 0;
-        if (reg.getSize() == 1) {
-          address = reg.getAddress() + ch;
-          mgt_set_param(_mgt, address, reg.getValue(ch));
-        } else if (reg.getSize() == 2) {
-          address = reg.getAddress() + ch * 2;
-          mgt_set_param2(_mgt, address, reg.getValue(ch));
-        }
-        B2DAQ::debug("  set register to address = %x ( value = %d )",
+        /*
+              if (reg.getSize() == 1) {
+                address = reg.getAddress() + ch;
+                mgt_set_param(_mgt, address, reg.getValue(ch));
+              } else if (reg.getSize() == 2) {
+                address = reg.getAddress() + ch * 2;
+                mgt_set_param2(_mgt, address, reg.getValue(ch));
+              }
+        */
+        B2DAQ::debug("[DEBUG] Register write to address = %x with value = %d",
                      address, reg.getValue(ch));
       }
     }

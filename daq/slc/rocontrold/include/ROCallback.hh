@@ -1,11 +1,12 @@
 #ifndef _B2DAQ_ROCallback_hh
 #define _B2DAQ_ROCallback_hh
 
-#include <system/Fork.hh>
+#include <runcontrol/RCCallback.hh>
 
 #include <node/RONode.hh>
 
-#include <runcontrol/RCCallback.hh>
+#include <system/Fork.hh>
+#include <system/PThread.hh>
 
 namespace B2DAQ {
 
@@ -32,6 +33,7 @@ namespace B2DAQ {
     int* _buf_config;
     int* _buf_status;
     Fork _fork_v[2];//0:eb0, 1:RecvStream1.py
+    PThread _thread_v[2];//0:eb0, 1:RecvStream1.py
     
   };
 

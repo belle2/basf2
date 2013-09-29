@@ -14,8 +14,6 @@ using namespace B2DAQ;
 
 void EventBuilderManager::run() throw()
 {
-  //${BELLE2_LOCAL_DIR}/daq/eventbuilder/evb0/eb0 -n 2 cpr006 cpr007 -D -b
-  //${BELLE2_LOCAL_DIR}/daq/copper/daq_scripts/RecvStream1.sh
   if (_node != NULL) {
     char* argv[30];
     char path[128];

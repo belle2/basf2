@@ -106,6 +106,8 @@ public class SystemStatusPanel extends JPanel implements Updatable {
 
 	public void update() {
 		_daq_state_label.update(_system.getRunControlNode());
+		setExpNumber(_system.getExpNumber());
+		setRunNumber(_system.getRunNumber());
 		setStartTime(_system.getStartTime());
 		setEndTime(_system.getEndTime());
 	}

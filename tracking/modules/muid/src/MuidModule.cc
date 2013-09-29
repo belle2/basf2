@@ -22,6 +22,7 @@
 #include <simulation/kernel/ExtManager.h>
 #include <simulation/kernel/ExtPhysicsList.h>
 #include <simulation/kernel/ExtCylSurfaceTarget.h>
+#include <ecl/geometry/ECLGeometryPar.h>
 #include <bklm/geometry/GeometryPar.h>
 
 #include <cmath>
@@ -86,6 +87,8 @@ MuidModule::MuidModule() : Module(), m_extMgr(NULL)    // no ExtManager yet
   setDescription("Identifies muons by extrapolating tracks from CDC to KLM using geant4e");
   setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
   addParam("pdgCodes", m_pdgCode, "Positive-charge PDG codes for extrapolation hypotheses", m_pdgCode);
+  addParam("BKLMHitsColName", m_bklmHitsColName, "Name of collection holding the reconstructed 2D hits in barrel KLM", string(""));
+  addParam("EKLMHitsColName", m_eklmHitsColName, "Name of collection holding the reconstructed 2D hits in endcap KLM", string(""));
   addParam("TracksColName", m_tracksColName, "Name of collection holding the reconstructed tracks", string(""));
   addParam("MuidLikelihoodsColName", m_muidLikelihoodsColName, "Name of collection holding the muon identification likelihood information from the extrapolation", string(""));
   addParam("MuidsColName", m_muidsColName, "Name of collection holding the muon identification information from the extrapolation", string(""));
@@ -189,7 +192,7 @@ void MuidModule::initialize()
   double dz(eklmContent.getLength("Endcap/Layer/ShiftZ")); // in G4e units (cm)
   double z0(eklmContent.getLength("Endcap/PositionZ") - m_OffsetZ + dz - 0.5 * eklmContent.getLength("Endcap/Layer/Length")); // in G4e units (cm)
   for (int layer = 1; layer <= m_EndcapLayers; ++layer) {
-    m_EndcapModuleMiddleZ[layer - 1] = z0 + dz * (layer - 1);  // in G4e units (cm)
+    m_EndcapModuleMiddleZ[layer - 1] = z0 + dz * (layer - 1); // in G4e units (cm)
   }
   m_EndcapActiveMinR = eklmContent.getLength("Endcap/Layer/Sector/Plane/InnerR");  // in G4e units (cm)
   m_EndcapActiveMaxR = eklmContent.getLength("Endcap/Layer/Sector/Plane/OuterR");  // in G4e units (cm)
@@ -306,6 +309,7 @@ void MuidModule::event()
 
       getStartPoint(gfTrack, pdgCode, position, momentum, covG4e);
       if (gfTrack->getMom().Pt() <= m_minPt) continue;
+      if (m_target->GetDistanceFromPoint(position) < 0.0) continue;
       G4ParticleDefinition* particle = G4ParticleTable::GetParticleTable()->FindParticle(pdgCode);
       string g4eName = "g4e_" + particle->GetParticleName();
       double mass = particle->GetPDGMass();
@@ -1038,7 +1042,7 @@ void MuidModule::findMatchingBarrelHit(Point& p, const StoreArray<BKLMHit2d>& bk
 {
 
   double diffBest = 1.0E12;
-  double localVariance[2] = {m_StripPositionError, m_StripPositionError};
+  double localVariance[2] = {m_StripPositionVariance, m_StripPositionVariance};
 
   p.hasMatchingHit = false;
   BKLMHit2d* hitBest = NULL;

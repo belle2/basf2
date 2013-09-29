@@ -268,6 +268,12 @@ void ExtModule::event()
           createHit(state, EXT_ESCAPE, t, pdgCode, extHits, TrackToExtHits);
           break;
         }
+        /* DIVOT */
+        if ((track->GetPosition().perp2() > 2890000.0) || (track->GetPosition().z() < -1735.0) || (track->GetPosition().z() > 2675.0)) {
+          B2WARNING("Ext::event(): position is outside target:  (" << track->GetPosition().x() << ", " << track->GetPosition().y() << ", " << track->GetPosition().z() << ")  r = " << track->GetPosition().perp())
+          break;
+        }
+        /* END DIVOT */
 
       } // track-extrapolation "infinite" loop
 

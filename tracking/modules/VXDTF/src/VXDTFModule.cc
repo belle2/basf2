@@ -1195,7 +1195,9 @@ void VXDTFModule::the_real_event()
     passNumber--;
   }
 
-  m_baselinePass.sectorMap.find(centerSector)->second->addHit(new VXDTFHit(vertexInfo, 0, 0, 0, 0, Const::IR, centerSector, centerVxdID, 0.0)); // uses orignValues of first pass since reverse foreach has been used
+  VXDTFHit* baseLineVertexHit = new VXDTFHit(vertexInfo, 0, 0, 0, 0, Const::IR, centerSector, centerVxdID, 0.0);
+  m_baselinePass.sectorMap.find(centerSector)->second->addHit(baseLineVertexHit);
+  m_baselinePass.hitVector.push_back(baseLineVertexHit);
 
   stopTimer = boostClock::now();
   m_TESTERtimeConsumption.intermediateStuff += boost::chrono::duration_cast<boostNsec>(stopTimer - beginEvent);
@@ -2506,7 +2508,7 @@ void VXDTFModule::greedyRecursive(std::list< std::pair<double, VXDTFTrackCandida
 
   while (tcEntry->second->getCondition() == false) {
     tcEntry = overlappingTCs.erase(tcEntry);
-    if (tcEntry == overlappingTCs.end()) return;
+    if (tcEntry == overlappingTCs.end() or overlappingTCs.empty() == true) return;
   }
 
   double qi = tcEntry->first;
@@ -2529,7 +2531,8 @@ void VXDTFModule::greedyRecursive(std::list< std::pair<double, VXDTFTrackCandida
     totalSurvivingQI += qi;
   }
 
-  overlappingTCs.pop_front();
+  if (overlappingTCs.empty() != true) { overlappingTCs.pop_front(); }
+
 
   greedyRecursive(overlappingTCs, totalSurvivingQI, countSurvivors, countKills);
 

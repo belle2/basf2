@@ -31,13 +31,13 @@ namespace Belle2 {
         m_radius(0.),
         m_x2(0.),
         m_y2(0.),
-        m_z2(0.),
-        m_magneticFieldFactor(1.5) {
+        m_z2(0.) {
         m_hitA.SetXYZ(0., 0., 0.);
         m_hitB.SetXYZ(0., 0., 0.);
         m_hitC.SetXYZ(0., 0., 0.);
         m_vecAB.SetXYZ(0., 0., 0.);
         m_vecBC.SetXYZ(0., 0., 0.);
+        resetMagneticField(1.5);
       }
 
       /** Constructor. needs the first parameter is outer hit, second is center hit, third is inner hit. Parameters in TVector3-format, Optional parameter is the strength of the magnetic field in Tesla*/

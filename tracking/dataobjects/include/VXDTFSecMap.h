@@ -97,8 +97,8 @@ namespace Belle2 {
 
   protected:
     SecMapCopy m_sectorMap; /**< contains full information of the sectorMap */
-    std::string  m_nameOfSecMap; /**< Name of the sectorMap */
-    std::string  m_detectorType; /**< Name of the detectorType (PXD, SVD, VXD) */
+    std::string m_nameOfSecMap; /**< Name of the sectorMap */
+    std::string m_detectorType; /**< Name of the detectorType (PXD, SVD, VXD) */
     std::vector<double> m_sectorConfigU; /**< allows defining the the config of the sectors in U direction value is valid for each sensor of chosen detector setup, minimum 2 values between 0.0 and 1.0 */
     std::vector<double> m_sectorConfigV; /**< allows defining the the config of the sectors in V direction value is valid for each sensor of chosen detector setup, minimum 2 values between 0.0 and 1.0 */
     TVector3 m_origin; /**< defines the position of the assumed primary vertex */

@@ -41,8 +41,8 @@ namespace Belle2 {
         m_clusterInfoV(NULL), // SVD only
         m_clusterInfoUV(NULL), // PXD only
         m_detectorType(-1), //  0 = PXD, 1 = SVD, -1 should not occur
-        m_papaSector(),
-        m_VxdID(),
+        m_papaSector(0),
+        m_VxdID(0),
         m_timeStamp(0),
         m_attachedTrackCandidates(0) {}
 

@@ -54,25 +54,11 @@ g4sim.param('StoreAllSecondaries', True)
 vxdtf = register_module('VXDTF')
 vxdtf.logging.log_level = LogLevel.INFO
 vxdtf.logging.debug_level = 6
-# calcQIType:  Supports 'kalman', 'circleFit' or 'trackLength'
-# filterOverlappingTCs: Supports 'hopfield' (good but slow), 'greedy' (faster but worse results), 'none' (no overlapping tc-removal)
-param_vxdtf = {'sectorSetup': secSetup}  # 'activateBaselineTF': 0,
-                                         # 'tccMinState': [2],
-                                         # 'tccMinLayer': [3],
-                                         # 'reserveHitsThreshold': [0.6],
-    # 'calcQIType': 'circleFit',
-    # 'tuneCircleFit': [0.001, 0.001, 0.00001],
-    # 'filterOverlappingTCs': 'hopfield',
-    # 'cleanOverlappingSet': True,
-    # 'activateZigZagXY': [False, True, True],
-    # 'TESTERexpandedTestingRoutines': True,
-    # 'qiSmear': False,
+param_vxdtf = {'sectorSetup': secSetup}
 vxdtf.param(param_vxdtf)
 
 mctrackfinder = register_module('MCTrackFinder')
 mctrackfinder.logging.log_level = LogLevel.INFO
-mctrackfinder.logging.debug_level = 101
-
 # select which detectors you would like to use
 param_mctrackfinder = {
     'UseCDCHits': 0,

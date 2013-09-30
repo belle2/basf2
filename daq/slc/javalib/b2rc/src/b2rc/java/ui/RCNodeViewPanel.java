@@ -92,28 +92,28 @@ public class RCNodeViewPanel extends JPanel implements Updatable {
 							JMenu submenu = new JMenu(command.getAlias());
 							JMenuItem item = new JMenuItem("NONE");
 							item.addActionListener(new TrgFTCommandMenuItemListener(FTSW.TRIG_NORMAL));
-							menu.add(item);
+							submenu.add(item);
 							item = new JMenuItem("IN");
 							item.addActionListener(new TrgFTCommandMenuItemListener(FTSW.TRIG_IN));
-							menu.add(item);
+							submenu.add(item);
 							item = new JMenuItem("PULSE");
 							item.addActionListener(new TrgFTCommandMenuItemListener(FTSW.TRIG_PULSE));
-							menu.add(item);
+							submenu.add(item);
 							item = new JMenuItem("REVO");
 							item.addActionListener(new TrgFTCommandMenuItemListener(FTSW.TRIG_REVO));
-							menu.add(item);
+							submenu.add(item);
 							item = new JMenuItem("RANDOM");
 							item.addActionListener(new TrgFTCommandMenuItemListener(FTSW.TRIG_RANDOM));
-							menu.add(item);
+							submenu.add(item);
 							item = new JMenuItem("POSSION");
 							item.addActionListener(new TrgFTCommandMenuItemListener(FTSW.TRIG_POSSION));
-							menu.add(item);
+							submenu.add(item);
 							item = new JMenuItem("ONCE");
 							item.addActionListener(new TrgFTCommandMenuItemListener(FTSW.TRIG_ONCE));
-							menu.add(item);
+							submenu.add(item);
 							item = new JMenuItem("STOP");
 							item.addActionListener(new TrgFTCommandMenuItemListener(FTSW.TRIG_STOP));
-							menu.add(item);
+							submenu.add(item);
 							menu.add(submenu);
 						}
 					}

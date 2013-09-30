@@ -93,12 +93,10 @@ bool COPPERCallback::load() throw()
     _thread.cancel();
   }
 
-  /*
   _fork.cancel();
   _fork = Fork(new SenderManager(_node));
   _listener = new ProcessListener(this, _fork);
   _thread = PThread(_listener);
-  */
   return true;
 }
 

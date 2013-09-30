@@ -12,7 +12,7 @@ using namespace B2DAQ;
 int main(int argc, char** argv)
 {
   if (argc < 2) {
-    B2DAQ::debug("Usage : ./recvd <name>");
+    B2DAQ::debug("Usage : ./rocontrold <name>");
     return 1;
   }
   const char* name = argv[1];

@@ -22,9 +22,17 @@ void EventBuilderManager::run() throw()
       B2DAQ::debug("env BELLE2_LOCAL_DIR is not avaiable.");
       return ;
     }
+    int i = 0;
     //sprintf(path, "%s/daq/eventbuilder/evb0/eb0", belle2_path);
-    sprintf(path, "/home/usr/eb2daq/eb0 trgcpr002:33000", belle2_path);
-    argv[0] = path;
+    sprintf(path, "/home/usr/eb2daq/eb/gen-eb0.sh");//, belle2_path);
+    argv[i++] = path;
+
+    char sender_c_v[20][128];
+    for (int j = 0; j < _node->getNSenders(); j++) {
+      sprintf(sender_c_v[j], "%s", _node->getSender(j)->getHost().c_str());
+      argv[j + 1] = sender_c_v[j];
+      i++;
+    }
 
     /*
     char arg_n_c[10];
@@ -50,7 +58,6 @@ void EventBuilderManager::run() throw()
     sprintf(arg_b_c, "-b");
     argv[i++] = arg_b_c;
     */
-    int i = 0;
     argv[i++] = NULL;
     i = 0;
     while (argv[i] != NULL) {
@@ -59,7 +66,7 @@ void EventBuilderManager::run() throw()
     }
     printf("\n");
     if (execvp(path, argv) == -1) {
-      B2DAQ::debug("Faield to start eb0");
+      B2DAQ::debug("Faield to configure eb0");
     }
   }
 }

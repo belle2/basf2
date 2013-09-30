@@ -96,19 +96,23 @@ int main(int argc, char** argv)
       data->getRunConfig()->setVersion(record_v[0].getFieldValueInt("version"));
       data->getRunStatus()->setExpNumber(record_v[0].getFieldValueInt("exp_no"));
       data->getRunStatus()->setRunNumber(record_v[0].getFieldValueInt("run_no"));
-      DBNodeSystemConfigurator config(db, &node_system);
-      try {
-        config.readTables(data->getRunConfig()->getVersion());
-      } catch (const IOException& e) {
-        B2DAQ::debug("[FATAL] Error on loading system configuration.:%s", e.what());
-        return 1;
-      }
     } else {
       data->getRunConfig()->setVersion(0);
       data->getRunStatus()->setExpNumber(0);
       data->getRunStatus()->setRunNumber(0);
     }
-  } catch (const std::exception& e) {}
+    try {
+      DBNodeSystemConfigurator config(db, &node_system);
+      config.readTables(data->getRunConfig()->getVersion());
+    } catch (const IOException& e) {
+      B2DAQ::debug("[FATAL] Error on loading system configuration.:%s", e.what());
+      return 1;
+    }
+  } catch (const std::exception& e) {
+    data->getRunConfig()->setVersion(0);
+    data->getRunStatus()->setExpNumber(0);
+    data->getRunStatus()->setRunNumber(0);
+  }
   HostCommunicator* ui_comm =  new GUICommunicator(server_socket, db, loader);
   B2DAQ::PThread(new Listener(ui_comm));
   B2DAQ::PThread(new LocalNSMCommunicator(comm));

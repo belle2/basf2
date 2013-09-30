@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <hosts>
   <host type="pc" name="ropc01" />
+  <host type="copper" name="trgcpr001" />
+  <host type="copper" name="trgcpr002" />
   <host type="copper" name="cpr001" />
   <host type="copper" name="cpr002" />
   <host type="copper" name="cpr003" />

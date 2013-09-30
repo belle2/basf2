@@ -31,8 +31,8 @@ export NSMD2_DEBUG=1
 export NSMD2_LOGDIR=$B2SLC_PATH/log/nsm2
 
 ## setup for slow control database access ##
-export B2SC_DB_HOST="b2slow2.kek.jp";
-#export B2SC_DB_HOST="ropc01.kek.jp";
+#export B2SC_DB_HOST="b2slow2.kek.jp";
+export B2SC_DB_HOST="ropc01.kek.jp";
 export B2SC_DB_NAME="b2slow_test";
 export B2SC_DB_USER="slcdaq";
 export B2SC_DB_PASS="slcdaq";

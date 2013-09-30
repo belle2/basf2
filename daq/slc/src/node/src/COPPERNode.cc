@@ -9,6 +9,7 @@
 #include <util/StringUtil.hh>
 #include <util/Debugger.hh>
 
+#include <iostream>
 #include <sstream>
 
 using namespace B2DAQ;
@@ -66,9 +67,9 @@ int COPPERNode::getParams(const Command& command, unsigned int* pars,
   std::stringstream ss; ss.str("");
   if (command == Command::BOOT) {
     pars[npar++] = getID();
+    pars[npar++] = 0;
     ss << _sender->getHost() << " "
        << _sender->getScript();
-    pars[npar++] = 0;
     for (size_t i = 0; i < MAX_HSLBS; i++) {
       if (_hslb_v[i] != NULL) {
         pars[1] |= _hslb_v[i]->isUsed();
@@ -116,7 +117,7 @@ void COPPERNode::setParams(const Command& command,
 {
   int par_i = 0;
   if (command == Command::BOOT) {
-    par_i = 1;
+    par_i = 2;
     std::vector<std::string> str_v = B2DAQ::split(datap, ' ');
     setID(pars[0]);
     _sender->setHost(str_v[0]);
@@ -127,9 +128,10 @@ void COPPERNode::setParams(const Command& command,
         _hslb_v[i]->setFEEModule(new FEEModule());
       }
       _hslb_v[i]->setUsed((pars[1] >> i) & 0x01);
-      FEEModule* module = _hslb_v[i]->getFEEModule();
       _hslb_v[i]->setFirmware(str_v[i + 2]);
       size_t nreg = pars[par_i++];
+      FEEModule* module = _hslb_v[i]->getFEEModule();
+      module->clearRegisters();
       for (size_t i = 0; i < nreg; i++) {
         FEEModule::Register reg;
         reg.setSize(pars[par_i++]);

@@ -17,12 +17,6 @@ size_t FEEModule::count() const throw()
 
 void FEEModule::addRegister(const Register& reg) throw()
 {
-  for (size_t i = 0; i < _reg_v.size(); i++) {
-    if (_reg_v[i].getName() == reg.getName()) {
-      //_reg_v[i] = reg;
-      return;
-    }
-  }
   _reg_v.push_back(reg);
 }
 

@@ -65,8 +65,8 @@ bool COPPERCallback::boot() throw()
   fread(str, 1, 4096 - 1, file);
   pclose(file);
   std::cout << str << std::endl;
-  */
 
+  */
   for (int slot = 0; slot < 4; slot++) {
     if (!(_hslbcon_v[slot].reset() &&
           _hslbcon_v[slot].boot())) {
@@ -75,6 +75,7 @@ bool COPPERCallback::boot() throw()
       return false;
     }
   }
+
   return true;
 }
 
@@ -92,10 +93,12 @@ bool COPPERCallback::load() throw()
     _thread.cancel();
   }
 
+  /*
   _fork.cancel();
   _fork = Fork(new SenderManager(_node));
   _listener = new ProcessListener(this, _fork);
   _thread = PThread(_listener);
+  */
   return true;
 }
 

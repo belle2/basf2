@@ -64,6 +64,7 @@ namespace B2DAQ {
     void addRegister(const Register& reg) throw();
     void setRegister(int index, const Register& reg) throw() { _reg_v[index] = reg; }
     void setRegisters(const RegisterList& reg_v) throw() { _reg_v = reg_v; }
+    void clearRegisters() throw() { _reg_v = RegisterList(); }
     size_t count() const throw();
     virtual const std::string getSQLFields() const throw();
     virtual const std::string getSQLLabels() const throw();

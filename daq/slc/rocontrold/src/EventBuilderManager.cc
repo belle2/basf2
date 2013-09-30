@@ -22,9 +22,11 @@ void EventBuilderManager::run() throw()
       B2DAQ::debug("env BELLE2_LOCAL_DIR is not avaiable.");
       return ;
     }
-    sprintf(path, "%s/daq/eventbuilder/evb0/eb0", belle2_path);
+    //sprintf(path, "%s/daq/eventbuilder/evb0/eb0", belle2_path);
+    sprintf(path, "/home/usr/eb2daq/eb0 trgcpr002:33000", belle2_path);
     argv[0] = path;
 
+    /*
     char arg_n_c[10];
     sprintf(arg_n_c, "-n");
     argv[1] = arg_n_c;
@@ -47,6 +49,8 @@ void EventBuilderManager::run() throw()
     char arg_b_c[10];
     sprintf(arg_b_c, "-b");
     argv[i++] = arg_b_c;
+    */
+    int i = 0;
     argv[i++] = NULL;
     i = 0;
     while (argv[i] != NULL) {

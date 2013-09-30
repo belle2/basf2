@@ -1,7 +1,5 @@
 package b2rc.java.io;
 
-import java.io.IOException;
-
 import b2daq.core.Reader;
 import b2daq.core.SerializableObject;
 import b2daq.core.Writer;

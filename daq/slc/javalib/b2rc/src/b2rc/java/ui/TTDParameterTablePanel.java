@@ -7,7 +7,6 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 
-import b2rc.core.COPPERNode;
 import b2rc.core.RCNodeSystem;
 import b2rc.core.TTDNode;
 import b2rc.db.RCDBManager;

@@ -70,7 +70,7 @@ public class RCNodeViewPanel extends JPanel implements Updatable {
 						command_v.add(RCCommand.LOAD);
 						command_v.add(RCCommand.START);
 						if ( _node instanceof TTDNode ) {
-							command_v.add(RCCommand.TRGFT);
+							command_v.add(RCCommand.TRGIFT);
 						}
 					} else if (_node.getState().equals(RCState.RUNNING_S)) {
 						command_v.add(RCCommand.STOP);
@@ -84,7 +84,7 @@ public class RCNodeViewPanel extends JPanel implements Updatable {
 					JMenu menu = new JMenu("Command");
 					popup_menu.add(menu);
 					for (RCCommand command : command_v) {
-						if ( !command.equal(RCCommand.TRGFT) ) {
+						if ( !command.equal(RCCommand.TRGIFT) ) {
 							JMenuItem item = new JMenuItem(command.getAlias());
 							item.addActionListener(new CommandMenuItemListener(command));
 							menu.add(item);
@@ -183,7 +183,7 @@ public class RCNodeViewPanel extends JPanel implements Updatable {
 	}
 
 	private class TrgFTCommandMenuItemListener implements ActionListener {
-		private RCCommand _command = RCCommand.TRGFT;
+		private RCCommand _command = RCCommand.TRGIFT;
 		private int _param = 0;
 		
 		public TrgFTCommandMenuItemListener(int param) {
@@ -191,9 +191,14 @@ public class RCNodeViewPanel extends JPanel implements Updatable {
 		}
 
 		public void actionPerformed(ActionEvent arg0) {
-			int [] value_v = new int[2];
+			int [] value_v = new int[6];
 			value_v[0] = _node.getIndex();
 			value_v[1] = _param;
+			value_v[2] = 0;
+			value_v[3] = 0;
+			value_v[4] = 0;
+			value_v[5] = 0;
+			value_v[6] = 0;
 			try {
 				RCServerCommunicator.get().sendMessage(new RunControlMessage(_command, value_v));
 			} catch (Exception e) {

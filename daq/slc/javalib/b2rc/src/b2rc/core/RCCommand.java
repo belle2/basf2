@@ -17,7 +17,7 @@ public class RCCommand extends RCEnum {
 	final static public RCCommand PAUSE = new RCCommand(106, "PAUSE", "PAUSE");
 	final static public RCCommand ABORT = new RCCommand(107, "ABORT", "ABORT");
 	final static public RCCommand STATECHECK = new RCCommand(201, "STATECHECK", "STATECHECK");
-	final static public RCCommand TRGFT = new RCCommand(301, "TRGFT", "TRGFT");
+	final static public RCCommand TRGIFT = new RCCommand(301, "TRIGFT", "TRIGFT");
 
 	public RCCommand() {
 		copy(RCCommand.UNKNOWN);
@@ -43,7 +43,7 @@ public class RCCommand extends RCEnum {
 		else if (msg.equals(PAUSE.getLabel())) copy(PAUSE);
 		else if (msg.equals(ABORT.getLabel())) copy(ABORT);
 		else if (msg.equals(STATECHECK.getLabel())) copy(STATECHECK);
-		else if (msg.equals(TRGFT.getLabel())) copy(TRGFT);
+		else if (msg.equals(TRGIFT.getLabel())) copy(TRGIFT);
 		else {
 			copy(UNKNOWN);
 			//throw new RCIllegalCommandException("Illegal command = " + msg);
@@ -68,7 +68,7 @@ public class RCCommand extends RCEnum {
 			return ENABLED;
 		} else if (equals(RESUME) && state.equals(RCState.PAUSED_S)) {
 			return SUGGESTED;
-		} else if (equals(STATECHECK) || equals(OK) || equals(TRGFT) || 
+		} else if (equals(STATECHECK) || equals(OK) || equals(TRGIFT) || 
 				equals(ERROR) || equals(ABORT)) {
 			return ENABLED;
 		} else {

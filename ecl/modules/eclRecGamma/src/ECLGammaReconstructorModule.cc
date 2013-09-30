@@ -119,12 +119,12 @@ void ECLGammaReconstructorModule::event()
     for (int iHA = 0; iHA < eclHitAssignmentArray.getEntries(); iHA++) {
 
       ECLHitAssignment* aECLHitAssignment = eclHitAssignmentArray[iHA];
-      int m_HAShowerId = aECLHitAssignment->getShowerId();
-      int m_HAcellId = aECLHitAssignment->getCellId() - 1;
+      m_HAshowerId = aECLHitAssignment->getShowerId();
+      m_HAcellId = aECLHitAssignment->getCellId() - 1;
 
-      if (m_HAShowerId != m_showerId)continue;
-      if (m_HAShowerId > m_showerId)break;
-      if (m_HAShowerId == m_showerId) {
+      if (m_HAshowerId != m_showerId)continue;
+      if (m_HAshowerId > m_showerId)break;
+      if (m_HAshowerId == m_showerId) {
         if (m_TrackCellId[m_HAcellId]) {m_extMatch = true; break;}
 
       }//if HAShowerId == ShowerId

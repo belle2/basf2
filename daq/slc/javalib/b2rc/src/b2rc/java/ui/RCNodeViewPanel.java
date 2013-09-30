@@ -18,9 +18,11 @@ import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 
 import b2daq.ui.Updatable;
+import b2rc.core.FTSW;
 import b2rc.core.RCCommand;
 import b2rc.core.RCNode;
 import b2rc.core.RCState;
+import b2rc.core.TTDNode;
 import b2rc.java.io.RCServerCommunicator;
 import b2rc.java.io.RunControlMessage;
 
@@ -67,7 +69,11 @@ public class RCNodeViewPanel extends JPanel implements Updatable {
 						command_v.add(RCCommand.BOOT);
 						command_v.add(RCCommand.LOAD);
 						command_v.add(RCCommand.START);
+						if ( _node instanceof TTDNode ) {
+							command_v.add(RCCommand.TRGFT);
+						}
 					} else if (_node.getState().equals(RCState.RUNNING_S)) {
+						command_v.add(RCCommand.STOP);
 						command_v.add(RCCommand.PAUSE);
 						command_v.add(RCCommand.ABORT);
 					} else if (_node.getState().equals(RCState.PAUSED_S)) {
@@ -78,10 +84,38 @@ public class RCNodeViewPanel extends JPanel implements Updatable {
 					JMenu menu = new JMenu("Command");
 					popup_menu.add(menu);
 					for (RCCommand command : command_v) {
-						JMenuItem item = new JMenuItem(command.getAlias());
-						item.addActionListener(new CommandMenuItemListener(
-								command));
-						menu.add(item);
+						if ( !command.equal(RCCommand.TRGFT) ) {
+							JMenuItem item = new JMenuItem(command.getAlias());
+							item.addActionListener(new CommandMenuItemListener(command));
+							menu.add(item);
+						} else {
+							JMenu submenu = new JMenu(command.getAlias());
+							JMenuItem item = new JMenuItem("NONE");
+							item.addActionListener(new TrgFTCommandMenuItemListener(FTSW.TRIG_NORMAL));
+							menu.add(item);
+							item = new JMenuItem("IN");
+							item.addActionListener(new TrgFTCommandMenuItemListener(FTSW.TRIG_IN));
+							menu.add(item);
+							item = new JMenuItem("PULSE");
+							item.addActionListener(new TrgFTCommandMenuItemListener(FTSW.TRIG_PULSE));
+							menu.add(item);
+							item = new JMenuItem("REVO");
+							item.addActionListener(new TrgFTCommandMenuItemListener(FTSW.TRIG_REVO));
+							menu.add(item);
+							item = new JMenuItem("RANDOM");
+							item.addActionListener(new TrgFTCommandMenuItemListener(FTSW.TRIG_RANDOM));
+							menu.add(item);
+							item = new JMenuItem("POSSION");
+							item.addActionListener(new TrgFTCommandMenuItemListener(FTSW.TRIG_POSSION));
+							menu.add(item);
+							item = new JMenuItem("ONCE");
+							item.addActionListener(new TrgFTCommandMenuItemListener(FTSW.TRIG_ONCE));
+							menu.add(item);
+							item = new JMenuItem("STOP");
+							item.addActionListener(new TrgFTCommandMenuItemListener(FTSW.TRIG_STOP));
+							menu.add(item);
+							menu.add(submenu);
+						}
 					}
 					popup_menu.show(e.getComponent(), e.getX(), e.getY());
 				}
@@ -140,6 +174,26 @@ public class RCNodeViewPanel extends JPanel implements Updatable {
 		public void actionPerformed(ActionEvent arg0) {
 			int [] value_v = new int[1];
 			value_v[0] = _node.getIndex();
+			try {
+				RCServerCommunicator.get().sendMessage(new RunControlMessage(_command, value_v));
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	private class TrgFTCommandMenuItemListener implements ActionListener {
+		private RCCommand _command = RCCommand.TRGFT;
+		private int _param = 0;
+		
+		public TrgFTCommandMenuItemListener(int param) {
+			_param = param;
+		}
+
+		public void actionPerformed(ActionEvent arg0) {
+			int [] value_v = new int[2];
+			value_v[0] = _node.getIndex();
+			value_v[1] = _param;
 			try {
 				RCServerCommunicator.get().sendMessage(new RunControlMessage(_command, value_v));
 			} catch (Exception e) {

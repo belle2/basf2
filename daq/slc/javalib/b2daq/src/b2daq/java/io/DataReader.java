@@ -2,7 +2,6 @@ package b2daq.java.io;
 
 //import java.io.BufferedInputStream;
 import java.io.DataInputStream;
-import java.io.EOFException;
 import java.io.InputStream;
 
 import b2daq.core.Reader;

@@ -92,20 +92,14 @@ public class RunControlMessage implements SerializableObject {
 	}
 
 	public void readObject(Reader reader) throws Exception {
-		//try {
-			
-			String str = reader.readString();
-			_command.copy(str);
-			int npar = reader.readInt();
-			setNParams(npar);
-			//System.out.println(npar);
-			for (int i = 0; i < _pars.length; i++) {
-				_pars[i] = reader.readInt();
-			}
-			_data = reader.readString();
-		//} catch (Exception e) {
-		//	e.printStackTrace();
-		//}
+		String str = reader.readString();
+		_command.copy(str);
+		int npar = reader.readInt();
+		setNParams(npar);
+		for (int i = 0; i < _pars.length; i++) {
+			_pars[i] = reader.readInt();
+		}
+		_data = reader.readString();
 	}
 
 	public void writeObject(Writer writer) throws Exception {

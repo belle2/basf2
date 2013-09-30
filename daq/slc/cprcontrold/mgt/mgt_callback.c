@@ -35,7 +35,7 @@ Mgt_t* mgt_boot(int slot, const char* path, int* board_type,
   } else { 
     printf("boot FPGA: failed\n");
     mgt_close(mgt);
-    free(mgt);
+    //free(mgt);
     return 0;
   }
 }

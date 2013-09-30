@@ -52,16 +52,20 @@ void SenderManager::run() throw()
     }
     char slots_c[8];
     sprintf(slots_c, "%d", flag);
-    char* argv[8];
+    char shmuse_c[8];
+    sprintf(shmuse_c, "%d", 1);
+
+    char* argv[10];
     int i = 0;
     argv[i++] = path;
     argv[i++] = script_c;
     argv[i++] = hostname_c;
     argv[i++] = id_c;
     argv[i++] = slots_c;
+    argv[i++] = shmuse_c;
     argv[i++] = NULL;
-    B2DAQ::debug("[BUDEG] Executing : %s %s %s %s %s",
-                 argv[0], argv[1], argv[2], argv[3], argv[4]);
+    B2DAQ::debug("[BUDEG] Executing : %s %s %s %s %s %s",
+                 argv[0], argv[1], argv[2], argv[3], argv[4], argv[5]);
     if (execvp(path, argv) == -1) {
       B2DAQ::debug("[ERROR] Faield to start receiver basf2 script");
     }

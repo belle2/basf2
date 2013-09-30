@@ -67,9 +67,9 @@ bool ROCallback::boot() throw()
 
 bool ROCallback::load() throw()
 {
-  //system("killall basf2");
-  //system("killall eb0");
-  _fork_v[0].cancel();
+  system("killall basf2");
+  system("killall eb0");
+  //_fork_v[0].cancel();
   _fork_v[1].cancel();
   _fork_v[0] = Fork(new EventBuilderManager(_node));
   _fork_v[1] = Fork(new RecieverManager(_node));

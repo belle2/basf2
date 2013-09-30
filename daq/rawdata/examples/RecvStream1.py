@@ -20,8 +20,8 @@
 from basf2 import *
 import sys
 argvs = sys.argv
-if len(argvs) != 2:
-    print 'Usage : RecvStream1.py <Use shared memory? yes=1/no=0>'
+if len(argvs) != 3:
+    print 'Usage : RecvStream1.py <Use shared memory? yes=1/no=0> <port # of eb0>'
     sys.exit()
 
 # Set the log level to show only error and fatal messages
@@ -41,7 +41,7 @@ receiver.param('NodeID', 3)
 receiver.param('NumConn', 1)
 receiver.param('HostNameFrom', ['localhost', 'cpr007'])
 # receiver.param('HostNameFrom', ['cpr006', 'cpr009'])
-receiver.param('PortFrom', [35000, 36000])
+receiver.param('PortFrom', [int(argvs[2]), 36000])
 
 receiver.param('EventDataBufferWords', 4801)
 receiver.param('MaxTime', 30.)

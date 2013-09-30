@@ -19,4 +19,4 @@
 #
 # basf2 on ROPC
 #
-${BELLE2_LOCAL_DIR}/daq/copper/daq_scripts/RecvStream1.sh 0
+${BELLE2_LOCAL_DIR}/daq/copper/daq_scripts/RecvStream1.sh 0 35000

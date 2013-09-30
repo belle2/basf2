@@ -88,6 +88,8 @@ namespace Belle2 {
       new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_PolePieceR, "phys_PolePieceR", &topVolume, false, 0);
 
 
+      /*
+
       double m_phi = content.getAngle("Phi") / Unit::rad;
       double m_dphi = content.getAngle("Dphi") / Unit::rad;
 
@@ -150,10 +152,12 @@ namespace Belle2 {
         //new G4LogicalVolume(ShieldPconL2, Materials::get("G4_Pb"), "LVShieldL2", 0, 0, 0);
         new G4LogicalVolume(ShieldPconL2, Materials::get("G4_POLYETHYLENE"), "LVShieldL2", 0, 0, 0);
 
-      //new G4PVPlacement(0, G4ThreeVector(0, 0, 0), ShieldLVR1, "PVShieldR1", &topVolume, false, 0);
-      //new G4PVPlacement(0, G4ThreeVector(0, 0, 0), ShieldLVR2, "PVShieldR2", &topVolume, false, 0);
-      //new G4PVPlacement(0, G4ThreeVector(0, 0, 0), ShieldLVL1, "PVShieldL1", &topVolume, false, 0);
-      //new G4PVPlacement(0, G4ThreeVector(0, 0, 0), ShieldLVL2, "PVShieldL2", &topVolume, false, 0);
+      new G4PVPlacement(0, G4ThreeVector(0, 0, 0), ShieldLVR1, "PVShieldR1", &topVolume, false, 0);
+      new G4PVPlacement(0, G4ThreeVector(0, 0, 0), ShieldLVR2, "PVShieldR2", &topVolume, false, 0);
+      new G4PVPlacement(0, G4ThreeVector(0, 0, 0), ShieldLVL1, "PVShieldL1", &topVolume, false, 0);
+      new G4PVPlacement(0, G4ThreeVector(0, 0, 0), ShieldLVL2, "PVShieldL2", &topVolume, false, 0);
+
+      */
 
     }
   }

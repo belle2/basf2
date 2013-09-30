@@ -249,7 +249,22 @@ int* DeSerializerPCModule::RecvData(int* malloc_flag, int* total_buf_nwords, int
     *total_buf_nwords += rawcpr_nwords;
 
     each_buf_nwords.push_back(rawcpr_nwords);
+
+#ifdef DEBUG
+    printf("*******HDR**********\n");
+    printf("\n%.8d : ", 0);
+    for (int i = 0; i < SendHeader::SENDHDR_NWORDS ; i++) {
+      printf("0x%.8x ", send_hdr_buf[ i ]);
+      if ((i + 1) % 10 == 0) {
+        printf("\n%.8d : ", i + 1);
+      }
+    }
+    printf("\n");
+    printf("\n");
+#endif
   }
+
+
 
   temp_buf = GetBuffer(*total_buf_nwords, malloc_flag);
   // Read body
@@ -262,6 +277,20 @@ int* DeSerializerPCModule::RecvData(int* malloc_flag, int* total_buf_nwords, int
     perror("Receiving data in an invalid unit. Exting...");
     exit(-1);
   }
+
+#ifdef DEBUG
+  printf("*******BODY**********\n");
+  printf("\n%.8d : ", 0);
+  for (int i = 0; i < *total_buf_nwords; i++) {
+    printf("0x%.8x ", temp_buf[ i ]);
+    if ((i + 1) % 10 == 0) {
+      printf("\n%.8d : ", i + 1);
+    }
+  }
+  printf("\n");
+  printf("\n");
+#endif
+
 
   // Read Traeiler
   int send_trl_buf[ SendTrailer::SENDTRL_NWORDS ];

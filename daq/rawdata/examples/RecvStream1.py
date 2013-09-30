@@ -18,6 +18,11 @@
 ######################################################
 
 from basf2 import *
+import sys
+argvs = sys.argv
+if len(argvs) != 2:
+    print 'Usage : RecvStream1.py <Use shared memory? yes=1/no=0>'
+    sys.exit()
 
 # Set the log level to show only error and fatal messages
 set_log_level(LogLevel.ERROR)
@@ -37,13 +42,13 @@ receiver.param('NumConn', 1)
 receiver.param('HostNameFrom', ['localhost', 'cpr007'])
 # receiver.param('HostNameFrom', ['cpr006', 'cpr009'])
 receiver.param('PortFrom', [35000, 36000])
-# receiver.param('PortFrom', [33000, 33000])
+
 receiver.param('EventDataBufferWords', 4801)
 receiver.param('MaxTime', 30.)
 # receiver.param('MaxTime', -1.)
 # receiver.param('MaxEventNum', 400000)
 receiver.param('MaxEventNum', -1)
-use_shm_flag = 0
+use_shm_flag = int(argvs[1])
 receiver.param('UseShmFlag', use_shm_flag)
 # receiver.param('DumpFileName', 'cpr006_dump.dat')
 

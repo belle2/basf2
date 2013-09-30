@@ -21,8 +21,8 @@ from basf2 import *
 import sys
 argvs = sys.argv
 
-if len(argvs) != 4:
-    print 'Usage : RecvSendCOPPER.py <COPPER hostname> <COPPER nodeID> <bit flag of FINNESEs>'
+if len(argvs) != 5:
+    print 'Usage : RecvSendCOPPER.py <COPPER hostname> <COPPER nodeID> <bit flag of FINNESEs> <Use shared memory? yes=1/no=0>'
     sys.exit()
 
 # Set the log level to show only error and fatal messages
@@ -34,7 +34,7 @@ set_log_level(LogLevel.INFO)
 reader = register_module('DeSerializerCOPPER')
 reader.param('NodeID', int(argvs[2]))
 reader.param('FinnesseBitFlag', int(argvs[3]))
-use_shm_flag = 0
+use_shm_flag = int(argvs[4])
 reader.param('UseShmFlag', use_shm_flag)
 # reader.param('DumpFileName', 'COPPERdump.dat' )
 

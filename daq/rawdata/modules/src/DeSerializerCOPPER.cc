@@ -45,6 +45,7 @@ DeSerializerCOPPERModule::DeSerializerCOPPERModule() : DeSerializerModule()
   //Parameter definition
   B2INFO("DeSerializerCOPPER: Constructor done.");
 
+  //Stop plx9054 process's runaway
 }
 
 
@@ -284,6 +285,9 @@ int* DeSerializerCOPPERModule::ReadCOPPERFIFO(const int entry, int* malloc_flag,
   return temp_buf;
 
 }
+
+
+
 
 
 void* DeSerializerCOPPERModule::OpenCOPPER()

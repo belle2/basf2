@@ -118,7 +118,7 @@ void Raw2DsModule::registerRawCOPPERs()
   // Store data contents in Corresponding RawXXXX
   for (int cprid = 0; cprid < ncprs; cprid++) {
     // Pick up one COPPER and copy data in a temporary buffer
-    int nwds_buf = tempcpr.GetCprBlockNwords(cprid);
+    int nwds_buf = tempcpr.GetBlockNwords(cprid);
     int* cprbuf = new int[nwds_buf];
     memcpy(cprbuf, tempcpr.GetBuffer(cprid), nwds_buf * 4);
     // Get subsys id

@@ -25,7 +25,7 @@ void NSMCommunicator::init(bool usesig) throw(NSMHandlerException)
     throw (NSMHandlerException(__FILE__, __LINE__, "No node for NSM was registered!"));
   }
   _nsmc = NULL;
-  if ((_nsmc = b2nsm_init(_node->getName().c_str())) < 0) {
+  if ((_nsmc = b2nsm_init(_node->getName().c_str())) <= 0) {
     _id = -1;
     throw (NSMHandlerException(__FILE__, __LINE__, "Error during init2"));
   }

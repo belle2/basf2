@@ -52,6 +52,7 @@ namespace Belle2 {
       double ROTATE; /**< rotation in [radian] */
       double DX;   /** horizontal displacement in [m] */
       double DY;   /** vertical displacement in [m] */
+
       /* Note that K parameters used in SAD is multiplied by the element length.
        * Popular definitions are:  K0,SK0[1/m] and K1,SK1[1/m^2]
        */
@@ -131,14 +132,21 @@ namespace Belle2 {
 
   private:
 
-    std::string m_mapFilenameHER, m_mapFilenameLER, m_mapFilenameHERleak;    /**< The filename of the magnetic field map */
-    std::string m_apertFilenameHER, m_apertFilenameLER; /**< The filename of the aperture*/
-    int m_mapSizeHER, m_mapSizeLER, m_mapSizeHERleak;                /**< The size of the map*/
-    int m_apertSizeHER, m_apertSizeLER;            /**< The size of the aperture*/
+    std::string m_mapFilenameHER;        /** Magnetic field map of HER   */
+    std::string m_mapFilenameLER;        /** Magnetic field map of LER   */
+    std::string m_mapFilenameHERleak;    /** The filename of the magnetic field map */
+    std::string m_apertFilenameHER;      /** Filename of the aperture for HER */
+    std::string m_apertFilenameLER;      /** The filename of the aperture for LER */
+    int m_mapSizeHER;                    /** The size of the map for HER */
+    int m_mapSizeLER;                    /** The size of the map for LER */
+    int m_mapSizeHERleak;                /** The size of the map         */
+    int m_apertSizeHER;                  /** The size of the aperture for HER */
+    int m_apertSizeLER;                  /** The size of the aperture for LER */
 
-    ParamPoint* m_mapBufferHER, *m_mapBufferLER, *m_mapBufferHERleak;    /**< The memory buffer for the field parameters. */
+    ParamPoint* m_mapBufferHER;          /** The map buffer for HER  */
+    ParamPoint* m_mapBufferLER;          /** The map buffer for LER  */
+    ParamPoint* m_mapBufferHERleak;      /** The memory buffer for the field parameters. */
     ApertPoint* m_apertBufferHER, *m_apertBufferLER; /**< The memory buffer for the aperture parameters. */
-
   };
 
 } //end of namespace Belle2

@@ -35,17 +35,17 @@ namespace Belle2 {
 
   public:
 
-    struct BFieldPoint {
-      double r;
-      double phi;
+    struct BFieldPoint {     /** BField Class as grid in cylindrical coordinates*/
+      double r;              /** Position in radius r */
+      double phi;            /** Position in phi*/
       //double z;
-      double Br;
-      double Bphi;
-      double Bz;
+      double Br;             /** BField coordinate in radius r */
+      double Bphi;           /** BField coordinate in phi   */
+      double Bz;             /** BField coordinate in z     */
     };
 
     struct InterpolationPoint {
-      std::vector<int> p;
+      std::vector<int> p;   /** Parameter in p */
     };
 
     /** The BFieldComponentBeamline constructor. */
@@ -58,10 +58,10 @@ namespace Belle2 {
      * Initializes the magnetic field component.
      * This method opens the magnetic field map file.
      */
-    virtual void initialize() {initialize_her(); initialize_ler();}
-    void initialize_beamline(int isher);
-    void initialize_her(void) {initialize_beamline(1);}
-    void initialize_ler(void) {initialize_beamline(0);}
+    virtual void initialize() {initialize_her(); initialize_ler();}  /** Initialization of LER and HER */
+    void initialize_beamline(int isher);                 /** Parameter for Lower Energy Ring */
+    void initialize_her(void) {initialize_beamline(1);}  /** Higher Beam Ring */
+    void initialize_ler(void) {initialize_beamline(0);}  /** Lower Beam Ring  */
 
     /**
      * Calculates the magnetic field vector at the specified space point.
@@ -70,9 +70,9 @@ namespace Belle2 {
      * @return The magnetic field vector at the given space point in [T]. Returns a zero vector TVector(0,0,0) if the space point lies outside the region described by the component.
      */
     virtual TVector3 calculate(const TVector3& point) const;
-    TVector3 calculate_beamline(const TVector3& point0, int isher) const;
-    TVector3 calculate_her(const TVector3& point) const {return calculate_beamline(point, 1);}
-    TVector3 calculate_ler(const TVector3& point) const {return calculate_beamline(point, 0);}
+    TVector3 calculate_beamline(const TVector3& point0, int isher) const;  /** Beamline Calculation */
+    TVector3 calculate_her(const TVector3& point) const {return calculate_beamline(point, 1);} /** HER calculation */
+    TVector3 calculate_ler(const TVector3& point) const {return calculate_beamline(point, 0);} /** LER calculation */
 
     /**
      * Terminates the magnetic field component.
@@ -107,16 +107,20 @@ namespace Belle2 {
      * @param maxR The right (max) border of the magnetic field map region in r [cm].
      */
     static void setMapRegionR(double minR, double maxR) { s_mapRegionR[0] = minR; s_mapRegionR[1] = maxR; }
-
+    /** Parameter to set Map Region  */
     static void setBeamAngle(double beamAngle) { s_beamAngle = beamAngle; }
+    /** Parameter to set Angle of the beam */
 
     /**
      * calculate coefficient for interpolation
      */
     TVectorD calculateCoefficientRectangle(const TVector3& x, const std::vector<TVector3>& vx) const;
+    /** Parameter for calculation of Coefficient Rectangle */
     TVectorD calculateCoefficientTriangle(const TVector3& x, const std::vector<TVector3>& vx) const;
-
+    /** Parameter for calculation of Coefficient Triangle  */
     static bool isInRange(const TVector3& point);
+    /** Parameter for checking the range of beam */
+
 
   protected:
 
@@ -134,15 +138,21 @@ namespace Belle2 {
     double m_mapOffset;         /**< Offset required because the accelerator group defines the Belle center as zero. */
     double m_gridPitchZ[2];       /**< The grid pitch in z. */
 
-    int m_mapSizeZ, m_mapSizeRPhi[2], m_interSizeX;
-    int m_offsetGridRPhi[2], m_offsetGridZ;
-    int m_nGridR, m_nGridPhi;
-    double m_jointR;
-    double m_jointZ, m_nGridZ;
-    double m_interMaxRadius, m_interGridSize;
+    int m_mapSizeZ;           /** Parameter for the size of the map in Z direction */
+    int m_mapSizeRPhi[2];     /** Parameter for the size of the map in phi direction  */
+    int m_interSizeX;         /** Parameter for   */
+    int m_offsetGridRPhi[2];  /** Grid Offset in Phi direction   */
+    int m_offsetGridZ;        /** Grid Offset in the Z direction */
+    int m_nGridR;             /** Number of grid in the radial direction  */
+    int m_nGridPhi;           /** Number of grid in the phi direction     */
+    double m_jointR;          /** Parameter   */
+    double m_jointZ;          /** Parameter   */
+    double m_nGridZ;          /** Number of grid in Z direction  */
+    double m_interMaxRadius;  /** Parameter for maximum Radius   */
+    double m_interGridSize;   /** Parameter for the grid size    */
 
     static double s_mapRegionR[2];  /**< The min and max boundaries of the map region in r. */
-    static double s_beamAngle;
+    static double s_beamAngle;      /** The angle of beam   */
   };
 
 } //end of namespace Belle2

@@ -41,7 +41,7 @@ namespace Belle2 {
       virtual ~TEclCFCR();
 
       /// assignment operator(s)
-      const TEclCFCR& operator=(const TEclCFCR&);
+      TEclCFCR& operator=(const TEclCFCR&);
 
       /** comparison operators */
       bool operator==(const TEclCFCR&) const;

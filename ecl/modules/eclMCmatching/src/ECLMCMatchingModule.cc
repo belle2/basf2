@@ -76,6 +76,8 @@ void ECLMCMatchingModule::initialize()
   // Initialize variables
   m_nRun    = 0 ;
   m_nEvent  = 0 ;
+  // CPU time start
+  m_timeCPU = clock() * Unit::us;
   RelationArray::registerPersistent<ECLHit, MCParticle>("", "");
   RelationArray::registerPersistent<ECLDigit, MCParticle>("", "");
   RelationArray::registerPersistent<ECLShower, MCParticle>("", "");
@@ -196,7 +198,7 @@ void ECLMCMatchingModule::event()
 
     int PrimaryIndex = -1;
     int MaxContribution = 0;
-    for (map<int, int>::iterator i = eclMCParticleContributionMap.begin(); i != eclMCParticleContributionMap.end(); i++) {
+    for (map<int, int>::iterator i = eclMCParticleContributionMap.begin(); i != eclMCParticleContributionMap.end(); ++i) {
       if ((*i).second > MaxContribution) {MaxContribution = (*i).second ;  PrimaryIndex = (*i).first; }
     }
 

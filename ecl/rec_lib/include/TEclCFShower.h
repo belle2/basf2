@@ -47,7 +47,7 @@ namespace Belle2 {
       MEclCFShowerHA(const MEclCFShowerHA& a)
         : fId(a.fId), fFraction(a.fFraction) {}
       /** define operator= for  MEclCFShowerHA */
-      const MEclCFShowerHA& operator=(const MEclCFShowerHA& rhs) {
+      MEclCFShowerHA& operator=(const MEclCFShowerHA& rhs) {
         if (this != &rhs) {
           fId = rhs.fId;
           fFraction = rhs.fFraction;
@@ -144,7 +144,7 @@ namespace Belle2 {
       }
 
       /// assignment operator(s)
-      const TEclCFShower& operator=(const TEclCFShower& rhs) {
+      TEclCFShower& operator=(const TEclCFShower& rhs) {
         if (this != &rhs) {
           fId = rhs.fId;
           fEnergy = rhs.fEnergy;

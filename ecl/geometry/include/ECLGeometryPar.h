@@ -166,7 +166,7 @@ namespace Belle2 {
       std::vector< Identifier >::size_type      nextSize()  const ;
 
       /// assignment operator(s)
-      const EclNbr& operator=(const EclNbr& aNbr);
+      EclNbr& operator=(const EclNbr& aNbr);
       /** get crystals nbr */
       EclNbr getNbr(const Identifier  aCellId);
       /** print crystals nbrs */
@@ -231,7 +231,7 @@ namespace Belle2 {
       virtual ~TEclEnergyHit() { }
 
       /// assignment operator(s)
-      const TEclEnergyHit& operator=(const TEclEnergyHit& hit) {
+      TEclEnergyHit& operator=(const TEclEnergyHit& hit) {
         if (this != &hit) {
           fId = hit.fId;
           fEnergy = hit.fEnergy;

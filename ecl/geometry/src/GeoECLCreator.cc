@@ -490,7 +490,6 @@ namespace Belle2 {
 
           // add barrel theta fin //////////////////////////////////////////////////////////////////////////
 
-          double smalldev = 0.01;
 
           if (iBrCry % 4 == 1) { // store the parameters of crystals before the fin (previous)
             prevk_Ba = k_Ba;
@@ -507,6 +506,7 @@ namespace Belle2 {
 
           if (iBrCry % 4 == 2 && (iBrCry != 2 && iBrCry != 46)) { // barrel fin between every  4 crystals (iBrCry%4==2 means after the fin)
 
+            double smalldev = 0.01;
             if (iBrCry < 29) { // choose the lower one
               brfink_Ba = k_Ba * (1 - smalldev);
               brfink_Bb = k_Ba * (1 - smalldev);

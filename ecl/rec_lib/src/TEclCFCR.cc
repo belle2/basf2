@@ -64,7 +64,7 @@ TEclCFCR::~TEclCFCR()
 //
 // assignment operators
 //
-const TEclCFCR&
+TEclCFCR&
 TEclCFCR::operator=(const TEclCFCR& rhs)
 {
   if (this != &rhs) {

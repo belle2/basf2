@@ -124,7 +124,7 @@ namespace Belle2 {
       int    m_nEvent;
       /** ECL Gamma index */
       int    m_GNum;
-      /** ECL Gamma index */
+      /** ECL Pi0 index */
       int    m_Pi0Num;
       /** gamma1 information    */
       int    m_showerId1 ;

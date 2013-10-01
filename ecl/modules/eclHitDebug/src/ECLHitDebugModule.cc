@@ -71,7 +71,8 @@ void ECLHitDebugModule::initialize()
   m_nRun    = 0 ;
   m_nEvent  = 0 ;
   m_hitNum = 0;
-
+  // CPU time start
+  m_timeCPU = clock() * Unit::us;
   StoreArray<ECLDebugHit>::registerPersistent();
 
 //  RelationArray mcPartToECLHitRel(mcParticles, eclHitArray);

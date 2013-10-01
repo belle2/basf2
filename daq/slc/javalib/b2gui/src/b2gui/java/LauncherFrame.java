@@ -24,9 +24,9 @@ public class LauncherFrame extends JFrame {
 	private LauncherMainPanel _main_panel = new LauncherMainPanel();
 	private LogViewPanel _log_panel = new LogViewPanel();
 	private LauncherLoginPane _login_panel = null;
-
 	private ArrayList<Process> _process_v = new ArrayList<Process>();
-	private String _class_path = "belle2gui.jar";
+	private String _class_path = "b2gui-exe.jar";
+	private boolean _use_ssh;
 
 	private LauncherFrame() {
 		String hostname = System.getenv("B2SC_SERVER_HOST");
@@ -37,12 +37,14 @@ public class LauncherFrame extends JFrame {
 		addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
 				int ans = JOptionPane.showConfirmDialog(null,
-						"All GUIs may close after the launcher closes.\n"+
+						(_use_ssh?"All GUIs may close after the launcher closes.\n":"")+
 						"Are you really closing this launcher?");
 				if ( ans == JOptionPane.YES_OPTION ) {
-					//for ( Process process : _process_v ) {
-					//	process.destroy();
-					//}
+					if ( _use_ssh ) {
+						for ( Process process : _process_v ) {
+							process.destroy();
+						}
+					}
 					System.exit(0);
 				}
 			}
@@ -94,4 +96,8 @@ public class LauncherFrame extends JFrame {
 		_main_panel.setEnableButtons(enabled);
 	}
 
+	public void setUseSSH(boolean use_ssh){
+		_use_ssh = use_ssh;
+	}
+	
 }

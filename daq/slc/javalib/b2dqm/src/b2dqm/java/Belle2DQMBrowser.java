@@ -119,7 +119,7 @@ public class Belle2DQMBrowser extends JavaEntoryPoint {
 			try {
 				_socket.close();
 			} catch (IOException e1) {}
-			_frame.dispose();
+			if (_frame != null)_frame.dispose();
 			if ( !LoginPanel.showLoginDialog(_frame, __host, __port, 
 					"Belle-II DQM browser Login",
 					"System ERROR! Try reconnect?",

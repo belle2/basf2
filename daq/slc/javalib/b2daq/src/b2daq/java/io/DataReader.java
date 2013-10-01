@@ -47,7 +47,6 @@ public class DataReader extends Reader {
 
 	@Override
 	public int readInt() throws Exception {
-		while ( _stream.available() == 0 ) {}
 		return _stream.readInt();
 	}
 

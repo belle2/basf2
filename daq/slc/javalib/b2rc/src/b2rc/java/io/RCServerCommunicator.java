@@ -13,6 +13,7 @@ import b2rc.core.RCConnection;
 import b2rc.core.RCNode;
 import b2rc.core.RCNodeSystem;
 import b2rc.core.RCState;
+import b2rc.db.RCDBManager;
 import b2rc.java.ui.ControlMainPanel;
 
 public class RCServerCommunicator {
@@ -44,10 +45,11 @@ public class RCServerCommunicator {
 		_system.getRunControlNode().setConnection(RCConnection.ONLINE);
 		_system.getRunControlNode().setState(RCState.UNKNOWN);
 		_socket_writer.writeObject(new RunControlMessage(RCCommand.STATECHECK, -1));
+		boolean initialized = false;
 		while (true) {
 			_socket_reader.readObject(msg);
-			RCCommand cmd = msg.getCommand();
-			if ( cmd.equal(RCCommand.ERROR) ) {
+ 			RCCommand cmd = msg.getCommand();
+ 			if ( cmd.equal(RCCommand.ERROR) ) {
 				RCNode node = _system.getNodes().get(msg.getParam(0));
 				_main_panel.addLog(new Log("Node " + node.getName()+ " got ERRPR : <br/>" +
 						"<span style='color:red;font-weight:bold;'>" + msg.getData()+"</span>",
@@ -81,7 +83,6 @@ public class RCServerCommunicator {
 								int end_time = msg.getParam(7);
 								_system.setEndTime(end_time);
 							}
-							System.out.println(msg.getData());
 							String [] str_v = msg.getData().split("\n");
 							if ( str_v.length > 0 ) {
 								String run_type = str_v[0];
@@ -91,6 +92,9 @@ public class RCServerCommunicator {
 								String operators = str_v[1];
 								_main_panel.getControlSummaryPanel().getConfigurationPanel().setOperators(operators);
 								_system.setOperators(operators);
+							}
+							if ( !initialized ) {
+								_main_panel.getControlSummaryPanel().getConfigurationPanel().readDatabase(version);;
 							}
 						}
 						_main_panel.update();

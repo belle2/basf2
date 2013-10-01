@@ -248,7 +248,7 @@ public class SystemConfigurationPanel extends JPanel implements Updatable {
 
 		setGrid(gbc, 1, 4, 0.2d, 0.1d, GridBagConstraints.NONE,
 				GridBagConstraints.LINE_START, new Insets(0, 5, 0, 5));
-		String[] combodata = { "latest", "0", "101", "102", "103" };
+		String[] combodata = { "latest", "0" };
 		DefaultComboBoxModel model_version = new DefaultComboBoxModel(combodata);
 		_combo_version = new JComboBox(model_version);
 		_combo_version.setFont(new Font("Sans", Font.PLAIN, 13));
@@ -264,19 +264,7 @@ public class SystemConfigurationPanel extends JPanel implements Updatable {
 				if (_system.getVersion() == _version_old ) return;
 				_version_old = _system.getVersion();
 				if ( _version_old < 0 ) return;
-				ResultSet result_v;
-				try {
-					result_v = RCDBManager.get().executeQuery("select description from version_control where version="+_system.getVersion()+";");
-					if ( result_v.next() ) {
-						String description = result_v.getString("description");
-						_label_description_contents.setText(description);
-					}
-					result_v.close();
-					RCDBManager.get().setNodeSystem(_system);
-					RCDBManager.get().readTables(_version_old);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+				readDatabase(_version_old);
 				_main_panel.addLog(new Log("Set run type version: " + "<span style='color:blue;font-weight:bold;'>"
 						+ _version_max + ((_version_old==_version_max)?" (latest)":"")
 						+ "</span>", LogLevel.INFO));
@@ -342,6 +330,20 @@ public class SystemConfigurationPanel extends JPanel implements Updatable {
 		_combo_version.removeAllItems();
 		_combo_version.addItem(""+_system.getVersion());
 		_combo_version.setEditable(false);
+	}
+
+	public void readDatabase(int version){
+		try {
+			ResultSet result_v = RCDBManager.get().executeQuery("select description from version_control where version="+_system.getVersion()+";");
+			if ( result_v.next() ) {
+				String description = result_v.getString("description");
+				_label_description_contents.setText(description);
+			}
+			result_v.close();
+			RCDBManager.get().readTables(_version_old);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 }

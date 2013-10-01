@@ -101,6 +101,7 @@ public class LauncherLoginPane extends JPanel {
 				options, options[0]);
 		switch (result) {
 		case 0:
+			frame.setUseSSH(login_panel.useSSH());
 			if ( login_panel.useSSH() ) {
 				String pass = login_panel.getPassword();
 				String hidden_pass = "";

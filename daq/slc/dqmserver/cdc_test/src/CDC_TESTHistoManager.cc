@@ -2,6 +2,7 @@
 
 #include <dqm/Histo1F.hh>
 #include <dqm/Histo2F.hh>
+#include <dqm/TimedGraph1F.hh>
 #include <dqm/TablePanel.hh>
 #include <dqm/TabbedPanel.hh>
 #include <dqm/CanvasPanel.hh>
@@ -20,14 +21,14 @@ CDC_TESTHistoManager::CDC_TESTHistoManager()
 HistoPackage* CDC_TESTHistoManager::createPackage(RootHistMap& hist_m)
 {
   _pack = new HistoPackage("CDC_TEST");
-  _h_ncpr = _pack->addHisto(new Histo1F("NumCOPPER", "Number of COPPERs", 10, 0.0, 10.0));
-  _h_nevt = _pack->addHisto(new Histo1F("Nevent", "Number of Events", 10, 0.0, 10.0));
-  _h_size = _pack->addHisto(new Histo1F("Data Size", "Data Size", 100, 0.0, 2000.0));
-  _h_size2d = _pack->addHisto(new Histo2F("Data Size vs. Cpr", "Data Size vs. Copper",
+  _h_ncpr = _pack->addHisto(new Histo1F("h_ncpr", "Number of COPPERs", 10, 0.0, 10.0));
+  _h_nevt = _pack->addHisto(new Histo1F("h_nevt", "Number of Events; Number of events; # of entries", 10, 0.0, 10.0));
+  _h_size = _pack->addHisto(new Histo1F("h_size", "Data Size; Data size [byte]; # of entries", 100, 0.0, 2000.0));
+  _h_size2d = _pack->addHisto(new Histo2F("h_size2d", "Data Size vs. Copper;Copper ID;Data size [byte]",
                                           100, 0.0, 2000.0, 5, 0.0, 5.0));
-  _h_ncpr_cpy = _pack->addHisto(new Histo1F("NumCOPPER_cpy", "Number of COPPERs", 10, 0.0, 10.0));
-  _h_nevt_cpy = _pack->addHisto(new Histo1F("Nevent_cpy", "Number of Events", 10, 0.0, 10.0));
-  _h_size_cpy = _pack->addHisto(new Histo1F("Data Size_cpy", "Data Size", 100, 0.0, 2000.0));
+  _h_ncpr = _pack->addHisto(new Histo1F("h_ncpr_cpy", "Number of COPPERs", 10, 0.0, 10.0));
+  _h_nevt = _pack->addHisto(new Histo1F("h_nevt_cpy", "Number of Events; Number of events; # of entries", 10, 0.0, 10.0));
+  _h_size = _pack->addHisto(new Histo1F("h_size_cpy", "Data Size; Data size [byte]; # of entries", 100, 0.0, 2000.0));
 
   _label_state = (MonLabel*)_pack->addMonObject(new MonLabel("label_state", 20));
   _label_state->setUpdated(true);
@@ -54,6 +55,14 @@ HistoPackage* CDC_TESTHistoManager::createPackage(RootHistMap& hist_m)
   font->setAlign("left middle");
   _label_nevt_rate->setFont(font);
 
+  _gr_nevt = (TimedGraph1*)_pack->addHisto(new TimedGraph1F("gr_nevt", "Event rate;;event rate [Hz]", 62, 0, 60 * 5));
+  _gr_nevt->fixMinimum(0);
+  _gr_nevt->fixMaximum(30);
+  _gr_nevt->setUpdated(true);
+  _gr_nevt->setLine(new LineProperty(MonColor::RED));
+  _gr_nevt->setFill(new FillProperty(MonColor::PINK));
+  _gr_nevt->setDrawOption("AL");
+
   return _pack;
 }
 
@@ -67,13 +76,21 @@ RootPanel* CDC_TESTHistoManager::createRootPanel(RootHistMap& hist_m)
   CanvasPanel* canvas = new CanvasPanel("c_ncpr", "Number of COPPERs");
   canvas->add(_h_ncpr);
   table->add(canvas);
+  canvas = new CanvasPanel("c_size2d", "Data Size vs. Copper");
+  canvas->add(_h_size2d);
+  table->add(canvas);
 
-  table = new TablePanel("table_nevt", 2, 1);
+  table = new TablePanel("table_size", 2, 1);
   tabpanel->add("Number of COPPERs", table);
+  canvas = new CanvasPanel("c_size", "Data Size");
+  canvas->add(_h_size);
+  table->add(canvas);
   canvas = new CanvasPanel("c_nevt", "Number of Events");
   canvas->add(_h_nevt);
   table->add(canvas);
 
+  table = new TablePanel("table_nevt", 2, 1);
+  tabpanel->add("Number of COPPERs", table);
   canvas = new CanvasPanel("c_labels", "States");
   Text* text = new Text("", "Status summary", 0.5, 0.05);
   FontProperty* font = new FontProperty(MonColor::BLACK, 1.8);
@@ -94,14 +111,16 @@ RootPanel* CDC_TESTHistoManager::createRootPanel(RootHistMap& hist_m)
   canvas->add(_label_nevt);
   canvas->add(_label_nevt_rate);
   table->add(canvas);
-
-  table = new TablePanel("table_size", 2, 1);
-  tabpanel->add("Number of COPPERs", table);
-  canvas = new CanvasPanel("c_size", "Data Size");
-  canvas->add(_h_size);
-  table->add(canvas);
-  canvas = new CanvasPanel("c_size2d", "Data Size vs. Copper");
-  canvas->add(_h_size2d);
+  canvas = new CanvasPanel("c_graphs", "Rate stability");
+  GAxis* axis_rate = new GAxis("axis_rate", "Event rate [Hz]");
+  axis_rate->setTickLine(new LineProperty(MonColor::BLACK, 1));
+  axis_rate->setLabelFont(new FontProperty(MonColor::BLACK, 1.2));
+  axis_rate->setFont(new FontProperty(MonColor::BLACK, 1.2));
+  axis_rate->setMin(0);
+  axis_rate->fixMin(true);
+  _gr_nevt->setLinkedAxis(axis_rate);
+  canvas->setYAxis(axis_rate);
+  canvas->add(_gr_nevt);
   table->add(canvas);
 
   root_panel->add(tabpanel);
@@ -121,8 +140,9 @@ void CDC_TESTHistoManager::analyze(RootHistMap& hist_m)
   _h_ncpr_cpy->getData().copy(_h_ncpr->getData());
   _h_nevt_cpy->getData().copy(_h_nevt->getData());
   _h_size_cpy->getData().copy(_h_size->getData());
-  _label_nevt->setText(B2DAQ::form("%2.2f [Hz]", rate));
-  _label_nevt_rate->setText(B2DAQ::form("%d events", (int)(_h_nevt->getEntries())));
+  _gr_nevt->addPoint(rate);
+  _label_nevt_rate->setText(B2DAQ::form("%2.2f [Hz]", rate));
+  _label_nevt->setText(B2DAQ::form("%d events", (int)(_h_nevt->getEntries())));
   _label_state->setFontColor(MonColor::WHITE);
   if (rate > 16.5 && rate < 20.5) {
     _label_state->setLineColor(MonColor::GREEN);

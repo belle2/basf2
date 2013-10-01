@@ -3,6 +3,7 @@
 
 #include <dqm/HistoManager.hh>
 #include <dqm/MonLabel.hh>
+#include <dqm/TimedGraph1.hh>
 
 namespace B2DQM {
 
@@ -29,6 +30,7 @@ namespace B2DQM {
     MonLabel* _label_state;
     MonLabel* _label_nevt;
     MonLabel* _label_nevt_rate;
+    TimedGraph1* _gr_nevt;
     double _time;
   };
 

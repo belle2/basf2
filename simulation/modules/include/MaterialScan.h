@@ -216,8 +216,8 @@ namespace Belle2 {
     /** Scan parameters for the planar scan */
     MaterialScan::ScanParams m_planar;
     /** Custom plane definition if m_planName is "custom" */
-    std::vector<double> m_customPlane;
-    std::vector<double> m_sphericalOrigin;
+    std::vector<double> m_customPlane;       /** Custom plane parameter  */
+    std::vector<double> m_sphericalOrigin;   /** original position in spherical coordinate  *?
   };
 }
 

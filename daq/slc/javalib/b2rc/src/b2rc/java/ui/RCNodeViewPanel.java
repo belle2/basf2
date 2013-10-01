@@ -191,7 +191,7 @@ public class RCNodeViewPanel extends JPanel implements Updatable {
 		}
 
 		public void actionPerformed(ActionEvent arg0) {
-			int [] value_v = new int[6];
+			int [] value_v = new int[7];
 			value_v[0] = _node.getIndex();
 			value_v[1] = _param;
 			value_v[2] = 0;

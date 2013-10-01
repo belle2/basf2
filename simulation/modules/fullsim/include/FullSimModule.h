@@ -81,7 +81,7 @@ namespace Belle2 {
 
     MCParticleGraph m_mcParticleGraph;     /**< The MCParticle Graph used to manage the MCParticles before and after the simulation.*/
 
-    G4VisManager* m_visManager;
+    G4VisManager* m_visManager;            /**< The parameter variable for manager display */
 
     std::string m_mcParticleInputColName;  /**< The parameter variable for the name of the input MCParticle collection. */
     std::string m_mcParticleOutputColName; /**< The parameter variable for the name of the output MCParticle collection. */

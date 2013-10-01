@@ -141,7 +141,12 @@ public class RCServerCommunicator {
 	}
 	
 	public void sendMessage(RunControlMessage msg) throws Exception {
-		_socket_writer.writeObject(msg);
+		try {
+			_socket_writer.writeObject(msg);
+		} catch(IOException e) {
+			_main_panel.addLog(new Log("Connection broken", LogLevel.ERROR));
+			throw e;
+		}
 	}
 
 }

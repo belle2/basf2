@@ -84,38 +84,13 @@ public class RCNodeViewPanel extends JPanel implements Updatable {
 					JMenu menu = new JMenu("Command");
 					popup_menu.add(menu);
 					for (RCCommand command : command_v) {
+						JMenuItem item = new JMenuItem(command.getAlias());
 						if ( !command.equal(RCCommand.TRGIFT) ) {
-							JMenuItem item = new JMenuItem(command.getAlias());
 							item.addActionListener(new CommandMenuItemListener(command));
-							menu.add(item);
 						} else {
-							JMenu submenu = new JMenu(command.getAlias());
-							JMenuItem item = new JMenuItem("NONE");
-							item.addActionListener(new TrgFTCommandMenuItemListener(FTSW.TRIG_NORMAL));
-							submenu.add(item);
-							item = new JMenuItem("IN");
-							item.addActionListener(new TrgFTCommandMenuItemListener(FTSW.TRIG_IN));
-							submenu.add(item);
-							item = new JMenuItem("PULSE");
-							item.addActionListener(new TrgFTCommandMenuItemListener(FTSW.TRIG_PULSE));
-							submenu.add(item);
-							item = new JMenuItem("REVO");
-							item.addActionListener(new TrgFTCommandMenuItemListener(FTSW.TRIG_REVO));
-							submenu.add(item);
-							item = new JMenuItem("RANDOM");
-							item.addActionListener(new TrgFTCommandMenuItemListener(FTSW.TRIG_RANDOM));
-							submenu.add(item);
-							item = new JMenuItem("POSSION");
-							item.addActionListener(new TrgFTCommandMenuItemListener(FTSW.TRIG_POSSION));
-							submenu.add(item);
-							item = new JMenuItem("ONCE");
-							item.addActionListener(new TrgFTCommandMenuItemListener(FTSW.TRIG_ONCE));
-							submenu.add(item);
-							item = new JMenuItem("STOP");
-							item.addActionListener(new TrgFTCommandMenuItemListener(FTSW.TRIG_STOP));
-							submenu.add(item);
-							menu.add(submenu);
+							item.addActionListener(new TrgFTCommandMenuItemListener((JPanel)e.getSource()));
 						}
+						menu.add(item);
 					}
 					popup_menu.show(e.getComponent(), e.getX(), e.getY());
 				}
@@ -183,27 +158,13 @@ public class RCNodeViewPanel extends JPanel implements Updatable {
 	}
 
 	private class TrgFTCommandMenuItemListener implements ActionListener {
-		private RCCommand _command = RCCommand.TRGIFT;
-		private int _param = 0;
-		
-		public TrgFTCommandMenuItemListener(int param) {
-			_param = param;
+		private JPanel _panel;
+		public TrgFTCommandMenuItemListener(JPanel panel) {
+			_panel = panel;
 		}
 
 		public void actionPerformed(ActionEvent arg0) {
-			int [] value_v = new int[7];
-			value_v[0] = _node.getIndex();
-			value_v[1] = _param;
-			value_v[2] = 0;
-			value_v[3] = 0;
-			value_v[4] = 0;
-			value_v[5] = 0;
-			value_v[6] = 0;
-			try {
-				RCServerCommunicator.get().sendMessage(new RunControlMessage(_command, value_v));
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+			TriggerSettingPanel.showLoginDialog(_panel, (TTDNode)_node);
 		}
 	}
 

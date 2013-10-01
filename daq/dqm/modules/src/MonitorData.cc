@@ -97,7 +97,7 @@ void MonitorDataModule::event()
       int size_byte = 0;
       buf = rawcprarray[ j ]->GetBuffer(i);
       rawhdr.SetBuffer(rawcprarray[ j ]->GetRawHdrBufPtr(i));
-      size_byte = rawcprarray[ j ]->GetCprBlockNwords(i) * sizeof(int);
+      size_byte = rawcprarray[ j ]->GetBlockNwords(i) * sizeof(int);
       h_size->Fill((float)size_byte);
       h_size2d->Fill((float)size_byte, (float)j);
 

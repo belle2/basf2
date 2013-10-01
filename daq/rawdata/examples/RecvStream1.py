@@ -44,7 +44,7 @@ receiver.param('HostNameFrom', ['localhost', 'cpr007'])
 receiver.param('PortFrom', [int(argvs[2]), 36000])
 
 receiver.param('EventDataBufferWords', 4801)
-receiver.param('MaxTime', 30.)
+receiver.param('MaxTime', 10.)
 # receiver.param('MaxTime', -1.)
 # receiver.param('MaxEventNum', 400000)
 receiver.param('MaxEventNum', -1)

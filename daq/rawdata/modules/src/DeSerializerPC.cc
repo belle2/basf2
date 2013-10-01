@@ -80,11 +80,8 @@ void DeSerializerPCModule::initialize()
   m_eventMetaDataPtr.registerAsPersistent();
 
   // Initialize Array of RawCOPPER
-#ifdef CLONE_ARRAY
-  rawcprarray.registerPersistent();
-#else
-  m_rawcopper.registerPersistent();
-#endif
+  raw_datablkarray.registerPersistent();
+
 
   if (dump_fname.size() > 0) {
     OpenOutputFile();
@@ -244,12 +241,12 @@ int* DeSerializerPCModule::RecvData(int* malloc_flag, int* total_buf_nwords, int
     }
     *num_nodes_in_sendblock += temp_num_nodes;
 
-    int rawcpr_nwords = send_hdr.GetTotalNwords()
+    int rawblk_nwords = send_hdr.GetTotalNwords()
                         - SendHeader::SENDHDR_NWORDS
                         - SendTrailer::SENDTRL_NWORDS;
-    *total_buf_nwords += rawcpr_nwords;
+    *total_buf_nwords += rawblk_nwords;
 
-    each_buf_nwords.push_back(rawcpr_nwords);
+    each_buf_nwords.push_back(rawblk_nwords);
 
 #ifdef DEBUG
     printf("*******HDR**********\n");
@@ -339,19 +336,21 @@ int* DeSerializerPCModule::RecvData(int* malloc_flag, int* total_buf_nwords, int
 void DeSerializerPCModule::event()
 {
   ClearNumUsedBuf();
+
+
   if (n_basf2evt < 0) {
     B2INFO("DeSerializerPC: event() started.");
     m_start_time = GetTimeSec();
     n_basf2evt = 0;
   }
 
-  // Make rawcopper array
+  // Make rawdatablk array
 #ifdef CLONE_ARRAY
-  rawcprarray.create();
+  raw_datablkarray.create();
   // DataStore interface
-  RawCOPPER* temp_rawcopper;
+  RawDataBlock* temp_rawdatablk;
 #else
-  m_rawcopper.create();
+  m_rawdatablk.create();
 #endif
 
 
@@ -384,7 +383,9 @@ void DeSerializerPCModule::event()
     // Dump binary data
 
 #ifdef DEBUG
+
     printf("********* checksum 0x%.8x : %d\n" , CalcSimpleChecksum(temp_buf, total_buf_nwords - 2), total_buf_nwords);
+    printf("eve %d nodes %d\n", num_events_in_sendblock, num_nodes_in_sendblock);
     printf("\n%.8d : ", 0);
     for (int i = 0; i < total_buf_nwords; i++) {
       printf("0x%.8x ", temp_buf[ i ]);
@@ -403,17 +404,17 @@ void DeSerializerPCModule::event()
 
 #ifndef DISCARD_DATA
 #ifdef CLONE_ARRAY
-    temp_rawcopper =  rawcprarray.appendNew();
+    temp_rawdatablk =  raw_datablkarray.appendNew();
 
     // NotRemove SendHeader
     //    printf("Node %d numblock %d \n", temp_buf[6], m_socket.size());
-    temp_rawcopper->SetBuffer((int*)temp_buf, total_buf_nwords, malloc_flag, num_events_in_sendblock, m_socket.size()*num_nodes_in_sendblock);
+    temp_rawdatablk->SetBuffer((int*)temp_buf, total_buf_nwords, malloc_flag, num_events_in_sendblock, m_socket.size()*num_nodes_in_sendblock);
 
 
     // Remove SendHeader
-    //    temp_rawcopper->SetBuffer((int*)temp_buf + SendHeader::SENDHDR_NWORDS, total_buf_nwords, malloc_flag);
+    //    temp_rawdatablk->SetBuffer((int*)temp_buf + SendHeader::SENDHDR_NWORDS, total_buf_nwords, malloc_flag);
 #else
-    //    m_rawcopper->buffer(temp_buf_body, body_size_word, malloc_flag_body);
+    //    m_rawdatablk->buffer(temp_buf_body, body_size_word, malloc_flag_body);
 #endif
 #endif // DISCARD_DATA
 
@@ -428,13 +429,13 @@ void DeSerializerPCModule::event()
 //       rawhdr.SetBuffer( temp_buf );
 //       int total_send_nwords =
 //  hdr.GetHdrNwords() +
-//  temp_rawcopper->TotalBufNwords()*2 +
+//  temp_rawdatablk->TotalBufNwords()*2 +
 //  trl.GetTrlNwords();
 //       int subsys_id = rawhdr.GetSubsysId();
 
 //       hdr.SetNwords(total_send_nwords);
-//       hdr.SetNumEventsinPacket(temp_rawcopper->GetNumEvents());
-//       hdr.SetNumNodesinPacket(temp_rawcopper->GetNumNodes());
+//       hdr.SetNumEventsinPacket(temp_rawdatablk->GetNumEvents());
+//       hdr.SetNumNodesinPacket(temp_rawdatablk->GetNumNodes());
 //       hdr.SetEventNumber(rawhdr.GetEveNo());
 //       hdr.SetNodeID( 0x00010000 );
 
@@ -448,7 +449,6 @@ void DeSerializerPCModule::event()
 //  }
 //       }
 //     }
-
 
 
   }
@@ -484,6 +484,10 @@ void DeSerializerPCModule::event()
       m_eventMetaDataPtr->setEndOfData();
     }
   }
+  //  if(n_basf2evt % 100 == 0 ){
+//    printf("eve %d time %lf\n",n_basf2evt, GetTimeSec() - m_start_time );
+//     fflush(stdout);
+  //  }
 
   n_basf2evt++;
 

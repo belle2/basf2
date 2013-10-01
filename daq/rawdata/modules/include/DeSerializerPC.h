@@ -22,7 +22,7 @@
 #include <framework/datastore/StoreArray.h>
 
 #include <daq/dataflow/EvtSocket.h>
-#include <daq/dataobjects/RawCOPPER.h>
+#include <daq/dataobjects/RawDataBlock.h>
 
 //#include <daq/dataobjects/RawROPC.h>
 #include <daq/rawdata/modules/DAQConsts.h>
@@ -85,6 +85,7 @@ namespace Belle2 {
     std::vector<int> m_port_from;
 
 
+    StoreArray<RawDataBlock> raw_datablkarray;
 
 
 

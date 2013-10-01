@@ -56,6 +56,13 @@ namespace Belle2 {
     //! get COPPER Block Size
     virtual int GetBlockNwords(int n);
 
+    //! get COPPER Block Size
+    virtual bool CheckFTSWID(int n);
+
+    enum {
+      POS_NWORDS = 0,
+      POS_FTSW_ID = 5
+    };
 
   protected :
 

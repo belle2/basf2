@@ -86,21 +86,54 @@ void PrintDataModule::VerifyCheckSum(int* buf)     // Should be modified
 }
 
 
-void PrintDataModule::PrintEvent(RawCOPPER* raw_array)
+void PrintDataModule::PrintEvent(RawDataBlock* raw_datablock, int i)
+{
+
+  int tot_size_byte = raw_datablock->TotalBufNwords() * sizeof(int);
+
+
+  int* buf;
+  int size_byte = 0;
+  buf = raw_datablock->GetBuffer(i);
+  size_byte = raw_datablock->GetBlockNwords(i) * sizeof(int);
+  if (!raw_datablock->CheckFTSWID(i)) {
+    RawHeader rawhdr;
+    rawhdr.SetBuffer(raw_datablock->GetBuffer(i));
+    printf("== (size %d) : %d (size %d) : This is a non-FTSW(COPPER)block\nexp %d run %d eve %d copperNode %d type %d\n",
+           tot_size_byte, i, size_byte,
+           rawhdr.GetExpNo(),
+           rawhdr.GetRunNo(),
+           rawhdr.GetEveNo(),
+           rawhdr.GetSubsysId(),
+           rawhdr.GetDataType());
+
+  } else {
+
+    printf("== (size %d) : %d (size %d) : This is a FTSW block\n",
+           tot_size_byte, i, size_byte);
+
+
+  }
+
+}
+
+
+
+void PrintDataModule::PrintCOPPEREvent(RawCOPPER* raw_copper)
 {
 
 
-  int tot_size_byte = raw_array->TotalBufNwords() * sizeof(int);
-  for (int i = 0; i < raw_array->GetNumEntries(); i++) {
+  int tot_size_byte = raw_copper->TotalBufNwords() * sizeof(int);
+  for (int i = 0; i < raw_copper->GetNumEntries(); i++) {
 
     RawHeader rawhdr;
     int* buf;
     int size_byte = 0;
-    buf = raw_array->GetBuffer(i);
+    buf = raw_copper->GetBuffer(i);
 
-    rawhdr.SetBuffer(raw_array->GetRawHdrBufPtr(i));
+    rawhdr.SetBuffer(raw_copper->GetRawHdrBufPtr(i));
 
-    size_byte = raw_array->GetBlockNwords(i) * sizeof(int);
+    size_byte = raw_copper->GetBlockNwords(i) * sizeof(int);
 
     //
     // Extract FEE buffer
@@ -125,16 +158,16 @@ void PrintDataModule::PrintEvent(RawCOPPER* raw_array)
            rawhdr.GetDataType());
 
 
-    finnesse_buf_1st = raw_array->Get1stFINNESSEBuffer(i);
-    finnesse_buf_2nd = raw_array->Get2ndFINNESSEBuffer(i);
-    finnesse_buf_3rd = raw_array->Get3rdFINNESSEBuffer(i);
-    finnesse_buf_4th = raw_array->Get4thFINNESSEBuffer(i);
+    finnesse_buf_1st = raw_copper->Get1stFINNESSEBuffer(i);
+    finnesse_buf_2nd = raw_copper->Get2ndFINNESSEBuffer(i);
+    finnesse_buf_3rd = raw_copper->Get3rdFINNESSEBuffer(i);
+    finnesse_buf_4th = raw_copper->Get4thFINNESSEBuffer(i);
     printf("FINNNESSE buf %p %p %p %p\n", finnesse_buf_1st, finnesse_buf_2nd, finnesse_buf_3rd, finnesse_buf_4th);
 
-    detector_buf_1st = raw_array->Get1stDetectorBuffer(i);
-    detector_buf_2nd = raw_array->Get2ndDetectorBuffer(i);
-    detector_buf_3rd = raw_array->Get3rdDetectorBuffer(i);
-    detector_buf_4th = raw_array->Get4thDetectorBuffer(i);
+    detector_buf_1st = raw_copper->Get1stDetectorBuffer(i);
+    detector_buf_2nd = raw_copper->Get2ndDetectorBuffer(i);
+    detector_buf_3rd = raw_copper->Get3rdDetectorBuffer(i);
+    detector_buf_4th = raw_copper->Get4thDetectorBuffer(i);
     printf("Detector  buf %p %p %p %p\n", detector_buf_1st, detector_buf_2nd, detector_buf_3rd, detector_buf_4th);
 
   }
@@ -144,6 +177,7 @@ void PrintDataModule::PrintEvent(RawCOPPER* raw_array)
 void PrintDataModule::event()
 {
   B2INFO("PrintData: event() started.");
+  StoreArray<RawDataBlock> raw_datablkarray;
   StoreArray<RawCOPPER> rawcprarray;
   StoreArray<RawCDC> raw_cdcarray;
 
@@ -153,42 +187,52 @@ void PrintDataModule::event()
   StoreArray<RawKLM> raw_klmarray;
   StoreArray<RawECL> raw_eclarray;
 
+
+  for (int j = 0; j < raw_datablkarray.getEntries(); j++) {
+    printf("=== RawDataBlock event====\nBlock # %d\n", j);
+    for (int i = 0; i < raw_datablkarray[ j ]->GetNumEntries(); i++) {
+      //  PrintEvent( &rawcprarray );
+      PrintEvent(raw_datablkarray[ j ], i);
+    }
+  }
+
+
   for (int j = 0; j < rawcprarray.getEntries(); j++) {
     printf("=== RawCOPPER event====\nBlock %d ", j);
     //  PrintEvent( &rawcprarray );
-    PrintEvent(rawcprarray[ j ]);
+    PrintCOPPEREvent(rawcprarray[ j ]);
   }
 
   for (int j = 0; j < raw_cdcarray.getEntries(); j++) {
     printf("=== RawCDC    event====\nBlock %d ", j);
-    //  PrintEvent( &rawcprarray );
-    PrintEvent(raw_cdcarray[ j ]);
+    //  PrintCOPPEREvent( &rawcprarray );
+    PrintCOPPEREvent(raw_cdcarray[ j ]);
   }
 
   for (int j = 0; j < raw_svdarray.getEntries(); j++) {
     printf("=== RawSVD    event====\nBlock %d ", j);
-    //  PrintEvent( &rawcprarray );
-    PrintEvent(raw_svdarray[ j ]);
+    //  PrintCOPPEREvent( &rawcprarray );
+    PrintCOPPEREvent(raw_svdarray[ j ]);
   }
   for (int j = 0; j < raw_bpidarray.getEntries(); j++) {
     printf("=== RawBPID    event====\nBlock %d ", j);
-    //  PrintEvent( &rawcprarray );
-    PrintEvent(raw_bpidarray[ j ]);
+    //  PrintCOPPEREvent( &rawcprarray );
+    PrintCOPPEREvent(raw_bpidarray[ j ]);
   }
   for (int j = 0; j < raw_epidarray.getEntries(); j++) {
     printf("=== RawEPID    event====\nBlock %d ", j);
-    //  PrintEvent( &rawcprarray );
-    PrintEvent(raw_epidarray[ j ]);
+    //  PrintCOPPEREvent( &rawcprarray );
+    PrintCOPPEREvent(raw_epidarray[ j ]);
   }
   for (int j = 0; j < raw_eclarray.getEntries(); j++) {
     printf("=== RawECL    event====\nBlock %d ", j);
-    //  PrintEvent( &rawcprarray );
-    PrintEvent(raw_eclarray[ j ]);
+    //  PrintCOPPEREvent( &rawcprarray );
+    PrintCOPPEREvent(raw_eclarray[ j ]);
   }
   for (int j = 0; j < raw_klmarray.getEntries(); j++) {
     printf("=== RawKLM    event====\nBlock %d ", j);
-    //  PrintEvent( &rawcprarray );
-    PrintEvent(raw_klmarray[ j ]);
+    //  PrintCOPPEREvent( &rawcprarray );
+    PrintCOPPEREvent(raw_klmarray[ j ]);
   }
 
 

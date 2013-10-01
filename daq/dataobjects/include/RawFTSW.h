@@ -32,6 +32,7 @@ namespace Belle2 {
     //! Copy nth header part to m_FTSW_header
     void SetFTSWHeader(int n);
 
+
   protected :
 
     SendHeader m_FTSW_header;

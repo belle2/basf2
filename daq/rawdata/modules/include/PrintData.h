@@ -26,6 +26,8 @@
 
 #include <daq/rawdata/modules/DAQConsts.h>
 
+#include <daq/dataobjects/RawDataBlock.h>
+#include <daq/dataobjects/RawFTSW.h>
 #include <daq/dataobjects/RawCOPPER.h>
 #include <daq/dataobjects/RawSVD.h>
 #include <daq/dataobjects/RawCDC.h>
@@ -68,7 +70,8 @@ namespace Belle2 {
     //! Module functions to be called from event process
     virtual void event();
     virtual void VerifyCheckSum(int* buf);
-    virtual void PrintEvent(RawCOPPER* raw_array);
+    virtual void PrintCOPPEREvent(RawCOPPER* raw_array);
+    virtual void PrintEvent(RawDataBlock* raw_array, int i);
 
 
     // Data members

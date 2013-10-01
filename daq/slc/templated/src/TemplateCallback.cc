@@ -12,6 +12,7 @@ using namespace B2DAQ;
 TemplateCallback::TemplateCallback(NSMNode* node)
   : RCCallback(node)
 {
+  add(Command::TRIGFT);
 }
 
 TemplateCallback::~TemplateCallback() throw()

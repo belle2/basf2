@@ -217,7 +217,8 @@ int RunControlMessageManager::distribute(int index_seq, const Command& command) 
   return (int)node_v.size();
 }
 
-bool RunControlMessageManager::send(NSMNode* node, const Command& command) throw()
+bool RunControlMessageManager::send(NSMNode* node, const Command& command,
+                                    int npar_in, const unsigned int* pars_in) throw()
 {
   try {
     int id = node->getNodeID();
@@ -227,7 +228,12 @@ bool RunControlMessageManager::send(NSMNode* node, const Command& command) throw
       unsigned int pars[256];
       std::string data = "";
       int npar = 0;
-      if (command != Command::START) {
+      if (npar_in > 1) {
+        for (int i = 0; i < npar_in - 1; i++) {
+          pars[i] = pars_in[i + 1];
+          npar++;
+        }
+      } else if (command != Command::START) {
         npar = node->getParams(command, pars, data);
       } else {
         npar = 2;

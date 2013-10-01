@@ -22,6 +22,7 @@ namespace B2DAQ {
     static const Command PAUSE;
     static const Command ABORT;
     static const Command STATECHECK;
+    static const Command TRIGFT;
 
   public:
     static const int SUGGESTED = 2;

@@ -12,7 +12,8 @@ const Command Command::STOP(104, "STOP", "STOP");
 const Command Command::RESUME(105, "RESUMEN", "RESUME");
 const Command Command::PAUSE(106, "PAUSE", "PAUSE");
 const Command Command::ABORT(107, "ABORT", "ABORT");
-const Command Command::STATECHECK(201, "STATECHECK", "STATECHEK");
+const Command Command::STATECHECK(201, "STATECHECK", "STATECHECK");
+const Command Command::TRIGFT(301, "TRIGFT", "TRIGFT");
 const Command Command::OK(1, "OK", "OK");
 const Command Command::ERROR(2, "ERROR", "ERROR");
 
@@ -26,6 +27,7 @@ const Command& Command::operator=(const std::string& label) throw()
   else if (label == PAUSE._label) *this = PAUSE;
   else if (label == ABORT._label) *this = ABORT;
   else if (label == STATECHECK._label) *this = STATECHECK;
+  else if (label == TRIGFT._label) *this = TRIGFT;
   else if (label == OK.getLabel()) *this = OK;
   else if (label == ERROR.getLabel()) *this = ERROR;
   else *this = Enum::UNKNOWN;
@@ -59,6 +61,7 @@ int Command::isAvailable(const State& state) const throw()
   } else if (*this == RESUME && state == State::PAUSED_S) {
     return SUGGESTED;
   } else if (*this == STATECHECK || *this == OK ||
+             *this == TRIGFT ||
              *this == ERROR || *this == ABORT) {
     return ENABLED;
   } else {

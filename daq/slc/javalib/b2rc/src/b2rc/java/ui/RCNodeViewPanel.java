@@ -18,7 +18,6 @@ import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 
 import b2daq.ui.Updatable;
-import b2rc.core.FTSW;
 import b2rc.core.RCCommand;
 import b2rc.core.RCNode;
 import b2rc.core.RCState;

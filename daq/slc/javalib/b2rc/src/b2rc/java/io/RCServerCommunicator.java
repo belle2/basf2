@@ -13,7 +13,6 @@ import b2rc.core.RCConnection;
 import b2rc.core.RCNode;
 import b2rc.core.RCNodeSystem;
 import b2rc.core.RCState;
-import b2rc.db.RCDBManager;
 import b2rc.java.ui.ControlMainPanel;
 
 public class RCServerCommunicator {

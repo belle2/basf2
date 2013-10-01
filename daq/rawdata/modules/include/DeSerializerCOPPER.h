@@ -56,7 +56,7 @@ namespace Belle2 {
   private:
 
     virtual void FillNewRawCOPPERHeader(RawCOPPER* raw_copper);
-    virtual int* ReadCOPPERFIFO(const int entry, int* malloc_flag, int* m_size_word);
+    virtual int* ReadOneEventFromCOPPERFIFO(const int entry, int* malloc_flag, int* m_size_word);
     virtual void* OpenCOPPER();
     //! receive data
     virtual int Read(int fd, char* buf, int data_size_byte);

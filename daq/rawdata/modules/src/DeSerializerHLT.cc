@@ -36,6 +36,7 @@ REG_MODULE(DeSerializerHLT)
 
 DeSerializerHLTModule::DeSerializerHLTModule() : DeSerializerPCModule()
 {
+  B2INFO("DeSerializerHLT: Constructor done.");
 }
 
 
@@ -47,6 +48,7 @@ DeSerializerHLTModule::~DeSerializerHLTModule()
 
 void DeSerializerHLTModule::initialize()
 {
+  B2INFO("DeSerializerHLT: initialize() started.");
 
   // Accept requests for connections
   Connect();
@@ -84,17 +86,16 @@ void DeSerializerHLTModule::initialize()
     OpenOutputFile();
   }
 
-  B2INFO("Rx initialized.");
 
   // Initialize arrays for time monitor
   memset(time_array0, 0, sizeof(time_array0));
   memset(time_array1, 0, sizeof(time_array1));
   memset(time_array2, 0, sizeof(time_array2));
 
+  // initialize buffer number
   ClearNumUsedBuf();
 
-//   m_shmname = "/tmp/temp.daq";
-//   int shm_open(const char *m_shmname, int oflag, mode_t mode);
+  B2INFO("DeSerializerHLT: initialize() done.");
 
 }
 
@@ -105,6 +106,7 @@ void DeSerializerHLTModule::event()
   ClearNumUsedBuf();
 
   if (n_basf2evt < 0) {
+    B2INFO("DeSerializerHLT: event() started.");
     m_start_time = GetTimeSec();
     n_basf2evt = 0;
   }
@@ -137,7 +139,7 @@ void DeSerializerHLTModule::event()
     for (int k = 0; k < temp_rawcopper.GetNumEvents(); k++) {
       for (int l = 0; l < temp_rawcopper.GetNumNodes(); l++) {
         int index = k * temp_rawcopper.GetNumEvents() + l;
-        int buf_nwords = temp_rawcopper.GetCprBlockNwords(index);
+        int buf_nwords = temp_rawcopper.GetBlockNwords(index);
 
         int* temp_buf2 = NULL;
         int malloc_flag2 = 0;

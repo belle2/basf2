@@ -44,8 +44,6 @@ DeSerializerCOPPERModule::DeSerializerCOPPERModule() : DeSerializerModule()
 
   //Parameter definition
   B2INFO("DeSerializerCOPPER: Constructor done.");
-
-  //Stop plx9054 process's runaway
 }
 
 
@@ -55,7 +53,7 @@ DeSerializerCOPPERModule::~DeSerializerCOPPERModule()
 
 void DeSerializerCOPPERModule::initialize()
 {
-
+  B2INFO("DeSerializerCOPPER: initialize() started.");
 #ifndef DUMMY
   use_slot = 0; /* bit mask */
   int slot_shift;
@@ -83,7 +81,7 @@ void DeSerializerCOPPERModule::initialize()
   // Present slots to use
   //
   if (! use_slot) {
-    perror("Slot is not specified. Exiting...");
+    perror("[ERROR] Slot is not specified. Exiting...");
     exit(1);
   } else {
     int slot;
@@ -130,14 +128,13 @@ void DeSerializerCOPPERModule::initialize()
     m_cfg_sta = ShmGet(m_shmfd_sta, 4);
   }
 
-
-  B2INFO("Rx initialized.");
   memset(time_array0, 0, sizeof(time_array0));
   memset(time_array1, 0, sizeof(time_array1));
   memset(time_array2, 0, sizeof(time_array2));
   memset(time_array3, 0, sizeof(time_array3));
   memset(time_array4, 0, sizeof(time_array4));
   memset(time_array5, 0, sizeof(time_array5));
+  B2INFO("DeSerializerCOPPER: initialize() done.");
 
 }
 
@@ -146,6 +143,9 @@ void DeSerializerCOPPERModule::initialize()
 
 void DeSerializerCOPPERModule::FillNewRawCOPPERHeader(RawCOPPER* raw_copper)
 {
+
+
+
   const int num_cprblock = 0; // On COPPER, 1 COPPER block will be stored in a RawCOPPER.
   RawHeader rawhdr;
   rawhdr.SetBuffer(raw_copper->GetRawHdrBufPtr(num_cprblock));
@@ -155,8 +155,9 @@ void DeSerializerCOPPERModule::FillNewRawCOPPERHeader(RawCOPPER* raw_copper)
   //
   rawhdr.Initialize(); // Fill 2nd( hdr size) and 20th header word( magic word )
 
+
   // Set total words info
-  int nwords = raw_copper->GetCprBlockNwords(num_cprblock);
+  int nwords = raw_copper->GetBlockNwords(num_cprblock);
   rawhdr.SetNwords(nwords);
 
   //
@@ -193,14 +194,14 @@ void DeSerializerCOPPERModule::FillNewRawCOPPERHeader(RawCOPPER* raw_copper)
   rawtrl.SetBuffer(raw_copper->GetRawTrlBufPtr(num_cprblock));
   rawtrl.Initialize(); // Fill 2nd word : magic word
   rawtrl.SetChksum(CalcSimpleChecksum(raw_copper->GetBuffer(num_cprblock),
-                                      raw_copper->GetCprBlockNwords(num_cprblock) - rawtrl.GetTrlNwords()));
+                                      raw_copper->GetBlockNwords(num_cprblock) - rawtrl.GetTrlNwords()));
 
   // Check magic words are set at proper positions
 }
 
 
 
-int* DeSerializerCOPPERModule::ReadCOPPERFIFO(const int entry, int* malloc_flag, int* m_size_word)
+int* DeSerializerCOPPERModule::ReadOneEventFromCOPPERFIFO(const int entry, int* malloc_flag, int* m_size_word)
 {
   // Get header size
   const int COPPER_HEADER_TRAILER_NWORDS = 9;
@@ -220,7 +221,7 @@ int* DeSerializerCOPPERModule::ReadCOPPERFIFO(const int entry, int* malloc_flag,
   while (1) {
     int read_size = 0;
     if ((read_size = read(cpr_fd, (char*)m_bufary[entry] + recvd_byte, sizeof(int) *  BUF_SIZE_WORD  - recvd_byte)) < 0) {
-      perror("Failed to read header");
+      perror("[ERROR] Failed to read header");
       exit(-1);
     } else {
       recvd_byte += read_size;
@@ -228,9 +229,15 @@ int* DeSerializerCOPPERModule::ReadCOPPERFIFO(const int entry, int* malloc_flag,
     }
   }
 
+  //
+  // Calcurate data size
+  //
   *m_size_word = m_bufary[ entry ][ RawCOPPER::POS_DATA_LENGTH + RawHeader::RAWHEADER_NWORDS ]
                  + COPPER_HEADER_TRAILER_NWORDS + RawHeader::RAWHEADER_NWORDS + RawTrailer::RAWTRAILER_NWORDS; // 9 words are COPPER haeder and trailer size.
 
+  //
+  // Allocate buffer if needed
+  //
   if ((int)((*m_size_word - RawTrailer::RAWTRAILER_NWORDS) * sizeof(int)) > recvd_byte) {
     // Check buffer size
     if (*m_size_word >  BUF_SIZE_WORD) {
@@ -244,19 +251,10 @@ int* DeSerializerCOPPERModule::ReadCOPPERFIFO(const int entry, int* malloc_flag,
                          (*m_size_word - RawTrailer::RAWTRAILER_NWORDS) * sizeof(int) - recvd_byte);
     }
   } else if ((int)((*m_size_word - RawTrailer::RAWTRAILER_NWORDS) * sizeof(int)) < recvd_byte) {
-    printf("Read more than data size. Exiting...: %d %d %d %d %d\n", recvd_byte, *m_size_word * sizeof(int) , RawTrailer::RAWTRAILER_NWORDS * sizeof(int), m_bufary[ entry ][ RawCOPPER::POS_DATA_LENGTH ],  RawCOPPER::POS_DATA_LENGTH);
+    printf("[ERROR] Read more than data size. Exiting...: %d %d %d %d %d\n", recvd_byte, *m_size_word * sizeof(int) , RawTrailer::RAWTRAILER_NWORDS * sizeof(int), m_bufary[ entry ][ RawCOPPER::POS_DATA_LENGTH ],  RawCOPPER::POS_DATA_LENGTH);
     exit(-1);
   }
-
-#ifdef DEBUG
-  for (int k = 0; k < 13; k++) {
-    printf("%4d %.8x\n", k, m_bufary[ entry ][k ]);
-  }
-  printf("\n");
-  fflush(stdout);
-#endif
   m_totbytes +=  recvd_byte - RawHeader::RAWHEADER_NWORDS * sizeof(int);
-
 
 #else
   //
@@ -265,6 +263,11 @@ int* DeSerializerCOPPERModule::ReadCOPPERFIFO(const int entry, int* malloc_flag,
   *m_size_word = 256 + entry;
   m_bufary[entry][0] = *m_size_word;
 #endif
+
+  //
+  // Fill Data length
+  //
+  temp_buf[ 0 ] = *m_size_word;
 
 
 #ifdef TIME_MONITOR
@@ -282,6 +285,8 @@ int* DeSerializerCOPPERModule::ReadCOPPERFIFO(const int entry, int* malloc_flag,
   m_bufary[entry][2] = checksum;
 #endif
 
+
+
   return temp_buf;
 
 }
@@ -296,7 +301,7 @@ void* DeSerializerCOPPERModule::OpenCOPPER()
   // Open a finnesse device
   //
   if ((cpr_fd = open("/dev/copper/copper", O_RDONLY)) == -1) {
-    perror("Failed to open Finnese. Exiting... ");
+    perror("[ERROR] Failed to open Finnese. Exiting... ");
     exit(1);
   }
 
@@ -307,8 +312,8 @@ void* DeSerializerCOPPERModule::OpenCOPPER()
   ioctl(cpr_fd, CPRIOSET_LEF_WC_FF, &set_regval);
   ioctl(cpr_fd, CPRIOSET_LEF_WD_FF, &set_regval);
   int ret = ioctl(cpr_fd, CPRIOSET_FINESSE_STA, &use_slot, sizeof(use_slot));
-  printf("Reset slot %d ret %d\n", use_slot, ret);
-  //    m_start_time = GetTimeSec();
+  B2INFO("DeSerializerCOPPER: OpenCOPPER() done.");
+
 }
 
 
@@ -320,7 +325,7 @@ int DeSerializerCOPPERModule::Read(int fd, char* buf, int data_size_byte)
   int read_size = 0;
   while (1) {
     if ((read_size = read(fd, (char*)buf + n, data_size_byte - n)) < 0) {
-      perror("Failed to read header");
+      perror("[ERROR] Failed to read header");
       exit(-1);
     } else {
       n += read_size;
@@ -335,10 +340,10 @@ int DeSerializerCOPPERModule::Read(int fd, char* buf, int data_size_byte)
 
 void DeSerializerCOPPERModule::event()
 {
-
+  const int num_nodes = 1;
 
   if (n_basf2evt < 0) {
-
+    B2INFO("DeSerializerCOPPER: event() started.");
     // Use shared memory to start(for HSLB dummy data)
     if (m_shmflag != 0) {
       //      int* cfg_buf = ShmGet(m_shmfd_cfg, 4);
@@ -360,14 +365,20 @@ void DeSerializerCOPPERModule::event()
   for (int j = 0; j < NUM_EVT_PER_BASF2LOOP; j++) {
     int m_size_word = 0;
     int malloc_flag = 0;
-    int* temp_buf = ReadCOPPERFIFO(j, &malloc_flag, &m_size_word);
+    int* temp_buf = ReadOneEventFromCOPPERFIFO(j, &malloc_flag, &m_size_word);
 
     //
     // Fill RawCOPPER
     //
     temp_rawcopper =  rawcprarray.appendNew();
     // Store data buffer
-    temp_rawcopper->SetBuffer(temp_buf, m_size_word, malloc_flag, 1, 1);
+
+    int num_events = 1;
+
+    temp_rawcopper->SetBuffer(temp_buf, m_size_word, malloc_flag, num_events, num_nodes);
+
+
+
     // Fill header and trailer
     FillNewRawCOPPERHeader(temp_rawcopper);
 

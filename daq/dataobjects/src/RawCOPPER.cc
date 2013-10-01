@@ -15,23 +15,37 @@ ClassImp(RawCOPPER);
 
 RawCOPPER::RawCOPPER()
 {
-  m_nwords = 0;
-  m_buffer = NULL;
-  m_use_prealloc_buf = false;
 }
 
 RawCOPPER::~RawCOPPER()
 {
-  if (!m_use_prealloc_buf && m_buffer != NULL) {
-    delete[] m_buffer;
+}
+
+
+int* RawCOPPER::GetRawHdrBufPtr(int n)
+{
+  int pos_nwords = GetBufferPos(n);
+  return &(m_buffer[ pos_nwords ]);
+}
+
+int* RawCOPPER::GetRawTrlBufPtr(int n)
+{
+  int pos_nwords;
+  RawTrailer trl;
+
+  if (n == (m_num_events * m_num_nodes) - 1) {
+    pos_nwords = m_nwords - trl.GetTrlNwords();
+  } else {
+    pos_nwords = GetBufferPos(n + 1) - trl.GetTrlNwords();
   }
+  return &(m_buffer[ pos_nwords ]);
 }
 
 
 int RawCOPPER::GetBufferPos(int n)
 {
   if (m_buffer == NULL || m_nwords <= 0) {
-    printf("RawCOPPER buffer is not available.\n");
+    printf("[ERROR] RawPacket buffer(%p) is not available or length(%d) is not set.\n", m_buffer, m_nwords);
     exit(1);
   }
 
@@ -64,91 +78,6 @@ int RawCOPPER::GetBufferPos(int n)
   return pos_nwords;
 
 }
-
-
-int RawCOPPER::TotalBufNwords()
-{
-  return m_nwords;
-}
-
-
-int* RawCOPPER::GetRawHdrBufPtr(int n)
-{
-  int pos_nwords = GetBufferPos(n);
-  return &(m_buffer[ pos_nwords ]);
-}
-
-int* RawCOPPER::GetRawTrlBufPtr(int n)
-{
-  int pos_nwords;
-  RawTrailer trl;
-
-  if (n == (m_num_events * m_num_nodes) - 1) {
-    pos_nwords = m_nwords - trl.GetTrlNwords();
-  } else {
-    pos_nwords = GetBufferPos(n + 1) - trl.GetTrlNwords();
-  }
-  return &(m_buffer[ pos_nwords ]);
-}
-
-
-int RawCOPPER::GetCprBlockNwords(int n)
-{
-  int size;
-  //  printf("aaaaaaaaaaaaa %d %d\n", n, m_num_events * m_num_nodes );
-  if (n == (m_num_events * m_num_nodes) - 1) {
-    size =  m_nwords - GetBufferPos(n);
-  } else {
-    size = GetBufferPos(n + 1) - GetBufferPos(n);
-  }
-  return size;
-}
-
-// int* RawCOPPER::AllocateBuffer(int nwords)
-// {
-//   m_nwords = nwords;
-//   if (!m_use_prealloc_buf && m_buffer != NULL) delete[] m_buffer;
-//   m_buffer = new int[nwords];
-//   m_use_prealloc_buf = false;
-//   return m_buffer;
-// }
-
-int* RawCOPPER::GetWholeBuffer()
-{
-  return m_buffer;
-}
-
-int* RawCOPPER::GetBuffer(int n)
-{
-  int pos_nwords = GetBufferPos(n);
-  return &(m_buffer[ pos_nwords ]);
-}
-
-
-void RawCOPPER::SetBuffer(int* bufin, int nwords, int malloc_flag, int num_events, int num_nodes)
-{
-  if (!m_use_prealloc_buf && m_buffer != NULL) delete[] m_buffer;
-
-  if (malloc_flag == 0) {
-    m_use_prealloc_buf = true;
-  } else {
-    m_use_prealloc_buf = false;
-  }
-  //  m_nwords = bufin[0];
-  m_nwords = nwords;
-  m_buffer = bufin;
-
-  m_num_nodes = num_nodes;
-  m_num_events = num_events;
-
-  //
-  // Assign header and trailer
-  //
-//   m_header.SetBuffer(&(bufin[ 0 ]));
-//   m_trailer.SetBuffer(&(bufin[ m_nwords - m_trailer.GetTrlNwords() ]));
-
-}
-
 
 
 int RawCOPPER::GetCOPPERNodeId(int n)

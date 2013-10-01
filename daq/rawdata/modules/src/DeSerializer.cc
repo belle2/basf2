@@ -90,7 +90,7 @@ void DeSerializerModule::ShmOpen(char* path_cfg, char* path_sta)
   m_shmfd_cfg = shm_open(path_cfg, O_RDWR, 0666);
   if (m_shmfd_cfg < 0) {
     printf("%s\n", path_cfg);
-    perror("shm_open2");
+    perror("[ERROR] shm_open2");
     exit(1);
   }
   //}
@@ -105,7 +105,7 @@ void DeSerializerModule::ShmOpen(char* path_cfg, char* path_sta)
   m_shmfd_sta = shm_open(path_sta , O_RDWR, 0666);
   if (m_shmfd_sta < 0) {
     printf("%s\n", path_sta);
-    perror("shm_open2");
+    perror("[ERROR] shm_open2");
     exit(1);
   }
   //}
@@ -125,11 +125,6 @@ void DeSerializerModule::event()
 {
 }
 
-
-void DeSerializerModule::beginRun()
-{
-  B2INFO("beginRun called.");
-}
 
 
 #define POS_HEADER_MAGIC 7
@@ -164,7 +159,7 @@ int DeSerializerModule::check_data(char* buf, int prev_eve, int* cur_eve)
   // check header magic number
   if (m_buf[ pos_header_magic ] != 0xfffffafa) {
 
-    printf("invalid header magic word : %d 0x%x\n", pos_header_magic, m_buf[ pos_footer_magic ]);
+    printf("[ERROR] invalid header magic word : %d 0x%x\n", pos_header_magic, m_buf[ pos_footer_magic ]);
 
     exit(1);
   }
@@ -173,13 +168,13 @@ int DeSerializerModule::check_data(char* buf, int prev_eve, int* cur_eve)
   // check event number
   *cur_eve = m_buf[ pos_event_num ];
   if (prev_eve >= 0 && m_buf[ pos_event_num ] != prev_eve + 1) {
-    perror("invalid event number");
+    perror("[ERROR] invalid event number");
     exit(1);
   }
 
   //  printf("%d 0x%x 0x%x\n", m_buf[ POS_EVENT_NUM ], m_buf[ POS_HEADER_MAGIC ], m_buf[ word_num - POS_FOOTER_MAGIC ] );
   if (m_buf[ word_num - pos_footer_magic ] != 0xfffff5f5) {
-    printf("invalid footer magic word : %d 0x%x\n", word_num - pos_footer_magic, m_buf[ word_num - pos_footer_magic ]);
+    printf("[ERROR] invalid footer magic word : %d 0x%x\n", word_num - pos_footer_magic, m_buf[ word_num - pos_footer_magic ]);
     exit(1);
   }
   return 0;
@@ -208,20 +203,6 @@ unsigned int  DeSerializerModule::CalcSimpleChecksum(int* buf, int nwords)
 }
 
 
-void DeSerializerModule::endRun()
-{
-  //fill Run data
-  B2INFO("endRun done.");
-
-}
-
-
-void DeSerializerModule::terminate()
-{
-  B2INFO("terminate called");
-
-  //  exit(1);
-}
 
 double DeSerializerModule::GetTimeSec()
 {
@@ -243,8 +224,8 @@ void DeSerializerModule::RecordTime(int event, double* array)
 void DeSerializerModule::OpenOutputFile()
 {
   if ((fp_dump = fopen(dump_fname.c_str(), "wb")) == NULL) {
-    perror("Failed to open file.");
-    printf("Failed to open file %s. Exting...\n", dump_fname.c_str());
+    perror("[ERROR] Failed to open file.");
+    printf("[ERROR] Failed to open file %s. Exiting...\n", dump_fname.c_str());
     exit(-1);
   }
 }
@@ -252,7 +233,7 @@ void DeSerializerModule::OpenOutputFile()
 void DeSerializerModule::DumpData(char* buf, int size)
 {
   if (fwrite(buf, size, 1, fp_dump) <= 0) {
-    perror("Failed to write buffer to a file. Exiting...");
+    perror("[ERROR] Failed to write buffer to a file. Exiting...");
     exit(-1);
   }
 }
@@ -267,7 +248,7 @@ int* DeSerializerModule::GetBuffer(int nwords, int* malloc_flag)
     temp_buf = new int[ nwords ];
   } else {
     if ((temp_buf = GetPreAllocBuf()) == 0x0) {
-      printf("Null pointer from GetPreALlocBuf(). Exting...\n");
+      printf("[ERROR] Null pointer from GetPreALlocBuf(). Exting...\n");
       sleep(1234567);
       exit(1);
     } else {
@@ -285,8 +266,8 @@ int* DeSerializerModule::GetPreAllocBuf()
     tempbuf = m_bufary[ m_num_usedbuf  ];
     m_num_usedbuf++;
   } else {
-    printf("No pre-allocated buffers are left. %d > %d \n", m_num_usedbuf, NUM_PREALLOC_BUF);
-    printf("Not enough buffers are allocated or memory leak or forget to call ClearNumUsedBuf every event loop. Exting...\n");
+    printf("[ERROR] No pre-allocated buffers are left. %d > %d \n", m_num_usedbuf, NUM_PREALLOC_BUF);
+    printf("[ERROR] Not enough buffers are allocated or memory leak or forget to call ClearNumUsedBuf every event loop. Exting...\n");
     sleep(1234567);
     exit(1);
   }

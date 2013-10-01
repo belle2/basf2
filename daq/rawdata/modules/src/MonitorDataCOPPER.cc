@@ -57,7 +57,7 @@ void MonitorDataCOPPERModule::initialize()
 
 void MonitorDataCOPPERModule::beginRun()
 {
-  B2INFO("beginRun called.");
+
 }
 
 
@@ -67,13 +67,13 @@ void MonitorDataCOPPERModule::endRun()
 {
   //fill Run data
 
-  B2INFO("endRun done.");
+
 }
 
 
 void MonitorDataCOPPERModule::terminate()
 {
-  B2INFO("terminate called");
+
 }
 
 
@@ -101,7 +101,7 @@ void MonitorDataCOPPERModule::event()
       int size_byte = 0;
       buf = rawcprarray[ j ]->GetBuffer(i);
       rawhdr.SetBuffer(rawcprarray[ j ]->GetRawHdrBufPtr(i));
-      size_byte = rawcprarray[ j ]->GetCprBlockNwords(i) * sizeof(int);
+      size_byte = rawcprarray[ j ]->GetBlockNwords(i) * sizeof(int);
       h_size->Fill((float)size_byte);
       h_size2d->Fill((float)size_byte, (float)j);
 

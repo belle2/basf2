@@ -12,6 +12,7 @@
 // Includes
 #include <stdio.h>
 #include <stdlib.h>
+#include <daq/dataobjects/RawDataBlock.h>
 #include <daq/dataobjects/RawHeader.h>
 #include <daq/dataobjects/RawTrailer.h>
 #include <framework/datastore/DataStore.h>
@@ -20,7 +21,7 @@
 
 namespace Belle2 {
 
-  class RawCOPPER : public TObject {
+  class RawCOPPER : public RawDataBlock {
   public:
     //! Default constructor
     RawCOPPER();
@@ -29,42 +30,8 @@ namespace Belle2 {
     //! Destructor
     virtual ~RawCOPPER();
 
-    //! copy rawdata into internal buffer
-    //    virtual void Copy(int* bufin, int nwords);
-
-    //! Get total length of
-    virtual int TotalBufNwords();
-
-    //! get position of COPPER block
+    //! get COPPER node id from data
     virtual int GetBufferPos(int n);
-
-
-    //! get nth buffer pointer
-    virtual int* GetWholeBuffer();
-
-    //! get nth buffer pointer
-    virtual int* GetBuffer(int n);
-
-    //! get nth buffer pointer
-    virtual int GetNumEntries() { return m_num_events * m_num_nodes; }
-
-    //! get nth buffer pointer
-    virtual int GetNumNodes() { return m_num_nodes; }
-
-    //! get nth buffer pointer
-    virtual int GetNumEvents() { return m_num_events; }
-
-    //! set buffer
-    virtual void SetBuffer(int* bufin, int nwords, int malloc_flag, int num_events, int num_nodes);
-
-    //! get COPPER Block Size
-    virtual int GetCprBlockNwords(int n);
-
-    /*     //! get data length */
-    /*     virtual RawHeader* GetRawHeader(); */
-
-    /*     //! get data length */
-    /*     virtual RawTrailer* GetRawTrailer(); */
 
     //! get buffer pointer of rawcopper header
     virtual int* GetRawHdrBufPtr(int n);
@@ -192,17 +159,6 @@ namespace Belle2 {
 
 
   protected :
-
-
-    int m_nwords;
-    int* m_buffer; //[m_nwords]
-    bool m_use_prealloc_buf;
-
-    RawHeader tmp_header;  //! Not record
-    RawTrailer tmp_trailer; //! Not record
-
-    int m_num_events;
-    int m_num_nodes;
 
     ClassDef(RawCOPPER, 1);
   };

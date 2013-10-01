@@ -69,7 +69,7 @@ void SerializerModule::initialize()
   } else if (p_method == "ROPC") {
     p_method_val = 2;
   } else {
-    printf("Please specify the data-handling");
+    printf("[ERROR] Please specify the data-handling");
     exit(1);
   }
 
@@ -182,14 +182,14 @@ void SerializerModule::SendByWriteV(RawCOPPER* rawcpr)
   int n = 0;
   if ((n = writev(m_socket, iov, NUM_BUFFER)) < 0) {
     //  if ((n = writev(m_socket, iov, NUM_BUFFER)) != total_send_bytes) {
-    perror("SEND error1");
+    perror("[ERROR] SEND error1");
     exit(1);
   }
 
   int total_send_bytes = sizeof(int) * send_header.GetTotalNwords();
   if (n != total_send_bytes) {
-    perror("Failed to send all data");
-    printf("Sent data length is not consistent. %d %d : Exiting...", n, total_send_bytes);
+    perror("[ERROR] Failed to send all data");
+    printf("[ERROR] Sent data length is not consistent. %d %d : Exiting...", n, total_send_bytes);
     fflush(stdout);
 //     for( int i = 0; i < total_send_bytes/4 ; i++){
 //       printf("", );
@@ -216,7 +216,7 @@ void SerializerModule::Accept()
   host = gethostbyname(m_hostname_local.c_str());
 
   if (host == NULL) {
-    printf("hostname cannot be resolved. Exiting...: %s \n", m_hostname_local.c_str());
+    printf("[ERROR] hostname cannot be resolved. Check /etc/hosts. Exiting...: %s \n", m_hostname_local.c_str());
     exit(1);
   }
 
@@ -243,8 +243,10 @@ void SerializerModule::Accept()
 
   if (bind(fd_listen, (struct sockaddr*)&sock_listen, sizeof(struct sockaddr)) < 0) {
     printf("port %d : ", m_port_to);
-    perror("Failed to bind. Maybe other programs have already occupied this port. Exting...");
-    sleep(1234567);
+    printf("\033[31m");
+    printf("[ERROR] Failed to bind. Maybe other programs have already occupied this port. Exiting...");
+    printf("\033[0m");
+    //    sleep(1234567);
     exit(1);
   }
 
@@ -252,7 +254,7 @@ void SerializerModule::Accept()
   setsockopt(fd_listen, IPPROTO_TCP, TCP_NODELAY, &val1, (socklen_t)sizeof(val1));
   int backlog = 1;
   if (listen(fd_listen, backlog) < 0) {
-    perror("Failed in listen:");
+    perror("[ERROR] Failed in listen:");
     exit(-1);
   }
 
@@ -264,7 +266,7 @@ void SerializerModule::Accept()
   printf("Accepting... : port %d server %s\n", m_port_to, m_hostname_local.c_str());
   fflush(stdout);
   if ((fd_accept = accept(fd_listen, (struct sockaddr*) & (sock_accept), &addrlen)) == 0) {
-    perror("Failed to accept. Exiting...");
+    perror("[ERROR] Failed to accept. Exiting...");
     exit(-1);
   } else {
     printf("Connection is established: port %d from adress %d %s\n",
@@ -276,7 +278,7 @@ void SerializerModule::Accept()
     timeout.tv_usec = 0;
     ret = setsockopt(fd_accept, SOL_SOCKET, SO_SNDTIMEO, &timeout, (socklen_t)sizeof(timeout));
     if (ret < 0) {
-      perror("Failed to set TIMEOUT. Exiting...");
+      perror("[ERROR] Failed to set TIMEOUT. Exiting...");
       exit(-1);
     }
   }
@@ -384,7 +386,7 @@ void SerializerModule::event()
 
         SendByWriteV(rawcprarray[ j ]);
 #else
-        perror("No SEND PARAMETER IS SPECIFIED.");
+        perror("[ERROR] No SEND PARAMETER IS SPECIFIED.");
         exit(1);
 #endif  // MULTIPLE_SEND
         break;
@@ -394,7 +396,7 @@ void SerializerModule::event()
         // Send Body
 
         if (send(m_socket, (char*)buf, m_size_byte, MSG_NOSIGNAL) != m_size_byte) {
-          perror("Failed to send data. Exiting...");
+          perror("[ERROR] Failed to send data. Exiting...");
           exit(1);
         }
 
@@ -412,7 +414,7 @@ void SerializerModule::event()
         break;
 
       default :
-        perror("Specify how to handle the data. Exiting...");
+        perror("[ERROR] Specify how to handle the data. Exiting...");
         exit(1);
     }
 #else //NOT_USE_SOCKETLIB

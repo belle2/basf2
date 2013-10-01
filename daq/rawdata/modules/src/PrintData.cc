@@ -41,6 +41,7 @@ PrintDataModule::PrintDataModule() : Module()
   n_basf2evt = -1;
   m_compressionLevel = 0;
 
+  B2INFO("PrintData: Constructor done.");
 }
 
 
@@ -51,6 +52,8 @@ PrintDataModule::~PrintDataModule()
 
 void PrintDataModule::initialize()
 {
+  B2INFO("PrintData: initialize() started.");
+
   //  StoreArray<RawCOPPER>::registerTransient(s_auxMCParticlesName.c_str());
   //  StoreObjPtr<RawCOPPER>::registerTransient();
   // Initialize EvtMetaData
@@ -58,29 +61,8 @@ void PrintDataModule::initialize()
 
   // Create Message Handler
   m_msghandler = new MsgHandler(m_compressionLevel);
+  B2INFO("PrintData: initialize() done.");
 
-}
-
-
-void PrintDataModule::beginRun()
-{
-  B2INFO("beginRun called.");
-}
-
-
-
-
-void PrintDataModule::endRun()
-{
-  //fill Run data
-
-  B2INFO("endRun done.");
-}
-
-
-void PrintDataModule::terminate()
-{
-  B2INFO("terminate called");
 }
 
 
@@ -88,10 +70,6 @@ void PrintDataModule::terminate()
 //
 // User defined functions
 //
-
-
-
-
 
 void PrintDataModule::VerifyCheckSum(int* buf)     // Should be modified
 {
@@ -122,7 +100,7 @@ void PrintDataModule::PrintEvent(RawCOPPER* raw_array)
 
     rawhdr.SetBuffer(raw_array->GetRawHdrBufPtr(i));
 
-    size_byte = raw_array->GetCprBlockNwords(i) * sizeof(int);
+    size_byte = raw_array->GetBlockNwords(i) * sizeof(int);
 
     //
     // Extract FEE buffer
@@ -165,6 +143,7 @@ void PrintDataModule::PrintEvent(RawCOPPER* raw_array)
 
 void PrintDataModule::event()
 {
+  B2INFO("PrintData: event() started.");
   StoreArray<RawCOPPER> rawcprarray;
   StoreArray<RawCDC> raw_cdcarray;
 

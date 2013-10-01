@@ -66,10 +66,7 @@ namespace Belle2 {
     virtual void initialize();
 
     //! Module functions to be called from event process
-    virtual void beginRun();
     virtual void event();
-    virtual void endRun();
-    virtual void terminate();
     virtual void VerifyCheckSum(int* buf);
     virtual void PrintEvent(RawCOPPER* raw_array);
 

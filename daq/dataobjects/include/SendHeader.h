@@ -44,6 +44,7 @@ namespace Belle2 {
     void SetEventNumber(int eve_num);
     void SetNodeID(int node_id);
 
+
     int GetTotalNwords();  //! get contents of Header
     int GetHdrNwords();  //! get contents of Header
     int GetNumEventsinPacket();

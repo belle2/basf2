@@ -42,6 +42,7 @@ DeSerializerPCModule::DeSerializerPCModule() : DeSerializerModule()
   addParam("NumConn", m_num_connections, "Number of Connections", 0);
   addParam("HostNameFrom", m_hostname_from, "Hostnames of data sources");
   addParam("PortFrom", m_port_from, "port numbers of data sources");
+
   B2INFO("DeSerializerPC: Constructor done.");
 
 }
@@ -56,7 +57,7 @@ DeSerializerPCModule::~DeSerializerPCModule()
 
 void DeSerializerPCModule::initialize()
 {
-
+  B2INFO("DeSerializerPC: initialize() started.");
   // Accept requests for connections
   Connect();
 
@@ -89,7 +90,7 @@ void DeSerializerPCModule::initialize()
     OpenOutputFile();
   }
 
-  B2INFO("Rx initialized.");
+
 
   // Initialize arrays for time monitor
   memset(time_array0, 0, sizeof(time_array0));
@@ -98,15 +99,15 @@ void DeSerializerPCModule::initialize()
 
   ClearNumUsedBuf();
 
-  //   m_shmname = "/tmp/temp.daq";
-  //   int shm_open(const char *m_shmname, int oflag, mode_t mode);
-  printf("PC  shmflag %d #################\n", m_shmflag);
+
+  // Shared memory
   if (m_shmflag != 0) {
     ShmOpen("/ropc_config", "/ropc_status");
     m_cfg_buf = ShmGet(m_shmfd_cfg, 4);
     m_cfg_sta = ShmGet(m_shmfd_sta, 4);
   }
 
+  B2INFO("DeSerializerPC: initialize() done.");
 }
 
 
@@ -125,7 +126,7 @@ int DeSerializerPCModule::Recv(int sock, char* buf, int data_size_byte, int flag
   int read_size = 0;
   while (1) {
     if ((read_size = recv(sock, (char*)buf + n, data_size_byte - n , flag)) < 0) {
-      perror("Failed to read header");
+      perror("[ERROR] Failed to read header");
       exit(-1);
     } else {
       n += read_size;
@@ -151,7 +152,7 @@ int DeSerializerPCModule::Connect()
     struct hostent* host;
     host = gethostbyname(m_hostname_from[ i ].c_str());
     if (host == NULL) {
-      perror("hostname cannot be resolved. Exiting...");
+      perror("[ERROR] hostname cannot be resolved. Check /etc/hosts. Exiting...");
       exit(1);
     }
     socPC.sin_addr.s_addr = *(unsigned int*)host->h_addr_list[0];
@@ -238,7 +239,7 @@ int* DeSerializerPCModule::RecvData(int* malloc_flag, int* total_buf_nwords, int
     if (i == 0) {
       *num_events_in_sendblock = temp_num_events;
     } else if (*num_events_in_sendblock != temp_num_events) {
-      printf("Different # of events or nodes over data sources( %d %d %d %d ). Exiting...\n", *num_events_in_sendblock , temp_num_events , *num_nodes_in_sendblock , temp_num_nodes);
+      printf("[ERROR] Different # of events or nodes over data sources( %d %d %d %d ). Exiting...\n", *num_events_in_sendblock , temp_num_events , *num_nodes_in_sendblock , temp_num_nodes);
       exit(1);
     }
     *num_nodes_in_sendblock += temp_num_nodes;
@@ -274,7 +275,7 @@ int* DeSerializerPCModule::RecvData(int* malloc_flag, int* total_buf_nwords, int
                              each_buf_nwords[ i ] * sizeof(int), flag);
   }
   if (*total_buf_nwords * sizeof(int) != total_recvd_byte) {
-    perror("Receiving data in an invalid unit. Exting...");
+    perror("[ERROR] Receiving data in an invalid unit. Exting...");
     exit(-1);
   }
 
@@ -311,13 +312,13 @@ int* DeSerializerPCModule::RecvData(int* malloc_flag, int* total_buf_nwords, int
     fflush(stdout);
 
     if (stat <= 0) {
-      cerr << "EoD is found without updating EventMetaData.";
+      cerr << "[ERROR] EoD is found without updating EventMetaData.";
       exit(-1); // Exit if EoD is found without updating EventMetaData
     } else if (tot_stat >  BUF_SIZE_WORD * sizeof(int)) {
-      printf("Too large data( %d bytes ). Exiting...", stat);
+      printf("[ERROR] Too large data( %d bytes ). Exiting...", stat);
       exit(-1);
     } else if (stat % sizeof(int) != 0) {
-      printf("Recvd data size is not multple of sizeof(int). Exiting... : %d\n", stat);
+      printf("[ERROR] Recvd data size is not multple of sizeof(int). Exiting... : %d\n", stat);
       exit(-1);
     }
 
@@ -335,14 +336,11 @@ int* DeSerializerPCModule::RecvData(int* malloc_flag, int* total_buf_nwords, int
 
 
 
-
-
-
-
 void DeSerializerPCModule::event()
 {
   ClearNumUsedBuf();
   if (n_basf2evt < 0) {
+    B2INFO("DeSerializerPC: event() started.");
     m_start_time = GetTimeSec();
     n_basf2evt = 0;
   }

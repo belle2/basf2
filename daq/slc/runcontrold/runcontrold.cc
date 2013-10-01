@@ -42,8 +42,8 @@ int main(int argc, char** argv)
 {
   using namespace B2DAQ;
 
-  if (argc < 2) {
-    std::cerr << "Usage : ./runcontrold <server ip for GUI>"
+  if (argc < 1) {
+    std::cerr << "Usage : ./runcontrold [ip=50000]"
               << std::endl;
     return 1;
   }
@@ -52,8 +52,8 @@ int main(int argc, char** argv)
   const std::string dir = getenv("B2SC_XML_PATH");
   const std::string entry = getenv("B2SC_XML_ENTRY");
   const std::string path = getenv("B2SC_CPRLIB_PATH");
-  const std::string ip = argv[1];
-  const int port = (argc > 2) ? atoi(argv[2]) : 50000;
+  const std::string ip = getenv("B2SC_SERVER_HOST");
+  const int port = (argc > 1) ? atoi(argv[1]) : 50000;
   const std::string db_host = getenv("B2SC_DB_HOST");
   const std::string db_name = getenv("B2SC_DB_NAME");
   const std::string db_user = getenv("B2SC_DB_USER");
@@ -93,6 +93,8 @@ int main(int argc, char** argv)
     db->execute("select * from run_config order by start_time desc limit 1;");
     std::vector<DBRecord>& record_v(db->loadRecords());
     if (record_v.size() > 0) {
+      data->getRunConfig()->setRunType(record_v[0].getFieldValue("run_type"));
+      data->getRunConfig()->setOperators(record_v[0].getFieldValue("operators"));
       data->getRunConfig()->setVersion(record_v[0].getFieldValueInt("version"));
       data->getRunStatus()->setExpNumber(record_v[0].getFieldValueInt("exp_no"));
       data->getRunStatus()->setRunNumber(record_v[0].getFieldValueInt("run_no"));

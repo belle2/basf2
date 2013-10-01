@@ -6,7 +6,7 @@ public class LogLevel {
 	
 	static final public LogLevel UNDEFINED = new LogLevel(-1, "UNDEFINED", HtmlColor.BLACK, HtmlColor.NULL);
 	static final public LogLevel DEBUG = new LogLevel(0, "DEBUG", HtmlColor.GRAY, HtmlColor.NULL);
-	static final public LogLevel INFO = new LogLevel(1, "INFO", HtmlColor.RUNNING_GREEN, HtmlColor.NULL);
+	static final public LogLevel INFO = new LogLevel(1, "INFO", new HtmlColor(0, 153, 51), HtmlColor.NULL);
 	static final public LogLevel NOTICE = new LogLevel(2, "NOTICE", HtmlColor.BLUE, HtmlColor.NULL);
 	static final public LogLevel WARNING = new LogLevel(3, "WARNING", HtmlColor.ORANGE, HtmlColor.NULL);
 	static final public LogLevel ERROR = new LogLevel(4, "ERROR", HtmlColor.MAGENTA, HtmlColor.NULL);

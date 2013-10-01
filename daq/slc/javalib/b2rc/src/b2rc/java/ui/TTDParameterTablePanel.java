@@ -63,8 +63,8 @@ public class TTDParameterTablePanel extends ParameterTablePanel {
 			//param_v.add(""+ttd.getHost().getProductID());
 			//param_v.add(ttd.getHost().getLocation());
 			for ( int i = 0; i < 10; i++ ) {
-				int id = (ttd.getFTSW(i) != null)?ttd.getFTSW(i).getId():-1;
-				param_v.add(id);
+				int id = (ttd.getFTSW(i) != null)?ttd.getFTSW(i).getChannel():-1;
+				param_v.add(id>=0?id:"");
 			}
 			model.addRow(param_v);
 		}

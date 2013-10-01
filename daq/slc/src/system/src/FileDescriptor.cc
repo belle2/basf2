@@ -46,10 +46,8 @@ bool FileDescriptor::select(int sec, int usec) throw(IOException)
   if (sec >= 0 && usec >= 0) {
     timeval t = {sec, usec};
     ret = ::select(FD_SETSIZE, &fds, NULL, NULL, &t);
-    //ret = ::select(1 + _fd, &fds, NULL, NULL, &t);
   } else {
     ret = ::select(FD_SETSIZE, &fds, NULL, NULL, NULL);
-    //ret = ::select(1 + _fd, &fds, NULL, NULL, NULL);
   }
   if (ret < 0) {
     perror("select");

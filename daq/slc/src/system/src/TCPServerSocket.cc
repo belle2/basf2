@@ -80,6 +80,7 @@ TCPSocket TCPServerSocket::accept() throw(IOException)
   addr.sin_port = htons(_port);
   int fd;
   if ((fd = ::accept(_fd, (sockaddr*) & (addr), &len)) == -1) {
+    perror("accept");
     throw (IOException(__FILE__, __LINE__, "Fail to accept."));
   }
   TCPSocket s(fd);

@@ -22,14 +22,19 @@ bool LocalNSMCommunicator::reset() throw()
 
 RunControlMessage LocalNSMCommunicator::waitMessage() throw(IOException)
 {
-  RunControlMessage msg(RunControlMessage::LOCALNSM);
-  if (_nsm_comm->wait(5000)) {
-    msg.setMessage(_nsm_comm->getMessage());
-    msg.setCommand(msg.getMessage().getRequestName());
-  } else {
-    msg.setCommand(Command::STATECHECK);
+  try {
+    RunControlMessage msg(RunControlMessage::LOCALNSM);
+    if (_nsm_comm->wait(5000)) {
+      msg.setMessage(_nsm_comm->getMessage());
+      msg.setCommand(msg.getMessage().getRequestName());
+    } else {
+      msg.setCommand(Command::STATECHECK);
+    }
+    return msg;
+  } catch (const IOException& e) {
+    B2DAQ::debug("[DEBUG] %s:%d: NSM error", __FILE__, __LINE__);
+    throw (e);
   }
-  return msg;
 }
 
 void LocalNSMCommunicator::sendMessage(const RunControlMessage& msg)

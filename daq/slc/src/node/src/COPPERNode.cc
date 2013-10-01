@@ -78,8 +78,8 @@ int COPPERNode::getParams(const Command& command, unsigned int* pars,
         if (module != NULL) {
           FEEModule::RegisterList& reg_v(module->getRegisters());
           pars[npar++] = reg_v.size();
-          for (size_t i = 0; i < reg_v.size(); i++) {
-            FEEModule::Register& reg(reg_v[i]);
+          for (size_t j = 0; j < reg_v.size(); j++) {
+            FEEModule::Register& reg(reg_v[j]);
             pars[npar++] = reg.getSize();
             pars[npar++] = reg.getAddress();
             pars[npar++] = reg.length();
@@ -97,8 +97,8 @@ int COPPERNode::getParams(const Command& command, unsigned int* pars,
         FEEModule* module = _hslb_v[i]->getFEEModule();
         if (module != NULL) {
           FEEModule::RegisterList& reg_v(module->getRegisters());
-          for (size_t i = 0; i < reg_v.size(); i++) {
-            FEEModule::Register& reg(reg_v[i]);
+          for (size_t j = 0; j < reg_v.size(); j++) {
+            FEEModule::Register& reg(reg_v[j]);
             for (size_t ch = 0; ch < reg.length(); ch++) {
               pars[npar++] = reg.getValue(ch);
             }
@@ -132,7 +132,7 @@ void COPPERNode::setParams(const Command& command,
       size_t nreg = pars[par_i++];
       FEEModule* module = _hslb_v[i]->getFEEModule();
       module->clearRegisters();
-      for (size_t i = 0; i < nreg; i++) {
+      for (size_t j = 0; j < nreg; j++) {
         FEEModule::Register reg;
         reg.setSize(pars[par_i++]);
         reg.setAddress(pars[par_i++]);
@@ -146,8 +146,8 @@ void COPPERNode::setParams(const Command& command,
         FEEModule* module = _hslb_v[i]->getFEEModule();
         if (module != NULL) {
           FEEModule::RegisterList& reg_v(module->getRegisters());
-          for (size_t i = 0; i < reg_v.size(); i++) {
-            FEEModule::Register& reg(reg_v[i]);
+          for (size_t j = 0; j < reg_v.size(); j++) {
+            FEEModule::Register& reg(reg_v[j]);
             for (size_t ch = 0; ch < reg.length(); ch++) {
               reg.setValue(ch, pars[par_i++]);
             }

@@ -16,6 +16,7 @@
 #include <unistd.h>
 #include <sys/select.h>
 #include <netinet/in.h>
+#include <errno.h>
 #include <netdb.h>
 
 using namespace B2DAQ;
@@ -67,12 +68,20 @@ size_t TCPSocket::write(const void* buf, size_t count) throw(IOException)
 {
   size_t c = 0;
   int ret;
+  errno = 0;
   while (c < count) {
     ret = send(_fd, ((unsigned char*)buf + c), (count - c), MSG_NOSIGNAL);
-    //std::cout << __FILE__ << ":" << __LINE__ << " " << count
-    //        << " " << ret << " " << c << std::endl;
     if (ret <= 0) {
-      throw (IOException(__FILE__, __LINE__, "Error while writing"));
+      switch (errno) {
+        case EINTR: continue;
+        case ENETUNREACH:
+        case EHOSTUNREACH:
+        case ETIMEDOUT:
+          usleep(500);
+          continue;
+        default:
+          throw (IOException(__FILE__, __LINE__, "Error while writing"));
+      }
     }
     c += ret;
   }
@@ -83,10 +92,16 @@ size_t TCPSocket::read(void* buf, size_t count) throw(IOException)
 {
   size_t c = 0;
   int ret;
+  errno = 0;
   while (c < count) {
     ret = recv(_fd, ((unsigned char*)buf + c), (count - c), 0);
     if (ret <= 0) {
-      throw (IOException(__FILE__, __LINE__, "Error while reading."));
+      switch (errno) {
+        case EINTR: continue;
+        case EAGAIN: continue;
+        default:
+          throw (IOException(__FILE__, __LINE__, "Error while reading."));
+      }
     }
     c += ret;
   }

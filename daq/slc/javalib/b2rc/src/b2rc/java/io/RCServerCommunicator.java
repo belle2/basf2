@@ -68,7 +68,6 @@ public class RCServerCommunicator {
 									+ "<span style='color:blue;font-weight:bold;'>"
 									+ state.getAlias() + "</span>", LogLevel.INFO));
 						}
-						_main_panel.update();
 						if ( msg.getNParams() > 3 ) {
 							int version = msg.getParam(3);
 							int exp_no = msg.getParam(4);
@@ -82,6 +81,7 @@ public class RCServerCommunicator {
 								int end_time = msg.getParam(7);
 								_system.setEndTime(end_time);
 							}
+							System.out.println(msg.getData());
 							String [] str_v = msg.getData().split("\n");
 							if ( str_v.length > 0 ) {
 								String run_type = str_v[0];
@@ -93,6 +93,7 @@ public class RCServerCommunicator {
 								_system.setOperators(operators);
 							}
 						}
+						_main_panel.update();
 						if ( state_org.equals(RCState.UNKNOWN) ) {
 							_main_panel.addLog(new Log("Current run configuration:<br/>"
 									+ "<span style='color:blue;font-weight:bold;'>"

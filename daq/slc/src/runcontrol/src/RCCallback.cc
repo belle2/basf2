@@ -50,7 +50,7 @@ bool RCCallback::perform(NSMMessage& msg) throw(NSMHandlerException)
     return true;
   }
   if (result) {
-    if (cmd != Command::STATECHECK &&
+    if (cmd != Command::TRIGFT &&
         _node->getState() == state_org) {
       _node->setState(cmd.nextState());
     }

@@ -62,6 +62,7 @@ int TTDNode::getParams(const Command& command, unsigned int* pars,
       }
     }
   } else if (command == Command::LOAD) {
+  } else if (command == Command::TRIGFT) {
     for (size_t i = 0; i < _ftsw_i; i++) {
       if (_ftsw_v[i] != NULL) {
         pars[npar++] = _ftsw_v[i]->getTriggerMode();
@@ -92,6 +93,7 @@ void TTDNode::setParams(const Command& command, int npar,
       _ftsw_v[i]->setFirmware(str_v[i]);
     }
   } else if (command == Command::LOAD) {
+  } else if (command == Command::TRIGFT) {
     for (size_t i = 0; i < _ftsw_i; i++) {
       if (_ftsw_v[i] != NULL) {
         _ftsw_v[i]->setTriggerMode(pars[par_i++]);

@@ -36,7 +36,7 @@ jar : all
 	@ $(JAR) cf $(JARFILE) -C $(OUTDIR) $(TARGET)
 	@ $(JAR) uf $(JARFILE) -C $(JAVALIB_PATH)/b2daq/classes b2daq
 	@ $(RM) $(OUTDIR)/com  $(OUTDIR)/org $(OUTDIR)/META-INF
-	@ jar -xvf $(MYSQL_JAR)
+	@ jar -xf $(MYSQL_JAR)
 	@ mv com org META-INF $(OUTDIR)
 	@ $(JAR) uf $(JAREXE) -C classes org
 	@ $(JAR) uf $(JAREXE) -C classes com
@@ -47,7 +47,7 @@ exe : all
 	@ $(JAR) cfm $(JAREXE) $(MANIFEST) -C $(OUTDIR) $(TARGET)
 	@ $(JAR) uf $(JAREXE) -C $(JAVALIB_PATH)/b2daq/classes b2daq
 	@ $(RM) $(OUTDIR)/com  $(OUTDIR)/org $(OUTDIR)/META-INF
-	@ jar -xvf $(MYSQL_JAR)
+	@ jar -xf $(MYSQL_JAR)
 	@ mv com org META-INF $(OUTDIR)
 	@ $(JAR) uf $(JAREXE) -C classes org
 	@ $(JAR) uf $(JAREXE) -C classes com

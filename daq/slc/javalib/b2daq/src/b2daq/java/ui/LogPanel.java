@@ -117,7 +117,7 @@ public class LogPanel extends JScrollPane {
 		setViewportView(_text_panel);
 		setCursor(Cursor.getPredefinedCursor(Cursor.TEXT_CURSOR));
 		add(new Log("Log open.", LogLevel.DEBUG));
-		_text_panel.setFont(new Font("Sans", Font.PLAIN, 14));
+		_text_panel.setFont(new Font("Sans", Font.PLAIN, 15));
 		_text_panel.setText("");
 	}
 	

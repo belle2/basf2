@@ -25,7 +25,6 @@ void HostCommunicator::run()
         MessageBox::get().push(msg);
       }
     } catch (const IOException& e) {
-      B2DAQ::debug("[DEBUG] %s:%d:Failed to recieve Message", __FILE__, __LINE__);
     }
     reset();
   }

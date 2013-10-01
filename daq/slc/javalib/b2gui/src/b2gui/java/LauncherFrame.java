@@ -23,13 +23,16 @@ public class LauncherFrame extends JFrame {
 	private static final long serialVersionUID = 1L;
 	private LauncherMainPanel _main_panel = new LauncherMainPanel();
 	private LogViewPanel _log_panel = new LogViewPanel();
-	private LauncherLoginPane _login_panel = new LauncherLoginPane(
-			"ropc01.kek.jp", "ropc01.kek.jp", 22, "");
+	private LauncherLoginPane _login_panel = null;
 
 	private ArrayList<Process> _process_v = new ArrayList<Process>();
 	private String _class_path = "belle2gui.jar";
 
 	private LauncherFrame() {
+		String hostname = System.getenv("B2SC_SERVER_HOST");
+		if (hostname == null) hostname = "localhost";
+		_login_panel = new LauncherLoginPane(
+				hostname, hostname, 22, "");
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
@@ -37,9 +40,9 @@ public class LauncherFrame extends JFrame {
 						"All GUIs will close when the launcher closes.\n"+
 						"Are you really close this launcher?");
 				if ( ans == JOptionPane.YES_OPTION ) {
-					for ( Process process : _process_v ) {
-						process.destroy();
-					}
+					//for ( Process process : _process_v ) {
+					//	process.destroy();
+					//}
 					System.exit(0);
 				}
 			}

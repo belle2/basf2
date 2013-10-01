@@ -78,7 +78,7 @@ public class Belle2RunController extends JavaEntoryPoint {
 			_communicator.run();
 		} catch (Exception e) {
 			e.printStackTrace();
-			_frame.dispose();
+			if ( _frame != null ) _frame.dispose();
 			if ( !LoginPanel.showLoginDialog(_frame, __host, __port, 
 					"Belle-II Run controller Login",
 					"System ERROR! Try reconnect?",

@@ -23,7 +23,7 @@ public class FTSWParameterTablePanel extends ParameterTablePanel {
 		// model.addColumn("Location");
 		model.addColumn("Host TTD");
 		model.addColumn("Channel");
-		model.addColumn("Firmware");
+		//model.addColumn("Firmware");
 		model.addColumn("Trigger mode");
 		model.addColumn("Dummy rate");
 		model.addColumn("Trigger limit");
@@ -48,10 +48,10 @@ public class FTSWParameterTablePanel extends ParameterTablePanel {
 							e1.printStackTrace();
 						}
 						break;
-					case 4:
-						ftsw.setFirmware(model2.getValueAt(row, col).toString());
-						break;
-					case 5: {
+					//case 4:
+					//	ftsw.setFirmware(model2.getValueAt(row, col).toString());
+					//	break;
+					case 4: {
 						String mode_s = model2.getValueAt(row, col).toString();
 						int mode = FTSW.TRIG_NORMAL;
 						if ( mode_s == "IN" ) mode = FTSW.TRIG_IN;
@@ -65,12 +65,12 @@ public class FTSWParameterTablePanel extends ParameterTablePanel {
 						ftsw.setTriggerMode(mode);
 						break;
 					}
-					case 6: {
+					case 5: {
 						int rate = Integer.parseInt(model2.getValueAt(row, col).toString());
 						ftsw.setDummyRate(rate);
 						break;
 					}
-					case 7: {
+					case 6: {
 						int limit = Integer.parseInt(model2.getValueAt(row, col).toString());
 						ftsw.setTriggerLimit(limit);
 						break;

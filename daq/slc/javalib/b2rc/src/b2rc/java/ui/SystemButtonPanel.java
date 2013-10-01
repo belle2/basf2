@@ -70,10 +70,12 @@ public class SystemButtonPanel extends JPanel implements Updatable {
 					int [] pars = new int [2];
 					pars[0] = -1;
 					pars[1] = _system.getVersion();
-					String data = _system.getOperators();
+					String data = _system.getRunType() + "\n" + _system.getOperators();
 					com.sendMessage(new RunControlMessage(_command, pars, data));
 				} else {
-					com.sendMessage(new RunControlMessage(_command));
+					int [] pars = new int [1];
+					pars[0] = -1;
+					com.sendMessage(new RunControlMessage(_command, pars));
 				}
 				com.getControlPanel().addLog(new Log("Pushed command: "+ _command.getAlias(), LogLevel.INFO));
 			} catch (Exception e) {

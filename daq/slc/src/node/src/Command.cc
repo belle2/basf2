@@ -45,12 +45,13 @@ int Command::isAvailable(const State& state) const throw()
 {
   if (*this == BOOT && state == State::INITIAL_S) {
     return SUGGESTED;
-  } else if (*this == BOOT && state == State::READY_S) {
+  } else if (*this == BOOT && (state == State::CONFIGURED_S ||
+                               state == State::READY_S)) {
     return ENABLED;
   } else if (*this == LOAD && state == State::CONFIGURED_S) {
     return SUGGESTED;
   } else if (*this == LOAD && state == State::READY_S) {
-    return SUGGESTED;
+    return ENABLED;
   } else if (*this == START && state == State::READY_S) {
     return SUGGESTED;
   } else if (*this == STOP && (state == State::RUNNING_S ||

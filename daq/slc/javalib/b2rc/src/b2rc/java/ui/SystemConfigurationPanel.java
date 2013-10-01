@@ -161,6 +161,7 @@ public class SystemConfigurationPanel extends JPanel implements Updatable {
 			public void keyReleased(KeyEvent arg0) {
 				_system.setOperators(_text_operator1.getText() + ":"
 						+ _text_operator2.getText());
+				update();
 			}
 
 			public void keyTyped(KeyEvent arg0) {

@@ -61,16 +61,21 @@ bool GUICommunicator::reset() throw()
 
 RunControlMessage GUICommunicator::waitMessage() throw(IOException)
 {
-  RunControlMessage msg(RunControlMessage::GUI);
-  msg.setCommand(_reader.readString().c_str());
-  NSMMessage nsm;
-  nsm.setNParams(_reader.readInt());
-  for (size_t i = 0; i < nsm.getNParams(); i++) {
-    nsm.setParam(i, _reader.readInt());
+  try {
+    RunControlMessage msg(RunControlMessage::GUI);
+    msg.setCommand(_reader.readString().c_str());
+    NSMMessage nsm;
+    nsm.setNParams(_reader.readInt());
+    for (size_t i = 0; i < nsm.getNParams(); i++) {
+      nsm.setParam(i, _reader.readInt());
+    }
+    nsm.setData(_reader.readString());
+    msg.setMessage(nsm);
+    return msg;
+  } catch (const IOException& e) {
+    B2DAQ::debug("[DEBUG] %s:%d: Connection broken", __FILE__, __LINE__);
+    throw (e);
   }
-  nsm.setData(_reader.readString());
-  msg.setMessage(nsm);
-  return msg;
 }
 
 void GUICommunicator::sendMessage(const RunControlMessage& msg)

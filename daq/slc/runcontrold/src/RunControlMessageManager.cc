@@ -9,6 +9,7 @@
 #include <system/Date.hh>
 
 #include <util/Debugger.hh>
+#include <util/StringUtil.hh>
 
 #include <unistd.h>
 
@@ -44,7 +45,7 @@ void RunControlMessageManager::run()
           if (state_next != State::UNKNOWN)
             node->setState(state_next);
           reportState(node);
-          send(node, cmd);
+          send(node, cmd, nsm.getNParams(), nsm.getParams());
         }
       } else {
         if (!cmd.isAvailable(_rc_node->getState())) continue;
@@ -58,20 +59,24 @@ void RunControlMessageManager::run()
           downloadConfig(cmd, _data_man->getRunConfig()->getVersion());
         } else if (cmd == Command::LOAD) {
           _data_man->getRunConfig()->setVersion(nsm.getParam(1));
-          _data_man->getRunConfig()->setOperators(nsm.getData());
           downloadConfig(cmd, _data_man->getRunConfig()->getVersion());
+          std::vector<std::string> str_v = B2DAQ::split(nsm.getData(), '\n');
+          _data_man->getRunConfig()->setRunType(str_v[0]);
+          _data_man->getRunConfig()->setOperators(str_v[1]);
+          reportRCStatus();
         } else if (cmd == Command::START) {
           uploadRunConfig();
-        } else if (cmd == Command::STOP) {
-          uploadRunResult();
+        } else if (cmd == Command::STOP || cmd == Command::ABORT) {
+          if (_rc_node->getState() == State::RUNNING_S)
+            uploadRunResult();
         } else if (cmd == Command::STATECHECK) {
           std::vector<NSMNode*>& node_v(_node_system->getNodes());
           for (size_t i = 0; i < node_v.size(); i++) {
             reportState(node_v[i]);
           }
+          reportRCStatus();
           continue;
         }
-        reportRCStatus();
         std::vector<NSMNode*>& node_v(_node_system->getNodes());
         for (size_t i = 0; i < node_v.size(); i++) {
           State state_org = node_v[i]->getState();
@@ -208,10 +213,9 @@ int RunControlMessageManager::distribute(int index_seq, const Command& command) 
   std::vector<NSMNode*>& node_v(_node_system->getNodes());
   for (int i = index_seq; i < (int)node_v.size(); i++) {
     if (node_v[i]->isUsed()) {
-      if (i > index_seq && node_v[i]->isSynchronize()) return i;
-      if (!send(node_v[i], command)) {
-        return -1;
-      }
+      if ((command == Command::BOOT || command == Command::LOAD) &&
+          i > index_seq && node_v[i]->isSynchronize()) return i;
+      if (!send(node_v[i], command)) return -1;
     }
   }
   return (int)node_v.size();
@@ -240,7 +244,9 @@ bool RunControlMessageManager::send(NSMNode* node, const Command& command,
         pars[0] = _data_man->getRunStatus()->getExpNumber();
         pars[1] = _data_man->getRunStatus()->getRunNumber();
       }
-      _comm->sendRequest(node, command, npar, pars, data);
+      if (!(command == Command::STATECHECK &&
+            node->getState() == State::RUNNING_S))
+        _comm->sendRequest(node, command, npar, pars, data);
       if (getNodeByID(id) == NULL) addNode(id, node);
       node->setConnection(Connection::ONLINE);
       return true;

@@ -43,6 +43,8 @@ bool RCCallback::perform(NSMMessage& msg) throw(NSMHandlerException)
     result = pause();
   } else if (cmd == Command::ABORT) {
     result = abort();
+  } else if (cmd == Command::TRIGFT) {
+    result = trigft();
   } else if (cmd == Command::STATECHECK) {
     com->replyOK(_node, "");
     return true;

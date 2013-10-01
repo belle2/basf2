@@ -19,6 +19,7 @@ namespace B2DAQ {
     virtual bool resume() throw();
     virtual bool pause() throw();
     virtual bool abort() throw();
+    virtual bool trigft() throw();
 
   };
 

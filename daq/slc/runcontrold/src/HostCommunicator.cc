@@ -15,7 +15,7 @@ void HostCommunicator::run()
         init();
         break;
       } catch (const IOException& e) {
-        B2DAQ::debug("[DEBUG] %s:%d:Failed to init", __FILE__, __LINE__);
+        B2DAQ::debug("[DEBUG] %s:%d:Failed to init %s", __FILE__, __LINE__, e.what());
         sleep(5);
       }
     }

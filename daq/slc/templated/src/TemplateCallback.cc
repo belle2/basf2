@@ -52,15 +52,31 @@ bool TemplateCallback::stop() throw()
 
 bool TemplateCallback::resume() throw()
 {
+  B2DAQ::debug("RESUME");
   return true;
 }
 
 bool TemplateCallback::pause() throw()
 {
+  B2DAQ::debug("PAUSE");
   return true;
 }
 
 bool TemplateCallback::abort() throw()
 {
+  B2DAQ::debug("ABORT");
+  return true;
+}
+
+bool TemplateCallback::trigft() throw()
+{
+  B2DAQ::debug("TRIGFT");
+  B2DAQ::debug("npar : %d", (int)getMessage().getNParams());
+  B2DAQ::debug("pars[0]: %d", (int)getMessage().getParam(0));
+  B2DAQ::debug("pars[1]: %d", (int)getMessage().getParam(1));
+  B2DAQ::debug("pars[2]: %d", (int)getMessage().getParam(2));
+  B2DAQ::debug("pars[3]: %d", (int)getMessage().getParam(3));
+  B2DAQ::debug("pars[4]: %d", (int)getMessage().getParam(4));
+
   return true;
 }

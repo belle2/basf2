@@ -25,6 +25,7 @@ namespace B2DAQ {
     virtual bool resume() throw() { return true; }
     virtual bool pause()  throw() { return true; }
     virtual bool abort()  throw() { return true; }
+    virtual bool trigft()  throw() { return true; }
 
   protected:
     virtual bool perform(NSMMessage& msg)

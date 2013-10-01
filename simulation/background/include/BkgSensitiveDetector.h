@@ -42,15 +42,15 @@ namespace Belle2 {
 
 
   private:
-    int m_subDet;           /* subdetector id number */
-    int m_identifier;       /* identifier of subdetector component */
-    int m_trackID;          /* track id */
-    TVector3 m_startPos;    /* particle position at the entrance in volume */
-    TVector3 m_startMom;    /* particle momentum at the entrance in volume */
-    double m_startTime;     /* global time */
-    double m_startEnergy;   /* particle energy at the entrance in volume */
-    double m_energyDeposit; /* energy deposited in volume */
-    double m_trackLength;   /* length of the track in the volume */
+    int m_subDet;           /**< subdetector id number */
+    int m_identifier;       /**< identifier of subdetector component */
+    int m_trackID;          /**< track id */
+    TVector3 m_startPos;    /**< particle position at the entrance in volume */
+    TVector3 m_startMom;    /**< particle momentum at the entrance in volume */
+    double m_startTime;     /**< global time */
+    double m_startEnergy;   /**< particle energy at the entrance in volume */
+    double m_energyDeposit; /**< energy deposited in volume */
+    double m_trackLength;   /**< length of the track in the volume */
 
   }; // SensitiveDetector class
 } // end of namespace Belle2

@@ -13,7 +13,6 @@ public class DataReader extends Reader {
 	public DataReader() {}
 	public DataReader(InputStream stream) {
 		_stream = new DataInputStream(new BufferedInputStream(stream));
-		//_stream = new DataInputStream(stream);
 	}
 	
 	@Override

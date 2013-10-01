@@ -45,7 +45,7 @@ export B2SC_CPRLIB_PATH=$B2SLC_PATH/lib/cdc_test
 
 ## setup for slow control database access ##
 export B2SC_DQM_MAP_PATH=$B2SLC_PATH/log
-export B2SC_DQM_LIB_PATH=$B2SLC_PATH/tools/dqmserver
+export B2SC_DQM_LIB_PATH=$B2SLC_PATH/dqmserver/lib
 
 ## setup for directory 
 export HSLB_FIRMEWATE_PATH=/home/usr/yamadas/bit/

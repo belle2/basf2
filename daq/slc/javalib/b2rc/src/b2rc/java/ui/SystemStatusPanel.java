@@ -146,11 +146,11 @@ public class SystemStatusPanel extends JPanel implements Updatable {
 		}
 	}
 	public void setEndTime(int time) {
-		if ( time <= 0 ) {
-			_text_end_time.setText("<html><span style='color:black;font-weight:bold;'>No data taking</span></html>");
+		if ( !_system.getRunControlNode().getState().equals(RCState.RUNNING_S)) {
+			_text_end_time.setText(new Time(time).toDateString());
 		} else {
-			if ( !_system.getRunControlNode().getState().equals(RCState.RUNNING_S)) {
-				_text_end_time.setText(new Time(time).toDateString());
+			if ( time <= 0 ) {
+				_text_end_time.setText("<html><span style='color:black;font-weight:bold;'>No data taking</span></html>");
 			} else {
 				_text_end_time.setText("<html><span style='color:blue;font-weight:bold;'>Data taking is on going</span></html>");
 			}

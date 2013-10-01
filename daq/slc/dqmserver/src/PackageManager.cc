@@ -176,15 +176,15 @@ std::string PackageManager::getName()
 
 HistoPackage* PackageManager::createPackage()
 {
-  return _manager->createPackage();
+  return _manager->createPackage(_reader->getHists());
 }
 
 RootPanel* PackageManager::createRootPanel()
 {
-  return _manager->createRootPanel();
+  return _manager->createRootPanel(_reader->getHists());
 }
 
 void PackageManager::analyze()
 {
-  _manager->analyze();
+  _manager->analyze(_reader->getHists());
 }

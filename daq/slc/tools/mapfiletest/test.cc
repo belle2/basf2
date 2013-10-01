@@ -3,9 +3,9 @@
 #include <TH2F.h>
 #include <TRandom.h>
 
-int main()
+int main(int argc, char** argv)
 {
-  TMapFile* file = TMapFile::Create("/tmp/test.map", "recreate", 100000, "test");
+  TMapFile* file = TMapFile::Create(argv[1], "recreate", 100000, "test");
   TH1F* h1 = new TH1F("h1", "Histogram 1;X value;Entires", 100, -20, 20);
   h1->SetLineColor(kBlue);
   h1->SetFillColor(-1);

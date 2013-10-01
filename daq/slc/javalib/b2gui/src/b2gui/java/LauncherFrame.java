@@ -37,8 +37,8 @@ public class LauncherFrame extends JFrame {
 		addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
 				int ans = JOptionPane.showConfirmDialog(null,
-						"All GUIs will close when the launcher closes.\n"+
-						"Are you really close this launcher?");
+						"All GUIs may close after the launcher closes.\n"+
+						"Are you really closing this launcher?");
 				if ( ans == JOptionPane.YES_OPTION ) {
 					//for ( Process process : _process_v ) {
 					//	process.destroy();

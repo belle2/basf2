@@ -31,7 +31,7 @@ bool HistoFileReader::init(const char* file_path)
 {
   if (_file) _file->Close();
   _file = TMapFile::Create(file_path);
-  _hist_m = TH1List();
+  _hist_m = RootHistMap();
   TMapRec* mr = _file->GetFirst();
   while (_file->OrgAddress(mr)) {
     TObject* obj = _file->Get(mr->GetName());
@@ -39,7 +39,7 @@ bool HistoFileReader::init(const char* file_path)
       TString class_name = obj->ClassName();
       if (class_name.Contains("TH1") ||  class_name.Contains("TH2")) {
         TH1* h = (TH1*)obj;
-        _hist_m.insert(TH1List::value_type(obj->GetName(), h));
+        _hist_m.insert(RootHistMap::value_type(obj->GetName(), h));
       }
     }
     mr = mr->GetNext();
@@ -51,7 +51,7 @@ void HistoFileReader::update(HistoPackage* pack)
 {
   if (pack == NULL) return;
   _file->Update();
-  for (TH1List::iterator it = _hist_m.begin();
+  for (RootHistMap::iterator it = _hist_m.begin();
        it != _hist_m.end(); it++) {
     std::string name = it->first;
     Histo* histo = (Histo*)pack->getHisto(name);

@@ -18,7 +18,7 @@ TestHistoManager::TestHistoManager()
 
 }
 
-HistoPackage* TestHistoManager::createPackage()
+HistoPackage* TestHistoManager::createPackage(RootHistMap& hist_m)
 {
   pack = new HistoPackage("Test");
   h1 = pack->addHisto(new Histo1F("h1", "Histogram 1;X value;Entires", 100, -20, 20));
@@ -78,7 +78,7 @@ HistoPackage* TestHistoManager::createPackage()
   return pack;
 }
 
-RootPanel* TestHistoManager::createRootPanel()
+RootPanel* TestHistoManager::createRootPanel(RootHistMap& hist_m)
 {
   RootPanel* root_panel = new RootPanel("Test");
   TabbedPanel* tabpanel = new TabbedPanel("gause_tab");
@@ -154,7 +154,7 @@ RootPanel* TestHistoManager::createRootPanel()
   return root_panel;
 }
 
-void TestHistoManager::analyze()
+void TestHistoManager::analyze(RootHistMap& hist_m)
 {
   double rate = 0;
   for (int n = 0; n < h1->getAxisX().getNbins(); n++) {

@@ -23,6 +23,7 @@ LIBTARGET  = $(LIBDIR)/libB2DQM_$(USER_CLASS).so
 .PHONY : all clean deb doc 
 
 all: $(OBJS) $(LIBTARGET)
+	@ cp $(LIBTARGET) ../lib
 
 clean:
 	@ echo "<< cleaning all monitor system >>"

@@ -4,7 +4,13 @@
 #include <dqm/HistoPackage.hh>
 #include <dqm/RootPanel.hh>
 
+#include <map>
+
+class TH1;
+
 namespace B2DQM {
+
+  typedef std::map<std::string, TH1*> RootHistMap;
 
   class HistoManager {
     
@@ -13,9 +19,9 @@ namespace B2DQM {
     virtual ~HistoManager() throw() {}
     
   public:
-    virtual HistoPackage* createPackage() = 0;
-    virtual RootPanel* createRootPanel() = 0;
-    virtual void analyze() {}
+    virtual HistoPackage* createPackage(RootHistMap& hito_m) = 0;
+    virtual RootPanel* createRootPanel(RootHistMap& hito_m) = 0;
+    virtual void analyze(RootHistMap& hito_m) {}
 
   };
 

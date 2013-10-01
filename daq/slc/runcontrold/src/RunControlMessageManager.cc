@@ -63,12 +63,12 @@ void RunControlMessageManager::run()
           std::vector<std::string> str_v = B2DAQ::split(nsm.getData(), '\n');
           _data_man->getRunConfig()->setRunType(str_v[0]);
           _data_man->getRunConfig()->setOperators(str_v[1]);
-          reportRCStatus();
         } else if (cmd == Command::START) {
           uploadRunConfig();
-        } else if (cmd == Command::STOP || cmd == Command::ABORT) {
-          if (_rc_node->getState() == State::RUNNING_S)
-            uploadRunResult();
+        } else if (cmd == Command::STOP ||
+                   (cmd == Command::ABORT &&
+                    _rc_node->getState() == State::RUNNING_S)) {
+          uploadRunResult();
         } else if (cmd == Command::STATECHECK) {
           std::vector<NSMNode*>& node_v(_node_system->getNodes());
           for (size_t i = 0; i < node_v.size(); i++) {
@@ -77,6 +77,7 @@ void RunControlMessageManager::run()
           reportRCStatus();
           continue;
         }
+        reportRCStatus();
         std::vector<NSMNode*>& node_v(_node_system->getNodes());
         for (size_t i = 0; i < node_v.size(); i++) {
           State state_org = node_v[i]->getState();

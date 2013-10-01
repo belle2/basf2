@@ -17,7 +17,7 @@ CDC_TESTHistoManager::CDC_TESTHistoManager()
 {
 }
 
-HistoPackage* CDC_TESTHistoManager::createPackage()
+HistoPackage* CDC_TESTHistoManager::createPackage(RootHistMap& hist_m)
 {
   _pack = new HistoPackage("CDC_TEST");
   _h_ncpr = _pack->addHisto(new Histo1F("NumCOPPER", "Number of COPPERs", 10, 0.0, 10.0));
@@ -57,7 +57,7 @@ HistoPackage* CDC_TESTHistoManager::createPackage()
   return _pack;
 }
 
-RootPanel* CDC_TESTHistoManager::createRootPanel()
+RootPanel* CDC_TESTHistoManager::createRootPanel(RootHistMap& hist_m)
 {
   RootPanel* root_panel = new RootPanel("CDC_TEST");
   TabbedPanel* tabpanel = new TabbedPanel("tab_cdc");
@@ -110,7 +110,7 @@ RootPanel* CDC_TESTHistoManager::createRootPanel()
   return root_panel;
 }
 
-void CDC_TESTHistoManager::analyze()
+void CDC_TESTHistoManager::analyze(RootHistMap& hist_m)
 {
   double time = B2DAQ::Time().getSecond();
   double rate = 0;

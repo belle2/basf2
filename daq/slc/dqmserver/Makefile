@@ -40,6 +40,7 @@ clean:
 	@ echo '<< cleaning directory >>'
 	@ $(RM) $(BINDIR) $(TMPDIR)
 	@ $(RM) *~ */*~ \#*\#* */\#*\#*
+	@ $(RM) lib/*.so
 
 $(TARGETS): $(BINDIR)/% : %.cc $(OBJS)
 	@ echo '<< creating executable $@ >>'

@@ -70,7 +70,9 @@ public class Belle2RunController extends JavaEntoryPoint {
 						database, username, password, port) ) System.exit(1);
 			RCDBManager.open(hostname, database, username, password, port);
 			RCDBManager.get().setNodeSystem(_loader.getSystem());
-			_frame = new RCMainFrame(_loader.getSystem());
+			if (_frame == null) {
+				_frame = new RCMainFrame(_loader.getSystem());
+			}
 			_frame.init();
 			_communicator = new RCServerCommunicator(_loader.getSystem(), 
 						_frame.getControlPanel());

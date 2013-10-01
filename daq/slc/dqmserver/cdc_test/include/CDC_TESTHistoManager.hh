@@ -13,9 +13,9 @@ namespace B2DQM {
     virtual ~CDC_TESTHistoManager() throw() {};
 
   public:
-    virtual HistoPackage* createPackage();
-    virtual RootPanel* createRootPanel();
-    virtual void analyze();
+    virtual HistoPackage* createPackage(RootHistMap& hist_m);
+    virtual RootPanel* createRootPanel(RootHistMap& hist_m);
+    virtual void analyze(RootHistMap& hist_m);
 
   private:
     HistoPackage* _pack;

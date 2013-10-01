@@ -41,10 +41,11 @@ MonitorDataCOPPERModule::~MonitorDataCOPPERModule()
 
 void MonitorDataCOPPERModule::defineHisto()
 {
-  h_ncpr = new TH1F("NumCOPPER", "Number of COPPERs", 10, 0.0, 10.0);
-  h_nevt = new TH1F("Nevent", "Number of Events", 10, 0.0, 10.0);
-  h_size = new TH1F("Data Size", "Data Size", 100, 0.0, 2000.0);
-  h_size2d = new TH2F("Data Size vs. Cpr", "Data Size vs. Copper", 100, 0.0, 2000.0, 5, 0.0, 5.0);
+  h_ncpr = new TH1F("h_ncpr", "Number of COPPERs", 10, 0.0, 10.0);
+  h_nevt = new TH1F("h_nevt", "Number of Events; Number of events; # of entries", 10, 0.0, 10.0);
+  h_size = new TH1F("h_size", "Data Size; Data size [byte]; # of entries", 100, 0.0, 2000.0);
+  h_size2d = new TH2F("h_size2d", "Data Size vs. Copper;Copper ID;Data size [byte]",
+                      100, 0.0, 2000.0, 5, 0.0, 5.0);
 }
 
 

@@ -179,12 +179,12 @@ void SerializerModule::SendByWriteV(RawCOPPER* rawcpr)
   iov[2].iov_len = sizeof(int) * send_trailer.GetTrlNwords();
 
 
-  //  int* temp_buf = new int[ iov[0].iov_len + iov[1].iov_len + iov[2].iov_len ];
+  int* temp_buf = new int[ iov[0].iov_len + iov[1].iov_len + iov[2].iov_len ];
 
   // Send Multiple buffers
   int n = 0;
-  //  if (send(m_socket, (char*)temp_buf, iov[0].iov_len + iov[1].iov_len + iov[2].iov_len, MSG_NOSIGNAL) != iov[0].iov_len + iov[1].iov_len + iov[2].iov_len ) {
-  if ((n = writev(m_socket, iov, NUM_BUFFER)) < 0) {
+  if (send(m_socket, (char*)temp_buf, iov[0].iov_len + iov[1].iov_len + iov[2].iov_len, MSG_NOSIGNAL) != iov[0].iov_len + iov[1].iov_len + iov[2].iov_len) {
+    //  if ((n = writev(m_socket, iov, NUM_BUFFER)) < 0) {
     print_err.PrintError("SEND error1", __FILE__, __PRETTY_FUNCTION__, __LINE__);
     exit(1);
   }
@@ -202,8 +202,8 @@ void SerializerModule::SendByWriteV(RawCOPPER* rawcpr)
     sleep(1234567);
     exit(1);
   }
-  printf("n %d total %d\n", n, total_send_bytes);
-  //  delete temp_buf;
+  //  printf("n %d total %d\n", n, total_send_bytes);
+  delete temp_buf;
 
   return;
 

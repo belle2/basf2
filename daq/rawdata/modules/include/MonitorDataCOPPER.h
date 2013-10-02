@@ -18,6 +18,7 @@
 #include <arpa/inet.h>
 #include <sys/resource.h>
 #include <sys/uio.h>
+#include <sys/time.h>
 
 #include <framework/core/HistoModule.h>
 
@@ -58,20 +59,61 @@ namespace Belle2 {
 
     //! Histogram definition
     virtual void defineHisto();
-
+    virtual double GetTimeSec();
     // Data members
 
   private:
 
     //! No. of sent events
-    int m_nevt;
+    int m_loop;
     int* m_buffer;
+
+
+
 
     //! Histograms
     TH1F* h_ncpr;
     TH1F* h_nevt;
-    TH1F* h_size;
+
     TH2F* h_size2d;
+
+    TH1F* h_rate;
+
+    TH1F* h_size;
+    TH1F* h_size_0;
+    TH1F* h_size_1;
+    TH1F* h_size_2;
+    TH1F* h_size_3;
+
+    int m_size_byte_0;
+    int m_size_byte_1;
+    int m_size_byte_2;
+    int m_size_byte_3;
+
+    int m_prev_size_byte_0;
+    int m_prev_size_byte_1;
+    int m_prev_size_byte_2;
+    int m_prev_size_byte_3;
+
+    TH1F* h_size_var;
+    TH1F* h_size_var_0;
+    TH1F* h_size_var_1;
+    TH1F* h_size_var_2;
+    TH1F* h_size_var_3;
+
+    TH1F* h_flow_rate;
+    TH1F* h_flow_rate_0;
+    TH1F* h_flow_rate_1;
+    TH1F* h_flow_rate_2;
+    TH1F* h_flow_rate_3;
+
+
+    int m_nevt;
+    int m_prev_nevt;
+
+    double m_start_time;
+    double m_prev_time;
+
 
   };
 

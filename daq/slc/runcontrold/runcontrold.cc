@@ -23,6 +23,7 @@
 
 #include <iostream>
 #include <cstdlib>
+#include <unistd.h>
 
 namespace B2DAQ {
   class Listener {
@@ -63,20 +64,23 @@ int main(int argc, char** argv)
   NodeLoader* loader = new NodeLoader(dir);
   loader->setVersion(0);
   loader->load(entry);
-  NSMDataManager* data = new NSMDataManager(loader);
 
   NodeSystem& node_system(loader->getSystem());
+  NSMDataManager* data = new NSMDataManager(&node_system);
   NSMNode* rc_node = new NSMNode(node_name);
   rc_node->setState(State::INITIAL_S);
   node_system.setRunControlNode(rc_node);
   NSMCommunicator* comm = new NSMCommunicator(rc_node);
   RCCallback* callback = new RCCallback(rc_node);
   comm->setCallback(callback);
-  try {
-    comm->init();
-  } catch (const NSMHandlerException& e) {
-    B2DAQ::debug("[DEBUG] Failed to connect NSM network. Terminate process...");
-    return 1;
+  while (true) {
+    try {
+      comm->init();
+      break;
+    } catch (const NSMHandlerException& e) {
+      B2DAQ::debug("[DEBUG] Failed to connect NSM network. Re-trying to connect...");
+      sleep(3);
+    }
   }
   data->allocateRunConfig();
   data->allocateRunStatus();

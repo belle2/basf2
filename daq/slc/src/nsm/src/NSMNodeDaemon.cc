@@ -12,11 +12,14 @@ void NSMNodeDaemon::run() throw()
 {
   NSMCommunicator* nsm_comm = new NSMCommunicator(_node);
   nsm_comm->setCallback(_callback);
-  try {
-    nsm_comm->init();
-  } catch (const NSMHandlerException& e) {
-    B2DAQ::debug("NSM node daemon : Failed to connect NSM network. Terminate process...");
-    return;
+  while (true) {
+    try {
+      nsm_comm->init();
+      break;
+    } catch (const NSMHandlerException& e) {
+      B2DAQ::debug("[DEBUG] Failed to connect NSM network. Re-trying to connect...");
+      sleep(3);
+    }
   }
   if (_rdata != NULL) {
     while (!_rdata->isAvailable()) {

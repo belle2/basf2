@@ -51,7 +51,7 @@ public class LauncherFrame extends JFrame {
 		});
 
 		setIconImage(Toolkit.getDefaultToolkit().createImage(getClass().getResource("guilauncher.png")));
-		setBounds(0, 0, 680, 40 * _main_panel.getPanels().length + 50);
+		setBounds(0, 0, 760, 50 * _main_panel.getPanels().length + 60);
 		setLocationRelativeTo(null);
 		setTitle("Belle 2 GUI Launcher version " + Belle2GUILauncherJavaGUI.VERSION);
 		setJMenuBar(new LauncherMenuBar());

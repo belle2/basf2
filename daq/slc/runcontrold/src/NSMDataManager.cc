@@ -3,6 +3,8 @@
 #include <util/Debugger.hh>
 #include <util/StringUtil.hh>
 
+#include <nsm/TTDStatus.hh>
+
 #include <iostream>
 extern "C" {
 #include <dlfcn.h>
@@ -10,10 +12,19 @@ extern "C" {
 
 using namespace B2DAQ;
 
-NSMDataManager::NSMDataManager(NodeLoader* node_loader) throw()
-  : _loader(node_loader), _status(NULL), _config(NULL)
+NSMDataManager::NSMDataManager(NodeSystem* node_system) throw()
+  : _system(node_system), _status(NULL), _config(NULL)
 {
-
+  std::vector<NSMNode*>& node_v(_system->getNodes());
+  for (size_t i = 0; i < node_v.size(); i++) {
+    NSMNode* node = node_v[i];
+    if (node->getType() == "ttd_node") {
+      NSMData* data = new TTDStatus(node_v[i]->getName());
+      _node_status_v.push_back(data);
+    } else {
+      _node_status_v.push_back(NULL);
+    }
+  }
 }
 
 NSMDataManager::~NSMDataManager() throw()
@@ -66,3 +77,19 @@ bool NSMDataManager::writeRunConfig() throw()
   return false;
 }
 
+void NSMDataManager::readNodeStatus() throw()
+{
+  std::vector<NSMNode*>& node_v(_system->getNodes());
+  for (size_t i = 0; i < node_v.size(); i++) {
+    NSMNode* node = node_v[i];
+    NSMData* data = _node_status_v[i];
+    if (data != NULL) {
+      try {
+        if (!data->isAvailable()) data->open();
+        data->read(node);
+      } catch (const NSMHandlerException& e) {
+        B2DAQ::debug("Failed to read NSM data in %s", node->getName().c_str());
+      }
+    }
+  }
+}

@@ -92,14 +92,6 @@ throw(IOException)
       }
       _buf.writeString(msg.getMessage().getData());
       _writer.write(_buf.ptr(), _buf.count());
-      /*
-      _writer.writeString(msg.getCommand().getLabelString());
-      _writer.writeInt(msg.getMessage().getNParams());
-      for (size_t i = 0; i < msg.getMessage().getNParams(); i++) {
-        _writer.writeInt(msg.getMessage().getParam(i));
-      }
-      _writer.writeString(msg.getMessage().getData());
-      */
       _mutex.unlock();
     } catch (const IOException& e) {
       B2DAQ::debug("[DEBUG] %s:%d error=%s", __FILE__, __LINE__, e.what());

@@ -89,8 +89,32 @@ void RunControlMessageManager::run()
     } else if (msg.getId() == RunControlMessage::LOCALNSM) {
       if (index_seq < 0 && cmd == Command::STATECHECK) {
         std::vector<NSMNode*>& node_v(_node_system->getNodes());
+        //_data_man->readNodeStatus();
+        //std::vector<NSMData*>& data_v(_data_man->getNodeStatus());
         for (size_t i = 0; i < node_v.size(); i++) {
-          if (node_v[i]->isUsed()) send(node_v[i], cmd);
+          if (node_v[i]->isUsed()) {
+            send(node_v[i], cmd);
+            /*
+            if ( data_v[i] != NULL && data_v[i]->isAvailable() ) {
+              int npar = 0;
+              int pars[256];
+              std::string datap;
+              data_v[i]->serialize(node_v[i], npar, pars, datap);
+              NSMMessage nsm;
+              nsm.setNParams(npar);
+              for ( int i = 0; i < npar; i++ )
+            nsm.setParam(i, pars[i]);
+              nsm.setData(datap);
+              RunControlMessage msg(RunControlMessage::RUNCONTROLLER, nsm);
+              msg.setCommand(Command::DATA);
+              try {
+            _ui_comm->sendMessage(msg);
+              } catch (const IOException& e) {
+            B2DAQ::debug("[DEBUG] %s:%d error=%s", __FILE__, __LINE__, e.what());
+              }
+            }
+            */
+          }
         }
       } else {
         int id = nsm.getNodeId();
@@ -129,11 +153,13 @@ NSMNode* RunControlMessageManager::findNode(int id) throw()
 {
   NSMNode* node = getNodeByID(id);
   if (node == NULL) {
-    std::string nodename = _comm->getMessage().getNodeName();
-    node = getNodeByName(nodename);
-    if (node == NULL) {
-      B2DAQ::debug("[DEBUG] Unexcepted node id: %d", id);
-      return NULL;
+    const char* nodename = _comm->getMessage().getNodeName();
+    if (nodename != NULL) {
+      node = getNodeByName(nodename);
+      if (node == NULL) {
+        B2DAQ::debug("[DEBUG] Unexcepted node id: %d", id);
+        return NULL;
+      }
     }
   }
   return node;

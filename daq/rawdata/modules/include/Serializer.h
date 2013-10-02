@@ -28,6 +28,7 @@
 #include <daq/dataobjects/RawCOPPER.h>
 #include <daq/dataobjects/SendHeader.h>
 #include <daq/dataobjects/SendTrailer.h>
+#include <daq/dataobjects/ErrorMessage.h>
 
 
 #include <sys/types.h>
@@ -123,6 +124,8 @@ namespace Belle2 {
     //! store time info.
     void RecordTime(int event, double* array);
 
+    //! error message program
+    ErrorMessage print_err;
 
   };
 

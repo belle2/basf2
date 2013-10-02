@@ -29,7 +29,7 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <daq/rawdata/modules/DAQConsts.h>
 #include <daq/dataobjects/RawCOPPER.h>
-
+#include <daq/dataobjects/ErrorMessage.h>
 #include <daq/rawdata/modules/DeSerializer.h>
 
 
@@ -69,6 +69,8 @@ namespace Belle2 {
     int use_slot;
 
     int finnesse_bit_flag;
+
+    ErrorMessage print_err;
 
   };
 

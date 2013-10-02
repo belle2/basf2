@@ -23,6 +23,7 @@
 
 #include <daq/dataflow/EvtSocket.h>
 #include <daq/dataobjects/RawDataBlock.h>
+#include <daq/dataobjects/ErrorMessage.h>
 
 //#include <daq/dataobjects/RawROPC.h>
 #include <daq/rawdata/modules/DAQConsts.h>
@@ -87,7 +88,7 @@ namespace Belle2 {
 
     StoreArray<RawDataBlock> raw_datablkarray;
 
-
+    ErrorMessage print_err;
 
   };
 

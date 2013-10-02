@@ -69,7 +69,8 @@ void SerializerModule::initialize()
   } else if (p_method == "ROPC") {
     p_method_val = 2;
   } else {
-    printf("[ERROR] Please specify the data-handling");
+    print_err.PrintError("Please specify the data-handling",
+                         __FILE__, __PRETTY_FUNCTION__, __LINE__);
     exit(1);
   }
 
@@ -181,14 +182,14 @@ void SerializerModule::SendByWriteV(RawCOPPER* rawcpr)
   // Send Multiple buffers
   int n = 0;
   if ((n = writev(m_socket, iov, NUM_BUFFER)) < 0) {
-    //  if ((n = writev(m_socket, iov, NUM_BUFFER)) != total_send_bytes) {
-    perror("[ERROR] SEND error1");
+    print_err.PrintError("SEND error1", __FILE__, __PRETTY_FUNCTION__, __LINE__);
     exit(1);
   }
 
   int total_send_bytes = sizeof(int) * send_header.GetTotalNwords();
   if (n != total_send_bytes) {
-    perror("[ERROR] Failed to send all data");
+    print_err.PrintError("Failed to send all data",
+                         __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("[ERROR] Sent data length is not consistent. %d %d : Exiting...", n, total_send_bytes);
     fflush(stdout);
 //     for( int i = 0; i < total_send_bytes/4 ; i++){
@@ -214,9 +215,10 @@ void SerializerModule::Accept()
 
   struct hostent* host;
   host = gethostbyname(m_hostname_local.c_str());
-
   if (host == NULL) {
-    printf("[ERROR] hostname cannot be resolved. Check /etc/hosts. Exiting...: %s \n", m_hostname_local.c_str());
+    char temp_buf[500];
+    sprintf(temp_buf, "[ERROR] hostname cannot be resolved. Check /etc/hosts. Exiting...: %s \n", m_hostname_local.c_str());
+    print_err.PrintError(temp_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     exit(1);
   }
 
@@ -242,11 +244,7 @@ void SerializerModule::Accept()
   }
 
   if (bind(fd_listen, (struct sockaddr*)&sock_listen, sizeof(struct sockaddr)) < 0) {
-    printf("port %d : ", m_port_to);
-    printf("\033[31m");
-    printf("[ERROR] Failed to bind. Maybe other programs have already occupied this port. Exiting...");
-    printf("\033[0m");
-    //    sleep(1234567);
+    print_err.PrintError("Failed to bind. Maybe other programs have already occupied this port. Exiting...", __FILE__, __PRETTY_FUNCTION__, __LINE__);
     exit(1);
   }
 
@@ -254,7 +252,7 @@ void SerializerModule::Accept()
   setsockopt(fd_listen, IPPROTO_TCP, TCP_NODELAY, &val1, (socklen_t)sizeof(val1));
   int backlog = 1;
   if (listen(fd_listen, backlog) < 0) {
-    perror("[ERROR] Failed in listen:");
+    print_err.PrintError("Failed in listen", __FILE__, __PRETTY_FUNCTION__, __LINE__);
     exit(-1);
   }
 
@@ -266,7 +264,7 @@ void SerializerModule::Accept()
   printf("Accepting... : port %d server %s\n", m_port_to, m_hostname_local.c_str());
   fflush(stdout);
   if ((fd_accept = accept(fd_listen, (struct sockaddr*) & (sock_accept), &addrlen)) == 0) {
-    perror("[ERROR] Failed to accept. Exiting...");
+    print_err.PrintError("Failed to accept. Exiting...", __FILE__, __PRETTY_FUNCTION__, __LINE__);
     exit(-1);
   } else {
     printf("Connection is established: port %d from adress %d %s\n",
@@ -278,7 +276,7 @@ void SerializerModule::Accept()
     timeout.tv_usec = 0;
     ret = setsockopt(fd_accept, SOL_SOCKET, SO_SNDTIMEO, &timeout, (socklen_t)sizeof(timeout));
     if (ret < 0) {
-      perror("[ERROR] Failed to set TIMEOUT. Exiting...");
+      print_err.PrintError("Failed to set TIMEOUT. Exiting...", __FILE__, __PRETTY_FUNCTION__, __LINE__);
       exit(-1);
     }
   }
@@ -386,7 +384,7 @@ void SerializerModule::event()
 
         SendByWriteV(rawcprarray[ j ]);
 #else
-        perror("[ERROR] No SEND PARAMETER IS SPECIFIED.");
+        print_err.PrintError("No SEND PARAMETER IS SPECIFIED.", __FILE__, __PRETTY_FUNCTION__, __LINE__);
         exit(1);
 #endif  // MULTIPLE_SEND
         break;
@@ -394,9 +392,8 @@ void SerializerModule::event()
       case ROPC :
 
         // Send Body
-
         if (send(m_socket, (char*)buf, m_size_byte, MSG_NOSIGNAL) != m_size_byte) {
-          perror("[ERROR] Failed to send data. Exiting...");
+          print_err.PrintError("Failed to send data. Exiting...", __FILE__, __PRETTY_FUNCTION__, __LINE__);
           exit(1);
         }
 
@@ -414,7 +411,7 @@ void SerializerModule::event()
         break;
 
       default :
-        perror("[ERROR] Specify how to handle the data. Exiting...");
+        print_err.PrintError("Specify how to handle the data. Exiting...", __FILE__, __PRETTY_FUNCTION__, __LINE__);
         exit(1);
     }
 #else //NOT_USE_SOCKETLIB

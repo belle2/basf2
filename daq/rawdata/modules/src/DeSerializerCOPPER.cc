@@ -81,7 +81,7 @@ void DeSerializerCOPPERModule::initialize()
   // Present slots to use
   //
   if (! use_slot) {
-    perror("[ERROR] Slot is not specified. Exiting...");
+    print_err.PrintError("Slot is not specified. Exiting...", __FILE__, __PRETTY_FUNCTION__, __LINE__);
     exit(1);
   } else {
     int slot;
@@ -221,7 +221,7 @@ int* DeSerializerCOPPERModule::ReadOneEventFromCOPPERFIFO(const int entry, int* 
   while (1) {
     int read_size = 0;
     if ((read_size = read(cpr_fd, (char*)m_bufary[entry] + recvd_byte, sizeof(int) *  BUF_SIZE_WORD  - recvd_byte)) < 0) {
-      perror("[ERROR] Failed to read header");
+      print_err.PrintError("Failed to read header", __FILE__, __PRETTY_FUNCTION__, __LINE__);
       exit(-1);
     } else {
       recvd_byte += read_size;
@@ -251,7 +251,10 @@ int* DeSerializerCOPPERModule::ReadOneEventFromCOPPERFIFO(const int entry, int* 
                          (*m_size_word - RawTrailer::RAWTRAILER_NWORDS) * sizeof(int) - recvd_byte);
     }
   } else if ((int)((*m_size_word - RawTrailer::RAWTRAILER_NWORDS) * sizeof(int)) < recvd_byte) {
-    printf("[ERROR] Read more than data size. Exiting...: %d %d %d %d %d\n", recvd_byte, *m_size_word * sizeof(int) , RawTrailer::RAWTRAILER_NWORDS * sizeof(int), m_bufary[ entry ][ RawCOPPER::POS_DATA_LENGTH ],  RawCOPPER::POS_DATA_LENGTH);
+    char    err_buf[500];
+    sprintf(err_buf, "Read more than data size. Exiting...: %d %d %d %d %d\n", recvd_byte, *m_size_word * sizeof(int) , RawTrailer::RAWTRAILER_NWORDS * sizeof(int), m_bufary[ entry ][ RawCOPPER::POS_DATA_LENGTH ],  RawCOPPER::POS_DATA_LENGTH);
+    print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+
     exit(-1);
   }
   m_totbytes +=  recvd_byte - RawHeader::RAWHEADER_NWORDS * sizeof(int);
@@ -301,7 +304,7 @@ void* DeSerializerCOPPERModule::OpenCOPPER()
   // Open a finnesse device
   //
   if ((cpr_fd = open("/dev/copper/copper", O_RDONLY)) == -1) {
-    perror("[ERROR] Failed to open Finnese. Exiting... ");
+    print_err.PrintError("Failed to open Finnese. Exiting... ", __FILE__, __PRETTY_FUNCTION__, __LINE__);
     exit(1);
   }
 
@@ -325,7 +328,7 @@ int DeSerializerCOPPERModule::Read(int fd, char* buf, int data_size_byte)
   int read_size = 0;
   while (1) {
     if ((read_size = read(fd, (char*)buf + n, data_size_byte - n)) < 0) {
-      perror("[ERROR] Failed to read header");
+      print_err.PrintError("Failed to read header", __FILE__, __PRETTY_FUNCTION__, __LINE__);
       exit(-1);
     } else {
       n += read_size;

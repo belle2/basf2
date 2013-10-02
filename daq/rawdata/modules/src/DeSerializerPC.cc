@@ -9,6 +9,7 @@
 #include <daq/rawdata/modules/DeSerializerPC.h>
 #include <daq/dataobjects/SendHeader.h>
 #include <daq/dataobjects/SendTrailer.h>
+
 #include <sys/mman.h>
 
 //#define MAXEVTSIZE 400000000
@@ -103,7 +104,6 @@ void DeSerializerPCModule::initialize()
     m_cfg_buf = ShmGet(m_shmfd_cfg, 4);
     m_cfg_sta = ShmGet(m_shmfd_sta, 4);
   }
-
   B2INFO("DeSerializerPC: initialize() done.");
 }
 
@@ -123,7 +123,7 @@ int DeSerializerPCModule::Recv(int sock, char* buf, int data_size_byte, int flag
   int read_size = 0;
   while (1) {
     if ((read_size = recv(sock, (char*)buf + n, data_size_byte - n , flag)) < 0) {
-      perror("[ERROR] Failed to read header");
+      print_err.PrintError("Failed to read header", __FILE__, __PRETTY_FUNCTION__, __LINE__);
       exit(-1);
     } else {
       n += read_size;
@@ -149,7 +149,7 @@ int DeSerializerPCModule::Connect()
     struct hostent* host;
     host = gethostbyname(m_hostname_from[ i ].c_str());
     if (host == NULL) {
-      perror("[ERROR] hostname cannot be resolved. Check /etc/hosts. Exiting...");
+      print_err.PrintError("hostname cannot be resolved. Check /etc/hosts. Exiting...", __FILE__, __PRETTY_FUNCTION__, __LINE__);
       exit(1);
     }
     socPC.sin_addr.s_addr = *(unsigned int*)host->h_addr_list[0];
@@ -236,7 +236,9 @@ int* DeSerializerPCModule::RecvData(int* malloc_flag, int* total_buf_nwords, int
     if (i == 0) {
       *num_events_in_sendblock = temp_num_events;
     } else if (*num_events_in_sendblock != temp_num_events) {
-      printf("[ERROR] Different # of events or nodes over data sources( %d %d %d %d ). Exiting...\n", *num_events_in_sendblock , temp_num_events , *num_nodes_in_sendblock , temp_num_nodes);
+      char err_buf[500];
+      sprintf(err_buf, "[ERROR] Different # of events or nodes over data sources( %d %d %d %d ). Exiting...\n", *num_events_in_sendblock , temp_num_events , *num_nodes_in_sendblock , temp_num_nodes);
+      print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
       exit(1);
     }
     *num_nodes_in_sendblock += temp_num_nodes;
@@ -272,7 +274,7 @@ int* DeSerializerPCModule::RecvData(int* malloc_flag, int* total_buf_nwords, int
                              each_buf_nwords[ i ] * sizeof(int), flag);
   }
   if (*total_buf_nwords * sizeof(int) != total_recvd_byte) {
-    perror("[ERROR] Receiving data in an invalid unit. Exting...");
+    print_err.PrintError("Receiving data in an invalid unit. Exting...", __FILE__, __PRETTY_FUNCTION__, __LINE__);
     exit(-1);
   }
 
@@ -309,13 +311,17 @@ int* DeSerializerPCModule::RecvData(int* malloc_flag, int* total_buf_nwords, int
     fflush(stdout);
 
     if (stat <= 0) {
-      cerr << "[ERROR] EoD is found without updating EventMetaData.";
+      print_err.PrintError("EoD is found without updating EventMetaData.", __FILE__, __PRETTY_FUNCTION__, __LINE__);
       exit(-1); // Exit if EoD is found without updating EventMetaData
     } else if (tot_stat >  BUF_SIZE_WORD * sizeof(int)) {
-      printf("[ERROR] Too large data( %d bytes ). Exiting...", stat);
+      char err_buf[500];
+      sprintf(err_buf, "Too large data( %d bytes ). Exiting....", stat);
+      print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
       exit(-1);
     } else if (stat % sizeof(int) != 0) {
-      printf("[ERROR] Recvd data size is not multple of sizeof(int). Exiting... : %d\n", stat);
+      char err_buf[500];
+      sprintf(err_buf, "Recvd data size is not multple of sizeof(int). Exiting... : %d\n", stat);
+      print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
       exit(-1);
     }
 

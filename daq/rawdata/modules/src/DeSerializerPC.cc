@@ -83,12 +83,9 @@ void DeSerializerPCModule::initialize()
   // Initialize Array of RawCOPPER
   raw_datablkarray.registerPersistent();
 
-
   if (dump_fname.size() > 0) {
     OpenOutputFile();
   }
-
-
 
   // Initialize arrays for time monitor
   memset(time_array0, 0, sizeof(time_array0));
@@ -96,7 +93,6 @@ void DeSerializerPCModule::initialize()
   memset(time_array2, 0, sizeof(time_array2));
 
   ClearNumUsedBuf();
-
 
   // Shared memory
   if (m_shmflag != 0) {
@@ -106,15 +102,6 @@ void DeSerializerPCModule::initialize()
   }
   B2INFO("DeSerializerPC: initialize() done.");
 }
-
-
-
-
-
-
-
-
-
 
 
 int DeSerializerPCModule::Recv(int sock, char* buf, int data_size_byte, int flag)
@@ -343,7 +330,6 @@ void DeSerializerPCModule::event()
 {
   ClearNumUsedBuf();
 
-
   if (n_basf2evt < 0) {
     B2INFO("DeSerializerPC: event() started.");
     m_start_time = GetTimeSec();
@@ -427,36 +413,6 @@ void DeSerializerPCModule::event()
 #ifdef TIME_MONITOR
     RecordTime(n_basf2evt * NUM_EVT_PER_BASF2LOOP + j, time_array2);
 #endif
-
-//     {
-//       RawHeader rawhdr;
-//       SendHeader hdr;
-//       SendTrailer trl;
-//       rawhdr.SetBuffer( temp_buf );
-//       int total_send_nwords =
-//  hdr.GetHdrNwords() +
-//  temp_rawdatablk->TotalBufNwords()*2 +
-//  trl.GetTrlNwords();
-//       int subsys_id = rawhdr.GetSubsysId();
-
-//       hdr.SetNwords(total_send_nwords);
-//       hdr.SetNumEventsinPacket(temp_rawdatablk->GetNumEvents());
-//       hdr.SetNumNodesinPacket(temp_rawdatablk->GetNumNodes());
-//       hdr.SetEventNumber(rawhdr.GetEveNo());
-//       hdr.SetNodeID( 0x00010000 );
-
-//       if (dump_fname.size() > 0) {
-//  if( subsys_id == 1 ){
-//  DumpData((char*)hdr.GetBuffer(), hdr.GetHdrNwords() * sizeof(int));
-//  }
-//  DumpData((char*)temp_buf, total_buf_nwords * sizeof(int));
-//  if( subsys_id == 2 ){
-//  DumpData((char*)trl.GetBuffer(), trl.GetTrlNwords() * sizeof(int));
-//  }
-//       }
-//     }
-
-
   }
 
 
@@ -485,15 +441,14 @@ void DeSerializerPCModule::event()
   if (max_nevt >= 0 || max_seconds >= 0.) {
     if ((n_basf2evt * NUM_EVT_PER_BASF2LOOP >= max_nevt && max_nevt > 0)
         || (GetTimeSec() - m_start_time > max_seconds && max_seconds > 0.)) {
-
       printf("################## check 5 maxevt %d  mattime %lf %d %lf\n", max_nevt , max_seconds, n_basf2evt * NUM_EVT_PER_BASF2LOOP, GetTimeSec() - m_start_time);
       m_eventMetaDataPtr->setEndOfData();
     }
   }
-  //  if(n_basf2evt % 100 == 0 ){
-//    printf("eve %d time %lf\n",n_basf2evt, GetTimeSec() - m_start_time );
-//     fflush(stdout);
-  //  }
+  if (n_basf2evt % 100 == 0) {
+    printf("eve %d time %lf\n", n_basf2evt, GetTimeSec() - m_start_time);
+    fflush(stdout);
+  }
 
   n_basf2evt++;
 

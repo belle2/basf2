@@ -124,7 +124,7 @@ int mgt_check_FEE(Mgt_t* mgt) {
   mgt_write(mgt, FEE_HWV, 0x02);
   mgt_write(mgt, FEE_FWV, 0x02);
   mgt_write(mgt, CONTROL, 0x07);
-  /*
+  ///*
   int n = 0;
   for ( n = 1; n < 4; n++ ) {
     usleep(100000);
@@ -139,7 +139,7 @@ int mgt_check_FEE(Mgt_t* mgt) {
     printf("value of status register  on HSLB:%c : %x \n",'a'+ mgt->slot ,val);
     if ( val == 0x11 ) break;
   }
-  */
+  //*/
   int feetype = mgt_read(mgt, FEE_TYPE);
   switch (feetype) {
   case 0x01:

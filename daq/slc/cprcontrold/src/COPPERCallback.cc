@@ -65,8 +65,8 @@ bool COPPERCallback::boot() throw()
   fread(str, 1, 4096 - 1, file);
   pclose(file);
   std::cout << str << std::endl;
-
   */
+
   for (int slot = 0; slot < 4; slot++) {
     if (!(_hslbcon_v[slot].reset() &&
           _hslbcon_v[slot].boot())) {

@@ -36,9 +36,19 @@ ROCallback::~ROCallback() throw()
 bool ROCallback::boot() throw()
 {
   /*
-  FILE* file = popen("cd /home/usr/tkonno/cdc;/home/xilinx/ise12.4/ISE/bin/lin/impact -batch cdc41b2l011-impact.cmd", "r");
+  FILE* file = popen("cd /home/usr/tkonno/tmp/cdc;/home/usr/nakao/bin/impact12  -batch cdc41b2l013-impact.cmd", "r");
   char str[102400];
   memset(str, '\0', 102400);
+  fread(str, 1, 102400 - 1, file);
+  pclose(file);
+  std::string s = str;
+  std::cout << s << std::endl;
+  */
+  system("cd ~tkonno/tmp/cdc;~nakao/bin/impact12 -batch cdc41b2l013-impact.cmd > $B2SLC_PATH/log/cdc_download_firm.log;cd -");
+  /*
+  FILE* file = popen("cat $B2SLC_PATH/log/cdc_download_firm.log | grep Programmed successfully", "r");
+  char str[1024];
+  memset(str, '\0', 1024);
   fread(str, 1, 102400 - 1, file);
   pclose(file);
   std::string s = str;
@@ -95,6 +105,7 @@ bool ROCallback::stop() throw()
 {
   if (_buf_config != NULL)
     memset(_buf_config, 0, sizeof(int) * 4);
+  system("killall eb0");
   return true;
 }
 

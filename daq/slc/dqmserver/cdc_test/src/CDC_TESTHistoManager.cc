@@ -26,9 +26,9 @@ HistoPackage* CDC_TESTHistoManager::createPackage(RootHistMap& hist_m)
   _h_size = _pack->addHisto(new Histo1F("h_size", "Data Size; Data size [byte]; # of entries", 100, 0.0, 2000.0));
   _h_size2d = _pack->addHisto(new Histo2F("h_size2d", "Data Size vs. Copper;Copper ID;Data size [byte]",
                                           100, 0.0, 2000.0, 5, 0.0, 5.0));
-  _h_ncpr = _pack->addHisto(new Histo1F("h_ncpr_cpy", "Number of COPPERs", 10, 0.0, 10.0));
-  _h_nevt = _pack->addHisto(new Histo1F("h_nevt_cpy", "Number of Events; Number of events; # of entries", 10, 0.0, 10.0));
-  _h_size = _pack->addHisto(new Histo1F("h_size_cpy", "Data Size; Data size [byte]; # of entries", 100, 0.0, 2000.0));
+  _h_ncpr_cpy = _pack->addHisto(new Histo1F("h_ncpr_cpy", "Number of COPPERs", 10, 0.0, 10.0));
+  _h_nevt_cpy = _pack->addHisto(new Histo1F("h_nevt_cpy", "Number of Events; Number of events; # of entries", 10, 0.0, 10.0));
+  _h_size_cpy = _pack->addHisto(new Histo1F("h_size_cpy", "Data Size; Data size [byte]; # of entries", 100, 0.0, 2000.0));
 
   _label_state = (MonLabel*)_pack->addMonObject(new MonLabel("label_state", 20));
   _label_state->setUpdated(true);

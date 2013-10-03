@@ -12,7 +12,7 @@ fi
 ## setup for slow control system libraries ##
 export B2SLC_PATH=$BELLE2_LOCAL_DIR/daq/slc
 export PATH=$PATH:$B2SLC_PATH/bin
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$B2SLC_PATH/lib
+export LD_LIBRARY_PATH=$B2SLC_PATH/lib:$LD_LIBRARY_PATH
 
 ## setup for slow control system java libraries ##
 export JAVA_HOME=/usr/java/latest/
@@ -21,7 +21,6 @@ export CLASSPATH=.:$JAVA_HOME/jre/lib:$JAVA_HOME/lib\
 :$JAVA_HOME/lib/tools.jar\
 :$B2SLC_PATH/javalib/mysql-connector-java-5.1.26-bin.jar
 export B2SC_SERVER_HOST="ropc01.kek.jp";
-#export B2SC_SERVER_HOST="b2slow2.kek.jp";
 
 ## NSM configuration ##
 export NSM2_HOST=`/sbin/ifconfig | grep "192\.168\.10\." | sed "s/:/ /g" | awk '{print $3}'`

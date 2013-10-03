@@ -28,9 +28,13 @@ void EventBuilderManager::run() throw()
     argv[i++] = path;
 
     char sender_c_v[20][128];
-    for (int j = 0; j < _node->getNSenders(); j++) {
-      sprintf(sender_c_v[j], "%s", _node->getSender(j)->getHost().c_str());
-      argv[j + 1] = sender_c_v[j];
+    sprintf(sender_c_v[0], "ttd3");
+    argv[i] = sender_c_v[0];
+    i++;
+    //for (int j = 0; j < _node->getNSenders(); j++) {
+    for (int j = 0; j < 1; j++) {
+      sprintf(sender_c_v[j + 1], "%s", _node->getSender(j)->getHost().c_str());
+      argv[j + 2] = sender_c_v[j + 1];
       i++;
     }
 

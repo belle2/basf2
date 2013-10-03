@@ -124,8 +124,10 @@ void DeSerializerCOPPERModule::initialize()
 
   if (m_shmflag != 0) {
     ShmOpen("/cpr_config", "/cpr_status");
+    // Status format : status_flag
     m_cfg_buf = ShmGet(m_shmfd_cfg, 4);
     m_cfg_sta = ShmGet(m_shmfd_sta, 4);
+    m_cfg_sta[ 0 ] = 0; // Status bit is 0 : not ready
   }
 
   memset(time_array0, 0, sizeof(time_array0));
@@ -350,6 +352,7 @@ void DeSerializerCOPPERModule::event()
     // Use shared memory to start(for HSLB dummy data)
     if (m_shmflag != 0) {
       //      int* cfg_buf = ShmGet(m_shmfd_cfg, 4);
+      m_cfg_sta[ 0 ] = 1; // Status bit is 0 : not ready
       printf("Waiting for Start...\n");
       fflush(stdout);
       while (1) {

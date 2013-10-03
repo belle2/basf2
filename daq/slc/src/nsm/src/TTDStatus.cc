@@ -42,6 +42,7 @@ throw(IOException)
   pars[npar++] = node->getIndex();
   pocket_ttd* ttd_status = (pocket_ttd*)_status;
   pars[npar++] = ttd_status->isrunning;
+  /*
   pars[npar++] = ttd_status->sigpipe;
   pars[npar++] = ttd_status->rsv2;
   pars[npar++] = ttd_status->rsv3;
@@ -49,12 +50,14 @@ throw(IOException)
   pars[npar++] = ttd_status->b2ebsock;
   pars[npar++] = ttd_status->b2ebip;
   pars[npar++] = ttd_status->myip;
+  */
   pars[npar++] = ttd_status->exp_number;
   pars[npar++] = ttd_status->run_number;
   pars[npar++] = ttd_status->run_count;
   pars[npar++] = ttd_status->evt_number;
   pars[npar++] = ttd_status->evt_total;
   pars[npar++] = ttd_status->ftswid;
+  /*
   pars[npar++] = ttd_status->cpldver;
   pars[npar++] = ttd_status->conf;
   pars[npar++] = ttd_status->cclk;
@@ -62,10 +65,12 @@ throw(IOException)
   pars[npar++] = ttd_status->fpgaver;
   pars[npar++] = ttd_status->setutim;
   pars[npar++] = ttd_status->clkfreq;
+  */
   pars[npar++] = ttd_status->utime;
   pars[npar++] = ttd_status->ctime;
   pars[npar++] = ttd_status->udead;
   pars[npar++] = ttd_status->cdead;
+  /*
   pars[npar++] = ttd_status->omask;
   pars[npar++] = ttd_status->stamisc;
   pars[npar++] = ttd_status->jtag;
@@ -103,6 +108,7 @@ throw(IOException)
     pars[npar++] = ttd_status->stab[i];
     pars[npar++] = ttd_status->maxt[i];
   }
+  */
 }
 
 void TTDStatus::deserialize(NSMNode* node, int npar, int* pars, const std::string& data)

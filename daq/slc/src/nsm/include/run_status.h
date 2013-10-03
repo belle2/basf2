@@ -4,13 +4,12 @@
 const int run_status_revision = 1;
 
 struct run_status {
-  uint64 serial;
-  uint64 exp_no;
-  uint64 run_no;
-  uint64 start_time;
-  uint64 end_time;
-  uint64 total_triggers;
-  uint32 state[1024];
+  uint32 serial;
+  uint32 exp_no;
+  uint32 run_no;
+  uint32 start_time;
+  uint32 end_time;
+  uint32 total_triggers;
 };
 
 #endif

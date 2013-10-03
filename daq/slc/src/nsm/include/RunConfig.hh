@@ -27,6 +27,9 @@ namespace B2DAQ {
     const std::string& getOperators() const throw() {
       return _operators;
     }
+    int getTriggerMode() const throw() { return _trigger_mode; }
+    int getDummyRate() const throw() { return _dummy_rate; }
+    int getTriggerLimit() const throw() { return _trigger_limit; }
     void setNUsed(unsigned int nused) throw() { _nused = nused; }
     void setUsed(unsigned int index, bool used) throw() {
       if ( index < _nused ) _used_v[index] = used;
@@ -38,6 +41,9 @@ namespace B2DAQ {
     void setOperators(const std::string& operators) throw() {
       _operators = operators;
     }
+    void setTriggerMode(int mode) throw() { _trigger_mode = mode; }
+    void setDummyRate(int rate) throw() { _dummy_rate = rate; }
+    void setTriggerLimit(int limit) throw() { _trigger_limit = limit; }
 
   public:
     virtual void read(NSMNode*) throw(NSMHandlerException);
@@ -49,7 +55,10 @@ namespace B2DAQ {
     std::string _run_type;
     int _version;
     std::string _operators;
-
+    int _trigger_mode;
+    int _dummy_rate;
+    int _trigger_limit;
+    
   };
 
 }

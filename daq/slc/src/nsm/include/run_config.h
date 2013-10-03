@@ -9,6 +9,9 @@ struct run_config {
   int32  version;
   char   run_type[256];
   char   operators[256];
+  int32 trigger_mode;
+  int32 dummy_rate;
+  int32 trigger_limit;
 };
 
 #endif

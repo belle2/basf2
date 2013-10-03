@@ -27,7 +27,7 @@ bool HSLBController::boot() throw()
     if (firmware_path == NULL) return false;
     const std::string path = B2DAQ::form("%s/%s", firmware_path,
                                          _hslb->getFirmware().c_str());
-    //B2DAQ::debug("[DEBUG] Firmware path = %s", path.c_str());
+    B2DAQ::debug("[DEBUG] Firmware path = %s", path.c_str());
     _mgt = mgt_boot(_slot, path.c_str(),
                     &board_type, &firmware, &hardware);
     if (_mgt == NULL) return false;
@@ -58,23 +58,22 @@ bool HSLBController::load() throw()
       return false;
     }
     mgt_execute(_mgt, CTL_VERBOSE);
+    mgt_execute(_mgt, CTL_TRG_NORMAL);
     FEEModule::RegisterList& reg_v(module->getRegisters());
     for (size_t i = 0; i < reg_v.size(); i++) {
       FEEModule::Register& reg(reg_v[i]);
       for (size_t ch = 0; ch < reg.length(); ch++) {
         if (reg.getValue(ch) < 0) continue;
-        /*
-              int address = 0;
-              if (reg.getSize() == 1) {
-                address = reg.getAddress() + ch;
-                mgt_set_param(_mgt, address, reg.getValue(ch));
-              } else if (reg.getSize() == 2) {
-                address = reg.getAddress() + ch * 2;
-                mgt_set_param2(_mgt, address, reg.getValue(ch));
-              }
-        */
-        //B2DAQ::debug("[DEBUG] Register write to address = 0x%x with value = %d",
-        //             address, reg.getValue(ch));
+        int address = 0;
+        if (reg.getSize() == 1) {
+          address = reg.getAddress() + ch;
+          mgt_set_param(_mgt, address, reg.getValue(ch));
+        } else if (reg.getSize() == 2) {
+          address = reg.getAddress() + ch * 2;
+          mgt_set_param2(_mgt, address, reg.getValue(ch));
+        }
+        B2DAQ::debug("[DEBUG] Register write to address = 0x%x with value = %d",
+                     address, reg.getValue(ch));
       }
     }
   }

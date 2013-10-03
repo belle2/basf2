@@ -51,7 +51,7 @@ namespace B2DAQ {
       if ( _pid < 0 ) return false;
       return ::waitpid(_pid, NULL, 0);
     }
-    bool cancel() { return kill(SIGABRT); }
+    bool cancel() { return kill(SIGQUIT); }
 
   private:
     pid_t _pid;

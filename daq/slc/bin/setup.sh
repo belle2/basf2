@@ -6,6 +6,7 @@ if [ ! -n "${BELLE2_LOCAL_DIR}" ]; then
 source $HOME/tools/setup_belle2
 cd $HOME/release/
 setuprel
+export BELLE2_OPTION=opt
 cd -
 fi
 
@@ -48,7 +49,8 @@ export B2SC_DQM_MAP_PATH=$B2SLC_PATH/log
 export B2SC_DQM_LIB_PATH=$B2SLC_PATH/dqmserver/lib
 
 ## setup for directory 
-export HSLB_FIRMEWATE_PATH=/home/usr/yamadas/bit/
+#export HSLB_FIRMEWATE_PATH=/home/usr/yamadas/bit/
+export HSLB_FIRMEWATE_PATH=${B2SLC_PATH}/cprcontrold/mgt/
 export TTRX_FIRMEWATE_PATH=/home/usr/nakao/daq/ftsw/
 export FTSW_FIRMEWATE_PATH=/home/usr/nakao/daq/ftsw/
 export FEE_FIRMWARE_PATH=/home/usr/tkonno/cdc

@@ -95,10 +95,14 @@ bool COPPERCallback::load() throw()
 
   system("killall basf2");
   _fork.cancel();
+  _buf_status[0] = 0;
   _fork = Fork(new SenderManager(_node));
   _listener = new ProcessListener(this, _fork);
   _thread = PThread(_listener);
-  sleep(3);
+  while (_buf_status[0] != 1) {
+    sleep(1);
+  }
+  //sleep(3);
   return true;
 }
 

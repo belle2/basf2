@@ -1,12 +1,12 @@
-#ifndef __POCKET_TTD_H__
-#define __POCKET_TTD_H__
+#ifndef __POCKET_TTD_H_
+#define __POCKET_TTD_H_
 
-const int pocket_ttd_revision = 3;
+const int pocket_ttd_revision = 4;
 
 struct pocket_ttd {
   byte8 isrunning;
   byte8 sigpipe;
-  byte8 rsv2;
+  byte8 verbose;
   byte8 rsv3;
   // tmp
   int16 b2ebport;

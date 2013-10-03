@@ -26,6 +26,9 @@ void RunConfig::read(NSMNode*) throw(NSMHandlerException)
   memcpy(_used_v, config->used, sizeof(config->used));
   _version = config->version;
   _run_type = config->run_type;
+  _trigger_mode = config->trigger_mode;
+  _dummy_rate = config->dummy_rate;
+  _trigger_limit = config->trigger_limit;
 }
 
 void RunConfig::write(NSMNode*) throw(NSMHandlerException)
@@ -35,5 +38,8 @@ void RunConfig::write(NSMNode*) throw(NSMHandlerException)
   memcpy(config->used, _used_v, sizeof(config->used));
   config->version = _version;
   strcpy(config->run_type, _run_type.c_str());
+  config->trigger_mode = _trigger_mode;
+  config->dummy_rate = _dummy_rate;
+  config->trigger_limit = _trigger_limit;
 }
 

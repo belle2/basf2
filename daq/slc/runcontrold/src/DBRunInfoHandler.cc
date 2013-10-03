@@ -11,7 +11,7 @@ using namespace B2DAQ;
 
 void DBRunInfoHandler::createRunConfigTable() throw(DBHandlerException)
 {
-  _db->execute("create table run_config (exp_no int, run_no int, run_type text, start_time timestamp, version int, operators text);");
+  _db->execute("create table run_config (exp_no int, run_no int, run_type text, trigger_mode int, dummy_rate int, trigger_limit int, start_time timestamp, version int, operators text);");
 }
 
 void DBRunInfoHandler::createRunStatusTable() throw(DBHandlerException)
@@ -23,7 +23,9 @@ void DBRunInfoHandler::writeRunConfigTable() throw(DBHandlerException)
 {
   std::stringstream ss;
   ss << "insert into run_config values (" << _status->getExpNumber() << ", "
-     << _status->getRunNumber() << ", '" << _config->getRunType() << "', '"
+     << _status->getRunNumber() << ", '" << _config->getRunType() << "', "
+     << _config->getTriggerMode() << ", " << _config->getDummyRate() << ", "
+     << _config->getTriggerLimit() << ", '"
      << std::string(Date(_status->getStartTime()).toString()) << "',  "
      << _config->getVersion() << ", '" << _config->getOperators() << "');";
   _db->execute(ss.str());

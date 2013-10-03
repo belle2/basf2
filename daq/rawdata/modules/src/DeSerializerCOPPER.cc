@@ -8,7 +8,7 @@
 
 #include <daq/rawdata/modules/DeSerializerCOPPER.h>
 
-#define CHECKEVT 1000
+#define CHECKEVT 10000
 
 
 //#define CHECK_SUM
@@ -44,6 +44,10 @@ DeSerializerCOPPERModule::DeSerializerCOPPERModule() : DeSerializerModule()
 
   //Parameter definition
   B2INFO("DeSerializerCOPPER: Constructor done.");
+
+  m_ftsweve_upper16bit = 0;
+  m_prev_ftsweve = 0;
+
 }
 
 
@@ -157,7 +161,6 @@ void DeSerializerCOPPERModule::FillNewRawCOPPERHeader(RawCOPPER* raw_copper)
   //
   rawhdr.Initialize(); // Fill 2nd( hdr size) and 20th header word( magic word )
 
-
   // Set total words info
   int nwords = raw_copper->GetBlockNwords(num_cprblock);
   rawhdr.SetNwords(nwords);
@@ -169,7 +172,27 @@ void DeSerializerCOPPERModule::FillNewRawCOPPERHeader(RawCOPPER* raw_copper)
   rawhdr.SetRunNo(m_run_no);   // Fill 3rd header word
 
   // Obtain eve.# from COPPER header
-  rawhdr.SetEveNo(raw_copper->GetCOPPEREveNo(num_cprblock));     // Fill 4th header word
+//   unsigned int cur_ftsw_eve16 = GetFTSW16bitEventNumber( 0 );
+//   unsigned int cur_ftsw_eve32 = ( ( m_ftsweve_upper16bit << 16 ) & 0xFFFF0000 ) | ( cur_ftsw_eve16 & 0x0000FFFF );
+//   if( cur_ftsw_eve32 < m_prev_ftsweve ){
+//     if( cur_ftsw_eve16 == 0 ){
+//       m_ftsweve_upper16bit++;
+//       cur_ftsw_eve32 = ( ( m_ftsweve_upper16bit << 16 ) & 0xFFFF0000 ) | ( cur_ftsw_eve16 & 0x0000FFFF );
+//     }else{
+//       char err_buf[500];
+//       sprintf(err_buf, "Invalid event_number. Exiting...: cur 32bit eve %u preveve %u\n",  cur_ftsw_eve32, m_prev_ftsweve );
+//       print_err.PrintError("Failed to read header", __FILE__, __PRETTY_FUNCTION__, __LINE__);
+//       exit(-1);
+//     }
+//   }
+//   rawhdr.SetEveNo( cur_ftsw_eve32 );     // Temporarily use COPPER counter   //raw_copper->GetCOPPERCounter()
+//   m_prev_ftsweve = cur_ftsw_eve16;
+
+//   // Set FTSW word
+//   rawhdr.SetFTSW2Words( raw_copper );
+
+
+
   //  rawhdr.SetB2LFEEHdrPart(raw_copper->GetB2LFEEHdr1(), raw_copper->GetB2LFEEHdr2());   // Fill 5th and 6th words
 
   // Obtain info from SlowController via AddParam or COPPER data

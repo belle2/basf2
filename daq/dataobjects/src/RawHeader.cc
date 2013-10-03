@@ -147,6 +147,15 @@ void RawHeader::SetOffset4thFINNESSE(int offset_4th_FINNESSE)
   m_buffer[ POS_OFFSET_4TH_FINNESSE ] = offset_4th_FINNESSE;
 }
 
+// void RawHeader::SetFTSW2Words(  RawCOPPER* rawcpr )
+// {
+//   CheckSetBuffer();
+//   memcpy( &(m_buffer[ POS_HSLB_1 ]), rawcpr->GetFTSW2Words(0) );
+//   m_buffer[ POS_EXP_RUN_NO ] = (m_buffer[ POS_EXP_RUN_NO ] & 0x003FFFFF) | ((exp_no << 22) & 0xFFC00000);
+//   return;
+// }
+
+
 int RawHeader::AddNodeInfo(int node_id)
 {
   CheckSetBuffer();

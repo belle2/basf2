@@ -87,7 +87,7 @@ int RawCOPPER::GetCOPPERNodeId(int n)
   return m_buffer[ pos_nwords ];
 }
 
-unsigned int RawCOPPER::GetCOPPEREveNo(int n)
+unsigned int RawCOPPER::GetCOPPERCounter(int n)
 {
   RawHeader hdr;
   int pos_nwords = GetBufferPos(n) + POS_EVE_NUM_COPPER + hdr.RAWHEADER_NWORDS;
@@ -219,4 +219,16 @@ int* RawCOPPER::Get4thDetectorBuffer(int n)
 {
   int pos_nwords = GetOffset4thFINNESSE(n) + SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER;
   return &(m_buffer[ pos_nwords ]);
+}
+
+int* RawCOPPER::GetFTSW2Words(int n)
+{
+  int pos_nwords = GetOffset1stFINNESSE(n) + SIZE_B2LHSLB_HEADER + POS_FTSW_0;
+  return &(m_buffer[ pos_nwords ]);
+}
+
+int RawCOPPER::GetFTSW16bitEventNumber(int n)
+{
+  int pos_nwords = GetOffset1stFINNESSE(n) + SIZE_B2LHSLB_HEADER + POS_FTSW_1;
+  return (m_buffer[ pos_nwords ] & 0x0000FFFF);
 }

@@ -43,7 +43,7 @@ namespace Belle2 {
     virtual int GetCOPPERNodeId(int n);
 
     //! get Event number from data
-    virtual unsigned int GetCOPPEREveNo(int n);
+    virtual unsigned int GetCOPPERCounter(int n);
 
     //! get subsystem-ID from data
     virtual int GetSubsysId(int n);
@@ -51,6 +51,11 @@ namespace Belle2 {
     //! get b2l block from data
     virtual int GetNumFINNESSEBlock(int n);
 
+    //! get b2l block from data
+    virtual int* GetFTSW2Words(int n);
+
+    //! get b2l block from data
+    virtual int GetFTSW16bitEventNumber(int n);
 
     //! get # of offset words for FEE slot A buffer position
     int GetOffset1stFINNESSE(int n);
@@ -88,23 +93,9 @@ namespace Belle2 {
     //! get Detector Buffer of slot D
     int* Get4thDetectorBuffer(int n);
 
-
-    /* Data Format : COPPER header*/
-    enum {
-      POS_MAGIC_COPPER_1 = 0,
-      POS_EVE_NUM_COPPER = 1,
-      POS_SUBSYSTEM_ID = 2,
-      POS_CRATE_ID = 3,
-      POS_SLOT_ID = 4,
-      POS_MAGIC_COPPER_2 = 7,
-      POS_DATA_LENGTH = 8,
-      POS_CH_A_DATA_LENGTH = 9,
-      POS_CH_B_DATA_LENGTH = 10,
-      POS_CH_C_DATA_LENGTH = 11,
-      POS_CH_D_DATA_LENGTH = 12,
-      SIZE_COPPER_HEADER = 13
-    };
-
+    //
+    // Size of COPPER "front" header and trailer
+    //
     /*
        size of COPPER_BLOCK =
        RawHeader.RAWHEADER_NWORDS +
@@ -118,44 +109,76 @@ namespace Belle2 {
       SIZE_COPPER_TRAILER = 2
     };
 
-
-    /* Data Format : B2link HSLB Header */
+    //
+    // Data Format : COPPER header
+    //
     enum {
-      POS_MAGIC_B2LHSLB = 0,
-      POS_EVE_CNT_B2LHSLB = 1,
-      //      SIZE_B2LHSLB_HEADER = 2
-      //      SIZE_B2LHSLB_HEADER = 0 // As of Aug.22,2013, the header size is one word. It should be 2 in future.
-      SIZE_B2LHSLB_HEADER = 2
-    };
-    /* Data Format : B2link HSLB Trailer */
-    enum {
-      POS_CHKSUM_B2LHSLB = 0,
-      SIZE_B2LHSLB_TRAILER = 1
-    };
+      POS_MAGIC_COPPER_1 = 0,
+      POS_EVE_NUM_COPPER = 1,
+      POS_SUBSYSTEM_ID = 2,
+      POS_CRATE_ID = 3,
+      POS_SLOT_ID = 4,
+      POS_MAGIC_COPPER_2 = 7,
+      POS_DATA_LENGTH = 8,
+      POS_CH_A_DATA_LENGTH = 9,
+      POS_CH_B_DATA_LENGTH = 10,
+      POS_CH_C_DATA_LENGTH = 11,
+      POS_CH_D_DATA_LENGTH = 12,
 
-
-    /* Data Format : B2link FEE Header */
-    enum {
-      POS_EVEID_B2LFEE = 0,
-      POS_EVETIME_B2LFEE = 1,
-      SIZE_B2LFEE_HEADER = 2
-                           //      SIZE_B2LFEE_HEADER = 1  // As of Aug.22,2013, the header size is one word. It should be 2 in future.
+      SIZE_COPPER_HEADER = 13
     };
 
-
-    /* Data Format : B2link FEE Trailer */
-    enum {
-      POS_CHKSUM_B2LFEE = 0,
-      SIZE_B2LFEE_TRAILER = 1
-    };
-
-
-    /* Data Format : COPPER Trailer*/
+    //
+    // Data Format : COPPER Trailer
+    //
     enum {
       POS_MAGIC_COPPER_3 = 0,
       POS_CHKSUM_COPPER = 1,
       POS_MAGIC_COPPER_4 = 2
+
     };
+
+    //
+    // Data Format : B2Link HSLB Header
+    //
+    enum {
+      POS_MAGIC_B2LHSLB = 0,
+      POS_EVE_CNT_B2LHSLB = 1,
+
+      SIZE_B2LHSLB_HEADER = 2
+    };
+
+    //
+    // Data Format : B2Link HSLB Trailer
+    //
+    enum {
+      POS_CHKSUM_B2LHSLB = 0,
+
+      SIZE_B2LHSLB_TRAILER = 2
+    };
+
+    //
+    // Data Format : B2Link FEE Header
+    //
+    enum {
+      POS_FTSW_0 = 0,
+      POS_FTSW_1 = 1,
+      POS_EXP_RUN = 2,
+      POS_B2L_TIME = 3,
+
+      SIZE_B2LFEE_HEADER = 4 // modified by Oct.3, 2013, Nakao-san's New firmware?
+                           //      SIZE_B2LFEE_HEADER = 1  // As of Aug.22,2013, the header size is one word. It should be 2 in future.
+    };
+
+    //
+    // Data Format : B2Link FEE Trailer
+    //
+    enum {
+      POS_CHKSUM_B2LFEE = 0,
+
+      SIZE_B2LFEE_TRAILER = 2
+    };
+
 
 
   protected :

@@ -48,6 +48,7 @@ public class RCServerCommunicator {
 		while (true) {
 			_socket_reader.readObject(msg);
  			RCCommand cmd = msg.getCommand();
+ 			/*
  			if ( cmd.equal(RCCommand.DATA) ) {
 				RCNode node = _system.getNodes().get(msg.getParam(0));
 				int npar = msg.getNParams();
@@ -58,7 +59,7 @@ public class RCServerCommunicator {
 					ss.append("par["+i+"] = "+ msg.getParam(i+1) + "<br/>");
 				}
 				_main_panel.addLog(new Log(ss.toString(), LogLevel.INFO));
- 			} else if ( cmd.equal(RCCommand.ERROR) ) {
+ 			} else*/ if ( cmd.equal(RCCommand.ERROR) ) {
 				RCNode node = _system.getNodes().get(msg.getParam(0));
 				_main_panel.addLog(new Log("Node " + node.getName()+ " got ERRPR : <br/>" +
 						"<span style='color:red;font-weight:bold;'>" + msg.getData()+"</span>",

@@ -65,7 +65,8 @@ histo.param('HistoFileName', 'ropc_histofile.root')
 monitor = register_module('MonitorDataCOPPER')
 
 # Dump
-dump.param('outputFileName', 'root_output.root')
+# dump.param('outputFileName', 'root_output.root')
+dump.param('outputFileName', '/mnt/usbhdd/root_output.root')
 dump.param('compressionLevel', 0)
 # Compression Level: 0 for no, 1 for low, 9 for high compression. Level 1 usually reduces size by 50%, higher levels have no noticeable effect.
 

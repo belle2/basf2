@@ -53,4 +53,8 @@ public class ComboBoxPanel extends JPanel {
 		_text_combo.setEnabled(enabled);
 	}
 
+	public JComboBox getCombo() {
+		return _text_combo;
+	}
+
 }

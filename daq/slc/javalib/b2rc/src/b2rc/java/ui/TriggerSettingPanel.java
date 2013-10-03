@@ -29,16 +29,17 @@ public class TriggerSettingPanel extends JPanel {
 	
 	public TriggerSettingPanel(TTDNode node) {
 		super();
-		String [] type = new String [9];
+		String [] type = new String [10];
 		type[0] = "NONE";
 		type[1] = "IN";
-		type[2] = "PULSE";
+		type[2] = "TLU";
 		type[3] = "--";
-		type[4] = "REVO";
-		type[5] = "RANDOM";
-		type[6] = "POSSION";
-		type[7] = "ONCE";
-		type[8] = "STOP";
+		type[4] = "PULSE";
+		type[5] = "REVO";
+		type[6] = "RANDOM";
+		type[7] = "POSSION";
+		type[8] = "ONCE";
+		type[9] = "STOP";
 		_trigger_type = new ComboBoxPanel("Trigger type : ", type);
 		_trigger_type.setFieldSize(80, 30);
 		_dummy_rate = new TextBoxPanel("Dummy rate [Hz]: ", ""+(-1));
@@ -113,7 +114,7 @@ public class TriggerSettingPanel extends JPanel {
 											+ "Trigger type : <span style='color:blue;font-weight:bold;'>"
 											+ panel._trigger_type.getText()+"</span><br/>"
 											+ "Dummy rate : <span style='color:blue;font-weight:bold;'>"
-											+ ((dummy_rate<0)?"none":dummy_rate/1000.0+" Hz")+"</span><br/>" 
+											+ ((dummy_rate<0)?"none":(dummy_rate>1000000)?(dummy_rate/1000000.0+" kHz"):(dummy_rate/1000.0+" Hz"))+"</span><br/>" 
 											+ "Trigger limit : <span style='color:blue;font-weight:bold;'>"
 											+ trigger_limit+"</span>", LogLevel.INFO));
 

@@ -9,7 +9,8 @@ struct run_status {
   uint32 run_no;
   uint32 start_time;
   uint32 end_time;
-  uint32 total_triggers;
+  uint32 event_number;
+  uint32 event_total;
 };
 
 #endif

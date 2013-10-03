@@ -5,6 +5,8 @@
 
 #include <db/DBNodeSystemConfigurator.hh>
 
+#include <nsm/TTDStatus.hh>
+
 #include <system/Time.hh>
 #include <system/Date.hh>
 
@@ -46,10 +48,15 @@ void RunControlMessageManager::run()
             node->setState(state_next);
           reportState(node);
           send(node, cmd, nsm.getNParams(), nsm.getParams());
-        } else if (cmd == Command::TRIGFT) {
-          _data_man->getRunConfig()->setTriggerMode(nsm.getParam(0));
-          _data_man->getRunConfig()->setDummyRate(nsm.getParam(1));
-          _data_man->getRunConfig()->setTriggerLimit(nsm.getParam(2));
+        }
+        if (cmd == Command::TRIGFT) {
+          _data_man->getRunConfig()->setTriggerMode(nsm.getParam(1));
+          _data_man->getRunConfig()->setDummyRate(nsm.getParam(2));
+          _data_man->getRunConfig()->setTriggerLimit(nsm.getParam(3));
+        } else if (cmd == Command::STOP &&
+                   (cmd == Command::ABORT &&
+                    _rc_node->getState() == State::RUNNING_S)) {
+          uploadRunResult();
         }
       } else {
         if (!cmd.isAvailable(_rc_node->getState())) continue;
@@ -74,9 +81,9 @@ void RunControlMessageManager::run()
                     _rc_node->getState() == State::RUNNING_S)) {
           uploadRunResult();
         } else if (cmd == Command::TRIGFT) {
-          _data_man->getRunConfig()->setTriggerMode(nsm.getParam(0));
-          _data_man->getRunConfig()->setDummyRate(nsm.getParam(1));
-          _data_man->getRunConfig()->setTriggerLimit(nsm.getParam(2));
+          _data_man->getRunConfig()->setTriggerMode(nsm.getParam(1));
+          _data_man->getRunConfig()->setDummyRate(nsm.getParam(2));
+          _data_man->getRunConfig()->setTriggerLimit(nsm.getParam(3));
         } else if (cmd == Command::STATECHECK) {
           std::vector<NSMNode*>& node_v(_node_system->getNodes());
           for (size_t i = 0; i < node_v.size(); i++) {
@@ -98,30 +105,9 @@ void RunControlMessageManager::run()
       if (index_seq < 0 && cmd == Command::STATECHECK) {
         std::vector<NSMNode*>& node_v(_node_system->getNodes());
         _data_man->readNodeStatus();
-        std::vector<NSMData*>& data_v(_data_man->getNodeStatus());
         for (size_t i = 0; i < node_v.size(); i++) {
           if (node_v[i]->isUsed()) {
             send(node_v[i], cmd);
-            ///*
-            if (data_v[i] != NULL && data_v[i]->isAvailable()) {
-              int npar = 0;
-              int pars[256];
-              std::string datap;
-              data_v[i]->serialize(node_v[i], npar, pars, datap);
-              NSMMessage nsm;
-              nsm.setNParams(npar);
-              for (int i = 0; i < npar; i++)
-                nsm.setParam(i, pars[i]);
-              nsm.setData(datap);
-              RunControlMessage msg(RunControlMessage::RUNCONTROLLER, nsm);
-              msg.setCommand(Command::DATA);
-              try {
-                _ui_comm->sendMessage(msg);
-              } catch (const IOException& e) {
-                B2DAQ::debug("[DEBUG] %s:%d error=%s", __FILE__, __LINE__, e.what());
-              }
-            }
-            //*/
           }
         }
       } else {
@@ -413,6 +399,18 @@ void RunControlMessageManager::uploadRunResult() throw()
   RunStatus* status = _data_man->getRunStatus();
   RunConfig* config = _data_man->getRunConfig();
   status->setEndTime(Time().getSecond());
+  std::vector<NSMNode*>& node_v(_node_system->getNodes());
+  std::vector<NSMData*>& data_v(_data_man->getNodeStatus());
+  _data_man->readNodeStatus();
+  for (size_t i = 0; i < node_v.size(); i++) {
+    if (node_v[i]->isUsed() && data_v[i] != NULL && data_v[i]->isAvailable()) {
+      if (node_v[i]->getType() == "ttd_node") {
+        TTDStatus* ttd_status = (TTDStatus*)data_v[i];
+        status->setEventNumber(ttd_status->getEventNumber());
+        status->setEventTotal(ttd_status->getEventTotal());
+      }
+    }
+  }
   try {
     _data_man->writeRunStatus();
     _data_man->writeRunConfig();

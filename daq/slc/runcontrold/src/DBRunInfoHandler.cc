@@ -35,7 +35,7 @@ void DBRunInfoHandler::writeRunStatusTable() throw(DBHandlerException)
 {
   std::stringstream ss;
   ss << "insert into run_status values (" << _status->getExpNumber() << ", "
-     << _status->getRunNumber() << ", " <<  _status->getTotalTriggers() << ", '"
+     << _status->getRunNumber() << ", " <<  _status->getEventTotal() << ", '"
      << std::string(Date(_status->getStartTime()).toString()) << "', '"
      << std::string(Date(_status->getEndTime()).toString()) << "');";
   _db->execute(ss.str());

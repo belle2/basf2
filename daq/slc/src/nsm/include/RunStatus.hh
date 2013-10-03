@@ -29,8 +29,11 @@ namespace B2DAQ {
     RunNumber_t getRunNumber() const throw() { return _run_no; }
     RunTime_t getStartTime() const throw() { return _start_time; }
     RunTime_t getEndTime() const throw() { return _end_time; }
-    unsigned long long getTotalTriggers() const throw() {
-      return _total_triggers;
+    unsigned long long getEventTotal() const throw() {
+      return _event_total;
+    }
+    unsigned long long getEventNumber() const throw() {
+      return _event_number;
     }
     int getState(unsigned int index, int state) throw() {
       return _state_v[index];
@@ -47,8 +50,11 @@ namespace B2DAQ {
     }
     void setStartTime(RunTime_t start_time) throw() { _start_time = start_time; }
     void setEndTime(RunTime_t end_time) throw() { _end_time = end_time; }
-    void setTotalTriggers(unsigned long long total_triggers) throw() {
-      _total_triggers = total_triggers;
+    void setEventTotal(unsigned long long event_total) throw() {
+      _event_total = event_total;
+    }
+    void setEventNumber(unsigned long long event_number) throw() {
+      _event_number = event_number;
     }
     void setState(unsigned int index, int state) throw() {
       _state_v[index] = state;
@@ -60,7 +66,8 @@ namespace B2DAQ {
     RunNumber_t _run_no;
     RunTime_t _start_time;
     RunTime_t _end_time;
-    unsigned long long _total_triggers;
+    unsigned long long _event_number;
+    unsigned long long _event_total;
     int _state_v[1024];
     
   };

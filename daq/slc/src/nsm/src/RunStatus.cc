@@ -17,7 +17,8 @@ RunStatus::RunStatus(const std::string& data_name) throw()
   _run_no = 0;
   _start_time = 0;
   _end_time = 0;
-  _total_triggers = 0;
+  _event_number = 0;
+  _event_total = 0;
 }
 
 void RunStatus::read(NSMNode*) throw(NSMHandlerException)
@@ -27,6 +28,8 @@ void RunStatus::read(NSMNode*) throw(NSMHandlerException)
   _run_no = status->run_no;
   _start_time = status->start_time;
   _end_time = status->end_time;
+  _event_number = status->event_number;
+  _event_total = status->event_total;
 }
 
 void RunStatus::write(NSMNode*) throw(NSMHandlerException)
@@ -36,5 +39,7 @@ void RunStatus::write(NSMNode*) throw(NSMHandlerException)
   status->run_no = _run_no;
   status->start_time = _start_time;
   status->end_time = _end_time;
+  status->event_number = _event_number;
+  status->event_total = _event_total;
 }
 

@@ -6,6 +6,9 @@ extern "C" {
 }
 
 #include <node/NSMNode.hh>
+
+#include <util/Debugger.hh>
+
 #include <cstring>
 #include <cstdlib>
 
@@ -115,4 +118,19 @@ void TTDStatus::deserialize(NSMNode* node, int npar, int* pars, const std::strin
 throw(IOException)
 {
 
+}
+
+int TTDStatus::getEventNumber()
+{
+  return ((pocket_ttd*)_status)->evt_number;
+}
+
+int TTDStatus::getEventTotal()
+{
+  return ((pocket_ttd*)_status)->evt_total;
+}
+
+bool TTDStatus::isRunning()
+{
+  return ((pocket_ttd*)_status)->isrunning;
 }

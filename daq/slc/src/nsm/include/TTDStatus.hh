@@ -16,6 +16,9 @@ namespace B2DAQ {
     virtual void write(NSMNode* node) throw(NSMHandlerException);
     virtual void serialize(NSMNode* node, int& npar, int* pars, std::string& data) throw(IOException);
     virtual void deserialize(NSMNode* node, int npar, int* pars, const std::string& data) throw(IOException);
+    int getEventNumber(); 
+    int getEventTotal(); 
+    bool isRunning();
 
   private:
     void* _status;

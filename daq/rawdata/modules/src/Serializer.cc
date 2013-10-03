@@ -190,18 +190,72 @@ void SerializerModule::SendByWriteV(RawCOPPER* rawcpr)
     exit(1);
   }
 
-  int total_send_bytes = sizeof(int) * send_header.GetTotalNwords();
-  if (n != total_send_bytes) {
-    print_err.PrintError("Failed to send all data",
-                         __FILE__, __PRETTY_FUNCTION__, __LINE__);
-    printf("[ERROR] Sent data length is not consistent. %d %d : Exiting...", n, total_send_bytes);
-    fflush(stdout);
 
+  int total_send_bytes = sizeof(int) * send_header.GetTotalNwords();
+
+  //
+  // Retry sending
+  //
+  if (n != total_send_bytes) {
+    // Send Header
+    if (n < iov[ 0 ].iov_len) {
+      int sent_bytes = n;
+      while (true) {
+        int ret = 0;
+        if ((ret = send(m_socket, (char*)iov[ 0 ].iov_base + sent_bytes, iov[ 0 ].iov_len - sent_bytes,  MSG_NOSIGNAL)
+            ) < 0) {
+          print_err.PrintError("Failed to send data. Exiting...", __FILE__, __PRETTY_FUNCTION__, __LINE__);
+          sleep(1234567);
+          exit(1);
+        }
+        sent_bytes += ret;
+        if (sent_bytes == iov[ 0 ].iov_len) break;
+      }
+      n = sent_bytes;
+    }
+
+    if (n < iov[ 1 ].iov_len) {
+      int sent_bytes = n - iov[ 0 ].iov_len;
+      while (true) {
+        int ret = 0;
+        if ((ret = send(m_socket, (char*)iov[ 1 ].iov_base + sent_bytes, iov[ 1 ].iov_len - sent_bytes,  MSG_NOSIGNAL)
+            ) < 0) {
+          print_err.PrintError("Failed to send data. Exiting...", __FILE__, __PRETTY_FUNCTION__, __LINE__);
+          sleep(1234567);
+          exit(1);
+        }
+        sent_bytes += ret;
+        if (sent_bytes == iov[ 1 ].iov_len) break;
+      }
+      n = sent_bytes;
+    }
+
+
+    if (n < iov[ 2 ].iov_len) {
+      int sent_bytes = n - iov[ 0 ].iov_len - iov[ 1 ].iov_len;
+      while (true) {
+        int ret = 0;
+        if ((ret = send(m_socket, (char*)iov[ 2 ].iov_base + sent_bytes, iov[ 2 ].iov_len - sent_bytes,  MSG_NOSIGNAL)
+            ) < 0) {
+          print_err.PrintError("Failed to send data. Exiting...", __FILE__, __PRETTY_FUNCTION__, __LINE__);
+          sleep(1234567);
+          exit(1);
+        }
+        sent_bytes += ret;
+        if (sent_bytes == iov[ 2 ].iov_len) break;
+      }
+    }
+
+//     print_err.PrintError("Failed to send all data",
+//                          __FILE__, __PRETTY_FUNCTION__, __LINE__);
+//     printf("[ERROR] Sent data length is not consistent. %d %d : Exiting...", n, total_send_bytes);
+//     fflush(stdout);
 //     for( int i = 0; i < total_send_bytes/4 ; i++){
 //       printf("", );
 //     }
-    sleep(1234567);
-    exit(1);
+//     sleep(1234567);
+//     exit(1);
+
   }
   //  printf("n %d total %d\n", n, total_send_bytes);
   //  delete temp_buf;

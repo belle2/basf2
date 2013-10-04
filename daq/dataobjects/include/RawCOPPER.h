@@ -55,6 +55,9 @@ namespace Belle2 {
     virtual int* GetFTSW2Words(int n);
 
     //! get b2l block from data
+    virtual int* GetExpRunBuf(int n);
+
+    //! get b2l block from data
     virtual int GetFTSW16bitEventNumber(int n);
 
     //! get # of offset words for FEE slot A buffer position
@@ -143,9 +146,8 @@ namespace Belle2 {
     //
     enum {
       POS_MAGIC_B2LHSLB = 0,
-      POS_EVE_CNT_B2LHSLB = 1,
-
-      SIZE_B2LHSLB_HEADER = 2
+      //      POS_EVE_CNT_B2LHSLB = 1,
+      SIZE_B2LHSLB_HEADER = 1
     };
 
     //

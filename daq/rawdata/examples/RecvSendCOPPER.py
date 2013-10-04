@@ -56,7 +56,6 @@ sender = register_module('Serializer')
 sender.param('DestPort', 33000)
 # sender.param('LocalHostName', 'cpr006')
 sender.param('LocalHostName', argvs[1])
-sender.param('ProcessMethod', 'COPPER')
 
 # Create main path
 main = create_path()

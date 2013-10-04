@@ -46,6 +46,8 @@ DeSerializerModule::DeSerializerModule() : Module()
 
   prev_event = -1;
 
+
+
   //Parameter definition
   B2INFO("DeSerializer: Constructor done.");
 }

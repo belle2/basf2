@@ -16,8 +16,9 @@ ClassImp(RawDataBlock);
 RawDataBlock::RawDataBlock()
 {
   m_nwords = 0;
+  m_use_prealloc_buf = 0;
   m_buffer = NULL;
-  m_use_prealloc_buf = false;
+
 }
 
 RawDataBlock::~RawDataBlock()
@@ -59,12 +60,12 @@ int RawDataBlock::GetBufferPos(int n)
 }
 
 
-bool RawDataBlock::CheckFTSWID(int n)
+int RawDataBlock::CheckFTSWID(int n)
 {
   if (m_buffer[ GetBufferPos(n) + POS_FTSW_ID ] == 0x54544420) {
-    return true;
+    return 1;
   } else {
-    return false;
+    return 0;
   }
 
 
@@ -79,7 +80,6 @@ int RawDataBlock::TotalBufNwords()
 int RawDataBlock::GetBlockNwords(int n)
 {
   int size;
-  //  printf("aaaaaaaaaaaaa %d %d\n", n, m_num_events * m_num_nodes );
   if (n == (m_num_events * m_num_nodes) - 1) {
     size =  m_nwords - GetBufferPos(n);
   } else {

@@ -48,6 +48,9 @@ namespace Belle2 {
     virtual int GetNumEvents() { return m_num_events; }
 
     //! get nth buffer pointer
+    virtual int GetPreAllocFlag() { return m_use_prealloc_buf; }
+
+    //! get nth buffer pointer
     virtual int* GetBuffer(int n);
 
     //! set buffer
@@ -57,7 +60,7 @@ namespace Belle2 {
     virtual int GetBlockNwords(int n);
 
     //! get COPPER Block Size
-    virtual bool CheckFTSWID(int n);
+    virtual int CheckFTSWID(int n);
 
     enum {
       POS_NWORDS = 0,
@@ -66,16 +69,20 @@ namespace Belle2 {
 
   protected :
 
-
     int m_nwords;
-    int* m_buffer; //[m_nwords]
-    bool m_use_prealloc_buf;
 
-    RawHeader tmp_header;  //! Not record
-    RawTrailer tmp_trailer; //! Not record
+    int m_num_nodes;
 
     int m_num_events;
-    int m_num_nodes;
+
+    int* m_buffer; //[m_nwords]
+
+    int m_use_prealloc_buf; //! Not record
+
+    RawHeader tmp_header;  //! Not record
+
+    RawTrailer tmp_trailer; //! Not record
+
 
     ClassDef(RawDataBlock, 1);
   };

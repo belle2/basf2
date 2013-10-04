@@ -54,7 +54,8 @@ namespace Belle2 {
     void SetDataType(int data_type);    //! set contents of header
     void SetTruncMask(int trunc_mask);    //! set contents of header
     void SetB2LFEEHdrPart(unsigned int word1, unsigned int word2);   //! set contents of header
-    //    void SetFTSW2Words(  RawCOPPER* rawcpr );
+    void SetFTSW2Words(int* ftsw_buf);
+    void SetExpRunNumber(int* exprun_buf);
 
     void SetOffset1stFINNESSE(int offset_1st_FINNESSE);    //! set contents of header
     void SetOffset2ndFINNESSE(int offset_2nd_FINNESSE);    //! set contents of header

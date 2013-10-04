@@ -16,9 +16,6 @@ using namespace Belle2;
 //#define DUMMY_DATA
 #define TIME_MONITOR
 
-//#define MULTIPLE_SEND
-//#define MEMCPY_TO_ONE_BUFFER
-#define SEND_BY_WRITEV
 
 //#define DEBUG
 
@@ -36,7 +33,6 @@ SerializerModule::SerializerModule() : Module()
   //Set module properties
   setDescription("Encode DataStore into RingBuffer");
   addParam("DestPort", m_port_to, "Destination port", BASE_PORT_ROPC_COPPER);
-  addParam("ProcessMethod", p_method, "Process method", string("COPPER"));
   addParam("LocalHostName", m_hostname_local, "local host", string(""));
 #ifdef DUMMY
   addParam("EventDataBufferWords", BUF_SIZE_WORD, "DataBuffer words per event", 4800);
@@ -63,19 +59,6 @@ void SerializerModule::initialize()
   m_buffer = new int[ BUF_SIZE_WORD ];
 
 #endif
-
-  if (p_method == "COPPER") {
-    p_method_val = 1;
-  } else if (p_method == "ROPC") {
-    p_method_val = 2;
-  } else {
-    print_err.PrintError("Please specify the data-handling",
-                         __FILE__, __PRETTY_FUNCTION__, __LINE__);
-    exit(1);
-  }
-
-  printf("METHOD %d %s %d\n", p_method_val, p_method.c_str(), m_port_to);
-
 
 #ifndef NOT_SEND
 #ifdef NOT_USE_SOCKETLIB
@@ -397,8 +380,6 @@ void SerializerModule::event()
 #endif
 
   StoreArray<RawCOPPER> rawcprarray;
-
-  //  for (int j = 0; j < NUM_EVT_PER_BASF2LOOP; j++) {
   for (int j = 0; j < rawcprarray.getEntries(); j++) {
     int* buf;
     int m_size_byte = 0;
@@ -420,60 +401,12 @@ void SerializerModule::event()
     //
     // Send data
     //
-
-#ifdef DEBUG
-    printf("Send loop : %d\n", j);
-#endif
-
 #ifndef NOT_SEND
 
 #ifdef NOT_USE_SOCKETLIB
 
-    switch (p_method_val) {
-      case COPPER :
+    SendByWriteV(rawcprarray[ j ]);
 
-#ifdef MULTIPLE_SEND
-
-        SendOneByOne(rawcprarray[ j ]);
-
-#elif defined( MEMCPY_TO_ONE_BUFFER ) // MULIPLE_SEND
-
-        SendOneBuffer(rawcprarray[ j ]);
-
-#elif defined( SEND_BY_WRITEV ) // MULIPLE_SEND
-
-        SendByWriteV(rawcprarray[ j ]);
-#else
-        print_err.PrintError("No SEND PARAMETER IS SPECIFIED.", __FILE__, __PRETTY_FUNCTION__, __LINE__);
-        exit(1);
-#endif  // MULTIPLE_SEND
-        break;
-
-      case ROPC :
-
-        // Send Body
-        if (send(m_socket, (char*)buf, m_size_byte, MSG_NOSIGNAL) != m_size_byte) {
-          print_err.PrintError("Failed to send data. Exiting...", __FILE__, __PRETTY_FUNCTION__, __LINE__);
-          exit(1);
-        }
-
-#ifdef DEBUG
-        printf("size :: %d %d\n", m_size_byte, m_size_byte / sizeof(int));
-        for (int i = 0; i < m_size_byte / sizeof(int); i++) {
-          printf("0x%.8x ", *((int*)buf + i));
-          if ((i + 1) % 10 == 0) printf("\n %6d :: ", i);
-        }
-        printf("\n");
-        printf("\n");
-
-#endif
-
-        break;
-
-      default :
-        print_err.PrintError("Specify how to handle the data. Exiting...", __FILE__, __PRETTY_FUNCTION__, __LINE__);
-        exit(1);
-    }
 #else //NOT_USE_SOCKETLIB
     // Use basf2 send library
     m_sock->send_buffer(m_size_byte, (char*)buf);

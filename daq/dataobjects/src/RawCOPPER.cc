@@ -221,6 +221,12 @@ int* RawCOPPER::Get4thDetectorBuffer(int n)
   return &(m_buffer[ pos_nwords ]);
 }
 
+int* RawCOPPER::GetExpRunBuf(int n)
+{
+  int pos_nwords = GetOffset1stFINNESSE(n) + SIZE_B2LHSLB_HEADER + POS_EXP_RUN;
+  return &(m_buffer[ pos_nwords ]);
+}
+
 int* RawCOPPER::GetFTSW2Words(int n)
 {
   int pos_nwords = GetOffset1stFINNESSE(n) + SIZE_B2LHSLB_HEADER + POS_FTSW_0;

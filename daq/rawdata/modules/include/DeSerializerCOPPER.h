@@ -54,6 +54,10 @@ namespace Belle2 {
 
     // Data members
   private:
+    //! data
+    StoreObjPtr<RawCOPPER> m_rawcopper;
+
+    StoreArray<RawCOPPER> rawcprarray;
 
     virtual void FillNewRawCOPPERHeader(RawCOPPER* raw_copper);
     virtual int* ReadOneEventFromCOPPERFIFO(const int entry, int* malloc_flag, int* m_size_word);
@@ -70,7 +74,9 @@ namespace Belle2 {
     int finnesse_bit_flag;
     ErrorMessage print_err;
     unsigned int m_ftsweve_upper16bit;
-    unsigned int m_prev_ftsweve;
+    unsigned int m_prev_ftsweve16;
+    unsigned int m_prev_ftsweve32;
+
 
 
   };

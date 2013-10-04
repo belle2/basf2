@@ -170,6 +170,21 @@ void PrintDataModule::PrintCOPPEREvent(RawCOPPER* raw_copper)
     detector_buf_4th = raw_copper->Get4thDetectorBuffer(i);
     printf("Detector  buf %p %p %p %p\n", detector_buf_1st, detector_buf_2nd, detector_buf_3rd, detector_buf_4th);
 
+
+    //#ifdef DEBUG
+    printf("*******BODY**********\n");
+    printf("\n%.8d : ", 0);
+    for (int j = 0; j < raw_copper->GetBlockNwords(i); j++) {
+      printf("0x%.8x ", (raw_copper->GetBuffer(i))[ j ]);
+      if ((j + 1) % 10 == 0) {
+        printf("\n%.8d : ", j + 1);
+      }
+    }
+    printf("\n");
+    printf("\n");
+    //#endif
+
+
   }
 }
 

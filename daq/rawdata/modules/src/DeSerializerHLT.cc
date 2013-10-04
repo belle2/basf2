@@ -72,7 +72,7 @@ void DeSerializerHLTModule::initialize()
   m_eventMetaDataPtr.registerAsPersistent();
 
   // Initialize Array of RawCOPPER
-
+  raw_datablkarray.registerPersistent();
   rawcprarray.registerPersistent();
   raw_cdcarray.registerPersistent();
   raw_svdarray.registerPersistent();
@@ -80,6 +80,8 @@ void DeSerializerHLTModule::initialize()
   raw_epidarray.registerPersistent();
   raw_eclarray.registerPersistent();
   raw_klmarray.registerPersistent();
+  raw_ftswarray.registerPersistent();
+
 
 
   if (dump_fname.size() > 0) {
@@ -111,6 +113,7 @@ void DeSerializerHLTModule::event()
     n_basf2evt = 0;
   }
 
+  raw_datablkarray.create();
   rawcprarray.create();
   raw_svdarray.create();
   raw_cdcarray.create();
@@ -118,7 +121,7 @@ void DeSerializerHLTModule::event()
   raw_epidarray.create();
   raw_eclarray.create();
   raw_klmarray.create();
-
+  raw_ftswarray.create();
 
   // DataStore interface
   for (int j = 0; j < NUM_EVT_PER_BASF2LOOP; j++) {

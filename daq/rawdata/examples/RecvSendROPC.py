@@ -32,7 +32,6 @@ reader.param('RecvPort', 35000)
 # sender.param('DestHostName', 'hltes')
 sender.param('DestHostName', 'localhost')
 sender.param('DestPort', 37000)
-sender.param('ProcessMethod', 'ROPC')
 
 # Create main path
 main = create_path()

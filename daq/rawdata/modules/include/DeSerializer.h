@@ -21,10 +21,11 @@
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/dataobjects/EventMetaData.h>
 
 #include <daq/dataflow/EvtSocket.h>
-#include <daq/dataobjects/RawCOPPER.h>
-#include <framework/dataobjects/EventMetaData.h>
+
+#include <daq/dataobjects/RawDataBlock.h>
 
 #include <sys/socket.h>
 #include <sys/types.h>
@@ -66,11 +67,9 @@ namespace Belle2 {
     // Event Meta Data
     StoreObjPtr<EventMetaData> m_eventMetaDataPtr;
 
-    //! data
-    StoreObjPtr<RawCOPPER> m_rawcopper;
 
-    //!    StoreObjPtr<RawCOPPER> m_rawcopper;
-    StoreArray<RawCOPPER> rawcprarray;
+    StoreArray<RawDataBlock> raw_datablkarray;     //!  StoreArray
+
 
     //! # of events in a run
     int max_nevt;

@@ -46,7 +46,8 @@ DeSerializerCOPPERModule::DeSerializerCOPPERModule() : DeSerializerModule()
   B2INFO("DeSerializerCOPPER: Constructor done.");
 
   m_ftsweve_upper16bit = 0;
-  m_prev_ftsweve = 0;
+  m_prev_ftsweve16 = 0;
+  m_prev_ftsweve32 = 0;
 
 }
 
@@ -140,6 +141,8 @@ void DeSerializerCOPPERModule::initialize()
   memset(time_array3, 0, sizeof(time_array3));
   memset(time_array4, 0, sizeof(time_array4));
   memset(time_array5, 0, sizeof(time_array5));
+
+
   B2INFO("DeSerializerCOPPER: initialize() done.");
 
 }
@@ -149,8 +152,6 @@ void DeSerializerCOPPERModule::initialize()
 
 void DeSerializerCOPPERModule::FillNewRawCOPPERHeader(RawCOPPER* raw_copper)
 {
-
-
 
   const int num_cprblock = 0; // On COPPER, 1 COPPER block will be stored in a RawCOPPER.
   RawHeader rawhdr;
@@ -165,31 +166,42 @@ void DeSerializerCOPPERModule::FillNewRawCOPPERHeader(RawCOPPER* raw_copper)
   int nwords = raw_copper->GetBlockNwords(num_cprblock);
   rawhdr.SetNwords(nwords);
 
-  //
-  // Obtain info from SlowController via AddParam
-  //
-  rawhdr.SetExpNo(m_exp_no);   // Fill 3rd header word
-  rawhdr.SetRunNo(m_run_no);   // Fill 3rd header word
+  // Obtain run and exp #
+  rawhdr.SetExpRunNumber(raw_copper->GetExpRunBuf(num_cprblock));       // Fill 3rd header word
 
-  // Obtain eve.# from COPPER header
-//   unsigned int cur_ftsw_eve16 = GetFTSW16bitEventNumber( 0 );
-//   unsigned int cur_ftsw_eve32 = ( ( m_ftsweve_upper16bit << 16 ) & 0xFFFF0000 ) | ( cur_ftsw_eve16 & 0x0000FFFF );
-//   if( cur_ftsw_eve32 < m_prev_ftsweve ){
-//     if( cur_ftsw_eve16 == 0 ){
-//       m_ftsweve_upper16bit++;
-//       cur_ftsw_eve32 = ( ( m_ftsweve_upper16bit << 16 ) & 0xFFFF0000 ) | ( cur_ftsw_eve16 & 0x0000FFFF );
-//     }else{
-//       char err_buf[500];
-//       sprintf(err_buf, "Invalid event_number. Exiting...: cur 32bit eve %u preveve %u\n",  cur_ftsw_eve32, m_prev_ftsweve );
-//       print_err.PrintError("Failed to read header", __FILE__, __PRETTY_FUNCTION__, __LINE__);
-//       exit(-1);
-//     }
-//   }
-//   rawhdr.SetEveNo( cur_ftsw_eve32 );     // Temporarily use COPPER counter   //raw_copper->GetCOPPERCounter()
-//   m_prev_ftsweve = cur_ftsw_eve16;
 
-//   // Set FTSW word
-//   rawhdr.SetFTSW2Words( raw_copper );
+  //  Obtain eve.# from COPPER header
+  unsigned int cur_ftsw_eve16 = raw_copper->GetFTSW16bitEventNumber(num_cprblock);
+  unsigned int cur_ftsw_eve32 = ((m_ftsweve_upper16bit << 16) & 0xFFFF0000) | (cur_ftsw_eve16 & 0x0000FFFF);
+  if (cur_ftsw_eve16 < m_prev_ftsweve16) {
+    if (cur_ftsw_eve16 == 0) {
+      m_ftsweve_upper16bit++;
+      cur_ftsw_eve32 = ((m_ftsweve_upper16bit << 16) & 0xFFFF0000) | (cur_ftsw_eve16 & 0x0000FFFF);
+    } else {
+      char err_buf[500];
+      sprintf(err_buf, "Invalid 16bit event_number. Exiting...: cur 32bit eve %u preveve %u\n",  cur_ftsw_eve16, m_prev_ftsweve16);
+      print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      exit(-1);
+    }
+  }
+
+
+  rawhdr.SetEveNo(cur_ftsw_eve32);       // Temporarily use COPPER counter   //raw_copper->GetCOPPERCounter()
+
+
+  if (m_prev_ftsweve32 != 0) {
+    if (m_prev_ftsweve32 + 1 != cur_ftsw_eve32) {
+      char err_buf[500];
+      sprintf(err_buf, "Invalid event_number. Exiting...: cur 32bit eve %u preveve %u\n",  cur_ftsw_eve32, m_prev_ftsweve32);
+      print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      exit(-1);
+    }
+  }
+  m_prev_ftsweve16 = cur_ftsw_eve16;
+  m_prev_ftsweve32 = cur_ftsw_eve32;
+
+  // Set FTSW word
+  rawhdr.SetFTSW2Words(raw_copper->GetFTSW2Words(num_cprblock));
 
 
 
@@ -371,6 +383,7 @@ void DeSerializerCOPPERModule::event()
   const int num_nodes = 1;
 
   if (n_basf2evt < 0) {
+
     B2INFO("DeSerializerCOPPER: event() started.");
     // Use shared memory to start(for HSLB dummy data)
     if (m_shmflag != 0) {

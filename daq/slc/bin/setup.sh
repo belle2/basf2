@@ -22,10 +22,11 @@ export CLASSPATH=.:$JAVA_HOME/jre/lib:$JAVA_HOME/lib\
 :$JAVA_HOME/lib/tools.jar\
 :$B2SLC_PATH/javalib/mysql-connector-java-5.1.26-bin.jar
 export B2SC_SERVER_HOST="ropc01.kek.jp";
+export B2SC_SERVER_HOST="b2slow2.kek.jp";
 
 ## NSM configuration ##
 export NSM2_HOST=`/sbin/ifconfig | grep "192\.168\.10\." | sed "s/:/ /g" | awk '{print $3}'`
-#export NSM2_HOST=130.87.227.252
+export NSM2_HOST=130.87.227.252
 export NSM2_PORT=8122
 export NSM2_SHMKEY=8122
 export NSM2_INCDIR=$B2SLC_PATH/bin
@@ -45,6 +46,7 @@ export B2SC_XML_PATH=$B2SLC_PATH/config/cdc_test
 export B2SC_CPRLIB_PATH=$B2SLC_PATH/lib/cdc_test
 
 ## setup for slow control database access ##
+export B2SC_DQM_CONFIG_PATH=$B2SLC_PATH/dqmserver/config/test.conf
 export B2SC_DQM_MAP_PATH=$B2SLC_PATH/log
 export B2SC_DQM_LIB_PATH=$B2SLC_PATH/dqmserver/lib
 

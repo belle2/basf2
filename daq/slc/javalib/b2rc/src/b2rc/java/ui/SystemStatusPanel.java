@@ -12,8 +12,10 @@ import javax.swing.border.TitledBorder;
 
 import b2daq.core.Time;
 import b2daq.ui.Updatable;
+//import b2rc.core.FTSW;
 import b2rc.core.RCNodeSystem;
 import b2rc.core.RCState;
+//import b2rc.core.TTDNode;
 
 public class SystemStatusPanel extends JPanel implements Updatable {
 
@@ -25,6 +27,12 @@ public class SystemStatusPanel extends JPanel implements Updatable {
 	private JLabel _text_run_no;
 	private JLabel _text_start_time;
 	private JLabel _text_end_time;
+
+	private JLabel _text_trigger_mode;
+
+	private JLabel _text_dummy_rate;
+
+	private JLabel _text_trigger_limit;
 	
 	public SystemStatusPanel(RCNodeSystem system) {
 		_system = system;
@@ -34,68 +42,111 @@ public class SystemStatusPanel extends JPanel implements Updatable {
 		GridBagLayout layout = new GridBagLayout();
 		GridBagConstraints gbc = new GridBagConstraints();
 		setLayout(layout);
-
-		setGrid(gbc, 0, 0, 0.2d, 0.1d, GridBagConstraints.BOTH,
+		
+		int rows = 0;
+		setGrid(gbc, 0, rows, 0.2d, 0.1d, GridBagConstraints.BOTH,
 				GridBagConstraints.LINE_START, new Insets(0, 5, 0, 5));
 		JLabel label_operation_mode = new JLabel("DAQ status:");
 		label_operation_mode.setFont(new Font("Sans", Font.PLAIN, 13));
 		layout.setConstraints(label_operation_mode, gbc);
 		add(label_operation_mode);
 
-		setGrid(gbc, 1, 0, 0.2d, 0.1d, GridBagConstraints.NONE,
+		setGrid(gbc, 1, rows++, 0.2d, 0.1d, GridBagConstraints.NONE,
 				GridBagConstraints.LINE_START, new Insets(0, 5, 0, 5));
 		layout.setConstraints(_daq_state_label, gbc);
 		add(_daq_state_label);
 
-		setGrid(gbc, 0, 1, 0.2d, 0.1d, GridBagConstraints.BOTH,
+		setGrid(gbc, 0, rows, 0.2d, 0.1d, GridBagConstraints.BOTH,
 				GridBagConstraints.LINE_START, new Insets(0, 5, 0, 5));
 		JLabel label_exp_no = new JLabel("Experiment #:");
 		label_exp_no.setFont(new Font("Sans", Font.PLAIN, 13));
 		layout.setConstraints(label_exp_no, gbc);
 		add(label_exp_no);
 
-		setGrid(gbc, 1, 1, 0.2d, 0.1d, GridBagConstraints.BOTH,
+		setGrid(gbc, 1, rows++, 0.2d, 0.1d, GridBagConstraints.BOTH,
 				GridBagConstraints.LINE_START, new Insets(0, 5, 0, 5));
 		_text_exp_no = new JLabel("--");
 		_text_exp_no.setFont(new Font("Sans", Font.PLAIN, 13));
 		layout.setConstraints(_text_exp_no, gbc);
 		add(_text_exp_no);
 
-		setGrid(gbc, 0, 2, 0.2d, 0.1d, GridBagConstraints.BOTH,
+		setGrid(gbc, 0, rows, 0.2d, 0.1d, GridBagConstraints.BOTH,
 				GridBagConstraints.LINE_START, new Insets(0, 5, 0, 5));
 		JLabel label_run_no = new JLabel("Run #:");
 		label_run_no.setFont(new Font("Sans", Font.PLAIN, 13));
 		layout.setConstraints(label_run_no, gbc);
 		add(label_run_no);
 
-		setGrid(gbc, 1, 2, 0.2d, 0.1d, GridBagConstraints.BOTH,
+		setGrid(gbc, 1, rows++, 0.2d, 0.1d, GridBagConstraints.BOTH,
 				GridBagConstraints.LINE_START, new Insets(0, 5, 0, 5));
 		_text_run_no = new JLabel("--");
 		layout.setConstraints(_text_run_no, gbc);
 		add(_text_run_no);
 
-		setGrid(gbc, 0, 3, 0.2d, 0.1d, GridBagConstraints.BOTH,
+		setGrid(gbc, 0, rows, 0.2d, 0.1d, GridBagConstraints.BOTH,
+				GridBagConstraints.LINE_START, new Insets(0, 5, 0, 5));
+		JLabel label_trigger_mode = new JLabel("Trigger mode:");
+		label_trigger_mode.setFont(new Font("Sans", Font.PLAIN, 13));
+		layout.setConstraints(label_trigger_mode, gbc);
+		add(label_trigger_mode);
+
+		setGrid(gbc, 1, rows++, 0.2d, 0.1d, GridBagConstraints.BOTH,
+				GridBagConstraints.LINE_START, new Insets(0, 5, 0, 5));
+		_text_trigger_mode = new JLabel("----");
+		_text_trigger_mode.setFont(new Font("Sans", Font.PLAIN, 13));
+		layout.setConstraints(_text_trigger_mode, gbc);
+		add(_text_trigger_mode);
+
+		setGrid(gbc, 0, rows, 0.2d, 0.1d, GridBagConstraints.BOTH,
+				GridBagConstraints.LINE_START, new Insets(0, 5, 0, 5));
+		JLabel label_dummy_rate = new JLabel("Dummy rate:");
+		label_dummy_rate.setFont(new Font("Sans", Font.PLAIN, 13));
+		layout.setConstraints(label_dummy_rate, gbc);
+		add(label_dummy_rate);
+
+		setGrid(gbc, 1, rows++, 0.2d, 0.1d, GridBagConstraints.BOTH,
+				GridBagConstraints.LINE_START, new Insets(0, 5, 0, 5));
+		_text_dummy_rate = new JLabel("----");
+		_text_dummy_rate.setFont(new Font("Sans", Font.PLAIN, 13));
+		layout.setConstraints(_text_dummy_rate, gbc);
+		add(_text_dummy_rate);
+
+		setGrid(gbc, 0, rows, 0.2d, 0.1d, GridBagConstraints.BOTH,
+				GridBagConstraints.LINE_START, new Insets(0, 5, 0, 5));
+		JLabel label_trigger_limit = new JLabel("Trigger limit:");
+		label_trigger_limit.setFont(new Font("Sans", Font.PLAIN, 13));
+		layout.setConstraints(label_trigger_limit, gbc);
+		add(label_trigger_limit);
+
+		setGrid(gbc, 1, rows++, 0.2d, 0.1d, GridBagConstraints.BOTH,
+				GridBagConstraints.LINE_START, new Insets(0, 5, 0, 5));
+		_text_trigger_limit = new JLabel("----");
+		_text_trigger_limit.setFont(new Font("Sans", Font.PLAIN, 13));
+		layout.setConstraints(_text_trigger_limit, gbc);
+		add(_text_trigger_limit);
+
+		setGrid(gbc, 0, rows, 0.2d, 0.1d, GridBagConstraints.BOTH,
 				GridBagConstraints.LINE_START, new Insets(0, 5, 0, 5));
 		JLabel label_start_time = new JLabel("Start time:");
 		label_start_time.setFont(new Font("Sans", Font.PLAIN, 13));
 		layout.setConstraints(label_start_time, gbc);
 		add(label_start_time);
 
-		setGrid(gbc, 1, 3, 0.2d, 0.1d, GridBagConstraints.BOTH,
+		setGrid(gbc, 1, rows++, 0.2d, 0.1d, GridBagConstraints.BOTH,
 				GridBagConstraints.LINE_START, new Insets(0, 5, 0, 5));
 		_text_start_time = new JLabel("2013/09/11 10:30");
 		_text_start_time.setFont(new Font("Sans", Font.PLAIN, 13));
 		layout.setConstraints(_text_start_time, gbc);
 		add(_text_start_time);
 
-		setGrid(gbc, 0, 4, 0.2d, 0.1d, GridBagConstraints.BOTH,
+		setGrid(gbc, 0, rows, 0.2d, 0.1d, GridBagConstraints.BOTH,
 				GridBagConstraints.LINE_START, new Insets(0, 5, 0, 5));
 		JLabel label_end_time = new JLabel("End time:");
 		label_end_time.setFont(new Font("Sans", Font.PLAIN, 13));
 		layout.setConstraints(label_end_time, gbc);
 		add(label_end_time);
 
-		setGrid(gbc, 1, 4, 0.2d, 0.1d, GridBagConstraints.BOTH,
+		setGrid(gbc, 1, rows++, 0.2d, 0.1d, GridBagConstraints.BOTH,
 				GridBagConstraints.LINE_START, new Insets(0, 5, 0, 5));
 		_text_end_time = new JLabel("2013/09/11 10:30");
 		_text_end_time.setFont(new Font("Sans", Font.PLAIN, 13));
@@ -110,8 +161,52 @@ public class SystemStatusPanel extends JPanel implements Updatable {
 		setRunNumber(_system.getRunNumber());
 		setStartTime(_system.getStartTime());
 		setEndTime(_system.getEndTime());
+		setTriggerType(_system.getTriggerMode());
+		setDummyRate(_system.getDummyRate());
+		setTriggerLimit(_system.getTriggerLimit());
+		/*
+		for ( TTDNode ttd : _system.getTTDNodes() ) {
+			if ( ttd == null || !ttd.isUsed() ) continue;
+			for ( FTSW ftsw : ttd.getFTSWs() ) {
+				if ( ftsw != null && ftsw.isUsed() ) {
+					setTriggerType(ftsw.getTriggerMode());
+					setDummyRate(ftsw.getDummyRate());
+					setTriggerLimit(ftsw.getTriggerLimit());
+				}
+			}
+		}
+		*/
 	}
 
+	public void setTriggerType(int trigger_mode) {
+		String [] type = new String [10]; 
+		type[0] = "NONE";
+		type[1] = "IN";
+		type[2] = "TLU";
+		type[3] = "--";
+		type[4] = "PULSE";
+		type[5] = "REVO";
+		type[6] = "RANDOM";
+		type[7] = "POSSION";
+		type[8] = "ONCE";
+		type[9] = "STOP";
+		_text_trigger_mode.setText(type[trigger_mode]);
+	}
+
+	public void setDummyRate(int dummy_rate) {
+		if ( dummy_rate < 0 ) {
+			_text_dummy_rate.setText("no dummy trigger");
+		} else if ( dummy_rate < 10000 ) {
+			_text_dummy_rate.setText(""+(dummy_rate/1000.0)+"Hz");
+		} else {
+			_text_dummy_rate.setText(""+(dummy_rate/1000000.0)+"kHz");
+		}
+	}
+
+	public void setTriggerLimit(int trigger_limit) {
+		_text_trigger_limit.setText(""+trigger_limit);		
+	}
+	
 	private void setGrid(GridBagConstraints gbc, int gridwidth, int gridheight,
 			int gridx, int gridy, double weightx, double weighty, int fill,
 			int anchor, Insets insets) {

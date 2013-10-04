@@ -14,6 +14,7 @@ import b2daq.core.Log;
 import b2daq.core.LogLevel;
 import b2daq.java.ui.ComboBoxPanel;
 import b2daq.java.ui.TextBoxPanel;
+import b2rc.core.FTSW;
 import b2rc.core.RCCommand;
 import b2rc.core.TTDNode;
 import b2rc.java.io.RCServerCommunicator;
@@ -100,13 +101,24 @@ public class TriggerSettingPanel extends JPanel {
 				   } catch (Exception e) {
 					   trigger_limit = 0;
 				   }
-					int [] value_v = new int[6];
+				   int [] value_v = new int[6];
 					value_v[0] = node.getIndex();
 					value_v[1] = panel._trigger_type.getSelected();
 					value_v[2] = dummy_rate;
 					value_v[3] = trigger_limit;
 					value_v[4] = 0;
 					value_v[5] = 0;
+					RCServerCommunicator.get().getNodeSystem().setTriggerMode(value_v[1]);
+					RCServerCommunicator.get().getNodeSystem().setDummyRate(value_v[2]);
+					RCServerCommunicator.get().getNodeSystem().setTriggerLimit(value_v[3]);
+					for ( FTSW ftsw : node.getFTSWs() ) {
+						if ( ftsw != null && ftsw.isUsed() ) {
+							ftsw.setTriggerMode(value_v[1]);
+							ftsw.setDummyRate(value_v[2]);
+							ftsw.setTriggerLimit(value_v[3]);
+							break;
+						}
+					}
 					try{
 						RCServerCommunicator.get().sendMessage(new RunControlMessage(RCCommand.TRGIFT, value_v));
 						RCServerCommunicator.get().getControlPanel().addLog(new Log("Sent new trigger setting to "

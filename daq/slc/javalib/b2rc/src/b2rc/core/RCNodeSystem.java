@@ -30,7 +30,10 @@ public class RCNodeSystem extends SCObject {
 	private int _run_no;
 	private int _start_time;
 	private int _end_time;
-	
+	private int _trigger_mode = 0;
+	private int _dummy_rate = -1;
+	private int _trigger_limit = 0;
+
 	public RCNodeSystem() {
 	}
 
@@ -296,6 +299,30 @@ public class RCNodeSystem extends SCObject {
 
 	public int getEndTime() {
 		return _end_time;
+	}
+
+	public int getTriggerMode() {
+		return _trigger_mode;
+	}
+	
+	public void setTriggerMode(int mode) {
+		_trigger_mode = mode;
+	}
+
+	public void setDummyRate(int rate) {
+		_dummy_rate = rate;
+	}
+
+	public void setTriggerLimit(int limit) {
+		_trigger_limit = limit;
+	}
+
+	public int getDummyRate() {
+		return _dummy_rate;
+	}
+
+	public int getTriggerLimit() {
+		return _trigger_limit;
 	}
 
 }

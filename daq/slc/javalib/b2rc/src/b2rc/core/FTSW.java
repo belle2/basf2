@@ -48,14 +48,6 @@ public class FTSW extends Module {
 		_used = used;
 	}
 
-	public int getTriggerMode() {
-		return _trigger_mode;
-	}
-	
-	public void setTriggerMode(int mode) {
-		_trigger_mode = mode;
-	}
-
 	@Override
 	public String getSQLFields() {
 		StringBuffer buf = new StringBuffer();
@@ -90,6 +82,14 @@ public class FTSW extends Module {
 	@Override
 	public String getTag() {
 		return TAG;
+	}
+
+	public int getTriggerMode() {
+		return _trigger_mode;
+	}
+	
+	public void setTriggerMode(int mode) {
+		_trigger_mode = mode;
 	}
 
 	public void setDummyRate(int rate) {

@@ -154,6 +154,10 @@ public class RCServerCommunicator {
 	public ControlMainPanel getControlPanel() {
 		return _main_panel;
 	}
+
+	public RCNodeSystem getNodeSystem() {
+		return _system;
+	}
 	
 	public void sendMessage(RunControlMessage msg) throws Exception {
 		try {

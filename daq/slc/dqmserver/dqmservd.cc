@@ -34,7 +34,7 @@ int main(int argc, char** argv)
   }
 
   std::vector<DQM_input> input_v;
-  std::ifstream fin(argv[1]);
+  std::ifstream fin(getenv("B2SC_DQM_CONFIG_PATH"));
   std::string buf;
   while (fin && getline(fin, buf)) {
     if (buf.size() == 0 || buf.at(0) == '#') continue;

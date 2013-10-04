@@ -192,6 +192,7 @@ namespace Belle2 {
     //! buffer for shared memory
     int* m_cfg_sta;
 
+    int monitor_numeve;
 
     // Data members
   private:

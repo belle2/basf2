@@ -32,7 +32,7 @@ set_log_level(LogLevel.ERROR)
 receiver = register_module('DeSerializerPC')
 # receiver = register_module('DeSerializerHLT')
 # dump = register_module('PrintCollections')
-dump = register_module('SeqRootOutput')
+dump = register_module('RootOutput')
 perf = register_module('DAQPerf')
 output = register_module('PrintData')
 
@@ -46,7 +46,7 @@ receiver.param('PortFrom', [int(argvs[2]), 36000])
 # receiver.param('PortFrom', [33000, 33000])
 
 receiver.param('EventDataBufferWords', 4801)
-receiver.param('MaxTime', 20.)
+receiver.param('MaxTime', 200.)
 # receiver.param('MaxTime', -1.)
 # receiver.param('MaxEventNum', 400000)
 receiver.param('MaxEventNum', -1)
@@ -68,7 +68,8 @@ monitor = register_module('MonitorDataCOPPER')
 
 # Dump
 # dump.param('outputFileName', 'root_output.root')
-dump.param('outputFileName', '~yamadas/root_output.root')
+#
+dump.param('outputFileName', 'root_output.root')
 dump.param('compressionLevel', 0)
 # Compression Level: 0 for no, 1 for low, 9 for high compression. Level 1 usually reduces size by 50%, higher levels have no noticeable effect.
 

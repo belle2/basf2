@@ -63,7 +63,15 @@ int RawTrailer::GetMagicWord()
   return m_buffer[ POS_TERM_WORD ];
 }
 
+unsigned int RawTrailer::GetChksum()
+{
+  CheckBuffer();
+  return (unsigned int)(m_buffer[ POS_CHKSUM ]);
+}
+
 int RawTrailer::GetTrlNwords()
 {
   return RAWTRAILER_NWORDS;
 }
+
+

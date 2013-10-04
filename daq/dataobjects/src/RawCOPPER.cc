@@ -238,3 +238,25 @@ int RawCOPPER::GetFTSW16bitEventNumber(int n)
   int pos_nwords = GetOffset1stFINNESSE(n) + SIZE_B2LHSLB_HEADER + POS_FTSW_1;
   return (m_buffer[ pos_nwords ] & 0x0000FFFF);
 }
+
+
+unsigned int RawCOPPER::GetMagic7FFF0008(int n)
+{
+  RawHeader hdr;
+  int pos_nwords = GetBufferPos(n) + hdr.RAWHEADER_NWORDS + POS_MAGIC_COPPER_1;
+  return (unsigned int)(m_buffer[ pos_nwords ]);
+}
+
+unsigned int RawCOPPER::GetMagicFFFFFAFA(int n)
+{
+  RawHeader hdr;
+  int pos_nwords = GetBufferPos(n) + hdr.RAWHEADER_NWORDS + POS_MAGIC_COPPER_2;
+  return (unsigned int)(m_buffer[ pos_nwords ]);
+}
+
+unsigned int RawCOPPER::GetMagic7FFF0009(int n)
+{
+  RawTrailer trl;
+  int pos_nwords = GetBufferPos(n) + GetBlockNwords(n) - trl.GetTrlNwords() - 1;
+  return (unsigned int)(m_buffer[ pos_nwords ]);
+}

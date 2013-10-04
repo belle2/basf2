@@ -96,6 +96,10 @@ namespace Belle2 {
     //! get Detector Buffer of slot D
     int* Get4thDetectorBuffer(int n);
 
+    unsigned int GetMagic7FFF0008(int n);
+    unsigned int GetMagicFFFFFAFA(int n);
+    unsigned int GetMagic7FFF0009(int n);
+
     //
     // Size of COPPER "front" header and trailer
     //

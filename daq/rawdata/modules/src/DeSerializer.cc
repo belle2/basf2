@@ -37,13 +37,15 @@ DeSerializerModule::DeSerializerModule() : Module()
   n_basf2evt = -1;
   m_totbytes = 0;
   m_compressionLevel = 0;
-
+  m_prev_time = 0.;
+  monitor_numeve = 10;
 
   m_exp_no = 0; // will obtain info from parameter
   m_run_no = 0; // will obtain info from parameter
   m_data_type = 0; // will obtain info from parameter
   m_trunc_mask = 0; // will obtain info from parameter
 
+  m_prev_nevt = -1;
   prev_event = -1;
 
 

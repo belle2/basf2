@@ -120,6 +120,7 @@ int DeSerializerPCModule::Recv(int sock, char* buf, int data_size_byte, int flag
   while (1) {
     if ((read_size = recv(sock, (char*)buf + n, data_size_byte - n , flag)) < 0) {
       print_err.PrintError("Failed to read header", __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      sleep(1234567);
       exit(-1);
     } else {
       n += read_size;
@@ -146,6 +147,7 @@ int DeSerializerPCModule::Connect()
     host = gethostbyname(m_hostname_from[ i ].c_str());
     if (host == NULL) {
       print_err.PrintError("hostname cannot be resolved. Check /etc/hosts. Exiting...", __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      sleep(1234567);
       exit(1);
     }
     socPC.sin_addr.s_addr = *(unsigned int*)host->h_addr_list[0];
@@ -238,6 +240,7 @@ int* DeSerializerPCModule::RecvData(int* malloc_flag, int* total_buf_nwords, int
       char err_buf[500];
       sprintf(err_buf, "[ERROR] Different # of events or nodes over data sources( %d %d %d %d ). Exiting...\n", *num_events_in_sendblock , temp_num_events , *num_nodes_in_sendblock , temp_num_nodes);
       print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      sleep(1234567);
       exit(1);
     }
     *num_nodes_in_sendblock += temp_num_nodes;
@@ -275,6 +278,7 @@ int* DeSerializerPCModule::RecvData(int* malloc_flag, int* total_buf_nwords, int
   }
   if (*total_buf_nwords * sizeof(int) != total_recvd_byte) {
     print_err.PrintError("Receiving data in an invalid unit. Exting...", __FILE__, __PRETTY_FUNCTION__, __LINE__);
+    sleep(1234567);
     exit(-1);
   }
 
@@ -309,6 +313,16 @@ int* DeSerializerPCModule::RecvData(int* malloc_flag, int* total_buf_nwords, int
 
 void DeSerializerPCModule::event()
 {
+  // For data check
+  int num_copper_ftsw = -1;
+  int data_size_copper_0 = -1;
+  int data_size_copper_1 = -1;
+  int data_size_ftsw = -1;
+
+  unsigned int eve_ftsw = 0;
+  unsigned int eve_copper_0 = 0;
+  unsigned int eve_copper_1 = 0;
+
   ClearNumUsedBuf();
 
 //   printf("EVE %d\n",n_basf2evt);
@@ -401,6 +415,9 @@ void DeSerializerPCModule::event()
     RawDataBlock rawdatablk;
     rawdatablk.SetBuffer((int*)temp_buf, total_buf_nwords, temp_malloc_flag,
                          num_events_in_sendblock, m_socket.size() * num_nodes_in_sendblock);
+
+    num_copper_ftsw = rawdatablk.GetNumEntries();
+    int cpr_num = 0;
     for (int i = 0; i < rawdatablk.GetNumEntries(); i++) {
       if (i == 0) {
         temp_malloc_flag = malloc_flag ;
@@ -408,13 +425,59 @@ void DeSerializerPCModule::event()
         temp_malloc_flag = 0;
       }
       if (rawdatablk.CheckFTSWID(i)) {
-
         temp_rawftsw = raw_ftswarray.appendNew();
-        temp_rawftsw->SetBuffer((int*)temp_buf, total_buf_nwords, temp_malloc_flag, 1, 1);
+        temp_rawftsw->SetBuffer((int*)temp_buf, rawdatablk.GetBlockNwords(i), temp_malloc_flag, 1, 1);
+        data_size_ftsw = rawdatablk.GetBlockNwords(i);
+        eve_ftsw = (rawdatablk.GetBuffer(i))[ 1 ] & 0xFFFF;
       } else {
         temp_rawcdc = raw_cdcarray.appendNew();
-        temp_rawcdc->SetBuffer((int*)temp_buf, total_buf_nwords, temp_malloc_flag, 1, 1);
+        temp_rawcdc->SetBuffer((int*)temp_buf, rawdatablk.GetBlockNwords(i), temp_malloc_flag, 1, 1);
+
+        RawTrailer rawtrl;
+        rawtrl.SetBuffer(temp_rawcdc->GetRawTrlBufPtr(0));
+        if (rawtrl.GetChksum() != CalcSimpleChecksum(temp_rawcdc->GetBuffer(0),
+                                                     temp_rawcdc->GetBlockNwords(0)
+                                                     - rawtrl.GetTrlNwords())) {
+          char err_buf[500];
+          sprintf(err_buf, "CheckSum error : calc %u trl %u\n",
+                  rawtrl.GetChksum(),
+                  CalcSimpleChecksum(temp_rawcdc->GetBuffer(0),
+                                     temp_rawcdc->GetBlockNwords(0)
+                                     - rawtrl.GetTrlNwords()));
+          print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+          sleep(1234567);
+          exit(-1);
+        }
+
+        if (cpr_num == 0) {
+          data_size_copper_0 = rawdatablk.GetBlockNwords(i);
+          eve_copper_0 = (rawdatablk.GetBuffer(i))[ 3 ];
+        } else if (cpr_num == 1) {
+          data_size_copper_1 = rawdatablk.GetBlockNwords(i);
+          eve_copper_1 = (rawdatablk.GetBuffer(i))[ 3 ];
+        }
+
+        cpr_num++;
       }
+
+
+      if (eve_copper_1 != 0 && (eve_copper_0 != eve_copper_1)) {
+        char err_buf[500];
+        sprintf(err_buf, "Different Event number c0 %u c1 %u\n", eve_copper_0, eve_copper_1);
+        print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+        sleep(1234567);
+        exit(-1);
+      }
+
+      if (eve_ftsw != 0 && (eve_copper_0 != eve_ftsw)) {
+        char err_buf[500];
+        sprintf(err_buf, "Different Event number c0 %u ftsw %u\n", eve_copper_0, eve_ftsw);
+        print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+        sleep(1234567);
+        exit(-1);
+      }
+
+
     }
 
 //     temp_rawdatablk = raw_datablkarray.appendNew();
@@ -468,9 +531,27 @@ void DeSerializerPCModule::event()
       m_eventMetaDataPtr->setEndOfData();
     }
   }
+
   if (n_basf2evt % 100 == 0) {
-    printf("eve %d time %lf\n", n_basf2evt, GetTimeSec() - m_start_time);
+    //  if ( ( n_basf2evt - m_prev_nevt ) > monitor_numeve ) {
+    double cur_time = GetTimeSec();
+    double interval = cur_time - m_prev_time;
+    if (n_basf2evt != 0) {
+      double multieve = (1. / interval);
+      if (multieve > 2.) multieve = 2.;
+      monitor_numeve = (int)(multieve * monitor_numeve) + 1;
+    }
+    printf("loop %d eve %u time %lf : # of nodes %d : ftsw words %d  copper0 words %d copper1 words %d\n",
+           n_basf2evt,
+           eve_copper_0,
+           GetTimeSec() - m_start_time,
+           num_copper_ftsw,
+           data_size_ftsw,
+           data_size_copper_0,
+           data_size_copper_1);
     fflush(stdout);
+    m_prev_time = cur_time;
+    m_prev_nevt = n_basf2evt;
   }
 
   n_basf2evt++;

@@ -170,6 +170,21 @@ void DeSerializerCOPPERModule::FillNewRawCOPPERHeader(RawCOPPER* raw_copper)
   rawhdr.SetExpRunNumber(raw_copper->GetExpRunBuf(num_cprblock));       // Fill 3rd header word
 
 
+  //magic word check
+  if (raw_copper->GetMagic7FFF0008(num_cprblock) != 0x7FFF0008 ||
+      raw_copper->GetMagicFFFFFAFA(num_cprblock) != 0xFFFFFAFA ||
+      raw_copper->GetMagic7FFF0009(num_cprblock) != 0x7FFF0009
+     ) {
+    char err_buf[500];
+    sprintf(err_buf, "Invalid Magic word 0x7FFFF0008=%u 0xFFFFFAFA=%u 0x7FFF0009=%u\n",
+            raw_copper->GetMagic7FFF0008(num_cprblock), raw_copper->GetMagicFFFFFAFA(num_cprblock),
+            raw_copper->GetMagic7FFF0009(num_cprblock));
+
+    print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+    exit(-1);
+  }
+
+
   //  Obtain eve.# from COPPER header
   unsigned int cur_ftsw_eve16 = raw_copper->GetFTSW16bitEventNumber(num_cprblock);
   unsigned int cur_ftsw_eve32 = ((m_ftsweve_upper16bit << 16) & 0xFFFF0000) | (cur_ftsw_eve16 & 0x0000FFFF);
@@ -445,10 +460,17 @@ void DeSerializerCOPPERModule::event()
   //
   // Print current status
   //
-  if (n_basf2evt % (CHECKEVT / NUM_EVT_PER_BASF2LOOP) == 0) {
+  if (n_basf2evt % 100 == 0) {
+    //  if ( ( n_basf2evt - m_prev_nevt ) > monitor_numeve ) {
     double cur_time = GetTimeSec();
     double total_time = cur_time - m_start_time;
     double interval = cur_time - m_prev_time;
+    if (n_basf2evt != 0) {
+      double multieve = (1. / interval);
+      if (multieve > 2.) multieve = 2.;
+      monitor_numeve = (int)(multieve * (n_basf2evt - m_prev_nevt)) + 1;
+    }
+
 
     time_t timer;
     struct tm* t_st;

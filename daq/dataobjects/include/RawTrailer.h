@@ -52,6 +52,8 @@ namespace Belle2 {
 
     int GetTrlNwords(); //!
 
+    unsigned int GetChksum();   //! initialize header
+
     int GetMagicWord(); //!
 
     enum {

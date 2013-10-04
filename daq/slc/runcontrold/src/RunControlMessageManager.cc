@@ -53,7 +53,7 @@ void RunControlMessageManager::run()
           _data_man->getRunConfig()->setTriggerMode(nsm.getParam(1));
           _data_man->getRunConfig()->setDummyRate(nsm.getParam(2));
           _data_man->getRunConfig()->setTriggerLimit(nsm.getParam(3));
-        } else if (cmd == Command::STOP &&
+        } else if (cmd == Command::STOP ||
                    (cmd == Command::ABORT &&
                     _rc_node->getState() == State::RUNNING_S)) {
           uploadRunResult();

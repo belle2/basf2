@@ -11,6 +11,7 @@ extern "C" {
 
 #include <cstring>
 #include <cstdlib>
+#include <iostream>
 
 using namespace B2DAQ;
 
@@ -28,6 +29,19 @@ TTDStatus::~TTDStatus() throw()
 void TTDStatus::read(NSMNode*) throw(NSMHandlerException)
 {
   const pocket_ttd* status = (const pocket_ttd*)get();
+  /*
+  std::cout << __FILE__ << ":" << __LINE__ << std::endl
+      << " exp_number = " << status->exp_number << std::endl
+      << " run_number = " << status->run_number << std::endl
+      << " evt_number = " << status->evt_number << std::endl
+      << " evt_total  = " << status->evt_total << std::endl
+      << " ftswid     = " << status->ftswid << std::endl
+      << " isrunning  = " << (status->isrunning?"running":"not running") << std::endl
+      << " utime      = " << status->utime << std::endl
+      << " ctime      = " << status->ctime << std::endl
+      << " udead      = " << status->udead << std::endl
+      << " cdead      = " << status->cdead << std::endl;
+  */
   memcpy(_status, status, sizeof(pocket_ttd));
 }
 

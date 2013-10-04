@@ -92,7 +92,8 @@ void Raw2DsModule::registerRawCOPPERs()
 
   int* evtbuf = new int[MAXEVTSIZE];
   while ((size = m_rbuf->remq((int*)evtbuf)) == 0) {
-    usleep(100);
+    //    usleep(100);
+    usleep(20);
   }
 
   B2INFO("Raw2Ds: got an event from RingBuffer, size=" << size <<

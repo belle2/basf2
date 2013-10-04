@@ -55,7 +55,8 @@ int main(int argc, char** argv)
     for (;;) {
       irb = rbuf->insq((int*)buf, *recsize);
       if (irb >= 0) break;
-      usleep(200);
+      //      usleep(200);
+      usleep(20);
     }
     nrec++;
   }

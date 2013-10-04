@@ -28,6 +28,7 @@
 #include <framework/dataobjects/EventMetaData.h>
 
 #include <daq/rawdata/modules/DAQConsts.h>
+#include <daq/dataobjects/RawCDC.h>
 #include <daq/dataobjects/RawCOPPER.h>
 #include <daq/dataobjects/SendHeader.h>
 #include <daq/dataobjects/SendTrailer.h>
@@ -66,6 +67,7 @@ namespace Belle2 {
 
     //! No. of sent events
     int m_loop;
+
     int* m_buffer;
 
 

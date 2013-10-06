@@ -22,7 +22,6 @@
 #include <simulation/kernel/ExtManager.h>
 #include <simulation/kernel/ExtPhysicsList.h>
 #include <simulation/kernel/ExtCylSurfaceTarget.h>
-#include <ecl/geometry/ECLGeometryPar.h>
 #include <bklm/geometry/GeometryPar.h>
 
 #include <cmath>

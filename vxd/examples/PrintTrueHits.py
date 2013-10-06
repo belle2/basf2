@@ -58,9 +58,10 @@ class CheckTrueHits(Module):
             sensor = id.getSensorNumber()
             sensor_info = geocache.get(id)
             thickness = sensor_info.getThickness()
-            B2INFO('\nPXDTrueHit {index}: layer:{ly} ladder:{ld} sensor:{sr}'\
+            base_info = \
+                '\nPXDTrueHit {index}: layer:{ly} ladder:{ld} sensor:{sr}'\
                 .format(index=truehit.getArrayIndex(),
-                    ly=layer, ld=ladder, sr=sensor))
+                    ly=layer, ld=ladder, sr=sensor)
             # Classify the TrueHit
             into_type = \
                 abs(abs(truehit.getEntryW()) - thickness / 2.0) < 1.0e-6
@@ -74,10 +75,10 @@ class CheckTrueHits(Module):
                 truehit_type_text = 'into'
             elif out_type:
                 truehit_type_text = 'out'
-            B2INFO('TrueHit type: ' + truehit_type_text)
+            base_info = '\n' + 'TrueHit type: ' + truehit_type_text
             # Get the generating MCParticle and check sign of relation weight
             mcparticle_relations = truehit.getRelationsFrom('MCParticles')
-            weight = mcparticle_relations.relations().at(0).weight
+            weight = mcparticle_relations.weight(0)
             particle = mcparticle_relations[0]
             particle_type_text = 'secondary'
             if particle.hasStatus(Belle2.MCParticle.c_PrimaryParticle):
@@ -90,15 +91,35 @@ class CheckTrueHits(Module):
                 self.truehit_stats_pxd[truehit_type_text]['secondary'] += 1
             if weight < 0:
                 self.truehit_stats_pxd[truehit_type_text]['remapped'] += 1
-                mcparticle_message += 'remapped'
-            B2INFO(mcparticle_message)
+                mcparticle_message += 'remapped ' + str(weight)
+            else:
+                continue
+            B2INFO(base_info + '\n' + mcparticle_message)
             # Now get and print out the SimHits
             simhits = truehit.getRelationsTo('PXDSimHits')
             B2INFO('SimHits:')
             for simhit in simhits:
+                particle_type_text = 'secondary'
+                simhit_weight = 0.0
+                particle_index = -1
+                ## get the sign of relation to MCParticle
+                simhit_relations = simhit.getRelationsFrom('MCParticles')
+                if simhit_relations.size() == 0:
+                    particle_type_text = 'none'
+                else:
+                    simhit_weight = simhit_relations.weight(0)
+                    particle = simhit_relations[0]
+                    particle_index = particle.getArrayIndex()
+                    if particle.hasStatus(Belle2.MCParticle.c_PrimaryParticle):
+                        particle_type_text = 'primary'
                 simhit_text = \
-                    '{index} {u_in:8.4f} {v_in:8.4f} {w_in:8.4f}'.format(
+                    '{index} {ptext} {pindex} {wt:9.6f}'.format(
                     index=simhit.getArrayIndex(),
+                    ptext=particle_type_text,
+                    pindex=particle_index,
+                    wt=simhit_weight)
+                simhit_text += \
+                    ' {u_in:8.4f} {v_in:8.4f} {w_in:8.4f}'.format(
                     u_in=simhit.getPosIn().X(),
                     v_in=simhit.getPosIn().Y(),
                     w_in=simhit.getPosIn().Z())
@@ -157,9 +178,10 @@ class CheckTrueHits(Module):
             sensor = id.getSensorNumber()
             sensor_info = geocache.get(id)
             thickness = sensor_info.getThickness()
-            B2INFO('\nSVDTrueHit {index}: layer:{ly} ladder:{ld} sensor:{sr}'\
+            base_info = \
+                '\nSVDTrueHit {index}: layer:{ly} ladder:{ld} sensor:{sr}'\
                 .format(index=truehit.getArrayIndex(),
-                    ly=layer, ld=ladder, sr=sensor))
+                    ly=layer, ld=ladder, sr=sensor)
             # Classify the TrueHit
             into_type = \
                 abs(abs(truehit.getEntryW()) - thickness / 2.0) < 1.0e-6
@@ -173,10 +195,10 @@ class CheckTrueHits(Module):
                 truehit_type_text = 'into'
             elif out_type:
                 truehit_type_text = 'out'
-            B2INFO('TrueHit type: ' + truehit_type_text)
+            base_info += '\n' + 'TrueHit type: ' + truehit_type_text
             # Get the generating MCParticle and check sign of relation weight
             mcparticle_relations = truehit.getRelationsFrom('MCParticles')
-            weight = mcparticle_relations.relations().at(0).weight
+            weight = mcparticle_relations.weight(0)
             particle = mcparticle_relations[0]
             particle_type_text = 'secondary'
             if particle.hasStatus(Belle2.MCParticle.c_PrimaryParticle):
@@ -189,15 +211,35 @@ class CheckTrueHits(Module):
                 self.truehit_stats_svd[truehit_type_text]['secondary'] += 1
             if weight < 0:
                 self.truehit_stats_svd[truehit_type_text]['remapped'] += 1
-                mcparticle_message += 'remapped'
-            B2INFO(mcparticle_message)
+                mcparticle_message += 'remapped ' + str(weight)
+            else:
+                continue
+            B2INFO(base_info + '\n' + mcparticle_message)
             # Now get and print out the SimHits
             simhits = truehit.getRelationsTo('SVDSimHits')
             B2INFO('SimHits:')
             for simhit in simhits:
+                particle_type_text = 'secondary'
+                simhit_weight = 0.0
+                particle_index = -1
+                ## get the sign of relation to MCParticle
+                simhit_relations = simhit.getRelationsFrom('MCParticles')
+                if simhit_relations.size() == 0:
+                    particle_type_text = 'none'
+                else:
+                    simhit_weight = simhit_relations.weight(0)
+                    particle = simhit_relations[0]
+                    particle_index = particle.getArrayIndex()
+                    if particle.hasStatus(Belle2.MCParticle.c_PrimaryParticle):
+                        particle_type_text = 'primary'
                 simhit_text = \
-                    '{index} ({u_in:8.4f},{v_in:8.4f},{w_in:8.4f}) '.format(
+                    '{index} {ptext} {pindex} {wt:9.6f}'.format(
                     index=simhit.getArrayIndex(),
+                    ptext=particle_type_text,
+                    pindex=particle_index,
+                    wt=simhit_weight)
+                simhit_text += \
+                    ' {u_in:8.4f} {v_in:8.4f} {w_in:8.4f}'.format(
                     u_in=simhit.getPosIn().X(),
                     v_in=simhit.getPosIn().Y(),
                     w_in=simhit.getPosIn().Z())
@@ -274,7 +316,7 @@ printParticles = CheckTrueHits()
 printParticles.set_log_level(LogLevel.INFO)
 
 # Specify number of events to generate
-evtmetagen.param({'evtNumList': [5], 'runList': [1]})
+evtmetagen.param({'evtNumList': [200], 'runList': [1]})
 
 # Set parameters for particlegun
 particlegun.param({

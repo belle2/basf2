@@ -183,7 +183,7 @@ namespace Belle2 {
                                               DataStore::arrayName<MCParticle>(""),
                                               DataStore::arrayName<SimHitClass>("")
                                             );
-      registerMCParticleRelation(relMCSimHitsName.c_str());
+      registerMCParticleRelation(relMCSimHitsName.c_str(), RelationArray::c_negativeWeight);
       const std::string& relMCTrueHitsName = DataStore::relationName(
                                                DataStore::arrayName<MCParticle>(""),
                                                DataStore::arrayName<TrueHitClass>("")
@@ -267,7 +267,7 @@ namespace Belle2 {
       //Add relation between the MCParticle and the hit.
       //The index of the MCParticle has to be set to the TrackID and will be
       //replaced later by the correct MCParticle index automatically.
-      relMCSimHit.add(trackID, hitIndex);
+      relMCSimHit.add(trackID, hitIndex, energy);
       return hitIndex;
     }
 

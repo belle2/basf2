@@ -348,7 +348,7 @@ namespace Belle2 {
         // Edge- and mid-values
         // Locate track midpoint
         double midLength = 0.5 * m_trackLengths.back();
-        int midIndexRight = 0;
+        int midIndexRight = 1;
         while (m_trackLengths.at(midIndexRight) < midLength) midIndexRight++;
         double weightLeft = (m_trackLengths.at(midIndexRight) - midLength) /
                             (m_trackLengths.at(midIndexRight) - m_trackLengths.at(midIndexRight - 1));

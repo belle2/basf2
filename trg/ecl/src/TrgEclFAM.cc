@@ -3,7 +3,7 @@
 //---------------------------------------------------------------
 // Filename : TrgEclFAM.cc
 // Section  : TRG ECL
-// Owner    : InSu Lee/Yuuji Unno
+// Owner    : InSu Lee / Yuuji Unno
 // Email    : islee@hep.hanyang.ac.kr / yunno@post.kek.jp
 //---------------------------------------------------------------
 // Description : A class to represent TRG ECL
@@ -706,7 +706,7 @@ TrgEclFAM::FADC(int flag_gen,
   //--------------------------------------
   double tsh,dd;
   static double tc,fm,fff,tt,dt,tc2,tm,tsc,tris;
-  static double amp,ts0,td,t1,b1,t2,b2,ts,dft,as;
+  static double amp,td,t1,b1,t2,b2,ts,dft,as;
   int im,ij;
 
   static int ifir=0;
@@ -724,7 +724,6 @@ TrgEclFAM::FADC(int flag_gen,
     //
     amp = 1.0;
     tris = 0.01;
-    ts0 = 0.0;
     tsc = ts;
     //
     ij = 0;

@@ -10,7 +10,6 @@
 //----------------------------------------------------------
 // $Log$
 //----------------------------------------------------------
-
 #define TRG_SHORT_NAMES
 #define TRGECLTCMAPPING_SHORT_NAMES
 
@@ -230,7 +229,7 @@ TrgEclMapping::getTCPhiIdFromTCId(int TCId){
   // forward-endcap  [Xtal=   1-1152, TC=  1- 80(80)]
   // Barrel          [Xtal=1153-7776, TC= 81-512(432)]
   // Backward-endcap [Xtal=7777-8736, TC=513-576(64)]
-  if      (TCId0 <  80){_tcphiid = (TCId0%5<3) ? _tcphiid=(TCId0/5)*2 : _tcphiid=1+(TCId0/5)*2;}
+  if      (TCId0 <  80){_tcphiid = (TCId0%5<3) ? (TCId0/5)*2 : 1+(TCId0/5)*2;}
   else if (TCId0 < 512){_tcphiid = (TCId0-80)/12;}
   else                 {_tcphiid = ((TCId0-512)/2)%2 ? (TCId0-512)/2-1 : (TCId0-512)/2+1;}
   if (_tcphiid < 0 || _tcphiid > 35) { 

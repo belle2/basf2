@@ -10,7 +10,7 @@
 
 #include <geometry/CreatorManager.h>
 #include <framework/logging/Logger.h>
-#include <framework/core/utilities.h>
+#include <framework/utilities/FileSystem.h>
 #include <memory>
 
 using namespace std;

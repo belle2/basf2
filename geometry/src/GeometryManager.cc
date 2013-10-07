@@ -10,6 +10,7 @@
 
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/GearDir.h>
+#include <framework/utilities/Utils.h>
 #include <geometry/GeometryManager.h>
 #include <geometry/Materials.h>
 #include <geometry/CreatorManager.h>
@@ -37,7 +38,6 @@
 
 #include <boost/foreach.hpp>
 #include <memory>
-#include <framework/core/utilities.h>
 
 using namespace std;
 

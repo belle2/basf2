@@ -10,7 +10,7 @@
 
 #include <geometry/bfieldmap/BFieldComponentQuad.h>
 
-#include <framework/core/utilities.h>
+#include <framework/utilities/FileSystem.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/gearbox/Unit.h>

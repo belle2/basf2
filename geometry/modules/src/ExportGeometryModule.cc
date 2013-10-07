@@ -10,7 +10,7 @@
 
 #include <geometry/modules/ExportGeometryModule.h>
 
-#include <framework/core/utilities.h>
+#include <framework/utilities/FileSystem.h>
 #include <geometry/GeometryManager.h>
 #include <TGeoManager.h>
 

@@ -76,11 +76,6 @@ namespace Belle2 {
     double m_rootNoHitSigmaV; /**< V stat error for intercepts in case of missing ROI*/
     double m_rootNoHitLambda; /**< track length for intercepts in case of missing ROI*/
     int m_rootNoHitVxdID; /**< sensor ID for intercepts in case of missing ROI*/
-    double m_rootNoHitCoorUmc; /**< true U coor of hit in case of missing ROI*/
-    double m_rootNoHitCoorVmc; /**< true V coor of hit in case of missing ROI*/
-    double m_rootNoHitUidmc; /**< true U id of hit in case of missing ROI*/
-    double m_rootNoHitVidmc; /**< true V id of hit in case of missing ROI*/
-    int m_rootNoHitVxdIDmc; /**< true sensorID of hit in case of missing ROI*/
 
     double m_rootGlobalTime; /**< global time of hit*/
     int m_rootNGlobalTime; /**< number of hits per intercept*/
@@ -97,11 +92,6 @@ namespace Belle2 {
 
     //noInter ROOT TREE
     TTree* m_rootNoInterTreePtr; /**< pointer at root tree used for information stored once per interception */
-    double m_rootNoInterUcoor; /**< U coor in case of no intercept found*/
-    double m_rootNoInterVcoor; /**< V coor in case of no intercept found*/
-    double m_rootNoInterUid; /**< U id in case of no intercept found*/
-    double m_rootNoInterVid; /**< V id in case of no intercept found*/
-    double m_rootNoInterVxdID; /**< sensor ID in case of no intercept found*/
 
     //mc truth infos
     double m_rootMomXmc; /**< X momentum from MC truth*/

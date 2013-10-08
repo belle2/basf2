@@ -28,8 +28,7 @@ using namespace Belle2;
 using namespace HepGeom;
 using namespace CLHEP;
 
-#define DEBUG
-
+// #define DEBUG
 #ifdef DEBUG
 ofstream ofs_cosmic1g("cosmic1g.out");
 ofstream ofs_cosmic1c("cosmic1c.out");

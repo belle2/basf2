@@ -99,9 +99,7 @@ namespace Belle2 {
       int m_id; /**< semaphore id, see semget(2). */
     };
 
-    /** Does the actual memcpy into RingBuffer. */
-    void insq_intern(const int* buf, int size);
-
+  private:
     bool m_new; /**< True if we created the ring buffer ourselves (and need to clean it). */
     bool m_file; /**< True if m_pathfd needs to be closed. */
     std::string m_pathname; /**< Path for identifying shared memory if named ring buffer is created. */

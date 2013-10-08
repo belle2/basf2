@@ -18,7 +18,7 @@
 
 /* Belle2 headers. */
 #include <eklm/simulation/FPGAFitter.h>
-#include <framework/core/utilities.h>
+#include <framework/utilities/FileSystem.h>
 #include <framework/logging/Logger.h>
 
 static const char MemErr[] = "Memory allocation error.";

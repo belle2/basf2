@@ -13,7 +13,7 @@
 
 /* Belle2 headers. */
 #include <eklm/geometry/TransformData.h>
-#include <framework/core/utilities.h>
+#include <framework/utilities/FileSystem.h>
 
 /**
  * @file

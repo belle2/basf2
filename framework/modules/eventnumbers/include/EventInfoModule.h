@@ -1,3 +1,4 @@
+#pragma once
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2010 - Belle II Collaboration                             *
@@ -8,11 +9,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EVTMETAINFOMODULE_H_
-#define EVTMETAINFOMODULE_H_
-
 #include <framework/core/Module.h>
-#include <vector>
 
 
 namespace Belle2 {
@@ -21,17 +18,16 @@ namespace Belle2 {
    * @{
    * \addtogroup framework_modules
    * \ingroup modules
-   * @{ EvtMetaInfoModule @} @}
+   * @{ EventInfoModule @} @}
    */
 
   /** The event meta data info module.
    *
-   * This module prints the current event meta data information to
-   * the command line.
+   * This module prints the current event meta data information using B2INFO.
+   *
    * (e.g. Could be used later to also send the info over TCP/IP to a GUI)
    */
-  class EvtMetaInfoModule : public Module {
-
+  class EventInfoModule : public Module {
   public:
 
     /**
@@ -39,10 +35,10 @@ namespace Belle2 {
      *
      * Sets the description of the module.
      */
-    EvtMetaInfoModule();
+    EventInfoModule();
 
     /** Destructor of the module. */
-    virtual ~EvtMetaInfoModule();
+    virtual ~EventInfoModule();
 
     /** initialization. */
     virtual void initialize();
@@ -65,14 +61,20 @@ namespace Belle2 {
      * was ended and which run number we were running on.
      */
     virtual void endRun();
+  };
 
-
-  protected:
-
-
-  private:
-
+  /** for compatibility.
+   *
+   * @deprecated
+   */
+  class EvtMetaInfoModule : public EventInfoModule {
+  public:
+    EvtMetaInfoModule() : EventInfoModule() {
+      setDescription("Deprecated, use the EventInfo module instead.");
+    }
+    virtual void initialize() {
+      B2WARNING("Deprecated, use the EventInfo module instead.");
+      EventInfoModule::initialize();
+    }
   };
 }
-
-#endif /* EVTMETAINFOMODULE_H_ */

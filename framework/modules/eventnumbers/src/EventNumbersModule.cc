@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <framework/modules/evtmetagen/EvtMetaGenModule.h>
+#include <framework/modules/eventnumbers/EventNumbersModule.h>
 
 #include <framework/core/Environment.h>
 
@@ -20,13 +20,14 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
+REG_MODULE(EventNumbers)
 REG_MODULE(EvtMetaGen)
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-EvtMetaGenModule::EvtMetaGenModule() : Module()
+EventNumbersModule::EventNumbersModule() : Module()
 {
   //Set module properties
   setDescription("Sets the event meta data information (exp, run, evt). You must use this module to tell basf2 about the number of events you want to generate, unless you have an input module that already does so.");
@@ -43,13 +44,13 @@ EvtMetaGenModule::EvtMetaGenModule() : Module()
 }
 
 
-EvtMetaGenModule::~EvtMetaGenModule()
+EventNumbersModule::~EventNumbersModule()
 {
 
 }
 
 
-void EvtMetaGenModule::initialize()
+void EventNumbersModule::initialize()
 {
   //Register the EventMetaData in the data store
   m_eventMetaDataPtr.registerAsPersistent();
@@ -72,7 +73,7 @@ void EvtMetaGenModule::initialize()
 }
 
 
-void EvtMetaGenModule::event()
+void EventNumbersModule::event()
 {
   if (m_evtNumber >= static_cast<unsigned long>(m_evtNumList[m_colIndex])) {
 

@@ -1,3 +1,4 @@
+#pragma once
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2010 - Belle II Collaboration                             *
@@ -8,12 +9,10 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EVTMETAGENMODULE_H_
-#define EVTMETAGENMODULE_H_
-
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
+
 #include <vector>
 
 
@@ -23,7 +22,7 @@ namespace Belle2 {
    * @{
    * \addtogroup framework_modules
    * \ingroup modules
-   * @{ EvtMetaGenModule @} @}
+   * @{ EventNumbersModule @} @}
    */
 
   /**
@@ -36,7 +35,7 @@ namespace Belle2 {
    *
    * @sa EventMetaData
    */
-  class EvtMetaGenModule : public Module {
+  class EventNumbersModule : public Module {
 
   public:
 
@@ -44,10 +43,10 @@ namespace Belle2 {
      * Constructor.
      * Sets the description, the properties and the parameters of the module.
      */
-    EvtMetaGenModule();
+    EventNumbersModule();
 
     /** Destructor. */
-    virtual ~EvtMetaGenModule();
+    virtual ~EventNumbersModule();
 
     /** Initializes the Module.
      *
@@ -81,6 +80,19 @@ namespace Belle2 {
     std::vector<int> m_runList;      /**< The list (column) of runs. */
     std::vector<int> m_evtNumList;   /**< The list (column) of the number of events which should be processed. */
   };
-}
 
-#endif /* EVTMETAGENMODULE_H_ */
+  /** for compatibility.
+   *
+   * @deprecated
+   */
+  class EvtMetaGenModule : public EventNumbersModule {
+  public:
+    EvtMetaGenModule() : EventNumbersModule() {
+      setDescription("Deprecated, use the EventNumbers module instead.");
+    }
+    virtual void initialize() {
+      B2WARNING("Deprecated, use the EventNumbers module instead.");
+      EventNumbersModule::initialize();
+    }
+  };
+}

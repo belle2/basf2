@@ -35,6 +35,7 @@ Framework::Framework()
   m_pathManager = new PathManager();
 
   RandomNumbers::initialize();
+  Environment::Instance().setup();
 }
 
 

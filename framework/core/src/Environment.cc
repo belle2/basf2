@@ -13,16 +13,54 @@
 #include <framework/core/ModuleManager.h>
 #include <framework/core/Module.h>
 
+#include <boost/filesystem/path.hpp>
+
 #include <iostream>
+#include <cstdlib>
 
 using namespace Belle2;
 using namespace std;
+namespace fs = boost::filesystem;
 
 
 Environment& Environment::Instance()
 {
   static Environment instance;
   return instance;
+}
+
+void Environment::setup()
+{
+  // Check for environment variables set by setuprel
+  const char* envarReleaseDir = getenv("BELLE2_RELEASE_DIR");
+  const char* envarLocalDir = getenv("BELLE2_LOCAL_DIR");
+  if (!envarReleaseDir and !envarLocalDir) {
+    B2FATAL("The basf2 environment is not set up. Please execute the 'setuprel' script first.");
+  }
+
+  const char* envarSubDir = getenv("BELLE2_SUBDIR");
+  if (!envarSubDir) {
+    B2FATAL("The environment variable BELLE2_SUBDIR is not set. Please execute the 'setuprel' script first.");
+  }
+
+  const char* envarExtDir = getenv("BELLE2_EXTERNALS_DIR");
+  if (!envarExtDir) {
+    B2FATAL("The environment variable BELLE2_EXTERNALS_DIR is not set. Please execute the 'setuprel' script first.");
+  }
+
+  // add module directories for current build options
+  if (envarLocalDir) {
+    const string localModules = (fs::path(envarLocalDir) / "modules" / envarSubDir).string();
+    ModuleManager::Instance().addModuleSearchPath(localModules);
+  }
+
+  if (envarReleaseDir) {
+    const string centralModules = (fs::path(envarReleaseDir) / "modules" / envarSubDir).string();
+    ModuleManager::Instance().addModuleSearchPath(centralModules);
+  }
+
+  //set path to external software
+  setExternalsPath(envarExtDir);
 }
 
 

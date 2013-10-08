@@ -32,42 +32,14 @@ basf2authors = [
 # to be stopped with Ctrl-c
 signal.signal(signal.SIGINT, signal.SIG_DFL)
 
-# Check for environment variables set by the belle 2 release script
-envarReleaseDir = os.environ.get('BELLE2_RELEASE_DIR', None)
-envarLocalDir = os.environ.get('BELLE2_LOCAL_DIR', None)
-if not envarReleaseDir and not envarLocalDir:
-    B2FATAL("The basf2 environment is not set up. \
-             Please execute the 'setuprel' script first.")
-
-envarSubDir = os.environ.get('BELLE2_SUBDIR', None)
-if envarSubDir is None:
-    B2FATAL("The environment variable BELLE2_SUBDIR is not set. \
-             Please execute the 'setuprel' script first.")
-
-envarExtDir = os.environ.get('BELLE2_EXTERNALS_DIR', None)
-if envarExtDir is None:
-    B2FATAL("The environment variable BELLE2_EXTERNALS_DIR is not set. \
-             Please execute the 'setuprel' script first.""")
 
 # -----------------------------------------------
 #       Create default framework object
 # -----------------------------------------------
 
-# Create default framework
+# Create default framework, also initialises environment
 fw = Framework()
 
-# Add the module search path pointing to the modules shipped with the framework
-basf2moddir = []
-if envarLocalDir:
-    basf2moddir.append(os.path.join(envarLocalDir, 'modules', envarSubDir))
-if envarReleaseDir:
-    basf2moddir.append(os.path.join(envarReleaseDir, 'modules', envarSubDir))
-
-for moddir in basf2moddir:
-    fw.add_module_search_path(moddir)
-
-# Sets the path in which the externals of the framework are located
-fw.set_externals_path(envarExtDir)
 
 # -----------------------------------------------
 #             Print output

@@ -19,22 +19,22 @@
 
 from basf2 import *
 
-# EvtMetaGen - generate event meta data
-evtmetagen = register_module('EvtMetaGen')
+# EventNumbers - generate event numbers
+eventnumbers = register_module('EventNumbers')
 
-evtruninfo = {'expList': [71, 71, 73, 73, 73], 'runList': [3, 4, 10, 20, 30],
+evtrunlists = {'expList': [71, 71, 73, 73, 73], 'runList': [3, 4, 10, 20, 30],
               'evtNumList': [4, 6, 2, 5, 3]}
-evtmetagen.param(evtruninfo)
+eventnumbers.param(evtrunlists)
 
-# EvtMetaInfo - show event meta info
-evtmetainfo = register_module('EvtMetaInfo')
+# EventInfo - show event meta info
+eventinfo = register_module('EventInfo')
 
 # Create main path
 main = create_path()
 
 # Add modules to main path
-main.add_module(evtmetagen)
-main.add_module(evtmetainfo)
+main.add_module(eventnumbers)
+main.add_module(eventinfo)
 
 # Process all events
 process(main)

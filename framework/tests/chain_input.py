@@ -40,7 +40,7 @@ except:
     pass  # we're probably in tests/ directory, no copy necessary
 
 input = register_module('RootInput')
-evtmetainfo = register_module('EvtMetaInfo')
+eventinfo = register_module('EventInfo')
 printcollections = register_module('PrintCollections')
 
 input.param('inputFileNames', ['chaintest_1.root', 'chaintest_2.root'])
@@ -52,7 +52,7 @@ main = create_path()
 main.add_module(NoopModule())
 
 main.add_module(input)
-main.add_module(evtmetainfo)
+main.add_module(eventinfo)
 main.add_module(printcollections)
 
 main.add_module(TestModule())

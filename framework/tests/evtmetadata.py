@@ -66,10 +66,10 @@ main = create_path()
 # exp 1 has only 2 events, so cannot trigger the test module,
 # exp 2 has no events and will be skipped
 # exp 3 will be stopped in event 3 by EvtMetaDataTest
-evtmetagen = register_module('EvtMetaGen')
-evtmetagen.param('expList', [0, 1, 2, 3])
-evtmetagen.param('runList', [0, 1, 2, 3])
-evtmetagen.param('evtNumList', [2, 2, 0, 5])
+eventnumbers = register_module('EventNumbers')
+eventnumbers.param('expList', [0, 1, 2, 3])
+eventnumbers.param('runList', [0, 1, 2, 3])
+eventnumbers.param('evtNumList', [2, 2, 0, 5])
 
 evtmetadatatest = EvtMetaDataTest()
 
@@ -77,7 +77,7 @@ evtmetadatatest = EvtMetaDataTest()
 # can be found if it's not the first module in the path.
 main.add_module(NoopModule())
 
-main.add_module(evtmetagen)
+main.add_module(eventnumbers)
 main.add_module(evtmetadatatest)
 
 process(main)

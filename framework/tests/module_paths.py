@@ -50,13 +50,13 @@ class PrintName(Module):
 
 
 # register necessary modules
-evtmetagen = register_module('EvtMetaGen')
+eventnumbers = register_module('EventNumbers')
 # generate three events
-evtmetagen.param('expList', [0, 1])
-evtmetagen.param('runList', [1, 2])
-evtmetagen.param('evtNumList', [2, 1])
+eventnumbers.param('expList', [0, 1])
+eventnumbers.param('runList', [1, 2])
+eventnumbers.param('evtNumList', [2, 1])
 
-evtmetainfo = register_module('EvtMetaInfo')
+eventinfo = register_module('EventInfo')
 progress = register_module('Progress')
 printcollections = register_module('PrintCollections')
 
@@ -67,7 +67,7 @@ emptypath = create_path()
 emptypath.add_path(create_path())
 main.add_path(emptypath)
 
-main.add_module(evtmetagen)
+main.add_module(eventnumbers)
 
 anotherpath = create_path()
 main.add_path(anotherpath)  # added here, filled later
@@ -80,16 +80,16 @@ subsubpath.add_path(emptypath)
 # fill anotherpath now
 module_with_condition = SelectOddEvents()
 anotherpath.add_module(module_with_condition)
-anotherpath.add_module(evtmetainfo)
+anotherpath.add_module(eventinfo)
 anotherpath.add_path(subsubpath)
 
 # check printing of paths, should be:
-# [] -> evtmetagen -> [SelectOddEvents -> evtmetainfo -> [Progress -> []]]
+# [] -> eventnumbers -> [SelectOddEvents -> eventinfo -> [Progress -> []]]
 # -> printcollections
 print main
 
 # when the module returns false/0 (odd events), we jump to Progress instead:
-# [] -> evtmetagen -> [SelectOddEvents -> [Progress -> []]]
+# [] -> eventnumbers -> [SelectOddEvents -> [Progress -> []]]
 module_with_condition.if_false(subsubpath)
 # this is equivalent to:
 # module_with_condition.if_value('<1', subsubpath)

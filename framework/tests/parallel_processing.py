@@ -131,7 +131,7 @@ print_params(particlegun)
 # Now lets create the necessary modules to perform a simulation
 
 # Create Event information
-evtmetagen = register_module('EvtMetaGen')
+eventnumbers = register_module('EventNumbers')
 # Show progress of processing
 progress = register_module('Progress')
 # Load parameters
@@ -145,7 +145,7 @@ param_g4sim = {'RegisterOptics': 1, 'PhotonFraction': 0.3,
                'TrackingVerbosity': 0}
 simulation.param(param_g4sim)
 
-evtmetagen.param({'evtNumList': [5], 'runList': [1]})
+eventnumbers.param({'evtNumList': [5], 'runList': [1]})
 
 # Set output filename
 output = register_module('RootOutput')
@@ -153,7 +153,7 @@ output.param('outputFileName', 'parallel_processing_test.root')
 
 main = create_path()
 # init path
-main.add_module(evtmetagen)
+main.add_module(eventnumbers)
 main.add_module(gearbox)
 main.add_module(particlegun)
 

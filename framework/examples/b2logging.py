@@ -71,14 +71,14 @@ B2INFO('Some other message')
 for (level, num) in logging.log_stats.items():
     print 'Messages for level %8s: %2d' % (level.name, num)
 
-evtmetagen = register_module('EvtMetaGen')
-# configure logging for the EvtMetaGen module:
+eventnumbers = register_module('EventNumbers')
+# configure logging for the EventNumbers module:
 # loglevel ERROR and info for ERROR message is file name and line number
-evtmetagen.logging.log_level = LogLevel.ERROR
-evtmetagen.logging.set_info(LogLevel.ERROR, LogInfo.FILE | LogInfo.LINE)
+eventnumbers.logging.log_level = LogLevel.ERROR
+eventnumbers.logging.set_info(LogLevel.ERROR, LogInfo.FILE | LogInfo.LINE)
 # or alternatively:
-evtmetagen.set_log_level(LogLevel.ERROR)
-evtmetagen.set_log_info(LogLevel.ERROR, LogInfo.FILE | LogInfo.LINE)
+eventnumbers.set_log_level(LogLevel.ERROR)
+eventnumbers.set_log_info(LogLevel.ERROR, LogInfo.FILE | LogInfo.LINE)
 
 # add time stamp to all INFO messages
 currentInfo = logging.get_info(LogLevel.INFO)
@@ -87,8 +87,8 @@ logging.set_info(LogLevel.INFO, currentInfo | LogInfo.TIMESTAMP)
 # run some events to see time stamp
 set_log_level(LogLevel.INFO)
 main = create_path()
-main.add_module(evtmetagen)
-evtmetagen.param('evtNumList', [30])
-evtmetainfo = register_module('EvtMetaInfo')
-main.add_module(evtmetainfo)
+main.add_module(eventnumbers)
+eventnumbers.param('evtNumList', [30])
+eventinfo = register_module('EventInfo')
+main.add_module(eventinfo)
 process(main)

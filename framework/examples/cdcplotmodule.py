@@ -131,8 +131,8 @@ class CDCPlotModule(Module):
 # Create main path
 main = create_path()
 
-evtmetagen = register_module('EvtMetaGen')
-evtmetagen.param('evtNumList', [5])
+eventnumbers = register_module('EventNumbers')
+eventnumbers.param('evtNumList', [5])
 
 gearbox = register_module('Gearbox')
 geo = register_module('Geometry')
@@ -170,7 +170,7 @@ g4sim.logging.log_level = LogLevel.ERROR
 
 plotmodule = CDCPlotModule()
 
-main.add_module(evtmetagen)
+main.add_module(eventnumbers)
 main.add_module(gearbox)
 main.add_module(geo)
 main.add_module(pGun)

@@ -16,9 +16,9 @@ logging.set_info(LogLevel.INFO, currentInfo | LogInfo.TIMESTAMP)
 
 main = create_path()
 
-evtmetagen = register_module('EvtMetaGen')
-evtmetagen.param('evtNumList', [30000])
-main.add_module(evtmetagen)
+eventnumbers = register_module('EventNumbers')
+eventnumbers.param('evtNumList', [30000])
+main.add_module(eventnumbers)
 
 progress = register_module('Progress')
 main.add_module(progress)

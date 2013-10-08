@@ -150,8 +150,8 @@ particlegun.param('independentVertices', False)
 # Now lets create the necessary modules to perform a simulation
 
 # Create Event information
-evtmetagen = register_module('EvtMetaGen')
-evtmetagen.param('evtNumList', [10])
+eventnumbers = register_module('EventNumbers')
+eventnumbers.param({'evtNumList': [5], 'runList': [1]})
 # Show progress of processing
 progress = register_module('Progress')
 # Load parameters
@@ -168,9 +168,6 @@ param_g4sim = {'RegisterOptics': 1, 'PhotonFraction': 0.3,
 simulation.param(param_g4sim)
 simulation.logging.log_level = LogLevel.ERROR  # ignore some warnings
 
-# Setting the option for all non particle gun modules:
-# want to process 100 MC events
-evtmetagen.param({'evtNumList': [5], 'runList': [1]})
 
 # Set output filename
 output = register_module('SeqRootOutput')
@@ -182,7 +179,7 @@ output.logging.log_level = LogLevel.WARNING  # ignore write rate
 
 main = create_path()
 # init path
-main.add_module(evtmetagen)
+main.add_module(eventnumbers)
 main.add_module(gearbox)
 main.add_module(particlegun)
 

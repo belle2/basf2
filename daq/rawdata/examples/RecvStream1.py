@@ -32,7 +32,9 @@ set_log_level(LogLevel.ERROR)
 receiver = register_module('DeSerializerPC')
 # receiver = register_module('DeSerializerHLT')
 # dump = register_module('PrintCollections')
-dump = register_module('RootOutput')
+
+dump = register_module('SeqRootOutput')
+# dump = register_module('RootOutput')
 perf = register_module('DAQPerf')
 output = register_module('PrintData')
 
@@ -46,8 +48,7 @@ receiver.param('PortFrom', [int(argvs[2]), 36000])
 # receiver.param('PortFrom', [33000, 33000])
 
 receiver.param('EventDataBufferWords', 4801)
-receiver.param('MaxTime', 200.)
-# receiver.param('MaxTime', -1.)
+receiver.param('MaxTime', -1.)
 # receiver.param('MaxEventNum', 400000)
 receiver.param('MaxEventNum', -1)
 use_shm_flag = int(argvs[1])
@@ -58,7 +59,7 @@ receiver.param('UseShmFlag', use_shm_flag)
 # histo = register_module('HistoManager')
 # main.add_module (histo)
 histo = register_module('DqmHistoManager')
-histo.param('HostName', 'ropc01')
+histo.param('HostName', 'ropc04')
 histo.param('Port', 9991)
 histo.param('DumpInterval', 10)
 histo.param('HistoFileName', 'ropc_histofile.root')
@@ -69,8 +70,9 @@ monitor = register_module('MonitorDataCOPPER')
 # Dump
 # dump.param('outputFileName', 'root_output.root')
 #
-dump.param('outputFileName', 'root_output.root')
-dump.param('compressionLevel', 0)
+dump.param('outputFileName', 'root_output.sroot')
+# dump.param('compressionLevel', 0)
+
 # Compression Level: 0 for no, 1 for low, 9 for high compression. Level 1 usually reduces size by 50%, higher levels have no noticeable effect.
 
 # Perf
@@ -82,10 +84,6 @@ main = create_path()
 
 # Add modules to main path
 main.add_module(receiver)
-
-# if use_shm_flag != 0:
-#    main.add_module(histo)
-#    main.add_module(monitor)
 main.add_module(histo)
 main.add_module(monitor)
 main.add_module(dump)

@@ -60,6 +60,15 @@ void SerializerModule::initialize()
 
 #endif
 
+
+  if (m_shmflag != 0) {
+    ShmOpen("/cpr_config", "/cpr_status");
+    // Status format : status_flag
+    m_cfg_buf = ShmGet(m_shmfd_cfg, 4);
+    m_cfg_sta = ShmGet(m_shmfd_sta, 4);
+    m_cfg_sta[ 0 ] = 1; // Status bit is 1 : ready before accept()
+  }
+
 #ifndef NOT_SEND
 #ifdef NOT_USE_SOCKETLIB
 
@@ -111,6 +120,51 @@ void SerializerModule::terminate()
 //
 // User defined functions
 //
+
+
+
+int* SerializerModule::ShmGet(int fd, int size_words)
+{
+  int offset = 0;
+  return (int*)mmap(NULL, size_words * sizeof(int), PROT_READ | PROT_WRITE, MAP_SHARED, fd, offset);
+}
+
+void SerializerModule::ShmOpen(char* path_cfg, char* path_sta)
+{
+  errno = 0;
+  /*m_shmfd_cfg = shm_open( "/cpr_config2", O_CREAT | O_EXCL | O_RDWR, 0666);
+  if (m_shmfd_cfg < 0) {
+    if (errno != EEXIST) {
+      perror("shm_open1");
+      exit(1);
+    }
+  */
+  m_shmfd_cfg = shm_open(path_cfg, O_RDWR, 0666);
+  if (m_shmfd_cfg < 0) {
+    printf("%s\n", path_cfg);
+    perror("[ERROR] shm_open2");
+    exit(1);
+  }
+  //}
+  /*
+  m_shmfd_sta = shm_open( "/cpr_status2", O_CREAT | O_EXCL | O_RDWR, 0666);
+  if (m_shmfd_sta < 0) {
+    if (errno != EEXIST) {
+      perror("shm_open1");
+      exit(1);
+    }
+    */
+  m_shmfd_sta = shm_open(path_sta , O_RDWR, 0666);
+  if (m_shmfd_sta < 0) {
+    printf("%s\n", path_sta);
+    perror("[ERROR] shm_open2");
+    exit(1);
+  }
+  //}
+  int size = 4 * sizeof(int);
+  ftruncate(m_shmfd_cfg, size);
+  ftruncate(m_shmfd_sta, size);
+}
 
 
 
@@ -172,6 +226,20 @@ void SerializerModule::SendByWriteV(RawCOPPER* rawcpr)
     print_err.PrintError("SEND error1", __FILE__, __PRETTY_FUNCTION__, __LINE__);
     exit(1);
   }
+
+
+#ifdef DEBUG
+  printf("*******BODY**********\n");
+  printf("\n%.8d : ", 0);
+  for (int i = 0; i < (iov[1].iov_len) / sizeof(int); i++) {
+    printf("0x%.8x ", (int*)(iov[1].iov_base) + i);
+    if ((i + 1) % 10 == 0) {
+      printf("\n%.8d : ", i + 1);
+    }
+  }
+  printf("\n");
+  printf("\n");
+#endif
 
 
   int total_send_bytes = sizeof(int) * send_header.GetTotalNwords();

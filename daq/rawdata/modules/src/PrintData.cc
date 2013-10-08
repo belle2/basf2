@@ -112,6 +112,16 @@ void PrintDataModule::PrintEvent(RawDataBlock* raw_datablock, int i)
     printf("== (size %d) : %d (size %d) : This is a FTSW block\n",
            tot_size_byte, i, size_byte);
 
+    printf("*******BODY**********\n");
+    printf("\n%.8d : ", 0);
+    for (int j = 0; j < size_byte / sizeof(int); j++) {
+      printf("0x%.8x ", (raw_datablock->GetBuffer(i))[ j ]);
+      if ((j + 1) % 10 == 0) {
+        printf("\n%.8d : ", j + 1);
+      }
+    }
+    printf("\n");
+    printf("\n");
 
   }
 
@@ -195,7 +205,7 @@ void PrintDataModule::event()
   StoreArray<RawDataBlock> raw_datablkarray;
   StoreArray<RawCOPPER> rawcprarray;
   StoreArray<RawCDC> raw_cdcarray;
-
+  StoreArray<RawFTSW> raw_ftswarray;
   StoreArray<RawSVD> raw_svdarray;
   StoreArray<RawBPID> raw_bpidarray;
   StoreArray<RawEPID> raw_epidarray;
@@ -203,11 +213,12 @@ void PrintDataModule::event()
   StoreArray<RawECL> raw_eclarray;
 
 
-  for (int j = 0; j < raw_datablkarray.getEntries(); j++) {
-    printf("=== RawDataBlock event====\nBlock # %d\n", j);
-    for (int i = 0; i < raw_datablkarray[ j ]->GetNumEntries(); i++) {
+  for (int j = 0; j < raw_ftswarray.getEntries(); j++) {
+    exit(1);
+    printf("=== RawFTSW event====\nBlock # %d\n", j);
+    for (int i = 0; i < raw_ftswarray[ j ]->GetNumEntries(); i++) {
       //  PrintEvent( &rawcprarray );
-      PrintEvent(raw_datablkarray[ j ], i);
+      PrintEvent(raw_ftswarray[ j ], i);
     }
   }
 

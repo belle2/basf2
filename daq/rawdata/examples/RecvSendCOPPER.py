@@ -42,7 +42,7 @@ reader.param('UseShmFlag', use_shm_flag)
 # histo = register_module('HistoManager')
 # main.add_module (histo)
 histo = register_module('DqmHistoManager')
-histo.param('HostName', 'ropc01')
+histo.param('HostName', 'ropc04')
 histo.param('Port', 9991)
 histo.param('DumpInterval', 10)
 
@@ -62,9 +62,9 @@ main = create_path()
 
 # Add modules to main path
 main.add_module(reader)
-if use_shm_flag != 0:
-    main.add_module(histo)
-    main.add_module(monitor)
+# if use_shm_flag != 0:
+#    main.add_module(histo)
+#    main.add_module(monitor)
 main.add_module(sender)
 
 # Process all events

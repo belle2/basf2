@@ -40,6 +40,9 @@
 
 #include <sys/uio.h>
 
+#include <sys/mman.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
 
 namespace Belle2 {
@@ -73,6 +76,28 @@ namespace Belle2 {
 
     //! calculate checksum
     unsigned int CalcXORChecksum(int* buf, int nwords);
+
+    //! Use shared memory
+    int m_shmflag;
+
+    //! open shared memory
+    void ShmOpen(char* path_cfg, char* path_sta);
+
+    //! Get shared memory
+    int* ShmGet(int fd, int size_words);
+
+    //! file descripter for shm
+    int m_shmfd_cfg;
+
+    //! file descripter for shm
+    int m_shmfd_sta;
+
+    //! buffer for shared memory
+    int* m_cfg_buf;
+
+    //! buffer for shared memory
+    int* m_cfg_sta;
+
 
   protected :
 

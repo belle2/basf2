@@ -70,45 +70,12 @@ namespace Belle2 {
 
     int* m_buffer;
 
-
-
-
-    //! Histograms
-    TH1F* h_ncpr;
-    TH1F* h_nevt;
-
-    TH2F* h_size2d;
-
-    TH1F* h_rate;
-
-    TH1F* h_size;
-    TH1F* h_size_0;
-    TH1F* h_size_1;
-    TH1F* h_size_2;
-    TH1F* h_size_3;
-
-    int m_size_byte_0;
-    int m_size_byte_1;
-    int m_size_byte_2;
-    int m_size_byte_3;
-
-    int m_prev_size_byte_0;
-    int m_prev_size_byte_1;
-    int m_prev_size_byte_2;
-    int m_prev_size_byte_3;
-
-    TH1F* h_size_var;
-    TH1F* h_size_var_0;
-    TH1F* h_size_var_1;
-    TH1F* h_size_var_2;
-    TH1F* h_size_var_3;
-
-    TH1F* h_flow_rate;
-    TH1F* h_flow_rate_0;
-    TH1F* h_flow_rate_1;
-    TH1F* h_flow_rate_2;
-    TH1F* h_flow_rate_3;
-
+    TH1* h_size;
+    TH1* h_nevt;
+    TH1* h_rate;
+    TH1* h_hslb_size[4];
+    TH1* h_hslb_nevt;
+    TH1* h_hslb_rate;
 
     int m_nevt;
     int m_prev_nevt;

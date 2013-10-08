@@ -106,6 +106,8 @@ namespace Belle2 {
 
     ErrorMessage print_err;
 
+    int event_diff;
+
   };
 
 } // end namespace Belle2

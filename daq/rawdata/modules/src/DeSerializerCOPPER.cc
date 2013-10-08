@@ -47,7 +47,7 @@ DeSerializerCOPPERModule::DeSerializerCOPPERModule() : DeSerializerModule()
 
   m_ftsweve_upper16bit = 0;
   m_prev_ftsweve16 = 0;
-  m_prev_ftsweve32 = 0;
+  m_prev_ftsweve32 = 0xFFFFFFFF;
 
 }
 
@@ -142,6 +142,7 @@ void DeSerializerCOPPERModule::initialize()
   memset(time_array4, 0, sizeof(time_array4));
   memset(time_array5, 0, sizeof(time_array5));
 
+  OpenCOPPER();
 
   B2INFO("DeSerializerCOPPER: initialize() done.");
 
@@ -194,22 +195,33 @@ void DeSerializerCOPPERModule::FillNewRawCOPPERHeader(RawCOPPER* raw_copper)
       cur_ftsw_eve32 = ((m_ftsweve_upper16bit << 16) & 0xFFFF0000) | (cur_ftsw_eve16 & 0x0000FFFF);
     } else {
       char err_buf[500];
+
+
       sprintf(err_buf, "Invalid 16bit event_number. Exiting...: cur 32bit eve %u preveve %u\n",  cur_ftsw_eve16, m_prev_ftsweve16);
       print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-      exit(-1);
+
+
+      //      exit(-1);
     }
   }
 
-
+  //  printf("Eve ###  32bit %d 16bit %d\n",cur_ftsw_eve32, cur_ftsw_eve16 );
   rawhdr.SetEveNo(cur_ftsw_eve32);       // Temporarily use COPPER counter   //raw_copper->GetCOPPERCounter()
 
 
-  if (m_prev_ftsweve32 != 0) {
+  if (m_prev_ftsweve32 != 0xFFFFFFFF) {
     if (m_prev_ftsweve32 + 1 != cur_ftsw_eve32) {
       char err_buf[500];
+
+
+
       sprintf(err_buf, "Invalid event_number. Exiting...: cur 32bit eve %u preveve %u\n",  cur_ftsw_eve32, m_prev_ftsweve32);
       print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-      exit(-1);
+
+
+
+
+      //      exit(-1);
     }
   }
   m_prev_ftsweve16 = cur_ftsw_eve16;
@@ -245,6 +257,10 @@ void DeSerializerCOPPERModule::FillNewRawCOPPERHeader(RawCOPPER* raw_copper)
   RawTrailer rawtrl;
   rawtrl.SetBuffer(raw_copper->GetRawTrlBufPtr(num_cprblock));
   rawtrl.Initialize(); // Fill 2nd word : magic word
+
+//   printf("eve %d check sum 0x%.8x\n", m_prev_ftsweve32 ,
+//   CalcSimpleChecksum(raw_copper->GetBuffer(num_cprblock),
+//        raw_copper->GetBlockNwords(num_cprblock) - rawtrl.GetTrlNwords()));
   rawtrl.SetChksum(CalcSimpleChecksum(raw_copper->GetBuffer(num_cprblock),
                                       raw_copper->GetBlockNwords(num_cprblock) - rawtrl.GetTrlNwords()));
 
@@ -274,7 +290,8 @@ int* DeSerializerCOPPERModule::ReadOneEventFromCOPPERFIFO(const int entry, int* 
     int read_size = 0;
     if ((read_size = read(cpr_fd, (char*)m_bufary[entry] + recvd_byte, sizeof(int) *  BUF_SIZE_WORD  - recvd_byte)) < 0) {
       print_err.PrintError("Failed to read header", __FILE__, __PRETTY_FUNCTION__, __LINE__);
-      exit(-1);
+      continue;
+      //      exit(-1);
     } else {
       recvd_byte += read_size;
       if (recvd_byte - RawHeader::RAWHEADER_NWORDS * sizeof(int) > (int)(sizeof(int) * (RawCOPPER::POS_DATA_LENGTH + 1)))break;
@@ -310,6 +327,21 @@ int* DeSerializerCOPPERModule::ReadOneEventFromCOPPERFIFO(const int entry, int* 
     exit(-1);
   }
   m_totbytes +=  recvd_byte - RawHeader::RAWHEADER_NWORDS * sizeof(int);
+
+
+
+#ifdef DEBUG
+  printf("*******BODY**********\n");
+  printf("\n%.8d : ", 0);
+  for (int i = 0; i < *m_size_word; i++) {
+    printf("0x%.8x ", temp_buf[ i ]);
+    if ((i + 1) % 10 == 0) {
+      printf("\n%.8d : ", i + 1);
+    }
+  }
+  printf("\n");
+  printf("\n");
+#endif
 
 #else
   //
@@ -360,8 +392,8 @@ void* DeSerializerCOPPERModule::OpenCOPPER()
     exit(1);
   }
 
-  int set_regval = 100; // How many events to be stored in COPPER FIFO before request for DMA
-  //    int set_regval=1;
+  int set_regval = 4; // How many events to be stored in COPPER FIFO before request for DMA
+  //      int set_regval=1;
   ioctl(cpr_fd, CPRIOSET_LEF_WA_FF, &set_regval);
   ioctl(cpr_fd, CPRIOSET_LEF_WB_FF, &set_regval);
   ioctl(cpr_fd, CPRIOSET_LEF_WC_FF, &set_regval);
@@ -400,6 +432,7 @@ void DeSerializerCOPPERModule::event()
   if (n_basf2evt < 0) {
 
     B2INFO("DeSerializerCOPPER: event() started.");
+
     // Use shared memory to start(for HSLB dummy data)
     if (m_shmflag != 0) {
       //      int* cfg_buf = ShmGet(m_shmfd_cfg, 4);
@@ -412,7 +445,7 @@ void DeSerializerCOPPERModule::event()
       }
     }
 
-    OpenCOPPER();
+
     m_start_time = GetTimeSec();
     n_basf2evt = 0;
   }

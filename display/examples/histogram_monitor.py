@@ -53,8 +53,8 @@ class GenerateHist(Module):
 
 
 # register necessary modules
-evtmetagen = register_module('EvtMetaGen')
-evtmetagen.param('evtNumList', [500])
+eventnumbers = register_module('EventNumbers')
+eventnumbers.param('evtNumList', [500])
 
 
 # create geometry
@@ -73,7 +73,7 @@ g4sim.logging.log_level = LogLevel.ERROR
 main = create_path()
 
 # add modules to paths
-main.add_module(evtmetagen)
+main.add_module(eventnumbers)
 
 main.add_module(gearbox)
 main.add_module(geometry)

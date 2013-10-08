@@ -1,4 +1,4 @@
-/// @file ring_bugger.h
+/// @file RingBuffer.h
 /// @brief Ring buffer definition
 /// @author Ryosuke Itoh
 /// @date Feb 22 2010
@@ -6,39 +6,25 @@
 #ifndef RING_BUFFER_H
 #define RING_BUFFER_H
 
-#include <iostream>
-#include <string>
-#include <errno.h>
 #include <sys/types.h>
-#include <sys/ipc.h>
-#include <sys/shm.h>
-#include <sys/sem.h>
-#include <stdio.h>
-#include <unistd.h>
-#include <string.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-
-
-#include <boost/format.hpp>
+#include <string>
 
 namespace Belle2 {
-
 
   /*! A structure to manage ring buffer. Placed on top of the shared memory. */
   struct RingBufInfo {
     int size; /**< ring buffer size, minus this header. */
-    int remain;
-    int wptr;
-    int prevwptr;
-    int rptr;
-    int nbuf;
+    int remain; /**< Unsure, always equal to size. */
+    int wptr; /**< Pointer for writing entries. */
+    int prevwptr; /**< Previous state of wptr (for error recovery). */
+    int rptr; /**< Pointer for reading entries. */
+    int nbuf; /**< Number of entries in ring buffer. */
     int semid; /**< Semaphore ID. */
     int nattached; /**< Number of RingBuffer instances currently attached to this buffer. */
-    int redzone;
-    int readbuf;
-    int mode;
-    int msgid;
+    int redzone; /**< Unused. */
+    int readbuf; /**< Unused. */
+    int mode; /**< Error state? 0: Normal, 1: buffer full and wptr>rptr, others are complicated. */
+    int msgid; /**< Unused. */
     int ninsq; /**< Count insq() calls for this buffer. */
     int nremq; /**< Count remq() calls for this buffer. */
   };
@@ -48,52 +34,78 @@ namespace Belle2 {
   public:
     /** Standard size of buffer, in integers (~40MB). */
     const static int c_DefaultSize = 10000000;
-    /*! Constructor to create a new shared memory in private space */
+
+    /** Constructor to create a new shared memory in private space.
+     *
+     * @param size Ring buffer size in integers (!)
+     */
     RingBuffer(int size = c_DefaultSize);
     /*! Constructor to create/attach named shared memory in global space */
-    RingBuffer(const char* name, unsigned int size = 0);    // Create / Attach Ring buffer
+    RingBuffer(const char* name, unsigned int size = 0);     // Create / Attach Ring buffer
     /*! Constructor by attaching to an existing shared memory */
     //    RingBuffer(int shmid);              // Attach Ring Buffer
     /*! Destructor */
     ~RingBuffer();
+    /** open shared memory */
+    void openSHM(int size);
     /*! Function to detach and remove shared memory*/
-    void cleanup(void);
+    void cleanup();
 
-    /*! Append a buffer in the RingBuffer */
-    int insq(int* buf, int size);
+    /*! Append a buffer to the RingBuffer */
+    int insq(const int* buf, int size);
     /*! Pick up a buffer from the RingBuffer */
     int remq(int* buf);
     /*! Prefetch a buffer from the RingBuffer w/o removing it*/
-    int spyq(int* buf);
+    int spyq(int* buf) const;
     /*! Returns number of buffers in the RingBuffer */
-    int numq(void);
+    int numq() const;
     /*! Clear the RingBuffer */
-    int clear(void);
+    int clear();
 
     /*! Return ID of the shared memory */
-    int shmid(void);
+    int shmid() const;
 
     // Debugging functions
-    void dump_db(void);
-    int ninsq(void);
-    int nremq(void);
+    /** Print some info on the RingBufInfo structure. */
+    void dump_db();
+    /** Return number of insq() calls for current buffer. */
+    int ninsq() const;
+    /** Return number of remq() calls for current buffer. */
+    int nremq() const;
 
     /** Return number of insq() calls. */
-    int insq_counter(void);
+    int insq_counter() const;
     /** Return number of remq() calls. */
-    int remq_counter(void);
+    int remq_counter() const;
 
   private:
-    /** Lock the given semaphore. */
-    int sem_lock(int);
-    /** Unlock the given semaphore. */
-    int sem_unlock(int);
+    /** Convenience class to lock a semaphore on construction, and unlock on destruction. */
+    class SemaphoreLocker {
+    public:
+      /** Lock the given semaphore. */
+      SemaphoreLocker(int semId): m_id(semId) { lock(); }
+      /** Unlock. */
+      ~SemaphoreLocker() { unlock(); }
 
-  private:
+      /** Create a new semaphore and initialize it. Returns the semaphore id or dies with an error. */
+      static int create(key_t semkey);
+
+      /** Lock the semaphore. */
+      void lock();
+      /** Unlock the semaphore. */
+      void unlock();
+
+    private:
+      int m_id; /**< semaphore id, see semget(2). */
+    };
+
+    /** Does the actual memcpy into RingBuffer. */
+    void insq_intern(const int* buf, int size);
+
     bool m_new; /**< True if we created the ring buffer ourselves (and need to clean it). */
-    bool m_file;
-    std::string m_pathname;
-    int  m_pathfd; /** Associated file descriptor. */
+    bool m_file; /**< True if m_pathfd needs to be closed. */
+    std::string m_pathname; /**< Path for identifying shared memory if named ring buffer is created. */
+    int  m_pathfd; /**< Associated file descriptor. */
     key_t m_shmkey; /**< SHM key, see shmget(2). */
     key_t m_semkey; /**< Semaphore key, see semget(2). */
 

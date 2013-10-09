@@ -12,16 +12,33 @@
 #define PARTICLEPROPERTIES_H_
 
 namespace Belle2 {
+  /** This struct is used by the StandardTrackingPerformanceModule to save information
+   * of reconstructed tracks
+   */
   struct ParticleProperties {
-    // measured values
+
+    /**< measured mass */
     double mass;
+
+    /**< measured transverse momentum */
     double pt;
+
+    /**< measured total momentum */
     double ptot;
+
+    /**< polar angle of measured momentum vector */
     double cosTheta;
-    // generated values
+
+    /**< generated mass */
     double mass_gen;
+
+    /**< generated transverse momentum */
     double pt_gen;
+
+    /**< generated total momentum */
     double ptot_gen;
+
+    /**< polar angle of generated momentum vector */
     double cosTheta_gen;
   };
 

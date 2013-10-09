@@ -27,6 +27,20 @@ namespace Belle2 {
   template< class T >
   class StoreArray;
 
+  /**
+   *  \addtogroup modules
+   *  @{
+   *  \addtogroup tracking_modules
+   *  \ingroup modules
+   *  @{ StandardTrackingPerformanceModule @} @}
+   */
+
+  /** This module takes the MCParticle and the GFTrack collection as input and
+   * writes out a root file with some information of the reconstructed tracks.
+   * If a generated track is not reconstructed, all output variables are set to
+   * the default value (-999). With the output file, you are able to estimate the
+   * reconstruction efficiency of tracks
+   */
   class StandardTrackingPerformanceModule : public Module {
   public:
     StandardTrackingPerformanceModule();
@@ -135,18 +149,25 @@ namespace Belle2 {
     std::vector< int > m_signalDaughterPDGs; /**< PDG codes of the B daughters of the interesting decay channel */
 
 
-    TFile* m_outputFile;
-    TTree* m_dataTree;
+    TFile* m_outputFile; /**< output root file */
+    TTree* m_dataTree; /**< root tree with all output data. Tree will be written to the output root file */
 
+    /**< vector with all interesting charged stable MCParticles in the event */
     std::vector< MCParticle* > m_interestingChargedStableMcParcticles;
+
+    /**< vector with all MCParticles of the searched signal decay */
     std::vector< MCParticle* > m_signalMCParticles;
 
+    /**< Particle vector with reconstructed charged stable particles */
     std::vector< Particle > m_chargedStableParticles;
 
-    ParticleProperties m_mcParticleProperties;
+    /**< properties of a reconstructed track */
     ParticleProperties m_trackProperties;
 
+    /**< total number of genrated charged stable MCParticles */
     double m_nGeneratedChargedStableMcParticles;
+
+    /**< total number of fitted tracks */
     double m_nFittedChargedStabletracks;
 
   };

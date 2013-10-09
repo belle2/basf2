@@ -71,7 +71,8 @@ void TxModule::event()
       B2WARNING("Ring buffer seems full, removing some previous data.");
       m_rbuf->remq(NULL);
     }
-    usleep(200);
+    //    usleep(200);
+    usleep(20);
   }
   m_nsent++;
 

@@ -49,7 +49,8 @@ void RxModule::readEvent()
   char* evtbuf = new char[EvtMessage::c_MaxEventSize];
   while ((size = m_rbuf->remq((int*)evtbuf)) == 0) {
     //    printf ( "Rx : evtbuf is not available yet....\n" );
-    usleep(100);
+    //    usleep(100);
+    usleep(20);
   }
   B2DEBUG(100, "Rx: got an event from RingBuffer, size=" << size);
 

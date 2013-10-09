@@ -160,7 +160,8 @@ void pEventProcessor::process(PathPtr spath)
            it != m_rbinlist.end(); ++it) {
         RingBuffer* rbuf = *it;
         while (rbuf->insq((int*)term.buffer(), term.paddedSize()) < 0) {
-          usleep(200);
+          //          usleep(200);
+          usleep(20);
         }
       }
     }
@@ -171,7 +172,8 @@ void pEventProcessor::process(PathPtr spath)
          it != m_rboutlist.end(); ++it) {
       RingBuffer* rbuf = *it;
       while (rbuf->insq((int*)term.buffer(), term.paddedSize()) < 0) {
-        usleep(200);
+        //        usleep(200);
+        usleep(20);
       }
     }
     m_procHandler->wait_output_server();

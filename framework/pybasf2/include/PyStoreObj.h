@@ -50,6 +50,9 @@ namespace Belle2 {
 
     ~PyStoreObj() { }
 
+    /** Print list of available objects for given durability. */
+    static void list(int durability = 0);
+
     /** Create a default object in the data store.
      *
      *  The object created will be of the type given by the 'name' argument of the ctor

@@ -52,6 +52,9 @@ namespace Belle2 {
 
     ~PyStoreArray() { }
 
+    /** Print list of available arrays for given durability. */
+    static void list(int durability = 0);
+
     /** Does this PyStoreArray contain a valid datastore array?  */
     operator bool() const { return m_storeArray; }
 

@@ -2,6 +2,7 @@
 
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreAccessorBase.h>
+#include <framework/dataobjects/RelationContainer.h>
 #include <framework/logging/Logger.h>
 
 #include <TObject.h>
@@ -55,4 +56,17 @@ bool PyStoreObj::registerAsTransient(bool errorIfExisting)
     return false;
 
   return DataStore::Instance().createEntry(m_name, DataStore::EDurability(m_durability), cl, false, true, errorIfExisting);
+}
+
+void PyStoreObj::list(int durability)
+{
+  const DataStore::StoreObjMap& map = DataStore::Instance().getStoreObjectMap(DataStore::EDurability(durability));
+  for (const auto & entrypair : map) {
+    if (!entrypair.second->isArray) {
+      const TObject* obj = entrypair.second->object;
+      if (obj and dynamic_cast<const RelationContainer*>(obj))
+        continue; //ignore relations in list
+      B2INFO(entrypair.first);
+    }
+  }
 }

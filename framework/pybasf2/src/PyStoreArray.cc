@@ -24,3 +24,13 @@ TObject* PyStoreArray::appendNew()
 
   return m_storeArray->ConstructedAt(getEntries());
 }
+
+void PyStoreArray::list(int durability)
+{
+  const DataStore::StoreObjMap& map = DataStore::Instance().getStoreObjectMap(DataStore::EDurability(durability));
+  for (const auto & entrypair : map) {
+    if (entrypair.second->isArray) {
+      B2INFO(entrypair.first);
+    }
+  }
+}

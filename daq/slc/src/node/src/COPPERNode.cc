@@ -72,7 +72,7 @@ int COPPERNode::getParams(const Command& command, unsigned int* pars,
        << _sender->getScript();
     for (size_t i = 0; i < MAX_HSLBS; i++) {
       if (_hslb_v[i] != NULL) {
-        pars[1] |= _hslb_v[i]->isUsed();
+        pars[1] |= (0x01 & _hslb_v[i]->isUsed()) << i;
         ss << " " << _hslb_v[i]->getFirmware();
         FEEModule* module = _hslb_v[i]->getFEEModule();
         if (module != NULL) {

@@ -40,7 +40,7 @@ namespace Belle2 {
     /** Write TTree to file, and close file if necessary. */
     void terminate() {};
     /** Search for MCParticles matching the given DecayString. */
-    DecayTree<MCParticle>* match(const MCParticle* mcp, const DecayDescriptor& d, bool isCC);
+    DecayTree<MCParticle>* match(const MCParticle* mcp, const DecayDescriptor* d, bool isCC);
     /** Create Particle from matched MCParticle and write to Particle list. */
     int write(DecayTree<MCParticle>* decay);
   };

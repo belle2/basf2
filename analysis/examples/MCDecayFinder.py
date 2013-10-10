@@ -17,7 +17,7 @@ main = create_path()
 
 # specify number of events to be generated in job
 evtmetagen = register_module('EvtMetaGen')
-evtmetagen.param('evtNumList', [5])  # process 10 events
+evtmetagen.param('evtNumList', [10])  # process 10 events
 evtmetagen.param('runList', [1])  # from run number 1
 evtmetagen.param('expList', [1])  # and experiment number 1
 main.add_module(evtmetagen)
@@ -117,7 +117,14 @@ ntuple = register_module('NtupleMaker')
 ntuple.param('strFileName', 'test.root')
 ntuple.param('strTreeName', 'test')
 ntuple.param('strListName', 'testB')
-ntuple.param('strTools', ['EventMetaData', 'B+', 'Kinematics', '^B+'])
+ntuple.param('strTools', [
+    'EventMetaData',
+    'B+',
+    'Kinematics',
+    '^B+',
+    'MCKinematics',
+    'B+ => (anti-D0 => ^K+ ^pi-) ...',
+    ])
 main.add_module(ntuple)
 
 # ----> start processing of modules

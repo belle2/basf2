@@ -100,9 +100,9 @@ ntuple1.param('strTools', [
     'EventMetaData',
     'B-',
     'Kinematics',
-    'B- -> (anti-D0 -> ^K+ ^pi-) ^pi-',
+    'B- -> [anti-D0 -> ^K+ ^pi-] ^pi-',
     'MCKinematics',
-    'B- -> (anti-D0 -> ^K+ ^pi-) ^pi-',
+    'B- -> [anti-D0 -> ^K+ ^pi-] ^pi-',
     ])
 main.add_module(ntuple1)
 

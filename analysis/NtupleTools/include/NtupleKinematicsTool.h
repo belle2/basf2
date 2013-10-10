@@ -38,7 +38,6 @@ namespace Belle2 {
   public:
     /** Constuctor. */
     NtupleKinematicsTool(TTree* tree, DecayDescriptor& decaydescriptor) : NtupleFlatTool(tree, decaydescriptor) {setupTree();}
-//    ~NtupleKinematicsTool() {printf("Destroy the NtupleKinematicsTool.... BOOOOOM!\n");}
     /** Set branch variables to properties of the provided Particle. */
     void eval(const Particle* p);
   };

@@ -10,47 +10,44 @@
 
 #ifndef DECAYDESCRIPTOR_H
 #define DECAYDESCRIPTOR_H
+
 #include <vector>
 #include <utility>
 #include <string>
 #include <analysis/dataobjects/Particle.h>
+#include <generators/dataobjects/MCParticle.h>
+#include <analysis/DecayDescriptor/DecayString.h>
+#include <analysis/DecayDescriptor/DecayDescriptorParticle.h>
 #include <boost/ptr_container/ptr_vector.hpp>
-
 
 namespace Belle2 {
 
   /** The DecayDescriptor stores information about
-  how Particle objects are constructed. It contains
-  the mother <-> daughter relations of the full decay
-  chain including also daughters of daughters.
-  Example: B -> D (D -> K pi) pi
-  There is the possibility to select any particle of the decay
-  chain. It is also possible to apply selection criteria
-  using DecayCut objects. */
+  a decay tree or parts of a decay tree. It contains
+  the mother <-> daughter relations. */
   class DecayDescriptor {
   private:
+    /** Mother of the decay ('left side'). */
+    DecayDescriptorParticle m_mother;
+    /** ID of the Daughter Particle* matched to this DecayDescriptor.
+    If this DecayDescriptor was not matched, the value is -1. */
+    int m_iDaughter_p;
     /** Direct daughters of the decaying particle. */
     std::vector<DecayDescriptor> m_daughters;
-    /** evt.pdl name of the decaying particle. */
-    std::string m_strName;
-    /** Tag of this particle to distinguish e.g. different decay channels or selection criteria. */
-    std::string m_strTag;
-    /** PDG code of the decaying particle. */
-    int m_iPDGCode;
-    /** Is this DecayDescriptor selected? */
-    bool m_isSelected;
     /** Ignore radiated photons? */
     bool m_isIgnorePhotons;
+    /** Ignore intermediate particles or resonances? */
+    bool m_isIgnoreIntermediate;
     /** Is this decay inclusive? */
     bool m_isInclusive;
-    /** If this DecayDescriptor is attached as daughter
-    of another DecayDescriptor, then it cannot be changed anymore! */
-    bool m_isFixed;
     /** Is this the NULL object? */
     bool m_isNULL;
+    /** Internally called by match(Particle*) and match(MCParticle*) function. */
+    template <class T>
+    int match(const T* p, int iDaughter_p);
   public:
     /** Singleton object representing NULL. */
-    const static DecayDescriptor& m_NULL;
+    const static DecayDescriptor& s_NULL;
     /** Dereference operator. */
     operator DecayDescriptor* () {
       return m_isNULL ? nullptr : this;
@@ -59,37 +56,67 @@ namespace Belle2 {
     DecayDescriptor();
     /** Copy ctor. */
     DecayDescriptor(const DecayDescriptor& other);
-    /** Return the human readable name m_strName. */
-    std::string getName() {
-      return m_strName;
-    };
-    /** Return the name from getName() without + - * or anti- */
-    std::string getNameSimple();
-    /** Append a daughter to this particle. If the daughter decays further, then
-    these decays have to be specified first because this sets daugher.m_isFixed = true. */
-    void append(const DecayDescriptor& daughter);
-    /** Initialise daughters from given string. */
-    bool init(const std::string strDecayString);
-    /** Select this DecayDescriptor. */
-    void select(bool isSelected = true) {
-      m_isSelected = isSelected;
-    }
+
+    /** Initialise the DecayDescriptor from given string.
+        Typically, the string is a parameter of an analysis module. */
+    bool init(const std::string s);
+
+    /** Initialise the DecayDescriptor from a given DecayString.
+    The DecayString struct is obtained from the parser called
+    in the init(const std::string) function. */
+    bool init(const DecayString& s);
+
+    /** Checy if the DecayDescriptor matches with the given Particle.
+    0 = no match
+    1 = matches DecayDescriptor
+    2 = matches charge conjugated DecayDescriptor
+    3 = matches DeacyDescriptor AND charge conjugated DecayDescriptor
+    -1, -2, -3 : same, but match is not unambigous. */
+    int match(const Particle* p) {return match<Particle>(p, -1);}
+
+    /** See match(const Particle* p). */
+    int match(const MCParticle* p) {return match<MCParticle>(p, -1);}
+
+    /** Particle daughter ID set by previous call of match(const Particle*) function. */
+    int getMatchedDaughter() {return m_iDaughter_p;}
+
+    /** Reset results from previous call of the match() function. */
+    void resetMatch();
+
     /** Get a vector of pointers with selected daughters in the decay tree. */
     std::vector<const Particle*> getSelectionParticles(const Particle* particle);
     /** Return list of human readable names of selected particles.
     Example for the case that all particles are selected in B+ -> (anti-D0 -> K^- pi^+) pi^+:
     ["B", "D0", "D0_K", "D_pi", "pi"] */
     std::vector<std::string> getSelectionNames();
-    /** Return PDG code.*/
-    int getPDGCode() const {return m_iPDGCode;}
+    /** return mother. */
+    const DecayDescriptorParticle* getMother() const {
+      return &m_mother;
+    }
     /** return number of direct daughters. */
-    int getNDaughters() const {return m_daughters.size();}
+    int getNDaughters() const {
+      return m_daughters.size();
+    }
     /** return i-th daughter (0 based index). */
-    const DecayDescriptor& getDaughter(int i) const {return (i < getNDaughters()) ? m_daughters[i] : DecayDescriptor::m_NULL;}
-    /** Also consider charge conjugated mode? */
-    bool isIgnorePhotons() const {return m_isIgnorePhotons;}
+    const DecayDescriptor* getDaughter(int i) const {
+      return (i < getNDaughters()) ? &(m_daughters[i]) : NULL;
+    }
+    bool isIgnorePhotons() const {
+      return m_isIgnorePhotons;
+    }
+    bool isIgnoreIntermediate() const {
+      return m_isIgnoreIntermediate;
+    }
     /** Is the decay inclusive? */
-    bool isInclusive() const {return m_isInclusive;}
+    bool isInclusive() const {
+      return m_isInclusive;
+    }
+
+    /** Takes as input argument a (reconstructed) Particle, tries to match with
+    this DecayDescriptorElement and returns true when matched. */
+    bool getSelectionParticlesAndNames(const Particle* particle,
+                                       std::vector<const Particle*>& selparticles,
+                                       std::vector<std::string>& selnames);
   };
 
 }

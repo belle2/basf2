@@ -1,155 +1,272 @@
-/**************************************************************************
-* BASF2 (Belle Analysis Framework 2)                                     *
-* Copyright(C) 2010 - Belle II Collaboration                             *
-*                                                                        *
-* Author: The Belle II Collaboration                                     *
-* Contributors: Christian Oswald                                         *
-*                                                                        *
-* This software is provided "as is" without any warranty.                *
-**************************************************************************/
-
+#include <framework/logging/Logger.h>
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
-#include <algorithm>
-#include <boost/algorithm/string/erase.hpp>
-#include <boost/algorithm/string/replace.hpp>
-#include <boost/lexical_cast.hpp>
-#include <boost/spirit/include/classic.hpp>
-#include <framework/core/Environment.h>
+#include <analysis/DecayDescriptor/DecayStringParticle.h>
+#include <analysis/DecayDescriptor/DecayStringDecay.h>
+#include <analysis/DecayDescriptor/DecayStringGrammar.h>
 #include <evtgen/EvtGenBase/EvtPDL.hh>
+#include <evtgen/EvtGenBase/EvtId.hh>
+#include <algorithm>
+#include <boost/variant/get.hpp>
+#include <boost/spirit/include/qi.hpp>
+#include <boost/lexical_cast.hpp>
+#include <set>
+#include <utility>
 
-using namespace std;
-using namespace boost::spirit::classic;
-using namespace boost::algorithm;
 using namespace Belle2;
+using namespace std;
 
-const DecayDescriptor& DecayDescriptor::m_NULL = DecayDescriptor();
+const DecayDescriptor& DecayDescriptor::s_NULL = DecayDescriptor();
 
 DecayDescriptor::DecayDescriptor() :
+  m_mother(),
+  m_iDaughter_p(-1),
   m_daughters(),
-  m_strName(""),
-  m_strTag("default"),
-  m_iPDGCode(0),
-  m_isSelected(false),
   m_isIgnorePhotons(false),
+  m_isIgnoreIntermediate(false),
   m_isInclusive(false),
-  m_isFixed(false)
+  m_isNULL(false)
 {
 }
 
 DecayDescriptor::DecayDescriptor(const DecayDescriptor& other) :
+  m_mother(other.m_mother),
+  m_iDaughter_p(other.m_iDaughter_p),
   m_daughters(other.m_daughters),
-  m_strName(other.m_strName),
-  m_strTag(other.m_strTag),
-  m_iPDGCode(other.m_iPDGCode),
-  m_isSelected(other.m_isSelected),
   m_isIgnorePhotons(other.m_isIgnorePhotons),
+  m_isIgnoreIntermediate(other.m_isIgnoreIntermediate),
   m_isInclusive(other.m_isInclusive),
-  m_isFixed(other.m_isFixed)
+  m_isNULL(other.m_isNULL)
 {
 }
 
-string DecayDescriptor::getNameSimple()
+bool DecayDescriptor::init(const std::string str)
 {
-  string strNameSimple(m_strName);
-  erase_all(strNameSimple, "anti-");
-  erase_all(strNameSimple, "+");
-  erase_all(strNameSimple, "-");
-  erase_all(strNameSimple, "/");
-  replace_all(strNameSimple, "*", "ST");
-  return strNameSimple;
+  // The decay string grammar
+  DecayStringGrammar<std::string::const_iterator> g;
+  DecayString s;
+  std::string::const_iterator iter = str.begin();
+  std::string::const_iterator end = str.end();
+  bool r = phrase_parse(iter, end, g, boost::spirit::ascii::space, s);
+  if (!r || iter != end) return false;
+  return init(s);
 }
 
-void DecayDescriptor::append(const DecayDescriptor& daughter)
+
+bool DecayDescriptor::init(const DecayString& s)
 {
-  if (m_isFixed) {
-    printf("DecayDescriptor::append - This DecayDescriptor is already used as daughter of another DecayDescritor!\n");
-    return;
+  // The DecayString is a hybrid, it can be
+  // a) DecayStringParticleList
+  // b) DecayStringDecay
+
+  bool isInitOK = false;
+
+  if (const DecayStringParticle* p = boost::get< DecayStringParticle >(&s)) {
+    isInitOK = m_mother.init(*p);
+    if (!isInitOK) {
+      B2WARNING("Could not initialise mother particle " << p->m_strName);
+      return false;
+    }
+    return true;
+  } else if (const DecayStringDecay* d = boost::get< DecayStringDecay > (&s)) {
+    // Initialise list of mother particles
+    isInitOK = m_mother.init(d->m_mother);
+    if (!isInitOK) {
+      B2WARNING("Could not initialise mother particle " << d->m_mother.m_strName);
+      return false;
+    }
+
+    // Identify arrow type
+    if (d->m_strArrow == "->") {
+      m_isIgnorePhotons = false;
+      m_isIgnoreIntermediate = false;
+    } else if (d->m_strArrow == "=>") {
+      m_isIgnorePhotons = true;
+      m_isIgnoreIntermediate = false;
+    } else if (d->m_strArrow == "-->") {
+      m_isIgnorePhotons = false;
+      m_isIgnoreIntermediate = true;
+    } else if (d->m_strArrow == "==>") {
+      m_isIgnorePhotons = true;
+      m_isIgnoreIntermediate = true;
+    } else {
+      B2WARNING("Unknown arrow: " << d->m_strArrow);
+      return false;
+    }
+
+    // Initialise list of daughters
+    if (d->m_daughters.empty()) return false;
+    int nDaughters = d->m_daughters.size();
+    for (int iDaughter = 0; iDaughter < nDaughters; iDaughter++) {
+      DecayDescriptor daughter;
+      isInitOK = daughter.init(d->m_daughters[iDaughter]);
+      if (!isInitOK) {
+        B2WARNING("Could not initialise daughter!");
+        return false;
+      }
+      m_daughters.push_back(daughter);
+    }
+    if (!d->m_strInclusive.empty()) m_isInclusive = true;
+    return true;
   }
-  m_daughters.push_back(daughter);
+  return false;
 }
 
-bool DecayDescriptor::init(const string strDecayString)
+template <class T>
+int DecayDescriptor::match(const T* p, int iDaughter_p)
 {
-  B2INFO("Parsing Descriptor: " << strDecayString);
+  // this DecayDescriptor was not matched or
+  // it is not the daughter of another DecayDescriptor
+  m_iDaughter_p = -1;
 
-  if (m_isFixed) {
-    B2WARNING("Could not initialise DecayDescriptor from decay string");
-    return false;
-  }
-  string strTag;
-  vector<string> strDaughters;
-
-  // exact match of decay
-  rule<> _ARROW_EXACT = *space_p >> strlit<>("->")  >> *space_p;
-  // intermediate resonances ignored
-  rule<> _ARROW_NORES = *space_p >> strlit<>("-->")  >> *space_p;
-  // additional photons ignored
-  rule<> _ARROW_IGGAM = *space_p >> strlit<>("=>")  >> *space_p;
-  // intermediate resonances and additional photons ignored
-  rule<> _ARROW_NORES_IGGAM = *space_p >> strlit<>("==>")  >> *space_p;
-  rule<> _ARROW = _ARROW_EXACT | _ARROW_NORES | _ARROW_IGGAM | _ARROW_NORES_IGGAM;
-
-  // plus any additional particles
-  rule<> _INCLUSIVE = *space_p >> strlit<>("...") >> *space_p;
-  // select the following particle
-  rule<> _SELECTOR = chlit<>('^');
-
-  // forbidden character sequences for particle and tag names
-  rule<> _RESERVED = _SELECTOR | chlit<>('(') | chlit<char>(')') | chlit<>('{') | chlit<>('}') | space_p | _ARROW | _INCLUSIVE;
-  // name of particle or tag
-  rule<> _NAME = +(anychar_p - _RESERVED);
-  rule<> _TAG = chlit<>('{') >> _NAME >> chlit<>('}') >> *space_p;
-  // particle on the left side (save properties)
-  rule<> _LPARTICLE = *space_p >> *_SELECTOR[assign_a(m_isSelected, true)] >> _NAME[assign_a(m_strName)] >> *_TAG[assign_a(m_strTag)];
-  // particle on the right side (will be evaluated by daughter decay descriptor)
-  rule<> _RPARTICLE = *space_p >> *_SELECTOR >> _NAME >> *_TAG;
-
-  // everything that can be on the right side
-  rule<> _DAUGHTER = _RPARTICLE | (*space_p >> chlit<>('(') >> _RPARTICLE >> _ARROW >> +_RPARTICLE >> *_INCLUSIVE >> chlit<>(')') >> *space_p);
-
-  rule<> _RIGHT = +_DAUGHTER[push_back_a(strDaughters)] >> *_INCLUSIVE[assign_a(m_isInclusive, true)];
-
-  rule<> _DECAYBASIC = _LPARTICLE >> (
-                         _ARROW_EXACT[assign_a(m_isIgnorePhotons, false)] |
-                         _ARROW_NORES[assign_a(m_isIgnorePhotons, false)] |
-                         _ARROW_IGGAM[assign_a(m_isIgnorePhotons, true)] |
-                         _ARROW_NORES_IGGAM[assign_a(m_isIgnorePhotons, true)]) >> _RIGHT;
-  rule<> _DECAY = _DECAYBASIC | (*space_p >> chlit<char>('(') >> _DECAYBASIC >> chlit<char>(')') >> *space_p) | _LPARTICLE;
-
-  bool isParseOK = parse(strDecayString.c_str(), _DECAY).full;
-
-  if (!isParseOK) {
-    B2WARNING("Could not parse decay descriptor string! Stopped @ " << parse(strDecayString.c_str(), _DECAY).stop);
-    return false;
+  if (!p) {
+    B2WARNING("NULL pointer provided instead of particle.")
+    return 0;
   }
 
-  if (EvtPDL::entries() == 0) {
-    string strEvtPDL = Environment::Instance().getExternalsPath() + "/share/evtgen/evt.pdl";
-    EvtPDL evtpdl;
-    evtpdl.read(strEvtPDL.c_str());
+  int iPDGCode_p = 0;
+  if (const Particle* test = dynamic_cast<const Particle*>(p)) iPDGCode_p = test->getPDGCode();
+  else if (const MCParticle* test = dynamic_cast<const MCParticle*>(p)) iPDGCode_p = test->getPDG();
+  else {
+    B2WARNING("Template type not supported!");
+    return 0;
   }
-  m_iPDGCode = EvtPDL::getLundKC(EvtPDL::getId(m_strName));
-  B2INFO(m_strName << "   ------>   " << m_iPDGCode << " " << m_strTag << " SEL = " << m_isSelected << " IgnPhoton = " << m_isIgnorePhotons << " INCL = " << m_isInclusive);
+  EvtId evtId_p = EvtPDL::evtIdFromStdHep(iPDGCode_p);
+  int iPDGCodeCC_p = EvtPDL::getStdHep(EvtPDL::chargeConj(evtId_p));
+  int iPDGCode_d = m_mother.getPDGCode();
+  if (abs(iPDGCode_d) != abs(iPDGCode_p)) return 0;
+  int iCC = 0;
+  if (iPDGCode_p == iPDGCodeCC_p) iCC = 3;
+  else if (iPDGCode_d == iPDGCode_p) iCC = 1;
+  else if (iPDGCode_d == iPDGCodeCC_p) iCC = 2;
 
-  for (unsigned int i = 0; i < strDaughters.size(); i++) B2INFO(strDaughters[i]);
-  for (vector<string>::iterator i = strDaughters.begin(); i != strDaughters.end(); ++i) {
-    DecayDescriptor daughter;
-    bool isDaughterOK = daughter.init(*i);
-    if (!isDaughterOK) return false;
-    append(const_cast<const DecayDescriptor&>(daughter));
+  const std::vector<T*> daughterList = p->getDaughters();
+
+  // 1st case: the descriptor has no daughters => nothing to check
+  if (getNDaughters() == 0) {
+    m_iDaughter_p = iDaughter_p;
+    return iCC;
   }
-  return true;
+
+  // 2nd case: the descriptor has daughters, but not the particle
+  // => that is not allowed!
+  if (daughterList.size() == 0) return 0;
+
+  // 3rd case: the descriptor and the particle have daughters
+  // There are two cases that can happen when matching the
+  // DecayDescriptor daughters to the particle daughters:
+  // 1. The match is unambigous -> no problem
+  // 2. Multiple particle daughters match the same DecayDescriptor daughter
+  // -> in the latter case the ambiguity is resolved later
+
+  // 1. DecayDescriptor -> Particle relation for the cases where only one particle matches
+  vector< pair< int, int > > singlematch;
+  // 2. DecayDescriptor -> Particle relation for the cases where multiple particles match
+  vector< pair< int, set<int> > > multimatch;
+  // Are there ambiguities in the match?
+  bool isAmbiguities = false;
+  // The particle daughters that have been matched
+  set<int> matches_global;
+
+  // check if the daughters match
+  for (int iDaughter_d = 0; iDaughter_d < getNDaughters(); iDaughter_d++) {
+    set<int> matches;
+    for (int iDaughter_p = 0; iDaughter_p < daughterList.size(); iDaughter_p++) {
+      const T* daughter = daughterList[iDaughter_p];
+      int iPDGCode_daughter_p = 0;
+      if (const Particle* test = dynamic_cast<const Particle*>(daughter)) iPDGCode_daughter_p = test->getPDGCode();
+      else if (const MCParticle* test = dynamic_cast<const MCParticle*>(daughter)) iPDGCode_daughter_p = test->getPDG();
+      if (iDaughter_d == 0 && m_isIgnorePhotons && iPDGCode_daughter_p == 22) matches_global.insert(iDaughter_p);
+      int iMatchResult = m_daughters[iDaughter_d].match(daughter, iDaughter_p);
+      if (iMatchResult < 0) isAmbiguities = true;
+      if (abs(iMatchResult) == 2 && iCC == 1) continue;
+      if (abs(iMatchResult) == 1 && iCC == 2) continue;
+      if (abs(iMatchResult) == 2 && iCC == 3) continue;
+      matches.insert(iDaughter_p);
+      matches_global.insert(iDaughter_p);
+    }
+    if (matches.empty()) return 0;
+    if (matches.size() == 1) {
+      int iDaughter_p = *(matches.begin());
+      singlematch.push_back(make_pair(iDaughter_d, iDaughter_p));
+    } else multimatch.push_back(make_pair(iDaughter_d, matches));
+  }
+
+  // Now, all daughters of the particles should be matched to at least one DecayDescriptor daughter
+  if (!m_isInclusive && matches_global.size() != daughterList.size()) return 0;
+
+  // In case that there are DecayDescriptor daughters with multiple matches, try to solve the problem
+  // by removing the daughter candidates which are already used in other unambigous relations.
+  // This is done iteratively. We limit the maximum number of attempts to 20 to avoid an infinit loop.
+  bool isModified = true;
+  for (int iTry = 0; iTry < 20; iTry++) {
+    if (singlematch.size() == getNDaughters()) break;
+    if (!isModified) break;
+    isModified = false;
+    for (vector< pair< int, set<int> > >::iterator itMulti = multimatch.begin(); itMulti != multimatch.end(); ++itMulti) {
+      for (vector< pair< int, int > >::iterator itSingle = singlematch.begin(); itSingle != singlematch.end(); ++itSingle) {
+        // try to remove particle from the multimatch list
+        if (itMulti->second.erase(itSingle->second)) {
+          // if multimatch list contains only one particle candidate, move the entry to the singlematch list
+          if (itMulti->second.size() == 1) {
+            int iDaughter_d = itMulti->first;
+            int iDaughter_p = *(itMulti->second.begin());
+            singlematch.push_back(make_pair(iDaughter_d, iDaughter_p));
+            multimatch.erase(itMulti);
+            // call match function again to set the correct daughter
+            if (!isAmbiguities) {
+              const T* daughter = daughterList[iDaughter_p];
+              if (!daughter) continue;
+              m_daughters[iDaughter_d].match(daughter, iDaughter_p);
+            }
+            itMulti--;
+            isModified = true;
+            break;
+          }
+        }
+      }
+    }
+  }
+
+  if (!multimatch.empty()) isAmbiguities = true;
+  if (isAmbiguities) return -iCC;
+  else {
+    m_iDaughter_p = iDaughter_p;
+    return iCC;
+  }
+  return 0;
+}
+
+void DecayDescriptor::resetMatch()
+{
+  m_iDaughter_p = -1;
+  int nDaughters = m_daughters.size();
+  for (int iDaughter = 0; iDaughter < nDaughters; iDaughter++) m_daughters[iDaughter].resetMatch();
 }
 
 vector<const Particle*> DecayDescriptor::getSelectionParticles(const Particle* particle)
 {
+  // Create vector for output
   vector<const Particle*> selparticles;
-  if (m_isSelected) selparticles.push_back(particle);
-  int nDaughters = m_daughters.size();
-  for (int iDaughter = 0; iDaughter < nDaughters; ++iDaughter) {
-    const Particle* daughter = particle->getDaughter(iDaughter);
-    if (!daughter) B2WARNING("Could not find daughter!");
-    vector<const Particle*> seldaughters = m_daughters[iDaughter].getSelectionParticles(daughter);
+  if (m_mother.isSelected()) selparticles.push_back(particle);
+  int nDaughters_d = getNDaughters();
+  for (int iDaughter_d = 0; iDaughter_d < nDaughters_d; ++iDaughter_d) {
+    // retrieve the particle daughter ID from this DecayDescriptor daughter
+    int iDaughter_p = m_daughters[iDaughter_d].getMatchedDaughter();
+    // If the particle daughter ID is below one, the match function was not called before
+    // or the match was ambigous. In this case try to use the daughter ID of the DecayDescriptor.
+    // This corresponds to using the particle order in the decay string.
+    if (iDaughter_p < 0) iDaughter_p = iDaughter_d;
+    const Particle* daughter = particle->getDaughter(iDaughter_p);
+    if (!daughter) {
+      B2WARNING("Could not find daughter!");
+      continue;
+    }
+    // check if the daughter has the correct PDG code
+    if (abs(daughter->getPDGCode()) != abs(m_daughters[iDaughter_d].getMother()->getPDGCode())) {
+      B2ERROR("The PDG code of the particle daughter does not match the PDG code of the DecayDescriptor daughter");
+      break;
+    }
+    vector<const Particle*> seldaughters = m_daughters[iDaughter_d].getSelectionParticles(daughter);
     selparticles.insert(selparticles.end(), seldaughters.begin(), seldaughters.end());
   }
   return selparticles;
@@ -158,12 +275,12 @@ vector<const Particle*> DecayDescriptor::getSelectionParticles(const Particle* p
 vector<string> DecayDescriptor::getSelectionNames()
 {
   vector<string> strNames;
-  if (m_isSelected) strNames.push_back(getNameSimple());
+  if (m_mother.isSelected()) strNames.push_back(m_mother.getNameSimple());
   for (vector<DecayDescriptor>::iterator i = m_daughters.begin(); i != m_daughters.end(); ++i) {
     vector<string> strDaughterNames = i->getSelectionNames();
     int nDaughters = strDaughterNames.size();
     for (int iDaughter = 0; iDaughter < nDaughters; iDaughter++) {
-      strDaughterNames[iDaughter] = getNameSimple() + "_" + strDaughterNames[iDaughter];
+      strDaughterNames[iDaughter] = m_mother.getNameSimple() + "_" + strDaughterNames[iDaughter];
     }
     strNames.insert(strNames.end(), strDaughterNames.begin(), strDaughterNames.end());
   }

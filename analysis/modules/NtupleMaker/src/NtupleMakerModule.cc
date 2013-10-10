@@ -115,9 +115,7 @@ void NtupleMakerModule::event()
     iCand->SetVal(i);
     const Particle* b = particlelist->getParticle(i);
     // loop over all NtupleTools and fill the tree
-    for (int iTool = 0; iTool < nTools; ++iTool) {
-      m_tools[iTool].eval(b);
-    }
+    for (int iTool = 0; iTool < nTools; ++iTool) m_tools[iTool].eval(b);
     m_tree->Fill();
   }
 }

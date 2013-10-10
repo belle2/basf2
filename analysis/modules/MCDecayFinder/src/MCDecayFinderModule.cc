@@ -68,7 +68,7 @@ void MCDecayFinderModule::event()
   // Get output particle list
   StoreObjPtr<ParticleList> outputList(m_strListName);
   outputList.create();
-  outputList->setPDG(m_decaydescriptor.getPDGCode());
+  outputList->setPDG(m_decaydescriptor.getMother()->getPDGCode());
   outputList->setParticleCollectionName(m_particleStore);
 
   // retrieve list of MCParticles
@@ -93,7 +93,7 @@ void MCDecayFinderModule::event()
   }
 }
 
-DecayTree<MCParticle>* MCDecayFinderModule::match(const MCParticle* mcp, const DecayDescriptor& d, bool isCC)
+DecayTree<MCParticle>* MCDecayFinderModule::match(const MCParticle* mcp, const DecayDescriptor* d, bool isCC)
 {
   // Suffixes used in this method:
   // P = Information from MCParticle
@@ -103,7 +103,7 @@ DecayTree<MCParticle>* MCDecayFinderModule::match(const MCParticle* mcp, const D
   DecayTree<MCParticle>* decay = new DecayTree<MCParticle>();
 
   // Load PDG codes and compare,
-  int iPDGD = d.getPDGCode();
+  int iPDGD = d->getMother()->getPDGCode();
   int iPDGP = mcp->getPDG();
   if (!isCC && iPDGD != iPDGP) return decay;
   else if (isCC && iPDGD != -iPDGP) return decay;
@@ -111,7 +111,7 @@ DecayTree<MCParticle>* MCDecayFinderModule::match(const MCParticle* mcp, const D
 
   // Get number of daughters in the decay descriptor.
   // If no daughters in decay descriptor, no more checks needed.
-  int nDaughtersD = d.getNDaughters();
+  int nDaughtersD = d->getNDaughters();
   if (nDaughtersD == 0) {
     B2INFO("DecayDescriptor has no Daughters, everything OK!");
     decay->setObj(const_cast<MCParticle*>(mcp));
@@ -129,7 +129,7 @@ DecayTree<MCParticle>* MCDecayFinderModule::match(const MCParticle* mcp, const D
   // 1) if radiated photons are to be ignored, the MCParticle must
   // have at least as many daughters as the decaydescriptor
   // 2) if radiated photons are included the number of daughters has to be equal!
-  bool isIgnorePhotons = d.isIgnorePhotons();
+  bool isIgnorePhotons = d->isIgnorePhotons();
   if (isIgnorePhotons && nDaughtersD > nDaughtersP) {
     B2INFO("DecayDescriptor has more daughters than MCParticle!");
     return decay;
@@ -143,7 +143,7 @@ DecayTree<MCParticle>* MCDecayFinderModule::match(const MCParticle* mcp, const D
     // check if there is an unmatched particle daughter matching this decay descriptor daughter
     bool isMatchDaughter = false;
     for (vector<int>::iterator itDP = daughtersPIndex.begin(); itDP != daughtersPIndex.end(); ++itDP) {
-      DecayTree<MCParticle>* daughter = match(daughtersP[*itDP], d.getDaughter(iDD), isCC);
+      DecayTree<MCParticle>* daughter = match(daughtersP[*itDP], d->getDaughter(iDD), isCC);
       if (!daughter->getObj()) continue;
       // Matching daughter found, remove it from list of unmatched particle daughters
       decay->append(daughter);
@@ -180,7 +180,7 @@ DecayTree<MCParticle>* MCDecayFinderModule::match(const MCParticle* mcp, const D
   }
   // Ok, it seems that everything from the DecayDescriptor could be matched.
   // If the decay is NOT INCLUSIVE,  no unmatched MCParticles should be left
-  bool isInclusive = d.isInclusive();
+  bool isInclusive = d->isInclusive();
   if (!isInclusive) {
     B2INFO("Decay is not inclusive, check for left over MCParticles!\n")
     for (vector<int>::iterator itDP = daughtersPIndex.begin(); itDP != daughtersPIndex.end(); ++itDP) {

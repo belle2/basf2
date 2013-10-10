@@ -140,6 +140,7 @@ int DecayDescriptor::match(const T* p, int iDaughter_p)
   else if (iPDGCode_d == iPDGCodeCC_p) iCC = 2;
 
   const std::vector<T*> daughterList = p->getDaughters();
+  int nDaughters_p = daughterList.size();
 
   // 1st case: the descriptor has no daughters => nothing to check
   if (getNDaughters() == 0) {
@@ -149,7 +150,7 @@ int DecayDescriptor::match(const T* p, int iDaughter_p)
 
   // 2nd case: the descriptor has daughters, but not the particle
   // => that is not allowed!
-  if (daughterList.size() == 0) return 0;
+  if (nDaughters_p == 0) return 0;
 
   // 3rd case: the descriptor and the particle have daughters
   // There are two cases that can happen when matching the
@@ -170,7 +171,7 @@ int DecayDescriptor::match(const T* p, int iDaughter_p)
   // check if the daughters match
   for (int iDaughter_d = 0; iDaughter_d < getNDaughters(); iDaughter_d++) {
     set<int> matches;
-    for (int iDaughter_p = 0; iDaughter_p < daughterList.size(); iDaughter_p++) {
+    for (int iDaughter_p = 0; iDaughter_p < nDaughters_p; iDaughter_p++) {
       const T* daughter = daughterList[iDaughter_p];
       int iPDGCode_daughter_p = 0;
       if (const Particle* test = dynamic_cast<const Particle*>(daughter)) iPDGCode_daughter_p = test->getPDGCode();
@@ -192,14 +193,14 @@ int DecayDescriptor::match(const T* p, int iDaughter_p)
   }
 
   // Now, all daughters of the particles should be matched to at least one DecayDescriptor daughter
-  if (!m_isInclusive && matches_global.size() != daughterList.size()) return 0;
+  if (!m_isInclusive && int(matches_global.size()) != nDaughters_p) return 0;
 
   // In case that there are DecayDescriptor daughters with multiple matches, try to solve the problem
   // by removing the daughter candidates which are already used in other unambigous relations.
   // This is done iteratively. We limit the maximum number of attempts to 20 to avoid an infinit loop.
   bool isModified = true;
   for (int iTry = 0; iTry < 20; iTry++) {
-    if (singlematch.size() == getNDaughters()) break;
+    if (int(singlematch.size()) == getNDaughters()) break;
     if (!isModified) break;
     isModified = false;
     for (vector< pair< int, set<int> > >::iterator itMulti = multimatch.begin(); itMulti != multimatch.end(); ++itMulti) {

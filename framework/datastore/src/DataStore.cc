@@ -13,6 +13,7 @@
 #include <framework/logging/Logger.h>
 #include <framework/dataobjects/RelationContainer.h>
 #include <framework/datastore/RelationIndex.h>
+#include <framework/datastore/RelationsObject.h>
 #include <framework/datastore/StoreAccessorBase.h>
 
 #include <TClonesArray.h>
@@ -202,6 +203,15 @@ bool DataStore::findStoreEntry(const TObject* object, DataStore::StoreEntry*& en
           //quickly find entry if it's at the end of the array
           index = array->GetLast();
         } else {
+          if (arrayClass->InheritsFrom(RelationsObject::Class())) {
+            //update cache for entire array
+            int nEntries = array->GetEntriesFast();
+            for (int i = 0; i < nEntries; i++) {
+              RelationsObject* relobj = static_cast<RelationsObject*>((*array)[i]);
+              relobj->m_cacheArrayIndex = i;
+              relobj->m_cacheDataStoreEntry = mapEntry.second;
+            }
+          }
           index = array->IndexOf(object);
         }
 

@@ -210,14 +210,16 @@ namespace Belle2 {
 
   private:
 
-    //version 0 to disable streaming
-    ClassDef(RelationsInterface, 0); /**< defines interface for accessing relations of objects in StoreArray. */
-
     /** Cache of the data store entry to which this object belongs. */
     mutable DataStore::StoreEntry* m_cacheDataStoreEntry;  //!
 
     /** Cache of the index in the TClonesArray to which this object belongs. */
     mutable int                    m_cacheArrayIndex;      //!
+
+    friend class DataStore;
+
+    //version 0 to disable streaming
+    ClassDef(RelationsInterface, 0); /**< defines interface for accessing relations of objects in StoreArray. */
   };
 
   template <class BASE> RelationsInterface<BASE>& RelationsInterface<BASE>::operator = (const RelationsInterface<BASE>& relationsInterface)

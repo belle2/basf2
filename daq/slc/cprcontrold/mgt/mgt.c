@@ -182,6 +182,7 @@ int mgt_set_param(Mgt_t* mgt, int address, int value) {
   int result = 1;
   result |= mgt_write(mgt, CONTROL, 0x05);
   result |= mgt_write(mgt, address, value);
+  result |= mgt_write(mgt, CONTROL, 0x0a);
   return result;
 }
 
@@ -192,6 +193,7 @@ int mgt_set_param2(Mgt_t* mgt, int address, int value) {
   address += 1;
   value = value >> 8;
   result |= mgt_write(mgt, address, value);
+  result |= mgt_write(mgt, CONTROL, 0x0a);
   return result;
 }
 
@@ -291,6 +293,7 @@ int mgt_boot_fpga(Mgt_t* mgt, const char *file,
   if (verbose || conf != m012) mgt_dump_fpga(conf, "(set M012)");
   if (conf != m012) {
     printf("cannot set FPGA to the download mode (M012=%d).\n", conf);
+    fclose(fp);
     if (! forced) return -1;
   }
   

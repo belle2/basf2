@@ -25,6 +25,8 @@ Mgt_t* mgt_boot(int slot, const char* path, int* board_type,
   }
   printf("Firmware ver.: %d\n", *firmware);
   printf("Hardware ver.: %d\n", *hardware);
+  return mgt;
+  /*
   printf("boot FPGA\n");
   if ( mgt_boot_fpga(mgt, path, 0, 0, M012_SELECTMAP) >= 0 ) {
     printf("boot FPGA: done\n");
@@ -34,5 +36,6 @@ Mgt_t* mgt_boot(int slot, const char* path, int* board_type,
     mgt_close(mgt);
     return 0;
   }
+  */
 }
 

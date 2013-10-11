@@ -38,7 +38,7 @@ bool HSLBController::boot() throw()
 bool HSLBController::reset() throw()
 {
   if (_mgt != NULL) {
-    mgt_execute(_mgt, CTL_RESET_LINK);
+    // mgt_execute(_mgt, CTL_RESET_LINK);
     mgt_close(_mgt);
     _mgt = NULL;
     return true;
@@ -52,13 +52,13 @@ bool HSLBController::load() throw()
   if (_hslb == NULL || !_hslb->isUsed() || _mgt == NULL) return true;
   FEEModule* module = _hslb->getFEEModule();
   if (module != NULL) {
-    mgt_execute(_mgt, CTL_LINK);
+    //mgt_execute(_mgt, CTL_LINK);
     if (mgt_check_FEE(_mgt) != 0) {
       printf("CHECK FEE ERROR\n");
       return false;
     }
     mgt_execute(_mgt, CTL_VERBOSE);
-    mgt_execute(_mgt, CTL_TRG_NORMAL);
+    mgt_execute(_mgt, CTL_TRIGGER);
     FEEModule::RegisterList& reg_v(module->getRegisters());
     for (size_t i = 0; i < reg_v.size(); i++) {
       FEEModule::Register& reg(reg_v[i]);

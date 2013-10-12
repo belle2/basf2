@@ -3,7 +3,11 @@
 #include <util/StringUtil.hh>
 
 #include <belle2nsm.h>
+extern "C" {
+#include <nsmlib2.h>
+}
 
+#include <iostream>
 #include <sstream>
 #include <cstdio>
 #include <cstdlib>
@@ -31,8 +35,18 @@ void* NSMData::allocate(int interval) throw(NSMHandlerException)
   return _pdata;
 }
 
-void NSMData::initProperties() throw()
+void* NSMData::parse(const char* incpath) throw(NSMHandlerException)
 {
+  if (!nsmlib_parse(_format.c_str(), _revision, incpath)) {
+    throw (NSMHandlerException(__FILE__, __LINE__, "Failed to parse header file"));
+  }
+  int size = initProperties();
+  return (_pdata = malloc(size));
+}
+
+int NSMData::initProperties() throw()
+{
+  int size = 0;
   nsm_data_att_t* nsm_data_att_p = nsm_data_att_list;
   while (nsm_data_att_p->length != 0) {
     NSMDataProperty pro;
@@ -52,19 +66,24 @@ void NSMData::initProperties() throw()
     else if (type == "byte8" || type == "uchar") pro.type = BYTE8;
     else if (type == "double") pro.type = DOUBLE;
     else if (type == "float") pro.type = FLOAT;
+    size += (length < 0) ? pro.type % 100 : (pro.type % 100) * length;
     if (length < 0 || pro.type == TEXT) {
       pro.length = length;
       _pro_m.insert(NSMDataPropertyMap::value_type(label, pro));
       _label_v.push_back(label);
+      std::cout << label << " ";
     } else if (length > 0) {
       for (int i = 0; i < length; i++) {
         std::string label_i = B2DAQ::form("%s_%d", label.c_str(), i);
         _pro_m.insert(NSMDataPropertyMap::value_type(label_i, pro));
         _label_v.push_back(label_i);
         pro.offset += pro.type % 100;
+        std::cout << label_i << " ";
       }
     }
   }
+  std::cout << std::endl;
+  return size;
 }
 
 void* NSMData::get() throw(NSMHandlerException)
@@ -152,7 +171,7 @@ const std::string NSMData::toSQLValues()
   return ss.str();
 }
 
-void NSMData::setSLQValues(std::vector<std::string>& name_v,
+void NSMData::setSQLValues(std::vector<std::string>& name_v,
                            std::vector<std::string>& value_v)
 {
   char* data = (char*)get();

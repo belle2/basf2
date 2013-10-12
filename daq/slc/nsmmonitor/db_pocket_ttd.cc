@@ -1,0 +1,50 @@
+#include <nsm/NSMNodeDaemon.hh>
+#include <nsm/NSMData.hh>
+#include <nsm/NSMCommunicator.hh>
+
+#include <nsm/pocket_ttd.h>
+
+#include <db/MySQLInterface.hh>
+
+#include <util/StringUtil.hh>
+
+#include <iostream>
+#include <unistd.h>
+#include <cstdlib>
+
+using namespace B2DAQ;
+
+int main(int argc, char** argv)
+{
+  if (argc < 1) {
+    std::cout << "Usage : ./dbmond "
+              << "[<dataname:formatname:rev>...]" << std::endl;
+    return 1;
+  }
+  const std::string db_host = getenv("B2SC_DB_HOST");
+  const std::string db_name = getenv("B2SC_DB_NAME");
+  const std::string db_user = getenv("B2SC_DB_USER");
+  const std::string db_password = getenv("B2SC_DB_PASS");
+  const int db_port = atoi(getenv("B2SC_DB_PORT"));
+  MySQLInterface* db = new MySQLInterface();
+  db->init();
+  db->connect(db_host, db_name, db_user, db_password, db_port);
+
+  std::vector<NSMData*> data_v;
+  NSMData* data = new NSMData(argv[1], "pocket_ttd", atoi(argv[2]));
+  pocket_ttd* status = (pocket_ttd*)data->parse();
+  try {
+    std::cout << B2DAQ::form("select * from %s_rev%d;",
+                             data->getName().c_str(), data->getRevision()) << std::endl;
+    db->execute(B2DAQ::form("select * from %s_rev%d;",
+                            data->getName().c_str(), data->getRevision()));
+    DBRecordList& ret(db->loadRecords());
+    for (size_t i = 0; i < ret.size(); i++) {
+      data->setSQLValues(ret[i].getFieldNames(), ret[i].getFieldValues());
+      std::cout << data->getName() << " : "
+                << status->staa[0] << " " << status->evt_number << std::endl;
+    }
+  } catch (const DBHandlerException& e) {}
+
+  return 0;
+}

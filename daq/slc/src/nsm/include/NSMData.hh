@@ -40,6 +40,7 @@ namespace B2DAQ {
     bool isAvailable() throw() { return (_pdata != NULL); }
     void* open() throw(NSMHandlerException);
     void* allocate(int interval = 3) throw(NSMHandlerException);
+    void* parse(const char* inc_dir=NULL) throw(NSMHandlerException);
     void* get() throw(NSMHandlerException);
     const void* get() const throw(NSMHandlerException);
     NSMDataPropertyMap& getProperties() { return _pro_m; }
@@ -48,11 +49,11 @@ namespace B2DAQ {
     const std::string toSQLConfig();
     const std::string toSQLNames();
     const std::string toSQLValues();
-    void setSLQValues(std::vector<std::string>& name_v,
+    void setSQLValues(std::vector<std::string>& name_v,
 		      std::vector<std::string>& value_v);
 
   private:
-    void initProperties() throw();
+    int initProperties() throw();
 
   private:
     void* _pdata;

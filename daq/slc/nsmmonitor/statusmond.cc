@@ -1,5 +1,3 @@
-#include "TemplateCallback.hh"
-
 #include <nsm/NSMNodeDaemon.hh>
 #include <nsm/NSMData.hh>
 #include <nsm/NSMCommunicator.hh>
@@ -36,7 +34,7 @@ int main(int argc, char** argv)
   comm->init();
   std::vector<NSMData*> data_v;
   data_v.push_back(new NSMData("RUN_STATUS", "run_status", 1));
-  data_v.push_back(new NSMData("TTD_STATUS", "pocket_ttd", 4));
+  data_v.push_back(new NSMData("TTD_STATUS", "pocket_ttd", 5));
   for (size_t i = 0; i < data_v.size(); i++) {
     NSMData* data = data_v[i];
     data->open();

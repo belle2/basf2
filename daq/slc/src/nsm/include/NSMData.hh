@@ -44,6 +44,7 @@ namespace B2DAQ {
     const void* get() const throw(NSMHandlerException);
     NSMDataPropertyMap& getProperties() { return _pro_m; }
     NSMDataProperty& getProperty(const std::string& label) { return _pro_m[label]; }
+
     const std::string toSQLConfig();
     const std::string toSQLNames();
     const std::string toSQLValues();

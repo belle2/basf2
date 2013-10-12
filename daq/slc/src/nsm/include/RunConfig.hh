@@ -44,10 +44,8 @@ namespace B2DAQ {
     void setTriggerMode(int mode) throw() { _trigger_mode = mode; }
     void setDummyRate(int rate) throw() { _dummy_rate = rate; }
     void setTriggerLimit(int limit) throw() { _trigger_limit = limit; }
-
-  public:
-    virtual void read(NSMNode*) throw(NSMHandlerException);
-    virtual void write(NSMNode*) throw(NSMHandlerException);
+    void read() throw(NSMHandlerException);
+    void write() throw(NSMHandlerException);
 
   private:
     unsigned int _nused;

@@ -1,5 +1,3 @@
-#include "TemplateCallback.hh"
-
 #include <nsm/NSMNodeDaemon.hh>
 #include <nsm/NSMData.hh>
 #include <nsm/NSMCommunicator.hh>

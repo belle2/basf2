@@ -20,8 +20,8 @@ namespace B2DAQ {
     virtual ~RunStatus() throw() {}
 
   public:
-    virtual void read(NSMNode*) throw(NSMHandlerException);
-    virtual void write(NSMNode*) throw(NSMHandlerException);
+    void read() throw(NSMHandlerException);
+    void write() throw(NSMHandlerException);
 
   public:
     unsigned long long getSerial() const throw() { return _serial; }

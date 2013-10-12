@@ -49,7 +49,7 @@ bool NSMDataManager::writeRunStatus() throw()
 {
   if (_status == NULL) return false;
   try {
-    _status->write(NULL);
+    _status->write();
   } catch (const NSMHandlerException& e) {}
   return false;
 }
@@ -72,7 +72,7 @@ bool NSMDataManager::writeRunConfig() throw()
 {
   if (_config == NULL) return false;
   try {
-    _config->write(NULL);
+    _config->write();
   } catch (const NSMHandlerException& e) {}
   return false;
 }
@@ -86,7 +86,7 @@ void NSMDataManager::readNodeStatus() throw()
     if (data != NULL) {
       try {
         if (!data->isAvailable()) data->open();
-        data->read(node);
+        /*  */
       } catch (const NSMHandlerException& e) {
         B2DAQ::debug("Failed to read NSM data in %s", node->getName().c_str());
       }

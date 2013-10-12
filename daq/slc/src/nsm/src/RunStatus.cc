@@ -21,7 +21,7 @@ RunStatus::RunStatus(const std::string& data_name) throw()
   _event_total = 0;
 }
 
-void RunStatus::read(NSMNode*) throw(NSMHandlerException)
+void RunStatus::read() throw(NSMHandlerException)
 {
   const run_status* status = (const run_status*)get();
   _exp_no = status->exp_no;
@@ -32,7 +32,7 @@ void RunStatus::read(NSMNode*) throw(NSMHandlerException)
   _event_total = status->event_total;
 }
 
-void RunStatus::write(NSMNode*) throw(NSMHandlerException)
+void RunStatus::write() throw(NSMHandlerException)
 {
   run_status* status = (run_status*)get();
   status->exp_no = _exp_no;

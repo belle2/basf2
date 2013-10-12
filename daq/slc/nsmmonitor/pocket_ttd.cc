@@ -1,5 +1,3 @@
-#include "TemplateCallback.hh"
-
 #include <nsm/NSMNodeDaemon.hh>
 #include <nsm/NSMData.hh>
 #include <nsm/NSMCommunicator.hh>
@@ -27,7 +25,7 @@ int main(int argc, char** argv)
   NSMNode* node = new NSMNode(name);
   NSMCommunicator* comm = new NSMCommunicator(node);
   comm->init();
-  NSMData* data = new NSMData("TTD_STATUS", "pocket_ttd", 4);
+  NSMData* data = new NSMData("TTD_STATUS", "pocket_ttd", 5);
   data->allocate();
   std::cout << data->toSQLConfig() << std::endl;
   std::cout << data->toSQLValues() << std::endl;

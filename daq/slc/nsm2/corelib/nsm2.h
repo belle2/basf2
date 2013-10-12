@@ -24,6 +24,7 @@
 #ifndef __nsm2_typedef__
 #define __nsm2_typedef__
 typedef unsigned char      byte8;
+typedef unsigned char      uchar;
 typedef unsigned short     uint16;
 typedef unsigned int       uint32;
 typedef unsigned long long uint64;

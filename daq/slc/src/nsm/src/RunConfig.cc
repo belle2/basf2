@@ -19,7 +19,7 @@ RunConfig::RunConfig(const std::string& data_name) throw()
   _version = -1;
 }
 
-void RunConfig::read(NSMNode*) throw(NSMHandlerException)
+void RunConfig::read() throw(NSMHandlerException)
 {
   const run_config* config = (const run_config*)get();
   _nused = config->nused;
@@ -31,7 +31,7 @@ void RunConfig::read(NSMNode*) throw(NSMHandlerException)
   _trigger_limit = config->trigger_limit;
 }
 
-void RunConfig::write(NSMNode*) throw(NSMHandlerException)
+void RunConfig::write() throw(NSMHandlerException)
 {
   run_config* config = (run_config*)get();
   config->nused = _nused;

@@ -180,6 +180,7 @@ NSMcontext* nsmlib_init(const char*, const char*, int port, int shmkey);
 void nsmlib_usesig(NSMcontext*, int usesig);
 NSMcontext* nsmlib_selectc(int usesig, unsigned int msec);
 void nsmlib_call(NSMcontext* nsmc, NSMtcphead* hp);
+char* nsmlib_parse(const char* datname, int revision, const char* incpath);
 
 /* -- (emacs outline mode setup) ------------------------------------- */
 /*

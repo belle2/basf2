@@ -4,7 +4,6 @@
 
 #include <db/MySQLInterface.hh>
 
-#include <util/Debugger.hh>
 #include <util/StringUtil.hh>
 
 #include <iostream>
@@ -16,10 +15,15 @@ using namespace B2DAQ;
 int main(int argc, char** argv)
 {
   if (argc < 2) {
-    B2DAQ::debug("Usage : ./recvd <name>");
+    std::cout << "Usage : ./nsmmond <name> "
+              << "[<dataname:formatname:rev>...]" << std::endl;
     return 1;
   }
   const char* name = argv[1];
+  NSMNode* node = new NSMNode(name);
+  NSMCommunicator* comm = new NSMCommunicator(node);
+  comm->init();
+
   const std::string db_host = getenv("B2SC_DB_HOST");
   const std::string db_name = getenv("B2SC_DB_NAME");
   const std::string db_user = getenv("B2SC_DB_USER");
@@ -29,12 +33,11 @@ int main(int argc, char** argv)
   db->init();
   db->connect(db_host, db_name, db_user, db_password, db_port);
 
-  NSMNode* node = new NSMNode(name);
-  NSMCommunicator* comm = new NSMCommunicator(node);
-  comm->init();
   std::vector<NSMData*> data_v;
-  data_v.push_back(new NSMData("RUN_STATUS", "run_status", 1));
-  data_v.push_back(new NSMData("TTD_STATUS", "pocket_ttd", 5));
+  for (int i = 2; i < argc; i++) {
+    std::vector<std::string> str_v = B2DAQ::split(argv[i], ':');
+    data_v.push_back(new NSMData(str_v[0], str_v[1], atoi(str_v[2].c_str())));
+  }
   for (size_t i = 0; i < data_v.size(); i++) {
     NSMData* data = data_v[i];
     data->open();
@@ -51,7 +54,8 @@ int main(int argc, char** argv)
       db->execute(B2DAQ::form("insert into %s_rev%d values (%s);",
                               data->getName().c_str(), data->getRevision(),
                               data->toSQLValues().c_str()));
-      std::cout << data->toSQLValues() << std::endl;
+      std::cout << data->getName() << " : "
+                << data->toSQLValues() << std::endl;
     }
     sleep(5);
   }

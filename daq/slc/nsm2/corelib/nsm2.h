@@ -126,7 +126,14 @@ typedef int (*NSMfunce_t)(int req, int seq, const char *msg, const char *from,
 
 /* -- FUNCTIONS ------------------------------------------------------ */
 
+typedef struct nsm_data_att {
+  char type[32];
+  char label[32];
+  int length;
+  int offset;
+} nsm_data_att_t;
 
+extern nsm_data_att_t nsm_data_att_list[256];
 
 #endif /* __nsm2_h__ */
 

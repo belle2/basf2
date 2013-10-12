@@ -25,6 +25,7 @@ namespace B2DAQ {
     unsigned short getNodeId() const throw();
     unsigned short getNParams() const throw();
     unsigned int getParam(int i) const throw();
+    unsigned int* getParams() throw();
     const unsigned int* getParams() const throw();
     unsigned int getLength() const throw();
     const std::string& getData() const throw();

@@ -65,10 +65,12 @@ unsigned int NSMMessage::getParam(int i) const throw()
 
 const unsigned int* NSMMessage::getParams() const throw()
 {
-  if (_nsm_msg.npar > 0)
-    return _nsm_msg.pars;
-  else
-    return NULL;
+  return _nsm_msg.pars;
+}
+
+unsigned int* NSMMessage::getParams() throw()
+{
+  return _nsm_msg.pars;
 }
 
 unsigned int NSMMessage::getLength() const throw()

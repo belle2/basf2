@@ -97,6 +97,7 @@ boot_fpga(TTXX_T *ttxx, int reg_prgm, char *file, int verbose, int forced)
   if (verbose) putchar('\n');
   if (ch == EOF) {
     printf("immature EOF for %s\n", file);
+    fclose(fp);
     return -1;
   }
 

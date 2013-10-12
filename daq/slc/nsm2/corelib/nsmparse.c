@@ -7,6 +7,8 @@
 #include <sys/fcntl.h>
 #include <unistd.h>
 
+#include "nsm2.h"
+
 static int  nsmparse_errcode;
 static char nsmparse_errstr[256];
 
@@ -18,6 +20,8 @@ static char nsmparse_errstr[256];
 #define  NSMEPARSEREV    (-13)
 #define  NSMEPARSENOSTR  (-14)
 #define  NSMEPARSEITEM   (-15)
+
+nsm_data_att_t nsm_data_att_list[256];
 
 /* -- readfile -------------------------------------------------------- */
 static char *
@@ -242,12 +246,17 @@ nsmparse_scan(const char *file, char *filebuf, char *start)
   int fmtlen = 63;
 
   *fmtstr = 0;
-  
+
+  int offset = 0;
+  memset(nsm_data_att_list, 0, sizeof(nsm_data_att_list));
+  nsm_data_att_t* nsm_data_att_p = nsm_data_att_list;
   while (1) {
     if (*ptr == '}') break;
     for (typep = types; typep->name; typep++) {
       int len = strlen(typep->name);
       if (strncmp(ptr, typep->name, len) == 0 && isspace(ptr[len])) {
+	strcpy(nsm_data_att_p->type, typep->name);
+	nsm_data_att_p->offset = offset;
 	ptr += len+1;
 	break;
       }
@@ -260,7 +269,12 @@ nsmparse_scan(const char *file, char *filebuf, char *start)
       nsmparse_error("valid name not found", file, filebuf, ptr);
       return 0;
     }
-    while (isalnum(*ptr) || *ptr == '_') ptr++;
+    char buf[32];
+    while (isalnum(*ptr) || *ptr == '_') {
+      sprintf(buf, "%c", *ptr);
+      strcat(nsm_data_att_p->label, buf);
+      ptr++;
+    }
     if (isspace(*ptr)) ptr++;
     if (*ptr == ';') {
       /* printf("%s %d\n", typep->name, typep->siz); */
@@ -277,6 +291,8 @@ nsmparse_scan(const char *file, char *filebuf, char *start)
       }
       sym_prev = typep->sym;
       n_same++;
+      nsm_data_att_p->length = -1;
+      offset += typep->siz;
     } else if (*ptr == '[') { /* multi-dim array not supported yet */
       int num;
       char *q;
@@ -286,6 +302,8 @@ nsmparse_scan(const char *file, char *filebuf, char *start)
 	return 0;
       }
       num = strtoul(ptr, &q, 0);
+      nsm_data_att_p->length = num;
+      offset += typep->siz * num;
       if (isspace(*q)) q++;
       if (*q != ']') {
 	nsmparse_error("invalid array size", file, filebuf, ptr);
@@ -315,6 +333,7 @@ nsmparse_scan(const char *file, char *filebuf, char *start)
       nsmparse_error("semicolon not found", file, filebuf, ptr);
       return 0;
     }
+    nsm_data_att_p++;
   }
 
   if (n_same) {

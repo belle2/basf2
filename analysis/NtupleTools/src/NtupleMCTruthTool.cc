@@ -31,7 +31,7 @@ void NtupleMCTruthTool::eval(const Particle* particle)
     return;
   }
 
-  StoreArray<MCParticle> mcParticles();
+  StoreArray<MCParticle> mcParticles;
 
   vector<const Particle*> selparticles = m_decaydescriptor.getSelectionParticles(particle);
   int nDecayProducts = selparticles.size();

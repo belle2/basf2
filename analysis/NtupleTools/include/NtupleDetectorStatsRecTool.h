@@ -45,8 +45,8 @@ namespace Belle2 {
     int m_iEKLMHit2ds;
     /** N EKLMK0Ls */
     int m_iEKLMK0Ls;
-    /** N EKLMStepHits */
-    int m_iEKLMStepHits;
+    // /** N EKLMStepHits */
+    // int m_iEKLMStepHits;
     /** N GFTracks */
     int m_iGFTracks;
     /** N PIDLikelihoods */

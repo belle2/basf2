@@ -101,9 +101,11 @@ namespace Belle2 {
     const DecayDescriptor* getDaughter(int i) const {
       return (i < getNDaughters()) ? &(m_daughters[i]) : NULL;
     }
+    /** Check if additional photons shall be ignored. */
     bool isIgnorePhotons() const {
       return m_isIgnorePhotons;
     }
+    /** Check if intermediate resonances/particles shall be ignored. */
     bool isIgnoreIntermediate() const {
       return m_isIgnoreIntermediate;
     }

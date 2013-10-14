@@ -16,6 +16,8 @@
 
 namespace Belle2 {
 
+  /** This Objects represents a particles in the DecayDescriptor.
+  It is used for mother and daughter particles. */
   class DecayDescriptorParticle {
   private:
     /** evt.pdl name of the particle. */

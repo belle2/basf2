@@ -17,8 +17,8 @@ using namespace B2DAQ;
 int main(int argc, char** argv)
 {
   if (argc < 1) {
-    std::cout << "Usage : ./dbmond "
-              << "[<dataname:formatname:rev>...]" << std::endl;
+    std::cout << "Usage : ./db_pocket_ttd <dataname> <revision>"
+              << std::endl;
     return 1;
   }
   const std::string db_host = getenv("B2SC_DB_HOST");
@@ -34,8 +34,6 @@ int main(int argc, char** argv)
   NSMData* data = new NSMData(argv[1], "pocket_ttd", atoi(argv[2]));
   pocket_ttd* status = (pocket_ttd*)data->parse();
   try {
-    std::cout << B2DAQ::form("select * from %s_rev%d;",
-                             data->getName().c_str(), data->getRevision()) << std::endl;
     db->execute(B2DAQ::form("select * from %s_rev%d;",
                             data->getName().c_str(), data->getRevision()));
     DBRecordList& ret(db->loadRecords());

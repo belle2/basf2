@@ -36,15 +36,18 @@ InteractiveModule::~InteractiveModule()
 
 void InteractiveModule::initialize()
 {
+}
+void InteractiveModule::event()
+{
+  //In case of exceptions in the embed() call, the imports may get lost (why?)
+  //reimporting them ensures we can call embed() again in the next event
   if (PyRun_SimpleString("import interactive") == -1) {
     B2FATAL("'import interactive' failed.");
   }
   if (PyRun_SimpleString("from ROOT import Belle2") == -1) {
     B2FATAL("'from ROOT import Belle2' failed.");
   }
-}
-void InteractiveModule::event()
-{
+
   B2INFO("Opening (I)Python shell, press Ctrl+D to close it. Press Ctrl+C first to exit basf2.");
   if (PyRun_SimpleString("interactive.embed()") == -1) {
     B2ERROR("embed() failed!");

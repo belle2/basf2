@@ -30,7 +30,9 @@
 #include "GFTrackCand.h"
 
 #include <time.h>
+#ifdef HAS_CALLGRIND
 #include <valgrind/callgrind.h>
+#endif
 
 using namespace std;
 using namespace Belle2;
@@ -89,7 +91,9 @@ void CDCLocalTrackingTestModule::initialize()
   const CDCWireHit& lowest = CDCWireHit::getLowest();
   B2DEBUG(100, lowest);
 
+#ifdef HAS_CALLGRIND
   CALLGRIND_START_INSTRUMENTATION;
+#endif
   test_generalized_circle();
 
   batch_line2d();
@@ -124,8 +128,9 @@ void CDCLocalTrackingTestModule::initialize()
 
   test_mock_root();
   test_sizeof();
+#ifdef HAS_CALLGRIND
   CALLGRIND_STOP_INSTRUMENTATION;
-
+#endif
 }
 
 void CDCLocalTrackingTestModule::beginRun()
@@ -144,7 +149,9 @@ void CDCLocalTrackingTestModule::endRun()
 
 void CDCLocalTrackingTestModule::terminate()
 {
+#ifdef HAS_CALLGRIND
   CALLGRIND_DUMP_STATS;
+#endif
 }
 
 void CDCLocalTrackingTestModule::test_modulo() const

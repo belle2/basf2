@@ -53,7 +53,9 @@
 //#include <tracking/cdcLocalTracking/testcode/MockTest.h>
 //#include <tracking/cdcLocalTracking/testcode/TemplateTest.h>
 
+#ifdef HAS_CALLGRIND
 #include <valgrind/callgrind.h>
+#endif
 #include <time.h>
 
 using namespace std;
@@ -124,7 +126,9 @@ void CDCLocalTrackingModule::beginRun()
 void CDCLocalTrackingModule::event()
 {
   B2DEBUG(100, "########## CDCLocalTracking begin ##########");
+#ifdef HAS_CALLGRIND
   CALLGRIND_START_INSTRUMENTATION;
+#endif
   //Start callgrind recording
   //To profile start basf2 with
   //  nohup valgrind --tool=callgrind --instr-atstart=no basf2 [basf2-options] > output.txt &
@@ -192,7 +196,9 @@ void CDCLocalTrackingModule::event()
 
 
   //End callgrind recording
+#ifdef HAS_CALLGRIND
   CALLGRIND_STOP_INSTRUMENTATION;
+#endif
 
   B2DEBUG(100, "########## CDCLocalTracking end ############");
 
@@ -204,6 +210,8 @@ void CDCLocalTrackingModule::endRun()
 
 void CDCLocalTrackingModule::terminate()
 {
+#ifdef HAS_CALLGRIND
   CALLGRIND_DUMP_STATS;
+#endif
 }
 

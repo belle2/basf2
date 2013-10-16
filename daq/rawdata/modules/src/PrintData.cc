@@ -42,6 +42,45 @@ PrintDataModule::PrintDataModule() : Module()
   m_compressionLevel = 0;
 
   B2INFO("PrintData: Constructor done.");
+
+
+  m_nftsw = 0;
+
+  m_ncdc = 0;
+
+  m_fina_nwords = 0;
+
+  m_finb_nwords = 0;
+
+  m_finc_nwords = 0;
+
+  m_find_nwords = 0;
+
+  m_upper16_ftsw_utime = 0;
+
+  m_upper16_cdc_utime = 0;
+
+  m_prev_ftsw_time16 = 0;
+
+  m_prev_cdc_time16 = 0;
+
+  m_start_ftsw_time = 0.;
+
+  m_start_cdc_time = 0.;
+
+  m_last_utime_ftsw = 0.;
+
+  m_last_utime_cdc = 0.;
+
+  m_prev_ftsw_eve16 = -1;
+
+  m_prev_cdc_eve16 = -1;
+
+  m_cnt_ftsw_evejump = 0;
+
+  m_cnt_cdc_evejump = 0;
+
+
 }
 
 
@@ -91,7 +130,6 @@ void PrintDataModule::PrintEvent(RawDataBlock* raw_datablock, int i)
 
   int tot_size_byte = raw_datablock->TotalBufNwords() * sizeof(int);
 
-
   int* buf;
   int size_byte = 0;
   buf = raw_datablock->GetBuffer(i);
@@ -99,29 +137,68 @@ void PrintDataModule::PrintEvent(RawDataBlock* raw_datablock, int i)
   if (!raw_datablock->CheckFTSWID(i)) {
     RawHeader rawhdr;
     rawhdr.SetBuffer(raw_datablock->GetBuffer(i));
-    printf("== (size %d) : %d (size %d) : This is a non-FTSW(COPPER)block\nexp %d run %d eve %d copperNode %d type %d\n",
-           tot_size_byte, i, size_byte,
-           rawhdr.GetExpNo(),
-           rawhdr.GetRunNo(),
-           rawhdr.GetEveNo(),
-           rawhdr.GetSubsysId(),
-           rawhdr.GetDataType());
+//     printf("== (size %d) : %d (size %d) : This is a non-FTSW(COPPER)block\nexp %d run %d eve %d copperNode %d type %d\n",
+//            tot_size_byte, i, size_byte,
+//            rawhdr.GetExpNo(),
+//            rawhdr.GetRunNo(),
+//            rawhdr.GetEveNo(),
+//            rawhdr.GetSubsysId(),
+//            rawhdr.GetDataType());
 
   } else {
 
-    printf("== (size %d) : %d (size %d) : This is a FTSW block\n",
-           tot_size_byte, i, size_byte);
+//     printf("== (size %d) : %d (size %d) : This is a FTSW block\n",
+//            tot_size_byte, i, size_byte);
 
-    printf("*******BODY**********\n");
-    printf("\n%.8d : ", 0);
-    for (int j = 0; j < size_byte / sizeof(int); j++) {
-      printf("0x%.8x ", (raw_datablock->GetBuffer(i))[ j ]);
-      if ((j + 1) % 10 == 0) {
-        printf("\n%.8d : ", j + 1);
+//#ifdef DEBUG
+    if (true) {
+//    if( m_cnt_cdc_evejump > 0 || m_cnt_ftsw_evejump > 0 ){
+
+      printf("*******BODY**********\n");
+      printf("\n%.8d : ", 0);
+      for (int j = 0; j < size_byte / sizeof(int); j++) {
+        printf("0x%.8x ", (raw_datablock->GetBuffer(i))[ j ]);
+        if ((j + 1) % 10 == 0) {
+          printf("\n%.8d : ", j + 1);
+        }
+      }
+      printf("\n");
+      printf("\n");
+    }
+
+//     printf("i %d eve %d 16bit %d \n",i,
+//     (raw_datablock->GetBuffer( i ))[ 7 ] & 0xFFFF,
+//     ( ( raw_datablock->GetBuffer( i ) )[ 7 ] >> 16 ) & 0xFFFF );
+
+//#endif
+    int cur_eve16 = (raw_datablock->GetBuffer(i))[ 7 ] & 0xFFFF;
+    if (m_prev_ftsw_eve16 != -1) {
+      if ((cur_eve16 != m_prev_ftsw_eve16 + 1)
+          && !(cur_eve16 == 0 && m_prev_ftsw_eve16 == 0xffff)) {
+
+
+        printf("diff ftsw 0x%x 0x%x\n", cur_eve16, m_prev_ftsw_eve16);
+        m_cnt_ftsw_evejump++;
       }
     }
-    printf("\n");
-    printf("\n");
+    m_prev_ftsw_eve16 = cur_eve16;
+
+    double cur_time16 = (((raw_datablock->GetBuffer(i))[ 7 ] >> 16) & 0xFFFF)
+                        + (((raw_datablock->GetBuffer(i))[ 6 ] >> 4) & 0x7FFFFFF) / 1.27e8;
+    if (m_nftsw == 0) {
+      m_start_ftsw_time = (double)cur_time16;
+    } else {
+      if (cur_time16 < m_prev_ftsw_time16) {
+        m_upper16_ftsw_utime++;
+      }
+    }
+    m_prev_ftsw_time16 = cur_time16;
+
+
+
+    m_last_utime_ftsw = (double)(cur_time16 + (m_upper16_ftsw_utime << 16));
+
+    m_nftsw++;
 
   }
 
@@ -129,59 +206,67 @@ void PrintDataModule::PrintEvent(RawDataBlock* raw_datablock, int i)
 
 
 
-void PrintDataModule::PrintCOPPEREvent(RawCOPPER* raw_copper)
+void PrintDataModule::PrintCOPPEREvent(RawCOPPER* raw_copper, int i)
 {
 
 
   int tot_size_byte = raw_copper->TotalBufNwords() * sizeof(int);
-  for (int i = 0; i < raw_copper->GetNumEntries(); i++) {
+  //  for (int i = 0; i < raw_copper->GetNumEntries(); i++) {
 
-    RawHeader rawhdr;
-    int* buf;
-    int size_byte = 0;
-    buf = raw_copper->GetBuffer(i);
+  RawHeader rawhdr;
+  int* buf;
+  int size_byte = 0;
+  buf = raw_copper->GetBuffer(i);
+  rawhdr.SetBuffer(raw_copper->GetRawHdrBufPtr(i));
+  size_byte = raw_copper->GetBlockNwords(i) * sizeof(int);
 
-    rawhdr.SetBuffer(raw_copper->GetRawHdrBufPtr(i));
-
-    size_byte = raw_copper->GetBlockNwords(i) * sizeof(int);
-
-    //
-    // Extract FEE buffer
-    //
-    int* finnesse_buf_1st;
-    int* finnesse_buf_2nd;
-    int* finnesse_buf_3rd;
-    int* finnesse_buf_4th;
-
-    int* detector_buf_1st;
-    int* detector_buf_2nd;
-    int* detector_buf_3rd;
-    int* detector_buf_4th;
-
-
-    printf("(size %d) : %d (size %d)\nexp %d run %d eve %d copperNode %d type %d\n",
-           tot_size_byte, i, size_byte,
-           rawhdr.GetExpNo(),
-           rawhdr.GetRunNo(),
-           rawhdr.GetEveNo(),
-           rawhdr.GetSubsysId(),
-           rawhdr.GetDataType());
+  //
+  // Check incrementation of 16bit events
+  //
+  int cur_eve16 = raw_copper->GetFTSW16bitEventNumber(i);
+  if (m_prev_cdc_eve16 != -1) {
+    if ((cur_eve16 != m_prev_cdc_eve16 + 1)
+        && !(cur_eve16 == 0 && m_prev_cdc_eve16 == 0xffff)) {
+      if (cur_eve16 == m_prev_cdc_eve16) {
+        printf("diff same cdc 0x%x 0x%x\n", cur_eve16, m_prev_cdc_eve16);
+      } else {
+        printf("diff cdc 0x%x 0x%x\n", cur_eve16, m_prev_cdc_eve16);
+      }
+      m_cnt_cdc_evejump++;
+    }
+  }
+  m_prev_cdc_eve16 = cur_eve16;
 
 
-    finnesse_buf_1st = raw_copper->Get1stFINNESSEBuffer(i);
-    finnesse_buf_2nd = raw_copper->Get2ndFINNESSEBuffer(i);
-    finnesse_buf_3rd = raw_copper->Get3rdFINNESSEBuffer(i);
-    finnesse_buf_4th = raw_copper->Get4thFINNESSEBuffer(i);
-    printf("FINNNESSE buf %p %p %p %p\n", finnesse_buf_1st, finnesse_buf_2nd, finnesse_buf_3rd, finnesse_buf_4th);
+  //
+  // Obtain time
+  //
+  int cur_time16 = ((int)(raw_copper->GetEventUnixTime(i)) & 0xFFFF);
+  if (m_ncdc == 0) {
+    m_start_cdc_time = (double)cur_time16;
+  } else {
+    if (cur_time16 < m_prev_cdc_time16) {
+      m_upper16_cdc_utime++;
+    }
+  }
+  m_prev_cdc_time16 = cur_time16;
+  m_last_utime_cdc = (double)(cur_time16 + (m_upper16_cdc_utime << 16));
 
-    detector_buf_1st = raw_copper->Get1stDetectorBuffer(i);
-    detector_buf_2nd = raw_copper->Get2ndDetectorBuffer(i);
-    detector_buf_3rd = raw_copper->Get3rdDetectorBuffer(i);
-    detector_buf_4th = raw_copper->Get4thDetectorBuffer(i);
-    printf("Detector  buf %p %p %p %p\n", detector_buf_1st, detector_buf_2nd, detector_buf_3rd, detector_buf_4th);
 
+  //
+  // Obtain data size for each FINNESSE
+  //
+  m_fina_nwords += raw_copper->Get1stFINNESSENwords(i);
+  m_finb_nwords += raw_copper->Get2ndFINNESSENwords(i);
+  m_finc_nwords += raw_copper->Get3rdFINNESSENwords(i);
+  m_find_nwords += raw_copper->Get4thFINNESSENwords(i);
+  m_ncdc++;
 
-    //#ifdef DEBUG
+  //    printf("cpreve %d\n", raw_copper->GetFTSW16bitEventNumber( i ) );
+  //#ifdef DEBUG
+  if (true) {
+    //    if( m_cnt_cdc_evejump > 0 || m_cnt_ftsw_evejump > 0 ){
+
     printf("*******BODY**********\n");
     printf("\n%.8d : ", 0);
     for (int j = 0; j < raw_copper->GetBlockNwords(i); j++) {
@@ -192,10 +277,9 @@ void PrintDataModule::PrintCOPPEREvent(RawCOPPER* raw_copper)
     }
     printf("\n");
     printf("\n");
-    //#endif
-
-
   }
+  //#endif
+  //  }
 }
 
 
@@ -214,53 +298,75 @@ void PrintDataModule::event()
 
 
   for (int j = 0; j < raw_ftswarray.getEntries(); j++) {
-    exit(1);
-    printf("=== RawFTSW event====\nBlock # %d\n", j);
+    //    printf("=== RawFTSW event====\nBlock # %d\n", j);
     for (int i = 0; i < raw_ftswarray[ j ]->GetNumEntries(); i++) {
       //  PrintEvent( &rawcprarray );
       PrintEvent(raw_ftswarray[ j ], i);
+      if (j < rawcprarray.getEntries() && i < rawcprarray[ j ]->GetNumEntries()) {
+        PrintCOPPEREvent(rawcprarray[ j ], i);
+      }
+      if (j < raw_cdcarray.getEntries() && i < raw_cdcarray[ j ]->GetNumEntries()) {
+        PrintCOPPEREvent(raw_cdcarray[ j ], i);
+      }
+      if (j < raw_svdarray.getEntries() && i < raw_svdarray[ j ]->GetNumEntries()) {
+        PrintCOPPEREvent(raw_svdarray[ j ], i);
+      }
+      if (j < raw_bpidarray.getEntries() && i < raw_bpidarray[ j ]->GetNumEntries()) {
+        PrintCOPPEREvent(raw_bpidarray[ j ], i);
+      }
+      if (j < raw_epidarray.getEntries() && i < raw_epidarray[ j ]->GetNumEntries()) {
+        PrintCOPPEREvent(raw_epidarray[ j ], i);
+      }
+      if (j < raw_klmarray.getEntries() && i < raw_klmarray[ j ]->GetNumEntries()) {
+        PrintCOPPEREvent(raw_klmarray[ j ], i);
+      }
     }
   }
 
 
-  for (int j = 0; j < rawcprarray.getEntries(); j++) {
-    printf("=== RawCOPPER event====\nBlock %d ", j);
-    //  PrintEvent( &rawcprarray );
-    PrintCOPPEREvent(rawcprarray[ j ]);
-  }
+//   for (int j = 0; j < rawcprarray.getEntries(); j++) {
+//     //    printf("=== RawCOPPER event====\nBlock %d ", j);
+//     //  PrintEvent( &rawcprarray );
+//     PrintCOPPEREvent(rawcprarray[ j ]);
+//   }
 
-  for (int j = 0; j < raw_cdcarray.getEntries(); j++) {
-    printf("=== RawCDC    event====\nBlock %d ", j);
-    //  PrintCOPPEREvent( &rawcprarray );
-    PrintCOPPEREvent(raw_cdcarray[ j ]);
-  }
+//   for (int j = 0; j < raw_cdcarray.getEntries(); j++) {
+//     //    printf("=== RawCDC    event====\nBlock %d ", j);
+//     //  PrintCOPPEREvent( &rawcprarray );
+//     PrintCOPPEREvent(raw_cdcarray[ j ]);
+//   }
 
-  for (int j = 0; j < raw_svdarray.getEntries(); j++) {
-    printf("=== RawSVD    event====\nBlock %d ", j);
-    //  PrintCOPPEREvent( &rawcprarray );
-    PrintCOPPEREvent(raw_svdarray[ j ]);
-  }
-  for (int j = 0; j < raw_bpidarray.getEntries(); j++) {
-    printf("=== RawBPID    event====\nBlock %d ", j);
-    //  PrintCOPPEREvent( &rawcprarray );
-    PrintCOPPEREvent(raw_bpidarray[ j ]);
-  }
-  for (int j = 0; j < raw_epidarray.getEntries(); j++) {
-    printf("=== RawEPID    event====\nBlock %d ", j);
-    //  PrintCOPPEREvent( &rawcprarray );
-    PrintCOPPEREvent(raw_epidarray[ j ]);
-  }
-  for (int j = 0; j < raw_eclarray.getEntries(); j++) {
-    printf("=== RawECL    event====\nBlock %d ", j);
-    //  PrintCOPPEREvent( &rawcprarray );
-    PrintCOPPEREvent(raw_eclarray[ j ]);
-  }
-  for (int j = 0; j < raw_klmarray.getEntries(); j++) {
-    printf("=== RawKLM    event====\nBlock %d ", j);
-    //  PrintCOPPEREvent( &rawcprarray );
-    PrintCOPPEREvent(raw_klmarray[ j ]);
-  }
+//   for (int j = 0; j < raw_svdarray.getEntries(); j++) {
+//     printf("=== RawSVD    event====\nBlock %d ", j);
+//     //  PrintCOPPEREvent( &rawcprarray );
+//     PrintCOPPEREvent(raw_svdarray[ j ]);
+//   }
+//   for (int j = 0; j < raw_bpidarray.getEntries(); j++) {
+//     printf("=== RawBPID    event====\nBlock %d ", j);
+//     //  PrintCOPPEREvent( &rawcprarray );
+//     PrintCOPPEREvent(raw_bpidarray[ j ]);
+//   }
+//   for (int j = 0; j < raw_epidarray.getEntries(); j++) {
+//     printf("=== RawEPID    event====\nBlock %d ", j);
+//     //  PrintCOPPEREvent( &rawcprarray );
+//     PrintCOPPEREvent(raw_epidarray[ j ]);
+//   }
+//   for (int j = 0; j < raw_eclarray.getEntries(); j++) {
+//     printf("=== RawECL    event====\nBlock %d ", j);
+//     //  PrintCOPPEREvent( &rawcprarray );
+//     PrintCOPPEREvent(raw_eclarray[ j ]);
+//   }
+//   for (int j = 0; j < raw_klmarray.getEntries(); j++) {
+//     printf("=== RawKLM    event====\nBlock %d ", j);
+//     //  PrintCOPPEREvent( &rawcprarray );
+//     PrintCOPPEREvent(raw_klmarray[ j ]);
+//   }
 
+
+  printf("ftsw %d cdc %d a %d b %d c %d d %d : diffstart %lf ftswtime %lf cdctime %lf : %d %d\n", m_nftsw, m_ncdc, m_fina_nwords, m_finb_nwords, m_finc_nwords, m_find_nwords,
+         m_start_ftsw_time - m_start_cdc_time, m_last_utime_ftsw - m_start_ftsw_time,
+         m_last_utime_cdc - m_start_cdc_time, m_cnt_ftsw_evejump, m_cnt_cdc_evejump
+        );
 
   n_basf2evt++;
 

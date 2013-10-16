@@ -70,7 +70,7 @@ namespace Belle2 {
     //! Module functions to be called from event process
     virtual void event();
     virtual void VerifyCheckSum(int* buf);
-    virtual void PrintCOPPEREvent(RawCOPPER* raw_array);
+    virtual void PrintCOPPEREvent(RawCOPPER* raw_array, int i);
     virtual void PrintEvent(RawDataBlock* raw_array, int i);
 
 
@@ -99,6 +99,41 @@ namespace Belle2 {
 
     int* m_buffer;
 
+    int m_nftsw;
+
+    int m_ncdc;
+
+    int m_fina_nwords;
+
+    int m_finb_nwords;
+
+    int m_finc_nwords;
+
+    int m_find_nwords;
+
+    int m_upper16_ftsw_utime;
+
+    int m_upper16_cdc_utime;
+
+    int m_prev_ftsw_time16;
+
+    int m_prev_cdc_time16;
+
+    double m_start_ftsw_time;
+
+    double m_start_cdc_time;
+
+    double m_last_utime_ftsw;
+
+    double m_last_utime_cdc;
+
+    int m_prev_ftsw_eve16;
+
+    int m_prev_cdc_eve16;
+
+    int m_cnt_ftsw_evejump;
+
+    int m_cnt_cdc_evejump;
 
   };
 

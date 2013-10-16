@@ -21,6 +21,7 @@ public class HSLBParameterTablePanel extends ParameterTablePanel {
 		DefaultTableModel model = (DefaultTableModel) getModel();
 		model.addColumn("Host COPPER");
 		model.addColumn("Firmware");
+		model.addColumn("Data type");
 		model.addColumn("FEEModule type");
 		model.addColumn("FEEModule ID");
 		_table.getModel().addTableModelListener(new TableModelListener() {
@@ -40,6 +41,16 @@ public class HSLBParameterTablePanel extends ParameterTablePanel {
 						break;
 					case 3:
 						hslb.setFirmware(model2.getValueAt(row, col).toString());
+					case 4: {
+						String mode_s = model2.getValueAt(row, col).toString();
+						if ( mode_s.toUpperCase().matches("SIMPLE") ) {
+							System.out.println(mode_s.toUpperCase());
+							hslb.setTriggerMode(0x07);
+						} else if ( mode_s.toUpperCase().matches("VERBOSE") ) {
+							System.out.println(mode_s.toUpperCase()+" = VERBOSE");
+							hslb.setTriggerMode(0x08);
+						} 
+					}
 					}
 				} catch (Exception e1) {
 					e1.printStackTrace();
@@ -78,6 +89,10 @@ public class HSLBParameterTablePanel extends ParameterTablePanel {
 				param_v.add("");
 			}
 			param_v.add(hslb.getFirmware());
+			int trigger_mode = hslb.getTriggerMode();
+			if ( trigger_mode == 0x07 ) param_v.add("SIMPLE");
+			else if ( trigger_mode == 0x08 ) param_v.add("VERBOSE");
+			else param_v.add("SIMPLE");
 			if (hslb.getFEEModule() != null) {
 				param_v.add(hslb.getFEEModule().getType());
 				param_v.add("" + hslb.getFEEModule().getId());

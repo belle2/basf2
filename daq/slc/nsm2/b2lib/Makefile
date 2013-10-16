@@ -4,8 +4,8 @@
 
 ALL = main
 LIBS      = 
-CC        = gcc44
-CXX       = g++44
+CC        = gcc
+CXX       = g++
 OPT = -g -fPIC -I../corelib
 DEPS   = belle2nsm.h Makefile
 CORELIBS = ../corelib/nsmlib2.o ../corelib/nsmhash.o ../corelib/nsmparse.o

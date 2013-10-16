@@ -205,6 +205,7 @@ public class RCDBManager {
 			hslb.setProductID(results.getInt("product_id"));
 			hslb.setLocation(results.getString("location"));
 			hslb.setFirmware(results.getString("firmware"));
+			hslb.setTriggerMode(results.getInt("trigger_mode"));
 		}
 	}
 

@@ -223,7 +223,7 @@ public class XMLRCNodeLoader {
 						hslb_new.setFirmware(hslb.getFirmware());
 						hslb_new.setLocation(hslb.getLocation());
 						hslb_new.setProductID(hslb.getProductID());
-						hslb_new.setTrgMode(hslb.getTrgMode());
+						hslb_new.setTriggerMode(hslb.getTriggerMode());
 						hslb_new.setUsed(hslb.isUsed());
 						hslb_new.setId(_system.getHSLBs().size());
 						hslb_new.setVersion(_version);

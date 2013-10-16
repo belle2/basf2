@@ -16,11 +16,11 @@ namespace B2DAQ {
 
   public:
     bool isUsed() const { return _used; }
-    int getTrgMode() const { return _trg_mode; }
+    int getTriggerMode() const { return _trg_mode; }
     const std::string& getFirmware() const { return _firmware; }
     FEEModule* getFEEModule() const { return _board; }
     void setUsed(bool used) { _used = used; }
-    void setTrgMode(int mode) { _trg_mode = mode; }
+    void setTriggerMode(int mode) { _trg_mode = mode; }
     void setFirmware(const std::string& firmware) { _firmware = firmware; }
     void setFEEModule(FEEModule* board) { _board = board; }
     virtual const std::string getSQLFields() const throw();

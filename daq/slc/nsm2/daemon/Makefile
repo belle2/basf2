@@ -4,8 +4,8 @@
 
 ALL = nsmd2 nsminfo2
 LIBS      = 
-CC        = gcc44
-CXX       = g++44
+CC        = gcc
+CXX       = g++
 OPT = -g 
 DEPS   = nsm2.h nsmsys2.h Makefile
 CFLAGS = $(OPT) $(EXTRA_CFLAGS)

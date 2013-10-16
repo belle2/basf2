@@ -95,6 +95,7 @@ int COPPERNode::getParams(const Command& command, unsigned int* pars,
     for (size_t i = 0; i < 4; i++) {
       if (_hslb_v[i] != NULL) {
         FEEModule* module = _hslb_v[i]->getFEEModule();
+        pars[npar++] = _hslb_v[i]->getTriggerMode();
         if (module != NULL) {
           FEEModule::RegisterList& reg_v(module->getRegisters());
           for (size_t j = 0; j < reg_v.size(); j++) {
@@ -144,6 +145,7 @@ void COPPERNode::setParams(const Command& command,
     for (size_t i = 0; i < MAX_HSLBS; i++) {
       if (_hslb_v[i] != NULL && _hslb_v[i]->isUsed()) {
         FEEModule* module = _hslb_v[i]->getFEEModule();
+        _hslb_v[i]->setTriggerMode(pars[par_i++]);
         if (module != NULL) {
           FEEModule::RegisterList& reg_v(module->getRegisters());
           for (size_t j = 0; j < reg_v.size(); j++) {

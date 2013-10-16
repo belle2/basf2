@@ -4,7 +4,7 @@ public class HSLB extends Module {
 
 	static public final String TAG = "hslb";
 
-	private int _trg_mode;
+	private int _trigger_mode;
 	private String _firmware;
 	private FEEModule _board;
 	private boolean _used = true;
@@ -12,8 +12,8 @@ public class HSLB extends Module {
 	public HSLB() {
 	}
 
-	public int getTrgMode() {
-		return _trg_mode;
+	public int getTriggerMode() {
+		return _trigger_mode;
 	}
 
 	public String getFirmware() {
@@ -24,8 +24,8 @@ public class HSLB extends Module {
 		return _board;
 	}
 
-	public void setTrgMode(int mode) {
-		_trg_mode = mode;
+	public void setTriggerMode(int mode) {
+		_trigger_mode = mode;
 	}
 
 	public void setFirmware(String firmware) {
@@ -46,17 +46,17 @@ public class HSLB extends Module {
 
 	@Override
 	public String getSQLFields() {
-		return super.getSQLFields() + ", used boolean, firmware text, module_type text, module_id int";
+		return super.getSQLFields() + ", used boolean, firmware text, trigger_mode smallint, module_type text, module_id int";
 	}
 
 	@Override
 	public String getSQLLabels() {
-		return super.getSQLLabels() + ", used, firmware, module_type, module_id";
+		return super.getSQLLabels() + ", used, firmware, trigger_mode , module_type, module_id";
 	}
 
 	@Override
 	public String getSQLValues() {
-		return super.getSQLValues() + ", " + _used + ", '" + _firmware + "', '" + _board.getType() + "', " + _board.getId();
+		return super.getSQLValues() + ", " + _used + ", '" + _firmware + "', "+ _trigger_mode + ", '" + _board.getType() + "', " + _board.getId();
 	}
 
 	@Override

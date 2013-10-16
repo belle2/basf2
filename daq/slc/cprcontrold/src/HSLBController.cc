@@ -57,7 +57,8 @@ bool HSLBController::load() throw()
       printf("CHECK FEE ERROR\n");
       return false;
     }
-    mgt_execute(_mgt, CTL_VERBOSE);
+    mgt_execute(_mgt, _hslb->getTriggerMode());
+    //mgt_execute(_mgt, CTL_VERBOSE);
     mgt_execute(_mgt, CTL_TRIGGER);
     FEEModule::RegisterList& reg_v(module->getRegisters());
     for (size_t i = 0; i < reg_v.size(); i++) {

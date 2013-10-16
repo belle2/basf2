@@ -4,8 +4,8 @@
 
 ALL = client client_wait master readdat bridge reciever
 LIBS      = 
-CC        = gcc44
-CXX       = g++44
+CC        = gcc
+CXX       = g++
 OPT = -g -I ../corelib -I ../b2lib -lm -lpthread
 DEPS   = Makefile
 CFLAGS = $(OPT) $(EXTRA_CFLAGS)

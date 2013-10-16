@@ -1,5 +1,5 @@
-CC = gcc44
-CXX = g++44
+CC = gcc
+CXX = g++
 
 CFLAGS   = -g -O3 -Wall -fPIC -D_REENTRANT
 

@@ -196,6 +196,7 @@ void DBNodeSystemConfigurator::readHSLBTable(int version) throw(DBHandlerExcepti
     hslb->setProductID(record_v[i].getFieldValueInt("product_id"));
     hslb->setLocation(record_v[i].getFieldValue("location"));
     hslb->setFirmware(record_v[i].getFieldValue("firmware"));
+    hslb->setTriggerMode(record_v[i].getFieldValueInt("trigger_mode"));
     std::string module_type = record_v[i].getFieldValue("module_type");
     std::vector<FEEModule*>& module_v(_system->getModules(module_type));
     int module_id = record_v[i].getFieldValueInt("module_id");

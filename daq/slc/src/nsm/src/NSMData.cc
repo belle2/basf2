@@ -71,18 +71,18 @@ int NSMData::initProperties() throw()
       pro.length = length;
       _pro_m.insert(NSMDataPropertyMap::value_type(label, pro));
       _label_v.push_back(label);
-      std::cout << label << " ";
+      //std::cout << label << " ";
     } else if (length > 0) {
       for (int i = 0; i < length; i++) {
         std::string label_i = B2DAQ::form("%s_%d", label.c_str(), i);
         _pro_m.insert(NSMDataPropertyMap::value_type(label_i, pro));
         _label_v.push_back(label_i);
         pro.offset += pro.type % 100;
-        std::cout << label_i << " ";
+        //std::cout << label_i << " ";
       }
     }
   }
-  std::cout << std::endl;
+  //std::cout << std::endl;
   return size;
 }
 

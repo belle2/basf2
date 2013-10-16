@@ -309,11 +309,7 @@ void EVEVisualization::addTrack(const GFTrack* gftrack, const TString& label)
     track_lines = new TEveTrack(&rectrack, m_gftrackpropagator);
     track_lines->SetName(label); //popup label set at end of function
     track_lines->SetPropagator(m_gftrackpropagator);
-    if (charge > 0) {
-      track_lines->SetLineColor(kRed);
-    } else {
-      track_lines->SetLineColor(kBlue);
-    }
+    track_lines->SetLineColor(c_trackColor);
     track_lines->SetLineWidth(2);
     track_lines->SetTitle(TString::Format("%s\n"
                                           "#hits: %u\n"
@@ -498,7 +494,7 @@ void EVEVisualization::addTrack(const GFTrack* gftrack, const TString& label)
           double depth = sensor.getThickness();
           TEveBox* hit_box = boxCreator(a, u, v, du, dv, depth);
           hit_box->SetName(TString::Format("SVDRecoHit %u", j));
-          hit_box->SetMainColor(kYellow);
+          hit_box->SetMainColor(c_recoHitColor);
           hit_box->SetMainTransparency(0);
           if (track_lines)
             track_lines->AddElement(hit_box);
@@ -531,7 +527,7 @@ void EVEVisualization::addTrack(const GFTrack* gftrack, const TString& label)
           det_shape->SetTransMatrix(det_trans);
           // finished rotating and translating --------------------------------------
 
-          det_shape->SetMainColor(kYellow);
+          det_shape->SetMainColor(c_recoHitColor);
           det_shape->SetMainTransparency(0);
           if (track_lines)
             track_lines->AddElement(det_shape);
@@ -574,7 +570,7 @@ void EVEVisualization::addTrack(const GFTrack* gftrack, const TString& label)
         det_shape->SetTransMatrix(det_trans);
         // finished rotating and translating ------------------------------------------
 
-        det_shape->SetMainColor(kYellow);
+        det_shape->SetMainColor(c_recoHitColor);
         det_shape->SetMainTransparency(0);
         if (track_lines)
           track_lines->AddElement(det_shape);
@@ -600,7 +596,7 @@ void EVEVisualization::addTrack(const GFTrack* gftrack, const TString& label)
         det_shape->SetTransMatrix(det_trans);
         // finished rotating and translating ------------------------------------------
 
-        det_shape->SetMainColor(kYellow);
+        det_shape->SetMainColor(c_recoHitColor);
         det_shape->SetMainTransparency(50);
         if (track_lines)
           track_lines->AddElement(det_shape);
@@ -836,7 +832,7 @@ void EVEVisualization::makeTracks()
       m_gftrackpropagator->SetRnrDaughters(true);
       //m_gftrackpropagator->SetRnrFV(true); //TODO: this crashes?
       TMarker m;
-      m.SetMarkerColor(kSpring);
+      m.SetMarkerColor(c_trackMarkerColor);
       m.SetMarkerStyle(1); //a single pixel
       m.SetMarkerSize(1); //ignored.
       m_gftrackpropagator->RefPMAtt() = m;
@@ -899,7 +895,7 @@ void EVEVisualization::addVertex(const GFRaveVertex* vertex, const TString& name
                                         "pVal=%e",
                                         name.Data(), v.x(), v.y(), v.z(),
                                         TMath::Prob(vertex->getChi2(), vertex->getNdf())));
-  vertexPoint->SetMainColor(kYellow);
+  vertexPoint->SetMainColor(c_recoHitColor);
   vertexPoint->SetNextPoint(v.x(), v.y(), v.z());
 
   TMatrixDEigen eigen_values(vertex->getCov());
@@ -932,7 +928,7 @@ void EVEVisualization::addVertex(const GFRaveVertex* vertex, const TString& name
   det_shape->SetTransMatrix(det_trans);
   // finished rotating and translating ------------------------------------------
 
-  det_shape->SetMainColor(kYellow);   //The color of the error ellipsoid.
+  det_shape->SetMainColor(kOrange);   //The color of the error ellipsoid.
   det_shape->SetMainTransparency(0);
 
   vertexPoint->AddElement(det_shape);

@@ -82,6 +82,16 @@ namespace Belle2 {
     };
 
 
+    /** Color for reco hits. */
+    const Color_t c_recoHitColor = kOrange;
+    /** Color for TrackCandidates. */
+    const Color_t c_trackCandColor = kAzure - 2;
+    /** Color for tracks. */
+    const Color_t c_trackColor = kAzure;
+    /** Color for track markers. */
+    const Color_t c_trackMarkerColor = kSpring;
+
+
   public:
     /** Constructor.
      */
@@ -281,8 +291,6 @@ namespace Belle2 {
   template<class PXDType, class SVDType> void EVEVisualization::addTrackCandidate(const GFTrackCand* trackCand, const TString& label,
       const StoreArray<PXDType>& pxdhits, const StoreArray<SVDType>& svdhits, const StoreArray<CDCHit>& cdchits)
   {
-    const Color_t trackCandColor = kAzure - 2;
-
     // parse the option string ------------------------------------------------------------------------
     bool drawHits = false;
     bool drawTrack = false;
@@ -301,8 +309,8 @@ namespace Belle2 {
     TVector3 track_mom = trackCand->getMomSeed();
 
     TEveStraightLineSet* lines = new TEveStraightLineSet("RecoHits");
-    lines->SetMainColor(trackCandColor);
-    lines->SetMarkerColor(trackCandColor);
+    lines->SetMainColor(c_trackCandColor);
+    lines->SetMarkerColor(c_trackCandColor);
     lines->SetMarkerStyle(6);
     lines->SetMainTransparency(60);
 
@@ -364,7 +372,7 @@ namespace Belle2 {
       TEveTrack* track_lines = new TEveTrack(&rectrack, m_gftrackpropagator);
       track_lines->SetName(label); //popup label set at end of function
       track_lines->SetPropagator(m_gftrackpropagator);
-      track_lines->SetLineColor(trackCandColor);
+      track_lines->SetLineColor(c_trackCandColor);
       track_lines->SetLineWidth(1);
       track_lines->SetTitle(TString::Format("%s\n"
                                             "#hits: %u\n"

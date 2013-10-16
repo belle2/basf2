@@ -17,9 +17,12 @@
 #include <daq/dataobjects/RawTrailer.h>
 #include <framework/datastore/DataStore.h>
 
+#include <daq/rawdata/modules/DAQConsts.h>
+
 #include <TObject.h>
 
 namespace Belle2 {
+
 
   class RawCOPPER : public RawDataBlock {
   public:
@@ -97,19 +100,31 @@ namespace Belle2 {
     int* Get4thDetectorBuffer(int n);
 
     unsigned int GetMagic7FFF0008(int n);
+
     unsigned int GetMagicFFFFFAFA(int n);
+
     unsigned int GetMagic7FFF0009(int n);
+
+    double GetEventUnixTime(int n);
+
+    int Get1stFINNESSENwords(int n);
+
+    int Get2ndFINNESSENwords(int n);
+
+    int Get3rdFINNESSENwords(int n);
+
+    int Get4thFINNESSENwords(int n);
 
     //
     // Size of COPPER "front" header and trailer
     //
     /*
-       size of COPPER_BLOCK =
-       RawHeader.RAWHEADER_NWORDS +
-       SIZE_COPPER_FRONT_HEADER +
-       m_buffer[ POS_DATA_LENGTH ] +
-       SIZE_COPPER_TRAILER +
-       RawTrailer.RAWTRAILER_NWORDS
+      size of COPPER_BLOCK =
+      RawHeader.RAWHEADER_NWORDS +
+      SIZE_COPPER_FRONT_HEADER +
+      m_buffer[ POS_DATA_LENGTH ] +
+      SIZE_COPPER_TRAILER +
+      RawTrailer.RAWTRAILER_NWORDS
     */
     enum {
       SIZE_COPPER_FRONT_HEADER = 7,
@@ -167,8 +182,8 @@ namespace Belle2 {
     // Data Format : B2Link FEE Header
     //
     enum {
-      POS_FTSW_0 = 0,
-      POS_FTSW_1 = 1,
+      POS_FTSW1 = 0,
+      POS_FTSW2 = 1,
       POS_EXP_RUN = 2,
       POS_B2L_TIME = 3,
 

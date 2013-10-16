@@ -44,11 +44,17 @@ namespace Belle2 {
        */
       void unpack_event(RawPXD* px);
 
+      /** Swap endianes inside all shorts of this frame besides CRC.
+       * @param data pointer to frame
+       * @param len length of frame
+       */
+      void endian_swap_frame(unsigned short* data, int len);
+
       /** Unpack one frame (within an event).
        * @param data pointer to frame
        * @param len length of frame
        */
-      void unpack_frame(void* data, int len, int pad, int& last_framenr, int& last_wie, int& last_start, int& last_end, unsigned int& last_evtnr);
+      void unpack_frame(void* data, int len, bool pad, int& last_framenr, int& last_wie, int& last_start, int& last_end, unsigned int& last_evtnr);
 
       void unpack_dhp(void* data, unsigned int len, unsigned int dhh_first_frame_id_lo, unsigned int dhh_ID, unsigned short toffset);
 

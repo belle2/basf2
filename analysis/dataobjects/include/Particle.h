@@ -12,17 +12,15 @@
 #define PARTICLE_H
 
 #include <framework/datastore/RelationsObject.h>
+#include <framework/gearbox/Const.h>
 
-#include <TClonesArray.h>
 #include <TVector3.h>
 #include <TLorentzVector.h>
 #include <TMatrixFSym.h>
-#include <framework/gearbox/Const.h>
-
-#include <tracking/dataobjects/Track.h>
 
 #include <vector>
 
+class TClonesArray;
 
 namespace Belle2 {
 
@@ -30,7 +28,7 @@ namespace Belle2 {
   class ECLShower;
   class ECLGamma;
   class ECLPi0;
-  //  class Track;
+  class Track;
   class MCParticle;
 
   /** \addtogroup dataobjects

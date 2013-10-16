@@ -10,10 +10,7 @@
 
 #include <analysis/dataobjects/Particle.h>
 
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
-
-#include <TDatabasePDG.h>
 
 #include <ecl/dataobjects/ECLShower.h>
 #include <ecl/dataobjects/ECLGamma.h>
@@ -21,6 +18,9 @@
 #include <generators/dataobjects/MCParticle.h>
 #include <tracking/dataobjects/Track.h>
 #include <tracking/dataobjects/TrackFitResult.h>
+
+#include <TClonesArray.h>
+#include <TDatabasePDG.h>
 
 #include <iostream>
 #include <iomanip>

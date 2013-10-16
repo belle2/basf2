@@ -11,6 +11,7 @@
 
 #include <analysis/raveInterface/RaveVertexFitter.h>
 #include <analysis/raveInterface/RaveSetup.h>
+#include <tracking/dataobjects/Track.h>
 
 #include <GFRaveVertexFactory.h>
 #include <RKTrackRep.h>

@@ -12,6 +12,8 @@
 #define NTUPLEFLATTOOL_H
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
+
+#include <framework/datastore/StoreArray.h>
 #include <TTree.h>
 
 using namespace std;

@@ -28,6 +28,7 @@
 
 
 namespace Belle2 {
+  class TrackFitResult;
 
   namespace analysis {
     /**

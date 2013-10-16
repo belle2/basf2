@@ -32,7 +32,7 @@
 #define DHH_FRAME_HEADER_DATA_TYPE_EVT_FRM  0x3
 #define DHH_FRAME_HEADER_DATA_TYPE_GHOST    0x2
 #define DHH_FRAME_HEADER_DATA_TYPE_END_FRM  0x4
-#define DHH_FRAME_HEADER_DATA_TYPE_UNUSED   0x7
+#define DHH_FRAME_HEADER_DATA_TYPE_HLTROI   0x7
 
 
 using namespace std;
@@ -70,7 +70,7 @@ char* dhh_type_name[8] = {
   (char*)"END_FRM",
   (char*)"DHP_ZSD",
   (char*)"COMMODE",
-  (char*)"UNUSED ",
+  (char*)"HLTROI ",
 };
 
 
@@ -231,7 +231,7 @@ public:
   void print(void) {
     word0.print();
     if (verbose)
-      B2INFO(" DHH Direct Readout (Raw|ZSD) Frame TNRLO " << hex << trigger_nr_lo << " CRC " << hex << calc_crc());
+      B2INFO(" DHH Direct Readout (Raw|ZSD) Frame TNRLO " << hex << trigger_nr_lo << " CRC " << calc_crc());
   };
 };
 
@@ -275,10 +275,10 @@ public:
     c = htonl(bocrc.checksum());
     if (c == crc32) {
       if (verbose)
-        B2INFO(" DHH Ghost Frame CRC " << hex << c << " == " << hex << crc32);
+        B2INFO(" DHH Ghost Frame CRC " << hex << c << " == " << crc32);
     } else {
       crc_error++;
-      B2ERROR(" DHH Ghost Frame CRC FAIL " << hex << c << " != " << hex << crc32);
+      B2ERROR(" DHH Ghost Frame CRC FAIL " << hex << c << " != " << crc32);
       error_flag = true;
     }
     return c;
@@ -292,7 +292,7 @@ public:
   void print(void) {
     word0.print();
     if (verbose)
-      B2INFO(" DHH Ghost Frame TNRLO " << hex << trigger_nr_lo << " CRC " << hex << crc32 << " (calc)" << hex << calc_crc());
+      B2INFO(" DHH Ghost Frame TNRLO " << hex << trigger_nr_lo << " CRC "  << crc32 << " (calc) "  << calc_crc());
   };
 };
 
@@ -322,10 +322,10 @@ public:
     c = htonl(bocrc.checksum());
     if (c == crc32) {
       if (verbose)
-        B2INFO(" DHH End Frame CRC " << hex << c << " ==  " << hex << crc32);
+        B2INFO(" DHH End Frame CRC " << hex << c << "==" << crc32);
     } else {
       crc_error++;
-      B2INFO(" DHH End Frame CRC " << hex << c << " != " << hex << crc32);
+      B2INFO(" DHH End Frame CRC " << hex << c << "!=" << crc32);
       error_flag = true;
     }
     return c;
@@ -349,7 +349,7 @@ public:
     word0.print();
     if (verbose)
       B2INFO("DHH End Frame TNRLO " << hex << trigger_nr_lo << " WIEVT " << hex << wordsinevent << " ERR " << hex << errorinfo
-             << " CRC " << hex << crc32 << hex << calc_crc());
+             << " CRC " << hex << crc32 << " (calc) " << calc_crc());
   };
 };
 
@@ -410,13 +410,14 @@ public:
 
     if (c == crc32) {
       if (verbose)
-        B2INFO(" DHH Data Frame CRC: " << hex << c << " == " << hex << crc32);
+        B2INFO(" DHH Data Frame CRC: " << hex << c << "==" << crc32);
     } else {
       crc_error++;
       if (verbose) {
-        B2ERROR(" DHH Data Frame CRC FAIL: " << hex << c << "!=" << hex << crc32 << " data " << hex << * (unsigned int*)(d + length - 8) << hex
-                << * (unsigned int*)(d + length - 6) << hex << * (unsigned int*)(d + length - 4) << hex << * (unsigned int*)(d + length - 2) << hex
-                << * (unsigned int*)(d + length + 0) << hex << * (unsigned int*)(d + length + 2));
+        B2ERROR(" DHH Data Frame CRC FAIL: " << hex << c << "!=" << crc32 << " data "  << * (unsigned int*)(d + length - 8) << " "
+                << * (unsigned int*)(d + length - 6) << " " << * (unsigned int*)(d + length - 4));
+        /// others would be interessting but possible subjects to access outside of buffer
+        /// << " " << * (unsigned int*)(d + length - 2) << " " << * (unsigned int*)(d + length + 0) << " " << * (unsigned int*)(d + length + 2));
       };
       error_flag = true;
     }
@@ -434,32 +435,27 @@ public:
         s = ((dhh_direct_readout_frame_zsd*)data)->size();
         break;
       case DHH_FRAME_HEADER_DATA_TYPE_DCE_RAW:
-        if (verbose)
-          B2INFO(" Error: DCE type no supported ");
+        B2INFO(" Error: DCE type no supported ");
         s = 0;
+        error_flag = true;
         break;
       case DHH_FRAME_HEADER_DATA_TYPE_COMMODE:
         s = ((dhh_commode_frame*)data)->size();
         break;
       case DHH_FRAME_HEADER_DATA_TYPE_EVT_FRM:
-
         s = ((dhh_event_frame*)data)->size();
         break;
       case DHH_FRAME_HEADER_DATA_TYPE_GHOST:
         s = ((dhh_ghost_frame*)data)->size();
         break;
       case DHH_FRAME_HEADER_DATA_TYPE_END_FRM:
-
         s = ((dhh_end_event_frame*)data)->size();
         break;
-      case DHH_FRAME_HEADER_DATA_TYPE_UNUSED:
-        B2INFO(" Error: type undefined ");
+      case DHH_FRAME_HEADER_DATA_TYPE_HLTROI:
         s = 0;
-        error_flag = true;
         break;
-
       default:
-        B2INFO(" Error: no data ");
+        B2ERROR("Error: not a valid data frame!");
         error_flag = true;
         s = 0;
         break;
@@ -849,7 +845,6 @@ void PXDUnpackerModule::unpack_frame(void* data, int len, bool pad, int& last_fr
       stat_start++;
       break;
     case DHH_FRAME_HEADER_DATA_TYPE_GHOST:
-
       ((dhh_ghost_frame*)data)->print();
       dhh.calc_crc();
       stat_ghost++;
@@ -883,11 +878,9 @@ void PXDUnpackerModule::unpack_frame(void* data, int len, bool pad, int& last_fr
           B2INFO(" EVT END: WIE " << hex << last_wie << " == END " << hex << w << " pad " << pad);
       }
       break;
-    case DHH_FRAME_HEADER_DATA_TYPE_UNUSED:
-      B2INFO(" Error: type undefined ");
-      type_error++;
+    case DHH_FRAME_HEADER_DATA_TYPE_HLTROI:
       hw->print();
-      error_flag = true;
+      dhh.calc_crc();
       break;
     default:
       B2INFO(" Error: no data ");

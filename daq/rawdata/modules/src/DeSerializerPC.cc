@@ -254,18 +254,6 @@ int* DeSerializerPCModule::RecvData(int* malloc_flag, int* total_buf_nwords, int
 
     each_buf_nwords.push_back(rawblk_nwords);
 
-#ifdef DEBUG
-    printf("*******HDR**********\n");
-    printf("\n%.8d : ", 0);
-    for (int i = 0; i < SendHeader::SENDHDR_NWORDS ; i++) {
-      printf("0x%.8x ", send_hdr_buf[ i ]);
-      if ((i + 1) % 10 == 0) {
-        printf("\n%.8d : ", i + 1);
-      }
-    }
-    printf("\n");
-    printf("\n");
-#endif
   }
 
 
@@ -284,18 +272,36 @@ int* DeSerializerPCModule::RecvData(int* malloc_flag, int* total_buf_nwords, int
     exit(-1);
   }
 
-#ifdef DEBUG
-  printf("*******BODY**********\n");
-  printf("\n%.8d : ", 0);
-  for (int i = 0; i < *total_buf_nwords; i++) {
-    printf("0x%.8x ", temp_buf[ i ]);
-    if ((i + 1) % 10 == 0) {
-      printf("\n%.8d : ", i + 1);
+  if (temp_buf[20] != 0x7fff0008) {
+    //#ifdef DEBUG
+    printf("*******HDR**********\n");
+    printf("\n%.8d : ", 0);
+    for (int i = 0; i < SendHeader::SENDHDR_NWORDS ; i++) {
+      printf("0x%.8x ", send_hdr_buf[ i ]);
+      if ((i + 1) % 10 == 0) {
+        printf("\n%.8d : ", i + 1);
+      }
     }
+    printf("\n");
+    printf("\n");
+    //#endif
+    //#ifdef DEBUG
+    printf("*******BODY**********\n");
+    printf("\n%.8d : ", 0);
+    //      for (int i = 0; i < *total_buf_nwords; i++) {
+    for (int i = 0; i < 100; i++) {
+      printf("0x%.8x ", temp_buf[ i ]);
+      if ((i + 1) % 10 == 0) {
+        printf("\n%.8d : ", i + 1);
+      }
+    }
+    printf("\n");
+    printf("\n");
+    exit(1);
+    //#endif
   }
-  printf("\n");
-  printf("\n");
-#endif
+
+
 
 
   // Read Traeiler
@@ -456,12 +462,12 @@ void DeSerializerPCModule::event()
                                                      - rawtrl.GetTrlNwords())) {
           char err_buf[500];
 
-          printf("==========BODY==========\n");
-          for (int k = 0 ; k < temp_rawcdc->GetBlockNwords(0); k++) {
-            printf("0x%.8x ", (temp_rawcdc->GetBuffer(0))[k]);
-            if (k % 10 == 9)printf("\n");
+//           printf("==========BODY==========\n");
+//           for (int k = 0 ; k < temp_rawcdc->GetBlockNwords(0); k++) {
+//             printf("0x%.8x ", (temp_rawcdc->GetBuffer(0))[k]);
+//             if (k % 10 == 9)printf("\n");
 
-          }
+//           }
 
           printf("==========temp_buf==========\n");
           for (int k = 0 ; k < 100; k++) {

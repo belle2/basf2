@@ -142,7 +142,7 @@ void DeSerializerCOPPERModule::initialize()
   memset(time_array4, 0, sizeof(time_array4));
   memset(time_array5, 0, sizeof(time_array5));
 
-  OpenCOPPER();
+  //  OpenCOPPER();
 
   B2INFO("DeSerializerCOPPER: initialize() done.");
 
@@ -427,12 +427,13 @@ int DeSerializerCOPPERModule::Read(int fd, char* buf, int data_size_byte)
 
 void DeSerializerCOPPERModule::event()
 {
+  //  B2INFO("Reader() started.");
   const int num_nodes = 1;
 
   if (n_basf2evt < 0) {
 
     B2INFO("DeSerializerCOPPER: event() started.");
-
+    OpenCOPPER();
     // Use shared memory to start(for HSLB dummy data)
     if (m_shmflag != 0) {
       //      int* cfg_buf = ShmGet(m_shmfd_cfg, 4);
@@ -443,6 +444,8 @@ void DeSerializerCOPPERModule::event()
         if (m_cfg_buf[0] == 1)break;
         usleep(10000);
       }
+      printf("Started!\n");
+      fflush(stdout);
     }
 
 
@@ -455,29 +458,32 @@ void DeSerializerCOPPERModule::event()
   for (int j = 0; j < NUM_EVT_PER_BASF2LOOP; j++) {
     int m_size_word = 0;
     int malloc_flag = 0;
-    int* temp_buf = ReadOneEventFromCOPPERFIFO(j, &malloc_flag, &m_size_word);
 
+    //    printf("%d", j);fflush(stdout);
+    int* temp_buf = ReadOneEventFromCOPPERFIFO(j, &malloc_flag, &m_size_word);
+    //    printf(".");
     //
     // Fill RawCOPPER
     //
     temp_rawcopper =  rawcprarray.appendNew();
     // Store data buffer
-
+    //    printf(".");fflush(stdout);
     int num_events = 1;
 
     temp_rawcopper->SetBuffer(temp_buf, m_size_word, malloc_flag, num_events, num_nodes);
+    //    printf(".");fflush(stdout);
 
 
 
     // Fill header and trailer
     FillNewRawCOPPERHeader(temp_rawcopper);
-
+    //    printf(".");fflush(stdout);
     if (dump_fname.size() > 0) {
       DumpData((char*)temp_buf, m_size_word * sizeof(int));
     }
     m_totbytes += m_size_word * sizeof(int);
   }
-
+  //  printf("\n");fflush(stdout);
 
   //
   // Update EventMetaData
@@ -494,6 +500,7 @@ void DeSerializerCOPPERModule::event()
   // Print current status
   //
   if (n_basf2evt % 100 == 0) {
+    //  printf("mon... ");fflush(stdout);
     //  if ( ( n_basf2evt - m_prev_nevt ) > monitor_numeve ) {
     double cur_time = GetTimeSec();
     double total_time = cur_time - m_start_time;
@@ -515,6 +522,7 @@ void DeSerializerCOPPERModule::event()
     m_prev_time = cur_time;
     m_prev_totbytes = m_totbytes;
     m_prev_nevt = n_basf2evt;
+    //  printf("Done.\n");fflush(stdout);
   }
 
   n_basf2evt++;

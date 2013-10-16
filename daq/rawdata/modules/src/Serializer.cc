@@ -248,6 +248,8 @@ void SerializerModule::SendByWriteV(RawCOPPER* rawcpr)
   // Retry sending
   //
   if (n != total_send_bytes) {
+    printf("byte %d tot %d\n", n, total_send_bytes);
+
     // Send Header
     if (n < iov[ 0 ].iov_len) {
       int sent_bytes = n;
@@ -265,7 +267,7 @@ void SerializerModule::SendByWriteV(RawCOPPER* rawcpr)
       n = sent_bytes;
     }
 
-    if (n < iov[ 1 ].iov_len) {
+    if (n < iov[ 0 ].iov_len + iov[ 1 ].iov_len) {
       int sent_bytes = n - iov[ 0 ].iov_len;
       while (true) {
         int ret = 0;
@@ -278,11 +280,11 @@ void SerializerModule::SendByWriteV(RawCOPPER* rawcpr)
         sent_bytes += ret;
         if (sent_bytes == iov[ 1 ].iov_len) break;
       }
-      n = sent_bytes;
+      n = iov[ 0 ].iov_len + sent_bytes;
     }
 
 
-    if (n < iov[ 2 ].iov_len) {
+    if (n < iov[ 0 ].iov_len + iov[ 1 ].iov_len + iov[ 2 ].iov_len) {
       int sent_bytes = n - iov[ 0 ].iov_len - iov[ 1 ].iov_len;
       while (true) {
         int ret = 0;
@@ -383,7 +385,7 @@ void SerializerModule::Accept()
 
     // set timepout option
     struct timeval timeout;
-    timeout.tv_sec = 1;
+    timeout.tv_sec = 100;
     timeout.tv_usec = 0;
     ret = setsockopt(fd_accept, SOL_SOCKET, SO_SNDTIMEO, &timeout, (socklen_t)sizeof(timeout));
     if (ret < 0) {

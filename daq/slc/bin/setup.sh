@@ -1,13 +1,17 @@
-
 #!/bin/bash
 
+HOSTNAME=`hostname`
 ## setup for Basf2 framework ##
 if [ ! -n "${BELLE2_LOCAL_DIR}" ]; then 
-source $HOME/tools/setup_belle2
-cd $HOME/release/
-setuprel
-export BELLE2_OPTION=opt
-cd -
+  if [ $HOSTNAME = "belle-rpc1" ]; then
+    source $HOME/belle2/tools/setup_belle2_desy
+  else
+    source $HOME/belle2/tools/setup_belle2
+  fi
+  cd $HOME/belle2/release/
+  setuprel
+  export BELLE2_OPTION=opt
+  cd -
 fi
 
 ## setup for slow control system libraries ##
@@ -21,12 +25,12 @@ export PATH=$JAVA_HOME/bin:$PATH
 export CLASSPATH=.:$JAVA_HOME/jre/lib:$JAVA_HOME/lib\
 :$JAVA_HOME/lib/tools.jar\
 :$B2SLC_PATH/javalib/mysql-connector-java-5.1.26-bin.jar
-export B2SC_SERVER_HOST="192.168.244.137";
+export B2SC_SERVER_HOST="belle-rpc1";
 #export B2SC_SERVER_HOST="b2slow2.kek.jp";
 
 ## NSM configuration ##
 export NSM2_HOST=`/sbin/ifconfig | grep "192\.168\.10\." | sed "s/:/ /g" | awk '{print $3}'`
-export NSM2_HOST=192.168.244.137
+#export NSM2_HOST=192.168.244.137
 export NSM2_PORT=8222
 export NSM2_SHMKEY=8222
 export NSM2_INCDIR=$B2SLC_PATH/bin

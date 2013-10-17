@@ -9,7 +9,6 @@ import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 
 import b2rc.core.RONode;
-import b2rc.core.DataSender;
 import b2rc.core.RCNodeSystem;
 import b2rc.db.RCDBManager;
 
@@ -49,8 +48,7 @@ public class ROParameterTablePanel extends ParameterTablePanel {
 					default:
 						if ( col > 4 ) {
 							int i = col - 5;
-							DataSender sender = recv.getSender(i);
-							sender.setHost(model2.getValueAt(row, col).toString());
+							recv.setSender(i, model2.getValueAt(row, col).toString());
 						}
 					}
 				} catch (Exception e1) {}
@@ -74,8 +72,8 @@ public class ROParameterTablePanel extends ParameterTablePanel {
 			//param_v.add(""+recv.getHost().getProductID());
 			//param_v.add(recv.getHost().getLocation());
 			param_v.add(recv.getScript());
-			for ( DataSender sender : recv.getSenders() ) {
-				if ( sender != null) param_v.add(sender.getHost());
+			for ( String sender : recv.getSenders() ) {
+				if ( sender != null) param_v.add(sender);
 				else param_v.add("");
 			}
 			model.addRow(param_v);

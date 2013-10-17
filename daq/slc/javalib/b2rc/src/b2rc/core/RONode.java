@@ -4,7 +4,7 @@ public class RONode extends RCNode {
 
 	public static String TAG = "ro_node";
 
-	public DataSender[] _sender_v = new DataSender[20];
+	public String[] _sender_v = new String[20];
 	public int _sender_i = 0;
 	public String _script;
 
@@ -16,7 +16,7 @@ public class RONode extends RCNode {
 		_script = script;
 	}
 
-	public void addSender(DataSender sender) {
+	public void addSender(String sender) {
 		if (_sender_i < _sender_v.length) {
 			_sender_v[_sender_i] = sender;
 			_sender_i++;
@@ -24,16 +24,20 @@ public class RONode extends RCNode {
 	}
 
 	public void clearSenders() {
-		_sender_v = new DataSender[20];
+		_sender_v = new String[20];
 		_sender_i = 0;
 	}
 
-	public DataSender getSender(int i) {
+	public String getSender(int i) {
 		return _sender_v[i];
 	}
 
-	public DataSender[] getSenders() {
+	public String[] getSenders() {
 		return _sender_v;
+	}
+
+	public void setSender(int i, String sender) {
+		_sender_v[i] = sender;
 	}
 
 	@Override
@@ -65,9 +69,9 @@ public class RONode extends RCNode {
 		buf.append(", '"+_script+"'");
 		for (int i = 0; i < _sender_v.length; i++) {
 			if (_sender_v[i] != null) {
-				buf.append(", " + _sender_v[i].getId());
+				buf.append(", '" + _sender_v[i] + "'");
 			} else {
-				buf.append(", -1");
+				buf.append(", ''");
 			}
 		}
 		return buf.toString();

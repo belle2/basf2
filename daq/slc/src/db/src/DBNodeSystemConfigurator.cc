@@ -252,7 +252,6 @@ void DBNodeSystemConfigurator::readRONodeTable(int version) throw(DBHandlerExcep
   _db->execute(B2DAQ::form("select * from ro_node_conf where version = %d;", version));
   std::vector<DBRecord>& record_v(_db->loadRecords());
   std::vector<RONode*>& node_v(_system->getRONodes());
-  std::vector<COPPERNode*>& copper_v(_system->getCOPPERNodes());
   for (size_t i = 0; i < record_v.size(); i++) {
     const int id = record_v[i].getFieldValueInt("id");
     if (id < 0 || id >= (int)node_v.size()) continue;
@@ -262,11 +261,8 @@ void DBNodeSystemConfigurator::readRONodeTable(int version) throw(DBHandlerExcep
     node->setScript(record_v[i].getFieldValue("script"));
     node->clearSenders();
     for (size_t slot = 0; slot < RONode::MAX_SENDERS; slot++) {
-      int copper_id = record_v[i].getFieldValueInt(B2DAQ::form("sender_id_%d", slot));
-      if (copper_id >= 0 && copper_id < (int)copper_v.size()) {
-        COPPERNode* copper = copper_v[copper_id];
-        node->addSender(copper->getSender());
-      }
+      std::string sender = record_v[i].getFieldValue(B2DAQ::form("sender_%d", slot));
+      node->addSender(sender);
     }
   }
 }

@@ -30,20 +30,6 @@ void NodeLoader::load(const std::string& entry)
     module_v[i]->setID(_system.getModules(type).size());
     _system.getModules(type).push_back(module_v[i]);
   }
-  std::vector<RONode*>& recv_v(_system.getRONodes());
-  for (size_t i = 0; i < recv_v.size(); i++) {
-    recv_v[i]->clearSenders();
-    std::vector<std::string> copper_name_v = B2DAQ::split(_copper_name_v[i], ',');
-    for (size_t j = 0; j < copper_name_v.size(); j ++) {
-      for (std::vector<COPPERNode*>::iterator it = _system.getCOPPERNodes().begin();
-           it != _system.getCOPPERNodes().end(); it++) {
-        if ((*it)->getName() == copper_name_v[j]) {
-          (*it)->getSender()->setHost((*it)->getHost()->getName());
-          recv_v[i]->addSender((*it)->getSender());
-        }
-      }
-    }
-  }
 }
 
 void NodeLoader::loadHosts(XMLElement* el,
@@ -184,11 +170,15 @@ void NodeLoader::loadNodes(XMLElement* el)
     recv->setScript(el->getAttribute("script"));
     _system.addRONode(recv);
     std::string hostname = el->getAttribute("host");
-    _copper_name_v.push_back(el->getAttribute("senders"));
     if (_host_m.find(hostname) != _host_m.end()) {
       recv->setHost(_host_m[hostname]);
     } else {
       recv->setHost(NULL);
+    }
+    recv->clearSenders();
+    std::vector<std::string> hostname_v = B2DAQ::split(el->getAttribute("senders"), ',');
+    for (size_t j = 0; j < hostname_v.size(); j++) {
+      recv->addSender(hostname_v[j]);
     }
   } else if (el->getElements().size() > 0) {
     if (tag == "group") {

@@ -15,7 +15,7 @@ namespace B2DAQ {
     static const size_t MAX_SENDERS = 20;
 
   public:
-    typedef std::vector<DataSender*> DataSenderList;
+    typedef std::vector<std::string> DataSenderList;
 
   public:
     RONode(const std::string& name = "")
@@ -26,10 +26,10 @@ namespace B2DAQ {
   public:
     const std::string& getScript() const throw() { return _script; }
     void setScript(const std::string& script) throw() { _script = script; }
-    void addSender(DataSender* sender) throw();
+    void addSender(const std::string& sender) throw();
     void clearSenders() throw();
     int getNSenders() const throw() { return _sender_i; }
-    DataSender* getSender(int i) throw() { return _sender_v[i]; }
+    const std::string& getSender(int i) const throw() { return _sender_v[i]; }
     DataSenderList& getSenders() throw() { return _sender_v; }
     const DataSenderList& getSenders() const throw() { return _sender_v; }
     virtual const std::string getSQLFields() const throw();

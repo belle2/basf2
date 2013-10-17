@@ -238,7 +238,6 @@ public class RCDBManager {
 		ResultSet results = executeQuery("select * from ro_node_conf where version = " + version + ";");
 		if ( results == null ) return;
 		ArrayList<RONode> node_v = _system.getReceiverNodes();
-		ArrayList<COPPERNode> copper_v = _system.getCOPPERNodes();
 		while ( !results.isClosed() && results.next() ) {
 			int id = results.getInt("id");
 			if (id < 0 || id >= (int) node_v.size()) continue;
@@ -248,11 +247,8 @@ public class RCDBManager {
 			node.setScript(results.getString("script"));
 			node.clearSenders();
 			for (int slot = 0; slot < 10; slot++) {
-				int sender_id = results.getInt("sender_id_" + slot);
-				if (sender_id >= 0 && sender_id < (int) copper_v.size()) {
-					COPPERNode copper = copper_v.get(sender_id);
-					node.addSender(copper.getSender());
-				}
+				String sender = results.getString("sender_" + slot);
+				node.addSender(sender);
 			}
 		}
 	}

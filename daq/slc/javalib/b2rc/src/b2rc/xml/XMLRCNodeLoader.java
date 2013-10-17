@@ -33,7 +33,6 @@ public class XMLRCNodeLoader {
 	private String _dir = "";
 	private RCNodeSystem _system = new RCNodeSystem();
 	private RCNodeGroup _group = new RCNodeGroup();
-	private ArrayList<String> _copper_name_v = new ArrayList<String>();
 	private HashMap<String, COPPERNode> _copper_m = new HashMap<String, COPPERNode>();
 	private HashMap<String, FEEModule> _module_m = new HashMap<String, FEEModule>();
 	private HashMap<Integer, FTSW> _ftsw_m = new HashMap<Integer, FTSW>();
@@ -107,19 +106,6 @@ public class XMLRCNodeLoader {
 				}
 				module.setId(_system.getModules(type).size());
 				_system.getModules(type).add(module);
-			}
-		}
-		ArrayList<RONode> recv_v = _system.getReceiverNodes();
-		for (int i = 0; i < recv_v.size(); i++) {
-			String[] copper_name_v = _copper_name_v.get(i).split(",");
-			recv_v.get(i).clearSenders();
-			for (int j = 0; j < copper_name_v.length; j++) {
-				for (COPPERNode copper : _system.getCOPPERNodes()) {
-					if (copper.getName().matches(copper_name_v[j])) {
-						copper.getSender().setHost(copper.getHost().getName());
-						recv_v.get(i).addSender(copper.getSender());
-					}
-				}
 			}
 		}
 	}
@@ -273,11 +259,15 @@ public class XMLRCNodeLoader {
 			recv.setScript(el.getAttribute("script"));
 			_system.addReceiverNode(recv);
 			String hostname = el.getAttribute("host");
-			_copper_name_v.add(el.getAttribute("senders"));
 			if (_host_m.containsKey(hostname)) {
 				recv.setHost(_host_m.get(hostname));
 			} else {
 				recv.setHost(null);
+			}
+			String [] hostname_v = el.getAttribute("senders").split(",");
+			recv.clearSenders();
+			for (String hostname_s : hostname_v) {
+				recv.addSender(hostname_s);
 			}
 		} else if (el.hasChildNodes()) {
 			if (tag == "group") {

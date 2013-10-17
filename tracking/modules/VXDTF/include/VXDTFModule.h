@@ -351,7 +351,7 @@ namespace Belle2 {
       /** Neuronal network filtering overlapping Track Candidates by searching best subset of TC's */
       void hopfield(TCsOfEvent& tcList,
                     double omega);
-
+      void hopfieldVectorized(TCsOfEvent& tcVector, double omega); /**< copy of hopfield() but using eigen instead of root */
 
       /** search for nonOverlapping trackCandidates using Greedy algorithm (start with TC of highest QI, remove all TCs incompatible with current TC, if there are still TCs there, repeat step until no incompatible TCs are there any more) */
       void greedy(TCsOfEvent& tcVector);
@@ -415,7 +415,7 @@ namespace Belle2 {
 
 
       /** name is program, needed for GFTrackCand export */
-      void calcInitialValues4TCs(CurrentPassData* currentPass); // -> TODO auslagern!
+      void calcInitialValues4TCs(CurrentPassData* currentPass);
 
 
       /** simplest way to determine QI of track candidates, calculating them by track length */
@@ -493,7 +493,7 @@ namespace Belle2 {
 
 
       /** sorts that specific tuple using position 1, not position 0 (which can be done by using standard sorting algorithm) */
-      bool sortHitExtraTupleAtPosition1(const HitExtraTuple& t1, const HitExtraTuple& t2);
+//       bool sortHitExtraTupleAtPosition1(const HitExtraTuple& t1, const HitExtraTuple& t2);
 
 
       /** executes the calculations needed for the circleFit */

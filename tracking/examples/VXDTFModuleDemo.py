@@ -52,8 +52,8 @@ g4sim = register_module('FullSim')
 g4sim.param('StoreAllSecondaries', True)
 
 vxdtf = register_module('VXDTF')
-vxdtf.logging.log_level = LogLevel.INFO
-vxdtf.logging.debug_level = 6
+vxdtf.logging.log_level = LogLevel.DEBUG
+vxdtf.logging.debug_level = 1
 param_vxdtf = {'sectorSetup': secSetup}
 vxdtf.param(param_vxdtf)
 
@@ -106,17 +106,17 @@ process(main)
 print 'Event Statistics :'
 print statistics
 
-print 'Event Statistics detailed:'
-print statistics(statistics.TOTAL)
+# print 'Event Statistics detailed:'
+# print statistics(statistics.TOTAL)
 
-print 'Event Statistics for vxdtf:'
-print statistics([vxdtf])
+# print 'Event Statistics for vxdtf:'
+# print statistics([vxdtf])
 
-print 'Memory statistics'
-for stats in statistics.modules:
-    print 'Module %s:' % stats.name
-    print ' -> initialize(): %10d KB' % stats.memory(statistics.INIT)
-    print ' -> beginRun():   %10d KB' % stats.memory(statistics.BEGIN_RUN)
-    print ' -> event():      %10d KB' % stats.memory()
-    print ' -> endRun():     %10d KB' % stats.memory(statistics.END_RUN)
-    print ' -> terminate():  %10d KB' % stats.memory(statistics.TERM)
+# print 'Memory statistics'
+# for stats in statistics.modules:
+    # print 'Module %s:' % stats.name
+    # print ' -> initialize(): %10d KB' % stats.memory(statistics.INIT)
+    # print ' -> beginRun():   %10d KB' % stats.memory(statistics.BEGIN_RUN)
+    # print ' -> event():      %10d KB' % stats.memory()
+    # print ' -> endRun():     %10d KB' % stats.memory(statistics.END_RUN)
+    # print ' -> terminate():  %10d KB' % stats.memory(statistics.TERM)

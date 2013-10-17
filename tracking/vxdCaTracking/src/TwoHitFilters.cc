@@ -10,7 +10,7 @@
 
 #include "../include/TwoHitFilters.h"
 #include <boost/math/special_functions/fpclassify.hpp>
-#include <cmath>
+#include <math.h>
 
 
 using namespace std;

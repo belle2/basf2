@@ -30,8 +30,8 @@
 // #include <TMatrixDColumn.h>
 
 // boost
-#include <boost/foreach.hpp>
 #include <boost/math/special_functions/fpclassify.hpp> // abs
+#include <boost/math/special_functions/sign.hpp> // sign
 
 // Vc
 // #include <Vc/Vc>
@@ -72,7 +72,7 @@ bool TrackletFilters::ziggZaggRZ()
   bool isZiggZagging = false; // good: not ziggZagging
   vector<TVector3> rzHits;
   TVector3 currentVector;
-  BOOST_FOREACH(PositionInfo * aHit, *m_hits) {
+  for (PositionInfo * aHit : *m_hits) {
     currentVector.SetXYZ(aHit->hitPosition.Perp(), aHit->hitPosition[1], 0.);
     rzHits.push_back(currentVector);
   }
@@ -90,6 +90,28 @@ bool TrackletFilters::ziggZaggRZ()
 }
 
 
+std::pair<TVector3, int> TrackletFilters::calcMomentumSeed(bool useBackwards)
+{
+
+  if (m_numHits < 3) {
+    B2ERROR("calcInitialValues4TCs: currentTC got " << m_numHits << " hits! At this point only tcs having at least 3 hits should exist!")
+  }
+  //     hitA = (*hits)[2]->hitPosition;
+  TVector3 hitB = (*m_hits)[1]->hitPosition;
+  TVector3 hitC = (*m_hits)[0]->hitPosition; // outermost hit and initial value for GFTrackCandidate
+
+  hitC -= hitB; // recycling TVector3s, this is segmentBC
+  hitB -= (*m_hits)[2]->hitPosition; // this is segmentAB
+  hitC.SetZ(0.);
+  hitB.SetZ(0.);
+  hitC = hitC.Orthogonal();
+
+  std::pair<double, TVector3> helixFitValues = helixFit(m_hits, useBackwards);
+
+  return make_pair(helixFitValues.second, boost::math::sign(hitC * hitB)); //.first: momentum vector. .second: sign of curvature: is > 0 if angle between vectors is < 90°, < 0 else (rule of scalar product)
+}
+
+
 // clap = closest approach of fitted circle to origin
 double TrackletFilters::circleFit(double& clapPhi, double& clapR, double& radius)
 {
@@ -102,7 +124,7 @@ double TrackletFilters::circleFit(double& clapPhi, double& clapR, double& radius
   double tuningParameter = 1.; //0.02; // this parameter is for internal tuning of the weights, since at the moment, the error seams highly overestimated at the moment. 1 means no influence of parameter.
 
   // looping over all hits and do the division afterwards
-  BOOST_FOREACH(PositionInfo * hit, *m_hits) {
+  for (PositionInfo * hit : *m_hits) {
     weight = 1. / ((hit->sigmaX) * (hit->sigmaX) * tuningParameter);
     B2DEBUG(100, " current hitSigma: " << hit->sigmaX << ", weight: " << weight)
     sumWeights += weight;
@@ -203,7 +225,7 @@ std::pair<double, TVector3> TrackletFilters::helixFit(const std::vector<Tracking
   if (useBackwards == false) { seedHit = (*hits).at(nHits - 1)->hitPosition; secondHit = (*hits).at(nHits - 2)->hitPosition; } // want innermost hit
 //  B2ERROR(" useBackwards == " << useBackwards << ", seedHit.Mag()/secondHit.Mag(): " << seedHit.Mag()<<"/"<< secondHit.Mag())
 
-  BOOST_FOREACH(PositionInfo * hit, *hits) { // column vectors now
+  for (PositionInfo * hit : *hits) { // column vectors now
     x = hit->hitPosition.X();
     y = hit->hitPosition.Y();
     z = hit->hitPosition.Z();
@@ -297,7 +319,7 @@ std::pair<double, TVector3> TrackletFilters::helixFit(const std::vector<Tracking
 //  B2WARNING("circle: n1: " << n1 << ", n2: " << n2 << ", n3: " << n3 )
   double a = 1. / (2.*n3); // temporary value
   double xc = -n1 * a; // x coordinate of the origin of the circle
-  double yc = -n2 * a; // x coordinate of the origin of the circle
+  double yc = -n2 * a; // y coordinate of the origin of the circle
 //  double rho2=(1.-n3*n3-4.*distanceOfPlane*n3)*(a*a);
   double rho = sqrt((1. - n3 * n3 - 4.*distanceOfPlane * n3) * (a * a)); // radius of the circle
 //  B2WARNING("circle: origin x: " << xc << ", y: " << yc << ", radius: " << rho  << endl)
@@ -402,13 +424,20 @@ std::pair<double, TVector3> TrackletFilters::helixFit(const std::vector<Tracking
 //  for (int i = 0; i < 2; ++i) {
 //    B2WARNING("p Rows: " <<  i << ", value: " << p(i,0) )
 //  }
-  double thetaVal = M_PI * 0.5 + atan(p(1, 0)); // WARNING: was M_PI*0.5 - atan(p(1,0)), but values were wrong!
+  double thetaVal = M_PI * 0.5 - atan(p(1, 0)); // WARNING: was M_PI*0.5 - atan(p(1,0)), but values were wrong! double-WARNING: but + atan was wrong too!
 //  B2WARNING("thetaVal: " << thetaVal)
 
   /// calc direction:
+//  TVector3 radialVector = (center - seedHit);
+// double radiusInCm = radialVector.Perp();
+// double pT = m_3hitFilterBox.calcPt(radiusInCm);
+// TVector3 pTVector = (pT / radiusInCm) * radialVector.Orthogonal();
+// pZ = pT / tan(theta);
+// TVector3 pVector = pTVector;
+//     TVector3 pVector.SetZ(pZ);
 
-  TVector3 radialVector(xc, yc, 0.);
-  radialVector = seedHit - radialVector;
+  TVector3 radialVector(xc, yc, 0.); // here it is the center of the circle
+  radialVector = radialVector - seedHit; // now it's the radialVector
   radialVector.SetZ(0.);
   double pT = m_3hitFilterBox.calcPt(rho);
   TVector3 pVector = pT  * (radialVector.Orthogonal()).Unit(); // now it is the pT-Vector, therefore without pZ information
@@ -416,6 +445,7 @@ std::pair<double, TVector3> TrackletFilters::helixFit(const std::vector<Tracking
   TVector3 vectorToSecondHit = secondHit - seedHit;
   vectorToSecondHit.SetZ(0);
   if (((useBackwards == true) && (vectorToSecondHit.Angle(pVector) < M_PI * 0.5)) || ((useBackwards == false) && (vectorToSecondHit.Angle(pVector) > M_PI * 0.5))) { pVector *= -1.; }
+//   B2WARNING("radius: " << rho << ", theta: " << thetaVal << " ");
 //  if ( vectorToSecondHit.Angle(pVector) > M_PI*0.5 ) { pVector *= -1.; }
   pVector.SetZ(pZ); // now that track carries full momentum
 //    B2ERROR("again: useBackwards == " << useBackwards << ", seedHit.Mag()/secondHit.Mag(): " << seedHit.Mag()<<"/"<< secondHit.Mag())

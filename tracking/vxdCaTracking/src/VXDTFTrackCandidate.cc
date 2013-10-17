@@ -10,7 +10,6 @@
 
 #include "../include/VXDTFTrackCandidate.h"
 #include <math.h>
-#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 #include "../include/ClusterInfo.h"
 
@@ -33,36 +32,36 @@ using namespace Belle2::Tracking;
 
 
 
-const vector<int>& VXDTFTrackCandidate::getSVDHitIndices()
-{
-  m_svdHitIndices.clear();
-  m_svdHitIndices.reserve(m_attachedHits.size());
-  int index;
-  for (VXDTFHit * aHit : m_attachedHits) {
-    if (aHit->getDetectorType() == Const::SVD) { /* SVD */
-      index = aHit->getClusterIndexU();
-      if (index != -1) { m_svdHitIndices.push_back(index); }
-      index = aHit->getClusterIndexV();
-      if (index != -1) { m_svdHitIndices.push_back(index); }
-    }
-  }
-  return m_svdHitIndices;
-} /**< returns indices of svdClusters forming current TC */
+// const vector<int>& VXDTFTrackCandidate::getSVDHitIndices()
+// {
+//   m_svdHitIndices.clear();
+//   m_svdHitIndices.reserve(m_attachedHits.size());
+//   int index;
+//   for (VXDTFHit * aHit : m_attachedHits) {
+//     if (aHit->getDetectorType() == Const::SVD) { /* SVD */
+//       index = aHit->getClusterIndexU();
+//       if (index != -1) { m_svdHitIndices.push_back(index); }
+//       index = aHit->getClusterIndexV();
+//       if (index != -1) { m_svdHitIndices.push_back(index); }
+//     }
+//   }
+//   return m_svdHitIndices;
+// } /**< returns indices of svdClusters forming current TC */
 
 
-const vector<int>& VXDTFTrackCandidate::getPXDHitIndices()
-{
-  m_pxdHitIndices.clear();
-  m_pxdHitIndices.reserve(m_attachedHits.size());
-  int index;
-  for (VXDTFHit * aHit : m_attachedHits) {
-    if (aHit->getDetectorType() == Const::PXD) { /* PXD */
-      index = aHit->getClusterIndexUV();
-      if (index != -1) { m_pxdHitIndices.push_back(index); }
-    }
-  }
-  return m_pxdHitIndices;
-} /**< returns indices of svdClusters forming current TC */
+// const vector<int>& VXDTFTrackCandidate::getPXDHitIndices()
+// {
+//   m_pxdHitIndices.clear();
+//   m_pxdHitIndices.reserve(m_attachedHits.size());
+//   int index;
+//   for (VXDTFHit * aHit : m_attachedHits) {
+//     if (aHit->getDetectorType() == Const::PXD) { /* PXD */
+//       index = aHit->getClusterIndexUV();
+//       if (index != -1) { m_pxdHitIndices.push_back(index); }
+//     }
+//   }
+//   return m_pxdHitIndices;
+// } /**< returns indices of svdClusters forming current TC */
 
 
 list<int> VXDTFTrackCandidate::getHopfieldHitIndices()
@@ -80,20 +79,20 @@ list<int> VXDTFTrackCandidate::getHopfieldHitIndices()
 }
 
 
-void VXDTFTrackCandidate::setCondition(bool newCondition)
-{
-  if (m_alive == true && newCondition == false) {   // in this case, the TC will be deactivated
-    for (VXDTFHit * aHit : m_attachedHits) {
-      aHit->removeTrackCandidate();
-      // TODO: for each ClusterInfo in aHit-> removeTrackCandidate(this);
-    }
-  } else if (m_alive == false && newCondition == true) {   // in this case the TC will be (re)activated
-    for (VXDTFHit * aHit : m_attachedHits) {
-      aHit->addTrackCandidate();
-    }
-  }
-  m_alive = newCondition;
-}
+// void VXDTFTrackCandidate::setCondition(bool newCondition)
+// {
+//   if (m_alive == true && newCondition == false) {   // in this case, the TC will be deactivated
+//     for (VXDTFHit * aHit : m_attachedHits) {
+//       aHit->removeTrackCandidate();
+//       // TODO: for each ClusterInfo in aHit-> removeTrackCandidate(this);
+//     }
+//   } else if (m_alive == false && newCondition == true) {   // in this case the TC will be (re)activated
+//     for (VXDTFHit * aHit : m_attachedHits) {
+//       aHit->addTrackCandidate();
+//     }
+//   }
+//   m_alive = newCondition;
+// }
 
 
 void VXDTFTrackCandidate::removeVirtualHit()   /// removing virtual hit/segment from TC after collecting the whole TC. This is done after the TCC and the TCC filter since the TCC needs the information provided by the virtual hit/segment.

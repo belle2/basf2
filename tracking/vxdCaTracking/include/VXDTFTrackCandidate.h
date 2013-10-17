@@ -10,6 +10,7 @@
 #ifndef VXDTFTRACKCANDIDATE_H
 #define VXDTFTRACKCANDIDATE_H
 
+#include <framework/gearbox/Const.h>
 
 #include "VXDTFHit.h"
 #include "VXDSegmentCell.h"
@@ -82,18 +83,19 @@ namespace Belle2 {
       std::vector<VXDSegmentCell*> getSegments() { return m_attachedCells; } /**< returns segments forming current TC */
 
 
-      const std::vector<VXDTFHit*>& getHits() { return m_attachedHits; } /**< returns hits forming current TC */
+      const std::vector<VXDTFHit*>& getHits() { return m_attachedHits; } /**< returns hits forming current TC. Currently, the first hit in the vector is the outermost hit  */
 
 
       const std::vector<PositionInfo*>* getPositionInfos() {
         if (m_attachedPositionInfos.size() == m_attachedHits.size()) { return &m_attachedPositionInfos; }
         m_attachedPositionInfos.clear();
         m_attachedPositionInfos.reserve(m_attachedHits.size());
-        for (std::vector<VXDTFHit*>::iterator it = m_attachedHits.begin(); it != m_attachedHits.end(); ++it) {
-          m_attachedPositionInfos.push_back((*it)->getPositionInfo());
-        }
+        for (auto * aHit : m_attachedHits) { m_attachedPositionInfos.push_back(aHit->getPositionInfo()); }
+//         for (std::vector<VXDTFHit*>::iterator it = m_attachedHits.begin(); it != m_attachedHits.end(); ++it) {
+//           m_attachedPositionInfos.push_back((*it)->getPositionInfo());
+//         }
         return &m_attachedPositionInfos;
-      } /**< returns position infos (global hit coordinates and errors for x and y coordinates) forming current TC */
+      } /**< returns position infos (global hit coordinates and errors for x and y coordinates) forming current TC. Currently, the first hit in the vector is the outermost hit  */
 
 
       std::vector<TVector3*> getHitCoordinates() { /**< returns hit positions forming current TC */
@@ -106,10 +108,34 @@ namespace Belle2 {
       }
 
 
-      const std::vector<int>& getSVDHitIndices(); /**< returns real indices of svdClusters forming current TC */
+      const std::vector<int>& getSVDHitIndices() {
+        m_svdHitIndices.clear();
+        m_svdHitIndices.reserve(m_attachedHits.size());
+        int index;
+        for (VXDTFHit * aHit : m_attachedHits) {
+          if (aHit->getDetectorType() == Const::SVD) { /* SVD */
+            index = aHit->getClusterIndexU();
+            if (index != -1) { m_svdHitIndices.push_back(index); }
+            index = aHit->getClusterIndexV();
+            if (index != -1) { m_svdHitIndices.push_back(index); }
+          }
+        }
+        return m_svdHitIndices;
+      }  /**< returns real indices of svdClusters forming current TC */
 
 
-      const std::vector<int>& getPXDHitIndices(); /**< returns real indices of pxdClusters forming current TC */
+      const std::vector<int>& getPXDHitIndices() {
+        m_pxdHitIndices.clear();
+        m_pxdHitIndices.reserve(m_attachedHits.size());
+        int index;
+        for (VXDTFHit * aHit : m_attachedHits) {
+          if (aHit->getDetectorType() == Const::PXD) { /* PXD */
+            index = aHit->getClusterIndexUV();
+            if (index != -1) { m_pxdHitIndices.push_back(index); }
+          }
+        }
+        return m_pxdHitIndices;
+      } /**< returns real indices of pxdClusters forming current TC */
 
 
       //     std::list<int> getHopfieldHitIndices() { return m_hopfieldHitIndices; } /**< returns slightly adapted indices for hopfield use only (no real indices, but only unique ones...) */
@@ -216,7 +242,19 @@ namespace Belle2 {
       void setQQQ(double qqqScore, double maxScore) { m_qqq = sqrt(qqqScore / maxScore); } /**< set estimated extended quality of TC (a potential minimal replacement for kalman filter, interesting for online-use) */
 
 
-      void setCondition(bool newCondition); /**< set condition. If true, TC is part of set of final TCs which are exported for further use */
+      void setCondition(bool newCondition) {
+        if (m_alive == true && newCondition == false) {   // in this case, the TC will be deactivated
+          for (VXDTFHit * aHit : m_attachedHits) {
+            aHit->removeTrackCandidate();
+            // TODO: for each ClusterInfo in aHit-> removeTrackCandidate(this);
+          }
+        } else if (m_alive == false && newCondition == true) {   // in this case the TC will be (re)activated
+          for (VXDTFHit * aHit : m_attachedHits) {
+            aHit->addTrackCandidate();
+          }
+        }
+        m_alive = newCondition;
+      } /**< set condition. If true, TC is part of set of final TCs which are exported for further use */
 
 
       void setNeuronValue(double aValue) { m_neuronValue = aValue; }  /**< set neuron value, needed by the hopfield network */
@@ -241,7 +279,7 @@ namespace Belle2 {
 
 
     protected:
-      std::vector<VXDTFHit*> m_attachedHits; /**< contains pointer to all VXDTFHits attached to current TC */
+      std::vector<VXDTFHit*> m_attachedHits; /**< contains pointer to all VXDTFHits attached to current TC. Currently, the first hit in the vector is the outermost hit */
       std::vector<PositionInfo*> m_attachedPositionInfos; /**< contains positionInfos (coordinates, sigmaValues) for each hit */
       std::vector<VXDSegmentCell*> m_attachedCells; /**< contains pointer to all VXDSegmentCells attached to current TC */
       std::vector<VXDTFTrackCandidate*> m_bookingRivals; /**< contains all TCs sharing hits with current one */

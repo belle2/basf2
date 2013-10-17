@@ -321,7 +321,7 @@ void FilterCalculatorModule::event()
     if (aMcParticlePtr->hasStatus(MCParticle::c_PrimaryParticle) == false) { continue; } // check whether current particle (and all its hits) belong to a primary particle
 
     TVector3 mcVertexPos = aMcParticlePtr->getVertex();
-    TVector3 mcMomentum = aMcParticlePtr->getMomentum(); /// filter hier nach MomentumStufe
+    TVector3 mcMomentum = aMcParticlePtr->getMomentum(); /// used for filtering depending on momentum of particle
     if (mcVertexPos.Perp() > m_PARAMmaxXYvertexDistance) {
       B2DEBUG(5, "FilterCalculatorModule - event " << m_eventCounter << ": mcParticle with index " << iPart << " discarded because of bad rho-value (" << mcVertexPos.Perp() << " is bigger than threshold: " << m_PARAMmaxXYvertexDistance << ") of the particle-vertex")
       continue;

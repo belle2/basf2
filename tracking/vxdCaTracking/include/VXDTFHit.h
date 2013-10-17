@@ -143,7 +143,7 @@ namespace Belle2 {
       ClusterInfo* m_clusterInfoUV; /**< pointer to  intermediate class storing index of PXDCluster */
       int m_detectorType; /**< knows wheter hit is in IP=Const::IR (only virtual hit), PXD=Const::PXD or SVD=Const::SVD  */
 
-      unsigned int m_papaSector; /**< name of sector containing hit */ // convert to int? is that faster? (needed very often)
+      unsigned int m_papaSector; /**< name of sector containing hit */
       VxdID m_VxdID; /**< VxdID of sensor containing hit */
       float m_timeStamp; /**< only filled when available (SVD), else 0  */
 

@@ -8,18 +8,23 @@
 #include <vector>
 #include <math.h>
 #include <utility> // pair
+#include <fstream>
 
 // root:
 #include <TVector3.h>
 #include <gtest/gtest.h>
 #include <TRandom.h>
+#include <TMatrixD.h>
 
 //boost:
-#include <boost/foreach.hpp>
+// #include <boost/foreach.hpp>
 #include <boost/bind/bind.hpp>
 // #ifndef __CINT__
 // #include <boost/chrono.hpp>
 // #endif
+
+//Eigen
+#include <Eigen/Dense>
 
 using namespace std;
 using namespace Belle2::Tracking;
@@ -75,23 +80,23 @@ namespace Belle2 {
     highPtMaxi.push_back(a), highPtMaxi.push_back(b), highPtMaxi.push_back(c), highPtMaxi.push_back(d), highPtMaxi.push_back(e), highPtMaxi.push_back(f), highPtMaxi.push_back(g), highPtMaxi.push_back(h), highPtMaxi.push_back(i), highPtMaxi.push_back(j), highPtMaxi.push_back(k), highPtMaxi.push_back(l), highPtMaxi.push_back(m);
 
 
-    BOOST_FOREACH(TVector3 & hit, highPtMaxi) {
+    for (TVector3 & hit : highPtMaxi) {
       PositionInfo posInfo;
       posInfo.hitPosition = hit;
       posInfo.sigmaX = sigma;
       tempMaxiStuff.push_back(posInfo);
     }
-    BOOST_FOREACH(PositionInfo & hit, tempMaxiStuff) {
+    for (PositionInfo & hit : tempMaxiStuff) {
       maxiStuff.push_back(&hit);
     }
 
-    BOOST_FOREACH(TVector3 & hit, highPtMini) {
+    for (TVector3 & hit : highPtMini) {
       PositionInfo posInfo;
       posInfo.hitPosition = hit;
       posInfo.sigmaX = sigma;
       tempMiniStuff.push_back(posInfo);
     }
-    BOOST_FOREACH(PositionInfo & hit, tempMiniStuff) {
+    for (PositionInfo & hit : tempMiniStuff) {
       miniStuff.push_back(&hit);
     }
 
@@ -104,13 +109,13 @@ namespace Belle2 {
     vector<TVector3> testVector;
     testVector.push_back(testa += moveSmall); testVector.push_back(testb += moveSmall); testVector.push_back(testc += moveSmall); testVector.push_back(testd += moveSmall); testVector.push_back(teste += moveSmall);
 
-    BOOST_FOREACH(TVector3 & hit, testVector) {
+    for (TVector3 & hit : testVector) {
       PositionInfo posInfo;
       posInfo.hitPosition = hit;
       posInfo.sigmaX = sigma;
       tempTestStuff.push_back(posInfo);
     }
-    BOOST_FOREACH(PositionInfo & hit, tempTestStuff) {
+    for (PositionInfo & hit : tempTestStuff) {
       testStuff.push_back(&hit);
     }
 
@@ -159,16 +164,23 @@ namespace Belle2 {
     vector<PositionInfo*> compareVec;
     vector<PositionInfo> tempCompareVec;
 
+    ofstream myfile;
+    myfile.open("output.txt");
+
     int ctr = 0;
-    BOOST_FOREACH(TVector3 & hit, hits) {
+    for (TVector3 & hit : hits) {
       PositionInfo posInfo;
       posInfo.hitPosition = hit;
       posInfo.sigmaX = 0.001;
       posInfo.sigmaY = 0.001;
+
+      myfile << hit.X() << " " << hit.Y() << " " << hit.Z() << " " << 0.001 << " " << 0.001 << endl;
+
       tempCompareVec.push_back(posInfo);
 //      compareVec.push_back(&(tempCompareVec.at(ctr)));
       ctr++;
     }
+    myfile.close();
 
     for (int i = 0; i < int(tempCompareVec.size()); ++i) {
       compareVec.push_back(&(tempCompareVec.at(i)));
@@ -189,6 +201,7 @@ namespace Belle2 {
 
 //    startTimer = boostClock::now();
     aFilter.circleFit(clapPhi, clapR, estimatedRadius);
+    EXPECT_FLOAT_EQ(14.511606, estimatedRadius);
 //    stopTimer = boostClock::now();
 //    boostNsec durCircleFit = boost::chrono::duration_cast<boostNsec>(stopTimer - startTimer);
 //    B2WARNING("after comparison-test, chi2 is " << chi2 << ", clapPhi,clapR,estimatedRadius is: " << clapPhi << "," << clapR << "," << estimatedRadius)
@@ -204,5 +217,90 @@ namespace Belle2 {
     EXPECT_FLOAT_EQ(14.511622, returnValues.first);
 
 //    B2WARNING("duration(ns): durCircleCenter: " << durCircleCenter.count() << ", durCircleFit: " << durCircleFit.count() << ", durHelixFit: " << durHelixFit.count() )
+
+    /// testing realistic values of b2fw:
+//    PositionInfo pos1, pos2, pos3, pos4, pos5, pos6;
+//    pos1.hitPosition = TVector3(4.30225,-9.65892,-1.448);
+//     pos1.sigmaX = 0.00201488;
+//     pos1.sigmaY = 0.0005161;
+//
+//    pos2.hitPosition = TVector3(3.64093,-13.1215,-6.748);
+//     pos2.sigmaX = 0.00168024;
+//     pos2.sigmaY = 0.000568051;
+//
+//    pos3.hitPosition = TVector3(4.03147,-6.97929,3.244);
+//     pos3.sigmaX = 0.00161568;
+//     pos3.sigmaY = 0.00188476;
+//
+//    pos4.hitPosition = TVector3(1.90634,-3.32975,-3.4);
+//     pos4.sigmaX = 0.0100725;
+//     pos4.sigmaY = 0.000319435;
+//
+//    pos5.hitPosition = TVector3(1.32762,-1.76951,-1.21305);
+//     pos5.sigmaX = 0.000644498;
+//     pos5.sigmaY = 0.00109565;
+//
+//    pos6.hitPosition = TVector3(1.17998,-0.805218,-0.88255);
+//     pos6.sigmaX = 0.000683021;
+//     pos6.sigmaY = 0.000819625;
+
+
+
+
+    /// testing Eigen library and comparing results with root TMatrixD:
+    int sizeOfMatrix = 4;
+    double seed = 4;
+    TMatrixD rootMatrix(sizeOfMatrix, sizeOfMatrix);  // testing matrix -root
+    TMatrixD rootMatrix2(sizeOfMatrix, sizeOfMatrix);  // testing matrix -root
+    TMatrixD rootVector(1, sizeOfMatrix); // testing vector -root
+    rootMatrix.Randomize(3.3, 1.0, seed); // .Randomize(double alpha, double beta, Double_t& seed);
+    rootMatrix2.Randomize(4.3, 1.0, seed);
+    rootVector.Randomize(3.3, 1.0, seed);
+    TMatrixD multipliedRoot = rootVector * rootMatrix;
+    TMatrixD multipliedRoot2 = rootMatrix2 * rootMatrix;
+    TMatrixD minusRoot = rootMatrix2 - rootMatrix;
+
+    Eigen::MatrixXd eigenMatrix(sizeOfMatrix, sizeOfMatrix);   // testing matrix -eigenLibrary
+    Eigen::MatrixXd eigenMatrix2(sizeOfMatrix, sizeOfMatrix);   // testing matrix -eigenLibrary
+    Eigen::MatrixXd eigenVector(1, sizeOfMatrix); // testing vector -eigenLibrary
+
+
+
+    for (int i = 0; i < sizeOfMatrix; ++i) {
+      eigenVector(0, i) = rootVector(0, i);
+      EXPECT_DOUBLE_EQ(eigenVector(0, i), rootVector(0, i));
+      for (int j = 0; j < sizeOfMatrix; ++j) {
+        eigenMatrix(i, j) = rootMatrix(i, j);
+        eigenMatrix2(i, j) = rootMatrix2(i, j);
+        EXPECT_DOUBLE_EQ(eigenMatrix(i, j), rootMatrix(i, j));
+        EXPECT_DOUBLE_EQ(eigenMatrix2(i, j), rootMatrix2(i, j));
+//        B2WARNING("eintrag ("<<i<<"/"<<j<<"): " << rootMatrix(i,j))
+      }
+    }
+    Eigen::MatrixXd multipliedEigen;
+    multipliedEigen = eigenVector * eigenMatrix;
+    Eigen::MatrixXd multipliedEigen2 = eigenMatrix2 * eigenMatrix;
+    Eigen::MatrixXd minusEigen;
+    minusEigen = eigenMatrix2 - eigenMatrix;
+    EXPECT_DOUBLE_EQ(multipliedEigen(0, 0), multipliedRoot(0, 0));
+    for (int i = 0; i < sizeOfMatrix; ++i) {
+      for (int j = 0; j < sizeOfMatrix; ++j) {
+        EXPECT_DOUBLE_EQ(minusRoot(i, j), minusEigen(i, j));
+      }
+    }
+
+//    multipliedRoot2.Abs().Max();
+    /*minusRoot.Abs().Max()*/;
+//    multipliedEigen2.array().abs().maxCoeff();
+    /*minusEigen.array().abs().maxCoeff()*/;
+    EXPECT_DOUBLE_EQ(multipliedRoot2.Abs().Max(), multipliedEigen2.array().abs().maxCoeff());
+    EXPECT_DOUBLE_EQ(minusRoot.Abs().Max(), minusEigen.array().abs().maxCoeff());
+
+//    for (int i= 0; i < sizeOfMatrix; ++i) {
+//      for (int j= 0; j < sizeOfMatrix; ++j) {
+//        EXPECT_DOUBLE_EQ(multipliedRoot2(i,j), multipliedEigen2(i,j));
+//        EXPECT_DOUBLE_EQ(minusRoot(i,j), minusEigen(i,j));
+//      }
+//    }
   }
 }  // namespace

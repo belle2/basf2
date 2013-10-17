@@ -12,6 +12,7 @@
 #ifndef TRACKLETFILTERS_H
 #define TRACKLETFILTERS_H
 
+#include <tuple>
 #include <TVector3.h>
 #include <vector>
 #include "ThreeHitFilters.h"
@@ -34,11 +35,12 @@ namespace Belle2 {
         m_numHits(0) { m_hits = NULL; }
 
       /** Constructor. expects a vector of TVector3 formatted hits ordered by magnitude in x-y (first entry should be the outermost hit. Atm not needed yet, but relevant for possible future changes where a dependency of related classes like the ThreeHitFilters expect a sorted input that way) */
-      TrackletFilters(const std::vector<Tracking::PositionInfo*>* hits):
+      TrackletFilters(const std::vector<Tracking::PositionInfo*>* hits, double magneticFieldStrength = 1.5):
         m_hits(hits),
         m_radius(0),
         m_chi2(0) {
         m_numHits = m_hits->size();
+        resetMagneticField(magneticFieldStrength);
       }
 
 
@@ -81,6 +83,9 @@ namespace Belle2 {
         if (m_radius < 0.001) { return 0.; }
         return m_3hitFilterBox.calcPt(m_radius);
       }
+
+      /** calculates the momentum vector on first or last hitPosition in the hitVector. This means, you can define the hit to be chosen by two ways: fast: if useBackwards = true, then the first hit in the hitList is taken (check VXDTrackCandidate.h for the sequence of hits), if useBackwards = false, the last hit will be taken. The second method means that you have to sort your hits beforehand and therefore you can place the hit of your choice in the front or back-position... Return values: .first: Momentum-vector of seed, .second, sign-curvature */
+      std::pair<TVector3, int> calcMomentumSeed(bool useBackwards = false);
 
     protected:
 

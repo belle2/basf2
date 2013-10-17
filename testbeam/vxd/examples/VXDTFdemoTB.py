@@ -8,8 +8,10 @@ from basf2 import *
 from subprocess import call
 import datetime
 
-secSetup = ['testBeamFINE_VXD']  # use 'testBeamFINE_SVD' for svd-onle or 'testBeamFINE_VXD' for full vxd reco
-# and don't forget to set the clusters for the detector type you want in the mcTrackFinder down below!
+secSetup = ['testBeamFINE_VXD']  # use 'testBeamFINE_SVD' for svd-only
+# or 'testBeamFINE_VXD' for full vxd reco.
+# and don't forget to set the clusters for the detector type you want in the
+# mcTrackFinder down below!
 qiType = 'circleFit'
 filterOverlaps = 'hopfield'
 seed = 1
@@ -34,7 +36,7 @@ gearbox = register_module('Gearbox')
 gearbox.param('fileName', 'testbeam/vxd/VXD.xml')
 
 geometry = register_module('Geometry')
-# only the tracking detectors will be simulated. Makes this example much faster
+# only the tracking detectors will be simulated. Makes the example much faster
 geometry.param('Components', ['MagneticField', 'TB'])
 
 # ParticleGun
@@ -83,9 +85,16 @@ PXDCLUST = register_module('PXDClusterizer')
 vxdtf = register_module('VXDTF')
 vxdtf.logging.log_level = LogLevel.INFO
 vxdtf.logging.debug_level = 11
-# calcQIType:  Supports 'kalman', 'circleFit' or 'trackLength', 'circleFit' has best performance at the moment
-# filterOverlappingTCs: Supports 'hopfield', 'greedy' or 'none', 'hopfield' has best performance at the moment
-param_vxdtf = {  # normally we don't know the particleID, but in the case of the testbeam, we can expect (anti-?)electrons...
+# calcQIType:
+# Supports 'kalman', 'circleFit' or 'trackLength.
+# 'circleFit' has best performance at the moment
+
+# filterOverlappingTCs:
+# Supports 'hopfield', 'greedy' or 'none'.
+# 'hopfield' has best performance at the moment
+param_vxdtf = {
+    # normally we don't know the particleID, but in the case of the testbeam,
+    # we can expect (anti-?)electrons...
     'activateBaselineTF': 1,
     'tccMinState': [2],
     'tccMinLayer': [3],
@@ -192,7 +201,7 @@ display.param('showAllPrimaries', True)
 display.param('showCharged', False)
 
 # show tracks?
-display.param('showGFTracks', True)
+display.param('showTrackLevelObjects', True)
 
 # save events non-interactively (without showing window)?
 display.param('automatic', False)

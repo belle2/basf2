@@ -112,7 +112,7 @@ display.param('showAllPrimaries', True)
 display.param('showCharged', False)
 
 # show tracks?
-display.param('showGFTracks', True)
+display.param('showTrackLevelObjects', True)
 
 # save events non-interactively (without showing window)?
 display.param('automatic', False)

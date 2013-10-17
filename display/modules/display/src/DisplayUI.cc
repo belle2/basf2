@@ -75,9 +75,13 @@ DisplayUI::~DisplayUI()
   delete m_timer;
 }
 
-void DisplayUI::addParameter(const std::string& label, ModuleParam<bool>& param)
+void DisplayUI::addParameter(const std::string& label, ModuleParam<bool>& param, int level)
 {
-  m_paramList.push_back(make_pair(label, &param));
+  Parameter p;
+  p.m_label = label;
+  p.m_param = &param;
+  p.m_level = level;
+  m_paramList.push_back(p);
 }
 
 void DisplayUI::next()
@@ -422,11 +426,12 @@ void DisplayUI::makeGui()
   {
     const int nParams = m_paramList.size();
     for (int i = 0; i < nParams; i++) {
-      TGCheckButton* b = new TGCheckButton(param_frame, m_paramList[i].first.c_str(), i);
-      b->SetToolTipText(m_paramList[i].second->getDescription().c_str());
-      b->SetState(m_paramList[i].second->getValue() ? kButtonDown : kButtonUp);
+      TGCheckButton* b = new TGCheckButton(param_frame, m_paramList[i].m_label.c_str(), i);
+      b->SetToolTipText(m_paramList[i].m_param->getDescription().c_str());
+      b->SetState(m_paramList[i].m_param->getValue() ? kButtonDown : kButtonUp);
       b->Connect("Clicked()", "Belle2::DisplayUI", this, TString::Format("handleParameterChange(=%d)", i));
-      param_frame->AddFrame(b, new TGLayoutHints(kLHintsExpandX | kLHintsCenterY, 5, 5, 5, 5));
+      int indentation = 15 * m_paramList[i].m_level;
+      param_frame->AddFrame(b, new TGLayoutHints(kLHintsExpandX | kLHintsCenterY, indentation, 5, 5, 5));
     }
   }
   frmMain->AddFrame(param_frame, new TGLayoutHints(kLHintsExpandX, 0, 0, 0, 0));
@@ -502,7 +507,7 @@ void DisplayUI::handleParameterChange(int id)
     return;
   }
   //toggle value
-  m_paramList[id].second->setValue(!m_paramList[id].second->getValue());
+  m_paramList[id].m_param->setValue(!m_paramList[id].m_param->getValue());
 
   //reprocess current event
   m_reshowCurrentEvent = true;

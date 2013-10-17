@@ -60,6 +60,9 @@ namespace Belle2 {
      */
     std::string m_options;
 
+    /** Show Monte Carlo information (MCParticles, SimHits). */
+    bool m_showMCInfo;
+
     /** If true, hits created by secondary particles (e.g. delta electrons) will be assigned to the original primary particle. */
     bool m_assignToPrimaries;
 
@@ -75,8 +78,8 @@ namespace Belle2 {
     /** If true, all neutral primary and secondary MCParticles will be shown, regardless of wether hits are produced. */
     bool m_showNeutrals;
 
-    /** Wether to show GFTracks */
-    bool m_showGFTracks;
+    /** If true, fitted GFTracks, GFRave Vertices and ECLGamma objects will be shown in the display. */
+    bool m_showTrackLevelObjects;
 
     /** Wether to show GFTrackCands */
     bool m_showGFTrackCands;

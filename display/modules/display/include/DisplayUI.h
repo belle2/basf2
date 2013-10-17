@@ -39,8 +39,13 @@ namespace Belle2 {
     /** Destructor. */
     ~DisplayUI();
 
-    /** Generate UI elements so the given module parameter can be changed at run time. */
-    void addParameter(const std::string& label, ModuleParam<bool>& param);
+    /** Generate UI elements so the given module parameter can be changed at run time.
+     *
+     * Will result in a checkbox with given label indented by the amount in level
+     * (0 being leftmost). Clicking the checkbox will toggle the parameter and
+     * reload the event.
+     */
+    void addParameter(const std::string& label, ModuleParam<bool>& param, int level);
 
     /** Go to next event. */
     void next();
@@ -121,6 +126,13 @@ namespace Belle2 {
 
 
   private:
+    /** Wraps a module parameter that can be toggled from the UI. */
+    struct Parameter {
+      std::string m_label; /**< Label shown in UI. */
+      ModuleParam<bool>* m_param; /**< wrapped parameter. */
+      int m_level; /**< Level this parameter is shown at (0 is highest). */
+    };
+
     /** Build the buttons for event navigation.*/
     void makeGui();
 
@@ -143,7 +155,7 @@ namespace Belle2 {
     bool m_automatic;
 
     /** List of run time configurable module parameters. */
-    std::vector< std::pair<std::string, ModuleParam<bool>* > > m_paramList;
+    std::vector<Parameter> m_paramList;
 
     /** Button to switch to previous event. */
     TGButton* m_prevButton;

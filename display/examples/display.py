@@ -49,7 +49,7 @@ display = register_module('Display')
 # Note that you can always turn off an individual detector component or track
 # interactively by removing its checkmark in the 'Eve' tab.
 #
-# This option only makes sense when showGFTracks/showGFTrackCands is used
+# only makes sense when showTrackLevelObjects/showGFTrackCands is used
 display.param('options', 'HTM')  # default
 
 # should hits always be assigned to a particle with c_PrimaryParticle flag?
@@ -64,8 +64,8 @@ display.param('showAllPrimaries', True)
 # show all neutral MCParticles? (SLOW)
 # display.param('showNeutrals', True)
 
-# show tracks?
-display.param('showGFTracks', True)
+# show tracks, vertices, eclgammas?
+display.param('showTrackLevelObjects', True)
 
 # show track candidates?
 # You most likely don't want this unless you are a tracking developer

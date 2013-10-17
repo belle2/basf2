@@ -31,12 +31,13 @@ DisplayModule::DisplayModule() : Module(), m_display(0), m_visualizer(0)
   setDescription("Interactive visualisation of MCParticles, GFTracks and various SimHits (plus geometry). See https://belle2.cc.kek.jp/~twiki/bin/view/Computing/EventDisplay for detailed documentation.");
 
   addParam("options", m_options, "Drawing options for GFTracks, a combination of DHMPST. See EVEVisualization::setOptions or the display.py example for an explanation.", std::string("MHT"));
+  addParam("showMCInfo", m_showMCInfo, "Show Monte Carlo information (MCParticles, SimHits)", true);
   addParam("assignHitsToPrimaries", m_assignToPrimaries, "If true, hits created by secondary particles (after scattering, decay-in-flight, ...) will be assigned to the original primary particle.", false);
   addParam("showAllPrimaries", m_showAllPrimaries, "If true, all primary MCParticles will be shown, regardless of wether hits are produced.", false);
   addParam("hideSecondaries", m_hideSecondaries, "If true, secondary MCParticles (and hits created by them) will not be shown.", false);
   addParam("showCharged", m_showCharged, "If true, all charged MCParticles will be shown, including secondaries (implies disabled assignHitsToPrimaries). May be slow.", false);
   addParam("showNeutrals", m_showNeutrals, "If true, all neutral MCParticles will be shown, including secondaries (implies disabled assignHitsToPrimaries). May be slow.", false);
-  addParam("showGFTracks", m_showGFTracks, "If true, fitted GFTracks will be shown in the display.", true);
+  addParam("showTrackLevelObjects", m_showTrackLevelObjects, "If true, fitted GFTracks, GFRave Vertices and ECLGamma objects will be shown in the display.", true);
   addParam("showGFTrackCands", m_showGFTrackCands, "If true, track candidates (GFTrackCands) and RecoHits will be shown in the display.", false);
   addParam("useClusters", m_useClusters, "Use PXD/SVD clusters for GFTrackCands/recohit visualisation (instead of TrueHits).", true);
   addParam("automatic", m_automatic, "Non-interactively save visualisations for each event.", false);
@@ -89,13 +90,17 @@ void DisplayModule::initialize()
 
   m_display = new DisplayUI(m_automatic);
   //pass some parameters to DisplayUI to be able to change them at run time
-  m_display->addParameter("Assign hits to primary particles", getParam<bool>("assignHitsToPrimaries"));
-  m_display->addParameter("Show all primaries", getParam<bool>("showAllPrimaries"));
-  m_display->addParameter("Show all charged particles", getParam<bool>("showCharged"));
-  m_display->addParameter("Show all neutral particles", getParam<bool>("showNeutrals"));
-  m_display->addParameter("Hide secondaries", getParam<bool>("hideSecondaries"));
-  m_display->addParameter("Show tracks", getParam<bool>("showGFTracks"));
-  m_display->addParameter("Show candidates and RecoHits", getParam<bool>("showGFTrackCands"));
+  m_display->addParameter("Show MC info", getParam<bool>("showMCInfo"), 0);
+  {
+    //MC-specific parameters
+    m_display->addParameter("Assign hits to primary particles", getParam<bool>("assignHitsToPrimaries"), 1);
+    m_display->addParameter("Show all primaries", getParam<bool>("showAllPrimaries"), 1);
+    m_display->addParameter("Show all charged particles", getParam<bool>("showCharged"), 1);
+    m_display->addParameter("Show all neutral particles", getParam<bool>("showNeutrals"), 1);
+    m_display->addParameter("Hide secondaries", getParam<bool>("hideSecondaries"), 1);
+  }
+  m_display->addParameter("Show candidates and RecoHits", getParam<bool>("showGFTrackCands"), 0);
+  m_display->addParameter("Show tracks, vertices, gammas", getParam<bool>("showTrackLevelObjects"), 0);
 
 
   m_visualizer = new EVEVisualization();
@@ -121,40 +126,42 @@ void DisplayModule::event()
 
   m_visualizer->setHideSecondaries(m_hideSecondaries);
 
-  //gather MC particles
-  StoreArray<MCParticle> mcparticles;
-  if (m_showAllPrimaries or m_showCharged or m_showNeutrals) {
-    for (const MCParticle & part : mcparticles) {
-      if ((m_showAllPrimaries and part.hasStatus(MCParticle::c_PrimaryParticle))
-          or (m_showCharged and TMath::Nint(part.getCharge()) != 0)
-          or (m_showNeutrals and TMath::Nint(part.getCharge()) == 0)) {
-        switch (abs(part.getPDG())) {
-          case 11:
-          case 13:
-          case 22:
-          case 211:
-          case 321:
-          case 2212:
-            m_visualizer->addMCParticle(&part);
-            break;
-          default:
-            if (part.hasStatus(MCParticle::c_PrimaryParticle)) {
-              //only show odd things if they're primary...
+  if (m_showMCInfo) {
+    //gather MC particles
+    StoreArray<MCParticle> mcparticles;
+    if (m_showAllPrimaries or m_showCharged or m_showNeutrals) {
+      for (const MCParticle & part : mcparticles) {
+        if ((m_showAllPrimaries and part.hasStatus(MCParticle::c_PrimaryParticle))
+            or (m_showCharged and TMath::Nint(part.getCharge()) != 0)
+            or (m_showNeutrals and TMath::Nint(part.getCharge()) == 0)) {
+          switch (abs(part.getPDG())) {
+            case 11:
+            case 13:
+            case 22:
+            case 211:
+            case 321:
+            case 2212:
               m_visualizer->addMCParticle(&part);
-            }
-            break;
+              break;
+            default:
+              if (part.hasStatus(MCParticle::c_PrimaryParticle)) {
+                //only show odd things if they're primary...
+                m_visualizer->addMCParticle(&part);
+              }
+              break;
+          }
         }
       }
     }
-  }
 
-  //gather simhits
-  m_visualizer->addSimHits(StoreArray<CDCSimHit>());
-  m_visualizer->addSimHits(StoreArray<PXDSimHit>());
-  m_visualizer->addSimHits(StoreArray<SVDSimHit>());
-  m_visualizer->addSimHits(StoreArray<ECLHit>());
-  m_visualizer->addSimHits(StoreArray<EKLMSimHit>());
-  m_visualizer->addSimHits(StoreArray<BKLMSimHit>());
+    //gather simhits
+    m_visualizer->addSimHits(StoreArray<CDCSimHit>());
+    m_visualizer->addSimHits(StoreArray<PXDSimHit>());
+    m_visualizer->addSimHits(StoreArray<SVDSimHit>());
+    m_visualizer->addSimHits(StoreArray<ECLHit>()); //ECLHits are input to the digitizer, so this _is_ MC level
+    m_visualizer->addSimHits(StoreArray<EKLMSimHit>());
+    m_visualizer->addSimHits(StoreArray<BKLMSimHit>());
+  }
 
   if (m_showGFTrackCands) {
     StoreArray<GFTrackCand> gftrackcands;
@@ -180,30 +187,28 @@ void DisplayModule::event()
     m_visualizer->addUnassignedRecoHits(StoreArray<CDCHit>());
   }
 
-  if (m_showGFTracks) {
-    //gather reconstructed tracks
+  if (m_showTrackLevelObjects) {
+    //gather track-level objects
     StoreArray<GFTrack> gftracks;
     const int nTracks = gftracks.getEntries();
     for (int i = 0; i < nTracks; i++)
       m_visualizer->addTrack(gftracks[i], TString::Format("GFTrack %d", i));
+
+    StoreArray<GFRaveVertex> vertices;
+    const int nVertices = vertices.getEntries();
+    for (int i = 0; i < nVertices; i++) {
+      m_visualizer->addVertex(vertices[i], TString::Format("GFRaveVertex %d", i));
+    }
+
+    StoreArray<ECLGamma> gammas;
+    const int nRecGammas = gammas.getEntries();
+    for (int i = 0; i < nRecGammas; i++) {
+      m_visualizer->addGamma(gammas[i], TString::Format("ECLGamma %d", i));
+    }
   }
 
-
+  //all hits/tracks are added, finish visual representations
   m_visualizer->makeTracks();
-
-
-  StoreArray<GFRaveVertex> vertices;
-  const int nVertices = vertices.getEntries();
-  for (int i = 0; i < nVertices; i++) {
-    m_visualizer->addVertex(vertices[i], TString::Format("GFRaveVertex %d", i));
-  }
-
-
-  StoreArray<ECLGamma> gammas;
-  const int nRecGammas = gammas.getEntries();
-  for (int i = 0; i < nRecGammas; i++) {
-    m_visualizer->addGamma(gammas[i], TString::Format("ECLGamma %d", i));
-  }
 
   StoreObjPtr<DisplayData> displayData;
   if (displayData) {

@@ -237,6 +237,8 @@ namespace Belle2 {
      * @param particleIndex daughter particle store array index
      */
     void appendDaughter(int particleIndex) {
+      m_particleType = c_Composite;
+
       m_daughterIndices.push_back(particleIndex);
     }
 

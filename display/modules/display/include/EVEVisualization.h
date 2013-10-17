@@ -83,15 +83,15 @@ namespace Belle2 {
 
 
     /** Color for reco hits. */
-    const Color_t c_recoHitColor = kOrange;
+    const static int c_recoHitColor = kOrange;
     /** Color for TrackCandidates. */
-    const Color_t c_trackCandColor = kAzure - 2;
+    const static int c_trackCandColor = kAzure - 2;
     /** Color for tracks. */
-    const Color_t c_trackColor = kAzure;
+    const static int c_trackColor = kAzure;
     /** Color for track markers. */
-    const Color_t c_trackMarkerColor = kSpring;
+    const static int c_trackMarkerColor = kSpring;
     /** Color for unassigned (reco)hits. */
-    const Color_t c_unassignedHitColor = kViolet - 5;
+    const static int c_unassignedHitColor = kViolet - 5;
 
   public:
     /** Constructor.

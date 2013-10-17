@@ -236,11 +236,13 @@ int* DeSerializerPCModule::RecvData(int* malloc_flag, int* total_buf_nwords, int
     temp_num_events = send_hdr.GetNumEventsinPacket();
     temp_num_nodes = send_hdr.GetNumNodesinPacket();
 
+
     if (i == 0) {
       *num_events_in_sendblock = temp_num_events;
     } else if (*num_events_in_sendblock != temp_num_events) {
       char err_buf[500];
-      sprintf(err_buf, "[ERROR] Different # of events or nodes over data sources( %d %d %d %d ). Exiting...\n", *num_events_in_sendblock , temp_num_events , *num_nodes_in_sendblock , temp_num_nodes);
+      sprintf(err_buf, "[ERROR] Different # of events or nodes over data sources( %d %d %d %d ). Exiting...\n",
+              *num_events_in_sendblock , temp_num_events , *num_nodes_in_sendblock , temp_num_nodes);
       print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
       sleep(1234567);
       exit(1);
@@ -309,7 +311,6 @@ int* DeSerializerPCModule::RecvData(int* malloc_flag, int* total_buf_nwords, int
   for (int i = 0; i < m_socket.size(); i++) {
     Recv(m_socket[ i ], (char*)send_trl_buf, SendTrailer::SENDTRL_NWORDS * sizeof(int), flag);
   }
-
 
   return temp_buf;
 
@@ -392,18 +393,14 @@ void DeSerializerPCModule::event()
     int num_nodes_in_sendblock = 0;
     int* temp_buf = RecvData(&malloc_flag, &total_buf_nwords, &num_events_in_sendblock, &num_nodes_in_sendblock);
     m_totbytes += total_buf_nwords * sizeof(int);
-
 #ifdef DEBUG
     printf("Recvd data : %d bytes\n", total_buf_nwords * sizeof(int));
     fflush(stdout);
 #endif
 
     // Dump binary data
-
 #ifdef DEBUG
-
     printf("********* checksum 0x%.8x : %d\n" , CalcSimpleChecksum(temp_buf, total_buf_nwords - 2), total_buf_nwords);
-    printf("eve %d nodes %d\n", num_events_in_sendblock, num_nodes_in_sendblock);
     printf("\n%.8d : ", 0);
     for (int i = 0; i < total_buf_nwords; i++) {
       printf("0x%.8x ", temp_buf[ i ]);
@@ -425,10 +422,12 @@ void DeSerializerPCModule::event()
     int temp_malloc_flag = 0;
     RawDataBlock rawdatablk;
     rawdatablk.SetBuffer((int*)temp_buf, total_buf_nwords, temp_malloc_flag,
-                         num_events_in_sendblock, m_socket.size() * num_nodes_in_sendblock);
+                         num_events_in_sendblock, num_nodes_in_sendblock);
 
     num_copper_ftsw = rawdatablk.GetNumEntries();
     int cpr_num = 0;
+
+
     for (int i = 0; i < rawdatablk.GetNumEntries(); i++) {
       if (i == 0) {
         temp_malloc_flag = malloc_flag ;
@@ -454,7 +453,6 @@ void DeSerializerPCModule::event()
         temp_rawcdc = raw_cdcarray.appendNew();
         temp_rawcdc->SetBuffer((int*)temp_buf + rawdatablk.GetBufferPos(i),
                                rawdatablk.GetBlockNwords(i), temp_malloc_flag, 1, 1);
-
         RawTrailer rawtrl;
         rawtrl.SetBuffer(temp_rawcdc->GetRawTrlBufPtr(0));
         if (rawtrl.GetChksum() != CalcSimpleChecksum(temp_rawcdc->GetBuffer(0),

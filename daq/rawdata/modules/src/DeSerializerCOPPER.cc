@@ -9,13 +9,11 @@
 #include <daq/rawdata/modules/DeSerializerCOPPER.h>
 
 #define CHECKEVT 10000
-
-
 //#define CHECK_SUM
 //#define DUMMY
 //#define MAXEVTSIZE 400000000
 //#define TIME_MONITOR
-
+#define HSLB_DUMMY
 
 
 
@@ -208,22 +206,16 @@ void DeSerializerCOPPERModule::FillNewRawCOPPERHeader(RawCOPPER* raw_copper)
   //  printf("Eve ###  32bit %d 16bit %d\n",cur_ftsw_eve32, cur_ftsw_eve16 );
   rawhdr.SetEveNo(cur_ftsw_eve32);       // Temporarily use COPPER counter   //raw_copper->GetCOPPERCounter()
 
-
+#ifndef HSLB_DUMMY
   if (m_prev_ftsweve32 != 0xFFFFFFFF) {
     if (m_prev_ftsweve32 + 1 != cur_ftsw_eve32) {
       char err_buf[500];
-
-
-
       sprintf(err_buf, "Invalid event_number. Exiting...: cur 32bit eve %u preveve %u\n",  cur_ftsw_eve32, m_prev_ftsweve32);
       print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-
-
-
-
       //      exit(-1);
     }
   }
+#endif
   m_prev_ftsweve16 = cur_ftsw_eve16;
   m_prev_ftsweve32 = cur_ftsw_eve32;
 

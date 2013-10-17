@@ -90,7 +90,8 @@ namespace Belle2 {
     const Color_t c_trackColor = kAzure;
     /** Color for track markers. */
     const Color_t c_trackMarkerColor = kSpring;
-
+    /** Color for unassigned (reco)hits. */
+    const Color_t c_unassignedHitColor = kViolet - 5;
 
   public:
     /** Constructor.
@@ -157,6 +158,25 @@ namespace Belle2 {
 
     /** Add a reconstructed photon in the ECL. */
     void addGamma(const ECLGamma* gamma, const TString& name);
+
+    /** After adding recohits for tracks/candidates, this function adds the remaining hits in a global collection. */
+    template <class T> void addUnassignedRecoHits(const StoreArray<T>& hits) {
+      if (hits.getEntries() == 0)
+        return;
+      if (!m_unassignedRecoHits) {
+        m_unassignedRecoHits = new TEveStraightLineSet("Unassigned RecoHits");
+        m_unassignedRecoHits->SetTitle("Unassigned RecoHits");
+        m_unassignedRecoHits->SetMainColor(c_unassignedHitColor);
+        m_unassignedRecoHits->SetMarkerColor(c_unassignedHitColor);
+        m_unassignedRecoHits->SetMarkerStyle(6);
+        //m_unassignedRecoHits->SetMainTransparency(60);
+      }
+      for (const T & hit : hits) {
+        if (m_shownRecohits.count(&hit) == 0) {
+          addRecoHit(&hit, m_unassignedRecoHits);
+        }
+      }
+    }
 
     /** Add user-defined data (labels, points, etc.) */
     void showUserData(const DisplayData& displayData);
@@ -237,6 +257,8 @@ namespace Belle2 {
       const VXD::SensorInfoBase& sensor = geo.get(hit->getSensorID());
       const TVector3 global_pos = sensor.pointToGlobal(local_pos);
       lines->AddMarker(global_pos.x(), global_pos.y(), global_pos.z());
+
+      m_shownRecohits.insert(hit);
     }
 
     /** specialisation for SVDCluster */
@@ -286,6 +308,13 @@ namespace Belle2 {
 
     /** The global magnetic field. */
     EveVisBField m_bfield;
+
+    /* List of shown recohits (PXDCluster, SVDCluster, CDCHit). */
+    std::set<const TObject*> m_shownRecohits;
+
+    /** Unassigned recohits. */
+    TEveStraightLineSet* m_unassignedRecoHits;
+
   };
 
   template<class PXDType, class SVDType> void EVEVisualization::addTrackCandidate(const GFTrackCand* trackCand, const TString& label,

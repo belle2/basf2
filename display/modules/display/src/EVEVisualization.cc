@@ -89,7 +89,8 @@ EVEVisualization::EVEVisualization():
   m_fullgeo(false),
   m_assignToPrimaries(false),
   m_trackcandlist(0),
-  m_eclsimhitdata(0)
+  m_eclsimhitdata(0),
+  m_unassignedRecoHits(0)
 {
   setErrScale();
 
@@ -137,6 +138,7 @@ EVEVisualization::~EVEVisualization()
     return; //objects are probably already freed by Eve
 
   delete m_eclsimhitdata;
+  delete m_unassignedRecoHits;
   delete m_tracklist;
   delete m_gftracklist;
   delete m_trackcandlist;
@@ -701,7 +703,7 @@ EVEVisualization::MCTrack* EVEVisualization::addMCParticle(const MCParticle* par
       m_mcparticleTracks[particle].simhits = new TEvePointSet(pointsTitle);
       m_mcparticleTracks[particle].simhits->SetTitle(pointsTitle);
       m_mcparticleTracks[particle].simhits->SetMarkerStyle(6);
-      m_mcparticleTracks[particle].simhits->SetMainColor(kViolet - 5);
+      m_mcparticleTracks[particle].simhits->SetMainColor(c_unassignedHitColor);
       //m_mcparticleTracks[particle].simhits->SetMainTransparency(50);
       m_mcparticleTracks[particle].track = NULL;
     }
@@ -857,6 +859,9 @@ void EVEVisualization::makeTracks()
     m_calo3d->SetRnrFrame(false, false); //don't show crystal grid
     gEve->AddElement(m_calo3d);
   }
+
+  if (m_unassignedRecoHits)
+    gEve->AddElement(m_unassignedRecoHits);
 }
 
 void EVEVisualization::clearEvent()
@@ -864,10 +869,12 @@ void EVEVisualization::clearEvent()
   if (!gEve)
     return;
   m_mcparticleTracks.clear();
+  m_shownRecohits.clear();
   m_tracklist->DestroyElements();
   m_gftracklist->DestroyElements();
   if (m_trackcandlist)
     m_trackcandlist->DestroyElements();
+
 
   //lower energy threshold for ECL
   float ecl_threshold = 0.01;
@@ -878,6 +885,9 @@ void EVEVisualization::clearEvent()
   m_eclsimhitdata = new TEveCaloDataVec(1); //#slices
   m_eclsimhitdata->IncDenyDestroy();
   m_eclsimhitdata->RefSliceInfo(0).Setup("ECL", ecl_threshold, kRed);
+
+  delete m_unassignedRecoHits;
+  m_unassignedRecoHits = 0;
 
   //other things are cleaned up by TEve...
 }
@@ -976,6 +986,7 @@ void EVEVisualization::addRecoHit(const SVDCluster* hit, TEveStraightLineSet* li
   }
 
   lines->AddLine(a.x(), a.y(), a.z(), b.x(), b.y(), b.z());
+  m_shownRecohits.insert(hit);
 }
 
 void EVEVisualization::addRecoHit(const CDCHit* hit, TEveStraightLineSet* lines)
@@ -985,6 +996,7 @@ void EVEVisualization::addRecoHit(const CDCHit* hit, TEveStraightLineSet* lines)
   const TVector3& wire_pos_b = cdcgeo.wireBackwardPosition(WireID(hit->getID()));
 
   lines->AddLine(wire_pos_f.x(), wire_pos_f.y(), wire_pos_f.z(), wire_pos_b.x(), wire_pos_b.y(), wire_pos_b.z());
+  m_shownRecohits.insert(hit);
 }
 
 void EVEVisualization::showUserData(const DisplayData& displayData)

@@ -37,8 +37,8 @@ DisplayModule::DisplayModule() : Module(), m_display(0), m_visualizer(0)
   addParam("showCharged", m_showCharged, "If true, all charged MCParticles will be shown, including secondaries (implies disabled assignHitsToPrimaries). May be slow.", false);
   addParam("showNeutrals", m_showNeutrals, "If true, all neutral MCParticles will be shown, including secondaries (implies disabled assignHitsToPrimaries). May be slow.", false);
   addParam("showGFTracks", m_showGFTracks, "If true, fitted GFTracks will be shown in the display.", true);
-  addParam("showGFTrackCands", m_showGFTrackCands, "If true, track candidates (GFTrackCands array) will be shown in the display.", false);
-  addParam("useClusters", m_useClusters, "Use PXD/SVD clusters for GFTrackCands visualisation", true);
+  addParam("showGFTrackCands", m_showGFTrackCands, "If true, track candidates (GFTrackCands) and RecoHits will be shown in the display.", false);
+  addParam("useClusters", m_useClusters, "Use PXD/SVD clusters for GFTrackCands/recohit visualisation (instead of TrueHits).", true);
   addParam("automatic", m_automatic, "Non-interactively save visualisations for each event.", false);
   addParam("fullGeometry", m_fullGeometry, "Show full geometry instead of simplified shapes. Further details can be enabled by changing the VisLevel option for Eve -> Scenes -> Geometry Scene -> Top_1.", false);
 
@@ -69,6 +69,9 @@ void DisplayModule::initialize()
   StoreArray<GFTrackCand>::optional();
   StoreArray<GFRaveVertex>::optional();
   StoreObjPtr<DisplayData>::optional();
+  StoreArray<PXDCluster>::optional();
+  StoreArray<SVDCluster>::optional();
+  StoreArray<CDCHit>::optional();
 
   if (!gGeoManager) { //TGeo geometry not initialized, do it ourselves
     //convert geant4 geometry to TGeo geometry
@@ -91,8 +94,8 @@ void DisplayModule::initialize()
   m_display->addParameter("Show all charged particles", getParam<bool>("showCharged"));
   m_display->addParameter("Show all neutral particles", getParam<bool>("showNeutrals"));
   m_display->addParameter("Hide secondaries", getParam<bool>("hideSecondaries"));
-  m_display->addParameter("Show GFTracks", getParam<bool>("showGFTracks"));
-  m_display->addParameter("Show GFTrackCandidates", getParam<bool>("showGFTrackCands"));
+  m_display->addParameter("Show tracks", getParam<bool>("showGFTracks"));
+  m_display->addParameter("Show candidates and RecoHits", getParam<bool>("showGFTrackCands"));
 
 
   m_visualizer = new EVEVisualization();
@@ -153,14 +156,6 @@ void DisplayModule::event()
   m_visualizer->addSimHits(StoreArray<EKLMSimHit>());
   m_visualizer->addSimHits(StoreArray<BKLMSimHit>());
 
-  if (m_showGFTracks) {
-    //gather reconstructed tracks
-    StoreArray<GFTrack> gftracks;
-    const int nTracks = gftracks.getEntries();
-    for (int i = 0; i < nTracks; i++)
-      m_visualizer->addTrack(gftracks[i], TString::Format("GFTrack %d", i));
-  }
-
   if (m_showGFTrackCands) {
     StoreArray<GFTrackCand> gftrackcands;
     const int nCands = gftrackcands.getEntries();
@@ -173,7 +168,26 @@ void DisplayModule::event()
                                         StoreArray<PXDTrueHit>(), StoreArray<SVDTrueHit>(), StoreArray<CDCHit>());
       }
     }
+
+    //add remaining recohits
+    if (m_useClusters) {
+      m_visualizer->addUnassignedRecoHits(StoreArray<PXDCluster>());
+      m_visualizer->addUnassignedRecoHits(StoreArray<SVDCluster>());
+    } else {
+      m_visualizer->addUnassignedRecoHits(StoreArray<PXDTrueHit>());
+      m_visualizer->addUnassignedRecoHits(StoreArray<SVDTrueHit>());
+    }
+    m_visualizer->addUnassignedRecoHits(StoreArray<CDCHit>());
   }
+
+  if (m_showGFTracks) {
+    //gather reconstructed tracks
+    StoreArray<GFTrack> gftracks;
+    const int nTracks = gftracks.getEntries();
+    for (int i = 0; i < nTracks; i++)
+      m_visualizer->addTrack(gftracks[i], TString::Format("GFTrack %d", i));
+  }
+
 
   m_visualizer->makeTracks();
 

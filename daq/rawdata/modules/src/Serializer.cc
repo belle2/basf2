@@ -62,7 +62,7 @@ void SerializerModule::initialize()
 
 
   if (m_shmflag != 0) {
-    ShmOpen("/cpr_config", "/cpr_status");
+    char temp_char1[100] = "/cpr_config"; char temp_char2[100] = "/cpr_status";  ShmOpen(temp_char1, temp_char2);
     // Status format : status_flag
     m_cfg_buf = ShmGet(m_shmfd_cfg, 4);
     m_cfg_sta = ShmGet(m_shmfd_sta, 4);
@@ -172,7 +172,7 @@ void SerializerModule::FillSendHeaderTrailer(SendHeader* hdr, SendTrailer* trl, 
 {
   const int num_cprblock = 0;
   RawHeader rawhdr;
-  rawhdr.SetBuffer(rawcpr->GetRawHdrBufPtr(0));
+  rawhdr.SetBuffer(rawcpr->GetRawHdrBufPtr(num_cprblock));
   int total_send_nwords =
     hdr->GetHdrNwords() +
     rawcpr->TotalBufNwords() +
@@ -191,7 +191,7 @@ void SerializerModule::FillSendHeaderTrailer(SendHeader* hdr, SendTrailer* trl, 
 
 void SerializerModule::SendByWriteV(RawCOPPER* rawcpr)
 {
-  const int num_cprblock = 0;
+
 
   SendHeader send_header;
   SendTrailer send_trailer;
@@ -223,7 +223,7 @@ void SerializerModule::SendByWriteV(RawCOPPER* rawcpr)
   //  if ( ( n = send(m_socket, (char*)temp_buf, iov[0].iov_len + iov[1].iov_len + iov[2].iov_len, MSG_NOSIGNAL) )
   //      != iov[0].iov_len + iov[1].iov_len + iov[2].iov_len) {
   if ((n = writev(m_socket, iov, NUM_BUFFER)) < 0) {
-    print_err.PrintError("SEND error1", __FILE__, __PRETTY_FUNCTION__, __LINE__);
+    char temp_char[100] = "SEND error1"; print_err.PrintError(temp_char, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     exit(1);
   }
 
@@ -251,51 +251,51 @@ void SerializerModule::SendByWriteV(RawCOPPER* rawcpr)
     printf("byte %d tot %d\n", n, total_send_bytes);
 
     // Send Header
-    if (n < iov[ 0 ].iov_len) {
+    if (n < (int)(iov[ 0 ].iov_len)) {
       int sent_bytes = n;
       while (true) {
         int ret = 0;
         if ((ret = send(m_socket, (char*)iov[ 0 ].iov_base + sent_bytes, iov[ 0 ].iov_len - sent_bytes,  MSG_NOSIGNAL)
             ) < 0) {
-          print_err.PrintError("Failed to send data. Exiting...", __FILE__, __PRETTY_FUNCTION__, __LINE__);
+          char temp_char[100] = "Failed to send data. Exiting...";  print_err.PrintError(temp_char, __FILE__, __PRETTY_FUNCTION__, __LINE__);
           sleep(1234567);
           exit(1);
         }
         sent_bytes += ret;
-        if (sent_bytes == iov[ 0 ].iov_len) break;
+        if (sent_bytes == (int)(iov[ 0 ].iov_len)) break;
       }
       n = sent_bytes;
     }
 
-    if (n < iov[ 0 ].iov_len + iov[ 1 ].iov_len) {
+    if (n < (int)(iov[ 0 ].iov_len + iov[ 1 ].iov_len)) {
       int sent_bytes = n - iov[ 0 ].iov_len;
       while (true) {
         int ret = 0;
         if ((ret = send(m_socket, (char*)iov[ 1 ].iov_base + sent_bytes, iov[ 1 ].iov_len - sent_bytes,  MSG_NOSIGNAL)
             ) < 0) {
-          print_err.PrintError("Failed to send data. Exiting...", __FILE__, __PRETTY_FUNCTION__, __LINE__);
+          char temp_char[100] = "Failed to send data. Exiting..."; print_err.PrintError(temp_char, __FILE__, __PRETTY_FUNCTION__, __LINE__);
           sleep(1234567);
           exit(1);
         }
         sent_bytes += ret;
-        if (sent_bytes == iov[ 1 ].iov_len) break;
+        if (sent_bytes == (int)(iov[ 1 ].iov_len)) break;
       }
       n = iov[ 0 ].iov_len + sent_bytes;
     }
 
 
-    if (n < iov[ 0 ].iov_len + iov[ 1 ].iov_len + iov[ 2 ].iov_len) {
+    if (n < (int)(iov[ 0 ].iov_len + iov[ 1 ].iov_len + iov[ 2 ].iov_len)) {
       int sent_bytes = n - iov[ 0 ].iov_len - iov[ 1 ].iov_len;
       while (true) {
         int ret = 0;
         if ((ret = send(m_socket, (char*)iov[ 2 ].iov_base + sent_bytes, iov[ 2 ].iov_len - sent_bytes,  MSG_NOSIGNAL)
             ) < 0) {
-          print_err.PrintError("Failed to send data. Exiting...", __FILE__, __PRETTY_FUNCTION__, __LINE__);
+          char temp_char[100] = "Send error. Exiting..."; print_err.PrintError(temp_char, __FILE__, __PRETTY_FUNCTION__, __LINE__);
           sleep(1234567);
           exit(1);
         }
         sent_bytes += ret;
-        if (sent_bytes == iov[ 2 ].iov_len) break;
+        if (sent_bytes == (int)(iov[ 2 ].iov_len)) break;
       }
     }
 
@@ -357,7 +357,7 @@ void SerializerModule::Accept()
   }
 
   if (bind(fd_listen, (struct sockaddr*)&sock_listen, sizeof(struct sockaddr)) < 0) {
-    print_err.PrintError("Failed to bind. Maybe other programs have already occupied this port. Exiting...", __FILE__, __PRETTY_FUNCTION__, __LINE__);
+    char temp_char[500] = "Failed to bind. Maybe other programs have already occupied this port. Exiting...";    print_err.PrintError(temp_char, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     exit(1);
   }
 
@@ -365,7 +365,7 @@ void SerializerModule::Accept()
   setsockopt(fd_listen, IPPROTO_TCP, TCP_NODELAY, &val1, (socklen_t)sizeof(val1));
   int backlog = 1;
   if (listen(fd_listen, backlog) < 0) {
-    print_err.PrintError("Failed in listen", __FILE__, __PRETTY_FUNCTION__, __LINE__);
+    char temp_char[100] = "Failed in listen"; print_err.PrintError(temp_char, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     exit(-1);
   }
 
@@ -377,7 +377,7 @@ void SerializerModule::Accept()
   printf("Accepting... : port %d server %s\n", m_port_to, m_hostname_local.c_str());
   fflush(stdout);
   if ((fd_accept = accept(fd_listen, (struct sockaddr*) & (sock_accept), &addrlen)) == 0) {
-    print_err.PrintError("Failed to accept. Exiting...", __FILE__, __PRETTY_FUNCTION__, __LINE__);
+    char temp_char[100] = "Failed to accept. Exiting..."; print_err.PrintError(temp_char, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     exit(-1);
   } else {
     printf("Connection is established: port %d from adress %d %s\n",
@@ -389,7 +389,7 @@ void SerializerModule::Accept()
     timeout.tv_usec = 0;
     ret = setsockopt(fd_accept, SOL_SOCKET, SO_SNDTIMEO, &timeout, (socklen_t)sizeof(timeout));
     if (ret < 0) {
-      print_err.PrintError("Failed to set TIMEOUT. Exiting...", __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      char temp_char[100] = "Failed to set TIMEOUT. Exiting..."; print_err.PrintError(temp_char, __FILE__, __PRETTY_FUNCTION__, __LINE__);
       exit(-1);
     }
   }
@@ -445,19 +445,19 @@ void SerializerModule::event()
   }
 
 #ifdef TIME_MONITOR
-  double cur_time;
+
   RecordTime(n_basf2evt, time_array0);
 #endif
 
   StoreArray<RawCOPPER> rawcprarray;
   for (int j = 0; j < rawcprarray.getEntries(); j++) {
-    int* buf;
-    int m_size_byte = 0;
+    //    int* buf;
+    //    int m_size_byte = 0;
 
 #ifndef DUMMY_DATA
     //  StoreObjPtr<RawCOPPER> rawcopper;
-    buf = rawcprarray[ j ]->GetWholeBuffer();
-    m_size_byte = rawcprarray[ j ]->TotalBufNwords() * sizeof(int);
+    //    buf = rawcprarray[ j ]->GetWholeBuffer();
+    //    m_size_byte = rawcprarray[ j ]->TotalBufNwords() * sizeof(int);
 #else
     m_size_byte = 1000;
     m_buffer[0] = (m_size_byte + 3) / 4;

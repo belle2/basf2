@@ -13,6 +13,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <TObject.h>
+#include <string>
 
 namespace Belle2 {
 
@@ -29,6 +30,8 @@ namespace Belle2 {
     virtual ~ErrorMessage();
 
     void PrintError(char* err_message, const char* file, const char* func_name, const int line);
+
+    void PrintError(const std::string err_message, const char* file, const char* func_name, const int line);
 
     ClassDef(ErrorMessage, 1);
   };

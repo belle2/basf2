@@ -41,11 +41,11 @@ output = register_module('PrintData')
 # Receiver
 receiver.param('NodeID', 3)
 receiver.param('NumConn', 1)
-receiver.param('HostNameFrom', ['localhost', 'cpr007'])
+# receiver.param('HostNameFrom', ['localhost', 'cpr007'])
 # receiver.param('HostNameFrom', ['ttd3', 'cpr006'])
-# receiver.param('HostNameFrom', ['cpr006', 'ttd3'])
-receiver.param('PortFrom', [int(argvs[2]), 36000])
-# receiver.param('PortFrom', [33000, 33000])
+receiver.param('HostNameFrom', ['cpr006', 'ttd3'])
+# receiver.param('PortFrom', [int(argvs[2]), 36000])
+receiver.param('PortFrom', [33000, 33000])
 
 receiver.param('EventDataBufferWords', 4801)
 receiver.param('MaxTime', -1.)
@@ -84,9 +84,9 @@ main = create_path()
 
 # Add modules to main path
 main.add_module(receiver)
-main.add_module(histo)
-main.add_module(monitor)
-main.add_module(dump)
+# main.add_module(histo)
+# main.add_module(monitor)
+# main.add_module(dump)
 # main.add_module(output)
 # main.add_module(perf)
 

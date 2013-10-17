@@ -84,7 +84,7 @@ void DeSerializerCOPPERModule::initialize()
   // Present slots to use
   //
   if (! use_slot) {
-    print_err.PrintError("Slot is not specified. Exiting...", __FILE__, __PRETTY_FUNCTION__, __LINE__);
+    char temp_char[100] = "Slot is not specified. Exiting...";     print_err.PrintError(temp_char, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     exit(1);
   } else {
     int slot;
@@ -126,7 +126,7 @@ void DeSerializerCOPPERModule::initialize()
   }
 
   if (m_shmflag != 0) {
-    ShmOpen("/cpr_config", "/cpr_status");
+    char temp_char1[100] = "/cpr_config";    char temp_char2[100] = "/cpr_status";    ShmOpen(temp_char1, temp_char2);
     // Status format : status_flag
     m_cfg_buf = ShmGet(m_shmfd_cfg, 4);
     m_cfg_sta = ShmGet(m_shmfd_sta, 4);
@@ -276,12 +276,12 @@ int* DeSerializerCOPPERModule::ReadOneEventFromCOPPERFIFO(const int entry, int* 
   //
   // Read data from HSLB
   //
-  int n = 0;
+
   int recvd_byte = RawHeader::RAWHEADER_NWORDS * sizeof(int);
   while (1) {
     int read_size = 0;
     if ((read_size = read(cpr_fd, (char*)m_bufary[entry] + recvd_byte, sizeof(int) *  BUF_SIZE_WORD  - recvd_byte)) < 0) {
-      print_err.PrintError("Failed to read header", __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      char temp_char[100] = "Failed to read header"; print_err.PrintError(temp_char, __FILE__, __PRETTY_FUNCTION__, __LINE__);
       continue;
       //      exit(-1);
     } else {
@@ -374,13 +374,13 @@ int* DeSerializerCOPPERModule::ReadOneEventFromCOPPERFIFO(const int entry, int* 
 
 
 
-void* DeSerializerCOPPERModule::OpenCOPPER()
+void DeSerializerCOPPERModule::OpenCOPPER()
 {
   //
   // Open a finnesse device
   //
   if ((cpr_fd = open("/dev/copper/copper", O_RDONLY)) == -1) {
-    print_err.PrintError("Failed to open Finnese. Exiting... ", __FILE__, __PRETTY_FUNCTION__, __LINE__);
+    char temp_char[100] = "Failed to open Finnese. Exiting... ";  print_err.PrintError(temp_char, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     exit(1);
   }
 
@@ -390,9 +390,9 @@ void* DeSerializerCOPPERModule::OpenCOPPER()
   ioctl(cpr_fd, CPRIOSET_LEF_WB_FF, &set_regval);
   ioctl(cpr_fd, CPRIOSET_LEF_WC_FF, &set_regval);
   ioctl(cpr_fd, CPRIOSET_LEF_WD_FF, &set_regval);
-  int ret = ioctl(cpr_fd, CPRIOSET_FINESSE_STA, &use_slot, sizeof(use_slot));
+  ioctl(cpr_fd, CPRIOSET_FINESSE_STA, &use_slot, sizeof(use_slot));
   B2INFO("DeSerializerCOPPER: OpenCOPPER() done.");
-
+  return;
 }
 
 
@@ -404,7 +404,7 @@ int DeSerializerCOPPERModule::Read(int fd, char* buf, int data_size_byte)
   int read_size = 0;
   while (1) {
     if ((read_size = read(fd, (char*)buf + n, data_size_byte - n)) < 0) {
-      print_err.PrintError("Failed to read header", __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      char temp_char[100] = "Failed to read header";   print_err.PrintError(temp_char, __FILE__, __PRETTY_FUNCTION__, __LINE__);
       exit(-1);
     } else {
       n += read_size;

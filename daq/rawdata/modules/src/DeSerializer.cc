@@ -171,7 +171,7 @@ int DeSerializerModule::check_data(char* buf, int prev_eve, int* cur_eve)
 
   // check event number
   *cur_eve = m_buf[ pos_event_num ];
-  if (prev_eve >= 0 && m_buf[ pos_event_num ] != prev_eve + 1) {
+  if ((int)prev_eve != -1 && (unsigned int)(m_buf[ pos_event_num ]) != (unsigned int)(prev_eve + 1)) {
     perror("[ERROR] invalid event number");
     exit(1);
   }

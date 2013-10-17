@@ -42,9 +42,9 @@ MonitorDataCOPPERModule::~MonitorDataCOPPERModule()
 void MonitorDataCOPPERModule::defineHisto()
 {
 
-  double t_min = 0.;
-  double t_max = 600.;
-  int t_nbin = 600;
+//   double t_min = 0.;
+//   double t_max = 600.;
+//   int t_nbin = 600;
 
   h_nevt = new TH1F("h_nevt", "Number of Events / COPPER; COPPER ID; # of Events", 20, 0, 20);
 

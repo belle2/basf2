@@ -128,11 +128,11 @@ void PrintDataModule::VerifyCheckSum(int* buf)     // Should be modified
 void PrintDataModule::PrintEvent(RawDataBlock* raw_datablock, int i)
 {
 
-  int tot_size_byte = raw_datablock->TotalBufNwords() * sizeof(int);
+  // int tot_size_byte = raw_datablock->TotalBufNwords() * sizeof(int);
 
-  int* buf;
+
   int size_byte = 0;
-  buf = raw_datablock->GetBuffer(i);
+
   size_byte = raw_datablock->GetBlockNwords(i) * sizeof(int);
   if (!raw_datablock->CheckFTSWID(i)) {
     RawHeader rawhdr;
@@ -155,8 +155,8 @@ void PrintDataModule::PrintEvent(RawDataBlock* raw_datablock, int i)
 //    if( m_cnt_cdc_evejump > 0 || m_cnt_ftsw_evejump > 0 ){
 
       printf("*******BODY**********\n");
-      printf("\n%.8d : ", 0);
-      for (int j = 0; j < size_byte / sizeof(int); j++) {
+      printf("\n 0 : ");
+      for (int j = 0; j < (int)(size_byte / sizeof(int)); j++) {
         printf("0x%.8x ", (raw_datablock->GetBuffer(i))[ j ]);
         if ((j + 1) % 10 == 0) {
           printf("\n%.8d : ", j + 1);
@@ -210,15 +210,15 @@ void PrintDataModule::PrintCOPPEREvent(RawCOPPER* raw_copper, int i)
 {
 
 
-  int tot_size_byte = raw_copper->TotalBufNwords() * sizeof(int);
+  //  int tot_size_byte = raw_copper->TotalBufNwords() * sizeof(int);
   //  for (int i = 0; i < raw_copper->GetNumEntries(); i++) {
 
   RawHeader rawhdr;
-  int* buf;
-  int size_byte = 0;
-  buf = raw_copper->GetBuffer(i);
+  //  int* buf;
+  //  int size_byte = 0;
+  //  buf = raw_copper->GetBuffer(i);
   rawhdr.SetBuffer(raw_copper->GetRawHdrBufPtr(i));
-  size_byte = raw_copper->GetBlockNwords(i) * sizeof(int);
+  //  size_byte = raw_copper->GetBlockNwords(i) * sizeof(int);
 
   //
   // Check incrementation of 16bit events

@@ -105,7 +105,10 @@ void DeSerializerPCModule::initialize()
 
   // Shared memory
   if (m_shmflag != 0) {
-    ShmOpen("/ropc_config", "/ropc_status");
+    char temp_char1[100], temp_char2[100];
+    sprintf(temp_char1, "/ropc_config");
+    sprintf(temp_char2, "/ropc_status");
+    ShmOpen(temp_char1, temp_char2);
     m_cfg_buf = ShmGet(m_shmfd_cfg, 4);
     m_cfg_sta = ShmGet(m_shmfd_sta, 4);
   }
@@ -121,7 +124,9 @@ int DeSerializerPCModule::Recv(int sock, char* buf, int data_size_byte, int flag
   int read_size = 0;
   while (1) {
     if ((read_size = recv(sock, (char*)buf + n, data_size_byte - n , flag)) < 0) {
-      print_err.PrintError("Failed to read header", __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      char temp_char[100];
+      sprintf(temp_char, "Failed to read header");
+      print_err.PrintError(temp_char, __FILE__, __PRETTY_FUNCTION__, __LINE__);
       sleep(1234567);
       exit(-1);
     } else {
@@ -138,7 +143,7 @@ int DeSerializerPCModule::Recv(int sock, char* buf, int data_size_byte, int flag
 
 int DeSerializerPCModule::Connect()
 {
-  for (unsigned int i = 0; i < m_num_connections; i++) {
+  for (int i = 0; i < m_num_connections; i++) {
     //
     // Connect to a downstream node
     //
@@ -148,7 +153,9 @@ int DeSerializerPCModule::Connect()
     struct hostent* host;
     host = gethostbyname(m_hostname_from[ i ].c_str());
     if (host == NULL) {
-      print_err.PrintError("hostname cannot be resolved. Check /etc/hosts. Exiting...", __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      char temp_char[100];
+      sprintf(temp_char, "hostname cannot be resolved. Check /etc/hosts. Exiting...");
+      print_err.PrintError(temp_char, __FILE__, __PRETTY_FUNCTION__, __LINE__);
       sleep(1234567);
       exit(1);
     }
@@ -159,7 +166,7 @@ int DeSerializerPCModule::Connect()
     int val1 = 0;
     setsockopt(sd, IPPROTO_TCP, TCP_NODELAY, &val1, sizeof(val1));
 
-    printf("Connecting to %s port %d ...\n", m_hostname_from[ i ].c_str(), m_port_from[ i ], sd);
+    printf("Connecting to %s port %d ...\n", m_hostname_from[ i ].c_str(), m_port_from[ i ]);
     while (1) {
       if (connect(sd, (struct sockaddr*)(&socPC), sizeof(socPC)) < 0) {
         perror("Failed to connect. Retrying...");
@@ -215,8 +222,8 @@ int* DeSerializerPCModule::RecvData(int* malloc_flag, int* total_buf_nwords, int
   //
   // Read Header and obtain data size
   //
-  int read_size = 0;
-  int recv_size = sizeof(int);
+
+
 
   int send_hdr_buf[ SendHeader::SENDHDR_NWORDS ];
 
@@ -224,11 +231,11 @@ int* DeSerializerPCModule::RecvData(int* malloc_flag, int* total_buf_nwords, int
   int temp_num_nodes = 0;
 
   // Read header
-  for (int i = 0; i < m_socket.size(); i++) {
+  for (int i = 0; i < (int)(m_socket.size()); i++) {
 //   printf("Read Header %d\n",i);
 //   fflush(stdout);
 
-    int recvd_size = 0;
+
     Recv(m_socket[ i ], (char*)send_hdr_buf, sizeof(int)*SendHeader::SENDHDR_NWORDS, flag);
     SendHeader send_hdr;
     send_hdr.SetBuffer(send_hdr_buf);
@@ -264,12 +271,13 @@ int* DeSerializerPCModule::RecvData(int* malloc_flag, int* total_buf_nwords, int
   // Read body
   //
   int total_recvd_byte = 0;
-  for (int i = 0; i < m_socket.size(); i++) {
+  for (int i = 0; i < (int)(m_socket.size()); i++) {
     total_recvd_byte += Recv(m_socket[ i ], (char*)temp_buf + total_recvd_byte,
                              each_buf_nwords[ i ] * sizeof(int), flag);
   }
-  if (*total_buf_nwords * sizeof(int) != total_recvd_byte) {
-    print_err.PrintError("Receiving data in an invalid unit. Exting...", __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  if ((int)(*total_buf_nwords * sizeof(int)) != total_recvd_byte) {
+    char temp_char[100] = "Receiving data in an invalid unit. Exting...";
+    print_err.PrintError(temp_char, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     sleep(1234567);
     exit(-1);
   }
@@ -307,8 +315,8 @@ int* DeSerializerPCModule::RecvData(int* malloc_flag, int* total_buf_nwords, int
 
 
   // Read Traeiler
-  int send_trl_buf[ SendTrailer::SENDTRL_NWORDS ];
-  for (int i = 0; i < m_socket.size(); i++) {
+  int send_trl_buf[(unsigned int)(SendTrailer::SENDTRL_NWORDS) ];
+  for (int i = 0; i < (int)(m_socket.size()); i++) {
     Recv(m_socket[ i ], (char*)send_trl_buf, SendTrailer::SENDTRL_NWORDS * sizeof(int), flag);
   }
 
@@ -353,15 +361,15 @@ void DeSerializerPCModule::event()
   raw_klmarray.create();
 
   // DataStore interface
-  RawDataBlock* temp_rawdatablk;
-  RawCOPPER* temp_rawcopper;
+//   RawDataBlock* temp_rawdatablk;
+//   RawCOPPER* temp_rawcopper;
   RawCDC* temp_rawcdc;
   RawFTSW* temp_rawftsw;
-  RawSVD* temp_rawsvd;
-  RawBPID* temp_rawbpid;
-  RawEPID* temp_rawepid;
-  RawECL* temp_rawecl;
-  RawKLM* temp_rawklm;
+//   RawSVD* temp_rawsvd;
+//   RawBPID* temp_rawbpid;
+//   RawEPID* temp_rawepid;
+//   RawECL* temp_rawecl;
+//   RawKLM* temp_rawklm;
 
 
 #else
@@ -484,8 +492,8 @@ void DeSerializerPCModule::event()
 
 
 
-          printf("Trl 0 0x.8x\n", (temp_rawcdc->GetRawTrlBufPtr(0))[0]);
-          printf("Trl 1 0x.8x\n", (temp_rawcdc->GetRawTrlBufPtr(0))[1]);
+          printf("Trl 0 0x%.8x\n", (temp_rawcdc->GetRawTrlBufPtr(0))[0]);
+          printf("Trl 1 0x%.8x\n", (temp_rawcdc->GetRawTrlBufPtr(0))[1]);
           sprintf(err_buf, "CheckSum error : block %d : length %d eve 0x%x : Trailer chksum 0x%.8x : calcd. now 0x%.8x\n",
                   i,
                   temp_rawcdc->GetBlockNwords(0),

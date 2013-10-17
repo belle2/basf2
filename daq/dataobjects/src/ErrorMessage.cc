@@ -50,3 +50,25 @@ void ErrorMessage::PrintError(char* err_message, const char* file, const char* f
 
   return;
 }
+
+
+
+void ErrorMessage::PrintError(const std::string err_message, const char* file, const char* func_name, const int line)
+{
+  time_t     current;
+  time(&current);
+
+  printf("\033[31m");
+  perror("[ERROR] 0: ");
+  printf("[ERROR] 1: %s", ctime(&current));
+  printf("[ERROR] 2: %s\n", err_message.c_str());
+  printf("[ERROR] 3: [file] %s [Line] %d\n", file, line);
+  printf("[ERROR] 4: [function] %s\n", func_name);
+  printf("\033[0m");
+  fflush(stdout);
+//     errmsg(LOG_LOCAL0|LOG_ERR,
+//            "CRITICAL : %s : init_shm() failed to get shmhead ( %p )\n",
+//            __PRETTY_FUNCTION__, shmhead );
+
+  return;
+}

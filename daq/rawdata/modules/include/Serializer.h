@@ -67,11 +67,11 @@ namespace Belle2 {
     virtual void endRun();
     virtual void terminate();
 
-    virtual void SendByWriteV(RawCOPPER* rawcpr);
+    virtual void SendByWriteV(RawDataBlock* rawdblk);
     //    virtual void Connect(const char* hostname, const int port);
     virtual void Accept();
 
-    virtual void FillSendHeaderTrailer(SendHeader* hdr, SendTrailer* trl, RawCOPPER* rawcpr);
+    virtual void FillSendHeaderTrailer(SendHeader* hdr, SendTrailer* trl, RawDataBlock* rawdblk);
     // Data members
 
     //! calculate checksum

@@ -95,6 +95,7 @@ namespace Belle2 {
     std::vector<int> m_port_from;
 
 
+    //    StoreArray<RawDataBlock> raw_dblkarray;
     StoreArray<RawCOPPER> rawcprarray;
     StoreArray<RawCDC> raw_cdcarray;
     StoreArray<RawSVD> raw_svdarray;

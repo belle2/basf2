@@ -159,26 +159,42 @@ int RawCOPPER::GetNumFINNESSEBlock(int n)
 
 int RawCOPPER::Get1stDetectorNwords(int n)
 {
-  return Get1stFINNESSENwords(n) -  SIZE_B2LHSLB_HEADER -
-         SIZE_B2LFEE_HEADER - SIZE_B2LFEE_TRAILER - SIZE_B2LHSLB_TRAILER;
+  int nwords = 0;
+  if (Get1stFINNESSENwords(n) > 0) {
+    nwords = Get1stFINNESSENwords(n) -  SIZE_B2LHSLB_HEADER - SIZE_B2LFEE_HEADER
+             - SIZE_B2LFEE_TRAILER - SIZE_B2LHSLB_TRAILER;
+  }
+  return nwords;
 }
 
 int RawCOPPER::Get2ndDetectorNwords(int n)
 {
-  return Get2ndFINNESSENwords(n) -  SIZE_B2LHSLB_HEADER -
-         SIZE_B2LFEE_HEADER - SIZE_B2LFEE_TRAILER - SIZE_B2LHSLB_TRAILER;
+  int nwords = 0;
+  if (Get2ndFINNESSENwords(n) > 0) {
+    nwords = Get2ndFINNESSENwords(n) -  SIZE_B2LHSLB_HEADER -
+             SIZE_B2LFEE_HEADER - SIZE_B2LFEE_TRAILER - SIZE_B2LHSLB_TRAILER;
+  }
+  return nwords;
 }
 
 int RawCOPPER::Get3rdDetectorNwords(int n)
 {
-  return Get3rdFINNESSENwords(n) -  SIZE_B2LHSLB_HEADER -
-         SIZE_B2LFEE_HEADER - SIZE_B2LFEE_TRAILER - SIZE_B2LHSLB_TRAILER;
+  int nwords = 0;
+  if (Get3rdFINNESSENwords(n) > 0) {
+    nwords = Get3rdFINNESSENwords(n) -  SIZE_B2LHSLB_HEADER -
+             SIZE_B2LFEE_HEADER - SIZE_B2LFEE_TRAILER - SIZE_B2LHSLB_TRAILER;
+  }
+  return nwords;
 }
 
 int RawCOPPER::Get4thDetectorNwords(int n)
 {
-  return Get4thFINNESSENwords(n) -  SIZE_B2LHSLB_HEADER -
-         SIZE_B2LFEE_HEADER - SIZE_B2LFEE_TRAILER - SIZE_B2LHSLB_TRAILER;
+  int nwords = 0;
+  if (Get4thFINNESSENwords(n) > 0) {
+    nwords = Get4thFINNESSENwords(n) -  SIZE_B2LHSLB_HEADER -
+             SIZE_B2LFEE_HEADER - SIZE_B2LFEE_TRAILER - SIZE_B2LHSLB_TRAILER;
+  }
+  return nwords;
 }
 
 
@@ -277,26 +293,38 @@ int* RawCOPPER::Get4thFINNESSEBuffer(int n)
 
 int* RawCOPPER::Get1stDetectorBuffer(int n)
 {
-  int pos_nwords = GetOffset1stFINNESSE(n) + SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER;
-  return &(m_buffer[ pos_nwords ]);
+  if (Get1stFINNESSENwords(n) > 0) {
+    int pos_nwords = GetOffset1stFINNESSE(n) + SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER;
+    return &(m_buffer[ pos_nwords ]);
+  }
+  return NULL;
 }
 
 int* RawCOPPER::Get2ndDetectorBuffer(int n)
 {
-  int pos_nwords = GetOffset2ndFINNESSE(n) + SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER;
-  return &(m_buffer[ pos_nwords ]);
+  if (Get2ndFINNESSENwords(n) > 0) {
+    int pos_nwords = GetOffset2ndFINNESSE(n) + SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER;
+    return &(m_buffer[ pos_nwords ]);
+  }
+  return NULL;
 }
 
 int* RawCOPPER::Get3rdDetectorBuffer(int n)
 {
-  int pos_nwords = GetOffset3rdFINNESSE(n) + SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER;
-  return &(m_buffer[ pos_nwords ]);
+  if (Get3rdFINNESSENwords(n) > 0) {
+    int pos_nwords = GetOffset3rdFINNESSE(n) + SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER;
+    return &(m_buffer[ pos_nwords ]);
+  }
+  return NULL;
 }
 
 int* RawCOPPER::Get4thDetectorBuffer(int n)
 {
-  int pos_nwords = GetOffset4thFINNESSE(n) + SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER;
-  return &(m_buffer[ pos_nwords ]);
+  if (Get4thFINNESSENwords(n) > 0) {
+    int pos_nwords = GetOffset4thFINNESSE(n) + SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER;
+    return &(m_buffer[ pos_nwords ]);
+  }
+  return NULL;
 }
 
 int* RawCOPPER::GetExpRunBuf(int n)

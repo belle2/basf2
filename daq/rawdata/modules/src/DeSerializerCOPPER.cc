@@ -118,20 +118,22 @@ void DeSerializerCOPPERModule::initialize()
 
   // Initialize Array of RawCOPPER
 
-  rawcprarray.registerPersistent();
+  raw_dblkarray.registerPersistent();
 
 
   if (dump_fname.size() > 0) {
     OpenOutputFile();
   }
 
-  if (m_shmflag != 0) {
-    char temp_char1[100] = "/cpr_config";    char temp_char2[100] = "/cpr_status";    ShmOpen(temp_char1, temp_char2);
-    // Status format : status_flag
-    m_cfg_buf = ShmGet(m_shmfd_cfg, 4);
-    m_cfg_sta = ShmGet(m_shmfd_sta, 4);
-    m_cfg_sta[ 0 ] = 0; // Status bit is 0 : not ready
-  }
+
+  //   if (m_shmflag != 0) {
+  //     ShmOpen("/cpr_config", "/cpr_status");
+  //     // Status format : status_flag
+  //     m_cfg_buf = ShmGet(m_shmfd_cfg, 4);
+  //     m_cfg_sta = ShmGet(m_shmfd_sta, 4);
+  //     m_cfg_sta[ 0 ] = 0; // Status bit is 0 : not ready
+  //   }
+
 
   memset(time_array0, 0, sizeof(time_array0));
   memset(time_array1, 0, sizeof(time_array1));
@@ -250,9 +252,9 @@ void DeSerializerCOPPERModule::FillNewRawCOPPERHeader(RawCOPPER* raw_copper)
   rawtrl.SetBuffer(raw_copper->GetRawTrlBufPtr(num_cprblock));
   rawtrl.Initialize(); // Fill 2nd word : magic word
 
-//   printf("eve %d check sum 0x%.8x\n", m_prev_ftsweve32 ,
-//   CalcSimpleChecksum(raw_copper->GetBuffer(num_cprblock),
-//        raw_copper->GetBlockNwords(num_cprblock) - rawtrl.GetTrlNwords()));
+  //   printf("eve %d check sum 0x%.8x\n", m_prev_ftsweve32 ,
+  //   CalcSimpleChecksum(raw_copper->GetBuffer(num_cprblock),
+  //        raw_copper->GetBlockNwords(num_cprblock) - rawtrl.GetTrlNwords()));
   rawtrl.SetChksum(CalcSimpleChecksum(raw_copper->GetBuffer(num_cprblock),
                                       raw_copper->GetBlockNwords(num_cprblock) - rawtrl.GetTrlNwords()));
 
@@ -427,15 +429,16 @@ void DeSerializerCOPPERModule::event()
     B2INFO("DeSerializerCOPPER: event() started.");
     OpenCOPPER();
     // Use shared memory to start(for HSLB dummy data)
+
     if (m_shmflag != 0) {
       //      int* cfg_buf = ShmGet(m_shmfd_cfg, 4);
-      m_cfg_sta[ 0 ] = 1; // Status bit is 0 : not ready
-      printf("Waiting for Start...\n");
-      fflush(stdout);
-      while (1) {
-        if (m_cfg_buf[0] == 1)break;
-        usleep(10000);
-      }
+      //      m_cfg_sta[ 0 ] = 1; // Status bit is 0 : not ready
+      //       printf("Waiting for Start...\n");
+      //       fflush(stdout);
+      //       while (1) {
+      //         if (m_cfg_buf[0] == 1)break;
+      //         usleep(10000);
+      //       }
       printf("Started!\n");
       fflush(stdout);
     }
@@ -445,37 +448,32 @@ void DeSerializerCOPPERModule::event()
     n_basf2evt = 0;
   }
 
-  rawcprarray.create();
-  RawCOPPER* temp_rawcopper;
+
+  raw_dblkarray.create();
+
+  RawDataBlock* temp_rawdblk;
+
   for (int j = 0; j < NUM_EVT_PER_BASF2LOOP; j++) {
     int m_size_word = 0;
     int malloc_flag = 0;
-
-    //    printf("%d", j);fflush(stdout);
     int* temp_buf = ReadOneEventFromCOPPERFIFO(j, &malloc_flag, &m_size_word);
-    //    printf(".");
-    //
+
+
     // Fill RawCOPPER
-    //
-    temp_rawcopper =  rawcprarray.appendNew();
-    // Store data buffer
-    //    printf(".");fflush(stdout);
     int num_events = 1;
+    temp_rawdblk =  raw_dblkarray.appendNew();
+    temp_rawdblk->SetBuffer(temp_buf, m_size_word, malloc_flag, num_events, num_nodes);
 
-    temp_rawcopper->SetBuffer(temp_buf, m_size_word, malloc_flag, num_events, num_nodes);
-    //    printf(".");fflush(stdout);
+    // Fill Header and Trailer
+    RawCOPPER temp_rawcopper;
+    temp_rawcopper.SetBuffer(temp_buf, m_size_word, 0, num_events, num_nodes);
+    FillNewRawCOPPERHeader(&temp_rawcopper);
 
-
-
-    // Fill header and trailer
-    FillNewRawCOPPERHeader(temp_rawcopper);
-    //    printf(".");fflush(stdout);
     if (dump_fname.size() > 0) {
       DumpData((char*)temp_buf, m_size_word * sizeof(int));
     }
     m_totbytes += m_size_word * sizeof(int);
   }
-  //  printf("\n");fflush(stdout);
 
   //
   // Update EventMetaData
@@ -485,15 +483,10 @@ void DeSerializerCOPPERModule::event()
   m_eventMetaDataPtr->setRun(105);
   m_eventMetaDataPtr->setEvent(n_basf2evt);
 
-
-
-
   //
   // Print current status
   //
   if (n_basf2evt % 100 == 0) {
-    //  printf("mon... ");fflush(stdout);
-    //  if ( ( n_basf2evt - m_prev_nevt ) > monitor_numeve ) {
     double cur_time = GetTimeSec();
     double total_time = cur_time - m_start_time;
     double interval = cur_time - m_prev_time;

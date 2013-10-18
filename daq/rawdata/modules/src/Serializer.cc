@@ -60,7 +60,6 @@ void SerializerModule::initialize()
 
 #endif
 
-
   if (m_shmflag != 0) {
     char temp_char1[100] = "/cpr_config"; char temp_char2[100] = "/cpr_status";  ShmOpen(temp_char1, temp_char2);
     // Status format : status_flag
@@ -68,6 +67,7 @@ void SerializerModule::initialize()
     m_cfg_sta = ShmGet(m_shmfd_sta, 4);
     m_cfg_sta[ 0 ] = 1; // Status bit is 1 : ready before accept()
   }
+
 
 #ifndef NOT_SEND
 #ifdef NOT_USE_SOCKETLIB
@@ -168,34 +168,48 @@ void SerializerModule::ShmOpen(char* path_cfg, char* path_sta)
 
 
 
-void SerializerModule::FillSendHeaderTrailer(SendHeader* hdr, SendTrailer* trl, RawCOPPER* rawcpr)
+void SerializerModule::FillSendHeaderTrailer(SendHeader* hdr, SendTrailer* trl,
+                                             RawDataBlock* rawdblk)
 {
   const int num_cprblock = 0;
-  RawHeader rawhdr;
-  rawhdr.SetBuffer(rawcpr->GetRawHdrBufPtr(num_cprblock));
   int total_send_nwords =
     hdr->GetHdrNwords() +
-    rawcpr->TotalBufNwords() +
+    rawdblk->TotalBufNwords() +
     //    rawhdr.GetNwords() +
     trl->GetTrlNwords();
 
   hdr->SetNwords(total_send_nwords);
-  hdr->SetNumEventsinPacket(rawcpr->GetNumEvents());
-  hdr->SetNumNodesinPacket(rawcpr->GetNumNodes());
-  hdr->SetEventNumber(rawhdr.GetEveNo());
-  hdr->SetNodeID(rawhdr.GetSubsysId());
+  hdr->SetNumEventsinPacket(rawdblk->GetNumEvents());
+  hdr->SetNumNodesinPacket(rawdblk->GetNumNodes());
 
+  for (int i = 0; i < rawdblk->GetNumEntries(); i++) {
+
+    if (!(rawdblk->CheckFTSWID(i))) {
+      RawHeader rawhdr;
+      rawhdr.SetBuffer(rawdblk->GetBuffer(i));
+      hdr->SetEventNumber(rawhdr.GetEveNo());
+      hdr->SetNodeID(rawhdr.GetSubsysId());
+      break;
+    }
+
+    if (i == (rawdblk->GetNumEntries() - 1)) {
+      char err_buf[500] = "No COPPER blocks in RawDataBlock. Exiting...";
+      print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      sleep(1234567);
+      exit(-1);
+    }
+  }
   return;
 }
 
 
-void SerializerModule::SendByWriteV(RawCOPPER* rawcpr)
+void SerializerModule::SendByWriteV(RawDataBlock* rawdblk)
 {
 
 
   SendHeader send_header;
   SendTrailer send_trailer;
-  FillSendHeaderTrailer(&send_header, &send_trailer, rawcpr);
+  FillSendHeaderTrailer(&send_header, &send_trailer, rawdblk);
 
   enum {
     NUM_BUFFER = 3
@@ -203,13 +217,13 @@ void SerializerModule::SendByWriteV(RawCOPPER* rawcpr)
   struct iovec iov[ NUM_BUFFER ];
 
   // check Body data size
-  int rawcopper_nwords = rawcpr->TotalBufNwords();
+  int rawcopper_nwords = rawdblk->TotalBufNwords();
 
   //Fill iov info.
   iov[0].iov_base = (char*)send_header.GetBuffer();
   iov[0].iov_len = sizeof(int) * send_header.GetHdrNwords();
 
-  iov[1].iov_base = (char*)rawcpr->GetWholeBuffer();
+  iov[1].iov_base = (char*)rawdblk->GetWholeBuffer();
   iov[1].iov_len = sizeof(int) * rawcopper_nwords;
 
   iov[2].iov_base = (char*)send_trailer.GetBuffer();
@@ -244,12 +258,12 @@ void SerializerModule::SendByWriteV(RawCOPPER* rawcpr)
 
   int total_send_bytes = sizeof(int) * send_header.GetTotalNwords();
 
+
   //
   // Retry sending
   //
   if (n != total_send_bytes) {
     printf("byte %d tot %d\n", n, total_send_bytes);
-
     // Send Header
     if (n < (int)(iov[ 0 ].iov_len)) {
       int sent_bytes = n;
@@ -449,11 +463,13 @@ void SerializerModule::event()
   RecordTime(n_basf2evt, time_array0);
 #endif
 
-  StoreArray<RawCOPPER> rawcprarray;
-  for (int j = 0; j < rawcprarray.getEntries(); j++) {
+  //  StoreArray<RawCOPPER> rawcprarray;
+  StoreArray<RawDataBlock> raw_dblkarray;
+
+  for (int j = 0; j < raw_dblkarray.getEntries(); j++) {
     //    int* buf;
     //    int m_size_byte = 0;
-
+    //    printf("sent %d bytes\n", m_size_byte);
 #ifndef DUMMY_DATA
     //  StoreObjPtr<RawCOPPER> rawcopper;
     //    buf = rawcprarray[ j ]->GetWholeBuffer();
@@ -475,7 +491,7 @@ void SerializerModule::event()
 
 #ifdef NOT_USE_SOCKETLIB
 
-    SendByWriteV(rawcprarray[ j ]);
+    SendByWriteV(raw_dblkarray[ j ]);
 
 #else //NOT_USE_SOCKETLIB
     // Use basf2 send library

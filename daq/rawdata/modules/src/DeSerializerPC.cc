@@ -199,6 +199,7 @@ int DeSerializerPCModule::Connect()
 #endif
 
   }
+  printf("Initialization finished\n");
   return 0;
 
 }
@@ -232,11 +233,12 @@ int* DeSerializerPCModule::RecvData(int* malloc_flag, int* total_buf_nwords, int
 
   // Read header
   for (int i = 0; i < (int)(m_socket.size()); i++) {
-//   printf("Read Header %d\n",i);
-//   fflush(stdout);
+
 
 
     Recv(m_socket[ i ], (char*)send_hdr_buf, sizeof(int)*SendHeader::SENDHDR_NWORDS, flag);
+
+
     SendHeader send_hdr;
     send_hdr.SetBuffer(send_hdr_buf);
 
@@ -260,6 +262,28 @@ int* DeSerializerPCModule::RecvData(int* malloc_flag, int* total_buf_nwords, int
                         - SendHeader::SENDHDR_NWORDS
                         - SendTrailer::SENDTRL_NWORDS;
     *total_buf_nwords += rawblk_nwords;
+
+    if (rawblk_nwords > (int)(2.5e6)) {
+
+      printf("*******HDR**********\n");
+      printf("\n%.8d : ", 0);
+      for (int j = 0; j < SendHeader::SENDHDR_NWORDS ; j++) {
+        printf("0x%.8x ", send_hdr_buf[ j ]);
+        if ((j + 1) % 10 == 0) {
+          printf("\n%.8d : ", j + 1);
+        }
+      }
+      printf("\n");
+      printf("\n");
+
+      char err_buf[500];
+      sprintf(err_buf, "Read Header %d %d %d %d\n", i, temp_num_events, temp_num_nodes, send_hdr.GetTotalNwords());
+      print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      sleep(123456);
+      exit(1);
+
+    }
+
 
     each_buf_nwords.push_back(rawblk_nwords);
 
@@ -330,6 +354,7 @@ int* DeSerializerPCModule::RecvData(int* malloc_flag, int* total_buf_nwords, int
 
 void DeSerializerPCModule::event()
 {
+
   // For data check
   int num_copper_ftsw = -1;
   int data_size_copper_0 = -1;
@@ -361,7 +386,7 @@ void DeSerializerPCModule::event()
   raw_klmarray.create();
 
   // DataStore interface
-//   RawDataBlock* temp_rawdatablk;
+  RawDataBlock* temp_rawdatablk;
 //   RawCOPPER* temp_rawcopper;
   RawCDC* temp_rawcdc;
   RawFTSW* temp_rawftsw;
@@ -400,6 +425,7 @@ void DeSerializerPCModule::event()
     int num_events_in_sendblock = 0;
     int num_nodes_in_sendblock = 0;
     int* temp_buf = RecvData(&malloc_flag, &total_buf_nwords, &num_events_in_sendblock, &num_nodes_in_sendblock);
+
     m_totbytes += total_buf_nwords * sizeof(int);
 #ifdef DEBUG
     printf("Recvd data : %d bytes\n", total_buf_nwords * sizeof(int));
@@ -432,6 +458,11 @@ void DeSerializerPCModule::event()
     rawdatablk.SetBuffer((int*)temp_buf, total_buf_nwords, temp_malloc_flag,
                          num_events_in_sendblock, num_nodes_in_sendblock);
 
+    temp_rawdatablk = raw_datablkarray.appendNew();
+    temp_rawdatablk->SetBuffer((int*)temp_buf, total_buf_nwords, malloc_flag,
+                               num_events_in_sendblock, num_nodes_in_sendblock);
+
+
     num_copper_ftsw = rawdatablk.GetNumEntries();
     int cpr_num = 0;
 
@@ -450,23 +481,74 @@ void DeSerializerPCModule::event()
       }
       printf("========================\n");
 #endif
+
+
       if (rawdatablk.CheckFTSWID(i)) {
-        temp_rawftsw = raw_ftswarray.appendNew();
+        //  temp_rawftsw = raw_ftswarray.appendNew();
+        temp_rawftsw = new RawFTSW;
         temp_rawftsw->SetBuffer((int*)temp_buf + rawdatablk.GetBufferPos(i),
                                 rawdatablk.GetBlockNwords(i), temp_malloc_flag, 1, 1);
         data_size_ftsw = rawdatablk.GetBlockNwords(i);
         eve_ftsw = (rawdatablk.GetBuffer(i))[ 7 ] & 0xFFFF;
 
       } else {
-        temp_rawcdc = raw_cdcarray.appendNew();
+        //        temp_rawcdc = raw_cdcarray.appendNew();
+        temp_rawcdc = new RawCDC;
         temp_rawcdc->SetBuffer((int*)temp_buf + rawdatablk.GetBufferPos(i),
                                rawdatablk.GetBlockNwords(i), temp_malloc_flag, 1, 1);
         RawTrailer rawtrl;
         rawtrl.SetBuffer(temp_rawcdc->GetRawTrlBufPtr(0));
+
+
+#ifdef DEBUG
+        printf("eve %d %d %d %d %d\n",
+               temp_rawcdc->GetEveNo(0),
+               temp_rawcdc->Get1stDetectorNwords(0),
+               temp_rawcdc->Get2ndDetectorNwords(0),
+               temp_rawcdc->Get3rdDetectorNwords(0),
+               temp_rawcdc->Get4thDetectorNwords(0)
+              );
+
+        printf("===COPPER BLOCK==============\n");
+        for (int k = 0 ; k < temp_rawcdc->GetBlockNwords(0); k++) {
+          printf("0x%.8x ", (temp_rawcdc->GetBuffer(0))[k]);
+          if (k % 10 == 9)printf("\n");
+        }
+
+        printf("===FINNESSE A ==============\n");
+        for (int k = 0 ; k < temp_rawcdc->Get1stDetectorNwords(0); k++) {
+          printf("0x%.8x ", (temp_rawcdc->Get1stDetectorBuffer(0))[k]);
+          if (k % 10 == 9)printf("\n");
+        }
+
+        printf("===FINNESSE B ==============\n");
+        for (int k = 0 ; k < temp_rawcdc->Get2ndDetectorNwords(0); k++) {
+          printf("0x%.8x ", (temp_rawcdc->Get2ndDetectorBuffer(0))[k]);
+          if (k % 10 == 9)printf("\n");
+        }
+
+        printf("===FINNESSE C ==============\n");
+        for (int k = 0 ; k < temp_rawcdc->Get3rdDetectorNwords(0); k++) {
+          printf("0x%.8x ", (temp_rawcdc->Get3rdDetectorBuffer(0))[k]);
+          if (k % 10 == 9)printf("\n");
+        }
+
+        printf("===FINNESSE D ==============\n");
+        for (int k = 0 ; k < temp_rawcdc->Get4thDetectorNwords(0); k++) {
+          printf("0x%.8x ", (temp_rawcdc->Get4thDetectorBuffer(0))[k]);
+          if (k % 10 == 9)printf("\n");
+        }
+        printf("=== END ==============\n");
+
+#endif
+
         if (rawtrl.GetChksum() != CalcSimpleChecksum(temp_rawcdc->GetBuffer(0),
-                                                     temp_rawcdc->GetBlockNwords(0)
-                                                     - rawtrl.GetTrlNwords())) {
+                                                     temp_rawcdc->GetBlockNwords(0) - rawtrl.GetTrlNwords())) {
           char err_buf[500];
+
+
+
+
 
 //           printf("==========BODY==========\n");
 //           for (int k = 0 ; k < temp_rawcdc->GetBlockNwords(0); k++) {
@@ -479,18 +561,13 @@ void DeSerializerPCModule::event()
           for (int k = 0 ; k < 100; k++) {
             printf("0x%.8x ", temp_buf[k]);
             if (k % 10 == 9)printf("\n");
-
           }
-
 
           printf("==========Header==========\n");
           for (int k = 0 ; k < 100; k++) {
             printf("0x%.8x ", (temp_rawcdc->GetBuffer(0))[k]);
             if (k % 10 == 9)printf("\n");
-
           }
-
-
 
           printf("Trl 0 0x%.8x\n", (temp_rawcdc->GetRawTrlBufPtr(0))[0]);
           printf("Trl 1 0x%.8x\n", (temp_rawcdc->GetRawTrlBufPtr(0))[1]);
@@ -537,10 +614,6 @@ void DeSerializerPCModule::event()
 //       exit(-1);
     }
 
-
-//     temp_rawdatablk = raw_datablkarray.appendNew();
-//     temp_rawdatablk->SetBuffer( (int*)temp_buf, total_buf_nwords, malloc_flag,
-//             num_events_in_sendblock, m_socket.size() * num_nodes_in_sendblock );
 
 #else
     //    m_rawdatablk->buffer(temp_buf_body, body_size_word, malloc_flag_body);

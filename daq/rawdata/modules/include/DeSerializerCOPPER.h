@@ -57,7 +57,7 @@ namespace Belle2 {
     //! data
     StoreObjPtr<RawCOPPER> m_rawcopper;
 
-    StoreArray<RawCOPPER> rawcprarray;
+    StoreArray<RawDataBlock> raw_dblkarray;
 
     virtual void FillNewRawCOPPERHeader(RawCOPPER* raw_copper);
     virtual int* ReadOneEventFromCOPPERFIFO(const int entry, int* malloc_flag, int* m_size_word);

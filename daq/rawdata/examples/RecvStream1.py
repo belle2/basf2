@@ -41,16 +41,15 @@ output = register_module('PrintData')
 # Receiver
 receiver.param('NodeID', 3)
 receiver.param('NumConn', 1)
-# receiver.param('HostNameFrom', ['localhost', 'cpr007'])
-# receiver.param('HostNameFrom', ['ttd3', 'cpr006'])
-receiver.param('HostNameFrom', ['cpr006', 'ttd3'])
-# receiver.param('PortFrom', [int(argvs[2]), 36000])
-receiver.param('PortFrom', [33000, 33000])
-
+receiver.param('HostNameFrom', ['localhost', 'cpr007'])
+# receiver.param('HostNameFrom', ['cpr001', 'cpr002'])
+# receiver.param('HostNameFrom', ['cpr006', 'ttd3'])
+receiver.param('PortFrom', [int(argvs[2]), int(argvs[2])])
 receiver.param('EventDataBufferWords', 4801)
 receiver.param('MaxTime', -1.)
 # receiver.param('MaxEventNum', 400000)
 receiver.param('MaxEventNum', -1)
+
 use_shm_flag = int(argvs[1])
 receiver.param('UseShmFlag', use_shm_flag)
 # receiver.param('DumpFileName', 'cpr006_dump.dat')
@@ -59,7 +58,7 @@ receiver.param('UseShmFlag', use_shm_flag)
 # histo = register_module('HistoManager')
 # main.add_module (histo)
 histo = register_module('DqmHistoManager')
-histo.param('HostName', 'ropc04')
+histo.param('HostName', 'belle-rpc1')
 histo.param('Port', 9991)
 histo.param('DumpInterval', 10)
 histo.param('HistoFileName', 'ropc_histofile.root')
@@ -72,6 +71,11 @@ monitor = register_module('MonitorDataCOPPER')
 #
 dump.param('outputFileName', 'root_output.sroot')
 # dump.param('compressionLevel', 0)
+
+# Sender
+sender = register_module('Serializer')
+sender.param('DestPort', 36000)
+sender.param('LocalHostName', 'belle-rpc1')
 
 # Compression Level: 0 for no, 1 for low, 9 for high compression. Level 1 usually reduces size by 50%, higher levels have no noticeable effect.
 
@@ -87,6 +91,8 @@ main.add_module(receiver)
 # main.add_module(histo)
 # main.add_module(monitor)
 # main.add_module(dump)
+# main.add_module(sender)
+
 # main.add_module(output)
 # main.add_module(perf)
 

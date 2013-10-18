@@ -23,6 +23,11 @@
 using namespace std;
 using namespace Belle2;
 
+PXDInterceptor::PXDInterceptor(const ROIinfo* theROIinfo):
+  m_theROIinfo(*theROIinfo)
+{
+}
+
 PXDInterceptor::PXDInterceptor()
 {
 }
@@ -36,6 +41,8 @@ PXDInterceptor::fillInterceptList(StoreArray<PXDIntercept>* listToBeFilled, cons
                                   RelationArray* gfTrackCandToPXDIntercepts)
 {
 
+  StoreArray<GFTrackCand> trackCandBadStats(m_theROIinfo.badTracksListName);
+  StoreArray<GFTrack> GFtracks(m_theROIinfo.gfTracksListName);
   StoreArray<SVDCluster> svdClusters;
 
   for (int i = 0; i < trackCandList.getEntries(); ++i) { //loop over all track candidates
@@ -62,9 +69,11 @@ PXDInterceptor::fillInterceptList(StoreArray<PXDIntercept>* listToBeFilled, cons
       m_kalmanFilter.processTrack(&gfTrack);
     } catch (...) { B2WARNING("track fit failed"); continue; }
 
-    if (trackRep->getStatusFlag() != 0) { B2WARNING("bad track status"); continue; }
+    if (trackRep->getStatusFlag() != 0) { B2WARNING("bad track status"); trackCandBadStats.appendNew(*aTrackCandPointer); continue; }
 
     m_theROIGeometry.appendIntercepts(listToBeFilled, trackRep, i, gfTrackCandToPXDIntercepts);
+
+    GFtracks.appendNew(gfTrack); //giulia
 
     //apparently the desctructor of GFTrack also take care of deleting the RKTrackRep
 

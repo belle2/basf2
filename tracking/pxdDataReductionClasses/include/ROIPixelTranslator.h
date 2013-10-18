@@ -15,6 +15,7 @@
 #include <tracking/dataobjects/PXDIntercept.h>
 #include <tracking/dataobjects/ROIid.h>
 #include <framework/datastore/StoreArray.h>
+#include <tracking/pxdDataReductionClasses/ROIinfo.h>
 
 namespace Belle2 {
 
@@ -28,6 +29,8 @@ namespace Belle2 {
     /**
      * Constructor.
      */
+
+    ROIPixelTranslator(const ROIinfo*  theROIinfo);
 
     ROIPixelTranslator(double sigmaSystU, double sigmaSystV,
                        double numSigmaTotU, double numSigmaTotV,
@@ -54,7 +57,6 @@ namespace Belle2 {
     double  m_numSigmaTotV; /**< number of standard deviations to be taken to define a ROI along V*/
     double  m_maxWidthU; /**< ROI maximum width allowed in the U direction*/
     double  m_maxWidthV; /**< ROI maximum width allowed in the V direction*/
-
 
   };
 

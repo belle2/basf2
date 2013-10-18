@@ -22,6 +22,7 @@
 #include <TTree.h>
 #include <TFile.h>
 #include <time.h>
+#include <tracking/pxdDataReductionClasses/ROIinfo.h>
 
 namespace Belle2 {
 
@@ -63,11 +64,13 @@ namespace Belle2 {
 
   protected:
 
-    ROIPixelTranslator* thePixelTranslator;
-    PXDInterceptor* thePXDInterceptor;
+    ROIPixelTranslator* m_thePixelTranslator;
+    PXDInterceptor* m_thePXDInterceptor;
     std::string m_gfTrackCandsColName;
     std::string m_PXDInterceptListName;
     std::string m_ROIListName;
+    std::string m_badTracksListName;
+    std::string m_gfTracksListName;
 
     int m_numIterKalmanFilter; /**< number of iterations of the Kalman Filter*/
 
@@ -77,6 +80,15 @@ namespace Belle2 {
     double m_numSigmaTotV;
     double m_maxWidthU;
     double m_maxWidthV;
+
+    ROIinfo m_ROIinfo;
+
+    /*    inline double getSigmaSystU(){return m_sigmaSystU;};
+    inline double getSigmaSystV(){return m_sigmaSystV;};
+    inline double getNumSigmaTotU(){return m_numSigmaTotU;};
+    inline double getNumSigmaTotV(){return m_numSigmaTotV;};
+    inline double getMaxWidthU(){return m_maxWidthU;};
+    inline double getMaxWidthV(){return m_maxWidthV;};*/
 
   private:
 

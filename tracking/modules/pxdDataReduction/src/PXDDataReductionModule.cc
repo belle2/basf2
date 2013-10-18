@@ -22,6 +22,7 @@
 #include <tracking/dataobjects/PXDIntercept.h>
 #include <time.h>
 #include <list>
+#include <GFTrack.h> //giulia
 
 using namespace std;
 using namespace Belle2;
@@ -43,6 +44,10 @@ PXDDataReductionModule::PXDDataReductionModule() : Module()
 
 
   addParam("trackCandCollName", m_gfTrackCandsColName, " name of the input collection of track candidates", std::string(""));
+
+  addParam("gfTrackListName", m_gfTracksListName, " name of the list of the fitted tracks", std::string("gfTracks"));
+  addParam("badTrackListName", m_badTracksListName, " name of the list of the bad_track_status tracks", std::string("badTracks"));
+
   addParam("numIterKalmanFilter", m_numIterKalmanFilter, " number of iterations of the kalman filter ", int(2));
 
   addParam("sigmaSystU", m_sigmaSystU, " systematic sigma in the u local coordinate ", double(0.025));
@@ -68,6 +73,8 @@ void PXDDataReductionModule::initialize()
   StoreArray<GFTrackCand>::required(m_gfTrackCandsColName);
   StoreArray<ROIid>::registerPersistent(m_ROIListName);
   StoreArray<PXDIntercept>::registerPersistent(m_PXDInterceptListName);
+  StoreArray<GFTrackCand>::registerPersistent(m_badTracksListName);
+  StoreArray<GFTrack>::registerPersistent(m_gfTracksListName);
 
   RelationArray::registerPersistent<GFTrackCand, PXDIntercept>(m_gfTrackCandsColName, m_PXDInterceptListName);
   RelationArray::registerPersistent<PXDIntercept, ROIid>(m_PXDInterceptListName, m_ROIListName);
@@ -88,10 +95,23 @@ void PXDDataReductionModule::initialize()
 
 void PXDDataReductionModule::beginRun()
 {
-  thePXDInterceptor = new PXDInterceptor();
-  thePXDInterceptor->setNumIterKalmanFilter(m_numIterKalmanFilter);
 
-  thePixelTranslator = new ROIPixelTranslator(m_sigmaSystU, m_sigmaSystV, m_numSigmaTotU, m_numSigmaTotV, m_maxWidthU, m_maxWidthV);
+  m_ROIinfo.sigmaSystU = m_sigmaSystU;
+  m_ROIinfo.sigmaSystV = m_sigmaSystV;
+  m_ROIinfo.numSigmaTotU = m_numSigmaTotU;
+  m_ROIinfo.numSigmaTotV = m_numSigmaTotV;
+  m_ROIinfo.maxWidthU = m_maxWidthU;
+  m_ROIinfo.maxWidthV = m_maxWidthV;
+  m_ROIinfo.gfTrackCandsColName =  m_gfTrackCandsColName;
+  m_ROIinfo.PXDInterceptListName = m_PXDInterceptListName;
+  m_ROIinfo.ROIListName = m_ROIListName;
+  m_ROIinfo.badTracksListName = m_badTracksListName;
+  m_ROIinfo.gfTracksListName = m_gfTracksListName;
+
+  m_thePXDInterceptor = new PXDInterceptor(&m_ROIinfo);
+  m_thePXDInterceptor->setNumIterKalmanFilter(m_numIterKalmanFilter);
+
+  m_thePixelTranslator = new ROIPixelTranslator(&m_ROIinfo);
 
 }
 
@@ -114,16 +134,20 @@ void PXDDataReductionModule::event()
   RelationArray PXDInterceptsToROIids(PXDInterceptList, ROIList);
   PXDInterceptsToROIids.create();
 
+  StoreArray<GFTrackCand> trackCandBadStats(m_badTracksListName);
+  trackCandBadStats.create();
+  StoreArray<GFTrack> GFtracks(m_gfTracksListName);
+  GFtracks.create();
 
   //  timespec time1, time2, time3;
 
   //  clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &time1);
 
-  thePXDInterceptor->fillInterceptList(&PXDInterceptList, trackCandList, &gfTrackCandToPXDIntercepts);
+  m_thePXDInterceptor->fillInterceptList(&PXDInterceptList, trackCandList, &gfTrackCandToPXDIntercepts);
 
   //clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &time2);
 
-  thePixelTranslator->fillRoiIDList(&PXDInterceptList, &ROIList);
+  m_thePixelTranslator->fillRoiIDList(&PXDInterceptList, &ROIList);
 
   // clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &time3);
 
@@ -132,14 +156,12 @@ void PXDDataReductionModule::event()
 
 void PXDDataReductionModule::endRun()
 {
-  delete thePXDInterceptor;
+  delete m_thePixelTranslator;
+  delete m_thePXDInterceptor;
 }
 
 
 void PXDDataReductionModule::terminate()
 {
-
-
-
 }
 

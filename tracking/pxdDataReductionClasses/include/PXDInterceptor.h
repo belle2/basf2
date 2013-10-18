@@ -19,6 +19,9 @@
 #include <tracking/dataobjects/PXDIntercept.h>
 #include <tracking/pxdDataReductionClasses/ROIGeometry.h>
 
+#include <tracking/pxdDataReductionClasses/ROIinfo.h>
+
+
 namespace Belle2 {
 
   /**
@@ -32,6 +35,8 @@ namespace Belle2 {
      * Constructor.
      */
     PXDInterceptor();
+
+    PXDInterceptor(const ROIinfo* user_theROIinfo);
 
     /**
      * Destructor.
@@ -59,6 +64,7 @@ namespace Belle2 {
 
     ROIGeometry m_theROIGeometry; /**< the geometry of the Region Of Interest */
 
+    ROIinfo m_theROIinfo; /**< the ROI info structure */
   };
 
 }

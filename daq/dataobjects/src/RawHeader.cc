@@ -215,6 +215,14 @@ int RawHeader::GetSubsysId()
 {
   CheckGetBuffer();
   return m_buffer[ POS_SUBSYS_ID ];
+//   unsigned int subsys = m_buffer[ POS_SUBSYSTEM_ID + tmp_header.RAWHEADER_NWORDS ];
+//   unsigned int crate = m_buffer[ POS_CRATE_ID + tmp_header.RAWHEADER_NWORDS ];
+//   unsigned int slot  = m_buffer[ POS_SLOT_ID + tmp_header.RAWHEADER_NWORDS ];
+//   return
+//     ((subsys << 16) & 0xFFFF0000) |
+//     ((crate << 8) & 0x0000FF00) |
+//     (slot & 0x000000FF);
+
 }
 
 int RawHeader::GetDataType()

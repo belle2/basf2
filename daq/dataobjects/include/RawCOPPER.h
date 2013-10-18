@@ -33,47 +33,46 @@ namespace Belle2 {
     //! Destructor
     virtual ~RawCOPPER();
 
-    //! get COPPER node id from data
+    //
+    // Get position of or pointer to data
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+    // POINTER TO "DETECTOR BUFFER"
+    //( after removing "B2link headers" from "FINNESSE buffer". THIS IS THE RAW DATA FROM A DETECTOR
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //! get Detector buffer length of slot A
+    int Get1stDetectorNwords(int n);
+
+    //! get Detector buffer length of slot B
+    int Get2ndDetectorNwords(int n);
+
+    //! get Detector buffer length of slot C
+    int Get3rdDetectorNwords(int n);
+
+    //! get Detector buffer length of slot D
+    int Get4thDetectorNwords(int n);
+
+    //! get Detector buffer of slot A
+    int* Get1stDetectorBuffer(int n);
+
+    //! get Detector Buffer of slot B
+    int* Get2ndDetectorBuffer(int n);
+
+    //! get Detector Buffer of slot C
+    int* Get3rdDetectorBuffer(int n);
+
+    //! get Detector Buffer of slot D
+    int* Get4thDetectorBuffer(int n);
+    ///////////////////////////////////////////////////////////////////////////////////////
+
+    //! get posistion of COPPER block in unit of word
     virtual int GetBufferPos(int n);
 
-    //! get buffer pointer of rawcopper header
+    //! get buffer pointer of rawcopper header(Currently same as GetBufferPos)
     virtual int* GetRawHdrBufPtr(int n);
 
     //! get buffer pointer of rawcopper trailer
     virtual int* GetRawTrlBufPtr(int n);
-
-    //! get COPPER node id from data
-    virtual int GetCOPPERNodeId(int n);
-
-    //! get Event number from data
-    virtual unsigned int GetCOPPERCounter(int n);
-
-    //! get subsystem-ID from data
-    virtual int GetSubsysId(int n);
-
-    //! get b2l block from data
-    virtual int GetNumFINNESSEBlock(int n);
-
-    //! get b2l block from data
-    virtual int* GetFTSW2Words(int n);
-
-    //! get b2l block from data
-    virtual int* GetExpRunBuf(int n);
-
-    //! get b2l block from data
-    virtual int GetFTSW16bitEventNumber(int n);
-
-    //! get # of offset words for FEE slot A buffer position
-    int GetOffset1stFINNESSE(int n);
-
-    //! get # of offset words for FEE slot A buffer position
-    int GetOffset2ndFINNESSE(int n);
-
-    //! get # of offset words for FEE slot A buffer position
-    int GetOffset3rdFINNESSE(int n);
-
-    //! get # of offset words for FEE slot A buffer position
-    int GetOffset4thFINNESSE(int n);
 
     //! get FINNESSE buffer pointer for slot A
     int* Get1stFINNESSEBuffer(int n);
@@ -87,52 +86,96 @@ namespace Belle2 {
     //! get FINNESSE buffer pointer for slot D
     int* Get4thFINNESSEBuffer(int n);
 
-    //! get Detector Buffer of slot A
-    int* Get1stDetectorBuffer(int n);
 
-    //! get Detector Buffer of slot B
-    int* Get2ndDetectorBuffer(int n);
+    //
+    // Get information from "RawCOPPER header" attached by DAQ software
+    //
+    int GetExpNo(int n);    //! get contents of header
 
-    //! get Detector Buffer of slot C
-    int* Get3rdDetectorBuffer(int n);
+    int GetRunNo(int n);    //! get contents of header
 
-    //! get Detector Buffer of slot D
-    int* Get4thDetectorBuffer(int n);
+    unsigned int GetEveNo(int n);    //! get contents of header
 
-    unsigned int GetMagic7FFF0008(int n);
+    int GetDataType(int n);    //! get contents of header
 
-    unsigned int GetMagicFFFFFAFA(int n);
+    int GetTruncMask(int n);    //! get contents of header
 
-    unsigned int GetMagic7FFF0009(int n);
+    int GetSubsysId(int n);     //! get subsystem-ID from data
 
-    double GetEventUnixTime(int n);
+    //
+    // Get information from 13words "COPPER header" attached by COPPER board
+    //
+    //! get COPPER counter(not event number)
+    virtual unsigned int GetCOPPERCounter(int n);
 
+    //! get COPPER node id from data(Currently same as GetCOPPERNodeId)
+    virtual int GetCOPPERNodeId(int n);
+
+    //! get # of FINNESEs which contains data
+    virtual int GetNumFINNESSEBlock(int n);
+
+    //! get # of offset words for FINNESSE slot A buffer position
+    int GetOffset1stFINNESSE(int n);
+
+    //! get # of offset words for FINNESSE slot B buffer position
+    int GetOffset2ndFINNESSE(int n);
+
+    //! get # of offset words for FINNESSE slot C buffer position
+    int GetOffset3rdFINNESSE(int n);
+
+    //! get # of offset words for FINNESSE slot D buffer position
+    int GetOffset4thFINNESSE(int n);
+
+    //! get data size of  FINNESSE slot A buffer
     int Get1stFINNESSENwords(int n);
 
+    //! get data size of  FINNESSE slot B buffer
     int Get2ndFINNESSENwords(int n);
 
+    //! get data size of  FINNESSE slot C buffer
     int Get3rdFINNESSENwords(int n);
 
+    //! get data size of  FINNESSE slot D buffer
     int Get4thFINNESSENwords(int n);
 
     //
-    // Size of COPPER "front" header and trailer
+    // Get information from "B2link(attached by FEE and HLSB) header"
     //
-    /*
-      size of COPPER_BLOCK =
-      RawHeader.RAWHEADER_NWORDS +
-      SIZE_COPPER_FRONT_HEADER +
-      m_buffer[ POS_DATA_LENGTH ] +
-      SIZE_COPPER_TRAILER +
-      RawTrailer.RAWTRAILER_NWORDS
-    */
+    //! get b2l block from "FEE b2link header"
+    virtual int* GetFTSW2Words(int n);
+
+    //! get b2l block from "FEE b2link header"
+    virtual int* GetExpRunBuf(int n);
+
+    //! get b2l block from "FEE b2link header"
+    virtual int GetFTSW16bitEventNumber(int n);
+
+    //! get Event unixtime from "FEE b2link header"
+    double GetEventUnixTime(int n);
+
+    //
+    // read magic word to check data
+    //
+    //! get magic word for the beginning of  COPPER data block
+    unsigned int GetMagic7FFF0008(int n);
+
+    //! get magic word in "COPPER header"
+    unsigned int GetMagicFFFFFAFA(int n);
+
+    //! get magic word for the end of  COPPER data block
+    unsigned int GetMagic7FFF0009(int n);
+
+
+    //
+    // size of "COPPER front header" and "COPPER trailer"
+    //
     enum {
       SIZE_COPPER_FRONT_HEADER = 7,
-      SIZE_COPPER_TRAILER = 2
+      SIZE_COPPER_TRAILER = 3
     };
 
     //
-    // Data Format : COPPER header
+    // Data Format : "COPPER header"
     //
     enum {
       POS_MAGIC_COPPER_1 = 0,
@@ -151,7 +194,7 @@ namespace Belle2 {
     };
 
     //
-    // Data Format : COPPER Trailer
+    // Data Format : "COPPER Trailer"
     //
     enum {
       POS_MAGIC_COPPER_3 = 0,
@@ -161,7 +204,7 @@ namespace Belle2 {
     };
 
     //
-    // Data Format : B2Link HSLB Header
+    // Data Format : "B2Link HSLB Header"
     //
     enum {
       POS_MAGIC_B2LHSLB = 0,
@@ -170,16 +213,15 @@ namespace Belle2 {
     };
 
     //
-    // Data Format : B2Link HSLB Trailer
+    // Data Format : "B2Link HSLB Trailer"
     //
     enum {
       POS_CHKSUM_B2LHSLB = 0,
-
-      SIZE_B2LHSLB_TRAILER = 2
+      SIZE_B2LHSLB_TRAILER = 1
     };
 
     //
-    // Data Format : B2Link FEE Header
+    // Data Format : "B2Link FEE Header"
     //
     enum {
       POS_FTSW1 = 0,
@@ -197,12 +239,16 @@ namespace Belle2 {
     enum {
       POS_CHKSUM_B2LFEE = 0,
 
-      SIZE_B2LFEE_TRAILER = 2
+      SIZE_B2LFEE_TRAILER = 1
     };
 
 
 
   protected :
+
+    RawHeader tmp_header;  //! Not record
+
+    RawTrailer tmp_trailer; //! Not record
 
     ClassDef(RawCOPPER, 1);
   };

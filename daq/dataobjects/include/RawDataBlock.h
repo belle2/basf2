@@ -29,37 +29,37 @@ namespace Belle2 {
     //! Destructor
     virtual ~RawDataBlock();
 
-    //! Get total length of
+    //! set buffer ( malloc_flag : m_buffer is freeed( = 0 )/ not freeed( = 1 ) in Destructer )
+    virtual void SetBuffer(int* bufin, int nwords, int malloc_flag, int num_events, int num_nodes);
+
+    //! Get total length of m_buffer
     virtual int TotalBufNwords();
 
-    //! get position of COPPER block
+    //! get position of data block in word
     virtual int GetBufferPos(int n);
-
-    //! get nth buffer pointer
-    virtual int* GetWholeBuffer();
-
-    //! get nth buffer pointer
-    virtual int GetNumEntries() { return m_num_events * m_num_nodes; }
-
-    //! get nth buffer pointer
-    virtual int GetNumNodes() { return m_num_nodes; }
-
-    //! get nth buffer pointer
-    virtual int GetNumEvents() { return m_num_events; }
-
-    //! get nth buffer pointer
-    virtual int GetPreAllocFlag() { return m_use_prealloc_buf; }
 
     //! get nth buffer pointer
     virtual int* GetBuffer(int n);
 
-    //! set buffer
-    virtual void SetBuffer(int* bufin, int nwords, int malloc_flag, int num_events, int num_nodes);
+    //! get pointer to  buffer(m_buffer)
+    virtual int* GetWholeBuffer();
 
-    //! get COPPER Block Size
+    //! get # of data blocks = (# of nodes)*(# of events)
+    virtual int GetNumEntries() { return m_num_events * m_num_nodes; }
+
+    //! get # of data sources(e.g. # of COPPER boards) in m_buffer
+    virtual int GetNumNodes() { return m_num_nodes; }
+
+    //! get # of events in m_buffer
+    virtual int GetNumEvents() { return m_num_events; }
+
+    //! get malloc_flag
+    virtual int GetPreAllocFlag() { return m_use_prealloc_buf; }
+
+    //! get size of a data block
     virtual int GetBlockNwords(int n);
 
-    //! get COPPER Block Size
+    //! get FTSW ID to check whether this data block is FTSW data or not
     virtual int CheckFTSWID(int n);
 
     enum {
@@ -78,10 +78,6 @@ namespace Belle2 {
     int* m_buffer; //[m_nwords]
 
     int m_use_prealloc_buf; //! Not record
-
-    RawHeader tmp_header;  //! Not record
-
-    RawTrailer tmp_trailer; //! Not record
 
 
     ClassDef(RawDataBlock, 1);

@@ -87,6 +87,52 @@ int RawCOPPER::GetCOPPERNodeId(int n)
   return m_buffer[ pos_nwords ];
 }
 
+
+int RawCOPPER::GetExpNo(int n)
+{
+  RawHeader hdr;
+  hdr.SetBuffer(GetBuffer(n));
+  return hdr.GetExpNo();
+}
+
+int RawCOPPER::GetRunNo(int n)
+{
+  RawHeader hdr;
+  hdr.SetBuffer(GetBuffer(n));
+  return hdr.GetRunNo();
+}
+
+unsigned int RawCOPPER::GetEveNo(int n)
+{
+  RawHeader hdr;
+  hdr.SetBuffer(GetBuffer(n));
+  return hdr.GetEveNo();
+}
+
+
+int RawCOPPER::GetSubsysId(int n)
+{
+  RawHeader hdr;
+  hdr.SetBuffer(GetBuffer(n));
+  return hdr.GetSubsysId();
+}
+
+
+int RawCOPPER::GetDataType(int n)
+{
+  RawHeader hdr;
+  hdr.SetBuffer(GetBuffer(n));
+  return hdr.GetDataType();
+}
+
+int RawCOPPER::GetTruncMask(int n)
+{
+  RawHeader hdr;
+  hdr.SetBuffer(GetBuffer(n));
+  return hdr.GetTruncMask();
+}
+
+
 unsigned int RawCOPPER::GetCOPPERCounter(int n)
 {
   RawHeader hdr;
@@ -94,20 +140,6 @@ unsigned int RawCOPPER::GetCOPPERCounter(int n)
   return (unsigned int)(m_buffer[ pos_nwords ]);
 }
 
-int RawCOPPER::GetSubsysId(int n)
-{
-  RawHeader hdr;
-  int pos_nwords = GetBufferPos(n) + hdr.POS_SUBSYS_ID;
-  return m_buffer[ pos_nwords ];
-
-//   unsigned int subsys = m_buffer[ POS_SUBSYSTEM_ID + tmp_header.RAWHEADER_NWORDS ];
-//   unsigned int crate = m_buffer[ POS_CRATE_ID + tmp_header.RAWHEADER_NWORDS ];
-//   unsigned int slot  = m_buffer[ POS_SLOT_ID + tmp_header.RAWHEADER_NWORDS ];
-//   return
-//     ((subsys << 16) & 0xFFFF0000) |
-//     ((crate << 8) & 0x0000FF00) |
-//     (slot & 0x000000FF);
-}
 
 int RawCOPPER::GetNumFINNESSEBlock(int n)
 {
@@ -123,6 +155,30 @@ int RawCOPPER::GetNumFINNESSEBlock(int n)
   pos_nwords = GetBufferPos(n) + POS_CH_D_DATA_LENGTH + hdr.RAWHEADER_NWORDS;
   if (m_buffer[ POS_CH_D_DATA_LENGTH + tmp_header.RAWHEADER_NWORDS ] > 0) cnt++;
   return cnt;
+}
+
+int RawCOPPER::Get1stDetectorNwords(int n)
+{
+  return Get1stFINNESSENwords(n) -  SIZE_B2LHSLB_HEADER -
+         SIZE_B2LFEE_HEADER - SIZE_B2LFEE_TRAILER - SIZE_B2LHSLB_TRAILER;
+}
+
+int RawCOPPER::Get2ndDetectorNwords(int n)
+{
+  return Get2ndFINNESSENwords(n) -  SIZE_B2LHSLB_HEADER -
+         SIZE_B2LFEE_HEADER - SIZE_B2LFEE_TRAILER - SIZE_B2LHSLB_TRAILER;
+}
+
+int RawCOPPER::Get3rdDetectorNwords(int n)
+{
+  return Get3rdFINNESSENwords(n) -  SIZE_B2LHSLB_HEADER -
+         SIZE_B2LFEE_HEADER - SIZE_B2LFEE_TRAILER - SIZE_B2LHSLB_TRAILER;
+}
+
+int RawCOPPER::Get4thDetectorNwords(int n)
+{
+  return Get4thFINNESSENwords(n) -  SIZE_B2LHSLB_HEADER -
+         SIZE_B2LFEE_HEADER - SIZE_B2LFEE_TRAILER - SIZE_B2LHSLB_TRAILER;
 }
 
 

@@ -40,6 +40,7 @@ void ROIpayload::setPayloadLength(int length)
 
   m_data32[0] = htobe32(length);
 
+  m_packetLengthByte = length + sizeof(int);
 }
 
 void ROIpayload::setHeader()

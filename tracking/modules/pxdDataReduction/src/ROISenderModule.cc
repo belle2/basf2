@@ -80,7 +80,7 @@ ROISenderModule::event()
 {
 
   StoreObjPtr<ROIpayload> payloadPtr(m_ROIpayloadName);
-  int length = payloadPtr->getLength();
+  int length = payloadPtr->getPacketLengthByte();
   const char* data = (const char*) payloadPtr->getRootdata();
 
   mqd_t ret;

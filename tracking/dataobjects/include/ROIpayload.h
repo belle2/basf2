@@ -40,6 +40,7 @@ namespace Belle2 {
      */
     virtual ~ROIpayload() {};
 
+    int m_packetLengthByte;
     int m_length;
     int*  m_rootdata; //[m_length]
 
@@ -53,6 +54,7 @@ namespace Belle2 {
     void addROIraw(ROIrawID roiraw);
     void setCRC();
 
+    int getPacketLengthByte() {return m_packetLengthByte;};
     int getLength() {return m_length;};
     int*  getRootdata() {return m_rootdata;}; //[m_length]
 

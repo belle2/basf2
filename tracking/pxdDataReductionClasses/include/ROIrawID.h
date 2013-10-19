@@ -16,7 +16,7 @@ namespace Belle2 {
 
   /** ROIrawID
    *
-   *
+   * 64 bit union that contains the ROI information to be stored in the payload that is sent to the ONSEN
    */
 
   class ROIrawID {
@@ -80,11 +80,11 @@ namespace Belle2 {
 
     ~ROIrawID() {};
 
-    //operator used to order the ROIs
+    //operator used to order the ROIs (ascending DHHID)
     inline bool operator()(const ROIrawID roi1, const ROIrawID roi2) const {
       if (roi1.getDHHID() == roi2.getDHHID())
-        return roi1.getID() > roi2.getID();
-      else return roi1.getDHHID() > roi2.getDHHID();
+        return roi1.getID() < roi2.getID();
+      else return roi1.getDHHID() < roi2.getDHHID();
 
     }
 

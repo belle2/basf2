@@ -10,7 +10,7 @@
 import os
 from basf2 import *
 
-numEvents = 1
+numEvents = 100
 
 ##first register the modules
 
@@ -60,7 +60,7 @@ main.add_module(evtnumber)
 main.add_module(evtinfo)
 main.add_module(roiGen)
 main.add_module(roiPayloadAssembler)
-# main.add_module(roiReadTest)
+#main.add_module(roiReadTest)
 main.add_module(roiSender)
 main.add_module(rootOutput)
 

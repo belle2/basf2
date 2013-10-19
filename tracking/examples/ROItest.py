@@ -10,14 +10,14 @@
 import os
 from basf2 import *
 
-numEvents = 10
+numEvents = 1
 
 ##first register the modules
 
-evtmetagen = register_module('EvtMetaGen')
-evtmetagen.param('expList', [0])
-evtmetagen.param('runList', [1])
-evtmetagen.param('evtNumList', [numEvents])
+evtnumber = register_module('EventNumbers')
+evtnumber.param('expList', [0])
+evtnumber.param('runList', [1])
+evtnumber.param('evtNumList', [numEvents])
 
 ##first register the modules
 evtinfo = register_module('EventInfo')
@@ -27,7 +27,7 @@ eventCounter.logging.log_level = LogLevel.INFO
 eventCounter.param('stepSize', 25)
 
 roiGen = register_module('ROIGenerator')
-param_roiGen = {'ROIListName': 'ROIs', 'nROIs': 4}
+param_roiGen = {'ROIListName': 'ROIs', 'nROIs': 8}
 roiGen.param(param_roiGen)
 
 roiPayloadAssembler = register_module('ROIPayloadAssembler')
@@ -40,6 +40,15 @@ param_roiReadTest = {'outfileName': 'ROIout.txt',
                      'ROIpayloadName': 'ROIpayload'}
 roiReadTest.param(param_roiReadTest)
 
+roiSender = register_module('ROISender')
+param_roiSender = {
+    'MessageQueueName': '/roi',
+    'ROIpayloadName': 'ROIpayload',
+    'MessageQueueDepth': 10,
+    'MessageSize': 8192,
+    }
+roiSender.param(param_roiSender)
+
 rootOutput = register_module('RootOutput')
 
 # Create paths
@@ -47,11 +56,12 @@ main = create_path()
 
 # Add modules to paths
 main.add_module(eventCounter)
-main.add_module(evtmetagen)
+main.add_module(evtnumber)
 main.add_module(evtinfo)
 main.add_module(roiGen)
 main.add_module(roiPayloadAssembler)
-main.add_module(roiReadTest)
+# main.add_module(roiReadTest)
+main.add_module(roiSender)
 main.add_module(rootOutput)
 
 # Process events

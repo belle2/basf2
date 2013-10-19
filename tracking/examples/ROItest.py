@@ -30,9 +30,10 @@ roiGen = register_module('ROIGenerator')
 param_roiGen = {'ROIListName': 'ROIs', 'nROIs': 4}
 roiGen.param(param_roiGen)
 
-roiToOnsen = register_module('ROItoOnsen')
-param_roiToOnsen = {'ROIListName': 'ROIs', 'ROIpayloadName': 'ROIpayload'}
-roiToOnsen.param(param_roiToOnsen)
+roiPayloadAssembler = register_module('ROIPayloadAssembler')
+param_roiPayloadAssembler = {'ROIListName': 'ROIs',
+                             'ROIpayloadName': 'ROIpayload'}
+roiPayloadAssembler.param(param_roiPayloadAssembler)
 
 roiReadTest = register_module('ROIReadTest')
 param_roiReadTest = {'outfileName': 'ROIout.txt',
@@ -49,7 +50,7 @@ main.add_module(eventCounter)
 main.add_module(evtmetagen)
 main.add_module(evtinfo)
 main.add_module(roiGen)
-main.add_module(roiToOnsen)
+main.add_module(roiPayloadAssembler)
 main.add_module(roiReadTest)
 main.add_module(rootOutput)
 

@@ -9,12 +9,12 @@
  **************************************************************************/
 
 #include <framework/datastore/StoreObjPtr.h>
-#include <tracking/modules/pxdDataReduction/ROItoOnsenModule.h>
+#include <framework/dataobjects/EventMetaData.h>
+#include <tracking/modules/pxdDataReduction/ROIPayloadAssemblerModule.h>
 #include <framework/datastore/StoreArray.h>
 #include <tracking/dataobjects/ROIid.h>
 #include <vxd/dataobjects/VxdID.h>
 #include <tracking/dataobjects/ROIpayload.h>
-//#include <daq/dataobjects/RawHeader.h>
 #include <stdlib.h>
 #include <set>
 
@@ -25,13 +25,13 @@ using namespace Belle2;
 //                 Register the Module
 //-----------------------------------------------------------------
 
-REG_MODULE(ROItoOnsen)
+REG_MODULE(ROIPayloadAssembler)
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-ROItoOnsenModule::ROItoOnsenModule() : Module()
+ROIPayloadAssemblerModule::ROIPayloadAssemblerModule() : Module()
 {
   //Set module properties
   setDescription("This module prepare the ROI in the correct format for the ONSEN");
@@ -42,29 +42,27 @@ ROItoOnsenModule::ROItoOnsenModule() : Module()
 
 }
 
-ROItoOnsenModule::~ROItoOnsenModule()
+ROIPayloadAssemblerModule::~ROIPayloadAssemblerModule()
 {
 }
 
 
-void ROItoOnsenModule::initialize()
+void ROIPayloadAssemblerModule::initialize()
 {
 
   StoreArray<ROIid>::required(m_ROIListName);
-  //  StoreObjPtr<RawHeader>::required("");
+  StoreObjPtr<EventMetaData>::required();
   StoreObjPtr<ROIpayload>::registerPersistent(m_ROIpayloadName);
-
-  m_dummyTriggerNumber = 0;
 
 }
 
-void ROItoOnsenModule::beginRun()
+void ROIPayloadAssemblerModule::beginRun()
 {
 
 }
 
 
-void ROItoOnsenModule::event()
+void ROIPayloadAssemblerModule::event()
 {
 
   StoreArray<ROIid> ROIList(m_ROIListName);
@@ -74,7 +72,7 @@ void ROItoOnsenModule::event()
   set<ROIrawID, ROIrawID> orderedROIraw;
   set<ROIrawID, ROIrawID>::iterator itOrderedROIraw;
 
-  cout << " number of ROIs in the list = " << ROIListSize << endl;
+  B2DEBUG(1, " number of ROIs in the list = " << ROIListSize);
 
   for (int iROI = 0; iROI < ROIListSize; iROI++) {
 
@@ -93,7 +91,7 @@ void ROItoOnsenModule::event()
 
   }
 
-  cout << " number of ROIs in the set = " << orderedROIraw.size() << endl;
+  B2DEBUG(1, " number of ROIs in the set = " << orderedROIraw.size());
 
   ROIpayload* payload = new ROIpayload(4 + 2 * ROIListSize);
 
@@ -106,10 +104,9 @@ void ROItoOnsenModule::event()
   payload->setPayloadLength(payloadLength);
   payload->setHeader();
 
-  //  StoreObjPtr<RawHeader> rawHeader("");
 
-  //  payload->setTriggerNumber( rawHeader.GetEveNo() );
-  payload->setTriggerNumber(++m_dummyTriggerNumber);
+  StoreObjPtr<EventMetaData> eventMetaDataPtr;
+  payload->setTriggerNumber(eventMetaDataPtr->getEvent());
 
   int tmpDHHID = -1;
   int countROIs = 0;
@@ -117,7 +114,7 @@ void ROItoOnsenModule::event()
 
   for (itOrderedROIraw = orderedROIraw.begin(); itOrderedROIraw != orderedROIraw.end(); ++itOrderedROIraw) {
 
-    if (itOrderedROIraw->getDHHID() == tmpDHHID)
+    if ((int) itOrderedROIraw->getDHHID() == tmpDHHID)
       countROIs ++;
     else
       countROIs = 0;
@@ -126,7 +123,7 @@ void ROItoOnsenModule::event()
       payload->addROIraw(*itOrderedROIraw);
       addROI++;
     } else
-      cout << " ROI rejected, exceeding the number of ROIs per event (32)" << endl;
+      B2INFO(" ROI rejected, exceeding the number of ROIs per event (32)");
 
     tmpDHHID = itOrderedROIraw->getDHHID();
 
@@ -134,16 +131,16 @@ void ROItoOnsenModule::event()
 
   payload->setCRC();
 
-  cout << " number of ROIs in payload = " << addROI << endl;
+  B2DEBUG(1, " number of ROIs in payload = " << addROI);
 }
 
 
-void ROItoOnsenModule::endRun()
+void ROIPayloadAssemblerModule::endRun()
 {
 }
 
 
-void ROItoOnsenModule::terminate()
+void ROIPayloadAssemblerModule::terminate()
 {
 }
 

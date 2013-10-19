@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ROI_TO_ONSEN_H_
-#define ROI_TO_ONSEN_H_
+#ifndef ROI_PAYLOAD_ASSEMBLER_H_
+#define ROI_PAYLOAD_ASSEMBLER_H_
 
 #include <framework/core/Module.h>
 #include <vxd/dataobjects/VxdID.h>
@@ -24,19 +24,19 @@ namespace Belle2 {
    *
    */
 
-  class ROItoOnsenModule : public Module {
+  class ROIPayloadAssemblerModule : public Module {
 
   public:
 
     /**
      * Constructor of the module.
      */
-    ROItoOnsenModule();
+    ROIPayloadAssemblerModule();
 
     /**
      * Destructor of the module.
      */
-    virtual ~ROItoOnsenModule();
+    virtual ~ROIPayloadAssemblerModule();
 
     /**
      *Initializes the Module.
@@ -57,8 +57,6 @@ namespace Belle2 {
   protected:
 
     ROIrawID m_roiraw;
-
-    int m_dummyTriggerNumber;
 
     std::string m_ROIListName;
     std::string m_ROIpayloadName;

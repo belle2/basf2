@@ -31,7 +31,7 @@ void ROIpayload::init(int length)
   m_index = 0;
   m_length = length;
   m_rootdata = new int[length];
-  m_data32 = (unsigned int*)m_rootdata;
+  m_data32 = (uint32_t*)m_rootdata;
   m_data64 = (ROIrawID::baseType*)(m_data32 + 3);
 }
 
@@ -40,7 +40,7 @@ void ROIpayload::setPayloadLength(int length)
 
   m_data32[0] = htobe32(length);
 
-  m_packetLengthByte = length + sizeof(int);
+  m_packetLengthByte = length + sizeof(uint32_t);
 }
 
 void ROIpayload::setHeader()
@@ -73,7 +73,7 @@ void ROIpayload::setCRC()
 
   crc_optimal<32, 0x04C11DB7, 0, 0, false, false> dhh_crc_32;
 
-  dhh_crc_32.process_bytes((void*)(m_rootdata + 1), 2 * sizeof(unsigned int) + m_index * sizeof(unsigned long int));
+  dhh_crc_32.process_bytes((void*)(m_rootdata + 1), 2 * sizeof(uint32_t) + m_index * sizeof(uint64_t));
 
   m_data32[m_index * 2 + 3] = htobe32(dhh_crc_32.checksum()) ;
 

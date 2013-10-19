@@ -20,7 +20,7 @@ namespace Belle2 {
 
   /** The ROI to ONSEN Module
    *
-   * this module translate the ROIs into the ONSEN format
+   * This module assembles payload for the ROI in the correct format to be sent to the ONSEN
    *
    */
 
@@ -56,10 +56,10 @@ namespace Belle2 {
 
   protected:
 
-    ROIrawID m_roiraw;
+    ROIrawID m_roiraw; /**< 64 bit union containing a single ROI info to be sent to ONSEN*/
 
-    std::string m_ROIListName;
-    std::string m_ROIpayloadName;
+    std::string m_ROIListName; /**< name of the ROI list */
+    std::string m_ROIpayloadName; /**< name of the payload to be sent to ONSEN */
 
   };
 }

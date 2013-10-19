@@ -34,7 +34,7 @@ REG_MODULE(ROIPayloadAssembler)
 ROIPayloadAssemblerModule::ROIPayloadAssemblerModule() : Module()
 {
   //Set module properties
-  setDescription("This module prepare the ROI in the correct format for the ONSEN");
+  setDescription("This module assembles payload for the ROI in the correct format to be sent to the ONSEN");
   setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
 
   addParam("ROIListName", m_ROIListName, "name of the list of ROIs", std::string(""));
@@ -82,10 +82,10 @@ void ROIPayloadAssemblerModule::event()
 
     m_roiraw.setSystemFlag(0);
     m_roiraw.setDHHID(((layer) << 5) | ((ladder) << 1) | (sensor));
-    m_roiraw.setRowMin(ROIList[iROI]->getMinUid());
-    m_roiraw.setRowMax(ROIList[iROI]->getMaxUid());
-    m_roiraw.setColMin(ROIList[iROI]->getMinVid());
-    m_roiraw.setColMax(ROIList[iROI]->getMaxVid());
+    m_roiraw.setRowMin(ROIList[iROI]->getMinVid());
+    m_roiraw.setRowMax(ROIList[iROI]->getMaxVid());
+    m_roiraw.setColMin(ROIList[iROI]->getMinUid());
+    m_roiraw.setColMax(ROIList[iROI]->getMaxUid());
 
     orderedROIraw.insert(m_roiraw);
 
@@ -128,6 +128,9 @@ void ROIPayloadAssemblerModule::event()
     tmpDHHID = itOrderedROIraw->getDHHID();
 
   }
+
+  for (itOrderedROIraw = orderedROIraw.begin(); itOrderedROIraw != orderedROIraw.end(); ++itOrderedROIraw)
+    B2DEBUG(1, "ordered DHHID: " << itOrderedROIraw->getDHHID());
 
   payload->setCRC();
 

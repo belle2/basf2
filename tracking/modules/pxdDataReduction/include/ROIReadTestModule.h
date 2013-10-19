@@ -12,7 +12,6 @@
 #define ROI_READ_TEST_H_
 
 #include <framework/core/Module.h>
-#include <tracking/pxdDataReductionClasses/ROIrawID.h>
 #include <string>
 #include <stdio.h>
 
@@ -20,7 +19,7 @@ namespace Belle2 {
 
   /** The ROI to ONSEN Module
    *
-   * this module is used to check the payload produced by the ROItoOnsen Module
+   * this module is used to check the payload produced by the ROIPayloadAssembler Module
    *
    */
 

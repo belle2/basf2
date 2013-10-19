@@ -28,7 +28,7 @@ REG_MODULE(ROIReadTest)
 ROIReadTestModule::ROIReadTestModule() : Module()
 {
   //Set module properties
-  setDescription("check the payload produced by the ROItoOnsen Module");
+  setDescription("check the payload produced by the ROIPayloadAssembler Module");
   setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
 
   addParam("outfileName", m_outfileName, "name of the output file", std::string("ROipayload.txt"));
@@ -62,16 +62,12 @@ void ROIReadTestModule::event()
   unsigned char* rootdata = (unsigned char*) payloadPtr->getRootdata();
 
   for (int i = 0; i < 4 * length; i++) {
-    if ((i % 4) == 0) printf(" ");
-    printf("%02x", rootdata[i]);
+    //    if ((i % 4) == 0) printf(" ");
+    //    printf("%02x", rootdata[i]);
     fputc(rootdata[i], m_pFile);
   }
 
-  cout << endl;
-
-
-
-
+  //  cout << endl;
 
 }
 

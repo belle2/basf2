@@ -12,13 +12,12 @@
 #define ROI_PAYLOAD_ASSEMBLER_H_
 
 #include <framework/core/Module.h>
-#include <vxd/dataobjects/VxdID.h>
 #include <tracking/pxdDataReductionClasses/ROIrawID.h>
 #include <string>
 
 namespace Belle2 {
 
-  /** The ROI to ONSEN Module
+  /** The ROI Payload Assembler Module
    *
    * This module assembles payload for the ROI in the correct format to be sent to the ONSEN
    *

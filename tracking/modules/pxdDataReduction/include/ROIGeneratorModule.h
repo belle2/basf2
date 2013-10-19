@@ -17,7 +17,7 @@ namespace Belle2 {
 
   /** The ROI generator Module
    *
-   * this module is used to test the ROI chain
+   * This module is used to generate a certain number of ROIs
    *
    */
 
@@ -54,6 +54,7 @@ namespace Belle2 {
   protected:
 
     std::string m_ROIListName;
+
     int m_nROIs;
 
   };

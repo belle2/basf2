@@ -29,7 +29,7 @@ REG_MODULE(ROIGenerator)
 ROIGeneratorModule::ROIGeneratorModule() : Module()
 {
   //Set module properties
-  setDescription("This module is used to test the ROI chain");
+  setDescription("This module is used to generate a certain number of ROIs");
   setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
 
   addParam("ROIListName", m_ROIListName, "name of the list of ROIs", std::string(""));
@@ -44,19 +44,16 @@ ROIGeneratorModule::~ROIGeneratorModule()
 
 void ROIGeneratorModule::initialize()
 {
-
   StoreArray<ROIid>::registerPersistent(m_ROIListName);
 }
 
 void ROIGeneratorModule::beginRun()
 {
-
 }
 
 
 void ROIGeneratorModule::event()
 {
-
 
   StoreArray<ROIid> ROIList(m_ROIListName);
   ROIList.create();
@@ -65,13 +62,12 @@ void ROIGeneratorModule::event()
 
   VxdID sensorID;
   sensorID.setLayerNumber(1);
+  //    sensorID.setLadderNumber(1);
   sensorID.setSensorNumber(1);
 
   for (int iROI = 0; iROI < m_nROIs; iROI++) {
-    //    cout<< " iROI = "<<iROI<<endl;
 
     sensorID.setLadderNumber((1 + iROI) % 8);
-    //    sensorID.setLadderNumber(1);
     tmp_ROIid.setMinUid(1 + iROI);
     tmp_ROIid.setMinVid(1);
     tmp_ROIid.setMaxUid(4 + iROI);

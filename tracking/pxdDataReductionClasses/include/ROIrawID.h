@@ -11,6 +11,7 @@
 #ifndef ROIRAWID_H_
 #define ROIRAWID_H_
 
+#include <stdint.h>
 
 namespace Belle2 {
 
@@ -23,7 +24,8 @@ namespace Belle2 {
 
   public:
 
-    typedef unsigned long baseType;
+    //    typedef unsigned long baseType;
+    typedef uint64_t baseType;
     enum {
       UnusedBits = 21,
       SystemFlagBits = 1,

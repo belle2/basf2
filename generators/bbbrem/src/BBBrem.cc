@@ -14,6 +14,7 @@
 #include <generators/dataobjects/MCParticleGraph.h>
 
 #include <TRandom3.h>
+//#include <cmath>
 
 using namespace std;
 using namespace Belle2;
@@ -29,7 +30,7 @@ void BBBrem::init(double cmsEnergy, double minPhotonEFrac, bool unweighted, doub
   m_maxWeightDelivered = 0.0;
   m_sumWeightDelivered = 0.0;
   m_sumWeightDeliveredSqr = 0.0;
-  m_eventCount = 0;
+  m_weightCount = 0;
 
   if ((minPhotonEFrac <= 0.0) || (minPhotonEFrac >= 1.0)) {
     B2ERROR("The minimum photon energy fraction has to be in the range ]0,1[ !")
@@ -41,7 +42,7 @@ void BBBrem::init(double cmsEnergy, double minPhotonEFrac, bool unweighted, doub
 
   //Initialize the constants (in order to be consistent with the FORTRAN source code)
   alpha = Const::fineStrConst;
-  rme = Const::electronMass;   //in MeV
+  rme = Const::electronMass;
 
   //Initialize the derived constants
   s     = cmsEnergy * cmsEnergy;
@@ -80,16 +81,19 @@ double BBBrem::generateEvent(MCParticleGraph& mcGraph)
     do {
       calcOutgoingLeptonsAndWeight();
       if (weight > m_maxWeightDelivered) m_maxWeightDelivered = weight;
+      m_weightCount++;
+      m_sumWeightDelivered += weight;
+      m_sumWeightDeliveredSqr += weight * weight;
+
       ran = gRandom->Uniform();
     } while (weight <= ran * m_maxWeight);
   } else {
     calcOutgoingLeptonsAndWeight();
     if (weight > m_maxWeightDelivered) m_maxWeightDelivered = weight;
+    m_weightCount++;
+    m_sumWeightDelivered += weight;
+    m_sumWeightDeliveredSqr += weight * weight;
   }
-
-  m_eventCount++;
-  m_sumWeightDelivered += weight;
-  m_sumWeightDeliveredSqr += weight * weight;
 
   //Store the incoming particles as virtual particles, the outgoing particles as real particles
   storeParticle(mcGraph, p1, 11, true);
@@ -120,8 +124,8 @@ double BBBrem::generateEvent(MCParticleGraph& mcGraph)
 
 void BBBrem::term()
 {
-  m_crossSection = m_sumWeightDelivered / m_eventCount;
-  m_crossSectionError = sqrt(m_sumWeightDeliveredSqr - m_sumWeightDelivered * m_sumWeightDelivered / m_eventCount) / m_eventCount;
+  m_crossSection = m_sumWeightDelivered / m_weightCount;
+  m_crossSectionError = sqrt(m_sumWeightDeliveredSqr - m_sumWeightDelivered * m_sumWeightDelivered / m_weightCount) / m_weightCount;
 }
 
 
@@ -318,6 +322,28 @@ void BBBrem::calcOutgoingLeptonsAndWeight()
 
       //The weight
       weight = rmex / rmap * sigapp;
+
+      //Isnan check (not sure if this is ok)
+      if (std::isnan(weight)) {
+        B2WARNING("Weight is nan! Setting the weight to zero.");
+        weight = 0.0;
+      }
+
+
+      //========================================================
+      // beam size effect (or density effect)
+      // ref: arxiv:hep-ph/9401333
+
+      // tc = (hbarc/simga_y)^2
+      double tc = 1.68e-17;  //SuperKEKB LER (sigma_y*=48nm)
+      //double tc = 9.81e-18;  //SuperKEKB HER (sigma_y*=63nm)
+
+      int cutflag = 0 ;  // 0: no cut, 1: hard cut, 2: soft cut
+
+      if (cutflag == 1) if (abs(t) < tc) weight = 0.0;
+      if (cutflag == 2) if (t != tc) weight *= t * t / (t - tc) / (t - tc); // t<0<tc, always t!=tc
+      //========================================================
+
     }
   }
 }

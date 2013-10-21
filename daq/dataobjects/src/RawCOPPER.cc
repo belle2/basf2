@@ -65,9 +65,9 @@ int RawCOPPER::GetBufferPos(int n)
     int size = tmp_header.RAWHEADER_NWORDS
                + m_buffer[ pos_nwords + tmp_header.RAWHEADER_NWORDS + POS_DATA_LENGTH ]
                + SIZE_COPPER_FRONT_HEADER
-               + SIZE_COPPER_TRAILER
+               + SIZE_COPPER_TRAILER - 1
                + tmp_trailer.RAWTRAILER_NWORDS;
-
+    // COPPER's data length include one word from COPPER trailer. so -1 is needed.
 
     pos_nwords +=  size;
     if (pos_nwords >= m_nwords) {

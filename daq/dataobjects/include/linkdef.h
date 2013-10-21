@@ -20,6 +20,6 @@
 #pragma link C++ class Belle2::SendTrailer;
 #pragma link C++ class Belle2::RawROPC;
 #pragma link C++ class Belle2::ErrorMessage;
-
+#pragma link C++ class Belle2::RawPXD;
 
 #endif

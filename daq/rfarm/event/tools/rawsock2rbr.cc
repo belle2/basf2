@@ -13,7 +13,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#include "daq/rfarm/event/RevSock2Rb.h"
+#include "daq/rfarm/event/RawRevSock2Rb.h"
 
 using namespace Belle2;
 using namespace std;
@@ -32,9 +32,10 @@ int main(int argc, char** argv)
   string a4(argv[4]);
   int a5 = atoi(argv[5]);
 
-  RevSock2Rb sr(a1, a2, a3, a4, a5);
+  RawRevSock2Rb sr(a1, a2, a3, a4, a5);
 
   int ncount = 0;
+  int nevt = 0;
   for (;;) {
     int stat = sr.ReceiveEvent();
     //    printf ( "sock2rb received : %d\n", stat );
@@ -45,6 +46,10 @@ int main(int argc, char** argv)
       sleep(10);
       ncount++;
       if (ncount > 100) break;
+    }
+    nevt++;
+    if (nevt % 5000 == 0) {
+      printf("rawsock2rbr : evt = %d\n", nevt);
     }
   }
   exit(0);

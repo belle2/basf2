@@ -57,10 +57,10 @@ namespace Belle2 {
     void SetFTSW2Words(int* ftsw_buf);
     void SetExpRunNumber(int* exprun_buf);
 
-    void SetOffset1stFINNESSE(int offset_1st_FINNESSE);    //! set contents of header
-    void SetOffset2ndFINNESSE(int offset_2nd_FINNESSE);    //! set contents of header
-    void SetOffset3rdFINNESSE(int offset_3rd_FINNESSE);    //! set contents of header
-    void SetOffset4thFINNESSE(int offset_4th_FINNESSE);    //! set contents of header
+    void SetOffset1stFINESSE(int offset_1st_FINESSE);    //! set contents of header
+    void SetOffset2ndFINESSE(int offset_2nd_FINESSE);    //! set contents of header
+    void SetOffset3rdFINESSE(int offset_3rd_FINESSE);    //! set contents of header
+    void SetOffset4thFINESSE(int offset_4th_FINESSE);    //! set contents of header
     void SetMagicWordEntireHeader(); //! set magic words;
 
     int AddNodeInfo(int node_id);
@@ -74,10 +74,10 @@ namespace Belle2 {
     int GetDataType();  //! get contents of header
     int GetTruncMask();  //! get contents of header
 
-    int GetOffset1stFINNESSE();  //! get contents of header
-    int GetOffset2ndFINNESSE();  //! get contents of header
-    int GetOffset3rdFINNESSE();  //! get contents of header
-    int GetOffset4thFINNESSE();  //! get contents of header
+    int GetOffset1stFINESSE();  //! get contents of header
+    int GetOffset2ndFINESSE();  //! get contents of header
+    int GetOffset3rdFINESSE();  //! get contents of header
+    int GetOffset4thFINESSE();  //! get contents of header
     int GetNumNodes();  //! get contents of header
     int GetNodeInfo(int node_no, int* node_id);    //! get contents of header
     unsigned int GetMagicWordEntireHeader();
@@ -97,10 +97,10 @@ namespace Belle2 {
       POS_HSLB_2 = 5,
       POS_SUBSYS_ID = 6,
       POS_TRUNC_MASK_DATATYPE = 7,
-      POS_OFFSET_1ST_FINNESSE = 8,
-      POS_OFFSET_2ND_FINNESSE = 9,
-      POS_OFFSET_3RD_FINNESSE = 10,
-      POS_OFFSET_4TH_FINNESSE = 11,
+      POS_OFFSET_1ST_FINESSE = 8,
+      POS_OFFSET_2ND_FINESSE = 9,
+      POS_OFFSET_3RD_FINESSE = 10,
+      POS_OFFSET_4TH_FINESSE = 11,
       POS_RESVD_1 = 12,
       POS_RESVD_2 = 13,
       POS_NUM_NODES = 14,

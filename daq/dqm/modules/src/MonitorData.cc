@@ -111,10 +111,10 @@ void MonitorDataModule::event()
        size_byte);
       */
 
-      int* finnesse_buf_1st = rawcprarray[ j ]->Get1stFINNESSEBuffer(i);
-      int* finnesse_buf_2nd = rawcprarray[ j ]->Get2ndFINNESSEBuffer(i);
-      int* finnesse_buf_3rd = rawcprarray[ j ]->Get3rdFINNESSEBuffer(i);
-      int* finnesse_buf_4th = rawcprarray[ j ]->Get4thFINNESSEBuffer(i);
+      int* finesse_buf_1st = rawcprarray[ j ]->Get1stFINESSEBuffer(i);
+      int* finesse_buf_2nd = rawcprarray[ j ]->Get2ndFINESSEBuffer(i);
+      int* finesse_buf_3rd = rawcprarray[ j ]->Get3rdFINESSEBuffer(i);
+      int* finesse_buf_4th = rawcprarray[ j ]->Get4thFINESSEBuffer(i);
       //    printf("FEEbuf %p %p %p %p\n", fee_buf_1st, fee_buf_2nd, fee_buf_3rd, fee_buf_4th);
     }
   }

@@ -125,26 +125,26 @@ void RawHeader::SetB2LFEEHdrPart(unsigned int word1, unsigned int word2)
 }
 
 
-void RawHeader::SetOffset1stFINNESSE(int offset_1st_FINNESSE)
+void RawHeader::SetOffset1stFINESSE(int offset_1st_FINESSE)
 {
   CheckSetBuffer();
-  m_buffer[ POS_OFFSET_1ST_FINNESSE ] = offset_1st_FINNESSE;
+  m_buffer[ POS_OFFSET_1ST_FINESSE ] = offset_1st_FINESSE;
 }
 
-void RawHeader::SetOffset2ndFINNESSE(int offset_2nd_FINNESSE)
+void RawHeader::SetOffset2ndFINESSE(int offset_2nd_FINESSE)
 {
   CheckSetBuffer();
-  m_buffer[ POS_OFFSET_2ND_FINNESSE ] = offset_2nd_FINNESSE;
+  m_buffer[ POS_OFFSET_2ND_FINESSE ] = offset_2nd_FINESSE;
 }
-void RawHeader::SetOffset3rdFINNESSE(int offset_3rd_FINNESSE)
+void RawHeader::SetOffset3rdFINESSE(int offset_3rd_FINESSE)
 {
   CheckSetBuffer();
-  m_buffer[ POS_OFFSET_3RD_FINNESSE ] = offset_3rd_FINNESSE;
+  m_buffer[ POS_OFFSET_3RD_FINESSE ] = offset_3rd_FINESSE;
 }
-void RawHeader::SetOffset4thFINNESSE(int offset_4th_FINNESSE)
+void RawHeader::SetOffset4thFINESSE(int offset_4th_FINESSE)
 {
   CheckSetBuffer();
-  m_buffer[ POS_OFFSET_4TH_FINNESSE ] = offset_4th_FINNESSE;
+  m_buffer[ POS_OFFSET_4TH_FINESSE ] = offset_4th_FINESSE;
 }
 
 void RawHeader::SetFTSW2Words(int* ftsw_buf)
@@ -238,28 +238,28 @@ int RawHeader::GetTruncMask()
 }
 
 
-int RawHeader::GetOffset1stFINNESSE()
+int RawHeader::GetOffset1stFINESSE()
 {
   CheckGetBuffer();
-  return m_buffer[ POS_OFFSET_1ST_FINNESSE ];
+  return m_buffer[ POS_OFFSET_1ST_FINESSE ];
 }
 
-int RawHeader::GetOffset2ndFINNESSE()
+int RawHeader::GetOffset2ndFINESSE()
 {
   CheckGetBuffer();
-  return m_buffer[ POS_OFFSET_2ND_FINNESSE ];
+  return m_buffer[ POS_OFFSET_2ND_FINESSE ];
 }
 
-int RawHeader::GetOffset3rdFINNESSE()
+int RawHeader::GetOffset3rdFINESSE()
 {
   CheckGetBuffer();
-  return m_buffer[ POS_OFFSET_3RD_FINNESSE ];
+  return m_buffer[ POS_OFFSET_3RD_FINESSE ];
 }
 
-int RawHeader::GetOffset4thFINNESSE()
+int RawHeader::GetOffset4thFINESSE()
 {
   CheckGetBuffer();
-  return m_buffer[ POS_OFFSET_4TH_FINNESSE ];
+  return m_buffer[ POS_OFFSET_4TH_FINESSE ];
 }
 
 int RawHeader::GetNumNodes()

@@ -254,12 +254,12 @@ void PrintDataModule::PrintCOPPEREvent(RawCOPPER* raw_copper, int i)
 
 
   //
-  // Obtain data size for each FINNESSE
+  // Obtain data size for each FINESSE
   //
-  m_fina_nwords += raw_copper->Get1stFINNESSENwords(i);
-  m_finb_nwords += raw_copper->Get2ndFINNESSENwords(i);
-  m_finc_nwords += raw_copper->Get3rdFINNESSENwords(i);
-  m_find_nwords += raw_copper->Get4thFINNESSENwords(i);
+  m_fina_nwords += raw_copper->Get1stFINESSENwords(i);
+  m_finb_nwords += raw_copper->Get2ndFINESSENwords(i);
+  m_finc_nwords += raw_copper->Get3rdFINESSENwords(i);
+  m_find_nwords += raw_copper->Get4thFINESSENwords(i);
   m_ncdc++;
 
   //    printf("cpreve %d\n", raw_copper->GetFTSW16bitEventNumber( i ) );

@@ -38,7 +38,7 @@ namespace Belle2 {
     //
     ///////////////////////////////////////////////////////////////////////////////////////
     // POINTER TO "DETECTOR BUFFER"
-    //( after removing "B2link headers" from "FINNESSE buffer". THIS IS THE RAW DATA FROM A DETECTOR
+    //( after removing "B2link headers" from "FINESSE buffer". THIS IS THE RAW DATA FROM A DETECTOR
     ///////////////////////////////////////////////////////////////////////////////////////
     //! get Detector buffer length of slot A
     int Get1stDetectorNwords(int n);
@@ -74,17 +74,17 @@ namespace Belle2 {
     //! get buffer pointer of rawcopper trailer
     virtual int* GetRawTrlBufPtr(int n);
 
-    //! get FINNESSE buffer pointer for slot A
-    int* Get1stFINNESSEBuffer(int n);
+    //! get FINESSE buffer pointer for slot A
+    int* Get1stFINESSEBuffer(int n);
 
-    //! get FINNESSE buffer pointer for slot B
-    int* Get2ndFINNESSEBuffer(int n);
+    //! get FINESSE buffer pointer for slot B
+    int* Get2ndFINESSEBuffer(int n);
 
-    //! get FINNESSE buffer pointer for slot C
-    int* Get3rdFINNESSEBuffer(int n);
+    //! get FINESSE buffer pointer for slot C
+    int* Get3rdFINESSEBuffer(int n);
 
-    //! get FINNESSE buffer pointer for slot D
-    int* Get4thFINNESSEBuffer(int n);
+    //! get FINESSE buffer pointer for slot D
+    int* Get4thFINESSEBuffer(int n);
 
 
     //
@@ -112,31 +112,31 @@ namespace Belle2 {
     virtual int GetCOPPERNodeId(int n);
 
     //! get # of FINNESEs which contains data
-    virtual int GetNumFINNESSEBlock(int n);
+    virtual int GetNumFINESSEBlock(int n);
 
-    //! get # of offset words for FINNESSE slot A buffer position
-    int GetOffset1stFINNESSE(int n);
+    //! get # of offset words for FINESSE slot A buffer position
+    int GetOffset1stFINESSE(int n);
 
-    //! get # of offset words for FINNESSE slot B buffer position
-    int GetOffset2ndFINNESSE(int n);
+    //! get # of offset words for FINESSE slot B buffer position
+    int GetOffset2ndFINESSE(int n);
 
-    //! get # of offset words for FINNESSE slot C buffer position
-    int GetOffset3rdFINNESSE(int n);
+    //! get # of offset words for FINESSE slot C buffer position
+    int GetOffset3rdFINESSE(int n);
 
-    //! get # of offset words for FINNESSE slot D buffer position
-    int GetOffset4thFINNESSE(int n);
+    //! get # of offset words for FINESSE slot D buffer position
+    int GetOffset4thFINESSE(int n);
 
-    //! get data size of  FINNESSE slot A buffer
-    int Get1stFINNESSENwords(int n);
+    //! get data size of  FINESSE slot A buffer
+    int Get1stFINESSENwords(int n);
 
-    //! get data size of  FINNESSE slot B buffer
-    int Get2ndFINNESSENwords(int n);
+    //! get data size of  FINESSE slot B buffer
+    int Get2ndFINESSENwords(int n);
 
-    //! get data size of  FINNESSE slot C buffer
-    int Get3rdFINNESSENwords(int n);
+    //! get data size of  FINESSE slot C buffer
+    int Get3rdFINESSENwords(int n);
 
-    //! get data size of  FINNESSE slot D buffer
-    int Get4thFINNESSENwords(int n);
+    //! get data size of  FINESSE slot D buffer
+    int Get4thFINESSENwords(int n);
 
     //
     // Get information from "B2link(attached by FEE and HLSB) header"

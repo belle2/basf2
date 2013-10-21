@@ -141,7 +141,7 @@ unsigned int RawCOPPER::GetCOPPERCounter(int n)
 }
 
 
-int RawCOPPER::GetNumFINNESSEBlock(int n)
+int RawCOPPER::GetNumFINESSEBlock(int n)
 {
 
   RawHeader hdr;
@@ -160,8 +160,8 @@ int RawCOPPER::GetNumFINNESSEBlock(int n)
 int RawCOPPER::Get1stDetectorNwords(int n)
 {
   int nwords = 0;
-  if (Get1stFINNESSENwords(n) > 0) {
-    nwords = Get1stFINNESSENwords(n) -  SIZE_B2LHSLB_HEADER - SIZE_B2LFEE_HEADER
+  if (Get1stFINESSENwords(n) > 0) {
+    nwords = Get1stFINESSENwords(n) -  SIZE_B2LHSLB_HEADER - SIZE_B2LFEE_HEADER
              - SIZE_B2LFEE_TRAILER - SIZE_B2LHSLB_TRAILER;
   }
   return nwords;
@@ -170,8 +170,8 @@ int RawCOPPER::Get1stDetectorNwords(int n)
 int RawCOPPER::Get2ndDetectorNwords(int n)
 {
   int nwords = 0;
-  if (Get2ndFINNESSENwords(n) > 0) {
-    nwords = Get2ndFINNESSENwords(n) -  SIZE_B2LHSLB_HEADER -
+  if (Get2ndFINESSENwords(n) > 0) {
+    nwords = Get2ndFINESSENwords(n) -  SIZE_B2LHSLB_HEADER -
              SIZE_B2LFEE_HEADER - SIZE_B2LFEE_TRAILER - SIZE_B2LHSLB_TRAILER;
   }
   return nwords;
@@ -180,8 +180,8 @@ int RawCOPPER::Get2ndDetectorNwords(int n)
 int RawCOPPER::Get3rdDetectorNwords(int n)
 {
   int nwords = 0;
-  if (Get3rdFINNESSENwords(n) > 0) {
-    nwords = Get3rdFINNESSENwords(n) -  SIZE_B2LHSLB_HEADER -
+  if (Get3rdFINESSENwords(n) > 0) {
+    nwords = Get3rdFINESSENwords(n) -  SIZE_B2LHSLB_HEADER -
              SIZE_B2LFEE_HEADER - SIZE_B2LFEE_TRAILER - SIZE_B2LHSLB_TRAILER;
   }
   return nwords;
@@ -190,36 +190,36 @@ int RawCOPPER::Get3rdDetectorNwords(int n)
 int RawCOPPER::Get4thDetectorNwords(int n)
 {
   int nwords = 0;
-  if (Get4thFINNESSENwords(n) > 0) {
-    nwords = Get4thFINNESSENwords(n) -  SIZE_B2LHSLB_HEADER -
+  if (Get4thFINESSENwords(n) > 0) {
+    nwords = Get4thFINESSENwords(n) -  SIZE_B2LHSLB_HEADER -
              SIZE_B2LFEE_HEADER - SIZE_B2LFEE_TRAILER - SIZE_B2LHSLB_TRAILER;
   }
   return nwords;
 }
 
 
-int RawCOPPER::Get1stFINNESSENwords(int n)
+int RawCOPPER::Get1stFINESSENwords(int n)
 {
   RawHeader hdr;
   int pos_nwords = GetBufferPos(n) + hdr.RAWHEADER_NWORDS + POS_CH_A_DATA_LENGTH;
   return m_buffer[ pos_nwords ];
 }
 
-int RawCOPPER::Get2ndFINNESSENwords(int n)
+int RawCOPPER::Get2ndFINESSENwords(int n)
 {
   RawHeader hdr;
   int pos_nwords = GetBufferPos(n) + hdr.RAWHEADER_NWORDS + POS_CH_B_DATA_LENGTH;
   return m_buffer[ pos_nwords ];
 }
 
-int RawCOPPER::Get3rdFINNESSENwords(int n)
+int RawCOPPER::Get3rdFINESSENwords(int n)
 {
   RawHeader hdr;
   int pos_nwords = GetBufferPos(n) + hdr.RAWHEADER_NWORDS + POS_CH_C_DATA_LENGTH;
   return m_buffer[ pos_nwords ];
 }
 
-int RawCOPPER::Get4thFINNESSENwords(int n)
+int RawCOPPER::Get4thFINESSENwords(int n)
 {
   RawHeader hdr;
   int pos_nwords = GetBufferPos(n) + hdr.RAWHEADER_NWORDS + POS_CH_D_DATA_LENGTH;
@@ -227,32 +227,32 @@ int RawCOPPER::Get4thFINNESSENwords(int n)
 }
 
 
-int RawCOPPER::GetOffset1stFINNESSE(int n)
+int RawCOPPER::GetOffset1stFINESSE(int n)
 {
   RawHeader hdr;
   int pos_nwords = GetBufferPos(n) + hdr.RAWHEADER_NWORDS + SIZE_COPPER_HEADER;
   return pos_nwords;
 }
 
-int RawCOPPER::GetOffset2ndFINNESSE(int n)
+int RawCOPPER::GetOffset2ndFINESSE(int n)
 {
-  return GetOffset1stFINNESSE(n) + Get1stFINNESSENwords(n);
+  return GetOffset1stFINESSE(n) + Get1stFINESSENwords(n);
 }
 
-int RawCOPPER::GetOffset3rdFINNESSE(int n)
+int RawCOPPER::GetOffset3rdFINESSE(int n)
 {
-  return GetOffset2ndFINNESSE(n) + Get2ndFINNESSENwords(n);
+  return GetOffset2ndFINESSE(n) + Get2ndFINESSENwords(n);
 }
 
-int RawCOPPER::GetOffset4thFINNESSE(int n)
+int RawCOPPER::GetOffset4thFINESSE(int n)
 {
-  return GetOffset3rdFINNESSE(n) + Get3rdFINNESSENwords(n);
+  return GetOffset3rdFINESSE(n) + Get3rdFINESSENwords(n);
 }
 
 
-int* RawCOPPER::Get1stFINNESSEBuffer(int n)
+int* RawCOPPER::Get1stFINESSEBuffer(int n)
 {
-  int pos_nwords = GetOffset1stFINNESSE(n);
+  int pos_nwords = GetOffset1stFINESSE(n);
   if (pos_nwords >= m_nwords) {
     printf("Data size is smaller than data position info. Exting...\n");
     exit(1);
@@ -260,9 +260,9 @@ int* RawCOPPER::Get1stFINNESSEBuffer(int n)
   return &(m_buffer[ pos_nwords]);
 }
 
-int* RawCOPPER::Get2ndFINNESSEBuffer(int n)
+int* RawCOPPER::Get2ndFINESSEBuffer(int n)
 {
-  int pos_nwords = GetOffset2ndFINNESSE(n);
+  int pos_nwords = GetOffset2ndFINESSE(n);
   if (pos_nwords >= m_nwords) {
     printf("Data size is smaller than data position info. Exting...\n");
     exit(1);
@@ -270,9 +270,9 @@ int* RawCOPPER::Get2ndFINNESSEBuffer(int n)
   return &(m_buffer[ pos_nwords]);
 }
 
-int* RawCOPPER::Get3rdFINNESSEBuffer(int n)
+int* RawCOPPER::Get3rdFINESSEBuffer(int n)
 {
-  int pos_nwords = GetOffset3rdFINNESSE(n);
+  int pos_nwords = GetOffset3rdFINESSE(n);
   if (pos_nwords >= m_nwords) {
     printf("Data size is smaller than data position info. Exting...\n");
     exit(1);
@@ -280,9 +280,9 @@ int* RawCOPPER::Get3rdFINNESSEBuffer(int n)
   return &(m_buffer[ pos_nwords]);
 }
 
-int* RawCOPPER::Get4thFINNESSEBuffer(int n)
+int* RawCOPPER::Get4thFINESSEBuffer(int n)
 {
-  int pos_nwords = GetOffset4thFINNESSE(n);
+  int pos_nwords = GetOffset4thFINESSE(n);
   if (pos_nwords >= m_nwords) {
     printf("Data size is smaller than data position info. Exting...\n");
     exit(1);
@@ -293,8 +293,8 @@ int* RawCOPPER::Get4thFINNESSEBuffer(int n)
 
 int* RawCOPPER::Get1stDetectorBuffer(int n)
 {
-  if (Get1stFINNESSENwords(n) > 0) {
-    int pos_nwords = GetOffset1stFINNESSE(n) + SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER;
+  if (Get1stFINESSENwords(n) > 0) {
+    int pos_nwords = GetOffset1stFINESSE(n) + SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER;
     return &(m_buffer[ pos_nwords ]);
   }
   return NULL;
@@ -302,8 +302,8 @@ int* RawCOPPER::Get1stDetectorBuffer(int n)
 
 int* RawCOPPER::Get2ndDetectorBuffer(int n)
 {
-  if (Get2ndFINNESSENwords(n) > 0) {
-    int pos_nwords = GetOffset2ndFINNESSE(n) + SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER;
+  if (Get2ndFINESSENwords(n) > 0) {
+    int pos_nwords = GetOffset2ndFINESSE(n) + SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER;
     return &(m_buffer[ pos_nwords ]);
   }
   return NULL;
@@ -311,8 +311,8 @@ int* RawCOPPER::Get2ndDetectorBuffer(int n)
 
 int* RawCOPPER::Get3rdDetectorBuffer(int n)
 {
-  if (Get3rdFINNESSENwords(n) > 0) {
-    int pos_nwords = GetOffset3rdFINNESSE(n) + SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER;
+  if (Get3rdFINESSENwords(n) > 0) {
+    int pos_nwords = GetOffset3rdFINESSE(n) + SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER;
     return &(m_buffer[ pos_nwords ]);
   }
   return NULL;
@@ -320,8 +320,8 @@ int* RawCOPPER::Get3rdDetectorBuffer(int n)
 
 int* RawCOPPER::Get4thDetectorBuffer(int n)
 {
-  if (Get4thFINNESSENwords(n) > 0) {
-    int pos_nwords = GetOffset4thFINNESSE(n) + SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER;
+  if (Get4thFINESSENwords(n) > 0) {
+    int pos_nwords = GetOffset4thFINESSE(n) + SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER;
     return &(m_buffer[ pos_nwords ]);
   }
   return NULL;
@@ -329,19 +329,19 @@ int* RawCOPPER::Get4thDetectorBuffer(int n)
 
 int* RawCOPPER::GetExpRunBuf(int n)
 {
-  int pos_nwords = GetOffset1stFINNESSE(n) + SIZE_B2LHSLB_HEADER + POS_EXP_RUN;
+  int pos_nwords = GetOffset1stFINESSE(n) + SIZE_B2LHSLB_HEADER + POS_EXP_RUN;
   return &(m_buffer[ pos_nwords ]);
 }
 
 int* RawCOPPER::GetFTSW2Words(int n)
 {
-  int pos_nwords = GetOffset1stFINNESSE(n) + SIZE_B2LHSLB_HEADER + POS_FTSW1;
+  int pos_nwords = GetOffset1stFINESSE(n) + SIZE_B2LHSLB_HEADER + POS_FTSW1;
   return &(m_buffer[ pos_nwords ]);
 }
 
 int RawCOPPER::GetFTSW16bitEventNumber(int n)
 {
-  int pos_nwords = GetOffset1stFINNESSE(n) + SIZE_B2LHSLB_HEADER + POS_FTSW2;
+  int pos_nwords = GetOffset1stFINESSE(n) + SIZE_B2LHSLB_HEADER + POS_FTSW2;
   return (m_buffer[ pos_nwords ] & 0x0000FFFF);
 }
 
@@ -370,16 +370,16 @@ unsigned int RawCOPPER::GetMagic7FFF0009(int n)
 
 double RawCOPPER::GetEventUnixTime(int n)
 {
-  int pos = GetOffset1stFINNESSE(n) + SIZE_B2LHSLB_HEADER + POS_EXP_RUN;
+  int pos = GetOffset1stFINESSE(n) + SIZE_B2LHSLB_HEADER + POS_EXP_RUN;
   int run = m_buffer[ pos ] & 0x3FFFFF;
 //    printf("Time %d %d %lf\n",
 //     sp8test_run_starttime[ run ] & 0xFFFF,
-//     ( m_buffer[ GetOffset1stFINNESSE(n) + SIZE_B2LHSLB_HEADER + POS_FTSW2 ] >> 16 ) & 0xFFFF,
-//     (double)( ( m_buffer[ GetOffset1stFINNESSE(n) + SIZE_B2LHSLB_HEADER + POS_FTSW1 ] >> 4 ) & 0x7FFFFFF )/1.27e8
+//     ( m_buffer[ GetOffset1stFINESSE(n) + SIZE_B2LHSLB_HEADER + POS_FTSW2 ] >> 16 ) & 0xFFFF,
+//     (double)( ( m_buffer[ GetOffset1stFINESSE(n) + SIZE_B2LHSLB_HEADER + POS_FTSW1 ] >> 4 ) & 0x7FFFFFF )/1.27e8
 //     );
   return (double)(sp8test_run_starttime[ run ] & 0xFFFF0000) +
-         (double)((m_buffer[ GetOffset1stFINNESSE(n) + SIZE_B2LHSLB_HEADER + POS_FTSW2 ] >> 16) & 0xFFFF) +
-         (double)((m_buffer[ GetOffset1stFINNESSE(n) + SIZE_B2LHSLB_HEADER + POS_FTSW1 ] >> 4) & 0x7FFFFFF) / 1.27e8;
+         (double)((m_buffer[ GetOffset1stFINESSE(n) + SIZE_B2LHSLB_HEADER + POS_FTSW2 ] >> 16) & 0xFFFF) +
+         (double)((m_buffer[ GetOffset1stFINESSE(n) + SIZE_B2LHSLB_HEADER + POS_FTSW1 ] >> 4) & 0x7FFFFFF) / 1.27e8;
 }
 
 

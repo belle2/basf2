@@ -38,7 +38,7 @@ DeSerializerCOPPERModule::DeSerializerCOPPERModule() : DeSerializerModule()
   setDescription("Encode DataStore into RingBuffer");
 
   //  setPropertyFlags(c_Input | c_ParallelProcessingCertified);
-  addParam("FinnesseBitFlag", finnesse_bit_flag, "finnese (A,B,C,D) -> bit (0,1,2,3)", 15);
+  addParam("FinesseBitFlag", finesse_bit_flag, "finnese (A,B,C,D) -> bit (0,1,2,3)", 15);
 
   //Parameter definition
   B2INFO("DeSerializerCOPPER: Constructor done.");
@@ -61,22 +61,22 @@ void DeSerializerCOPPERModule::initialize()
   use_slot = 0; /* bit mask */
   int slot_shift;
 
-  if ((finnesse_bit_flag & 0x1) == 1) {
+  if ((finesse_bit_flag & 0x1) == 1) {
     slot_shift = 0; // a:0, b:1, c:2, d:3
     use_slot |= 1 << slot_shift;  //
   }
 
-  if (((finnesse_bit_flag >> 1) & 0x1) == 1) {
+  if (((finesse_bit_flag >> 1) & 0x1) == 1) {
     slot_shift = 1; // a:0, b:1, c:2, d:3
     use_slot |= 1 << slot_shift;  //
   }
 
-  if (((finnesse_bit_flag >> 2) & 0x1) == 1) {
+  if (((finesse_bit_flag >> 2) & 0x1) == 1) {
     slot_shift = 2; // a:0, b:1, c:2, d:3
     use_slot |= 1 << slot_shift;  //
   }
 
-  if (((finnesse_bit_flag >> 3) & 0x1) == 1) {
+  if (((finesse_bit_flag >> 3) & 0x1) == 1) {
     slot_shift = 3; // a:0, b:1, c:2, d:3
     use_slot |= 1 << slot_shift;  //
   }
@@ -234,10 +234,10 @@ void DeSerializerCOPPERModule::FillNewRawCOPPERHeader(RawCOPPER* raw_copper)
   rawhdr.SetTruncMask(m_trunc_mask);   // Fill 8th header word
 
   // Offset
-  rawhdr.SetOffset1stFINNESSE(raw_copper->GetOffset1stFINNESSE(num_cprblock) - raw_copper->GetBufferPos(num_cprblock));          // Fill 9th header word
-  rawhdr.SetOffset2ndFINNESSE(raw_copper->GetOffset2ndFINNESSE(num_cprblock) - raw_copper->GetBufferPos(num_cprblock));         // Fill 10th header word
-  rawhdr.SetOffset3rdFINNESSE(raw_copper->GetOffset3rdFINNESSE(num_cprblock) - raw_copper->GetBufferPos(num_cprblock));         // Fill 11th header word
-  rawhdr.SetOffset4thFINNESSE(raw_copper->GetOffset4thFINNESSE(num_cprblock) - raw_copper->GetBufferPos(num_cprblock));         // Fill 12th header word
+  rawhdr.SetOffset1stFINESSE(raw_copper->GetOffset1stFINESSE(num_cprblock) - raw_copper->GetBufferPos(num_cprblock));          // Fill 9th header word
+  rawhdr.SetOffset2ndFINESSE(raw_copper->GetOffset2ndFINESSE(num_cprblock) - raw_copper->GetBufferPos(num_cprblock));         // Fill 10th header word
+  rawhdr.SetOffset3rdFINESSE(raw_copper->GetOffset3rdFINESSE(num_cprblock) - raw_copper->GetBufferPos(num_cprblock));         // Fill 11th header word
+  rawhdr.SetOffset4thFINESSE(raw_copper->GetOffset4thFINESSE(num_cprblock) - raw_copper->GetBufferPos(num_cprblock));         // Fill 12th header word
 
   // Add node-info
   rawhdr.SetMagicWordEntireHeader();
@@ -379,7 +379,7 @@ int* DeSerializerCOPPERModule::ReadOneEventFromCOPPERFIFO(const int entry, int* 
 void DeSerializerCOPPERModule::OpenCOPPER()
 {
   //
-  // Open a finnesse device
+  // Open a finesse device
   //
   if ((cpr_fd = open("/dev/copper/copper", O_RDONLY)) == -1) {
     char temp_char[100] = "Failed to open Finnese. Exiting... ";  print_err.PrintError(temp_char, __FILE__, __PRETTY_FUNCTION__, __LINE__);

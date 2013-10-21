@@ -53,7 +53,7 @@ int HistoRelay::collect()
   (msg->header())->reserved[1] = nobjs;
   (msg->header())->reserved[2] = 0;
 
-  printf("HistoRelay : Sending %d histograms\n", nobjs);
+  //  printf("HistoRelay : Sending %d histograms\n", nobjs);
 
   m_sock->send(msg);
 

@@ -29,7 +29,7 @@ int main(int argc, char** argv)
 
   for (;;) {
     sleep(interval);
-    printf("hrelay : collecting histograms\n");
+    //    printf("hrelay : collecting histograms\n");
     hrelay.collect();
   }
 

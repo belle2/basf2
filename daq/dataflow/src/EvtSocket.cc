@@ -50,10 +50,17 @@ int EvtSocketSend::recv_buffer(char* buf)
   return stat;
 }
 
+int EvtSocketSend::recv_pxd_buffer(char* buf)
+{
+  int stat = m_sock->get_pxd(buf, MAXEVTSIZE);
+  return stat;
+}
+
 SocketSend* EvtSocketSend::sock(void)
 {
   return m_sock;
 }
+
 
 // EvtSocketRecv
 
@@ -100,3 +107,4 @@ SocketRecv* EvtSocketRecv::sock(void)
 {
   return m_sock;
 }
+

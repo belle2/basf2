@@ -31,6 +31,7 @@ public:
 
   int send_buffer(int size, char* buf);
   int recv_buffer(char* buf);
+  int recv_pxd_buffer(char* buf);
 
   SocketSend* sock(void);
 

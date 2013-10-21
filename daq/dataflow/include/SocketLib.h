@@ -39,6 +39,7 @@ namespace Belle2 {
 
     int put(int sock, char* data, int len);
     int get(int sock, char* data, int len);
+    int get_pxd(int sock, char* data, int len);
 
     // protected:
     int read_data(int sock, char* data, int len);
@@ -89,6 +90,7 @@ namespace Belle2 {
     int put(char* data, int len);
     int write(char* data, int len);
     int get(char* data, int len);
+    int get_pxd(char* data, int len);
     int read(char* data, int len);
 
     char* node(void);

@@ -96,6 +96,42 @@ int SocketIO::get(int sock, char* data, int len)
   return (bcount);
 }
 
+int SocketIO::get_pxd(int sock, char* data, int len)
+{
+#define MAX_PXD_FRAMES  256
+  const int headerlen = 8;
+  int* pxdheader = (int*) data;
+  int* pxdheadertable = (int*) &data[headerlen];
+  int framenr = 0, tablelen = 0, datalen = 0;
+  int br = read_data(sock, data, headerlen);
+  if (br <= 0) return br;
+  if (pxdheader[0] != htonl(0xCAFEBABE)) {
+    printf("pxdheader wrong : Magic %X , Frames %X \n", pxdheader[0], ntohl(pxdheader[1]));
+    exit(0);
+  }
+  pxdheader[0] = ntohl(pxdheader[0]); /// as this is fixed .... might not be needed if taken care of in unpacker
+  framenr = pxdheader[1] = ntohl(pxdheader[1]);
+  if (framenr > MAX_PXD_FRAMES) {
+    printf("MAX_PXD_FRAMES too small : %d(%d) \n", framenr, MAX_PXD_FRAMES);
+    exit(0);
+  }
+  tablelen = 4 * framenr;
+  br = read_data(sock, (char*)&data[headerlen], tablelen);
+  if (br <= 0) return br;
+  for (int i = 0; i < framenr; i++) {
+    pxdheadertable[i] = ntohl(pxdheadertable[i]);
+    datalen += (pxdheadertable[i] + 3) & 0xFFFFFFFC;
+  }
+
+  if (datalen + headerlen + tablelen > len) {
+    printf("buffer too small : %d %d %d(%d) \n", headerlen, tablelen, datalen, len);
+    exit(0);
+  }
+  int bcount = read_data(sock, data + headerlen + tablelen, datalen);
+  if (br <= 0) return br;
+  return (headerlen + tablelen + bcount);
+}
+
 int SocketIO::read_data(int sock, char* data, int len)
 {
   char* buf = data;
@@ -372,6 +408,12 @@ int SocketSend::get(char* data, int len)
 {
   m_errno = 0;
   return m_io.get(m_sock, data, len);
+}
+
+int SocketSend::get_pxd(char* data, int len)
+{
+  m_errno = 0;
+  return m_io.get_pxd(m_sock, data, len);
 }
 
 int SocketSend::read(char* data, int len)

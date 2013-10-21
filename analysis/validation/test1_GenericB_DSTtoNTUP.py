@@ -20,7 +20,7 @@ selectParticle('mu+', 13, [''])
 selectParticle('mu-', -13, [''])
 
 makeParticle(
-    'KS0',
+    'K_S0',
     310,
     ['pi-', 'pi+'],
     0.4,
@@ -141,14 +141,14 @@ main.add_module(ntuple2)
 # quick search for KS0 candidates
 ntuple3 = register_module('NtupleMaker')
 ntuple3.param('strTreeName', 'kstuple')
-ntuple3.param('strListName', 'KS0')
+ntuple3.param('strListName', 'K_S0')
 ntuple3.param('strTools', [
     'EventMetaData',
-    'KS0',
+    'K_S0',
     'MCTruth',
-    '^KS0 -> ^pi+ ^pi-',
+    '^K_S0 -> ^pi+ ^pi-',
     'Kinematics',
-    '^KS0 -> ^pi+ ^pi-',
+    '^K_S0 -> ^pi+ ^pi-',
     ])
 main.add_module(ntuple3)
 

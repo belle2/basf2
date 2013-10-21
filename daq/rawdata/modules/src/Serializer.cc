@@ -324,7 +324,7 @@ void SerializerModule::SendByWriteV(RawDataBlock* rawdblk)
 //     exit(1);
 
   }
-  //  printf("n %d total %d\n", n, total_send_bytes);
+  //   printf("n %d total %d\n", n, total_send_bytes);
   //  delete temp_buf;
 
   return;
@@ -465,6 +465,7 @@ void SerializerModule::event()
 
   //  StoreArray<RawCOPPER> rawcprarray;
   StoreArray<RawDataBlock> raw_dblkarray;
+
 
   for (int j = 0; j < raw_dblkarray.getEntries(); j++) {
     //    int* buf;

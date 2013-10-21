@@ -28,4 +28,11 @@
     </Content>
   </DetectorComponent>
 
+  <DetectorComponent name="TriggerTelescope" xmlns:xi="http://www.w3.org/2001/XInclude">
+    <Creator library="testbeam">TOPTBCreator</Creator>
+    <Content>
+      <xi:include href="TriggerTelescope.xml"/>
+    </Content>
+  </DetectorComponent>
+
 </Detector>

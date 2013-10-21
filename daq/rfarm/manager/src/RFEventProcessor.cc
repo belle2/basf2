@@ -11,6 +11,8 @@
 
 #define RFOTSOUT stdout
 
+// #define DESY
+
 using namespace std;
 using namespace Belle2;
 
@@ -21,7 +23,19 @@ RFEventProcessor::RFEventProcessor(string conffile)
   //  char* nodename = m_conf->getconf ( "processor", "nodename" );
   //  char nodename[256];
   strcpy(m_nodename, "evp_");
+#ifndef DESY
   gethostname(&m_nodename[4], sizeof(m_nodename));
+#else
+  // Special treatment for DESY test nodes!!
+  char hostnamebuf[256];
+  gethostname(hostnamebuf, sizeof(hostnamebuf));
+  strcat(&m_nodename[4], &hostnamebuf[6]);
+  int lend = strlen(m_nodename);
+  m_nodename[lend + 1] = (char)0;
+  m_nodename[lend] = m_nodename[lend - 1];
+  strncpy(&m_nodename[lend - 1], "0", 1);
+  // End of DESY special treatment
+#endif
   printf("nodename = %s\n", m_nodename);
 
   // 1. Set execution directory
@@ -106,14 +120,21 @@ void RFEventProcessor::Configure(NSMmsg*, NSMcontext*)
   int portbase = m_conf->getconfi("distributor", "sender", "portbase");
   char* hostbase = m_conf->getconf("processor", "nodebase");
   int baselen = strlen(hostbase);
+  /* OLD impl
   char hostname[256];
   gethostname(hostname, sizeof(hostname));
   char id[3];
   strcpy(id, &hostname[baselen + 1]);
   int rport = atoi(id) + portbase;
+  */
+  int rport;
+  sscanf(&m_nodename[strlen(m_nodename) - 2], "%d", &rport);
+  rport += portbase;
   char portchar[256];
   sprintf(portchar, "%d", rport);
   m_pid_receiver = m_proc->Execute(receiver, rbufin, srchost, portchar, m_nodename, (char*)"0");
+
+  fflush(stdout);
 
 }
 
@@ -128,18 +149,33 @@ void RFEventProcessor::Stop(NSMmsg*, NSMcontext*)
 
 void RFEventProcessor::Restart(NSMmsg*, NSMcontext*)
 {
+  printf("RFEventProcessor : Restarting!!!!!\n");
+  /* Original impl.
   if (m_pid_sender != 0) {
     printf("RFEventProcessor : killing sender pid=%d\n", m_pid_sender);
     kill(m_pid_sender, SIGINT);
   }
   if (m_pid_basf2 != 0) {
     printf("RFEventProcessor : killing basf2 pid=%d\n", m_pid_basf2);
-    kill(m_pid_basf2, SIGQUIT);
+    kill(m_pid_basf2, SIGINT);
   }
   if (m_pid_receiver != 0) {
     printf("RFEventProcessor : killing receiver pid=%d\n", m_pid_receiver);
     kill(m_pid_receiver, SIGINT);
   }
+  if (m_pid_hrecv != 0) {
+    printf("RFEventProcessor : killing hserver pid=%d\n", m_pid_hrecv);
+    kill(m_pid_receiver, SIGINT);
+  }
+  if (m_pid_hrelay != 0) {
+    printf("RFEventProcessor : killing hrelay pid=%d\n", m_pid_hrelay);
+    kill(m_pid_receiver, SIGINT);
+  }
+  */
+  // Simple implementation to stop all processes
+  system("killall basf2 sock2rbr rb2sockr hrelay hserver");
+
+  fflush(stdout);
   sleep(2);
   NSMmsg* nsmmsg = NULL;
   NSMcontext* nsmcontext = NULL;

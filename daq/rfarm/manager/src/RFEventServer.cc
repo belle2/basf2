@@ -143,6 +143,8 @@ void RFEventServer::Stop(NSMmsg*, NSMcontext*)
 
 void RFEventServer::Restart(NSMmsg*, NSMcontext*)
 {
+  printf("RFEventServer : Restarting!!!!!\n");
+  /* Original impl.
   if (m_pid_recv != 0) {
     kill(m_pid_recv, SIGINT);
   }
@@ -152,6 +154,11 @@ void RFEventServer::Restart(NSMmsg*, NSMcontext*)
       kill(m_pid_sender[i], SIGINT);
     }
   }
+  */
+  // Simple implementation
+  system("killall sock2rbr rb2sockr");
+
+  fflush(stdout);
   sleep(2);
   NSMmsg* nsmmsg = NULL;
   NSMcontext* nsmcontext = NULL;

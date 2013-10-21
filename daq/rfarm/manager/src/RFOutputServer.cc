@@ -144,11 +144,17 @@ void RFOutputServer::Stop(NSMmsg*, NSMcontext*)
 
 void RFOutputServer::Restart(NSMmsg*, NSMcontext*)
 {
-  kill(m_pid_sender, SIGTERM);
-  kill(m_pid_basf2, SIGTERM);
+  printf("RFOutputServer : Restarting!!!!!!\n");
+  /* Original Impl
+  kill(m_pid_sender, SIGINT);
+  kill(m_pid_basf2, SIGINT);
   for (int i = 0; i < m_nnodes; i++) {
-    kill(m_pid_receiver[i], SIGTERM);
+    kill(m_pid_receiver[i], SIGINT);
   }
+  */
+  // Simple Implementation
+  system("killall sock2rbr rb2sockr basf2 hrelay hserver");
+  fflush(stdout);
   sleep(2);
   NSMmsg* nsmmsg = NULL;
   NSMcontext* nsmcontext = NULL;

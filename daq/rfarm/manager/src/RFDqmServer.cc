@@ -64,9 +64,14 @@ void RFDqmServer::Stop(NSMmsg*, NSMcontext*)
 
 void RFDqmServer::Restart(NSMmsg*, NSMcontext*)
 {
+  printf("RFDqmServer : Restarted!!!!!\n");
+  /* Original Impl
   if (m_pid_dqm != 0) {
     kill(m_pid_dqm, SIGINT);
   }
+  */
+  system("killall hrelay hserver");
+  fflush(stdout);
   sleep(2);
   NSMmsg* nsmmsg = NULL;
   NSMcontext* nsmcontext = NULL;

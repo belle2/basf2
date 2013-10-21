@@ -126,6 +126,7 @@ void Ds2RawModule::event()
 
   // Release EvtMessage buffer
   delete[] buffer;
+  delete msg;
 
   // return
   m_nsent++;

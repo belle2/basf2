@@ -38,7 +38,7 @@ DeSerializerCOPPERModule::DeSerializerCOPPERModule() : DeSerializerModule()
   setDescription("Encode DataStore into RingBuffer");
 
   //  setPropertyFlags(c_Input | c_ParallelProcessingCertified);
-  addParam("FinesseBitFlag", finesse_bit_flag, "finnese (A,B,C,D) -> bit (0,1,2,3)", 15);
+  addParam("FinesseBitFlag", finesse_bit_flag, "finesse (A,B,C,D) -> bit (0,1,2,3)", 15);
 
   //Parameter definition
   B2INFO("DeSerializerCOPPER: Constructor done.");
@@ -382,7 +382,7 @@ void DeSerializerCOPPERModule::OpenCOPPER()
   // Open a finesse device
   //
   if ((cpr_fd = open("/dev/copper/copper", O_RDONLY)) == -1) {
-    char temp_char[100] = "Failed to open Finnese. Exiting... ";  print_err.PrintError(temp_char, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+    char temp_char[100] = "Failed to open Finesse. Exiting... ";  print_err.PrintError(temp_char, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     exit(1);
   }
 

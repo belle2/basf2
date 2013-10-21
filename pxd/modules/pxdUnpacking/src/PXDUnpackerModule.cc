@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Bjoern Spruck / Klemens Lautenbach                                          *
+ * Contributors: Bjoern Spruck / Klemens Lautenbach                       *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -34,6 +34,7 @@
 #define DHH_FRAME_HEADER_DATA_TYPE_END_FRM  0x4
 #define DHH_FRAME_HEADER_DATA_TYPE_HLTROI   0x7
 
+// #define B2INFO(a) {}
 
 using namespace std;
 using namespace Belle2;
@@ -226,7 +227,7 @@ public:
     crc32 = c;
   };
   inline static unsigned int size(void) {
-    return 2;
+    return 0;//2;
   };
   void print(void) {
     word0.print();
@@ -252,6 +253,29 @@ public:
   };
 };
 
+class dhh_onsen_frame {
+  dhh_frame_header_word0 word0;/// mainly empty
+  unsigned short trignr0;// not used
+  unsigned int magic1;
+  unsigned int trignr1;
+  unsigned int magic2;
+  unsigned int trignr2;
+  /// plus n* ROIs (64 bit)
+  /// plus checksum 32bit
+public:
+  dhh_onsen_frame(void) {};
+  void print(void) {
+    word0.print();
+    if (verbose)
+      B2INFO("DHH HLT/ROI Frame ");
+    if ((magic1 & 0xFFFF0000) != 0xCAFE0000) B2ERROR("DHH HLT/ROI Magic 1 error $" << hex << magic1);
+    if ((magic2 & 0xFFFF0000) != 0xCAFE0000) B2ERROR("DHH HLT/ROI Magic 2 error $" << hex << magic2);
+    if (trignr1 != trignr2) B2ERROR("DHH HLT/ROI Frame Trigger Nr Mismatch $" << hex << trignr1 << "!=$" << trignr2);
+  };
+  inline static unsigned int size(void) {
+    return 0;//2;
+  };
+};
 
 class dhh_ghost_frame {
 public:
@@ -325,7 +349,7 @@ public:
         B2INFO(" DHH End Frame CRC " << hex << c << "==" << crc32);
     } else {
       crc_error++;
-      B2INFO(" DHH End Frame CRC " << hex << c << "!=" << crc32);
+      B2ERROR(" DHH End Frame CRC " << hex << c << "!=" << crc32);
       error_flag = true;
     }
     return c;
@@ -410,14 +434,21 @@ public:
 
     if (c == crc32) {
       if (verbose)
-        B2INFO(" DHH Data Frame CRC: " << hex << c << "==" << crc32);
+//         B2INFO(" DHH Data Frame CRC: " << hex << c << "==" << crc32);
+        B2INFO(" DHH Data Frame CRC OK: " << hex << c << "==" << crc32 << " data "  << * (unsigned int*)(d + length - 8) << " "
+               << * (unsigned int*)(d + length - 6) << " " << * (unsigned int*)(d + length - 4) << " pad " << pad << " len $" << length);
     } else {
       crc_error++;
       if (verbose) {
         B2ERROR(" DHH Data Frame CRC FAIL: " << hex << c << "!=" << crc32 << " data "  << * (unsigned int*)(d + length - 8) << " "
-                << * (unsigned int*)(d + length - 6) << " " << * (unsigned int*)(d + length - 4));
+                << * (unsigned int*)(d + length - 6) << " " << * (unsigned int*)(d + length - 4) << " pad " << pad << " len $" << length);
         /// others would be interessting but possible subjects to access outside of buffer
         /// << " " << * (unsigned int*)(d + length - 2) << " " << * (unsigned int*)(d + length + 0) << " " << * (unsigned int*)(d + length + 2));
+        if (length <= 32) {
+          for (int i = 0; i < length / 4; i++) {
+            B2ERROR("== " << i << "  $" << hex << ((unsigned int*)d)[i]);
+          }
+        }
       };
       error_flag = true;
     }
@@ -535,10 +566,11 @@ void PXDUnpackerModule::endian_swap_frame(unsigned short* dataptr, int len)
 
 void PXDUnpackerModule::unpack_event(RawPXD* px)
 {
-  int last_wie = 0, last_framenr = 0, last_start = 0, last_end = 0;
-  unsigned int last_evtnr = 0;
-  unsigned int Frames_per_event;
+  int last_wie = 0, last_framenr = 0, last_start = 0, last_end = 1;
+  static unsigned int last_evtnr = 0;
+  int Frames_per_event;
   int fullsize;
+  int datafullsize;
 
   unsigned int* data;
   data = (unsigned int*)px->data();
@@ -547,31 +579,31 @@ void PXDUnpackerModule::unpack_event(RawPXD* px)
   /// NEW format
   if (verbose) {
     B2INFO(" PXD Unpacker --> data[0]: <-- Magic " << hex << data[0]);
-    B2INFO(" PXD Unpacker --> data[1]: <-- Reserved (will be #frames lateron) " << hex << data[1]);
-    B2INFO(" PXD Unpacker --> data[2]: <-- Frame 1 len " << hex << data[2]);
+    B2INFO(" PXD Unpacker --> data[1]: <-- #Frames " << hex << data[1]);
+    if (data[1] >= 1) B2INFO(" PXD Unpacker --> data[2]: <-- Frame 1 len " << hex << data[2]);
+    if (data[1] >= 2) B2INFO(" PXD Unpacker --> data[3]: <-- Frame 2 len " << hex << data[3]);
+    if (data[1] >= 3) B2INFO(" PXD Unpacker --> data[4]: <-- Frame 3 len " << hex << data[4]);
+    if (data[1] >= 4) B2INFO(" PXD Unpacker --> data[5]: <-- Frame 4 len " << hex << data[5]);
   };
 
   unsigned int* tableptr;
   tableptr = &data[2]; // skip header!!!
-  Frames_per_event = 0;
-  while (tableptr[Frames_per_event]) {
-    Frames_per_event++;
-  };
-  /// zero not counted as frame ... (header length is Frames_per_event+3)/4 bytes
+  Frames_per_event = data[1];
 
   unsigned int* dataptr;
-  dataptr = &tableptr[Frames_per_event + 1];
+  dataptr = &tableptr[Frames_per_event];
+  datafullsize = fullsize - 2 * 4 - Frames_per_event * 4; // minus header, minus table
 
   int ll = 0; // Offset in dataptr in bytes
   for (unsigned int j = 0; j < Frames_per_event; j++) {
     int lo;/// len of frame in bytes
     bool pad;
-    lo = htonl(tableptr[j]);
+    lo = tableptr[j];
     if (lo <= 0) {
       B2ERROR(" size of frame invalid: " << j << "size " << lo << " at byte offset in dataptr " << ll);
       exit(0);
     }
-    if (ll + lo > fullsize) {
+    if (ll + lo > datafullsize) {
       B2ERROR(" frames exceed packet size: " << j  << " size " << lo << " at byte offset in dataptr " << ll << " of fullsize " << fullsize);
       exit(0);
     }
@@ -586,8 +618,9 @@ void PXDUnpackerModule::unpack_event(RawPXD* px)
     B2INFO(" unpack DHH frame: " << j << " with size " << lo << " at byte offset in dataptr " << ll);
     endian_swap_frame((unsigned short*)(ll + (char*)dataptr), lo);
     unpack_frame(ll + (char*)dataptr, lo, pad, last_framenr, last_wie, last_start, last_end, last_evtnr);
-    ll += lo;
+    ll += (lo + 3) & 0xFFFFFFFC; /// round up to next 32 bit boundary
   }
+  if (!last_end) B2ERROR("Error: Last Frame is not an END FRAME!");
 
 }
 
@@ -777,9 +810,8 @@ void PXDUnpackerModule::unpack_frame(void* data, int len, bool pad, int& last_fr
   dhh.set(data, hw->get_type(), len, pad);
   int s;
   s = dhh.size() * 4;
-  if (len != s) {
-    if (verbose)
-      B2INFO(" Size (real) " << len << " != " << s << " (in data) " << pad);
+  if (len != s && s != 0) {
+    B2WARNING(" Size (real) " << len << " != " << s << " (in data) " << pad);
   }
 
   int le = 0, ls = last_start;
@@ -801,6 +833,7 @@ void PXDUnpackerModule::unpack_frame(void* data, int len, bool pad, int& last_fr
     case DHH_FRAME_HEADER_DATA_TYPE_DHP_ZSD:
 
       hw->print();
+//       B2WARNING(" Size (real) " << len << " != " << s << " (in data) " << pad);
       dhh.calc_crc();
       stat_zsd++;
 
@@ -823,7 +856,7 @@ void PXDUnpackerModule::unpack_frame(void* data, int len, bool pad, int& last_fr
       if (last_end == 0) {
         end_error++;
         if (verbose) {
-          B2INFO(" Error: Start without End ");
+          B2ERROR(" Error: Start without End ");
         };
         error_flag = true;
       }
@@ -834,7 +867,7 @@ void PXDUnpackerModule::unpack_frame(void* data, int len, bool pad, int& last_fr
       if ((evtnr & 0x7FFF) != ((last_evtnr + 1) & 0x7FFF)) {
         evt_skip_error++;
         if (verbose) {
-          B2INFO(" Event skipped: " << evtnr << " != " << last_evtnr << " + 1 ");
+          B2WARNING(" Event skipped: " << evtnr << " != " << last_evtnr << " + 1 ");
         };
         error_flag = true;
       }
@@ -857,7 +890,7 @@ void PXDUnpackerModule::unpack_frame(void* data, int len, bool pad, int& last_fr
       le = 1;
       stat_end++;
       if (last_start == 0) {
-        B2INFO(" Error: End without Start ");
+        B2ERROR(" Error: End without Start ");
         start_error++;
         error_flag = true;
       }
@@ -880,10 +913,11 @@ void PXDUnpackerModule::unpack_frame(void* data, int len, bool pad, int& last_fr
       break;
     case DHH_FRAME_HEADER_DATA_TYPE_HLTROI:
       hw->print();
-      dhh.calc_crc();
+      ((dhh_onsen_frame*)data)->print();
+      //dhh.calc_crc();
       break;
     default:
-      B2INFO(" Error: no data ");
+      B2ERROR(" Error: no data ");
       type_error++;
       hw->print();
       error_flag = true;
@@ -891,12 +925,12 @@ void PXDUnpackerModule::unpack_frame(void* data, int len, bool pad, int& last_fr
   }
 
   if (evtnr != last_evtnr) {
-    B2INFO(" Error: Event Nr " << evtnr << " != " << last_evtnr);
+    B2ERROR(" Error: Event Nr " << evtnr << " != " << last_evtnr);
     evtnr_error++;
     error_flag = true;
   }
   if (lfnr != ((last_framenr + 1) & 0xF)) {
-    B2INFO(" Error: Frame Nr " << lfnr << " != " << last_framenr << " + 1 ");
+    B2ERROR(" Error: Frame Nr " << lfnr << " != " << last_framenr << " + 1 ");
     fnr_error++;
     error_flag = true;
   }

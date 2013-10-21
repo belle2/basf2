@@ -33,7 +33,7 @@ using namespace analysis;
 
 RaveSetup* RaveSetup::s_instance = NULL;
 
-void RaveSetup::initialize(int verbosity)
+void RaveSetup::initialize(int verbosity, double MagneticField)
 {
   if (s_instance == NULL) {
     s_instance = new RaveSetup();
@@ -54,7 +54,7 @@ void RaveSetup::initialize(int verbosity)
 
   //now setup everything for the dirct use of Rave without GFRave
   //TODO get magnetic field from framework
-  s_instance->m_raveVertexFactory = new rave::VertexFactory(rave::ConstantMagneticField(0, 0, 1.5), rave::VacuumPropagator(), "kalman", verbosity);
+  s_instance->m_raveVertexFactory = new rave::VertexFactory(rave::ConstantMagneticField(0, 0, MagneticField), rave::VacuumPropagator(), "kalman", verbosity);
 
 //  s_instance->m_raveKinematicTreeFactory = new rave::KinematicTreeFactory(rave::ConstantMagneticField(0, 0, 1.5),rave::VacuumPropagator(),verbosity);
 

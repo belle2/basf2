@@ -55,7 +55,7 @@ namespace Belle2 {
         return s_instance;
       }
       /** Set everything up so everything needed for vertex fitting is there. Must be called before RaveVertexFitter can be used*/
-      static void initialize(int verbosity = 1);
+      static void initialize(int verbosity = 1, double MagneticField = 1.5);
       /** The beam spot position and covarance is known you can set it here so that and a vertex in the beam spot should be fitted you can set it here */
       void setBeamSpot(TVector3 beamSpot, TMatrixDSym beamSpotCov);
 

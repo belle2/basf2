@@ -91,11 +91,18 @@ def makeParticle(
     path.add_module(pmake)
 
 
-def fitVertex(list_name, confidenceLevel, path=main):
+def fitVertex(
+    list_name,
+    confidenceLevel,
+    fitter='kfitter',
+    path=main,
+    ):
+
     pvfit = register_module('ParticleVertexFitter')
     pvfit.set_name('ParticleVertexFitter_' + list_name)
     pvfit.param('ListName', list_name)
     pvfit.param('ConfidenceLevel', confidenceLevel)
+    pvfit.param('VertexFitter', fitter)
     path.add_module(pvfit)
 
 

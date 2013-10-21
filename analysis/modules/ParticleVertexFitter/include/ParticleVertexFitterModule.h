@@ -20,6 +20,9 @@
 #include <analysis/KFit/VertexFitKFit.h>
 #include <analysis/KFit/MakeMotherKFit.h>
 
+// rave
+#include <analysis/raveInterface/RaveSetup.h>
+#include <analysis/raveInterface/RaveVertexFitter.h>
 
 namespace Belle2 {
 
@@ -78,9 +81,10 @@ namespace Belle2 {
 
   private:
 
-    std::string m_listName;   /**< particle list name */
-    double m_confidenceLevel; /**< required fit confidence level */
-    double m_Bfield;          /**< magnetic field from data base */
+    std::string m_listName;     /**< particle list name */
+    double m_confidenceLevel;   /**< required fit confidence level */
+    double m_Bfield;            /**< magnetic field from data base */
+    std::string m_vertexFitter; /**< Vertex Fitter name */
 
     /**
      * Main steering routine
@@ -103,6 +107,21 @@ namespace Belle2 {
      * @return true for successfull construction of mother
      */
     bool makeKvMother(analysis::VertexFitKFit& kv, Particle* p);
+
+    /**
+     * Unconstrained fit using Rave
+     * @param p pointer to particle
+     * @return true for successfull update of mother
+     */
+    bool doRaveFit(Particle* mother);
+
+    /**
+     * Update mother using Rave
+     * @param rf reference to :RaveVertexFitter object
+     * @param p pointer to particle
+     * @return true for successfull update of mother
+     */
+    bool makeRaveMother(analysis::RaveVertexFitter& rf, Particle* p);
 
   };
 

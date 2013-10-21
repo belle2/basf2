@@ -57,6 +57,7 @@ namespace Belle2 {
     addParam("ListName", m_listName, "name of particle list", string(""));
     addParam("ConfidenceLevel", m_confidenceLevel,
              "required confidence level of fit to keep particles in the list", 0.001);
+    addParam("VertexFitter", m_vertexFitter, "kfitter or rave", string("kfitter"));
 
   }
 
@@ -67,11 +68,15 @@ namespace Belle2 {
   void ParticleVertexFitterModule::initialize()
   {
     m_Bfield = 1.5;
+    analysis::RaveSetup::initialize(1, m_Bfield);
   }
 
   void ParticleVertexFitterModule::beginRun()
   {
     m_Bfield = 1.5; //TODO: get from gearbox
+    std::string rfs("rave");
+    if (m_vertexFitter.compare(rfs) == 0)
+      B2WARNING("RAVE works only for single vertex non kinematic fit ");
   }
 
   void ParticleVertexFitterModule::event()
@@ -132,8 +137,15 @@ namespace Belle2 {
   bool ParticleVertexFitterModule::doVertexFit(Particle* mother)
   {
     // steering starts here
+    bool ok = false;
+    std::string kfs("kfitter");
+    std::string rfs("rave");
 
-    bool ok = doKvFit(mother);
+    if (m_vertexFitter.compare(kfs) == 0) ok = doKvFit(mother);
+    if (m_vertexFitter.compare(rfs) == 0) ok = doRaveFit(mother);
+    if (m_vertexFitter.compare(kfs) != 0 && m_vertexFitter.compare(rfs) != 0)
+      B2ERROR("ParticleVertexFitter: " << m_vertexFitter << " ***invalid vertex fitter ");
+
     if (!ok) return false;
 
     // steering ends here
@@ -175,6 +187,7 @@ namespace Belle2 {
     bool ok = makeKvMother(kv, mother);
     return ok;
   }
+
 
 
   bool ParticleVertexFitterModule::makeKvMother(analysis::VertexFitKFit& kv,
@@ -227,6 +240,41 @@ namespace Belle2 {
 
   }
 
+  bool ParticleVertexFitterModule::doRaveFit(Particle* mother)
+  {
+    if (mother->getNDaughters() < 2) return false;
+
+    analysis::RaveVertexFitter rf;
+    rf.addMother(mother);
+
+    int nVert = rf.fit("kalman");
+    if (nVert != 1) return false;
+
+    bool ok = makeRaveMother(rf, mother);
+    return ok;
+
+  }
+
+  bool ParticleVertexFitterModule::makeRaveMother(analysis::RaveVertexFitter& rf,
+                                                  Particle* p)
+  {
+
+    TVector3 pos = rf.getPos(0);
+    TMatrixDSym RerrMatrix = rf.getCov(0);
+    double prob = rf.getPValue(0);
+    TLorentzVector mom(p->getMomentum(), p->getEnergy());
+    TMatrixDSym errMatrix(7);
+    for (int i = 0; i < 7; i++) {
+      for (int j = 0; j < 7; j++) {
+        if (i > 3 && j > 3) {errMatrix[i][j] = RerrMatrix[i - 4][j - 4];}
+        else {errMatrix[i][j] = 0;}
+      }
+    }
+
+    p->updateMomentum(mom, pos, errMatrix, prob);
+    return true;
+
+  }
 
 } // end Belle2 namespace
 

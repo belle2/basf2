@@ -62,7 +62,7 @@ ROISenderModule::initialize()
             m_messageQueueName << " invalid. cfr: man mq_overview ");
 
 
-  unlinkMessageQueue("on initialize");
+  //  unlinkMessageQueue("on initialize");
   openMessageQueue("on initialize");
 
 }
@@ -112,7 +112,7 @@ void
 ROISenderModule::terminate()
 {
   closeMessageQueue("on terminate");
-  unlinkMessageQueue("on terminate");
+  //  unlinkMessageQueue("on terminate");
 }
 
 void
@@ -120,10 +120,10 @@ ROISenderModule::openMessageQueue(const char* log_string)
 {
   struct mq_attr attr;
   attr.mq_flags   = 0;
-  attr.mq_maxmsg  = 10;
-  attr.mq_msgsize = 8192; // bytes
+  attr.mq_maxmsg  = m_messageQueueDepth;
+  attr.mq_msgsize = m_messageQueueMsgSize; // bytes
 
-  int oflags = O_WRONLY | O_CREAT | O_EXCL;
+  int oflags = O_WRONLY ; //| O_CREAT | O_EXCL;
   mode_t mode =  S_IRUSR | S_IWUSR | S_IROTH |  S_IRGRP ;
 
 

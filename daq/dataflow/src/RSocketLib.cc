@@ -162,6 +162,16 @@ int RSocketSend::put(char* data, int len)
     return -1;
 }
 
+int RSocketSend::put_wordbuf(int* data, int len)
+{
+  //  printf("RSocketSend::put (sd = %d)\n", m_sender);
+  m_errno = 0;
+  if (m_sender > 0)
+    return m_io.put_wordbuf(m_sender, data, len);
+  else
+    return -1;
+}
+
 int RSocketSend::write(char* data, int len)
 {
   m_errno = 0;
@@ -234,6 +244,7 @@ tryagain:
   if (connect(s, (struct sockaddr*)&sa, sizeof(sa)) < 0) {
     m_errno = errno;
     perror("RSocketRecv:connect");
+    printf("tried to connect to %s, port %d\n", node, port);
     printf("connection error..... m_sock set to %d\n", m_sock);
     if (m_errno == ETIMEDOUT) {
       printf(".... try again after 5 sec. \n");
@@ -263,6 +274,17 @@ int RSocketRecv::get(char* data, int len)
 {
   m_errno = 0;
   return m_io.get(m_sock, data, len);
+}
+
+int RSocketRecv::get_wordbuf(int* data, int len)
+{
+  //  printf("RSocketRecv::get_wordbuf()\n");
+
+  m_errno = 0;
+  if (m_sock > 0)
+    return m_io.get_wordbuf(m_sock, data, len);
+  else
+    return -1;
 }
 
 int RSocketRecv::read(char* data, int len)

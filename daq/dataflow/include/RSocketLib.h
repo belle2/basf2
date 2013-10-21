@@ -49,6 +49,7 @@ namespace Belle2 {
     int get(char* data, int len);
     int read(char* data, int len);
     int put(char* data, int len);
+    int put_wordbuf(int* data, int len);
     int write(char* data, int len);
 
     int err() const;
@@ -71,6 +72,7 @@ namespace Belle2 {
     int put(char* data, int len);
     int write(char* data, int len);
     int get(char* data, int len);
+    int get_wordbuf(int* data, int len);
     int read(char* data, int len);
 
     char* node(void);

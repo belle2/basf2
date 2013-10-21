@@ -51,6 +51,17 @@ int SocketIO::put(int sock, char* data, int len)
   return (bcount);
 }
 
+int SocketIO::put_wordbuf(int sock, int* data, int len)
+{
+  //  printf("SocketIO::put_wordbuf(%d): sending data...\n",sock);
+  int bcount = write_data(sock, (char*)data, len * sizeof(int));
+  if (bcount < 0) perror("put: sending data");
+  if (bcount <= 0)
+    return bcount;
+  else
+    return ((bcount - 1) / 4 + 1);
+}
+
 int SocketIO::write_data(int sock, char* data, int len)
 {
   errno = 0;
@@ -94,6 +105,23 @@ int SocketIO::get(int sock, char* data, int len)
   }
   int bcount = read_data(sock, data, gcount);
   return (bcount);
+}
+
+int SocketIO::get_wordbuf(int sock, int* wrdbuf, int len)
+{
+  int gcount;
+  int br = read_data(sock, (char*)wrdbuf, sizeof(int));
+  if (br <= 0) return br;
+  //  gcount = ntohl(wrdbuf[0]);
+  gcount = wrdbuf[0];
+  //  printf ( "gcount = %8.8x (%d)\n", gcount, gcount );
+  if (gcount > len) {
+    printf("buffer too small : %d(%d)", gcount, len);
+    exit(0);
+  }
+  int bcount = read_data(sock, (char*)&wrdbuf[1], (gcount - 1) * sizeof(int));
+  //  printf ( "term = %8.8x\n", wrdbuf[gcount-1] );
+  return (wrdbuf[0]);
 }
 
 int SocketIO::get_pxd(int sock, char* data, int len)
@@ -288,6 +316,17 @@ int SocketRecv::get(char* data, int len)
     return -1;
 }
 
+int SocketRecv::get_wordbuf(int* data, int len)
+{
+  //  printf("SocketSend::get()\n");
+
+  m_errno = 0;
+  if (m_sender > 0)
+    return m_io.get_wordbuf(m_sender, data, len);
+  else
+    return -1;
+}
+
 int SocketRecv::read(char* data, int len)
 {
   m_errno = 0;
@@ -427,6 +466,13 @@ int SocketSend::put(char* data, int len)
   m_errno = 0;
   // printf("SocketSend::put (sd = %d)\n", m_sock);
   return m_io.put(m_sock, data, len);
+}
+
+int SocketSend::put_wordbuf(int* data, int len)
+{
+  m_errno = 0;
+  // printf("SocketSend::put (sd = %d)\n", m_sock);
+  return m_io.put_wordbuf(m_sock, data, len);
 }
 
 int SocketSend::write(char* data, int len)

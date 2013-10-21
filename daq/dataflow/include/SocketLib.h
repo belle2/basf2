@@ -38,7 +38,10 @@ namespace Belle2 {
     ~SocketIO();
 
     int put(int sock, char* data, int len);
+    int put_wordbuf(int sock, int* data, int len);
     int get(int sock, char* data, int len);
+    int get_wordbuf(int sock, int* data, int len);
+
     int get_pxd(int sock, char* data, int len);
 
     // protected:
@@ -66,6 +69,7 @@ namespace Belle2 {
     void sock(int sockid);
 
     int get(char* data, int len);
+    int get_wordbuf(int* data, int len);
     int read(char* data, int len);
     int put(char* data, int len);
     int write(char* data, int len);
@@ -88,6 +92,7 @@ namespace Belle2 {
     ~SocketSend();
 
     int put(char* data, int len);
+    int put_wordbuf(int* data, int len);
     int write(char* data, int len);
     int get(char* data, int len);
     int get_pxd(char* data, int len);

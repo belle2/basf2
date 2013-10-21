@@ -6,6 +6,8 @@
 // Date : 27 - Aug - 2013
 //-
 
+#define DESY
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -56,7 +58,20 @@ int main(int argc, char** argv)
       nid = nnodes + 1;
     }
   } else {
+#ifdef DESY
+    // Special treatment for DESY test nodes!!
+    strcpy(nodename, "evp_");
+    char hostnamebuf[256];
+    gethostname(hostnamebuf, sizeof(hostnamebuf));
+    strcat(&nodename[4], &hostnamebuf[6]);
+    int lend = strlen(nodename);
+    nodename[lend + 1] = (char)0;
+    nodename[lend] = nodename[lend - 1];
+    strncpy(&nodename[lend - 1], "0", 1);
+    // End of DESY special treatment
+#else
     sprintf(nodename, "evp_%s", host);
+#endif
     idlist[0] = 0;
     strcpy(item[0], "IN    ");
     idlist[1] = 1;

@@ -83,7 +83,7 @@ namespace Belle2 {
     ~ROIrawID() {};
 
     //operator used to order the ROIs (ascending DHHID)
-    inline bool operator()(const ROIrawID roi1, const ROIrawID roi2) const {
+    inline bool operator()(const ROIrawID& roi1, const ROIrawID& roi2) const {
       if (roi1.getDHHID() == roi2.getDHHID())
         return roi1.getID() < roi2.getID();
       else return roi1.getDHHID() < roi2.getDHHID();

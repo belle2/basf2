@@ -14,7 +14,7 @@ using namespace Belle2;
 
 ROIrawID::baseType ROIrawID::getBigEndian() const
 {
-  //  return htobe64(m_rawID.id);
+  //  return ROIrawID::baseType htobe64(m_rawID.id);
 
   uint32_t low_host, hi_host;
   uint64_t low_be, hi_be;
@@ -28,5 +28,5 @@ ROIrawID::baseType ROIrawID::getBigEndian() const
   low_be = htonl(low_host);
   hi_be = htonl(hi_host);
   /* Exchange low and high words. */
-  return low_be << 32 | hi_be;
+  return (ROIrawID::baseType)(low_be << 32 | hi_be);
 }

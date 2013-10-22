@@ -50,6 +50,7 @@ namespace Belle2 {
     RingBuffer* m_rbuf;
     MsgHandler* m_msghandler;
     DataStoreStreamer* m_streamer;
+
     int m_compressionLevel;
     int m_nrecv;
 

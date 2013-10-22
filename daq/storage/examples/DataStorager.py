@@ -19,7 +19,7 @@
 
 from basf2 import *
 import sys
-argvs = sys.argv
+argv = sys.argv
 
 # Set the log level to show only error and fatal messages
 set_log_level(LogLevel.ERROR)
@@ -27,14 +27,18 @@ set_log_level(LogLevel.INFO)
 
 # Modules
 deserializer = register_module('StorageDeserializer')
-deserializer.param('RingBufferName', argvs[1])
+deserializer.param('RingBufferName', argv[1])
 #deserializer.param('CompressionLevel', int(argvs[2])
+output = register_module('SeqRootOutput')
+#output = register_module('RootOutput')
+output.param('outputFileName', argv[2])
 
 # Create main path
 main = create_path()
 
 # Add modules to main path
 main.add_module(deserializer)
+main.add_module(output)
 
 # Process all events
 process(main)

@@ -13,6 +13,8 @@
 #include <boost/crc.hpp>
 #include <assert.h>
 #include <stdio.h>
+#define _BSD_SOURCE
+#include <endian.h>
 
 using namespace Belle2;
 using boost::crc_optimal;
@@ -38,7 +40,9 @@ void ROIpayload::init(int length)
 void ROIpayload::setPayloadLength(int length)
 {
 
-  m_data32[0] = htobe32(length);
+  //  m_data32[0] = htobe32(length);
+  m_data32[0] = htonl(length);
+
 
   m_packetLengthByte = length + sizeof(uint32_t);
 }
@@ -46,14 +50,16 @@ void ROIpayload::setPayloadLength(int length)
 void ROIpayload::setHeader()
 {
 
-  m_data32[1] = htobe32(0xCAFE8000);
+  //  m_data32[1] = htobe32(0xCAFE8000);
+  m_data32[1] = htonl(0xCAFE8000);
 
 };
 
 void ROIpayload::setTriggerNumber(unsigned long int triggerNumber)
 {
 
-  m_data32[2] = htobe32(triggerNumber);
+  //  m_data32[2] = htobe32(triggerNumber);
+  m_data32[2] = htonl(triggerNumber);
 
 };
 
@@ -75,7 +81,8 @@ void ROIpayload::setCRC()
 
   dhh_crc_32.process_bytes((void*)(m_rootdata + 1), 2 * sizeof(uint32_t) + m_index * sizeof(uint64_t));
 
-  m_data32[m_index * 2 + 3] = htobe32(dhh_crc_32.checksum()) ;
+  //  m_data32[m_index * 2 + 3] = htobe32(dhh_crc_32.checksum()) ;
+  m_data32[m_index * 2 + 3] = htonl(dhh_crc_32.checksum()) ;
 
 
 }

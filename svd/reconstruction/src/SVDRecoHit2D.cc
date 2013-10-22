@@ -11,7 +11,6 @@
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Const.h>
 #include <svd/reconstruction/SVDRecoHit2D.h>
-#include <svd/dataobjects/SVDTrueHit.h>
 #include <svd/geometry/SensorInfo.h>
 #include <vxd/geometry/SensorPlane.h>
 #include <vxd/geometry/GeoCache.h>
@@ -29,13 +28,14 @@ const double SVDRecoHit2D::c_HMatrixContent[10] = {0, 0, 0, 1, 0, 0, 0, 0, 0, 1}
 const TMatrixD SVDRecoHit2D::c_HMatrix = TMatrixD(HIT_DIMENSIONS, 5, c_HMatrixContent);
 
 SVDRecoHit2D::SVDRecoHit2D():
-  GFAbsPlanarHit(HIT_DIMENSIONS), m_sensorID(0), m_trueHit(0),
-  m_energyDep(0)//, m_energyDepError(0)
+  GFAbsPlanarHit(HIT_DIMENSIONS), m_sensorID(0), m_trueHit(NULL), m_uCluster(NULL), m_vCluster(NULL),
+  m_energyDep(0)
 {}
 
 SVDRecoHit2D::SVDRecoHit2D(const SVDTrueHit* hit, float sigmaU, float sigmaV):
   GFAbsPlanarHit(HIT_DIMENSIONS), m_sensorID(0), m_trueHit(hit),
-  m_energyDep(0)//, m_energyDepError(0)
+  m_uCluster(NULL), m_vCluster(NULL),
+  m_energyDep(0)
 {
   if (!gRandom) B2FATAL("gRandom not initialized, please set up gRandom first");
 
@@ -64,7 +64,7 @@ SVDRecoHit2D::SVDRecoHit2D(const SVDTrueHit* hit, float sigmaU, float sigmaV):
 }
 
 SVDRecoHit2D::SVDRecoHit2D(const VxdID vxdid, const double u, const double v, double sigmaU, double sigmaV):
-  GFAbsPlanarHit(HIT_DIMENSIONS), m_sensorID(vxdid.getID()), m_trueHit(NULL),
+  GFAbsPlanarHit(HIT_DIMENSIONS), m_sensorID(vxdid.getID()), m_trueHit(NULL), m_uCluster(NULL), m_vCluster(NULL),
   m_energyDep(0)//, m_energyDepError(0)
 {
   //If no error is given, estimate the error by dividing the pixel size by sqrt(12)
@@ -77,6 +77,31 @@ SVDRecoHit2D::SVDRecoHit2D(const VxdID vxdid, const double u, const double v, do
   fHitCoord(0) = u;
   fHitCoord(1) = v;
   // Set the error covariance matrix
+  fHitCov(0, 0) = sigmaU * sigmaU;
+  fHitCov(0, 1) = 0;
+  fHitCov(1, 0) = 0;
+  fHitCov(1, 1) = sigmaV * sigmaV;
+  // Setup geometry information
+  setDetectorPlane();
+}
+
+SVDRecoHit2D::SVDRecoHit2D(const SVDCluster& uHit, const SVDCluster& vHit):
+  GFAbsPlanarHit(HIT_DIMENSIONS), m_trueHit(NULL), m_uCluster(&uHit), m_vCluster(&vHit),
+  m_energyDep(0)
+{
+  if ((uHit.getRawSensorID() != vHit.getRawSensorID()) || !uHit.isUCluster() || vHit.isUCluster())
+    B2FATAL("Error in SVDRecoHit2D: Incorrect SVDClusterTypes on input!")
+
+    m_sensorID = uHit.getRawSensorID();
+
+  fHitCoord[0] = uHit.getPosition();
+  fHitCoord[1] = vHit.getPosition();
+
+  double sigmaU = uHit.getPositionSigma();
+  double sigmaV = vHit.getPositionSigma();
+
+  m_energyDep = 0.5 * (uHit.getCharge() + vHit.getCharge());
+
   fHitCov(0, 0) = sigmaU * sigmaU;
   fHitCov(0, 1) = 0;
   fHitCov(1, 0) = 0;

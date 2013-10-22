@@ -13,6 +13,7 @@
 
 #include <vxd/dataobjects/VxdID.h>
 #include <svd/dataobjects/SVDTrueHit.h>
+#include <svd/dataobjects/SVDCluster.h>
 
 // ROOT includes
 #include <TMatrixD.h>
@@ -69,6 +70,12 @@ namespace Belle2 {
      */
     SVDRecoHit2D(const VxdID vxdid, const double u, const double v, double sigmaU = -1, double sigmaV = -1);
 
+    /** Construct SVDRecoHit from a u- and v- SVDCluster.
+     * @param uHit the u-type SVDCluster
+     * @param vHit the v-type SVDCluster
+     */
+    SVDRecoHit2D(const SVDCluster& uHit, const SVDCluster& vHit);
+
     /** Destructor. */
     virtual ~SVDRecoHit2D() {}
 
@@ -87,6 +94,10 @@ namespace Belle2 {
 
     /** Get pointer to the TrueHit used when creating this RecoHit, can be NULL if created from something else */
     const SVDTrueHit* getTrueHit() const { return m_trueHit; }
+    /** Get pointer to the u cluster used to create this RecoHit. */
+    const SVDCluster* getUCluster() const {return m_uCluster; }
+    /** Get pointer to the u cluster used to create this RecoHit. */
+    const SVDCluster* getVCluster() const {return m_vCluster; }
 
     /** Get u coordinate.*/
     float getU() const { return fHitCoord(0); }
@@ -114,6 +125,8 @@ namespace Belle2 {
 
     unsigned short m_sensorID; /**< Unique sensor identifier.*/
     const SVDTrueHit* m_trueHit; /**< Pointer to the Truehit used to generate this hit */
+    const SVDCluster* m_uCluster; /**< Pointer to mother uCluster. */
+    const SVDCluster* m_vCluster; /**< Pointer to mother vCluster. */
 
     float m_energyDep; /**< deposited energy.*/
     //float m_energyDepError; /**< error in dep. energy.*/
@@ -121,7 +134,7 @@ namespace Belle2 {
     /** Set up Detector plane information */
     void setDetectorPlane();
 
-    ClassDef(SVDRecoHit2D, 3)
+    ClassDef(SVDRecoHit2D, 4)
   };
 
 } // namespace Belle2

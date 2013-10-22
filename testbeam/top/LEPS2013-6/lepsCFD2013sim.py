@@ -22,7 +22,7 @@ from basf2 import *
 # (last two in approximation for phi<<1)
 # ------------------------------------------
 
-# beam definition for exp001 (cosTheta=0.0), Inami-san alignment (2013/8/8)
+# beam definition for exp001 (cosTheta=0.0), new alignment with basf2 (2013/9/5)
 
 beam01 = {
     'pdgCodes': [-11],
@@ -31,16 +31,16 @@ beam01 = {
     'momentumGeneration': 'normal',
     'momentumParams': [2.12, 0.21],
     'thetaGeneration': 'normal',
-    'thetaParams': [89.639, 0],
+    'thetaParams': [90.2, 0.10],
     'phiGeneration': 'normal',
-    'phiParams': [0.057, 0],
+    'phiParams': [0.0, 0.10],
     'vertexGeneration': 'normal',
     'xVertexParams': [0, 0],
-    'yVertexParams': [-0.20, 0.5],
-    'zVertexParams': [124.30, 0.5],
+    'yVertexParams': [0.0, 0.15],
+    'zVertexParams': [124.8, 0.15],
     }
 
-# beam definition for exp002 (cosTheta=0.39), Inami-san alignment (2013/8/8)
+# beam definition for exp002 (cosTheta=0.39), new alignment with basf2 (2013/9/5)
 
 beam02 = {
     'pdgCodes': [-11],
@@ -49,17 +49,17 @@ beam02 = {
     'momentumGeneration': 'normal',
     'momentumParams': [2.12, 0.21],
     'thetaGeneration': 'normal',
-    'thetaParams': [67.288, 0],
+    'thetaParams': [67.5, 0.10],
     'phiGeneration': 'normal',
-    'phiParams': [0.124, 0],
+    'phiParams': [0.0, 0.10],
     'vertexGeneration': 'normal',
     'xVertexParams': [0, 0],
-    'yVertexParams': [-0.10, 0.5],
-    'zVertexParams': [73.00, 0.5],
+    'yVertexParams': [0.0, 0.15],
+    'zVertexParams': [73.4, 0.15],
     }
 
 # beam definition for exp003 (cosTheta=0.39, impact close to bar side)
-# (no alignment data yet!)
+# new alignment with basf2 (2013/9/5)
 
 beam03 = {
     'pdgCodes': [-11],
@@ -68,13 +68,13 @@ beam03 = {
     'momentumGeneration': 'normal',
     'momentumParams': [2.12, 0.21],
     'thetaGeneration': 'normal',
-    'thetaParams': [67.288, 0],
+    'thetaParams': [67.65, 0.10],
     'phiGeneration': 'normal',
-    'phiParams': [0.124, 0],
+    'phiParams': [0.10, 0.10],
     'vertexGeneration': 'normal',
     'xVertexParams': [0, 0],
-    'yVertexParams': [-19.9, 0.5],
-    'zVertexParams': [73.00, 0.5],
+    'yVertexParams': [-19.2, 0.15],
+    'zVertexParams': [74.6, 0.15],
     }
 
 # specify here the beam setup, number of events to simulate and output file

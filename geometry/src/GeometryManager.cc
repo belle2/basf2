@@ -36,7 +36,6 @@
 #include "RootGM/volumes/Factory.h"
 #include "TGeoManager.h"
 
-#include <boost/foreach.hpp>
 #include <memory>
 
 using namespace std;
@@ -54,7 +53,7 @@ namespace Belle2 {
 
     void GeometryManager::clear()
     {
-      BOOST_FOREACH(CreatorBase * creator, m_creators) delete creator;
+      for (CreatorBase * creator : m_creators) delete creator;
       m_creators.clear();
       m_topVolume = 0;
       //FIXME: Geometry is now run independent, don't delete anything, let Geant4 care about freeing stuff
@@ -68,7 +67,7 @@ namespace Belle2 {
       G4LogicalSkinSurface::CleanSurfaceTable();
       //FIXME: The MaterialPropertyTables associated with the surfaces won't get deleted.
       G4SurfaceProperty::CleanSurfacePropertyTable();
-      BOOST_FOREACH(CreatorBase * creator, m_creators) delete creator;
+      for (CreatorBase * creator : m_creators) delete creator;
       m_creators.clear();
       m_topVolume = 0;
     }
@@ -88,8 +87,8 @@ namespace Belle2 {
 
       Materials& materials = Materials::getInstance();
       //Set up Materials first since we possibly need them for the top volume
-      BOOST_FOREACH(const GearDir & matlist, detectorDir.getNodes("Materials")) {
-        BOOST_FOREACH(const GearDir & mat, matlist.getNodes("Material")) {
+      for (const GearDir & matlist : detectorDir.getNodes("Materials")) {
+        for (const GearDir & mat : matlist.getNodes("Material")) {
           materials.createMaterial(mat);
         }
       }
@@ -104,9 +103,13 @@ namespace Belle2 {
       G4LogicalVolume* top_log = new G4LogicalVolume(top_box, top_mat, "Top", 0, 0, 0);
       setVisibility(*top_log, false);
       m_topVolume = new G4PVPlacement(0, G4ThreeVector(), top_log, "Top", 0, false, 0);
+      //Make a copy of the names for all selected or excluded components to
+      //check if all of those names are actually known components
+      std::set<std::string> componentNames = m_components;
+      std::set<std::string> excludedNames = m_excluded;
 
       //Now create all subcomponents
-      BOOST_FOREACH(const GearDir & component, detectorDir.getNodes("DetectorComponent")) {
+      for (const GearDir & component : detectorDir.getNodes("DetectorComponent")) {
         string name;
         string creatorName;
         try {
@@ -116,6 +119,10 @@ namespace Belle2 {
           B2ERROR("Could not find required element Name or Creator for " << component.getPath());
           continue;
         }
+        //Remove this name from the list of selected or excluded components. At
+        //the end there should be nothing left in these lists
+        componentNames.erase(name);
+        excludedNames.erase(name);
         if (m_components.size() > 0 && m_components.count(name) == 0) {
           B2INFO("DetectorComponent " << name << " not in list of components, skipping");
           continue;
@@ -144,6 +151,16 @@ namespace Belle2 {
                  << newPhysical << " physical volumes");
           m_creators.push_back(creator);
         }
+      }
+      //If there is still stuff left in the list of selected components throw
+      //errors because there might be a typo in the component list
+      for (const std::string & name : componentNames) {
+        B2ERROR("'" << name << "' is specified in list of components but could not be found");
+      }
+      //If there is still stuff left in the list of excluded components throw
+      //errors because there might be a typo in the excluded component list
+      for (const std::string & name : excludedNames) {
+        B2ERROR("'" << name << "' is specified in list of excluded components but could not be found");
       }
       int newSolids = G4SolidStore::GetInstance()->size();
       int newLogical = G4LogicalVolumeStore::GetInstance()->size();

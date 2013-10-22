@@ -9,6 +9,8 @@
  **************************************************************************/
 
 #include <tracking/modules/pxdDataReduction/ROIGeneratorModule.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/dataobjects/EventMetaData.h>
 #include <pxd/geometry/SensorInfo.h>
 #include <framework/datastore/StoreArray.h>
 #include <tracking/dataobjects/ROIid.h>
@@ -44,6 +46,7 @@ ROIGeneratorModule::~ROIGeneratorModule()
 
 void ROIGeneratorModule::initialize()
 {
+  StoreObjPtr<EventMetaData>::required();
   StoreArray<ROIid>::registerPersistent(m_ROIListName);
 }
 
@@ -62,20 +65,33 @@ void ROIGeneratorModule::event()
 
   VxdID sensorID;
   sensorID.setLayerNumber(1);
-  //    sensorID.setLadderNumber(1);
+  sensorID.setLadderNumber(1);
   sensorID.setSensorNumber(1);
 
-  for (int iROI = 0; iROI < m_nROIs; iROI++) {
+  int minU;
+  int minV;
+  int maxU;
+  int maxV;
 
-    sensorID.setLadderNumber((1 + iROI) % 8);
-    tmp_ROIid.setMinUid(1 + iROI);
-    tmp_ROIid.setMinVid(1);
-    tmp_ROIid.setMaxUid(4 + iROI);
-    tmp_ROIid.setMaxVid(8);
-    tmp_ROIid.setSensorID(sensorID);
+  StoreObjPtr<EventMetaData> eventMetaDataPtr;
+  int iROI = eventMetaDataPtr->getEvent();
+  //  for (int iROI = 0; iROI < m_nROIs; iROI++) {
 
-    ROIList.appendNew(tmp_ROIid);
-  }
+  //    minU =  (0 + iROI*16 ) % 250;
+  minU =  iROI % 250;
+  maxU = min(249, minU + 5);
+  //    minV =  (0 + iROI*32 ) % 768;
+  minV = (iROI / 250) % 768;
+  maxV = min(767 , minV + 10);
+
+  tmp_ROIid.setMinUid(minU) ;
+  tmp_ROIid.setMinVid(minV);
+  tmp_ROIid.setMaxUid(maxU);
+  tmp_ROIid.setMaxVid(maxV);
+  tmp_ROIid.setSensorID(sensorID);
+
+  ROIList.appendNew(tmp_ROIid);
+  //  }
 }
 
 

@@ -161,6 +161,16 @@ public:
   void set_crc(unsigned int c) {
     crc32 = c;
   };
+  bool is_fake(void) {
+    if (word0.data != 0x3000) return false;
+    if (trigger_nr_lo != 0) return false;
+    if (trigger_nr_hi != 0) return false;
+    if (time_tag_lo != 0) return false;
+    if (time_tag_hi != 0) return false;
+    if (sfnr_offset != 0) return false;
+    //if(crc32!=0x87654321) return false;
+    return true;
+  };
   inline static unsigned int size(void) {
     return 4;
   };
@@ -368,6 +378,14 @@ public:
   };
   inline static unsigned int size(void) {
     return 4;
+  };
+  bool is_fake(void) {
+    if (word0.data != 0xC100) return false;
+    if (trigger_nr_lo != 0) return false;
+    if (wordsinevent != 0) return false;
+    if (errorinfo != 0) return false;
+    //if(crc32!=0x87654321) return false;
+    return true;
   };
   void print(void) {
     word0.print();
@@ -595,7 +613,7 @@ void PXDUnpackerModule::unpack_event(RawPXD* px)
   datafullsize = fullsize - 2 * 4 - Frames_per_event * 4; // minus header, minus table
 
   int ll = 0; // Offset in dataptr in bytes
-  for (unsigned int j = 0; j < Frames_per_event; j++) {
+  for (int j = 0; j < Frames_per_event; j++) {
     int lo;/// len of frame in bytes
     bool pad;
     lo = tableptr[j];
@@ -850,9 +868,13 @@ void PXDUnpackerModule::unpack_frame(void* data, int len, bool pad, int& last_fr
       hw->print();
       dhh.calc_crc();
       break;
-    case DHH_FRAME_HEADER_DATA_TYPE_EVT_FRM:
-
-      ((dhh_event_frame*)data)->print();
+    case DHH_FRAME_HEADER_DATA_TYPE_EVT_FRM: {
+      bool fake = ((dhh_event_frame*)data)->is_fake();
+      if (fake) {
+        B2WARNING("Faked DHH START Data -> trigger without Data!");
+      } else {
+        ((dhh_event_frame*)data)->print();
+      }
       if (last_end == 0) {
         end_error++;
         if (verbose) {
@@ -864,28 +886,35 @@ void PXDUnpackerModule::unpack_frame(void* data, int len, bool pad, int& last_fr
       last_framenr = -1;
       last_wie = 0;
 
-      if ((evtnr & 0x7FFF) != ((last_evtnr + 1) & 0x7FFF)) {
-        evt_skip_error++;
-        if (verbose) {
-          B2WARNING(" Event skipped: " << evtnr << " != " << last_evtnr << " + 1 ");
-        };
-        error_flag = true;
+      if (!fake) {
+        if ((evtnr & 0x7FFF) != ((last_evtnr + 1) & 0x7FFF)) {
+          evt_skip_error++;
+          if (verbose) {
+            B2WARNING(" Event skipped: " << evtnr << " != " << last_evtnr << " + 1 ");
+          };
+          error_flag = true;
+        }
       }
       last_evtnr = evtnr;
       dhh_first_frame_id_lo = ((dhh_event_frame*)data)->get_sfnr();
       dhh_first_offset = ((dhh_event_frame*)data)->get_toffset();
-      dhh.calc_crc();
+      if (!fake) dhh.calc_crc();
       stat_start++;
       break;
+    };
     case DHH_FRAME_HEADER_DATA_TYPE_GHOST:
       ((dhh_ghost_frame*)data)->print();
       dhh.calc_crc();
       stat_ghost++;
       last_wie -= 2;
       break;
-    case DHH_FRAME_HEADER_DATA_TYPE_END_FRM:
-
-      ((dhh_end_event_frame*)data)->print();
+    case DHH_FRAME_HEADER_DATA_TYPE_END_FRM: {
+      bool fake = ((dhh_end_event_frame*)data)->is_fake();
+      if (fake) {
+        B2WARNING("Faked DHH END Data -> trigger without Data!");
+      } else {
+        ((dhh_end_event_frame*)data)->print();
+      }
       ls = 0;
       le = 1;
       stat_end++;
@@ -894,23 +923,27 @@ void PXDUnpackerModule::unpack_frame(void* data, int len, bool pad, int& last_fr
         start_error++;
         error_flag = true;
       }
-      int w;
-      w = ((dhh_end_event_frame*)data)->get_words() * 2;
-      last_wie += 2;
-      if (verbose) {
-        B2INFO(" last_wie " << last_wie << " w " << w);
-      };
-      if (last_wie != w) {
+      if (!fake) {
+        int w;
+        w = ((dhh_end_event_frame*)data)->get_words() * 2;
+        last_wie += 2;
         if (verbose) {
-          B2INFO(" Error: WIE " << hex << last_wie << " vs END " << hex << w << " pad " << pad);
+          B2INFO(" last_wie " << last_wie << " w " << w);
         };
-        error_flag = true;
-        wie_error++;
-      } else {
-        if (verbose)
-          B2INFO(" EVT END: WIE " << hex << last_wie << " == END " << hex << w << " pad " << pad);
+        if (last_wie != w) {
+          if (verbose) {
+            B2INFO(" Error: WIE " << hex << last_wie << " vs END " << hex << w << " pad " << pad);
+          };
+          error_flag = true;
+          wie_error++;
+        } else {
+          if (verbose)
+            B2INFO(" EVT END: WIE " << hex << last_wie << " == END " << hex << w << " pad " << pad);
+        }
+        dhh.calc_crc();
       }
       break;
+    };
     case DHH_FRAME_HEADER_DATA_TYPE_HLTROI:
       hw->print();
       ((dhh_onsen_frame*)data)->print();

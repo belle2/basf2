@@ -1,6 +1,5 @@
 #include <reconstruction/modules/dedxPID/DedxPIDModule.h>
 #include <reconstruction/modules/dedxPID/HelixHelper.h>
-#include <reconstruction/modules/dedxPID/DedxConstants.h>
 
 #include <reconstruction/dataobjects/DedxTrack.h>
 #include <reconstruction/dataobjects/DedxLikelihood.h>

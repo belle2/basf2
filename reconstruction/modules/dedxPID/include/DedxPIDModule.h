@@ -13,7 +13,7 @@
 
 #include <framework/core/Module.h>
 
-#include <reconstruction/modules/dedxPID/DedxConstants.h>
+#include <reconstruction/dataobjects/DedxConstants.h>
 #include <framework/gearbox/Const.h>
 
 #include <framework/datastore/StoreArray.h>

@@ -11,7 +11,7 @@
 #ifndef DEDXTRACK_H
 #define DEDXTRACK_H
 
-#include <reconstruction/modules/dedxPID/DedxConstants.h>
+#include <reconstruction/dataobjects/DedxConstants.h>
 
 #include <framework/datastore/RelationsObject.h>
 #include <framework/gearbox/Const.h>
@@ -60,7 +60,7 @@ namespace Belle2 {
       edep.push_back(energydep);
       extrapolationFailed.push_back(extrapFailed);
       driftLength.push_back(drift_length);
-      if ((layer < 0 and layer < m_last_layer) or(layer >= 0 and layer > m_last_layer))
+      if ((layer < 0 and layer < m_last_layer) or (layer >= 0 and layer > m_last_layer))
         m_last_layer = layer;
     }
 

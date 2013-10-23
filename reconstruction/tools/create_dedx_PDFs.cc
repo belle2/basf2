@@ -1,5 +1,5 @@
 #include <framework/gearbox/Const.h>
-#include <reconstruction/modules/dedxPID/DedxConstants.h>
+#include <reconstruction/dataobjects/DedxConstants.h>
 
 #include <TFile.h>
 #include <TMath.h>

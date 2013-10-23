@@ -75,8 +75,8 @@ namespace Belle2 {
     */
 
     /** The VXDTFModule is a low momentum Si-only trackfinder. It can use both VXD Detectors (SVD and PXD) to search for tracks.
-    * It suports different momentum ranges which can be set via 'sectorSetup' Standard is a three pass setup covering the range of 50MeV/c < pT < 1GeV/c.
-    * lower and higher momentum tracks can be found with reduced efficiency.
+    * It suports different momentum ranges which can be set via 'sectorSetup' Standard is a three pass setup covering the whole transverse momentum range above 50MeV/c.
+    * lower momentum tracks can be found with reduced efficiency.
     * long term features like curling track support is currently not included
     * needed imput: PXD/SCDClusters
     * output: GFTrackCand

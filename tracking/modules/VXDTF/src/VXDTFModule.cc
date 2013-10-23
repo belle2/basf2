@@ -11,11 +11,7 @@
 #include "tracking/modules/VXDTF/VXDTFModule.h"
 
 // framework
-#include <generators/dataobjects/MCParticle.h>
-#include <framework/datastore/RelationIndex.h>
 #include <framework/gearbox/Const.h>
-#include <pxd/dataobjects/PXDTrueHit.h>
-#include <svd/dataobjects/SVDTrueHit.h>
 #include <geometry/GeometryManager.h>
 #include <geometry/bfieldmap/BFieldMap.h>
 #include <tracking/dataobjects/VXDTFSecMap.h>
@@ -60,6 +56,7 @@
 #include <time.h>
 #include <fstream>
 #include <iomanip>      // std::setprecision
+#include <array>
 
 
 //Boost-packages:
@@ -1247,6 +1244,9 @@ void VXDTFModule::the_real_event()
         }
         finalTrackCandidates.appendNew(gfTC);
       }
+
+      m_TESTERcountTotalTCsFinal += finalTrackCandidates.getEntries();
+      thisInfoPackage.numTCsfinal += finalTrackCandidates.getEntries();
     }
 
     stopTimer = boostClock::now();
@@ -2071,6 +2071,8 @@ void VXDTFModule::endRun()
     B2DEBUG(2, "fastest event: " << m_TESTERlogEvents.at(numLoggedEvents - 1).Print());
     B2DEBUG(1, "manually calculated mean: " << meanTimeConsumption / numLoggedEvents << ", and median: " << m_TESTERlogEvents.at(median).totalTime.count() << " of time consumption per event");
   }
+
+  B2INFO(" VXDTF - endRun: within " << m_eventCounter + 1 << " events, there have been a total number of " << m_TESTERcountTotalTCsFinal << " TCs and " << float(m_TESTERcountTotalTCsFinal) / (float(m_eventCounter + 1)) << " TCs per event")
 
   B2DEBUG(1, " ############### " << m_PARAMnameOfInstance << " endRun - end ############### ")
 }

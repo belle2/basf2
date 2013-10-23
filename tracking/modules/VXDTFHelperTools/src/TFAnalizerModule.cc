@@ -557,6 +557,9 @@ void TFAnalizerModule::printInfo(int recoveryState, VXDTrackCandidate& mcTC, VXD
       rootVariables.totalPXresiduals.push_back(px);
       rootVariables.totalPYresiduals.push_back(py);
       rootVariables.totalPZresiduals.push_back(pz);
+      if (true) { /// DEBUGGING! py > 0.08
+        B2DEBUG(10, " pyResidual is: " << py << ", pxGuess/pxReal/pyGuess/pyReal/pzGuess/pzReal: " << caDirection[0] << "/" << mcDirection[0] << "/" << caDirection[1] << "/" << mcDirection[1] << "/" << mcDirection[2] << "/" << caDirection[2] << ", same for position: " << caSeedHit[0] << "/" << mcSeedHit[0] << "/" << caSeedHit[1] << "/" << mcSeedHit[1] << "/" << caSeedHit[2] << "/" << mcSeedHit[2] << " guessed/real pdg: " << caTC.pdgCode << "/" << mcTC.pdgCode)
+      }
     }
   }
 
@@ -736,36 +739,51 @@ void TFAnalizerModule::extractHits(GFTrackCand* aTC,
     TVector3 tempSeedHit; // position of innermost hit
     aTC->getHit(0, detID, hitID); // 0 means innermost hit
     if (detID == Const::PXD) {  // means PXD
+      vector< pair<double, const PXDTrueHit* > > tempPXDSeeds; // .first = momentumResidual (vertex - hit), .second pointer to hit
       RelationIndex<PXDCluster, PXDTrueHit>::range_from relationRange = relationPXD.getElementsFrom(pxdClusters[hitID]);
       for (const auto & relElement : relationRange) {
-        // since more than one trueHit can be the cause of current hit, we have to find the real TrueHit. Identified by |momentum|
+        // since more than one trueHit can be the cause of current hit, we have to find the real TrueHit. Identified by |momentum| (that trueHit with the closest total momentum compared to the primary vertex is accepted)
         const PXDTrueHit* aTrueHit = relElement.to;
-        tempMomentum = aTrueHit->getMomentum();
-        tempSeedHit.SetXYZ(aTrueHit->getU(), aTrueHit->getV(), aTrueHit->getW());
+        double momentumResidual = pValue - aTrueHit->getMomentum().Mag();
+        if (momentumResidual < 0) { momentumResidual = -momentumResidual; }
+        tempPXDSeeds.push_back(make_pair(momentumResidual, aTrueHit));
+//         if (pValue - tempMomentum.Mag() < pValue * 0.1) { gotNewMomentum = true; break; } // if difference in Momentum is less than 10% of initial momentum, we accept current value as the real one
+      }
 
-        aVxdID = aTrueHit->getSensorID();
+      if (tempPXDSeeds.size() != 0) {
+        std::sort(tempPXDSeeds.begin(), tempPXDSeeds.end()); // sorts by first entry of pair -> entry with smallest difference between vertex and hit will be taken...
+        tempMomentum = tempPXDSeeds.at(0).second->getMomentum();
+        tempSeedHit.SetXYZ(tempPXDSeeds.at(0).second->getU(), tempPXDSeeds.at(0).second->getV(), tempPXDSeeds.at(0).second->getW());
+
+        aVxdID = tempPXDSeeds.at(0).second->getSensorID();
         VXD::SensorInfoBase aSensorInfo = geometry.getSensorInfo(aVxdID);
         tempMomentum = aSensorInfo.vectorToGlobal(tempMomentum);
         tempSeedHit = aSensorInfo.pointToGlobal(tempSeedHit);
-
-        if (pValue - tempMomentum.Mag() < pValue * 0.1) { gotNewMomentum = true; break; } // if difference in Momentum is less than 10% of initial momentum, we accept current value as the real one
-
+//        B2ERROR(" tempSeedHit stored...")
+        gotNewMomentum = true;
       }
     } else if (detID == Const::SVD) {  // SVD
+      vector< pair<double, const SVDTrueHit* > > tempSVDSeeds; // .first = momentumResidual (vertex - hit), .second pointer to hit
       RelationIndex<SVDCluster, SVDTrueHit>::range_from relationRange = relationSVD.getElementsFrom(svdClusters[hitID]);
       for (const auto & relElement : relationRange) {
         // since more than one trueHit can be the cause of current hit, we have to find the real TrueHit. Identified by |momentum|
         const SVDTrueHit* aTrueHit = relElement.to;
-        tempMomentum = aTrueHit->getMomentum();
-        tempSeedHit.SetXYZ(aTrueHit->getU(), aTrueHit->getV(), aTrueHit->getW());
+        double momentumResidual = pValue - aTrueHit->getMomentum().Mag();
+        if (momentumResidual < 0) { momentumResidual = -momentumResidual; }
+        tempSVDSeeds.push_back(make_pair(momentumResidual, aTrueHit));
+      }
 
-        aVxdID = aTrueHit->getSensorID();
+      if (tempSVDSeeds.size() != 0) {
+        std::sort(tempSVDSeeds.begin(), tempSVDSeeds.end()); // sorts by first entry of pair -> entry with smallest difference between vertex and hit will be taken...
+        tempMomentum = tempSVDSeeds.at(0).second->getMomentum();
+        tempSeedHit.SetXYZ(tempSVDSeeds.at(0).second->getU(), tempSVDSeeds.at(0).second->getV(), tempSVDSeeds.at(0).second->getW());
+
+        aVxdID = tempSVDSeeds.at(0).second->getSensorID();
         VXD::SensorInfoBase aSensorInfo = geometry.getSensorInfo(aVxdID);
         tempMomentum = aSensorInfo.vectorToGlobal(tempMomentum);
         tempSeedHit = aSensorInfo.pointToGlobal(tempSeedHit);
-
-        if (pValue - tempMomentum.Mag() < pValue * 0.1) { gotNewMomentum = true; break; } // if difference in Momentum is less than 10% of initial momentum, we accept current value as the real one
-
+//        B2ERROR(" tempSeedHit stored...")
+        gotNewMomentum = true;
       }
     } else { B2FATAL("TFAnalizer - this track candidate does not have any VXD-hits, can not analyze it") }
 

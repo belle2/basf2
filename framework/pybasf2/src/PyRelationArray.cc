@@ -14,7 +14,7 @@ PyRelationArray::PyRelationArray(const std::string& name, int durability):
     return;
   }
 
-  m_relations = reinterpret_cast<RelationContainer*>(iter->second->ptr);
+  m_relations = static_cast<RelationContainer*>(iter->second->ptr);
 
   //build index
   if (m_relations) {

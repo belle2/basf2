@@ -42,7 +42,7 @@ namespace Belle2 {
         Processes all events for the given run number and for events from 0 to maxEvent.
         \param spath The processing starts with the first module of this path.
     */
-    void process(PathPtr spath);
+    void process(PathPtr spath, long maxEvent);
 
 
   private:

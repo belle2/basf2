@@ -93,11 +93,9 @@ void Framework::process(PathPtr startPath, long maxEvent)
     if (Environment::Instance().getNumberProcesses() == 0) {
       EventProcessor processor(*m_pathManager);
       processor.process(startPath, maxEvent);
-    } else if (maxEvent <= 0) {
-      pEventProcessor processor(*m_pathManager);
-      processor.process(startPath);
     } else {
-      B2FATAL("process(path, maxEvent) not supported when using parallel processing.")
+      pEventProcessor processor(*m_pathManager);
+      processor.process(startPath, maxEvent);
     }
   } catch (std::exception& e) {
     B2ERROR("Uncaught exception encountered: " << e.what()); //should show module name

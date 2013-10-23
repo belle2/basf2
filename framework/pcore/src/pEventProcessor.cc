@@ -45,16 +45,20 @@ pEventProcessor::~pEventProcessor()
 }
 
 
-void pEventProcessor::process(PathPtr spath)
+void pEventProcessor::process(PathPtr spath, long maxEvent)
 {
   if (spath->getModules().size() == 0) return;
 
   const int numProcesses = Environment::Instance().getNumberProcesses();
 
-  // 0. Should serial processing be used instead?
+  //Check whether the number of events was set via command line argument
+  int numEventsArgument = Environment::Instance().getNumberEventsOverride();
+  if ((numEventsArgument > 0) && ((maxEvent == 0) || (maxEvent > numEventsArgument))) {
+    maxEvent = numEventsArgument;
+  }
+
   if (numProcesses == 0) {
-    B2WARNING("pEventProcessor::process() called for serial processing! Most likely a bug in Framework.");
-    EventProcessor::process(spath);
+    B2FATAL("pEventProcessor::process() called for serial processing! Most likely a bug in Framework.");
     return;
   }
 
@@ -94,7 +98,7 @@ void pEventProcessor::process(PathPtr spath)
     ModulePtrList procinitmodules = init_modules_in_process(inpath_modules);
     if (!procinitmodules.empty())
       processInitialize(procinitmodules);
-    processCore(inpath, inpath_modules);
+    processCore(inpath, inpath_modules, maxEvent);
     processTerminate(inpath_modules);
     B2INFO("Event Server Terminated");
     exit(0);
@@ -112,7 +116,7 @@ void pEventProcessor::process(PathPtr spath)
         ModulePtrList procinitmodules = init_modules_in_process(outpath_modules);
         if (!procinitmodules.empty())
           processInitialize(procinitmodules);
-        processCore(outpath, outpath_modules);
+        processCore(outpath, outpath_modules, maxEvent);
         processTerminate(outpath_modules);
         B2INFO("Output Server Terminated");
         exit(0);
@@ -131,7 +135,7 @@ void pEventProcessor::process(PathPtr spath)
     ModulePtrList procinitmodules = init_modules_in_process(main_modules);
     if (!procinitmodules.empty())
       processInitialize(procinitmodules);
-    processCore(mainpath, main_modules);
+    processCore(mainpath, main_modules, maxEvent);
     processTerminate(main_modules);
     B2INFO("Event Process Terminated");
     exit(0);

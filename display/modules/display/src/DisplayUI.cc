@@ -21,6 +21,7 @@
 #include <TGFrame.h>
 #include <TGLabel.h>
 #include <TGNumberEntry.h>
+#include <TGMsgBox.h>
 #include <TGFileDialog.h>
 #include <TGInputDialog.h>
 #include <TGTextEntry.h>
@@ -535,14 +536,23 @@ void DisplayUI::toggleColorScheme()
 
 void DisplayUI::savePicture(bool highres)
 {
+  const char* filetypes[] = {
+    "PNG (bitmap)",    "*.png",
+    "PDF (experimental!)",   "*.pdf",
+    "All files",     "*",
+    0,               0
+  };
   TGFileInfo fi;
+  fi.fFileTypes = filetypes;
+
   //deleting the pointer crashes, so I'm assuming this is magically cleaned up at some point
   new TGFileDialog(gEve->GetBrowser()->GetClient()->GetDefaultRoot(), gEve->GetBrowser(), kFDSave, &fi);
   if (!fi.fFilename)
     return; //cancelled
   TGLViewer* v = m_viewer->getActiveGLViewer();
+  bool success = false;
   if (!highres) {
-    v->SavePicture(fi.fFilename);
+    success = v->SavePicture(fi.fFilename);
   } else {
     char returnString[256];
     new TGInputDialog(gEve->GetBrowser()->GetClient()->GetDefaultRoot(), gEve->GetBrowser(),
@@ -558,10 +568,14 @@ void DisplayUI::savePicture(bool highres)
     }
     const int width = t.Atoi();
     B2INFO("Saving bitmap (width: " << width << "px)..."); //may take a while
-    v->SavePictureWidth(fi.fFilename, width);
+    success = v->SavePictureWidth(fi.fFilename, width);
   }
 
-  B2INFO("Saved picture in: " << fi.fFilename)
+  if (success) {
+    B2INFO("Saved picture in: " << fi.fFilename)
+  } else {
+    new TGMsgBox(gEve->GetBrowser()->GetClient()->GetDefaultRoot(), gEve->GetBrowser(), "Saving picture failed", TString::Format("Couldn't save to '%s'! Please verify you used an appropriate image file extension in the file name. Check console output for further information.", fi.fFilename));
+  }
 
   //file dialog leaves empty box, redraw
   gEve->Redraw3D(false); //do not reset camera when redrawing

@@ -8,6 +8,7 @@ from basf2 import *
 from subprocess import call
 import datetime
 
+### setup of the most important parts for the VXDTF ###
 secSetup = ['testBeamFINE_VXD']  # use 'testBeamFINE_SVD' for svd-only
 # or 'testBeamFINE_VXD' for full vxd reco.
 # and don't forget to set the clusters for the detector type you want in the
@@ -17,10 +18,6 @@ filterOverlaps = 'hopfield'
 seed = 1
 numEvents = 250
 
-now = datetime.datetime.now()
-
-roFileNameTF = 'VXDTFoutput' + qiType + filterOverlaps + secSetup[0] \
-    + now.strftime('%Y-%m-%d %H:%M')
 
 set_log_level(LogLevel.ERROR)
 set_random_seed(seed)
@@ -67,15 +64,12 @@ g4sim = register_module('FullSim')
 # this is needed for the MCTrackFinder to work correctly
 g4sim.param('StoreAllSecondaries', True)
 SVDDIGI = register_module('SVDDigitizer')
-# SVDDIGI.logging.log_level = LogLevel.DEBUG
 SVDDIGI.param('PoissonSmearing', True)
 SVDDIGI.param('ElectronicEffects', True)
 
 SVDCLUST = register_module('SVDClusterizer')
-# SVDCLUST.logging.log_level = LogLevel.DEBUG
 
 PXDDIGI = register_module('PXDDigitizer')
-# PXDDIGI.logging.log_level = LogLevel.DEBUG
 PXDDIGI.param('SimpleDriftModel', False)
 PXDDIGI.param('PoissonSmearing', True)
 PXDDIGI.param('ElectronicEffects', True)
@@ -83,8 +77,8 @@ PXDDIGI.param('ElectronicEffects', True)
 PXDCLUST = register_module('PXDClusterizer')
 
 vxdtf = register_module('VXDTF')
-vxdtf.logging.log_level = LogLevel.INFO
-vxdtf.logging.debug_level = 11
+vxdtf.logging.log_level = LogLevel.DEBUG
+vxdtf.logging.debug_level = 1
 # calcQIType:
 # Supports 'kalman', 'circleFit' or 'trackLength.
 # 'circleFit' has best performance at the moment
@@ -107,25 +101,15 @@ param_vxdtf = {
     'qiSmear': False,
     'smearSigma': 0.000001,
     'GFTrackCandidatesColName': 'caTracks',
-    'writeToRoot': True,
-    'rootFileName': [roFileNameTF, 'RECREATE'],
-    'activateDistance3D': [True],
     'activateDistanceXY': [False],
-    'activateDistanceZ': [False],
-    'activateSlopeRZ': [False],
-    'activateNormedDistance3D': [False],
-    'activateNormedDistance3D': [False],
     'activateAngles3DHioC': [False],
     'activateAnglesXYHioC': [False],
-    'activateAnglesRZHioC': [False],
-    'activateDeltaSlopeRZHioC': [False],
     'activateDeltaSlopeRZHioC': [False],
     'activateDistance2IPHioC': [False],
     'activatePTHioC': [False],
     'activateHelixFitHioC': [False],
     'activateDeltaPtHioC': [False],
     'activateDeltaDistance2IPHioC': [False],
-    'activateAngles3D': [True],
     'activateAnglesXY': [False],
     'activateAnglesRZ': [False],
     'activateDeltaSlopeRZ': [False],
@@ -133,19 +117,17 @@ param_vxdtf = {
     'activatePT': [False],
     'activateHelixFit': [False],
     'activateZigZagXY': [False],
-    'activateZigZagRZ': [False],
     'activateDeltaPt': [False],
-    'activateDeltaDistance2IP': [False],
     'activateCircleFit': [True],
     'tuneCircleFit': [0.00001],
     }
 vxdtf.param(param_vxdtf)
 
+
 analyzer = register_module('TFAnalizer')
 analyzer.logging.log_level = LogLevel.INFO
 analyzer.logging.debug_level = 11
 param_analyzer = {'printExtentialAnalysisData': False, 'caTCname': 'caTracks'}
-# 'printExtentialAnalysisData': set true if PRINTINFO is wanted
 analyzer.param(param_analyzer)
 
 mctrackfinder = register_module('MCTrackFinder')
@@ -157,7 +139,7 @@ param_mctrackfinder = {
     'Smearing': 0,
     'UseClusters': True,
     'MinimalNDF': 5,
-    'WhichParticles': ['PXD', 'SVD'],
+    'WhichParticles': ['primary'],
     'GFTrackCandidatesColName': 'mcTracks',
     }
 mctrackfinder.param(param_mctrackfinder)
@@ -171,46 +153,6 @@ eventCounter = register_module('EventCounter')
 eventCounter.logging.log_level = LogLevel.INFO
 eventCounter.param('stepSize', 25)
 
-display = register_module('Display')
-
-# The Options parameter is a combination of:
-# D draw detectors - draw simple detector representation (with different size)
-#   for each hit
-# H draw track hits
-# M draw track markers - intersections of track with detector planes
-#   (use with T)
-# P draw detector planes
-# S scale manually - spacepoint hits are drawn as spheres and scaled with
-#   errors
-# T draw track (straight line between detector planes)
-#
-# Note that you can always turn off an individual detector component or track
-# interactively by removing its checkmark in the 'Eve' tab.
-#
-# This option only makes sense when ShowGFTracks is true
-display.param('options', 'HTMS')  # default
-
-# should hits always be assigned to a particle with c_PrimaryParticle flag?
-# with this option off, many tracking hits will be assigned to secondary e-
-display.param('assignHitsToPrimaries', 0)
-
-# show all primary MCParticles?
-display.param('showAllPrimaries', True)
-
-# show all charged MCParticles? (SLOW)
-display.param('showCharged', False)
-
-# show tracks?
-display.param('showTrackLevelObjects', True)
-
-# save events non-interactively (without showing window)?
-display.param('automatic', False)
-
-# Use clusters to display tracks
-display.param('useClusters', True)
-
-# Display the testbeam geometry rather than Belle II extract
-display.param('fullGeometry', True)
 
 # Create paths
 main = create_path()
@@ -230,24 +172,8 @@ main.add_module(mctrackfinder)
 main.add_module(analyzer)
 main.add_module(trackfitter)
 main.add_module(eventCounter)
-# main.add_module(display)
 
 # Process events
 process(main)
 
 print statistics
-
-# print 'Event Statistics for vxdtf:'
-# print statistics([vxdtf])
-
-print 'Memory statistics'
-for stats in statistics.modules:
-    print 'Module %s:' % stats.name
-    print ' -> initialize(): %10d KB' % stats.memory(statistics.INIT)
-    print ' -> beginRun():   %10d KB' % stats.memory(statistics.BEGIN_RUN)
-    print ' -> event():      %10d KB' % stats.memory()
-    print ' -> endRun():     %10d KB' % stats.memory(statistics.END_RUN)
-    print ' -> terminate():  %10d KB' % stats.memory(statistics.TERM)
-
-print 'Event Statistics detailed:'
-print statistics(statistics.TOTAL)

@@ -45,7 +45,6 @@ geometry.param('Components', [
     'MagneticField',
     'PXD',
     'SVD',
-    'SVD-Support',
     ])
 
 g4sim = register_module('FullSim')
@@ -105,18 +104,3 @@ process(main)
 
 print 'Event Statistics :'
 print statistics
-
-# print 'Event Statistics detailed:'
-# print statistics(statistics.TOTAL)
-
-# print 'Event Statistics for vxdtf:'
-# print statistics([vxdtf])
-
-# print 'Memory statistics'
-# for stats in statistics.modules:
-    # print 'Module %s:' % stats.name
-    # print ' -> initialize(): %10d KB' % stats.memory(statistics.INIT)
-    # print ' -> beginRun():   %10d KB' % stats.memory(statistics.BEGIN_RUN)
-    # print ' -> event():      %10d KB' % stats.memory()
-    # print ' -> endRun():     %10d KB' % stats.memory(statistics.END_RUN)
-    # print ' -> terminate():  %10d KB' % stats.memory(statistics.TERM)

@@ -90,11 +90,7 @@ namespace Belle2 {
       struct Vertex; /**< forward declaration  */
       struct Edge; /**< forward declaration  */
 
-      //      boost::unordered_map
 
-      //    typedef std::map<std::string, VXDSector*> MapOfSectors;
-      //    typedef std::map<std::string, Cutoff*> CutoffMap;
-      //     typedef std::map<std::string, CutoffMap*> MapOfCutoffTypes;
       typedef boost::unordered_map<unsigned int, VXDSector*> MapOfSectors; /**< stores whole sectorMap used for storing cutoffs */
       typedef std::pair<unsigned int, VXDSector* > secMapEntry; /**< represents an entry of the MapOfSectors */
       typedef boost::unordered_map<int, Cutoff*> CutoffMap; /**< Is a map storing cutoffs  */
@@ -111,9 +107,7 @@ namespace Belle2 {
       typedef std::pair<bool, double> Filter; /**< defines whether current filter is allowed (.first) and whether the cutoffvalues shall be tuned (.second).  */
       typedef boost::chrono::high_resolution_clock boostClock; /**< used for measuring time comsumption */ // high_resolution_clock, process_cpu_clock
       typedef boost::chrono::microseconds boostNsec; /**< defines time resolution (currently mictroseconds) */ // microseconds, milliseconds
-      //    typedef boost::chrono::duration_cast durationCast;
-      //    typedef std::chrono::high_resolution_clock boostClock;
-      //    typedef std::chrono::nanoseconds boostNsec;
+
       typedef boost::tuple<double, double, VXDTFHit*> HitExtraTuple; /**< get<0>: distance to origin, get<1>: distance to seedHit, get<2> pointer to hit. SeedHit is outermost hit of detector and will be used for cosmic search */
       typedef boost::adjacency_list <
       boost::vecS, // defines the container used for the edges (vecS = std::vector)
@@ -136,15 +130,6 @@ namespace Belle2 {
 
 
 
-      /** structs for internal use **/
-
-      struct Vertex {
-        // or whatever, maybe nothing
-      };
-
-      struct Edge {
-        // nothing, probably. Or a weight, a distance, a direction, ...
-      };
 
       /** SensorStruct needed for SVDCluster sorting, stores u and v clusters of Sensor  */
       struct SensorStruct {
@@ -484,14 +469,6 @@ namespace Belle2 {
       VXDTFHit deliverVXDTFHitWrappedSVDHit(ClusterInfo* uClusterInfo, ClusterInfo* vClusterInfo);
 
 
-//      /** creates a mathematical directed graph (check typedef for more info) which will be used by the simpleEventReco to find trackCandidates */
-//      BoostDirectedGraph createDirectedGraph(std::vector<VXDTFHit>& hits);
-//
-//
-//      /** creates a mathematical undirected graph (check typedef for more info) which will be used by the simpleEventReco to find trackCandidates */
-//      BoostUndirectedGraph createUndirectedGraph(std::vector<VXDTFHit>& hits);
-
-
       /** sorts that specific tuple using position 1, not position 0 (which can be done by using standard sorting algorithm) */
 //       bool sortHitExtraTupleAtPosition1(const HitExtraTuple& t1, const HitExtraTuple& t2);
 
@@ -517,9 +494,6 @@ namespace Belle2 {
       bool m_PARAMDebugMode; /**< some code will only be executed if this mode is enabled */
       std::vector<std::string> m_PARAMsectorSetup; /**< lets you chose the sectorSetup (compatibility of sensors, individual cutoffs,...) accepts 'std', 'low', 'high' and 'personal', please note that the chosen setup has to exist as a xml-file in ../tracking/data/friendList_XXX.xml. If you can not create your own xml files using e.g. the filterCalculatorModule, use params for  'tuneCutoffXXX' or 'setupWeigh' instead. multipass supported by setting setups in a row */
 
-//       std::vector<std::string> m_PARAMdetectorType; /**< defines which detector type has to be exported. VXD, PXD, SVD */
-//       std::vector<double> m_PARAMsetOrigin; /**< allows to reset orign (e.g. usefull for special cases like testbeams), only valid if 3 entries are found */
-//       double m_PARAMmagneticFieldStrength; /**< strength of magnetic field in Tesla, standard is 1.5T */
       std::vector<int> m_PARAMhighestAllowedLayer; /**< set value below 6 if you want to exclude outer layers (standard is 6) */
       std::vector<int> m_PARAMminLayer; /**< determines lowest layer considered by track candidate collector */
       std::vector<int> m_PARAMminState; /**< determines lowest state of cells considered by track candidate collector */
@@ -586,8 +560,7 @@ namespace Belle2 {
       PassSetupVector m_passSetupVector; /**< contains information for each pass */
       CurrentPassData m_baselinePass; /**< baselineTF gets his own pass, gets some settings from the first pass of the PassSetupVector */
 
-//       std::vector<double> m_PARAMsectorConfigU; /**< allows defining the the config of the sectors in U direction value is valid for each sensor of chosen detector setup, minimum 2 values between 0.0 and 1.0 */
-//       std::vector<double> m_PARAMsectorConfigV; /**< allows defining the the config of the sectors in V direction value is valid for each sensor of chosen detector setup, minimum 2 values between 0.0 and 1.0 */
+
       int m_PARAMpdGCode; /**< tandard value is 211 (pi+), ATTENTION, instead of using inconsistent sign of PdGList, in this module positively charged particles are always positive and negatively charged ones are negative (relevant for leptons) */
 
       LittleHelper m_littleHelperBox; /**< bundles small but often used functions for smearing and others.  */
@@ -598,7 +571,6 @@ namespace Belle2 {
       std::vector< std::pair<double, double> > m_errorContainer; /**< stores error of u and v coordinates of each layer in the vxd. These values are needed by the circleFitter. How to access: container[layerID].first = sigmaU, container[layerID].second = sigmaV */
       int m_usePXDorSVDorVXDhits; /**< when having more than one pass per event, sector maps using PXD, SVD or VXD can be set independently. To produce TFHits only when needed, this value is set to -1,0 or 1 */
 
-      //     std::vector<std::string> m_PARAMmultiPassSectorSetup; /**< controls usage of one or several passes for TF per event (allows differnt pT's or curling track support) */
       double m_PARAMtuneCutoffs; /**< for rapid changes of cutoffs (no personal xml files needed), reduces/enlarges the range of the cutoffs in percent (lower and upper values are changed by this value). Only valid in range -50% < x < +1000% */
 
       int m_eventCounter; /**< knows current event number */
@@ -620,7 +592,7 @@ namespace Belle2 {
 
       bool m_PARAMqiSmear; /**<  allows to smear QIs via qqq-Interface, needed when having more than one TC with the same QI */
       bool m_PARAMcleanOverlappingSet; /**< when true, TCs which are found more than once (possible because of multipass) will get filtered */
-      //     bool m_PARAMuseHopfield;
+
       std::string m_PARAMfilterOverlappingTCs; /**< defines which technique shall be used for filtering overlapping TCs, currently supported: 'hopfield', 'greedy', 'none' */
       int m_filterOverlappingTCs; /**< is set by m_PARAMfilterOverlappingTCs and defines which technique shall be used for filtering overlapping TCs */
       double m_PARAMsmearMean; /**< allows to introduce a bias for QI (e.g. surpressing all values, ...)*/

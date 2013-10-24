@@ -57,8 +57,12 @@ void EventNumbersModule::initialize()
 
   //steering file content overwritten via command line arguments?
   int numEventsArgument = Environment::Instance().getNumberEventsOverride();
-  if (numEventsArgument > 0)
+  if (numEventsArgument > 0) {
+    if (m_evtNumList.size() > 1) {
+      B2ERROR("The -n/--events option cannot be used when multiple runs are specified for EventNumbers!");
+    }
     m_evtNumList[0] = numEventsArgument;
+  }
 
   //Make sure all lists have the same size
   unsigned int defListSize = m_expList.size();

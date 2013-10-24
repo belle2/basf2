@@ -16,6 +16,7 @@
 #include <framework/dataobjects/FileMetaData.h>
 #include <framework/core/FileCatalog.h>
 #include <framework/core/RandomNumbers.h>
+#include <framework/utilities/Utils.h>
 
 #include <TClonesArray.h>
 #include <TBaseClass.h>
@@ -76,6 +77,8 @@ void RootOutputModule::initialize()
   //buffer size in bytes (default value used by root)
   const int bufsize = 32000;
 
+  m_startTime = Utils::getClock();
+
   //create a file level metadata object in the data store
   StoreObjPtr<FileMetaData>::registerPersistent("", DataStore::c_Persistent, false);
 
@@ -134,7 +137,7 @@ void RootOutputModule::initialize()
       m_tree[ii]->Branch(branchName.c_str(), &iter->second->object, bufsize, m_splitLevel);
       m_tree[ii]->SetBranchAddress(branchName.c_str(), &iter->second->object);
       m_entries[ii].push_back(iter->second);
-      B2DEBUG(50, "The branch " << branchName << " was created.");
+      B2DEBUG(150, "The branch " << branchName << " was created.");
     }
   }
   dir->cd();
@@ -256,9 +259,13 @@ void RootOutputModule::terminate()
   }
   dir->cd();
 
+  double MBwritten = m_file->GetBytesWritten() / 1024.0 / 1024.0;
+  double elapsedSeconds = ((unsigned long)Utils::getClock() - m_startTime) / 1e9;
+  B2DEBUG(100, "wrote " << MBwritten << " MB in " << elapsedSeconds << "s (" << MBwritten / elapsedSeconds << " MB/s)");
+
   delete m_file;
 
-  B2DEBUG(1, "terminate() finished");
+  B2DEBUG(200, "terminate() finished");
 }
 
 

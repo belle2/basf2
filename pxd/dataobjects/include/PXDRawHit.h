@@ -33,8 +33,9 @@ namespace Belle2 {
       m_row(0),
       m_column(0),
       m_charge(0) ,
-      m_StartRow(0),
-      m_FrameNr(0) {};
+      m_startRow(0),
+      m_frameNr(0),
+      m_commonMode(0) {};
 
 
     /**
@@ -42,13 +43,14 @@ namespace Belle2 {
      * @param row Pixel row coordinate.
      * @param column Pixel column coordinate.
      * @param charge The Pixel charge.
-     * @param StartRow Number of the row where the reading electronic startet.
-     * @param FrameNr number of frame.
+     * @param startRow Number of the row where the reading electronic startet.
+     * @param frameNr number of the (readout) frame.
+     * @param commonMode Common Mode correction for this pixel.
      */
     PXDRawHit(VxdID sensorID, short row, short column, short charge,
-              unsigned short StartRow, unsigned int FrameNr):
+              unsigned short startRow, unsigned int frameNr, unsigned int commonMode = 0):
       m_sensorID(sensorID), m_row(row), m_column(column),
-      m_charge(charge), m_StartRow(StartRow), m_FrameNr(FrameNr)
+      m_charge(charge), m_startRow(startRow), m_frameNr(frameNr), m_commonMode(commonMode)
     {};
 
     /** Get the sensor ID.
@@ -83,23 +85,31 @@ namespace Belle2 {
      * @return row where reading begins.
      */
     unsigned short getStartRow() const {
-      return m_StartRow;
+      return m_startRow;
     }
 
-    /** Get number of Frames.
-     * @return Number of Frames.
+    /** Get number of the Frames.
+     * @return Number of the Frames.
      */
     unsigned short getFrameNr() const {
-      return m_FrameNr;
+      return m_frameNr;
+    }
+
+    /** Get Common Mode correction.
+     * @return Common Mode correction.
+     */
+    unsigned short getCommonMode() const {
+      return m_commonMode;
     }
 
   protected:
-    unsigned short m_sensorID; /**< Compressed sensor identifier.*/
+    VxdID m_sensorID; /**< Compressed sensor identifier.*/
     short m_row;         /**< Absolute pixel position in u. */
     short m_column;         /**< Absolute pixel position in v. */
     short m_charge;           /**< Deposited charge in pixel. */
-    unsigned short m_StartRow;  /**< pixel where reading starts */
-    unsigned short m_FrameNr;    /**< Number of Frames */
+    unsigned short m_startRow;  /**< pixel row where reading starts */
+    unsigned short m_frameNr;    /**< Number of the Frames */
+    short m_commonMode;    /**< Common Mode correction */
 
     // ~PXDRawHit();
 

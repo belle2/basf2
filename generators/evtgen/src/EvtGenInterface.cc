@@ -80,9 +80,20 @@ int EvtGenInterface::simulateEvent(MCParticleGraph& graph, TLorentzVector pParen
 
   // Boost to CMS frame
   pParentParticle = m_labboost.Inverse() * pParentParticle;
-  m_pinit.set(pParentParticle.E(), pParentParticle.X(), pParentParticle.Y(), pParentParticle.Z());
 
-  //B2INFO(pParentParticle.E() << "tt" << pParentParticle.X() << "tt" << pParentParticle.Y() << "tt" << pParentParticle.Z());
+  if (m_ParentParticle.getId() != 93) {
+
+    // Boost to CMS frame
+    //pParentParticle = m_labboost.Inverse() * pParentParticle;
+    m_pinit.set(pParentParticle.E(), pParentParticle.X(), pParentParticle.Y(), pParentParticle.Z());
+
+    //B2INFO(pParentParticle.E() << "tt" << pParentParticle.X() << "tt" << pParentParticle.Y() << "tt" << pParentParticle.Z());
+
+  } else {
+    EvtId Ups = EvtPDL::getId("Upsilon(4S)");
+    //m_pinit.set(EvtPDL::getMass(Ups), 0.0, 0.0, 0.0);
+    m_pinit.set(EvtPDL::getMass(Ups), pParentParticle.X(), pParentParticle.Y(), pParentParticle.Z());
+  }
 
   m_parent = EvtParticleFactory::particleFactory(m_ParentParticle, m_pinit);
   m_parent->setVectorSpinDensity();

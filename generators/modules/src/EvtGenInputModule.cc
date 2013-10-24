@@ -122,8 +122,13 @@ void EvtGenInputModule::event()
 
     pParentParticle = (vlHer + vlLer);
 
-    if (pParentParticle.M() > EvtPDL::getMinMass(EvtPDL::getId(m_parentParticle)) &&
-        pParentParticle.M() < EvtPDL::getMaxMass(EvtPDL::getId(m_parentParticle))) break;
+
+    EvtId temp = EvtPDL::getId(m_parentParticle);
+
+    if (temp.getId() == 93) temp = EvtPDL::getId("Upsilon(4S)");
+    if (pParentParticle.M() > EvtPDL::getMinMass(temp) &&
+        pParentParticle.M() < EvtPDL::getMaxMass(temp)) break;
+
   }
 
   //end initialization
@@ -137,6 +142,7 @@ void EvtGenInputModule::event()
 
   StoreObjPtr<EventMetaData> eventMetaDataPtr;
   mpg.clear();
+
   int nPart =  m_Ievtgen.simulateEvent(mpg, pParentParticle);
   B2INFO("Simulated event " << eventMetaDataPtr->getEvent() << " with " << nPart << " particles.");
 

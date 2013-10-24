@@ -39,10 +39,11 @@ namespace Belle2 {
     /** Store DataStore objects in EvtMessage
      *
      *  @param durability Durability of DataStore objects to be streamed
+     *  @param streamTransientObjects Should objects/arrays registered as transient be streamed?
      *  @return pointer to EvtMessage, caller is responsible for deletion
      *
      */
-    EvtMessage* streamDataStore(DataStore::EDurability durability);
+    EvtMessage* streamDataStore(DataStore::EDurability durability, bool streamTransientObjects = true);
 
     // EvtMessage->DataStore
     /** Restore DataStore objects from EvtMessage

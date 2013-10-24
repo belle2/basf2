@@ -39,7 +39,7 @@ DataStoreStreamer::~DataStoreStreamer()
 }
 
 // Stream DataStore
-EvtMessage* DataStoreStreamer::streamDataStore(DataStore::EDurability durability)
+EvtMessage* DataStoreStreamer::streamDataStore(DataStore::EDurability durability, bool streamTransientObjects)
 {
   // Clear Message Handler
   m_msghandler->clear();
@@ -50,6 +50,11 @@ EvtMessage* DataStoreStreamer::streamDataStore(DataStore::EDurability durability
   int nobjs = 0;
   for (DataStore::StoreObjConstIter it = map.begin(); it != map.end(); ++it) {
     DataStore::StoreEntry* entry = it->second;
+
+    //skip transient objects/arrays?
+    if (!streamTransientObjects and entry->isTransient)
+      continue;
+
     //verify that bits are unused
     if (entry->object->TestBit(c_IsTransient)) {
       B2FATAL("DataStoreStreamer::c_IsTransient bit is set for " << it->first << "!");

@@ -12,8 +12,9 @@
 #define PXDUnpackerModule_H
 
 #include <framework/core/Module.h>
-// #include <pxd/dataobjects/PXDRawHit.h>
+#include <pxd/dataobjects/PXDRawHit.h>
 #include <pxd/dataobjects/RawPXD.h>
+#include <framework/datastore/StoreArray.h>
 
 
 namespace Belle2 {
@@ -56,6 +57,10 @@ namespace Belle2 {
        */
       void unpack_frame(void* data, int len, bool pad, int& last_framenr, int& last_wie, int& last_start, int& last_end, unsigned int& last_evtnr);
 
+      /** Unpack DHP data within one DHH frame
+       * @param data pointer to dhp data
+       * @param len length of dhp data
+       */
       void unpack_dhp(void* data, unsigned int len, unsigned int dhh_first_frame_id_lo, unsigned int dhh_ID, unsigned short toffset);
 
 
@@ -66,6 +71,9 @@ namespace Belle2 {
       //Pxd
       std::string m_storeRAWPxdName;
       std::string m_storeRawHitsName;
+
+      /** Output array. */
+      StoreArray<PXDRawHit> m_storeRawHits;
 
     };//end class declaration
 

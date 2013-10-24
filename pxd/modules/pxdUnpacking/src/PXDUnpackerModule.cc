@@ -10,11 +10,8 @@
 
 #include <pxd/modules/pxdUnpacking/PXDUnpackerModule.h>
 #include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/logging/Logger.h>
 #include <pxd/dataobjects/RawPXD.h>
-#include <pxd/dataobjects/PXDRawHit.h>
 
 // for htonl
 #include <arpa/inet.h>
@@ -33,8 +30,6 @@
 #define DHH_FRAME_HEADER_DATA_TYPE_GHOST    0x2
 #define DHH_FRAME_HEADER_DATA_TYPE_END_FRM  0x4
 #define DHH_FRAME_HEADER_DATA_TYPE_HLTROI   0x7
-
-// #define B2INFO(a) {}
 
 using namespace std;
 using namespace Belle2;
@@ -60,7 +55,6 @@ unsigned long long evt_counter = 0;
 unsigned int stat_start = 0, stat_end = 0, stat_ghost = 0, stat_raw = 0, stat_zsd = 0;
 unsigned int dhp_size_error = 0, dhp_pixel_error = 0, dhp_warning = 0;
 bool verbose = true;
-bool dcp_check_flag = true;
 bool error_flag = false;
 
 char* dhh_type_name[8] = {
@@ -140,12 +134,16 @@ public:
     return sfnr_offset & 0x3FF;
   };
   unsigned int calc_crc(void) {
-    unsigned int* d;
+    unsigned char* d;
     dhh_crc_32_type bocrc;
-    d = (unsigned int*)this;
-    for (unsigned int k = 0; k < (size() - 1) * 4; k++) {
-      bocrc.process_byte(((const unsigned char*)d)[(k ^ 1)]);
+    char crcbuffer[size()];
+    d = (unsigned char*)this;
+
+    for (unsigned int k = 0; k < (size() - 1) * 4; k += 2) {
+      crcbuffer[k] = d[k + 1];
+      crcbuffer[k + 1] = d[k];
     }
+    bocrc.process_bytes(crcbuffer, (size() - 1) * 4);
     unsigned int c;
     c = htonl(bocrc.checksum());
     if (c == crc32) {
@@ -177,7 +175,7 @@ public:
   void print(void) {
     word0.print();
     if (verbose)
-      B2INFO(" DHH Event Frame TNRLO " << hex << trigger_nr_lo << " TNRHI " << hex << trigger_nr_hi << " TTLO " << hex
+      B2INFO(" DHH Event Frame TNRLO " << hex << trigger_nr_lo << " TNRHI " << hex << trigger_nr_hi << " TTLO " << hex << time_tag_lo
              << " TTHI " << hex << time_tag_hi << " SFNR " << hex << ((sfnr_offset >> 10) & 0x3F) << " OFF " << hex << (sfnr_offset & 0x3FF)
              << " CRC " << hex << crc32 << " (calc)" << calc_crc());
   };
@@ -272,15 +270,26 @@ class dhh_onsen_frame {
   unsigned int trignr2;
   /// plus n* ROIs (64 bit)
   /// plus checksum 32bit
+  unsigned int length;/// not part
 public:
   dhh_onsen_frame(void) {};
+  void set_length(unsigned int l) {length = l;};
   void print(void) {
+    if (magic1 == 0x56781234) {
+      B2WARNING("DAVID ROI Framer Error");
+      memmove(&magic1, &trignr1, length - 4);
+      length -= 4;
+    }
     word0.print();
     if (verbose)
-      B2INFO("DHH HLT/ROI Frame ");
-    if ((magic1 & 0xFFFF0000) != 0xCAFE0000) B2ERROR("DHH HLT/ROI Magic 1 error $" << hex << magic1);
-    if ((magic2 & 0xFFFF0000) != 0xCAFE0000) B2ERROR("DHH HLT/ROI Magic 2 error $" << hex << magic2);
-    if (trignr1 != trignr2) B2ERROR("DHH HLT/ROI Frame Trigger Nr Mismatch $" << hex << trignr1 << "!=$" << trignr2);
+      B2INFO("DHH HLT/ROI Frame " << hex << trignr1 << " ," << trignr2);
+    if ((magic1 & 0xFFFF) != 0xCAFE) B2ERROR("DHH HLT/ROI Magic 1 error $" << hex << magic1);
+    if ((magic2 & 0xFFFF) != 0xCAFE) B2ERROR("DHH HLT/ROI Magic 2 error $" << hex << magic2);
+    if (magic2 == 0x0000CAFE && trignr2 == 0x00000000) {
+      B2WARNING("DHH HLT/ROI Frame: No DATCON data " << hex << trignr1 << "!=$" << trignr2);
+    } else {
+      if (trignr1 != trignr2) B2ERROR("DHH HLT/ROI Frame Trigger Nr Mismatch $" << hex << trignr1 << "!=$" << trignr2);
+    }
   };
   inline static unsigned int size(void) {
     return 0;//2;
@@ -299,12 +308,16 @@ public:
     set_crc(calc_crc());
   };
   unsigned int calc_crc(void) {
-    unsigned int* d;
+    unsigned char* d;
     dhh_crc_32_type bocrc;
-    d = (unsigned int*)this;
-    for (unsigned int k = 0; k < (size() - 1) * 4; k++) {
-      bocrc.process_byte(((const unsigned char*)d)[(k ^ 1)]);
+    char crcbuffer[size()];
+    d = (unsigned char*)this;
+
+    for (unsigned int k = 0; k < (size() - 1) * 4; k += 2) {
+      crcbuffer[k] = d[k + 1];
+      crcbuffer[k + 1] = d[k];
     }
+    bocrc.process_bytes(crcbuffer, (size() - 1) * 4);
     unsigned int c;
     c = htonl(bocrc.checksum());
     if (c == crc32) {
@@ -346,12 +359,16 @@ public:
     set_crc(calc_crc());
   };
   unsigned int calc_crc(void) {
-    unsigned int* d;
+    unsigned char* d;
     dhh_crc_32_type bocrc;
-    d = (unsigned int*)this;
-    for (unsigned int k = 0; k < (size() - 1) * 4; k++) {
-      bocrc.process_byte(((const unsigned char*)d)[(k ^ 1)]);
+    char crcbuffer[size()];
+    d = (unsigned char*)this;
+
+    for (unsigned int k = 0; k < (size() - 1) * 4; k += 2) {
+      crcbuffer[k] = d[k + 1];
+      crcbuffer[k + 1] = d[k];
     }
+    bocrc.process_bytes(crcbuffer, (size() - 1) * 4);
     unsigned int c;
     c = htonl(bocrc.checksum());
     if (c == crc32) {
@@ -436,10 +453,24 @@ public:
   unsigned int calc_crc(void) {
     unsigned char* d;
     dhh_crc_32_type bocrc;
+    char crcbuffer[65536 * 16]; /// 1MB
     d = (unsigned char*)data;
-    for (int k = 0; k < length - 4; k++) {
-      bocrc.process_byte(((const unsigned char*)d)[(k ^ 1)]);
+
+    if (length > 65536 * 16) {
+      B2WARNING(" DHH Data Frame CRC FAIL bacause of too large packet (>1MB)!");
+    } else {
+      for (int k = 0; k < length - 4; k += 2) {
+        crcbuffer[k] = d[k + 1];
+        crcbuffer[k + 1] = d[k];
+      }
+      bocrc.process_bytes(crcbuffer, length - 4);
     }
+//     unsigned char* d;
+//     dhh_crc_32_type bocrc;
+//     d = (unsigned char*)data;
+//     for (int k = 0; k < length - 4; k++) {
+//       bocrc.process_byte(((const unsigned char*)d)[(k ^ 1)]);
+//     }
     unsigned int c;
     c = htonl(bocrc.checksum());
 
@@ -520,7 +551,9 @@ public:
 };
 
 PXDUnpackerModule::PXDUnpackerModule() :
-  Module()
+  Module(),
+  m_storeRawHitsName("RawHit"),
+  m_storeRawHits(m_storeRawHitsName)
 {
   //Set module properties
   setDescription("Unpack Raw PXD Hits");
@@ -530,31 +563,19 @@ PXDUnpackerModule::PXDUnpackerModule() :
   //addParam("Clusters", m_storeClustersName, "Cluster collection name",
 //          string(""));
 
-  m_storeRawHitsName = "RawHit";
-
-
-
 }
 
 void PXDUnpackerModule::initialize()
 {
   //Register output collections
-  StoreArray<PXDRawHit>::registerPersistent(m_storeRawHitsName);
-  m_storeRawHitsName = "RawHit";
+  m_storeRawHits.registerAsPersistent();
 }
+
 unsigned char tmpbuffer[1024 * 1024 * 16];
 
 void PXDUnpackerModule::event()
 {
   StoreArray<RawPXD> storeRaws(m_storeRAWPxdName);
-  StoreArray<PXDRawHit> storeRawHits(m_storeRawHitsName);
-  m_storeRawHitsName = "RawHit";
-  if (!storeRawHits.isValid())
-    storeRawHits.create();
-  else
-    storeRawHits.getPtr()->Clear();
-
-
 
   int nRaws = storeRaws.getEntries();
   if (verbose) {
@@ -563,13 +584,11 @@ void PXDUnpackerModule::event()
   if (nRaws == 0)
     return;
 
-
   for (int i = 0; i < nRaws; i++) {
     if (verbose) {
       B2INFO(" PXD Unpacker --> Unpack Objects: " << i);
     };
     unpack_event(storeRaws[i]);
-
   }
 
 }
@@ -589,6 +608,7 @@ void PXDUnpackerModule::unpack_event(RawPXD* px)
   int Frames_per_event;
   int fullsize;
   int datafullsize;
+  bool header_swap_endian = true;
 
   unsigned int* data;
   data = (unsigned int*)px->data();
@@ -606,7 +626,7 @@ void PXDUnpackerModule::unpack_event(RawPXD* px)
 
   unsigned int* tableptr;
   tableptr = &data[2]; // skip header!!!
-  Frames_per_event = data[1];
+  if (header_swap_endian) Frames_per_event = ntohl(data[1]); else Frames_per_event = data[1];
 
   unsigned int* dataptr;
   dataptr = &tableptr[Frames_per_event];
@@ -616,14 +636,15 @@ void PXDUnpackerModule::unpack_event(RawPXD* px)
   for (int j = 0; j < Frames_per_event; j++) {
     int lo;/// len of frame in bytes
     bool pad;
-    lo = tableptr[j];
+    if (header_swap_endian) lo = ntohl(tableptr[j]); else lo = tableptr[j];
     if (lo <= 0) {
       B2ERROR(" size of frame invalid: " << j << "size " << lo << " at byte offset in dataptr " << ll);
       exit(0);
     }
     if (ll + lo > datafullsize) {
-      B2ERROR(" frames exceed packet size: " << j  << " size " << lo << " at byte offset in dataptr " << ll << " of fullsize " << fullsize);
-      exit(0);
+      B2ERROR(" frames exceed packet size: " << j  << " size " << lo << " at byte offset in dataptr " << ll << " of datafullsize " << datafullsize << " of fullsize " << fullsize);
+//       exit(0);
+      return;
     }
     if (lo & 0x3) {
       pad = true;
@@ -645,7 +666,6 @@ void PXDUnpackerModule::unpack_event(RawPXD* px)
 void PXDUnpackerModule::unpack_dhp(void* data, unsigned int len2, unsigned int dhh_first_frame_id_lo, unsigned int dhh_ID, unsigned short toffset)
 {
   unsigned int anzahl = len2 / 2; // len2 in bytes!!!
-  StoreArray<PXDRawHit> storeRawHits(m_storeRawHitsName);
   bool commode = false;
   bool printflag = false;
   unsigned short* dhp_pix = (unsigned short*)data;
@@ -734,7 +754,7 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int len2, unsigned int d
     B2INFO(" DHP Frame Nr     |   " << hex << dhp_header_id_I << " ( " << hex << dhp_header_id_I << " ) ");
 
   if (dhp_pix[3] == dhp_pix[4]) {
-    B2INFO(" Warn: Could be double FrameNr ");
+    B2INFO(" Warn: Could be double FrameNr " << dhp_pix[3] << "=" << dhp_pix[4]);
     dhp_warning++;
 
   } else {
@@ -765,7 +785,7 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int len2, unsigned int d
           dhp_adc = dhp_pix[i] & 0xFF;
           if (printflag)
             B2INFO(" SetPix: Row " << hex << dhp_row << " Col " << hex << dhp_col << " ADC " << hex << dhp_adc
-                   << " ADC+CM " << hex << (dhp_adc + dhp_cm));
+                   << " CM " << hex << dhp_cm);
 
           /*if (verbose) {
             B2INFO(" raw    |   " << hex << d[i]);
@@ -776,18 +796,14 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int len2, unsigned int d
             B2INFO(" toffset " << toffset);
           };*/
 
-          if (commode) {
-//            p_pix[raw_anzahl] = ((dhp_row & 0x7FF) << 21) | ((dhp_col & 0x7FF) << 10) | ((dhp_adc + dhp_cm) & 0x3FF);
-            storeRawHits.appendNew(PXDRawHit(
-                                     dhh_ID, dhp_row, dhp_col, dhp_adc + dhp_cm,
-                                     dhh_first_frame_id_lo, toffset
-                                   ));
+          if (commode) {/// TODO I Have the strong feeling that this is wrong, as CM is already substracted in DHH, isnt it??
+            m_storeRawHits.appendNew(dhh_ID, dhp_row, dhp_col, dhp_adc,
+                                     dhh_first_frame_id_lo, toffset, dhp_cm
+                                    );
           } else {
-//            p_pix[raw_anzahl] = ((dhp_row & 0xFFF) << 20) | ((dhp_col & 0xFFF) << 8) | ((dhp_adc & 0xFF));
-            storeRawHits.appendNew(PXDRawHit(
-                                     dhh_ID, dhp_row, dhp_col, dhp_adc,
-                                     dhh_first_frame_id_lo, toffset
-                                   ));
+            m_storeRawHits.appendNew(dhh_ID, dhp_row, dhp_col, dhp_adc,
+                                     dhh_first_frame_id_lo, toffset, 0
+                                    );
           }
         }
       }
@@ -946,8 +962,9 @@ void PXDUnpackerModule::unpack_frame(void* data, int len, bool pad, int& last_fr
     };
     case DHH_FRAME_HEADER_DATA_TYPE_HLTROI:
       hw->print();
+      ((dhh_onsen_frame*)data)->set_length(len - 4);
       ((dhh_onsen_frame*)data)->print();
-      //dhh.calc_crc();
+      //dhh.calc_crc(); /// WILL FAIL anyway
       break;
     default:
       B2ERROR(" Error: no data ");

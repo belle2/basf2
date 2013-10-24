@@ -392,36 +392,6 @@ void DisplayUI::makeGui()
   }
   frmMain->AddFrame(event_frame, new TGLayoutHints(kLHintsExpandX, 0, 0, 0, 0));
 
-  TGGroupFrame* viewer_frame = new TGGroupFrame(frmMain);
-  viewer_frame->SetTitle("Current Viewer");
-  {
-    TGButton* b = 0;
-    TGHorizontalFrame* hf = new TGHorizontalFrame(viewer_frame);
-    {
-      b = new TGTextButton(hf, "Dark/light colors");
-      b->SetToolTipText("Toggle background color");
-      hf->AddFrame(b, new TGLayoutHints(kLHintsCenterX | kLHintsCenterY, 5, 5, 5, 5));
-      b->Connect("Clicked()", "Belle2::DisplayUI", this, "toggleColorScheme()");
-    }
-    viewer_frame->AddFrame(hf, new TGLayoutHints(kLHintsCenterX | kLHintsCenterY, 0, 0, 0, 0));
-
-    hf = new TGHorizontalFrame(viewer_frame);
-    {
-      b = new TGTextButton(hf, "Save As...");
-      b->SetToolTipText("Save a bitmap graphic");
-      hf->AddFrame(b, new TGLayoutHints(kLHintsCenterX | kLHintsCenterY, 5, 0, 5, 5));
-      b->Connect("Clicked()", "Belle2::DisplayUI", this, "savePicture()");
-
-      b = new TGTextButton(hf, "Save As (High-Res)... ");
-      b->SetToolTipText("Save a bitmap graphic with user-specified size");
-      hf->AddFrame(b, new TGLayoutHints(kLHintsCenterX | kLHintsCenterY, 5, 5, 5, 5));
-      b->Connect("Clicked()", "Belle2::DisplayUI", this, "saveHiResPicture()");
-
-    }
-    viewer_frame->AddFrame(hf, new TGLayoutHints(kLHintsCenterX | kLHintsCenterY, 0, 0, 0, 0));
-  }
-  frmMain->AddFrame(viewer_frame, new TGLayoutHints(kLHintsExpandX, 0, 0, 0, 0));
-
   TGGroupFrame* param_frame = new TGGroupFrame(frmMain);
   param_frame->SetTitle("Options");
   {
@@ -437,8 +407,38 @@ void DisplayUI::makeGui()
   }
   frmMain->AddFrame(param_frame, new TGLayoutHints(kLHintsExpandX, 0, 0, 0, 0));
 
+  TGGroupFrame* viewer_frame = new TGGroupFrame(frmMain);
+  viewer_frame->SetTitle("Viewer");
+  {
+    TGButton* b = 0;
+    TGHorizontalFrame* hf = new TGHorizontalFrame(viewer_frame);
+    {
+      b = new TGTextButton(hf, "Dark/light colors");
+      b->SetToolTipText("Toggle background color");
+      hf->AddFrame(b, new TGLayoutHints(kLHintsCenterX | kLHintsCenterY, 5, 5, 5, 5));
+      b->Connect("Clicked()", "Belle2::DisplayUI", this, "toggleColorScheme()");
+    }
+    viewer_frame->AddFrame(hf, new TGLayoutHints(kLHintsCenterX | kLHintsCenterY, 0, 0, 0, 0));
+
+    hf = new TGHorizontalFrame(viewer_frame);
+    {
+      b = new TGTextButton(hf, "Save As...");
+      b->SetToolTipText("Save a bitmap graphic for the current viewer");
+      hf->AddFrame(b, new TGLayoutHints(kLHintsCenterX | kLHintsCenterY, 5, 0, 5, 5));
+      b->Connect("Clicked()", "Belle2::DisplayUI", this, "savePicture()");
+
+      b = new TGTextButton(hf, "Save As (High-Res)... ");
+      b->SetToolTipText("Save a bitmap graphic for the current viewer with user-specified size");
+      hf->AddFrame(b, new TGLayoutHints(kLHintsCenterX | kLHintsCenterY, 5, 5, 5, 5));
+      b->Connect("Clicked()", "Belle2::DisplayUI", this, "saveHiResPicture()");
+
+    }
+    viewer_frame->AddFrame(hf, new TGLayoutHints(kLHintsCenterX | kLHintsCenterY, 0, 0, 0, 0));
+  }
+  frmMain->AddFrame(viewer_frame, new TGLayoutHints(kLHintsExpandX, 0, 0, 0, 0));
+
   TGGroupFrame* automatisation_frame = new TGGroupFrame(frmMain);
-  automatisation_frame->SetTitle("Automatic Saving");
+  automatisation_frame->SetTitle("Automatic Saving (experimental)");
   {
     TGHorizontalFrame* hf = new TGHorizontalFrame(automatisation_frame);
     {

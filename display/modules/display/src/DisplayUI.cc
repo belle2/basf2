@@ -572,9 +572,9 @@ void DisplayUI::savePicture(bool highres)
   }
 
   if (success) {
-    B2INFO("Saved picture in: " << fi.fFilename)
+    B2INFO("Saved image in: " << fi.fFilename)
   } else {
-    new TGMsgBox(gEve->GetBrowser()->GetClient()->GetDefaultRoot(), gEve->GetBrowser(), "Saving picture failed", TString::Format("Couldn't save to '%s'! Please verify you used an appropriate image file extension in the file name. Check console output for further information.", fi.fFilename));
+    new TGMsgBox(gEve->GetBrowser()->GetClient()->GetDefaultRoot(), gEve->GetBrowser(), "Saving image failed", TString::Format("Couldn't save to '%s'! Please verify you used an appropriate image file extension in the file name. Check console output for further information.", fi.fFilename));
   }
 
   //file dialog leaves empty box, redraw
@@ -608,8 +608,9 @@ void DisplayUI::automaticEvent()
 
     TString projectionName(v->GetName());
     projectionName.ReplaceAll(" viewer", "");
+    projectionName.ReplaceAll("/", "");
     const int width = m_autoPictureWidth->GetIntNumber();
-    glv->SavePictureWidth(TString::Format("%s%d_%s.png", m_autoFileNamePrefix->GetText(), i, projectionName.Data()), width, false); // don't scale pixel objects
+    glv->SavePictureWidth(TString::Format("%s_%s_%d.png", m_autoFileNamePrefix->GetText(), projectionName.Data(), i), width, false); // don't scale pixel objects
   }
 
   i++;

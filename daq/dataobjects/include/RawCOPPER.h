@@ -148,7 +148,10 @@ namespace Belle2 {
     virtual int* GetExpRunBuf(int n);
 
     //! get b2l block from "FEE b2link header"
-    virtual int GetFTSW16bitEventNumber(int n);
+    virtual unsigned int GetFTSW16bitEventNumber(int n);
+
+    //! get b2l block from "FEE b2link header"
+    virtual unsigned int GetTail32bitEventNumber(int n);
 
     //! get Event unixtime from "FEE b2link header"
     double GetEventUnixTime(int n);
@@ -156,14 +159,20 @@ namespace Belle2 {
     //
     // read magic word to check data
     //
-    //! get magic word for the beginning of  COPPER data block
-    unsigned int GetMagic7FFF0008(int n);
+    //! get magic word of  COPPER driver header
+    unsigned int GetMagicDriverHeader(int n);
 
-    //! get magic word in "COPPER header"
-    unsigned int GetMagicFFFFFAFA(int n);
+    //! get magic word of  COPPER FPGA header
+    unsigned int GetMagicFPGAHeader(int n);
 
-    //! get magic word for the end of  COPPER data block
-    unsigned int GetMagic7FFF0009(int n);
+    //! get magic word of  COPPER FPGA trailer
+    unsigned int GetMagicFPGATrailer(int n);
+
+    //! get magic word of  COPPER driver trailer
+    unsigned int GetMagicDriverTrailer(int n);
+
+    //! Check if COPPER Magic words are correct
+    bool CheckCOPPERMagic(int n);
 
 
     //
@@ -238,10 +247,18 @@ namespace Belle2 {
     //
     enum {
       POS_CHKSUM_B2LFEE = 0,
-
       SIZE_B2LFEE_TRAILER = 1
     };
 
+    //
+    // COPPER magic words
+    //
+    enum {
+      COPPER_MAGIC_DRIVER_HEADER = 0x7FFF0008,
+      COPPER_MAGIC_FPGA_HEADER = 0xFFFFFAFA,
+      COPPER_MAGIC_FPGA_TRAILER = 0xFFFFF5F5,
+      COPPER_MAGIC_DRIVER_TRAILER = 0x7FFF0009
+    };
 
 
   protected :

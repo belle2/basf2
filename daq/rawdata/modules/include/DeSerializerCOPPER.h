@@ -76,6 +76,9 @@ namespace Belle2 {
     unsigned int m_ftsweve_upper16bit;
     unsigned int m_prev_ftsweve16;
     unsigned int m_prev_ftsweve32;
+    int m_exp;
+    int m_run;
+
 
 
 

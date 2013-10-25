@@ -9,12 +9,15 @@
 #include <daq/rawdata/modules/DeSerializerCOPPER.h>
 
 #define CHECKEVT 10000
+
+
 //#define CHECK_SUM
 //#define DUMMY
 //#define MAXEVTSIZE 400000000
 //#define TIME_MONITOR
-#define HSLB_DUMMY
+//#define NO_DATA_CHECK
 
+#define TAIL_EVENT32
 
 
 
@@ -38,7 +41,7 @@ DeSerializerCOPPERModule::DeSerializerCOPPERModule() : DeSerializerModule()
   setDescription("Encode DataStore into RingBuffer");
 
   //  setPropertyFlags(c_Input | c_ParallelProcessingCertified);
-  addParam("FinesseBitFlag", finesse_bit_flag, "finesse (A,B,C,D) -> bit (0,1,2,3)", 15);
+  addParam("FinesseBitFlag", finesse_bit_flag, "finnese (A,B,C,D) -> bit (0,1,2,3)", 15);
 
   //Parameter definition
   B2INFO("DeSerializerCOPPER: Constructor done.");
@@ -84,7 +87,8 @@ void DeSerializerCOPPERModule::initialize()
   // Present slots to use
   //
   if (! use_slot) {
-    char temp_char[100] = "Slot is not specified. Exiting...";     print_err.PrintError(temp_char, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+    char err_buf[100] = "Slot is not specified. Exiting...";
+    print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     exit(1);
   } else {
     int slot;
@@ -116,24 +120,23 @@ void DeSerializerCOPPERModule::initialize()
   // Initialize EvtMetaData
   m_eventMetaDataPtr.registerAsPersistent();
 
+
   // Initialize Array of RawCOPPER
 
+  //  rawcprarray.registerPersistent();
   raw_dblkarray.registerPersistent();
-
 
   if (dump_fname.size() > 0) {
     OpenOutputFile();
   }
 
-
-  //   if (m_shmflag != 0) {
-  //     ShmOpen("/cpr_config", "/cpr_status");
-  //     // Status format : status_flag
-  //     m_cfg_buf = ShmGet(m_shmfd_cfg, 4);
-  //     m_cfg_sta = ShmGet(m_shmfd_sta, 4);
-  //     m_cfg_sta[ 0 ] = 0; // Status bit is 0 : not ready
-  //   }
-
+  if (m_shmflag != 0) {
+    ShmOpen("/cpr_config", "/cpr_status");
+    // Status format : status_flag
+    m_cfg_buf = ShmGet(m_shmfd_cfg, 4);
+    m_cfg_sta = ShmGet(m_shmfd_sta, 4);
+    m_cfg_sta[ 0 ] = 0; // Status bit is 0 : not ready
+  }
 
   memset(time_array0, 0, sizeof(time_array0));
   memset(time_array1, 0, sizeof(time_array1));
@@ -142,7 +145,6 @@ void DeSerializerCOPPERModule::initialize()
   memset(time_array4, 0, sizeof(time_array4));
   memset(time_array5, 0, sizeof(time_array5));
 
-  //  OpenCOPPER();
 
   B2INFO("DeSerializerCOPPER: initialize() done.");
 
@@ -154,79 +156,45 @@ void DeSerializerCOPPERModule::initialize()
 void DeSerializerCOPPERModule::FillNewRawCOPPERHeader(RawCOPPER* raw_copper)
 {
 
-  const int num_cprblock = 0; // On COPPER, 1 COPPER block will be stored in a RawCOPPER.
-  RawHeader rawhdr;
-  rawhdr.SetBuffer(raw_copper->GetRawHdrBufPtr(num_cprblock));
+  const int cprblock = 0; // On COPPER, 1 COPPER block will be stored in a RawCOPPER.
 
-  //
   // initialize header(header nwords, magic word) and trailer(magic word)
-  //
+  RawHeader rawhdr;
+  rawhdr.SetBuffer(raw_copper->GetRawHdrBufPtr(cprblock));
   rawhdr.Initialize(); // Fill 2nd( hdr size) and 20th header word( magic word )
 
-  // Set total words info
-  int nwords = raw_copper->GetBlockNwords(num_cprblock);
+  // 1, Set total words info
+  int nwords = raw_copper->GetBlockNwords(cprblock);
   rawhdr.SetNwords(nwords);
 
-  // Obtain run and exp #
-  rawhdr.SetExpRunNumber(raw_copper->GetExpRunBuf(num_cprblock));       // Fill 3rd header word
+  // 2, Set run and exp #
+  rawhdr.SetExpRunNumber(raw_copper->GetExpRunBuf(cprblock));       // Fill 3rd header word
 
-
-  //magic word check
-  if (raw_copper->GetMagic7FFF0008(num_cprblock) != 0x7FFF0008 ||
-      raw_copper->GetMagicFFFFFAFA(num_cprblock) != 0xFFFFFAFA ||
-      raw_copper->GetMagic7FFF0009(num_cprblock) != 0x7FFF0009
-     ) {
-    char err_buf[500];
-    sprintf(err_buf, "Invalid Magic word 0x7FFFF0008=%u 0xFFFFFAFA=%u 0x7FFF0009=%u\n",
-            raw_copper->GetMagic7FFF0008(num_cprblock), raw_copper->GetMagicFFFFFAFA(num_cprblock),
-            raw_copper->GetMagic7FFF0009(num_cprblock));
-
-    print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-    exit(-1);
-  }
-
-
-  //  Obtain eve.# from COPPER header
-  unsigned int cur_ftsw_eve16 = raw_copper->GetFTSW16bitEventNumber(num_cprblock);
+  // 3, Make 32bit event number from B2link FEE header
+#ifdef TAIL_EVENT32
+  unsigned int cur_ftsw_eve32 = raw_copper->GetTail32bitEventNumber(cprblock);
+  unsigned int cur_ftsw_eve16 = cur_ftsw_eve32 & 0xFFFF;
+#else
+  unsigned int cur_ftsw_eve16 = raw_copper->GetFTSW16bitEventNumber(cprblock);
   unsigned int cur_ftsw_eve32 = ((m_ftsweve_upper16bit << 16) & 0xFFFF0000) | (cur_ftsw_eve16 & 0x0000FFFF);
   if (cur_ftsw_eve16 < m_prev_ftsweve16) {
     if (cur_ftsw_eve16 == 0) {
       m_ftsweve_upper16bit++;
       cur_ftsw_eve32 = ((m_ftsweve_upper16bit << 16) & 0xFFFF0000) | (cur_ftsw_eve16 & 0x0000FFFF);
     } else {
+#ifndef NO_DATA_CHECK
       char err_buf[500];
-
-
       sprintf(err_buf, "Invalid 16bit event_number. Exiting...: cur 32bit eve %u preveve %u\n",  cur_ftsw_eve16, m_prev_ftsweve16);
       print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-
-
-      //      exit(-1);
-    }
-  }
-
-  //  printf("Eve ###  32bit %d 16bit %d\n",cur_ftsw_eve32, cur_ftsw_eve16 );
-  rawhdr.SetEveNo(cur_ftsw_eve32);       // Temporarily use COPPER counter   //raw_copper->GetCOPPERCounter()
-
-#ifndef HSLB_DUMMY
-  if (m_prev_ftsweve32 != 0xFFFFFFFF) {
-    if (m_prev_ftsweve32 + 1 != cur_ftsw_eve32) {
-      char err_buf[500];
-      sprintf(err_buf, "Invalid event_number. Exiting...: cur 32bit eve %u preveve %u\n",  cur_ftsw_eve32, m_prev_ftsweve32);
-      print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-      //      exit(-1);
+      exit(-1);
+#endif
     }
   }
 #endif
-  m_prev_ftsweve16 = cur_ftsw_eve16;
-  m_prev_ftsweve32 = cur_ftsw_eve32;
+  rawhdr.SetEveNo(cur_ftsw_eve32);       // Temporarily use COPPER counter   //raw_copper->GetCOPPERCounter()
 
   // Set FTSW word
-  rawhdr.SetFTSW2Words(raw_copper->GetFTSW2Words(num_cprblock));
-
-
-
-  //  rawhdr.SetB2LFEEHdrPart(raw_copper->GetB2LFEEHdr1(), raw_copper->GetB2LFEEHdr2());   // Fill 5th and 6th words
+  rawhdr.SetFTSW2Words(raw_copper->GetFTSW2Words(cprblock));
 
   // Obtain info from SlowController via AddParam or COPPER data
   rawhdr.SetSubsysId(m_nodeid);   // Fill 7th header word
@@ -234,10 +202,10 @@ void DeSerializerCOPPERModule::FillNewRawCOPPERHeader(RawCOPPER* raw_copper)
   rawhdr.SetTruncMask(m_trunc_mask);   // Fill 8th header word
 
   // Offset
-  rawhdr.SetOffset1stFINESSE(raw_copper->GetOffset1stFINESSE(num_cprblock) - raw_copper->GetBufferPos(num_cprblock));          // Fill 9th header word
-  rawhdr.SetOffset2ndFINESSE(raw_copper->GetOffset2ndFINESSE(num_cprblock) - raw_copper->GetBufferPos(num_cprblock));         // Fill 10th header word
-  rawhdr.SetOffset3rdFINESSE(raw_copper->GetOffset3rdFINESSE(num_cprblock) - raw_copper->GetBufferPos(num_cprblock));         // Fill 11th header word
-  rawhdr.SetOffset4thFINESSE(raw_copper->GetOffset4thFINESSE(num_cprblock) - raw_copper->GetBufferPos(num_cprblock));         // Fill 12th header word
+  rawhdr.SetOffset1stFINESSE(raw_copper->GetOffset1stFINESSE(cprblock) - raw_copper->GetBufferPos(cprblock));          // Fill 9th header word
+  rawhdr.SetOffset2ndFINESSE(raw_copper->GetOffset2ndFINESSE(cprblock) - raw_copper->GetBufferPos(cprblock));         // Fill 10th header word
+  rawhdr.SetOffset3rdFINESSE(raw_copper->GetOffset3rdFINESSE(cprblock) - raw_copper->GetBufferPos(cprblock));         // Fill 11th header word
+  rawhdr.SetOffset4thFINESSE(raw_copper->GetOffset4thFINESSE(cprblock) - raw_copper->GetBufferPos(cprblock));         // Fill 12th header word
 
   // Add node-info
   rawhdr.SetMagicWordEntireHeader();
@@ -249,16 +217,38 @@ void DeSerializerCOPPERModule::FillNewRawCOPPERHeader(RawCOPPER* raw_copper)
   // Fill info in Trailer
   //
   RawTrailer rawtrl;
-  rawtrl.SetBuffer(raw_copper->GetRawTrlBufPtr(num_cprblock));
+  rawtrl.SetBuffer(raw_copper->GetRawTrlBufPtr(cprblock));
   rawtrl.Initialize(); // Fill 2nd word : magic word
+  rawtrl.SetChksum(CalcSimpleChecksum(raw_copper->GetBuffer(cprblock),
+                                      raw_copper->GetBlockNwords(cprblock) - rawtrl.GetTrlNwords()));
 
-  //   printf("eve %d check sum 0x%.8x\n", m_prev_ftsweve32 ,
-  //   CalcSimpleChecksum(raw_copper->GetBuffer(num_cprblock),
-  //        raw_copper->GetBlockNwords(num_cprblock) - rawtrl.GetTrlNwords()));
-  rawtrl.SetChksum(CalcSimpleChecksum(raw_copper->GetBuffer(num_cprblock),
-                                      raw_copper->GetBlockNwords(num_cprblock) - rawtrl.GetTrlNwords()));
+  //magic word check
+#ifndef NO_DATA_CHECK
+// 3, magic word check
+  if (!(raw_copper->CheckCOPPERMagic(cprblock))) {
+    char err_buf[500];
+    sprintf(err_buf, "Invalid Magic word 0x7FFFF0008=%u 0xFFFFFAFA=%u 0xFFFFF5F5=%u 0x7FFF0009=%u\n",
+            raw_copper->GetMagicDriverHeader(cprblock),
+            raw_copper->GetMagicFPGAHeader(cprblock),
+            raw_copper->GetMagicFPGATrailer(cprblock),
+            raw_copper->GetMagicDriverTrailer(cprblock));
+    print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+    sleep(12345678);
+    exit(-1);
+  }
 
+  // 3, event # increment check
+  if (m_prev_ftsweve32 + 1 != cur_ftsw_eve32) {
+    char err_buf[500];
+    sprintf(err_buf, "Invalid event_number. Exiting...: cur 32bit eve %u preveve %u\n",  cur_ftsw_eve32, m_prev_ftsweve32);
+    print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+    //      exit(-1);
+  }
+#endif
+  m_prev_ftsweve16 = cur_ftsw_eve16;
+  m_prev_ftsweve32 = cur_ftsw_eve32;
   // Check magic words are set at proper positions
+  return;
 }
 
 
@@ -278,14 +268,17 @@ int* DeSerializerCOPPERModule::ReadOneEventFromCOPPERFIFO(const int entry, int* 
   //
   // Read data from HSLB
   //
-
+  int n = 0;
   int recvd_byte = RawHeader::RAWHEADER_NWORDS * sizeof(int);
   while (1) {
     int read_size = 0;
     if ((read_size = read(cpr_fd, (char*)m_bufary[entry] + recvd_byte, sizeof(int) *  BUF_SIZE_WORD  - recvd_byte)) < 0) {
-      char temp_char[100] = "Failed to read header"; print_err.PrintError(temp_char, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-      continue;
-      //      exit(-1);
+      if (read_size == EINTR) {
+        continue;
+      } else {
+        char err_buf[100] = "Failed to read header"; print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+        exit(-1);
+      }
     } else {
       recvd_byte += read_size;
       if (recvd_byte - RawHeader::RAWHEADER_NWORDS * sizeof(int) > (int)(sizeof(int) * (RawCOPPER::POS_DATA_LENGTH + 1)))break;
@@ -321,21 +314,6 @@ int* DeSerializerCOPPERModule::ReadOneEventFromCOPPERFIFO(const int entry, int* 
     exit(-1);
   }
   m_totbytes +=  recvd_byte - RawHeader::RAWHEADER_NWORDS * sizeof(int);
-
-
-
-#ifdef DEBUG
-  printf("*******BODY**********\n");
-  printf("\n%.8d : ", 0);
-  for (int i = 0; i < *m_size_word; i++) {
-    printf("0x%.8x ", temp_buf[ i ]);
-    if ((i + 1) % 10 == 0) {
-      printf("\n%.8d : ", i + 1);
-    }
-  }
-  printf("\n");
-  printf("\n");
-#endif
 
 #else
   //
@@ -382,19 +360,28 @@ void DeSerializerCOPPERModule::OpenCOPPER()
   // Open a finesse device
   //
   if ((cpr_fd = open("/dev/copper/copper", O_RDONLY)) == -1) {
-    char temp_char[100] = "Failed to open Finesse. Exiting... ";  print_err.PrintError(temp_char, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+    char err_buf[100] = "Failed to open Finesse. Exiting... ";  print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     exit(1);
   }
 
   int set_regval = 4; // How many events to be stored in COPPER FIFO before request for DMA
-  //      int set_regval=1;
+  //    int set_regval=1;
   ioctl(cpr_fd, CPRIOSET_LEF_WA_FF, &set_regval);
   ioctl(cpr_fd, CPRIOSET_LEF_WB_FF, &set_regval);
   ioctl(cpr_fd, CPRIOSET_LEF_WC_FF, &set_regval);
   ioctl(cpr_fd, CPRIOSET_LEF_WD_FF, &set_regval);
-  ioctl(cpr_fd, CPRIOSET_FINESSE_STA, &use_slot, sizeof(use_slot));
+  int ret = ioctl(cpr_fd, CPRIOSET_FINESSE_STA, &use_slot, sizeof(use_slot));
+
+  int v = 511 - 32;
+
+  ioctl(cpr_fd, CPRIOSET_LEF_WA_AF, &v, sizeof(v));
+  ioctl(cpr_fd, CPRIOSET_LEF_WB_AF, &v, sizeof(v));
+  ioctl(cpr_fd, CPRIOSET_LEF_WC_AF, &v, sizeof(v));
+  ioctl(cpr_fd, CPRIOSET_LEF_WD_AF, &v, sizeof(v));
+
+
   B2INFO("DeSerializerCOPPER: OpenCOPPER() done.");
-  return;
+
 }
 
 
@@ -406,8 +393,12 @@ int DeSerializerCOPPERModule::Read(int fd, char* buf, int data_size_byte)
   int read_size = 0;
   while (1) {
     if ((read_size = read(fd, (char*)buf + n, data_size_byte - n)) < 0) {
-      char temp_char[100] = "Failed to read header";   print_err.PrintError(temp_char, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-      exit(-1);
+      if (read_size == EINTR) {
+        continue;
+      } else {
+        char err_buf[100] = "Failed to read header";   print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+        exit(-1);
+      }
     } else {
       n += read_size;
       if (n == data_size_byte)break;
@@ -421,52 +412,46 @@ int DeSerializerCOPPERModule::Read(int fd, char* buf, int data_size_byte)
 
 void DeSerializerCOPPERModule::event()
 {
-  //  B2INFO("Reader() started.");
-  const int num_nodes = 1;
+
 
   if (n_basf2evt < 0) {
 
     B2INFO("DeSerializerCOPPER: event() started.");
-    OpenCOPPER();
     // Use shared memory to start(for HSLB dummy data)
-
     if (m_shmflag != 0) {
       //      int* cfg_buf = ShmGet(m_shmfd_cfg, 4);
-      //      m_cfg_sta[ 0 ] = 1; // Status bit is 0 : not ready
-      //       printf("Waiting for Start...\n");
-      //       fflush(stdout);
-      //       while (1) {
-      //         if (m_cfg_buf[0] == 1)break;
-      //         usleep(10000);
-      //       }
-      printf("Started!\n");
+      m_cfg_sta[ 0 ] = 1; // Status bit is 0 : not ready
+      printf("Waiting for Start...\n");
       fflush(stdout);
+      while (1) {
+        if (m_cfg_buf[0] == 1)break;
+        usleep(10000);
+      }
     }
 
-
+    OpenCOPPER();
     m_start_time = GetTimeSec();
     n_basf2evt = 0;
   }
 
-
+  //  rawcprarray.create();
   raw_dblkarray.create();
-
   RawDataBlock* temp_rawdblk;
-
+  //  RawCOPPER* temp_rawcopper;
   for (int j = 0; j < NUM_EVT_PER_BASF2LOOP; j++) {
     int m_size_word = 0;
     int malloc_flag = 0;
     int* temp_buf = ReadOneEventFromCOPPERFIFO(j, &malloc_flag, &m_size_word);
 
-
-    // Fill RawCOPPER
-    int num_events = 1;
+    const int num_nodes = 1;
+    const int num_events = 1;
     temp_rawdblk =  raw_dblkarray.appendNew();
     temp_rawdblk->SetBuffer(temp_buf, m_size_word, malloc_flag, num_events, num_nodes);
-
     // Fill Header and Trailer
     RawCOPPER temp_rawcopper;
     temp_rawcopper.SetBuffer(temp_buf, m_size_word, 0, num_events, num_nodes);
+
+    // Fill header and trailer
     FillNewRawCOPPERHeader(&temp_rawcopper);
 
     if (dump_fname.size() > 0) {
@@ -474,6 +459,7 @@ void DeSerializerCOPPERModule::event()
     }
     m_totbytes += m_size_word * sizeof(int);
   }
+
 
   //
   // Update EventMetaData
@@ -483,10 +469,14 @@ void DeSerializerCOPPERModule::event()
   m_eventMetaDataPtr->setRun(105);
   m_eventMetaDataPtr->setEvent(n_basf2evt);
 
+
+
+
   //
   // Print current status
   //
   if (n_basf2evt % 100 == 0) {
+    //  if ( ( n_basf2evt - m_prev_nevt ) > monitor_numeve ) {
     double cur_time = GetTimeSec();
     double total_time = cur_time - m_start_time;
     double interval = cur_time - m_prev_time;
@@ -507,7 +497,6 @@ void DeSerializerCOPPERModule::event()
     m_prev_time = cur_time;
     m_prev_totbytes = m_totbytes;
     m_prev_nevt = n_basf2evt;
-    //  printf("Done.\n");fflush(stdout);
   }
 
   n_basf2evt++;

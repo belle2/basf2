@@ -19,6 +19,10 @@
 #define NUM_EVT_PER_BASF2LOOP 50
 #define NUM_PREALLOC_BUF 500
 
+// Magic words
+
+
+
 const int sp8test_run_starttime[93] = {
   -1, 1381029053
   , 1381029116

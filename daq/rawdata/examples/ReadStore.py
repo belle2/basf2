@@ -31,7 +31,7 @@ input = register_module('RootInput')
 
 
 # output
-output = register_module('PrintData')
+output = register_module('PrintDataTemplate')
 
 # Create main path
 main = create_path()

@@ -23,6 +23,8 @@
 //#define TIME_MONITOR
 //#define DEBUG
 
+//#define NO_DATA_CHECK
+
 using namespace std;
 using namespace Belle2;
 
@@ -277,7 +279,7 @@ int* DeSerializerPCModule::RecvData(int* malloc_flag, int* total_buf_nwords, int
       printf("\n");
 
       char err_buf[500];
-      sprintf(err_buf, "Read Header %d %d %d %d\n", i, temp_num_events, temp_num_nodes, send_hdr.GetTotalNwords());
+      sprintf(err_buf, "Too large event : Header %d %d %d %d\n", i, temp_num_events, temp_num_nodes, send_hdr.GetTotalNwords());
       print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
       sleep(123456);
       exit(1);
@@ -361,6 +363,8 @@ void DeSerializerPCModule::event()
   int data_size_ftsw = -1;
 
   unsigned int eve_copper_0 = 0;
+  unsigned int temp_copper_ctr = 0;
+
 
   ClearNumUsedBuf();
 
@@ -370,6 +374,7 @@ void DeSerializerPCModule::event()
     B2INFO("DeSerializerPC: event() started.");
     m_start_time = GetTimeSec();
     n_basf2evt = 0;
+
   }
 
   // Make rawdatablk array
@@ -485,17 +490,37 @@ void DeSerializerPCModule::event()
         eve_ftsw = (rawdatablk.GetBuffer(i))[ 7 ] & 0xFFFF;
         delete temp_rawftsw;
       } else {
+
         //        temp_rawcdc = raw_cdcarray.appendNew();
         RawCDC* temp_rawcdc = new RawCDC;
         temp_rawcdc->SetBuffer((int*)temp_buf + rawdatablk.GetBufferPos(i),
                                rawdatablk.GetBlockNwords(i), 0, 1, 1);
+
+
+        temp_copper_ctr = temp_rawcdc->GetEveNo(0);
+        //  temp_copper_ctr = temp_rawcdc->GetCOPPERCounter( 0 );
+        //  printf("temp_copper_ctr %d %d\n", temp_copper_ctr, m_prev_copper_ctr);
+
+#ifndef NO_DATA_CHECK
+        if (n_basf2evt != 0) {
+          if ((unsigned int)(m_prev_copper_ctr + 1) != temp_copper_ctr) {
+            char err_buf[500];
+            sprintf(err_buf, "Differet COPPER counter : i %d prev 0x%x cur 0x%x : Exiting...\n",
+                    i, m_prev_copper_ctr, temp_rawcdc->GetEveNo(0));
+            //        i, m_prev_copper_ctr, 0 );
+            print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+            sleep(1234567);
+            exit(1);
+          }
+        }
+#endif
         RawTrailer rawtrl;
         rawtrl.SetBuffer(temp_rawcdc->GetRawTrlBufPtr(0));
 
 
 #ifdef DEBUG
         printf("eve %d %d %d %d %d\n",
-               temp_rawcdc->GetEveNo(0),
+               //               temp_rawcdc->GetEveNo(0),
                temp_rawcdc->Get1stDetectorNwords(0),
                temp_rawcdc->Get2ndDetectorNwords(0),
                temp_rawcdc->Get3rdDetectorNwords(0),
@@ -593,10 +618,10 @@ void DeSerializerPCModule::event()
 
     if (eve_copper_1 != 0 && (eve_copper_0 != eve_copper_1)) {
       char err_buf[500];
-      sprintf(err_buf, "Differet Event number c0 %u c1 %u\n", eve_copper_0, eve_copper_1);
+      sprintf(err_buf, "Differet Event number over COPPERS COPPER0 %u COPPER1 %u\n", eve_copper_0, eve_copper_1);
       print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-      //       sleep(1234567);
-      //       exit(-1);
+      sleep(1234567);
+      exit(-1);
     }
 
     if (eve_ftsw != 0 && ((eve_copper_0 & 0xFFFF) != eve_ftsw + (int)event_diff)) {
@@ -604,8 +629,8 @@ void DeSerializerPCModule::event()
       event_diff = (eve_copper_0 & 0xFFFF) - eve_ftsw;
       sprintf(err_buf, "Different Event number c0 %u ftsw %u diff %d\n", (eve_copper_0 & 0xFFFF), eve_ftsw, event_diff);
       print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-      //       sleep(1234567);
-      //       exit(-1);
+      sleep(1234567);
+      exit(-1);
     }
 
 
@@ -617,6 +642,8 @@ void DeSerializerPCModule::event()
 #ifdef TIME_MONITOR
     RecordTime(n_basf2evt * NUM_EVT_PER_BASF2LOOP + j, time_array2);
 #endif
+
+    m_prev_copper_ctr = temp_copper_ctr;
   }
 
 

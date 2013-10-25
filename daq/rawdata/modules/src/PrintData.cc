@@ -296,6 +296,22 @@ void PrintDataModule::event()
   StoreArray<RawKLM> raw_klmarray;
   StoreArray<RawECL> raw_eclarray;
 
+  printf("datablock %d ftsw %d COPPER %d CDC %d\n",
+         raw_datablkarray.getEntries(),
+         raw_ftswarray.getEntries(),
+         rawcprarray.getEntries(),
+         raw_cdcarray.getEntries()
+
+        );
+
+  for (int j = 0; j < raw_datablkarray.getEntries(); j++) {
+    printf("=== RawDataBlock ===\nBlock %d ", j);
+    for (int i = 0; i < raw_datablkarray[ j ]->GetNumEntries(); i++) {
+      PrintEvent(raw_datablkarray[ j ], i);
+    }
+    //     PrintCOPPEREvent(raw_cdcarray[ j ]);
+  }
+
 
   for (int j = 0; j < raw_ftswarray.getEntries(); j++) {
     //    printf("=== RawFTSW event====\nBlock # %d\n", j);
@@ -322,19 +338,14 @@ void PrintDataModule::event()
       }
     }
   }
-
-
 //   for (int j = 0; j < rawcprarray.getEntries(); j++) {
 //     //    printf("=== RawCOPPER event====\nBlock %d ", j);
 //     //  PrintEvent( &rawcprarray );
 //     PrintCOPPEREvent(rawcprarray[ j ]);
 //   }
 
-//   for (int j = 0; j < raw_cdcarray.getEntries(); j++) {
-//     //    printf("=== RawCDC    event====\nBlock %d ", j);
-//     //  PrintCOPPEREvent( &rawcprarray );
-//     PrintCOPPEREvent(raw_cdcarray[ j ]);
-//   }
+
+
 
 //   for (int j = 0; j < raw_svdarray.getEntries(); j++) {
 //     printf("=== RawSVD    event====\nBlock %d ", j);
@@ -363,10 +374,10 @@ void PrintDataModule::event()
 //   }
 
 
-  printf("ftsw %d cdc %d a %d b %d c %d d %d : diffstart %lf ftswtime %lf cdctime %lf : %d %d\n", m_nftsw, m_ncdc, m_fina_nwords, m_finb_nwords, m_finc_nwords, m_find_nwords,
-         m_start_ftsw_time - m_start_cdc_time, m_last_utime_ftsw - m_start_ftsw_time,
-         m_last_utime_cdc - m_start_cdc_time, m_cnt_ftsw_evejump, m_cnt_cdc_evejump
-        );
+//   printf("ftsw %d cdc %d a %d b %d c %d d %d : diffstart %lf ftswtime %lf cdctime %lf : %d %d\n", m_nftsw, m_ncdc, m_fina_nwords, m_finb_nwords, m_finc_nwords, m_find_nwords,
+//          m_start_ftsw_time - m_start_cdc_time, m_last_utime_ftsw - m_start_ftsw_time,
+//          m_last_utime_cdc - m_start_cdc_time, m_cnt_ftsw_evejump, m_cnt_cdc_evejump
+//         );
 
   n_basf2evt++;
 

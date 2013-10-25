@@ -339,32 +339,188 @@ int* RawCOPPER::GetFTSW2Words(int n)
   return &(m_buffer[ pos_nwords ]);
 }
 
-int RawCOPPER::GetFTSW16bitEventNumber(int n)
+unsigned int RawCOPPER::GetFTSW16bitEventNumber(int n)
 {
-  int pos_nwords = GetOffset1stFINESSE(n) + SIZE_B2LHSLB_HEADER + POS_FTSW2;
-  return (m_buffer[ pos_nwords ] & 0x0000FFFF);
+  ErrorMessage print_err;
+  unsigned int eve_num = 0, eve_1st = 12345678, eve_2nd = 12345678, eve_3rd = 12345678, eve_4th = 12345678;
+  int flag = 0, err_flag = 0;
+  int pos_nwords;
+
+
+  if (Get1stFINESSENwords(n) > 0) {
+    pos_nwords = GetOffset1stFINESSE(n) + SIZE_B2LHSLB_HEADER + POS_FTSW2;
+    eve_1st = m_buffer[ pos_nwords ] & 0x0000FFFF;
+    eve_num = eve_1st;
+    flag = 1;
+  }
+
+  if (Get2ndFINESSENwords(n) > 0) {
+    pos_nwords = GetOffset2ndFINESSE(n) + SIZE_B2LHSLB_HEADER + POS_FTSW2;
+    eve_2nd = m_buffer[ pos_nwords ] & 0x0000FFFF;
+    if (flag != 0 && eve_num != eve_2nd) {
+      err_flag = 1;
+    }
+    eve_num = eve_2nd;
+    flag = 1;
+  }
+
+  if (Get3rdFINESSENwords(n) > 0) {
+    pos_nwords = GetOffset3rdFINESSE(n) + SIZE_B2LHSLB_HEADER + POS_FTSW2;
+    eve_3rd = m_buffer[ pos_nwords ] & 0x0000FFFF;
+    if (flag != 0 && eve_num != eve_3rd) {
+      err_flag = 1;
+    }
+    eve_num = eve_3rd;
+    flag = 1;
+  }
+
+  if (Get4thFINESSENwords(n) > 0) {
+    pos_nwords = GetOffset4thFINESSE(n) + SIZE_B2LHSLB_HEADER + POS_FTSW2;
+    eve_4th = m_buffer[ pos_nwords ] & 0x0000FFFF;
+    if (flag != 0 && eve_num != eve_4th) {
+      err_flag = 1;
+    }
+    eve_num = eve_4th;
+    flag = 1;
+  }
+
+  if (flag == 0) {
+    char err_buf[500];
+    sprintf(err_buf, "No HSLB data in COPPER data. Exiting...\n");
+    print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+    sleep(12345678);
+    exit(-1);
+  }
+
+  if (err_flag == 1) {
+    char err_buf[500];
+    sprintf(err_buf, "Different event number over HSLBs : slot A 0x%x : B 0x%x :C 0x%x : D 0x%x\n",
+            eve_1st, eve_2nd, eve_3rd, eve_4th);
+    print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+    sleep(12345678);
+    exit(-1);
+  }
+
+  return eve_num;
 }
 
 
-unsigned int RawCOPPER::GetMagic7FFF0008(int n)
+unsigned int RawCOPPER::GetTail32bitEventNumber(int n)
+{
+  ErrorMessage print_err;
+  unsigned int eve_num = 0, eve_1st = 0x12345678, eve_2nd = 0x12345678, eve_3rd = 0x12345678, eve_4th = 0x12345678;
+  int flag = 0, err_flag = 0;
+  int pos_nwords;
+
+
+  if (Get1stFINESSENwords(n) > 0) {
+    pos_nwords = GetOffset2ndFINESSE(n) - 2;
+    eve_1st = m_buffer[ pos_nwords ];
+    eve_num = eve_1st;
+    flag = 1;
+  }
+
+  if (Get2ndFINESSENwords(n) > 0) {
+    pos_nwords = GetOffset3rdFINESSE(n) - 2;
+    eve_2nd = m_buffer[ pos_nwords ];
+    if (flag != 0 && eve_num != eve_2nd) {
+      err_flag = 1;
+    }
+    eve_num = eve_2nd;
+    flag = 1;
+  }
+
+  if (Get3rdFINESSENwords(n) > 0) {
+    pos_nwords = GetOffset4thFINESSE(n) - 2;
+    eve_3rd = m_buffer[ pos_nwords ];
+    if (flag != 0 && eve_num != eve_3rd) {
+      err_flag = 1;
+    }
+    eve_num = eve_3rd;
+    flag = 1;
+  }
+
+//   if (Get4thFINESSENwords(n) > 0) {
+//     pos_nwords = GetOffset4thFINESSE(n) + SIZE_B2LHSLB_HEADER + POS_FTSW2;
+//     eve_4th = m_buffer[ pos_nwords ] & 0x0000FFFF;
+//     if( flag == 0 && eve_num != eve_4th ){
+//       err_flag = 1;
+//     }
+//     eve_num = eve_4th;
+//     flag = 1;
+//   }
+
+  if (flag == 0) {
+    char err_buf[500];
+    sprintf(err_buf, "No HSLB data in COPPER data. Exiting...\n");
+    print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+    sleep(12345678);
+    exit(-1);
+  }
+
+
+  if (err_flag == 1) {
+    char err_buf[500];
+    sprintf(err_buf, "Different event number over HSLBs : slot A 0x%.8x : B 0x%.8x :C 0x%.8x : D 0x%.8x\n",
+            eve_1st, eve_2nd, eve_3rd, eve_4th);
+    print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+    printf("Tot words %d\n", TotalBufNwords());
+    for (int i = 0; i < TotalBufNwords(); i++) {
+      printf("0x%.8x ", m_buffer[ i ]);
+      if ((i % 10) == 9)printf("\n");
+      fflush(stdout);
+    }
+    sleep(12345678);
+    exit(-1);
+  }
+
+  return eve_num;
+}
+
+
+
+
+unsigned int RawCOPPER::GetMagicDriverHeader(int n)
 {
   RawHeader hdr;
   int pos_nwords = GetBufferPos(n) + hdr.RAWHEADER_NWORDS + POS_MAGIC_COPPER_1;
   return (unsigned int)(m_buffer[ pos_nwords ]);
 }
 
-unsigned int RawCOPPER::GetMagicFFFFFAFA(int n)
+unsigned int RawCOPPER::GetMagicFPGAHeader(int n)
 {
   RawHeader hdr;
   int pos_nwords = GetBufferPos(n) + hdr.RAWHEADER_NWORDS + POS_MAGIC_COPPER_2;
   return (unsigned int)(m_buffer[ pos_nwords ]);
 }
 
-unsigned int RawCOPPER::GetMagic7FFF0009(int n)
+unsigned int RawCOPPER::GetMagicFPGATrailer(int n)
+{
+  RawTrailer trl;
+  int pos_nwords = GetBufferPos(n) + GetBlockNwords(n) - trl.GetTrlNwords() - 3;
+  return (unsigned int)(m_buffer[ pos_nwords ]);
+}
+
+unsigned int RawCOPPER::GetMagicDriverTrailer(int n)
 {
   RawTrailer trl;
   int pos_nwords = GetBufferPos(n) + GetBlockNwords(n) - trl.GetTrlNwords() - 1;
   return (unsigned int)(m_buffer[ pos_nwords ]);
+}
+
+
+bool RawCOPPER::CheckCOPPERMagic(int n)
+{
+  if (GetMagicDriverHeader(n) != COPPER_MAGIC_DRIVER_HEADER) {
+    return false;
+  } else if (GetMagicFPGAHeader(n) != COPPER_MAGIC_FPGA_HEADER) {
+    return false;
+  } else if (GetMagicFPGATrailer(n) != COPPER_MAGIC_FPGA_TRAILER) {
+    return false;
+  } else if (GetMagicDriverTrailer(n) != COPPER_MAGIC_DRIVER_TRAILER) {
+    return false;
+  }
+  return true;
 }
 
 

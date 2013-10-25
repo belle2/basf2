@@ -12,10 +12,8 @@
 // Includes
 #include <stdio.h>
 #include <stdlib.h>
-#include <daq/dataobjects/RawHeader.h>
-#include <daq/dataobjects/RawTrailer.h>
+#include <daq/dataobjects/ErrorMessage.h>
 #include <framework/datastore/DataStore.h>
-
 #include <TObject.h>
 
 namespace Belle2 {

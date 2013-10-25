@@ -26,6 +26,7 @@
 #include <daq/dataflow/EvtSocket.h>
 
 #include <daq/dataobjects/RawDataBlock.h>
+#include <daq/dataobjects/RawCOPPER.h>
 
 #include <sys/socket.h>
 #include <sys/types.h>
@@ -66,6 +67,8 @@ namespace Belle2 {
 
     // Event Meta Data
     StoreObjPtr<EventMetaData> m_eventMetaDataPtr;
+
+    StoreArray<RawCOPPER> rawcprarray;
 
 
     StoreArray<RawDataBlock> raw_datablkarray;     //!  StoreArray

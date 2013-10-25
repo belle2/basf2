@@ -4,7 +4,7 @@ from basf2 import *
 
 # suppress messages and warnings during processing:
 set_log_level(LogLevel.INFO)
-set_random_seed(75628607)
+#set_random_seed(75628607)
 
 evtnumbers = register_module('EvtMetaGen')
 evtnumbers.param('evtNumList', [100])  # we want to process 100 events

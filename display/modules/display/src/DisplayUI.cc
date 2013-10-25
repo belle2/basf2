@@ -568,7 +568,7 @@ void DisplayUI::savePicture(bool highres)
     }
     const int width = t.Atoi();
     B2INFO("Saving bitmap (width: " << width << "px)..."); //may take a while
-    success = v->SavePictureWidth(fi.fFilename, width);
+    success = v->SavePictureWidth(fi.fFilename, width, false); // don't scale pixel objects
   }
 
   if (success) {
@@ -609,7 +609,7 @@ void DisplayUI::automaticEvent()
     TString projectionName(v->GetName());
     projectionName.ReplaceAll(" viewer", "");
     const int width = m_autoPictureWidth->GetIntNumber();
-    glv->SavePictureWidth(TString::Format("%s%d_%s.png", m_autoFileNamePrefix->GetText(), i, projectionName.Data()), width);
+    glv->SavePictureWidth(TString::Format("%s%d_%s.png", m_autoFileNamePrefix->GetText(), i, projectionName.Data()), width, false); // don't scale pixel objects
   }
 
   i++;

@@ -55,6 +55,8 @@ namespace Belle2 {
     //! Module functions to be called from main process
     virtual void initialize();
 
+    virtual void terminate();
+
     //! Module functions to be called from main process
     virtual void event();
 

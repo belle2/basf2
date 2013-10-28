@@ -50,22 +50,11 @@ DeSerializerModule::DeSerializerModule() : Module()
 
 
 
-  //Parameter definition
-  B2INFO("DeSerializer: Constructor done.");
 }
 
 
 DeSerializerModule::~DeSerializerModule()
 {
-  delete[] m_buffer;
-  for (int i = 0 ; i < NUM_EVT_PER_BASF2LOOP; i++) {
-    delete[] m_bufary[i];
-  }
-
-  if (dump_fname.size() > 0) {
-    fclose(fp_dump);
-  }
-
 }
 
 
@@ -77,6 +66,19 @@ void DeSerializerModule::initialize()
     m_bufary[i] = new int[ BUF_SIZE_WORD ];
   }
   m_buffer = new int[ BUF_SIZE_WORD ];
+
+}
+
+void DeSerializerModule::terminate()
+{
+  delete[] m_buffer;
+  for (int i = 0 ; i < NUM_EVT_PER_BASF2LOOP; i++) {
+    delete[] m_bufary[i];
+  }
+
+  if (dump_fname.size() > 0) {
+    fclose(fp_dump);
+  }
 
 }
 

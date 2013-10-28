@@ -50,7 +50,8 @@ namespace Belle2 {
     void setPayloadLength(int length);
     void setHeader();
     void setTriggerNumber(unsigned long int triggerNumber);
-    void addROIraw(ROIrawID roiraw);
+    //    void addROIraw(ROIrawID roiraw);
+    void addROIraw(unsigned long int roiraw);
     void setCRC();
 
     int getPacketLengthByte() {return m_packetLengthByte;};

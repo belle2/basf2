@@ -120,7 +120,8 @@ void ROIPayloadAssemblerModule::event()
       countROIs = 0;
 
     if (countROIs < 32) {
-      payload->addROIraw(*itOrderedROIraw);
+      //      payload->addROIraw(*itOrderedROIraw);
+      payload->addROIraw(itOrderedROIraw->getBigEndian());
       addROI++;
     } else
       B2INFO(" ROI rejected, exceeding the number of ROIs per event (32)");

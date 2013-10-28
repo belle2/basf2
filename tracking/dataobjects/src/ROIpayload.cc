@@ -63,12 +63,13 @@ void ROIpayload::setTriggerNumber(unsigned long int triggerNumber)
 
 };
 
-void ROIpayload::addROIraw(ROIrawID roiraw)
+//void ROIpayload::addROIraw(ROIrawID roiraw)
+void ROIpayload::addROIraw(unsigned long int roiraw)
 {
 
   assert((int*)(m_data64 + m_index) < m_rootdata + m_length);
 
-  m_data64[m_index++] = roiraw.getBigEndian();
+  m_data64[m_index++] = roiraw; //.getBigEndian();
 
 }
 

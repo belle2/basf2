@@ -91,7 +91,8 @@ gearbox.param('fileName', 'testbeam/top/LEPS2013-6/TOP.xml')
 
 # Geometry
 geometry = register_module('Geometry')
-geometry.param('Components', ['TOP', 'TriggerTelescope'])
+geometry.param('Components', ['TOP'])
+# geometry.param('Components', ['TOP', 'TriggerTelescope']) # under development
 
 # Simulation
 simulation = register_module('FullSim')

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- definitions of various setups built from basic elements of TB geometry -->
+
+<setups desc="definitions of various setups">
+  <!-- rotation angles: phi, theta, psi (default=0) -->
+  <!-- translations: x, y, z (default=0) -->
+
+  <LEPStriggerTelescope desc="trigger/tracker used at LEPS beam tests in June-2013">
+    <!-- elements are aligned along z-axis symmetrically to the origin -->
+
+    <element>
+      <type>TriggerS</type>
+      <name>TriggerS1</name>
+      <detectorID>1</detectorID>
+      <z unit="mm">-702.3</z>
+    </element>
+
+    <element>
+      <type>TriggerM</type>
+      <name>TriggerM1</name>
+      <detectorID>2</detectorID>
+      <z unit="mm">-680.3</z>
+    </element>
+
+    <element>
+      <type>SciFi</type>
+      <name>SciFi1x</name>
+      <detectorID>3</detectorID>
+      <z unit="mm">-607.3</z>
+    </element>
+
+    <element>
+      <type>SciFi</type>
+      <name>SciFi1y</name>
+      <detectorID>4</detectorID>
+      <z unit="mm">-587.3</z>
+      <phi unit="deg">90</phi>
+    </element>
+
+    <element>
+      <type>SciFi</type>
+      <name>SciFi2y</name>
+      <detectorID>5</detectorID>
+      <z unit="mm">587.3</z>
+      <phi unit="deg">90</phi>
+    </element>
+
+    <element>
+      <type>SciFi</type>
+      <name>SciFi2x</name>
+      <detectorID>6</detectorID>
+      <z unit="mm">607.3</z>
+    </element>
+
+    <element>
+      <type>TriggerM</type>
+      <name>TriggerM2</name>
+      <detectorID>7</detectorID>
+      <z unit="mm">680.3</z>
+    </element>
+
+    <element>
+      <type>TriggerS</type>
+      <name>TriggerS2</name>
+      <detectorID>8</detectorID>
+      <z unit="mm">702.3</z>
+    </element>
+  </LEPStriggerTelescope>
+
+  <CRTsetup desc="currently empty -> to be constructed by Matt">
+    
+  </CRTsetup>
+
+  </setups>
+
+

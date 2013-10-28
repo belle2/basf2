@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Detector xmlns:xi="http://www.w3.org/2001/XInclude">
-  <Name>TOPCRTtype</Name>
+  <Name>TOPTBtype</Name>
   <Description>focusing i-TOP used in CRT tests</Description>
   <Global>
     <material>Air</material>
@@ -12,6 +12,7 @@
   <!-- Define materials -->
   <xi:include href="../../../geometry/BasicMaterials.xml"/>
   <xi:include href="../../../top/TOP-Materials.xml"/>
+  <xi:include href="Materials.xml"/>
 
   <DetectorComponent name="TOP" xmlns:xi="http://www.w3.org/2001/XInclude">
     <Creator library="top">TOPCreator</Creator>
@@ -27,5 +28,42 @@
 
     </Content>
   </DetectorComponent>
+
+  <DetectorComponent name="TriggerTelescopeExp1" 
+                     xmlns:xi="http://www.w3.org/2001/XInclude">
+    <Creator library="testbeam">TOPTBCreator</Creator>
+    <Content>
+      <experimentType>CFD</experimentType>
+      <experimentNumber>1</experimentNumber>
+      <xi:include href="TBelements.xml"/>
+      <xi:include href="TBsetups.xml"/>
+      <xi:include href="TBplacements.xml"/>
+    </Content>
+  </DetectorComponent>
+
+  <DetectorComponent name="TriggerTelescopeExp2" 
+                     xmlns:xi="http://www.w3.org/2001/XInclude">
+    <Creator library="testbeam">TOPTBCreator</Creator>
+    <Content>
+      <experimentType>CFD</experimentType>
+      <experimentNumber>2</experimentNumber>
+      <xi:include href="TBelements.xml"/>
+      <xi:include href="TBsetups.xml"/>
+      <xi:include href="TBplacements.xml"/>
+    </Content>
+  </DetectorComponent>
+
+  <DetectorComponent name="TriggerTelescopeExp3" 
+                     xmlns:xi="http://www.w3.org/2001/XInclude">
+    <Creator library="testbeam">TOPTBCreator</Creator>
+    <Content>
+      <experimentType>CFD</experimentType>
+      <experimentNumber>3</experimentNumber>
+      <xi:include href="TBelements.xml"/>
+      <xi:include href="TBsetups.xml"/>
+      <xi:include href="TBplacements.xml"/>
+    </Content>
+  </DetectorComponent>
+
 
 </Detector>

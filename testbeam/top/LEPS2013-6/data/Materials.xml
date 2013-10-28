@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<Materials>
+
+  <Material name="PlasticScintillator">
+    <state>Solid</state>
+    <density unit="g/cm3">1.00</density>
+    <Components>
+      <Element fraction="0.15">H</Element>
+      <Element fraction="0.85">O</Element>
+    </Components>
+  </Material>
+
+  <Material name="Aluminum">
+    <state>Solid</state>
+    <density unit="g/cm3">2.70</density>
+    <Components>
+      <Element fraction="1.0">Al</Element>
+    </Components>
+  </Material>
+
+</Materials>

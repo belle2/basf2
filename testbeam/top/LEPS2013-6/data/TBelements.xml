@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- definitions of basic building elements of TB geometry -->
+
+<elements desc="counters, absorbers, supports etc.">
+
+  <TriggerS desc="small trigger scintillator">
+    <creatorName>scintillatorCounter</creatorName>
+    <Material>PlasticScintillator</Material>
+    <width unit="mm">5.0</width>
+    <height unit="mm">5.0</height>
+    <thickness unit="mm">5.0</thickness>
+  </TriggerS>
+
+  <TriggerM desc="large trigger scintillator">
+    <creatorName>scintillatorCounter</creatorName>
+    <Material>PlasticScintillator</Material>
+    <width unit="mm">50.0</width>
+    <height unit="mm">50.0</height>
+    <thickness unit="mm">5.0</thickness>
+  </TriggerM>
+
+  <SciFi desc="scintillating fiber tracker">
+    <creatorName>SciFiTracker</creatorName>
+    <Material desc="empty space material">Air</Material>
+    <fullThickness desc="optional" unit="mm">0</fullThickness>
+    <fibers>
+      <Material>PlasticScintillator</Material>
+      <coatingMaterial>Aluminum</coatingMaterial>
+      <fiberDiameter unit="mm">2</fiberDiameter>
+      <activeDiameter unit="mm">1.8</activeDiameter>
+      <fiberLength unit="mm">100</fiberLength>
+      <numberOfFibers>32</numberOfFibers>
+      <firstFiber desc="z- or z+, default=z-">z-</firstFiber>
+      <row2rowDistance desc="optional" unit="mm">0</row2rowDistance>
+    </fibers>
+    <coverPlate>
+      <Material>Aluminum</Material>
+      <width unit="mm">100</width>
+      <height unit="mm">100</height>
+      <thickness unit="mm">0.5</thickness>
+    </coverPlate>
+  </SciFi>
+
+</elements>
+

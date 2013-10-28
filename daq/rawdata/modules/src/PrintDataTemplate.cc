@@ -156,6 +156,8 @@ void PrintDataTemplateModule::event()
         RawFTSW temp_raw_ftsw;
         temp_raw_ftsw.SetBuffer(temp_buf, nwords, malloc_flag, num_nodes, num_events);
         PrintFTSWEvent(&temp_raw_ftsw, 0);
+      } else if (raw_datablkarray[ i ]->CheckTLUID(j)) {
+        // No operation
       } else {
         // COPPER data block
         printf("\n===== DataBlock( RawDataBlock(COPPER) ) : Block # %d ", i);

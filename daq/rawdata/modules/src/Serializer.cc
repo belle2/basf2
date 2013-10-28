@@ -184,7 +184,8 @@ void SerializerModule::FillSendHeaderTrailer(SendHeader* hdr, SendTrailer* trl,
 
   for (int i = 0; i < rawdblk->GetNumEntries(); i++) {
 
-    if (!(rawdblk->CheckFTSWID(i))) {
+    //copy event # from a top COPPER block
+    if (!(rawdblk->CheckFTSWID(i)) && !(rawdblk->CheckTLUID(i))) {
       RawHeader rawhdr;
       rawhdr.SetBuffer(rawdblk->GetBuffer(i));
       hdr->SetEventNumber(rawhdr.GetEveNo());
@@ -192,12 +193,22 @@ void SerializerModule::FillSendHeaderTrailer(SendHeader* hdr, SendTrailer* trl,
       break;
     }
 
+    //Error if you cannot find any COPPER block
     if (i == (rawdblk->GetNumEntries() - 1)) {
+      printf("i= %d : num entries %d : Tot words %d\n", i , rawdblk->GetNumEntries(), rawdblk->TotalBufNwords());
+      for (int j = 0; j < rawdblk->TotalBufNwords(); j++) {
+        printf("0x%.8x ", (rawdblk->GetBuffer(0))[ j ]);
+        if ((j % 10) == 9)printf("\n");
+        fflush(stdout);
+      }
+
       char err_buf[500] = "No COPPER blocks in RawDataBlock. Exiting...";
       print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
       sleep(1234567);
       exit(-1);
     }
+
+
   }
   return;
 }

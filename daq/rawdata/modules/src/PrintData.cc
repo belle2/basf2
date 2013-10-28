@@ -134,7 +134,8 @@ void PrintDataModule::PrintEvent(RawDataBlock* raw_datablock, int i)
   int size_byte = 0;
 
   size_byte = raw_datablock->GetBlockNwords(i) * sizeof(int);
-  if (!raw_datablock->CheckFTSWID(i)) {
+  if (!(raw_datablock->CheckFTSWID(i)) &&
+      !(raw_datablock->CheckTLUID(i))) {
     RawHeader rawhdr;
     rawhdr.SetBuffer(raw_datablock->GetBuffer(i));
 //     printf("== (size %d) : %d (size %d) : This is a non-FTSW(COPPER)block\nexp %d run %d eve %d copperNode %d type %d\n",

@@ -8,6 +8,8 @@
 
 #include "daq/dataobjects/RawCOPPER.h"
 
+#define NO_DATA_CHECK
+
 using namespace std;
 using namespace Belle2;
 
@@ -392,6 +394,7 @@ unsigned int RawCOPPER::GetFTSW16bitEventNumber(int n)
     exit(-1);
   }
 
+#ifndef NO_DATA_CHECK
   if (err_flag == 1) {
     char err_buf[500];
     sprintf(err_buf, "Different event number over HSLBs : slot A 0x%x : B 0x%x :C 0x%x : D 0x%x\n",
@@ -400,6 +403,7 @@ unsigned int RawCOPPER::GetFTSW16bitEventNumber(int n)
     sleep(12345678);
     exit(-1);
   }
+#endif
 
   return eve_num;
 }
@@ -414,14 +418,16 @@ unsigned int RawCOPPER::GetTail32bitEventNumber(int n)
 
 
   if (Get1stFINESSENwords(n) > 0) {
-    pos_nwords = GetOffset2ndFINESSE(n) - 2;
+    pos_nwords = GetOffset1stFINESSE(n) + SIZE_B2LHSLB_HEADER + POS_FTSW2;
+    //    pos_nwords = GetOffset2ndFINESSE(n) - 2;
     eve_1st = m_buffer[ pos_nwords ];
     eve_num = eve_1st;
     flag = 1;
   }
 
   if (Get2ndFINESSENwords(n) > 0) {
-    pos_nwords = GetOffset3rdFINESSE(n) - 2;
+    pos_nwords = GetOffset2ndFINESSE(n) + SIZE_B2LHSLB_HEADER + POS_FTSW2;
+    //    pos_nwords = GetOffset3rdFINESSE(n) - 2;
     eve_2nd = m_buffer[ pos_nwords ];
     if (flag != 0 && eve_num != eve_2nd) {
       err_flag = 1;
@@ -431,7 +437,8 @@ unsigned int RawCOPPER::GetTail32bitEventNumber(int n)
   }
 
   if (Get3rdFINESSENwords(n) > 0) {
-    pos_nwords = GetOffset4thFINESSE(n) - 2;
+    pos_nwords = GetOffset3rdFINESSE(n) + SIZE_B2LHSLB_HEADER + POS_FTSW2;
+    //    pos_nwords = GetOffset4thFINESSE(n) - 2;
     eve_3rd = m_buffer[ pos_nwords ];
     if (flag != 0 && eve_num != eve_3rd) {
       err_flag = 1;
@@ -440,15 +447,16 @@ unsigned int RawCOPPER::GetTail32bitEventNumber(int n)
     flag = 1;
   }
 
-//   if (Get4thFINESSENwords(n) > 0) {
-//     pos_nwords = GetOffset4thFINESSE(n) + SIZE_B2LHSLB_HEADER + POS_FTSW2;
-//     eve_4th = m_buffer[ pos_nwords ] & 0x0000FFFF;
-//     if( flag == 0 && eve_num != eve_4th ){
-//       err_flag = 1;
-//     }
-//     eve_num = eve_4th;
-//     flag = 1;
-//   }
+  if (Get4thFINESSENwords(n) > 0) {
+    pos_nwords = GetOffset4thFINESSE(n) + SIZE_B2LHSLB_HEADER + POS_FTSW2;
+    //     pos_nwords = GetOffset4thFINESSE(n) + SIZE_B2LHSLB_HEADER + POS_FTSW2;
+    eve_4th = m_buffer[ pos_nwords ];
+    if (flag == 0 && eve_num != eve_4th) {
+      err_flag = 1;
+    }
+    eve_num = eve_4th;
+    flag = 1;
+  }
 
   if (flag == 0) {
     char err_buf[500];
@@ -459,20 +467,20 @@ unsigned int RawCOPPER::GetTail32bitEventNumber(int n)
   }
 
 
-  if (err_flag == 1) {
-    char err_buf[500];
-    sprintf(err_buf, "Different event number over HSLBs : slot A 0x%.8x : B 0x%.8x :C 0x%.8x : D 0x%.8x\n",
-            eve_1st, eve_2nd, eve_3rd, eve_4th);
-    print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-    printf("Tot words %d\n", TotalBufNwords());
-    for (int i = 0; i < TotalBufNwords(); i++) {
-      printf("0x%.8x ", m_buffer[ i ]);
-      if ((i % 10) == 9)printf("\n");
-      fflush(stdout);
-    }
-    sleep(12345678);
-    exit(-1);
-  }
+//   if (err_flag == 1) {
+//     char err_buf[500];
+//     sprintf(err_buf, "Different event number over HSLBs : slot A 0x%.8x : B 0x%.8x :C 0x%.8x : D 0x%.8x\n",
+//             eve_1st, eve_2nd, eve_3rd, eve_4th);
+//     print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+//     printf("Tot words %d\n", TotalBufNwords());
+//     for (int i = 0; i < TotalBufNwords(); i++) {
+//       printf("0x%.8x ", m_buffer[ i ]);
+//       if ((i % 10) == 9)printf("\n");
+//       fflush(stdout);
+//     }
+//     sleep(12345678);
+//     exit(-1);
+//   }
 
   return eve_num;
 }

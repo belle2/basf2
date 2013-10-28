@@ -67,8 +67,16 @@ int RawDataBlock::CheckFTSWID(int n)
   } else {
     return 0;
   }
+}
 
 
+int RawDataBlock::CheckTLUID(int n)
+{
+  if (m_buffer[ GetBufferPos(n) + POS_FTSW_ID ] == 0x544c5520) {
+    return 1;
+  } else {
+    return 0;
+  }
 }
 
 int RawDataBlock::TotalBufNwords()

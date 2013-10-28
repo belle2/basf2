@@ -23,7 +23,7 @@
 //#define TIME_MONITOR
 //#define DEBUG
 
-//#define NO_DATA_CHECK
+#define NO_DATA_CHECK
 
 using namespace std;
 using namespace Belle2;
@@ -137,11 +137,7 @@ int DeSerializerPCModule::Recv(int sock, char* buf, int data_size_byte, int flag
     }
   }
   return n;
-
 }
-
-
-
 
 int DeSerializerPCModule::Connect()
 {
@@ -489,17 +485,14 @@ void DeSerializerPCModule::event()
         data_size_ftsw = rawdatablk.GetBlockNwords(i);
         eve_ftsw = (rawdatablk.GetBuffer(i))[ 7 ] & 0xFFFF;
         delete temp_rawftsw;
+      } else if (rawdatablk.CheckTLUID(i)) {
+        // No operation
       } else {
-
         //        temp_rawcdc = raw_cdcarray.appendNew();
         RawCDC* temp_rawcdc = new RawCDC;
         temp_rawcdc->SetBuffer((int*)temp_buf + rawdatablk.GetBufferPos(i),
                                rawdatablk.GetBlockNwords(i), 0, 1, 1);
-
-
         temp_copper_ctr = temp_rawcdc->GetEveNo(0);
-        //  temp_copper_ctr = temp_rawcdc->GetCOPPERCounter( 0 );
-        //  printf("temp_copper_ctr %d %d\n", temp_copper_ctr, m_prev_copper_ctr);
 
 #ifndef NO_DATA_CHECK
         if (n_basf2evt != 0) {
@@ -509,8 +502,8 @@ void DeSerializerPCModule::event()
                     i, m_prev_copper_ctr, temp_rawcdc->GetEveNo(0));
             //        i, m_prev_copper_ctr, 0 );
             print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-            sleep(1234567);
-            exit(1);
+//             sleep(1234567);
+//             exit(1);
           }
         }
 #endif
@@ -620,8 +613,8 @@ void DeSerializerPCModule::event()
       char err_buf[500];
       sprintf(err_buf, "Differet Event number over COPPERS COPPER0 %u COPPER1 %u\n", eve_copper_0, eve_copper_1);
       print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-      sleep(1234567);
-      exit(-1);
+//       sleep(1234567);
+//       exit(-1);
     }
 
     if (eve_ftsw != 0 && ((eve_copper_0 & 0xFFFF) != eve_ftsw + (int)event_diff)) {
@@ -629,8 +622,8 @@ void DeSerializerPCModule::event()
       event_diff = (eve_copper_0 & 0xFFFF) - eve_ftsw;
       sprintf(err_buf, "Different Event number c0 %u ftsw %u diff %d\n", (eve_copper_0 & 0xFFFF), eve_ftsw, event_diff);
       print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-      sleep(1234567);
-      exit(-1);
+//       sleep(1234567);
+//       exit(-1);
     }
 
 

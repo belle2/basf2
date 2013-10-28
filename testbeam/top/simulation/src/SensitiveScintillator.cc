@@ -33,9 +33,10 @@ using namespace std;
 namespace Belle2 {
   namespace TOPTB {
 
-    SensitiveScintillator::SensitiveScintillator(int detectorID):
+    SensitiveScintillator::SensitiveScintillator(int detectorID, EDetectorType type):
       Simulation::SensitiveDetectorBase("TOP", SensitiveScintillator::Other),
-      m_detectorID(detectorID), m_energyDeposit(0), m_channelID(0), m_trackID(0)
+      m_detectorID(detectorID), m_type(type), m_energyDeposit(0),
+      m_meanTime(0), m_meanX(0), m_meanY(0), m_trackID(0)
     {
       /*
       // registration
@@ -57,50 +58,41 @@ namespace Belle2 {
       G4Track& track = *aStep->GetTrack();
 
       // reset energy deposit if trackID changed
+
       if (m_trackID != track.GetTrackID()) {
         m_trackID = track.GetTrackID();
         m_energyDeposit = 0;
-        m_channelID = track.GetTouchableHandle()->GetReplicaNumber();
+        m_meanTime = 0;
+        m_meanX = 0;
+        m_meanY = 0;
       }
 
-      // update energy deposit (note: unit is MeV)
-      m_energyDeposit += aStep->GetTotalEnergyDeposit();
+      // update energy deposit (note: unit is MeV) and other privates
+
+      double energyLoss = aStep->GetTotalEnergyDeposit();
+      m_energyDeposit += energyLoss;
+      m_meanTime += track.GetGlobalTime() * energyLoss;
+      const G4ThreeVector& position = track.GetPosition();
+      G4ThreeVector localPosition =
+        track.GetTouchableHandle()->GetHistory()->
+        GetTopTransform().TransformPoint(position);
+      m_meanX += localPosition.x() * energyLoss;
+      m_meanY += localPosition.y() * energyLoss;
 
       // save hit if track leaves volume or is killed
+
       if (track.GetNextVolume() != track.GetVolume() ||
           track.GetTrackStatus() >= fStopAndKill) {
         if (m_energyDeposit > 0) {
+          int channelID = 0;
+          if (m_type == c_sciFi)
+            channelID = track.GetTouchableHandle()->GetReplicaNumber();
+          m_meanTime /= m_energyDeposit;
+          m_meanX /= m_energyDeposit;
+          m_meanY /= m_energyDeposit;
 
+          //--> not finished yet!
 
-          //--> test
-          const G4ThreeVector& r = track.GetPosition();
-          G4ThreeVector rl = track.GetTouchableHandle()->GetHistory()->GetTopTransform().TransformPoint(r);
-
-          cout << m_detectorID << " ";
-          cout << m_channelID << " ";
-          cout << m_trackID << " ";
-          cout << " " << r.x();
-          cout << " " << r.y();
-          cout << " " << r.z();
-          cout << " " << rl.x();
-          cout << " " << rl.y();
-          cout << " " << rl.z();
-          cout << endl;
-
-          /*
-          cout << "detector" << m_detectorID;
-          cout << " chID=" << chID;
-          cout << " trackID=" << m_trackID;
-          cout << " energyDeposit=" << m_energyDeposit;
-          cout << " " << r.x();
-          cout << " " << r.y();
-          cout << " " << r.z();
-          cout << " " << rl.x();
-          cout << " " << rl.y();
-          cout << " " << rl.z();
-          cout << endl;
-          */
-          //<-- endtest
         }
 
         m_trackID = 0;

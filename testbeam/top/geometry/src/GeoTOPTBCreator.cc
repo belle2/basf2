@@ -233,6 +233,8 @@ namespace Belle2 {
     }
 
 
+    //------- creator functions for elements of TB geometry ---------------------
+
     G4LogicalVolume* GeoTOPTBCreator::scintillatorCounter(const GearDir& content,
                                                           std::string elementName,
                                                           int detectorID)
@@ -248,7 +250,8 @@ namespace Belle2 {
       G4Material* material = Materials::get(Material);
       G4LogicalVolume* counter = new G4LogicalVolume(box, material, elementName);
 
-      SensitiveScintillator* sensitive = new SensitiveScintillator(detectorID);
+      SensitiveScintillator* sensitive =
+        new SensitiveScintillator(detectorID, SensitiveScintillator::c_scintillator);
       m_sensitiveScintillators.push_back(sensitive);
       counter->SetSensitiveDetector(sensitive);
 
@@ -319,7 +322,8 @@ namespace Belle2 {
                                 0., 2 * M_PI);
       material = Materials::get(fiberMaterial);
       G4LogicalVolume* fiberCore = new G4LogicalVolume(core, material, "fiberCore");
-      SensitiveScintillator* sensitive = new SensitiveScintillator(detectorID);
+      SensitiveScintillator* sensitive =
+        new SensitiveScintillator(detectorID, SensitiveScintillator::c_sciFi);
       m_sensitiveScintillators.push_back(sensitive);
       fiberCore->SetSensitiveDetector(sensitive);
 

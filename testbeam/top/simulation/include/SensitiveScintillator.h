@@ -25,10 +25,16 @@ namespace Belle2 {
     public:
 
       /**
+       * detector type enumerators
+       */
+      enum EDetectorType {c_undefined, c_scintillator, c_sciFi};
+
+      /**
        * Constructor.
        * @param detectorID detector ID
+       * @param type detector type
        */
-      SensitiveScintillator(int detectorID);
+      SensitiveScintillator(int detectorID, EDetectorType type);
 
       /**
        * Process each step and fill simulated hits
@@ -40,8 +46,11 @@ namespace Belle2 {
     protected:
 
       int m_detectorID;       /**< detector ID */
-      double m_energyDeposit; /**< temporay deposited energy */
-      int m_channelID;        /**< temporary channel ID */
+      int m_type;             /**< type of detector */
+      double m_energyDeposit; /**< deposited energy */
+      double m_meanTime;      /**< average time */
+      double m_meanX;         /**< average x coordinate in local frame */
+      double m_meanY;         /**< average y coordinate in local frame */
       int m_trackID;          /**< track id */
 
     };

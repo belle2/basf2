@@ -4,6 +4,8 @@
 import sys
 from basf2 import *
 
+# Do not show INFO messages in module list (actually a problem of the module)
+set_log_level(LogLevel.WARNING)
 
 # Get the list of available modules
 avModList = fw.list_available_modules()

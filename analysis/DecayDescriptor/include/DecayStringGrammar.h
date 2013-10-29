@@ -32,12 +32,12 @@ namespace Belle2 {
     using boost::spirit::repeat;
 
     // Reserved characters for steering
-    reserved = space || '^' || '[' || ']' || '/' || '>' || '|';
+    reserved = space || '^' || '[' || ']' || '>' || ':';
 
     // particle composed of selector, particle name, and user label: "^D_s+/label"
     particle %= -selector >> lexeme[+(char_ - reserved)] >> -label;
     selector = string("^");
-    label %= lit("/") >> lexeme[+(char_ - reserved)];
+    label %= lit(":") >> lexeme[+(char_ - reserved)];
 
     // Arrow types
     arrow %= string("->") | string("-->") | string("=>") | string("==>");

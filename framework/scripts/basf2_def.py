@@ -150,7 +150,7 @@ def nprocess(nproc):
     fw.set_nprocess(nproc)
 
 
-def print_all_modules(moduleList):
+def print_all_modules(moduleList, package=""):
     """
     Loop over the list of available modules,
     register them and print their information
@@ -162,18 +162,26 @@ def print_all_modules(moduleList):
     for (moduleName, sharedLib) in sorted(moduleList.iteritems()):
         try:
             current_module = register_module(moduleName)
-            table.append([moduleName, current_module.description()])
+            if package == "" or current_module.package() == package:
+                table.append([moduleName, current_module.description()])
         except:
             B2ERROR('The module could not be loaded. This is most likely '
                     + 'caused by a library with missing links.')
+    if package != "" and len(table) == 0:
+        B2FATAL('Print module information: No module or package named "'
+                + package + '" found!')
+
+    print term_width * '-'
+    print ''
 
     pretty_print_table(table, [25, '*'], first_row_is_heading=False)
 
     print ''
     print term_width * '-'
     print ''
-    print 'To show detailed information on a module, including its parameters,'
-    print 'type \'basf2 -m ModuleName\'.'
+    print "To show detailed information on a module, including its parameters,"
+    print "type \'basf2 -m ModuleName\'. Use \'basf2 -m package\' to only list"
+    print "modules belonging to a given package."
 
 
 def print_params(module, print_values=True, shared_lib_path=None):

@@ -165,6 +165,12 @@ namespace Belle2 {
     const std::string& getName() const {return m_name;}
 
     /**
+     * Returns the package this module is in.
+     */
+    const std::string& getPackage() const {return m_package;}
+
+
+    /**
      * Returns the description of the module.
      *
      * @return The description of the module as string.
@@ -421,6 +427,7 @@ namespace Belle2 {
     std::list<ModulePtr> getModules() const { return std::list<ModulePtr>(); }
 
     std::string m_name;           /**< The name of the module, saved as a string. */
+    std::string m_package;        /**< Package this module is found in (may be empty). */
     std::string m_description;    /**< The description of the module. */
     unsigned int m_propertyFlags; /**< The properties of the module as bitwise or (with |) of EModulePropFlags. */
 
@@ -553,7 +560,7 @@ namespace Belle2 {
      * The constructor registers the proxy to the ModuleManager.
      * @param moduleName The type name of the module.
      */
-    ModuleProxyBase(const std::string& moduleName);
+    ModuleProxyBase(const std::string& moduleName, const std::string& package);
 
     /**
      * The destructor of the ModuleProxyBase class.
@@ -577,6 +584,7 @@ namespace Belle2 {
   protected:
 
     std::string m_moduleName; /**< The type name of the module. (without trailing "Module") */
+    std::string m_package; /**< Package this module is found in (may be empty). */
   };
 
 
@@ -596,7 +604,7 @@ namespace Belle2 {
      * Calls the constructor of the base class.
      * @param moduleName The type name of the module.
      */
-    ModuleProxy(const std::string& moduleName) : ModuleProxyBase(moduleName) {};
+    ModuleProxy(const std::string& moduleName, const std::string& package = "") : ModuleProxyBase(moduleName, package) {};
 
     /**
      * The destructor of the ModuleProxy class.
@@ -611,6 +619,7 @@ namespace Belle2 {
     ModulePtr createModule() const {
       ModulePtr nm(new T());
       nm->m_name = m_moduleName;
+      nm->m_package = m_package;
       return nm;
     }
   };
@@ -619,7 +628,11 @@ namespace Belle2 {
   //------------------------------------------------------
   //             Define convenient macros
   //------------------------------------------------------
+#ifdef _PACKAGE_
+#define REG_MODULE(moduleName) ModuleProxy<moduleName##Module> regProxy##moduleName(#moduleName, _PACKAGE_);
+#else
 #define REG_MODULE(moduleName) ModuleProxy<moduleName##Module> regProxy##moduleName(#moduleName);
+#endif
 
   //-------------------------------
 

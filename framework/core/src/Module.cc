@@ -235,6 +235,7 @@ void Module::exposePythonAPI()
   .def("name", &Module::getName, return_value_policy<copy_const_reference>())
   .def("set_name", &Module::setModuleName)
   .def("description", &Module::getDescription, return_value_policy<copy_const_reference>())
+  .def("package", &Module::getPackage, return_value_policy<copy_const_reference>())
   .def("if_value", &Module::if_value, if_value_overloads())
   .def("if_false", &Module::if_false, if_false_overloads())
   .def("param", &Module::setParamObject)
@@ -266,7 +267,7 @@ void Module::exposePythonAPI()
 //                          ModuleProxyBase
 //=====================================================================
 
-ModuleProxyBase::ModuleProxyBase(const std::string& moduleName) : m_moduleName(moduleName)
+ModuleProxyBase::ModuleProxyBase(const std::string& moduleName, const std::string& package) : m_moduleName(moduleName), m_package(package)
 {
   ModuleManager::Instance().registerModuleProxy(this);
 }

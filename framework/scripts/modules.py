@@ -18,6 +18,9 @@ if len(sys.argv) == 2:
         except:
             B2FATAL('The module could not be loaded. This is most likely '
                     + 'caused by a library with missing links.')
+    elif modName == modName.lower():
+        # lower case? might be a package instead
+        print_all_modules(avModList, modName)
     else:
         B2FATAL('Print module information: A module with the name "'
                 + modName + '" does not exist!')

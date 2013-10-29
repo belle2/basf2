@@ -128,7 +128,7 @@ int main(int argc, char* argv[])
     ("help,h", "print all available options")
     ("version,v", "print version string")
     ("info", "print information about basf2")
-    ("modules,m", prog::value<string>()->implicit_value(""), "print a list of all available modules; or give detailed information on a specific module given as an argument (case sensitive)")
+    ("modules,m", prog::value<string>()->implicit_value(""), "print a list of all available modules (can be limited to a given package), or give detailed information on a specific module given as an argument (case sensitive).")
     ;
 
     // Declare a group of options that will be

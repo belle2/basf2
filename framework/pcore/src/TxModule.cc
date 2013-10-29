@@ -60,8 +60,8 @@ void TxModule::beginRun()
 
 void TxModule::event()
 {
-  // Stream DataStore in EvtMessage
-  EvtMessage* msg = m_streamer->streamDataStore(DataStore::c_Event);
+  // Stream DataStore in EvtMessage, also stream transient objects
+  EvtMessage* msg = m_streamer->streamDataStore(DataStore::c_Event, true);
 
   // Put the message in ring buffer
   for (;;) {

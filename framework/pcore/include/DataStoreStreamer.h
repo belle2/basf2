@@ -43,7 +43,7 @@ namespace Belle2 {
      *  @return pointer to EvtMessage, caller is responsible for deletion
      *
      */
-    EvtMessage* streamDataStore(DataStore::EDurability durability, bool streamTransientObjects = true);
+    EvtMessage* streamDataStore(DataStore::EDurability durability, bool streamTransientObjects = false);
 
     // EvtMessage->DataStore
     /** Restore DataStore objects from EvtMessage

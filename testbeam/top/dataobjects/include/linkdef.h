@@ -5,7 +5,8 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
-#pragma link C++ class Belle2::TOPCRTDigit;
+#pragma link C++ class Belle2::TOPTBSimHit;
+#pragma link C++ class Belle2::TOPTBDigit;
 #pragma link C++ class Belle2::TOPWaveform;
 
 #endif

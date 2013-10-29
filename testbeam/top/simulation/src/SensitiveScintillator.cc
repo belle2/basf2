@@ -25,6 +25,9 @@
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Unit.h>
 
+#include <testbeam/top/dataobjects/TOPTBSimHit.h>
+
+
 #include <TVector3.h>
 #include <cmath>
 
@@ -36,19 +39,17 @@ namespace Belle2 {
     SensitiveScintillator::SensitiveScintillator(int detectorID, EDetectorType type):
       Simulation::SensitiveDetectorBase("TOP", SensitiveScintillator::Other),
       m_detectorID(detectorID), m_type(type), m_energyDeposit(0),
-      m_meanTime(0), m_meanX(0), m_meanY(0), m_trackID(0)
+      m_meanTime(0), m_meanX(0), m_meanY(0), m_meanZ(0), m_trackID(0)
     {
-      /*
       // registration
-      StoreArray<TOPBarHit>::registerPersistent();
-      RelationArray::registerPersistent<MCParticle, TOPBarHit>();
+      StoreArray<TOPTBSimHit>::registerPersistent();
+      RelationArray::registerPersistent<MCParticle, TOPTBSimHit>();
 
       // additional registration of MCParticle relation (required for correct relations)
       StoreArray<MCParticle> particles;
-      StoreArray<TOPBarHit>  barhits;
-      RelationArray  relation(particles, barhits);
+      StoreArray<TOPTBSimHit>  hits;
+      RelationArray  relation(particles, hits);
       registerMCParticleRelation(relation, RelationArray::c_deleteElement);
-      */
     }
 
 
@@ -65,22 +66,27 @@ namespace Belle2 {
         m_meanTime = 0;
         m_meanX = 0;
         m_meanY = 0;
+        m_meanZ = 0;
       }
 
-      // update energy deposit (note: unit is MeV) and other privates
+      // update energy deposit (note: unit is MeV)
 
       double energyLoss = aStep->GetTotalEnergyDeposit();
       m_energyDeposit += energyLoss;
-      m_meanTime += track.GetGlobalTime() * energyLoss;
-      const G4ThreeVector& position = track.GetPosition();
+      double time = track.GetGlobalTime() - 0.5 * aStep->GetDeltaTime();
+      m_meanTime += (time * energyLoss);
+      const G4ThreeVector& position = track.GetPosition() -
+                                      0.5 * aStep->GetDeltaPosition();
       G4ThreeVector localPosition =
         track.GetTouchableHandle()->GetHistory()->
         GetTopTransform().TransformPoint(position);
-      m_meanX += localPosition.x() * energyLoss;
-      m_meanY += localPosition.y() * energyLoss;
+      m_meanX += (localPosition.x() * Unit::mm * energyLoss);
+      m_meanY += (localPosition.y() * Unit::mm * energyLoss);
+      m_meanZ += (localPosition.z() * Unit::mm * energyLoss);
 
-      // save hit if track leaves volume or is killed
+      // save hit if track leaves volume or is killed and energy deposit is > 0
 
+      bool detected = false;
       if (track.GetNextVolume() != track.GetVolume() ||
           track.GetTrackStatus() >= fStopAndKill) {
         if (m_energyDeposit > 0) {
@@ -90,17 +96,30 @@ namespace Belle2 {
           m_meanTime /= m_energyDeposit;
           m_meanX /= m_energyDeposit;
           m_meanY /= m_energyDeposit;
+          m_meanZ /= m_energyDeposit;
 
-          //--> not finished yet!
-
+          StoreArray<TOPTBSimHit> hits;
+          if (!hits.isValid()) hits.create();
+          new(hits.nextFreeAddress()) TOPTBSimHit(m_detectorID,
+                                                  m_type,
+                                                  channelID,
+                                                  m_energyDeposit,
+                                                  m_meanTime,
+                                                  m_meanX,
+                                                  m_meanY,
+                                                  m_meanZ);
+          StoreArray<MCParticle> particles;
+          RelationArray relation(particles, hits);
+          int lastHit = hits.getEntries() - 1;
+          relation.add(m_trackID, lastHit);
+          detected = true;
         }
 
         m_trackID = 0;
       }
 
-      return true;
+      return detected;
     }
-
 
   } // end of namespace TOPTB
 } // end of namespace Belle2

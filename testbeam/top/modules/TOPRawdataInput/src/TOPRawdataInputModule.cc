@@ -27,7 +27,7 @@
 // DataStore classes
 #include <framework/dataobjects/EventMetaData.h>
 #include <top/dataobjects/TOPDigit.h>
-#include <testbeam/top/dataobjects/TOPCRTDigit.h>
+#include <testbeam/top/dataobjects/TOPTBDigit.h>
 #include <testbeam/top/dataobjects/TOPWaveform.h>
 
 
@@ -84,7 +84,7 @@ namespace Belle2 {
     // data store objects registration
     StoreObjPtr<EventMetaData>::registerPersistent();
     StoreArray<TOPDigit>::registerPersistent();
-    StoreArray<TOPCRTDigit>::registerPersistent();
+    StoreArray<TOPTBDigit>::registerPersistent();
     StoreArray<TOPWaveform>::registerPersistent();
 
   }
@@ -102,8 +102,8 @@ namespace Belle2 {
     evtMetaData.create();
     StoreArray<TOPDigit> digits;
     digits.create();
-    StoreArray<TOPCRTDigit> crtDigits;
-    crtDigits.create();
+    StoreArray<TOPTBDigit> tbDigits;
+    tbDigits.create();
     StoreArray<TOPWaveform> waveforms;
     waveforms.create();
 

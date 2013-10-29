@@ -12,7 +12,7 @@
 #define TOPSENSITIVESCINTILLATOR_H
 
 #include <simulation/kernel/SensitiveDetectorBase.h>
-
+#include <testbeam/top/geometry/DetectorTypes.h>
 
 namespace Belle2 {
   namespace TOPTB {
@@ -23,11 +23,6 @@ namespace Belle2 {
     class SensitiveScintillator : public Simulation::SensitiveDetectorBase {
 
     public:
-
-      /**
-       * detector type enumerators
-       */
-      enum EDetectorType {c_undefined, c_scintillator, c_sciFi};
 
       /**
        * Constructor.
@@ -51,6 +46,7 @@ namespace Belle2 {
       double m_meanTime;      /**< average time */
       double m_meanX;         /**< average x coordinate in local frame */
       double m_meanY;         /**< average y coordinate in local frame */
+      double m_meanZ;         /**< average z coordinate in local frame */
       int m_trackID;          /**< track id */
 
     };

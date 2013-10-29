@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef TOPCRTDIGIT_H
-#define TOPCRTDIGIT_H
+#ifndef TOPTBDIGIT_H
+#define TOPTBDIGIT_H
 
 #include <framework/datastore/RelationsObject.h>
 
@@ -21,14 +21,15 @@ namespace Belle2 {
   /**
    * Class to store beam test data for any counter other than TOP
    */
-  class TOPCRTDigit : public RelationsObject {
+  class TOPTBDigit : public RelationsObject {
   public:
 
     /**
      * Default constructor
      */
-    TOPCRTDigit():
+    TOPTBDigit():
       m_counterID(0),
+      m_type(0),
       m_channelID(0),
       m_hardChannelID(0),
       m_TDC(0),
@@ -37,13 +38,16 @@ namespace Belle2 {
 
     /** Full constructor
      * @param counterID counter ID
+     * @param type counter type
      * @param channelID software channel ID
-     * @param hardchID  hardware channel ID
      * @param TDC       digitized time
      * @param ADC       digitized pulse hight or charge
+     * @param hardchID  hardware channel ID
      */
-    TOPCRTDigit(int counterID, int channelID, unsigned hardchID, int TDC, int ADC):
+    TOPTBDigit(int counterID, int type, int channelID, int TDC, int ADC,
+               unsigned hardchID = 0):
       m_counterID(counterID),
+      m_type(type),
       m_channelID(channelID),
       m_hardChannelID(hardchID),
       m_TDC(TDC),
@@ -54,6 +58,11 @@ namespace Belle2 {
      * @return counter ID
      */
     int getCounterID() const { return m_counterID; }
+
+    /** Get counter type
+    * @return counter type
+    */
+    int getType() const { return m_type;}
 
     /** Get software channel ID
      * @return channel ID
@@ -77,12 +86,13 @@ namespace Belle2 {
 
   private:
     int m_counterID;          /**< counter ID */
+    int m_type;               /**< counter type */
     int m_channelID;          /**< software channel ID */
     unsigned m_hardChannelID; /**< hardware channel ID */
     int m_TDC;                /**< digitized time */
     int m_ADC;                /**< digitized pulse hight or charge */
 
-    ClassDef(TOPCRTDigit, 1); /**< ClassDef */
+    ClassDef(TOPTBDigit, 1); /**< ClassDef */
 
   };
 

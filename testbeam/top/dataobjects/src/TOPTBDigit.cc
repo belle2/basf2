@@ -8,12 +8,12 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <testbeam/top/dataobjects/TOPCRTDigit.h>
+#include <testbeam/top/dataobjects/TOPTBDigit.h>
 
 using namespace std;
 using namespace Belle2;
 
-ClassImp(TOPCRTDigit)
+ClassImp(TOPTBDigit)
 
 
 

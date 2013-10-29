@@ -9,7 +9,9 @@
  **************************************************************************/
 
 #include <testbeam/top/geometry/GeoTOPTBCreator.h>
+#include <testbeam/top/geometry/DetectorTypes.h>
 #include <testbeam/top/simulation/SensitiveScintillator.h>
+
 
 #include <geometry/Materials.h>
 #include <geometry/CreatorFactory.h>
@@ -241,6 +243,8 @@ namespace Belle2 {
     {
       if (!content) return NULL;
 
+      EDetectorType detectorType = c_scintillator;
+
       std::string Material = content.getString("Material");
       double width = content.getLength("width") / Unit::mm;
       double height = content.getLength("height") / Unit::mm;
@@ -251,7 +255,7 @@ namespace Belle2 {
       G4LogicalVolume* counter = new G4LogicalVolume(box, material, elementName);
 
       SensitiveScintillator* sensitive =
-        new SensitiveScintillator(detectorID, SensitiveScintillator::c_scintillator);
+        new SensitiveScintillator(detectorID, detectorType);
       m_sensitiveScintillators.push_back(sensitive);
       counter->SetSensitiveDetector(sensitive);
 
@@ -265,6 +269,8 @@ namespace Belle2 {
                                                    int detectorID)
     {
       if (!content) return NULL;
+
+      EDetectorType detectorType = c_sciFi;
 
       // get data from DB
       std::string emptySpaceMaterial = content.getString("Material");
@@ -323,7 +329,7 @@ namespace Belle2 {
       material = Materials::get(fiberMaterial);
       G4LogicalVolume* fiberCore = new G4LogicalVolume(core, material, "fiberCore");
       SensitiveScintillator* sensitive =
-        new SensitiveScintillator(detectorID, SensitiveScintillator::c_sciFi);
+        new SensitiveScintillator(detectorID, detectorType);
       m_sensitiveScintillators.push_back(sensitive);
       fiberCore->SetSensitiveDetector(sensitive);
 

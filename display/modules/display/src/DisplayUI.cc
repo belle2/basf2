@@ -578,7 +578,7 @@ void DisplayUI::savePicture(bool highres)
   }
 
   //file dialog leaves empty box, redraw
-  gEve->Redraw3D(false); //do not reset camera when redrawing
+  gEve->FullRedraw3D(false); //do not reset camera when redrawing
 }
 
 void DisplayUI::startAutomaticRun()

@@ -41,15 +41,15 @@ ntuple1.param('strTools', [
     'RecoStats',
     'B0',
     'Kinematics',
-    '^B0 -> [^K*0->^K+ ^pi-] ^gamma',
+    '^B0 -> [^K*0 -> ^K+ ^pi-] ^gamma',
     'MCTruth',
-    'B0 -> [K*0->^K+ ^pi-] ^gamma',
+    'B0 -> [K*0 -> ^K+ ^pi-] ^gamma',
     'DeltaEMbc',
-    '^B0 -> [K*0->K+ pi-] gamma',
+    '^B0 -> [K*0 -> K+ pi-] gamma',
     'MCHierarchy',
-    'B0 -> [K*0->^K+ ^pi-] ^gamma',
+    'B0 -> [K*0 -> ^K+ ^pi-] ^gamma',
     'PID',
-    'B0 -> [K*0->^K+ ^pi-] gamma',
+    'B0 -> [K*0 -> ^K+ ^pi-] gamma',
     ])
     # exp_no, run_no, evt_no
 main.add_module(ntuple1)

@@ -23,25 +23,10 @@ evtgeninput.param('boost2LAB', True)
 main.add_module(evtgeninput)
 
 # detector simulation,  digitisers and clusterisers
-components = [
-    'MagneticField',
-    'BeamPipe',
-    'PXD',
-    'SVD',
-    'CDC',
-    'TOP',
-    'ECL',
-    'ARICH',
-    'BKLM',
-    'EKLM',
-    'ESTR',
-    'Coil',
-    'STR',
-    ]
-add_simulation(main, components)
+add_simulation(main)
 
 # reconstruction
-add_reconstruction(main, components)
+add_reconstruction(main)
 
 # dst output
 output = register_module('RootOutput')

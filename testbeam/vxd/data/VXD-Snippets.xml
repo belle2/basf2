@@ -2,19 +2,19 @@
 	
 	<Snippet name="SupportBox">
 		<Color>#006699</Color>
-		<Material>ColdAir</Material>
+		<Material>Air</Material>
 		<Shape>Box</Shape>
 		
-		<DX unit="mm">0.0</DX>
+		<DX unit="mm">0</DX>
 		<DY unit="mm">0.0</DY>
 		<DZ unit="mm">0</DZ>
 		<Theta unit="deg">0</Theta>
 		<Phi unit="deg">0</Phi>
 		<Psi unit="deg">0</Psi>		  
 		
-		<HalfX unit="mm">110.4</HalfX>
-		<HalfY unit="mm">30.4</HalfY>
-		<HalfZ unit="mm">65.4</HalfZ>		
+		<HalfX unit="mm">130</HalfX>
+		<HalfY unit="mm">120</HalfY>
+		<HalfZ unit="mm">100</HalfZ>		
 		<!--Volume>
 			<Name>SupportBoxShell</Name>
 			<Color>#006699</Color>
@@ -39,12 +39,12 @@
 	</Snippet>
 	
 	<Snippet name="PXD_module">
-		<Material>ColdAir</Material>
+		<Material>Air</Material>
 		<Visible>false</Visible>
 		<Shape>Box</Shape>
 		
 		
-		<DY unit="mm">0</DY>
+		<DY unit="mm">-6.250</DY>
 		<DZ unit="mm">0</DZ>
 		<Theta unit="deg">90</Theta>
 		<Phi unit="deg">90</Phi>
@@ -57,11 +57,11 @@
 	</Snippet>
 	<Snippet name="SVD_module">
 		<Visible>false</Visible>			 
-		<Material>ColdAir</Material>
+		<Material>Air</Material>
 		<Shape>Box</Shape>
 		
 		
-		<DY unit="mm">0</DY>
+		<DY unit="mm">-28.860</DY>
 		<DZ unit="mm">0</DZ>
 		<Theta unit="deg">90</Theta>
 		<Phi unit="deg">90</Phi>
@@ -147,6 +147,58 @@
 	
 	
 	<Snippet name="Magnet">
+
+<Volume>
+		<Name>Al_Scatterer</Name>
+		<Color>#006699</Color>
+		<Material>G4_Al</Material>
+		<Shape>Box</Shape>
+		
+		<DX unit="mm">750</DX>
+		<DY unit="mm">0</DY>
+		<DZ unit="mm">0</DZ>
+		<Theta unit="deg">0</Theta>
+		<Phi unit="deg">0</Phi>
+		<Psi unit="deg">0</Psi>
+		
+		<HalfX unit="cm">0.2</HalfX>
+		<HalfY unit="cm">4</HalfY>
+		<HalfZ unit="cm">4</HalfZ>
+</Volume>
+
+<!--Volume>
+		<Name>Al_Scatterer</Name>
+		<Color>#006699</Color>
+		<Material>G4_Al</Material>
+		<Shape>Box</Shape>
+		
+		<DX unit="mm">590</DX>
+		<DY unit="mm">0</DY>
+		<DZ unit="mm">0</DZ>
+		<Theta unit="deg">0</Theta>
+		<Phi unit="deg">0</Phi>
+		<Psi unit="deg">0</Psi>
+		
+		<HalfX unit="cm">2.21</HalfX>
+		<HalfY unit="cm">4</HalfY>
+		<HalfZ unit="cm">4</HalfZ>
+</Volume-->
+		<Volume>
+			<Material>Air</Material>
+			<Name>Magnet</Name>
+			<Color>#010101</Color>
+			<Shape>Tube</Shape>
+			<DZ unit="cm">0</DZ>	  
+			<DX unit="cm">0</DX>
+			<DY unit="um">0</DY>
+			<Theta unit="deg">0</Theta>
+			<Phi unit="deg">0</Phi>
+			<Psi unit="deg">0</Psi>
+			
+			<InnerRadius unit="mm">400.0</InnerRadius>
+			<OuterRadius unit="mm">590.0</OuterRadius>
+			<Hz unit="cm">80</Hz>
+		
 		<Volume>
 			<Material>G4_Al</Material>
 			<Name>Magnet_Inner_Wall</Name>
@@ -259,7 +311,73 @@
 			<OuterRadius unit="mm">543.8</OuterRadius>
 			<Hz unit="cm">78</Hz>
 		</Volume>					
-	
+	</Volume>
 	</Snippet>	
+
+
+	<Snippet name="PXD_sensor2">
+		<Color>#006699</Color>
+		<Material>Si</Material>
+		<Shape>Box</Shape>
+		
+		<DX unit="mm">0</DX>
+		<DY unit="mm">0</DY>
+		<DZ unit="mm">0</DZ>
+		<Theta unit="deg">0</Theta>
+		<Phi unit="deg">0</Phi>
+		<Psi unit="deg">0</Psi>
+		
+    		<HalfX unit="mm">5.2992</HalfX>
+    		<HalfY unit="mm">10.5984</HalfY>
+		<HalfZ unit="um">25.0</HalfZ>
+		
+	</Snippet>
+	<Snippet name="PXD_module2">
+		<Visible>false</Visible>			 
+		<Material>Air</Material>
+		<Shape>Box</Shape>
+		
+		
+		<DY unit="mm">-10.650</DY>
+		<!--DY unit="mm">0.0</DY-->
+
+		<DZ unit="mm">0</DZ>
+		<Theta unit="deg">90</Theta>
+		<Phi unit="deg">90</Phi>
+		<Psi unit="deg">-90</Psi>
+		
+		<HalfX unit="mm">65.00</HalfX>
+		<HalfY unit="mm">30.00</HalfY>
+		<HalfZ unit="mm">10</HalfZ>
+		
+	</Snippet>
+
+
+	<Snippet name="PXD_active2">
+		<DetectorType>PXD</DetectorType>
+		
+		<stepSize unit="um">5</stepSize>
+		<!-- define the number of pixels in rphi direction -->
+		<pixelsR>576</pixelsR>
+		<!-- define the number of pixels in z direction. There are two values since we have two different pixel sizes inside of one module: Larger pixels in the outer area, smaller pixels in the middle -->
+		<pixelsZ>1152</pixelsZ>
+		<pixelsZ>0</pixelsZ>
+		<!-- splitLength defines the position inside the active area (starting at the outside) where the pixel size changes. Pixel size is calculated automatically from the size of the active area and the number of pixels -->
+		<splitLength unit="mm">0.0</splitLength>
+		<!-- Parameters describing the physical attributes of the sensor needed for digitization. The voltages might be time dependent and than should be placed somewhere else -->
+		<BulkDoping unit="1/um^3">10.0</BulkDoping>
+		<BackVoltage unit="V">-60.0</BackVoltage>
+		<TopVoltage unit="V">0.0</TopVoltage>
+		<SourceBorder unit="um">3.0</SourceBorder>
+		<ClearBorder unit="um">8.0</ClearBorder>
+		<DrainBorder unit="um">8.0</DrainBorder>
+		<GateDepth unit="um">22</GateDepth>
+		<DoublePixel>true</DoublePixel>
+		<!-- Define the integration window to be 20us. This probably should go somewhere else -->
+		<IntegrationStart unit="us">-10.0</IntegrationStart>
+		<IntegrationEnd   unit="us"> 10.0</IntegrationEnd>				 
+	</Snippet>
+	
+
 	
 </Snippets>

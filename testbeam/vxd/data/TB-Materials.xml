@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Materials>
-
+  <Material name="PMMA">
+    <state>Solid</state>
+    <density unit="g/cm3">1.18</density>
+    <Components>
+      <Element fraction="0.0805">H</Element>
+      <Element fraction="0.6">C</Element>
+      <Element fraction="0.3195">O</Element>
+    </Components>
+  </Material>
 
 </Materials>

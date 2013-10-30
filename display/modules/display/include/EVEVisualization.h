@@ -309,7 +309,7 @@ namespace Belle2 {
     /** The global magnetic field. */
     EveVisBField m_bfield;
 
-    /* List of shown recohits (PXDCluster, SVDCluster, CDCHit). */
+    /** List of shown recohits (PXDCluster, SVDCluster, CDCHit). */
     std::set<const TObject*> m_shownRecohits;
 
     /** Unassigned recohits. */

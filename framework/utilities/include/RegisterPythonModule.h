@@ -15,12 +15,28 @@
 namespace Belle2 {
   /** Proxy class to register python modules (the things you can 'import').
    *
+   * \sa REGISTER_PYTHON_MODULE
+   * \sa REGISTER_PYTHON_MODULE_AUTOIMPORT
+   */
+  class BoostPythonModuleProxy {
+  public:
+    /** Don't construct this object yourself, use the REGISTER_PYTHON_MODULE macro instead. */
+    BoostPythonModuleProxy(const char* name, void (*initFunc)(), bool auto_import = false);
+  };
+
+  /*
+   * Register a python module to make available when loading the library.
+   *
    * Use it by defining your module via BOOST_PYTHON_MODULE(name), then call
    * REGISTER_PYTHON_MODULE(name) with the same name.
    *
    * After the library has been loaded, you can use 'import name' to import the
    * defined objects.
-   * The REGISTER_PYTHON_MODULE_AUTOIMPORT() macro is identical, but will also
+   */
+#define REGISTER_PYTHON_MODULE(moduleName) Belle2::BoostPythonModuleProxy boostPythonModuleProxy##moduleName(#moduleName, init##moduleName);
+
+  /*
+   * Identical to REGISTER_PYTHON_MODULE(), but will also
    * import the module into the global namespace after loading it.
    *
    * This might be useful to allow extra definitions for individual basf2 modules,
@@ -55,13 +71,6 @@ namespace Belle2 {
    * In a steering file, the type MyTest.Sphere is available immediately after
    * register_module('MyTest').
    */
-  class BoostPythonModuleProxy {
-  public:
-    /** Don't construct this object yourself, use the REGISTER_PYTHON_MODULE macro instead. */
-    BoostPythonModuleProxy(const char* name, void (*initFunc)(), bool auto_import = false);
-  };
-
-#define REGISTER_PYTHON_MODULE(moduleName) Belle2::BoostPythonModuleProxy boostPythonModuleProxy##moduleName(#moduleName, init##moduleName);
 #define REGISTER_PYTHON_MODULE_AUTOIMPORT(moduleName) Belle2::BoostPythonModuleProxy boostPythonModuleProxy##moduleName(#moduleName, init##moduleName, true);
 }
 #endif

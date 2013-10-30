@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Detector xmlns:xi="http://www.w3.org/2001/XInclude">
 	<Name>TBDetector</Name>
-	<Description>Common PXD and SVD TestBeam</Description>
+	<Description>Common PXD and SVD TestBeam OBSOLETE, DO NOT USE ANY LONGER</Description>
 	<Global>
 		<material>Air</material>
 		<width  unit="m">2.0</width>

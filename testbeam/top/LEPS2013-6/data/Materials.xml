@@ -10,6 +10,79 @@
     </Components>
   </Material>
 
+  <Material name="Polystyrene">
+    <!-- Polystyrene (C8H8)n : SciFi fibre core (doped with small quantities of other elements) --> 
+    <state>Solid</state>
+    <density unit="g/cm3">1.05</density>
+    <Components>
+      <Element fraction="0.923">C</Element>
+      <Element fraction="0.077">H</Element>
+    </Components>
+  </Material>
+
+  <Material name="PMMA">
+    <!-- Polymethylmethacrylate (C5H8O2)n : SciFi fibre cladding --> 
+    <state>Solid</state>
+    <density unit="g/cm3">1.2</density>
+    <Components>
+      <Element fraction="0.600">C</Element>
+      <Element fraction="0.081">H</Element>
+      <Element fraction="0.320">O</Element>
+    </Components>
+  </Material>
+
+  <Material name="PEEK">
+    <!-- Polyetheretherketone (C19H12O3)n --> 
+    <state>Solid</state>
+    <density unit="g/cm3">1.32</density>
+    <Components>
+      <Element fraction="0.792">C</Element>
+      <Element fraction="0.042">H</Element>
+      <Element fraction="0.166">O</Element>
+    </Components>
+  </Material>
+
+  <Material name="ExpandedPolystyrene">
+    <state>Solid</state>
+    <density unit="g/cm3">0.05</density>
+    <Components>
+      <Element fraction="0.923">C</Element>
+      <Element fraction="0.077">H</Element>
+    </Components>
+  </Material>
+
+  <Material name="BorosilicateGlass">
+    <state>Solid</state>
+    <density unit="g/cm3">2.23</density>
+    <Components>
+      <Element fraction="0.3776">Si</Element>
+      <Element fraction="0.5925">O</Element>
+      <Element fraction="0.0068">Na</Element>
+      <Element fraction="0.0123">B</Element>
+      <Element fraction="0.0108">Al</Element>
+    </Components>
+  </Material>
+
+  <Material name="P2O5-Al2O3Glass">
+    <!-- Wavelength filter glass : exact composition unknown -->
+    <state>Solid</state>
+    <density unit="g/cm3">2.57</density>
+    <Components>
+      <Element fraction="0.1">P</Element>
+      <Element fraction="0.1">O</Element>
+      <Element fraction="0.1">Al</Element>
+    </Components>
+  </Material>
+
+  <Material name="Steel">
+    <state>Solid</state>
+    <density unit="g/cm3">7.85</density>
+    <Components>
+      <Element fraction="0.997">Fe</Element>
+      <Element fraction="0.003">C</Element>
+    </Components>
+  </Material>
+
   <Material name="Aluminum">
     <state>Solid</state>
     <density unit="g/cm3">2.70</density>

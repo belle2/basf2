@@ -47,8 +47,7 @@ namespace Belle2 {
      * @param scan steering parameters
      * @param Name name (optional)
      */
-    Scan(std::vector<double>& scan, std::string Name = std::string("")) {
-      name = Name;
+    Scan(std::vector<double>& scan, std::string Name = std::string("")): name(Name) {
       while (scan.size() < 4) scan.push_back(0.0);
       int np = int(scan[2]);
       if (np < 0) B2ERROR(name << ": np must be non-negative");
@@ -270,21 +269,21 @@ namespace Belle2 {
 
     // steering parameters
 
-    std::string m_outputFileName;  /**< output file name */
-    std::string m_beamParticle;    /**< beam particle: one of e, mu, pi, K, p */
-    double m_beamMomentum;         /**< beam momentum */
-    std::vector<double> m_scanY;   /**< scan in y: central, step, np, a */
-    std::vector<double> m_scanZ;   /**< scan in z: central, step, np, a */
+    std::string m_outputFileName;    /**< output file name */
+    std::string m_beamParticle;      /**< beam particle: one of e, mu, pi, K, p */
+    double m_beamMomentum;           /**< beam momentum */
+    std::vector<double> m_scanY;     /**< scan in y: central, step, np, a */
+    std::vector<double> m_scanZ;     /**< scan in z: central, step, np, a */
     std::vector<double> m_scanTheta; /**< scan in theta: central, step, np, a */
-    std::vector<double> m_scanPhi; /**< scan in phi: central, step, np, a */
-    int m_scanT0;                /**< scan in t0: np */
-    double m_tMin; /**< minimal TDC time */
-    double m_tMax; /**< maximal TDC time */
-    int m_numBins; /**< number of bins for TDC time */
-    int m_numIterations; /** number of iterations */
-    bool m_parabolicMaximum;  /** use parabolic maximum */
-    double m_minBkgPerBar;    /**< minimal assumed background photons per bar */
-    double m_electronicJitter;     /**< r.m.s of electronic jitter */
+    std::vector<double> m_scanPhi;   /**< scan in phi: central, step, np, a */
+    int m_scanT0;                    /**< scan in t0: np */
+    double m_tMin;                   /**< minimal TDC time */
+    double m_tMax;                   /**< maximal TDC time */
+    int m_numBins;                   /**< number of bins for TDC time */
+    int m_numIterations;             /**< number of iterations */
+    bool m_parabolicMaximum;         /**< use parabolic maximum */
+    double m_minBkgPerBar;           /**< minimal assumed background photons per bar */
+    double m_electronicJitter;       /**< r.m.s of electronic jitter */
 
     // others
 
@@ -307,10 +306,10 @@ namespace Belle2 {
 
     // root file and histograms
 
-    TFile* m_file;           /**< TFile */
-    TH2F* m_ringImage;       /**< 2D histogram of a ring image */
-    TH2F* m_pdfInitial;      /**< 2D histogram of the corresponding PDF before alignment */
-    TH2F* m_pdfAligned;      /**< 2D histogram of the corresponding PDF after alignment */
+    TFile* m_file;       /**< TFile */
+    TH2F* m_ringImage;   /**< 2D histogram of a ring image */
+    TH2F* m_pdfInitial;  /**< 2D histogram of the corresponding PDF before alignment */
+    TH2F* m_pdfAligned;  /**< 2D histogram of the corresponding PDF after alignment */
     std::vector<TH2F*> m_scanHistograms;  /**< scan histograms for control */
 
 

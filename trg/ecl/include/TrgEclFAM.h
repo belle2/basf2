@@ -31,8 +31,8 @@ class TrgEclFAM : public TObject {
     virtual ~TrgEclFAM();
 
     //
-    void setup(int, int, float);
-    void getTCHit(float);
+    void setup(int, int);
+    void getTCHit(int);
     void digitization01(void); // fit method,    digi with 96ns interval
     void digitization02(void); // no fit method, digi with 96ns interval
     void digitization03(void); // orignal no fit method, digi with 12ns interval
@@ -47,12 +47,13 @@ class TrgEclFAM : public TObject {
     std::vector<int> TCId(void) const { return _tcid; }
     std::vector<int> TCThetaId(void) const { return _tcthetaid; }
     std::vector<int> TCPhiId(void) const { return _tcphiid; }
-    //    std::vector<double> TCEnergy(void) const { return _tcenergy; }
+  
 
     int getTCThetaId(int tcid) const { return _tcthetaid[tcid-1]; }
     int getTCPhiId(int tcid) const { return _tcphiid[tcid-1]; }
-    double getTCEnergy(int tcid) const { return _tcenergy[tcid-1]; }
-    double getTCTiming() const {return m_TimeAve;}
+    int getTCNoOutput(int tcid) const { return _tcnoutput[tcid-1]; }
+    double getTCEnergy(int tcid, int noutput) const {return TCFitEnergy[tcid-1][noutput]; }
+    double getTCTiming(int tcid, int noutput) const {return TCFitTiming[tcid-1][noutput];}
 
     // return PDF of shaping based on ShapeF
     double FADC(int, double);
@@ -65,28 +66,39 @@ class TrgEclFAM : public TObject {
     // function for fit
     void FAMFit(int,
 		int,
+		int,
 		double,
-		double *,
-		double *,
-		double *);
+		double *
+		);
 
   private:
-
+    double returnE[20] ;
+    double returnT[20] ;
+   
+   
+    int noutput[576] ;//The # of output per TC
+    int ninput[576]; //The # of input per TC
     double TCEnergy[576][160]; // TC energy[GeV]
     // TC timing[ns] which is weighted by E ( = sum(Ei*Ti)/sum(Ei)).
     double TCTiming[576][160];
+    int bin;
+
     // TC enegry[GeV] and timing for all t=0-8000[ns]
     double TCEnergy_tot[576]; 
     double TCTiming_tot[576];
     // fitted energy and timing
-    double TCFitEnergy[576]; // [GeV]
-    double TCFitTiming[576]; // [ns]
+    double TCFitEnergy[576][20]; // [GeV]
+    double TCFitTiming[576][20]; // [ns]
+ 
+    double TCRawEnergy[576][20]; // Input  TC energy[GeV] 
+    double TCRawTiming[576][20]; // Input  TC timing[ns]
 
     std::vector<int>    _tcid;
     std::vector<int>    _tcphiid;
     std::vector<int>    _tcthetaid;
+    std::vector<int>    _tcnoutput; 
     std::vector<double> _tcenergy;
-
+    
     TrgEclMapping * _TCMap;
     
     // coefficient of signal and noise
@@ -95,7 +107,7 @@ class TrgEclFAM : public TObject {
     double CoeffNoise31[192][14];
     double CoeffNoise32[192][14];
     double CoeffNoise33[192][14];
-
+   
   };
 } // end namespace Belle2
 

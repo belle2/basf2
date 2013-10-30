@@ -47,11 +47,11 @@ class TrgEclCluster {
  public:
 
   // set ICN for each part(Fw,Br,Bw)
-  void setICN(TrgEclFAM *);
+  void setICN(TrgEclFAM *, int HitTC[][20]);
   // calculate ICN in Barrel
-  int setBarrelICN(TrgEclFAM *);
+  int setBarrelICN(TrgEclFAM *,int HitTC[][20]);
   // calculate ICN in Foward endcap
-  int setForwardICN(TrgEclFAM *);
+  int setForwardICN(TrgEclFAM *,int HitTC[][20]);
   // calculate ICN in Backward endcap
   int setBackwardICN(TrgEclFAM *);
   //

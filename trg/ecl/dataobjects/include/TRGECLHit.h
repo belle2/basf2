@@ -29,6 +29,10 @@ namespace Belle2 {
 
     //! The cell id of this hit.
     int m_cellId;
+    
+    //! The # of output of TC.
+    int m_noutput;
+
 
     //! Deposited energy of this hit.
     double m_edep;
@@ -40,7 +44,11 @@ namespace Belle2 {
     void setEventId(int eventId) { m_eventId = eventId; }
 
     //! The method to set cell id
-    void setCellId(int cellId) { m_cellId = cellId; }
+    void setTCId(int cellId) { m_cellId = cellId; }
+
+    //! The method to set # of output per TC
+    void setTCOutput(int noutput) { m_noutput = noutput; }
+
 
     //! The method to set deposited energy
     void setEnergyDep(double edep) { m_edep = edep; }
@@ -69,6 +77,7 @@ namespace Belle2 {
     TRGECLHit(
       int eventId,
       int cellId,
+      int noutput,
       double edep,
       double TimeAve
     ) {
@@ -76,6 +85,7 @@ namespace Belle2 {
       m_cellId = cellId;
       m_edep = edep;
       m_TimeAve = TimeAve;
+      m_noutput = noutput;
     }
     ClassDef(TRGECLHit, 1); /*< the class title */
 

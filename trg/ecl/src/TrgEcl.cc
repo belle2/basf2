@@ -21,7 +21,7 @@
 //#include "trg/trg/Signal.h"
 //#include "trg/trg/Link.h"
 //#include "trg/trg/Utilities.h"
-
+ #include <framework/logging/Logger.h>
 #include "trg/ecl/TrgEcl.h"
 #include "trg/ecl/TrgEclCluster.h"
 
@@ -29,6 +29,7 @@
 #include "trg/ecl/dataobjects/TRGECLTrg.h"
 //
 #include <math.h>
+#include <TRandom3.h>
 //
 //
 using namespace std;
@@ -63,6 +64,8 @@ void
 //iwasaki TrgEcl::initialize(int m_nEvent)
 TrgEcl::initialize(int )
 {
+  
+ 
 }
 //
 //
@@ -88,7 +91,7 @@ TrgEcl::getTrgEcl(void) {
 //
 //
 void
-TrgEcl::setPRS(TrgEclFAM * obj_trgeclfam){
+TrgEcl::setPRS(TrgEclFAM * obj_trgeclfam, int hitTC[][20]){
   //
   //
   // TC Phi ring sum
@@ -100,22 +103,33 @@ TrgEcl::setPRS(TrgEclFAM * obj_trgeclfam){
   //ID             0-2  3-14  15-16
   //----------------------------------------
   //
-  std::cout << "yunno01" << std::endl;
   for (int iTCThetaId = 0; iTCThetaId < 17; iTCThetaId++ ){
     _PhiRingSum[iTCThetaId] = 0;
   }
-  std::cout << "yunno02" << std::endl;
+
+  
   for (int iTCId = 1; iTCId <= 576; iTCId++) {
+
+    
+    //   cout <<"check_1"<< endl;
+    int ntcoutput = obj_trgeclfam->getTCNoOutput(iTCId);
+    //  cout << ntcoutput << endl;
     for (int iTCThetaId = 0; iTCThetaId < 17; iTCThetaId++) {
-      std::cout << "yunno03" << std::endl;
       if (iTCThetaId == obj_trgeclfam->getTCThetaId(iTCId)) {
-      std::cout << "yunno04" << std::endl;
-        _PhiRingSum[iTCThetaId] += obj_trgeclfam->getTCEnergy(iTCId);
-      std::cout << "yunno05" << std::endl;
+	//		cout <<"check_2"<< endl;
+	for(int intcoutput=0 ; intcoutput<ntcoutput ; intcoutput++){
+	  if(hitTC[iTCId][intcoutput]>0){
+	    _PhiRingSum[iTCThetaId] += obj_trgeclfam->getTCEnergy(iTCId,intcoutput);
+	  }
+	}
+      //	cout << obj_trgeclfam->getTCEnergy(iTCId)  << endl;
       }
     }
   }
 }
+
+
+
 //
 //
 //
@@ -123,8 +137,8 @@ void
 TrgEcl::simulate(int m_nEvent)
 {
   TrgEclFAM * obj_trgeclfam = new TrgEclFAM();
-  obj_trgeclfam->setup(m_nEvent, 1, 100);
-  setPRS(obj_trgeclfam);
+  obj_trgeclfam->setup(m_nEvent, 2);
+  // setPRS(obj_trgeclfam);
   //
   //----------
   // TC Etot
@@ -134,30 +148,57 @@ TrgEcl::simulate(int m_nEvent)
   // so Etot is sum of "phi ring ID" = 1-14
   // Etot threshold are
   // 1.0 GeV for Etot01
-  // 0.5 GeV for Etot02
+  // 0.5 GeV for Etot02nt
   // 3.0 GeV for Etot03
   //
-  // double TsimECL_parameters::Etot[3] = { 1.000, 0.500, 3.000 };
-  double E_tot = 0;
-  for (int iii = 1; iii <= 14; iii++) { E_tot += _PhiRingSum[iii]; }
+  //-----------------------------------------
+  // Calculate event timing
+  //-----------------------------------------
+  double MaxE = 0;
+  double EventTiming=0;
+  //------------------------------------------
+  double MaxTCId;
+  if(1){
+   
+    MaxE = 0;
+    EventTiming =0;
+    int HitTC[576][20] = {{0}};
+    
+    for (int iTCId = 1; iTCId <= 576; iTCId++) {
+      int nTCOutput = obj_trgeclfam->getTCNoOutput(iTCId);// the # of hit per TC
+      for(int inTCOutput=0 ; inTCOutput<nTCOutput ; inTCOutput++){
+	if((obj_trgeclfam->getTCEnergy(iTCId,inTCOutput))>MaxE){
+	  MaxE = obj_trgeclfam->getTCEnergy(iTCId, inTCOutput);
+	  EventTiming= obj_trgeclfam->getTCTiming(iTCId,inTCOutput);
+	  MaxTCId = iTCId;
+	} 
+      }
+    }  // Find Event timing. 
+    
+    setPRS(obj_trgeclfam,HitTC);
+    
+    //--------------------------------------------------
+    
+    double E_tot = 0;
+    for (int iii = 1; iii <= 14; iii++) { E_tot += _PhiRingSum[iii]; }
+    
+    //----------
+    // Bhabha*
+    //----------
   //
-  //----------
-  // Bhabha*
-  //----------
-  //
-  // Threshold for each combination of PRS
-  //
-  //   5.0,  // (1)  F1 + F2 + B1 + B2
-  //   5.5,  // (2)  F2 + F3 + B1 + B2 + C11 + C12
-  //   5.0,  // (3)  F2 :: backward gap
-  //   5.0,  // (4)  F3 + C10 + C11 + C12
-  //   5.0,  // (5)  C1 + C9 + C10
-  //   5.0,  // (6)  C1 + C2 + C9
-  //   5.0,  // (7)  C2 + C8 + C9
-  //   5.0,  // (8)  C3 + C7 + C8
-  //   5.0,  // (9)  C4 + C6 + C7
-  //   5.0,  // (10) C5 + C6
-  //   3.0   // (11) C10 :: forward gap
+  // // Threshold for each combination of PRS
+  // //
+  // //   5.0,  // (1)  F1 + F2 + B1 + B2
+  // //   5.5,  // (2)  F2 + F3 + B1 + B2 + C11 + C12
+  // //   5.0,  // (3)  F2 :: backward gap
+  // //   5.0,  // (4)  F3 + C10 + C11 + C12
+  // //   5.0,  // (5)  C1 + C9 + C10
+  // //   5.0,  // (6)  C1 + C2 + C9
+  // //   5.0,  // (7)  C2 + C8 + C9
+  // //   5.0,  // (8)  C3 + C7 + C8
+  // //   5.0,  // (9)  C4 + C6 + C7z
+  // //   5.0,  // (10) C5 + C6
+  // //   3.0   // (11) C10 :: forward gap
   //
   int k01[] = {4,  1, 2, 16, 17};     // (1)  F1+F2 + B1+B2
   int k02[] = {6,  2, 3, 14, 15, 16, 17}; // (2)  F2+F3 + C11+C12 + B1+B2
@@ -173,7 +214,7 @@ TrgEcl::simulate(int m_nEvent)
   
   double vct_bhabha[11];
   for (int iii = 0; iii < 11; iii++) {vct_bhabha[iii] = 0.0;}
-  for (int iii = 1; iii <= k01[0]; iii++) { vct_bhabha[0]  += _PhiRingSum[k01[iii] - 1]; }
+  for (int iii = 1; iii <= k01[0]; iii++) { vct_bhabha[0]  += _PhiRingSum[k01[iii] - 1];}
   for (int iii = 1; iii <= k02[0]; iii++) { vct_bhabha[1]  += _PhiRingSum[k02[iii] - 1]; }
   for (int iii = 1; iii <= k03[0]; iii++) { vct_bhabha[2]  += _PhiRingSum[k03[iii] - 1]; }
   for (int iii = 1; iii <= k04[0]; iii++) { vct_bhabha[3]  += _PhiRingSum[k04[iii] - 1]; }
@@ -186,7 +227,7 @@ TrgEcl::simulate(int m_nEvent)
   for (int iii = 1; iii <= k11[0]; iii++) { vct_bhabha[10] += _PhiRingSum[k11[iii] - 1]; }
   bool boolBhabhaStar = 
     (vct_bhabha[0]  > 5.0 ||
-     vct_bhabha[1]  > 5.0 ||
+     vct_bhabha[1]  > 5.5 ||
      vct_bhabha[2]  > 5.0 ||
      vct_bhabha[3]  > 5.0 ||
      vct_bhabha[4]  > 5.0 ||
@@ -195,15 +236,13 @@ TrgEcl::simulate(int m_nEvent)
      vct_bhabha[7]  > 5.0 ||
      vct_bhabha[8]  > 5.0 ||
      vct_bhabha[9]  > 5.0 ||
-     vct_bhabha[10] > 5.0);
-  //
-  //----------
+     vct_bhabha[10] > 3.0);
+   //----------
   // ICN
   //----------
   //
-  //  TrgEclCluster & aaa = TrgEclCluster::Instance();
   TrgEclCluster objCluster;
-  objCluster.setICN(obj_trgeclfam);
+  objCluster.setICN(obj_trgeclfam,HitTC);
   //  int BarrelICN = 
   //  int ForwardICN = 
   //  int BackwardICN = objCluster.getBackwardICN(&obj_trgeclfam);
@@ -246,7 +285,7 @@ TrgEcl::simulate(int m_nEvent)
   int bitForwardICN  = 0x0100;
   int bitBeamBkgVeto = 0x0200;
   int bitTiming      = 0x0400;
-
+  //if (E_tot > 0.1){continue;}
   bool boolEtot[3] = {false};
   if (E_tot > 1.0) boolEtot[1] = true;
   bool boolBhabha = (boolBhabhaStar && ICN>4);
@@ -289,56 +328,67 @@ TrgEcl::simulate(int m_nEvent)
 //     }
 //     printf("xxx = %i \n", ans);
 //   }
+  int BeamBkgVeto = 0;
+  if(boolBeamBkgVeto){BeamBkgVeto = 1;}
+  
+
+  //cout << vct_bhabha[0] << "  " << vct_bhabha[1] << "  " << vct_bhabha[2] << "  " << vct_bhabha[3] << "  " << vct_bhabha[4] << "  " << vct_bhabha[5] << "  " << vct_bhabha[6] << "  " << vct_bhabha[7] << "  " << vct_bhabha[8] << "  " << vct_bhabha[9] << "  " << vct_bhabha[10] << endl;
   //----------------------
   //
   //-------------
   // Store
   //-------------
   int m_hitEneNum = 0;
-  StoreArray<TRGECLTrg> eclEneArray("TRGECLTrg");
-  new(eclEneArray.nextFreeAddress()) TRGECLTrg();
-  m_hitEneNum = eclEneArray.getEntries() - 1;
-  eclEneArray[m_hitEneNum]->setEventId(m_nEvent);
-  eclEneArray[m_hitEneNum]->setPRS01(_PhiRingSum[0]);
-  eclEneArray[m_hitEneNum]->setPRS02(_PhiRingSum[1]);
-  eclEneArray[m_hitEneNum]->setPRS03(_PhiRingSum[2]);
-  eclEneArray[m_hitEneNum]->setPRS04(_PhiRingSum[3]);
-  eclEneArray[m_hitEneNum]->setPRS05(_PhiRingSum[4]);
-  eclEneArray[m_hitEneNum]->setPRS06(_PhiRingSum[5]);
-  eclEneArray[m_hitEneNum]->setPRS07(_PhiRingSum[6]);
-  eclEneArray[m_hitEneNum]->setPRS08(_PhiRingSum[7]);
-  eclEneArray[m_hitEneNum]->setPRS09(_PhiRingSum[8]);
-  eclEneArray[m_hitEneNum]->setPRS10(_PhiRingSum[9]);
-  eclEneArray[m_hitEneNum]->setPRS11(_PhiRingSum[10]);
-  eclEneArray[m_hitEneNum]->setPRS12(_PhiRingSum[11]);
-  eclEneArray[m_hitEneNum]->setPRS13(_PhiRingSum[12]);
-  eclEneArray[m_hitEneNum]->setPRS14(_PhiRingSum[13]);
-  eclEneArray[m_hitEneNum]->setPRS15(_PhiRingSum[14]);
-  eclEneArray[m_hitEneNum]->setPRS16(_PhiRingSum[15]);
-  eclEneArray[m_hitEneNum]->setPRS17(_PhiRingSum[16]);
+  StoreArray<TRGECLTrg> trgEcltrgArray("TRGECLTrgs");
+  new(trgEcltrgArray.nextFreeAddress()) TRGECLTrg();
+  m_hitEneNum = trgEcltrgArray.getEntries() - 1;
+  
+  trgEcltrgArray[m_hitEneNum]->setEventId(m_nEvent);
+  trgEcltrgArray[m_hitEneNum]->setPRS01(_PhiRingSum[0]);
+  trgEcltrgArray[m_hitEneNum]->setPRS02(_PhiRingSum[1]);
+  trgEcltrgArray[m_hitEneNum]->setPRS03(_PhiRingSum[2]);
+  trgEcltrgArray[m_hitEneNum]->setPRS04(_PhiRingSum[3]);
+  trgEcltrgArray[m_hitEneNum]->setPRS05(_PhiRingSum[4]);
+  trgEcltrgArray[m_hitEneNum]->setPRS06(_PhiRingSum[5]);
+  trgEcltrgArray[m_hitEneNum]->setPRS07(_PhiRingSum[6]);
+  trgEcltrgArray[m_hitEneNum]->setPRS08(_PhiRingSum[7]);
+  trgEcltrgArray[m_hitEneNum]->setPRS09(_PhiRingSum[8]);
+  trgEcltrgArray[m_hitEneNum]->setPRS10(_PhiRingSum[9]);
+  trgEcltrgArray[m_hitEneNum]->setPRS11(_PhiRingSum[10]);
+  trgEcltrgArray[m_hitEneNum]->setPRS12(_PhiRingSum[11]);
+  trgEcltrgArray[m_hitEneNum]->setPRS13(_PhiRingSum[12]);
+  trgEcltrgArray[m_hitEneNum]->setPRS14(_PhiRingSum[13]);
+  trgEcltrgArray[m_hitEneNum]->setPRS15(_PhiRingSum[14]);
+  trgEcltrgArray[m_hitEneNum]->setPRS16(_PhiRingSum[15]);
+  trgEcltrgArray[m_hitEneNum]->setPRS17(_PhiRingSum[16]);
   //
-  eclEneArray[m_hitEneNum]->setEtot(E_tot);
+  trgEcltrgArray[m_hitEneNum]->setEtot(E_tot);
   //
-  eclEneArray[m_hitEneNum]->setBhabha01(vct_bhabha[0]);
-  eclEneArray[m_hitEneNum]->setBhabha02(vct_bhabha[1]);
-  eclEneArray[m_hitEneNum]->setBhabha03(vct_bhabha[2]);
-  eclEneArray[m_hitEneNum]->setBhabha04(vct_bhabha[3]);
-  eclEneArray[m_hitEneNum]->setBhabha05(vct_bhabha[4]);
-  eclEneArray[m_hitEneNum]->setBhabha06(vct_bhabha[5]);
-  eclEneArray[m_hitEneNum]->setBhabha07(vct_bhabha[6]);
-  eclEneArray[m_hitEneNum]->setBhabha08(vct_bhabha[7]);
-  eclEneArray[m_hitEneNum]->setBhabha09(vct_bhabha[8]);
-  eclEneArray[m_hitEneNum]->setBhabha10(vct_bhabha[9]);
-  eclEneArray[m_hitEneNum]->setBhabha11(vct_bhabha[10]);
+  trgEcltrgArray[m_hitEneNum]->setBhabha01(vct_bhabha[0]);
+  trgEcltrgArray[m_hitEneNum]->setBhabha02(vct_bhabha[1]);
+  trgEcltrgArray[m_hitEneNum]->setBhabha03(vct_bhabha[2]);
+  trgEcltrgArray[m_hitEneNum]->setBhabha04(vct_bhabha[3]);
+  trgEcltrgArray[m_hitEneNum]->setBhabha05(vct_bhabha[4]);
+  trgEcltrgArray[m_hitEneNum]->setBhabha06(vct_bhabha[5]);
+  trgEcltrgArray[m_hitEneNum]->setBhabha07(vct_bhabha[6]);
+  trgEcltrgArray[m_hitEneNum]->setBhabha08(vct_bhabha[7]);
+  trgEcltrgArray[m_hitEneNum]->setBhabha09(vct_bhabha[8]);
+  trgEcltrgArray[m_hitEneNum]->setBhabha10(vct_bhabha[9]);
+  trgEcltrgArray[m_hitEneNum]->setBhabha11(vct_bhabha[10]);
   //
-  eclEneArray[m_hitEneNum]->setICN(ICN);
-  eclEneArray[m_hitEneNum]->setICNFw(ICNForward);
-  eclEneArray[m_hitEneNum]->setICNBr(ICNBarrel);
-  eclEneArray[m_hitEneNum]->setICNBw(ICNBackward);
+  trgEcltrgArray[m_hitEneNum]->setICN(ICN);
+  trgEcltrgArray[m_hitEneNum]->setICNFw(ICNForward);
+  trgEcltrgArray[m_hitEneNum]->setICNBr(ICNBarrel);
+  trgEcltrgArray[m_hitEneNum]->setICNBw(ICNBackward);
   //
-  eclEneArray[m_hitEneNum]->setECLtoGDL(bitECLtoGDL);
-  //
-  //
+  // cout << itimebin << endl;
+  trgEcltrgArray[m_hitEneNum]->setECLtoGDL(bitECLtoGDL);
+  trgEcltrgArray[m_hitEneNum]->setBeamBkgVeto(BeamBkgVeto);
+  trgEcltrgArray[m_hitEneNum]->setEventTiming(EventTiming );
+  trgEcltrgArray[m_hitEneNum]->setMaxTCId(MaxTCId);
+  trgEcltrgArray[m_hitEneNum]->setMaxTCEnergy(MaxE);
+
+  }
   return;
 }
 //

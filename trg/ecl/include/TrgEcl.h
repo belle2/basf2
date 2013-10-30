@@ -63,7 +63,7 @@ class TrgEcl {
   int getECLtoGDL(void){ return bitECLtoGDL; }
 
   // 
-  void setPRS(TrgEclFAM *);
+  void setPRS(TrgEclFAM *,int HitTC[][20] );
   
  private:
 

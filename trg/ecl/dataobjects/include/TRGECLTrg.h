@@ -67,6 +67,11 @@ namespace Belle2 {
     int m_icn_bw;
     // bit output to GDL
     int  m_bitECLtoGDL;
+    int  m_itimebin;
+    int m_BeamBkgVeto;
+    int m_maxTCId;
+    double m_maxTCEnergy;
+    double m_eventtiming;
 
     // Set event id
     void setEventId( int eventId) { m_eventId = eventId; }
@@ -107,11 +112,19 @@ namespace Belle2 {
     void setICNFw( int icn_fw ) { m_icn_fw = icn_fw; }
     void setICNBr( int icn_br ) { m_icn_br = icn_br; }
     void setICNBw( int icn_bw ) { m_icn_bw = icn_bw; }
-
+    
     // Set bit for GDL
     void setECLtoGDL( int bitECLtoGDL ) { m_bitECLtoGDL = bitECLtoGDL; }
+    void setitimebin( int itimebin ) { m_itimebin = itimebin; }
+    void setBeamBkgVeto( int BeamBkgVeto  ) { m_BeamBkgVeto = BeamBkgVeto; }
+    void setEventTiming( double eventtiming ) { m_eventtiming = eventtiming; }
+    void setMaxTCId( double maxTCId ) { m_maxTCId = maxTCId; }
+    void setMaxTCEnergy( double maxTCEnergy ) { m_maxTCEnergy = maxTCEnergy; }
 
-    // Empty constructor
+
+
+
+// Empty constructor
     // Recommended for ROOT IO
     TRGECLTrg() {;}
 
@@ -156,7 +169,14 @@ namespace Belle2 {
       int icn_fw,
       int icn_bw,
       //
-      int bitECLtoGDL
+      int bitECLtoGDL,
+      int BeamBkgVeto,
+      int itimebin,
+      double eventtiming,
+      int maxTCId,
+      double maxTCEnergy
+  
+
     ) {
       m_eventId = eventId;
       //
@@ -198,6 +218,12 @@ namespace Belle2 {
       m_icn_bw = icn_bw;
       //
       m_bitECLtoGDL = bitECLtoGDL;
+      m_BeamBkgVeto = BeamBkgVeto;
+      m_eventtiming = eventtiming;
+      m_itimebin = itimebin;
+      m_maxTCId = maxTCId; 
+      m_maxTCEnergy = maxTCEnergy;
+
     }
     ClassDef(TRGECLTrg, 1); /*< the class title */
 

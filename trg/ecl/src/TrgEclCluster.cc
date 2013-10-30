@@ -61,10 +61,10 @@ TrgEclCluster::getICNSub(int FwBrBw ){
 //
 //
 void
-TrgEclCluster::setICN(TrgEclFAM *obj_tchit){
+TrgEclCluster::setICN(TrgEclFAM *obj_tchit,int HitTC[][20]){
 
-  _icnfwbrbw[0] = setForwardICN(obj_tchit);
-  _icnfwbrbw[1] = setBarrelICN(obj_tchit);
+  _icnfwbrbw[0] = setForwardICN(obj_tchit,HitTC );
+  _icnfwbrbw[1] = setBarrelICN(obj_tchit,HitTC);
   _icnfwbrbw[2] = setBackwardICN(obj_tchit);
   
   return;
@@ -77,10 +77,10 @@ TrgEclCluster::getBeamBkgVeto(void){
 
   bool boolBeamBkgVeto = false;
   bool boolForward = 
-    !(( _icnquadrant[0][0] && _icnquadrant[0][2] ) ||
+    (( _icnquadrant[0][0] && _icnquadrant[0][2] ) ||
       ( _icnquadrant[0][1] && _icnquadrant[0][3] ));
   bool boolBarrel = 
-    !(( _icnquadrant[1][0] && _icnquadrant[1][2] ) ||
+    (( _icnquadrant[1][0] && _icnquadrant[1][2] ) ||
       ( _icnquadrant[1][1] && _icnquadrant[1][3] ));
   boolBeamBkgVeto = (boolForward || boolBarrel );
 
@@ -90,14 +90,20 @@ TrgEclCluster::getBeamBkgVeto(void){
 //
 //
 int
-TrgEclCluster::setBarrelICN(TrgEclFAM *obj_tchit){
+TrgEclCluster::setBarrelICN(TrgEclFAM *obj_tchit, int HitTC[][20]){
 
   int TCFire[432] = { 0 };
+ 
   for (int iTCId0 = 0; iTCId0 < 576 ; iTCId0++) {
     int TCId = iTCId0+1;
-    if( TCId >= 81 && TCId <= 512 && 
-	obj_tchit->getTCEnergy(TCId) > 0.1 ){
-      TCFire[TCId-81] = 1;
+    int ntcoutput = obj_tchit->getTCNoOutput(TCId);
+    for(int intcoutput=0 ; intcoutput<ntcoutput ; intcoutput++){
+      if(HitTC[TCId][intcoutput]>0){
+	if( TCId >= 81 && TCId <= 512 && obj_tchit->getTCEnergy(TCId,intcoutput) > 0.1 ){
+	  
+	  TCFire[TCId-81] = 1;
+	}
+      }
     }
   }
   int icn = 0;
@@ -150,58 +156,62 @@ TrgEclCluster::setBarrelICN(TrgEclFAM *obj_tchit){
       }
     }
   } // iii loop
-
   return icn;
 }
 //
 //
 //
 int
-TrgEclCluster::setForwardICN(TrgEclFAM *obj_tchit){
+TrgEclCluster::setForwardICN(TrgEclFAM *obj_tchit, int HitTC[][20]){
 
   int TCFire[96] = { 0 };
   int icn = 0;
-
+  
   for (int iTCId0 = 0; iTCId0 < 80 ; iTCId0++) {
     int TCId = iTCId0+1;
+    int ntcoutput = obj_tchit->getTCNoOutput(TCId);
+    for(int intcoutput=0 ; intcoutput<ntcoutput ; intcoutput++){ 
+      if(HitTC[TCId][intcoutput]==0){continue;}
+      if ( TCId > 80 || obj_tchit->getTCEnergy(TCId,intcoutput) < 0.1 ) { continue; }
     
-    if ( TCId > 80 || obj_tchit->getTCEnergy(TCId) < 0.1 ) { continue; }
-    //------------------------------------    
-    // To rearrange the hitted map
-    //
-    //   orignal       converted
-    //  (<- Theta)    (<- Theta)
-    //
-    //   3  2  1       64 32  0
-    //   4  5  -       65 33  1
-    //   8  7  6  =>   66 34  2
-    //   9 10  -       67 35  3
-    //  ....           ...
-    //  78 77 76       94 62 30
-    //  79 80  -       95 63 31
-    //
-    // Here, TCId-1 becomes TCId=0 and 1.
-    //------------------------------------
-    int kkk = 0;
-    if( iTCId0%5 == 0 ) {
-      kkk = (iTCId0/5)*2;
-      TCFire[kkk]   = 1;
-      TCFire[kkk+1] = 1;
-    } else {
-      kkk = iTCId0/5;
-      switch ( iTCId0%5 ){
-      case 1 : 
-	TCFire[32+2*kkk]   = 1; break;
-      case 2 : 
-	TCFire[64+2*kkk]   = 1; break;
-      case 3 : 
-	TCFire[64+2*kkk+1] = 1; break;
-      case 4 : 
-	TCFire[32+2*kkk+1] = 1; break;
-      default:
-	break;
+      //------------------------------------    
+      // To rearrange the hitted map
+      //
+      //   orignal       converted
+      //  (<- Theta)    (<- Theta)
+      //
+      //   3  2  1       64 32  0
+      //   4  5  -       65 33  1
+      //   8  7  6  =>   66 34  2
+      //   9 10  -       67 35  3
+      //  ....           ...
+      //  78 77 76       94 62 30
+      //  79 80  -       95 63 31
+      //
+      // Here, TCId-1 becomes TCId=0 and 1.
+      //------------------------------------
+      int kkk = 0;
+      if( iTCId0%5 == 0 ) {
+	kkk = (iTCId0/5)*2;
+	TCFire[kkk]   = 1;
+	TCFire[kkk+1] = 1;
+      } else {
+	kkk = iTCId0/5;
+	switch ( iTCId0%5 ){
+	case 1 : 
+	  TCFire[32+2*kkk]   = 1; break;
+	case 2 : 
+	  TCFire[64+2*kkk]   = 1; break;
+	case 3 : 
+	  TCFire[64+2*kkk+1] = 1; break;
+	case 4 : 
+	  TCFire[32+2*kkk+1] = 1; break;
+	default:
+	  break;
+	}
       }
     }
+    
   }
   //
   // First calculate the middle part

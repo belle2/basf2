@@ -3,7 +3,7 @@
 //---------------------------------------------------------------
 // Filename : TrgEclFAM.cc
 // Section  : TRG ECL
-// Owner    : InSu Lee / Yuuji Unno
+// Owner    : InSoo Lee/Yuuji Unno
 // Email    : islee@hep.hanyang.ac.kr / yunno@post.kek.jp
 //---------------------------------------------------------------
 // Description : A class to represent TRG ECL
@@ -18,10 +18,12 @@
 
 #include <ecl/geometry/ECLGeometryPar.h>
 #include <ecl/dataobjects/ECLSimHit.h>
+#include <ecl/dataobjects/ECLHit.h>
 
 #include "trg/ecl/TrgEclFAM.h"
 #include "trg/ecl/dataobjects/TRGECLDigi.h"
-#include "trg/ecl/dataobjects/TRGECLDigi0.h"
+#include "trg//ecl/dataobjects/TRGECLDigi0.h"
+#include "trg/ecl/dataobjects/TRGECLHit.h"
 
 #include <stdlib.h>
 #include <iostream>
@@ -35,35 +37,36 @@ using namespace Belle2;
 //
 //
 TrgEclFAM::TrgEclFAM(){
-
+  
   _TCMap = new TrgEclMapping();
-
+  
 }
 //
 //
 //
 TrgEclFAM::~TrgEclFAM(){
-
+  
   delete _TCMap;
-
+  
 }
 //
 //
 //
 void
 TrgEclFAM::setup(int m_nEvent, 
-		 int digi_method,
-		 float BinTimeInterval){
-
+		 int digi_method
+		 ){
+  
   //
   // prepare coefficient for fitting
   //
   readFAMDB();
   //
+  int TableFlag = 1;//1: ECLHit ,2: ECLSimHit 
   // initialize parameters
   //
   for (int iTCIdm=0; iTCIdm<576; iTCIdm++) {
-    for (int  iTime=0; iTime<160; iTime++) {
+    for (int  iTime=0; iTime<80; iTime++) {
       TCEnergy[iTCIdm][iTime] = 0;
       TCTiming[iTCIdm][iTime] = 0;
     }
@@ -71,15 +74,18 @@ TrgEclFAM::setup(int m_nEvent,
     TCTiming_tot[iTCIdm] = 0;
   }
   for (int iTCIdm = 0; iTCIdm < 576; iTCIdm++) {
-    TCFitEnergy[iTCIdm]=0;
-    TCFitTiming[iTCIdm]=0;
+    for (int iii = 0; iii<20 ;iii++){
+      TCFitEnergy[iTCIdm][iii]=0;
+      TCFitTiming[iTCIdm][iii]=0;
+    }
   }
   //
-  // digitization
+  // digitization0
   //
-  getTCHit(BinTimeInterval);
-  if      (digi_method==2){ digitization02(); } // no-fit method
-  else if (digi_method==3){ digitization03(); } // orignal method
+  getTCHit(TableFlag);
+  cout << m_nEvent << endl;
+  if      (digi_method==2){ digitization02(); } // no-fit method = backup method 1
+  else if (digi_method==3){ digitization03(); } // orignal method = backup method 2
   else                    { digitization01(); } // fit method
   save(m_nEvent);
   //
@@ -91,88 +97,114 @@ TrgEclFAM::setup(int m_nEvent,
 //
 //
 void
-TrgEclFAM::getTCHit(float BinTimeInterval)
+TrgEclFAM::getTCHit(int TableFlag )
 {
   //
-  float (*E_cell)[160]  = new float[8736][160];
-  float (*T_ave)[160]   = new float[8736][160]; // (1)Averaged time[ns] between hit point in Xtal and PD.
-  float (*Tof_ave)[160] = new float[8736][160]; // (2)Averaged time[ns] between hit point in Xtal and IP.
-  int nBinTime = 160; // "160" covers t=0-8us even for 50ns binning.
+  float (*E_cell)[80]  = new float[8736][80];
+  float (*T_ave)[80]   = new float[8736][80]; // (1)Averaged time[ns] between hit point in Xtal and PD.
+  float (*Tof_ave)[80] = new float[8736][80]; // (2)Averaged time[ns] between hit point in Xtal and IP.
+  //  int nBinTime = 80; // "80" covers t=0-8us even for 100ns binning.
   for (int iXCell=0; iXCell<8736; iXCell++){
-    for (int iBinTime=0; iBinTime<160; iBinTime++){
+    for (int iBinTime=0; iBinTime<80; iBinTime++){
       E_cell[iXCell][iBinTime] = 0;
       T_ave[iXCell][iBinTime] = 0;
       Tof_ave[iXCell][iBinTime] = 0;
     }
   }
-  //  float BinTimeInterval = 200; // [ns], 500, 200, 100, 50(<-?)
-  // Get instance of ecl geometry parameters
-  ECL::ECLGeometryPar * eclp = ECL::ECLGeometryPar::Instance();
-  //=====================
-  // Loop over all hits of steps
-  //=====================
-  StoreArray<ECLSimHit> eclArray("ECLSimHits");
-  //  int nHits = eclArray->GetEntriesFast();
-  int nHits = eclArray.getEntries();
-  //
-  for (int iHits = 0; iHits < nHits; iHits++) {
-    // Get a hit
-    ECLSimHit* aECLSimHit = eclArray[iHits];
-    // Hit geom. info
-    int hitCellId  = aECLSimHit->getCellId()-1;
-    float hitE     = aECLSimHit->getEnergyDep() / Unit::GeV;
-    // "hitTOF" [ns] is flight time of track at ECL from IP
-    float hitTOF      = aECLSimHit->getFlightTime() / Unit::ns; 
-
-    TVector3 HitInPos = aECLSimHit->getPosIn(); // [cm], Hit position in Xtal (based on from IP)
-    TVector3 PosCell  = eclp->GetCrystalPos(hitCellId); // [cm], Xtal position (based on from IP)
-    TVector3 VecCell  = eclp->GetCrystalVec(hitCellId);
-    // "local_pos_r" = Distance between track hit in Xtal and 
-    // rear surface(max=30, min=0) of the Xtal.
-    //    float local_pos_r = (15. - (0.5 * (HitInPos + HitOutPos) - PosCell) * VecCell);
-    float local_pos_r = (15.0 - (HitInPos - PosCell) * VecCell);
+  int nBinTime = 80;
+  ////-------------------------------------------------------------------
+  //                          read Xtal data 
+  //---------------------------------------------------------------------
+  if(TableFlag ==1 ){// read  ECLHit table
+    StoreArray<ECLHit> eclHitArray("ECLHits");
+    int nHits_hit = eclHitArray.getEntries()-1;
+    int TimeIndex = 0 ;
+    
+    //
+    for (int iHits = 0; iHits < nHits_hit; iHits++) {
+      // Get a hit
+      ECLHit* aECLHit = eclHitArray[iHits];
+      // Hit geom. info
+      int hitCellId  = aECLHit->getCellId()-1;
+      float hitE     = aECLHit->getEnergyDep() / Unit::GeV;
+      float aveT     = aECLHit->getTimeAve();
+      TimeIndex = (int)aveT/100;
+      // "hitTO" [ns] is flight time of track at ECL from IP
+      for (int iECLCell = 0; iECLCell < 8736; iECLCell++) {
+	if (hitCellId == iECLCell) {
+	  
+     	  E_cell[iECLCell][TimeIndex]  = E_cell[iECLCell][TimeIndex]+hitE;
+     	  T_ave[iECLCell][TimeIndex]   = aveT;  
+	  
+	}
+      } // End loop crsyal 8736
+    }
+  }
+  
+  
+  if(TableFlag==2){ // read ECLSimHit
+    ECL::ECLGeometryPar * eclp = ECL::ECLGeometryPar::Instance();
+    //=====================
+    // Loop over all hits of steps
+    //=====================
+    StoreArray<ECLSimHit> eclArray("ECLSimHits");
+    int nHits = eclArray.getEntries();
+    //
+    for (int iHits = 0; iHits < nHits; iHits++) {
+      // Get a hit
+      ECLSimHit* aECLSimHit = eclArray[iHits];
+      
+      int hitCellId  = aECLSimHit->getCellId()-1;
+      float hitE     = aECLSimHit->getEnergyDep() / Unit::GeV;
+      float hitTOF      = aECLSimHit->getFlightTime() / Unit::ns; 
+      
+      TVector3 HitInPos = aECLSimHit->getPosIn(); // [cm], Hit position in Xtal (based on from IP)
+      TVector3 PosCell  = eclp->GetCrystalPos(hitCellId); // [cm], Xtal position (based on from IP)
+      TVector3 VecCell  = eclp->GetCrystalVec(hitCellId);
+      // "local_pos_r" = Distance between track hit in Xtal and 
+      // rear surface(max=30, min=0) of the Xtal.
+      float local_pos_r = (15.0 - (HitInPos - PosCell) * VecCell);
+      for (int iECLCell = 0; iECLCell < 8736; iECLCell++) {
+	if (hitCellId == iECLCell && hitTOF < 8000) {
+	  // time interval is (0.5, 0.1, 0.05us) => (16, 80, 160bins) between T=0-8us.
+	  int TimeIndex = (int) (hitTOF / 100);
+	  E_cell[iECLCell][TimeIndex]  = E_cell[iECLCell][TimeIndex]  + hitE;
+	  T_ave[iECLCell][TimeIndex]   = T_ave[iECLCell][TimeIndex]   + hitE * local_pos_r;
+	  Tof_ave[iECLCell][TimeIndex] = Tof_ave[iECLCell][TimeIndex] + hitE * hitTOF;
+	}
+      } // End loop crsyal 8736
+    }
+    //
+    //
+    //
+    //===============
+    // Xtal energy and timing (0-8us, 0.2us interval, 40 bins)
+    //===============
     for (int iECLCell = 0; iECLCell < 8736; iECLCell++) {
-      if (hitCellId == iECLCell && hitTOF < 8000) {
-	// time interval is (0.5, 0.1, 0.05us) => (16, 80, 160bins) between T=0-8us.
-        int TimeIndex = (int) (hitTOF / BinTimeInterval);
-        E_cell[iECLCell][TimeIndex]  = E_cell[iECLCell][TimeIndex]  + hitE;
-        T_ave[iECLCell][TimeIndex]   = T_ave[iECLCell][TimeIndex]   + hitE * local_pos_r;
-        Tof_ave[iECLCell][TimeIndex] = Tof_ave[iECLCell][TimeIndex] + hitE * hitTOF;
-      }
-    } // End loop crsyal 8736
+      for (int  TimeIndex = 0; TimeIndex < nBinTime; TimeIndex++) {
+	
+	if (E_cell[iECLCell][TimeIndex] < 1e-9) {continue;} // 0.01MeV cut
+	
+	T_ave[iECLCell][TimeIndex]   = T_ave[iECLCell][TimeIndex] / E_cell[iECLCell][TimeIndex];
+	T_ave[iECLCell][TimeIndex]   = 
+	  6.05 + 
+	  0.0749  * T_ave[iECLCell][TimeIndex] - 
+	  0.00112 * T_ave[iECLCell][TimeIndex] * T_ave[iECLCell][TimeIndex];
+	Tof_ave[iECLCell][TimeIndex] = Tof_ave[iECLCell][TimeIndex] / E_cell[iECLCell][TimeIndex];
+      } // 40bins,  Time interval = 200ns
+    }
+    //
+    //
+    //
+    
+    
   }
-  //
-  //
-  //
-  //===============
-  // Xtal energy and timing (0-8us, 0.2us interval, 40 bins)
-  //===============
-  for (int iECLCell = 0; iECLCell < 8736; iECLCell++) {
-    for (int  TimeIndex = 0; TimeIndex < nBinTime; TimeIndex++) {
-
-      if (E_cell[iECLCell][TimeIndex] < 1e-9) {continue;} // 0.01MeV cut
-
-      T_ave[iECLCell][TimeIndex]   = T_ave[iECLCell][TimeIndex] / E_cell[iECLCell][TimeIndex];
-      T_ave[iECLCell][TimeIndex]   = 
-	6.05 + 
-	0.0749  * T_ave[iECLCell][TimeIndex] - 
-	0.00112 * T_ave[iECLCell][TimeIndex] * T_ave[iECLCell][TimeIndex];
-      Tof_ave[iECLCell][TimeIndex] = Tof_ave[iECLCell][TimeIndex] / E_cell[iECLCell][TimeIndex];
-    } // 40bins,  Time interval = 200ns
-  }
-  //
-  //
-  //
-  //=================
-  // TC energy and  timing (0-8us, 0.2us interval, 40 bins)
-  //=================
   for (int iXtalIdm = 0; iXtalIdm < 8736; iXtalIdm++) {
     int iTCIdm = _TCMap->getTCIdFromXtalId(iXtalIdm+1)-1;
     for (int  iTime = 0; iTime < nBinTime; iTime++) {
       if ( E_cell[iXtalIdm][iTime] < 1e-9) {continue;} // 0.01MeV cut
       TCEnergy[iTCIdm][iTime] += E_cell[iXtalIdm][iTime];
-      TCTiming[iTCIdm][iTime] += 
-	E_cell[iXtalIdm][iTime]*(T_ave[iXtalIdm][iTime]+Tof_ave[iXtalIdm][iTime]);
+      TCTiming[iTCIdm][iTime] += E_cell[iXtalIdm][iTime]*(T_ave[iXtalIdm][iTime]);
     }
   }
   for (int iTCIdm=0; iTCIdm<576; iTCIdm++) {
@@ -181,17 +213,36 @@ TrgEclFAM::getTCHit(float BinTimeInterval)
       TCTiming[iTCIdm][iTime] /= TCEnergy[iTCIdm][iTime];
     }
   }
+  
+  //-------------------------------------------------
+  // Save Raw data
+  //--------------------------------------------
+  for (int iTCIdm=0; iTCIdm<576; iTCIdm++) {
+    ninput[iTCIdm] = 0;
+    for (int  iTime = 0; iTime < nBinTime; iTime++) {
+      if ( TCEnergy[iTCIdm][iTime] >= 0.05) {
+	TCRawEnergy[iTCIdm][ninput[iTCIdm]] = TCEnergy[iTCIdm][iTime];
+	TCRawTiming[iTCIdm][ninput[iTCIdm]] = TCTiming[iTCIdm][iTime];
+	ninput[iTCIdm]++;
+      }
+    }
+  }
+  
+  
   //--------------------------
   // TC energy and timing in t=0-1us as true values.
   //--------------------------
-  int nBin_1us = (int) (1000.0 / BinTimeInterval);
+  int nBin_1us = (int) (1000.0 / 100);
   for (int iTCIdm=0; iTCIdm<576; iTCIdm++) {
     for (int  iTime = 0; iTime < nBin_1us; iTime++) {
       TCEnergy_tot[iTCIdm] += TCEnergy[iTCIdm][iTime];
       TCTiming_tot[iTCIdm] += TCTiming[iTCIdm][iTime]*TCEnergy[iTCIdm][iTime];
     }
     TCTiming_tot[iTCIdm] /= TCEnergy_tot[iTCIdm];
+    
   }
+  
+  
   //
   delete [] E_cell;
   delete [] T_ave;
@@ -205,11 +256,12 @@ void
 TrgEclFAM::digitization01( void ){
   //
   double cut_energy_tot = 0.03; // [GeV]
-  int nbin_pedestal = 50; // = nbin_pedestal*fam_sampling_interval [ns] in total
+  int nbin_pedestal = 5; // = nbin_pedestal*fam_sampling_interval [ns] in total
   double fam_sampling_interval = 96; // [ns]
   double TCDigiE[576][160] = {{0}};  // [GeV]
   double TCDigiT[576][160] = {{0}};  // [ns]
-  int NSampling = 160; // # of sampling array
+  int NSampling = 80; // # of sampling array
+  
   TRandom3* rand00 = new TRandom3(0);
   // (Make sampling time random between FAM sampling intervals)
   double random_sampling_correction = 0; // [ns]
@@ -219,7 +271,7 @@ TrgEclFAM::digitization01( void ){
   //==================
   for (int iTCIdm=0; iTCIdm<576; iTCIdm++) {
     if (TCEnergy_tot[iTCIdm]<cut_energy_tot){continue;} // TC energy_tot cut
-    for (int iTimeBin=0; iTimeBin<160; iTimeBin++) {
+    for (int iTimeBin=0; iTimeBin<80; iTimeBin++) {
       if (TCEnergy[iTCIdm][iTimeBin]<0.0001){continue;} // 0.1MeV cut on TC bin_energy
       for (int iSampling=0; iSampling<NSampling; iSampling++) {
 	// inputTiming is in [us] <-- Be careful, here is NOT [ns]
@@ -256,11 +308,10 @@ TrgEclFAM::digitization01( void ){
   // (01)noise embedding
   //==================
   double tmin_noise = -nbin_pedestal*fam_sampling_interval*0.001; // [us]
-  double tgen = NSampling-tmin_noise; // [us] 
-  // tmin_noise=-4; // orignal
-  // tgen = 10.3;   // orignal
+  double tgen = NSampling*fam_sampling_interval*0.001-tmin_noise; // [us] 
+  tmin_noise = -4; // orignal
+  tgen = 10.3;   // orignal   
   int bkg_level = 1030;
-  //  int bkg_level = 1;
   double ttt0 = 0; // [us]
   double ttt1 = 0; // [us]
   double ttt2 = 0; // [us]
@@ -274,9 +325,10 @@ TrgEclFAM::digitization01( void ){
   double corr_pileup   = times_pileup   * frac_pileup   * sqrt(fam_sampling_interval*0.001);
   double corr_parallel = times_parallel * frac_parallel * sqrt(fam_sampling_interval*0.001);
   double corr_serial   = times_serial   * frac_serial   * sqrt(fam_sampling_interval*0.001);
-  corr_pileup   = 0.011068;   // default in case 1xBelle noise in 100ns sampling
-  corr_parallel = 0.00727324; // default in case 1xBelle noise in 100ns sampling
-  corr_serial   = 0.0173925;  // default in case 1xBelle noise in 100ns sampling
+  // corr_pileup   = 0.011068;   // default in case 1xBelle noise in 100ns sampling
+  // corr_parallel = 0.00727324; // default in case 1xBelle noise in 100ns sampling
+  // corr_serial   = 0.0173925;  // default in case 1xBelle noise in 100ns sampling
+  
   for (int iTCIdm=0; iTCIdm<576; iTCIdm++) {
     if ( TCEnergy_tot[iTCIdm] < cut_energy_tot ) { continue; } // TC energy_tot cut
     for (int jjj=0; jjj<bkg_level; jjj++){
@@ -284,19 +336,21 @@ TrgEclFAM::digitization01( void ){
       ttt1 = -(tmin_noise + tgen * rand00->Rndm());  // [us]
       ttt2 = -(tmin_noise + tgen * rand00->Rndm());  // [us]
       for (int iSampling=0; iSampling<NSampling; iSampling++) {
-	// (pile-up noise)
-	if (ttt0>0){ TCDigiE[iTCIdm][iSampling] += FADC(0,ttt0) * corr_pileup * 0.001; }
-	// (parallel noise)
-	if (ttt1>0){ TCDigiE[iTCIdm][iSampling] += FADC(1,ttt1) * corr_parallel; }
-	// (serial noise)
-	if (ttt2>0){ TCDigiE[iTCIdm][iSampling] += FADC(2,ttt2) * corr_serial; }
-	ttt0 += fam_sampling_interval*0.001;
-	ttt1 += fam_sampling_interval*0.001;
-	ttt2 += fam_sampling_interval*0.001;
+    	// (pile-up noise)
+    	if (ttt0>0){ TCDigiE[iTCIdm][iSampling] += FADC(0,ttt0) * corr_pileup * 0.001; }
+    	// (parallel noise)
+    	if (ttt1>0){ TCDigiE[iTCIdm][iSampling] += FADC(1,ttt1) * corr_parallel; }
+    	// (serial noise)
+    	if (ttt2>0){ TCDigiE[iTCIdm][iSampling] += FADC(2,ttt2) * corr_serial; }
+    	ttt0 += fam_sampling_interval*0.001;
+    	ttt1 += fam_sampling_interval*0.001;
+    	ttt2 += fam_sampling_interval*0.001;
       }
     }
   }
   delete rand00;
+  
+  
   //
   //
   //
@@ -316,37 +370,46 @@ TrgEclFAM::digitization01( void ){
   //============
   // (01)fit
   //============
-  double returnE = 0;
-  double returnT = 0;
+  for(int jjj=0; jjj <20; jjj++){
+    returnE[jjj]=  0  ;
+    returnT[jjj]=  0   ;
+  }
+  
+  
+  
   for (int iTCIdm=0; iTCIdm<576; iTCIdm++) {
-    if (TCEnergy_tot[iTCIdm]<cut_energy_tot){continue;} // TC energy_tot cut
+    noutput[iTCIdm] = 0;
+    if (TCEnergy_tot[iTCIdm] < cut_energy_tot){continue;} // TC energy_tot cut
+    
     FAMFit(nbin_pedestal, 
 	   NSampling, 
+	   iTCIdm,
 	   fam_sampling_interval, 
-	   TCDigiE[iTCIdm],
-	   &returnE, 
-	   &returnT);
-
-    TCFitEnergy[iTCIdm] = returnE;
-    TCFitTiming[iTCIdm] = returnT+random_sampling_correction;
+	   TCDigiE[iTCIdm] );
+    
+    for(int inoutput=0; inoutput<noutput[iTCIdm];inoutput++){
+      TCFitEnergy[iTCIdm][inoutput] = returnE[inoutput];
+      TCFitTiming[iTCIdm][inoutput] = returnT[inoutput]+random_sampling_correction;
+    }
   }
   //
   //
   //
   return;
+  
 }
 //
 //
 //
 void
 TrgEclFAM::digitization02( void ){
-
+  
   double cut_energy_tot = 0.03; // [GeV]
-  int nbin_pedestal = 50; // = nbin_pedestal*fam_sampling_interval [ns] in total
+  int nbin_pedestal = 5; // = nbin_pedestal*fam_sampling_interval [ns] in total
   double fam_sampling_interval = 96; //@ [ns]
   double TCDigiE[576][160] = {{0}};  //@ [GeV]
   double TCDigiT[576][160] = {{0}};  //@ [ns]
-  int NSampling = 160;
+  int NSampling = 80;
   TRandom3* rand00 = new TRandom3(0);
   //@ Make sampling time random between FAM sampling intervals
   double random_sampling_correction = 0; //@ [ns]
@@ -358,6 +421,7 @@ TrgEclFAM::digitization02( void ){
     if (TCEnergy_tot[iTCIdm]<cut_energy_tot){continue;} // TC energy_tot cut
     for (int iTimeBin=0; iTimeBin<80; iTimeBin++) {
       if (TCEnergy[iTCIdm][iTimeBin]<0.0001){continue;} // 0.1 MeV cut on TC bin_energy
+      cout << TCTiming[iTCIdm][iTimeBin] << endl;
       for (int iSampling=0; iSampling<NSampling; iSampling++) {
 	//@ inputTiming is in [us] <-- Be careful, here is NOT [ns]
 	double inputTiming 
@@ -375,7 +439,9 @@ TrgEclFAM::digitization02( void ){
   // (02)noise embedding
   //==================
   double tmin_noise = -nbin_pedestal*fam_sampling_interval*0.001; // [us]
-  double tgen = NSampling-tmin_noise; // [us] 
+  double tgen =  NSampling*fam_sampling_interval*0.001-tmin_noise; // [us] 
+  tmin_noise = -4; // orignal
+  tgen = 10.3;   // 
   int bkg_level = 1030;
   double ttt0 = 0; //@ [us]
   double ttt1 = 0; //@ [us]
@@ -388,10 +454,12 @@ TrgEclFAM::digitization02( void ){
   double times_serial   =  1;   // noise scale
   double corr_pileup   = times_pileup   * frac_pileup   * sqrt(fam_sampling_interval*0.001);
   double corr_parallel = times_parallel * frac_parallel * sqrt(fam_sampling_interval*0.001);
-  double corr_serial   = times_serial   * frac_serial   * sqrt(fam_sampling_interval*0.00);  
-  corr_pileup   = 0.011068;
-  corr_parallel = 0.00727324;
-  corr_serial   = 0.0173925;
+  double corr_serial   = times_serial   * frac_serial   * sqrt(fam_sampling_interval*0.001);  
+  // corr_pileup   = 0.011068;
+  // corr_parallel = 0.00727324;
+  // corr_serial   = 0.0173925;
+  
+  
   for (int iTCIdm=0; iTCIdm<576; iTCIdm++) {
     if ( TCEnergy_tot[iTCIdm] < cut_energy_tot ) { continue; } // TC energy_tot cut
     for (int jjj=0; jjj<bkg_level; jjj++){
@@ -399,90 +467,122 @@ TrgEclFAM::digitization02( void ){
       ttt1 = -(tmin_noise + tgen * rand00->Rndm());  //@ [us]
       ttt2 = -(tmin_noise + tgen * rand00->Rndm());  //@ [us]
       for (int iSampling=0; iSampling<NSampling; iSampling++) {
-	//@ (pile-up noise)
-	if (ttt0>0){ TCDigiE[iTCIdm][iSampling] += FADC(0,ttt0) * corr_pileup * 0.001; }
-	//@ (parallel noise)
-	if (ttt1>0){ TCDigiE[iTCIdm][iSampling] += FADC(1,ttt1) * corr_parallel; }
-	//@ (serial noise)
-	if (ttt2>0){ TCDigiE[iTCIdm][iSampling] += FADC(2,ttt2) * corr_serial; }
-	ttt0 += fam_sampling_interval*0.001;
-	ttt1 += fam_sampling_interval*0.001;
-	ttt2 += fam_sampling_interval*0.001;
+  	//@ (pile-up noise)
+  	if (ttt0>0){ TCDigiE[iTCIdm][iSampling] += FADC(0,ttt0) * corr_pileup * 0.001; }
+  	//@ (parallel noise)
+  	if (ttt1>0){ TCDigiE[iTCIdm][iSampling] += FADC(1,ttt1) * corr_parallel; }
+  	//@ (serial noise)
+  	if (ttt2>0){ TCDigiE[iTCIdm][iSampling] += FADC(2,ttt2) * corr_serial; }
+  	ttt0 += fam_sampling_interval*0.001;
+  	ttt1 += fam_sampling_interval*0.001;
+  	ttt2 += fam_sampling_interval*0.001;
       }
     }
   }
+  
+  
+  
   delete rand00;
   //==================
   // (02)Peak search
   //==================
-  int maxId = 0; //@ sampling id at peak
   //@ T_a and T_b is time at sampling points in which 0.6*E exists.
-  int ta_id = 1000; //@ id of T_a
-  double ttt_a=0; //@ time of T_a
-  double ttt_b=0; //@ time of T_b
+  int ta_id[20] = {1000}; //@ id of T_a
+  double ttt_a[20]={0}; //@ time of T_a
+  double ttt_b[20]={0}; //@ time of T_b
   for (int iTCIdm = 0; iTCIdm < 576; iTCIdm++) {
+    noutput[iTCIdm]=0;
     if ( TCEnergy_tot[iTCIdm] < cut_energy_tot ) { continue; } // TC energy_tot cut
-    maxId = 0;
-    int wait_max = 0;
+    
+    
+    double threshold = 0.05; //GeV
+    int maxId[500] = {0};
+    int count_up = 0;
+    int count_down = 0;
+    int flag_up = 3;
+    int flag_down = 3;
+    
+    double max = 0;
     for (int iSampling=1; iSampling<NSampling; iSampling++) {
-      if (wait_max<4) { wait_max++; } //@ check 4 bins (=4x96ns = 384ns)
-      else{ 
-	if ( TCDigiE[iTCIdm][maxId]<0.05 ){ wait_max = 0;}
-	else{ continue; }
+      //-------------------------------------------------------------------------
+      //Peak finding Method 1 
+      //------------------------------------------------------------------------
+      
+      if (TCDigiE[iTCIdm][iSampling]>=max){
+	
+	max = TCDigiE[iTCIdm][iSampling];
+	maxId[noutput[iTCIdm]]= iSampling;
+	count_up ++;
+	count_down =0;
       }
-      if (TCDigiE[iTCIdm][iSampling]>TCDigiE[iTCIdm][maxId]){
-	maxId = iSampling;
-	wait_max = 0;
+      else{
+	count_down++;
+	if(count_down >= flag_down){
+	  if(count_up >= flag_up){
+	    if(threshold<max){
+	      max =0;
+	      count_up =0;
+	      count_down = 0;
+	      
+	      double NoiseLevel = 0;  
+	      double NoiseCount = 0;
+	      for (int iNoise=0; iNoise<5; iNoise++){
+		int iNoiseReplace = (maxId[noutput[iTCIdm]]-10) + iNoise;
+		if (iNoiseReplace>=0){
+		  NoiseLevel += TCDigiE[iTCIdm][iNoiseReplace];
+		  NoiseCount++;
+		}
+	      }
+	      if (NoiseCount!=0) { NoiseLevel /= NoiseCount; }
+	      TCFitEnergy[iTCIdm][noutput[iTCIdm]] = TCDigiE[iTCIdm][maxId[noutput[iTCIdm]]]-NoiseLevel;
+	      if(!(maxId[noutput[iTCIdm]]-1)){
+		for (int iSampling=1; iSampling<maxId[noutput[iTCIdm]]+3; iSampling++) {
+		  TCDigiE[iTCIdm][iSampling] -= NoiseLevel;
+		}
+	      }
+	      else{
+		for (int iSampling=maxId[noutput[iTCIdm]-1]; iSampling<maxId[noutput[iTCIdm]]+3; iSampling++) {
+		  TCDigiE[iTCIdm][iSampling] -= NoiseLevel;
+		}
+	      }
+	      //@ Search T_a ID
+	      for (int iSearch=0; iSearch<5; iSearch++){
+		
+		if ( TCDigiE[iTCIdm][maxId[noutput[iTCIdm]]-iSearch]  >0.6*TCFitEnergy[iTCIdm][noutput[iTCIdm]] &&
+		     TCDigiE[iTCIdm][maxId[noutput[iTCIdm]]-iSearch-1]<0.6*TCFitEnergy[iTCIdm][noutput[iTCIdm]] ){
+		  ta_id[noutput[iTCIdm]] = maxId[noutput[iTCIdm]]-iSearch-1;
+		}
+	      }
+	      
+	      //@ Estimate timing of t0
+	      if (ta_id[noutput[iTCIdm]]==1000){ 
+		printf("TrgEclFAM::digi02> Cannot find TC Timing (TCId=%5i, E=%8.5f)!!!\n", iTCIdm-1, TCFitEnergy[iTCIdm][0]); 
+		B2ERROR("TrgEclFAM::digi02> Cannot find TC Timing"); 
+	      } else {
+		ttt_a[noutput[iTCIdm]] = TCDigiT[iTCIdm][ta_id[noutput[iTCIdm]]];
+		ttt_b[noutput[iTCIdm]] = TCDigiT[iTCIdm][ta_id[noutput[iTCIdm]]+1];
+		TCFitTiming[iTCIdm][noutput[iTCIdm]] = 
+		  ttt_a[noutput[iTCIdm]]+
+		  (0.6*TCFitEnergy[iTCIdm][noutput[iTCIdm]]-TCDigiE[iTCIdm][ta_id[noutput[iTCIdm]]])*(ttt_b[noutput[iTCIdm]]-ttt_a[noutput[iTCIdm]])
+		  /(TCDigiE[iTCIdm][ta_id[noutput[iTCIdm]]+1]-TCDigiE[iTCIdm][ta_id[noutput[iTCIdm]]]);
+		//@ time between t0 and 0.6*peak_energy
+		//@ Alex's number = 274.4 (how he got this value ?)
+		//@ by my check = 278.7 [ns]
+		TCFitTiming[iTCIdm][noutput[iTCIdm]] -= (278.7 + 2);
+		//@ here "+2" is a shift due to imperfectness of no-fit method.
+	      }
+	      noutput[iTCIdm]++;
+	    }
+	  }
+	}
       }
-    }
-    //
-    if ( TCDigiE[iTCIdm][maxId] < 0.001 ) { continue; } //@ 1 MeV TC energy cut
-    //@ Remove noise effect
-    double NoiseLevel = 0;  
-    double NoiseCount = 0;
-    for (int iNoise=0; iNoise<5; iNoise++){
-      int iNoiseReplace = (maxId-10) + iNoise;
-      if (iNoiseReplace>=0){
-	NoiseLevel += TCDigiE[iTCIdm][iNoiseReplace];
-	NoiseCount++;
-      }
-    }
-    if (NoiseCount!=0) { NoiseLevel /= NoiseCount; }
-    //@ Energy after subtraction of noise
-    TCFitEnergy[iTCIdm] = TCDigiE[iTCIdm][maxId];
-    TCFitEnergy[iTCIdm] = TCDigiE[iTCIdm][maxId] - NoiseLevel;
-    for (int iSampling=1; iSampling<NSampling; iSampling++) {
-      TCDigiE[iTCIdm][iSampling] -= NoiseLevel;
-    }
-    //@ Search T_a ID
-    for (int iSearch=0; iSearch<5; iSearch++){
-      if ( TCDigiE[iTCIdm][maxId-iSearch]  >0.6*TCFitEnergy[iTCIdm] &&
-      	   TCDigiE[iTCIdm][maxId-iSearch-1]<0.6*TCFitEnergy[iTCIdm] ){
-	ta_id = maxId-iSearch-1;
-      }
-    }
-    //@ Estimate timing of t0
-    if (ta_id==1000){ 
-      printf("TrgEclFAM::digi02> Cannot find TC Timing (TCId=%5i, E=%8.5f)!!!\n", iTCIdm-1, TCFitEnergy[iTCIdm]); 
-      B2ERROR("TrgEclFAM::digi02> Cannot find TC Timing"); 
-    } else {
-      ttt_a = TCDigiT[iTCIdm][ta_id];
-      ttt_b = TCDigiT[iTCIdm][ta_id+1];
-      TCFitTiming[iTCIdm] = 
-	ttt_a+
-	(0.6*TCFitEnergy[iTCIdm]-TCDigiE[iTCIdm][ta_id])*(ttt_b-ttt_a)
-	/(TCDigiE[iTCIdm][ta_id+1]-TCDigiE[iTCIdm][ta_id]);
-      //@ time between t0 and 0.6*peak_energy
-      //@ Alex's number = 274.4 (how he got this value ?)
-      //@ by my check = 278.7 [ns]
-      TCFitTiming[iTCIdm] -= (278.7 + 2);
-      //@ here "+2" is a shift due to imperfectness of no-fit method.
     }
   }
   //
   //
   //
   return;
+  
 }
 //
 //
@@ -495,9 +595,9 @@ TrgEclFAM::digitization03( void ){
   double cut_energy_tot = 0.03; // [GeV]
   int nbin_pedestal = 100;
   float fam_sampling_interval = 12; // [ns]
-  float TCDigiE[576][400] = {{0}};  // [GeV]
-  float TCDigiT[576][400] = {{0}};  // [ns]
-  int NSampling = 400;
+  float TCDigiE[576][666] = {{0}};  // [GeV]
+  float TCDigiT[576][666] = {{0}};  // [ns]
+  int NSampling = 666;
   TRandom3* rand00 = new TRandom3(0);
   // Make sampling time random between FAM sampling intervals
   float random_sampling_correction = 0; // [ns]
@@ -523,7 +623,9 @@ TrgEclFAM::digitization03( void ){
   // (03)noise embedding
   //==================
   double tmin_noise = -nbin_pedestal*fam_sampling_interval*0.001; // [us]
-  double tgen = NSampling-tmin_noise; // [us] 
+  double tgen = NSampling*fam_sampling_interval*0.001-tmin_noise; // [us] 
+  tmin_noise = -4; // orignal
+  tgen = 10.3;   // 
   int bkg_level = 1030;
   double ttt0 = 0; // [us]
   double ttt1 = 0; // [us]
@@ -536,10 +638,12 @@ TrgEclFAM::digitization03( void ){
   double times_serial   =  1;   // noise scale
   double corr_pileup   = times_pileup   * frac_pileup   * sqrt(fam_sampling_interval*0.001);
   double corr_parallel = times_parallel * frac_parallel * sqrt(fam_sampling_interval*0.001);
-  double corr_serial   = times_serial   * frac_serial   * sqrt(fam_sampling_interval*0.00);  
+  double corr_serial   = times_serial   * frac_serial   * sqrt(fam_sampling_interval*0.001);  
   corr_pileup   = 0.011068;
   corr_parallel = 0.00727324;
   corr_serial   = 0.0173925;
+  
+  
   for (int iTCIdm=0; iTCIdm<576; iTCIdm++) {
     if ( TCEnergy_tot[iTCIdm] < cut_energy_tot ) { continue; } // 1 MeV TC energy cut
     for (int jjj=0; jjj<bkg_level; jjj++){
@@ -547,19 +651,21 @@ TrgEclFAM::digitization03( void ){
       ttt1 = -(tmin_noise + tgen * rand00->Rndm());  // [us]
       ttt2 = -(tmin_noise + tgen * rand00->Rndm());  // [us]
       for (int iSampling=0; iSampling<NSampling; iSampling++) {
-	// (pile-up noise)
-	if (ttt0>0){ TCDigiE[iTCIdm][iSampling] += FADC(0,ttt0) * corr_pileup * 0.001; }
-	// (parallel noise)
-	if (ttt1>0){ TCDigiE[iTCIdm][iSampling] += FADC(1,ttt1) * corr_parallel; }
-	// (serial noise)
-	if (ttt2>0){ TCDigiE[iTCIdm][iSampling] += FADC(2,ttt2) * corr_serial; }
-	ttt0 += fam_sampling_interval*0.001;
-	ttt1 += fam_sampling_interval*0.001;
-	ttt2 += fam_sampling_interval*0.001;
+ 	// (pile-up noise)
+ 	if (ttt0>0){ TCDigiE[iTCIdm][iSampling] += FADC(0,ttt0) * corr_pileup * 0.001; }
+ 	// (parallel noise)
+ 	if (ttt1>0){ TCDigiE[iTCIdm][iSampling] += FADC(1,ttt1) * corr_parallel; }
+ 	// (serial noise)
+ 	if (ttt2>0){ TCDigiE[iTCIdm][iSampling] += FADC(2,ttt2) * corr_serial; }
+ 	ttt0 += fam_sampling_interval*0.001;
+ 	ttt1 += fam_sampling_interval*0.001;
+ 	ttt2 += fam_sampling_interval*0.001;
       }
     }
   }
   delete rand00;
+  
+  
   //
   //
   //
@@ -581,38 +687,52 @@ TrgEclFAM::digitization03( void ){
   // (03)Peak search
   //==================
   float max_shape_time = 563.48; // [ns], time between peak of PDF and t0.
-  int maxId = 0;
+  double threshold = 0.1; //GeV
   for (int iTCIdm = 0; iTCIdm < 576; iTCIdm++) {
+    noutput[iTCIdm]=0;
     if ( TCEnergy_tot[iTCIdm] < cut_energy_tot ) { continue; } // TC energy_tot cut
-    maxId = 0;
-    int wait_max = 0;
+    int maxId[500] = {0};
+    int count_up = 0;
+    int count_down = 0;
+    int flag_up = 30;;
+    int flag_down = 40;
+    double max = 0;
     for (int iSampling=1; iSampling<NSampling; iSampling++) {
-      if (wait_max<32) { wait_max++; } // check 32 bins (=32x12ns =384ns)
-      else{ 
-	if ( TCDigiE[iTCIdm][maxId]<0.05 ){ wait_max = 0;}
-	else{ continue; }
+      
+      if (TCDigiE[iTCIdm][iSampling]>=max){
+	
+	max = TCDigiE[iTCIdm][iSampling];
+	maxId[noutput[iTCIdm]]= iSampling;
+	count_up ++;
+	count_down =0;
       }
-      if (TCDigiE[iTCIdm][iSampling]>TCDigiE[iTCIdm][maxId]){
-	maxId = iSampling;
-	wait_max = 0;
+      else{
+	count_down++;
+	if(count_down >= flag_down){
+	  if(count_up >= flag_up){
+	    if(threshold<max){
+	      max =0;
+	      count_up =0;
+	      count_down = 0;
+	      //@ Remove noise effect
+	      float NoiseLevel = 0;  
+	      float NoiseCount = 0;
+	      for (int iNoise=0; iNoise<42; iNoise++){
+		int iNoiseReplace = (maxId[noutput[iTCIdm]]-88) + iNoise;
+		if (iNoiseReplace>=0){
+		  NoiseLevel += TCDigiE[iTCIdm][iNoiseReplace];
+		  NoiseCount++;
+		}
+	      }
+	      if (NoiseCount!=0) { NoiseLevel /= NoiseCount; }
+	      TCFitEnergy[iTCIdm][noutput[iTCIdm]] = TCDigiE[iTCIdm][maxId[noutput[iTCIdm]]]-NoiseLevel;
+	      TCFitTiming[iTCIdm][noutput[iTCIdm]] = TCDigiT[iTCIdm][maxId[noutput[iTCIdm]]]-max_shape_time;
+	      noutput[iTCIdm]++;
+	    }
+	  }
+	}
       }
     }
-    //
-    if ( TCDigiE[iTCIdm][maxId] < 0.001 ) { continue; } // 1 MeV TC energy cut
-    //@ Remove noise effect
-    float NoiseLevel = 0;  
-    float NoiseCount = 0;
-    for (int iNoise=0; iNoise<42; iNoise++){
-      int iNoiseReplace = (maxId-88) + iNoise;
-      if (iNoiseReplace>=0){
-	NoiseLevel += TCDigiE[iTCIdm][iNoiseReplace];
-	NoiseCount++;
-      }
-    }
-    if (NoiseCount!=0) { NoiseLevel /= NoiseCount; }
-    //@ Energy after subtraction of noise
-    TCFitEnergy[iTCIdm] = TCDigiE[iTCIdm][maxId]-NoiseLevel;
-    TCFitTiming[iTCIdm] = TCDigiT[iTCIdm][maxId]-max_shape_time;
   }
   return;
 }
@@ -626,36 +746,41 @@ TrgEclFAM::save(int m_nEvent){
   //---------------
   int m_hitNum = 0;
   for (int iTCIdm = 0; iTCIdm < 576; iTCIdm++) {
-    if ( TCFitEnergy[iTCIdm] < 0.05 ) { 
-      continue;  // 50 MeV Fitted TC energy cut
+    for(int ininput=0; ininput< ninput[iTCIdm] ; ininput++){
+      if ( TCFitEnergy[iTCIdm][ininput] < 0.05 ) { 
+	continue;  // 50 MeV Fitted TC energy cut
+      }
+      if ( TCFitEnergy[iTCIdm][ininput]==0&& TCFitTiming[iTCIdm][ininput]==0 ) { 
+	continue;
+      }
+      if(noutput[iTCIdm] != ninput[iTCIdm]){continue;}
+      StoreArray<TRGECLDigi> TCDigiArray;
+      if (!TCDigiArray) TCDigiArray.create();
+      new(TCDigiArray.nextFreeAddress()) TRGECLDigi();
+      m_hitNum = TCDigiArray.getEntries() - 1;
+      TCDigiArray[m_hitNum]->setEventId(m_nEvent);
+      TCDigiArray[m_hitNum]->setTCId(iTCIdm+1);
+      TCDigiArray[m_hitNum]->setTCnOutput(ininput+1);
+      TCDigiArray[m_hitNum]->setPhiId(_TCMap->getTCPhiIdFromTCId(iTCIdm+1));
+      TCDigiArray[m_hitNum]->setThetaId(_TCMap->getTCThetaIdFromTCId(iTCIdm+1));
+      TCDigiArray[m_hitNum]->setRawEnergy(TCRawEnergy[iTCIdm][ininput]);
+      TCDigiArray[m_hitNum]->setRawTiming(TCRawTiming[iTCIdm][ininput]);
+      TCDigiArray[m_hitNum]->setRawEnergyTot(TCEnergy_tot[iTCIdm]);
+      TCDigiArray[m_hitNum]->setRawTimingTot(TCTiming_tot[iTCIdm]);
+      TCDigiArray[m_hitNum]->setFitEnergy(TCFitEnergy[iTCIdm][ininput]);
+      TCDigiArray[m_hitNum]->setFitTiming(TCFitTiming[iTCIdm][ininput]);
     }
-    StoreArray<TRGECLDigi> TCDigiArray;
-    if (!TCDigiArray) TCDigiArray.create();
-    //    m_hitNum = TCDigiArray->GetLast() + 1;
-    //    new(TCDigiArray->AddrAt(m_hitNum)) TRGECLDigi();
-    new(TCDigiArray.nextFreeAddress()) TRGECLDigi();
-    m_hitNum = TCDigiArray.getEntries() - 1;
-    TCDigiArray[m_hitNum]->setEventId(m_nEvent);
-    TCDigiArray[m_hitNum]->setTCId(iTCIdm+1);
-    TCDigiArray[m_hitNum]->setPhiId(_TCMap->getTCPhiIdFromTCId(iTCIdm+1));
-    TCDigiArray[m_hitNum]->setThetaId(_TCMap->getTCThetaIdFromTCId(iTCIdm+1));
-    TCDigiArray[m_hitNum]->setRawEnergy(TCEnergy[iTCIdm][0]);
-    TCDigiArray[m_hitNum]->setRawTiming(TCTiming[iTCIdm][0]);
-    TCDigiArray[m_hitNum]->setRawEnergyTot(TCEnergy_tot[iTCIdm]);
-    TCDigiArray[m_hitNum]->setRawTimingTot(TCTiming_tot[iTCIdm]);
-    TCDigiArray[m_hitNum]->setFitEnergy(TCFitEnergy[iTCIdm]);
-    TCDigiArray[m_hitNum]->setFitTiming(TCFitTiming[iTCIdm]);
   }
   m_hitNum = 0;
   for (int iTCIdm = 0; iTCIdm < 576; iTCIdm++) {
-    for (int iBinTime = 0; iBinTime < 160; iBinTime++) {
+    for (int iBinTime = 0; iBinTime < 80; iBinTime++) {
       if ( TCEnergy[iTCIdm][iBinTime] < 0.001 ) {continue;}
       StoreArray<TRGECLDigi0> TCDigiArray;
       if (!TCDigiArray) TCDigiArray.create();
-      //      m_hitNum = TCDigiArray->GetLast() + 1;
-      //      new(TCDigiArray->AddrAt(m_hitNum)) TRGECLDigi0();
       new(TCDigiArray.nextFreeAddress()) TRGECLDigi0();
+      
       m_hitNum = TCDigiArray.getEntries() - 1;
+      
       TCDigiArray[m_hitNum]->setEventId(m_nEvent);
       TCDigiArray[m_hitNum]->setTCId(iTCIdm+1);
       TCDigiArray[m_hitNum]->setiBinTime(iBinTime);
@@ -663,28 +788,39 @@ TrgEclFAM::save(int m_nEvent){
       TCDigiArray[m_hitNum]->setRawTiming(TCTiming[iTCIdm][iBinTime]);
     }
   }
-  //
-  //
-  //
-  /*
-  float TC_threshold = 0.1; // 100MeV threshold
-  float TC_energy_raw[576] = {0};
-  float TC_energy_cut[576] = {0};
-  for (int iXtalIdm = 0; iXtalIdm < 8736; iXtalIdm++) {
-    TC_energy_raw[_TCMap->getTCIdFromXtalId(iXtalIdm+1) - 1] += xtal_energy[iXtalIdm];
-  }
-  for (int iTCIdm = 0; iTCIdm < 576; iTCIdm++) {
-    if (TC_energy_raw[iTCIdm] > TC_threshold) {
-      TC_energy_cut[iTCIdm] = TC_energy_raw[iTCIdm];
+  m_hitNum = 0;
+  
+  for (int iTCIdm = 0; iTCIdm < 576;  iTCIdm++) {
+    for(int inoutput=0; inoutput< noutput[iTCIdm] ; inoutput++){
+      if ( TCFitEnergy[iTCIdm][inoutput] < 0.001 ) { 
+	continue;  // 50 MeV Fitted TC energy cut
+      }
+      if ( TCFitEnergy[iTCIdm][inoutput]==0&& TCFitTiming[iTCIdm][inoutput]==0 ) { 
+	continue;
+      }
+      StoreArray<TRGECLHit> TrgEclHitArray;
+      if (!TrgEclHitArray) TrgEclHitArray.create();
+      
+      new(TrgEclHitArray.nextFreeAddress()) TRGECLHit();
+      m_hitNum = TrgEclHitArray.getEntries() - 1;
+      TrgEclHitArray[m_hitNum]->setEventId(m_nEvent);
+      TrgEclHitArray[m_hitNum]->setTCId(iTCIdm+ 1);
+      TrgEclHitArray[m_hitNum]->setTCOutput(inoutput+1);
+      TrgEclHitArray[m_hitNum]->setEnergyDep(TCFitEnergy[iTCIdm][inoutput]);
+      TrgEclHitArray[m_hitNum] ->setTimeAve(TCFitTiming[iTCIdm][inoutput]);
     }
   }
   for (int iTCIdm = 0; iTCIdm < 576; iTCIdm++) {
+    
+    _tcnoutput.push_back(noutput[iTCIdm]);
+    
     _tcid.push_back(iTCIdm + 1);
+    
     _tcthetaid.push_back(_TCMap->getTCThetaIdFromTCId(iTCIdm+1));
+    
     _tcphiid.push_back(_TCMap->getTCPhiIdFromTCId(iTCIdm+1));
-    _tcenergy.push_back(TC_energy_cut[iTCIdm]);
+    
   }
-  */
   //
   //
   //
@@ -695,8 +831,8 @@ TrgEclFAM::save(int m_nEvent){
 //
 double
 TrgEclFAM::FADC(int flag_gen, 
-	    double timing){
-
+		double timing){
+  
   //--------------------------------------
   //
   // o "timing" unit is [us]
@@ -708,7 +844,7 @@ TrgEclFAM::FADC(int flag_gen,
   static double tc,fm,fff,tt,dt,tc2,tm,tsc,tris;
   static double amp,td,t1,b1,t2,b2,ts,dft,as;
   int im,ij;
-
+  
   static int ifir=0;
   
   if(ifir==0){
@@ -800,7 +936,7 @@ TrgEclFAM::FADC(int flag_gen,
 		ShapeF(tc2,t1,b1,t2,b2,td,tsh)*as)-pdf)/dd;
     pdf = pdf*0.001; // GeV
   }
-
+  
   return pdf;
 }
 //
@@ -823,7 +959,7 @@ TrgEclFAM::ShapeF(double t00,
   
   double sv123 = 0.0;
   if ( t00<0 ) return 0;
-      
+  
   dr = (ts1-td1)/td1;
   if(fabs(dr)<=1.0e-5){
     if( ts1>td1 ){ ts1 = td1*1.00001; }
@@ -845,7 +981,7 @@ TrgEclFAM::ShapeF(double t00,
   double b2 = 1/tb2;
   double c1 = 1/td1;
   double c2 = 1/ts1;
-
+  
   das0 = b2*(pow((b1-a1),2)+(b2+a2)*(b2-a2));
   dac0 = -2*(b1-a1)*a2*b2;
   das1 = a2*(pow((b1-a1),2)-(b2+a2)*(b2-a2));
@@ -865,7 +1001,7 @@ TrgEclFAM::ShapeF(double t00,
   //
   //
   dzna = (pow((b1-a1),2)+pow((b2-a2),2))*(pow((b1-a1),2)+pow((a2+b2),2));
-
+  
   sv123 = (
 	   (dcs0s+dcs1s)*exp(-c2*t00)*(-1)+
 	   (dcs0d+dcs1d)*exp(-c1*t00)+
@@ -873,7 +1009,7 @@ TrgEclFAM::ShapeF(double t00,
  	   ((dsn1s-dsn1d)*sin(b2*t00)+(dcs1s-dcs1d)*cos(b2*t00))*exp(-b1*t00)
 	   )
     /dzna/(1/c2-1/c1);
-
+  
   return sv123;
 }
 //
@@ -881,20 +1017,19 @@ TrgEclFAM::ShapeF(double t00,
 //
 double
 TrgEclFAM::u_max(double aaa, double bbb){
-
+  
   if (aaa>bbb){ return aaa; }
   else        { return bbb; }
 }
 //
 //
-//
+
 void
 TrgEclFAM::FAMFit(int nbin_pedestal,
 		  int NSampling,
+		  int iTCIdm,
 		  double fam_sampling_interval,
-		  double digiEnergy[],
-		  double *returnE,
-		  double *returnT){
+		  double digiEnergy[]){
   //============================
   // In this function,
   // o Energy unit must be [MeV/c2]
@@ -904,19 +1039,26 @@ TrgEclFAM::FAMFit(int nbin_pedestal,
   // o return time unit must be [ns]
   //============================
   double TCFitSample[14] = {0}; // MeV/c2
-  double SigStartTime = 0;
   double CoeffAAA=0;
   double CoeffBBB=0;
   double CoeffPPP=0;
-
   int dTBin = 0;
   int ShiftdTBin = 0;
-  //  double IntervaldT = 1.0/960.0; // (= 1.0417 ns)
-  double IntervaldT = 1.0/(fam_sampling_interval*10)*(fam_sampling_interval/100.0);
-
-  //  for(int iShift=0; iShift<(64-14); iShift++ ){
+  int Nsmalldt = 96;
+  int SmallOffset = 1;
+  double IntervaldT  = fam_sampling_interval*0.001/ Nsmalldt;
+  double EThreshold = 50; //[GeV]
+  int FitSleepCounter   = 100; // counter to suspend fit
+  int FitSleepThreshold = 2;   // # of clk to suspend fit
+  double FitE = 0;
+  double FitT = 0;
+  
+  noutput[iTCIdm]= 0;
+  
   for(int iShift=0; iShift<(NSampling-14); iShift++ ){
-    //
+    
+    FitSleepCounter++;
+    if (FitSleepCounter<=FitSleepThreshold){continue;}
     for(int iFitSample=0; iFitSample<14; iFitSample++){ 
       int iReplace = iFitSample+iShift;
       TCFitSample[iFitSample] = digiEnergy[iReplace]*1000.0;
@@ -924,16 +1066,11 @@ TrgEclFAM::FAMFit(int nbin_pedestal,
     //
     //
     //
-    if( fabs(SigStartTime-0.17)>0.5*(fam_sampling_interval*0.001) ){ 
-      // condition (SigStartTime = +0.05 to +0.25)
-      //      dTBin = 96;
-      dTBin = (int) fam_sampling_interval;
-    }else{
-      //      dTBin = ShiftdTBin+96;
-      dTBin = ShiftdTBin+(int) fam_sampling_interval;
-      if(dTBin<1)  {dTBin =   1;}
-      if(dTBin>192){dTBin = 192;}
-    }
+    
+    dTBin = (int)(ShiftdTBin+Nsmalldt);
+    if(dTBin<1)  {dTBin =   1;}
+    if(dTBin>192){dTBin = 192;}
+    
     CoeffAAA=0;
     CoeffBBB=0;
     CoeffPPP=0;
@@ -942,51 +1079,51 @@ TrgEclFAM::FAMFit(int nbin_pedestal,
       CoeffBBB += CoeffNoise32[dTBin-1][iFitSample] * TCFitSample[iFitSample];
       CoeffPPP += CoeffNoise33[dTBin-1][iFitSample] * TCFitSample[iFitSample];
     }
-    double deltaT = -CoeffBBB/CoeffAAA;  // deltaT [us]
-    //@ In lookup table,
-    //@ smaller bin of dTBin means more larger(positive)  t0 shift 
-    //@ larger  bin of dTBin means more smaller(negative) t0 shift
-    //@ So, "-deltaT/IntervaldT + dTBin" is needed for "ShiftBin" below
-    ShiftdTBin = int(-deltaT/IntervaldT+dTBin+100.5)-100;
-    deltaT -= (dTBin-fam_sampling_interval) * IntervaldT;
-    //
-    SigStartTime = 0.5*(fam_sampling_interval*0.001) + (deltaT);
-    //------------------
-    // Choose a start time of signal 
-    // => -0.03 < SigStartTime < 0.13
-    // => -0.08 < bbb/aaa < 0.08
-    //------------------
-    if( fabs(deltaT)<0.8*(fam_sampling_interval*0.001) && CoeffAAA>0.0 ){
-      SigStartTime  += (iShift-(nbin_pedestal-5)-1)*(fam_sampling_interval*0.001);
-      if( CoeffAAA>100.0 ){
-	//	printf("%5i %8.1f %5.0i\n", iShift, SigStartTime*1000, dTBin);
-	//--------
-	//	double chi  = 0.0;
-	//	for(int iii=0; iii<14; iii++){
-	//	  pp[iii] = noise_fl1[iii];
-	//	  pf[iii] = p1r + CoeffAAA * f0[iii][i51] + b1r * f1[iii][i51];
-	//	  if(iii<bin14) {
-	//	    chi = chi + fabs(pp[iii]-pf[iii]) * fabs(pp[iii]-pf[iii]);
-	//	  }
-	//	}
-	//--------
-	break;
-      }
+    double deltaT = CoeffBBB/CoeffAAA;  // deltaT [us]
+    
+    ShiftdTBin = int(deltaT/IntervaldT+dTBin); 
+    
+    FitE = CoeffAAA;
+    
+    //-------
+    // Require "expected time" is around middle of table = Nsmalldt.
+    //-------
+    double condition_t = -(deltaT + dTBin*IntervaldT - fam_sampling_interval*0.001);
+    
+    
+    if( fabs(deltaT)<0.8*(fam_sampling_interval*0.001) && FitE>EThreshold ){
+      FitT = condition_t + (SmallOffset+iShift+nbin_pedestal-1-5.5)*(fam_sampling_interval*0.001);
+      //--------
+      //	double chi  = 0.0;
+      //	for(int iii=0; iii<14; iii++){
+      //	  pp[iii] = noise_fl1[iii];
+      //	  pf[iii] = p1r + CoeffAAA * f0[iii][i51] + b1r * f1[iii][i51];
+      //	  if(iii<bin14) {
+      //	    chi = chi + fabs(pp[iii]-pf[iii]) * fabs(pp[iii]-pf[iii]);
+      //	  }
+      //	}
+      //--------
+      //	break;
+      returnE[noutput[iTCIdm]] = FitE/1000.0;  // [GeV/c2]
+      returnT[noutput[iTCIdm]] = FitT*1000;
+      noutput[iTCIdm]++;
+      FitSleepCounter = 0;
+      ShiftdTBin = 0;
+      
     }
   }
-  *returnE = CoeffAAA/1000.0;  // [GeV/c2]
-  *returnT = SigStartTime*1000;   // [ns]
   //
   //
   //
   return;
 }
+
 //
 //
 //
 void 
 TrgEclFAM::readFAMDB(void){
-
+  
   double par_f0[192][14] = {
 { 0.00000, 0.00000, 0.00000, 0.00000, 0.00000, 0.00000, 0.00368, 0.15726, 0.47637, 0.76169, 0.93179, 0.99603, 0.98951, 0.89182},
 { 0.00000, 0.00000, 0.00000, 0.00000, 0.00000, 0.00000, 0.00401, 0.16011, 0.47978, 0.76409, 0.93295, 0.99626, 0.98918, 0.88996},

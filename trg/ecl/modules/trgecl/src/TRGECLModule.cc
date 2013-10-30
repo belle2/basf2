@@ -27,6 +27,8 @@
 #include "trg/ecl/modules/trgecl/TRGECLModule.h"
 #include "trg/ecl/dataobjects/TRGECLDigi.h"
 #include "trg/ecl/dataobjects/TRGECLDigi0.h"
+#include "trg/ecl/dataobjects/TRGECLHit.h"
+#include "trg/ecl/dataobjects/TRGECLTrg.h"
 
 #include <stdlib.h>
 #include <iostream>
@@ -97,6 +99,12 @@ namespace Belle2 {
     m_hitTCNum = 0;
     StoreArray<TRGECLDigi>::registerPersistent();
     StoreArray<TRGECLDigi0>::registerPersistent();
+    StoreArray<TRGECLHit>::registerPersistent();
+    StoreArray<TRGECLTrg>::registerPersistent();
+
+
+
+
   }
 //
 //

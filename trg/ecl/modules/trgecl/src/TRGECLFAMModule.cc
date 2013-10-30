@@ -28,7 +28,7 @@
 #include "trg/ecl/TrgEclFAM.h"
 #include "trg/ecl/dataobjects/TRGECLDigi.h"
 #include "trg/ecl/dataobjects/TRGECLDigi0.h"
-
+#include "trg/ecl/dataobjects/TRGECLHit.h"
 #include <stdlib.h>
 #include <iostream>
 
@@ -103,7 +103,7 @@ TRGECLFAMModule::initialize() {
 
   StoreArray<TRGECLDigi>::registerPersistent();
   StoreArray<TRGECLDigi0>::registerPersistent();
-
+  StoreArray<TRGECLHit>::registerPersistent();
 }
 //
 //
@@ -138,7 +138,7 @@ TRGECLFAMModule::event() {
   //
   // FAM simulation
   TrgEclFAM * obj_trgeclfam = new TrgEclFAM();
-  obj_trgeclfam->setup(m_nEvent, _famMethod, _binTimeInterval);
+  obj_trgeclfam->setup(m_nEvent, _famMethod);
   //
   //
   //

@@ -29,6 +29,7 @@ namespace Belle2 {
     int m_tcid;
     int m_phiid;
     int m_thetaid;
+    int m_tcnoutput;
     // TC Energy and Timing
     double m_raw_energy;
     double m_raw_timing;
@@ -50,6 +51,8 @@ namespace Belle2 {
     void setRawTimingTot(double raw_timing_tot) { m_raw_timing_tot = raw_timing_tot; }
     void setFitEnergy(double fit_energy) { m_fit_energy = fit_energy; }
     void setFitTiming(double fit_timing) { m_fit_timing = fit_timing; }
+    
+    void setTCnOutput(int TC_noutput) { m_tcnoutput= TC_noutput; }
 
     // Get event id
     int getEventId() const { return m_eventid; }

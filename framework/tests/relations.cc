@@ -443,6 +443,8 @@ namespace Belle2 {
 
     //should be safe
     EXPECT_FALSE((relObjData)[0]->addRelationTo(NULL));
+    ProfileInfo notInArray;
+    EXPECT_FALSE((relObjData)[0]->addRelationTo(&notInArray));
   }
 
   /** Test getting array name/index from a RelationsObject. */

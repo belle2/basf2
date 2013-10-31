@@ -107,8 +107,6 @@ void CDCDigitizerModule::initialize()
   m_driftV       = cdcp.getNominalDriftV();
   m_driftVInv    = 1. / m_driftV;
   m_propSpeedInv = 1. / cdcp.getNominalPropSpeed();
-
-  m_noOfSmallCellLayers = 8; //set here tentatively; a function which returns this no. should be provided in CDCGeometryPar
   /*
       m_fraction = 1.0;
       m_resolution1 = cdcp.getNominalSpaceResol();
@@ -127,7 +125,6 @@ void CDCDigitizerModule::initialize()
   cout << "m_driftV= " <<  m_driftV << endl;
   cout << "m_driftVInv= " <<  m_driftVInv << endl;
   cout << "m_propSpeedInv= " <<  m_propSpeedInv << endl;
-  cout << "m_noOfSmallCellLayers= " << m_noOfSmallCellLayers << endl;
   /*
     cout << "m_fraction= " <<  m_fraction << endl;
     cout << "m_resolution1= " <<  m_resolution1 << endl;
@@ -204,7 +201,7 @@ void CDCDigitizerModule::event()
 
     //apply time window cut
     double tMax = m_tMaxOuter;
-    if (m_wireID.getICLayer() < m_noOfSmallCellLayers) tMax = m_tMaxInner;
+    if (m_wireID.getISuperLayer() == 0) tMax = m_tMaxInner;
     if (hitDriftTime < m_tMin || hitDriftTime > tMax) continue;
 
     iterSignalMap = signalMap.find(m_wireID);

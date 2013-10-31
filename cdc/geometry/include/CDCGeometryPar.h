@@ -407,7 +407,7 @@ namespace Belle2 {
 
       double m_XT[MAX_N_SLAYERS][2][18][9];
 
-      double m_Sigma[MAX_N_SLAYERS][6];
+      double m_Sigma[MAX_N_SLAYERS][7];
 
       double m_PropSpeedInv[MAX_N_SLAYERS];
 

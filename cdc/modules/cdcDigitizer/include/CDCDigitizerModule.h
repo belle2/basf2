@@ -130,7 +130,6 @@ namespace Belle2 {
     double m_driftV;            /**< Nominal drift velocity (in cm/ns)*/
     double m_driftVInv;         /**< m_driftV^-1 (in ns/cm)*/
     double m_propSpeedInv;      /**< Inv. of nominal signal propagation speed in a wire (in ns/cm)*/
-    unsigned short m_noOfSmallCellLayers; /**< No. of layers consisting of small cells */
 
     //--- Universal digitization parameters -------------------------------------------------------------------------------------
     bool m_addInWirePropagationDelay; /**< A switch used to control adding propagation delay into the total drift time or not */

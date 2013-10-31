@@ -245,7 +245,7 @@ void CDCGeometryPar::read()
 
   if (m_XTetc4Recon) {
     readXT(gbxParams, 1);
-    //    readSigma(gbxParams, 1);
+    readSigma(gbxParams, 1);
     readPropSpeed(gbxParams, 1);
   }
 
@@ -316,7 +316,7 @@ void CDCGeometryPar::readXT(const GearDir gbxParams, const int mode)
 {
   std::string fileName0 = gbxParams.getString("xtFileName");
   if (mode == 1) {
-    std::string fileName0 = gbxParams.getString("xt4ReconFileName");
+    fileName0 = gbxParams.getString("xt4ReconFileName");
   }
 
   fileName0 = "/cdc/data/" + fileName0;
@@ -400,7 +400,7 @@ void CDCGeometryPar::readSigma(const GearDir gbxParams, const int mode)
 {
   std::string fileName0 = gbxParams.getString("sigmaFileName");
   if (mode == 1) {
-    std::string fileName0 = gbxParams.getString("sigma4ReconFileName");
+    fileName0 = gbxParams.getString("sigma4ReconFileName");
   }
   fileName0 = "/cdc/data/" + fileName0;
   std::string fileName = FileSystem::findFile(fileName0);
@@ -433,10 +433,12 @@ void CDCGeometryPar::readSigma(const GearDir gbxParams, const int mode)
       m_Sigma[iL][i] = sigma[i];
     }
 
+    m_Sigma[iL][np] = 0.5 * m_cellSize[iL] - 0.75;
+
     if (m_debug) {
       cout << iL;
-      for (int i = 0; i < np; ++i) {
-        cout << " " << sigma[i];
+      for (int i = 0; i < np + 1; ++i) {
+        cout << " " << m_Sigma[iL][i];
       }
       cout << endl;
     }
@@ -452,7 +454,7 @@ void CDCGeometryPar::readPropSpeed(const GearDir gbxParams, const int mode)
 {
   std::string fileName0 = gbxParams.getString("propSpeedFileName");
   if (mode == 1) {
-    std::string fileName0 = gbxParams.getString("propSpeed4ReconFileName");
+    fileName0 = gbxParams.getString("propSpeed4ReconFileName");
   }
   fileName0 = "/cdc/data/" + fileName0;
   std::string fileName = FileSystem::findFile(fileName0);
@@ -816,29 +818,30 @@ double CDCGeometryPar::getDriftTime(const double dist, const unsigned short iCLa
 double CDCGeometryPar::getSigma(const double driftL, const unsigned short iCLayer) const
 {
 
-  if (false) {
-    std::cout << "driftL " << driftL << " iCLayer " << iCLayer << std::endl;
-  }
-  return m_nominalSpaceResol; //tentatively; to be updated in the next release
+  const double P0 = m_Sigma[iCLayer][0];
+  const double P1 = m_Sigma[iCLayer][1];
+  const double P2 = m_Sigma[iCLayer][2];
+  const double P3 = m_Sigma[iCLayer][3];
+  const double P4 = m_Sigma[iCLayer][4];
+  const double P5 = m_Sigma[iCLayer][5];
+  const double P6 = m_Sigma[iCLayer][6];
 
-  /*  const double P0 = m_Sigma[iCLayer][0];
-      const double P1 = m_Sigma[iCLayer][1];
-      const double P2 = m_Sigma[iCLayer][2];
-      const double P3 = m_Sigma[iCLayer][3];
-      const double P4 = m_Sigma[iCLayer][4];
-      const double P5 = m_Sigma[iCLayer][5];
-      cout <<"P0= " << P0 << endl;
-      cout <<"P1= " << P1 << endl;
-      cout <<"P2= " << P2 << endl;
-      cout <<"P3= " << P3 << endl;
-      cout <<"P4= " << P4 << endl;
-      cout <<"P5= " << P5 << endl;
-      cout <<"driftL= " << driftL << endl;
-      cout <<"iCLayer= " << iCLayer << endl;
+  double sigma = sqrt(P0 / (driftL * driftL + P1) + P2 * driftL + P3 +
+                      P4 * exp(P5 * (driftL - P6) * (driftL - P6)));
+  sigma = std::min(sigma, m_maxSpaceResol);
 
-      const double driftL2 = driftL * driftL;
-      const double sigma = sqrt(P0/(driftL2 + P1) + P2*driftL + P3 + P4*exp(P5*driftL2));
+#if defined(CDC_DEBUG)
+  cout << "driftL= " << driftL << endl;
+  cout << "iCLayer= " << iCLayer << endl;
+  cout << "P0= " << P0 << endl;
+  cout << "P1= " << P1 << endl;
+  cout << "P2= " << P2 << endl;
+  cout << "P3= " << P3 << endl;
+  cout << "P4= " << P4 << endl;
+  cout << "P5= " << P5 << endl;
+  cout << "P6= " << P6 << endl;
+  cout << "sigma= " << sigma << endl;
+#endif
 
-      return std::min(sigma, m_maxSpaceResol);
-  */
+  return sigma;
 }

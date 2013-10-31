@@ -24,7 +24,7 @@ namespace Belle2 {
     BoostPythonModuleProxy(const char* name, void (*initFunc)(), bool auto_import = false);
   };
 
-  /*
+  /**
    * Register a python module to make available when loading the library.
    *
    * Use it by defining your module via BOOST_PYTHON_MODULE(name), then call
@@ -35,7 +35,7 @@ namespace Belle2 {
    */
 #define REGISTER_PYTHON_MODULE(moduleName) Belle2::BoostPythonModuleProxy boostPythonModuleProxy##moduleName(#moduleName, init##moduleName);
 
-  /*
+  /**
    * Identical to REGISTER_PYTHON_MODULE(), but will also
    * import the module into the global namespace after loading it.
    *

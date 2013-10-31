@@ -156,8 +156,8 @@ TrgEcl::simulate(int m_nEvent)
   //-----------------------------------------
   double MaxE = 0;
   double EventTiming=0;
-  //------------------------------------------
-  double MaxTCId;
+  int MaxTCId=0;
+
   if(1){
    
     MaxE = 0;

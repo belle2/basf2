@@ -1,18 +1,18 @@
 #!/bin/bash
 
-HOSTNAME=`hostname`
+#HOSTNAME=`hostname`
 ## setup for Basf2 framework ##
-if [ ! -n "${BELLE2_LOCAL_DIR}" ]; then 
-  if [ $HOSTNAME = "belle-rpc1" ]; then
-    source $HOME/belle2/tools/setup_belle2_desy
-  else
-    source $HOME/belle2/tools/setup_belle2
-  fi
-  cd $HOME/belle2/release/
-  setuprel
-  export BELLE2_OPTION=opt
-  cd -
-fi
+#if [ ! -n "${BELLE2_LOCAL_DIR}" ]; then 
+#  if [ $HOSTNAME = "belle-rpc1" ]; then
+#    source $HOME/belle2/tools/setup_belle2_desy
+#  else
+#    source $HOME/belle2/tools/setup_belle2
+#  fi
+#  cd $HOME/belle2/release/
+#  setuprel
+#  export BELLE2_OPTION=opt
+#  cd -
+#fi
 
 ## setup for slow control system libraries ##
 export B2SLC_PATH=$BELLE2_LOCAL_DIR/daq/slc

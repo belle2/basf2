@@ -713,6 +713,11 @@ EVEVisualization::MCTrack* EVEVisualization::addMCParticle(const MCParticle* par
   if (m_hideSecondaries and !particle->hasStatus(MCParticle::c_PrimaryParticle)) {
     return NULL;
   }
+  //don't show Upsilon(4S)
+  //workaround for workaround, remove once bug #937 is fixed
+  if (particle->getDecayTime() == 0.0 and particle->getDecayTime() == particle->getProductionTime()) {
+    return NULL;
+  }
   if (m_assignToPrimaries) {
     while (!particle->hasStatus(MCParticle::c_PrimaryParticle) and particle->getMother())
       particle = particle->getMother();
@@ -755,6 +760,7 @@ EVEVisualization::MCTrack* EVEVisualization::addMCParticle(const MCParticle* par
     //neutrals and very short-lived particles should stop somewhere
     //(can result in wrong shapes for particles stopped in the detector, so not used there)
     //also make sure a decay vertex is set, and that it is not set to (0,0,0) (as with particle gun)
+    //last bit is workaround for particlegun bug #937
     if ((TMath::Nint(particle->getCharge()) == 0 or !particle->hasStatus(MCParticle::c_StoppedInDetector))
         and mctrack.fDecayed and mctrack.fTDecay != 0.0) {
       TEvePathMarkD decayMark(TEvePathMarkD::kDecay);

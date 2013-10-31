@@ -35,29 +35,13 @@ ParticleGunModule::ParticleGunModule() : Module()
   setPropertyFlags(c_Input);
 
   //Set default values for parameters
-  //m_parameters.pdgCodes       += -11, 11;
-  //m_parameters.momentumParams += 0.05, 3.0;
-  //m_parameters.phiParams      += 0.0, 360.0;
-  //m_parameters.thetaParams    += 17.0, 150.0;
-  //m_parameters.xVertexParams  += 0.0, 0.7;
-  //m_parameters.yVertexParams  += 0.0, 0.7;
-  //m_parameters.zVertexParams  += 0.0, 1.0;
-
-  //
-  addParam("pdgCodes", m_parameters.pdgCodes,
-           "PDG codes for generated particles", { -11, 11});
-  addParam("momentumParams", m_parameters.momentumParams,
-           "Set momentum value", {0.05, 3.0});
-  addParam("phiParams", m_parameters.phiParams,
-           "Set phi angle value", {0.0, 360.0});
-  addParam("thetaParams", m_parameters.thetaParams,
-           "Set theta angle value", {17.0, 150.0});
-  addParam("xVertexParams", m_parameters.xVertexParams,
-           "Set xVertexParams value", {0.0, 0.7});
-  addParam("yVertexParams", m_parameters.yVertexParams,
-           "Set yVertexParams value", {0.0, 0.7});
-  addParam("zVertexParams", m_parameters.zVertexParams,
-           "Set zVertexParams value", {0.0, 1.0});
+  m_parameters.pdgCodes       += -11, 11;
+  m_parameters.momentumParams += 0.05, 3.0;
+  m_parameters.phiParams      += 0.0, 360.0;
+  m_parameters.thetaParams    += 17.0, 150.0;
+  m_parameters.xVertexParams  += 0.0, 0.7;
+  m_parameters.yVertexParams  += 0.0, 0.7;
+  m_parameters.zVertexParams  += 0.0, 1.0;
 
   //Parameter definition
   addParam("nTracks", m_parameters.nTracks,

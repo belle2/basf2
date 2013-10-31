@@ -16,7 +16,7 @@
     <!-- Switch for reading x-t etc. (from disk) to be used in simulation -->
     <XTetc desc="true: read x-t etc. params. from disk; false: not read.">true</XTetc>
     <xtFileName desc="file which contains x-t relation">xt_v0.dat</xtFileName>
-    <sigmaFileName desc="file which contains space resol.">sigma_const.dat</sigmaFileName>
+    <sigmaFileName desc="file which contains space resol.">sigma_v0.dat</sigmaFileName>
     <propSpeedFileName desc="file which contains propagation speed">propspeed_v0.dat</propSpeedFileName>
 
     <!-- Switch for selecting geometry to be used in reconstruction -->
@@ -26,7 +26,7 @@
     <!-- Switch for selecting x-t etc. to be used in reconstruction -->
     <XTetc4Recon desc="true: use calibrated x-t etc.; false: use the same ones as used in simulation">false</XTetc4Recon>
     <xt4ReconFileName desc="file which contains x-t relation for reconstruction">xt_v0.dat</xt4ReconFileName>
-    <sigma4ReconFileName desc="file which contains space resol. for reconstruction">sigma_const.dat</sigma4ReconFileName>
+    <sigma4ReconFileName desc="file which contains space resol. for reconstruction">sigma_v0.dat</sigma4ReconFileName>
     <propSpeed4ReconFileName desc="file which contains propagation speed for reconstruction">propspeed_v0.dat</propSpeed4ReconFileName>
 
     <OffsetZ desc="The offset of the whole cdc in z with respect to the IP (should be the same as beampipe)" unit="mm">0.0</OffsetZ>

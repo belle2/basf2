@@ -30,7 +30,7 @@ export B2SC_SERVER_HOST="belle-rpc1";
 
 ## NSM configuration ##
 export NSM2_HOST=`/sbin/ifconfig | grep "192\.168\.10\." | sed "s/:/ /g" | awk '{print $3}'`
-#export NSM2_HOST=192.168.244.137
+export NSM2_HOST=130.87.227.252
 export NSM2_PORT=8222
 export NSM2_SHMKEY=8222
 export NSM2_INCDIR=$B2SLC_PATH/bin

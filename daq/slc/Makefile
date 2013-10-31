@@ -2,6 +2,7 @@
 
 all:
 	make -C nsm2/
+	cp nsm2/example/master bin/cui
 	make -C src/ full
 	make -C templated/
 	make -C cprcontrold/
@@ -26,5 +27,5 @@ clean:
 #	make -C ttdd/ clean
 	make -C src/ clean
 	make -C nsm2/ clean
-	rm -rf *~ .*~ \#*~
+	rm -rf *~ .*~ \#*~ bin/cui
 	make -C bin/ clean

@@ -723,10 +723,6 @@ EVEVisualization::MCTrack* EVEVisualization::addMCParticle(const MCParticle* par
       particle = particle->getMother();
   }
 
-  //particles with PDG 0 will not be shown (many created in TOP)
-  while (particle->getPDG() == 0 and particle->getMother())
-    particle = particle->getMother();
-
   if (!m_mcparticleTracks[particle].track) {
     const TVector3& p = particle->getMomentum();
     const TVector3& vertex = particle->getProductionVertex();

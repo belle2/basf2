@@ -1,75 +1,100 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# This steering file will simulate testbeam events, fit tracks and
-# show tracking statistics
-import os
+# Common PXD&SVD TestBeam Jan 2014 @ DESY Simulation
+# This is the default simulation scenario for VXD beam test without telescopes
+
+# Important parameters of the simulation:
+events = 100  # Number of events to simulate
+momentum = 6.0  # GeV/c
+momentum_spread = 0.05  # %
+theta = 90.0  # degrees
+theta_spread = 0.005  # # degrees (sigma of gaussian)
+phi = 180.0  # degrees
+phi_spread = 0.005  # degrees (sigma of gaussian)
+gun_x_position = 100.  # cm ... 100cm ... outside magnet + plastic shielding + Al scatterer (air equiv.)
+# gun_x_position = 40. # cm ... 40cm ... inside magnet
+beamspot_size_y = 0.3  # cm (sigma of gaussian)
+beamspot_size_z = 0.3  # cm (sigma of gaussian)
+
 from basf2 import *
-from subprocess import call
-
+# suppress messages and warnings during processing:
 set_log_level(LogLevel.ERROR)
-set_random_seed(3)
+# ParticleGun
+particlegun = register_module('ParticleGun')
+# number of primaries per event
+particlegun.param('nTracks', 10)
+# DESY electrons:
+particlegun.param('pdgCodes', [11])
+# momentum magnitude 2 GeV/c or something above or around.
+# At DESY we can have up to 6 GeV/c(+-5%) electron beam.
+# Beam divergence divergence and spot size is adjusted similar to reality
+# See studies of Benjamin Schwenker
+particlegun.param('momentumGeneration', 'normal')
+momentum = 6.0  # GeV/c
+momentum_spread = 0.05  # %
+particlegun.param('momentumParams', [momentum, momentum * momentum_spread])
+# momentum direction must be around theta=90, phi=180
+particlegun.param('thetaGeneration', 'normal')
+particlegun.param('thetaParams', [theta, theta_spread])
+particlegun.param('phiGeneration', 'normal')
+particlegun.param('phiParams', [phi, phi_spread])
+# gun position must be in positive values of x.
+# Magnet wall starts at 424mm and ends at 590mm
+# Plastic 1cm shielding is at 650mm
+# Aluminium target at 750mm to "simulate" 15m air between collimator and TB setup
+particlegun.param('vertexGeneration', 'normal')
+particlegun.param('xVertexParams', [gun_x_position, 0.0])
+particlegun.param('yVertexParams', [0.0, beamspot_size_y])
+particlegun.param('zVertexParams', [0.0, beamspot_size_z])
+particlegun.param('independentVertices', True)
 
+# Create Event information
 evtmetagen = register_module('EvtMetaGen')
-evtmetagen.param('expList', [0])
-evtmetagen.param('runList', [1])
-evtmetagen.param('evtNumList', [1000])
+evtmetagen.param({'evtNumList': [events], 'runList': [1]})
 
 # Show progress of processing
 progress = register_module('Progress')
 
+# Load parameters from xml
 gearbox = register_module('Gearbox')
-# use simple testbeam geometry
-gearbox.param('fileName', 'testbeam/vxd/VXD.xml')
+# This file contains the VXD (no Telescopes) beam test geometry including the real PCMAG magnetic field
+gearbox.param('fileName', 'testbeam/vxd/VXD-simple-noTels-30Oct13.xml')
 
+# Create geometry
 geometry = register_module('Geometry')
-# only the tracking detectors will be simulated. Makes this example much faster
+# You can specify components to be created
 geometry.param('Components', ['MagneticField', 'TB'])
+# To turn off magnetic field:
+# geometry.param('Components', ['TB'])
 
-# ParticleGun
-particlegun = register_module('ParticleGun')
+# Full simulation module
+simulation = register_module('FullSim')
 
-# number of primaries per event
-particlegun.param('nTracks', 1)
+# Uncomment the following lines to get particle tracks visualization
+# simulation.param('EnableVisualization', True)
+# simulation.param('UICommands', ['/vis/open VRML2FILE', '/vis/drawVolume',
+#                 '/vis/scene/add/axes 0 0 0 100 mm',
+#                 '/vis/scene/add/trajectories smooth',
+#                 '/vis/modeling/trajectories/create/drawByCharge'])
 
-# DESY electrons:
-particlegun.param('pdgCodes', [-11])
-# momentum magnitude 2 - 6 GeV/c
-# Beam divergence 2mrad not covered yet (we need some starting point location)
-particlegun.param('momentumGeneration', 'fixed')
-particlegun.param('momentumParams', [2.0, 0.0])
-# momentum direction
-particlegun.param('thetaGeneration', 'fixed')
-particlegun.param('thetaParams', [90.0, 0.0])
-particlegun.param('phiGeneration', 'fixed')
-particlegun.param('phiParams', [0.0, 0.0])
-# gun displacement
-particlegun.param('vertexGeneration', 'fixed')
-# Set xVertexParams to [-30.0,0.0] to move the gun inside the magnet
-particlegun.param('xVertexParams', [-90.0, 0.0])
-particlegun.param('yVertexParams', [1.0, 0.0])
-particlegun.param('zVertexParams', [0.0, 0.0])
-particlegun.param('independentVertices', True)
+# PXD/SVD digitizer
+PXDDigi = register_module('PXDDigitizer')
+SVDDigi = register_module('SVDDigitizer')
+# PXD/SVD clusterizer
+PXDClust = register_module('PXDClusterizer')
+SVDClust = register_module('SVDClusterizer')
+# Save output of simulation
+output = register_module('RootOutput')
+output.param('outputFileName', 'TBSimulation.root')
+# You can specify branch names to be saved (only), see module doc
+# output.param('branchNames[0]', ['PXDTrueHits', 'SVDTrueHits'])
 
-g4sim = register_module('FullSim')
-# this is needed for the MCTrackFinder to work correctly
-g4sim.param('StoreAllSecondaries', True)
-SVDDIGI = register_module('SVDDigitizer')
-# SVDDIGI.logging.log_level = LogLevel.DEBUG
-SVDDIGI.param('PoissonSmearing', True)
-SVDDIGI.param('ElectronicEffects', True)
+# Export used geometry for checking
+geosaver = register_module('ExportGeometry')
+geosaver.param('Filename', 'TBGeometry.root')
 
-SVDCLUST = register_module('SVDClusterizer')
-# SVDCLUST.logging.log_level = LogLevel.DEBUG
-
-PXDDIGI = register_module('PXDDigitizer')
-# PXDDIGI.logging.log_level = LogLevel.DEBUG
-PXDDIGI.param('SimpleDriftModel', False)
-PXDDIGI.param('PoissonSmearing', True)
-PXDDIGI.param('ElectronicEffects', True)
-
-PXDCLUST = register_module('PXDClusterizer')
-
+# Use truth information to create track candidates
 mctrackfinder = register_module('MCTrackFinder')
 mctrackfinder.logging.log_level = LogLevel.WARNING
 param_mctrackfinder = {
@@ -83,9 +108,12 @@ mctrackfinder.param(param_mctrackfinder)
 
 # mctrackfinder.logging.log_level = LogLevel.DEBUG
 
+# Fit tracks with GENFIT
 trackfitter = register_module('GenFitter')
 trackfitter.logging.log_level = LogLevel.WARNING
 trackfitter.param('UseClusters', True)
+
+# Check track fitting results
 trackfitchecker = register_module('TrackFitChecker')
 # the results only show up at info or debug level
 trackfitchecker.logging.log_level = LogLevel.INFO
@@ -95,29 +123,26 @@ trackfitchecker.param('truthAvailable', True)
 trackfitchecker.param('robustTests', True)
 trackfitchecker.param('writeToRootFile', True)
 
-# Save output of simulation
-output = register_module('RootOutput')
-output.param('outputFileName', 'TBSimulationOutput.root')
-
-# Create paths
+# Path construction
 main = create_path()
-# Add modules to paths
 main.add_module(evtmetagen)
 main.add_module(progress)
 main.add_module(gearbox)
 main.add_module(geometry)
 main.add_module(particlegun)
-main.add_module(g4sim)
-main.add_module(PXDDIGI)
-main.add_module(PXDCLUST)
-main.add_module(SVDDIGI)
-main.add_module(SVDCLUST)
+main.add_module(simulation)
+main.add_module(PXDDigi)
+main.add_module(SVDDigi)
+main.add_module(PXDClust)
+main.add_module(SVDClust)
 main.add_module(mctrackfinder)
 main.add_module(trackfitter)
 main.add_module(trackfitchecker)
 main.add_module(output)
+main.add_module(geosaver)
 
 # Process events
 process(main)
 
+# Print call statistics
 print statistics

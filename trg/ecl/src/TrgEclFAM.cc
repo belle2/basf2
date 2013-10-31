@@ -862,6 +862,7 @@ TrgEclFAM::FADC(int flag_gen,
     tris = 0.01;
     tsc = ts;
     //
+    im = 0;
     ij = 0;
     fm = 0;
     tc = 0;

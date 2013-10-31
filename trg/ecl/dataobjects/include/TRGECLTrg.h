@@ -118,7 +118,7 @@ namespace Belle2 {
     void setitimebin( int itimebin ) { m_itimebin = itimebin; }
     void setBeamBkgVeto( int BeamBkgVeto  ) { m_BeamBkgVeto = BeamBkgVeto; }
     void setEventTiming( double eventtiming ) { m_eventtiming = eventtiming; }
-    void setMaxTCId( double maxTCId ) { m_maxTCId = maxTCId; }
+    void setMaxTCId( int maxTCId ) { m_maxTCId = maxTCId; }
     void setMaxTCEnergy( double maxTCEnergy ) { m_maxTCEnergy = maxTCEnergy; }
 
 

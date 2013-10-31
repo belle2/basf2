@@ -1,16 +1,15 @@
-#include "EventBuilderManager.hh"
+#include "EventBuilderManager.h"
 
-#include <node/DataSender.hh>
-#include <node/HSLB.hh>
-
-#include <util/Debugger.hh>
+#include <base/DataSender.h>
+#include <base/HSLB.h>
+#include <base/Debugger.h>
 
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <unistd.h>
 
-using namespace B2DAQ;
+using namespace Belle2;
 
 void EventBuilderManager::run() throw()
 {
@@ -19,7 +18,7 @@ void EventBuilderManager::run() throw()
     char path[128];
     const char* belle2_path = getenv("BELLE2_LOCAL_DIR");
     if (belle2_path == NULL) {
-      B2DAQ::debug("env BELLE2_LOCAL_DIR is not avaiable.");
+      Belle2::debug("env BELLE2_LOCAL_DIR is not avaiable.");
       return ;
     }
     int i = 0;
@@ -40,7 +39,7 @@ void EventBuilderManager::run() throw()
     }
     printf("\n");
     if (execvp(path, argv) == -1) {
-      B2DAQ::debug("Faield to configure eb0");
+      Belle2::debug("Faield to configure eb0");
     }
   }
 }

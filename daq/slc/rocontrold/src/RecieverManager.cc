@@ -1,23 +1,22 @@
-#include "RecieverManager.hh"
+#include "RecieverManager.h"
 
-#include <node/DataSender.hh>
-#include <node/HSLB.hh>
-
-#include <util/Debugger.hh>
+#include <base/DataSender.h>
+#include <base/HSLB.h>
+#include <base/Debugger.h>
 
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <unistd.h>
 
-using namespace B2DAQ;
+using namespace Belle2;
 
 void RecieverManager::run() throw()
 {
   if (_node != NULL) {
     const char* belle2_path = getenv("BELLE2_LOCAL_DIR");
     if (belle2_path == NULL) {
-      B2DAQ::debug("env BELLE2_LOCAL_DIR is not avaiable.");
+      Belle2::debug("env BELLE2_LOCAL_DIR is not avaiable.");
       return ;
     }
     char path[128];
@@ -35,9 +34,9 @@ void RecieverManager::run() throw()
     argv[2] = shmuse_c;
     argv[3] = port_c;
     argv[4] = NULL;
-    B2DAQ::debug("%s %s %s %s", path, script_c, shmuse_c, port_c);
+    Belle2::debug("%s %s %s %s", path, script_c, shmuse_c, port_c);
     if (execvp(path, argv) == -1) {
-      B2DAQ::debug("Faield to start receiver basf2 script");
+      Belle2::debug("Faield to start receiver basf2 script");
     }
   }
 }

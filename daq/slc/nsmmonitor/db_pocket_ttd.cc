@@ -1,18 +1,18 @@
-#include <nsm/NSMNodeDaemon.hh>
-#include <nsm/NSMData.hh>
-#include <nsm/NSMCommunicator.hh>
+#include <nsm/NSMNodeDaemon.h>
+#include <nsm/NSMData.h>
+#include <nsm/NSMCommunicator.h>
 
 #include <nsm/pocket_ttd.h>
 
-#include <db/MySQLInterface.hh>
+#include <database/MySQLInterface.h>
 
-#include <util/StringUtil.hh>
+#include <base/StringUtil.h>
 
 #include <iostream>
 #include <unistd.h>
 #include <cstdlib>
 
-using namespace B2DAQ;
+using namespace Belle2;
 
 int main(int argc, char** argv)
 {
@@ -34,8 +34,8 @@ int main(int argc, char** argv)
   NSMData* data = new NSMData(argv[1], "pocket_ttd", atoi(argv[2]));
   pocket_ttd* status = (pocket_ttd*)data->parse();
   try {
-    db->execute(B2DAQ::form("select * from %s_rev%d;",
-                            data->getName().c_str(), data->getRevision()));
+    db->execute(Belle2::form("select * from %s_rev%d;",
+                             data->getName().c_str(), data->getRevision()));
     DBRecordList& ret(db->loadRecords());
     for (size_t i = 0; i < ret.size(); i++) {
       data->setSQLValues(ret[i].getFieldNames(), ret[i].getFieldValues());

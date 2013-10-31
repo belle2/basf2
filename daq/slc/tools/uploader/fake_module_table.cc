@@ -3,12 +3,12 @@
 #include <fstream>
 #include <cstdlib>
 
-#include <util/StringUtil.hh>
+#include <base/StringUtil.h>
 
-#include <xml/XMLParser.hh>
-#include <xml/NodeLoader.hh>
+#include <xml/XMLParser.h>
+#include <xml/NodeLoader.h>
 
-using namespace B2DAQ;
+using namespace Belle2;
 
 int main(int argc, char** argv)
 {
@@ -38,7 +38,7 @@ int main(int argc, char** argv)
       if (hslb != NULL) {
         FEEModule* module = hslb->getFEEModule();
         if (module != NULL && module->getType() == module_type) {
-          std::cout << B2DAQ::form("%s:%c:", copper->getName().c_str(), (char)(slot + 'a'));
+          std::cout << Belle2::form("%s:%c:", copper->getName().c_str(), (char)(slot + 'a'));
           FEEModule::RegisterList& reg_v(module->getRegisters());
           for (size_t i = 0; true;) {
             FEEModule::Register& reg(reg_v[i]);

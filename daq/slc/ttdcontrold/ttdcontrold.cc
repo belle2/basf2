@@ -2,17 +2,17 @@
 
 #include <nsm/NSMNodeDaemon.hh>
 
-#include <node/TTDNode.hh>
+#include <base/TTDNode.hh>
 
-#include <util/Debugger.hh>
-#include <util/StringUtil.hh>
+#include <base/Debugger.hh>
+#include <base/StringUtil.hh>
 
-using namespace B2DAQ;
+using namespace Belle2;
 
 int main(int argc, char** argv)
 {
   if (argc < 2) {
-    B2DAQ::debug("Usage : ./ttdd <name>");
+    Belle2::debug("Usage : ./ttdd <name>");
     return 1;
   }
   const char* name = argv[1];

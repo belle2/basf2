@@ -1,12 +1,12 @@
-#include "PackageBuffer.hh"
+#include "PackageBuffer.h"
 
-#include <util/Debugger.hh>
+#include <base/Debugger.h>
 
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
 
-using namespace B2DQM;
+using namespace Belle2;
 
 PackageBuffer::PackageBuffer()
 {
@@ -23,13 +23,13 @@ size_t PackageBuffer::allocate(HistoPackage* pack)
 {
   _pack = pack;
   _lock.init();
-  B2DAQ::StreamSizeCounter counter;
+  Belle2::StreamSizeCounter counter;
   counter.reset();
   _lock.wrlock();
   serializeAll(counter);
   size_t count = (size_t)(counter.count() * 1.2);
   if (_writer != NULL) delete _writer;
-  _writer = new B2DAQ::ZipDeflater(counter.count(), count);
+  _writer = new Belle2::ZipDeflater(counter.count(), count);
   _lock.unlock();
   return count;
 }

@@ -1,11 +1,11 @@
-#include "PackageUpdater.hh"
+#include "PackageUpdater.h"
 
-#include "PackageManager.hh"
-#include "HistoServer.hh"
+#include "PackageManager.h"
+#include "HistoServer.h"
 
-#include <util/Debugger.hh>
+#include <base/Debugger.h>
 
-using namespace B2DQM;
+using namespace Belle2;
 
 void PackageUpdater::run()
 {

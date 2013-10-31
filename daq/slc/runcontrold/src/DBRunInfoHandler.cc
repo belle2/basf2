@@ -1,13 +1,13 @@
-#include "DBRunInfoHandler.hh"
+#include "DBRunInfoHandler.h"
 
-#include <system/Date.hh>
+#include <system/Date.h>
 
-#include <util/StringUtil.hh>
+#include <base/StringUtil.h>
 
 #include <iostream>
 #include <sstream>
 
-using namespace B2DAQ;
+using namespace Belle2;
 
 void DBRunInfoHandler::createRunConfigTable() throw(DBHandlerException)
 {

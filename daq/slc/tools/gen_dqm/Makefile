@@ -11,9 +11,9 @@ INCDIR  = ./include
 TMPDIR  = ./tmp
 LIBDIR  = ./lib
 
-LIBS    += -L$(B2SLC_LIB)/lib -lB2SLCUTIL
-LIBS    += -L$(B2SLC_LIB)/lib -lB2SLCDQM
-LIBS    += -L$(B2SLC_LIB)/lib -lB2SLCSYS 
+LIBS    += -L$(B2SLC_LIB)/lib -ldaq_slc_base
+LIBS    += -L$(B2SLC_LIB)/lib -ldaq_slc_system
+LIBS    += -L$(B2SLC_LIB)/lib -ldaq_slc_dqm
 LIBS    += -lm -lpthread -lrt -lz
 
 CFLAGS   = -g -Wall -fPIC -D_REENTRANT -DB2SLC_DEBUG_MODE #-Wno-deprecated
@@ -45,11 +45,11 @@ $(TARGETS): $(BINDIR)/% : %.cc $(OBJS)
 	@ $(RM) *~ */*~ \#*\#* */\#*\#*
 	@ echo '<< compiling succeded!! >>'
 
-$(OBJS): $(TMPDIR)/%.o : $(SRCDIR)/%.cc $(INCDIR)/%.hh
+$(OBJS): $(TMPDIR)/%.o : $(SRCDIR)/%.cc $(INCDIR)/%.h
 	@ echo '<< compiling $@ >>'
 	@ $(CXX) -c $(CFLAGS) $< -o  $@
 
-$(DEPS) : $(TMPDIR)/%.d: $(SRCDIR)/%.cc $(INCDIR)/%.hh
+$(DEPS) : $(TMPDIR)/%.d: $(SRCDIR)/%.cc $(INCDIR)/%.h
 	@ if [ ! -d $(TMPDIR) ];then mkdir $(TMPDIR) ;fi
 	@ echo '<< making dipendency $@ >>'
 	@ $(CXX) $(CFLAGS) -MM -MT $(basename $@).o $< -o $@

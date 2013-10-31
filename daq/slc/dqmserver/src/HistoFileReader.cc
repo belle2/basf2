@@ -1,13 +1,13 @@
-#include "HistoFileReader.hh"
+#include "HistoFileReader.h"
 
-#include <dqm/HistoPackage.hh>
-#include <dqm/Histo.hh>
+#include <dqm/HistoPackage.h>
+#include <dqm/Histo.h>
 
 #include "TH2.h"
 
 #include <iostream>
 
-using namespace B2DQM;
+using namespace Belle2;
 
 HistoFileReader::HistoFileReader(const char* file_path)
   : _file(NULL)

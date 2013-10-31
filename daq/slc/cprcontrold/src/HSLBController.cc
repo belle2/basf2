@@ -1,17 +1,16 @@
-#include "HSLBController.hh"
+#include "HSLBController.h"
 
 #include "mgt_control.h"
 
-#include <node/HSLB.hh>
-#include <node/FEEModule.hh>
-
-#include <util/Debugger.hh>
-#include <util/StringUtil.hh>
+#include <base/HSLB.h>
+#include <base/FEEModule.h>
+#include <base/Debugger.h>
+#include <base/StringUtil.h>
 
 #include <cstdlib>
 #include <cstdio>
 
-using namespace B2DAQ;
+using namespace Belle2;
 
 HSLBController::HSLBController(int slot, HSLB* hslb)
   : _slot(slot), _hslb(hslb), _mgt(NULL) {}
@@ -25,9 +24,9 @@ bool HSLBController::boot() throw()
   if (_hslb->isUsed()) {
     const char* firmware_path = getenv("HSLB_FIRMEWATE_PATH");
     if (firmware_path == NULL) return false;
-    const std::string path = B2DAQ::form("%s/%s", firmware_path,
-                                         _hslb->getFirmware().c_str());
-    B2DAQ::debug("[DEBUG] Firmware path = %s", path.c_str());
+    const std::string path = Belle2::form("%s/%s", firmware_path,
+                                          _hslb->getFirmware().c_str());
+    Belle2::debug("[DEBUG] Firmware path = %s", path.c_str());
     _mgt = mgt_boot(_slot, path.c_str(),
                     &board_type, &firmware, &hardware);
     if (_mgt == NULL) return false;
@@ -73,8 +72,8 @@ bool HSLBController::load() throw()
           address = reg.getAddress() + ch * 2;
           mgt_set_param2(_mgt, address, reg.getValue(ch));
         }
-        B2DAQ::debug("[DEBUG] Register write to address = 0x%x with value = %d",
-                     address, reg.getValue(ch));
+        Belle2::debug("[DEBUG] Register write to address = 0x%x with value = %d",
+                      address, reg.getValue(ch));
       }
     }
   }

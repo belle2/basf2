@@ -2,16 +2,16 @@
 #include <sstream>
 #include <cstdlib>
 
-#include <util/StringUtil.hh>
+#include <base/StringUtil.h>
 
-#include <xml/XMLParser.hh>
-#include <xml/NodeLoader.hh>
+#include <xml/XMLParser.h>
+#include <xml/NodeLoader.h>
 
-#include <db/MySQLInterface.hh>
+#include <database/MySQLInterface.h>
 
 #include <cstdlib>
 
-using namespace B2DAQ;
+using namespace Belle2;
 
 int main(int argc, char** argv)
 {
@@ -25,7 +25,7 @@ int main(int argc, char** argv)
   NodeSystem& nodesystem(loader.getSystem());
   std::map<std::string, std::vector<FEEModule*> >& module_v_m(nodesystem.getModuleLists());
 
-  B2DAQ::MySQLInterface db;
+  Belle2::MySQLInterface db;
   db.init();
   db.connect(getenv("B2SC_DB_HOST"),
              getenv("B2SC_DB_NAME"),

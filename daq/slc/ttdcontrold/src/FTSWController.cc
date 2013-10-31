@@ -1,18 +1,18 @@
-#include "FTSWController.hh"
+#include "FTSWController.h"
 
-#include "FTSWFIFOListener.hh"
+#include "FTSWFIFOListener.h"
 
-#include <node/FTSW.hh>
-#include <node/FEEModule.hh>
+#include <base/FTSW.h>
+#include <base/FEEModule.h>
 
-#include <util/Debugger.hh>
-#include <util/StringUtil.hh>
+#include <base/Debugger.h>
+#include <base/StringUtil.h>
 
 #include <cstdlib>
 #include <cstdio>
 #include <sys/time.h>
 
-using namespace B2DAQ;
+using namespace Belle2;
 
 FTSWController::FTSWController(FTSW* ftsw)
   : _ftsw(ftsw), _ftsw_fd(NULL)
@@ -27,12 +27,12 @@ bool FTSWController::boot() throw()
 
   if (_ftsw->isUsed()) {
     if (!(_ftsw_fd = open_ftsw(_ftsw->getChannel(), FTSW_RDWR))) {
-      B2DAQ::debug("Failed to open VME register: channel = %d", _ftsw->getChannel());
+      Belle2::debug("Failed to open VME register: channel = %d", _ftsw->getChannel());
       return false;
     }
     const char* firmware_path = getenv("FTSW_FIRMWARE_PATH");
     if (firmware_path == NULL) {
-      B2DAQ::debug("FTSW_FIRMWARE_PATH is not set");
+      Belle2::debug("FTSW_FIRMWARE_PATH is not set");
       return false;
     }
     char path[512];
@@ -42,7 +42,7 @@ bool FTSWController::boot() throw()
     int forced   = 0;
     int m012 = M012_SELECTMAP;
     if (boot_ftsw_fpga(_ftsw_fd, path, verbose, forced, m012)) {
-      B2DAQ::debug("Failed to trigger: channel = %d", _ftsw->getChannel());
+      Belle2::debug("Failed to trigger: channel = %d", _ftsw->getChannel());
       return false;
     }
     int fpgaid  = read_ftsw(_ftsw_fd, FTSWREG_FPGAID);
@@ -70,7 +70,7 @@ bool FTSWController::reboot() throw()
 {
   if (_ftsw_fd != NULL) {
     if (close_ftsw(_ftsw_fd) < 0) {
-      B2DAQ::debug("Failed to close VME register: channel = %d", _ftsw->getChannel());
+      Belle2::debug("Failed to close VME register: channel = %d", _ftsw->getChannel());
     }
     return boot();
   }
@@ -82,7 +82,7 @@ bool FTSWController::load() throw()
   if (_ftsw_fd != NULL) {
     /* tempolary defined. should be replaced with correct one */
     if (stop_ftsw_trigger(_ftsw_fd) < 0) {
-      B2DAQ::debug("Failed to trigger: channel = %d", _ftsw->getChannel());
+      Belle2::debug("Failed to trigger: channel = %d", _ftsw->getChannel());
       return false;
     }
     /* -------------------------------------------------------*/
@@ -97,7 +97,7 @@ bool FTSWController::reload() throw()
     _thread.cancel();
     /* tempolary defined. should be replaced with correct one */
     if (stop_ftsw_trigger(_ftsw_fd) < 0) {
-      B2DAQ::debug("Failed to trigger: channel = %d", _ftsw->getChannel());
+      Belle2::debug("Failed to trigger: channel = %d", _ftsw->getChannel());
       return false;
     }
     /* -------------------------------------------------------*/

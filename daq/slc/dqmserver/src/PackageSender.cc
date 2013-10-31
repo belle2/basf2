@@ -1,17 +1,17 @@
-#include "PackageSender.hh"
+#include "PackageSender.h"
 
-#include "HistoServer.hh"
-#include "PackageManager.hh"
+#include "HistoServer.h"
+#include "PackageManager.h"
 
-#include <system/TCPSocketWriter.hh>
-#include <system/TCPSocketReader.hh>
+#include <system/TCPSocketWriter.h>
+#include <system/TCPSocketReader.h>
 
-#include <util/Debugger.hh>
+#include <base/Debugger.h>
 
 #include <cstdlib>
 #include <map>
 
-using namespace B2DQM;
+using namespace Belle2;
 
 const int PackageSender::FLAG_ALL = 0;
 const int PackageSender::FLAG_UPDATE = 1;
@@ -28,9 +28,9 @@ PackageSender::~PackageSender()
   }
 }
 
-bool PackageSender::sendUpdates(B2DAQ::Writer& writer,
+bool PackageSender::sendUpdates(Belle2::Writer& writer,
                                 size_t i, int n)
-throw(B2DAQ::IOException)
+throw(Belle2::IOException)
 {
   PackageManager* manager = _server->getManager(i);
   if (!manager->isAvailable()) {
@@ -57,7 +57,7 @@ throw(B2DAQ::IOException)
 
 void PackageSender::run()
 {
-  using namespace B2DAQ;
+  using namespace Belle2;
   TCPSocketWriter writer(_socket);
   TCPSocketReader reader(_socket);
 

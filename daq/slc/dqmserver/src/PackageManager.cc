@@ -1,12 +1,12 @@
-#include "PackageManager.hh"
+#include "PackageManager.h"
 
-#include "HistoFileReader.hh"
+#include "HistoFileReader.h"
 
-#include <dqm/HistoManager.hh>
+#include <dqm/HistoManager.h>
 
-#include <system/Time.hh>
+#include <system/Time.h>
 
-using namespace B2DQM;
+using namespace Belle2;
 
 PackageManager::PackageManager(HistoManager* manager)
 {
@@ -58,7 +58,7 @@ void PackageManager::update()
   _lock.wrlock();
   _reader->update(_pack);
   _pack->incrementUpdateId();
-  _pack->setUpdateTime(B2DAQ::Time().getSecond());
+  _pack->setUpdateTime(Belle2::Time().getSecond());
   analyze();
   _serializer.update();
   _lock.unlock();

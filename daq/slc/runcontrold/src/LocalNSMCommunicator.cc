@@ -1,14 +1,14 @@
-#include "LocalNSMCommunicator.hh"
+#include "LocalNSMCommunicator.h"
 
-#include "MessageBox.hh"
+#include "MessageBox.h"
 
-#include <nsm/NSMCommunicator.hh>
+#include <nsm/NSMCommunicator.h>
 
-#include <util/Debugger.hh>
+#include <base/Debugger.h>
 
 #include <iostream>
 
-using namespace B2DAQ;
+using namespace Belle2;
 
 bool LocalNSMCommunicator::init() throw(IOException)
 {
@@ -32,7 +32,7 @@ RunControlMessage LocalNSMCommunicator::waitMessage() throw(IOException)
     }
     return msg;
   } catch (const IOException& e) {
-    B2DAQ::debug("[DEBUG] %s:%d: NSM error", __FILE__, __LINE__);
+    Belle2::debug("[DEBUG] %s:%d: NSM error", __FILE__, __LINE__);
     throw (e);
   }
 }

@@ -1,16 +1,16 @@
-#include "TemplateCallback.hh"
+#include "TemplateCallback.h"
 
-#include <nsm/NSMNodeDaemon.hh>
+#include <nsm/NSMNodeDaemon.h>
 
-#include <util/Debugger.hh>
-#include <util/StringUtil.hh>
+#include <base/Debugger.h>
+#include <base/StringUtil.h>
 
-using namespace B2DAQ;
+using namespace Belle2;
 
 int main(int argc, char** argv)
 {
   if (argc < 2) {
-    B2DAQ::debug("Usage : ./recvd <name>");
+    Belle2::debug("Usage : ./recvd <name>");
     return 1;
   }
   const char* name = argv[1];

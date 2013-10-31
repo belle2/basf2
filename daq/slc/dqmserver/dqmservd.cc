@@ -1,13 +1,14 @@
-#include "HistoServer.hh"
-#include "DefaultHistoManager.hh"
-#include "SocketAcceptor.hh"
+#include "HistoServer.h"
 
-#include <dqm/HistoManager.hh>
+#include "DefaultHistoManager.h"
+#include "SocketAcceptor.h"
 
-#include <system/PThread.hh>
+#include <dqm/HistoManager.h>
 
-#include <util/StringUtil.hh>
-#include <util/Debugger.hh>
+#include <system/PThread.h>
+
+#include <base/StringUtil.h>
+#include <base/Debugger.h>
 
 #include <fstream>
 #include <iostream>
@@ -15,7 +16,7 @@
 
 #include <dlfcn.h>
 
-using namespace B2DQM;
+using namespace Belle2;
 
 typedef void* func_t();
 
@@ -38,7 +39,7 @@ int main(int argc, char** argv)
   std::string buf;
   while (fin && getline(fin, buf)) {
     if (buf.size() == 0 || buf.at(0) == '#') continue;
-    std::vector<std::string> str_v = B2DAQ::split(buf, ':');
+    std::vector<std::string> str_v = Belle2::split(buf, ':');
     if (str_v.size() == 3) {
       DQM_input input = {str_v[0], str_v[1], str_v[2] == "use_so_file"};
       input_v.push_back(input);
@@ -54,20 +55,20 @@ int main(int argc, char** argv)
   for (size_t n = 0; n < ninputs; n++) {
     DQM_input& input(input_v[n]);
     if (input.use_so_file) {
-      void* handle = dlopen(B2DAQ::form("%s/libB2DQM_%s.so",
-                                        getenv("B2SC_DQM_LIB_PATH"),
-                                        input.name.c_str()).c_str(),
+      void* handle = dlopen(Belle2::form("%s/libB2DQM_%s.so",
+                                         getenv("B2SC_DQM_LIB_PATH"),
+                                         input.name.c_str()).c_str(),
                             RTLD_NOW | RTLD_GLOBAL);
       if (!handle) {
-        B2DAQ::debug("%s", dlerror());
+        Belle2::debug("%s", dlerror());
         return 1;
       }
       char* error = NULL;
       func_t* createHistoManager =
-        (func_t*)dlsym(handle, B2DAQ::form("create%sHistoManager",
-                                           input.name.c_str()).c_str());
+        (func_t*)dlsym(handle, Belle2::form("create%sHistoManager",
+                                            input.name.c_str()).c_str());
       if ((error = dlerror()) != NULL) {
-        B2DAQ::debug("%s", error);
+        Belle2::debug("%s", error);
         return 1;
       }
       server->addManager(input.filename, (HistoManager*)createHistoManager());
@@ -75,7 +76,7 @@ int main(int argc, char** argv)
       server->addManager(input.filename, new DefaultHistoManager(input.name));
     }
   }
-  B2DAQ::PThread(new SocketAcceptor(getenv("B2SC_SERVER_HOST"), server));
+  Belle2::PThread(new SocketAcceptor(getenv("B2SC_SERVER_HOST"), server));
   server->run();
   return 0;
 }

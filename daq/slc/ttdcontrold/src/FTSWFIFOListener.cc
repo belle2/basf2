@@ -1,9 +1,9 @@
-#include "FTSWFIFOListener.hh"
+#include "FTSWFIFOListener.h"
 
 #include <cstdlib>
 #include <cstdio>
 
-using namespace B2DAQ;
+using namespace Belle2;
 
 void FTSWFIFOListener::run()
 {

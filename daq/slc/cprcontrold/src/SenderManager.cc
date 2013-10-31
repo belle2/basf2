@@ -1,17 +1,16 @@
-#include "SenderManager.hh"
+#include "SenderManager.h"
 
-#include <node/DataSender.hh>
-#include <node/HSLB.hh>
-#include <node/Host.hh>
-
-#include <util/Debugger.hh>
+#include <base/DataSender.h>
+#include <base/HSLB.h>
+#include <base/Host.h>
+#include <base/Debugger.h>
 
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <unistd.h>
 
-using namespace B2DAQ;
+using namespace Belle2;
 
 std::string SenderManager::run_script(const std::string& cmd)
 {
@@ -30,7 +29,7 @@ void SenderManager::run() throw()
     const char* belle2_path = getenv("BELLE2_LOCAL_DIR");
     const char* belle2_sub = getenv("BELLE2_SUBDIR");
     if (belle2_path == NULL) {
-      B2DAQ::debug("[DEBUG] env BELLE2_LOCAL_DIR is not avaiable.");
+      Belle2::debug("[DEBUG] env BELLE2_LOCAL_DIR is not avaiable.");
       return ;
     }
     char path[128];
@@ -67,13 +66,13 @@ void SenderManager::run() throw()
     argv[i++] = shmuse_c;
     argv[i++] = options_c;
     argv[i++] = NULL;
-    B2DAQ::debug("[BUDEG] Executing : %s %s %s %s %s %s %s",
-                 argv[0], argv[1], argv[2], argv[3], argv[4], argv[5], argv[6]);
+    Belle2::debug("[BUDEG] Executing : %s %s %s %s %s %s %s",
+                  argv[0], argv[1], argv[2], argv[3], argv[4], argv[5], argv[6]);
     if (execvp(path, argv) == -1) {
-      B2DAQ::debug("[ERROR] Faield to start receiver basf2 script");
+      Belle2::debug("[ERROR] Faield to start receiver basf2 script");
     }
   } else {
-    B2DAQ::debug("[DEBUG] No NSM node was registered");
+    Belle2::debug("[DEBUG] No NSM node was registered");
   }
 }
 

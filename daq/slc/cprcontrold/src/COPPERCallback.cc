@@ -1,15 +1,14 @@
-#include "COPPERCallback.hh"
+#include "COPPERCallback.h"
 
-#include "SenderManager.hh"
-#include "ProcessListener.hh"
+#include "SenderManager.h"
+#include "ProcessListener.h"
 
-#include <system/Fork.hh>
-#include <system/PThread.hh>
+#include <system/Fork.h>
+#include <system/PThread.h>
 
-#include <node/COPPERNode.hh>
-
-#include <util/Debugger.hh>
-#include <util/StringUtil.hh>
+#include <base/COPPERNode.h>
+#include <base/Debugger.h>
+#include <base/StringUtil.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -21,7 +20,7 @@
 #include <cstdio>
 #include <iostream>
 
-using namespace B2DAQ;
+using namespace Belle2;
 
 COPPERCallback::COPPERCallback(COPPERNode* node)
   : RCCallback(node), _node(node)
@@ -40,7 +39,7 @@ bool COPPERCallback::boot() throw()
   if (_buf_config == NULL) {
     _buf_config = openBuffer(4, "/cpr_config");
     if (_buf_config == NULL) {
-      B2DAQ::debug("[ERROR] Failed to open buffer /cpr_config");
+      Belle2::debug("[ERROR] Failed to open buffer /cpr_config");
       setReply("Failed to open buffer for config");
       return false;
     }
@@ -49,7 +48,7 @@ bool COPPERCallback::boot() throw()
   if (_buf_status == NULL) {
     _buf_status = openBuffer(4, "/cpr_status");
     if (_buf_status == NULL) {
-      B2DAQ::debug("[ERROR] Failed to open buffer /cpr_status");
+      Belle2::debug("[ERROR] Failed to open buffer /cpr_status");
       setReply("Failed to open buffer for status");
       return false;
     }
@@ -70,8 +69,8 @@ bool COPPERCallback::boot() throw()
   for (int slot = 0; slot < 4; slot++) {
     if (!(_hslbcon_v[slot].reset() &&
           _hslbcon_v[slot].boot())) {
-      B2DAQ::debug("[ERROR] Failed to boot HSLB:%c", (char)(slot + 'a'));
-      setReply(B2DAQ::form("Failed to boot HSLB:%c", (char)(slot + 'a')));
+      Belle2::debug("[ERROR] Failed to boot HSLB:%c", (char)(slot + 'a'));
+      setReply(Belle2::form("Failed to boot HSLB:%c", (char)(slot + 'a')));
       return false;
     }
   }
@@ -83,7 +82,7 @@ bool COPPERCallback::load() throw()
 {
   for (size_t slot = 0; slot < 4; slot++) {
     if (!_hslbcon_v[slot].load()) {
-      B2DAQ::debug("[ERROR] Failed to load HSLB:%c", (char)(slot + 'a'));
+      Belle2::debug("[ERROR] Failed to load HSLB:%c", (char)(slot + 'a'));
       return false;
     }
   }
@@ -111,7 +110,7 @@ bool COPPERCallback::start() throw()
   /*
   for (size_t slot = 0; slot < 4; slot++) {
     if (!_hslbcon_v[slot].start()) {
-      B2DAQ::debug("Failed to start HSLB:%c", (char)(slot + 'a'));
+      Belle2::debug("Failed to start HSLB:%c", (char)(slot + 'a'));
       return false;
     }
   }
@@ -131,7 +130,7 @@ bool COPPERCallback::stop() throw()
   /*
   for (size_t slot = 0; slot < 4; slot++) {
     if (!_hslbcon_v[slot].stop()) {
-      B2DAQ::debug("Failed to stop HSLB:%c", (char)(slot + 'a'));
+      Belle2::debug("Failed to stop HSLB:%c", (char)(slot + 'a'));
       return false;
     }
   }

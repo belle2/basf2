@@ -1,23 +1,23 @@
-#include <nsm/NSMNodeDaemon.hh>
-#include <nsm/NSMData.hh>
-#include <nsm/NSMCommunicator.hh>
+#include <nsm/NSMNodeDaemon.h>
+#include <nsm/NSMData.h>
+#include <nsm/NSMCommunicator.h>
 #include <nsm/run_status.h>
 
-#include <db/MySQLInterface.hh>
+#include <database/MySQLInterface.h>
 
-#include <util/Debugger.hh>
-#include <util/StringUtil.hh>
+#include <base/Debugger.h>
+#include <base/StringUtil.h>
 
 #include <iostream>
 #include <unistd.h>
 #include <cstdlib>
 
-using namespace B2DAQ;
+using namespace Belle2;
 
 int main(int argc, char** argv)
 {
   if (argc < 2) {
-    B2DAQ::debug("Usage : ./recvd <name>");
+    Belle2::debug("Usage : ./recvd <name>");
     return 1;
   }
   const char* name = argv[1];

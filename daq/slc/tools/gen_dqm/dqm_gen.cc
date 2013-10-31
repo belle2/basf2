@@ -1,4 +1,4 @@
-#include "HistoManagerGenerator.hh"
+#include "HistoManagerGenerator.h"
 
 #include <iostream>
 
@@ -15,7 +15,7 @@ int main(int argc, char** argv)
   const std::string name = argv[1];
   const std::string output_path = argv[2];
 
-  B2DQM::HistoManagerGenerator generator(name, output_path);
+  Belle2::HistoManagerGenerator generator(name, output_path);
   generator.create();
 
   return 0;

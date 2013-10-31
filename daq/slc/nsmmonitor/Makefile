@@ -13,12 +13,10 @@ TMPDIR  = ./tmp
 LIBDIR  = ./lib
 
 LIBS    +=  -lm -lpthread -lz 
-LIBS    += -L$(B2SLC_LIB)/lib -lB2SLCUTIL
-LIBS    += -L$(B2SLC_LIB)/lib -lB2SLCSYS
-LIBS    += -L$(B2SLC_LIB)/lib -lB2SLCNODE
-LIBS    += -L$(B2SLC_LIB)/lib -lB2SLCRC
-LIBS    += -L$(B2SLC_LIB)/lib -lB2SLCNSM
-LIBS    += -L$(B2SLC_LIB)/lib -lB2SLCDB
+LIBS    += -L$(B2SLC_LIB)/lib -ldaq_slc_base
+LIBS    += -L$(B2SLC_LIB)/lib -ldaq_slc_nsm
+LIBS    += -L$(B2SLC_LIB)/lib -ldaq_slc_system
+LIBS    += -L$(B2SLC_LIB)/lib -ldaq_slc_database
 LIBS    += $(NSM2_PATH)/corelib/nsmlib2.o \
            $(NSM2_PATH)/corelib/nsmhash.o \
            $(NSM2_PATH)/corelib/nsmparse.o \

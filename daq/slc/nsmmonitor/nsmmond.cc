@@ -1,16 +1,16 @@
-#include <nsm/NSMNodeDaemon.hh>
-#include <nsm/NSMData.hh>
-#include <nsm/NSMCommunicator.hh>
+#include <nsm/NSMNodeDaemon.h>
+#include <nsm/NSMData.h>
+#include <nsm/NSMCommunicator.h>
 
-#include <db/MySQLInterface.hh>
+#include <database/MySQLInterface.h>
 
-#include <util/StringUtil.hh>
+#include <base/StringUtil.h>
 
 #include <iostream>
 #include <unistd.h>
 #include <cstdlib>
 
-using namespace B2DAQ;
+using namespace Belle2;
 
 int main(int argc, char** argv)
 {
@@ -35,25 +35,25 @@ int main(int argc, char** argv)
 
   std::vector<NSMData*> data_v;
   for (int i = 2; i < argc; i++) {
-    std::vector<std::string> str_v = B2DAQ::split(argv[i], ':');
+    std::vector<std::string> str_v = Belle2::split(argv[i], ':');
     data_v.push_back(new NSMData(str_v[0], str_v[1], atoi(str_v[2].c_str())));
   }
   for (size_t i = 0; i < data_v.size(); i++) {
     NSMData* data = data_v[i];
     data->open();
     try {
-      db->execute(B2DAQ::form("create table %s_rev%d (%s);",
-                              data->getName().c_str(), data->getRevision(),
-                              data->toSQLConfig().c_str()));
+      db->execute(Belle2::form("create table %s_rev%d (%s);",
+                               data->getName().c_str(), data->getRevision(),
+                               data->toSQLConfig().c_str()));
     } catch (const DBHandlerException& e) {}
   }
 
   while (true) {
     for (size_t i = 0; i < data_v.size(); i++) {
       NSMData* data = data_v[i];
-      db->execute(B2DAQ::form("insert into %s_rev%d values (%s);",
-                              data->getName().c_str(), data->getRevision(),
-                              data->toSQLValues().c_str()));
+      db->execute(Belle2::form("insert into %s_rev%d values (%s);",
+                               data->getName().c_str(), data->getRevision(),
+                               data->toSQLValues().c_str()));
       std::cout << data->getName() << " : "
                 << data->toSQLValues() << std::endl;
     }

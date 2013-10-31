@@ -1,19 +1,19 @@
-#include "SocketAcceptor.hh"
+#include "SocketAcceptor.h"
 
-#include "HistoServer.hh"
-#include "PackageSender.hh"
+#include "HistoServer.h"
+#include "PackageSender.h"
 
-#include <system/TCPServerSocket.hh>
-#include <system/PThread.hh>
+#include <system/TCPServerSocket.h>
+#include <system/PThread.h>
 
-using namespace B2DQM;
+using namespace Belle2;
 
 void SocketAcceptor::run()
 {
-  B2DAQ::TCPServerSocket server_socket(_ip, 50100);
+  Belle2::TCPServerSocket server_socket(_ip, 50100);
   server_socket.open();
   while (true) {
-    B2DAQ::TCPSocket socket = server_socket.accept();
-    B2DAQ::PThread(new PackageSender(_server, socket));
+    Belle2::TCPSocket socket = server_socket.accept();
+    Belle2::PThread(new PackageSender(_server, socket));
   }
 }

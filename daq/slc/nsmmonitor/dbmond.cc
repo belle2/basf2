@@ -1,16 +1,16 @@
-#include <nsm/NSMNodeDaemon.hh>
-#include <nsm/NSMData.hh>
-#include <nsm/NSMCommunicator.hh>
+#include <nsm/NSMNodeDaemon.h>
+#include <nsm/NSMData.h>
+#include <nsm/NSMCommunicator.h>
 
-#include <db/MySQLInterface.hh>
+#include <database/MySQLInterface.h>
 
-#include <util/StringUtil.hh>
+#include <base/StringUtil.h>
 
 #include <iostream>
 #include <unistd.h>
 #include <cstdlib>
 
-using namespace B2DAQ;
+using namespace Belle2;
 
 int main(int argc, char** argv)
 {
@@ -30,7 +30,7 @@ int main(int argc, char** argv)
 
   std::vector<NSMData*> data_v;
   for (int i = 1; i < argc; i++) {
-    std::vector<std::string> str_v = B2DAQ::split(argv[i], ':');
+    std::vector<std::string> str_v = Belle2::split(argv[i], ':');
     data_v.push_back(new NSMData(str_v[0], str_v[1], atoi(str_v[2].c_str())));
   }
   for (size_t i = 0; i < data_v.size(); i++) {
@@ -38,10 +38,10 @@ int main(int argc, char** argv)
     //data->parse("/home/usr/tkonno/b2slc/bin");
     data->parse();
     try {
-      std::cout << B2DAQ::form("select * from %s_rev%d;",
-                               data->getName().c_str(), data->getRevision()) << std::endl;
-      db->execute(B2DAQ::form("select * from %s_rev%d;",
-                              data->getName().c_str(), data->getRevision()));
+      std::cout << Belle2::form("select * from %s_rev%d;",
+                                data->getName().c_str(), data->getRevision()) << std::endl;
+      db->execute(Belle2::form("select * from %s_rev%d;",
+                               data->getName().c_str(), data->getRevision()));
       DBRecordList& ret(db->loadRecords());
       for (size_t i = 0; i < ret.size(); i++) {
         data->setSQLValues(ret[i].getFieldNames(), ret[i].getFieldValues());

@@ -1,8 +1,8 @@
-#include "MessageBox.hh"
+#include "MessageBox.h"
 
 #include <iostream>
 
-using namespace B2DAQ;
+using namespace Belle2;
 
 MessageBox MessageBox::__box;
 

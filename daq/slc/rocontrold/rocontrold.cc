@@ -1,18 +1,18 @@
-#include "ROCallback.hh"
+#include "ROCallback.h"
 
-#include <nsm/NSMNodeDaemon.hh>
+#include <nsm/NSMNodeDaemon.h>
 
-#include <node/RONode.hh>
+#include <base/RONode.h>
 
-#include <util/Debugger.hh>
-#include <util/StringUtil.hh>
+#include <base/Debugger.h>
+#include <base/StringUtil.h>
 
-using namespace B2DAQ;
+using namespace Belle2;
 
 int main(int argc, char** argv)
 {
   if (argc < 2) {
-    B2DAQ::debug("Usage : ./rocontrold <name>");
+    Belle2::debug("Usage : ./rocontrold <name>");
     return 1;
   }
   const char* name = argv[1];

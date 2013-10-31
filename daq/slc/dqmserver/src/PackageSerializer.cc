@@ -1,6 +1,6 @@
-#include "PackageSerializer.hh"
+#include "PackageSerializer.h"
 
-using namespace B2DQM;
+using namespace Belle2;
 
 bool PackageSerializer::allocate(HistoPackage* pack)
 {

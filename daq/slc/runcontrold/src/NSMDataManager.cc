@@ -1,16 +1,16 @@
-#include "NSMDataManager.hh"
+#include "NSMDataManager.h"
 
-#include <util/Debugger.hh>
-#include <util/StringUtil.hh>
+#include <base/Debugger.h>
+#include <base/StringUtil.h>
 
-#include <nsm/TTDStatus.hh>
+#include <nsm/TTDStatus.h>
 
 #include <iostream>
 extern "C" {
 #include <dlfcn.h>
 }
 
-using namespace B2DAQ;
+using namespace Belle2;
 
 NSMDataManager::NSMDataManager(NodeSystem* node_system) throw()
   : _system(node_system), _status(NULL), _config(NULL)
@@ -88,7 +88,7 @@ void NSMDataManager::readNodeStatus() throw()
         if (!data->isAvailable()) data->open();
         /*  */
       } catch (const NSMHandlerException& e) {
-        B2DAQ::debug("Failed to read NSM data in %s", node->getName().c_str());
+        Belle2::debug("Failed to read NSM data in %s", node->getName().c_str());
       }
     }
   }

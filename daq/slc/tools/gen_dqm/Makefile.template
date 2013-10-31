@@ -17,7 +17,7 @@ CFLAGS   = -g -fPIC -O2 -Wall
 CFLAGS  += -I$(INCDIR) 
 CFLAGS  += -I$(B2SLC_LIB)/include
 
-LIBTARGET  = $(LIBDIR)/libB2DQM_$(USER_CLASS).so
+LIBTARGET  = $(LIBDIR)/libdaq_slc_dqm_$(USER_CLASS).so
 
 .PHONY : all clean deb doc 
 

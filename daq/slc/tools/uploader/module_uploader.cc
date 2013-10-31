@@ -3,15 +3,15 @@
 #include <fstream>
 #include <cstdlib>
 
-#include <util/StringUtil.hh>
+#include <base/StringUtil.h>
 
-#include <xml/XMLParser.hh>
-#include <xml/NodeLoader.hh>
+#include <xml/XMLParser.h>
+#include <xml/NodeLoader.h>
 
-#include <db/DBNodeSystemConfigurator.hh>
-#include <db/MySQLInterface.hh>
+#include <database/DBNodeSystemConfigurator.h>
+#include <database/MySQLInterface.h>
 
-using namespace B2DAQ;
+using namespace Belle2;
 
 int main(int argc, char** argv)
 {
@@ -44,7 +44,7 @@ int main(int argc, char** argv)
   db.connect("localhost", "sample", "tkonno", "homerun0308", 0);
   int latest_version = -1;
   int temp_version = -1;
-  db.execute(B2DAQ::form("select version from %s_conf;", B2DAQ::tolower(module_type).c_str()));
+  db.execute(Belle2::form("select version from %s_conf;", Belle2::tolower(module_type).c_str()));
   std::vector<DBRecord>& record_v(db.loadRecords());
   for (size_t i = 0; i < record_v.size(); i++) {
     int version = record_v[i].getFieldValueInt("version");
@@ -65,7 +65,7 @@ int main(int argc, char** argv)
   std::string str;
   while (fin >> str) {
     std::cout << str << std::endl;
-    std::vector<std::string> str_v(B2DAQ::split(str, ':'));
+    std::vector<std::string> str_v(Belle2::split(str, ':'));
     for (std::vector<COPPERNode*>::iterator it = copper_v.begin();
          it != copper_v.end(); it++) {
       COPPERNode* copper = *it;
@@ -77,11 +77,11 @@ int main(int argc, char** argv)
             FEEModule* module = hslb->getFEEModule();
             if (module != NULL) {
               for (size_t i = 2; i < str_v.size(); i++) {
-                std::vector<std::string> label_v(B2DAQ::split(str_v[i], '='));
+                std::vector<std::string> label_v(Belle2::split(str_v[i], '='));
                 if (label_v.size() != 2) continue;
                 FEEModule::Register* reg = module->getRegister(label_v[0]);
                 if (reg != NULL) {
-                  std::vector<std::string> value_v(B2DAQ::split(label_v[1], ','));
+                  std::vector<std::string> value_v(Belle2::split(label_v[1], ','));
                   for (size_t ch = 0; ch < value_v.size(); ch++) {
                     reg->setValue(ch, atoi(value_v[ch].c_str()));
                   }

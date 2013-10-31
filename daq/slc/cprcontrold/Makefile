@@ -16,11 +16,9 @@ LIBDIR  = ./lib
 LIBS    += -lm -lpthread -ldl -lz -lrt
 LIBS    += $(MGT_PATH)/*.o
 #LIBS    += -L$(MGT_PATH) -lMGT
-LIBS    += -L$(B2SLC_LIB)/lib -lB2SLCSYS
-LIBS    += -L$(B2SLC_LIB)/lib -lB2SLCUTIL
-LIBS    += -L$(B2SLC_LIB)/lib -lB2SLCNODE
-LIBS    += -L$(B2SLC_LIB)/lib -lB2SLCRC
-LIBS    += -L$(B2SLC_LIB)/lib -lB2SLCNSM
+LIBS    += -L$(B2SLC_LIB)/lib -ldaq_slc_base
+LIBS    += -L$(B2SLC_LIB)/lib -ldaq_slc_system
+LIBS    += -L$(B2SLC_LIB)/lib -ldaq_slc_nsm
 LIBS    += $(NSM2_PATH)/corelib/nsmlib2.o \
            $(NSM2_PATH)/corelib/nsmhash.o \
            $(NSM2_PATH)/corelib/nsmparse.o \
@@ -67,11 +65,11 @@ $(TARGETS): $(BINDIR)/% : %.cc $(OBJS)
 	@ $(RM) *~ */*~ \#*\#* */\#*\#*
 	@ echo '<< compiling succeded!! >>'
 
-$(OBJS): $(TMPDIR)/%.o : $(SRCDIR)/%.cc $(INCDIR)/%.hh
+$(OBJS): $(TMPDIR)/%.o : $(SRCDIR)/%.cc $(INCDIR)/%.h
 	@ echo '<< compiling $@ >>'
 	@ $(CXX) -c $(CFLAGS) $< -o  $@
 
-$(DEPS) : $(TMPDIR)/%.d: $(SRCDIR)/%.cc $(INCDIR)/%.hh
+$(DEPS) : $(TMPDIR)/%.d: $(SRCDIR)/%.cc $(INCDIR)/%.h
 	@ if [ ! -d $(TMPDIR) ];then mkdir $(TMPDIR) ;fi
 	@ echo '<< making dipendency $@ >>'
 	@ $(CXX) $(CFLAGS) -MM -MT $(basename $@).o $< -o $@

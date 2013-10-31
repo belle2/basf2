@@ -1,6 +1,6 @@
-#include "RunControlMessage.hh"
+#include "RunControlMessage.h"
 
-using namespace B2DAQ;
+using namespace Belle2;
 
 const unsigned int RunControlMessage::FLAG_MODE = 101;
 const unsigned int RunControlMessage::FLAG_OPERATORS = 102;

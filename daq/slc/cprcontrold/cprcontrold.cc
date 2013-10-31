@@ -1,23 +1,21 @@
-#include "COPPERCallback.hh"
+#include "COPPERCallback.h"
 
-#include <nsm/NSMData.hh>
-#include <nsm/NSMNodeDaemon.hh>
+#include <nsm/NSMData.h>
+#include <nsm/NSMNodeDaemon.h>
 
-#include <node/COPPERNode.hh>
-
-#include <util/Debugger.hh>
-#include <util/StringUtil.hh>
+#include <base/COPPERNode.h>
+#include <base/Debugger.h>
 
 #include <dlfcn.h>
 
-using namespace B2DAQ;
+using namespace Belle2;
 
 typedef void* func_t(void*, const char*);
 
 int main(int argc, char** argv)
 {
   if (argc < 2) {
-    B2DAQ::debug("Usage : ./cprcontrold <name>");
+    Belle2::debug("Usage : ./cprcontrold <name>");
     return 1;
   }
   const char* name = argv[1];

@@ -1,16 +1,16 @@
-#include "DefaultHistoManager.hh"
+#include "DefaultHistoManager.h"
 
-#include <dqm/Histo1F.hh>
-#include <dqm/Histo2F.hh>
-#include <dqm/RootPanel.hh>
-#include <dqm/TabbedPanel.hh>
-#include <dqm/CanvasPanel.hh>
+#include <dqm/Histo1F.h>
+#include <dqm/Histo2F.h>
+#include <dqm/RootPanel.h>
+#include <dqm/TabbedPanel.h>
+#include <dqm/CanvasPanel.h>
 
-#include <util/StringUtil.hh>
+#include <base/StringUtil.h>
 
 #include <TH1.h>
 
-using namespace B2DQM;
+using namespace Belle2;
 
 DefaultHistoManager::DefaultHistoManager(const std::string& name)
   : _name(name)
@@ -27,18 +27,18 @@ HistoPackage* DefaultHistoManager::createPackage(RootHistMap& hist_m)
     TString class_name = h->ClassName();
     if (class_name.Contains("TH1")) {
       _pack->addHisto(new Histo1F(h->GetName(),
-                                  B2DAQ::form("%s;%s;%s",
-                                              h->GetTitle(),
-                                              h->GetXaxis()->GetTitle(),
-                                              h->GetYaxis()->GetTitle()),
+                                  Belle2::form("%s;%s;%s",
+                                               h->GetTitle(),
+                                               h->GetXaxis()->GetTitle(),
+                                               h->GetYaxis()->GetTitle()),
                                   h->GetNbinsX(), h->GetXaxis()->GetXmin(),
                                   h->GetXaxis()->GetXmax()));
     } else if (class_name.Contains("TH2")) {
       _pack->addHisto(new Histo2F(h->GetName(),
-                                  B2DAQ::form("%s;%s;%s",
-                                              h->GetTitle(),
-                                              h->GetXaxis()->GetTitle(),
-                                              h->GetYaxis()->GetTitle()),
+                                  Belle2::form("%s;%s;%s",
+                                               h->GetTitle(),
+                                               h->GetXaxis()->GetTitle(),
+                                               h->GetYaxis()->GetTitle()),
                                   h->GetNbinsX(), h->GetXaxis()->GetXmin(),
                                   h->GetXaxis()->GetXmax(),
                                   h->GetNbinsY(), h->GetYaxis()->GetXmin(),
@@ -55,7 +55,7 @@ RootPanel* DefaultHistoManager::createRootPanel(RootHistMap& hist_m)
   root_panel->add(tabpanel);
   for (int i = 0; i < _pack->getNHistos(); i++) {
     Histo* histo = _pack->getHisto(i);
-    std::string c_name = B2DAQ::form("c_%s", histo->getName().c_str());
+    std::string c_name = Belle2::form("c_%s", histo->getName().c_str());
     CanvasPanel* canvas = new CanvasPanel(c_name, histo->getTitle());
     canvas->add(histo);
     tabpanel->add(histo->getTitle(), canvas);

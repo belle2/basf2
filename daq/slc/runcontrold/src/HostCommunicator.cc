@@ -1,11 +1,11 @@
-#include "HostCommunicator.hh"
-#include "MessageBox.hh"
+#include "HostCommunicator.h"
+#include "MessageBox.h"
 
-#include <util/Debugger.hh>
+#include <base/Debugger.h>
 
 #include <unistd.h>
 
-using namespace B2DAQ;
+using namespace Belle2;
 
 void HostCommunicator::run()
 {
@@ -15,7 +15,7 @@ void HostCommunicator::run()
         init();
         break;
       } catch (const IOException& e) {
-        B2DAQ::debug("[DEBUG] %s:%d:Failed to init %s", __FILE__, __LINE__, e.what());
+        Belle2::debug("[DEBUG] %s:%d:Failed to init %s", __FILE__, __LINE__, e.what());
         sleep(5);
       }
     }

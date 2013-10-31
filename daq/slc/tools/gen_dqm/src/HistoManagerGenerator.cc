@@ -1,6 +1,6 @@
-#include "HistoManagerGenerator.hh"
+#include "HistoManagerGenerator.h"
 
-#include <util/StringUtil.hh>
+#include <base/StringUtil.h>
 
 #include <iostream>
 #include <fstream>
@@ -9,7 +9,7 @@
 #include <algorithm>
 #include <string>
 
-using namespace B2DQM;
+using namespace Belle2;
 
 void HistoManagerGenerator::create()
 {
@@ -26,24 +26,24 @@ void HistoManagerGenerator::create()
             << createSource() << std::endl;
   std::cout << "creating source file for dynamic loader of histo manager : "
             << createLibSource() << std::endl;
-  system(B2DAQ::form("echo \"USER_CLASS=%s\" > %s/Makefile ",
-                     _name.c_str(), _output_dir.c_str()).c_str());
-  system(B2DAQ::form("cat Makefile.template >> %s/Makefile",
-                     _output_dir.c_str()).c_str());
-  system(B2DAQ::form("make -C %s/ ", _output_dir.c_str()).c_str());
+  system(Belle2::form("echo \"USER_CLASS=%s\" > %s/Makefile ",
+                      _name.c_str(), _output_dir.c_str()).c_str());
+  system(Belle2::form("cat Makefile.template >> %s/Makefile",
+                      _output_dir.c_str()).c_str());
+  system(Belle2::form("make -C %s/ ", _output_dir.c_str()).c_str());
 }
 
 std::string HistoManagerGenerator::createHeader()
 {
   const std::string class_name = _name + "HistoManager";
-  std::string file_path = _output_dir + "/include/" + class_name + ".hh";
+  std::string file_path = _output_dir + "/include/" + class_name + ".h";
   std::ofstream fout(file_path.c_str());
-  fout << "#ifndef _B2DQM_" << class_name << "_hh" << std::endl
-       << "#define _B2DQM_" << class_name << "_hh" << std::endl
+  fout << "#ifndef _Belle2_" << class_name << "_hh" << std::endl
+       << "#define _Belle2_" << class_name << "_hh" << std::endl
        << std::endl
-       << "#include <dqm/HistoManager.hh>" << std::endl
+       << "#include <dqm/HistoManager.h>" << std::endl
        << std::endl
-       << "namespace B2DQM {" << std::endl
+       << "namespace Belle2 {" << std::endl
        << std::endl
        << "  class " << class_name << " : public HistoManager {" << std::endl
        << std::endl
@@ -74,9 +74,9 @@ std::string HistoManagerGenerator::createSource()
   const std::string class_name = _name + "HistoManager";
   std::string file_path = _output_dir + "/src/" + class_name + ".cc";
   std::ofstream fout(file_path.c_str());
-  fout << "#include \"" << class_name << ".hh\"" << std::endl
+  fout << "#include \"" << class_name << ".h\"" << std::endl
        << std::endl
-       << "using namespace B2DQM;" << std::endl
+       << "using namespace Belle2;" << std::endl
        << std::endl
        << class_name << "::" << class_name << "() {" << std::endl
        << std::endl
@@ -103,10 +103,10 @@ std::string HistoManagerGenerator::createLibSource()
   const std::string class_name = _name + "HistoManager";
   std::string file_path = _output_dir + "/src/lib" + class_name + ".cc";
   std::ofstream fout(file_path.c_str());
-  fout << "#include \"" << class_name << ".hh\"" << std::endl
+  fout << "#include \"" << class_name << ".h\"" << std::endl
        << std::endl
        << "extern \"C\" void* create" << class_name << "() {" << std::endl
-       << "  return new B2DQM::" << class_name << "();" << std::endl
+       << "  return new Belle2::" << class_name << "();" << std::endl
        << "}" << std::endl
        << std::endl;
   fout.close();

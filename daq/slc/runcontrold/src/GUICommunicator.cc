@@ -1,18 +1,18 @@
-#include "GUICommunicator.hh"
-#include "MessageBox.hh"
+#include "GUICommunicator.h"
+#include "MessageBox.h"
 
-#include <node/State.hh>
-#include <node/Connection.hh>
+#include <base/State.h>
+#include <base/Connection.h>
 
-#include <util/Debugger.hh>
-#include <util/StringUtil.hh>
+#include <base/Debugger.h>
+#include <base/StringUtil.h>
 
 #include <fstream>
 
 #include <string.h>
 #include <unistd.h>
 
-using namespace B2DAQ;
+using namespace Belle2;
 
 bool GUICommunicator::init() throw(IOException)
 {
@@ -25,7 +25,7 @@ bool GUICommunicator::init() throw(IOException)
   _writer.writeInt((int)file_path_v.size());
   for (size_t i = 0; i < file_path_v.size(); i++) {
     _buf.seekTo(0);
-    std::vector<std::string> str_v = B2DAQ::split(file_path_v[i], '/');
+    std::vector<std::string> str_v = Belle2::split(file_path_v[i], '/');
     std::string label = str_v[str_v.size() - 1];
     _writer.writeString(label);
     std::ifstream fin(file_path_v[i].c_str());
@@ -73,7 +73,7 @@ RunControlMessage GUICommunicator::waitMessage() throw(IOException)
     msg.setMessage(nsm);
     return msg;
   } catch (const IOException& e) {
-    B2DAQ::debug("[DEBUG] %s:%d: Connection broken", __FILE__, __LINE__);
+    Belle2::debug("[DEBUG] %s:%d: Connection broken", __FILE__, __LINE__);
     throw (e);
   }
 }
@@ -94,7 +94,7 @@ throw(IOException)
       _writer.write(_buf.ptr(), _buf.count());
       _mutex.unlock();
     } catch (const IOException& e) {
-      B2DAQ::debug("[DEBUG] %s:%d error=%s", __FILE__, __LINE__, e.what());
+      Belle2::debug("[DEBUG] %s:%d error=%s", __FILE__, __LINE__, e.what());
       _is_ready = false;
       _socket.close();
       _mutex.unlock();

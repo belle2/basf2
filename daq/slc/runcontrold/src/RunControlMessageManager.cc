@@ -1,23 +1,23 @@
-#include "RunControlMessageManager.hh"
+#include "RunControlMessageManager.h"
 
-#include "MessageBox.hh"
-#include "DBRunInfoHandler.hh"
+#include "MessageBox.h"
+#include "DBRunInfoHandler.h"
 
-#include <db/DBNodeSystemConfigurator.hh>
+#include <database/DBNodeSystemConfigurator.h>
 
-#include <nsm/TTDStatus.hh>
+#include <nsm/TTDStatus.h>
 
-#include <system/Time.hh>
-#include <system/Date.hh>
+#include <system/Time.h>
+#include <system/Date.h>
 
-#include <util/Debugger.hh>
-#include <util/StringUtil.hh>
+#include <base/Debugger.h>
+#include <base/StringUtil.h>
 
 #include <unistd.h>
 
 #include <iostream>
 
-using namespace B2DAQ;
+using namespace Belle2;
 
 void RunControlMessageManager::run()
 {
@@ -71,7 +71,7 @@ void RunControlMessageManager::run()
         } else if (cmd == Command::LOAD) {
           _data_man->getRunConfig()->setVersion(nsm.getParam(1));
           downloadConfig(cmd, _data_man->getRunConfig()->getVersion());
-          std::vector<std::string> str_v = B2DAQ::split(nsm.getData(), '\n');
+          std::vector<std::string> str_v = Belle2::split(nsm.getData(), '\n');
           _data_man->getRunConfig()->setRunType(str_v[0]);
           _data_man->getRunConfig()->setOperators(str_v[1]);
         } else if (cmd == Command::START) {
@@ -151,7 +151,7 @@ NSMNode* RunControlMessageManager::findNode(int id) throw()
     if (nodename != NULL) {
       node = getNodeByName(nodename);
       if (node == NULL) {
-        B2DAQ::debug("[DEBUG] Unexcepted node id: %d", id);
+        Belle2::debug("[DEBUG] Unexcepted node id: %d", id);
         return NULL;
       }
     }
@@ -277,7 +277,7 @@ bool RunControlMessageManager::send(NSMNode* node, const Command& command,
       reportState(node);
     }
   } catch (const IOException& e) {
-    B2DAQ::debug("[DEBUG] %s:%d : %s", __FILE__, __LINE__, e.what());
+    Belle2::debug("[DEBUG] %s:%d : %s", __FILE__, __LINE__, e.what());
   }
   if (_rc_node->getState() != State::ERROR_ES) {
     _rc_node->setState(State::ERROR_ES);
@@ -299,7 +299,7 @@ bool RunControlMessageManager::reportState(NSMNode* node, const std::string& dat
   try {
     _ui_comm->sendMessage(msg);
   } catch (const IOException& e) {
-    B2DAQ::debug("[DEBUG] %s:%d error=%s", __FILE__, __LINE__, e.what());
+    Belle2::debug("[DEBUG] %s:%d error=%s", __FILE__, __LINE__, e.what());
   }
   if (node != _rc_node && node->getState() == State::ERROR_ES) {
     _rc_node->setState(State::ERROR_ES);
@@ -319,7 +319,7 @@ bool RunControlMessageManager::reportError(NSMNode* node, const std::string& dat
   try {
     _ui_comm->sendMessage(msg);
   } catch (const IOException& e) {
-    B2DAQ::debug("[DEBUG] %s:%d error=%s", __FILE__, __LINE__, e.what());
+    Belle2::debug("[DEBUG] %s:%d error=%s", __FILE__, __LINE__, e.what());
   }
   return true;
 }
@@ -344,7 +344,7 @@ bool RunControlMessageManager::reportRCStatus() throw()
   try {
     _ui_comm->sendMessage(msg);
   } catch (const IOException& e) {
-    B2DAQ::debug("[DEBUG] %s:%d error=%s", __FILE__, __LINE__, e.what());
+    Belle2::debug("[DEBUG] %s:%d error=%s", __FILE__, __LINE__, e.what());
   }
   return true;
 }
@@ -355,7 +355,7 @@ void RunControlMessageManager::downloadConfig(const Command& cmd, int version) t
   try {
     config.readTables(version);
   } catch (const IOException& e) {
-    B2DAQ::debug("[DEBUG] Error on loading system configuration.:%s", e.what());
+    Belle2::debug("[DEBUG] Error on loading system configuration.:%s", e.what());
   }
   if (cmd == Command::BOOT || cmd == Command::LOAD) {
     std::vector<NSMNode*>& node_v(_node_system->getNodes());
@@ -380,7 +380,7 @@ void RunControlMessageManager::uploadRunConfig() throw()
     _data_man->writeRunStatus();
     _data_man->writeRunConfig();
   } catch (const IOException& e) {
-    B2DAQ::debug("[DEBUG] Error on writing run configuration to NSM.:%s", e.what());
+    Belle2::debug("[DEBUG] Error on writing run configuration to NSM.:%s", e.what());
   }
   DBRunInfoHandler handler(_db, status, config);
   try {
@@ -389,7 +389,7 @@ void RunControlMessageManager::uploadRunConfig() throw()
   try {
     handler.writeRunConfigTable();
   } catch (const IOException& e) {
-    B2DAQ::debug("[DEBUG] Error on uploading run configuration.:%s", e.what());
+    Belle2::debug("[DEBUG] Error on uploading run configuration.:%s", e.what());
   }
 
 }
@@ -415,7 +415,7 @@ void RunControlMessageManager::uploadRunResult() throw()
     _data_man->writeRunStatus();
     _data_man->writeRunConfig();
   } catch (const IOException& e) {
-    B2DAQ::debug("[DEBUG] Error on writing run configuration to NSM.:%s", e.what());
+    Belle2::debug("[DEBUG] Error on writing run configuration to NSM.:%s", e.what());
   }
   DBRunInfoHandler handler(_db, status, config);
   try {
@@ -424,6 +424,6 @@ void RunControlMessageManager::uploadRunResult() throw()
   try {
     handler.writeRunStatusTable();
   } catch (const IOException& e) {
-    B2DAQ::debug("[DEBUG] Error on uploading run status.:%s", e.what());
+    Belle2::debug("[DEBUG] Error on uploading run status.:%s", e.what());
   }
 }

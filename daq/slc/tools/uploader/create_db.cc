@@ -2,17 +2,17 @@
 #include <sstream>
 #include <cstdlib>
 
-#include <util/StringUtil.hh>
+#include <base/StringUtil.h>
 
-#include <xml/XMLParser.hh>
-#include <xml/NodeLoader.hh>
+#include <xml/XMLParser.h>
+#include <xml/NodeLoader.h>
 
-#include <db/DBNodeSystemConfigurator.hh>
-#include <db/MySQLInterface.hh>
+#include <database/DBNodeSystemConfigurator.h>
+#include <database/MySQLInterface.h>
 
 #include <cstdlib>
 
-using namespace B2DAQ;
+using namespace Belle2;
 
 int main(int argc, char** argv)
 {

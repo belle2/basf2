@@ -1,21 +1,21 @@
-#include "HistoServer.hh"
+#include "HistoServer.h"
 
-#include "PackageManager.hh"
-#include "PackageUpdater.hh"
+#include "PackageManager.h"
+#include "PackageUpdater.h"
 
-#include <dqm/HistoManager.hh>
+#include <dqm/HistoManager.h>
 
-#include <system/Inotify.hh>
-#include <system/PThread.hh>
+#include <system/Inotify.h>
+#include <system/PThread.h>
 
-#include <util/Debugger.hh>
+#include <base/Debugger.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>
 
 #include <iostream>
 
-using namespace B2DQM;
+using namespace Belle2;
 
 void HistoServer::addManager(const std::string& filename, HistoManager* manager)
 {
@@ -43,7 +43,7 @@ int HistoServer::wait(int sec)
 
 void HistoServer::run()
 {
-  using namespace B2DAQ;
+  using namespace Belle2;
 
   for (size_t i = 0; i < _manager_v.size(); i++) {
     _index_m.insert(std::map<std::string, int>::value_type(_filename_v[i], i));

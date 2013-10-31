@@ -1,31 +1,29 @@
-#include "RunControlMessageManager.hh"
+#include "RunControlMessageManager.h"
 
-#include "GUICommunicator.hh"
-#include "LocalNSMCommunicator.hh"
+#include "GUICommunicator.h"
+#include "LocalNSMCommunicator.h"
 
-#include <nsm/RunStatus.hh>
-#include <nsm/NSMNodeDaemon.hh>
+#include <nsm/RunStatus.h>
+#include <nsm/NSMNodeDaemon.h>
+#include <nsm/RCCallback.h>
 
-#include <db/MySQLInterface.hh>
-#include <db/DBNodeSystemConfigurator.hh>
+#include <database/MySQLInterface.h>
+#include <database/DBNodeSystemConfigurator.h>
 
-#include <xml/NodeLoader.hh>
+#include <xml/NodeLoader.h>
 
-#include <system/PThread.hh>
+#include <system/PThread.h>
 
-#include <node/NSMNode.hh>
-
-#include <runcontrol/RCCallback.hh>
-
-#include <util/ConfigReader.hh>
-#include <util/Debugger.hh>
-#include <util/StringUtil.hh>
+#include <base/NSMNode.h>
+#include <base/ConfigReader.h>
+#include <base/Debugger.h>
+#include <base/StringUtil.h>
 
 #include <iostream>
 #include <cstdlib>
 #include <unistd.h>
 
-namespace B2DAQ {
+namespace Belle2 {
   class Listener {
   public:
     Listener(HostCommunicator* comm)
@@ -41,7 +39,7 @@ namespace B2DAQ {
 
 int main(int argc, char** argv)
 {
-  using namespace B2DAQ;
+  using namespace Belle2;
 
   if (argc < 1) {
     std::cerr << "Usage : ./runcontrold [ip=50000]"
@@ -78,7 +76,7 @@ int main(int argc, char** argv)
       comm->init();
       break;
     } catch (const NSMHandlerException& e) {
-      B2DAQ::debug("[DEBUG] Failed to connect NSM network. Re-trying to connect...");
+      Belle2::debug("[DEBUG] Failed to connect NSM network. Re-trying to connect...");
       sleep(3);
     }
   }
@@ -111,7 +109,7 @@ int main(int argc, char** argv)
       DBNodeSystemConfigurator config(db, &node_system);
       config.readTables(data->getRunConfig()->getVersion());
     } catch (const IOException& e) {
-      B2DAQ::debug("[FATAL] Error on loading system configuration.:%s", e.what());
+      Belle2::debug("[FATAL] Error on loading system configuration.:%s", e.what());
       return 1;
     }
   } catch (const std::exception& e) {
@@ -120,8 +118,8 @@ int main(int argc, char** argv)
     data->getRunStatus()->setRunNumber(0);
   }
   HostCommunicator* ui_comm =  new GUICommunicator(server_socket, db, loader);
-  B2DAQ::PThread(new Listener(ui_comm));
-  B2DAQ::PThread(new LocalNSMCommunicator(comm));
+  Belle2::PThread(new Listener(ui_comm));
+  Belle2::PThread(new LocalNSMCommunicator(comm));
 
   RunControlMessageManager* manager
     = new RunControlMessageManager(db, comm, data, ui_comm,

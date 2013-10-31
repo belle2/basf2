@@ -1,15 +1,14 @@
-#include "ROCallback.hh"
+#include "ROCallback.h"
 
-#include "ProcessListener.hh"
-#include "RecieverManager.hh"
-#include "EventBuilderManager.hh"
+#include "ProcessListener.h"
+#include "RecieverManager.h"
+#include "EventBuilderManager.h"
 
-#include <node/RONode.hh>
+#include <system/Fork.h>
 
-#include <system/Fork.hh>
-
-#include <util/Debugger.hh>
-#include <util/StringUtil.hh>
+#include <base/RONode.h>
+#include <base/Debugger.h>
+#include <base/StringUtil.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -20,7 +19,7 @@
 #include <cstring>
 #include <cstdio>
 
-using namespace B2DAQ;
+using namespace Belle2;
 
 ROCallback::ROCallback(RONode* node)
   : RCCallback(node), _node(node)
@@ -38,7 +37,7 @@ bool ROCallback::boot() throw()
   if (_buf_config == NULL) {
     _buf_config = openBuffer(4, "/ropc_config");
     if (_buf_config == NULL) {
-      B2DAQ::debug("Failed to open buffer for config");
+      Belle2::debug("Failed to open buffer for config");
       setReply("Failed to open buffer for config");
       return false;
     }
@@ -47,7 +46,7 @@ bool ROCallback::boot() throw()
   if (_buf_status == NULL) {
     _buf_status = openBuffer(4, "/ropc_status");
     if (_buf_status == NULL) {
-      B2DAQ::debug("Failed to open buffer for status");
+      Belle2::debug("Failed to open buffer for status");
       setReply("Failed to open buffer for status");
       return false;
     }

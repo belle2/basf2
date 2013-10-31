@@ -4,15 +4,15 @@
 #include <cstdlib>
 #include <cstring>
 
-#include <util/StringUtil.hh>
+#include <base/StringUtil.h>
 
-#include <xml/XMLParser.hh>
-#include <xml/NodeLoader.hh>
+#include <xml/XMLParser.h>
+#include <xml/NodeLoader.h>
 
-#include <db/DBNodeSystemConfigurator.hh>
-#include <db/MySQLInterface.hh>
+#include <database/DBNodeSystemConfigurator.h>
+#include <database/MySQLInterface.h>
 
-using namespace B2DAQ;
+using namespace Belle2;
 
 int main(int argc, char** argv)
 {
@@ -31,7 +31,7 @@ int main(int argc, char** argv)
   int old_version = atoi(argv[3]);
   int mode = (strcmp(argv[4], "global") == 0) ? NodeSystem::MODE_GLOBAL : NodeSystem::MODE_LOCAL;
   const char* run_type = argv[5];
-  std::vector<std::string> str_v = B2DAQ::split(argv[6], ':');
+  std::vector<std::string> str_v = Belle2::split(argv[6], ':');
   std::stringstream ss;
   for (int i = 7; i < argc; i++) {
     ss << argv[i] << " ";
@@ -69,7 +69,7 @@ int main(int argc, char** argv)
               << "Default configuration was used." << std::endl;
   }
   for (size_t i = 0; i < str_v.size(); i++) {
-    std::vector<std::string> label_v = B2DAQ::split(str_v[i], '=');
+    std::vector<std::string> label_v = Belle2::split(str_v[i], '=');
     int version = atoi(label_v[1].c_str());
     node_system.setVersion(label_v[0], version);
   }

@@ -2,6 +2,12 @@
 
 all:
 	make -C nsm2/
+	make -C src/
+	make -C vmecontrold/
+	make -C bin/
+
+full:
+	make -C nsm2/
 	make -C src/ full
 	make -C templated/
 	make -C vmecontrold/
@@ -9,7 +15,7 @@ all:
 	make -C rocontrold/
 	make -C runcontrold/
 	make -C nsmmonitor/
-	make -C bin/
+	make -C bin/ full
 
 clean:
 	make -C javalib/ clean

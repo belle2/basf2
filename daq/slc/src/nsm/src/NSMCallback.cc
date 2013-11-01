@@ -30,3 +30,21 @@ NSMMessage& NSMCallback::getMessage()
 {
   return _comm->getMessage();
 }
+
+int NSMCallback::getExpNumber()
+{
+  if (getMessage().getNParams() > 1) {
+    return (int)getMessage().getParam(0);
+  } else {
+    return -1;
+  }
+}
+
+int NSMCallback::getRunNumber()
+{
+  if (getMessage().getNParams() > 1) {
+    return (int)getMessage().getParam(1);
+  } else {
+    return -1;
+  }
+}

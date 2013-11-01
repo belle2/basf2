@@ -1,11 +1,6 @@
 #include "VMEControllerCallback.h"
 
-#include <nsm/RunStatus.h>
-
 #include <base/Debugger.h>
-#include <base/StringUtil.h>
-
-#include <unistd.h>
 
 using namespace Belle2;
 
@@ -35,8 +30,8 @@ bool VMEControllerCallback::load() throw()
 bool VMEControllerCallback::start() throw()
 {
   Belle2::debug("START");
-  Belle2::debug("Exp no: %d", (int)getMessage().getParam(0));
-  Belle2::debug("Run no: %d", (int)getMessage().getParam(1));
+  Belle2::debug("Exp no: %d", getExpNumber());
+  Belle2::debug("Run no: %d", getRunNumber());
   return true;
 }
 

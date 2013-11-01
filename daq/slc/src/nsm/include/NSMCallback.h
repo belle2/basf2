@@ -40,6 +40,8 @@ namespace Belle2 {
     NSMMessage& getMessage();
     NSMCommunicator* getCommunicator() { return _comm; }
     void setCommunicator(NSMCommunicator* comm) { _comm = comm; }
+    int getExpNumber();
+    int getRunNumber();
 
   protected:
     void setReply(const std::string& reply) { _reply = reply; }

@@ -4,7 +4,7 @@ all:
 	make -C nsm2/
 	make -C src/ full
 	make -C templated/
-	make -C cprcontrold/
+	make -C vmecontrold/
 #	make ttdd
 	make -C rocontrold/
 	make -C runcontrold/
@@ -15,7 +15,7 @@ clean:
 	make -C javalib/ clean
 	make -C tools/ clean
 	make -C dqmserver/ clean
-	make -C templated/ clean
+	make -C vmecontrold/ clean
 	make -C cprcontrold/ clean
 	make -C rocontrold/ clean
 	make -C runcontrold/ clean

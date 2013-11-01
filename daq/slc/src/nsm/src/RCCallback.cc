@@ -6,6 +6,8 @@
 
 #include <belle2nsm.h>
 
+#include <cstdlib>
+
 using namespace Belle2;
 
 bool RCCallback::perform(NSMMessage& msg) throw(NSMHandlerException)

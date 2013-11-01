@@ -5,9 +5,9 @@ all:
 	@ ln -s $(B2SLC_PATH)/dqmserver/bin/dqmservd
 	@ ln -s $(B2SLC_PATH)/runcontrold/bin/runcontrold
 	@ ln -s $(B2SLC_PATH)/cprcontrold/bin/cprcontrold
-	@ ln -s $(B2SLC_PATH)/ttdcontrold/bin/ttdcontrold
+#	@ ln -s $(B2SLC_PATH)/ttdcontrold/bin/ttdcontrold
 	@ ln -s $(B2SLC_PATH)/rocontrold/bin/rocontrold
-	@ ln -s $(B2SLC_PATH)/templated/bin/tempd
+	@ ln -s $(B2SLC_PATH)/vmecontrold/bin/vmecontrold
 	@ ln -s $(B2SLC_PATH)/include/nsm/pocket_ttd.h .
 	@ ln -s $(B2SLC_PATH)/include/nsm/run_status.h .
 	@ ln -s $(B2SLC_PATH)/include/nsm/run_config.h .

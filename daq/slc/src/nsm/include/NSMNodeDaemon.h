@@ -11,12 +11,13 @@ namespace Belle2 {
   class NSMNodeDaemon {
 
   public:
-    NSMNodeDaemon(NSMNode* node = NULL, NSMCallback* callback = NULL,
-                  NSMData* rdata = NULL, NSMData* wdata = NULL)
-      : _node(node), _callback(callback), _rdata(rdata), _wdata(wdata) {}
+    NSMNodeDaemon(NSMNode* node = NULL, NSMCallback* callback = NULL)
+      : _node(node), _callback(callback), _rdata(NULL), _wdata(NULL) {}
     virtual ~NSMNodeDaemon() throw() {}
 
   public:
+    void setReadData(NSMData* rdata) { _rdata = rdata; }
+    void setWriteData(NSMData* wdata) { _wdata = wdata; }
     void run() throw();
 
   private:

@@ -1,7 +1,5 @@
 all:
-	make -C gen_dqm
 	make -C uploader
-	make -C mapfiletest
 
 clean:
 	make -C gen_dqm clean

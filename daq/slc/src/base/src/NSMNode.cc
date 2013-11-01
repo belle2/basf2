@@ -6,6 +6,15 @@
 
 using namespace Belle2;
 
+NSMNode::NSMNode(const std::string& name,
+                 const std::string& type)
+  : _type(type), _name(name)
+{
+  _host = NULL;
+  _node_id = _index = -1;
+  setState(State::INITIAL_S);
+}
+
 const std::string NSMNode::getSQLFields() const throw()
 {
   return Node::getSQLFields() + ", name text, used boolean, host_id int";

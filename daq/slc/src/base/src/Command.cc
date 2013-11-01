@@ -9,6 +9,7 @@ const Command Command::BOOT(101, "BOOT", "BOOT");
 const Command Command::LOAD(102, "LOAD", "LOAD");
 const Command Command::START(103, "START", "START");
 const Command Command::STOP(104, "STOP", "STOP");
+const Command Command::RECOVER(108, "RECOVER", "RECOVER");
 const Command Command::RESUME(105, "RESUMEN", "RESUME");
 const Command Command::PAUSE(106, "PAUSE", "PAUSE");
 const Command Command::ABORT(107, "ABORT", "ABORT");
@@ -24,6 +25,7 @@ const Command& Command::operator=(const std::string& label) throw()
   else if (label == LOAD._label) *this = LOAD;
   else if (label == START._label) *this = START;
   else if (label == STOP._label) *this = STOP;
+  else if (label == RECOVER._label) *this = RECOVER;
   else if (label == RESUME._label) *this = RESUME;
   else if (label == PAUSE._label) *this = PAUSE;
   else if (label == ABORT._label) *this = ABORT;
@@ -64,6 +66,7 @@ int Command::isAvailable(const State& state) const throw()
   } else if (*this == RESUME && state == State::PAUSED_S) {
     return SUGGESTED;
   } else if (*this == STATECHECK || *this == OK ||
+             *this == RECOVER ||
              *this == TRIGFT || *this == DATA ||
              *this == ERROR || *this == ABORT) {
     return ENABLED;
@@ -79,6 +82,7 @@ State Command::nextState() const throw()
   else if (*this == START) return State::RUNNING_S;
   else if (*this == STOP) return State::READY_S;
   else if (*this == RESUME) return State::RUNNING_S;
+  else if (*this == RECOVER) return State::READY_S;
   else if (*this == PAUSE) return State::PAUSED_S;
   else if (*this == ABORT) return State::INITIAL_S;
   else return UNKNOWN;

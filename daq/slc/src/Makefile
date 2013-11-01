@@ -4,7 +4,7 @@ SRCDIR=$(B2SLC_PATH)/src
 INCDIR=$(B2SLC_PATH)/include
 LIBDIR=$(B2SLC_PATH)/lib
 
-all: base system nsm dqm
+all: base system nsm
 
 full: all xml database
 

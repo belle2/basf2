@@ -66,7 +66,6 @@ int main(int argc, char** argv)
   NodeSystem& node_system(loader->getSystem());
   NSMDataManager* data = new NSMDataManager(&node_system);
   NSMNode* rc_node = new NSMNode(node_name);
-  rc_node->setState(State::INITIAL_S);
   node_system.setRunControlNode(rc_node);
   NSMCommunicator* comm = new NSMCommunicator(rc_node);
   RCCallback* callback = new RCCallback(rc_node);

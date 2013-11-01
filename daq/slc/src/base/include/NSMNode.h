@@ -16,8 +16,7 @@ namespace Belle2 {
 
   public:
     NSMNode(const std::string& name = "",
-            const std::string& type = "nsmnode")
-      : _type(type), _name(name) { _host = NULL; _node_id = _index = -1; }
+            const std::string& type = "nsmnode");
     virtual ~NSMNode() throw() {}
 
   public:

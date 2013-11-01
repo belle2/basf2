@@ -2,7 +2,6 @@
 
 all:
 	make -C nsm2/
-	cp nsm2/example/master bin/cui
 	make -C src/ full
 	make -C templated/
 	make -C cprcontrold/
@@ -10,9 +9,6 @@ all:
 	make -C rocontrold/
 	make -C runcontrold/
 	make -C nsmmonitor/
-	make -C tools/
-	make -C dqmserver/
-	make -C javalib/
 	make -C bin/
 
 clean:
@@ -27,5 +23,11 @@ clean:
 #	make -C ttdd/ clean
 	make -C src/ clean
 	make -C nsm2/ clean
-	rm -rf *~ .*~ \#*~ bin/cui
 	make -C bin/ clean
+
+dqm:
+	make -C src/ dqm
+	make -C tools/ gen_dqm
+	make -C tools/ mapfiletest
+	make -C dqmserver/
+	make -C javalib/b2dqm

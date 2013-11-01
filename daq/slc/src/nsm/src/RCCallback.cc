@@ -37,6 +37,8 @@ bool RCCallback::perform(NSMMessage& msg) throw(NSMHandlerException)
     result = start();
   } else if (cmd == Command::STOP) {
     result = stop();
+  } else if (cmd == Command::RECOVER) {
+    result = recover();
   } else if (cmd == Command::RESUME) {
     result = resume();
   } else if (cmd == Command::PAUSE) {
@@ -71,8 +73,30 @@ RCCallback::RCCallback(NSMNode* node) throw()
   add(Command::LOAD);
   add(Command::START);
   add(Command::STOP);
-  add(Command::RESUME);
-  add(Command::PAUSE);
+  add(Command::RECOVER);
+  //add(Command::RESUME);
+  //add(Command::PAUSE);
   add(Command::ABORT);
   add(Command::STATECHECK);
+  const char* rc_name = getenv("RC_NAME");
+  if (rc_name != NULL) {
+    _rc_node = new NSMNode(rc_name);
+  }
+}
+
+void RCCallback::reportState() throw(NSMHandlerException)
+{
+  if (_rc_node != NULL) {
+    getCommunicator()->sendRequest(_rc_node, Command::OK,
+                                   0, 0, _node->getState().getLabel());
+  }
+}
+
+void RCCallback::reportError(const std::string& str)
+throw(NSMHandlerException)
+{
+  if (_rc_node != NULL) {
+    getCommunicator()->sendRequest(_rc_node, Command::ERROR,
+                                   0, 0, str.c_str());
+  }
 }

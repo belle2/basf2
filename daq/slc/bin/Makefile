@@ -8,7 +8,11 @@ all:
 	@ ln -s $(B2SLC_PATH)/ttdcontrold/bin/ttdcontrold
 	@ ln -s $(B2SLC_PATH)/rocontrold/bin/rocontrold
 	@ ln -s $(B2SLC_PATH)/templated/bin/tempd
-	@ ln -s $(B2SLC_PATH)/include/nsm/*.h .
+	@ ln -s $(B2SLC_PATH)/include/nsm/pocket_ttd.h .
+	@ ln -s $(B2SLC_PATH)/include/nsm/run_status.h .
+	@ ln -s $(B2SLC_PATH)/include/nsm/run_config.h .
+	@ rm cui; cp $(B2SLC_PATH)/nsm2/example/master cui
 
 clean:
 	@ rm -f *d nsmd2 *.h
+	@ rm -rf *~ .*~ \#*~ cui

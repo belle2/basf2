@@ -20,7 +20,6 @@ int main(int argc, char** argv)
   RONode* node = new RONode(name);
   ROCallback* callback = new ROCallback(node);
   NSMNodeDaemon* daemon = new NSMNodeDaemon(node, callback);
-  node->setState(State::INITIAL_S);
   daemon->run();
 
   return 0;

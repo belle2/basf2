@@ -18,7 +18,7 @@
 
 namespace Belle2 {
 
-//Macro that defines an exception
+  /** Macro that defines an exception with the given message template. */
 #define BELLE2_DEFINE_EXCEPTION(ClassName, Message) \
   class ClassName : public std::runtime_error { \
   public: \
@@ -37,6 +37,7 @@ namespace Belle2 {
 }
 
 #else
+/** Macro that defines an exception with the given message template. */
 #define BELLE2_DEFINE_EXCEPTION(ClassName, Message)
 #endif
 

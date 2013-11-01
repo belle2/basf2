@@ -629,8 +629,10 @@ namespace Belle2 {
   //             Define convenient macros
   //------------------------------------------------------
 #ifdef _PACKAGE_
+  /** Register the given module (without 'Module' suffix) with the framework. */
 #define REG_MODULE(moduleName) ModuleProxy<moduleName##Module> regProxy##moduleName(#moduleName, _PACKAGE_);
 #else
+  /** Register the given module (without 'Module' suffix) with the framework. */
 #define REG_MODULE(moduleName) ModuleProxy<moduleName##Module> regProxy##moduleName(#moduleName);
 #endif
 

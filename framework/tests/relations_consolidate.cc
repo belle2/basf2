@@ -8,6 +8,7 @@
 using namespace std;
 
 namespace Belle2 {
+  /** command x should exit using B2FATAL. */
 #define EXPECT_FATAL(x) EXPECT_EXIT(x,::testing::KilledBySignal(SIGABRT),"");
 
   /** The fixture for testing class Foo. */

@@ -58,6 +58,7 @@ namespace Belle2 {
              string("leps2013simu.root"));
     addParam("randomize", m_randomize, "Randomize time within TDC bin",
              true);
+    addParam("t0", m_t0, "common offset to be added to photon TDC times [ns]", 0.0);
 
     // initialize other private data members
     m_file = NULL;
@@ -173,7 +174,7 @@ namespace Belle2 {
       m_top.ch_mcp[i] = ich % m_numPMTchannels + 1;
       float tdc = TDC[ich];
       if (m_randomize) tdc += gRandom->Rndm();
-      m_top.tdc0_mcp[i] = tdc * m_tdcWidth;
+      m_top.tdc0_mcp[i] = tdc * m_tdcWidth + m_t0 * Unit::ns / Unit::ps;
       m_top.pmtflag_mcp[i] = 1;
 
       m_top.tdc0_ch[ich] = m_top.tdc0_mcp[i];

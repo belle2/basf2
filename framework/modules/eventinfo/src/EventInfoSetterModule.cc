@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <framework/modules/eventnumbers/EventNumbersModule.h>
+#include <framework/modules/eventinfo/EventInfoSetterModule.h>
 
 #include <framework/core/Environment.h>
 
@@ -20,14 +20,15 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(EventNumbers)
+REG_MODULE(EventInfoSetter)
 REG_MODULE(EvtMetaGen)
+REG_MODULE(EventNumbers)
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-EventNumbersModule::EventNumbersModule() : Module()
+EventInfoSetterModule::EventInfoSetterModule() : Module()
 {
   //Set module properties
   setDescription("Sets the event meta data information (exp, run, evt). You must use this module to tell basf2 about the number of events you want to generate, unless you have an input module that already does so.");
@@ -44,13 +45,13 @@ EventNumbersModule::EventNumbersModule() : Module()
 }
 
 
-EventNumbersModule::~EventNumbersModule()
+EventInfoSetterModule::~EventInfoSetterModule()
 {
 
 }
 
 
-void EventNumbersModule::initialize()
+void EventInfoSetterModule::initialize()
 {
   //Register the EventMetaData in the data store
   m_eventMetaDataPtr.registerAsPersistent();
@@ -59,7 +60,7 @@ void EventNumbersModule::initialize()
   int numEventsArgument = Environment::Instance().getNumberEventsOverride();
   if (numEventsArgument > 0) {
     if (m_evtNumList.size() > 1) {
-      B2ERROR("The -n/--events option cannot be used when multiple runs are specified for EventNumbers!");
+      B2ERROR("The -n/--events option cannot be used when multiple runs are specified for EventInfoSetter!");
     }
     m_evtNumList[0] = numEventsArgument;
   }
@@ -77,7 +78,7 @@ void EventNumbersModule::initialize()
 }
 
 
-void EventNumbersModule::event()
+void EventInfoSetterModule::event()
 {
   if (m_evtNumber >= static_cast<unsigned long>(m_evtNumList[m_colIndex])) {
 

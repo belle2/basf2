@@ -22,7 +22,7 @@ namespace Belle2 {
    * @{
    * \addtogroup framework_modules
    * \ingroup modules
-   * @{ EventNumbersModule @} @}
+   * @{ EventInfoSetterModule @} @}
    */
 
   /**
@@ -35,7 +35,7 @@ namespace Belle2 {
    *
    * @sa EventMetaData
    */
-  class EventNumbersModule : public Module {
+  class EventInfoSetterModule : public Module {
 
   public:
 
@@ -43,10 +43,10 @@ namespace Belle2 {
      * Constructor.
      * Sets the description, the properties and the parameters of the module.
      */
-    EventNumbersModule();
+    EventInfoSetterModule();
 
     /** Destructor. */
-    virtual ~EventNumbersModule();
+    virtual ~EventInfoSetterModule();
 
     /** Initializes the Module.
      *
@@ -85,14 +85,28 @@ namespace Belle2 {
    *
    * @deprecated
    */
-  class EvtMetaGenModule : public EventNumbersModule {
+  class EvtMetaGenModule : public EventInfoSetterModule {
   public:
-    EvtMetaGenModule() : EventNumbersModule() {
-      setDescription("Deprecated, use the EventNumbers module instead.");
+    EvtMetaGenModule() : EventInfoSetterModule() {
+      setDescription("Deprecated, use the EventInfoSetter module instead.");
     }
     virtual void initialize() {
-      B2WARNING("Deprecated, use the EventNumbers module instead.");
-      EventNumbersModule::initialize();
+      B2WARNING("Deprecated, use the EventInfoSetter module instead.");
+      EventInfoSetterModule::initialize();
+    }
+  };
+  /** for compatibility.
+   *
+   * @deprecated
+   */
+  class EventNumbersModule : public EventInfoSetterModule {
+  public:
+    EventNumbersModule() : EventInfoSetterModule() {
+      setDescription("Deprecated, use the EventInfoSetter module instead.");
+    }
+    virtual void initialize() {
+      B2WARNING("Deprecated, use the EventInfoSetter module instead.");
+      EventInfoSetterModule::initialize();
     }
   };
 }

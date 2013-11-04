@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "framework/modules/eventnumbers/EventInfoModule.h"
+#include "framework/modules/eventinfo/EventInfoPrinterModule.h"
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
@@ -20,31 +20,31 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(EventInfo)
+REG_MODULE(EventInfoPrinter)
 REG_MODULE(EvtMetaInfo)
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-EventInfoModule::EventInfoModule() : Module()
+EventInfoPrinterModule::EventInfoPrinterModule() : Module()
 {
   //Set module properties
   setDescription("Prints the current event meta data information (exp, run, event numbers).");
 }
 
 
-EventInfoModule::~EventInfoModule()
+EventInfoPrinterModule::~EventInfoPrinterModule()
 {
 
 }
 
-void EventInfoModule::initialize()
+void EventInfoPrinterModule::initialize()
 {
   StoreObjPtr<EventMetaData>::required();
 }
 
-void EventInfoModule::beginRun()
+void EventInfoPrinterModule::beginRun()
 {
   StoreObjPtr<EventMetaData> eventMetaDataPtr;
   B2INFO("========================================================================");
@@ -53,7 +53,7 @@ void EventInfoModule::beginRun()
 }
 
 
-void EventInfoModule::event()
+void EventInfoPrinterModule::event()
 {
   //Print event meta data information
   StoreObjPtr<EventMetaData> eventMetaDataPtr;
@@ -62,7 +62,7 @@ void EventInfoModule::event()
 }
 
 
-void EventInfoModule::endRun()
+void EventInfoPrinterModule::endRun()
 {
   StoreObjPtr<EventMetaData> eventMetaDataPtr;
   B2INFO("------------------------------------------------------------------------");

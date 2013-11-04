@@ -18,7 +18,7 @@ namespace Belle2 {
    * @{
    * \addtogroup framework_modules
    * \ingroup modules
-   * @{ EventInfoModule @} @}
+   * @{ EventInfoPrinterModule @} @}
    */
 
   /** The event meta data info module.
@@ -27,7 +27,7 @@ namespace Belle2 {
    *
    * (e.g. Could be used later to also send the info over TCP/IP to a GUI)
    */
-  class EventInfoModule : public Module {
+  class EventInfoPrinterModule : public Module {
   public:
 
     /**
@@ -35,10 +35,10 @@ namespace Belle2 {
      *
      * Sets the description of the module.
      */
-    EventInfoModule();
+    EventInfoPrinterModule();
 
     /** Destructor of the module. */
-    virtual ~EventInfoModule();
+    virtual ~EventInfoPrinterModule();
 
     /** initialization. */
     virtual void initialize();
@@ -67,14 +67,14 @@ namespace Belle2 {
    *
    * @deprecated
    */
-  class EvtMetaInfoModule : public EventInfoModule {
+  class EvtMetaInfoModule : public EventInfoPrinterModule {
   public:
-    EvtMetaInfoModule() : EventInfoModule() {
-      setDescription("Deprecated, use the EventInfo module instead.");
+    EvtMetaInfoModule() : EventInfoPrinterModule() {
+      setDescription("Deprecated, use the EventInfoPrinter module instead.");
     }
     virtual void initialize() {
-      B2WARNING("Deprecated, use the EventInfo module instead.");
-      EventInfoModule::initialize();
+      B2WARNING("Deprecated, use the EventInfoPrinter module instead.");
+      EventInfoPrinterModule::initialize();
     }
   };
 }

@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Staric                                             *
+ * Contributors: Marko Staric . Luigi Li Gioi                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -23,6 +23,7 @@
 // rave
 #include <analysis/raveInterface/RaveSetup.h>
 #include <analysis/raveInterface/RaveVertexFitter.h>
+#include <analysis/raveInterface/RaveKinematicVertexFitter.h>
 
 namespace Belle2 {
 
@@ -81,10 +82,13 @@ namespace Belle2 {
 
   private:
 
-    std::string m_listName;     /**< particle list name */
-    double m_confidenceLevel;   /**< required fit confidence level */
-    double m_Bfield;            /**< magnetic field from data base */
-    std::string m_vertexFitter; /**< Vertex Fitter name */
+    std::string m_listName;       /**< particle list name */
+    double m_confidenceLevel;     /**< required fit confidence level */
+    double m_Bfield;              /**< magnetic field from data base */
+    std::string m_vertexFitter;   /**< Vertex Fitter name */
+    std::string m_fitType;        /**< type of the kinematic fit */
+    std::string m_withConstraint; /**< additional constraint on vertex */
+    std::string m_decayString   ; /**< daughter particles selection */
 
     /**
      * Main steering routine
@@ -111,17 +115,9 @@ namespace Belle2 {
     /**
      * Unconstrained fit using Rave
      * @param p pointer to particle
-     * @return true for successfull update of mother
+     * @return true for successfull fit and update of mother
      */
     bool doRaveFit(Particle* mother);
-
-    /**
-     * Update mother using Rave
-     * @param rf reference to :RaveVertexFitter object
-     * @param p pointer to particle
-     * @return true for successfull update of mother
-     */
-    bool makeRaveMother(analysis::RaveVertexFitter& rf, Particle* p);
 
   };
 

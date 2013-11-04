@@ -1,9 +1,10 @@
+
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Staric                                             *
+ * Contributors: Marko Staric, Luigi Li Gioi                              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -58,6 +59,11 @@ namespace Belle2 {
     addParam("ConfidenceLevel", m_confidenceLevel,
              "required confidence level of fit to keep particles in the list", 0.001);
     addParam("VertexFitter", m_vertexFitter, "kfitter or rave", string("kfitter"));
+    addParam("fitType", m_fitType, "type of the kinematic fit", string("vertex"));
+    addParam("withConstraint", m_withConstraint, "additional constraint on vertex", string(""));
+    addParam("decayString", m_decayString, "specifies which daughter particles are included in the kinematic fit", string(""));  // to be implemented
+
+
 
   }
 
@@ -69,14 +75,26 @@ namespace Belle2 {
   {
     m_Bfield = 1.5;
     analysis::RaveSetup::initialize(1, m_Bfield);
+
+    TVector3 beamSpot(0, 0, 0);
+    TMatrixDSym beamSpotCov(3);
+    beamSpotCov(0, 0) = 1e-03; beamSpotCov(1, 1) = 5.9e-06;
+    if (m_withConstraint.compare(std::string("ipprofile")) == 0) beamSpotCov(2, 2) = 1.9e-02; // from TDR
+    if (m_withConstraint.compare(std::string("iptube")) == 0) beamSpotCov(2, 2) = 1000;
+
+    if (m_withConstraint.compare(std::string("ipprofile")) == 0 || m_withConstraint.compare(std::string("iptube")) == 0)
+      analysis::RaveSetup::getInstance()->setBeamSpot(beamSpot, beamSpotCov);
   }
 
   void ParticleVertexFitterModule::beginRun()
   {
     m_Bfield = 1.5; //TODO: get from gearbox
-    std::string rfs("rave");
-    if (m_vertexFitter.compare(rfs) == 0)
-      B2WARNING("RAVE works only for single vertex non kinematic fit ");
+    if (m_vertexFitter.compare(std::string("kfitter")) == 0)
+      B2WARNING("KFITTER Constraints not implemented ");
+
+    if (m_decayString.compare(std::string("")) != 0)
+      B2WARNING("decayString not implemented. All daughters added to the vertex fit");
+
   }
 
   void ParticleVertexFitterModule::event()
@@ -137,13 +155,18 @@ namespace Belle2 {
   bool ParticleVertexFitterModule::doVertexFit(Particle* mother)
   {
     // steering starts here
-    bool ok = false;
-    std::string kfs("kfitter");
-    std::string rfs("rave");
 
-    if (m_vertexFitter.compare(kfs) == 0) ok = doKvFit(mother);
-    if (m_vertexFitter.compare(rfs) == 0) ok = doRaveFit(mother);
-    if (m_vertexFitter.compare(kfs) != 0 && m_vertexFitter.compare(rfs) != 0)
+    if (m_withConstraint.compare(std::string("ipprofile")) != 0 &&
+        m_withConstraint.compare(std::string("iptube")) != 0 && m_withConstraint.compare(std::string("")) != 0) {
+      B2ERROR("ParticleVertexFitter: " << m_withConstraint << " ***invalid Constraint ");
+      return false;
+    }
+
+
+    bool ok = false;
+    if (m_vertexFitter.compare(std::string("kfitter")) == 0) ok = doKvFit(mother);
+    if (m_vertexFitter.compare(std::string("rave")) == 0) ok = doRaveFit(mother);
+    if (m_vertexFitter.compare(std::string("kfitter")) != 0 && m_vertexFitter.compare(std::string("rave")) != 0)
       B2ERROR("ParticleVertexFitter: " << m_vertexFitter << " ***invalid vertex fitter ");
 
     if (!ok) return false;
@@ -244,37 +267,40 @@ namespace Belle2 {
   {
     if (mother->getNDaughters() < 2) return false;
 
-    analysis::RaveVertexFitter rf;
-    rf.addMother(mother);
+    analysis::RaveKinematicVertexFitter rf;
+    if (m_fitType.compare(std::string("mass")) == 0) rf.setVertFit(false);
 
-    int nVert = rf.fit("kalman");
-    if (nVert != 1) return false;
+    rf.addMother(mother);  // change here to implement m_decayString
 
-    bool ok = makeRaveMother(rf, mother);
-    return ok;
-
-  }
-
-  bool ParticleVertexFitterModule::makeRaveMother(analysis::RaveVertexFitter& rf,
-                                                  Particle* p)
-  {
-
-    TVector3 pos = rf.getPos(0);
-    TMatrixDSym RerrMatrix = rf.getCov(0);
-    double prob = rf.getPValue(0);
-    TLorentzVector mom(p->getMomentum(), p->getEnergy());
-    TMatrixDSym errMatrix(7);
-    for (int i = 0; i < 7; i++) {
-      for (int j = 0; j < 7; j++) {
-        if (i > 3 && j > 3) {errMatrix[i][j] = RerrMatrix[i - 4][j - 4];}
-        else {errMatrix[i][j] = 0;}
-      }
+    int nVert = 0;
+    bool okFT = false;
+    if (m_fitType.compare(std::string("vertex")) == 0) {
+      okFT = true;
+      nVert = rf.fit("kalman");
+      if (nVert != 1) return false;
+    }
+    if (m_fitType.compare(std::string("mass")) == 0) {
+      // add protection
+      okFT = true;
+      rf.setMassConstFit(true);
+      rf.setVertFit(false);
+      nVert = rf.fit("kalman");
+      if (nVert != 1) return false;
+    };
+    if (m_fitType.compare(std::string("massvertex")) == 0) {
+      okFT = true;
+      rf.setMassConstFit(true);
+      nVert = rf.fit("kalman");
+      if (nVert != 1) return false;
+    };
+    if (!okFT) {
+      B2ERROR("fitType : " << m_fitType << " ***invalid fit type ");
+      return false;
     }
 
-    p->updateMomentum(mom, pos, errMatrix, prob);
     return true;
-
   }
+
 
 } // end Belle2 namespace
 

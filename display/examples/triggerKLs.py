@@ -33,14 +33,10 @@ class PyTrigger(Module):
 
 
 # register necessary modules
-eventnumbers = register_module('EventNumbers')
+eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter.param('evtNumList', [20])
 
-# generate one event
-eventnumbers.param('expList', [0])
-eventnumbers.param('runList', [1])
-eventnumbers.param('evtNumList', [20])
-
-evtmetainfo = register_module('EventInfo')
+evtmetainfo = register_module('EventInfoPrinter')
 
 # create geometry
 gearbox = register_module('Gearbox')
@@ -60,7 +56,7 @@ g4sim.logging.log_level = LogLevel.ERROR
 main = create_path()
 
 # add modules to paths
-main.add_module(eventnumbers)
+main.add_module(eventinfosetter)
 main.add_module(evtmetainfo)
 
 main.add_module(gearbox)

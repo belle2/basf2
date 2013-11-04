@@ -7,9 +7,8 @@ import random
 from basf2 import *
 
 
-# register necessary modules
-eventnumbers = register_module('EventNumbers')
-eventnumbers.param('evtNumList', [5000])
+eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter.param('evtNumList', [5000])
 
 
 # create geometry
@@ -33,7 +32,7 @@ tx.param('DestHostName', 'localhost')
 main = create_path()
 
 # add modules to paths
-main.add_module(eventnumbers)
+main.add_module(eventinfosetter)
 main.add_module(register_module('Progress'))
 
 main.add_module(gearbox)

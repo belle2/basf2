@@ -53,8 +53,8 @@ class GenerateHist(Module):
 
 
 # register necessary modules
-eventnumbers = register_module('EventNumbers')
-eventnumbers.param('evtNumList', [500])
+eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter.param('evtNumList', [500])
 
 
 # create geometry
@@ -73,7 +73,7 @@ g4sim.logging.log_level = LogLevel.ERROR
 main = create_path()
 
 # add modules to paths
-main.add_module(eventnumbers)
+main.add_module(eventinfosetter)
 
 main.add_module(gearbox)
 main.add_module(geometry)

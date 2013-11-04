@@ -11,6 +11,8 @@
 #include <analysis/NtupleTools/NtupleDetectorStatsRecTool.h>
 #include <analysis/NtupleTools/NtupleDetectorStatsSimTool.h>
 #include <analysis/NtupleTools/NtupleMCReconstructibleTool.h>
+#include <analysis/NtupleTools/NtupleVertexTool.h>
+#include <analysis/NtupleTools/NtupleMCVertexTool.h>
 
 using namespace Belle2;
 using namespace std;
@@ -29,6 +31,8 @@ NtupleFlatTool* NtupleToolList::create(string strName, TTree* tree, DecayDescrip
   else if (strName.compare("DetectorStatsSim") == 0) return new NtupleDetectorStatsSimTool(tree, d);
   else if (strName.compare("MCReconstructible") == 0) return new NtupleMCReconstructibleTool(tree, d);
   else if (strName.compare("Track") == 0) return new NtupleTrackTool(tree, d);
+  else if (strName.compare("Vertex") == 0) return new NtupleVertexTool(tree, d);
+  else if (strName.compare("MCVertex") == 0) return new NtupleMCVertexTool(tree, d);
 
   B2WARNING("The specified NtupleTool is not available!");
   return NULL;

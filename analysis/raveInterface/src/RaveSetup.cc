@@ -53,14 +53,14 @@ void RaveSetup::initialize(int verbosity, double MagneticField)
 //  s_instance->m_GFRaveVertexFactory = new GFRaveVertexFactory(verbosity, true);
 
   //now setup everything for the dirct use of Rave without GFRave
-  //TODO get magnetic field from framework
+
   s_instance->m_raveVertexFactory = new rave::VertexFactory(rave::ConstantMagneticField(0, 0, MagneticField), rave::VacuumPropagator(), "kalman", verbosity);
 
-//  s_instance->m_raveKinematicTreeFactory = new rave::KinematicTreeFactory(rave::ConstantMagneticField(0, 0, 1.5),rave::VacuumPropagator(),verbosity);
+  s_instance->m_raveKinematicTreeFactory = new rave::KinematicTreeFactory(rave::ConstantMagneticField(0, 0, MagneticField), rave::VacuumPropagator(), verbosity);
 
 }
 
-RaveSetup::RaveSetup(): m_useBeamSpot(false), m_raveVertexFactory(NULL)/*, m_GFRaveVertexFactory(NULL), m_raveKinematicTreeFactory(NULL)*/
+RaveSetup::RaveSetup(): m_useBeamSpot(false), m_raveVertexFactory(NULL)/*, m_GFRaveVertexFactory(NULL)*/, m_raveKinematicTreeFactory(NULL)
 {
   ;
 }
@@ -71,9 +71,9 @@ RaveSetup::~RaveSetup()
   if (m_raveVertexFactory not_eq NULL) {
     delete m_raveVertexFactory;
   }
-//  if (m_raveKinematicTreeFactory not_eq NULL) {
-//    delete m_raveKinematicTreeFactory;
-//  }
+  if (m_raveKinematicTreeFactory not_eq NULL) {
+    delete m_raveKinematicTreeFactory;
+  }
 //  if (m_GFRaveVertexFactory not_eq NULL) {
 //    delete m_GFRaveVertexFactory;
 //  }

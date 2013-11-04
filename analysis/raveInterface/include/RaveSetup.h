@@ -46,7 +46,7 @@ namespace Belle2 {
 
     public:
       friend class RaveVertexFitter;
-//      friend class RaveKinematicVertexFitter;
+      friend class RaveKinematicVertexFitter;
       /** get the pointer to the instance to get/set any of options stored in RaveSetup*/
       static RaveSetup* getInstance() {
         if (s_instance == NULL) {
@@ -77,7 +77,7 @@ namespace Belle2 {
 
 //      GFRaveVertexFactory* m_GFRaveVertexFactory;
 
-//      rave::KinematicTreeFactory* m_raveKinematicTreeFactory;
+      rave::KinematicTreeFactory* m_raveKinematicTreeFactory;
 
 
 

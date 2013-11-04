@@ -5,7 +5,7 @@
 # gives an example for the use of the HepEvtReader as a master module. The
 # master module sets event, run and experiment number for the event in process.
 # There can only be one master module. In most cases with simulated events this
-# is the EvtMetaGen module. But, if you want to use the event numbers given in
+# is the EventInfoSetter module. But, if you want to use the event numbers given in
 # the HepEvt file you should use the HepEvtReader as a master module.
 #
 # Example steering file - 2011 Belle II Collaboration
@@ -65,7 +65,7 @@ print_params(hepevtreader)
 
 # Add all other modules for simple processing to path
 main.add_module(progress)
-#main.add_module(paramloader)
+# main.add_module(paramloader)
 main.add_module(geobuilder)
 main.add_module(g4sim)
 main.add_module(simpleoutput)

@@ -105,8 +105,8 @@ outfile = 'TOPbeamtest05.root'
 # -------------------------------------------------------------------------
 
 # Number of events to generate
-evtmetagen = register_module('EvtMetaGen')
-evtmetagen.param({'evtNumList': nevents, 'runList': [1]})
+eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter.param({'evtNumList': nevents, 'runList': [1]})
 
 # particle gun
 particlegun = register_module('ParticleGun')
@@ -141,7 +141,7 @@ set_log_level(LogLevel.ERROR)
 
 # Create path
 main = create_path()
-main.add_module(evtmetagen)
+main.add_module(eventinfosetter)
 main.add_module(progress)
 main.add_module(gearbox)
 main.add_module(geometry)

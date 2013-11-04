@@ -34,8 +34,8 @@ options = parser.parse_args()[0]
 print options
 
 # number of events etc.
-evtmetagen = register_module('EvtMetaGen')
-param_evtmetagen = {'evtNumList': [1],
+eventinfosetter = register_module('EventInfoSetter')
+param_eventinfosetter = {'evtNumList': [1],
                     'runList': [1],
                     'expList': [1],
                     }
@@ -127,7 +127,7 @@ display.param('useClusters', True)
 # path
 mainpath = create_path()
 
-mainpath.add_module(evtmetagen)
+mainpath.add_module(eventinfosetter)
 mainpath.add_module(evtgeninput)
 
 mainpath.add_module(progress)

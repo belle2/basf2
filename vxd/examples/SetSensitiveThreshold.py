@@ -75,7 +75,7 @@ class SetVXDSensitiveThreshold(Module):
 # Particle gun module
 particlegun = register_module('ParticleGun')
 # Create Event information
-evtmetagen = register_module('EvtMetaGen')
+eventinfosetter = register_module('EventInfoSetter')
 # Show progress of processing
 progress = register_module('Progress')
 # Manipulate the energy threshold in VXD SensitiveDetectors.
@@ -98,7 +98,7 @@ svdclust = register_module('SVDClusterizer')
 output = register_module('RootOutput')
 
 # Specify number of events to generate
-evtmetagen.param({'evtNumList': [10], 'runList': [1]})
+eventinfosetter.param({'evtNumList': [10], 'runList': [1]})
 
 # Set parameters for particlegun
 particlegun.param({  # Generate 5 tracks on average
@@ -139,7 +139,7 @@ geometry.param('Components', ['MagneticField', 'PXD', 'SVD'])
 
 # create processing path
 main = create_path()
-main.add_module(evtmetagen)
+main.add_module(eventinfosetter)
 main.add_module(progress)
 main.add_module(particlegun)
 main.add_module(set_thr)  # MUST precede gearbox!

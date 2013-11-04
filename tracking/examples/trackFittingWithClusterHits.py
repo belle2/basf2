@@ -7,11 +7,11 @@ from basf2 import *
 from subprocess import call
 set_log_level(LogLevel.ERROR)
 set_random_seed(3)
-evtmetagen = register_module('EvtMetaGen')
-evtmetagen.param('expList', [0])
-evtmetagen.param('runList', [1])
-evtmetagen.param('evtNumList', [1000])
-evtmetainfo = register_module('EvtMetaInfo')
+eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter.param('expList', [0])
+eventinfosetter.param('runList', [1])
+eventinfosetter.param('evtNumList', [1000])
+eventinfoprinter = register_module('EventInfoPrinter')
 gearbox = register_module('Gearbox')
 geometry = register_module('Geometry')
 
@@ -70,8 +70,8 @@ trackfitchecker.param('robustTests', True)
 # Create paths
 main = create_path()
 # Add modules to paths
-main.add_module(evtmetagen)
-main.add_module(evtmetainfo)
+main.add_module(eventinfosetter)
+main.add_module(eventinfoprinter)
 main.add_module(gearbox)
 main.add_module(geometry)
 main.add_module(pGun)

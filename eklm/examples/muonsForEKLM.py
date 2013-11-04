@@ -27,9 +27,9 @@ from basf2 import *
 # Set the log level to show only error and fatal messages
 set_log_level(LogLevel.INFO)
 
-# EvtMetaGen - generate event meta data
-evtmetagen = register_module('EvtMetaGen')
-evtmetagen.param('evtNumList', [20])
+# EventInfoSetter - generate event meta data
+eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter.param('evtNumList', [20])
 
 # Particle gun
 particlegun = register_module('ParticleGun')
@@ -76,7 +76,7 @@ eklmreco.log_level = LogLevel.INFO
 main = create_path()
 
 # Add modules to main path
-main.add_module(evtmetagen)
+main.add_module(eventinfosetter)
 main.add_module(particlegun)
 main.add_module(paramloader)
 main.add_module(geobuilder)

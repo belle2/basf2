@@ -17,9 +17,9 @@ set_log_level(LogLevel.ERROR)
 main = create_path()
 
 # Set number of events to generate
-evtmetagen = register_module('EvtMetaGen')
-evtmetagen.param({'evtNumList': [10], 'runList': [1]})
-main.add_module(evtmetagen)
+eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter.param({'evtNumList': [10], 'runList': [1]})
+main.add_module(eventinfosetter)
 
 # Gearbox: access to database (xml files)
 gearbox = register_module('Gearbox')

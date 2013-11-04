@@ -10,20 +10,20 @@ evtgeninput = register_module('EvtGenInput')
 # evtgeninput.param('userDECFile',
 # os.path.join(basf2datadir,'generators/belle/MIX.DEC'))
 evtgeninput.param('boost2LAB', True)
-evtmetagen = register_module('EvtMetaGen')
+eventinfosetter = register_module('EventInfoSetter')
 paramloader = register_module('Gearbox')
 geobuilder = register_module('Geometry')
 
-evtmetagen = register_module('EvtMetaGen')
-evtmetagen.param('evtNumList', [100])  # we want to process 100 events
-evtmetagen.param('runList', [1])  # from run number 1
-evtmetagen.param('expList', [1])  # and experiment number 1
+eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter.param('evtNumList', [100])  # we want to process 100 events
+eventinfosetter.param('runList', [1])  # from run number 1
+eventinfosetter.param('expList', [1])  # and experiment number 1
 mcparticleprinter = register_module('PrintMCParticles')
 mcparticleprinter.logging.log_level = LogLevel.ERROR
 
 # creating the path for the processing
 main = create_path()
-main.add_module(evtmetagen)
+main.add_module(eventinfosetter)
 main.add_module(paramloader)
 main.add_module(geobuilder)
 

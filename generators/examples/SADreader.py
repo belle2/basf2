@@ -36,8 +36,8 @@ set_log_level(LogLevel.ERROR)
 
 ## Register the event meta generator and set the number of events to a very #
 # high number which exceeds the number of events in the input file.
-evtmetagen = register_module('EvtMetaGen')
-evtmetagen.param({'evtNumList': [10000000], 'runList': [1]})
+eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter.param({'evtNumList': [10000000], 'runList': [1]})
 
 ## Register the SADInput module and specify the location of the SAD # input
 # file. The file can be downloaded from the TWiki.
@@ -86,7 +86,7 @@ progress = register_module('Progress')
 
 ## Create the main path and add the required modules
 main = create_path()
-main.add_module(evtmetagen)
+main.add_module(eventinfosetter)
 main.add_module(gearbox)
 main.add_module(sadinput)
 main.add_module(geometry)

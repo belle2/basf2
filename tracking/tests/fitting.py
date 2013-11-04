@@ -11,14 +11,14 @@ from basf2 import *
 set_log_level(LogLevel.ERROR)
 set_random_seed(3)
 # register necessary modules
-evtmetagen = register_module('EvtMetaGen')
+eventinfosetter = register_module('EventInfoSetter')
 
 # generate one event
-evtmetagen.param('expList', [0])
-evtmetagen.param('runList', [1])
-evtmetagen.param('evtNumList', [10])
+eventinfosetter.param('expList', [0])
+eventinfosetter.param('runList', [1])
+eventinfosetter.param('evtNumList', [10])
 
-evtmetainfo = register_module('EvtMetaInfo')
+eventinfoprinter = register_module('EventInfoPrinter')
 
 # create geometry
 gearbox = register_module('Gearbox')
@@ -84,8 +84,8 @@ trackfitchecker.param('robustTests', True)
 main = create_path()
 
 # add modules to paths
-main.add_module(evtmetagen)
-main.add_module(evtmetainfo)
+main.add_module(eventinfosetter)
+main.add_module(eventinfoprinter)
 
 main.add_module(gearbox)
 main.add_module(geometry)

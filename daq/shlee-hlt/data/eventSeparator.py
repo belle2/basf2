@@ -4,7 +4,7 @@ import os
 from basf2 import *
 
 # Register modules
-evtMetaGen = fw.register_module('EvtMetaGen')
+evtMetaGen = fw.register_module('EventInfoSetter')
 particleGun = fw.register_module('PGunInput')
 hltOutput = fw.register_module('HLTOutput')
 simpleOutput = fw.register_module('SimpleOutput')

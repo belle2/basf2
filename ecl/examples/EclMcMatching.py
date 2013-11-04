@@ -7,8 +7,8 @@ set_log_level(LogLevel.ERROR)
 set_random_seed(75628607)
 
 # Register necessary modules
-evtmetagen = register_module('EvtMetaGen')
-evtmetainfo = register_module('EvtMetaInfo')
+eventinfosetter = register_module('EventInfoSetter')
+eventinfoprinter = register_module('EventInfoPrinter')
 
 # Create geometry
 # Geometry parameter loader
@@ -21,7 +21,7 @@ geometry = register_module('Geometry')
 g4sim = register_module('FullSim')
 
 # one event
-evtmetagen.param({'evtNumList': [3], 'runList': [1]})
+eventinfosetter.param({'evtNumList': [3], 'runList': [1]})
 
 import random
 intseed = random.randint(1, 10000000)
@@ -84,8 +84,8 @@ makeMatch = register_module('ECLMCMatching')
 
 # Create paths
 main = create_path()
-main.add_module(evtmetagen)
-main.add_module(evtmetainfo)
+main.add_module(eventinfosetter)
+main.add_module(eventinfoprinter)
 main.add_module(gearbox)
 main.add_module(geometry)
 main.add_module(pGun)

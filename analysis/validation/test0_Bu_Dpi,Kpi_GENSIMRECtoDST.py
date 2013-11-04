@@ -10,11 +10,11 @@ set_random_seed(12345)
 main = create_path()
 
 # specify number of events to be generated
-evtmetagen = register_module('EvtMetaGen')
-evtmetagen.param('evtNumList', [1000])
-evtmetagen.param('runList', [1])
-evtmetagen.param('expList', [1])
-main.add_module(evtmetagen)
+eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter.param('evtNumList', [1000])
+eventinfosetter.param('runList', [1])
+eventinfosetter.param('expList', [1])
+main.add_module(eventinfosetter)
 
 # generate Bu->D0(K pi) pi events
 evtgeninput = register_module('EvtGenInput')

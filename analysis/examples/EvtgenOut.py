@@ -5,10 +5,10 @@ from basf2 import *
 set_log_level(LogLevel.ERROR)
 
 # Events
-evtmetagen = register_module('EvtMetaGen')
-evtmetagen.param('evtNumList', [1000])  # we want to process 1000 events
-evtmetagen.param('runList', [1])  # from run number 1
-evtmetagen.param('expList', [1])  # and experiment number 1
+eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter.param('evtNumList', [1000])  # we want to process 1000 events
+eventinfosetter.param('runList', [1])  # from run number 1
+eventinfosetter.param('expList', [1])  # and experiment number 1
 
 # Generator
 evtgeninput = register_module('EvtGenInput')
@@ -26,7 +26,7 @@ output = register_module('RootOutput')
 output.param('outputFileName', 'EvtGenOutput.root')
 
 main = create_path()
-main.add_module(evtmetagen)
+main.add_module(eventinfosetter)
 main.add_module(progress)
 main.add_module(gearbox)
 main.add_module(evtgeninput)

@@ -11,11 +11,11 @@ set_random_seed(12345)
 main = create_path()
 
 # specify number of events to be generated
-evtmetagen = register_module('EvtMetaGen')
-evtmetagen.param('evtNumList', [100])
-evtmetagen.param('runList', [1])
-evtmetagen.param('expList', [1])
-main.add_module(evtmetagen)
+eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter.param('evtNumList', [100])
+eventinfosetter.param('runList', [1])
+eventinfosetter.param('expList', [1])
+main.add_module(eventinfosetter)
 
 # generate BBbar events
 evtgeninput = register_module('EvtGenInput')

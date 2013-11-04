@@ -60,13 +60,13 @@ class ShowMCParticles(Module):
                           mc.getProductionVertex().Y())
 
 
-evtmetagen = register_module('EvtMetaGen')
+eventinfosetter = register_module('EventInfoSetter')
 progress = register_module('Progress')
 particlegun = register_module('ParticleGun')
 showMCPart = ShowMCParticles()
 
 # Specify number of events to generate
-evtmetagen.param({'evtNumList': [10000], 'runList': [1]})
+eventinfosetter.param({'evtNumList': [10000], 'runList': [1]})
 
 # Set parameters for particlegun
 particlegun.param({  # Generate 5 tracks But vary the number of tracks
@@ -97,7 +97,7 @@ particlegun.param({  # Generate 5 tracks But vary the number of tracks
 
 # create processing path
 main = create_path()
-main.add_module(evtmetagen)
+main.add_module(eventinfosetter)
 main.add_module(progress)
 main.add_module(particlegun)
 main.add_module(showMCPart)

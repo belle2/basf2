@@ -50,8 +50,8 @@ particlegun.param('zVertexParams', [0.0, beamspot_size_z])
 particlegun.param('independentVertices', True)
 
 # Create Event information
-evtmetagen = register_module('EvtMetaGen')
-evtmetagen.param({'evtNumList': [events], 'runList': [1]})
+eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter.param({'evtNumList': [events], 'runList': [1]})
 
 # Show progress of processing
 progress = register_module('Progress')
@@ -154,7 +154,7 @@ display.param('fullGeometry', True)
 # Create paths
 main = create_path()
 # Add modules to paths
-main.add_module(evtmetagen)
+main.add_module(eventinfosetter)
 main.add_module(progress)
 main.add_module(gearbox)
 main.add_module(geometry)

@@ -6,14 +6,14 @@ from basf2 import *
 logging.log_level = LogLevel.ERROR
 
 # Create a all modules needed to set up simulation
-evtmetagen = register_module('EvtMetaGen')
+eventinfosetter = register_module('EventInfoSetter')
 gearbox = register_module('Gearbox')
 geometry = register_module('Geometry')
 pgun = register_module('ParticleGun')
 simulation = register_module('FullSim')
 
 # Create one Event in one Run
-evtmetagen.param({'runList': [1], 'evtNumList': [1]})
+eventinfosetter.param({'runList': [1], 'evtNumList': [1]})
 
 # Restrict Geometry to certain components, in this case only PXD and SVD
 geometry.param('Components', ['PXD', 'SVD'])
@@ -106,7 +106,7 @@ materialscan.param({  # Filename for output File
 
 # Create a path and add all modules
 main = create_path()
-main.add_module(evtmetagen)
+main.add_module(eventinfosetter)
 main.add_module(gearbox)
 main.add_module(geometry)
 main.add_module(pgun)

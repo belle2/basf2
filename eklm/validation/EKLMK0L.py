@@ -11,9 +11,9 @@ set_log_level(LogLevel.WARNING)
 set_random_seed(12345)
 
 # Event data
-evtmetagen = register_module('EvtMetaGen')
-evtmetagen.param('evtNumList', [500])
-evtmetagen.param('runList', [1])
+eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter.param('evtNumList', [500])
+eventinfosetter.param('runList', [1])
 
 # Particle gun
 particlegun = register_module('ParticleGun')
@@ -45,7 +45,7 @@ output.param('outputFileName', '../EKLMK0LOutput.root')
 main = create_path()
 
 # Add modules to main path
-main.add_module(evtmetagen)
+main.add_module(eventinfosetter)
 main.add_module(particlegun)
 main.add_module(paramloader)
 main.add_module(geometry)

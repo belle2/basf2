@@ -31,8 +31,8 @@ class TestModule(Module):
         to_relations = mcparticles[0].getRelationsTo("ALL")
 
 
-evtmetagen = register_module('EvtMetaGen')
-evtmetagen.param('evtNumList', [10])
+eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter.param('evtNumList', [10])
 
 gearbox = register_module('Gearbox')
 geometry = register_module('Geometry')
@@ -43,7 +43,7 @@ g4sim.logging.log_level = LogLevel.ERROR
 
 main = create_path()
 
-main.add_module(evtmetagen)
+main.add_module(eventinfosetter)
 main.add_module(gearbox)
 main.add_module(geometry)
 main.add_module(pgun)

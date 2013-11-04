@@ -16,11 +16,11 @@ from basf2 import *
 main = create_path()
 
 # specify number of events to be generated in job
-evtmetagen = register_module('EvtMetaGen')
-evtmetagen.param('evtNumList', [10])  # process 10 events
-evtmetagen.param('runList', [1])  # from run number 1
-evtmetagen.param('expList', [1])  # and experiment number 1
-main.add_module(evtmetagen)
+eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter.param('evtNumList', [10])  # process 10 events
+eventinfosetter.param('runList', [1])  # from run number 1
+eventinfosetter.param('expList', [1])  # and experiment number 1
+main.add_module(eventinfosetter)
 
 # ----> EvtGen
 evtgeninput = register_module('EvtGenInput')

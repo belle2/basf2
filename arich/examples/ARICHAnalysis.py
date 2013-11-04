@@ -29,8 +29,8 @@ filename = options.filename
 set_log_level(LogLevel.INFO)
 
 # Create Event information
-evtmetagen = register_module('EvtMetaGen')
-evtmetagen.param({'evtNumList': [nevents], 'runList': [1]})
+eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter.param({'evtNumList': [nevents], 'runList': [1]})
 
 # Show progress of processing
 progress = register_module('Progress')
@@ -122,7 +122,7 @@ arichEfficiency.param('inputTrackType', 0)
 # Do the simulation
 # =============================================================================
 main = create_path()
-main.add_module(evtmetagen)
+main.add_module(eventinfosetter)
 main.add_module(progress)
 main.add_module(gearbox)
 main.add_module(geometry)

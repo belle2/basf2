@@ -17,7 +17,7 @@ set_log_level(LogLevel.WARNING)
 # to run the framework the used modules need to be registered
 
 # Create Event information
-evtmetagen = register_module('EvtMetaGen')
+eventinfosetter = register_module('EventInfoSetter')
 # Show progress of processing
 progress = register_module('Progress')
 # Load parameters
@@ -29,9 +29,9 @@ particlegun = register_module('ParticleGun')
 # Run simulation
 simulation = register_module('FullSim')
 
-# EvtMetaGen parameters
+# EventInfoSetter parameters
 # Set the number of events to be processed (10 event)
-evtmetagen.param({'evtNumList': [1], 'runList': [1]})
+eventinfosetter.param({'evtNumList': [1], 'runList': [1]})
 # ============================================================================
 
 # ============================================================================
@@ -88,7 +88,7 @@ simulation.param('UICommands', ['/vis/open VRML2FILE', '/vis/drawVolume'])
 # Do the simulation
 # =============================================================================
 main = create_path()
-main.add_module(evtmetagen)
+main.add_module(eventinfosetter)
 main.add_module(progress)
 main.add_module(gearbox)
 main.add_module(geometry)

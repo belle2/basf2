@@ -15,10 +15,10 @@
 import os
 from basf2 import *
 
-# EvtMetaGen - generate event meta data
-evtmetagen = register_module('EvtMetaGen')
+# EventInfoSetter - generate event meta data
+eventinfosetter = register_module('EventInfoSetter')
 evtruninfo = {'expList': [0], 'runList': [1], 'evtNumList': [1]}
-evtmetagen.param(evtruninfo)
+eventinfosetter.param(evtruninfo)
 
 # Geometry parameter loader
 gearbox = register_module('Gearbox')
@@ -38,7 +38,7 @@ geosaver.param('Filename', 'Belle2Geo.root')
 main = create_path()
 
 # Add modules to main path
-main.add_module(evtmetagen)
+main.add_module(eventinfosetter)
 main.add_module(gearbox)
 main.add_module(geometry)
 # main.add_module(overlapchecker)

@@ -70,7 +70,7 @@ hepevtreader.param('wrongSignPz', True)
 #
 # for a simple simulation job with output to a root file these additional
 # modules are needed
-evtmetagen = register_module('EvtMetaGen')
+eventinfosetter = register_module('EventInfoSetter')
 progress = register_module('Progress')
 paramloader = register_module('Gearbox')
 geobuilder = register_module('Geometry')
@@ -78,9 +78,9 @@ g4sim = register_module('FullSim')
 simpleoutput = register_module('RootOutput')
 
 # Setting the option for all non-hepevt reader modules:
-evtmetagen.param('evtNumList', [100])  # we want to process 100 events
-evtmetagen.param('runList', [1])  # from run number 1
-evtmetagen.param('expList', [1])  # and experiment number 1
+eventinfosetter.param('evtNumList', [100])  # we want to process 100 events
+eventinfosetter.param('runList', [1])  # from run number 1
+eventinfosetter.param('expList', [1])  # and experiment number 1
 
 # paramloader.param('InputFileXML', os.path.join(basf2datadir,
 # 'simulation/Belle2.xml'))
@@ -89,7 +89,7 @@ simpleoutput.param('outputFileName', 'HepEvtReaderOutput.root')
 
 # creating the path for the processing
 main = create_path()
-main.add_module(evtmetagen)
+main.add_module(eventinfosetter)
 main.add_module(progress)
 
 # Add hepevtreader module to path:

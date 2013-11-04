@@ -8,7 +8,7 @@
 
 from basf2 import *
 
-evtmeta = register_module('EvtMetaGen')
+evtmeta = register_module('EventInfoSetter')
 
 # Geometry parameter loader
 gearbox = register_module('Gearbox')

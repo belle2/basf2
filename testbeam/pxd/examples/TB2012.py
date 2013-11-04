@@ -28,8 +28,8 @@ particlegun.param('zVertexParams', [-1.0, 0.0])
 particlegun.param('independentVertices', True)
 
 # Create Event information
-evtmetagen = register_module('EvtMetaGen')
-evtmetagen.param({'evtNumList': [10], 'runList': [1]})
+eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter.param({'evtNumList': [10], 'runList': [1]})
 
 # Show progress of processing
 progress = register_module('Progress')
@@ -75,7 +75,7 @@ geosaver.param('Filename', 'TBGeometry.root')
 
 # Path construction
 main = create_path()
-main.add_module(evtmetagen)
+main.add_module(eventinfosetter)
 main.add_module(progress)
 main.add_module(gearbox)
 main.add_module(geometry)

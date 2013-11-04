@@ -71,10 +71,10 @@ print 'TrackMask:' + options.mask
 # this variable is called from GeoARICHBtest2011Creator
 averageagel = int(options.avgagel)
 
-evtmetagen = register_module('EvtMetaGen')
-evtmetagen.param('evtNumList', [int(options.neve)])
-evtmetagen.param('runList', [int(options.runno)])
-evtmetagen.param('expList', [1])
+eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter.param('evtNumList', [int(options.neve)])
+eventinfosetter.param('runList', [int(options.runno)])
+eventinfosetter.param('expList', [1])
 
 # Load XML parameters
 paramloader = register_module('Gearbox')
@@ -141,7 +141,7 @@ profile = register_module('Profile')
 profile.param('outputFileName', 'profileusage.ps')
 
 main = create_path()
-main.add_module(evtmetagen)
+main.add_module(eventinfosetter)
 main.add_module(paramloader)
 # main.add_module(profile)
 main.add_module(geobuilder)

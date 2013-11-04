@@ -15,10 +15,10 @@ set_log_level(LogLevel.INFO)
 
 main = create_path()
 
-evtmetagen = register_module('EvtMetaGen')
-evtmetagen.param('evtNumList', [10000])  # we want to process 10 events
-evtmetagen.param('runList', [1])  # from run number 1
-evtmetagen.param('expList', [1])  # and experiment number 1
+eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter.param('evtNumList', [10000])  # we want to process 10 events
+eventinfosetter.param('runList', [1])  # from run number 1
+eventinfosetter.param('expList', [1])  # and experiment number 1
 
 ## Register the BBBremInput module
 bbbrem = register_module('BBBremInput')
@@ -56,7 +56,7 @@ output.param('outputFileName', './bbbremgen.root')
 
 ## Create the main path and add the modules
 main = create_path()
-main.add_module(evtmetagen)
+main.add_module(eventinfosetter)
 main.add_module(progress)
 main.add_module(gearbox)
 main.add_module(bbbrem)

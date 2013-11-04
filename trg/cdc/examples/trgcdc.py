@@ -32,9 +32,9 @@ particlegun.param('yVertexParams', [0, 0])
 particlegun.param('zVertexParams', [0, 0])
 
 #Register modules
-evtmetagen  = register_module('EvtMetaGen')
-evtmetainfo = register_module('Progress')
-#evtmetainfo = fw.register_module("EvtMetaInfo")
+eventinfosetter  = register_module('EventInfoSetter')
+eventinfoprinter = register_module('Progress')
+#eventinfoprinter = fw.register_module("EventInfoPrinter")
 paramloader = register_module('Gearbox')
 geobuilder = register_module('Geometry')
 #geobuilder.log_level = LogLevel.INFO
@@ -49,8 +49,8 @@ cdctrg      = fw.register_module("TRGCDC")
 #    "physics.mac" is located at "trg/examples/".
 #g4sim.param('UICommands',['/control/execute physics.mac'])
 
-#...EvtMetaGen...
-evtmetagen.param({'EvtNumList': [2], 'RunList': [1]})
+#...EventInfoSetter...
+eventinfosetter.param({'EvtNumList': [2], 'RunList': [1]})
 
 #...GeoBuilder... Exclude detectors other than CDC
 geobuilder.param('Components', ['MagneticField', 'CDC'])
@@ -98,8 +98,8 @@ evtgeninput.param('boost2LAB', True)
 main = create_path()
 
 #Add modules to paths
-main.add_module(evtmetagen)
-main.add_module(evtmetainfo)
+main.add_module(eventinfosetter)
+main.add_module(eventinfoprinter)
 main.add_module(paramloader)
 main.add_module(geobuilder)
 main.add_module(particlegun)

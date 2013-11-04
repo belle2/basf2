@@ -9,7 +9,7 @@ logging.log_level = LogLevel.WARNING
 # for example http://freewrl.sourceforge.net/
 os.environ['G4VRMLFILE_VIEWER'] = 'freewrl'
 
-evtmetagen = register_module('EvtMetaGen')
+eventinfosetter = register_module('EventInfoSetter')
 # Load XML parameters
 paramloader = register_module('Gearbox')
 # Create Geometry
@@ -18,7 +18,7 @@ geobuilder.log_level = LogLevel.INFO
 pguninput = register_module('ParticleGun')
 g4sim = register_module('FullSim')
 
-evtmetagen.param('evtNumList', [1])
+eventinfosetter.param('evtNumList', [1])
 
 g4sim.param('EnableVisualization', True)
 g4sim.param('UICommands', [
@@ -46,7 +46,7 @@ pguninput.param('phiParams', [-5.0, 5.0])
 
 main = create_path()
 
-main.add_module(evtmetagen)
+main.add_module(eventinfosetter)
 main.add_module(paramloader)
 main.add_module(geobuilder)
 # Without Particle Gun there are no tracks

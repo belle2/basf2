@@ -73,8 +73,8 @@ class ShowMCParticles(Module):
                               mc.getProductionVertex().Y())
 
 
-evtmetagen = register_module('EvtMetaGen')
-evtmetagen.param({'evtNumList': [10000], 'runList': [1]})
+eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter.param({'evtNumList': [10000], 'runList': [1]})
 paramloader = register_module('Gearbox')
 
 ## Register the BHWideInput module
@@ -100,7 +100,7 @@ showMCPart = ShowMCParticles()
 
 ## Create the main path and add the modules
 main = create_path()
-main.add_module(evtmetagen)
+main.add_module(eventinfosetter)
 main.add_module(paramloader)
 main.add_module(progress)
 main.add_module(bhwide)

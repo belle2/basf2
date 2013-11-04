@@ -11,7 +11,7 @@ logging.log_level = LogLevel.WARNING
 # Particle gun module
 particlegun = register_module('ParticleGun')
 # Create Event information
-evtmetagen = register_module('EvtMetaGen')
+eventinfosetter = register_module('EventInfoSetter')
 # Show progress of processing
 progress = register_module('Progress')
 # Load parameters
@@ -28,7 +28,7 @@ pxdclust = register_module('PXDClusterizer')
 output = register_module('RootOutput')
 
 # Specify number of events to generate
-evtmetagen.param({'evtNumList': [10], 'runList': [1]})
+eventinfosetter.param({'evtNumList': [10], 'runList': [1]})
 
 # Set parameters for particlegun
 particlegun.param({  # Generate 5 tracks on average
@@ -71,7 +71,7 @@ pxddigi.param('SimpleDriftModel', False)
 
 # create processing path
 main = create_path()
-main.add_module(evtmetagen)
+main.add_module(eventinfosetter)
 main.add_module(progress)
 main.add_module(particlegun)
 main.add_module(gearbox)

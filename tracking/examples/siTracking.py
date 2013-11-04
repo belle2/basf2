@@ -7,12 +7,12 @@ from basf2 import *
 set_log_level(LogLevel.ERROR)
 set_random_seed(1)
 # register the modules and set there options
-evtmetagen = register_module('EvtMetaGen')
-evtmetagen.param('expList', [0])
-evtmetagen.param('runList', [1])
-evtmetagen.param('evtNumList', [10000])
+eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter.param('expList', [0])
+eventinfosetter.param('runList', [1])
+eventinfosetter.param('evtNumList', [10000])
 
-evtmetainfo = register_module('EvtMetaInfo')
+eventinfoprinter = register_module('EventInfoPrinter')
 
 gearbox = register_module('Gearbox')
 
@@ -63,8 +63,8 @@ trackfitchecker.param('outputFileName', 'siTracking')
 # Create paths
 main = create_path()
 # Add modules to paths
-main.add_module(evtmetagen)
-main.add_module(evtmetainfo)
+main.add_module(eventinfosetter)
+main.add_module(eventinfoprinter)
 main.add_module(gearbox)
 main.add_module(geometry)
 main.add_module(pGun)

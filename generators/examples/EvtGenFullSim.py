@@ -8,7 +8,7 @@ set_log_level(LogLevel.ERROR)
 # to run the framework the used modules need to be registered
 evtgeninput = register_module('EvtGenInput')
 evtgeninput.param('boost2LAB', True)
-evtmetagen = register_module('EvtMetaGen')
+eventinfosetter = register_module('EventInfoSetter')
 paramloader = register_module('Gearbox')
 geobuilder = register_module('Geometry')
 g4sim = register_module('FullSim')
@@ -16,15 +16,15 @@ simpleoutput = register_module('RootOutput')
 mcparticleprinter = register_module('PrintMCParticles')
 
 # Setting the option for all non-hepevt reader modules:
-evtmetagen.param('evtNumList', [3])  # we want to process 100 events
-evtmetagen.param('runList', [1])  # from run number 1
-evtmetagen.param('expList', [1])  # and experiment number 1
+eventinfosetter.param('evtNumList', [3])  # we want to process 100 events
+eventinfosetter.param('runList', [1])  # from run number 1
+eventinfosetter.param('expList', [1])  # and experiment number 1
 simpleoutput.param('outputFileName', 'EvtGenOutput.root')
 mcparticleprinter.set_log_level(0)
 
 # creating the path for the processing
 main = create_path()
-main.add_module(evtmetagen)
+main.add_module(eventinfosetter)
 main.add_module(paramloader)
 main.add_module(geobuilder)
 

@@ -15,7 +15,7 @@
 # simulation, mc based and realistic pattern recognition in der CDC. Afterwards
 # the resulting tracks are fitted and stored in a suitable way.
 #
-# EvtMetaGen and EvtMetaInfo generates and shows event meta data (see example
+# EventInfoSetter and EventInfoPrinter generates and shows event meta data (see example
 # in the framework package). Gearbox and Geometry are used to create the Belle2
 # detector geometry. The generator used in this example is geant4 particle gun
 # (see example in the simulation or generator package). FullSim performs the
@@ -42,13 +42,13 @@ import os
 from basf2 import *
 
 # register necessary modules
-evtmetagen = register_module('EvtMetaGen')
+eventinfosetter = register_module('EventInfoSetter')
 
 # generate one event
-evtmetagen.param('expList', [0])
-evtmetagen.param('runList', [1])
-evtmetagen.param('evtNumList', [1])
-evtmetainfo = register_module('EvtMetaInfo')
+eventinfosetter.param('expList', [0])
+eventinfosetter.param('runList', [1])
+eventinfosetter.param('evtNumList', [1])
+eventinfoprinter = register_module('EventInfoPrinter')
 
 # create geometry
 gearbox = register_module('Gearbox')
@@ -158,8 +158,8 @@ output.param('outputFileName', 'TrackingEvaluationOutput.root')
 main = create_path()
 
 # Add modules to paths
-main.add_module(evtmetagen)
-main.add_module(evtmetainfo)
+main.add_module(eventinfosetter)
+main.add_module(eventinfoprinter)
 main.add_module(gearbox)
 main.add_module(geometry)
 main.add_module(pGun)

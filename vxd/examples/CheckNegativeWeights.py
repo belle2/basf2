@@ -152,7 +152,7 @@ class CheckNegativeWeights(Module):
 # Particle gun module
 particlegun = register_module('ParticleGun')
 # Create Event information
-evtmetagen = register_module('EvtMetaGen')
+eventinfosetter = register_module('EventInfoSetter')
 # Show progress of processing
 progress = register_module('Progress')
 # Load parameters
@@ -166,7 +166,7 @@ printWeights = CheckNegativeWeights()
 printWeights.set_log_level(LogLevel.INFO)
 
 # Specify number of events to generate
-evtmetagen.param({'evtNumList': [1000], 'runList': [1]})
+eventinfosetter.param({'evtNumList': [1000], 'runList': [1]})
 
 # Set parameters for particlegun
 particlegun.param({
@@ -203,7 +203,7 @@ geometry.param('Components', ['MagneticField', 'PXD', 'SVD'])
 
 # create processing path
 main = create_path()
-main.add_module(evtmetagen)
+main.add_module(eventinfosetter)
 main.add_module(progress)
 main.add_module(particlegun)
 main.add_module(gearbox)

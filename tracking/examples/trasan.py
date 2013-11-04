@@ -26,9 +26,9 @@ g4sim = register_module('FullSim')
 # "tracking/examples" g4sim.param('UICommands',['/control/execute
 # physics.mac'])
 #
-# ...EvtMetaGen...
-evtmetagen = register_module('EvtMetaGen')
-evtmetagen.param({'evtNumList': [10], 'runList': [1]})
+# ...EventInfoSetter...
+eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter.param({'evtNumList': [10], 'runList': [1]})
 
 # ...GeoBuilder...
 geobuilder = register_module('Geometry')
@@ -48,13 +48,13 @@ trasan.param('DebugLevel', 10)
 trasan.param('GFTrackCandidatesColName', 'GFTrackCands_Trasan')
 
 # ...Other modules...
-evtmetainfo = register_module('Progress')
+eventinfoprinter = register_module('Progress')
 paramloader = register_module('Gearbox')
 
 # ...Path...
 main = create_path()
-main.add_module(evtmetagen)
-main.add_module(evtmetainfo)
+main.add_module(eventinfosetter)
+main.add_module(eventinfoprinter)
 main.add_module(paramloader)
 main.add_module(geobuilder)
 main.add_module(particlegun)

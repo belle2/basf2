@@ -10,7 +10,7 @@ set_log_level(LogLevel.ERROR)
 # Register modules
 
 # lets generate empty events
-evtmetagen = register_module('EvtMetaGen')
+eventinfosetter = register_module('EventInfoSetter')
 # and shoot some particles into them
 particlegun = register_module('ParticleGun')
 # load the simulation parameters
@@ -32,7 +32,7 @@ progress = register_module('Progress')
 # Now lets set some parameters ...
 
 # Generate run 1 with 500 events
-evtmetagen.param({'evtNumList': [5], 'runList': [1]})
+eventinfosetter.param({'evtNumList': [5], 'runList': [1]})
 
 # Set the parameters for the particle gun
 particlegun.param({  # Shoot electrons and positrons
@@ -84,7 +84,7 @@ output.param('updateFileCatalog', False)
 
 # Here we create a processing path and add the modules
 main = create_path()
-main.add_module(evtmetagen)
+main.add_module(eventinfosetter)
 main.add_module(gearbox)
 main.add_module(geometry)
 main.add_module(particlegun)

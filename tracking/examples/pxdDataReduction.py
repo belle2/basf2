@@ -21,12 +21,12 @@ numEvents = 10
 
 ##first register the modules
 
-evtmetagen = register_module('EvtMetaGen')
-evtmetagen.param('expList', [0])
-evtmetagen.param('runList', [1])
-evtmetagen.param('evtNumList', [numEvents])
+eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter.param('expList', [0])
+eventinfosetter.param('runList', [1])
+eventinfosetter.param('evtNumList', [numEvents])
 
-evtmetainfo = register_module('EvtMetaInfo')
+eventinfoprinter = register_module('EventInfoPrinter')
 gearbox = register_module('Gearbox')
 pxdDigitizer = register_module('PXDDigitizer')
 svdDigitizer = register_module('SVDDigitizer')
@@ -94,8 +94,8 @@ pxdDataRedAnalysis.param(param_pxdDataRedAnalysis)
 main = create_path()
 
 # Add modules to paths
-main.add_module(evtmetagen)
-main.add_module(evtmetainfo)
+main.add_module(eventinfosetter)
+main.add_module(eventinfoprinter)
 main.add_module(gearbox)
 main.add_module(geometry)
 main.add_module(evtgeninput)

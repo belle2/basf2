@@ -37,7 +37,7 @@ cosmics.param('ipRequirement', 0)
 # Now lets create the necessary modules to perform a simulation
 #
 # Create Event information
-evtmetagen = register_module('EvtMetaGen')
+eventinfosetter = register_module('EventInfoSetter')
 # Show progress of processing
 progress = register_module('Progress')
 # Load parameters
@@ -50,7 +50,7 @@ simulation = register_module('FullSim')
 output = register_module('RootOutput')
 
 # Setting the option for all modules: want to process 100 MC events
-evtmetagen.param({'evtNumList': [100], 'runList': [1]})
+eventinfosetter.param({'evtNumList': [100], 'runList': [1]})
 
 # Set output filename
 output.param('outputFileName', 'CosmicsOutput.root')
@@ -59,7 +59,7 @@ output.param('outputFileName', 'CosmicsOutput.root')
 # Do the simulation
 
 main = create_path()
-main.add_module(evtmetagen)
+main.add_module(eventinfosetter)
 main.add_module(progress)
 main.add_module(gearbox)
 main.add_module(geometry)

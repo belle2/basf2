@@ -10,9 +10,9 @@ from basf2 import *
 # Set the log level to show only error and fatal messages
 set_log_level(LogLevel.WARNING)
 
-# EvtMetaGen - generate event meta data
-evtmetagen = register_module('EvtMetaGen')
-evtmetagen.param('evtNumList', [1])
+# EventInfoSetter - generate event meta data
+eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter.param('evtNumList', [1])
 
 # XML reader
 xmldata = register_module('Gearbox')
@@ -29,7 +29,7 @@ eklmadc.param('OutputFile', 'FPGA.root')
 main = create_path()
 
 # Add modules to main path
-main.add_module(evtmetagen)
+main.add_module(eventinfosetter)
 main.add_module(xmldata)
 main.add_module(eklmadc)
 

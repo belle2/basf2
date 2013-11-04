@@ -6,11 +6,11 @@ import os
 from basf2 import *
 
 # register necessary modules
-evtmetagen = register_module('EvtMetaGen')
+eventinfosetter = register_module('EventInfoSetter')
 
 # generate one event
-evtmetagen.param('evtNumList', [1000])
-evtmetainfo = register_module('EvtMetaInfo')
+eventinfosetter.param('evtNumList', [1000])
+eventinfoprinter = register_module('EventInfoPrinter')
 
 # create geometry
 gearbox = register_module('Gearbox')
@@ -138,8 +138,8 @@ si_cdcTracksMerger.param(trackMeger_param)
 main = create_path()
 
 # Add modules to paths
-main.add_module(evtmetagen)
-main.add_module(evtmetainfo)
+main.add_module(eventinfosetter)
+main.add_module(eventinfoprinter)
 main.add_module(gearbox)
 main.add_module(geometry)
 main.add_module(pGun)

@@ -21,7 +21,7 @@ set_log_level(LogLevel.WARNING)
 # Particle gun module
 particlegun = register_module('ParticleGun')
 # Create Event information
-evtmetagen = register_module('EvtMetaGen')
+eventinfosetter = register_module('EventInfoSetter')
 # Show progress of processing
 progress = register_module('Progress')
 # Load parameters
@@ -58,7 +58,7 @@ particlegun.param('nTracks', 1)
 print_params(particlegun)
 
 # Set the number of events to be processed (10 events)
-evtmetagen.param({'evtNumList': [100], 'runList': [1]})
+eventinfosetter.param({'evtNumList': [100], 'runList': [1]})
 
 # Set output filename
 output.param('outputFileName', 'PXDTestOutput.root')
@@ -78,7 +78,7 @@ PXDCLUST.param('NoiseSN', 1.0)
 # Do the simulation
 
 main = create_path()
-main.add_module(evtmetagen)
+main.add_module(eventinfosetter)
 main.add_module(progress)
 main.add_module(gearbox)
 main.add_module(geometry)

@@ -31,14 +31,14 @@ def run_simulation(path, pt_value, output_filename):
         ]
 
     # evt meta
-    evtmetagen = register_module('EvtMetaGen')
+    eventinfosetter = register_module('EventInfoSetter')
 
     # generate one event
-    evtmetagen.param('expList', [1])
-    evtmetagen.param('runList', [1])
-    evtmetagen.param('evtNumList', [500])
+    eventinfosetter.param('expList', [1])
+    eventinfosetter.param('runList', [1])
+    eventinfosetter.param('evtNumList', [500])
 
-    path.add_module(evtmetagen)
+    path.add_module(eventinfosetter)
 
     progress = register_module('Progress')
     path.add_module(progress)

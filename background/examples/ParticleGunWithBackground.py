@@ -63,8 +63,8 @@ particlegun.param('independentVertices', True)
 # Create the necessary modules to perform a simulation
 #
 # Create Event information
-evtmetagen = register_module('EvtMetaGen')
-evtmetagen.param({'evtNumList': [60], 'runList': [1]})
+eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter.param({'evtNumList': [60], 'runList': [1]})
 # Show progress of processing
 progress = register_module('Progress')
 # Load parameters
@@ -94,7 +94,7 @@ output.param('outputFileName', 'ParticleGunWithBackgroundOutput.root')
 # Construct processing path
 
 main = create_path()
-main.add_module(evtmetagen)
+main.add_module(eventinfosetter)
 main.add_module(progress)
 main.add_module(gearbox)
 main.add_module(geometry)

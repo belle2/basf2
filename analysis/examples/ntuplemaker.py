@@ -37,12 +37,12 @@ evtgeninput.param('userDECFile', os.environ['BELLE2_LOCAL_DIR']
                   + '/analysis/examples/exampleEvtgenDecayFiles/BtoDpi.dec')
 
 # specify number of events to be generated in job
-evtmetagen = register_module('EvtMetaGen')
-evtmetagen.param('evtNumList', [nOfEvents])  # we want to process 'nOfEvents' events
-evtmetagen.param('runList', [1])  # from run number 1
-evtmetagen.param('expList', [1])  # and experiment number 1
+eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter.param('evtNumList', [nOfEvents])  # we want to process 'nOfEvents' events
+eventinfosetter.param('runList', [1])  # from run number 1
+eventinfosetter.param('expList', [1])  # and experiment number 1
 
-main.add_module(evtmetagen)
+main.add_module(eventinfosetter)
 main.add_module(evtgeninput)
 
 # ---------------------------------------------------------------

@@ -83,9 +83,9 @@ class MinModule(Module):
 main = create_path()
 
 
-evtmetagen = register_module('EvtMetaGen')
-evtmetagen.param('evtNumList', [20])
-main.add_module(evtmetagen)
+eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter.param('evtNumList', [20])
+main.add_module(eventinfosetter)
 
 evtgeninput = register_module('EvtGenInput')
 evtgeninput.param('boost2LAB', True)

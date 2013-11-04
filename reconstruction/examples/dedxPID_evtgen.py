@@ -9,13 +9,13 @@ from basf2 import *
 use_pxd = False
 
 # register necessary modules
-evtmetagen = register_module('EvtMetaGen')
+eventinfosetter = register_module('EventInfoSetter')
 
 # generate one event
-evtmetagen.param('expList', [0])
-evtmetagen.param('runList', [1])
-evtmetagen.param('evtNumList', [20])
-evtmetainfo = register_module('EvtMetaInfo')
+eventinfosetter.param('expList', [0])
+eventinfosetter.param('runList', [1])
+eventinfosetter.param('evtNumList', [20])
+eventinfoprinter = register_module('EventInfoPrinter')
 
 # create geometry
 gearbox = register_module('Gearbox')
@@ -35,8 +35,8 @@ g4sim.logging.log_level = LogLevel.ERROR
 main = create_path()
 
 # add modules to paths
-main.add_module(evtmetagen)
-main.add_module(evtmetainfo)
+main.add_module(eventinfosetter)
+main.add_module(eventinfoprinter)
 main.add_module(gearbox)
 main.add_module(geometry)
 main.add_module(evtgeninput)

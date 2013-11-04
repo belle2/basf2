@@ -36,7 +36,7 @@ class PyTrigger(Module):
 eventinfosetter = register_module('EventInfoSetter')
 eventinfosetter.param('evtNumList', [20])
 
-evtmetainfo = register_module('EventInfoPrinter')
+eventinfoprinter = register_module('EventInfoPrinter')
 
 # create geometry
 gearbox = register_module('Gearbox')
@@ -57,7 +57,7 @@ main = create_path()
 
 # add modules to paths
 main.add_module(eventinfosetter)
-main.add_module(evtmetainfo)
+main.add_module(eventinfoprinter)
 
 main.add_module(gearbox)
 main.add_module(geometry)

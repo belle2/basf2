@@ -11,7 +11,7 @@ logging.log_level = LogLevel.ERROR
 # Particle gun module
 particlegun = register_module('ParticleGun')
 # Create Event information
-evtmetagen = register_module('EvtMetaGen')
+eventinfosetter = register_module('EventInfoSetter')
 # Show progress of processing
 progress = register_module('Progress')
 # Load parameters
@@ -26,7 +26,7 @@ svddigi = register_module('SVDDigitizer')
 svdclust = register_module('SVDClusterizer')
 
 # Specify number of events to generate
-evtmetagen.param({'evtNumList': [1000], 'runList': [1]})
+eventinfosetter.param({'evtNumList': [1000], 'runList': [1]})
 
 # Set parameters for particlegun
 particlegun.param({
@@ -56,7 +56,7 @@ svdclust.param('TanLorentz_electrons', 0.0)
 
 # create processing path
 main = create_path()
-main.add_module(evtmetagen)
+main.add_module(eventinfosetter)
 main.add_module(progress)
 main.add_module(particlegun)
 main.add_module(gearbox)

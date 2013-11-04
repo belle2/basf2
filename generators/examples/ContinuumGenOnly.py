@@ -6,7 +6,7 @@ from basf2 import *
 set_log_level(LogLevel.INFO)
 #set_random_seed(75628607)
 
-evtnumbers = register_module('EvtMetaGen')
+evtnumbers = register_module('EventInfoSetter')
 evtnumbers.param('evtNumList', [100])  # we want to process 100 events
 evtnumbers.param('runList', [1])  # from run number 1
 evtnumbers.param('expList', [1])  # and experiment number 1

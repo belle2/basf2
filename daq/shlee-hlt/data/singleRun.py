@@ -5,7 +5,7 @@ from basf2 import *
 
 # Register modules
 hltInput = fw.register_module('HLTInput')
-evtMetaGen = fw.register_module('EvtMetaGen')
+evtMetaGen = fw.register_module('EventInfoSetter')
 gearBox = fw.register_module('Gearbox')
 particleGun = fw.register_module('ParticleGun')
 geoBuilder = fw.register_module('Geometry')

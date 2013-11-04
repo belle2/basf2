@@ -74,8 +74,8 @@ class ShowMCParticles(Module):
                               mc.getProductionVertex().Y())
 
 
-evtmetagen = register_module('EvtMetaGen')
-evtmetagen.param({'evtNumList': [100], 'runList': [1]})
+eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter.param({'evtNumList': [100], 'runList': [1]})
 
 ## Register the BHWideInput module
 koralw = register_module('KoralWInput')
@@ -98,7 +98,7 @@ showMCPart = ShowMCParticles()
 
 ## Create the main path and add the modules
 main = create_path()
-main.add_module(evtmetagen)
+main.add_module(eventinfosetter)
 main.add_module(progress)
 main.add_module(gearbox)
 main.add_module(koralw)

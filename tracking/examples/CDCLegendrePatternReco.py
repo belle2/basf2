@@ -91,10 +91,10 @@ evtgeninput.param('userDECFile', os.environ['BELLE2_LOCAL_DIR']
                   + '/analysis/modules/B2Dpi/datafiles/BtoDpi.dec')
 
 # specify number of events to be generated in job
-evtmetagen = register_module('EvtMetaGen')
-evtmetagen.param('evtNumList', [1])  # we want to process nOfEvents events
-evtmetagen.param('runList', [1])  # from run number 1
-evtmetagen.param('expList', [1])  # and experiment number 1
+eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter.param('evtNumList', [1])  # we want to process nOfEvents events
+eventinfosetter.param('runList', [1])  # from run number 1
+eventinfosetter.param('expList', [1])  # and experiment number 1
 
 # ---------------------------------------------------------------
 # Show progress of processing
@@ -198,7 +198,7 @@ input.param('inputFileName', options.input)
 main = create_path()
 
 if options.input == '-999':
-    main.add_module(evtmetagen)
+    main.add_module(eventinfosetter)
     main.add_module(evtgeninput)
 
     main.add_module(progress)

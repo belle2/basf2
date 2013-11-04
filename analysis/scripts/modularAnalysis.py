@@ -94,7 +94,10 @@ def makeParticle(
 def fitVertex(
     list_name,
     confidenceLevel,
+    decay_string='',
     fitter='kfitter',
+    fit_type='vertex',
+    with_constraint='',
     path=main,
     ):
 
@@ -103,6 +106,9 @@ def fitVertex(
     pvfit.param('ListName', list_name)
     pvfit.param('ConfidenceLevel', confidenceLevel)
     pvfit.param('VertexFitter', fitter)
+    pvfit.param('fitType', fit_type)
+    pvfit.param('withConstraint', with_constraint)
+    pvfit.param('decayString', decay_string)
     path.add_module(pvfit)
 
 

@@ -14,13 +14,13 @@ numEvents = 100
 
 ##first register the modules
 
-evtnumber = register_module('EventNumbers')
+evtnumber = register_module('EventInfoSetter')
 evtnumber.param('expList', [0])
 evtnumber.param('runList', [1])
 evtnumber.param('evtNumList', [numEvents])
 
 ##first register the modules
-evtinfo = register_module('EventInfo')
+evtinfo = register_module('EventInfoPrinter')
 
 eventCounter = register_module('EventCounter')
 eventCounter.logging.log_level = LogLevel.INFO

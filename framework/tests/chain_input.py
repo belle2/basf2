@@ -40,7 +40,7 @@ except:
     pass  # we're probably in tests/ directory, no copy necessary
 
 input = register_module('RootInput')
-eventinfo = register_module('EventInfo')
+eventinfo = register_module('EventInfoPrinter')
 printcollections = register_module('PrintCollections')
 
 input.param('inputFileNames', ['chaintest_1.root', 'chaintest_2.root'])

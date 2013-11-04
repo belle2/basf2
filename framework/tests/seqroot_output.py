@@ -150,8 +150,8 @@ particlegun.param('independentVertices', False)
 # Now lets create the necessary modules to perform a simulation
 
 # Create Event information
-eventnumbers = register_module('EventNumbers')
-eventnumbers.param({'evtNumList': [5], 'runList': [1]})
+eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter.param({'evtNumList': [5], 'runList': [1]})
 # Show progress of processing
 progress = register_module('Progress')
 # Load parameters
@@ -179,7 +179,7 @@ output.logging.log_level = LogLevel.WARNING  # ignore write rate
 
 main = create_path()
 # init path
-main.add_module(eventnumbers)
+main.add_module(eventinfosetter)
 main.add_module(gearbox)
 main.add_module(particlegun)
 

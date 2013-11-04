@@ -66,10 +66,10 @@ namespace Belle2 {
      */
     const std::string& getExternalsPath() const { return m_externalsPath; };
 
-    /** Override the number of events in run 1 for EventNumbers module. */
+    /** Override the number of events in run 1 for EventInfoSetter module. */
     void setNumberEventsOverride(int nevents) { m_numberEventsOverride = nevents; }
 
-    /** Returns number of events in run 1 for EventNumbers module, or 0 for no override. */
+    /** Returns number of events in run 1 for EventInfoSetter module, or 0 for no override. */
     int getNumberEventsOverride() const { return m_numberEventsOverride; }
 
     /** Override input file names for modules */

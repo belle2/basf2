@@ -21,10 +21,10 @@ particlegun = register_module('ParticleGun')
 particlegun.param('pdgCodes', [211, -211, 321, -321])
 particlegun.param('nTracks', 5)
 
-eventnumbers = register_module('EventNumbers')
+eventinfosetter = register_module('EventInfoSetter')
 
 # want to process 100 MC events
-eventnumbers.param('evtNumList', [100])
+eventinfosetter.param('evtNumList', [100])
 
 # Set output filename
 output = register_module('RootOutput')
@@ -33,7 +33,7 @@ output.param('outputFileName', 'simout.root')
 # ============================================================================
 
 main = create_path()
-main.add_module(eventnumbers)
+main.add_module(eventinfosetter)
 main.add_module(particlegun)
 
 # detecor simulation

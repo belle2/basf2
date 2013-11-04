@@ -71,14 +71,14 @@ B2INFO('Some other message')
 for (level, num) in logging.log_stats.items():
     print 'Messages for level %8s: %2d' % (level.name, num)
 
-eventnumbers = register_module('EventNumbers')
-# configure logging for the EventNumbers module:
+eventinfosetter = register_module('EventInfoSetter')
+# configure logging for the EventInfoSetter module:
 # loglevel ERROR and info for ERROR message is file name and line number
-eventnumbers.logging.log_level = LogLevel.ERROR
-eventnumbers.logging.set_info(LogLevel.ERROR, LogInfo.FILE | LogInfo.LINE)
+eventinfosetter.logging.log_level = LogLevel.ERROR
+eventinfosetter.logging.set_info(LogLevel.ERROR, LogInfo.FILE | LogInfo.LINE)
 # or alternatively:
-eventnumbers.set_log_level(LogLevel.ERROR)
-eventnumbers.set_log_info(LogLevel.ERROR, LogInfo.FILE | LogInfo.LINE)
+eventinfosetter.set_log_level(LogLevel.ERROR)
+eventinfosetter.set_log_info(LogLevel.ERROR, LogInfo.FILE | LogInfo.LINE)
 
 # add time stamp to all INFO messages
 currentInfo = logging.get_info(LogLevel.INFO)
@@ -87,8 +87,8 @@ logging.set_info(LogLevel.INFO, currentInfo | LogInfo.TIMESTAMP)
 # run some events to see time stamp
 set_log_level(LogLevel.INFO)
 main = create_path()
-main.add_module(eventnumbers)
-eventnumbers.param('evtNumList', [30])
-eventinfo = register_module('EventInfo')
+main.add_module(eventinfosetter)
+eventinfosetter.param('evtNumList', [30])
+eventinfo = register_module('EventInfoPrinter')
 main.add_module(eventinfo)
 process(main)

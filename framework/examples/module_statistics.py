@@ -10,18 +10,19 @@
 
 from basf2 import *
 
-# EventNumbers - generate event meta data
-eventnumbers = register_module('EventNumbers')
-eventnumbers.param({'expList': [71, 71, 73, 73, 73], 'runList': [3, 4, 10, 20,
-                 30], 'evtNumList': [4, 6, 2, 5, 3]})
+# EventInfoSetter - generate event meta data
+eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter.param({'expList': [71, 71, 73, 73, 73],
+                 'runList': [3, 4, 10, 20, 30],
+                 'evtNumList': [4, 6, 2, 5, 3]})
 # eventinfo - show event meta info
-eventinfo = register_module('EventInfo')
+eventinfo = register_module('EventInfoPrinter')
 
 # Create main path
 main = create_path()
 
 # Add modules to main path
-main.add_module(eventnumbers)
+main.add_module(eventinfosetter)
 main.add_module(eventinfo)
 main.add_module(register_module('Gearbox'))
 
@@ -34,14 +35,14 @@ print statistics
 
 # Print basic event statistics for specific modules
 print 'Event Statistics for selected modules:'
-print statistics([eventnumbers])
+print statistics([eventinfosetter])
 
 # Print statistics adding all counters
 print 'Total processing times:'
 print statistics(statistics.TOTAL)
 
 # Change name of modules
-statistics.set_name(eventnumbers, 'Foo')
+statistics.set_name(eventinfosetter, 'Foo')
 
 # Print detailed statistics for each module
 for stats in statistics.modules:
@@ -80,8 +81,8 @@ for stats in statistics.modules:
         % (stats.memory(statistics.TERM))
 
 # Get Statistics for single module
-stats = statistics.get(eventnumbers)
-print 'EventNumbers needed %.3f ms in total' % (1e3
+stats = statistics.get(eventinfosetter)
+print 'EventInfoSetter needed %.3f ms in total' % (1e3
         * stats.time(statistics.TOTAL))
 
 # Print total processing time

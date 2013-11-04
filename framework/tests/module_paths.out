@@ -1,7 +1,7 @@
 [INFO] Steering file: framework/tests/module_paths.py
 >>> basf2 Python environment set
 >>> Framework object created: fw
-[[[]] -> EventNumbers -> [SelectOddEvents -> EventInfo -> [Progress -> [[]]]] -> PrintCollections]
+[[[]] -> EventInfoSetter -> [SelectOddEvents -> EventInfoPrinter -> [Progress -> [[]]]] -> PrintCollections]
 [INFO] Begin of new run
 [INFO] ========================================================================
 [INFO] >>> Start new run: 1
@@ -53,4 +53,4 @@
 [INFO] <<< End run: 2
 [INFO] ========================================================================
 [INFO] terminating SelectOddEvents
-[[[]] -> EventNumbers -> [SelectOddEvents -> EventInfo -> [Progress -> [[]]]] -> PrintCollections -> ReturnFalse -> final]
+[[[]] -> EventInfoSetter -> [SelectOddEvents -> EventInfoPrinter -> [Progress -> [[]]]] -> PrintCollections -> ReturnFalse -> final]

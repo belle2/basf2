@@ -19,21 +19,21 @@
 
 from basf2 import *
 
-# EventNumbers - generate event numbers
-eventnumbers = register_module('EventNumbers')
+# EventInfoSetter - generate event numbers
+eventinfosetter = register_module('EventInfoSetter')
 
 evtrunlists = {'expList': [71, 71, 73, 73, 73], 'runList': [3, 4, 10, 20, 30],
               'evtNumList': [4, 6, 2, 5, 3]}
-eventnumbers.param(evtrunlists)
+eventinfosetter.param(evtrunlists)
 
-# EventInfo - show event meta info
-eventinfo = register_module('EventInfo')
+# EventInfoPrinter - show event meta info
+eventinfo = register_module('EventInfoPrinter')
 
 # Create main path
 main = create_path()
 
 # Add modules to main path
-main.add_module(eventnumbers)
+main.add_module(eventinfosetter)
 main.add_module(eventinfo)
 
 # Process all events

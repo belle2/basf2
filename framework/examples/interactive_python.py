@@ -29,9 +29,9 @@ class MinModule(Module):
 
 main = create_path()
 
-eventnumbers = register_module('EventNumbers')
-eventnumbers.param('evtNumList', [2])
-main.add_module(eventnumbers)
+eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter.param('evtNumList', [2])
+main.add_module(eventinfosetter)
 
 pGun = register_module('ParticleGun')
 main.add_module(pGun)

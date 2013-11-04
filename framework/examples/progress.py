@@ -16,9 +16,9 @@ logging.set_info(LogLevel.INFO, currentInfo | LogInfo.TIMESTAMP)
 
 main = create_path()
 
-eventnumbers = register_module('EventNumbers')
-eventnumbers.param('evtNumList', [30000])
-main.add_module(eventnumbers)
+eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter.param('evtNumList', [30000])
+main.add_module(eventinfosetter)
 
 progress = register_module('Progress')
 main.add_module(progress)

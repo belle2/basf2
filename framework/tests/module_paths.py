@@ -50,13 +50,13 @@ class PrintName(Module):
 
 
 # register necessary modules
-eventnumbers = register_module('EventNumbers')
+eventinfosetter = register_module('EventInfoSetter')
 # generate three events
-eventnumbers.param('expList', [0, 1])
-eventnumbers.param('runList', [1, 2])
-eventnumbers.param('evtNumList', [2, 1])
+eventinfosetter.param('expList', [0, 1])
+eventinfosetter.param('runList', [1, 2])
+eventinfosetter.param('evtNumList', [2, 1])
 
-eventinfo = register_module('EventInfo')
+eventinfo = register_module('EventInfoPrinter')
 progress = register_module('Progress')
 printcollections = register_module('PrintCollections')
 
@@ -67,7 +67,7 @@ emptypath = create_path()
 emptypath.add_path(create_path())
 main.add_path(emptypath)
 
-main.add_module(eventnumbers)
+main.add_module(eventinfosetter)
 
 anotherpath = create_path()
 main.add_path(anotherpath)  # added here, filled later
@@ -84,12 +84,12 @@ anotherpath.add_module(eventinfo)
 anotherpath.add_path(subsubpath)
 
 # check printing of paths, should be:
-# [] -> eventnumbers -> [SelectOddEvents -> eventinfo -> [Progress -> []]]
+# [] -> eventinfosetter -> [SelectOddEvents -> eventinfo -> [Progress -> []]]
 # -> printcollections
 print main
 
 # when the module returns false/0 (odd events), we jump to Progress instead:
-# [] -> eventnumbers -> [SelectOddEvents -> [Progress -> []]]
+# [] -> eventinfosetter -> [SelectOddEvents -> [Progress -> []]]
 module_with_condition.if_false(subsubpath)
 # this is equivalent to:
 # module_with_condition.if_value('<1', subsubpath)

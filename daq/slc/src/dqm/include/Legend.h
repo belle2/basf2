@@ -1,8 +1,8 @@
 #ifndef _Belle2_Legend_hh
 #define _Belle2_Legend_hh
 
-#include "Histo.h"
-#include "Rect.h"
+#include "dqm/Histo.h"
+#include "dqm/Rect.h"
 
 namespace Belle2 {
 

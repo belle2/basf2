@@ -1,8 +1,8 @@
 #ifndef _Belle2_DBInterface_hh
 #define _Belle2_DBInterface_hh
 
-#include "DBHandlerException.h"
-#include "DBRecord.h"
+#include "database/DBHandlerException.h"
+#include "database/DBRecord.h"
 
 #include <vector>
 

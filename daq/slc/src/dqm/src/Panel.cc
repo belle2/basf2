@@ -1,4 +1,4 @@
-#include "Panel.h"
+#include "dqm/Panel.h"
 
 using namespace Belle2;
 

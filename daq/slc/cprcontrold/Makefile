@@ -3,9 +3,6 @@ CXX     = g++
 RM      = rm -rf
 CP      = cp -f
 
-NSM2_PATH  = $(BELLE2_DAQ_SLC_DIR)/nsm2
-MGT_PATH   = $(BELLE2_DAQ_SLC_DIR)/cprcontrold/mgt
-
 BINDIR  = ./bin
 SRCDIR  = ./src
 INCDIR  = ./include
@@ -13,21 +10,20 @@ TMPDIR  = ./tmp
 LIBDIR  = ./lib
 
 LIBS    += -lm -lpthread -ldl -lz -lrt
-LIBS    += $(MGT_PATH)/*.o
-#LIBS    += -L$(MGT_PATH) -lMGT
+LIBS    += ./mgt/*.o
 LIBS    += -L$(BELLE2_DAQ_SLC_DIR)/lib -ldaq_slc_base
 LIBS    += -L$(BELLE2_DAQ_SLC_DIR)/lib -ldaq_slc_system
 LIBS    += -L$(BELLE2_DAQ_SLC_DIR)/lib -ldaq_slc_nsm
-LIBS    += $(NSM2_PATH)/corelib/nsmlib2.o \
-           $(NSM2_PATH)/corelib/nsmhash.o \
-           $(NSM2_PATH)/corelib/nsmparse.o \
-           $(NSM2_PATH)/b2lib/belle2nsm.o
+LIBS    += -L$(BELLE2_DAQ_SLC_DIR)/lib -ldaq_slc_system
+LIBS    += -L$(BELLE2_DAQ_SLC_DIR)/lib -ldaq_slc_xml
+LIBS    += -L$(BELLE2_DAQ_SLC_DIR)/lib -lnsm2_corelib
+LIBS    += -L$(BELLE2_DAQ_SLC_DIR)/lib -lnsm2_b2lib
+LIBS    += $(shell xml2-config --libs)
 
 CFLAGS   = -g -Wall -fPIC -D_REENTRANT 
-CFLAGS  += -I./include 
-CFLAGS  += -I$(MGT_PATH)
-CFLAGS  += -I$(NSM2_PATH)/corelib -I$(NSM2_PATH)/b2lib
+CFLAGS  += -I./include -I.
 CFLAGS  += -I$(BELLE2_DAQ_SLC_DIR)/include 
+CFLAGS  += $(shell xml2-config --cflags)
 
 MAINS   = $(wildcard *.cc)
 TARGETS = $(MAINS:%.cc=$(BINDIR)/%)

@@ -1,7 +1,7 @@
 #ifndef _Belle2_FillProperty_hh
 #define _Belle2_FillProperty_hh
 
-#include "Property.h"
+#include "dqm/Property.h"
 
 #include <string>
 

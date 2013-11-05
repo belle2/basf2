@@ -1,51 +1,49 @@
-.PHONY : all clean base system nsm database xml dqm
+.PHONY : all clean base system nsm dqm xml database
 
-SRCDIR=$(BELLE2_DAQ_SLC_DIR)/src
-INCDIR=$(BELLE2_DAQ_SLC_DIR)/include
-LIBDIR=$(BELLE2_DAQ_SLC_DIR)/lib
+SRCDIR=../src
+INCDIR=../include
+LIBDIR=../lib
+TMPDIR=../tmp
 
-all: base system nsm
+all: base nsm system
 
 full: all xml database
 
 base:
-	@ make -C base
-	@ if [ ! -e $(INCDIR)/base ]; then ln -s $(SRCDIR)/base/include $(INCDIR)/base; fi
-	@ if [ ! -e $(LIBDIR)/libdaq_slc_base.so ]; then ln -s $(SRCDIR)/base/lib/libdaq_slc_base.so $(LIBDIR)/; fi
+	@ mkdir -p $(INCDIR)/$@
+	@ install -m 644 -p $(SRCDIR)/$@/include/* $(INCDIR)/$@
+	@ make -f Makefile.src TARGET=$@
 
 system:
-	@ make -C system
-	@ if [ ! -e $(INCDIR)/system ]; then ln -s $(SRCDIR)/system/include $(INCDIR)/system; fi
-	@ if [ ! -e $(LIBDIR)/libdaq_slc_system.so ]; then ln -s $(SRCDIR)/system/lib/libdaq_slc_system.so $(LIBDIR)/; fi
-
-xml:
-	@ make -C xml
-	@ if [ ! -e $(INCDIR)/xml ]; then ln -s $(SRCDIR)/xml/include $(INCDIR)/xml; fi
-	@ if [ ! -e $(LIBDIR)/libdaq_slc_xml.so ]; then ln -s $(SRCDIR)/xml/lib/libdaq_slc_xml.so $(LIBDIR)/; fi
-
-database:
-	@ make -C database
-	@ if [ ! -e $(INCDIR)/database ]; then ln -s $(SRCDIR)/database/include $(INCDIR)/database; fi
-	@ if [ ! -e $(LIBDIR)/libdaq_slc_database.so ]; then ln -s $(SRCDIR)/database/lib/libdaq_slc_database.so $(LIBDIR)/; fi
-
-nsm:
-	@ make -C nsm
-	@ if [ ! -e $(INCDIR)/nsm ]; then ln -s $(SRCDIR)/nsm/include $(INCDIR)/nsm; fi
-	@ if [ ! -e $(LIBDIR)/libdaq_slc_nsm.so ]; then ln -s $(SRCDIR)/nsm/lib/libdaq_slc_nsm.so $(LIBDIR)/; fi
+	@ mkdir -p $(INCDIR)/$@
+	@ install -m 644 -p $(SRCDIR)/$@/include/* $(INCDIR)/$@
+	@ make -f Makefile.src TARGET=$@
 
 dqm:
-	@ make -C dqm
-	@ if [ ! -e $(INCDIR)/dqm ]; then ln -s $(SRCDIR)/dqm/include $(INCDIR)/dqm; fi
-	@ if [ ! -e $(LIBDIR)/libdaq_slc_dqm.so ]; then ln -s $(SRCDIR)/dqm/lib/libdaq_slc_dqm.so $(LIBDIR)/; fi
+	@ mkdir -p $(INCDIR)/$@
+	@ install -m 644 -p $(SRCDIR)/$@/include/* $(INCDIR)/$@
+	@ make -f Makefile.src TARGET=$@
+
+nsm:
+	@ mkdir -p $(INCDIR)/$@
+	@ if [ ! -e $(LIBDIR)/libnsm2_corelib.so ]; then make -C ../nsm2/; fi
+	@ install -m 644 -p $(SRCDIR)/$@/include/* $(INCDIR)/$@
+	@ make -f Makefile.src TARGET=$@
+
+xml:
+	@ mkdir -p $(INCDIR)/$@
+	@ install -m 644 -p $(SRCDIR)/$@/include/* $(INCDIR)/$@
+	@ make -f Makefile.src TARGET=$@ EXTERNAL_CFLAGS=$(shell xml2-config --cflags)
+
+database:
+	@ mkdir -p $(INCDIR)/$@
+	@ install -m 644 -p $(SRCDIR)/$@/include/* $(INCDIR)/$@
+	@ make -f Makefile.src TARGET=$@ EXTERNAL_CFLAGS=\
+	"$(shell xml2-config --cflags) $(shell mysql_config --cflags)"
 
 clean:
-	@ make -C base clean
-	@ make -C system clean
-	@ make -C nsm clean
-	@ make -C xml clean
-	@ make -C database clean
-	@ make -C dqm clean
-	@ rm -rf $(INCDIR)/* $(LIBDIR)/*.so
-	@ rm -rf *~ \#*~ .*~
+	@ rm -rf $(INCDIR)/* $(LIBDIR)/*.so $(TMPDIR)
+	@ make -C ../nsm2 clean
+	@ rm -rf *~ \#*~ .*~ */*~ */*/*~
 
 # LocalWords:  gui

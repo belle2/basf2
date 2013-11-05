@@ -1,8 +1,8 @@
 #ifndef _B2ARICH_TCPServerSocket_hh_
 #define _B2ARICH_TCPServerSocket_hh_
 
-#include "TCPSocket.h"
-#include "FileDescriptor.h"
+#include "system/TCPSocket.h"
+#include "system/FileDescriptor.h"
 
 namespace Belle2 {
 

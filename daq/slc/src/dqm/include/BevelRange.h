@@ -1,7 +1,7 @@
 #ifndef BevelRange_hh
 #define BevelRange_hh
 
-#include "Range.h"
+#include "dqm/Range.h"
 
 namespace Belle2 {
 

@@ -1,7 +1,5 @@
 #include "TemplateCallback.h"
 
-#include <nsm/RunStatus.h>
-
 #include <base/Debugger.h>
 #include <base/StringUtil.h>
 

@@ -1,8 +1,6 @@
 #include "RecieverManager.h"
 
-#include <base/DataSender.h>
-#include <base/HSLB.h>
-#include <base/Debugger.h>
+#include "base/Debugger.h"
 
 #include <cstdio>
 #include <cstdlib>
@@ -25,7 +23,7 @@ void RecieverManager::run() throw()
     char port_c[128];
     sprintf(path, "/bin/sh");
     sprintf(script_c, "%s/daq/copper/daq_scripts/%s",
-            belle2_path, _node->getScript().c_str());
+            belle2_path, _node->getData()->getTextValue("script").c_str());
     sprintf(shmuse_c, "1");
     sprintf(port_c, "5101");
     char* argv[5];

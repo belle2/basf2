@@ -3,7 +3,7 @@
 
 #include "base/Serializable.h"
 
-#include "Histo.h"
+#include "dqm/Histo.h"
 
 #include <vector>
 

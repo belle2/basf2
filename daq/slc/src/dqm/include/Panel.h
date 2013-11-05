@@ -1,7 +1,7 @@
 #ifndef _Belle2_UI_Panel_hh
 #define _Belle2_UI_Panel_hh
 
-#include "XMLElement.h"
+#include "dqm/XMLElement.h"
 
 #include <string>
 #include <vector>

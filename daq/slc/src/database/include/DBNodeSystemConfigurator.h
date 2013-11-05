@@ -1,9 +1,10 @@
 #ifndef _Belle2_DBNodeSystemConfigurator_hh
 #define _Belle2_DBNodeSystemConfigurator_hh
 
-#include "DBInterface.h"
+#include "database/DBObjectLoader.h"
+#include "database/DBInterface.h"
 
-#include "base/NodeSystem.h"
+#include "xml/NodeLoader.h"
 
 namespace Belle2 {
 
@@ -11,49 +12,29 @@ namespace Belle2 {
 
   public:
     DBNodeSystemConfigurator(DBInterface* db = NULL,
-                             NodeSystem* node_system = NULL) throw()
-      : _db(db), _system(node_system) {}
+                             NodeLoader* loader = NULL) throw();
     virtual ~DBNodeSystemConfigurator() throw() {}
 
   public:
     DBInterface* getDB() { return _db; }
-    NodeSystem* getNodeSystem() { return _system; }
-    void createTables() throw(DBHandlerException);
-    DBRecord readTables(int version) throw(DBHandlerException);
-    void writeTables() throw(DBHandlerException);
-    virtual void createVersionControlTable() throw(DBHandlerException);
-    virtual void createHostTable() throw(DBHandlerException);
-    virtual void createCOPPERNodeTable() throw(DBHandlerException);
-    virtual void createHSLBTable() throw(DBHandlerException);
-    virtual void createFEEModuleTable(const std::string& module_class,
-                                      std::vector<FEEModule*>& module_v) throw(DBHandlerException);
-    virtual void createTTDNodeTable() throw(DBHandlerException);
-    virtual void createFTSWTable() throw(DBHandlerException);
-    virtual void createRONodeTable() throw(DBHandlerException);
-    virtual DBRecord readVersionControlTable(int version) throw(DBHandlerException);
-    virtual void readHostTable(int version) throw(DBHandlerException);
-    virtual void readCOPPERNodeTable(int version) throw(DBHandlerException);
-    virtual void readHSLBTable(int version) throw(DBHandlerException);
-    virtual void readFEEModuleTable(const std::string& module_class,
-                                    std::vector<FEEModule*>& module_v,
-                                    int version) throw(DBHandlerException);
-    virtual void readTTDNodeTable(int version) throw(DBHandlerException);
-    virtual void readFTSWTable(int version) throw(DBHandlerException);
-    virtual void readRONodeTable(int version) throw(DBHandlerException);
-    virtual void writeVersionControlTable() throw(DBHandlerException);
-    virtual void writeHostTable(int version) throw(DBHandlerException);
-    virtual void writeCOPPERNodeTable(int version) throw(DBHandlerException);
-    virtual void writeHSLBTable(int version) throw(DBHandlerException);
-    virtual void writeFEEModuleTable(const std::string& module_class,
-                                     std::vector<FEEModule*>& module_v,
-                                     int version) throw(DBHandlerException);
-    virtual void writeTTDNodeTable(int version) throw(DBHandlerException);
-    virtual void writeFTSWTable(int version) throw(DBHandlerException);
-    virtual void writeRONodeTable(int version) throw(DBHandlerException);
+    NodeLoader* getNodeLoader() { return _loader; }
+    std::map<std::string, int>& getVersions() { return _version_m; }
+    void setVersion(const std::string& name, int version) {
+      _version_m[name] = version;
+    }
 
-  protected:
+  public:
+    void createTable();
+    void dropTable();
+    int rereadTable();
+    int readTable(int revision);
+    int writeTable(int revision);
+
+  private:
     DBInterface* _db;
-    NodeSystem* _system;
+    NodeLoader* _loader;
+    DBObjectLoader _dbloader;
+    std::map<std::string, int> _version_m;
 
   };
 

@@ -1,6 +1,6 @@
-#include "Histo1I.h"
+#include "dqm/Histo1I.h"
 
-#include "IntArray.h"
+#include "dqm/IntArray.h"
 
 using namespace Belle2;
 

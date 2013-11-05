@@ -1,4 +1,4 @@
-#include "Mutex.h"
+#include "system/Mutex.h"
 
 using namespace Belle2;
 

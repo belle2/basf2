@@ -1,8 +1,8 @@
 #ifndef _Belle2_MonObject_hh
 #define _Belle2_MonObject_hh
 
-#include "XMLElement.h"
-#include "Shape.h"
+#include "dqm/XMLElement.h"
+#include "dqm/Shape.h"
 
 #include "base/Writer.h"
 #include "base/Reader.h"

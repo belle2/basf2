@@ -2,7 +2,7 @@
 #include <nsm/NSMData.h>
 #include <nsm/NSMCommunicator.h>
 
-#include <nsm/pocket_ttd.h>
+#include "pocket_ttd.h"
 
 #include <database/MySQLInterface.h>
 

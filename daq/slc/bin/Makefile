@@ -20,5 +20,5 @@ full:
 	@ rm -f cui; cp $(BELLE2_DAQ_SLC_DIR)/nsm2/example/master cui
 
 clean:
-	@ rm -f *d nsmd2 *.h
+	@ rm -f *d nsmd2 nsminfo2 *.h
 	@ rm -rf *~ .*~ \#*~ cui

@@ -1,6 +1,6 @@
-#include "Graph1F.h"
+#include "dqm/Graph1F.h"
 
-#include "FloatArray.h"
+#include "dqm/FloatArray.h"
 
 using namespace Belle2;
 

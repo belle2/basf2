@@ -1,4 +1,4 @@
-#include "Enum.h"
+#include "base/Enum.h"
 
 using namespace Belle2;
 

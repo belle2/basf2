@@ -1,8 +1,6 @@
 #include "EventBuilderManager.h"
 
-#include <base/DataSender.h>
-#include <base/HSLB.h>
-#include <base/Debugger.h>
+#include "base/Debugger.h"
 
 #include <cstdio>
 #include <cstdlib>
@@ -25,11 +23,9 @@ void EventBuilderManager::run() throw()
     sprintf(path, "%s/daq/slc/bin/gen-eb0.sh", belle2_path);
     argv[i++] = path;
 
-    char sender_c_v[20][128];
-    for (int j = 0; j < _node->getNSenders(); j++) {
-      sprintf(sender_c_v[j + 1], "%s", _node->getSender(j).c_str());
-      argv[i++] = sender_c_v[j + 1];
-    }
+    char sender_c[256];
+    sprintf(sender_c, "%s", _node->getData()->getTextValue("hosts").c_str());
+    argv[i++] = sender_c;
 
     argv[i++] = NULL;
     i = 0;

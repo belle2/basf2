@@ -1,7 +1,8 @@
 #ifndef _Belle2_NodeLoader_hh
 #define _Belle2_NodeLoader_hh
 
-#include "XMLParser.h"
+#include "xml/XMLParser.h"
+#include "xml/ObjectLoader.h"
 
 #include "base/NodeSystem.h"
 
@@ -15,45 +16,27 @@ namespace Belle2 {
 
   public:
     NodeLoader(const std::string& dir = ".")
-      : _dir(dir), _parser(NULL) { _group = NULL; }
+      : _dir(dir), _loader(dir) {}
     ~NodeLoader() throw() {}
 
   public:
     void load(const std::string& entry);
-    void loadHosts(XMLElement* el,
-                   const std::string& parent_tag = "hosts",
-                   const std::string& tag = "host");
-    void loadFTSWs(XMLElement* el);
-    void loadNodes(XMLElement* el);
-    void loadCOPPERNodes(XMLElement* el);
-    void setVersion(int version) { _version = version; }
-    int getVersion() { return _version; }
     NodeSystem& getSystem() { return _system; }
-    std::map<std::string, COPPERNode*>& getCOPPERNodeList() { return _copper_m; }
-    std::map<std::string, FEEModule*>& getModuleList() { return _module_m; }
-    std::map<std::string, Host*>& getHostList() { return _host_m; }
-    std::map<std::string, DataSender*>& getSenderList() { return _sender_m; }
+    const std::string& getEntryLabel() const throw() { return _entry; }
     std::vector<std::string>& getFilePathList() { return _file_path_v; }
-    const std::string& getEntryLabel() { return _entry; }
+    std::map<std::string, std::vector<DataObject*> >& getObbjectSet() { return _obj_v_m; }
 
   protected:
-    void search(std::map<std::string, XMLElement*>& el_m, XMLElement* el,
-                const std::string& type);
+    void push(DataObject* obj);
 
   private:
-    int _version;
     std::string _dir;
     std::string _entry;
-    XMLParser* _parser;
+    XMLParser _parser;
+    ObjectLoader _loader;
     NodeSystem _system;
-    NodeGroup* _group;
-    std::vector<std::string> _copper_name_v;
-    std::map<std::string, COPPERNode*> _copper_m;
-    std::map<std::string, FEEModule*> _module_m;
-    std::map<int, FTSW*> _ftsw_m;
-    std::map<std::string, Host*> _host_m;
-    std::map<std::string, DataSender*> _sender_m;
     std::vector<std::string> _file_path_v;
+    std::map<std::string, std::vector<DataObject*> > _obj_v_m;
 
   };
 

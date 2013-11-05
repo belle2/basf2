@@ -1,8 +1,8 @@
 #ifndef _Belle2_TCPSocketWriter_hh
 #define _Belle2_TCPSocketWriter_hh
 
-#include "FileWriter.h"
-#include "TCPSocket.h"
+#include "system/FileWriter.h"
+#include "system/TCPSocket.h"
 
 namespace Belle2 {
 

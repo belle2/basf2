@@ -2,24 +2,34 @@
 #  Makefile for NSM2 corelib
 #
 
-ALL = nsmlib2.o nsmparse.o nsmhash.o
-LIBS      = 
-CC        = gcc
-CXX       = g++
-OPT = -g -fPIC
+ALL    = nsmlib2.o nsmparse.o nsmhash.o
+LIBS   = 
+CC     = gcc
+CXX    = g++
+OPT    = -g
 DEPS   = nsm2.h nsmsys2.h nsmlib2.h Makefile
-CFLAGS = $(OPT) $(EXTRA_CFLAGS)
+CFLAGS = $(OPT) -fPIC
+INSDIR = $(BELLE2_DAQ_SLC_DIR)
 
 .c.o:
-	$(CC) $(CFLAGS) -c $<
+	@ echo '<< creating executable $@ >>'
+	@ $(CC) $(CFLAGS) -c $<
 
 .cc.o:
-	$(CXX) $(CFLAGS) -c $<
+	@ echo '<< creating executable $@ >>'
+	@ $(CXX) $(CFLAGS) -c $<
 
-all:: $(ALL)
+all:: $(ALL) libs
+
+libs::
+	@ $(CXX) -shared -o libnsm2_corelib.so $(ALL)
+
+install::
+	@ install libnsm2_corelib.so $(INSDIR)/lib
+	@ install -m644 -p nsm2.h nsmlib2.h nsmsys2.h $(INSDIR)/include/nsm
 
 clean::
-	-rm -f *.o *.bak *~
+	@ rm -f *.o *.bak *.a *.so *~
 
 nsmlib2.o: $(DEPS)
 

@@ -1,6 +1,6 @@
-#include "TimedGraph1F.h"
+#include "dqm/TimedGraph1F.h"
 
-#include "FloatArray.h"
+#include "dqm/FloatArray.h"
 
 using namespace Belle2;
 

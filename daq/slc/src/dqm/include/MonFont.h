@@ -1,7 +1,7 @@
 #ifndef _Belle2_MonFont_hh
 #define _Belle2_MonFont_hh
 
-#include "MonColor.h"
+#include "dqm/MonColor.h"
 
 #include <string>
 

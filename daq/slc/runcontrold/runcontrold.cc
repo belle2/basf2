@@ -3,125 +3,61 @@
 #include "GUICommunicator.h"
 #include "LocalNSMCommunicator.h"
 
-#include <nsm/RunStatus.h>
-#include <nsm/NSMNodeDaemon.h>
+#include <database/MySQLInterface.h>
+
 #include <nsm/RCCallback.h>
 
-#include <database/MySQLInterface.h>
-#include <database/DBNodeSystemConfigurator.h>
-
-#include <xml/NodeLoader.h>
+#include <base/NSMNode.h>
+#include <base/ConfigFile.h>
 
 #include <system/PThread.h>
 
-#include <base/NSMNode.h>
 #include <base/Debugger.h>
-#include <base/StringUtil.h>
 
 #include <iostream>
 #include <cstdlib>
 #include <unistd.h>
 
-namespace Belle2 {
-  class Listener {
-  public:
-    Listener(HostCommunicator* comm)
-      : _comm(comm) {}
-    ~Listener() {}
-    void run() {
-      _comm->run();
-    }
-  private:
-    HostCommunicator* _comm;
-  };
-}
-
 int main(int argc, char** argv)
 {
   using namespace Belle2;
 
-  if (argc < 1) {
-    std::cerr << "Usage : ./runcontrold [ip=50000]"
-              << std::endl;
-    return 1;
-  }
+  ConfigFile config("slc_config.conf");
 
-  const std::string node_name = "RUNCONTROL";
-  const std::string dir = getenv("B2SC_XML_PATH");
-  const std::string entry = getenv("B2SC_XML_ENTRY");
-  const std::string path = getenv("B2SC_CPRLIB_PATH");
-  const std::string ip = getenv("B2SC_SERVER_HOST");
-  const int port = (argc > 1) ? atoi(argv[1]) : 50000;
-  const std::string db_host = getenv("B2SC_DB_HOST");
-  const std::string db_name = getenv("B2SC_DB_NAME");
-  const std::string db_user = getenv("B2SC_DB_USER");
-  const std::string db_password = getenv("B2SC_DB_PASS");
-  const int db_port = atoi(getenv("B2SC_DB_PORT"));
+  NSMNode* rc_node = new NSMNode(config.get("RC_NSMNAME"));
 
-  NodeLoader* loader = new NodeLoader(dir);
-  loader->setVersion(0);
-  loader->load(entry);
-
+  NodeLoader* loader = new NodeLoader(config.get("RC_XML_PATH"));
+  loader->load(config.get("RC_XML_ENTRY"));
   NodeSystem& node_system(loader->getSystem());
-  NSMDataManager* data = new NSMDataManager(&node_system);
-  NSMNode* rc_node = new NSMNode(node_name);
+  node_system.setStatus(new RunStatus(config.get("RC_STATUS_NAME"),
+                                      config.getInt("RC_STATUS_REV")));
+  node_system.setConfig(new RunConfig(config.get("RC_CONFIG_NAME"),
+                                      config.getInt("RC_CONFIG_REV")));
   node_system.setRunControlNode(rc_node);
-  NSMCommunicator* comm = new NSMCommunicator(rc_node);
-  RCCallback* callback = new RCCallback(rc_node);
-  comm->setCallback(callback);
-  while (true) {
-    try {
-      comm->init();
-      break;
-    } catch (const NSMHandlerException& e) {
-      Belle2::debug("[DEBUG] Failed to connect NSM network. Re-trying to connect...");
-      sleep(3);
-    }
-  }
-  data->allocateRunConfig();
-  data->allocateRunStatus();
-  data->writeRunConfig();
-  data->writeRunStatus();
 
-  TCPServerSocket server_socket(ip, port);
-  server_socket.open();
+  NSMCommunicator* gcomm = new NSMCommunicator(rc_node, config.get("RC_NSMHOST_IP"),
+                                               config.getInt("RC_NSMHOST_PORT"));
+  gcomm->setCallback(new RCCallback(rc_node));
+  NSMCommunicator* lcomm = new NSMCommunicator(rc_node, config.get("RC_NSMHOST_LOCAL_IP"),
+                                               config.getInt("RC_NSMHOST_LOCAL_PORT"));
+  lcomm->setCallback(new RCCallback(rc_node));
+  LocalNSMCommunicator* nsm_comm = new LocalNSMCommunicator(gcomm, lcomm);
+  PThread th_nsm(nsm_comm);
 
   MySQLInterface* db = new MySQLInterface();
   db->init();
-  db->connect(db_host, db_name, db_user, db_password, db_port);
-  try {
-    db->execute("select * from run_config order by start_time desc limit 1;");
-    std::vector<DBRecord>& record_v(db->loadRecords());
-    if (record_v.size() > 0) {
-      data->getRunConfig()->setRunType(record_v[0].getFieldValue("run_type"));
-      data->getRunConfig()->setOperators(record_v[0].getFieldValue("operators"));
-      data->getRunConfig()->setVersion(record_v[0].getFieldValueInt("version"));
-      data->getRunStatus()->setExpNumber(record_v[0].getFieldValueInt("exp_no"));
-      data->getRunStatus()->setRunNumber(record_v[0].getFieldValueInt("run_no"));
-    } else {
-      data->getRunConfig()->setVersion(0);
-      data->getRunStatus()->setExpNumber(0);
-      data->getRunStatus()->setRunNumber(0);
-    }
-    try {
-      DBNodeSystemConfigurator config(db, &node_system);
-      config.readTables(data->getRunConfig()->getVersion());
-    } catch (const IOException& e) {
-      Belle2::debug("[FATAL] Error on loading system configuration.:%s", e.what());
-      return 1;
-    }
-  } catch (const std::exception& e) {
-    data->getRunConfig()->setVersion(0);
-    data->getRunStatus()->setExpNumber(0);
-    data->getRunStatus()->setRunNumber(0);
-  }
-  HostCommunicator* ui_comm =  new GUICommunicator(server_socket, db, loader);
-  Belle2::PThread(new Listener(ui_comm));
-  Belle2::PThread(new LocalNSMCommunicator(comm));
+  db->connect(config.get("DB_HOST"), config.get("DB_NAME"),
+              config.get("DB_USER"), config.get("DB_PASS"), config.getInt("DB_PORT"));
+  DBNodeSystemConfigurator dbconfig(db, loader);
+  dbconfig.rereadTable();
+
+  GUICommunicator* gui_comm =  new GUICommunicator(config.get("RC_HOST_IP"),
+                                                   config.getInt("RC_HOST_PORT"),
+                                                   db, loader);
+  PThread th_gui(gui_comm);
 
   RunControlMessageManager* manager
-    = new RunControlMessageManager(db, comm, data, ui_comm,
-                                   rc_node, &node_system);
+    = new RunControlMessageManager(db, nsm_comm, gui_comm, rc_node, loader);
   manager->run();
 
   return 0;

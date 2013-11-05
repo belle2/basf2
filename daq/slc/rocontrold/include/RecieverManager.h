@@ -1,14 +1,14 @@
 #ifndef _Belle2_RecieverManager_hh
 #define _Belle2_RecieverManager_hh
 
-#include <base/RONode.h>
+#include "base/NSMNode.h"
 
 namespace Belle2 {
 
   class RecieverManager {
 
   public:
-    RecieverManager(RONode* node = NULL)
+    RecieverManager(NSMNode* node = NULL)
       : _node(node) {}
     virtual ~RecieverManager() {}
 
@@ -16,7 +16,7 @@ namespace Belle2 {
     virtual void run() throw();
 
   private:
-    RONode* _node;
+    NSMNode* _node;
 
   };
 

@@ -1,8 +1,8 @@
 #ifndef _Belle2_ProcessListener_hh
 #define _Belle2_ProcessListener_hh
 
-#include <system/Fork.h>
-#include <system/Mutex.h>
+#include "system/Fork.h"
+#include "system/Mutex.h"
 
 namespace Belle2 {
 

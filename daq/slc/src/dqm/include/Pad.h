@@ -1,7 +1,7 @@
 #ifndef _Belle2_Pad_hh
 #define _Belle2_Pad_hh
 
-#include "Rect.h"
+#include "dqm/Rect.h"
 
 namespace Belle2 {
 

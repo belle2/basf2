@@ -1,8 +1,8 @@
 #ifndef _Belle2_HistoManager_hh
 #define _Belle2_HistoManager_hh
 
-#include "HistoPackage.h"
-#include "RootPanel.h"
+#include "dqm/HistoPackage.h"
+#include "dqm/RootPanel.h"
 
 #include <map>
 

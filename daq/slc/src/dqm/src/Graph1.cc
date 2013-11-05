@@ -1,4 +1,4 @@
-#include "Graph1.h"
+#include "dqm/Graph1.h"
 
 using namespace Belle2;
 

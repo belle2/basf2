@@ -1,12 +1,12 @@
 #ifndef _Belle2_ROCallback_hh
 #define _Belle2_ROCallback_hh
 
-#include <nsm/RCCallback.h>
+#include "nsm/RCCallback.h"
 
-#include <system/Fork.h>
-#include <system/PThread.h>
+#include "base/NSMNode.h"
 
-#include <base/RONode.h>
+#include "system/Fork.h"
+#include "system/PThread.h"
 
 namespace Belle2 {
 
@@ -16,7 +16,7 @@ namespace Belle2 {
     int* openBuffer(size_t count, const char* path) throw();
 
   public:
-    ROCallback(RONode* node = NULL);
+    ROCallback(NSMNode* node);
     virtual ~ROCallback() throw();
 
   public:
@@ -29,7 +29,7 @@ namespace Belle2 {
     virtual bool abort() throw();
 
   private:
-    RONode* _node;
+    NSMNode* _node;
     int* _buf_config;
     int* _buf_status;
     Fork _fork_v[2];//0:eb0, 1:RecvStream1.py

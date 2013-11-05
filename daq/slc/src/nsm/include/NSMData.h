@@ -1,7 +1,7 @@
 #ifndef _Belle2_NSMData_hh
 #define _Belle2_NSMData_hh
 
-#include "NSMHandlerException.h"
+#include "nsm/NSMHandlerException.h"
 
 #include <map>
 #include <vector>

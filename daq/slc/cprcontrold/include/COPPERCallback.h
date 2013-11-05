@@ -1,13 +1,12 @@
 #ifndef _Belle2_COPPERCallback_hh
 #define _Belle2_COPPERCallback_hh
 
-#include <system/Fork.h>
-#include <system/PThread.h>
+#include "base/NSMNode.h"
 
-#include <nsm/RCCallback.h>
-#include <nsm/RunStatus.h>
+#include "system/Fork.h"
+#include "system/PThread.h"
 
-#include <base/COPPERNode.h>
+#include "nsm/RCCallback.h"
 
 #include "HSLBController.h"
 
@@ -18,7 +17,7 @@ namespace Belle2 {
   class COPPERCallback : public RCCallback {
 
   public:
-    COPPERCallback(COPPERNode* node = NULL);
+    COPPERCallback(NSMNode* node = NULL);
     virtual ~COPPERCallback() throw();
 
   public:
@@ -34,7 +33,7 @@ namespace Belle2 {
     int* openBuffer(size_t count, const char* path) throw();
 
   private:
-    COPPERNode* _node;
+    NSMNode* _node;
     int* _buf_config;
     int* _buf_status;
     HSLBController _hslbcon_v[4];

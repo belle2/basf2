@@ -1,4 +1,4 @@
-#include "Connection.h"
+#include "base/Connection.h"
 
 using namespace Belle2;
 

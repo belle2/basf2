@@ -1,11 +1,11 @@
 #ifndef _Belle2_Shape_hh
 #define _Belle2_Shape_hh
 
-#include "XMLElement.h"
-#include "FillProperty.h"
-#include "LineProperty.h"
-#include "FontProperty.h"
-#include "MonColor.h"
+#include "dqm/XMLElement.h"
+#include "dqm/FillProperty.h"
+#include "dqm/LineProperty.h"
+#include "dqm/FontProperty.h"
+#include "dqm/MonColor.h"
 
 #include <string>
 

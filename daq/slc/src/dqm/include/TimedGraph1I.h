@@ -1,7 +1,7 @@
 #ifndef _Belle2_TimedGraph1I_hh
 #define _Belle2__TimedGraph1I_hh
 
-#include "TimedGraph1.h"
+#include "dqm/TimedGraph1.h"
 
 namespace Belle2 {
 

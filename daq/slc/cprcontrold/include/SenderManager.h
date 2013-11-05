@@ -1,14 +1,14 @@
 #ifndef _Belle2_SenderManager_hh
 #define _Belle2_SenderManager_hh
 
-#include <base/COPPERNode.h>
+#include "base/NSMNode.h"
 
 namespace Belle2 {
 
   class SenderManager {
 
   public:
-    SenderManager(COPPERNode* node) : _node(node) {}
+    SenderManager(NSMNode* node) : _node(node) {}
     virtual ~SenderManager() {}
 
   public:
@@ -16,7 +16,7 @@ namespace Belle2 {
     std::string run_script(const std::string& cmd);
 
   private:
-    COPPERNode* _node;
+    NSMNode* _node;
 
   };
 

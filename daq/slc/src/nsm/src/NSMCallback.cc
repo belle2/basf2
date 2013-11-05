@@ -1,7 +1,7 @@
-#include "NSMCallback.h"
+#include "nsm/NSMCallback.h"
 
-#include "NSMCommunicator.h"
-#include "NSMMessage.h"
+#include "nsm/NSMCommunicator.h"
+#include "nsm/NSMMessage.h"
 
 #include <cstdarg>
 #include <cstdio>

@@ -1,4 +1,4 @@
-#include "StringUtil.h"
+#include "base/StringUtil.h"
 
 #include <cstdarg>
 #include <cstdio>
@@ -44,6 +44,18 @@ namespace Belle2 {
       str_v.push_back("");
     }
     return str_v;
+  }
+
+  std::string join(StringList str_v, const std::string& s)
+  {
+    std::stringstream ss;
+    for (size_t i = 0; i < str_v.size() ;) {
+      ss << str_v[i];
+      i++;
+      if (i == str_v.size()) break;
+      ss << s;
+    }
+    return ss.str();
   }
 
   std::string replace(const std::string& source,

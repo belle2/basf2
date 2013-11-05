@@ -1,7 +1,7 @@
 #ifndef _Belle2_MonCircle_hh
 #define _Belle2_MonCircle_hh
 
-#include "MonShape.h"
+#include "dqm/MonShape.h"
 
 namespace Belle2 {
 

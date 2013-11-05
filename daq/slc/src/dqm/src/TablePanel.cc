@@ -1,4 +1,4 @@
-#include "TablePanel.h"
+#include "dqm/TablePanel.h"
 
 #include <sstream>
 

@@ -1,7 +1,8 @@
 #include <nsm/NSMNodeDaemon.h>
 #include <nsm/NSMData.h>
 #include <nsm/NSMCommunicator.h>
-#include <nsm/run_status.h>
+
+#include "run_status.h"
 
 #include <database/MySQLInterface.h>
 

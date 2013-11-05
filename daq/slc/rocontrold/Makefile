@@ -1,9 +1,8 @@
 CXX     = g++
-#CXX     = g++44
 RM      = rm -rf
 CP      = cp -f
 
-NSM2_PATH  = $(BELLE2_DAQ_SLC_DIR)/nsm2
+B2SLC_LIB  = $(BELLE2_LOCAL_DIR)/daq/slc
 
 BINDIR  = ./bin
 SRCDIR  = ./src
@@ -12,18 +11,20 @@ TMPDIR  = ./tmp
 LIBDIR  = ./lib
 
 LIBS    +=  -lm -lpthread -lz -lrt
-LIBS    += -L$(BELLE2_DAQ_SLC_DIR)/lib -ldaq_slc_base
-LIBS    += -L$(BELLE2_DAQ_SLC_DIR)/lib -ldaq_slc_system
-LIBS    += -L$(BELLE2_DAQ_SLC_DIR)/lib -ldaq_slc_nsm
-LIBS    += $(NSM2_PATH)/corelib/nsmlib2.o \
-           $(NSM2_PATH)/corelib/nsmhash.o \
-           $(NSM2_PATH)/corelib/nsmparse.o \
-           $(NSM2_PATH)/b2lib/belle2nsm.o
+LIBS    += -L$(B2SLC_LIB)/lib -ldaq_slc_base
+LIBS    += -L$(B2SLC_LIB)/lib -ldaq_slc_nsm
+LIBS    += -L$(B2SLC_LIB)/lib -ldaq_slc_system
+LIBS    += -L$(B2SLC_LIB)/lib -ldaq_slc_xml
+LIBS    += -L$(B2SLC_LIB)/lib -lnsm2_corelib
+LIBS    += -L$(B2SLC_LIB)/lib -lnsm2_b2lib
+LIBS    += $(shell xml2-config --libs)
+LIBS    += $(shell mysql_config --libs)
 
 CFLAGS   = -g -Wall -fPIC -D_REENTRANT 
 CFLAGS  += -I./include 
-CFLAGS  += -I$(NSM2_PATH)/corelib -I$(NSM2_PATH)/b2lib
-CFLAGS  += -I$(BELLE2_DAQ_SLC_DIR)/include 
+CFLAGS  += -I$(B2SLC_LIB)/include 
+CFLAGS  += $(shell xml2-config --cflags)
+CFLAGS  += $(shell mysql_config --cflags)
 
 MAINS   = $(wildcard *.cc)
 TARGETS = $(MAINS:%.cc=$(BINDIR)/%)
@@ -33,10 +34,7 @@ DEPS   = $(SRCS:$(SRCDIR)/%.cc=$(TMPDIR)/%.d)
 OBJS   = $(SRCS:$(SRCDIR)/%.cc=$(TMPDIR)/%.o)
 
 all: $(TARGETS)
-
-force:
-	@ $(RM) $(BINDIR)/*
-	@ make all
+	@ install -m755 -p $(BINDIR)/* $(B2SLC_LIB)/bin
 
 clean:
 	@ echo '<< cleaning directory >>'

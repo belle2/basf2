@@ -1,8 +1,8 @@
 #ifndef _Belle2_TimedGraph_hh
 #define _Belle2_TimedGraph_hh
 
-#include "Histo.h"
-#include "LongArray.h"
+#include "dqm/Histo.h"
+#include "dqm/LongArray.h"
 
 namespace Belle2 {
 

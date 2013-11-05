@@ -10,6 +10,7 @@ namespace Belle2 {
 
   StringList split(const std::string& str,
                    const char type, size_t max = 0);
+  std::string join(StringList str_v, const std::string& s);
   std::string replace(const std::string& source,
                       const std::string& pattern,
                       const std::string& placement);

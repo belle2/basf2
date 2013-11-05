@@ -1,10 +1,10 @@
 #ifndef _Belle2_Histo_hh
 #define _Belle2_Histo_hh
 
-#include "MonObject.h"
+#include "dqm/MonObject.h"
 
-#include "GAxis.h"
-#include "NumberArray.h"
+#include "dqm/GAxis.h"
+#include "dqm/NumberArray.h"
 
 #include <string>
 

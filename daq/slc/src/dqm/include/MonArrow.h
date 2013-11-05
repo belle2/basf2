@@ -1,7 +1,7 @@
 #ifndef _Belle2_MonArrow_hh
 #define _Belle2_MonArrow_hh
 
-#include "MonShape.h"
+#include "dqm/MonShape.h"
 
 namespace Belle2 {
 

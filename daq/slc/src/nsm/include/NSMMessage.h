@@ -1,9 +1,11 @@
 #ifndef _Belle2_NSMMessage_hh
 #define _Belle2_NSMMessage_hh
 
-#include <nsm2.h>
+extern "C" {
+#include "nsm/nsm2.h"
+}
 
-#include "NSMHandlerException.h"
+#include "nsm/NSMHandlerException.h"
 
 namespace Belle2 {
 

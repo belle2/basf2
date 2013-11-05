@@ -1,12 +1,12 @@
-#include "NSMMessage.h"
+#include "nsm/NSMMessage.h"
 
 #include <string.h>
 #include <unistd.h>
 #include <errno.h>
 
 extern "C" {
-#include <nsmlib2.h>
-#include <belle2nsm.h>
+#include "nsm/nsmlib2.h"
+#include "nsm/belle2nsm.h"
 }
 
 using namespace Belle2;

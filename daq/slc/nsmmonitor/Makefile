@@ -14,18 +14,15 @@ LIBDIR  = ./lib
 LIBS    +=  -lm -lpthread -lz 
 LIBS    += -L$(BELLE2_DAQ_SLC_DIR)/lib -ldaq_slc_base
 LIBS    += -L$(BELLE2_DAQ_SLC_DIR)/lib -ldaq_slc_nsm
-LIBS    += -L$(BELLE2_DAQ_SLC_DIR)/lib -ldaq_slc_system
+LIBS    += -L$(BELLE2_DAQ_SLC_DIR)/lib -lnsm2_corelib
+LIBS    += -L$(BELLE2_DAQ_SLC_DIR)/lib -lnsm2_b2lib
 LIBS    += -L$(BELLE2_DAQ_SLC_DIR)/lib -ldaq_slc_database
-LIBS    += $(NSM2_PATH)/corelib/nsmlib2.o \
-           $(NSM2_PATH)/corelib/nsmhash.o \
-           $(NSM2_PATH)/corelib/nsmparse.o \
-           $(NSM2_PATH)/b2lib/belle2nsm.o
 LIBS    += $(shell mysql_config --libs)
 
 CFLAGS   = -g -Wall -fPIC -D_REENTRANT 
 CFLAGS  += -I./include 
-CFLAGS  += -I$(NSM2_PATH)/corelib -I$(NSM2_PATH)/b2lib
 CFLAGS  += -I$(BELLE2_DAQ_SLC_DIR)/include 
+CFLAGS  += -I$(BELLE2_DAQ_SLC_DIR)/data/nsm
 CFLAGS  += $(shell mysql_config --cflags)
 
 MAINS   = $(wildcard *.cc)

@@ -1,7 +1,7 @@
 #ifndef _Belle2_HistoFactory_hh
 #define _Belle2_HistoFactory_hh
 
-#include "Histo.h"
+#include "dqm/Histo.h"
 
 #include "base/Reader.h"
 

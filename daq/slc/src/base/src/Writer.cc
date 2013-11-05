@@ -1,8 +1,6 @@
-#include "Writer.h"
+#include "base/Writer.h"
 
-#include "Serializable.h"
-
-#include <iostream>
+#include "base/Serializable.h"
 
 #define __ENDIAN_L__
 

@@ -1,8 +1,8 @@
 #ifndef _Belle2_Command_hh
 #define _Belle2_Command_hh
 
-#include "Enum.h"
-#include "State.h"
+#include "base/Enum.h"
+#include "base/State.h"
 
 namespace Belle2 {
 
@@ -18,13 +18,13 @@ namespace Belle2 {
     static const Command LOAD;
     static const Command START;
     static const Command STOP;
-    static const Command RECOVER;
     static const Command RESUME;
     static const Command PAUSE;
     static const Command ABORT;
     static const Command STATECHECK;
     static const Command TRIGFT;
     static const Command DATA;
+    static const Command SETPARAMS;
 
   public:
     static const int SUGGESTED = 2;

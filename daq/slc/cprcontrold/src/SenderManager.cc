@@ -1,9 +1,7 @@
 #include "SenderManager.h"
 
-#include <base/DataSender.h>
-#include <base/HSLB.h>
-#include <base/Host.h>
-#include <base/Debugger.h>
+#include "base/Debugger.h"
+#include "base/StringUtil.h"
 
 #include <cstdio>
 #include <cstdlib>
@@ -26,6 +24,7 @@ std::string SenderManager::run_script(const std::string& cmd)
 void SenderManager::run() throw()
 {
   if (_node != NULL) {
+    DataObject* obj = _node->getData();
     const char* belle2_path = getenv("BELLE2_LOCAL_DIR");
     const char* belle2_sub = getenv("BELLE2_SUBDIR");
     if (belle2_path == NULL) {
@@ -36,16 +35,15 @@ void SenderManager::run() throw()
     sprintf(path, "%s/bin/%s/basf2", belle2_path, belle2_sub);
     char script_c[128];
     sprintf(script_c, "%s/daq/rawdata/examples/%s",
-            belle2_path, _node->getSender()->getScript().c_str());
+            belle2_path, obj->getTextValue("script").c_str());
     char hostname_c[64];
-    std::string hostname = _node->getSender()->getHost();
+    std::string hostname = obj->getTextValue("host");
     sprintf(hostname_c, "%s", hostname.c_str());
     char id_c[32];
     sprintf(id_c, "%d", (int)_node->getID());
     int flag = 0;
     for (size_t slot = 0; slot < 4; slot++) {
-      HSLB* hslb = _node->getHSLB(slot);
-      if (hslb != NULL && hslb->isUsed()) {
+      if (obj->getBooleanValue(Belle2::form("used_%d", slot))) {
         flag += 1 << slot;
       }
     }

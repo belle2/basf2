@@ -1,10 +1,10 @@
 #ifndef _Belle2_RCCallback_hh
 #define _Belle2_RCCallback_hh
 
-#include "NSMCallback.h"
+#include "nsm/NSMCallback.h"
 
-#include <base/Command.h>
-#include <base/NSMNode.h>
+#include "base/Command.h"
+#include "base/NSMNode.h"
 
 namespace Belle2 {
 
@@ -22,16 +22,11 @@ namespace Belle2 {
     virtual bool load()   throw() { return true; }
     virtual bool start()  throw() { return true; }
     virtual bool stop()   throw() { return true; }
-    virtual bool recover() throw() { return true; }
     virtual bool resume() throw() { return true; }
     virtual bool pause()  throw() { return true; }
     virtual bool abort()  throw() { return true; }
     virtual bool trigft()  throw() { return true; }
-
-  public:
-    virtual void reportState() throw(NSMHandlerException);
-    virtual void reportError(const std::string& str)
-    throw(NSMHandlerException);
+    virtual bool setparams()  throw();
 
   protected:
     virtual bool perform(NSMMessage& msg)
@@ -39,7 +34,6 @@ namespace Belle2 {
 
   private:
     NSMNode* _node;
-    NSMNode* _rc_node;
 
   };
 

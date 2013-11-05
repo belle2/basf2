@@ -1,126 +1,87 @@
 #include "RunControlMessageManager.h"
 
 #include "MessageBox.h"
-#include "DBRunInfoHandler.h"
 
-#include <database/DBNodeSystemConfigurator.h>
+#include "database/DBObjectLoader.h"
 
-#include <nsm/TTDStatus.h>
+#include "system/Time.h"
+#include "system/Date.h"
 
-#include <system/Time.h>
-#include <system/Date.h>
-
-#include <base/Debugger.h>
-#include <base/StringUtil.h>
+#include "base/Debugger.h"
+#include "base/StringUtil.h"
+#include "base/ConfigFile.h"
 
 #include <unistd.h>
-
-#include <iostream>
+#include <fstream>
 
 using namespace Belle2;
 
 void RunControlMessageManager::run()
 {
+  std::vector<NSMNode*>& node_v(_node_system->getNodes());
   _ntry_recover = 0;
-  {
-    std::vector<NSMNode*>& node_v(_node_system->getNodes());
-    for (size_t i = 0; i < node_v.size(); i++) {
-      NSMNode* node(node_v[i]);
-      _node_used_v.push_back(node->isUsed());
-    }
-  }
-  downloadConfig(Command::UNKNOWN,
-                 _data_man->getRunConfig()->getVersion());
+  downloadConfig(Command::SETPARAMS,
+                 _node_system->getConfig()->getVersion());
   int index_seq = -1;
   Command cmd_seq;
   while (true) {
     RunControlMessage msg = MessageBox::get().pop();
-    usleep(100);
     Command cmd = msg.getCommand();
     const NSMMessage& nsm(msg.getMessage());
     if (msg.getId() == RunControlMessage::GUI) {
       if (nsm.getParam(0) != (unsigned int) - 1) {
-        index_seq = -1;
         NSMNode* node = _node_system->getNodes()[nsm.getParam(0)];
         if (cmd.isAvailable(node->getState())) {
+          index_seq = -1;
           State state_next = getNextState(cmd);
           if (state_next != State::UNKNOWN)
             node->setState(state_next);
           reportState(node);
           send(node, cmd, nsm.getNParams(), nsm.getParams());
-        }
-        if (cmd == Command::TRIGFT) {
-          _data_man->getRunConfig()->setTriggerMode(nsm.getParam(1));
-          _data_man->getRunConfig()->setDummyRate(nsm.getParam(2));
-          _data_man->getRunConfig()->setTriggerLimit(nsm.getParam(3));
-        } else if (cmd == Command::STOP ||
-                   (cmd == Command::ABORT &&
-                    _rc_node->getState() == State::RUNNING_S)) {
-          uploadRunResult();
+          uploadRunResult(cmd);
         }
       } else {
         if (!cmd.isAvailable(_rc_node->getState())) continue;
         index_seq = 0;
         cmd_seq = cmd;
         State state_next = getNextState(cmd);
-        if (state_next != State::UNKNOWN)
+        if (state_next != State::UNKNOWN) {
           _rc_node->setState(state_next);
-        if (cmd == Command::BOOT) {
-          _data_man->getRunConfig()->setVersion(nsm.getParam(1));
-          downloadConfig(cmd, _data_man->getRunConfig()->getVersion());
-        } else if (cmd == Command::LOAD) {
-          _data_man->getRunConfig()->setVersion(nsm.getParam(1));
-          downloadConfig(cmd, _data_man->getRunConfig()->getVersion());
-          std::vector<std::string> str_v = Belle2::split(nsm.getData(), '\n');
-          _data_man->getRunConfig()->setRunType(str_v[0]);
-          _data_man->getRunConfig()->setOperators(str_v[1]);
-        } else if (cmd == Command::START) {
-          uploadRunConfig();
-        } else if (cmd == Command::STOP ||
-                   (cmd == Command::ABORT &&
-                    _rc_node->getState() == State::RUNNING_S)) {
-          uploadRunResult();
-        } else if (cmd == Command::TRIGFT) {
-          _data_man->getRunConfig()->setTriggerMode(nsm.getParam(1));
-          _data_man->getRunConfig()->setDummyRate(nsm.getParam(2));
-          _data_man->getRunConfig()->setTriggerLimit(nsm.getParam(3));
-        } else if (cmd == Command::STATECHECK) {
-          std::vector<NSMNode*>& node_v(_node_system->getNodes());
+        }
+        downloadConfig(cmd, nsm.getParam(1));
+        uploadRunConfig(cmd, nsm.getData());
+        uploadRunResult(cmd);
+        if (cmd == Command::STATECHECK) {
           for (size_t i = 0; i < node_v.size(); i++) {
             reportState(node_v[i]);
           }
           reportRCStatus();
           continue;
-        }
-        reportRCStatus();
-        std::vector<NSMNode*>& node_v(_node_system->getNodes());
-        for (size_t i = 0; i < node_v.size(); i++) {
-          State state_org = node_v[i]->getState();
-          node_v[i]->setState(_rc_node->getState());
-          reportState(node_v[i]);
+        } else {
+          for (size_t i = 0; i < node_v.size(); i++) {
+            State state_org = node_v[i]->getState();
+            node_v[i]->setState(_rc_node->getState());
+            reportState(node_v[i]);
+          }
         }
         index_seq = distribute(index_seq, cmd_seq);
+        reportRCStatus();
       }
     } else if (msg.getId() == RunControlMessage::LOCALNSM) {
-      if (index_seq < 0 && cmd == Command::STATECHECK) {
-        std::vector<NSMNode*>& node_v(_node_system->getNodes());
-        _data_man->readNodeStatus();
+      if (index_seq < 0 && cmd == Command::STATECHECK &&
+          _rc_node->getState() != State::RUNNING_S) {
         for (size_t i = 0; i < node_v.size(); i++) {
-          if (node_v[i]->isUsed()) {
-            send(node_v[i], cmd);
-          }
+          if (node_v[i]->isUsed()) send(node_v[i], cmd);
         }
       } else {
         int id = nsm.getNodeId();
-        NSMNode* node = findNode(id);
+        NSMNode* node = findNode(id, nsm);
         if (node != NULL) {
           if (cmd == Command::OK) {
             node->setState(State(nsm.getData()));
             reportState(node);
-            std::vector<NSMNode*>& node_v(_node_system->getNodes());
             for (size_t i = 0; i < node_v.size(); i++) {
-              if (node_v[i]->isUsed())
-                reportState(node_v[i]);
+              if (node_v[i]->isUsed()) reportState(node_v[i]);
             }
             if (isSynchronized(node->getState(), node_v.size())) {
               _rc_node->setState(node->getState());
@@ -143,11 +104,11 @@ void RunControlMessageManager::run()
   }
 }
 
-NSMNode* RunControlMessageManager::findNode(int id) throw()
+NSMNode* RunControlMessageManager::findNode(int id, const NSMMessage& msg) throw()
 {
   NSMNode* node = getNodeByID(id);
   if (node == NULL) {
-    const char* nodename = _comm->getMessage().getNodeName();
+    const char* nodename = msg.getNodeName();
     if (nodename != NULL) {
       node = getNodeByName(nodename);
       if (node == NULL) {
@@ -182,17 +143,17 @@ bool RunControlMessageManager::recover(NSMNode* node)
 {
   if (!node->isUsed()) return true;
   if (node->getState() == State::INITIAL_S) {
-    _comm->sendRequest(node, Command::BOOT);
+    send(node, Command::BOOT, 0, NULL);
   } else if (node->getState() == State::CONFIGURED_S) {
-    _comm->sendRequest(node, Command::LOAD);
+    send(node, Command::LOAD, 0, NULL);
   } else if (node->getState() == State::READY_S) {
     return true;
   } else if (node->getState() == State::PAUSED_S) {
-    _comm->sendRequest(node, Command::STOP);
+    send(node, Command::STOP, 0, NULL);
   } else if (node->getState() == State::RUNNING_S) {
-    _comm->sendRequest(node, Command::STOP);
+    send(node, Command::STOP, 0, NULL);
   } else if (node->getState() == State::ERROR_ES) {
-    _comm->sendRequest(node, Command::ABORT);
+    send(node, Command::ABORT, 0, NULL);
   }
   return false;
 }
@@ -243,42 +204,33 @@ int RunControlMessageManager::distribute(int index_seq, const Command& command) 
 }
 
 bool RunControlMessageManager::send(NSMNode* node, const Command& command,
-                                    int npar_in, const int* pars_in) throw()
+                                    int npar_in, const unsigned int* pars_in) throw()
 {
   try {
-    int id = node->getNodeID();
-    if (id < 0) id = _comm->getNodeIdByName(node->getName());
-    int pid = (id >= 0) ? _comm->getNodePidByName(node->getName()) : -1;
-    if (id >= 0 && pid > 0) {
-      int pars[256];
-      std::string data = "";
-      int npar = 0;
-      if (npar_in > 1) {
-        for (int i = 0; i < npar_in - 1; i++) {
-          pars[i] = pars_in[i + 1];
-          npar++;
-        }
-        //} else if (command != Command::START) {
-        //npar = node->getParams(command, pars, data);
-      } else {
-        npar = 2;
-        pars[0] = _data_man->getRunStatus()->getExpNumber();
-        pars[1] = _data_man->getRunStatus()->getRunNumber();
+    NSMMessage msg;
+    if (npar_in > 1) {
+      msg.setNParams(npar_in - 1);
+      for (int i = 0; i < npar_in - 1; i++) {
+        msg.setParam(i, pars_in[i + 1]);
       }
-      if (!(command == Command::STATECHECK &&
-            node->getState() == State::RUNNING_S))
-        _comm->sendRequest(node, command, npar, pars, data);
-      if (getNodeByID(id) == NULL) addNode(id, node);
-      node->setConnection(Connection::ONLINE);
+    }
+    if (command == Command::START) {
+      msg.setNParams(2);
+      msg.setParam(0, _node_system->getStatus()->getExpNumber());
+      msg.setParam(1, _node_system->getStatus()->getRunNumber());
+    }
+    RunControlMessage rcmsg(RunControlMessage::RUNCONTROLLER, command, msg);
+    int id = _nsm_comm->sendMessage(node, rcmsg);
+    if (getNodeByID(id) == NULL) addNode(id, node);
+    if (id >= 0) {
       return true;
     } else {
-      node->setConnection(Connection::OFFLINE);
-      node->setState(State::UNKNOWN);
       reportState(node);
     }
   } catch (const IOException& e) {
     Belle2::debug("[DEBUG] %s:%d : %s", __FILE__, __LINE__, e.what());
   }
+
   if (_rc_node->getState() != State::ERROR_ES) {
     _rc_node->setState(State::ERROR_ES);
     reportRCStatus();
@@ -326,19 +278,18 @@ bool RunControlMessageManager::reportError(NSMNode* node, const std::string& dat
 
 bool RunControlMessageManager::reportRCStatus() throw()
 {
-  RunStatus* status = _data_man->getRunStatus();
-  RunConfig* config = _data_man->getRunConfig();
   NSMMessage nsm;
   nsm.setNParams(8);
   nsm.setParam(0, -1);
   nsm.setParam(1, _rc_node->getConnection().getId());
   nsm.setParam(2, _rc_node->getState().getId());
-  nsm.setParam(3, config->getVersion());
-  nsm.setParam(4, status->getExpNumber());
-  nsm.setParam(5, status->getRunNumber());
-  nsm.setParam(6, status->getStartTime());
-  nsm.setParam(7, status->getEndTime());
-  nsm.setData(config->getRunType() + "\n" + config->getOperators());
+  nsm.setParam(3, _node_system->getConfig()->getVersion());
+  nsm.setParam(4, _node_system->getStatus()->getExpNumber());
+  nsm.setParam(5, _node_system->getStatus()->getRunNumber());
+  nsm.setParam(6, _node_system->getStatus()->getStartTime());
+  nsm.setParam(7, _node_system->getStatus()->getEndTime());
+  nsm.setData(_node_system->getConfig()->getRunType() + "\n" +
+              _node_system->getConfig()->getOperators());
   RunControlMessage msg(RunControlMessage::RUNCONTROLLER, nsm);
   msg.setCommand(Command::OK);
   try {
@@ -351,79 +302,71 @@ bool RunControlMessageManager::reportRCStatus() throw()
 
 void RunControlMessageManager::downloadConfig(const Command& cmd, int version) throw()
 {
-  DBNodeSystemConfigurator config(_db, _node_system);
-  try {
-    config.readTables(version);
-  } catch (const IOException& e) {
-    Belle2::debug("[DEBUG] Error on loading system configuration.:%s", e.what());
-  }
-  if (cmd == Command::BOOT || cmd == Command::LOAD) {
+  if (cmd == Command::SETPARAMS) {
+    _node_system->getConfig()->setVersion(version);
     std::vector<NSMNode*>& node_v(_node_system->getNodes());
+    ConfigFile config;
     for (size_t i = 0; i < node_v.size(); i++) {
-      NSMNode* node(node_v[i]);
-      bool used = _node_used_v[i];
-      _node_used_v[i] = node->isUsed();
-      if (node->isUsed() && !used) {
-        _comm->sendRequest(node, Command::BOOT);
+      NSMNode* node = node_v[i];
+      if (node->getData() != NULL) {
+        std::ofstream fout((config.get("CONFIG_FILE_DIR") + "/" + node->getName()).c_str());
+        fout << node->getData()->getValueString() << std::endl;
+        fout.close();
       }
+    }
+    try {
+      _dbconfig.readTable(version);
+    } catch (const IOException& e) {
+      Belle2::debug("[DEBUG] Error on loading system configuration.:%s", e.what());
     }
   }
 }
 
-void RunControlMessageManager::uploadRunConfig() throw()
+void RunControlMessageManager::uploadRunConfig(const Command& cmd,
+                                               const std::string& data) throw()
 {
-  RunStatus* status = _data_man->getRunStatus();
-  RunConfig* config = _data_man->getRunConfig();
-  status->incrementRunNumber();
-  status->setStartTime(Time().getSecond());
-  try {
-    _data_man->writeRunStatus();
-    _data_man->writeRunConfig();
-  } catch (const IOException& e) {
-    Belle2::debug("[DEBUG] Error on writing run configuration to NSM.:%s", e.what());
-  }
-  DBRunInfoHandler handler(_db, status, config);
-  try {
-    handler.createRunConfigTable();
-  } catch (const IOException& e) {}
-  try {
-    handler.writeRunConfigTable();
-  } catch (const IOException& e) {
-    Belle2::debug("[DEBUG] Error on uploading run configuration.:%s", e.what());
-  }
-
-}
-
-void RunControlMessageManager::uploadRunResult() throw()
-{
-  RunStatus* status = _data_man->getRunStatus();
-  RunConfig* config = _data_man->getRunConfig();
-  status->setEndTime(Time().getSecond());
-  std::vector<NSMNode*>& node_v(_node_system->getNodes());
-  std::vector<NSMData*>& data_v(_data_man->getNodeStatus());
-  _data_man->readNodeStatus();
-  for (size_t i = 0; i < node_v.size(); i++) {
-    if (node_v[i]->isUsed() && data_v[i] != NULL && data_v[i]->isAvailable()) {
-      if (node_v[i]->getType() == "ttd_node") {
-        TTDStatus* ttd_status = (TTDStatus*)data_v[i];
-        status->setEventNumber(ttd_status->getEventNumber());
-        status->setEventTotal(ttd_status->getEventTotal());
-      }
+  if (cmd == Command::LOAD) {
+    std::vector<std::string> str_v = Belle2::split(data, '\n');
+    if (str_v.size() > 0 && str_v[0].size() > 0)
+      _node_system->getConfig()->setRunType(str_v[0]);
+    if (str_v.size() > 1 && str_v[1].size() > 0)
+      _node_system->getConfig()->setOperators(str_v[1]);
+  } else if (cmd == Command::START) {
+    _node_system->getStatus()->incrementRunNumber();
+    _node_system->getStatus()->setStartTime(Time().getSecond());
+    _node_system->getStatus()->setEndTime(-1);
+    DBObjectLoader handler(_db);
+    try {
+      handler.createTable(_node_system->getConfig());
+    } catch (const IOException& e) {}
+    _node_system->getConfig()->setRunNumber(_node_system->getStatus()->getRunNumber());
+    _node_system->getConfig()->setStartTime(_node_system->getStatus()->getStartTime());
+    try {
+      std::vector<DataObject*> obj_v;
+      obj_v.push_back(_node_system->getConfig());
+      handler.writeTable(obj_v, 0);
+    } catch (const IOException& e) {
+      Belle2::debug("[DEBUG] failed to write new colum for run config:%s", e.what());
     }
   }
-  try {
-    _data_man->writeRunStatus();
-    _data_man->writeRunConfig();
-  } catch (const IOException& e) {
-    Belle2::debug("[DEBUG] Error on writing run configuration to NSM.:%s", e.what());
-  }
-  DBRunInfoHandler handler(_db, status, config);
-  try {
-    handler.createRunStatusTable();
-  } catch (const IOException& e) {}
-  try {
-    handler.writeRunStatusTable();
-  } catch (const IOException& e) {
-    Belle2::debug("[DEBUG] Error on uploading run status.:%s", e.what());
+}
+
+void RunControlMessageManager::uploadRunResult(const Command& cmd) throw()
+{
+  State state = _rc_node->getState();
+  if (cmd == Command::STOP ||
+      (cmd == Command::ABORT && state == State::RUNNING_S)) {
+    DBObjectLoader handler(_db);
+    _node_system->getStatus()->setEndTime(Time().getSecond());
+    try {
+      handler.createTable(_node_system->getStatus());
+    } catch (const IOException& e) {}
+    try {
+      std::vector<DataObject*> obj_v;
+      obj_v.push_back(_node_system->getStatus());
+      handler.writeTable(obj_v, 0);
+    } catch (const IOException& e) {
+      Belle2::debug("[DEBUG] failed to write new colum for run config:%s", e.what());
+    }
   }
 }

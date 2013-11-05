@@ -1,4 +1,4 @@
-#include "IntArray.h"
+#include "dqm/IntArray.h"
 
 #include <sstream>
 

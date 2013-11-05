@@ -1,8 +1,8 @@
 #ifndef _Belle2_Range_hh
 #define _Belle2_Range_hh
 
-#include "Histo1D.h"
-#include "DoubleArray.h"
+#include "dqm/Histo1D.h"
+#include "dqm/DoubleArray.h"
 
 namespace Belle2 {
 

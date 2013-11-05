@@ -3,12 +3,11 @@
 #include "SenderManager.h"
 #include "ProcessListener.h"
 
-#include <system/Fork.h>
-#include <system/PThread.h>
+#include "system/Fork.h"
+#include "system/PThread.h"
 
-#include <base/COPPERNode.h>
-#include <base/Debugger.h>
-#include <base/StringUtil.h>
+#include "base/Debugger.h"
+#include "base/StringUtil.h"
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -22,7 +21,7 @@
 
 using namespace Belle2;
 
-COPPERCallback::COPPERCallback(COPPERNode* node)
+COPPERCallback::COPPERCallback(NSMNode* node)
   : RCCallback(node), _node(node)
 {
   _buf_config = NULL;
@@ -55,23 +54,16 @@ bool COPPERCallback::boot() throw()
     memset(_buf_status, 0, sizeof(int) * 4);
   }
   for (int slot = 0; slot < 4; slot++) {
-    _hslbcon_v[slot].setHSLB(slot, _node->getHSLB(slot));
+    DataObject* hslb = _node->getData()->getObject(Belle2::form("hslb_%c", (char)slot));
+    _hslbcon_v[slot].setHSLB(slot, hslb);
   }
-  /*
-  FILE* file = popen("${B2SLC_PATH}/cprcontrold/ttrx/bootrx ${B2SLC_PATH}/cprcontrold/ttrx/tt4r009.bit", "r");
-  char str[4096];
-  memset(str, '\0', 4096);
-  fread(str, 1, 4096 - 1, file);
-  pclose(file);
-  std::cout << str << std::endl;
-  */
-
   for (int slot = 0; slot < 4; slot++) {
-    if (!(_hslbcon_v[slot].reset() &&
-          _hslbcon_v[slot].boot())) {
-      Belle2::debug("[ERROR] Failed to boot HSLB:%c", (char)(slot + 'a'));
-      setReply(Belle2::form("Failed to boot HSLB:%c", (char)(slot + 'a')));
-      return false;
+    if (_node->getData()->getBooleanValue(Belle2::form("used_%d", slot))) {
+      if (!(_hslbcon_v[slot].reset() && _hslbcon_v[slot].boot())) {
+        Belle2::debug("[ERROR] Failed to boot HSLB:%c", (char)(slot + 'a'));
+        setReply(Belle2::form("Failed to boot HSLB:%c", (char)(slot + 'a')));
+        return false;
+      }
     }
   }
 
@@ -81,9 +73,11 @@ bool COPPERCallback::boot() throw()
 bool COPPERCallback::load() throw()
 {
   for (size_t slot = 0; slot < 4; slot++) {
-    if (!_hslbcon_v[slot].load()) {
-      Belle2::debug("[ERROR] Failed to load HSLB:%c", (char)(slot + 'a'));
-      return false;
+    if (_node->getData()->getBooleanValue(Belle2::form("hslb_%c", (char)slot))) {
+      if (!_hslbcon_v[slot].load()) {
+        Belle2::debug("[ERROR] Failed to load HSLB:%c", (char)(slot + 'a'));
+        return false;
+      }
     }
   }
   if (_listener != NULL) {
@@ -107,14 +101,6 @@ bool COPPERCallback::load() throw()
 
 bool COPPERCallback::start() throw()
 {
-  /*
-  for (size_t slot = 0; slot < 4; slot++) {
-    if (!_hslbcon_v[slot].start()) {
-      Belle2::debug("Failed to start HSLB:%c", (char)(slot + 'a'));
-      return false;
-    }
-  }
-  */
   int input[4] = {
     1,//RUNNING,
     (int)getMessage().getParam(0),//ExpNumber
@@ -127,14 +113,6 @@ bool COPPERCallback::start() throw()
 
 bool COPPERCallback::stop() throw()
 {
-  /*
-  for (size_t slot = 0; slot < 4; slot++) {
-    if (!_hslbcon_v[slot].stop()) {
-      Belle2::debug("Failed to stop HSLB:%c", (char)(slot + 'a'));
-      return false;
-    }
-  }
-  */
   if (_buf_config != NULL)
     memset(_buf_config, 0, sizeof(int) * 4);
   return true;

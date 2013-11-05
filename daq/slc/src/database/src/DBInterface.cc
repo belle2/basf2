@@ -1,4 +1,4 @@
-#include "DBInterface.h"
+#include "database/DBInterface.h"
 
 using namespace Belle2;
 

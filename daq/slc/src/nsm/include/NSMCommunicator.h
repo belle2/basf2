@@ -1,43 +1,49 @@
 #ifndef _Belle2_NSMCommunicator_hh
 #define _Belle2_NSMCommunicator_hh
 
-#include "NSMHandlerException.h"
-#include "NSMMessage.h"
+#include "nsm/NSMHandlerException.h"
+#include "nsm/NSMMessage.h"
 
 #include "base/NSMNode.h"
 #include "base/Command.h"
 
 extern "C" {
-#include <nsm2.h>
+#include "nsm/nsm2.h"
 }
 
 #include <vector>
+#include <map>
 
 namespace Belle2 {
 
   class NSMCallback;
+  class NSMMessage;
 
   class NSMCommunicator {
 
   public:
-    NSMCommunicator(NSMNode* node = NULL) throw();
-    virtual ~NSMCommunicator() throw() {}
+    static NSMCommunicator* select(int timeout) throw(NSMHandlerException);
+
+  private:
+    static std::vector<NSMCommunicator*> __com_v;
 
   public:
-    virtual void init(bool usesig = false) throw(NSMHandlerException);
+    NSMCommunicator(NSMNode* node = NULL,
+                    const std::string& host = "", int port = -1) throw();
+    ~NSMCommunicator() throw() {}
+
+  public:
+    void init(const std::string& host = "", int port = -1) throw(NSMHandlerException);
     void sendRequest(NSMNode* node, const Command& cmd,
                      int npar = 0, unsigned int* pars = NULL,
                      int len = 0, const char* datap = NULL) throw(NSMHandlerException);
     void sendRequest(NSMNode* node, const Command& cmd,
                      int npar, unsigned int* pars,
-                     const std::string& message) throw(NSMHandlerException) {
-      sendRequest(node, cmd, npar, pars, message.size(),
-                  (message.size() == 0) ? NULL : message.c_str());
-    }
+                     const std::string& message) throw(NSMHandlerException);
     void sendRequest(NSMNode* node, const Command& cmd,
-                     const std::string& message) throw(NSMHandlerException) {
-      sendRequest(node, cmd, 0, NULL, message.size(), message.c_str());
-    }
+                     NSMMessage& message) throw(NSMHandlerException);
+    void sendRequest(NSMNode* node, const Command& cmd,
+                     const std::string& message) throw(NSMHandlerException);
     void replyOK(NSMNode* node, const std::string& message = "") throw(NSMHandlerException);
     void replyError(const std::string& message = "") throw(NSMHandlerException);
     bool wait(int sec) throw(NSMHandlerException);
@@ -56,11 +62,13 @@ namespace Belle2 {
     int getNodePidByName(const std::string& name) throw(NSMHandlerException);
 
   private:
-    int _id;
     NSMNode* _node;
     NSMCallback* _callback;
+    int _id;
     NSMMessage _message;
     NSMcontext* _nsmc;
+    std::string _host;
+    int _port;
 
   };
 

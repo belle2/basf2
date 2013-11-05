@@ -1,8 +1,8 @@
 #ifndef _Belle2_Graph1S_hh
 #define _Belle2_Graph1S_hh
 
-#include "Graph1.h"
-#include "ShortArray.h"
+#include "dqm/Graph1.h"
+#include "dqm/ShortArray.h"
 
 namespace Belle2 {
 

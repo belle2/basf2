@@ -1,4 +1,4 @@
-#include "XMLParser.h"
+#include "xml/XMLParser.h"
 
 using namespace Belle2;
 

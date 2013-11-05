@@ -1,4 +1,4 @@
-#include "DoubleArray.h"
+#include "dqm/DoubleArray.h"
 
 #include <sstream>
 

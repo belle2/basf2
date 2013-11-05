@@ -1,8 +1,8 @@
 #ifndef _Belle2_NSMCallback_hh
 #define _Belle2_NSMCallback_hh
 
-#include "NSMHandlerException.h"
-#include "NSMMessage.h"
+#include "nsm/NSMHandlerException.h"
+#include "nsm/NSMMessage.h"
 
 #include "base/Command.h"
 

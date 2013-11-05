@@ -1,7 +1,7 @@
 #ifndef _Belle2_NodeGroup_hh
 #define _Belle2_NodeGroup_hh
 
-#include "NSMNode.h"
+#include "base/NSMNode.h"
 
 #include <vector>
 

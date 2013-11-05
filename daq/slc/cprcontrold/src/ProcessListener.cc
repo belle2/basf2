@@ -2,9 +2,9 @@
 
 #include "COPPERCallback.h"
 
-#include <base/Debugger.h>
+#include "base/Debugger.h"
 
-#include <nsm/NSMCommunicator.h>
+#include "nsm/NSMCommunicator.h"
 
 using namespace Belle2;
 

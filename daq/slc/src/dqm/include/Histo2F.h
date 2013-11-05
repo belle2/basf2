@@ -1,8 +1,8 @@
 #ifndef _Belle2_Histo2F_hh
 #define _Belle2_Histo2F_hh
 
-#include "Histo2.h"
-#include "FloatArray.h"
+#include "dqm/Histo2.h"
+#include "dqm/FloatArray.h"
 
 namespace Belle2 {
 

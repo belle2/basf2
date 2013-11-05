@@ -1,6 +1,6 @@
-#include "TimedGraph1C.h"
+#include "dqm/TimedGraph1C.h"
 
-#include "CharArray.h"
+#include "dqm/CharArray.h"
 
 using namespace Belle2;
 

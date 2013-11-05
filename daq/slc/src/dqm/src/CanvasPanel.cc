@@ -1,6 +1,6 @@
-#include "CanvasPanel.h"
+#include "dqm/CanvasPanel.h"
 
-#include "Graph1D.h"
+#include "dqm/Graph1D.h"
 
 #include "base/StringUtil.h"
 

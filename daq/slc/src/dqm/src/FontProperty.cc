@@ -1,4 +1,4 @@
-#include "FontProperty.h"
+#include "dqm/FontProperty.h"
 
 #include <sstream>
 

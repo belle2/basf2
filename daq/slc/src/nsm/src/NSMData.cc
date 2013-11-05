@@ -1,10 +1,10 @@
-#include "NSMData.h"
+#include "nsm/NSMData.h"
 
 #include "base/StringUtil.h"
 
-#include <belle2nsm.h>
+#include "nsm/belle2nsm.h"
 extern "C" {
-#include <nsmlib2.h>
+#include "nsm/nsmlib2.h"
 }
 
 #include <iostream>

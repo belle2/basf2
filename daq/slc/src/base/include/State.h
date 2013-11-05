@@ -1,7 +1,7 @@
 #ifndef _Belle2_State_hh
 #define _Belle2_State_hh
 
-#include "Enum.h"
+#include "base/Enum.h"
 
 namespace Belle2 {
 
@@ -19,7 +19,6 @@ namespace Belle2 {
     static const State STOPPING_TS;
     static const State ERROR_ES;
     static const State FATAL_ES;
-    static const State RECOVERING_RS;
     static const State ABORTING_RS;
 
   public:

@@ -1,12 +1,12 @@
 #ifndef _Belle2_CanvasPanel_hh
 #define _Belle2_CanvasPanel_hh
 
-#include "GAxis.h"
-#include "Shape.h"
-#include "Panel.h"
-#include "Pad.h"
-#include "Legend.h"
-#include "Graph1.h"
+#include "dqm/GAxis.h"
+#include "dqm/Shape.h"
+#include "dqm/Panel.h"
+#include "dqm/Pad.h"
+#include "dqm/Legend.h"
+#include "dqm/Graph1.h"
 
 namespace Belle2 {
 

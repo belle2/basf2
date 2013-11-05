@@ -1,8 +1,8 @@
 #ifndef _Belle2_Histo2C_hh
 #define _Belle2_Histo2C_hh
 
-#include "Histo2.h"
-#include "CharArray.h"
+#include "dqm/Histo2.h"
+#include "dqm/CharArray.h"
 
 namespace Belle2 {
 

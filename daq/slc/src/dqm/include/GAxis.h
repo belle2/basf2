@@ -1,8 +1,8 @@
 #ifndef _Belle2_GAxis_hh
 #define _Belle2_GAxis_hh
 
-#include "Axis.h"
-#include "Shape.h"
+#include "dqm/Axis.h"
+#include "dqm/Shape.h"
 
 #include <map>
 #include <vector>

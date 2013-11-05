@@ -1,38 +1,36 @@
 #ifndef _Belle2_GUICommunicator_hh
 #define _Belle2_GUICommunicator_hh
 
-#include "HostCommunicator.h"
-#include "NSMDataManager.h"
+#include "xml/NodeLoader.h"
 
-#include <xml/NodeLoader.h>
+#include "database/DBInterface.h"
 
-#include <database/DBInterface.h>
+#include "system/Mutex.h"
+#include "system/TCPSocketWriter.h"
+#include "system/TCPSocketReader.h"
+#include "system/BufferedWriter.h"
 
-#include <system/TCPServerSocket.h>
-#include <system/Mutex.h>
-#include <system/TCPSocketWriter.h>
-#include <system/TCPSocketReader.h>
-#include <system/BufferedWriter.h>
+#include "RunControlMessage.h"
 
 namespace Belle2 {
 
-  class GUICommunicator : public HostCommunicator {
+  class GUICommunicator {
 
   public:
-    GUICommunicator(const TCPServerSocket& server_socket,
+    GUICommunicator(const std::string& host, int port,
                     DBInterface* db, NodeLoader* loader)
-      : _server_socket(server_socket), _loader(loader), _db(db) {}
-    virtual ~GUICommunicator() throw() {}
+      : _host(host), _port(port), _loader(loader), _db(db) {}
+    ~GUICommunicator() throw() {}
 
   public:
-    virtual bool init() throw(IOException);
-    virtual bool reset() throw();
-    virtual RunControlMessage waitMessage() throw(IOException);
-    virtual void sendMessage(const RunControlMessage& message)
+    void run();
+    void sendMessage(const RunControlMessage& message)
     throw(IOException);
+    bool isReady() { return _is_ready; }
 
   private:
-    TCPServerSocket _server_socket;
+    std::string _host;
+    int _port;
     NodeLoader* _loader;
     DBInterface* _db;
     TCPSocket _socket;
@@ -40,7 +38,7 @@ namespace Belle2 {
     TCPSocketReader _reader;
     BufferedWriter _buf;
     Mutex _mutex;
-
+    bool _is_ready;
   };
 
 }

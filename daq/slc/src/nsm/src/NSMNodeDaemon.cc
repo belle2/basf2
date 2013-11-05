@@ -1,8 +1,9 @@
-#include "NSMNodeDaemon.h"
+#include "nsm/NSMNodeDaemon.h"
 
-#include "NSMCommunicator.h"
+#include "nsm/NSMCommunicator.h"
 
 #include "base/Debugger.h"
+#include "base/StringUtil.h"
 
 #include <unistd.h>
 
@@ -14,7 +15,10 @@ void NSMNodeDaemon::run() throw()
   nsm_comm->setCallback(_callback);
   while (true) {
     try {
-      nsm_comm->init();
+      if (_port1 < 0)
+        nsm_comm->init();
+      else
+        nsm_comm->init(_host1, _port1);
       break;
     } catch (const NSMHandlerException& e) {
       Belle2::debug("[DEBUG] Failed to connect NSM network. Re-trying to connect...");
@@ -46,9 +50,19 @@ void NSMNodeDaemon::run() throw()
       if (nsm_comm->wait(2000)) {
         NSMMessage msg = nsm_comm->getMessage();
         Command command = msg.getRequestName();
-        int npar = msg.getNParams();
-        const unsigned int* pars = msg.getParams();
-        _node->setParams(command, npar, pars, msg.getData());
+        if (_node->getData() != NULL) {
+          DataObject::ParamPriority priority = DataObject::NONE;
+          if (command == Command::BOOT) {
+            priority = DataObject::BOOT;
+          } else if (command == Command::LOAD) {
+            priority = DataObject::LOAD;
+          } else if (command == Command::TRIGFT) {
+            priority = DataObject::TRIGFT;
+          }
+          const unsigned int* pars = msg.getParams();
+          std::vector<std::string> datap = Belle2::split(msg.getData(), '\n');
+          _node->getData()->getFromMessage(priority, pars, 0, datap);
+        }
         _node->setConnection(Connection::ONLINE);
         nsm_comm->performCallback();
       } else {

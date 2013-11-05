@@ -1,7 +1,7 @@
 #ifndef _Belle2_VerticalRange_hh
 #define _Belle2_VerticalRange_hh
 
-#include "Range.h"
+#include "dqm/Range.h"
 
 namespace Belle2 {
 

@@ -1,7 +1,7 @@
 #ifndef _Belle2_TablePanel_hh
 #define _Belle2_TablePanel_hh
 
-#include "Panel.h"
+#include "dqm/Panel.h"
 
 namespace Belle2 {
 

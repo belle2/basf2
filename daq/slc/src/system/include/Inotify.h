@@ -1,7 +1,7 @@
 #ifndef _Belle2_Inotify_hh
 #define _Belle2_Inotify_hh
 
-#include "FileDescriptor.h"
+#include "system/FileDescriptor.h"
 
 #include <vector>
 

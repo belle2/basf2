@@ -1,7 +1,5 @@
 #include "MessageBox.h"
 
-#include <iostream>
-
 using namespace Belle2;
 
 MessageBox MessageBox::__box;

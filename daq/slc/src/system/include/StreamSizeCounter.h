@@ -1,7 +1,7 @@
 #ifndef _Belle2_StreamSizeCounter_hh
 #define _Belle2_StreamSizeCounter_hh
 
-#include "base/Writer.h"
+#include "base//Writer.h"
 
 namespace Belle2 {
 

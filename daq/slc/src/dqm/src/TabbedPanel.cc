@@ -1,4 +1,4 @@
-#include "TabbedPanel.h"
+#include "dqm/TabbedPanel.h"
 
 #include <sstream>
 

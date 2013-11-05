@@ -1,10 +1,10 @@
 #ifndef _Belle2_MessageBox_hh
 #define _Belle2_MessageBox_hh
 
-#include "RunControlMessage.h"
+#include "system/Mutex.h"
+#include "system/Cond.h"
 
-#include <system/Mutex.h>
-#include <system/Cond.h>
+#include "RunControlMessage.h"
 
 #include <queue>
 

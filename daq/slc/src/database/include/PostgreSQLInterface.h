@@ -1,7 +1,7 @@
 #ifndef _Belle2_PostgreSQLInterface_hh
 #define _Belle2_PostgreSQLInterface_hh
 /*
-#include "DBInterface.h"
+#include "database/DBInterface.h"
 
 #include <libpq-fe.h>
 

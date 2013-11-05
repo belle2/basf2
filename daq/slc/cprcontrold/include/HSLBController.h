@@ -1,20 +1,27 @@
 #ifndef _Belle2_HSLBController_hh
 #define _Belle2_HSLBController_hh
 
-#include <base/HSLB.h>
+#include "base/DataObject.h"
 
-#include <mgt.h>
+#include <mgt/mgt.h>
 
 namespace Belle2 {
+
+  struct HSLBRegister {
+  public:
+    std::string name;
+    int address;
+    int size;
+  };
 
   class HSLBController {
 
   public:
-    HSLBController(int slot = -1, HSLB* hslb = NULL);
+    HSLBController(int slot = -1, DataObject* hslb = NULL);
     ~HSLBController() throw();
 
   public:
-    void setHSLB(int slot, HSLB* hslb) {
+    void setHSLB(int slot, DataObject* hslb) {
       _slot = slot;
       _hslb = hslb;
     }
@@ -23,13 +30,12 @@ namespace Belle2 {
     bool boot() throw();
     bool reset() throw();
     bool load() throw();
-    //bool start() throw();
-    //bool stop() throw();
 
   private:
     int _slot;
-    HSLB* _hslb;
+    DataObject* _hslb;
     Mgt_t* _mgt;
+    std::vector<HSLBRegister> _reg_v;
 
   };
 

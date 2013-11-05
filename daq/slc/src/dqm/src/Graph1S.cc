@@ -1,6 +1,6 @@
-#include "Graph1S.h"
+#include "dqm/Graph1S.h"
 
-#include "ShortArray.h"
+#include "dqm/ShortArray.h"
 
 using namespace Belle2;
 

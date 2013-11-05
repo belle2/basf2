@@ -1,4 +1,4 @@
-#include "Text.h"
+#include "dqm/Text.h"
 
 #include "base/StringUtil.h"
 

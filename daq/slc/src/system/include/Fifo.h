@@ -1,7 +1,7 @@
 #ifndef _Belle2_Fifo_hh
 #define _Belle2_Fifo_hh
 
-#include "FileDescriptor.h"
+#include "system/FileDescriptor.h"
 
 #include "base/IOException.h"
 

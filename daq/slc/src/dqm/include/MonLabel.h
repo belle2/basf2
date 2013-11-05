@@ -1,8 +1,8 @@
 #ifndef _Belle2_MonLabel_hh
 #define _Belle2_MonLabel_hh
 
-#include "MonShape.h"
-#include "CharArray.h"
+#include "dqm/MonShape.h"
+#include "dqm/CharArray.h"
 
 namespace Belle2 {
 

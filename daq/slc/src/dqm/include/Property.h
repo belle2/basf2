@@ -1,7 +1,7 @@
 #ifndef _Belle2_Property_hh
 #define _Belle2_Property_hh
 
-#include "MonColor.h"
+#include "dqm/MonColor.h"
 
 #include <string>
 

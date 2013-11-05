@@ -1,4 +1,4 @@
-#include "MonLabel.h"
+#include "dqm/MonLabel.h"
 
 #include <cstring>
 #include <sstream>

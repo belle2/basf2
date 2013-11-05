@@ -1,7 +1,7 @@
 #ifndef _Belle2_Reader_hh
 #define _Belle2_Reader_hh
 
-#include "IOException.h"
+#include "base/IOException.h"
 
 namespace Belle2 {
 

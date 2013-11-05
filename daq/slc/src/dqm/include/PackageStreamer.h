@@ -1,10 +1,10 @@
 #ifndef _Belle2_PackageStreamer_hh
 #define _Belle2_PackageStreamer_hh
 
-#include "system/Writer.h"
-#include "system/Reader.h"
+#include <system/Writer.h"
+#include <system/Reader.h"
 
-#include "HistoPackage.h"
+#include "dqm/HistoPackage.h"
 
 namespace Belle2 {
 

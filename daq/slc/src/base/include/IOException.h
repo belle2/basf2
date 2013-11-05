@@ -1,7 +1,7 @@
 #ifndef _Belle2_IOException_hh
 #define _Belle2_IOException_hh
 
-#include "Exception.h"
+#include "base/Exception.h"
 
 namespace Belle2 {
 

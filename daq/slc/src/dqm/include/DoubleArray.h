@@ -1,7 +1,7 @@
 #ifndef DoubleArray_hh
 #define DoubleArray_hh
 
-#include "NumberArray.h"
+#include "dqm/NumberArray.h"
 
 namespace Belle2 {
 

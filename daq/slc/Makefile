@@ -1,13 +1,11 @@
 .PHONY: all runcontrold cprcontrold rocontrold full clean ttdd 
 
 all:
-	make -C nsm2/
 	make -C src/
 	make -C vmecontrold/
 	make -C bin/
 
 full:
-	make -C nsm2/
 	make -C src/ full
 	make -C templated/
 	make -C vmecontrold/
@@ -28,7 +26,6 @@ clean:
 	make -C nsmmonitor/ clean
 #	make -C ttdd/ clean
 	make -C src/ clean
-	make -C nsm2/ clean
 	make -C bin/ clean
 
 dqm:

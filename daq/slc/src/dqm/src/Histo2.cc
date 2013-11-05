@@ -1,4 +1,4 @@
-#include "Histo2.h"
+#include "dqm/Histo2.h"
 
 using namespace Belle2;
 

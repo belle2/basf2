@@ -1,8 +1,8 @@
 #ifndef _Belle2_MonPieTable_hh
 #define _Belle2_MonPieTable_hh
 
-#include "MonShape.h"
-#include "FloatArray.h"
+#include "dqm/MonShape.h"
+#include "dqm/FloatArray.h"
 
 namespace Belle2 {
 

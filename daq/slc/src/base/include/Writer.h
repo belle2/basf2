@@ -1,7 +1,7 @@
 #ifndef _Belle2_Writer_hh
 #define _Belle2_Writer_hh
 
-#include "IOException.h"
+#include "base/IOException.h"
 
 namespace Belle2 {
 

@@ -1,8 +1,8 @@
 #ifndef _Belle2_RefObject_hh
 #define _Belle2_RefObject_hh
 
-#include "Shape.h"
-#include "Histo.h"
+#include "dqm/Shape.h"
+#include "dqm/Histo.h"
 
 namespace Belle2 {
 

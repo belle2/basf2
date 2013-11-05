@@ -1,9 +1,9 @@
 #ifndef _Belle2_RunControlMessage_hh
 #define _Belle2_RunControlMessage_hh
 
-#include <base/Command.h>
+#include "base/Command.h"
 
-#include <nsm/NSMMessage.h>
+#include "nsm/NSMMessage.h"
 
 #include <queue>
 
@@ -40,6 +40,11 @@ namespace Belle2 {
       _id = id;
       _msg = msg;
     }
+    RunControlMessage(HostID id, const Command& command, const NSMMessage& msg) {
+      _id = id;
+      _command = command;
+      _msg = msg;
+    }
     ~RunControlMessage() throw() {}
 
   public:
@@ -47,10 +52,14 @@ namespace Belle2 {
     void setMessage(const NSMMessage& msg) { _msg = msg; }
     HostID getId() { return _id; }
     const NSMMessage& getMessage() const { return _msg; }
+    NSMMessage& getMessage() { return _msg; }
     void setCommand(const Command& command) throw() {
       _command = command;
     }
     const Command& getCommand() const throw() {
+      return _command;
+    }
+    Command& getCommand() throw() {
       return _command;
     }
 

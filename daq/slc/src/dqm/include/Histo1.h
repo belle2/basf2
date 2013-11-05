@@ -1,7 +1,7 @@
 #ifndef _Belle2_Histo1_hh
 #define _Belle2_Histo1_hh
 
-#include "Histo.h"
+#include "dqm/Histo.h"
 
 namespace Belle2 {
 

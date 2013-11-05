@@ -1,4 +1,4 @@
-#include "StreamSizeCounter.h"
+#include "system/StreamSizeCounter.h"
 
 using namespace Belle2;
 

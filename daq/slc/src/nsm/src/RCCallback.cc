@@ -1,12 +1,8 @@
-#include "RCCallback.h"
+#include "nsm/RCCallback.h"
+#include "nsm/NSMCommunicator.h"
 
-#include "NSMCommunicator.h"
-
-#include <base/Debugger.h>
-
-#include <belle2nsm.h>
-
-#include <cstdlib>
+#include "base/Debugger.h"
+#include "base/ConfigFile.h"
 
 using namespace Belle2;
 
@@ -18,12 +14,6 @@ bool RCCallback::perform(NSMMessage& msg) throw(NSMHandlerException)
   } else if (cmd == Command::ERROR) {
     return error();
   }
-  /*
-  Belle2::debug("Node = %s", msg.getNodeName());
-  Belle2::debug("Request = %s", msg.getRequestName());
-  Belle2::debug("Command = %s", cmd.getLabel());
-  Belle2::debug("State = %s", _node->getState().getLabel());
-  */
   if (cmd.isAvailable(_node->getState()) == 0) {
     return false;
   }
@@ -39,8 +29,6 @@ bool RCCallback::perform(NSMMessage& msg) throw(NSMHandlerException)
     result = start();
   } else if (cmd == Command::STOP) {
     result = stop();
-  } else if (cmd == Command::RECOVER) {
-    result = recover();
   } else if (cmd == Command::RESUME) {
     result = resume();
   } else if (cmd == Command::PAUSE) {
@@ -49,6 +37,8 @@ bool RCCallback::perform(NSMMessage& msg) throw(NSMHandlerException)
     result = abort();
   } else if (cmd == Command::TRIGFT) {
     result = trigft();
+  } else if (cmd == Command::SETPARAMS) {
+    result = setparams();
   } else if (cmd == Command::STATECHECK) {
     com->replyOK(_node, "");
     return true;
@@ -75,30 +65,17 @@ RCCallback::RCCallback(NSMNode* node) throw()
   add(Command::LOAD);
   add(Command::START);
   add(Command::STOP);
-  add(Command::RECOVER);
-  //add(Command::RESUME);
-  //add(Command::PAUSE);
+  add(Command::RESUME);
+  add(Command::PAUSE);
   add(Command::ABORT);
   add(Command::STATECHECK);
-  const char* rc_name = getenv("RC_NAME");
-  if (rc_name != NULL) {
-    _rc_node = new NSMNode(rc_name);
-  }
+  add(Command::SETPARAMS);
 }
 
-void RCCallback::reportState() throw(NSMHandlerException)
+bool RCCallback::setparams() throw()
 {
-  if (_rc_node != NULL) {
-    getCommunicator()->sendRequest(_rc_node, Command::OK,
-                                   0, 0, _node->getState().getLabel());
-  }
+  ConfigFile config(_node->getName());
+  _node->getData()->readValueString(config);
+  return true;
 }
 
-void RCCallback::reportError(const std::string& str)
-throw(NSMHandlerException)
-{
-  if (_rc_node != NULL) {
-    getCommunicator()->sendRequest(_rc_node, Command::ERROR,
-                                   0, 0, str.c_str());
-  }
-}

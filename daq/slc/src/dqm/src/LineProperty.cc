@@ -1,4 +1,4 @@
-#include "LineProperty.h"
+#include "dqm/LineProperty.h"
 
 #include <sstream>
 

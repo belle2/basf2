@@ -4,7 +4,7 @@
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 
-#include "XMLElement.h"
+#include "xml/XMLElement.h"
 
 namespace Belle2 {
 

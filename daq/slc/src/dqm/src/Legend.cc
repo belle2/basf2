@@ -1,4 +1,4 @@
-#include "Legend.h"
+#include "dqm/Legend.h"
 
 #include <sstream>
 

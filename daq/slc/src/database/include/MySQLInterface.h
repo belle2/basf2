@@ -1,7 +1,7 @@
 #ifndef _Belle2_MySQLInterface_hh
 #define _Belle2_MySQLInterface_hh
 
-#include "DBInterface.h"
+#include "database/DBInterface.h"
 
 #include <mysql.h>
 

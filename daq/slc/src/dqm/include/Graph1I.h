@@ -1,9 +1,9 @@
 #ifndef _Belle2_Graph1I_hh
 #define _Belle2_Graph1I_hh
 
-#include "Graph1.h"
+#include "dqm/Graph1.h"
 
-#include "IntArray.h"
+#include "dqm/IntArray.h"
 
 namespace Belle2 {
 

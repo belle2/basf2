@@ -1,7 +1,7 @@
 #ifndef _Belle2_Cond_hh
 #define _Belle2_Cond_hh
 
-#include "Mutex.h"
+#include "system/Mutex.h"
 
 namespace Belle2 {
 

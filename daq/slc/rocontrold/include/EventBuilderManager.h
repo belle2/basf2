@@ -1,14 +1,14 @@
 #ifndef _Belle2_EventBuilderManager_hh
 #define _Belle2_EventBuilderManager_hh
 
-#include <base/RONode.h>
+#include "base/NSMNode.h"
 
 namespace Belle2 {
 
   class EventBuilderManager {
 
   public:
-    EventBuilderManager(RONode* node = NULL)
+    EventBuilderManager(NSMNode* node = NULL)
       : _node(node) {}
     virtual ~EventBuilderManager() {}
 
@@ -16,7 +16,7 @@ namespace Belle2 {
     virtual void run() throw();
 
   private:
-    RONode* _node;
+    NSMNode* _node;
 
   };
 

@@ -1,7 +1,7 @@
 #ifndef _Belle2_Text_hh
 #define _Belle2_Text_hh
 
-#include "Shape.h"
+#include "dqm/Shape.h"
 
 namespace Belle2 {
 

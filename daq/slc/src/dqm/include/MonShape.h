@@ -1,8 +1,8 @@
 #ifndef _Belle2_MonShape_hh
 #define _Belle2_MonShape_hh
 
-#include "MonObject.h"
-#include "MonColor.h"
+#include "dqm/MonObject.h"
+#include "dqm/MonColor.h"
 
 namespace Belle2 {
 

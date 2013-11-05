@@ -1,4 +1,4 @@
-#include "Shape.h"
+#include "dqm/Shape.h"
 
 using namespace Belle2;
 

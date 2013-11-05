@@ -1,8 +1,8 @@
 #ifndef _Belle2_MonLine_hh
 #define _Belle2_MonLine_hh
 
-#include "MonShape.h"
-#include "DoubleArray.h"
+#include "dqm/MonShape.h"
+#include "dqm/DoubleArray.h"
 
 namespace Belle2 {
 

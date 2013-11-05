@@ -4,11 +4,10 @@
 #include "RecieverManager.h"
 #include "EventBuilderManager.h"
 
-#include <system/Fork.h>
+#include "system/Fork.h"
 
-#include <base/RONode.h>
-#include <base/Debugger.h>
-#include <base/StringUtil.h>
+#include "base/Debugger.h"
+#include "base/StringUtil.h"
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -21,7 +20,7 @@
 
 using namespace Belle2;
 
-ROCallback::ROCallback(RONode* node)
+ROCallback::ROCallback(NSMNode* node)
   : RCCallback(node), _node(node)
 {
   _buf_config = NULL;

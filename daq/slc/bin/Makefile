@@ -3,7 +3,7 @@ all:
 	@ rm -f *d nsmd2 *.h
 	@ ln -s $(BELLE2_DAQ_SLC_DIR)/nsm2/daemon/nsmd2
 	@ ln -s $(BELLE2_DAQ_SLC_DIR)/vmecontrold/bin/vmecontrold
-	@ rm cui; cp $(BELLE2_DAQ_SLC_DIR)/nsm2/example/master cui
+	@ rm -f cui; cp $(BELLE2_DAQ_SLC_DIR)/nsm2/example/master cui
 
 full:
 	@ rm -f *d nsmd2 *.h

@@ -16,7 +16,7 @@ MAIN       = src/b2dqm/java/Belle2DQMBrowser.java
 JARFILE  = $(JARDIR)/b2dqm.jar
 JAREXE  = $(JARDIR)/b2dqm-exe.jar
 
-JAVALIB_PATH = $(BELLE2_DAQ_SLC_DIR)/javalib
+JAVALIB_PATH = $(BELLE2_DAQ_SLC_DIR)/tools/javalib
 
 CLASSPATH  = $(JAVALIB_PATH)/b2daq/classes:$(SRCDIR)
 SOURCEPATH = $(JAVALIB_PATH)/b2daq/src:$(SRCDIR)

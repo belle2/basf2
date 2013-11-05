@@ -24,8 +24,6 @@ CLASSPATH = $(SRCDIR)
 
 JFLAG = -classpath $(CLASSPATH) -d $(OUTDIR) -sourcepath $(SRCDIR)
 
-WEBJARDIR = $(DCONLINE_WEB_HOME)/java/jars
-
 all : $(OBJS) 
 
 jar : 
@@ -41,9 +39,3 @@ clean:
 	@ echo '<< cleaning directory >>'
 	@ $(RM) *~ $(OUTDIR) $(BINDIR) $(JARDIR) $(CONDIR)
 
-install: $(JARTARGET)
-	@ echo '<< installing jar files to html directory >>'
-	@ $(CP) $(JARTARGET) $(WEBJARDIR)
-
-ant:
-	@ ant

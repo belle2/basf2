@@ -16,7 +16,7 @@ MAIN       = src/b2gui/java/Belle2GUILauncherJavaGUI.java
 JARFILE    = $(JARDIR)/b2gui.jar
 JAREXE     = $(JARDIR)/b2gui-exe.jar
 
-B2JAVA_PATH = $(BELLE2_DAQ_SLC_DIR)/javalib
+B2JAVA_PATH = $(BELLE2_DAQ_SLC_DIR)/tools/javalib
 
 CLASSPATH  = $(B2JAVA_PATH)/b2daq/classes:$(B2JAVA_PATH)/b2dqm/classes:$(B2JAVA_PATH)/b2rc/classes
 SOURCEPATH = $(SRCDIR)

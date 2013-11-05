@@ -5,7 +5,7 @@
 #include "database/DBObjectLoader.h"
 
 #include "system/Time.h"
-#include "system/Date.h"
+#include "base/Date.h"
 
 #include "base/Debugger.h"
 #include "base/StringUtil.h"

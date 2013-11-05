@@ -76,7 +76,7 @@ namespace Belle2 {
     private:
 
       //! Assume line track to calculate  distance between track and wire (drift length).
-      G4double ClosestApproach(G4int layerId, G4int cellId, G4ThreeVector posIn, G4ThreeVector posOut, G4ThreeVector& hitPosition);//,G4double& transferT);
+      G4double ClosestApproach(G4ThreeVector bwp, G4ThreeVector fwp, G4ThreeVector posIn, G4ThreeVector posOut, G4ThreeVector& hitPosition, G4ThreeVector& wirePosition);//,G4double& transferT);
 
       //! Calculate intersection of track with cell boundary.
       /*!

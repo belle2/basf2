@@ -125,6 +125,14 @@ EVEVisualization::EVEVisualization():
   m_gftracklist = new TEveTrackList("Fitted tracks", m_gftrackpropagator);
   m_gftracklist->IncDenyDestroy();
 
+  m_calo3d = new TEveCalo3D(NULL, "ECLHits");
+  m_calo3d->SetBarrelRadius(125.80); //inner radius of ECL barrel
+  m_calo3d->SetForwardEndCapPos(196.5); //inner edge of forward endcap
+  m_calo3d->SetBackwardEndCapPos(-102.0); //inner edge of backward endcap
+  m_calo3d->SetMaxValAbs(2.1);
+  m_calo3d->SetRnrFrame(false, false); //don't show crystal grid
+  m_calo3d->IncDenyDestroy();
+
   clearEvent();
 }
 
@@ -144,6 +152,7 @@ EVEVisualization::~EVEVisualization()
   delete m_trackcandlist;
   delete m_trackpropagator;
   delete m_gftrackpropagator;
+  delete m_calo3d;
 }
 
 void EVEVisualization::enableVolume(const char* name, bool only_daughters, bool enable)
@@ -853,14 +862,9 @@ void EVEVisualization::makeTracks()
   m_eclsimhitdata->DataChanged(); //update limits (Empty() won't work otherwise)
   if (!m_eclsimhitdata->Empty()) {
     m_eclsimhitdata->SetAxisFromBins();
-    m_calo3d = new TEveCalo3D(m_eclsimhitdata, "ECLHits");
-    m_calo3d->SetBarrelRadius(125.80); //inner radius of ECL barrel
-    m_calo3d->SetForwardEndCapPos(196.5); //inner edge of forward endcap
-    m_calo3d->SetBackwardEndCapPos(-102.0); //inner edge of backward endcap
-    m_calo3d->SetMaxValAbs(2.1);
-    m_calo3d->SetRnrFrame(false, false); //don't show crystal grid
-    gEve->AddElement(m_calo3d);
+    m_calo3d->SetData(m_eclsimhitdata);
   }
+  gEve->AddElement(m_calo3d);
 
   if (m_unassignedRecoHits) {
     if (m_unassignedRecoHits->GetLinePlex().Size() == 0 && m_unassignedRecoHits->GetMarkerPlex().Size() != 0) {
@@ -885,6 +889,10 @@ void EVEVisualization::clearEvent()
   if (m_trackcandlist)
     m_trackcandlist->DestroyElements();
 
+
+  //remove ECL data from event
+  m_calo3d->SetData(NULL);
+  m_calo3d->DestroyElements();
 
   //lower energy threshold for ECL
   float ecl_threshold = 0.01;

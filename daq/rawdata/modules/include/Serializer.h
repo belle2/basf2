@@ -67,7 +67,7 @@ namespace Belle2 {
     virtual void endRun();
     virtual void terminate();
 
-    virtual void SendByWriteV(RawDataBlock* rawdblk);
+    virtual int SendByWriteV(RawDataBlock* rawdblk);
     //    virtual void Connect(const char* hostname, const int port);
     virtual void Accept();
 
@@ -133,7 +133,14 @@ namespace Belle2 {
 
     //! EvtSocket
     EvtSocketSend* m_sock;
+
     double m_start_time;
+
+    double m_prev_time;
+
+    unsigned int m_prev_nevt;
+
+    double m_prev_totbytes;
 
     double time_array0[1000];
     double time_array1[1000];
@@ -151,6 +158,9 @@ namespace Belle2 {
 
     //! error message program
     ErrorMessage print_err;
+
+    //! sent data size
+    int m_totbytes;
 
   };
 

@@ -214,7 +214,7 @@ void SerializerModule::FillSendHeaderTrailer(SendHeader* hdr, SendTrailer* trl,
 }
 
 
-void SerializerModule::SendByWriteV(RawDataBlock* rawdblk)
+int SerializerModule::SendByWriteV(RawDataBlock* rawdblk)
 {
 
 
@@ -338,7 +338,7 @@ void SerializerModule::SendByWriteV(RawDataBlock* rawdblk)
   //   printf("n %d total %d\n", n, total_send_bytes);
   //  delete temp_buf;
 
-  return;
+  return total_send_bytes;
 
 }
 
@@ -503,7 +503,7 @@ void SerializerModule::event()
 
 #ifdef NOT_USE_SOCKETLIB
 
-    SendByWriteV(raw_dblkarray[ j ]);
+    m_totbytes += SendByWriteV(raw_dblkarray[ j ]);
 
 #else //NOT_USE_SOCKETLIB
     // Use basf2 send library
@@ -521,6 +521,33 @@ void SerializerModule::event()
 #ifdef TIME_MONITOR
   RecordTime(n_basf2evt, time_array2);
 #endif
+
+
+  //
+  // Print current status
+  //
+  if (n_basf2evt % 100 == 0) {
+    double cur_time = GetTimeSec();
+    double total_time = cur_time - m_start_time;
+    double interval = cur_time - m_prev_time;
+    if (n_basf2evt != 0) {
+      double multieve = (1. / interval);
+      if (multieve > 2.) multieve = 2.;
+    }
+
+
+    time_t timer;
+    struct tm* t_st;
+    time(&timer);
+    t_st = localtime(&timer);
+    printf("Event %d TotSent  %.1lf [MB] ElapsedTime %.1lf [s] EvtRate %.2lf [kHz] RcvdRate %.2lf [MB/s] %s",
+           n_basf2evt, m_totbytes / 1.e6, total_time, (n_basf2evt - m_prev_nevt) / interval / 1.e3 * NUM_EVT_PER_BASF2LOOP, (m_totbytes - m_prev_totbytes) / interval / 1.e6, asctime(t_st));
+    fflush(stdout);
+    m_prev_time = cur_time;
+    m_prev_totbytes = m_totbytes;
+    m_prev_nevt = n_basf2evt;
+  }
+
 
   n_basf2evt++;
 

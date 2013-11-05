@@ -61,8 +61,6 @@ DeSerializerPCModule::~DeSerializerPCModule()
 void DeSerializerPCModule::initialize()
 {
   B2INFO("DeSerializerPC: initialize() started.");
-  // Accept requests for connections
-  Connect();
 
   // allocate buffer
   for (int i = 0 ; i < NUM_PREALLOC_BUF; i++) {
@@ -367,6 +365,9 @@ void DeSerializerPCModule::event()
   //   printf("EVE %d\n",n_basf2evt);
   //   fflush(stdout);
   if (n_basf2evt < 0) {
+    // Accept requests for connections
+    Connect();
+
     B2INFO("DeSerializerPC: event() started.");
     m_start_time = GetTimeSec();
     n_basf2evt = 0;

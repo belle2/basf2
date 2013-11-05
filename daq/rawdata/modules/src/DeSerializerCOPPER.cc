@@ -335,6 +335,17 @@ int* DeSerializerCOPPERModule::ReadOneEventFromCOPPERFIFO(const int entry, int* 
       recvd_byte += Read(cpr_fd, (char*)(m_bufary[ entry ]) + recvd_byte,
                          (*m_size_word - RawTrailer::RAWTRAILER_NWORDS) * sizeof(int) - recvd_byte);
     }
+
+    if ((int)((*m_size_word - RawTrailer::RAWTRAILER_NWORDS) * sizeof(int)) != recvd_byte) {
+      char    err_buf[500];
+      sprintf(err_buf, "Read less bytes(%d) than expected(%d:%d). Exiting...\n",
+              recvd_byte,
+              *m_size_word * sizeof(int) - RawTrailer::RAWTRAILER_NWORDS * sizeof(int),
+              m_bufary[ entry ][ RawCOPPER::POS_DATA_LENGTH ],  RawCOPPER::POS_DATA_LENGTH);
+      print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      exit(-1);
+    }
+
   } else if ((int)((*m_size_word - RawTrailer::RAWTRAILER_NWORDS) * sizeof(int)) < recvd_byte) {
     char    err_buf[500];
     sprintf(err_buf, "Read more than data size. Exiting...: %d %d %d %d %d\n", recvd_byte, *m_size_word * sizeof(int) , RawTrailer::RAWTRAILER_NWORDS * sizeof(int), m_bufary[ entry ][ RawCOPPER::POS_DATA_LENGTH ],  RawCOPPER::POS_DATA_LENGTH);
@@ -342,8 +353,6 @@ int* DeSerializerCOPPERModule::ReadOneEventFromCOPPERFIFO(const int entry, int* 
 
     exit(-1);
   }
-  m_totbytes +=  recvd_byte - RawHeader::RAWHEADER_NWORDS * sizeof(int);
-
 #else
   //
   // Make dummy data
@@ -505,14 +514,12 @@ void DeSerializerCOPPERModule::event()
   // Print current status
   //
   if (n_basf2evt % 100 == 0) {
-    //  if ( ( n_basf2evt - m_prev_nevt ) > monitor_numeve ) {
     double cur_time = GetTimeSec();
     double total_time = cur_time - m_start_time;
     double interval = cur_time - m_prev_time;
     if (n_basf2evt != 0) {
       double multieve = (1. / interval);
       if (multieve > 2.) multieve = 2.;
-      monitor_numeve = (int)(multieve * (n_basf2evt - m_prev_nevt)) + 1;
     }
 
 

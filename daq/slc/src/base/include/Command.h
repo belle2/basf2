@@ -18,6 +18,7 @@ namespace Belle2 {
     static const Command LOAD;
     static const Command START;
     static const Command STOP;
+    static const Command RECOVER;
     static const Command RESUME;
     static const Command PAUSE;
     static const Command ABORT;

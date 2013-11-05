@@ -29,6 +29,8 @@ bool RCCallback::perform(NSMMessage& msg) throw(NSMHandlerException)
     result = start();
   } else if (cmd == Command::STOP) {
     result = stop();
+  } else if (cmd == Command::RECOVER) {
+    result = recover();
   } else if (cmd == Command::RESUME) {
     result = resume();
   } else if (cmd == Command::PAUSE) {
@@ -65,9 +67,10 @@ RCCallback::RCCallback(NSMNode* node) throw()
   add(Command::LOAD);
   add(Command::START);
   add(Command::STOP);
-  add(Command::RESUME);
-  add(Command::PAUSE);
-  add(Command::ABORT);
+  add(Command::RECOVER);
+  //add(Command::RESUME);
+  //add(Command::PAUSE);
+  //add(Command::ABORT);
   add(Command::STATECHECK);
   add(Command::SETPARAMS);
 }

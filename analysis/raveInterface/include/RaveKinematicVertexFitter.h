@@ -41,7 +41,7 @@ namespace Belle2 {
       /** The default constructor checks if RaveSetup was initialized and will set the attributes of RaveKinematicVertexFitter */
       RaveKinematicVertexFitter();
 
-      RaveKinematicVertexFitter(std::string howToInterfaceRave);
+      //RaveKinematicVertexFitter(std::string howToInterfaceRave);
       /** Destructor */
       ~RaveKinematicVertexFitter();
       /** add a track (in the format of a Belle2::Particle) to set of tracks that should be fitted to a vertex */
@@ -78,7 +78,7 @@ namespace Belle2 {
           m_useBeamSpot = false;
         }
       }
-
+      /** returns a pointer to the updated mother particle */
       Particle* getMother();
 
       /* TLorentzVector get4Vector(std::vector<int>::size_type vertexId = 0){ */
@@ -114,16 +114,22 @@ namespace Belle2 {
 
       /** Set mass constrained fit   */
       void setMassConstFit(bool isConstFit = true);
-      void setVertFit(bool isConstFit = true);
+      /** Set vertex fit: set false in case of mass fit only*/
+      void setVertFit(bool isVertFit = true);
 
 
     protected:
 
-      bool m_useBeamSpot; /**< flag determines if the beam spot will be used or not. Overwrites the global flag in RaveSetup */
+      /**< flag determines if the beam spot will be used or not. Overwrites the global flag in RaveSetup */
+      bool m_useBeamSpot;
 
-      /*const*/ Particle* m_motherParticlePtr; /**< pointer to the mother particle who's  daughters will be used in the fit. the fit result will be written back to the mother particle*/
+      /**< pointer to the mother particle who's  daughters will be used in the fit. the fit result will be written back to the mother particle*/
+      Particle* m_motherParticlePtr;
+
+      /** Algorithm used by rave (kalman, avr, ...)*/
       std::string m_raveAlgorithm;
 
+      /** the output of the kinematic fit*/
       rave::KinematicTree m_fittedResult;
 
       /** holds the tracks that were added to a RaveVertexFitter object in the format used by Rave*/
@@ -132,16 +138,26 @@ namespace Belle2 {
       /** holds the fitted vertices after fit() was called in the format used by Rave*/
       std::vector < rave::Vertex > m_raveVertices;
 
-      std::vector< rave::KinematicParticle > m_inputParticles; /** input particles for vertex fit in rave format */
-      rave::KinematicParticle m_fittedParticle;    /** fit output */
+      /** input particles for vertex fit in rave format */
+      std::vector< rave::KinematicParticle > m_inputParticles;
+      /** Particle fit output */
+      rave::KinematicParticle m_fittedParticle;
 
+      /** flag determines if the mass fit is performed */
       bool m_massConstFit;
+      /** flag determines if the vertex fit is performed */
       bool m_vertFit;
+      /** Ndf of the vertex fit*/
       double m_fittedNdf;
+      /** Pvalue of the fit result */
       double m_fittedPValue;
+      /** chi^2 of the vertex fit*/
       double m_fittedChi2;
+      /** Fitted vertex position*/
       TVector3 m_fittedPos;
+      /** 4 momentum of the mother particle after the fit */
       TLorentzVector m_fitted4Vector;
+      /** 7x7 errror matrix of the mother particle after the fit */
       TMatrixFSym m_fitted7Cov;
 
     };

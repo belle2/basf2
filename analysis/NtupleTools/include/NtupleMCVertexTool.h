@@ -26,10 +26,13 @@ namespace Belle2 {
       to a flat ntuple. */
   class NtupleMCVertexTool : public NtupleFlatTool {
   private:
-    /** Vertex position. */
+    /** Truth Vertex position X. */
     float* m_fTruthX;
+    /** Truth Vertex position Y. */
     float* m_fTruthY;
+    /** Truth Vertex position Z. */
     float* m_fTruthZ;
+    /** Truth Vertex position Sqrt(X^2+Y^2). */
     float* m_fTruthRho;
     /** Create branches in m_tree - this function should be called by the constructor only. */
     void setupTree();

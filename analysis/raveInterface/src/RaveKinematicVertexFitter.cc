@@ -45,20 +45,20 @@ RaveKinematicVertexFitter::RaveKinematicVertexFitter(): m_useBeamSpot(false), m_
   m_useBeamSpot = RaveSetup::s_instance->m_useBeamSpot;
 }
 
-RaveKinematicVertexFitter::RaveKinematicVertexFitter(string howToInterfaceRave)
-{
-  // if ( howToInterfaceRave == "GFRave" ) {
-  //   m_gfRave = true;
-  //   RaveKinematicVertexFitter();
-  // } else if(howToInterfaceRave == "Rave" ) {
-  if (howToInterfaceRave == "Rave") {
-    // m_gfRave = false;
-    RaveKinematicVertexFitter();
-  } else {
-    //B2FATAL("RaveKinematicVertexFitter: \"GFRave\" and \"Rave\" are the only 2 valid options");
-    B2FATAL("RaveKinematicVertexFitter: \"Rave\" is the only valid option");
-  }
-}
+//RaveKinematicVertexFitter::RaveKinematicVertexFitter(/*string howToInterfaceRave*/)
+//{
+// if ( howToInterfaceRave == "GFRave" ) {
+//   m_gfRave = true;
+//   RaveKinematicVertexFitter();
+// } else if(howToInterfaceRave == "Rave" ) {
+//if (howToInterfaceRave == "Rave") {
+// m_gfRave = false;
+//RaveKinematicVertexFitter();
+//} else {
+//B2FATAL("RaveKinematicVertexFitter: \"GFRave\" and \"Rave\" are the only 2 valid options");
+//B2FATAL("RaveKinematicVertexFitter: \"Rave\" is the only valid option");
+//}
+//}
 
 
 RaveKinematicVertexFitter::~RaveKinematicVertexFitter()

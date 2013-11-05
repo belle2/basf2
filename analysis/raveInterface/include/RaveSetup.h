@@ -75,8 +75,8 @@ namespace Belle2 {
 
       rave::VertexFactory* m_raveVertexFactory; /**< The RAVE vertex factory is the principal interface offered by the RAVE vertex fitting library. */
 
-//      GFRaveVertexFactory* m_GFRaveVertexFactory;
-
+      //GFRaveVertexFactory* m_GFRaveVertexFactory;
+      /**< The RAVE Kinematic Tree factory is the principal interface offered by the RAVE for kinematic vertex fitting. */
       rave::KinematicTreeFactory* m_raveKinematicTreeFactory;
 
 

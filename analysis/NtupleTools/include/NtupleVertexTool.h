@@ -25,10 +25,13 @@ namespace Belle2 {
   /** Writes vertex information of B candidate to flat ntuple. */
   class NtupleVertexTool : public NtupleFlatTool {
   private:
-    /** Vertex position */
+    /** Vertex position X*/
     float* m_fDX;
+    /** Vertex position Y*/
     float* m_fDY;
+    /** Vertex position Z*/
     float* m_fDZ;
+    /** Vertex position Sqrt(X^2+Y^2)*/
     float* m_fDRho;
     /** Vertex fit P-value */
     float* m_fPvalue;

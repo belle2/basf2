@@ -13,36 +13,36 @@
       <type>TriggerS</type>
       <name>TriggerS1</name>
       <detectorID>1</detectorID>
-      <z unit="mm">-702.3</z>
+      <z unit="mm">-703.3</z>
     </element>
 
     <element>
       <type>TriggerM</type>
       <name>TriggerM1</name>
       <detectorID>2</detectorID>
-      <z unit="mm">-680.3</z>
-    </element>
-
-    <element>
-      <type>SciFi</type>
-      <name>SciFi1x</name>
-      <detectorID>3</detectorID>
-      <z unit="mm">-607.3</z>
+      <z unit="mm">-681.3</z>
     </element>
 
     <element>
       <type>SciFi</type>
       <name>SciFi1y</name>
-      <detectorID>4</detectorID>
-      <z unit="mm">-587.3</z>
+      <detectorID>3</detectorID>
+      <z unit="mm">-623.3</z>
       <phi unit="deg">90</phi>
+    </element>
+
+    <element>
+      <type>SciFi</type>
+      <name>SciFi1x</name>
+      <detectorID>4</detectorID>
+      <z unit="mm">-571.3</z>
     </element>
 
     <element>
       <type>SciFi</type>
       <name>SciFi2y</name>
       <detectorID>5</detectorID>
-      <z unit="mm">587.3</z>
+      <z unit="mm">571.3</z>
       <phi unit="deg">90</phi>
     </element>
 
@@ -50,21 +50,21 @@
       <type>SciFi</type>
       <name>SciFi2x</name>
       <detectorID>6</detectorID>
-      <z unit="mm">607.3</z>
+      <z unit="mm">623.3</z>
     </element>
 
     <element>
       <type>TriggerM</type>
       <name>TriggerM2</name>
       <detectorID>7</detectorID>
-      <z unit="mm">680.3</z>
+      <z unit="mm">681.3</z>
     </element>
 
     <element>
       <type>TriggerS</type>
       <name>TriggerS2</name>
       <detectorID>8</detectorID>
-      <z unit="mm">702.3</z>
+      <z unit="mm">703.3</z>
     </element>
   </LEPStriggerTelescope>
 

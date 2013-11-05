@@ -6,7 +6,7 @@
 
   <TriggerS desc="small trigger scintillator">
     <creatorName>scintillatorCounter</creatorName>
-    <Material>PlasticScintillator</Material>
+    <Material>Polystyrene</Material>
     <width unit="mm">5.0</width>
     <height unit="mm">5.0</height>
     <thickness unit="mm">5.0</thickness>
@@ -14,7 +14,7 @@
 
   <TriggerM desc="large trigger scintillator">
     <creatorName>scintillatorCounter</creatorName>
-    <Material>PlasticScintillator</Material>
+    <Material>Polystyrene</Material>
     <width unit="mm">50.0</width>
     <height unit="mm">50.0</height>
     <thickness unit="mm">5.0</thickness>
@@ -25,20 +25,20 @@
     <Material desc="empty space material">Air</Material>
     <fullThickness desc="optional" unit="mm">0</fullThickness>
     <fibers>
-      <Material>PlasticScintillator</Material>
-      <coatingMaterial>Aluminum</coatingMaterial>
+      <Material>Polystyrene</Material>
+      <coatingMaterial>PMMA</coatingMaterial>
       <fiberDiameter unit="mm">2</fiberDiameter>
       <activeDiameter unit="mm">1.8</activeDiameter>
-      <fiberLength unit="mm">100</fiberLength>
-      <numberOfFibers>32</numberOfFibers>
+      <fiberLength unit="mm">300</fiberLength>
+      <numberOfFibers>10</numberOfFibers>
       <firstFiber desc="z- or z+, default=z-">z-</firstFiber>
       <row2rowDistance desc="optional" unit="mm">0</row2rowDistance>
     </fibers>
     <coverPlate>
-      <Material>Aluminum</Material>
-      <width unit="mm">100</width>
-      <height unit="mm">100</height>
-      <thickness unit="mm">0.5</thickness>
+      <Material>PVC</Material>
+      <width unit="mm">10</width>
+      <height unit="mm">300</height>
+      <thickness unit="mm">5.0</thickness>
     </coverPlate>
   </SciFi>
 

@@ -1,15 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?> 
 <Materials>
 
-  <Material name="PlasticScintillator">
-    <state>Solid</state>
-    <density unit="g/cm3">1.00</density>
-    <Components>
-      <Element fraction="0.15">H</Element>
-      <Element fraction="0.85">O</Element>
-    </Components>
-  </Material>
-
   <Material name="Polystyrene">
     <!-- Polystyrene (C8H8)n : SciFi fibre core (doped with small quantities of other elements) --> 
     <state>Solid</state>
@@ -28,6 +19,16 @@
       <Element fraction="0.600">C</Element>
       <Element fraction="0.081">H</Element>
       <Element fraction="0.320">O</Element>
+    </Components>
+  </Material>
+
+  <Material name="PVC">
+    <state>Solid</state>
+    <density unit="g/cm3">1.35</density>
+    <Components>
+      <Element fraction="0.3844">C</Element>
+      <Element fraction="0.0484">H</Element>
+      <Element fraction="0.5672">Cl</Element>
     </Components>
   </Material>
 

@@ -3,25 +3,23 @@ CXX     = g++
 RM      = rm -rf
 CP      = cp -f
 
-B2SLC_LIB = $(B2SLC_PATH)
-
 BINDIR  = ./bin
 SRCDIR  = ./src
 INCDIR  = ./include
 TMPDIR  = ./tmp
 LIBDIR  = ./lib
 
-LIBS    += -L$(B2SLC_LIB)/lib -ldaq_slc_base
-LIBS    += -L$(B2SLC_LIB)/lib -ldaq_slc_system
-LIBS    += -L$(B2SLC_LIB)/lib -ldaq_slc_xml
-LIBS    += -L$(B2SLC_LIB)/lib -ldaq_slc_database
+LIBS    += -L$(BELLE2_DAQ_SLC_DIR)/lib -ldaq_slc_base
+LIBS    += -L$(BELLE2_DAQ_SLC_DIR)/lib -ldaq_slc_system
+LIBS    += -L$(BELLE2_DAQ_SLC_DIR)/lib -ldaq_slc_xml
+LIBS    += -L$(BELLE2_DAQ_SLC_DIR)/lib -ldaq_slc_database
 LIBS    += -lm -lpthread
 LIBS    += $(shell xml2-config --libs)
 LIBS    += $(shell mysql_config --libs)
 
 CFLAGS   = -g -Wall -fPIC -D_REENTRANT -DB2SLC_DEBUG_MODE #-Wno-deprecated
 CFLAGS  += -I./include
-CFLAGS  += -I$(B2SLC_LIB)/include
+CFLAGS  += -I$(BELLE2_DAQ_SLC_DIR)/include
 CFLAGS  += $(GTKCFLAGS)
 CFLAGS  += $(shell xml2-config --cflags)
 CFLAGS  += $(shell mysql_config --cflags)

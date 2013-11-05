@@ -3,8 +3,7 @@ CXX     = g++
 RM      = rm -rf
 CP      = cp -f
 
-B2SLC_LIB  = $(B2SLC_PATH)
-NSM2_PATH  = $(B2SLC_PATH)/nsm2
+NSM2_PATH  = $(BELLE2_DAQ_SLC_DIR)/nsm2
 
 BINDIR  = ./bin
 SRCDIR  = ./src
@@ -13,10 +12,10 @@ TMPDIR  = ./tmp
 LIBDIR  = ./lib
 
 LIBS    +=  -lm -lpthread -lz 
-LIBS    += -L$(B2SLC_LIB)/lib -ldaq_slc_base
-LIBS    += -L$(B2SLC_LIB)/lib -ldaq_slc_nsm
-LIBS    += -L$(B2SLC_LIB)/lib -ldaq_slc_system
-LIBS    += -L$(B2SLC_LIB)/lib -ldaq_slc_database
+LIBS    += -L$(BELLE2_DAQ_SLC_DIR)/lib -ldaq_slc_base
+LIBS    += -L$(BELLE2_DAQ_SLC_DIR)/lib -ldaq_slc_nsm
+LIBS    += -L$(BELLE2_DAQ_SLC_DIR)/lib -ldaq_slc_system
+LIBS    += -L$(BELLE2_DAQ_SLC_DIR)/lib -ldaq_slc_database
 LIBS    += $(NSM2_PATH)/corelib/nsmlib2.o \
            $(NSM2_PATH)/corelib/nsmhash.o \
            $(NSM2_PATH)/corelib/nsmparse.o \
@@ -26,7 +25,7 @@ LIBS    += $(shell mysql_config --libs)
 CFLAGS   = -g -Wall -fPIC -D_REENTRANT 
 CFLAGS  += -I./include 
 CFLAGS  += -I$(NSM2_PATH)/corelib -I$(NSM2_PATH)/b2lib
-CFLAGS  += -I$(B2SLC_LIB)/include 
+CFLAGS  += -I$(BELLE2_DAQ_SLC_DIR)/include 
 CFLAGS  += $(shell mysql_config --cflags)
 
 MAINS   = $(wildcard *.cc)

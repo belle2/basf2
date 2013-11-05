@@ -38,7 +38,7 @@ namespace Belle2 {
     bool isSynchronized(const State& state, int size);
     int distribute(int index, const Command& command) throw();
     bool send(NSMNode* node, const Command& command,
-              int npar = 0, const unsigned int* pars = NULL) throw();
+              int npar = 0, const int* pars = NULL) throw();
     void downloadConfig(const Command& command, int version) throw();
     void uploadRunConfig() throw();
     void uploadRunResult() throw();

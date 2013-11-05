@@ -3,8 +3,7 @@ CXX     = g++
 RM      = rm -rf
 CP      = cp -f
 
-B2SLC_LIB  = $(B2SLC_PATH)
-NSM2_PATH  = $(B2SLC_PATH)/nsm2
+NSM2_PATH  = $(BELLE2_DAQ_SLC_DIR)/nsm2
 
 BINDIR  = ./bin
 SRCDIR  = ./src
@@ -13,14 +12,14 @@ TMPDIR  = ./tmp
 LIBDIR  = ./lib
 
 LIBS    += -lNew $(shell root-config --libs)
-LIBS    += -L$(B2SLC_LIB)/lib -ldaq_slc_base
-LIBS    += -L$(B2SLC_LIB)/lib -ldaq_slc_system
-LIBS    += -L$(B2SLC_LIB)/lib -ldaq_slc_dqm
+LIBS    += -L$(BELLE2_DAQ_SLC_DIR)/lib -ldaq_slc_base
+LIBS    += -L$(BELLE2_DAQ_SLC_DIR)/lib -ldaq_slc_system
+LIBS    += -L$(BELLE2_DAQ_SLC_DIR)/lib -ldaq_slc_dqm
 LIBS    += -lm -lpthread -lrt
 
 CFLAGS   = -g -Wall -fPIC -D_REENTRANT -DB2SLC_DEBUG_MODE #-Wno-deprecated
 CFLAGS  += -I./include 
-CFLAGS  += -I$(B2SLC_LIB)/include
+CFLAGS  += -I$(BELLE2_DAQ_SLC_DIR)/include
 CFLAGS  += $(shell root-config --cflags)
 
 MAINS   = $(wildcard *.cc)

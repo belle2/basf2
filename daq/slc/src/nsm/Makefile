@@ -6,7 +6,7 @@ MKDIR   = mkdir
 AR      = ar rcsv
 RM      = rm -f
 
-NSM2_PATH = $(B2SLC_PATH)/nsm2
+NSM2_PATH = $(BELLE2_DAQ_SLC_DIR)/nsm2
 
 HOMEDIR  = .
 SRCDIR   = $(HOMEDIR)/src
@@ -24,7 +24,7 @@ DEPS     = $(OBJS:%.o=%.d)
 
 CFLAGS   = -g -fPIC -O2 -Wall
 CFLAGS  += -I$(INCDIR) 
-CFLAGS  += -I$(B2SLC_PATH)/include 
+CFLAGS  += -I$(BELLE2_DAQ_SLC_DIR)/include 
 CFLAGS  += -I$(NSM2_PATH)/corelib -I$(NSM2_PATH)/b2lib
 
 .PHONY : all clean 

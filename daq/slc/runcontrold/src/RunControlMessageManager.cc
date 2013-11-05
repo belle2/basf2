@@ -243,14 +243,14 @@ int RunControlMessageManager::distribute(int index_seq, const Command& command) 
 }
 
 bool RunControlMessageManager::send(NSMNode* node, const Command& command,
-                                    int npar_in, const unsigned int* pars_in) throw()
+                                    int npar_in, const int* pars_in) throw()
 {
   try {
     int id = node->getNodeID();
     if (id < 0) id = _comm->getNodeIdByName(node->getName());
     int pid = (id >= 0) ? _comm->getNodePidByName(node->getName()) : -1;
     if (id >= 0 && pid > 0) {
-      unsigned int pars[256];
+      int pars[256];
       std::string data = "";
       int npar = 0;
       if (npar_in > 1) {
@@ -258,8 +258,8 @@ bool RunControlMessageManager::send(NSMNode* node, const Command& command,
           pars[i] = pars_in[i + 1];
           npar++;
         }
-      } else if (command != Command::START) {
-        npar = node->getParams(command, pars, data);
+        //} else if (command != Command::START) {
+        //npar = node->getParams(command, pars, data);
       } else {
         npar = 2;
         pars[0] = _data_man->getRunStatus()->getExpNumber();

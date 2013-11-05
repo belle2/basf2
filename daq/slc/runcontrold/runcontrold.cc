@@ -15,7 +15,6 @@
 #include <system/PThread.h>
 
 #include <base/NSMNode.h>
-#include <base/ConfigReader.h>
 #include <base/Debugger.h>
 #include <base/StringUtil.h>
 

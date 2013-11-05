@@ -22,7 +22,7 @@ DEPS     = $(OBJS:%.o=%.d)
 
 CFLAGS   = -g -fPIC -O2 -Wall
 CFLAGS  += -I$(INCDIR) 
-CFLAGS  += -I$(B2SLC_PATH)/include 
+CFLAGS  += -I$(BELLE2_DAQ_SLC_DIR)/include 
 
 .PHONY : all clean deb doc
 

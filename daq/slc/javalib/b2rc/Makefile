@@ -16,7 +16,7 @@ MAIN       = src/b2rc/java/Belle2RunController.java
 JARFILE  = $(JARDIR)/b2rc.jar
 JAREXE  = $(JARDIR)/b2rc-exe.jar
 
-JAVALIB_PATH = $(B2SLC_PATH)/javalib
+JAVALIB_PATH = $(BELLE2_DAQ_SLC_DIR)/javalib
 
 CLASSPATH  = $(JAVALIB_PATH)/b2daq/classes:$(SRCDIR)
 SOURCEPATH = $(JAVALIB_PATH)/b2daq/src:$(SRCDIR)

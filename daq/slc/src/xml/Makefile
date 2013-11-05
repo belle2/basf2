@@ -13,7 +13,7 @@ BINDIR   = $(HOMEDIR)/bin
 TMPDIR   = $(HOMEDIR)/tmp
 LIBDIR   = $(HOMEDIR)/lib
 
-NSM2_PATH = $(B2SLC_PATH)/nsm2
+NSM2_PATH = $(BELLE2_DAQ_SLC_DIR)/nsm2
 
 LIBTARGET  = $(LIBDIR)/libdaq_slc_xml.so
 
@@ -24,7 +24,7 @@ DEPS     = $(OBJS:%.o=%.d)
 
 CFLAGS   = -g -fPIC -O2 -Wall
 CFLAGS  += -I$(INCDIR) 
-CFLAGS  += -I$(B2SLC_PATH)/include
+CFLAGS  += -I$(BELLE2_DAQ_SLC_DIR)/include 
 CFLAGS  += -I$(NSM2_PATH)/corelib -I$(NSM2_PATH)/b2lib
 CFLAGS  += $(shell xml2-config --cflags)
 

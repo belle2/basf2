@@ -7,15 +7,14 @@ BINDIR   = $(HOMEDIR)/bin
 TMPDIR   = $(HOMEDIR)/tmp
 LIBDIR   = $(HOMEDIR)/lib
 
-B2SLC_LIB = $(B2SLC_PATH)
-NSM2_PATH = $(B2SLC_PATH)/nsm2
+NSM2_PATH = $(BELLE2_DAQ_SLC_DIR)/nsm2
 
 SRCS   = $(SRCDIR)/$(USER_CLASS)HistoManager.cc $(SRCDIR)/lib$(USER_CLASS)HistoManager.cc 
 OBJS   = $(SRCS:$(SRCDIR)/%.cc=$(TMPDIR)/%.o)
 
 CFLAGS   = -g -fPIC -O2 -Wall
 CFLAGS  += -I$(INCDIR) 
-CFLAGS  += -I$(B2SLC_LIB)/include
+CFLAGS  += -I$(BELLE2_DAQ_SLC_DIR)/include
 
 LIBTARGET  = $(LIBDIR)/libdaq_slc_dqm_$(USER_CLASS).so
 

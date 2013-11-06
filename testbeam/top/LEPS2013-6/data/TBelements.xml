@@ -6,7 +6,7 @@
 
   <TriggerS desc="small trigger scintillator">
     <creatorName>scintillatorCounter</creatorName>
-    <Material>Polystyrene</Material>
+    <Material>PMMA</Material>
     <width unit="mm">5.0</width>
     <height unit="mm">5.0</height>
     <thickness unit="mm">5.0</thickness>
@@ -14,7 +14,7 @@
 
   <TriggerM desc="large trigger scintillator">
     <creatorName>scintillatorCounter</creatorName>
-    <Material>Polystyrene</Material>
+    <Material>PMMA</Material>
     <width unit="mm">50.0</width>
     <height unit="mm">50.0</height>
     <thickness unit="mm">5.0</thickness>
@@ -29,15 +29,15 @@
       <coatingMaterial>PMMA</coatingMaterial>
       <fiberDiameter unit="mm">2</fiberDiameter>
       <activeDiameter unit="mm">1.8</activeDiameter>
-      <fiberLength unit="mm">300</fiberLength>
+      <fiberLength unit="mm">250</fiberLength>
       <numberOfFibers>10</numberOfFibers>
       <firstFiber desc="z- or z+, default=z-">z-</firstFiber>
       <row2rowDistance desc="optional" unit="mm">0</row2rowDistance>
     </fibers>
     <coverPlate>
-      <Material>PVC</Material>
+      <Material>Polyacetal</Material>
       <width unit="mm">10</width>
-      <height unit="mm">300</height>
+      <height unit="mm">250</height>
       <thickness unit="mm">5.0</thickness>
     </coverPlate>
   </SciFi>

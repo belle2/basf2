@@ -12,17 +12,29 @@
   </Material>
 
   <Material name="PMMA">
-    <!-- Polymethylmethacrylate (C5H8O2)n : SciFi fibre cladding --> 
+    <!-- Polymethylmethacrylate (C5H8O2)n (Plexiglas): SciFi fibre cladding --> 
     <state>Solid</state>
     <density unit="g/cm3">1.2</density>
     <Components>
-      <Element fraction="0.600">C</Element>
-      <Element fraction="0.081">H</Element>
-      <Element fraction="0.320">O</Element>
+      <Element fraction="0.5999">C</Element>
+      <Element fraction="0.0805">H</Element>
+      <Element fraction="0.3196">O</Element>
+    </Components>
+  </Material>
+
+  <Material name="Polyacetal">
+    <!-- Polyoxymethylene (POM) -->
+    <state>Solid</state>
+    <density unit="g/cm3">1.42</density>
+    <Components>
+      <Element fraction="0.4000">C</Element>
+      <Element fraction="0.0672">H</Element>
+      <Element fraction="0.5328">O</Element>
     </Components>
   </Material>
 
   <Material name="PVC">
+    <!-- Polyvinyl chloride -->
     <state>Solid</state>
     <density unit="g/cm3">1.35</density>
     <Components>

@@ -114,28 +114,28 @@ namespace Belle2 {
 
       /** Set mass constrained fit   */
       void setMassConstFit(bool isConstFit = true);
-      /** Set vertex fit: set false in case of mass fit only*/
+      /** Set vertex fit: set false in case of mass fit only */
       void setVertFit(bool isVertFit = true);
 
 
     protected:
 
-      /**< flag determines if the beam spot will be used or not. Overwrites the global flag in RaveSetup */
+      /** flag determines if the beam spot will be used or not. Overwrites the global flag in RaveSetup */
       bool m_useBeamSpot;
 
-      /**< pointer to the mother particle who's  daughters will be used in the fit. the fit result will be written back to the mother particle*/
+      /** pointer to the mother particle who's  daughters will be used in the fit. the fit result will be written back to the mother particle */
       Particle* m_motherParticlePtr;
 
-      /** Algorithm used by rave (kalman, avr, ...)*/
+      /** Algorithm used by rave (kalman, avr, ...) */
       std::string m_raveAlgorithm;
 
-      /** the output of the kinematic fit*/
+      /** the output of the kinematic fit */
       rave::KinematicTree m_fittedResult;
 
-      /** holds the tracks that were added to a RaveVertexFitter object in the format used by Rave*/
+      /** holds the tracks that were added to a RaveVertexFitter object in the format used by Rave */
       std::vector<rave::Track> m_raveTracks;
 
-      /** holds the fitted vertices after fit() was called in the format used by Rave*/
+      /** holds the fitted vertices after fit() was called in the format used by Rave */
       std::vector < rave::Vertex > m_raveVertices;
 
       /** input particles for vertex fit in rave format */
@@ -147,13 +147,13 @@ namespace Belle2 {
       bool m_massConstFit;
       /** flag determines if the vertex fit is performed */
       bool m_vertFit;
-      /** Ndf of the vertex fit*/
+      /** Ndf of the vertex fit */
       double m_fittedNdf;
       /** Pvalue of the fit result */
       double m_fittedPValue;
-      /** chi^2 of the vertex fit*/
+      /** chi^2 of the vertex fit */
       double m_fittedChi2;
-      /** Fitted vertex position*/
+      /** Fitted vertex position */
       TVector3 m_fittedPos;
       /** 4 momentum of the mother particle after the fit */
       TLorentzVector m_fitted4Vector;

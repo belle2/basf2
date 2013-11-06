@@ -23,6 +23,7 @@ bool LoggerCallback::log() throw()
   NSMMessage& msg(getMessage());
   log.unpack(msg.getNParams(), (const int*)msg.getParams(),
              msg.getData());
+  log.setGroupName(_comm->getNode()->getName());
   std::cout << log.toString() << std::endl;
   try {
     _comm->sendLog(log);

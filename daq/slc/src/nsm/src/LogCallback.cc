@@ -9,22 +9,15 @@ using namespace Belle2;
 bool LogCallback::perform(NSMMessage& msg) throw(NSMHandlerException)
 {
   Command cmd(msg.getRequestName());
+  setReply("");
   if (cmd == Command::OK) {
     return ok();
   } else if (cmd == Command::ERROR) {
     return error();
+  } else if (cmd == Command::LOG) {
+    return log();
   }
-  setReply("");
-  NSMCommunicator* com = getCommunicator();
-  bool result = true;
-  if (cmd == Command::LOG) {
-    if ((result = log())) {
-      //com->replyOK(_node, _reply);
-    } else {
-      //com->replyError(_reply);
-    }
-  }
-  return result;
+  return true;
 }
 
 LogCallback::LogCallback(NSMNode* node) throw()

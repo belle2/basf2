@@ -157,7 +157,7 @@ void NSMCommunicator::sendLog(const LogMessage& log) throw(NSMHandlerException)
 {
   if (_logger_node != NULL) {
     std::string str;
-    unsigned int pars[2];
+    unsigned int pars[3];
     int npar = log.pack((int*)pars, str);
     sendRequest(_logger_node, Command::LOG, npar, pars, str);
   }

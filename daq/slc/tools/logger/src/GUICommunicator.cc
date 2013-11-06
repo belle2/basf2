@@ -48,14 +48,15 @@ void GUICommunicator::run()
   _is_ready = true;
   try {
     int npar = 0;
-    int pars[2];
+    int pars[3];
     std::string str;
     while (true) {
       LogMessage msg = _box.pop();
       npar = msg.pack(pars, str);
       _writer.writeInt(npar);
-      _writer.writeInt(pars[0]);
-      _writer.writeInt(pars[1]);
+      for (int i = 0; i < npar; i++) {
+        _writer.writeInt(pars[i]);
+      }
       _writer.writeString(str);
     }
   } catch (const IOException& e) {

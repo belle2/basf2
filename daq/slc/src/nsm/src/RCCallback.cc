@@ -9,6 +9,7 @@ using namespace Belle2;
 bool RCCallback::perform(NSMMessage& msg) throw(NSMHandlerException)
 {
   Command cmd(msg.getRequestName());
+  setReply("");
   if (cmd == Command::OK) {
     return ok();
   } else if (cmd == Command::ERROR) {
@@ -17,7 +18,6 @@ bool RCCallback::perform(NSMMessage& msg) throw(NSMHandlerException)
   if (cmd.isAvailable(_node->getState()) == 0) {
     return false;
   }
-  setReply("");
   State state_org = _node->getState();
   bool result = false;
   NSMCommunicator* com = getCommunicator();

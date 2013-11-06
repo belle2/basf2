@@ -24,7 +24,8 @@ int main(int argc, char** argv)
     sleep(5);
     comm->sendLog(LogMessage(name, LogMessage::WARNING, "warning message"));
     sleep(5);
-    comm->sendLog(LogMessage(name, LogMessage::ERROR, "error message <a href=\"http://belle2.cc.kek.jp/\">help</a>"));
+    comm->sendLog(LogMessage(name, LogMessage::ERROR,
+                             "error message <a href=\"http://belle2.kek.jp\">http://belle2.kek.jp</a>"));
     sleep(5);
     comm->sendLog(LogMessage(name, LogMessage::FATAL, "fatal message"));
     sleep(5);

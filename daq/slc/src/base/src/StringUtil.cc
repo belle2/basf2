@@ -19,12 +19,13 @@ namespace Belle2 {
       c = str.at(n);
       if (c == type) {
         std::string s = ss.str();
-        if (s.size() == 0) continue;
-        while (s.at(0) == ' ' || s.at(0) == '\t' || s.at(0) == '\n') {
-          s.erase(0, 1);
-        }
-        while (s.at(s.size() - 1) == ' ' || s.at(s.size() - 1) == '\t' || s.at(s.size() - 1) == '\n') {
-          s.erase(s.size() - 1, 1);
+        if (s.size() > 0) {
+          while (s.at(0) == ' ' || s.at(0) == '\t' || s.at(0) == '\n') {
+            s.erase(0, 1);
+          }
+          while (s.at(s.size() - 1) == ' ' || s.at(s.size() - 1) == '\t' || s.at(s.size() - 1) == '\n') {
+            s.erase(s.size() - 1, 1);
+          }
         }
         str_v.push_back(s);
         ss.str("");

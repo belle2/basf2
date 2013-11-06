@@ -14,7 +14,9 @@ public class LauncherMainPanel extends JPanel {
 			new LauncherPanel("DQM browser", 50100, "b2dqm.java.Belle2DQMBrowser", 
 					b2dqm.java.Belle2DQMBrowser.VERSION),
 			new LauncherPanel("Run controller", 50000, "b2rc.java.Belle2RunController", 
-					b2rc.java.Belle2RunController.VERSION)
+					b2rc.java.Belle2RunController.VERSION),
+			new LauncherPanel("Run controller", 50200, "b2logger.java.Belle2LogViewer", 
+					b2logger.java.Belle2LogViewer.VERSION)
 	};
 	
 	public LauncherMainPanel() {

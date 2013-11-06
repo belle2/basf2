@@ -18,7 +18,7 @@ JAREXE     = $(JARDIR)/b2gui-exe.jar
 
 B2JAVA_PATH = $(BELLE2_DAQ_SLC_DIR)/tools/javalib
 
-CLASSPATH  = $(B2JAVA_PATH)/b2daq/classes:$(B2JAVA_PATH)/b2dqm/classes:$(B2JAVA_PATH)/b2rc/classes
+CLASSPATH  = $(B2JAVA_PATH)/b2daq/classes:$(B2JAVA_PATH)/b2dqm/classes:$(B2JAVA_PATH)/b2rc/classes:$(B2JAVA_PATH)/b2logger/classes
 SOURCEPATH = $(SRCDIR)
 
 JFLAG      = -classpath $(CLASSPATH) -d $(OUTDIR) -sourcepath $(SOURCEPATH)

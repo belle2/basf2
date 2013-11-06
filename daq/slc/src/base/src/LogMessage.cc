@@ -9,9 +9,10 @@ using namespace Belle2;
 
 std::string LogMessage::__hostname = "";
 
-LogMessage::LogMessage(Priority priority, const std::string& message)
+LogMessage::LogMessage(const std::string& process_name,
+                       Priority priority, const std::string& message)
   : _priority(priority), _log_date(), _hostname(),
-    _process_name(), _message(message)
+    _process_name(process_name), _message(message)
 {
   if (__hostname.size() == 0) {
     const char* hostname = getenv("HOSTNAME");

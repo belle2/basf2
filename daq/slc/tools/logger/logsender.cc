@@ -12,10 +12,23 @@ int main(int argc, char** argv)
     Belle2::debug("Usage : ./loggerd <name>");
     return 1;
   }
-  NSMCommunicator* comm = new NSMCommunicator(new NSMNode(argv[1]));
+  const char* name = argv[1];
+  NSMCommunicator* comm = new NSMCommunicator(new NSMNode(name));
   comm->init();
-  comm->sendLog(LogMessage(LogMessage::DEBUG, "degbug message"));
-  comm->sendLog(LogMessage(LogMessage::INFO, "info message"));
+  while (true) {
+    comm->sendLog(LogMessage(name, LogMessage::DEBUG, "degbug message"));
+    sleep(5);
+    comm->sendLog(LogMessage(name, LogMessage::INFO, "info message"));
+    sleep(5);
+    comm->sendLog(LogMessage(name, LogMessage::NOTICE, "notice message"));
+    sleep(5);
+    comm->sendLog(LogMessage(name, LogMessage::WARNING, "warning message"));
+    sleep(5);
+    comm->sendLog(LogMessage(name, LogMessage::ERROR, "error message"));
+    sleep(5);
+    comm->sendLog(LogMessage(name, LogMessage::FATAL, "fatal message"));
+    sleep(5);
+  }
 
   return 0;
 }

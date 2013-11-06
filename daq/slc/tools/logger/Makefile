@@ -14,6 +14,7 @@ LIBDIR  = ./lib
 LIBS    += -lm -lpthread -lrt -lz
 LIBS    += -L$(BELLE2_DAQ_SLC_DIR)/lib -ldaq_slc_base
 LIBS    += -L$(BELLE2_DAQ_SLC_DIR)/lib -ldaq_slc_nsm
+LIBS    += -L$(BELLE2_DAQ_SLC_DIR)/lib -ldaq_slc_system
 LIBS    += $(NSM2_PATH)/corelib/nsmlib2.o \
            $(NSM2_PATH)/corelib/nsmhash.o \
            $(NSM2_PATH)/corelib/nsmparse.o \

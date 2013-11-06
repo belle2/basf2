@@ -19,9 +19,9 @@ bool LogCallback::perform(NSMMessage& msg) throw(NSMHandlerException)
   bool result = true;
   if (cmd == Command::LOG) {
     if ((result = log())) {
-      com->replyOK(_node, _reply);
+      //com->replyOK(_node, _reply);
     } else {
-      com->replyError(_reply);
+      //com->replyError(_reply);
     }
   }
   return result;

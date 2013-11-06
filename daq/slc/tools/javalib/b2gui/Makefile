@@ -47,6 +47,7 @@ all : $(LIB_OBJS)
 	@ $(JAR) uf $(JAREXE) -C $(B2JAVA_PATH)/b2rc/classes b2rc
 	@ $(JAR) uf $(JAREXE) -C $(B2JAVA_PATH)/b2rc/classes com
 	@ $(JAR) uf $(JAREXE) -C $(B2JAVA_PATH)/b2rc/classes org
+	@ $(JAR) uf $(JAREXE) -C $(B2JAVA_PATH)/b2logger/classes b2logger
 	@ $(RM) -rf com META-INF
 
 $(LIB_OBJS) : $(OUTDIR)/%.class: $(SRCDIR)/%.java

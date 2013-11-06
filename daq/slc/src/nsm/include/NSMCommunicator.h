@@ -48,7 +48,7 @@ namespace Belle2 {
                      const std::string& message) throw(NSMHandlerException);
     void replyOK(NSMNode* node, const std::string& message = "") throw(NSMHandlerException);
     void replyError(const std::string& message = "") throw(NSMHandlerException);
-    void sendLog(LogMessage log) throw(NSMHandlerException);
+    void sendLog(const LogMessage& log) throw(NSMHandlerException);
 
   public:
     int getId() const throw() { return _id; }

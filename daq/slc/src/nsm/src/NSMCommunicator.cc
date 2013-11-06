@@ -15,6 +15,10 @@ extern "C" {
 #include <cstdio>
 #include <cstring>
 
+#include <unistd.h>
+#include <sys/select.h>
+#include <errno.h>
+
 using namespace Belle2;
 
 std::vector<NSMCommunicator*> NSMCommunicator::__com_v;
@@ -97,6 +101,7 @@ void NSMCommunicator::sendRequest(NSMNode* node, const Command& command,
                                   int npar, unsigned int* pars,
                                   int len, const char* datap) throw(NSMHandlerException)
 {
+  std::cout << node->getName() << " " << datap << std::endl;
   b2nsm_context(_nsmc);
   if (b2nsm_sendreq_data(node->getName().c_str(), command.getLabel(),
                          npar, (int*)pars, len, datap) < 0) {
@@ -148,12 +153,11 @@ throw(NSMHandlerException)
   }
 }
 
-void NSMCommunicator::sendLog(LogMessage log) throw(NSMHandlerException)
+void NSMCommunicator::sendLog(const LogMessage& log) throw(NSMHandlerException)
 {
   if (_logger_node != NULL) {
     std::string str;
     unsigned int pars[2];
-    log.setProcessName(_node->getName());
     int npar = log.pack((int*)pars, str);
     sendRequest(_logger_node, Command::LOG, npar, pars, str);
   }
@@ -164,6 +168,7 @@ bool NSMCommunicator::wait(int sec) throw(NSMHandlerException)
   if (_nsmc == NULL) {
     throw (NSMHandlerException(__FILE__, __LINE__, "Not ready for wait"));
   }
+  /*
   NSMcontext* nsmc = nsmlib_selectc(0, sec);
   if (nsmc == (NSMcontext*) - 1) {
     throw (NSMHandlerException(__FILE__, __LINE__, "Error during wait"));
@@ -172,9 +177,35 @@ bool NSMCommunicator::wait(int sec) throw(NSMHandlerException)
     b2nsm_context(_nsmc);
     return true;
   } else if (nsmc != NULL) {
-    return true;
+    _message.read(nsmc);
+    return false;
   }
   return false;
+  */
+  fd_set fds;
+  FD_ZERO(&fds);
+  FD_SET(_nsmc->sock, &fds);
+  int ret;
+  while (true) {
+    if (sec >= 0) {
+      timeval t = {sec, 0};
+      ret = ::select(FD_SETSIZE, &fds, NULL, NULL, &t);
+    } else {
+      ret = ::select(FD_SETSIZE, &fds, NULL, NULL, NULL);
+    }
+    if (ret != -1 || (errno != EINTR && errno != EAGAIN)) break;
+  }
+  if (ret < 0) {
+    perror("select");
+    throw (NSMHandlerException(__FILE__, __LINE__, "Failed to select"));
+  }
+  if (FD_ISSET(_nsmc->sock, &fds)) {
+    _message.read(_nsmc);
+    b2nsm_context(_nsmc);
+    return true;
+  } else {
+    return false;
+  }
 }
 
 bool NSMCommunicator::performCallback() throw(NSMHandlerException)

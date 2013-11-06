@@ -23,7 +23,7 @@ int main(int argc, char** argv)
   ConfigFile config("slc_config");
   NSMNode* node = new NSMNode(config.get("LOG_NSM_NAME"));
   LoggerCallback* callback = new LoggerCallback(node, comm);
-  NSMNodeDaemon* daemon = new NSMNodeDaemon(node, callback, argv[2], 8322);
+  NSMNodeDaemon* daemon = new NSMNodeDaemon(node, callback, "192.168.10.1", 8122);
   daemon->run();
 
   return 0;

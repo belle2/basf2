@@ -18,7 +18,9 @@ namespace Belle2 {
     static std::string __hostname;
 
   public:
-    LogMessage(Priority priority = DEBUG, const std::string& message = "");
+    LogMessage(const std::string& proces_name = "",
+               Priority priority = DEBUG,
+               const std::string& message = "");
     ~LogMessage() {}
 
   public:

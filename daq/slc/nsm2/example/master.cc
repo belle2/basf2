@@ -281,6 +281,14 @@ main(int argc, char** argv)
       } else {
         b2nsm_sendreq_data(av[1], "RECOVER", 0, 0, len, text);
       }
+    } else if (strcasecmp(av[0], "log") == 0) {
+      if (ac < 3) {
+        printf("usage: log <message>\n");
+      } else {
+        len = strlen(av[2]);
+        text = av[2];
+        b2nsm_sendreq_data(av[1], "LOG", 0, 0, len, text);
+      }
     } else {
       printf("unknown request %s\n", av[0]);
     }

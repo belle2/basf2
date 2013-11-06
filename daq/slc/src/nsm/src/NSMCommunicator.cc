@@ -4,6 +4,7 @@
 
 #include "base/StringUtil.h"
 #include "base/Debugger.h"
+#include "base/ConfigFile.h"
 
 extern "C" {
 #include "nsm/nsmlib2.h"
@@ -36,13 +37,16 @@ NSMCommunicator* NSMCommunicator::select(int timeout) throw(NSMHandlerException)
 }
 
 
-NSMCommunicator::NSMCommunicator(NSMNode* node, const std::string& host, int port) throw()
+NSMCommunicator::NSMCommunicator(NSMNode* node, const std::string& host,
+                                 int port, const std::string& config_name) throw()
   : _node(node), _callback(NULL)
 {
   _id = -1;
   _nsmc = NULL;
   _host = host;
   _port = port;
+  _logger_node = NULL;
+  _config_name = config_name;
 }
 
 void NSMCommunicator::init(const std::string& host, int port) throw(NSMHandlerException)
@@ -61,7 +65,6 @@ void NSMCommunicator::init(const std::string& host, int port) throw(NSMHandlerEx
     _id = -1;
     throw (NSMHandlerException(__FILE__, __LINE__, "Error during init2"));
   }
-
   nsmlib_usesig(_nsmc, 0);
   //b2nsm_logging(stdout);
   _id = _nsmc->nodeid;
@@ -81,6 +84,11 @@ void NSMCommunicator::init(const std::string& host, int port) throw(NSMHandlerEx
                                                 command.getLabel())));
       }
     }
+  }
+  ConfigFile config(_config_name);
+  std::string logger_name = config.get("LOG_NSM_NAME");
+  if (logger_name.size() > 0) {
+    _logger_node = new NSMNode(logger_name);
   }
   __com_v.push_back(this);
 }
@@ -137,6 +145,17 @@ throw(NSMHandlerException)
   b2nsm_context(_nsmc);
   if (b2nsm_error(_message.getMsg(), message.c_str()) < 0) {
     throw (NSMHandlerException(__FILE__, __LINE__, "Failed to reply error"));
+  }
+}
+
+void NSMCommunicator::sendLog(LogMessage log) throw(NSMHandlerException)
+{
+  if (_logger_node != NULL) {
+    std::string str;
+    unsigned int pars[2];
+    log.setProcessName(_node->getName());
+    int npar = log.pack((int*)pars, str);
+    sendRequest(_logger_node, Command::LOG, npar, pars, str);
   }
 }
 

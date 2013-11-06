@@ -15,10 +15,10 @@ void NSMNodeDaemon::run() throw()
   nsm_comm->setCallback(_callback);
   while (true) {
     try {
-      if (_port1 < 0)
+      if (_port < 0)
         nsm_comm->init();
       else
-        nsm_comm->init(_host1, _port1);
+        nsm_comm->init(_host, _port);
       break;
     } catch (const NSMHandlerException& e) {
       Belle2::debug("[DEBUG] Failed to connect NSM network. Re-trying to connect...");

@@ -6,6 +6,7 @@
 
 #include "base/NSMNode.h"
 #include "base/Command.h"
+#include "base/LogMessage.h"
 
 extern "C" {
 #include "nsm/nsm2.h"
@@ -28,12 +29,13 @@ namespace Belle2 {
     static std::vector<NSMCommunicator*> __com_v;
 
   public:
-    NSMCommunicator(NSMNode* node = NULL,
-                    const std::string& host = "", int port = -1) throw();
+    NSMCommunicator(NSMNode* node, const std::string& host = "",
+                    int port = -1, const std::string& config_name = "slc_config") throw();
     ~NSMCommunicator() throw() {}
 
   public:
     void init(const std::string& host = "", int port = -1) throw(NSMHandlerException);
+    bool wait(int sec) throw(NSMHandlerException);
     void sendRequest(NSMNode* node, const Command& cmd,
                      int npar = 0, unsigned int* pars = NULL,
                      int len = 0, const char* datap = NULL) throw(NSMHandlerException);
@@ -46,7 +48,7 @@ namespace Belle2 {
                      const std::string& message) throw(NSMHandlerException);
     void replyOK(NSMNode* node, const std::string& message = "") throw(NSMHandlerException);
     void replyError(const std::string& message = "") throw(NSMHandlerException);
-    bool wait(int sec) throw(NSMHandlerException);
+    void sendLog(LogMessage log) throw(NSMHandlerException);
 
   public:
     int getId() const throw() { return _id; }
@@ -62,6 +64,7 @@ namespace Belle2 {
     int getNodePidByName(const std::string& name) throw(NSMHandlerException);
 
   private:
+    std::string _config_name;
     NSMNode* _node;
     NSMCallback* _callback;
     int _id;
@@ -69,6 +72,7 @@ namespace Belle2 {
     NSMcontext* _nsmc;
     std::string _host;
     int _port;
+    NSMNode* _logger_node;
 
   };
 

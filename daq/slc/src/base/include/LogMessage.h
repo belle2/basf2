@@ -1,7 +1,7 @@
 #ifndef _BELLE2_LOGMESSAGE_H_
 #define _BELLE2_LOGMESSAGE_H_
 
-#include "base/Date.h"
+#include <base/Date.h>
 
 #include <string>
 
@@ -10,30 +10,31 @@ namespace Belle2 {
   class LogMessage {
 
   public:
-    LogMessage() {}
-    LogMessage(const std::string& process_name,
-               int priority, const std::string& log_date,
-               const std::string& message);
-    LogMessage(const std::string& hostname,
-               const std::string& process_name,
-               int priority, const std::string& log_date,
-               const std::string& message);
-    LogMessage(const std::string& process_name,
-               int priority, const std::string& message);
-    LogMessage(const std::string& hostname,
-               const std::string& process_name,
-               int priority, const std::string& message);
+    enum Priority {
+      DEBUG, INFO, NOTICE, WARNING, ERROR, FATAL
+    };
+
+  public:
+    static std::string __hostname;
+
+  public:
+    LogMessage(Priority priority = DEBUG, const std::string& message = "");
     ~LogMessage() {}
 
   public:
-    const std::string encode();
-    bool decode(const std::string& str);
+    const std::string toString() const;
+    bool unpack(int npar, const int* pars,
+                const std::string& str_in);
+    int pack(int* pars, std::string& str_out) const;
+    void setProcessName(const std::string& name) {
+      _process_name = name;
+    }
 
   private:
+    Priority _priority;
+    Date _log_date;
     std::string _hostname;
     std::string _process_name;
-    int _priority;
-    std::string _log_date;
     std::string _message;
 
   };

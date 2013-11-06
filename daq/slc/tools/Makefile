@@ -9,7 +9,7 @@ all:
 	make -C javalib
 
 dqm:
-	make -C dqmserver
+	make -C dqmviewd
 	make -C gen_dqm
 	make -C mapfiletest
 	make -C javalib/b2dqm
@@ -19,7 +19,7 @@ clean:
 	make -C cprcontrold clean
 	make -C rocontrold clean
 	make -C nsmmonitor clean
-	make -C uploader clean
+	make -C dqmviewd clean
 	make -C uploader clean
 	make -C gen_dqm clean
 	make -C mapfiletest clean

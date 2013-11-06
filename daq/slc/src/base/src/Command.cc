@@ -16,6 +16,7 @@ const Command Command::ABORT(107, "ABORT", "ABORT");
 const Command Command::STATECHECK(201, "STATECHECK", "STATECHECK");
 const Command Command::SETPARAMS(202, "SETPARAMS", "SETPARAMS");
 const Command Command::TRIGFT(301, "TRIGFT", "TRIGFT");
+const Command Command::LOG(501, "LOG", "LOG");
 const Command Command::DATA(401, "DATA", "DATA");
 const Command Command::OK(1, "OK", "OK");
 const Command Command::ERROR(2, "ERROR", "ERROR");
@@ -33,6 +34,7 @@ const Command& Command::operator=(const std::string& label) throw()
   else if (label == STATECHECK._label) *this = STATECHECK;
   else if (label == SETPARAMS._label) *this = SETPARAMS;
   else if (label == TRIGFT._label) *this = TRIGFT;
+  else if (label == LOG._label) *this = LOG;
   else if (label == OK.getLabel()) *this = OK;
   else if (label == ERROR.getLabel()) *this = ERROR;
   else if (label == DATA.getLabel()) *this = DATA;
@@ -69,7 +71,7 @@ int Command::isAvailable(const State& state) const throw()
     return SUGGESTED;
   } else if (*this == RECOVER || *this == STATECHECK || *this == SETPARAMS ||
              *this == OK || *this == TRIGFT || *this == DATA ||
-             *this == ERROR || *this == ABORT) {
+             *this == ERROR || *this == ABORT || *this == LOG) {
     return ENABLED;
   } else {
     return DISABLED;

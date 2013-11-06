@@ -12,15 +12,13 @@ std::map<std::string, std::string> ConfigFile::__value_m;
 
 void ConfigFile::read(const std::string& filename)
 {
-  const char* path = getenv("BELLE2_LOCAL_DIR");
+  const char* path = getenv("BELLE2_DAQ_SLC_DIR");
   if (path == NULL) {
-    Belle2::debug("[ERROR] Enveriment varialble : BELLE_LOCAL_DIR");
+    Belle2::debug("[ERROR] Enveriment varialble : BELLE_DAQ_SLC_DIR");
     exit(1);
   }
   std::string file_path = path;
-  file_path += "/daq/slc/data/";
-  file_path += filename;
-  Belle2::debug("[DEBUG] %s", file_path.c_str());
+  file_path += "/data/" + filename + ".conf";
   std::ifstream fin(file_path.c_str());
   std::string s;
   while (fin && getline(fin, s)) {

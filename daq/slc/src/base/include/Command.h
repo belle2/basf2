@@ -24,6 +24,7 @@ namespace Belle2 {
     static const Command ABORT;
     static const Command STATECHECK;
     static const Command TRIGFT;
+    static const Command LOG;
     static const Command DATA;
     static const Command SETPARAMS;
 

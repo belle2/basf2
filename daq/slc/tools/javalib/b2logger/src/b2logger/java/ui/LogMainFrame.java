@@ -60,7 +60,6 @@ public class LogMainFrame extends JFrame {
 		}
 		String html_message = "["+message.getNodeName()+"] "+message.getMessage();
 		html_message = html_message.replace("<a", "<a color='blue'");
-		System.out.println(html_message);
 		log_view.add(new Log(html_message, 
 				message.getLogLevel(), message.getTime().getSecond()));
 		if ( !getLogThreshold(group_name).hiegher(message.getLogLevel()) ){

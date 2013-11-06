@@ -85,7 +85,7 @@ public class LogMenuBar extends JMenuBar {
 	    version_item.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				JOptionPane.showMessageDialog(_frame,
-						"DCGaibuViewer GUI version " + Belle2LogViewer.VERSION, "version", JOptionPane.INFORMATION_MESSAGE);
+						"Belle2LogViewer version " + Belle2LogViewer.VERSION, "version", JOptionPane.INFORMATION_MESSAGE);
 			}
 	    });
 	    help_menu.add(version_item);

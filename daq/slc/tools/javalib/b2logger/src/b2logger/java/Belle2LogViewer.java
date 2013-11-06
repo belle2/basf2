@@ -13,7 +13,7 @@ import b2logger.java.ui.LogPopupLauncher;
 
 public class Belle2LogViewer extends JavaEntoryPoint {
 
-	public static final String VERSION = "1.1.7";
+	public static final String VERSION = "0.0.1";
 
 	static public Belle2LogViewer __VIEWER;
 	static public Belle2LogViewer get() {
@@ -49,7 +49,7 @@ public class Belle2LogViewer extends JavaEntoryPoint {
 					LogMessage message = new LogMessage();
 					try {
 						message.readObject(_reader);
-						String host_name = message.getHostName(); 
+						String host_name = message.getNodeName(); 
 						LogLevel level = message.getLogLevel(); 
 						if ( !_frame.getPopupLevel(host_name).hiegher(level) ) {
 							_generator.create(message).start();

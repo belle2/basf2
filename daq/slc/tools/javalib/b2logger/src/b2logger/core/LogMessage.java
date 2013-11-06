@@ -91,12 +91,14 @@ public class LogMessage {
 		return "Log ID : "+ _id + ", time:" + _time.toString() + "\n"
 			+ "LogLevel : " + _level.toString() +"\n" 
 			+ "From : " + _host_name +"\n"
+			+ "Node : " + _node_name +"\n"
 			+ "Message : " + getMessage();
 	}
 	
 	public String toHTML() {
 		return "<center> Logger " + _level.toString() +"</center>"
 			+ "From : " + _host_name +"<br />"
+			+ "Node : " + _node_name +"<br />"
 			+ "Time:" + _time.toDateString()+ "<br />" 
 			+ "Message : <br /> "
 			+ getMessage();

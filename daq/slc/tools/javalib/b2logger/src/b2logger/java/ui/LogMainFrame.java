@@ -29,7 +29,7 @@ public class LogMainFrame extends JFrame {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(0, 0, 660, 520);
 		setLocationRelativeTo(null);
-		setTitle("Double Chooz Gaibu Monitor version " + Belle2LogViewer.VERSION);
+		setTitle("Belle2 Log Viewer version " + Belle2LogViewer.VERSION);
 		_side_panel.setPreferredSize(new Dimension(180, 520));
 		_side_panel.setMaximumSize(new Dimension(180, 520));
 		_side_panel.setLayout(new BoxLayout(_side_panel, BoxLayout.Y_AXIS));

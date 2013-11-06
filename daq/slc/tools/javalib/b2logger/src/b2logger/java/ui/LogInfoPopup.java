@@ -18,7 +18,7 @@ public class LogInfoPopup extends LogPopup {
     private int _sleep_time = 2;
     
 	public LogInfoPopup(LogMessage message) {
-		this(message, 12);
+		this(message, 15);
 	}
 	
 	public LogInfoPopup(LogMessage message, int font_size) {

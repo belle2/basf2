@@ -6,7 +6,7 @@ import b2logger.core.SystemLogLevel;
 public class LogNoticePopup extends LogInfoPopup {
 	
 	public LogNoticePopup(LogMessage message) {
-		super(message, 14, 5);
+		super(message, 15, 5);
 	}
 
 	public LogNoticePopup() {

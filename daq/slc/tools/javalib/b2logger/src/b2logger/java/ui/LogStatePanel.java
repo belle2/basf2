@@ -68,7 +68,7 @@ public class LogStatePanel extends JavaGCanvasPanel {
 	
 	public LogStatePanel(LogMessage message) {
 		this();
-		_g_name.setText(message.getHostName());
+		_g_name.setText(message.getGroupName());
 		update(message);
 	}
 	

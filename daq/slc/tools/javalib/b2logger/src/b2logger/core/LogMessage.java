@@ -5,11 +5,13 @@ import b2daq.core.Time;
 
 public class LogMessage {
 
+	private String _group_name = "GUI";
 	private String _host_name;
 	private String _node_name;
 	private String _message;
 	private SystemLogLevel _level;
 	private Time _time;
+	private int _ref_no;
 	private int _id;
 	
 	public LogMessage() {
@@ -34,6 +36,14 @@ public class LogMessage {
 
 	public LogMessage(String host) {
 		this(host, "", SystemLogLevel.UNDEFINED, "");
+	}
+
+	public void setGroupName(String name) {
+		_group_name = name;
+	}
+
+	public String getGroupName() {
+		return _group_name;
 	}
 
 	public void setHostName(String name) {
@@ -76,12 +86,14 @@ public class LogMessage {
 		}
 		_level = SystemLogLevel.Get(pars[0]);
 		_time.set(((long)pars[1]) * 1000, 0);
+		_ref_no = pars[2];
 		String [] str_v = reader.readString().split(";");
-		if ( str_v.length < 3 ) return ;
-		setHostName(str_v[0]);
-		setNodeName(str_v[1]);
-		String message = str_v[2];
-		for ( int n = 3; n < str_v.length; n++ ) {
+		if ( str_v.length < 4 ) return ;
+		setGroupName(str_v[0].replace("_LOGGER", ""));
+		setHostName(str_v[1]);
+		setNodeName(str_v[2]);
+		String message = str_v[3];
+		for ( int n = 4; n < str_v.length; n++ ) {
 			message += ";" + str_v[n];
 		}
 		setMessage(message);
@@ -90,16 +102,18 @@ public class LogMessage {
 	public String toString() {
 		return "Log ID : "+ _id + ", time:" + _time.toString() + "\n"
 			+ "LogLevel : " + _level.toString() +"\n" 
-			+ "From : " + _host_name +"\n"
-			+ "Node : " + _node_name +"\n"
-			+ "Message : " + getMessage();
+			+ "Group    : " + _group_name +"\n"
+			+ "Host     : " + _host_name +"\n"
+			+ "Node     : " + _node_name +"\n"
+			+ "Message  : " + getMessage();
 	}
 	
 	public String toHTML() {
 		return "<center> Logger " + _level.toString() +"</center>"
-			+ "From : " + _host_name +"<br />"
-			+ "Node : " + _node_name +"<br />"
-			+ "Time:" + _time.toDateString()+ "<br />" 
+				+ "Group : " + _group_name +"<br />"
+			+ "Host  : " + _host_name +"<br />"
+			+ "Node  : " + _node_name +"<br />"
+			+ "Date  :" + _time.toDateString()+ "<br />" 
 			+ "Message : <br /> "
 			+ getMessage();
 	}

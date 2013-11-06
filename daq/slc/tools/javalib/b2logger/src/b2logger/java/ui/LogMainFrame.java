@@ -11,6 +11,7 @@ import javax.swing.JTabbedPane;
 
 import b2daq.core.Log;
 import b2daq.core.LogLevel;
+import b2daq.java.ui.DnDTabbedPane;
 import b2daq.java.ui.LogViewPanel;
 import b2logger.core.LogMessage;
 import b2logger.java.Belle2LogViewer;
@@ -23,7 +24,7 @@ public class LogMainFrame extends JFrame {
 	private HashMap<String, LogLevel> _popup_level_m = new HashMap<String, LogLevel>();
 	private JPanel _side_panel = new JPanel();
 	private HashMap<String, LogStatePanel> _state_panel_m = new HashMap<String, LogStatePanel>();
-	private JTabbedPane _tab_panel = new JTabbedPane(JTabbedPane.TOP);
+	private JTabbedPane _tab_panel = new DnDTabbedPane();
 
 	public LogMainFrame () {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -44,26 +45,29 @@ public class LogMainFrame extends JFrame {
 	
 	public void update (LogMessage message) {
 		LogViewPanel log_view = null;
-		String host_name = message.getHostName();
-		if ( _log_view_m.containsKey(host_name) ) {
-			log_view = _log_view_m.get(host_name);
+		String group_name = message.getGroupName();
+		if ( _log_view_m.containsKey(group_name) ) {
+			log_view = _log_view_m.get(group_name);
 		}
 		if ( log_view == null ) {
 			log_view = new LogViewPanel();
-			_log_view_m.put(host_name, log_view);
-			_popup_level_m.put(host_name, LogLevel.DEBUG);
-			_tab_panel.addTab(host_name, log_view);
+			_log_view_m.put(group_name, log_view);
+			_popup_level_m.put(group_name, LogLevel.DEBUG);
+			_tab_panel.addTab(group_name, log_view);
 			LogStatePanel state_panel = new LogStatePanel(message);
 			_side_panel.add(state_panel);
-			_state_panel_m.put(host_name, state_panel);
+			_state_panel_m.put(group_name, state_panel);
 		}
-		log_view.add(new Log(message.getMessage(), 
+		String html_message = "["+message.getNodeName()+"] "+message.getMessage();
+		html_message = html_message.replace("<a", "<a color='blue'");
+		System.out.println(html_message);
+		log_view.add(new Log(html_message, 
 				message.getLogLevel(), message.getTime().getSecond()));
-		if ( !getLogThreshold(host_name).hiegher(message.getLogLevel()) ){
+		if ( !getLogThreshold(group_name).hiegher(message.getLogLevel()) ){
 			_tab_panel.setSelectedComponent(log_view);
 		}
-		if ( _state_panel_m.containsKey(host_name) ) {
-			_state_panel_m.get(host_name).update(message);
+		if ( _state_panel_m.containsKey(group_name) ) {
+			_state_panel_m.get(group_name).update(message);
 		}
 	}
 	

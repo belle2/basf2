@@ -42,7 +42,7 @@ public class LogWarningPopup extends LogPopup {
 	} 
 	
 	public LogWarningPopup(LogMessage message) {
-		this(message, 14);
+		this(message, 15);
 	}
 
 	public LogWarningPopup() {

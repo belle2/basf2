@@ -2,6 +2,7 @@ package b2daq.java.ui;
 
 import java.awt.Color;
 import java.awt.Cursor;
+import java.awt.Desktop;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -9,6 +10,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -20,6 +22,8 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import javax.swing.border.BevelBorder;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.BadLocationException;
@@ -111,6 +115,20 @@ public class LogPanel extends JScrollPane {
 				menu.add(save_menu);
 				pop_menu.add(menu);
 				pop_menu.show(arg0.getComponent(), arg0.getX(), arg0.getY());
+			}
+		});
+		_text_panel.addHyperlinkListener(new HyperlinkListener() {
+			@Override
+			public void hyperlinkUpdate(HyperlinkEvent e) {
+				if ( e.getEventType() == HyperlinkEvent.EventType.ACTIVATED ) {
+					try {
+						Desktop.getDesktop().browse(e.getURL().toURI());
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					} catch (URISyntaxException e1) {
+						e1.printStackTrace();
+					}
+				}
 			}
 		});
 		setBorder(new BevelBorder(BevelBorder.LOWERED));

@@ -34,7 +34,7 @@ public class Belle2LogViewer extends JavaEntoryPoint {
 
 	public void run() {
 		_frame.setVisible(true);
-		_frame.update(new LogMessage("localhost", "Belle2LogViewer",
+		_frame.update(new LogMessage("localhost", "GUI",
 				SystemLogLevel.INFO, "Viewer started"));
 		_frame.setPopupLevel("GaibuViewer", SystemLogLevel.EXCEPTION);
 		while (true) {
@@ -43,7 +43,7 @@ public class Belle2LogViewer extends JavaEntoryPoint {
 				_writer = new SocketDataWriter(_socket);
 				_reader = new SocketDataReader(_socket);
 				_writer.writeString("GUI");
-				_frame.update(new LogMessage("localhost", "Belle2LogViewer",
+				_frame.update(new LogMessage("localhost", "GUI",
 						SystemLogLevel.NOTICE, "Connected with GaibuServer."));
 				while (true) {
 					LogMessage message = new LogMessage();
@@ -56,14 +56,14 @@ public class Belle2LogViewer extends JavaEntoryPoint {
 						}
 						_frame.update(message);
 					} catch (Exception e) {
-						_frame.update(new LogMessage("localhost", "Belle2LogViewer",
+						_frame.update(new LogMessage("localhost", "GUI",
 								SystemLogLevel.DEBUG, "Got wong message."));
 					}
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
 				try { _socket.close(); } catch (Exception e1) {} 
-				_frame.update(new LogMessage("localhost", "Belle2LogViewer",
+				_frame.update(new LogMessage("localhost", "GUI",
 						SystemLogLevel.WARNING, "Failed to reconnect to GaibuServer<br/>" +
 						"Tring to reconnect after 3 second"));
 				try {
@@ -90,7 +90,7 @@ public class Belle2LogViewer extends JavaEntoryPoint {
 		try { 
 			_writer.writeString(msg.toGaibu());
 		} catch (Exception e) {
-			_frame.update(new LogMessage("localhost", "Belle2LogViewer",
+			_frame.update(new LogMessage("localhost", "GUI",
 					SystemLogLevel.WARNING, "sending : " + msg.toGaibu()));
 			e.printStackTrace();
 		}

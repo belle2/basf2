@@ -24,7 +24,9 @@ public class LogFatalPopup extends LogPopup {
 		super(message, 16);
 		_frame = new JFrame("Logger " + message.getLogLevel().getLabel());
 		_view.add(new Log("<p width='100%' style='padding:0;text-align:center;font-size:110%;font-weight:bold;'>Logger FATAL</p>"+
-				"From : " + message.getHostName() + "<br/>" +
+				"Group : " + message.getGroupName() + "<br/>" +
+				"Host : " + message.getHostName() + "<br/>" +
+				"Node : " + message.getNodeName() + "<br/>" +
 				"Date : " + message.getTime().toDateString() + "<br/" +
 				"Meesage : <br/>" + message.getMessage(), SystemLogLevel.FATAL));
 		_frame.setIconImage(Toolkit.getDefaultToolkit().createImage(getClass().getResource("gaibu.png")));
@@ -61,7 +63,7 @@ public class LogFatalPopup extends LogPopup {
 	private class ExceptionLogPanel extends LogPanel {
 		private static final long serialVersionUID = 1L;
 		public ExceptionLogPanel() {
-			super("GaibuException");
+			super("Logger FATAL");
 		}
 		public String createHTML(Log log) {
 			return "<div width='100%' style='color:"+

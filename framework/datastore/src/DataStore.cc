@@ -94,8 +94,8 @@ bool DataStore::createEntry(const std::string& name, EDurability durability,
 
     // Check whether the persistency type matches
     if (entry->isTransient != transient) {
-      B2WARNING("Existing object '" << name << "' has different persistency type than the requested one. Using persistent option.");
-      entry->isTransient = false;
+      B2WARNING("Existing object '" << name << "' has different persistency type than the requested one. Using " << (transient ? "transient" : "persistent") << ".");
+      entry->isTransient = transient;
     }
 
     B2DEBUG(100, "An entry with name " << name << " and durability " << durability << " already exists.");

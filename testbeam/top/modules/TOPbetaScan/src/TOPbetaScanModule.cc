@@ -67,6 +67,7 @@ namespace Belle2 {
     addParam("betaMin", m_betaMin, "lower limit of beta range to scan", 0.9);
     addParam("betaMax", m_betaMax, "upper limit of beta range to scan", 1.1);
     addParam("numPoints", m_numPoints, "number of scan points", 20);
+    addParam("numBisect", m_numBisect, "number of bisection steps", 10);
     addParam("numBins", m_numBins, "number of histogram bins", 200);
     addParam("numScanHistograms", m_numScanHistograms,
              "number of scan histograms to be written for control", 10);
@@ -221,7 +222,7 @@ namespace Belle2 {
 
     // array to hold scan values
 
-    double logLikelihood[m_numPoints];
+    double logL[m_numPoints];
 
     // array to hold beta values
 
@@ -233,51 +234,101 @@ namespace Belle2 {
     // scan beta
 
     for (int i = 0; i < m_numPoints; i++) {
-      reco.setBeta(beta[i]);
-      reco.Reconstruct(track);
-      if (reco.Flag() != 1) B2WARNING("TOPbetaScan: reconstruction flag = false");
-      double logL[1], expPhot[1];
-      int Nphot;
-      reco.GetLogL(1, logL, expPhot, Nphot);
-      logLikelihood[i] = logL[0];
+      logL[i] = getLogLikelihood(reco, track, beta[i]);
     }
 
-    // save scan to histogram (for control)
+    // find maximum
+
+    int i0 = 0;
+    double maxL = logL[i0];
+    for (int i = 1; i < m_numPoints; i++) {
+      if (logL[i] > maxL) {maxL = logL[i]; i0 = i;}
+    }
+    if (i0 == 0) i0++;
+    if (i0 == m_numPoints - 1) i0--;
+
+    double Beta[] = {beta[i0 - 1], 0, beta[i0], 0, beta[i0 + 1]};
+    double LogL[] = {logL[i0 - 1], 0, logL[i0], 0, logL[i0 + 1]};
+    for (int i = 0; i < m_numBisect; i++) {
+      improvePrecision(reco, track, Beta, LogL);
+    }
+
+    // save scan to a histogram (for control)
 
     if ((int) m_scanHistograms.size() < m_numScanHistograms) {
       string id = string("Hscan") + numberToString(m_scanHistograms.size());
       StoreObjPtr<EventMetaData> evtMetaData;
       string htit = string("beta scan of event ") +
                     numberToString(evtMetaData->getEvent()) +
-                    string(" run ") + numberToString(evtMetaData->getRun()) + string(", ") +
+                    string(" run ") + numberToString(evtMetaData->getRun()) +
+                    string(", ") +
                     numberToString(reco.DataSize()) + string(" photons");
       TH1F* h = new TH1F(id.c_str(), htit.c_str(),
                          m_numPoints, m_betaMin, m_betaMax);
-      for (int i = 0; i < m_numPoints; i++) h->SetBinContent(i + 1, logLikelihood[i]);
+      for (int i = 0; i < m_numPoints; i++) h->SetBinContent(i + 1, logL[i] - LogL[2]);
       m_scanHistograms.push_back(h);
     }
 
-    // find maximum
+    return Beta[2];
 
-    int i0 = 0;
-    double maxL = logLikelihood[i0];
-    for (int i = 1; i < m_numPoints; i++) {
-      if (logLikelihood[i] > maxL) {maxL = logLikelihood[i]; i0 = i;}
+  }
+
+
+  double TOPbetaScanModule::getLogLikelihood(TOP::TOPreco& reco,
+                                             TOP::TOPtrack& track,
+                                             double beta)
+  {
+    reco.setBeta(beta);
+    reco.Reconstruct(track);
+    if (reco.Flag() != 1) B2WARNING("TOPbetaScan: reconstruction flag = false");
+    double logL[1], expPhot[1];
+    int Nphot;
+    reco.GetLogL(1, logL, expPhot, Nphot);
+    return logL[0];
+  }
+
+
+  void TOPbetaScanModule::improvePrecision(TOP::TOPreco& reco, TOP::TOPtrack& track,
+                                           double Beta[], double LogL[])
+  {
+    Beta[1] = (Beta[0] + Beta[2]) / 2;
+    LogL[1] = getLogLikelihood(reco, track, Beta[1]);
+
+    Beta[3] = (Beta[2] + Beta[4]) / 2;
+    LogL[3] = getLogLikelihood(reco, track, Beta[3]);
+
+    int i0 = 1;
+    double maxL = LogL[i0];
+    for (int i = 2; i < 4; i++) {
+      if (LogL[i] > maxL) {maxL = LogL[i]; i0 = i;}
     }
-    if (i0 == 0) i0++;
-    if (i0 == m_numPoints - 1) i0--;
 
-    // find parabolic maximum by interpolation
-
-    double D21 = logLikelihood[i0] - logLikelihood[i0 - 1];
-    double D32 = logLikelihood[i0 + 1] - logLikelihood[i0];
-    double A = (D32 - D21) / 2;
-    if (A == 0) return beta[i0];
-    double B = (D32 + D21) / 2;
-    double X_M = - B / 2 / A;
-    double Beta = beta[i0] + X_M * Dbeta;
-
-    return Beta;
+    switch (i0) {
+      case 1:
+        Beta[4] = Beta[2];
+        LogL[4] = LogL[2];
+        Beta[2] = Beta[1];
+        LogL[2] = LogL[1];
+        break;
+      case 2:
+        Beta[4] = Beta[3];
+        LogL[4] = LogL[3];
+        Beta[0] = Beta[1];
+        LogL[0] = LogL[1];
+        break;
+      case 3:
+        Beta[0] = Beta[2];
+        LogL[0] = LogL[2];
+        Beta[2] = Beta[3];
+        LogL[2] = LogL[3];
+        break;
+      default:
+        B2ERROR("improvePrecision: bug!");
+    }
+    Beta[1] = 0;
+    LogL[1] = 0;
+    Beta[3] = 0;
+    LogL[3] = 0;
 
   }
 

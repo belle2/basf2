@@ -83,11 +83,31 @@ namespace Belle2 {
     void getTracks(std::vector<TOP::TOPtrack>& tracks, Const::ChargedStable chargedStable);
 
     /**
-     * Reconstruct particle beta
+     * Reconstruct particle velocity beta
      * @param reco reconstruction object
      * @param track TOPtrack
+     * @return beta
      */
     double reconstructBeta(TOP::TOPreco& reco, TOP::TOPtrack& track);
+
+    /**
+     * Return log likelihood for given beta
+     * @param reco reconstruction object
+     * @param track TOPtrack
+     * @param beta particle velocity beta
+     * @return log likelihood
+     */
+    double getLogLikelihood(TOP::TOPreco& reco, TOP::TOPtrack& track, double beta);
+
+    /**
+     * Improve precision of log likelihood maximum position using bisection
+     * @param reco reconstruction object
+     * @param track TOPtrack
+     * @param Beta array of particle velocities beta
+     * @param LogL array of log likelihoods
+     */
+    void improvePrecision(TOP::TOPreco& reco, TOP::TOPtrack& track,
+                          double Beta[], double LogL[]);
 
     /**
      * convert a number to printable string
@@ -100,6 +120,7 @@ namespace Belle2 {
     double m_betaMin;  /**< lower limit of beta range to scan */
     double m_betaMax;  /**< upper limit of beta range to scan */
     int m_numPoints;   /**< number of scan points */
+    int m_numBisect;   /**< number of bisection steps */
     int m_numBins;     /**< number of histogram bins to histogram the results */
     int m_numScanHistograms; /**< number of scan histograms to be written to file */
     double m_minBkgPerBar;    /**< minimal assumed background photons per bar */

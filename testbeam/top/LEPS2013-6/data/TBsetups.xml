@@ -10,6 +10,22 @@
     <!-- elements are aligned along z-axis symmetrically to the origin -->
 
     <element>
+      <type>vetoCounter</type>
+      <name>vetoL</name>
+      <detectorID>9</detectorID>
+      <z unit="mm">-731.3</z>
+      <x unit="mm">-270.0</x>
+    </element>
+    
+    <element>
+      <type>vetoCounter</type>
+      <name>vetoR</name>
+      <detectorID>10</detectorID>
+      <z unit="mm">-731.3</z>
+      <x unit="mm">240.0</x>
+    </element>    
+    
+    <element>
       <type>TriggerS</type>
       <name>TriggerS1</name>
       <detectorID>1</detectorID>

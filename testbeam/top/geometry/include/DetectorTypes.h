@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Staric                                             *
+ * Contributors: Marko Staric, Matthew Barrett                            *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -19,7 +19,7 @@ namespace Belle2 {
      * detector type enumerators
      * relation to detector creator functions must be one-to-one
      */
-    enum EDetectorType {c_undefined, c_scintillator, c_sciFi};
+    enum EDetectorType {c_undefined, c_scintillator, c_sciFi, c_timing, c_veto};
 
   }
 }

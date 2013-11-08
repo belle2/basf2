@@ -28,7 +28,7 @@
       <Material>Polystyrene</Material>
       <coatingMaterial>PMMA</coatingMaterial>
       <fiberDiameter unit="mm">2</fiberDiameter>
-      <activeDiameter unit="mm">1.8</activeDiameter>
+      <activeDiameter unit="mm">1.94</activeDiameter>
       <fiberLength unit="mm">250</fiberLength>
       <numberOfFibers>10</numberOfFibers>
       <firstFiber desc="z- or z+, default=z-">z-</firstFiber>
@@ -41,6 +41,21 @@
       <thickness unit="mm">5.0</thickness>
     </coverPlate>
   </SciFi>
+
+  <VetoCounter desc="veto counter">
+    <creatorName>vetoCounter</creatorName>
+    <Material>PMMA</Material>
+    <ShieldingMaterial>ExpandedPolystyrene</ShieldingMaterial>
+    <ESMaterial desc="empty space material">Air</ESMaterial>
+    <width unit="mm">200.0</width>
+    <height unit="mm">400.0</height>
+    <thickness unit="mm">20.0</thickness>    
+    <shieldingThickness unit="mm">18.0</shieldingThickness>
+  </VetoCounter>
+
+
+
+
 
 </elements>
 

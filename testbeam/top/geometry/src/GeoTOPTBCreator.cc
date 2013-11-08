@@ -358,6 +358,53 @@ namespace Belle2 {
     }
 
 
+    G4LogicalVolume* GeoTOPTBCreator::vetoCounter(const GearDir& content,
+                                                  std::string elementName,
+                                                  int detectorID)
+    {
+      if (!content) return NULL;
+
+      EDetectorType detectorType = c_veto;
+
+      std::string Material             = content.getString("Material");
+      std::string ShieldingMaterial    = content.getString("shieldingMaterial");
+      std::string ESMaterial           = content.getString("ESMaterial");
+      double width                     = content.getLength("width") / Unit::mm;
+      double height                    = content.getLength("height") / Unit::mm;
+      double thickness                 = content.getLength("thickness") / Unit::mm;
+      double shieldingThickness        = content.getLength("shieldingThickness") / Unit::mm;
+      double fullThickness             = thickness + 2 * shieldingThickness;
+
+      //detector volume
+      G4Box* box                       = new G4Box("vetoCounter", width / 2.0, height / 2.0, fullThickness / 2.0);
+      G4Material* material             = Materials::get(ESMaterial);
+      G4LogicalVolume* counter         = new G4LogicalVolume(box, material, elementName);
+
+      G4Box* vetoCounterBox            = new G4Box("vetoCounterBox", width / 2.0, height / 2.0, thickness / 2.0);
+      G4Material* vetoCounterMaterial  = Materials::get(Material);
+      G4LogicalVolume* vetoCounterLV   = new G4LogicalVolume(vetoCounterBox, vetoCounterMaterial, "vetoCounter");
+
+      G4Box* shieldingBox              = new G4Box("vetoCounterShieldingBox", width / 2.0, height / 2.0, shieldingThickness / 2.0);
+      G4Material* shieldingMaterial    = Materials::get(ShieldingMaterial);
+      G4LogicalVolume* shieldingLV     = new G4LogicalVolume(shieldingBox, shieldingMaterial, "vetoCounterShielding");
+
+      //Placement of counter and shielding
+      G4PVPlacement* vetoCounterPV;
+      G4PVPlacement* shielding1PV;
+      G4PVPlacement* shielding2PV;
+      G4Transform3D Translation1       = G4Translate3D(0, 0, -thickness - shieldingThickness);
+      G4Transform3D Translation2       = G4Translate3D(0, 0, thickness + shieldingThickness);
+      vetoCounterPV                    = new G4PVPlacement(G4Transform3D(), vetoCounterLV, "vetoCounter", counter, false, 0);
+      shielding1PV                     = new G4PVPlacement(Translation1, shieldingLV, "vetoCounterShielding", counter, false, 0);
+      shielding2PV                     = new G4PVPlacement(Translation2, shieldingLV, "vetoCounterShielding", counter, false, 1);
+
+      SensitiveScintillator* sensitive = new SensitiveScintillator(detectorID, detectorType);
+      m_sensitiveScintillators.push_back(sensitive);
+      vetoCounterLV->SetSensitiveDetector(sensitive);
+
+      return counter;
+
+    }
 
   } // namespace TOPTB
 } // namespace Belle2

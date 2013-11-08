@@ -111,6 +111,19 @@ namespace Belle2 {
 
 
       /**
+       * creates veto counter
+       * @param content counter parameters
+       * @param elementName element name in the setup
+       * @param detectorID detector ID
+       */
+      G4LogicalVolume* vetoCounter(const GearDir& content,
+                                   std::string elementName,
+                                   int detectorID);
+
+
+
+
+      /**
        * list of sensitive scintillators (needed to be known to class destructor)
        */
       std::vector<SensitiveScintillator*> m_sensitiveScintillators;

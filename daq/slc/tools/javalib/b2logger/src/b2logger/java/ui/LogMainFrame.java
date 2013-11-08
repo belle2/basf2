@@ -24,6 +24,7 @@ public class LogMainFrame extends JFrame {
 	private HashMap<String, LogLevel> _popup_level_m = new HashMap<String, LogLevel>();
 	private JPanel _side_panel = new JPanel();
 	private HashMap<String, LogStatePanel> _state_panel_m = new HashMap<String, LogStatePanel>();
+	private HashMap<String, DnDTabbedPane> _tab_panel_m = new HashMap<String, DnDTabbedPane>();
 	private JTabbedPane _tab_panel = new DnDTabbedPane();
 
 	public LogMainFrame () {
@@ -44,26 +45,35 @@ public class LogMainFrame extends JFrame {
 	}
 	
 	public void update (LogMessage message) {
-		LogViewPanel log_view = null;
+		DnDTabbedPane tab_panel = null;
 		String group_name = message.getGroupName();
-		if ( _log_view_m.containsKey(group_name) ) {
-			log_view = _log_view_m.get(group_name);
-		}
-		if ( log_view == null ) {
-			log_view = new LogViewPanel();
-			_log_view_m.put(group_name, log_view);
-			_popup_level_m.put(group_name, LogLevel.DEBUG);
-			_tab_panel.addTab(group_name, log_view);
+		if ( _tab_panel_m.containsKey(group_name) ) {
+			tab_panel = _tab_panel_m.get(group_name);
+		} else {
+			tab_panel = new DnDTabbedPane();
+			_tab_panel_m.put(group_name, tab_panel);
+			_tab_panel.addTab(group_name, tab_panel);
 			LogStatePanel state_panel = new LogStatePanel(message);
 			_side_panel.add(state_panel);
 			_state_panel_m.put(group_name, state_panel);
 		}
-		String html_message = "["+message.getNodeName()+"] "+message.getMessage();
-		html_message = html_message.replace("<a", "<a color='blue'");
+
+		LogViewPanel log_view = null;
+		String node_name = message.getNodeName();
+		if ( _log_view_m.containsKey(node_name) ) {
+			log_view = _log_view_m.get(node_name);
+		}
+		if ( log_view == null ) {
+			log_view = new LogViewPanel();
+			_log_view_m.put(node_name, log_view);
+			_popup_level_m.put(node_name, LogLevel.DEBUG);
+			tab_panel.add(node_name, log_view);
+		}
+		String html_message = message.getMessage().replace("<a", "<a style='color:#0000FF;'");
 		log_view.add(new Log(html_message, 
 				message.getLogLevel(), message.getTime().getSecond()));
 		if ( !getLogThreshold(group_name).hiegher(message.getLogLevel()) ){
-			_tab_panel.setSelectedComponent(log_view);
+			_tab_panel.setSelectedComponent(tab_panel);
 		}
 		if ( _state_panel_m.containsKey(group_name) ) {
 			_state_panel_m.get(group_name).update(message);

@@ -1,5 +1,6 @@
 package b2logger.java.ui;
 
+import java.awt.Color;
 import java.awt.GraphicsEnvironment;
 
 import javax.swing.JToolTip;
@@ -28,7 +29,9 @@ public class LogPopup extends Thread {
 		message.toHTML() +
 		"</div></html>";
         _tip.setTipText(_html);
-        _window.setAlwaysOnTop(true);
+        _tip.setBackground(Color.WHITE);
+        _window.setBackground(Color.WHITE);
+	_window.setAlwaysOnTop(true);
 	}
 
 	public LogPopup() {}

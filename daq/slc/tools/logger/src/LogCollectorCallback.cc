@@ -25,6 +25,9 @@ bool LogCollectorCallback::log() throw()
   NSMMessage& msg(getMessage());
   log.unpack(msg.getNParams(), (const int*)msg.getParams(),
              msg.getData());
+  if (log.getGroupName().size() == 0) {
+    log.setGroupName("GLOBAL");
+  }
   GUICommunicator::push(log);
   std::cout << log.toString() << std::endl;
   return true;

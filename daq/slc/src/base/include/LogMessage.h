@@ -35,6 +35,12 @@ namespace Belle2 {
     void setGroupName(const std::string& name) {
       _group_name = name;
     }
+    const std::string& getNodeName() const {
+      return _node_name;
+    }
+    const std::string& getGroupName() const {
+      return _group_name;
+    }
 
   private:
     Priority _priority;

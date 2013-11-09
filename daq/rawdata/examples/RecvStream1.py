@@ -58,9 +58,9 @@ receiver.param('UseShmFlag', use_shm_flag)
 # histo = register_module('HistoManager')
 # main.add_module (histo)
 histo = register_module('DqmHistoManager')
-histo.param('HostName', 'belle-rpc1')
+histo.param('HostName', 'ropc01')
 histo.param('Port', 9991)
-histo.param('DumpInterval', 10)
+histo.param('DumpInterval', 1000)
 histo.param('HistoFileName', 'ropc_histofile.root')
 
 # Monitor module
@@ -76,7 +76,8 @@ dump.param('outputFileName', '/dev/null')
 # Sender
 sender = register_module('Serializer')
 sender.param('DestPort', 36000)
-sender.param('LocalHostName', 'belle-rpc1')
+# sender.param('LocalHostName', 'belle-rpc1')
+sender.param('LocalHostName', 'localhost')
 
 # Compression Level: 0 for no, 1 for low, 9 for high compression. Level 1 usually reduces size by 50%, higher levels have no noticeable effect.
 
@@ -91,8 +92,8 @@ main = create_path()
 main.add_module(receiver)
 # main.add_module(histo)
 # main.add_module(monitor)
-main.add_module(dump)
-# main.add_module(sender)
+# main.add_module(dump)
+main.add_module(sender)
 
 # main.add_module(output)
 # main.add_module(perf)

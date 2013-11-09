@@ -52,6 +52,7 @@ void MonitorDataCOPPERModule::defineHisto()
 
   h_rate = new TH1F("h_rate", "Data rate / COPPER; COPPER ID; Data rate [Bytes/s]", 20, 0, 20);
 
+
   /*
   h_hslb_size[0] = new TH1F("h_hslb_size_0", "Data size / HSLB; Data size [Byte]; entries", 50, 0, 10000);
   h_hslb_size[1] = new TH1F("h_hslb_size_1", "Data size / HSLB; Data size [Byte]; entries", 50, 0, 10000);
@@ -114,20 +115,19 @@ void MonitorDataCOPPERModule::event()
     m_nevt = 0;
   }
 
-  /*
+
   //StoreArray<RawCOPPER> rawcprarray;
-  StoreArray<RawCDC> raw_array;
-  //StoreArray<RawDataBlock> raw_dblkarray;
-  int ncpr = raw_array.getEntries();
+  //StoreArray<RawCDC> raw_dblkarray;
+  StoreArray<RawDataBlock> raw_dblkarray;
+
+  int ncpr = raw_dblkarray.getEntries();
   for (int j = 0; j < ncpr; j++) {
     m_nevt++;
-    for (int i = 0; i < raw_array[j]->GetNumEntries(); i++) {
-      //RawHeader rawhdr;
-      //int* buf;
-      int size_byte = 0;
-      //buf = raw_cdcarray[ j ]->GetBuffer(i);
-      //rawhdr.SetBuffer(raw_array[j]->GetRawHdrBufPtr(i));
-      int size_byte = raw_array[j]->GetBlockNwords(i) * sizeof(int);
+    for (int i = 0; i < raw_dblkarray[j]->GetNumEntries(); i++) {
+      RawCOPPER* temp_rawcopper = new RawCOPPER;
+      temp_rawcopper->SetBuffer(raw_dblkarray[j]->GetBuffer(i),
+                                raw_dblkarray[j]->GetBlockNwords(i), 0, 1, 1);
+      int size_byte = raw_dblkarray[j]->GetBlockNwords(i) * sizeof(int);
       //h_ncpr->Fill(i);
       h_nevt->SetBinContent(i + 1, m_nevt);
       h_size->SetBinContent(i + 1, h_size->GetBinContent(i + 1) + size_byte);
@@ -146,5 +146,4 @@ void MonitorDataCOPPERModule::event()
     m_prev_time = cur_time;
   }
   m_loop++;
-  */
 }

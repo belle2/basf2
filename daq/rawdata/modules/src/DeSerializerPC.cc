@@ -609,7 +609,7 @@ void DeSerializerPCModule::event()
       }
     }
 
-
+#ifndef NO_DATA_CHECK
     if (eve_copper_1 != 0 && (eve_copper_0 != eve_copper_1)) {
       char err_buf[500];
       sprintf(err_buf, "Differet Event number over COPPERS COPPER0 %u COPPER1 %u\n", eve_copper_0, eve_copper_1);
@@ -626,7 +626,7 @@ void DeSerializerPCModule::event()
 //       sleep(1234567);
 //       exit(-1);
     }
-
+#endif
 
 #else
     //    m_rawdatablk->buffer(temp_buf_body, body_size_word, malloc_flag_body);

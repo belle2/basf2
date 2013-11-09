@@ -69,7 +69,6 @@ namespace Belle2 {
     };
 
   protected :
-
     int m_nwords;
 
     int m_num_nodes;
@@ -80,9 +79,12 @@ namespace Belle2 {
 
     int m_use_prealloc_buf; //! Not record
 
+    int m_which_part; //! Not record
 
     ClassDef(RawDataBlock, 1);
+
   };
+
 }
 
 #endif

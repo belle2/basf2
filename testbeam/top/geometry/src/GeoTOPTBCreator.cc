@@ -389,14 +389,11 @@ namespace Belle2 {
       G4LogicalVolume* shieldingLV     = new G4LogicalVolume(shieldingBox, shieldingMaterial, "vetoCounterShielding");
 
       //Placement of counter and shielding
-      G4PVPlacement* vetoCounterPV;
-      G4PVPlacement* shielding1PV;
-      G4PVPlacement* shielding2PV;
       G4Transform3D Translation1       = G4Translate3D(0, 0, -thickness - shieldingThickness);
       G4Transform3D Translation2       = G4Translate3D(0, 0, thickness + shieldingThickness);
-      vetoCounterPV                    = new G4PVPlacement(G4Transform3D(), vetoCounterLV, "vetoCounter", counter, false, 0);
-      shielding1PV                     = new G4PVPlacement(Translation1, shieldingLV, "vetoCounterShielding", counter, false, 0);
-      shielding2PV                     = new G4PVPlacement(Translation2, shieldingLV, "vetoCounterShielding", counter, false, 1);
+      new G4PVPlacement(G4Transform3D(), vetoCounterLV, "vetoCounter", counter, false, 0);
+      new G4PVPlacement(Translation1, shieldingLV, "vetoCounterShielding", counter, false, 0);
+      new G4PVPlacement(Translation2, shieldingLV, "vetoCounterShielding", counter, false, 1);
 
       SensitiveScintillator* sensitive = new SensitiveScintillator(detectorID, detectorType);
       m_sensitiveScintillators.push_back(sensitive);

@@ -10,7 +10,7 @@
     <!-- elements are aligned along z-axis symmetrically to the origin -->
 
     <element>
-      <type>vetoCounter</type>
+      <type>VetoCounter</type>
       <name>vetoL</name>
       <detectorID>9</detectorID>
       <z unit="mm">-731.3</z>
@@ -18,7 +18,7 @@
     </element>
     
     <element>
-      <type>vetoCounter</type>
+      <type>VetoCounter</type>
       <name>vetoR</name>
       <detectorID>10</detectorID>
       <z unit="mm">-731.3</z>

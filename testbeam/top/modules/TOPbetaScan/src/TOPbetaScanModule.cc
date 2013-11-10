@@ -269,7 +269,7 @@ namespace Belle2 {
       m_scanHistograms.push_back(h);
     }
 
-    return Beta[2];
+    return Beta[2] + (Beta[2] - Beta[0]) * (gRandom->Rndm() - 0.5);
 
   }
 

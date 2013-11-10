@@ -163,6 +163,10 @@ namespace Belle2 {
         G4LogicalVolume* ele = sciFiTracker(element, elementName, detectorID);
         return ele;
       }
+      if (creatorName == "vetoCounter") {
+        G4LogicalVolume* ele = vetoCounter(element, elementName, detectorID);
+        return ele;
+      }
 
       B2ERROR("Creator with the name " << creatorName << " doesn't exist");
       return NULL;
@@ -367,7 +371,7 @@ namespace Belle2 {
       EDetectorType detectorType = c_veto;
 
       std::string Material             = content.getString("Material");
-      std::string ShieldingMaterial    = content.getString("shieldingMaterial");
+      std::string ShieldingMaterial    = content.getString("ShieldingMaterial");
       std::string ESMaterial           = content.getString("ESMaterial");
       double width                     = content.getLength("width") / Unit::mm;
       double height                    = content.getLength("height") / Unit::mm;
@@ -389,8 +393,9 @@ namespace Belle2 {
       G4LogicalVolume* shieldingLV     = new G4LogicalVolume(shieldingBox, shieldingMaterial, "vetoCounterShielding");
 
       //Placement of counter and shielding
-      G4Transform3D Translation1       = G4Translate3D(0, 0, -thickness - shieldingThickness);
-      G4Transform3D Translation2       = G4Translate3D(0, 0, thickness + shieldingThickness);
+      double shiftZ = (thickness + shieldingThickness) / 2;
+      G4Transform3D Translation1       = G4Translate3D(0, 0, -shiftZ);
+      G4Transform3D Translation2       = G4Translate3D(0, 0,  shiftZ);
       new G4PVPlacement(G4Transform3D(), vetoCounterLV, "vetoCounter", counter, false, 0);
       new G4PVPlacement(Translation1, shieldingLV, "vetoCounterShielding", counter, false, 0);
       new G4PVPlacement(Translation2, shieldingLV, "vetoCounterShielding", counter, false, 1);

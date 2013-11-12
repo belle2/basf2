@@ -36,7 +36,11 @@ int main(int argc, char** argv)
   for (;;) {
     int stat = rs.SendEvent();
     //    printf ( "rb2sock : sending %d\n", stat );
-    if (stat <= 0) break;
+    if (stat <= 0) {
+      printf("rb2sock : error in sending event. The event is lost. Reconnecting....\n");
+      rs.Reconnect();
+      printf("rb2sock : reconnected.\n");
+    }
   }
   exit(0);
 }

@@ -41,7 +41,16 @@ int RawRevRb2Sock::SendEvent(void)
   m_flow->log(size * 4);
 
   int is = m_sock->put_wordbuf(m_evtbuf, size);
-  if (is < 0) perror("put_wordbuf");
+  //  if (is < 0) perror("put_wordbuf");
   return is;
 }
+
+int RawRevRb2Sock::Reconnect(void)
+{
+  int port = m_sock->port();
+  delete m_sock;
+  m_sock = new RSocketSend((u_short)port);
+  m_sock->accept();
+}
+
 

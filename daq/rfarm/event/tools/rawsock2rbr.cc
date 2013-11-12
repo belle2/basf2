@@ -1,5 +1,5 @@
 //+
-// File : sock2rbr.cc
+// File : rawsock2rbr.cc
 // Description : Get an event from RingBuffer and send it to socket
 //               Reverse connection
 //
@@ -42,10 +42,15 @@ int main(int argc, char** argv)
     if (stat < 0)
       break;
     else if (stat == 0) {
-      printf("sock2rb : status 0, waiting %d times\n", ncount);
-      sleep(10);
-      ncount++;
-      if (ncount > 100) break;
+      // Reconnection needed
+      int nrepeat = 5000;
+      for (;;) {
+        int rstat = sr.Reconnect(nrepeat);
+        if (rstat == -1)
+          continue;
+        else
+          break;
+      }
     }
     nevt++;
     if (nevt % 5000 == 0) {

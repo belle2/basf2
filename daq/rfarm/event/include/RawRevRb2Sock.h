@@ -35,6 +35,9 @@ public:
   /*! Event function */
   int SendEvent(void);
 
+  /*! Reconnect */
+  int Reconnect(void);
+
 private:
   RingBuffer* m_rbuf;
   RSocketSend* m_sock;

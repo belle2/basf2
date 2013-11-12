@@ -45,6 +45,7 @@ namespace Belle2 {
     int sock() const;
     int sender() const;
     void sock(int sockid);
+    int port() const;
 
     int get(char* data, int len);
     int read(char* data, int len);
@@ -58,6 +59,7 @@ namespace Belle2 {
   private:
     SocketIO m_io;
     int m_sock;
+    int m_port;
     int m_sender;
     int m_errno;
     int m_int;
@@ -68,6 +70,8 @@ namespace Belle2 {
   public:
     RSocketRecv(const char* node, u_short prt);
     ~RSocketRecv();
+
+    int reconnect(int ntry);
 
     int put(char* data, int len);
     int write(char* data, int len);
@@ -84,6 +88,8 @@ namespace Belle2 {
 
   private:
     SocketIO m_io;
+    struct hostent* m_hp;
+    struct sockaddr_in m_sa;
     int m_sock;
     int m_port;
     char m_node[128];

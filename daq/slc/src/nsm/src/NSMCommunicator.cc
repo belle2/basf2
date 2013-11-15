@@ -50,6 +50,7 @@ NSMCommunicator::NSMCommunicator(NSMNode* node, const std::string& host,
   _host = host;
   _port = port;
   _logger_node = NULL;
+  _rc_node = NULL;
   _config_name = config_name;
 }
 
@@ -93,6 +94,10 @@ void NSMCommunicator::init(const std::string& host, int port) throw(NSMHandlerEx
   std::string logger_name = config.get("LOG_NSM_NAME");
   if (logger_name.size() > 0) {
     _logger_node = new NSMNode(logger_name);
+  }
+  std::string rc_name = config.get("RC_NSM_NAME");
+  if (rc_name.size() > 0) {
+    _rc_node = new NSMNode(rc_name);
   }
   __com_v.push_back(this);
 }
@@ -160,6 +165,13 @@ void NSMCommunicator::sendLog(const LogMessage& log) throw(NSMHandlerException)
     unsigned int pars[3];
     int npar = log.pack((int*)pars, str);
     sendRequest(_logger_node, Command::LOG, npar, pars, str);
+  }
+}
+
+void NSMCommunicator::sendError(const std::string& message) throw(NSMHandlerException)
+{
+  if (_rc_node != NULL) {
+    sendRequest(_rc_node, Command::ERROR, 0, NULL, message);
   }
 }
 

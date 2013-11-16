@@ -5,7 +5,12 @@
 # .so with them, but only when linking executables
 
 import os
+import sys
 import tempfile
+
+if len(sys.argv) < 2:
+    print "Test disabled, start with - --really argument to run it manually."
+    sys.exit(0)
 
 localdir = os.environ['BELLE2_LOCAL_DIR']
 subdir = os.environ['BELLE2_SUBDIR']

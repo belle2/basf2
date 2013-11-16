@@ -14,6 +14,7 @@
 #include <vxd/dataobjects/VxdID.h>
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <svd/dataobjects/SVDCluster.h>
+#include <svd/reconstruction/SVDRecoHit.h>
 
 // ROOT includes
 #include <TMatrixD.h>
@@ -75,6 +76,12 @@ namespace Belle2 {
      * @param vHit the v-type SVDCluster
      */
     SVDRecoHit2D(const SVDCluster& uHit, const SVDCluster& vHit);
+
+    /** Construct SVDRecoHit from a u- and v- (1D) SVDRecoHit.
+     * @param uHit the u-type SVDRecoHit
+     * @param vHit the v-type SVDRecoHit
+     */
+    SVDRecoHit2D(const SVDRecoHit& uHit, const SVDRecoHit& vHit);
 
     /** Destructor. */
     virtual ~SVDRecoHit2D() {}

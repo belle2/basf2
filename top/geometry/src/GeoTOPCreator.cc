@@ -176,9 +176,15 @@ namespace Belle2 {
 
       //! set the color of the bar
       setColor(*qbar, "rgb(0.0,0.75,1.0,1.0)");
+
+      GearDir barSurface(content, "Bars/Surface");
+      if (barSurface) {
+        Materials& materials = Materials::getInstance();
+        G4OpticalSurface* optSurf = materials.createOpticalSurface(barSurface);
+        new G4LogicalSkinSurface("barSurface", qbar, optSurf);
+      } else B2WARNING("TOP bar: no surface properties defined!");
+
       /*!  Build shapes of mirror  */
-
-
       G4double   pRmin = Mirradius;
       G4double   pRmax = Mirradius + Mirthickness * 100.0;
 

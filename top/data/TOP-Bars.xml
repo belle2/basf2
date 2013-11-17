@@ -21,5 +21,20 @@
     <Thicknes2 desc="glue thicknes quartz-quartz" unit="mm">0.1</Thicknes2>
     <Thicknes3 desc="glue thicknes quartz-mirror section" unit="mm">0.1</Thicknes3>
   </Glue>
+
+  <Surface>
+    <Properties>
+      <Property name="REFLECTIVITY" unit="eV">
+        <value energy="1.0">0.9994</value> 
+        <value energy="2.0">0.9994</value> 
+        <value energy="3.0">0.9994</value> 
+        <value energy="4.0">0.9994</value> 
+      </Property>
+    </Properties>
+    <Type>dielectric_dielectric</Type>
+    <Finish>polished</Finish>
+    <Model>unified</Model>
+  </Surface>
+
 </Bars>
 

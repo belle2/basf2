@@ -123,9 +123,46 @@ SVDRecoHit2D::SVDRecoHit2D(const SVDCluster& uHit, const SVDCluster& vHit):
   setDetectorPlane();
 }
 
-SVDRecoHit2D::SVDRecoHit2D(const SVDRecoHit& uHit, const SVDRecoHit& vHit):
-  SVDRecoHit2D(*(uHit.getCluster()), *(vHit.getCluster()))
-{}
+SVDRecoHit2D::SVDRecoHit2D(const SVDRecoHit& uRecoHit, const SVDRecoHit& vRecoHit):
+  GFAbsPlanarHit(HIT_DIMENSIONS), m_trueHit(NULL), m_energyDep(0)
+{
+  const SVDCluster& uHit = *(uRecoHit.getCluster());
+  const SVDCluster& vHit = *(vRecoHit.getCluster());
+  if ((uHit.getRawSensorID() != vHit.getRawSensorID()) || !uHit.isUCluster() || vHit.isUCluster())
+    B2FATAL("Error in SVDRecoHit2D: Incorrect SVDCluster instances on input!")
+
+    m_sensorID = uHit.getRawSensorID();
+  m_uCluster = &uHit;
+  m_vCluster = &vHit;
+
+  // Now that we have a v coordinate, we can rescale u.
+  const SVD::SensorInfo& info =
+    dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(m_sensorID));
+
+  double DeltaU =
+    (info.getForwardWidth() - info.getBackwardWidth()) / info.getLength() / info.getWidth(0);
+  double scaleFactorU = 1 + DeltaU * vHit.getPosition();
+  double tan_phi = DeltaU * uHit.getPosition(); // need u at v=0!
+  double one_over_cos_phi_sqr = 1 + tan_phi * tan_phi;
+
+  fHitCoord[0] = uHit.getPosition() * scaleFactorU;
+  fHitCoord[1] = vHit.getPosition();
+
+  double sigmaU = uHit.getPositionSigma() * scaleFactorU;
+  double sigmaU_sq = sigmaU * sigmaU;
+  double sigmaV = vHit.getPositionSigma();
+  double sigmaV_sq = sigmaV * sigmaV;
+
+  m_energyDep = 0.5 * (uHit.getCharge() + vHit.getCharge());
+
+  fHitCov(0, 0) = sigmaV_sq * tan_phi * tan_phi + sigmaU_sq * one_over_cos_phi_sqr;
+  fHitCov(0, 1) = sigmaV_sq * tan_phi;
+  fHitCov(1, 0) = sigmaV_sq * tan_phi;
+  fHitCov(1, 1) = sigmaV_sq;
+  // Setup geometry information
+  setDetectorPlane();
+}
+
 
 
 void SVDRecoHit2D::setDetectorPlane()

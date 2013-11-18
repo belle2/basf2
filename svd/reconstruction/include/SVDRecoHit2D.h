@@ -78,10 +78,10 @@ namespace Belle2 {
     SVDRecoHit2D(const SVDCluster& uHit, const SVDCluster& vHit);
 
     /** Construct SVDRecoHit from a u- and v- (1D) SVDRecoHit.
-     * @param uHit the u-type SVDRecoHit
-     * @param vHit the v-type SVDRecoHit
+     * @param uRecoHit the u-type SVDRecoHit
+     * @param vRecoHit the v-type SVDRecoHit
      */
-    SVDRecoHit2D(const SVDRecoHit& uHit, const SVDRecoHit& vHit);
+    SVDRecoHit2D(const SVDRecoHit& uRecoHit, const SVDRecoHit& vRecoHit);
 
     /** Destructor. */
     virtual ~SVDRecoHit2D() {}

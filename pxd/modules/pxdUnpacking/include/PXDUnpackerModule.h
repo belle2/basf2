@@ -43,7 +43,7 @@ namespace Belle2 {
       /** Unpack one event (several frames) stored in RawPXD object.
        * @param px RawPXD data object
        */
-      void unpack_event(RawPXD* px);
+      void unpack_event(RawPXD& px);
 
       /** Swap endianes inside all shorts of this frame besides CRC.
        * @param data pointer to frame
@@ -69,8 +69,6 @@ namespace Belle2 {
        */
       /** Name of the collection to use for the PXDDigits */
       //Pxd
-      std::string m_storeRAWPxdName;
-      std::string m_storeRawHitsName;
 
       /** Output array. */
       StoreArray<PXDRawHit> m_storeRawHits;

@@ -552,43 +552,36 @@ public:
 
 PXDUnpackerModule::PXDUnpackerModule() :
   Module(),
-  m_storeRawHitsName("RawHit"),
-  m_storeRawHits(m_storeRawHitsName)
+  m_storeRawHits()
 {
   //Set module properties
   setDescription("Unpack Raw PXD Hits");
   setPropertyFlags(c_ParallelProcessingCertified);
-
-  m_storeRAWPxdName = "RawPXDs";
-  //addParam("Clusters", m_storeClustersName, "Cluster collection name",
-//          string(""));
-
 }
 
 void PXDUnpackerModule::initialize()
 {
   //Register output collections
   m_storeRawHits.registerAsPersistent();
+  /// actually, later we do not want o store it into output file ...  aside from debugging
 }
 
 unsigned char tmpbuffer[1024 * 1024 * 16];
 
 void PXDUnpackerModule::event()
 {
-  StoreArray<RawPXD> storeRaws(m_storeRAWPxdName);
+  StoreArray<RawPXD> storeRaws;
 
   int nRaws = storeRaws.getEntries();
   if (verbose) {
     B2INFO(" PXD Unpacker --> RawPXD Objects in event: " << nRaws);
   };
-  if (nRaws == 0)
-    return;
 
-  for (int i = 0; i < nRaws; i++) {
+  for (auto & it : storeRaws) {
     if (verbose) {
-      B2INFO(" PXD Unpacker --> Unpack Objects: " << i);
+      B2INFO(" PXD Unpacker --> Unpack Objects: ");
     };
-    unpack_event(storeRaws[i]);
+    unpack_event(it);
   }
 
 }
@@ -601,18 +594,18 @@ void PXDUnpackerModule::endian_swap_frame(unsigned short* dataptr, int len)
   }
 }
 
-void PXDUnpackerModule::unpack_event(RawPXD* px)
+void PXDUnpackerModule::unpack_event(RawPXD& px)
 {
   int last_wie = 0, last_framenr = 0, last_start = 0, last_end = 1;
   static unsigned int last_evtnr = 0;
   int Frames_per_event;
   int fullsize;
   int datafullsize;
-  bool header_swap_endian = true;
+  bool header_swap_endian = false;//true;
 
   unsigned int* data;
-  data = (unsigned int*)px->data();
-  fullsize = px->size() * 4; /// in bytes ... rounded up to next 32bit boundary
+  data = (unsigned int*)px.data();
+  fullsize = px.size() * 4; /// in bytes ... rounded up to next 32bit boundary
 
   /// NEW format
   if (verbose) {

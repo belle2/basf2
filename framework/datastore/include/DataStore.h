@@ -342,11 +342,11 @@ namespace Belle2 {
      *                 If the special name "ALL" is given all store arrays containing objects of type TO are considered.
      *  @return        The related object or a null pointer.
      */
-    template <class TO> static const TO* getRelatedFromObj(const TObject* fromObject, const std::string& toName = "") {
+    template <class TO> static TO* getRelatedFromObj(const TObject* fromObject, const std::string& toName = "") {
       if (!fromObject) return 0;
       StoreEntry* storeEntry = 0;
       int index = -1;
-      return static_cast<const TO*>(DataStore::Instance().getRelationWith(c_ToSide, fromObject, storeEntry, index, TO::Class(), toName).object);
+      return static_cast<TO*>(DataStore::Instance().getRelationWith(c_ToSide, fromObject, storeEntry, index, TO::Class(), toName).object);
     }
 
     /** Get the object from which another object has a relation.
@@ -358,11 +358,11 @@ namespace Belle2 {
      *                  If the special name "ALL" is given all store arrays containing objects of type FROM are considered.
      *  @return         The related object or a null pointer.
      */
-    template <class FROM> static const FROM* getRelatedToObj(const TObject* toObject, const std::string& fromName = "") {
+    template <class FROM> static FROM* getRelatedToObj(const TObject* toObject, const std::string& fromName = "") {
       if (!toObject) return 0;
       StoreEntry* storeEntry = 0;
       int index = -1;
-      return static_cast<const FROM*>(DataStore::Instance().getRelationWith(c_FromSide, toObject, storeEntry, index, FROM::Class(), fromName).object);
+      return static_cast<FROM*>(DataStore::Instance().getRelationWith(c_FromSide, toObject, storeEntry, index, FROM::Class(), fromName).object);
     }
 
     /** Get the object to or from which another object has a relation.
@@ -374,11 +374,11 @@ namespace Belle2 {
      *                 If the special name "ALL" is given all store arrays containing objects of type T are considered.
      *  @return        The related object or a null pointer.
      */
-    template <class T> static const T* getRelated(const TObject* object, const std::string& name = "") {
+    template <class T> static T* getRelated(const TObject* object, const std::string& name = "") {
       if (!object) return 0;
       StoreEntry* storeEntry = 0;
       int index = -1;
-      return static_cast<const T*>(DataStore::Instance().getRelationWith(c_BothSides, object, storeEntry, index, T::Class(), name).object);
+      return static_cast<T*>(DataStore::Instance().getRelationWith(c_BothSides, object, storeEntry, index, T::Class(), name).object);
     }
 
     /** Find an object in an array in the data store.

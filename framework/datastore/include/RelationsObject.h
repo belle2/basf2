@@ -87,7 +87,7 @@ namespace Belle2 {
      *  Cached values are cleared.
      *  @param relationsInterface  The object that should be assigned.
      */
-    RelationsInterface& operator = (const RelationsInterface& relationsInterface);
+    RelationsInterface& operator=(const RelationsInterface& relationsInterface);
 
 
     /** Add a relation from this object to another object.
@@ -146,8 +146,8 @@ namespace Belle2 {
      *                 If the special name "ALL" is given all store arrays containing objects of type TO are considered.
      *  @return        The first related object or a null pointer.
      */
-    template <class TO> const TO* getRelatedTo(const std::string& name = "") const {
-      return static_cast<const TO*>(DataStore::Instance().getRelationWith(DataStore::c_ToSide, this, m_cacheDataStoreEntry, m_cacheArrayIndex, TO::Class(), name).object);
+    template <class TO> TO* getRelatedTo(const std::string& name = "") const {
+      return static_cast<TO*>(DataStore::Instance().getRelationWith(DataStore::c_ToSide, this, m_cacheDataStoreEntry, m_cacheArrayIndex, TO::Class(), name).object);
     }
 
     /** Get the object from which this object has a relation.
@@ -158,8 +158,8 @@ namespace Belle2 {
      *                 If the special name "ALL" is given all store arrays containing objects of type FROM are considered.
      *  @return        The first related object or a null pointer.
      */
-    template <class FROM> const FROM* getRelatedFrom(const std::string& name = "") const {
-      return static_cast<const FROM*>(DataStore::Instance().getRelationWith(DataStore::c_FromSide, this, m_cacheDataStoreEntry, m_cacheArrayIndex, FROM::Class(), name).object);
+    template <class FROM> FROM* getRelatedFrom(const std::string& name = "") const {
+      return static_cast<FROM*>(DataStore::Instance().getRelationWith(DataStore::c_FromSide, this, m_cacheDataStoreEntry, m_cacheArrayIndex, FROM::Class(), name).object);
     }
 
     /** Get the object to or from which this object has a relation.
@@ -170,8 +170,8 @@ namespace Belle2 {
      *                 If the special name "ALL" is given all store arrays containing objects of type T are considered.
      *  @return        The first related object or a null pointer.
      */
-    template <class T> const T* getRelated(const std::string& name = "") const {
-      return static_cast<const T*>(DataStore::Instance().getRelationWith(DataStore::c_BothSides, this, m_cacheDataStoreEntry, m_cacheArrayIndex, T::Class(), name).object);
+    template <class T> T* getRelated(const std::string& name = "") const {
+      return static_cast<T*>(DataStore::Instance().getRelationWith(DataStore::c_BothSides, this, m_cacheDataStoreEntry, m_cacheArrayIndex, T::Class(), name).object);
     }
 
     /** Get name of array this object is stored in, or "" if not found. */
@@ -202,9 +202,9 @@ namespace Belle2 {
     RelationVector<TObject> getRelationsWith(const std::string& name) const {
       return getRelationsWith<TObject>(name);
     }
-    const TObject* getRelatedTo(const std::string& name) const { return getRelatedTo<TObject>(name); }
-    const TObject* getRelatedFrom(const std::string& name) const { return getRelatedFrom<TObject>(name); }
-    const TObject* getRelated(const std::string& name) const { return getRelated<TObject>(name); }
+    TObject* getRelatedTo(const std::string& name) const { return getRelatedTo<TObject>(name); }
+    TObject* getRelatedFrom(const std::string& name) const { return getRelatedFrom<TObject>(name); }
+    TObject* getRelated(const std::string& name) const { return getRelated<TObject>(name); }
     /** @} */
 #endif
 

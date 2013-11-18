@@ -22,7 +22,6 @@ namespace Belle2 {
   class MCParticle;
   class Track;
   class TrackFitResult;
-  class Particle;
 
   template< class T >
   class StoreArray;
@@ -110,11 +109,6 @@ namespace Belle2 {
      */
     const TrackFitResult* findRelatedTrackFitResult(const GFTrack* gfTrack);
 
-    /** find a related Track to a given MCParticle
-     * @param mcParticle: Track must be related to this MCParticle
-     * @return: true is returned if a related track was found, else false is returned
-     */
-    bool findRelatedTrack(MCParticle& mcParticle);
 
     /** add all charged stable particles to a vector which originate from
      * @param mcParticle
@@ -132,12 +126,6 @@ namespace Belle2 {
      * @return: true if MCParticle decays in the given decay chain, else false
      */
     bool isSignalDecay(MCParticle& mcParticle);
-
-    /** take a Track and PDG code and create a Particle object. The Particle is added to a vector of Particles
-     * @param track: pointer to a Track
-     * @param pdg: particle hypothesis
-     */
-    void createParticleFromTrack(Track* track, int pdg);
 
     /** write root tree to output file and close the file */
     void writeData();
@@ -157,9 +145,6 @@ namespace Belle2 {
 
     /**< vector with all MCParticles of the searched signal decay */
     std::vector< MCParticle* > m_signalMCParticles;
-
-    /**< Particle vector with reconstructed charged stable particles */
-    std::vector< Particle > m_chargedStableParticles;
 
     /**< properties of a reconstructed track */
     ParticleProperties m_trackProperties;

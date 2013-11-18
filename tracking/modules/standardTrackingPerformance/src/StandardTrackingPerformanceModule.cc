@@ -16,8 +16,6 @@
 #include <framework/datastore/RelationIndex.h>
 #include <framework/datastore/RelationVector.h>
 
-#include <analysis/dataobjects/Particle.h>
-
 #include <generators/dataobjects/MCParticle.h>
 #include <tracking/dataobjects/Track.h>
 
@@ -165,35 +163,6 @@ GFTrack* StandardTrackingPerformanceModule::findRelatedTrack(
   }
 
   return resultGfTrack;
-}
-
-bool StandardTrackingPerformanceModule::findRelatedTrack(
-  MCParticle& mcParticle)
-{
-  RelationVector< Track > relatedTracks = mcParticle.getRelationsTo< Track >();
-
-  int nRelatedTracks = relatedTracks.size();
-  B2DEBUG(99, "MCParticle: pdg = " << mcParticle.getPDG());
-  B2DEBUG(99, "# related tracks: " << nRelatedTracks);
-
-  const TrackFitResult* trackResult = NULL;
-  if (nRelatedTracks == 1) {
-    trackResult = relatedTracks[0]->getTrackFitResult(Const::ChargedStable(abs(mcParticle.getPDG())));
-  }
-
-  bool foundResult = bool (trackResult != NULL);
-  // create a Particle from track if a valid TrackFitResult was found
-  if (foundResult) {
-    createParticleFromTrack(relatedTracks[0], mcParticle.getPDG());
-  }
-  return foundResult;
-}
-
-void StandardTrackingPerformanceModule::createParticleFromTrack(Track* track, int pdg)
-{
-  Particle particle(track, Const::ChargedStable(abs(pdg)));
-  // add Particle to m_chargedStableParticles
-  m_chargedStableParticles.push_back(particle);
 }
 
 void StandardTrackingPerformanceModule::setupTree()

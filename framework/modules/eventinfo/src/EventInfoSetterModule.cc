@@ -41,7 +41,7 @@ EventInfoSetterModule::EventInfoSetterModule() : Module()
 
   addParam("expList",      m_expList,      "List of experiment numbers.", defaultExpRunList);
   addParam("runList",      m_runList,      "List of run numbers.",        defaultExpRunList);
-  addParam("evtNumList",   m_evtNumList,   "List of the number of events which should be processed.", defaultEvtNum);
+  addParam("evtNumList",   m_evtNumList,   "List of the number of events which should be processed. Can be overridden via -n argument to basf2.", defaultEvtNum);
 }
 
 

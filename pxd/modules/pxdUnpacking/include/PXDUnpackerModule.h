@@ -45,6 +45,8 @@ namespace Belle2 {
       bool m_headerEndianSwap;
       /**  Run in DHHC mode yes/no */
       bool m_DHHCmode;
+      /** Output array for Raw Hits. */
+      StoreArray<PXDRawHit> m_storeRawHits;
 
       /** Unpack one event (several frames) stored in RawPXD object.
        * @param px RawPXD data object
@@ -74,16 +76,6 @@ namespace Belle2 {
        * @param len length of dhp data
        */
       void unpack_dhp(void* data, unsigned int len, unsigned int dhh_first_frame_id_lo, unsigned int dhh_ID, unsigned short toffset);
-
-
-      /** Write clusters to collection.
-       * This method will check all cluster candidates and write valid ones to the datastore
-       */
-      /** Name of the collection to use for the PXDDigits */
-      //Pxd
-
-      /** Output array. */
-      StoreArray<PXDRawHit> m_storeRawHits;
 
     };//end class declaration
 

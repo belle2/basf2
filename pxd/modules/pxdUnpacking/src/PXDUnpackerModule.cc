@@ -23,6 +23,7 @@
 #define DHP_FRAME_HEADER_DATA_TYPE_RAW  0x0
 #define DHP_FRAME_HEADER_DATA_TYPE_ZSD  0x5
 
+// DHH frames
 #define DHH_FRAME_HEADER_DATA_TYPE_DHP_RAW  0x0
 #define DHH_FRAME_HEADER_DATA_TYPE_DHP_ZSD  0x5
 #define DHH_FRAME_HEADER_DATA_TYPE_DCE_RAW  0x1
@@ -30,10 +31,18 @@
 #define DHH_FRAME_HEADER_DATA_TYPE_EVT_FRM  0x3
 #define DHH_FRAME_HEADER_DATA_TYPE_GHOST    0x2
 #define DHH_FRAME_HEADER_DATA_TYPE_END_FRM  0x4
+// Onsen processed data
 #define DHH_FRAME_HEADER_DATA_TYPE_HLTROI   0x7
 
+// DHHC envelope
 #define DHHC_FRAME_HEADER_DATA_TYPE_DHHC_START  0xB
 #define DHHC_FRAME_HEADER_DATA_TYPE_DHHC_END    0xC
+// Onsen processed data
+#define DHHC_FRAME_HEADER_DATA_TYPE_DHP_ONS     0xD
+#define DHHC_FRAME_HEADER_DATA_TYPE_FCE_ONS     0x9
+#define DHHC_FRAME_HEADER_DATA_TYPE_HLTROI      0xF
+
+// DHH like above, but format has changed
 #define DHHC_FRAME_HEADER_DATA_TYPE_DHP_RAW     0x0
 #define DHHC_FRAME_HEADER_DATA_TYPE_DHP_ZSD     0x5
 #define DHHC_FRAME_HEADER_DATA_TYPE_FCE_RAW     0x1
@@ -41,7 +50,6 @@
 #define DHHC_FRAME_HEADER_DATA_TYPE_GHOST       0x2
 #define DHHC_FRAME_HEADER_DATA_TYPE_DHH_START   0x3
 #define DHHC_FRAME_HEADER_DATA_TYPE_DHH_END     0x4
-#define DHHC_FRAME_HEADER_DATA_TYPE_HLTROI      0x7
 
 using namespace std;
 using namespace Belle2;
@@ -88,15 +96,15 @@ char* dhhc_type_name[16] = {
   (char*)"H_END  ",
   (char*)"DHP_ZSD",
   (char*)"COMMODE",
-  (char*)"HLTROI ",
   (char*)"undef  ",
   (char*)"undef  ",
+  (char*)"FCE_ONS",
   (char*)"undef  ",
   (char*)"C_START",
   (char*)"C_END  ",
+  (char*)"DHP_ONS",
   (char*)"undef  ",
-  (char*)"undef  ",
-  (char*)"undef  "
+  (char*)"HLTROI "
 };
 
 
@@ -1189,9 +1197,9 @@ void PXDUnpackerModule::unpack_event(RawPXD& px)
   int fullsize;
   int datafullsize;
 
-  unsigned int* data;
-  data = (unsigned int*)px.data();
+  unsigned int data[px.size()];
   fullsize = px.size() * 4; /// in bytes ... rounded up to next 32bit boundary
+  memcpy(data, (unsigned int*)px.data(), fullsize);
 
   /// NEW format
   if (verbose) {

@@ -12,13 +12,9 @@
 #define pxdRawDQMModule_H
 
 #include <framework/core/HistoModule.h>
-#include <boost/format.hpp>
 #include <string>
-#include <deque>
 #include <framework/datastore/DataStore.h>
 #include <TH2.h>
-#include <TCanvas.h>
-#include <pxd/dataobjects/PXDRawHit.h>
 
 namespace Belle2 {
 

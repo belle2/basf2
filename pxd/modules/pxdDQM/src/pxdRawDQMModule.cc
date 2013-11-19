@@ -9,12 +9,7 @@
  **************************************************************************/
 
 #include <pxd/modules/pxdDQM/pxdRawDQMModule.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/logging/Logger.h>
-#include <vxd/geometry/GeoCache.h>
-#include <pxd/geometry/SensorInfo.h>
 #include <pxd/dataobjects/PXDRawHit.h>
 #include <pxd/dataobjects/RawPXD.h>
 

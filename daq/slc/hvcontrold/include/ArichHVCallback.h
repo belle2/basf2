@@ -7,6 +7,8 @@
 
 namespace Belle2 {
 
+  class ArichHVCommunicator;
+
   class ArichHVCallback : public HVCallback {
 
   public:
@@ -17,6 +19,13 @@ namespace Belle2 {
     virtual bool load() throw();
     virtual bool switchOn() throw();
     virtual bool switchOff() throw();
+
+    void setHVCommunicator(ArichHVCommunicator* hv_comm) {
+      _hv_comm = hv_comm;
+    }
+
+  private:
+    ArichHVCommunicator* _hv_comm;
 
   };
 

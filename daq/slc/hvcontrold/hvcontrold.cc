@@ -26,7 +26,7 @@ int main(int argc, char** argv)
   NSMData* data = new NSMData(name + "_STATUS", "ArichHVStatus", 1);
   ArichHVCallback* callback = new ArichHVCallback(node);
   NSMNodeDaemon* daemon = new NSMNodeDaemon(callback);
-  PThread(new ArichHVCommunicator(callback->getCrate(), host, port, data));
+  PThread(new ArichHVCommunicator(callback, host, port, data));
   daemon->run();
 
   return 0;

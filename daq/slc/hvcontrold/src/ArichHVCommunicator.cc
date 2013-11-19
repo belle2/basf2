@@ -30,6 +30,8 @@ throw(IOException)
         return ss.str();
       }
     } catch (const IOException& e) {
+      Belle2::debug("Socket error on HV crate: %s", e.what());
+      _socket.close();
       _mutex.unlock();
       throw (e);
     }

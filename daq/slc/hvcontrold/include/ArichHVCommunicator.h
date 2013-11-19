@@ -2,7 +2,7 @@
 #define Belle2_ArichHVCommunicator_h
 
 #include "ArichHVMessage.h"
-#include "HVCrateInfo.h"
+#include "ArichHVCallback.h"
 
 #include <nsm/NSMData.h>
 
@@ -16,10 +16,13 @@ namespace Belle2 {
   class ArichHVCommunicator {
 
   public:
-    ArichHVCommunicator(HVCrateInfo* crate,
+    ArichHVCommunicator(ArichHVCallback* callback,
                         const std::string& host,
                         int port, NSMData* data)
-      : _crate(crate), _host(host), _port(port), _data(data) {}
+      : _crate(callback->getCrate()), _host(host),
+        _port(port), _data(data) {
+      callback->setHVCommunicator(this);
+    }
     ~ArichHVCommunicator() throw() {}
 
   public:

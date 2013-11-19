@@ -21,6 +21,7 @@ namespace Belle2 {
     unsigned int getVoltageDemand() const { return getUInt("voltage_demand"); }
     unsigned int getVoltageLimit() const { return getUInt("voltage_limit"); }
     unsigned int getCurrentLimit() const { return getUInt("current_limit"); }
+    unsigned int getStatus() const { return getUInt("status"); }
     unsigned int getVoltageMonitored() const { return getUInt("voltage_monitored"); }
     unsigned int getCurrentMonitored() const { return getUInt("current_monitored"); }
 
@@ -33,6 +34,7 @@ namespace Belle2 {
     void setVoltageDemand(unsigned int v) { setUInt("voltage_demand", v); }
     void setVoltageLimit(unsigned int v) { setUInt("voltage_limit", v); }
     void setCurrentLimit(unsigned int v) { setUInt("current_limit", v); }
+    void setStatus(unsigned int v) { setUInt("status", v); }
     void setVoltageMonitored(unsigned int v) { setUInt("voltage_monitored", v); }
     void setCurrentMonitored(unsigned int v) { setUInt("current_monitored", v); }
 

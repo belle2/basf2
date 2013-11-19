@@ -13,7 +13,6 @@ using namespace Belle2;
 ArichHVCallback::ArichHVCallback(NSMNode* node) throw()
   : HVCallback(node)
 {
-  download();
 }
 
 bool ArichHVCallback::load() throw()

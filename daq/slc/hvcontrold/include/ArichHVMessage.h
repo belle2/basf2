@@ -39,9 +39,9 @@ namespace Belle2 {
     void setCommand(Command command) { m_command = command; }
     void setParamType(ParamType type) { m_type = type; }
     void setChannelInfo(HVChannelInfo* info) { m_info = info; }
-    Command setCommand() const { return m_command; }
-    ParamType setParamType() const { return m_type; }
-    HVChannelInfo* setChannelInfo() { return m_info; }
+    Command getCommand() const { return m_command; }
+    ParamType getParamType() const { return m_type; }
+    HVChannelInfo* getChannelInfo() { return m_info; }
 
   private:
     Command m_command;

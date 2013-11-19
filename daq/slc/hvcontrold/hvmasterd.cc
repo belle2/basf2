@@ -98,7 +98,10 @@ int main(int argc, char** argv)
       std::cout << "show [<slot> <channel>]" << std::endl;
       std::cout << "set  [<slot> <channel>] <param_name> <value>" << std::endl;
       std::cout << "get  [<slot> <channel>] <param_name>" << std::endl;
-      std::cout << "save [<slot> <channel>]" << std::endl;
+      std::cout << "save <nodename>" << std::endl;
+      std::cout << "recall <nodename> <config_no>" << std::endl;
+      std::cout << "load <nodename>" << std::endl;
+      std::cout << "switch <nodename> <on/off>" << std::endl;
       std::cout << "quit => quit program" << std::endl;
     } else if (str_v[0] == "load") {
       NSMCommunicator* comm = callback->getCommunicator();
@@ -215,6 +218,9 @@ void recall(HVCrateInfo* crate, std::string nodename, int confno)
     db.execute(Belle2::form("select * from hv_database where node = '%s' and confno = %d;",
                             nodename.c_str(), confno));
     std::vector<DBRecord>& record_v(db.loadRecords());
+    if (record_v.size() == 0) {
+      Belle2::debug("No entry found where node = %s and confno = %d", nodename.c_str(), confno);
+    }
     for (size_t i = 0; i < record_v.size(); i++) {
       unsigned int slot = record_v[i].getFieldValueInt("slot");
       unsigned int ch = record_v[i].getFieldValueInt("channel");

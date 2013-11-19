@@ -17,6 +17,7 @@ HVChannelInfo::HVChannelInfo(unsigned int crate, unsigned int slot, unsigned int
   addUInt("voltage_demand", 0);
   addUInt("voltage_limit", 0);
   addUInt("current_limit", 0);
+  addUInt("status", 0);
   addUInt("voltage_monitored", 0);
   addUInt("current_monitored", 0);
 }

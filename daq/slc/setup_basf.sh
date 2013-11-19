@@ -29,7 +29,7 @@ export NSM2_HOST=`/sbin/ifconfig | grep "192\.168\.10\." | sed "s/:/ /g" | awk '
 export NSM2_HOST=130.87.227.252
 export NSM2_PORT=8322
 export NSM2_SHMKEY=8322
-export NSM2_INCDIR=$BELLE2_DAQ_SLC_DIR/bin
+export NSM2_INCDIR=$BELLE2_DAQ_SLC_DIR/data/nsm
 export NSMD2_DEBUG=1
 export NSMD2_LOGDIR=$BELLE2_DAQ_SLC_DIR/log/nsm2
 

@@ -37,6 +37,11 @@ OBJS   = $(SRCS:$(SRCDIR)/%.cc=$(TMPDIR)/%.o)
 
 all: $(TARGETS)
 
+install: all
+	@ install -m 644 -p ./include/ArichHVStatus.h $(BELLE2_DAQ_SLC_DIR)/data/nsm
+	@ install -m 755 -p ./bin/*d $(BELLE2_DAQ_SLC_DIR)/bin
+
+
 force:
 	@ $(RM) $(BINDIR)/*
 	@ make all

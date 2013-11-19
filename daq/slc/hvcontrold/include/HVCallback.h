@@ -20,6 +20,7 @@ namespace Belle2 {
     virtual bool load() throw() { return true; }
     virtual bool switchOn() throw() { return true; }
     virtual bool switchOff() throw() { return true; }
+    virtual void init() throw();
     void download() throw();
 
   protected:

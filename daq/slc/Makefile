@@ -16,6 +16,7 @@ clean:
 	make -C tools/ clean
 	make -C hvcontrold/ clean
 	make -C src/ clean
+	make -C nsm2/ clean
 
 dqm:
 	make -C src/ dqm

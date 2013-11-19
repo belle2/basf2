@@ -26,6 +26,12 @@ void HVCallback::download() throw()
   }
   socket.close();
 }
+
+void HVCallback::init() throw()
+{
+  download();
+}
+
 bool HVCallback::perform(NSMMessage& msg) throw(NSMHandlerException)
 {
   HVCommand cmd(msg.getRequestName());

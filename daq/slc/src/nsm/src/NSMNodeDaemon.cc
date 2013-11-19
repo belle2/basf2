@@ -26,6 +26,7 @@ void NSMNodeDaemon::run() throw()
       sleep(3);
     }
   }
+  _callback->init();
   if (_rdata != NULL) {
     while (!_rdata->isAvailable()) {
       try {

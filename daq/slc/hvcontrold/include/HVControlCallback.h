@@ -14,6 +14,7 @@ namespace Belle2 {
     virtual ~HVControlCallback() throw() {}
 
   public:
+    virtual void init() throw() {}
     virtual bool ok() throw();
     virtual bool error() throw();
     virtual bool load() throw();

@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2013 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: kl                                           *
+ * Contributors: Klemens Lautenbach, Bjoern Spruck                        *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -12,8 +12,11 @@
 #define pxdRawDQMModule_H
 
 #include <framework/core/HistoModule.h>
-#include <string>
 #include <framework/datastore/DataStore.h>
+#include <framework/datastore/StoreArray.h>
+#include <pxd/dataobjects/PXDRawHit.h>
+#include <pxd/dataobjects/RawPXD.h>
+#include <string>
 #include <TH2.h>
 
 namespace Belle2 {
@@ -22,6 +25,10 @@ namespace Belle2 {
     /** \addtogroup modules
     * @{
     */
+    /** The raw PXD DQM module.
+     *
+     * Creates basic DQM for Raw PXD data and Pixels
+     */
     class pxdRawDQMModule : public HistoModule {
 
     public:
@@ -37,15 +44,21 @@ namespace Belle2 {
 
     private:
 
-      //void Draw();
+      /** Storearray for raw data packets  */
+      StoreArray<RawPXD> m_storeRawPxdrarray;
+      /** Storearray for raw pixels   */
+      StoreArray<PXDRawHit> m_storeRawHits;
 
+      /** Histogram number of raw packets */
       TH1F* hrawPxdPackets;
+      /** Histogram raw packet size */
       TH1F* hrawPxdPacketSize;
+      /** Histogram pixelcount/??? */
       TH1F* hrawPxdHitsCount;
+      /** Histogram 2d hitmap */
       TH2F* hrawPxdHits;
+      /** Histogram raw pixel charge */
       TH1F* hrawPxdHitsCharge;
-
-      std::string m_storeRawHitsName;
 
       virtual void defineHisto();
 

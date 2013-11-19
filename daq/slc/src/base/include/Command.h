@@ -40,7 +40,7 @@ namespace Belle2 {
     Command(const char* label) throw() { *this = label; }
     ~Command() throw() {}
 
-  private:
+  protected:
     Command(int id, const char* label, const char* alias)
     throw() : Enum(id, label, alias) {}
 

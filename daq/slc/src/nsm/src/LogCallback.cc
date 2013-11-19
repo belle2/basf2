@@ -21,7 +21,7 @@ bool LogCallback::perform(NSMMessage& msg) throw(NSMHandlerException)
 }
 
 LogCallback::LogCallback(NSMNode* node) throw()
+  : NSMCallback(node)
 {
-  _node = node;
   add(Command::LOG);
 }

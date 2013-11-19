@@ -47,8 +47,8 @@ int DBObjectLoader::readTable(std::vector<DataObject*>& obj_v, int version)
     for (size_t i = 0; i < record_v.size(); i++) {
       const int id = record_v[i].getFieldValueInt("id");
       if (id >= 0 && id < (int)obj_v.size()) {
-        obj_v[id]->setSQLValues(record_v[i].getFieldNames(),
-                                record_v[i].getFieldValues());
+        obj_v[id]->setValues(record_v[i].getFieldNames(),
+                             record_v[i].getFieldValues());
         count++;
       }
     }

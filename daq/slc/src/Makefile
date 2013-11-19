@@ -5,9 +5,9 @@ INCDIR=../include
 LIBDIR=../lib
 TMPDIR=../tmp
 
-all: base nsm system
+all: base nsm system xml
 
-full: all xml database
+full: all database
 
 base:
 	@ mkdir -p $(INCDIR)/$@

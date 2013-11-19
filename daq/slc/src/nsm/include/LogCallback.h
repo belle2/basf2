@@ -15,17 +15,11 @@ namespace Belle2 {
     virtual ~LogCallback() throw() {}
 
   public:
-    NSMNode* getNode() throw() { return _node; }
-
-  public:
     virtual bool log()   throw() { return true; }
 
   protected:
     virtual bool perform(NSMMessage& msg)
     throw(NSMHandlerException);
-
-  private:
-    NSMNode* _node;
 
   };
 

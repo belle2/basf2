@@ -1,4 +1,4 @@
-#include "VMEControllerCallback.h"
+#include "ArichHVCallback.h"
 
 #include <nsm/NSMNodeDaemon.h>
 
@@ -15,7 +15,7 @@ int main(int argc, char** argv)
 
   const char* name = argv[1];
   NSMNode* node = new NSMNode(name);
-  VMEControllerCallback* callback = new VMEControllerCallback(node);
+  ArichHVCallback* callback = new ArichHVCallback(node);
   NSMNodeDaemon* daemon = new NSMNodeDaemon(callback);
   daemon->run();
 

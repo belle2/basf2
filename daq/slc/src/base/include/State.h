@@ -30,7 +30,7 @@ namespace Belle2 {
     State(int id) throw() { *this = id; }
     ~State()  throw() {}
 
-  private:
+  protected:
     State(int id, const char* label, const char* alias)
     throw() : Enum(id, label, alias) {}
 

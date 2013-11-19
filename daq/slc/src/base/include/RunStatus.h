@@ -12,14 +12,14 @@ namespace Belle2 {
     virtual ~RunStatus() throw() {}
 
   public:
-    int getRunNumber() const throw() { return getIntValue("run_number"); }
-    int getExpNumber() const throw() { return getIntValue("exp_number"); }
-    int getStartTime() const throw() { return getIntValue("start_time"); }
-    int getEndTime() const throw() { return getIntValue("end_time"); }
-    void setRunNumber(int run_number) throw() { setIntValue("run_number", run_number); }
-    void setExpNumber(int exp_number) throw() { setIntValue("exp_number", exp_number); }
-    void setStartTime(int start_time) throw() { setIntValue("start_time", start_time); }
-    void setEndTime(int end_time) throw() { setIntValue("end_time", end_time); }
+    int getRunNumber() const throw() { return getInt("run_number"); }
+    int getExpNumber() const throw() { return getInt("exp_number"); }
+    int getStartTime() const throw() { return getInt("start_time"); }
+    int getEndTime() const throw() { return getInt("end_time"); }
+    void setRunNumber(int run_number) throw() { setInt("run_number", run_number); }
+    void setExpNumber(int exp_number) throw() { setInt("exp_number", exp_number); }
+    void setStartTime(int start_time) throw() { setInt("start_time", start_time); }
+    void setEndTime(int end_time) throw() { setInt("end_time", end_time); }
     int incrementExpNumber() throw() {
       int exp_number = getExpNumber();
       exp_number++;

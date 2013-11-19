@@ -54,7 +54,6 @@ void NodeLoader::load(const std::string& entry)
   for (std::map<std::string, std::string>::iterator it = _loader.getPathList().begin();
        it != _loader.getPathList().end(); it++) {
     std::string path = it->second;
-    std::cout << path << std::endl;
     _file_path_v.push_back(path);
   }
 }
@@ -68,8 +67,9 @@ void NodeLoader::push(DataObject* obj)
     _obj_v_m.insert(std::map<std::string, std::vector<DataObject*> >::value_type(class_name, obj_v));
   }
   _obj_v_m[class_name].push_back(obj);
-  for (std::map<std::string, DataObject*>::iterator it = obj->getObjects().begin();
-       it != obj->getObjects().end(); it++) {
-    push(it->second);
+  for (DataObject::ParamInfoMap::iterator it = obj->getParams().begin();
+       it != obj->getParams().end(); it++) {
+    if (it->second.type == DataObject::OBJECT)
+      push((DataObject*)(it->second.buf));
   }
 }

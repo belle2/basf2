@@ -7,12 +7,14 @@ all:
 
 full:
 	make -C src/ full
-	make -C tools/
+	make -C hvcontrold/
+#	make -C tools/
 	make -C bin/ full
 
 clean:
 	make -C bin/ clean
 	make -C tools/ clean
+	make -C hvcontrold/ clean
 	make -C src/ clean
 
 dqm:

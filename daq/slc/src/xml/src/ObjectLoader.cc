@@ -26,13 +26,8 @@ DataObject* ObjectLoader::load(const std::string& entry, DataObject* obj)
   std::vector<XMLElement*> el_v = el->getElements();
   for (size_t i = 0; i < el_v.size(); i++) {
     XMLElement* elc = el_v[i];
-    const std::string pname = elc->getAttribute("name");
-    const std::string priority_s = Belle2::toupper(elc->getAttribute("priority"));
-    DataObject::ParamPriority priority = DataObject::LOAD;
-    if (priority_s == "BOOT") priority = DataObject::BOOT;
-    else if (priority_s == "LOAD") priority = DataObject::LOAD;
-    else if (priority_s == "TRIGFT") priority = DataObject::TRIGFT;
-    if (pname.size() == 0) continue;
+    const std::string name = elc->getAttribute("name");
+    if (name.size() == 0) continue;
     if (elc->getTag() == "enum") {
       const std::string value = elc->getAttribute("value");
       std::map<std::string, int> enum_m;
@@ -41,40 +36,42 @@ DataObject* ObjectLoader::load(const std::string& entry, DataObject* obj)
         std::vector<std::string> str_v = Belle2::split(options_v[j], ':');
         enum_m.insert(std::map<std::string, int>::value_type(str_v[0], atoi(str_v[1].c_str())));
       }
-      obj->addEnum(pname, enum_m, value, priority);
-    } else if (elc->getTag() == "int") {
-      const int value = atoi(elc->getAttribute("value").c_str());
-      obj->addInt(pname, value, priority);
-    } else if (elc->getTag() == "int_array") {
-      const size_t length = atoi(elc->getAttribute("length").c_str());
-      std::vector<std::string> str_v = Belle2::split(elc->getAttribute("value"), ',');
-      for (size_t j = 0; j < length; j++) {
-        const int value = atoi(((str_v.size() == length) ? str_v[j] : str_v[0]).c_str());
-        obj->addInt(Belle2::form(pname + "_%d", j), value, priority);
+      obj->addEnum(name, enum_m, value);
+    } else if (elc->getTag() != "object") {
+      DataObject::ParamInfo info = { DataObject::TEXT, 0, NULL };
+      if (elc->getTag().find("array") != std::string::npos) {
+        info.length = atoi(elc->getAttribute("length").c_str());
       }
-    } else if (elc->getTag() == "uint") {
-      const int value = strtoul(elc->getAttribute("value").c_str(), 0, 0);
-      obj->addInt(pname, value, priority);
-    } else if (elc->getTag() == "uint_array") {
-      const size_t length = atoi(elc->getAttribute("length").c_str());
-      std::vector<std::string> str_v = Belle2::split(elc->getAttribute("value"), ',');
-      for (size_t j = 0; j < length; j++) {
-        const int value = strtoul(((str_v.size() == length) ? str_v[j] : str_v[0]).c_str(), 0, 0);
-        obj->addInt(Belle2::form(pname + "_%d", j), value, priority);
+      const std::string value = elc->getAttribute("value");
+      if (elc->getTag().find("bool") != std::string::npos) {
+        info.type = DataObject::BOOL;
+      } else if (elc->getTag().find("ulong") != std::string::npos) {
+        info.type = DataObject::ULONG;
+      } else if (elc->getTag().find("uint") != std::string::npos) {
+        info.type = DataObject::UINT;
+      } else if (elc->getTag().find("ushort") != std::string::npos) {
+        info.type = DataObject::USHORT;
+      } else if (elc->getTag().find("uchar") != std::string::npos) {
+        info.type = DataObject::UCHAR;
+      } else if (elc->getTag().find("long") != std::string::npos) {
+        info.type = DataObject::LONG;
+      } else if (elc->getTag().find("int") != std::string::npos) {
+        info.type = DataObject::INT;
+      } else if (elc->getTag().find("short") != std::string::npos) {
+        info.type = DataObject::SHORT;
+      } else if (elc->getTag().find("char") != std::string::npos) {
+        info.type = DataObject::CHAR;
+      } else if (elc->getTag().find("double") != std::string::npos) {
+        info.type = DataObject::DOUBLE;
+      } else if (elc->getTag().find("float") != std::string::npos) {
+        info.type = DataObject::FLOAT;
+      } else if (elc->getTag().find("text") != std::string::npos) {
+        info.type = DataObject::TEXT;
+        if (info.length == 0) info.length = 64;
       }
-    } else if (elc->getTag() == "bool") {
-      const bool value = elc->getAttribute("value") == "true";
-      obj->addBoolean(pname, value, priority);
-    } else if (elc->getTag() == "bool_array") {
-      const size_t length = atoi(elc->getAttribute("length").c_str());
-      std::vector<std::string> str_v = Belle2::split(elc->getAttribute("value"), ',');
-      for (size_t j = 0; j < length; j++) {
-        const bool value = ((str_v.size() == length) ? str_v[j] : str_v[0]) == "true";
-        obj->addBoolean(Belle2::form(pname + "_%d", j), value, priority);
-      }
-    } else if (elc->getTag() == "text") {
-      obj->addText(pname, elc->getAttribute("value"), priority);
-    } else if (elc->getTag() == "object") {
+      obj->add(name, NULL, info.type, info.length);
+      obj->setValue(name, value);
+    } else {
       std::string class_name = elc->getAttribute("class");
       DataObject* objc = NULL;
       if (_class_m.find(class_name) == _class_m.end()) {
@@ -83,26 +80,14 @@ DataObject* ObjectLoader::load(const std::string& entry, DataObject* obj)
       } else {
         objc = new DataObject(_class_m[class_name]);
       }
-      for (size_t j = 0; j < objc->getParamNames().size(); j++) {
-        std::string ppname = objc->getParamName(j);
-        if (elc->hasAttribute(ppname)) {
-          std::string value = elc->getAttribute(ppname);
-          switch (objc->getParamType(j)) {
-            case DataObject::BOOLEAN:
-              objc->setBooleanValue(ppname, value == "true");
-              break;
-            case DataObject::INT:
-              objc->setIntValue(ppname, atoi(value.c_str()));
-              break;
-            case DataObject::TEXT:
-              objc->setTextValue(ppname, value);
-              break;
-            default:
-              break;
-          }
+      for (DataObject::ParamInfoMap::iterator it = objc->getParams().begin();
+           it != objc->getParams().end(); it++) {
+        std::string pname = it->first;
+        if (elc->hasAttribute(pname)) {
+          objc->setValue(pname, elc->getAttribute(pname));
         }
       }
-      obj->addObject(pname, objc, priority);
+      obj->addObject(name, objc);
     }
   }
   return obj;

@@ -9,7 +9,8 @@
 
 using namespace Belle2;
 
-NSMCallback::NSMCallback() throw()
+NSMCallback::NSMCallback(NSMNode* node) throw()
+  : _node(node)
 {
   add(Command::OK);
   add(Command::ERROR);

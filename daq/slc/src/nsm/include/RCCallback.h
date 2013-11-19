@@ -15,9 +15,6 @@ namespace Belle2 {
     virtual ~RCCallback() throw() {}
 
   public:
-    NSMNode* getNode() throw() { return _node; }
-
-  public:
     virtual bool boot()   throw() { return true; }
     virtual bool load()   throw() { return true; }
     virtual bool start()  throw() { return true; }
@@ -27,14 +24,10 @@ namespace Belle2 {
     virtual bool pause()  throw() { return true; }
     virtual bool abort()  throw() { return true; }
     virtual bool trigft()  throw() { return true; }
-    virtual bool setparams()  throw();
 
   protected:
     virtual bool perform(NSMMessage& msg)
     throw(NSMHandlerException);
-
-  private:
-    NSMNode* _node;
 
   };
 

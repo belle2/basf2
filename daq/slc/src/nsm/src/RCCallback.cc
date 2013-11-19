@@ -39,15 +39,12 @@ bool RCCallback::perform(NSMMessage& msg) throw(NSMHandlerException)
     result = abort();
   } else if (cmd == Command::TRIGFT) {
     result = trigft();
-  } else if (cmd == Command::SETPARAMS) {
-    result = setparams();
   } else if (cmd == Command::STATECHECK) {
     com->replyOK(_node, "");
     return true;
   }
   if (result) {
-    if (cmd != Command::TRIGFT &&
-        _node->getState() == state_org) {
+    if (cmd != Command::TRIGFT && _node->getState() == state_org) {
       _node->setState(cmd.nextState());
     }
     com->replyOK(_node, _reply);
@@ -60,9 +57,8 @@ bool RCCallback::perform(NSMMessage& msg) throw(NSMHandlerException)
 }
 
 RCCallback::RCCallback(NSMNode* node) throw()
+  : NSMCallback(node)
 {
-  _node = node;
-  if (node != NULL) node->setState(State::INITIAL_S);
   add(Command::BOOT);
   add(Command::LOAD);
   add(Command::START);
@@ -74,11 +70,3 @@ RCCallback::RCCallback(NSMNode* node) throw()
   add(Command::STATECHECK);
   add(Command::SETPARAMS);
 }
-
-bool RCCallback::setparams() throw()
-{
-  ConfigFile config(_node->getName());
-  _node->getData()->readValueString(config);
-  return true;
-}
-

@@ -52,6 +52,7 @@ namespace Belle2 {
     void sendError(const std::string& message) throw(NSMHandlerException);
 
   public:
+    NSMcontext* getContext() throw() { return _nsmc; }
     int getId() const throw() { return _id; }
     bool isOnline() const throw() { return (_id >= 0); }
     NSMNode* getNode() throw() { return _node; }

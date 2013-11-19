@@ -10,7 +10,7 @@ RunConfig::RunConfig(const std::string& data_name, int revision) throw()
   addInt("exp_number", 0);
   addInt("version", 0);
   addInt("start_time", 0);
-  addText("run_type", "TESTT:DEFAULT");
-  addText("operators", ":");
+  addText("run_type", "TESTT:DEFAULT", 64);
+  addText("operators", ":", 64);
 }
 

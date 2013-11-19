@@ -1,4 +1,5 @@
 #include "nsm/NSMData.h"
+#include "nsm/NSMCommunicator.h"
 
 #include "base/StringUtil.h"
 
@@ -15,8 +16,9 @@ extern "C" {
 
 using namespace Belle2;
 
-void* NSMData::open() throw(NSMHandlerException)
+void* NSMData::open(NSMCommunicator* comm) throw(NSMHandlerException)
 {
+  b2nsm_context(comm->getContext());
   if ((_pdata = b2nsm_openmem(_data_name.c_str(), _format.c_str(), _revision))
       == NULL) {
     throw (NSMHandlerException(__FILE__, __LINE__, "Failed to open data memory"));
@@ -25,8 +27,9 @@ void* NSMData::open() throw(NSMHandlerException)
   return _pdata;
 }
 
-void* NSMData::allocate(int interval) throw(NSMHandlerException)
+void* NSMData::allocate(NSMCommunicator* comm, int interval) throw(NSMHandlerException)
 {
+  b2nsm_context(comm->getContext());
   if ((_pdata = b2nsm_allocmem(_data_name.c_str(), _format.c_str(), _revision, interval))
       == NULL) {
     throw (NSMHandlerException(__FILE__, __LINE__, "Failed to allocate data memory"));

@@ -106,7 +106,6 @@ void NSMCommunicator::sendRequest(NSMNode* node, const Command& command,
                                   int npar, unsigned int* pars,
                                   int len, const char* datap) throw(NSMHandlerException)
 {
-  std::cout << node->getName() << " " << datap << std::endl;
   b2nsm_context(_nsmc);
   if (b2nsm_sendreq_data(node->getName().c_str(), command.getLabel(),
                          npar, (int*)pars, len, datap) < 0) {

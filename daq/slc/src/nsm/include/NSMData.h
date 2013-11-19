@@ -9,6 +9,7 @@
 namespace Belle2 {
 
   class NSMNode;
+  class NSMCommunicator;
 
   enum NSMDataType {
     CHAR = 1, INT16 = 2, INT32 = 4, INT64 = 8,
@@ -38,8 +39,8 @@ namespace Belle2 {
     const std::string& getFormat() const { return  _format; }
     int getRevision() const { return _revision; }
     bool isAvailable() throw() { return (_pdata != NULL); }
-    void* open() throw(NSMHandlerException);
-    void* allocate(int interval = 3) throw(NSMHandlerException);
+    void* open(NSMCommunicator* comm) throw(NSMHandlerException);
+    void* allocate(NSMCommunicator* comm, int interval = 3) throw(NSMHandlerException);
     void* parse(const char* inc_dir = NULL) throw(NSMHandlerException);
     void* get() throw(NSMHandlerException);
     const void* get() const throw(NSMHandlerException);

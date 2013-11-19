@@ -4,6 +4,7 @@
 #include "nsm/NSMHandlerException.h"
 #include "nsm/NSMMessage.h"
 
+#include "base/NSMNode.h"
 #include "base/Command.h"
 
 #include <string>
@@ -28,7 +29,7 @@ namespace Belle2 {
     typedef std::vector<NSMRequestId> NSMRequestList;
 
   public:
-    NSMCallback() throw();
+    NSMCallback(NSMNode* node) throw();
     virtual ~NSMCallback() throw() {}
 
   public:
@@ -39,6 +40,7 @@ namespace Belle2 {
   public:
     NSMMessage& getMessage();
     NSMCommunicator* getCommunicator() { return _comm; }
+    NSMNode* getNode() { return _node; }
     void setCommunicator(NSMCommunicator* comm) { _comm = comm; }
     int getExpNumber();
     int getRunNumber();
@@ -53,6 +55,7 @@ namespace Belle2 {
 
   protected:
     std::string _reply;
+    NSMNode* _node;
 
   private:
     NSMRequestList& getRequestList() throw() { return _req_v; }

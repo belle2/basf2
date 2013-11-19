@@ -11,10 +11,10 @@ namespace Belle2 {
   class NSMNodeDaemon {
 
   public:
-    NSMNodeDaemon(NSMNode* node = NULL, NSMCallback* callback = NULL,
+    NSMNodeDaemon(NSMCallback* callback = NULL,
                   const std::string host = "", int port = -1,
                   NSMData* rdata = NULL, NSMData* wdata = NULL)
-      : _node(node), _callback(callback), _rdata(rdata), _wdata(wdata),
+      : _callback(callback), _rdata(rdata), _wdata(wdata),
         _host(host), _port(port) {}
     virtual ~NSMNodeDaemon() throw() {}
 
@@ -22,7 +22,6 @@ namespace Belle2 {
     void run() throw();
 
   private:
-    NSMNode* _node;
     NSMCallback* _callback;
     NSMData* _rdata;
     NSMData* _wdata;

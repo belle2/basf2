@@ -22,6 +22,7 @@
 
 #define DHP_FRAME_HEADER_DATA_TYPE_RAW  0x0
 #define DHP_FRAME_HEADER_DATA_TYPE_ZSD  0x5
+
 #define DHH_FRAME_HEADER_DATA_TYPE_DHP_RAW  0x0
 #define DHH_FRAME_HEADER_DATA_TYPE_DHP_ZSD  0x5
 #define DHH_FRAME_HEADER_DATA_TYPE_DCE_RAW  0x1
@@ -30,6 +31,17 @@
 #define DHH_FRAME_HEADER_DATA_TYPE_GHOST    0x2
 #define DHH_FRAME_HEADER_DATA_TYPE_END_FRM  0x4
 #define DHH_FRAME_HEADER_DATA_TYPE_HLTROI   0x7
+
+#define DHHC_FRAME_HEADER_DATA_TYPE_DHHC_START  0xB
+#define DHHC_FRAME_HEADER_DATA_TYPE_DHHC_END    0xC
+#define DHHC_FRAME_HEADER_DATA_TYPE_DHP_RAW     0x0
+#define DHHC_FRAME_HEADER_DATA_TYPE_DHP_ZSD     0x5
+#define DHHC_FRAME_HEADER_DATA_TYPE_FCE_RAW     0x1
+#define DHHC_FRAME_HEADER_DATA_TYPE_COMMODE     0x6
+#define DHHC_FRAME_HEADER_DATA_TYPE_GHOST       0x2
+#define DHHC_FRAME_HEADER_DATA_TYPE_DHH_START   0x3
+#define DHHC_FRAME_HEADER_DATA_TYPE_DHH_END     0x4
+#define DHHC_FRAME_HEADER_DATA_TYPE_HLTROI      0x7
 
 using namespace std;
 using namespace Belle2;
@@ -68,7 +80,43 @@ char* dhh_type_name[8] = {
   (char*)"HLTROI ",
 };
 
+char* dhhc_type_name[16] = {
+  (char*)"DHP_RAW",
+  (char*)"FCE_RAW",
+  (char*)"GHOST  ",
+  (char*)"H_START",
+  (char*)"H_END  ",
+  (char*)"DHP_ZSD",
+  (char*)"COMMODE",
+  (char*)"HLTROI ",
+  (char*)"undef  ",
+  (char*)"undef  ",
+  (char*)"undef  ",
+  (char*)"C_START",
+  (char*)"C_END  ",
+  (char*)"undef  ",
+  (char*)"undef  ",
+  (char*)"undef  "
+};
 
+
+class dhhc_frame_header_word0 {
+public:
+  unsigned short data;
+  dhhc_frame_header_word0(unsigned int error_flag = 0, unsigned int data_typ = 0, unsigned int dependent = 0) {
+    data = ((error_flag & 0x1) << 15) | ((data_typ & 0xF) << 11) | (dependent & 0x3FF);
+  };
+  int get_type(void) {
+    return (data >> 11) & 0xF;
+  };
+  int get_err(void) {
+    return (data >> 15) & 0x1;
+  };
+  void print(void) {
+    if (verbose)
+      B2INFO(" DHH FRAME TYP " << hex << get_type() << " -> " << dhhc_type_name[get_type()] << " ERR " << get_err() << " data " << data);
+  };
+};
 
 class dhh_frame_header_word0 {
 public:
@@ -136,7 +184,7 @@ public:
   unsigned int calc_crc(void) {
     unsigned char* d;
     dhh_crc_32_type bocrc;
-    char crcbuffer[size()];
+    char crcbuffer[size() * 4];
     d = (unsigned char*)this;
 
     for (unsigned int k = 0; k < (size() - 1) * 4; k += 2) {
@@ -310,7 +358,7 @@ public:
   unsigned int calc_crc(void) {
     unsigned char* d;
     dhh_crc_32_type bocrc;
-    char crcbuffer[size()];
+    char crcbuffer[size() * 4];
     d = (unsigned char*)this;
 
     for (unsigned int k = 0; k < (size() - 1) * 4; k += 2) {
@@ -361,7 +409,7 @@ public:
   unsigned int calc_crc(void) {
     unsigned char* d;
     dhh_crc_32_type bocrc;
-    char crcbuffer[size()];
+    char crcbuffer[size() * 4];
     d = (unsigned char*)this;
 
     for (unsigned int k = 0; k < (size() - 1) * 4; k += 2) {
@@ -550,6 +598,541 @@ public:
 
 };
 
+
+class dhhc_start_frame {
+public:
+  dhhc_frame_header_word0 word0;
+  unsigned short trigger_nr_lo;
+  unsigned short trigger_nr_hi;
+  unsigned short time_tag_lo_and_type;
+  unsigned short time_tag_mid;
+  unsigned short time_tag_hi;
+  unsigned short nr_words_in_frame;
+  unsigned int crc32;
+
+//    dhhc_start_frame(unsigned int time_tag = 0, unsigned int trigger_nr = 0, unsigned int depend = 0): word0(0, DHH_FRAME_HEADER_DATA_TYPE_EVT_FRM, depend) {
+//    };
+  unsigned short get_evtnr(void) {
+    return trigger_nr_lo;
+  };
+  unsigned int calc_crc(void) {
+    unsigned char* d;
+    dhh_crc_32_type bocrc;
+    char crcbuffer[size() * 4];
+    d = (unsigned char*)this;
+
+    for (unsigned int k = 0; k < (size() - 1) * 4; k += 2) {
+      crcbuffer[k] = d[k + 1];
+      crcbuffer[k + 1] = d[k];
+    }
+    bocrc.process_bytes(crcbuffer, (size() - 1) * 4);
+    unsigned int c;
+    c = htonl(bocrc.checksum());
+    if (c == crc32) {
+      if (verbose)
+        B2INFO(" DHHC Start Frame CRC " << hex << c << " == " << hex << crc32);
+    } else {
+      crc_error++;
+      B2ERROR(" DHHC Start Frame CRC FAIL " << hex << c << " != " << hex << crc32);
+      error_flag = true;
+    }
+    return c;
+  };
+  bool is_fake(void) {
+    /*      if (word0.data != 0x3000) return false;
+          if (trigger_nr_lo != 0) return false;
+          if (trigger_nr_hi != 0) return false;
+          if (time_tag_lo != 0) return false;
+          if (time_tag_hi != 0) return false;
+          if (sfnr_offset != 0) return false;
+          //if(crc32!=0x87654321) return false;
+          return true;
+          */
+    return false;
+  };
+  inline static unsigned int size(void) {
+    return 4;// 9 words???
+  };
+  void print(void) {
+    word0.print();
+    /*      if (verbose)
+             B2INFO(" DHHC Start Frame TNRLO " << hex << trigger_nr_lo << " TNRHI " << hex << trigger_nr_hi << " TTLO " << hex << time_tag_lo
+             << " TTHI " << hex << time_tag_hi << " SFNR " << hex << ((sfnr_offset >> 10) & 0x3F) << " OFF " << hex << (sfnr_offset & 0x3FF)
+             << " CRC " << hex << crc32 << " (calc)" << calc_crc());*/
+  };
+};
+
+class dhhc_dhh_start_frame {
+public:
+  dhhc_frame_header_word0 word0;
+  unsigned short trigger_nr_lo;
+  //unsigned short trigger_nr_hi;
+  unsigned short dhh_time_tag_lo;
+  unsigned short dhh_time_tag_hi;
+  unsigned short sfnr_offset;
+  unsigned int crc32;
+
+//    dhhc_dhh_start_frame(unsigned int time_tag = 0, unsigned int trigger_nr = 0, unsigned int depend = 0): word0(0, DHH_FRAME_HEADER_DATA_TYPE_EVT_FRM, depend) {
+//    };
+  unsigned short get_evtnr(void) {
+    return trigger_nr_lo;
+  };
+  unsigned short get_sfnr(void) {// last DHP fraem before trigger
+    return (sfnr_offset >> 10) & 0x3F;
+  };
+  unsigned short get_toffset(void) {// and trigger row offset
+    return sfnr_offset & 0x3FF;
+  };
+  unsigned int calc_crc(void) {
+    unsigned char* d;
+    dhh_crc_32_type bocrc;
+    char crcbuffer[size() * 4];
+    d = (unsigned char*)this;
+
+    for (unsigned int k = 0; k < (size() - 1) * 4; k += 2) {
+      crcbuffer[k] = d[k + 1];
+      crcbuffer[k + 1] = d[k];
+    }
+    bocrc.process_bytes(crcbuffer, (size() - 1) * 4);
+    unsigned int c;
+    c = htonl(bocrc.checksum());
+    if (c == crc32) {
+      if (verbose)
+        B2INFO(" DHHC DHH Start Frame CRC " << hex << c << " == " << hex << crc32);
+    } else {
+      crc_error++;
+      B2ERROR(" DHHC DHH Start CRC FAIL " << hex << c << " != " << hex << crc32);
+      error_flag = true;
+    }
+    return c;
+  };
+  bool is_fake(void) {
+    /*if (word0.data != 0x3000) return false;
+    if (trigger_nr_lo != 0) return false;
+    if (trigger_nr_hi != 0) return false;
+    if (time_tag_lo != 0) return false;
+    if (time_tag_hi != 0) return false;
+    if (sfnr_offset != 0) return false;
+    //if(crc32!=0x87654321) return false;
+    return true;*/
+    return false;
+  };
+  inline static unsigned int size(void) {
+    return 4;// 7 words
+  };
+  void print(void) {
+    word0.print();
+    /*      if (verbose)
+             B2INFO(" DHHC Event Frame TNRLO " << hex << trigger_nr_lo << " TNRHI " << hex << trigger_nr_hi << " TTLO " << hex << time_tag_lo
+             << " TTHI " << hex << time_tag_hi << " SFNR " << hex << ((sfnr_offset >> 10) & 0x3F) << " OFF " << hex << (sfnr_offset & 0x3FF)
+             << " CRC " << hex << crc32 << " (calc)" << calc_crc());*/
+  };
+};
+
+class dhhc_commode_frame {
+public:
+  dhhc_frame_header_word0 word0;
+  unsigned short trigger_nr_lo;
+  unsigned short data[96];
+  unsigned int crc32;
+
+//    dhhc_commode_frame(unsigned int trigger_nr = 0, unsigned int dhhc_id = 0, unsigned int depend = 0):
+//    word0(0, DHH_FRAME_HEADER_DATA_TYPE_COMMODE, depend) {
+//    };
+  unsigned int calc_crc(void) {
+    //     unsigned int* d;
+    unsigned int c = 0;
+    //     d = (unsigned int*)this;
+
+    if (verbose)
+      B2INFO(" DHHC Common Frame CRC not implemented here... ");
+    //     for (unsigned int i = 0; i < size(); i++) if (verbose) B2INFO(" d " << hex << d[i]);
+    return c;
+  };
+  inline static unsigned int size(void) {
+    return 2 + 96 / 2;
+  };
+};
+
+class dhhc_direct_readout_frame {
+public:
+  dhhc_frame_header_word0 word0;
+  unsigned short trigger_nr_lo;
+  dhp_frame data;
+  unsigned int crc32;
+//    dhhc_direct_readout_frame(unsigned int type, unsigned int trigger_nr = 0, unsigned int depend = 0):
+//    word0(0, type, depend) {
+//    };
+  unsigned int calc_crc(void) {
+
+    unsigned int c = 0;
+
+    if (verbose)
+      B2INFO(" CRC for data frames not implemented here... ");
+    return c;
+  };
+  inline static unsigned int size(void) {
+    return 0;//2;
+  };
+  void print(void) {
+    word0.print();
+    if (verbose)
+      B2INFO(" DHHC Direct Readout (Raw|ZSD) Frame TNRLO " << hex << trigger_nr_lo << " CRC " << calc_crc());
+  };
+};
+
+class dhhc_direct_readout_frame_raw : public dhhc_direct_readout_frame {
+public:
+//    dhhc_direct_readout_frame_raw(unsigned int trigger_nr = 0, unsigned int depend = 0):
+//    dhhc_direct_readout_frame(DHH_FRAME_HEADER_DATA_TYPE_DHP_RAW, trigger_nr, depend) {
+//    };
+//    void print(void) {
+//       dhhc_direct_readout_frame::print();
+//    };
+};
+
+class dhhc_direct_readout_frame_zsd : public dhhc_direct_readout_frame {
+public:
+//    dhhc_direct_readout_frame_zsd(unsigned int trigger_nr = 0, unsigned int depend = 0):
+//    dhhc_direct_readout_frame(DHHC_FRAME_HEADER_DATA_TYPE_DHP_ZSD, trigger_nr, depend) {
+//    };
+};
+
+class dhhc_onsen_frame {
+  dhhc_frame_header_word0 word0;/// mainly empty
+  unsigned short trignr0;// not used
+  unsigned int magic1;
+  unsigned int trignr1;
+  unsigned int magic2;
+  unsigned int trignr2;
+  /// plus n* ROIs (64 bit)
+  /// plus checksum 32bit
+  unsigned int length;/// not part
+public:
+//    dhhc_onsen_frame(void) {};
+  void set_length(unsigned int l) {length = l;};
+  void print(void) {
+    if (magic1 == 0x56781234) {
+      B2WARNING("DAVID ROI Framer Error");
+      memmove(&magic1, &trignr1, length - 4);
+      length -= 4;
+    }
+    word0.print();
+    if (verbose)
+      B2INFO("DHHC HLT/ROI Frame " << hex << trignr1 << " ," << trignr2);
+    if ((magic1 & 0xFFFF) != 0xCAFE) B2ERROR("DHHC HLT/ROI Magic 1 error $" << hex << magic1);
+    if ((magic2 & 0xFFFF) != 0xCAFE) B2ERROR("DHHC HLT/ROI Magic 2 error $" << hex << magic2);
+    if (magic2 == 0x0000CAFE && trignr2 == 0x00000000) {
+      B2WARNING("DHHC HLT/ROI Frame: No DATCON data " << hex << trignr1 << "!=$" << trignr2);
+    } else {
+      if (trignr1 != trignr2) B2ERROR("DHHC HLT/ROI Frame Trigger Nr Mismatch $" << hex << trignr1 << "!=$" << trignr2);
+    }
+  };
+  inline static unsigned int size(void) {
+    return 0;//2;
+  };
+};
+
+class dhhc_ghost_frame {
+public:
+  dhhc_frame_header_word0 word0;
+  unsigned short trigger_nr_lo;
+  unsigned int crc32;
+
+//    dhhc_ghost_frame(unsigned int trigger_nr = 0, unsigned int depend = 0):
+//    word0(1, DHH_FRAME_HEADER_DATA_TYPE_GHOST, depend) {
+//    };
+  unsigned int calc_crc(void) {
+    unsigned char* d;
+    dhh_crc_32_type bocrc;
+    char crcbuffer[size() * 4];
+    d = (unsigned char*)this;
+
+    for (unsigned int k = 0; k < (size() - 1) * 4; k += 2) {
+      crcbuffer[k] = d[k + 1];
+      crcbuffer[k + 1] = d[k];
+    }
+    bocrc.process_bytes(crcbuffer, (size() - 1) * 4);
+    unsigned int c;
+    c = htonl(bocrc.checksum());
+    if (c == crc32) {
+      if (verbose)
+        B2INFO(" DHHC Ghost Frame CRC " << hex << c << " == " << crc32);
+    } else {
+      crc_error++;
+      B2ERROR(" DHHC Ghost Frame CRC FAIL " << hex << c << " != " << crc32);
+      error_flag = true;
+    }
+    return c;
+  };
+  inline static unsigned int size(void) {
+    return 2;
+  };
+  void print(void) {
+    word0.print();
+    if (verbose)
+      B2INFO(" DHHC Ghost Frame TNRLO " << hex << trigger_nr_lo << " CRC "  << crc32 << " (calc) "  << calc_crc());
+  };
+};
+
+class dhhc_end_frame {
+public:
+  dhhc_frame_header_word0 word0;
+  unsigned short trigger_nr_lo;
+  unsigned int wordsinevent;
+  unsigned int errorinfo;
+  unsigned int crc32;
+
+//    dhhc_end_frame(unsigned int wie = 0, unsigned int eo = 0, unsigned int trigger_nr = 0, unsigned int depend = 0):
+//    word0(0, DHHC_FRAME_HEADER_DATA_TYPE_DHH_END, depend) {
+//    };
+  unsigned int calc_crc(void) {
+    unsigned char* d;
+    dhh_crc_32_type bocrc;
+    char crcbuffer[size() * 4];
+    d = (unsigned char*)this;
+
+    for (unsigned int k = 0; k < (size() - 1) * 4; k += 2) {
+      crcbuffer[k] = d[k + 1];
+      crcbuffer[k + 1] = d[k];
+    }
+    bocrc.process_bytes(crcbuffer, (size() - 1) * 4);
+    unsigned int c;
+    c = htonl(bocrc.checksum());
+    if (c == crc32) {
+      if (verbose)
+        B2INFO(" DHHC End Frame CRC " << hex << c << "==" << crc32);
+    } else {
+      crc_error++;
+      B2ERROR(" DHHC End Frame CRC " << hex << c << "!=" << crc32);
+      error_flag = true;
+    }
+    return c;
+  };
+  unsigned int get_words(void) {
+    return wordsinevent;
+  }
+  inline static unsigned int size(void) {
+    return 4;
+  };
+  bool is_fake(void) {
+    /*      if (word0.data != 0xC100) return false;
+          if (trigger_nr_lo != 0) return false;
+          if (wordsinevent != 0) return false;
+          if (errorinfo != 0) return false;
+          //if(crc32!=0x87654321) return false;
+          return true;*/
+    return false;
+  };
+  void print(void) {
+    word0.print();
+    if (verbose)
+      B2INFO("DHHC End Frame TNRLO " << hex << trigger_nr_lo << " WIEVT " << hex << wordsinevent << " ERR " << hex << errorinfo
+             << " CRC " << hex << crc32 << " (calc) " << calc_crc());
+  };
+};
+
+class dhhc_dhh_end_frame {
+public:
+  dhhc_frame_header_word0 word0;
+  unsigned short trigger_nr_lo;
+  unsigned int wordsinevent;
+  unsigned int errorinfo;
+  unsigned int crc32;
+
+//    dhhc_dhh_end_frame(unsigned int wie = 0, unsigned int eo = 0, unsigned int trigger_nr = 0, unsigned int depend = 0):
+//    word0(0, DHHC_FRAME_HEADER_DATA_TYPE_DHH_END, depend) {
+//    };
+  unsigned int calc_crc(void) {
+    unsigned char* d;
+    dhh_crc_32_type bocrc;
+    char crcbuffer[size() * 4];
+    d = (unsigned char*)this;
+
+    for (unsigned int k = 0; k < (size() - 1) * 4; k += 2) {
+      crcbuffer[k] = d[k + 1];
+      crcbuffer[k + 1] = d[k];
+    }
+    bocrc.process_bytes(crcbuffer, (size() - 1) * 4);
+    unsigned int c;
+    c = htonl(bocrc.checksum());
+    if (c == crc32) {
+      if (verbose)
+        B2INFO(" DHHC DHH End Frame CRC " << hex << c << "==" << crc32);
+    } else {
+      crc_error++;
+      B2ERROR(" DHHC DHH End Frame CRC " << hex << c << "!=" << crc32);
+      error_flag = true;
+    }
+    return c;
+  };
+  unsigned int get_words(void) {
+    return wordsinevent;
+  }
+  inline static unsigned int size(void) {
+    return 4;
+  };
+  bool is_fake(void) {
+    /*      if (word0.data != 0xC100) return false;
+          if (trigger_nr_lo != 0) return false;
+          if (wordsinevent != 0) return false;
+          if (errorinfo != 0) return false;
+          //if(crc32!=0x87654321) return false;
+          return true;*/
+    return false;
+  };
+  void print(void) {
+    word0.print();
+    if (verbose)
+      B2INFO("DHHC DHH End Frame TNRLO " << hex << trigger_nr_lo << " WIEVT " << hex << wordsinevent << " ERR " << hex << errorinfo
+             << " CRC " << hex << crc32 << " (calc) " << calc_crc());
+  };
+};
+
+class dhhc_frames {
+  void* data;
+  unsigned int datasize;
+  int type;
+  int length;
+  bool pad;
+public:
+  dhhc_frames(void) {
+    data = 0;
+    datasize = 0;
+    type = -1;
+    length = 0;
+    pad = false;
+  };
+  int get_type(void) {
+    return type;
+  };
+  void set(void* d, unsigned int t) {
+    data = d;
+    type = t;
+    length = 0;
+    pad = false;
+  };
+  void set(void* d, unsigned int t, unsigned int l, bool p) {
+    data = d;
+    type = t;
+    length = l;
+    pad = p;
+  };
+  void set(void* d) {
+    data = d;
+    type = ((dhhc_frame_header_word0*)data)->get_type();
+    length = 0;
+    pad = false;
+  };
+  unsigned int get_evtnr(void) {
+    return ((unsigned short*)data)[1];
+  };
+  unsigned int calc_crc(void) {
+    unsigned char* d;
+    dhh_crc_32_type bocrc;
+    char crcbuffer[65536 * 16]; /// 1MB
+    d = (unsigned char*)data;
+
+    if (length > 65536 * 16) {
+      B2WARNING(" DHHC Data Frame CRC FAIL bacause of too large packet (>1MB)!");
+    } else {
+      for (int k = 0; k < length - 4; k += 2) {
+        crcbuffer[k] = d[k + 1];
+        crcbuffer[k + 1] = d[k];
+      }
+      bocrc.process_bytes(crcbuffer, length - 4);
+    }
+    //     unsigned char* d;
+    //     dhh_crc_32_type bocrc;
+    //     d = (unsigned char*)data;
+    //     for (int k = 0; k < length - 4; k++) {
+    //       bocrc.process_byte(((const unsigned char*)d)[(k ^ 1)]);
+    //     }
+    unsigned int c;
+    c = htonl(bocrc.checksum());
+
+    unsigned int crc32;
+    if (pad) {
+      crc32 = (*(unsigned short*)(d + length - 4))  | ((*(unsigned short*)(d + length - 2)) << 16);
+    } else {
+      crc32 = *(unsigned int*)(d + length - 4);
+    }
+
+    if (c == crc32) {
+      if (verbose)
+        //         B2INFO(" DHH Data Frame CRC: " << hex << c << "==" << crc32);
+        B2INFO(" DHHC Data Frame CRC OK: " << hex << c << "==" << crc32 << " data "  << * (unsigned int*)(d + length - 8) << " "
+               << * (unsigned int*)(d + length - 6) << " " << * (unsigned int*)(d + length - 4) << " pad " << pad << " len $" << length);
+    } else {
+      crc_error++;
+      if (verbose) {
+        B2ERROR(" DHHC Data Frame CRC FAIL: " << hex << c << "!=" << crc32 << " data "  << * (unsigned int*)(d + length - 8) << " "
+                << * (unsigned int*)(d + length - 6) << " " << * (unsigned int*)(d + length - 4) << " pad " << pad << " len $" << length);
+        /// others would be interessting but possible subjects to access outside of buffer
+        /// << " " << * (unsigned int*)(d + length - 2) << " " << * (unsigned int*)(d + length + 0) << " " << * (unsigned int*)(d + length + 2));
+        if (length <= 32) {
+          for (int i = 0; i < length / 4; i++) {
+            B2ERROR("== " << i << "  $" << hex << ((unsigned int*)d)[i]);
+          }
+        }
+      };
+      error_flag = true;
+    }
+    return c;
+  };
+
+
+  unsigned int size(void) {
+    unsigned int s = 0;
+    switch (get_type()) {
+      case DHHC_FRAME_HEADER_DATA_TYPE_DHP_RAW:
+        s = ((dhhc_direct_readout_frame_raw*)data)->size();
+        break;
+      case DHHC_FRAME_HEADER_DATA_TYPE_DHP_ZSD:
+        s = ((dhhc_direct_readout_frame_zsd*)data)->size();
+        break;
+      case DHHC_FRAME_HEADER_DATA_TYPE_FCE_RAW:
+        B2INFO(" Error: FCE type no supported ");
+        s = 0;
+        error_flag = true;
+        break;
+      case DHHC_FRAME_HEADER_DATA_TYPE_COMMODE:
+        s = ((dhhc_commode_frame*)data)->size();
+        break;
+      case DHHC_FRAME_HEADER_DATA_TYPE_GHOST:
+        s = ((dhhc_ghost_frame*)data)->size();
+        break;
+      case DHHC_FRAME_HEADER_DATA_TYPE_DHH_START:
+        s = ((dhhc_dhh_start_frame*)data)->size();
+        break;
+      case DHHC_FRAME_HEADER_DATA_TYPE_DHH_END:
+        s = ((dhhc_dhh_end_frame*)data)->size();
+        break;
+      case DHHC_FRAME_HEADER_DATA_TYPE_DHHC_START:
+        s = ((dhhc_start_frame*)data)->size();
+        break;
+      case DHHC_FRAME_HEADER_DATA_TYPE_DHHC_END:
+        s = ((dhhc_end_frame*)data)->size();
+        break;
+      case DHHC_FRAME_HEADER_DATA_TYPE_HLTROI:
+        s = 0;
+        break;
+      default:
+        B2ERROR("Error: not a valid data frame!");
+        error_flag = true;
+        s = 0;
+        break;
+    }
+    datasize = s;
+    return s;
+  };
+
+  void write_pedestal(void) {
+    B2INFO(" Write Pedestal Data - not implemented... !");
+  };
+
+};
+
 PXDUnpackerModule::PXDUnpackerModule() :
   Module(),
   m_storeRawHits()
@@ -557,6 +1140,9 @@ PXDUnpackerModule::PXDUnpackerModule() :
   //Set module properties
   setDescription("Unpack Raw PXD Hits");
   setPropertyFlags(c_ParallelProcessingCertified);
+
+  addParam("HeaderEndianSwap", m_headerEndianSwap, "Swap the endianess of the ONSEN header", false);
+  addParam("DHHCmode", m_DHHCmode, "Run in DHHC mode", false);
 }
 
 void PXDUnpackerModule::initialize()
@@ -564,9 +1150,10 @@ void PXDUnpackerModule::initialize()
   //Register output collections
   m_storeRawHits.registerAsPersistent();
   /// actually, later we do not want o store it into output file ...  aside from debugging
-}
+  B2INFO("HeaderEndianSwap: " << m_headerEndianSwap);
+  B2INFO("DHHCmode: " << m_DHHCmode);
 
-unsigned char tmpbuffer[1024 * 1024 * 16];
+}
 
 void PXDUnpackerModule::event()
 {
@@ -601,7 +1188,6 @@ void PXDUnpackerModule::unpack_event(RawPXD& px)
   int Frames_per_event;
   int fullsize;
   int datafullsize;
-  bool header_swap_endian = false;//true;
 
   unsigned int* data;
   data = (unsigned int*)px.data();
@@ -619,7 +1205,7 @@ void PXDUnpackerModule::unpack_event(RawPXD& px)
 
   unsigned int* tableptr;
   tableptr = &data[2]; // skip header!!!
-  if (header_swap_endian) Frames_per_event = ntohl(data[1]); else Frames_per_event = data[1];
+  if (m_headerEndianSwap) Frames_per_event = ntohl(data[1]); else Frames_per_event = data[1];
 
   unsigned int* dataptr;
   dataptr = &tableptr[Frames_per_event];
@@ -629,7 +1215,7 @@ void PXDUnpackerModule::unpack_event(RawPXD& px)
   for (int j = 0; j < Frames_per_event; j++) {
     int lo;/// len of frame in bytes
     bool pad;
-    if (header_swap_endian) lo = ntohl(tableptr[j]); else lo = tableptr[j];
+    if (m_headerEndianSwap) lo = ntohl(tableptr[j]); else lo = tableptr[j];
     if (lo <= 0) {
       B2ERROR(" size of frame invalid: " << j << "size " << lo << " at byte offset in dataptr " << ll);
       exit(0);
@@ -649,7 +1235,11 @@ void PXDUnpackerModule::unpack_event(RawPXD& px)
 
     B2INFO(" unpack DHH frame: " << j << " with size " << lo << " at byte offset in dataptr " << ll);
     endian_swap_frame((unsigned short*)(ll + (char*)dataptr), lo);
-    unpack_frame(ll + (char*)dataptr, lo, pad, last_framenr, last_wie, last_start, last_end, last_evtnr);
+    if (m_DHHCmode) {
+      unpack_dhhc_frame(ll + (char*)dataptr, lo, pad, last_wie, last_start, last_end, last_evtnr);
+    } else {
+      unpack_frame(ll + (char*)dataptr, lo, pad, last_framenr, last_wie, last_start, last_end, last_evtnr);
+    }
     ll += (lo + 3) & 0xFFFFFFFC; /// round up to next 32 bit boundary
   }
   if (!last_end) B2ERROR("Error: Last Frame is not an END FRAME!");
@@ -978,6 +1568,185 @@ void PXDUnpackerModule::unpack_frame(void* data, int len, bool pad, int& last_fr
     error_flag = true;
   }
   last_framenr = lfnr;
+
+  last_wie += len;
+
+  last_end = le;
+  last_start = ls;
+}
+
+void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& last_wie, int& last_start, int& last_end, unsigned int& last_evtnr)
+{
+  dhhc_frame_header_word0* hw;
+  error_flag = false;
+  hw = (dhhc_frame_header_word0*)data;
+  // printf("len %d", len);
+
+  dhhc_frames dhhc;
+  dhhc.set(data, hw->get_type(), len, pad);
+  int s;
+  s = dhhc.size() * 4;
+  if (len != s && s != 0) {
+    B2WARNING(" Size (real) " << len << " != " << s << " (in data) " << pad);
+  }
+
+  int le = 0, ls = last_start;
+
+  unsigned int evtnr;
+
+  evtnr = dhhc.get_evtnr();
+  int dhh_id = 0x0; //hw->get_dhhid()
+
+  switch (dhhc.get_type()) {
+    case DHHC_FRAME_HEADER_DATA_TYPE_DHP_RAW: {
+
+      ((dhhc_direct_readout_frame_raw*)data)->print();
+      dhhc.calc_crc();
+      stat_raw++;
+      dhhc.write_pedestal();
+      break;
+    };
+    case DHHC_FRAME_HEADER_DATA_TYPE_DHP_ZSD: {
+
+      hw->print();
+      //       B2WARNING(" Size (real) " << len << " != " << s << " (in data) " << pad);
+      dhhc.calc_crc();
+      stat_zsd++;
+
+      unpack_dhp(data, len - 4, dhh_first_frame_id_lo, dhh_id, dhh_first_offset);
+
+      break;
+    };
+    case DHHC_FRAME_HEADER_DATA_TYPE_FCE_RAW: {
+
+      hw->print();
+      dhhc.calc_crc();
+      break;
+    };
+    case DHHC_FRAME_HEADER_DATA_TYPE_COMMODE: {
+
+      hw->print();
+      dhhc.calc_crc();
+      break;
+    };
+    case DHHC_FRAME_HEADER_DATA_TYPE_DHHC_START: {
+      bool fake = ((dhhc_start_frame*)data)->is_fake();
+      if (fake) {
+        B2WARNING("Faked DHHC START Data -> trigger without Data!");
+      } else {
+        ((dhhc_start_frame*)data)->print();
+      }
+      if (last_end == 0) {
+        end_error++;
+        if (verbose) {
+          B2ERROR(" Error: Start without End ");
+        };
+        error_flag = true;
+      }
+      ls = 1;
+      last_wie = 0;
+
+      if (!fake) {
+        if ((evtnr & 0x7FFF) != ((last_evtnr + 1) & 0x7FFF)) {
+          evt_skip_error++;
+          if (verbose) {
+            B2WARNING(" Event skipped: " << evtnr << " != " << last_evtnr << " + 1 ");
+          };
+          error_flag = true;
+        }
+      }
+      last_evtnr = evtnr;
+//         dhh_first_frame_id_lo = ((dhhc_start_frame*)data)->get_sfnr();
+//         dhh_first_offset = ((dhhc_start_frame*)data)->get_toffset();
+      if (!fake) dhhc.calc_crc();
+      stat_start++;
+      break;
+    };
+    case DHHC_FRAME_HEADER_DATA_TYPE_DHH_START: {
+      bool fake = ((dhhc_dhh_start_frame*)data)->is_fake();
+      if (fake) {
+        B2WARNING("Faked DHH START Data -> trigger without Data!");
+      } else {
+        ((dhhc_dhh_start_frame*)data)->print();
+      }
+      dhh_first_frame_id_lo = ((dhhc_dhh_start_frame*)data)->get_sfnr();
+      dhh_first_offset = ((dhhc_dhh_start_frame*)data)->get_toffset();
+      if (!fake) dhhc.calc_crc();
+      break;
+    };
+    case DHHC_FRAME_HEADER_DATA_TYPE_GHOST:
+      ((dhhc_ghost_frame*)data)->print();
+      dhhc.calc_crc();
+      stat_ghost++;
+      last_wie -= 2;
+      break;
+    case DHHC_FRAME_HEADER_DATA_TYPE_DHHC_END: {
+      bool fake = ((dhhc_end_frame*)data)->is_fake();
+      if (fake) {
+        B2WARNING("Faked DHHC END Data -> trigger without Data!");
+      } else {
+        ((dhhc_end_frame*)data)->print();
+      }
+      ls = 0;
+      le = 1;
+      stat_end++;
+      if (last_start == 0) {
+        B2ERROR(" Error: End without Start ");
+        start_error++;
+        error_flag = true;
+      }
+      if (!fake) {
+        /*int w;
+        w = ((dhhc_dhh_end_frame*)data)->get_words() * 2;
+        last_wie += 2;
+        if (verbose) {
+           B2INFO(" last_wie " << last_wie << " w " << w);
+        };
+        if (last_wie != w) {
+           if (verbose) {
+              B2INFO(" Error: WIE " << hex << last_wie << " vs END " << hex << w << " pad " << pad);
+           };
+           error_flag = true;
+           wie_error++;
+        } else {
+           if (verbose)
+              B2INFO(" EVT END: WIE " << hex << last_wie << " == END " << hex << w << " pad " << pad);
+        }*/
+        dhhc.calc_crc();
+      }
+      break;
+    };
+    case DHHC_FRAME_HEADER_DATA_TYPE_DHH_END: {
+      bool fake = ((dhhc_dhh_end_frame*)data)->is_fake();
+      if (fake) {
+        B2WARNING("Faked DHH END Data -> trigger without Data!");
+      } else {
+        ((dhhc_dhh_end_frame*)data)->print();
+      }
+      if (!fake) {
+        dhhc.calc_crc();
+      }
+      break;
+    };
+    case DHHC_FRAME_HEADER_DATA_TYPE_HLTROI:
+      hw->print();
+      ((dhhc_onsen_frame*)data)->set_length(len - 4);
+      ((dhhc_onsen_frame*)data)->print();
+      //dhh.calc_crc(); /// WILL FAIL anyway
+      break;
+    default:
+      B2ERROR(" Error: no data ");
+      type_error++;
+      hw->print();
+      error_flag = true;
+      break;
+  }
+
+  if (evtnr != last_evtnr) {
+    B2ERROR(" Error: Event Nr " << evtnr << " != " << last_evtnr);
+    evtnr_error++;
+    error_flag = true;
+  }
 
   last_wie += len;
 

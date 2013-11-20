@@ -8,7 +8,7 @@
 // Daet : 17 - Oct - 2013, Special version for DESY test nodes
 //-
 
-#define DESY
+//#define DESY
 
 #include "daq/rfarm/manager/RFEventProcessor.h"
 #include "daq/rfarm/manager/RFNSM.h"

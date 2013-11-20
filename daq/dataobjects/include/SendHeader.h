@@ -52,6 +52,10 @@ namespace Belle2 {
     int GetEventNumber();
     int GetNodeID();
 
+    int GetRunNum(); //!
+    int GetExpNum(); //!
+
+
     /* Data Format : Node info */
     enum {
       SENDHDR_NWORDS = 6

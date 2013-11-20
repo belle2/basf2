@@ -26,18 +26,12 @@ REG_MODULE(PrintDataTemplate)
 PrintDataTemplateModule::PrintDataTemplateModule() : Module()
 {
   //Set module properties
-
   setDescription("Encode DataStore into RingBuffer");
   n_basf2evt = -1;
   m_compressionLevel = 0;
-
   B2INFO("PrintDataTemplate: Constructor done.");
-
   m_ncpr = 0;
   m_nftsw = 0;
-
-
-
 }
 
 
@@ -76,6 +70,7 @@ void PrintDataTemplateModule::PrintData(int* buf, int nwords)
     if ((j + 1) % 10 == 0) {
       //        printf("\n%.8d : ", j + 1);
       printf("\n");
+      //      break;
     }
   }
   printf("\n");
@@ -86,9 +81,28 @@ void PrintDataTemplateModule::PrintData(int* buf, int nwords)
 
 void PrintDataTemplateModule::PrintFTSWEvent(RawDataBlock* raw_datablock, int i)
 {
-  printf("*******FTSW data**********: nwords %d\n", raw_datablock->GetBlockNwords(i));
+  int* buf  = raw_datablock->GetBuffer(i);
+  int nwords =  raw_datablock->GetBlockNwords(i);
+  printf("*******FTSW data**********: nwords %d\n", nwords);
+  PrintData(buf, nwords);
+
+  RawFTSW rawftsw;
+  int malloc_flag = 0; // No need to free the buffer
+  int num_event = 1;
+  int num_nodes = 1;
+  rawftsw.SetBuffer(buf, nwords, malloc_flag, num_event, num_nodes);
+
+  int n = 0;
+  printf("%d %d %.8x %.8x %lf\n",
+         rawftsw.GetNwords(n),
+         rawftsw.GetNwordsHeader(n),
+         rawftsw.GetFTSWNodeID(n),
+         rawftsw.GetTrailerMagic(n),
+         rawftsw.GetEventUnixTime(n)
+        );
+
+
 #ifdef DEBUG
-  PrintData("", raw_datablock->GetBuffer(i), raw_datablock->GetBlockNwords(i));
 #endif
   m_nftsw++;
   return;

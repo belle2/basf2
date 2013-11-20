@@ -19,19 +19,24 @@
 
 from basf2 import *
 
-
 # Set the log level to show only error and fatal messages
 set_log_level(LogLevel.ERROR)
 # set_log_level(LogLevel.INFO)
 
 # input
 input = register_module('RootInput')
-#input = register_module('SeqRootInput')
-#input.param('iutputFileName', 'RootOutput1.root')
-
+# input = register_module('SeqRootInput')
+# input.param('iutputFileName', 'RootOutput1.root')
 
 # output
-output = register_module('PrintDataTemplate')
+output = register_module('PrintData')
+
+# dump
+dump = register_module('RootOutput')
+dump.param('outputFileName', 'temp.root')
+
+# Histogram
+hist = register_module('HistoExercise1')
 
 # Create main path
 main = create_path()
@@ -39,6 +44,8 @@ main = create_path()
 # Add modules to main path
 main.add_module(input)
 main.add_module(output)
+# main.add_module(hist)
+# main.add_module(dump)
 
 # Process all events
 process(main)

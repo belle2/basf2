@@ -207,8 +207,6 @@ void SerializerModule::FillSendHeaderTrailer(SendHeader* hdr, SendTrailer* trl,
       sleep(1234567);
       exit(-1);
     }
-
-
   }
   return;
 }
@@ -216,8 +214,6 @@ void SerializerModule::FillSendHeaderTrailer(SendHeader* hdr, SendTrailer* trl,
 
 int SerializerModule::SendByWriteV(RawDataBlock* rawdblk)
 {
-
-
   SendHeader send_header;
   SendTrailer send_trailer;
   FillSendHeaderTrailer(&send_header, &send_trailer, rawdblk);
@@ -240,9 +236,7 @@ int SerializerModule::SendByWriteV(RawDataBlock* rawdblk)
   iov[2].iov_base = (char*)send_trailer.GetBuffer();
   iov[2].iov_len = sizeof(int) * send_trailer.GetTrlNwords();
 
-
   //  char* temp_buf = new char[ iov[0].iov_len + iov[1].iov_len + iov[2].iov_len ];
-
   // Send Multiple buffers
   int n = 0;
   //  if ( ( n = send(m_socket, (char*)temp_buf, iov[0].iov_len + iov[1].iov_len + iov[2].iov_len, MSG_NOSIGNAL) )

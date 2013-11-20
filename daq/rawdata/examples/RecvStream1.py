@@ -33,8 +33,8 @@ receiver = register_module('DeSerializerPC')
 # receiver = register_module('DeSerializerHLT')
 # dump = register_module('PrintCollections')
 
-dump = register_module('SeqRootOutput')
-# dump = register_module('RootOutput')
+# dump = register_module('SeqRootOutput')
+dump = register_module('RootOutput')
 perf = register_module('DAQPerf')
 output = register_module('PrintData')
 

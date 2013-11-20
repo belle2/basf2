@@ -14,6 +14,7 @@
 #include <stdlib.h>
 #include <daq/dataobjects/RawDataBlock.h>
 #include <daq/dataobjects/SendHeader.h>
+#include <daq/dataobjects/SendTrailer.h>
 #include <framework/datastore/DataStore.h>
 
 #include <TObject.h>
@@ -29,14 +30,35 @@ namespace Belle2 {
     //! Destructor
     virtual ~RawFTSW();
 
-    //! Copy nth header part to m_FTSW_header
-    void SetFTSWHeader(int n);
+    //!
+    int GetNwords(int n);
 
+    //!
+    int GetNwordsHeader(int n);
+
+    //!
+    int GetFTSWNodeID(int n);
+
+    //!
+    int GetTrailerMagic(int n);
+
+    //!
+    unsigned int GetFTSWData1(int n);
+
+    //!
+    unsigned int GetFTSWData2(int n);
+
+    //!
+    double GetEventUnixTime(int n);
+
+    enum {
+      POS_FTSW1 = 0,
+      POS_FTSW2 = 1,
+      SIZE_FTSW_BODY = 4 // modified by Oct.3, 2013, Nakao-san's New firmware?
+    };
 
   protected :
-
-    SendHeader m_FTSW_header;
-
+    Belle2::SendHeader m_FTSW_header; //
 
     ClassDef(RawFTSW, 1);
   };

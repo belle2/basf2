@@ -16,9 +16,8 @@
 //#define MAXEVTSIZE 400000000
 //#define TIME_MONITOR
 #define NO_DATA_CHECK
-
 #define TAIL_EVENT32
-
+#define DUMMY_EVENT_NUM
 
 
 using namespace std;
@@ -191,6 +190,12 @@ void DeSerializerCOPPERModule::FillNewRawCOPPERHeader(RawCOPPER* raw_copper)
     }
   }
 #endif
+
+#ifdef DUMMY_EVENT_NUM
+  cur_ftsw_eve32 = m_prev_ftsweve32 + 1;
+  cur_ftsw_eve16 = cur_ftsw_eve32 & 0xFFFF;
+#endif
+
   rawhdr.SetEveNo(cur_ftsw_eve32);       // Temporarily use COPPER counter   //raw_copper->GetCOPPERCounter()
 
   // Set FTSW word
@@ -402,7 +407,7 @@ void DeSerializerCOPPERModule::OpenCOPPER()
     exit(1);
   }
 
-  int set_regval = 4; // How many events to be stored in COPPER FIFO before request for DMA
+  int set_regval = 10; // How many events to be stored in COPPER FIFO before request for DMA
   //    int set_regval=1;
   ioctl(cpr_fd, CPRIOSET_LEF_WA_FF, &set_regval);
   ioctl(cpr_fd, CPRIOSET_LEF_WB_FF, &set_regval);

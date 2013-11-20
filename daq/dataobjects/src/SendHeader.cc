@@ -96,4 +96,8 @@ int SendHeader::GetEventNumber() { return m_buffer[ POS_EVE_NUM ]; }
 
 int SendHeader::GetNodeID() { return m_buffer[ POS_NODE_ID ]; }
 
+int SendHeader::GetRunNum() { return (m_buffer[ POS_EXP_RUN_NUM ] & 0x3FFFFF); }
+
+int SendHeader::GetExpNum() { return ((m_buffer[ POS_EXP_RUN_NUM ] >> 22) & 0x3FF); }
+
 

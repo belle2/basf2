@@ -50,10 +50,52 @@
 #include <sys/uio.h>
 
 
+#include <framework/core/HistoModule.h>
+#include "TH1F.h"
+#include "TH2F.h"
+
+#define SIZE_CDC_1_NUM 1000
+#define SIZE_CDC_1_MIN 0.
+#define SIZE_CDC_1_MAX 5000.
+#define SIZE_CDC_2_NUM 1000
+#define SIZE_CDC_2_MIN 0.
+#define SIZE_CDC_2_MAX 5000.
+#define SIZE_UT3_NUM 1000
+#define SIZE_UT3_MIN 0.
+#define SIZE_UT3_MAX 5000.
+
+#define TDIFF_EVE_NUM 1000
+#define TDIFF_EVE_MIN 0.
+#define TDIFF_EVE_MAX 0.01
+
+#define EVEDIFF_NUM 1000
+#define EVEDIFF_MIN -500.
+#define EVEDIFF_MAX 500.
+
+#define TRGRATE_NUM 3000
+#define TRGRATE_MIN 0.
+#define TRGRATE_MAX 3000.
 
 namespace Belle2 {
 
   /*! A class definition of an input module for Sequential ROOT I/O */
+
+
+
+  /*   class Histo1D : public TObject { */
+  /*   public : */
+  /*     Histo1D(){} */
+  /*     ~Histo1D(); */
+  /*     virtual void Fill( double value ); */
+  /*     virtual void Set( int, double, double); */
+  /*     virtual void Print(); */
+  /*   private : */
+  /*     double min; */
+  /*     double max; */
+  /*     int array_size; */
+  /*     int* array; */
+  /*     ClassDef( Histo1D, 1); */
+  /*   }; */
 
   class PrintDataModule : public Module {
 
@@ -69,27 +111,21 @@ namespace Belle2 {
 
     //! Module functions to be called from event process
     virtual void event();
-    virtual void VerifyCheckSum(int* buf);
     virtual void PrintCOPPEREvent(RawCOPPER* raw_array, int i);
-    virtual void PrintEvent(RawDataBlock* raw_array, int i);
-
-
-    // Data members
+    virtual void PrintFTSWEvent(RawDataBlock* raw_array, int i);
+    virtual void PrintData(int* buf, int nwords);
+    virtual void defineHisto();
+    virtual void FillHisto1D(double, int*, int, double, double);
+    virtual void FillHisto2D(double, double, int*, int, double, double,  int, double, double);
+    virtual void Print(int* array, int array_size, double min, double max, const char*);
+    virtual void endRun();
+    virtual void terminate();
 
   protected :
-
-    // Event Meta Data
-    //    StoreObjPtr<EventMetaData> m_eventMetaDataPtr;
-
-    //! data
-    //    StoreObjPtr<RawCOPPER> m_rawcopper;
-
-
-    //! size of buffer for one event (word)
-    int BUF_SIZE_WORD;
-
     //!Compression parameter
     int m_compressionLevel;
+    //! Event Meta Data
+    StoreObjPtr<EventMetaData> m_eventMetaDataPtr;
 
     //! Messaage handler
     MsgHandler* m_msghandler;
@@ -97,45 +133,50 @@ namespace Belle2 {
     //! No. of sent events
     int n_basf2evt;
 
-    int* m_buffer;
-
     int m_nftsw;
 
-    int m_ncdc;
+    int m_ncpr;
 
-    int m_fina_nwords;
+    TH1* h_size;
+    TH1* h_nhit;
+    TH2* h_winfadc[48];
+    TH2* h_wintdc[48];
+    TH2* h_chfadc;
+    TH2* h_chtdc;
 
-    int m_finb_nwords;
 
-    int m_finc_nwords;
+    int  m_size_cdc_1[SIZE_CDC_1_NUM];
+    int  m_size_cdc_2[SIZE_CDC_2_NUM];
+    int  m_size_ut3[SIZE_UT3_NUM];
+    int  m_tdiff_eve[TDIFF_EVE_NUM] ;
 
-    int m_find_nwords;
+    int m_tdiff_cdc_1[ TDIFF_EVE_NUM ];
+    int m_tdiff_cdc_2[ TDIFF_EVE_NUM ];
+    int m_tdiff_ut3[ TDIFF_EVE_NUM ];
 
-    int m_upper16_ftsw_utime;
+    int m_eve_diff[ EVEDIFF_NUM ];
+    int m_eve_diff_prev[ EVEDIFF_NUM ];
 
-    int m_upper16_cdc_utime;
+    int m_rate[ TRGRATE_NUM ];
 
-    int m_prev_ftsw_time16;
+    double m_prev_time_cdc_1;
+    double m_prev_time_cdc_2;
+    double m_prev_time_ut3;
 
-    int m_prev_cdc_time16;
+    double m_time_cdc_1;
+    double m_time_cdc_2;
+    double m_time_ut3;
 
-    double m_start_ftsw_time;
+    unsigned int m_eve_cnt;
+    unsigned int m_eve_from_data;
+    unsigned int m_prev_eve_from_data;
 
-    double m_start_cdc_time;
+    unsigned int m_eve_from_ftsw;
 
-    double m_last_utime_ftsw;
-
-    double m_last_utime_cdc;
-
-    int m_prev_ftsw_eve16;
-
-    int m_prev_cdc_eve16;
-
-    int m_cnt_ftsw_evejump;
-
-    int m_cnt_cdc_evejump;
+    double m_start_time;
 
   };
+
 
 } // end namespace Belle2
 

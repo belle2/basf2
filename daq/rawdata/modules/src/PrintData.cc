@@ -114,7 +114,7 @@ void PrintDataModule::PrintData(int* buf, int nwords)
     if ((j + 1) % 12 == 0) {
       //      printf("\n%.8d : ", j + 1);
       //      printf("\n %.8d :", j + 1);
-      printf("\n", j + 1);
+      printf("\n");
       //      break;
     }
   }
@@ -150,13 +150,13 @@ void PrintDataModule::PrintFTSWEvent(RawDataBlock* raw_datablock, int i)
 
   }
 
-  RawFTSW rawftsw;
-  int malloc_flag = 0; // No need to free the buffer
-  int num_event = 1;
-  int num_nodes = 1;
+  //  RawFTSW rawftsw;
+  //  int malloc_flag = 0; // No need to free the buffer
+  //  int num_event = 1;
+  //  int num_nodes = 1;
   //  rawftsw.SetBuffer( buf, nwords, malloc_flag, num_event, num_nodes );
 
-  int n = 0;
+  //  int n = 0;
   //   printf("%d %d %.8x %.8x %lf\n",
   //   rawftsw.GetNwords(n),
   //   rawftsw.GetNwordsHeader(n),
@@ -199,15 +199,16 @@ void PrintDataModule::FillHisto2D(double value_x, double value_y, int* array,
                                   int array_size_y, double min_y, double max_y
                                  )
 {
-  int entry_x = 1, entry_y = 1;
-  if (value_x > max_x) {
-    entry_x = array_size_x - 1;
-  } else if (value_x < min_x) {
-    entry_x = 0;
-  } else {
-    entry_x = (int)((value_x - min_x) / (max_x - min_x) * array_size_x);
-  }
+//   int entry_x = 1;
+//   if (value_x > max_x) {
+//     entry_x = array_size_x - 1;
+//   } else if (value_x < min_x) {
+//     entry_x = 0;
+//   } else {
+//     entry_x = (int)((value_x - min_x) / (max_x - min_x) * array_size_x);
+//   }
 
+  int entry_y = 1;
   if (value_y > max_y) {
     entry_y = array_size_y - 1;
   } else if (value_y < min_y) {
@@ -329,8 +330,6 @@ void PrintDataModule::PrintCOPPEREvent(RawCOPPER* raw_copper, int i)
 
   for (int finesse = 0; finesse < 4; finesse++) {
     if (raw_copper->GetDetectorNwords(i, finesse) > 0) {
-      int* temp_buf2 = raw_copper->GetFINESSEBuffer(i, finesse);
-
       if ((5 - 5 < m_eve_cnt && m_eve_cnt < 5 + 5)
           //   if( ( 173848 -5 < m_eve_cnt && m_eve_cnt < 173848 + 5)
          ) { // for run10038

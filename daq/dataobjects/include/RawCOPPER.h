@@ -21,6 +21,9 @@
 
 #include <TObject.h>
 
+//#define USE_B2LFEE_FORMAT_BOTH_VER1_AND_2
+
+
 namespace Belle2 {
 
 
@@ -40,6 +43,11 @@ namespace Belle2 {
     // POINTER TO "DETECTOR BUFFER"
     //( after removing "B2link headers" from "FINESSE buffer". THIS IS THE RAW DATA FROM A DETECTOR
     ///////////////////////////////////////////////////////////////////////////////////////
+
+
+    //! get Detector buffer length
+    int GetDetectorNwords(int n, int finesse_num);
+
     //! get Detector buffer length of slot A
     int Get1stDetectorNwords(int n);
 
@@ -51,6 +59,9 @@ namespace Belle2 {
 
     //! get Detector buffer length of slot D
     int Get4thDetectorNwords(int n);
+
+    //! get Detector buffer
+    int* GetDetectorBuffer(int n, int finesse_num);
 
     //! get Detector buffer of slot A
     int* Get1stDetectorBuffer(int n);
@@ -73,6 +84,9 @@ namespace Belle2 {
 
     //! get buffer pointer of rawcopper trailer
     virtual int* GetRawTrlBufPtr(int n);
+
+    //! get FINESSE buffer pointer
+    int* GetFINESSEBuffer(int n, int finesse_num);
 
     //! get FINESSE buffer pointer for slot A
     int* Get1stFINESSEBuffer(int n);
@@ -114,6 +128,9 @@ namespace Belle2 {
     //! get # of FINNESEs which contains data
     virtual int GetNumFINESSEBlock(int n);
 
+    //! get # of offset words
+    int GetOffsetFINESSE(int n, int finesse);
+
     //! get # of offset words for FINESSE slot A buffer position
     int GetOffset1stFINESSE(int n);
 
@@ -125,6 +142,9 @@ namespace Belle2 {
 
     //! get # of offset words for FINESSE slot D buffer position
     int GetOffset4thFINESSE(int n);
+
+    //! get data size of  FINESSE buffer
+    int GetFINESSENwords(int n, int finesse);
 
     //! get data size of  FINESSE slot A buffer
     int Get1stFINESSENwords(int n);
@@ -173,6 +193,11 @@ namespace Belle2 {
 
     //! Check if COPPER Magic words are correct
     bool CheckCOPPERMagic(int n);
+
+    /* #ifdef USE_B2LFEE_FORMAT_BOTH_VER1_AND_2 */
+    /*     //! Check B2LFEE header version */
+    /*     int CheckB2LFEEHeaderVersion( int  n ); */
+    /* #endif */
 
 
     //
@@ -242,6 +267,8 @@ namespace Belle2 {
                            //      SIZE_B2LFEE_HEADER = 1  // As of Aug.22,2013, the header size is one word. It should be 2 in future.
     };
 
+
+
     //
     // Data Format : B2Link FEE Trailer
     //
@@ -267,7 +294,8 @@ namespace Belle2 {
 
     RawTrailer tmp_trailer; //! Not record
 
-    ClassDef(RawCOPPER, 1);
+    ClassDef(RawCOPPER, 2);
+    //ver.2 Change FEE format as presented at B2GM in Nov.2013 ( Nov.20, 2013)
   };
 }
 

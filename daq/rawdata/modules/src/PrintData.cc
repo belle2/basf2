@@ -56,9 +56,9 @@ PrintDataModule::~PrintDataModule()
 void PrintDataModule::defineHisto()
 {
 
-//   double t_min = 0.;
-//   double t_max = 600.;
-//   int t_nbin = 600;
+  //   double t_min = 0.;
+  //   double t_max = 600.;
+  //   int t_nbin = 600;
 
   h_size = new TH1F("h_size", "Data size / COPPER; Data size [Byte]; entries", 50, 0, 10000);
   h_nhit = new TH1F("h_rate", "Data rate / COPPER; COPPER ID; Data rate [Bytes/s]", 48, 0, 48);
@@ -69,12 +69,12 @@ void PrintDataModule::defineHisto()
 
 
   /*
-  h_hslb_size[0] = new TH1F("h_hslb_size_0", "Data size / HSLB; Data size [Byte]; entries", 50, 0, 10000);
-  h_hslb_size[1] = new TH1F("h_hslb_size_1", "Data size / HSLB; Data size [Byte]; entries", 50, 0, 10000);
-  h_hslb_size[2] = new TH1F("h_hslb_size_2", "Data size / HSLB; Data size [Byte]; entries", 50, 0, 10000);
-  h_hslb_size[3] = new TH1F("h_hslb_size_3", "Data size / HSLB; Data size [Byte]; entries", 50, 0, 10000);
-  h_hslb_nevt = new TH1F("h_hslb_nevt", "Number of Events / HSLB; HSLB slot; # of Events", 4, 0, 4);
-  h_hslb_rate = new TH1F("h_hslb_rate", "Data rate / HSLB; HSLB slot; Data rate [Bytes/s]", 4, 0, 4);
+    h_hslb_size[0] = new TH1F("h_hslb_size_0", "Data size / HSLB; Data size [Byte]; entries", 50, 0, 10000);
+    h_hslb_size[1] = new TH1F("h_hslb_size_1", "Data size / HSLB; Data size [Byte]; entries", 50, 0, 10000);
+    h_hslb_size[2] = new TH1F("h_hslb_size_2", "Data size / HSLB; Data size [Byte]; entries", 50, 0, 10000);
+    h_hslb_size[3] = new TH1F("h_hslb_size_3", "Data size / HSLB; Data size [Byte]; entries", 50, 0, 10000);
+    h_hslb_nevt = new TH1F("h_hslb_nevt", "Number of Events / HSLB; HSLB slot; # of Events", 4, 0, 4);
+    h_hslb_rate = new TH1F("h_hslb_rate", "Data rate / HSLB; HSLB slot; Data rate [Bytes/s]", 4, 0, 4);
   */
 }
 
@@ -133,14 +133,14 @@ void PrintDataModule::PrintFTSWEvent(RawDataBlock* raw_datablock, int i)
   if ((5 - 5 < m_eve_cnt && m_eve_cnt < 5 + 5)
       //  if( ( 173848 -5 < m_eve_cnt && m_eve_cnt < 173848 + 5)
      ) { // for run10038
-//   if( ( 579 -5 < m_eve_cnt && m_eve_cnt < 579 + 5)
-//       ){
-//     if( ( 25348 -5 < m_eve_cnt && m_eve_cnt < 25348 + 5) ||
-//  ( 1292201 -5 < m_eve_cnt && m_eve_cnt < 1292201 + 5) ||
-//  ( 384553 -5 < m_eve_cnt && m_eve_cnt < 384553 + 5) ||
-//  ( 387625 -5 < m_eve_cnt && m_eve_cnt < 387625 + 5) ||
-//  ( 1026080  -5 < m_eve_cnt && m_eve_cnt < 1026080 + 5)
-//  ){  // for run10048
+    //   if( ( 579 -5 < m_eve_cnt && m_eve_cnt < 579 + 5)
+    //       ){
+    //     if( ( 25348 -5 < m_eve_cnt && m_eve_cnt < 25348 + 5) ||
+    //  ( 1292201 -5 < m_eve_cnt && m_eve_cnt < 1292201 + 5) ||
+    //  ( 384553 -5 < m_eve_cnt && m_eve_cnt < 384553 + 5) ||
+    //  ( 387625 -5 < m_eve_cnt && m_eve_cnt < 387625 + 5) ||
+    //  ( 1026080  -5 < m_eve_cnt && m_eve_cnt < 1026080 + 5)
+    //  ){  // for run10048
     //      printf("FTSWEVE %d %x\n", m_eve_cnt, m_eve_cnt);
     printf("FTSW **** %x %x %x ******** **** 4\n",
            buf[7] & 0xFFFF, (buf[6] >> 4)  & 0x7FFFFFF,
@@ -157,13 +157,13 @@ void PrintDataModule::PrintFTSWEvent(RawDataBlock* raw_datablock, int i)
   //  rawftsw.SetBuffer( buf, nwords, malloc_flag, num_event, num_nodes );
 
   int n = 0;
-//   printf("%d %d %.8x %.8x %lf\n",
-//   rawftsw.GetNwords(n),
-//   rawftsw.GetNwordsHeader(n),
-//   rawftsw.GetFTSWNodeID(n),
-//   rawftsw.GetTrailerMagic(n),
-//   rawftsw.GetEventUnixTime(n)
-//   );
+  //   printf("%d %d %.8x %.8x %lf\n",
+  //   rawftsw.GetNwords(n),
+  //   rawftsw.GetNwordsHeader(n),
+  //   rawftsw.GetFTSWNodeID(n),
+  //   rawftsw.GetTrailerMagic(n),
+  //   rawftsw.GetEventUnixTime(n)
+  //   );
 
 
   m_nftsw++;
@@ -289,18 +289,18 @@ void PrintDataModule::PrintCOPPEREvent(RawCOPPER* raw_copper, int i)
   printf(": Event # %d \n", raw_copper->GetEveNo(i));
 #endif
 
-//   printf(": Event # %d : node ID 0x%.8x : block size %d bytes : %d %d %d %d : %d %d %d %d\n",
-//          raw_copper->GetEveNo(i), raw_copper->GetCOPPERNodeId(i),
-//          raw_copper->GetBlockNwords(i) * sizeof(int),
-//          raw_copper->Get1stDetectorNwords(i),
-//          raw_copper->Get2ndDetectorNwords(i),
-//          raw_copper->Get3rdDetectorNwords(i),
-//          raw_copper->Get4thDetectorNwords(i),
-//          raw_cdc.RawDataType1st(i),
-//          raw_cdc.RawDataType2nd(i),
-//          raw_cdc.RawDataType3rd(i),
-//          raw_cdc.RawDataType4th(i)
-//   );
+  //   printf(": Event # %d : node ID 0x%.8x : block size %d bytes : %d %d %d %d : %d %d %d %d\n",
+  //          raw_copper->GetEveNo(i), raw_copper->GetCOPPERNodeId(i),
+  //          raw_copper->GetBlockNwords(i) * sizeof(int),
+  //          raw_copper->Get1stDetectorNwords(i),
+  //          raw_copper->Get2ndDetectorNwords(i),
+  //          raw_copper->Get3rdDetectorNwords(i),
+  //          raw_copper->Get4thDetectorNwords(i),
+  //          raw_cdc.RawDataType1st(i),
+  //          raw_cdc.RawDataType2nd(i),
+  //          raw_cdc.RawDataType3rd(i),
+  //          raw_cdc.RawDataType4th(i)
+  //   );
 
 #ifdef DEBUG
   printf("******* Raw COPPER data block(including Detector Buffer)**********\n");
@@ -321,179 +321,51 @@ void PrintDataModule::PrintCOPPEREvent(RawCOPPER* raw_copper, int i)
       printf("Diff eve %d %d %d\n", m_eve_from_data , m_eve_from_ftsw,
              m_eve_cnt);
     }
-
-
-
-
-
-
-
   }
   m_prev_eve_from_data = m_eve_from_data;
-
-
   FillHisto1D((double)(m_eve_from_data - m_eve_cnt), m_eve_diff,
               EVEDIFF_NUM, EVEDIFF_MIN, EVEDIFF_MAX);
 
-  //  printf("event %u %u\n", m_eve_cnt, m_eve_from_data );
+
+  for (int finesse = 0; finesse < 4; finesse++) {
+    if (raw_copper->GetDetectorNwords(i, finesse) > 0) {
+      int* temp_buf2 = raw_copper->GetFINESSEBuffer(i, finesse);
+
+      if ((5 - 5 < m_eve_cnt && m_eve_cnt < 5 + 5)
+          //   if( ( 173848 -5 < m_eve_cnt && m_eve_cnt < 173848 + 5)
+         ) { // for run10038
+        //   if( ( 579 -5 < m_eve_cnt && m_eve_cnt < 579 + 5)
+        //       ){ // for run10036
+        //     if( ( 25348 -5 < m_eve_cnt && m_eve_cnt < 25348 + 5) ||
+        //  ( 1292201 -5 < m_eve_cnt && m_eve_cnt < 1292201 + 5) ||
+        //  ( 384553 -5 < m_eve_cnt && m_eve_cnt < 384553 + 5) ||
+        //  ( 1026080  -5 < m_eve_cnt && m_eve_cnt < 1026080 + 5)
+        //  ){ //for run10048
+
+        //      int* temp_buf = raw_copper->GetBuffer(i);
+        int* temp_buf = raw_copper->GetFINESSEBuffer(i, finesse);
+        int nwords = raw_copper->GetFINESSENwords(i, finesse);
+        unsigned int hslb_eve = temp_buf[0] & 0xFFFF; //temp_buf[];
+        unsigned int tt_eve = temp_buf[2] & 0xFFFF; //temp_buf[];
+        unsigned int tt_ctime = (temp_buf[1] >> 4) & 0x7FFFFFF ;
+        unsigned int tt_utime1 = (temp_buf[2] >> 16) & 0xFFFF ;
+        unsigned int b2l_ctime = (temp_buf[4] >> 4) & 0x7FFFFFF;
+        unsigned int tt_utime2 = 0x12345678;
+        if (nwords >= 2) {
+          tt_utime2 = (temp_buf[ nwords - 2 ] >> 16) & 0xFFFF;
+        }
+        printf("CDC1  %x %x %x %x %x %x %d\n",
+               hslb_eve, tt_eve, tt_ctime, tt_utime1, b2l_ctime, tt_utime2,
+               nwords
+              );
 
 
-
-
-  int hslb_eve1 = 0;
-
-  //
-  // Print data from each FINESSE
-  //
-  if (raw_copper->Get1stDetectorNwords(i) > 0) {
-    int* temp_buf2 = raw_copper->Get1stFINESSEBuffer(i);
-    hslb_eve1 =  temp_buf2[0] & 0xFFFF;
-    //    if(true){
-    if ((5 - 5 < m_eve_cnt && m_eve_cnt < 5 + 5)
-        //   if( ( 173848 -5 < m_eve_cnt && m_eve_cnt < 173848 + 5)
-       ) { // for run10038
-//   if( ( 579 -5 < m_eve_cnt && m_eve_cnt < 579 + 5)
-//       ){ // for run10036
-//     if( ( 25348 -5 < m_eve_cnt && m_eve_cnt < 25348 + 5) ||
-//  ( 1292201 -5 < m_eve_cnt && m_eve_cnt < 1292201 + 5) ||
-//  ( 384553 -5 < m_eve_cnt && m_eve_cnt < 384553 + 5) ||
-//  ( 1026080  -5 < m_eve_cnt && m_eve_cnt < 1026080 + 5)
-//  ){ //for run10048
-
-      //      int* temp_buf = raw_copper->GetBuffer(i);
-      int* temp_buf = raw_copper->Get1stFINESSEBuffer(i);
-      int nwords = raw_copper->Get1stFINESSENwords(i);
-      unsigned int hslb_eve = temp_buf[0] & 0xFFFF; //temp_buf[];
-      unsigned int tt_eve = temp_buf[2] & 0xFFFF; //temp_buf[];
-      unsigned int tt_ctime = (temp_buf[1] >> 4) & 0x7FFFFFF ;
-      unsigned int tt_utime1 = (temp_buf[2] >> 16) & 0xFFFF ;
-      unsigned int b2l_ctime = (temp_buf[4] >> 4) & 0x7FFFFFF;
-      unsigned int tt_utime2 = 0x12345678;
-      if (nwords >= 2) {
-        tt_utime2 = (temp_buf[ nwords - 2 ] >> 16) & 0xFFFF;
+        //      PrintData(raw_copper->GetBuffer(i), raw_copper->GetBlockNwords(i) );
       }
-      printf("CDC1  %x %x %x %x %x %x %d\n",
-             hslb_eve, tt_eve, tt_ctime, tt_utime1, b2l_ctime, tt_utime2,
-             nwords
-            );
-
-
-      //      PrintData(raw_copper->GetBuffer(i), raw_copper->GetBlockNwords(i) );
     }
-
-
-#ifdef DEBUG
-    printf("1= Detector Buffer(FINESSE A)\n");
-#endif
-    int size = raw_copper->Get1stDetectorNwords(i);
-    m_time_cdc_1 = raw_copper->GetEventUnixTime(i);
-    if (m_prev_time_cdc_1 > 0.) {
-      FillHisto1D((double)(m_time_cdc_1 - m_prev_time_cdc_1), m_tdiff_cdc_1,
-                  TDIFF_EVE_NUM, TDIFF_EVE_MIN, TDIFF_EVE_MAX);
-    }
-    m_prev_time_cdc_1 = m_time_cdc_1;
-
-
-
-
-
-    //    printf("%lf %lf %lf\n", m_time_cdc_1, m_time_cdc_2, m_time_ut3);
-//     if( size >= 100){
-//       printf("large size\n");
-//       PrintData(raw_copper->Get1stDetectorBuffer(i), size);
-//     }
-    FillHisto1D((double)size, m_size_cdc_1, SIZE_CDC_1_NUM, SIZE_CDC_1_MIN, SIZE_CDC_1_MAX);
   }
 
-  if (raw_copper->Get2ndDetectorNwords(i) > 0) {
-    int* temp_buf2 = raw_copper->Get2ndFINESSEBuffer(i);
-//       if( ( m_eve_cnt & 0xFFFF ) != ( temp_buf2[2] & 0xFFFF ) ){
-//  printf("deiff %x %x\n", m_eve_cnt, temp_buf2[2] & 0xFFFF,  );
-//       }
-    if (hslb_eve1 != (temp_buf2[0] & 0xFFFF)) {
-      printf("dkif %d\n", m_eve_cnt);
-    }
 
-
-    if ((5 - 5 < m_eve_cnt && m_eve_cnt < 5 + 5)
-        //   if( ( 173848 -5 < m_eve_cnt && m_eve_cnt < 173848 + 5)
-       ) { // for run10038
-//   if( ( 579 -5 < m_eve_cnt && m_eve_cnt < 579 + 5)
-//       ){ // for run10036
-//     if( ( 25348 -5 < m_eve_cnt && m_eve_cnt < 25348 + 5) ||
-//  ( 1292201 -5 < m_eve_cnt && m_eve_cnt < 1292201 + 5) ||
-//  ( 384553 -5 < m_eve_cnt && m_eve_cnt < 384553 + 5) ||
-//  ( 1026080  -5 < m_eve_cnt && m_eve_cnt < 1026080 + 5)
-//  ){ //for run10048
-
-      //      int* temp_buf = raw_copper->GetBuffer(i);
-      int* temp_buf = raw_copper->Get2ndFINESSEBuffer(i);
-      int nwords = raw_copper->Get2ndFINESSENwords(i);
-      unsigned int hslb_eve = temp_buf[0] & 0xFFFF; //temp_buf[];
-      unsigned int tt_eve = temp_buf[2] & 0xFFFF; //temp_buf[];
-      unsigned int tt_ctime = (temp_buf[1] >> 4) & 0x7FFFFFF ;
-      unsigned int tt_utime1 = (temp_buf[2] >> 16) & 0xFFFF ;
-      unsigned int b2l_ctime = (temp_buf[4] >> 4) & 0x7FFFFFF;
-      unsigned int tt_utime2 = 0x12345678;
-      if (nwords >= 2) {
-        tt_utime2 = (temp_buf[ nwords - 2 ] >> 16) & 0xFFFF;
-      }
-      printf("CDC2  %x %x %x %x %x %x %d\n",
-             hslb_eve, tt_eve, tt_ctime, tt_utime1, b2l_ctime, tt_utime2,
-             nwords
-            );
-
-      PrintData(raw_copper->GetBuffer(i), raw_copper->GetBlockNwords(i));
-    }
-
-
-
-#ifdef DEBUG
-    printf("2= Detector Buffer(FINESSE B)\n");
-#endif
-    m_time_cdc_2 = raw_copper->GetEventUnixTime(i);
-    if (m_prev_time_cdc_2 > 0.) {
-      FillHisto1D((double)(m_time_cdc_2 - m_prev_time_cdc_2),  m_tdiff_cdc_2,
-                  TDIFF_EVE_NUM, TDIFF_EVE_MIN, TDIFF_EVE_MAX);
-      FillHisto1D((double)(m_time_cdc_2 - m_start_time),  m_rate,
-                  TRGRATE_NUM, TRGRATE_MIN, TRGRATE_MAX);
-    } else {
-      m_start_time = m_time_cdc_2;
-    }
-    m_prev_time_cdc_2 = m_time_cdc_2;
-
-    //    printf("%lf %lf %lf\n", m_time_cdc_1, m_time_cdc_2, m_time_ut3);
-    int size = raw_copper->Get2ndDetectorNwords(i);
-//     if( size >= 100){
-//       printf("large size\n");
-//       PrintData(raw_copper->Get2ndDetectorBuffer(i), size);
-//     }
-    FillHisto1D((double)size, m_size_cdc_2, SIZE_CDC_2_NUM, SIZE_CDC_2_MIN, SIZE_CDC_2_MAX);
-  }
-
-  if (raw_copper->Get3rdDetectorNwords(i) > 0) {
-#ifdef DEBUG
-    printf("3= Detector Buffer(FINESSE C)\n");
-#endif
-    m_time_ut3 = raw_copper->GetEventUnixTime(i);
-    if (m_prev_time_ut3 > 0.) {
-      FillHisto1D((double)(m_time_ut3 - m_prev_time_ut3), m_tdiff_ut3,
-                  TDIFF_EVE_NUM, TDIFF_EVE_MIN, TDIFF_EVE_MAX);
-    }
-    m_prev_time_ut3 = m_time_ut3;
-
-    //    printf("%lf %lf %lf\n", m_time_cdc_1, m_time_cdc_2, m_time_ut3);
-
-    int size = raw_copper->Get3rdDetectorNwords(i);
-    //    PrintData(raw_copper->Get3rdDetectorBuffer(i), size);
-    FillHisto1D((double)size, m_size_ut3, SIZE_UT3_NUM, SIZE_UT3_MIN, SIZE_UT3_MAX);
-  }
-
-  if (raw_copper->Get4thDetectorNwords(i) > 0) {
-    printf("4= Detector Buffer(FINESSE D)\n");
-    PrintData(raw_copper->Get4thDetectorBuffer(i), raw_copper->Get4thDetectorNwords(i));
-    //    PrintData(raw_copper->GetBuffer(i), raw_copper->GetBlockNwords(i));
-  }
 
   m_ncpr++;
 
@@ -533,16 +405,16 @@ void PrintDataModule::event()
 
 #endif
   //    printf("nbasf2 %d\n", n_basf2evt);
-//   if( n_basf2evt > 10 ){
-//     m_eventMetaDataPtr.create();
-//     m_eventMetaDataPtr->setEndOfData();
-//     printf("EndofData****************\n");
-//     Print( m_size_cdc_1, SIZE_CDC_1_NUM, SIZE_CDC_1_MIN, SIZE_CDC_1_MAX );
-//     Print( m_size_cdc_2, SIZE_CDC_2_NUM, SIZE_CDC_2_MIN, SIZE_CDC_2_MAX );
-//     Print( m_size_ut3, SIZE_UT3_NUM, SIZE_UT3_MIN, SIZE_UT3_MAX );
+  //   if( n_basf2evt > 10 ){
+  //     m_eventMetaDataPtr.create();
+  //     m_eventMetaDataPtr->setEndOfData();
+  //     printf("EndofData****************\n");
+  //     Print( m_size_cdc_1, SIZE_CDC_1_NUM, SIZE_CDC_1_MIN, SIZE_CDC_1_MAX );
+  //     Print( m_size_cdc_2, SIZE_CDC_2_NUM, SIZE_CDC_2_MIN, SIZE_CDC_2_MAX );
+  //     Print( m_size_ut3, SIZE_UT3_NUM, SIZE_UT3_MIN, SIZE_UT3_MAX );
 
-//     exit(1);
-//   }
+  //     exit(1);
+  //   }
 
 
   n_basf2evt++;

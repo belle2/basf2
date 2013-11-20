@@ -159,6 +159,33 @@ int RawCOPPER::GetNumFINESSEBlock(int n)
   return cnt;
 }
 
+int RawCOPPER::GetDetectorNwords(int n, int finesse_num)
+{
+  switch (finesse_num) {
+    case 0 :
+      return Get1stDetectorNwords(n);
+      break;
+    case 1 :
+      return Get2ndDetectorNwords(n);
+      break;
+    case 2 :
+      return Get3rdDetectorNwords(n);
+      break;
+    case 3 :
+      return Get4thDetectorNwords(n);
+      break;
+    default :
+      break;
+  }
+  ErrorMessage print_err;
+  char err_buf[500];
+  sprintf(err_buf, "Specifined FINESSE number( = %d ) is invalid. Exiting...\n", finesse_num);
+  print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  sleep(12345678);
+  exit(-1);
+  return 0;
+}
+
 int RawCOPPER::Get1stDetectorNwords(int n)
 {
   int nwords = 0;
@@ -200,6 +227,35 @@ int RawCOPPER::Get4thDetectorNwords(int n)
 }
 
 
+int RawCOPPER::GetFINESSENwords(int n, int finesse_num)
+{
+  switch (finesse_num) {
+    case 0 :
+      return Get1stFINESSENwords(n);
+      break;
+    case 1 :
+      return Get2ndFINESSENwords(n);
+      break;
+    case 2 :
+      return Get3rdFINESSENwords(n);
+      break;
+    case 3 :
+      return Get4thFINESSENwords(n);
+      break;
+    default :
+      break;
+  }
+  ErrorMessage print_err;
+  char err_buf[500];
+  sprintf(err_buf, "Specifined FINESSE number( = %d ) is invalid. Exiting...\n", finesse_num);
+  print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  sleep(12345678);
+  exit(-1);
+  return 0;
+
+}
+
+
 int RawCOPPER::Get1stFINESSENwords(int n)
 {
   RawHeader hdr;
@@ -229,6 +285,37 @@ int RawCOPPER::Get4thFINESSENwords(int n)
 }
 
 
+
+int RawCOPPER::GetOffsetFINESSE(int n, int finesse_num)
+{
+  switch (finesse_num) {
+    case 0 :
+      return GetOffset1stFINESSE(n);
+      break;
+    case 1 :
+      return GetOffset2ndFINESSE(n);
+      break;
+    case 2 :
+      return GetOffset3rdFINESSE(n);
+      break;
+    case 3 :
+      return GetOffset4thFINESSE(n);
+      break;
+    default :
+      break;
+  }
+  ErrorMessage print_err;
+  char err_buf[500];
+  sprintf(err_buf, "Specifined FINESSE number( = %d ) is invalid. Exiting...\n", finesse_num);
+  print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  sleep(12345678);
+  exit(-1);
+  return 0;
+
+}
+
+
+
 int RawCOPPER::GetOffset1stFINESSE(int n)
 {
   RawHeader hdr;
@@ -251,6 +338,35 @@ int RawCOPPER::GetOffset4thFINESSE(int n)
   return GetOffset3rdFINESSE(n) + Get3rdFINESSENwords(n);
 }
 
+
+
+int* RawCOPPER::GetFINESSEBuffer(int n, int finesse_num)
+{
+  switch (finesse_num) {
+    case 0 :
+      return Get1stFINESSEBuffer(n);
+      break;
+    case 1 :
+      return Get2ndFINESSEBuffer(n);
+      break;
+    case 2 :
+      return Get3rdFINESSEBuffer(n);
+      break;
+    case 3 :
+      return Get4thFINESSEBuffer(n);
+      break;
+    default :
+      break;
+  }
+
+  ErrorMessage print_err;
+  char err_buf[500];
+  sprintf(err_buf, "Specifined FINESSE number( = %d ) is invalid. Exiting...\n", finesse_num);
+  print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  sleep(12345678);
+  exit(-1);
+  return 0;
+}
 
 int* RawCOPPER::Get1stFINESSEBuffer(int n)
 {
@@ -290,6 +406,37 @@ int* RawCOPPER::Get4thFINESSEBuffer(int n)
     exit(1);
   }
   return &(m_buffer[ pos_nwords]);
+}
+
+
+
+
+int* RawCOPPER::GetDetectorBuffer(int n, int finesse_num)
+{
+  switch (finesse_num) {
+    case 0 :
+      return Get1stDetectorBuffer(n);
+      break;
+    case 1 :
+      return Get2ndDetectorBuffer(n);
+      break;
+    case 2 :
+      return Get3rdDetectorBuffer(n);
+      break;
+    case 3 :
+      return Get4thDetectorBuffer(n);
+      break;
+    default :
+      break;
+  }
+
+  ErrorMessage print_err;
+  char err_buf[500];
+  sprintf(err_buf, "Specifined FINESSE number( = %d ) is invalid. Exiting...\n", finesse_num);
+  print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  sleep(12345678);
+  exit(-1);
+  return 0;
 }
 
 
@@ -387,6 +534,7 @@ unsigned int RawCOPPER::GetFTSW16bitEventNumber(int n)
   }
 
   if (flag == 0) {
+
     char err_buf[500];
     sprintf(err_buf, "No HSLB data in COPPER data. Exiting...\n");
     print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
@@ -547,3 +695,8 @@ double RawCOPPER::GetEventUnixTime(int n)
 }
 
 
+// int CheckB2LFEEHeaderVersion( int  n ){
+//   if (Get1stFINESSENwords(n) > 0) {
+//   }
+// int* RawCOPPER::Get1stFINESSEBuffer(int n)
+// }

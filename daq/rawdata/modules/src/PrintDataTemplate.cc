@@ -93,12 +93,10 @@ void PrintDataTemplateModule::PrintFTSWEvent(RawDataBlock* raw_datablock, int i)
   rawftsw.SetBuffer(buf, nwords, malloc_flag, num_event, num_nodes);
 
   int n = 0;
-  printf("%d %d %.8x %.8x %lf\n",
+  printf("%d %d %.8x\n",
          rawftsw.GetNwords(n),
          rawftsw.GetNwordsHeader(n),
-         rawftsw.GetFTSWNodeID(n),
-         rawftsw.GetTrailerMagic(n),
-         rawftsw.GetEventUnixTime(n)
+         rawftsw.GetFTSWNodeID(n)
         );
 
 

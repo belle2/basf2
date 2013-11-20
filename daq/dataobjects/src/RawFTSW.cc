@@ -25,54 +25,18 @@ RawFTSW::~RawFTSW()
 
 int RawFTSW::GetNwords(int n)
 {
-  SendHeader hdr;
-  hdr.SetBuffer(GetBuffer(n));
-  return  hdr.GetTotalNwords();
+  return  m_buffer[ POS_NWORDS ];
 }
 
 int RawFTSW::GetNwordsHeader(int n)
 {
-  SendHeader hdr;
-  hdr.SetBuffer(GetBuffer(n));
-  return hdr.GetHdrNwords();
+  return  m_buffer[ POS_HDR_NWORDS ];
 }
 
 
 int RawFTSW::GetFTSWNodeID(int n)
 {
-  SendHeader hdr;
-  hdr.SetBuffer(GetBuffer(n));
-  return hdr.GetNodeID();
-}
-
-int RawFTSW::GetTrailerMagic(int n)
-{
-  SendTrailer trl;
-  trl.SetBuffer(GetBuffer(n) + GetNwords(n) - SendTrailer::SENDTRL_NWORDS);
-  return trl.GetMagicWord();
-}
-
-
-unsigned int RawFTSW::GetFTSWData1(int n)
-{
-  return  m_buffer[ GetBufferPos(n) + GetNwordsHeader(n) + POS_FTSW1 ];
-}
-
-unsigned int RawFTSW::GetFTSWData2(int n)
-{
-  return  m_buffer[ GetBufferPos(n) + GetNwordsHeader(n) + POS_FTSW2 ];
-}
-
-double RawFTSW::GetEventUnixTime(int n)
-{
-  SendHeader hdr;
-  hdr.SetBuffer(GetBuffer(n));
-
-  int run = hdr.GetRunNum();
-
-  return (double)(sp8test_run_starttime[ run ] & 0xFFFF0000) +
-         (double)((m_buffer[ GetBufferPos(n) + GetNwordsHeader(n) + POS_FTSW2 ] >> 16) & 0xFFFF) +
-         (double)((m_buffer[ GetBufferPos(n) + GetNwordsHeader(n) + POS_FTSW1 ] >> 4) & 0x7FFFFFF) / 1.27e8;
+  return  m_buffer[ POS_NODE_ID ];
 }
 
 

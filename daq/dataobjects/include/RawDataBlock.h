@@ -57,6 +57,7 @@ namespace Belle2 {
     //! get size of a data block
     virtual int GetBlockNwords(int n);
 
+
     //! get FTSW ID to check whether this data block is FTSW data or not
     virtual int CheckFTSWID(int n);
 
@@ -65,7 +66,14 @@ namespace Belle2 {
 
     enum {
       POS_NWORDS = 0,
-      POS_FTSW_ID = 5
+      POS_NODE_ID = 6
+    };
+
+    enum {
+      // Tentatively needed to distinguish new and old FTSW format, which will be changed in Nov. 2013
+      POS_FTSW_ID_OLD = 5,
+      TEMP_POS_NWORDS_HEADER = 1,
+      OLD_FTSW_NWORDS_HEADER = 6
     };
 
   protected :

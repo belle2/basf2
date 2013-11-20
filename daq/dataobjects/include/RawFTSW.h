@@ -39,28 +39,24 @@ namespace Belle2 {
     //!
     int GetFTSWNodeID(int n);
 
-    //!
-    int GetTrailerMagic(int n);
-
-    //!
-    unsigned int GetFTSWData1(int n);
-
-    //!
-    unsigned int GetFTSWData2(int n);
-
-    //!
-    double GetEventUnixTime(int n);
 
     enum {
-      POS_FTSW1 = 0,
-      POS_FTSW2 = 1,
-      SIZE_FTSW_BODY = 4 // modified by Oct.3, 2013, Nakao-san's New firmware?
+      POS_NWORDS = 0,
+      POS_HDR_NWORDS = 1,
+      POS_EXP_RUN_NO = 3,
+      POS_EVE_NO = 4,
+      POS_NODE_ID = 6,
+      POS_FTSW_1 = 8,
+      POS_FTSW_2 = 9,
+      POS_FTSW_3 = 10,
+      POS_FTSW_4 = 11
     };
 
   protected :
-    Belle2::SendHeader m_FTSW_header; //
+    //    Belle2::SendHeader m_FTSW_header; //
 
-    ClassDef(RawFTSW, 1);
+    ClassDef(RawFTSW, 2);
+    // ver.2 Remove m_FTSW_header and introduce a new data format on Nov. 20, 2013
   };
 }
 

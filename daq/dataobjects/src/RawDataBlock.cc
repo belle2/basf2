@@ -62,7 +62,12 @@ int RawDataBlock::GetBufferPos(int n)
 
 int RawDataBlock::CheckFTSWID(int n)
 {
-  if (m_buffer[ GetBufferPos(n) + POS_FTSW_ID ] == 0x54544420) {
+  int pos = POS_NODE_ID;
+  if (m_buffer[ GetBufferPos(n) + TEMP_POS_NWORDS_HEADER ] == OLD_FTSW_NWORDS_HEADER) {
+    pos =  POS_FTSW_ID_OLD;
+  }
+
+  if (m_buffer[ GetBufferPos(n) + pos ] == 0x54544420) { // "TTD "
     return 1;
   } else {
     return 0;
@@ -72,7 +77,11 @@ int RawDataBlock::CheckFTSWID(int n)
 
 int RawDataBlock::CheckTLUID(int n)
 {
-  if (m_buffer[ GetBufferPos(n) + POS_FTSW_ID ] == 0x544c5520) {
+  int pos = POS_NODE_ID;
+  if (m_buffer[ GetBufferPos(n) + TEMP_POS_NWORDS_HEADER ] == OLD_FTSW_NWORDS_HEADER) {
+    pos =  POS_FTSW_ID_OLD;
+  }
+  if (m_buffer[ GetBufferPos(n) + pos ] == 0x544c5520) {
     return 1;
   } else {
     return 0;

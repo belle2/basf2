@@ -17,29 +17,16 @@ namespace Belle2 {
    */
   struct ParticleProperties {
 
-    /**< measured mass */
-    double mass;
 
-    /**< measured transverse momentum */
-    double pt;
+    double mass; /**< measured mass */
+    double pt; /**< measured transverse momentum */
+    double ptot; /**< measured total momentum */
+    double cosTheta; /**< polar angle of measured momentum vector */
 
-    /**< measured total momentum */
-    double ptot;
-
-    /**< polar angle of measured momentum vector */
-    double cosTheta;
-
-    /**< generated mass */
-    double mass_gen;
-
-    /**< generated transverse momentum */
-    double pt_gen;
-
-    /**< generated total momentum */
-    double ptot_gen;
-
-    /**< polar angle of generated momentum vector */
-    double cosTheta_gen;
+    double mass_gen; /**< generated mass */
+    double pt_gen; /**< generated transverse momentum */
+    double ptot_gen; /**< generated total momentum */
+    double cosTheta_gen; /**< polar angle of generated momentum vector */
   };
 
 }

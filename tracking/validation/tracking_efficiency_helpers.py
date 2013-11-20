@@ -13,6 +13,8 @@
 
 from simulation import add_simulation
 from basf2 import *
+import glob
+import os
 
 
 def run_simulation(path, pt_value, output_filename):
@@ -61,8 +63,19 @@ def run_simulation(path, pt_value, output_filename):
 
     path.add_module(pGun)
 
+    background_files = []
+    if os.environ.has_key('BELLE2_BACKGROUND_DIR'):
+        background_files += glob.glob(os.environ['BELLE2_BACKGROUND_DIR']
+                                      + '/PXD*.root')
+        background_files += glob.glob(os.environ['BELLE2_BACKGROUND_DIR']
+                                      + '/SVD*.root')
+        background_files += glob.glob(os.environ['BELLE2_BACKGROUND_DIR']
+                                      + '/CDC*.root')
+
+        print 'Number of used background files (%d): ' % len(background_files)
+
     # add simulation modules to the path
-    add_simulation(path, components)
+    add_simulation(path, components, background_files)
 
     # write output root file
     root_output = register_module('RootOutput')

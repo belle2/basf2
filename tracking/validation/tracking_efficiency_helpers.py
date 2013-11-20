@@ -38,7 +38,7 @@ def run_simulation(path, pt_value, output_filename):
     # generate one event
     eventinfosetter.param('expList', [1])
     eventinfosetter.param('runList', [1])
-    eventinfosetter.param('evtNumList', [500])
+    eventinfosetter.param('evtNumList', [200])
 
     path.add_module(eventinfosetter)
 

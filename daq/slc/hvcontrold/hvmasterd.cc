@@ -36,7 +36,7 @@ void get(HVChannelInfo*, std::string, std::string);
 void save(HVCrateInfo*, std::string);
 void recall(HVCrateInfo*, std::string, int);
 
-HVCrateInfo* crate = new HVCrateInfo(0, 1, 4);
+HVCrateInfo* crate = new HVCrateInfo(0, 1, 1);
 
 class ParamProvider {
 public:
@@ -96,7 +96,7 @@ int main(int argc, char** argv)
     } else if (str_v[0] == "help") {
       std::cout << "usage:" << std::endl;
       std::cout << "show [<slot> <channel>]" << std::endl;
-      std::cout << "set  [<slot> <channel>] <param_name> <value>" << std::endl;
+      std::cout << "set  <slot> <channel> <param_name> <value>" << std::endl;
       std::cout << "get  [<slot> <channel>] <param_name>" << std::endl;
       std::cout << "save <nodename>" << std::endl;
       std::cout << "recall <nodename> <config_no>" << std::endl;
@@ -226,7 +226,7 @@ void recall(HVCrateInfo* crate, std::string nodename, int confno)
       unsigned int ch = record_v[i].getFieldValueInt("channel");
       if (slot < crate->getNSlot() + 1 && ch < crate->getNChannel() + 1) {
         HVChannelInfo* info = crate->getChannel(slot - 1, ch - 1);
-        info->setSwitchOn(record_v[i].getFieldValueInt("slot") == 1);
+        info->setSwitchOn(record_v[i].getFieldValueInt("switch_on") == 1);
         info->setVoltageDemand(record_v[i].getFieldValueInt("voltage_demand"));
         info->setVoltageLimit(record_v[i].getFieldValueInt("voltage_limit"));
         info->setCurrentLimit(record_v[i].getFieldValueInt("current_limit"));

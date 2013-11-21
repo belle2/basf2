@@ -57,6 +57,7 @@ bool ArichHVCallback::switchOn() throw()
         ArichHVMessage msg(ArichHVMessage::SET,
                            ArichHVMessage::SWITCH,
                            getCrate()->getChannel(ns, nc));
+        std::cout << msg.toString() << std::endl;
         _hv_comm->sendRequest(msg);
       }
     }
@@ -80,6 +81,7 @@ bool ArichHVCallback::switchOff() throw()
         ArichHVMessage msg(ArichHVMessage::SET,
                            ArichHVMessage::SWITCH,
                            info);
+        std::cout << msg.toString() << std::endl;
         _hv_comm->sendRequest(msg);
         info->setSwitchOn(is_switch_on);
       }

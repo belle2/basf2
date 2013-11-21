@@ -18,15 +18,19 @@ throw(IOException)
   if (_available) {
     try {
       std::string str = msg.toString() + "\r";
+      std::cout << str << std::endl;
       _writer.write(str.c_str(), str.size());
       if (msg.getCommand() == ArichHVMessage::GET) {
         std::stringstream ss;
         char c;
         while (true) {
+          _socket.select(10);
           c = _reader.readChar();
           if (c == '\r') break;
           ss << c;
         }
+        std::cout << ss.str() << std::endl;
+        _mutex.unlock();
         return ss.str();
       }
     } catch (const IOException& e) {
@@ -52,7 +56,7 @@ void ArichHVCommunicator::run()
     } catch (const IOException& e) {
       _socket.close();
       _mutex.unlock();
-      Belle2::debug("Socket error: %s", e.what());
+      Belle2::debug("Socket connection error to HV crate: %s", e.what());
       sleep(5);
       continue;
     }
@@ -74,7 +78,6 @@ void ArichHVCommunicator::run()
       try {
         for (size_t ns = 0; ns < _crate->getNSlot(); ns++) {
           for (size_t nc = 0; nc < _crate->getNChannel(); nc++) {
-            //HVChannelInfo* info = _crate->getChannel(ns, nc);
             ArichHVMessage msg(ArichHVMessage::GET, ArichHVMessage::ALL);
             info->setSlot(ns + 1);
             info->setChannel(nc + 1);
@@ -94,7 +97,7 @@ void ArichHVCommunicator::run()
             status->rampup_speed[index] = info->getRampUpSpeed();
             status->rampdown_speed[index] = info->getRampDownSpeed();
             status->voltage_limit[index] = info->getVoltageLimit();
-            status->current_limit[index] = info->getVoltageLimit();
+            status->current_limit[index] = info->getCurrentLimit();
           }
         }
       } catch (const IOException& e) {
@@ -104,7 +107,7 @@ void ArichHVCommunicator::run()
         _mutex.unlock();
         Belle2::debug("Socket error: %s", e.what());
         sleep(5);
-        continue;
+        break;
       }
       sleep(2);
     }

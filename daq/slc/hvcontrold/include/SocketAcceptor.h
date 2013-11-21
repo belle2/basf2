@@ -5,6 +5,7 @@
 #include <system/PThread.h>
 
 #include <string>
+#include <unistd.h>
 
 namespace Belle2 {
 
@@ -19,10 +20,13 @@ namespace Belle2 {
   public:
     void run() {
       TCPServerSocket server_socket(_ip, _port);
-      server_socket.open();
       while (true) {
-        TCPSocket socket = server_socket.accept();
-        PThread(new WORKER(socket));
+        server_socket.open();
+        while (true) {
+          TCPSocket socket = server_socket.accept();
+          PThread(new WORKER(socket));
+        }
+        sleep(2);
       }
     }
 

@@ -5,7 +5,7 @@ INCDIR=../include
 LIBDIR=../lib
 TMPDIR=../tmp
 
-all: base nsm system xml
+all: base nsm system xml dqm
 
 full: all database
 

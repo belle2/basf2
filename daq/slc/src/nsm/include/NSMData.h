@@ -3,6 +3,11 @@
 
 #include "nsm/NSMHandlerException.h"
 
+#include "base/DataObject.h"
+
+extern "C" {
+#include "nsm/nsm2.h"
+}
 #include <map>
 #include <vector>
 
@@ -47,11 +52,51 @@ namespace Belle2 {
     NSMDataPropertyMap& getProperties() { return _pro_m; }
     NSMDataProperty& getProperty(const std::string& label) { return _pro_m[label]; }
 
+  public:
+    void* getValue(const std::string& label) throw(NSMHandlerException);
+    void* getValueArray(const std::string& label, size_t& length) throw(NSMHandlerException);
+    void setValue(const std::string& label, const void* value, size_t size) throw(NSMHandlerException);
+    int64 getInt64(const std::string& label) throw(NSMHandlerException);
+    int32 getInt32(const std::string& label) throw(NSMHandlerException);
+    int16 getInt16(const std::string& label) throw(NSMHandlerException);
+    char getChar(const std::string& label) throw(NSMHandlerException);
+    uint64 getUInt64(const std::string& label) throw(NSMHandlerException);
+    uint32 getUInt32(const std::string& label) throw(NSMHandlerException);
+    uint16 getUInt16(const std::string& label) throw(NSMHandlerException);
+    byte8 getByte(const std::string& label) throw(NSMHandlerException);
+    double getDouble(const std::string& label) throw(NSMHandlerException);
+    float getFloat(const std::string& label) throw(NSMHandlerException);
+    void setInt64(const std::string& label, int64 value) throw(NSMHandlerException);
+    void setInt32(const std::string& label, int32 value) throw(NSMHandlerException);
+    void setInt16(const std::string& label, int16 value) throw(NSMHandlerException);
+    void setChar(const std::string& label, char value) throw(NSMHandlerException);
+    void setUInt64(const std::string& label, uint64 value) throw(NSMHandlerException);
+    void setUInt32(const std::string& label, uint32 value) throw(NSMHandlerException);
+    void setUInt16(const std::string& label, uint16 value) throw(NSMHandlerException);
+    void setByte8(const std::string& label, byte8 value) throw(NSMHandlerException);
+    void setDouble(const std::string& label, double value) throw(NSMHandlerException);
+    void setFloat(const std::string& label, float value) throw(NSMHandlerException);
+
+    int64* getInt64Array(const std::string& label, size_t& length) throw(NSMHandlerException);
+    int32* getInt32Array(const std::string& label, size_t& length) throw(NSMHandlerException);
+    int16* getInt16Array(const std::string& label, size_t& length) throw(NSMHandlerException);
+    char* getCharArray(const std::string& label, size_t& length) throw(NSMHandlerException);
+    uint64* getUInt64Array(const std::string& label, size_t& length) throw(NSMHandlerException);
+    uint32* getUInt32Array(const std::string& label, size_t& length) throw(NSMHandlerException);
+    uint16* getUInt16Array(const std::string& label, size_t& length) throw(NSMHandlerException);
+    byte8* getByteArray(const std::string& label, size_t& length) throw(NSMHandlerException);
+    double* getDoubleArray(const std::string& label, size_t& length) throw(NSMHandlerException);
+    float* getFloatArray(const std::string& label, size_t& length) throw(NSMHandlerException);
+
     const std::string toSQLConfig();
     const std::string toSQLNames();
     const std::string toSQLValues();
     void setSQLValues(std::vector<std::string>& name_v,
                       std::vector<std::string>& value_v);
+    void getSQLValues(std::vector<std::string>& name_v,
+                      std::vector<std::string>& value_v);
+    DataObject* createDataObject();
+    const std::string toXML();
 
   private:
     int initProperties() throw();

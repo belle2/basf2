@@ -291,7 +291,7 @@ const std::string NSMData::toSQLConfig()
       ss << ", " << label << " " << type_s;
     } else {
       for (size_t i = 0; i < pro.length; i++) {
-        ss << ", " << label << ":" << i << " " << type_s;
+        ss << ", `" << label << ":" << i << "` " << type_s;
       }
     }
   }
@@ -310,7 +310,7 @@ const std::string NSMData::toSQLNames()
       ss << ", " << label;
     } else {
       for (size_t i = 0; i < pro.length; i++) {
-        ss << ", " << label;
+        ss << ", `" << label << ":" << i << "`";
       }
     }
   }

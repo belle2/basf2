@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <system name="ArichHVMonitor" >
-  <data name="GB01_STATUS" format="ArichHVStatus" revision="1" monitor_class="ArichHV" />
+  <data name="HV02_STATUS" format="ArichHVStatus" revision="1" monitor_class="ArichHV" />
 </system>

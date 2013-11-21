@@ -1,5 +1,4 @@
 CXX     = g++
-#CXX     = g++44
 RM      = rm -rf
 CP      = cp -f
 
@@ -11,18 +10,25 @@ INCDIR  = ./include
 TMPDIR  = ./tmp
 LIBDIR  = ./lib
 
-LIBS    +=  -lm -lpthread -lz 
+LIBS    +=  -lm -lpthread -lz -ldl
 LIBS    += -L$(BELLE2_DAQ_SLC_DIR)/lib -ldaq_slc_base
 LIBS    += -L$(BELLE2_DAQ_SLC_DIR)/lib -ldaq_slc_nsm
-LIBS    += -L$(BELLE2_DAQ_SLC_DIR)/lib -lnsm2_corelib
-LIBS    += -L$(BELLE2_DAQ_SLC_DIR)/lib -lnsm2_b2lib
+LIBS    += $(NSM2_PATH)/corelib/nsmlib2.o \
+           $(NSM2_PATH)/corelib/nsmhash.o \
+           $(NSM2_PATH)/corelib/nsmparse.o \
+           $(NSM2_PATH)/b2lib/belle2nsm.o
+LIBS    += -L$(BELLE2_DAQ_SLC_DIR)/lib -ldaq_slc_system
+LIBS    += -L$(BELLE2_DAQ_SLC_DIR)/lib -ldaq_slc_xml
 LIBS    += -L$(BELLE2_DAQ_SLC_DIR)/lib -ldaq_slc_database
+LIBS    += -L$(BELLE2_DAQ_SLC_DIR)/lib -ldaq_slc_dqm
+LIBS    += $(shell xml2-config --libs)
 LIBS    += $(shell mysql_config --libs)
 
 CFLAGS   = -g -Wall -fPIC -D_REENTRANT 
 CFLAGS  += -I./include 
 CFLAGS  += -I$(BELLE2_DAQ_SLC_DIR)/include 
 CFLAGS  += -I$(BELLE2_DAQ_SLC_DIR)/data/nsm
+CFLAGS  += $(shell xml2-config --cflags)
 CFLAGS  += $(shell mysql_config --cflags)
 
 MAINS   = $(wildcard *.cc)
@@ -50,11 +56,11 @@ $(TARGETS): $(BINDIR)/% : %.cc $(OBJS)
 	@ $(RM) *~ */*~ \#*\#* */\#*\#*
 	@ echo '<< compiling succeded!! >>'
 
-$(OBJS): $(TMPDIR)/%.o : $(SRCDIR)/%.cc $(INCDIR)/%.hh
+$(OBJS): $(TMPDIR)/%.o : $(SRCDIR)/%.cc $(INCDIR)/%.h
 	@ echo '<< compiling $@ >>'
 	@ $(CXX) -c $(CFLAGS) $< -o  $@
 
-$(DEPS) : $(TMPDIR)/%.d: $(SRCDIR)/%.cc $(INCDIR)/%.hh
+$(DEPS) : $(TMPDIR)/%.d: $(SRCDIR)/%.cc $(INCDIR)/%.h
 	@ if [ ! -d $(TMPDIR) ];then mkdir $(TMPDIR) ;fi
 	@ echo '<< making dipendency $@ >>'
 	@ $(CXX) $(CFLAGS) -MM -MT $(basename $@).o $< -o $@

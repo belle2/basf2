@@ -4,8 +4,7 @@ all:
 	make -C runcontrold
 	make -C cprcontrold
 	make -C rocontrold
-	make -C nsmmonitor
-#	make -C uploader
+	make -C envmond
 	make -C javalib
 
 dqm:
@@ -18,7 +17,7 @@ clean:
 	make -C runcontrold clean
 	make -C cprcontrold clean
 	make -C rocontrold clean
-	make -C nsmmonitor clean
+	make -C envmond clean
 	make -C dqmviewd clean
 	make -C uploader clean
 	make -C gen_dqm clean

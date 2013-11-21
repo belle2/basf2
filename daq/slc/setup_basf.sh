@@ -10,7 +10,7 @@ if [ ! -n "${BELLE2_LOCAL_DIR}" ]; then
   cd -
 fi
 
-export B2SC_SERVER_HOST="belle-rpc1";
+export B2SC_SERVER_HOST="belle2-hv";
 
 ## setup for slow control system libraries ##
 export BELLE2_DAQ_SLC_DIR=$BELLE2_LOCAL_DIR/daq/slc
@@ -25,8 +25,7 @@ export CLASSPATH=.:$JAVA_HOME/jre/lib:$JAVA_HOME/lib\
 :$BELLE2_DAQ_SLC_DIR/javalib/mysql-connector-java-5.1.26-bin.jar
 
 ## NSM configuration ##
-export NSM2_HOST=`/sbin/ifconfig | grep "192\.168\.10\." | sed "s/:/ /g" | awk '{print $3}'`
-export NSM2_HOST=130.87.227.252
+export NSM2_HOST=192.168.11.12
 export NSM2_PORT=8322
 export NSM2_SHMKEY=8322
 export NSM2_INCDIR=$BELLE2_DAQ_SLC_DIR/data/nsm

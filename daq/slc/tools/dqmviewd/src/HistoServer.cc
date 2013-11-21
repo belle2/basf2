@@ -43,12 +43,9 @@ int HistoServer::wait(int sec)
 
 void HistoServer::run()
 {
-  using namespace Belle2;
-
   for (size_t i = 0; i < _manager_v.size(); i++) {
     _index_m.insert(std::map<std::string, int>::value_type(_filename_v[i], i));
     std::string path = _directory + "/" + _filename_v[i];
-    std::cout << __FILE__ << ":" << __LINE__ << " path = " << path << std::endl;
     _manager_v[i]->setFilePath(path);
     PackageUpdater* updater = new PackageUpdater(i, _manager_v[i], this);
     _updater_v.push_back(updater);

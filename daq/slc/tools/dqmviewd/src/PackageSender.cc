@@ -57,7 +57,6 @@ throw(Belle2::IOException)
 
 void PackageSender::run()
 {
-  using namespace Belle2;
   TCPSocketWriter writer(_socket);
   TCPSocketReader reader(_socket);
 

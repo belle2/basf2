@@ -20,6 +20,7 @@ namespace Belle2 {
 
   public:
     void run() throw();
+    void setWData(NSMData* data) { _wdata = data; }
 
   private:
     NSMCallback* _callback;

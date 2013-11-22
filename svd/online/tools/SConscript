@@ -1,0 +1,3 @@
+Import('env')
+env['TOOLS_LIBS']['read_svd_online_map'] = ['svd','vxd','$ROOT_LIBS'];
+Return('env')

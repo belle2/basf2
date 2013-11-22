@@ -1,5 +1,6 @@
 #include "SocketAcceptor.h"
 
+#include "EnvMonitorMaster.h"
 #include "PackageSender.h"
 
 #include <system/TCPServerSocket.h>

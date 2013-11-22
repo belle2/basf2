@@ -4,7 +4,10 @@
 
 #include <database/MySQLInterface.h>
 
+#include <xml/XMLParser.h>
+
 #include <base/StringUtil.h>
+#include <base/ConfigFile.h>
 
 #include <iostream>
 #include <unistd.h>
@@ -19,23 +22,29 @@ int main(int argc, char** argv)
               << "[<dataname:formatname:rev>...]" << std::endl;
     return 1;
   }
-  const std::string db_host = getenv("B2SC_DB_HOST");
-  const std::string db_name = getenv("B2SC_DB_NAME");
-  const std::string db_user = getenv("B2SC_DB_USER");
-  const std::string db_password = getenv("B2SC_DB_PASS");
-  const int db_port = atoi(getenv("B2SC_DB_PORT"));
-  MySQLInterface* db = new MySQLInterface();
+  ConfigFile config("slc_config");
+  DBInterface* db = new MySQLInterface();
   db->init();
-  db->connect(db_host, db_name, db_user, db_password, db_port);
+  db->connect(config.get("HV_DATABASE_HOST"), config.get("HV_DATABASE_NAME"),
+              config.get("HV_DATABASE_USER"), config.get("HV_DATABASE_PASS"),
+              config.getInt("HV_DATABASE_PORT"));
 
   std::vector<NSMData*> data_v;
-  for (int i = 1; i < argc; i++) {
-    std::vector<std::string> str_v = Belle2::split(argv[i], ':');
-    data_v.push_back(new NSMData(str_v[0], str_v[1], atoi(str_v[2].c_str())));
+  XMLParser parser;
+  XMLElement* el = parser.parse(config.get("HV_MONITOR_XML_PATH") + "/" +
+                                config.get("HV_MONITOR_XML_ENTRY") + ".xml");
+  std::vector<XMLElement*> el_v = el->getElements();
+  for (size_t i = 0; i < el_v.size(); i++) {
+    XMLElement* elc = el_v[i];
+    std::string name = elc->getAttribute("name");
+    std::string format = elc->getAttribute("format");
+    std::string monitor_class = elc->getAttribute("monitor_class");
+    int revision = atoi(elc->getAttribute("revision").c_str());
+    data_v.push_back(new NSMData(name, format, revision));
   }
+
   for (size_t i = 0; i < data_v.size(); i++) {
     NSMData* data = data_v[i];
-    //data->parse("/home/usr/tkonno/b2slc/bin");
     data->parse();
     try {
       std::cout << Belle2::form("select * from %s_rev%d;",

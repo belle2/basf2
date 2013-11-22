@@ -27,19 +27,25 @@ void PackageManager::clear()
 void PackageManager::init()
 {
   _lock.wrlock();
-  _monitor->init();
-  _serializer.allocate(_monitor->getPackage());
-  _serializer.update();
-  _available = true;
+  if (_monitor != NULL) {
+    _monitor->init();
+    _serializer.allocate(_monitor->getPackage());
+    _serializer.update();
+    _available = true;
+  } else {
+    _available = false;
+  }
   _lock.unlock();
 }
 
 void PackageManager::update()
 {
   _lock.wrlock();
-  _monitor->getPackage()->incrementUpdateId();
-  _monitor->getPackage()->setUpdateTime(Time().getSecond());
-  if (_data->isAvailable()) _monitor->update(_data);
+  if (_monitor != NULL) {
+    _monitor->getPackage()->incrementUpdateId();
+    _monitor->getPackage()->setUpdateTime(Time().getSecond());
+    if (_data->isAvailable()) _monitor->update(_data);
+  }
   _serializer.update();
   _lock.unlock();
 }
@@ -142,7 +148,10 @@ const std::string PackageManager::createXML()
 int PackageManager::getUpdateId()
 {
   _lock.rdlock();
-  int id = _monitor->getPackage()->getUpdateId();
+  int id = 0;
+  if (_monitor != NULL) {
+    id = _monitor->getPackage()->getUpdateId();
+  }
   _lock.unlock();
   return id;
 }
@@ -150,7 +159,10 @@ int PackageManager::getUpdateId()
 std::string PackageManager::getName()
 {
   _lock.rdlock();
-  std::string name = _monitor->getPackage()->getName();
+  std::string name = "";
+  if (_monitor != NULL) {
+    name = _monitor->getPackage()->getName();
+  }
   _lock.unlock();
   return name;
 }

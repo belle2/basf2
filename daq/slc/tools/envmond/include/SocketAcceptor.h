@@ -1,11 +1,11 @@
 #ifndef _Belle2_SocketAcceptor_hh
 #define _Belle2_SocketAcceptor_hh
 
-#include "EnvMonitorMaster.h"
-
 #include <string>
 
 namespace Belle2 {
+
+  class EnvMonitorMaster;
 
   class SocketAcceptor {
 

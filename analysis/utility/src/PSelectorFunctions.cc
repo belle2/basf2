@@ -12,6 +12,8 @@
 #include <analysis/utility/PSelectorFunctions.h>
 #include <analysis/utility/PCmsLabTransform.h>
 
+#include <analysis/utility/VariableManager.h>
+
 // framework - DataStore
 #include <framework/datastore/DataStore.h>
 
@@ -37,31 +39,26 @@ namespace Belle2 {
 
     double particleP(const Particle* part)
     {
-      if (!part) return 0;
       return part->getP();
     }
 
     double particlePx(const Particle* part)
     {
-      if (!part) return 0;
       return part->getPx();
     }
 
     double particlePy(const Particle* part)
     {
-      if (!part) return 0;
       return part->getPy();
     }
 
     double particlePz(const Particle* part)
     {
-      if (!part) return 0;
       return part->getPz();
     }
 
     double particlePt(const Particle* part)
     {
-      if (!part) return 0;
       float px = part->getPx();
       float py = part->getPy();
       return sqrt(px * px + py * py);
@@ -69,13 +66,11 @@ namespace Belle2 {
 
     double particleCosTheta(const Particle* part)
     {
-      if (!part) return 0;
       return part->getPz() / part->getP();
     }
 
     double particlePhi(const Particle* part)
     {
-      if (!part) return 0;
       return atan2(part->getPy(), part->getPx()) / Unit::deg;
     }
 
@@ -83,7 +78,6 @@ namespace Belle2 {
 
     double particlePStar(const Particle* part)
     {
-      if (!part) return 0;
       PCmsLabTransform T;
       TLorentzVector vec = T.rotateLabToCms() * part->get4Vector();
       return vec.P();
@@ -91,7 +85,6 @@ namespace Belle2 {
 
     double particlePxStar(const Particle* part)
     {
-      if (!part) return 0;
       PCmsLabTransform T;
       TLorentzVector vec = T.rotateLabToCms() * part->get4Vector();
       return vec.Px();
@@ -99,7 +92,6 @@ namespace Belle2 {
 
     double particlePyStar(const Particle* part)
     {
-      if (!part) return 0;
       PCmsLabTransform T;
       TLorentzVector vec = T.rotateLabToCms() * part->get4Vector();
       return vec.Py();
@@ -107,7 +99,6 @@ namespace Belle2 {
 
     double particlePzStar(const Particle* part)
     {
-      if (!part) return 0;
       PCmsLabTransform T;
       TLorentzVector vec = T.rotateLabToCms() * part->get4Vector();
       return vec.Pz();
@@ -115,7 +106,6 @@ namespace Belle2 {
 
     double particlePtStar(const Particle* part)
     {
-      if (!part) return 0;
       PCmsLabTransform T;
       TLorentzVector vec = T.rotateLabToCms() * part->get4Vector();
       return vec.Pt();
@@ -123,7 +113,6 @@ namespace Belle2 {
 
     double particleCosThetaStar(const Particle* part)
     {
-      if (!part) return 0;
       PCmsLabTransform T;
       TLorentzVector vec = T.rotateLabToCms() * part->get4Vector();
       return vec.CosTheta();
@@ -131,7 +120,6 @@ namespace Belle2 {
 
     double particlePhiStar(const Particle* part)
     {
-      if (!part) return 0;
       PCmsLabTransform T;
       TLorentzVector vec = T.rotateLabToCms() * part->get4Vector();
       return vec.Phi();
@@ -141,25 +129,21 @@ namespace Belle2 {
 
     double particleDX(const Particle* part)
     {
-      if (!part) return 0;
       return part->getX() - 0; // TODO replace with IP position
     }
 
     double particleDY(const Particle* part)
     {
-      if (!part) return 0;
       return part->getY() - 0; // TODO replace with IP position
     }
 
     double particleDZ(const Particle* part)
     {
-      if (!part) return 0;
       return part->getZ() - 0; // TODO replace with IP position
     }
 
     double particleDRho(const Particle* part)
     {
-      if (!part) return 0;
       float x = part->getX() - 0; // TODO replace with IP position
       float y = part->getY() - 0; // TODO replace with IP position
       return sqrt(x * x + y * y);
@@ -169,13 +153,11 @@ namespace Belle2 {
 
     double particleMass(const Particle* part)
     {
-      if (!part) return 0;
       return part->getMass();
     }
 
     double particleDMass(const Particle* part)
     {
-      if (!part) return 0;
       return part->getMass() - part->getPDGMass();
     }
 
@@ -183,7 +165,6 @@ namespace Belle2 {
 
     double particleQ(const Particle* part)
     {
-      if (!part) return 0;
       float m = part->getMass();
       for (unsigned i = 0; i < part->getNDaughters(); i++) {
         const Particle* child = part->getDaughter(i);
@@ -194,7 +175,6 @@ namespace Belle2 {
 
     double particleDQ(const Particle* part)
     {
-      if (!part) return 0;
       float m = part->getMass() - part->getPDGMass();
       for (unsigned i = 0; i < part->getNDaughters(); i++) {
         const Particle* child = part->getDaughter(i);
@@ -207,7 +187,6 @@ namespace Belle2 {
 
     double particleMbc(const Particle* part)
     {
-      if (!part) return 0;
       PCmsLabTransform T;
       TLorentzVector vec = T.rotateLabToCms() * part->get4Vector();
       double E = T.getCMSEnergy() / 2;
@@ -218,7 +197,6 @@ namespace Belle2 {
 
     double particleDeltaE(const Particle* part)
     {
-      if (!part) return 0;
       PCmsLabTransform T;
       TLorentzVector vec = T.rotateLabToCms() * part->get4Vector();
       return vec.E() - T.getCMSEnergy() / 2;
@@ -228,19 +206,16 @@ namespace Belle2 {
 
     double particleElectronId(const Particle* part)
     {
-      if (!part) return 0;
       return 0.5; //TODO when eId availabe
     }
 
     double particleMuonId(const Particle* part)
     {
-      if (!part) return 0;
       return 0.5; //TODO when muId availabe
     }
 
     double particlePionId(const Particle* part)
     {
-      if (!part) return 0;
       const PIDLikelihood* pid = DataStore::getRelated<PIDLikelihood>(part);
       if (!pid) return 0.5;
 
@@ -256,7 +231,6 @@ namespace Belle2 {
 
     double particleKaonId(const Particle* part)
     {
-      if (!part) return 0;
       const PIDLikelihood* pid = DataStore::getRelated<PIDLikelihood>(part);
       if (!pid) return 0.5;
 
@@ -272,7 +246,6 @@ namespace Belle2 {
 
     double particleProtonId(const Particle* part)
     {
-      if (!part) return 0;
       const PIDLikelihood* pid = DataStore::getRelated<PIDLikelihood>(part);
       if (!pid) return 0.5;
 
@@ -289,22 +262,58 @@ namespace Belle2 {
 
     double particlePvalue(const Particle* part)
     {
-      if (!part) return 0;
       return part->getPValue();
     }
 
-    double particleNchilds(const Particle* part)
+    double particleNDaughters(const Particle* part)
     {
-      if (!part) return 0;
       return part->getNDaughters();
     }
 
     double particleFlavorType(const Particle* part)
     {
-      if (!part) return 0;
       return part->getFlavorType();
     }
 
+    REGISTER_VARIABLE("p", particleP, "momentum magnitude");
+    REGISTER_VARIABLE("px", particlePx, "momentum component x");
+    REGISTER_VARIABLE("py", particlePy, "momentum component y");
+    REGISTER_VARIABLE("pz", particlePz, "momentum component z");
+    REGISTER_VARIABLE("pt", particlePt, "transverse momentum");
+    REGISTER_VARIABLE("cosTheta", particleCosTheta, "momentum cosine of polar angle");
+    REGISTER_VARIABLE("cth", particleCosTheta, "momentum cosine of polar angle");
+    REGISTER_VARIABLE("phi", particlePhi, "momentum azimuthal angle in degrees");
+
+    REGISTER_VARIABLE("p*", particlePStar, "CMS momentum magnitude");
+    REGISTER_VARIABLE("px*", particlePxStar, "CMS momentum component x");
+    REGISTER_VARIABLE("py*", particlePyStar, "CMS momentum component y");
+    REGISTER_VARIABLE("pz*", particlePzStar, "CMS momentum component z");
+    REGISTER_VARIABLE("pt*", particlePtStar, "CMS transverse momentum");
+    REGISTER_VARIABLE("cosTheta*", particleCosThetaStar, "CMS momentum cosine of polar angle");
+    REGISTER_VARIABLE("cth*", particleCosThetaStar, "CMS momentum cosine of polar angle");
+    REGISTER_VARIABLE("phi*", particlePhiStar, "CMS momentum azimuthal angle in degrees");
+
+    REGISTER_VARIABLE("dx", particleDX, "x in respect to IP");
+    REGISTER_VARIABLE("dy", particleDY, "y in respect to IP");
+    REGISTER_VARIABLE("dz", particleDZ, "z in respect to IP");
+    REGISTER_VARIABLE("dr", particleDRho, "transverse distance in respect to IP");
+
+    REGISTER_VARIABLE("M", particleMass, "mass");
+    REGISTER_VARIABLE("dM", particleDMass, "mass minus nominal mass");
+    REGISTER_VARIABLE("Q", particleQ, "released energy in decay");
+    REGISTER_VARIABLE("dQ", particleDQ, "released energy in decay minus nominal one");
+    REGISTER_VARIABLE("Mbc", particleMbc, "beam constrained mass");
+    REGISTER_VARIABLE("deltaE", particleDeltaE, "energy difference");
+
+    REGISTER_VARIABLE("eid", particleElectronId, "electron identification probability");
+    REGISTER_VARIABLE("muid", particleMuonId, "muon identification probability");
+    REGISTER_VARIABLE("piid", particlePionId, "pion identification probability");
+    REGISTER_VARIABLE("Kid", particleKaonId, "kaon identification probability");
+    REGISTER_VARIABLE("prid", particleProtonId, "proton identification probability");
+
+    REGISTER_VARIABLE("chiProb", particlePvalue, "chi^2 probability of the fit");
+    REGISTER_VARIABLE("nDaughters", particleNDaughters, "number of daughter particles");
+    REGISTER_VARIABLE("flavor", particleFlavorType, "flavor type of decay (0=unflavored, 1=flavored)");
 
   }
 }

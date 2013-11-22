@@ -10,7 +10,7 @@
 
 // Own include
 #include <analysis/utility/PSelector.h>
-#include <analysis/utility/PSelectorFunctions.h>
+#include <analysis/utility/VariableManager.h>
 
 // framework aux
 #include <framework/gearbox/Unit.h>
@@ -28,79 +28,17 @@
 #include <sstream>
 
 using namespace std;
-using namespace Belle2::analysis;
 
 namespace Belle2 {
 
-  std::map<std::string, FunctionDescr>  PSelector::m_functionList;
 
   PSelector::PSelector()
   {
-    if (m_functionList.empty()) initialize();
   }
 
   PSelector::~PSelector()
   {
   }
-
-  void PSelector::initialize()
-  {
-
-    addFunction("p", "momentum magnitude", particleP);
-    addFunction("px", "momentum component x", particlePx);
-    addFunction("py", "momentum component y", particlePy);
-    addFunction("pz", "momentum component z", particlePz);
-    addFunction("pt", "transverse momentum", particlePt);
-    addFunction("cosTheta", "momentum cosine of polar angle", particleCosTheta);
-    addFunction("cth", "momentum cosine of polar angle", particleCosTheta);
-    addFunction("phi", "momentum azimuthal angle in degrees", particlePhi);
-
-    addFunction("p*", "CMS momentum magnitude", particlePStar);
-    addFunction("px*", "CMS momentum component x", particlePxStar);
-    addFunction("py*", "CMS momentum component y", particlePyStar);
-    addFunction("pz*", "CMS momentum component z", particlePzStar);
-    addFunction("pt*", "CMS transverse momentum", particlePtStar);
-    addFunction("cosTheta*", "CMS momentum cosine of polar angle", particleCosThetaStar);
-    addFunction("cth*", "CMS momentum cosine of polar angle", particleCosThetaStar);
-    addFunction("phi*", "CMS momentum azimuthal angle in degrees", particlePhiStar);
-
-    addFunction("dx", "x in respect to IP", particleDX);
-    addFunction("dy", "y in respect to IP", particleDY);
-    addFunction("dz", "z in respect to IP", particleDZ);
-    addFunction("dr", "transverse distance in respect to IP", particleDRho);
-
-    addFunction("M", "mass", particleMass);
-    addFunction("dM", "mass minus nominal mass", particleDMass);
-    addFunction("Q", "released energy in decay", particleQ);
-    addFunction("dQ", "released energy in decay minus nominal one", particleDQ);
-    addFunction("Mbc", "beam constrained mass", particleMbc);
-    addFunction("deltaE", "energy difference", particleDeltaE);
-
-    addFunction("eid", "electron identification probability", particleElectronId);
-    addFunction("muid", "muon identification probability", particleMuonId);
-    addFunction("piid", "pion identification probability", particlePionId);
-    addFunction("Kid", "kaon identification probability", particleKaonId);
-    addFunction("prid", "proton identification probability", particleProtonId);
-
-    addFunction("chiProb", "chi^2 probability of the fit", particlePvalue);
-    addFunction("childs", "number of daughter particles", particleNchilds);
-    addFunction("flavor", "flavor type of decay (0=unflavored, 1=flavored)",
-                particleFlavorType);
-
-  }
-
-  void PSelector::addFunction(std::string varName, std::string varDescription,
-                              double(*fun)(const Particle*))
-  {
-    std::map<std::string, FunctionDescr>::iterator it = m_functionList.find(varName);
-    if (it == m_functionList.end()) {
-      m_functionList[varName] = make_pair(varDescription, fun);
-    } else {
-      cout << " ***error PSelector::addFunction: variable " << varName <<
-           " already in the list - ignored" << endl;
-    }
-  }
-
 
   bool PSelector::select(const Particle* particle)
   {
@@ -198,14 +136,12 @@ namespace Belle2 {
       return true;
     }
 
-    std::map<std::string, FunctionDescr>::iterator it;
-    it = m_functionList.find(varName);
-    if (it == m_functionList.end()) {
+    const VariableManager::Var* var = VariableManager::Instance().getVariable(varName);
+    if (!var) {
       cout << str << " ***undefined variable: " << varName << endl;
       return false;
     }
-    FunctionDescr fd = it->second;
-    SelectionCriteria selection(fd.second, childIndex, ranges);
+    SelectionCriteria selection(var->function, childIndex, ranges);
     m_selectionList.push_back(selection);
 
     return true;
@@ -328,9 +264,8 @@ namespace Belle2 {
 
   void PSelector::listVariables() const
   {
-    for (std::map<std::string, FunctionDescr>::iterator it = m_functionList.begin();
-         it != m_functionList.end(); ++it) {
-      cout << setw(12) << it->first << "  " << (it->second).first << endl;
+    for (const VariableManager::Var * var : VariableManager::Instance().getVariables()) {
+      cout << setw(12) << var->name << "  " << var->description << endl;
     }
   }
 

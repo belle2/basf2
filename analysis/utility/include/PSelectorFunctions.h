@@ -233,7 +233,7 @@ namespace Belle2 {
      * @param part const pointer to Particle
      * @return number of daughter particles
      */
-    double particleNchilds(const Particle* part);
+    double particleNDaughters(const Particle* part);
 
     /**
      * function for PSelector

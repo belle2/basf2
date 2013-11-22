@@ -87,11 +87,6 @@ namespace Belle2 {
    */
   typedef std::vector<SelectionRange> SelRangeVector;
 
-  /**
-   * type definition of a function descriptor that holds variable name and a function
-   * that returns variable value
-   */
-  typedef std::pair<std::string, double(*)(const Particle*)> FunctionDescr;
 
   /**
    * Structure to hold selection criteria
@@ -137,14 +132,6 @@ namespace Belle2 {
      */
     ~PSelector();
 
-    /**
-     * add a selection function
-     * @param varName a variable name
-     * @param varDescription a description of a variable
-     * @param fun a pointer to function that returns the variable value
-     */
-    void addFunction(std::string varName, std::string varDescription,
-                     double(*fun)(const Particle*));
 
     /**
      * add selection criteria for a single variable
@@ -180,11 +167,6 @@ namespace Belle2 {
   private:
 
     /**
-     * Initialize functionList
-     */
-    void initialize();
-
-    /**
      * Append range to vector of ranges (called by addSelection)
      * @param varname a variable name
      * @param cut a string to parse
@@ -218,7 +200,6 @@ namespace Belle2 {
     bool intheRange(double x, const SelectionRange& range);
 
     std::vector<SelectionCriteria> m_selectionList; /**< selection criteria */
-    static std::map<std::string, FunctionDescr>  m_functionList; /**< functions */
 
   };
 

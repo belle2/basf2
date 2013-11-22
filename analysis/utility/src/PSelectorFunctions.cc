@@ -204,12 +204,12 @@ namespace Belle2 {
 
     // PID ---------------------------------------------
 
-    double particleElectronId(const Particle* part)
+    double particleElectronId(const Particle*)
     {
       return 0.5; //TODO when eId availabe
     }
 
-    double particleMuonId(const Particle* part)
+    double particleMuonId(const Particle*)
     {
       return 0.5; //TODO when muId availabe
     }

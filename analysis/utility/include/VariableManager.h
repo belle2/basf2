@@ -61,6 +61,7 @@ namespace Belle2 {
 
   private:
     VariableManager() {};
+    /** Copy constructor disabled (not defined). */
     VariableManager(const VariableManager&);
     ~VariableManager();
 

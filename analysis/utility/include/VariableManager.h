@@ -41,6 +41,9 @@ namespace Belle2 {
       std::string name; /**< Unique identifier of the function, used as key. */
       FunctionPtr function; /**< Pointer to function. */
       std::string description; /**< Description of what this function does. */
+
+      /** Constructor. */
+      Var(std::string n, FunctionPtr f, std::string d) : name(n), function(f), description(d) { }
     };
 
     /** get singleton instance. */

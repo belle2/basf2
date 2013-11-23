@@ -1,5 +1,5 @@
 Import('env')
 
-env['LIBS'] = ['framework', 'analysis_dataobjects', 'tracking_dataobjects', 'CLHEP']
+env['LIBS'] = ['framework', 'analysis_dataobjects', 'CLHEP']
 Return('env')
 

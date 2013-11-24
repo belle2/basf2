@@ -178,7 +178,7 @@ TVector3 BFieldComponentBeamline::calculate_beamline(const TVector3& point0, int
   InterpolationPoint** interBuffer;
   double rotate_angle;
   int offsetRPhi;
-  double mapSizeRPhi;
+  //double mapSizeRPhi;  ---> Temporarily masked because this variable is not used
 
   //added by nakayama to avoid segV
   if (TMath::Abs(point0.z()) > 399.) return TVector3(0., 0., 0.);
@@ -193,7 +193,7 @@ TVector3 BFieldComponentBeamline::calculate_beamline(const TVector3& point0, int
     rotate_angle = -1. * s_beamAngle;
   }
   offsetRPhi = m_offsetGridRPhi[isher];
-  mapSizeRPhi = m_mapSizeRPhi[isher];
+  //mapSizeRPhi = m_mapSizeRPhi[isher]; ---> Temporarily masked because this variable is not used
 
   //from GEANT4 coordinate to ANSYS coordinate
   //fabs(y) is used because field data exist only in y>0

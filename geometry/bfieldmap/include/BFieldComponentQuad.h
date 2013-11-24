@@ -50,8 +50,8 @@ namespace Belle2 {
       double SK0; /**< skew dipole component  in [dimensionless] */
       double SK1; /**< skew quadrupole component in [1/m] */
       double ROTATE; /**< rotation in [radian] */
-      double DX;   /** horizontal displacement in [m] */
-      double DY;   /** vertical displacement in [m] */
+      double DX;   /**< horizontal displacement in [m] */
+      double DY;   /**< vertical displacement in [m] */
 
       /* Note that K parameters used in SAD is multiplied by the element length.
        * Popular definitions are:  K0,SK0[1/m] and K1,SK1[1/m^2]
@@ -104,14 +104,21 @@ namespace Belle2 {
      * @param filenameLER The filename of the magnetic field map for LER.
      * @param filenameHERleak The filename of the magnetic field map for HER (leak field from LER).
      */
-    void setMapFilename(const std::string& filenameHER, const std::string& filenameLER, const std::string& filenameHERleak) { m_mapFilenameHER = filenameHER; m_mapFilenameLER = filenameLER; m_mapFilenameHERleak = filenameHERleak; }
+    void setMapFilename(const std::string& filenameHER, const std::string& filenameLER, const std::string& filenameHERleak) {
+      m_mapFilenameHER = filenameHER;
+      m_mapFilenameLER = filenameLER;
+      m_mapFilenameHERleak = filenameHERleak;
+    }
 
     /**
      * Sets the filename of aperture definition file.
      * @param filenameHER The filename of the aperture definition for HER.
      * @param filenameLER The filename of the aperture definition for LER.
      */
-    void setApertFilename(const std::string& filenameHER, const std::string& filenameLER) { m_apertFilenameHER = filenameHER; m_apertFilenameLER = filenameLER; }
+    void setApertFilename(const std::string& filenameHER, const std::string& filenameLER) {
+      m_apertFilenameHER = filenameHER;
+      m_apertFilenameLER = filenameLER;
+    }
 
     /**
      * Sets the size of the magnetic field map.
@@ -119,33 +126,40 @@ namespace Belle2 {
      * @param mapSizeLER The number of points in the LER field parameters.
      * @param mapSizeHERleak The number of points in the HER field parameters (leak field from LER).
      */
-    void setMapSize(int sizeHER, int sizeLER, int sizeHERleak) { m_mapSizeHER = sizeHER; m_mapSizeLER = sizeLER; m_mapSizeHERleak = sizeHERleak;}
+    void setMapSize(int sizeHER, int sizeLER, int sizeHERleak) {
+      m_mapSizeHER = sizeHER;
+      m_mapSizeLER = sizeLER;
+      m_mapSizeHERleak = sizeHERleak;
+    }
 
     /**
      * Sets the size of the aperture map
      * @param apertSizeHER The number of points in the HER aperture file.
      * @param apertSizeLER The number of points in the LER aperture file.
      */
-    void setApertSize(int sizeHER, int sizeLER) { m_apertSizeHER = sizeHER; m_apertSizeLER = sizeLER; }
+    void setApertSize(int sizeHER, int sizeLER) {
+      m_apertSizeHER = sizeHER;
+      m_apertSizeLER = sizeLER;
+    }
 
   protected:
 
   private:
 
-    std::string m_mapFilenameHER;        /** Magnetic field map of HER   */
-    std::string m_mapFilenameLER;        /** Magnetic field map of LER   */
-    std::string m_mapFilenameHERleak;    /** The filename of the magnetic field map */
-    std::string m_apertFilenameHER;      /** Filename of the aperture for HER */
-    std::string m_apertFilenameLER;      /** The filename of the aperture for LER */
-    int m_mapSizeHER;                    /** The size of the map for HER */
-    int m_mapSizeLER;                    /** The size of the map for LER */
-    int m_mapSizeHERleak;                /** The size of the map         */
-    int m_apertSizeHER;                  /** The size of the aperture for HER */
-    int m_apertSizeLER;                  /** The size of the aperture for LER */
+    std::string m_mapFilenameHER;        /**< Magnetic field map of HER   */
+    std::string m_mapFilenameLER;        /**< Magnetic field map of LER   */
+    std::string m_mapFilenameHERleak;    /**< The filename of the magnetic field map */
+    std::string m_apertFilenameHER;      /**< Filename of the aperture for HER */
+    std::string m_apertFilenameLER;      /**< The filename of the aperture for LER */
+    int m_mapSizeHER;                    /**< The size of the map for HER */
+    int m_mapSizeLER;                    /**< The size of the map for LER */
+    int m_mapSizeHERleak;                /**< The size of the map         */
+    int m_apertSizeHER;                  /**< The size of the aperture for HER */
+    int m_apertSizeLER;                  /**< The size of the aperture for LER */
 
-    ParamPoint* m_mapBufferHER;          /** The map buffer for HER  */
-    ParamPoint* m_mapBufferLER;          /** The map buffer for LER  */
-    ParamPoint* m_mapBufferHERleak;      /** The memory buffer for the field parameters. */
+    ParamPoint* m_mapBufferHER;          /**< The map buffer for HER  */
+    ParamPoint* m_mapBufferLER;          /**< The map buffer for LER  */
+    ParamPoint* m_mapBufferHERleak;      /**< The memory buffer for the field parameters. */
     ApertPoint* m_apertBufferHER, *m_apertBufferLER; /**< The memory buffer for the aperture parameters. */
   };
 

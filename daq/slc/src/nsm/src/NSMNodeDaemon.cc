@@ -42,7 +42,6 @@ void NSMNodeDaemon::run() throw()
       try {
         _wdata->allocate(nsm_comm);
       } catch (const NSMHandlerException& e) {
-        Belle2::debug("NSM node daemon : Failed to allocate NSM node data. Waiting for 5 seconds..");
         sleep(5);
       }
     }

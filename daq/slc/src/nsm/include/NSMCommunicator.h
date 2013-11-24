@@ -50,6 +50,7 @@ namespace Belle2 {
     void replyError(const std::string& message = "") throw(NSMHandlerException);
     void sendLog(const LogMessage& log) throw(NSMHandlerException);
     void sendError(const std::string& message) throw(NSMHandlerException);
+    void sendState() throw(NSMHandlerException);
 
   public:
     NSMcontext* getContext() throw() { return _nsmc; }

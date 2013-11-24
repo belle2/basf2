@@ -174,25 +174,18 @@ void NSMCommunicator::sendError(const std::string& message) throw(NSMHandlerExce
   }
 }
 
+void NSMCommunicator::sendState() throw(NSMHandlerException)
+{
+  if (_rc_node != NULL) {
+    sendRequest(_rc_node, Command::OK, 0, NULL, _node->getState().getLabel());
+  }
+}
+
 bool NSMCommunicator::wait(int sec) throw(NSMHandlerException)
 {
   if (_nsmc == NULL) {
     throw (NSMHandlerException(__FILE__, __LINE__, "Not ready for wait"));
   }
-  /*
-  NSMcontext* nsmc = nsmlib_selectc(0, sec);
-  if (nsmc == (NSMcontext*) - 1) {
-    throw (NSMHandlerException(__FILE__, __LINE__, "Error during wait"));
-  } else if (nsmc == _nsmc) {
-    _message.read(nsmc);
-    b2nsm_context(_nsmc);
-    return true;
-  } else if (nsmc != NULL) {
-    _message.read(nsmc);
-    return false;
-  }
-  return false;
-  */
   fd_set fds;
   FD_ZERO(&fds);
   FD_SET(_nsmc->sock, &fds);

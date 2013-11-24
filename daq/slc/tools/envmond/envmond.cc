@@ -50,31 +50,36 @@ int main(int argc, char** argv)
   EnvMonitorMaster* master = new EnvMonitorMaster(comm);
   for (size_t i = 0; i < el_v.size(); i++) {
     XMLElement* elc = el_v[i];
-    std::string name = elc->getAttribute("name");
-    std::string format = elc->getAttribute("format");
-    std::string monitor_class = elc->getAttribute("monitor_class");
-    int revision = atoi(elc->getAttribute("revision").c_str());
-    AbstractMonitor* monitor = NULL;
-    if (monitor_class.size() > 0) {
-      void* handle = dlopen(Belle2::form("%s/libdaq_slc_dqm_%s.so",
-                                         config.get("DQM_LIB_PATH").c_str(),
-                                         monitor_class.c_str()).c_str(),
-                            RTLD_NOW | RTLD_GLOBAL);
-      if (!handle) {
-        Belle2::debug("%s", dlerror());
-        return 1;
+    std::string nodename = elc->getAttribute("name");
+    std::vector<XMLElement*> elc_v = elc->getElements();
+    for (size_t i = 0; i < elc_v.size(); i++) {
+      XMLElement* elcc = elc_v[i];
+      std::string dataname = elcc->getAttribute("name");
+      std::string format = elcc->getAttribute("format");
+      std::string monitor_class = elcc->getAttribute("monitor_class");
+      int revision = atoi(elcc->getAttribute("revision").c_str());
+      AbstractMonitor* monitor = NULL;
+      if (monitor_class.size() > 0) {
+        void* handle = dlopen(Belle2::form("%s/libdaq_slc_dqm_%s.so",
+                                           config.get("DQM_LIB_PATH").c_str(),
+                                           monitor_class.c_str()).c_str(),
+                              RTLD_NOW | RTLD_GLOBAL);
+        if (!handle) {
+          Belle2::debug("%s", dlerror());
+          return 1;
+        }
+        char* error = NULL;
+        MonitorFunc_t* createMonitor =
+          (MonitorFunc_t*)dlsym(handle, Belle2::form("create%sMonitor",
+                                                     monitor_class.c_str()).c_str());
+        if ((error = dlerror()) != NULL) {
+          Belle2::debug("%s", error);
+          return 1;
+        }
+        monitor = (AbstractMonitor*)createMonitor();
       }
-      char* error = NULL;
-      MonitorFunc_t* createMonitor =
-        (MonitorFunc_t*)dlsym(handle, Belle2::form("create%sMonitor",
-                                                   monitor_class.c_str()).c_str());
-      if ((error = dlerror()) != NULL) {
-        Belle2::debug("%s", error);
-        return 1;
-      }
-      monitor = (AbstractMonitor*)createMonitor();
+      master->add(new NSMData(dataname, format, revision), monitor);
     }
-    master->add(new NSMData(name, format, revision), monitor);
   }
   PThread(new SocketAcceptor(config.get("DQM_GUI_HOST"),
                              config.getInt("DQM_GUI_PORT"), master));

@@ -112,24 +112,27 @@ const std::string DataObject::toSQLConfig()
       ss << ", " << name << " text";
     } else if (type != OBJECT) {
       size_t length = info.length;
-      ss << ", " << name;
-      switch (type) {
-        case BOOL:   ss << " boolean"; break;
-        case LONG:   ss << " bigint"; break;
-        case ENUM:
-        case INT:    ss << " int"; break;
-        case SHORT:  ss << " smallint"; break;
-        case CHAR:   ss << " tinyint"; break;
-        case ULONG:  ss << " bigint unsigned"; break;
-        case UINT:   ss << " int unsigned"; break;
-        case USHORT: ss << " smallint unsigned"; break;
-        case UCHAR:  ss << " tinyint unsigned"; break;
-        case FLOAT:  ss << " float"; break;
-        case DOUBLE: ss << " double"; break;
-        default : break;
-      }
-      if (length > 0) {
-        ss << "[" << length << "]";
+      if (length == 0) length = 1;
+      for (size_t i = 0; i < length; i++) {
+        if (info.length > 0)
+          ss << ", `" << name << ":i`";
+        else
+          ss << ", `" << name << "`";
+        switch (type) {
+          case BOOL:   ss << " boolean"; break;
+          case LONG:   ss << " bigint"; break;
+          case ENUM:
+          case INT:    ss << " int"; break;
+          case SHORT:  ss << " smallint"; break;
+          case CHAR:   ss << " tinyint"; break;
+          case ULONG:  ss << " bigint unsigned"; break;
+          case UINT:   ss << " int unsigned"; break;
+          case USHORT: ss << " smallint unsigned"; break;
+          case UCHAR:  ss << " tinyint unsigned"; break;
+          case FLOAT:  ss << " float"; break;
+          case DOUBLE: ss << " double"; break;
+          default : break;
+        }
       }
     }
   }
@@ -144,8 +147,18 @@ const std::string DataObject::toSQLNames()
        it != _name_v.end(); it++) {
     std::string& name(*it);
     ParamInfo& info(_param_m[name]);
-    if (info.type != OBJECT) {
-      ss << ", " << name;
+    ParamType type = info.type;
+    if (type == TEXT) {
+      ss << ", " << name << "";
+    } else if (type != OBJECT) {
+      size_t length = info.length;
+      if (length == 0) length = 1;
+      for (size_t i = 0; i < length; i++) {
+        if (info.length > 0)
+          ss << ", `" << name << ":i`";
+        else
+          ss << ", `" << name << "`";
+      }
     }
   }
   return ss.str();
@@ -159,17 +172,17 @@ const std::string DataObject::toSQLValues()
        it != _name_v.end(); it++) {
     std::string& name(*it);
     ParamInfo& info(_param_m[name]);
-    if (info.type == TEXT) {
+    ParamType type = info.type;
+    if (type == TEXT) {
       ss << ", '" << getText(name) << "'";
-    } else if (info.type != OBJECT) {
+    } else if (type != OBJECT) {
       void* buf = info.buf;
       size_t length = info.length;
-      ss << ", ";
       if (length == 0) length = 1;
-      else ss << "'{";
       for (size_t i = 0; i < length; i++) {
-        switch (info.type) {
-          case BOOL:   ss << (((bool*)buf)[i] ? "true" : "false"); break;
+        ss << ", ";
+        switch (type) {
+          case BOOL:   ss << ((bool*)buf)[i]; break;
           case LONG:   ss << ((long long*)buf)[i]; break;
           case ENUM:
           case INT:    ss << ((int*)buf)[i]; break;
@@ -183,9 +196,7 @@ const std::string DataObject::toSQLValues()
           case DOUBLE: ss << ((double*)buf)[i]; break;
           default : break;
         }
-        if (i < length - 1) ss << ", ";
       }
-      if (info.length != 0) ss << "}'";
     }
   }
   return ss.str();
@@ -311,41 +322,33 @@ void DataObject::setValues(std::vector<std::string>& name_v,
   }
 }
 
-void DataObject::setValue(const std::string& name,
-                          const std::string& value_in)
+void DataObject::setValue(const std::string& name_in,
+                          const std::string& value)
 {
+  std::vector<std::string> str_v = Belle2::split(name_in, ':');
+  std::string name = str_v[0];
   if (_param_m.find(name) != _param_m.end()) {
     ParamInfo& info(_param_m[name]);
+    ParamType type = info.type;
     void* buf = info.buf;
-    if (info.type == TEXT) {
-      setText(name, value_in);
-    } else if (info.type != OBJECT) {
-      size_t length = info.length;
-      std::vector<std::string> value_v;
-      std::string value = value_in;
-      if (length == 0) {
-        length = 1;
-      } else {
-        value = Belle2::replace(Belle2::replace(value_in, "{", ""), "}", "");
-        value_v = Belle2::split(value, ',');
-      }
-      for (size_t i = 0; i < length; i++) {
-        value = (value_v.size() < length) ? value_in : value_v[i];
-        switch (info.type) {
-          case BOOL: ((bool*)buf)[i] = (value == "true" || value == "t" || value == "1"); break;
-          case LONG: ((long long*)buf)[i] = atol(value.c_str()); break;
-          case ENUM: ((int*)buf)[i] = _enum_m_m[name][value]; break;
-          case INT: ((int*)buf)[i] = atoi(value.c_str()); break;
-          case SHORT: ((short*)buf)[i] = (short)atoi(value.c_str()); break;
-          case CHAR: ((char*)buf)[i] = (char)atoi(value.c_str()); break;
-          case ULONG: ((unsigned long long*)buf)[i] = strtoul(value.c_str(), 0, 0); break;
-          case UINT: ((unsigned int*)buf)[i] = (unsigned int)strtoul(value.c_str(), 0, 0);  break;
-          case USHORT: ((unsigned short*)buf)[i] = (unsigned short)strtoul(value.c_str(), 0, 0);  break;
-          case UCHAR: ((unsigned char*)buf)[i] = (unsigned char)strtoul(value.c_str(), 0, 0);  break;
-          case DOUBLE: ((double*)buf)[i] = atof(value.c_str()); break;
-          case FLOAT: ((float*)buf)[i] = (float)atof(value.c_str()); break;
-          default : break;
-        }
+    if (type == TEXT) {
+      setText(name, value);
+    } else if (type != OBJECT) {
+      size_t i = (str_v.size() > 1) ? atoi(str_v[1].c_str()) : 0;
+      switch (type) {
+        case BOOL: ((bool*)buf)[i] = (value == "true" || value == "t" || value == "1"); break;
+        case LONG: ((long long*)buf)[i] = atol(value.c_str()); break;
+        case ENUM: ((int*)buf)[i] = _enum_m_m[name][value]; break;
+        case INT: ((int*)buf)[i] = atoi(value.c_str()); break;
+        case SHORT: ((short*)buf)[i] = (short)atoi(value.c_str()); break;
+        case CHAR: ((char*)buf)[i] = (char)atoi(value.c_str()); break;
+        case ULONG: ((unsigned long long*)buf)[i] = strtoul(value.c_str(), 0, 0); break;
+        case UINT: ((unsigned int*)buf)[i] = (unsigned int)strtoul(value.c_str(), 0, 0);  break;
+        case USHORT: ((unsigned short*)buf)[i] = (unsigned short)strtoul(value.c_str(), 0, 0);  break;
+        case UCHAR: ((unsigned char*)buf)[i] = (unsigned char)strtoul(value.c_str(), 0, 0);  break;
+        case DOUBLE: ((double*)buf)[i] = atof(value.c_str()); break;
+        case FLOAT: ((float*)buf)[i] = (float)atof(value.c_str()); break;
+        default : break;
       }
     }
   }

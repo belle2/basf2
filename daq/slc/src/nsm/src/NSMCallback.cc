@@ -10,10 +10,15 @@
 using namespace Belle2;
 
 NSMCallback::NSMCallback(NSMNode* node) throw()
-  : _node(node)
+  : _node(node), _comm(NULL)
 {
   add(Command::OK);
   add(Command::ERROR);
+}
+
+bool NSMCallback::isReady() const throw()
+{
+  return _comm != NULL && _comm->isOnline();
 }
 
 bool NSMCallback::perform(NSMMessage& msg) throw(NSMHandlerException)

@@ -26,6 +26,8 @@ export CLASSPATH=.:$JAVA_HOME/jre/lib:$JAVA_HOME/lib\
 
 ## NSM configuration ##
 export NSM2_HOST=192.168.11.12
+export NSM2_HOST=192.168.244.137
+export NSM2_HOST=belle2-hv
 export NSM2_PORT=8322
 export NSM2_SHMKEY=8322
 export NSM2_INCDIR=$BELLE2_DAQ_SLC_DIR/data/nsm

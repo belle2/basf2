@@ -37,6 +37,7 @@ namespace Belle2 {
     virtual bool ok() { return true; }
     virtual bool error() { return true; }
     virtual void selfCheck() throw(NSMHandlerException) {}
+    bool isReady() const throw();
 
   public:
     NSMMessage& getMessage();

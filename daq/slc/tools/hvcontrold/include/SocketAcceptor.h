@@ -1,38 +1,27 @@
 #ifndef _Belle2_SocketAcceptor_hh
 #define _Belle2_SocketAcceptor_hh
 
-#include <system/TCPServerSocket.h>
-#include <system/PThread.h>
-
 #include <string>
-#include <unistd.h>
 
 namespace Belle2 {
 
-  template <class WORKER>
+  class HVControlMaster;
+
   class SocketAcceptor {
 
   public:
-    SocketAcceptor(const std::string& ip, int port)
-      : _ip(ip), _port(port) {}
+    SocketAcceptor(const std::string& ip, int port,
+                   HVControlMaster* master)
+      : _ip(ip), _port(port), _master(master) {}
     ~SocketAcceptor() {}
 
   public:
-    void run() {
-      TCPServerSocket server_socket(_ip, _port);
-      while (true) {
-        server_socket.open();
-        while (true) {
-          TCPSocket socket = server_socket.accept();
-          PThread(new WORKER(socket));
-        }
-        sleep(2);
-      }
-    }
+    void run();
 
   private:
     std::string _ip;
     int _port;
+    HVControlMaster* _master;
 
   };
 

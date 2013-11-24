@@ -5,6 +5,7 @@
 
 #include "nsm/NSMCommunicator.h"
 
+#include "system/TCPSocketWriter.h"
 #include "system/TCPSocketReader.h"
 
 #include "base/Debugger.h"
@@ -12,15 +13,33 @@
 
 using namespace Belle2;
 
-void HVCallback::download() throw()
+void HVCallback::getInfo() throw()
 {
   TCPSocket socket;
   try {
     ConfigFile config("slc_config");
     socket.connect(config.get("HV_GLOBAL_HOST"),
                    config.getInt("HV_GLOBAL_PORT"));
+    TCPSocketWriter writer(socket);
+    writer.writeString(_node->getName() + ":R");
     TCPSocketReader reader(socket);
-    m_crate->readObject(reader);
+    m_crate->readInfo(reader);
+  } catch (const IOException& e) {
+    Belle2::debug("Socket Erorr: %s", e.what());
+  }
+  socket.close();
+}
+
+void HVCallback::sendStatus() throw()
+{
+  TCPSocket socket;
+  try {
+    ConfigFile config("slc_config");
+    socket.connect(config.get("HV_GLOBAL_HOST"),
+                   config.getInt("HV_GLOBAL_PORT"));
+    TCPSocketWriter writer(socket);
+    writer.writeString(_node->getName() + ":S");
+    m_crate->writeStatus(writer);
   } catch (const IOException& e) {
     Belle2::debug("Socket Erorr: %s", e.what());
   }
@@ -29,7 +48,7 @@ void HVCallback::download() throw()
 
 void HVCallback::init() throw()
 {
-  download();
+  getInfo();
 }
 
 bool HVCallback::perform(NSMMessage& msg) throw(NSMHandlerException)
@@ -41,16 +60,11 @@ bool HVCallback::perform(NSMMessage& msg) throw(NSMHandlerException)
   } else if (cmd == Command::ERROR) {
     return error();
   }
-  /*
-  if (cmd.isAvailable(_node->getState()) == 0) {
-    return false;
-  }
-  */
-  State state_org = _node->getState();
+  HVState state(_node->getState());
   bool result = false;
   NSMCommunicator* com = getCommunicator();
   if (cmd == HVCommand::LOAD) {
-    download();
+    getInfo();
     result = load();
   } else if (cmd == HVCommand::SWITCHON) {
     result = switchOn();

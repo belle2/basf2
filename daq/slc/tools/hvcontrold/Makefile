@@ -15,17 +15,20 @@ LIBS    +=  -lm -lpthread -lz -lncurses  -lreadline
 LIBS    += -L$(BELLE2_DAQ_SLC_DIR)/lib -ldaq_slc_base
 LIBS    += -L$(BELLE2_DAQ_SLC_DIR)/lib -ldaq_slc_system
 LIBS    += -L$(BELLE2_DAQ_SLC_DIR)/lib -ldaq_slc_database
+LIBS    += -L$(BELLE2_DAQ_SLC_DIR)/lib -ldaq_slc_xml
 LIBS    += -L$(BELLE2_DAQ_SLC_DIR)/lib -ldaq_slc_nsm
 LIBS    += $(NSM2_PATH)/corelib/nsmlib2.o \
            $(NSM2_PATH)/corelib/nsmhash.o \
            $(NSM2_PATH)/corelib/nsmparse.o \
            $(NSM2_PATH)/b2lib/belle2nsm.o
 LIBS    += $(shell mysql_config --libs)
+LIBS    += $(shell xml2-config --libs)
 
 CFLAGS   = -g -Wall -fPIC -D_REENTRANT 
 CFLAGS  += -I./include 
 CFLAGS  += -I$(NSM2_PATH)/corelib -I$(NSM2_PATH)/b2lib
 CFLAGS  += -I$(BELLE2_DAQ_SLC_DIR)/include 
+CFLAGS  += $(shell xml2-config --cflags)
 CFLAGS  += $(shell mysql_config --cflags)
 
 MAINS   = $(wildcard *.cc)

@@ -24,10 +24,10 @@ bool ArichHVCallback::load() throw()
   try {
     for (size_t ns = 0; ns < nslot; ns++) {
       for (size_t nc = 0; nc < nchannel; nc++) {
-        ArichHVMessage msg(ArichHVMessage::SET,
-                           ArichHVMessage::ALL,
-                           getCrate()->getChannel(ns, nc));
-        std::cout << msg.toString() << std::endl;
+        HVChannelInfo* info = getCrate()->getChannelInfo(ns, nc);
+        HVChannelStatus* status = getCrate()->getChannelStatus(ns, nc);
+        ArichHVMessage msg(ArichHVMessage::SET, ArichHVMessage::ALL,
+                           info, status);
         msg.setParamType(ArichHVMessage::VOLTAGE_DEMAND);
         _hv_comm->sendRequest(msg);
         msg.setParamType(ArichHVMessage::VOLTAGE_LIMIT);
@@ -54,10 +54,10 @@ bool ArichHVCallback::switchOn() throw()
   try {
     for (size_t ns = 0; ns < nslot; ns++) {
       for (size_t nc = 0; nc < nchannel; nc++) {
-        ArichHVMessage msg(ArichHVMessage::SET,
-                           ArichHVMessage::SWITCH,
-                           getCrate()->getChannel(ns, nc));
-        std::cout << msg.toString() << std::endl;
+        HVChannelInfo* info = getCrate()->getChannelInfo(ns, nc);
+        HVChannelStatus* status = getCrate()->getChannelStatus(ns, nc);
+        ArichHVMessage msg(ArichHVMessage::SET, ArichHVMessage::SWITCH,
+                           info, status);
         _hv_comm->sendRequest(msg);
       }
     }
@@ -75,13 +75,13 @@ bool ArichHVCallback::switchOff() throw()
   try {
     for (size_t ns = 0; ns < nslot; ns++) {
       for (size_t nc = 0; nc < nchannel; nc++) {
-        HVChannelInfo* info = getCrate()->getChannel(ns, nc);
+        HVChannelInfo* info = getCrate()->getChannelInfo(ns, nc);
+        HVChannelStatus* status = getCrate()->getChannelStatus(ns, nc);
         bool is_switch_on = info->isSwitchOn();
         info->setSwitchOn(false);
         ArichHVMessage msg(ArichHVMessage::SET,
                            ArichHVMessage::SWITCH,
-                           info);
-        std::cout << msg.toString() << std::endl;
+                           info, status);
         _hv_comm->sendRequest(msg);
         info->setSwitchOn(is_switch_on);
       }

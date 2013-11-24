@@ -21,7 +21,8 @@ namespace Belle2 {
     virtual bool switchOn() throw() { return true; }
     virtual bool switchOff() throw() { return true; }
     virtual void init() throw();
-    void download() throw();
+    void getInfo() throw();
+    void sendStatus() throw();
 
   protected:
     virtual bool perform(NSMMessage& msg)

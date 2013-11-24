@@ -22,6 +22,7 @@ namespace Belle2 {
       : _crate(callback->getCrate()), _host(host),
         _port(port), _data(data) {
       callback->setHVCommunicator(this);
+      _callback = callback;
     }
     ~ArichHVCommunicator() throw() {}
 
@@ -40,6 +41,7 @@ namespace Belle2 {
     TCPSocket _socket;
     TCPSocketWriter _writer;
     TCPSocketReader _reader;
+    ArichHVCallback* _callback;
 
   };
 

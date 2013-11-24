@@ -1,5 +1,5 @@
 USER_CLASS=ArichHV
-DQM_LIB_PATH=/home/hep-user/belle2/release/daq/slc/data/dqm/lib
+DQM_LIB_PATH=/home/tkonno/belle2/release/daq/slc/data/dqm/lib
 CXX     = g++
 
 HOMEDIR  = .
@@ -15,7 +15,7 @@ SRCS   = $(SRCDIR)/$(USER_CLASS)Monitor.cc $(SRCDIR)/lib$(USER_CLASS)Monitor.cc
 OBJS   = $(SRCS:$(SRCDIR)/%.cc=$(TMPDIR)/%.o)
 
 CFLAGS   = -g -fPIC -O2 -Wall
-CFLAGS  += -I$(INCDIR) 
+CFLAGS  += -I$(INCDIR)
 CFLAGS  += -I$(BELLE2_DAQ_SLC_DIR)/include
 
 LIBTARGET  = $(LIBDIR)/libdaq_slc_dqm_$(USER_CLASS).so

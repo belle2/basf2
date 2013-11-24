@@ -32,13 +32,30 @@ public:
       mutex.lock();
       for (size_t ns = 0; ns < crate->getNSlot(); ns++) {
         for (size_t nc = 0; nc < crate->getNChannel(); nc++) {
-          HVChannelInfo* info = crate->getChannel(ns, nc);
+          HVChannelInfo* info = crate->getChannelInfo(ns, nc);
+          HVChannelStatus* status = crate->getChannelStatus(ns, nc);
           if (info->isSwitchOn()) {
-            info->setVoltageMonitored(info->getVoltageDemand() + rand() % 100);
-            info->setCurrentMonitored(info->getVoltageDemand() + rand() % 100);
+            double diff = (status->getVoltageMonitored() - info->getVoltageDemand())
+                          / info->getVoltageDemand();
+            if (diff < 0.05 && diff > -0.05) {
+              if (status->getVoltageMonitored() < info->getVoltageDemand()) {
+                status->setVoltageMonitored(status->getVoltageMonitored() +
+                                            rand() / (double)RAND_MAX * info->getVoltageDemand() * 0.01);
+              } else {
+                status->setVoltageMonitored(status->getVoltageMonitored() -
+                                            rand() / (double)RAND_MAX * info->getVoltageDemand() * 0.01);
+              }
+            } else {
+              if (status->getVoltageMonitored() < info->getVoltageDemand()) {
+                status->setVoltageMonitored(status->getVoltageMonitored() + rand() % 500);
+              } else {
+                status->setVoltageMonitored(status->getVoltageMonitored() - rand() % 400);
+              }
+            }
+            status->setCurrentMonitored(rand() % 200 + 50);
           } else {
-            info->setVoltageMonitored(0);
-            info->setCurrentMonitored(0);
+            status->setVoltageMonitored(0);
+            status->setCurrentMonitored(0);
           }
         }
       }
@@ -58,6 +75,7 @@ int main(int argc, char** argv)
   server_socket.open();
   PThread(new HVGenerator());
   HVChannelInfo* ch_info  = new HVChannelInfo();
+  HVChannelStatus* ch_status  = new HVChannelStatus();
   while (true) {
     TCPSocket socket;
     try {
@@ -90,42 +108,47 @@ int main(int argc, char** argv)
         if (s.at(0) == ' ') s.erase(0, 1);
       }
       HVChannelInfo* info = NULL;
+      HVChannelStatus* status = NULL;
       mutex.lock();
       if (slot == 0 || ch == 0) {
         info = ch_info;
+        status = ch_status;
       } else {
-        info = crate->getChannel(slot - 1, ch - 1);
+        info = crate->getChannelInfo(slot - 1, ch - 1);
+        status = crate->getChannelStatus(slot - 1, ch - 1);
       }
       ArichHVMessage msg;
       msg.setChannelInfo(info);
+      msg.setChannelStatus(status);
       s = Belle2::form("#%d%d ", slot, ch) + s;
       msg.read(s);
       if (msg.getCommand() == ArichHVMessage::GET) {
         ss.str("");
         switch (msg.getParamType()) {
           case ArichHVMessage::ALL: {
-            ss << "#" << slot << ch << "GET=" << info->getVoltageMonitored() << ","
-               << info->getCurrentMonitored() << ","
-               << info->isSwitchOn() << ","
-               << info->getRampUpSpeed() << ","
-               << info->getRampDownSpeed();
+            ss << "#" << slot << ch
+               << Belle2::form("GET=%04X,%04X,%d,%04X,%04X",
+                               status->getVoltageMonitored(),
+                               status->getCurrentMonitored(),
+                               info->isSwitchOn(), info->getRampUpSpeed(),
+                               info->getRampDownSpeed());
           }; break;
           case ArichHVMessage::SWITCH:
-            ss << "#" << slot << ch << "SW=" << info->isSwitchOn(); break;
+            ss << "#" << slot << ch << Belle2::form("SW=%d", info->isSwitchOn()); break;
           case ArichHVMessage::RAMPUP_SPEED:
-            ss << "#" << slot << ch << "RVU=" << info->getRampUpSpeed(); break;
+            ss << "#" << slot << ch << Belle2::form("RVU=%04X", info->getRampUpSpeed()); break;
           case ArichHVMessage::RAMPDOWN_SPEED:
-            ss << "#" << slot << ch << "RVD=" << info->getRampDownSpeed(); break;
+            ss << "#" << slot << ch << Belle2::form("RVD=%04X", info->getRampDownSpeed()); break;
           case ArichHVMessage::VOLTAGE_DEMAND:
-            ss << "#" << slot << ch << "CH5=" << info->getVoltageDemand(); break;
+            ss << "#" << slot << ch << Belle2::form("CH5=%04X", info->getVoltageDemand()); break;
           case ArichHVMessage::VOLTAGE_LIMIT:
-            ss << "#" << slot << ch << "CH2=" << info->getVoltageLimit(); break;
+            ss << "#" << slot << ch << Belle2::form("CH2=%04X", info->getVoltageLimit()); break;
           case ArichHVMessage::CURRENT_LIMIT:
-            ss << "#" << slot << ch << "CH7=" << info->getCurrentLimit(); break;
+            ss << "#" << slot << ch << Belle2::form("CH7=%04X", info->getCurrentLimit()); break;
           case ArichHVMessage::VOLTAGE_MON:
-            ss << "#" << slot << ch << "MNH1=" << info->getVoltageMonitored(); break;
+            ss << "#" << slot << ch << Belle2::form("MNH1=%04X", status->getVoltageMonitored()); break;
           case ArichHVMessage::CURRENT_MON:
-            ss << "#" << slot << ch << "NMH2=" << info->getCurrentMonitored(); break;
+            ss << "#" << slot << ch << Belle2::form("NMH2=%04X", status->getCurrentMonitored()); break;
           case ArichHVMessage::DATE: break;
         }
         ss << "\r";

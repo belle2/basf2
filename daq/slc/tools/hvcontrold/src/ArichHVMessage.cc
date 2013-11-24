@@ -68,10 +68,10 @@ void ArichHVMessage::read(const std::string& str)
       m_type = ALL;
       if (s_v.size() > 1) {
         std::vector<std::string> ss_v = Belle2::split(s_v[1], ',');
-        m_info->setVoltageMonitored(strtoul(("0x" + ss_v[0]).c_str(), 0, 0));
-        m_info->setCurrentMonitored(strtoul(("0x" + ss_v[1]).c_str(), 0, 0));
+        m_status->setVoltageMonitored(strtoul(("0x" + ss_v[0]).c_str(), 0, 0));
+        m_status->setCurrentMonitored(strtoul(("0x" + ss_v[1]).c_str(), 0, 0));
         m_info->setSwitchOn(ss_v[2] == "1");
-        m_info->setStatus(atoi(ss_v[2].c_str()));
+        m_status->setStatus(atoi(ss_v[2].c_str()));
         m_info->setRampUpSpeed(strtoul(("0x" + ss_v[3]).c_str(), 0, 0));
         m_info->setRampDownSpeed(strtoul(("0x" + ss_v[4]).c_str(), 0, 0));
       }
@@ -79,7 +79,7 @@ void ArichHVMessage::read(const std::string& str)
       m_type = SWITCH;
       if (s_v.size() > 1) {
         m_info->setSwitchOn(s_v[1] != "0");
-        m_info->setStatus(atoi(s_v[1].c_str()));
+        m_status->setStatus(atoi(s_v[1].c_str()));
       }
     } else if (s_v[0].find("RVU") != std::string::npos) {
       m_type = RAMPUP_SPEED;
@@ -98,10 +98,10 @@ void ArichHVMessage::read(const std::string& str)
       if (s_v.size() > 1) m_info->setCurrentLimit(strtoul(("0x" + s_v[1]).c_str(), 0, 0));
     } else if (s_v[0].find("MNH1") != std::string::npos) {
       m_type = VOLTAGE_MON;
-      if (s_v.size() > 1) m_info->setVoltageMonitored(strtoul(("0x" + s_v[1]).c_str(), 0, 0));
+      if (s_v.size() > 1) m_status->setVoltageMonitored(strtoul(("0x" + s_v[1]).c_str(), 0, 0));
     } else if (s_v[0].find("MNH2") != std::string::npos) {
       m_type = CURRENT_MON;
-      if (s_v.size() > 1) m_info->setCurrentMonitored(strtoul(("0x" + s_v[1]).c_str(), 0, 0));
+      if (s_v.size() > 1) m_status->setCurrentMonitored(strtoul(("0x" + s_v[1]).c_str(), 0, 0));
     } else if (s_v[0].find("DATE") != std::string::npos) {
       m_type = DATE;
     }

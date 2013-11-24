@@ -1,4 +1,5 @@
 #include "ArichHVCommunicator.h"
+#include "HVState.h"
 
 #include <nsm/nsm2.h>
 #include "ArichHVStatus.h"
@@ -64,24 +65,28 @@ void ArichHVCommunicator::run()
     _mutex.unlock();
 
     ArichHVStatus* status = NULL;
-    while (true) {
-      try {
-        status = (ArichHVStatus*)_data->get();
-        break;
-      } catch (const IOException& e) {
-        Belle2::debug("NSM error: %s", e.what());
-        sleep(5);
+    while (status == NULL) {
+      if (_callback != NULL && _callback->isReady()) {
+        try {
+          status = (ArichHVStatus*)_data->get();
+          break;
+        } catch (const IOException& e) {
+          Belle2::debug("NSM error: %s", e.what());
+        }
       }
+      sleep(2);
     }
-    HVChannelInfo* info = new HVChannelInfo();
+    HVChannelInfo* ch_info_tmp = new HVChannelInfo();
+    HVChannelStatus* ch_status_tmp = new HVChannelStatus();
     while (true) {
       try {
         for (size_t ns = 0; ns < _crate->getNSlot(); ns++) {
           for (size_t nc = 0; nc < _crate->getNChannel(); nc++) {
             ArichHVMessage msg(ArichHVMessage::GET, ArichHVMessage::ALL);
-            info->setSlot(ns + 1);
-            info->setChannel(nc + 1);
-            msg.setChannelInfo(info);
+            ch_info_tmp->setSlot(ns + 1);
+            ch_info_tmp->setChannel(nc + 1);
+            msg.setChannelInfo(ch_info_tmp);
+            msg.setChannelStatus(ch_status_tmp);
             msg.read(sendRequest(msg));
             msg.setParamType(ArichHVMessage::CURRENT_LIMIT);
             msg.read(sendRequest(msg));
@@ -90,20 +95,54 @@ void ArichHVCommunicator::run()
             msg.setParamType(ArichHVMessage::VOLTAGE_DEMAND);
             msg.read(sendRequest(msg));
             int index = ns * _crate->getNChannel() + nc;
-            status->status[index] = info->getStatus();
-            status->voltage_mon[index] = info->getVoltageMonitored();
-            status->current_mon[index] = info->getCurrentMonitored();
-            status->voltage_demand[index] = info->getVoltageDemand();
-            status->rampup_speed[index] = info->getRampUpSpeed();
-            status->rampdown_speed[index] = info->getRampDownSpeed();
-            status->voltage_limit[index] = info->getVoltageLimit();
-            status->current_limit[index] = info->getCurrentLimit();
+            HVChannelStatus* ch_status = _crate->getChannelStatus(ns, nc);
+            switch (ch_status_tmp->getStatus()) {
+              case 0: {
+                ch_status->setStatus(HVState::OFF_STABLE_S.getId());
+              } break;
+              case 1: {
+                if (ch_info_tmp->getVoltageDemand() > 0) {
+                  double diff = (ch_status_tmp->getVoltageMonitored() - ch_info_tmp->getVoltageDemand())
+                                / ((double)ch_info_tmp->getVoltageDemand());
+                  if (diff < 0.05 && diff > -0.05) {
+                    ch_status->setStatus(HVState::ON_STABLE_S.getId());
+                  } else if (ch_status_tmp->getVoltageMonitored() - ch_status->getVoltageMonitored() > 0) {
+                    ch_status->setStatus(HVState::ON_RAMPINGUP_TS.getId());
+                  } else if (ch_status_tmp->getVoltageMonitored() - ch_status->getVoltageMonitored() < 0) {
+                    ch_status->setStatus(HVState::ON_RAMPINGDOWN_TS.getId());
+                  }
+                }
+              } break;
+              case 2: {
+                ch_status->setStatus(HVState::ON_OCP_ES.getId());
+              } break;
+              case 3: {
+                ch_status->setStatus(HVState::ON_OVP_ES.getId());
+              } break;
+            }
+            ch_status->setVoltageMonitored(ch_status_tmp->getVoltageMonitored());
+            ch_status->setCurrentMonitored(ch_status_tmp->getCurrentMonitored());
+            status->status[index] = ch_status->getStatus();
+            status->voltage_mon[index] = ch_status->getVoltageMonitored();
+            status->current_mon[index] = ch_status->getCurrentMonitored();
+            status->voltage_demand[index] = ch_info_tmp->getVoltageDemand();
+            status->rampup_speed[index] = ch_info_tmp->getRampUpSpeed();
+            status->rampdown_speed[index] = ch_info_tmp->getRampDownSpeed();
+            status->voltage_limit[index] = ch_info_tmp->getVoltageLimit();
+            status->current_limit[index] = ch_info_tmp->getCurrentLimit();
           }
         }
+        _callback->sendStatus();
       } catch (const IOException& e) {
         _mutex.lock();
         _socket.close();
         _available = false;
+        for (size_t ns = 0; ns < _crate->getNSlot(); ns++) {
+          for (size_t nc = 0; nc < _crate->getNChannel(); nc++) {
+            HVChannelStatus* ch_status = _crate->getChannelStatus(ns, nc);
+            ch_status->setStatus(HVState::OFF_ERROR_ES.getId());
+          }
+        }
         _mutex.unlock();
         Belle2::debug("Socket error: %s", e.what());
         sleep(5);

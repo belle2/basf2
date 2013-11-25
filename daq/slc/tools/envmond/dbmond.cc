@@ -63,7 +63,7 @@ int main(int argc, char** argv)
                   << ret[i].getFieldValueInt("record_time") << ","
                   << (int)data->getByte("status") << ","
                   << data->getInt32("voltage_mon") << ","
-                  << data->getInt32("voltage_mon") << std::endl;
+                  << data->getInt32("current_mon") << std::endl;
       }
     } catch (const DBHandlerException& e) {}
   }

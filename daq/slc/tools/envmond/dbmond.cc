@@ -5,6 +5,7 @@
 #include <database/MySQLInterface.h>
 
 #include <xml/XMLParser.h>
+#include <base/Date.h>
 
 #include <base/StringUtil.h>
 #include <base/ConfigFile.h>
@@ -29,33 +30,40 @@ int main(int argc, char** argv)
               config.get("HV_DATABASE_USER"), config.get("HV_DATABASE_PASS"),
               config.getInt("HV_DATABASE_PORT"));
 
-  std::vector<NSMData*> data_v;
   XMLParser parser;
   XMLElement* el = parser.parse(config.get("HV_MONITOR_XML_PATH") + "/" +
                                 config.get("HV_MONITOR_XML_ENTRY") + ".xml");
   std::vector<XMLElement*> el_v = el->getElements();
+  std::vector<NSMData*> data_v;
   for (size_t i = 0; i < el_v.size(); i++) {
     XMLElement* elc = el_v[i];
-    std::string name = elc->getAttribute("name");
-    std::string format = elc->getAttribute("format");
-    std::string monitor_class = elc->getAttribute("monitor_class");
-    int revision = atoi(elc->getAttribute("revision").c_str());
-    data_v.push_back(new NSMData(name, format, revision));
+    std::string nodename = elc->getAttribute("name");
+    std::vector<XMLElement*> elc_v = elc->getElements();
+    for (size_t i = 0; i < elc_v.size(); i++) {
+      XMLElement* elcc = elc_v[i];
+      std::string dataname = elcc->getAttribute("name");
+      std::string format = elcc->getAttribute("format");
+      std::string monitor_class = elcc->getAttribute("monitor_class");
+      int revision = atoi(elcc->getAttribute("revision").c_str());
+      data_v.push_back(new NSMData(dataname, format, revision));
+    }
   }
 
   for (size_t i = 0; i < data_v.size(); i++) {
     NSMData* data = data_v[i];
     data->parse();
     try {
-      std::cout << Belle2::form("select * from %s_rev%d;",
-                                data->getName().c_str(), data->getRevision()) << std::endl;
-      db->execute(Belle2::form("select * from %s_rev%d;",
+      db->execute(Belle2::form("select unix_timestamp(record_time) %sfrom %s_rev%d;",
+                               data->toSQLNames().c_str(),
                                data->getName().c_str(), data->getRevision()));
       DBRecordList& ret(db->loadRecords());
       for (size_t i = 0; i < ret.size(); i++) {
         data->setSQLValues(ret[i].getFieldNames(), ret[i].getFieldValues());
-        std::cout << data->getName() << " : "
-                  << data->toSQLValues() << std::endl;
+        std::cout << data->getName() << " "
+                  << ret[i].getFieldValueInt("record_time") << " "
+                  << (int)data->getByte("status") << " "
+                  << data->getInt32("voltage_mon") << " "
+                  << data->getInt32("voltage_mon") << std::endl;
       }
     } catch (const DBHandlerException& e) {}
   }

@@ -358,27 +358,25 @@ void NSMData::setSQLValues(std::vector<std::string>& name_v,
   for (size_t i = 0; i < name_v.size(); i++) {
     std::string name = name_v[i];
     std::vector<std::string> str_v = Belle2::split(name, ':');
-    int length = 1;
+    int index = 0;
     if (str_v.size() > 1) {
       name = str_v[0];
-      length = atoi(str_v[1].c_str());
+      index = atoi(str_v[1].c_str());
     }
     NSMDataProperty& pro(_pro_m[name]);
-    for (int l = 0; l < length; l++) {
-      switch (pro.type) {
-        case INT64: ((int64*)(data + pro.offset))[l] = atoll(value_v[i].c_str()); break;
-        case INT32: ((int32*)(data + pro.offset))[l] = atoi(value_v[i].c_str()); break;
-        case INT16: ((int16*)(data + pro.offset))[l] = atoi(value_v[i].c_str()); break;
-        case CHAR: ((char*)(data + pro.offset))[l] = (char)atoi(value_v[i].c_str()); break;
-        case UINT64: ((uint64*)(data + pro.offset))[l] = strtoll(value_v[i].c_str(), NULL, 0); break;
-        case UINT32: ((uint32*)(data + pro.offset))[l] = strtol(value_v[i].c_str(), NULL, 0); break;
-        case UINT16: ((uint16*)(data + pro.offset))[l] = strtol(value_v[i].c_str(), NULL, 0); break;
-        case BYTE8: ((byte8*)(data + pro.offset))[l] = (byte8)atoi(value_v[i].c_str()); break;
-        case DOUBLE: ((double*)(data + pro.offset))[l] = atof(value_v[i].c_str()); break;
-        case FLOAT: ((float*)(data + pro.offset))[l] = atof(value_v[i].c_str()); break;
-        case TEXT:   strncpy((char*)(data + pro.offset), value_v[i].c_str(), pro.length); break;
-        default : break;
-      }
+    switch (pro.type) {
+      case INT64: ((int64*)(data + pro.offset))[index] = atoll(value_v[i].c_str()); break;
+      case INT32: ((int32*)(data + pro.offset))[index] = atoi(value_v[i].c_str()); break;
+      case INT16: ((int16*)(data + pro.offset))[index] = atoi(value_v[i].c_str()); break;
+      case CHAR: ((char*)(data + pro.offset))[index] = (char)atoi(value_v[i].c_str()); break;
+      case UINT64: ((uint64*)(data + pro.offset))[index] = strtoll(value_v[i].c_str(), NULL, 0); break;
+      case UINT32: ((uint32*)(data + pro.offset))[index] = strtol(value_v[i].c_str(), NULL, 0); break;
+      case UINT16: ((uint16*)(data + pro.offset))[index] = strtol(value_v[i].c_str(), NULL, 0); break;
+      case BYTE8: ((byte8*)(data + pro.offset))[index] = (byte8)atoi(value_v[i].c_str()); break;
+      case DOUBLE: ((double*)(data + pro.offset))[index] = atof(value_v[i].c_str()); break;
+      case FLOAT: ((float*)(data + pro.offset))[index] = atof(value_v[i].c_str()); break;
+      case TEXT:   strncpy((char*)(data + pro.offset), value_v[i].c_str(), pro.length); break;
+      default : break;
     }
   }
 }

@@ -35,6 +35,7 @@ namespace Belle2 {
 
   public:
 
+    /** BField Class as grid in cylindrical coordinates */
     struct BFieldPoint {     /** BField Class as grid in cylindrical coordinates*/
       double r;              /**< Position in radius r */
       double phi;            /**< Position in phi*/
@@ -44,6 +45,7 @@ namespace Belle2 {
       double Bz;             /**< BField coordinate in z     */
     };
 
+    /** Interpolation Point */
     struct InterpolationPoint {
       std::vector<int> p;   /**< Parameter in p */
     };
@@ -62,6 +64,10 @@ namespace Belle2 {
       initialize_her();    /** Initialization of LER and HER */
       initialize_ler();
     }
+    /**
+     * Initializes the magnetic field component around the beampipe
+     * @param isher parameter  for Lower Energy Ring
+     */
     void initialize_beamline(int isher);                 /** Parameter for Lower Energy Ring */
     void initialize_her(void) {
       initialize_beamline(1);   /** Higher Beam Ring */

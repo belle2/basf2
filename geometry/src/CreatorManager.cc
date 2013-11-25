@@ -14,35 +14,33 @@
 #include <memory>
 
 using namespace std;
+using namespace Belle2;
+using namespace Belle2::geometry;
 
-namespace Belle2 {
-  namespace geometry {
-    CreatorManager& CreatorManager::getInstance()
-    {
-      static auto_ptr<CreatorManager> instance(new CreatorManager());
-      return *instance;
-    }
+CreatorManager& CreatorManager::getInstance()
+{
+  static auto_ptr<CreatorManager> instance(new CreatorManager());
+  return *instance;
+}
 
-    //map<string, CreatorManager::CreatorFactory*> CreatorManager::m_creatorFactories;
+//map<string, CreatorManager::CreatorFactory*> CreatorManager::m_creatorFactories;
 
-    void CreatorManager::registerCreatorFactory(const std::string& name, CreatorFactory* factory)
-    {
-      getInstance().m_creatorFactories[name] = factory;
-    }
+void CreatorManager::registerCreatorFactory(const std::string& name, CreatorFactory* factory)
+{
+  getInstance().m_creatorFactories[name] = factory;
+}
 
-    CreatorBase* CreatorManager::getCreator(const string& name, const string& library)
-    {
-      if (!library.empty()) {
-        FileSystem::loadLibrary(library, false);
-      }
-
-      CreatorManager& instance = getInstance();
-      map<string, CreatorFactory*>::const_iterator it = instance.m_creatorFactories.find(name);
-      if (it == instance.m_creatorFactories.end()) {
-        B2ERROR("Could not find a geometry creator named " << name);
-        return 0;
-      }
-      return it->second();
-    }
+CreatorBase* CreatorManager::getCreator(const string& name, const string& library)
+{
+  if (!library.empty()) {
+    FileSystem::loadLibrary(library, false);
   }
+
+  CreatorManager& instance = getInstance();
+  map<string, CreatorFactory*>::const_iterator it = instance.m_creatorFactories.find(name);
+  if (it == instance.m_creatorFactories.end()) {
+    B2ERROR("Could not find a geometry creator named " << name);
+    return 0;
+  }
+  return it->second();
 }

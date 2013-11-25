@@ -50,13 +50,11 @@ namespace Belle2 {
       static CreatorBase* getCreator(const std::string& name, const std::string& library = "");
 
     protected:
+      /** constructor */
       CreatorManager() {}
-      CreatorManager(const CreatorManager&);
-      /** Parameter of the creator manager */
-      void operator=(const CreatorManager&);
-      /** Parameter of the operator */
-      static CreatorManager& getInstance();
-      /** Static map to hold all registered factories */
+      CreatorManager(const CreatorManager&);  /** Parameter of the creator manager */
+      void operator=(const CreatorManager&);  /** Parameter of the operator */
+      static CreatorManager& getInstance();   /** Static map to hold all registered factories */
       std::map<std::string, CreatorFactory*> m_creatorFactories;
     };
 

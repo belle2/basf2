@@ -103,6 +103,8 @@ namespace Belle2 {
       double XsizPMT = m_topgp->getNpmtx() * m_topgp->getMsizex() +
                        (m_topgp->getNpmtx() - 1) * m_topgp->getXgap();
       double YsizPMT = m_topgp->getNpmty() * m_topgp->getMsizey() + m_topgp->getYgap();
+      double x0 = m_topgp->getPMToffsetX();
+      double y0 = m_topgp->getPMToffsetY();
 
       //! No edge roughness
       setEdgeRoughness(0);
@@ -114,7 +116,7 @@ namespace Belle2 {
         addExpansionVolume(id, Left, Prism, DzExp - Wflat, B / 2, B / 2 - YsizExp,
                            0, 0, Wwidth);
         setBBoxWindow(id, Wflat + filterThick + pmtWindow);
-        arrangePMT(id, Left, XsizPMT, YsizPMT);
+        arrangePMT(id, Left, XsizPMT, YsizPMT, x0, y0);
         Phi += Dphi;
       }
 

@@ -92,6 +92,8 @@ namespace Belle2 {
       m_AsizexHalf = 0;
       m_AsizeyHalf = 0;
       m_dGlue = 0;
+      m_pmtOffsetX = 0;
+      m_pmtOffsetY = 0;
 
       //! TDC
       m_NTDC = 0;
@@ -178,10 +180,13 @@ namespace Belle2 {
       m_Npadx = detParams.getInt("Module/PadXNum");
       m_Npady = detParams.getInt("Module/PadYNum");
       m_dGlue = detParams.getLength("dGlue");
+      m_pmtOffsetX = detParams.getLength("offsetX", 0.0);
+      m_pmtOffsetY = detParams.getLength("offsetY", 0.0);
       m_padx = m_Asizex / (double)m_Npadx;
       m_pady = m_Asizey / (double)m_Npady;
       m_AsizexHalf = m_Asizex / 2;
       m_AsizeyHalf = m_Asizey / 2;
+
 
       //! TDC
 

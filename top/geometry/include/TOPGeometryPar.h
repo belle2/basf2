@@ -257,6 +257,16 @@ namespace Belle2 {
        */
       double getdGlue() const {return m_dGlue / m_unit; }
 
+      /** Get offset of PMT array
+       * @return offset in x
+       */
+      double getPMToffsetX() const {return m_pmtOffsetX / m_unit;}
+
+      /** Get offset of PMT array
+       * @return offset in y
+       */
+      double getPMToffsetY() const {return m_pmtOffsetY / m_unit;}
+
       /** Get number of TDC bits
        * @return number of TDC bits
        */
@@ -457,6 +467,8 @@ namespace Belle2 {
       double m_AsizexHalf;        /**< active area half size in x */
       double m_AsizeyHalf;        /**< active area half size in y */
       double m_dGlue;             /**< PMT wedge glue thickness */
+      double m_pmtOffsetX;        /**< PMT array offset in x */
+      double m_pmtOffsetY;        /**< PMT array offset in y */
 
       //! TDC parameters
 

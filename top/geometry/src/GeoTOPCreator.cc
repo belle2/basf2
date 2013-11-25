@@ -531,16 +531,19 @@ namespace Belle2 {
       //! Build one PMT
       G4LogicalVolume* PMT = buildPMT(content);
 
-      //! Place the PMTs insde the stack
+      //! Place the PMTs inside the stack
+      G4double x0 = m_topgp->getPMToffsetX();
+      G4double y0 = m_topgp->getPMToffsetY();
+
       for (G4int iy = 0; iy < Npmty; iy++) {
         for (G4int ix = 0; ix < Npmtx; ix++) {
 
-          G4Transform3D tpmt = G4Translate3D(-x / 2.0 + dx / 2.0 + (dx + Xgap) * ix , -y / 2.0 + dy / 2.0 + (dy + Ygap) * iy, 0.0);
+          G4Transform3D tpmt = G4Translate3D(-x / 2.0 + dx / 2.0 + (dx + Xgap) * ix + x0,
+                                             -y / 2.0 + dy / 2.0 + (dy + Ygap) * iy + y0,
+                                             0.0);
 
-          new G4PVPlacement(tpmt, PMT, "TOP.window", stack, false, (ix + 1) + (iy * Npmtx));
-
-          // Next line used for checks only
-          // B2INFO("Module: "<<(ix + 1) + (iy * Npmtx)<<"\t x coordinate:"<<-x / 2.0 + dx / 2.0 + (dx + Xgap) * ix <<"\t y-coordinate"<< -y / 2.0 + dy / 2.0 + (dy + Ygap) * iy);
+          new G4PVPlacement(tpmt, PMT, "TOP.window", stack, false,
+                            (ix + 1) + (iy * Npmtx));
 
         }
       }

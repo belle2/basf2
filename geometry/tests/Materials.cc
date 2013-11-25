@@ -16,10 +16,10 @@ using namespace std;
 namespace Belle2 {
   namespace geometry {
 
+    /** Check that we can find hydrogen and that the basic Parameters are correct.
+     */
     TEST(Materials, Element)
     {
-      //Check that we can find hydrogen and that the basic Parameters
-      //are correct.
       Materials& m = Materials::getInstance();
       G4Element* e1 = m.getElement("H");
       ASSERT_TRUE(e1);
@@ -28,10 +28,11 @@ namespace Belle2 {
       EXPECT_EQ(1., e1->GetZ());
     }
 
+    /** Check if we find the Air Material which is named G4_AIR in Geant4
+     *  So check if Air and G4_AIR refer to the same material
+     */
     TEST(Materials, Material)
     {
-      //Check if we find the Air Material which is named G4_AIR in Geant4
-      //So check if Air and G4_AIR refer to the same material
       G4Material* m1 = Materials::get("Air");
       G4Material* m2 = Materials::get("G4_AIR");
       EXPECT_EQ(m1, m2);
@@ -40,11 +41,11 @@ namespace Belle2 {
       EXPECT_TRUE(Materials::get("Si"));
     }
 
+    /** Check creation of a simple mixture with fractions of other materials
+     *  The density of the new material should be equal to the weighted sum of the original densities
+     */
     TEST(Materials, Create)
     {
-      //Check creation of a simple mixture with fractions of other materials
-      //The density of the new material should be equal to the weighted sum
-      //of the original densities
       Gearbox& gb = Gearbox::getInstance();
       vector<string> backends;
       backends.push_back("string:<Material name='Test'><state>Gas</state><Components>"
@@ -66,10 +67,10 @@ namespace Belle2 {
       gb.close();
     }
 
+    /** When adding elements one has to specify a density since elements do not have a density
+     */
     TEST(Materials, CreateDensityError)
     {
-      //When adding elements one has to specify a density since elements do not
-      //have a density
       Gearbox& gb = Gearbox::getInstance();
       vector<string> backends;
       backends.push_back("string:<Material name='Test1'><state>Solid</state><Components>"
@@ -85,9 +86,10 @@ namespace Belle2 {
       gb.close();
     }
 
+    /** Same as above, but with density so it should work
+     */
     TEST(Materials, CreateDensity)
     {
-      //Same as above, but with density so it should work
       Gearbox& gb = Gearbox::getInstance();
       vector<string> backends;
       backends.push_back("string:<Material name='Test2'><state>Liquid</state><density>1</density><Components>"
@@ -103,9 +105,10 @@ namespace Belle2 {
       gb.close();
     }
 
+    /** When adding unknown materials we should get NULL
+     */
     TEST(Materials, CreateMaterialError)
     {
-      //When adding unknown materials we should get NULL
       Gearbox& gb = Gearbox::getInstance();
       vector<string> backends;
       backends.push_back("string:<Material name='Test3'><Components>"
@@ -120,9 +123,10 @@ namespace Belle2 {
       gb.close();
     }
 
+    /** When adding unknown elements we should get NULL
+     */
     TEST(Materials, CreateElementError)
     {
-      //When adding unknown elements we should get NULL
       Gearbox& gb = Gearbox::getInstance();
       vector<string> backends;
       backends.push_back("string:<Material name='Test4'><density>1</density><Components>"
@@ -137,6 +141,8 @@ namespace Belle2 {
       gb.close();
     }
 
+    /** Check the OpticalSurface setting
+     */
     TEST(Materials, OpticalSurface)
     {
       Gearbox& gb = Gearbox::getInstance();
@@ -177,6 +183,8 @@ namespace Belle2 {
       EXPECT_FALSE(surf5);
     }
 
+    /** Check the material properties (need to be checked)
+     */
     TEST(Materials, Properties)
     {
       Gearbox& gb = Gearbox::getInstance();

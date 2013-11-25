@@ -59,10 +59,10 @@ int main(int argc, char** argv)
       DBRecordList& ret(db->loadRecords());
       for (size_t i = 0; i < ret.size(); i++) {
         data->setSQLValues(ret[i].getFieldNames(), ret[i].getFieldValues());
-        std::cout << data->getName() << " "
-                  << ret[i].getFieldValueInt("record_time") << " "
-                  << (int)data->getByte("status") << " "
-                  << data->getInt32("voltage_mon") << " "
+        std::cout << data->getName() << ","
+                  << ret[i].getFieldValueInt("record_time") << ","
+                  << (int)data->getByte("status") << ","
+                  << data->getInt32("voltage_mon") << ","
                   << data->getInt32("voltage_mon") << std::endl;
       }
     } catch (const DBHandlerException& e) {}

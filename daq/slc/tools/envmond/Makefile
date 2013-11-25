@@ -39,6 +39,7 @@ DEPS   = $(SRCS:$(SRCDIR)/%.cc=$(TMPDIR)/%.d)
 OBJS   = $(SRCS:$(SRCDIR)/%.cc=$(TMPDIR)/%.o)
 
 all: $(TARGETS)
+	@ install -m 755 -p ./bin/*d $(BELLE2_DAQ_SLC_DIR)/bin
 
 force:
 	@ $(RM) $(BINDIR)/*

@@ -8,7 +8,9 @@
   <dGlue desc="Thickness of glue+filter btw. PMTs and wedge" unit="mm">2.5</dGlue>
   <glueMaterial>PMTGlue</glueMaterial>
   <stackMaterial>TOPAir</stackMaterial>
-    
+  <offsetX desc="PMT array offset in x" unit="mm">0.0</offsetX>
+  <offsetY desc="PMT array offset in y" unit="mm">0.0</offsetY>
+
   <Module> 
     <wallMaterial>TOPPMTCase</wallMaterial>
     <fillMaterial>TOPVacuum</fillMaterial>

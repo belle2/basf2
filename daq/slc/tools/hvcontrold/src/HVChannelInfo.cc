@@ -17,8 +17,8 @@ HVChannelInfo::HVChannelInfo(unsigned int crate, unsigned int slot, unsigned int
   addUInt("rampup_speed", 0);
   addUInt("rampdown_speed", 0);
   addUInt("voltage_demand", 0);
-  addUInt("voltage_limit", 0);
-  addUInt("current_limit", 0);
+  addUInt("voltage_limit", 0xFFFF);
+  addUInt("current_limit", 0xFFFF);
 }
 
 HVChannelInfo::~HVChannelInfo() throw()

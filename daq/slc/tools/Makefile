@@ -1,9 +1,10 @@
 .PHONY: all full clean
 
 all:
-	make -C runcontrold
-	make -C cprcontrold
-	make -C rocontrold
+#	make -C runcontrold
+#	make -C cprcontrold
+#	make -C rocontrold
+	make -C hvcontrold
 	make -C envmond
 	make -C javalib
 

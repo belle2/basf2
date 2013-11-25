@@ -309,9 +309,11 @@ void RunControlMessageManager::downloadConfig(const Command& cmd, int version) t
     for (size_t i = 0; i < node_v.size(); i++) {
       NSMNode* node = node_v[i];
       if (node->getData() != NULL) {
+        /*
         std::ofstream fout((config.get("CONFIG_FILE_DIR") + "/" + node->getName()).c_str());
-        fout << node->getData()->getValueString() << std::endl;
+        fout << node->getData()->getText() << std::endl;
         fout.close();
+        */
       }
     }
     try {

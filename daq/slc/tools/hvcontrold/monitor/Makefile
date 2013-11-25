@@ -32,12 +32,13 @@ clean:
 	@ rm -rf *~ */*~ */*/*~ \#*\#* */\#*\#*
 
 $(OBJS): $(TMPDIR)/%.o : $(SRCDIR)/%.cc 
+	@ if [ ! -d $(TMPDIR) ];then mkdir $(TMPDIR); fi
 	@ echo '<< compiling $@ >>'
 	@ $(CXX) -c $(CFLAGS) $< -o  $@
 
 $(LIBTARGET) : $(OBJS)
 	@ echo "<< creating $@ >>"
-	@ if [ ! -d $(LIBDIR) ];then $(MKDIR) $(LIBDIR); fi
+	@ if [ ! -d $(LIBDIR) ];then mkdir $(LIBDIR); fi
 	@ $(CXX) -shared $(CFLAGS) $^ -o $@ $(LIBS)
 	@ echo "<< compiling succeede!! >>"
 	@ $(RM) *~ */*~ */*/*~ */*/*/*~ */*/*/*/*~ \#*\#* */\#*\#*

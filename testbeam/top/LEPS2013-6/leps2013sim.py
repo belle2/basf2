@@ -12,6 +12,7 @@ from basf2 import *
 #   y = -y(LEPS)
 #   z = x(LEPS)
 #
+
 # beam definition for experiment 2 (cosTheta=0.0)
 
 beam02 = {
@@ -21,13 +22,13 @@ beam02 = {
     'momentumGeneration': 'normal',
     'momentumParams': [2.12, 0.21],
     'thetaGeneration': 'normal',
-    'thetaParams': [89.83, 0],
+    'thetaParams': [90.525, 0],
     'phiGeneration': 'normal',
     'phiParams': [0, 0],
     'vertexGeneration': 'normal',
     'xVertexParams': [0, 0],
-    'yVertexParams': [-0.4, 0.5],
-    'zVertexParams': [122.84, 0.5],
+    'yVertexParams': [0.5, 0.5],
+    'zVertexParams': [125.25, 0.5],
     }
 
 # beam definition for experiment 3 (cosTheta=0.43)
@@ -39,13 +40,13 @@ beam03 = {
     'momentumGeneration': 'normal',
     'momentumParams': [2.12, 0.21],
     'thetaGeneration': 'normal',
-    'thetaParams': [64.5849, 0],
+    'thetaParams': [64.80, 0],
     'phiGeneration': 'normal',
-    'phiParams': [0, 0],
+    'phiParams': [0.024, 0],
     'vertexGeneration': 'normal',
     'xVertexParams': [0, 0],
-    'yVertexParams': [0, 0.5],
-    'zVertexParams': [55.52, 0.5],
+    'yVertexParams': [1.31, 0.5],
+    'zVertexParams': [55.40, 0.5],
     }
 
 # beam definition for experiment 4 (cosTheta=0.36)
@@ -57,13 +58,13 @@ beam04 = {
     'momentumGeneration': 'normal',
     'momentumParams': [2.12, 0.21],
     'thetaGeneration': 'normal',
-    'thetaParams': [69.1649, 0],
+    'thetaParams': [68.35, 0],
     'phiGeneration': 'normal',
-    'phiParams': [0, 0],
+    'phiParams': [0.90, 0],
     'vertexGeneration': 'normal',
     'xVertexParams': [0, 0],
-    'yVertexParams': [-19.9, 0.5],
-    'zVertexParams': [65.73, 0.5],
+    'yVertexParams': [-19.90, 0.5],
+    'zVertexParams': [63.80, 0.5],
     }
 
 # specify here the beam setup, number of events to simulate and output file

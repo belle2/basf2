@@ -576,19 +576,19 @@ namespace Belle2 {
       //---------------------------
 
       //neutron shield (poly)
-      logi_polyShieldL->SetSensitiveDetector(new BkgSensitiveDetector("IR", 1));
-      logi_polyShieldR->SetSensitiveDetector(new BkgSensitiveDetector("IR", 2));
+      logi_polyShieldL->SetSensitiveDetector(new BkgSensitiveDetector("IR", 1001));
+      logi_polyShieldR->SetSensitiveDetector(new BkgSensitiveDetector("IR", 1002));
 
       //additional neutron shield (concrete)
-      logi_ConcreteShieldL->SetSensitiveDetector(new BkgSensitiveDetector("IR", 3));
-      logi_ConcreteShieldR->SetSensitiveDetector(new BkgSensitiveDetector("IR", 4));
+      logi_ConcreteShieldL->SetSensitiveDetector(new BkgSensitiveDetector("IR", 1003));
+      logi_ConcreteShieldR->SetSensitiveDetector(new BkgSensitiveDetector("IR", 1004));
 
       //gate shield (concrete)
-      //logi_GateShield->SetSensitiveDetector(new BkgSensitiveDetector("IR", 5));
+      //logi_GateShield->SetSensitiveDetector(new BkgSensitiveDetector("IR", 1005));
 
       //virtual material outsire gate-shield
       if (radiation_study) {
-        logi_Tube->SetSensitiveDetector(new BkgSensitiveDetector("IR", 6));
+        logi_Tube->SetSensitiveDetector(new BkgSensitiveDetector("IR", 1006));
       }
 
     }

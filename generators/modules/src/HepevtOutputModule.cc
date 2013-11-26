@@ -4,7 +4,7 @@
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Andreas Moll                                             *
- *                                                                        *
+ * Updated by R. Godang 11/26/13                                          *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
@@ -34,7 +34,7 @@ REG_MODULE(HepevtOutput)
 HepevtOutputModule::HepevtOutputModule() : Module()
 {
   //Set module properties
-  setDescription("Hepevt file output");
+  setDescription("HepEvt file output. This module loads an event record from the MCParticle collection and store the content back into the HEPEVT format. HEPEVT format is a standard event record format to contain an event record in a Monte Carlo-independent format.");
 
   //Parameter definition
   addParam("OutputFilename", m_filename, "The filename of the output file");

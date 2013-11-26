@@ -78,6 +78,8 @@ void benchmarkSteeringFiles()
       std::cout << "size : " << times_ms.size() << "\n";
     const double average = sum / times_ms.size();
     bench->Fill(average, sqrt(squares / times_ms.size() - average * average) / (times_ms.size() - 1));
+    bench->SetAlias("Description", TString::Format("Measures average runtime of the '%s' test over %d runs", files[iFile], nRuns));
+    bench->SetAlias("Check", "Increases in runtime could indicate performance regressions in the framework.");
     bench->Write();
   }
 

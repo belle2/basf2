@@ -216,24 +216,31 @@ main(int argc, char* argv[])
   unsigned short merger_port;
 
 
+  if (argc < 3) {
+    printf("hltout2merger : mergerhost mergerport\n");
+    exit(-1);
+  }
+
   /* environmental variable check */
   {
     char* p;
-
-    p = getenv("ROI_MERGER_HOST");
+    p = argv[1];
+    //    p = getenv("ROI_MERGER_HOST");
     if (!p) {
       fprintf(stderr, "%s:%d: main(): export \"ROI_MERGER_HOST\"\n", __FILE__, __LINE__);
       exit(1);
     }
     strcpy(merger_host, p);
 
-    p = getenv("ROI_MERGER_PORT");
+    p = argv[2];
+    //    p = getenv("ROI_MERGER_PORT");
     if (!p) {
       fprintf(stderr, "%s:%d: main(): export \"ROI_MERGER_PORT\"\n", __FILE__, __LINE__);
       exit(1);
     }
     merger_port = atoi(p);
   }
+
 
   /* initialization */
   {

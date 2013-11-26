@@ -263,27 +263,34 @@ main(int argc, char* argv[])
      const unsigned short onsen_port = 24; */
   unsigned short accept_port[MM_MAX_HLTOUT];
 
+  if (argc < 4) {
+    printf("merger_merge : onsenhost onsenport clientpots\n");
+    exit(-1);
+  }
 
   /* environmental variable check */
   {
     char* p;
     size_t n_ports;
 
-    p = getenv("ROI_ONSEN_HOST");
+    p = argv[1];
+    //    p = getenv("ROI_ONSEN_HOST");
     if (!p) {
       fprintf(stderr, "%s:%d: main(): export \"ROI_ONSEN_HOST\"\n", __FILE__, __LINE__);
       exit(1);
     }
     strcpy(onsen_host, p);
 
-    p = getenv("ROI_ONSEN_PORT");
+    p = argv[2];
+    //    p = getenv("ROI_ONSEN_PORT");
     if (!p) {
       fprintf(stderr, "%s:%d: main(): export \"ROI_ONSEN_PORT\"\n", __FILE__, __LINE__);
       exit(1);
     }
     onsen_port = atoi(p);
 
-    p = getenv("ROI_CLIENT_PORTS");
+    p = argv[3];
+    //    p = getenv("ROI_CLIENT_PORTS");
     if (!p) {
       fprintf(stderr, "%s:%d: main(): export \"ROI_CLIENT_PORTS\"\n", __FILE__, __LINE__);
       exit(1);

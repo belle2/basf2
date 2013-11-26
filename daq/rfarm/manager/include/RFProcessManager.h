@@ -15,6 +15,9 @@
 #include <sys/types.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+
 
 namespace Belle2 {
 

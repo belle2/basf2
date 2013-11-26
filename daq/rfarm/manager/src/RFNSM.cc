@@ -17,6 +17,8 @@ extern "C" void nsmlib_debuglevel(int);
 // Global variable to contain server instance
 RFServerBase* g_nsmserver = 0;
 
+RFNSM_Status* RFNSM_Status::s_instance = 0;
+
 // Constructor / Destructor
 RFNSM::RFNSM(char* nodename, RFServerBase* server)
 {
@@ -45,6 +47,10 @@ RFNSM::RFNSM(char* nodename, RFServerBase* server)
     fprintf(stderr, "RFNSM : %s hooking CONFIGURE failed, %s\n",
             m_nodename.c_str(), b2nsm_strerror());
   }
+  if (b2nsm_callback("RF_UNCONFIGURE", m_UnConfigure) < 0) {
+    fprintf(stderr, "RFNSM : %s hooking UNCONFIGURE failed, %s\n",
+            m_nodename.c_str(), b2nsm_strerror());
+  }
   if (b2nsm_callback("RF_START", m_Start) < 0) {
     fprintf(stderr, "RFNSM : %s hooking START failed, %s\n",
             m_nodename.c_str(), b2nsm_strerror());
@@ -67,6 +73,16 @@ RFNSM::RFNSM(char* nodename, RFServerBase* server)
   }
   if (b2nsm_callback("RF_STATUS", m_Status) < 0) {
     fprintf(stderr, "RFNSM : %s hooking STATUS failed, %s\n",
+            m_nodename.c_str(), b2nsm_strerror());
+  }
+
+  // Hook communication functions
+  if (b2nsm_callback("OK", m_OK) < 0) {
+    fprintf(stderr, "RFNSM : %s hooking OK failed, %s\n",
+            m_nodename.c_str(), b2nsm_strerror());
+  }
+  if (b2nsm_callback("ERROR", m_ERROR) < 0) {
+    fprintf(stderr, "RFNSM : %s hooking ERROR failed, %s\n",
             m_nodename.c_str(), b2nsm_strerror());
   }
 }
@@ -94,38 +110,93 @@ void RFNSM::AllocMem(char* format)
 // Wrapper functions to be hooked to NSM
 void RFNSM::m_Configure(NSMmsg* msg, NSMcontext* ctx)
 {
-  g_nsmserver->Configure(msg, ctx);
+  int stat = g_nsmserver->Configure(msg, ctx);
+  if (stat == 0)
+    b2nsm_ok(msg, "Configured", NULL);
+  else
+    b2nsm_error(msg, NULL);
+}
+
+void RFNSM::m_UnConfigure(NSMmsg* msg, NSMcontext* ctx)
+{
+  int stat = g_nsmserver->UnConfigure(msg, ctx);
+  if (stat == 0)
+    b2nsm_ok(msg, "Unconfigured", NULL);
+  else
+    b2nsm_error(msg, NULL);
 }
 
 void RFNSM::m_Start(NSMmsg* msg, NSMcontext* ctx)
 {
-  g_nsmserver->Start(msg, ctx);
+  int stat = g_nsmserver->Start(msg, ctx);
+  if (stat == 0)
+    b2nsm_ok(msg, "Running", NULL);
+  else
+    b2nsm_error(msg, NULL);
 }
 
 void RFNSM::m_Stop(NSMmsg* msg, NSMcontext* ctx)
 {
-  g_nsmserver->Stop(msg, ctx);
+  int stat = g_nsmserver->Stop(msg, ctx);
+  if (stat == 0)
+    b2nsm_ok(msg, "Running", NULL);
+  else
+    b2nsm_error(msg, NULL);
 }
 
 void RFNSM::m_Pause(NSMmsg* msg, NSMcontext* ctx)
 {
-  g_nsmserver->Pause(msg, ctx);
+  int stat = g_nsmserver->Pause(msg, ctx);
+  if (stat == 0)
+    b2nsm_ok(msg, "Idle", NULL);
+  else
+    b2nsm_error(msg, NULL);
 }
 
 void RFNSM::m_Resume(NSMmsg* msg, NSMcontext* ctx)
 {
-  g_nsmserver->Resume(msg, ctx);
+  int stat = g_nsmserver->Resume(msg, ctx);
+  if (stat == 0)
+    b2nsm_ok(msg, "Running", NULL);
+  else
+    b2nsm_error(msg, NULL);
 }
 
 void RFNSM::m_Restart(NSMmsg* msg, NSMcontext* ctx)
 {
-  g_nsmserver->Restart(msg, ctx);
+  int stat = g_nsmserver->Restart(msg, ctx);
+  if (stat == 0)
+    b2nsm_ok(msg, "Configured", NULL);
+  else
+    b2nsm_error(msg, NULL);
 }
 
 void RFNSM::m_Status(NSMmsg* msg, NSMcontext* ctx)
 {
-  g_nsmserver->Status(msg, ctx);
+  int stat = g_nsmserver->Status(msg, ctx);
+  if (stat == 0)
+    b2nsm_ok(msg, "Status", NULL);
+  else
+    b2nsm_error(msg, NULL);
+
 }
+
+// Function to handle execution status
+void RFNSM::m_OK(NSMmsg* msg, NSMcontext* ctx)
+{
+  RFNSM_Status& rfs = RFNSM_Status::Instance();
+  int flag = rfs.get_flag();
+  flag++;
+  rfs.set_flag(flag);
+  //  printf ( "OK received. flag set to %d\n", flag );
+}
+
+void RFNSM::m_ERROR(NSMmsg* msg, NSMcontext* ctx)
+{
+  RFNSM_Status::Instance().set_flag(-1);
+  //  printf ( "ERROR received. m_flag set to -1\n" );
+}
+
 
 // Interface to Node Info
 
@@ -134,4 +205,31 @@ RfNodeInfo* RFNSM::GetNodeInfo()
   return m_info;
 }
 
+// RFNSM_Status implementation
+
+RFNSM_Status::RFNSM_Status()
+{
+}
+
+RFNSM_Status::~RFNSM_Status()
+{
+}
+
+RFNSM_Status& RFNSM_Status::Instance()
+{
+  if (!s_instance) {
+    s_instance = new RFNSM_Status;
+  }
+  return *s_instance;
+}
+
+void RFNSM_Status::set_flag(int val)
+{
+  m_flag = val;
+}
+
+int RFNSM_Status::get_flag()
+{
+  return m_flag;
+}
 

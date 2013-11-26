@@ -13,7 +13,7 @@
 // State transition of RFARM
 //      "configure"    "start"   "pause"
 //  OFFLINE<->CONFIGURED<->RUNNING<->PAUSE
-//    ^                         "resume"
+//    ^ "unconfigure"            "resume"
 //    +---------"restart"
 //
 #define RFSTATE_OFFLINE 0
@@ -27,6 +27,8 @@
 #include <string>
 #include <stdio.h>
 #include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 
 #include "nsm2/nsm2.h"
 #include "nsm2/belle2nsm.h"
@@ -36,8 +38,23 @@
 
 namespace Belle2 {
 
-  // Class to interface to NSM
+  // Class to handle global reference to status
+  class RFNSM_Status {
+  public:
+    RFNSM_Status();
+    ~RFNSM_Status();
 
+    static RFNSM_Status& Instance();
+
+    void set_flag(int);
+    int get_flag();
+
+  private:
+    int m_flag;
+    static RFNSM_Status* s_instance;
+  };
+
+  // Class to interface to NSM
   class RFNSM {
   public:
     RFNSM(char* nodename, RFServerBase*);
@@ -54,12 +71,17 @@ namespace Belle2 {
 
     // Wrappers to be called from NSM
     static void m_Configure(NSMmsg*, NSMcontext*);
+    static void m_UnConfigure(NSMmsg*, NSMcontext*);
     static void m_Start(NSMmsg*, NSMcontext*);
     static void m_Stop(NSMmsg*, NSMcontext*);
     static void m_Pause(NSMmsg*, NSMcontext*);
     static void m_Resume(NSMmsg*, NSMcontext*);
     static void m_Restart(NSMmsg*, NSMcontext*);
     static void m_Status(NSMmsg*, NSMcontext*);
+
+    // Functions to receive response from function call
+    static void m_OK(NSMmsg*, NSMcontext*);
+    static void m_ERROR(NSMmsg*, NSMcontext*);
 
   };
 };

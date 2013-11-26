@@ -17,13 +17,14 @@ namespace Belle2 {
     RFServerBase() {};
     ~RFServerBase() {};
 
-    virtual void Configure(NSMmsg*, NSMcontext*) {};
-    virtual void Start(NSMmsg*, NSMcontext*) {};
-    virtual void Stop(NSMmsg*, NSMcontext*) {};
-    virtual void Pause(NSMmsg*, NSMcontext*) {};
-    virtual void Resume(NSMmsg*, NSMcontext*) {};
-    virtual void Restart(NSMmsg*, NSMcontext*) {};
-    virtual void Status(NSMmsg*, NSMcontext*) {};
+    virtual int Configure(NSMmsg*, NSMcontext*) { return 0; };
+    virtual int UnConfigure(NSMmsg*, NSMcontext*) { return 0; };
+    virtual int Start(NSMmsg*, NSMcontext*) { return 0; };
+    virtual int Stop(NSMmsg*, NSMcontext*) { return 0; };
+    virtual int Pause(NSMmsg*, NSMcontext*) { return 0; };
+    virtual int Resume(NSMmsg*, NSMcontext*) { return 0; };
+    virtual int Restart(NSMmsg*, NSMcontext*) { return 0; };
+    virtual int Status(NSMmsg*, NSMcontext*) { return 0; };
 
     virtual void SetNodeInfo(RfNodeInfo* ptr) {
       m_nsmmem = ptr;

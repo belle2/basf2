@@ -8,6 +8,9 @@
 // Date : 31 - Jul - 2013
 //-
 
+#include <sys/types.h>
+#include <sys/wait.h>
+
 #include "daq/rfarm/manager/RFConf.h"
 #include "daq/rfarm/manager/RFSharedMem.h"
 #include "daq/rfarm/manager/RFProcessManager.h"
@@ -23,10 +26,11 @@ namespace Belle2 {
     ~RFMaster();
 
     // Functions to be hooked to NSM
-    void Configure(NSMmsg*, NSMcontext*);
-    void Start(NSMmsg*, NSMcontext*);
-    void Stop(NSMmsg*, NSMcontext*);
-    void Restart(NSMmsg*, NSMcontext*);
+    int Configure(NSMmsg*, NSMcontext*);
+    int UnConfigure(NSMmsg*, NSMcontext*);
+    int Start(NSMmsg*, NSMcontext*);
+    int Stop(NSMmsg*, NSMcontext*);
+    int Restart(NSMmsg*, NSMcontext*);
 
     // Server function
     void monitor_loop();

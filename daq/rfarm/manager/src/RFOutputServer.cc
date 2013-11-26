@@ -64,7 +64,7 @@ RFOutputServer::~RFOutputServer()
 
 // Functions hooked up by NSM2
 
-void RFOutputServer::Configure(NSMmsg*, NSMcontext*)
+int RFOutputServer::Configure(NSMmsg*, NSMcontext*)
 {
   // Start processes from down stream
 
@@ -131,18 +131,50 @@ void RFOutputServer::Configure(NSMmsg*, NSMcontext*)
       m_nnodes++;
     }
   }
+  return 0;
 }
 
-void RFOutputServer::Start(NSMmsg*, NSMcontext*)
+int RFOutputServer::UnConfigure(NSMmsg*, NSMcontext*)
 {
+  //  system("killall sock2rbr rb2sockr basf2 hrelay hserver");
+
+  printf("m_pid_sender = %d\n", m_pid_sender);
+  printf("m_pid_basf2 = %d\n", m_pid_basf2);
+  fflush(stdout);
+  int status;
+  printf("killing sender %d\n", m_pid_sender);
+  kill(m_pid_sender, SIGINT);
+  int ws = waitpid(m_pid_sender, &status, 0);
+  printf("wait return = %d, status = %d\n", ws, status);
+
+  printf("killing sender %d\n", m_pid_sender);
+  kill(m_pid_basf2, SIGINT);
+  waitpid(m_pid_basf2, &status, 0);
+  printf("wait return = %d, status = %d\n", ws, status);
+
+  for (int i = 0; i < m_nnodes; i++) {
+    printf("killing receiver %d\n", m_pid_receiver[i]);
+    kill(m_pid_receiver[i], SIGINT);
+    ws = waitpid(m_pid_receiver[i], &status, 0);
+    printf("wait return = %d, status = %d\n", ws, status);
+  }
+  printf("Unconfigure done\n");
+  fflush(stdout);
+  return 0;
 }
 
-void RFOutputServer::Stop(NSMmsg*, NSMcontext*)
+int RFOutputServer::Start(NSMmsg*, NSMcontext*)
 {
+  return 0;
+}
+
+int RFOutputServer::Stop(NSMmsg*, NSMcontext*)
+{
+  return 0;
 }
 
 
-void RFOutputServer::Restart(NSMmsg*, NSMcontext*)
+int RFOutputServer::Restart(NSMmsg*, NSMcontext*)
 {
   printf("RFOutputServer : Restarting!!!!!!\n");
   /* Original Impl
@@ -151,14 +183,16 @@ void RFOutputServer::Restart(NSMmsg*, NSMcontext*)
   for (int i = 0; i < m_nnodes; i++) {
     kill(m_pid_receiver[i], SIGINT);
   }
-  */
   // Simple Implementation
   system("killall sock2rbr rb2sockr basf2 hrelay hserver");
   fflush(stdout);
-  sleep(2);
+  */
   NSMmsg* nsmmsg = NULL;
   NSMcontext* nsmcontext = NULL;
+  RFOutputServer::UnConfigure(nsmmsg, nsmcontext);
+  sleep(2);
   RFOutputServer::Configure(nsmmsg, nsmcontext);
+  return 0;
 }
 
 // Server function

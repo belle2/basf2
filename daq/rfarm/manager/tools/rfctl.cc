@@ -96,6 +96,7 @@ xlogtime(char* buf)
 
   gettimeofday(&now, 0);
   cur = localtime((time_t*)&now.tv_sec);
+  /*
   if (lastday != cur->tm_yday) {
     char datebuf[128];
     lastday = cur->tm_yday;
@@ -106,6 +107,7 @@ xlogtime(char* buf)
             cur->tm_year + 1900, cur->tm_mon + 1, cur->tm_mday);
     xprintlog(datebuf);
   }
+  */
   sprintf(buf, "%02d:%02d:%02d.%03d ",
           cur->tm_hour, cur->tm_min, cur->tm_sec, (int)now.tv_usec / 1000);
 }
@@ -181,7 +183,8 @@ main(int argc, char** argv)
 
   int ret;
 
-  xreopenlog();
+  //  xreopenlog();
+  master_logfp = stdout;
 
   // ARGV check
   if (argc < 2) {
@@ -264,6 +267,12 @@ main(int argc, char** argv)
         printf("usage: config <node>\n");
       } else {
         b2nsm_sendreq(av[1], "RF_CONFIGURE", 0, 0);
+      }
+    } else if (strcasecmp(av[0], "unconfig") == 0) {
+      if (ac < 2) {
+        printf("usage: config <node>\n");
+      } else {
+        b2nsm_sendreq(av[1], "RF_UNCONFIGURE", 0, 0);
       }
     } else if (strcasecmp(av[0], "restart") == 0) {
       if (ac < 2) {

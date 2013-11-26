@@ -42,7 +42,7 @@ RFDqmServer::~RFDqmServer()
 
 // Functions hooked up by NSM2
 
-void RFDqmServer::Configure(NSMmsg*, NSMcontext*)
+int RFDqmServer::Configure(NSMmsg*, NSMcontext*)
 {
   // 1. Run DqmSever
   char* dqmserver = m_conf->getconf("dqmserver", "script");
@@ -51,31 +51,48 @@ void RFDqmServer::Configure(NSMmsg*, NSMcontext*)
 
   m_pid_dqm = m_proc->Execute(dqmserver, port, mapfile);
 
+  return 0;
+
 }
 
-void RFDqmServer::Start(NSMmsg*, NSMcontext*)
+int RFDqmServer::UnConfigure(NSMmsg*, NSMcontext*)
 {
+  //  system("killall hrelay hserver");
+  int status;
+  kill(m_pid_dqm, SIGINT);
+  waitpid(m_pid_dqm, &status, 0);
+  printf("Unconfigre : done\n");
+  return 0;
 }
 
-void RFDqmServer::Stop(NSMmsg*, NSMcontext*)
+int RFDqmServer::Start(NSMmsg*, NSMcontext*)
 {
+  return 0;
+}
+
+int RFDqmServer::Stop(NSMmsg*, NSMcontext*)
+{
+  return 0;
 }
 
 
-void RFDqmServer::Restart(NSMmsg*, NSMcontext*)
+int RFDqmServer::Restart(NSMmsg*, NSMcontext*)
 {
   printf("RFDqmServer : Restarted!!!!!\n");
   /* Original Impl
   if (m_pid_dqm != 0) {
     kill(m_pid_dqm, SIGINT);
   }
-  */
   system("killall hrelay hserver");
   fflush(stdout);
-  sleep(2);
+  */
+
   NSMmsg* nsmmsg = NULL;
   NSMcontext* nsmcontext = NULL;
+  RFDqmServer::UnConfigure(nsmmsg, nsmcontext);
+  sleep(2);
   RFDqmServer::Configure(nsmmsg, nsmcontext);
+  return 0;
 }
 
 // Server function

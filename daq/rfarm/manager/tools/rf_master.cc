@@ -20,6 +20,8 @@ int main(int argc, char** argv)
   //  RFOutputServer& ots = RFOutputServer::Create ( argv[1] );
 
   RFNSM nsm(conf.getconf("master", "nodename"), master);
+  nsm.AllocMem(conf.getconf("system", "nsmdata"));
+  master->SetNodeInfo(nsm.GetNodeInfo());
 
   master->monitor_loop();
 

@@ -77,7 +77,7 @@ RFEventServer& RFEventServer::Instance()
 
 // Functions hooked up by NSM2
 
-void RFEventServer::Configure(NSMmsg*, NSMcontext*)
+int RFEventServer::Configure(NSMmsg*, NSMcontext*)
 {
   // 0. Global parameters
   char* ringbuf = m_conf->getconf("distributor", "ringbuffer");
@@ -128,20 +128,43 @@ void RFEventServer::Configure(NSMmsg*, NSMcontext*)
     m_pid_recv = m_proc->Execute(filein, ringbuf, file, nnodechr);
   }
   // else none
+  return 0;
 }
 
-void RFEventServer::Start(NSMmsg*, NSMcontext*)
+int RFEventServer::UnConfigure(NSMmsg*, NSMcontext*)
+{
+  //  system("killall sock2rbr rb2sockr");
+  int status;
+  if (m_pid_recv != 0) {
+    kill(m_pid_recv, SIGINT);
+    waitpid(m_pid_recv, &status, 0);
+  }
+  for (int i = 0; i < m_nnodes; i++) {
+    if (m_pid_sender[i] != 0) {
+      printf("RFEventServer:: killing sender pid=%d\n", m_pid_sender[i]);
+      kill(m_pid_sender[i], SIGINT);
+      waitpid(m_pid_sender[i], &status, 0);
+    }
+  }
+
+  printf("Unconfigure : done\n");
+  return 0;
+}
+
+int RFEventServer::Start(NSMmsg*, NSMcontext*)
 {
   m_rbufin->clear();
+  return 0;
 }
 
-void RFEventServer::Stop(NSMmsg*, NSMcontext*)
+int RFEventServer::Stop(NSMmsg*, NSMcontext*)
 {
   m_rbufin->clear();
+  return 0;
 }
 
 
-void RFEventServer::Restart(NSMmsg*, NSMcontext*)
+int RFEventServer::Restart(NSMmsg*, NSMcontext*)
 {
   printf("RFEventServer : Restarting!!!!!\n");
   /* Original impl.
@@ -154,15 +177,16 @@ void RFEventServer::Restart(NSMmsg*, NSMcontext*)
       kill(m_pid_sender[i], SIGINT);
     }
   }
-  */
   // Simple implementation
   system("killall sock2rbr rb2sockr");
-
   fflush(stdout);
-  sleep(2);
+  */
   NSMmsg* nsmmsg = NULL;
   NSMcontext* nsmcontext = NULL;
+  RFEventServer::UnConfigure(nsmmsg, nsmcontext);
+  sleep(2);
   RFEventServer::Configure(nsmmsg, nsmcontext);
+  return 0;
 }
 
 // Server function

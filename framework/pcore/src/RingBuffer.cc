@@ -173,7 +173,7 @@ void RingBuffer::dump_db()
 int RingBuffer::insq(const int* buf, int size)
 {
   //  printf ( "insq: requesting : %d, nbuf = %d\n", size, m_bufinfo->nbuf );
-  if (size < 0) {
+  if (size <= 0) {
     printf("RingBuffer::insq : buffer size = %d, not queued.\n", size);
     return -1;
   }

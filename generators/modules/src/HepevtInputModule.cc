@@ -4,7 +4,7 @@
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Martin Ritter, Susanne Koblitz                           *
- *                                                                        *
+ * Updated by R. Godang, 11/25/13                                         *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
@@ -36,7 +36,7 @@ REG_MODULE(HepevtInput)
 HepevtInputModule::HepevtInputModule() : Module(), m_evtNum(-1)
 {
   //Set module properties
-  setDescription("Hepevt file input");
+  setDescription("HepEvt file input. This module loads an event record from HEPEVT format and store the content into the MCParticle collection. HEPEVT format is a standard event record format to contain an event record in a Monte Carlo-independent format.");
   setPropertyFlags(c_Input);
 
   //Parameter definition

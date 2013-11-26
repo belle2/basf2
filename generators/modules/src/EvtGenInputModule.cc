@@ -42,7 +42,8 @@ REG_MODULE(EvtGenInput)
 EvtGenInputModule::EvtGenInputModule() : Module()
 {
   //Set module properties
-  setDescription("EvtGen input");
+  //setDescription("EvtGen input");
+  setDescription("EvtGenInput module. The module is served as an interface for EvtGen Event Generator so that the EvtGen generator can store the generated particles into MCParticles. The users need to provide their own decay mode based on the standard DECAY.DEC.");
   setPropertyFlags(c_Input);
 
   //Parameter definition

@@ -1,4 +1,4 @@
 #! /bin/tcsh
 foreach x (hltes hltos hltwk01 hltwk02 hltwk03)
-  ssh root@$x service nsmd stop
+  ssh root@$x reboot
 end

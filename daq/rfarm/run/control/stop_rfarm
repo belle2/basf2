@@ -1,8 +1,9 @@
 #! /bin/tcsh
-foreach x (02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17)
-  ssh hlttb$x killall rf_eventprocessor basf2 sock2rbr rb2sockr
-  ssh hlttb$x clshm
+foreach x (hltwk01 hltwk02 hltwk03)
+  ssh $x killall rf_eventprocessor basf2 sock2rbr rawsock2rbr rb2sockr hr\
+elay hserver
+  ssh $x killall processor.csh
+  ssh $x ~/bin/clshm
 end
-ssh hltsr01 "killall rf_eventserver sock2rbr rb2sockr; clshm"
-ssh hltsr01 "killall rf_outputserver sock2rbr rb2sockr basf2; clshm"
-ssh hlttb01 "killall rf_master; clshm"
+ssh hltes "killall rf_eventserver sock2rbr rb2sockr rawrb2sockr rawsock2rbr rf_master hserver hrelay rf_dqmserver; ~/bin/clshm"
+ssh hltos "killall rf_outputserver sock2rbr rb2sockr basf2 hrelay hserver collector_basf2.csh rawrb2sockr rf_roisender merger_merge hltout2merger; ~/bin/clshm"

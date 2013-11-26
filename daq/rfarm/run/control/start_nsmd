@@ -1,6 +1,5 @@
 #! /bin/tcsh
-foreach x (02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17)
-  ssh root@hlttb$x service nsmd start
+foreach x (hltes hltos hltwk01 hltwk02 hltwk03)
+  ssh root@$x service nsmd start
+  sleep 1
 end
-ssh root@hlttbsrv service nsmd start
-ssh root@hltsr01 service nsmd start

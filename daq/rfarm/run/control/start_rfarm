@@ -1,8 +1,11 @@
 #! /bin/tcsh
-foreach x (02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17)
-  ssh hlttb$x "cd belle2/daq/rfarm/run;rf_eventprocessor rfarm1.conf > & evp_hlttb$x/nsmlog.log" &
-end
-ssh hltsr01 "cd belle2/daq/rfarm/run;rf_eventserver rfarm1.conf > & collector/nsmlog.log " &
-ssh hltsr01 "cd belle2/daq/rfarm/run;rf_outputserver rfarm1.conf > & distributor/nsmlog.log" &
-ssh hlttbsrv "cd belle2/daq/rfarm/run;setenv NSM2_HOST hlttbsrv; rf_master rfarm1.conf > & master/nsmlog.log" &
+ssh hltwk01 "cd hlt/run; setenv NSM2_HOST cevproc01; rf_eventprocessor rfarm.conf > & evp_hltwk01/nsmlog.log" &
+ssh hltwk02 "cd hlt/run; setenv NSM2_HOST cevproc02; rf_eventprocessor rfarm.conf > & evp_hltwk02/nsmlog.log" &
+ssh hltwk03 "cd hlt/run; setenv NSM2_HOST cevproc03; rf_eventprocessor rfarm.conf > & evp_hltwk03/nsmlog.log" &
 
+ssh hltos "cd hlt/run; setenv NSM2_HOST coutserv; rf_outputserver rfarm.conf > & collector/nsmlog.log " &
+ssh hltes "cd hlt/run; setenv NSM2_HOST cevserv; rf_eventserver rfarm.conf > & distributor/nsmlog.log" &
+ssh hltes "cd hlt/run; setenv NSM2_HOST cevserv; rf_dqmserver rfarm.conf > & dqmserver/nsmlog.log" &
+ssh hltes "cd hlt/run; setenv NSM2_HOST cevserv; rf_master rfarm.conf > & master/nsmlog.log" &
+
+ssh hltos "cd hlt/run; setenv NSM2_HOST coutserv; rf_roisender rfarm.conf > & roisender/nsmlog.log" &

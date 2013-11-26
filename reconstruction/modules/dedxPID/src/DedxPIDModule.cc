@@ -114,8 +114,10 @@ void DedxPIDModule::initialize()
     StoreArray<PXDCluster>::optional();
 
   //register outputs (if needed)
-  if (m_enableDebugOutput)
+  if (m_enableDebugOutput) {
     StoreArray<DedxTrack>::registerPersistent();
+    RelationArray::registerPersistent<Track, DedxTrack>();
+  }
 
   if (!m_pdfFile.empty()) {
     StoreArray<DedxLikelihood>::registerPersistent();
@@ -455,7 +457,8 @@ void DedxPIDModule::event()
       dedxTrack->m_event_id = m_eventID;
       dedxTrack->m_track_id = iTrack;
 
-      dedx_array.appendNew(*dedxTrack);
+      DedxTrack* new_dedxTrack = dedx_array.appendNew(*dedxTrack);
+      track->addRelationTo(new_dedxTrack);
     }
 
     //save DedxLikelihood

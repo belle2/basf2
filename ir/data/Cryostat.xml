@@ -3,16 +3,28 @@
   <Creator library="ir">CryostatCreator</Creator>
   <Content>
 	<TubeR>
-		<N desc="Number of planes">2</N>
+		<N desc="Number of planes">4</N>
 
 		<Z0 unit="cm">63.35</Z0>
-		<Z1 unit="cm">382.15</Z1>
+		<Z1 unit="cm">373.45</Z1>
+		<Z2 unit="cm">373.45</Z2>
+		<!--Z3 unit="cm">398.00</Z3-->
+		<!--Z3 unit="cm">392.00</Z3-->
+		<!--Z3 unit="cm">830.00</Z3-->
+		<Z3 unit="cm">800.00</Z3>
 
-		<R0 unit="cm">100</R0>
-		<R1 unit="cm">100</R1>
+		<R0 unit="cm">75</R0>
+		<R1 unit="cm">75</R1>
+		<R2 unit="cm">75</R2>
+		<R3 unit="cm">75</R3>
+
+		<r0 unit="cm">0</r0>
+		<r1 unit="cm">0</r1>
+		<r2 unit="cm">37</r2>
+		<r3 unit="cm">65</r3>
 	</TubeR>
 
-	<Tube2>
+	<TubeR2>
 		<N desc="Number of planes">2</N>
 
 		<Z0 unit="cm">0</Z0>
@@ -20,16 +32,25 @@
 
 		<R0 unit="cm">18.44</R0>
 		<R1 unit="cm">18.44</R1>
-	</Tube2>
+	</TubeR2>
 
 	<TubeL>
-		<N desc="Number of planes">2</N>
+		<N desc="Number of planes">4</N>
 
 		<Z0 unit="cm">-62.73</Z0>
-		<Z1 unit="cm">-336.1</Z1>
+		<Z1 unit="cm">-321.10</Z1>
+		<Z2 unit="cm">-321.10</Z2>
+		<Z3 unit="cm">-716.10</Z3>
 
-		<R0 unit="cm">100</R0>
-		<R1 unit="cm">100</R1>
+		<R0 unit="cm">75</R0>
+		<R1 unit="cm">75</R1>
+		<R2 unit="cm">75</R2>
+		<R3 unit="cm">75</R3>
+
+		<r0 unit="cm">0</r0>
+		<r1 unit="cm">0</r1>
+		<r2 unit="cm">37</r2>
+		<r3 unit="cm">65</r3>
 	</TubeL>
 
 	<A1spc1>
@@ -111,7 +132,8 @@
 		<R35 unit="cm">4.4</R35>
 		<R36 unit="cm">4.4</R36>
 
-		<Material desc="Right HER Beam pipe space 1">Vacuum</Material>
+		<Material>Vacuum</Material>
+		<Desc>Right HER Beam pipe space 1</Desc>
 	</A1spc1>
 
 	<A1spc2>
@@ -123,10 +145,11 @@
 		<R0 unit="cm">9.3</R0>
 		<R1 unit="cm">9.3</R1>
 
-		<Material desc="Right HER Beam pipe space 2">Vacuum</Material>
+		<Material>Vacuum</Material>
+		<Desc>Right HER Beam pipe space 2</Desc>
 	</A1spc2>
 
-	<A2wal1>
+	<Straight name="A2wal1">
 		<N desc="Number of planes">8</N>
 
 		<Z0 unit="cm">62.05</Z0>
@@ -156,10 +179,16 @@
 		<r6 unit="cm">4.0</r6>
 		<r7 unit="cm">4.0</r7>
 
-		<Material desc="Right HER Beam pipe">Ta</Material>
-	</A2wal1>
+		<Intersect>A1spc1</Intersect>
 
-	<A3wal1>
+		<MotherVolume>A1spc1</MotherVolume>
+
+		<Material>Ta</Material>
+
+		<Desc>Right HER Beam pipe</Desc>
+	</Straight>
+
+	<Straight name="A3wal1">
 		<N desc="Number of planes">14</N>
 
 		<Z0 unit="cm">67.50</Z0>
@@ -207,10 +236,15 @@
 		<r12 unit="cm">4.7</r12>
 		<r13 unit="cm">4.7</r13>
 
-		<Material desc="Vacuum vessel">SUS316L</Material>
-	</A3wal1>
+		<Intersect>A1spc1</Intersect>
 
-	<A3wal2>
+		<MotherVolume>A1spc1</MotherVolume>
+
+		<Material>SUS316L</Material>
+		<Desc>Vacuum vessel</Desc>
+	</Straight>
+
+	<Straight name="A3wal2">
 		<N desc="Number of planes">6</N>
 
 		<Z0 unit="cm">261.30</Z0>
@@ -234,10 +268,13 @@
 		<r4 unit="cm">5.0</r4>
 		<r5 unit="cm">5.0</r5>
 
-		<Material desc="Vacuum vessel">SUS316L</Material>
-	</A3wal2>
+		<MotherVolume>A1spc1</MotherVolume>
 
-	<A4mag1>
+		<Material>SUS316L</Material>
+		<Desc>Vacuum vessel</Desc>
+	</Straight>
+
+	<Straight name="A4mag1">
 		<N desc="Number of planes">2</N>
 
 		<Z0 unit="cm">73.4</Z0>
@@ -249,10 +286,15 @@
 		<r0 unit="cm">2.1</r0>
 		<r1 unit="cm">2.1</r1>
 
-		<Material desc="Magnet">SC_COIL</Material>
-	</A4mag1>
+		<Intersect>A1spc1</Intersect>
 
-	<A4mag2p1>
+		<MotherVolume>A1spc1</MotherVolume>
+
+		<Material>SC_COIL</Material>
+		<Desc>Magnet</Desc>
+	</Straight>
+
+	<Straight name="A4mag2p1">
 		<N desc="Number of planes">2</N>
 
 		<Z0 unit="cm">116.9</Z0>
@@ -264,10 +306,14 @@
 		<r0 unit="cm">2.8</r0>
 		<r1 unit="cm">2.8</r1>
 
-		<Material desc="Magnet 2 part 1">Cryo_G-10</Material>
-	</A4mag2p1>
+		<Intersect>A1spc1</Intersect>
 
-	<A4mag2p2>
+		<MotherVolume>A1spc1</MotherVolume>
+
+		<Material desc="Magnet 2 part 1">Cryo_G-10</Material>
+	</Straight>
+
+	<Straight name="A4mag2p2">
 		<N desc="Number of planes">4</N>
 
 		<Z0 unit="cm">118.3</Z0>
@@ -285,10 +331,15 @@
 		<r2 unit="cm">4.7</r2>
 		<r3 unit="cm">4.7</r3>
 
-		<Material desc="Magnet 2 part 2 iron yoke">Fe</Material>
-	</A4mag2p2>
+		<Intersect>A1spc1</Intersect>
 
-	<A4mag2p3>
+		<MotherVolume>A1spc1</MotherVolume>
+
+		<Material>Fe</Material>
+		<Desc>Magnet 2 part 2 iron yoke</Desc>
+	</Straight>
+
+	<Straight name="A4mag2p3">
 		<N desc="Number of planes">6</N>
 
 		<Z0 unit="cm">118.3</Z0>
@@ -312,10 +363,15 @@
 		<r4 unit="cm">3.3</r4>
 		<r5 unit="cm">3.3</r5>
 
-		<Material desc="Magnet 2 part 3">SUS316L</Material>
-	</A4mag2p3>
+		<Intersect>A1spc1</Intersect>
 
-	<A4mag2p4>
+		<MotherVolume>A1spc1</MotherVolume>
+
+		<Material>SUS316L</Material>
+		<Desc>Magnet 2 part 3</Desc>
+	</Straight>
+
+	<Straight name="A4mag2p4">
 		<N desc="Number of planes">2</N>
 
 		<Z0 unit="cm">119.5</Z0>
@@ -327,10 +383,15 @@
 		<r0 unit="cm">2.8</r0>
 		<r1 unit="cm">2.8</r1>
 
-		<Material desc="Magnet 2 part 4">SC_COIL</Material>
-	</A4mag2p4>
+		<Intersect>A1spc1</Intersect>
 
-	<A4mag3p1>
+		<MotherVolume>A1spc1</MotherVolume>
+
+		<Material>SC_COIL</Material>
+		<Desc>Magnet 2 part 4</Desc>
+	</Straight>
+
+	<Straight name="A4mag3p1">
 		<N desc="Number of planes">2</N>
 
 		<Z0 unit="cm">163.7</Z0>
@@ -342,10 +403,15 @@
 		<r0 unit="cm">6.8</r0>
 		<r1 unit="cm">6.8</r1>
 
-		<Material desc="Magnet 3 part 1">Fe</Material>
-	</A4mag3p1>
+		<Intersect>A1spc1</Intersect>
 
-	<A4mag3p2>
+		<MotherVolume>A1spc1</MotherVolume>
+
+		<Material>Fe</Material>
+		<Desc>Magnet 3 part 1</Desc>
+	</Straight>
+
+	<Straight name="A4mag3p2">
 		<N desc="Number of planes">2</N>
 
 		<Z0 unit="cm">163.7</Z0>
@@ -357,10 +423,15 @@
 		<r0 unit="cm">5.08</r0>
 		<r1 unit="cm">5.08</r1>
 
-		<Material desc="Magnet 3 part 2">SUS316L</Material>
-	</A4mag3p2>
+		<Intersect>A1spc1</Intersect>
 
-	<A4mag4p1>
+		<MotherVolume>A1spc1</MotherVolume>
+
+		<Material>SUS316L</Material>
+		<Desc>Magnet 3 part 2</Desc>
+	</Straight>
+
+	<Straight name="A4mag4p1">
 		<N desc="Number of planes">2</N>
 
 		<Z0 unit="cm">264.10</Z0>
@@ -372,10 +443,13 @@
 		<r0 unit="cm">8.5</r0>
 		<r1 unit="cm">8.5</r1>
 
-		<Material desc="Magnet 4 part 1">Fe</Material>
-	</A4mag4p1>
+		<MotherVolume>A1spc1</MotherVolume>
 
-	<A4mag4p2>
+		<Material>Fe</Material>
+		<Desc>Magnet 4 part 1</Desc>
+	</Straight>
+
+	<Straight name="A4mag4p2">
 		<N desc="Number of planes">2</N>
 
 		<Z0 unit="cm">262.7</Z0>
@@ -387,10 +461,12 @@
 		<r0 unit="cm">5.4</r0>
 		<r1 unit="cm">5.4</r1>
 
-		<Material desc="Magnet 4 part 2">Cryo_G-10</Material>
-	</A4mag4p2>
+		<MotherVolume>A1spc1</MotherVolume>
 
-	<A4mag4p3>
+		<Material desc="Magnet 4 part 2">Cryo_G-10</Material>
+	</Straight>
+
+	<Straight name="A4mag4p3">
 		<N desc="Number of planes">2</N>
 
 		<Z0 unit="cm">264.1</Z0>
@@ -402,10 +478,13 @@
 		<r0 unit="cm">5.4</r0>
 		<r1 unit="cm">5.4</r1>
 
-		<Material desc="Magnet 4 part 3">SUS316L</Material>
-	</A4mag4p3>
+		<MotherVolume>A1spc1</MotherVolume>
 
-	<A4mag4p4>
+		<Material>SUS316L</Material>
+		<Desc>Magnet 4 part 3</Desc>
+	</Straight>
+
+	<Straight name="A4mag4p4">
 		<N desc="Number of planes">2</N>
 
 		<Z0 unit="cm">265.3</Z0>
@@ -417,10 +496,13 @@
 		<r0 unit="cm">5.4</r0>
 		<r1 unit="cm">5.4</r1>
 
-		<Material desc="Magnet 4 part 4">SC_COIL</Material>
-	</A4mag4p4>
+		<MotherVolume>A1spc1</MotherVolume>
 
-	<A4mag4p5>
+		<Material>SC_COIL</Material>
+		<Desc>Magnet 4 part 4</Desc>
+	</Straight>
+
+	<Straight name="A4mag4p5">
 		<N desc="Number of planes">2</N>
 
 		<Z0 unit="cm">318.8</Z0>
@@ -432,10 +514,13 @@
 		<r0 unit="cm">5.4</r0>
 		<r1 unit="cm">5.4</r1>
 
-		<Material desc="Magnet 4 part 5">SUS316L</Material>
-	</A4mag4p5>
+		<MotherVolume>A1spc1</MotherVolume>
 
-	<A4mag4p6>
+		<Material>SUS316L</Material>
+		<Desc>Magnet 4 part 5</Desc>
+	</Straight>
+
+	<Straight name="A4mag4p6">
 		<N desc="Number of planes">2</N>
 
 		<Z0 unit="cm">320.00</Z0>
@@ -447,10 +532,13 @@
 		<r0 unit="cm">5.4</r0>
 		<r1 unit="cm">5.4</r1>
 
-		<Material desc="Magnet 4 part 6">Cryo_Liq_He</Material>
-	</A4mag4p6>
+		<MotherVolume>A1spc1</MotherVolume>
 
-	<A4mag4p7>
+		<Material>Cryo_Liq_He</Material>
+		<Desc>Magnet 4 part 6</Desc>
+	</Straight>
+
+	<Straight name="A4mag4p7">
 		<N desc="Number of planes">6</N>
 
 		<Z0 unit="cm">264.10</Z0>
@@ -474,10 +562,13 @@
 		<r4 unit="cm">7.6</r4>
 		<r5 unit="cm">7.6</r5>
 
-		<Material desc="Magnet 4 part 7">SUS316L</Material>
-	</A4mag4p7>
+		<MotherVolume>A1spc1</MotherVolume>
 
-	<A4mag4p8>
+		<Material>SUS316L</Material>
+		<Desc>Magnet 4 part 7</Desc>
+	</Straight>
+
+	<Straight name="A4mag4p8">
 		<N desc="Number of planes">2</N>
 
 		<Z0 unit="cm">264.59</Z0>
@@ -489,10 +580,13 @@
 		<r0 unit="cm">8.0</r0>
 		<r1 unit="cm">8.0</r1>
 
-		<Material desc="Magnet 4 part 8">SC_COIL</Material>
-	</A4mag4p8>
+		<MotherVolume>A1spc1</MotherVolume>
 
-	<A4mag4p9>
+		<Material>SC_COIL</Material>
+		<Desc>Magnet 4 part 8</Desc>
+	</Straight>
+
+	<Straight name="A4mag4p9">
 		<N desc="Number of planes">2</N>
 
 		<Z0 unit="cm">264.59</Z0>
@@ -504,8 +598,11 @@
 		<r0 unit="cm">8.2</r0>
 		<r1 unit="cm">8.2</r1>
 
-		<Material desc="Magnet 4 part 9">Cryo_Epoxy</Material>
-	</A4mag4p9>
+		<MotherVolume>A1spc1</MotherVolume>
+
+		<Material>Cryo_Epoxy</Material>
+		<Desc>Magnet 4 part 9</Desc>
+	</Straight>
 
 	<B1spc1>
 		<N desc="Number of planes">28</N>
@@ -568,7 +665,8 @@
 		<R26 unit="cm">4.4</R26>
 		<R27 unit="cm">4.4</R27>
 
-		<Material desc="Right LER Beam pipe space 1">Vacuum</Material>
+		<Material>Vacuum</Material>
+		<Desc>Right LER Beam pipe space 1</Desc>
 	</B1spc1>
 
 	<B1spc2>
@@ -580,10 +678,11 @@
 		<R0 unit="cm">9.3</R0>
 		<R1 unit="cm">9.3</R1>
 
-		<Material desc="Right LER Beam pipe space 2">Vacuum</Material>
+		<Material>Vacuum</Material>
+		<Desc>Right LER Beam pipe space 2</Desc>
 	</B1spc2>
 
-	<B2wal1>
+	<Straight name="B2wal1">
 		<N desc="Number of planes">10</N>
 
 		<Z0 unit="cm">62.05</Z0>
@@ -619,10 +718,15 @@
 		<r8 unit="cm">4.0</r8>
 		<r9 unit="cm">4.0</r9>
 
-		<Material desc="Right LER Beam pipe">Ta</Material>
-	</B2wal1>
+		<Intersect>B1spc1</Intersect>
 
-	<B3wal1>
+		<MotherVolume>B1spc1</MotherVolume>
+
+		<Material>Ta</Material>
+		<Desc>Right LER Beam pipe</Desc>
+	</Straight>
+
+	<Straight name="B3wal1">
 		<N desc="Number of planes">11</N>
 
 		<Z0 unit="cm">67.50</Z0>
@@ -661,10 +765,15 @@
 		<r9 unit="cm">4.5</r9>
 		<r10 unit="cm">4.5</r10>
 
-		<Material desc="Vacuum vessel">SUS316L</Material>
-	</B3wal1>
+		<Intersect>B1spc1</Intersect>
 
-	<B3wal2>
+		<MotherVolume>B1spc1</MotherVolume>
+
+		<Material>SUS316L</Material>
+		<Desc>Vacuum vessel</Desc>
+	</Straight>
+
+	<Straight name="B3wal2">
 		<N desc="Number of planes">2</N>
 
 		<Z0 unit="cm">261.39</Z0>
@@ -676,10 +785,13 @@
 		<r0 unit="cm">7.0</r0>
 		<r1 unit="cm">7.0</r1>
 
-		<Material desc="Vacuum vessel">SUS316L</Material>
-	</B3wal2>
+		<MotherVolume>B1spc1</MotherVolume>
 
-	<B4mag1p1>
+		<Material>SUS316L</Material>
+		<Desc>Vacuum vessel</Desc>
+	</Straight>
+
+	<Straight name="B4mag1p1">
 		<N desc="Number of planes">2</N>
 
 		<Z0 unit="cm">72.01</Z0>
@@ -691,10 +803,12 @@
 		<r0 unit="cm">2.1</r0>
 		<r1 unit="cm">2.1</r1>
 
-		<Material desc="Magnet 1 part 1">Cryo_G-10</Material>
-	</B4mag1p1>
+		<MotherVolume>B1spc1</MotherVolume>
 
-	<B4mag1p2>
+		<Material desc="Magnet 1 part 1">Cryo_G-10</Material>
+	</Straight>
+
+	<Straight name="B4mag1p2">
 		<N desc="Number of planes">6</N>
 
 		<Z0 unit="cm">73.11</Z0>
@@ -718,10 +832,13 @@
 		<r4 unit="cm">2.5</r4>
 		<r5 unit="cm">2.5</r5>
 
-		<Material desc="Magnet 1 part 2">SUS316L</Material>
-	</B4mag1p2>
+		<MotherVolume>B1spc1</MotherVolume>
 
-	<B4mag1p3>
+		<Material>SUS316L</Material>
+		<Desc>Magnet 1 part 2</Desc>
+	</Straight>
+
+	<Straight name="B4mag1p3">
 		<N desc="Number of planes">3</N>
 
 		<Z0 unit="cm">74.31</Z0>
@@ -736,10 +853,13 @@
 		<r1 unit="cm">2.1</r1>
 		<r2 unit="cm">2.5</r2>
 
-		<Material desc="Magnet 1 part 3">SC_COIL</Material>
-	</B4mag1p3>
+		<MotherVolume>B1spc1</MotherVolume>
 
-	<B4mag2>
+		<Material>SC_COIL</Material>
+		<Desc>Magnet 1 part 3</Desc>
+	</Straight>
+
+	<Straight name="B4mag2">
 		<N desc="Number of planes">5</N>
 
 		<Z0 unit="cm">118.3</Z0>
@@ -760,10 +880,13 @@
 		<r3 unit="cm">4.03</r3>
 		<r4 unit="cm">4.29</r4>
 
-		<Material desc="Magnet 2">SUS316L</Material>
-	</B4mag2>
+		<MotherVolume>B1spc1</MotherVolume>
 
-	<B4mag3p1>
+		<Material>SUS316L</Material>
+		<Desc>Magnet 2</Desc>
+	</Straight>
+
+	<Straight name="B4mag3p1">
 		<N desc="Number of planes">2</N>
 
 		<Z0 unit="cm">163.7</Z0>
@@ -777,10 +900,13 @@
 		<r0 unit="cm">4.4</r0>
 		<r1 unit="cm">4.8</r1>
 
-		<Material desc="Magnet 3 part 1">Cryo_Liq_He</Material>
-	</B4mag3p1>
+		<MotherVolume>B1spc1</MotherVolume>
 
-	<B4mag3p2>
+		<Material>Cryo_Liq_He</Material>
+		<Desc>Magnet 3 part 1</Desc>
+	</Straight>
+
+	<Straight name="B4mag3p2">
 		<N desc="Number of planes">2</N>
 
 		<Z0 unit="cm">165.8</Z0>
@@ -792,10 +918,12 @@
 		<r0 unit="cm">4.85</r0>
 		<r1 unit="cm">4.85</r1>
 
-		<Material desc="Magnet 3 part 2">Cryo_G-10</Material>
-	</B4mag3p2>
+		<MotherVolume>B1spc1</MotherVolume>
 
-	<B4mag3p3>
+		<Material desc="Magnet 3 part 2">Cryo_G-10</Material>
+	</Straight>
+
+	<Straight name="B4mag3p3">
 		<N desc="Number of planes">2</N>
 
 		<Z0 unit="cm">169.0</Z0>
@@ -807,10 +935,13 @@
 		<r0 unit="cm">4.85</r0>
 		<r1 unit="cm">4.85</r1>
 
-		<Material desc="Magnet 3 part 3">SC_COIL</Material>
-	</B4mag3p3>
+		<MotherVolume>B1spc1</MotherVolume>
 
-	<B4mag3p4>
+		<Material>SC_COIL</Material>
+		<Desc>Magnet 3 part 3</Desc>
+	</Straight>
+
+	<Straight name="B4mag3p4">
 		<N desc="Number of planes">6</N>
 
 		<Z0 unit="cm">167.8</Z0>
@@ -834,10 +965,13 @@
 		<r4 unit="cm">4.85</r4>
 		<r5 unit="cm">4.85</r5>
 
-		<Material desc="Magnet 3 part 4">SUS316L</Material>
-	</B4mag3p4>
+		<MotherVolume>B1spc1</MotherVolume>
 
-	<B4mag3p5>
+		<Material>SUS316L</Material>
+		<Desc>Magnet 3 part 4</Desc>
+	</Straight>
+
+	<Straight name="B4mag3p5">
 		<N desc="Number of planes">2</N>
 
 		<Z0 unit="cm">217.2</Z0>
@@ -849,10 +983,15 @@
 		<r0 unit="cm">4.85</r0>
 		<r1 unit="cm">4.85</r1>
 
-		<Material desc="Magnet 3 part 5">Cryo_Liq_He</Material>
-	</B4mag3p5>
+		<Intersect>B1spc1</Intersect>
 
-	<B4mag3p6>
+		<MotherVolume>B1spc1</MotherVolume>
+
+		<Material>Cryo_Liq_He</Material>
+		<Desc>Magnet 3 part 5</Desc>
+	</Straight>
+
+	<Straight name="B4mag3p6">
 		<N desc="Number of planes">2</N>
 
 		<Z0 unit="cm">163.7</Z0>
@@ -864,10 +1003,15 @@
 		<r0 unit="cm">6.8</r0>
 		<r1 unit="cm">6.8</r1>
 
-		<Material desc="Magnet 3 part 6">Fe</Material>
-	</B4mag3p6>
+		<Intersect>B1spc1</Intersect>
 
-	<B4mag4p1>
+		<MotherVolume>B1spc1</MotherVolume>
+
+		<Material>Fe</Material>
+		<Desc>Magnet 3 part 6</Desc>
+	</Straight>
+
+	<Straight name="B4mag4p1">
 		<N desc="Number of planes">2</N>
 
 		<Z0 unit="cm">264.10</Z0>
@@ -879,10 +1023,13 @@
 		<r0 unit="cm">8.5</r0>
 		<r1 unit="cm">8.5</r1>
 
-		<Material desc="Magnet 4 part 1">Fe</Material>
-	</B4mag4p1>
+		<MotherVolume>B1spc1</MotherVolume>
 
-	<B4mag4p7>
+		<Material>Fe</Material>
+		<Desc>Magnet 4 part 1</Desc>
+	</Straight>
+
+	<Straight name="B4mag4p7">
 		<N desc="Number of planes">6</N>
 
 		<Z0 unit="cm">264.10</Z0>
@@ -906,10 +1053,13 @@
 		<r4 unit="cm">7.6</r4>
 		<r5 unit="cm">7.6</r5>
 
-		<Material desc="Magnet 4 part 7">SUS316L</Material>
-	</B4mag4p7>
+		<MotherVolume>B1spc1</MotherVolume>
 
-	<B4mag4p8>
+		<Material>SUS316L</Material>
+		<Desc>Magnet 4 part 7</Desc>
+	</Straight>
+
+	<Straight name="B4mag4p8">
 		<N desc="Number of planes">2</N>
 
 		<Z0 unit="cm">264.59</Z0>
@@ -921,10 +1071,13 @@
 		<r0 unit="cm">8.0</r0>
 		<r1 unit="cm">8.0</r1>
 
-		<Material desc="Magnet 4 part 8">SC_COIL</Material>
-	</B4mag4p8>
+		<MotherVolume>B1spc1</MotherVolume>
 
-	<B4mag4p9>
+		<Material>SC_COIL</Material>
+		<Desc>Magnet 4 part 8</Desc>
+	</Straight>
+
+	<Straight name="B4mag4p9">
 		<N desc="Number of planes">2</N>
 
 		<Z0 unit="cm">264.59</Z0>
@@ -936,263 +1089,320 @@
 		<r0 unit="cm">8.2</r0>
 		<r1 unit="cm">8.2</r1>
 
-		<Material desc="Magnet 4 part 9">Cryo_Epoxy</Material>
-	</B4mag4p9>
+		<MotherVolume>B1spc1</MotherVolume>
+
+		<Material>Cryo_Epoxy</Material>
+		<Desc>Magnet 4 part 9</Desc>
+	</Straight>
 
 	<C1wal1>
-		<N desc="Number of planes">15</N>
+		<N desc="Number of planes">23</N>
 
-		<Z0 unit="cm">64.85</Z0>
-		<Z1 unit="cm">88.89</Z1>
-		<Z2 unit="cm">88.89</Z2>
-		<Z3 unit="cm">99.27</Z3>
-		<Z4 unit="cm">99.27</Z4>
-		<Z5 unit="cm">107.67</Z5>
-		<Z6 unit="cm">214.00</Z6>
-		<Z7 unit="cm">214.00</Z7>
-		<Z8 unit="cm">253.00</Z8>
-		<Z9 unit="cm">253.00</Z9>
-		<Z10 unit="cm">336.75</Z10>
-		<Z11 unit="cm">357.48</Z11>
-		<Z12 unit="cm">376.15</Z12>
-		<Z13 unit="cm">376.15</Z13>
-		<Z14 unit="cm">382.15</Z14>
+		<Z0 unit="cm">63.35</Z0>
+		<Z1 unit="cm">95.24</Z1>
+		<Z2 unit="cm">101.80</Z2>
+		<Z3 unit="cm">101.80</Z3>
+		<Z4 unit="cm">104.30</Z4>
+		<Z5 unit="cm">104.30</Z5>
+		<Z6 unit="cm">115.68</Z6>
+		<Z7 unit="cm">127.13</Z7>
+		<Z8 unit="cm">214.00</Z8>
+		<Z9 unit="cm">214.00</Z9>
+		<Z10 unit="cm">260.80</Z10>
+		<Z11 unit="cm">260.80</Z11>
+		<Z12 unit="cm">261.68</Z12>
+		<Z13 unit="cm">261.68</Z13>
+		<Z14 unit="cm">274.28</Z14>
+		<Z15 unit="cm">274.28</Z15>
+		<Z16 unit="cm">340.78</Z16>
+		<Z17 unit="cm">369.20</Z17>
+		<Z18 unit="cm">392.00</Z18>
+		<Z19 unit="cm">392.00</Z19>
+		<Z20 unit="cm">444.00</Z20>
+		<Z21 unit="cm">444.00</Z21>
+		<Z22 unit="cm">830.00</Z22>
 
-		<R0 unit="cm">11.65</R0>
-		<R1 unit="cm">19.00</R1>
-		<R2 unit="cm">19.90</R2>
-		<R3 unit="cm">19.90</R3>
-		<R4 unit="cm">23.23</R4>
-		<R5 unit="cm">25.80</R5>
-		<R6 unit="cm">25.80</R6>
-		<R7 unit="cm">35.00</R7>
-		<R8 unit="cm">35.00</R8>
+		<R0 unit="cm">12.25</R0>
+		<R1 unit="cm">22.00</R1>
+		<R2 unit="cm">22.00</R2>
+		<R3 unit="cm">24.00</R3>
+		<R4 unit="cm">24.00</R4>
+		<R5 unit="cm">22.50</R5>
+		<R6 unit="cm">22.50</R6>
+		<R7 unit="cm">26.00</R7>
+		<R8 unit="cm">26.00</R8>
 		<R9 unit="cm">34.70</R9>
-		<R10 unit="cm">34.7</R10>
-		<R11 unit="cm">56.0</R11>
-		<R12 unit="cm">56.0</R12>
-		<R13 unit="cm">64.0</R13>
-		<R14 unit="cm">64.0</R14>
+		<R10 unit="cm">34.70</R10>
+		<R11 unit="cm">31.40</R11>
+		<R12 unit="cm">31.40</R12>
+		<R13 unit="cm">30.64</R13>
+		<R14 unit="cm">30.64</R14>
+		<R15 unit="cm">31.40</R15>
+		<R16 unit="cm">31.40</R16>
+		<R17 unit="cm">51.30</R17>
+		<R18 unit="cm">51.30</R18>
+		<R19 unit="cm">68.00</R19>
+		<R20 unit="cm">68.00</R20>
+		<R21 unit="cm">75.00</R21>
+		<R22 unit="cm">75.00</R22>
 
-		<Material desc="Vacuum vessel">SUS316L</Material>
+		<Material>SUS316L</Material>
+		<Desc>Vacuum vessel</Desc>
         </C1wal1>
 
-        <C1wal2>
-		<N desc="Number of planes">4</N>
+        <Straight name="C1wal2">
+		<N desc="Number of planes">8</N>
 
 		<Z0 unit="cm">63.35</Z0>
 		<Z1 unit="cm">64.85</Z1>
 		<Z2 unit="cm">64.85</Z2>
-		<Z3 unit="cm">88.89</Z3>
+		<Z3 unit="cm">95.24</Z3>
+		<Z4 unit="cm">95.39</Z4>
+		<Z5 unit="cm">101.80</Z5>
+		<Z6 unit="cm">101.80</Z6>
+		<Z7 unit="cm">102.80</Z7>
 
 		<R0 unit="cm">12.25</R0>
-		<R1 unit="cm">12.70</R1>
-		<R2 unit="cm">12.70</R2>
-		<R3 unit="cm">19.90</R3>
+		<R1 unit="cm">12.76</R1>
+		<R2 unit="cm">12.76</R2>
+		<R3 unit="cm">22.00</R3>
+		<R4 unit="cm">22.00</R4>
+		<R5 unit="cm">22.00</R5>
+		<R6 unit="cm">24.00</R6>
+		<R7 unit="cm">24.00</R7>
 
-		<r0 unit="cm">0.0</r0>
-		<r1 unit="cm">0.0</r1>
-		<r2 unit="cm">11.65</r2>
-		<r3 unit="cm">19.00</r3>
+		<r0 unit="cm">0.00</r0>
+		<r1 unit="cm">0.00</r1>
+		<r2 unit="cm">11.66</r2>
+		<r3 unit="cm">20.96</r3>
+		<r4 unit="cm">21.00</r4>
+		<r5 unit="cm">21.00</r5>
+		<r6 unit="cm">21.00</r6>
+		<r7 unit="cm">21.00</r7>
 
-		<Material desc="Tungsten shield forward">W</Material>
-        </C1wal2>
+		<Intersect>C1wal1</Intersect>
 
-	<C2spc1>
-		<N desc="Number of planes">8</N>
+		<MotherVolume>C1wal1</MotherVolume>
+
+		<Material>W</Material>
+		<Desc>Tungsten shield forward</Desc>
+        </Straight>
+
+	<Straight name="C2spc1">
+		<N desc="Number of planes">5</N>
 
 		<Z0 unit="cm">64.85</Z0>
-		<Z1 unit="cm">88.89</Z1>
-		<Z2 unit="cm">101.27</Z2>
-		<Z3 unit="cm">101.27</Z3>
-		<Z4 unit="cm">106.23</Z4>
-		<Z5 unit="cm">228.0</Z5>
-		<Z6 unit="cm">228.0</Z6>
-		<Z7 unit="cm">230.5</Z7>
+		<Z1 unit="cm">95.39</Z1>
+		<Z2 unit="cm">115.90</Z2>
+		<Z3 unit="cm">127.51</Z3>
+		<Z4 unit="cm">232.30</Z4>
 
-		<R0 unit="cm">11.65</R0>
-		<R1 unit="cm">19.00</R1>
-		<R2 unit="cm">19.00</R2>
-		<R3 unit="cm">22.78</R3>
-		<R4 unit="cm">24.30</R4>
-		<R5 unit="cm">24.30</R5>
-		<R6 unit="cm">24.50</R6>
-		<R7 unit="cm">24.50</R7>
+		<R0 unit="cm">11.66</R0>
+		<R1 unit="cm">21.00</R1>
+		<R2 unit="cm">21.00</R2>
+		<R3 unit="cm">24.50</R3>
+		<R4 unit="cm">24.50</R4>
 
-		<Material desc="Vacuum space">Vacuum</Material>
-        </C2spc1>
+		<Intersect>C1wal1</Intersect>
 
-	<C2spc2>
-		<N desc="Number of planes">11</N>
+		<MotherVolume>C1wal1</MotherVolume>
 
-		<Z0 unit="cm">222.0</Z0>
-		<Z1 unit="cm">230.5</Z1>
-		<Z2 unit="cm">230.5</Z2>
-		<Z3 unit="cm">259.0</Z3>
-		<Z4 unit="cm">259.0</Z4>
-		<Z5 unit="cm">340.92</Z5>
-		<Z6 unit="cm">344.09</Z6>
-		<Z7 unit="cm">352.92</Z7>
-		<Z8 unit="cm">352.92</Z8>
-		<Z9 unit="cm">360.34</Z9>
-		<Z10 unit="cm">382.15</Z10>
+		<Material>Vacuum</Material>
+		<Desc>Vacuum space</Desc>
+        </Straight>
 
-		<R0 unit="cm">30.8</R0>
-		<R1 unit="cm">30.8</R1>
-		<R2 unit="cm">30.8</R2>
-		<R3 unit="cm">30.8</R3>
-		<R4 unit="cm">28.4</R4>
-		<R5 unit="cm">28.4</R5>
-		<R6 unit="cm">31.0</R6>
-		<R7 unit="cm">31.0</R7>
-		<R8 unit="cm">41.91</R8>
-		<R9 unit="cm">48.0</R9>
-		<R10 unit="cm">48.0</R10>
+	<Straight name="C2spc2">
+		<N desc="Number of planes">10</N>
 
-		<r0 unit="cm">25.80</r0>
-		<r1 unit="cm">25.80</r1>
-		<r2 unit="cm">0</r2>
-		<r3 unit="cm">0</r3>
+		<Z0 unit="cm">222.00</Z0>
+		<Z1 unit="cm">232.00</Z1>
+		<Z2 unit="cm">232.00</Z2>
+		<Z3 unit="cm">232.30</Z3>
+		<Z4 unit="cm">232.30</Z4>
+		<Z5 unit="cm">256.30</Z5>
+		<Z6 unit="cm">256.30</Z6>
+		<Z7 unit="cm">343.63</Z7>
+		<Z8 unit="cm">363.25</Z8>
+		<Z9 unit="cm">370.95</Z9>
+
+		<R0 unit="cm">30.40</R0>
+		<R1 unit="cm">30.40</R1>
+		<R2 unit="cm">30.40</R2>
+		<R3 unit="cm">30.40</R3>
+		<R4 unit="cm">30.40</R4>
+		<R5 unit="cm">30.40</R5>
+		<R6 unit="cm">28.40</R6>
+		<R7 unit="cm">28.40</R7>
+		<R8 unit="cm">42.25</R8>
+		<R9 unit="cm">42.25</R9>
+
+		<r0 unit="cm">26.00</r0>
+		<r1 unit="cm">26.00</r1>
+		<r2 unit="cm">24.50</r2>
+		<r3 unit="cm">24.50</r3>
 		<r4 unit="cm">0</r4>
-		<r5 unit="cm">0</r5>
-		<r6 unit="cm">0</r6>
-		<r7 unit="cm">0</r7>
-		<r8 unit="cm">0</r8>
-		<r9 unit="cm">0</r9>
-		<r10 unit="cm">0</r10>
+		<!--...-->
 
-		<Material desc="Vacuum space">Vacuum</Material>
-        </C2spc2>
+		<Intersect>C1wal1</Intersect>
 
-        <C3wal1>
+		<MotherVolume>C1wal1</MotherVolume>
+
+		<Material>Vacuum</Material>
+		<Desc>Vacuum space</Desc>
+        </Straight>
+
+	<Straight name="C2spc3">
+		<N desc="Number of planes">6</N>
+
+		<Z0 unit="cm">373.45</Z0>
+		<Z1 unit="cm">402.00</Z1>
+		<Z2 unit="cm">402.00</Z2>
+		<Z3 unit="cm">450.00</Z3>
+		<Z4 unit="cm">450.00</Z4>
+		<Z5 unit="cm">830.00</Z5>
+
+		<R0 unit="cm">47.30</R0>
+		<R1 unit="cm">47.30</R1>
+		<R2 unit="cm">64.00</R2>
+		<R3 unit="cm">64.00</R3>
+		<R4 unit="cm">71.00</R4>
+		<R5 unit="cm">71.00</R5>
+
+		<Intersect>C1wal1</Intersect>
+
+		<MotherVolume>C1wal1</MotherVolume>
+
+		<Material>Air</Material>
+		<Desc>Open space</Desc>
+        </Straight>
+
+        <Straight name="C3wal1">
 		<N desc="Number of planes">7</N>
 
 		<Z0 unit="cm">65.85</Z0>
-		<Z1 unit="cm">87.82</Z1>
-		<Z2 unit="cm">99.45</Z2>
-		<Z3 unit="cm">102.27</Z3>
-		<Z4 unit="cm">102.27</Z4>
-		<Z5 unit="cm">106.38</Z5>
-		<Z6 unit="cm">230.30</Z6>
+		<Z1 unit="cm">94.92</Z1>
+		<Z2 unit="cm">96.10</Z2>
+		<Z3 unit="cm">96.10</Z3>
+		<Z4 unit="cm">116.05</Z4>
+		<Z5 unit="cm">127.50</Z5>
+		<Z6 unit="cm">232.30</Z6>
 
 		<R0 unit="cm">10.90</R0>
-		<R1 unit="cm">17.40</R1>
-		<R2 unit="cm">17.40</R2>
-		<R3 unit="cm">18.26</R3>
-		<R4 unit="cm">22.04</R4>
-		<R5 unit="cm">23.30</R5>
-		<R6 unit="cm">23.30</R6>
+		<R1 unit="cm">19.50</R1>
+		<R2 unit="cm">19.50</R2>
+		<R3 unit="cm">20.00</R3>
+		<R4 unit="cm">20.00</R4>
+		<R5 unit="cm">23.50</R5>
+		<R6 unit="cm">23.50</R6>
 
-		<Material desc="Cold shield">SUS316L</Material>
-        </C3wal1>
+		<Intersect>C1wal1</Intersect>
 
-        <C3wal2>
-		<N desc="Number of planes">6</N>
+		<MotherVolume>C2spc1</MotherVolume>
 
-		<Z0 unit="cm">257.45</Z0>
-		<Z1 unit="cm">257.75</Z1>
-		<Z2 unit="cm">257.75</Z2>
-		<Z3 unit="cm">342.85</Z3>
-		<Z4 unit="cm">342.85</Z4>
-		<Z5 unit="cm">343.45</Z5>
+		<Material>SUS316L</Material>
+		<Desc>Cold shield</Desc>
+        </Straight>
 
-		<R0 unit="cm">28.0</R0>
-		<R1 unit="cm">28.0</R1>
-		<R2 unit="cm">27.7</R2>
-		<R3 unit="cm">27.7</R3>
-		<R4 unit="cm">29.9</R4>
-		<R5 unit="cm">29.9</R5>
-
-		<Material desc="Cold shield">SUS316L</Material>
-        </C3wal2>
-
-        <C3wal3>
+        <Straight name="C3wal2">
 		<N desc="Number of planes">2</N>
 
-		<Z0 unit="cm">352.92</Z0>
-		<Z1 unit="cm">355.42</Z1>
+		<Z0 unit="cm">256.55</Z0>
+		<Z1 unit="cm">341.95</Z1>
 
-		<R0 unit="cm">37.7</R0>
-		<R1 unit="cm">37.7</R1>
+		<R0 unit="cm">27.7</R0>
+		<R1 unit="cm">27.7</R1>
 
-		<Material desc="Vacuum vessel">SUS316L</Material>
-	</C3wal3>
+		<Intersect>C1wal1</Intersect>
 
-        <C3wal4>
+		<MotherVolume>C2spc2</MotherVolume>
+
+		<Material>SUS316L</Material>
+		<Desc>Cold shield</Desc>
+        </Straight>
+
+        <!--Straight name="C3wal3">
 		<N desc="Number of planes">2</N>
 
-		<Z0 unit="cm">252.45</Z0>
-		<Z1 unit="cm">257.45</Z1>
+		<Z0 unit="cm">370.95</Z0>
+		<Z1 unit="cm">373.45</Z1>
 
-		<R0 unit="cm">29.0</R0>
-		<R1 unit="cm">29.0</R1>
+		<R0 unit="cm">47.0</R0>
+		<R1 unit="cm">47.0</R1>
 
-		<Material desc="Tungsten shield in front of QCS2">W</Material>
-	</C3wal4>
+		<Intersect>C1wal1</Intersect>
 
-        <C4spc1>
-		<N desc="Number of planes">7</N>
+		<MotherVolume>C2spc2</MotherVolume>
+
+		<Material>SUS316L</Material>
+		<Desc>Vacuum vessel</Desc>
+	</Straight-->
+
+        <Straight name="C4spc1">
+		<N desc="Number of planes">5</N>
 
 		<Z0 unit="cm">66.05</Z0>
-		<Z1 unit="cm">86.18</Z1>
-		<Z2 unit="cm">99.56</Z2>
-		<Z3 unit="cm">102.97</Z3>
-		<Z4 unit="cm">102.97</Z4>
-		<Z5 unit="cm">106.48</Z5>
-		<Z6 unit="cm">229.60</Z6>
+		<Z1 unit="cm">94.94</Z1>
+		<Z2 unit="cm">116.15</Z2>
+		<Z3 unit="cm">127.60</Z3>
+		<Z4 unit="cm">232.10</Z4>
 
 		<R0 unit="cm">10.75</R0>
-		<R1 unit="cm">16.70</R1>
-		<R2 unit="cm">16.70</R2>
-		<R3 unit="cm">17.74</R3>
-		<R4 unit="cm">21.53</R4>
-		<R5 unit="cm">22.60</R5>
-		<R6 unit="cm">22.60</R6>
+		<R1 unit="cm">19.30</R1>
+		<R2 unit="cm">19.30</R2>
+		<R3 unit="cm">22.80</R3>
+		<R4 unit="cm">22.80</R4>
 
-		<Material desc="Vacuum space">Vacuum</Material>
-        </C4spc1>
+		<Intersect>C1wal1</Intersect>
 
-        <C4spc2>
-		<N desc="Number of planes">4</N>
+		<MotherVolume>C3wal1</MotherVolume>
 
-		<Z0 unit="cm">257.75</Z0>
-		<Z1 unit="cm">258.75</Z1>
-		<Z2 unit="cm">258.75</Z2>
-		<Z3 unit="cm">343.15</Z3>
+		<Material>Vacuum</Material>
+		<Desc>Vacuum space</Desc>
+        </Straight>
 
-		<R0 unit="cm">25.5</R0>
-		<R1 unit="cm">25.5</R1>
-		<R2 unit="cm">27.0</R2>
-		<R3 unit="cm">27.0</R3>
+        <Straight name="C4spc2">
+		<N desc="Number of planes">2</N>
 
-		<Material desc="Vacuum space">Vacuum</Material>
-        </C4spc2>
+		<Z0 unit="cm">256.85</Z0>
+		<Z1 unit="cm">341.65</Z1>
 
-        <C5wal1>
-		<N desc="Number of planes">8</N>
+		<R0 unit="cm">27.0</R0>
+		<R1 unit="cm">27.0</R1>
+
+		<Intersect>C1wal1</Intersect>
+
+		<MotherVolume>C3wal2</MotherVolume>
+
+		<Material>Vacuum</Material>
+		<Desc>Vacuum space</Desc>
+        </Straight>
+
+        <Straight name="C5wal1">
+		<N desc="Number of planes">6</N>
 
 		<Z0 unit="cm">67.35</Z0>
-		<Z1 unit="cm">80.91</Z1>
-		<Z2 unit="cm">95.86</Z2>
-		<Z3 unit="cm">103.57</Z3>
-		<Z4 unit="cm">103.57</Z4>
-		<Z5 unit="cm">107.94</Z5>
-		<Z6 unit="cm">226.50</Z6>
-		<Z7 unit="cm">227.30</Z7>
+		<Z1 unit="cm">89.70</Z1>
+		<Z2 unit="cm">110.75</Z2>
+		<Z3 unit="cm">128.41</Z3>
+		<Z4 unit="cm">226.50</Z4>
+		<Z5 unit="cm">227.30</Z5>
 
 		<R0 unit="cm">9.99</R0>
-		<R1 unit="cm">14.00</R1>
-		<R2 unit="cm">14.00</R2>
-		<R3 unit="cm">16.36</R3>
-		<R4 unit="cm">20.66</R4>
-		<R5 unit="cm">22.00</R5>
-		<R6 unit="cm">22.00</R6>
-		<R7 unit="cm">19.80</R7>
+		<R1 unit="cm">16.60</R1>
+		<R2 unit="cm">16.60</R2>
+		<R3 unit="cm">22.00</R3>
+		<R4 unit="cm">22.00</R4>
+		<R5 unit="cm">19.80</R5>
 
-		<Material desc="Helium vessel">SUS316L</Material>
-        </C5wal1>
+		<Intersect>C1wal1</Intersect>
 
-        <C5wal2>
+		<MotherVolume>C4spc1</MotherVolume>
+
+		<Material>SUS316L</Material>
+		<Desc>Helium vessel</Desc>
+        </Straight>
+
+        <Straight name="C5wal2">
 		<N desc="Number of planes">2</N>
 
 		<Z0 unit="cm">260.85</Z0>
@@ -1201,32 +1411,55 @@
 		<R0 unit="cm">26.4</R0>
 		<R1 unit="cm">26.4</R1>
 
-		<Material desc="Helium vessel">SUS316L</Material>
-        </C5wal2>
+		<Intersect>C1wal1</Intersect>
 
-        <C6spc1>
-		<N desc="Number of planes">7</N>
+		<MotherVolume>C4spc2</MotherVolume>
+
+		<Material>SUS316L</Material>
+		<Desc>Helium vessel</Desc>
+        </Straight>
+
+        <Straight name="C5wal3">
+		<N desc="Number of planes">2</N>
+
+		<Z0 unit="cm">257.85</Z0>
+		<Z1 unit="cm">260.85</Z1>
+
+		<R0 unit="cm">26.4</R0>
+		<R1 unit="cm">26.4</R1>
+
+		<Intersect>C1wal1</Intersect>
+
+		<MotherVolume>C4spc2</MotherVolume>
+
+		<Material>W</Material>
+		<Desc>Tungsten shield in front of QCS2</Desc>
+	</Straight>
+
+        <Straight name="C6spc1">
+		<N desc="Number of planes">5</N>
 
 		<Z0 unit="cm">68.35</Z0>
-		<Z1 unit="cm">77.68</Z1>
-		<Z2 unit="cm">96.16</Z2>
-		<Z3 unit="cm">105.57</Z3>
-		<Z4 unit="cm">105.57</Z4>
-		<Z5 unit="cm">108.12</Z5>
-		<Z6 unit="cm">225.8</Z6>
+		<Z1 unit="cm">86.46</Z1>
+		<Z2 unit="cm">109.33</Z2>
+		<Z3 unit="cm">129.61</Z3>
+		<Z4 unit="cm">225.80</Z4>
 
 		<R0 unit="cm">9.24</R0>
-		<R1 unit="cm">12.00</R1>
-		<R2 unit="cm">12.00</R2>
-		<R3 unit="cm">14.88</R3>
-		<R4 unit="cm">20.02</R4>
-		<R5 unit="cm">20.80</R5>
-		<R6 unit="cm">20.80</R6>
+		<R1 unit="cm">14.60</R1>
+		<R2 unit="cm">14.60</R2>
+		<R3 unit="cm">20.80</R3>
+		<R4 unit="cm">20.80</R4>
 
-		<Material desc="Liquid helium">Cryo_Liq_He</Material>
-        </C6spc1>
+		<Intersect>C1wal1</Intersect>
 
-        <C6spc2>
+		<MotherVolume>C5wal1</MotherVolume>
+
+		<Material>Cryo_Liq_He</Material>
+		<Desc>Liquid helium</Desc>
+        </Straight>
+
+        <Straight name="C6spc2">
 		<N desc="Number of planes">2</N>
 
 		<Z0 unit="cm">262.35</Z0>
@@ -1235,10 +1468,15 @@
 		<R0 unit="cm">24.9</R0>
 		<R1 unit="cm">24.9</R1>
 
-		<Material desc="Liquid helium">Cryo_Liq_He</Material>
-	</C6spc2>
+		<Intersect>C1wal1</Intersect>
 
-        <C7wal1>
+		<MotherVolume>C5wal2</MotherVolume>
+
+		<Material>Cryo_Liq_He</Material>
+		<Desc>Liquid helium</Desc>
+	</Straight>
+
+        <Straight name="C7wal1">
 		<N desc="Number of planes">2</N>
 
 		<Z0 unit="cm">262.45</Z0>
@@ -1247,112 +1485,116 @@
 		<R0 unit="cm">24.8</R0>
 		<R1 unit="cm">24.8</R1>
 
-		<Material desc="Iron yoke">Fe</Material>
-	</C7wal1>
+		<Intersect>C1wal1</Intersect>
 
-        <C7lyr1>
-		<N desc="Number of planes">31</N>
+		<MotherVolume>C6spc2</MotherVolume>
+
+		<Material>Fe</Material>
+		<Desc>Iron yoke</Desc>
+	</Straight>
+
+        <Straight name="C7lyr1">
+		<N desc="Number of planes">29</N>
 
 		<Z0 unit="cm">73.30</Z0>
-		<Z1 unit="cm">77.69</Z1>
-		<Z2 unit="cm">87.87</Z2>
-		<Z3 unit="cm">87.87</Z3>
-		<Z4 unit="cm">96.17</Z4>
+		<Z1 unit="cm">86.48</Z1>
+		<Z2 unit="cm">87.88</Z2>
+		<Z3 unit="cm">87.88</Z3>
+		<Z4 unit="cm">98.73</Z4>
 		<Z5 unit="cm">98.73</Z5>
-		<Z6 unit="cm">98.73</Z6>
-		<Z7 unit="cm">104.55</Z7>
-		<Z8 unit="cm">104.55</Z8>
-		<Z9 unit="cm">105.67</Z9>
-		<Z10 unit="cm">105.67</Z10>
-		<Z11 unit="cm">108.13</Z11>
-		<Z12 unit="cm">109.63</Z12>
-		<Z13 unit="cm">109.63</Z13>
-		<Z14 unit="cm">115.45</Z14>
-		<Z15 unit="cm">115.45</Z15>
-		<Z16 unit="cm">121.28</Z16>
-		<Z17 unit="cm">121.28</Z17>
-		<Z18 unit="cm">130.73</Z18>
-		<Z19 unit="cm">130.73</Z19>
-		<Z20 unit="cm">138.70</Z20>
-		<Z21 unit="cm">138.70</Z21>
-		<Z22 unit="cm">164.20</Z22>
-		<Z23 unit="cm">164.20</Z23>
-		<Z24 unit="cm">175.80</Z24>
-		<Z25 unit="cm">175.80</Z25>
-		<Z26 unit="cm">197.58</Z26>
-		<Z27 unit="cm">197.58</Z27>
-		<Z28 unit="cm">220.70</Z28>
-		<Z29 unit="cm">220.70</Z29>
-		<Z30 unit="cm">225.37</Z30>
+		<Z6 unit="cm">104.555</Z6>
+		<Z7 unit="cm">104.555</Z7>
+		<Z8 unit="cm">109.355</Z8>
+		<Z9 unit="cm">109.625</Z9>
+		<Z10 unit="cm">109.625</Z10>
+		<Z11 unit="cm">115.450</Z11>
+		<Z12 unit="cm">115.450</Z12>
+		<Z13 unit="cm">121.275</Z13>
+		<Z14 unit="cm">121.275</Z14>
+		<Z15 unit="cm">129.625</Z15>
+		<Z16 unit="cm">130.725</Z16>
+		<Z17 unit="cm">130.725</Z17>
+		<Z18 unit="cm">138.70</Z18>
+		<Z19 unit="cm">138.70</Z19>
+		<Z20 unit="cm">164.20</Z20>
+		<Z21 unit="cm">164.20</Z21>
+		<Z22 unit="cm">175.80</Z22>
+		<Z23 unit="cm">175.80</Z23>
+		<Z24 unit="cm">197.575</Z24>
+		<Z25 unit="cm">197.575</Z25>
+		<Z26 unit="cm">220.70</Z26>
+		<Z27 unit="cm">220.70</Z27>
+		<Z28 unit="cm">225.37</Z28>
 
-		<r0 unit="cm">10.60</r0>
-		<r1 unit="cm">10.60</r1>
-		<r2 unit="cm">10.60</r2>
-		<r3 unit="cm">11.10</r3>
-		<r4 unit="cm">11.10</r4>
-		<r5 unit="cm">11.10</r5>
-		<r6 unit="cm">11.70</r6>
-		<r7 unit="cm">11.70</r7>
-		<r8 unit="cm">13.20</r8>
-		<r9 unit="cm">13.20</r9>
-		<r10 unit="cm">13.20</r10>
-		<r11 unit="cm">13.20</r11>
-		<r12 unit="cm">13.20</r12>
-		<r13 unit="cm">13.80</r13>
-		<r14 unit="cm">13.80</r14>
-		<r15 unit="cm">14.80</r15>
-		<r16 unit="cm">14.80</r16>
-		<r17 unit="cm">15.80</r17>
-		<r18 unit="cm">15.80</r18>
-		<r19 unit="cm">16.80</r19>
-		<r20 unit="cm">16.80</r20>
-		<r21 unit="cm">17.80</r21>
-		<r22 unit="cm">17.80</r22>
-		<r23 unit="cm">18.55</r23>
-		<r24 unit="cm">18.55</r24>
-		<r25 unit="cm">19.30</r25>
-		<r26 unit="cm">19.30</r26>
-		<r27 unit="cm">19.80</r27>
-		<r28 unit="cm">19.80</r28>
-		<r29 unit="cm">20.00</r29>
-		<r30 unit="cm">20.00</r30>
+		<r0 unit="cm">10.6</r0>
+		<r1 unit="cm">10.6</r1>
+		<r2 unit="cm">10.6</r2>
+		<r3 unit="cm">11.1</r3>
+		<r4 unit="cm">11.1</r4>
+		<r5 unit="cm">11.7</r5>
+		<r6 unit="cm">11.7</r6>
+		<r7 unit="cm">13.2</r7>
+		<r8 unit="cm">13.2</r8>
+		<r9 unit="cm">13.2</r9>
+		<r10 unit="cm">13.8</r10>
+		<r11 unit="cm">13.8</r11>
+		<r12 unit="cm">14.8</r12>
+		<r13 unit="cm">14.8</r13>
+		<r14 unit="cm">15.8</r14>
+		<r15 unit="cm">15.8</r15>
+		<r16 unit="cm">15.8</r16>
+		<r17 unit="cm">16.8</r17>
+		<r18 unit="cm">16.8</r18>
+		<r19 unit="cm">17.8</r19>
+		<r20 unit="cm">17.8</r20>
+		<r21 unit="cm">18.55</r21>
+		<r22 unit="cm">18.55</r22>
+		<r23 unit="cm">19.30</r23>
+		<r24 unit="cm">19.30</r24>
+		<r25 unit="cm">19.80</r25>
+		<r26 unit="cm">19.80</r26>
+		<r27 unit="cm">20.00</r27>
+		<r28 unit="cm">20.00</r28>
 
-		<R0 unit="cm">10.60</R0>
-		<R1 unit="cm">11.90</R1>
-		<R2 unit="cm">11.90</R2>
-		<R3 unit="cm">11.90</R3>
-		<R4 unit="cm">11.90</R4>
-		<R5 unit="cm">12.69</R5>
-		<R6 unit="cm">12.69</R6>
-		<R7 unit="cm">14.47</R7>
-		<R8 unit="cm">14.47</R8>
-		<R9 unit="cm">14.80</R9>
-		<R10 unit="cm">19.95</R10>
-		<R11 unit="cm">20.70</R11>
-		<R12 unit="cm">20.70</R12>
-		<R13 unit="cm">20.70</R13>
-		<R14 unit="cm">20.70</R14>
-		<R15 unit="cm">20.70</R15>
-		<R16 unit="cm">20.70</R16>
-		<R17 unit="cm">20.70</R17>
-		<R18 unit="cm">20.70</R18>
-		<R19 unit="cm">20.70</R19>
-		<R20 unit="cm">20.70</R20>
-		<R21 unit="cm">20.70</R21>
-		<R22 unit="cm">20.70</R22>
-		<R23 unit="cm">20.70</R23>
-		<R24 unit="cm">20.70</R24>
-		<R25 unit="cm">20.70</R25>
-		<R26 unit="cm">20.70</R26>
-		<R27 unit="cm">20.70</R27>
-		<R28 unit="cm">20.70</R28>
-		<R29 unit="cm">20.70</R29>
-		<R30 unit="cm">20.70</R30>
+		<R0 unit="cm">10.6</R0>
+		<R1 unit="cm">14.5</R1>
+		<R2 unit="cm">14.5</R2>
+		<R3 unit="cm">14.5</R3>
+		<R4 unit="cm">14.5</R4>
+		<R5 unit="cm">14.5</R5>
+		<R6 unit="cm">14.5</R6>
+		<R7 unit="cm">14.5</R7>
+		<R8 unit="cm">14.5</R8>
+		<R9 unit="cm">14.58</R9>
+		<R10 unit="cm">14.58</R10>
+		<R11 unit="cm">16.36</R11>
+		<R12 unit="cm">16.36</R12>
+		<R13 unit="cm">18.15</R13>
+		<R14 unit="cm">18.15</R14>
+		<R15 unit="cm">20.7</R15>
+		<R16 unit="cm">20.7</R16>
+		<R17 unit="cm">20.7</R17>
+		<R18 unit="cm">20.7</R18>
+		<R19 unit="cm">20.7</R19>
+		<R20 unit="cm">20.7</R20>
+		<R21 unit="cm">20.7</R21>
+		<R22 unit="cm">20.7</R22>
+		<R23 unit="cm">20.7</R23>
+		<R24 unit="cm">20.7</R24>
+		<R25 unit="cm">20.7</R25>
+		<R26 unit="cm">20.7</R26>
+		<R27 unit="cm">20.7</R27>
+		<R28 unit="cm">20.7</R28>
 
-		<Material desc="Tungsten shield 1">W</Material>
-        </C7lyr1>
+		<Intersect>C1wal1</Intersect>
 
-        <C7lyr2>
+		<MotherVolume>C6spc1</MotherVolume>
+
+		<Material>W</Material>
+		<Desc>Tungsten shield 1</Desc>
+        </Straight>
+
+        <Straight name="C7lyr2">
 		<N desc="Number of planes">55</N>
 
 		<Z0 unit="cm">68.35</Z0>
@@ -1369,24 +1611,24 @@
 		<Z11 unit="cm">98.73</Z11>
 		<Z12 unit="cm">99.03</Z12>
 		<Z13 unit="cm">99.03</Z13>
-		<Z14 unit="cm">104.55</Z14>
-		<Z15 unit="cm">104.55</Z15>
+		<Z14 unit="cm">104.555</Z14>
+		<Z15 unit="cm">104.555</Z15>
 		<Z16 unit="cm">104.80</Z16>
 		<Z17 unit="cm">104.90</Z17>
-		<Z18 unit="cm">109.63</Z18>
-		<Z19 unit="cm">109.63</Z19>
+		<Z18 unit="cm">109.625</Z18>
+		<Z19 unit="cm">109.625</Z19>
 		<Z20 unit="cm">109.88</Z20>
 		<Z21 unit="cm">109.98</Z21>
 		<Z22 unit="cm">115.45</Z22>
 		<Z23 unit="cm">115.45</Z23>
 		<Z24 unit="cm">115.70</Z24>
 		<Z25 unit="cm">115.80</Z25>
-		<Z26 unit="cm">121.28</Z26>
-		<Z27 unit="cm">121.28</Z27>
+		<Z26 unit="cm">121.275</Z26>
+		<Z27 unit="cm">121.275</Z27>
 		<Z28 unit="cm">121.53</Z28>
 		<Z29 unit="cm">121.63</Z29>
-		<Z30 unit="cm">130.73</Z30>
-		<Z31 unit="cm">130.73</Z31>
+		<Z30 unit="cm">130.725</Z30>
+		<Z31 unit="cm">130.725</Z31>
 		<Z32 unit="cm">130.98</Z32>
 		<Z33 unit="cm">131.08</Z33>
 		<Z34 unit="cm">138.70</Z34>
@@ -1401,8 +1643,8 @@
 		<Z43 unit="cm">175.80</Z43>
 		<Z44 unit="cm">176.05</Z44>
 		<Z45 unit="cm">176.15</Z45>
-		<Z46 unit="cm">197.58</Z46>
-		<Z47 unit="cm">197.58</Z47>
+		<Z46 unit="cm">197.575</Z46>
+		<Z47 unit="cm">197.575</Z47>
 		<Z48 unit="cm">197.83</Z48>
 		<Z49 unit="cm">197.93</Z49>
 		<Z50 unit="cm">220.70</Z50>
@@ -1523,10 +1765,15 @@
 		<R53 unit="cm">20.0</R53>
 		<R54 unit="cm">20.0</R54>
 
-		<Material desc="Epoxy">Cryo_Epoxy</Material>
-        </C7lyr2>
+		<Intersect>C1wal1</Intersect>
 
-        <C7lyr3>
+		<MotherVolume>C6spc1</MotherVolume>
+
+		<Material>Cryo_Epoxy</Material>
+		<Desc>Epoxy</Desc>
+        </Straight>
+
+        <Straight name="C7lyr3">
 		<N desc="Number of planes">30</N>
 
 		<Z0 unit="cm">68.93</Z0>
@@ -1622,10 +1869,15 @@
 		<R28 unit="cm">19.7</R28>
 		<R29 unit="cm">19.7</R29>
 
-		<Material desc="NbTi">Cryo_NbTi</Material>
-	</C7lyr3>
+		<Intersect>C1wal1</Intersect>
 
-	<C7lyr4>
+		<MotherVolume>C6spc1</MotherVolume>
+
+		<Material>Cryo_NbTi</Material>
+		<Desc>NbTi</Desc>
+	</Straight>
+
+	<Straight name="C7lyr4">
 		<N desc="Number of planes">59</N>
 
 		<Z0 unit="cm">68.35</Z0>
@@ -1808,68 +2060,99 @@
 		<R57 unit="cm">19.87</R57>
 		<R58 unit="cm">19.87</R58>
 
-		<Material desc="Support structure">SUS316L</Material>
-	</C7lyr4>
+		<Intersect>C1wal1</Intersect>
 
-	<C7lyr5>
-		<N desc="Number of planes">17</N>
+		<MotherVolume>C6spc1</MotherVolume>
 
-		<Z0 unit="cm">110.53</Z0>
-		<Z1 unit="cm">116.35</Z1>
-		<Z2 unit="cm">116.35</Z2>
-		<Z3 unit="cm">116.50</Z3>
-		<Z4 unit="cm">116.50</Z4>
-		<Z5 unit="cm">117.80</Z5>
-		<Z6 unit="cm">117.80</Z6>
-		<Z7 unit="cm">122.17</Z7>
-		<Z8 unit="cm">122.17</Z8>
-		<Z9 unit="cm">131.62</Z9>
-		<Z10 unit="cm">131.62</Z10>
-		<Z11 unit="cm">139.60</Z11>
-		<Z12 unit="cm">139.60</Z12>
-		<Z13 unit="cm">161.94</Z13>
-		<Z14 unit="cm">161.94</Z14>
-		<Z15 unit="cm">163.06</Z15>
-		<Z16 unit="cm">163.14</Z16>
+		<Material>SUS316L</Material>
+		<Desc>Support structure</Desc>
+	</Straight>
 
-		<r0 unit="cm">9.4</r0>
-		<r1 unit="cm">9.4</r1>
-		<r2 unit="cm">9.4</r2>
-		<r3 unit="cm">9.4</r3>
-		<r4 unit="cm">9.7</r4>
-		<r5 unit="cm">9.7</r5>
-		<r6 unit="cm">12.0</r6>
-		<r7 unit="cm">12.18</r7>
-		<r8 unit="cm">12.18</r8>
-		<r9 unit="cm">12.57</r9>
-		<r10 unit="cm">12.57</r10>
-		<r11 unit="cm">12.90</r11>
-		<r12 unit="cm">12.90</r12>
-		<r13 unit="cm">13.83</r13>
-		<r14 unit="cm">13.83</r14>
-		<r15 unit="cm">14.378</r15>
-		<r16 unit="cm">14.381</r16>
+	<Straight name="C7lyr5">
+		<N desc="Number of planes">24</N>
 
-		<R0 unit="cm">12.4</R0>
-		<R1 unit="cm">12.4</R1>
-		<R2 unit="cm">13.4</R2>
-		<R3 unit="cm">13.4</R3>
-		<R4 unit="cm">13.4</R4>
-		<R5 unit="cm">13.4</R5>
-		<R6 unit="cm">13.4</R6>
-		<R7 unit="cm">13.4</R7>
-		<R8 unit="cm">14.4</R8>
-		<R9 unit="cm">14.4</R9>
-		<R10 unit="cm">15.4</R10>
-		<R11 unit="cm">15.4</R11>
-		<R12 unit="cm">16.4</R12>
-		<R13 unit="cm">16.4</R13>
-		<R14 unit="cm">16.4</R14>
-		<R15 unit="cm">16.4</R15>
-		<R16 unit="cm">14.381</R16>
+		<Z0 unit="cm">71.80</Z0>
+		<Z1 unit="cm">75.82</Z1>
+		<Z2 unit="cm">75.82</Z2>
+		<Z3 unit="cm">88.77</Z3>
+		<Z4 unit="cm">88.77</Z4>
+		<Z5 unit="cm">99.62</Z5>
+		<Z6 unit="cm">99.62</Z6>
+		<Z7 unit="cm">105.45</Z7>
+		<Z8 unit="cm">105.45</Z8>
+		<Z9 unit="cm">110.52</Z9>
+		<Z10 unit="cm">110.52</Z10>
+		<Z11 unit="cm">115.00</Z11>
+		<Z12 unit="cm">115.00</Z12>
+		<Z13 unit="cm">116.35</Z13>
+		<Z14 unit="cm">116.35</Z14>
+		<Z15 unit="cm">117.80</Z15>
+		<Z16 unit="cm">117.80</Z16>
+		<Z17 unit="cm">122.17</Z17>
+		<Z18 unit="cm">122.17</Z18>
+		<Z19 unit="cm">131.62</Z19>
+		<Z20 unit="cm">131.62</Z20>
+		<Z21 unit="cm">139.60</Z21>
+		<Z22 unit="cm">139.60</Z22>
+		<Z23 unit="cm">162.60</Z23>
 
-		<Material desc="Tungsten shield 2">W</Material>
-        </C7lyr5>
+		<r0 unit="cm">5.68</r0>
+		<r1 unit="cm">5.85</r1>
+		<r2 unit="cm">5.85</r2>
+		<r3 unit="cm">6.39</r3>
+		<r4 unit="cm">6.39</r4>
+		<r5 unit="cm">6.84</r5>
+		<r6 unit="cm">6.84</r6>
+		<r7 unit="cm">7.08</r7>
+		<r8 unit="cm">7.08</r8>
+		<r9 unit="cm">7.29</r9>
+		<r10 unit="cm">7.29</r10>
+		<r11 unit="cm">7.48</r11>
+		<r12 unit="cm">9.7</r12>
+		<r13 unit="cm">9.70</r13>
+		<r14 unit="cm">9.70</r14>
+		<r15 unit="cm">9.70</r15>
+		<r16 unit="cm">11.93</r16>
+		<r17 unit="cm">12.11</r17>
+		<r18 unit="cm">12.11</r18>
+		<r19 unit="cm">12.50</r19>
+		<r20 unit="cm">12.50</r20>
+		<r21 unit="cm">12.84</r21>
+		<r22 unit="cm">12.84</r22>
+		<r23 unit="cm">13.79</r23>
+
+		<R0 unit="cm">7.4</R0>
+		<R1 unit="cm">7.4</R1>
+		<R2 unit="cm">8.4</R2>
+		<R3 unit="cm">8.4</R3>
+		<R4 unit="cm">8.9</R4>
+		<R5 unit="cm">8.9</R5>
+		<R6 unit="cm">9.9</R6>
+		<R7 unit="cm">9.9</R7>
+		<R8 unit="cm">11.4</R8>
+		<R9 unit="cm">11.4</R9>
+		<R10 unit="cm">12.4</R10>
+		<R11 unit="cm">12.4</R11>
+		<R12 unit="cm">12.4</R12>
+		<R13 unit="cm">12.4</R13>
+		<R14 unit="cm">13.4</R14>
+		<R15 unit="cm">13.4</R15>
+		<R16 unit="cm">13.4</R16>
+		<R17 unit="cm">13.4</R17>
+		<R18 unit="cm">14.4</R18>
+		<R19 unit="cm">14.4</R19>
+		<R20 unit="cm">15.4</R20>
+		<R21 unit="cm">15.4</R21>
+		<R22 unit="cm">16.4</R22>
+		<R23 unit="cm">16.4</R23>
+
+		<Intersect>C1wal1</Intersect>
+
+		<MotherVolume>C6spc1</MotherVolume>
+
+		<Material>W</Material>
+		<Desc>Tungsten shield 2</Desc>
+        </Straight>
 
 	<D1spc1>
 		<N desc="Number of planes">30</N>
@@ -1936,10 +2219,11 @@
 		<R28 unit="cm">4.4</R28>
 		<R29 unit="cm">4.4</R29>
 
-		<Material desc="Left HER Beam pipe space">Vacuum</Material>
+		<Material>Vacuum</Material>
+		<Desc>Left HER Beam pipe space</Desc>
 	</D1spc1>
 
-	<D2wal1>
+	<Straight name="D2wal1">
 		<N desc="Number of planes">8</N>
 
 		<Z0 unit="cm">-62.05</Z0>
@@ -1969,10 +2253,15 @@
 		<r6 unit="cm">4.0</r6>
 		<r7 unit="cm">4.0</r7>
 
-		<Material desc="Left HER Beam pipe">Ta</Material>
-	</D2wal1>
+		<Intersect>D1spc1</Intersect>
 
-	<D3wal1>
+		<MotherVolume>D1spc1</MotherVolume>
+
+		<Material>Ta</Material>
+		<Desc>Left HER Beam pipe</Desc>
+	</Straight>
+
+	<Straight name="D3wal1">
 		<N desc="Number of planes">21</N>
 
 		<Z0 unit="cm">-66.87</Z0>
@@ -2041,10 +2330,15 @@
 		<r19 unit="cm">4.7</r19>
 		<r20 unit="cm">4.7</r20>
 
-		<Material desc="Vacuum vessel">SUS316L</Material>
-	</D3wal1>
+		<Subtract>D2wal1</Subtract>
 
-	<D3wal2>
+		<MotherVolume>D1spc1</MotherVolume>
+
+		<Material>SUS316L</Material>
+		<Desc>Vacuum vessel</Desc>
+	</Straight>
+
+	<Straight name="D3wal2">
 		<N desc="Number of planes">6</N>
 
 		<Z0 unit="cm">-233.6</Z0>
@@ -2068,10 +2362,13 @@
 		<r4 unit="cm">4.4</r4>
 		<r5 unit="cm">4.4</r5>
 
-		<Material desc="Vacuum vessel">SUS316L</Material>
-	</D3wal2>
+		<MotherVolume>D1spc1</MotherVolume>
 
-	<D4mag1>
+		<Material>SUS316L</Material>
+		<Desc>Vacuum vessel</Desc>
+	</Straight>
+
+	<Straight name="D4mag1">
 		<N desc="Number of planes">2</N>
 
 		<Z0 unit="cm">-73.4</Z0>
@@ -2083,10 +2380,15 @@
 		<r0 unit="cm">2.1</r0>
 		<r1 unit="cm">2.1</r1>
 
-		<Material desc="Magnet">SC_COIL</Material>
-	</D4mag1>
+		<Intersect>D1spc1</Intersect>
 
-	<D4mag2p1>
+		<MotherVolume>D1spc1</MotherVolume>
+
+		<Material>SC_COIL</Material>
+		<Desc>Magnet</Desc>
+	</Straight>
+
+	<Straight name="D4mag2p1">
 		<N desc="Number of planes">2</N>
 
 		<Z0 unit="cm">-116.9</Z0>
@@ -2098,10 +2400,14 @@
 		<r0 unit="cm">2.8</r0>
 		<r1 unit="cm">2.8</r1>
 
-		<Material desc="Magnet 2 part 1">Cryo_G-10</Material>
-	</D4mag2p1>
+		<Intersect>D1spc1</Intersect>
 
-	<D4mag2p2>
+		<MotherVolume>D1spc1</MotherVolume>
+
+		<Material desc="Magnet 2 part 1">Cryo_G-10</Material>
+	</Straight>
+
+	<Straight name="D4mag2p2">
 		<N desc="Number of planes">2</N>
 
 		<Z0 unit="cm">-118.3</Z0>
@@ -2113,10 +2419,15 @@
 		<r0 unit="cm">4.7</r0>
 		<r1 unit="cm">4.7</r1>
 
-		<Material desc="Magnet 2 part 2 iron yoke">Fe</Material>
-	</D4mag2p2>
+		<Intersect>D1spc1</Intersect>
 
-	<D4mag2p3>
+		<MotherVolume>D1spc1</MotherVolume>
+
+		<Material>Fe</Material>
+		<Desc>Magnet 2 part 2 iron yoke</Desc>
+	</Straight>
+
+	<Straight name="D4mag2p3">
 		<N desc="Number of planes">6</N>
 
 		<Z0 unit="cm">-118.3</Z0>
@@ -2140,10 +2451,15 @@
 		<r4 unit="cm">3.3</r4>
 		<r5 unit="cm">3.3</r5>
 
-		<Material desc="Magnet 2 part 3">SUS316L</Material>
-	</D4mag2p3>
+		<Intersect>D1spc1</Intersect>
 
-	<D4mag2p4>
+		<MotherVolume>D1spc1</MotherVolume>
+
+		<Material>SUS316L</Material>
+		<Desc>Magnet 2 part 3</Desc>
+	</Straight>
+
+	<Straight name="D4mag2p4">
 		<N desc="Number of planes">2</N>
 
 		<Z0 unit="cm">-119.5</Z0>
@@ -2155,10 +2471,15 @@
 		<r0 unit="cm">2.8</r0>
 		<r1 unit="cm">2.8</r1>
 
-		<Material desc="Magnet 2 part 4">SC_COIL</Material>
-	</D4mag2p4>
+		<Intersect>D1spc1</Intersect>
 
-	<D4mag3p1>
+		<MotherVolume>D1spc1</MotherVolume>
+
+		<Material>SC_COIL</Material>
+		<Desc>Magnet 2 part 4</Desc>
+	</Straight>
+
+	<Straight name="D4mag3p1">
 		<N desc="Number of planes">6</N>
 
 		<Z0 unit="cm">-235.8</Z0>
@@ -2182,10 +2503,13 @@
 		<r4 unit="cm">5.4</r4>
 		<r5 unit="cm">5.4</r5>
 
-		<Material desc="Magnet 3 part 1">SUS316L</Material>
-	</D4mag3p1>
+		<MotherVolume>D1spc1</MotherVolume>
 
-	<D4mag3p2>
+		<Material>SUS316L</Material>
+		<Desc>Magnet 3 part 1</Desc>
+	</Straight>
+
+	<Straight name="D4mag3p2">
 		<N desc="Number of planes">8</N>
 
 		<Z0 unit="cm">-236.8</Z0>
@@ -2215,10 +2539,13 @@
 		<r6 unit="cm">5.4</r6>
 		<r7 unit="cm">5.4</r7>
 
-		<Material desc="Magnet 3 part 2">Cryo_Liq_He</Material>
-	</D4mag3p2>
+		<MotherVolume>D1spc1</MotherVolume>
 
-	<D4mag3p3>
+		<Material>Cryo_Liq_He</Material>
+		<Desc>Magnet 3 part 2</Desc>
+	</Straight>
+
+	<Straight name="D4mag3p3">
 		<N desc="Number of planes">2</N>
 
 		<Z0 unit="cm">-238.7</Z0>
@@ -2230,10 +2557,13 @@
 		<r0 unit="cm">7.5</r0>
 		<r1 unit="cm">7.5</r1>
 
-		<Material desc="Magnet 3 part 3">Fe</Material>
-	</D4mag3p3>
+		<MotherVolume>D1spc1</MotherVolume>
 
-	<D4mag3p4>
+		<Material>Fe</Material>
+		<Desc>Magnet 3 part 3</Desc>
+	</Straight>
+
+	<Straight name="D4mag3p4">
 		<N desc="Number of planes">2</N>
 
 		<Z0 unit="cm">-237.3</Z0>
@@ -2245,10 +2575,13 @@
 		<r0 unit="cm">6.45</r0>
 		<r1 unit="cm">6.45</r1>
 
-		<Material desc="Magnet 3 part 4">SUS316L</Material>
-	</D4mag3p4>
+		<MotherVolume>D1spc1</MotherVolume>
 
-	<D4mag3p5>
+		<Material>SUS316L</Material>
+		<Desc>Magnet 3 part 4</Desc>
+	</Straight>
+
+	<Straight name="D4mag3p5">
 		<N desc="Number of planes">2</N>
 
 		<Z0 unit="cm">-237.3</Z0>
@@ -2260,10 +2593,13 @@
 		<r0 unit="cm">5.4</r0>
 		<r1 unit="cm">5.4</r1>
 
-		<Material desc="Magnet 3 part 5">SC_COIL</Material>
-	</D4mag3p5>
+		<MotherVolume>D1spc1</MotherVolume>
 
-	<D4mag3p6>
+		<Material>SC_COIL</Material>
+		<Desc>Magnet 3 part 5</Desc>
+	</Straight>
+
+	<Straight name="D4mag3p6">
 		<N desc="Number of planes">2</N>
 
 		<Z0 unit="cm">-235.8</Z0>
@@ -2275,8 +2611,11 @@
 		<r0 unit="cm">5.0</r0>
 		<r1 unit="cm">5.0</r1>
 
-		<Material desc="Magnet 3 part 6">SUS316L</Material>
-	</D4mag3p6>
+		<MotherVolume>D1spc1</MotherVolume>
+
+		<Material>SUS316L</Material>
+		<Desc>Magnet 3 part 6</Desc>
+	</Straight>
 
 	<E1spc1>
 		<N desc="Number of planes">27</N>
@@ -2337,10 +2676,11 @@
 		<R25 unit="cm">4.4</R25>
 		<R26 unit="cm">4.4</R26>
 
-		<Material desc="Left LER Beam pipe space 1">Vacuum</Material>
+		<Material>Vacuum</Material>
+		<Desc>Left LER Beam pipe space 1</Desc>
 	</E1spc1>
 
-	<E2wal1>
+	<Straight name="E2wal1">
 		<N desc="Number of planes">10</N>
 
 		<Z0 unit="cm">-62.05</Z0>
@@ -2376,10 +2716,15 @@
 		<r8 unit="cm">4.0</r8>
 		<r9 unit="cm">4.0</r9>
 
-		<Material desc="Left LER Beam pipe">Ta</Material>
-	</E2wal1>
+		<Intersect>E1spc1</Intersect>
 
-	<E3wal1>
+		<MotherVolume>E1spc1</MotherVolume>
+
+		<Material>Ta</Material>
+		<Desc>Left LER Beam pipe</Desc>
+	</Straight>
+
+	<Straight name="E3wal1">
 		<N desc="Number of planes">15</N>
 
 		<Z0 unit="cm">-66.87</Z0>
@@ -2430,10 +2775,15 @@
 		<r13 unit="cm">4.5</r13>
 		<r14 unit="cm">4.5</r14>
 
-		<Material desc="Vacuum vessel">SUS316L</Material>
-	</E3wal1>
+		<Intersect>E1spc1</Intersect>
 
-	<E4mag1p1>
+		<MotherVolume>E1spc1</MotherVolume>
+
+		<Material>SUS316L</Material>
+		<Desc>Vacuum vessel</Desc>
+	</Straight>
+
+	<Straight name="E4mag1p1">
 		<N desc="Number of planes">2</N>
 
 		<Z0 unit="cm">-72.01</Z0>
@@ -2445,10 +2795,12 @@
 		<r0 unit="cm">2.1</r0>
 		<r1 unit="cm">2.1</r1>
 
-		<Material desc="Magnet 1 part 1">Cryo_G-10</Material>
-	</E4mag1p1>
+		<MotherVolume>E1spc1</MotherVolume>
 
-	<E4mag1p2>
+		<Material desc="Magnet 1 part 1">Cryo_G-10</Material>
+	</Straight>
+
+	<Straight name="E4mag1p2">
 		<N desc="Number of planes">6</N>
 
 		<Z0 unit="cm">-73.11</Z0>
@@ -2472,10 +2824,13 @@
 		<r4 unit="cm">2.5</r4>
 		<r5 unit="cm">2.5</r5>
 
-		<Material desc="Magnet 1 part 2">SUS316L</Material>
-	</E4mag1p2>
+		<MotherVolume>E1spc1</MotherVolume>
 
-	<E4mag1p3>
+		<Material>SUS316L</Material>
+		<Desc>Magnet 1 part 2</Desc>
+	</Straight>
+
+	<Straight name="E4mag1p3">
 		<N desc="Number of planes">3</N>
 
 		<Z0 unit="cm">-74.31</Z0>
@@ -2490,10 +2845,15 @@
 		<r1 unit="cm">2.1</r1>
 		<r2 unit="cm">2.5</r2>
 
-		<Material desc="Magnet 1 part 3">SC_COIL</Material>
-	</E4mag1p3>
+		<Subtract>E3wal1</Subtract>
 
-	<E4mag2>
+		<MotherVolume>E1spc1</MotherVolume>
+
+		<Material>SC_COIL</Material>
+		<Desc>Magnet 1 part 3</Desc>
+	</Straight>
+
+	<Straight name="E4mag2">
 		<N desc="Number of planes">3</N>
 
 		<Z0 unit="cm">-118.3</Z0>
@@ -2508,10 +2868,15 @@
 		<r1 unit="cm">3.63</r1>
 		<r2 unit="cm">4.03</r2>
 
-		<Material desc="Magnet 2">SUS316L</Material>
-	</E4mag2>
+		<Subtract>E3wal1</Subtract>
 
-	<E4mag3p1>
+		<MotherVolume>E1spc1</MotherVolume>
+
+		<Material>SUS316L</Material>
+		<Desc>Magnet 2</Desc>
+	</Straight>
+
+	<Straight name="E4mag3p1">
 		<N desc="Number of planes">4</N>
 
 		<Z0 unit="cm">-162.5</Z0>
@@ -2529,10 +2894,15 @@
 		<r2 unit="cm">6.8</r2>
 		<r3 unit="cm">6.8</r3>
 
-		<Material desc="Magnet 3 part 1">Fe</Material>
-	</E4mag3p1>
+		<Subtract>E3wal1</Subtract>
 
-	<E4mag3p2>
+		<MotherVolume>E1spc1</MotherVolume>
+
+		<Material>Fe</Material>
+		<Desc>Magnet 3 part 1</Desc>
+	</Straight>
+
+	<Straight name="E4mag3p2">
 		<N desc="Number of planes">2</N>
 
 		<Z0 unit="cm">-163.7</Z0>
@@ -2544,10 +2914,15 @@
 		<r0 unit="cm">4.29</r0>
 		<r1 unit="cm">4.71</r1>
 
-		<Material desc="Magnet 3 part 2">Cryo_Liq_He</Material>
-	</E4mag3p2>
+		<Subtract>E3wal1</Subtract>
 
-	<E4mag3p3>
+		<MotherVolume>E1spc1</MotherVolume>
+
+		<Material>Cryo_Liq_He</Material>
+		<Desc>Magnet 3 part 2</Desc>
+	</Straight>
+
+	<Straight name="E4mag3p3">
 		<N desc="Number of planes">2</N>
 
 		<Z0 unit="cm">-165.8</Z0>
@@ -2559,10 +2934,12 @@
 		<r0 unit="cm">4.85</r0>
 		<r1 unit="cm">4.85</r1>
 
-		<Material desc="Magnet 3 part 3">Cryo_G-10</Material>
-	</E4mag3p3>
+		<MotherVolume>E1spc1</MotherVolume>
 
-	<E4mag3p4>
+		<Material desc="Magnet 3 part 3">Cryo_G-10</Material>
+	</Straight>
+
+	<Straight name="E4mag3p4">
 		<N desc="Number of planes">6</N>
 
 		<Z0 unit="cm">-167.8</Z0>
@@ -2586,10 +2963,13 @@
 		<r4 unit="cm">4.85</r4>
 		<r5 unit="cm">4.85</r5>
 
-		<Material desc="Magnet 3 part 4">SUS316L</Material>
-	</E4mag3p4>
+		<MotherVolume>E1spc1</MotherVolume>
 
-	<E4mag3p5>
+		<Material>SUS316L</Material>
+		<Desc>Magnet 3 part 4</Desc>
+	</Straight>
+
+	<Straight name="E4mag3p5">
 		<N desc="Number of planes">2</N>
 
 		<Z0 unit="cm">-169.0</Z0>
@@ -2601,186 +2981,349 @@
 		<r0 unit="cm">4.85</r0>
 		<r1 unit="cm">4.85</r1>
 
-		<Material desc="Magnet 3 part 5">SC_COIL</Material>
-	</E4mag3p5>
+		<MotherVolume>E1spc1</MotherVolume>
+
+		<Material>SC_COIL</Material>
+		<Desc>Magnet 3 part 5</Desc>
+	</Straight>
 
         <F1wal1>
-		<N desc="Number of planes">13</N>
+		<N desc="Number of planes">21</N>
 
 		<Z0 unit="cm">-62.73</Z0>
-		<Z1 unit="cm">-73.17</Z1>
-		<Z2 unit="cm">-76.30</Z2>
+		<Z1 unit="cm">-75.30</Z1>
+		<Z2 unit="cm">-75.30</Z2>
 		<Z3 unit="cm">-76.30</Z3>
-		<Z4 unit="cm">-89.73</Z4>
-		<Z5 unit="cm">-136.65</Z5>
-		<Z6 unit="cm">-208.4</Z6>
-		<Z7 unit="cm">-208.4</Z7>
-		<Z8 unit="cm">-240.25</Z8>
-		<Z9 unit="cm">-248.25</Z9>
-		<Z10 unit="cm">-322.10</Z10>
-		<Z11 unit="cm">-322.10</Z11>
-		<Z12 unit="cm">-336.10</Z12>
+		<Z4 unit="cm">-76.30</Z4>
+		<Z5 unit="cm">-99.08</Z5>
+		<Z6 unit="cm">-131.68</Z6>
+		<Z7 unit="cm">-208.25</Z7>
+		<Z8 unit="cm">-208.25</Z8>
+		<Z9 unit="cm">-211.00</Z9>
+		<Z10 unit="cm">-233.78</Z10>
+		<Z11 unit="cm">-250.75</Z11>
+		<Z12 unit="cm">-258.25</Z12>
+		<Z13 unit="cm">-258.25</Z13>
+		<Z14 unit="cm">-291.10</Z14>
+		<Z15 unit="cm">-305.10</Z15>
+		<Z16 unit="cm">-331.10</Z16>
+		<Z17 unit="cm">-331.10</Z17>
+		<Z18 unit="cm">-335.10</Z18>
+		<Z19 unit="cm">-335.10</Z19>
+		<!--Z20 unit="cm">-339.10</Z20-->
+		<Z20 unit="cm">-716.10</Z20>
 
 		<R0 unit="cm">13.55</R0>
-		<R1 unit="cm">17.35</R1>
-		<R2 unit="cm">17.35</R2>
+		<R1 unit="cm">18.13</R1>
+		<R2 unit="cm">20.25</R2>
 		<R3 unit="cm">20.25</R3>
-		<R4 unit="cm">20.25</R4>
-		<R5 unit="cm">25.00</R5>
+		<R4 unit="cm">21.70</R4>
+		<R5 unit="cm">21.70</R5>
 		<R6 unit="cm">25.00</R6>
-		<R7 unit="cm">34.00</R7>
-		<R8 unit="cm">34.00</R8>
-		<R9 unit="cm">41.00</R9>
-		<R10 unit="cm">41.00</R10>
-		<R11 unit="cm">42.55</R11>
-		<R12 unit="cm">42.55</R12>
+		<R7 unit="cm">25.00</R7>
+		<R8 unit="cm">31.50</R8>
+		<R9 unit="cm">32.50</R9>
+		<R10 unit="cm">32.50</R10>
+		<R11 unit="cm">42.30</R11>
+		<R12 unit="cm">42.30</R12>
+		<R13 unit="cm">41.00</R13>
+		<R14 unit="cm">41.00</R14>
+		<R15 unit="cm">55.00</R15>
+		<R16 unit="cm">55.00</R16>
+		<R17 unit="cm">60.00</R17>
+		<R18 unit="cm">60.00</R18>
+		<!--R19 unit="cm">63.00</R19>
+		<R20 unit="cm">63.00</R20-->
+		<R19 unit="cm">75.00</R19>
+		<R20 unit="cm">75.00</R20>
 
-		<Material desc="Vacuum vessel">SUS316L</Material>
+		<Material>SUS316L</Material>
+		<Desc>Vacuum vessel</Desc>
         </F1wal1>
 
-        <F2spc1>
-		<N desc="Number of planes">11</N>
-
-		<Z0 unit="cm">-64.23</Z0>
-		<Z1 unit="cm">-72.19</Z1>
-		<Z2 unit="cm">-77.80</Z2>
-		<Z3 unit="cm">-77.80</Z3>
-		<Z4 unit="cm">-89.80</Z4>
-		<Z5 unit="cm">-136.72</Z5>
-		<Z6 unit="cm">-210.90</Z6>
-		<Z7 unit="cm">-210.90</Z7>
-		<Z8 unit="cm">-240.25</Z8>
-		<Z9 unit="cm">-248.25</Z9>
-		<Z10 unit="cm">-336.10</Z10>
-
-		<R0 unit="cm">12.95</R0>
-		<R1 unit="cm">15.85</R1>
-		<R2 unit="cm">15.85</R2>
-		<R3 unit="cm">18.75</R3>
-		<R4 unit="cm">18.75</R4>
-		<R5 unit="cm">23.45</R5>
-		<R6 unit="cm">23.45</R6>
-		<R7 unit="cm">31.50</R7>
-		<R8 unit="cm">31.50</R8>
-		<R9 unit="cm">37.00</R9>
-		<R10 unit="cm">37.00</R10>
-
-		<Material desc="Vacuum space">Vacuum</Material>
-        </F2spc1>
-
-        <F3wal1>
+	
+	<Straight name="F1wal2">
 		<N desc="Number of planes">7</N>
 
-		<Z0 unit="cm">-65.23</Z0>
-		<Z1 unit="cm">-71.17</Z1>
+		<Z0 unit="cm">-62.73</Z0>
+		<Z1 unit="cm">-64.23</Z1>
+		<Z2 unit="cm">-64.23</Z2>
+		<Z3 unit="cm">-71.83</Z3>
+		<Z4 unit="cm">-75.30</Z4>
+		<Z5 unit="cm">-75.30</Z5>
+		<Z6 unit="cm">-76.30</Z6>
+
+		<R0 unit="cm">13.55</R0>
+		<R1 unit="cm">14.10</R1>
+		<R2 unit="cm">14.10</R2>
+		<R3 unit="cm">16.87</R3>
+		<R4 unit="cm">18.13</R4>
+		<R5 unit="cm">20.25</R5>
+		<R6 unit="cm">20.25</R6>
+
+		<r0 unit="cm">0</r0>
+		<r1 unit="cm">0</r1>
+		<r2 unit="cm">13.03</r2>
+		<r3 unit="cm">15.80</r3>
+		<r4 unit="cm">15.80</r4>
+		<r5 unit="cm">15.80</r5>
+		<r6 unit="cm">15.80</r6>
+
+		<Intersect>F1wal1</Intersect>
+
+		<MotherVolume>F1wal1</MotherVolume>
+
+		<Material>W</Material>
+		<Desc>Tungsten shield backward</Desc>
+	</Straight>
+
+        <Straight name="F2spc1">
+		<N desc="Number of planes">9</N>
+
+		<!--Z0 unit="cm">-64.23</Z0-->
+		<Z0 unit="cm">-64.73</Z0>
+		<Z1 unit="cm">-71.84</Z1>
+		<!--Z2 unit="cm">-76.31</Z2>
+		<Z3 unit="cm">-76.31</Z3-->
+		<Z2 unit="cm">-76.81</Z2>
+		<Z3 unit="cm">-76.81</Z3>
+		<Z4 unit="cm">-77.71</Z4>
+		<Z5 unit="cm">-77.71</Z5>
+		<Z6 unit="cm">-84.85</Z6>
+		<Z7 unit="cm">-131.77</Z7>
+		<Z8 unit="cm">-225.25</Z8>
+
+		<!--R0 unit="cm">13.03</R0>
+		<R1 unit="cm">15.80</R1>
+		<R2 unit="cm">15.80</R2-->
+		<R0 unit="cm">12.53</R0>
+		<R1 unit="cm">15.30</R1>
+		<R2 unit="cm">15.30</R2>
+		<R3 unit="cm">17.85</R3>
+		<R4 unit="cm">17.85</R4>
+		<R5 unit="cm">18.75</R5>
+		<R6 unit="cm">18.75</R6>
+		<R7 unit="cm">23.50</R7>
+		<R8 unit="cm">23.50</R8>
+
+		<Intersect>F1wal1</Intersect>
+
+		<MotherVolume>F1wal1</MotherVolume>
+
+		<Material>Vacuum</Material>
+		<Desc>Vacuum space</Desc>
+        </Straight>
+
+	<Straight name="F2spc2">
+		<N desc="Number of planes">8</N>
+
+		<Z0 unit="cm">-214.55</Z0>
+		<Z1 unit="cm">-225.25</Z1>
+		<Z2 unit="cm">-225.25</Z2>
+		<Z3 unit="cm">-234.45</Z3>
+		<Z4 unit="cm">-246.57</Z4>
+		<Z5 unit="cm">-292.76</Z5>
+		<Z6 unit="cm">-306.76</Z6>
+		<Z7 unit="cm">-314.60</Z7>
+		<Z8 unit="cm">-318.60</Z8>
+		<Z9 unit="cm">-318.60</Z9>
+
+		<R0 unit="cm">30.0</R0>
+		<R1 unit="cm">30.0</R1>
+		<R2 unit="cm">30.0</R2>
+		<R3 unit="cm">30.0</R3>
+		<R4 unit="cm">37.0</R4>
+		<R5 unit="cm">37.0</R5>
+		<R6 unit="cm">51.0</R6>
+		<R7 unit="cm">51.0</R7>
+		<R7 unit="cm">45.0</R7>
+		<R7 unit="cm">45.0</R7>
+
+		<r0 unit="cm">25.5</r0>
+		<r1 unit="cm">25.5</r1>
+		<r2 unit="cm">0</r2>
+		<!--...-->
+
+		<Intersect>F1wal1</Intersect>
+
+		<MotherVolume>F1wal1</MotherVolume>
+
+		<Material>Vacuum</Material>
+		<Desc>Vacuum space</Desc>
+	</Straight>
+
+	<Straight name="F2spc3">
+		<N desc="Number of planes">4</N>
+
+		<Z0 unit="cm">-321.10</Z0>
+		<Z1 unit="cm">-339.10</Z1>
+		<Z2 unit="cm">-339.10</Z2>
+		<Z3 unit="cm">-716.10</Z3>
+
+		<R0 unit="cm">51.00</R0>
+		<R1 unit="cm">51.00</R1>
+		<R2 unit="cm">71.00</R2>
+		<R3 unit="cm">71.00</R3>
+
+		<Intersect>F1wal1</Intersect>
+
+		<MotherVolume>F1wal1</MotherVolume>
+
+		<Material>Air</Material>
+		<Desc>Open space</Desc>
+	</Straight>
+
+        <Straight name="F3wal1">
+		<N desc="Number of planes">9</N>
+
+		<Z0 unit="cm">-65.43</Z0>
+		<Z1 unit="cm">-69.54</Z1>
 		<Z2 unit="cm">-78.60</Z2>
 		<Z3 unit="cm">-78.60</Z3>
-		<Z4 unit="cm">-88.86</Z4>
-		<Z5 unit="cm">-131.83</Z5>
-		<Z6 unit="cm">-225.45</Z6>
+		<Z4 unit="cm">-78.80</Z4>
+		<Z5 unit="cm">-78.80</Z5>
+		<Z6 unit="cm">-88.86</Z6>
+		<Z7 unit="cm">-131.83</Z7>
+		<Z8 unit="cm">-224.65</Z8>
 
-		<R0 unit="cm">12.34</R0>
-		<R1 unit="cm">14.5</R1>
-		<R2 unit="cm">14.5</R2>
-		<R3 unit="cm">17.65</R3>
-		<R4 unit="cm">17.65</R4>
-		<R5 unit="cm">22.0</R5>
-		<R6 unit="cm">22.0</R6>
+		<R0 unit="cm">12.30</R0>
+		<R1 unit="cm">13.80</R1>
+		<R2 unit="cm">13.80</R2>
+		<R3 unit="cm">17.35</R3>
+		<R4 unit="cm">17.35</R4>
+		<R5 unit="cm">17.65</R5>
+		<R6 unit="cm">17.65</R6>
+		<R7 unit="cm">22.00</R7>
+		<R8 unit="cm">22.00</R8>
 
-		<Material desc="Vacuum vessel">SUS316L</Material>
-        </F3wal1>
+		<Intersect>F1wal1</Intersect>
 
-        <F3wal2>
+		<MotherVolume>F2spc1</MotherVolume>
+
+		<Material>SUS316L</Material>
+		<Desc>Vacuum vessel</Desc>
+        </Straight>
+
+        <Straight name="F3wal2">
 		<N desc="Number of planes">2</N>
 
-		<Z0 unit="cm">-280.0</Z0>
-		<Z1 unit="cm">-283.0</Z1>
+		<Z0 unit="cm">-256.83</Z0>
+		<Z1 unit="cm">-259.83</Z1>
 
 		<R0 unit="cm">37.0</R0>
 		<R1 unit="cm">37.0</R1>
 
-		<Material desc="Vacuum vessel">SUS316L</Material>
-	</F3wal2>
+		<Intersect>F1wal1</Intersect>
 
-        <F3wal3>
+		<MotherVolume>F2spc2</MotherVolume>
+
+		<Material>SUS316L</Material>
+		<Desc>Vacuum vessel</Desc>
+	</Straight>
+
+        <Straight name="F3wal3">
 		<N desc="Number of planes">2</N>
 
-		<Z0 unit="cm">-318.6</Z0>
-		<Z1 unit="cm">-321.1</Z1>
+		<Z0 unit="cm">-282.68</Z0>
+		<Z1 unit="cm">-285.68</Z1>
 
 		<R0 unit="cm">37.0</R0>
 		<R1 unit="cm">37.0</R1>
 
-		<Material desc="Vacuum vessel">SUS316L</Material>
-	</F3wal3>
+		<Intersect>F1wal1</Intersect>
 
-        <F4spc1>
+		<MotherVolume>F2spc2</MotherVolume>
+
+		<Material>SUS316L</Material>
+		<Desc>Vacuum vessel</Desc>
+	</Straight>
+
+        <Straight name="F4spc1">
 		<N desc="Number of planes">7</N>
 
-		<Z0 unit="cm">-65.93</Z0>
-		<Z1 unit="cm">-71.29</Z1>
-		<Z2 unit="cm">-79.30</Z2>
-		<Z3 unit="cm">-79.30</Z3>
-		<Z4 unit="cm">-88.90</Z4>
-		<Z5 unit="cm">-131.87</Z5>
-		<Z6 unit="cm">-224.75</Z6>
+		<Z0 unit="cm">-65.63</Z0>
+		<Z1 unit="cm">-69.58</Z1>
+		<Z2 unit="cm">-78.81</Z2>
+		<Z3 unit="cm">-78.81</Z3>
+		<Z4 unit="cm">-88.91</Z4>
+		<Z5 unit="cm">-131.88</Z5>
+		<Z6 unit="cm">-224.45</Z6>
 
-		<R0 unit="cm">11.85</R0>
-		<R1 unit="cm">13.8</R1>
-		<R2 unit="cm">13.8</R2>
+		<R0 unit="cm">12.16</R0>
+		<R1 unit="cm">13.60</R1>
+		<R2 unit="cm">13.60</R2>
 		<R3 unit="cm">16.95</R3>
 		<R4 unit="cm">16.95</R4>
-		<R5 unit="cm">21.3</R5>
-		<R6 unit="cm">21.3</R6>
+		<R5 unit="cm">21.30</R5>
+		<R6 unit="cm">21.30</R6>
 
-		<Material desc="Vacuum space">Vacuum</Material>
-        </F4spc1>
+		<Intersect>F1wal1</Intersect>
 
-        <F5wal1>
-		<N desc="Number of planes">7</N>
+		<MotherVolume>F3wal1</MotherVolume>
+
+		<Material>Vacuum</Material>
+		<Desc>Vacuum space</Desc>
+        </Straight>
+
+        <Straight name="F5wal1">
+		<N desc="Number of planes">8</N>
 
 		<Z0 unit="cm">-66.73</Z0>
-		<Z1 unit="cm">-70.85</Z1>
-		<Z2 unit="cm">-84.06</Z2>
-		<Z3 unit="cm">-86.5</Z3>
-		<Z4 unit="cm">-131.91</Z4>
-		<Z5 unit="cm">-220.23</Z5>
-		<Z6 unit="cm">-222.05</Z6>
+		<Z1 unit="cm">-69.48</Z1>
+		<Z2 unit="cm">-79.57</Z2>
+		<Z3 unit="cm">-79.57</Z3>
+		<Z4 unit="cm">-84.07</Z4>
+		<Z5 unit="cm">-86.51</Z5>
+		<Z6 unit="cm">-131.92</Z6>
+		<Z7 unit="cm">-221.35</Z7>
 
-		<R0 unit="cm">11.5</R0>
-		<R1 unit="cm">13.0</R1>
-		<R2 unit="cm">13.0</R2>
-		<R3 unit="cm">15.9</R3>
-		<R4 unit="cm">20.5</R4>
-		<R5 unit="cm">20.5</R5>
-		<R6 unit="cm">15.5</R6>
+		<R0 unit="cm">11.50</R0>
+		<R1 unit="cm">12.50</R1>
+		<R2 unit="cm">12.50</R2>
+		<R3 unit="cm">13.00</R3>
+		<R4 unit="cm">13.00</R4>
+		<R5 unit="cm">15.90</R5>
+		<R6 unit="cm">20.50</R6>
+		<R7 unit="cm">20.50</R7>
 
-		<Material desc="Vacuum vessel">SUS316L</Material>
-        </F5wal1>
+		<Intersect>F1wal1</Intersect>
 
-        <F6spc1>
-		<N desc="Number of planes">7</N>
+		<MotherVolume>F4spc1</MotherVolume>
+
+		<Material>SUS316L</Material>
+		<Desc>Vacuum vessel</Desc>
+        </Straight>
+
+        <Straight name="F6spc1">
+		<N desc="Number of planes">8</N>
 
 		<Z0 unit="cm">-67.73</Z0>
-		<Z1 unit="cm">-68.28</Z1>
-		<Z2 unit="cm">-84.34</Z2>
-		<Z3 unit="cm">-87.72</Z3>
-		<Z4 unit="cm">-131.96</Z4>
-		<Z5 unit="cm">-219.00</Z5>
-		<Z6 unit="cm">-220.55</Z6>
+		<Z1 unit="cm">-69.65</Z1>
+		<Z2 unit="cm">-82.00</Z2>
+		<Z3 unit="cm">-82.30</Z3>
+		<Z4 unit="cm">-85.02</Z4>
+		<Z5 unit="cm">-87.72</Z5>
+		<Z6 unit="cm">-131.96</Z6>
+		<Z7 unit="cm">-219.35</Z7>
 
-		<R0 unit="cm">10.8</R0>
-		<R1 unit="cm">11.0</R1>
-		<R2 unit="cm">11.0</R2>
-		<R3 unit="cm">15.0</R3>
-		<R4 unit="cm">19.48</R4>
-		<R5 unit="cm">19.48</R5>
-		<R6 unit="cm">15.21</R6>
+		<R0 unit="cm">10.80</R0>
+		<R1 unit="cm">11.50</R1>
+		<R2 unit="cm">11.50</R2>
+		<R3 unit="cm">11.80</R3>
+		<R4 unit="cm">11.80</R4>
+		<R5 unit="cm">15.02</R5>
+		<R6 unit="cm">19.50</R6>
+		<R7 unit="cm">19.50</R7>
 
-		<Material desc="Liquid helium">Cryo_Liq_He</Material>
-        </F6spc1>
+		<Intersect>F1wal1</Intersect>
 
-        <F7lyr1>
+		<MotherVolume>F5wal1</MotherVolume>
+
+		<Material>Cryo_Liq_He</Material>
+		<Desc>Liquid helium</Desc>
+        </Straight>
+
+        <Straight name="F7lyr1">
 		<N desc="Number of planes">16</N>
 
 		<Z0 unit="cm">-84.85</Z0>
@@ -2834,10 +3377,15 @@
 		<r14 unit="cm">15.3</r14>
 		<r15 unit="cm">15.3</r15>
 
-		<Material desc="Tungsten shield">W</Material>
-        </F7lyr1>
+		<Intersect>F1wal1</Intersect>
 
-        <F7lyr2>
+		<MotherVolume>F6spc1</MotherVolume>
+
+		<Material>W</Material>
+		<Desc>Tungsten shield</Desc>
+        </Straight>
+
+        <Straight name="F7lyr2">
 		<N desc="Number of planes">30</N>
 
 		<Z0 unit="cm">-67.73</Z0>
@@ -2933,10 +3481,15 @@
 		<r28 unit="cm">15.0</r28>
 		<r29 unit="cm">15.0</r29>
 
-		<Material desc="Epoxy">Cryo_Epoxy</Material>
-        </F7lyr2>
+		<Intersect>F1wal1</Intersect>
 
-        <F7lyr3>
+		<MotherVolume>F6spc1</MotherVolume>
+
+		<Material>Cryo_Epoxy</Material>
+		<Desc>Epoxy</Desc>
+        </Straight>
+
+        <Straight name="F7lyr3">
 		<N desc="Number of planes">16</N>
 
 		<Z0 unit="cm">-68.50</Z0>
@@ -2990,10 +3543,15 @@
 		<r14 unit="cm">14.5</r14>
 		<r15 unit="cm">14.5</r15>
 
-		<Material desc="NbTi">Cryo_NbTi</Material>
-        </F7lyr3>
+		<Intersect>F1wal1</Intersect>
 
-	<F7lyr4>
+		<MotherVolume>F6spc1</MotherVolume>
+
+		<Material>Cryo_NbTi</Material>
+		<Desc>NbTi</Desc>
+        </Straight>
+
+	<Straight name="F7lyr4">
 		<N desc="Number of planes">34</N>
 
 		<Z0 unit="cm">-67.73</Z0>
@@ -3101,10 +3659,15 @@
 		<r32 unit="cm">13.8</r32>
 		<r33 unit="cm">13.8</r33>
 
-		<Material desc="Support structure">SUS316L</Material>
-	</F7lyr4>
+		<Intersect>F1wal1</Intersect>
 
-	<F7lyr5>
+		<MotherVolume>F6spc1</MotherVolume>
+
+		<Material>SUS316L</Material>
+		<Desc>Support structure</Desc>
+	</Straight>
+
+	<Straight name="F7lyr5">
 		<N desc="Number of planes">2</N>
 
 		<Z0 unit="cm">-161.50</Z0>
@@ -3113,8 +3676,13 @@
 		<R0 unit="cm">19.4</R0>
 		<R1 unit="cm">19.4</R1>
 
-		<Material desc="Iron yoke">Fe</Material>
-	</F7lyr5>
+		<Intersect>F1wal1</Intersect>
+
+		<MotherVolume>F6spc1</MotherVolume>
+
+		<Material>Fe</Material>
+		<Desc>Iron yoke</Desc>
+	</Straight>
 
   </Content>
 </DetectorComponent>

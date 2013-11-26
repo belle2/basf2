@@ -16,32 +16,236 @@
 
 	<!-- limits -->
 	<TubeR>
-		<Z0 unit="m">3.8215</Z0>
-		<Z1 unit="m">29.00</Z1>
-		<R unit="cm">500</R>
+		<N desc="Number of planes">4</N>
+
+		<Z0 unit="cm">373.45</Z0>
+		<Z1 unit="cm">830.00</Z1>
+		<Z2 unit="cm">830.00</Z2>
+		<!--Z1 unit="cm">392.00</Z1>
+		<Z2 unit="cm">392.00</Z2-->
+		<Z3 unit="m">29.00</Z3>
+
+		<R0 unit="cm">37.0</R0>
+		<R1 unit="cm">65.0</R1>
+		<R2 unit="cm">300</R2>
+		<R3 unit="cm">300</R3>
+
+		<r0 unit="cm">0.0</r0>
+		<r1 unit="cm">0.0</r1>
+		<r2 unit="cm">0.0</r2>
+		<r3 unit="cm">0.0</r3>
 	</TubeR>
 
 	<TubeL>
-		<Z0 unit="m">-3.361</Z0>
-		<Z1 unit="m">-29.00</Z1>
-		<R unit="cm">500</R>
+		<N desc="Number of planes">4</N>
+
+		<Z0 unit="cm">-321.1</Z0>
+		<Z1 unit="cm">-716.1</Z1>
+		<Z2 unit="cm">-716.1</Z2>
+		<Z3 unit="m">-29.00</Z3>
+
+		<R0 unit="cm">37</R0>
+		<R1 unit="cm">65</R1>
+		<R2 unit="cm">300</R2>
+		<R3 unit="cm">300</R3>
+
+		<r0 unit="cm">0.0</r0>
+		<r1 unit="cm">0.0</r1>
+		<r2 unit="cm">0.0</r2>
+		<r3 unit="cm">0.0</r3>
 	</TubeL>
 
-	<!-- vacuum tube -->
-	<LHR1>
+	<!-- straight parts of vacuum tube -->
+	<Straight type="pipe" name="LHR1">
 		<X0 unit="m">0.0</X0>
 		<Z0 unit="m">0.0</Z0>
 		<L unit="m">8.190</L>
-
 		<PHI unit="rad">0.04158</PHI>
 
 		<R unit="cm">4.4</R>
 		<r unit="cm">4.0</r>
 
-		<Material desc="Right HER far beam pipe linear part 1">Cu</Material>
-	</LHR1>
+		<Material>Cu</Material>
+		<Desc>Right HER far beam pipe straight part 1</Desc>
 
-	<BLC2REtube>
+		<Intersect>TubeR</Intersect>
+	</Straight>
+
+	<Straight type="pipe" name="LHR2">
+		<X0 unit="m">0.427</X0>
+		<Z0 unit="m">10.411</Z0>
+		<L unit="m">20.000</L>
+		<PHI unit="rad">0.03573</PHI>
+
+		<R unit="cm">4.4</R>
+		<r unit="cm">4.0</r>
+
+		<Material>Cu</Material>
+		<Desc>Right HER far beam pipe straight part 2</Desc>
+
+		<Intersect>TubeR</Intersect>
+	</Straight>
+
+	<Straight type="pipe" name="LLR1">
+		<X0 unit="m">0.0</X0>
+		<Z0 unit="m">0.0</Z0>
+		<L unit="m">4.000</L>
+		<PHI unit="rad">-0.04051</PHI>
+
+		<R unit="cm">4.4</R>
+		<r unit="cm">4.0</r>
+
+		<Material>Cu</Material>
+		<Desc>Right LER far beam pipe straight part 1</Desc>
+
+		<Intersect>TubeR</Intersect>
+	</Straight>
+
+	<Straight type="pipe" name="LLR2">
+		<X0 unit="m">-0.176</X0>
+		<Z0 unit="m">4.341</Z0>
+		<L unit="m">1.194</L>
+		<PHI unit="rad">-0.03998</PHI>
+
+		<R unit="cm">4.4</R>
+		<r unit="cm">4.0</r>
+
+		<Material>Cu</Material>
+		<Desc>Right LER far beam pipe straight part 2</Desc>
+	</Straight>
+
+	<Straight type="pipe" name="LLR3">
+		<X0 unit="m">-0.297</X0>
+		<Z0 unit="m">7.763</Z0>
+		<L unit="m">0.300</L>
+		<PHI unit="rad">-0.02554</PHI>
+
+		<R unit="cm">4.4</R>
+		<r unit="cm">4.0</r>
+
+		<Material>Cu</Material>
+		<Desc>Right LER far beam pipe straight part 3</Desc>
+	</Straight>
+
+	<Straight type="pipe" name="LLR4">
+		<X0 unit="m">-0.329</X0>
+		<Z0 unit="m">10.293</Z0>
+		<L unit="m">9.924</L>
+		<PHI unit="rad">0.00358</PHI>
+
+		<R unit="cm">4.4</R>
+		<r unit="cm">4.0</r>
+
+		<Material>Cu</Material>
+		<Desc>Right LER far beam pipe straight part 4</Desc>
+	</Straight>
+
+	<Straight type="pipe" name="LLR5">
+		<X0 unit="m">-0.408</X0>
+		<Z0 unit="m">24.404</Z0>
+		<L unit="m">3.494</L>
+		<PHI unit="rad">-0.05842</PHI>
+
+		<R unit="cm">4.4</R>
+		<r unit="cm">4.0</r>
+
+		<Material>Cu</Material>
+		<Desc>Right LER far beam pipe straight part 5</Desc>
+
+		<Intersect>TubeR</Intersect>
+	</Straight>
+
+	<Straight type="pipe" name="LHL1">
+		<X0 unit="m">0.0</X0>
+		<Z0 unit="m">0.0</Z0>
+		<L unit="m">7.505</L>
+		<PHI unit="rad">-3.09999</PHI>
+
+		<R unit="cm">4.4</R>
+		<r unit="cm">4.0</r>
+
+		<Material>Cu</Material>
+		<Desc>Left HER far beam pipe straight part 1</Desc>
+
+		<Intersect>TubeL</Intersect>
+	</Straight>
+
+	<Straight type="pipe" name="LHL2">
+		<X0 unit="m">-0.451</X0>
+		<Z0 unit="m">-11.096</Z0>
+		<L unit="m">18.701</L>
+		<PHI unit="rad">-3.10589</PHI>
+
+		<R unit="cm">4.4</R>
+		<!--r unit="cm">4.0</r-->
+	        <!-- movable collimator -->
+		<r unit="cm">0.0</r>
+
+		<Material>Cu</Material>
+		<Desc>Left HER far beam pipe straight part 2</Desc>
+
+		<Intersect>TubeL</Intersect>
+	</Straight>
+
+	<Straight type="pipe" name="LLL1">
+		<X0 unit="m">0.0</X0>
+		<Z0 unit="m">0.0</Z0>
+		<L unit="m">4.000</L>
+		<PHI unit="rad">-3.18399</PHI>
+
+		<R unit="cm">4.4</R>
+		<r unit="cm">4.0</r>
+
+		<Material>Cu</Material>
+		<Desc>Left LER far beam pipe straight part 1</Desc>
+
+		<Intersect>TubeL</Intersect>
+	</Straight>
+
+	<Straight type="pipe" name="LLL2">
+		<X0 unit="m">0.185</X0>
+		<Z0 unit="m">-4.340</Z0>
+		<L unit="m">1.194</L>
+		<PHI unit="rad">-3.18479</PHI>
+
+		<R unit="cm">4.4</R>
+		<r unit="cm">4.0</r>
+
+		<Material>Cu</Material>
+		<Desc>Left LER far beam pipe straight part 2</Desc>
+	</Straight>
+
+	<Straight type="pipe" name="LLL3">
+		<X0 unit="m">0.482</X0>
+		<Z0 unit="m">-9.515</Z0>
+		<L unit="m">12.008</L>
+		<PHI unit="rad">-3.22169</PHI>
+
+		<R unit="cm">4.4</R>
+		<r unit="cm">4.0</r>
+
+		<Material>Cu</Material>
+		<Desc>Left LER far beam pipe straight part 3</Desc>
+	</Straight>
+
+	<Straight type="pipe" name="LLL4">
+		<X0 unit="m">1.645</X0>
+		<Z0 unit="m">-25.668</Z0>
+		<L unit="m">3.494</L>
+		<PHI unit="rad">-3.15809</PHI>
+
+		<R unit="cm">4.4</R>
+		<r unit="cm">4.0</r>
+
+		<Material>Cu</Material>
+		<Desc>Left LER far beam pipe straight part 4</Desc>
+
+		<Intersect>TubeL</Intersect>
+	</Straight>
+
+        <!-- bending parts: pipes and magnets -->
+
+	<Bending type="pipe" name="BLC2RE">
 		<X0 unit="m">-380.884</X0>
 		<Z0 unit="m">24.041</Z0>
 		<RT unit="m">381.554</RT>
@@ -51,34 +255,41 @@
 		<R unit="cm">4.4</R>
 		<r unit="cm">4.0</r>
 
-		<Material desc="Right HER far beam pipe bending part 1">Cu</Material>
-	</BLC2REtube>
+		<Material>Cu</Material>
+		<Desc>Right HER far beam pipe bending part 1</Desc>
 
-	<LHR2>
-		<X0 unit="m">0.427</X0>
-		<Z0 unit="m">10.411</Z0>
-		<L unit="m">20.000</L>
-		<PHI unit="rad">0.03573</PHI>
+		<Subtract>LHR1</Subtract>
+	</Bending>
 
-		<R unit="cm">4.4</R>
-		<r unit="cm">4.0</r>
+	<Bending type="magnet" name="BLC2REcoil">
+		<X0 unit="m">-380.884</X0>
+		<Z0 unit="m">24.041</Z0>
+		<RT unit="m">381.554</RT>
+		<SPHI unit="rad">-0.04158</SPHI>
+		<DPHI unit="rad">0.00585</DPHI>
 
-		<Material desc="Right HER far beam pipe linear part 2">Cu</Material>
-	</LHR2>
+		<R unit="cm">10.0</R>
+		<r unit="cm">5.0</r>
 
-	<LLR1>
-		<X0 unit="m">0.0</X0>
-		<Z0 unit="m">0.0</Z0>
-		<L unit="m">4.000</L>
-		<PHI unit="rad">-0.04051</PHI>
+		<Material>Cu</Material>
+		<Desc>BLC2RE magnet coil</Desc>
+	</Bending>
 
-		<R unit="cm">4.4</R>
-		<r unit="cm">4.0</r>
+	<Bending type="magnet" name="BLC2REyoke">
+		<X0 unit="m">-380.884</X0>
+		<Z0 unit="m">24.041</Z0>
+		<RT unit="m">381.554</RT>
+		<SPHI unit="rad">-0.04158</SPHI>
+		<DPHI unit="rad">0.00585</DPHI>
 
-		<Material desc="Right LER far beam pipe linear part 1">Cu</Material>
-	</LLR1>
+		<R unit="cm">20.0</R>
+		<r unit="cm">10.0</r>
 
-	<BC1RPtube>
+		<Material>Fe</Material>
+		<Desc>BLC2RE magnet yoke</Desc>
+	</Bending>
+
+	<Bending type="pipe" name="BC1RP">
 		<X0 unit="m">656.907</X0>
 		<Z0 unit="m">30.627</Z0>
 		<RT unit="m">657.608</RT>
@@ -89,22 +300,45 @@
 		<R unit="cm">4.4</R>
 		<r unit="cm">4.0</r>
 
-		<Material desc="Right LER far beam pipe bending part 1">Cu</Material>
-	</BC1RPtube>
+		<Material>Cu</Material>
+		<Desc>Right LER far beam pipe bending part 1</Desc>
 
-	<LLR2>
-		<X0 unit="m">-0.176</X0>
-		<Z0 unit="m">4.341</Z0>
-		<L unit="m">1.194</L>
-		<PHI unit="rad">-0.03998</PHI>
+		<Subtract>LLR2</Subtract>
+	</Bending>
 
-		<R unit="cm">4.4</R>
-		<r unit="cm">4.0</r>
+	<Bending type="magnet" name="BC1RPcoil">
+		<X0 unit="m">656.907</X0>
+		<Z0 unit="m">30.627</Z0>
+		<RT unit="m">657.608</RT>
+		<SPHI unit="rad">-3.10161</SPHI>
+		<SPHI1 unit="rad">-3.10109</SPHI1>
+		<DPHI unit="rad">0.000524</DPHI>
 
-		<Material desc="Right LER far beam pipe linear part 2">Cu</Material>
-	</LLR2>
+		<R unit="cm">10.0</R>
+		<r unit="cm">5.0</r>
 
-	<BLCWRPtube>
+		<Material>Cu</Material>
+		<Desc>BC1RP magnet coil</Desc>
+	</Bending>
+
+	<Bending type="magnet" name="BC1RPyoke">
+		<X0 unit="m">656.907</X0>
+		<Z0 unit="m">30.627</Z0>
+		<RT unit="m">657.608</RT>
+		<SPHI unit="rad">-3.10161</SPHI>
+		<SPHI1 unit="rad">-3.10109</SPHI1>
+		<DPHI unit="rad">0.000524</DPHI>
+
+		<R unit="cm">20.0</R>
+		<r unit="cm">10.0</r>
+
+		<Material>Fe</Material>
+		<Desc>BC1RP magnet yoke</Desc>
+
+		<Subtract>QKAREyoke</Subtract>
+	</Bending>
+
+	<Bending type="pipe" name="BLCWRP">
 		<X0 unit="m">154.031</X0>
 		<Z0 unit="m">11.705</Z0>
 		<RT unit="m">154.378</RT>
@@ -114,22 +348,39 @@
 		<R unit="cm">4.4</R>
 		<r unit="cm">4.0</r>
 
-		<Material desc="Right LER far beam pipe bending part 2">Cu</Material>
-	</BLCWRPtube>
+		<Material>Cu</Material>
+		<Desc>Right LER far beam pipe bending part 2</Desc>
+	</Bending>
 
-	<LLR3>
-		<X0 unit="m">-0.297</X0>
-		<Z0 unit="m">7.763</Z0>
-		<L unit="m">0.300</L>
-		<PHI unit="rad">-0.02554</PHI>
+	<Bending type="magnet" name="BLCWRPcoil">
+		<X0 unit="m">154.031</X0>
+		<Z0 unit="m">11.705</Z0>
+		<RT unit="m">154.378</RT>
+		<SPHI unit="rad">-3.116055</SPHI>
+		<DPHI unit="rad">0.014445</DPHI>
 
-		<R unit="cm">4.4</R>
-		<r unit="cm">4.0</r>
+		<R unit="cm">10.0</R>
+		<r unit="cm">5.0</r>
 
-		<Material desc="Right LER far beam pipe linear part 3">Cu</Material>
-	</LLR3>
+		<Material>Cu</Material>
+		<Desc>BLCWRP magnet coil</Desc>
+	</Bending>
 
-	<BLC1RPtube>
+	<Bending type="magnet" name="BLCWRPyoke">
+		<X0 unit="m">154.031</X0>
+		<Z0 unit="m">11.705</Z0>
+		<RT unit="m">154.378</RT>
+		<SPHI unit="rad">-3.116055</SPHI>
+		<DPHI unit="rad">0.014445</DPHI>
+
+		<R unit="cm">20.0</R>
+		<r unit="cm">10.0</r>
+
+		<Material>Fe</Material>
+		<Desc>BLCWRP magnet yoke</Desc>
+	</Bending>
+
+	<Bending type="pipe" name="BLC1RP">
 		<X0 unit="m">76.280</X0>
 		<Z0 unit="m">10.019</Z0>
 		<RT unit="m">76.609</RT>
@@ -137,24 +388,45 @@
 		<DPHI unit="rad">0.02911</DPHI>
 
 		<R unit="cm">4.4</R>
-		<r unit="cm">4.0</r>
+		<!--r unit="cm">4.0</r-->
+	        <!-- movable collimator -->
+		<r unit="cm">0.0</r>
 
-		<Material desc="Right LER far beam pipe bending part 3">Cu</Material>
-	</BLC1RPtube>
+		<Material>Cu</Material>
+		<Desc>Right LER far beam pipe bending part 3</Desc>
 
-	<LLR4>
-		<X0 unit="m">-0.329</X0>
-		<Z0 unit="m">10.293</Z0>
-		<L unit="m">9.924</L>
-		<PHI unit="rad">0.00358</PHI>
+		<Subtract>LLR3</Subtract>
+	</Bending>
 
-		<R unit="cm">4.4</R>
-		<r unit="cm">4.0</r>
+	<Bending type="magnet" name="BLC1RPcoil">
+		<X0 unit="m">76.280</X0>
+		<Z0 unit="m">10.019</Z0>
+		<RT unit="m">76.609</RT>
+		<SPHI unit="rad">-3.14516</SPHI>
+		<DPHI unit="rad">0.02911</DPHI>
 
-		<Material desc="Right LER far beam pipe linear part 4">Cu</Material>
-	</LLR4>
+		<R unit="cm">10.0</R>
+		<r unit="cm">5.0</r>
 
-	<BLC2RPtube>
+		<Material>Cu</Material>
+		<Desc>BLC1RP magnet coil</Desc>
+	</Bending>
+
+	<Bending type="magnet" name="BLC1RPyoke">
+		<X0 unit="m">76.280</X0>
+		<Z0 unit="m">10.019</Z0>
+		<RT unit="m">76.609</RT>
+		<SPHI unit="rad">-3.14516</SPHI>
+		<DPHI unit="rad">0.02911</DPHI>
+
+		<R unit="cm">20.0</R>
+		<r unit="cm">10.0</r>
+
+		<Material>Fe</Material>
+		<Desc>BLC1RP magnet yoke</Desc>
+	</Bending>
+
+	<Bending type="pipe" name="BLC2RP">
 		<X0 unit="m">-67.871</X0>
 		<Z0 unit="m">20.459</Z0>
 		<RT unit="m">67.578</RT>
@@ -164,34 +436,41 @@
 		<R unit="cm">4.4</R>
 		<r unit="cm">4.0</r>
 
-		<Material desc="Right LER far beam pipe bending part 4">Cu</Material>
-	</BLC2RPtube>
+		<Material>Cu</Material>
+		<Desc>Right LER far beam pipe bending part 4</Desc>
 
-	<LLR5>
-		<X0 unit="m">-0.408</X0>
-		<Z0 unit="m">24.404</Z0>
-		<L unit="m">3.494</L>
-		<PHI unit="rad">-0.05842</PHI>
+		<Subtract>LLR5</Subtract>
+	</Bending>
 
-		<R unit="cm">4.4</R>
-		<r unit="cm">4.0</r>
+	<Bending type="magnet" name="BLC2RPcoil">
+		<X0 unit="m">-67.871</X0>
+		<Z0 unit="m">20.459</Z0>
+		<RT unit="m">67.578</RT>
+		<SPHI unit="rad">-0.00358</SPHI>
+		<DPHI unit="rad">0.06200</DPHI>
 
-		<Material desc="Right LER far beam pipe linear part 5">Cu</Material>
-	</LLR5>
+		<R unit="cm">10.0</R>
+		<r unit="cm">5.0</r>
 
-	<LHL1>
-		<X0 unit="m">0.0</X0>
-		<Z0 unit="m">0.0</Z0>
-		<L unit="m">7.505</L>
-		<PHI unit="rad">-3.09999</PHI>
+		<Material>Cu</Material>
+		<Desc>BLC2RP magnet coil</Desc>
+	</Bending>
 
-		<R unit="cm">4.4</R>
-		<r unit="cm">4.0</r>
+	<Bending type="magnet" name="BLC2RPyoke">
+		<X0 unit="m">-67.871</X0>
+		<Z0 unit="m">20.459</Z0>
+		<RT unit="m">67.578</RT>
+		<SPHI unit="rad">-0.00358</SPHI>
+		<DPHI unit="rad">0.06200</DPHI>
 
-		<Material desc="Left HER far beam pipe linear part 1">Cu</Material>
-	</LHL1>
+		<R unit="cm">20.0</R>
+		<r unit="cm">10.0</r>
 
-	<BLC1LEtube>
+		<Material>Fe</Material>
+		<Desc>BLC2RP magnet yoke</Desc>
+	</Bending>
+
+	<Bending type="pipe" name="BLC1LE">
 		<X0 unit="m">616.500</X0>
 		<Z0 unit="m">-33.150</Z0>
 		<RT unit="m">617.345</RT>
@@ -202,34 +481,43 @@
 		<R unit="cm">4.4</R>
 		<r unit="cm">4.0</r>
 
-		<Material desc="Left HER far beam pipe bending part 1">Cu</Material>
-	</BLC1LEtube>
+		<Material>Cu</Material>
+		<Desc>Left HER far beam pipe bending part 1</Desc>
 
-	<LHL2>
-		<X0 unit="m">-0.451</X0>
-		<Z0 unit="m">-11.096</Z0>
-		<L unit="m">18.701</L>
-		<PHI unit="rad">-3.10589</PHI>
+		<Subtract>LHL1</Subtract>
+	</Bending>
 
-		<R unit="cm">4.4</R>
-		<r unit="cm">4.0</r>
+	<Bending type="magnet" name="BLC1LEcoil">
+		<X0 unit="m">616.500</X0>
+		<Z0 unit="m">-33.150</Z0>
+		<RT unit="m">617.345</RT>
+		<SPHI unit="rad">3.10000</SPHI>
+		<DPHI unit="rad">0.00586</DPHI>
+		<DPHI1 unit="rad">0.00583</DPHI1>
 
-		<Material desc="Left HER far beam pipe linear part 2">Cu</Material>
-	</LHL2>
+		<R unit="cm">10.0</R>
+		<r unit="cm">5.0</r>
 
-	<LLL1>
-		<X0 unit="m">0.0</X0>
-		<Z0 unit="m">0.0</Z0>
-		<L unit="m">4.000</L>
-		<PHI unit="rad">-3.18399</PHI>
+		<Material>Cu</Material>
+		<Desc>BLC1LE magnet coil</Desc>
+	</Bending>
 
-		<R unit="cm">4.4</R>
-		<r unit="cm">4.0</r>
+	<Bending type="magnet" name="BLC1LEyoke">
+		<X0 unit="m">616.500</X0>
+		<Z0 unit="m">-33.150</Z0>
+		<RT unit="m">617.345</RT>
+		<SPHI unit="rad">3.10000</SPHI>
+		<DPHI unit="rad">0.00586</DPHI>
+		<DPHI1 unit="rad">0.00583</DPHI1>
 
-		<Material desc="Left LER far beam pipe linear part 1">Cu</Material>
-	</LLL1>
+		<R unit="cm">20.0</R>
+		<r unit="cm">10.0</r>
 
-	<BC1LPtube>
+		<Material>Fe</Material>
+		<Desc>BLC1LE magnet yoke</Desc>
+	</Bending>
+
+	<Bending type="pipe" name="BC1LP">
 		<X0 unit="m">449.227</X0>
 		<Z0 unit="m">15.073</Z0>
 		<RT unit="m">449.462</RT>
@@ -239,22 +527,43 @@
 		<R unit="cm">4.4</R>
 		<r unit="cm">4.0</r>
 
-		<Material desc="Left LER far beam pipe bending part 1">Cu</Material>
-	</BC1LPtube>
+		<Material>Cu</Material>
+		<Desc>Left LER far beam pipe bending part 1</Desc>
 
-	<LLL2>
-		<X0 unit="m">0.185</X0>
-		<Z0 unit="m">-4.340</Z0>
-		<L unit="m">1.194</L>
-		<PHI unit="rad">-3.18479</PHI>
+		<Subtract>LLL2</Subtract>
+	</Bending>
 
-		<R unit="cm">4.4</R>
-		<r unit="cm">4.0</r>
+	<Bending type="magnet" name="BC1LPcoil">
+		<X0 unit="m">449.227</X0>
+		<Z0 unit="m">15.073</Z0>
+		<RT unit="m">449.462</RT>
+		<SPHI unit="rad">-3.099152</SPHI>
+		<DPHI unit="rad">0.000766</DPHI>
 
-		<Material desc="Left LER far beam pipe linear part 2">Cu</Material>
-	</LLL2>
+		<R unit="cm">10.0</R>
+		<r unit="cm">5.0</r>
 
-	<BLC1LPtube>
+		<Material>Cu</Material>
+		<Desc>BC1LP magnet coil</Desc>
+	</Bending>
+
+	<Bending type="magnet" name="BC1LPyoke">
+		<X0 unit="m">449.227</X0>
+		<Z0 unit="m">15.073</Z0>
+		<RT unit="m">449.462</RT>
+		<SPHI unit="rad">-3.099152</SPHI>
+		<DPHI unit="rad">0.000766</DPHI>
+
+		<R unit="cm">20.0</R>
+		<r unit="cm">10.0</r>
+
+		<Material>Fe</Material>
+		<Desc>BC1LP magnet yoke</Desc>
+
+		<Subtract>QKALEyoke</Subtract>
+	</Bending>
+
+	<Bending type="pipe" name="BLC1LP">
 		<X0 unit="m">108.176</X0>
 		<Z0 unit="m">-0.867</Z0>
 		<RT unit="m">108.041</RT>
@@ -264,22 +573,41 @@
 		<R unit="cm">4.4</R>
 		<r unit="cm">4.0</r>
 
-		<Material desc="Left LER far beam pipe bending part 2">Cu</Material>
-	</BLC1LPtube>
+		<Material>Cu</Material>
+		<Desc>Left LER far beam pipe bending part 2</Desc>
 
-	<LLL3>
-		<X0 unit="m">0.482</X0>
-		<Z0 unit="m">-9.515</Z0>
-		<L unit="m">12.008</L>
-		<PHI unit="rad">-3.22169</PHI>
+		<Subtract>LLL3</Subtract>
+	</Bending>
 
-		<R unit="cm">4.4</R>
-		<r unit="cm">4.0</r>
+	<Bending type="magnet" name="BLC1LPcoil">
+		<X0 unit="m">108.176</X0>
+		<Z0 unit="m">-0.867</Z0>
+		<RT unit="m">108.041</RT>
+		<SPHI unit="rad">-3.098387</SPHI>
+		<DPHI unit="rad">0.036927</DPHI>
 
-		<Material desc="Left LER far beam pipe linear part 3">Cu</Material>
-	</LLL3>
+		<R unit="cm">10.0</R>
+		<r unit="cm">5.0</r>
 
-	<BLC2LPtube>
+		<Material>Cu</Material>
+		<Desc>BLC1LP magnet coil</Desc>
+	</Bending>
+
+	<Bending type="magnet" name="BLC1LPyoke">
+		<X0 unit="m">108.176</X0>
+		<Z0 unit="m">-0.867</Z0>
+		<RT unit="m">108.041</RT>
+		<SPHI unit="rad">-3.098387</SPHI>
+		<DPHI unit="rad">0.036927</DPHI>
+
+		<R unit="cm">20.0</R>
+		<r unit="cm">10.0</r>
+
+		<Material>Fe</Material>
+		<Desc>BLC1LP magnet yoke</Desc>
+	</Bending>
+
+	<Bending type="pipe" name="BLC2LP">
 		<X0 unit="m">-64.139</X0>
 		<Z0 unit="m">-26.750</Z0>
 		<RT unit="m">65.793</RT>
@@ -289,152 +617,43 @@
 		<R unit="cm">4.4</R>
 		<r unit="cm">4.0</r>
 
-		<Material desc="Left LER far beam pipe bending part 3">Cu</Material>
-	</BLC2LPtube>
+		<Material>Cu</Material>
+		<Desc>Left LER far beam pipe bending part 3</Desc>
 
-	<LLL4>
-		<X0 unit="m">1.645</X0>
-		<Z0 unit="m">-25.668</Z0>
-		<L unit="m">3.494</L>
-		<PHI unit="rad">-3.15809</PHI>
+		<Subtract>LLL3</Subtract>
+	</Bending>
 
-		<R unit="cm">4.4</R>
-		<r unit="cm">4.0</r>
+	<Bending type="magnet" name="BLC2LPcoil">
+		<X0 unit="m">-64.139</X0>
+		<Z0 unit="m">-26.750</Z0>
+		<RT unit="m">65.793</RT>
+		<SPHI unit="rad">0.016455</SPHI>
+		<DPHI unit="rad">0.063678</DPHI>
 
-		<Material desc="Left LER far beam pipe linear part 4">Cu</Material>
-	</LLL4>
-
-        <!-- bending magnets -->
-
-	<BLC2REp1>
 		<R unit="cm">10.0</R>
 		<r unit="cm">5.0</r>
 
-		<Material desc="Magnet BLC2RE coil">Cu</Material>
-	</BLC2REp1>
+		<Material>Cu</Material>
+		<Desc>BLC2LP magnet coil</Desc>
+	</Bending>
 
-	<BLC2REp2>
+	<Bending type="magnet" name="BLC2LPyoke">
+		<X0 unit="m">-64.139</X0>
+		<Z0 unit="m">-26.750</Z0>
+		<RT unit="m">65.793</RT>
+		<SPHI unit="rad">0.016455</SPHI>
+		<DPHI unit="rad">0.063678</DPHI>
+
 		<R unit="cm">20.0</R>
 		<r unit="cm">10.0</r>
 
-		<Material desc="Magnet BLC2RE yoke">Fe</Material>
-	</BLC2REp2>
-
-	<BC1RPp1>
-		<R unit="cm">10.0</R>
-		<r unit="cm">5.0</r>
-
-		<Material desc="Magnet BC1RP coil">Cu</Material>
-	</BC1RPp1>
-
-	<BC1RPp2>
-		<R unit="cm">20.0</R>
-		<r unit="cm">10.0</r>
-
-		<Material desc="Magnet BC1RP yoke">Fe</Material>
-	</BC1RPp2>
-
-	<BLCWRPp1>
-		<R unit="cm">10.0</R>
-		<r unit="cm">5.0</r>
-
-		<Material desc="Magnet BLCWRP coil">Cu</Material>
-	</BLCWRPp1>
-
-	<BLCWRPp2>
-		<R unit="cm">20.0</R>
-		<r unit="cm">10.0</r>
-
-		<Material desc="Magnet BLCWRP yoke">Fe</Material>
-	</BLCWRPp2>
-
-	<BLC1RPp1>
-		<R unit="cm">10.0</R>
-		<r unit="cm">5.0</r>
-
-		<Material desc="Magnet BLC1RP coil">Cu</Material>
-	</BLC1RPp1>
-
-	<BLC1RPp2>
-		<R unit="cm">20.0</R>
-		<r unit="cm">10.0</r>
-
-		<Material desc="Magnet BLC1RP yoke">Fe</Material>
-	</BLC1RPp2>
-
-	<BLC2RPp1>
-		<R unit="cm">10.0</R>
-		<r unit="cm">5.0</r>
-
-		<Material desc="Magnet BLC2RP coil">Cu</Material>
-	</BLC2RPp1>
-
-	<BLC2RPp2>
-		<R unit="cm">20.0</R>
-		<r unit="cm">10.0</r>
-
-		<Material desc="Magnet BLC2RP yoke">Fe</Material>
-	</BLC2RPp2>
-
-	<BLC1LEp1>
-		<R unit="cm">10.0</R>
-		<r unit="cm">5.0</r>
-
-		<Material desc="Magnet BLC1LE coil">Cu</Material>
-	</BLC1LEp1>
-
-	<BLC1LEp2>
-		<R unit="cm">20.0</R>
-		<r unit="cm">10.0</r>
-
-		<Material desc="Magnet BLC1LE yoke">Fe</Material>
-	</BLC1LEp2>
-
-	<BC1LPp1>
-		<R unit="cm">10.0</R>
-		<r unit="cm">5.0</r>
-
-		<Material desc="Magnet BC1LP coil">Cu</Material>
-	</BC1LPp1>
-
-	<BC1LPp2>
-		<R unit="cm">20.0</R>
-		<r unit="cm">10.0</r>
-
-		<Material desc="Magnet BC1LP yoke">Fe</Material>
-	</BC1LPp2>
-
-	<BLC1LPp1>
-		<R unit="cm">10.0</R>
-		<r unit="cm">5.0</r>
-
-		<Material desc="Magnet BLC1LP coil">Cu</Material>
-	</BLC1LPp1>
-
-	<BLC1LPp2>
-		<R unit="cm">20.0</R>
-		<r unit="cm">10.0</r>
-
-		<Material desc="Magnet BLC1LP yoke">Fe</Material>
-	</BLC1LPp2>
-
-	<BLC2LPp1>
-		<R unit="cm">10.0</R>
-		<r unit="cm">5.0</r>
-
-		<Material desc="Magnet BLC2LP coil">Cu</Material>
-	</BLC2LPp1>
-
-	<BLC2LPp2>
-		<R unit="cm">20.0</R>
-		<r unit="cm">10.0</r>
-
-		<Material desc="Magnet BLC2LP yoke">Fe</Material>
-	</BLC2LPp2>
+		<Material>Fe</Material>
+		<Desc>BLC2LP magnet yoke</Desc>
+	</Bending>
 
 	<!-- magnets -->
 
-        <BKC1REp1>
+        <Straight type="magnet" name="BKC1REcoil">
                 <X0 unit="m">0.563</X0>
                 <Z0 unit="m">14.220</Z0>
                 <L unit="m">0.3444</L>
@@ -443,10 +662,11 @@
                 <r unit="cm">5.0</r>
                 <R unit="cm">10.0</R>
 
-                <Material desc="Magnet BKC1RE coil">Cu</Material>
-	</BKC1REp1>
+                <Material>Cu</Material>
+                <Desc>Magnet BKC1RE coil</Desc>
+	</Straight>
 
-        <BKC1REp2>
+        <Straight type="magnet" name="BKC1REyoke">
                 <X0 unit="m">0.563</X0>
                 <Z0 unit="m">14.220</Z0>
                 <L unit="m">0.3444</L>
@@ -455,10 +675,11 @@
                 <r unit="cm">10.0</r>
                 <R unit="cm">20.0</R>
 
-                <Material desc="Magnet BKC1RE yoke">Fe</Material>
-        </BKC1REp2>
+                <Material>Fe</Material>
+                <Desc>Magnet BKC1RE yoke</Desc>
+        </Straight>
 
-        <BKC2REp1>
+        <Straight type="magnet" name="BKC2REcoil">
                 <X0 unit="m">0.687</X0>
                 <Z0 unit="m">17.688</Z0>
                 <L unit="m">0.3444</L>
@@ -467,10 +688,11 @@
                 <r unit="cm">5.0</r>
                 <R unit="cm">10.0</R>
 
-                <Material desc="Magnet BKC2RE coil">Cu</Material>
-        </BKC2REp1>
+                <Material>Cu</Material>
+                <Desc>Magnet BKC2RE coil</Desc>
+        </Straight>
 
-        <BKC2REp2>
+        <Straight type="magnet" name="BKC2REyoke">
                 <X0 unit="m">0.687</X0>
                 <Z0 unit="m">17.688</Z0>
                 <L unit="m">0.3444</L>
@@ -479,10 +701,11 @@
                 <r unit="cm">10.0</r>
                 <R unit="cm">20.0</R>
 
-                <Material desc="Magnet BKC2RE yoke">Fe</Material>
-        </BKC2REp2>
+                <Material>Fe</Material>
+                <Desc>Magnet BKC2RE yoke</Desc>
+        </Straight>
 
-        <BKC3REp1>
+        <Straight type="magnet" name="BKC3REcoil">
                 <X0 unit="m">0.873</X0>
                 <Z0 unit="m">22.909</Z0>
                 <L unit="m">0.3444</L>
@@ -491,10 +714,11 @@
                 <r unit="cm">5.0</r>
                 <R unit="cm">10.0</R>
 
-                <Material desc="Magnet BKC3RE coil">Cu</Material>
-	</BKC3REp1>
+                <Material>Cu</Material>
+                <Desc>Magnet BKC3RE coil</Desc>
+	</Straight>
 
-        <BKC3REp2>
+        <Straight type="magnet" name="BKC3REyoke">
                 <X0 unit="m">0.873</X0>
                 <Z0 unit="m">22.909</Z0>
                 <L unit="m">0.3444</L>
@@ -503,10 +727,11 @@
                 <r unit="cm">10.0</r>
                 <R unit="cm">20.0</R>
 
-                <Material desc="Magnet BKC3RE yoke">Fe</Material>
-        </BKC3REp2>
+                <Material>Fe</Material>
+                <Desc>Magnet BKC3RE yoke</Desc>
+        </Straight>
 
-        <BKC4REp1>
+        <Straight type="magnet" name="BKC4REcoil">
                 <X0 unit="m">0.978</X0>
                 <Z0 unit="m">25.828</Z0>
                 <L unit="m">0.3444</L>
@@ -515,10 +740,11 @@
                 <r unit="cm">5.0</r>
                 <R unit="cm">10.0</R>
 
-                <Material desc="Magnet BKC4RE coil">Cu</Material>
-	</BKC4REp1>
+                <Material>Cu</Material>
+                <Desc>Magnet BKC4RE coil</Desc>
+	</Straight>
 
-        <BKC4REp2>
+        <Straight type="magnet" name="BKC4REyoke">
                 <X0 unit="m">0.978</X0>
                 <Z0 unit="m">25.828</Z0>
                 <L unit="m">0.3444</L>
@@ -527,10 +753,11 @@
                 <r unit="cm">10.0</r>
                 <R unit="cm">20.0</R>
 
-                <Material desc="Magnet BKC4RE yoke">Fe</Material>
-        </BKC4REp2>
+                <Material>Fe</Material>
+                <Desc>Magnet BKC4RE yoke</Desc>
+        </Straight>
 
-        <BKC1LEp1>
+        <Straight type="magnet" name="BKC1LEcoil">
                 <X0 unit="m">-0.563</X0>
                 <Z0 unit="m">-14.221</Z0>
                 <L unit="m">0.3444</L>
@@ -539,10 +766,11 @@
                 <r unit="cm">5.0</r>
                 <R unit="cm">10.0</R>
 
-                <Material desc="Magnet BKC1LE coil">Cu</Material>
-	</BKC1LEp1>
+                <Material>Cu</Material>
+                <Desc>Magnet BKC1LE coil</Desc>
+	</Straight>
 
-        <BKC1LEp2>
+        <Straight type="magnet" name="BKC1LEyoke">
                 <X0 unit="m">-0.563</X0>
                 <Z0 unit="m">-14.221</Z0>
                 <L unit="m">0.3444</L>
@@ -551,10 +779,11 @@
                 <r unit="cm">10.0</r>
                 <R unit="cm">20.0</R>
 
-                <Material desc="Magnet BKC1LE yoke">Fe</Material>
-        </BKC1LEp2>
+                <Material>Fe</Material>
+                <Desc>Magnet BKC1LE yoke</Desc>
+        </Straight>
 
-        <BKC2LEp1>
+        <Straight type="magnet" name="BKC2LEcoil">
                 <X0 unit="m">-0.687</X0>
                 <Z0 unit="m">-17.688</Z0>
                 <L unit="m">0.3444</L>
@@ -563,10 +792,11 @@
                 <r unit="cm">5.0</r>
                 <R unit="cm">10.0</R>
 
-                <Material desc="Magnet BKC2LE coil">Cu</Material>
-        </BKC2LEp1>
+                <Material>Cu</Material>
+                <Desc>Magnet BKC2LE coil</Desc>
+        </Straight>
 
-        <BKC2LEp2>
+        <Straight type="magnet" name="BKC2LEyoke">
                 <X0 unit="m">-0.687</X0>
                 <Z0 unit="m">-17.688</Z0>
                 <L unit="m">0.3444</L>
@@ -575,10 +805,11 @@
                 <r unit="cm">10.0</r>
                 <R unit="cm">20.0</R>
 
-                <Material desc="Magnet BKC2LE yoke">Fe</Material>
-        </BKC2LEp2>
+                <Material>Fe</Material>
+                <Desc>Magnet BKC2LE yoke</Desc>
+        </Straight>
 
-        <BKC3LEp1>
+        <Straight type="magnet" name="BKC3LEcoil">
                 <X0 unit="m">-0.870</X0>
                 <Z0 unit="m">-22.810</Z0>
                 <L unit="m">0.3444</L>
@@ -587,10 +818,11 @@
                 <r unit="cm">5.0</r>
                 <R unit="cm">10.0</R>
 
-                <Material desc="Magnet BKC3LE coil">Cu</Material>
-	</BKC3LEp1>
+                <Material>Cu</Material>
+                <Desc>Magnet BKC3LE coil</Desc>
+	</Straight>
 
-        <BKC3LEp2>
+        <Straight type="magnet" name="BKC3LEyoke">
                 <X0 unit="m">-0.870</X0>
                 <Z0 unit="m">-22.810</Z0>
                 <L unit="m">0.3444</L>
@@ -599,10 +831,11 @@
                 <r unit="cm">10.0</r>
                 <R unit="cm">20.0</R>
 
-                <Material desc="Magnet BKC3LE yoke">Fe</Material>
-        </BKC3LEp2>
+                <Material>Fe</Material>
+                <Desc>Magnet BKC3LE yoke</Desc>
+        </Straight>
 
-        <BKC4LEp1>
+        <Straight type="magnet" name="BKC4LEcoil">
                 <X0 unit="m">-0.981</X0>
                 <Z0 unit="m">-25.929</Z0>
                 <L unit="m">0.3444</L>
@@ -611,10 +844,11 @@
                 <r unit="cm">5.0</r>
                 <R unit="cm">10.0</R>
 
-                <Material desc="Magnet BKC4LE coil">Cu</Material>
-	</BKC4LEp1>
+                <Material>Cu</Material>
+                <Desc>Magnet BKC4LE coil</Desc>
+	</Straight>
 
-        <BKC4LEp2>
+        <Straight type="magnet" name="BKC4LEyoke">
                 <X0 unit="m">-0.981</X0>
                 <Z0 unit="m">-25.929</Z0>
                 <L unit="m">0.3444</L>
@@ -623,10 +857,11 @@
                 <r unit="cm">10.0</r>
                 <R unit="cm">20.0</R>
 
-                <Material desc="Magnet BKC4LE yoke">Fe</Material>
-        </BKC4LEp2>
+                <Material>Fe</Material>
+                <Desc>Magnet BKC4LE yoke</Desc>
+        </Straight>
 
-        <QKAREp1>
+        <Straight type="magnet" name="QKAREcoil">
                 <X0 unit="m">0.170114</X0>
                 <Z0 unit="m">4.09647</Z0>
                 <L unit="m">0.344400</L>
@@ -635,10 +870,11 @@
                 <R unit="cm">10.0</R>
                 <r unit="cm">5.0</r>
 
-                <Material desc="Magnet QKARE coil">Cu</Material>
-        </QKAREp1>
+                <Material>Cu</Material>
+                <Desc>Magnet QKARE coil</Desc>
+        </Straight>
 
-        <QKAREp2>
+        <Straight type="magnet" name="QKAREyoke">
                 <X0 unit="m">0.170114</X0>
                 <Z0 unit="m">4.09647</Z0>
                 <L unit="m">0.344400</L>
@@ -647,10 +883,11 @@
                 <R unit="cm">20.0</R>
                 <r unit="cm">10.0</r>
 
-                <Material desc="Magnet QKARE yoke">Fe</Material>
-        </QKAREp2>
+                <Material>Fe</Material>
+                <Desc>Magnet QKARE yoke</Desc>
+        </Straight>
 
-        <QLC2REp1>
+        <Straight type="magnet" name="QLC2REcoil">
                 <X0 unit="m">0.242756</X0>
                 <Z0 unit="m">5.83968</Z0>
                 <L unit="m">0.560000</L>
@@ -659,10 +896,11 @@
                 <R unit="cm">10.0</R>
                 <r unit="cm">5.0</r>
 
-                <Material desc="Magnet QLC2RE coil">Cu</Material>
-        </QLC2REp1>
+                <Material>Cu</Material>
+                <Desc>Magnet QLC2RE coil</Desc>
+        </Straight>
 
-        <QLC2REp2>
+        <Straight type="magnet" name="QLC2REyoke">
                 <X0 unit="m">0.242756</X0>
                 <Z0 unit="m">5.83968</Z0>
                 <L unit="m">0.560000</L>
@@ -671,10 +909,11 @@
                 <R unit="cm">20.0</R>
                 <r unit="cm">10.0</r>
 
-                <Material desc="Magnet QLC2RE yoke">Fe</Material>
-        </QLC2REp2>
+                <Material>Fe</Material>
+                <Desc>Magnet QLC2RE yoke</Desc>
+        </Straight>
 
-        <QKBREp1>
+        <Straight type="magnet" name="QKBREcoil">
                 <X0 unit="m">0.27648</X0>
                 <Z0 unit="m">6.64898</Z0>
                 <L unit="m">0.344400</L>
@@ -683,10 +922,11 @@
                 <R unit="cm">10.0</R>
                 <r unit="cm">5.0</r>
 
-                <Material desc="Magnet QKBRE coil">Cu</Material>
-        </QKBREp1>
+                <Material>Cu</Material>
+                <Desc>Magnet QKBRE coil</Desc>
+        </Straight>
 
-        <QKBREp2>
+        <Straight type="magnet" name="QKBREyoke">
                 <X0 unit="m">0.27648</X0>
                 <Z0 unit="m">6.64898</Z0>
                 <L unit="m">0.344400</L>
@@ -695,10 +935,11 @@
                 <R unit="cm">20.0</R>
                 <r unit="cm">10.0</r>
 
-                <Material desc="Magnet QKBRE yoke">Fe</Material>
-        </QKBREp2>
+                <Material>Fe</Material>
+                <Desc>Magnet QKBRE yoke</Desc>
+        </Straight>
 
-        <QKCREp1>
+        <Straight type="magnet" name="QKCREcoil">
                 <X0 unit="m">0.469175</X0>
                 <Z0 unit="m">11.6009</Z0>
                 <L unit="m">0.344400</L>
@@ -707,10 +948,11 @@
                 <R unit="cm">10.0</R>
                 <r unit="cm">5.0</r>
 
-                <Material desc="Magnet QKCRE coil">Cu</Material>
-        </QKCREp1>
+                <Material>Cu</Material>
+                <Desc>Magnet QKCRE coil</Desc>
+        </Straight>
 
-        <QKCREp2>
+        <Straight type="magnet" name="QKCREyoke">
                 <X0 unit="m">0.469175</X0>
                 <Z0 unit="m">11.6009</Z0>
                 <L unit="m">0.344400</L>
@@ -719,10 +961,11 @@
                 <R unit="cm">20.0</R>
                 <r unit="cm">10.0</r>
 
-                <Material desc="Magnet QKCRE yoke">Fe</Material>
-        </QKCREp2>
+                <Material>Fe</Material>
+                <Desc>Magnet QKCRE yoke</Desc>
+        </Straight>
 
-        <QLC3REp1>
+        <Straight type="magnet" name="QLC3REcoil">
                 <X0 unit="m">0.490409</X0>
                 <Z0 unit="m">12.1949</Z0>
                 <L unit="m">0.560000</L>
@@ -731,10 +974,11 @@
                 <R unit="cm">10.0</R>
                 <r unit="cm">5.0</r>
 
-                <Material desc="Magnet QLC3RE coil">Cu</Material>
-        </QLC3REp1>
+                <Material>Cu</Material>
+                <Desc>Magnet QLC3RE coil</Desc>
+        </Straight>
 
-        <QLC3REp2>
+        <Straight type="magnet" name="QLC3REyoke">
                 <X0 unit="m">0.490409</X0>
                 <Z0 unit="m">12.1949</Z0>
                 <L unit="m">0.560000</L>
@@ -743,10 +987,11 @@
                 <R unit="cm">20.0</R>
                 <r unit="cm">10.0</r>
 
-                <Material desc="Magnet QLC3RE yoke">Fe</Material>
-        </QLC3REp2>
+                <Material>Fe</Material>
+                <Desc>Magnet QLC3RE yoke</Desc>
+        </Straight>
 
-        <QKDREp1>
+        <Straight type="magnet" name="QKDREcoil">
                 <X0 unit="m">0.540577</X0>
                 <Z0 unit="m">13.5984</Z0>
                 <L unit="m">0.372300</L>
@@ -755,10 +1000,11 @@
                 <R unit="cm">10.0</R>
                 <r unit="cm">5.0</r>
 
-                <Material desc="Magnet QKDRE coil">Cu</Material>
-        </QKDREp1>
+                <Material>Cu</Material>
+                <Desc>Magnet QKDRE coil</Desc>
+        </Straight>
 
-        <QKDREp2>
+        <Straight type="magnet" name="QKDREyoke">
                 <X0 unit="m">0.540577</X0>
                 <Z0 unit="m">13.5984</Z0>
                 <L unit="m">0.372300</L>
@@ -767,10 +1013,11 @@
                 <R unit="cm">20.0</R>
                 <r unit="cm">10.0</r>
 
-                <Material desc="Magnet QKDRE yoke">Fe</Material>
-        </QKDREp2>
+                <Material>Fe</Material>
+                <Desc>Magnet QKDRE yoke</Desc>
+        </Straight>
 
-        <QLC5REp1>
+        <Straight type="magnet" name="QLC5REcoil">
                 <X0 unit="m">0.708</X0>
                 <Z0 unit="m">18.282</Z0>
                 <L unit="m">0.560</L>
@@ -779,10 +1026,11 @@
                 <R unit="cm">10.0</R>
                 <r unit="cm">5.0</r>
 
-                <Material desc="Magnet QLC5RE coil">Cu</Material>
-        </QLC5REp1>
+                <Material>Cu</Material>
+                <Desc>Magnet QLC5RE coil</Desc>
+        </Straight>
 
-        <QLC5REp2>
+        <Straight type="magnet" name="QLC5REyoke">
                 <X0 unit="m">0.708</X0>
                 <Z0 unit="m">18.282</Z0>
                 <L unit="m">0.560</L>
@@ -791,10 +1039,11 @@
                 <R unit="cm">20.0</R>
                 <r unit="cm">10.0</r>
 
-                <Material desc="Magnet QLC5RE yoke">Fe</Material>
-        </QLC5REp2>
+                <Material>Fe</Material>
+                <Desc>Magnet QLC5RE yoke</Desc>
+        </Straight>
 
-        <QLC6REp1>
+        <Straight type="magnet" name="QLC6REcoil">
                 <X0 unit="m">0.840892</X0>
                 <Z0 unit="m">21.9999</Z0>
                 <L unit="m">0.560000</L>
@@ -803,10 +1052,11 @@
                 <R unit="cm">10.0</R>
                 <r unit="cm">5.0</r>
 
-                <Material desc="Magnet QLC6RE coil">Cu</Material>
-        </QLC6REp1>
+                <Material>Cu</Material>
+                <Desc>Magnet QLC6RE coil</Desc>
+        </Straight>
 
-        <QLC6REp2>
+        <Straight type="magnet" name="QLC6REyoke">
                 <X0 unit="m">0.840892</X0>
                 <Z0 unit="m">21.9999</Z0>
                 <L unit="m">0.560000</L>
@@ -815,10 +1065,11 @@
                 <R unit="cm">20.0</R>
                 <r unit="cm">10.0</r>
 
-                <Material desc="Magnet QLC6RE yoke">Fe</Material>
-        </QLC6REp2>
+                <Material>Fe</Material>
+                <Desc>Magnet QLC6RE yoke</Desc>
+        </Straight>
 
-        <QLC7REp1>
+        <Straight type="magnet" name="QLC7REcoil">
                 <X0 unit="m">0.998972</X0>
                 <Z0 unit="m">26.4224</Z0>
                 <L unit="m">0.560000</L>
@@ -827,10 +1078,11 @@
                 <R unit="cm">10.0</R>
                 <r unit="cm">5.0</r>
 
-                <Material desc="Magnet QLC7RE coil">Cu</Material>
-        </QLC7REp1>
+                <Material>Cu</Material>
+                <Desc>Magnet QLC7RE coil</Desc>
+        </Straight>
 
-        <QLC7REp2>
+        <Straight type="magnet" name="QLC7REyoke">
                 <X0 unit="m">0.998972</X0>
                 <Z0 unit="m">26.4224</Z0>
                 <L unit="m">0.560000</L>
@@ -839,10 +1091,11 @@
                 <R unit="cm">20.0</R>
                 <r unit="cm">10.0</r>
 
-                <Material desc="Magnet QLC7RE yoke">Fe</Material>
-        </QLC7REp2>
+                <Material>Fe</Material>
+                <Desc>Magnet QLC7RE yoke</Desc>
+        </Straight>
 
-        <SLYTRE2p1>
+        <Straight type="magnet" name="SLYTRE2coil">
                 <X0 unit="m">1.03327</X0>
                 <Z0 unit="m">27.3817</Z0>
                 <L unit="m">0.600000</L>
@@ -851,10 +1104,11 @@
                 <R unit="cm">10.0</R>
                 <r unit="cm">5.0</r>
 
-                <Material desc="Magnet SLYTRE2 coil">Cu</Material>
-        </SLYTRE2p1>
+                <Material>Cu</Material>
+                <Desc>Magnet SLYTRE2 coil</Desc>
+        </Straight>
 
-        <SLYTRE2p2>
+        <Straight type="magnet" name="SLYTRE2yoke">
                 <X0 unit="m">1.03327</X0>
                 <Z0 unit="m">27.3817</Z0>
                 <L unit="m">0.600000</L>
@@ -863,10 +1117,11 @@
                 <R unit="cm">20.0</R>
                 <r unit="cm">10.0</r>
 
-                <Material desc="Magnet SLYTRE2 yoke">Fe</Material>
-        </SLYTRE2p2>
+                <Material>Fe</Material>
+                <Desc>Magnet SLYTRE2 yoke</Desc>
+        </Straight>
 
-        <QLY2RE2p1>
+        <Straight type="magnet" name="QLY2RE2coil">
                 <X0 unit="m">1.07435</X0>
                 <Z0 unit="m">28.531</Z0>
                 <L unit="m">0.460000</L>
@@ -875,10 +1130,11 @@
                 <R unit="cm">10.0</R>
                 <r unit="cm">5.0</r>
 
-                <Material desc="Magnet QLY2RE2 coil">Cu</Material>
-        </QLY2RE2p1>
+                <Material>Cu</Material>
+                <Desc>Magnet QLY2RE2 coil</Desc>
+        </Straight>
 
-        <QLY2RE2p2>
+        <Straight type="magnet" name="QLY2RE2yoke">
                 <X0 unit="m">1.07435</X0>
                 <Z0 unit="m">28.531</Z0>
                 <L unit="m">0.460000</L>
@@ -887,10 +1143,11 @@
                 <R unit="cm">20.0</R>
                 <r unit="cm">10.0</r>
 
-                <Material desc="Magnet QLY2RE2 yoke">Fe</Material>
-        </QLY2RE2p2>
+                <Material>Fe</Material>
+                <Desc>Magnet QLY2RE2 yoke</Desc>
+        </Straight>
 
-        <QKARPp1>
+        <Straight type="magnet" name="QKARPcoil">
                 <X0 unit="m">-0.187742</X0>
                 <Z0 unit="m">4.64059</Z0>
                 <L unit="m">0.313740</L>
@@ -899,10 +1156,11 @@
                 <R unit="cm">10.0</R>
                 <r unit="cm">5.0</r>
 
-                <Material desc="Magnet QKARP coil">Cu</Material>
-        </QKARPp1>
+                <Material>Cu</Material>
+                <Desc>Magnet QKARP coil</Desc>
+        </Straight>
 
-        <QKARPp2>
+        <Straight type="magnet" name="QKARPyoke">
                 <X0 unit="m">-0.187742</X0>
                 <Z0 unit="m">4.64059</Z0>
                 <L unit="m">0.313740</L>
@@ -911,10 +1169,11 @@
                 <R unit="cm">20.0</R>
                 <r unit="cm">10.0</r>
 
-                <Material desc="Magnet QKARP yoke">Fe</Material>
-        </QKARPp2>
+                <Material>Fe</Material>
+                <Desc>Magnet QKARP yoke</Desc>
+        </Straight>
 
-        <QKBRPp1>
+        <Straight type="magnet" name="QKBRPcoil">
                 <X0 unit="m">-0.326594</X0>
                 <Z0 unit="m">10.8727</Z0>
                 <L unit="m">0.313740</L>
@@ -923,10 +1182,11 @@
                 <R unit="cm">10.0</R>
                 <r unit="cm">5.0</r>
 
-                <Material desc="Magnet QKBRP coil">Cu</Material>
-        </QKBRPp1>
+                <Material>Cu</Material>
+                <Desc>Magnet QKBRP coil</Desc>
+        </Straight>
 
-        <QKBRPp2>
+        <Straight type="magnet" name="QKBRPyoke">
                 <X0 unit="m">-0.326594</X0>
                 <Z0 unit="m">10.8727</Z0>
                 <L unit="m">0.313740</L>
@@ -935,10 +1195,11 @@
                 <R unit="cm">20.0</R>
                 <r unit="cm">10.0</r>
 
-                <Material desc="Magnet QKBRP yoke">Fe</Material>
-        </QKBRPp2>
+                <Material>Fe</Material>
+                <Desc>Magnet QKBRP yoke</Desc>
+        </Straight>
 
-        <QLC1RPp1>
+        <Straight type="magnet" name="QLC1RPcoil">
                 <X0 unit="m">-0.319116</X0>
                 <Z0 unit="m">12.9633</Z0>
                 <L unit="m">0.583720</L>
@@ -947,10 +1208,11 @@
                 <R unit="cm">10.0</R>
                 <r unit="cm">5.0</r>
 
-                <Material desc="Magnet QLC1RP coil">Cu</Material>
-        </QLC1RPp1>
+                <Material>Cu</Material>
+                <Desc>Magnet QLC1RP coil</Desc>
+        </Straight>
 
-        <QLC1RPp2>
+        <Straight type="magnet" name="QLC1RPyoke">
                 <X0 unit="m">-0.319116</X0>
                 <Z0 unit="m">12.9633</Z0>
                 <L unit="m">0.583720</L>
@@ -959,10 +1221,11 @@
                 <R unit="cm">20.0</R>
                 <r unit="cm">10.0</r>
 
-                <Material desc="Magnet QLC1RP yoke">Fe</Material>
-        </QLC1RPp2>
+                <Material>Fe</Material>
+                <Desc>Magnet QLC1RP yoke</Desc>
+        </Straight>
 
-        <QKCRPp1>
+        <Straight type="magnet" name="QKCRPcoil">
                 <X0 unit="m">-0.316999</X0>
                 <Z0 unit="m">13.5551</Z0>
                 <L unit="m">0.313740</L>
@@ -971,10 +1234,11 @@
                 <R unit="cm">10.0</R>
                 <r unit="cm">5.0</r>
 
-                <Material desc="Magnet QKCRP coil">Cu</Material>
-        </QKCRPp1>
+                <Material>Cu</Material>
+                <Desc>Magnet QKCRP coil</Desc>
+        </Straight>
 
-        <QKCRPp2>
+        <Straight type="magnet" name="QKCRPyoke">
                 <X0 unit="m">-0.316999</X0>
                 <Z0 unit="m">13.5551</Z0>
                 <L unit="m">0.313740</L>
@@ -983,10 +1247,11 @@
                 <R unit="cm">20.0</R>
                 <r unit="cm">10.0</r>
 
-                <Material desc="Magnet QKCRP yoke">Fe</Material>
-        </QKCRPp2>
+                <Material>Fe</Material>
+                <Desc>Magnet QKCRP yoke</Desc>
+        </Straight>
 
-        <QLC2RPp1>
+        <Straight type="magnet" name="QLC2RPcoil">
                 <X0 unit="m">-0.298485</X0>
                 <Z0 unit="m">18.7314</Z0>
                 <L unit="m">0.583720</L>
@@ -995,10 +1260,11 @@
                 <R unit="cm">10.0</R>
                 <r unit="cm">5.0</r>
 
-                <Material desc="Magnet QLC2RP coil">Cu</Material>
-        </QLC2RPp1>
+                <Material>Cu</Material>
+                <Desc>Magnet QLC2RP coil</Desc>
+        </Straight>
 
-        <QLC2RPp2>
+        <Straight type="magnet" name="QLC2RPyoke">
                 <X0 unit="m">-0.298485</X0>
                 <Z0 unit="m">18.7314</Z0>
                 <L unit="m">0.583720</L>
@@ -1007,10 +1273,11 @@
                 <R unit="cm">20.0</R>
                 <r unit="cm">10.0</r>
 
-                <Material desc="Magnet QLC2RP yoke">Fe</Material>
-        </QLC2RPp2>
+                <Material>Fe</Material>
+                <Desc>Magnet QLC2RP yoke</Desc>
+        </Straight>
 
-        <QKDRPp1>
+        <Straight type="magnet" name="QKDRPcoil">
                 <X0 unit="m">-0.296368</X0>
                 <Z0 unit="m">19.3233</Z0>
                 <L unit="m">0.313740</L>
@@ -1019,10 +1286,11 @@
                 <R unit="cm">10.0</R>
                 <r unit="cm">5.0</r>
 
-                <Material desc="Magnet QKDRP coil">Cu</Material>
-        </QKDRPp1>
+                <Material>Cu</Material>
+                <Desc>Magnet QKDRP coil</Desc>
+        </Straight>
 
-        <QKDRPp2>
+        <Straight type="magnet" name="QKDRPyoke">
                 <X0 unit="m">-0.296368</X0>
                 <Z0 unit="m">19.3233</Z0>
                 <L unit="m">0.313740</L>
@@ -1031,10 +1299,11 @@
                 <R unit="cm">20.0</R>
                 <r unit="cm">10.0</r>
 
-                <Material desc="Magnet QKDRP yoke">Fe</Material>
-        </QKDRPp2>
+                <Material>Fe</Material>
+                <Desc>Magnet QKDRP yoke</Desc>
+        </Straight>
 
-        <QKFRPp1>
+        <Straight type="magnet" name="QKFRPcoil">
                 <X0 unit="m">-0.441882</X0>
                 <Z0 unit="m">24.9833</Z0>
                 <L unit="m">0.313740</L>
@@ -1043,10 +1312,11 @@
                 <R unit="cm">10.0</R>
                 <r unit="cm">5.0</r>
 
-                <Material desc="Magnet QKFRP coil">Cu</Material>
-        </QKFRPp1>
+                <Material>Cu</Material>
+                <Desc>Magnet QKFRP coil</Desc>
+        </Straight>
 
-        <QKFRPp2>
+        <Straight type="magnet" name="QKFRPyoke">
                 <X0 unit="m">-0.441882</X0>
                 <Z0 unit="m">24.9833</Z0>
                 <L unit="m">0.313740</L>
@@ -1055,10 +1325,11 @@
                 <R unit="cm">20.0</R>
                 <r unit="cm">10.0</r>
 
-                <Material desc="Magnet QKFRP yoke">Fe</Material>
-        </QKFRPp2>
+                <Material>Fe</Material>
+                <Desc>Magnet QKFRP yoke</Desc>
+        </Straight>
 
-        <QLC3RPp1>
+        <Straight type="magnet" name="QLC3RPcoil">
                 <X0 unit="m">-0.51811</X0>
                 <Z0 unit="m">26.2867</Z0>
                 <L unit="m">0.583720</L>
@@ -1067,10 +1338,11 @@
                 <R unit="cm">10.0</R>
                 <r unit="cm">5.0</r>
 
-                <Material desc="Magnet QLC3RP coil">Cu</Material>
-        </QLC3RPp1>
+                <Material>Cu</Material>
+                <Desc>Magnet QLC3RP coil</Desc>
+        </Straight>
 
-        <QLC3RPp2>
+        <Straight type="magnet" name="QLC3RPyoke">
                 <X0 unit="m">-0.51811</X0>
                 <Z0 unit="m">26.2867</Z0>
                 <L unit="m">0.583720</L>
@@ -1079,10 +1351,11 @@
                 <R unit="cm">20.0</R>
                 <r unit="cm">10.0</r>
 
-                <Material desc="Magnet QLC3RP yoke">Fe</Material>
-        </QLC3RPp2>
+                <Material>Fe</Material>
+                <Desc>Magnet QLC3RP yoke</Desc>
+        </Straight>
 
-        <SLYTRP2p1>
+        <Straight type="magnet" name="SLYTRP2coil">
                 <X0 unit="m">-0.558505</X0>
                 <Z0 unit="m">26.9774</Z0>
                 <L unit="m">0.334000</L>
@@ -1091,10 +1364,11 @@
                 <R unit="cm">10.0</R>
                 <r unit="cm">5.0</r>
 
-                <Material desc="Magnet SLYTRP2 coil">Cu</Material>
-        </SLYTRP2p1>
+                <Material>Cu</Material>
+                <Desc>Magnet SLYTRP2 coil</Desc>
+        </Straight>
 
-        <SLYTRP2p2>
+        <Straight type="magnet" name="SLYTRP2yoke">
                 <X0 unit="m">-0.558505</X0>
                 <Z0 unit="m">26.9774</Z0>
                 <L unit="m">0.334000</L>
@@ -1103,10 +1377,11 @@
                 <R unit="cm">20.0</R>
                 <r unit="cm">10.0</r>
 
-                <Material desc="Magnet SLYTRP2 yoke">Fe</Material>
-        </SLYTRP2p2>
+                <Material>Fe</Material>
+                <Desc>Magnet SLYTRP2 yoke</Desc>
+        </Straight>
 
-        <QKALEp1>
+        <Straight type="magnet" name="QKALEcoil">
                 <X0 unit="m">-0.170083</X0>
                 <Z0 unit="m">-4.09647</Z0>
                 <L unit="m">0.344400</L>
@@ -1115,10 +1390,11 @@
                 <R unit="cm">10.0</R>
                 <r unit="cm">5.0</r>
 
-                <Material desc="Magnet QKALE coil">Cu</Material>
-        </QKALEp1>
+                <Material>Cu</Material>
+                <Desc>Magnet QKALE coil</Desc>
+        </Straight>
 
-        <QKALEp2>
+        <Straight type="magnet" name="QKALEyoke">
                 <X0 unit="m">-0.170083</X0>
                 <Z0 unit="m">-4.09647</Z0>
                 <L unit="m">0.344400</L>
@@ -1127,10 +1403,11 @@
                 <R unit="cm">20.0</R>
                 <r unit="cm">10.0</r>
 
-                <Material desc="Magnet QKALE yoke">Fe</Material>
-        </QKALEp2>
+                <Material>Fe</Material>
+                <Desc>Magnet QKALE yoke</Desc>
+        </Straight>
 
-        <QLC2LEp1>
+        <Straight type="magnet" name="QLC2LEcoil">
                 <X0 unit="m">-0.242749</X0>
                 <Z0 unit="m">-5.84043</Z0>
                 <L unit="m">0.560000</L>
@@ -1139,10 +1416,11 @@
                 <R unit="cm">10.0</R>
                 <r unit="cm">5.0</r>
 
-                <Material desc="Magnet QLC2LE coil">Cu</Material>
-        </QLC2LEp1>
+                <Material>Cu</Material>
+                <Desc>Magnet QLC2LE coil</Desc>
+        </Straight>
 
-        <QLC2LEp2>
+        <Straight type="magnet" name="QLC2LEyoke">
                 <X0 unit="m">-0.242749</X0>
                 <Z0 unit="m">-5.84043</Z0>
                 <L unit="m">0.560000</L>
@@ -1151,10 +1429,11 @@
                 <R unit="cm">20.0</R>
                 <r unit="cm">10.0</r>
 
-                <Material desc="Magnet QLC2LE yoke">Fe</Material>
-        </QLC2LEp2>
+                <Material>Fe</Material>
+                <Desc>Magnet QLC2LE yoke</Desc>
+        </Straight>
 
-        <QKBLEp1>
+        <Straight type="magnet" name="QKBLEcoil">
                 <X0 unit="m">-0.276469</X0>
                 <Z0 unit="m">-6.64973</Z0>
                 <L unit="m">0.344400</L>
@@ -1163,10 +1442,11 @@
                 <R unit="cm">10.0</R>
                 <r unit="cm">5.0</r>
 
-                <Material desc="Magnet QKBLE coil">Cu</Material>
-        </QKBLEp1>
+                <Material>Cu</Material>
+                <Desc>Magnet QKBLE coil</Desc>
+        </Straight>
 
-        <QKBLEp2>
+        <Straight type="magnet" name="QKBLEyoke">
                 <X0 unit="m">-0.276469</X0>
                 <Z0 unit="m">-6.64973</Z0>
                 <L unit="m">0.344400</L>
@@ -1175,10 +1455,11 @@
                 <R unit="cm">20.0</R>
                 <r unit="cm">10.0</r>
 
-                <Material desc="Magnet QKBLE yoke">Fe</Material>
-        </QKBLEp2>
+                <Material>Fe</Material>
+                <Desc>Magnet QKBLE yoke</Desc>
+        </Straight>
 
-        <QKCLEp1>
+        <Straight type="magnet" name="QKCLEcoil">
                 <X0 unit="m">-0.469155</X0>
                 <Z0 unit="m">-11.6016</Z0>
                 <L unit="m">0.344400</L>
@@ -1187,10 +1468,11 @@
                 <R unit="cm">10.0</R>
                 <r unit="cm">5.0</r>
 
-                <Material desc="Magnet QKCLE coil">Cu</Material>
-        </QKCLEp1>
+                <Material>Cu</Material>
+                <Desc>Magnet QKCLE coil</Desc>
+        </Straight>
 
-        <QKCLEp2>
+        <Straight type="magnet" name="QKCLEyoke">
                 <X0 unit="m">-0.469155</X0>
                 <Z0 unit="m">-11.6016</Z0>
                 <L unit="m">0.344400</L>
@@ -1199,10 +1481,11 @@
                 <R unit="cm">20.0</R>
                 <r unit="cm">10.0</r>
 
-                <Material desc="Magnet QKCLE yoke">Fe</Material>
-        </QKCLEp2>
+                <Material>Fe</Material>
+                <Desc>Magnet QKCLE yoke</Desc>
+        </Straight>
 
-        <QLC3LEp1>
+        <Straight type="magnet" name="QLC3LEcoil">
                 <X0 unit="m">-0.49039</X0>
                 <Z0 unit="m">-12.1956</Z0>
                 <L unit="m">0.560000</L>
@@ -1211,10 +1494,11 @@
                 <R unit="cm">10.0</R>
                 <r unit="cm">5.0</r>
 
-                <Material desc="Magnet QLC3LE coil">Cu</Material>
-        </QLC3LEp1>
+                <Material>Cu</Material>
+                <Desc>Magnet QLC3LE coil</Desc>
+        </Straight>
 
-        <QLC3LEp2>
+        <Straight type="magnet" name="QLC3LEyoke">
                 <X0 unit="m">-0.49039</X0>
                 <Z0 unit="m">-12.1956</Z0>
                 <L unit="m">0.560000</L>
@@ -1223,10 +1507,11 @@
                 <R unit="cm">20.0</R>
                 <r unit="cm">10.0</r>
 
-                <Material desc="Magnet QLC3LE yoke">Fe</Material>
-        </QLC3LEp2>
+                <Material>Fe</Material>
+                <Desc>Magnet QLC3LE yoke</Desc>
+        </Straight>
 
-        <QKDLEp1>
+        <Straight type="magnet" name="QKDLEcoil">
                 <X0 unit="m">-0.541</X0>
                 <Z0 unit="m">-13.599</Z0>
                 <L unit="m">0.372</L>
@@ -1235,10 +1520,11 @@
                 <R unit="cm">10.0</R>
                 <r unit="cm">5.0</r>
 
-                <Material desc="Magnet QKDLE coil">Cu</Material>
-        </QKDLEp1>
+                <Material>Cu</Material>
+                <Desc>Magnet QKDLE coil</Desc>
+        </Straight>
 
-        <QKDLEp2>
+        <Straight type="magnet" name="QKDLEyoke">
                 <X0 unit="m">-0.541</X0>
                 <Z0 unit="m">-13.599</Z0>
                 <L unit="m">0.372</L>
@@ -1247,10 +1533,11 @@
                 <R unit="cm">20.0</R>
                 <r unit="cm">10.0</r>
 
-                <Material desc="Magnet QKDLE yoke">Fe</Material>
-        </QKDLEp2>
+                <Material>Fe</Material>
+                <Desc>Magnet QKDLE yoke</Desc>
+        </Straight>
 
-        <QLC4LEp1>
+        <Straight type="magnet" name="QLC4LEcoil">
                 <X0 unit="m">-0.707962</X0>
                 <Z0 unit="m">-18.2823</Z0>
                 <L unit="m">0.560000</L>
@@ -1259,10 +1546,11 @@
                 <R unit="cm">10.0</R>
                 <r unit="cm">5.0</r>
 
-                <Material desc="Magnet QLC4LE coil">Cu</Material>
-        </QLC4LEp1>
+                <Material>Cu</Material>
+                <Desc>Magnet QLC4LE coil</Desc>
+        </Straight>
 
-        <QLC4LEp2>
+        <Straight type="magnet" name="QLC4LEyoke">
                 <X0 unit="m">-0.707962</X0>
                 <Z0 unit="m">-18.2823</Z0>
                 <L unit="m">0.560000</L>
@@ -1271,10 +1559,11 @@
                 <R unit="cm">20.0</R>
                 <r unit="cm">10.0</r>
 
-                <Material desc="Magnet QLC4LE yoke">Fe</Material>
-        </QLC4LEp2>
+                <Material>Fe</Material>
+                <Desc>Magnet QLC4LE yoke</Desc>
+        </Straight>
 
-        <QLC5LEp1>
+        <Straight type="magnet" name="QLC5LEcoil">
                 <X0 unit="m">-0.840878</X0>
                 <Z0 unit="m">-22.0007</Z0>
                 <L unit="m">0.560000</L>
@@ -1283,10 +1572,11 @@
                 <R unit="cm">10.0</R>
                 <r unit="cm">5.0</r>
 
-                <Material desc="Magnet QLC5LE coil">Cu</Material>
-        </QLC5LEp1>
+                <Material>Cu</Material>
+                <Desc>Magnet QLC5LE coil</Desc>
+        </Straight>
 
-        <QLC5LEp2>
+        <Straight type="magnet" name="QLC5LEyoke">
                 <X0 unit="m">-0.840878</X0>
                 <Z0 unit="m">-22.0007</Z0>
                 <L unit="m">0.560000</L>
@@ -1295,10 +1585,11 @@
                 <R unit="cm">20.0</R>
                 <r unit="cm">10.0</r>
 
-                <Material desc="Magnet QLC5LE yoke">Fe</Material>
-        </QLC5LEp2>
+                <Material>Fe</Material>
+                <Desc>Magnet QLC5LE yoke</Desc>
+        </Straight>
 
-        <QLC7LEp1>
+        <Straight type="magnet" name="QLC7LEcoil">
                 <X0 unit="m">-1.00253</X0>
                 <Z0 unit="m">-26.523</Z0>
                 <L unit="m">0.560000</L>
@@ -1307,10 +1598,11 @@
                 <R unit="cm">10.0</R>
                 <r unit="cm">5.0</r>
 
-                <Material desc="Magnet QLC7LE coil">Cu</Material>
-        </QLC7LEp1>
+                <Material>Cu</Material>
+                <Desc>Magnet QLC7LE coil</Desc>
+        </Straight>
 
-        <QLC7LEp2>
+        <Straight type="magnet" name="QLC7LEyoke">
                 <X0 unit="m">-1.00253</X0>
                 <Z0 unit="m">-26.523</Z0>
                 <L unit="m">0.560000</L>
@@ -1319,10 +1611,11 @@
                 <R unit="cm">20.0</R>
                 <r unit="cm">10.0</r>
 
-                <Material desc="Magnet QLC7LE yoke">Fe</Material>
-        </QLC7LEp2>
+                <Material>Fe</Material>
+                <Desc>Magnet QLC7LE yoke</Desc>
+        </Straight>
 
-        <SLYTLE1p1>
+        <Straight type="magnet" name="SLYTLE1coil">
                 <X0 unit="m">-1.03683</X0>
                 <Z0 unit="m">-27.4824</Z0>
                 <L unit="m">0.600000</L>
@@ -1331,10 +1624,11 @@
                 <R unit="cm">10.0</R>
                 <r unit="cm">5.0</r>
 
-                <Material desc="Magnet SLYTLE1 coil">Cu</Material>
-        </SLYTLE1p1>
+                <Material>Cu</Material>
+                <Desc>Magnet SLYTLE1 coil</Desc>
+        </Straight>
 
-        <SLYTLE1p2>
+        <Straight type="magnet" name="SLYTLE1yoke">
                 <X0 unit="m">-1.03683</X0>
                 <Z0 unit="m">-27.4824</Z0>
                 <L unit="m">0.600000</L>
@@ -1343,10 +1637,11 @@
                 <R unit="cm">20.0</R>
                 <r unit="cm">10.0</r>
 
-                <Material desc="Magnet SLYTLE1 yoke">Fe</Material>
-        </SLYTLE1p2>
+                <Material>Fe</Material>
+                <Desc>Magnet SLYTLE1 yoke</Desc>
+        </Straight>
 
-        <QLY1LE1p1>
+        <Straight type="magnet" name="QLY1LE1coil">
                 <X0 unit="m">-1.07791</X0>
                 <Z0 unit="m">-28.6317</Z0>
                 <L unit="m">0.460000</L>
@@ -1355,10 +1650,11 @@
                 <R unit="cm">10.0</R>
                 <r unit="cm">5.0</r>
 
-                <Material desc="Magnet QLY1LE1 coil">Cu</Material>
-        </QLY1LE1p1>
+                <Material>Cu</Material>
+                <Desc>Magnet QLY1LE1 coil</Desc>
+        </Straight>
 
-        <QLY1LE1p2>
+        <Straight type="magnet" name="QLY1LE1yoke">
                 <X0 unit="m">-1.07791</X0>
                 <Z0 unit="m">-28.6317</Z0>
                 <L unit="m">0.460000</L>
@@ -1367,10 +1663,11 @@
                 <R unit="cm">20.0</R>
                 <r unit="cm">10.0</r>
 
-                <Material desc="Magnet QLY1LE1 yoke">Fe</Material>
-        </QLY1LE1p2>
+                <Material>Fe</Material>
+                <Desc>Magnet QLY1LE1 yoke</Desc>
+        </Straight>
 
-        <QKALPp1>
+        <Straight type="magnet" name="QKALPcoil">
                 <X0 unit="m">0.197543</X0>
                 <Z0 unit="m">-4.64021</Z0>
                 <L unit="m">0.313740</L>
@@ -1379,10 +1676,11 @@
                 <R unit="cm">10.0</R>
                 <r unit="cm">5.0</r>
 
-                <Material desc="Magnet QKALP coil">Cu</Material>
-        </QKALPp1>
+                <Material>Cu</Material>
+                <Desc>Magnet QKALP coil</Desc>
+        </Straight>
 
-        <QKALPp2>
+        <Straight type="magnet" name="QKALPyoke">
                 <X0 unit="m">0.197543</X0>
                 <Z0 unit="m">-4.64021</Z0>
                 <L unit="m">0.313740</L>
@@ -1391,10 +1689,11 @@
                 <R unit="cm">20.0</R>
                 <r unit="cm">10.0</r>
 
-                <Material desc="Magnet QKALP yoke">Fe</Material>
-        </QKALPp2>
+                <Material>Fe</Material>
+                <Desc>Magnet QKALP yoke</Desc>
+        </Straight>
 
-        <QKBLPp1>
+        <Straight type="magnet" name="QKBLPcoil">
                 <X0 unit="m">0.528438</X0>
                 <Z0 unit="m">-10.093</Z0>
                 <L unit="m">0.313740</L>
@@ -1403,10 +1702,11 @@
                 <R unit="cm">10.0</R>
                 <r unit="cm">5.0</r>
 
-                <Material desc="Magnet QKBLP coil">Cu</Material>
-        </QKBLPp1>
+                <Material>Cu</Material>
+                <Desc>Magnet QKBLP coil</Desc>
+        </Straight>
 
-        <QKBLPp2>
+        <Straight type="magnet" name="QKBLPyoke">
                 <X0 unit="m">0.528438</X0>
                 <Z0 unit="m">-10.093</Z0>
                 <L unit="m">0.313740</L>
@@ -1415,10 +1715,11 @@
                 <R unit="cm">20.0</R>
                 <r unit="cm">10.0</r>
 
-                <Material desc="Magnet QKBLP yoke">Fe</Material>
-        </QKBLPp2>
+                <Material>Fe</Material>
+                <Desc>Magnet QKBLP yoke</Desc>
+        </Straight>
 
-        <QLC1LPp1>
+        <Straight type="magnet" name="QLC1LPcoil">
                 <X0 unit="m">0.817333</X0>
                 <Z0 unit="m">-13.6905</Z0>
                 <L unit="m">0.583720</L>
@@ -1427,10 +1728,11 @@
                 <R unit="cm">10.0</R>
                 <r unit="cm">5.0</r>
 
-                <Material desc="Magnet QLC1LP coil">Cu</Material>
-        </QLC1LPp1>
+                <Material>Cu</Material>
+                <Desc>Magnet QLC1LP coil</Desc>
+        </Straight>
 
-        <QLC1LPp2>
+        <Straight type="magnet" name="QLC1LPyoke">
                 <X0 unit="m">0.817333</X0>
                 <Z0 unit="m">-13.6905</Z0>
                 <L unit="m">0.583720</L>
@@ -1439,10 +1741,11 @@
                 <R unit="cm">20.0</R>
                 <r unit="cm">10.0</r>
 
-                <Material desc="Magnet QLC1LP yoke">Fe</Material>
-        </QLC1LPp2>
+                <Material>Fe</Material>
+                <Desc>Magnet QLC1LP yoke</Desc>
+        </Straight>
 
-        <QKCLPp1>
+        <Straight type="magnet" name="QKCLPcoil">
                 <X0 unit="m">0.888072</X0>
                 <Z0 unit="m">-14.5714</Z0>
                 <L unit="m">0.313740</L>
@@ -1451,10 +1754,11 @@
                 <R unit="cm">10.0</R>
                 <r unit="cm">5.0</r>
 
-                <Material desc="Magnet QKCLP coil">Cu</Material>
-        </QKCLPp1>
+                <Material>Cu</Material>
+                <Desc>Magnet QKCLP coil</Desc>
+        </Straight>
 
-        <QKCLPp2>
+        <Straight type="magnet" name="QKCLPyoke">
                 <X0 unit="m">0.888072</X0>
                 <Z0 unit="m">-14.5714</Z0>
                 <L unit="m">0.313740</L>
@@ -1463,10 +1767,11 @@
                 <R unit="cm">20.0</R>
                 <r unit="cm">10.0</r>
 
-                <Material desc="Magnet QKCLP yoke">Fe</Material>
-        </QKCLPp2>
+                <Material>Fe</Material>
+                <Desc>Magnet QKCLP yoke</Desc>
+        </Straight>
 
-        <QLC2LPp1>
+        <Straight type="magnet" name="QLC2LPcoil">
                 <X0 unit="m">1.3009</X0>
                 <Z0 unit="m">-19.7122</Z0>
                 <L unit="m">0.583720</L>
@@ -1475,10 +1780,11 @@
                 <R unit="cm">10.0</R>
                 <r unit="cm">5.0</r>
 
-                <Material desc="Magnet QLC2LP coil">Cu</Material>
-        </QLC2LPp1>
+                <Material>Cu</Material>
+                <Desc>Magnet QLC2LP coil</Desc>
+        </Straight>
 
-        <QLC2LPp2>
+        <Straight type="magnet" name="QLC2LPyoke">
                 <X0 unit="m">1.3009</X0>
                 <Z0 unit="m">-19.7122</Z0>
                 <L unit="m">0.583720</L>
@@ -1487,10 +1793,11 @@
                 <R unit="cm">20.0</R>
                 <r unit="cm">10.0</r>
 
-                <Material desc="Magnet QLC2LP yoke">Fe</Material>
-        </QLC2LPp2>
+                <Material>Fe</Material>
+                <Desc>Magnet QLC2LP yoke</Desc>
+        </Straight>
 
-        <QKELPp1>
+        <Straight type="magnet" name="QKELPcoil">
                 <X0 unit="m">1.37164</X0>
                 <Z0 unit="m">-20.5931</Z0>
                 <L unit="m">0.313740</L>
@@ -1499,10 +1806,11 @@
                 <R unit="cm">10.0</R>
                 <r unit="cm">5.0</r>
 
-                <Material desc="Magnet QKELP coil">Cu</Material>
-        </QKELPp1>
+                <Material>Cu</Material>
+                <Desc>Magnet QKELP coil</Desc>
+        </Straight>
 
-        <QKELPp2>
+        <Straight type="magnet" name="QKELPyoke">
                 <X0 unit="m">1.37164</X0>
                 <Z0 unit="m">-20.5931</Z0>
                 <L unit="m">0.313740</L>
@@ -1511,10 +1819,11 @@
                 <R unit="cm">20.0</R>
                 <r unit="cm">10.0</r>
 
-                <Material desc="Magnet QKELP yoke">Fe</Material>
-        </QKELPp2>
+                <Material>Fe</Material>
+                <Desc>Magnet QKELP yoke</Desc>
+        </Straight>
 
-        <QKFLPp1>
+        <Straight type="magnet" name="QKFLPcoil">
                 <X0 unit="m">1.65494</X0>
                 <Z0 unit="m">-26.2478</Z0>
                 <L unit="m">0.313740</L>
@@ -1523,10 +1832,11 @@
                 <R unit="cm">10.0</R>
                 <r unit="cm">5.0</r>
 
-                <Material desc="Magnet QKFLP coil">Cu</Material>
-        </QKFLPp1>
+                <Material>Cu</Material>
+                <Desc>Magnet QKFLP coil</Desc>
+        </Straight>
 
-        <QKFLPp2>
+        <Straight type="magnet" name="QKFLPyoke">
                 <X0 unit="m">1.65494</X0>
                 <Z0 unit="m">-26.2478</Z0>
                 <L unit="m">0.313740</L>
@@ -1535,10 +1845,11 @@
                 <R unit="cm">20.0</R>
                 <r unit="cm">10.0</r>
 
-                <Material desc="Magnet QKFLP yoke">Fe</Material>
-        </QKFLPp2>
+                <Material>Fe</Material>
+                <Desc>Magnet QKFLP yoke</Desc>
+        </Straight>
 
-        <QLC3LPp1>
+        <Straight type="magnet" name="QLC3LPcoil">
                 <X0 unit="m">1.67162</X0>
                 <Z0 unit="m">-27.2614</Z0>
                 <L unit="m">0.583720</L>
@@ -1547,10 +1858,11 @@
                 <R unit="cm">10.0</R>
                 <r unit="cm">5.0</r>
 
-                <Material desc="Magnet QLC3LP coil">Cu</Material>
-        </QLC3LPp1>
+                <Material>Cu</Material>
+                <Desc>Magnet QLC3LP coil</Desc>
+        </Straight>
 
-        <QLC3LPp2>
+        <Straight type="magnet" name="QLC3LPyoke">
                 <X0 unit="m">1.67162</X0>
                 <Z0 unit="m">-27.2614</Z0>
                 <L unit="m">0.583720</L>
@@ -1559,10 +1871,11 @@
                 <R unit="cm">20.0</R>
                 <r unit="cm">10.0</r>
 
-                <Material desc="Magnet QLC3LP yoke">Fe</Material>
-        </QLC3LPp2>
+                <Material>Fe</Material>
+                <Desc>Magnet QLC3LP yoke</Desc>
+        </Straight>
 
-        <SLYTLP1p1>
+        <Straight type="magnet" name="SLYTLP1coil">
                 <X0 unit="m">1.68781</X0>
                 <Z0 unit="m">-28.245</Z0>
                 <L unit="m">0.334000</L>
@@ -1571,10 +1884,11 @@
                 <R unit="cm">10.0</R>
                 <r unit="cm">5.0</r>
 
-                <Material desc="Magnet SLYTLP1 coil">Cu</Material>
-        </SLYTLP1p1>
+                <Material>Cu</Material>
+                <Desc>Magnet SLYTLP1 coil</Desc>
+        </Straight>
 
-        <SLYTLP1p2>
+        <Straight type="magnet" name="SLYTLP1yoke">
                 <X0 unit="m">1.68781</X0>
                 <Z0 unit="m">-28.245</Z0>
                 <L unit="m">0.334000</L>
@@ -1583,12 +1897,13 @@
                 <R unit="cm">20.0</R>
                 <r unit="cm">10.0</r>
 
-                <Material desc="Magnet SLYTLP1 yoke">Fe</Material>
-        </SLYTLP1p2>
+                <Material>Fe</Material>
+                <Desc>Magnet SLYTLP1 yoke</Desc>
+        </Straight>
 
        <!--
          Following geometry should be parallel to Gx, so we need to rotate by -8.5 mrad.
-          (except for the polyethyren shield attaching Belle-Endcap)
+          (except for the polyethylene shield attaching Belle-Endcap)
         -->
 
 
@@ -1605,10 +1920,11 @@
                 <DETDZ unit="m">0.47</DETDZ>
                 <ROT unit="rad">-0.0085</ROT>
 
-                <Material desc="gate shield">G4_CONCRETE</Material>
+                <Material>G4_CONCRETE</Material>
+                <Desc>gate shield</Desc>
 	</GateShield>
 
-	<!-- polyetyren neutron shield -->
+	<!-- polyethylene neutron shield -->
 
         <PolyShieldR>
                 <Xp unit="m">1.80</Xp>
@@ -1616,10 +1932,12 @@
                 <Y unit="m">1.87</Y>
                 <Z unit="m">0.15</Z>
                 <DZ unit="m">4.25</DZ>
-                <r unit="m">0.85</r>
+                <!--r unit="m">0.85</r-->
+                <r unit="m">1</r>
                 <dx unit="m">-0.145</dx>
 
-                <Material desc="Neutron shield">G4_POLYETHYLENE</Material>
+                <Material>G4_POLYETHYLENE</Material>
+                <Desc>Neutron shield</Desc>
         </PolyShieldR>
 
         <PolyShieldL>
@@ -1628,10 +1946,12 @@
                 <Y unit="m">1.87</Y>
                 <Z unit="m">0.15</Z>
                 <DZ unit="m">-3.31</DZ>
-                <r unit="m">0.85</r>
+                <!--r unit="m">0.85</r-->
+                <r unit="m">1</r>
                 <dx unit="m">0.07</dx>
 
-                <Material desc="Neutron shield">G4_POLYETHYLENE</Material>
+                <Material>G4_POLYETHYLENE</Material>
+                <Desc>Neutron shield</Desc>
         </PolyShieldL>
 
 	<!-- additional concrete shield -->
@@ -1641,12 +1961,15 @@
                 <Y unit="m">1.9</Y>
                 <Z unit="m">0.35</Z>
                 <DZ unit="m">5.26</DZ>
-                <x unit="m">0.8</x>
+                <!--x unit="m">0.8</x-->
+                <x unit="m">0.9</x>
                 <y unit="m">1.45</y>
                 <dx unit="m">-0.1</dx>
                 <dy unit="m">-0.45</dy>
                 <ROT unit="rad">-0.0085</ROT>
+
                 <Material>G4_CONCRETE</Material>
+                <Desc>Concrete shield</Desc>
         </ConcreteShieldR>
 
         <ConcreteShieldL>
@@ -1654,15 +1977,17 @@
                 <Y unit="m">1.9</Y>
                 <Z unit="m">0.35</Z>
                 <DZ unit="m">-4.32</DZ>
-                <x unit="m">0.8</x>
+                <!--x unit="m">0.8</x-->
+                <x unit="m">0.9</x>
                 <y unit="m">1.45</y>
                 <dx unit="m">0.1</dx>
                 <dy unit="m">-0.45</dy>
                 <ROT unit="rad">-0.0085</ROT>
+
                 <Material>G4_CONCRETE</Material>
+                <Desc>Concrete shield</Desc>
         </ConcreteShieldL>
 
   </Content>
 </DetectorComponent>
-
 

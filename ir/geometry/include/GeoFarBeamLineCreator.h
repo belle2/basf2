@@ -21,12 +21,19 @@
 #include <sstream>
 
 #include <G4Transform3D.hh>
-class G4LogicalVolume;
-class G4AssemblyVolume;
-class G4Polycone;
+#include <G4VSolid.hh>
+//class G4LogicalVolume;
+//class G4AssemblyVolume;
+//class G4Polycone;
 
 namespace Belle2 {
   namespace ir {
+    // Struct with description of elements
+    struct FarBeamLineElement {
+      G4Transform3D transform;
+      G4VSolid* geo;
+    };
+
     class SensitiveDetector;
 
     /** The creator for the FarBeamLine geometry of the Belle II detector.   */

@@ -351,9 +351,32 @@ namespace Belle2 {
 
       double getDriftV(double dt, unsigned short layer, unsigned short lr, double alpha = 0.) const;
 
+      /**
+       * Getter for Drift Length
+       * @param dt Drift time.
+       * @param layer Layer ID.
+       * @param lr Left/Right
+       * @param alpha incident angle w.r.t. the cell.
+       */
+
       double getDriftLength(double dt, unsigned short layer, unsigned short lr, double alpha = 0.) const;
 
+      /**
+       * Getter for Drift time.
+       * @param dt Drift time.
+       * @param layer Layer ID.
+       * @param lr Left/Right
+       * @param alpha incident angle w.r.t. the cell.
+       */
+
       double getDriftTime(double dist, unsigned short layer, unsigned short lr, double alpha = 0.) const;
+
+
+      /**
+       * Get the resolution of drift length.
+       * @param dist  Drift length..
+       * @param layer Layer id
+       */
 
       double getSigma(double dist, unsigned short layer) const;
 

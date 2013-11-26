@@ -56,6 +56,8 @@ namespace Belle2 {
     std::string m_userDECFileName; /**<  Standard input user decay file. */
     std::string m_pdlFileName;     /**<  Standard input pdl file.  */
     std::string m_parentParticle;  /**<  Standard input parent particle. */
+    int m_inclusiveType;        /**< Inclusive type 0 : generic, 1 : m_inclusiveParticle inclusive, 2 : m_inclusiveParticle + c.c. inclusive */
+    std::string m_inclusiveParticle; /**< inclusive Particle */
     bool m_boost2LAB;              /**<  Boosted to LAB frame. */
     double m_EHER;              /**< Energy for HER [GeV]. */
     double m_ELER;              /**< Energy for LER [GeV]. */

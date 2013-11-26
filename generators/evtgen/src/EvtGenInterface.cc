@@ -72,7 +72,7 @@ int EvtGenInterface::setup(const std::string& DECFileName, const std::string& pd
 }
 
 
-int EvtGenInterface::simulateEvent(MCParticleGraph& graph, TLorentzVector pParentParticle)
+int EvtGenInterface::simulateEvent(MCParticleGraph& graph, TLorentzVector pParentParticle, int inclusiveType, const std::string& inclusiveParticle)
 {
   //  B2INFO("Starting event simulation.");
 
@@ -95,10 +95,39 @@ int EvtGenInterface::simulateEvent(MCParticleGraph& graph, TLorentzVector pParen
     m_pinit.set(EvtPDL::getMass(Ups), pParentParticle.X(), pParentParticle.Y(), pParentParticle.Z());
   }
 
-  m_parent = EvtParticleFactory::particleFactory(m_ParentParticle, m_pinit);
-  m_parent->setVectorSpinDensity();
-  B2INFO("Set starting particle");
-  m_Generator->generateDecay(m_parent);
+  EvtId Inclusive_Particle_ID = EvtPDL::getId(inclusiveParticle);
+  EvtId Inclusive_Anti_Particle_ID = EvtPDL::chargeConj(Inclusive_Particle_ID);
+
+  bool we_got_inclusive_particle = false;
+  do {
+    m_parent = EvtParticleFactory::particleFactory(m_ParentParticle, m_pinit);
+    m_parent->setVectorSpinDensity();
+    //B2INFO("Set starting particle");
+    m_Generator->generateDecay(m_parent);
+
+    if (inclusiveType != 0) {
+      EvtParticle* p = m_parent;
+      // following loop will go through generated event and check it for
+      // presense of inclusive particle
+      do {
+        //for (int ii = 0; ii < iPart ; ii++) {
+        //std::cout << p->getPDGId() << std::endl;
+        if (p->getId() == Inclusive_Particle_ID ||
+            (inclusiveType == 2 && p->getId() == Inclusive_Anti_Particle_ID)) {
+          we_got_inclusive_particle = true;
+          break;
+        }
+        p = p->nextIter(m_parent);
+      } while (p != 0);
+
+      if (!we_got_inclusive_particle) {
+        m_parent->deleteTree();
+      }
+    } else {
+      // we don't do inclusive skimming so any generated event will do
+      we_got_inclusive_particle = true;
+    }
+  } while (!we_got_inclusive_particle);
 
   //  B2INFO("after generate Decay.");
 

@@ -52,6 +52,8 @@ EvtGenInputModule::EvtGenInputModule() : Module()
   addParam("pdlFile", m_pdlFileName, "standard pdlfile name should be provided: default file is in externals/share/evtgen/evt.pdl",
            Environment::Instance().getExternalsPath() + "/share/evtgen/evt.pdl");
   addParam("ParentParticle", m_parentParticle, "Parent Particle Name", string("Upsilon(4S)"));
+  addParam("InclusiveType", m_inclusiveType, "inclusive decay type (0: generic, 1: inclusive, 2: inclusive (charge conjugate)", 0);
+  addParam("InclusiveParticle", m_inclusiveParticle, "Inclusive Particle Name", string(""));
   addParam("boost2LAB", m_boost2LAB, "Boolean to indicate whether the particles should be boosted to LAB frame", true);
 }
 
@@ -72,6 +74,9 @@ void EvtGenInputModule::initialize()
 
   //Initialize MCParticle collection
   StoreArray<MCParticle>::registerPersistent();
+
+  if (m_inclusiveType == 0) m_inclusiveParticle == " ";
+  if (m_inclusiveType != 0 && EvtPDL::getId(m_inclusiveParticle).getId() == -1) B2ERROR("User Specified Inclusive Particle does not exist !!") ;
 
   B2INFO("finished initialising the EvtGen Input Module. ");
 }
@@ -143,7 +148,7 @@ void EvtGenInputModule::event()
   StoreObjPtr<EventMetaData> eventMetaDataPtr;
   mpg.clear();
 
-  int nPart =  m_Ievtgen.simulateEvent(mpg, pParentParticle);
+  int nPart =  m_Ievtgen.simulateEvent(mpg, pParentParticle,  m_inclusiveType, m_inclusiveParticle);
   B2INFO("Simulated event " << eventMetaDataPtr->getEvent() << " with " << nPart << " particles.");
 
 }

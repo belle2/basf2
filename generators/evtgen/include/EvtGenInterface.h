@@ -55,7 +55,7 @@ namespace Belle2 {
     }
 
     int setup(const std::string& decayFileName, const std::string& pdlFileName, const std::string& parentParticle, const std::string& userFileName = std::string("")); /**< Member setup for user decay  */
-    int simulateEvent(MCParticleGraph& graph, TLorentzVector pParentParticle); /**< MC simulation function */
+    int simulateEvent(MCParticleGraph& graph, TLorentzVector pParentParticle, int inclusiveType, const std::string& inclusiveParticle); /**< MC simulation function */
     TLorentzRotation m_labboost;     /**< Boost&rotation vector for boost from CM to LAB. */
 
   private:

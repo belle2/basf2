@@ -75,12 +75,14 @@ namespace Belle2 {
       count(0)
     {
       // Set description()
-      setDescription("TOPBackground");
+      setDescription("A module to analyze beam background simulations regarding TOP");
 
       // Add parameters
-      addParam("Type", m_BkgType, "Backgound typ name" , string("Backgound"));
-      addParam("Output", m_OutputFileName, "Name of output file", string("Backgound.root"));
-      addParam("TimeOfSimulation", m_TimeOfSimulation, "How is the analysed file", 5.);
+      addParam("Type", m_BkgType, "Backgound type" , string("Backgound"));
+      addParam("Output", m_OutputFileName, "Name of the output file",
+               string("Backgound.root"));
+      addParam("TimeOfSimulation", m_TimeOfSimulation,
+               "Real time in micro seconds that corresponds to simulated data", 5.);
     }
 
     TOPBackgroundModule::~TOPBackgroundModule()

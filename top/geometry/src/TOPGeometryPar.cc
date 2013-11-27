@@ -70,6 +70,7 @@ namespace Belle2 {
       m_Gwidth1 = 0;
       m_Gwidth2 = 0;
       m_Gwidth3 = 0;
+      m_SigmaAlpha = 0;
 
       //! PMT's
       m_Xgap = 0;
@@ -160,6 +161,7 @@ namespace Belle2 {
       m_Gwidth1 = barParams.getLength("Glue/Thicknes1");
       m_Gwidth2 = barParams.getLength("Glue/Thicknes2");
       m_Gwidth3 = barParams.getLength("Glue/Thicknes3");
+      m_SigmaAlpha = barParams.getDouble("Surface/SigmaAlpha");
 
       //! PMT's
 

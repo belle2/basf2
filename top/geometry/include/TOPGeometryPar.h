@@ -165,6 +165,11 @@ namespace Belle2 {
        */
       double getGwidth3() const {return m_Gwidth3 / m_unit; }
 
+      /** Get sigma alpha parameter describing surface roughness of quartz
+       * @return sigma alpha of quartz
+       */
+      double getSigmaAlpha() const {return m_SigmaAlpha; }
+
       //! Parameters of the PMT
 
       /** Get gap between PMTs in x direction
@@ -444,6 +449,7 @@ namespace Belle2 {
       double m_Gwidth1;     /**< glue thickness between wedge and segment 1 */
       double m_Gwidth2;     /**< glue thickness between segments 1 and 2 */
       double m_Gwidth3;     /**< glue thickness between segment 3 and mirror */
+      double m_SigmaAlpha;  /**< surface roughness of quartz */
 
       //! PMT parameters
 

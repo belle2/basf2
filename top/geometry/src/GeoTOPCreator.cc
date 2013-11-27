@@ -142,7 +142,7 @@ namespace Belle2 {
       G4double Mirradius = m_topgp->getMirradius();
 
       G4double dGlue = m_topgp->getdGlue();
-
+      G4double SigmaAlpha = m_topgp->getSigmaAlpha();
 
       //!calculate the total length and width of the qurtz bar
 
@@ -152,15 +152,15 @@ namespace Belle2 {
 
       //! read bar material names
       GearDir materialNames(content, "Bars");
-      string quartzName = materialNames.getString("BarMaterial", "TOPSiO2");
-      string glueName = materialNames.getString("Glue/GlueMaterial", "TOPGlue");
+      string quartzName = materialNames.getString("BarMaterial");
+      string glueName = materialNames.getString("Glue/GlueMaterial");
 
       G4Material* quartzMaterial = Materials::get(quartzName);
       G4Material* glueMaterial = Materials::get(glueName);
 
       //! read PMT glueing parameter name
       GearDir gluematerialNames(content, "PMTs");
-      string gluePMTName = gluematerialNames.getString("glueMaterial", "PMTGlue");
+      string gluePMTName = gluematerialNames.getString("glueMaterial");
       G4Material* gluePMTMaterial = Materials::get(gluePMTName);
       if (!gluePMTMaterial) { B2FATAL("Material '" << gluePMTName << "', required for gluing of PMTs to quartz not found");}
 
@@ -181,6 +181,7 @@ namespace Belle2 {
       if (barSurface) {
         Materials& materials = Materials::getInstance();
         G4OpticalSurface* optSurf = materials.createOpticalSurface(barSurface);
+        optSurf->SetSigmaAlpha(SigmaAlpha);
         new G4LogicalSkinSurface("barSurface", qbar, optSurf);
       } else B2WARNING("TOP bar: no surface properties defined!");
 
@@ -423,8 +424,8 @@ namespace Belle2 {
       /*! Read support and fill materials */
 
       GearDir supportNames(content, "Support");
-      string suportName = supportNames.getString("PannelMaterial", "TOPQBB");
-      string fillName = supportNames.getString("FillMaterial", "TOPAir");
+      string suportName = supportNames.getString("PannelMaterial");
+      string fillName = supportNames.getString("FillMaterial");
       G4Material* supportMaterial = Materials::get(suportName);
       G4Material* fillMaterial = Materials::get(fillName);
       if (!supportMaterial) { B2FATAL("Material '" << suportName << "' missing!");}
@@ -515,7 +516,7 @@ namespace Belle2 {
 
       /*! Get materials for PMT stack that houses the PMTs*/
       GearDir materialNames(content, "PMTs");
-      string airName = materialNames.getString("stackMaterial", "TOPAir");
+      string airName = materialNames.getString("stackMaterial");
       G4Material* airMaterial = Materials::get(airName);
       if (!airMaterial) { B2FATAL("Material '" << airName << "' missing!");}
 
@@ -585,11 +586,11 @@ namespace Belle2 {
       /*! Get PMT material */
 
       GearDir materialNames(content, "PMTs/Module");
-      string caseName = materialNames.getString("wallMaterial", "TOPPMTCase");
-      string sensName = materialNames.getString("sensMaterial", "TOPPMTBialkali");
-      string winName = materialNames.getString("winMaterial", "TOPBorosilicateGlass");
-      string botName = materialNames.getString("botMaterial", "TOPPMTBottom");
-      string fillName = materialNames.getString("fillMaterial", "TOPAir");
+      string caseName = materialNames.getString("wallMaterial");
+      string sensName = materialNames.getString("sensMaterial");
+      string winName = materialNames.getString("winMaterial");
+      string botName = materialNames.getString("botMaterial");
+      string fillName = materialNames.getString("fillMaterial");
 
       G4Material* caseMaterial = Materials::get(caseName);
       G4Material* sensMaterial = Materials::get(sensName);

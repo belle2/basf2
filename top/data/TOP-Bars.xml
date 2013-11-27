@@ -13,13 +13,13 @@
   <QWedgeLength dest="Length of the wedge" unit="mm">100</QWedgeLength>
   <QWedgeWidth desc="Width of the wedge" unit="mm">454</QWedgeWidth>
   <QWedgeDown dest="Wedge extension downward" unit="mm">31</QWedgeDown>
-  <QWedgeFlat desc="Wedge flat portion at exit" unit="mm">0</QWedgeFlat>
+  <QWedgeFlat desc="Wedge flat portion at exit" unit="mm">5</QWedgeFlat>
     
   <Glue>
-    <GlueMaterial>TOPGlue</GlueMaterial>
-    <Thicknes1 desc="glue thicknes quartz-wedge" unit="mm">0.1</Thicknes1>
-    <Thicknes2 desc="glue thicknes quartz-quartz" unit="mm">0.1</Thicknes2>
-    <Thicknes3 desc="glue thicknes quartz-mirror section" unit="mm">0.1</Thicknes3>
+    <GlueMaterial>TOPglueNOA61</GlueMaterial>
+    <Thicknes1 desc="glue thicknes quartz-wedge" unit="mm">0.05</Thicknes1>
+    <Thicknes2 desc="glue thicknes quartz-quartz" unit="mm">0.05</Thicknes2>
+    <Thicknes3 desc="glue thicknes quartz-mirror section" unit="mm">0.05</Thicknes3>
   </Glue>
 
   <Surface>
@@ -30,11 +30,30 @@
         <value energy="3.0">0.9994</value> 
         <value energy="4.0">0.9994</value> 
       </Property>
+      <!-- SPECULARLOBECONSTANT, SPECULARSPIKECONSTANT, Diffuse lobe constant (implicitly calculated), and BACKSCATTERCONSTANT must sum to unity-->
+      <Property name="SPECULARLOBECONSTANT" unit="eV">
+        <value energy="1.0">1.0</value> 
+        <value energy="2.0">1.0</value> 
+        <value energy="3.0">1.0</value> 
+        <value energy="4.0">1.0</value> 
+      </Property>
+      <Property name="SPECULARSPIKECONSTANT" unit="eV">
+        <value energy="1.0">0.0</value> 
+        <value energy="2.0">0.0</value> 
+        <value energy="3.0">0.0</value> 
+        <value energy="4.0">0.0</value> 
+      </Property>
+      <Property name="BACKSCATTERCONSTANT" unit="eV">
+        <value energy="1.0">0.0</value> 
+        <value energy="2.0">0.0</value> 
+        <value energy="3.0">0.0</value> 
+        <value energy="4.0">0.0</value> 
+      </Property>
     </Properties>
     <Type>dielectric_dielectric</Type>
-    <Finish>polished</Finish>
+    <Finish>ground</Finish>
     <Model>unified</Model>
+    <SigmaAlpha desc="geant4 parameter for surface roughness">0.000125</SigmaAlpha>
   </Surface>
 
 </Bars>
-

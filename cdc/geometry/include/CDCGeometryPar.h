@@ -1,4 +1,3 @@
-
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2012 - Belle II Collaboration                             *
@@ -57,8 +56,30 @@ namespace Belle2 {
       //! Gets geometry parameters from gearbox.
       void read();
       void readGeometry4Recon(const GearDir);
+
+
+      /**
+       * Read XT-relation table.
+       * @param GearDir Gear Dir.
+       * @param mode 0: read simulation file, 1: read reconstruction file.
+       */
+
       void readXT(const GearDir, int mode = 0);
+
+      /**
+       * Read spatial resolution of Drift length.
+       * @param GearDir Gear Dir.
+       * @param mode 0: read simulation file, 1: read reconstruction file.
+       */
+
       void readSigma(const GearDir, int mode = 0);
+
+      /**
+       * Read the propagatio of speed on the sense wire.
+       * @param GearDir Gear Dir.
+       * @param mode 0: read simulation file, 1: read reconstruction file.
+       */
+
       void readPropSpeed(const GearDir, int mode = 0);
 
       //! Generate an xml file used in gearbox

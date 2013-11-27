@@ -134,6 +134,7 @@ namespace Belle2 {
     StoreArray<Track> Tracks;
     StoreArray<ECLGamma> Gammas;
     StoreArray<ECLPi0> Pi0s;
+    StoreArray<ECLShower> ECLShowers;
     StoreArray<Particle> Particles;
 
     const Const::ChargedStable charged[] = {Const::electron,
@@ -181,11 +182,11 @@ namespace Belle2 {
 
     for (int i = 0; i < Pi0s.getEntries(); i++) {
       const ECLPi0* pi0 = Pi0s[i];
-      const MCParticle* mcParticle = DataStore::getRelated<MCParticle>(pi0);
       Particle particle(pi0, i);
       if (particle.getParticleType() == Particle::c_Pi0) { // should always hold but...
         int showerId1 = pi0->getShowerId1();
         int showerId2 = pi0->getShowerId2();
+        //find corresponding gamma Particles from shower ID
         for (unsigned k = 0; k < gammaShowerId.size(); k++) {
           int showerId = gammaShowerId[k].second;
           if (showerId == showerId1 || showerId == showerId2) {
@@ -193,7 +194,13 @@ namespace Belle2 {
           }
         }
         Particle* newPart = Particles.appendNew(particle);
-        DataStore::addRelationFromTo(newPart, mcParticle);
+
+        const MCParticle* gammaMc1 = ECLShowers[showerId1]->getRelated<MCParticle>();
+        const MCParticle* gammaMc2 = ECLShowers[showerId2]->getRelated<MCParticle>();
+        if (gammaMc1 and gammaMc2 and gammaMc1->getMother() == gammaMc2->getMother()) {
+          //both ECLShowers have same mother, save MC info
+          newPart->addRelationTo(gammaMc1->getMother());
+        }
       }
     }
 

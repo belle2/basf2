@@ -39,7 +39,7 @@ REG_MODULE(PXDClusterizer);
 
 PXDClusterizerModule::PXDClusterizerModule() :
   Module(), m_elNoise(200.0), m_cutSeed(5.0), m_cutAdjacent(3.0), m_cutCluster(
-    8.0), m_sizeHeadTail(3)
+    8.0), m_sizeHeadTail(3), m_clusterCacheSize(0)
 {
   //Set module properties
   setDescription("Cluster PXDHits");
@@ -52,6 +52,8 @@ PXDClusterizerModule::PXDClusterizerModule() :
   addParam("SeedSN", m_cutSeed, "SN for digits to be considered as seed",
            m_cutSeed);
   addParam("ClusterSN", m_cutCluster, "Minimum SN for clusters", m_cutCluster);
+  addParam("ClusterCacheSize", m_clusterCacheSize,
+           "Maximum desired number of sensor rows", 0);
   addParam("HeadTailSize", m_sizeHeadTail,
            "Minimum cluster size to switch to Analog head tail algorithm for cluster center",
            m_sizeHeadTail);
@@ -133,6 +135,10 @@ void PXDClusterizerModule::initialize()
   //This is still static noise for all pixels, should be done more sophisticated in the future
   m_noiseMap.setNoiseLevel(m_elNoise);
   m_cutElectrons = m_elNoise * m_cutAdjacent;
+  if (m_clusterCacheSize > 0)
+    m_cache = std::unique_ptr<ClusterCache>(new ClusterCache(m_clusterCacheSize));
+  else
+    m_cache = std::unique_ptr<ClusterCache>(new ClusterCache());
 }
 
 void PXDClusterizerModule::event()
@@ -169,7 +175,7 @@ void PXDClusterizerModule::event()
   createRelationLookup(relDigitMCParticle, m_mcRelation, storeDigits.getEntries());
   createRelationLookup(relDigitTrueHit, m_trueRelation, storeDigits.getEntries());
 
-  m_cache.clear();
+  m_cache->clear();
 
   //We require all pixels are already sorted and directly cluster them. Once
   //the sensorID changes, we write out all existing clusters and continue.
@@ -205,7 +211,7 @@ void PXDClusterizerModule::event()
     // begin(m_deadChannels) when the sensorID changes), we would do
     //
     // while(m_currentDeadChannel != end(m_deadChannels) && *m_currentDeadChannel < px){
-    //   m_cache.findCluster(m_currentDeadChannel->getU(), m_currentDeadChannel->getV());
+    //   m_cache->findCluster(m_currentDeadChannel->getU(), m_currentDeadChannel->getV());
     //   m_currentDeadChannel++;
     // }
     //
@@ -215,7 +221,7 @@ void PXDClusterizerModule::event()
     // contain holes or are disconnected.
 
     // Find correct cluster and add pixel to cluster
-    m_cache.findCluster(px.getU(), px.getV()).add(px);
+    m_cache->findCluster(px.getU(), px.getV()).add(px);
   }
   writeClusters(sensorID);
 }
@@ -247,7 +253,7 @@ void PXDClusterizerModule::fillRelationMap(const RelationLookup& lookup, std::ma
 
 void PXDClusterizerModule::writeClusters(VxdID sensorID)
 {
-  if (m_cache.empty())
+  if (m_cache->empty())
     return;
 
   //Get all datastore elements
@@ -270,7 +276,7 @@ void PXDClusterizerModule::writeClusters(VxdID sensorID)
   map<unsigned int, float> truehit_relations;
   vector<pair<unsigned int, float> > digit_weights;
 
-  for (ClusterCandidate & cls : m_cache) {
+  for (ClusterCandidate & cls : *m_cache) {
     //Check for noise cuts
     if (!(cls.size() > 0 && m_noiseMap(cls.getCharge(), m_cutCluster) && m_noiseMap(cls.getSeed(), m_cutSeed))) continue;
 
@@ -337,7 +343,7 @@ void PXDClusterizerModule::writeClusters(VxdID sensorID)
     relClusterDigit.add(clsIndex, digit_weights.begin(), digit_weights.end());
   }
 
-  m_cache.clear();
+  m_cache->clear();
 }
 
 void PXDClusterizerModule::calculatePositionError(const ClusterCandidate& cls, ClusterProjection& primary, const ClusterProjection& secondary, double minPitch, double centerPitch, double maxPitch)

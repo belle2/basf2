@@ -17,6 +17,7 @@
 #include <pxd/reconstruction/ClusterProjection.h>
 #include <pxd/reconstruction/NoiseMap.h>
 #include <string>
+#include <memory>
 
 namespace Belle2 {
   class RelationArray;
@@ -120,8 +121,10 @@ namespace Belle2 {
       /** LorentzAngle , FIXME: should be determined directly from B-Field */
       double m_tanLorentzAngle;
 
+      /** Size of cluster Cache (0 = default) */
+      int m_clusterCacheSize;
       /** cache of the last seen clusters to speed up clustering */
-      ClusterCache m_cache;
+      std::unique_ptr<ClusterCache> m_cache;
       /** Noisemap for the currently active sensor */
       NoiseMap m_noiseMap;
 

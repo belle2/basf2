@@ -82,6 +82,11 @@ namespace Belle2 {
      */
     float getCharge() const { return m_charge; }
 
+    /** Set digit charge.
+     * @param charge The charge to be set to the digit.
+     */
+    void setCharge(float charge) { m_charge = charge; }
+
   private:
 
     unsigned short m_sensorID; /**< Compressed sensor identifier.*/

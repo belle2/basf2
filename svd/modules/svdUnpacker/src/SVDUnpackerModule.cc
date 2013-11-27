@@ -49,8 +49,8 @@ SVDUnpackerModule::~SVDUnpackerModule()
 void SVDUnpackerModule::initialize()
 {
 
+  //commented out ssince daq/rawdata/RawSVD is not in the release:
   //  StoreArray<RawSVD>::required(m_rawSVDListName);
-  StoreObjPtr<RawSVD>::required(m_rawSVDListName);
   StoreArray<SVDDigit>::registerPersistent(m_svdDigitListName);
 
   loadMap();
@@ -63,42 +63,27 @@ void SVDUnpackerModule::beginRun()
 
 void SVDUnpackerModule::event()
 {
-  StoreArray<RawSVD> rawSVDList(m_rawSVDListName);
-  //  StoreObjPtr<RawSVD> rawSVDList(m_rawSVDListName);
+  //commented out ssince daq/rawdata/RawSVD is not in the release:
+  //  StoreArray<RawSVD> rawSVDList(m_rawSVDListName);
   StoreArray<SVDDigit> svdDigits(m_svdDigitListName);
   svdDigits.create();
 
-  for (int i = 0; i < rawSVDList.getEntries(); i++) {
+  //commented out ssince daq/rawdata/RawSVD is not in the release
+  /*  for (int i = 0; i < rawSVDList.getEntries(); i++) {
     for (int j = 0; j < rawSVDList[ i ]->GetNumEntries(); j++) {
 
       int nWords = rawSVDList[i]->Get1stDetectorNwords(j); // * sizeof(int) bytes
       uint32_t* data32 = (uint32_t*)rawSVDList[i]->Get1stDetectorBuffer(j);
 
       //first check the payload checksum:
-      checksum(/* ... */);
+      checksum();
 
       fillSVDDigitList(data32, &svdDigits);
 
     }
   }
-
-
-  /*  for(int i = 0; i < rawSVDList.getEntries(); ++i){
-    //  for(int i = 0; i < rawSVDList->GetNumEntries(); ++i){
-    //first check the payload checksum:
-    checksum();
-
-    //    uint32_t* data32 =  (uint32_t*)rawSVDList[i]->GetWholeBuffer();
-    //    uint32_t* data32 =  (uint32_t*)rawSVDList[i]->Get1stFINESSEBuffer(1);
-    //    uint32_t* data32 =  (uint32_t*)rawSVDList[i]->Get1stDetectorBuffer(i);
-    uint32_t* data32 =  (uint32_t*)rawSVDList->Get1stDetectorBuffer(i);
-
-
-    //    int length8 = 2* rawSVDList[i]->TotalBufNwords(); //in bytes
-    //    int length8 = 2* rawSVDList[i]->Get1stFINESSENwords(1); //in bytes //TO CHECK Satoru Yamada/Katsuro
-
-    }
   */
+
 
 }
 

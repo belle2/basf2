@@ -342,7 +342,7 @@ void PXDClusterizerModule::writeClusters(VxdID sensorID)
 
 void PXDClusterizerModule::calculatePositionError(const ClusterCandidate& cls, ClusterProjection& primary, const ClusterProjection& secondary, double minPitch, double centerPitch, double maxPitch)
 {
-  if (primary.getSize() >= m_sizeHeadTail) { //Analog head tail
+  if (primary.getSize() >= static_cast<unsigned int>(m_sizeHeadTail)) { //Analog head tail
     //Average charge in the central area
     const double centerCharge = primary.getCenterCharge() / (primary.getSize() - 2);
     const double minCharge = (primary.getMinCharge() < centerCharge) ? primary.getMinCharge() : centerCharge;

@@ -116,7 +116,7 @@ namespace Belle2 {
       std::string m_relClusterTrueHitName;
 
       /** Size of the cluster at which we switch from Center of Gravity to Analog Head Tail */
-      unsigned int m_sizeHeadTail;
+      int m_sizeHeadTail;
       /** LorentzAngle , FIXME: should be determined directly from B-Field */
       double m_tanLorentzAngle;
 

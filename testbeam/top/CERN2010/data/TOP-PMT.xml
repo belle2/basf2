@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <PMTs>
     
-  <Xgap desc="Gap between PMTs in x direction" unit="mm">0.5</Xgap>
-  <Ygap desc="Gap between PMTs in y direction" unit="mm">0.5</Ygap>
   <nPMTx desc="Number of PMT modules columns">9</nPMTx>
   <nPMTy desc="Number of PMT modules rows">1</nPMTy>
-  <dGlue desc="Thickness of the glue with which the PMTs are glued to the wedge" unit="mm">0.1</dGlue>
-  <glueMaterial>PMTGlue</glueMaterial>
+  <Xgap desc="Gap between PMTs in x direction" unit="mm">0.5</Xgap>
+  <Ygap desc="Gap between PMTs in y direction" unit="mm">0.5</Ygap>
+  <dGlue desc="Thickness of glue+filter btw. PMTs and wedge" unit="mm">2.5</dGlue>
+  <glueMaterial>TOPWavelengthFilterIHU340</glueMaterial>
   <stackMaterial>TOPAir</stackMaterial>
     
   <Module> 
@@ -17,16 +17,16 @@
     <ModuleZSize  desc="module wall size in Z" unit="mm">9.6</ModuleZSize>
     <ModuleWall desc="thickness of the module wall" unit="mm">0.5</ModuleWall>
     
+    <sensMaterial desc="Active surface material">TOPPMTBialkali</sensMaterial>
     <SensXSize desc="Active surface x dimension" unit="mm">22.5</SensXSize>
     <SensYSize desc="Active surface y dimension" unit="mm">22.5</SensYSize>
     <SensThickness desc="Thickness of active surface" unit="mm">0.1</SensThickness>	
-    <sensMaterial desc="Active surface material">TOPPMTBialkali</sensMaterial>
     
     <winMaterial>TOPBorosilicateGlass</winMaterial>
     <WindowThickness desc="Thickness of window" unit="mm">1.5</WindowThickness> 
     
-    <BottomThickness desc="Thickness of the bottom of the PMT" unit="mm">2</BottomThickness>
     <botMaterial desc="Material of reflective bottom">TOPPMTBottom</botMaterial>
+    <BottomThickness desc="Bottom thickness of the PMT" unit="mm">2</BottomThickness>
     
     <PadXNum desc="Number of pads in x direction">1</PadXNum>
     <PadYNum desc="Number of pads in y direction">4</PadYNum>

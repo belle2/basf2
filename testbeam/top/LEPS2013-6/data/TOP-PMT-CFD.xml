@@ -6,7 +6,7 @@
   <Xgap desc="Gap between PMTs in x direction" unit="mm">0.5</Xgap>
   <Ygap desc="Gap between PMTs in y direction" unit="mm">0.5</Ygap>
   <dGlue desc="Thickness of glue+filter btw. PMTs and wedge" unit="mm">2.5</dGlue>
-  <glueMaterial>PMTGlue</glueMaterial>
+  <glueMaterial>TOPWavelengthFilterIHU340</glueMaterial>
   <stackMaterial>TOPAir</stackMaterial>
   <offsetX desc="PMT array offset in x" unit="mm">0.0</offsetX>
   <offsetY desc="PMT array offset in y" unit="mm">1.0</offsetY>
@@ -19,16 +19,16 @@
     <ModuleZSize  desc="module wall size in Z" unit="mm">9.6</ModuleZSize>
     <ModuleWall desc="thickness of the module wall" unit="mm">0.5</ModuleWall>
     
+    <sensMaterial desc="Active surface material">TOPPMTBialkali</sensMaterial>
     <SensXSize desc="Active surface x dimension" unit="mm">23.0</SensXSize>
     <SensYSize desc="Active surface y dimension" unit="mm">23.0</SensYSize>
     <SensThickness desc="Thickness of active surface" unit="mm">0.1</SensThickness>	
-    <sensMaterial desc="Active surface material">TOPPMTBialkali</sensMaterial>
     
     <winMaterial>TOPBorosilicateGlass</winMaterial>
     <WindowThickness desc="Thickness of window" unit="mm">1.5</WindowThickness> 
     
-    <BottomThickness desc="Thickness of the bottom of the PMT" unit="mm">2</BottomThickness>
     <botMaterial desc="Material of reflective bottom">TOPPMTBottom</botMaterial>
+    <BottomThickness desc="Bottom thickness of the PMT" unit="mm">2</BottomThickness>
     
     <PadXNum desc="Number of pads in x direction">1</PadXNum>
     <PadYNum desc="Number of pads in y direction">4</PadYNum>

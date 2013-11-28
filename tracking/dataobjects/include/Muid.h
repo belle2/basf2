@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef MUID_H
-#define MUID_H
+#pragma once
 
 #include <framework/datastore/RelationsObject.h>
 #include <TMatrixD.h>
@@ -201,6 +200,4 @@ namespace Belle2 {
     ClassDef(Muid, 1)
 
   };
-
 }
-#endif

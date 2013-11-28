@@ -13,14 +13,13 @@
 
 using namespace Belle2;
 
-ROIid::ROIid()
+ROIid::ROIid() : m_minUid(0), m_maxUid(0), m_minVid(0), m_maxVid(0),
+  m_sensorID()
 {
-
 }
 
 ROIid::~ROIid()
 {
-
 }
 
 
@@ -33,7 +32,6 @@ ROIid::Contains(const PXDDigit& thePXDDigit) const
           m_maxVid >= thePXDDigit.getVCellID() &&
           m_sensorID == thePXDDigit.getSensorID()
          );
-
 }
 
 ClassImp(ROIid);

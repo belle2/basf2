@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EXTHIT_H
-#define EXTHIT_H
+#pragma once
 
 #include <framework/datastore/RelationsObject.h>
 #include <TVector3.h>
@@ -91,7 +90,4 @@ namespace Belle2 {
     ClassDef(ExtHit, 1)
 
   };
-
-} // end of namespace Belle2
-
-#endif //EXTHIT_H
+}

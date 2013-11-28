@@ -8,9 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-
-#ifndef ROIID_H
-#define ROIID_H
+#pragma once
 
 #include <framework/datastore/RelationsObject.h>
 #include <pxd/geometry/SensorInfo.h>
@@ -19,25 +17,19 @@
 namespace Belle2 {
 
   /** ROIid stores the U and V ids and the sensor id of the Region Of Interest.
-   *
-   *
    */
-
   class ROIid : public RelationsObject {
 
   public:
 
-    /**
-     * default constructor.
+    /** Default constructor.
      */
     ROIid();
 
 
-    /**
-     * destructor.
+    /** Destructor.
      */
     virtual ~ROIid();
-
 
     //some accessors
     int getMinUid() const { return m_minUid; } /**< return the minimum U id of the ROI*/
@@ -66,5 +58,3 @@ namespace Belle2 {
     ClassDef(ROIid, 1)
   };
 }
-
-#endif  // ROIID_H  

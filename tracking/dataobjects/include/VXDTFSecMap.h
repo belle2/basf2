@@ -8,25 +8,19 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef VXDTFSecMap_H
-#define VXDTFSecMap_H
+#pragma once
 
-// stl:
 #include <vector>
 #include <string>
 #include <utility> // std::pair
 
-// root
 #include <TVector3.h>
 #include <TObject.h>
 
 namespace Belle2 {
-  /** \addtogroup dataobjects
-   * @{
-   */
-
   /** The VXD Track Finder Sector Map Container
-   * This class is needed for importing a sector map (lookup-table generated using simulated data).
+   *
+   *  This class is needed for importing a sector map (lookup-table generated using simulated data).
    */
   class VXDTFSecMap: public TObject {
   public:
@@ -107,7 +101,4 @@ namespace Belle2 {
 
     ClassDef(VXDTFSecMap, 1)
   };
-
-  /** @}*/
-} //Belle2 namespace
-#endif
+}

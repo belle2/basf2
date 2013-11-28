@@ -8,43 +8,41 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PXD_INTERCEPTOR_H_
-#define PXD_INTERCEPTOR_H_
+#pragma once
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
-#include <GFTrackCand.h>
-#include <GFKalman.h>
 #include <framework/datastore/StoreArray.h>
 #include <tracking/dataobjects/PXDIntercept.h>
 #include <tracking/pxdDataReductionClasses/ROIGeometry.h>
-
 #include <tracking/pxdDataReductionClasses/ROIinfo.h>
+
+#include <GFTrackCand.h>
+#include <GFKalman.h>
 
 
 namespace Belle2 {
 
-  /**
-   * This Class implements the interceptor of the SVD tracks on the PXD layers.
+  /** This Class implements the interceptor of the SVD tracks on the PXD layers.
    */
   class PXDInterceptor {
 
   public:
-
-    /**
-     * Constructor.
+    /** Constructor.
      */
     PXDInterceptor();
 
+    /** Another Constructor.
+     *
+     *  @TODO: Can the comment explain, why there are these two constructors?
+     */
     PXDInterceptor(const ROIinfo* user_theROIinfo);
 
-    /**
-     * Destructor.
+    /** Destructor.
      */
     virtual ~PXDInterceptor();
 
-    /**
-     * Fill the list of PXD intecepts corresponding to the list of track candidates
+    /** Fill the list of PXD intecepts corresponding to the list of track candidates.
      */
     void fillInterceptList(StoreArray<PXDIntercept>* listToBeFilled,
                            const StoreArray<GFTrackCand>& trackCandList,
@@ -66,8 +64,4 @@ namespace Belle2 {
 
     ROIinfo m_theROIinfo; /**< the ROI info structure */
   };
-
 }
-
-#endif
-

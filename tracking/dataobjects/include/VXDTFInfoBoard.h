@@ -7,22 +7,16 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
-#ifndef VXDTFINFOBOARD_H
-#define VXDTFINFOBOARD_H
-
+#pragma once
 #include <vector>
-
 #include <TObject.h>
 
 namespace Belle2 {
-  /** \addtogroup dataobjects
-   * @{
-   */
-
   /** The VXD Track Finder Info Board Class
-   * This class is needed for information transport between the VXD Track Finder and its analysis tool. It simply stores a
-   * vector of integers. These integers are index numbers of (depending on the case) TFHits, VXDSegmentCells or VXDTFTrackCandidates
+   *
+   *  This class is needed for information transport between the VXD Track Finder and its analysis tool. It simply stores a
+   *  vector of integers. These integers are index numbers of (depending on the case) TFHits, VXDSegmentCells or VXDTFTrackCandidates
+   *  @TODO: Is there a reason not to inherit from the RelationsObject but rather from the TObject?
    */
   class VXDTFInfoBoard: public TObject {
   public:
@@ -66,7 +60,4 @@ namespace Belle2 {
 
     ClassDef(VXDTFInfoBoard, 1)
   };
-
-  /** @}*/
-} //Belle2 namespace
-#endif
+}

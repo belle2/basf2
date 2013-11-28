@@ -8,17 +8,13 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef TRACKINGOUTPUT_H_
-#define TRACKINGOUTPUT_H_
-
-#include "TObject.h"
-
-
+#pragma once
+#include <framework/datastore/RelationsObject.h>
 
 namespace Belle2 {
 
   /** Class to store information after the fit. The idea is to have for each primary MCParticle an TrackingOutputClass, where all the information concerning this particle can be stored (MCtruth together with fit results). */
-  class TrackingOutput : public TObject {
+  class TrackingOutput : public RelationsObject {
   public:
 
     /** Constructor, that initializes everything to 0.
@@ -668,9 +664,4 @@ namespace Belle2 {
 
     ClassDef(TrackingOutput, 1);
   };
-
 }
-
-
-
-#endif /* TRACKINGOUTPUT_H_ */

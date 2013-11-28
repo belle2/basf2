@@ -7,38 +7,30 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#ifndef GENFITTERMODULE_H
-#define GENFITTERMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
-
-#include <fstream>
-#include <string>
 
 #include <GFKalman.h>
 #include <GFDaf.h>
 
+#include <fstream>
+#include <string>
+
 namespace Belle2 {
 
-  /**
-   *  \addtogroup modules
-   *  @{
-   *  \addtogroup tracking_modules
-   *  \ingroup modules
-   *  @{ GenFitterModule @} @}
-   */
-
-
-  /** This module use GFTrackCand objects (track candidates with hits and momentum seed) and fits them using GenFit.
+  /** This module uses GFTrackCand objects (track candidates with hits and momentum seed)
+   *  and fits them using GenFit.
    *
-   *  This modules can be executed after MCTrackFinderModule or any pattern recognition module, as long as these modules provide valid GFTrackCand array.
-   *
-   *  At the end GFTracks (native GenFit output with all the information) and Tracks (custom objects with only the important parameters we want to have at the end) are created.
+   *  This modules can be executed after MCTrackFinderModule or any pattern
+   *  recognition module, as long as these modules provide a valid GFTrackCand array.
+   *  At the end GFTracks (native GenFit output with all the information) and
+   *  Tracks (custom objects with only the important parameters we want to have at the end)
+   *  are created.
    */
   class GenFitterModule : public Module {
 
   public:
-
     /** Constructor .
      */
     GenFitterModule();
@@ -68,10 +60,6 @@ namespace Belle2 {
     /** This method is called at the end of the event processing.
      */
     virtual void terminate();
-
-
-  protected:
-
 
   private:
 
@@ -112,9 +100,6 @@ namespace Belle2 {
     bool m_noiseBrems;                               /**< Determines if calculation of bremsstrahlung energy loss variance is on/off in Genfit */
     bool m_noEffects;                                /**< switch on/off ALL material effects in Genfit. "true" overwrites "true" flags for the individual effects.*/
     bool m_resolveWireHitAmbi;                       /**< Determines if DAF should resolve left/right ambiguity of wire hits or else if just possibility closet to prediction is taken */
-  }; /** @} @} */
-} // end namespace Belle2
-
-
-#endif /* GENFITTERMODULE_H */
+  };
+}
 

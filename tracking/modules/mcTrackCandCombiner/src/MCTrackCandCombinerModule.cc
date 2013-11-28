@@ -38,7 +38,6 @@
 
 using namespace std;
 using namespace Belle2;
-using namespace Tracking;
 using boost::math::sign;
 
 //-----------------------------------------------------------------

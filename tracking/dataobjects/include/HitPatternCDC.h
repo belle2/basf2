@@ -13,12 +13,7 @@
 #include <algorithm>
 
 namespace Belle2 {
-  /** @addtogroup Tracking_dataobjects
-   *  @ingroup Dataobjects
-   *  @{
-   *  Track
-   *  @}
-   */
+
   /** Hit pattern of CDC hits within a track and efficient getters.
    *
    *  The pattern is stored using a std::bitset. This allows to use some stuff from the

@@ -8,23 +8,13 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef MCTRACKFIDNERMODULE_H_
-#define MCTRACKFIDNERMODULE_H_
-
+#pragma once
 #include <framework/core/Module.h>
 #include <string>
 
 namespace Belle2 {
   template< class T >
   class RelationVector;
-  /**
-   *  \addtogroup modules
-   *  @{
-   *  \addtogroup tracking_modules
-   *  \ingroup modules
-   *  @{ MCTrackCandCombinerModule @} @}
-   */
-
 
   /** This module uses the simulated truth information (MCParticles and their relations) to determine which
    * track candidates created separately in the CDC and VXD belong together
@@ -101,7 +91,3 @@ namespace Belle2 {
     bool m_addMcInfo;                             /**< if true the correct PDG code from the MCParticle and the MCParticleID will be put in the output track candidates*/
   };
 }
-
-#endif /* MCTrackCandCombinerModule_H_ */
-
-

@@ -109,12 +109,11 @@ cdcfitting = register_module('GenFitter')
 # select DAF instead of Kalman as Filter set the pdg hypothesis to the
 # simulated one, if you want to fit with different pdg hypothesises, set
 # 'allPDG' to true
-param_cdcfitting = {
+param_cdcfitting = {  # 'pdg': 211,
     'GFTrackCandidatesColName': 'GFTrackCands_PatternReco',
     'TracksColName': 'Tracks_PatternReco',
     'GFTracksColName': 'GFTracks_PatternReco',
     'StoreFailedTracks': 1,
-    #'pdg': 211,
     'FilterId': 1,
     'ProbCut': 0.001,
     }
@@ -132,12 +131,11 @@ svdfitting = register_module('GenFitter')
 
 # set proper new collection names (important to avoid mix up with previous
 # collections)
-param_svdfitting = {
+param_svdfitting = {  # 'PDGCodes': [211],
     'GFTrackCandidatesColName': 'GFTrackCands_withSVD',
     'TracksColName': 'Tracks_withSVD',
     'GFTracksColName': 'GFTracks_withSVD',
     'StoreFailedTracks': 1,
-    #'PDGCodes': [211],
     'FilterId': 1,
     'ProbCut': 0.001,
     }

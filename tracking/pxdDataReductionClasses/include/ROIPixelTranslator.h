@@ -8,28 +8,24 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ROIPIXELTRANSLATOR_H_
-#define ROIPIXELTRANSLATOR_H_
+#pragma once
 
 #include <framework/datastore/RelationArray.h>
+#include <framework/datastore/StoreArray.h>
 #include <tracking/dataobjects/PXDIntercept.h>
 #include <tracking/dataobjects/ROIid.h>
-#include <framework/datastore/StoreArray.h>
 #include <tracking/pxdDataReductionClasses/ROIinfo.h>
 
 namespace Belle2 {
 
-  /**
-   * This Class translates the information of the ROI geometry into a list of pixels.
+  /** Translator for ROI-geometry-information into a list of pixels.
    */
   class ROIPixelTranslator {
 
   public:
 
-    /**
-     * Constructor.
+    /** Constructor.
      */
-
     ROIPixelTranslator(const ROIinfo*  theROIinfo);
 
     ROIPixelTranslator(double sigmaSystU, double sigmaSystV,
@@ -37,18 +33,14 @@ namespace Belle2 {
                        double maxWidthU, double maxWidthV);
 
 
-    /**
-     * Destructor.
+    /** Destructor.
      */
     ~ROIPixelTranslator();
 
-    /**
-     * Append the ROIid to the list listToBeFilled
+    /** Append the ROIid to the list listToBeFilled.
      */
     void fillRoiIDList(StoreArray<PXDIntercept>* listOfIntercepts,
-                       StoreArray<ROIid>* ROIidList); /**< fill the list of ROIs*/
-
-
+                       StoreArray<ROIid>* ROIidList);
 
   protected:
     double  m_sigmaSystU; /**< systematic error along the U coordinate*/
@@ -57,15 +49,5 @@ namespace Belle2 {
     double  m_numSigmaTotV; /**< number of standard deviations to be taken to define a ROI along V*/
     double  m_maxWidthU; /**< ROI maximum width allowed in the U direction*/
     double  m_maxWidthV; /**< ROI maximum width allowed in the V direction*/
-
   };
-
-
-
-
 }
-
-
-#endif
-
-

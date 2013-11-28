@@ -7,23 +7,17 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#pragma once
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Const.h>
-#include <tracking/dataobjects/TrackFitResult.h>
 #include <framework/logging/Logger.h>
 #include <framework/datastore/RelationsObject.h>
+#include <tracking/dataobjects/TrackFitResult.h>
 #include <algorithm>
-#pragma once
 
 class GFTrack;
 
 namespace Belle2 {
-
-  /** @addtogroup Tracking_dataobjects
-   *  @ingroup Dataobjects
-   *  @{ Track
-   *  @}
-   */
   /** Class that bundles various TrackFitResults.
    *
    *  As the GFTrack has a lot of information that is only necessary during the fit,

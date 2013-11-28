@@ -8,41 +8,36 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ROIGEOMETRY_H_
-#define ROIGEOMETRY_H_
+#pragma once
 
-#include <list>
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/StoreArray.h>
 #include <tracking/dataobjects/PXDIntercept.h>
-#include <RKTrackRep.h>
-#include <GFTrackCand.h>
 #include <tracking/pxdDataReductionClasses/ROIDetPlane.h>
 
+#include <RKTrackRep.h>
+#include <GFTrackCand.h>
 class ROIDetPlane;
 class GFTrack;
 
+#include <list>
+
 namespace Belle2 {
 
-  /**
-   * This Class append the PXDIntercept infos of a track to the list of intercepts.
+  /** This class appends the PXDIntercept infos of a track to the list of intercepts.
    */
   class ROIGeometry {
 
   public:
-
-    /**
-     * Constructor.
+    /** Constructor.
      */
     ROIGeometry();
 
-    /**
-     * Destructor.
+    /** Destructor.
      */
     ~ROIGeometry();
 
-    /**
-     * Append the PXDIntercept infos related to the track theTrack to the listToBeFilled
+    /** Append the PXDIntercept infos related to the track theTrack to the listToBeFilled.
      */
     void appendIntercepts(StoreArray<PXDIntercept>* listToBeFilled, RKTrackRep* theTrack,
                           int theGFTrackCandIndex, RelationArray* gfTrackCandToPXDIntercepts);
@@ -50,14 +45,6 @@ namespace Belle2 {
     std::list<ROIDetPlane> m_planeList; /**< list of planes*/
 
     void fillPlaneList(); /**< fill the list of planes*/
-
   };
-
-
-
 }
-
-
-#endif
-
 

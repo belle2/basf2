@@ -11,6 +11,5 @@
 #include <tracking/trackCandidateHits/CDCTrackCandHit.h>
 
 using namespace Belle2;
-using namespace Tracking;
 
 ClassImp(CDCTrackCandHit)

@@ -8,26 +8,20 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef GFGEANT4FIELD_H
-#define GFGEANT4FIELD_H
-
+#pragma once
 #include <GFAbsBField.h>
 #include <geometry/bfieldmap/BFieldMap.h>
 
-
+/** Interface of the Belle II B-field with GenFit.
+ */
 class GFGeant4Field : public GFAbsBField {
 public:
-
   GFGeant4Field(): GFAbsBField(), m_bField(Belle2::BFieldMap::Instance()) {}
   TVector3 get(const TVector3& pos) const;
 
 
 protected:
-
   Belle2::BFieldMap& m_bField; /**< Reference to the central magnetic field map.*/
 
 };
 
-
-
-#endif /* GFGEANT4FIELD_H */

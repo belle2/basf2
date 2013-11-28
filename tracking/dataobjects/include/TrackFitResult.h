@@ -20,12 +20,6 @@
 
 namespace Belle2 {
 
-  /** @addtogroup Tracking_dataobjects
-   *  @ingroup Dataobjects
-   *  @{
-   *  TrackFitResult
-   *  @}
-   */
   /** Values of the result of a track fit with a given particle hypothesis.
    */
   class TrackFitResult : public RelationsObject {

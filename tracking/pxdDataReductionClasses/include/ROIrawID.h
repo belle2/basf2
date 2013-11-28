@@ -8,22 +8,20 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ROIRAWID_H_
-#define ROIRAWID_H_
+#pragma once
 
 #include <stdint.h>
 
 namespace Belle2 {
 
-  /** ROIrawID
+  /** ROIrawID.
    *
-   * 64 bit union that contains the ROI information to be stored in the payload that is sent to the ONSEN
+   * 64 bit union that contains the ROI information to be stored in the
+   * payload that is sent to the ONSEN.
    */
-
   class ROIrawID {
 
   public:
-
     //    typedef unsigned long baseType;
     typedef uint64_t baseType;
     enum {
@@ -107,7 +105,4 @@ baseType unused: UnusedBits;
     } m_rawID;
 
   };
-
 }
-
-#endif //ROIRAWID_H_

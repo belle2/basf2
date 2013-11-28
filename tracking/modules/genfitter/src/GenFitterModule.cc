@@ -69,7 +69,6 @@
 using namespace std;
 using namespace Belle2;
 using namespace CDC;
-using namespace Tracking;
 
 REG_MODULE(GenFitter)
 

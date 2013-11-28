@@ -64,10 +64,12 @@ cdcDigitizer = register_module('CDCDigitizer')
 mctrackfinder = register_module('MCTrackFinder')
 
 # select which detectors you would like to use
-param_mctrackfinder = {'UseCDCHits': 1,
-                       'UseSVDHits': 1,
-                       'UsePXDHits': 1,
-                       'UseClusters': False}
+param_mctrackfinder = {
+    'UseCDCHits': 1,
+    'UseSVDHits': 1,
+    'UsePXDHits': 1,
+    'UseClusters': False,
+    }
 mctrackfinder.param(param_mctrackfinder)
 # select which particles to use, here as example: only particles which created
 # hits in all tracking detectors (PXD, SVD and CDC) but do not have to be

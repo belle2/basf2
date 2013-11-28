@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef MUIDLIKELIHOOD_H
-#define MUIDLIKELIHOOD_H
+#pragma once
 
 #include <framework/datastore/RelationsObject.h>
 
@@ -17,21 +16,15 @@ namespace Belle2 {
 
   class Muid;
 
-  /** \addtogroup dataobjects
-   * @{
-   */
-
   /*! Class to store Muid log likelihoods (output of MuidModule)
    * relation from Tracks
    * filled in tracking/modules/muid/src/MuidModule.cc
    */
-
   class MuidLikelihood : public RelationsObject {
 
   public:
 
     /*! default constructor */
-
     MuidLikelihood() :
       RelationsObject(),
       m_logL_mu(0),
@@ -44,7 +37,6 @@ namespace Belle2 {
     /*! full constructor
      * @param muid container of muid likelihoods
      */
-
     MuidLikelihood(const Muid* muid);
 
     /*! Get muon log likelihood
@@ -82,10 +74,4 @@ namespace Belle2 {
     ClassDef(MuidLikelihood, 1); /**< ClassDef */
 
   };
-
-  /** @}*/
-
-} // end namespace Belle2
-
-#endif
-
+}

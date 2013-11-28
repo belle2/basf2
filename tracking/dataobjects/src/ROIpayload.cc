@@ -21,9 +21,7 @@ using boost::crc_optimal;
 
 ROIpayload::ROIpayload(int length)
 {
-
   init(length);
-
 };
 
 

@@ -8,22 +8,13 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef MCTRACKFIDNERMODULE_H_
-#define MCTRACKFIDNERMODULE_H_
+#pragma once
 
 #include <framework/core/Module.h>
-#include <string>
 #include <TMatrixDSym.h>
+#include <string>
 
 namespace Belle2 {
-  /**
-   *  \addtogroup modules
-   *  @{
-   *  \addtogroup tracking_modules
-   *  \ingroup modules
-   *  @{ MCTrackFinderModule @} @}
-   */
-
 
   /** This module uses the simulated truth information (MCParticles and their relations) to determine which hits belong to which particles
    * and writes track candidates filled with necessary information into the DataStore.
@@ -41,7 +32,6 @@ namespace Belle2 {
   class MCTrackFinderModule : public Module {
 
   public:
-
     /**
      * Constructor of the module.
      *
@@ -102,7 +92,4 @@ namespace Belle2 {
     std::vector<int> m_particlePdgCodes;                        /**< if size() is not 0, only for particles with PDG codes same as in this vector a track candidate will be created*/
   };
 }
-
-#endif /* MCTRACKFINDERMODULE_H_ */
-
 

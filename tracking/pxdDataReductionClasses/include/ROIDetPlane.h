@@ -8,38 +8,28 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ROIDETPLANE_H_
-#define ROIDETPLANE_H_
+#pragma once
 
-#include <GFDetPlane.h>
 #include <pxd/geometry/SensorInfo.h>
 
-namespace Belle2 {
+#include <GFDetPlane.h>
 
+namespace Belle2 {
   /** ROIDetPlane describes the plane containing a sensor.
-   *
-   *
    */
 
   class ROIDetPlane : public GFDetPlane {
 
   public:
-
     ROIDetPlane() {};
 
     ROIDetPlane(const VxdID& sensorInfo); /**< the constructor*/
 
     ~ROIDetPlane();
 
-    inline VxdID getSensorInfo() {return m_sensorInfo;}; /**< return the sensor ID*/
+    VxdID getSensorInfo() {return m_sensorInfo;}; /**< return the sensor ID*/
 
   private:
-
     VxdID m_sensorInfo; /**< the sensor ID*/
-
-
   };
-
 }
-
-#endif //ROIDETPLANE_H_

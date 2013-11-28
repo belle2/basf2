@@ -8,13 +8,11 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PXDINTERCEPT_H
-#define PXDINTERCEPT_H
+#pragma once
 
 #include <framework/datastore/RelationsObject.h>
-#include <GFTrackCand.h>
-#include <framework/datastore/RelationsObject.h>
 #include <pxd/geometry/SensorInfo.h>
+#include <GFTrackCand.h>
 
 namespace Belle2 {
 
@@ -25,15 +23,14 @@ namespace Belle2 {
 
   public:
 
-    /**
-     * default constructor.
+    /** Default constructor for I/O.
      */
-    PXDIntercept() {};
+    PXDIntercept(): m_coorU(0), m_coorV(0), m_sigmaU(0), m_sigmaV(0),
+      m_sigmaUprime(0), m_sigmaVprime(0), m_lambda(0), m_sensorID() {}
 
-    /**
-     * destructor.
+    /** Destructor.
      */
-    ~PXDIntercept() {};
+    ~PXDIntercept() {}
 
     double getCoorU() const { return m_coorU; } /**< return the U coordinate of the intercept */
     double getCoorV() const { return m_coorV; } /**< return the V coordinate of the intercept */
@@ -69,4 +66,3 @@ namespace Belle2 {
     ClassDef(PXDIntercept, 1);
   };
 }
-#endif  // PXDINTERCEPT_H  

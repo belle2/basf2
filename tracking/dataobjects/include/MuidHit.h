@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef MUIDHIT_H
-#define MUIDHIT_H
+#pragma once
 
 #include <framework/datastore/RelationsObject.h>
 #include <TVector3.h>
@@ -96,6 +95,4 @@ namespace Belle2 {
     ClassDef(MuidHit, 1)
 
   };
-
 }
-#endif

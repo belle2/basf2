@@ -1,6 +1,4 @@
-
-#ifndef ROI_INFO_H
-#define ROI_INFO_H
+#pragma once
 
 #include <string>
 
@@ -17,5 +15,3 @@ struct ROIinfo {
   std::string badTracksListName;
   std::string gfTracksListName;
 };
-
-#endif

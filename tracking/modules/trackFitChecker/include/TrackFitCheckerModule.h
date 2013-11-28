@@ -9,8 +9,7 @@
  **************************************************************************/
 
 
-#ifndef TrackFitCheckerModule_H_
-#define TrackFitCheckerModule_H_
+#pragma once
 
 #include <framework/core/Module.h>
 
@@ -276,10 +275,5 @@ namespace Belle2 {
     void truthTests();
 
     //void inspectTracks(double chi2tot_fu, double vertexAbsMom);
-
   };
-
-
 }
-
-#endif /* TrackFitCheckerModule_H_ */

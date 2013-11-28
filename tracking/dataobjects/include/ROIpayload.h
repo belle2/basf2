@@ -8,30 +8,23 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-
-#ifndef ROIPAYLOAD_H
-#define ROIPAYLOAD_H
-
-#include <stdio.h>
-#include "TObject.h"
+#pragma once
 #include <tracking/pxdDataReductionClasses/ROIrawID.h>
+#include "TObject.h"
+#include <stdio.h>
 #include <stdint.h>
 
 namespace Belle2 {
 
   /** ROIpayload
-   *
-   *
+   * @TODO: Better explanation, Is there a reason to inherit from TObject and not Relationsobject here?
    */
 
   class ROIpayload : public TObject {
 
   public:
-
-    /**
-     * default constructor.
+    /** Default constructor.
      */
-
     ROIpayload(int length = 0);
 
     /**
@@ -61,11 +54,7 @@ namespace Belle2 {
     void init(int length);
 
   private:
-
-
     //! Needed to make the ROOT object storable
     ClassDef(ROIpayload, 1)
   };
 }
-
-#endif  // ROIPAYLOAD_H  

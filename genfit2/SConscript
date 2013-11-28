@@ -1,5 +1,28 @@
 Import('env')
 
+import os
+from SCons.Script import *
+
+# define directories and targets
+sourcedir = os.path.abspath('code')
+cmakefile = os.path.join(sourcedir, 'CMakeLists.txt')
+builddir = os.path.join(env.subst('$BUILDDIR'), 'genfit2')
+makefile = os.path.join(builddir, 'Makefile')
+libfile = os.path.join(builddir, 'lib', 'libgenfit2.so')
+extincdir = env['EXTINCDIR']
+swigincdir = os.path.join(extincdir, 'rave', 'swig')
+
+# build genfit2
+env.Command(builddir, cmakefile, Mkdir('$TARGET'))
+env.Command(makefile, cmakefile, 'cd ${TARGET.dir} && cmake -DRAVE_CFLAGS="-DRAVE;-DRaveDllExport=;-DWITH_FLAVORTAGGING;-DWITH_KINEMATICS;-I%s;-I%s" -DRAVE_LDFLAGS="-L%s;-lRaveBase;-lRaveCore;-lRaveVertex;-lRaveFlavorTag;-lRaveVertexKinematics" -DRAVE_INCLUDE_DIRS="%s;%s" %s' % (extincdir, swigincdir, env['EXTLIBDIR'], extincdir, swigincdir, sourcedir))
+env.Command(libfile, makefile, 'cd ${SOURCE.dir} && make')
+
+# install header files and library
+includes = env.Install(os.path.join(env['INCDIR'], 'genfit2'), Glob(os.path.join(sourcedir, '*', 'include', '*.h')))
+env.Alias('genfit2', includes)
+lib = env.Install(env['LIBDIR'], libfile)
+env.Alias('genfit2', lib)
+
 env['CONTINUE'] = False
 
 Return('env')

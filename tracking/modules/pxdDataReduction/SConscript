@@ -1,5 +1,6 @@
 Import('env')
 
-env['LIBS'] = ['framework', 'generators_dataobjects', 'pxd_dataobjects', 'vxd_dataobjects', 'tracking_dataobjects', 'tracking','genfit', 'genfitRK','vxd']
+env['LIBS'] = ['framework', 'generators_dataobjects', 'pxd_dataobjects', 'vxd_dataobjects', 'tracking_dataobjects', 'tracking', 'genfit', 'genfitRK', 'vxd', 'geometry']
+
 Return('env')
 

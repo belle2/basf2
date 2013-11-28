@@ -339,15 +339,15 @@ void PXDDataRedAnalysisModule::event()
       PXDInterceptIteratorType thePXDInterceptIteratorEnd = PXDIntercepts.end();
       bool MissingHit(true);
 
-      double tmpPullU;
-      double tmpPullV;
-      double tmpResidU;
-      double tmpResidV;
-      double tmpSigmaU;
-      double tmpSigmaV;
+      double tmpPullU = 0;
+      double tmpPullV = 0;
+      double tmpResidU = 0;
+      double tmpResidV = 0;
+      double tmpSigmaU = 0;
+      double tmpSigmaV = 0;
       int tmpDistU = 0 ;
       int tmpDistV = 0 ;
-      double tmpArea;
+      double tmpArea = 0;
 
       double distance = 100000;
       double distanceROI = 100000;

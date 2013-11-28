@@ -13,8 +13,8 @@
 #include <boost/crc.hpp>
 #include <assert.h>
 #include <stdio.h>
-#define _BSD_SOURCE
-#include <endian.h>
+//#define _BSD_SOURCE
+//#include <endian.h>
 
 using namespace Belle2;
 using boost::crc_optimal;

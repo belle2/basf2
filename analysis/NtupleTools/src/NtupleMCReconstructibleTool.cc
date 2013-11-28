@@ -64,21 +64,21 @@ void NtupleMCReconstructibleTool::eval(const Particle* particle)
       m_iReconstructible[iProduct] =  0;
       /* if it is a track make sure it went through the SVD for now */
       if (abs(mcparticle->getCharge()) > 0) {
-        m_iReconstructible[iProduct] = (int) mcparticle->hasStatus(0x20);
+        m_iReconstructible[iProduct] = (int) mcparticle->hasStatus(MCParticle::c_SeenInSVD);
         /* if it is a photon make sure it hit the ECL */
       } else if (abs(mcparticle->getPDG()) == 22) {
-        m_iReconstructible[iProduct] = (int) mcparticle->hasStatus(0x100);
+        m_iReconstructible[iProduct] = (int) mcparticle->hasStatus(MCParticle::c_LastSeenInECL);
         /* if it is a klong make sure it hit the ECL */
       } else if (abs(mcparticle->getPDG()) == 130) {
-        m_iReconstructible[iProduct] = (int) mcparticle->hasStatus(0x200);
+        m_iReconstructible[iProduct] = (int) mcparticle->hasStatus(MCParticle::c_LastSeenInECL);
       }
 
-      m_iSeenInPXD[iProduct] = (int)mcparticle->hasStatus(0x10);
-      m_iSeenInSVD[iProduct] = (int)mcparticle->hasStatus(0x20);
-      m_iSeenInCDC[iProduct] = (int)mcparticle->hasStatus(0x40);
-      m_iSeenInTOP[iProduct] = (int)mcparticle->hasStatus(0x80);
-      m_iLastSeenInECL[iProduct] = (int)mcparticle->hasStatus(0x100);
-      m_iLastSeenInKLM[iProduct] = (int)mcparticle->hasStatus(0x200);
+      m_iSeenInPXD[iProduct] = (int)mcparticle->hasStatus(MCParticle::c_SeenInPXD);
+      m_iSeenInSVD[iProduct] = (int)mcparticle->hasStatus(MCParticle::c_SeenInSVD);
+      m_iSeenInCDC[iProduct] = (int)mcparticle->hasStatus(MCParticle::c_SeenInCDC);
+      m_iSeenInTOP[iProduct] = (int)mcparticle->hasStatus(MCParticle::c_SeenInTOP);
+      m_iLastSeenInECL[iProduct] = (int)mcparticle->hasStatus(MCParticle::c_LastSeenInECL);
+      m_iLastSeenInKLM[iProduct] = (int)mcparticle->hasStatus(MCParticle::c_LastSeenInKLM);
 
 
     }

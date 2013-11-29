@@ -71,7 +71,7 @@ FullSimModule::FullSimModule() : Module(), m_visManager(NULL)
   addParam("ThresholdTrials", m_thresholdTrials, "Geant4 will try 'ThresholdTrials' times to move a particle which got 'stuck' and has an energy less than 'ThresholdImportantEnergy'.", 10);
   addParam("TrackingVerbosity", m_trackingVerbosity, "Tracking verbosity: 0=Silent; 1=Min info per step; 2=sec particles; 3=pre/post step info; 4=like 3 but more info; 5=proposed step length info.", 0);
   addParam("HadronProcessVerbosity", m_hadronprocessVerbosity, "Hadron Process verbosity: 0=Silent; 1=info level; 2=debug level", 0);
-  addParam("PhysicsList", m_physicsList, "The name of the physics list which is used for the simulation.", string("QGSP_BERT"));
+  addParam("PhysicsList", m_physicsList, "The name of the physics list which is used for the simulation.", string("FTFP_BERT"));
   addParam("RegisterOptics", m_optics, "If true, G4OpticalPhysics is registered in Geant4 PhysicsList.", true);
   addParam("ProductionCut", m_productionCut, "[cm] Apply continuous energy loss to primary particle which has no longer enough energy to produce secondaries which travel at least the specified productionCut distance.", 0.07);
   addParam("MaxNumberSteps", m_maxNumberSteps, "The maximum number of steps before the track transportation is stopped and the track is killed.", 100000);

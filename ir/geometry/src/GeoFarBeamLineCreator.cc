@@ -196,7 +196,7 @@ namespace Belle2 {
         string geo_polyconex_name = "geo_" + name + "x_name";
         string geo_polycone_name = "geo_" + name + "_name";
 
-        G4VSolid* geo_polyconexx, *geo_polyconex, *geo_polycone;
+        G4VSolid* geo_polyconexx(NULL), *geo_polyconex(NULL), *geo_polycone(NULL);
 
         if (subtract != "" || intersect != "")
           if (type == "pipe") // for pipes inner space will be created as vacuum
@@ -300,7 +300,7 @@ namespace Belle2 {
         string geo_torusx_name = "geo_" + name + "x_name";
         string geo_torus_name = "geo_" + name + "_name";
 
-        G4VSolid* geo_torusxx, *geo_torusx, *geo_torus;
+        G4VSolid* geo_torusxx(NULL), *geo_torusx(NULL), *geo_torus(NULL);
 
         if (subtract != "" || intersect != "")
           if (type == "pipe") // for pipes inner space will be created as vacuum

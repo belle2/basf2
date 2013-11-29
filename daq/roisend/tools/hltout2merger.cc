@@ -10,6 +10,7 @@
 #include <signal.h>
 #include <malloc.h>
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <sys/socket.h>
 #include <mqueue.h>
 

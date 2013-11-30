@@ -92,8 +92,10 @@ namespace Belle2 {
       /**
        * Creates the G4 Objects for the TB geometry.
        * @param content A reference to the content part of the parameter
-       *                description, which should to be used to create the G4
+       *                description, which should be used to create the G4
        *                objects.
+       * @param topVolume Top world volume where the geometry created should be placed
+       * @param type Type of geometry to be created. NOT USED
        */
       virtual void create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type);
 
@@ -114,6 +116,8 @@ namespace Belle2 {
       bool m_onlyPrimaryTrueHits;
       /** Minimum deposited energy per step in the SensitiveDetector (discard step if less) */
       double m_sensitiveThreshold;
+      /** Name of material to be used as default, if no material for volume is specified. (Default is "Air") */
+      std::string m_worldMaterial;
       /** GearDir pointing to the alignment parameters */
       GearDir m_alignment;
     };

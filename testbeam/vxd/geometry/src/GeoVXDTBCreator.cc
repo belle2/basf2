@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <testbeam/vxd/geometry/GeoVXDTBCreator.h>
+
 #include <vxd/dataobjects/VxdID.h>
 #include <vxd/geometry/GeoCache.h>
 #include <pxd/geometry/SensorInfo.h>
@@ -28,24 +29,17 @@
 #include <boost/algorithm/string.hpp>
 
 #include <G4LogicalVolume.hh>
+#include <G4Point3D.hh>
 #include <G4ThreeVector.hh>
-
 #include <G4PVPlacement.hh>
-#include <G4AssemblyVolume.hh>
-
-//Shapes
-#include <G4Trd.hh>
 #include <G4Box.hh>
 #include <G4Tubs.hh>
-#include <G4Polycone.hh>
 #include <G4SubtractionSolid.hh>
+#include <G4UnionSolid.hh>
+#include <G4IntersectionSolid.hh>
 #include <G4UserLimits.hh>
 #include <G4RegionStore.hh>
-#include <G4Point3D.hh>
 
-#include <G4TessellatedSolid.hh>
-#include <G4QuadrangularFacet.hh>
-#include <G4TriangularFacet.hh>
 
 //#define MATERIAL_SCAN
 
@@ -54,7 +48,7 @@ using namespace boost;
 
 namespace Belle2 {
 
-  /** Namespace to encapsulate code needed for simulation and reconstrucion of the TB environment */
+  /** Namespace to encapsulate code needed for simulation and reconstruction of the TB environment */
   namespace TB {
 
 
@@ -92,12 +86,18 @@ namespace Belle2 {
 
     G4LogicalVolume* GeoTBCreator::getLogicalVolume(const GearDir& content)
     {
-      std::string volName = content.getString("Name");
+      std::string volName = content.getString("@name", "");
+
+      //NOTE: This is for backward compatibility.
+      // Some name must always be specified to force users to keep XML readable
+      if (volName == "") volName = content.getString("Name");
+      // (end of note)
+
       std::string volShape = content.getString("Shape", "Box");
       std::string volColor = content.getString("Color", "#000000");
       bool volVisibility = content.getBool("Visible", true);
 
-      std::string volMaterial = content.getString("Material");
+      std::string volMaterial = content.getString("Material", m_worldMaterial);
       G4Material* volG4Material = geometry::Materials::get(volMaterial);
       G4LogicalVolume* g4vol = 0;
 
@@ -107,20 +107,7 @@ namespace Belle2 {
         double volHalfZ = content.getLength("HalfZ") / Unit::mm;
         G4Box* volG4Box = new G4Box(string("TB_G4Box_") + volName, volHalfX, volHalfY, volHalfZ);
         g4vol = new G4LogicalVolume(volG4Box, volG4Material, volName);
-      }
-      if (volShape == "EmptyBox") {
-        double volHalfX = content.getLength("HalfX") / Unit::mm;
-        double volHalfY = content.getLength("HalfY") / Unit::mm;
-        double volHalfZ = content.getLength("HalfZ") / Unit::mm;
-        double volHalfXIn = content.getLength("HalfXIn") / Unit::mm;
-        double volHalfYIn = content.getLength("HalfYIn") / Unit::mm;
-        double volHalfZIn = content.getLength("HalfZIn") / Unit::mm;
-        G4Box* volG4Box = new G4Box(string("TB_G4Box_") + volName, volHalfX, volHalfY, volHalfZ);
-        G4Box* volG4BoxIn = new G4Box(string("TB_G4Box_inside_") + volName, volHalfXIn, volHalfYIn, volHalfZIn);
-        G4VSolid* subtract = new G4SubtractionSolid("TB_EmptyBox_" + volName, volG4Box, volG4BoxIn);
-        g4vol = new G4LogicalVolume(subtract, volG4Material, volName);
-      }
-      if (volShape == "Tube") {
+      } else if (volShape == "Tube") {
         double innerRadius = content.getLength("InnerRadius") / Unit::mm;
         double outerRadius = content.getLength("OuterRadius") / Unit::mm;
         double hz = content.getLength("Hz") / Unit::mm;
@@ -133,9 +120,48 @@ namespace Belle2 {
                                        startAngle,
                                        spanningAngle);
         g4vol = new G4LogicalVolume(volG4Tube, volG4Material, volName);
+      } else {
+        B2FATAL("Unsupported volume shape");
       }
-      geometry::setColor(*g4vol, volColor);
-      geometry::setVisibility(*g4vol, volVisibility);
+
+      // Subtraction of volumes
+      std::vector<GearDir> boolVolumes = content.getNodes("Subtract");
+      if (boolVolumes.size() > 0) {
+        // These volumes do not need material
+
+        BOOST_FOREACH(const GearDir & sub_volume, boolVolumes) {
+          G4LogicalVolume* toSubtract = getLogicalVolume(sub_volume);
+          G4VSolid* subtracted = new G4SubtractionSolid(G4String(volName + "_subtracted_" + toSubtract->GetName()), g4vol->GetSolid(), toSubtract->GetSolid(), getTransform(sub_volume));
+          delete g4vol;
+          g4vol = new G4LogicalVolume(subtracted, volG4Material, volName);
+        }
+      }
+      // Union with volumes
+      boolVolumes = content.getNodes("Union");
+      if (boolVolumes.size() > 0) {
+        // These volumes do not need material
+
+        BOOST_FOREACH(const GearDir & sub_volume, boolVolumes) {
+          G4LogicalVolume* toUnion = getLogicalVolume(sub_volume);
+          G4VSolid* united = new G4UnionSolid(G4String(volName + "_united_" + toUnion->GetName()), g4vol->GetSolid(), toUnion->GetSolid(), getTransform(sub_volume));
+          delete g4vol;
+          g4vol = new G4LogicalVolume(united, volG4Material, volName);
+        }
+      }
+      // Interesct with volumes
+      boolVolumes = content.getNodes("Intersect");
+      if (boolVolumes.size() > 0) {
+        // These volumes do not need material
+
+        BOOST_FOREACH(const GearDir & sub_volume, boolVolumes) {
+          G4LogicalVolume* toIntersect = getLogicalVolume(sub_volume);
+          G4VSolid* intersected = new G4IntersectionSolid(G4String(volName + "_intersected_" + toIntersect->GetName()), g4vol->GetSolid(), toIntersect->GetSolid(), getTransform(sub_volume));
+          delete g4vol;
+          g4vol = new G4LogicalVolume(intersected, volG4Material, volName);
+        }
+      }
+      Belle2::geometry::setColor(*g4vol, volColor);
+      Belle2::geometry::setVisibility(*g4vol, volVisibility);
 
       return g4vol;
     }
@@ -143,12 +169,12 @@ namespace Belle2 {
     G4Transform3D GeoTBCreator::getTransform(const GearDir& content)
     {
 
-      double volDX = content.getLength("DX") / Unit::mm;
-      double volDY = content.getLength("DY") / Unit::mm;
-      double volDZ = content.getLength("DZ") / Unit::mm;
-      double volPhi = content.getAngle("Phi");
-      double volTheta = content.getAngle("Theta");
-      double volPsi = content.getAngle("Psi");
+      double volDX = content.getLength("DX", 0.) / Unit::mm;
+      double volDY = content.getLength("DY", 0.) / Unit::mm;
+      double volDZ = content.getLength("DZ", 0.) / Unit::mm;
+      double volPhi = content.getAngle("Phi", 0.);
+      double volTheta = content.getAngle("Theta", 0.);
+      double volPsi = content.getAngle("Psi", 0.);
 
       G4RotationMatrix volRotation(volPhi, volTheta, volPsi);
       G4ThreeVector volTranslation(volDX, volDY, volDZ);
@@ -167,28 +193,36 @@ namespace Belle2 {
 
     void GeoTBCreator::setVolumeActive(const GearDir& content, G4LogicalVolume* volume, const GearDir& parentContent)
     {
-      B2INFO("GeoVXDTBCreator: Setting active volume...")
+      if (parentContent.getString("Shape", "Box") != "Box")
+        B2FATAL("Only 'Box' shape can host a sensitive volume (Active node) for supported detectors");
+
       // get size of the volume from parent node GearDir (these are half-sizes - multiply by 2)
-      double aWidth = 2.0 * parentContent.getLength("HalfX") ;// Unit::mm/10.0;
-      double aLength = 2.0 * parentContent.getLength("HalfY") ;// Unit::mm/10.0;
-      double aHeight = 2.0 * parentContent.getLength("HalfZ") ;// Unit::mm/10.0;
+      double aWidth = 2.0 * parentContent.getLength("HalfX");// Unit::mm/10.0;
+      double aLength = 2.0 * parentContent.getLength("HalfY");// Unit::mm/10.0;
+      double aHeight = 2.0 * parentContent.getLength("HalfZ");// Unit::mm/10.0;
 
       unsigned short sensorID = content.getInt("SensorID");
       unsigned short ladder = content.getInt("Ladder");
       unsigned short layer = content.getInt("Layer");
-      if (sensorID == 0) B2ERROR("Do not use sensorID=0 in your XML, it is incompatible with PXD geometry cache and with the TB Analysis Module.");
-      double stepSize = content.getLength("stepSize") ;// Unit::mm;
-      string detectorType = content.getString("DetectorType", "");
+      if (sensorID == 0 || ladder == 0 || layer == 0) B2FATAL("Do not use 0-based id/ladder/layer in your XML, it is incompatible with VXD geometry cache.");
 
-      if (detectorType == "") B2FATAL("TB: Geometry XML Problem: No DetectorType provided in 'Active' node.");
+      double stepSize = content.getLength("stepSize") ;// Unit::mm;
+      string detectorType = content.getString("DetectorType", "Unknown");
+
       if (detectorType == "PXD") {
-        if (sensorID == 0) B2FATAL("TB Geometry Creator: sensorID=0 in your XML is incompatible with PXD geometry cache. Use 1-based numbering of sensorID's.");
         VxdID xID(layer, ladder, sensorID);
-        PXD::SensorInfo sensorInfo(xID, aWidth, aLength, aHeight, content.getInt("pixelsR"), content.getInt("pixelsZ[1]"), content.getLength("splitLength", 0), content.getInt("pixelsZ[2]", 0));
+        PXD::SensorInfo sensorInfo(xID,
+                                   aWidth,
+                                   aLength,
+                                   aHeight,
+                                   content.getInt("pixelsR"),
+                                   content.getInt("pixelsZ[1]"),
+                                   content.getLength("splitLength", 0),
+                                   content.getInt("pixelsZ[2]", 0));
         sensorInfo.setDEPFETParams(
           content.getDouble("BulkDoping") / (Unit::um * Unit::um * Unit::um),
-          content.getWithUnit("BackVoltage"), // Unit::V,
-          content.getWithUnit("TopVoltage"), // Unit::V,
+          content.getWithUnit("BackVoltage"),
+          content.getWithUnit("TopVoltage"),
           content.getLength("SourceBorder"),
           content.getLength("ClearBorder"),
           content.getLength("DrainBorder"),
@@ -205,12 +239,16 @@ namespace Belle2 {
         m_sensitivePXD.push_back(sensitive);
 
         volume->SetSensitiveDetector(sensitive);
-      }
-      if (detectorType == "SVD") {
-        if (sensorID == 0) B2FATAL("TB Geometry Creator: sensorID=0 in your XML is incompatible with VXD geometry cache. Use 1-based numbering of sensorID's.");
+
+      } else if (detectorType == "SVD") {
         VxdID xID(layer, ladder, sensorID);
-        SVD::SensorInfo sensorInfo(xID, aWidth, aLength, aHeight,
-                                   content.getInt("stripsU"), content.getInt("stripsV"), content.getLength("width2", 0));
+        SVD::SensorInfo sensorInfo(xID,
+                                   aWidth,
+                                   aLength,
+                                   aHeight,
+                                   content.getInt("stripsU"),
+                                   content.getInt("stripsV"),
+                                   content.getLength("width2", 0));
         const double unit_pF = 1000 * Unit::fC / Unit::V; // picofarad
         sensorInfo.setSensorParams(
           content.getWithUnit("DepletionVoltage"),
@@ -225,19 +263,34 @@ namespace Belle2 {
         m_sensitiveSVD.push_back(sensitive);
 
         volume->SetSensitiveDetector(sensitive);
-      }
-      if (detectorType == "TEL") {
-        TB::SensorInfo sensorInfo(sensorID, aWidth, aLength, aHeight, content.getInt("pixelsR"), content.getInt("pixelsZ[1]"), content.getLength("splitLength", 0), content.getInt("pixelsZ[2]", 0));
+
+      } else if (detectorType == "TEL") {
+        TB::SensorInfo sensorInfo(sensorID,
+                                  aWidth,
+                                  aLength,
+                                  aHeight,
+                                  content.getInt("pixelsR"),
+                                  content.getInt("pixelsZ[1]"),
+                                  content.getLength("splitLength", 0),
+                                  content.getInt("pixelsZ[2]", 0));
 
         TB::SensorInfo* newInfo = new TB::SensorInfo(sensorInfo);
         TB::SensitiveDetector* sensitive = new TB::SensitiveDetector(newInfo, m_seeNeutrons, m_onlyPrimaryTrueHits, m_sensitiveThreshold);
         m_sensitiveTB.push_back(sensitive);
 
         volume->SetSensitiveDetector(sensitive);
+
+      } else {
+        B2FATAL("Unsupported or non-specified DetecorType for Active node");
       }
-      // set the stepSize and update volume name
+
+      // set the stepSize and update volume name with VXD ID
       volume->SetUserLimits(new G4UserLimits(stepSize));
-      volume->SetName(volume->GetName() + ".Active");
+      volume->SetName(volume->GetName().append((
+                                                 boost::format(".Active_%1%")
+                                                 %
+                                                 (int)VxdID(layer, ladder, sensorID)
+                                               ).str()));
     }
 
     G4Transform3D GeoTBCreator::getAlignment(const string& component)
@@ -272,12 +325,10 @@ namespace Belle2 {
         if (activePar != 0) {
           // if Active node is found, read its params and make it active
           setVolumeActive(activePar, g4vol, volume);
-          // only in case we create PXD/SVD/TEL type sensor, let the GeoCache to search it through
-          VXD::GeoCache::getInstance().findVolumes(g4PhysVol);
         }
         // check child Volume tags and read them recursively
         GearDir childVolumes(volume, "Volume");
-        if (childVolumes != 0) readAddVolumes(volume, g4vol, level + 1);
+        if (childVolumes) readAddVolumes(volume, g4vol, level + 1);
         if (level == 1) VXD::GeoCache::getInstance().findVolumes(g4PhysVol);
       }
     }
@@ -288,6 +339,9 @@ namespace Belle2 {
       m_seeNeutrons = content.getBool("SeeNeutrons", false);
       m_onlyPrimaryTrueHits = content.getBool("OnlyPrimaryTrueHits", false);
       m_sensitiveThreshold = content.getWithUnit("SensitiveThreshold", 1.0 * Unit::eV);
+
+      m_worldMaterial = content.getString("DefaultMaterial", "Air");
+
       m_alignment = GearDir(content, "Alignment/");
 
       GearDir volumes(content, "Volumes");

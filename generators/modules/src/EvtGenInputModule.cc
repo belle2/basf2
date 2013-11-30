@@ -76,7 +76,7 @@ void EvtGenInputModule::initialize()
   //Initialize MCParticle collection
   StoreArray<MCParticle>::registerPersistent();
 
-  if (m_inclusiveType == 0) m_inclusiveParticle == " ";
+  if (m_inclusiveType == 0) m_inclusiveParticle = " ";
   if (m_inclusiveType != 0 && EvtPDL::getId(m_inclusiveParticle).getId() == -1) B2ERROR("User Specified Inclusive Particle does not exist !!") ;
 
   B2INFO("finished initialising the EvtGen Input Module. ");

@@ -54,8 +54,8 @@ timeZeroJitter = 25e-3  # ns
 # -------------------------------------------------------------------------
 
 # Number of events to generate
-evtmetagen = register_module('EvtMetaGen')
-evtmetagen.param({'evtNumList': [100], 'runList': [1]})
+eventinfo = register_module('EventInfoSetter')
+eventinfo.param({'evtNumList': [100], 'runList': [1]})
 
 # particle gun
 particlegun = register_module('ParticleGun')
@@ -99,7 +99,7 @@ set_log_level(LogLevel.ERROR)
 
 # Create path
 main = create_path()
-main.add_module(evtmetagen)
+main.add_module(eventinfo)
 main.add_module(progress)
 main.add_module(gearbox)
 main.add_module(geometry)

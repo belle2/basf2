@@ -75,6 +75,8 @@ namespace Belle2 {
       };
       /** Create a new cache */
       ClusterCache(unsigned int maxSamples = MAX_SAMPLES);
+      /** No copy construction. */
+      ClusterCache(const ClusterCache& other) = delete;
       /** Delete the cache and free the memory */
       ~ClusterCache();
       /** Clear the cache structure */
@@ -107,11 +109,7 @@ namespace Belle2 {
       ClusterCandidate** m_clsCur;
 
     private:
-      /** Hide copy constructor. */
-      ClusterCache(const ClusterCache& other):
-        m_maxSamples(other.m_maxSamples), m_curTime(other.m_curTime), m_curStrip(other.m_curStrip),
-        m_clsTop(other.m_clsTop), m_clsCur(other.m_clsCur)
-      {}
+
     };
 
   }

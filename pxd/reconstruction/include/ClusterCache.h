@@ -88,6 +88,10 @@ namespace Belle2 {
       };
       /** Create a new cache */
       ClusterCache(unsigned int maxU = c_defaultNumberColumns);
+
+      /** No copy construction. */
+      ClusterCache(const ClusterCache&) = delete;
+
       /** Delete the cache and free the memory */
       ~ClusterCache();
       /** Clear the cache structure */
@@ -120,8 +124,6 @@ namespace Belle2 {
       bool empty() const { return m_clusters.begin() == m_currCluster; }
 
     private:
-      /** Hidden copy constructor. */
-      ClusterCache(const ClusterCache&);
 
       /** Merge two cluster and update the list of cached clusters */
       ClusterCandidate* mergeCluster(ClusterCandidate* cls1, ClusterCandidate* cls2);

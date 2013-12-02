@@ -26,7 +26,7 @@ namespace Belle2 {
     //! Default constructor
     RawFTSW();
     //! Constructor using existing pointer to raw data buffer
-    RawFTSW(int* bufin, int nwords);
+    //RawFTSW(int* bufin, int nwords);
     //! Destructor
     virtual ~RawFTSW();
 

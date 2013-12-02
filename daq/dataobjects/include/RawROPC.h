@@ -25,7 +25,7 @@ namespace Belle2 {
     //! Default constructor
     RawROPC();
     //! Constructor using existing pointer to raw data buffer
-    RawROPC(int* bufin, int nwords);
+    //RawROPC(int* bufin, int nwords);
     //! Destructor
     virtual ~RawROPC();
 

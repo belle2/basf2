@@ -23,7 +23,7 @@ namespace Belle2 {
     //! Default constructor
     RawDataBlock();
     //! Constructor using existing pointer to raw data buffer
-    RawDataBlock(int* bufin, int nwords);
+//    RawDataBlock(int* bufin, int nwords);
     //! Destructor
     virtual ~RawDataBlock();
 

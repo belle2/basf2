@@ -32,7 +32,7 @@ namespace Belle2 {
     //! Default constructor
     RawCOPPER();
     //! Constructor using existing pointer to raw data buffer
-    RawCOPPER(int* bufin, int nwords);
+    //RawCOPPER(int* bufin, int nwords);
     //! Destructor
     virtual ~RawCOPPER();
 

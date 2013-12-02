@@ -21,6 +21,36 @@
 #include <TFile.h>
 #include <TTree.h>
 #include <TVectorD.h>
+#include <TH1.h>
+
+// For DAQRoot
+#include <framework/core/Module.h>
+#include <framework/pcore/EvtMessage.h>
+#include <framework/pcore/MsgHandler.h>
+#include <daq/dataflow/EvtSocket.h>
+#include <framework/datastore/DataStore.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/datastore/StoreArray.h>
+#include <framework/dataobjects/EventMetaData.h>
+#include <daq/rawdata/modules/DAQConsts.h>
+#include <daq/dataobjects/RawDataBlock.h>
+#include <daq/dataobjects/RawFTSW.h>
+#include <daq/dataobjects/RawCOPPER.h>
+#include <daq/dataobjects/RawSVD.h>
+#include <daq/dataobjects/RawCDC.h>
+#include <daq/dataobjects/RawBPID.h>
+#include <daq/dataobjects/RawEPID.h>
+#include <daq/dataobjects/RawECL.h>
+#include <daq/dataobjects/RawKLM.h>
+#include <daq/dataobjects/SendHeader.h>
+#include <daq/dataobjects/SendTrailer.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <netinet/tcp.h>
+#include <arpa/inet.h>
+#include <sys/resource.h>
+#include <sys/uio.h>
 
 #define TRGCDC_UNDEFINED 999999
 
@@ -74,11 +104,21 @@ class TRGCDC {
                               bool perfect3DFinder = false,
 			      const std::string & innerTSLUTDataFile = "?",
 			      const std::string & outerTSLUTDataFile = "?",
+			      const std::string & tsfLUTSL0DataFile = "?",
+			      const std::string & tsfLUTSL1DataFile = "?",
+			      const std::string & tsfLUTSL2DataFile = "?",
+			      const std::string & tsfLUTSL3DataFile = "?",
+			      const std::string & tsfLUTSL4DataFile = "?",
+			      const std::string & tsfLUTSL5DataFile = "?",
+			      const std::string & tsfLUTSL6DataFile = "?",
+			      const std::string & tsfLUTSL7DataFile = "?",
+			      const std::string & tsfLUTSL8DataFile = "?",
 			      const std::string & rootTRGCDCFile = "?",
 			      const std::string & rootFitter3DFile = "?",
                               unsigned houghFinderMeshX = 96,
                               unsigned houghFinderMeshY = 96,
                               unsigned houghFinderPeakMin = 5,
+                              bool fLogicLUTTSF = 0,
                               bool fLRLUT = 1,
 			      bool fevtTime = 1,
 			      bool fzierror=1,
@@ -87,7 +127,8 @@ class TRGCDC {
             bool fileTSF=0,
             bool fileHough3D=0,
             int finder3DMode=0,
-            bool fileFitter3D=0);
+            bool fileFitter3D=0,
+            int trgCDCDataInputMode=0);
     
     /// returns TRGCDC object. TRGCDC should be created with specific
     /// configuration before calling this function.
@@ -105,11 +146,21 @@ class TRGCDC {
 	   bool perfect3DFinder,
 	   const std::string & innerTSLUTDataFile,
 	   const std::string & outerTSLUTDataFile,
+	   const std::string & tsfLUTSL0DataFile,
+	   const std::string & tsfLUTSL1DataFile,
+	   const std::string & tsfLUTSL2DataFile,
+	   const std::string & tsfLUTSL3DataFile,
+	   const std::string & tsfLUTSL4DataFile,
+	   const std::string & tsfLUTSL5DataFile,
+	   const std::string & tsfLUTSL6DataFile,
+	   const std::string & tsfLUTSL7DataFile,
+	   const std::string & tsfLUTSL8DataFile,
 	   const std::string & rootTRGCDCFile,
 	   const std::string & rootFitter3DFile,
            unsigned houghFinderMeshX,
            unsigned houghFinderMeshY,
            unsigned houghFinderPeakMin,
+           bool fLogicLUTTSF,
            bool fLRLUT,
 	   bool fevtTime,
 	   bool fzierror,
@@ -118,7 +169,8 @@ class TRGCDC {
      bool fileTSF,
      bool fileHough3D,
      int finder3DMode,
-     bool fileFitter3D);
+     bool fileFitter3D,
+     int trgCDCDataInputMode);
 
     /// Destructor
     virtual ~TRGCDC();
@@ -262,6 +314,12 @@ class TRGCDC {
 
     /// updates TRGCDC wire information. clear() is called in this function.
     void update(bool mcAnalysis = true);
+
+    /// updates TRGCDC wire information by Hardware data
+    /// 0: From CDC FE ASCII file (Implementing)
+    /// 1: From CDC FE-DAQ root file (Not implemented)
+    /// 2: From TSIM root file (Not implemented)
+    void updateByData(int inputMode);
 
     /// returns a list of TRGCDCWireHit. 'update()' must be called
     /// before calling this function.
@@ -411,11 +469,41 @@ class TRGCDC {
     /// The filename of LUT for outer track segments.
     std::string _outerTSLUTDataFilename;
 
+    /// The filename of LUT for track segment finder SL0.
+    std::string _tsfLUTSL0DataFilename;
+
+    /// The filename of LUT for track segment finder SL1.
+    std::string _tsfLUTSL1DataFilename;
+
+    /// The filename of LUT for track segment finder SL2.
+    std::string _tsfLUTSL2DataFilename;
+
+    /// The filename of LUT for track segment finder SL3.
+    std::string _tsfLUTSL3DataFilename;
+
+    /// The filename of LUT for track segment finder SL4.
+    std::string _tsfLUTSL4DataFilename;
+
+    /// The filename of LUT for track segment finder SL5.
+    std::string _tsfLUTSL5DataFilename;
+
+    /// The filename of LUT for track segment finder SL6.
+    std::string _tsfLUTSL6DataFilename;
+
+    /// The filename of LUT for track segment finder SL7.
+    std::string _tsfLUTSL7DataFilename;
+
+    /// The filename of LUT for track segment finder SL8.
+    std::string _tsfLUTSL8DataFilename;
+
     /// The filename of root file for TRGCDC.
     std::string _rootTRGCDCFilename;
 
     /// The filename of root file for Fitter3D.
     std::string _rootFitter3DFilename;
+
+    /// Switch for logic or LUT TSF
+    bool _fLogicLUTTSF;
 
     /// Switch for the LR LUT in Fitter3D.
     bool _fLRLUT;
@@ -597,6 +685,32 @@ class TRGCDC {
 
     /// 2D track information
     TClonesArray * _tracks2D;
+
+    // Switch for TRG CDC input mode
+    int _trgCDCDataInputMode;
+
+    // Debugging members for firmware ROOT input.
+    //int m_minCDCTdc;
+    //int m_maxCDCTdc;
+    //int m_minTRGTdc;
+    //int m_maxTRGTdc;
+    /// root tree for ROOT input
+    TTree * m_treeROOTInput;
+    // [0]: iLayer, [1]: iWire, [2]: CDCADC, [3]: CDCTDC, [4]: CDC FE TRG timing
+    TClonesArray* m_rootCDCHitInformation;
+    // [0]: iLayer, [1]: iWire, [2]: window number, [3]: priority timing
+    TClonesArray* m_rootTRGHitInformation;
+    // [0]: iLayer, [1]: iWire, [2]: Timing(CDC), [3]: MatchNumber
+    // MatchNumber: 1: Only CDC, 2: Only TRG, 3: Both CDC & TRG
+    //TClonesArray* m_CDCTRGTimeMatch;
+    TClonesArray* m_rootTRGRawInformation;
+
+    // Save functions for ROOT
+    void saveCDCHitInformation(std::vector<std::vector<unsigned> >& );
+    void saveTRGHitInformation(std::vector<std::vector<int > >& );
+    void saveTRGRawInformation(std::vector<std::string >& );
+    //void saveCDCTRGTimeMatchInformation(std::vector<std::vector<std::map<int, int > > >& );
+
 
     friend class TRGCDCModule;
 };

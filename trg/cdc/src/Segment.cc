@@ -28,6 +28,7 @@
 #include "cdc/geometry/CDCGeometryPar.h"
 
 #include "trg/cdc/EventTime.h"
+#include <bitset>
 
 //... Global varibles...
 double wireR[9];
@@ -158,7 +159,7 @@ TRGCDCSegment::name(void) const {
 }
 
 void
-TCSegment::simulate(bool clockSimulation) {
+TCSegment::simulate(bool clockSimulation, bool logicLUTFlag) {
 
     //...Get wire informtion for speed-up...
     const unsigned n = _wires.size();
@@ -177,17 +178,17 @@ TCSegment::simulate(bool clockSimulation) {
 	return;
 
     if (clockSimulation)
-	simulateWithClock();
+	simulateWithClock(logicLUTFlag);
     else
-	simulateWithoutClock();
+	simulateWithoutClock(logicLUTFlag);
 }
 
 void
-TCSegment::simulateWithoutClock(void) {
+TCSegment::simulateWithoutClock(bool logicLUTFlag) {
 
     TRGDebug::enterStage("TS sim");
 
-    //...System clocks...
+    //...System clocks... Freq: 125 MHz
     const TRGClock & systemClock = TRGCDC::getTRGCDC()->systemClock();
     //systemClock.dump();
 
@@ -197,64 +198,104 @@ TCSegment::simulateWithoutClock(void) {
     vector<TRGSignal> signals;
     for (unsigned i = 0; i < n; i++) {
 
-	//...Store wire hit information...
-	const TCWHit * h = _wires[i]->hit();
-	if (h)
-	    _hits.push_back(h);
+      //...Store wire hit information...
+      const TCWHit * h = _wires[i]->hit();
+      if (h)
+        _hits.push_back(h);
 
-	//...Copy signal from a wire...
-        const TRGSignal & s = _wires[i]->signal();
-        signals.push_back(s);
+      //...Copy signal from a wire...
+      const TRGSignal & s = _wires[i]->signal();
+      signals.push_back(s);
 
-	//...Change clock...
-	signals.back().clock(systemClock);
+      //...Change clock...
+      signals.back().clock(systemClock);
 
- 	//...Widen it...
- 	static const unsigned width = systemClock.unit(400);
- 	signals.back().widen(width);
+      //...Widen it...
+      static const unsigned width = systemClock.unit(400);
+      signals.back().widen(width);
 
-        if (s.active())
-            ++nHits;
+      if (s.active())
+        ++nHits;
     }
 
-    //...Check number of hit wires...
-    if (nHits < 4) {
-	TRGDebug::leaveStage("TS sim");
+
+    if( logicLUTFlag == 0) {
+      ///// TS Logic Finder
+      //...Check number of hit wires...
+      //cout<<"TSF: nHits is "<<nHits<<endl;
+      if (nHits < 4) {
+        TRGDebug::leaveStage("TS sim");
         return;
+      }
+
+      //...Signal simulation...
+      TRGSignal l0, l1, l2, l3, l4;
+      if (n == 11) {
+
+        //...Simple simulation assuming 3:2:1:2:3 shape...
+        l0 = signals[0] | signals[1] | signals[2];
+        l1 = signals[3] | signals[4];
+        l2 = signals[5];
+        l3 = signals[6] | signals[7];
+        l4 = signals[8] | signals[9] | signals[10];
+        //l0.dump();
+        //l1.dump();
+        //l2.dump();
+        //l3.dump();
+        //l4.dump();
+
+      }
+      else if (n == 15) {
+
+        //...Simple simulation assuming 1:2:3:4:5 shape...
+        l0 = signals[0];
+        l1 = signals[1] | signals[2];
+        l2 = signals[3] | signals[4] | signals[5];
+        l3 = signals[6] | signals[7] | signals[8] | signals[9];
+        l4 = signals[10] |signals[11] | signals[12] | signals[13] |signals[14];
+      }
+
+      //...Coincidence of all layers...
+      TRGSignal all = l0 & l1 & l2 & l3 & l4;
+
+      if (all.nEdges()) {
+        //cout<<"TSF is found"<<endl;
+        all.name(name());
+        _signal = all;
+        //cout<<all.name()<<":#signals="<<all.nSignals()<<endl;;
+        //all.dump();
+      }
+      ///// End of TS logic finder
     }
 
-    //...Signal simulation...
-    TRGSignal l0, l1, l2, l3, l4;
-    if (n == 11) {
-
-	//...Simple simulation assuming 3:2:1:2:3 shape...
-	l0 = signals[0] | signals[1] | signals[2];
-	l1 = signals[3] | signals[4];
-	l2 = signals[5];
-	l3 = signals[6] | signals[7];
-	l4 = signals[8] | signals[9] | signals[10];
-
-    }
-    else if (n == 15) {
-
-	//...Simple simulation assuming 1:2:3:4:5 shape...
-	l0 = signals[0];
-	l1 = signals[1] | signals[2];
-	l2 = signals[3] | signals[4] | signals[5];
-	l3 = signals[6] | signals[7] | signals[8] | signals[9];
-	l4 = signals[10] |signals[11] | signals[12] | signals[13] |signals[14];
-    }
-    
-    //...Coincidence of all layers...
-    TRGSignal all = l0 & l1 & l2 & l3 & l4;
+    if (logicLUTFlag == 1) {
+      ///// TS LUT finder
+      //... Find hit wires ...
+      vector<TRGSignal> hitSignals;
+      for (unsigned iWire = 0; iWire < signals.size(); iWire++ ) {
+        if (signals[iWire].active()) hitSignals.push_back(signals[iWire]);
+      }
+      //... Coincidence all hit wires ...
+      TRGSignal allSignals;
+      if (hitSignals.size() != 0) {
+        allSignals = hitSignals[0];
+        for (unsigned iHitWire = 1; iHitWire < hitSignals.size(); iHitWire++) {
+          allSignals = allSignals & hitSignals[iHitWire];
+        }
+      }
 
 
-
-    if (all.nEdges()) {
-    all.name(name());
-	_signal = all;
-    //cout<<all.name()<<":#signals="<<all.nSignals()<<endl;;
-    //all.dump();
+      //bitset<15> strHitPattern(this->hitPattern());
+      //cout<<"SuperLayerID: "<<this->superLayerId()<<" hitPattern: "<<this->hitPattern()<<" "<<strHitPattern<<endl;
+      //cout<<"LUT result: "<<this->LUT()->getHitLRLUT(this->hitPattern(),this->superLayerId())<<endl;
+      //cout<<"Is center hit fired? " << (this->center().hit() != 0)<<endl;
+      int lutHit = atoi(&(this->LUT()->getHitLRLUT(this->hitPattern(),this->superLayerId()).at(4)));
+      // Only when center wire is hit
+      if(lutHit == 1 && (this->center().hit() != 0) ) {
+        allSignals.name(name());
+        _signal = allSignals;
+      }
+      ///// End of TS LUT finder
     }
 
 //     if (iwd) {
@@ -273,7 +314,7 @@ TCSegment::simulateWithoutClock(void) {
 }
 
 void
-TCSegment::simulateWithClock(void) {
+TCSegment::simulateWithClock(bool logicLUTFlag) {
 
     //cout<<"Start TSF with clock"<<endl;
 
@@ -324,51 +365,77 @@ TCSegment::simulateWithClock(void) {
     bool tsPrevious = 0;
     TRGSignal tsSignal(dataClock);
     for (unsigned i = 0; i < nStates; i++) {
-	const TRGState state = signals.state(clocks[i]);
-//	state.dump("dump of state:", TRGDebug::tab());
-//cout << TRGDebug::tab() << i << ":c=" << clocks[i] << ":" << state
-//<< endl;
+      const TRGState state = signals.state(clocks[i]);
+      //	state.dump("dump of state:", TRGDebug::tab());
+      //cout << TRGDebug::tab() << i << ":c=" << clocks[i] << ":" << state
+      //<< endl;
 
-	  //_lut->getLRLUT(unsigned(state), superLayerId());
-    bool tsL0,tsL1,tsL2,tsL3,tsL4, tsAll= 0;
-    if(tsSize == 11) {
-      //cout<<"Outer TS"<<endl;
-	    //...Simple simulation assuming 3:2:1:2:3 shape...
-	    tsL0 = state[0] | state[1] | state[2];
-	    tsL1 = state[3] | state[4];
-	    tsL2 = state[5];
-	    tsL3 = state[6] | state[7];
-	    tsL4 = state[8] | state[9] | state[10];
-    } else if (tsSize == 15) {
-      //cout<<"Inner TS"<<endl;
-	    //...Simple simulation assuming 1:2:3:4:5 shape...
-	    tsL0 = state[0];
-	    tsL1 = state[1] | state[2];
-	    tsL2 = state[3] | state[4] | state[5];
-	    tsL3 = state[6] | state[7] | state[8] | state[9];
-	    tsL4 = state[10] |state[11] | state[12] | state[13] |state[14];
-    }
+      bool tsAll = 0;
 
-    tsAll = tsL0 & tsL1 & tsL2 & tsL3 & tsL4;
-    //cout<<"L0,L1,L2,L3,L4: "<<tsL0<<tsL1<<tsL2<<tsL3<<tsL4<<endl;
-    //cout<<"tsAll: "<<tsAll<<endl;
+      if ( logicLUTFlag == 0 ) {
+        ////// TS logic Finder
+        bool tsL0,tsL1,tsL2,tsL3,tsL4=0;
+        if(tsSize == 11) {
+          //cout<<"Outer TS"<<endl;
+          //...Simple simulation assuming 3:2:1:2:3 shape...
+          tsL0 = state[0] | state[1] | state[2];
+          tsL1 = state[3] | state[4];
+          tsL2 = state[5];
+          tsL3 = state[6] | state[7];
+          tsL4 = state[8] | state[9] | state[10];
+        } else if (tsSize == 15) {
+          //cout<<"Inner TS"<<endl;
+          //...Simple simulation assuming 1:2:3:4:5 shape...
+          tsL0 = state[0];
+          tsL1 = state[1] | state[2];
+          tsL2 = state[3] | state[4] | state[5];
+          tsL3 = state[6] | state[7] | state[8] | state[9];
+          tsL4 = state[10] |state[11] | state[12] | state[13] |state[14];
+        }
 
-    // Makes signal for TS
-    if(tsPrevious != tsAll) {
-      if(tsAll == 1) {
-        //cout<<"Start of new signal"<<endl;
-        tsRise = clocks[i];
-        tsPrevious = tsAll;
+        tsAll = tsL0 & tsL1 & tsL2 & tsL3 & tsL4;
+        //cout<<"L0,L1,L2,L3,L4: "<<tsL0<<tsL1<<tsL2<<tsL3<<tsL4<<endl;
+        //cout<<"tsAll: "<<tsAll<<endl;
+        //// TS logic Finder
       }
-      if(tsAll == 0) {
-        tsFall = clocks[i];
-        tsSignal |= TRGSignal(dataClock, tsRise, tsFall);
-        tsPrevious = tsAll;
-        //cout<<"End of new signal"<<endl;
-        //tsSignal.dump();
+
+      if (logicLUTFlag == 1) {
+        ////// TS LUT Finder
+        bool centerState;
+        if(tsSize==15) {
+          centerState = state[0];
+        } else if (tsSize==11) {
+          centerState = state[5];
+        }
+        //cout<<"State: "<<unsigned(state)<<endl;
+        //unsigned iHitPattern = unsigned(state);
+        //bitset<15> strHitPattern(iHitPattern);
+        //cout<<"SuperLayerID: "<<this->superLayerId()<<" hitPattern: "<<unsigned(state)<<" "<<strHitPattern<<endl;
+        //cout<<"LUT result: "<<this->LUT()->getHitLRLUT(unsigned(state),this->superLayerId())<<" TS logic result: "<<tsAll<<endl;
+        //cout<<"Is center hit fired? " <<centerState<<endl;
+        int lutHit = atoi(&(this->LUT()->getHitLRLUT(unsigned(state),this->superLayerId()).at(4)));
+        if(lutHit == 1 && (centerState != 0) ) {
+          tsAll = 1;
+        }
+        ////// TS LUT Finder
       }
-    }
-    
+
+      // Makes signal for TS
+      if(tsPrevious != tsAll) {
+        if(tsAll == 1) {
+          //cout<<"Start of new signal"<<endl;
+          tsRise = clocks[i];
+          tsPrevious = tsAll;
+        }
+        if(tsAll == 0) {
+          tsFall = clocks[i];
+          tsSignal |= TRGSignal(dataClock, tsRise, tsFall);
+          tsPrevious = tsAll;
+          //cout<<"End of new signal"<<endl;
+          //tsSignal.dump();
+        }
+      }
+
     } // Loop over all state changes
 
     //cout<<"End of all signals for TS"<<endl;

@@ -1,5 +1,5 @@
 Import('env')
 
-#print env.Dump()
+env['LIBS'] = []
 
 Return('env')

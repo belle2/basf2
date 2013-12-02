@@ -161,6 +161,9 @@ class TRGCDCCellHit {
     /// sets sequential length in one segment : this parameter is used in TCurlFinder now.
     unsigned sequence(unsigned) const;
 
+    /// Sets drift time.
+    void setDriftTime(double driftTime, unsigned i);
+
   public:// Static utility functions
 
     /// Sort function.
@@ -316,6 +319,13 @@ inline
 unsigned
 TRGCDCCellHit::sequence(unsigned a) const {
     return _sequentialLength = a;
+}
+
+inline
+void
+TRGCDCCellHit::setDriftTime(double driftTime, unsigned i) {
+  if(i) _drift[1] = driftTime;
+  else _drift[0] = driftTime;
 }
 
 inline

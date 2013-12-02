@@ -54,6 +54,7 @@ class TRGCDCFrontEnd
     /// Destructor
     virtual ~TRGCDCFrontEnd();
 
+
   public:// Selectors
 
     /// returns version.
@@ -66,6 +67,11 @@ class TRGCDCFrontEnd
 
     /// simulates firmware.
     void simulate(void);
+
+    /// output from FrontEnd
+    //    TRGSignalBundle  output(void) { return *_osb;};
+    TRGSignalBundle* getOSB(void) { return _osb; };
+
 
   public:// VHDL utilities
 
@@ -112,6 +118,10 @@ class TRGCDCFrontEnd
     /// dump. "pre" will be printed in head of each line.
     void dump(const std::string & message = "",
 	      const std::string & pre = "") const;
+
+  public: // allow Merger class to access FrontEnd data
+    
+    friend class TRGCDCMerger;
 
   private:
 

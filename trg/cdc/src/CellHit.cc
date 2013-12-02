@@ -58,6 +58,7 @@ TRGCDCCellHit::TRGCDCCellHit(const TRGCDCCell & w,
 TRGCDCCellHit::~TRGCDCCellHit() {
 }
 
+// [FIXME] Crashes when there is no MC information
 void
 TRGCDCCellHit::dump(const std::string & msg,
 		    const std::string & pre) const {

@@ -287,6 +287,10 @@ TRGSignal::widen(unsigned width) {
                 _history[i].time(t0 + width);
         }
     }
+    // Merge overlapping history
+    std::sort(_history.begin(), _history.end(), TRGTime::sortByTime);
+    _history = orOperation(_history);
+
 
 #if TRG_DEBUG
     consistencyCheck();

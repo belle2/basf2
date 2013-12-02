@@ -37,6 +37,15 @@ TRGCDCModule::TRGCDCModule()
       _configFilename("TRGCDCConfig.dat"),
       _innerTSLUTDataFilename("undefined"),
       _outerTSLUTDataFilename("undefined"),
+      _tsfLUTSL0DataFilename("undefined"),
+      _tsfLUTSL1DataFilename("undefined"),
+      _tsfLUTSL2DataFilename("undefined"),
+      _tsfLUTSL3DataFilename("undefined"),
+      _tsfLUTSL4DataFilename("undefined"),
+      _tsfLUTSL5DataFilename("undefined"),
+      _tsfLUTSL6DataFilename("undefined"),
+      _tsfLUTSL7DataFilename("undefined"),
+      _tsfLUTSL8DataFilename("undefined"),
       _rootTRGCDCFilename("undefined"),
       _rootFitter3DFilename("undefined"),
       _curlBackStop(0),
@@ -51,6 +60,7 @@ TRGCDCModule::TRGCDCModule()
 //    _hFinderMeshY(96),
       _hFinderMeshY(24),
       _hFinderPeakMin(5),
+      _fLogicLUTTSF(0),
       _fLRLUT(1),
       _fevtTime(1),
       _wireHitInefficiency(0.),
@@ -58,6 +68,7 @@ TRGCDCModule::TRGCDCModule()
       _fileHough3D(0),
       _finder3DMode(0),
       _fileFitter3D(0),
+      _trgCDCDataInputMode(0),
       _cdc(0),
       _sa(0) {
 
@@ -78,6 +89,42 @@ TRGCDCModule::TRGCDCModule()
              _outerTSLUTDataFilename,
              "The filename of LUT for outer track segments",
              _outerTSLUTDataFilename);
+    addParam("TSFLUTSL0DataFile",
+             _tsfLUTSL0DataFilename,
+             "The filename of LUT for TSF SL0",
+             _tsfLUTSL0DataFilename);
+    addParam("TSFLUTSL1DataFile",
+             _tsfLUTSL1DataFilename,
+             "The filename of LUT for TSF SL1",
+             _tsfLUTSL1DataFilename);
+    addParam("TSFLUTSL2DataFile",
+             _tsfLUTSL2DataFilename,
+             "The filename of LUT for TSF SL2",
+             _tsfLUTSL2DataFilename);
+    addParam("TSFLUTSL3DataFile",
+             _tsfLUTSL3DataFilename,
+             "The filename of LUT for TSF SL3",
+             _tsfLUTSL3DataFilename);
+    addParam("TSFLUTSL4DataFile",
+             _tsfLUTSL4DataFilename,
+             "The filename of LUT for TSF SL4",
+             _tsfLUTSL4DataFilename);
+    addParam("TSFLUTSL5DataFile",
+             _tsfLUTSL5DataFilename,
+             "The filename of LUT for TSF SL5",
+             _tsfLUTSL5DataFilename);
+    addParam("TSFLUTSL6DataFile",
+             _tsfLUTSL6DataFilename,
+             "The filename of LUT for TSF SL6",
+             _tsfLUTSL6DataFilename);
+    addParam("TSFLUTSL7DataFile",
+             _tsfLUTSL7DataFilename,
+             "The filename of LUT for TSF SL7",
+             _tsfLUTSL7DataFilename);
+    addParam("TSFLUTSL8DataFile",
+             _tsfLUTSL8DataFilename,
+             "The filename of LUT for TSF SL8",
+             _tsfLUTSL8DataFilename);
     addParam("RootTRGCDCFile",
               _rootTRGCDCFilename,
               "The filename of root file for TRGCDC",
@@ -106,6 +153,10 @@ TRGCDCModule::TRGCDCModule()
               _fileTRGCDC,
               "Flag for making TRGCDC.root",
               _fileTRGCDC);
+    addParam("TSFLogicLUT",
+             _fLogicLUTTSF,
+             "Use logic or LUT for TSF",
+             _fLogicLUTTSF);
     addParam("2DFinderPerfect",
              _perfect2DFinder,
              "2D finder perfect option",
@@ -162,6 +213,10 @@ TRGCDCModule::TRGCDCModule()
               _fileFitter3D,
               "Flag for making Fitter3D.root",
               _fileFitter3D);
+    addParam("TRGCDCDataInputMode",
+              _trgCDCDataInputMode,
+              "Flag for TRG CDC input mode",
+              _trgCDCDataInputMode);
 
 
     if (TRGDebug::level())
@@ -231,11 +286,21 @@ TRGCDCModule::beginRun() {
 				 _perfect3DFinder,
 				 _innerTSLUTDataFilename,
 				 _outerTSLUTDataFilename,
+				 _tsfLUTSL0DataFilename,
+				 _tsfLUTSL1DataFilename,
+				 _tsfLUTSL2DataFilename,
+				 _tsfLUTSL3DataFilename,
+				 _tsfLUTSL4DataFilename,
+				 _tsfLUTSL5DataFilename,
+				 _tsfLUTSL6DataFilename,
+				 _tsfLUTSL7DataFilename,
+				 _tsfLUTSL8DataFilename,
 				 _rootTRGCDCFilename,
 				 _rootFitter3DFilename,
 				 _hFinderMeshX,
 				 _hFinderMeshY,
 				 _hFinderPeakMin,
+         _fLogicLUTTSF,
 				 _fLRLUT,
 				 _fevtTime,
 				 _fzierror,
@@ -244,7 +309,8 @@ TRGCDCModule::beginRun() {
          _fileTSF,
          _fileHough3D,
          _finder3DMode,
-         _fileFitter3D);
+         _fileFitter3D,
+         _trgCDCDataInputMode);
 
     if (TRGDebug::level())
 	cout << "TRGCDCModule ... beginRun called " << endl;

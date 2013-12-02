@@ -67,6 +67,33 @@ class TRGCDCModule : public Module {
     /// The filename of LUT for outer track segments.
     std::string _outerTSLUTDataFilename;
 
+    /// The filename of LUT for track segment finder SL0.
+    std::string _tsfLUTSL0DataFilename;
+
+    /// The filename of LUT for track segment finder SL1.
+    std::string _tsfLUTSL1DataFilename;
+
+    /// The filename of LUT for track segment finder SL2.
+    std::string _tsfLUTSL2DataFilename;
+
+    /// The filename of LUT for track segment finder SL3.
+    std::string _tsfLUTSL3DataFilename;
+
+    /// The filename of LUT for track segment finder SL4.
+    std::string _tsfLUTSL4DataFilename;
+
+    /// The filename of LUT for track segment finder SL5.
+    std::string _tsfLUTSL5DataFilename;
+
+    /// The filename of LUT for track segment finder SL6.
+    std::string _tsfLUTSL6DataFilename;
+
+    /// The filename of LUT for track segment finder SL7.
+    std::string _tsfLUTSL7DataFilename;
+
+    /// The filename of LUT for track segment finder SL8.
+    std::string _tsfLUTSL8DataFilename;
+
     /// The filename of root file for TRGCDC
     std::string _rootTRGCDCFilename;
 
@@ -103,6 +130,9 @@ class TRGCDCModule : public Module {
     /// Min. peak height for the Hough finder.
     int _hFinderPeakMin;
 
+    /// Switch for the Logic/LUT TSF.
+    bool _fLogicLUTTSF;
+
     /// Switch for the LR LUT in Fitter3D.
     bool _fLRLUT;
 
@@ -129,6 +159,9 @@ class TRGCDCModule : public Module {
     
     /// Switch for Fitter3D.root file.
     bool _fileFitter3D;
+
+    /// Switch for TRG CDC input mode
+    int _trgCDCDataInputMode;
 
   private:
 

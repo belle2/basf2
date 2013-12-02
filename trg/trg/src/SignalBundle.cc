@@ -46,13 +46,16 @@ TRGSignalBundle::TRGSignalBundle(const string & name,
 				 TRGState (* packer)(const TRGState &))
     : _name(name),
       _clock(& c) {
-
+ 
     //...Get state information...
     const vector<int> states = input.stateChanges();
     const unsigned nStates = states.size();
 
     //...Loop over all states...
     vector<TRGState *> outputStates;
+    TRGState s0 = input.state(0);
+    outputStates.push_back(new TRGState((* packer)(s0)));
+
     unsigned outputSize = 0;
     for (unsigned i = 0; i < nStates; i++) {
 	TRGState s = input.state(states[i]);
@@ -60,18 +63,22 @@ TRGSignalBundle::TRGSignalBundle(const string & name,
 	cout << "Clock=" << states[i] << endl;
 #endif	
 	outputStates.push_back(new TRGState((* packer)(s)));
+
     }
     if (outputStates.size())
 	outputSize = outputStates.back()->size();
-
+   
     //...Creat a SignalVector...
     TRGSignalVector * sb = new TRGSignalVector(_name, c, outputSize);
-
+ 
     //...Make a SignalVector...
-    const unsigned n = outputStates.size();
-    for (unsigned i = 0; i < n; i++) {
-	const TRGState & s = * outputStates[i];
-	sb->set(s, states[i]);
+    const TRGState &os0 = * outputStates[0];
+          sb->set(os0, 0); delete &os0;
+    const unsigned n = outputStates.size();   // same as nStates
+    
+    for (unsigned i = 1; i <n; i++) {
+      	const TRGState & s = * outputStates[i];
+	sb->set(s, states[i-1]);
 	delete & s;
     }
 

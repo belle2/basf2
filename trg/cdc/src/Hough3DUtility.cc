@@ -63,6 +63,8 @@ void Hough3DFinder::initialize(TVectorD &geometryVariables, vector<float > &init
     m_nWires[i] = (int)geometryVariables[i+12];
   }
   switch (m_mode){
+    case 0: 
+      break;
     case 1: 
       initVersion1(initVariables);
       break;
@@ -73,7 +75,7 @@ void Hough3DFinder::initialize(TVectorD &geometryVariables, vector<float > &init
       initVersion3(initVariables);
       break;
     default:
-      cout<<"[Error] 3DFinder mode is not correct"<<endl;
+      cout<<"[Error] 3DFinder mode is not correct. Current mode is "<<m_mode<<"."<<endl;
       break;
   }
 }

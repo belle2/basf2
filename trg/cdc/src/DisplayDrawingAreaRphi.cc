@@ -228,7 +228,21 @@ TRGCDCDisplayDrawingAreaRphi::drawHits(void) {
         //...Points...
         const TCWire & w = _hits[i]->wire();
         const HepGeom::Point3D<double> & p = w.backwardPosition();
-	const double radius = _hits[i]->drift();
+        // In ns scale. Actually in length scale. cm
+        double t_driftTime = _hits[i]->drift();
+        // To show in display when driftTime is 0.
+        if(t_driftTime == 0) t_driftTime = 0.3;
+        if(t_driftTime < 0) {
+          t_driftTime = 0.3;
+          cout<<"[DisplayDrawingAreaRphi] Error. DriftTime is minus."<<endl;
+        }
+        if(t_driftTime > 2) {
+          t_driftTime = 0.3;
+          cout<<"[DisplayDrawingAreaRphi] Error. DriftTime is larger than 800 ns."<<endl;
+        }
+	      //const double radius = _hits[i]->drift();
+        //t_driftTime = 0.3;
+	      const double radius = t_driftTime;
 
         colormap->alloc_color(_hitsColor[i]);
         _gc->set_foreground(_hitsColor[i]);

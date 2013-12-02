@@ -1,3 +1,3 @@
 Import('env')
-env['TOOLS_LIBS']['TRGUT2Template'] = ['trg']
+env['TOOLS_LIBS']['TRGUT2Template'] = ['trg', 'dataobjects']
 Return('env')

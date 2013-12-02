@@ -14,6 +14,8 @@
 #include <algorithm>
 #include <functional>
 #include <iostream>
+#include <ctype.h>
+#include <cstring>
 #include "trg/trg/State.h"
 
 using namespace std;
@@ -79,6 +81,70 @@ TRGState::TRGState(vector<bool> states)
     }
 }
 
+TRGState::TRGState(vector<unsigned> & states, unsigned order)
+    : _size(0),
+      _n(0),
+      _state(0) {
+
+    _size = states.size()*_bsu;
+    _n = _size / _bsu;
+    _state = (unsigned *) calloc(_n, _su);
+
+    for (unsigned i = 0; i < _n; i++) {
+
+      if(order == 0) _state[i] = states[i];
+      else _state[_n-1-i] = states[i];
+// 	cout << "size,given,states=" << _size << "," << states[i] << ","
+// 	     << _state[wp] << endl;
+
+    }
+}
+
+TRGState::TRGState(const char * inChar, unsigned inType)
+    : _size(0),
+      _n(0),
+      _state(0) {
+
+  if(inType == 0) {
+    _size = strlen(inChar);
+    // Check if all values are binary
+    for(unsigned iBit=0; iBit<_size; iBit++){
+      if(!(inChar[iBit] == '0' || inChar[iBit] == '1')) return;
+    }
+  }
+  else if (inType == 1) {
+    _size = strlen(inChar)*4;
+    // Check if all values are hex
+    for(unsigned iChar=0; iChar<_size/4; iChar++){
+      if(!isxdigit(inChar[iChar])) return;
+    }
+  } else return;
+  _n = _size / _bsu;
+  if (_size % _bsu) ++_n;
+  _state = (unsigned *) calloc(_n, _su);
+  if(inType == 0){
+    for(unsigned iBit=0; iBit<_size; iBit++){
+	    const unsigned wp = iBit / _bsu;
+	    const unsigned bp = iBit % _bsu;
+      if(inChar[_size-1-iBit] == '1')
+	      _state[wp] |= (1 << bp);
+      else 
+	      _state[wp] &= ~(1 << bp);
+    }
+  } else if (inType == 1){
+    for(unsigned iChar=0; iChar<_size/4; iChar++){
+      if(iChar%8==0) _state[iChar/8] = 0;
+      short unsigned t_int;
+      unsigned charP =_size/4-1-iChar;
+      if(inChar[charP] > 47 && inChar[charP]<58) t_int = inChar[charP]-48;
+      else t_int = inChar[charP] - 97 + 10;
+      _state[iChar/8] += t_int << ((iChar%8)*4);
+    }
+  }
+
+}
+
+
 TRGState::~TRGState() {
     if (_state)
 	free(_state);
@@ -88,10 +154,11 @@ void
 TRGState::dump(const string & msg,
 	       const string & pre) const {
 //    if (msg.find("bin") != string::npos) {
+  msg.find("bin");
 	cout << pre << "size=" << _size << ",";
 	for (unsigned i = 0; i < _size; i++) {
 	    const unsigned j = _size - i - 1;
-	    if ((j % 8) == 7)
+	    if ((j % 8) == 7) 
 		cout << "_";
 	    if ((* this)[j])
 		cout << "1";

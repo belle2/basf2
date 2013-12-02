@@ -15,7 +15,10 @@
 #define TRGState_FLAG_
 
 #include <vector>
+#include <iomanip>
 #include <iostream>
+#include <sstream>
+#include <bitset>
 #include "trg/trg/Time.h"
 
 namespace Belle2 {
@@ -35,6 +38,12 @@ class TRGState {
 
     /// Constructor.
     TRGState(unsigned bitSize, const bool * const states);
+
+    /// Constructor. order: 0=>inVector[0] is lsb. 1=>inVector[0] is msb.
+    TRGState(std::vector<unsigned>& states, unsigned order);
+
+    /// Constructor. type: 0-> binary, 1->hex
+    TRGState(const char*, unsigned type);
 
     // /// Copy constructor.
     // TRGState(const TRGState &);
@@ -87,6 +96,9 @@ class TRGState {
 
     /// Conversion to unsigned long long
     operator unsigned long long() const;
+
+    /// Conversion to string
+    operator std::string() const;
 
     /// appends TRGState (as MSB).
     TRGState & operator+=(const TRGState &);
@@ -198,6 +210,24 @@ TRGState::operator unsigned long long() const {
 	a += b << (i * s);
     }
     return a;
+}
+
+inline
+TRGState::operator std::string() const {
+    unsigned nWords = _size / _bsu;
+    if(_size % _bsu) ++nWords;
+    unsigned lastNHex = (_size % _bsu);
+    if(lastNHex == 0) lastNHex = 8;
+    else {
+      lastNHex = lastNHex/4;
+      if((_size%_bsu)%4) ++lastNHex;
+    }
+    std::stringstream t_stringstream;
+    t_stringstream<<std::setw(lastNHex)<<std::setfill('0')<<std::hex<<_state[nWords-1];
+    for(unsigned iWord=1; iWord<nWords; iWord++){
+      t_stringstream<<std::setw(8)<<std::setfill('0')<<std::hex<<_state[nWords-1-iWord];
+    }
+    return t_stringstream.str();
 }
 
 inline

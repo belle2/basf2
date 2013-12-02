@@ -284,14 +284,14 @@ int intersect(const TRGCDCLpar&lp1, const TRGCDCLpar&lp2, CLHEP::HepVector&v1, C
           TRGCDCLpar::Cpar cp1(lp1);
           TRGCDCLpar::Cpar cp2(lp2);
 	  for(int j=0;j<2;j++) {
-	    double s1,s2;
-	    if(j==0) {
-	      s1 = lp1.s(v1(1),v1(2));
-	      s2 = lp2.s(v1(1),v1(2));
-	    } else {
-	      s1 = lp1.s(v2(1),v2(2));
-	      s2 = lp2.s(v2(1),v2(2));
-	    }
+//jb	    double s1,s2;
+//jb	    if(j==0) {
+//jb	      s1 = lp1.s(v1(1),v1(2));
+//jb	      s2 = lp2.s(v1(1),v1(2));
+//jb	    } else {
+//jb	      s1 = lp1.s(v2(1),v2(2));
+//jb	      s2 = lp2.s(v2(1),v2(2));
+//jb	    }
 //cnv	    double phi1 = cp1.fi() + 2 * cp1.cu() * s1;
 //cnv	    double phi2 = cp2.fi() + 2 * cp2.cu() * s2;
 	    double f = (1 + 2 * cp1.cu() * cp1.da()) *

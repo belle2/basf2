@@ -111,52 +111,52 @@ namespace Belle2 {
       m_st3GeoCandidatesDiffStWiresTrackHough3D = new TClonesArray("TVectorD");
       m_stAxPhiTrackHough3D = new TClonesArray("TVectorD");
       m_eventTrackIDTrackHough3D = new TClonesArray("TVectorD");
-      m_treeTrackHough3D->Branch("st0TSsTrackHough3D", &m_st0TSsTrackHough3D);
-      m_treeTrackHough3D->Branch("st1TSsTrackHough3D", &m_st1TSsTrackHough3D);
-      m_treeTrackHough3D->Branch("st2TSsTrackHough3D", &m_st2TSsTrackHough3D);
-      m_treeTrackHough3D->Branch("st3TSsTrackHough3D", &m_st3TSsTrackHough3D);
-      m_treeTrackHough3D->Branch("driftSt0TSsTrackHough3D", &m_driftSt0TSsTrackHough3D);
-      m_treeTrackHough3D->Branch("driftSt1TSsTrackHough3D", &m_driftSt1TSsTrackHough3D);
-      m_treeTrackHough3D->Branch("driftSt2TSsTrackHough3D", &m_driftSt2TSsTrackHough3D);
-      m_treeTrackHough3D->Branch("driftSt3TSsTrackHough3D", &m_driftSt3TSsTrackHough3D);
-      m_treeTrackHough3D->Branch("fit2DTrackHough3D", &m_fit2DTrackHough3D);
-      m_treeTrackHough3D->Branch("bestFitTrackHough3D", &m_bestFitTrackHough3D);
-      m_treeTrackHough3D->Branch("mcTrackHough3D", &m_mcTrackHough3D);
-      m_treeTrackHough3D->Branch("mcStatusTrackHough3D", &m_mcStatusTrackHough3D);
-      m_treeTrackHough3D->Branch("mcVertexTrackHough3D", &m_mcVertexTrackHough3D);
-      m_treeTrackHough3D->Branch("mc4VectorTrackHough3D", &m_mc4VectorTrackHough3D);
-      m_treeTrackHough3D->Branch("bestTSsTrackHough3D", &m_bestTSsTrackHough3D);
-      m_treeTrackHough3D->Branch("mcTSsTrackHough3D", &m_mcTSsTrackHough3D);
-      m_treeTrackHough3D->Branch("mcSt0TSsTrackHough3D", &m_mcSt0TSsTrackHough3D);
-      m_treeTrackHough3D->Branch("mcSt1TSsTrackHough3D", &m_mcSt1TSsTrackHough3D);
-      m_treeTrackHough3D->Branch("mcSt2TSsTrackHough3D", &m_mcSt2TSsTrackHough3D);
-      m_treeTrackHough3D->Branch("mcSt3TSsTrackHough3D", &m_mcSt3TSsTrackHough3D);
-      m_treeTrackHough3D->Branch("performanceTrackHough3D", &m_performanceTrackHough3D);
-      m_treeTrackHough3D->Branch("deltaWireDiffTrackHough3D", &m_deltaWireDiffTrackHough3D);
-      m_treeTrackHough3D->Branch("fitZTrackHough3D", &m_fitZTrackHough3D);
-      m_treeTrackHough3D->Branch("mcStAxXYTrackHough3D", &m_mcStAxXYTrackHough3D);
-      m_treeTrackHough3D->Branch("st0GeoCandidatesPhiTrackHough3D", &m_st0GeoCandidatesPhiTrackHough3D);
-      m_treeTrackHough3D->Branch("st1GeoCandidatesPhiTrackHough3D", &m_st1GeoCandidatesPhiTrackHough3D);
-      m_treeTrackHough3D->Branch("st2GeoCandidatesPhiTrackHough3D", &m_st2GeoCandidatesPhiTrackHough3D);
-      m_treeTrackHough3D->Branch("st3GeoCandidatesPhiTrackHough3D", &m_st3GeoCandidatesPhiTrackHough3D);
-      m_treeTrackHough3D->Branch("st0GeoCandidatesDiffStWiresTrackHough3D", &m_st0GeoCandidatesDiffStWiresTrackHough3D);
-      m_treeTrackHough3D->Branch("st1GeoCandidatesDiffStWiresTrackHough3D", &m_st1GeoCandidatesDiffStWiresTrackHough3D);
-      m_treeTrackHough3D->Branch("st2GeoCandidatesDiffStWiresTrackHough3D", &m_st2GeoCandidatesDiffStWiresTrackHough3D);
-      m_treeTrackHough3D->Branch("st3GeoCandidatesDiffStWiresTrackHough3D", &m_st3GeoCandidatesDiffStWiresTrackHough3D);
-      m_treeTrackHough3D->Branch("stAxPhiTrackHough3D", &m_stAxPhiTrackHough3D);
-      m_treeTrackHough3D->Branch("eventTrackIDTrackHough3D", &m_eventTrackIDTrackHough3D);
+      m_treeTrackHough3D->Branch("st0TSsTrackHough3D", &m_st0TSsTrackHough3D,32000,0);
+      m_treeTrackHough3D->Branch("st1TSsTrackHough3D", &m_st1TSsTrackHough3D,32000,0);
+      m_treeTrackHough3D->Branch("st2TSsTrackHough3D", &m_st2TSsTrackHough3D,32000,0);
+      m_treeTrackHough3D->Branch("st3TSsTrackHough3D", &m_st3TSsTrackHough3D,32000,0);
+      m_treeTrackHough3D->Branch("driftSt0TSsTrackHough3D", &m_driftSt0TSsTrackHough3D,32000,0);
+      m_treeTrackHough3D->Branch("driftSt1TSsTrackHough3D", &m_driftSt1TSsTrackHough3D,32000,0);
+      m_treeTrackHough3D->Branch("driftSt2TSsTrackHough3D", &m_driftSt2TSsTrackHough3D,32000,0);
+      m_treeTrackHough3D->Branch("driftSt3TSsTrackHough3D", &m_driftSt3TSsTrackHough3D,32000,0);
+      m_treeTrackHough3D->Branch("fit2DTrackHough3D", &m_fit2DTrackHough3D,32000,0);
+      m_treeTrackHough3D->Branch("bestFitTrackHough3D", &m_bestFitTrackHough3D,32000,0);
+      m_treeTrackHough3D->Branch("mcTrackHough3D", &m_mcTrackHough3D,32000,0);
+      m_treeTrackHough3D->Branch("mcStatusTrackHough3D", &m_mcStatusTrackHough3D,32000,0);
+      m_treeTrackHough3D->Branch("mcVertexTrackHough3D", &m_mcVertexTrackHough3D,32000,0);
+      m_treeTrackHough3D->Branch("mc4VectorTrackHough3D", &m_mc4VectorTrackHough3D,32000,0);
+      m_treeTrackHough3D->Branch("bestTSsTrackHough3D", &m_bestTSsTrackHough3D,32000,0);
+      m_treeTrackHough3D->Branch("mcTSsTrackHough3D", &m_mcTSsTrackHough3D,32000,0);
+      m_treeTrackHough3D->Branch("mcSt0TSsTrackHough3D", &m_mcSt0TSsTrackHough3D,32000,0);
+      m_treeTrackHough3D->Branch("mcSt1TSsTrackHough3D", &m_mcSt1TSsTrackHough3D,32000,0);
+      m_treeTrackHough3D->Branch("mcSt2TSsTrackHough3D", &m_mcSt2TSsTrackHough3D,32000,0);
+      m_treeTrackHough3D->Branch("mcSt3TSsTrackHough3D", &m_mcSt3TSsTrackHough3D,32000,0);
+      m_treeTrackHough3D->Branch("performanceTrackHough3D", &m_performanceTrackHough3D,32000,0);
+      m_treeTrackHough3D->Branch("deltaWireDiffTrackHough3D", &m_deltaWireDiffTrackHough3D,32000,0);
+      m_treeTrackHough3D->Branch("fitZTrackHough3D", &m_fitZTrackHough3D,32000,0);
+      m_treeTrackHough3D->Branch("mcStAxXYTrackHough3D", &m_mcStAxXYTrackHough3D,32000,0);
+      m_treeTrackHough3D->Branch("st0GeoCandidatesPhiTrackHough3D", &m_st0GeoCandidatesPhiTrackHough3D,32000,0);
+      m_treeTrackHough3D->Branch("st1GeoCandidatesPhiTrackHough3D", &m_st1GeoCandidatesPhiTrackHough3D,32000,0);
+      m_treeTrackHough3D->Branch("st2GeoCandidatesPhiTrackHough3D", &m_st2GeoCandidatesPhiTrackHough3D,32000,0);
+      m_treeTrackHough3D->Branch("st3GeoCandidatesPhiTrackHough3D", &m_st3GeoCandidatesPhiTrackHough3D,32000,0);
+      m_treeTrackHough3D->Branch("st0GeoCandidatesDiffStWiresTrackHough3D", &m_st0GeoCandidatesDiffStWiresTrackHough3D,32000,0);
+      m_treeTrackHough3D->Branch("st1GeoCandidatesDiffStWiresTrackHough3D", &m_st1GeoCandidatesDiffStWiresTrackHough3D,32000,0);
+      m_treeTrackHough3D->Branch("st2GeoCandidatesDiffStWiresTrackHough3D", &m_st2GeoCandidatesDiffStWiresTrackHough3D,32000,0);
+      m_treeTrackHough3D->Branch("st3GeoCandidatesDiffStWiresTrackHough3D", &m_st3GeoCandidatesDiffStWiresTrackHough3D,32000,0);
+      m_treeTrackHough3D->Branch("stAxPhiTrackHough3D", &m_stAxPhiTrackHough3D,32000,0);
+      m_treeTrackHough3D->Branch("eventTrackIDTrackHough3D", &m_eventTrackIDTrackHough3D,32000,0);
 
       m_treeEventHough3D = new TTree("m_treeEventHough3D","event");
       m_performanceEventHough3D = new TVectorD(1);
-      m_treeEventHough3D->Branch("performanceEventHough3D", &m_performanceEventHough3D);
+      m_treeEventHough3D->Branch("performanceEventHough3D", &m_performanceEventHough3D,32000,0);
 
       m_treeConstantsHough3D = new TTree("m_treeConstantsHough3D", "constants");
       m_geometryHough3D = new TVectorD(16);
       m_modeHough3D = new TVectorD(1);
       m_initVariablesHough3D = new TVectorD(6);
-      m_treeConstantsHough3D->Branch("geometryHough3D", &m_geometryHough3D);
-      m_treeConstantsHough3D->Branch("modeHough3D", &m_modeHough3D);
-      m_treeConstantsHough3D->Branch("initVariablesHough3D", &m_initVariablesHough3D);
+      m_treeConstantsHough3D->Branch("geometryHough3D", &m_geometryHough3D,32000,0);
+      m_treeConstantsHough3D->Branch("modeHough3D", &m_modeHough3D,32000,0);
+      m_treeConstantsHough3D->Branch("initVariablesHough3D", &m_initVariablesHough3D,32000,0);
 
       // Save geometry to root file.
       TVectorD &geometryHough3D = *m_geometryHough3D;
@@ -461,7 +461,7 @@ namespace Belle2 {
       if (aTrack.charge() < 0) fitPhi0 = aTrack.p().phi() + M_PI / 2; 
       // Need to do 2D fitting here one more time
       // Get phi and rr for Ax.
-      double axPhi[5];
+      double axPhi[5]={0,0,0,0,0};
       for (int iLayer=0; iLayer<5; iLayer++){
         const vector<TCLink *> & links = aTrack.links(2*iLayer);
         const unsigned nSegments = links.size();
@@ -514,7 +514,7 @@ namespace Belle2 {
 
       // Get results of finder
       const TCSHit* p_bestTS[4]={0,0,0,0};
-      double bestZ0,bestCot,houghMax,minDiffHough;
+      double bestZ0,bestCot,houghMax,minDiffHough = 0;
       double bestTS[4];
       vector<double> tempResult;
       m_Hough3DFinder->getValues("bestTSIndex",tempResult);

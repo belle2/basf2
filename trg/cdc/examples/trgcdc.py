@@ -32,9 +32,9 @@ particlegun.param('yVertexParams', [0, 0])
 particlegun.param('zVertexParams', [0, 0])
 
 #Register modules
-eventinfosetter  = register_module('EventInfoSetter')
-eventinfoprinter = register_module('Progress')
-#eventinfoprinter = fw.register_module("EventInfoPrinter")
+evtmetagen  = register_module('EvtMetaGen')
+evtmetainfo = register_module('Progress')
+#evtmetainfo = fw.register_module("EvtMetaInfo")
 paramloader = register_module('Gearbox')
 geobuilder = register_module('Geometry')
 #geobuilder.log_level = LogLevel.INFO
@@ -49,16 +49,25 @@ cdctrg      = fw.register_module("TRGCDC")
 #    "physics.mac" is located at "trg/examples/".
 #g4sim.param('UICommands',['/control/execute physics.mac'])
 
-#...EventInfoSetter...
-eventinfosetter.param({'EvtNumList': [2], 'RunList': [1]})
+#...EvtMetaGen...
+evtmetagen.param({'EvtNumList': [2], 'RunList': [1]})
 
 #...GeoBuilder... Exclude detectors other than CDC
 geobuilder.param('Components', ['MagneticField', 'CDC'])
 
 #...CDC Trigger...
-cdctrg.param('ConfigFile', os.path.join(basf2datadir,"trg/TRGCDCConfig_0_20101111_1051.dat"))
-cdctrg.param('InnerTSLUTDataFile', os.path.join(basf2datadir,"trg/LRLUT.coe"))
-cdctrg.param('OuterTSLUTDataFile', os.path.join(basf2datadir,"trg/LRLUT.coe"))
+cdctrg.param('ConfigFile', os.path.join(basf2datadir,"trg/cdc/TRGCDCConfig_0_20101111_1051.dat"))
+cdctrg.param('InnerTSLUTDataFile', os.path.join(basf2datadir,"trg/cdc/LRLUT.coe"))
+cdctrg.param('OuterTSLUTDataFile', os.path.join(basf2datadir,"trg/cdc/LRLUT.coe"))
+cdctrg.param('TSFLUTSL0DataFile', os.path.join(basf2datadir,"trg/cdc/TSF.FPGA.SL0.coe"))
+cdctrg.param('TSFLUTSL1DataFile', os.path.join(basf2datadir,"trg/cdc/TSF.FPGA.SL1.coe"))
+cdctrg.param('TSFLUTSL2DataFile', os.path.join(basf2datadir,"trg/cdc/TSF.FPGA.SL2.coe"))
+cdctrg.param('TSFLUTSL3DataFile', os.path.join(basf2datadir,"trg/cdc/TSF.FPGA.SL3.coe"))
+cdctrg.param('TSFLUTSL4DataFile', os.path.join(basf2datadir,"trg/cdc/TSF.FPGA.SL4.coe"))
+cdctrg.param('TSFLUTSL5DataFile', os.path.join(basf2datadir,"trg/cdc/TSF.FPGA.SL5.coe"))
+cdctrg.param('TSFLUTSL6DataFile', os.path.join(basf2datadir,"trg/cdc/TSF.FPGA.SL6.coe"))
+cdctrg.param('TSFLUTSL7DataFile', os.path.join(basf2datadir,"trg/cdc/TSF.FPGA.SL7.coe"))
+cdctrg.param('TSFLUTSL8DataFile', os.path.join(basf2datadir,"trg/cdc/TSF.FPGA.SL8.coe"))
 cdctrg.param('DebugLevel', 10)
 cdctrg.param('CurlBackStop', 1)
 cdctrg.param('SimulationMode', 3)
@@ -70,6 +79,14 @@ cdctrg.param('2DFinderPerfect',1)
 #cdctrg.param('RootTRGCDCFile', 'TRGCDC.root')
 #cdctrg.param('RootFitter3DFile', 'Fitter3D.root')
 #cdctrg.param('Fitter3DLRLUT', 0)
+#cdctrg.param('TRGCDCRootFile',1)
+#cdctrg.param('TSFRootFile',1)
+#cdctrg.param('Hough3DRootFile',1)
+#cdctrg.param('Fitter3DRootFile',1)
+# 0: perfect finder, 1: Hough3DFinder, 2: (Default) GeoFinder, 3: VHDL GeoFinder
+#cdctrg.param('Finder3DMode',2)
+# 0: (Default) Logic TSF, 1: LUT TSF
+#cdctrg.param('TSFLogicLUT', 1)
 
 #set mcprinter
 mcparticleprinter = register_module('PrintMCParticles')
@@ -98,8 +115,8 @@ evtgeninput.param('boost2LAB', True)
 main = create_path()
 
 #Add modules to paths
-main.add_module(eventinfosetter)
-main.add_module(eventinfoprinter)
+main.add_module(evtmetagen)
+main.add_module(evtmetainfo)
 main.add_module(paramloader)
 main.add_module(geobuilder)
 main.add_module(particlegun)

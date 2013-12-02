@@ -2,25 +2,47 @@ Import('env')
 
 import os
 from SCons.Script import *
+from SCons.Scanner.C import CScanner
 
-# define directories and targets
-sourcedir = os.path.abspath('code')
-cmakefile = os.path.join(sourcedir, 'CMakeLists.txt')
-builddir = os.path.join(env.subst('$BUILDDIR'), 'genfit2')
-makefile = os.path.join(builddir, 'Makefile')
-libfile = os.path.join(builddir, 'lib', 'libgenfit2.so')
-extincdir = env['EXTINCDIR']
-swigincdir = os.path.join(extincdir, 'rave', 'swig')
+# genfit2 directories
+dirs = ['core', 'eventDisplay', 'fields', 'finitePlanes', 'fitters', 'GBL', 'GFRave', 'measurements', 'trackReps', 'utilities']
 
-# build genfit2
-env.Command(builddir, cmakefile, Mkdir('$TARGET'))
-env.Command(makefile, cmakefile, 'cd ${TARGET.dir} && cmake -DRAVE_CFLAGS="-DRAVE;-DRaveDllExport=;-DWITH_FLAVORTAGGING;-DWITH_KINEMATICS;-I%s;-I%s" -DRAVE_LDFLAGS="-L%s;-lRaveBase;-lRaveCore;-lRaveVertex;-lRaveFlavorTag;-lRaveVertexKinematics" -DRAVE_INCLUDE_DIRS="%s;%s" %s' % (extincdir, swigincdir, env['EXTLIBDIR'], extincdir, swigincdir, sourcedir))
-env.Command(libfile, makefile, 'cd ${SOURCE.dir} && make')
+# remove genfit1 from include path and add genfit2 to it
+env['CCFLAGS'].remove('-I' + os.path.join(env['EXTINCDIR'], 'genfit'))
+env.Append(CPPPATH = os.path.join(env['INCDIR'], 'genfit'))
 
-# install header files and library
-includes = env.Install(os.path.join(env['INCDIR'], 'genfit2'), Glob(os.path.join(sourcedir, '*', 'include', '*.h')))
+# install header files
+includes = env.Install(os.path.join(env['INCDIR'], 'genfit'), Glob(os.path.join('code', '*', 'include', '*.h')))
 env.Alias('genfit2', includes)
-lib = env.Install(env['LIBDIR'], libfile)
+
+# collect source files
+source_files = []
+for dir in dirs:
+    source_files.append([os.path.join(env['BUILDDIR'], 'genfit2', str(source_file)) for source_file in Glob(os.path.join('code', dir, 'src', '*.cc'))])
+
+# builder for root dictionaries
+rootcint = Builder(action='rootcint -f $TARGET -c -p $CINTFLAGS $_CPPDEFFLAGS $_CPPINCFLAGS $SOURCES', source_scanner=CScanner())
+env['BUILDERS']['RootCint'] = rootcint
+
+# generate, build, and collect dictionary files
+dict_files = []
+for dir in dirs:
+    linkdef_files = Glob(os.path.join('code', dir, 'src', '*LinkDef.h'))
+    for linkdef_file in linkdef_files:
+        dict_filename = str(linkdef_file).replace(os.sep, '_')[:-9] + 'Dict.cc'
+        header_files = Glob(os.path.join('code', dir, 'include', '*.h'))
+        if dir == 'core':
+            header_files += Glob(os.path.join('code', 'finitePlanes', 'include', '*.h'))
+        elif dir == 'GBL':
+    	    header_files = [os.path.join('code', dir, 'include', 'GFGbl.h')]
+        elif dir == 'GFRave':
+            header_files = [os.path.join('code', dir, 'include', 'GFRaveVertex.h'), os.path.join('code', dir, 'include', 'GFRaveTrackParameters.h')]
+        header_files = [os.path.join(env['INCDIR'], 'genfit', os.path.basename(str(header_file))) for header_file in header_files]
+        dict_file = env.RootCint(os.path.join(env['BUILDDIR'], dict_filename), header_files + [linkdef_file])
+        dict_files.append(env.SharedObject(dict_file, CPPPATH=['#'] + env['CPPPATH']))
+
+# build library
+lib = env.SharedLibrary(os.path.join(env['LIBDIR'], 'libgenfit2.so'), [source_files, dict_files])
 env.Alias('genfit2', lib)
 
 env['CONTINUE'] = False

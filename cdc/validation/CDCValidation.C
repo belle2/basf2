@@ -48,11 +48,11 @@
 
 
 // Definitions of files
-const string cInRoot = "EvtGenSimRec.root";  // input root file
+const string cInRoot = "../CDCOutputGen.root";  // input root file
+const string cOutRootSL  = "CDCValidation.root";       // output root file (super layer histograms)
 const string cOutRootAll = "CDCvalidatationAll.root";      // output root file (all histograms)
-const string cOutRootSL  = "CDCvalidation.root";       // output root file (super layer histograms)
 const string cOutDraw = "CDCvalidation.pdf";             // output drawing file
-                                                //  filetype: ps or pdf 
+
 const string cOutDrawInit = cOutDraw+"(";
 const string cOutDrawFinal = cOutDraw+")";
 
@@ -65,7 +65,7 @@ const Int_t kWriteHisto = 1;       // 0: Disable   1: Enable
 
 // Drawing option
 const Int_t kDrawFitting    = 0;   // 0: Disable   1: Enable
-const Int_t kDrawLayerHisto = 1;   // 0: Disable   1: Enable
+const Int_t kDrawLayerHisto = 0;   // 0: Disable   1: Enable
 
 
 // Bin definitions for TDC histograms
@@ -138,7 +138,7 @@ void FillHisto();                      // Fill histograms for all the layers
 void PlotHisto();                      // Draw histograms on canvases on the screen
 void PrintHisto();                     // Save drawing files of the canvases for layer histograms
 void WriteHisto();                     // Save histograms to a root file
-Int_t CDCvalidation();                 // Main macro for plotting, printing and saving
+Int_t CDCValidation();                 // Main macro for plotting, printing and saving
 
 
 void SetLayerID()
@@ -692,12 +692,12 @@ void WriteHisto()
 }
 
 
-Int_t CDCvalidation()
+Int_t CDCValidation()
 {
 
   SetLayerID();
   FillHisto();
-  PlotHisto();
+  //  PlotHisto();
   if(kDrawLayerHisto){
     PrintHisto();
   }

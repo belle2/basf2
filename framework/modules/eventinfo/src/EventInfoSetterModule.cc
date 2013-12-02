@@ -21,8 +21,6 @@ using namespace Belle2;
 //                 Register the Module
 //-----------------------------------------------------------------
 REG_MODULE(EventInfoSetter)
-REG_MODULE(EvtMetaGen)
-REG_MODULE(EventNumbers)
 
 //-----------------------------------------------------------------
 //                 Implementation

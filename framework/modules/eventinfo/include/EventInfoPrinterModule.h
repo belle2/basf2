@@ -63,18 +63,4 @@ namespace Belle2 {
     virtual void endRun();
   };
 
-  /** for compatibility.
-   *
-   * @deprecated
-   */
-  class EvtMetaInfoModule : public EventInfoPrinterModule {
-  public:
-    EvtMetaInfoModule() : EventInfoPrinterModule() {
-      setDescription("Deprecated, use the EventInfoPrinter module instead.");
-    }
-    virtual void initialize() {
-      B2WARNING("Deprecated, use the EventInfoPrinter module instead.");
-      EventInfoPrinterModule::initialize();
-    }
-  };
 }

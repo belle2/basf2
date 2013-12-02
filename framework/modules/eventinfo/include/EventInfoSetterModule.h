@@ -26,7 +26,7 @@ namespace Belle2 {
    */
 
   /**
-   * The event meta data generator module.
+   * Module to set event, run, experiment numbers.
    *
    * This module generates the event meta data information
    * like experiment, run and event number. It is meant to
@@ -79,34 +79,5 @@ namespace Belle2 {
     std::vector<int> m_expList;      /**< The list (column) of experiments. */
     std::vector<int> m_runList;      /**< The list (column) of runs. */
     std::vector<int> m_evtNumList;   /**< The list (column) of the number of events which should be processed. */
-  };
-
-  /** for compatibility.
-   *
-   * @deprecated
-   */
-  class EvtMetaGenModule : public EventInfoSetterModule {
-  public:
-    EvtMetaGenModule() : EventInfoSetterModule() {
-      setDescription("Deprecated, use the EventInfoSetter module instead.");
-    }
-    virtual void initialize() {
-      B2WARNING("Deprecated, use the EventInfoSetter module instead.");
-      EventInfoSetterModule::initialize();
-    }
-  };
-  /** for compatibility.
-   *
-   * @deprecated
-   */
-  class EventNumbersModule : public EventInfoSetterModule {
-  public:
-    EventNumbersModule() : EventInfoSetterModule() {
-      setDescription("Deprecated, use the EventInfoSetter module instead.");
-    }
-    virtual void initialize() {
-      B2WARNING("Deprecated, use the EventInfoSetter module instead.");
-      EventInfoSetterModule::initialize();
-    }
   };
 }

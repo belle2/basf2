@@ -50,7 +50,7 @@
 // Definitions of files
 const string cInRoot = "../CDCOutputGen.root";  // input root file
 const string cOutRootSL  = "CDCValidation.root";       // output root file (super layer histograms)
-const string cOutRootAll = "CDCvalidatationAll.root";      // output root file (all histograms)
+
 const string cOutDraw = "CDCvalidation.pdf";             // output drawing file
 
 const string cOutDrawInit = cOutDraw+"(";
@@ -657,21 +657,6 @@ void PrintHisto()
 
 void WriteHisto()
 {
-
-  TFile *flOutRoot = new TFile(cOutRootAll.c_str(), "recreate");
-
-  for(Int_t iLayer = 0; iLayer<MAXLAYER; iLayer++){
-    hHitPattern[iLayer]->Write();
-    hTDC[iLayer]->Write();
-    hADC[iLayer]->Write();
-    hADCfit[iLayer]->Write();
-    hADCTDC[iLayer]->Write();
-  }
-
-  hmeanADC->Write();
-  hsigmaADC->Write();
-
-  flOutRoot->Close();
 
 
   TFile *flOutRootSL = new TFile(cOutRootSL.c_str(), "recreate");

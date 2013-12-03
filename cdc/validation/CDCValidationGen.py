@@ -43,9 +43,9 @@ particlegun.param({  # Generate 5 tracks (on average)
                      # all tracks sharing the same vertex per event
     'nTracks': 1,
     'varyNTracks': False,
-    'pdgCodes': [211, -211, 11, -11],
-    'momentumGeneration': 'normal',
-    'momentumParams': [2, 0.2],
+    'pdgCodes': [211, -211],
+    'momentumGeneration': 'uniform',
+    'momentumParams': [0.2, 3.0],
     'phiGeneration': 'uniform',
     'phiParams': [0, 360],
     'thetaGeneration': 'uniformCosinus',

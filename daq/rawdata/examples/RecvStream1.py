@@ -47,7 +47,7 @@ receiver.param('HostNameFrom', ['localhost', 'cpr007'])
 receiver.param('PortFrom', [int(argvs[2]), int(argvs[2])])
 receiver.param('EventDataBufferWords', 4801)
 receiver.param('MaxTime', -1.)
-# receiver.param('MaxEventNum', 400000)
+# receiver.param('MaxEventNum', 5000)
 receiver.param('MaxEventNum', -1)
 
 use_shm_flag = int(argvs[1])
@@ -67,10 +67,10 @@ histo.param('HistoFileName', 'ropc_histofile.root')
 monitor = register_module('MonitorDataCOPPER')
 
 # Dump
-# dump.param('outputFileName', 'root_output.root')
+dump.param('outputFileName', 'root_output.root')
 #
 # dump.param('outputFileName', 'root_output.sroot')
-dump.param('outputFileName', '/dev/null')
+# dump.param('outputFileName', '/dev/null')
 # dump.param('compressionLevel', 0)
 
 # Sender
@@ -92,8 +92,8 @@ main = create_path()
 main.add_module(receiver)
 # main.add_module(histo)
 # main.add_module(monitor)
-# main.add_module(dump)
-main.add_module(sender)
+main.add_module(dump)
+# main.add_module(sender)
 
 # main.add_module(output)
 # main.add_module(perf)

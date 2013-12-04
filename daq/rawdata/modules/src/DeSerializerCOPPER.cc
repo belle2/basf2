@@ -9,15 +9,12 @@
 #include <daq/rawdata/modules/DeSerializerCOPPER.h>
 
 #define CHECKEVT 10000
-
-
 //#define CHECK_SUM
 //#define DUMMY
 //#define MAXEVTSIZE 400000000
 //#define TIME_MONITOR
-#define NO_DATA_CHECK
-#define TAIL_EVENT32
-#define DUMMY_EVENT_NUM
+//#define NO_DATA_CHECK
+#define WO_FIRST_EVENUM_CHECK
 
 
 using namespace std;
@@ -44,9 +41,6 @@ DeSerializerCOPPERModule::DeSerializerCOPPERModule() : DeSerializerModule()
 
   //Parameter definition
   B2INFO("DeSerializerCOPPER: Constructor done.");
-
-  m_ftsweve_upper16bit = 0;
-  m_prev_ftsweve16 = 0;
   m_prev_ftsweve32 = 0xFFFFFFFF;
 
 }
@@ -170,36 +164,18 @@ void DeSerializerCOPPERModule::FillNewRawCOPPERHeader(RawCOPPER* raw_copper)
   rawhdr.SetExpRunNumber(raw_copper->GetExpRunBuf(cprblock));       // Fill 3rd header word
 
   // 3, Make 32bit event number from B2link FEE header
-#ifdef TAIL_EVENT32
-  unsigned int cur_ftsw_eve32 = raw_copper->GetTail32bitEventNumber(cprblock);
-  unsigned int cur_ftsw_eve16 = cur_ftsw_eve32 & 0xFFFF;
-#else
-  unsigned int cur_ftsw_eve16 = raw_copper->GetFTSW16bitEventNumber(cprblock);
-  unsigned int cur_ftsw_eve32 = ((m_ftsweve_upper16bit << 16) & 0xFFFF0000) | (cur_ftsw_eve16 & 0x0000FFFF);
-  if (cur_ftsw_eve16 < m_prev_ftsweve16) {
-    if (cur_ftsw_eve16 == 0) {
-      m_ftsweve_upper16bit++;
-      cur_ftsw_eve32 = ((m_ftsweve_upper16bit << 16) & 0xFFFF0000) | (cur_ftsw_eve16 & 0x0000FFFF);
-    } else {
-#ifndef NO_DATA_CHECK
-      char err_buf[500];
-      sprintf(err_buf, "Invalid 16bit event_number. Exiting...: cur 32bit eve %u preveve %u\n",  cur_ftsw_eve16, m_prev_ftsweve16);
-      print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-      exit(-1);
-#endif
-    }
-  }
-#endif
+  unsigned int cur_ftsw_eve32 =  raw_copper->GetB2LFEE32bitEventNumber(cprblock);
+  //((m_ftsweve_upper16bit << 16) & 0xFFFF0000) | (cur_ftsw_eve16 & 0x0000FFFF);
 
 #ifdef DUMMY_EVENT_NUM
   cur_ftsw_eve32 = m_prev_ftsweve32 + 1;
-  cur_ftsw_eve16 = cur_ftsw_eve32 & 0xFFFF;
 #endif
 
   rawhdr.SetEveNo(cur_ftsw_eve32);       // Temporarily use COPPER counter   //raw_copper->GetCOPPERCounter()
 
   // Set FTSW word
-  rawhdr.SetFTSW2Words(raw_copper->GetFTSW2Words(cprblock));
+
+  rawhdr.SetFTSW2Words(raw_copper->GetB2LFEETtCtime(cprblock), raw_copper->GetB2LFEETtUtime(cprblock));
 
 #ifdef debug
   printf("1: i= %d : num entries %d : Tot words %d\n", 0 , raw_copper->GetNumEntries(), raw_copper->TotalBufNwords());
@@ -262,14 +238,25 @@ void DeSerializerCOPPERModule::FillNewRawCOPPERHeader(RawCOPPER* raw_copper)
   }
 
   // 3, event # increment check
+#ifdef WO_FIRST_EVENUM_CHECK
+  if ((m_prev_ftsweve32 + 1 != cur_ftsw_eve32) && (m_prev_ftsweve32 != 0xFFFFFFFF)) {
+#else
   if (m_prev_ftsweve32 + 1 != cur_ftsw_eve32) {
+#endif
     char err_buf[500];
     sprintf(err_buf, "Invalid event_number. Exiting...: cur 32bit eve %u preveve %u\n",  cur_ftsw_eve32, m_prev_ftsweve32);
     print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+
+    printf("i= %d : num entries %d : Tot words %d\n", 0 , raw_copper->GetNumEntries(), raw_copper->TotalBufNwords());
+    for (int j = 0; j < raw_copper->TotalBufNwords(); j++) {
+      printf("0x%.8x ", (raw_copper->GetBuffer(0))[ j ]);
+      if ((j % 10) == 9)printf("\n");
+      fflush(stdout);
+    }
+
     exit(-1);
   }
 #endif
-  m_prev_ftsweve16 = cur_ftsw_eve16;
   m_prev_ftsweve32 = cur_ftsw_eve32;
   // Check magic words are set at proper positions
 
@@ -407,7 +394,7 @@ void DeSerializerCOPPERModule::OpenCOPPER()
     exit(1);
   }
 
-  int set_regval = 10; // How many events to be stored in COPPER FIFO before request for DMA
+  int set_regval = 4; // How many events to be stored in COPPER FIFO before request for DMA
   //    int set_regval=1;
   ioctl(cpr_fd, CPRIOSET_LEF_WA_FF, &set_regval);
   ioctl(cpr_fd, CPRIOSET_LEF_WB_FF, &set_regval);
@@ -532,8 +519,8 @@ void DeSerializerCOPPERModule::event()
     struct tm* t_st;
     time(&timer);
     t_st = localtime(&timer);
-    printf("Event %d TotRecvd %.1lf [MB] ElapsedTime %.1lf [s] EvtRate %.2lf [kHz] RcvdRate %.2lf [MB/s] %s",
-           n_basf2evt, m_totbytes / 1.e6, total_time, (n_basf2evt - m_prev_nevt) / interval / 1.e3 * NUM_EVT_PER_BASF2LOOP, (m_totbytes - m_prev_totbytes) / interval / 1.e6, asctime(t_st));
+    printf("Event %d(%d) TotRecvd %.1lf [MB] ElapsedTime %.1lf [s] EvtRate %.2lf [kHz] RcvdRate %.2lf [MB/s] %s",
+           n_basf2evt, m_prev_ftsweve32,  m_totbytes / 1.e6, total_time, (n_basf2evt - m_prev_nevt) / interval / 1.e3 * NUM_EVT_PER_BASF2LOOP, (m_totbytes - m_prev_totbytes) / interval / 1.e6, asctime(t_st));
     fflush(stdout);
     m_prev_time = cur_time;
     m_prev_totbytes = m_totbytes;

@@ -10,18 +10,13 @@
 #define RAWHEADER_H
 
 #include <string.h>
-
-#include <framework/datastore/DataStore.h>
-#include <daq/dataobjects/RawHeader.h>
-//#include <daq/dataobjects/RawCOPPER.h>
-
+#include <stdlib.h>
 #include <TObject.h>
 
-#include <stdlib.h>
+#include <framework/datastore/DataStore.h>
+
 
 //#define HEADER_SIZE 16
-
-
 
 namespace Belle2 {
 
@@ -54,7 +49,9 @@ namespace Belle2 {
     void SetDataType(int data_type);    //! set contents of header
     void SetTruncMask(int trunc_mask);    //! set contents of header
     void SetB2LFEEHdrPart(unsigned int word1, unsigned int word2);   //! set contents of header
+
     void SetFTSW2Words(int* ftsw_buf);
+    void SetFTSW2Words(unsigned int word1, unsigned int word2);
     void SetExpRunNumber(int* exprun_buf);
 
     void SetOffset1stFINESSE(int offset_1st_FINESSE);    //! set contents of header

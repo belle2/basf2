@@ -6,7 +6,8 @@
 // Date : 2 - Aug - 2013
 //-
 
-#include "daq/dataobjects/RawHeader.h"
+#include <daq/dataobjects/RawHeader.h>
+
 
 using namespace std;
 using namespace Belle2;
@@ -151,6 +152,14 @@ void RawHeader::SetFTSW2Words(int* ftsw_buf)
 {
   CheckSetBuffer();
   memcpy(&(m_buffer[ POS_HSLB_1 ]), (char*)ftsw_buf, sizeof(int) * 2);
+  return;
+}
+
+void RawHeader::SetFTSW2Words(unsigned int word1, unsigned int word2)
+{
+  CheckSetBuffer();
+  m_buffer[ POS_HSLB_1 ] = word1;
+  m_buffer[ POS_HSLB_2 ] = word2;
   return;
 }
 

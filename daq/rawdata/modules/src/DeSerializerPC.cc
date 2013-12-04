@@ -23,7 +23,7 @@
 //#define TIME_MONITOR
 //#define DEBUG
 
-#define NO_DATA_CHECK
+//#define NO_DATA_CHECK
 
 using namespace std;
 using namespace Belle2;

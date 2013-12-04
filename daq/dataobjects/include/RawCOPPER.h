@@ -21,7 +21,7 @@
 
 #include <TObject.h>
 
-//#define USE_B2LFEE_FORMAT_BOTH_VER1_AND_2
+#define USE_B2LFEE_FORMAT_BOTH_VER1_AND_2
 
 
 namespace Belle2 {
@@ -158,20 +158,20 @@ namespace Belle2 {
     //! get data size of  FINESSE slot D buffer
     int Get4thFINESSENwords(int n);
 
+    //! For copying FTSW word1 (FEE header)
+    unsigned int GetB2LHeaderWord(int n, int finesse_buffer_pos);
+
     //
     // Get information from "B2link(attached by FEE and HLSB) header"
     //
     //! get b2l block from "FEE b2link header"
-    virtual int* GetFTSW2Words(int n);
+    //    virtual int* GetFTSW2Words(int n);
 
     //! get b2l block from "FEE b2link header"
     virtual int* GetExpRunBuf(int n);
 
     //! get b2l block from "FEE b2link header"
-    virtual unsigned int GetFTSW16bitEventNumber(int n);
-
-    //! get b2l block from "FEE b2link header"
-    virtual unsigned int GetTail32bitEventNumber(int n);
+    virtual unsigned int GetB2LFEE32bitEventNumber(int n);
 
     //! get Event unixtime from "FEE b2link header"
     double GetEventUnixTime(int n);
@@ -194,10 +194,17 @@ namespace Belle2 {
     //! Check if COPPER Magic words are correct
     bool CheckCOPPERMagic(int n);
 
-    /* #ifdef USE_B2LFEE_FORMAT_BOTH_VER1_AND_2 */
-    /*     //! Check B2LFEE header version */
-    /*     int CheckB2LFEEHeaderVersion( int  n ); */
-    /* #endif */
+#ifdef USE_B2LFEE_FORMAT_BOTH_VER1_AND_2
+    //! Check B2LFEE header version
+    void CheckB2LFEEHeaderVersion(int  n);
+#endif
+
+    //! Check if COPPER Magic words are correct
+    unsigned int GetB2LFEETtCtime(int n);
+
+    //! Check if COPPER Magic words are correct
+    unsigned int GetB2LFEETtUtime(int n);
+
 
 
     //
@@ -256,18 +263,23 @@ namespace Belle2 {
 
     //
     // Data Format : "B2Link FEE Header"
-    //
+    // modified by Nov. 21, 2013, Nakao-san's New firmware?
     enum {
-      POS_FTSW1 = 0,
-      POS_FTSW2 = 1,
-      POS_EXP_RUN = 2,
-      POS_B2L_TIME = 3,
-
-      SIZE_B2LFEE_HEADER = 4 // modified by Oct.3, 2013, Nakao-san's New firmware?
-                           //      SIZE_B2LFEE_HEADER = 1  // As of Aug.22,2013, the header size is one word. It should be 2 in future.
+      POS_TT_CTIME_TYPE = 0,
+      POS_TT_TAG = 1,
+      POS_TT_UTIME = 2,
+      POS_EXP_RUN = 3,
+      POS_B2L_CTIME = 4,
+      SIZE_B2LFEE_HEADER = 5
     };
-
-
+    /* Old version before Nov. 21, 2013 */
+    /*     enum { */
+    /*       POS_FTSW1 = 0, */
+    /*       POS_FTSW2 = 1, */
+    /*       POS_EXP_RUN = 2, */
+    /*       POS_B2L_TIME = 3, */
+    /*       SIZE_B2LFEE_HEADER = 4
+    /*     }; */
 
     //
     // Data Format : B2Link FEE Trailer

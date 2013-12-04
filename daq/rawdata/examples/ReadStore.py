@@ -29,7 +29,7 @@ input = register_module('RootInput')
 # input.param('iutputFileName', 'RootOutput1.root')
 
 # output
-output = register_module('PrintData')
+output = register_module('PrintDataTemplate')
 
 # dump
 dump = register_module('RootOutput')

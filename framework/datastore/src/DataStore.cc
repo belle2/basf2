@@ -275,8 +275,10 @@ bool DataStore::addRelation(const TObject* fromObject, DataStore::StoreEntry*& f
   }
 
   // add relation
-  TClonesArray& relations = static_cast<RelationContainer*>(entry->ptr)->elements();
+  RelationContainer* relContainer = static_cast<RelationContainer*>(entry->ptr);
+  TClonesArray& relations = relContainer->elements();
   new(relations.AddrAt(relations.GetLast() + 1)) RelationElement(fromIndex, toIndex, weight);
+  relContainer->setModified(true);
   return true;
 }
 

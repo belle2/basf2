@@ -448,13 +448,39 @@ namespace Belle2 {
     EXPECT_FALSE((relObjData)[0]->addRelationTo(&notInArray));
   }
 
+  /** Test updating of index after using addRelation. */
+  TEST_F(RelationTest, IndexUpdating)
+  {
+    DataStore::Instance().setInitializeActive(true);
+    RelationArray(relObjData, profileData).registerAsPersistent();
+    DataStore::Instance().setInitializeActive(false);
+
+    //not yet set
+    EXPECT_FALSE((relObjData)[0]->getRelated<ProfileInfo>() != NULL);
+
+    bool ret = (relObjData)[0]->addRelationTo((profileData)[0], -42.0);
+    EXPECT_TRUE(ret);
+
+    //now it should be found (index updated because RelationContainer was just created)
+    EXPECT_TRUE((relObjData)[0]->getRelated<ProfileInfo>() != NULL);
+
+    //test again with different object
+    EXPECT_FALSE((relObjData)[1]->getRelated<ProfileInfo>() != NULL);
+
+    ret = (relObjData)[1]->addRelationTo((profileData)[0], -42.0);
+    EXPECT_TRUE(ret);
+
+    //now it should be found (index updated because addRelation marks RelationContainer as modified)
+    EXPECT_TRUE((relObjData)[1]->getRelated<ProfileInfo>() != NULL);
+  }
+
   /** Test getting array name/index from a RelationsObject. */
   TEST_F(RelationTest, RelationsObjectArrayIndex)
   {
-    EXPECT_TRUE((relObjData)[0]->getArrayName() == relObjData.getName());
-    EXPECT_TRUE((relObjData)[9]->getArrayName() == relObjData.getName());
-    EXPECT_TRUE((relObjData)[0]->getArrayIndex() == 0);
-    EXPECT_TRUE((relObjData)[9]->getArrayIndex() == 9);
+    for (int i = 0; i < relObjData.getEntries(); i++) {
+      EXPECT_TRUE((relObjData)[i]->getArrayName() == relObjData.getName());
+      EXPECT_TRUE((relObjData)[i]->getArrayIndex() == i);
+    }
 
     RelationsObject bla;
     EXPECT_TRUE(bla.getArrayName() == "");

@@ -2,9 +2,9 @@
 #include <framework/logging/Logger.h>
 #include <tracking/dataobjects/Track.h>
 #include <tracking/dataobjects/TrackFitResult.h>
-#include <GFTrack.h>
+#include <genfit/Track.h>
 #include <TMatrixF.h>
-#include <RKTrackRep.h>
+#include <genfit/RKTrackRep.h>
 
 
 #include <gtest/gtest.h>

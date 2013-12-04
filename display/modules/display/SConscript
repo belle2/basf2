@@ -10,6 +10,6 @@ if env.has_key('HAS_TEVE'):
                  'vxd', 'vxd_dataobjects', 'pxd_dataobjects', 'svd_dataobjects', 'svd', 'cdc_dataobjects',
                  'cdc', 'ecl_dataobjects', 'bklm_dataobjects', 'ecl', 'generators_dataobjects', 'eklm_dataobjects',
                  'display_dataobjects',
-                 'genfit', 'genfitRK', 'gfrave'] + env['TEVE_LIBS']
+                 'genfit2'] + env['TEVE_LIBS']
 
 Return('env')

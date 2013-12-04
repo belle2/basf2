@@ -17,7 +17,7 @@
 
 #include <generators/dataobjects/MCParticle.h>
 #include <cdc/dataobjects/CDCHit.h>
-#include "GFTrackCand.h"
+#include "genfit/TrackCand.h"
 
 #include <cstdlib>
 #include <string>
@@ -31,7 +31,7 @@ REG_MODULE(CDCMCMatching)
 CDCMCMatchingModule::CDCMCMatchingModule() :
   Module()
 {
-  setDescription("Matches the GFTrackCandidates with MCTruth to evaluate the performance of the pattern recognition. Assigns to each GFTrackCandidate a relation to the MCParticle which contributed the largest amount of hits to this track candidate.");
+  setDescription("Matches the genfit::TrackCandidates with MCTruth to evaluate the performance of the pattern recognition. Assigns to each genfit::TrackCandidate a relation to the MCParticle which contributed the largest amount of hits to this track candidate.");
   setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
 
   //the collection names as parameters may soon be obsolete if we will always use the default names created automatically
@@ -40,7 +40,7 @@ CDCMCMatchingModule::CDCMCMatchingModule() :
   addParam("MCParticlesColName", m_mcParticlesCollectionName, "Name of collection holding the MCParticles", string(""));
   addParam("CDCHitsColName", m_cdcHitsCollectionName, "CDCHits collection ", string(""));
 
-  addParam("GFTrackCandidatesColName", m_gfTrackCandsCollectionName, "Name of collection holding the GFTrackCandidates (output of the pattern recognition)", string(""));
+  addParam("GFTrackCandidatesColName", m_gfTrackCandsCollectionName, "Name of collection holding the genfit::TrackCandidates (output of the pattern recognition)", string(""));
 
 }
 
@@ -50,8 +50,8 @@ CDCMCMatchingModule::~CDCMCMatchingModule()
 
 void CDCMCMatchingModule::initialize()
 {
-  StoreArray<GFTrackCand>::required(m_gfTrackCandsCollectionName);
-  RelationArray::registerPersistent<GFTrackCand, MCParticle>(m_gfTrackCandsCollectionName, m_mcParticlesCollectionName);
+  StoreArray<genfit::TrackCand>::required(m_gfTrackCandsCollectionName);
+  RelationArray::registerPersistent<genfit::TrackCand, MCParticle>(m_gfTrackCandsCollectionName, m_mcParticlesCollectionName);
 
 }
 
@@ -77,8 +77,8 @@ void CDCMCMatchingModule::event()
   if (mcPartToCDCHits.getEntries() == 0) B2WARNING("CDCMCMatching: MCParticlesToCDCHitsCollection is empty!");
 
 
-  StoreArray<GFTrackCand> gfTrackCandidates(m_gfTrackCandsCollectionName);
-  B2INFO("CDCMCMatching: Number of GFTrackCandidates: " << gfTrackCandidates.getEntries());
+  StoreArray<genfit::TrackCand> gfTrackCandidates(m_gfTrackCandsCollectionName);
+  B2INFO("CDCMCMatching: Number of genfit::TrackCandidates: " << gfTrackCandidates.getEntries());
   if (gfTrackCandidates.getEntries() == 0) B2WARNING("CDCMCMatching: GFTrackCandidatesCollection is empty!");
 
 
@@ -113,7 +113,7 @@ void CDCMCMatchingModule::event()
 
     gfTrackCandidates[i]->setMcTrackId(bestMCId.first);    //assign the ID of this MCParticle to the candidate
     //setDip will not exist anymore very soon so I (Moritz) commented it out
-    //gfTrackCandidates[i]->setDip(bestMCId.second);         //here I just 'misuse' one unused member variable from GFTrackCand called 'Dip' to store the 'purity' of the track
+    //gfTrackCandidates[i]->setDip(bestMCId.second);         //here I just 'misuse' one unused member variable from genfit::TrackCand called 'Dip' to store the 'purity' of the track
 
     //check if there is an MCParticle contributing to the track (-999 as ID means its random composition of background hits)
     if (bestMCId.first != -999) {

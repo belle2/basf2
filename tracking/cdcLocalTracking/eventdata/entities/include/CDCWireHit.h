@@ -31,7 +31,7 @@ namespace Belle2 {
      *  It forms the basis of all other higher level tracking objects.
      *  It inherits from AutomataCell since we want to use it with the Clusterizer which makes use of the cell state. \n
      *  Additionally contains references to both the CDCWire instance from the CDCTopology and the CDCHit from the StoreArray of the event. \n
-     *  Also it keeps the index of the CDCHit in the StoreArray since we will need it for later output to GFTrackCands \n
+     *  Also it keeps the index of the CDCHit in the StoreArray since we will need it for later output to genfit::TrackCands \n
      */
 
     class CDCWireHit : public AutomatonCell {

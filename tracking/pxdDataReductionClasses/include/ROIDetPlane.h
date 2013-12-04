@@ -12,13 +12,13 @@
 
 #include <pxd/geometry/SensorInfo.h>
 
-#include <GFDetPlane.h>
+#include <genfit/DetPlane.h>
 
 namespace Belle2 {
   /** ROIDetPlane describes the plane containing a sensor.
    */
 
-  class ROIDetPlane : public GFDetPlane {
+  class ROIDetPlane : public genfit::DetPlane {
 
   public:
     ROIDetPlane() {};

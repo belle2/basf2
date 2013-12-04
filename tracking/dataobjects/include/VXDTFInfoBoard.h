@@ -33,7 +33,7 @@ namespace Belle2 {
     /** getter - isFitPossible returns whether fit using GenFit within the VXDTFModule was possible or not */
     bool isFitPossible() const { return m_fitSuccessful; }
 
-    /** getter - returns index number of assigned GFTrackCand */
+    /** getter - returns index number of assigned genfit::TrackCand */
     int getAssignedGFTC() const { return m_assignedGFTC; }
 
     /** getter - returns calculated probability that assigned GFTC is real track */
@@ -56,7 +56,7 @@ namespace Belle2 {
     std::vector<int> m_indexNumbers; /**< contains index numbers of (depending on the case) TFHits, VXDSegmentCells or VXDTFTrackCandidates */
     bool m_fitSuccessful; /**< is true, when fit was successfull */
     double m_probValue; /**< probability-value calculated by kalman fit (probability that his TC is real track) */
-    int m_assignedGFTC; /**< index number of assigned GFTrackCand for unique identification */
+    int m_assignedGFTC; /**< index number of assigned genfit::TrackCand for unique identification */
 
     ClassDef(VXDTFInfoBoard, 1)
   };

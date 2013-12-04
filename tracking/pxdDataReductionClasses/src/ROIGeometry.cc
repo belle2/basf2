@@ -11,8 +11,8 @@
 
 #include "tracking/pxdDataReductionClasses/ROIGeometry.h"
 #include <framework/logging/Logger.h>
-#include <RKTrackRep.h>
-#include <GFTrack.h>
+#include <genfit/RKTrackRep.h>
+#include <genfit/Track.h>
 #include <vxd/geometry/GeoCache.h>
 #include <vxd/geometry/SensorInfoBase.h>
 
@@ -36,12 +36,12 @@ ROIGeometry::~ROIGeometry()
 
 void
 ROIGeometry::appendIntercepts(StoreArray<PXDIntercept>* listToBeFilled,
-                              RKTrackRep* theTrack, int theGFTrackCandIndex,
+                              genfit::Track* theTrack, int theGFTrackCandIndex,
                               RelationArray* gfTrackCandToPXDIntercepts)
 {
 
   TVectorD predictedIntersect;
-  TMatrixDSym covMatrix;
+  TMatrixDSym covMatrix(theTrack->getCardinalRep()->getDim());
   PXDIntercept tmpPXDIntercept;
 
   std::list<ROIDetPlane>::iterator itPlanes = m_planeList.begin();
@@ -51,17 +51,23 @@ ROIGeometry::appendIntercepts(StoreArray<PXDIntercept>* listToBeFilled,
   double lambda = 0;
 
   for (int propDir = -1; propDir <= 1; propDir += 2) {
-    theTrack->setPropDir(propDir);
+    theTrack->getCardinalRep()->setPropDir(propDir);
 
     while (itPlanes != m_planeList.end()) {
 
+      genfit::MeasuredStateOnPlane state = theTrack->getFittedState();
+
       try {
-        lambda = theTrack->extrapolate(*itPlanes, predictedIntersect, covMatrix);
+        genfit::SharedPlanePtr plane(new ROIDetPlane(*itPlanes)); // TODO: save copying
+        lambda = state.extrapolateToPlane(plane);
       }  catch (...) {
         B2WARNING("extrapolation failed");
         itPlanes++;
         continue;
       }
+
+      predictedIntersect = state.getState();
+      covMatrix = state.getCov();
 
       tmpPXDIntercept.setCoorU(predictedIntersect[3]);
       tmpPXDIntercept.setCoorV(predictedIntersect[4]);

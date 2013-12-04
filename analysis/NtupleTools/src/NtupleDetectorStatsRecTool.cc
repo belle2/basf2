@@ -31,7 +31,7 @@
 #include <svd/dataobjects/SVDCluster.h>
 #include <top/dataobjects/TOPBarHit.h>
 #include <top/dataobjects/TOPLikelihood.h>
-#include <GFTrack.h>
+#include <genfit/Track.h>
 
 void NtupleDetectorStatsRecTool::setupTree()
 {
@@ -109,7 +109,7 @@ void NtupleDetectorStatsRecTool::eval(const  Particle*)
   StoreArray<EKLMK0L>    mEKLMK0Ls;
   m_iEKLMK0Ls = (int) mEKLMK0Ls.getEntries();
 
-  StoreArray<GFTrack>    mGFTracks("");
+  StoreArray<genfit::Track>    mGFTracks("");
   m_iGFTracks = (int) mGFTracks.getEntries();
 
   StoreArray<PIDLikelihood>    mPIDLikelihoods;

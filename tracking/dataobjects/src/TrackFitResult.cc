@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/dataobjects/TrackFitResult.h>
-#include <GFAbsTrackRep.h>
+#include <genfit/AbsTrackRep.h>
 
 using namespace Belle2;
 

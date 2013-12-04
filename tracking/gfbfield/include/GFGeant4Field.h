@@ -9,14 +9,14 @@
  **************************************************************************/
 
 #pragma once
-#include <GFAbsBField.h>
+#include <genfit/AbsBField.h>
 #include <geometry/bfieldmap/BFieldMap.h>
 
 /** Interface of the Belle II B-field with GenFit.
  */
-class GFGeant4Field : public GFAbsBField {
+class GFGeant4Field : public genfit::AbsBField {
 public:
-  GFGeant4Field(): GFAbsBField(), m_bField(Belle2::BFieldMap::Instance()) {}
+  GFGeant4Field(): genfit::AbsBField(), m_bField(Belle2::BFieldMap::Instance()) {}
   TVector3 get(const TVector3& pos) const;
 
 

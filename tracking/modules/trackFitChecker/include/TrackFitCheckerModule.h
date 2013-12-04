@@ -37,7 +37,7 @@
 //#include <boost/accumulators/statistics/tail.hpp>
 #include <boost/accumulators/statistics/median.hpp>
 //genfit stuff
-#include <GFTrack.h>
+#include <genfit/Track.h>
 
 //stuff for root output
 #include <TTree.h>
@@ -48,7 +48,7 @@
 namespace Belle2 {
 
   /*!
-      This module performs a wide variety of statistical tests on the GFTrack objects created by Genfit via the GenFitter module. It is intended for tracking developers.
+      This module performs a wide variety of statistical tests on the genfit::Track objects created by Genfit via the GenFitter module. It is intended for tracking developers.
   */
 
   class TrackFitCheckerModule : public Module {
@@ -235,7 +235,7 @@ namespace Belle2 {
     /** struct to store data needed by normalTests() and truthTests() for one track. */
     struct TrackData {
 
-      int nHits; /**<number of hits in GFTrack object */
+      int nHits; /**<number of hits in genfit::Track object */
 
       //stuff for the normal layer wise tests:
 
@@ -264,11 +264,11 @@ namespace Belle2 {
     };
     TrackData m_trackData; /**< holds data needed by normalTests() and truthTests() for one track. */
     /** Reads all data from aTrackPtr that are needed for the layer wise tests. The extracted data of one track will be written into m_trackData*/
-    void extractTrackData(GFTrack* const aTrackPtr, const double charge);
+    void extractTrackData(genfit::Track* const aTrackPtr, const double charge);
 
-//    void testDaf(GFTrack* const aTrackPtr); // implementation of testDaf currently broken
+//    void testDaf(genfit::Track* const aTrackPtr); // implementation of testDaf currently broken
     /** Checks if the left/right ambiguity of all CDC hits in aTrackPtr was resolved correct or not during the track fit */
-    void testLRAmbiResolution(GFTrack* const aTrackPtr);
+    void testLRAmbiResolution(genfit::Track* const aTrackPtr);
     /** Calculates pulls and χ² of the residuals res = m -H*state for all hits. So it does _not_ need the true track state (TrueHits). Reads in the data from m_trackData that was prepared by extractTrackData*/
     void normalTests();
     /** Calculates pulls and χ² of the residuals res = state - state_true for all hits. So it needs the true track state (TrueHits). Reads in the data from m_trackData that was prepared by extractTrackData*/

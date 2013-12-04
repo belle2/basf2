@@ -23,8 +23,8 @@
 #include <svd/geometry/SensorInfo.h>
 #include <vxd/dataobjects/VxdID.h>
 
-#include "GFTrack.h"
-#include "GFTrackCand.h"
+#include "genfit/Track.h"
+#include "genfit/TrackCand.h"
 
 #include <cstdlib>
 #include <iomanip>
@@ -46,11 +46,11 @@ ExtrapolateToSVDModule::ExtrapolateToSVDModule() :
 {
 
   setDescription(
-    "Uses Tracks found (and fitted) in the CDC and extrapolates them to the SVD. Adds the most probable SVD hit candidates to the Tracks and creates new GFTrackCands collection. Execute GenFitter again after this module to refit these track candidates.");
+    "Uses Tracks found (and fitted) in the CDC and extrapolates them to the SVD. Adds the most probable SVD hit candidates to the Tracks and creates new genfit::TrackCands collection. Execute GenFitter again after this module to refit these track candidates.");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   //input
-  addParam("GFTracksColName", m_gfTracksColName, "Name of collection holding the GFTracks found in the CDC and fitted with GenFitter", string(""));
+  addParam("GFTracksColName", m_gfTracksColName, "Name of collection holding the genfit::Tracks found in the CDC and fitted with GenFitter", string(""));
   addParam("SVDHitsColName", m_svdHitsColName, "SVDHits collection", string(""));
 
   //only for crosscheck and plotting
@@ -60,7 +60,7 @@ ExtrapolateToSVDModule::ExtrapolateToSVDModule() :
   addParam("TextFileOutput", m_textFileOutput, "Set to true if some text files with hit coordinates should be created", bool(false));
 
   //output
-  addParam("GFTrackCandsColName", m_gfTrackCandsColName, "Name of collection holding the output GFTrackCands with CDC+SVD hits ready to be refitted", string("GFTrackCands_CDCSVD"));
+  addParam("GFTrackCandsColName", m_gfTrackCandsColName, "Name of collection holding the output genfit::TrackCands with CDC+SVD hits ready to be refitted", string("GFTrackCands_CDCSVD"));
 
 }
 
@@ -70,7 +70,7 @@ ExtrapolateToSVDModule::~ExtrapolateToSVDModule()
 
 void ExtrapolateToSVDModule::initialize()
 {
-  StoreArray<GFTrackCand>::registerPersistent(m_gfTrackCandsColName);
+  StoreArray<genfit::TrackCand>::registerPersistent(m_gfTrackCandsColName);
 
   if (m_textFileOutput) {
     Tracksfile.open("Tracks.txt");
@@ -86,10 +86,10 @@ void ExtrapolateToSVDModule::beginRun()
 void ExtrapolateToSVDModule::event()
 {
   B2INFO("*******   ExtrapolateToSVDModule  *******");
-  StoreArray<GFTrack> gftracks(m_gfTracksColName);
+  StoreArray<genfit::Track> gftracks(m_gfTracksColName);
   int nTracks = gftracks.getEntries();
   B2INFO("ExtrapolateToSVD: input Number of Tracks: " << nTracks);
-  if (nTracks == 0) B2WARNING("ExtrapolateToSVD: GFTracksCollection is empty!");
+  if (nTracks == 0) B2WARNING("ExtrapolateToSVD: genfit::TracksCollection is empty!");
 
   StoreArray<SVDTrueHit> svdHits(m_svdHitsColName);
   int nSvdHits = svdHits.getEntries();
@@ -102,19 +102,19 @@ void ExtrapolateToSVDModule::event()
   if (nCdcHits == 0) B2WARNING("ExtrapolateToSVD: CDCHitsCollection is empty!");
 
   //initialize the new output collection
-  StoreArray<GFTrackCand> newGFTrackCands(m_gfTrackCandsColName);
+  StoreArray<genfit::TrackCand> newGFTrackCands(m_gfTrackCandsColName);
   newGFTrackCands.create();
 
   //get the CDCGeometryPar to get the hit coordinates
   CDCGeometryPar& cdcg = CDCGeometryPar::Instance();
 
 
-  B2INFO("Copy GFTrackCands from input GFTracks, replace the momentum seed with the current fit result and create a new collection with " << nTracks << " GFTrackCands");
+  B2INFO("Copy genfit::TrackCands from input genfit::Tracks, replace the momentum seed with the current fit result and create a new collection with " << nTracks << " genfit::TrackCands");
 
-  //fill the array of new GFTrackCands by copying the existing GFTrackCand from GFTracks, SVDHits will be added afterwards to these new GFTrackCands
+  //fill the array of new genfit::TrackCands by copying the existing genfit::TrackCand from genfit::Tracks, SVDHits will be added afterwards to these new genfit::TrackCands
   for (int i = 0; i < nTracks; i++) {
     newGFTrackCands.appendNew(gftracks[i]->getCand());
-    //in the copy of GFTrackCand the 'old' start values are stored
+    //in the copy of genfit::TrackCand the 'old' start values are stored
     //the fit of the CDCHits should already provide a very good momentum estimation, so it makes sense to use the result of this fit as start values for the fit with svd hits
     //as for the vertex position, I am not sure how good it is after a cdc fit, so I do not change it...
     TVector3 pos(0., 0., 0.); //origin
@@ -158,7 +158,7 @@ void ExtrapolateToSVDModule::event()
 
   int nTrackCands = newGFTrackCands.getEntries();
 
-  if (nTracks != nTrackCands) B2WARNING("GFTrackCands were not copied properly from existing GFTracks!");
+  if (nTracks != nTrackCands) B2WARNING("genfit::TrackCands were not copied properly from existing genfit::Tracks!");
 
   //cut on the distance between the point of closest approach and the hit, hits outside if this range are not added to the track candidate
   //how large this value should or may be has to be figured out in more elaborate studies, this is just a first guess...

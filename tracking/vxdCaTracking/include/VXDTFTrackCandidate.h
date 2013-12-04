@@ -28,7 +28,7 @@ namespace Belle2 {
 
     /** The VXD Track Finder Track Candidate class
     * This class stores all information needed for reconstructing track candidates within the VXDonlyTrackFinder.
-    * It's for internal and analysis use only and will be exported as a GFTrackCandidate which is the official
+    * It's for internal and analysis use only and will be exported as a genfit::TrackCandidate which is the official
     * interface for track reconstruction modules.
     */
     class VXDTFTrackCandidate {
@@ -184,13 +184,13 @@ namespace Belle2 {
       double getEstRadius() { return m_estRadius; } /**< returns the estimated radius of the track circle in the x-y-plane */
 
 
-      TVector3 getInitialCoordinates() const { return m_initialHit; } /**< returns initial coordinates needed for export as GFTrackCand */
+      TVector3 getInitialCoordinates() const { return m_initialHit; } /**< returns initial coordinates needed for export as genfit::TrackCand */
 
 
-      TVector3 getInitialMomentum(); /**< returns initial momentum needed for export as GFTrackCand */
+      TVector3 getInitialMomentum(); /**< returns initial momentum needed for export as genfit::TrackCand */
 
 
-      int getPDGCode() const { return m_pdgCode; } /**< returns estimated PDGCode (its always a pion, but charge changes depending of the sign of the curvature of the track) needed for export as GFTrackCandid */
+      int getPDGCode() const { return m_pdgCode; } /**< returns estimated PDGCode (its always a pion, but charge changes depending of the sign of the curvature of the track) needed for export as genfit::TrackCandid */
 
 
       int getPassIndex() { return m_passIndex; } /**< TCs are passDependent and are merged at the end of the TF-process to be filtered there */

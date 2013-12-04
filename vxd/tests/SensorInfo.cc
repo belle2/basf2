@@ -132,7 +132,7 @@ namespace Belle2 {
     TEST(SensorPlane, NotFound)
     {
       SensorPlane plane(VxdID(1, 1, 1));
-      EXPECT_FATAL(plane.inActive(0, 0));
+      EXPECT_FATAL(plane.isInActive(0, 0));
     }
 
   } // vxd namespace

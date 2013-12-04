@@ -38,7 +38,7 @@ namespace Belle2 {
    * If a PDF file is specified using the 'PDFFile' parameter, likelihood values
    * for all particle hypotheses are calculated and saved in a DedxLikelihood object.
    *
-   * The 'EnableDebugOutput' option adds DedxTrack objects (one for each GFTrack),
+   * The 'EnableDebugOutput' option adds DedxTrack objects (one for each genfit::Track),
    * which includes individual dE/dx data points and their corresponding layer,
    * and hit information like reconstructed position, charge, etc.
    *
@@ -96,7 +96,7 @@ namespace Belle2 {
 
     int m_trackID; /**< counter for tracks */
     int m_eventID; /**< counter for events */
-    int m_numExtrapolations; /**< number of times GFTrackCand::extrapolate... was called after the origin */
+    int m_numExtrapolations; /**< number of times genfit::TrackCand::extrapolate... was called after the origin */
 
     /** dedx:momentum PDFs. */
     TH2F* m_pdfs[Dedx::c_num_detectors][Const::ChargedStable::c_SetSize]; //m_pdfs[detector_type][particle_type]

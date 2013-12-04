@@ -10,15 +10,16 @@
 #include <tracking/gfbfield/GFGeant4Field.h>
 
 
-#include <GFTrack.h>
-#include <GFException.h>
-#include <GFTrackCand.h>
-#include <GFConstField.h>
-#include <GFFieldManager.h>
-#include <GFTGeoMaterialInterface.h>
-#include <GFMaterialEffects.h>
-
-#include <GFRaveVertex.h>
+#include <genfit/Track.h>
+#include <genfit/MeasuredStateOnPlane.h>
+#include <genfit/Exception.h>
+#include <genfit/TrackCand.h>
+#include <genfit/ConstField.h>
+#include <genfit/FieldManager.h>
+#include <genfit/TGeoMaterialInterface.h>
+#include <genfit/MaterialEffects.h>
+#include <genfit/GFRaveVertexFactory.h>
+#include <genfit/GFRaveVertex.h>
 
 #include <TVector3.h>
 #include <TMatrixD.h>
@@ -36,7 +37,7 @@ REG_MODULE(Vertexer)
 
 VertexerModule::VertexerModule() : Module()
 {
-  setDescription("Wrapper module for GFRave. Will get GFTracks from the dataStore and put fitted GFRaveVertices onto the dataStore.");
+  setDescription("Wrapper module for GFRave. Will get genfit::Tracks from the dataStore and put fitted GFRaveVertices onto the dataStore.");
   setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
 
   addParam("GFRaveVerbosityLevel", m_verbosity, "Integer will control the verbosity of the GFRaveFactory class", 0);
@@ -45,26 +46,26 @@ VertexerModule::VertexerModule() : Module()
   addParam("useGenfitPropagation", m_useGenfitPropagation, "use either the Genfit propagation (default) or the Rave propagation (vacuum only)", true);
   addParam("beamSpotPosition", m_beamSpotPos, "the position of the beam spot", vector<double>(0));
   addParam("beamSpotCovariance", m_beamSpotCov, "the covariance matrix of the beam spot position", vector<double>(0));
-  addParam("GFTracksColName", m_gfTracksColName, "Name of collection of GFTracks used for input", string(""));
-  addParam("extrapolateToInterActionRegion", m_extrapolateToIR, "if true extrapolate the GFTracks to the interaction point before giving them to the vertex fit", false);
+  addParam("genfit::TracksColName", m_gfTracksColName, "Name of collection of genfit::Tracks used for input", string(""));
+  addParam("extrapolateToInterActionRegion", m_extrapolateToIR, "if true extrapolate the genfit::Tracks to the interaction point before giving them to the vertex fit", false);
 }
 
 
 void VertexerModule::initialize()
 {
-  StoreArray<GFTrack>::required();
+  StoreArray<genfit::Track>::required();
   if (gGeoManager == NULL) { //setup geometry and B-field for Genfit if not already there
     geometry::GeometryManager& geoManager = geometry::GeometryManager::getInstance();
     geoManager.createTGeoRepresentation();
     //pass the magnetic field to genfit
-    GFFieldManager::getInstance()->init(new GFGeant4Field());
-    GFMaterialEffects::getInstance()->init(new GFTGeoMaterialInterface());
-    GFMaterialEffects::getInstance()->setMscModel("Highland");
+    genfit::FieldManager::getInstance()->init(new GFGeant4Field());
+    genfit::MaterialEffects::getInstance()->init(new genfit::TGeoMaterialInterface());
+    genfit::MaterialEffects::getInstance()->setMscModel("Highland");
   }
   //register output datastore
-  StoreArray<GFRaveVertex>::registerPersistent();// vertices;
+  StoreArray<genfit::GFRaveVertex>::registerPersistent();// vertices;
 
-  m_gfRaveVertexFactoryPtr = new GFRaveVertexFactory(m_verbosity, not m_useGenfitPropagation);
+  m_gfRaveVertexFactoryPtr = new genfit::GFRaveVertexFactory(m_verbosity, not m_useGenfitPropagation);
   m_gfRaveVertexFactoryPtr->setMethod(m_method);
   if (m_useBeamSpot == true) {
     if (m_beamSpotPos.size() == 3 and m_beamSpotCov.size() == 9) {
@@ -95,10 +96,10 @@ void VertexerModule::event()
   const int eventCounter = eventMetaDataPtr->getEvent();
 
   B2DEBUG(100, "********   VertexerModule  processing event number: " << eventCounter << " ************");
-  StoreArray<GFTrack> gfTracks(m_gfTracksColName);
+  StoreArray<genfit::Track> gfTracks(m_gfTracksColName);
   const int nGfTracks = gfTracks.getEntries();
   //StoreArray<MCParticle> mcParticles;
-  //StoreArray<GFTrackCand> trackCandidates;
+  //StoreArray<genfit::TrackCand> trackCandidates;
 
   int ndf = 2 * nGfTracks;
   if (m_useBeamSpot == true) {
@@ -110,41 +111,41 @@ void VertexerModule::event()
     return;
   }
 
-  StoreArray<GFRaveVertex> vertices; //the output datastore
+  StoreArray<genfit::GFRaveVertex> vertices; //the output datastore
   vertices.create();
 
   B2DEBUG(100, " will feed  " << nGfTracks << " tracks to GFRave");
 
 
   //get all tracks of one event
-  vector<GFTrack*> tracksForRave(nGfTracks);
+  vector<genfit::Track*> tracksForRave(nGfTracks);
+  vector<genfit::MeasuredStateOnPlane*> statesForRave(nGfTracks);
   for (int i = 0; i not_eq nGfTracks; ++i) {
-    if (m_extrapolateToIR == true) {
+    if (m_extrapolateToIR == true) { //
+      genfit::MeasuredStateOnPlane* state = NULL;
       try {
         TVector3 pos(0., 0., 0.); //origin assume the interaction point is (0,0,0)
-        TVector3 poca(0., 0., 0.); //point of closest approach
-        TVector3 dirInPoca(0., 0., 0.); //direction of the track at the point of closest approach
 
-        gfTracks[i]->getCardinalRep()->extrapolateToPoint(pos, poca, dirInPoca);
-        GFDetPlane plane(poca, dirInPoca);
-        TVector3 resultPosition;
-        TVector3 resultMomentum;
-        TMatrixDSym resultCovariance;
-        gfTracks[i]->getPosMomCov(plane, resultPosition, resultMomentum, resultCovariance);
-        gfTracks[i]->getCardinalRep()->setPosMomCov(resultPosition, resultMomentum, resultCovariance);
+        genfit::MeasuredStateOnPlane* state = new genfit::MeasuredStateOnPlane(gfTracks[i]->getFittedState());
+        state->extrapolateToPoint(pos);
 
+        tracksForRave[i] =  gfTracks[i];
+        statesForRave[i] = state;
       } catch (...) {
         ++m_extrapFailed;
+        delete state;
       }
 
-    }
-    tracksForRave[i] =  gfTracks[i];
-
+    } else
+      tracksForRave[i] =  gfTracks[i];
   }
 
-  vector < GFRaveVertex* > verticesFromRave;
+  vector < genfit::GFRaveVertex* > verticesFromRave;
 
-  m_gfRaveVertexFactoryPtr->findVertices(&verticesFromRave, tracksForRave, m_useBeamSpot);
+  if (m_extrapolateToIR == true)
+    m_gfRaveVertexFactoryPtr->findVertices(&verticesFromRave, tracksForRave, statesForRave, m_useBeamSpot);
+  else
+    m_gfRaveVertexFactoryPtr->findVertices(&verticesFromRave, tracksForRave, m_useBeamSpot);
 
   const int nVerticesFromRave = verticesFromRave.size();
   B2DEBUG(100, nVerticesFromRave << " vertices were found/fitted in event " << eventCounter);
@@ -157,6 +158,8 @@ void VertexerModule::event()
   }
 
 }
+
+
 void VertexerModule::endRun()
 {
   if (m_ndfTooSmallCounter not_eq 0) {
@@ -167,6 +170,8 @@ void VertexerModule::endRun()
   }
   B2INFO(m_fittedVertices << " vertices were fitted by Rave in this Run");
 }
+
+
 void VertexerModule::terminate()
 {
   delete m_gfRaveVertexFactoryPtr;

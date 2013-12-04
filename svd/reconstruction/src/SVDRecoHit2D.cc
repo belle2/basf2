@@ -15,7 +15,7 @@
 #include <vxd/geometry/SensorPlane.h>
 #include <vxd/geometry/GeoCache.h>
 
-#include <GFDetPlane.h>
+#include <genfit/DetPlane.h>
 #include <TVector3.h>
 #include <TRandom.h>
 #include <cmath>
@@ -25,18 +25,14 @@ using namespace Belle2;
 
 ClassImp(SVDRecoHit2D)
 
-const double SVDRecoHit2D::c_HMatrixContent[10] = {0, 0, 0, 1, 0, 0, 0, 0, 0, 1};
-const TMatrixD SVDRecoHit2D::c_HMatrix = TMatrixD(HIT_DIMENSIONS, 5, c_HMatrixContent);
-
 SVDRecoHit2D::SVDRecoHit2D():
-  GFAbsPlanarHit(HIT_DIMENSIONS), m_sensorID(0), m_trueHit(NULL), m_uCluster(NULL), m_vCluster(NULL),
-  m_energyDep(0)
+  genfit::PlanarMeasurement(HIT_DIMENSIONS), m_sensorID(0), m_trueHit(0),
+  m_energyDep(0)//, m_energyDepError(0)
 {}
 
-SVDRecoHit2D::SVDRecoHit2D(const SVDTrueHit* hit, float sigmaU, float sigmaV):
-  GFAbsPlanarHit(HIT_DIMENSIONS), m_sensorID(0), m_trueHit(hit),
-  m_uCluster(NULL), m_vCluster(NULL),
-  m_energyDep(0)
+SVDRecoHit2D::SVDRecoHit2D(const SVDTrueHit* hit, const genfit::TrackCandHit* trackCandHit, float sigmaU, float sigmaV):
+  genfit::PlanarMeasurement(HIT_DIMENSIONS), m_sensorID(0), m_trueHit(hit),
+  m_energyDep(0)//, m_energyDepError(0)
 {
   if (!gRandom) B2FATAL("gRandom not initialized, please set up gRandom first");
 
@@ -51,13 +47,13 @@ SVDRecoHit2D::SVDRecoHit2D(const SVDTrueHit* hit, float sigmaU, float sigmaV):
   }
 
   // Set positions
-  fHitCoord(0) = gRandom->Gaus(hit->getU(), sigmaU);
-  fHitCoord(1) = gRandom->Gaus(hit->getV(), sigmaV);
+  rawHitCoords_(0) = gRandom->Gaus(hit->getU(), sigmaU);
+  rawHitCoords_(1) = gRandom->Gaus(hit->getV(), sigmaV);
   // Set the error covariance matrix
-  fHitCov(0, 0) = sigmaU * sigmaU;
-  fHitCov(0, 1) = 0;
-  fHitCov(1, 0) = 0;
-  fHitCov(1, 1) = sigmaV * sigmaV;
+  rawHitCov_(0, 0) = sigmaU * sigmaU;
+  rawHitCov_(0, 1) = 0;
+  rawHitCov_(1, 0) = 0;
+  rawHitCov_(1, 1) = sigmaV * sigmaV;
   // Set physical parameters
   m_energyDep = hit->getEnergyDep();
   // Setup geometry information
@@ -65,7 +61,7 @@ SVDRecoHit2D::SVDRecoHit2D(const SVDTrueHit* hit, float sigmaU, float sigmaV):
 }
 
 SVDRecoHit2D::SVDRecoHit2D(const VxdID vxdid, const double u, const double v, double sigmaU, double sigmaV):
-  GFAbsPlanarHit(HIT_DIMENSIONS), m_sensorID(vxdid.getID()), m_trueHit(NULL), m_uCluster(NULL), m_vCluster(NULL),
+  genfit::PlanarMeasurement(HIT_DIMENSIONS), m_sensorID(vxdid.getID()), m_trueHit(NULL),
   m_energyDep(0)//, m_energyDepError(0)
 {
   //If no error is given, estimate the error by dividing the pixel size by sqrt(12)
@@ -75,19 +71,19 @@ SVDRecoHit2D::SVDRecoHit2D(const VxdID vxdid, const double u, const double v, do
     sigmaV = geometry.getVPitch(v) / sqrt(12);
   }
   // Set positions
-  fHitCoord(0) = u;
-  fHitCoord(1) = v;
+  rawHitCoords_(0) = u;
+  rawHitCoords_(1) = v;
   // Set the error covariance matrix
-  fHitCov(0, 0) = sigmaU * sigmaU;
-  fHitCov(0, 1) = 0;
-  fHitCov(1, 0) = 0;
-  fHitCov(1, 1) = sigmaV * sigmaV;
+  rawHitCov_(0, 0) = sigmaU * sigmaU;
+  rawHitCov_(0, 1) = 0;
+  rawHitCov_(1, 0) = 0;
+  rawHitCov_(1, 1) = sigmaV * sigmaV;
   // Setup geometry information
   setDetectorPlane();
 }
 
 SVDRecoHit2D::SVDRecoHit2D(const SVDCluster& uHit, const SVDCluster& vHit):
-  GFAbsPlanarHit(HIT_DIMENSIONS), m_trueHit(NULL), m_uCluster(&uHit), m_vCluster(&vHit),
+  genfit::PlanarMeasurement(HIT_DIMENSIONS), m_trueHit(NULL), m_uCluster(&uHit), m_vCluster(&vHit),
   m_energyDep(0)
 {
   if ((uHit.getRawSensorID() != vHit.getRawSensorID()) || !uHit.isUCluster() || vHit.isUCluster())
@@ -105,8 +101,8 @@ SVDRecoHit2D::SVDRecoHit2D(const SVDCluster& uHit, const SVDCluster& vHit):
   double tan_phi = DeltaU * uHit.getPosition(); // need u at v=0!
   double one_over_cos_phi_sqr = 1 + tan_phi * tan_phi;
 
-  fHitCoord[0] = uHit.getPosition() * scaleFactorU;
-  fHitCoord[1] = vHit.getPosition();
+  rawHitCoords_[0] = uHit.getPosition() * scaleFactorU;
+  rawHitCoords_[1] = vHit.getPosition();
 
   double sigmaU = uHit.getPositionSigma() * scaleFactorU;
   double sigmaU_sq = sigmaU * sigmaU;
@@ -115,16 +111,16 @@ SVDRecoHit2D::SVDRecoHit2D(const SVDCluster& uHit, const SVDCluster& vHit):
 
   m_energyDep = 0.5 * (uHit.getCharge() + vHit.getCharge());
 
-  fHitCov(0, 0) = sigmaV_sq * tan_phi * tan_phi + sigmaU_sq * one_over_cos_phi_sqr;
-  fHitCov(0, 1) = sigmaV_sq * tan_phi;
-  fHitCov(1, 0) = sigmaV_sq * tan_phi;
-  fHitCov(1, 1) = sigmaV_sq;
+  rawHitCov_(0, 0) = sigmaV_sq * tan_phi * tan_phi + sigmaU_sq * one_over_cos_phi_sqr;
+  rawHitCov_(0, 1) = sigmaV_sq * tan_phi;
+  rawHitCov_(1, 0) = sigmaV_sq * tan_phi;
+  rawHitCov_(1, 1) = sigmaV_sq;
   // Setup geometry information
   setDetectorPlane();
 }
 
 SVDRecoHit2D::SVDRecoHit2D(const SVDRecoHit& uRecoHit, const SVDRecoHit& vRecoHit):
-  GFAbsPlanarHit(HIT_DIMENSIONS), m_trueHit(NULL), m_energyDep(0)
+  genfit::PlanarMeasurement(HIT_DIMENSIONS), m_trueHit(NULL), m_energyDep(0)
 {
   const SVDCluster& uHit = *(uRecoHit.getCluster());
   const SVDCluster& vHit = *(vRecoHit.getCluster());
@@ -145,8 +141,8 @@ SVDRecoHit2D::SVDRecoHit2D(const SVDRecoHit& uRecoHit, const SVDRecoHit& vRecoHi
   double tan_phi = DeltaU * uHit.getPosition(); // need u at v=0!
   double one_over_cos_phi_sqr = 1 + tan_phi * tan_phi;
 
-  fHitCoord[0] = uHit.getPosition() * scaleFactorU;
-  fHitCoord[1] = vHit.getPosition();
+  rawHitCoords_[0] = uHit.getPosition() * scaleFactorU;
+  rawHitCoords_[1] = vHit.getPosition();
 
   double sigmaU = uHit.getPositionSigma() * scaleFactorU;
   double sigmaU_sq = sigmaU * sigmaU;
@@ -155,10 +151,10 @@ SVDRecoHit2D::SVDRecoHit2D(const SVDRecoHit& uRecoHit, const SVDRecoHit& vRecoHi
 
   m_energyDep = 0.5 * (uHit.getCharge() + vHit.getCharge());
 
-  fHitCov(0, 0) = sigmaV_sq * tan_phi * tan_phi + sigmaU_sq * one_over_cos_phi_sqr;
-  fHitCov(0, 1) = sigmaV_sq * tan_phi;
-  fHitCov(1, 0) = sigmaV_sq * tan_phi;
-  fHitCov(1, 1) = sigmaV_sq;
+  rawHitCov_(0, 0) = sigmaV_sq * tan_phi * tan_phi + sigmaU_sq * one_over_cos_phi_sqr;
+  rawHitCov_(0, 1) = sigmaV_sq * tan_phi;
+  rawHitCov_(1, 0) = sigmaV_sq * tan_phi;
+  rawHitCov_(1, 1) = sigmaV_sq;
   // Setup geometry information
   setDetectorPlane();
 }
@@ -176,16 +172,18 @@ void SVDRecoHit2D::setDetectorPlane()
   TVector3 vGlobal = geometry.vectorToGlobal(TVector3(0, 1, 0));
 
   //Construct the detector plane
-  GFDetPlane detPlane(origin, uGlobal, vGlobal, new VXD::SensorPlane(m_sensorID, 20, 20));
-  setDetPlane(detPlane);
+  genfit::SharedPlanePtr detPlane(new genfit::DetPlane(origin, uGlobal, vGlobal, new VXD::SensorPlane(m_sensorID, 20, 20)));
+  setPlane(detPlane, m_sensorID);
 }
 
-GFAbsRecoHit* SVDRecoHit2D::clone()
+std::vector<genfit::MeasurementOnPlane*> SVDRecoHit2D::constructMeasurementsOnPlane(const genfit::AbsTrackRep* rep,
+    const genfit::SharedPlanePtr& pl) const
+{
+  return std::vector<genfit::MeasurementOnPlane*>(1, new genfit::MeasurementOnPlane(rawHitCoords_, rawHitCov_, pl, rep, this->constructHMatrix(rep)));
+}
+
+genfit::AbsMeasurement* SVDRecoHit2D::clone() const
 {
   return new SVDRecoHit2D(*this);
 }
 
-const TMatrixD& SVDRecoHit2D::getHMatrix(const GFAbsTrackRep*)
-{
-  return c_HMatrix;
-}

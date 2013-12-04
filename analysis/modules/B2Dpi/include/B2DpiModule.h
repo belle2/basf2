@@ -29,8 +29,8 @@
 #include <framework/datastore/RelationIndex.h>
 
 // tracking
-#include <GFTrack.h>
-#include <GFTrackCand.h>
+#include <genfit/Track.h>
+#include <genfit/TrackCand.h>
 #include <tracking/dataobjects/Track.h>
 #include <tracking/dataobjects/TrackFitResult.h>
 
@@ -96,7 +96,7 @@ namespace Belle2 {
   protected:
     std::string  m_mcParticlesColName;     /**< MCParticles collection name. */
     std::string  m_gfTrackCandColName;     /**< Track Candidates collection name. */
-    std::string  m_gfTracksColName;        /**< GFTracks collection name. */
+    std::string  m_gfTracksColName;        /**< genfit::Tracks collection name. */
     std::string  m_tracksColName;          /**< Tracks collection name. */
     std::string  m_gammasColName;          /**< Gammas collection name. */
     std::string  m_eclsColName;            /**< ECLs collection name. */

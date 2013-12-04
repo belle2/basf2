@@ -16,9 +16,9 @@
 
 namespace Belle2 {
 
-  /** Module to match the GFTrackCandidates with MCParticles to be able to evaluate the performance of pattern recognition.
+  /** Module to match the genfit::TrackCandidates with MCParticles to be able to evaluate the performance of pattern recognition.
    *  It is checked which MCParticles created the CDCHits assigned to this TrackCandidates.
-   *  The MCParticle with the largest contribution is evaluated and its ID is assigned to the GFTrackCandidate.
+   *  The MCParticle with the largest contribution is evaluated and its ID is assigned to the genfit::TrackCandidate.
    *  @todo: at the moment this module is only usable for CDC pattern recognition, at some point VTX detectors also could be included
    */
 
@@ -82,7 +82,7 @@ namespace Belle2 {
 
     std::string m_cdcHitsCollectionName;                /**< CDCHits collection name */
 
-    std::string m_gfTrackCandsCollectionName;           /**< GFTrackCandidates collection name */
+    std::string m_gfTrackCandsCollectionName;           /**< genfit::TrackCandidates collection name */
 
 
 

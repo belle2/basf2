@@ -344,7 +344,7 @@ namespace Belle {
     void fastClear(void);
 
     /// returns a list of reconstructed tracks.
-    const AList<TTrack> & tracks(void) const;
+    const AList<TTrack>& tracks(void) const;
 
   private:
     /// returns true if an event is MC.
@@ -354,22 +354,22 @@ namespace Belle {
     void mcInformation(void);
 
     /// returns unused hits.
-    void selectUnusedHits(const CAList<Belle2::TRGCDCWireHit> & hits,
-                          CAList<Belle2::TRGCDCWireHit> & unusedHits) const;
+    void selectUnusedHits(const CAList<Belle2::TRGCDCWireHit>& hits,
+                          CAList<Belle2::TRGCDCWireHit>& unusedHits) const;
 
     /// standard main loop.
-    void main0(const CAList<Belle2::TRGCDCWireHit> & axialHits,
-               const CAList<Belle2::TRGCDCWireHit> & stereoHits,
-               const CAList<Belle2::TRGCDCWireHit> & allHits,
-               AList<TTrack> & tracks,
-               AList<TTrack> & tracks2D);
+    void main0(const CAList<Belle2::TRGCDCWireHit>& axialHits,
+               const CAList<Belle2::TRGCDCWireHit>& stereoHits,
+               const CAList<Belle2::TRGCDCWireHit>& allHits,
+               AList<TTrack>& tracks,
+               AList<TTrack>& tracks2D);
 
     /// Hough + Conf + Curl (Conf doesn't use used hits)
-    void main1(const CAList<Belle2::TRGCDCWireHit> & axialHits,
-               const CAList<Belle2::TRGCDCWireHit> & stereoHits,
-               const CAList<Belle2::TRGCDCWireHit> & allHits,
-               AList<TTrack> & tracks,
-               AList<TTrack> & tracks2D);
+    void main1(const CAList<Belle2::TRGCDCWireHit>& axialHits,
+               const CAList<Belle2::TRGCDCWireHit>& stereoHits,
+               const CAList<Belle2::TRGCDCWireHit>& allHits,
+               AList<TTrack>& tracks,
+               AList<TTrack>& tracks2D);
 
   public:// public members for basf interface
 
@@ -377,7 +377,7 @@ namespace Belle {
     float b_cdcVersion;           // 0:automatic, 1:normal cell, 2:small cell
     std::string _cdcVersion;
     float b_fudgeFactor;
- 
+
     //...Trasan...
     int b_debugLevel;
     int b_useAllHits;
@@ -541,7 +541,7 @@ namespace Belle {
     unsigned _nEvents;
     AList<TTrackMC> _mcTracks;
 
-    /// GFTrackCandidates name.
+    /// genfit::TrackCandidates name.
     std::string _gfTrackCandsName;
 
 #ifdef TRASAN_WINDOW_GTK
@@ -592,7 +592,7 @@ namespace Belle {
   }
 
   inline
-  const AList<TTrack> &
+  const AList<TTrack>&
   Trasan::tracks(void) const
   {
     return _trackManager.tracksFinal();

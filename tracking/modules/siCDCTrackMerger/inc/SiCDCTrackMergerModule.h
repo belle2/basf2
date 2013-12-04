@@ -2,7 +2,7 @@
 #define SICDCTRACKMERGERMODULE_H
 
 #include <framework/core/Module.h>
-#include "GFTrack.h"
+#include "genfit/Track.h"
 
 //root stuff
 #include <TTree.h>
@@ -50,9 +50,9 @@ namespace Belle2 {
     /** Clean up anything you created in initialize(). */
     virtual void terminate();
   private:
-    void insertTrackInGrid(double track_theta, double track_phi, GFTrack* gftrack, std::vector<std::vector<std::vector<GFTrack*>*>*>* tracks_grid);
-    void insertTrackAndPositionInGrid(TVector3 position, GFTrack* gftrack, std::vector<std::vector<std::vector<TVector3>*>*>* positions_grid,
-                                      std::vector<std::vector<std::vector<GFTrack*>*>*>* tracks_grid);
+    void insertTrackInGrid(double track_theta, double track_phi, genfit::Track* gftrack, std::vector<std::vector<std::vector<genfit::Track*>*>*>* tracks_grid);
+    void insertTrackAndPositionInGrid(TVector3 position, genfit::Track* gftrack, std::vector<std::vector<std::vector<TVector3>*>*>* positions_grid,
+                                      std::vector<std::vector<std::vector<genfit::Track*>*>*>* tracks_grid);
     double m_CDC_wall_radius;
     //theta grid
     double m_theta_min;
@@ -73,8 +73,8 @@ namespace Belle2 {
     //position at which a cdc track crosses  the cdc wall
     std::vector<std::vector<std::vector<TVector3>*>*>* m_cdc_tracks_position;
     //the eta-phi grid silicon and cdc tracks grid
-    std::vector<std::vector<std::vector<GFTrack*>*>*>* m_si_tracks_grid;
-    std::vector<std::vector<std::vector<GFTrack*>*>*>* m_cdc_tracks_grid;
+    std::vector<std::vector<std::vector<genfit::Track*>*>*>* m_si_tracks_grid;
+    std::vector<std::vector<std::vector<genfit::Track*>*>*>* m_cdc_tracks_grid;
 
     //root stuff
     bool m_produce_root_file;

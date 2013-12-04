@@ -22,12 +22,15 @@
 #include <geometry/GeometryManager.h>
 #include <tracking/gfbfield/GFGeant4Field.h>
 
-#include <GFTrack.h>
-#include <GFAbsTrackRep.h>
-#include <GFException.h>
-#include <GFFieldManager.h>
-#include <GFMaterialEffects.h>
-#include <GFTGeoMaterialInterface.h>
+#include <genfit/TrackCand.h>
+#include <genfit/Track.h>
+#include <genfit/AbsTrackRep.h>
+#include <genfit/Exception.h>
+#include <genfit/FieldManager.h>
+#include <genfit/MaterialEffects.h>
+#include <genfit/TGeoMaterialInterface.h>
+#include <genfit/StateOnPlane.h>
+#include <genfit/KalmanFitStatus.h>
 
 #include <TFile.h>
 #include <TGeoManager.h>
@@ -94,9 +97,10 @@ void DedxPIDModule::initialize()
   }
 
   //required inputs
-  StoreArray<GFTrack>::required();
+  StoreArray<genfit::Track>::required();
   StoreArray<Track>::required();
   StoreArray<TrackFitResult>::required();
+  StoreArray<genfit::TrackCand>::required();
 
   //optional inputs
   StoreArray<MCParticle>::optional();
@@ -179,8 +183,8 @@ void DedxPIDModule::initialize()
     geoManager.createTGeoRepresentation();
 
     //initialize some things for genfit
-    GFFieldManager::getInstance()->init(new GFGeant4Field());
-    GFMaterialEffects::getInstance()->init(new GFTGeoMaterialInterface());
+    genfit::FieldManager::getInstance()->init(new GFGeant4Field());
+    genfit::MaterialEffects::getInstance()->init(new genfit::TGeoMaterialInterface());
   }
 }
 
@@ -190,8 +194,8 @@ void DedxPIDModule::event()
   //go through Tracks
   //get fitresult and gftrack and do extrapolations, save corresponding dE/dx and likelihood values
   //  !check if i've already done extrapolations for the given result (i.e. I got less than 5 fits)
-  //   get GFTrackCand through GFTrack::getCand()
-  //   get hit indices through GFTrackCand::getHit(...)
+  //   get genfit::TrackCand through genfit::Track::getCand()
+  //   get hit indices through genfit::TrackCand::getHit(...)
   //   create one DedxTrack per fitresult/gftrack
   //create one DedkLikelihood per Track (plus rel)
   m_eventID++;
@@ -250,17 +254,19 @@ void DedxPIDModule::event()
       }
     }
 
-    //calculate dE/dx values using associated GFTrack
-    const GFTrack* gftrack = fitResult->getRelatedFrom<GFTrack>();
-    GFAbsTrackRep* trackrep = gftrack->getCardinalRep();
+    //calculate dE/dx values using associated genfit::Track
+    const genfit::Track* gftrack = fitResult->getRelatedFrom<genfit::Track>();
+    genfit::TrackCand gftrackcand = *fitResult->getRelatedFrom<genfit::TrackCand>();
+    genfit::AbsTrackRep* trackrep = gftrack->getCardinalRep();
 
     //get momentum (at origin) from fit result
     const TVector3& poca = fitResult->getPosition();
     const TVector3& poca_momentum = fitResult->getMomentum();
+    genfit::StateOnPlane pocaState = gftrack->getPointWithMeasurement(0)->getFitterInfo(trackrep)->getFittedState(true);
 
     dedxTrack->m_pdg_hyp = fitResult->getParticleType().getPDGCode();
-    dedxTrack->m_chi2 = gftrack->getChiSqu();
-    dedxTrack->m_charge = (short)((gftrack->getCharge() >= 0) ? 1 : -1);
+    dedxTrack->m_chi2 = gftrack->getFitStatus(trackrep)->getChi2();
+    dedxTrack->m_charge = (short)((gftrack->getFitStatus(trackrep)->getCharge() >= 0) ? 1 : -1);
     dedxTrack->m_p_vec = poca_momentum;
     dedxTrack->m_p = poca_momentum.Mag();
 
@@ -269,7 +275,7 @@ void DedxPIDModule::event()
 
     //sort hits in the order they were created
     //this is required if I want to use the helix path length
-    GFTrackCand gftrackcand = gftrack->getCand();
+    //genfit::TrackCand gftrackcand = gftrack->getCand();
     gftrackcand.sortHits();
     const int num_hits = gftrackcand.getNHits();
     if (num_hits == 0) {
@@ -328,24 +334,23 @@ void DedxPIDModule::event()
         const bool helix_accurate = (hit_pos - hit_pos_helix).Perp() <= m_trackDistanceThreshhold;
 
         if (!track_extrapolation_failed && !helix_accurate) {
-          TVector3 poca, dir_in_poca, poca_on_wire;
+          //TVector3 poca, dir_in_poca, poca_on_wire;
           try {
-            trackrep->extrapolateToLine(wire_pos_f, wire_pos_b,
-                                        poca, dir_in_poca, poca_on_wire);
-
-            //Now choose a correct reference plane to get the momentum
-            GFDetPlane plane(poca, dir_in_poca);
+            TVector3 wire_dir = (wire_pos_b - wire_pos_f).Unit();
+            trackrep->extrapolateToLine(pocaState, wire_pos_f, wire_dir);
+            TVector3 poca = trackrep->getPos(pocaState);
+            TVector3 pocaMom = trackrep->getMom(pocaState);
 
             //update cdchelix
-            const double momentum_mag = trackrep->getMom(plane).Mag();
-            dir_in_poca.SetMag(momentum_mag);
-            cdchelix = HelixHelper(poca, dir_in_poca, dedxTrack->m_charge);
+            cdchelix = HelixHelper(poca, pocaMom, dedxTrack->m_charge);
 
-            local_momentum = dir_in_poca;
+            TVector3 poca_on_wire = wire_pos_f + (poca - wire_pos_f).Dot(wire_dir) * wire_pos_f;
+
+            local_momentum = pocaMom;
             hit_pos_helix = poca;
             hit_pos = poca_on_wire;
-          } catch (GFException) {
-            B2WARNING("Event " << m_eventID << ", Track: " << iTrack << ": GFTrack extrapolation failed (in CDC), further hits will be less accurate");
+          } catch (genfit::Exception) {
+            B2WARNING("Event " << m_eventID << ", Track: " << iTrack << ": genfit::Track extrapolation failed (in CDC), further hits will be less accurate");
 
             //if extrapolation fails once, it's unlikely to work again
             track_extrapolation_failed = true;

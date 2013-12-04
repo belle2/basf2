@@ -29,17 +29,15 @@
 
 //genfit
 
-#include <GFTrack.h>
-#include <GFRecoHitProducer.h>
-#include <GFRecoHitFactory.h>
-#include <GFAbsTrackRep.h>
-#include <RKTrackRep.h>
-#include <GFFieldManager.h>
-#include <GFConstField.h>
-#include <GFTools.h>
-#include <GFKalman.h>
-#include <GFMaterialEffects.h>
-#include <GFTGeoMaterialInterface.h>
+#include <genfit/Track.h>
+#include <genfit/AbsTrackRep.h>
+#include <genfit/RKTrackRep.h>
+#include <genfit/FieldManager.h>
+#include <genfit/Tools.h>
+#include <genfit/KalmanFitterRefTrack.h>
+#include <genfit/KalmanFitter.h>
+#include <genfit/MaterialEffects.h>
+#include <genfit/TGeoMaterialInterface.h>
 
 
 //root packages:
@@ -204,7 +202,7 @@ VXDTFModule::VXDTFModule() : Module()
   addParam("sectorSetup", m_PARAMsectorSetup, "lets you chose the sectorSetup (compatibility of sensors, individual cutoffs,...) accepts 'std', 'low', 'high' and 'personal', please note that the chosen setup has to exist as a xml-file in ../tracking/data/friendList_XXX.xml. If you can not create your own xml files using e.g. the filterCalculatorModule, use params for  'tuneCutoffXXX' (for tuning single values) or 'tuneCutoffs' (for tuning all at once) instead. multipass supported by setting setups in a row", sectorSetup);
 
   addParam("tuneCutoffs", m_PARAMtuneCutoffs, "for rapid changes of all cutoffs (no personal xml files needed), reduces/enlarges the range of the cutoffs in percent (lower and upper values are changed by this value). Only valid in range -99% < x < +1000%", double(0.0));
-  addParam("GFTrackCandidatesColName", m_PARAMgfTrackCandsColName, "Name of collection holding the GFTrackCandidates (output)", string(""));
+  addParam("GFTrackCandidatesColName", m_PARAMgfTrackCandsColName, "Name of collection holding the genfit::TrackCandidates (output)", string(""));
   addParam("InfoBoardName", m_PARAMinfoBoardName, "Name of container used for data transfer to TFAnalyzer, only used when TESTERexpandedTestingRoutines == true", string(""));
   addParam("nameOfInstance", m_PARAMnameOfInstance, "Name of trackFinder, usefull, if there is more than one VXDTF running at the same time. Note: please choose short names", string("VXDTF"));
   addParam("activateBaselineTF", m_PARAMactivateBaselineTF, "there is a baseline trackfinder which catches events with a very small number of hits, e.g. bhabha, cosmic and single-track-events", bool(true));
@@ -332,16 +330,20 @@ void VXDTFModule::initialize()
   }
 
 
-  /// GFTrackCandidate
-  StoreArray<GFTrackCand>::registerPersistent(m_PARAMgfTrackCandsColName);
+  /// genfit::TrackCandidate
+  StoreArray<genfit::TrackCand>::registerPersistent(m_PARAMgfTrackCandsColName);
 
   if (gGeoManager == NULL) {
     geometry::GeometryManager& geoManager = geometry::GeometryManager::getInstance();
     geoManager.createTGeoRepresentation();
-    GFFieldManager::getInstance()->init(new GFGeant4Field());
-    GFMaterialEffects::getInstance()->init(new GFTGeoMaterialInterface());
   }
-  GFMaterialEffects::getInstance()->setMscModel("Highland");
+
+  if (!genfit::FieldManager::getInstance()->isInitialized())
+    genfit::FieldManager::getInstance()->init(new GFGeant4Field());
+  if (!genfit::MaterialEffects::getInstance()->isInitialized())
+    genfit::MaterialEffects::getInstance()->init(new genfit::TGeoMaterialInterface());
+
+  genfit::MaterialEffects::getInstance()->setMscModel("Highland");
 
 /// TODO: further checks for validity needed!
 
@@ -1126,7 +1128,7 @@ void VXDTFModule::the_real_event()
   }
 
   // preparing storearray for trackCandidates and fitted tracks
-  StoreArray<GFTrackCand> finalTrackCandidates(m_PARAMgfTrackCandsColName);
+  StoreArray<genfit::TrackCand> finalTrackCandidates(m_PARAMgfTrackCandsColName);
   finalTrackCandidates.create();
   if (m_TESTERexpandedTestingRoutines == true) {
     StoreArray<VXDTFInfoBoard> extraInfo4GFTCs;
@@ -1201,7 +1203,7 @@ void VXDTFModule::the_real_event()
       calcInitialValues4TCs(&m_baselinePass);                                                 /// calcInitialValues4TCs
 
       for (VXDTFTrackCandidate * aTC : m_baselinePass.tcVector) {
-        GFTrackCand gfTC = generateGFTrackCand(aTC);                                          /// generateGFTrackCand
+        genfit::TrackCand gfTC = generateGFTrackCand(aTC);                                          /// generateGFTrackCand
 
         if (m_TESTERexpandedTestingRoutines == true) {
           VXDTFInfoBoard newBoard;
@@ -1805,7 +1807,7 @@ void VXDTFModule::the_real_event()
 
     /// REACTIVATE the following code snippet if you want to test callgrind-stuff
 // #if 0
-    GFTrackCand gfTC = generateGFTrackCand(currentTC);                          /// generateGFTrackCand
+    genfit::TrackCand gfTC = generateGFTrackCand(currentTC);                          /// generateGFTrackCand
 
     if (m_TESTERexpandedTestingRoutines == true) {
       VXDTFInfoBoard newBoard;
@@ -1814,7 +1816,8 @@ void VXDTFModule::the_real_event()
       int indexNumber = finalTrackCandidates.getEntries(); // valid for both, GFTrackCand and InfoBoard
       gfTC.setMcTrackId(indexNumber); // so the GFTrackCand knows which index of infoBoard is assigned to it
 
-      newBoard.assignGFTC(indexNumber); // same number aDEBUGs for the GFTrackCand
+
+      newBoard.assignGFTC(indexNumber); // same number aDEBUGs for the genfit::TrackCand
       newBoard.fitIsPossible(currentTC->getFitSucceeded());
       newBoard.setProbValue(currentTC->getTrackQuality());
       extraInfo4GFTCs.appendNew(newBoard);
@@ -3679,8 +3682,8 @@ void VXDTFModule::calcQIbyLength(TCsOfEvent& tcVector, PassSetupVector& passSetu
 void VXDTFModule::calcQIbyKalman(TCsOfEvent& tcVector, StoreArray<PXDCluster>& pxdClusters, vector<ClusterInfo>& clusters)
 {
   /// produce GFTrackCands for each currently living TC and calculate real kalman-QI's
-  GFKalman kalmanFilter;
-  kalmanFilter.setBlowUpFactor(500.0); // TODO: hardcoded values should be set as steering file-parameter
+  genfit::KalmanFitter kalmanFilter;
+  //kalmanFilter.setBlowUpFactor(500.0); // TODO: hardcoded values should be set as steering file-parameter
 
   for (VXDTFTrackCandidate * currentTC : tcVector) {
     if (currentTC->getCondition() == false) { continue; }
@@ -3689,55 +3692,60 @@ void VXDTFModule::calcQIbyKalman(TCsOfEvent& tcVector, StoreArray<PXDCluster>& p
 
     TVector3 posErrors(1, 1, 1);
 
-    RKTrackRep* trackRep = new RKTrackRep(currentTC->getInitialCoordinates(), currentTC->getInitialMomentum(), posErrors, momErrors, currentTC->getPDGCode());
+    //genfit::RKTrackRep* trackRep = new RKTrackRep(currentTC->getInitialCoordinates(), currentTC->getInitialMomentum(), posErrors, momErrors, currentTC->getPDGCode());
+    genfit::AbsTrackRep* trackRep = new genfit::RKTrackRep(currentTC->getPDGCode());
 
-    GFTrack track(trackRep);
+    genfit::Track track(trackRep, currentTC->getInitialCoordinates(), currentTC->getInitialMomentum());
 
-    track.setSmoothing(false);
+    //track.setSmoothing(false);
 
     for (VXDTFHit * tfHit : currentTC->getHits()) {
       if (tfHit->getDetectorType() == Const::PXD) {
         PXDRecoHit* newRecoHit = new PXDRecoHit(pxdClusters[clusters[tfHit->getClusterIndexUV()].getRealIndex()]);
-        track.addHit(newRecoHit);
+        track.insertMeasurement(newRecoHit);
       } else if (tfHit->getDetectorType() == Const::SVD) {
         TVector3 pos = *(tfHit->getHitCoordinates());
         SVDRecoHit2D* newRecoHit = new SVDRecoHit2D(tfHit->getVxdID(), pos[0], pos[1]);
-        track.addHit(newRecoHit);
+        track.insertMeasurement(newRecoHit);
       } else {
         B2ERROR("VXDTFModule::calcQIbyKalman: event " << m_eventCounter << " a hit has unknown detector type ( " << tfHit->getDetectorType() << ") discarding hit")
       }
     }
 
-    B2DEBUG(50, "VXDTFModule::calcQIbyKalman, numOfPxdIndices : " << currentTC->getPXDHitIndices().size() << ", numOfSvdIndices : " << currentTC->getSVDHitIndices().size() << ", nHitsInTrack: " << track.getNumHits())
+    B2DEBUG(50, "VXDTFModule::calcQIbyKalman, numOfPxdIndices : " << currentTC->getPXDHitIndices().size() << ", numOfSvdIndices : " << currentTC->getSVDHitIndices().size() << ", nHitsInTrack: " << track.getNumPoints())
 
-    if (m_KFBackwardFilter == true) {
-      kalmanFilter.setNumIterations(0);
-      try {
-        kalmanFilter.processTrack(&track);
-      } catch (exception& e) {
-//         std::cerr << e.what();
-        B2WARNING("VXDTFModule::calcQIbyKalman event " << m_eventCounter << ":, processTrack failed with message: " << e.what() << "! skipping current TC")
-        currentTC->setCondition(false); // do not store TCs with failed fits if param-flag is set to false
-        continue;
-      }
+    /* FIXME: use processTrackPartially function of Kalman
+        if (m_KFBackwardFilter == true) {
+          kalmanFilter.setNumIterations(0);
+          try {
+            kalmanFilter.processTrack(&track);
+          } catch (exception& e) {
+    //         std::cerr << e.what();
+            B2WARNING("VXDTFModule::calcQIbyKalman event " << m_eventCounter << ":, processTrack failed with message: " << e.what() << "! skipping current TC")
+            currentTC->setCondition(false); // do not store TCs with failed fits if param-flag is set to false
+            continue;
+          }
 
-      track.setNextHitToFit(track.getNumHits() - 1);
-      kalmanFilter.fittingPass(&track, -1) ;   // -1 means backward filtering!
-    } else {
-      kalmanFilter.setNumIterations(1); // TODO: hardcoded values should be set as steering file-parameter
-      try {
-        kalmanFilter.processTrack(&track);
-      } catch (exception& e) {
-//         std::cerr << e.what();
-        B2WARNING("VXDTFModule::calcQIbyKalman event " << m_eventCounter << ":, processTrack failed with message: " << e.what() << "!, skipping current TC")
-        currentTC->setCondition(false); // do not store TCs with failed fits if param-flag is set to false
-        continue;
-      }
-    }
-
-    if (trackRep->getStatusFlag() == 0) { // 0 means, it was successfull
-      double pVal = track.getCardinalRep()->getPVal();
-      B2DEBUG(10, "calcQI4TC succeeded: calculated kalmanQI: " << track.getChiSqu() << ", forward-QI: " << track.getForwardChiSqu() << " with NDF: " << track.getNDF() << ", p-value: " << pVal << ", numOfHits: " <<  currentTC->getPXDHitIndices().size() + currentTC->getSVDHitIndices().size())
+          track.setNextHitToFit(track.getNumPoints() - 1);
+          kalmanFilter.fittingPass(&track, -1) ;   // -1 means backward filtering!
+        } else {
+          kalmanFilter.setNumIterations(1); // TODO: hardcoded values should be set as steering file-parameter
+          try {
+            kalmanFilter.processTrack(&track);
+          } catch (exception& e) {
+    //         std::cerr << e.what();
+            B2WARNING("VXDTFModule::calcQIbyKalman event " << m_eventCounter << ":, processTrack failed with message: " << e.what() << "!, skipping current TC")
+            currentTC->setCondition(false); // do not store TCs with failed fits if param-flag is set to false
+            continue;
+          }
+        }
+    */
+    if (kalmanFilter.isTrackFitted(&track, trackRep)) {
+      int direction = 1;
+      if (m_KFBackwardFilter)
+        direction = -1;
+      double pVal = kalmanFilter.getPVal(&track, trackRep, direction);
+      B2DEBUG(10, "calcQI4TC succeeded: calculated kalmanQI: " << kalmanFilter.getChiSqu(&track, trackRep, direction) << ", forward-QI: " << kalmanFilter.getChiSqu(&track, trackRep, 1) << " with NDF: " << kalmanFilter.getNdf(&track, trackRep, 1) << ", p-value: " << pVal << ", numOfHits: " <<  currentTC->getPXDHitIndices().size() + currentTC->getSVDHitIndices().size())
 //       RKTrackRep::getPosMomCov
       if (pVal < 0.000001 and m_PARAMqiSmear == true) {
         currentTC->setTrackQuality(m_littleHelperBox.smearNormalizedGauss(pVal));
@@ -3766,9 +3774,9 @@ void VXDTFModule::calcQIbyKalman(TCsOfEvent& tcVector, StoreArray<PXDCluster>& p
 
 
 
-GFTrackCand VXDTFModule::generateGFTrackCand(VXDTFTrackCandidate* currentTC)
+genfit::TrackCand VXDTFModule::generateGFTrackCand(VXDTFTrackCandidate* currentTC)
 {
-  GFTrackCand newGFTrackCand;
+  genfit::TrackCand newGFTrackCand;
 
   B2DEBUG(50, "VXDTFModule::generateGFTrackCand, after newGFTrackCand")
   TVector3 posIn = currentTC->getInitialCoordinates();
@@ -3794,7 +3802,8 @@ GFTrackCand VXDTFModule::generateGFTrackCand(VXDTFTrackCandidate* currentTC)
   covSeed(3, 3) = 0.01 ; covSeed(4, 4) = 0.01 ; covSeed(5, 5) = 0.04 ;
   B2DEBUG(10, "generating GFTrackCandidate: posIn.Mag(): " << posIn.Mag() << ", momIn.Mag(): " << momIn.Mag() << ", pdgCode: " << pdgCode);
 
-  newGFTrackCand.set6DSeedAndPdgCode(stateSeed, pdgCode, covSeed);
+  //newGFTrackCand.set6DSeedAndPdgCode(stateSeed, pdgCode, covSeed);
+  newGFTrackCand.set6DSeedAndPdgCode(stateSeed, pdgCode);
 
   BOOST_REVERSE_FOREACH(int hitIndex, pxdHits) {  // order of hits within VXDTFTrackCandidate: outer->inner hits. GFTrackCand: inner->outer hits
     newGFTrackCand.addHit(Const::PXD, hitIndex);

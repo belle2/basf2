@@ -21,9 +21,9 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Const.h>
 
-#include <GFRaveVertex.h>
-#include <GFTrack.h>
-#include <GFTrackCand.h>
+#include <genfit/GFRaveVertex.h>
+#include <genfit/Track.h>
+#include <genfit/TrackCand.h>
 
 #include <TEveStraightLineSet.h>
 #include <TEveTrackPropagator.h>
@@ -46,7 +46,7 @@ class TEveTrackList;
 namespace Belle2 {
   class DisplayData;
 
-  /** Produces visualisation for MCParticles, simhits, GFTracks, geometry and other things.
+  /** Produces visualisation for MCParticles, simhits, genfit::Tracks, geometry and other things.
    *
    * Creates TEve objects from the given data, and adds them to the global
    * or event scene.
@@ -105,13 +105,13 @@ namespace Belle2 {
 
     // === adding event data ===
 
-    /** Add this GFTrack to event data.
+    /** Add this genfit::Track to event data.
      *
      *  Adapted from GenfitDisplay, originally written by Karl Bicker. */
-    void addTrack(const GFTrack* gftrack, const TString& label = "");
+    void addTrack(const genfit::Track* gftrack, const TString& label = "");
 
-    /** Add a GFTrackCand, to evaluate track finding. */
-    template<class PXDType, class SVDType> void addTrackCandidate(const GFTrackCand* trackCand, const TString& label,
+    /** Add a genfit::TrackCand, to evaluate track finding. */
+    template<class PXDType, class SVDType> void addTrackCandidate(const genfit::TrackCand* trackCand, const TString& label,
         const StoreArray<PXDType>& pxdhits, const StoreArray<SVDType>& svdhits, const StoreArray<CDCHit>& cdchits);
 
     /** Add all entries in the given 'hits' array (and the corresponding MCParticles) to the event scene. */
@@ -154,7 +154,7 @@ namespace Belle2 {
     MCTrack* addMCParticle(const MCParticle* particle);
 
     /** Add a vertex point and its covariance matrix. */
-    void addVertex(const GFRaveVertex* vertex, const TString& name);
+    void addVertex(const genfit::GFRaveVertex* vertex, const TString& name);
 
     /** Add a reconstructed photon in the ECL. */
     void addGamma(const ECLGamma* gamma, const TString& name);
@@ -270,7 +270,7 @@ namespace Belle2 {
     /** Rescale PXD/SVD errors with this factor to ensure visibility. */
     double m_errorScale;
 
-    /** Option string for GFTrack visualisation.
+    /** Option string for genfit::Track visualisation.
      *
      * @sa setOptions
      */
@@ -300,7 +300,7 @@ namespace Belle2 {
     /** Track propagator for MCParticles*/
     TEveTrackPropagator* m_trackpropagator;
 
-    /** Track propagator for GFTracks (different mainly because of drawing options) */
+    /** Track propagator for genfit::Tracks (different mainly because of drawing options) */
     TEveTrackPropagator* m_gftrackpropagator;
 
     /** ECL hit data. */
@@ -317,7 +317,7 @@ namespace Belle2 {
 
   };
 
-  template<class PXDType, class SVDType> void EVEVisualization::addTrackCandidate(const GFTrackCand* trackCand, const TString& label,
+  template<class PXDType, class SVDType> void EVEVisualization::addTrackCandidate(const genfit::TrackCand* trackCand, const TString& label,
       const StoreArray<PXDType>& pxdhits, const StoreArray<SVDType>& svdhits, const StoreArray<CDCHit>& cdchits)
   {
     // parse the option string ------------------------------------------------------------------------

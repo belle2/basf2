@@ -12,7 +12,8 @@
 
 #include <framework/datastore/RelationsObject.h>
 #include <pxd/geometry/SensorInfo.h>
-#include <GFTrackCand.h>
+#include <genfit/TrackCand.h>
+#include <framework/datastore/RelationsObject.h>
 
 namespace Belle2 {
 

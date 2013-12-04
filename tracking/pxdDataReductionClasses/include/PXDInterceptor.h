@@ -17,8 +17,8 @@
 #include <tracking/pxdDataReductionClasses/ROIGeometry.h>
 #include <tracking/pxdDataReductionClasses/ROIinfo.h>
 
-#include <GFTrackCand.h>
-#include <GFKalman.h>
+#include <genfit/TrackCand.h>
+#include <genfit/KalmanFitter.h>
 
 
 namespace Belle2 {
@@ -45,20 +45,20 @@ namespace Belle2 {
     /** Fill the list of PXD intecepts corresponding to the list of track candidates.
      */
     void fillInterceptList(StoreArray<PXDIntercept>* listToBeFilled,
-                           const StoreArray<GFTrackCand>& trackCandList,
+                           const StoreArray<genfit::TrackCand>& trackCandList,
                            RelationArray* gfTrackCandToPXDIntercepts);
 
     /**
      * Set the nuber of iterations of the Kalman Filter to numIterKalmanFilter
      */
     void setNumIterKalmanFilter(int numIterKalmanFilter) {
-      m_kalmanFilter.setNumIterations(numIterKalmanFilter);
+      m_kalmanFilter.setMinIterations(numIterKalmanFilter);
     };
 
 
   private:
 
-    GFKalman m_kalmanFilter; /**< kalman filter object to fit the track */
+    genfit::KalmanFitter m_kalmanFilter; /**< kalman filter object to fit the track */
 
     ROIGeometry m_theROIGeometry; /**< the geometry of the Region Of Interest */
 

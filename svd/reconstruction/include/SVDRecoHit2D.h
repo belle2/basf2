@@ -20,7 +20,8 @@
 #include <TMatrixD.h>
 
 // GenFit includes
-#include <RecoHits/GFAbsPlanarHit.h>
+#include <genfit/PlanarMeasurement.h>
+#include <genfit/TrackCandHit.h>
 
 namespace Belle2 {
   /**
@@ -40,7 +41,7 @@ namespace Belle2 {
    * }
    * @endcode
    */
-  class SVDRecoHit2D: public GFAbsPlanarHit {
+  class SVDRecoHit2D: public genfit::PlanarMeasurement {
   public:
     /** Default constructor for ROOT IO. */
     SVDRecoHit2D();
@@ -57,7 +58,7 @@ namespace Belle2 {
      * @param sigmaU Error of the Hit along u
      * @param sigmaV Error of the Hit along v
      */
-    SVDRecoHit2D(const SVDTrueHit* hit, float sigmaU = -1, float sigmaV = -1);
+    SVDRecoHit2D(const SVDTrueHit* hit, const genfit::TrackCandHit* trackCandHit = NULL, float sigmaU = -1, float sigmaV = -1);
 
 
     /** Construct SVDRecoHit directly from vxdid and coordinates without using a hit object from the storearray
@@ -89,12 +90,7 @@ namespace Belle2 {
     /** Creating a deep copy of this hit.
      * Overrides the method inherited from GFRecoHit.
      */
-    GFAbsRecoHit* clone();
-
-    /** Projection for the hit ...
-     * Overrides the method inherited from GFRecoHit.
-     */
-    const TMatrixD& getHMatrix(const GFAbsTrackRep* stateVector);
+    genfit::AbsMeasurement* clone() const;
 
     /** Get the compact ID.*/
     VxdID getSensorID() const { return m_sensorID; }
@@ -107,16 +103,16 @@ namespace Belle2 {
     const SVDCluster* getVCluster() const {return m_vCluster; }
 
     /** Get u coordinate.*/
-    float getU() const { return fHitCoord(0); }
+    float getU() const { return rawHitCoords_(0); }
     /** Get v coordinate.*/
-    float getV() const { return fHitCoord(1); }
+    float getV() const { return rawHitCoords_(1); }
 
     /** Get u coordinate variance */
-    float getUVariance() const { return fHitCov(0, 0); }
+    float getUVariance() const { return rawHitCov_(0, 0); }
     /** Get v coordinate variance */
-    float getVVariance() const { return fHitCov(1, 1); }
+    float getVVariance() const { return rawHitCov_(1, 1); }
     /** Get u-v error covariance.*/
-    float getUVCov() const { return fHitCov(0, 1); }
+    float getUVCov() const { return rawHitCov_(0, 1); }
 
     /** Get deposited energy. */
     float getEnergyDep() const { return m_energyDep; }
@@ -124,11 +120,13 @@ namespace Belle2 {
     /** Get deposited energy error. */
     //float getEnergyDepError() const { return m_energyDepError; }
 
+    /** Methods that actually interface to Genfit.  */
+    //virtual genfit::SharedPlanePtr constructPlane(const genfit::StateOnPlane&) const;
+    virtual std::vector<genfit::MeasurementOnPlane*> constructMeasurementsOnPlane(const genfit::AbsTrackRep*,
+        const genfit::SharedPlanePtr&) const;
   private:
 
     enum { HIT_DIMENSIONS = 2 /**< sensitive Dimensions of the Hit */ };
-    const static double c_HMatrixContent[10]; /**< holds all elements of H Matrix. A C array is the only possibility to set TMatrixD elements with its constructor*/
-    const static TMatrixD c_HMatrix; /**< H matrix needed for Genfit. getHMatrix will return this attribute*/
 
     unsigned short m_sensorID; /**< Unique sensor identifier.*/
     const SVDTrueHit* m_trueHit; /**< Pointer to the Truehit used to generate this hit */
@@ -141,7 +139,7 @@ namespace Belle2 {
     /** Set up Detector plane information */
     void setDetectorPlane();
 
-    ClassDef(SVDRecoHit2D, 4)
+    ClassDef(SVDRecoHit2D, 5)
   };
 
 } // namespace Belle2

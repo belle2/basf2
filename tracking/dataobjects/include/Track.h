@@ -15,12 +15,12 @@
 #include <tracking/dataobjects/TrackFitResult.h>
 #include <algorithm>
 
-class GFTrack;
+namespace genfit { class Track; }
 
 namespace Belle2 {
   /** Class that bundles various TrackFitResults.
    *
-   *  As the GFTrack has a lot of information that is only necessary during the fit,
+   *  As the genfit::Track has a lot of information that is only necessary during the fit,
    *  this is a much stripped down version containing only indices of TrackFitResults
    *  (which is what remains of the various TrackReps, that Genfit might use during the fit).
    */

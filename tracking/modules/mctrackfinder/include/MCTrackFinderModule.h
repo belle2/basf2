@@ -25,7 +25,7 @@ namespace Belle2 {
    *  but this can be changed with the WhichParticles option.
    *  For every hit the true time information is extracted from the trueHits or simHit hits.
    *  This Information is used to sort the hits in the correct order for the fitting of curling tracks.
-   *  The created GFTrackCandidates can be fitted with GenFitterModule.
+   *  The created genfit::TrackCandidates can be fitted with GenFitterModule.
    *
    *  @todo: maybe the asingment of planeIds and the true timing information is not 100 % accurate in every use case
    */

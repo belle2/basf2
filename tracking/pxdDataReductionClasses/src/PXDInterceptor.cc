@@ -8,10 +8,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <RKTrackRep.h>
-#include <GFTrack.h>
-#include <GFRecoHitFactory.h>
-#include <GFRecoHitProducer.h>
+#include <genfit/RKTrackRep.h>
+#include <genfit/Track.h>
+#include <genfit/MeasurementFactory.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Const.h>
 #include <framework/datastore/StoreArray.h>
@@ -37,45 +36,39 @@ PXDInterceptor::~PXDInterceptor()
 }
 
 void
-PXDInterceptor::fillInterceptList(StoreArray<PXDIntercept>* listToBeFilled, const StoreArray<GFTrackCand>& trackCandList,
+PXDInterceptor::fillInterceptList(StoreArray<PXDIntercept>* listToBeFilled, const StoreArray<genfit::TrackCand>& trackCandList,
                                   RelationArray* gfTrackCandToPXDIntercepts)
 {
 
-  StoreArray<GFTrackCand> trackCandBadStats(m_theROIinfo.badTracksListName);
-  StoreArray<GFTrack> GFtracks(m_theROIinfo.gfTracksListName);
+  StoreArray<genfit::TrackCand> trackCandBadStats(m_theROIinfo.badTracksListName);
+  StoreArray<genfit::Track> GFtracks(m_theROIinfo.gfTracksListName);
   StoreArray<SVDCluster> svdClusters;
 
   for (int i = 0; i < trackCandList.getEntries(); ++i) { //loop over all track candidates
 
     B2DEBUG(1, " %%%%%  Fit track candidate Nr. : " << i + 1);
-    GFTrackCand* aTrackCandPointer = trackCandList[i];
+    genfit::TrackCand* aTrackCandPointer = trackCandList[i];
 
-    RKTrackRep* trackRep = new RKTrackRep(aTrackCandPointer); //initialize track representation and give the seed helix parameters and cov and the pdg code to the track fitter
+    genfit::RKTrackRep* trackRep = new genfit::RKTrackRep(aTrackCandPointer->getPdgCode()); //initialize track representation
 
-    GFTrack gfTrack(trackRep);  //create the track with the corresponding track representation
-    gfTrack.setCandidate(*aTrackCandPointer);
-    GFRecoHitFactory factory;
-    GFRecoHitProducer <SVDCluster, SVDRecoHit>* svdClusterProducer = NULL;
-    svdClusterProducer =  new GFRecoHitProducer <SVDCluster, SVDRecoHit> (svdClusters.getPtr());
+    genfit::MeasurementFactory<genfit::AbsMeasurement>  factory;
+    genfit::MeasurementProducer <SVDCluster, SVDRecoHit>* svdClusterProducer = NULL;
+    svdClusterProducer =  new genfit::MeasurementProducer <SVDCluster, SVDRecoHit> (svdClusters.getPtr());
     factory.addProducer(Const::SVD, svdClusterProducer);
 
-    //use the factory to create RecoHits for all Hits stored in the track candidate
-    vector <GFAbsRecoHit*> factoryHits = factory.createMany(*aTrackCandPointer);
-    //add created hits to the track
-    gfTrack.addHitVector(factoryHits);
-    gfTrack.setCandidate(*aTrackCandPointer);
+    genfit::Track gfTrack(*aTrackCandPointer, factory, trackRep);  //create the track with the corresponding track representation
 
     try {
       m_kalmanFilter.processTrack(&gfTrack);
     } catch (...) { B2WARNING("track fit failed"); continue; }
 
-    if (trackRep->getStatusFlag() != 0) { B2WARNING("bad track status"); trackCandBadStats.appendNew(*aTrackCandPointer); continue; }
+    if (! gfTrack.getFitStatus()->isFitConverged()) { B2WARNING("bad track status"); continue; }
 
-    m_theROIGeometry.appendIntercepts(listToBeFilled, trackRep, i, gfTrackCandToPXDIntercepts);
+    m_theROIGeometry.appendIntercepts(listToBeFilled, &gfTrack, i, gfTrackCandToPXDIntercepts);
 
     GFtracks.appendNew(gfTrack); //giulia
 
-    //apparently the desctructor of GFTrack also take care of deleting the RKTrackRep
+    //apparently the desctructor of genfit::Track also take care of deleting the RKTrackRep
 
   } //loop on the track candidate list
 

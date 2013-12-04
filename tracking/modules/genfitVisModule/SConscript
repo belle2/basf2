@@ -1,0 +1,12 @@
+Import('env')
+ 
+env['LIBS'] = ['framework', 'genfit2']
+
+# check for EVE (needed for eventDisplay)
+if env.has_key('HAS_TEVE'):
+  if not env['HAS_TEVE']:
+    print "GenfitVis module disabled, please recompile root with opengl support (on Debian/Ubuntu you'll probably only need to install libglu1-mesa-dev and rebuild)"
+
+  env['CONTINUE'] = True
+  
+Return('env')

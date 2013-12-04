@@ -40,7 +40,7 @@ namespace Belle2 {
     ~DisplayModule(); //< dtor
 
     void initialize(); //< Sets up geometry if needed.
-    void event(); //< Show GFTracks & hits in event viewer until next event is requested.
+    void event(); //< Show genfit::Tracks & hits in event viewer until next event is requested.
     void terminate(); //< terminate gEve to avoid problems with root's cleanup
   private:
     /** List of drawing options, a combination of:
@@ -78,13 +78,13 @@ namespace Belle2 {
     /** If true, all neutral primary and secondary MCParticles will be shown, regardless of wether hits are produced. */
     bool m_showNeutrals;
 
-    /** If true, fitted GFTracks, GFRave Vertices and ECLGamma objects will be shown in the display. */
+    /** If true, fitted genfit::Tracks, GFRave Vertices and ECLGamma objects will be shown in the display. */
     bool m_showTrackLevelObjects;
 
-    /** Wether to show GFTrackCands */
+    /** Wether to show genfit::TrackCands */
     bool m_showGFTrackCands;
 
-    /** Wether to use cluster hits for GFTrackCands */
+    /** Wether to use cluster hits for genfit::TrackCands */
     bool m_useClusters;
 
     /** Non-interactively save visualisations for each event. */

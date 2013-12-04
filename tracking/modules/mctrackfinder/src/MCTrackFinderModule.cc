@@ -26,8 +26,8 @@
 #include <svd/dataobjects/SVDCluster.h>
 #include <vxd/dataobjects/VxdID.h>
 #include <framework/dataobjects/SimpleVec.h>
-#include <GFTrackCand.h>
-#include <tracking/trackCandidateHits/CDCTrackCandHit.h>
+#include <genfit/TrackCand.h>
+#include <genfit/WireTrackCandHit.h>
 
 #include <boost/foreach.hpp>
 #include <boost/math/special_functions/sign.hpp>
@@ -55,7 +55,7 @@ REG_MODULE(MCTrackFinder)
 MCTrackFinderModule::MCTrackFinderModule() : Module()
 {
   //Set module properties
-  setDescription("Uses the MC information to create GFTrackCandidates for primary MCParticles and Relations between them.  Fills the created GFTrackCandidates with all information (start values, hit indices) needed for the fitting.");
+  setDescription("Uses the MC information to create genfit::TrackCandidates for primary MCParticles and Relations between them.  Fills the created genfit::TrackCandidates with all information (start values, hit indices) needed for the fitting.");
   setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
 
   //Parameter definition
@@ -79,10 +79,10 @@ MCTrackFinderModule::MCTrackFinderModule() : Module()
   addParam("Neutrals", m_neutrals, "Set true if track candidates should be created also for neutral particles", bool(false));
 
   //smearing of MCMomentum
-  addParam("Smearing", m_smearing, "Smearing of MCMomentum/MCVertex prior to storing it in GFTrackCandidate (in %). A negative value will switch off smearing. This is also the default.", -1.0);
+  addParam("Smearing", m_smearing, "Smearing of MCMomentum/MCVertex prior to storing it in genfit::TrackCandidate (in %). A negative value will switch off smearing. This is also the default.", -1.0);
   addParam("SmearingCov", m_smearingCov, "Covariance matrix used to smear the true pos and mom before passed to track candidate. This matrix will also passed to Genfit as the initial covarance matrix. If any diagonal value is negative this feature will not be used. OFF DIAGNOLA ELEMENTS DO NOT HAVE AN EFFECT AT THE MOMENT", vector<double>(36, -1.0));
   // names of output containers
-  addParam("GFTrackCandidatesColName", m_gfTrackCandsColName, "Name of collection holding the GFTrackCandidates (output)", string(""));
+  addParam("genfit::TrackCandidatesColName", m_gfTrackCandsColName, "Name of collection holding the genfit::TrackCandidates (output)", string(""));
 
   addParam("TrueHitMustExist", m_enforceTrueHit, "If set true only cluster hits that have a relation to a TrueHit will be included in the track candidate", false);
 }
@@ -99,9 +99,9 @@ void MCTrackFinderModule::initialize()
   StoreArray<MCParticle>::required();
 
   //output store arrays have to be registered in initialize()
-  StoreArray<GFTrackCand>::registerPersistent(m_gfTrackCandsColName);
+  StoreArray<genfit::TrackCand>::registerPersistent(m_gfTrackCandsColName);
 
-  RelationArray::registerPersistent<GFTrackCand, MCParticle>(m_gfTrackCandsColName, "");
+  RelationArray::registerPersistent<genfit::TrackCand, MCParticle>(m_gfTrackCandsColName, "");
 
   // build a bit mask with all properties a MCParticle should have to lead to the creation of a track candidate
   m_particleProperties = 0;
@@ -236,7 +236,7 @@ void MCTrackFinderModule::event()
 
 
   //register StoreArray which will be filled by this module
-  StoreArray<GFTrackCand> trackCandidates(m_gfTrackCandsColName);
+  StoreArray<genfit::TrackCand> trackCandidates(m_gfTrackCandsColName);
   trackCandidates.create();
   RelationArray gfTrackCandToMCPart(trackCandidates, mcParticles);
 
@@ -461,10 +461,10 @@ void MCTrackFinderModule::event()
       momentum.SetXYZ(smearedPX, smearedPY, smearedPZ);
     }
 
-    //Errors for the position/momentum values can also be passed to GFTrackCandidate
+    //Errors for the position/momentum values can also be passed to genfit::TrackCandidate
     //Default values in Genfit are (1.,1.,1.,), they seem to be not good!!
     //The best way to set the 'correct' errors has to be investigated....
-    if (m_initialCov(0, 0) > 0.0) { // alternative seamring with according to a covariance matrix that will also be passed to genfit
+    if (m_initialCov(0, 0) > 0.0) { // alternative seamring with according to a covariance matrix
       double smearedX = gRandom->Gaus(positionTrue.x(), sqrt(m_initialCov(0, 0)));
       double smearedY = gRandom->Gaus(positionTrue.y(), sqrt(m_initialCov(1, 1)));
       double smearedZ = gRandom->Gaus(positionTrue.z(), sqrt(m_initialCov(2, 2)));
@@ -479,17 +479,17 @@ void MCTrackFinderModule::event()
     stateSeed(3) = momentum[0]; stateSeed(4) = momentum[1]; stateSeed(5) = momentum[2];
 
     //Finally set the complete track seed
-    trackCandidates[counter]->set6DSeedAndPdgCode(stateSeed, pdg, covSeed);
+    trackCandidates[counter]->set6DSeedAndPdgCode(stateSeed, pdg);
 
     //Save the MCParticleID in the TrackCandidate
     trackCandidates[counter]->setMcTrackId(iPart);
 
     //create relation between the track candidates and the mcParticle (redundant to saving the MCId)
     gfTrackCandToMCPart.add(counter, iPart);
-    B2DEBUG(100, " --- Create relation between GFTrackCand " << counter << " and MCParticle " << iPart);
+    B2DEBUG(100, " --- Create relation between genfit::TrackCand " << counter << " and MCParticle " << iPart);
 
     //member variable Dip is currently used to store the purity of the tracks, for MCTracks it is always 100 %
-    //trackCandidates[counter]->setDip(100); //it is better to compare GFTrackCands from this module with a "real" track finder to get calculate the purity in a separate step than putting it into something with intended for something else
+    //trackCandidates[counter]->setDip(100); //it is better to compare genfit::TrackCands from this module with a "real" track finder to get calculate the purity in a separate step than putting it into something with intended for something else
 
     //assign indices of the Hits from all detectors, their are distinguishable by their DetID. The official detector ids in basf2 are:
     // pxd 1
@@ -587,7 +587,7 @@ void MCTrackFinderModule::event()
         TVector3 wireToSimHit = simHitPos - simHitPosOnWire;
         double scalarProduct = wireToSimHit * (wireDir.Cross(simMom));
         char lrAmbiSign = boost::math::sign(scalarProduct);
-        CDCTrackCandHit* aCdcTrackCandHit = new CDCTrackCandHit(Const::CDC, hitID, -1, time, lrAmbiSign); //do not delete! the GFTrackCand has ownership
+        genfit::WireTrackCandHit* aCdcTrackCandHit = new genfit::WireTrackCandHit(Const::CDC, hitID, -1, time, lrAmbiSign); //do not delete! the genfit::TrackCand has ownership
         trackCandidates[counter]->addHit(aCdcTrackCandHit);
         B2DEBUG(101, "CDC hit " << hitID << " has reft/right sign " << int(lrAmbiSign));
       }

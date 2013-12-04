@@ -60,6 +60,7 @@ if chain.GetEntriesFast() < 1:
 
 # output files
 outFile = ROOT.TFile(outFileName, 'recreate')
+outFile.cd()
 
 # important numbers -----------------------------------------------------------------------------------------------------------------------------
 # 2D Histograms
@@ -86,7 +87,10 @@ pValue_RMS_Range = 0.125
 # 1D Histograms
 histRange = 10.0  # range for the analysis histogram
 resoScaling = 0.1  # scaling factor for resolution analysis histogram
-histBins = 1000  # number of bins for the analysis histogram
+histBins = 250  # number of bins for the analysis histogram
+if full:
+    histBins = 1000
+iterRange = 15  # number of bins for the number of iterations histogram
 
 MADtoSigma = 1.4826  # sigma = 1.4826*MAD (for gaussian distributions)
 outlierCut = 4.  # distance from median in terms of MAD std when to count as outlier
@@ -138,9 +142,9 @@ resHistos = []
 pullHistos = []
 
 # fitting efficiency
-h_efficiency = ROOT.TH2F(
-    'h_efficiency',
-    'track fitting efficiency',
+h_fitted = ROOT.TH2F(
+    'h_fitted',
+    'tracks fitted',
     costhN,
     costhL,
     costhU,
@@ -148,13 +152,42 @@ h_efficiency = ROOT.TH2F(
     ptL,
     ptU,
     )
-h_efficiency.SetMinimum(0.)
-h_efficiency.SetMaximum(1.)
-histos.append(h_efficiency)
+h_fitted.SetMinimum(0.)
+h_fitted.SetMaximum(1.)
+histos.append(h_fitted)
+
+# fitting efficiency
+h_fittedConverged = ROOT.TH2F(
+    'h_fittedConverged',
+    'tracks fitted and converged',
+    costhN,
+    costhL,
+    costhU,
+    ptN,
+    ptL,
+    ptU,
+    )
+h_fittedConverged.SetMinimum(0.)
+h_fittedConverged.SetMaximum(1.)
+histos.append(h_fittedConverged)
+
+h_NumIterations = ROOT.TH2F(
+    'h_NumIterations',
+    'number of iterations',
+    costhN,
+    costhL,
+    costhU,
+    ptN,
+    ptL,
+    ptU,
+    )
+h_NumIterations.SetMinimum(0.)
+h_NumIterations.SetMaximum(20.)
+histos.append(h_NumIterations)
 
 # p-values
-h_pValue_bu_mean = ROOT.TH2F(
-    'h_pValue_bu_mean',
+h_pValue_b_mean = ROOT.TH2F(
+    'h_pValue_b_mean',
     'mean of p-value distribution from the backward filter',
     costhN,
     costhL,
@@ -163,12 +196,12 @@ h_pValue_bu_mean = ROOT.TH2F(
     ptL,
     ptU,
     )
-h_pValue_bu_mean.SetMinimum(pValue_mean_Ideal - pValue_mean_Range)
-h_pValue_bu_mean.SetMaximum(pValue_mean_Ideal + pValue_mean_Range)
-histos.append(h_pValue_bu_mean)
+h_pValue_b_mean.SetMinimum(pValue_mean_Ideal - pValue_mean_Range)
+h_pValue_b_mean.SetMaximum(pValue_mean_Ideal + pValue_mean_Range)
+histos.append(h_pValue_b_mean)
 
-h_pValue_bu_RMS = ROOT.TH2F(
-    'h_pValue_bu_RMS',
+h_pValue_b_RMS = ROOT.TH2F(
+    'h_pValue_b_RMS',
     'RMS of p-value distribution from the backward filter',
     costhN,
     costhL,
@@ -177,12 +210,12 @@ h_pValue_bu_RMS = ROOT.TH2F(
     ptL,
     ptU,
     )
-h_pValue_bu_RMS.SetMinimum(pValue_RMS_Ideal - pValue_RMS_Range)
-h_pValue_bu_RMS.SetMaximum(pValue_RMS_Ideal + pValue_RMS_Range)
-histos.append(h_pValue_bu_RMS)
+h_pValue_b_RMS.SetMinimum(pValue_RMS_Ideal - pValue_RMS_Range)
+h_pValue_b_RMS.SetMaximum(pValue_RMS_Ideal + pValue_RMS_Range)
+histos.append(h_pValue_b_RMS)
 
-h_pValue_fu_mean = ROOT.TH2F(
-    'h_pValue_fu_mean',
+h_pValue_f_mean = ROOT.TH2F(
+    'h_pValue_f_mean',
     'mean of p-value distribution from the forward filter',
     costhN,
     costhL,
@@ -191,12 +224,12 @@ h_pValue_fu_mean = ROOT.TH2F(
     ptL,
     ptU,
     )
-h_pValue_fu_mean.SetMinimum(pValue_mean_Ideal - pValue_mean_Range)
-h_pValue_fu_mean.SetMaximum(pValue_mean_Ideal + pValue_mean_Range)
-histos.append(h_pValue_fu_mean)
+h_pValue_f_mean.SetMinimum(pValue_mean_Ideal - pValue_mean_Range)
+h_pValue_f_mean.SetMaximum(pValue_mean_Ideal + pValue_mean_Range)
+histos.append(h_pValue_f_mean)
 
-h_pValue_fu_RMS = ROOT.TH2F(
-    'h_pValue_fu_RMS',
+h_pValue_f_RMS = ROOT.TH2F(
+    'h_pValue_f_RMS',
     'RMS of p-value distribution from the forward filter',
     costhN,
     costhL,
@@ -205,9 +238,9 @@ h_pValue_fu_RMS = ROOT.TH2F(
     ptL,
     ptU,
     )
-h_pValue_fu_RMS.SetMinimum(pValue_RMS_Ideal - pValue_RMS_Range)
-h_pValue_fu_RMS.SetMaximum(pValue_RMS_Ideal + pValue_RMS_Range)
-histos.append(h_pValue_fu_RMS)
+h_pValue_f_RMS.SetMinimum(pValue_RMS_Ideal - pValue_RMS_Range)
+h_pValue_f_RMS.SetMaximum(pValue_RMS_Ideal + pValue_RMS_Range)
+histos.append(h_pValue_f_RMS)
 
 # resolutions
 h_relRes_curvVertex_mean = ROOT.TH2F(
@@ -378,20 +411,27 @@ anaHistos.append(ROOT.TH1F('histoPull4', 'Pulls p_y', histBins, -1.
 anaHistos.append(ROOT.TH1F('histoPull5', 'Pulls p_z', histBins, -1.
                  * histRange, histRange))  # p_z
 
+anaHistos.append(ROOT.TH1F('histoNIter', 'number of iterations', iterRange, 0,
+                 iterRange))
+
 absDev = ROOT.TH1D('absDev', 'absDev', histBins, 0, histRange)
 
 # loop over chain ------------------------------------------------------------------------------------------------------------------------------
 if full:
     outFileBins = ROOT.TFile(outFileName + '.bins.root', 'recreate')
+    outFile.cd()
 
     # set up eventLists for event selection
     evtListCosth = ROOT.TEventList('evtListCosth', 'evtListCosth')
     evtListBin = ROOT.TEventList('evtListBin', 'evtListBin')
-    evtListBinFlag = ROOT.TEventList('evtListBinFlag', 'evtListBinFlag')
+    evtListBinFitted = ROOT.TEventList('evtListBinFitted', 'evtListBinFitted')
+    evtListBinFittedConverged = ROOT.TEventList('evtListBinFittedConverged',
+            'evtListBinFittedConverged')
 
     canvases = []  # canvases for plotting bin-wise data
 
-    statusFlagCut = ROOT.TCut('genfitStatusFlag==0')
+    fittedCut = ROOT.TCut('fitted==1')
+    fittedConvergedCut = ROOT.TCut('fittedConverged==1')
 
     costh = costhL
     binX = 1
@@ -403,7 +443,8 @@ if full:
         # select events in theta range
         evtListCosth.Reset()
         evtListBin.Reset()
-        evtListBinFlag.Reset()
+        evtListBinFitted.Reset()
+        evtListBinFittedConverged.Reset()
         chain.SetEventList(ROOT.NULL)
         chain.Draw('>> evtListCosth', costhCUT)
         chain.SetEventList(evtListCosth)
@@ -416,8 +457,8 @@ if full:
             ptCUT = ROOT.TCut('trueVertexMom.Perp()>=' + str(pt)
                               + ' && trueVertexMom.Perp()<' + str(pt + ptS))
             binCut = ROOT.TCut(ptCUT.GetTitle() + ' && ' + costhCUT.GetTitle())
-            binStFlCut = ROOT.TCut(statusFlagCut.GetTitle() + ' && '
-                                   + binCut.GetTitle())
+            binFittedCut = ROOT.TCut(fittedCut.GetTitle() + ' && '
+                                     + binCut.GetTitle())
 
             # create canvas for plotting bin-wise data
             canvases.append(ROOT.TCanvas('Bin(' + str(binX) + ',' + str(binY)
@@ -429,41 +470,55 @@ if full:
 
             # further select events in pt range
             evtListBin.Reset()
-            evtListBinFlag.Reset()
+            evtListBinFitted.Reset()
+            evtListBinFittedConverged.Reset()
             chain.SetEventList(evtListCosth)
             chain.Draw('>> evtListBin', binCut)
             chain.SetEventList(evtListBin)
 
-            # further reduce event list to entries with statusFlag==0
-            chain.Draw('>> evtListBinFlag', statusFlagCut)
-            chain.SetEventList(evtListBinFlag)
+            # number of iterations
+            chain.Draw('numIterations >> histoNIter')
+            if anaHistos[9].GetEntries() > 0:
+                h_NumIterations.SetBinContent(binX, binY,
+                        anaHistos[9].GetMean())
+
+            # further reduce event list to fitted tracks
+            chain.Draw('>> evtListBinFitted', fittedCut)
+            chain.Draw('>> evtListBinFittedConverged', fittedConvergedCut)
+            chain.SetEventList(evtListBinFitted)
 
             print 'Bin(', binX, binY, '), costh =', costh, '; pt =', pt, \
                 '   # events in bin: ', evtListBin.GetN(), \
-                '   # fitted events in bin: ', evtListBinFlag.GetN()
+                '   # fitted events in bin: ', evtListBinFitted.GetN()
 
-            # efficiency
+            # fitted tracks
             if evtListBin.GetN() > 0:
-                h_efficiency.SetBinContent(binX, binY,
-                        float(evtListBinFlag.GetN())
+                h_fitted.SetBinContent(binX, binY,
+                                       float(evtListBinFitted.GetN())
+                                       / float(evtListBin.GetN()))
+
+            # fitted and converged tracks
+            if evtListBin.GetN() > 0:
+                h_fittedConverged.SetBinContent(binX, binY,
+                        float(evtListBinFittedConverged.GetN())
                         / float(evtListBin.GetN()))
+
+            # from here on, only fitted tracks will be taken into account
 
             # p-values
             canvases[-1].cd(1)
-            chain.Draw('pValue_bu >> histo_p_bu')
+            chain.Draw('pValue_b >> histo_p_bu')
             if anaHistos[0].GetEntries() > 0:
-                h_pValue_bu_mean.SetBinContent(binX, binY,
+                h_pValue_b_mean.SetBinContent(binX, binY,
                         anaHistos[0].GetMean())
-                h_pValue_bu_RMS.SetBinContent(binX, binY,
-                        anaHistos[0].GetRMS())
+                h_pValue_b_RMS.SetBinContent(binX, binY, anaHistos[0].GetRMS())
 
             canvases[-1].cd(2)
-            chain.Draw('pValue_fu >> histo_p_fu')
+            chain.Draw('pValue_f >> histo_p_fu')
             if anaHistos[1].GetEntries() > 0:
-                h_pValue_fu_mean.SetBinContent(binX, binY,
+                h_pValue_f_mean.SetBinContent(binX, binY,
                         anaHistos[1].GetMean())
-                h_pValue_fu_RMS.SetBinContent(binX, binY,
-                        anaHistos[1].GetRMS())
+                h_pValue_f_RMS.SetBinContent(binX, binY, anaHistos[1].GetRMS())
 
             # resolutions
             iHist = 0
@@ -490,6 +545,7 @@ if full:
 
             outFileBins.cd()
             canvases[-1].Write()
+            outFile.cd()
 
             pt += ptS
             binY += 1
@@ -513,21 +569,41 @@ else:
 
        # full == false
 
-    Efficiency = ROOT.TNtuple('Efficiency', 'Efficiency of the track fitter',
-                              'number')
+    nt_Fitted = ROOT.TNtuple('nt_Fitted', 'Fitted tracks', 'number')
 
-    evtListFlag = ROOT.TEventList('evtListFlag', 'evtListFlag')
-    statusFlagCut = ROOT.TCut('genfitStatusFlag==0')
-    chain.Draw('>> evtListFlag', statusFlagCut)
+    nt_FittedConverged = ROOT.TNtuple('nt_FittedConverged',
+                                      'Fitted and converged tracks', 'number')
 
-    efficiency = float(evtListFlag.GetN()) / float(chain.GetEntries())
-    Efficiency.Fill(efficiency)
+    evtListFitted = ROOT.TEventList('evtListFitted', 'evtListFitted')
+    evtListFittedConverged = ROOT.TEventList('evtListFittedConverged',
+            'evtListFittedConverged')
+
+    fittedCut = ROOT.TCut('fitted==1')
+    fittedConvergedCut = ROOT.TCut('fittedConverged==1')
+
+    chain.Draw('>> evtListFitted', fittedCut)
+
+    fitted = float(evtListFitted.GetN()) / float(chain.GetEntries())
+    nt_Fitted.Fill(fitted)
+
+    chain.Draw('>> evtListFittedConverged', fittedConvergedCut)
+
+    fittedConverged = float(evtListFittedConverged.GetN()) \
+        / float(chain.GetEntries())
+    nt_FittedConverged.Fill(fittedConverged)
+
+    # number of iterations
+    chain.Draw('numIterations >> histoNIter')
+
+    chain.SetEventList(evtListFitted)
+
+    # from here on, only fitted tracks will be taken into account
 
     # p-values
-    chain.Draw('pValue_bu >> histo_p_bu')
+    chain.Draw('pValue_b >> histo_p_bu')
     anaHistos[0].Fit('pol1', 'M')
 
-    chain.Draw('pValue_fu >> histo_p_fu')
+    chain.Draw('pValue_f >> histo_p_fu')
     anaHistos[1].Fit('pol1', 'M')
 
     # resolutions
@@ -542,7 +618,8 @@ else:
         anaHistos[3 + iVar].Fit('gaus', 'LM')
 
     outFile.cd()
-    Efficiency.Write()
+    nt_Fitted.Write()
+    nt_FittedConverged.Write()
     for h in anaHistos:
         h.Write()
 

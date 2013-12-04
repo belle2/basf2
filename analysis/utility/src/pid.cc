@@ -1,6 +1,6 @@
 #include <analysis/utility/pid.h>
 
-#include <GFTrack.h>
+#include <genfit/Track.h>
 
 #include <top/dataobjects/TOPBarHit.h>
 #include <arich/dataobjects/ARICHAeroHit.h>
@@ -11,10 +11,10 @@
 const TOPLikelihood* getTOPLikelihood(const Track& track)
 {
   StoreArray<TOPLikelihood> toplogL;
-  StoreArray<GFTrack>        gfTracks;
+  StoreArray<genfit::Track>        gfTracks;
   StoreArray<Track>          tracks;
 
-  RelationIndex<GFTrack, TOPLikelihood> gfTracksToTOPLogL(gfTracks, toplogL);
+  RelationIndex<genfit::Track, TOPLikelihood> gfTracksToTOPLogL(gfTracks, toplogL);
 
   if (!(tracks && gfTracks && toplogL && gfTracksToTOPLogL))
     return 0;
@@ -24,7 +24,7 @@ const TOPLikelihood* getTOPLikelihood(const Track& track)
   if (trackIndex < 0)
     return 0;
 
-  // It is assumed that Tracks and GFTracks have the same indices
+  // It is assumed that Tracks and genfit::Tracks have the same indices
   if (!gfTracks[trackIndex])
     return 0;
 
@@ -37,10 +37,10 @@ const TOPLikelihood* getTOPLikelihood(const Track& track)
 const DedxLikelihood* getDEDXLikelihood(const Track& track)
 {
   StoreArray<DedxLikelihood> dedxlogL;
-  StoreArray<GFTrack>        gfTracks;
+  StoreArray<genfit::Track>        gfTracks;
   StoreArray<Track>          tracks;
 
-  RelationIndex<GFTrack, DedxLikelihood> gfTracksToDEDXLogL(gfTracks, dedxlogL);
+  RelationIndex<genfit::Track, DedxLikelihood> gfTracksToDEDXLogL(gfTracks, dedxlogL);
 
   if (!(tracks && gfTracks && dedxlogL && gfTracksToDEDXLogL))
     return 0;
@@ -50,7 +50,7 @@ const DedxLikelihood* getDEDXLikelihood(const Track& track)
   if (trackIndex < 0)
     return 0;
 
-  // It is assumed that Tracks and GFTracks have the same indices
+  // It is assumed that Tracks and genfit::Tracks have the same indices
   if (!gfTracks[trackIndex])
     return 0;
 

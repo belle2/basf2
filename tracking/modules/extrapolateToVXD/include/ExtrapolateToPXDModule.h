@@ -18,12 +18,12 @@
 namespace Belle2 {
 
   /** Module to extrapolate Tracks found in the CDC and SVD to PXD.
-   *  This module needs as input GFTracks created by fitting CDC+SVD Hits.
+   *  This module needs as input genfit::Tracks created by fitting CDC+SVD Hits.
    *  This module is basically very similar to the ExtrapolateToSVDModule.
    *  The search for corresponding PXDHits is perfomed layer wise.
-   *  For each layer the GFTrack is extrapolated to each PXDHit and the distance between the PXDHit and the found point of closest approach is considered.
+   *  For each layer the genfit::Track is extrapolated to each PXDHit and the distance between the PXDHit and the found point of closest approach is considered.
    *  The PXDHit with the shortest distance is taken (one hit per layer).
-   *  The output are GFTrackCands, which are basically copies of GFTrackCands from GFTracks, but with new momentum seed (fit result) and the additional PXDHits.
+   *  The output are genfit::TrackCands, which are basically copies of genfit::TrackCands from genfit::Tracks, but with new momentum seed (fit result) and the additional PXDHits.
    *  @todo So far the module only proves that the principle is working, there is plenty of room for improvement (preselection of PXDHits to be considered, more elaborate criteria to assign hits, possibility to have 2 PXDHits per layer etc)
    */
 
@@ -70,8 +70,8 @@ namespace Belle2 {
     std::string m_pxdHitsColName;                    /**< PXDHits collection name */
     std::string m_svdHitsColName;                    /**< SVDHits collection name */
     std::string m_cdcHitsColName;                    /**< CDCHits collection name */
-    std::string m_gfTrackCandsColName;               /**< GFTrackCandidates collection name */
-    std::string m_gfTracksColName;                   /**< GFTracks collection name */
+    std::string m_gfTrackCandsColName;               /**< genfit::TrackCandidates collection name */
+    std::string m_gfTracksColName;                   /**< genfit::Tracks collection name */
 
     bool m_textFileOutput;                           /**< Boolean to mark if text output files with hit coordinates should be created*/
     std::ofstream Hitsfile;                          /**< Simple text file to write out the coordinates of the digitized hits*/

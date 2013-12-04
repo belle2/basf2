@@ -15,7 +15,7 @@
 #include <vxd/geometry/SensorPlane.h>
 #include <vxd/geometry/GeoCache.h>
 
-#include <GFDetPlane.h>
+#include <genfit/DetPlane.h>
 #include <TVector3.h>
 #include <TRandom.h>
 #include <cmath>
@@ -28,21 +28,19 @@ using namespace Belle2;
 ClassImp(SVDRecoHit)
 
 
-const double SVDRecoHit::c_HMatrixUContent[5] = {0, 0, 0, 1, 0};
-const TMatrixD SVDRecoHit::c_HMatrixU = TMatrixD(HIT_DIMENSIONS, 5, c_HMatrixUContent);
-
-const double SVDRecoHit::c_HMatrixVContent[5] = {0, 0, 0, 0, 1};
-const TMatrixD SVDRecoHit::c_HMatrixV = TMatrixD(HIT_DIMENSIONS, 5, c_HMatrixVContent);
-
 SVDRecoHit::SVDRecoHit():
-  GFAbsPlanarHit(HIT_DIMENSIONS), m_sensorID(0), m_trueHit(0),
-  m_cluster(0), m_energyDep(0), m_rotationPhi(0)
-{}
+  genfit::PlanarMeasurement(HIT_DIMENSIONS), m_sensorID(0), m_trueHit(0),
+  m_cluster(0), m_isU(0), m_energyDep(0), m_rotationPhi(0)
+{
+  setStripV(!m_isU);
+}
 
 SVDRecoHit::SVDRecoHit(const SVDTrueHit* hit, bool uDirection, float sigma):
-  GFAbsPlanarHit(HIT_DIMENSIONS), m_sensorID(0), m_trueHit(hit),
+  genfit::PlanarMeasurement(HIT_DIMENSIONS), m_sensorID(0), m_trueHit(hit),
   m_cluster(0), m_isU(uDirection), m_energyDep(0), m_rotationPhi(0)
 {
+  setStripV(!m_isU);
+
   // Smear the coordinate when constructing from a TrueHit.
   if (!gRandom) B2FATAL("gRandom not initialized, please set up gRandom first");
 
@@ -56,22 +54,24 @@ SVDRecoHit::SVDRecoHit(const SVDTrueHit* hit, bool uDirection, float sigma):
   }
 
   // Set positions
-  fHitCoord(0) = (m_isU) ? gRandom->Gaus(hit->getU(), sigma) : gRandom->Gaus(hit->getV(), sigma);
+  rawHitCoords_(0) = (m_isU) ? gRandom->Gaus(hit->getU(), sigma) : gRandom->Gaus(hit->getV(), sigma);
   // Set the error covariance matrix
-  fHitCov(0, 0) = sigma * sigma;
+  rawHitCov_(0, 0) = sigma * sigma;
   // Set physical parameters
   m_energyDep = hit->getEnergyDep();
   // Setup geometry information
   setDetectorPlane();
 }
 
-SVDRecoHit::SVDRecoHit(const SVDCluster* hit):
-  GFAbsPlanarHit(HIT_DIMENSIONS), m_sensorID(0), m_trueHit(0),
+SVDRecoHit::SVDRecoHit(const SVDCluster* hit, const genfit::TrackCandHit* trackCandHit):
+  genfit::PlanarMeasurement(HIT_DIMENSIONS), m_sensorID(0), m_trueHit(0),
   m_cluster(hit), m_energyDep(0), m_rotationPhi(0)
 {
   // Set the sensor UID
   m_sensorID = hit->getSensorID();
   m_isU = hit->isUCluster();
+
+  setStripV(!m_isU);
 
   // Determine if we have a wedge sensor.
   const SVD::SensorInfo& geometry = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(m_sensorID));
@@ -80,16 +80,16 @@ SVDRecoHit::SVDRecoHit(const SVDCluster* hit):
 
   // Set positions
   if (!isWedgeU)
-    fHitCoord(0) = hit->getPosition();
+    rawHitCoords_(0) = hit->getPosition();
   else {
     // For u coordinate in a wedge sensor, the position line is not u = const.
     // We have to rotate the coordinate system to achieve this.
     m_rotationPhi = atan2((geometry.getBackwardWidth() - geometry.getForwardWidth()) / geometry.getWidth(0) * hit->getPosition(), geometry.getLength());
     // Set the position in the rotated coordinate frame.
-    fHitCoord(0) = hit->getPosition() * cos(m_rotationPhi);
+    rawHitCoords_(0) = hit->getPosition() * cos(m_rotationPhi);
   }
   // Set the error covariance matrix (this does not scale with position)
-  fHitCov(0, 0) = hit->getPositionSigma() * hit->getPositionSigma();
+  rawHitCov_(0, 0) = hit->getPositionSigma() * hit->getPositionSigma();
   // Set physical parameters
   m_energyDep = hit->getCharge();
   // Setup geometry information
@@ -118,20 +118,20 @@ void SVDRecoHit::setDetectorPlane()
   //Construct the detector plane
   VXD::SensorPlane* finitePlane = new VXD::SensorPlane(m_sensorID, 20.0, 20.0);
   if (isWedgeU) finitePlane->setRotation(m_rotationPhi);
-  GFDetPlane detPlane(origin, uGlobal, vGlobal, finitePlane);
-  setDetPlane(detPlane);
+  genfit::SharedPlanePtr detPlane(new genfit::DetPlane(origin, uGlobal, vGlobal, finitePlane));
+  setPlane(detPlane, m_sensorID);
 }
 
-GFAbsRecoHit* SVDRecoHit::clone()
+genfit::AbsMeasurement* SVDRecoHit::clone() const
 {
   return new SVDRecoHit(*this);
 }
 
-const TMatrixD& SVDRecoHit::getHMatrix(const GFAbsTrackRep*)
+
+std::vector<genfit::MeasurementOnPlane*> SVDRecoHit::constructMeasurementsOnPlane(const genfit::AbsTrackRep* rep,
+    const genfit::SharedPlanePtr& pl) const
 {
-  if (m_isU == true) {
-    return c_HMatrixU;
-  } else {
-    return c_HMatrixV;
-  }
+  return std::vector<genfit::MeasurementOnPlane*>(1, new genfit::MeasurementOnPlane(rawHitCoords_, rawHitCov_, pl, rep, this->constructHMatrix(rep)));
 }
+
+

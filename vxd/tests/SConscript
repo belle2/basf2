@@ -1,5 +1,5 @@
 Import('env')
 
-env['LIBS'] = ['framework', 'Geom', 'vxd_dataobjects', 'vxd', '$ROOT_LIBS', 'genfit']
+env['LIBS'] = ['framework', 'Geom', 'vxd_dataobjects', 'vxd', '$ROOT_LIBS', 'genfit2']
 
 Return('env')

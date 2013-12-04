@@ -21,7 +21,8 @@
 
 #include "Exception.h"
 #include "KalmanFitterInfo.h"
-#include <PlanarMeasurement.h>
+#include "KalmanFitStatus.h"
+#include "PlanarMeasurement.h"
 
 #include <algorithm>
 #include <iostream>
@@ -95,6 +96,15 @@ Track::Track(AbsTrackRep* trackRep, const TVectorD& stateSeed) :
   covSeed_(TMatrixDSym::kUnit, TMatrixDSym(6))
 {
   addTrackRep(trackRep);
+}
+
+
+Track::Track(AbsTrackRep* trackRep, const TVector3& posSeed, const TVector3& momSeed) :
+  cardinalRep_(0), fitStatuses_(), stateSeed_(6),
+  covSeed_(TMatrixDSym::kUnit, TMatrixDSym(6))
+{
+  addTrackRep(trackRep);
+  setStateSeed(posSeed, momSeed);
 }
 
 
@@ -252,12 +262,42 @@ bool Track::hasFitStatus(const AbsTrackRep* rep) const {
 }
 
 
+bool Track::hasKalmanFitStatus(const AbsTrackRep* rep) const {
+  if (rep == NULL)
+    rep = getCardinalRep();
+
+  if (fitStatuses_.find(rep) == fitStatuses_.end())
+    return false;
+
+  return (dynamic_cast<KalmanFitStatus*>(fitStatuses_.at(rep)) != NULL);
+}
+
+
+KalmanFitStatus* Track::getKalmanFitStatus(const AbsTrackRep* rep) const {
+  return dynamic_cast<KalmanFitStatus*>(getFitStatus(rep));
+}
+
+
 void Track::setFitStatus(FitStatus* fitStatus, const AbsTrackRep* rep) {
   if (fitStatuses_.find(rep) != fitStatuses_.end())
     delete fitStatuses_.at(rep);
 
   fitStatuses_[rep] = fitStatus;
 }
+
+
+void Track::setStateSeed(const TVector3& pos, const TVector3& mom) {
+  stateSeed_.ResizeTo(6);
+
+  stateSeed_(0) = pos.X();
+  stateSeed_(1) = pos.Y();
+  stateSeed_(2) = pos.Z();
+
+  stateSeed_(3) = mom.X();
+  stateSeed_(4) = mom.Y();
+  stateSeed_(5) = mom.Z();
+}
+
 
 
 void Track::insertPoint(TrackPoint* point, int id) {
@@ -400,6 +440,11 @@ void Track::deletePoint(int id) {
   delete trackPoints_[id];
   trackPoints_.erase(trackPoints_.begin()+id);
 
+}
+
+
+void Track::insertMeasurement(AbsMeasurement* measurement, int id) {
+  insertPoint(new TrackPoint(measurement, this), id);
 }
 
 
@@ -741,6 +786,8 @@ double Track::getTrackLen(AbsTrackRep* rep, int startId, int endId) const {
 
   endId += 1;
 
+  if (rep == NULL)
+    rep = getCardinalRep();
 
   double trackLen(0);
   StateOnPlane state;
@@ -782,6 +829,8 @@ double Track::getTOF(AbsTrackRep* rep, int startId, int endId) const {
 
   endId += 1;
 
+  if (rep == NULL)
+    rep = getCardinalRep();
 
   double tof(0);
   double trackLen(0);

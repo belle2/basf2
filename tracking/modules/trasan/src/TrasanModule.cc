@@ -18,13 +18,14 @@ using namespace std;
 
 namespace Belle2 {
 
-REG_MODULE(Trasan);
+  REG_MODULE(Trasan);
 
-TrasanModule::TrasanModule()
+  TrasanModule::TrasanModule()
     : Module::Module(),
       _debugLevel(0),
       _gfTrackCandsName(""),
-      _tra(Belle::Trasan()) {
+      _tra(Belle::Trasan())
+  {
 
     string desc = "TrasanModule(" + _tra.version() + ")";
     setDescription(desc);
@@ -33,32 +34,32 @@ TrasanModule::TrasanModule()
     addParam("DebugLevel", _debugLevel, "Debug level", 0);
     addParam("GFTrackCandidatesColName",
              _gfTrackCandsName,
-             "Name of collection holding the GFTrackCandidates (output)",
+             "Name of collection holding the genfit::TrackCandidates (output)",
              string(""));
     addParam("nEventsToSkip", _tra.b_nEventsToSkip, "#Events to skip", 0);
 
     //...Hough Finder...
     addParam("doHoughFinder", _tra.b_doHoughFinder,
-	     "Hough Finder switch", 1);
+             "Hough Finder switch", 1);
     addParam("doHoughFinderCurlSearch", _tra.b_doHoughFinderCurlSearch,
-	     "Hough Finder curl search switch", 1);
+             "Hough Finder curl search switch", 1);
 
     //...Conformal finder...
     addParam("doConformalFinder", _tra.b_doConformalFinder,
-	     "Conformal Finder switch", 1);
+             "Conformal Finder switch", 1);
 
     //...CurlFinder...
     addParam("doCurlFinder", _tra.b_doCurlFinder,
-	     "Curl Finder switch", 0);
+             "Curl Finder switch", 0);
 
     //...Fitter...
     addParam("helixFitterNtrialMax", _tra.b_helixFitterNtrialMax,
-	     "helix fitter max. # iterations", 20);
+             "helix fitter max. # iterations", 20);
 
 #ifdef TRASAN_DEBUG
     cout << "TrasanModule ... created" << endl;
 #endif
-}
+  }
 
   TrasanModule::~TrasanModule()
   {
@@ -70,7 +71,7 @@ TrasanModule::TrasanModule()
   void
   TrasanModule::initialize()
   {
-    Belle2::StoreArray<GFTrackCand> trackCandidates(_gfTrackCandsName);
+    Belle2::StoreArray<genfit::TrackCand> trackCandidates(_gfTrackCandsName);
     _tra._gfTrackCandsName = _gfTrackCandsName;
     _tra.b_debugLevel = _debugLevel;
     _tra.initialize();

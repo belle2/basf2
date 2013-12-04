@@ -16,7 +16,7 @@
 // forward declarations
 class TTree;
 class TFile;
-class GFTrack;
+namespace genfit { class Track; }
 
 namespace Belle2 {
   class MCParticle;
@@ -34,7 +34,7 @@ namespace Belle2 {
    *  @{ StandardTrackingPerformanceModule @} @}
    */
 
-  /** This module takes the MCParticle and the GFTrack collection as input and
+  /** This module takes the MCParticle and the genfit::Track collection as input and
    * writes out a root file with some information of the reconstructed tracks.
    * If a generated track is not reconstructed, all output variables are set to
    * the default value (-999). With the output file, you are able to estimate the
@@ -96,18 +96,18 @@ namespace Belle2 {
     /** add branches to data tree */
     void setupTree();
 
-    /** search for a GFTrack which is related to a given MCParticle and return pointer to the GFTrack if existing
-     * @param mcParticle: MCParticle, to which the GFTrack must belong
-     * @param gfTracks: StoreArray with GFTrack objects in the event
+    /** search for a genfit::Track which is related to a given MCParticle and return pointer to the genfit::Track if existing
+     * @param mcParticle: MCParticle, to which the genfit::Track must belong
+     * @param gfTracks: StoreArray with genfit::Track objects in the event
      * @return: pointer to the found, related track, else NULL is returned
      */
-    GFTrack* findRelatedTrack(MCParticle& mcParticle, StoreArray< GFTrack >& gfTracks);
+    genfit::Track* findRelatedTrack(MCParticle& mcParticle, StoreArray< genfit::Track >& gfTracks);
 
-    /** search a valid TrackFitResult for a given GFTrack
-     * @param gfTrack: TrackFitResult must be related to this GFTrack
+    /** search a valid TrackFitResult for a given genfit::Track
+     * @param gfTrack: TrackFitResult must be related to this genfit::Track
      * @return: pointer to the found TrackFitResult if found, else NULL is returned
      */
-    const TrackFitResult* findRelatedTrackFitResult(const GFTrack* gfTrack);
+    const TrackFitResult* findRelatedTrackFitResult(const genfit::Track* gfTrack);
 
 
     /** add all charged stable particles to a vector which originate from
@@ -132,7 +132,7 @@ namespace Belle2 {
 
 
     std::string m_outputFileName; /**< name of output root file */
-    std::string m_gfTrackColName; /**< GFTrack collection name */
+    std::string m_gfTrackColName; /**< genfit::Track collection name */
     std::string m_trackColName; /**< Track collection name */
     std::vector< int > m_signalDaughterPDGs; /**< PDG codes of the B daughters of the interesting decay channel */
 

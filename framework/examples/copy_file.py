@@ -11,8 +11,7 @@ from basf2 import *
 from ROOT import gSystem
 gSystem.Load('libvxd')
 gSystem.Load('libtracking')
-gSystem.Load('libgenfit')
-gSystem.Load('libgenfitRK')
+gSystem.Load('libgenfit2')
 
 main = create_path()
 

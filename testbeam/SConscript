@@ -3,6 +3,6 @@ Import('env')
 env['LIBS'] = ['$ROOT_LIBS', 'framework', 'geometry', 'simulation', 'simulation_dataobjects',
     'generators_dataobjects', 'geometry', 'vxd', 'vxd_dataobjects',
     'pxd_dataobjects', 'svd_dataobjects', 'testbeam_vxd_dataobjects', 
-    'testbeam_top_dataobjects', 'genfit']
+    'testbeam_top_dataobjects', 'genfit2']
 
 Return('env')

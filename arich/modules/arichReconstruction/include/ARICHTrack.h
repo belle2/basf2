@@ -236,7 +236,7 @@ namespace Belle2 {
 
     double m_PDGCharge;                   /**< particle charge */
     int    m_PDGEncoding;                 /**< particle PDG id number */
-    int    m_trackID;                     /**< track identification number in GFTrack */
+    int    m_trackID;                     /**< track identification number in genfit::Track */
     int    m_extHitID;                    /**< track identification number in ext */
     int    m_identity;                    /**< particle index (0 electron, 1 muon, 2 pion, 3 kaon, 4 proton, -1 else). */
     int    m_aeroIndex;                   /**< Relation index needed to create relation from ARICHAeroHit(MC simulation) to ARICHLikelihood. */

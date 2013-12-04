@@ -98,9 +98,9 @@ TFAnalizerModule::~TFAnalizerModule()
 
 void TFAnalizerModule::initialize()
 {
-  StoreArray<GFTrackCand>::required(m_PARAMmcTCname);
-  StoreArray<GFTrackCand>::required(m_PARAMcaTCname);
-  StoreArray<GFTrackCand>::registerPersistent(m_PARAMacceptedTCname);
+  StoreArray<genfit::TrackCand>::required(m_PARAMmcTCname);
+  StoreArray<genfit::TrackCand>::required(m_PARAMcaTCname);
+  StoreArray<genfit::TrackCand>::registerPersistent(m_PARAMacceptedTCname);
   StoreArray<PXDCluster>::required();
   StoreArray<SVDCluster>::required();
   StoreArray<PXDTrueHit>::required();
@@ -211,11 +211,11 @@ void TFAnalizerModule::event()
   RootVariables rootVariables; // storing all root related infos
   m_forRootCountFoundIDs.clear(); // reset foundIDs-counter
 
-  /// import all GFTrackCands (McFinder, TFinder)
-  StoreArray<GFTrackCand> mcTrackCandidates(m_PARAMmcTCname);
-  StoreArray<GFTrackCand> caTrackCandidates(m_PARAMcaTCname);
+  /// import all genfit::TrackCands (McFinder, TFinder)
+  StoreArray<genfit::TrackCand> mcTrackCandidates(m_PARAMmcTCname);
+  StoreArray<genfit::TrackCand> caTrackCandidates(m_PARAMcaTCname);
   // preparing storearray for trackCandidates and fitted tracks
-  StoreArray<GFTrackCand> acceptedTrackCandidates(m_PARAMacceptedTCname);
+  StoreArray<genfit::TrackCand> acceptedTrackCandidates(m_PARAMacceptedTCname);
   acceptedTrackCandidates.create();
 
   StoreArray<PXDCluster> pxdClusters;
@@ -248,7 +248,7 @@ void TFAnalizerModule::event()
 
   for (int i = 0; i not_eq numOfMcTCs; ++i) {
     B2DEBUG(10, "--importing trackCandidate " << i << "...")
-    GFTrackCand* aTC =  mcTrackCandidates[i];
+    genfit::TrackCand* aTC =  mcTrackCandidates[i];
     extractHits(aTC, relPXDCluster2TrueHit, relSVDCluster2TrueHit, pxdClusters, svdClusters, extraInfos, mcTcVector, true, i);    /// extractHits
     /// missing: export2File!
   }
@@ -258,7 +258,7 @@ void TFAnalizerModule::event()
   B2DEBUG(1, "importing " << numOfCaTCs << " caTrackCandidates...")
   for (int i = 0; i not_eq numOfCaTCs; ++i) {
     B2DEBUG(10, "--importing trackCandidate " << i << "...")
-    GFTrackCand* aTC =  caTrackCandidates[i];
+    genfit::TrackCand* aTC =  caTrackCandidates[i];
     extractHits(aTC, relPXDCluster2TrueHit, relSVDCluster2TrueHit, pxdClusters, svdClusters, extraInfos, caTcVector, false, i); /// extractHits
   }
 
@@ -292,7 +292,7 @@ void TFAnalizerModule::event()
       continue;
     }
 
-    // adding MCiD-information to GFTrackCand (needed for trackFitChecker) and storing correctly recognized TC into new storearray:
+    // adding MCiD-information to genfit::TrackCand (needed for trackFitChecker) and storing correctly recognized TC into new storearray:
     caTrackCandidates[caTC.indexNumber]->setMcTrackId(mcTrackCandidates[mcTcVector[caTC.finalAssignedID].indexNumber]->getMcTrackId());
     acceptedTrackCandidates.appendNew(*caTrackCandidates[caTC.indexNumber]);
 
@@ -647,7 +647,7 @@ void TFAnalizerModule::printCA(bool type, VXDTrackCandidate& caTC)
 
 
 
-void TFAnalizerModule::extractHits(GFTrackCand* aTC,
+void TFAnalizerModule::extractHits(genfit::TrackCand* aTC,
                                    RelationIndex<PXDCluster, PXDTrueHit>& relationPXD,
                                    RelationIndex<SVDCluster, SVDTrueHit>& relationSVD,
                                    StoreArray<PXDCluster>& pxdClusters,

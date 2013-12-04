@@ -20,6 +20,7 @@
 #include <TSystem.h>
 #include <TFile.h>
 
+#include <genfit/Track.h>
 
 using namespace std;
 using namespace Belle2;
@@ -62,6 +63,11 @@ void RootInputModule::initialize()
 {
   gSystem->Load("libdataobjects");
   gSystem->Load("libTreePlayer");
+  gSystem->Load("libgenfit2");    // Because genfit2 classes need custom streamers.
+  gSystem->Load("libvxd");
+  gSystem->Load("libsvd");
+  gSystem->Load("libpxd");
+  gSystem->Load("libcdc");
 
   const vector<string>& inputFiles = getInputFiles();
   if (inputFiles.empty()) {

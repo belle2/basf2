@@ -47,7 +47,7 @@
 
 
 //out type
-#include "GFTrackCand.h"
+#include "genfit/TrackCand.h"
 
 //test to be removed
 //#include <tracking/cdcLocalTracking/testcode/MockTest.h>
@@ -91,7 +91,7 @@ void CDCLocalTrackingModule::initialize()
 
 
   //output collection
-  StoreArray < GFTrackCand >::registerTransient("GFTrackCands");
+  StoreArray < genfit::TrackCand >::registerTransient("GFTrackCands");
 
   m_segmentWorker.init();
   m_trackingWorker.init();
@@ -190,7 +190,7 @@ void CDCLocalTrackingModule::event()
   mcLookUp.addSegments(m_recoSegments);
 
   //build the gfTracks
-  StoreArray < GFTrackCand > storedGFTrackCands("GFTrackCands");
+  StoreArray < genfit::TrackCand > storedGFTrackCands("GFTrackCands");
   storedGFTrackCands.create();
   m_trackingWorker.apply(m_recoSegments, storedGFTrackCands);
 

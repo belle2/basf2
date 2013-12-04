@@ -25,8 +25,8 @@
 #include <pxd/geometry/SensorInfo.h>
 #include <vxd/dataobjects/VxdID.h>
 
-#include "GFTrack.h"
-#include "GFTrackCand.h"
+#include "genfit/Track.h"
+#include "genfit/TrackCand.h"
 
 #include <cstdlib>
 #include <iomanip>
@@ -48,11 +48,11 @@ ExtrapolateToPXDModule::ExtrapolateToPXDModule() :
 {
 
   setDescription(
-    "Uses Tracks found (and fitted) in the CDC (and SVD) extrapolates them to the PXD. Adds the most probable PXD hit candidates to the existing Tracks and creates new GFTrackCands collection. Execute GenFitter again after this module to refit these track candidates.");
+    "Uses Tracks found (and fitted) in the CDC (and SVD) extrapolates them to the PXD. Adds the most probable PXD hit candidates to the existing Tracks and creates new genfit::TrackCands collection. Execute GenFitter again after this module to refit these track candidates.");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   //input
-  addParam("GFTracksColName", m_gfTracksColName, "Name of collection holding the GFTracks found in the CDC and fitted with GenFitter", string(""));
+  addParam("GFTracksColName", m_gfTracksColName, "Name of collection holding the genfit::Tracks found in the CDC and fitted with GenFitter", string(""));
   addParam("PXDHitsColName", m_pxdHitsColName, "PXDHits collection", string(""));
 
   //only for crosscheck and plotting
@@ -63,7 +63,7 @@ ExtrapolateToPXDModule::ExtrapolateToPXDModule() :
   addParam("TextFileOutput", m_textFileOutput, "Set to true if some text files with hit coordinates should be created", bool(false));
 
   //output
-  addParam("GFTrackCandsColName", m_gfTrackCandsColName, "Name of collection holding the output GFTrackCands with CDC+SVD+PXD hits ready to be refitted", string("GFTrackCands_CDCSVDPXD"));
+  addParam("GFTrackCandsColName", m_gfTrackCandsColName, "Name of collection holding the output genfit::TrackCands with CDC+SVD+PXD hits ready to be refitted", string("GFTrackCands_CDCSVDPXD"));
 
 }
 
@@ -73,7 +73,7 @@ ExtrapolateToPXDModule::~ExtrapolateToPXDModule()
 
 void ExtrapolateToPXDModule::initialize()
 {
-  StoreArray<GFTrackCand>::registerPersistent(m_gfTrackCandsColName);
+  StoreArray<genfit::TrackCand>::registerPersistent(m_gfTrackCandsColName);
 
   if (m_textFileOutput) {
     Tracksfile.open("Tracks.txt");
@@ -89,10 +89,10 @@ void ExtrapolateToPXDModule::beginRun()
 void ExtrapolateToPXDModule::event()
 {
   B2INFO("*******   ExtrapolateToPXDModule  *******");
-  StoreArray<GFTrack> gftracks(m_gfTracksColName);
+  StoreArray<genfit::Track> gftracks(m_gfTracksColName);
   int nTracks = gftracks.getEntries();
   B2INFO("ExtrapolateToPXD: input Number of Tracks: " << nTracks);
-  if (nTracks == 0) B2WARNING("ExtrapolateToPXD: GFTracksCollection is empty!");
+  if (nTracks == 0) B2WARNING("ExtrapolateToPXD: genfit::TracksCollection is empty!");
 
   StoreArray<PXDTrueHit> pxdHits(m_pxdHitsColName);
   int nPxdHits = pxdHits.getEntries();
@@ -110,20 +110,20 @@ void ExtrapolateToPXDModule::event()
   if (nCdcHits == 0) B2WARNING("ExtrapolateToSVD: CDCHitsCollection is empty!");
 
   //initialize the new output collection
-  StoreArray<GFTrackCand> newGFTrackCands(m_gfTrackCandsColName);
+  StoreArray<genfit::TrackCand> newGFTrackCands(m_gfTrackCandsColName);
   newGFTrackCands.create();
 
   //get the CDCGeometryPar to get the hit coordinates
   CDCGeometryPar& cdcg = CDCGeometryPar::Instance();
 
 
-  B2INFO("Copy GFTrackCands from input GFTracks, replace the momentum seed with the current fit result and create a new collection with " << nTracks << " GFTrackCands");
+  B2INFO("Copy genfit::TrackCands from input genfit::Tracks, replace the momentum seed with the current fit result and create a new collection with " << nTracks << " genfit::TrackCands");
 
-  //fill the array of new GFTrackCands by copying the existing GFTrackCand from GFTracks, SVDHits will be added afterwards to these new GFTrackCands
+  //fill the array of new genfit::TrackCands by copying the existing genfit::TrackCand from genfit::Tracks, SVDHits will be added afterwards to these new genfit::TrackCands
   for (int i = 0; i < nTracks; i++) {
     newGFTrackCands.appendNew(gftracks[i]->getCand());
 
-    //in the copy of GFTrackCand the 'old' start values are stored
+    //in the copy of genfit::TrackCand the 'old' start values are stored
     //the fit of the CDC+SVD Hits should already provide a very good momentum and vertex estimation, so it makes sense to use the result of this fit as start values for the fit with PXD hits
     TVector3 pos(0., 0., 0.); //origin
     TVector3 poca(0., 0., 0.); //point of closest approach
@@ -171,7 +171,7 @@ void ExtrapolateToPXDModule::event()
 
   int nTrackCands = newGFTrackCands.getEntries();
 
-  if (nTracks != nTrackCands) B2WARNING("GFTrackCands were not copied properly from existing GFTracks!");
+  if (nTracks != nTrackCands) B2WARNING("genfit::TrackCands were not copied properly from existing genfit::Tracks!");
 
   //cut on the distance between the point of closest approach and the hit, hits outside if this range are not added to the track candidate
   //how large this value should or may be has to be figured out in more elaborate studies, this is just a first guess...
@@ -262,7 +262,7 @@ void ExtrapolateToPXDModule::event()
         //addHit(detectorID, hitID, rho (distance from the origin to sort hits), planeId (Id of the sensor, needed for DAF))
         newGFTrackCands[iTrack]->addHit(Const::PXD, bestHitID, double(time), uniqueSensorId);
         B2INFO("-->Add hit from layer " << iLayer << " with ID " << bestHitID << " ( distance: " << minDistance << " )");
-      } else B2INFO("(--> Best Hit still too far away from the extrapolated point, will not be added to the GFTrackCand!)");
+      } else B2INFO("(--> Best Hit still too far away from the extrapolated point, will not be added to the genfit::TrackCand!)");
 
     }// end loop over all layers
     B2INFO("--------------------       Track " << iTrack << " has now " << newGFTrackCands[iTrack]->getNHits() << " Hits");

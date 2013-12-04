@@ -47,7 +47,7 @@ namespace Belle2 {
     int m_iEKLMK0Ls;
     // /** N EKLMStepHits */
     // int m_iEKLMStepHits;
-    /** N GFTracks */
+    /** N genfit::Tracks */
     int m_iGFTracks;
     /** N PIDLikelihoods */
     int m_iPIDLikelihoods;

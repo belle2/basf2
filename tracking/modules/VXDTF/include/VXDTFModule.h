@@ -61,7 +61,7 @@
 #endif
 
 //genfit:
-#include <GFTrackCand.h>
+namespace genfit { class TrackCand; }
 
 
 namespace Belle2 {
@@ -79,7 +79,7 @@ namespace Belle2 {
     * lower momentum tracks can be found with reduced efficiency.
     * long term features like curling track support is currently not included
     * needed imput: PXD/SCDClusters
-    * output: GFTrackCand
+    * output: genfit::TrackCand
     */
     class VXDTFModule : public Module {
 
@@ -399,7 +399,7 @@ namespace Belle2 {
 
 
 
-      /** name is program, needed for GFTrackCand export */
+      /** name is program, needed for genfit::TrackCand export */
       void calcInitialValues4TCs(CurrentPassData* currentPass);
 
 
@@ -409,7 +409,7 @@ namespace Belle2 {
 
 
       /** produce GFTrackCand for current TC */
-      GFTrackCand generateGFTrackCand(VXDTFTrackCandidate* currentTC);
+      genfit::TrackCand generateGFTrackCand(VXDTFTrackCandidate* currentTC);
 
 
       /** calculate real kalman-QI's for each currently living TC */

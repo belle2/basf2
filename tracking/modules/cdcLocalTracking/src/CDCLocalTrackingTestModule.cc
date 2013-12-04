@@ -27,7 +27,7 @@
 #include <tracking/cdcLocalTracking/topology/CDCWireTopology.h>
 
 //out type
-#include "GFTrackCand.h"
+#include "genfit/TrackCand.h"
 
 #include <time.h>
 #ifdef HAS_CALLGRIND
@@ -69,7 +69,7 @@ void CDCLocalTrackingTestModule::initialize()
 
 
   //output collection
-  StoreArray < GFTrackCand >::registerTransient("GFTrackCands");
+  StoreArray < genfit::TrackCand >::registerTransient("GFTrackCands");
 
   //m_segmentWorker.init();
   //m_trackingWorker.init();

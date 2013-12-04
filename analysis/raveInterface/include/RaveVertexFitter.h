@@ -20,9 +20,9 @@
 #include <string>
 
 //Genfit
-#include <GFTrack.h>
+#include <genfit/Track.h>
 //#include <GFRaveVertex.h>
-#include <GFRaveConverters.h> // has some converter functions between root and rave
+#include <genfit/GFRaveConverters.h> // has some converter functions between root and rave
 //rave
 #include <rave/Track.h>
 
@@ -47,14 +47,11 @@ namespace Belle2 {
       /** Destructor */
       ~RaveVertexFitter();
 
-      /** add a track (in the format of a GFTrack) to set of tracks that should be fitted to a vertex */
-      void addTrack(const GFTrack& aGFTrack);
+      /** add a track (in the format of a genfit::Track) to set of tracks that should be fitted to a vertex */
+      void addTrack(const genfit::Track& aGFTrack);
 
-      /** add a track (in the format of a pointer to a GFTrack) to set of tracks that should be fitted to a vertex */
-      void addTrack(const GFTrack* const aGFTrackPtr);
-
-      /** add a track (in the format of a pointer to a GFAbsTrackRep) to set of tracks that should be fitted to a vertex */
-      void addTrack(GFAbsTrackRep*  aTrackRepPtr);
+      /** add a track (in the format of a pointer to a genfit::Track) to set of tracks that should be fitted to a vertex */
+      void addTrack(const genfit::Track* aGFTrackPtr);
 
       /** add a track (in the format of a Belle2::Particle) to set of tracks that should be fitted to a vertex */
       void addTrack(const Particle* const aParticlePtr);
@@ -157,8 +154,8 @@ namespace Belle2 {
       void initBeamSpotMember();
       /** checks if the vertex the user requested via one of the getters it actually there*/
       void isVertexIdValid(const VecSize vertexId) const;
-      /** converts a track from Genfit GFTrackRep format to rave::Track format*/
-      rave::Track GFTrackRepToRaveTrack(GFAbsTrackRep* const  aGFTrackRep) const;
+      /** converts a track from genfit::MeasuredStateOnPlane format to rave::Track format*/
+      rave::Track GFMeasuredStateToRaveTrack(const genfit::MeasuredStateOnPlane& aGFState) const;
 
       /** converts a track from Belle2::TrackFitResult format to rave::Track format*/
       rave::Track TrackFitResultToRaveTrack(const TrackFitResult* const aTrackPtr) const;

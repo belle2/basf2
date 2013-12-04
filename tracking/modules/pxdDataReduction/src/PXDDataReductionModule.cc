@@ -11,18 +11,18 @@
 #include <tracking/modules/pxdDataReduction/PXDDataReductionModule.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/StoreArray.h>
-#include <GFMaterialEffects.h>
-#include <GFTGeoMaterialInterface.h>
-#include <GFTrackCand.h>
+#include <genfit/MaterialEffects.h>
+#include <genfit/TGeoMaterialInterface.h>
+#include <genfit/TrackCand.h>
 #include <geometry/GeometryManager.h>
 #include <TGeoManager.h>
 #include <tracking/gfbfield/GFGeant4Field.h>
-#include <GFFieldManager.h>
+#include <genfit/FieldManager.h>
 #include <tracking/dataobjects/ROIid.h>
 #include <tracking/dataobjects/PXDIntercept.h>
 #include <time.h>
 #include <list>
-#include <GFTrack.h> //giulia
+#include <genfit/Track.h> //giulia
 
 using namespace std;
 using namespace Belle2;
@@ -70,13 +70,13 @@ PXDDataReductionModule::~PXDDataReductionModule()
 void PXDDataReductionModule::initialize()
 {
 
-  StoreArray<GFTrackCand>::required(m_gfTrackCandsColName);
+  StoreArray<genfit::TrackCand>::required(m_gfTrackCandsColName);
   StoreArray<ROIid>::registerPersistent(m_ROIListName);
   StoreArray<PXDIntercept>::registerPersistent(m_PXDInterceptListName);
-  StoreArray<GFTrackCand>::registerPersistent(m_badTracksListName);
-  StoreArray<GFTrack>::registerPersistent(m_gfTracksListName);
+  StoreArray<genfit::TrackCand>::registerPersistent(m_badTracksListName);
+  StoreArray<genfit::Track>::registerPersistent(m_gfTracksListName);
 
-  RelationArray::registerPersistent<GFTrackCand, PXDIntercept>(m_gfTrackCandsColName, m_PXDInterceptListName);
+  RelationArray::registerPersistent<genfit::TrackCand, PXDIntercept>(m_gfTrackCandsColName, m_PXDInterceptListName);
   RelationArray::registerPersistent<PXDIntercept, ROIid>(m_PXDInterceptListName, m_ROIListName);
 
 
@@ -84,11 +84,11 @@ void PXDDataReductionModule::initialize()
     geometry::GeometryManager& geoManager = geometry::GeometryManager::getInstance();
     geoManager.createTGeoRepresentation();
     //pass the magnetic field to genfit
-    GFFieldManager::getInstance()->init(new GFGeant4Field());
-    GFMaterialEffects::getInstance()->init(new GFTGeoMaterialInterface());
+    genfit::FieldManager::getInstance()->init(new GFGeant4Field());
+    genfit::MaterialEffects::getInstance()->init(new genfit::TGeoMaterialInterface());
   }
 
-  GFMaterialEffects::getInstance()->setMscModel("Highland");
+  genfit::MaterialEffects::getInstance()->setMscModel("Highland");
 
 
 }
@@ -124,7 +124,7 @@ void PXDDataReductionModule::event()
   StoreArray<ROIid> ROIList(m_ROIListName);
   ROIList.create();
 
-  StoreArray<GFTrackCand> trackCandList(m_gfTrackCandsColName);
+  StoreArray<genfit::TrackCand> trackCandList(m_gfTrackCandsColName);
   B2DEBUG(1, "%%%%%%%% EVENT # of tracks =  " << trackCandList.getEntries());
 
 
@@ -134,9 +134,9 @@ void PXDDataReductionModule::event()
   RelationArray PXDInterceptsToROIids(PXDInterceptList, ROIList);
   PXDInterceptsToROIids.create();
 
-  StoreArray<GFTrackCand> trackCandBadStats(m_badTracksListName);
+  StoreArray<genfit::TrackCand> trackCandBadStats(m_badTracksListName);
   trackCandBadStats.create();
-  StoreArray<GFTrack> GFtracks(m_gfTracksListName);
+  StoreArray<genfit::Track> GFtracks(m_gfTracksListName);
   GFtracks.create();
 
   //  timespec time1, time2, time3;

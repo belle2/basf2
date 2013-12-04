@@ -166,7 +166,7 @@
 
 #include <string>
 #include "framework/datastore/StoreArray.h"
-#include "GFTrackCand.h"
+#include "genfit/TrackCand.h"
 #include "tracking/modules/trasan/ConstAList.h"
 #include "tracking/modules/trasan/TUpdater.h"
 #include "tracking/modules/trasan/THelixFitter.h"
@@ -204,16 +204,16 @@ namespace Belle {
     std::string version(void) const;
 
     /// returns a list of all reconstructed tracks including junks.
-    const AList<TTrack> & allTracks(void) const;
+    const AList<TTrack>& allTracks(void) const;
 
     /// returns a list of reconstructed tracks.
-    const AList<TTrack> & tracks(void) const;
+    const AList<TTrack>& tracks(void) const;
 
     /// returns a list of 2D tracks.
-    const AList<TTrack> & tracks2D(void) const;
+    const AList<TTrack>& tracks2D(void) const;
 
     /// returns a list of tracks writen to reccdc_trk.
-    const AList<TTrack> & tracksFinal(void) const;
+    const AList<TTrack>& tracksFinal(void) const;
 
   public:// parameters
     /// sets fitting flag.
@@ -247,8 +247,8 @@ namespace Belle {
     static bool goodTrack(const TTrack&, bool track2D = false);
 
     /// appends (2D) tracks. 'list' will be cleaned up.
-    void append(AList<TTrack> & list);
-    void append2D(AList<TTrack> & list);
+    void append(AList<TTrack>& list);
+    void append2D(AList<TTrack>& list);
 
     /// refits tracks.
     void refit(void);
@@ -285,8 +285,8 @@ namespace Belle {
     /// stores MC track info. into Panther table.
     void saveMCTables(void) const;
 
-    /// stores track info. into GFTrackCand.
-    void saveBelle2(Belle2::StoreArray<GFTrackCand> &);
+    /// stores track info. into genfit::TrackCand.
+    void saveBelle2(Belle2::StoreArray<genfit::TrackCand>&);
 
     /// sorts RECCDC_TRK tables.
     void sortBanksByPt(void) const;
@@ -299,7 +299,7 @@ namespace Belle {
                   reccdc_trk_add** a) const;
 
     /// copies a track. Non-zero will be returned if error happens.
-    int copyTrack(Belle2::StoreArray<GFTrackCand> &, TTrack& t) const;
+    int copyTrack(Belle2::StoreArray<genfit::TrackCand>&, TTrack& t) const;
 
     /// sorts banks.
     void swapReccdc(reccdc_trk& cdc0,
@@ -321,15 +321,15 @@ namespace Belle {
 
   public:// hit manipulations
     /// masks hits on found curl tracks.
-    void maskCurlHits(const CAList<Belle2::TRGCDCWireHit> & axial,
-                      const CAList<Belle2::TRGCDCWireHit> & stereo,
-                      const AList<TTrack> & tracks) const;
+    void maskCurlHits(const CAList<Belle2::TRGCDCWireHit>& axial,
+                      const CAList<Belle2::TRGCDCWireHit>& stereo,
+                      const AList<TTrack>& tracks) const;
 
     /// masks hits with large chisq as associated hits. Pull in TLink is used.
-    static void maskBadHits(const AList<TTrack> &, float maxSigma2);
+    static void maskBadHits(const AList<TTrack>&, float maxSigma2);
 
     /// salvages hits for dE/dx(not for track fitting).
-    void salvageAssociateHits(const CAList<Belle2::TRGCDCWireHit> &,
+    void salvageAssociateHits(const CAList<Belle2::TRGCDCWireHit>&,
                               float maxSigma2);
 
     /// associates SVD and then adds track information.
@@ -337,7 +337,7 @@ namespace Belle {
 
   private:// internal functions
     /// checks track quality.
-    AList<TTrack> selectGoodTracks(const AList<TTrack> &,
+    AList<TTrack> selectGoodTracks(const AList<TTrack>&,
                                    bool track2D = false) const;
     static bool checkNumberOfHits(const TTrack&, bool track2D = false);
 
@@ -355,18 +355,18 @@ namespace Belle {
     float minimum(float y0, float y1, float y2) const;
 
   public:// obsolete
-    TLink& divide(const TTrack& t, AList<TLink> * l) const;
-    TLink& divideByIp(const TTrack& t, AList<TLink> * l) const;
-    void removeHitsAcrossOverIp(AList<TLink> &) const;
+    TLink& divide(const TTrack& t, AList<TLink>* l) const;
+    TLink& divideByIp(const TTrack& t, AList<TLink>* l) const;
+    void removeHitsAcrossOverIp(AList<TLink>&) const;
     /// returns a track which is the closest to a hit.
-    TTrack* closest(const AList<TTrack> &, const Belle2::TRGCDCWireHit&) const;
+    TTrack* closest(const AList<TTrack>&, const Belle2::TRGCDCWireHit&) const;
     /// salvages remaining hits.
-    void salvage(const CAList<Belle2::TRGCDCWireHit> &) const;
+    void salvage(const CAList<Belle2::TRGCDCWireHit>&) const;
     /// masks hits out which are in tail of curly tracks.
     void mask(void) const;
     void maskNormal(TTrack&) const;
     void maskCurl(TTrack&) const;
-    void maskOut(TTrack&, const AList<TLink> &) const;
+    void maskOut(TTrack&, const AList<TLink>&) const;
     void maskMultiHits(TTrack&) const;
     void merge(void);
 
@@ -425,21 +425,21 @@ namespace Belle {
   }
 
   inline
-  const AList<TTrack> &
+  const AList<TTrack>&
   TTrackManager::tracks(void) const
   {
     return _tracks;
   }
 
   inline
-  const AList<TTrack> &
+  const AList<TTrack>&
   TTrackManager::tracks2D(void) const
   {
     return _tracks2D;
   }
 
   inline
-  const AList<TTrack> &
+  const AList<TTrack>&
   TTrackManager::allTracks(void) const
   {
     return _tracksAll;
@@ -491,7 +491,7 @@ namespace Belle {
   }
 
   inline
-  const AList<TTrack> &
+  const AList<TTrack>&
   TTrackManager::tracksFinal(void) const
   {
     return _tracksFinal;

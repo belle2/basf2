@@ -2,25 +2,21 @@
 #include <analysis/utility/tracking.h>
 #include <framework/logging/Logger.h>
 
-int getTrackParametersAtGivenPoint(GFTrack* thisTrack, TVector3 point, TVector3& poca, TVector3& momentum)
+int getTrackParametersAtGivenPoint(genfit::Track* thisTrack, TVector3 point, TVector3& poca, TVector3& momentum)
 {
 
-  if (thisTrack->getCardinalRep()->getStatusFlag() == 0) {
+  if (thisTrack->getFitStatus()->isFitted()) {
     //direction of the track at the point of closest approach
-    TVector3 dirInPoca(0., 0., 0.);
+    genfit::MeasuredStateOnPlane state = thisTrack->getFittedState();
     try {
-      thisTrack->getCardinalRep()->extrapolateToPoint(point, poca, dirInPoca);
+      state.extrapolateToPoint(point);
     } catch (...) {
       B2WARNING("Track extrapolation failed!");
       return 0;
     }
 
-    // get track position and momentum in a certain plane
-    // define a plane, here just the vectors from above are used
-    // if the plane is defined to be parallel to xy plane the result is the same,
-    // but it's still not clear which direction should be taken (or if it is important at all)
-    GFDetPlane plane(poca, dirInPoca);
-    momentum = thisTrack->getMom(plane);
+    // get position and momentum
+    state.getPosMom(poca, momentum);
   }
   return 1;
 }

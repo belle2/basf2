@@ -20,7 +20,9 @@
 #include <TMatrixD.h>
 
 // GenFit includes
-#include <RecoHits/GFAbsPlanarHit.h>
+#include <genfit/PlanarMeasurement.h>
+#include <genfit/HMatrixUV.h>
+#include <genfit/TrackCandHit.h>
 
 namespace Belle2 {
   /**
@@ -44,7 +46,7 @@ namespace Belle2 {
    * }
    * @endcode
    */
-  class PXDRecoHit: public GFAbsPlanarHit {
+  class PXDRecoHit: public genfit::PlanarMeasurement {
   public:
     /** Default constructor for ROOT IO. */
     PXDRecoHit();
@@ -61,7 +63,7 @@ namespace Belle2 {
      * @param sigmaU Error of the Hit along u
      * @param sigmaV Error of the Hit along v
      */
-    PXDRecoHit(const PXDTrueHit* hit, float sigmaU = -1, float sigmaV = -1);
+    PXDRecoHit(const PXDTrueHit* hit, const genfit::TrackCandHit* trackCandHit = NULL, float sigmaU = -1, float sigmaV = -1);
 
     /** Construct PXDRecoHit from a PXD cluster.
      * For users that want to supply their own errors on construction
@@ -83,20 +85,17 @@ namespace Belle2 {
      *
      * @param hit    PXDCluster to use as base
      */
-    PXDRecoHit(const PXDCluster* hit);
+    PXDRecoHit(const PXDCluster* hit, const genfit::TrackCandHit* trackCandHit = NULL);
 
     /** Destructor. */
     virtual ~PXDRecoHit() {}
 
-    /** Creating a deep copy of this hit.
-     * Overrides the method inherited from GFRecoHit.
-     */
-    GFAbsRecoHit* clone();
+    /** Creating a deep copy of this hit. */
+    genfit::AbsMeasurement* clone() const;
 
-    /** Projection for the hit ...
-     * Overrides the method inherited from GFRecoHit.
-     */
-    const TMatrixD& getHMatrix(const GFAbsTrackRep* stateVector);
+    /** Methods that actually interface to Genfit.  */
+    virtual std::vector<genfit::MeasurementOnPlane*> constructMeasurementsOnPlane(const genfit::AbsTrackRep*,
+        const genfit::SharedPlanePtr&) const;
 
     /** Get the compact ID.*/
     VxdID getSensorID() const { return m_sensorID; }
@@ -107,16 +106,16 @@ namespace Belle2 {
     const PXDCluster* getCluster() const { return m_cluster; }
 
     /** Get u coordinate.*/
-    float getU() const { return fHitCoord(0); }
+    float getU() const { return rawHitCoords_(0); }
     /** Get v coordinate.*/
-    float getV() const { return fHitCoord(1); }
+    float getV() const { return rawHitCoords_(1); }
 
     /** Get u coordinate variance */
-    float getUVariance() const { return fHitCov(0, 0); }
+    float getUVariance() const { return rawHitCov_(0, 0); }
     /** Get v coordinate variance */
-    float getVVariance() const { return fHitCov(1, 1); }
+    float getVVariance() const { return rawHitCov_(1, 1); }
     /** Get u-v error covariance.*/
-    float getUVCov() const { return fHitCov(0, 1); }
+    float getUVCov() const { return rawHitCov_(0, 1); }
 
     /** Get deposited energy. */
     float getEnergyDep() const { return m_energyDep; }
@@ -124,11 +123,10 @@ namespace Belle2 {
     /** Get deposited energy error. */
     //float getEnergyDepError() const { return m_energyDepError; }
 
+    virtual const genfit::AbsHMatrix* constructHMatrix(const genfit::AbsTrackRep*) const { return new genfit::HMatrixUV(); };
   private:
 
     enum { HIT_DIMENSIONS = 2 /**< sensitive Dimensions of the Hit */ };
-    const static double c_HMatrixContent[10]; /**< holds all elements of H Matrix. A C array is the only possibility to set TMatrixD elements with its constructor*/
-    const static TMatrixD c_HMatrix; /**< H matrix needed for Genfit. getHMatrix will return this attribute*/
 
     unsigned short m_sensorID; /**< Unique sensor identifier.*/
     const PXDTrueHit* m_trueHit; /**< Pointer to the TrueHit used when creating this object */
@@ -139,7 +137,7 @@ namespace Belle2 {
     /** Set up Detector plane information */
     void setDetectorPlane();
 
-    ClassDef(PXDRecoHit, 3)
+    ClassDef(PXDRecoHit, 4)
   };
 
 } // namespace Belle2

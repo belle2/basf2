@@ -5,7 +5,7 @@
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
-#include "GFTrackCand.h"
+#include "genfit/TrackCand.h"
 #include <generators/dataobjects/MCParticle.h>
 
 //avoid having to wrap everything in the namespace explicitly
@@ -58,24 +58,24 @@ void SiCDCTrackMergerModule::initialize()
   m_phi_bin_length   = (m_phi_max -  m_phi_min) / double(m_N_phi_bin);
 
   //initializing the silicon tracks grid
-  m_si_tracks_grid = new std::vector<std::vector<std::vector<GFTrack*>*>*>();
+  m_si_tracks_grid = new std::vector<std::vector<std::vector<genfit::Track*>*>*>();
   for (int itheta = 0; itheta < m_N_theta_bin; itheta++) {
-    std::vector<std::vector<GFTrack*>*>* phi_row = new std::vector<std::vector<GFTrack*>*>();
+    std::vector<std::vector<genfit::Track*>*>* phi_row = new std::vector<std::vector<genfit::Track*>*>();
     for (int iphi = 0; iphi < m_N_phi_bin; iphi++) {
-      std::vector<GFTrack*>* thetaphi_cell = new std::vector<GFTrack*>();
+      std::vector<genfit::Track*>* thetaphi_cell = new std::vector<genfit::Track*>();
       phi_row->push_back(thetaphi_cell);
     }
     m_si_tracks_grid->push_back(phi_row);
   }
 
   //initializing the cdc tracks grid and cdc wall crossing positons
-  m_cdc_tracks_grid = new std::vector<std::vector<std::vector<GFTrack*>*>*>();
+  m_cdc_tracks_grid = new std::vector<std::vector<std::vector<genfit::Track*>*>*>();
   m_cdc_tracks_position = new std::vector<std::vector<std::vector<TVector3>*>*>();
   for (int itheta = 0; itheta < m_N_theta_bin; itheta++) {
-    std::vector<std::vector<GFTrack*>*>* phi_row_vec = new std::vector<std::vector<GFTrack*>*>();
+    std::vector<std::vector<genfit::Track*>*>* phi_row_vec = new std::vector<std::vector<genfit::Track*>*>();
     std::vector<std::vector<TVector3>*>* phi_pos_vec = new std::vector<std::vector<TVector3>*>();
     for (int iphi = 0; iphi < m_N_phi_bin; iphi++) {
-      std::vector<GFTrack*>* thetaphi_cell_vec = new std::vector<GFTrack*>();
+      std::vector<genfit::Track*>* thetaphi_cell_vec = new std::vector<genfit::Track*>();
       phi_row_vec->push_back(thetaphi_cell_vec);
       std::vector<TVector3>* thetaphi_pos_vec = new std::vector<TVector3>();
       phi_pos_vec->push_back(thetaphi_pos_vec);
@@ -133,14 +133,14 @@ void SiCDCTrackMergerModule::event()
     m_dz_vec->clear();
   }
   //get silicon tracks
-  StoreArray<GFTrack> si_mcGFTracks(m_SiGFTracksColName);
+  StoreArray<genfit::Track> si_mcGFTracks(m_SiGFTracksColName);
   unsigned int nSiTracks = si_mcGFTracks.getEntries();
 
   //B2INFO("SiCDCTrackMerger: input Number of Silicon Tracks: " << nSiTracks);
   if (nSiTracks == 0) B2WARNING("SiCDCTrackMerger: SiGFTracksCollection is empty!");
 
   //get CDC tracks
-  StoreArray<GFTrack> cdc_mcGFTracks(m_CDCGFTracksColName);
+  StoreArray<genfit::Track> cdc_mcGFTracks(m_CDCGFTracksColName);
   unsigned int nCDCTracks = cdc_mcGFTracks.getEntries();
 
   //B2INFO("SiCDCTrackMerger: input Number of CDC Tracks: " << nCDCTracks);
@@ -177,7 +177,7 @@ void SiCDCTrackMergerModule::event()
     insertTrackAndPositionInGrid(position, cdc_mcGFTracks[itrack], m_cdc_tracks_position, m_cdc_tracks_grid);
   }//end of for(unsigned int itrack=0; itrack<nCDCTracks; ...)
 
-  std::map<GFTrack*, GFTrack*>* matched_tracks_map = new std::map<GFTrack*, GFTrack*>();
+  std::map<genfit::Track*, genfit::Track*>* matched_tracks_map = new std::map<genfit::Track*, genfit::Track*>();
   //loop on the silicon and cdc grid cells and try to associate the tracks
   for (int itheta = 0; itheta < m_N_theta_bin; itheta++) {
     for (int iphi = 0; iphi < m_N_phi_bin; iphi++) {
@@ -189,7 +189,7 @@ void SiCDCTrackMergerModule::event()
         TVector3 cyl_norm_direction(position.X(), position.Y(), 0);
         GFDetPlane cylinder_plane(position, cyl_norm_direction);
 
-        GFTrack* cdc_track = ((m_cdc_tracks_grid->at(itheta))->at(iphi))->at(i_cdc_trk);
+        genfit::Track* cdc_track = ((m_cdc_tracks_grid->at(itheta))->at(iphi))->at(i_cdc_trk);
         try {
           cdc_track->getCardinalRep()->extrapolate(cylinder_plane);
         } catch (...) {
@@ -206,7 +206,7 @@ void SiCDCTrackMergerModule::event()
         int N_si_Tracks = ((m_si_tracks_grid->at(itheta))->at(iphi))->size();
         //loop on the si tracks and find the one that matches the actual cdc track.
         for (int i_si_trk = 0; i_si_trk < N_si_Tracks; i_si_trk++) {
-          GFTrack* si_track = ((m_si_tracks_grid->at(itheta))->at(iphi))->at(i_si_trk);
+          genfit::Track* si_track = ((m_si_tracks_grid->at(itheta))->at(iphi))->at(i_si_trk);
           //extrapolate the si track to the same plane
           try {
             si_track->getCardinalRep()->extrapolate(cylinder_plane);
@@ -231,8 +231,8 @@ void SiCDCTrackMergerModule::event()
           }
         }//end of for(int i_si_trk=0; ...)
         if (matched_trk > -1) {
-          GFTrack* si_track = ((m_si_tracks_grid->at(itheta))->at(iphi))->at(matched_trk);
-          std::pair<GFTrack*, GFTrack*> track_pair(cdc_track, si_track);
+          genfit::Track* si_track = ((m_si_tracks_grid->at(itheta))->at(iphi))->at(matched_trk);
+          std::pair<genfit::Track*, genfit::Track*> track_pair(cdc_track, si_track);
           matched_tracks_map->insert(track_pair);
         }
       }//end of  for(int i_cdc_trk=0; ...)
@@ -243,12 +243,12 @@ void SiCDCTrackMergerModule::event()
   int true_match = 0;
   //fill analysis (root tree) variables. it's not possible to do it above because some track pairs belong to more than one cell and thus
   //one will get the same entry more than onece (which may screw a distribution)!
-  for (std::map<GFTrack*, GFTrack*>::iterator trk_it = matched_tracks_map->begin(); trk_it != matched_tracks_map->end(); ++trk_it) {
-    GFTrack* cdc_trk = trk_it->first;
+  for (std::map<genfit::Track*, genfit::Track*>::iterator trk_it = matched_tracks_map->begin(); trk_it != matched_tracks_map->end(); ++trk_it) {
+    genfit::Track* cdc_trk = trk_it->first;
     TVector3 cdc_trk_position   = cdc_trk->getCardinalRep()->getPos();
     TVectorD cdc_trk_state      = cdc_trk->getCardinalRep()->getState();
     TMatrixDSym cdc_trk_covmtrx = cdc_trk->getCardinalRep()->getCov();
-    GFTrack* si_trk = trk_it->second;
+    genfit::Track* si_trk = trk_it->second;
     TVector3 si_trk_position    = si_trk->getCardinalRep()->getPos();
     TVectorD si_trk_state       = si_trk->getCardinalRep()->getState();
     TMatrixDSym si_trk_covmtrx  = si_trk->getCardinalRep()->getCov();
@@ -292,7 +292,7 @@ void SiCDCTrackMergerModule::event()
       m_dz_vec->push_back(cdc_trk_position.Z() - si_trk_position.Z());
     }// end of if (m_produce_root_file)
     n_trk_pair++;
-  }//end of for (std::map<GFTrack*, GFTrack*>::iterator trk_it = ...)
+  }//end of for (std::map<genfit::Track*, genfit::Track*>::iterator trk_it = ...)
 
   if (m_produce_root_file) {
     //number of si tracks, number of cdc tracks and number of track pairs
@@ -311,8 +311,8 @@ void SiCDCTrackMergerModule::event()
 }
 
 
-void SiCDCTrackMergerModule::insertTrackInGrid(double track_theta, double track_phi, GFTrack* gftrack,
-                                               std::vector<std::vector<std::vector<GFTrack*>*>*>* tracks_grid)
+void SiCDCTrackMergerModule::insertTrackInGrid(double track_theta, double track_phi, genfit::Track* gftrack,
+                                               std::vector<std::vector<std::vector<genfit::Track*>*>*>* tracks_grid)
 {
   double theta_bin = track_theta / m_theta_bin_length;
   //if track_theta is on the border of a cell, make two indices
@@ -346,9 +346,9 @@ void SiCDCTrackMergerModule::insertTrackInGrid(double track_theta, double track_
   }
 }
 
-void SiCDCTrackMergerModule::insertTrackAndPositionInGrid(TVector3 position, GFTrack* gftrack,
+void SiCDCTrackMergerModule::insertTrackAndPositionInGrid(TVector3 position, genfit::Track* gftrack,
                                                           std::vector<std::vector<std::vector<TVector3>*>*>* positions_grid,
-                                                          std::vector<std::vector<std::vector<GFTrack*>*>*>* tracks_grid)
+                                                          std::vector<std::vector<std::vector<genfit::Track*>*>*>* tracks_grid)
 {
   double track_theta = position.Theta();
   double track_phi   = position.Phi();

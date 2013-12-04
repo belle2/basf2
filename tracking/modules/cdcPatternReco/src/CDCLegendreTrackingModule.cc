@@ -19,7 +19,7 @@
 #include <tracking/cdcLegendreTracking/CDCLegendreTrackHit.h>
 #include <tracking/cdcLegendreTracking/CDCLegendreTrackCandidate.h>
 
-#include "GFTrackCand.h"
+#include "genfit/TrackCand.h"
 
 #include <cstdlib>
 #include <iomanip>
@@ -44,7 +44,7 @@ CDCLegendreTrackingModule::CDCLegendreTrackingModule() :
   Module(), m_rMin(-0.15), m_rMax(0.15)
 {
   setDescription(
-    "Performs the pattern recognition in the CDC with the conformal finder: digitized CDCHits are combined to track candidates (GFTrackCand)");
+    "Performs the pattern recognition in the CDC with the conformal finder: digitized CDCHits are combined to track candidates (genfit::TrackCand)");
 
   addParam("CDCHitsColName", m_cdcHitsColName,
            "Input CDCHits collection (should be created by CDCDigi module)",
@@ -79,8 +79,8 @@ CDCLegendreTrackingModule::~CDCLegendreTrackingModule()
 
 void CDCLegendreTrackingModule::initialize()
 {
-  //StoreArray for GFTrackCandidates
-  StoreArray<GFTrackCand>::registerPersistent(m_gfTrackCandsColName);
+  //StoreArray for genfit::TrackCandidates
+  StoreArray<genfit::TrackCand>::registerPersistent(m_gfTrackCandsColName);
 
   //Initialize look-up table
   m_nbinsTheta = static_cast<int>(std::pow(2.0, m_maxLevel));
@@ -361,8 +361,8 @@ bool CDCLegendreTrackingModule::fullfillsQualityCriteria(CDCLegendreTrackCandida
 
 void CDCLegendreTrackingModule::createGFTrackCandidates()
 {
-  //StoreArray for GFTrackCandidates: interface class to Genfit
-  StoreArray<GFTrackCand> gfTrackCandidates(m_gfTrackCandsColName);
+  //StoreArray for genfit::TrackCandidates: interface class to Genfit
+  StoreArray<genfit::TrackCand> gfTrackCandidates(m_gfTrackCandsColName);
   gfTrackCandidates.create();
 
   int i = 0;
@@ -370,8 +370,8 @@ void CDCLegendreTrackingModule::createGFTrackCandidates()
   BOOST_FOREACH(CDCLegendreTrackCandidate * trackCand, m_trackList) {
     gfTrackCandidates.appendNew();
 
-    //set the values needed as start values for the fit in the GFTrackCandidate from the CDCTrackCandidate information
-    //variables stored in the GFTrackCandidates are: vertex position + error, momentum + error, pdg value, indices for the Hits
+    //set the values needed as start values for the fit in the genfit::TrackCandidate from the CDCTrackCandidate information
+    //variables stored in the genfit::TrackCandidates are: vertex position + error, momentum + error, pdg value, indices for the Hits
     TVector3 position;
     position.SetXYZ(0.0, 0.0, 0.0);//at the moment there is no vertex determination in the ConformalFinder, but maybe the origin or the innermost hit are good enough as start values...
     //position = cdcTrackCandidates[i]->getInnerMostHit().getWirePosition();
@@ -383,19 +383,19 @@ void CDCLegendreTrackingModule::createGFTrackCandidates()
     int pdg = trackCand->getChargeSign() * (211);
 
     //The initial covariance matrix is calculated from these errors and it is important (!!) that it is not completely wrong
-    TMatrixDSym covSeed(6);
+    /*TMatrixDSym covSeed(6);
     covSeed(0, 0) = 4; covSeed(1, 1) = 4; covSeed(2, 2) = 4;
-    covSeed(3, 3) = 0.1 * 0.1; covSeed(4, 4) = 0.1 * 0.1; covSeed(5, 5) = 0.5 * 0.5;
+    covSeed(3, 3) = 0.1 * 0.1; covSeed(4, 4) = 0.1 * 0.1; covSeed(5, 5) = 0.5 * 0.5;*/
 
     //set the start parameters
-    gfTrackCandidates[i]->setPosMomSeedAndPdgCode(position, momentum, pdg, covSeed);
+    gfTrackCandidates[i]->setPosMomSeedAndPdgCode(position, momentum, pdg);
 
 
-    B2DEBUG(100, "Create GFTrackCandidate " << i << "  with pdg " << pdg);
+    B2DEBUG(100, "Create genfit::TrackCandidate " << i << "  with pdg " << pdg);
     B2DEBUG(100,
-            "position seed:  (" << position.x() << ", " << position.y() << ", " << position.z() << ")   position variance: (" << covSeed(0, 0) << ", " << covSeed(1, 1) << ", " << covSeed(2, 2) << ") ");
+            "position seed:  (" << position.x() << ", " << position.y() << ", " << position.z() << ")");//   position variance: (" << covSeed(0, 0) << ", " << covSeed(1, 1) << ", " << covSeed(2, 2) << ") ");
     B2DEBUG(100,
-            "momentum seed:  (" << momentum.x() << ", " << momentum.y() << ", " << momentum.z() << ")   position variance: (" << covSeed(3, 3) << ", " << covSeed(4, 4) << ", " << covSeed(5, 5) << ") ");
+            "momentum seed:  (" << momentum.x() << ", " << momentum.y() << ", " << momentum.z() << ")");//   position variance: (" << covSeed(3, 3) << ", " << covSeed(4, 4) << ", " << covSeed(5, 5) << ") ");
 
     //find indices of the Hits
     std::vector<CDCLegendreTrackHit*> trackHitVector = trackCand->getTrackHits();

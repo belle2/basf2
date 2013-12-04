@@ -4,7 +4,7 @@ from ROOT import gSystem
 gSystem.Load('libframework')  # for PyStoreArray
 gSystem.Load('libcdc')  # for CDCSimHit
 gSystem.Load('libtracking')  # for CDCWire and so on
-gSystem.Load('libgenfit')  # for GFTrackCands
+gSystem.Load('libgenfit2')  # for GFTrackCands
 
 gSystem.Load('libdataobjects')
 

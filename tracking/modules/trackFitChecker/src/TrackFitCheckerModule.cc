@@ -35,17 +35,18 @@
 #include <geometry/bfieldmap/BFieldMap.h>
 
 #include <tracking/gfbfield/GFGeant4Field.h>
-#include <tracking/trackCandidateHits/CDCTrackCandHit.h>
+#include <genfit/WireTrackCandHit.h>
 
-#include <GFTrack.h>
-#include <GFTools.h>
-#include <RKTrackRep.h>
-
-#include <GFFieldManager.h>
-#include <GFConstField.h>
-#include <GFMaterialEffects.h>
-#include <GFTGeoMaterialInterface.h>
-#include <GFException.h>
+#include <genfit/Track.h>
+#include <genfit/Tools.h>
+#include <genfit/RKTrackRep.h>
+#include <genfit/KalmanFitStatus.h>
+#include <genfit/KalmanFitterInfo.h>
+#include <genfit/FieldManager.h>
+#include <genfit/ConstField.h>
+#include <genfit/MaterialEffects.h>
+#include <genfit/TGeoMaterialInterface.h>
+#include <genfit/Exception.h>
 //root stuff
 #include <TMatrixDEigen.h>
 #include <TGeoManager.h>
@@ -75,7 +76,7 @@ REG_MODULE(TrackFitChecker)
 TrackFitCheckerModule::TrackFitCheckerModule() : Module()
 {
   //Set module properties
-  setDescription("This module takes GFTracks as input an calculates different statistical tests some of them using the simulated truth information");
+  setDescription("This module takes genfit::Tracks as input an calculates different statistical tests some of them using the simulated truth information");
 
   //Parameter definition
   addParam("outputFileName", m_dataOutFileName, "A common name for all output files of this module. Suffixes to distinguish them will be added automatically", string("trackFitChecker"));
@@ -101,16 +102,15 @@ TrackFitCheckerModule::~TrackFitCheckerModule()
 
 void TrackFitCheckerModule::initialize()
 {
-  StoreArray<GFTrack>::required();
+  StoreArray<genfit::Track>::required();
   StoreArray<MCParticle>::required();
-  if (gGeoManager == NULL) { //setup geometry and B-field for Genfit if not already there
-    geometry::GeometryManager& geoManager = geometry::GeometryManager::getInstance();
-    geoManager.createTGeoRepresentation();
-    //pass the magnetic field to genfit
-    GFFieldManager::getInstance()->init(new GFGeant4Field());
-    GFMaterialEffects::getInstance()->init(new GFTGeoMaterialInterface());
-    GFMaterialEffects::getInstance()->setMscModel("Highland"); // this line assumes the input tracks were fitted with this model. Otherwise there can be inconsistencies.
-  }
+  //pass the magnetic field to genfit
+  if (!genfit::FieldManager::getInstance()->isInitialized())
+    genfit::FieldManager::getInstance()->init(new GFGeant4Field());
+  if (!genfit::MaterialEffects::getInstance()->isInitialized())
+    genfit::MaterialEffects::getInstance()->init(new genfit::TGeoMaterialInterface());
+
+  //genfit::MaterialEffects::getInstance()->setMscModel("Highland"); // this line assumes the input tracks were fitted with this model. Otherwise there can be inconsistencies.
 
   //set all user parameters
 //  if (m_inspectTracks > 0 and m_truthAvailable == false) {
@@ -161,7 +161,9 @@ void TrackFitCheckerModule::initialize()
     registerTrackWiseData("pullVertexAbsMom");
     registerTVector3("trueVertexPos");
     registerTVector3("trueVertexMom");
-    registerInt("genfitStatusFlag");
+    registerInt("fitted");
+    registerInt("fittedConverged");
+    registerInt("numIterations");
   } else {
     m_rootFilePtr = NULL;
     m_statDataTreePtr = NULL;
@@ -323,58 +325,36 @@ void TrackFitCheckerModule::event()
   StoreArray<MCParticle> aMcParticleArray;
 
   //genfit stuff
-  StoreArray<GFTrack> fittedTracks(""); // the results of the track fit
+  StoreArray<genfit::Track> fittedTracks(""); // the results of the track fit
   const int nFittedTracks = fittedTracks.getEntries();
+  RelationArray gfTracksToMCPart(fittedTracks, aMcParticleArray);
   //stringstreams for text file output of all forward tracking parameters
-
-  //test one time for prediction and and weights
-  if (nFittedTracks not_eq 0 and m_wAndPredPresentsTested == false) {
-//    if (m_testSi == true) {
-//      try {
-//        fittedTracks[0]->getBK(0)->getVector(GFBKKey_dafWeight, 0);
-//      } catch (GFException& e) {
-//        std::cerr << e.what() << std::endl;
-//        m_testDaf = false;
-//        B2DEBUG(100, "tried to detect the DAF. Result DAF is not used");
-//      }
-//    } else {
-//      m_testDaf = false;
-//    }
-
-    try {
-      fittedTracks[0]->getBK(0)->getVector(GFBKKey_fSt, 0);
-    } catch (GFException& e) {
-      //m_layerWiseTests.havePredicitons = false;
-      m_testPrediction = false;
-//      if (m_inspectTracks > 0) {
-//        m_dataOut << "#inspect tracks was disabled because no predictions are available in the Genfit bookkeeping\n";
-//      }
-    }
-
-    m_wAndPredPresentsTested = true;
-  }
 
 
   for (int i = 0; i not_eq nFittedTracks; ++i) { // loop over all tracks in one event
-    GFTrack* const aTrackPtr = fittedTracks[i];
-    GFTrackCand aTrackCand = aTrackPtr->getCand();
-    const int mcParticleIndex = aTrackCand.getMcTrackId();
+    genfit::Track* const aTrackPtr = fittedTracks[i];
+    const int mcParticleIndex = gfTracksToMCPart[i].getFromIndex();
     const double charge = aMcParticleArray[mcParticleIndex]->getCharge();
     const TVector3 trueVertexMom = aMcParticleArray[mcParticleIndex]->getMomentum();
     const TVector3 trueVertexPos = aMcParticleArray[mcParticleIndex]->getVertex();
-//    cerr << "trueVertexPos" << endl; trueVertexPos.Print();
+    //cerr << "trueVertexPos" << endl; trueVertexPos.Print();
+    //cerr << "trueVertexMom" << endl; trueVertexMom.Print();
     //write the mcparticle info to the root output
     fillTVector3("trueVertexPos", trueVertexPos);
     fillTVector3("trueVertexMom", trueVertexMom);
-    RKTrackRep* aRKTrackRepPtr = dynamic_cast<RKTrackRep*>(aTrackPtr->getCardinalRep());
+    genfit::RKTrackRep* aRKTrackRepPtr = dynamic_cast<genfit::RKTrackRep*>(aTrackPtr->getCardinalRep());
     if (aRKTrackRepPtr == NULL) {
       B2FATAL("Only the RKTrackRep can be used by TrackFitChecker")
     }
-    const int genfitStatusFlag = aRKTrackRepPtr->getStatusFlag();
-    fillInt("genfitStatusFlag", genfitStatusFlag);
+    bool trackFitted = aTrackPtr->getFitStatus()->isFitted();
+    fillInt("fitted", trackFitted);
+    bool converged = aTrackPtr->getFitStatus()->isFitConverged();
+    fillInt("fittedConverged", converged);
+    int nIter = (dynamic_cast<genfit::KalmanFitStatus*>(aTrackPtr->getFitStatus()))->getNumIterations();
+    fillInt("numIterations", nIter);
 //    cerr << "first state cov" << endl;
     //aRKTrackRepPtr->getFirstState().Print(); aRKTrackRepPtr->getFirstCov().Print();
-    if (genfitStatusFlag not_eq 0) {
+    if (!trackFitted) {
       // we have a track that was not fitted successfully no tests can be done. Goto next track
 //      if( m_spMode == true){
 //        m_piStuffOut << trueVertexMom.Mag()*1000.0<< "\t" << -20 << "\n";
@@ -385,29 +365,21 @@ void TrackFitCheckerModule::event()
       }
       continue;
     }
-    TVector3 poca; //point of closest approach will be overwritten
-    TVector3 dirInPoca; //direction of the track at the point of closest approach will be overwritten
-    aRKTrackRepPtr->setPropDir(-1);
-    TVectorD local5DState;
-    TMatrixDSym local5DCov;
+    //aRKTrackRepPtr->setPropDir(-1);
+    TVectorD local5DState(5);
+    TMatrixDSym local5DCov(5);
     TVector3 vertexPos;
     TVector3 vertexMom;
     TMatrixDSym vertexCov(6);
     try {
       B2DEBUG(100, "before propagation");
-      aRKTrackRepPtr->extrapolateToPoint(trueVertexPos, poca, dirInPoca);
-//      cerr << "poca etc" << endl;
-//      poca.Print(); dirInPoca.Print();
-      GFDetPlane planeThroughVertex(poca, dirInPoca); //get planeThroughVertex through fitted vertex position
-//      cerr << "detplane" << endl;
-//      planeThroughVertex.Print();
-      B2DEBUG(100, "plane through vertex constructed");
-      aTrackPtr->getPosMomCov(planeThroughVertex, vertexPos, vertexMom, vertexCov);
-//      vertexCov.Print();
+      genfit::MeasuredStateOnPlane state = aTrackPtr->getFittedState();
+      state.extrapolateToPoint(trueVertexPos);
+      state.getPosMomCov(vertexPos, vertexMom, vertexCov);
+      local5DState = state.getState();
+      local5DCov = state.getCov();
       B2DEBUG(100, "pos mom cov extracted");
-      aRKTrackRepPtr->extrapolate(planeThroughVertex, local5DState, local5DCov);
-//      local5DCov.Print();
-    } catch (GFException& e) {
+    } catch (genfit::Exception& e) {
       B2WARNING("Extrapolation of a track in Event " << eventCounter <<  " to his true vertex position failed. Track will be ignored in statistical tests");
       ++m_extrapFailed;
       continue;
@@ -416,10 +388,10 @@ void TrackFitCheckerModule::event()
     //    poca.Print();
     //    dirInPoca.Print();
 
-    const double chi2tot_b = aTrackPtr->getChiSqu(); // returns the total chi2 from the backward filter
-    const double chi2tot_f = aTrackPtr->getForwardChiSqu();
-    const double ndf = aTrackPtr->getNDF();
-    const double pValue_b = ROOT::Math::chisquared_cdf_c(chi2tot_b, ndf);
+    const double chi2tot_b = aTrackPtr->getFitStatus()->getChi2(); // returns the total chi2 from the backward filter
+    const double pValue_b = aTrackPtr->getFitStatus()->getPVal();
+    const double chi2tot_f = aTrackPtr->getKalmanFitStatus()->getForwardChi2();
+    const double pValue_f = aTrackPtr->getKalmanFitStatus()->getPVal();
     if (pValue_b < m_pvalueCut) {//consider this track to be an outlier and do not use it in the statistical tests results written to the text file/ terminal but sill wirte the tests to the root file
       ++m_nCutawayTracks;
       m_fillOnlyInRootFile = true;
@@ -429,7 +401,6 @@ void TrackFitCheckerModule::event()
     // first part: get variables describing the hole track
 
     B2DEBUG(100, "p value of fitted track " << i << " is " << pValue_b);
-    const double pValue_f = ROOT::Math::chisquared_cdf_c(chi2tot_f, ndf);
     fillTrackWiseData("pValue_b", pValue_b);
     fillTrackWiseData("pValue_f", pValue_f);
     fillTrackWiseData("chi2tot_b", chi2tot_b);
@@ -503,10 +474,10 @@ void TrackFitCheckerModule::event()
       //cerr << "m_nLayers: " << m_nLayers << endl;
       if (m_testLRRes == false) {
         //cout << "aTrackPtr->getNumHits()" << aTrackPtr->getNumHits() << endl;
-        extractTrackData(aTrackPtr, charge);// read all the data for the layer wise tests from GFTracks
+        extractTrackData(aTrackPtr, charge);// read all the data for the layer wise tests from genfit::Tracks
         B2DEBUG(100, "extractTrackData finished successfully");
       }
-      // do the layer wise test uses only data from GFTrack object
+      // do the layer wise test uses only data from genfit::Track object
       if (m_testLRRes == true) {
         testLRAmbiResolution(aTrackPtr);
         B2DEBUG(100, "executed left right resolution tests");
@@ -1165,7 +1136,7 @@ void TrackFitCheckerModule::fillInt(const std::string& nameOfDataSample, const i
 }
 
 
-void TrackFitCheckerModule::extractTrackData(GFTrack* const aTrackPtr, const double charge)
+void TrackFitCheckerModule::extractTrackData(genfit::Track* const aTrackPtr, const double charge)
 {
 
 //  cerr << "1";
@@ -1187,18 +1158,18 @@ void TrackFitCheckerModule::extractTrackData(GFTrack* const aTrackPtr, const dou
   m_trackData.states_bp.clear();
   m_trackData.covs_bp.clear();
 
-  const int trackRepId = 0;
-  GFAbsTrackRep* rep = aTrackPtr->getTrackRep(trackRepId);
-  m_trackData.nHits = aTrackPtr->getNumHits();
+  m_trackData.nHits = aTrackPtr->getNumPointsWithMeasurement();
   //cerr << "nHits: " << aTrackPtr->getNumHits() << endl;
   for (int iGFHit = 0; iGFHit not_eq m_trackData.nHits; ++iGFHit) {
-    GFAbsRecoHit*  aGFAbsRecoHitPtr = aTrackPtr->getHit(iGFHit);
+    genfit::TrackPoint* aTrackPointPtr = aTrackPtr->getPointWithMeasurement(iGFHit);
+    genfit::AbsMeasurement*  aAbsMeasurementPtr = aTrackPointPtr->getRawMeasurement(0);
+    genfit::KalmanFitterInfo* fitterInfo = dynamic_cast<genfit::KalmanFitterInfo*>(aTrackPointPtr->getFitterInfo());
     //cerr << "2 iGFHit " << iGFHit << "\n";
     VXDTrueHit const* aVxdTrueHitPtr = NULL;
-    PXDRecoHit const*  aPxdRecoHitPtr = dynamic_cast<PXDRecoHit const* >(aGFAbsRecoHitPtr);
-    SVDRecoHit2D const*  aSvdRecoHit2DPtr =  dynamic_cast<SVDRecoHit2D  const* >(aGFAbsRecoHitPtr);
-    SVDRecoHit const*  aSvdRecoHitPtr =  dynamic_cast<SVDRecoHit  const* >(aGFAbsRecoHitPtr);
-    CDCRecoHit const*  aCdcRecoHitPtr = dynamic_cast<CDCRecoHit const* >(aGFAbsRecoHitPtr); // cannot use the additional const here because the getter fuctions inside the CDCRecoHit class are not decleared as const (although they could be const)
+    PXDRecoHit const*  aPxdRecoHitPtr = dynamic_cast<PXDRecoHit const* >(aAbsMeasurementPtr);
+    SVDRecoHit2D const*  aSvdRecoHit2DPtr =  dynamic_cast<SVDRecoHit2D  const* >(aAbsMeasurementPtr);
+    SVDRecoHit const*  aSvdRecoHitPtr =  dynamic_cast<SVDRecoHit  const* >(aAbsMeasurementPtr);
+    CDCRecoHit const*  aCdcRecoHitPtr = dynamic_cast<CDCRecoHit const* >(aAbsMeasurementPtr); // cannot use the additional const here because the getter fuctions inside the CDCRecoHit class are not decleared as const (although they could be const)
 
     if (aPxdRecoHitPtr not_eq NULL) {
       //cerr << "aPxdRecoHitPtr";
@@ -1269,46 +1240,35 @@ void TrackFitCheckerModule::extractTrackData(GFTrack* const aTrackPtr, const dou
       B2ERROR("An unknown type of recoHit was detected in TrackFitCheckerModule::event(). This hit will not be included in the statistical tests");
     }
 
-    //    if (m_testDaf == true or(aCdcRecoHitPtr not_eq NULL and m_testCdc == false) or(aPxdRecoHitPtr not_eq NULL and m_testSi == false)or(aSvdRecoHit2DPtr not_eq NULL and m_testSi == false)) {    // skip all other stuff when daf is tested because it is not used // something is wrong with the skipping better leave it out
-    //      continue;
-    //    }
-    //cerr << "4";
-    GFDetPlane detPlaneOfRecoHit = aGFAbsRecoHitPtr->getDetPlane(rep);
 
-    //cerr << "5";
+    genfit::MeasurementOnPlane* measurement = fitterInfo->getMeasurementOnPlane(-1);
+
+    m_trackData.Hs.push_back(measurement->getHMatrix()->getMatrix());
+
+    m_trackData.ms.push_back(TMatrixD(measurement->getState().GetNrows(), 1, measurement->getState().GetMatrixArray()));
+    m_trackData.Vs.push_back(TMatrixD(measurement->getCov()));
     TVectorD state(5);
     TMatrixDSym cov(5);
-    TVectorD m;
-    TMatrixDSym V;
-    //cerr << "bin hier vor get measurement\n";
-    aGFAbsRecoHitPtr->getMeasurement(rep, detPlaneOfRecoHit, rep->getState(), rep->getCov(), m, V);
-    //cerr << "und jetzt danach\n";
-    m_trackData.Hs.push_back(aGFAbsRecoHitPtr->getHMatrix(rep));
-
-    m_trackData.ms.push_back(TMatrixD(m.GetNrows(), 1, m.GetMatrixArray()));
-    m_trackData.Vs.push_back(TMatrixD(V));
-
-    state = aTrackPtr->getBK(trackRepId)->getVector(GFBKKey_fUpSt, iGFHit);
-    cov = aTrackPtr->getBK(trackRepId)->getSymMatrix(GFBKKey_fUpCov, iGFHit);
+    state = fitterInfo->getForwardUpdate()->getState();
+    cov   = fitterInfo->getForwardUpdate()->getCov();
     m_trackData.states_fu.push_back(TMatrixD(state.GetNrows(), 1, state.GetMatrixArray()));
     m_trackData.covs_fu.push_back(TMatrixD(cov));
-    state = aTrackPtr->getBK(trackRepId)->getVector(GFBKKey_bUpSt, iGFHit);
-    cov = aTrackPtr->getBK(trackRepId)->getSymMatrix(GFBKKey_bUpCov, iGFHit);
+    state = fitterInfo->getBackwardUpdate()->getState();
+    cov   = fitterInfo->getBackwardUpdate()->getCov();
     m_trackData.states_bu.push_back(TMatrixD(state.GetNrows(), 1, state.GetMatrixArray()));
     m_trackData.covs_bu.push_back(TMatrixD(cov));
-    //cerr << "getbias\n";
-    GFTools::getBiasedSmoothedData(aTrackPtr, trackRepId, iGFHit, state, cov);
-    //cerr << "und jetzt danach\n";
+    state = fitterInfo->getFittedState(true).getState();
+    cov   = fitterInfo->getFittedState(true).getCov();
     m_trackData.states_sm.push_back(TMatrixD(state.GetNrows(), 1, state.GetMatrixArray()));
     m_trackData.covs_sm.push_back(TMatrixD(cov));
 
     if (m_testPrediction == true) {
-      state = aTrackPtr->getBK(trackRepId)->getVector(GFBKKey_fSt, iGFHit);
-      cov = aTrackPtr->getBK(trackRepId)->getSymMatrix(GFBKKey_fCov, iGFHit);
+      state = fitterInfo->getForwardPrediction()->getState();
+      cov   = fitterInfo->getForwardPrediction()->getCov();
       m_trackData.states_fp.push_back(TMatrixD(state.GetNrows(), 1, state.GetMatrixArray()));
       m_trackData.covs_fp.push_back(TMatrixD(cov));
-      state = aTrackPtr->getBK(trackRepId)->getVector(GFBKKey_bSt, iGFHit);
-      cov = aTrackPtr->getBK(trackRepId)->getSymMatrix(GFBKKey_bCov, iGFHit);
+      state = fitterInfo->getBackwardPrediction()->getState();
+      cov   = fitterInfo->getBackwardPrediction()->getCov();
       m_trackData.states_bp.push_back(TMatrixD(state.GetNrows(), 1, state.GetMatrixArray()));
       m_trackData.covs_bp.push_back(TMatrixD(cov));
     } /*else if (m_inspectTracks > 0) {
@@ -1467,178 +1427,19 @@ void TrackFitCheckerModule::normalTests()
 }
 
 
-//void TrackFitCheckerModule::inspectTracks(double chi2tot_f, double vertexAbsMom)
-//{
-//  //#event# proc# layer#  χ²_inc,p  χ²_inc,u  m_u m_v Δu Δv
-//  //# |p| q/p_p du/dw_p dv/dw_p u_p v_p σ_u,p  σ_v,p
-//  //# χ²_tot,u  q/p_u du/dw_u dv/dw_u u_u v_u σ_u,u  σ_v,u
-//  //#   q/p du/dw dv/dw u v ΔΦ  Δθ
-//  StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
-//
-//  //cerr << "iam in inspectTracks and m_inspectTracks is " << m_inspectTracks  << "\n";
-//  int eventCounter = eventMetaDataPtr->getEvent();
-//  if (m_inspectTracks == 1) { // old style output
-//    stringstream secondLine;
-//    stringstream thirdLine;
-//    stringstream forthLine;
-//
-//    m_dataOut << eventCounter << "\t" << m_processedTracks ;
-//    if (chi2tot_f > 50.0) {
-//      thirdLine << "!!!!\t" << chi2tot_f; //mark as outlier track
-//    } else {
-//      thirdLine << "\t" << chi2tot_f;
-//    }
-//    forthLine << "\t";
-//    secondLine << "\t" << vertexAbsMom;
-//
-//    for (int iGFHit = 0; iGFHit not_eq m_trackData.nHits; ++iGFHit) {
-//      int hitLayerId = m_trackData.accuVecIndices[iGFHit] + 1;
-//      forthLine << "\t" << m_trackData.states_t[iGFHit][0][0] << "\t" << m_trackData.states_t[iGFHit][1][0] << "\t" << m_trackData.states_t[iGFHit][2][0] << "\t" << m_trackData.states_t[iGFHit][3][0] << "\t" << m_trackData.states_t[iGFHit][4][0] /*<< "\t" << pOutTrue.DeltaPhi(pInTrue) << "\t" <<  pOutTrue.Theta() - pInTrue.Theta()*/;
-//
-//      secondLine << "\t" << m_trackData.states_fp[iGFHit][0][0] << "\t" << m_trackData.states_fp[iGFHit][1][0] << "\t" << m_trackData.states_fp[iGFHit][2][0] << "\t" << m_trackData.states_fp[iGFHit][3][0] << "\t" << m_trackData.states_fp[iGFHit][4][0] << "\t" << sqrt(m_trackData.covs_fp[iGFHit][3][3]) << "\t" << sqrt(m_trackData.covs_fp[iGFHit][4][4]);
-//
-//      thirdLine  << "\t" << m_trackData.states_fu[iGFHit][0][0] << "\t" << m_trackData.states_fu[iGFHit][1][0] << "\t" << m_trackData.states_fu[iGFHit][2][0] << "\t" << m_trackData.states_fu[iGFHit][3][0] << "\t" << m_trackData.states_fu[iGFHit][4][0] << "\t" << sqrt(m_trackData.covs_fu[iGFHit][3][3]) << "\t" << sqrt(m_trackData.covs_fu[iGFHit][4][4]);
-//      if (m_trackData.ms[iGFHit].GetNrows() == 2) {
-//        m_dataOut << "\t" << "layer " << hitLayerId /*<< "\t" <<  fpChi2increment << "\t" << fuChi2Inrement*/ << "\t" << m_trackData.ms[iGFHit][0][0] << "\t" << m_trackData.ms[iGFHit][1][0] /*<< "\t" << uOutTrue - uInTrue << "\t" << vOutTrue - vInTrue*/;
-//      } else if (m_trackData.ms[iGFHit].GetNrows() == 2) {
-//        m_dataOut << "\t" << "layer " << hitLayerId /*<< "\t" <<  fpChi2increment << "\t" << fuChi2Inrement*/ << "\t" << m_trackData.ms[iGFHit][0][0] << "\t" << m_trackData.ms[iGFHit][1][0] /*<< "\t" << uOutTrue - uInTrue << "\t" << vOutTrue - vInTrue*/;
-//
-//      }
-//
-//      m_dataOut << "\t" << "layer " << hitLayerId /*<< "\t" <<  fpChi2increment << "\t" << fuChi2Inrement*/ << "\t" << m_trackData.ms[iGFHit][0][0] << "\t" << "1DHit" /*<< "\t" << uOutTrue - uInTrue << "\t" << vOutTrue - vInTrue*/;
-//
-//
-//    }
-//    m_dataOut << "\n" << secondLine.rdbuf() << "\n" << thirdLine.rdbuf() << "\n" << forthLine.rdbuf() << "\n";
-//
-//  } else if (m_inspectTracks == 2) {  // mainly input data to the track
-//    stringstream secondLine;
-//    m_dataOut << eventCounter << "\t" << m_processedTracks ;
-//    secondLine << chi2tot_f << "\t" << vertexAbsMom;
-//    for (int iGFHit = 0; iGFHit not_eq m_trackData.nHits; ++iGFHit) {
-//      int hitLayerId = m_trackData.accuVecIndices[iGFHit] + 1;
-//      if (m_trackData.ms[iGFHit].GetNrows() == 2) {
-//        m_dataOut << "\t" << "layer " << hitLayerId << "\t" << sqrt(m_trackData.Vs[iGFHit][0][0]) << "\t" << sqrt(m_trackData.Vs[iGFHit][1][1]) << "\t" << m_trackData.ms[iGFHit][0][0] << "\t" << m_trackData.ms[iGFHit][1][0];
-//      }
-//      if (m_trackData.ms[iGFHit].GetNrows() == 1 and m_trackData.Hs[iGFHit][0][3] > 0.1) { // 1D hit with u coordinate
-//        m_dataOut << "\t" << "layer " << hitLayerId << "\t" << sqrt(m_trackData.Vs[iGFHit][0][0]) << "\t" << "\t" << m_trackData.ms[iGFHit][0][0] << "\t";
-//      }
-//      if (m_trackData.ms[iGFHit].GetNrows() == 1 and m_trackData.Hs[iGFHit][0][4] > 0.1) { // 1D hit with u coordinate
-//        m_dataOut << "\t" << "layer " << hitLayerId << "\t" << "\t" << sqrt(m_trackData.Vs[iGFHit][0][0]) << "\t"  << "\t" << m_trackData.ms[iGFHit][0][0];
-//      }
-//      secondLine << "\t" << m_trackData.states_t[iGFHit][0][0] << "\t" << m_trackData.states_t[iGFHit][1][0] << "\t" << m_trackData.states_t[iGFHit][2][0] << "\t" << m_trackData.states_t[iGFHit][3][0] << "\t" << m_trackData.states_t[iGFHit][4][0];
-//    }
-//    m_dataOut << "\n" << secondLine.rdbuf() << "\n";
-//  }
-//
-//}
-
-
-
-
-//void TrackFitCheckerModule::testDaf(GFTrack* const aTrackPtr)
-//{
-/// expects simpleDigiHits, which are not existing any more
-//  //first test the weights
-//  const int nHits = aTrackPtr->getNumHits();
-//  double dafWeight = -2.0;
-//  double dafChi2 = -2.0;
-//
-//  vector<vector<float> > allWeights(m_nLayers, vector<float>(5, -1.0)); //it is important that the content is initalized to -1
-//  vector<vector<float> > allChi2s(m_nLayers, vector<float>(5, -1.0));
-//  for (int iGFHit = 0; iGFHit not_eq nHits; ++iGFHit) {
-//    int accuVecIndex = m_trackData.accuVecIndices[iGFHit];
-//    //aTrackPtr->getBK(0)->getNumber("dafChi2s", iGFHit,  dafChi2);
-//    dafWeight = (aTrackPtr->getBK(0)->getVector(GFBKKey_dafWeight, iGFHit))(0);// double check if this still works with background => more then one hit... probarbly it does work...
-//    GFAbsRecoHit* aGFAbsRecoHitPtr = aTrackPtr->getHit(iGFHit);
-//    const PXDRecoHit*   aPxdRecoHitPtr = dynamic_cast<const PXDRecoHit* >(aGFAbsRecoHitPtr);
-//    const SVDRecoHit2D*   aSvdRecoHit2DPtr =  dynamic_cast<const SVDRecoHit2D* >(aGFAbsRecoHitPtr);
-//
-//    const VXDSimpleDigiHit* aVXDSimpleDigiHit = NULL;
-//    const VXDTrueHit* aVXDTrueHit = NULL;
-//
-//    if (aPxdRecoHitPtr not_eq NULL) {
-//      aVXDSimpleDigiHit = aPxdRecoHitPtr->getSimpleDigiHit();
-//      if (aVXDSimpleDigiHit == NULL) {
-//        aVXDTrueHit = static_cast<const VXDTrueHit*>(aPxdRecoHitPtr->getTrueHit());
-//      }
-//    } else if (aSvdRecoHit2DPtr not_eq NULL) {
-//      aVXDSimpleDigiHit = aSvdRecoHit2DPtr->getSimpleDigiHit();
-//      if (aVXDSimpleDigiHit == NULL) {
-//        aVXDTrueHit = static_cast<const VXDTrueHit*>(aSvdRecoHit2DPtr->getTrueHit());
-//      }
-//    } else { //
-//
-//    }
-//    //XXX if (aVXDSimpleDigiHit->getTrueHit() not_eq NULL) cout << "iGFHit=" << iGFHit << " u,v="  << aVXDSimpleDigiHit->getTrueHit()->getU() << " , "<< aVXDSimpleDigiHit->getTrueHit()->getV() << endl;
-//
-//    //allWeights[accuVecIndex][0] = dafWeight; // first all weights in go into one histogram
-//    //allChi2s[accuVecIndex][0] = dafChi2;
-//    if (aVXDSimpleDigiHit not_eq NULL) { // at the moment only VXDSimpleDigiHit are support so skip if there is no VXDSimpleDigiHit
-//
-//      if (aVXDSimpleDigiHit->getTrueHit() not_eq NULL and aVXDSimpleDigiHit->isVarianceCorrect() == true) { //no background hit, no outlier hit
-//        allWeights[accuVecIndex][1] = dafWeight;
-//        allChi2s[accuVecIndex][1] = dafChi2;
-//      }
-//      if (aVXDSimpleDigiHit->getTrueHit() not_eq NULL and aVXDSimpleDigiHit->isVarianceCorrect() == false) { //no background hit, but measurement outlier hit
-//        allWeights[accuVecIndex][2] = dafWeight;
-//        allChi2s[accuVecIndex][2] = dafChi2;
-//      }
-//      if (aVXDSimpleDigiHit->getTrueHit() == NULL) {
-//        if (allWeights[accuVecIndex][3] < 0.0) {
-//          allWeights[accuVecIndex][3] = dafWeight;// first background hit
-//          allChi2s[accuVecIndex][3] = dafChi2;
-//        } else {
-//          allWeights[accuVecIndex][4] = dafWeight;
-//          allChi2s[accuVecIndex][4] = dafChi2;
-//        }
-//      }
-//    } else if (aVXDTrueHit not_eq NULL) { // not really useful at the moment... just to make sure nothing crashes when somebody fits trueHits with the daf
-//      //no background hit, no outlier hit
-//      allWeights[accuVecIndex][1] = dafWeight;
-//      allChi2s[accuVecIndex][1] = dafChi2;
-//
-//    }
-//
-//  }
-//
-//  for (int l = 0; l not_eq m_nLayers; ++l) {
-//    for (int i = 1; i not_eq 5; ++i) { // index starts at 1
-//      if (allWeights[l][i] >= 0.0) {
-//        m_layerWiseDataSamples["DAF_weights"][l][i](allWeights[l][i]);
-//        m_layerWiseDataSamples["DAF_weights"][l][0](allWeights[l][i]);
-//        m_layerWiseDataSamples["DAF_chi2s"][l][i](allChi2s[l][i]);
-//        m_layerWiseDataSamples["DAF_chi2s"][l][0](allChi2s[l][i]);
-//      }
-//    }
-//  }
-//
-//  if (m_writeToRootFile == true) {
-//    for (int l = 0; l not_eq m_nLayers; ++l) {
-//      for (int i = 1; i not_eq 5; ++i) {// index starts at 1
-//        (*m_layerWiseDataForRoot["DAF_weights"])[l][i] = allWeights[l][i];
-//        (*m_layerWiseDataForRoot["DAF_chi2s"])[l][i] = allChi2s[l][i];
-//      }
-//    }
-//  }
-//  if (m_robust == true) {
-//    for (int l = 0; l not_eq m_nLayers; ++l) {
-//      for (int i = 1; i not_eq 5; ++i) {// index starts at 1
-//        m_layerWiseData["DAF_weights"][l][i].push_back(allWeights[l][i]);
-//      }
-//    }
-//  }
-//}
-
-void TrackFitCheckerModule::testLRAmbiResolution(GFTrack* const aTrackPtr)
+void TrackFitCheckerModule::testLRAmbiResolution(genfit::Track* const aTrackPtr)
 {
-  const int nHits = aTrackPtr->getNumHits();
-  const GFTrackCand& aTrackCand = aTrackPtr->getCand();
+
+  const genfit::TrackCand* aTrackCandPtr = DataStore::getRelatedToObj<genfit::TrackCand>(aTrackPtr);
+
+  const int nHits = aTrackPtr->getNumPointsWithMeasurement();
   CDC::CDCGeometryPar& cdcGeometry = CDC::CDCGeometryPar::Instance();
   for (int iGFHit = 0; iGFHit not_eq nHits; ++iGFHit) {
     B2DEBUG(100, "iGFHit " << iGFHit);
-    GFAbsRecoHit* aGFAbsRecoHitPtr = aTrackPtr->getHit(iGFHit);
-    const CDCRecoHit* aCdcRecoHit =  dynamic_cast<const CDCRecoHit* >(aGFAbsRecoHitPtr);
+
+    genfit::TrackPoint* aTrackPointPtr = aTrackPtr->getPointWithMeasurement(iGFHit);
+    genfit::AbsMeasurement*  aAbsMeasurementPtr = aTrackPointPtr->getRawMeasurement(0);
+    const CDCRecoHit* aCdcRecoHit =  dynamic_cast<const CDCRecoHit* >(aAbsMeasurementPtr);
     if (aCdcRecoHit not_eq NULL) {
       const CDCHit* aCdcHit = aCdcRecoHit->getCDCHit();
       int lrSignFromDaf = aCdcRecoHit->getLeftRightResolution();
@@ -1659,9 +1460,9 @@ void TrackFitCheckerModule::testLRAmbiResolution(GFTrack* const aTrackPtr)
         lrAmbiSigns[0] = 1.0;
       }
 
-      CDCTrackCandHit* aCdcTrackCandHit = static_cast<CDCTrackCandHit*>(aTrackCand.getHit(iGFHit));
+      genfit::WireTrackCandHit* aCdcTrackCandHit = static_cast<genfit::WireTrackCandHit*>(aTrackCandPtr->getHit(iGFHit));
       int lrAmbiSignFromCand = aCdcTrackCandHit->getLeftRightResolution();
-      B2DEBUG(100, "l/r ambi signs simulation, GFTrack, GFTrackCand " <<  lrAmbiSign << " " << lrSignFromDaf << " " << lrAmbiSignFromCand);
+      B2DEBUG(100, "l/r ambi signs simulation, genfit::Track, genfit::TrackCand " <<  lrAmbiSign << " " << lrSignFromDaf << " " << lrAmbiSignFromCand);
       if (lrAmbiSign == lrAmbiSignFromCand) {
         lrAmbiSigns[1] = 1.0;
       }

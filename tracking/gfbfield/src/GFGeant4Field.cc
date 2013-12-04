@@ -16,10 +16,7 @@ using namespace Belle2;
 TVector3 GFGeant4Field::get(const TVector3& pos) const
 {
 
-  TVector3 magField = m_bField.getBField(pos);
-
   //Convert Tesla to kGauss
-  magField *= 10.0;
-  return magField;
+  return 10.0 * m_bField.getBField(pos);
 }
 

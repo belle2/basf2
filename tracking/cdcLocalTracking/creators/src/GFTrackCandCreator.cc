@@ -27,13 +27,13 @@ GFTrackCandCreator::GFTrackCandCreator() {;}
 void
 GFTrackCandCreator::create(
   const std::vector<CDCTrack>& cdcTracks,
-  StoreArray<GFTrackCand>& gfTrackCands
+  StoreArray<genfit::TrackCand>& gfTrackCands
 ) const
 {
 
   BOOST_FOREACH(const CDCTrack & cdcTrack, cdcTracks) {
 
-    GFTrackCand* gfTrack =  gfTrackCands.appendNew();
+    genfit::TrackCand* gfTrack =  gfTrackCands.appendNew();
     create(cdcTrack, *gfTrack);
 
   }
@@ -43,7 +43,7 @@ GFTrackCandCreator::create(
 void
 GFTrackCandCreator::create(
   const CDCTrack& track,
-  GFTrackCand& gfTrackCand
+  genfit::TrackCand& gfTrackCand
 ) const
 {
 
@@ -90,7 +90,7 @@ GFTrackCandCreator::create(
 inline void
 GFTrackCandCreator::appendHits(
   const CDCTrack& track,
-  GFTrackCand& gfTrackCand
+  genfit::TrackCand& gfTrackCand
 ) const
 {
 

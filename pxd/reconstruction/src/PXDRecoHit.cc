@@ -17,7 +17,7 @@
 #include <vxd/geometry/SensorPlane.h>
 #include <vxd/geometry/GeoCache.h>
 
-#include <GFDetPlane.h>
+#include <genfit/DetPlane.h>
 #include <TVector3.h>
 #include <TRandom.h>
 
@@ -26,16 +26,13 @@ using namespace Belle2;
 
 ClassImp(PXDRecoHit)
 
-const double PXDRecoHit::c_HMatrixContent[10] = {0, 0, 0, 1, 0, 0, 0, 0, 0, 1};
-const TMatrixD PXDRecoHit::c_HMatrix = TMatrixD(HIT_DIMENSIONS, 5, c_HMatrixContent);
-
 PXDRecoHit::PXDRecoHit():
-  GFAbsPlanarHit(HIT_DIMENSIONS), m_sensorID(0), m_trueHit(0), m_cluster(0),
+  genfit::PlanarMeasurement(HIT_DIMENSIONS), m_sensorID(0), m_trueHit(0), m_cluster(0),
   m_energyDep(0)//, m_energyDepError(0)
 {}
 
-PXDRecoHit::PXDRecoHit(const PXDTrueHit* hit, float sigmaU, float sigmaV):
-  GFAbsPlanarHit(HIT_DIMENSIONS), m_sensorID(0), m_trueHit(hit), m_cluster(0),
+PXDRecoHit::PXDRecoHit(const PXDTrueHit* hit, const genfit::TrackCandHit* trackCandHit, float sigmaU, float sigmaV):
+  genfit::PlanarMeasurement(HIT_DIMENSIONS), m_sensorID(0), m_trueHit(hit), m_cluster(0),
   m_energyDep(0)//, m_energyDepError(0)
 {
   if (!gRandom) B2FATAL("gRandom not initialized, please set up gRandom first");
@@ -51,13 +48,13 @@ PXDRecoHit::PXDRecoHit(const PXDTrueHit* hit, float sigmaU, float sigmaV):
   }
 
   // Set positions
-  fHitCoord(0) = gRandom->Gaus(hit->getU(), sigmaU);
-  fHitCoord(1) = gRandom->Gaus(hit->getV(), sigmaV);
+  rawHitCoords_(0) = gRandom->Gaus(hit->getU(), sigmaU);
+  rawHitCoords_(1) = gRandom->Gaus(hit->getV(), sigmaV);
   // Set the error covariance matrix
-  fHitCov(0, 0) = sigmaU * sigmaU;
-  fHitCov(0, 1) = 0;
-  fHitCov(1, 0) = 0;
-  fHitCov(1, 1) = sigmaV * sigmaV;
+  rawHitCov_(0, 0) = sigmaU * sigmaU;
+  rawHitCov_(0, 1) = 0;
+  rawHitCov_(1, 0) = 0;
+  rawHitCov_(1, 1) = sigmaV * sigmaV;
   // Set physical parameters
   m_energyDep = hit->getEnergyDep();
   // Setup geometry information
@@ -65,19 +62,19 @@ PXDRecoHit::PXDRecoHit(const PXDTrueHit* hit, float sigmaU, float sigmaV):
 }
 
 PXDRecoHit::PXDRecoHit(const PXDCluster* hit, float sigmaU, float sigmaV, float covUV):
-  GFAbsPlanarHit(HIT_DIMENSIONS), m_sensorID(0), m_trueHit(0), m_cluster(hit),
+  genfit::PlanarMeasurement(HIT_DIMENSIONS), m_sensorID(0), m_trueHit(0), m_cluster(hit),
   m_energyDep(0)//, m_energyDepError(0)
 {
   // Set the sensor UID
   m_sensorID = hit->getSensorID();
   // Set positions
-  fHitCoord(0) = hit->getU();
-  fHitCoord(1) = hit->getV();
+  rawHitCoords_(0) = hit->getU();
+  rawHitCoords_(1) = hit->getV();
   // Set the error covariance matrix
-  fHitCov(0, 0) = sigmaU * sigmaU;
-  fHitCov(0, 1) = covUV;
-  fHitCov(1, 0) = covUV;
-  fHitCov(1, 1) = sigmaV * sigmaV;
+  rawHitCov_(0, 0) = sigmaU * sigmaU;
+  rawHitCov_(0, 1) = covUV;
+  rawHitCov_(1, 0) = covUV;
+  rawHitCov_(1, 1) = sigmaV * sigmaV;
   // Set physical parameters
   m_energyDep = hit->getCharge() * Const::ehEnergy;
   //m_energyDepError = 0;
@@ -86,26 +83,32 @@ PXDRecoHit::PXDRecoHit(const PXDCluster* hit, float sigmaU, float sigmaV, float 
 }
 
 
-PXDRecoHit::PXDRecoHit(const PXDCluster* hit):
-  GFAbsPlanarHit(HIT_DIMENSIONS), m_sensorID(0), m_trueHit(0), m_cluster(hit),
+PXDRecoHit::PXDRecoHit(const PXDCluster* hit, const genfit::TrackCandHit* trackCandHit):
+  genfit::PlanarMeasurement(HIT_DIMENSIONS), m_sensorID(0), m_trueHit(0), m_cluster(hit),
   m_energyDep(0)//, m_energyDepError(0)
 {
   // Set the sensor UID
   m_sensorID = hit->getSensorID();
   // Set positions
-  fHitCoord(0) = hit->getU();
-  fHitCoord(1) = hit->getV();
+  rawHitCoords_(0) = hit->getU();
+  rawHitCoords_(1) = hit->getV();
   // Set the error covariance matrix
-  fHitCov(0, 0) = hit->getUSigma() * hit->getUSigma();
-  fHitCov(0, 1) = hit->getRho() * hit->getUSigma() * hit->getVSigma();
-  fHitCov(1, 0) = hit->getRho() * hit->getUSigma() * hit->getVSigma();
-  fHitCov(1, 1) = hit->getVSigma() * hit->getVSigma();
+  rawHitCov_(0, 0) = hit->getUSigma() * hit->getUSigma();
+  rawHitCov_(0, 1) = hit->getRho() * hit->getUSigma() * hit->getVSigma();
+  rawHitCov_(1, 0) = hit->getRho() * hit->getUSigma() * hit->getVSigma();
+  rawHitCov_(1, 1) = hit->getVSigma() * hit->getVSigma();
   // Set physical parameters
   m_energyDep = hit->getCharge() * Const::ehEnergy;
   //m_energyDepError = 0;
   // Setup geometry information
   setDetectorPlane();
 }
+
+genfit::AbsMeasurement* PXDRecoHit::clone() const
+{
+  return new PXDRecoHit(*this);
+}
+
 
 void PXDRecoHit::setDetectorPlane()
 {
@@ -118,16 +121,14 @@ void PXDRecoHit::setDetectorPlane()
   TVector3 vGlobal = geometry.vectorToGlobal(TVector3(0, 1, 0));
 
   //Construct the detector plane
-  GFDetPlane detPlane(origin, uGlobal, vGlobal, new VXD::SensorPlane(m_sensorID, 20, 20));
-  setDetPlane(detPlane);
+  genfit::DetPlane* p = new genfit::DetPlane(origin, uGlobal, vGlobal, new VXD::SensorPlane(m_sensorID, 20, 20));
+  genfit::SharedPlanePtr detPlane(p);
+  setPlane(detPlane, m_sensorID);
 }
 
-GFAbsRecoHit* PXDRecoHit::clone()
-{
-  return new PXDRecoHit(*this);
-}
 
-const TMatrixD& PXDRecoHit::getHMatrix(const GFAbsTrackRep*)
+std::vector<genfit::MeasurementOnPlane*> PXDRecoHit::constructMeasurementsOnPlane(const genfit::AbsTrackRep* rep,
+    const genfit::SharedPlanePtr& pl) const
 {
-  return c_HMatrix;
+  return std::vector<genfit::MeasurementOnPlane*>(1, new genfit::MeasurementOnPlane(rawHitCoords_, rawHitCov_, pl, rep, this->constructHMatrix(rep)));
 }

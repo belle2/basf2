@@ -33,7 +33,7 @@ class G4UserSteppingAction;
 class G4VPhysicalVolume;
 class G4ErrorFreeTrajState;
 class G4String;
-class GFTrack;
+namespace genfit { class Track; }
 
 namespace Belle2 {
 
@@ -105,7 +105,7 @@ namespace Belle2 {
     TMatrixD getCov(const G4ErrorFreeTrajState*);
 
     //! Define a new track candidate for one reconstructed track and PDG hypothesis
-    void getStartPoint(const GFTrack*, int, G4ThreeVector&, G4ThreeVector&, G4ErrorTrajErr&);
+    void getStartPoint(const genfit::Track*, int, G4ThreeVector&, G4ThreeVector&, G4ErrorTrajErr&);
 
     //! Create another extrapolation hit for a track candidate
     void createHit(const G4ErrorFreeTrajState*, ExtHitStatus, int, int, StoreArray<ExtHit>&, RelationArray&);

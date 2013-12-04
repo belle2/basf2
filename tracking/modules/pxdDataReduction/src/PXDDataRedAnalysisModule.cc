@@ -14,7 +14,7 @@
 #include <framework/logging/Logger.h>
 #include <framework/datastore/RelationArray.h>
 
-#include <GFTrackCand.h>
+#include <genfit/TrackCand.h>
 #include <generators/dataobjects/MCParticle.h>
 #include <pxd/dataobjects/PXDDigit.h>
 #include <pxd/dataobjects/PXDSimHit.h>
@@ -82,7 +82,7 @@ PXDDataRedAnalysisModule::~PXDDataRedAnalysisModule()
 void PXDDataRedAnalysisModule::initialize()
 {
 
-  StoreArray<GFTrackCand>::required(m_gfTrackCandsColName);
+  StoreArray<genfit::TrackCand>::required(m_gfTrackCandsColName);
   StoreArray<ROIid>::required(m_ROIListName);
   StoreArray<PXDIntercept>::required(m_PXDInterceptListName);
 
@@ -196,7 +196,7 @@ void PXDDataRedAnalysisModule::event()
 {
 
   B2DEBUG(1, "  ++++++++++++++ PXDDataRedAnalysisModule");
-  StoreArray<GFTrackCand> trackCandList(m_gfTrackCandsColName);
+  StoreArray<genfit::TrackCand> trackCandList(m_gfTrackCandsColName);
   StoreArray<PXDIntercept> PXDInterceptList(m_PXDInterceptListName);
   StoreArray<ROIid> ROIList(m_ROIListName);
 
@@ -207,14 +207,14 @@ void PXDDataRedAnalysisModule::event()
   StoreArray<PXDSimHit> pxdSimHits;
   StoreArray<PXDTrueHit> pxdTrueHits;
 
-  RelationIndex < GFTrackCand, PXDIntercept >
+  RelationIndex < genfit::TrackCand, PXDIntercept >
   gfTrackCandToPXDIntercept(DataStore::relationName(m_gfTrackCandsColName, m_PXDInterceptListName));
 
   if (! gfTrackCandToPXDIntercept)
-    B2FATAL("No GFTrackCand -> PXDIntercept relation found! :'(");
+    B2FATAL("No genfit::TrackCand -> PXDIntercept relation found! :'(");
 
-  typedef RelationIndex < GFTrackCand, PXDIntercept>::range_from PXDInterceptsFromGFTracks;
-  typedef RelationIndex < GFTrackCand, PXDIntercept>::iterator_from PXDInterceptIteratorType;
+  typedef RelationIndex < genfit::TrackCand, PXDIntercept>::range_from PXDInterceptsFromGFTracks;
+  typedef RelationIndex < genfit::TrackCand, PXDIntercept>::iterator_from PXDInterceptIteratorType;
 
   typedef RelationIndex < PXDDigit, PXDTrueHit>::range_from PXDTrueHitFromPXDDigit;
   typedef RelationIndex < PXDDigit, PXDTrueHit>::iterator_from PXDTrueHitIteratorType;

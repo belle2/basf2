@@ -10,17 +10,17 @@
 #include <tracking/gfbfield/GFGeant4Field.h>
 #include <tracking/modules/trackFitChecker/TrackFitCheckerModule.h>
 //Genfit stuff
-#include <GFTrack.h>
-#include <GFException.h>
-#include <GFTrackCand.h>
-#include <GFConstField.h>
-#include <GFFieldManager.h>
-#include <GFTools.h>
-#include <GFMaterialEffects.h>
-#include <GFTGeoMaterialInterface.h>
-#include <GFRaveVertexFactory.h>
-#include <GFRaveVertex.h>
-#include <GFTGeoMaterialInterface.h>
+#include <genfit/Track.h>
+#include <genfit/Exception.h>
+#include <genfit/TrackCand.h>
+#include <genfit/ConstField.h>
+#include <genfit/FieldManager.h>
+#include <genfit/Tools.h>
+#include <genfit/MaterialEffects.h>
+#include <genfit/TGeoMaterialInterface.h>
+#include <genfit/GFRaveVertexFactory.h>
+#include <genfit/GFRaveVertex.h>
+#include <genfit/TGeoMaterialInterface.h>
 //root stuff
 #include <TVector3.h>
 #include <TMatrixD.h>
@@ -71,17 +71,21 @@ VertexFitCheckerModule::VertexFitCheckerModule() : Module()
 void VertexFitCheckerModule::initialize()
 {
 
-  StoreArray<GFTrack>::required();
-  StoreArray<GFRaveVertex>::required();
+  StoreArray<genfit::Track>::required();
+  StoreArray<genfit::GFRaveVertex>::required();
   StoreArray<MCParticle>::required();
   if (gGeoManager == NULL) { //setup geometry and B-field for Genfit if not already there
     geometry::GeometryManager& geoManager = geometry::GeometryManager::getInstance();
     geoManager.createTGeoRepresentation();
-    //pass the magnetic field to genfit
-    GFFieldManager::getInstance()->init(new GFGeant4Field());
-    GFMaterialEffects::getInstance()->init(new GFTGeoMaterialInterface());
-    GFMaterialEffects::getInstance()->setMscModel("Highland");
+
   }
+  if (!genfit::FieldManager::getInstance()->isInitialized()) {
+    //pass the magnetic field to genfit
+    genfit::FieldManager::getInstance()->init(new GFGeant4Field());
+    genfit::MaterialEffects::getInstance()->init(new genfit::TGeoMaterialInterface());
+    genfit::MaterialEffects::getInstance()->setMscModel("Highland");
+  }
+
   //configure the output
   m_textOutput.precision(4);
   if (m_writeToRootFile == true) {
@@ -146,14 +150,15 @@ void VertexFitCheckerModule::event()
 
   StoreArray<MCParticle> mcParticles;
   //const int nMcParticles = mcParticles.getEntries();
-  StoreArray<GFTrack> gfTracks;
+  StoreArray<genfit::Track> gfTracks;
   const int nGfTracks = gfTracks.getEntries();
   //input
 
   //find all real vertices that led to fitted tracks with the simulation information
   vector<const MCParticle*> motherParticles;
   for (int i = 0; i not_eq nGfTracks; ++i) {
-    int mcIndex = gfTracks[i]->getCand().getMcTrackId();
+    const genfit::TrackCand* aTrackCandPtr = DataStore::getRelatedToObj<genfit::TrackCand>(gfTracks[i]);
+    int mcIndex = aTrackCandPtr->getMcTrackId();
     const MCParticle* motherParticle = mcParticles[mcIndex]->getMother();
     motherParticles.push_back(motherParticle);
   }
@@ -161,18 +166,18 @@ void VertexFitCheckerModule::event()
 //  struct TrueVertex {
 //    TVector3 pos;
 //    //oder MCParicle*
-//    vector<const GFTrack*> tracks;
+//    vector<const genfit::Track*> tracks;
 //
 //  };
 
-  StoreArray<GFRaveVertex> vertices;
+  StoreArray<genfit::GFRaveVertex> vertices;
 
   const int nVertices = vertices.getEntries();
   B2DEBUG(100, "there are " << nVertices << " in this event");
 
   for (int iVertex = 0; iVertex not_eq nVertices; ++iVertex) {
 
-    const GFRaveVertex* aGFRaveVertexPtr = vertices[iVertex];
+    const genfit::GFRaveVertex* aGFRaveVertexPtr = vertices[iVertex];
     const double chi2 = aGFRaveVertexPtr->getChi2();
     const double ndf = aGFRaveVertexPtr->getNdf();
     const double pValue = ROOT::Math::chisquared_cdf_c(chi2, ndf);
@@ -186,16 +191,17 @@ void VertexFitCheckerModule::event()
     const int nTracks = aGFRaveVertexPtr->getNTracks();
     bool skipVertex = false;
     for (int i = 0; i not_eq nTracks; ++i) {
-      const GFRaveTrackParameters* const trackInfo = aGFRaveVertexPtr->getParameters(i);
+      const genfit::GFRaveTrackParameters* const trackInfo = aGFRaveVertexPtr->getParameters(i);
 //      cout << "trackInfo " << trackInfo << endl;
-      double pValueOfTrack = trackInfo->getRep()->getPVal();
+      double pValueOfTrack = trackInfo->getTrack()->getFitStatus()->getPVal();
       B2DEBUG(100, "p value of track " << i << " in vertex " << iVertex << " is " << pValueOfTrack);
       if (pValueOfTrack < m_trackPValueCut) { // if contributing track is bad ignore this vertex
         ++m_badTrackPValueVertices;
         skipVertex = true;
         break;
       }
-      particlesCommingFromVertex.push_back(mcParticles[trackInfo->getTrack()->getCand().getMcTrackId()]);
+      const genfit::TrackCand* aTrackCandPtr = DataStore::getRelatedToObj<genfit::TrackCand>(trackInfo->getTrack());
+      particlesCommingFromVertex.push_back(mcParticles[aTrackCandPtr->getMcTrackId()]);
     }
     if (skipVertex == true) {
       continue;

@@ -16,8 +16,8 @@
 #include <string>
 
 //Genfit
-#include <GFTrack.h>
-#include <GFRaveVertexFactory.h>
+#include <genfit/Track.h>
+#include <genfit/GFRaveVertexFactory.h>
 //tracking
 //#include <tracking/dataobjects/Track.h>
 //basf2

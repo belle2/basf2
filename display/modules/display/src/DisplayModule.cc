@@ -12,11 +12,11 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
-#include <GFTrack.h>
-#include <GFRaveVertex.h>
-#include <GFFieldManager.h>
-#include <GFMaterialEffects.h>
-#include <GFTGeoMaterialInterface.h>
+#include <genfit/Track.h>
+#include <genfit/GFRaveVertex.h>
+#include <genfit/FieldManager.h>
+#include <genfit/MaterialEffects.h>
+#include <genfit/TGeoMaterialInterface.h>
 
 #include "TGeoManager.h"
 #include "TEveManager.h"
@@ -28,25 +28,25 @@ REG_MODULE(Display)
 
 DisplayModule::DisplayModule() : Module(), m_display(0), m_visualizer(0)
 {
-  setDescription("Interactive visualisation of MCParticles, GFTracks and various SimHits (plus geometry). See https://belle2.cc.kek.jp/~twiki/bin/view/Computing/EventDisplay for detailed documentation.");
+  setDescription("Interactive visualisation of MCParticles, genfit::Tracks and various SimHits (plus geometry). See https://belle2.cc.kek.jp/~twiki/bin/view/Computing/EventDisplay for detailed documentation.");
 
-  addParam("options", m_options, "Drawing options for GFTracks, a combination of DHMPST. See EVEVisualization::setOptions or the display.py example for an explanation.", std::string("MHT"));
+  addParam("options", m_options, "Drawing options for genfit::Tracks, a combination of DHMPST. See EVEVisualization::setOptions or the display.py example for an explanation.", std::string("MHT"));
   addParam("showMCInfo", m_showMCInfo, "Show Monte Carlo information (MCParticles, SimHits)", true);
   addParam("assignHitsToPrimaries", m_assignToPrimaries, "If true, hits created by secondary particles (after scattering, decay-in-flight, ...) will be assigned to the original primary particle.", false);
   addParam("showAllPrimaries", m_showAllPrimaries, "If true, all primary MCParticles will be shown, regardless of wether hits are produced.", false);
   addParam("hideSecondaries", m_hideSecondaries, "If true, secondary MCParticles (and hits created by them) will not be shown.", false);
   addParam("showCharged", m_showCharged, "If true, all charged MCParticles will be shown, including secondaries (implies disabled assignHitsToPrimaries). May be slow.", false);
   addParam("showNeutrals", m_showNeutrals, "If true, all neutral MCParticles will be shown, including secondaries (implies disabled assignHitsToPrimaries). May be slow.", false);
-  addParam("showTrackLevelObjects", m_showTrackLevelObjects, "If true, fitted GFTracks, GFRave Vertices and ECLGamma objects will be shown in the display.", true);
-  addParam("showGFTrackCands", m_showGFTrackCands, "If true, track candidates (GFTrackCands) and RecoHits will be shown in the display.", false);
-  addParam("useClusters", m_useClusters, "Use PXD/SVD clusters for GFTrackCands/recohit visualisation (instead of TrueHits).", true);
+  addParam("showTrackLevelObjects", m_showTrackLevelObjects, "If true, fitted genfit::Tracks, genfit::GFRave Vertices and ECLGamma objects will be shown in the display.", true);
+  addParam("showGFTrackCands", m_showGFTrackCands, "If true, track candidates (genfit::TrackCands) and RecoHits will be shown in the display.", false);
+  addParam("useClusters", m_useClusters, "Use PXD/SVD clusters for genfit::TrackCands/recohit visualisation (instead of TrueHits).", true);
   addParam("automatic", m_automatic, "Non-interactively save visualisations for each event.", false);
   addParam("fullGeometry", m_fullGeometry, "Show full geometry instead of simplified shapes. Further details can be enabled by changing the VisLevel option for Eve -> Scenes -> Geometry Scene -> Top_1.", false);
 
   //make sure dictionaries for PXDrecohits and RKTrackRep are loaded
   //needs to be done here to have dictionaries available during RootInput::initialize()
   gSystem->Load("libpxd");
-  gSystem->Load("libgenfitRK");
+  gSystem->Load("libgenfit2");
 }
 
 
@@ -66,9 +66,9 @@ void DisplayModule::initialize()
   StoreArray<EKLMSimHit>::optional();
   StoreArray<ECLHit>::optional();
   StoreArray<ECLGamma>::optional();
-  StoreArray<GFTrack>::optional();
-  StoreArray<GFTrackCand>::optional();
-  StoreArray<GFRaveVertex>::optional();
+  StoreArray<genfit::Track>::optional();
+  StoreArray<genfit::TrackCand>::optional();
+  StoreArray<genfit::GFRaveVertex>::optional();
   StoreObjPtr<DisplayData>::optional();
   StoreArray<PXDCluster>::optional();
   StoreArray<SVDCluster>::optional();
@@ -80,8 +80,8 @@ void DisplayModule::initialize()
     geoManager.createTGeoRepresentation();
 
     //initialize some things for genfit
-    GFFieldManager::getInstance()->init(new GFGeant4Field());
-    GFMaterialEffects::getInstance()->init(new GFTGeoMaterialInterface());
+    genfit::FieldManager::getInstance()->init(new GFGeant4Field());
+    genfit::MaterialEffects::getInstance()->init(new genfit::TGeoMaterialInterface());
   }
   if (!gGeoManager) {
     B2ERROR("Couldn't create TGeo geometry!");
@@ -164,7 +164,7 @@ void DisplayModule::event()
   }
 
   if (m_showGFTrackCands) {
-    StoreArray<GFTrackCand> gftrackcands;
+    StoreArray<genfit::TrackCand> gftrackcands;
     const int nCands = gftrackcands.getEntries();
     for (int i = 0; i < nCands; i++) {
       if (m_useClusters) {
@@ -189,12 +189,12 @@ void DisplayModule::event()
 
   if (m_showTrackLevelObjects) {
     //gather track-level objects
-    StoreArray<GFTrack> gftracks;
+    StoreArray<genfit::Track> gftracks;
     const int nTracks = gftracks.getEntries();
     for (int i = 0; i < nTracks; i++)
-      m_visualizer->addTrack(gftracks[i], TString::Format("GFTrack %d", i));
+      m_visualizer->addTrack(gftracks[i], TString::Format("genfit::Track %d", i));
 
-    StoreArray<GFRaveVertex> vertices;
+    StoreArray<genfit::GFRaveVertex> vertices;
     const int nVertices = vertices.getEntries();
     for (int i = 0; i < nVertices; i++) {
       m_visualizer->addVertex(vertices[i], TString::Format("GFRaveVertex %d", i));

@@ -57,7 +57,7 @@ namespace Belle2 {
       }
 
       inline void apply(const std::vector< CDCRecoSegment2D >& recoSegments,
-                        StoreArray < GFTrackCand >& storedGFTrackCands) {
+                        StoreArray < genfit::TrackCand >& storedGFTrackCands) {
 
         //create the segment triples
         B2DEBUG(100, "Combining CDCReco2DSegments to CDCSegmentTriples");
@@ -173,9 +173,9 @@ namespace Belle2 {
         m_trackOrientator.markOrientation(m_tracks);
 
         //create the gftracks
-        B2DEBUG(100, "Creating the GFTrackCands");
+        B2DEBUG(100, "Creating the genfit::TrackCands");
         m_gfTrackCandCreator.create(m_tracks, storedGFTrackCands);
-        B2DEBUG(100, "  Created " << storedGFTrackCands.getEntries()  << " GFTrackCands");
+        B2DEBUG(100, "  Created " << storedGFTrackCands.getEntries()  << " genfit::TrackCands");
 
         // IO for monitoring in python
 #ifdef USE_ROOT_IN_CDCLOCALTRACKING

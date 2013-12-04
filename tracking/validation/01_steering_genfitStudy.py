@@ -23,18 +23,23 @@ pxd = True
 svd = True
 cdc = True
 
-# select fitter: 0 = Kalman, 1 = Daf
-FilterId = 0
+# select fitter (simpleKalman, Kalman, DAF)
+FilterId = 'Kalman'
+
+# visualize failed tracks?
+vis = False
 
 ##############################################################################
 
+import inspect
 import ROOT
 import sys
 import shutil
 from ROOT import std
 from basf2 import *
 
-ROOT.gROOT.ProcessLine('gROOT.SetBatch()')
+if not vis:
+    ROOT.gROOT.ProcessLine('gROOT.SetBatch()')
 
 # generate filename
 print 'use the following detectors: '
@@ -48,14 +53,12 @@ if svd:
 if cdc:
     rootFileName += 'cdc'
     print 'cdc'
-if FilterId == 1:
-    rootFileName += '_Daf'
-    print 'fit with Daf'
-else:
-    print 'fit with Kalman'
+    rootFileName += '_'
+    rootFileName += FilterId
+    print 'fit with ' + FilterId
 if full:
     rootFileName += '_FULL'
-    nOfEvents = 200000  # should take about 12 hrs
+    nOfEvents = 100000
     print 'do FULL test'
 else:
     nOfEvents = 1000
@@ -137,11 +140,11 @@ else:
     particlegun.param('thetaParams', [100, 100])
 particlegun.param('phiGeneration', 'uniform')
 particlegun.param('phiParams', [0, 360])
-particlegun.param('vertexGeneration', 'fixed')
-particlegun.param('xVertexParams', [0])
-particlegun.param('yVertexParams', [0])
-particlegun.param('zVertexParams', [0])
 particlegun.param('independentVertices', False)
+particlegun.param('vertexGeneration', 'uniform')
+particlegun.param('xVertexParams', [0, 0])
+particlegun.param('yVertexParams', [0, 0])
+particlegun.param('zVertexParams', [-0.01, 0.01])
 print_params(particlegun)
 
 # Create Event information
@@ -168,6 +171,12 @@ simulation.param('StoreAllSecondaries', True)
 
 # ---------------------------------------------------------------
 # digitizer
+if pxd:
+    pxdDigitizer = register_module('PXDDigitizer')
+    pxdClusterizer = register_module('PXDClusterizer')
+if svd:
+    svdDigitizer = register_module('SVDDigitizer')
+    svdClusterizer = register_module('SVDClusterizer')
 if cdc:
     cdcDigitizer = register_module('CDCDigitizer')
 
@@ -182,9 +191,18 @@ fitter = register_module('GenFitter')
 param_fitter = {
     'StoreFailedTracks': True,
     'FilterId': FilterId,
-    'NIterations': 1,
+    'NMinIterations': 3,
+    'NMaxIterations': 10,
     'ProbCut': 0.001,
     }
+    # 'MSCModel': "GEANE",
+    # 'noEffects' : False,
+    # 'energyLossBetheBloch' : True,
+    # 'noiseBetheBloch' : False,
+    # 'noiseCoulomb' : False,
+    # 'energyLossBrems' : False,
+    # 'noiseBrems' : False,
+    # 'GFTracksColName': 'GF2Tracks',
 
 fitter.param(param_fitter)
 
@@ -195,11 +213,11 @@ eventinfosetter.param({'evtNumList': [nOfEvents], 'runList': [1]})
 
 trackfitchecker = register_module('TrackFitChecker')
 # trackfitchecker.logging.log_level = LogLevel.INFO  # the reults of the statistical tests will only show up at info or debug level
-# trackfitchecker.param('testSi', True)
 trackfitchecker.param('robustTests', True)
 trackfitchecker.param('writeToTextFile', True)
 trackfitchecker.param('writeToRootFile', True)
-trackfitchecker.param('inspectTracks', False)
+# trackfitchecker.param('testSi', True)
+# trackfitchecker.param('inspectTracks', False)
 trackfitchecker.param('truthAvailable', True)
 trackfitchecker.param('outputFileName', rootFileName)
 
@@ -213,11 +231,26 @@ main.add_module(gearbox)
 main.add_module(geometry)
 main.add_module(particlegun)
 main.add_module(simulation)
+if pxd:
+    main.add_module(pxdDigitizer)
+    main.add_module(pxdClusterizer)
+if svd:
+    main.add_module(svdDigitizer)
+    main.add_module(svdClusterizer)
 if cdc:
     main.add_module(cdcDigitizer)
 main.add_module(mctrackfinder)
 main.add_module(fitter)
 main.add_module(trackfitchecker)
+
+if vis:
+    visualization = register_module('GenfitVis')
+    # visualization.param('onlyBadTracks', 1)
+    main.add_module(visualization)
+
+output = register_module('RootOutput')
+output.param('outputFileName', 'GF2Tracks.root')
+# main.add_module(output)
 
 # Process events
 process(main)

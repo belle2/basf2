@@ -57,7 +57,7 @@ B2DpiModule::B2DpiModule() : Module()
 
   addParam("MCParticlesColName", m_mcParticlesColName, "MCParticles collection name" , string(""));
   addParam("GFTrackCandidatesColName", m_gfTrackCandColName, "GF Track cand. collection name",       string(""));
-  addParam("GFTracksColName", m_gfTracksColName, "GFTracks collection name", string(""));
+  addParam("GFTracksColName", m_gfTracksColName, "genfit::Tracks collection name", string(""));
   addParam("TracksColName", m_tracksColName, "Tracks collection name", string(""));
 }
 
@@ -70,8 +70,8 @@ void B2DpiModule::initialize()
   // Initialize store arrays
   // Why is it necessary to do here????
   StoreArray<MCParticle>     mcParticles(m_mcParticlesColName);
-  StoreArray<GFTrackCand>    gfTrackCand(m_gfTrackCandColName);
-  StoreArray<GFTrack>        gfTracks(m_gfTracksColName);
+  StoreArray<genfit::TrackCand>    gfTrackCand(m_gfTrackCandColName);
+  StoreArray<genfit::Track>        gfTracks(m_gfTracksColName);
   StoreArray<Track>          tracks(m_tracksColName);
 
   StoreArray<Particle>::registerPersistent();

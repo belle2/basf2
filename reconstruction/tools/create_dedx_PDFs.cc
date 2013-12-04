@@ -36,7 +36,7 @@ int main(int argc, char* argv[])
     return 1;
   }
   gSystem->Load("libtracking");
-  gSystem->Load("libgenfitRK");
+  gSystem->Load("libgenfit2");
   gSystem->Load("libvxd");
 
   const TString input_filename(argv[1]);

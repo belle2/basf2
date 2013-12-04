@@ -1,6 +1,6 @@
 Import('env')
 
-env['LIBS'] = ['analysis', 'framework', 'generators', 'reconstruction_dataobjects', 'analysis_dataobjects', 'pxd_dataobjects', 'svd_dataobjects', 'cdc_dataobjects', 'vxd_dataobjects', 'tracking_dataobjects', 'generators_dataobjects', 'ecl_dataobjects', 'genfit', 'RaveBase', 'CLHEP']
+env['LIBS'] = ['analysis', 'framework', 'generators', 'reconstruction_dataobjects', 'analysis_dataobjects', 'pxd_dataobjects', 'svd_dataobjects', 'cdc_dataobjects', 'vxd_dataobjects', 'tracking_dataobjects', 'generators_dataobjects', 'ecl_dataobjects', 'genfit2', 'RaveBase', 'CLHEP']
 
 Return('env')
 

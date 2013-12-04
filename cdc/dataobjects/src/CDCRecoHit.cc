@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <cdc/dataobjects/CDCRecoHit.h>
+#include <genfit/WireTrackCandHit.h>
 
 using namespace std;
 using namespace Belle2;
@@ -46,13 +47,13 @@ void CDCRecoHit::setUpdate(bool update)
 }
 
 CDCRecoHit::CDCRecoHit()
-  : GFAbsWireHit(c_nParHitRep),
+  : genfit::WireMeasurement(c_nParHitRep),
     m_adcCount(0), m_charge(0), m_tdcCount(0), m_driftLength(0), m_driftLengthResolution(0), m_wireID(WireID()), m_cdcHit(NULL)
 {
 }
 
-CDCRecoHit::CDCRecoHit(const CDCHit* cdcHit)
-  : GFAbsWireHit(c_nParHitRep), m_cdcHit(cdcHit)
+CDCRecoHit::CDCRecoHit(const CDCHit* cdcHit, const genfit::TrackCandHit* trackCandHit)
+  : genfit::WireMeasurement(c_nParHitRep), m_cdcHit(cdcHit)
 {
   if (s_adcCountTranslator == 0 || s_cdcGeometryTranslator == 0 || s_tdcCountTranslator == 0) {
     B2FATAL("Can't produce CDCRecoHits without setting of the translators.")
@@ -70,41 +71,44 @@ CDCRecoHit::CDCRecoHit(const CDCHit* cdcHit)
 
   // forward wire position
   TVector3 dummyVector3 = s_cdcGeometryTranslator->getWireForwardPosition(m_wireID);
-  fHitCoord(0) = dummyVector3.X();
-  fHitCoord(1) = dummyVector3.y();
-  fHitCoord(2) = dummyVector3.z();
+  rawHitCoords_(0) = dummyVector3.X();
+  rawHitCoords_(1) = dummyVector3.y();
+  rawHitCoords_(2) = dummyVector3.z();
   // backward wire position
   dummyVector3 = s_cdcGeometryTranslator->getWireBackwardPosition(m_wireID);
-  fHitCoord(3) = dummyVector3.X();
-  fHitCoord(4) = dummyVector3.Y();
-  fHitCoord(5) = dummyVector3.Z();
+  rawHitCoords_(3) = dummyVector3.X();
+  rawHitCoords_(4) = dummyVector3.Y();
+  rawHitCoords_(5) = dummyVector3.Z();
 
-  fHitCoord(6) = m_driftLength;
-  fHitCov(6, 6) = m_driftLengthResolution;
+  rawHitCoords_(6) = m_driftLength;
+  rawHitCov_(6, 6) = m_driftLengthResolution;
 
   B2DEBUG(250, "CDCRecoHit assigned drift-length " << m_driftLength
           << ", drift-length resolution" << m_driftLengthResolution << ", dummyVector3"
           << dummyVector3.X()  <<  ", " << dummyVector3.Y() << ", " << dummyVector3.Z());
+
+  // set l-r info
+  const genfit::WireTrackCandHit* aTrackCandHitPtr =  dynamic_cast<const genfit::WireTrackCandHit*>(trackCandHit);
+  if (aTrackCandHitPtr not_eq NULL) {
+    char lrInfo = aTrackCandHitPtr->getLeftRightResolution();
+    B2DEBUG(250, "l/r: " << int(lrInfo));
+    setLeftRightResolution(lrInfo);
+  }
 }
 
-GFAbsRecoHit* CDCRecoHit::clone()
+genfit::AbsMeasurement* CDCRecoHit::clone() const
 {
   return new CDCRecoHit(*this);
 }
 
-const TMatrixD& CDCRecoHit::getHMatrix(const GFAbsTrackRep* /*stateVector*/)
-{
-  //don't check for specific Track Representation at the moment, as RKTrackRep is the only one we are currently using.
-  return (c_HMatrix);
-}
 
-void CDCRecoHit::getMeasurement(const GFAbsTrackRep* trackRep, const GFDetPlane& plane, const TVectorD& whatever, const TMatrixDSym& whatever2,
-                                TVectorD& m, TMatrixDSym& V)
+std::vector<genfit::MeasurementOnPlane*> CDCRecoHit::constructMeasurementsOnPlane(const genfit::AbsTrackRep* rep,
+    const genfit::SharedPlanePtr& pl) const
 {
   if (s_update) {
     B2FATAL("The extraction of track/hit parameters for the getMeasurement function has still to be implemented. \n"
             << "Please avoid setting s_update to true for the moment.");
-  } else {
-    GFAbsWireHit::getMeasurement(trackRep, plane, whatever, whatever2, m, V);
   }
+  return this->genfit::WireMeasurement::constructMeasurementsOnPlane(rep, pl);
 }
+

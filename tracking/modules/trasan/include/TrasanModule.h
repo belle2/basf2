@@ -55,7 +55,7 @@ namespace Belle2 {
     /// Debug level.
     int _debugLevel;
 
-    /// GFTrackCandidate name.
+    /// genfit::TrackCandidate name.
     std::string _gfTrackCandsName;
 
     /// Trasan.

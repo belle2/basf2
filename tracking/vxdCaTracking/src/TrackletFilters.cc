@@ -98,7 +98,7 @@ std::pair<TVector3, int> TrackletFilters::calcMomentumSeed(bool useBackwards)
   }
   //     hitA = (*hits)[2]->hitPosition;
   TVector3 hitB = (*m_hits)[1]->hitPosition;
-  TVector3 hitC = (*m_hits)[0]->hitPosition; // outermost hit and initial value for GFTrackCandidate
+  TVector3 hitC = (*m_hits)[0]->hitPosition; // outermost hit and initial value for genfit::TrackCandidate
 
   hitC -= hitB; // recycling TVector3s, this is segmentBC
   hitB -= (*m_hits)[2]->hitPosition; // this is segmentAB

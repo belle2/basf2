@@ -15,7 +15,7 @@
 
 #include <framework/datastore/StoreArray.h>
 
-#include "GFTrackCand.h"
+#include "genfit/TrackCand.h"
 
 namespace Belle2 {
   namespace CDCLocalTracking {
@@ -31,13 +31,13 @@ namespace Belle2 {
       ~GFTrackCandCreator() {;}
 
       void create(const std::vector<CDCTrack>& cdcTracks,
-                  StoreArray<GFTrackCand>& gfTrackCands) const;
+                  StoreArray<genfit::TrackCand>& gfTrackCands) const;
 
     private:
-      void create(const CDCTrack& track, GFTrackCand& gfTrackCand) const;
+      void create(const CDCTrack& track, genfit::TrackCand& gfTrackCand) const;
 
 
-      inline void appendHits(const CDCTrack& track, GFTrackCand& gfTrackCand) const;
+      inline void appendHits(const CDCTrack& track, genfit::TrackCand& gfTrackCand) const;
 
     private:
 

@@ -22,7 +22,7 @@
 #include <tracking/dataobjects/VXDTFInfoBoard.h>
 
 //genfit-stuff
-#include <GFTrackCand.h>
+#include <genfit/TrackCand.h>
 
 //stl-stuff
 #include <string>
@@ -178,8 +178,8 @@ namespace Belle2 {
       static bool isFirstValueTheSame(foundIDentry& lhs, foundIDentry& rhs);
 
 
-      /** extracts hits from GFTrackCand. Working with both TC-types (mc (monte carlo) or ca (cellular automaton)) */
-      void extractHits(GFTrackCand* aTC,
+      /** extracts hits from genfit::TrackCand. Working with both TC-types (mc (monte carlo) or ca (cellular automaton)) */
+      void extractHits(genfit::TrackCand* aTC,
                        RelationIndex<PXDCluster, PXDTrueHit>& relationPXD,
                        RelationIndex<SVDCluster, SVDTrueHit>& relationSVD,
                        StoreArray<PXDCluster>& pxdClusters,

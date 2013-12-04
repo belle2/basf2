@@ -37,6 +37,8 @@
 
 namespace genfit {
 
+class KalmanFitStatus;
+
 /**
  * @brief Helper class for TrackPoint sorting, used in Track::sort().
  */
@@ -91,6 +93,7 @@ class Track : public TObject {
   Track(const TrackCand& trackCand, const MeasurementFactory<genfit::AbsMeasurement>& factory, AbsTrackRep* rep = NULL);
 
   Track(AbsTrackRep* trackRep, const TVectorD& stateSeed);
+  Track(AbsTrackRep* trackRep, const TVector3& posSeed, const TVector3& momSeed);
   Track(AbsTrackRep* trackRep, const TVectorD& stateSeed, const TMatrixDSym& covSeed);
 
   Track(const Track&); // copy constructor
@@ -140,10 +143,17 @@ class Track : public TObject {
   bool hasFitStatus(const AbsTrackRep* rep = NULL) const;
   //! Get FitStatus for a AbsTrackRep. Per default, return FitStatus for cardinalRep.
   FitStatus* getFitStatus(const AbsTrackRep* rep = NULL) const {if (rep == NULL) rep = getCardinalRep(); return fitStatuses_.at(rep);}
+
+  //! Check if track has a KalmanFitStatus for given AbsTrackRep. Per default, check for cardinal rep.
+  bool hasKalmanFitStatus(const AbsTrackRep* rep = NULL) const;
+  //! If FitStatus is a KalmanFitStatus, return it. Otherwise return NULL
+  KalmanFitStatus* getKalmanFitStatus(const AbsTrackRep* rep = NULL) const;
+
   void setFitStatus(FitStatus* fitStatus, const AbsTrackRep* rep);
 
   const TVectorD& getStateSeed() const {return stateSeed_;}
   void setStateSeed(const TVectorD& s) {stateSeed_.ResizeTo(s); stateSeed_ = s;}
+  void setStateSeed(const TVector3& pos, const TVector3& mom);
 
   const TMatrixDSym& getCovSeed() const {return covSeed_;}
   void setCovSeed(const TMatrixDSym& c) {covSeed_.ResizeTo(c); covSeed_ = c;}
@@ -161,19 +171,22 @@ class Track : public TObject {
 
   void deletePoint(int id);
 
+  //! Creates a new TrackPoint contaioning the measurement, and adds it to the track
+  void insertMeasurement(AbsMeasurement* measurement, int id = -1);
+
   /**
    * @brief Merge two tracks.
    *
    * The TrackPoint objects of other will be cloned and inserted
    * after id (per default, they will be appended at the end).
    * The other Track will not be altered, the TrackPoint objects will be (deep) copied.
-   * Only copies the TrackPoint objects, NOT the AbsTrackRep, FitStatus, seed state and other objets of the other track.
+   * Only copies the TrackPoint objects, NOT the AbsTrackRep, FitStatus, seed state and other objects of the other track.
    */
   void mergeTrack(const Track* other, int id = -1);
 
   void addTrackRep(AbsTrackRep* trackRep);
 
-  //! Delete a AbsTrackRep and all corresponding AbsFitterInfo objets in every TrackPoint.
+  //! Delete a AbsTrackRep and all corresponding AbsFitterInfo objects in every TrackPoint.
   void deleteTrackRep(int id);
 
   void setCardinalRep(int id);
@@ -193,10 +206,10 @@ class Track : public TObject {
   void deleteMeasurementInfo(int startId = 0, int endId = -1, const AbsTrackRep* rep = NULL); // delete in range [startId, endId]. If rep == NULL, delete for ALL reps, otherwise only for rep.
   void deleteFitterInfo(int startId = 0, int endId = -1, const AbsTrackRep* rep = NULL); // delete in range [startId, endId]. If rep == NULL, delete for ALL reps, otherwise only for rep.
 
-  //! get TrackLength between to trackPoints
-  double getTrackLen(AbsTrackRep* rep, int startId = 0, int endId = -1) const;
-  //! get time of flight in ns between to trackPoints
-  double getTOF(AbsTrackRep* rep, int startId = 0, int endId = -1) const;
+  //! get TrackLength between to trackPoints (if NULL, for cardinal rep)
+  double getTrackLen(AbsTrackRep* rep = NULL, int startId = 0, int endId = -1) const;
+  //! get time of flight in ns between to trackPoints (if NULL, for cardinal rep)
+  double getTOF(AbsTrackRep* rep = NULL, int startId = 0, int endId = -1) const;
 
   //! Helper function: For all KalmanFitterInfos belonging to rep (if NULL, for all reps),
   //! call the fixWeights() function, so that e.g. the DAF will not alter weights anymore.

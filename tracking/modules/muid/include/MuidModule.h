@@ -34,7 +34,7 @@ class G4UserSteppingAction;
 class G4VPhysicalVolume;
 class G4ErrorFreeTrajState;
 class G4String;
-class GFTrack;
+namespace genfit { class Track; }
 
 #define BARREL 1
 #define ENDCAP 2
@@ -173,7 +173,7 @@ namespace Belle2 {
     TMatrixD getCov(const G4ErrorFreeTrajState*);
 
     //! Get the starting phase-space point and covariance for one reconstructed track and PDG hypothesis
-    void getStartPoint(const GFTrack*, int, G4ThreeVector&, G4ThreeVector&, G4ErrorTrajErr&);
+    void getStartPoint(const genfit::Track*, int, G4ThreeVector&, G4ThreeVector&, G4ErrorTrajErr&);
 
     //! Add an extrapolation point for the track
     bool createHit(G4ErrorFreeTrajState*, int, int, StoreArray<MuidHit>&, RelationArray&, const StoreArray<BKLMHit2d>&, const StoreArray<EKLMHit2d>&);

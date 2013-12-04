@@ -25,8 +25,8 @@
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <svd/dataobjects/SVDCluster.h>
 #include <vxd/dataobjects/VxdID.h>
-#include <GFTrackCand.h>
-#include <tracking/trackCandidateHits/CDCTrackCandHit.h>
+#include <genfit/TrackCand.h>
+#include <genfit/WireTrackCandHit.h>
 
 #include <boost/foreach.hpp>
 #include <boost/math/special_functions/sign.hpp>
@@ -52,14 +52,14 @@ REG_MODULE(MCTrackCandCombiner)
 MCTrackCandCombinerModule::MCTrackCandCombinerModule() : Module()
 {
   //Set module properties
-  setDescription("Uses the MC information to create GFTrackCandidates for primary MCParticles and Relations between them.  Fills the created GFTrackCandidates with all information (start values, hit indices) needed for the fitting.");
+  setDescription("Uses the MC information to create genfit::TrackCandidates for primary MCParticles and Relations between them.  Fills the created genfit::TrackCandidates with all information (start values, hit indices) needed for the fitting.");
   setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
 
   //Parameter definition
   //addParam("UseClusters", m_useClusters, "Set true if you want to use PXD/SVD clusters instead of PXD/SVD trueHits", bool(false));
-  addParam("CDCTrackCandidatesColName", m_cdcTrackCandColName, "Name of collection holding the GFTrackCandidates from CDC track finding (input)", string(""));
-  addParam("VXDTrackCandidatesColName", m_vxdTrackCandColName, "Name of collection holding the GFTrackCandidates from VXD track finding(input)", string(""));
-  addParam("OutputTrackCandidatesColName", m_combinedTrackCandColName, "Name of collection holding the combined GFTrackCandidates (output)", string(""));
+  addParam("CDCTrackCandidatesColName", m_cdcTrackCandColName, "Name of collection holding the genfit::TrackCandidates from CDC track finding (input)", string(""));
+  addParam("VXDTrackCandidatesColName", m_vxdTrackCandColName, "Name of collection holding the genfit::TrackCandidates from VXD track finding(input)", string(""));
+  addParam("OutputTrackCandidatesColName", m_combinedTrackCandColName, "Name of collection holding the combined genfit::TrackCandidates (output)", string(""));
   addParam("HitsRatio", m_hitsRatio, "minimal ratio of hits belonging to one MCParticle to declare a track candidate coming from this MCParticle", 0.6);
   addParam("InsertCorrectPDGCode", m_addMcInfo, "set the correct PDG code from the MCParticle in the output track candidates", true);
 //  addParam("UseClusters", m_useClusters, "Set true if you want to use PXD/SVD clusters instead of PXD/SVD trueHits", bool(false));
@@ -76,14 +76,14 @@ void MCTrackCandCombinerModule::initialize()
 {
   StoreArray<MCParticle>::required();
   // at least one of the two store arrays has to be present
-  if (StoreArray<GFTrackCand>::optional(m_vxdTrackCandColName) == false) {
-    StoreArray<GFTrackCand>::required(m_cdcTrackCandColName);
+  if (StoreArray<genfit::TrackCand>::optional(m_vxdTrackCandColName) == false) {
+    StoreArray<genfit::TrackCand>::required(m_cdcTrackCandColName);
   }
 
   //output store arrays have to be registered in initialize()
-  StoreArray<GFTrackCand>::registerPersistent(m_combinedTrackCandColName);
+  StoreArray<genfit::TrackCand>::registerPersistent(m_combinedTrackCandColName);
 
-  RelationArray::registerPersistent<GFTrackCand, MCParticle>(m_combinedTrackCandColName, "");
+  RelationArray::registerPersistent<genfit::TrackCand, MCParticle>(m_combinedTrackCandColName, "");
 
 
 
@@ -131,16 +131,16 @@ void MCTrackCandCombinerModule::event()
 
 
   //input store arrays
-  StoreArray<GFTrackCand> vxdCands(m_vxdTrackCandColName);
+  StoreArray<genfit::TrackCand> vxdCands(m_vxdTrackCandColName);
   const int nVxdTCs = vxdCands.getEntries();
   B2DEBUG(100, "Number of vxdCands in this Event: " << nVxdTCs);
   m_nVxdTcs += nVxdTCs;
-  StoreArray<GFTrackCand> cdcCands(m_cdcTrackCandColName);
+  StoreArray<genfit::TrackCand> cdcCands(m_cdcTrackCandColName);
   const int nCdcTCs = cdcCands.getEntries();
   B2DEBUG(100, "Number of cdcCands in this Event: " << nCdcTCs);
   m_nCdcTcs += nCdcTCs;
   //register StoreArray which will be filled by this module
-  StoreArray<GFTrackCand> outCands(m_combinedTrackCandColName);
+  StoreArray<genfit::TrackCand> outCands(m_combinedTrackCandColName);
   outCands.create();
   //RelationArray gfTrackCandToMCPart(trackCandidates, mcParticles);
 
@@ -175,12 +175,12 @@ void MCTrackCandCombinerModule::event()
       continue; //2 hits are not enough to produce a TC no matter what track finder was used
     }
 
-    vector<GFTrackCand*> goodCdcCands; //should have a maximum of 1 in most cases
+    vector<genfit::TrackCand*> goodCdcCands; //should have a maximum of 1 in most cases
     vector<int> matchingHitsInGoodCdcCands;
 //    int nMostMatchingHits = 0;
     for (int iTC = 0; iTC not_eq nCdcTCs; ++iTC) {
       int nMatchingHits = 0;
-      GFTrackCand* aTC = cdcCands[iTC];
+      genfit::TrackCand* aTC = cdcCands[iTC];
       vector<int> hitIDsFromTC = aTC->getHitIDs(Const::CDC);
       const int nHitIDs = hitIDsFromTC.size();
       const int nNeededHits = int(m_hitsRatio * double(nHitIDs));
@@ -203,12 +203,12 @@ void MCTrackCandCombinerModule::event()
     }
 
 
-    vector<GFTrackCand*> goodVxdCands; //should have a maximum of 1 in most cases
+    vector<genfit::TrackCand*> goodVxdCands; //should have a maximum of 1 in most cases
     vector<int> matchingHitsInGoodVxdCands;
 //    nMostMatchingHits = 0;
     for (int iTC = 0; iTC not_eq nVxdTCs; ++iTC) {
       int nMatchingHits = 0;
-      GFTrackCand* aTC = vxdCands[iTC];
+      genfit::TrackCand* aTC = vxdCands[iTC];
       vector<int> pxdHitIDsFromTC = aTC->getHitIDs(Const::PXD);
       const int nPxdHitsFromTC = pxdHitIDsFromTC.size();
       vector<int> svdHitIDsFromTC = aTC->getHitIDs(Const::SVD);
@@ -251,7 +251,7 @@ void MCTrackCandCombinerModule::event()
     //throw out all TC that have less good hits than the best of them (of course the makes curler finding impossible
     vector<int>::iterator it;
     int index = -1;
-    GFTrackCand* bestTC = NULL;
+    genfit::TrackCand* bestTC = NULL;
     if (goodVxdCands.size() > 1) {
       m_nIgnoredVxdTcs += goodVxdCands.size() - 1;
       it = max_element(matchingHitsInGoodVxdCands.begin(), matchingHitsInGoodVxdCands.end());
@@ -274,7 +274,7 @@ void MCTrackCandCombinerModule::event()
     B2DEBUG(100, "The track caused by MCParticle with index " << iPart << " and PDG code " << truePdgCode << " that has p = " << aMcParticle->getMomentum().Mag() << " GeV and θ = " << aMcParticle->getMomentum().Theta() * 180 / TMath::Pi() << "° was found by at least one track finder.");
     B2DEBUG(100, "goodVxdCands.size() " << goodVxdCands.size() << " goodCdcCands.size() " << goodCdcCands.size());
     if (goodVxdCands.size() == 1 and goodCdcCands.size() == 1) { //from one mcparticle we have one tc in vxd and one in cdc
-      GFTrackCand* combinedTrackCand = outCands.appendNew();
+      genfit::TrackCand* combinedTrackCand = outCands.appendNew();
       (*combinedTrackCand) = *(goodVxdCands[0]);
       if (m_addMcInfo) {
         combinedTrackCand->setMcTrackId(iPart);
@@ -296,7 +296,7 @@ void MCTrackCandCombinerModule::event()
     }
 
     if (goodVxdCands.size() == 1 and goodCdcCands.size() == 0) {
-      GFTrackCand* combinedTrackCand = outCands.appendNew();
+      genfit::TrackCand* combinedTrackCand = outCands.appendNew();
       (*combinedTrackCand) = *(goodVxdCands[0]);
       if (m_addMcInfo) {
         combinedTrackCand->setMcTrackId(iPart);
@@ -307,7 +307,7 @@ void MCTrackCandCombinerModule::event()
     }
 
     if (goodVxdCands.size() == 0 and goodCdcCands.size() == 1) {
-      GFTrackCand* combinedTrackCand = outCands.appendNew();
+      genfit::TrackCand* combinedTrackCand = outCands.appendNew();
       (*combinedTrackCand) = *(goodCdcCands[0]);
       if (m_addMcInfo) {
         combinedTrackCand->setMcTrackId(iPart);

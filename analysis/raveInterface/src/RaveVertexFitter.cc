@@ -13,8 +13,8 @@
 #include <analysis/raveInterface/RaveSetup.h>
 #include <tracking/dataobjects/Track.h>
 
-#include <GFRaveVertexFactory.h>
-#include <RKTrackRep.h>
+#include <genfit/GFRaveVertexFactory.h>
+#include <genfit/RKTrackRep.h>
 
 //root
 #include <Math/ProbFunc.h>
@@ -82,24 +82,24 @@ RaveVertexFitter::~RaveVertexFitter()
 }
 
 
-void RaveVertexFitter::addTrack(const GFTrack& aGFTrack)
+void RaveVertexFitter::addTrack(const genfit::Track& aGFTrack)
 {
-  GFAbsTrackRep* const aGFTrackRepPtr = aGFTrack.getCardinalRep();
+  const genfit::MeasuredStateOnPlane& fittedState = aGFTrack.getFittedState();
 //  if (m_gfRave == true) {
 //    m_gfTrackReps.push_back(aGFTrackRepPtr);
 //  } else {
-  m_raveTracks.push_back(GFTrackRepToRaveTrack(aGFTrackRepPtr));
+  m_raveTracks.push_back(GFMeasuredStateToRaveTrack(fittedState));
 //  }
 }
 
 
-void RaveVertexFitter::addTrack(const GFTrack* const aGFTrackPtr)
+void RaveVertexFitter::addTrack(const genfit::Track* aGFTrackPtr)
 {
-  GFAbsTrackRep* const aGFTrackRepPtr = aGFTrackPtr->getCardinalRep();
+  const genfit::MeasuredStateOnPlane& fittedState = aGFTrackPtr->getFittedState();
 //  if (m_gfRave == true) {
 //    m_gfTrackReps.push_back(aGFTrackRepPtr);
 //  } else {
-  m_raveTracks.push_back(GFTrackRepToRaveTrack(aGFTrackRepPtr));
+  m_raveTracks.push_back(GFMeasuredStateToRaveTrack(fittedState));
 //  }
 }
 
@@ -128,24 +128,15 @@ void RaveVertexFitter::addTrack(const TrackFitResult* const aTrackPtr)
 //
 //}
 
-void RaveVertexFitter::addTrack(GFAbsTrackRep*   aTrackRepPtr)
-{
-//  if (m_gfRave == true) {
-//    m_gfTrackReps.push_back(aTrackRepPtr);
-//  } else {
-  m_raveTracks.push_back(GFTrackRepToRaveTrack(aTrackRepPtr));
-//  }
 
-}
-
-rave::Track RaveVertexFitter::GFTrackRepToRaveTrack(GFAbsTrackRep*  const aGFTrackRepPtr) const
+rave::Track RaveVertexFitter::GFMeasuredStateToRaveTrack(const genfit::MeasuredStateOnPlane& aGFState) const
 {
   const int id = m_raveTracks.size();
   TVector3 pos;
   TVector3 mom;
   TMatrixDSym cov;
 
-  aGFTrackRepPtr->getPosMomCov(pos, mom, cov);
+  aGFState.getPosMomCov(pos, mom, cov);
 
   // state
   rave::Vector6D ravestate(pos.X(), pos.Y(), pos.Z(),
@@ -159,7 +150,7 @@ rave::Track RaveVertexFitter::GFTrackRepToRaveTrack(GFAbsTrackRep*  const aGFTra
                              cov(3, 3), cov(4, 3), cov(5, 3),
                              cov(4, 4), cov(5, 4), cov(5, 5));
 
-  return rave::Track(id, ravestate, ravecov, rave::Charge(aGFTrackRepPtr->getCharge() + 0.1), aGFTrackRepPtr->getChiSqu(), aGFTrackRepPtr->getNDF());
+  return rave::Track(id, ravestate, ravecov, rave::Charge(aGFState.getCharge() + 0.1), 1, 1); //the two 1s are just dummy values. They are not used by Rave anyway
 
 }
 
@@ -412,6 +403,6 @@ TMatrixDSym RaveVertexFitter::getCov(VecSize vertexId) const
 //  if (m_gfRave == true) {
 //    return m_GFRaveVertices[vertexId]->getCov();
 //  } else {
-  return GFRave::Covariance3DToTMatrixDSym(m_raveVertices[vertexId].error());
+  return genfit::Covariance3DToTMatrixDSym(m_raveVertices[vertexId].error());
 //  }
 }

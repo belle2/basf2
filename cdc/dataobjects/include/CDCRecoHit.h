@@ -16,8 +16,9 @@
 #include <cdc/dataobjects/CDCGeometryTranslatorBase.h>
 #include <cdc/dataobjects/TDCCountTranslatorBase.h>
 
-#include <genfit/RecoHits/GFAbsWireHit.h>
-
+#include <genfit/WireMeasurement.h>
+#include <genfit/MeasurementOnPlane.h>
+#include <genfit/TrackCandHit.h>
 
 #include <TMatrixD.h>
 
@@ -31,7 +32,7 @@ namespace Belle2 {
    *  @}
    */
   /** This class is used to transfer CDC information to the track fit. */
-  class CDCRecoHit : public GFAbsWireHit  {
+  class CDCRecoHit : public genfit::WireMeasurement  {
 
   public:
     /** Default Constructor for ROOT IO.*/
@@ -41,22 +42,13 @@ namespace Belle2 {
      *
      *  This constructor assumes, that no information from tracking is currently known.
      */
-    CDCRecoHit(const CDCHit* cdcHit);
+    CDCRecoHit(const CDCHit* cdcHit, const genfit::TrackCandHit* trackCandHit);
 
     /** Destructor. */
     ~CDCRecoHit() {}
 
-    /** Creating a copy of this hit.
-     *
-     *  This function overwrites a function that GFRecoHitIfc inherits from GFRecoHit.
-     */
-    GFAbsRecoHit* clone();
-
-    /** Projection for the hit ...
-     *
-     * This function overwrites a function that GFRecoHitIfc inherits from GFRecoHit.
-     */
-    const TMatrixD& getHMatrix(const GFAbsTrackRep* stateVector);
+    /** Creating a copy of this hit. */
+    genfit::AbsMeasurement* clone() const;
 
     /** Getter for WireID object. */
     WireID getWireID() const {
@@ -80,11 +72,9 @@ namespace Belle2 {
     static void setUpdate(bool update = false);
 
     /** Method, that actually interfaces to Genfit.
-     *
-     *  This method is inherited from the GFAbsRecoHitIfc.
      */
-    void getMeasurement(const GFAbsTrackRep*, const GFDetPlane& pl, const TVectorD&, const TMatrixDSym&,
-                        TVectorD& m, TMatrixDSym& V);
+    std::vector<genfit::MeasurementOnPlane*> constructMeasurementsOnPlane(const genfit::AbsTrackRep*,
+        const genfit::SharedPlanePtr&) const;
 
 
     /** get the pointer to the CDCHit object that was used to create this CDCRecoHit object.
@@ -153,7 +143,7 @@ namespace Belle2 {
     const CDCHit* m_cdcHit;
 
     /** ROOT Macro.*/
-    ClassDef(CDCRecoHit, 6);
+    ClassDef(CDCRecoHit, 7);
   };
 }
 #endif

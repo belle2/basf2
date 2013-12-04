@@ -18,11 +18,11 @@
 namespace Belle2 {
 
   /** Module to extrapolate Tracks found in the CDC to the SVD.
-   *  This modules needs as input GFTracks created by fitting CDC Hits.
+   *  This modules needs as input genfit::Tracks created by fitting CDC Hits.
    *  The search for corresponding SVDHits is perfomed layerwise.
-   *  For each layer the GFTrack is extrapolated to each SVDHit and the distance between the SVDHit and the found point of closest approach is considered.
+   *  For each layer the genfit::Track is extrapolated to each SVDHit and the distance between the SVDHit and the found point of closest approach is considered.
    *  The SVDHit with the shortest distance is taken (one hit per layer).
-   *  The output are GFTrackCands, which are basically copies of GFTrackCands from GFTracks, but with new momentum seed (fit result) and the additional SVDHits.
+   *  The output are genfit::TrackCands, which are basically copies of genfit::TrackCands from genfit::Tracks, but with new momentum seed (fit result) and the additional SVDHits.
    *  @todo So far the module only proves that the principle is working, there is plenty of room for improvement (preselection of SVDHits to be considered, more elaborate criteria to assign hits, possibility to have 2 SVDHits per layer etc)
    */
 
@@ -69,8 +69,8 @@ namespace Belle2 {
 
     std::string m_svdHitsColName;                    /**< SVDHits collection name */
     std::string m_cdcHitsColName;                    /**< CDCHits collection name */
-    std::string m_gfTrackCandsColName;               /**< GFTrackCandidates collection name */
-    std::string m_gfTracksColName;                   /**< GFTracks collection name */
+    std::string m_gfTrackCandsColName;               /**< genfit::TrackCandidates collection name */
+    std::string m_gfTracksColName;                   /**< genfit::Tracks collection name */
 
     bool m_textFileOutput;                           /**< Boolean to mark if text output files with hit coordinates should be created*/
     std::ofstream Hitsfile;                          /**< Simple text file to write out the coordinates of the digitized hits*/

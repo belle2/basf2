@@ -20,7 +20,7 @@
 #include <vxd/geometry/GeoCache.h>
 #endif
 
-#include <GFAbsFinitePlane.h>
+#include <genfit/AbsFinitePlane.h>
 #include <cmath>
 
 namespace Belle2 {
@@ -29,7 +29,7 @@ namespace Belle2 {
      * A Finite plane of one VXD Sensor.
      * This class takes the SensorID of the sensor and gets the dimensions from the SensorInfo of that Sensor.
      */
-    class SensorPlane: public GFAbsFinitePlane {
+    class SensorPlane: public genfit::AbsFinitePlane {
     public:
       /**
        * Constructs the plane for a given VXD Sensor
@@ -54,7 +54,7 @@ namespace Belle2 {
        * @param v v-coordinate of the point.
        * @return true if (u,v) is within the sensor plane, otherwise false.
        */
-      bool inActive(const double& u, const double& v) const {
+      bool isInActive(double u, double v) const {
 #ifndef __CINT__
         //If running in ROOT CINT we do not know about GeoCache so we cannot get
         //the SensorInfo
@@ -78,7 +78,7 @@ namespace Belle2 {
        * Deep copy of the object.
        * @return Pointer to a deep copy of the object.
        */
-      virtual GFAbsFinitePlane* clone() const {
+      virtual genfit::AbsFinitePlane* clone() const {
         return new SensorPlane(*this);
       }
 

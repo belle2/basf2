@@ -19,7 +19,7 @@
 #include <generators/dataobjects/MCParticle.h>
 #include <tracking/dataobjects/Track.h>
 
-#include <genfit/GFTrack.h>
+#include <genfit/Track.h>
 
 #include <root/TFile.h>
 #include <root/TTree.h>
@@ -41,7 +41,7 @@ StandardTrackingPerformanceModule::StandardTrackingPerformanceModule() :
   setDescription("Module to test the tracking efficiency. Writes information about the tracks and MCParticles in a ROOT file.");
   addParam("outputFileName", m_outputFileName, "Name of output root file.",
            std::string("StandardTrackingPerformanceOutput.root"));
-  addParam("gfTrackColName", m_gfTrackColName, "Name of GFTrack collection.",
+  addParam("gfTrackColName", m_gfTrackColName, "Name of genfit::Track collection.",
            std::string(""));
   addParam("trackColName", m_trackColName, "Name of Track collection.",
            std::string(""));
@@ -59,7 +59,7 @@ void StandardTrackingPerformanceModule::initialize()
   // MCParticles and Tracks needed for this module
   StoreArray<MCParticle>::required();
   StoreArray<Track>::required();
-  StoreArray< GFTrack >::required(m_gfTrackColName);
+  StoreArray< genfit::Track >::required(m_gfTrackColName);
   StoreArray<TrackFitResult>::required();
 
   m_outputFile = new TFile(m_outputFileName.c_str(), "RECREATE");
@@ -84,7 +84,7 @@ void StandardTrackingPerformanceModule::event()
   B2DEBUG(99,
           "Processes experiment " << expNumber << " run " << runNumber << " event " << eventNumber);
 
-  StoreArray< GFTrack > gfTracks(m_gfTrackColName);
+  StoreArray< genfit::Track > gfTracks(m_gfTrackColName);
   StoreArray<MCParticle> mcParticles;
 
   m_nGeneratedChargedStableMcParticles = 0;
@@ -104,10 +104,10 @@ void StandardTrackingPerformanceModule::event()
       m_trackProperties.ptot_gen = mcParticle.getMomentum().Mag();
       m_trackProperties.pt_gen = mcParticle.getMomentum().Pt();
 
-      GFTrack* gfTrack = findRelatedTrack(mcParticle, gfTracks);
+      genfit::Track* gfTrack = findRelatedTrack(mcParticle, gfTracks);
 
 
-      if (gfTrack != NULL) { // GFTrack found
+      if (gfTrack != NULL) { // genfit::Track found
         // find related TrackFitResult, if none is found, something went wrong during fit or extrapolation
         const TrackFitResult* fitResult = findRelatedTrackFitResult(gfTrack);
         if (fitResult != NULL) { // valid TrackFitResult found
@@ -146,18 +146,19 @@ bool StandardTrackingPerformanceModule::isChargedStable(MCParticle& mcParticle)
          != Const::invalidParticle;
 }
 
-GFTrack* StandardTrackingPerformanceModule::findRelatedTrack(
-  MCParticle& mcParticle, StoreArray<GFTrack>& gfTracks)
+genfit::Track* StandardTrackingPerformanceModule::findRelatedTrack(
+  MCParticle& mcParticle, StoreArray<genfit::Track>& gfTracks)
 {
   B2DEBUG(99, "Entered findRelatedTrack function.");
   int iMcParticle = mcParticle.getArrayIndex();
   B2DEBUG(99, "MCParticle array index: " << iMcParticle);
-  GFTrack* resultGfTrack = NULL;
+  genfit::Track* resultGfTrack = NULL;
 
-  for (GFTrack & gfTrack : gfTracks) {
-    if (gfTrack.getCand().getMcTrackId() == iMcParticle
-        && gfTrack.getCand().getPdgCode() == mcParticle.getPDG()) {
-      B2DEBUG(99, "Found GFTrack<->MCParticle relation.");
+  for (genfit::Track & gfTrack : gfTracks) {
+    const genfit::TrackCand* aTrackCandPtr = DataStore::getRelatedToObj<genfit::TrackCand>(&gfTrack);
+    if (aTrackCandPtr->getMcTrackId() == iMcParticle
+        && aTrackCandPtr->getPdgCode() == mcParticle.getPDG()) {
+      B2DEBUG(99, "Found genfit::Track<->MCParticle relation.");
       resultGfTrack = &gfTrack;
     }
   }
@@ -186,12 +187,12 @@ void StandardTrackingPerformanceModule::setupTree()
 }
 
 const TrackFitResult* StandardTrackingPerformanceModule::findRelatedTrackFitResult(
-  const GFTrack* gfTrack)
+  const genfit::Track* gfTrack)
 {
   // search for a related TrackFitResult
-  RelationIndex<GFTrack, TrackFitResult> relGfTracksToTrackFitResults;
+  RelationIndex<genfit::Track, TrackFitResult> relGfTracksToTrackFitResults;
 
-  typedef RelationIndex<GFTrack, TrackFitResult>::Element relElement_t;
+  typedef RelationIndex<genfit::Track, TrackFitResult>::Element relElement_t;
 
   std::vector<const TrackFitResult*> fitResults;
 
@@ -211,7 +212,7 @@ const TrackFitResult* StandardTrackingPerformanceModule::findRelatedTrackFitResu
   }
   if (numberTrackFitResults > 1) {
     B2DEBUG(99,
-            "GFTrack has " << numberTrackFitResults << " related TrackFitResults. No TrackFitResult is returned.");
+            "genfit::Track has " << numberTrackFitResults << " related TrackFitResults. No TrackFitResult is returned.");
   }
 
   return NULL;

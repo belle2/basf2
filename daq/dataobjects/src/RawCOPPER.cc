@@ -509,8 +509,10 @@ int* RawCOPPER::GetExpRunBuf(int n)
   return &(m_buffer[ pos_nwords ]);
 }
 
+
 unsigned int RawCOPPER::GetB2LFEE32bitEventNumber(int n)
 {
+#ifndef READ_OLD_B2LFEE_FORMAT_FILE
   ErrorMessage print_err;
   unsigned int eve_num = 0;
   int flag = 0, err_flag = 0;
@@ -545,8 +547,11 @@ unsigned int RawCOPPER::GetB2LFEE32bitEventNumber(int n)
     exit(-1);
   }
 #endif
-
   return eve_num;
+#else
+  exit(1);
+  return 0;
+#endif
 }
 
 
@@ -595,9 +600,10 @@ bool RawCOPPER::CheckCOPPERMagic(int n)
 }
 
 
+
 double RawCOPPER::GetEventUnixTime(int n)
 {
-
+#ifndef READ_OLD_B2LFEE_FORMAT_FILE
   int pos, run;
   double retval;
 #ifdef USE_B2LFEE_FORMAT_BOTH_VER1_AND_2
@@ -608,17 +614,37 @@ double RawCOPPER::GetEventUnixTime(int n)
   retval = (double)(m_buffer[ GetOffset1stFINESSE(n) + SIZE_B2LHSLB_HEADER + POS_TT_UTIME ]) +
            (double)((m_buffer[ GetOffset1stFINESSE(n) + SIZE_B2LHSLB_HEADER + POS_TT_CTIME_TYPE ] >> 4) & 0x7FFFFFF) / 1.27e8;
   return retval;
+#else
+  exit(1);
+  return 0.;
+#endif
+
 }
+
+
 
 unsigned int RawCOPPER::GetB2LFEETtCtime(int n)
 {
+#ifndef READ_OLD_B2LFEE_FORMAT_FILE
   return GetB2LHeaderWord(n, SIZE_B2LHSLB_HEADER + POS_TT_CTIME_TYPE);
+#else
+  exit(1);
+  return 0;
+#endif
 }
+
+
 
 unsigned int RawCOPPER::GetB2LFEETtUtime(int n)
 {
+#ifndef READ_OLD_B2LFEE_FORMAT_FILE
   return GetB2LHeaderWord(n, SIZE_B2LHSLB_HEADER + POS_TT_UTIME);
+#else
+  exit(1);
+  return 0;
+#endif
 }
+
 
 unsigned int RawCOPPER::GetB2LHeaderWord(int n, int finesse_buffer_pos)
 {

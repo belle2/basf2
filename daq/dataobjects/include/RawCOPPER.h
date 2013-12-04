@@ -22,7 +22,7 @@
 #include <TObject.h>
 
 #define USE_B2LFEE_FORMAT_BOTH_VER1_AND_2
-
+//#define READ_OLD_B2LFEE_FORMAT_FILE
 
 namespace Belle2 {
 
@@ -199,12 +199,12 @@ namespace Belle2 {
     void CheckB2LFEEHeaderVersion(int  n);
 #endif
 
+
     //! Check if COPPER Magic words are correct
     unsigned int GetB2LFEETtCtime(int n);
 
     //! Check if COPPER Magic words are correct
     unsigned int GetB2LFEETtUtime(int n);
-
 
 
     //
@@ -261,6 +261,17 @@ namespace Belle2 {
       SIZE_B2LHSLB_TRAILER = 1
     };
 
+
+#ifdef READ_OLD_B2LFEE_FORMAT_FILE
+    //    Old version before Nov. 21, 2013
+    enum {
+      POS_FTSW1 = 0,
+      POS_FTSW2 = 1,
+      POS_EXP_RUN = 2,
+      POS_B2L_TIME = 3,
+      SIZE_B2LFEE_HEADER = 4
+    };
+#else
     //
     // Data Format : "B2Link FEE Header"
     // modified by Nov. 21, 2013, Nakao-san's New firmware?
@@ -272,14 +283,7 @@ namespace Belle2 {
       POS_B2L_CTIME = 4,
       SIZE_B2LFEE_HEADER = 5
     };
-    /* Old version before Nov. 21, 2013 */
-    /*     enum { */
-    /*       POS_FTSW1 = 0, */
-    /*       POS_FTSW2 = 1, */
-    /*       POS_EXP_RUN = 2, */
-    /*       POS_B2L_TIME = 3, */
-    /*       SIZE_B2LFEE_HEADER = 4
-    /*     }; */
+#endif
 
     //
     // Data Format : B2Link FEE Trailer

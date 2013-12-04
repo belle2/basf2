@@ -52,6 +52,7 @@ namespace Belle2 {
       POS_FTSW_4 = 11
     };
 
+
   protected :
     //    Belle2::SendHeader m_FTSW_header; //
 

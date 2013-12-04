@@ -3,13 +3,16 @@
 * Copyright(C) 2010 - Belle II Collaboration                             *
 *                                                                        *
 * Author: The Belle II Collaboration                                     *
-* Contributors: Christian Oswald, Phillip Urquijo                        *
+* Contributors: Christian Oswald, Phillip Urquijo, Anze Zupanc           *
 *                                                                        *
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 
 #include <analysis/NtupleTools/NtupleMCTruthTool.h>
 #include <generators/dataobjects/MCParticle.h>
+
+#include <analysis/utility/mcParticleMatching.h>
+
 #include <TBranch.h>
 
 void NtupleMCTruthTool::setupTree()
@@ -26,11 +29,6 @@ void NtupleMCTruthTool::setupTree()
 
 void NtupleMCTruthTool::eval(const Particle* particle)
 {
-  if (!particle) {
-    printf("NtupleMCTruthTool::eval - ERROR, no Particle found!\n");
-    return;
-  }
-
   StoreArray<MCParticle> mcParticles;
 
   vector<const Particle*> selparticles = m_decaydescriptor.getSelectionParticles(particle);
@@ -40,13 +38,10 @@ void NtupleMCTruthTool::eval(const Particle* particle)
     m_iTruthIDMatch[iProduct] = 0;
 
     const MCParticle* mcparticle = DataStore::getRelated<MCParticle>(selparticles[iProduct]);
-    if (selparticles[iProduct]->getParticleType() == 6/*c_Composite*/) {
-      B2INFO(boost::format("[NtupleMCTruthTool]: this tool does not currently return the truth ID for composite particles : %d") % selparticles[iProduct]->getParticleType());
-    } else if (!mcparticle) {
-      printf("NtupleMCTruthTool::eval - WARNING no truth match found for this reco particle!\n");
-    } else {
-      m_iTruthID[iProduct] =  mcparticle->getPDG();
-      m_iTruthIDMatch[iProduct] = (mcparticle->getPDG() == selparticles[iProduct]->getPDGCode());
+
+    if (mcparticle) {
+      m_iTruthID[iProduct]      = mcparticle->getPDG();
+      m_iTruthIDMatch[iProduct] = getMCTruthFlag(selparticles[iProduct], mcparticle);
     }
   }
 }

@@ -163,3 +163,10 @@ def summaryOfLists(particleLists, path=main):
     path.add_module(particleStats)
 
 
+def matchMCTruth(list_name, path=main):
+    mcMatch = register_module('MCMatching')
+    mcMatch.set_name('MCMatching_' + list_name)
+    mcMatch.param('ListName', list_name)
+    path.add_module(mcMatch)
+
+

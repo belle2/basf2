@@ -41,22 +41,35 @@ from modularAnalysis import *
 # check if the required input file exists
 import os.path
 import sys
-if not os.path.isfile('EvtGenOutput.root'):
+if not os.path.isfile('evtgen-Dstar.root'):
     sys.exit('EvtGenOutput.root file does not exist. Please run analysis/examples/EvtgenOut.py script first.'
              )
 
-inputMdst('EvtGenOutput.root')
+inputMdst('evtgen-Dstar.root')
 loadMCParticles()
 
 selectParticle('K-', -321, [])
 selectParticle('pi+', 211, [])
-makeParticle('D0', 421, ['K-', 'pi+'], 1.7, 2.0)
-makeParticle('D*+', 413, ['D0', 'pi+'], 1.9, 2.1)
-applyCuts('D*+', ['M.1 1.81:1.91', 'Q :0.02'])
+selectParticle('g', 22, [])
 
-# printList('D*+',True) # uncomment to investigate the content of the list
+makeParticle('pi0', 111, ['g', 'g'], 0.110, 0.150)
 
-outputMdst('recDstarMC.root')
+applyCuts('pi0', ['p.1 0.1:', 'p.2 0.1:'])
+
+makeParticle('D0', 421, ['K-', 'pi+', 'pi0'], 1.700, 2.000)
+makeParticle('D*+', 413, ['D0', 'pi+'], 1.900, 2.100)
+
+applyCuts('D*+', ['M.1 1.81:1.91', 'Q :0.02', 'p* 2.0:'])
+
+matchMCTruth('D*+')
+
+# define tools for flat ntuples
+toolsDst = ['Kinematics', '^D*+ -> ^D0 ^pi+']
+toolsDst += ['MCTruth', '^D*+ -> ^D0 ^pi+']
+
+# write flat ntuples
+ntupleFile('ntupleDstar.root')
+ntupleTree('ntupDst', 'D*+', toolsDst)
 
 process(main)
 print statistics

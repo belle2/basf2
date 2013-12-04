@@ -5,10 +5,22 @@ from SCons.Script import *
 from SCons.Scanner.C import CScanner
 
 # genfit2 directories
-dirs = ['core', 'eventDisplay', 'fields', 'finitePlanes', 'fitters', 'GBL', 'GFRave', 'measurements', 'trackReps', 'utilities']
+dirs = ['core', 'fields', 'finitePlanes', 'fitters', 'GBL', 'GFRave', 'measurements', 'trackReps', 'utilities']
+
+# libraries
+env['LIBS'] = ['$ROOT_LIBS', 'RaveBase']
+
+# check for EVE (needed for eventDisplay)
+if env.has_key('HAS_TEVE'):
+  if not env['HAS_TEVE']:
+    print "Genfit's eventDisplay disabled, please recompile root with opengl support (on Debian/Ubuntu you'll probably only need to install libglu1-mesa-dev and rebuild)"
+
+  env['LIBS'] += env['TEVE_LIBS']
+  dirs += 'eventDisplay'
 
 # remove genfit1 from include path and add genfit2 to it
-env['CCFLAGS'].remove('-I' + os.path.join(env['EXTINCDIR'], 'genfit'))
+if os.path.exists(os.path.join(env['EXTINCDIR'], 'genfit')) :
+    env['CCFLAGS'].remove('-I' + os.path.join(env['EXTINCDIR'], 'genfit'))
 env.Append(CPPPATH = os.path.join(env['INCDIR'], 'genfit'))
 
 # install header files
@@ -44,6 +56,7 @@ for dir in dirs:
 # build library
 lib = env.SharedLibrary(os.path.join(env['LIBDIR'], 'libgenfit2.so'), [source_files, dict_files])
 env.Alias('genfit2', lib)
+
 
 env['CONTINUE'] = False
 

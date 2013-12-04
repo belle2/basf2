@@ -119,14 +119,14 @@ namespace Belle2 {
       if (!mc->hasStatus(bitmask)) continue;
       for (int k = 0; k < Npdg; k++) {
         if (abs(mc->getPDG()) == pdgCode[k]) {
-          new(Particles.nextFreeAddress()) Particle(mc);
+          Particle particle(mc);
+          Particle* newPart = Particles.appendNew(particle);
+          DataStore::addRelationFromTo(newPart, mc);
           break;
         }
       }
-
     }
     B2INFO("ParticleLoader::loadFromMCParticles size=" << Particles.getEntries());
-
   }
 
   void ParticleLoaderModule::loadFromReconstruction()

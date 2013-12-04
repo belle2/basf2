@@ -6,8 +6,8 @@
 // Date : 2 - Aug - 2013
 //-
 
-#ifndef DATAFORMAT_H
-#define DATAFORMAT_H
+#ifndef DAQCONSTS_H
+#define DAQCONSTS_H
 
 
 //#define RAWDATASIZE 1

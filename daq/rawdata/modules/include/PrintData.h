@@ -6,8 +6,8 @@
 // Date : 2 - Aug - 2013
 //-
 
-#ifndef SERIALIZER_H
-#define SERIALIZER_H
+#ifndef PRINTDATA_H
+#define PRINTDATA_H
 
 #include <stdlib.h>
 #include <string>

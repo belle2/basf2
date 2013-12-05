@@ -5,10 +5,10 @@ from basf2 import *
 from modularAnalysis import *
 
 # ----------------------------------------------------------------------------------
-# Example of reconstruction D*+ -> D0 pi+, D0 -> K- pi+ using EvtGen output file
+# Example of reconstruction D*+ -> D0 pi+, D0 -> K- pi+ pi0 using EvtGen output file
 #
-# To run this script you need first to prepare a root file EvtGenOutput.root
-# using for example analysis/examples/EvtgenOut.py
+# To run this script you need first to prepare a root file evtgen-Dstar.root
+# using for example analysis/examples/ContinuumGenOnly.py
 #
 # Charge conjugate combinations are always done.
 #
@@ -42,7 +42,7 @@ from modularAnalysis import *
 import os.path
 import sys
 if not os.path.isfile('evtgen-Dstar.root'):
-    sys.exit('EvtGenOutput.root file does not exist. Please run analysis/examples/EvtgenOut.py script first.'
+    sys.exit('evtgen-Dstar.root file does not exist. Please run analysis/examples/ContinuumGenOnly.py script first.'
              )
 
 inputMdst('evtgen-Dstar.root')
@@ -66,6 +66,9 @@ matchMCTruth('D*+')
 # define tools for flat ntuples
 toolsDst = ['Kinematics', '^D*+ -> ^D0 ^pi+']
 toolsDst += ['MCTruth', '^D*+ -> ^D0 ^pi+']
+toolsDst += ['MCHierarchy', 'D*+ -> [D0 -> K- pi+ ^pi0] pi+']
+toolsDst += ['MCKinematics', 'D*+ -> [D0 -> ^K- ^pi+ ^pi0] ^pi+']
+toolsDst += ['MCVertex', '^D*+ -> ^D0 pi+']
 
 # write flat ntuples
 ntupleFile('ntupleDstar.root')

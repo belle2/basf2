@@ -3,13 +3,14 @@
 
 ##############################################################################
 #
-# This is an example steering file to run myArichModule.
+# This is an example steering file to run ARICHAnalysisModule.
 # It uses ParicleGun module to generate tracks,
 # (see "generators/example/ParticleGunFull.py" for detailed usage),
-# simulated inner detectors (SVD, PXD, CDC), and needs
+# simulated inner detectors (PXD, SVD, CDC), and needs
 # reconstructed tracks(MCTrackFinder+GenFit) extrapolated to ARICH (ExtHits).
 # The module builds geometry, performs geant4 simulation, does ARICH
-# reconstruction and stores output in an output root file.
+# reconstruction and stores output in an output root file (defined in
+# ARICHAnalysisModule).
 #
 ##############################################################################
 
@@ -28,15 +29,17 @@ filename = options.filename
 # suppress messages and warnings during processing DEBUG, INFO, WARNING, ERROR
 set_log_level(LogLevel.INFO)
 
+# Create path
+main = create_path()
+
 # Create Event information
 eventinfosetter = register_module('EventInfoSetter')
 eventinfosetter.param({'evtNumList': [nevents], 'runList': [1]})
-
-# Show progress of processing
-progress = register_module('Progress')
+main.add_module(eventinfosetter)
 
 # Load parameters
 gearbox = register_module('Gearbox')
+main.add_module(gearbox)
 
 # Create geometry
 geometry = register_module('Geometry')
@@ -48,6 +51,7 @@ geometry.param('Components', [
     'CDC',
     'ARICH',
     ])
+main.add_module(geometry)
 
 # Particle gun module
 particlegun = register_module('ParticleGun')
@@ -62,7 +66,7 @@ particlegun.param('nTracks', 1)
 # Setting the parameters for the random generation
 # of particles momenta:
 particlegun.param('momentumGeneration', 'uniform')
-particlegun.param('momentumParams', [0.5, 5])
+particlegun.param('momentumParams', [0.5, 4])
 # Setting the parameters for the random generation
 # of the particle polar angle:
 particlegun.param('thetaGeneration', 'uniformCosinus')
@@ -71,46 +75,55 @@ particlegun.param('vertexGeneration', 'fixed')
 particlegun.param('xVertexParams', [0])
 particlegun.param('yVertexParams', [0])
 particlegun.param('zVertexParams', [0])
+particlegun.param('independentVertices', False)
 # Print the parameters of the particle gun
 print_params(particlegun)
+main.add_module(particlegun)
 # ============================================================================
 
 # Run simulation
 simulation = register_module('FullSim')
 simulation.param('StoreAllSecondaries', 1)
-# Here you can select visualization driver and visualization commands.
-# You can use any visualization supported by geant4:
-# "http://geant4.web.cern.ch/geant4/UserDocumentation/UsersGuides/
-#  ForApplicationDeveloper/html/ch08.html"
-# Uncomment following lines  to create VRML file that can be examined with any
-# vrml viewer (freewrl,...)
-# simulation.param('EnableVisualization', True)
-# simulation.param('UICommands', ['/vis/open VRML2FILE', '/vis/drawVolume',
-#                            '/vis/scene/add/axes 0 0 0 100 mm',
-#                            '/vis/scene/add/trajectories smooth',
-#                            '/vis/modeling/trajectories/create/drawByCharge'])
-# =============================================================================
+main.add_module(simulation)
 
-# CDC digitizer
+# PXD digitization & clustering
+pxd_digitizer = register_module('PXDDigitizer')
+main.add_module(pxd_digitizer)
+pxd_clusterizer = register_module('PXDClusterizer')
+main.add_module(pxd_clusterizer)
+
+# SVD digitization & clustering
+svd_digitizer = register_module('SVDDigitizer')
+main.add_module(svd_digitizer)
+svd_clusterizer = register_module('SVDClusterizer')
+main.add_module(svd_clusterizer)
+
+# CDC digitization
 cdcDigitizer = register_module('CDCDigitizer')
+main.add_module(cdcDigitizer)
 
 # MC track finder (for simplicity)
 mctrackfinder = register_module('MCTrackFinder')
+main.add_module(mctrackfinder)
 
 # Track fitting
-cdcfitting = register_module('GenFitter')
+trackfitter = register_module('GenFitter')
+main.add_module(trackfitter)
 
 # Track extrapolation
 ext = register_module('Ext')
+main.add_module(ext)
 
 # ARICH digitization module
 arichDIGI = register_module('ARICHDigitizer')
+main.add_module(arichDIGI)
 
 # ARICH reconstruction module
 arichRECO = register_module('ARICHReconstructor')
 arichRECO.logging.log_level = LogLevel.DEBUG
 arichRECO.logging.debug_level = 20
 arichRECO.param('inputTrackType', 0)
+main.add_module(arichRECO)
 
 # my module - reconstruction efficiency analysis
 arichEfficiency = register_module('ARICHAnalysis')
@@ -118,23 +131,11 @@ arichEfficiency.logging.log_level = LogLevel.DEBUG
 arichEfficiency.logging.debug_level = 20
 arichEfficiency.param('outputFile', filename)
 arichEfficiency.param('inputTrackType', 0)
-
-# Do the simulation
-# =============================================================================
-main = create_path()
-main.add_module(eventinfosetter)
-main.add_module(progress)
-main.add_module(gearbox)
-main.add_module(geometry)
-main.add_module(particlegun)
-main.add_module(simulation)
-main.add_module(cdcDigitizer)
-main.add_module(mctrackfinder)
-main.add_module(cdcfitting)
-main.add_module(ext)
-main.add_module(arichDIGI)
-main.add_module(arichRECO)
 main.add_module(arichEfficiency)
+
+# Show progress of processing
+progress = register_module('Progress')
+main.add_module(progress)
 
 # Process events
 process(main)

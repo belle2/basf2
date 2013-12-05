@@ -21,7 +21,22 @@
 
 namespace Belle2 {
   namespace arich {
-    //! This Class contains methods needed to obtain the value of identity likelihood function for different particle hypotheses.
+    /** Internal ARICH track reconstruction
+      *
+      * The class contains objects and methods needed for internal ARICH track
+      * reconstruction.
+      * The main method is likelihood2, which returns
+      * the value of the likelihood function and number of expected photons for every
+      * input track and all hypotheses. For that purpose,
+      * the Cherenkov photon is generated for every
+      * track that hits the aerogel, by calling the CherenkovPhoton method.
+      * The photon is propagated (FastTracking) to
+      * the active area of the detection inside a HAPD
+      * and the intersection point with the active area is determined.
+      * Whether the photon was detected or not is determined by numerical simulation
+      * of the module's geometric acceptance.
+      *
+      */
 
     class ARICHReconstruction {
 
@@ -37,7 +52,7 @@ namespace Belle2 {
       int smearTracks(std::vector<ARICHTrack>&);
 
       //! Computes the value of identity likelihood function for different particle hypotheses.
-      int Likelihood2(std::vector<ARICHTrack>&);
+      int likelihood2(std::vector<ARICHTrack>&);
       //! Sets detector background level (photon hits / m^2)
       void setBackgroundLevel(double nbkg);
       //! Sets track position resolution (from tracking)
@@ -55,9 +70,9 @@ namespace Belle2 {
       static const int c_noOfAerogels = 5; /**< Maximal number of aerogel layers to loop over */
 
       ARICHGeometryPar* m_arichGeoParameters; /**< holding the parameters of detector */
-      TNtuple* m_hitstuple;  /**< debug output hit-track pairs */
-      TNtuple* m_tracktuple; /**< debug output tracks */
-      double m_Debug; /**< debug level */
+      TNtuple* m_hitstuple;  /**< beamtest/debug output hit-track pairs */
+      TNtuple* m_tracktuple; /**< beamtest/debug output tracks */
+      double m_beamtest; /**< in the case of beamtest analysis >=1, default 0 */
       double m_bkgLevel; /**< detector photon background level */
       double m_trackPosRes; /**< track position resolution (from tracking) */
       double m_trackAngRes; /**< track direction resolution (from tracking) */

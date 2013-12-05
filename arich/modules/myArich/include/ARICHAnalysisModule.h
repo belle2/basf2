@@ -6,12 +6,7 @@
  * Contributors: Dino Tahirovic                                           *
  *                                                                        *
  * The purpose of this module is to test the reconstruction of            *
- * the particles with ARICH. It reconstructs particles using              *
- * the datastore arrays Tracks, EXTHit and ARICHLikelihood. To find       *
- * the true values, it searches for the relations from these arrays       *
- * to MCParticles.                                                        *
- * As a result, it saves root ntuple object with relevant data            *
- * which can be used in root script for final analysis.                   *
+ * the particles with ARICH.                                              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -31,9 +26,27 @@
 
 namespace Belle2 {
 
-  /**
-   *
-   */
+  /** ARICH reconstruction efficiency test module
+    *
+    * The purpose of this module is to test the reconstruction of
+    * the particles with ARICH. There are two paths (parameter inputTrackType),
+    * depending on the input tracks,
+    * which can either be obtained from the tracking subdetectors
+    * or from GEANT4 simulation directly, without taking into account the inner structure
+    * of the Belle II detector. In the case of tracking, the input are
+    * fitted tracks, extrapolated hits and Monte Carlo information.
+    * The output is a root ntuple object (parameter fileName) with the true and
+    * reconstructed position of the track, the true and reconstructed momentum,
+    * likelihood value and number of expected photons for each of the five hypotheses
+    * and number of detected photons.
+    * In the case of GEANT4 simulation only, the input are hits at the aerogel
+    * (datastore ntuple ARICHAeroHits). The output is the same as in tracking case,
+    * only without the reconstructed values.
+    * The output ntuple is used in root scripts
+    * (examples/resolutions.C, examples/extArichEfficiency.C)
+    * for the final analysis.
+
+    */
   class ARICHAnalysisModule : public Module {
 
   public:

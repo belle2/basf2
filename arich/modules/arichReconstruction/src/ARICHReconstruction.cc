@@ -34,17 +34,17 @@ using namespace boost;
 namespace Belle2 {
   namespace arich {
 
-    ARICHReconstruction::ARICHReconstruction(int debug):
+    ARICHReconstruction::ARICHReconstruction(int beamtest):
       m_arichGeoParameters(ARICHGeometryPar::Instance()),
+      m_beamtest(beamtest),
       m_bkgLevel(0),
       m_trackPosRes(0),
       m_trackAngRes(0),
       m_singleRes(0),
       m_aeroMerit(0)
     {
-      m_Debug = debug;
       B2INFO("ARICHReconstruction::ARICHReconstruction()");
-      if (m_Debug) {
+      if (m_beamtest) {
         m_hitstuple = new TNtuple("hits", "Btest Cherenkov angle", "n:agel:mir:thc:fic:x:y:z:tx:ty:tz:sx:sy");
         m_tracktuple = new TNtuple("tracks", "Btest tracks", "id:p:nexp:acc:ndet:le:lmu:lpi:lk:lp");
       }
@@ -263,7 +263,7 @@ namespace Belle2 {
     }
 
 
-    int ARICHReconstruction::Likelihood2(std::vector<ARICHTrack>& arichTracks)
+    int ARICHReconstruction::likelihood2(std::vector<ARICHTrack>& arichTracks)
     {
       static int ncount = 0;
       ncount++;
@@ -453,8 +453,8 @@ namespace Belle2 {
               double th_cer = dirch.Theta();
 
 
-              if (m_Debug) m_hitstuple->Fill(ncount, iAerogel, mirr, th_cer, fi_cer, hitpos.x(), hitpos.y(), hitpos.z(), epoint.x(), epoint.y(), epoint.z() , edir.x(), edir.y());
-              if (m_Debug > 2) continue;
+              if (m_beamtest) m_hitstuple->Fill(ncount, iAerogel, mirr, th_cer, fi_cer, hitpos.x(), hitpos.y(), hitpos.z(), epoint.x(), epoint.y(), epoint.z() , edir.x(), edir.y());
+              if (m_beamtest > 2) continue;
               if (fabs(th_cer - thetaCh[track->getIdentity()][0]) < 0.05 && iAerogel == 0 && nfoo == nDetPhotons) nDetPhotons++;
               if (fi_cer < 0) fi_cer += 2 * M_PI;
               double fii = 0;
@@ -544,7 +544,7 @@ namespace Belle2 {
         track->setLikelihood(logL);
         //**************************************
 
-        if (m_Debug) {
+        if (m_beamtest) {
           int id = track->getIdentity();
           if (id < 0) id = 0;
           m_tracktuple->Fill(id, track->getReconstructedMomentum(), nSig[2][nAerogelLayers], acceptance[2][0], nDetPhotons, logL[0], logL[1], logL[2], logL[3], logL[4]);

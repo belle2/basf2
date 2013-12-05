@@ -6,19 +6,7 @@
  * Contributors: Dino Tahirovic                                           *
  *                                                                        *
  * The purpose of this module is to test the reconstruction of            *
- * the particles with ARICH. It is split in two reconstruction paths,     *
- * depending on the purpuse of the analysis.                              *
- * The first one reconstructs particles using                             *
- * the datastore arrays Tracks, EXTHit and ARICHLikelihood. To find       *
- * the true values, it searches for the relations from these arrays       *
- * to MCParticles.                                                        *
- * The second one uses particle's information obtained from ARICHAeroHits,*
- * which is produced in GEANT4 simulation.                                *
- * Python script parameter 'inputTrackType' selects between the two.      *
- *                                                                        *
- * As a result, in the Terminate function, the module saves root ntuple   *
- * object with the relevant data                                          *
- * which can be used in a root script for final analysis.                 *
+ * the particles with ARICH.                                              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -80,8 +68,8 @@ namespace Belle2 {
     setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
 
     // Add parameters
-    addParam("outputFile", m_outputFile, "root file name", string("extArichTest.root"));
-    addParam("inputTrackType", m_inputTrackType, "Input tracks from the tracking (0) or from AeroHit (1)", 0);
+    addParam("outputFile", m_outputFile, "ROOT output file name", string("extArichTest.root"));
+    addParam("inputTrackType", m_inputTrackType, "Input tracks switch: tracking (0) or AeroHit (1)", 0);
 
     //    addParam("InputName", m_inName, "some name",string(""));
     //    vector<string> defaultList;
@@ -260,6 +248,7 @@ namespace Belle2 {
   {
     file->Write();
     file->Close();
+    B2INFO("ARICHAnalysisModule: finished. Output " << m_outputFile << " written.");
   }
 
   void ARICHAnalysisModule::printModuleParams() const

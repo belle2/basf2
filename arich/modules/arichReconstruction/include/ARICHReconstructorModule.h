@@ -20,12 +20,17 @@
 
 namespace Belle2 {
   namespace arich {
-    /** This module calculates the values of particles identity likelihood function
+    /** ARICH subdetector main module
      *
-     * It reads the tracks and hits information from datastore, for each
-     * track it creates internal vector ARICHTrack, calculates
-     * values of likelihood function
-     * for different particle hypotheses and stores them in datastore.
+     * This module takes either reconstructed tracks from tracking or GEANT4
+     * simulated tracks as input. For every track, the value of ARICH likelihood
+     * function is calculated (by calling likelihood2 function), which gives the
+     * probability that a track was made by a certain particle. This information
+     * is stored in ARICHLikelihood object. Also, number of theoretically
+     * expected photons per hypothesis (five in all) and number of detected photons
+     * are added to this object.
+     * Finally, the module stores the relations between the track candidate,
+     * extrapolated track and calculated ARICH likelihood.
      */
 
     class ARICHReconstructorModule : public Module {
@@ -90,13 +95,13 @@ namespace Belle2 {
       double m_timeCPU;                /**< CPU time.     */
       int    m_nRun;                   /**< Run number.   */
       int    m_nEvent;                 /**< Event number. */
-      double m_trackPositionResolution;/**< Track position resolution from tracking. */
-      double m_trackAngleResolution;   /**< Track direction resolution from tracking. */
+      double m_trackPositionResolution;/**< Track position resolution; simulation smearing. */
+      double m_trackAngleResolution;   /**< Track direction resolution; simulation smearing. */
       double m_backgroundLevel;        /**< Photon background level. */
       double m_singleResolution;       /**< Resolution of single photon emission angle. */
       std::vector<double> m_aerogelMerit; /**< Vector of aerogel layer figures of merit. */
       int m_inputTrackType;            /**< Input tracks from the tracking (0) or from MCParticles>AeroHits (1). */
-      int    m_debug;                  /**< Debug Level For ARICH, >2 means beamtest*/
+      int    m_beamtest;                  /**< If >=1 ARICH beamtest, default 0 (off) */
 
       //! Function fills the internal vector ARICHTracks from ext module
       /*!

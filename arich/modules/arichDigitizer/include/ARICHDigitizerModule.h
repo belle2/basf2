@@ -18,11 +18,12 @@
 
 namespace Belle2 {
   namespace arich {
-    //! ARICH digitizer module.
-    /*!
-      This module takes the hits form G4 simulation (ARICHSimHit), applies q.e. of HAPDs, calculates and saves hit channel numbers (ARICHDigit).
-      If channel has multiple hits, only one is saved.
-    */
+    /** ARICH digitizer module.
+      *
+      * This module takes the hits form GEANT4 simulation (ARICHSimHit),
+      * applies q.e. of HAPDs, calculates and saves hit channel numbers (ARICHDigit).
+      * If the channel has multiple hits, only one is saved.
+      */
     class ARICHDigitizerModule : public Module {
 
     public:

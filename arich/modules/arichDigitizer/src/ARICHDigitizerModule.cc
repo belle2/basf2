@@ -57,8 +57,8 @@ namespace Belle2 {
       setDescription("ARICHDigitizer");
       setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
       // Add parameters
-      addParam("InputColName", m_inColName, "Input collection name", string("ARICHSimHitArray"));
-      addParam("OutputColName", m_outColName, "Output collection name", string("ARICHDigitArray"));
+      addParam("InputColName", m_inColName, "ARICHSimHits collection name", string("ARICHSimHitArray"));
+      addParam("OutputColName", m_outColName, "ARICHDigit collection name", string("ARICHDigitArray"));
     }
 
     ARICHDigitizerModule::~ARICHDigitizerModule()

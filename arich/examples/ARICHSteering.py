@@ -70,7 +70,7 @@ particlegun.param('nTracks', 1)
 # Setting the parameters for the random generation
 # of particles momenta:
 particlegun.param('momentumGeneration', 'uniform')
-particlegun.param('momentumParams', [0.5, 5])
+particlegun.param('momentumParams', [0.5, 4])
 # Setting the parameters for the random generation
 # of the particle polar angle:
 particlegun.param('thetaGeneration', 'uniformCosinus')

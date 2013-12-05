@@ -57,7 +57,7 @@ namespace Belle2 {
       m_timeCPU(0),
       m_nRun(0),
       m_nEvent(0),
-      m_debug(0)
+      m_beamtest(0)
     {
       // Set description()
       setDescription("ARICHReconstructor");
@@ -67,17 +67,17 @@ namespace Belle2 {
       defMerit.push_back(30.0);
       defMerit.push_back(30.0);
       // Add parameters
-      addParam("debug", m_debug, "Debug level for ARICH", 0);
-      addParam("MCColName", m_mcColName, "Input from MC", string(""));
-      addParam("tracksColName", m_tracksColName, "Mdst tracks", string(""));
-      addParam("extHitsColName", m_extHitsColName, "Extrapolated tracks", string(""));
-      addParam("outColName", m_outColName, "Output: ARICH Likelihoods",  string(""));
+      addParam("beamtest", m_beamtest, "ARICH beamtest switch (beamtest>=1)", 0);
+      addParam("MCColName", m_mcColName, "MCParticles collection name", string(""));
+      addParam("tracksColName", m_tracksColName, "Tracks collection name", string(""));
+      addParam("extHitsColName", m_extHitsColName, "ExtHits collection name", string(""));
+      addParam("outColName", m_outColName, "ARICHLikelihoods collection name",  string(""));
       addParam("trackPositionResolution", m_trackPositionResolution, "Resolution of track position on aerogel plane", 1.0 * Unit::mm);
       addParam("trackAngleResolution", m_trackAngleResolution, "Resolution of track direction angle on aerogel plane", 1.0 * Unit::mrad);
       addParam("backgroundLevel", m_backgroundLevel, "Background level in photon hits per m^2", 0.0);
       addParam("singleResolution", m_singleResolution, "Single photon resolution without pad", 0.03 * Unit::mm);
       addParam("aerogelMerit", m_aerogelMerit, "Aerogel figure of merit", defMerit);
-      addParam("inputTrackType", m_inputTrackType, "Input tracks from the tracking (0) or from AeroHit (1)", 0);
+      addParam("inputTrackType", m_inputTrackType, "Input tracks switch: tracking (0) or AeroHit (1)", 0);
     }
 
     ARICHReconstructorModule::~ARICHReconstructorModule()
@@ -90,7 +90,7 @@ namespace Belle2 {
       // Initialize variables
       m_nRun    = 0 ;
       m_nEvent  = 0 ;
-      m_ana = new ARICHReconstruction(m_debug);
+      m_ana = new ARICHReconstruction(m_beamtest);
       m_ana->setBackgroundLevel(m_backgroundLevel);
       m_ana->setTrackPositionResolution(m_trackPositionResolution);
       m_ana->setTrackAngleResolution(m_trackAngleResolution);
@@ -142,21 +142,20 @@ namespace Belle2 {
         B2DEBUG(100, "Number of tracks from ext" << arichTracks.size());
         if (arichTracks.empty()) return;
 
-        m_ana->Likelihood2(arichTracks);
+        m_ana->likelihood2(arichTracks);
 
         int nTracks = arichTracks.size();
         for (int iTrack = 0; iTrack < nTracks; ++iTrack) {
           ARICHTrack* track = &arichTracks[iTrack];
-
-          double like[5];
+          double likelihoods[5];
           double expectedPhotons[5];
-          track->getLikelihood(like);
+          track->getLikelihood(likelihoods);
           track->getExpectedPhotons(expectedPhotons);
           double detectedPhotons = track->getDetectedPhotons();
           B2DEBUG(50, "Number of expected photons " << expectedPhotons[0]);
           B2DEBUG(50, "Number of detected photons " << detectedPhotons);
 
-          new(arichLikelihoods.nextFreeAddress()) ARICHLikelihood(1, like, detectedPhotons, expectedPhotons);
+          new(arichLikelihoods.nextFreeAddress()) ARICHLikelihood(1, likelihoods, detectedPhotons, expectedPhotons);
 
           // Add relations
           int last = arichLikelihoods.getEntries() - 1;
@@ -197,18 +196,18 @@ namespace Belle2 {
         } // for iTrack
 
         m_ana->smearTracks(arichTracks);
-        m_ana->Likelihood2(arichTracks);
+        m_ana->likelihood2(arichTracks);
 
 
 
         for (int iTrack = 0; iTrack < nTracks; ++iTrack) {
           ARICHTrack* track = &arichTracks[iTrack];
           double expectedPhotons[5];
-          double like[5];
+          double likelihoods[5];
           track->getExpectedPhotons(expectedPhotons);
-          track->getLikelihood(like);
+          track->getLikelihood(likelihoods);
           int detectedPhotons = track->getDetectedPhotons();
-          new(arichLikelihoods.nextFreeAddress()) ARICHLikelihood(1, like, detectedPhotons, expectedPhotons);
+          new(arichLikelihoods.nextFreeAddress()) ARICHLikelihood(1, likelihoods, detectedPhotons, expectedPhotons);
           aeroHitToArich.add(iTrack, iTrack);
         } // for iTrack
       }
@@ -233,8 +232,7 @@ namespace Belle2 {
     void ARICHReconstructorModule::printModuleParams() const
     {
       B2INFO("ARICHReconstructorModule parameters:")
-      std::string input[2] = {"extrapolation", "simulation"};
-      B2INFO("Input from " << input[m_inputTrackType]);
+      B2INFO("Input tracks switch: " << m_inputTrackType);
     }
 
     void ARICHReconstructorModule::getTracks(std::vector<ARICHTrack>& tracks,

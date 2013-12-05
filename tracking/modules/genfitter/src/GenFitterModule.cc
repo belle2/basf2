@@ -138,6 +138,7 @@ void GenFitterModule::initialize()
   m_failedGFTrackCandFitCounter = 0;
   m_successfulGFTrackCandFitCounter = 0;
 
+  StoreArray<genfit::TrackCand>::required(m_gfTrackCandsColName);
 
   StoreArray<Track>::registerPersistent();
   StoreArray<TrackFitResult>::registerPersistent();
@@ -149,14 +150,12 @@ void GenFitterModule::initialize()
     //TODO: implementation might also need different name for TrackFitResults?
   }
 
-
   RelationArray::registerPersistent<genfit::Track, MCParticle>(m_gfTracksColName, m_mcParticlesColName);
   RelationArray::registerPersistent<MCParticle, Track> ();
   RelationArray::registerPersistent<genfit::Track, TrackFitResult>(m_gfTracksColName, "");
   RelationArray::registerPersistent<genfit::TrackCand, TrackFitResult>(m_gfTrackCandsColName, "");
   RelationArray::registerPersistent<genfit::TrackCand, genfit::Track>(m_gfTrackCandsColName, m_gfTracksColName);
 
-  StoreArray<genfit::TrackCand>::required(m_gfTrackCandsColName);
 
   if (m_createTextFile) {
     HelixParam.open("HelixParam.txt");
@@ -450,10 +449,8 @@ void GenFitterModule::event()
             kfs->Print();
           fitSuccess = fitSuccess && kfs;
         }
-        //int genfitStatusFlag = trackRep->getStatusFlag();
-        int genfitStatusFlag = !fitSuccess; //StatusFlag == 0 means fit was successful
         B2DEBUG(99, "-----> Fit results:");
-        B2DEBUG(99, "       Status of fit: " << genfitStatusFlag);
+        B2DEBUG(99, "       Fitted and converged: " << fitSuccess);
         //hSuccess->Fill(fitSuccess);
         if (fitSuccess) {
           B2DEBUG(99, "       Chi2 of the fit: " << kfs->getChi2());
@@ -466,10 +463,10 @@ void GenFitterModule::event()
         //B2DEBUG(99,"       Covariance matrix: ");
         //gfTrack.getTrackRep(0)->getCov().Print();
 
-        if (genfitStatusFlag != 0) {    //if fit failed
+        if (!fitSuccess) {    //if fit failed
           std::stringstream warningStreamFitFailed;
           warningStreamFitFailed << "Event " << eventCounter << ", genfit::TrackCand: " << iCand << ", PDG hypo: " << currentPdgCode <<
-                                 ": fit failed. GenFit returned an error (with status flag " << genfitStatusFlag << ").";
+                                 ": fit failed. GenFit returned an error (with fitSuccess " << fitSuccess << ").";
           B2WARNING(warningStreamFitFailed.str());
           ++m_failedFitCounter;
           if (m_storeFailed == true) {
@@ -585,10 +582,10 @@ void GenFitterModule::event()
             trackFitResultCounter++;
 
             if (fitSuccess) {
-              genfit::FitStatus* fs = gfTrack.getFitStatus();
+              genfit::KalmanFitStatus* fs = gfTrack.getKalmanFitStatus();
               newTrackFitResult->setCharge(fs->getCharge());
-              newTrackFitResult->setPValue(dynamic_cast<genfit::KalmanFitStatus*>(fs)->getBackwardPVal());  // FIXME -> this functionality should move to the general FitStatus class
-              double Pval = dynamic_cast<genfit::KalmanFitStatus*>(fs)->getBackwardPVal();
+              newTrackFitResult->setPValue(fs->getBackwardPVal());
+              double Pval = fs->getBackwardPVal();
               /*hPval->Fill(Pval);
               if (nPXD == 0 && nSVD == 0)
                  hPvalCDC->Fill(Pval);

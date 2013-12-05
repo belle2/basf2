@@ -96,12 +96,12 @@ GenFitterModule::GenFitterModule() :
            "Name of collection holding the MCParticles (need to create relations between found tracks and MCParticles)", string(""));
   //select the filter and set some parameters
   addParam("FilterId", m_filterId, "Set to 'Kalman' use Kalman Filter, 'DAF' to use the DAF and 'simpleKalman' for the Kalman without reference track", string("DAF"));
-  addParam("NMinIterations", m_nMinIter, "Minimum umber of iterations for the Kalman filter", int(2));
-  addParam("NMaxIterations", m_nMaxIter, "Maximum umber of iterations for the Kalman filter", int(4));
+  addParam("NMinIterations", m_nMinIter, "Minimum umber of iterations for the Kalman filter", int(3));
+  addParam("NMaxIterations", m_nMaxIter, "Maximum umber of iterations for the Kalman filter", int(10));
   addParam("ProbCut", m_probCut, "Probability cut for the DAF. Any value between 0 and 1 possible. Common values are between 0.01 and 0.001", double(0.001));
   addParam("StoreFailedTracks", m_storeFailed, "Set true if the tracks where the fit failed should also be stored in the output", bool(false));
   addParam("UseClusters", m_useClusters, "if set to true cluster hits (PXD/SVD clusters) will be used for fitting. If false Gaussian smeared trueHits will be used", true);
-  addParam("PDGCodes", m_pdgCodes, "List of PDG codes used to set the mass hypothesis for the fit. All your codes will be tried with every track. The sign of your codes will be ignored and the charge will always come from the GFTrackCand. If you do not set any PDG code the code will be taken from the GFTrackCand. This is the default behavior)", vector<int>(0));
+  addParam("PDGCodes", m_pdgCodes, "List of PDG codes used to set the mass hypothesis for the fit. All your codes will be tried with every track. The sign of your codes will be ignored and the charge will always come from the genfit::TrackCand. If you do not set any PDG code the code will be taken from the genfit::TrackCand. This is the default behavior)", vector<int>(0));
   //output
   addParam("GFTracksColName", m_gfTracksColName, "Name of collection holding the final genfit::Tracks (will be created by this module)", string(""));
   addParam("TracksColName", m_tracksColName, "Name of collection holding the final Tracks (will be created by this module). NOT IMPLEMENTED!", string(""));
@@ -302,7 +302,7 @@ void GenFitterModule::event()
       B2DEBUG(99, "GenFitter: current PDG code: " << m_pdgCodes[iPdg]);
       int currentPdgCode = boost::math::sign(aTrackCandPointer->getChargeSeed()) * m_pdgCodes[iPdg];
       if (currentPdgCode == 0) {
-        B2FATAL("Either the charge of the current GFTRackCand is 0 or you set 0 as a PDG code");
+        B2FATAL("Either the charge of the current genfit::TrackCand is 0 or you set 0 as a PDG code");
       }
       if (part->Charge() < 0.0) {
         currentPdgCode *= -1; //swap sign

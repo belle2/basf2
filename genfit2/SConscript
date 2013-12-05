@@ -15,8 +15,9 @@ if env.has_key('HAS_TEVE'):
   if not env['HAS_TEVE']:
     print "Genfit's eventDisplay disabled, please recompile root with opengl support (on Debian/Ubuntu you'll probably only need to install libglu1-mesa-dev and rebuild)"
 
+  #print "TEve found, Genfit's eventDisplay will be built!"
   env['LIBS'] += env['TEVE_LIBS']
-  dirs += 'eventDisplay'
+  dirs += ['eventDisplay']
 
 # remove genfit1 from include path and add genfit2 to it
 genfit1_include = '-I' + os.path.join(env['EXTINCDIR'], 'genfit')

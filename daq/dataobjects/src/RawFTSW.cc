@@ -39,7 +39,7 @@ int RawFTSW::GetFTSWNodeID(int n)
   return  m_buffer[ GetBufferPos(n) +  POS_NODE_ID ];
 }
 
-// unsigned int RawFTSW::GetEveNo(int n){
-
-
-// }
+unsigned int RawFTSW::GetEveNo(int n)
+{
+  return m_buffer[  GetBufferPos(n) + POS_EVE_NO ];
+}

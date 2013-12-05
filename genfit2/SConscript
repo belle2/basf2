@@ -19,8 +19,9 @@ if env.has_key('HAS_TEVE'):
   dirs += 'eventDisplay'
 
 # remove genfit1 from include path and add genfit2 to it
-if os.path.exists(os.path.join(env['EXTINCDIR'], 'genfit')) :
-    env['CCFLAGS'].remove('-I' + os.path.join(env['EXTINCDIR'], 'genfit'))
+genfit1_include = '-I' + os.path.join(env['EXTINCDIR'], 'genfit')
+if genfit1_include in env['CCFLAGS']:
+    env['CCFLAGS'].remove(genfit1_include)
 env.Append(CPPPATH = os.path.join(env['INCDIR'], 'genfit'))
 
 # install header files
@@ -35,6 +36,7 @@ for dir in dirs:
 # builder for root dictionaries
 rootcint = Builder(action='rootcint -f $TARGET -c -p $CINTFLAGS $_CPPDEFFLAGS $_CPPINCFLAGS $SOURCES', source_scanner=CScanner())
 env['BUILDERS']['RootCint'] = rootcint
+rootcint.action.cmdstr = '${ROOTCINTCOMSTR}'
 
 # generate, build, and collect dictionary files
 dict_files = []

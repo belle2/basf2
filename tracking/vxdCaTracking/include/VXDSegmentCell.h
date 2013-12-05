@@ -25,91 +25,89 @@
 #include "VXDSector.h"
 
 namespace Belle2 {
-  namespace Tracking {
 
-    //  class VXDSector;
-    //  class VXDTFHit;
+  //  class VXDSector;
+  //  class VXDTFHit;
 
-    /** \addtogroup dataobjects
-    * @{
-    */
+  /** \addtogroup dataobjects
+   * @{
+   */
 
-    /** The VXD SegmentCell class
-    * This class represents segments of track candidates needed for the Cellular automaton (CA) implemented in the VXDTF.
-    */
-    class VXDSegmentCell {
-    public:
-      //    using boost::unordered_map;
+  /** The VXD SegmentCell class
+   * This class represents segments of track candidates needed for the Cellular automaton (CA) implemented in the VXDTF.
+   */
+  class VXDSegmentCell {
+  public:
+    //    using boost::unordered_map;
 #ifndef __CINT__
-      typedef boost::unordered_map<unsigned int, VXDSector*> MapOfSectors; /**< stores whole sectorMap used for storing cutoffs */
+    typedef boost::unordered_map<unsigned int, VXDSector*> MapOfSectors; /**< stores whole sectorMap used for storing cutoffs */
 #endif
 
-      /** Default constructor for the ROOT IO. */
-      VXDSegmentCell():
-        m_pOuterHit(NULL),
-        m_pInnerHit(NULL),
-        m_pOuterSector(NULL),
-        m_pInnerSector(NULL) { m_state = 0; m_activated = true; m_seed = true; m_stateUpgrade = false; }
+    /** Default constructor for the ROOT IO. */
+    VXDSegmentCell():
+      m_pOuterHit(NULL),
+      m_pInnerHit(NULL),
+      m_pOuterSector(NULL),
+      m_pInnerSector(NULL) { m_state = 0; m_activated = true; m_seed = true; m_stateUpgrade = false; }
 
-      /** Constructor.
-      //      * @param pOuterHit pointer to hit forming the outer end of the SegmentCell.
-      //      * @param pInnerHit pointer to hit forming the inner end of the SegmentCell.
-      //      * @param pOuterSector pointer to sector in which the outer hit lies.
-      //      * @param pInnerSector pointer to sector in which the inner hit lies.
-      //      */
+    /** Constructor.
+     *      //      * @param pOuterHit pointer to hit forming the outer end of the SegmentCell.
+     *      //      * @param pInnerHit pointer to hit forming the inner end of the SegmentCell.
+     *      //      * @param pOuterSector pointer to sector in which the outer hit lies.
+     *      //      * @param pInnerSector pointer to sector in which the inner hit lies.
+     *      //      */
 #ifndef __CINT__
-      VXDSegmentCell(VXDTFHit* pOuterHit, VXDTFHit* pInnerHit, MapOfSectors::iterator pOuterSector, MapOfSectors::iterator pInnerSector):
-        m_pOuterHit(pOuterHit),
-        m_pInnerHit(pInnerHit),
-        m_pOuterSector(pOuterSector),
-        m_pInnerSector(pInnerSector) { m_state = 0; m_activated = true; m_seed = true; m_stateUpgrade = false; }
+    VXDSegmentCell(VXDTFHit* pOuterHit, VXDTFHit* pInnerHit, MapOfSectors::iterator pOuterSector, MapOfSectors::iterator pInnerSector):
+      m_pOuterHit(pOuterHit),
+      m_pInnerHit(pInnerHit),
+      m_pOuterSector(pOuterSector),
+      m_pInnerSector(pInnerSector) { m_state = 0; m_activated = true; m_seed = true; m_stateUpgrade = false; }
 #endif
 
-      int getState() const { return m_state; } /**< returns state of Cell (CA-feature) */
-      bool isSeed() const { return m_seed; } /**< returns whether Cell is allowed to be a seed for TCs */
-      bool isActivated() const { return m_activated; } /**< returns activationState (CA-feature) */
-      bool isUpgradeAllowed() const { return m_stateUpgrade; } /**< returns info whether stateIncrease is allowed or not (CA-feature) */
-      VXDTFHit* getInnerHit() const { return m_pInnerHit; } /**< returns inner hit of current Cell */
-      VXDTFHit* getOuterHit() const { return m_pOuterHit; } /**< returns outer hit of current Cell */
+    int getState() const { return m_state; } /**< returns state of Cell (CA-feature) */
+    bool isSeed() const { return m_seed; } /**< returns whether Cell is allowed to be a seed for TCs */
+    bool isActivated() const { return m_activated; } /**< returns activationState (CA-feature) */
+    bool isUpgradeAllowed() const { return m_stateUpgrade; } /**< returns info whether stateIncrease is allowed or not (CA-feature) */
+    VXDTFHit* getInnerHit() const { return m_pInnerHit; } /**< returns inner hit of current Cell */
+    VXDTFHit* getOuterHit() const { return m_pOuterHit; } /**< returns outer hit of current Cell */
 
-      std::list<Belle2::Tracking::VXDSegmentCell*>& getInnerNeighbours() { return m_innerNeighbours; } /**< returns list of inner Neighbours (CA-feature and needed by TC-Collector), does deliver different results depending on when you call that function */
-      const std::list<Belle2::Tracking::VXDSegmentCell*>& getAllInnerNeighbours() const { return m_allInnerNeighbours; } /**< returns list of all inner neighbours (does not change during event) */
-      std::list<Belle2::Tracking::VXDSegmentCell*>& getOuterNeighbours() { return m_outerNeighbours; } /**< returns list of outer Neighbours */
+    std::list<Belle2::VXDSegmentCell*>& getInnerNeighbours() { return m_innerNeighbours; } /**< returns list of inner Neighbours (CA-feature and needed by TC-Collector), does deliver different results depending on when you call that function */
+    const std::list<Belle2::VXDSegmentCell*>& getAllInnerNeighbours() const { return m_allInnerNeighbours; } /**< returns list of all inner neighbours (does not change during event) */
+    std::list<Belle2::VXDSegmentCell*>& getOuterNeighbours() { return m_outerNeighbours; } /**< returns list of outer Neighbours */
 
-      /** incompatible neighbours get kicked when new information about the situation recommends that step */
-      std::list<Belle2::Tracking::VXDSegmentCell*>::iterator eraseInnerNeighbour(std::list<VXDSegmentCell*>::iterator it) {
-        it = m_innerNeighbours.erase(it);
-        return it;
-      } //items.erase(i++);  or  i = items.erase(i);
+    /** incompatible neighbours get kicked when new information about the situation recommends that step */
+    std::list<Belle2::VXDSegmentCell*>::iterator eraseInnerNeighbour(std::list<VXDSegmentCell*>::iterator it) {
+      it = m_innerNeighbours.erase(it);
+      return it;
+    } //items.erase(i++);  or  i = items.erase(i);
 
-      void kickFalseFriends(TVector3 primaryVertex); /**<  checks state of inner neighbours and removes incompatible and virtual ones */
-      void copyNeighbourList() { m_allInnerNeighbours = m_innerNeighbours; } /**<   makes a copy of m_innerNeighbours (to be used before CA!) */
-      void increaseState() { m_state++; } /**< increases state during CA update step */
-      void allowStateUpgrade(bool upgrade) { m_stateUpgrade = upgrade; } /**< sets flag whether Cell is allowed to increase state during update step within CA */
-      void setSeed(bool seedValue) { m_seed = seedValue; } /**< sets flag whether Cell is allowed to be the seed of a new track candidate or not */
-      void setActivationState(bool activationState) { m_activated = activationState; } /**< sets flag whether Cell is active (takes part during current CA iteration) or inactive (does not take part, it is 'dead') */
-      void addInnerNeighbour(VXDSegmentCell* aSegment) { m_innerNeighbours.push_back(aSegment); } /**< adds an inner neighbour-cell */
-      void addOuterNeighbour(VXDSegmentCell* aSegment) { m_outerNeighbours.push_back(aSegment); } /**< adds an outer neighbour-cell */
+    void kickFalseFriends(TVector3 primaryVertex); /**<  checks state of inner neighbours and removes incompatible and virtual ones */
+    void copyNeighbourList() { m_allInnerNeighbours = m_innerNeighbours; } /**<   makes a copy of m_innerNeighbours (to be used before CA!) */
+    void increaseState() { m_state++; } /**< increases state during CA update step */
+    void allowStateUpgrade(bool upgrade) { m_stateUpgrade = upgrade; } /**< sets flag whether Cell is allowed to increase state during update step within CA */
+    void setSeed(bool seedValue) { m_seed = seedValue; } /**< sets flag whether Cell is allowed to be the seed of a new track candidate or not */
+    void setActivationState(bool activationState) { m_activated = activationState; } /**< sets flag whether Cell is active (takes part during current CA iteration) or inactive (does not take part, it is 'dead') */
+    void addInnerNeighbour(VXDSegmentCell* aSegment) { m_innerNeighbours.push_back(aSegment); } /**< adds an inner neighbour-cell */
+    void addOuterNeighbour(VXDSegmentCell* aSegment) { m_outerNeighbours.push_back(aSegment); } /**< adds an outer neighbour-cell */
 
-    protected:
-      VXDTFHit* m_pOuterHit; /**< pointer to hit forming the outer end of the SegmentCell. */
-      VXDTFHit* m_pInnerHit; /**< pointer to hit forming the inner end of the SegmentCell. */
+  protected:
+    VXDTFHit* m_pOuterHit; /**< pointer to hit forming the outer end of the SegmentCell. */
+    VXDTFHit* m_pInnerHit; /**< pointer to hit forming the inner end of the SegmentCell. */
 #ifndef __CINT__
-      MapOfSectors::iterator m_pOuterSector; /**< link to sector carrying outer hit */
-      MapOfSectors::iterator m_pInnerSector; /**< link to sector carrying inner hit */
+    MapOfSectors::iterator m_pOuterSector; /**< link to sector carrying outer hit */
+    MapOfSectors::iterator m_pInnerSector; /**< link to sector carrying inner hit */
 #endif
-      int m_state; /**< state of Cell during CA process, begins with 0 */
-      bool m_activated; /**< activation state. Living Cells (active) are allowed to evolve in the CA, dead ones (inactive) are not allowed */
-      bool m_stateUpgrade; /**< sets flag whether Cell is allowed to increase state during update step within CA */
-      bool m_seed; /**< sets flag whether Cell is allowed to be the seed of a new track candidate or not */
+    int m_state; /**< state of Cell during CA process, begins with 0 */
+    bool m_activated; /**< activation state. Living Cells (active) are allowed to evolve in the CA, dead ones (inactive) are not allowed */
+    bool m_stateUpgrade; /**< sets flag whether Cell is allowed to increase state during update step within CA */
+    bool m_seed; /**< sets flag whether Cell is allowed to be the seed of a new track candidate or not */
 
-      std::list<VXDSegmentCell*> m_innerNeighbours; /**< segments attached at the inner end of current segment. Since this list gets reduced during CA process, a copy is made before that step. If you want to see all neighbours, use getAllInnerNeighbours */
-      std::list<VXDSegmentCell*> m_allInnerNeighbours; /**< carries full list of all inner neighbour-Cells. */
-      std::list<VXDSegmentCell*> m_outerNeighbours; /**< carries list of outer neighbour-Cells */
+    std::list<VXDSegmentCell*> m_innerNeighbours; /**< segments attached at the inner end of current segment. Since this list gets reduced during CA process, a copy is made before that step. If you want to see all neighbours, use getAllInnerNeighbours */
+    std::list<VXDSegmentCell*> m_allInnerNeighbours; /**< carries full list of all inner neighbour-Cells. */
+    std::list<VXDSegmentCell*> m_outerNeighbours; /**< carries list of outer neighbour-Cells */
 
-    };
+  };
 
-    /** @}*/
-  } // Tracking namespace
+  /** @}*/
 } //Belle2 namespace
 #endif

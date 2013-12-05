@@ -3,9 +3,12 @@
 <CATFParameters xmlns:xi="http://www.w3.org/2001/XInclude">
 	<!-- TODO: If you want to use the VXDTFModule, you have to uncomment the following lines! -->
 
-	<xi:include href="sectorList_testBeamFINE_VXD.xml"/>
-	<xi:include href="sectorList_testBeamSTD_SVD.xml"/>
-	<xi:include href="sectorList_testBeamFINE_SVD.xml"/>
-	<xi:include href="sectorList_testBeamSTD2_VXD.xml"/>
-
+	<xi:include href="testBeamStdVXD-moreThan1500MeV_VXD.xml"/>
+	<xi:include href="testBeamStdSVD-moreThan1500MeV_SVD.xml"/>
+	<xi:include href="testBeamMiniVXD-moreThan1500MeV_VXD.xml"/>
+	<xi:include href="testBeamMiniSVD-moreThan1500MeV_SVD.xml"/>
+	<xi:include href="testBeamFineVXD-moreThan1500MeV_VXD.xml"/>
+	<xi:include href="testBeamFineSVD-moreThan1500MeV_SVD.xml"/>
+	
+	
 </CATFParameters>

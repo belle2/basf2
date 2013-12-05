@@ -12,24 +12,18 @@
 #include "../include/ClusterInfo.h"
 #include <framework/logging/Logger.h>
 
-#include <boost/foreach.hpp>
+// #include <boost/foreach.hpp>
 
 using namespace std;
 using namespace Belle2;
-using namespace Belle2::Tracking;
 
 
 
-void Belle2::Tracking::ClusterInfo::addTrackCandidate(VXDTFTrackCandidate* aTC)
-{
-  BOOST_FOREACH(VXDTFTrackCandidate * anotherTC, m_attachedTCs) {
-    if (isSameTC(aTC, anotherTC) == true) { return; }
-  }
-  m_attachedTCs.push_back(aTC);
-}
+// void Belle2::ClusterInfo::addTrackCandidate(VXDTFTrackCandidate* aTC)
 
 
-bool Belle2::Tracking::ClusterInfo::isOverbooked()
+
+bool Belle2::ClusterInfo::isOverbooked()
 {
   int nTCs = m_attachedTCs.size(), countIterations = 0;
   TcContainer::iterator tcIta = m_attachedTCs.begin();
@@ -57,7 +51,7 @@ bool Belle2::Tracking::ClusterInfo::isOverbooked()
 }
 
 
-bool Belle2::Tracking::ClusterInfo::setReserved(VXDTFTrackCandidate* newBossTC)
+bool Belle2::ClusterInfo::setReserved(VXDTFTrackCandidate* newBossTC)
 {
   if (newBossTC == NULL) { B2WARNING("ClusterInfo::setReserved: you gave me a NULL pointer! ") return false; }
   if (newBossTC->getCondition() == false) {
@@ -73,7 +67,7 @@ bool Belle2::Tracking::ClusterInfo::setReserved(VXDTFTrackCandidate* newBossTC)
     m_reserved = true;
     return true;
   }
-  BOOST_FOREACH(VXDTFTrackCandidate * aTC, m_attachedTCs) {
+  for (VXDTFTrackCandidate * aTC : m_attachedTCs) {
     if (aTC->getCondition() == false) { continue; }
     if (isSameTC(aTC, newBossTC) == false) { aTC->setCondition(false); }
   }

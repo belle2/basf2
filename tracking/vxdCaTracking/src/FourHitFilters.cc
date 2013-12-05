@@ -15,7 +15,6 @@
 
 using namespace std;
 using namespace Belle2;
-using namespace Belle2::Tracking;
 
 /// TODO: evtly do a 'nan'-check for return values
 

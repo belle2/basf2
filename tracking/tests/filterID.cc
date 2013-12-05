@@ -20,11 +20,11 @@ namespace Belle2 {
   TEST_F(FilterIDTest, simpleTest)
   {
     // provides a usefull filterType
-    Belle2::Tracking::FilterID aFilterIDTranslator;
-    Belle2::Tracking::FilterID::filterTypes aFilterType = aFilterIDTranslator.getFilterType(Belle2::Tracking::FilterID::nameHelixFit);
-    EXPECT_EQ(Belle2::Tracking::FilterID::nameHelixFit, aFilterIDTranslator.getFilterString(aFilterType));
+    Belle2::FilterID aFilterIDTranslator;
+    Belle2::FilterID::filterTypes aFilterType = aFilterIDTranslator.getFilterType(Belle2::FilterID::nameHelixFit);
+    EXPECT_EQ(Belle2::FilterID::nameHelixFit, aFilterIDTranslator.getFilterString(aFilterType));
 
-    EXPECT_EQ(aFilterType, aFilterIDTranslator.getFilterType(Belle2::Tracking::FilterID::nameHelixFit));
+    EXPECT_EQ(aFilterType, aFilterIDTranslator.getFilterType(Belle2::FilterID::nameHelixFit));
 
   }
 }

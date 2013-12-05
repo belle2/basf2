@@ -13,19 +13,16 @@
 #include "../include/SectorFriends.h"
 #include "../include/VXDTFHit.h"
 #include "../include/VXDSegmentCell.h"
-#include "../include/FullSecID.h"
+#include "tracking/dataobjects/FullSecID.h"
 
 #include <framework/logging/Logger.h>
 
 using namespace std;
 using namespace Belle2;
-using namespace Tracking;
-
 
 void VXDSector::addFriend(int newSector)
 {
   m_friends.push_back(newSector);
-//   SectorFriends aFriend = SectorFriends(newSector, m_sectorID);
   m_friendMap.insert(make_pair(newSector, SectorFriends(newSector, m_sectorID)));
 } // should be called only at the beginning of a new run
 
@@ -33,9 +30,7 @@ void VXDSector::addCutoff(int cutOffType, unsigned int friendName, pair<double, 
 {
   FriendMap::iterator mapIter = m_friendMap.find(friendName);
   if (mapIter == m_friendMap.end()) {
-    m_friends.push_back(friendName);
-//     SectorFriends aFriend = SectorFriends(friendName, m_sectorID);
-    m_friendMap.insert(make_pair(friendName, SectorFriends(friendName, m_sectorID)));
+    addFriend(friendName);
     mapIter = m_friendMap.find(friendName);
   }
   mapIter->second.addValuePair(cutOffType, values);

@@ -9,85 +9,84 @@
  **************************************************************************/
 
 #include "../include/SharedFunctions.h"
-#include <boost/foreach.hpp> // for getGlobalizedHiterrors
-#include <vxd/geometry/GeoCache.h> // for getGlobalizedHiterrors
-#include <vxd/geometry/SensorInfoBase.h> // for getGlobalizedHiterrors
-#include <vxd/dataobjects/VxdID.h> // for getGlobalizedHiterrors
-#include <framework/logging/Logger.h> // for B2WARNING
+#include <vxd/geometry/GeoCache.h> // for getGlobalizedHiterrors, getHitErrors
+#include <vxd/geometry/SensorInfoBase.h> // for getGlobalizedHiterrors, getHitErrors
+#include <vxd/dataobjects/VxdID.h> // for getGlobalizedHiterrors, VxdID
+#include <framework/logging/Logger.h> // for B2DEBUG
 
 using namespace std;
-using namespace Belle2;
-using namespace Belle2::Tracking;
+// using namespace Belle2;
 
-vector< vector< pair<double, double> > > Tracking::getGlobalizedHitErrors()
-{
+namespace Belle2 {
+  vector< vector< pair<double, double> > > getGlobalizedHitErrors()
+  {
 
-  vector< vector< pair<double, double> > > errorContainer;
+    vector< vector< pair<double, double> > > errorContainer;
 
-  VXD::GeoCache& aGeometry = VXD::GeoCache::getInstance();
-  set< VxdID > layers = aGeometry.getLayers(); // SensorInfoBase::SensorType sensortype=SensorInfoBase::VXD
-  BOOST_FOREACH(VxdID layer, layers) {
-    vector< pair<double, double> > layerErrors;
-    const set<VxdID>& ladders = aGeometry.getLadders(layer);
-    BOOST_FOREACH(VxdID ladder, ladders) {
+    VXD::GeoCache& aGeometry = VXD::GeoCache::getInstance();
+    set< VxdID > layers = aGeometry.getLayers(); // SensorInfoBase::SensorType sensortype=SensorInfoBase::VXD
+    for (VxdID layer : layers) {
+      vector< pair<double, double> > layerErrors;
+      const set<VxdID>& ladders = aGeometry.getLadders(layer);
+      for (VxdID ladder : ladders) {
+        const set<VxdID>& sensors = aGeometry.getSensors(ladder);
+
+        VxdID sensorID = *sensors.begin();
+
+        const VXD::SensorInfoBase& aSensorInfo = aGeometry.getSensorInfo(sensorID);
+
+        double sigmaU = aSensorInfo.getUPitch(0.); // error at center of sensor
+        TVector3 localError = TVector3(sigmaU, 0., 0.);
+        TVector3 globalError = aSensorInfo.vectorToGlobal(localError);
+
+        layerErrors.push_back(make_pair(globalError.X(), globalError.Y()));
+        B2DEBUG(175, " getGlobalizedHitErrors at layer " << layer << ", ladder " << ladder << ", sigmaX/Y/Z" << globalError.X() << "/" << globalError.Y() << "/" << globalError.Z() <<  " [unit cm?]")
+      }
+
+      errorContainer.push_back(layerErrors);
+    }
+
+    B2DEBUG(1, " getGlobalizedHitErrors, " << errorContainer.size() << " layers stored...")
+
+    return errorContainer;
+  }
+
+  vector< pair<double, double> > getHitErrors()
+  {
+
+    vector< pair<double, double> > errorContainer;
+
+    VXD::GeoCache& aGeometry = VXD::GeoCache::getInstance();
+    set< VxdID > layers = aGeometry.getLayers(); // SensorInfoBase::SensorType sensortype=SensorInfoBase::VXD
+    for (VxdID layer : layers) { // only one sensor of each layer is enough. taking first sensor of first ladder of each layer
+      const set<VxdID>& ladders = aGeometry.getLadders(layer);
+      VxdID ladder = *ladders.begin();
       const set<VxdID>& sensors = aGeometry.getSensors(ladder);
-
-      VxdID sensorID = *sensors.begin();
-
-      const VXD::SensorInfoBase& aSensorInfo = aGeometry.getSensorInfo(sensorID);
+      VxdID sensor = *sensors.begin();
+      const VXD::SensorInfoBase& aSensorInfo = aGeometry.getSensorInfo(sensor);
 
       double sigmaU = aSensorInfo.getUPitch(0.); // error at center of sensor
-      TVector3 localError = TVector3(sigmaU, 0., 0.);
-      TVector3 globalError = aSensorInfo.vectorToGlobal(localError);
-
-      layerErrors.push_back(make_pair(globalError.X(), globalError.Y()));
-      B2DEBUG(5, " Tracking::getGlobalizedHitErrors at layer " << layer << ", ladder " << ladder << ", sigmaX/Y/Z" << globalError.X() << "/" << globalError.Y() << "/" << globalError.Z() <<  " [unit cm?]")
+      double sigmaV = aSensorInfo.getVPitch(0.); // error at center of sensor
+      errorContainer.push_back(make_pair(sigmaU, sigmaV));
+      B2DEBUG(5, " getHitErrors at layer " << layer << ", sigmaU/V" << sigmaU << "/" << sigmaV << " [unit cm?]")
     }
 
-    errorContainer.push_back(layerErrors);
+    B2DEBUG(1, " getHitErrors, " << errorContainer.size() << " layers stored...")
+    return errorContainer;
   }
 
-  B2DEBUG(1, " Tracking::getGlobalizedHitErrors, " << errorContainer.size() << " layers stored...")
 
-  return errorContainer;
-}
-
-vector< pair<double, double> > Tracking::getHitErrors()
-{
-
-  vector< pair<double, double> > errorContainer;
-
-  VXD::GeoCache& aGeometry = VXD::GeoCache::getInstance();
-  set< VxdID > layers = aGeometry.getLayers(); // SensorInfoBase::SensorType sensortype=SensorInfoBase::VXD
-  BOOST_FOREACH(VxdID layer, layers) { // only one sensor of each layer is enough. taking first sensor of first ladder of each layer
-    const set<VxdID>& ladders = aGeometry.getLadders(layer);
-    VxdID ladder = *ladders.begin();
-    const set<VxdID>& sensors = aGeometry.getSensors(ladder);
-    VxdID sensor = *sensors.begin();
-    const VXD::SensorInfoBase& aSensorInfo = aGeometry.getSensorInfo(sensor);
-
-    double sigmaU = aSensorInfo.getUPitch(0.); // error at center of sensor
-    double sigmaV = aSensorInfo.getVPitch(0.); // error at center of sensor
-    errorContainer.push_back(make_pair(sigmaU, sigmaV));
-    B2DEBUG(5, " Tracking::getHitErrors at layer " << layer << ", sigmaU/V" << sigmaU << "/" << sigmaV << " [unit cm?]")
-  }
-
-  B2DEBUG(1, " Tracking::getHitErrors, " << errorContainer.size() << " layers stored...")
-  return errorContainer;
-}
-
-
-void printMyMatrix(TMatrixD& aMatrix, std::stringstream& ss)
-{
-  //      std::stringstream printOut;
-  for (int nRow = 0; nRow < aMatrix.GetNrows(); nRow++) {
-    for (int nCol = 0; nCol < aMatrix.GetNcols(); nCol++) {
-      ss << aMatrix(nRow, nCol) << '\t';
+  void printMyMatrix(TMatrixD& aMatrix, std::stringstream& ss)
+  {
+    //      std::stringstream printOut;
+    for (int nRow = 0; nRow < aMatrix.GetNrows(); nRow++) {
+      for (int nCol = 0; nCol < aMatrix.GetNcols(); nCol++) {
+        ss << aMatrix(nRow, nCol) << '\t';
+      }
+      ss << std::endl;
     }
-    ss << std::endl;
+    //      return printOut;
   }
-  //      return printOut;
-}
 
 // void printMyMatrix(Eigen::MatrixXd& aMatrix, std::stringstream& ss) {
 //      std::stringstream printOut;
@@ -99,3 +98,4 @@ void printMyMatrix(TMatrixD& aMatrix, std::stringstream& ss)
 //  }
 //      return printOut;
 // }
+}

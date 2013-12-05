@@ -10,8 +10,10 @@ from time import time
 numEvents = 100
 initialValue = 1
 
-# secSetup = ['evtNormSecHIGH_SVD', 'evtNormSecMED_SVD', 'evtNormSecLOW_SVD']
-secSetup = ['evtNormSecHIGH_VXD', 'evtNormSecMED_VXD', 'evtNormSecLOW_VXD']
+secSetup = ['sectorList_evtNormSecHIGH_SVD', 'sectorList_evtNormSecMED_SVD',
+            'sectorList_evtNormSecLOW_SVD']
+
+# secSetup = ['sectorList_evtNormSecHIGH_VXD', 'sectorList_evtNormSecMED_VXD', 'sectorList_evtNormSecLOW_VXD']
 # WARNING if you want to use SVD only, please uncomment secSetup ending with SVD, then comment the VXD-version - and don't forget to set the clusters for the detector type you want in the mcTrackFinder down below!
 
 print 'running {events:} events, Seed {theSeed:} - evtGen No BG'.format(events=numEvents,
@@ -54,6 +56,7 @@ vxdtf = register_module('VXDTF')
 vxdtf.logging.log_level = LogLevel.DEBUG
 vxdtf.logging.debug_level = 1
 param_vxdtf = {'sectorSetup': secSetup}
+# , 'calcQIType': 'kalman'
 vxdtf.param(param_vxdtf)
 
 mctrackfinder = register_module('MCTrackFinder')
@@ -62,7 +65,7 @@ mctrackfinder.logging.log_level = LogLevel.INFO
 param_mctrackfinder = {
     'UseCDCHits': 0,
     'UseSVDHits': 1,
-    'UsePXDHits': 1,
+    'UsePXDHits': 0,
     'MinimalNDF': 6,
     'WhichParticles': ['primary'],
     'GFTrackCandidatesColName': 'mcTracks',

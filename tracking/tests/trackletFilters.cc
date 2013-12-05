@@ -27,7 +27,6 @@
 #include <Eigen/Dense>
 
 using namespace std;
-using namespace Belle2::Tracking;
 
 namespace Belle2 {
 

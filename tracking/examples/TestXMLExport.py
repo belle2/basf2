@@ -38,13 +38,13 @@ gearbox = register_module('Gearbox')
 # use simple testbeam geometry
 gearbox.param('fileName', 'testbeam/vxd/VXD.xml')
 
-geometry = register_module('Geometry')
+# geometry = register_module('Geometry')
 # only the tracking detectors will be simulated. Makes this example much faster
-geometry.param('Components', ['MagneticField', 'TB'])
+# geometry.param('Components', ['MagneticField', 'TB'])
 
 exportXML = register_module('ExportSectorMap')
 exportXML.logging.log_level = LogLevel.DEBUG
-exportXML.logging.debug_level = 111
+exportXML.logging.debug_level = 1
 exportXML.param('detectorType', detectType)
 exportXML.param('sectorSetup', secSetup)
 

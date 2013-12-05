@@ -10,9 +10,9 @@
 
 #include "tracking/modules/VXDTFHelperTools/TestMapModule.h"
 #include "tracking/vxdCaTracking/LittleHelper.h"
-#include "tracking/vxdCaTracking/FullSecID.h"
+#include "tracking/dataobjects/FullSecID.h"
 #include <framework/logging/Logger.h>
-#include <boost/foreach.hpp>
+// #include <boost/foreach.hpp>
 #include <algorithm>
 // #include <functional>
 // #include <utility>
@@ -87,7 +87,7 @@ void TestMapModule::event()
   }
 
   boostClock::time_point beginEvent = boostClock::now();
-  BOOST_FOREACH(int sectorValue, accessVariables) {
+  for (int sectorValue : accessVariables) {
 //    const vector<unsigned int>& friends = m_testMap.find(m_sectorAdresses[sectorValue])->second.getFriends();
     unsigned int secID = m_testMap.find(m_sectorAdresses[sectorValue])->second.getSecID();
     ++secID;
@@ -96,7 +96,7 @@ void TestMapModule::event()
   m_eventMapStuff += boost::chrono::duration_cast<boostNsec>(stopTimer - beginEvent);
 
   /*boostClock::time_point */beginEvent = boostClock::now();
-  BOOST_FOREACH(int sectorValue, accessVariables) {
+  for (int sectorValue : accessVariables) {
 //    const vector<unsigned int>& friends = m_testFlatMap.find(m_sectorAdresses[sectorValue])->second.getFriends();
     unsigned int secID = m_testFlatMap.find(m_sectorAdresses[sectorValue])->second.getSecID();
     ++secID;
@@ -105,7 +105,7 @@ void TestMapModule::event()
   m_eventFlatMapStuff += boost::chrono::duration_cast<boostNsec>(stopTimer - beginEvent);
 
   /*boostClock::time_point */beginEvent = boostClock::now();
-  BOOST_FOREACH(int sectorValue, accessVariables) {
+  for (int sectorValue : accessVariables) {
     unsigned int secID = m_testUnorderedMap.find(m_sectorAdresses[sectorValue])->second.getSecID();
     ++secID;
   }
@@ -137,7 +137,7 @@ void TestMapModule::FillMaps()
 
   int numSectors = m_sectorAdresses.size();
   vector<VXDSector> sectors, seccopy;
-  BOOST_FOREACH(unsigned int fullSecID, m_sectorAdresses) { // produce sectors
+  for (unsigned int fullSecID : m_sectorAdresses) { // produce sectors
     VXDSector aSector = VXDSector(fullSecID);
     for (int i = 0; i < m_PARAMnumFriends; ++i) {
       aSector.addFriend(littleHelperBox.getRandomIntegerUniform(0, numSectors));
@@ -184,7 +184,7 @@ void TestMapModule::FillMaps()
   LittleHelper littleHelperBox = LittleHelper();
 
   int numSectors = m_sectorAdresses.size();
-  BOOST_FOREACH(unsigned int fullSecID, m_sectorAdresses) {
+  for(unsigned int fullSecID : m_sectorAdresses) {
 
     VXDSector aSector = VXDSector(fullSecID);
     for (int i = 0; i < m_PARAMnumFriends; ++i) {

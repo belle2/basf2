@@ -8,8 +8,10 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../include/ClusterInfo.h"
+#include <tracking/dataobjects/SecMapVector.h>
 
 using namespace std;
 using namespace Belle2;
 
+
+ClassImp(SecMapVector);

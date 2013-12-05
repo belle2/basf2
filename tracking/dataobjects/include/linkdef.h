@@ -29,7 +29,17 @@
 #pragma link C++ class vector < pair < unsigned int, vector < pair <unsigned int, pair < double, double > > > > >+;
 #pragma link C++ class pair < unsigned int, vector < pair < unsigned int, vector < pair <unsigned int, pair < double, double > > > > > >+;
 #pragma link C++ class vector < pair < unsigned int, vector < pair < unsigned int, vector < pair <unsigned int, pair < double, double > > > > > > >+;
-
+#pragma link C++ class list < double >+;
+#pragma link C++ class pair <unsigned int, list < double > >+;
+#pragma link C++ class vector < pair <unsigned int, list < double > > >+;
+#pragma link C++ class pair < unsigned int, vector < pair <unsigned int, list < double > > > >+;
+#pragma link C++ class vector < pair < unsigned int, vector < pair <unsigned int, list < double > > > > >+;
+#pragma link C++ class pair < unsigned int, vector < pair < unsigned int, vector < pair <unsigned int, list < double > > > > > >+;
+#pragma link C++ class vector < pair < unsigned int, vector < pair < unsigned int, vector < pair <unsigned int, list < double > > > > > > >+;
+#pragma link C++ class Belle2::VXDTFRawSecMap+;
+#pragma link C++ class pair <string, Belle2::VXDTFRawSecMap >+;
+#pragma link C++ class vector < pair <string, Belle2::VXDTFRawSecMap > >+;
+#pragma link C++ class Belle2::SecMapVector+;
 #pragma link C++ class Belle2::ROIid;
 #pragma link C++ class Belle2::ROIpayload;
 #pragma link C++ class Belle2::PXDIntercept;

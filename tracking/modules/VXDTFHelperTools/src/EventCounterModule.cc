@@ -9,15 +9,7 @@
  **************************************************************************/
 
 #include "tracking/modules/VXDTFHelperTools/EventCounterModule.h"
-// #include <framework/dataobjects/EventMetaData.h>
-// #include <framework/datastore/StoreArray.h>
-// #include <framework/gearbox/GearDir.h> // braucht man zum Auslesen von xml-files
-/*
-#include <TVector3.h>
-#include <vxd/geometry/GeoCache.h>
-#include <vxd/geometry/SensorInfoBase.h>
-#include <vxd/dataobjects/VxdID.h>
-#include <set>*/
+#include "tracking/modules/VXDTF/VXDTFModule.h"
 
 
 using namespace std;

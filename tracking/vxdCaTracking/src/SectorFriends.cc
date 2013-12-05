@@ -9,14 +9,13 @@
 **************************************************************************/
 
 #include "../include/SectorFriends.h"
-#include "../include/FullSecID.h"
+#include "tracking/dataobjects/FullSecID.h"
 #include <iostream>
 #include <boost/foreach.hpp>
 #include <framework/logging/Logger.h>
 
 using namespace std;
 using namespace Belle2;
-using namespace Belle2::Tracking;
 
 
 void SectorFriends::addValuePair(int aFilter, pair<double, double> values)

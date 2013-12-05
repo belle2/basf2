@@ -9,18 +9,16 @@
  **************************************************************************/
 
 #include "../include/VXDTFHit.h"
-#include "../include/FullSecID.h"
+#include "tracking/dataobjects/FullSecID.h"
 #include <framework/gearbox/Const.h>
 #include "../include/ClusterInfo.h"
 #include <framework/logging/Logger.h>
 
 using namespace std;
 using namespace Belle2;
-using namespace Belle2::Tracking;
-
 
 /** operator overload **/
-bool Belle2::Tracking::VXDTFHit::operator==(const VXDTFHit& b) const
+bool Belle2::VXDTFHit::operator==(const VXDTFHit& b) const
 {
   B2FATAL("somebody is using the '=='-operator of VXDTFHit, although it does no valid comparison!");
   if (getVxdID() != b.getVxdID()) { return false; }   /// ensures that hits are from the same sensor

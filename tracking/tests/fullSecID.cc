@@ -1,13 +1,12 @@
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
-#include <tracking/vxdCaTracking/FullSecID.h>
+#include <tracking/dataobjects/FullSecID.h>
 #include <iostream>
 // #include <TMatrixF.h>
 // #include <RKTrackRep.h>
 #include <gtest/gtest.h>
 
 using namespace std;
-using namespace Belle2::Tracking;
 
 namespace Belle2 {
 #define EXPECT_FATAL(x) EXPECT_EXIT(x,::testing::KilledBySignal(SIGABRT),"");
@@ -76,5 +75,23 @@ namespace Belle2 {
     EXPECT_EQ(aFullSecID.getFullSecID(), aThirdFullSecID.getFullSecID());
 
     EXPECT_EQ(aSecIDString.str(), aThirdFullSecID.getFullSecString());
+
+    // now we are using the third constructor again using an encoded short fullSecID (string, used by filterCalculator) as input:
+    stringstream aSecIDString2;
+    aSecIDString2 << aFullSecID.getLayerID() << "_" << int(aFullSecID.getVxdID()) << "_" << aFullSecID.getSecID();
+
+    FullSecID aFourthFullSecID = FullSecID(aSecIDString2.str());
+
+    EXPECT_EQ(4, aFourthFullSecID.getLayerID());
+
+    EXPECT_FALSE(aFourthFullSecID.getSubLayerID());
+
+    EXPECT_EQ(vxdID, aFourthFullSecID.getVxdID());
+
+    EXPECT_EQ(vxdIDInt, aFourthFullSecID.getUniID());
+
+    EXPECT_EQ(FullSecID(vxdID, false, sectorID).getSecID(), aFourthFullSecID.getSecID());
+
+    EXPECT_NE(aSecIDString2.str(), aFourthFullSecID.getFullSecString()); // they should not be the same any more...
   }
 }  // namespace

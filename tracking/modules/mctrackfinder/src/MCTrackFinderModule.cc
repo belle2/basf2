@@ -82,7 +82,7 @@ MCTrackFinderModule::MCTrackFinderModule() : Module()
   addParam("Smearing", m_smearing, "Smearing of MCMomentum/MCVertex prior to storing it in genfit::TrackCandidate (in %). A negative value will switch off smearing. This is also the default.", -1.0);
   addParam("SmearingCov", m_smearingCov, "Covariance matrix used to smear the true pos and mom before passed to track candidate. This matrix will also passed to Genfit as the initial covarance matrix. If any diagonal value is negative this feature will not be used. OFF DIAGNOLA ELEMENTS DO NOT HAVE AN EFFECT AT THE MOMENT", vector<double>(36, -1.0));
   // names of output containers
-  addParam("genfit::TrackCandidatesColName", m_gfTrackCandsColName, "Name of collection holding the genfit::TrackCandidates (output)", string(""));
+  addParam("GFTrackCandidatesColName", m_gfTrackCandsColName, "Name of collection holding the genfit::TrackCandidates (output)", string(""));
 
   addParam("TrueHitMustExist", m_enforceTrueHit, "If set true only cluster hits that have a relation to a TrueHit will be included in the track candidate", false);
 }

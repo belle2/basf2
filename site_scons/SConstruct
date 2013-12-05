@@ -64,7 +64,7 @@ global_env = Environment(ENV = os.environ,
                          SHLINK='g++',
                          CCFLAGS = ['-Wall', '-I$EXTINCDIR', '-I' + sysconfig.get_python_inc(), '-std=c++11'],
                          CPPDEFINES = {'_PACKAGE_': '\\"$PACKAGE\\"'},
-                         CPPPATH = ['include', os.path.join('include', 'genfit')],
+                         CPPPATH = ['include'],
                          LIBPATH = ['$LIBDIR', '$EXTLIBDIR', os.path.join(os.environ['ROOTSYS'], 'lib')],
                          DATAOBJECT_LIBS = [],
                          TOOLS_LIBS = {},
@@ -76,7 +76,6 @@ global_env = Environment(ENV = os.environ,
 genfit1_include = '-I' + os.path.join(global_env['EXTINCDIR'], 'genfit')
 if genfit1_include in global_env['CCFLAGS']:
     global_env['CCFLAGS'].remove(genfit1_include)
-global_env.Prepend(CCFLAGS = '-I' + os.path.join('include', 'genfit'))
 global_env.Prepend(CCFLAGS = '-I' + 'include')
 
 # recalculate MD5 sums only if the time stamp differs

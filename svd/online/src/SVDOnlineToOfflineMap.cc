@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include "svd/online/SVDOnlineToOfflineMap.h"
-#include "framework/logging/Logger.h"
 #include <boost/foreach.hpp>
 #include <iostream>
 

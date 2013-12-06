@@ -13,8 +13,8 @@
 
 #include <boost/property_tree/xml_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
+#include "framework/logging/Logger.h"
 
-#include "svd/dataobjects/SVDDigit.h"
 #include "svd/dataobjects/SVDDigit.h"
 
 #include <string>
@@ -40,12 +40,14 @@ namespace Belle2 {
      * @param FADC is FADC number from the SVDRawCopper data.
      * @param APV25 is the APV25 number from the SVDRawCopper data.
      * @param channel is the APV25 channel number from the SVDRawCopper data.
-     * @return a pointer to the new SVDDigit owned by the caller whose Time,
-     * Position and Charge=0
+     * @return a pointer to the new SVDDigit owned by the caller whose
+     * Position is 0
      */
     inline SVDDigit* NewDigit(const unsigned char FADC,
                               const unsigned char APV25,
-                              const unsigned char channel);
+                              const unsigned char channel,
+                              const unsigned char charge,
+                              const unsigned char time);
 
 
   private:
@@ -121,9 +123,34 @@ namespace Belle2 {
   inline SVDDigit*
   SVDOnlineToOfflineMap::NewDigit(const unsigned char FADC,
                                   const unsigned char APV25,
-                                  const unsigned char channel)
+                                  const unsigned char channel,
+                                  const unsigned char charge = 0,
+                                  const unsigned char time = 0)
   {
-    // Put some control here
+
+    if (FADC >= m_VxdID.size()) {
+      B2WARNING(" FADC #" <<  FADC << " not in the SVD On-line to Off-line map "
+                << "whose present lenght is: " << m_chipIsInTheDAQ.size());
+      return NULL;
+    }
+
+    if (APV25 >= m_VxdID [FADC].size()) {
+      B2WARNING(" FADC #" <<  FADC << " and APV25 # " << APV25 << " not in the SVD On-line to Off-line map "
+                << "whose present lenght is: " << m_VxdID[FADC].size());
+      return NULL;
+    }
+
+    if (! m_chipIsInTheDAQ[ FADC ] & (1 << APV25)) {
+      B2WARNING(" FADC #" <<  FADC << " and APV25 # " << APV25 << " not initialized in the SVD On-line to Off-line map");
+      return NULL;
+    }
+
+    if (channel > 127) {
+      B2WARNING(" channel #" <<  channel << " is not supposed to exixst");
+      return NULL;
+    }
+
+
     return new SVDDigit(m_VxdID [FADC][APV25] ,
                         (m_isOnUside [FADC] & (1 << APV25)) != 0 ,
                         m_channel0Strip [FADC][APV25] +
@@ -131,7 +158,7 @@ namespace Belle2 {
                         * (
                           (m_parallel[FADC] & (1 << APV25)) ?
                           1 : -1),
-                        0., 0., 0.);
+                        0., charge, time);
   }
 
 }

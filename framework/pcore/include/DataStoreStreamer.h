@@ -15,12 +15,14 @@
 #include <sys/types.h>
 
 #include <vector>
+#include <queue>
 #include <string>
 
 #include <framework/datastore/DataStore.h>
 #include <framework/pcore/EvtMessage.h>
 
 #define MAXTHREADS 16
+#define MAXQUEUEDEPTH 64
 
 namespace Belle2 {
   class MsgHandler;
@@ -64,15 +66,15 @@ namespace Belle2 {
     // Pipelined destreaming of EvtMessage using thread
 
     /** Queue EvtMessage for destreaming
-     *  @param msg        EvtMessage to be restored.
+     *  @param msg        Event buffer to be restored.
      */
-    int queueEvtMessage(EvtMessage* msg);
+    int queueEvtMessage(char* msg);
 
     /** Decode EvtMessage and store objects in temporary buffer
      *  @param id         Thread id
      *  @param msg        EvtMessage to be restored
      */
-    void* decodeEvtMessage(int id, EvtMessage* msg);
+    void* decodeEvtMessage(int id);
 
     /** Restore objects in DataStore from temporary buffer
      */
@@ -81,7 +83,9 @@ namespace Belle2 {
     /** Functions to retrieve info
      */
     void setMaxThreads(int);
-    int getNumFreeThreads();
+    int  getMaxThreads();
+    void setDecoderStatus(int);
+    int  getDecoderStatus();
 
   private:
     /** bits to store in TObject. */
@@ -114,33 +118,32 @@ namespace Belle2 {
     /** thread pointer
      */
     pthread_t m_pt[MAXTHREADS];
+    int m_id[MAXTHREADS];
     int m_threadin;
     int m_threadout;
-    int m_done[MAXTHREADS];
-    int m_navail;
+    int m_decstat[MAXTHREADS];
+    //    char* m_evtbuf[MAXTHREADS];
+    std::queue<char*> m_evtbuf[MAXTHREADS];
 
-    /** Number of objects arrays in temporary buffer
+    /** Object arrays in temporary buffer
      */
-    int m_nobjs[MAXTHREADS];
-    int m_narrays[MAXTHREADS];
-    DataStore::EDurability m_durability[MAXTHREADS];
 
-    /** Temporary object arrays
-     */
-    std::vector<TObject*> m_objlist[MAXTHREADS];
-    std::vector<std::string> m_namelist[MAXTHREADS];
+    //    int m_nobjs[MAXTHREADS];
+    //    int m_narrays[MAXTHREADS];
+    //    DataStore::EDurability m_durability[MAXTHREADS];
+    //    std::vector<TObject*> m_objlist[MAXTHREADS];
+    //    std::vector<std::string> m_namelist[MAXTHREADS];
 
+    std::queue<int> m_nobjs;
+    std::queue<int> m_narrays;
+    std::queue<DataStore::EDurability> m_durability;
+    std::queue<std::vector<TObject*>> m_objlist;
+    std::queue<std::vector<std::string>> m_namelist;
   };
 
   // Function to hook DataStoreStreamer::decodeEvtMessage to pthread
 
   //  void* RunDecodeEvtMessage ( void* );
-
-  // Struct to pass argument to thread
-  struct DecoderArgs {
-    int id;
-    EvtMessage* msg;
-  };
 
 
 } // namespace Belle2

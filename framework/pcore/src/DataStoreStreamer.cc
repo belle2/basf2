@@ -19,14 +19,15 @@
 using namespace std;
 using namespace Belle2;
 
-static struct DecoderArgs decoder_arg[MAXTHREADS];
+// Thread related
+
+static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+static pthread_mutex_t mutex_thread[MAXTHREADS];
 
 void* RunDecodeEvtMessage(void* targ)
 {
-  int id = ((struct DecoderArgs*)targ)->id;
-  EvtMessage* msg = ((struct DecoderArgs*)targ)->msg;
-  //  printf ( "DecodeEvtMessage : decoding started for id %d, size = %d\n", id, msg->size() );
-  DataStoreStreamer::Instance().decodeEvtMessage(id, msg);
+  int* id = (int*)targ;
+  DataStoreStreamer::Instance().decodeEvtMessage(*id);
   return NULL;
 }
 
@@ -45,11 +46,24 @@ DataStoreStreamer::DataStoreStreamer(int complevel, int maxthread) : m_compressi
   if (m_maxthread > MAXTHREADS) {
     B2FATAL("DataStoreStreamer : Too many threads " << m_maxthread);
   }
-  m_navail = m_maxthread;
-  for (int i = 0; i < MAXTHREADS; i++) m_done[i] = 1;
-
   m_msghandler = new MsgHandler(m_compressionLevel);
 
+  if (maxthread > 0) {
+    // Run decoder threads as sustainable detached threads
+    pthread_attr_t thread_attr;
+    pthread_attr_init(&thread_attr);
+    //    pthread_attr_setschedpolicy(&thread_attr , SCHED_FIFO);
+    //    pthread_attr_setdetachstate(&thread_attr , PTHREAD_CREATE_DETACHED);
+    for (int i = 0; i < maxthread; i++) {
+      m_decstat[i] = 0;
+      m_pt[i] = (pthread_t)0;
+      m_id[i] = i;
+      mutex_thread[i] = PTHREAD_MUTEX_INITIALIZER;
+      //      args.evtbuf = m_evtbuf[i];
+      pthread_create(&m_pt[i], NULL, RunDecodeEvtMessage, (void*)&m_id[i]);
+    }
+    pthread_attr_destroy(&thread_attr);
+  }
 }
 
 // Destructor
@@ -139,6 +153,8 @@ int DataStoreStreamer::restoreDataStore(EvtMessage* msg)
     int nobjs = (msg->header())->reserved[1];
     int narrays = (msg->header())->reserved[2];
 
+    //    if ( m_initStatus != 0 ) return 0;   // Debugging only
+
     // Restore objects in DataStore
     for (int i = 0; i < nobjs + narrays; i++) {
       bool array = (dynamic_cast<TClonesArray*>(objlist.at(i)) != 0);
@@ -154,9 +170,11 @@ int DataStoreStreamer::restoreDataStore(EvtMessage* msg)
         //only restore object if it is valid for current event
         bool ptrIsNULL = obj->TestBit(c_IsNull);
         if (!ptrIsNULL) {
+          //  if (!ptrIsNULL && !array) {
           DataStore::Instance().createObject(obj, true,
                                              StoreAccessorBase(namelist.at(i), durability, cl, array));
-          B2DEBUG(100, "restoreDS: " << (array ? "Array" : "Object") << ": " << namelist.at(i) << " stored");
+          //          B2DEBUG(100, "restoreDS: " << (array ? "Array" : "Object") << ": " << namelist.at(i) << " stored");
+          //    B2INFO("restoreDS: " << (array ? "Array" : "Object") << ": " << namelist.at(i) << " stored");
 
           //reset bits of object in DataStore (are checked to be false when streaming the object)
           obj->SetBit(c_IsTransient, false);
@@ -170,6 +188,7 @@ int DataStoreStreamer::restoreDataStore(EvtMessage* msg)
         B2ERROR("restoreDS: " << (array ? "Array" : "Object") << ": " << namelist.at(i) << " is NULL!");
       }
     }
+
   }
   // Return with normal exit status
   if (m_initStatus == 0) m_initStatus = 1;
@@ -178,83 +197,156 @@ int DataStoreStreamer::restoreDataStore(EvtMessage* msg)
 
 // Parallel EvtMessage Destreamer implemented using thread
 
-int DataStoreStreamer::queueEvtMessage(EvtMessage* msg)
+int DataStoreStreamer::queueEvtMessage(char* evtbuf)
 {
-  // If EoF, set EoD in EventMetaData and return with status 1
-  if (msg->type() == MSG_TERMINATE) {
-    B2INFO("Got termination message. Exitting...");
-    //msg doesn't really contain data, set EventMetaData to something equivalent
-    StoreObjPtr<EventMetaData> eventMetaData;
-    if (m_initStatus == 0)
-      eventMetaData.registerAsPersistent();
-    eventMetaData.create();
-    eventMetaData->setEndOfData();
-    return 1;
+  // EOF case
+  if (evtbuf == NULL) {
+    for (int i = 0; i < m_maxthread; i++) {
+      while (m_evtbuf[i].size() >= MAXQUEUEDEPTH) usleep(10);
+      m_evtbuf[m_threadin].push(evtbuf);
+    }
+    return 0;
   }
-  // Wait for previous thread to complete if engaged.
-  //  pthread_join ( m_pt[m_threadin], NULL );
-  while (m_done[m_threadin] != 1) usleep(2);
-  m_done[m_threadin] = 0;
-  // Start decoding EvtMessage in a thread
-  decoder_arg[m_threadin].id = m_threadin;
-  decoder_arg[m_threadin].msg = msg;
-  pthread_create(&m_pt[m_threadin], NULL, RunDecodeEvtMessage, (void*)&decoder_arg[m_threadin]);
-  // Set next thread ID
-  m_navail--;
+
+  // Put the event buffer in the queue of current thread
+  struct timeval t_0, t_1;
+  gettimeofday(&t_0, NULL);
+
+  int nloop = 0;
+  for (;;) {
+    if (m_evtbuf[m_threadin].size() < MAXQUEUEDEPTH) {
+      m_evtbuf[m_threadin].push(evtbuf);
+      break;
+    } else {
+      m_threadin++;
+      if (m_threadin >= m_maxthread) m_threadin = 0;
+    }
+    nloop++;
+    if (nloop == m_maxthread) {
+      usleep(20);
+      nloop = 0;
+    }
+  }
+  gettimeofday(&t_1, NULL);
+
+  // Statistics
+  int flagtime = (t_1.tv_sec * 1000000 + t_1.tv_usec) - (t_0.tv_sec * 1000000 + t_0.tv_usec);
+  //  printf ( "queueEvtMessage : thread %d wait took %d usec \n", m_threadin, flagtime );
+
+  // Preparation for next event
+  //  printf ( "queueEvtMessage : event queued in thread %d!\n", m_threadin );
+  m_decstat[m_threadin] = 1; // Event queued for decoding
   m_threadin++;
   if (m_threadin >= m_maxthread) m_threadin = 0;
-  //  printf ( "queueEvtMessage : event queued!\n" );
-  return 0;
+  return 1;
 }
 
-void* DataStoreStreamer::decodeEvtMessage(int id, EvtMessage* msg)
+void* DataStoreStreamer::decodeEvtMessage(int id)
 {
+  //  printf ( "decodeEvtMessge : started. Thread ID = %d\n", id );
   // Clear Message Handler
-  m_msghandler->clear();
+  //  m_msghandler->clear();
+  MsgHandler msghandler(m_compressionLevel);
 
-  // Decode EvtMessage
-  m_msghandler->decode_msg(msg, m_objlist[id], m_namelist[id]);
-  m_nobjs[id] = (msg->header())->reserved[1];
-  m_narrays[id] = (msg->header())->reserved[2];
-  m_durability[id] = (DataStore::EDurability)(msg->header())->reserved[0];
+  struct timeval t_0, t_1, t_2;
+  for (;;) {
+    gettimeofday(&t_0, NULL);
+    // Dequeue one event
+    int nloop = 0;
+    while (m_evtbuf[id].empty()) {
+      usleep(10);
+      nloop++;
+    }
+    gettimeofday(&t_1, NULL);
+    //    printf ( "Thread processing id=%d, wait %d times\n", id, nloop );
 
-  // End of thread processing, no synchronization in this function required.
+    // Pick up event buffer
+    char* evtbuf = m_evtbuf[id].front(); m_evtbuf[id].pop();
+    // In case of EOF
+    if (evtbuf == NULL) {
+      m_nobjs.push(-1);
+      return NULL;
+    }
 
-  // Delete msg
-  delete msg;
+    // Construct EvtMessage
+    EvtMessage* msg = new EvtMessage(evtbuf);
+
+    /* OLD implementation
+    msghandler.decode_msg(msg, m_objlist[id], m_namelist[id]);
+    m_nobjs[id] =  (msg->header())->reserved[1];
+    m_narrays[id] = (msg->header())->reserved[2];
+    m_durability[id] = (DataStore::EDurability)(msg->header())->reserved[0];
+    */
+
+    // Decode EvtMessage into Objects
+    vector<TObject*> objlist;
+    vector<string> namelist;
+    msghandler.decode_msg(msg, objlist, namelist);
+
+    // Queue them for the registration in DataStore
+    while (m_nobjs.size() >= MAXQUEUEDEPTH) usleep(10);
+    pthread_mutex_lock(&mutex);     // Lock queueing
+    m_objlist.push(objlist);
+    m_namelist.push(namelist);
+    m_nobjs.push((msg->header())->reserved[1]);
+    m_narrays.push((msg->header())->reserved[2]);
+    m_durability.push((DataStore::EDurability)(msg->header())->reserved[0]);
+    pthread_mutex_unlock(&mutex);    // Unlock queueing
+
+    // Preparation for next event
+    delete msg;
+    delete[] evtbuf;
+    m_decstat[id]  = 0; // Ready to read next event
+
+    gettimeofday(&t_2, NULL);
+    int gettime = (t_1.tv_sec * 1000000 + t_1.tv_usec) - (t_0.tv_sec * 1000000 + t_0.tv_usec);
+    int proctime = (t_2.tv_sec * 1000000 + t_2.tv_usec) - (t_1.tv_sec * 1000000 + t_1.tv_usec);
+    //    printf ( "Thread processing id=%d, done. took %d + %d = %d usec\n", id, gettime, proctime, gettime+proctime );
+  }
 
   return NULL;
 }
 
-
 int DataStoreStreamer::restoreDataStoreAsync()
 {
-  // Check for the completion of thread
-  pthread_join(m_pt[m_threadout], NULL);
+// Wait for the queue to become ready
+  while (m_nobjs.empty()) usleep(10);
 
   // Register decoded objects in DataStore
-  DataStore::EDurability durability = m_durability[m_threadout];
-  int nobjs = m_nobjs[m_threadout];
-  int narrays = m_narrays[m_threadout];
+
+  // Pick up event on the top and remove it from the queue
+  pthread_mutex_lock(&mutex);
+  int nobjs = m_nobjs.front(); m_nobjs.pop();
+  if (nobjs == -1) {
+    printf("restoreDataStore: EOF detected. exitting with status 0\n");
+    pthread_mutex_unlock(&mutex);
+    return 0;
+  }
+  int narrays = m_narrays.front(); m_narrays.pop();
+  DataStore::EDurability durability = m_durability.front(); m_durability.pop();
+  vector<TObject*> objlist = m_objlist.front(); m_objlist.pop();
+  vector<string> namelist = m_namelist.front(); m_namelist.pop();
+  pthread_mutex_unlock(&mutex);
 
   // Restore objects in DataStore
   for (int i = 0; i < nobjs + narrays; i++) {
-    bool array = (dynamic_cast<TClonesArray*>(m_objlist[m_threadout].at(i)) != 0);
-    if (m_objlist[m_threadout].at(i) != NULL) {
-      TObject* obj = m_objlist[m_threadout].at(i);
+    //    printf ( "restoring object %d = %s\n", i, namelist.at(i).c_str() );
+    bool array = (dynamic_cast<TClonesArray*>(objlist.at(i)) != 0);
+    if (objlist.at(i) != NULL) {
+      TObject* obj = objlist.at(i);
       const TClass* cl = obj->IsA();
       if (array)
         cl = static_cast<TClonesArray*>(obj)->GetClass();
       if (m_initStatus == 0) { //are we called by the module's initialize() function?
         bool transient = obj->TestBit(c_IsTransient);
-        DataStore::Instance().createEntry(m_namelist[m_threadout].at(i), durability, cl, array, transient, false);
+        DataStore::Instance().createEntry(namelist.at(i), durability, cl, array, transient, false);
       }
       //only restore object if it is valid for current event
       bool ptrIsNULL = obj->TestBit(c_IsNull);
       if (!ptrIsNULL) {
         DataStore::Instance().createObject(obj, true,
-                                           StoreAccessorBase(m_namelist[m_threadout].at(i), durability, cl, array));
-        B2DEBUG(100, "restoreDS: " << (array ? "Array" : "Object") << ": " << m_namelist[m_threadout].at(i) << " stored");
+                                           StoreAccessorBase(namelist.at(i), durability, cl, array));
+        B2DEBUG(100, "restoreDS: " << (array ? "Array" : "Object") << ": " << namelist.at(i) << " stored");
 
         //reset bits of object in DataStore (are checked to be false when streaming the object)
         obj->SetBit(c_IsTransient, false);
@@ -265,29 +357,35 @@ int DataStoreStreamer::restoreDataStoreAsync()
       }
     } else {
       //DataStore always has non-NULL content (wether they're available is a different matter)
-      B2ERROR("restoreDS: " << (array ? "Array" : "Object") << ": " << m_namelist[m_threadout].at(i) << " is NULL!");
+      B2ERROR("restoreDS: " << (array ? "Array" : "Object") << ": " << namelist.at(i) << " is NULL!");
     }
   }
 
-  // Preparation for Next thread
-  //   Clear vectors
-  m_objlist[m_threadout].erase(m_objlist[m_threadout].begin(), m_objlist[m_threadout].end());
-  m_namelist[m_threadout].erase(m_namelist[m_threadout].begin(), m_namelist[m_threadout].end());
-  m_done[m_threadout] = 1;
-  m_navail++;
-  m_threadout++;
-  if (m_threadout >= m_maxthread) m_threadout = 0;
-  return 0;
+  //  printf ( "Objects restored in DataStore\n" );
+
+  return 1;
 }
 
 void DataStoreStreamer::setMaxThreads(int maxthread)
 {
   m_maxthread = maxthread;
-  m_navail = maxthread;
 }
 
-int DataStoreStreamer::getNumFreeThreads()
+int DataStoreStreamer::getMaxThreads()
 {
-  return m_navail;
+  return m_maxthread;
 }
+
+int DataStoreStreamer::getDecoderStatus()
+{
+  //  printf ( "Decode thread %d = %d\n", m_threadin, m_done_decode[m_threadin] );
+  return (m_decstat[m_threadin]);
+}
+
+void DataStoreStreamer::setDecoderStatus(int val)
+{
+  //  printf ( "Decode thread %d = %d\n", m_threadin, m_done_decode[m_threadin] );
+  m_decstat[m_threadin] = val;
+}
+
 

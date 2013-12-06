@@ -215,7 +215,9 @@ int DataStoreStreamer::queueEvtMessage(char* evtbuf)
   int nloop = 0;
   for (;;) {
     if (m_evtbuf[m_threadin].size() < MAXQUEUEDEPTH) {
+      pthread_mutex_lock(&mutex_thread[m_threadin]);
       m_evtbuf[m_threadin].push(evtbuf);
+      pthread_mutex_unlock(&mutex_thread[m_threadin]);
       break;
     } else {
       m_threadin++;
@@ -261,7 +263,9 @@ void* DataStoreStreamer::decodeEvtMessage(int id)
     //    printf ( "Thread processing id=%d, wait %d times\n", id, nloop );
 
     // Pick up event buffer
+    pthread_mutex_lock(&mutex_thread[id]);
     char* evtbuf = m_evtbuf[id].front(); m_evtbuf[id].pop();
+    pthread_mutex_unlock(&mutex_thread[id]);
     // In case of EOF
     if (evtbuf == NULL) {
       m_nobjs.push(-1);

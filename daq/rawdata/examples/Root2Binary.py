@@ -28,24 +28,18 @@ input = register_module('RootInput')
 # input = register_module('SeqRootInput')
 # input.param('inputFileName', 'RootOutput1.root')
 
-# output
-output = register_module('PrintDataTemplate')
-
 # dump
-dump = register_module('RootOutput')
-dump.param('outputFileName', 'temp.root')
-
-# Histogram
-hist = register_module('HistoExercise1')
+#dump = register_module('PrintDataTemplate')
+dump = register_module('Root2Binary')
+dump.param('outputFileName', 'temp.dat')
 
 # Create main path
 main = create_path()
 
 # Add modules to main path
 main.add_module(input)
-main.add_module(output)
-# main.add_module(hist)
-# main.add_module(dump)
+#main.add_module(output)
+main.add_module(dump)
 
 # Process all events
 process(main)

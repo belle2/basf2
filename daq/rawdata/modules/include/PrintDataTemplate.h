@@ -87,6 +87,9 @@ namespace Belle2 {
 
     int m_ncpr;
 
+    //!
+    int m_print_cnt;
+
   };
 
 } // end namespace Belle2

@@ -165,16 +165,14 @@ void DeSerializerCOPPERModule::FillNewRawCOPPERHeader(RawCOPPER* raw_copper)
 
   // 3, Make 32bit event number from B2link FEE header
   unsigned int cur_ftsw_eve32 =  raw_copper->GetB2LFEE32bitEventNumber(cprblock);
-  //((m_ftsweve_upper16bit << 16) & 0xFFFF0000) | (cur_ftsw_eve16 & 0x0000FFFF);
+
 
 #ifdef DUMMY_EVENT_NUM
   cur_ftsw_eve32 = m_prev_ftsweve32 + 1;
 #endif
-
   rawhdr.SetEveNo(cur_ftsw_eve32);       // Temporarily use COPPER counter   //raw_copper->GetCOPPERCounter()
 
   // Set FTSW word
-
   rawhdr.SetFTSW2Words(raw_copper->GetB2LFEETtCtime(cprblock), raw_copper->GetB2LFEETtUtime(cprblock));
 
 #ifdef debug
@@ -197,12 +195,11 @@ void DeSerializerCOPPERModule::FillNewRawCOPPERHeader(RawCOPPER* raw_copper)
   rawhdr.SetOffset3rdFINESSE(raw_copper->GetOffset3rdFINESSE(cprblock) - raw_copper->GetBufferPos(cprblock));         // Fill 11th header word
   rawhdr.SetOffset4thFINESSE(raw_copper->GetOffset4thFINESSE(cprblock) - raw_copper->GetBufferPos(cprblock));         // Fill 12th header word
 
-  // Add node-info
+  // Set magic word
   rawhdr.SetMagicWordEntireHeader();
 
   // Add node-info
   rawhdr.AddNodeInfo(m_nodeid);   // Fill 13th header word
-
 
 #ifdef debug
   printf("2: i= %d : num entries %d : Tot words %d\n", 0 , raw_copper->GetNumEntries(), raw_copper->TotalBufNwords());
@@ -276,8 +273,6 @@ void DeSerializerCOPPERModule::FillNewRawCOPPERHeader(RawCOPPER* raw_copper)
 
 int* DeSerializerCOPPERModule::ReadOneEventFromCOPPERFIFO(const int entry, int* malloc_flag, int* m_size_word)
 {
-  // Get header size
-  const int COPPER_HEADER_TRAILER_NWORDS = 9;
 
   // prepare buffer
   *m_size_word = 0;

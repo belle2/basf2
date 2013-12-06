@@ -32,6 +32,7 @@ PrintDataTemplateModule::PrintDataTemplateModule() : Module()
   B2INFO("PrintDataTemplate: Constructor done.");
   m_ncpr = 0;
   m_nftsw = 0;
+  m_print_cnt = 0;
 }
 
 
@@ -63,18 +64,16 @@ void PrintDataTemplateModule::initialize()
 
 void PrintDataTemplateModule::PrintData(int* buf, int nwords)
 {
-  //  printf("\n%.8d : ", 0);
-  //  printf("%.8d : ", 0);
   for (int j = 0; j < nwords; j++) {
-    printf("0x%.8x ", buf[ j ]);
+    printf(" %.8x", buf[ j ]);
     if ((j + 1) % 10 == 0) {
-      //        printf("\n%.8d : ", j + 1);
+      //    if ((m_print_cnt + 1) % 10 == 0) {
       printf("\n");
-      //      break;
     }
+    m_print_cnt++;
   }
   printf("\n");
-  //  printf("\n");
+
   return;
 }
 
@@ -93,7 +92,8 @@ void PrintDataTemplateModule::PrintFTSWEvent(RawDataBlock* raw_datablock, int i)
   rawftsw.SetBuffer(buf, nwords, malloc_flag, num_event, num_nodes);
 
   int n = 0;
-  printf("%d %d %.8x\n",
+  printf("eve %d : %d %d %.8x\n",
+         rawftsw.GetEveNo(n),
          rawftsw.GetNwords(n),
          rawftsw.GetNwordsHeader(n),
          rawftsw.GetFTSWNodeID(n)
@@ -119,6 +119,7 @@ void PrintDataTemplateModule::PrintCOPPEREvent(RawCOPPER* raw_copper, int i)
   printf("******* Raw COPPER data block(including Detector Buffer)**********\n");
   PrintData(raw_copper->GetBuffer(i), raw_copper->GetBlockNwords(i));
 #endif
+
 
   //
   // Print data from each FINESSE
@@ -147,14 +148,18 @@ void PrintDataTemplateModule::PrintCOPPEREvent(RawCOPPER* raw_copper, int i)
 
 }
 
-
 void PrintDataTemplateModule::event()
 {
+
+
   B2INFO("PrintDataTemplate: event() started.");
   //
   // FTSW + COPPER can be combined in the array
   //
   StoreArray<RawDataBlock> raw_datablkarray;
+
+
+
   for (int i = 0; i < raw_datablkarray.getEntries(); i++) {
     for (int j = 0; j < raw_datablkarray[ i ]->GetNumEntries(); j++) {
       int* temp_buf = raw_datablkarray[ i ]->GetBuffer(j);
@@ -229,6 +234,7 @@ void PrintDataTemplateModule::event()
   StoreArray<RawKLM> raw_klmarray;
   StoreArray<RawECL> raw_eclarray;
 
+  //  printf("loop %d\n", n_basf2evt);
   n_basf2evt++;
 
 }

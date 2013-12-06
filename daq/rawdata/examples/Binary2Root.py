@@ -24,28 +24,26 @@ set_log_level(LogLevel.ERROR)
 # set_log_level(LogLevel.INFO)
 
 # input
-input = register_module('RootInput')
-# input = register_module('SeqRootInput')
-# input.param('inputFileName', 'RootOutput1.root')
+input = register_module('DeSerializerFILE')
+#input.param('inputFileName', 'cdc_10kHz_newFEEformat_131206.dat')
+input.param('inputFileName', 'RUN20131206170859.dat')
 
 # output
-output = register_module('PrintDataTemplate')
+#output = register_module('PrintDataTemplate')
+#output = register_module('Root2Binary')
 
 # dump
 dump = register_module('RootOutput')
 dump.param('outputFileName', 'temp.root')
 
-# Histogram
-hist = register_module('HistoExercise1')
 
 # Create main path
 main = create_path()
 
 # Add modules to main path
 main.add_module(input)
-main.add_module(output)
-# main.add_module(hist)
-# main.add_module(dump)
+#main.add_module(output)
+main.add_module(dump)
 
 # Process all events
 process(main)

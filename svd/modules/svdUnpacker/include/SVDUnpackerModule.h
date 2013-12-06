@@ -17,7 +17,8 @@
 
 #include <framework/datastore/StoreArray.h>
 #include <vxd/dataobjects/VxdID.h>
-#include <daq/dataobjects/RawSVD.h>
+//disappeared from the release:
+//#include <daq/dataobjects/RawSVD.h>
 #include <svd/dataobjects/SVDDigit.h>
 
 #include <svd/online/SVDOnlineToOfflineMap.h>

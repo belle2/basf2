@@ -30,10 +30,11 @@ using namespace std;
 
 namespace Belle2 {
 
-  /** execute this file typing "test_tracking" in the tracking/test */
+
+  /** command x should exit using B2FATAL. */
 #define EXPECT_FATAL(x) EXPECT_EXIT(x,::testing::KilledBySignal(SIGABRT),"");
 
-  /** Producing suitable input data for for the TrackletFilters-class */
+  /** Producing suitable input data for for the TrackletFilters-class, execute this file typing "test_tracking" */
   class TrackletFiltersTest : public ::testing::Test {
   protected:
   };

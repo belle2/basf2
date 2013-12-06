@@ -46,13 +46,18 @@ namespace Belle2 {
     /** Default constructor for the ROOT IO. */
     VXDTFRawSecMap():
       m_magneticFieldStrength(1.5),
+      m_lowPt(0.),
+      m_highPt(0.),
+      m_smallSampleThreshold(1),
+      m_minSampleThreshold(1),
+      m_smallStretchFactor(0.),
+      m_stretchFactor(0.),
       m_removeDeadSectorChains(true) {
       m_maxLayerLevelDifference.first = true;
       m_maxLayerLevelDifference.second = 2;
       m_rareSectorCombinations.first = false;
       m_rareSectorCombinations.second = 0.0;
     }
-
 
 
     bool operator<(const VXDTFRawSecMap& b)  const {
@@ -270,12 +275,12 @@ namespace Belle2 {
 
 
 
-    /** factor by which the values can be stretched when having a normal sample size */
+    /** factor by which the values can be stretched when having a normal sample size. The value will be increased(for max cutoffs)/decreased(for min cutoffs) by factor times the original value -> if factor == 0 -> no stretching */
     void setStretchFactor(double factor) { m_stretchFactor = factor; }
 
 
 
-    /** factor by which the values can be stretched when having a normal sample size */
+    /** factor by which the values can be stretched when having a normal sample size. The value will be increased(for max cutoffs)/decreased(for min cutoffs) by factor times the original value -> if factor == 0 -> no stretching */
     void setSmallStretchFactor(double factor) { m_smallStretchFactor = factor; }
 
 
@@ -285,7 +290,7 @@ namespace Belle2 {
 
 
 
-    /**< use this member if you want to steer whether rare sector-friend-combinations shall be filtered or not. first parameter is whether you want to filter these combinations or not, second is (if first parameter is true) the threshold for filter. 100% = 1. 1% = 0.01% ... */
+    /** use this member if you want to steer whether rare sector-friend-combinations shall be filtered or not. first parameter is whether you want to filter these combinations or not, second is (if first parameter is true) the threshold for filter. 100% = 1. 1% = 0.01% ... */
     void setRareSectorCombinations(bool checkRareness, double threshold) { m_rareSectorCombinations = std::make_pair(checkRareness, threshold); }
 
 
@@ -335,7 +340,7 @@ namespace Belle2 {
     double addExtraGain(double cutOff, double gain) {
       if (cutOff > 0.) { return cutOff + cutOff * gain; }
       return cutOff - cutOff * gain;
-    } /**< changes value (first parameter) by gain (second parameter) */
+    } /**< changes value (first parameter) by gain (second parameter). The value will be increased(for positive gain)/decreased(for negative gain) by gain times the original value */
 
 
 
@@ -382,8 +387,8 @@ namespace Belle2 {
     std::pair<double, double> m_smallCutoffQuantiles; /**< same as for 'm_cutoffQuantiles' but for sector-combinations with small sample size */
     double m_smallSampleThreshold; /**< defines threshold for big samples, if sampleSize is smaller than threshold, m_minSampleThresholds will be used leading to quantiles for smallCutoffSamples */
     double m_minSampleThreshold; /**< if sample size of current sector-combination is smaller than this value, it gets rejected */
-    double m_smallStretchFactor; /**< is a stretchFactor by which the value will be stretched if the value is from a small sample */
-    double m_stretchFactor; /**< is a stretchFactor by which the value will be stretched if the value is from a normal sample */
+    double m_smallStretchFactor; /**< is a stretchFactor by which the value will be stretched if the value is from a small sample. The value will be increased(for max cutoffs)/decreased(for min cutoffs) by m_smallStretchFactor times the original value -> if = 0 -> no stretching */
+    double m_stretchFactor; /**< is a stretchFactor by which the value will be stretched if the value is from a normal sample. The value will be increased(for max cutoffs)/decreased(for min cutoffs) by m_stretchFactor times the original value  -> if = 0 -> no stretching */
     std::pair<bool, double> m_rareSectorCombinations; /**< .first allows check for rare sectorCombinations if true, .second is the rareness-threshold (examples: 1. = 100%, 0.001 = 0.1%) if a sector-friend-combination occurs less than threshold value compared to total occurrence of current sector, it gets deleted*/
     std::pair<bool, int> m_maxLayerLevelDifference; /**< .first allows check for maximum difference in level of layers for current sector-friend-combination, .second sets max level difference (example: .second is 2, layerID of sector is 6, of friend is 3 -> more than threshold -> friend gets kicked) missing layers by choice of detector type are considered */
     bool m_removeDeadSectorChains; /**< if true, not only sectors having no friends after first filtering iteration are deleted but also all combinations where dead sectors were friends. If these combinations can lead to kill more sectors and therefore the map gets holey but clean of non-existing cases */

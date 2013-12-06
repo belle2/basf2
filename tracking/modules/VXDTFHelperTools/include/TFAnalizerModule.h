@@ -54,6 +54,13 @@ namespace Belle2 {
             double > /// qualityValue (calculated by other values)
             CompatibilityIndex; /**< stores info about compatipility between two TCs */
 
+    /** The TFAnalizerModule
+    *
+    * this module analyzes and compares the output of the MCTrackFinder with the VXDTF.
+    * It calculates the efficiency of the VXDTF based on the output of the MCTF.
+    * run example file tracking/examples/VXDTFModuleDemo.py in debug mode (1 or more) for the TFAnalizer for more details
+    *
+    */
     class TFAnalizerModule : public Module {
 
     public:
@@ -62,17 +69,17 @@ namespace Belle2 {
 
       /** internal datastore for root export */
       struct RootVariables  {
-        std::vector<double> totalPXresiduals; /** used to store all residuals (true - estimated) of the momentum in x-direction which were reconstructed by the VXDTF*/
-        std::vector<double> totalPYresiduals; /** used to store all residuals (true - estimated) of the momentum in y-direction which were reconstructed by the VXDTF */
-        std::vector<double> totalPZresiduals; /** used to store all residuals (true - estimated) of the momentum in z-direction which were reconstructed by the VXDTF */
+        std::vector<double> totalPXresiduals; /**< used to store all residuals (true - estimated) of the momentum in x-direction which were reconstructed by the VXDTF*/
+        std::vector<double> totalPYresiduals; /**< used to store all residuals (true - estimated) of the momentum in y-direction which were reconstructed by the VXDTF */
+        std::vector<double> totalPZresiduals; /**< used to store all residuals (true - estimated) of the momentum in z-direction which were reconstructed by the VXDTF */
 
-        std::vector<double> cleanPXresiduals; /** used to store all residuals (true - estimated) of the momentum in x-direction which were reconstructed by the VXDTF (clean) */
-        std::vector<double> cleanPYresiduals;/** used to store all residuals (true - estimated) of the momentum in y-direction which were reconstructed by the VXDTF (clean) */
-        std::vector<double> cleanPZresiduals; /** used to store all residuals (true - estimated) of the momentum in z-direction which were reconstructed by the VXDTF (clean) */
+        std::vector<double> cleanPXresiduals; /**< used to store all residuals (true - estimated) of the momentum in x-direction which were reconstructed by the VXDTF (clean) */
+        std::vector<double> cleanPYresiduals;/**< used to store all residuals (true - estimated) of the momentum in y-direction which were reconstructed by the VXDTF (clean) */
+        std::vector<double> cleanPZresiduals; /**< used to store all residuals (true - estimated) of the momentum in z-direction which were reconstructed by the VXDTF (clean) */
 
-        std::vector<double> completePXresiduals; /** used to store all residuals (true - estimated) of the momentum in x-direction which were reconstructed by the VXDTF  (clean and no hits missing) */
-        std::vector<double> completePYresiduals; /** used to store all residuals (true - estimated) of the momentum in y-direction which were reconstructed by the VXDTF (clean and no hits missing) */
-        std::vector<double> completePZresiduals; /** used to store all residuals (true - estimated) of the momentum in z-direction which were reconstructed by the VXDTF (clean and no hits missing) */
+        std::vector<double> completePXresiduals; /**< used to store all residuals (true - estimated) of the momentum in x-direction which were reconstructed by the VXDTF  (clean and no hits missing) */
+        std::vector<double> completePYresiduals; /**< used to store all residuals (true - estimated) of the momentum in y-direction which were reconstructed by the VXDTF (clean and no hits missing) */
+        std::vector<double> completePZresiduals; /**< used to store all residuals (true - estimated) of the momentum in z-direction which were reconstructed by the VXDTF (clean and no hits missing) */
 
         std::vector<double> totalMCMomValues; /**< used to store all momentum values of tracks reconstructed by the MCTF */
         std::vector<double> totalCAMomValues; /**< used to store all momentum values of tracks reconstructed by the CATF */
@@ -237,17 +244,17 @@ namespace Belle2 {
       TFile* m_rootFilePtr; /**< pointer at root file used for p-value-output */
       TTree* m_treePtr; /**< pointer at root tree used for p-value-output */
 
-      std::vector<double> m_rootTotalPXresiduals; /** used to store all residuals (true - estimated) of the momentum in x-direction which were reconstructed by the VXDTF*/
-      std::vector<double> m_rootTotalPYresiduals; /** used to store all residuals (true - estimated) of the momentum in y-direction which were reconstructed by the VXDTF */
-      std::vector<double> m_rootTotalPZresiduals; /** used to store all residuals (true - estimated) of the momentum in z-direction which were reconstructed by the VXDTF */
+      std::vector<double> m_rootTotalPXresiduals; /**< used to store all residuals (true - estimated) of the momentum in x-direction which were reconstructed by the VXDTF*/
+      std::vector<double> m_rootTotalPYresiduals; /**< used to store all residuals (true - estimated) of the momentum in y-direction which were reconstructed by the VXDTF */
+      std::vector<double> m_rootTotalPZresiduals; /**< used to store all residuals (true - estimated) of the momentum in z-direction which were reconstructed by the VXDTF */
 
-      std::vector<double> m_rootCleanPXresiduals; /** used to store all residuals (true - estimated) of the momentum in x-direction which were reconstructed by the VXDTF (clean) */
-      std::vector<double> m_rootCleanPYresiduals;/** used to store all residuals (true - estimated) of the momentum in y-direction which were reconstructed by the VXDTF (clean) */
-      std::vector<double> m_rootCleanPZresiduals; /** used to store all residuals (true - estimated) of the momentum in z-direction which were reconstructed by the VXDTF (clean) */
+      std::vector<double> m_rootCleanPXresiduals; /**< used to store all residuals (true - estimated) of the momentum in x-direction which were reconstructed by the VXDTF (clean) */
+      std::vector<double> m_rootCleanPYresiduals;/**< used to store all residuals (true - estimated) of the momentum in y-direction which were reconstructed by the VXDTF (clean) */
+      std::vector<double> m_rootCleanPZresiduals; /**< used to store all residuals (true - estimated) of the momentum in z-direction which were reconstructed by the VXDTF (clean) */
 
-      std::vector<double> m_rootCompletePXresiduals; /** used to store all residuals (true - estimated) of the momentum in x-direction which were reconstructed by the VXDTF  (clean and no hits missing) */
-      std::vector<double> m_rootCompletePYresiduals; /** used to store all residuals (true - estimated) of the momentum in y-direction which were reconstructed by the VXDTF (clean and no hits missing) */
-      std::vector<double> m_rootCompletePZresiduals; /** used to store all residuals (true - estimated) of the momentum in z-direction which were reconstructed by the VXDTF (clean and no hits missing) */
+      std::vector<double> m_rootCompletePXresiduals; /**< used to store all residuals (true - estimated) of the momentum in x-direction which were reconstructed by the VXDTF  (clean and no hits missing) */
+      std::vector<double> m_rootCompletePYresiduals; /**< used to store all residuals (true - estimated) of the momentum in y-direction which were reconstructed by the VXDTF (clean and no hits missing) */
+      std::vector<double> m_rootCompletePZresiduals; /**< used to store all residuals (true - estimated) of the momentum in z-direction which were reconstructed by the VXDTF (clean and no hits missing) */
 
       std::vector<double> m_rootTotalMCMomValues; /**< used to store all momentum values of tracks reconstructed by the MCTF */
       std::vector<double> m_rootTotalCAMomValues; /**< used to store all momentum values of tracks reconstructed by the CATF */

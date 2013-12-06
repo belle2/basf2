@@ -49,9 +49,7 @@
 
 //boost:
 #include "boost/tuple/tuple.hpp" // for tuple, tie
-// #include <boost/graph/adjacency_list.hpp> // for customizable graphs
 #ifndef __CINT__
-// #include <boost/unordered_map.hpp>
 #include <boost/chrono.hpp>
 #endif
 
@@ -80,16 +78,10 @@ namespace Belle2 {
 
   public:
 
-    //       struct PassData; /**< forward declaration  */
     struct SensorStruct; /**< forward declaration  */
-//     struct Vertex; /**< forward declaration  */
-//     struct Edge; /**< forward declaration  */
 
 
     typedef std::pair<unsigned int, VXDSector* > secMapEntry; /**< represents an entry of the MapOfSectors */
-//     typedef boost::unordered_map<int, Cutoff*> CutoffMap; /**< Is a map storing cutoffs  */
-//     typedef boost::unordered_map<int, CutoffMap*> MapOfCutoffTypes; /**< represents an entry of the CutoffMap */
-
     typedef std::map<int, SensorStruct> ActiveSensorsOfEvent; /**< is map where adresses to each activated sensor (key->int = uniID/vxdID) are stored and all clusters which can be found on them */
     typedef std::list<int> BrokenSensorsOfEvent; /**< atm a list containing the keys to all sensors where number of u and v clusters don't fit */
 
@@ -98,26 +90,6 @@ namespace Belle2 {
     typedef boost::chrono::microseconds boostNsec; /**< defines time resolution (currently mictroseconds) */ // microseconds, milliseconds
 
     typedef boost::tuple<double, double, VXDTFHit*> HitExtraTuple; /**< get<0>: distance to origin, get<1>: distance to seedHit, get<2> pointer to hit. SeedHit is outermost hit of detector and will be used for cosmic search */
-//     typedef boost::adjacency_list <
-//     boost::vecS, // defines the container used for the edges (vecS = std::vector)
-//           boost::vecS, // defines the container used for the vertices
-//           boost::directedS, // defines the behavior of the edges: directed graph
-//           Vertex, //  The type that describes a Vertex.
-//           Edge //  The type that describes an Edge
-//           > BoostUndirectedGraph; /**< used by simpleReco - is a mathematical graph storing info about Hits and their relations */
-//     typedef boost::adjacency_list <
-//     boost::vecS, // defines the container used for the edges (vecS = std::vector)
-//           boost::vecS, // defines the container used for the vertices
-//           boost::undirectedS, // defines the behavior of the edges: undirected graph (edge u,v = edge v,u) != bidirectionalS (edge u,v != edge v,u)
-//           Vertex, //  The type that describes a Vertex.
-//           Edge //  The type that describes an Edge
-//           > BoostDirectedGraph; /**< used by simpleReco - is a mathematical graph storing info about Hits and their relations */
-//     typedef BoostUndirectedGraph::vertex_descriptor undirectedVertexID; /**< used for adding vertices to BoostGraph */
-//     typedef BoostUndirectedGraph::edge_descriptor undirectedEdgeID; /**< used for adding vertices to BoostGraph */
-//     typedef BoostDirectedGraph::vertex_descriptor directedVertexID; /**< used for adding vertices to BoostGraph */
-//     typedef BoostDirectedGraph::edge_descriptor directedEdgeID; /**< used for adding vertices to BoostGraph */
-
-
 
 
     /** SensorStruct needed for SVDCluster sorting, stores u and v clusters of Sensor  */

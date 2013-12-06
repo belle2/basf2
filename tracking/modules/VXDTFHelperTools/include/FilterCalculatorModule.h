@@ -247,7 +247,7 @@ namespace Belle2 {
   /** info about compatible sectors to main sector */
   class FMSectorFriends {
   public:
-    typedef std::pair<unsigned int, HitFilter*> MapEntry;
+    typedef std::pair<unsigned int, HitFilter*> MapEntry; /**< Entry of sectorMap */
 
     /** Constructor of class FMSectorFriends*/
     FMSectorFriends(std::string myName):
@@ -297,7 +297,7 @@ namespace Belle2 {
   /** sector is a subunit of a sensor, please check low momentum trackfinder for more details (VXDTF) */
   class Sector {
   public:
-    typedef std::pair<std::string, FMSectorFriends> MapEntry;
+    typedef std::pair<std::string, FMSectorFriends> MapEntry;  /**< Entry of sectorMap */
 
     /** constructor */
     Sector(float v1, float v2, float u1v1, float u1v2, float u2v1, float u2v2, std::string myName):
@@ -372,7 +372,12 @@ namespace Belle2 {
   };
 
 
-
+  /** The FilterCalculatorModule
+   *
+   * this module analyzes a big number of events (pGun or evtGen) to create raw sectorMaps which are needed for the VXDTF.
+   * This information can be exported via ascii files (not recommended) and root files (default, recommended).
+   *
+   */
   class FilterCalculatorModule : public Module {
 
 

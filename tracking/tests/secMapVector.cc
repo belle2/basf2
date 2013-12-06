@@ -15,6 +15,7 @@
 using namespace std;
 
 namespace Belle2 {
+  /** command x should exit using B2FATAL. */
 #define EXPECT_FATAL(x) EXPECT_EXIT(x,::testing::KilledBySignal(SIGABRT),"");
 
   /** Testing SecMapVector to be able to store it in a .root file and reopen/rewrite it */

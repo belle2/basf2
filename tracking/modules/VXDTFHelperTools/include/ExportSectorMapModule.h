@@ -33,9 +33,8 @@ namespace Belle2 {
 
   /** The ExportSectorMapModule
    *
-   * this module is a workaround for the fact, that XML-Trees are currently far to consuming concerning RAM
-   * The purpose of this module is to import a sectorMap to be able to export it again in a RAM-saving format
-   * It shall not be used during normal runs but only to produce these new maps.
+   * this module takes a root file containing a raw sectorMap created by the FilterCalculatorModule
+   * and converts it to a sectormap which can be read by the VXDTF. Please check the parameters to be set...
    *
    */
   class ExportSectorMapModule : public Module {

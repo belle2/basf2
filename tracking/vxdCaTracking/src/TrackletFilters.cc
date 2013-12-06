@@ -264,7 +264,7 @@ std::pair<double, TVector3> TrackletFilters::helixFit(const std::vector<Position
 //  B2INFO("onesR nRows: " << onesR.GetNrows() << ", nCols: " << onesR.GetNcols() )
 
   /** local lambda-function used for checking TMatrixDs, whether there are nan values included, returns true, if there are */
-  auto lambdaCheckMatrix4NAN = [](TMatrixD & aMatrix) { /// testing c++11 lambda functions...
+  auto lambdaCheckMatrix4NAN = [](TMatrixD & aMatrix) -> bool { /// testing c++11 lambda functions...
     double totalEntries = 0;
     for (int i = 0; i < aMatrix.GetNrows(); ++i) {
       for (int j = 0; j < aMatrix.GetNcols(); ++j) {
@@ -273,11 +273,12 @@ std::pair<double, TVector3> TrackletFilters::helixFit(const std::vector<Position
     }
     return std::isnan(totalEntries);
   }; // should be converted to normal function, since feature could be used much more often...
-  TMatrixD lambdaTestMatrix(nHits, 1);
-  for (int i = 0; i < nHits; ++i) { lambdaTestMatrix(i, 0) = 1.; }
-  B2DEBUG(175, "lambdaCheckMatrix4NAN(lambdaTestMatrix): " << lambdaCheckMatrix4NAN(lambdaTestMatrix) << " (should be 0)")
-  lambdaTestMatrix(nHits - 2, 0) = sqrt(-1); // producing 'nan'
-  B2DEBUG(175, "lambdaCheckMatrix4NAN(lambdaTestMatrix): " << lambdaCheckMatrix4NAN(lambdaTestMatrix) << " (should be 1)")
+// TEST for lambdaCheckMatrix4NAN:
+//   TMatrixD lambdaTestMatrix(nHits, 1);
+//   for (int i = 0; i < nHits; ++i) { lambdaTestMatrix(i, 0) = 1.; }
+//   B2DEBUG(175, "lambdaCheckMatrix4NAN(lambdaTestMatrix): " << lambdaCheckMatrix4NAN(lambdaTestMatrix) << " (should be 0)")
+//   lambdaTestMatrix(nHits - 2, 0) = sqrt(-1); // producing 'nan'
+//   B2DEBUG(175, "lambdaCheckMatrix4NAN(lambdaTestMatrix): " << lambdaCheckMatrix4NAN(lambdaTestMatrix) << " (should be 1)")
 
   if (lambdaCheckMatrix4NAN(inverseCovMatrix) == true) { B2DEBUG(10, "helixFit: inverseCovMatrix got 'nan'-entries!") }
   if (lambdaCheckMatrix4NAN(X) == true) { B2DEBUG(10, "helixFit: X got 'nan'-entries!") }

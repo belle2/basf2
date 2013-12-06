@@ -27,6 +27,17 @@
 using namespace std;
 using namespace Belle2;
 
+static FastSeqRootInputModule* s_input = NULL;
+
+//-----------------------------------------------------------------
+// File Read Thread Interface
+//-----------------------------------------------------------------
+void* RunFileReader(void*)
+{
+  s_input->ReadFileInThread();
+  return NULL;
+}
+
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
@@ -47,6 +58,8 @@ FastSeqRootInputModule::FastSeqRootInputModule() : Module()
 
   //Parameter definition
   addParam("inputFileName"  , m_inputFileName, "FastSeqRoot file name.", string("FastSeqRootInput.root"));
+
+  s_input = this;
 
   B2DEBUG(1, "FastSeqRootInput: Constructor done.");
 }
@@ -94,25 +107,47 @@ void FastSeqRootInputModule::initialize()
     B2FATAL("SeqRootInput : Error in reading first event")
   }
   delete evtmsg;
+  delete[] evtbuf;
 
-  // Read next events and Queue them in threads for decoding
-  while (m_streamer->getNumFreeThreads() > 0) {
-    size = m_file->read(evtbuf, EvtMessage::c_MaxEventSize);
-    printf("record read : size = %d\n", size);
-    if (size > 0) {
-      evtmsg = new EvtMessage();
-      evtmsg->buffer(evtbuf);    // Copy evtbuf to internal buffer
-      m_streamer->queueEvtMessage(evtmsg);
-      printf("event queued : freethreads = %d\n", m_streamer->getNumFreeThreads());
+  // Create a new sustainable thread to read events and queue them
+  // to decoder
+  pthread_attr_t thread_attr;
+  pthread_attr_init(&thread_attr);
+  //  pthread_attr_setschedpolicy(&thread_attr , SCHED_FIFO);
+  //  pthread_attr_setdetachstate(&thread_attr , PTHREAD_CREATE_DETACHED);
+  //  pthread_t thr_input;
+  pthread_create(&m_thr_input, NULL, RunFileReader, NULL);
+
+  B2INFO("FastSeqRootInput: initialized.");
+}
+
+void FastSeqRootInputModule::ReadFileInThread()
+{
+  printf("ReadFileInThread started!!\n");
+  int rf_nevt = 0;
+  for (;;) {
+    char* evtbuf = new char[EvtMessage::c_MaxEventSize];
+    int size = m_file->read(evtbuf, EvtMessage::c_MaxEventSize);
+    if (size == 0) {
+      printf("ReadFileInThread : EOF detected!!!!!\n");
+      m_streamer->queueEvtMessage(NULL);
+      delete m_file;
+      m_file = 0;
+      delete[] evtbuf;
+      return;
+    } else if (size > 0) {
+      m_streamer->queueEvtMessage(evtbuf);
     } else {
       B2FATAL("FastSeqRootInput : Error in reading first event");
     }
+    // Statistics
+    double dsize = (double)size / 1000.0;
+    m_size += dsize;
+    m_size2 += dsize * dsize;
+    //    printf ( "ReadFileInThread : event read, size=%d\n", size );
+    rf_nevt++;
+    //    if ( rf_nevt%1000 == 0 ) printf ( "ReadFileInThread : %d events\n", rf_nevt );
   }
-  delete[] evtbuf;
-
-
-
-  B2INFO("FastSeqRootInput: initialized.");
 }
 
 
@@ -133,32 +168,9 @@ void FastSeqRootInputModule::event()
   // First event is already loaded
   if (m_nevt == 0) return;
 
-  // Read events and Queue them in threads for decoding
-  int size;
-  char* evtbuf = new char[EvtMessage::c_MaxEventSize];
-  while (m_streamer->getNumFreeThreads() > 0) {
-    size = m_file->read(evtbuf, EvtMessage::c_MaxEventSize);
-    if (size == 0) {
-      delete m_file;
-      m_file = 0;
-      delete[] evtbuf;
-      return;
-    } else if (size > 0) {
-      EvtMessage* evtmsg = new EvtMessage();
-      evtmsg->buffer(evtbuf);    // Copy evtbuf to internal buffer
-      m_streamer->queueEvtMessage(evtmsg);
-    } else {
-      B2FATAL("FastSeqRootInput : Error in reading first event");
-    }
-    // Statistics
-    double dsize = (double)size / 1000.0;
-    m_size += dsize;
-    m_size2 += dsize * dsize;
+  //  printf ( "FastSeqRootInput : event = %d, start processing\n", m_nevt );
 
-  }
-  delete[] evtbuf;
-
-  // Restore the first event
+  // Restore DataStore
   m_streamer->restoreDataStoreAsync();
 
 }
@@ -174,14 +186,14 @@ void FastSeqRootInputModule::endRun()
   // Sigma^2 = Sum(X^2)/n - (Sum(X)/n)^2
 
   double flowmb = m_size / etime * 1000.0;
+  double evrate = (double)m_nevt / (etime / 1000.0);
   double avesize = m_size / (double)m_nevt;
   double avesize2 = m_size2 / (double)m_nevt;
   double sigma2 = avesize2 - avesize * avesize;
   double sigma = sqrt(sigma2);
 
-  //  printf ( "m_size = %f, m_size2 = %f, m_nevt = %d\n", m_size, m_size2, m_nevt );
-  //  printf ( "avesize2 = %f, avesize = %f, avesize*avesize = %f\n", avesize2, avesize, avesize*avesize );
   B2INFO("FastSeqRootInput :  " << m_nevt << " events read with total bytes of " << m_size << " kB");
+  B2INFO("FastSeqRootInput : event rate = " << evrate << " (KHz)");
   B2INFO("FastSeqRootInput : flow rate = " << flowmb << " (MB/s)");
   B2INFO("FastSeqRootInput : event size = " << avesize << " +- " << sigma << " (kB)");
 
@@ -191,6 +203,7 @@ void FastSeqRootInputModule::endRun()
 
 void FastSeqRootInputModule::terminate()
 {
+  pthread_join(m_thr_input, NULL);
   //  delete m_streamer;
   //  delete m_file;
   B2INFO("FastSeqRootInput: terminate called")

@@ -16,6 +16,7 @@
 #include <string>
 
 #include <sys/time.h>
+#include <pthread.h>
 
 namespace Belle2 {
   /**
@@ -46,6 +47,9 @@ namespace Belle2 {
     virtual void endRun();
     virtual void terminate();
 
+    //! Function to read events
+    void ReadFileInThread();
+
     // Data members
   private:
     //! File name
@@ -53,6 +57,7 @@ namespace Belle2 {
 
     //! Blocked file handler
     SeqFile* m_file;
+    pthread_t m_thr_input;
 
     //! Total nr. of events in the file
     int m_nevt;

@@ -134,6 +134,7 @@ void SeqRootInputModule::event()
   // Restore objects in DataStore
   m_streamer->restoreDataStore(evtmsg);
 
+
   // Delete buffers
   delete[] evtbuf;
   delete evtmsg;
@@ -150,6 +151,7 @@ void SeqRootInputModule::endRun()
   // Sigma^2 = Sum(X^2)/n - (Sum(X)/n)^2
 
   double flowmb = m_size / etime * 1000.0;
+  double evrate = (double)m_nevt / (etime / 1000.0);
   double avesize = m_size / (double)m_nevt;
   double avesize2 = m_size2 / (double)m_nevt;
   double sigma2 = avesize2 - avesize * avesize;
@@ -158,6 +160,7 @@ void SeqRootInputModule::endRun()
   //  printf ( "m_size = %f, m_size2 = %f, m_nevt = %d\n", m_size, m_size2, m_nevt );
   //  printf ( "avesize2 = %f, avesize = %f, avesize*avesize = %f\n", avesize2, avesize, avesize*avesize );
   B2INFO("SeqRootInput :  " << m_nevt << " events read with total bytes of " << m_size << " kB");
+  B2INFO("SeqRootInput : event rate = " << evrate << " (KHz)");
   B2INFO("SeqRootInput : flow rate = " << flowmb << " (MB/s)");
   B2INFO("SeqRootInput : event size = " << avesize << " +- " << sigma << " (kB)");
 

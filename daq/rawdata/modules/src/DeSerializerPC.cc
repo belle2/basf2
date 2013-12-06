@@ -393,7 +393,7 @@ void DeSerializerPCModule::event()
 #endif
 
 
-  for (int j = 0; j < NUM_EVT_PER_BASF2LOOP; j++) {
+  for (int j = 0; j < NUM_EVT_PER_BASF2LOOP_PC; j++) {
 
     unsigned int eve_ftsw = 0;
     eve_copper_0 = 0;
@@ -401,7 +401,7 @@ void DeSerializerPCModule::event()
 
 
 #ifdef TIME_MONITOR
-    RecordTime(n_basf2evt * NUM_EVT_PER_BASF2LOOP + j, time_array0);
+    RecordTime(n_basf2evt * NUM_EVT_PER_BASF2LOOP_PC + j, time_array0);
 #endif
 
 
@@ -439,7 +439,7 @@ void DeSerializerPCModule::event()
 
 
 #ifdef TIME_MONITOR
-    RecordTime(n_basf2evt * NUM_EVT_PER_BASF2LOOP + j, time_array1);
+    RecordTime(n_basf2evt * NUM_EVT_PER_BASF2LOOP_PC + j, time_array1);
 #endif
 
 #ifndef DISCARD_DATA
@@ -634,7 +634,7 @@ void DeSerializerPCModule::event()
 #endif // DISCARD_DATA
 
 #ifdef TIME_MONITOR
-    RecordTime(n_basf2evt * NUM_EVT_PER_BASF2LOOP + j, time_array2);
+    RecordTime(n_basf2evt * NUM_EVT_PER_BASF2LOOP_PC + j, time_array2);
 #endif
 
     m_prev_copper_ctr = temp_copper_ctr;
@@ -658,7 +658,7 @@ void DeSerializerPCModule::event()
     if (n_basf2evt % 10 == 0) {
       if (m_cfg_buf[ 0 ] == 0) {
         printf("\033[34m");
-        printf("[INFO] RunStop was detected. ( Setting:  Max event # %d MaxTime %lf ) Processed Event %d Elapsed Time %lf[s]\n", max_nevt , max_seconds, n_basf2evt * NUM_EVT_PER_BASF2LOOP, GetTimeSec() - m_start_time);
+        printf("[INFO] RunStop was detected. ( Setting:  Max event # %d MaxTime %lf ) Processed Event %d Elapsed Time %lf[s]\n", max_nevt , max_seconds, n_basf2evt * NUM_EVT_PER_BASF2LOOP_PC, GetTimeSec() - m_start_time);
         printf("\033[0m");
         m_eventMetaDataPtr->setEndOfData();
       }
@@ -669,10 +669,10 @@ void DeSerializerPCModule::event()
   // Monitor
   //
   if (max_nevt >= 0 || max_seconds >= 0.) {
-    if ((n_basf2evt * NUM_EVT_PER_BASF2LOOP >= max_nevt && max_nevt > 0)
+    if ((n_basf2evt * NUM_EVT_PER_BASF2LOOP_PC >= max_nevt && max_nevt > 0)
         || (GetTimeSec() - m_start_time > max_seconds && max_seconds > 0.)) {
       printf("\033[34m");
-      printf("[INFO] RunStop was detected. ( Setting:  Max event # %d MaxTime %lf ) Processed Event %d Elapsed Time %lf[s]\n", max_nevt , max_seconds, n_basf2evt * NUM_EVT_PER_BASF2LOOP, GetTimeSec() - m_start_time);
+      printf("[INFO] RunStop was detected. ( Setting:  Max event # %d MaxTime %lf ) Processed Event %d Elapsed Time %lf[s]\n", max_nevt , max_seconds, n_basf2evt * NUM_EVT_PER_BASF2LOOP_PC, GetTimeSec() - m_start_time);
       printf("\033[0m");
       m_eventMetaDataPtr->setEndOfData();
     }

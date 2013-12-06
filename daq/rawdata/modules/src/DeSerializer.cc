@@ -72,7 +72,7 @@ void DeSerializerModule::initialize()
 void DeSerializerModule::terminate()
 {
   delete[] m_buffer;
-  for (int i = 0 ; i < NUM_EVT_PER_BASF2LOOP; i++) {
+  for (int i = 0 ; i < NUM_EVT_PER_BASF2LOOP_COPPER; i++) {
     delete[] m_bufary[i];
   }
 

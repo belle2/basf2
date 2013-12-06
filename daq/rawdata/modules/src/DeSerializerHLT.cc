@@ -124,7 +124,7 @@ void DeSerializerHLTModule::event()
   raw_ftswarray.create();
 
   // DataStore interface
-  for (int j = 0; j < NUM_EVT_PER_BASF2LOOP; j++) {
+  for (int j = 0; j < NUM_EVT_PER_BASF2LOOP_PC; j++) {
     // Get a record from socket
     int total_buf_nwords = 0 ;
     int malloc_flag = 0;
@@ -215,7 +215,7 @@ void DeSerializerHLTModule::event()
 
 
   if (max_nevt >= 0 || max_seconds >= 0.) {
-    if ((n_basf2evt * NUM_EVT_PER_BASF2LOOP >= max_nevt && max_nevt > 0)
+    if ((n_basf2evt * NUM_EVT_PER_BASF2LOOP_PC >= max_nevt && max_nevt > 0)
         || (GetTimeSec() - m_start_time > max_seconds && max_seconds > 0.)) {
       m_eventMetaDataPtr->setEndOfData();
     }

@@ -463,7 +463,7 @@ void DeSerializerCOPPERModule::event()
   raw_dblkarray.create();
   RawDataBlock* temp_rawdblk;
   //  RawCOPPER* temp_rawcopper;
-  for (int j = 0; j < NUM_EVT_PER_BASF2LOOP; j++) {
+  for (int j = 0; j < NUM_EVT_PER_BASF2LOOP_COPPER; j++) {
     int m_size_word = 0;
     int malloc_flag = 0;
     int* temp_buf = ReadOneEventFromCOPPERFIFO(j, &malloc_flag, &m_size_word);
@@ -515,7 +515,7 @@ void DeSerializerCOPPERModule::event()
     time(&timer);
     t_st = localtime(&timer);
     printf("Event %d(%d) TotRecvd %.1lf [MB] ElapsedTime %.1lf [s] EvtRate %.2lf [kHz] RcvdRate %.2lf [MB/s] %s",
-           n_basf2evt, m_prev_ftsweve32,  m_totbytes / 1.e6, total_time, (n_basf2evt - m_prev_nevt) / interval / 1.e3 * NUM_EVT_PER_BASF2LOOP, (m_totbytes - m_prev_totbytes) / interval / 1.e6, asctime(t_st));
+           n_basf2evt, m_prev_ftsweve32,  m_totbytes / 1.e6, total_time, (n_basf2evt - m_prev_nevt) / interval / 1.e3 * NUM_EVT_PER_BASF2LOOP_COPPER, (m_totbytes - m_prev_totbytes) / interval / 1.e6, asctime(t_st));
     fflush(stdout);
     m_prev_time = cur_time;
     m_prev_totbytes = m_totbytes;

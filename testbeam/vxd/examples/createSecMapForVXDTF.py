@@ -56,11 +56,11 @@ else:
 set_log_level(LogLevel.ERROR)
 set_random_seed(initialValue)
 
-evtmetagen = register_module('EvtMetaGen')
-evtmetagen.param('expList', [0])
-evtmetagen.param('runList', [1])
-evtmetagen.param('evtNumList', [numEvents])
-evtmetainfo = register_module('EvtMetaInfo')
+eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter.param('expList', [0])
+eventinfosetter.param('runList', [1])
+eventinfosetter.param('evtNumList', [numEvents])
+eventinfoprinter = register_module('EventInfoPrinter')
 
 gearbox = register_module('Gearbox')
 # use simple testbeam geometry
@@ -174,7 +174,7 @@ eventCounter.param('stepSize', 250)
 # Create paths
 main = create_path()
 # Add modules to paths
-main.add_module(evtmetagen)
+main.add_module(eventinfosetter)
 main.add_module(evtmetainfo)
 main.add_module(gearbox)
 main.add_module(geometry)

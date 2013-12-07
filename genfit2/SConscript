@@ -19,10 +19,7 @@ if env.has_key('HAS_TEVE'):
   env['LIBS'] += env['TEVE_LIBS']
   dirs += ['eventDisplay']
 
-# remove genfit1 from include path and add genfit2 to it
-genfit1_include = '-I' + os.path.join(env['EXTINCDIR'], 'genfit')
-if genfit1_include in env['CCFLAGS']:
-    env['CCFLAGS'].remove(genfit1_include)
+# add genfit2 to include path
 env.Append(CPPPATH = os.path.join(env['INCDIR'], 'genfit'))
 
 # install header files

@@ -72,12 +72,6 @@ global_env = Environment(ENV = os.environ,
                          TEST_LIBS = [],
                          TEST_FILES = [])
 
-# remove genfit1 from include path and add genfit2 to it
-genfit1_include = '-I' + os.path.join(global_env['EXTINCDIR'], 'genfit')
-if genfit1_include in global_env['CCFLAGS']:
-    global_env['CCFLAGS'].remove(genfit1_include)
-global_env.Prepend(CCFLAGS = '-I' + 'include')
-
 # recalculate MD5 sums only if the time stamp differs
 global_env.Decider('MD5-timestamp')
 

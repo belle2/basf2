@@ -126,43 +126,48 @@ namespace Belle2 {
 
       // Subtraction of volumes
       std::vector<GearDir> boolVolumes = content.getNodes("Subtract");
-      if (boolVolumes.size() > 0) {
+      if (!boolVolumes.empty()) {
         // These volumes do not need material
 
         BOOST_FOREACH(const GearDir & sub_volume, boolVolumes) {
           G4LogicalVolume* toSubtract = getLogicalVolume(sub_volume);
           G4VSolid* subtracted = new G4SubtractionSolid(G4String(volName + "_subtracted_" + toSubtract->GetName()), g4vol->GetSolid(), toSubtract->GetSolid(), getTransform(sub_volume));
           delete g4vol;
+          delete toSubtract;
           g4vol = new G4LogicalVolume(subtracted, volG4Material, volName);
         }
       }
       // Union with volumes
       boolVolumes = content.getNodes("Union");
-      if (boolVolumes.size() > 0) {
+      if (!boolVolumes.empty()) {
         // These volumes do not need material
 
         BOOST_FOREACH(const GearDir & sub_volume, boolVolumes) {
           G4LogicalVolume* toUnion = getLogicalVolume(sub_volume);
           G4VSolid* united = new G4UnionSolid(G4String(volName + "_united_" + toUnion->GetName()), g4vol->GetSolid(), toUnion->GetSolid(), getTransform(sub_volume));
           delete g4vol;
+          delete toUnion;
           g4vol = new G4LogicalVolume(united, volG4Material, volName);
         }
       }
       // Interesct with volumes
       boolVolumes = content.getNodes("Intersect");
-      if (boolVolumes.size() > 0) {
+      if (!boolVolumes.empty()) {
         // These volumes do not need material
 
         BOOST_FOREACH(const GearDir & sub_volume, boolVolumes) {
           G4LogicalVolume* toIntersect = getLogicalVolume(sub_volume);
           G4VSolid* intersected = new G4IntersectionSolid(G4String(volName + "_intersected_" + toIntersect->GetName()), g4vol->GetSolid(), toIntersect->GetSolid(), getTransform(sub_volume));
           delete g4vol;
+          delete toIntersect;
           g4vol = new G4LogicalVolume(intersected, volG4Material, volName);
         }
       }
       Belle2::geometry::setColor(*g4vol, volColor);
       Belle2::geometry::setVisibility(*g4vol, volVisibility);
 
+      // All helper logical volumes created along the way by "new" are deleted.
+      // Final result, which is returned, is the only remaining object on the heap
       return g4vol;
     }
 

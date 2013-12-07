@@ -10,4 +10,16 @@
     </Components>
   </Material>
 
+<Material name="PCB-FR4">
+  <state>Solid</state>
+  <density unit="g/cm3">1.7</density>
+  <Components>
+    <Element fraction="0.0684428">H</Element>
+    <Element fraction="0.278042">C</Element>
+    <Element fraction="0.405633">O</Element>
+    <Element fraction="0.180774">Si</Element>
+    <Element fraction="0.0671091">Br</Element>
+  </Components>
+</Material>
+
 </Materials>

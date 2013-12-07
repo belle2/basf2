@@ -70,7 +70,7 @@ geometry.param('Components', ['MagneticField', 'TB'])
 
 # Full simulation module
 simulation = register_module('FullSim')
-simulation.param('StoreAllSecondaries', T)
+simulation.param('StoreAllSecondaries', True)
 # Uncomment the following lines to get particle tracks visualization
 # simulation.param('EnableVisualization', True)
 # simulation.param('UICommands', ['/vis/open VRML2FILE', '/vis/drawVolume',

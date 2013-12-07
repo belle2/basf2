@@ -131,10 +131,10 @@ cdclocaltracking = register_module('CDCLocalTracking')
 
 # ---------------------------------------------------------------
 # Conformal finder
-cdcconformaltracking = register_module('CDCTracking')
+# cdcconformaltracking = register_module('CDCTracking')
 
-param_cdcconformaltracking = {'GFTrackCandidatesColName': 'GFTrackCands'}
-cdcconformaltracking.param(param_cdcconformaltracking)
+# param_cdcconformaltracking = {'GFTrackCandidatesColName': 'GFTrackCands'}
+# cdcconformaltracking.param(param_cdcconformaltracking)
 
 # select which detectors you would like to use
 

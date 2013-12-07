@@ -50,10 +50,11 @@ namespace Belle2 {
 
       void init() {
 
-#ifdef USE_ROOT_IN_CDCLOCALTRACKING
+#ifdef CDCLOCALTRACKING_USE_ROOT
         StoreArray < CDCSegmentTriple >::registerTransient("CDCSegmentTriples");
         StoreArray < CDCTrack >::registerTransient("CDCTracks");
 #endif
+
       }
 
       inline void apply(const std::vector< CDCRecoSegment2D >& recoSegments,
@@ -178,7 +179,7 @@ namespace Belle2 {
         B2DEBUG(100, "  Created " << storedGFTrackCands.getEntries()  << " genfit::TrackCands");
 
         // IO for monitoring in python
-#ifdef USE_ROOT_IN_CDCLOCALTRACKING
+#ifdef CDCLOCALTRACKING_USE_ROOT
         // IO segment triples
         {
           B2DEBUG(100, "  Creating the StoreArray for the CDCSegmentTriple");

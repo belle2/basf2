@@ -271,7 +271,7 @@ namespace Belle2 {
       Vector2D  m_tangential; ///< Tangential vector of the line
 
     private:
-      /** ROOT Macro to make ParameterLine2D a ROOT class if USE_ROOT_IN_CDCLOCALTRACKING was defined*/
+      /** ROOT Macro to make ParameterLine2D a ROOT class if CDCLOCALTRACKING_USE_ROOT was defined*/
       ClassDefInCDCLocalTracking(ParameterLine2D, 1);
 
     }; //class

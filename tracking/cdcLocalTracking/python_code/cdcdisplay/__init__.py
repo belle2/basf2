@@ -1,14 +1,17 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+
 from basf2 import Module
 
 from ROOT import gSystem
 gSystem.Load('libframework')  # for PyStoreArray
 gSystem.Load('libcdc')  # for CDCSimHit
 gSystem.Load('libtracking')  # for CDCHit and so on
+gSystem.Load('libgenfit2')  # for GFTrackCands
 
 from ROOT import Belle2  # make Belle2 namespace available
 from ROOT import std
+from ROOT import genfit
 
 import subprocess
 from datetime import datetime
@@ -92,19 +95,20 @@ class CDCSVGDisplayModule(Module):
 
     def event(self):
         print '##################### DISPLAY EVENT ###########################'
-        plotter = svgdrawing.CDCSVGPlotter()
 
         if not hasattr(Belle2, 'CDCLocalTracking'):
             print 'CDCLocalTracking namespace not available from Python'
-            print 'Did you compile with USE_ROOT_IN_LOCALTRACKING?'
-            print 'Activate in cdcLocalTracking/mockroot/include/'\
-            'ToggleMockRoot.h and recompile.'
+            print 'Did you compile with LOCALTRACKING_USE_ROOT?'
+            print 'Activate in cdcLocalTracking/mockroot/include/ToggleMockRoot.h and recompile.'
             r = raw_input('')
             return
         else:
             print 'CDCLocalTracking namespace available from Python'
             print 'dir(Belle2)', dir(Belle2)
             print 'dir(Belle2.CDCLocalTracking)', dir(Belle2.CDCLocalTracking)
+            print 'dir(genfit)', dir(genfit)
+
+        plotter = svgdrawing.CDCSVGPlotter()
 
     # Draw wires from cdcwire objects
     # Now prefered way of ploting the wires
@@ -210,8 +214,8 @@ class CDCSVGDisplayModule(Module):
                 def color_map(iWireHit, wirehit):
                     simhit = mcLookUp.getSimHit(wirehit)
                     recohit = \
-                        Belle2.CDCLocalTracking.CDCRecoHit2D.fromSimHit(
-                            wirehit, simhit)
+                        Belle2.CDCLocalTracking.CDCRecoHit2D.fromSimHit(wirehit,
+                            simhit)
                     if recohit.getRLInfo() == 1:
                         return 'green'
                     else:
@@ -487,8 +491,8 @@ class CDCSVGDisplayModule(Module):
         plotter.saveSVGFile(fileName)
 
         if self.interactive:
-            print " Use the 'display' command to show the svg file", \
-                fileName, 'generated for the last event'
+            print " Use the 'display' command to show the svg file", fileName, \
+                'generated for the last event'
       # 'display' is part of the ImageMagic package commonly installed in linux
             procDisplay = subprocess.Popen(['display', fileName])
       # procDisplay = subprocess.Popen(['display','-background','white',
@@ -508,3 +512,5 @@ class CDCSVGDisplayModule(Module):
 
     def new_output_filename(self):
         return os.path.join(self.output_folder, self.new_output_basename())
+
+

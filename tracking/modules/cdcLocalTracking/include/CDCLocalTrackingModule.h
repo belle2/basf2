@@ -28,8 +28,6 @@
 #include <tracking/cdcLocalTracking/creator_filters/OptimizingFacetFilter.h>
 #include <tracking/cdcLocalTracking/neighbor_chooser/OptimizingFacetNeighborChooser.h>
 
-
-
 #include <tracking/cdcLocalTracking/workers/SegmentTripleTrackingWorker.h>
 
 #include <tracking/cdcLocalTracking/creator_filters/SimpleSegmentTripleFilter.h>
@@ -37,8 +35,6 @@
 
 #include <tracking/cdcLocalTracking/creator_filters/MCSegmentTripleFilter.h>
 #include <tracking/cdcLocalTracking/neighbor_chooser/MCSegmentTripleNeighborChooser.h>
-
-
 
 namespace Belle2 {
 
@@ -83,7 +79,7 @@ namespace Belle2 {
 
   private:
 
-    std::string m_cdcHitsName; /**< Input digitized hits collection name (output of CDCDigitizer module) */
+    std::string m_param_gfTrackCandColName; /**< Name of the output collection of genfit::TrackCands */
 
     CDCLocalTracking::WireHitCreator m_wirehitCreator;
 
@@ -97,10 +93,8 @@ namespace Belle2 {
 
     CDCLocalTracking::FacetSegmentWorker<FacetFilter, FacetNeighborChooser> m_segmentWorker;
 
-
     //storing the recosegments for the whole event
     std::vector< Belle2::CDCLocalTracking::CDCRecoSegment2D > m_recoSegments;
-
 
     //typedef CDCLocalTracking::SimpleSegmentTripleFilter SegmentTripleFilter;
     typedef CDCLocalTracking::MCSegmentTripleFilter SegmentTripleFilter;

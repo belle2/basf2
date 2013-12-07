@@ -7,7 +7,7 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
-#ifdef USE_ROOT_IN_CDCLOCALTRACKING
+#ifdef CDCLOCALTRACKING_USE_ROOT
 
 #pragma link C++ class Belle2::CDCLocalTracking::CDCRiemannFitter;
 #pragma link C++ class Belle2::CDCLocalTracking::CDCSZFitter;

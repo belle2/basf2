@@ -27,16 +27,19 @@ namespace Belle2 {
     // we fake it in case we do not want to use ROOT
 
 
-#ifdef USE_ROOT_IN_CDCLOCALTRACKING
+#ifdef CDCLOCALTRACKING_USE_ROOT
 
     typedef TObject UsedTObject;
+
 #define ClassDefInCDCLocalTracking(ClassName,ClassVersion) ClassDef(ClassName, ClassVersion)
 #define ClassImpInCDCLocalTracking(ClassName) ClassImp(ClassName);
 
 #else
-
+    // Do not use the ROOT inheritance in all Tracking objects
+    // Use an empty base class instead
     class MockTObject { ; };
     typedef MockTObject UsedTObject;
+
 #define ClassDefInCDCLocalTracking(ClassName,ClassVersion)
 #define ClassImpInCDCLocalTracking(ClassName)
 

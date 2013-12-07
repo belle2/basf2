@@ -10,7 +10,12 @@ gSystem.Load('libdataobjects')
 
 from ROOT import Belle2  # make Belle2 namespace available
 from ROOT import std
-from ROOT import GFTrackCand
+from ROOT import genfit
+
+print dir(genfit)
+print dir(genfit.TrackCand)
+print dir(Belle2)
+#from ROOT import GFTrackCand
 
 import primitives
 
@@ -65,7 +70,7 @@ class CDCDataobjectsConverter:
                 self.CDCTrajectory2DToSVG,
             Belle2.CDCSimHit: self.CDCSimHitToSVG,
             Belle2.CDCHit: self.CDCHitToSVG,
-            GFTrackCand: self.GFTrackCandToSVG,
+            genfit.TrackCand: self.GFTrackCandToSVG,
             }
 
     # Generics

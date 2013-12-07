@@ -14,7 +14,7 @@
 #include <vector>
 
 #include <tracking/cdcLocalTracking/typedefs/UsedDataHolders.h>
-#include<framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreArray.h>
 
 #include <tracking/cdcLocalTracking/algorithms/WeightedNeighborhood.h>
 #include <tracking/cdcLocalTracking/algorithms/NeighborhoodBuilder.h>
@@ -54,7 +54,7 @@ namespace Belle2 {
 
       void init() {
 
-#ifdef USE_ROOT_IN_CDCLOCALTRACKING
+#ifdef CDCLOCALTRACKING_USE_ROOT
         StoreArray < CDCRecoTangentCollection >::registerTransient("CDCRecoTangentSegments");
         StoreArray < CDCRecoSegment2D >::registerTransient("CDCRecoHit2DSegments");
         StoreArray < CDCRecoSegment2D >::registerTransient("CDCRecoHit2DSegmentsSelected");
@@ -80,7 +80,7 @@ namespace Belle2 {
         recoSegments.clear();
         selectedRecoSegments.clear();
 
-#ifdef USE_ROOT_IN_CDCLOCALTRACKING
+#ifdef CDCLOCALTRACKING_USE_ROOT
         m_recoTangentSegments.clear();
 #endif
 
@@ -158,7 +158,7 @@ namespace Belle2 {
             B2DEBUG(100, "  Created " << m_facetSegments.size()  << " CDCRecoFacetPtrSegment");
 
             //save the tangents for display only
-#ifdef USE_ROOT_IN_CDCLOCALTRACKING
+#ifdef CDCLOCALTRACKING_USE_ROOT
             B2DEBUG(100, "Reduce the CDCRecoFacetPtrSegment to RecoSegment2D");
             m_tangentSegmentCreator.create(m_facetSegments, m_recoTangentSegments);
 #endif
@@ -244,7 +244,7 @@ namespace Belle2 {
             B2DEBUG(100, "  Created " << m_facetSegments.size()  << " CDCRecoFacetPtrSegment");
 
             //save the tangents for display only
-#ifdef USE_ROOT_IN_CDCLOCALTRACKING
+#ifdef CDCLOCALTRACKING_USE_ROOT
             B2DEBUG(100, "Reduce the CDCRecoFacetPtrSegment to RecoSegment2D");
             m_tangentSegmentCreator.create(m_facetSegments, m_recoTangentSegments);
 #endif
@@ -272,7 +272,7 @@ namespace Belle2 {
         //TODO: combine matching segments or here
 
         // IO for monitoring in python
-#ifdef USE_ROOT_IN_CDCLOCALTRACKING
+#ifdef CDCLOCALTRACKING_USE_ROOT
         // IO wire hit clusters
 
         B2DEBUG(100, "  Creating the StoreArray for the CDCWireHitClusters");
@@ -335,7 +335,7 @@ namespace Belle2 {
 
       std::vector< CDCRecoFacetPtrSegment > m_facetSegments;
 
-#ifdef USE_ROOT_IN_CDCLOCALTRACKING
+#ifdef CDCLOCALTRACKING_USE_ROOT
       std::vector< CDCRecoTangentCollection > m_recoTangentSegments;
 #endif
 

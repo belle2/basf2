@@ -63,7 +63,7 @@ void CDCLocalTrackingTestModule::initialize()
   //it to the output file by default
   //StoreObjPtr<CDCWireHit>::registerTransient("AnotherHit");
 
-#ifdef USE_ROOT_IN_CDCLOCALTRACKING
+#ifdef CDCLOCALTRACKING_USE_ROOT
   StoreObjPtr< CDCWireHitCollection >::registerTransient("CDCAllWireHitCollection");
 #endif
 

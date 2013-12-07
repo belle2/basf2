@@ -12,50 +12,25 @@
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-
 #include <framework/dataobjects/EventMetaData.h>
-
 #include <cdc/geometry/CDCGeometryPar.h>
 
 //in type
 #include <generators/dataobjects/MCParticle.h>
+
 #include <cdc/dataobjects/CDCSimHit.h>
 #include <cdc/dataobjects/CDCHit.h>
 
 //typedefs
 #include <tracking/cdcLocalTracking/typedefs/UsedDataHolders.h>
 
-
-//#include <tracking/cdcLocalTracking/algorithms/CellularAutomat.h>
-//#include <tracking/cdcLocalTracking/algorithms/CellularPathFollower.h>
-//#include <tracking/cdcLocalTracking/algorithms/Clusterizer.h>
-
-//#include <tracking/cdcLocalTracking/algorithms/NeighborhoodBuilder.h>
-//#include <tracking/cdcLocalTracking/neighbor_chooser/WireHitNeighborChooser.h>
-//#include <tracking/cdcLocalTracking/neighbor_chooser/SimpleFacetNeighborChooser.h>
-//#include <tracking/cdcLocalTracking/neighbor_chooser/SimpleSegmentTripleNeighborChooser.h>
-
-
-//#include <tracking/cdcLocalTracking/creators/FacetCreator.h>
-//#include <tracking/cdcLocalTracking/creators/FacetSegmentReducer.h> //no decisions to optimize
-//#include <tracking/cdcLocalTracking/creators/SegmentSelecter.h>
-//#include <tracking/cdcLocalTracking/creators/SegmentReverser.h>
-
-//#include <tracking/cdcLocalTracking/creators/SegmentTripleCreator.h>
-//#include <tracking/cdcLocalTracking/creators/SegmentTripleTrackReducer.h> //no decisions to optimize
-//#include <tracking/cdcLocalTracking/creators/GFTrackCandCreator.h>
-
-
 //out type
 #include "genfit/TrackCand.h"
-
-//test to be removed
-//#include <tracking/cdcLocalTracking/testcode/MockTest.h>
-//#include <tracking/cdcLocalTracking/testcode/TemplateTest.h>
 
 #ifdef HAS_CALLGRIND
 #include <valgrind/callgrind.h>
 #endif
+
 #include <time.h>
 
 using namespace std;
@@ -63,13 +38,13 @@ using namespace Belle2;
 using namespace CDCLocalTracking;
 
 
-REG_MODULE(CDCLocalTracking)
+REG_MODULE(CDCLocalTracking);
 
 CDCLocalTrackingModule::CDCLocalTrackingModule() : Module()
 {
   setDescription("Performs patter recognition in the CDC based on local hit following");
 
-  addParam("Input collection name",  m_cdcHitsName, "Name of the CDCHit input collection ", string(""));
+  addParam("GFTrackCandColName",  m_param_gfTrackCandColName, "Name of the output collection of genfit::TrackCands ", string(""));
 
 }
 
@@ -80,34 +55,24 @@ CDCLocalTrackingModule::~CDCLocalTrackingModule()
 void CDCLocalTrackingModule::initialize()
 {
 
-  //StoreObjPtr<CDCWireHit>::registerPersistent();
-  //register a single cdchit under the name "AnotherHit" and do not write
-  //it to the output file by default
-  //StoreObjPtr<CDCWireHit>::registerTransient("AnotherHit");
-
-#ifdef USE_ROOT_IN_CDCLOCALTRACKING
+#ifdef CDCLOCALTRACKING_USE_ROOT
   StoreObjPtr< CDCWireHitCollection >::registerTransient("CDCAllWireHitCollection");
 #endif
 
-
   //output collection
-  StoreArray < genfit::TrackCand >::registerTransient("GFTrackCands");
+  StoreArray < genfit::TrackCand >::registerPersistent(m_param_gfTrackCandColName);
 
   m_segmentWorker.init();
   m_trackingWorker.init();
 
   //StoreArray with digitized CDCHits
-  StoreArray <CDCHit> cdcHits(m_cdcHitsName);
-  cdcHits.isRequired();
+  StoreArray <CDCHit>::required();
 
-  StoreArray <CDCSimHit> storedSimhits;
-  storedSimhits.isRequired();
-
-  StoreArray <MCParticle> storedMCParticles;
-  storedMCParticles.isRequired();
+  StoreArray <CDCSimHit>::required();
+  StoreArray <MCParticle>::required();
 
   //preload geometry during initialization
-  //maked as unused intentionally to avoid a compile warning
+  //marked as unused intentionally to avoid a compile warning
   CDC::CDCGeometryPar& cdcGeo __attribute__((unused)) = CDC::CDCGeometryPar::Instance();
   CDCWireTopology& topo __attribute__((unused)) = CDCWireTopology::getInstance();
 
@@ -138,13 +103,13 @@ void CDCLocalTrackingModule::event()
 
   //fetch the CDCHits from the datastore
   B2DEBUG(100, "Getting the CDCHits from the data store");
-  StoreArray <CDCHit> storedCDCHits(m_cdcHitsName);
+  StoreArray <CDCHit> storedCDCHits;
   B2DEBUG(100, "  storedCDCHits.getEntries() == " << storedCDCHits.getEntries());
 
   //create the wirehits
   B2DEBUG(100, "Creating all CDCWireHits");
 
-#ifdef USE_ROOT_IN_CDCLOCALTRACKING
+#ifdef CDCLOCALTRACKING_USE_ROOT
   B2DEBUG(100, "  Getting storedCDCWireHits from DataStore");
   StoreObjPtr< CDCWireHitCollection > storeCDCWireHits("CDCAllWireHitCollection");
   storeCDCWireHits.create();
@@ -190,7 +155,7 @@ void CDCLocalTrackingModule::event()
   mcLookUp.addSegments(m_recoSegments);
 
   //build the gfTracks
-  StoreArray < genfit::TrackCand > storedGFTrackCands("GFTrackCands");
+  StoreArray < genfit::TrackCand > storedGFTrackCands(m_param_gfTrackCandColName);
   storedGFTrackCands.create();
   m_trackingWorker.apply(m_recoSegments, storedGFTrackCands);
 

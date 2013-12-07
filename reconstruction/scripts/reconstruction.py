@@ -98,13 +98,15 @@ def add_reconstruction(path, components=None):
             vxd_trackfinder = register_module('VXDTF')
             vxd_trackfinder.param('GFTrackCandidatesColName', vxd_trackcands)
             if components != None and 'PXD' not in components:
-                vxd_trackfinder.param('sectorSetup', ['evtNormSecHIGH_SVD',
-                                      'evtNormSecMED_SVD', 'evtNormSecLOW_SVD'
-                                      ])
+                vxd_trackfinder.param('sectorSetup',
+                                      ['sectorList_evtNormSecHIGH_SVD',
+                                      'sectorList_evtNormSecMED_SVD',
+                                      'sectorList_evtNormSecLOW_SVD'])
             else:
-                vxd_trackfinder.param('sectorSetup', ['evtNormSecHIGH_VXD',
-                                      'evtNormSecMED_VXD', 'evtNormSecLOW_VXD'
-                                      ])
+                vxd_trackfinder.param('sectorSetup',
+                                      ['sectorList_evtNormSecHIGH_VXD',
+                                      'sectorList_evtNormSecMED_VXD',
+                                      'sectorList_evtNormSecLOW_VXD'])
             path.add_module(vxd_trackfinder)
 
         # track merging

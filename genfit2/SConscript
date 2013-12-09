@@ -11,13 +11,11 @@ dirs = ['core', 'fields', 'finitePlanes', 'fitters', 'GBL', 'GFRave', 'measureme
 env['LIBS'] = ['$ROOT_LIBS', 'RaveBase']
 
 # check for EVE (needed for eventDisplay)
-if env.has_key('HAS_TEVE'):
-  if not env['HAS_TEVE']:
-    print "Genfit's eventDisplay disabled, please recompile root with opengl support (on Debian/Ubuntu you'll probably only need to install libglu1-mesa-dev and rebuild)"
-
-  #print "TEve found, Genfit's eventDisplay will be built!"
+if env.get('HAS_TEVE', False):
   env['LIBS'] += env['TEVE_LIBS']
   dirs += ['eventDisplay']
+else:
+  print "Genfit's eventDisplay disabled, please recompile root with opengl support (on Debian/Ubuntu you'll probably only need to install libglu1-mesa-dev and rebuild)"
 
 # add genfit2 to include path
 env.Append(CPPPATH = os.path.join(env['INCDIR'], 'genfit'))

@@ -7,7 +7,7 @@
 //-
 
 #include <rawdata/RawFTSW.h>
-#include <daq/rawdata/modules/DAQConsts.h>
+//#include <daq/rawdata/modules/DAQConsts.h>
 
 using namespace std;
 using namespace Belle2;

@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ftswset >
+  <ftsw channel="48" firmware="m010-000deg.bit" trigger_mode="TLU" dummy_rate="0" trigger_limit="-1" />
+</ftswset>

@@ -1,0 +1,105 @@
+package b2dqm.core;
+
+import b2daq.core.Reader;
+import b2daq.core.Writer;
+
+public abstract class Histo2 extends Histo {
+
+	public Histo2() {
+		super();
+	}
+
+	public Histo2(String name, String title, int nbinx, double xmin, double xmax
+			, int nbiny, double ymin, double ymax) {
+		super(name, title);
+		_axis_x.setRange(nbinx, xmin, xmax);
+		_axis_y.setRange(nbiny, ymin, ymax);
+	}
+/*
+	public void reset() {
+		super.reset();
+		setMaximum(1);
+	}
+*/	
+	public void fixMaximum(double data, boolean fix) {
+		_axis_z.setMax(data);
+		_axis_z.fixMax(fix);
+	}
+
+	public void fixMinimum(double data, boolean fix) {
+		_axis_z.setMin(data);
+		_axis_z.fixMin(fix);
+	}
+	public double getBinContent(int nx, int ny) { 
+		return _data_v.get((nx+1) + (ny+1)*(_axis_x.getNbins()+2));
+	}
+	public double getOverFlow() { return _data_v.get(_data_v.length() - 1); }
+	public double getUnderFlow() { return _data_v.get(0); }
+	public double getOverFlowX(int ny) { return _data_v.get(_data_v.length() - 1); }
+	public double getUnderFlowX(int ny) { return _data_v.get(0); }
+	public double getOverFlowY(int nx) { return _data_v.get(_data_v.length() - 1); }
+	public double getUnderFlowY(int nx) { return _data_v.get(0); }
+	public void setBinContent(int nx, int ny, double data) {
+		if ( nx >= 0 && nx < _axis_x.getNbins() && ny >= 0 && ny < _axis_y.getNbins()) {
+			_data_v.set((nx+1) + (ny+1)*(_axis_x.getNbins()+2), data);
+			if ( data * 1.05 > getMaximum() ) setMaximum(data * 1.05);
+		}
+	}
+	public void setOverFlow(double data) { _data_v.set(_data_v.length() - 1, data); }
+	public void setUnderFlow(double data) { _data_v.set(0, data); }
+    
+	public int getDim() { return 2; }
+	public double getMaximum() { return _axis_z.getMax(); }
+	public double getMinimum() { return _axis_z.getMin(); }
+	public void setMaximum(double data) {
+		if ( !_axis_z.isFixMax() ) _axis_z.setMax(data);
+	}
+	public void setMinimum(double data) {
+		if ( !_axis_z.isFixMin() ) _axis_z.setMin(data);
+	}
+
+	public void setMaxAndMin(){
+		if ( ! _axis_y.isFixMax() || ! _axis_y.isFixMin()) {
+			double data; 
+			for ( int ny = 0;  ny < _axis_y.getNbins(); ny++) {
+				for ( int nx = 0;  nx < _axis_x.getNbins(); nx++) {
+					data = getBinContent(nx, ny);
+					if ( data * 1.05 > getMaximum() ) setMaximum(data * 1.05);
+				}
+			}
+		}
+	}
+
+	@Override
+	public void readConfig(Reader reader) throws Exception {
+		setTabId(reader.readChar());
+		setPositionId(reader.readChar());
+		setName(reader.readString());
+		setTitle(reader.readString());
+		setAxisX(readAxis(reader));
+		setAxisY(readAxis(reader));
+		_data_v.resize((getAxisX().getNbins()+2)*(getAxisY().getNbins()+2));
+	}
+
+	@Override
+	public void writeConfig(Writer writer) throws Exception {
+		writer.writeString(getDataType());
+		writer.writeChar((char)getTabId());
+		writer.writeChar((char)getPositionId());
+		writer.writeString(getName());
+		writer.writeString(getTitle());
+		writeAxis(writer, getAxisX());
+		writeAxis(writer, getAxisY());
+	}
+
+	protected String getXML() {
+		String str = "title=\"" + getTitle() + 
+		"\" data=\"" + _data_v.toString() + 
+		"\" >\n";
+		str += _axis_x.getXML("axis-x");
+		str += _axis_y.getXML("axis-y");
+		str += _axis_z.getXML("axis-z");
+		return str;
+	}
+
+}

@@ -6,7 +6,7 @@ env['TOOLS_LIBS']['rf_outputserver'] = ['daq', 'framework', '$ROOT_LIBS', 'nsm2_
 env['TOOLS_LIBS']['rf_dqmserver'] = ['daq', 'framework', '$ROOT_LIBS', 'nsm2_b2lib', 'nsm2_corelib' ]
 env['TOOLS_LIBS']['rf_roisender'] = ['daq', 'framework', '$ROOT_LIBS', 'nsm2_b2lib', 'nsm2_corelib' ]
 #env['TOOLS_LIBS']['dbg_itoh'] = ['nsm2_b2lib', 'nsm2_corelib' ]
-env['TOOLS_LIBS']['rf_master'] = ['daq', 'framework', '$ROOT_LIBS', 'nsm2_b2lib', 'nsm2_corelib']
+env['TOOLS_LIBS']['rf_master'] = ['daq', 'framework', '$ROOT_LIBS', 'pthread', 'nsm2_b2lib', 'nsm2_corelib']
 env['TOOLS_LIBS']['rfctl'] = ['nsm2_b2lib', 'nsm2_corelib', 'readline', 'curses']
 env['TOOLS_LIBS']['nodedump'] = ['daq', 'framework']
 

@@ -1,0 +1,41 @@
+#ifndef _Belle2_HVCallback_hh
+#define _Belle2_HVCallback_hh
+
+#include "daq/slc/apps/hvcontrold/HVCrateInfo.h"
+
+#include "daq/slc/nsm/NSMCallback.h"
+
+#include "daq/slc/base/Command.h"
+#include "daq/slc/base/NSMNode.h"
+
+namespace Belle2 {
+
+  class HVCallback : public NSMCallback {
+
+  public:
+    HVCallback(NSMNode* node) throw();
+    virtual ~HVCallback() throw() {}
+
+  public:
+    virtual bool load() throw() { return true; }
+    virtual bool switchOn() throw() { return true; }
+    virtual bool switchOff() throw() { return true; }
+    virtual void init() throw();
+    void getInfo() throw();
+    void sendStatus() throw();
+
+  protected:
+    virtual bool perform(NSMMessage& msg)
+    throw(NSMHandlerException);
+
+  public:
+    HVCrateInfo* getCrate() { return m_crate; }
+
+  private:
+    HVCrateInfo* m_crate;
+
+  };
+
+};
+
+#endif

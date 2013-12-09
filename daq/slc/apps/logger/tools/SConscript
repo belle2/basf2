@@ -1,0 +1,7 @@
+Import('env')
+
+env['TOOLS_LIBS']['loggerd'] = ['pthread' , '$PGSQL_LIBS', 'daq', 'framework', 'nsm2_b2lib', 'nsm2_corelib']
+env['TOOLS_LIBS']['logcollectord'] = ['pthread' , '$PGSQL_LIBS', 'daq', 'framework', 'nsm2_b2lib', 'nsm2_corelib']
+env['TOOLS_LIBS']['logsender'] = ['pthread' , '$PGSQL_LIBS', 'daq', 'framework', 'nsm2_b2lib', 'nsm2_corelib']
+
+Return('env')

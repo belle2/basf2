@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hosts>
+  <host type="pc" name="ropc01" />
+  <host type="copper" name="trgcpr001" />
+  <host type="copper" name="trgcpr002" />
+  <host type="copper" name="cpr001" />
+  <host type="copper" name="cpr002" />
+  <host type="copper" name="cpr003" />
+  <host type="copper" name="cpr004" />
+  <host type="copper" name="cpr005" />
+  <host type="copper" name="cpr006" />
+  <host type="copper" name="cpr007" />
+  <host type="copper" name="cpr008" />
+  <host type="copper" name="cpr009" />
+  <host type="copper" name="cpr010" />
+  <host type="copper" name="cpr011" />
+  <host type="copper" name="cpr012" />
+  <host type="copper" name="cpr013" />
+  <host type="copper" name="cpr014" />
+  <host type="copper" name="cpr015" />
+  <host type="vmic" name="ttd3" />
+</hosts>

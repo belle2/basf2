@@ -1,0 +1,30 @@
+#ifndef _Belle2_RFRunControlCallback_hh
+#define _Belle2_RFRunControlCallback_hh
+
+#include <daq/slc/nsm/RCCallback.h>
+
+namespace Belle2 {
+
+  class RFMaster;
+
+  class RFRunControlCallback : public RCCallback {
+
+  public:
+    RFRunControlCallback(NSMNode* node, RFMaster* master);
+    virtual ~RFRunControlCallback() throw();
+
+  public:
+    virtual bool boot() throw();
+    virtual bool load() throw();
+    virtual bool start() throw();
+    virtual bool stop() throw();
+    virtual bool recover() throw();
+
+  private:
+    RFMaster* _master;
+
+  };
+
+}
+
+#endif

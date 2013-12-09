@@ -392,13 +392,6 @@ namespace Belle2 {
       m_trackcandlist->IncDenyDestroy();
     }
 
-    if (lines->GetLinePlex().Size() == 0 && lines->GetMarkerPlex().Size() != 0) {
-      //bug in root <= 5.34.10: nothing shown if no lines in set
-      //workaround: add arbitrary line but don't render it
-      lines->AddLine(0, 0, 0, 10, 0, 0);
-      lines->SetRnrLines(false);
-    }
-
     // draw track if corresponding option is set ------------------------------------------
     if (drawTrack) {
       TEveRecTrack rectrack;

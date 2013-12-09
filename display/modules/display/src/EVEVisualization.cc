@@ -860,13 +860,6 @@ void EVEVisualization::makeTracks()
   gEve->AddElement(m_calo3d);
 
   if (m_unassignedRecoHits) {
-    if (m_unassignedRecoHits->GetLinePlex().Size() == 0 && m_unassignedRecoHits->GetMarkerPlex().Size() != 0) {
-      //bug in root <= 5.34.10: nothing shown if no lines in set
-      //workaround: add arbitrary line but don't render it
-      m_unassignedRecoHits->AddLine(0, 0, 0, 10, 0, 0);
-      m_unassignedRecoHits->SetRnrLines(false);
-    }
-
     gEve->AddElement(m_unassignedRecoHits);
   }
 }

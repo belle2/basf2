@@ -22,15 +22,15 @@
 
 
 #include <daq/rawdata/modules/DAQConsts.h>
-#include <daq/dataobjects/RawCDC.h>
-#include <daq/dataobjects/RawSVD.h>
-#include <daq/dataobjects/RawECL.h>
-#include <daq/dataobjects/RawEPID.h>
-#include <daq/dataobjects/RawBPID.h>
-#include <daq/dataobjects/RawKLM.h>
-#include <daq/dataobjects/RawCOPPER.h>
-#include <daq/dataobjects/RawHeader.h>
-#include <daq/dataobjects/RawTrailer.h>
+#include <rawdata/RawCDC.h>
+#include <rawdata/RawSVD.h>
+#include <rawdata/RawECL.h>
+#include <rawdata/RawEPID.h>
+#include <rawdata/RawBPID.h>
+#include <rawdata/RawKLM.h>
+#include <rawdata/RawCOPPER.h>
+#include <rawdata/RawHeader.h>
+#include <rawdata/RawTrailer.h>
 #include <daq/dataobjects/SendHeader.h>
 #include <daq/dataobjects/SendTrailer.h>
 

@@ -24,7 +24,7 @@
 #include <framework/datastore/StoreArray.h>
 
 #include <framework/dataobjects/EventMetaData.h>
-#include <daq/dataobjects/RawCOPPER.h>
+#include <rawdata/RawCOPPER.h>
 
 namespace Belle2 {
 

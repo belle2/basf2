@@ -25,10 +25,10 @@
 #include <framework/dataobjects/EventMetaData.h>
 
 #include <daq/rawdata/modules/DAQConsts.h>
-#include <daq/dataobjects/RawCOPPER.h>
+#include <rawdata/RawCOPPER.h>
 #include <daq/dataobjects/SendHeader.h>
 #include <daq/dataobjects/SendTrailer.h>
-#include <daq/dataobjects/ErrorMessage.h>
+#include <rawdata/ErrorMessage.h>
 
 
 #include <sys/types.h>

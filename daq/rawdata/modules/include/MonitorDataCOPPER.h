@@ -28,8 +28,8 @@
 #include <framework/dataobjects/EventMetaData.h>
 
 #include <daq/rawdata/modules/DAQConsts.h>
-#include <daq/dataobjects/RawCDC.h>
-#include <daq/dataobjects/RawCOPPER.h>
+#include <rawdata/RawCDC.h>
+#include <rawdata/RawCOPPER.h>
 #include <daq/dataobjects/SendHeader.h>
 #include <daq/dataobjects/SendTrailer.h>
 

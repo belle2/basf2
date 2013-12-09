@@ -40,8 +40,8 @@ ROIGeometry::appendIntercepts(StoreArray<PXDIntercept>* listToBeFilled,
                               RelationArray* gfTrackCandToPXDIntercepts)
 {
 
-  TVectorD predictedIntersect;
-  TMatrixDSym covMatrix(theTrack->getCardinalRep()->getDim());
+  //  TVectorD predictedIntersect(theTrack->getCardinalRep()->getDim());
+  //  TMatrixDSym covMatrix(theTrack->getCardinalRep()->getDim());
   PXDIntercept tmpPXDIntercept;
 
   std::list<ROIDetPlane>::iterator itPlanes = m_planeList.begin();
@@ -66,8 +66,8 @@ ROIGeometry::appendIntercepts(StoreArray<PXDIntercept>* listToBeFilled,
         continue;
       }
 
-      predictedIntersect = state.getState();
-      covMatrix = state.getCov();
+      const TVectorD& predictedIntersect = state.getState();
+      const TMatrixDSym& covMatrix = state.getCov();
 
       tmpPXDIntercept.setCoorU(predictedIntersect[3]);
       tmpPXDIntercept.setCoorV(predictedIntersect[4]);
@@ -76,8 +76,8 @@ ROIGeometry::appendIntercepts(StoreArray<PXDIntercept>* listToBeFilled,
       tmpPXDIntercept.setSigmaUprime(sqrt(covMatrix(1, 1)));
       tmpPXDIntercept.setSigmaVprime(sqrt(covMatrix(2, 2)));
       tmpPXDIntercept.setLambda(lambda);
-      //      tmpPXDIntercept.setPlane(*itPlanes);
       tmpPXDIntercept.setVxdID(itPlanes->getSensorInfo());
+
 
       listToBeFilled->appendNew(tmpPXDIntercept);
 

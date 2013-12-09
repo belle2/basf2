@@ -25,7 +25,7 @@ namespace Belle2 {
 
     ROIDetPlane(const VxdID& sensorInfo); /**< the constructor*/
 
-    ~ROIDetPlane();
+    virtual ~ROIDetPlane();
 
     VxdID getSensorInfo() {return m_sensorInfo;}; /**< return the sensor ID*/
 

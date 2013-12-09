@@ -163,11 +163,12 @@ namespace Belle2 {
     //Other variables
 
     typedef int NDF;
-    std::map<int, NDF> m_ndf_by_detId {
-      std::make_pair(Const::PXD, 2),
-      std::make_pair(Const::SVD, 2),
-      std::make_pair(Const::CDC, 1)
-    };                                 /**< Map storing the standard number degrees of freedom for a single hit by detector */
+    std::map<int, NDF> m_ndf_by_detId;            /**< Map storing the standard number degrees of freedom for a single hit by detector */
+    /*{
+    std::make_pair(Const::PXD, 2),
+    std::make_pair(Const::SVD, 2),
+    std::make_pair(Const::CDC, 1)
+    };  */
 
   }; // end class
 } // end namespace Belle2

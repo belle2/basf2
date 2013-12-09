@@ -13,8 +13,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <daq/dataobjects/RawDataBlock.h>
-#include <daq/dataobjects/SendHeader.h>
-#include <daq/dataobjects/SendTrailer.h>
 #include <daq/dataobjects/RawCOPPER.h>
 #include <framework/datastore/DataStore.h>
 
@@ -79,7 +77,6 @@ namespace Belle2 {
 #endif
 
   protected :
-    //    Belle2::SendHeader m_FTSW_header; //
 
     ClassDef(RawFTSW, 2);
     // ver.2 Remove m_FTSW_header and introduce a new data format on Nov. 20, 2013

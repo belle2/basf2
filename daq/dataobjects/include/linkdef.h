@@ -18,7 +18,6 @@
 #pragma link C++ class Belle2::RawFTSW;
 #pragma link C++ class Belle2::SendHeader;
 #pragma link C++ class Belle2::SendTrailer;
-#pragma link C++ class Belle2::RawROPC;
 #pragma link C++ class Belle2::ErrorMessage;
 
 #endif

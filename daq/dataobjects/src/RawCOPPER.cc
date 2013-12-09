@@ -8,8 +8,6 @@
 
 #include "daq/dataobjects/RawCOPPER.h"
 
-#define NO_DATA_CHECK
-
 using namespace std;
 using namespace Belle2;
 
@@ -512,11 +510,15 @@ int* RawCOPPER::GetExpRunBuf(int n)
 
 unsigned int RawCOPPER::GetB2LFEE32bitEventNumber(int n)
 {
+
+
+
+
 #ifndef READ_OLD_B2LFEE_FORMAT_FILE
   ErrorMessage print_err;
+  int err_flag = 0;
   unsigned int eve_num = 0;
-  int flag = 0, err_flag = 0;
-
+  int flag = 0;
   unsigned int eve[4];
   for (int i = 0; i < 4 ; i++) {
     eve[ i ] = 12345678;
@@ -537,16 +539,18 @@ unsigned int RawCOPPER::GetB2LFEE32bitEventNumber(int n)
     exit(-1);
   }
 
-#ifndef NO_DATA_CHECK
+
   if (err_flag == 1) {
+#ifndef NO_DATA_CHECK
     char err_buf[500];
     sprintf(err_buf, "Different event number over HSLBs : slot A 0x%x : B 0x%x :C 0x%x : D 0x%x\n",
             eve[ 0 ], eve[ 1 ], eve[ 2 ], eve[ 3 ]);
     print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     sleep(12345678);
     exit(-1);
-  }
 #endif
+  }
+
   return eve_num;
 #else
   exit(1);
@@ -672,16 +676,18 @@ unsigned int RawCOPPER::GetB2LHeaderWord(int n, int finesse_buffer_pos)
     exit(-1);
   }
 
-#ifndef NO_DATA_CHECK
+
   if (err_flag == 1) {
+#ifndef NO_DATA_CHECK
     char err_buf[500];
     sprintf(err_buf, "Different event number over HSLBs : slot A 0x%x : B 0x%x :C 0x%x : D 0x%x\n",
             word[ 0 ], word[ 1 ], word[ 2 ], word[ 3 ]);
     print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     sleep(12345678);
     exit(-1);
-  }
 #endif
+  }
+
   return ret_word;
 
 }

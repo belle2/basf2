@@ -5,8 +5,9 @@
 // Author : Satoru Yamada Itoh, IPNS, KEK
 // Date : 2 - Aug - 2013
 //-
+#include <daq/slc/readout/modules/RCTestModule.h>
+
 #include <daq/rawdata/modules/DAQConsts.h>
-#include <daq/rawdata/modules/RCTestModule.h>
 
 using namespace std;
 using namespace Belle2;

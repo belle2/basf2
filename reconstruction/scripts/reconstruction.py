@@ -6,7 +6,8 @@ from basf2 import *
 
 def add_posttracking_reconstruction(path, components=None):
     """
-    This function adds the standard reconstruction modules after tracking to a path.
+    This function adds the standard reconstruction modules after tracking
+    to a path.
     """
 
     # track extrapolation
@@ -80,21 +81,24 @@ def add_reconstruction(path, components=None):
 
     # tracking
     if components == None or 'SVD' in components or 'CDC' in components:
+        use_vxd = (components == None or 'SVD' in components)
+        use_cdc = (components == None or 'CDC' in components)
 
         # CDC track finder: trasan
-        cdc_trackcands = None
-        if components == None or 'CDC' in components:
-            cdc_trackcands = 'CDCGFTrackCands'
+        if use_cdc:
+            cdc_trackcands = ''
+            if use_vxd:
+                cdc_trackcands = 'CDCGFTrackCands'
             trackcands = cdc_trackcands
             cdc_trackfinder = register_module('Trasan')
             cdc_trackfinder.param('GFTrackCandidatesColName', cdc_trackcands)
             path.add_module(cdc_trackfinder)
 
         # VXD track finder
-        vxd_trackcands = None
-        if components == None or 'SVD' in components:
-            vxd_trackcands = 'VXDGFTrackCands'
-            trackcands = vxd_trackcands
+        if use_vxd:
+            vxd_trackcands = ''
+            if use_cdc:
+                vxd_trackcands = 'VXDGFTrackCands'
             vxd_trackfinder = register_module('VXDTF')
             vxd_trackfinder.param('GFTrackCandidatesColName', vxd_trackcands)
             if components != None and 'PXD' not in components:
@@ -110,25 +114,20 @@ def add_reconstruction(path, components=None):
             path.add_module(vxd_trackfinder)
 
         # track merging
-        if cdc_trackcands and vxd_trackcands:
-            trackcands = 'GFTrackCands'
+        if use_vxd and use_cdc:
             track_merger = register_module('MCTrackCandCombiner')
             track_merger.param('CDCTrackCandidatesColName', cdc_trackcands)
             track_merger.param('VXDTrackCandidatesColName', vxd_trackcands)
-            track_merger.param('OutputTrackCandidatesColName', trackcands)
             path.add_module(track_merger)
 
         # track fitting
         trackfitter = register_module('GenFitter')
-        trackfitter.param('GFTrackCandidatesColName', trackcands)
         path.add_module(trackfitter)
 
         # dE/dx PID
         dEdxPID = register_module('DedxPID')
-        if not vxd_trackcands:
-            dEdxPID.param('useSVD', False)
-        if not cdc_trackcands:
-            dEdxPID.param('useCDC', False)
+        dEdxPID.param('useSVD', use_vxd)
+        dEdxPID.param('useCDC', use_cdc)
         path.add_module(dEdxPID)
 
     # add further reconstruction modules
@@ -137,7 +136,8 @@ def add_reconstruction(path, components=None):
 
 def add_mc_reconstruction(path, components=None):
     """
-    This function adds the standard reconstruction modules with MC tracking to a path.
+    This function adds the standard reconstruction modules with MC tracking
+    to a path.
     """
 
     # tracking
@@ -195,5 +195,3 @@ def add_mdst_output(path, mc=True, filename='mdst.root'):
                      'ECLShowersToMCParticles']
     output.param('branchNames', branches)
     path.add_module(output)
-
-

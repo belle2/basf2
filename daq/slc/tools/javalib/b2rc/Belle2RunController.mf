@@ -1,1 +1,0 @@
-Main-Class: b2rc.java.Belle2RunController

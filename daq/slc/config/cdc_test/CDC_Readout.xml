@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<hslb type="CD_Readout" version="102" >
-  <reg name="window" address="0x63" value="4" />
-  <reg name="delay"  address="0x64" value="4" />
-  <reg name="tdc" address="0x65" value="3700" size="2" />
-  <reg name="adc" address="0x61" value="-1" size="2" />
-  <reg name="pedestal" address="0x01" length="48" size="2" value="-1" />
-</hslb>

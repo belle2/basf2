@@ -1,6 +1,0 @@
-<copper type="CDC_COPPER" version="10001" >
-  <hslb slot="a" type="CDC_Readout" used="true" firmware="hslb.bit" />
-  <hslb slot="b" type="CDC_Readout" used="false" firmware="hslb.bit" />
-  <hslb slot="c" type="CDC_Readout" used="false" firmware="hslb.bit" />
-  <hslb slot="d" type="CDC_Readout" used="false" firmware="hslb.bit" />
-</copper>

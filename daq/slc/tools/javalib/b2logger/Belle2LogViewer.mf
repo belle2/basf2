@@ -1,1 +1,0 @@
-Main-Class: b2dqm.java.Belle2DQMBrowser

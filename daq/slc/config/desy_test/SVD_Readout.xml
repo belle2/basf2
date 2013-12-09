@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<object class="SVD_Readout" extends="HSLB" revision="1" >
-  <int name="window" value="4" address="0x63" />
-  <int name="delay" value="4" address="0x64" />
-  <int name="tdc" value="3700" address="0x65" size="2" />
-  <int name="adc" value="-1" address="0x61" size="2" />
-  <int_array name="pedestal" value="-1" length="48" address="0x01" size="2" />
-</object>

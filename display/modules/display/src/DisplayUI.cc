@@ -44,6 +44,23 @@ using namespace Belle2;
 
 ClassImp(DisplayUI)
 
+/* since 5.34.11 (possibly some previous patch release) creating TApplication resets gStyle, TGeo,
+ *
+ * this is a very ugly workaround to prevent this cleanup.
+ *
+ * See https://sft.its.cern.ch/jira/browse/ROOT-5823
+ */
+struct TApplicationWorkaround : public TApplication {
+  /** There can be only one TApplication, but there is a list of them anyway.
+   *
+   * We'll just add the default application again, which prevents calls to
+   * gROOT->EndOfProcessCleanup().
+   */
+  static void magic() {
+    fgApplications->Add(gApplication);
+  }
+};
+
 DisplayUI::DisplayUI(bool automatic):
   m_currentEntry(0),
   m_guiInitialized(false),
@@ -53,8 +70,11 @@ DisplayUI::DisplayUI(bool automatic):
   m_timer(0)
 {
   if ((!gApplication) || (gApplication && gApplication->TestBit(TApplication::kDefaultApplication))) {
+    B2INFO("Creating TApplication window.");
+    TApplicationWorkaround::magic(); //hackhack
     new TApplication("ROOT_application", 0, 0);
   }
+
   if (!gEve) {
     B2INFO("Creating TEve window.");
     TEveManager::Create(!m_automatic, "I"); //show window in interactive mode, hide file browser

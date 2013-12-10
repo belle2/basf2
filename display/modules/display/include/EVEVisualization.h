@@ -21,9 +21,9 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Const.h>
 
-#include <genfit/GFRaveVertex.h>
 #include <genfit/Track.h>
 #include <genfit/TrackCand.h>
+#include <genfit/GFRaveVertex.h>
 
 #include <TEveStraightLineSet.h>
 #include <TEveTrackPropagator.h>
@@ -54,6 +54,14 @@ namespace Belle2 {
    *  @sa DisplayModule
    */
   class EVEVisualization {
+    /** Fitter type to be used for addTrack(). */
+    enum eFitterType {
+      SimpleKalman,
+      RefKalman,
+      DafSimple,
+      DafRef
+    };
+
 
     /** Hold MC tracks and associated visualisation objects. */
     struct MCTrack {
@@ -108,7 +116,7 @@ namespace Belle2 {
     /** Add this genfit::Track to event data.
      *
      *  Adapted from GenfitDisplay, originally written by Karl Bicker. */
-    void addTrack(const genfit::Track* gftrack, const TString& label = "");
+    void addTrack(const genfit::Track* track, const TString& label = "");
 
     /** Add a genfit::TrackCand, to evaluate track finding. */
     template<class PXDType, class SVDType> void addTrackCandidate(const genfit::TrackCand* trackCand, const TString& label,
@@ -239,6 +247,9 @@ namespace Belle2 {
      *  return a pointer to the box object.
      */
     TEveBox* boxCreator(const TVector3& o, TVector3 u, TVector3 v, float ud, float vd, float depth);
+
+    void makeLines(const genfit::StateOnPlane* prevState, const genfit::StateOnPlane* state, const genfit::AbsTrackRep* rep,
+                   const Color_t& color, const Style_t& style, bool drawMarkers, bool drawErrors, double lineWidth = 2, int markerPos = 1);
 
     /** enable/disable rendering of the volume 'name', or only its daughters if only_daughters is set. */
     void enableVolume(const char* name, bool only_daughters = false, bool enable = true);

@@ -82,9 +82,9 @@ namespace Belle2 {
     bool m_showTrackLevelObjects;
 
     /** Wether to show genfit::TrackCands */
-    bool m_showGFTrackCands;
+    bool m_showTrackCandidates;
 
-    /** Wether to use cluster hits for genfit::TrackCands */
+    /** Wether to use cluster hits for track candidates */
     bool m_useClusters;
 
     /** Non-interactively save visualisations for each event. */

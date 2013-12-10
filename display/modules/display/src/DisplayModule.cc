@@ -37,16 +37,15 @@ DisplayModule::DisplayModule() : Module(), m_display(0), m_visualizer(0)
   addParam("hideSecondaries", m_hideSecondaries, "If true, secondary MCParticles (and hits created by them) will not be shown.", false);
   addParam("showCharged", m_showCharged, "If true, all charged MCParticles will be shown, including secondaries (implies disabled assignHitsToPrimaries). May be slow.", false);
   addParam("showNeutrals", m_showNeutrals, "If true, all neutral MCParticles will be shown, including secondaries (implies disabled assignHitsToPrimaries). May be slow.", false);
-  addParam("showTrackLevelObjects", m_showTrackLevelObjects, "If true, fitted genfit::Tracks, genfit::GFRave Vertices and ECLGamma objects will be shown in the display.", true);
-  addParam("showGFTrackCands", m_showGFTrackCands, "If true, track candidates (genfit::TrackCands) and RecoHits will be shown in the display.", false);
-  addParam("useClusters", m_useClusters, "Use PXD/SVD clusters for genfit::TrackCands/recohit visualisation (instead of TrueHits).", true);
+  addParam("showTrackLevelObjects", m_showTrackLevelObjects, "If true, fitted genfit::Tracks, GFRave Vertices and ECLGamma objects will be shown in the display.", true);
+  addParam("showTrackCandidates", m_showTrackCandidates, "If true, track candidates (genfit::TrackCand) and RecoHits will be shown in the display.", false);
+  addParam("useClusters", m_useClusters, "Use PXD/SVD clusters for track candidate/recohit visualisation (instead of TrueHits).", true);
   addParam("automatic", m_automatic, "Non-interactively save visualisations for each event.", false);
   addParam("fullGeometry", m_fullGeometry, "Show full geometry instead of simplified shapes. Further details can be enabled by changing the VisLevel option for Eve -> Scenes -> Geometry Scene -> Top_1.", false);
 
-  //make sure dictionaries for PXDrecohits and RKTrackRep are loaded
+  //make sure dictionaries for PXDrecohits are loaded
   //needs to be done here to have dictionaries available during RootInput::initialize()
   gSystem->Load("libpxd");
-  gSystem->Load("libgenfit2");
 }
 
 
@@ -82,6 +81,7 @@ void DisplayModule::initialize()
     //initialize some things for genfit
     genfit::FieldManager::getInstance()->init(new GFGeant4Field());
     genfit::MaterialEffects::getInstance()->init(new genfit::TGeoMaterialInterface());
+
   }
   if (!gGeoManager) {
     B2ERROR("Couldn't create TGeo geometry!");
@@ -99,7 +99,7 @@ void DisplayModule::initialize()
     m_display->addParameter("Show all neutral particles", getParam<bool>("showNeutrals"), 1);
     m_display->addParameter("Hide secondaries", getParam<bool>("hideSecondaries"), 1);
   }
-  m_display->addParameter("Show candidates and RecoHits", getParam<bool>("showGFTrackCands"), 0);
+  m_display->addParameter("Show candidates and RecoHits", getParam<bool>("showTrackCandidates"), 0);
   m_display->addParameter("Show tracks, vertices, gammas", getParam<bool>("showTrackLevelObjects"), 0);
 
 
@@ -163,15 +163,15 @@ void DisplayModule::event()
     m_visualizer->addSimHits(StoreArray<BKLMSimHit>());
   }
 
-  if (m_showGFTrackCands) {
+  if (m_showTrackCandidates) {
     StoreArray<genfit::TrackCand> gftrackcands;
     const int nCands = gftrackcands.getEntries();
     for (int i = 0; i < nCands; i++) {
       if (m_useClusters) {
-        m_visualizer->addTrackCandidate(gftrackcands[i], TString::Format("GFTrackCand %d", i),
+        m_visualizer->addTrackCandidate(gftrackcands[i], TString::Format("genfit::TrackCand %d", i),
                                         StoreArray<PXDCluster>(), StoreArray<SVDCluster>(), StoreArray<CDCHit>());
       } else {
-        m_visualizer->addTrackCandidate(gftrackcands[i], TString::Format("GFTrackCand %d", i),
+        m_visualizer->addTrackCandidate(gftrackcands[i], TString::Format("genfit::TrackCand %d", i),
                                         StoreArray<PXDTrueHit>(), StoreArray<SVDTrueHit>(), StoreArray<CDCHit>());
       }
     }

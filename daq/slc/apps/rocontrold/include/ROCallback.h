@@ -1,15 +1,9 @@
 #ifndef _Belle2_ROCallback_hh
 #define _Belle2_ROCallback_hh
 
+#include "daq/slc/readout/Basf2ScriptManager.h"
+
 #include "daq/slc/nsm/RCCallback.h"
-
-#include "daq/slc/base/NSMNode.h"
-
-#include "daq/slc/system/Fork.h"
-#include "daq/slc/system/PThread.h"
-
-#include "daq/slc/readout/RunInfoBuffer.h"
-#include "daq/slc/readout/RunLogMessanger.h"
 
 namespace Belle2 {
 
@@ -30,12 +24,7 @@ namespace Belle2 {
     virtual bool abort() throw();
 
   private:
-    std::string _buf_path;
-    std::string _fifo_path;
-    RunInfoBuffer _buf;
-    RunLogMessanger _msg;
-    Fork _fork;
-    PThread _thread;
+    Basf2ScriptManager _man;
 
   };
 

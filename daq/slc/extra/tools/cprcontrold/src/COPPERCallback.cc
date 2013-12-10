@@ -1,23 +1,9 @@
 #include "COPPERCallback.h"
 
-#include "SenderManager.h"
-
-#include "daq/slc/apps/ProcessListener.h"
-
-#include "daq/slc/system/Fork.h"
-#include "daq/slc/system/PThread.h"
-
 #include "daq/slc/base/Debugger.h"
 #include "daq/slc/base/StringUtil.h"
 
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <unistd.h>
-#include <fcntl.h>
-#include <sys/mman.h>
-#include <errno.h>
-#include <cstring>
-#include <cstdio>
 #include <iostream>
 
 using namespace Belle2;
@@ -26,7 +12,7 @@ COPPERCallback::COPPERCallback(NSMNode* node)
   : RCCallback(node)
 {
   node->setData(new DataObject());
-  _listener = NULL;
+  _man.setCallback(this);
 }
 
 COPPERCallback::~COPPERCallback() throw()
@@ -35,21 +21,20 @@ COPPERCallback::~COPPERCallback() throw()
 
 void COPPERCallback::init() throw()
 {
-  _buf_path = "/run_info_buf_" + _node->getName();
-  _fifo_path = "/tmp/run_log_fifo_" + _node->getName();
-  SharedMemory::unlink(_buf_path);
-  _msg.unlink(_fifo_path);
-  _buf.open(_buf_path);
-  _msg.create(_fifo_path, "r");
+  _man.create();
 }
 
 bool COPPERCallback::boot() throw()
 {
   download();
-  for (int slot = 0; slot < 4; slot++) {
-    DataObject* hslb = _node->getData()->getObject(Belle2::form("hslb_%c", (char)slot));
-    if (hslb != NULL)
-      _hslbcon_v[slot].boot(slot, hslb);
+  DataObject* data = _node->getData();
+  size_t length;
+  bool* used_v = data->getBoolArray("hslb_used", length);
+  for (size_t slot = 0; slot < length; slot++) {
+    if (used_v[slot]) {
+      DataObject* hslb = data->getObject(Belle2::form("hslb_%c", (char)slot));
+      if (hslb != NULL) _hslbcon_v[slot].boot(slot, hslb);
+    }
   }
   return true;
 }
@@ -59,9 +44,13 @@ bool COPPERCallback::load() throw()
   bool boot_firm = (_confno == (int)getMessage().getParam(0));
   _confno = getMessage().getParam(0);
   download();
-  _buf.clear();
-  for (size_t slot = 0; slot < 4; slot++) {
-    if (_node->getData()->getBool(Belle2::form("hslb_%c", (char)slot))) {
+  int flag = 0;
+  DataObject* data = _node->getData();
+  size_t length;
+  bool* used_v = data->getBoolArray("hslb_used", length);
+  for (size_t slot = 0; slot < length; slot++) {
+    if (used_v[slot]) {
+      flag += 1 << slot;
       _hslbcon_v[slot].setBootFirmware(boot_firm);
       if (!(_hslbcon_v[slot].reset() && _hslbcon_v[slot].boot())) {
         Belle2::debug("[ERROR] Failed to boot HSLB:%c", (char)(slot + 'a'));
@@ -74,47 +63,26 @@ bool COPPERCallback::load() throw()
       }
     }
   }
-  if (_listener != NULL) {
-    _listener->setRunning(false);
-    _listener = NULL;
-    _thread.cancel();
-  }
-  system("killall basf2");
-  _fork.cancel();
-  _fork = Fork(new SenderManager(_node));
-  _listener = new ProcessListener(this, _fork, "basf2_readout");
-  _thread = PThread(_listener);
-  return true;
+  _man.clearArguments();
+  const char* belle2_path = getenv("BELLE2_LOCAL_DIR");
+  _man.setScriptDir(Belle2::form("%s/daq/rawdata/examples/", belle2_path));
+  _man.setScript(data->getText("script"));
+  _man.addArgument(data->getText("host"));
+  _man.addArgument(Belle2::form("%d", (int)_node->getID()));
+  _man.addArgument(Belle2::form("%d", flag));
+  _man.addArgument("1");
+  _man.addArgument(_node->getName());
+  return _man.load();
 }
 
 bool COPPERCallback::start() throw()
 {
-  _buf.lock();
-  _buf.setExpNumber(getExpNumber());
-  _buf.setColdNumber(getColdNumber());
-  _buf.setHotNumber(getHotNumber());
-  _buf.setNodeId(_node->getData()->getId());
-  _buf.setState(1);
-  _buf.unlock();
-  try {
-    SystemLog log = _msg.recieveLog();
-    if (log.getPriority() == SystemLog::INFO) {
-      return true;
-    } else {
-      Belle2::debug("Error on readout worker : %s", log.getMessage().c_str());
-      setReply(log.getMessage());
-    }
-  } catch (const IOException& e) {
-    Belle2::debug("Fifo IO error");
-    setReply("Fifo IO error");
-  }
-  return false;
+  return _man.start();
 }
 
 bool COPPERCallback::stop() throw()
 {
-  _buf.clear();
-  return true;
+  return _man.stop();
 }
 
 bool COPPERCallback::resume() throw()
@@ -129,7 +97,5 @@ bool COPPERCallback::pause() throw()
 
 bool COPPERCallback::abort() throw()
 {
-  _buf.clear();
-  _fork.cancel();
-  return true;
+  return _man.stop();
 }

@@ -1,4 +1,4 @@
-#include "daq/slc/apps/ProcessListener.h"
+#include "daq/slc/readout/ProcessListener.h"
 
 #include "daq/slc/nsm/RCCallback.h"
 #include "daq/slc/nsm/NSMCommunicator.h"

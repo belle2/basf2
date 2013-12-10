@@ -70,12 +70,11 @@ bool HSLBController::load() throw()
     ConfigFile config;
     std::string path = _hslb->getText("firmware");
     if (path.size() > 0) path = config.get("HSLB_FIRMWARE_PATH") + "/" + path;
-    _mgt = mgt_boot(_slot, (path.size() > 0) ? path.c_str() : NULL, &board_type,
-                    &firmware, &hardware);
+    const char* firm_path = (path.size() > 0) ? path.c_str() : NULL;
+    _mgt = mgt_boot(_slot, firm_path, &board_type,  &firmware, &hardware);
     if (_mgt == NULL) return false;
   }
   if (_hslb == NULL || _mgt == NULL) return true;
-  //mgt_execute(_mgt, CTL_LINK);
   if (mgt_check_FEE(_mgt) != 0) {
     printf("[FATAL] Check FEE error\n");
     return false;
@@ -83,8 +82,6 @@ bool HSLBController::load() throw()
   mgt_execute(_mgt, _hslb->getEnum("trigger_mode"));
   Belle2::debug("[DEBUG] Selected trigger mode = %d",
                 _hslb->getEnum("trigger_mode"));
-  //mgt_execute(_mgt, CTL_VERBOSE);
-  //mgt_execute(_mgt, CTL_TRIGGER);
   for (size_t i = 0; i < _reg_v.size(); i++) {
     HSLBRegister& reg(_reg_v[i]);
     size_t length = 0;

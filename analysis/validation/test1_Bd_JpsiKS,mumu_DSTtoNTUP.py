@@ -5,28 +5,26 @@ import sys
 import os
 from basf2 import *
 from modularAnalysis import *
+from stdFSParticles import *
+from stdLooseFSParticles import *
 
 inputMdst('../Bd_JpsiKS,mumu_GENSIMRECtoDST.dst.root')
 loadReconstructedParticles()
+stdFSParticles()
+stdLooseFSParticles()
 
-selectParticle('pi+', 211, [''])
-selectParticle('pi-', -211, [''])
-selectParticle('mu+', 13, [''])
-selectParticle('mu-', -13, [''])
-
-makeParticle('jpsi', 443, ['mu-', 'mu+'], 2.8, 3.3)
-makeParticle('KS0', 310, ['pi-', 'pi+'], 0.4, 0.6)
+makeParticle('jpsi', 443, ['StdVeryLooseMu-', 'StdVeryLooseMu+'], 2.8, 3.3)
+matchMCTruth('jpsi')
+makeParticle('KS0', 310, ['StdVeryLoosePi-', 'StdVeryLoosePi+'], 0.4, 0.6)
+matchMCTruth('KS0')
 
 # Prepare the B candidates
 makeParticle('B0toJpsiKS', 511, ['jpsi', 'KS0'], 5.2, 5.4)
+matchMCTruth('B0toJpsiKS')
 
 # ----> NtupleMaker module
-ntuple1 = register_module('NtupleMaker')
-# output root file name (the suffix .root will be added automaticaly)
-ntuple1.param('strFileName', '../Bd_JpsiKS,mumu.ntup.root')
-ntuple1.param('strTreeName', 'Bd_JpsiKS_tuple')
-ntuple1.param('strListName', 'B0toJpsiKS')
-ntuple1.param('strTools', [
+ntupleFile('ntuples/Bd_JpsiKS,mumu.ntup.root')
+tools = [
     'EventMetaData',
     'B0',
     'RecoStats',
@@ -41,16 +39,23 @@ ntuple1.param('strTools', [
     'B0 -> [J/psi -> ^mu+ ^mu-] [K_S0 -> ^pi+ ^pi-]',
     'PID',
     'B0 -> [J/psi -> ^mu+ ^mu-] [K_S0 -> ^pi+ ^pi-]',
-    ])
-    # exp_no, run_no, evt_no
-main.add_module(ntuple1)
+    ]
+ntupleTree('Bd_JpsiKS_tuple', 'B0toJpsiKS', tools)
 
-# useful to save some event summary information
-ntuple2 = register_module('NtupleMaker')
-ntuple2.param('strTreeName', 'eventTuple')
-ntuple2.param('strListName', '')
-ntuple2.param('strTools', ['EventMetaData', 'B-'])
-main.add_module(ntuple2)
+# dump all event summary information
+eventtools = [
+    'EventMetaData',
+    'B-',
+    'RecoStats',
+    'B-',
+    'DetectorStatsRec',
+    'B-',
+    'DetectorStatsSim',
+    'B-',
+    ]
+ntupleTree('eventtuple', '', eventtools)
+
+summaryOfLists(['jpsi', 'KS0', 'B0toJpsiKS'])
 
 # ----> start processing of modules
 process(main)

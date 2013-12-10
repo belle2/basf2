@@ -41,14 +41,15 @@ TH1F * h_PhgammaHighE ;
 
 void test2_Validation_Efficiency_Truth(TString);
 void test2_Validation_Efficiency_Reco(TString);
-void test2_Validation_Efficiency_Photon_Truth(TString);
-void test2_Validation_Efficiency_Photon_Reco(TString);
+void test2_Validation_Efficiency_Photon_Truth(TString, int);
+void test2_Validation_Efficiency_Photon_Reco(TString, int);
 
-void test2_Validation_Efficiency(bool doOfflineStudy=false){
+void test2_Validation_Efficiency(int region=0, bool runOffline=false){ // region 0=all, 1=barrel, 2=forward, 3=backward
+
 
   //If running offline study then use finer binning
   int binfactor=1;
-  if(doOfflineStudy)binfactor=2;
+  if(runOffline)binfactor=2;
   int nthbins=16*binfactor;
   float thlow=0;
   float thhigh=3.2;
@@ -59,9 +60,23 @@ void test2_Validation_Efficiency(bool doOfflineStudy=false){
   float plow=0.;
   float phigh=2.6;
   
+  int nthgbins=25;
+  float thglow=0.21;
+  float thghigh=2.71;
+
   int nptbins=26*binfactor;
   float ptlow=0.;
   float pthigh=2.6;
+
+  //line for showing forward and background regions of the ECL
+  TLine *lfwdlow  = new TLine(0.21,0.,0.21,1.05);
+  lfwdlow->SetLineColor(kGray);
+  TLine *lfwdhigh = new TLine(0.61,0.,0.61,1.05);
+  lfwdhigh->SetLineColor(kGray);
+  TLine *lbwdlow  = new TLine(2.21,0.,2.21,1.05);
+  lbwdlow->SetLineColor(kGray);
+  TLine *lbwdhigh = new TLine(2.71,0.,2.71,1.05);
+  lbwdhigh->SetLineColor(kGray);
   
   //Set the Binning
   //Lab momentum
@@ -81,14 +96,14 @@ void test2_Validation_Efficiency(bool doOfflineStudy=false){
 
 //Photons
   h_PgammaTruth        = new TH1F("P_gamma_Truth"         ,";E(#gamma) GeV;N"             ,npbins,plow,phigh);
-  h_ThgammaTruthLowE  = new TH1F("Theta_gamma_Truth_LowE" ,"E<500 MeV;#theta(#gamma) ;N"  ,nthbins,thlow,thhigh);	
-  h_ThgammaTruthHighE = new TH1F("Theta_gamma_Truth_HighE","E>=500 MeV;#theta(#gamma) ;N" ,nthbins,thlow,thhigh);	
+  h_ThgammaTruthLowE  = new TH1F("Theta_gamma_Truth_LowE" ,"E<500 MeV;#theta(#gamma) ;N"  ,nthgbins,thglow,thghigh);	
+  h_ThgammaTruthHighE = new TH1F("Theta_gamma_Truth_HighE","E>=500 MeV;#theta(#gamma) ;N" ,nthgbins,thglow,thghigh);	
   h_PhgammaTruthLowE  = new TH1F("Phi_gamma_Truth_LowE"   ,"E<500 MeV;#phi(#gamma) ;N"    ,nthbins,phlow,phhigh);	
   h_PhgammaTruthHighE = new TH1F("Phi_gamma_Truth_HighE"  ,"E>=500 MeV;#phi(#gamma) ;N"   ,nthbins,phlow,phhigh);	
 
   h_Pgamma       = new TH1F("P_gamma_"         ,";E(#gamma) GeV;N"   ,npbins,plow,phigh);
-  h_ThgammaLowE  = new TH1F("Theta_gamma_LowE" ,";#theta(#gamma) ;N" ,nthbins,thlow,thhigh);	
-  h_ThgammaHighE = new TH1F("Theta_gamma_HighE",";#theta(#gamma) ;N" ,nthbins,thlow,thhigh);	
+  h_ThgammaLowE  = new TH1F("Theta_gamma_LowE" ,";#theta(#gamma) ;N" ,nthgbins,thglow,thghigh);	
+  h_ThgammaHighE = new TH1F("Theta_gamma_HighE",";#theta(#gamma) ;N" ,nthgbins,thglow,thghigh);	
   h_PhgammaLowE  = new TH1F("Phi_gamma_LowE"   ,";#phi(#gamma) ;N"   ,nthbins,phlow,phhigh);	
   h_PhgammaHighE = new TH1F("Phi_gamma_HighE"  ,";#phi(#gamma) ;N"   ,nthbins,phlow,phhigh);	
 
@@ -103,8 +118,8 @@ void test2_Validation_Efficiency(bool doOfflineStudy=false){
 
   test2_Validation_Efficiency_Truth(testfile);
   test2_Validation_Efficiency_Reco(testfile);
-  test2_Validation_Efficiency_Photon_Truth(testfile);
-  test2_Validation_Efficiency_Photon_Reco(testfile);
+  test2_Validation_Efficiency_Photon_Truth(testfile,region);
+  test2_Validation_Efficiency_Photon_Reco(testfile,region);
 
   TCanvas *maincanvas = new TCanvas ("maincanvas","maincanvas");
 
@@ -115,7 +130,8 @@ void test2_Validation_Efficiency(bool doOfflineStudy=false){
   h_PpiTruth->Draw();
   h_Ppi->SetLineColor(kRed);
   h_Ppi->SetLineStyle(2);
-  h_Ppi->Draw("same");belleName->Draw();
+  h_Ppi->Draw("same");
+  if(runOffline)BELLE2Label(0.4,0.9,"Simulation (Preliminary)");
   maincanvas->Print("efficiency.pdf(","Title:Track p_{T} truth and reco");
 
   h_ThpiTruthLowpt->SetMaximum(h_ThpiTruthLowpt->GetMaximum()*1.2);
@@ -124,7 +140,8 @@ void test2_Validation_Efficiency(bool doOfflineStudy=false){
   h_ThpiLowpt->SetLineColor(kRed);
   h_ThpiLowpt->SetLineStyle(2);
   h_ThpiTruthLowpt->Draw();
-  h_ThpiLowpt->Draw("same");belleName->Draw();
+  h_ThpiLowpt->Draw("same");
+  if(runOffline)BELLE2Label(0.4,0.9,"Simulation (Preliminary)");
   maincanvas->Print("efficiency.pdf","Title:Track #theta_{lab} truth and reco, pt<250 MeV");
 
   h_ThpiTruthHighpt->SetMaximum(h_ThpiTruthHighpt->GetMaximum()*1.2);
@@ -133,7 +150,8 @@ void test2_Validation_Efficiency(bool doOfflineStudy=false){
   h_ThpiHighpt->SetLineColor(kRed);
   h_ThpiHighpt->SetLineStyle(2);
   h_ThpiTruthHighpt->Draw();
-  h_ThpiHighpt->Draw("same");belleName->Draw();
+  h_ThpiHighpt->Draw("same");
+  if(runOffline)BELLE2Label(0.4,0.9,"Simulation (Preliminary)");
   maincanvas->Print("efficiency.pdf","Title:Track #theta_{lab} truth and reco, pt>=250 MeV");
 
   h_PhpiTruthLowpt->SetMaximum(h_PhpiTruthLowpt->GetMaximum()*1.2);
@@ -142,7 +160,8 @@ void test2_Validation_Efficiency(bool doOfflineStudy=false){
   h_PhpiLowpt->SetLineColor(kRed);
   h_PhpiLowpt->SetLineStyle(2);
   h_PhpiTruthLowpt->Draw();
-  h_PhpiLowpt->Draw("same");belleName->Draw();  
+  h_PhpiLowpt->Draw("same");
+  if(runOffline)BELLE2Label(0.4,0.9,"Simulation (Preliminary)");
   maincanvas->Print("efficiency.pdf","Title:Track #phi_{lab} truth and reco, pt<250 MeV");
 
   h_PhpiTruthHighpt->SetMaximum(h_PhpiTruthHighpt->GetMaximum()*1.2);
@@ -151,47 +170,57 @@ void test2_Validation_Efficiency(bool doOfflineStudy=false){
   h_PhpiHighpt->SetLineColor(kRed);
   h_PhpiHighpt->SetLineStyle(2);
   h_PhpiTruthHighpt->Draw();
-  h_PhpiHighpt->Draw("same");belleName->Draw();  
+  h_PhpiHighpt->Draw("same");
+  if(runOffline)BELLE2Label(0.4,0.9,"Simulation (Preliminary)");
   maincanvas->Print("efficiency.pdf","Title:Track #phi_{lab} truth and reco, pt>=250 MeV");
 
   TH1F * h_p  = new TH1F("pdummy","Eff Track;p_{T} GeV; Track Efficiency",10,ptlow,pthigh);
 
   TH1F * h_th  = new TH1F("thdummylow","Eff Track;#theta ; Track Efficiency",10,thlow,thhigh);
   TH1F * h_ph  = new TH1F("phdummylow","Eff Track;#phi ; Track Efficiency",10,phlow,phhigh);
-    
+  maincanvas->cd()->SetGridy(1);
+  maincanvas->cd()->SetGridx(1);
+
   TGraphAsymmErrors *Eff_Track = new TGraphAsymmErrors();
   Eff_Track  -> Divide(h_Ppi ,h_PpiTruth ,"cl=0.683 b(1,1) mode");
   h_p->Draw();
   Eff_Track->SetFillColor(kBlue);
-  Eff_Track->Draw("2");belleName->Draw();
+  Eff_Track->SetMarkerColor(kBlue);
+  Eff_Track->SetMarkerStyle(21);
+  Eff_Track->Draw("2p");
+  if(runOffline)BELLE2Label(0.4,0.9,"Simulation (Preliminary)");
   maincanvas->Print("efficiency.pdf","Title:Track efficiency p_{T}");
 
   TGraphAsymmErrors *Eff_TrackThLowpt = new TGraphAsymmErrors();
   Eff_TrackThLowpt  -> Divide(h_ThpiLowpt ,h_ThpiTruthLowpt ,"cl=0.683 b(1,1) mode");
   h_th->Draw();
   Eff_TrackThLowpt->SetFillColor(kBlue);
-  Eff_TrackThLowpt->Draw("2");belleName->Draw();
+  Eff_TrackThLowpt->Draw("2");
+  if(runOffline)BELLE2Label(0.4,0.9,"Simulation (Preliminary)");
   maincanvas->Print("efficiency.pdf","Title:Track efficiency #theta, pt<250 MeV");
 
   TGraphAsymmErrors *Eff_TrackThHighpt = new TGraphAsymmErrors();
   Eff_TrackThHighpt  -> Divide(h_ThpiHighpt ,h_ThpiTruthHighpt ,"cl=0.683 b(1,1) mode");
   h_th->Draw();
   Eff_TrackThHighpt->SetFillColor(kBlue);
-  Eff_TrackThHighpt->Draw("2");belleName->Draw();
+  Eff_TrackThHighpt->Draw("2");
+  if(runOffline)BELLE2Label(0.4,0.9,"Simulation (Preliminary)");
   maincanvas->Print("efficiency.pdf","Title:Track efficiency #theta, pt>=250 MeV");
 
   TGraphAsymmErrors *Eff_TrackPhLowpt = new TGraphAsymmErrors();
   Eff_TrackPhLowpt  -> Divide(h_PhpiLowpt ,h_PhpiTruthLowpt ,"cl=0.683 b(1,1) mode");
   h_ph->Draw();
   Eff_TrackPhLowpt->SetFillColor(kBlue);
-  Eff_TrackPhLowpt->Draw("2");belleName->Draw();
+  Eff_TrackPhLowpt->Draw("2");
+  if(runOffline)BELLE2Label(0.4,0.9,"Simulation (Preliminary)");
   maincanvas->Print("efficiency.pdf","Title:Track efficiency #phi, pt<250 MeV");
 
   TGraphAsymmErrors *Eff_TrackPhHighpt = new TGraphAsymmErrors();
   Eff_TrackPhHighpt  -> Divide(h_PhpiHighpt ,h_PhpiTruthHighpt ,"cl=0.683 b(1,1) mode");
   h_ph->Draw();
   Eff_TrackPhHighpt->SetFillColor(kBlue);
-  Eff_TrackPhHighpt->Draw("2");belleName->Draw();
+  Eff_TrackPhHighpt->Draw("2");
+  if(runOffline)BELLE2Label(0.4,0.9,"Simulation (Preliminary)");
   maincanvas->Print("efficiency.pdf","Title:Track efficiency #phi, pt>=250 MeV");
 
   TFile* output = new TFile("EfficiencyValidationTracks.root", "recreate");
@@ -228,6 +257,9 @@ void test2_Validation_Efficiency(bool doOfflineStudy=false){
   h_Eff_TrackPhHighpt ->Divide(h_PhpiHighpt,h_PhpiTruthHighpt,1,1);
   output->Write();
   output->Close();
+  maincanvas->cd()->SetGridy(0);
+  maincanvas->cd()->SetGridx(0);
+
   ///////////////////// Photons
   h_PgammaTruth->SetMaximum(h_PgammaTruth->GetMaximum()*1.2);
   h_PgammaTruth->SetMinimum(0.);
@@ -235,7 +267,8 @@ void test2_Validation_Efficiency(bool doOfflineStudy=false){
   h_PgammaTruth->Draw();
   h_Pgamma->SetLineColor(kRed);
   h_Pgamma->SetLineStyle(2);
-  h_Pgamma->Draw("same");belleName->Draw();
+  h_Pgamma->Draw("same");
+  if(runOffline)BELLE2Label(0.4,0.9,"Simulation (Preliminary)");
   maincanvas->Print("efficiency.pdf(","Title:Photon p_{T} truth and reco");
 
   h_ThgammaTruthLowE->SetMaximum(h_ThgammaTruthLowE->GetMaximum()*1.2);
@@ -244,7 +277,8 @@ void test2_Validation_Efficiency(bool doOfflineStudy=false){
   h_ThgammaTruthLowE->Draw();
   h_ThgammaLowE->SetLineColor(kRed);
   h_ThgammaLowE->SetLineStyle(2);
-  h_ThgammaLowE->Draw("same");belleName->Draw();
+  h_ThgammaLowE->Draw("same");
+  if(runOffline)BELLE2Label(0.4,0.9,"Simulation (Preliminary)");
   maincanvas->Print("efficiency.pdf","Title:Photon #theta_{lab} truth and reco, E<500 MeV");
 
   h_ThgammaTruthHighE->SetMaximum(h_ThgammaTruthHighE->GetMaximum()*1.2);
@@ -253,7 +287,8 @@ void test2_Validation_Efficiency(bool doOfflineStudy=false){
   h_ThgammaTruthHighE->Draw();
   h_ThgammaHighE->SetLineColor(kRed);
   h_ThgammaHighE->SetLineStyle(2);
-  h_ThgammaHighE->Draw("same");belleName->Draw();
+  h_ThgammaHighE->Draw("same");
+  if(runOffline)BELLE2Label(0.4,0.9,"Simulation (Preliminary)");
   maincanvas->Print("efficiency.pdf","Title:Photon #theta_{lab} truth and reco, E>=500 MeV");
 
   h_PhgammaTruthLowE->SetMaximum(h_PhgammaTruthLowE->GetMaximum()*1.2);
@@ -262,7 +297,8 @@ void test2_Validation_Efficiency(bool doOfflineStudy=false){
   h_PhgammaLowE->SetLineColor(kRed);
   h_PhgammaLowE->SetLineStyle(2);
   h_PhgammaTruthLowE->Draw();
-  h_PhgammaLowE->Draw("same");belleName->Draw();
+  h_PhgammaLowE->Draw("same");
+  if(runOffline)BELLE2Label(0.4,0.9,"Simulation (Preliminary)");
   maincanvas->Print("efficiency.pdf","Title:Photon #phi_{lab} truth and reco, E<500 MeV");
 
   h_PhgammaTruthHighE->SetMaximum(h_PhgammaTruthHighE->GetMaximum()*1.2);
@@ -271,7 +307,8 @@ void test2_Validation_Efficiency(bool doOfflineStudy=false){
   h_PhgammaHighE->SetLineColor(kRed);
   h_PhgammaHighE->SetLineStyle(2);
   h_PhgammaTruthHighE->Draw();
-  h_PhgammaHighE->Draw("same");belleName->Draw();
+  h_PhgammaHighE->Draw("same");
+  if(runOffline)BELLE2Label(0.4,0.9,"Simulation (Preliminary)");
   maincanvas->Print("efficiency.pdf","Title:Photon #phi_{lab} truth and reco, E>=500 MeV");
 
   TH1F * h_pg   = new TH1F("pdummy"  ,"Eff Photon;E GeV; Photon Efficiency",10,plow,phigh);
@@ -282,35 +319,42 @@ void test2_Validation_Efficiency(bool doOfflineStudy=false){
   Eff_Photon  -> Divide(h_Pgamma ,h_PgammaTruth ,"cl=0.683 b(1,1) mode");
   h_pg->Draw();
   Eff_Photon->SetFillColor(kBlue);
-  Eff_Photon->Draw("2");belleName->Draw();
+  Eff_Photon->SetMarkerColor(kBlue);
+  Eff_Photon->SetMarkerStyle(21);
+  Eff_Photon->Draw("2p");
+  if(runOffline)BELLE2Label(0.4,0.9,"Simulation (Preliminary)");
   maincanvas->Print("efficiency.pdf","Title:Photon efficiency E");
 
   TGraphAsymmErrors *Eff_PhotonThLowE = new TGraphAsymmErrors();
   Eff_PhotonThLowE  -> Divide(h_ThgammaLowE ,h_ThgammaTruthLowE ,"cl=0.683 b(1,1) mode");
   h_thg->Draw();
   Eff_PhotonThLowE->SetFillColor(kBlue);
-  Eff_PhotonThLowE->Draw("2");belleName->Draw();
+  Eff_PhotonThLowE->Draw("2");
+  if(runOffline)BELLE2Label(0.4,0.9,"Simulation (Preliminary)");
   maincanvas->Print("efficiency.pdf","Title:Photon efficiency #theta, E<500 MeV");
 
   TGraphAsymmErrors *Eff_PhotonThHighE = new TGraphAsymmErrors();
   Eff_PhotonThHighE  -> Divide(h_ThgammaHighE ,h_ThgammaTruthHighE ,"cl=0.683 b(1,1) mode");
   h_thg->Draw();
   Eff_PhotonThHighE->SetFillColor(kBlue);
-  Eff_PhotonThHighE->Draw("2");belleName->Draw();
+  Eff_PhotonThHighE->Draw("2");
+  if(runOffline)BELLE2Label(0.4,0.9,"Simulation (Preliminary)");
   maincanvas->Print("efficiency.pdf","Title:Photon efficiency #theta, E>=500 MeV");
 
   TGraphAsymmErrors *Eff_PhotonPhLowE = new TGraphAsymmErrors();
   Eff_PhotonPhLowE  -> Divide(h_PhgammaLowE ,h_PhgammaTruthLowE ,"cl=0.683 b(1,1) mode");
   h_phg->Draw();
   Eff_PhotonPhLowE->SetFillColor(kBlue);
-  Eff_PhotonPhLowE->Draw("2");belleName->Draw();
+  Eff_PhotonPhLowE->Draw("2");
+  if(runOffline)BELLE2Label(0.4,0.9,"Simulation (Preliminary)");
   maincanvas->Print("efficiency.pdf)","Title:Photon efficiency #phi, E<500 MeV");
 
   TGraphAsymmErrors *Eff_PhotonPhHighE = new TGraphAsymmErrors();
   Eff_PhotonPhHighE  -> Divide(h_PhgammaHighE ,h_PhgammaTruthHighE ,"cl=0.683 b(1,1) mode");
   h_phg->Draw();
   Eff_PhotonPhHighE->SetFillColor(kBlue);
-  Eff_PhotonPhHighE->Draw("2");belleName->Draw();
+  Eff_PhotonPhHighE->Draw("2");
+  if(runOffline)BELLE2Label(0.4,0.9,"Simulation (Preliminary)");
   maincanvas->Print("efficiency.pdf)","Title:Photon efficiency #phi, E>=500 MeV");
 
   TFile* outputP = new TFile("EfficiencyValidationPhotons.root", "recreate");
@@ -358,12 +402,13 @@ void test2_Validation_Efficiency_Truth(TString filename){
 
   float fpi_P4[4];  
   truthTree->SetBranchAddress("pi_P4",      &fpi_P4);  
-  
+
   for(Int_t iloop=0;iloop<truthTree->GetEntries();iloop++) {
     truthTree->GetEntry(iloop);
     TLorentzVector lv_pi(fpi_P4);  
 
     h_PpiTruth->Fill(lv_pi.Pt());
+    if(lv_pi.Theta()>2.62 || lv_pi.Theta()<0.3) continue;
 
     if(lv_pi.Pt()<0.25){
       h_ThpiTruthLowpt->Fill(lv_pi.Theta());
@@ -408,11 +453,10 @@ void test2_Validation_Efficiency_Reco(TString filename){
       for(int i=0;i<30;i++)cache_p[i]=0;
       count_pi=0;
     }
+    if(lv_pi_truth.Theta()>2.62 || lv_pi_truth.Theta()<0.3) continue;
 
     int pdgid=abs(ipi_TruthID);
     if(pdgid==pid[pion]){
-      //if(count_pi>0)
-      //      if(iCand>0 && cache_p[iCand-1]-lv_pi_truth.Rho()<epsilon_p) continue;
       cache_p[count_pi]=lv_pi_truth.Pt();
       h_Ppi->Fill(lv_pi_truth.Pt());
       
@@ -434,7 +478,7 @@ void test2_Validation_Efficiency_Reco(TString filename){
 }
 
 
-void test2_Validation_Efficiency_Photon_Truth(TString filename){
+void test2_Validation_Efficiency_Photon_Truth(TString filename, int region){
 
   TPaveText *belleName = new TPaveText(0.6,0.8,0.9,0.9,"BRNDC");
   belleName->SetFillColor(0);
@@ -455,6 +499,12 @@ void test2_Validation_Efficiency_Photon_Truth(TString filename){
     TLorentzVector lv_gamma(fgamma_P4);  
     h_PgammaTruth->Fill(lv_gamma.E());
 
+    if(lv_gamma.E()<0.02) continue;
+    if(lv_gamma.Theta()>2.71 || lv_gamma.Theta()<0.21) continue;
+    if((lv_gamma.Theta()>2.23 || lv_gamma.Theta()<0.58) && region==1) continue; //baRrel
+    if((lv_gamma.Theta()>0.58 || lv_gamma.Theta()<0.21) && region==2) continue; //forward
+    if((lv_gamma.Theta()>2.71 || lv_gamma.Theta()<2.23) && region==3) continue; //backward
+
     if(lv_gamma.E()<0.5){
       h_ThgammaTruthLowE->Fill(lv_gamma.Theta());
       h_PhgammaTruthLowE->Fill(lv_gamma.Phi());
@@ -469,7 +519,7 @@ void test2_Validation_Efficiency_Photon_Truth(TString filename){
 
 }
 
-void test2_Validation_Efficiency_Photon_Reco(TString filename){
+void test2_Validation_Efficiency_Photon_Reco(TString filename, int region){
 
   TChain * recoTree = new TChain("gammatuple");
   recoTree->AddFile(filename);
@@ -502,6 +552,11 @@ void test2_Validation_Efficiency_Photon_Reco(TString filename){
       cache_p=0;
       count_gamma=0;
     }
+
+    if(lv_gamma_truth.Theta()>2.71 || lv_gamma_truth.Theta()<0.21) continue;
+    if((lv_gamma_truth.Theta()>2.23 || lv_gamma_truth.Theta()<0.58) && region==1) continue; //baRrel
+    if((lv_gamma_truth.Theta()>0.58 || lv_gamma_truth.Theta()<0.21) && region==2) continue; //forward
+    if((lv_gamma_truth.Theta()>2.71 || lv_gamma_truth.Theta()<2.23) && region==3) continue; //backward
 
     int pdgid=abs(igamma_TruthID);
     if(pdgid==22){

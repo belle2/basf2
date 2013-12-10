@@ -5,37 +5,25 @@ import sys
 import os
 from basf2 import *
 from modularAnalysis import *
+from stdFSParticles import *
+from stdLooseFSParticles import *
+from stdLightMesons import *
 
 inputMdst('../Bd_Kstgamma_GENSIMRECtoDST.dst.root')
 loadReconstructedParticles()
+stdFSParticles()
+stdLooseFSParticles()
+stdLightMesons()
 
-selectParticle('K-', -321, [''])
-selectParticle('pi+', 211, [''])
-selectParticle('gamma', 22, [''])
-makeParticle(
-    'K*0',
-    313,
-    ['K-', 'pi+'],
-    0.6,
-    1.2,
-    )
+makeParticle('K*0', 313, ['StdVeryLooseK-', 'StdVeryLoosePi+'], 0.6, 1.2)
+matchMCTruth('K*0')
 
 # Prepare the B candidates
-makeParticle(
-    'B0toK*0gamma',
-    511,
-    ['K*0', 'gamma'],
-    5.2,
-    5.4,
-    )
+makeParticle('B0toK*0gamma', 511, ['K*0', 'StdPhoton'], 5.2, 5.4)
+matchMCTruth('B0toK*0gamma')
 
-# ----> NtupleMaker module
-ntuple1 = register_module('NtupleMaker')
-# output root file name (the suffix .root will be added automaticaly)
-ntuple1.param('strFileName', '../Bd_Kstgamma.ntup.root')
-ntuple1.param('strTreeName', 'Bd_Kstgamma_tuple')
-ntuple1.param('strListName', 'B0toK*0gamma')
-ntuple1.param('strTools', [
+ntupleFile('../Bd_Kstgamma.ntup.root')
+tools = [
     'EventMetaData',
     'B0',
     'RecoStats',
@@ -50,16 +38,24 @@ ntuple1.param('strTools', [
     'B0 -> [K*0 -> ^K+ ^pi-] ^gamma',
     'PID',
     'B0 -> [K*0 -> ^K+ ^pi-] gamma',
-    ])
-    # exp_no, run_no, evt_no
-main.add_module(ntuple1)
+    ]
+ntupleTree('Bd_Kstgamma_tuple', 'B0toK*0gamma', tools)
 
-# useful to save some event summary information
-ntuple2 = register_module('NtupleMaker')
-ntuple2.param('strTreeName', 'eventTuple')
-ntuple2.param('strListName', '')
-ntuple2.param('strTools', ['EventMetaData', 'B-'])
-main.add_module(ntuple2)
+##########
+# dump all event summary information
+eventtools = [
+    'EventMetaData',
+    'B-',
+    'RecoStats',
+    'B-',
+    'DetectorStatsRec',
+    'B-',
+    'DetectorStatsSim',
+    'B-',
+    ]
+ntupleTree('eventtuple', '', eventtools)
+
+summaryOfLists(['K*0', 'B0toK*0gamma'])
 
 # ----> start processing of modules
 process(main)

@@ -5,37 +5,21 @@ import sys
 import os
 from basf2 import *
 from modularAnalysis import *
+from stdFSParticles import *
+from stdLooseFSParticles import *
+from stdLightMesons import *
 
 inputMdst('../GenericB_GENSIMRECtoDST.dst.root')
 loadReconstructedParticles()
-
-selectParticle('K-', -321, [''])
-selectParticle('pi+', 211, [''])
-selectParticle('pi-', -211, [''])
-selectParticle('pi0', 111, [''])
-selectParticle('gamma', 22, [''])
-selectParticle('e+', 11, [''])
-selectParticle('e-', -11, [''])
-selectParticle('mu+', 13, [''])
-selectParticle('mu-', -13, [''])
-
-makeParticle(
-    'K_S0',
-    310,
-    ['pi-', 'pi+'],
-    0.4,
-    0.6,
-    )
+stdFSParticles()
+stdLooseFSParticles()
+stdLightMesons()
 
 # ----> NtupleMaker module
-ntuple1 = register_module('NtupleMaker')
-# output root file name (the suffix .root will be added automaticaly)
-ntuple1.param('strFileName', '../GenericB.ntup.root')
-
-# check PID efficiency
-ntuple1.param('strTreeName', 'pituple')
-ntuple1.param('strListName', 'pi+')
-ntuple1.param('strTools', [
+ntupleFile('../GenericB.ntup.root')
+##########
+# Save the tracks to ntuple
+recotools = [
     'EventMetaData',
     '^pi+',
     'Kinematics',
@@ -50,28 +34,14 @@ ntuple1.param('strTools', [
     '^pi+',
     'PID',
     '^pi+',
-    ])
-main.add_module(ntuple1)
-
-mcfinder = register_module('MCDecayFinder')
-mcfinder.param('strDecayString', 'pi+')
-mcfinder.param('strListName', 'truthpi+')
-main.add_module(mcfinder)
-
-mcfinder2 = register_module('MCDecayFinder')
-mcfinder2.param('strDecayString', 'gamma')
-mcfinder2.param('strListName', 'truthgamma')
-main.add_module(mcfinder2)
-
-ntuple1truth = register_module('NtupleMaker')
-ntuple1truth.param('strTreeName', 'truthpituple')
-ntuple1truth.param('strListName', 'truthpi+')
-ntuple1truth.param('strTools', [
+    ]
+ntupleTree('pituple', 'StdVeryLoosePi+', recotools)
+# Save the truth tracks to ntuple
+findMCDecay('truthPi+', 'pi+')
+truthtools = [
     'EventMetaData',
     '^pi+',
     'Kinematics',
-    '^pi+',
-    'Track',
     '^pi+',
     'MCTruth',
     '^pi+',
@@ -79,15 +49,12 @@ ntuple1truth.param('strTools', [
     '^pi+',
     'MCReconstructible',
     '^pi+',
-    'PID',
+    'MCHierarchy',
     '^pi+',
-    ])
-main.add_module(ntuple1truth)
-
-ntuple1b = register_module('NtupleMaker')
-ntuple1b.param('strTreeName', 'gammatuple')
-ntuple1b.param('strListName', 'gamma')
-ntuple1b.param('strTools', [
+    ]
+ntupleTree('truthpituple', 'truthPi+', truthtools)
+# Save the photons to ntuple
+recotoolsGamma = [
     'EventMetaData',
     '^gamma',
     'Kinematics',
@@ -98,35 +65,33 @@ ntuple1b.param('strTools', [
     '^gamma',
     'MCKinematics',
     '^gamma',
+    'MCReconstructible',
+    '^gamma',
     'PID',
     '^gamma',
-    ])
-main.add_module(ntuple1b)
-
-ntuple1btruth = register_module('NtupleMaker')
-ntuple1btruth.param('strTreeName', 'truthgammatuple')
-ntuple1btruth.param('strListName', 'truthgamma')
-ntuple1btruth.param('strTools', [
+    ]
+ntupleTree('gammatuple', 'StdPhoton', recotoolsGamma)
+findMCDecay('truthGamma', 'gamma')
+truthtoolsGamma = [
     'EventMetaData',
     '^gamma',
     'Kinematics',
-    '^gamma',
-    'Track',
     '^gamma',
     'MCTruth',
     '^gamma',
     'MCKinematics',
     '^gamma',
-    'PID',
+    'MCReconstructible',
     '^gamma',
-    ])
-main.add_module(ntuple1btruth)
+    'MCHierarchy',
+    '^gamma',
+    ]
+ntupleTree('truthgammatuple', 'truthGamma', truthtoolsGamma)
 
-# check pi0 resolution
-ntuple2 = register_module('NtupleMaker')
-ntuple2.param('strTreeName', 'pi0tuple')
-ntuple2.param('strListName', 'pi0')
-ntuple2.param('strTools', [
+###########
+# check the pi0 list for resolution etc.
+matchMCTruth('StdPi0')
+pi0tools = [
     'EventMetaData',
     'pi0',
     'MCTruth',
@@ -135,28 +100,51 @@ ntuple2.param('strTools', [
     'pi0 -> ^gamma ^gamma',
     'Kinematics',
     '^pi0 -> ^gamma ^gamma',
-    ])
-main.add_module(ntuple2)
+    'MCReconstructible',
+    'pi0 -> ^gamma ^gamma',
+    'MCHierarchy',
+    'pi0 -> ^gamma ^gamma',
+    ]
+ntupleTree('pi0tuple', 'StdPi0', pi0tools)
+findMCDecay('truthpi0', 'pi0 => gamma gamma')
+pi0truthtools = [
+    'EventMetaData',
+    'pi0',
+    'Kinematics',
+    '^pi0 -> ^gamma ^gamma',
+    'MCReconstructible',
+    'pi0 -> ^gamma ^gamma',
+    ]
+ntupleTree('truthpi0tuple', 'truthpi0', pi0truthtools)
 
-# quick search for KS0 candidates
-ntuple3 = register_module('NtupleMaker')
-ntuple3.param('strTreeName', 'kstuple')
-ntuple3.param('strListName', 'K_S0')
-ntuple3.param('strTools', [
+# Check the KS0 candidates
+matchMCTruth('StdLooseKS0')
+kstools = [
     'EventMetaData',
     'K_S0',
     'MCTruth',
-    '^K_S0 -> ^pi+ ^pi-',
+    '^K_S0 -> ^pi- ^pi+',
     'Kinematics',
-    '^K_S0 -> ^pi+ ^pi-',
-    ])
-main.add_module(ntuple3)
+    '^K_S0 -> ^pi- ^pi+',
+    ]
+ntupleTree('kstuple', 'StdLooseKS0', kstools)
 
+##########
+# check the Phi candidates
+matchMCTruth('StdPhi')
+phitools = [
+    'EventMetaData',
+    'phi',
+    'MCTruth',
+    '^phi -> ^K- ^K+',
+    'Kinematics',
+    '^phi -> ^K- ^K+',
+    ]
+ntupleTree('phituple', 'StdPhi', phitools)
+
+##########
 # dump all event summary information
-ntuple4 = register_module('NtupleMaker')
-ntuple4.param('strTreeName', 'eventTuple')
-ntuple4.param('strListName', '')
-ntuple4.param('strTools', [
+eventtools = [
     'EventMetaData',
     'B-',
     'RecoStats',
@@ -165,8 +153,10 @@ ntuple4.param('strTools', [
     'B-',
     'DetectorStatsSim',
     'B-',
-    ])
-main.add_module(ntuple4)
+    ]
+ntupleTree('eventtuple', '', eventtools)
+
+summaryOfLists(['StdPhi', 'StdLooseKS0'])
 
 # ----> start processing of modules
 process(main)

@@ -9,11 +9,16 @@
 //
 gSystem->Load("libRooFit.so");
 using namespace RooFit ;
-void test2_Validation_PID(){
+void test2_Validation_PID(int region=0, bool runOffline=False){//0=all,1=forward,2=barrel,3=backward,4=endcap
+
+  if(runOffline){
+    SetBelle2Style();
+    gROOT->LoadMacro("Belle2Labels.C");
+  }
 
   TCanvas *c_pidvalidation = new TCanvas ("PIDvalidation","PIDvalidation",1600,800);
   c_pidvalidation->Print("pid.pdf[");			      
-   TPaveText *belleName = new TPaveText(0.6,0.9,0.9,0.95,"BRNDC");
+  TPaveText *belleName = new TPaveText(0.6,0.9,0.9,0.95,"BRNDC");
   belleName->SetFillColor(0);
   belleName->SetTextColor(kGray);
   belleName->SetTextAlign(12);
@@ -37,9 +42,10 @@ void test2_Validation_PID(){
   const float plow=0.;
   const float phigh=3.6;
 
-  const int npidbins=20;
+  const int npidbins=21;
   const float pidlow=0.;
-  const float pidhigh=1.;
+  const float pidhigh=1.05;
+
 
   for(int i=0;i<2;i++){ //Hypo counter
 
@@ -101,6 +107,13 @@ void test2_Validation_PID(){
       //Recalculate the particle 4 vector for different hypotheses
       TLorentzVector lv_pi(lv_pi_temp.Px(),lv_pi_temp.Py(),lv_pi_temp.Pz(),sqrt(lv_pi_temp.E()*lv_pi_temp.E() - pdgmasses[0]*pdgmasses[0] + pdgmasses[i]*pdgmasses[i]));
       int pdgid=abs(ipi_TruthID);
+
+      if(region==1 && (lv_pi.Theta()<0.21 || lv_pi.Theta()>0.58) ) continue; //forward
+      if(region==2 && (lv_pi.Theta()<0.58 || lv_pi.Theta()>2.23) ) continue; //barrel
+      if(region==3 && (lv_pi.Theta()<2.23 || lv_pi.Theta()>2.71) ) continue; //backward
+      if(region==4 && (lv_pi.Theta()<0.21 || lv_pi.Theta()>2.71 || (lv_pi.Theta()>0.58 && lv_pi.Theta()<2.23) ) ) continue; //backward
+      if(region==5 && (lv_pi.Theta()<0.58 || lv_pi.Theta()>2.23) && lv_pi.Rho()>0.5&&lv_pi.Rho()<1.5 ) continue; //special case for presentations 
+
       //PID cut
       bool passPID = false;
       if(i==pion     && fpi_PIDpi>0.5)    passPID=true; 
@@ -183,6 +196,7 @@ void test2_Validation_PID(){
     h_Pmu->Draw("same");
     h_Pp->SetLineColor(kMagenta);
     h_Pp->Draw("same");
+    if(runOffline)BELLE2Label(0.5,0.9,"Belle II Validation");
     tc->Print("pid.pdf",Form("Title: P noPID, %s hypothesis",string(names[i]).c_str()));
     
     tc->cd();
@@ -196,6 +210,7 @@ void test2_Validation_PID(){
     h_cosThmu->Draw("same");
     h_cosThp->SetLineColor(kMagenta);
     h_cosThp->Draw("same");
+    if(runOffline)BELLE2Label(0.5,0.9,"Belle II Validation");
     tc->Print("pid.pdf",Form("Title: cos#theta noPID, %s hypothesis",string(names[i]).c_str()));
 
     tc->cd();
@@ -209,6 +224,7 @@ void test2_Validation_PID(){
     h_Pmu_PID->Draw("same");
     h_Pp_PID->SetLineColor(kMagenta);
     h_Pp_PID->Draw("same");
+    if(runOffline)BELLE2Label(0.5,0.9,"Belle II Validation");
     tc->Print("pid.pdf",Form("Title: P PID, %s hypothesis",string(names[i]).c_str()));
     
     tc->cd(4);
@@ -222,6 +238,7 @@ void test2_Validation_PID(){
     h_cosThmu_PID->Draw("same");
     h_cosThp_PID->SetLineColor(kMagenta);
     h_cosThp_PID->Draw("same");
+    if(runOffline)BELLE2Label(0.5,0.9,"Belle II Validation");
     tc->Print("pid.pdf",Form("Title: cos#theta PID, %s hypothesis",string(names[i]).c_str()));
 
 
@@ -236,7 +253,22 @@ void test2_Validation_PID(){
     h_PIDp->SetLineColor(kMagenta);
     h_PIDp->Draw("same");
     tc->Print("pid.pdf",Form("Title: PID, %s hypothesis",string(names[i]).c_str()));
- 
+
+    if(runOffline){ 
+      tc->SetLogy(1);
+      h_PIDpi->SetFillColor(kYellow);
+      h_PIDpi->SetLineColor(kYellow);
+      h_PIDpi->SetMinimum(10);
+      h_PIDpi->SetMaximum(1000000);
+      h_PIDpi->Draw();
+      h_PIDk->SetLineColor(kBlack);
+      h_PIDk->SetFillColor(kBlack);
+      h_PIDk->SetFillStyle(3004);
+      h_PIDk->Draw("same");
+      tc->Print("pid.pdf",Form("Title: PID, %s hypothesis",string(names[i]).c_str()));
+      tc->Clear();
+      tc->SetLogy(0);
+    }
    
     TFile* output = new TFile(Form("PIDValidation%sID.root",string(names[i]).c_str()), "recreate");
     
@@ -294,6 +326,18 @@ void test2_Validation_PID(){
     Eff_P_p  ->Draw("p");
     tc->Print("pid.pdf",Form("Title: Efficiency, %s hypothesis",string(names[i]).c_str()));
 
+    if(runOffline){
+      tc->cd()->SetGridy(1);
+      tc->cd()->SetGridx(1);
+      h_P_Efficiency->Draw();
+      Eff_P_pi ->Draw("p");
+      Eff_P_k  ->Draw("p");
+      if(region==4)    BELLE2Label(0.5,0.9,"Endcaps");
+      if(region==2)    BELLE2Label(0.5,0.9,"Barrel");
+      tc->Print("pid.pdf",Form("Title: Efficiency, %s hypothesis",string(names[i]).c_str()));
+    }
+
+
     TGraphAsymmErrors *Eff_cosTh_pi = new TGraphAsymmErrors();
     TGraphAsymmErrors *Eff_cosTh_k  = new TGraphAsymmErrors();
     TGraphAsymmErrors *Eff_cosTh_e  = new TGraphAsymmErrors();
@@ -345,6 +389,21 @@ void test2_Validation_PID(){
     h_Eff_cosThmu -> Divide(h_cosThmu_PID,h_cosThmu);
     h_Eff_cosThp  -> Divide(h_cosThp_PID,h_cosThp);
     tc->Print("pid.pdf",Form("Title: Efficiency, %s hypothesis",string(names[i]).c_str()));
+
+    if(runOffline){
+      h_cosTh_Efficiency->Draw();
+      Eff_cosTh_pi ->Draw("p");
+      Eff_cosTh_k  ->Draw("p");
+      if(region==4)    BELLE2Label(0.5,0.9,"Endcaps");
+      if(region==2)    BELLE2Label(0.5,0.9,"Barrel");
+      h_Eff_cosThpi -> Divide(h_cosThpi_PID,h_cosThpi);
+      h_Eff_cosThk  -> Divide(h_cosThk_PID,h_cosThk);
+      h_Eff_cosThe  -> Divide(h_cosThe_PID,h_cosThe);
+      h_Eff_cosThmu -> Divide(h_cosThmu_PID,h_cosThmu);
+      h_Eff_cosThp  -> Divide(h_cosThp_PID,h_cosThp);
+      tc->Print("pid.pdf",Form("Title: Efficiency, %s hypothesis",string(names[i]).c_str()));
+    }
+
 
     output->Write();
     

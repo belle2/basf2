@@ -49,15 +49,15 @@ main.add_module(geometry)
 
 # ---------------------------------------------------------------
 # Analysis module to check basic analysis input containers
-#analysis = register_module('analysisValidation')
+# analysis = register_module('analysisValidation')
 # output root file name (the suffix .root will be added automaticaly)
-#analysis.param('outputFileName', rootFileName)
+# analysis.param('outputFileName', rootFileName)
 ## specify the names of Track collections
-#analysis.param('GFTrackCandidatesColName', 'GFTrackCands')
-#analysis.param('GFTracksColName', 'GFTracks')
-#analysis.param('TracksColName', 'Tracks')
-#analysis.param('TestType', 'dst')
-#main.add_module(analysis)
+# analysis.param('GFTrackCandidatesColName', 'GFTrackCands')
+# analysis.param('GFTracksColName', 'GFTracks')
+# analysis.param('TracksColName', 'Tracks')
+# analysis.param('TestType', 'dst')
+# main.add_module(analysis)
 
 # ---------------------------------------------------------------
 # Produce an mdst based on the official set of containers

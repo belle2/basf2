@@ -62,6 +62,13 @@ namespace Belle2 {
     */
     EXPECT_TRUE(VariableManager::Instance().getVariables().size() > 0);
 
+    //special characters are not allowed!
+    EXPECT_FATAL(VariableManager::Instance().registerVariable(" space", dummyVar, "blah"));
+    EXPECT_FATAL(VariableManager::Instance().registerVariable("star*", dummyVar, "blah"));
+    EXPECT_FATAL(VariableManager::Instance().registerVariable("*", dummyVar, "blah"));
+
+    //this is ok, though
+    VariableManager::Instance().registerVariable("abcdef0123945859432689_ZEFUEONHSUTNSXA", dummyVar, "blah");
   }
 
 }  // namespace

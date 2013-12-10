@@ -2,6 +2,8 @@
 
 #include <framework/logging/Logger.h>
 
+#include <boost/regex.hpp>
+
 using namespace Belle2;
 
 
@@ -31,6 +33,11 @@ void VariableManager::registerVariable(const std::string& name, VariableManager:
 {
   if (!f) {
     B2FATAL("No function provided for variable '" << name << "'.");
+  }
+
+  const static boost::regex allowedNameRegex("^[a-zA-Z0-9_]*$");
+  if (!boost::regex_match(name, allowedNameRegex)) {
+    B2FATAL("Variable '" << name << "' contains forbidden characters! Only alphanumeric characters plus underscores (_) are allowed for variable names.");
   }
 
   auto mapIter = m_variables.find(name);

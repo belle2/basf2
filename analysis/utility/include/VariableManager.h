@@ -28,6 +28,7 @@ namespace Belle2 {
       \endcode
    *
    *  This registers the variable "flavor" with the given function and description.
+   *  Note that only alphanumeric characters (0-9, a-Z) plus '_' are permitted in variable names.
    *
    *  Variables can then be accessed using getVariable(name) and getVariables().
    */

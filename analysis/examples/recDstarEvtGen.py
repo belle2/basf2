@@ -59,7 +59,7 @@ applyCuts('pi0', ['p.1 0.1:', 'p.2 0.1:'])
 makeParticle('D0', 421, ['K-', 'pi+', 'pi0'], 1.700, 2.000)
 makeParticle('D*+', 413, ['D0', 'pi+'], 1.900, 2.100)
 
-applyCuts('D*+', ['M.1 1.81:1.91', 'Q :0.02', 'p* 2.0:'])
+applyCuts('D*+', ['M.1 1.81:1.91', 'Q :0.02', 'p_CMS 2.0:'])
 
 matchMCTruth('D*+')
 

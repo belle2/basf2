@@ -60,7 +60,7 @@ applyCuts('D0', ['M 1.81:1.91'])
 makeParticle('D*+', 413, ['D0', 'pi_slow+'], 1.9, 2.1)
 fitVertex('D*+', 0.001)
 applyCuts('D*+', ['Q :0.02'])
-# applyCuts('D*+',['Q :0.02', 'p* 2.5:']) # to select charm (but no EvtGen at the moment)
+# applyCuts('D*+',['Q :0.02', 'p_CMS 2.5:']) # to select charm (but no EvtGen at the moment)
 
 # uncomment to investigate the content of the list
 # printList('D*+',True)

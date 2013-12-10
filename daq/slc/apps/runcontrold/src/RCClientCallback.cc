@@ -100,7 +100,8 @@ void RCClientCallback::selfCheck() throw(NSMHandlerException)
             master_comm->sendState(_master->getNode());
           }
         }
-      } else if (!comm->sendMessage(msg)) {
+      }
+      if (!comm->sendMessage(msg)) {
         _master->getNode()->setState(State::ERROR_ES);
         if (master_comm != NULL) {
           master_comm->sendState(node);

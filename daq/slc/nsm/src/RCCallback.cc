@@ -8,6 +8,8 @@
 #include "daq/slc/base/ConfigFile.h"
 #include "daq/slc/base/Debugger.h"
 
+#include <iostream>
+
 using namespace Belle2;
 
 RCCallback::RCCallback(NSMNode* node) throw()
@@ -23,6 +25,7 @@ RCCallback::RCCallback(NSMNode* node) throw()
   //add(Command::ABORT);
   add(Command::STATECHECK);
   add(Command::TRIGFT);
+  ConfigFile config("runcontrol");
 }
 
 void RCCallback::download()

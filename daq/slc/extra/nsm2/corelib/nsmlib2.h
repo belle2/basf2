@@ -4,6 +4,8 @@
 #include "nsm2.h"
 #include "nsmsys2.h"
 
+#define __NSM_SLC__
+
 /* -- DATA TYPES ----------------------------------------------------- */
 #if 0
 #ifndef __nsm2_typedef__

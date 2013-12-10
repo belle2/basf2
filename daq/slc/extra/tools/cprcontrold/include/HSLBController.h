@@ -14,6 +14,8 @@ namespace Belle2 {
     int size;
   };
 
+  class XMLElement;
+
   class HSLBController {
 
   public:
@@ -24,7 +26,8 @@ namespace Belle2 {
     void setBootFirmware(bool boot_firm) { _boot_firm = boot_firm; }
 
   public:
-    bool boot(int slot = -1, DataObject* hslb = NULL) throw();
+    bool boot(int slot = -1, DataObject* hslb = NULL,
+              XMLElement* el = NULL) throw();
     bool reset() throw();
     bool load() throw();
 

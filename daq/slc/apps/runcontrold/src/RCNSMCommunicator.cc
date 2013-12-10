@@ -67,7 +67,7 @@ bool RCNSMCommunicator::sendDataObject(const std::string& name,
 bool RCNSMCommunicator::isOnline(NSMNode* node) throw()
 {
   _nsm_mutex.lock();
-  bool is_online = _comm->getNodeIdByName(node->getName()) > 0 &&
+  bool is_online = _comm->getNodeIdByName(node->getName()) >= 0 &&
                    _comm->getNodePidByName(node->getName()) > 0;
   _nsm_mutex.unlock();
   return is_online;

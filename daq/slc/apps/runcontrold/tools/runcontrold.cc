@@ -37,7 +37,6 @@ int main(int argc, char** argv)
   XMLElement* el = parser.parse(config.get("RC_XML_PATH") + "/" +
                                 config.get("RC_XML_ENTRY") + ".xml");
   const std::string name = el->getAttribute("name");
-  std::cout << name << std::endl;
   int revision = data->getRevision();
   NSMNode* node_master = new NSMNode(name);
   NSMNode* node_client = new NSMNode(config.get("RC_NSM_NAME"));

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <object class="FTSW" revision="1" >
-  <int name="channel" value="" priority="BOOT" />
-  <text name="firmware" value="m010-000deg.bit" priority="BOOT" />
-  <enum name="trigger_mode" options="NORMAL:0,IN:1,TLU:2,PULSE:4,REVO:5,RANDOM:6,POSSION:7,ONCE:8,STOP:9" value="IN" priority="TRIGFT" />
-  <int name="dummy_rate" value="0" priority="TRIGFT" />
-  <int name="trigger_limit" value="-1" priority="TRIGFT" />
+  <int name="channel" value=""/>
+  <text name="firmware" value="m010-000deg.bit"/>
+  <enum name="trigger_type" options="NORMAL:0,IN:1,TLU:2,PULSE:4,REVO:5,RANDOM:6,POSSION:7,ONCE:8,STOP:9" value="IN" />
+  <int name="dummy_rate" value="0" />
+  <int name="trigger_limit" value="-1" />
 </object>

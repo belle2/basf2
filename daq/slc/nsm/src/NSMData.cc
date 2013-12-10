@@ -41,16 +41,21 @@ void* NSMData::allocate(NSMCommunicator* comm, int interval) throw(NSMHandlerExc
 
 void* NSMData::parse(const char* incpath) throw(NSMHandlerException)
 {
+#ifdef __NSM_SLC__
   if (!nsmlib_parse(_format.c_str(), _revision, incpath)) {
     throw (NSMHandlerException(__FILE__, __LINE__, "Failed to parse header file"));
   }
   int size = initProperties();
   return (_pdata = malloc(size));
+#else
+  return NULL;
+#endif
 }
 
 int NSMData::initProperties() throw()
 {
   int size = 0;
+#ifdef __NSM_SLC__
   nsm_data_att_t* nsm_data_att_p = nsm_data_att_list;
   while (nsm_data_att_p->length != 0) {
     NSMDataProperty pro;
@@ -75,6 +80,7 @@ int NSMData::initProperties() throw()
     _pro_m.insert(NSMDataPropertyMap::value_type(label, pro));
     _label_v.push_back(label);
   }
+#endif
   return size;
 }
 

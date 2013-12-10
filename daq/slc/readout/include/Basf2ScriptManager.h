@@ -15,6 +15,8 @@ namespace Belle2 {
 
   class Basf2ScriptManager {
 
+    friend class Basf2ScriptWorker;
+
   public:
     Basf2ScriptManager() : _node(NULL), _callback(NULL) {}
     Basf2ScriptManager(const std::string& name);
@@ -37,7 +39,6 @@ namespace Belle2 {
     bool load();
     bool start();
     bool stop();
-    void run();
 
   private:
     NSMNode* _node;
@@ -54,6 +55,18 @@ namespace Belle2 {
 
   };
 
+  class Basf2ScriptWorker {
+  public:
+    Basf2ScriptWorker(Basf2ScriptManager* manager) {
+      _manager = manager;
+    }
+
+  public:
+    void run();
+
+  private:
+    Basf2ScriptManager* _manager;
+  };
 }
 
 #endif

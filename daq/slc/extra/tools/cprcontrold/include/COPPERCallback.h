@@ -10,11 +10,12 @@
 namespace Belle2 {
 
   class ProcessListener;
+  class XMLElement;
 
   class COPPERCallback : public RCCallback {
 
   public:
-    COPPERCallback(NSMNode* node = NULL);
+    COPPERCallback(NSMNode* node, const std::string& rc_config);
     virtual ~COPPERCallback() throw();
 
   public:
@@ -28,9 +29,11 @@ namespace Belle2 {
     virtual bool abort() throw();
 
   private:
+    std::string _rc_config;
     Basf2ScriptManager _man;
     HSLBController _hslbcon_v[4];
     int _confno;
+    XMLElement* _el_v[4];
 
   };
 

@@ -94,6 +94,7 @@ void RCGUICommunicator::run()
         RCMaster* master = _callback->getMaster();
         master->lock();
         DataObject* data = master->getData();
+        data->print();
         if (name == master->getNode()->getName()) {
           data->readObject(_reader);
         } else {

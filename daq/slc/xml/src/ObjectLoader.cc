@@ -35,7 +35,9 @@ DataObject* ObjectLoader::load(const std::string& entry, DataObject* obj)
       std::vector<std::string> options_v = Belle2::split(elc->getAttribute("options"), ',');
       for (size_t j = 0; j < options_v.size(); j++) {
         std::vector<std::string> str_v = Belle2::split(options_v[j], ':');
-        enum_m.insert(std::map<std::string, int>::value_type(str_v[0], atoi(str_v[1].c_str())));
+        if (str_v.size() > 1) {
+          enum_m.insert(std::map<std::string, int>::value_type(str_v[0], atoi(str_v[1].c_str())));
+        }
       }
       obj->addEnum(name, enum_m, value);
     } else if (elc->getTag() != "object") {

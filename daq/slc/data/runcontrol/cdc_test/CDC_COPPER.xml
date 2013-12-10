@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <object class="CDC_COPPER" revision="2" >
-  <text name="host" value="" priority="BOOT" />
-  <text name="script" value="RecvSendCOPPER.py" priority="BOOT" />
-  <bool_array name="hslb_used" length="4" value="true,false,false,false" priority="BOOT" />
+  <text name="host" value="" />
+  <text name="script" value="RecvSendCOPPER.py" />
+  <bool_array name="hslb_used" length="4" value="true,false,false,false" />
   <object name="hslb_a" class="CDC_Readout" />
   <object name="hslb_b" class="CDC_Readout" />
   <object name="hslb_c" class="CDC_Readout" />

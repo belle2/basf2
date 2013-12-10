@@ -38,7 +38,7 @@ int main(int, char**)
   XMLParser parser;
   XMLElement* el = parser.parse(config.get("RC_XML_PATH") + "/" +
                                 config.get("RC_XML_ENTRY") + ".xml");
-  const std::string name = "RUNCONTROL";//el->getAttribute("name");
+  const std::string name = el->getAttribute("name");
   HIST_ENTRY* history = NULL;
   int nhistory = 0;
   char* prompt = (char*)malloc(name.size() + 3);

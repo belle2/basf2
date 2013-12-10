@@ -27,9 +27,6 @@ RCTestModuleModule::RCTestModuleModule() : Module()
   setDescription("Encode DataStore into RingBuffer");
 
   addParam("ProcName", m_name, "Name for basf2 process", string("basf2"));
-  addParam("RunInfoBufPath", m_buf_path, "File path to run info buffer", string(""));
-  addParam("RunLogMessangerPath", m_msg_path, "File path to run log messanger", string(""));
-
 }
 
 
@@ -42,7 +39,6 @@ void RCTestModuleModule::initialize()
 {
   m_buf.open(m_buf_path);
   m_msg.open(m_msg_path, "w");
-  m_msg.sendLog(SystemLog(m_name, SystemLog::NOTICE, "Ready for start"));
 }
 
 void RCTestModuleModule::terminate()
@@ -53,4 +49,5 @@ void RCTestModuleModule::terminate()
 
 void RCTestModuleModule::event()
 {
+  m_msg.sendLog(SystemLog(m_name, SystemLog::NOTICE, "Ready for start"));
 }

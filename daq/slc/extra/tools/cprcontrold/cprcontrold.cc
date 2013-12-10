@@ -14,13 +14,14 @@ typedef void* func_t(void*, const char*);
 
 int main(int argc, char** argv)
 {
-  if (argc < 2) {
-    Belle2::debug("Usage : ./cprcontrold <name>");
+  if (argc < 3) {
+    Belle2::debug("Usage : ./cprcontrold <name> <config>");
     return 1;
   }
   const char* name = argv[1];
+  const char* config = argv[2];
   NSMNode* node = new NSMNode(name);
-  COPPERCallback* callback = new COPPERCallback(node);
+  COPPERCallback* callback = new COPPERCallback(node, config);
   NSMNodeDaemon* daemon = new NSMNodeDaemon(callback);
   daemon->run();
 

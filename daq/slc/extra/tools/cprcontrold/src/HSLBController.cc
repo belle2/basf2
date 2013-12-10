@@ -22,20 +22,17 @@ HSLBController::HSLBController()
 
 HSLBController::~HSLBController() throw() {}
 
-bool HSLBController::boot(int slot, DataObject* hslb) throw()
+bool HSLBController::boot(int slot, DataObject* hslb,
+                          XMLElement* el) throw()
 {
-  if (hslb == NULL || _hslb == NULL) return true;
-  else {
+  if (hslb == NULL || el == NULL) {
+    return true;
+  } else {
     _slot = slot;
     _hslb = hslb;
-    ConfigFile config;
-    std::string path = config.get("RC_XML_PATH") + "/" +
-                       hslb->getClassName() + ".xml";
-    XMLParser parser;
-    XMLElement* root = parser.parse(path);
-    if (root->getTag() == "object" &&
-        root->getAttribute("extends") == "HSLB") {
-      std::vector<XMLElement*> el_v = root->getElements();
+    if (el->getTag() == "object" &&
+        el->getAttribute("extends") == "HSLB") {
+      std::vector<XMLElement*> el_v = el->getElements();
       for (size_t i = 0; i < el_v.size(); i++) {
         XMLElement* el = el_v[i];
         if (el->getTag() == "int" || el->getTag() == "int_array") {
@@ -43,11 +40,12 @@ bool HSLBController::boot(int slot, DataObject* hslb) throw()
           reg.name = el->getAttribute("name");
           reg.address = strtoul(el->getAttribute("address").c_str(), 0, 0);
           reg.size = strtoul(el->getAttribute("size").c_str(), 0, 0);
+          Belle2::debug("name = %s, address = %x, size=%d",
+                        reg.name.c_str(), reg.address, reg.size);
           _reg_v.push_back(reg);
         }
       }
     }
-    delete root;
   }
   return true;
 }
@@ -66,6 +64,7 @@ bool HSLBController::reset() throw()
 bool HSLBController::load() throw()
 {
   int board_type, firmware, hardware;
+  /*
   if (_boot_firm) {
     ConfigFile config;
     std::string path = _hslb->getText("firmware");
@@ -79,11 +78,14 @@ bool HSLBController::load() throw()
     printf("[FATAL] Check FEE error\n");
     return false;
   }
-  mgt_execute(_mgt, _hslb->getEnum("trigger_mode"));
-  Belle2::debug("[DEBUG] Selected trigger mode = %d",
-                _hslb->getEnum("trigger_mode"));
+  */
+  if (_hslb == NULL) return true;
+  int trigger_mode = _hslb->getEnum("trigger_mode");
+  //mgt_execute(_mgt, trigger_mode);
+  Belle2::debug("[DEBUG] Selected trigger mode = %d", trigger_mode);
   for (size_t i = 0; i < _reg_v.size(); i++) {
     HSLBRegister& reg(_reg_v[i]);
+    Belle2::debug("[DEBUG] Register write to name = %s", reg.name.c_str());
     size_t length = 0;
     int* value_v = _hslb->getIntArray(reg.name, length);
     if (value_v == NULL) continue;
@@ -92,9 +94,9 @@ bool HSLBController::load() throw()
     for (size_t i = 0; i < length; i++) {
       if (value_v[i] < 0) continue;
       if (reg.size == 1) {
-        mgt_set_param(_mgt, address, value_v[i]);
+        //mgt_set_param(_mgt, address, value_v[i]);
       } else if (reg.size == 2) {
-        mgt_set_param2(_mgt, address, value_v[i]);
+        //mgt_set_param2(_mgt, address, value_v[i]);
       }
       address += reg.size;
       Belle2::debug("[DEBUG] Register write to address = 0x%x with value = %d",

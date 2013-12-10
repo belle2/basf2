@@ -17,7 +17,6 @@ void RCSequencer::notify(bool killed)
 {
   __mutex.lock();
   __killed = killed;
-  Belle2::debug("%s:%d : notify", __FILE__, __LINE__);
   __cond.broadcast();
   __mutex.unlock();
 }
@@ -27,16 +26,21 @@ RCSequencer::RCSequencer(RCMaster* master,
                          bool synchronized)
   : _master(master), _msg(msg), _synchronized(synchronized)
 {
+  __mutex.lock();
+  __seq_l.push_back(this);
+  __mutex.unlock();
 }
 
 RCSequencer::~RCSequencer()
 {
+  __mutex.lock();
+  __seq_l.remove(this);
+  __mutex.unlock();
 }
 
 void RCSequencer::run() throw()
 {
   __mutex.lock();
-  __seq_l.push_back(this);
   RCCommunicator* comm = _master->getClientCommunicator();
   RCCommunicator* master_comm = _master->getMasterCommunicator();
   try {
@@ -75,7 +79,6 @@ void RCSequencer::run() throw()
     _master->unlock();
   }
   _master->unlock();
-  __seq_l.remove(this);
   __mutex.unlock();
   return;
 }

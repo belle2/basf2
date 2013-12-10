@@ -155,11 +155,11 @@ bool RCMasterCallback::trigft() throw()
       }
     } else if (node->getData() != NULL && node->getData()->hasObject("ftsw")) {
       DataObject* ftsw = node->getData()->getObject("ftsw");
-      if (ftsw->hasValue("trigger_mode") && ftsw->hasValue("dummy_rate") &&
+      if (ftsw->hasValue("trigger_type") && ftsw->hasValue("dummy_rate") &&
           ftsw->hasValue("trigger_limit")) {
         NSMMessage& nsm(getMessage());
         if (nsm.getNParams() > 2 && nsm.getParam(0) >= 0) {
-          ftsw->setInt("trigger_mode", nsm.getParam(0));
+          ftsw->setInt("trigger_type", nsm.getParam(0));
           ftsw->setInt("dummy_rate", nsm.getParam(1));
           ftsw->setInt("trigger_limit", nsm.getParam(2));
           ftsw->setConfigNumber(ftsw->getConfigNumber() + 1);
@@ -172,7 +172,7 @@ bool RCMasterCallback::trigft() throw()
           _master->getDBManager()->writeConfigs();
         }
         nsm.setNParams(3);
-        nsm.setParam(0, ftsw->getInt("trigger_mode"));
+        nsm.setParam(0, ftsw->getInt("trigger_type"));
         nsm.setParam(1, ftsw->getInt("dummy_rate"));
         nsm.setParam(2, ftsw->getInt("trigger_limit"));
         RunControlMessage msg(node, Command::TRIGFT, nsm);

@@ -15,11 +15,11 @@ bool RunInfoBuffer::open(const std::string& path)
     _path = path;
     _memory.open(path, size());
     char* buf = (char*) _memory.map(0, size());
+    _info = (run_info*)buf;
+    buf += sizeof(run_info);
     _mutex = MMutex(buf);
     buf += _mutex.size();
     _cond = MCond(buf);
-    buf += _cond.size();
-    _info = (run_info*)buf;
   } catch (const IOException& e) {
     return false;
   }

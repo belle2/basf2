@@ -1,8 +1,10 @@
 #include "daq/slc/base/DataObject.h"
+
 #include "daq/slc/base/ConfigFile.h"
 #include "daq/slc/base/StringUtil.h"
 #include "daq/slc/base/Reader.h"
 #include "daq/slc/base/Writer.h"
+#include "daq/slc/base/Date.h"
 
 #include <iostream>
 #include <sstream>
@@ -42,6 +44,17 @@ DataObject::DataObject(DataObject* obj)
     ParamInfo& info(obj->_param_m[name]);
     if (info.type == OBJECT) {
       addObject(name, (new DataObject((DataObject*)info.buf)));
+    } else if (info.type == ENUM) {
+      std::string value = "";
+      EnumMap& enum_m(obj->_enum_m_m[name]);
+      for (EnumMap::iterator iit = enum_m.begin();
+           iit != enum_m.end(); iit++) {
+        std::cout << iit->first << " " << iit->second << std::endl;
+        if (iit->second == *(int*)info.buf) {
+          value = iit->first;// break;
+        }
+      }
+      addEnum(name, enum_m, value);
     } else {
       add(name, info.buf, info.type, info.length);
     }
@@ -121,9 +134,6 @@ const std::string DataObject::toSQLConfig()
       if (length == 0) length = 1;
       for (size_t i = 0; i < length; i++) {
         if (info.length > 0)
-          //          ss << ", `" << name << ":" << i << "`";
-          //else
-          //ss << ", `" << name << "`";
           ss << ", \"" << name << ":" << i << "\"";
         else
           ss << ", \"" << name << "\"";
@@ -138,10 +148,6 @@ const std::string DataObject::toSQLConfig()
           case UINT:   ss << " int"; break;
           case USHORT: ss << " smallint"; break;
           case UCHAR:  ss << " tinyint"; break;
-            //case ULONG:  ss << " bigint unsigned"; break;
-            //case UINT:   ss << " int unsigned"; break;
-            //case USHORT: ss << " smallint unsigned"; break;
-            //case UCHAR:  ss << " tinyint unsigned"; break;
           case FLOAT:  ss << " float"; break;
           case DOUBLE: ss << " double"; break;
           default : break;
@@ -155,7 +161,7 @@ const std::string DataObject::toSQLConfig()
 const std::string DataObject::toSQLNames()
 {
   std::stringstream ss;
-  ss << "confno, id";
+  ss << "record_time, confno, id";
   for (ParamNameList::iterator it = _name_v.begin();
        it != _name_v.end(); it++) {
     std::string& name(*it);
@@ -168,9 +174,6 @@ const std::string DataObject::toSQLNames()
       if (length == 0) length = 1;
       for (size_t i = 0; i < length; i++) {
         if (info.length > 0)
-          //          ss << ", `" << name << ":" << i << "`";
-          //        else
-          //          ss << ", `" << name << "`";
           ss << ", \"" << name << ":" << i << "\"";
         else
           ss << ", \"" << name << "\"";
@@ -183,7 +186,7 @@ const std::string DataObject::toSQLNames()
 const std::string DataObject::toSQLValues()
 {
   std::stringstream ss;
-  ss << _confno << ", " << _id << "";
+  ss << "'" << Date().toString() << "', " << _confno << ", " << _id << "";
   for (ParamNameList::iterator it = _name_v.begin();
        it != _name_v.end(); it++) {
     std::string& name(*it);
@@ -249,12 +252,11 @@ void DataObject::readObject(Reader& reader) throw(IOException)
         while (true) {
           std::string label = reader.readString();
           if (label == "==ENUM_END==") break;
-          enum_m.insert(EnumMap::value_type(label, reader.readInt()));
+          int value = reader.readInt();
+          enum_m.insert(EnumMap::value_type(label, value));
         }
-        if (_enum_m_m.find(name) == _enum_m_m.end())
-          _enum_m_m.insert(EnumMapMap::value_type(name, enum_m));
-      }
-      if (info.buf == NULL) {
+        addEnum(name, enum_m, "");
+      } else if (info.buf == NULL) {
         add(name, NULL, info.type, info.length);
       }
       info = _param_m[name];
@@ -289,6 +291,7 @@ void DataObject::writeObject(Writer& writer) const throw(IOException)
   writer.writeInt(_id);
   //writer.writeString(_name);
   writer.writeString(_class);
+  int count = 0;
   for (ParamNameList::iterator it = _name_v.begin();
        it != _name_v.end(); it++) {
     std::string& name(*it);
@@ -313,6 +316,9 @@ void DataObject::writeObject(Writer& writer) const throw(IOException)
             for (EnumMap::iterator iit = enum_m.begin(); iit != enum_m.end(); iit++) {
               writer.writeString(iit->first);
               writer.writeInt(iit->second);
+              std::cout << __FILE__ << ":" << __LINE__ << " " << _class << " " << count << " '" << name << "' : '"
+                        << iit->first << "':'" << iit->second << "'" << std::endl;
+              count++;
             }
             writer.writeString("==ENUM_END==");
           }
@@ -356,7 +362,13 @@ void DataObject::setValue(const std::string& name_in, const std::string& value)
       switch (type) {
         case BOOL: ((bool*)buf)[i] = (value == "true" || value == "t" || value == "1"); break;
         case LONG: ((long long*)buf)[i] = atol(value.c_str()); break;
-        case ENUM: ((int*)buf)[i] = _enum_m_m[name][value]; break;
+        case ENUM: {
+          if (_enum_m_m[name].find(value) != _enum_m_m[name].end()) {
+            ((int*)buf)[i] = _enum_m_m[name][value]; break;
+          } else {
+            ((int*)buf)[i] = atoi(value.c_str()); break;
+          }
+        }
         case INT: ((int*)buf)[i] = atoi(value.c_str()); break;
         case SHORT: ((short*)buf)[i] = (short)atoi(value.c_str()); break;
         case CHAR: ((char*)buf)[i] = (char)atoi(value.c_str()); break;
@@ -392,7 +404,13 @@ void DataObject::setValue(const std::string& name, const std::string& value_in, 
         switch (type) {
           case BOOL: ((bool*)buf)[i] = (value == "true" || value == "t" || value == "1"); break;
           case LONG: ((long long*)buf)[i] = atol(value.c_str()); break;
-          case ENUM: ((int*)buf)[i] = _enum_m_m[name][value]; break;
+          case ENUM: {
+            if (_enum_m_m[name].find(value) != _enum_m_m[name].end()) {
+              ((int*)buf)[i] = _enum_m_m[name][value]; break;
+            } else {
+              ((int*)buf)[i] = atoi(value.c_str()); break;
+            }
+          }
           case INT: ((int*)buf)[i] = atoi(value.c_str()); break;
           case SHORT: ((short*)buf)[i] = (short)atoi(value.c_str()); break;
           case CHAR: ((char*)buf)[i] = (char)atoi(value.c_str()); break;
@@ -429,8 +447,10 @@ bool DataObject::hasInt(const std::string& name)
 void DataObject::addEnum(const std::string& name, EnumMap& enum_m,
                          const std::string& value)
 {
-  _enum_m_m.insert(EnumMapMap::value_type(name, enum_m));
-  add(name, &enum_m[value], ENUM, 0);
+  if (_enum_m_m.find(name) == _enum_m_m.end()) {
+    _enum_m_m.insert(EnumMapMap::value_type(name, enum_m));
+    add(name, &enum_m[value], ENUM, 0);
+  }
 }
 
 void DataObject::addEnumArray(const std::string& name, EnumMap& enum_m,

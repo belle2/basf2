@@ -56,6 +56,7 @@ NSMCommunicator::NSMCommunicator(NSMNode* node, const std::string& host,
 
 void NSMCommunicator::init(const std::string& host, int port) throw(NSMHandlerException)
 {
+#ifdef __NSM_SLC__
   if (_node == NULL) {
     throw (NSMHandlerException(__FILE__, __LINE__, "No node for NSM was registered!"));
   }
@@ -100,18 +101,21 @@ void NSMCommunicator::init(const std::string& host, int port) throw(NSMHandlerEx
     _rc_node = new NSMNode(rc_name);
   }
   __com_v.push_back(this);
+#endif
 }
 
 void NSMCommunicator::sendRequest(const NSMNode* node, const Command& command,
                                   int npar, unsigned int* pars,
                                   int len, const char* datap) throw(NSMHandlerException)
 {
+#ifdef __NSM_SLC__
   b2nsm_context(_nsmc);
   if (b2nsm_sendreq_data(node->getName().c_str(), command.getLabel(),
                          npar, (int*)pars, len, datap) < 0) {
     _id = -1;
     throw (NSMHandlerException(__FILE__, __LINE__, "Failed to send request"));
   }
+#endif
 }
 
 void NSMCommunicator::sendRequest(const NSMNode* node, const Command& cmd,
@@ -142,19 +146,23 @@ throw(NSMHandlerException)
 void NSMCommunicator::replyOK(const NSMNode*, const std::string& message)
 throw(NSMHandlerException)
 {
+#ifdef __NSM_SLC__
   b2nsm_context(_nsmc);
   if (b2nsm_ok(_message.getMsg(), _node->getState().getLabel(), message.c_str()) < 0) {
     throw (NSMHandlerException(__FILE__, __LINE__, "Failed to reply OK"));
   }
+#endif
 }
 
 void NSMCommunicator::replyError(const std::string& message)
 throw(NSMHandlerException)
 {
+#ifdef __NSM_SLC__
   b2nsm_context(_nsmc);
   if (b2nsm_error(_message.getMsg(), message.c_str()) < 0) {
     throw (NSMHandlerException(__FILE__, __LINE__, "Failed to reply error"));
   }
+#endif
 }
 
 void NSMCommunicator::sendLog(const SystemLog& log) throw(NSMHandlerException)
@@ -224,13 +232,21 @@ bool NSMCommunicator::performCallback() throw(NSMHandlerException)
 int NSMCommunicator::getNodeIdByName(const std::string& name)
 throw(NSMHandlerException)
 {
+#ifdef __NSM_SLC__
   b2nsm_context(_nsmc);
   return b2nsm_nodeid(name.c_str());
+#else
+  return -1;
+#endif
 }
 
 int NSMCommunicator::getNodePidByName(const std::string& name)
 throw(NSMHandlerException)
 {
+#ifdef __NSM_SLC__
   b2nsm_context(_nsmc);
   return b2nsm_nodepid(name.c_str());
+#else
+  return -1;
+#endif
 }

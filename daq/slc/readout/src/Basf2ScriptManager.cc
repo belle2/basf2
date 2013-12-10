@@ -1,3 +1,4 @@
+
 #include "daq/slc/readout/Basf2ScriptManager.h"
 #include "daq/slc/readout/ProcessListener.h"
 
@@ -25,7 +26,7 @@ void Basf2ScriptManager::setNode(NSMNode* node)
 {
   _node = node;
   _buf_path = "/run_info_buf_" + _node->getName();
-  _fifo_path = "/run_log_fifo_" + _node->getName();
+  _fifo_path = "/tmp/run_log_fifo_" + _node->getName();
 }
 
 bool Basf2ScriptManager::create()
@@ -63,7 +64,7 @@ bool Basf2ScriptManager::load()
 {
   _buf.clear();
   _fork.cancel();
-  _fork = Fork(this);
+  _fork = Fork(new Basf2ScriptWorker(this));
   _thread = PThread(new ProcessListener(_callback, _fork, _script));
   return true;
 }
@@ -98,16 +99,16 @@ bool Basf2ScriptManager::stop()
   return true;
 }
 
-void Basf2ScriptManager::run()
+void Basf2ScriptWorker::run()
 {
   const char* belle2_path = getenv("BELLE2_LOCAL_DIR");
   const char* belle2_sub = getenv("BELLE2_SUBDIR");
   Executor executor;
   executor.setExecutable("%s/bin/%s/basf2", belle2_path, belle2_sub);
   executor.addArg("%s/%s/%s", belle2_path,
-                  _scriptdir.c_str(), _script.c_str());
-  for (size_t i = 0; i < _arg_v.size(); i++)
-    executor.addArg(_arg_v[i]);
+                  _manager->_scriptdir.c_str(), _manager->_script.c_str());
+  for (size_t i = 0; i < _manager->_arg_v.size(); i++)
+    executor.addArg(_manager->_arg_v[i]);
   executor.addArg("--no-stats");
   executor.execute();
 }

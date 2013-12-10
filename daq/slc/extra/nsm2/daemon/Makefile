@@ -6,8 +6,9 @@ ALL = nsmd2 nsminfo2
 LIBS      = 
 CC        = gcc
 CXX       = g++
-OPT = -g 
+OPT = -g
 DEPS   = nsm2.h nsmsys2.h Makefile
+EXTRA_CFLAGS =
 CFLAGS = $(OPT) $(EXTRA_CFLAGS)
 
 .c.o:
@@ -18,8 +19,15 @@ CFLAGS = $(OPT) $(EXTRA_CFLAGS)
 
 all:: $(ALL)
 
+install::
+	install nsmd2 $(EXTBINDIR)
+	install nsminfo2 $(EXTBINDIR)
+	install nsm2.h $(EXTINCDIR)/nsm2
+	install nsmsys2.h $(EXTINCDIR)/nsm2
+
+
 clean::
-	-rm -f *.o *.bak *~ $(ALL)
+	-rm -f *.o *.bak *~ nsmd2 nsminfo2
 
 nsmd2: nsmd2.o nsmhash.o
 	$(CXX) -o nsmd2 $(CFLAGS) nsmd2.o nsmhash.o $(LIBS)

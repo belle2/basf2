@@ -3,10 +3,12 @@ CXX     = g++
 RM      = rm -rf
 CP      = cp -f
 
-BELLE2_LIB = $(BELLE2_LOCAL_DIR)/lib/$(BELLE2_SUBDIR)
-BELLE2_INC = $(BELLE2_LOCAL_DIR)/include
-BELLE2EX_LIB = $(BELLE2_EXTERNALS_DIR)/lib/$(BELLE2_SUBDIR)
-BELLE2EX_INC = $(BELLE2_EXTERNALS_DIR)/include
+BELLE2_LIB = $(BELLE2_LOCAL_DIR)/daq/slc/lib
+BELLE2_INC = $(BELLE2_LOCAL_DIR)/daq/slc/include
+#BELLE2_LIB = $(BELLE2_LOCAL_DIR)/lib/$(BELLE2_SUBDIR)
+#BELLE2_INC = $(BELLE2_LOCAL_DIR)/include
+#BELLE2EX_LIB = $(BELLE2_EXTERNALS_DIR)/lib/$(BELLE2_SUBDIR)
+#BELLE2EX_INC = $(BELLE2_EXTERNALS_DIR)/include
 
 BINDIR  = ./bin
 SRCDIR  = ./src
@@ -15,14 +17,14 @@ TMPDIR  = ./tmp
 LIBDIR  = ./lib
 
 LIBS    +=  -lm -lpthread -lz 
-LIBS    += -L$(BELLE2_LIB) -ldaq 
-LIBS    += -L$(BELLE2EX_LIB) -lnsm2_corelib -lnsm2_b2lib
+LIBS    += -L$(BELLE2_LIB) -ldaq_slc_base -ldaq_slc_nsm\
+ -ldaq_slc_system -ldaq_slc_xml\
+ -lnsm2_corelib -lnsm2_b2lib
 LIBS    += $(shell xml2-config --libs)
 
 CFLAGS   = -g -Wall -fPIC -D_REENTRANT 
 CFLAGS  += -I./include 
 CFLAGS  += -I$(BELLE2_INC)
-CFLAGS  += -I$(BELLE2EX_INC)
 CFLAGS  += $(shell xml2-config --cflags)
 
 MAINS   = $(wildcard *.cc)
@@ -33,7 +35,8 @@ DEPS   = $(SRCS:$(SRCDIR)/%.cc=$(TMPDIR)/%.d)
 OBJS   = $(SRCS:$(SRCDIR)/%.cc=$(TMPDIR)/%.o)
 
 all: $(TARGETS)
-	@ install -m755 -p $(BINDIR)/* $(BELLE2_LOCAL_DIR)/bin/$(BELLE2_SUBDIR)
+	@ mkdir -p $(BELLE2_LOCAL_DIR)/daq/slc/bin
+	@ install -m755 -p $(BINDIR)/* $(BELLE2_LOCAL_DIR)/daq/slc/bin
 
 force:
 	@ $(RM) $(BINDIR)/*

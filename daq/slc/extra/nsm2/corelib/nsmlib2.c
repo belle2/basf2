@@ -839,9 +839,12 @@ nsmlib_initsig(NSMcontext *nsmc)
 #else
   void nsmlib_handler(int);
   int  sig = SIGUSR1;
-#define NSMLIB_SETHANDLER(a,h) (a).sa_sighandler=(h)
+  //#define NSMLIB_SETHANDLER(a,h) (a).sa_sighandler=(h)
+#define NSMLIB_SETHANDLER(a,h) (a).sa_sigaction=(h)
 #endif
   struct sigaction action;
+  sigset_t block;
+
   int pipes[2];
 
   nsmc->maxrecursive = NSMLIB_MAXRECURSIVE;

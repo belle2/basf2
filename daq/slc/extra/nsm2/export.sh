@@ -8,6 +8,7 @@ export EXTLIBDIR=${EXTDIR}/lib/${BELLE2_EXTERNALS_SUBDIR}
 export EXTBINDIR=${EXTDIR}/bin/${BELLE2_EXTERNALS_SUBDIR}
 
 cp corelib/nsm2.h $BELLE2_EXTERNALS_DIR/src/nsm2/daemon
+cp corelib/nsm2.h $BELLE2_EXTERNALS_DIR/include/nsm2/
 cp corelib/nsmparse.c $BELLE2_EXTERNALS_DIR/src/nsm2/corelib
 cp corelib/nsmlib2.c $BELLE2_EXTERNALS_DIR/src/nsm2/corelib
 cp corelib/nsmlib2.h $BELLE2_EXTERNALS_DIR/src/nsm2/corelib

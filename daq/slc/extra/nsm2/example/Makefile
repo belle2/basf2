@@ -2,17 +2,18 @@
 #  Makefile for NSM2 example clients
 #
 
-ALL = client client_wait master readdat bridge reciever
+ALL = client client_wait master readdat
 LIBS      = 
 CC        = gcc
 CXX       = g++
-OPT = -g -I ../corelib -I ../b2lib -lm -lpthread
+OPT = -g -I ../corelib -I ../b2lib
 DEPS   = Makefile
+EXTRA_CFLAGS =
 CFLAGS = $(OPT) $(EXTRA_CFLAGS)
-LIBS += ../corelib/nsmlib2.o \
-	../corelib/nsmhash.o \
-        ../corelib/nsmparse.o \
-        ../b2lib/belle2nsm.o
+LIBS = ../corelib/nsmlib2.o \
+       ../corelib/nsmhash.o \
+       ../corelib/nsmparse.o \
+       ../b2lib/belle2nsm.o
 
 .c.o:
 	$(CC) $(CFLAGS) -c $<
@@ -23,13 +24,7 @@ LIBS += ../corelib/nsmlib2.o \
 all:: $(ALL)
 
 clean::
-	-rm -f $(UNIX_TARGET) $(VXW_TARGET) *.o *.bak *~ $(ALL)
-
-bridge: bridge.o $(LIBS)
-	$(CXX) -o bridge $(CFLAGS) bridge.o $(LIBS)
-
-reciever: reciever.o $(LIBS)
-	$(CXX) -o reciever $(CFLAGS) reciever.o $(LIBS)
+	-rm -f client cluent_wait readdat master *.o *.bak *~
 
 client: client.o $(LIBS)
 	$(CXX) -o client $(CFLAGS) client.o $(LIBS)
@@ -41,13 +36,11 @@ readdat: readdat.o $(LIBS)
 	$(CXX) -o readdat $(CFLAGS) readdat.o $(LIBS)
 
 master: master.o $(LIBS)
-	$(CXX) -o master $(CFLAGS) master.o $(LIBS)
+	$(CXX) -o master $(CFLAGS) master.o $(LIBS) -lreadline -lcurses
 
-reciever.o: $(DEPS)
-bridge.o: $(DEPS)
 client.o: $(DEPS)
 client_wait.o: $(DEPS)
 readdat.o: $(DEPS)
 
 master.o: $(DEPS)
-	$(CXX) $(CFLAGS) -c master.cc #-DUSE_READLINE master.cc 
+	$(CXX) $(CFLAGS) -c -DUSE_READLINE master.cc

@@ -5,6 +5,8 @@
 
 #include <analysis/utility/mcParticleMatching.h>
 
+#include <analysis/utility/VariableManager.h>
+
 // DataStore related
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
@@ -338,3 +340,10 @@ int compareFinalStates(vector<const Particle*> reconstructed, vector<const MCPar
   } else
     return -5;
 }
+
+double mcTruthFlag(const Particle* part)
+{
+  return getMCTruthFlag(part, part->getRelated<MCParticle>());
+}
+
+REGISTER_VARIABLE("mcTruthFlag", mcTruthFlag, "Monte Carlo truth flag, different values are described in getMCTruthFlag() documentation");

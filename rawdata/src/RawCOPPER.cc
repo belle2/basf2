@@ -510,12 +510,10 @@ int* RawCOPPER::GetExpRunBuf(int n)
 
 unsigned int RawCOPPER::GetB2LFEE32bitEventNumber(int n)
 {
-
-
-
+  ErrorMessage print_err;
 
 #ifndef READ_OLD_B2LFEE_FORMAT_FILE
-  ErrorMessage print_err;
+
   int err_flag = 0;
   unsigned int eve_num = 0;
   int flag = 0;
@@ -539,7 +537,6 @@ unsigned int RawCOPPER::GetB2LFEE32bitEventNumber(int n)
     exit(-1);
   }
 
-
   if (err_flag == 1) {
 #ifndef NO_DATA_CHECK
     char err_buf[500];
@@ -548,14 +545,21 @@ unsigned int RawCOPPER::GetB2LFEE32bitEventNumber(int n)
     print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     sleep(12345678);
     exit(-1);
-#endif
+#endif //NO_DATA_CHECK
   }
-
   return eve_num;
-#else
+
+#else // READ_OLD_B2LFEE_FORMAT_FILE
+
+  char err_buf[500];
+  sprintf(err_buf, "You need comment out READ_OLD_B2LFEE_FORMAT_FILE if you are handling a new data format\n");
+  print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  sleep(12345678);
   exit(1);
   return 0;
-#endif
+
+#endif // READ_OLD_B2LFEE_FORMAT_FILE
+
 }
 
 

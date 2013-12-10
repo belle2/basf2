@@ -57,6 +57,8 @@ namespace Belle2 {
       POS_MAGIC_1 = 11
     };
 #else
+    //
+
     enum {
       POS_NWORDS = 0,
       POS_HDR_NWORDS = 1,

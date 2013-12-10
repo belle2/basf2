@@ -94,9 +94,11 @@ void RCClientCallback::selfCheck() throw(NSMHandlerException)
         if (node->getConnection() == Connection::ONLINE) {
           node->setState(State::ERROR_ES);
           node->setConnection(Connection::OFFLINE);
-          master_comm->sendState(node);
           _master->getNode()->setState(State::ERROR_ES);
-          master_comm->sendState(_master->getNode());
+          if (master_comm != NULL) {
+            master_comm->sendState(node);
+            master_comm->sendState(_master->getNode());
+          }
         }
       } else if (!comm->sendMessage(msg)) {
         _master->getNode()->setState(State::ERROR_ES);
@@ -108,7 +110,8 @@ void RCClientCallback::selfCheck() throw(NSMHandlerException)
     } catch (const IOException& e) {
       Belle2::debug("%s:%d %s", __FILE__, __LINE__, e.what());
       _master->getNode()->setState(State::ERROR_ES);
-      master_comm->sendState(_master->getNode());
+      if (master_comm != NULL)
+        master_comm->sendState(_master->getNode());
       _master->unlock();
       return;
     }

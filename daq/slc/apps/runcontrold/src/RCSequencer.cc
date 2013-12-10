@@ -2,6 +2,9 @@
 
 #include "daq/slc/apps/runcontrold/RCMaster.h"
 #include "daq/slc/apps/runcontrold/RCCommunicator.h"
+#include "daq/slc/base/Debugger.h"
+
+#include <unistd.h>
 
 using namespace Belle2;
 
@@ -14,30 +17,26 @@ void RCSequencer::notify(bool killed)
 {
   __mutex.lock();
   __killed = killed;
+  Belle2::debug("%s:%d : notify", __FILE__, __LINE__);
   __cond.broadcast();
   __mutex.unlock();
 }
 
 RCSequencer::RCSequencer(RCMaster* master,
-                         const RunControlMessage& msg,
+                         RunControlMessage msg,
                          bool synchronized)
   : _master(master), _msg(msg), _synchronized(synchronized)
 {
-  __mutex.lock();
-  __seq_l.push_back(this);
-  __mutex.unlock();
 }
 
 RCSequencer::~RCSequencer()
 {
-  __mutex.lock();
-  __seq_l.remove(this);
-  __mutex.unlock();
 }
 
 void RCSequencer::run() throw()
 {
   __mutex.lock();
+  __seq_l.push_back(this);
   RCCommunicator* comm = _master->getClientCommunicator();
   RCCommunicator* master_comm = _master->getMasterCommunicator();
   try {
@@ -74,10 +73,9 @@ void RCSequencer::run() throw()
   } catch (const NSMHandlerException& e) {
     //setReply("NSM error");
     _master->unlock();
-    __mutex.unlock();
-    return;
   }
   _master->unlock();
+  __seq_l.remove(this);
   __mutex.unlock();
   return;
 }

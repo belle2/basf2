@@ -30,13 +30,14 @@ using namespace Belle2;
 int main(int argc, char** argv)
 {
   std::string configname = (argc > 1) ? argv[1] : "runcontrol";
-  ConfigFile config("slowcontrol", "cdc");
+  ConfigFile config("slowcontrol", configname);
   ObjectLoader oloader(config.get("RC_XML_PATH"));
   DataObject* data = oloader.load(config.get("RC_XML_ENTRY"));
   XMLParser parser;
   XMLElement* el = parser.parse(config.get("RC_XML_PATH") + "/" +
                                 config.get("RC_XML_ENTRY") + ".xml");
   const std::string name = el->getAttribute("name");
+  std::cout << name << std::endl;
   int revision = data->getRevision();
   NSMNode* node_master = new NSMNode(name);
   NSMNode* node_client = new NSMNode(config.get("RC_NSM_NAME"));
@@ -50,15 +51,12 @@ int main(int argc, char** argv)
   PThread(new NSMNodeDaemon(new RCClientCallback(node_client, master),
                             config.get("NSM_LOCAL_HOST"),
                             config.getInt("NSM_LOCAL_PORT")));
-  sleep(5);
   RCMasterCallback* callback = new RCMasterCallback(node_master);
   callback->setMaster(master);
   int port = config.getInt("NSM_GLOBAL_PORT");
   if (port > 0) {
-    sleep(5);
     PThread(new NSMNodeDaemon(callback, config.get("NSM_GLOBAL_HOST"), port));
   }
-  sleep(5);
   PostgreSQLInterface* db =
     new PostgreSQLInterface(config.get("DATABASE_HOST"), config.get("DATABASE_NAME"),
                             config.get("DATABASE_USER"), config.get("DATABASE_PASS"),

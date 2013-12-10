@@ -25,7 +25,7 @@ namespace Belle2 {
 
   public:
     RCSequencer(RCMaster* master,
-                const RunControlMessage& msg,
+                RunControlMessage msg,
                 bool synchronized = true);
     ~RCSequencer();
 

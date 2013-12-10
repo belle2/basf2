@@ -53,6 +53,8 @@ static int   nsmlib_debugflag = 0; /* context independent error code */
 #define DBG    nsmlib_debug
 #define LOG    nsmlib_log
 
+#undef SIGRTMIN
+
 int nsmlib_hash(NSMsys *, int32 *hashtable, int hashmax,
 		const char *key, int create);
 char * nsmlib_parse(const char *datname, int revision, const char *incpath);
@@ -858,10 +860,18 @@ nsmlib_initsig(NSMcontext *nsmc)
   /* ... and many more to follow ----> */
   
   /* setup signals */
-  sigemptyset(&action.sa_mask);
-  sigaddset(&action.sa_mask, sig);
-  action.sa_flags - 0;
+  //sigemptyset(&action.sa_mask);
+  //sigaddset(&action.sa_mask, sig);
+
+  sigemptyset ( &block );
+  sigaddset( &block, SIGHUP );
+  sigaddset( &block, SIGQUIT );
+  sigaddset( &block, SIGTERM );
+
+  memset ( &action, 0, sizeof (struct sigaction) );
   NSMLIB_SETHANDLER(action, nsmlib_handler);
+  action.sa_flags |= SA_RESTART;   // BSD-like behavior
+  //action.sa_flags - 0;
   sigaction(sig, &action, 0);
 
   nsmc->usesig = -1; /* undecided */

@@ -76,49 +76,49 @@ namespace Belle2 {
 
     // momentum (CMS) -----------------------------------------------
 
-    double particlePStar(const Particle* part)
+    double particleP_CMS(const Particle* part)
     {
       PCmsLabTransform T;
       TLorentzVector vec = T.rotateLabToCms() * part->get4Vector();
       return vec.P();
     }
 
-    double particlePxStar(const Particle* part)
+    double particlePx_CMS(const Particle* part)
     {
       PCmsLabTransform T;
       TLorentzVector vec = T.rotateLabToCms() * part->get4Vector();
       return vec.Px();
     }
 
-    double particlePyStar(const Particle* part)
+    double particlePy_CMS(const Particle* part)
     {
       PCmsLabTransform T;
       TLorentzVector vec = T.rotateLabToCms() * part->get4Vector();
       return vec.Py();
     }
 
-    double particlePzStar(const Particle* part)
+    double particlePz_CMS(const Particle* part)
     {
       PCmsLabTransform T;
       TLorentzVector vec = T.rotateLabToCms() * part->get4Vector();
       return vec.Pz();
     }
 
-    double particlePtStar(const Particle* part)
+    double particlePt_CMS(const Particle* part)
     {
       PCmsLabTransform T;
       TLorentzVector vec = T.rotateLabToCms() * part->get4Vector();
       return vec.Pt();
     }
 
-    double particleCosThetaStar(const Particle* part)
+    double particleCosTheta_CMS(const Particle* part)
     {
       PCmsLabTransform T;
       TLorentzVector vec = T.rotateLabToCms() * part->get4Vector();
       return vec.CosTheta();
     }
 
-    double particlePhiStar(const Particle* part)
+    double particlePhi_CMS(const Particle* part)
     {
       PCmsLabTransform T;
       TLorentzVector vec = T.rotateLabToCms() * part->get4Vector();
@@ -284,14 +284,14 @@ namespace Belle2 {
     REGISTER_VARIABLE("cth", particleCosTheta, "momentum cosine of polar angle");
     REGISTER_VARIABLE("phi", particlePhi, "momentum azimuthal angle in degrees");
 
-    REGISTER_VARIABLE("p*", particlePStar, "CMS momentum magnitude");
-    REGISTER_VARIABLE("px*", particlePxStar, "CMS momentum component x");
-    REGISTER_VARIABLE("py*", particlePyStar, "CMS momentum component y");
-    REGISTER_VARIABLE("pz*", particlePzStar, "CMS momentum component z");
-    REGISTER_VARIABLE("pt*", particlePtStar, "CMS transverse momentum");
-    REGISTER_VARIABLE("cosTheta*", particleCosThetaStar, "CMS momentum cosine of polar angle");
-    REGISTER_VARIABLE("cth*", particleCosThetaStar, "CMS momentum cosine of polar angle");
-    REGISTER_VARIABLE("phi*", particlePhiStar, "CMS momentum azimuthal angle in degrees");
+    REGISTER_VARIABLE("p_CMS", particleP_CMS, "CMS momentum magnitude");
+    REGISTER_VARIABLE("px_CMS", particlePx_CMS, "CMS momentum component x");
+    REGISTER_VARIABLE("py_CMS", particlePy_CMS, "CMS momentum component y");
+    REGISTER_VARIABLE("pz_CMS", particlePz_CMS, "CMS momentum component z");
+    REGISTER_VARIABLE("pt_CMS", particlePt_CMS, "CMS transverse momentum");
+    REGISTER_VARIABLE("cosTheta_CMS", particleCosTheta_CMS, "CMS momentum cosine of polar angle");
+    REGISTER_VARIABLE("cth_CMS", particleCosTheta_CMS, "CMS momentum cosine of polar angle");
+    REGISTER_VARIABLE("phi_CMS", particlePhi_CMS, "CMS momentum azimuthal angle in degrees");
 
     REGISTER_VARIABLE("dx", particleDX, "x in respect to IP");
     REGISTER_VARIABLE("dy", particleDY, "y in respect to IP");

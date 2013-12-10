@@ -72,49 +72,49 @@ namespace Belle2 {
      * @param part const pointer to Particle
      * @return momentum magnitude in CMS
      */
-    double particlePStar(const Particle* part);
+    double particleP_CMS(const Particle* part);
 
     /**
      * function for PSelector
      * @param part const pointer to Particle
      * @return momentum component x in CMS
      */
-    double particlePxStar(const Particle* part);
+    double particlePx_CMS(const Particle* part);
 
     /**
      * function for PSelector
      * @param part const pointer to Particle
      * @return momentum component y in CMS
      */
-    double particlePyStar(const Particle* part);
+    double particlePy_CMS(const Particle* part);
 
     /**
      * function for PSelector
      * @param part const pointer to Particle
      * @return momentum component z in CMS
      */
-    double particlePzStar(const Particle* part);
+    double particlePz_CMS(const Particle* part);
 
     /**
      * function for PSelector
      * @param part const pointer to Particle
      * @return transverse momentum in CMS
      */
-    double particlePtStar(const Particle* part);
+    double particlePt_CMS(const Particle* part);
 
     /**
      * function for PSelector
      * @param part const pointer to Particle
      * @return momentum cosine of polar angle in CMS
      */
-    double particleCosThetaStar(const Particle* part);
+    double particleCosTheta_CMS(const Particle* part);
 
     /**
      * function for PSelector
      * @param part const pointer to Particle
      * @return momentum azimuthal angle in CMS
      */
-    double particlePhiStar(const Particle* part);
+    double particlePhi_CMS(const Particle* part);
 
     /**
      * function for PSelector
@@ -246,6 +246,3 @@ namespace Belle2 {
 } // Belle2 namespace
 
 #endif
-
-
-

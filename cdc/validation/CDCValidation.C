@@ -137,8 +137,8 @@ void FillADCTDC(Int_t iLayer);         // Filling functions can be used independ
 void FillHisto();                      // Fill histograms for all the layers
 void PlotHisto();                      // Draw histograms on canvases on the screen
 void PrintHisto();                     // Save drawing files of the canvases for layer histograms
-void WriteHisto();                     // Save histograms to a root file
-Int_t CDCValidation();                 // Main macro for plotting, printing and saving
+void WriteHisto();        // Save histograms to a root file
+Int_t CDCValidation();    // Main macro for plotting, printing and saving
 
 
 void SetLayerID()
@@ -147,7 +147,7 @@ void SetLayerID()
   Int_t MaxLL, WireID;
   Int_t iSL, iLL;
 
-  printf("Initializing layer identifiers\n");
+  //  printf("Initializing layer identifiers\n");
   for(iSL=0; iSL < MAXSUPERLAYER; iSL++){
     for(iLL=0; iLL < MAXLOCALLAYER; iLL++){
       LayerID[iSL][iLL] = -1;
@@ -168,15 +168,15 @@ void SetLayerID()
       EncodedLayer[iLayer] = WireID*512;
       Layer[iLayer] = (double) iLayer;
       LayerID[iSL][iLL] = iLayer;
-      printf("LayerID: %02d  Super Layer: %02d   Local Layer: %02d  wireID: %02d\n", 
-	     iLayer, iSL, iLL, WireID);
+      //      printf("LayerID: %02d  Super Layer: %02d   Local Layer: %02d  wireID: %02d\n", 
+      //iLayer, iSL, iLL, WireID);
       iLayer++;
     }
   }
-
+  
   LayerReady=1;
 
-  printf("\n\n");
+  //  printf("\n\n");
 
   return;
 }
@@ -225,7 +225,7 @@ void FillHitPattern(Int_t iLayer)
     hHitPattern[iLayer]->GetXaxis()->SetTitle("Cell");
     hHitPattern[iLayer]->GetYaxis()->SetTitle("Entries");
     hHitPattern[iLayer]->SetStats(0);
-    SetHistoSizes(hHitPattern[iLayer]);
+    //    SetHistoSizes(hHitPattern[iLayer]);
 
     tree->Project(chName, "int(CDCHits.m_eWire&0x01ff)", CutLayer);
   } else {
@@ -257,7 +257,7 @@ void FillTDC(Int_t iLayer)
     hTDC[iLayer] = new TH1D(chName, chTitle, NbinTDC, MinTDC, MaxTDC);
     hTDC[iLayer]->GetXaxis()->SetTitle("TDC count");
     hTDC[iLayer]->GetYaxis()->SetTitle("Entries");
-    SetHistoSizes(hTDC[iLayer]);
+    //    SetHistoSizes(hTDC[iLayer]);
     tree->Project(chName, "CDCHits.m_tdcCount", CutLayer);
   } else {
     printf("TDC histogram for Layer %d is already filled\n", iLayer);
@@ -287,7 +287,7 @@ void FillADC(Int_t iLayer)
     hADC[iLayer] = new TH1D(chName, chTitle, NbinADC, MinADC, MaxADC);
     hADC[iLayer]->GetXaxis()->SetTitle("ADC count");
     hADC[iLayer]->GetYaxis()->SetTitle("Entries");
-    SetHistoSizes(hADC[iLayer]);
+    //    SetHistoSizes(hADC[iLayer]);
     tree->Project(chName, "CDCHits.m_adcCount", CutLayer);
 
     hADCfit[iLayer] = (TH1D*) hADC[iLayer]->Clone();
@@ -682,10 +682,6 @@ Int_t CDCValidation()
 
   SetLayerID();
   FillHisto();
-  //  PlotHisto();
-  if(kDrawLayerHisto){
-    PrintHisto();
-  }
   if(kWriteHisto){
     WriteHisto();
   }

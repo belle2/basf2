@@ -60,8 +60,8 @@ namespace Belle2 {
 
       /**
        * Read XT-relation table.
-       * @param GearDir Gear Dir.
-       * @param mode 0: read simulation file, 1: read reconstruction file.
+       * @param[in] GearDir Gear Dir.
+       * @param[in] mode 0: read simulation file, 1: read reconstruction file.
        */
 
       void readXT(const GearDir, int mode = 0);
@@ -340,44 +340,100 @@ namespace Belle2 {
       */
       void setSenseWireBZ(int layerId, double bz);
 
+      /**
+       * Return TDC offset value (default = 0 ch).
+       */
+
       inline unsigned short getTdcOffset() const {
         return m_tdcOffset;
       }
+
+      /**
+       * Return TDC bin width (default: 1 nsec).
+       */
 
       inline double getTdcBinWidth() const {
         return m_tdcBinWidth;
       }
 
+      /**
+       * Return the nominal drift velocity of He-ethane gas
+       * (default: 4.0x10^-3 cm/nsec).
+       */
+
       inline double getNominalDriftV() const {
         return m_nominalDriftV;
       }
+
+      /**
+       * Return the nominal propagation speed of the sense wire
+       * (default: 27.25 cm/nsec).
+       */
 
       inline double getNominalPropSpeed() const {
         return m_nominalPropSpeed;
       }
 
+      /**
+       * Return the nominal spacial resolution.
+       * (default: 130 um defined in CDC.xml).
+       */
+
       inline double getNominalSpaceResol() const {
         return m_nominalSpaceResol;
       }
+
+      /**
+       * Set the nominal spacial resolution in the unit of um.
+       * @param[in] resol spacial resolution (um)
+       *
+       */
 
       inline void setNominalSpaceResol(double resol) {
         m_nominalSpaceResol = resol;
       }
 
-      inline double getPropSpeedInv(const unsigned int iCLayer) const {
-        return m_PropSpeedInv[iCLayer];
+      /**
+       * Get the inversel of propagation speed in the sense wire.
+       * @param[in]  layerID  layer ID (0-55)
+       *
+       */
+
+      inline double getPropSpeedInv(const unsigned int layerID) const {
+        return m_PropSpeedInv[layerID];
       }
 
+      /**
+       * Get the sag effets of the sense wire.
+       * @param[in] layerID Layer ID
+       * @param[in] cellID Cell  ID in the layer
+       * @param[in] zw  Z-coord. (cm) at which the sense wire sag is computed
+       * @param[out] ywb_sag Y-corrd. (cm) of intersection between a tangent line and the backward endplate.
+       * @param[out] ywf_sag Y-corrd. (cm) of intersection between a tangent line and the forward endplate.
+       * @attention The tangent line is computed from the first derivative of a paraboric wire (due to gravity) defined at Z.
+       * @todo The electrostatic force effect should be included.
+       * @todo It shoule be replaced with a bit more accurate formula.
+       */
+
       void getWirSagEffect(unsigned layerID, unsigned cellID, double zw, double& ywb_sag, double& ywf_sag) const;
+
+      /**
+       * Get the realistic drift velocity.
+       * @param[in] dt Drift time.
+       * @param[in] layer Layer ID.
+       * @param[in] lr Left/Right
+       * @param[in] alpha incident angle w.r.t. the cell.
+       *
+       */
 
       double getDriftV(double dt, unsigned short layer, unsigned short lr, double alpha = 0.) const;
 
       /**
        * Return the drift dength to the sense wire.
-       * @param dt Drift time.
-       * @param layer Layer ID.
-       * @param lr Left/Right
-       * @param alpha incident angle w.r.t. the cell.
+       * @param[in] dt Drift time.
+       * @param[in] layer Layer ID.
+       * @param[in] lr Left/Right
+       * @param[in] alpha incident angle w.r.t. the cell.
        */
 
       double getDriftLength(double dt, unsigned short layer, unsigned short lr, double alpha = 0.) const;
@@ -400,6 +456,24 @@ namespace Belle2 {
        */
 
       double getSigma(double dist, unsigned short layer) const;
+
+
+      /**
+       * Set the desizend wire parameters.
+       * @param[in] layerID Layer ID
+       * @param[in] cellID Cell ID
+       */
+
+      void setDesignWirParam(unsigned layerID, unsigned cellID);
+
+      /**
+       * Write the designed wire parameters to the alignment\.dat (default).
+       * @param[in] layerID Layer ID
+       * @param[in] cellID Cell ID
+       */
+
+      void outputDesignWirParam(unsigned layerID, unsigned cellID) const;
+
 
 
     private:
@@ -425,8 +499,6 @@ namespace Belle2 {
       int m_nShifts[MAX_N_SLAYERS];             /*!< The array to store shifted cell number in each sense wire layer. */
       unsigned m_nWires[MAX_N_SLAYERS];         /*!< The array to store the wire number in each sense wire layre. */
 
-      //TVector3 m_wireForwardPosition[MAX_N_SLAYERS][MAX_N_SCELLS];  /*!< The forward position of each sense wire in each layer. */
-      //TVector3 m_wireBackwardPosition[MAX_N_SLAYERS][MAX_N_SCELLS]; /*!< The backward position of each sense wire in each layer. */
 
       double m_senseWireDiameter;                   /*!< The diameter of sense wires. */
       double m_senseWireTension;                    /*!< The tension of sense wires. */
@@ -440,19 +512,13 @@ namespace Belle2 {
       double m_momZ[7];
       double m_momRmin[7];
 
-      //      float m_FWirPos[MAX_N_SLAYERS][MAX_N_SCELLS][3];
-      //      float m_BWirPos[MAX_N_SLAYERS][MAX_N_SCELLS][3];
-      double m_FWirPos[MAX_N_SLAYERS][MAX_N_SCELLS][3];
-      double m_BWirPos[MAX_N_SLAYERS][MAX_N_SCELLS][3];
-      //      TVector3 m_FWirPos[MAX_N_SLAYERS][MAX_N_SCELLS];
-      //      TVector3 m_BWirPos[MAX_N_SLAYERS][MAX_N_SCELLS];
+      double m_FWirPos[MAX_N_SLAYERS][MAX_N_SCELLS][3]; /*!< Wire position at the forward endplate for each layer and cell. */
+      double m_BWirPos[MAX_N_SLAYERS][MAX_N_SCELLS][3]; /*!< Wire position at the backward endplate for each layer and cell. */
 
-      double m_WirSagCoef[MAX_N_SLAYERS][MAX_N_SCELLS];
+      double m_WirSagCoef[MAX_N_SLAYERS][MAX_N_SCELLS]; /*!< Wire sag coeffients for each layer and cell. */
 
       double m_XT[MAX_N_SLAYERS][2][18][9];
-
       double m_Sigma[MAX_N_SLAYERS][7];
-
       double m_PropSpeedInv[MAX_N_SLAYERS];
 
       unsigned short m_tdcOffset;
@@ -464,9 +530,6 @@ namespace Belle2 {
 
       static CDCGeometryPar* m_B4CDCGeometryParDB; /*!< Pointer that saves the instance of this class. */
 
-      void setDesignWirParam(unsigned, unsigned);
-
-      void outputDesignWirParam(unsigned, unsigned) const;
 
     };
 

@@ -338,6 +338,11 @@ void CDCGeometryPar::readXT(const GearDir gbxParams, const int mode)
   unsigned nRead = 0;
 
   while (true) {
+
+    //
+    // Read a line of xt-parameter from Garfield calculations.
+    //
+
     ifs >> iL >> alpha >> dummy0 >> dummy1 >> lr;
     for (int i = 0; i < np - 1; ++i) {
       ifs >> xt[i];
@@ -638,29 +643,33 @@ void CDCGeometryPar::generateXML(const string& of)
 
 void CDCGeometryPar::getWirSagEffect(const unsigned layerID, const unsigned cellID, const double Z, double& Yb_sag, double& Yf_sag) const
 {
-  //input layerID: layer id (0 - 55);
+  //Input layerID: layer id (0 - 55);
   //       cellID: cell  id in the layer;
   //            Z: Z-coord. (cm) at which sense wire sag is computed.
   //
-  //output Yb_sag: Y-corrd. (cm) of intersection of a tangent line and the backward endplate. Here the tangent line is computed from the 1'st derivative of a paraboric wire (due to gravity) defined at Z.
+  //Output Yb_sag: Y-corrd. (cm) of intersection of a tangent line and the backward endplate.
+  //               Here the tangent line is computed from the 1'st derivative of
+  //               a paraboric wire (due to gravity) defined at Z.
   //       Yf_sag: ibid. but for forward.
   //
   //N.B.- Maybe replaced with a bit more accurate formula.
   //    - The electrostatic force effect is not included.
 
+  const double Xb = m_BWirPos[layerID][cellID][0];
+  const double Xf = m_FWirPos[layerID][cellID][0];
   const double Yb = m_BWirPos[layerID][cellID][1];
+  const double Yf = m_FWirPos[layerID][cellID][1];
   const double Zb = m_BWirPos[layerID][cellID][2];
   const double Zf = m_FWirPos[layerID][cellID][2];
 
-  const double dx = m_FWirPos[layerID][cellID][0] - m_BWirPos[layerID][cellID][0];
-  const double dy = m_FWirPos[layerID][cellID][1] - Yb;
+  const double dx = Xf - Xb;
+  const double dy = Yf - Yb;
   const double dz = Zf - Zb;
 
-  const double Zfp = sqrt(dz * dz + dx * dx); //=wire length in z-x plane since Zbp==0
+  const double Zfp = sqrt(dz * dz + dx * dx); // Wire length in z-x plane since Zbp==0
   const double Zp  = (Z - Zb) * Zfp / dz;
 
   const double Coef = m_WirSagCoef[layerID][cellID];
-  //  cout << "Coef= " << Coef << endl;
 
   const double Y_sag = (Coef * (Zp - Zfp) + dy / Zfp) * Zp + Yb;
   const double dydz = (Coef * (2.*Zp - Zfp) * Zfp + dy) / dz;
@@ -668,11 +677,6 @@ void CDCGeometryPar::getWirSagEffect(const unsigned layerID, const unsigned cell
   Yb_sag = Y_sag + dydz * (Zb - Z);
   Yf_sag = Y_sag + dydz * (Zf - Z);
 
-  //  const double Yf = m_FWirPos[layerID][cellID][1];
-  //  const double Xf = m_FWirPos[layerID][cellID][0];
-  //  const double Xb = m_BWirPos[layerID][cellID][0];
-  //    cout <<"Z,Zb,Zf,Yb,Yf,Vb,Xf= " << Z <<" "<< Zb <<" "<< Zf <<" "<< Yb <<" "<< Yf <<" "<< Xb <<" "<< Xf << endl;
-  //  cout <<"layerID,Yb_sag-Yb,Yf_sag-Yf= " << layerID <<" "<<1.e4*(Yb_sag - Yb) <<" "<< 1.e4*(Yf_sag - Yf) << endl;
 }
 
 void CDCGeometryPar::setDesignWirParam(const unsigned layerID, const unsigned cellID)

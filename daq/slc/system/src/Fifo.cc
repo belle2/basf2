@@ -20,9 +20,17 @@ Fifo Fifo::mkfifo(const std::string& path) throw(IOException)
   return fifo;
 }
 
-void Fifo::open(const std::string& path) throw(IOException)
+void Fifo::open(const std::string& path, const std::string& mode_s)
+throw(IOException)
 {
-  if ((_fd = ::open(path.c_str(), O_WRONLY)) < 0) {
+  int mode = O_RDONLY;
+  if (mode_s.find("w") != std::string::npos) {
+    mode = O_WRONLY;
+    if (mode_s.find("r") != std::string::npos) {
+      mode = O_RDWR;
+    }
+  }
+  if ((_fd = ::open(path.c_str(), mode)) < 0) {
     perror("open");
     Belle2::debug("Failed to open fifo : '%s'", path.c_str());
     throw (IOException(__FILE__, __LINE__, "Failed to open fifo."));

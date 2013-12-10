@@ -17,7 +17,8 @@ namespace Belle2 {
     virtual ~Fifo() throw() {}
 
   public:
-    void open(const std::string& path) throw(IOException);
+    void open(const std::string& path,
+              const std::string& mode = "r") throw(IOException);
     void unlink(const std::string& path) throw(IOException);
     virtual size_t write(const void* v, size_t count) throw(IOException);
     virtual size_t read(void* v, size_t count) throw(IOException);

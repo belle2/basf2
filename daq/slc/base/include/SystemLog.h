@@ -27,15 +27,19 @@ namespace Belle2 {
     const std::string toString() const;
     bool unpack(int npar, const int* pars, const std::string& str_in);
     int pack(int* pars, std::string& str_out) const;
+    void setPriority(Priority priority) { _priority = priority; }
     void setNodeName(const std::string& name) { _node_name = name; }
     void setGroupName(const std::string& name) { _group_name = name; }
     void setHostName(const std::string& name) { _hostname = name; }
+    void setMessage(const std::string& message) { _message = message; }
     void setDate() { _log_date = Date(); }
     void setDate(int date) { _log_date = Date(date); }
     void setDate(const Date& date) { _log_date = date; }
+    Priority getPriority() const { return _priority; }
     const std::string& getNodeName() const { return _node_name; }
     const std::string& getGroupName() const { return _group_name; }
     const std::string& getHostName() const { return _hostname; }
+    const std::string& getMessage() const { return _message; }
     const Date& getDate() const { return _log_date; }
     virtual void readObject(Reader& reader) throw(IOException);
     virtual void writeObject(Writer& writer) const throw(IOException);

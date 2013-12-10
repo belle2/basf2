@@ -41,7 +41,7 @@ RCTestModuleModule::~RCTestModuleModule()
 void RCTestModuleModule::initialize()
 {
   m_buf.open(m_buf_path);
-  m_msg.open(m_msg_path);
+  m_msg.open(m_msg_path, "w");
   m_msg.sendLog(SystemLog(m_name, SystemLog::NOTICE, "Ready for start"));
 }
 

@@ -40,7 +40,7 @@ void COPPERCallback::init() throw()
   SharedMemory::unlink(_buf_path);
   _msg.unlink(_fifo_path);
   _buf.open(_buf_path);
-  _msg.create(_fifo_path);
+  _msg.create(_fifo_path, "r");
 }
 
 bool COPPERCallback::boot() throw()
@@ -96,7 +96,19 @@ bool COPPERCallback::start() throw()
   _buf.setNodeId(_node->getData()->getId());
   _buf.setState(1);
   _buf.unlock();
-  return true;
+  try {
+    SystemLog log = _msg.recieveLog();
+    if (log.getPriority() == SystemLog::INFO) {
+      return true;
+    } else {
+      Belle2::debug("Error on readout worker : %s", log.getMessage().c_str());
+      setReply(log.getMessage());
+    }
+  } catch (const IOException& e) {
+    Belle2::debug("Fifo IO error");
+    setReply("Fifo IO error");
+  }
+  return false;
 }
 
 bool COPPERCallback::stop() throw()

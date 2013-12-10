@@ -22,7 +22,7 @@
 using namespace Belle2;
 
 ROCallback::ROCallback(NSMNode* node)
-  : RCCallback(node), _node(node)
+  : RCCallback(node)
 {
   node->setData(new DataObject());
 }
@@ -66,6 +66,19 @@ bool ROCallback::start() throw()
   _buf.setNodeId(_node->getData()->getId());
   _buf.setState(1);
   _buf.unlock();
+  try {
+    SystemLog log = _msg.recieveLog();
+    if (log.getPriority() == SystemLog::INFO) {
+      return true;
+    } else {
+      Belle2::debug("Error on readout worker : %s", log.getMessage().c_str());
+      setReply(log.getMessage());
+      return false;
+    }
+  } catch (const IOException& e) {
+    Belle2::debug("Fifo IO error");
+    return false;
+  }
   return true;
 }
 

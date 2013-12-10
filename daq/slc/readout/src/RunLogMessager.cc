@@ -2,11 +2,11 @@
 
 using namespace Belle2;
 
-bool RunLogMessanger::open(const std::string& path)
+bool RunLogMessanger::open(const std::string& path, const std::string& mode)
 {
   try {
     _path = path;
-    _fifo.open(path);
+    _fifo.open(path, mode);
   } catch (const IOException& e) {
     _fifo.close();
     return false;
@@ -14,7 +14,7 @@ bool RunLogMessanger::open(const std::string& path)
   return true;
 }
 
-bool RunLogMessanger::create(const std::string& path)
+bool RunLogMessanger::create(const std::string& path, const std::string& mode)
 {
   try {
     _path = path;
@@ -22,7 +22,7 @@ bool RunLogMessanger::create(const std::string& path)
   } catch (const IOException& e) {
     return false;
   }
-  return open(path);
+  return open(path, mode);
 }
 
 void RunLogMessanger::close()

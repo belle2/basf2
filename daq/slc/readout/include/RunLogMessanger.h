@@ -14,8 +14,8 @@ namespace Belle2 {
     ~RunLogMessanger() {}
 
   public:
-    bool open(const std::string& path);
-    bool create(const std::string& path);
+    bool open(const std::string& path, const std::string& mode = "r");
+    bool create(const std::string& path, const std::string& mode = "r");
     void close();
     void unlink(const std::string& path = "");
     SystemLog recieveLog() throw(IOException) {

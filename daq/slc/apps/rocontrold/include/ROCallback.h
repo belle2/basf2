@@ -30,7 +30,6 @@ namespace Belle2 {
     virtual bool abort() throw();
 
   private:
-    NSMNode* _node;
     std::string _buf_path;
     std::string _fifo_path;
     RunInfoBuffer _buf;

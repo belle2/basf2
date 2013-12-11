@@ -20,14 +20,17 @@ using namespace std;
 using namespace Belle2;
 
 // Thread related
+static DataStoreStreamer* s_streamer = NULL;
 
 static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 static pthread_mutex_t mutex_thread[MAXTHREADS];
+static char* evtbuf_thread[MAXTHREADS];
 
 void* RunDecodeEvtMessage(void* targ)
 {
   int* id = (int*)targ;
-  DataStoreStreamer::Instance().decodeEvtMessage(*id);
+  //  DataStoreStreamer::Instance().decodeEvtMessage(*id);
+  s_streamer->decodeEvtMessage(*id);
   return NULL;
 }
 
@@ -45,16 +48,17 @@ DataStoreStreamer::DataStoreStreamer(int complevel, int maxthread) : m_compressi
 {
   if (m_maxthread > MAXTHREADS) {
     B2FATAL("DataStoreStreamer : Too many threads " << m_maxthread);
+    m_maxthread = MAXTHREADS;
   }
   m_msghandler = new MsgHandler(m_compressionLevel);
 
-  if (maxthread > 0) {
+  if (m_maxthread > 0) {
     // Run decoder threads as sustainable detached threads
     pthread_attr_t thread_attr;
     pthread_attr_init(&thread_attr);
     //    pthread_attr_setschedpolicy(&thread_attr , SCHED_FIFO);
     //    pthread_attr_setdetachstate(&thread_attr , PTHREAD_CREATE_DETACHED);
-    for (int i = 0; i < maxthread; i++) {
+    for (int i = 0; i < m_maxthread; i++) {
       m_decstat[i] = 0;
       m_pt[i] = (pthread_t)0;
       m_id[i] = i;
@@ -64,6 +68,7 @@ DataStoreStreamer::DataStoreStreamer(int complevel, int maxthread) : m_compressi
     }
     pthread_attr_destroy(&thread_attr);
   }
+  s_streamer = this;
 }
 
 // Destructor
@@ -201,6 +206,7 @@ int DataStoreStreamer::queueEvtMessage(char* evtbuf)
 {
   // EOF case
   if (evtbuf == NULL) {
+    printf("queueEvtMessage : NULL evtbuf detected. %8.8x \n", evtbuf);
     for (int i = 0; i < m_maxthread; i++) {
       while (m_evtbuf[i].size() >= MAXQUEUEDEPTH) usleep(10);
       m_evtbuf[m_threadin].push(evtbuf);
@@ -209,34 +215,17 @@ int DataStoreStreamer::queueEvtMessage(char* evtbuf)
   }
 
   // Put the event buffer in the queue of current thread
-  struct timeval t_0, t_1;
-  gettimeofday(&t_0, NULL);
-
-  int nloop = 0;
   for (;;) {
     if (m_evtbuf[m_threadin].size() < MAXQUEUEDEPTH) {
       pthread_mutex_lock(&mutex_thread[m_threadin]);
       m_evtbuf[m_threadin].push(evtbuf);
       pthread_mutex_unlock(&mutex_thread[m_threadin]);
       break;
-    } else {
-      m_threadin++;
-      if (m_threadin >= m_maxthread) m_threadin = 0;
     }
-    nloop++;
-    if (nloop == m_maxthread) {
-      usleep(20);
-      nloop = 0;
-    }
+    usleep(20);
   }
-  gettimeofday(&t_1, NULL);
 
-  // Statistics
-  int flagtime = (t_1.tv_sec * 1000000 + t_1.tv_usec) - (t_0.tv_sec * 1000000 + t_0.tv_usec);
-  //  printf ( "queueEvtMessage : thread %d wait took %d usec \n", m_threadin, flagtime );
-
-  // Preparation for next event
-  //  printf ( "queueEvtMessage : event queued in thread %d!\n", m_threadin );
+  // Switch to next thread
   m_decstat[m_threadin] = 1; // Event queued for decoding
   m_threadin++;
   if (m_threadin >= m_maxthread) m_threadin = 0;
@@ -245,47 +234,41 @@ int DataStoreStreamer::queueEvtMessage(char* evtbuf)
 
 void* DataStoreStreamer::decodeEvtMessage(int id)
 {
-  //  printf ( "decodeEvtMessge : started. Thread ID = %d\n", id );
+  printf("decodeEvtMessge : started. Thread ID = %d\n", id);
   // Clear Message Handler
   //  m_msghandler->clear();
   MsgHandler msghandler(m_compressionLevel);
 
-  struct timeval t_0, t_1, t_2;
   for (;;) {
-    gettimeofday(&t_0, NULL);
-    // Dequeue one event
-    int nloop = 0;
-    while (m_evtbuf[id].empty()) {
-      usleep(10);
-      nloop++;
-    }
-    gettimeofday(&t_1, NULL);
-    //    printf ( "Thread processing id=%d, wait %d times\n", id, nloop );
+    // Wait for event in queue becomes ready
+    while (m_evtbuf[id].size() <= 0) usleep(10);
 
     // Pick up event buffer
     pthread_mutex_lock(&mutex_thread[id]);
+    int nqueue = m_evtbuf[id].size();
+    if (nqueue <= 0) printf("!!!!! Nqueue = %d\n", nqueue);
     char* evtbuf = m_evtbuf[id].front(); m_evtbuf[id].pop();
-    pthread_mutex_unlock(&mutex_thread[id]);
+
     // In case of EOF
     if (evtbuf == NULL) {
+      printf("decodeEvtMessage: NULL evtbuf detected %8.8x, nq = %d\n", evtbuf, nqueue);
       m_nobjs.push(-1);
       return NULL;
     }
 
     // Construct EvtMessage
-    EvtMessage* msg = new EvtMessage(evtbuf);
+    //    EvtMessage* msg = new EvtMessage(evtbuf);
+    EvtMessage* msg = new EvtMessage();
+    msg->buffer(evtbuf);
+    delete[] evtbuf;
 
-    /* OLD implementation
-    msghandler.decode_msg(msg, m_objlist[id], m_namelist[id]);
-    m_nobjs[id] =  (msg->header())->reserved[1];
-    m_narrays[id] = (msg->header())->reserved[2];
-    m_durability[id] = (DataStore::EDurability)(msg->header())->reserved[0];
-    */
+    pthread_mutex_unlock(&mutex_thread[id]);
 
     // Decode EvtMessage into Objects
     vector<TObject*> objlist;
     vector<string> namelist;
     msghandler.decode_msg(msg, objlist, namelist);
+
 
     // Queue them for the registration in DataStore
     while (m_nobjs.size() >= MAXQUEUEDEPTH) usleep(10);
@@ -297,15 +280,12 @@ void* DataStoreStreamer::decodeEvtMessage(int id)
     m_durability.push((DataStore::EDurability)(msg->header())->reserved[0]);
     pthread_mutex_unlock(&mutex);    // Unlock queueing
 
-    // Preparation for next event
+    // Release EvtMessage
     delete msg;
-    delete[] evtbuf;
+
+    // Preparation for next event
     m_decstat[id]  = 0; // Ready to read next event
 
-    gettimeofday(&t_2, NULL);
-    int gettime = (t_1.tv_sec * 1000000 + t_1.tv_usec) - (t_0.tv_sec * 1000000 + t_0.tv_usec);
-    int proctime = (t_2.tv_sec * 1000000 + t_2.tv_usec) - (t_1.tv_sec * 1000000 + t_1.tv_usec);
-    //    printf ( "Thread processing id=%d, done. took %d + %d = %d usec\n", id, gettime, proctime, gettime+proctime );
   }
 
   return NULL;

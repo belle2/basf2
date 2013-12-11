@@ -33,7 +33,7 @@ namespace Belle2 {
     /** Constructor
      *  @param complevel  Compression level of streaming
      */
-    DataStoreStreamer(int complevel = 0, int maxthread = 4);
+    DataStoreStreamer(int complevel = 0, int maxthread = 0);
 
     // Destructor
     /** destructor */

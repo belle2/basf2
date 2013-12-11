@@ -48,7 +48,7 @@ void ProgressBarModule::event()
     long elapsedSec = clockSec - m_startTime;
     double ratio = double(m_evtNr) / m_nTotal;
     double time_per_event = double(elapsedSec) / m_evtNr;
-    double time_remaining = (m_nTotal - m_evtNr) * time_per_event;
+    int remainingSeconds = (m_nTotal - m_evtNr) * time_per_event;
 
     std::cerr << "\r"; //carriage return
 
@@ -67,10 +67,14 @@ void ProgressBarModule::event()
 
     }
     cerr << "] " << int(ratio * 100) << "% ";
-    cerr.precision(3);
-    cerr << time_remaining << "s remaining";
+    if (remainingSeconds > 60) {
+      int minutes = remainingSeconds / 60;
+      remainingSeconds %= 60;
+      cerr << minutes << "m";
+    }
+    cerr << remainingSeconds << "s remaining";
     //some spaces to overwrite other stuff
-    cerr << "        " << flush;
+    cerr << "          " << flush;
 
     m_lastPrint = clockSec;
   }

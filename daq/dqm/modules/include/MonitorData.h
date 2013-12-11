@@ -27,7 +27,7 @@
 #include <framework/dataobjects/EventMetaData.h>
 
 #include <daq/rawdata/modules/DAQConsts.h>
-#include <rawdata/RawCOPPER.h>
+#include <rawdata/dataobjects/RawCOPPER.h>
 #include <daq/dataobjects/SendHeader.h>
 #include <daq/dataobjects/SendTrailer.h>
 

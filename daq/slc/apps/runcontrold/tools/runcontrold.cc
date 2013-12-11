@@ -31,6 +31,10 @@ int main(int argc, char** argv)
 {
   std::string configname = (argc > 1) ? argv[1] : "runcontrol";
   ConfigFile config("slowcontrol", configname);
+  const std::string local_host = config.get("NSM_LOCAL_HOST");
+  const int local_port = config.getInt("NSM_LOCAL_PORT");
+  const std::string global_host = config.get("NSM_GLOBAL_HOST");
+  const int global_port = config.getInt("NSM_GLOBAL_PORT");
   ObjectLoader oloader(config.get("RC_XML_PATH"));
   DataObject* data = oloader.load(config.get("RC_XML_ENTRY"));
   XMLParser parser;
@@ -48,14 +52,11 @@ int main(int argc, char** argv)
   master->setNodeControl(el);
   run_config->add(oloader.getClassList(), master->getNSMNodes());
   PThread(new NSMNodeDaemon(new RCClientCallback(node_client, master),
-                            config.get("NSM_LOCAL_HOST"),
-                            config.getInt("NSM_LOCAL_PORT")));
-  sleep(5);
+                            local_host, local_port));
   RCMasterCallback* callback = new RCMasterCallback(node_master);
   callback->setMaster(master);
-  int port = config.getInt("NSM_GLOBAL_PORT");
-  if (port > 0) {
-    PThread(new NSMNodeDaemon(callback, config.get("NSM_GLOBAL_HOST"), port));
+  if (global_port > 0) {
+    PThread(new NSMNodeDaemon(callback, global_host, global_port));
   }
   PostgreSQLInterface* db =
     new PostgreSQLInterface(config.get("DATABASE_HOST"), config.get("DATABASE_NAME"),
@@ -66,7 +67,7 @@ int main(int argc, char** argv)
   dbmanager->createTables();
   dbmanager->readStatus();
   dbmanager->writeConfigs();
-  port = config.getInt("RC_GLOBAL_PORT");
+  int port = config.getInt("RC_GLOBAL_PORT");
   if (port > 0) {
     PThread(new RCGUIAcceptor(config.get("RC_GLOBAL_HOST"), port, callback));
   }

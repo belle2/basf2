@@ -1,4 +1,4 @@
-#include "daq/slc/readout/RunInfoBuffer.h"
+#include "daq/slc/readout/modules/RunInfoBuffer.h"
 
 #include <cstring>
 
@@ -6,54 +6,54 @@ using namespace Belle2;
 
 size_t RunInfoBuffer::size() throw()
 {
-  return _mutex.size() + _cond.size() + sizeof(run_info);
+  return _mutex.size() + _cond.size() + sizeof(unsigned int) * 5;
 }
 
 bool RunInfoBuffer::open(const std::string& path)
 {
-  try {
-    _path = path;
-    _memory.open(path, size());
-    char* buf = (char*) _memory.map(0, size());
-    _info = (run_info*)buf;
-    buf += sizeof(run_info);
-    _mutex = MMutex(buf);
-    buf += _mutex.size();
-    _cond = MCond(buf);
-  } catch (const IOException& e) {
+  _path = path;
+  if (!_memory.open(path, size())) {
     return false;
   }
+  char* buf = (char*) _memory.map(0, size());
+  if (buf == NULL) {
+    return false;
+  }
+  _info = (unsigned int*)buf;
+  buf += sizeof(unsigned int) * 5;
+  _mutex = MMutex(buf);
+  buf += _mutex.size();
+  _cond = MCond(buf);
   return true;
 }
 
 bool RunInfoBuffer::init()
 {
-  try {
-    _mutex.init();
-    _cond.init();
-    memset(_info, 0, sizeof(run_info));
-  } catch (const IOException& e) {
-    return false;
-  }
+  if (_info == NULL) return false;
+  _mutex.init();
+  _cond.init();
+  memset(_info, 0, sizeof(unsigned int) * 5);
   return true;
 }
 
 void RunInfoBuffer::clear()
 {
   _mutex.lock();
-  memset(_info, 0, sizeof(run_info));
+  memset(_info, 0, sizeof(unsigned int) * 5);
   _mutex.unlock();
 }
 
 bool RunInfoBuffer::close()
 {
-  return _memory.close();
+  _memory.close();
+  return true;
 }
 
 bool RunInfoBuffer::unlink()
 {
   _memory.unlink();
-  return _memory.close();
+  _memory.close();
+  return true;
 }
 
 bool RunInfoBuffer::lock() throw()

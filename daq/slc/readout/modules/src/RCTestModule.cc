@@ -43,11 +43,11 @@ void RCTestModuleModule::initialize()
 
 void RCTestModuleModule::terminate()
 {
-  m_msg.sendLog(SystemLog(m_name, SystemLog::NOTICE, "Run terminating"));
+  m_msg.send(RunLogMessanger::NOTICE, "Run terminating");
 }
 
 
 void RCTestModuleModule::event()
 {
-  m_msg.sendLog(SystemLog(m_name, SystemLog::NOTICE, "Ready for start"));
+  m_msg.send(RunLogMessanger::NOTICE, "Run started");
 }

@@ -1,7 +1,7 @@
 #ifndef _Belle2_MCond_h
 #define _Belle2_MCond_h
 
-#include "daq/slc/readout/MMutex.h"
+#include "daq/slc/readout/modules/MMutex.h"
 
 #include <pthread.h>
 

@@ -1,4 +1,4 @@
-#include "daq/slc/readout/MCond.h"
+#include "daq/slc/readout/modules/MCond.h"
 
 #include <sys/time.h>
 

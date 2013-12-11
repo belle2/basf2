@@ -3,6 +3,13 @@
 
 #include <pthread.h>
 
+#ifdef __CINT__
+#undef __GNUC__
+#define _SYS__SELECT_H_
+struct pthread_cond_t;
+struct pthread_mutex_t;
+#endif
+
 namespace Belle2 {
 
   class MMutex {

@@ -1,13 +1,17 @@
 #ifndef _Belle2_RunLogMessanger_h
 #define _Belle2_RunLogMessanger_h
 
-#include <daq/slc/system/FifoWriter.h>
-#include <daq/slc/system/FifoReader.h>
-#include <daq/slc/base/SystemLog.h>
+#include <string>
 
 namespace Belle2 {
 
   class RunLogMessanger {
+
+  public:
+    static const int DEBUG;
+    static const int NOTICE;
+    static const int ERROR;
+    static const int FATAL;
 
   public:
     RunLogMessanger() {}
@@ -18,20 +22,16 @@ namespace Belle2 {
     bool create(const std::string& path, const std::string& mode = "r");
     void close();
     void unlink(const std::string& path = "");
-    SystemLog recieveLog() throw(IOException) {
-      SystemLog log;
-      _reader.readObject(log);
-      return log;
-    }
-    void sendLog(const SystemLog& log) throw(IOException) {
-      _writer.writeObject(log);
-    }
+    std::string recieve(int& priority, int timeout = -1);
+    bool send(int priority, const std::string& message);
+
+  private:
+    int write(const void* v, size_t count);
+    int read(void* v, size_t count);
 
   private:
     std::string _path;
-    Fifo _fifo;
-    FifoWriter _writer;
-    FifoReader _reader;
+    int _fifo;
 
   };
 

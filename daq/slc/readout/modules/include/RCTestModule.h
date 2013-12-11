@@ -11,8 +11,8 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/dataobjects/EventMetaData.h>
 
-#include <daq/slc/readout/RunInfoBuffer.h>
-#include <daq/slc/readout/RunLogMessanger.h>
+#include <daq/slc/readout/modules/RunInfoBuffer.h>
+#include <daq/slc/readout/modules/RunLogMessanger.h>
 
 namespace Belle2 {
 

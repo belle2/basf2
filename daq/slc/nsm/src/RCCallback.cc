@@ -35,8 +35,10 @@ void RCCallback::download()
     TCPSocket socket;
     try {
       ConfigFile config;
+      int port = config.getInt("RC_LOCAL_PORT");
+      if (port <= 0) return;
       socket.connect(config.get("RC_LOCAL_HOST"),
-                     config.getInt("RC_LOCAL_PORT"));
+                     port);
       TCPSocketWriter writer(socket);
       TCPSocketReader reader(socket);
       writer.writeString(_node->getName());

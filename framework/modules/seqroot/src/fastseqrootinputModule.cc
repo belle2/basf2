@@ -58,6 +58,10 @@ FastSeqRootInputModule::FastSeqRootInputModule() : Module()
 
   //Parameter definition
   addParam("inputFileName"  , m_inputFileName, "FastSeqRoot file name.", string("FastSeqRootInput.root"));
+  addParam("CompressionLevel", m_compressionLevel, "Compression level",
+           0);
+  addParam("NumThreads", m_numThread, "Number of threads for object decoding",
+           1);
 
   s_input = this;
 
@@ -83,8 +87,9 @@ void FastSeqRootInputModule::initialize()
   }
 
   // Initialize DataStoreStreamer, use Instance to use threads
-  m_streamer = &(DataStoreStreamer::Instance());
-  m_streamer->setMaxThreads(4);
+  //  m_streamer = &(DataStoreStreamer::Instance());
+  //  m_streamer->setMaxThreads(1);
+  m_streamer = new DataStoreStreamer(m_compressionLevel, m_numThread);
 
   // Read the first event in FastSeqRoot file and restore in DataStore.
   // This is necessary to create object tables before TTree initialization

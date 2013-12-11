@@ -55,6 +55,12 @@ namespace Belle2 {
     //! File name
     std::string m_inputFileName;
 
+    //! Compression Level
+    int m_compressionLevel;
+
+    //! Number of decoder threads
+    int m_numThread;
+
     //! Blocked file handler
     SeqFile* m_file;
     pthread_t m_thr_input;

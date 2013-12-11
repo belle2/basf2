@@ -126,13 +126,13 @@ TRGCDCModule::TRGCDCModule()
              "The filename of LUT for TSF SL8",
              _tsfLUTSL8DataFilename);
     addParam("RootTRGCDCFile",
-              _rootTRGCDCFilename,
-              "The filename of root file for TRGCDC",
-              string("TRGCDC.root"));
+             _rootTRGCDCFilename,
+             "The filename of root file for TRGCDC",
+             string("TRGCDC.root"));
     addParam("RootFitter3DFile",
-              _rootFitter3DFilename,
-              "The filename of root file for Fitter3D",
-              string("Fitter3D.root"));
+             _rootFitter3DFilename,
+             "The filename of root file for Fitter3D",
+             string("Fitter3D.root"));
     addParam("CurlBackStop",
              _curlBackStop,
              "Curl back stop parameter",
@@ -150,9 +150,9 @@ TRGCDCModule::TRGCDCModule()
 	     "TRGCDC firmware simulation mode",
 	     _firmwareSimulationMode);
     addParam("TRGCDCRootFile",
-              _fileTRGCDC,
-              "Flag for making TRGCDC.root",
-              _fileTRGCDC);
+             _fileTRGCDC,
+             "Flag for making TRGCDC.root",
+             _fileTRGCDC);
     addParam("TSFLogicLUT",
              _fLogicLUTTSF,
              "Use logic or LUT for TSF",
@@ -198,44 +198,43 @@ TRGCDCModule::TRGCDCModule()
              "wire hit inefficiency",
              _wireHitInefficiency);
     addParam("TSFRootFile",
-              _fileTSF,
-              "Flag for making TSF.root",
-              _fileTSF);
+             _fileTSF,
+             "Flag for making TSF.root",
+             _fileTSF);
     addParam("Hough3DRootFile",
-              _fileHough3D,
-              "Flag for making Hough3D.root",
-              _fileHough3D);
+             _fileHough3D,
+             "Flag for making Hough3D.root",
+             _fileHough3D);
     addParam("Finder3DMode",
-              _finder3DMode,
-              "Mode for finder3D",
-              _finder3DMode);
+             _finder3DMode,
+             "Mode for finder3D",
+             _finder3DMode);
     addParam("Fitter3DRootFile",
-              _fileFitter3D,
-              "Flag for making Fitter3D.root",
-              _fileFitter3D);
+             _fileFitter3D,
+             "Flag for making Fitter3D.root",
+             _fileFitter3D);
     addParam("TRGCDCDataInputMode",
-              _trgCDCDataInputMode,
-              "Flag for TRG CDC input mode",
-              _trgCDCDataInputMode);
+             _trgCDCDataInputMode,
+             "Flag for TRG CDC input mode",
+             _trgCDCDataInputMode);
 
 
     if (TRGDebug::level())
 	cout << "TRGCDCModule ... created" << endl;
 }
 
-  TRGCDCModule::~TRGCDCModule()
-  {
+TRGCDCModule::~TRGCDCModule() {
 
     if (_cdc)
-      TRGCDC::getTRGCDC("good-bye");
+        TRGCDC::getTRGCDC("good-bye");
 
     //...Maybe G4RunManager delete it, so don't delete _sa.
 //  if (_sa)
 //         delete _sa;
 
     if (TRGDebug::level())
-      cout << "TRGCDCModule ... destructed " << endl;
-  }
+        cout << "TRGCDCModule ... destructed " << endl;
+}
 
 void
 TRGCDCModule::initialize() {
@@ -281,7 +280,7 @@ TRGCDCModule::beginRun() {
 				 _simulationMode,
 				 _fastSimulationMode,
 				 _firmwareSimulationMode,
-         _fileTRGCDC,
+                                 _fileTRGCDC,
 				 _perfect2DFinder,
 				 _perfect3DFinder,
 				 _innerTSLUTDataFilename,
@@ -300,17 +299,17 @@ TRGCDCModule::beginRun() {
 				 _hFinderMeshX,
 				 _hFinderMeshY,
 				 _hFinderPeakMin,
-         _fLogicLUTTSF,
+                                 _fLogicLUTTSF,
 				 _fLRLUT,
 				 _fevtTime,
 				 _fzierror,
 				 _fmclr,
 				 _wireHitInefficiency,
-         _fileTSF,
-         _fileHough3D,
-         _finder3DMode,
-         _fileFitter3D,
-         _trgCDCDataInputMode);
+                                 _fileTSF,
+                                 _fileHough3D,
+                                 _finder3DMode,
+                                 _fileFitter3D,
+                                 _trgCDCDataInputMode);
 
     if (TRGDebug::level())
 	cout << "TRGCDCModule ... beginRun called " << endl;
@@ -329,12 +328,11 @@ TRGCDCModule::event() {
     _cdc->simulate();
 }
 
-  void
-  TRGCDCModule::endRun()
-  {
+void
+TRGCDCModule::endRun() {
     if (TRGDebug::level())
-      cout << "TRGCDCModule ... endRun called " << endl;
-  }
+        cout << "TRGCDCModule ... endRun called " << endl;
+}
 
 void
 TRGCDCModule::terminate() {

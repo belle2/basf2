@@ -15,12 +15,47 @@
 #define TRGCDC_SHORT_NAMES
 
 #include <cstdlib>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <netinet/tcp.h>
+#include <arpa/inet.h>
+#include <sys/resource.h>
+#include <sys/uio.h>
+#include <string>
+#include <vector>
+#include <iostream>
+#include <iomanip>
+#include "TFile.h"
+#include "TTree.h"
+#include "TVectorD.h"
+#include "TH1.h"
 #include "framework/datastore/StoreArray.h"
 #include "framework/datastore/RelationArray.h"
+#include "framework/core/Module.h"
+#include "framework/pcore/EvtMessage.h"
+#include "framework/pcore/MsgHandler.h"
+#include "framework/datastore/DataStore.h"
+#include "framework/datastore/StoreObjPtr.h"
+#include "framework/datastore/StoreArray.h"
+#include "framework/dataobjects/EventMetaData.h"
 #include "generators/dataobjects/MCParticle.h"
 #include "cdc/dataobjects/CDCHit.h"
 #include "cdc/dataobjects/CDCSimHit.h"
 #include "cdc/geometry/CDCGeometryPar.h"
+#include "daq/dataflow/EvtSocket.h"
+#include "daq/rawdata/modules/DAQConsts.h"
+#include "rawdata/RawDataBlock.h"
+#include "rawdata/RawFTSW.h"
+#include "rawdata/RawCOPPER.h"
+#include "rawdata/RawSVD.h"
+#include "rawdata/RawCDC.h"
+#include "rawdata/RawBPID.h"
+#include "rawdata/RawEPID.h"
+#include "rawdata/RawECL.h"
+#include "rawdata/RawKLM.h"
+// #include <rawdata/SendHeader.h>
+// #include <rawdata/SendTrailer.h>
 #include "trg/trg/Debug.h"
 #include "trg/trg/Time.h"
 #include "trg/trg/State.h"
@@ -48,12 +83,10 @@
 #include "trg/cdc/Link.h"
 #include "trg/cdc/Relation.h"
 #include "trg/cdc/EventTime.h"
-#include <iostream>
 // For DAQ root file
 #include <daq/rawdata/modules/DAQConsts.h>
 #include <daq/rawdata/modules/PrintData.h>
 #include <framework/core/InputController.h>
-#include <iomanip>
 #define NOT_USE_SOCKETLIB
 //#define NOT_SEND
 //#define DUMMY_DATA

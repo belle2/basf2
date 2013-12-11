@@ -14,58 +14,25 @@
 #ifndef TRGCDC_FLAG_
 #define TRGCDC_FLAG_
 
-//#include <cmath>
-#include <string>
-#include <vector>
-#include "trg/trg/Clock.h"
-#include <TFile.h>
-#include <TTree.h>
-#include <TVectorD.h>
-#include <TH1.h>
-
-// For DAQRoot
-#include <framework/core/Module.h>
-#include <framework/pcore/EvtMessage.h>
-#include <framework/pcore/MsgHandler.h>
-#include <daq/dataflow/EvtSocket.h>
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/dataobjects/EventMetaData.h>
-#include <daq/rawdata/modules/DAQConsts.h>
-#include <daq/dataobjects/RawDataBlock.h>
-#include <daq/dataobjects/RawFTSW.h>
-#include <daq/dataobjects/RawCOPPER.h>
-#include <daq/dataobjects/RawSVD.h>
-#include <daq/dataobjects/RawCDC.h>
-#include <daq/dataobjects/RawBPID.h>
-#include <daq/dataobjects/RawEPID.h>
-#include <daq/dataobjects/RawECL.h>
-#include <daq/dataobjects/RawKLM.h>
-#include <daq/dataobjects/SendHeader.h>
-#include <daq/dataobjects/SendTrailer.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <netinet/tcp.h>
-#include <arpa/inet.h>
-#include <sys/resource.h>
-#include <sys/uio.h>
-
 #define TRGCDC_UNDEFINED 999999
 
+#include <vector>
+#include "trg/trg/Clock.h"
+
+class TFile;
+class TTree;
+class TClonesArray;
+
 namespace HepGeom {
-    template <class T> class Point3D;
-}
-
-namespace Belle2 {
-    class TRGTime;
+template <class T> class Point3D;
 }
 
 namespace Belle2 {
 
-class TRGLink;
 class CDCGeometryPar;
+class TRGTime;
+class TRGClock;
+class TRGLink;
 class TRGCDC;
 class TRGCDCWire;
 class TRGCDCLayer;
@@ -99,7 +66,7 @@ class TRGCDC {
 			      unsigned simulationMode = 0,
 			      unsigned fastSimulationMode = 0,
 			      unsigned firmwareSimulationMode = 0,
-            bool _makeRootFile = 0,
+                              bool _makeRootFile = 0,
                               bool perfect2DFinder = false,
                               bool perfect3DFinder = false,
 			      const std::string & innerTSLUTDataFile = "?",
@@ -124,11 +91,11 @@ class TRGCDC {
 			      bool fzierror=1,
 			      bool fmclr=0,
 			      double inefficiency=0,
-            bool fileTSF=0,
-            bool fileHough3D=0,
-            int finder3DMode=0,
-            bool fileFitter3D=0,
-            int trgCDCDataInputMode=0);
+                              bool fileTSF=0,
+                              bool fileHough3D=0,
+                              int finder3DMode=0,
+                              bool fileFitter3D=0,
+                              int trgCDCDataInputMode=0);
     
     /// returns TRGCDC object. TRGCDC should be created with specific
     /// configuration before calling this function.
@@ -141,7 +108,7 @@ class TRGCDC {
 	   unsigned simulationMode,
 	   unsigned fastSimulationMode,
 	   unsigned firmwareSimulationMode,
-     bool makeRootFile,
+           bool makeRootFile,
 	   bool perfect2DFinder,
 	   bool perfect3DFinder,
 	   const std::string & innerTSLUTDataFile,
@@ -166,11 +133,11 @@ class TRGCDC {
 	   bool fzierror,
 	   bool fmclr,
 	   double inefficiecny,
-     bool fileTSF,
-     bool fileHough3D,
-     int finder3DMode,
-     bool fileFitter3D,
-     int trgCDCDataInputMode);
+           bool fileTSF,
+           bool fileHough3D,
+           int finder3DMode,
+           bool fileFitter3D,
+           int trgCDCDataInputMode);
 
     /// Destructor
     virtual ~TRGCDC();

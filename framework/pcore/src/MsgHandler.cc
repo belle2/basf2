@@ -133,6 +133,7 @@ EvtMessage* MsgHandler::encode_msg(RECORD_TYPE rectype)
 
   delete[] msgbuf;
   m_buf.erase(m_buf.begin(), m_buf.end());
+  m_name.erase(m_name.begin(), m_name.end());
 
   return evtmsg;
 

@@ -12,8 +12,8 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/DataStore.h>
 
-#include <rawdata/RawCOPPER.h>
-#include <rawdata/RawHeader.h>
+#include <rawdata/dataobjects/RawCOPPER.h>
+#include <rawdata/dataobjects/RawHeader.h>
 #include <daq/rawdata/modules/DAQConsts.h>
 
 #include <framework/datastore/StoreObjPtr.h>

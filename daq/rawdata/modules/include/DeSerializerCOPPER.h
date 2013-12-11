@@ -28,8 +28,8 @@
 
 #include <framework/dataobjects/EventMetaData.h>
 #include <daq/rawdata/modules/DAQConsts.h>
-#include <rawdata/RawCOPPER.h>
-#include <rawdata/ErrorMessage.h>
+#include <rawdata/dataobjects/RawCOPPER.h>
+#include <rawdata/dataobjects/ErrorMessage.h>
 #include <daq/rawdata/modules/DeSerializer.h>
 
 

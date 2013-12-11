@@ -25,8 +25,8 @@
 
 #include <daq/dataflow/EvtSocket.h>
 
-#include <rawdata/RawDataBlock.h>
-#include <rawdata/RawCOPPER.h>
+#include <rawdata/dataobjects/RawDataBlock.h>
+#include <rawdata/dataobjects/RawCOPPER.h>
 
 #include <sys/socket.h>
 #include <sys/types.h>

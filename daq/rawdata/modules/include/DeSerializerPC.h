@@ -22,16 +22,16 @@
 #include <framework/datastore/StoreArray.h>
 
 #include <daq/dataflow/EvtSocket.h>
-#include <rawdata/ErrorMessage.h>
+#include <rawdata/dataobjects/ErrorMessage.h>
 
-#include <rawdata/RawCOPPER.h>
-#include <rawdata/RawCDC.h>
-#include <rawdata/RawSVD.h>
-#include <rawdata/RawECL.h>
-#include <rawdata/RawEPID.h>
-#include <rawdata/RawBPID.h>
-#include <rawdata/RawKLM.h>
-#include <rawdata/RawFTSW.h>
+#include <rawdata/dataobjects/RawCOPPER.h>
+#include <rawdata/dataobjects/RawCDC.h>
+#include <rawdata/dataobjects/RawSVD.h>
+#include <rawdata/dataobjects/RawECL.h>
+#include <rawdata/dataobjects/RawEPID.h>
+#include <rawdata/dataobjects/RawBPID.h>
+#include <rawdata/dataobjects/RawKLM.h>
+#include <rawdata/dataobjects/RawFTSW.h>
 
 
 //#include <rawdata/RawROPC.h>

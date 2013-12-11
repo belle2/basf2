@@ -101,6 +101,8 @@ void NSMCommunicator::init(const std::string& host, int port) throw(NSMHandlerEx
     _rc_node = new NSMNode(rc_name);
   }
   __com_v.push_back(this);
+#else
+#warning "Wrong version of nsm2. try source daq/slc/extra/nsm2/export.sh"
 #endif
 }
 

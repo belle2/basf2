@@ -50,6 +50,7 @@ int main(int argc, char** argv)
   PThread(new NSMNodeDaemon(new RCClientCallback(node_client, master),
                             config.get("NSM_LOCAL_HOST"),
                             config.getInt("NSM_LOCAL_PORT")));
+  sleep(5);
   RCMasterCallback* callback = new RCMasterCallback(node_master);
   callback->setMaster(master);
   int port = config.getInt("NSM_GLOBAL_PORT");

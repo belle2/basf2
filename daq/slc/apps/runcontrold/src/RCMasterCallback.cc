@@ -158,7 +158,7 @@ bool RCMasterCallback::trigft() throw()
       if (ftsw->hasValue("trigger_type") && ftsw->hasValue("dummy_rate") &&
           ftsw->hasValue("trigger_limit")) {
         NSMMessage& nsm(getMessage());
-        if (nsm.getNParams() > 2 && nsm.getParam(0) >= 0) {
+        if (nsm.getNParams() > 2 && (int)nsm.getParam(0) >= 0) {
           ftsw->setInt("trigger_type", nsm.getParam(0));
           ftsw->setInt("dummy_rate", nsm.getParam(1));
           ftsw->setInt("trigger_limit", nsm.getParam(2));

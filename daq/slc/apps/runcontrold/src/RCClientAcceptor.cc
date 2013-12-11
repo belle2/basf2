@@ -1,15 +1,19 @@
 #include "daq/slc/apps/runcontrold/RCClientAcceptor.h"
 
 #include "daq/slc/apps/runcontrold/RCMaster.h"
+#include "daq/slc/apps/runcontrold/RCSequencer.h"
 
 #include <daq/slc/system/TCPServerSocket.h>
 #include <daq/slc/system/TCPSocketReader.h>
 #include <daq/slc/system/TCPSocketWriter.h>
 
+#include <daq/slc/base/Debugger.h>
+
 using namespace Belle2;
 
 void RCClientAcceptor::run()
 {
+  RCSequencer::init();
   TCPServerSocket server_socket(_ip, _port);
   server_socket.open();
   while (true) {

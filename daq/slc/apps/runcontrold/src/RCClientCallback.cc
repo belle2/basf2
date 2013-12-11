@@ -34,7 +34,7 @@ bool RCClientCallback::ok() throw()
 {
   NSMMessage& nsm(getMessage());
   int id = nsm.getNodeId();
-  _master->unlock();
+  _master->lock();
   NSMNode* node = _master->findNode(id, nsm);
   node->setState(State(nsm.getData()));
   node->setConnection(Connection::ONLINE);

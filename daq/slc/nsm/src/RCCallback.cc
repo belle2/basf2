@@ -23,6 +23,7 @@ RCCallback::RCCallback(NSMNode* node) throw()
   //add(Command::RESUME);
   //add(Command::PAUSE);
   //add(Command::ABORT);
+  add(Command::STATE);
   add(Command::STATECHECK);
   add(Command::TRIGFT);
   ConfigFile config("runcontrol");
@@ -82,6 +83,8 @@ throw(NSMHandlerException)
     result = trigft();
   } else if (cmd == Command::STATECHECK) {
     if (com != NULL) com->replyOK(_node, "");
+    return true;
+  } else if (cmd == Command::STATE) {
     return true;
   }
   if (result) {

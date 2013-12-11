@@ -1,4 +1,5 @@
 #include "daq/slc/system/Mutex.h"
+#include "daq/slc/base/Debugger.h"
 
 using namespace Belle2;
 

@@ -16,6 +16,7 @@ namespace Belle2 {
   public:
     typedef std::list<RCSequencer*> RCSequencerList;
     static void notify(bool killed = false);
+    static void init();
 
   private:
     static RCSequencerList __seq_l;

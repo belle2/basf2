@@ -19,10 +19,25 @@ RCMaster::~RCMaster() throw()
 
 }
 
-void RCMaster::lock() throw() { _mutex.lock(); }
-void RCMaster::unlock() throw() { _mutex.unlock(); }
-void RCMaster::wait() throw() { _cond.wait(_mutex); }
-void RCMaster::signal() throw() { _cond.signal(); }
+void RCMaster::lock() throw()
+{
+  _mutex.lock();
+}
+
+void RCMaster::unlock() throw()
+{
+  _mutex.unlock();
+}
+
+void RCMaster::wait() throw()
+{
+  _cond.wait(_mutex);
+}
+
+void RCMaster::signal() throw()
+{
+  _cond.signal();
+}
 
 NSMNode* RCMaster::findNode(int id, const NSMMessage& msg) throw()
 {

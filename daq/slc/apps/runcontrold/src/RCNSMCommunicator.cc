@@ -31,6 +31,7 @@ bool RCNSMCommunicator::sendMessage(const RunControlMessage& msg) throw()
 bool RCNSMCommunicator::sendState(NSMNode* node) throw()
 {
   _nsm_mutex.lock();
+  /*
   try {
     unsigned int pars[2];
     int npar = sizeof(pars) / sizeof(int);
@@ -42,6 +43,7 @@ bool RCNSMCommunicator::sendState(NSMNode* node) throw()
     _nsm_mutex.unlock();
     return false;
   }
+  */
   _nsm_mutex.unlock();
   return true;
 }
@@ -50,6 +52,7 @@ bool RCNSMCommunicator::sendDataObject(const std::string& name,
                                        DataObject* data) throw()
 {
   _nsm_mutex.lock();
+  /*
   try {
     unsigned int pars[1];
     int npar = sizeof(pars) / sizeof(int);
@@ -60,6 +63,7 @@ bool RCNSMCommunicator::sendDataObject(const std::string& name,
     _nsm_mutex.unlock();
     return false;
   }
+  */
   _nsm_mutex.unlock();
   return true;
 }

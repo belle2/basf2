@@ -21,21 +21,21 @@ void RCSequencer::notify(bool killed)
   __mutex.unlock();
 }
 
+void RCSequencer::init()
+{
+  __mutex = Mutex();
+  __cond = Cond();
+}
+
 RCSequencer::RCSequencer(RCMaster* master,
                          RunControlMessage msg,
                          bool synchronized)
   : _master(master), _msg(msg), _synchronized(synchronized)
 {
-  __mutex.lock();
-  __seq_l.push_back(this);
-  __mutex.unlock();
 }
 
 RCSequencer::~RCSequencer()
 {
-  __mutex.lock();
-  __seq_l.remove(this);
-  __mutex.unlock();
 }
 
 void RCSequencer::run() throw()
@@ -78,7 +78,7 @@ void RCSequencer::run() throw()
     //setReply("NSM error");
     _master->unlock();
   }
-  _master->unlock();
   __mutex.unlock();
+  _master->unlock();
   return;
 }

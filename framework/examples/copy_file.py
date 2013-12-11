@@ -21,6 +21,9 @@ main.add_module(input)
 output = register_module('RootOutput')
 main.add_module(output)
 
+main.add_module(register_module('ProgressBar'))
+
+
 process(main)
 
 print statistics

@@ -240,6 +240,9 @@ void* DataStoreStreamer::decodeEvtMessage(int id)
   MsgHandler msghandler(m_compressionLevel);
 
   for (;;) {
+    // Clear message handler event by event
+    //    MsgHandler msghandler(m_compressionLevel);
+    msghandler.clear();
     // Wait for event in queue becomes ready
     while (m_evtbuf[id].size() <= 0) usleep(10);
 
@@ -248,6 +251,7 @@ void* DataStoreStreamer::decodeEvtMessage(int id)
     int nqueue = m_evtbuf[id].size();
     if (nqueue <= 0) printf("!!!!! Nqueue = %d\n", nqueue);
     char* evtbuf = m_evtbuf[id].front(); m_evtbuf[id].pop();
+    pthread_mutex_unlock(&mutex_thread[id]);
 
     // In case of EOF
     if (evtbuf == NULL) {
@@ -257,12 +261,9 @@ void* DataStoreStreamer::decodeEvtMessage(int id)
     }
 
     // Construct EvtMessage
-    //    EvtMessage* msg = new EvtMessage(evtbuf);
-    EvtMessage* msg = new EvtMessage();
-    msg->buffer(evtbuf);
-    delete[] evtbuf;
-
-    pthread_mutex_unlock(&mutex_thread[id]);
+    EvtMessage* msg = new EvtMessage(evtbuf);
+    //    EvtMessage* msg = new EvtMessage();
+    //    msg->buffer(evtbuf);
 
     // Decode EvtMessage into Objects
     vector<TObject*> objlist;
@@ -282,6 +283,7 @@ void* DataStoreStreamer::decodeEvtMessage(int id)
 
     // Release EvtMessage
     delete msg;
+    delete[] evtbuf;
 
     // Preparation for next event
     m_decstat[id]  = 0; // Ready to read next event

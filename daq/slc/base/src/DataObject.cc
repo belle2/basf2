@@ -49,7 +49,6 @@ DataObject::DataObject(DataObject* obj)
       EnumMap& enum_m(obj->_enum_m_m[name]);
       for (EnumMap::iterator iit = enum_m.begin();
            iit != enum_m.end(); iit++) {
-        std::cout << iit->first << " " << iit->second << std::endl;
         if (iit->second == *(int*)info.buf) {
           value = iit->first;// break;
         }
@@ -316,8 +315,6 @@ void DataObject::writeObject(Writer& writer) const throw(IOException)
             for (EnumMap::iterator iit = enum_m.begin(); iit != enum_m.end(); iit++) {
               writer.writeString(iit->first);
               writer.writeInt(iit->second);
-              std::cout << __FILE__ << ":" << __LINE__ << " " << _class << " " << count << " '" << name << "' : '"
-                        << iit->first << "':'" << iit->second << "'" << std::endl;
               count++;
             }
             writer.writeString("==ENUM_END==");

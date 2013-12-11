@@ -155,12 +155,10 @@ int RCDatabaseManager::readConfig(const std::string classname, int confno)
     DBRecordList& record_v(loader.readAll(data_v[0]));
     if (confno < 0 && data_v.size() > 0) {
       confno = loader.getLatestConfig(data_v[0]);
-      Belle2::debug("%s:%d confno = %d", __FILE__, __LINE__, confno);
     }
     for (size_t i = 0; i < record_v.size(); i++) {
       int id = record_v[i].getFieldValueInt("id");
       int confno = record_v[i].getFieldValueInt("confno");
-      Belle2::debug("%s:%d confno = %d", __FILE__, __LINE__, confno);
       if (id >= 0 && id < (int)data_v.size()) {
         data_v[id]->setConfigNumber(confno);
         data_v[id]->setValues(record_v[i].getFieldNames(),
@@ -199,7 +197,6 @@ int RCDatabaseManager::readStatus(int confno)
     RunStatus* status = _master->getStatus();
     if (confno < 0) {
       confno = loader.getLatestConfig(status);
-      Belle2::debug("%s:%d confno = %d", __FILE__, __LINE__, confno);
     }
     RunConfig* config = _master->getConfig();
     status->setConfigNumber(confno);

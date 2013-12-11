@@ -58,10 +58,12 @@ int RFDqmServer::Configure(NSMmsg*, NSMcontext*)
 int RFDqmServer::UnConfigure(NSMmsg*, NSMcontext*)
 {
   //  system("killall hrelay hserver");
-  int status;
-  kill(m_pid_dqm, SIGINT);
-  waitpid(m_pid_dqm, &status, 0);
-  printf("Unconfigre : done\n");
+  if (m_pid_dqm != 0) {
+    int status;
+    kill(m_pid_dqm, SIGINT);
+    waitpid(m_pid_dqm, &status, 0);
+    printf("Unconfigre : done\n");
+  }
   return 0;
 }
 

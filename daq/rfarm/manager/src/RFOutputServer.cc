@@ -141,23 +141,34 @@ int RFOutputServer::UnConfigure(NSMmsg*, NSMcontext*)
   printf("m_pid_sender = %d\n", m_pid_sender);
   printf("m_pid_basf2 = %d\n", m_pid_basf2);
   fflush(stdout);
-  int status;
-  printf("killing sender %d\n", m_pid_sender);
-  kill(m_pid_sender, SIGINT);
-  int ws = waitpid(m_pid_sender, &status, 0);
-  printf("wait return = %d, status = %d\n", ws, status);
-
-  printf("killing sender %d\n", m_pid_sender);
-  kill(m_pid_basf2, SIGINT);
-  waitpid(m_pid_basf2, &status, 0);
-  printf("wait return = %d, status = %d\n", ws, status);
-
-  for (int i = 0; i < m_nnodes; i++) {
-    printf("killing receiver %d\n", m_pid_receiver[i]);
-    kill(m_pid_receiver[i], SIGINT);
-    ws = waitpid(m_pid_receiver[i], &status, 0);
+  int status, ws;
+  if (m_pid_sender != 0) {
+    printf("killing sender %d\n", m_pid_sender);
+    kill(m_pid_sender, SIGINT);
+    ws = waitpid(m_pid_sender, &status, 0);
     printf("wait return = %d, status = %d\n", ws, status);
   }
+
+  if (m_pid_basf2 != 0) {
+    printf("killing sender %d\n", m_pid_sender);
+    kill(m_pid_basf2, SIGINT);
+    ws = waitpid(m_pid_basf2, &status, 0);
+    printf("wait return = %d, status = %d\n", ws, status);
+  }
+
+  for (int i = 0; i < m_nnodes; i++) {
+    if (m_pid_receiver[i] != 0) {
+      printf("killing receiver %d\n", m_pid_receiver[i]);
+      kill(m_pid_receiver[i], SIGINT);
+      ws = waitpid(m_pid_receiver[i], &status, 0);
+      printf("wait return = %d, status = %d\n", ws, status);
+    }
+  }
+
+  // Clear RingBuffer
+  m_rbufin->clear();
+  m_rbufout->clear();
+
   printf("Unconfigure done\n");
   fflush(stdout);
   return 0;

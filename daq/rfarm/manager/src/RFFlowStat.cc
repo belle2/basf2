@@ -63,8 +63,8 @@ RfShm_Cell& RFFlowStat::getinfo(int id)
 
 void RFFlowStat::fillNodeInfo(int id, RfNodeInfo* info, bool outflag)
 {
-  /*
   RfShm_Cell& cell = getinfo(id);
+  //DEBUG  printf ( "fillNodeInfo: celleid = %d, nevent = %d\n", id, cell.nevent );
   if (!outflag) {
     info->nevent_in = cell.nevent;
     info->nqueue_in = cell.nqueue;
@@ -81,7 +81,15 @@ void RFFlowStat::fillNodeInfo(int id, RfNodeInfo* info, bool outflag)
   double loads[3];
   if (getloadavg(loads, 3) > 0)
     info->loadave = (float)loads[0];
+
+  /* Test
+  info->nevent_in = 99999;
+  info->nqueue_in = 123;
+  info->flowrate_in = 10.0;
+  info->avesize_in = 100.0;
+  info->evtrate_in = 1000.0;
   */
+
 }
 
 

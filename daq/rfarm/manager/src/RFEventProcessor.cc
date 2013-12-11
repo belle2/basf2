@@ -170,6 +170,10 @@ int RFEventProcessor::UnConfigure(NSMmsg*, NSMcontext*)
     waitpid(m_pid_hrelay, &status, 0);
   }
 
+  // Clear RingBuffers
+  m_rbufin->clear();
+  m_rbufout->clear();
+
   printf("Unconfigure : done\n");
   return 0;
 }

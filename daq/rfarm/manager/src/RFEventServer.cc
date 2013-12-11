@@ -146,6 +146,8 @@ int RFEventServer::UnConfigure(NSMmsg*, NSMcontext*)
       waitpid(m_pid_sender[i], &status, 0);
     }
   }
+  // Clear RingBuffer
+  m_rbufin->clear();
 
   printf("Unconfigure : done\n");
   return 0;
@@ -193,6 +195,7 @@ int RFEventServer::Restart(NSMmsg*, NSMcontext*)
 
 void RFEventServer::server()
 {
+  //  int nevt = 0;
   while (true) {
     int st = m_proc->CheckOutput();
     if (st < 0) {
@@ -201,7 +204,13 @@ void RFEventServer::server()
     } else if (st > 0) {
       m_log->ProcessLog(m_proc->GetFd());
     }
-    m_flow->fillNodeInfo(RF_INPUT_ID, GetNodeInfo(), false);
+    //    m_flow->fillNodeInfo(RF_INPUT_ID, GetNodeInfo(), false);
+    m_flow->fillNodeInfo(0, GetNodeInfo(), false);
+    // Debug
+    //    RfNodeInfo* info = GetNodeInfo();
+    //info->nevent_in = nevt++;
+    //    info->nqueue_in = nevt;
+    //    printf ( "FillNodeInfo called!! info->nevent_in = %d\n", info->nevent_in );
   }
 }
 

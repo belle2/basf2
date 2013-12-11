@@ -9,5 +9,6 @@ env['TOOLS_LIBS']['rf_roisender'] = ['daq', 'framework', '$ROOT_LIBS', 'nsm2_b2l
 env['TOOLS_LIBS']['rf_master'] = ['daq', 'framework', '$ROOT_LIBS', 'pthread', 'nsm2_b2lib', 'nsm2_corelib']
 env['TOOLS_LIBS']['rfctl'] = ['nsm2_b2lib', 'nsm2_corelib', 'readline', 'curses']
 env['TOOLS_LIBS']['nodedump'] = ['daq', 'framework']
+env['TOOLS_LIBS']['rf_monitor'] = ['daq', 'framework', 'nsm2_b2lib', 'nsm2_corelib']
 
 Return('env')

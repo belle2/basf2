@@ -11,7 +11,7 @@ dirs = ['core', 'fields', 'finitePlanes', 'fitters', 'GBL', 'GFRave', 'measureme
 env['LIBS'] = ['$ROOT_LIBS', 'RaveBase']
 
 # check for EVE (needed for eventDisplay)
-if env.get('HAS_TEVE', True):
+if env.get('HAS_TEVE', False):
   env['LIBS'] += env['TEVE_LIBS']
   dirs += ['eventDisplay']
 else:

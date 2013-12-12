@@ -1,8 +1,8 @@
-#ifndef _Belle2_ROMessanger_h
-#define _Belle2_ROMessanger_h
+#ifndef _Belle2_ProcessStatusBuffer_h
+#define _Belle2_ProcessStatusBuffer_h
 
 #include "daq/slc/readout/RunInfoBuffer.h"
-#include "daq/slc/readout/RunLogMessanger.h"
+#include "daq/slc/readout/ProcessLogBuffer.h"
 
 #include <vector>
 
@@ -10,19 +10,19 @@ namespace Belle2 {
 
   class RCCallback;
 
-  class ROMessanger {
+  class ProcessStatusBuffer {
 
   public:
-    ROMessanger() {}
-    ROMessanger(const std::string& nodename, int nodeid);
-    ~ROMessanger();
+    ProcessStatusBuffer() {}
+    ProcessStatusBuffer(const std::string& nodename, int nodeid);
+    ~ProcessStatusBuffer();
 
   public:
     void setNode(const std::string& nodename, int nodeid);
     const std::string& getNodeName() { return _nodename; }
     int getNodeId() { return _nodeid; }
     RunInfoBuffer& getInfo() { return _buf; }
-    RunLogMessanger& getLog() { return _msg; }
+    ProcessLogBuffer& getLog() { return _msg; }
     bool reportReady();
     bool reportRunning();
     bool reportError(const std::string message);
@@ -34,7 +34,7 @@ namespace Belle2 {
 
   private:
     RunInfoBuffer _buf;
-    RunLogMessanger _msg;
+    ProcessLogBuffer _msg;
     std::string _nodename;
     int _nodeid;
     std::string _buf_path;

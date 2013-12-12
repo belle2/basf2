@@ -1,5 +1,5 @@
-#ifndef _Belle2_RunLogMessanger_h
-#define _Belle2_RunLogMessanger_h
+#ifndef _Belle2_ProcessLogBuffer_h
+#define _Belle2_ProcessLogBuffer_h
 
 #include "daq/slc/readout/SharedMemory.h"
 #include "daq/slc/readout/MMutex.h"
@@ -9,13 +9,13 @@
 
 namespace Belle2 {
 
-  class RunLogMessanger {
+  class ProcessLogBuffer {
 
   public:
     static const int MAX_MESSAGE;
 
   public:
-    struct run_log_message {
+    struct process_log_message {
       int priority;
       char message[60];
     };
@@ -29,8 +29,8 @@ namespace Belle2 {
     static const int FATAL;
 
   public:
-    RunLogMessanger() {}
-    ~RunLogMessanger() {}
+    ProcessLogBuffer() {}
+    ~ProcessLogBuffer() {}
 
   public:
     size_t size() throw();
@@ -49,7 +49,7 @@ namespace Belle2 {
     MCond _cond;
     int* _windex;
     int* _rindex;
-    run_log_message* _msg_v;
+    process_log_message* _msg_v;
 
   };
 

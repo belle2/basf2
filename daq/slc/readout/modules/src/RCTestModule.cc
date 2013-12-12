@@ -38,28 +38,28 @@ RCTestModuleModule::~RCTestModuleModule()
 
 void RCTestModuleModule::initialize()
 {
-  m_msg.setNode(m_name, m_id);
-  m_msg.open();
-  m_msg.reportReady();
+  m_buf.setNode(m_name, m_id);
+  m_buf.open();
+  m_buf.reportReady();
   m_running = false;
 }
 
 void RCTestModuleModule::terminate()
 {
-  m_msg.reportReady();
+  m_buf.reportReady();
 }
 
 
 void RCTestModuleModule::event()
 {
   if (!m_running) {
-    m_msg.reportRunning();
+    m_buf.reportRunning();
     m_running = true;
   }
   if (false) {  // if error
-    m_msg.reportError("some trouble");
+    m_buf.reportError("some trouble");
   }
   if (false) {  // if critical error
-    m_msg.reportFatal("some critical trouble");
+    m_buf.reportFatal("some critical trouble");
   }
 }

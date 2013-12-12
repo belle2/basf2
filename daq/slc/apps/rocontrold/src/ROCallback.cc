@@ -35,8 +35,9 @@ bool ROCallback::load() throw()
   Belle2::debug("LOAD");
   download();
   _con.clearArguments();
-  _con.setScriptDir("daq/copper/daq_scripts");
-  _con.setScript(_node->getData()->getText("script"));
+  _con.addArgument(Belle2::form("%s/daq/copper/daq_scripts/",
+                                getenv("BELLE2_LOCAL_DIR"))
+                   + _node->getData()->getText("script"));
   _con.addArgument("1");
   _con.addArgument("5101");
   _con.addArgument(_node->getName());

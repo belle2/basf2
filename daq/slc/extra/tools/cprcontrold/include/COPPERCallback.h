@@ -3,7 +3,7 @@
 
 #include "HSLBController.h"
 
-#include "daq/slc/readout/ROController.h"
+#include "daq/slc/readout/ProcessController.h"
 
 #include "daq/slc/nsm/RCCallback.h"
 
@@ -30,7 +30,7 @@ namespace Belle2 {
 
   private:
     std::string _rc_config;
-    ROController _con;
+    ProcessController _con;
     HSLBController _hslbcon_v[4];
     int _confno;
     XMLElement* _el_v[4];

@@ -1,4 +1,4 @@
-#include "daq/slc/readout/RunLogMessanger.h"
+#include "daq/slc/readout/ProcessLogBuffer.h"
 
 #include "daq/slc/base/Debugger.h"
 
@@ -12,22 +12,22 @@
 
 using namespace Belle2;
 
-const int RunLogMessanger::DEBUG = 1;
-const int RunLogMessanger::INFO = 2;
-const int RunLogMessanger::NOTICE = 3;
-const int RunLogMessanger::WARNING = 4;
-const int RunLogMessanger::ERROR = 5;
-const int RunLogMessanger::FATAL = 6;
+const int ProcessLogBuffer::DEBUG = 1;
+const int ProcessLogBuffer::INFO = 2;
+const int ProcessLogBuffer::NOTICE = 3;
+const int ProcessLogBuffer::WARNING = 4;
+const int ProcessLogBuffer::ERROR = 5;
+const int ProcessLogBuffer::FATAL = 6;
 
-const int RunLogMessanger::MAX_MESSAGE = 20;
+const int ProcessLogBuffer::MAX_MESSAGE = 20;
 
-size_t RunLogMessanger::size() throw()
+size_t ProcessLogBuffer::size() throw()
 {
   return _mutex.size() + _cond.size() + sizeof(int) * 2 +
-         sizeof(run_log_message) * MAX_MESSAGE;
+         sizeof(process_log_message) * MAX_MESSAGE;
 }
 
-bool RunLogMessanger::open(const std::string& path)
+bool ProcessLogBuffer::open(const std::string& path)
 {
   _path = path;
   if (!_memory.open(path, size())) {
@@ -45,41 +45,41 @@ bool RunLogMessanger::open(const std::string& path)
   buf += sizeof(int);
   _rindex = (int*)buf;
   buf += sizeof(int);
-  _msg_v = (run_log_message*)buf;
+  _msg_v = (process_log_message*)buf;
   return true;
 }
 
-bool RunLogMessanger::create(const std::string& path)
+bool ProcessLogBuffer::create(const std::string& path)
 {
   _path = path;
   if (open(path)) {
     _mutex.init();
     _cond.init();
     *_windex = *_rindex = 0;
-    memset(_msg_v, 0, sizeof(run_log_message) * MAX_MESSAGE);
+    memset(_msg_v, 0, sizeof(process_log_message) * MAX_MESSAGE);
     return true;
   }
   return false;
 }
 
-void RunLogMessanger::clear()
+void ProcessLogBuffer::clear()
 {
   *_windex = *_rindex = 0;
-  memset(_msg_v, 0, sizeof(run_log_message) * MAX_MESSAGE);
+  memset(_msg_v, 0, sizeof(process_log_message) * MAX_MESSAGE);
 }
 
-void RunLogMessanger::close()
+void ProcessLogBuffer::close()
 {
   _memory.close();
 }
 
-void RunLogMessanger::unlink(const std::string& path)
+void ProcessLogBuffer::unlink(const std::string& path)
 {
   SharedMemory::unlink(path);
   close();
 }
 
-std::string RunLogMessanger::recieve(int& priority, int timeout)
+std::string ProcessLogBuffer::recieve(int& priority, int timeout)
 {
   _mutex.lock();
   if (*_rindex == MAX_MESSAGE) *_rindex = 0;
@@ -101,7 +101,7 @@ std::string RunLogMessanger::recieve(int& priority, int timeout)
   return message;
 }
 
-bool RunLogMessanger::send(int priority, const std::string& message)
+bool ProcessLogBuffer::send(int priority, const std::string& message)
 {
   _mutex.lock();
   if (*_windex == MAX_MESSAGE) *_windex = 0;

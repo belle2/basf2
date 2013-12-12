@@ -1,6 +1,6 @@
-#include "daq/slc/readout/ROMessageMonitor.h"
+#include "daq/slc/readout/ProcessLogListener.h"
 
-#include "daq/slc/readout/ROController.h"
+#include "daq/slc/readout/ProcessController.h"
 
 #include "daq/slc/nsm/NSMCommunicator.h"
 
@@ -10,23 +10,23 @@
 
 using namespace Belle2;
 
-void ROMessageMonitor::run()
+void ProcessLogListener::run()
 {
   while (true) {
     int priority = 0;
     std::string message = _con->getLog().recieve(priority);
     _con->lock();
-    if (priority == RunLogMessanger::NOTICE) {
+    if (priority == ProcessLogBuffer::NOTICE) {
       State state = State(message);
       if (state != State::UNKNOWN) {
         _con->setState(state);
         message = "";
         _con->signal();
       }
-    } else if (priority == RunLogMessanger::ERROR) {
+    } else if (priority == ProcessLogBuffer::ERROR) {
       _con->setState(State::ERROR_ES);
       _con->signal();
-    } else if (priority == RunLogMessanger::FATAL) {
+    } else if (priority == ProcessLogBuffer::FATAL) {
       _con->setState(State::FATAL_ES);
       _con->signal();
     }
@@ -35,11 +35,11 @@ void ROMessageMonitor::run()
     if (message.size() > 0) {
       Belle2::debug("priority = %d, message = %s", priority, message.c_str());
       SystemLog::Priority sys_priority = SystemLog::DEBUG;
-      if (priority == RunLogMessanger::INFO) sys_priority = SystemLog::INFO;
-      else if (priority == RunLogMessanger::NOTICE) sys_priority = SystemLog::NOTICE;
-      else if (priority == RunLogMessanger::WARNING) sys_priority = SystemLog::WARNING;
-      else if (priority == RunLogMessanger::ERROR) sys_priority = SystemLog::ERROR;
-      else if (priority == RunLogMessanger::FATAL) sys_priority = SystemLog::FATAL;
+      if (priority == ProcessLogBuffer::INFO) sys_priority = SystemLog::INFO;
+      else if (priority == ProcessLogBuffer::NOTICE) sys_priority = SystemLog::NOTICE;
+      else if (priority == ProcessLogBuffer::WARNING) sys_priority = SystemLog::WARNING;
+      else if (priority == ProcessLogBuffer::ERROR) sys_priority = SystemLog::ERROR;
+      else if (priority == ProcessLogBuffer::FATAL) sys_priority = SystemLog::FATAL;
       NSMCommunicator* comm = _con->getCallback()->getCommunicator();
       NSMNode* node = _con->getCallback()->getNode();
       try {

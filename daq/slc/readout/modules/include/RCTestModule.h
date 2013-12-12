@@ -14,7 +14,7 @@
 #include <rawdata/dataobjects/RawDataBlock.h>
 #include <rawdata/dataobjects/RawCOPPER.h>
 
-#include <daq/slc/readout/ROMessanger.h>
+#include <daq/slc/readout/ProcessStatusBuffer.h>
 
 namespace Belle2 {
 
@@ -34,7 +34,7 @@ namespace Belle2 {
   private:
     int m_id;
     std::string m_name;
-    ROMessanger m_msg;
+    ProcessStatusBuffer m_buf;
     bool m_running;
 
   };

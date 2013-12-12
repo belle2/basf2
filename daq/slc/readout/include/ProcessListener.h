@@ -8,12 +8,12 @@
 
 namespace Belle2 {
 
-  class ROController;
+  class ProcessController;
 
   class ProcessListener {
 
   public:
-    ProcessListener(ROController* con)
+    ProcessListener(ProcessController* con)
       : _con(con) {}
     ~ProcessListener() {}
 
@@ -21,7 +21,7 @@ namespace Belle2 {
     void run();
 
   private:
-    ROController* _con;
+    ProcessController* _con;
 
   };
 

@@ -7,6 +7,7 @@
 #include "daq/slc/base/ConfigFile.h"
 
 #include <unistd.h>
+#include <cstdlib>
 #include <iostream>
 
 using namespace Belle2;
@@ -79,8 +80,9 @@ bool COPPERCallback::load() throw()
     }
   }
   _con.clearArguments();
-  _con.setScriptDir("/daq/rawdata/examples/");
-  _con.setScript(data->getText("script"));
+  _con.addArgument(Belle2::form("%s/daq/rawdata/examples/",
+                                getenv("BELLE2_LOCAL_DIR"))
+                   + data->getText("script"));
   _con.addArgument(data->getText("host"));
   _con.addArgument(Belle2::form("%d", (int)_node->getData()->getId()));
   _con.addArgument(Belle2::form("%d", flag));

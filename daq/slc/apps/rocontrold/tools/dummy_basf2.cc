@@ -1,4 +1,4 @@
-#include <daq/slc/readout/ROMessanger.h>
+#include <daq/slc/readout/ProcessStatusBuffer.h>
 
 #include <daq/slc/base/Debugger.h>
 
@@ -12,7 +12,7 @@ int main(int argc, char** argv)
   if (argc < 4) {
     Belle2::debug("usage : dummy_basf2 <nodeid> <> <nodename>");
   }
-  ROMessanger m_msg;
+  ProcessStatusBuffer m_msg;
   int nodeid = atoi(argv[0]);
   const char* nodename = argv[2];
   Belle2::debug("node = %s, id = %d", nodename, nodeid);

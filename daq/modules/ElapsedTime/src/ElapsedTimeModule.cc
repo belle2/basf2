@@ -66,8 +66,11 @@ void ElapsedTimeModule::event()
     double evtime = etime / ((double)m_nevent);
     //    double devtime = delta/(double)(m_nevent-m_nevprev);
     double devtime = delta / (double)m_interval;
-    printf("Elapsed( %d ) : time = %7.2f (msec), time/evt = %5.2f [ %5.3f ](msec)\n",
-           m_nevent, etime / 1000.0, evtime / 1000.0, devtime / 1000.0);
+    double erate = (double)m_nevent / etime * 1000.0;
+    double derate = (double)m_interval / delta * 1000.0;
+    printf("Elapsed( %d ) : time = %7.2f (msec), time/evt = %5.2f [ %5.3f ](msec) (%f[%f]kHz)\n",
+           m_nevent, etime / 1000.0, evtime / 1000.0, devtime / 1000.0,
+           erate, derate);
     m_nevprev = m_nevent;
     m_tprev = m_tnow;
   }

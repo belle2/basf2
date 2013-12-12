@@ -48,6 +48,7 @@ int Sock2Rb::ReceiveEvent(void)
     //    usleep(200);
     usleep(20);
   }
+  delete msg;
   return stat;
 }
 

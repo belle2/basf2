@@ -41,9 +41,12 @@ int Rb2Sock::SendEvent(void)
   if (msg->type() == MSG_TERMINATE) {
     printf("EoF found. Exitting.....\n");
     m_sock->send(msg);
+    delete msg;
     return -1;
   } else {
-    return m_sock->send(msg);
+    int is = m_sock->send(msg);
+    delete msg;
+    return is;
     //    return msg->size();
   }
 }

@@ -6,15 +6,16 @@ export EXTBUILDDIR=${EXTDIR}/build/${BELLE2_EXTERNALS_SUBDIR}
 export EXTINCDIR=${EXTDIR}/include
 export EXTLIBDIR=${EXTDIR}/lib/${BELLE2_EXTERNALS_SUBDIR}
 export EXTBINDIR=${EXTDIR}/bin/${BELLE2_EXTERNALS_SUBDIR}
+SLC_DIR=${BELLE2_LOCAL_DIR}/daq/slc/extra/nsm2/
 
-cp corelib/nsm2.h $BELLE2_EXTERNALS_DIR/src/nsm2/daemon
-cp corelib/nsm2.h $BELLE2_EXTERNALS_DIR/include/nsm2/
-cp corelib/nsmparse.c $BELLE2_EXTERNALS_DIR/src/nsm2/corelib
-cp corelib/nsmlib2.c $BELLE2_EXTERNALS_DIR/src/nsm2/corelib
-cp corelib/nsmlib2.h $BELLE2_EXTERNALS_DIR/src/nsm2/corelib
-cp corelib/nsmlib2.h $BELLE2_EXTERNALS_DIR/include/nsm2/
-cp b2lib/belle2nsm.c $BELLE2_EXTERNALS_DIR/src/nsm2/b2lib
-cp b2lib/belle2nsm.h $BELLE2_EXTERNALS_DIR/src/nsm2/b2lib
+cp ${SLC_DIR}/corelib/nsm2.h $BELLE2_EXTERNALS_DIR/src/nsm2/daemon
+cp ${SLC_DIR}/corelib/nsm2.h $BELLE2_EXTERNALS_DIR/include/nsm2/
+cp ${SLC_DIR}/corelib/nsmparse.c $BELLE2_EXTERNALS_DIR/src/nsm2/corelib
+cp ${SLC_DIR}/corelib/nsmlib2.c $BELLE2_EXTERNALS_DIR/src/nsm2/corelib
+cp ${SLC_DIR}/corelib/nsmlib2.h $BELLE2_EXTERNALS_DIR/src/nsm2/corelib
+cp ${SLC_DIR}/corelib/nsmlib2.h $BELLE2_EXTERNALS_DIR/include/nsm2/
+cp ${SLC_DIR}/b2lib/belle2nsm.c $BELLE2_EXTERNALS_DIR/src/nsm2/b2lib
+cp ${SLC_DIR}/b2lib/belle2nsm.h $BELLE2_EXTERNALS_DIR/src/nsm2/b2lib
 make -C $BELLE2_EXTERNALS_DIR/src/nsm2 
 make -C $BELLE2_EXTERNALS_DIR/src/nsm2 install
 

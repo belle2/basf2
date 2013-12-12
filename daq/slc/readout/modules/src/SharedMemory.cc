@@ -45,6 +45,7 @@ bool SharedMemory::open(const std::string& path, size_t size)
   _fd = fd;
   _path = path;
   _size = size;
+  return true;
 }
 
 bool SharedMemory::open()

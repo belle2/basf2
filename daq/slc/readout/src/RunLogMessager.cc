@@ -1,5 +1,7 @@
 #include "daq/slc/readout/RunLogMessanger.h"
 
+#include "daq/slc/base/Debugger.h"
+
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -24,7 +26,7 @@ bool RunLogMessanger::open(const std::string& path, const std::string& mode_s)
       mode = O_RDWR;
     }
   }
-  if ((_fifo = ::open(path.c_str(), mode)) < 0) {
+  if ((_fifo = ::open(path.c_str(), mode, 0)) < 0) {
     _fifo = 0;
     perror("open");
     return false;
@@ -35,8 +37,9 @@ bool RunLogMessanger::open(const std::string& path, const std::string& mode_s)
 bool RunLogMessanger::create(const std::string& path, const std::string& mode_s)
 {
   _path = path;
-  if (::mkfifo(path.c_str(), 0666) < 0) {
-    perror("mkfifo");
+  if (_fifo = ::open(path.c_str(), O_CREAT | O_RDWR, 0666) < 0) {
+    //if (mkfifo(path.c_str(), S_IRUSR | S_IWUSR | S_IWGRP | S_IRGRP) < 0) {
+    perror("open");
     return false;
   }
   return open(path, mode_s);

@@ -1,5 +1,7 @@
 #include "daq/slc/readout/RunInfoBuffer.h"
 
+#include <daq/slc/base/Debugger.h>
+
 #include <cstring>
 
 using namespace Belle2;

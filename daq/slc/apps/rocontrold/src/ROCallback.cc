@@ -11,6 +11,7 @@ ROCallback::ROCallback(NSMNode* node)
   : RCCallback(node)
 {
   node->setData(new DataObject());
+  node->setState(State::INITIAL_S);
   _con.setCallback(this);
 }
 

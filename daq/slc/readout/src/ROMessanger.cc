@@ -1,5 +1,7 @@
 #include "daq/slc/readout/ROMessanger.h"
 
+#include "daq/slc/base/Debugger.h"
+
 using namespace Belle2;
 
 ROMessanger::~ROMessanger()
@@ -27,6 +29,7 @@ bool ROMessanger::create()
   SharedMemory::unlink(_buf_path);
   _msg.unlink(_fifo_path);
   _buf.open(_buf_path);
+  _buf.init();
   _msg.create(_fifo_path, "r");
   return true;
 }

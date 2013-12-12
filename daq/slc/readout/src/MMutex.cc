@@ -1,5 +1,6 @@
 #include "daq/slc/readout/MMutex.h"
 
+#include <daq/slc/base/Debugger.h>
 using namespace Belle2;
 
 MMutex::MMutex() throw() {}
@@ -18,18 +19,22 @@ MMutex::~MMutex() throw() {}
 
 bool MMutex::init(void* addr) throw()
 {
+  Belle2::debug("%s:%d", __FILE__, __LINE__);
   set(addr);
   init();
+  Belle2::debug("%s:%d", __FILE__, __LINE__);
   return true;
 }
 
 bool MMutex::init() throw()
 {
+  Belle2::debug("%s:%d", __FILE__, __LINE__);
   pthread_mutexattr_t attr;
   pthread_mutexattr_init(&attr);
   pthread_mutexattr_setpshared(&attr, PTHREAD_PROCESS_SHARED);
   pthread_mutex_init(_mu, &attr);
   pthread_mutexattr_destroy(&attr);
+  Belle2::debug("%s:%d", __FILE__, __LINE__);
   return true;
 }
 

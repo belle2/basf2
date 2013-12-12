@@ -4,6 +4,7 @@
 #include "daq/slc/system/Executor.h"
 
 #include "daq/slc/base/StringUtil.h"
+#include <daq/slc/base/Debugger.h>
 
 #include <cstdlib>
 

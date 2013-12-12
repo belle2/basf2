@@ -1,6 +1,6 @@
 Import('env')
 
-env['LIBS'] = ['cdc', 'ecl', 'rawdata', 'cdc_dataobjects', 'trg_ecl_dataobjects']
+env['LIBS'] = ['cdc', 'ecl', 'cdc_dataobjects', 'trg_ecl_dataobjects']
 #env.Append(CPPDEFINES = {'TRG_DEBUG':None})
 #env.Append(CPPDEFINES = {'TRG_DISPLAY':None})
 #env.Append(CPPDEFINES = {'TRGCDC_DISPLAY':None})

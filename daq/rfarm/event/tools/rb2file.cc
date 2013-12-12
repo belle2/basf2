@@ -59,6 +59,7 @@ int main(int argc, char** argv)
       perror("write");
       exit(-99);
     }
+    delete msg;
   }
 }
 

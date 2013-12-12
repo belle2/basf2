@@ -6,6 +6,7 @@
 // Date : 25 - Sep - 2013
 //-
 
+#include <sys/types.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -33,6 +34,7 @@ int main(int argc, char** argv)
     perror("fopen");
     exit(-1);
   }
+  int neof = atoi(argv[3]);
 
   RingBuffer* rbuf = new RingBuffer(argv[1]);
   rbuf->dump_db();
@@ -40,6 +42,8 @@ int main(int argc, char** argv)
   char* buf = new char[MAXBUF];
 
   int nrec = 0;
+
+retry:
   for (;;) {
     int sstat = read(fd, buf, sizeof(int));
     if (sstat <= 0) break;
@@ -59,6 +63,10 @@ int main(int argc, char** argv)
       usleep(20);
     }
     nrec++;
+  }
+  if (neof < 0) {
+    lseek(fd, 0, SEEK_SET);
+    goto retry;
   }
   close(fd);
 }

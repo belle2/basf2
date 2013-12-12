@@ -13,6 +13,7 @@ const State State::STARTING_TS(203, "STARTING", "STARTING");
 const State State::STOPPING_TS(204, "STOPPING", "STOPPING");
 const State State::ERROR_ES(301, "ERROR", "ERROR");
 const State State::FATAL_ES(302, "FATAL", "FATAL");
+const State State::RECOVERING_RS(402, "RECOVERING", "RECOVERING");
 const State State::ABORTING_RS(403, "ABORTING", "ABORTING");
 
 const State& State::operator=(const std::string& label) throw()
@@ -28,6 +29,7 @@ const State& State::operator=(const std::string& label) throw()
   else if (label == STOPPING_TS._label) *this = STOPPING_TS;
   else if (label == ERROR_ES._label) *this = ERROR_ES;
   else if (label == FATAL_ES._label) *this = FATAL_ES;
+  else if (label == RECOVERING_RS._label) *this = RECOVERING_RS;
   else if (label == ABORTING_RS._label) *this = ABORTING_RS;
   else *this = Enum::UNKNOWN;
   return *this;
@@ -53,6 +55,7 @@ const State& State::operator=(int id) throw()
   else if (id == STOPPING_TS._id) *this = STOPPING_TS;
   else if (id == ERROR_ES._id) *this = ERROR_ES;
   else if (id == FATAL_ES._id) *this = FATAL_ES;
+  else if (id == RECOVERING_RS._id) *this = RECOVERING_RS;
   else if (id == ABORTING_RS._id) *this = ABORTING_RS;
   else *this = Enum::UNKNOWN;
   return *this;
@@ -64,5 +67,7 @@ State State::next() const throw()
   else if (*this == LOADING_TS) return READY_S;
   else if (*this == STARTING_TS) return RUNNING_S;
   else if (*this == STOPPING_TS) return READY_S;
+  else if (*this == RECOVERING_RS) return READY_S;
+  else if (*this == ABORTING_RS) return INITIAL_S;
   else return UNKNOWN;
 }

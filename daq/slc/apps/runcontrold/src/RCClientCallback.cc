@@ -63,7 +63,7 @@ bool RCClientCallback::error() throw()
   int id = nsm.getNodeId();
   _master->unlock();
   NSMNode* node = _master->findNode(id, nsm);
-  node->setState(State(nsm.getData()));
+  node->setState(State::ERROR_ES);
   node->setConnection(Connection::ONLINE);
   _master->getStatus()->update();
   RCCommunicator* comm = _master->getMasterCommunicator();

@@ -22,7 +22,7 @@ RCCallback::RCCallback(NSMNode* node) throw()
   add(Command::RECOVER);
   //add(Command::RESUME);
   //add(Command::PAUSE);
-  //add(Command::ABORT);
+  add(Command::ABORT);
   add(Command::STATE);
   add(Command::STATECHECK);
   add(Command::TRIGFT);

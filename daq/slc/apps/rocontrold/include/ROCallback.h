@@ -21,6 +21,7 @@ namespace Belle2 {
     virtual bool stop() throw();
     virtual bool resume() throw();
     virtual bool pause() throw();
+    virtual bool recover() throw();
     virtual bool abort() throw();
 
   private:

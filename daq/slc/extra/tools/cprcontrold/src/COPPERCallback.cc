@@ -16,7 +16,7 @@ COPPERCallback::COPPERCallback(NSMNode* node, const std::string& rc_config)
 {
   node->setData(new DataObject());
   node->setState(State::INITIAL_S);
-  _man.setCallback(this);
+  _con.setCallback(this);
 }
 
 COPPERCallback::~COPPERCallback() throw()
@@ -25,7 +25,7 @@ COPPERCallback::~COPPERCallback() throw()
 
 void COPPERCallback::init() throw()
 {
-  _man.create();
+  _con.init();
   ConfigFile(_rc_config);
 }
 
@@ -78,25 +78,25 @@ bool COPPERCallback::load() throw()
       }
     }
   }
-  _man.clearArguments();
-  _man.setScriptDir("/daq/rawdata/examples/");
-  _man.setScript(data->getText("script"));
-  _man.addArgument(data->getText("host"));
-  _man.addArgument(Belle2::form("%d", (int)_node->getData()->getId()));
-  _man.addArgument(Belle2::form("%d", flag));
-  _man.addArgument("1");
-  _man.addArgument(_node->getName());
-  return _man.load();
+  _con.clearArguments();
+  _con.setScriptDir("/daq/rawdata/examples/");
+  _con.setScript(data->getText("script"));
+  _con.addArgument(data->getText("host"));
+  _con.addArgument(Belle2::form("%d", (int)_node->getData()->getId()));
+  _con.addArgument(Belle2::form("%d", flag));
+  _con.addArgument("1");
+  _con.addArgument(_node->getName());
+  return _con.load(10);
 }
 
 bool COPPERCallback::start() throw()
 {
-  return _man.start();
+  return _con.start(10);
 }
 
 bool COPPERCallback::stop() throw()
 {
-  return _man.stop();
+  return _con.stop(30);
 }
 
 bool COPPERCallback::resume() throw()
@@ -111,5 +111,5 @@ bool COPPERCallback::pause() throw()
 
 bool COPPERCallback::abort() throw()
 {
-  return _man.stop();
+  return _con.stop(0);
 }

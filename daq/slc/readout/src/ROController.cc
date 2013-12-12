@@ -1,4 +1,5 @@
 #include "daq/slc/readout/ROController.h"
+#include "daq/slc/readout/ROMessageMonitor.h"
 #include "daq/slc/readout/ProcessListener.h"
 
 #include "daq/slc/system/Executor.h"
@@ -14,26 +15,41 @@ bool ROController::init()
 {
   _msg.setNode(_callback->getNode()->getName(),
                _callback->getNode()->getData()->getId());
+  _state = State::CONFIGURED_S;
+  _thread_msg = PThread(new ROMessageMonitor(this));
   return _msg.create();
+}
+
+void ROController::clear()
+{
+  _msg.getInfo().clear();
+  _msg.getLog().clear();
 }
 
 bool ROController::load(int timeout)
 {
+  _mutex.lock();
+  _state = State::LOADING_TS;
   _msg.getInfo().clear();
   _fork.cancel();
   _fork = Fork(new ROSubmitter(this));
-  _thread = PThread(new ProcessListener(_callback, _fork, _script));
-  State state = wait(timeout);
-  if (state != State::READY_S) {
-    _callback->setReply(Belle2::form("Failed to be ready: state = %s",
-                                     state.getLabel()));
+  _thread = PThread(new ProcessListener(this));
+  _cond.wait(_mutex, timeout);
+  if (_state != State::READY_S) {
+    _callback->setReply(Belle2::form("Failed to be ready: %s",
+                                     getMessage().c_str()));
+    _mutex.unlock();
     return false;
   }
+  _mutex.unlock();
+  _state = State::READY_S;
   return true;
 }
 
 bool ROController::start(int timeout)
 {
+  _mutex.lock();
+  _state = State::STARTING_TS;
   _msg.getInfo().lock();
   _msg.getInfo().setExpNumber(_callback->getExpNumber());
   _msg.getInfo().setColdNumber(_callback->getColdNumber());
@@ -42,50 +58,45 @@ bool ROController::start(int timeout)
   _msg.getInfo().setState(1);
   _msg.getInfo().notify();
   _msg.getInfo().unlock();
-  State state = wait(timeout);
-  if (state != State::RUNNING_S) {
-    _callback->setReply(Belle2::form("Failed to start run: state = %s",
-                                     state.getLabel()));
+  _cond.wait(_mutex, timeout);
+  if (_state != State::RUNNING_S) {
+    _callback->setReply(Belle2::form("Failed to start run: %s",
+                                     getMessage().c_str()));
+    _mutex.unlock();
     return false;
   }
+  _mutex.unlock();
   return true;
 }
 
 bool ROController::stop(int timeout)
 {
+  _mutex.lock();
+  _state = State::STOPPING_TS;
   _msg.getInfo().clear();
-  State state = wait(timeout);
-  if (state != State::READY_S) {
-    _callback->setReply(Belle2::form("Failed to start run: state = %s",
-                                     state.getLabel()));
+  _cond.wait(_mutex, timeout);
+  if (_state != State::READY_S) {
+    _callback->setReply(Belle2::form("Failed to stop run: %s",
+                                     getMessage().c_str()));
+    _mutex.unlock();
     return false;
   }
+  _mutex.unlock();
   return true;
 }
 
 bool ROController::abort()
 {
   _msg.getInfo().clear();
+  _msg.getLog().clear();
   _fork.cancel();
   return true;
 }
 
-State ROController::wait(int timeout)
-{
-  int priority = 0;
-  std::string message = _msg.getLog().recieve(priority, timeout);
-  if (priority == RunLogMessanger::NOTICE) {
-    return State(message);
-  } else if (priority == RunLogMessanger::ERROR) {
-    return State::ERROR_ES;
-  } else if (priority == RunLogMessanger::FATAL) {
-    return State::FATAL_ES;
-  }
-  return State::UNKNOWN;
-}
-
 void ROSubmitter::run()
 {
+  //close(1);
+  //close(2);
   const char* belle2_path = getenv("BELLE2_LOCAL_DIR");
   const char* belle2_sub = getenv("BELLE2_SUBDIR");
   Executor executor;
@@ -97,3 +108,4 @@ void ROSubmitter::run()
   executor.addArg("--no-stats");
   executor.execute();
 }
+

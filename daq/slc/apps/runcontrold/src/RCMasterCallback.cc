@@ -63,8 +63,14 @@ bool RCMasterCallback::distribute(Command command,
           node->setConnection(Connection::OFFLINE);
           master_comm->sendState(node);
         }
-      } else if (!comm->sendMessage(msg)) {
-        _master->getNode()->setState(State::ERROR_ES);
+      } else {
+        if (!comm->sendMessage(msg)) {
+          _master->getNode()->setState(State::ERROR_ES);
+        } else {
+          State state = msg.getCommand().nextTState();
+          if (state != State::UNKNOWN)
+            node->setState(state);
+        }
         master_comm->sendState(node);
       }
     } catch (const NSMHandlerException& e) {
@@ -189,3 +195,16 @@ bool RCMasterCallback::trigft() throw()
   _master->unlock();
   return true;
 }
+
+bool RCMasterCallback::recover() throw()
+{
+  Belle2::debug("RECOVER");
+  return distribute(Command::RECOVER, 0, 0, 0);
+}
+
+bool RCMasterCallback::abort() throw()
+{
+  Belle2::debug("ABORT");
+  return distribute(Command::ABORT, 0, 0, 0);
+}
+

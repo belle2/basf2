@@ -104,8 +104,8 @@ int Command::isAvailable(const State& state) const throw()
     return SUGGESTED;
   } else if (*this == RECOVER || *this == STATECHECK || *this == STATE ||
              *this == OK || *this == TRIGFT || *this == DATA ||
-             *this == SAVE || *this == RECALL ||
-             *this == ACTIVATE || *this == INACTIVATE ||
+             *this == SAVE || *this == RECALL || *this == ACTIVATE ||
+             *this == INACTIVATE || *this == RECOVER ||
              *this == ERROR || *this == ABORT || *this == LOG) {
     return ENABLED;
   } else if (state == State::ERROR_ES) {
@@ -123,6 +123,20 @@ State Command::nextState() const throw()
   else if (*this == STOP) return State::READY_S;
   else if (*this == RESUME) return State::RUNNING_S;
   else if (*this == PAUSE) return State::PAUSED_S;
+  else if (*this == RECOVER) return State::READY_S;
   else if (*this == ABORT) return State::INITIAL_S;
+  else return UNKNOWN;
+}
+
+State Command::nextTState() const throw()
+{
+  if (*this == BOOT) return State::BOOTING_TS;
+  else if (*this == LOAD) return State::LOADING_TS;
+  else if (*this == START) return State::STARTING_TS;
+  else if (*this == STOP) return State::STOPPING_TS;
+  else if (*this == RESUME) return State::RUNNING_S;
+  else if (*this == PAUSE) return State::PAUSED_S;
+  else if (*this == RECOVER) return State::RECOVERING_RS;
+  else if (*this == ABORT) return State::ABORTING_RS;
   else return UNKNOWN;
 }

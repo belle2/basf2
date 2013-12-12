@@ -31,6 +31,7 @@ bool RCGUICommunicator::sendMessage(const RunControlMessage& msg) throw()
   _socket_mutex.lock();
   try {
     _writer.writeInt(msg.getCommand().getId());
+    _writer.writeString(msg.getNode()->getName());
     _writer.writeInt(msg.getMessage().getNParams());
     for (size_t i = 0; i < msg.getMessage().getNParams(); i++) {
       _writer.writeInt(msg.getMessage().getParam(i));
@@ -89,6 +90,7 @@ void RCGUICommunicator::run()
     while (true) {
       int number = _reader.readInt();
       Command cmd = number;
+      Belle2::debug("number = %d, cmd = %s", number, cmd.getLabel());
       if (cmd == Command::DATA) {
         std::string name = _reader.readString();
         RCMaster* master = _callback->getMaster();

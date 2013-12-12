@@ -13,9 +13,11 @@
 using namespace Belle2;
 
 const int RunLogMessanger::DEBUG = 1;
-const int RunLogMessanger::NOTICE = 2;
-const int RunLogMessanger::ERROR = 3;
-const int RunLogMessanger::FATAL = 4;
+const int RunLogMessanger::INFO = 2;
+const int RunLogMessanger::NOTICE = 3;
+const int RunLogMessanger::WARNING = 4;
+const int RunLogMessanger::ERROR = 5;
+const int RunLogMessanger::FATAL = 6;
 
 const int RunLogMessanger::MAX_MESSAGE = 20;
 
@@ -58,6 +60,12 @@ bool RunLogMessanger::create(const std::string& path)
     return true;
   }
   return false;
+}
+
+void RunLogMessanger::clear()
+{
+  *_windex = *_rindex = 0;
+  memset(_msg_v, 0, sizeof(run_log_message) * MAX_MESSAGE);
 }
 
 void RunLogMessanger::close()

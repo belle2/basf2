@@ -3,7 +3,7 @@
 
 #include "HSLBController.h"
 
-#include "daq/slc/readout/Basf2ScriptManager.h"
+#include "daq/slc/readout/ROController.h"
 
 #include "daq/slc/nsm/RCCallback.h"
 
@@ -30,7 +30,7 @@ namespace Belle2 {
 
   private:
     std::string _rc_config;
-    Basf2ScriptManager _man;
+    ROController _con;
     HSLBController _hslbcon_v[4];
     int _confno;
     XMLElement* _el_v[4];

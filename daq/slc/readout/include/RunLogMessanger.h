@@ -22,7 +22,9 @@ namespace Belle2 {
 
   public:
     static const int DEBUG;
+    static const int INFO;
     static const int NOTICE;
+    static const int WARNING;
     static const int ERROR;
     static const int FATAL;
 
@@ -35,6 +37,7 @@ namespace Belle2 {
     bool open(const std::string& path);
     bool create(const std::string& path);
     void close();
+    void clear();
     void unlink(const std::string& path = "");
     std::string recieve(int& priority, int timeout = -1);
     bool send(int priority, const std::string& message);

@@ -52,6 +52,7 @@ namespace Belle2 {
   public:
     int isAvailable(const State& state) const throw();
     State nextState() const throw();
+    State nextTState() const throw();
 
   public:
     const Command& operator=(const std::string& label) throw();

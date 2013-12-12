@@ -13,7 +13,7 @@ namespace Belle2 {
   class ProcessListener {
 
   public:
-    ProcessListener(RCCallback* callback, Fork forkfd,
+    ProcessListener(RCCallback* callback, Fork& forkfd,
                     const std::string& process_name)
       : _callback(callback), _forkfd(forkfd),
         _process_name(process_name) {}
@@ -25,7 +25,7 @@ namespace Belle2 {
 
   private:
     RCCallback* _callback;
-    Fork _forkfd;
+    Fork& _forkfd;
     std::string _process_name;
     Mutex _mutex;
     bool _is_running;

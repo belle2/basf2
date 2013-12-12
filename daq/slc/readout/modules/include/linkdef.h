@@ -7,7 +7,7 @@
 
 #pragma link C++ class Belle2::MMutex;
 #pragma link C++ class Belle2::MCond;
-#pragma link C++ class Belle2::ROControlMessanger;
+#pragma link C++ class Belle2::ROMessanger;
 #pragma link C++ class Belle2::RunLogMessanger;
 #pragma link C++ class Belle2::RunInfoBuffer;
 #pragma link C++ class Belle2::SharedMemory;

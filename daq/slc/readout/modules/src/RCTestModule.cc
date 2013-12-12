@@ -37,17 +37,17 @@ RCTestModuleModule::~RCTestModuleModule()
 
 void RCTestModuleModule::initialize()
 {
-  m_buf.open(m_buf_path);
-  m_msg.open(m_msg_path, "w");
+  m_msg.open();
+  m_msg.reportReady();
 }
 
 void RCTestModuleModule::terminate()
 {
-  m_msg.send(RunLogMessanger::NOTICE, "Run terminating");
+  m_msg.reportReady();
 }
 
 
 void RCTestModuleModule::event()
 {
-  m_msg.send(RunLogMessanger::NOTICE, "Run started");
+  m_msg.reportRunning();
 }

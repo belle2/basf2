@@ -11,7 +11,7 @@ ROCallback::ROCallback(NSMNode* node)
   : RCCallback(node)
 {
   node->setData(new DataObject());
-  //_man.setCallback(this);
+  _con.setCallback(this);
 }
 
 ROCallback::~ROCallback() throw()
@@ -20,7 +20,7 @@ ROCallback::~ROCallback() throw()
 
 void ROCallback::init() throw()
 {
-  //_man.create();
+  _con.init();
 }
 
 bool ROCallback::boot() throw()
@@ -31,27 +31,23 @@ bool ROCallback::boot() throw()
 bool ROCallback::load() throw()
 {
   download();
-  /*
-  _man.clearArguments();
-  const char* belle2_path = getenv("BELLE2_LOCAL_DIR");
-  _man.setScriptDir(Belle2::form("%s/daq/copper/daq_scripts/", belle2_path));
-  _man.setScript(_node->getData()->getText("script"));
-  _man.addArgument("1");
-  _man.addArgument("5101");
-  _man.addArgument(_node->getName());
-  return _man.load();
-  */
-  return false;
+  _con.clearArguments();
+  _con.setScriptDir("daq/copper/daq_scripts");
+  _con.setScript(_node->getData()->getText("script"));
+  _con.addArgument("1");
+  _con.addArgument("5101");
+  _con.addArgument(_node->getName());
+  return _con.load(10);
 }
 
 bool ROCallback::start() throw()
 {
-  return false;//_man.start();
+  return _con.start(10);
 }
 
 bool ROCallback::stop() throw()
 {
-  return false;//_man.stop();
+  return _con.stop(30);
 }
 
 bool ROCallback::resume() throw()
@@ -66,6 +62,6 @@ bool ROCallback::pause() throw()
 
 bool ROCallback::abort() throw()
 {
-  return false;//_man.stop();
+  return _con.abort();
 }
 

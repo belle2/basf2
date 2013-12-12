@@ -1,7 +1,7 @@
 #ifndef _Belle2_ROCallback_hh
 #define _Belle2_ROCallback_hh
 
-//#include "daq/slc/readout/Basf2ScriptManager.h"
+#include "daq/slc/readout/ROController.h"
 
 #include "daq/slc/nsm/RCCallback.h"
 
@@ -24,7 +24,7 @@ namespace Belle2 {
     virtual bool abort() throw();
 
   private:
-    //Basf2ScriptManager _man;
+    ROController _con;
 
   };
 

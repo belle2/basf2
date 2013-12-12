@@ -11,8 +11,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/dataobjects/EventMetaData.h>
 
-#include <daq/slc/readout/modules/RunInfoBuffer.h>
-#include <daq/slc/readout/modules/RunLogMessanger.h>
+#include <daq/slc/readout/modules/ROMessanger.h>
 
 namespace Belle2 {
 
@@ -33,8 +32,7 @@ namespace Belle2 {
     std::string m_name;
     std::string m_buf_path;
     std::string m_msg_path;
-    RunInfoBuffer m_buf;
-    RunLogMessanger m_msg;
+    ROMessanger m_msg;
 
   };
 

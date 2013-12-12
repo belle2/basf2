@@ -20,8 +20,6 @@
 #include <TSystem.h>
 #include <TFile.h>
 
-#include <genfit/Track.h>
-
 using namespace std;
 using namespace Belle2;
 using namespace RootIOUtilities;

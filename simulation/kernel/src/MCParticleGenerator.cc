@@ -3,7 +3,8 @@
  * Copyright(C) 2010-2011  Belle II Collaboration                            *
  *                                                                           *
  * Author: The Belle II Collaboration                                        *
- * Contributors: Andreas Moll, Martin Ritter                                 *
+ * Contributors: Andreas Moll, Martin Ritter, Doris Kim, Romulus Godang,     *
+ *               Marko Staric                                                *
  *                                                                           *
  * This software is provided "as is" without any warranty.                   *
  *                                                                           *
@@ -22,6 +23,8 @@
 
 #include <G4ParticleTable.hh>
 #include <G4VUserPrimaryParticleInformation.hh>
+#include <G4ParticleDefinition.hh>
+#include <G4ParticleTypes.hh>
 
 #include <TLorentzVector.h>
 
@@ -64,22 +67,36 @@ void MCParticleGenerator::GeneratePrimaryVertex(G4Event* event)
 }
 
 
-void MCParticleGenerator::addParticle(MCParticle& mcParticle, G4Event* event, G4PrimaryParticle* lastG4Mother, int motherIndex, bool useTime)
+void MCParticleGenerator::addParticle(MCParticle& mcParticle,
+                                      G4Event* event,
+                                      G4PrimaryParticle* lastG4Mother,
+                                      int motherIndex,
+                                      bool useTime)
 {
   G4PrimaryParticle* g4Mother = lastG4Mother;
 
   //Check if the particle should be added to Geant4
-  //Only add the particle if its pdg value is known to Geant4 and it is not flagged as virtual.
+  //Only add particle if its PDG code is known to Geant4 and it is not flagged as virtual.
   bool addToG4 = !mcParticle.isVirtual();
 
-  G4ParticleDefinition* pdef = G4ParticleTable::GetParticleTable()->FindParticle(mcParticle.getPDG());
+  //MS: distinguish optical photon from the rest of particles
+  bool opticalPhoton = mcParticle.getPDG() == 0 && mcParticle.getEnergy() < 10.0 * Unit::eV;
+
+  G4ParticleDefinition* pdef = NULL;
+  if (opticalPhoton) {
+    pdef = G4OpticalPhoton::OpticalPhotonDefinition();
+  } else {
+    pdef = G4ParticleTable::GetParticleTable()->FindParticle(mcParticle.getPDG());
+  }
+
   if (pdef == NULL) {
-    // 7/28/13 RG, DK when the skipped particle has a long lived and it is not flagged as virtual
-    if (addToG4 && mcParticle.getLifetime() != 0.0) B2WARNING("PDG code " << mcParticle.getPDG() << " unknown to Geant4. Particle will be skipped.");
+    // RG, DK when the skipped particle has a long lived and it is not flagged as virtual
+    if (addToG4 && mcParticle.getLifetime() != 0.0)
+      B2WARNING("PDG code " << mcParticle.getPDG() << " unknown to Geant4 - particle skipped.");
     addToG4 = false;
   }
 
-  //Add the particle to the MCParticle graph
+  //Add particle to MCParticle graph
   MCParticleGraph::GraphParticle& graphParticle = m_mcParticleGraph.addParticle();
   graphParticle.setPDG(mcParticle.getPDG());
   graphParticle.setStatus(mcParticle.getStatus());
@@ -94,17 +111,26 @@ void MCParticleGenerator::addParticle(MCParticle& mcParticle, G4Event* event, G4
   graphParticle.setDecayVertex(mcParticle.getDecayVertex());
   graphParticle.setFirstDaughter(mcParticle.getFirstDaughter());
   graphParticle.setLastDaughter(mcParticle.getLastDaughter());
-  if (motherIndex > 0) graphParticle.comesFrom(m_mcParticleGraph[motherIndex - 1]); //Add decay
+  //Add decay to MCParticle graph
+  if (motherIndex > 0) graphParticle.comesFrom(m_mcParticleGraph[motherIndex - 1]);
 
-  //Create a new Geant4 Primary particle and store the link to the GraphMCParticle object as user info.
+  //Create a new Geant4 Primary particle and
+  //store the link to the GraphMCParticle object as user info.
   G4PrimaryParticle* newPart = NULL;
 
   if (addToG4) {
     TLorentzVector mcPartMom4 = mcParticle.get4Vector();
-
-    newPart = new G4PrimaryParticle(pdef, mcPartMom4.X() / Unit::MeV, mcPartMom4.Y() / Unit::MeV, mcPartMom4.Z() / Unit::MeV, mcPartMom4.E() / Unit::MeV);
+    newPart = new G4PrimaryParticle(pdef,
+                                    mcPartMom4.X() / Unit::MeV,
+                                    mcPartMom4.Y() / Unit::MeV,
+                                    mcPartMom4.Z() / Unit::MeV,
+                                    mcPartMom4.E() / Unit::MeV);
     newPart->SetMass(mcParticle.getMass() / Unit::MeV);
     newPart->SetCharge(mcParticle.getCharge());
+    if (opticalPhoton) {
+      TVector3 polarization = mcParticle.getDecayVertex(); // temporary stored here
+      newPart->SetPolarization(polarization.X(), polarization.Y(), polarization.Z());
+    }
     newPart->SetUserInformation(new ParticleInfo(graphParticle));
 
     //Set propagation time only if useTime is true, the MCparticle has a valid vertex and has children.
@@ -122,19 +148,22 @@ void MCParticleGenerator::addParticle(MCParticle& mcParticle, G4Event* event, G4
     graphParticle.setIgnore();
 
   } else {
-    B2DEBUG(100, "The particle " << mcParticle.getIndex() << " (PDG " << mcParticle.getPDG() << ") was not added to Geant4")
+    B2DEBUG(100, "The particle " << mcParticle.getIndex() << " (PDG " << mcParticle.getPDG() << ") was not added to Geant4");
   }
 
   //If there is no Geant4 mother particle and the particle is added to Geant4, create a new primary vertex and assign the particle
   if ((lastG4Mother == NULL) && (addToG4)) {
     //Create the vertex
     TVector3 mcProdVtx = mcParticle.getProductionVertex();
-    G4PrimaryVertex* vertex = new G4PrimaryVertex(mcProdVtx.X() / Unit::mm, mcProdVtx.Y() / Unit::mm, mcProdVtx.Z() / Unit::mm, mcParticle.getProductionTime());
+    G4PrimaryVertex* vertex = new G4PrimaryVertex(mcProdVtx.X() / Unit::mm,
+                                                  mcProdVtx.Y() / Unit::mm,
+                                                  mcProdVtx.Z() / Unit::mm,
+                                                  mcParticle.getProductionTime());
     vertex->SetPrimary(newPart);
 
     //Add the vertex to the event
     event->AddPrimaryVertex(vertex);
-    B2DEBUG(10, "Created the vertex (" << mcProdVtx.X() << "," << mcProdVtx.Y() << "," << mcProdVtx.Z() << ") with the primary particle " << mcParticle.getPDG())
+    B2DEBUG(10, "Created the vertex (" << mcProdVtx.X() << "," << mcProdVtx.Y() << "," << mcProdVtx.Z() << ") with the primary particle " << mcParticle.getPDG());
   }
 
   //Add all children

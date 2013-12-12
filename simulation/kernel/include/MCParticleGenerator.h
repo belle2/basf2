@@ -3,7 +3,7 @@
  * Copyright(C) 2010-2011  Belle II Collaboration                         *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Andreas Moll, Martin Ritter                              *
+ * Contributors: Andreas Moll, Martin Ritter, Marko Staric                *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -26,7 +26,7 @@ namespace Belle2 {
   namespace Simulation {
 
     /**
-     * The MCParticleGenerator class generates the Geant4 primary particles using the MCParticle list from the DataStore.
+     * This class creates Geant4 primary particles from MCParticle list
      * The generator assumes that each particle in the list has exactly one mother.
      */
     class MCParticleGenerator: public G4VPrimaryGenerator {
@@ -34,16 +34,18 @@ namespace Belle2 {
     public:
 
       /** The constructor of the MCParticleGenerator class.
-       * @param mcParticleGraph Reference to the MCParticle graph which is filled by this class.
-       * @param mcCollectionName The name of the MCParticle collection from which the MCParticles should be read.
+       * @param mcCollectionName MCParticle collection from which MCParticles are read.
+       * @param mcParticleGraph Reference to the MCParticle graph that will be filled
        */
-      MCParticleGenerator(const std::string& mcCollectionName, MCParticleGraph& mcParticleGraph);
+      MCParticleGenerator(const std::string& mcCollectionName,
+                          MCParticleGraph& mcParticleGraph);
 
       /** The destructor of the MCParticleGenerator class. */
       virtual ~MCParticleGenerator();
 
       /**
-       * This method is called for each event by Geant4 and creates the primary particles from the MCParticle list.
+       * Create G4 primary particles from MCParticle list.
+       * This method is called for each event.
        *
        * @param event Pointer to the G4Event.
        */
@@ -52,17 +54,24 @@ namespace Belle2 {
 
     protected:
 
-      std::string m_mcCollectionName;     /**< The name of the MCParticle collection from which the MCParticles should be read.*/
-      MCParticleGraph& m_mcParticleGraph; /**< Reference to the MCParticle graph which is filled by this class. */
+      std::string m_mcCollectionName;     /**< Name of the MCParticle collection */
+      MCParticleGraph& m_mcParticleGraph; /**< Reference to the MCParticle graph */
 
       /**
        * Takes a MCParticle and creates a primary particle for Geant4.
        * The daughters of the specified MCParticle are added recursively.
        *
-       * @param motherIndex Graph MCParticle
-       * @return Returns a pointer to the created primary particle. NULL if the primary particle could not be created.
+       * @param mcParticle a reference to MCParticle
+       * @param event a pointer to Geant4 event
+       * @param lastG4Mother a pointer to G4 mother particle
+       * @param motherIndex mother index from MCParticle graph
+       * @param useTime use MCParticle decay time (as given by the generator)
        */
-      void addParticle(MCParticle& mcParticle, G4Event* event, G4PrimaryParticle* lastG4Mother, int motherIndex, bool useTime);
+      void addParticle(MCParticle& mcParticle,
+                       G4Event* event,
+                       G4PrimaryParticle* lastG4Mother,
+                       int motherIndex,
+                       bool useTime);
 
     };
 

@@ -36,10 +36,12 @@ StackingAction::~StackingAction()
 
 G4ClassificationOfNewTrack StackingAction::ClassifyNewTrack(const G4Track* aTrack)
 {
-
   // look for optical photon
   if (aTrack->GetDefinition() != G4OpticalPhoton::OpticalPhotonDefinition())
     return fUrgent;
+
+  // check if creator process is available
+  if (!aTrack->GetCreatorProcess()) return fUrgent;
 
   // look for Cerenkov photon
   if (aTrack->GetCreatorProcess()->GetProcessName() != "Cerenkov") return fUrgent;

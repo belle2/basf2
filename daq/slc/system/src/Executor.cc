@@ -42,10 +42,10 @@ void Executor::addArg(const std::string& arg)
 bool Executor::execute()
 {
   char* argv[30];
-  std::cout << "\"" << _path.c_str() << "\" ";
+  std::cout << "" << _path.c_str() << " ";
   for (size_t i = 0; i < _arg_v.size(); i++) {
     argv[i] = (char*)_arg_v[i].c_str();
-    std::cout << "'" << argv[i] << "' ";
+    std::cout << "" << argv[i] << " ";
   }
   std::cout << std::endl;
   argv[_arg_v.size()] = NULL;

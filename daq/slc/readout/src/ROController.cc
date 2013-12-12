@@ -89,12 +89,11 @@ void ROSubmitter::run()
   const char* belle2_path = getenv("BELLE2_LOCAL_DIR");
   const char* belle2_sub = getenv("BELLE2_SUBDIR");
   Executor executor;
-  //executor.setExecutable("%s/bin/%s/basf2", belle2_path, belle2_sub);
-  executor.setExecutable("dummy_basf2");
-  //executor.addArg("%s/%s/%s", belle2_path,
-  //                _con->_scriptdir.c_str(), _con->_script.c_str());
+  executor.setExecutable("%s/bin/%s/basf2", belle2_path, belle2_sub);
+  executor.addArg("%s/%s/%s", belle2_path,
+                  _con->_scriptdir.c_str(), _con->_script.c_str());
   for (size_t i = 0; i < _con->_arg_v.size(); i++)
     executor.addArg(_con->_arg_v[i]);
-  //executor.addArg("--no-stats");
+  executor.addArg("--no-stats");
   executor.execute();
 }

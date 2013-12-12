@@ -11,7 +11,10 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/dataobjects/EventMetaData.h>
 
-#include <daq/slc/readout/modules/ROMessanger.h>
+#include <rawdata/dataobjects/RawDataBlock.h>
+#include <rawdata/dataobjects/RawCOPPER.h>
+
+#include <daq/slc/readout/ROMessanger.h>
 
 namespace Belle2 {
 
@@ -29,10 +32,10 @@ namespace Belle2 {
     virtual void event();
 
   private:
+    int m_id;
     std::string m_name;
-    std::string m_buf_path;
-    std::string m_msg_path;
     ROMessanger m_msg;
+    bool m_running;
 
   };
 

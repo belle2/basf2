@@ -25,6 +25,8 @@ namespace Belle2 {
     RunLogMessanger& getLog() { return _msg; }
     bool reportReady();
     bool reportRunning();
+    bool reportError(const std::string message);
+    bool reportFatal(const std::string message);
     bool create();
     bool open();
     bool close();

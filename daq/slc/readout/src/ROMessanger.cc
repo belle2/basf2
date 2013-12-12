@@ -21,7 +21,7 @@ void ROMessanger::setNode(const std::string& nodename,
   _nodeid = nodeid;
   _nodename = nodename;
   _buf_path = "/run_info_buf_" + _nodename;
-  _fifo_path = "/tmp/run_log_fifo_" + _nodename;
+  _fifo_path = "/run_log_fifo_" + _nodename;
 }
 
 bool ROMessanger::create()
@@ -30,7 +30,7 @@ bool ROMessanger::create()
   _msg.unlink(_fifo_path);
   _buf.open(_buf_path);
   _buf.init();
-  _msg.create(_fifo_path, "r");
+  _msg.create(_fifo_path);
   return true;
 }
 
@@ -38,7 +38,7 @@ bool ROMessanger::open()
 {
 
   _buf.open(_buf_path);
-  _msg.open(_fifo_path, "w");
+  _msg.open(_fifo_path);
   return true;
 }
 
@@ -66,3 +66,12 @@ bool ROMessanger::reportRunning()
   return _msg.send(RunLogMessanger::NOTICE, "RUNNING");
 }
 
+bool ROMessanger::reportError(const std::string message)
+{
+  return _msg.send(RunLogMessanger::ERROR, message);
+}
+
+bool ROMessanger::reportFatal(const std::string message)
+{
+  return _msg.send(RunLogMessanger::FATAL, message);
+}

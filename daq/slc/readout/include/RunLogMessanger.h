@@ -1,11 +1,24 @@
 #ifndef _Belle2_RunLogMessanger_h
 #define _Belle2_RunLogMessanger_h
 
+#include "daq/slc/readout/SharedMemory.h"
+#include "daq/slc/readout/MMutex.h"
+#include "daq/slc/readout/MCond.h"
+
 #include <string>
 
 namespace Belle2 {
 
   class RunLogMessanger {
+
+  public:
+    static const int MAX_MESSAGE;
+
+  public:
+    struct run_log_message {
+      int priority;
+      char message[60];
+    };
 
   public:
     static const int DEBUG;
@@ -18,20 +31,22 @@ namespace Belle2 {
     ~RunLogMessanger() {}
 
   public:
-    bool open(const std::string& path, const std::string& mode = "r");
-    bool create(const std::string& path, const std::string& mode = "r");
+    size_t size() throw();
+    bool open(const std::string& path);
+    bool create(const std::string& path);
     void close();
     void unlink(const std::string& path = "");
     std::string recieve(int& priority, int timeout = -1);
     bool send(int priority, const std::string& message);
 
   private:
-    int write(const void* v, size_t count);
-    int read(void* v, size_t count);
-
-  private:
     std::string _path;
-    int _fifo;
+    SharedMemory _memory;
+    MMutex _mutex;
+    MCond _cond;
+    int* _windex;
+    int* _rindex;
+    run_log_message* _msg_v;
 
   };
 

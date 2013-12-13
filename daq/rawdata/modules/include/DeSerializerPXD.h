@@ -24,7 +24,7 @@
 #include <daq/dataflow/EvtSocket.h>
 
 #include <framework/dataobjects/EventMetaData.h>
-#include <pxd/dataobjects/RawPXD.h>
+#include <rawdata/dataobjects/RawPXD.h>
 
 namespace Belle2 {
 

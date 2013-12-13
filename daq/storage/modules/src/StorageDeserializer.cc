@@ -14,7 +14,7 @@
 #include "framework/dataobjects/EventMetaData.h"
 
 #include <framework/datastore/StoreArray.h>
-#include <pxd/dataobjects/RawPXD.h>
+#include <rawdata/dataobjects/RawPXD.h>
 
 using namespace Belle2;
 

@@ -21,7 +21,7 @@
 #include <TObject.h>
 
 #define USE_B2LFEE_FORMAT_BOTH_VER1_AND_2
-#define READ_OLD_B2LFEE_FORMAT_FILE
+//#define READ_OLD_B2LFEE_FORMAT_FILE
 
 namespace Belle2 {
 
@@ -199,13 +199,14 @@ namespace Belle2 {
     void CheckB2LFEEHeaderVersion(int  n);
 #endif
 
-
     //! Check if COPPER Magic words are correct
     unsigned int GetB2LFEETtCtime(int n);
 
     //! Check if COPPER Magic words are correct
     unsigned int GetB2LFEETtUtime(int n);
 
+    //! should be called by DeSerializerCOPPER.cc and fill contents in RawHeader
+    unsigned int FillTopBlockRawHeader(unsigned int m_node_id, unsigned int m_data_type, unsigned int m_trunc_mask);
 
     //
     // size of "COPPER front header" and "COPPER trailer"
@@ -214,6 +215,9 @@ namespace Belle2 {
       SIZE_COPPER_FRONT_HEADER = 7,
       SIZE_COPPER_TRAILER = 3
     };
+
+    //! Copper data words = ( total_data_length in COPPER header ) + COPPER_HEADER_TRAILER_NWORDS
+    enum { COPPER_HEADER_TRAILER_NWORDS = 9 }; //See COPPER data format
 
     //
     // Data Format : "COPPER header"

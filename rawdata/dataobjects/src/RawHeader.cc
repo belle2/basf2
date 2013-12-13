@@ -176,7 +176,7 @@ int RawHeader::AddNodeInfo(int node_id)
 {
   CheckSetBuffer();
   // When the number of total nodes exceeds NUM_MAX_NODES
-  if (GetNumNodes() > NUM_MAX_NODES) {
+  if (GetNumNodes() >= NUM_MAX_NODES) {
     m_buffer[ POS_NUM_NODES ]++;
     return -1;
   }

@@ -697,6 +697,180 @@ unsigned int RawCOPPER::GetB2LHeaderWord(int n, int finesse_buffer_pos)
 }
 
 
+unsigned int RawCOPPER::FillTopBlockRawHeader(unsigned int m_node_id, unsigned int m_data_type, unsigned int m_trunc_mask)
+{
+
+  ErrorMessage print_err;
+  //
+  // This function only fills RawHeader contents for the first datablock.
+  //
+  if (m_num_nodes * m_num_events != 1) {
+    char err_buf[500];
+    sprintf(err_buf,
+            "This function should be used for RawCOPPER containing only one datablock, while. this object has num_nodes of %d and num_events of %d\n",
+            m_num_nodes, m_num_events);
+    print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+    sleep(12345678);
+    exit(-1);
+  }
+  memset(m_buffer, 0, sizeof(int) * RawHeader::RAWHEADER_NWORDS);
+
+  //
+  // Check FINESSEs which containes data
+  //
+  int* copper_buf = &(m_buffer[ RawHeader::RAWHEADER_NWORDS ]);
+
+  if (copper_buf[ POS_CH_A_DATA_LENGTH ] == 0 &&
+      copper_buf[ POS_CH_B_DATA_LENGTH ] == 0 &&
+      copper_buf[ POS_CH_C_DATA_LENGTH ] == 0 &&
+      copper_buf[ POS_CH_D_DATA_LENGTH ] == 0) {
+    char err_buf[500];
+    sprintf(err_buf,
+            "No FINESSE data in a copper data block. Exiting...\n");
+    print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+    sleep(12345678);
+    exit(-1);
+  }
+
+
+  // initialize header(header nwords, magic word) and trailer(magic word)
+  //   RawHeader rawhdr;
+  //   rawhdr.SetBuffer(raw_copper->GetRawHdrBufPtr(cprblock));
+  //   rawhdr.Initialize(); // Fill 2nd( hdr size) and 20th header word( magic word )
+
+  // 1, Set total words info
+  //   int nwords = raw_copper->GetBlockNwords(cprblock);
+  //   rawhdr.SetNwords(nwords);
+
+  int datablock_nwords = RawHeader::RAWHEADER_NWORDS +
+                         (copper_buf[ POS_DATA_LENGTH ] + COPPER_HEADER_TRAILER_NWORDS) +
+                         RawTrailer::RAWTRAILER_NWORDS;
+
+  m_buffer[ RawHeader::POS_NWORDS ] = datablock_nwords;
+
+
+  if (m_buffer[ RawHeader::POS_NWORDS ] != m_nwords) {
+    char err_buf[500];
+    sprintf(err_buf,
+            "Data length is inconsistent m_nwords %d : nwords from COPPER data %d\n",
+            m_nwords, m_buffer[ RawHeader::POS_NWORDS ]);
+    print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+    sleep(12345678);
+    exit(-1);
+  }
+
+  //   // 2, Set run and exp #
+  //   rawhdr.SetExpRunNumber(raw_copper->GetExpRunBuf(cprblock));       // Fill 3rd header word
+  int offset_1st_finesse =  RawHeader::RAWHEADER_NWORDS + SIZE_COPPER_HEADER;
+  int offset_2nd_finesse = offset_1st_finesse + copper_buf[ POS_CH_A_DATA_LENGTH ];
+  int offset_3rd_finesse = offset_2nd_finesse + copper_buf[ POS_CH_B_DATA_LENGTH ];
+  int offset_4th_finesse = offset_3rd_finesse + copper_buf[ POS_CH_C_DATA_LENGTH ];
+  int* finesse_buf = &(m_buffer[ offset_1st_finesse ]); // In any finesse implementations, the top finesse buffer should be at offset_1st_finesse;
+  m_buffer[ RawHeader::POS_EXP_RUN_NO ] = finesse_buf[ SIZE_B2LHSLB_HEADER + POS_EXP_RUN ];
+
+  // 3, Make 32bit event number from B2link FEE header
+  //  unsigned int cur_ftsw_eve32 =  raw_copper->GetB2LFEE32bitEventNumber(cprblock);
+  //  rawhdr.SetEveNo(cur_ftsw_eve32);       // Temporarily use COPPER counter   //raw_copper->GetCOPPERCounter()
+  unsigned int cur_ftsw_eve32 =  finesse_buf[ SIZE_B2LHSLB_HEADER + POS_TT_TAG ];
+  m_buffer[ RawHeader::POS_EVE_NO ] = cur_ftsw_eve32;
+
+  // Set FTSW word
+  //  rawhdr.SetFTSW2Words(raw_copper->GetB2LFEETtCtime(cprblock), raw_copper->GetB2LFEETtUtime(cprblock));
+  m_buffer[ RawHeader::POS_HSLB_1 ] = finesse_buf[ SIZE_B2LHSLB_HEADER + POS_TT_CTIME_TYPE ];
+  m_buffer[ RawHeader::POS_HSLB_2 ] = finesse_buf[ SIZE_B2LHSLB_HEADER + POS_TT_UTIME ];
+
+  // Obtain info from SlowController via AddParam or COPPER data
+//   rawhdr.SetSubsysId(m_nodeid);   // Fill 7th header word
+//   rawhdr.SetDataType(m_data_type);   // Fill 8th header word
+//   rawhdr.SetTruncMask(m_trunc_mask);   // Fill 8th header word
+  m_buffer[ RawHeader::POS_SUBSYS_ID ] = m_node_id;
+  m_buffer[ RawHeader::POS_SUBSYS_ID ] = m_data_type;
+  m_buffer[ RawHeader::POS_SUBSYS_ID ] = m_trunc_mask;
+
+  // Offset
+//   rawhdr.SetOffset1stFINESSE(raw_copper->GetOffset1stFINESSE(cprblock) - raw_copper->GetBufferPos(cprblock));          // Fill 9th header word
+//   rawhdr.SetOffset2ndFINESSE(raw_copper->GetOffset2ndFINESSE(cprblock) - raw_copper->GetBufferPos(cprblock));         // Fill 10th header word
+//   rawhdr.SetOffset3rdFINESSE(raw_copper->GetOffset3rdFINESSE(cprblock) - raw_copper->GetBufferPos(cprblock));         // Fill 11th header word
+//   rawhdr.SetOffset4thFINESSE(raw_copper->GetOffset4thFINESSE(cprblock) - raw_copper->GetBufferPos(cprblock));         // Fill 12th header word
+  m_buffer[ RawHeader::POS_OFFSET_1ST_FINESSE ] = offset_1st_finesse;
+  m_buffer[ RawHeader::POS_OFFSET_2ND_FINESSE ] = offset_2nd_finesse;
+  m_buffer[ RawHeader::POS_OFFSET_3RD_FINESSE ] = offset_3rd_finesse;
+  m_buffer[ RawHeader::POS_OFFSET_4TH_FINESSE ] = offset_4th_finesse;
+
+
+  // Set magic word
+  //  rawhdr.SetMagicWordEntireHeader();
+  m_buffer[ RawHeader::POS_TERM_HEADER ] = RawHeader::MAGIC_WORD_TERM_HEADER;
+
+
+  // Add node-info
+  //  rawhdr.AddNodeInfo(m_nodeid);   // Fill 13th header word
+  if (m_buffer[ RawHeader::POS_NUM_NODES ] < RawHeader::NUM_MAX_NODES) {
+    m_buffer[ RawHeader::POS_NODES_1 + m_buffer[ RawHeader::POS_NUM_NODES ] ] = m_node_id;
+  }
+  m_buffer[ RawHeader::POS_NUM_NODES ]++;
+
+
+  //
+  // Fill info in Trailer
+  //
+  //   RawTrailer rawtrl;
+  //   rawtrl.SetBuffer(raw_copper->GetRawTrlBufPtr(cprblock));
+  //   rawtrl.Initialize(); // Fill 2nd word : magic word
+  //   rawtrl.SetChksum(CalcSimpleChecksum(raw_copper->GetBuffer(cprblock),
+  //   raw_copper->GetBlockNwords(cprblock) - rawtrl.GetTrlNwords()));
+  int* trl = &(m_buffer[ datablock_nwords - RawTrailer::RAWTRAILER_NWORDS ]);
+  trl[ RawTrailer::POS_TERM_WORD ] = RawTrailer::MAGIC_WORD_TERM_TRAILER;
+  unsigned int chksum = 0;
+  for (int i = 0; i < datablock_nwords - RawTrailer::RAWTRAILER_NWORDS; i++) {
+    chksum += m_buffer[ i ];
+  }
+  trl[ RawTrailer::POS_CHKSUM ] = chksum;
+
+
+
+//   //magic word check
+// #ifndef NO_DATA_CHECK
+// // 3, magic word check
+//   if (!(raw_copper->CheckCOPPERMagic(cprblock))) {
+//     char err_buf[500];
+//     sprintf(err_buf, "Invalid Magic word 0x7FFFF0008=%u 0xFFFFFAFA=%u 0xFFFFF5F5=%u 0x7FFF0009=%u\n",
+//             raw_copper->GetMagicDriverHeader(cprblock),
+//             raw_copper->GetMagicFPGAHeader(cprblock),
+//             raw_copper->GetMagicFPGATrailer(cprblock),
+//             raw_copper->GetMagicDriverTrailer(cprblock));
+//     print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+//     sleep(12345678);
+//     exit(-1);
+//   }
+
+
+//   // 3, event # increment check
+// #ifdef WO_FIRST_EVENUM_CHECK
+//   if ((m_prev_ftsweve32 + 1 != cur_ftsw_eve32) && (m_prev_ftsweve32 != 0xFFFFFFFF)) {
+// #else
+//   if (m_prev_ftsweve32 + 1 != cur_ftsw_eve32) {
+// #endif
+//     char err_buf[500];
+//     sprintf(err_buf, "Invalid event_number. Exiting...: cur 32bit eve %u preveve %u\n",  cur_ftsw_eve32, m_prev_ftsweve32);
+//     print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+
+//     printf("i= %d : num entries %d : Tot words %d\n", 0 , raw_copper->GetNumEntries(), raw_copper->TotalBufNwords());
+//     for (int j = 0; j < raw_copper->TotalBufNwords(); j++) {
+//       printf("0x%.8x ", (raw_copper->GetBuffer(0))[ j ]);
+//       if ((j % 10) == 9)printf("\n");
+//       fflush(stdout);
+//     }
+
+//     exit(-1);
+//   }
+// #endif
+  return cur_ftsw_eve32;
+
+}
+
+
+
 #ifdef USE_B2LFEE_FORMAT_BOTH_VER1_AND_2
 void RawCOPPER::CheckB2LFEEHeaderVersion(int n)
 {
@@ -708,6 +882,7 @@ void RawCOPPER::CheckB2LFEEHeaderVersion(int n)
     if (GetFINESSENwords(n, i) > 0) {
       temp_buf = GetFINESSEBuffer(n, i);
       if ((temp_buf[ 3 ] & 0x40000000) == 0) {
+#ifdef TEMP
         // this word for exp/run
         flag = 1; // old one (ver.1) used for SPring8 test in 2013
         printf("\033[31m");
@@ -725,6 +900,7 @@ void RawCOPPER::CheckB2LFEEHeaderVersion(int n)
         print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
         sleep(12345678);
         exit(-1);
+#endif
       } else {
         // this word for 32bit unixtime
         flag = 2; // new one (ver.2)
@@ -733,12 +909,13 @@ void RawCOPPER::CheckB2LFEEHeaderVersion(int n)
     }
 
     if (i == 3) {
-
+#ifdef TEMP
       char err_buf[500];
       sprintf(err_buf, "RawCOPPER contains no FINESSE data. Exiting...\n");
       print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
       sleep(12345678);
       exit(-1);
+#endif
     }
   }
   return;

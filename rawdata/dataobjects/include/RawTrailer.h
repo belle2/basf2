@@ -60,7 +60,6 @@ namespace Belle2 {
       RAWTRAILER_NWORDS = 2
     };
 
-  private:
     enum {
       MAGIC_WORD_TERM_TRAILER = 0x7fff0006
     };
@@ -69,6 +68,8 @@ namespace Belle2 {
       POS_CHKSUM = 0,
       POS_TERM_WORD = 1
     };
+
+  private:
 
     int* m_buffer; //! do not record buffer ( RawCOPPER includes buffer of RawHeader and RawTrailer )
     //    unsigned int m_trailer[RAWCOPPER_TRAILER_SIZE];

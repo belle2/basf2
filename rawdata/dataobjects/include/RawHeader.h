@@ -107,8 +107,6 @@ namespace Belle2 {
       POS_NODES_4 = 18,
       POS_TERM_HEADER = 19
     };
-
-  private:
     /* Data Format : Node info */
     enum {
       NUM_MAX_NODES = 4   /* (NUM_MAX_NODES + 1) slots are available in m_buffer.
@@ -120,6 +118,8 @@ namespace Belle2 {
     enum {
       MAGIC_WORD_TERM_HEADER = 0x7fff0005
     };
+
+  private:
 
     int* m_buffer; //! do not record buffer ( RawCOPPER includes buffer of RawHeader and RawTrailer )
     //    unsigned int m_header[HEADER_SIZE];

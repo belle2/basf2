@@ -75,6 +75,9 @@ namespace Belle2 {
     } else {
       StoreObjPtr<ParticleList>::registerTransient(m_listName);
     }
+    for (unsigned i = 0; i < m_inputListNames.size(); i++) {
+      StoreObjPtr<ParticleList>::required(m_inputListNames[i]);
+    }
   }
 
   void ParticleCombinerModule::beginRun()

@@ -12,6 +12,13 @@
 #define PARTICLECOMBINERMODULE_H
 
 #include <framework/core/Module.h>
+
+// framework - DataStore
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
+
+#include <analysis/dataobjects/ParticleList.h>
+
 #include <string>
 #include <vector>
 #include <unordered_set>
@@ -31,7 +38,7 @@ namespace std {
 }
 
 namespace Belle2 {
-
+  class Particle;
 
   /**
    * particle combiner module

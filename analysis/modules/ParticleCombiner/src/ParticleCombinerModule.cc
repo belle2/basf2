@@ -8,13 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <framework/core/ModuleManager.h>
-
-// framework - DataStore
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/RelationArray.h>
+// Own include
+#include <analysis/modules/ParticleCombiner/ParticleCombinerModule.h>
 
 // framework aux
 #include <framework/gearbox/Unit.h>
@@ -25,11 +20,8 @@
 #include <generators/dataobjects/MCParticle.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleInfo.h>
-#include <analysis/dataobjects/ParticleList.h>
 #include <analysis/utility/VariableManager.h>
 
-// Own include
-#include <analysis/modules/ParticleCombiner/ParticleCombinerModule.h>
 #include <algorithm>
 
 

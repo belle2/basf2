@@ -16,7 +16,7 @@
 #include <limits>
 #include <fstream>
 
-#include <trg/cdc/Helix.h>
+#include <generators/cosmics/cosmicsHelix.h>
 #include "CLHEP/Matrix/Vector.h"
 #include "CLHEP/Matrix/SymMatrix.h"
 #include "CLHEP/Vector/ThreeVector.h"
@@ -118,7 +118,7 @@ bool SGCosmic::generateEvent(MCParticleGraph& graph)
     newA[2] = (double)charge / pt;
     newA[3] = dz;
     newA[4] = tanl;
-    TRGCDCHelix CosmicMCHelix(IP, newA, Ea);
+    cosmicsHelix CosmicMCHelix(IP, newA, Ea);
 
     // move pivot to outside
     // double Cr = 87.9; // radius (cm) of CDC CFRP body

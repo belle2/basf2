@@ -4,6 +4,9 @@
 
 #include <boost/regex.hpp>
 
+#include <analysis/dataobjects/Particle.h>
+#include <analysis/dataobjects/ParticleInfo.h>
+
 using namespace Belle2;
 
 
@@ -48,4 +51,28 @@ void VariableManager::registerVariable(const std::string& name, VariableManager:
   } else {
     B2FATAL("A variable named '" << name << "' was already registered! Note that all variables need a unique name!");
   }
+}
+
+void VariableManager::registerParticleInfoVariable(const std::string& name, const std::string& description, bool allowMultipleRegistrations)
+{
+
+  auto mapIter = m_variables.find(name);
+  if (mapIter == m_variables.end()) {
+    auto func = [name](const Particle * particle) -> double {
+      const ParticleInfo* particleInfo = DataStore::getRelated<ParticleInfo>(particle);
+      if (particleInfo == nullptr or not particleInfo->isAvailable(name)) {
+        B2INFO("VariableManger: Particle doesn't have " <<  name << " set in the related ParticleInfo. Return 0!")
+        return 0.0;
+      }
+      return particleInfo->getValue(name);
+    };
+    Var* var = new Var {name, func, description};
+    m_variables[name] = var;
+    m_variablesInRegistrationOrder.push_back(var);
+  } else {
+    if (allowMultipleRegistrations)
+      return;
+    B2FATAL("A variable named '" << name << "' was already registered! Note that all variables need a unique name!");
+  }
+
 }

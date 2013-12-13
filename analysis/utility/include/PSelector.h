@@ -18,6 +18,7 @@
 #include <iostream>
 #include <sstream>
 
+#include <analysis/utility/VariableManager.h>
 
 namespace Belle2 {
 
@@ -92,7 +93,7 @@ namespace Belle2 {
    * Structure to hold selection criteria
    */
   struct SelectionCriteria {
-    double(*function)(const Particle*);   /**< function that returns the variable value */
+    VariableManager::FunctionPtr function;   /**< function that returns the variable value */
     std::vector<unsigned int> childIndex; /**< a child tree indices */
     SelRangeVector ranges;                /**< vector of selection ranges */
 
@@ -108,7 +109,7 @@ namespace Belle2 {
      * @param childInd a vector of child tree indices
      * @param selRanges a vector of selection ranges
      */
-    SelectionCriteria(double(*fun)(const Particle*),
+    SelectionCriteria(VariableManager::FunctionPtr fun,
                       std::vector<unsigned int> childInd,
                       SelRangeVector selRanges):
       function(fun), childIndex(childInd), ranges(selRanges)

@@ -196,9 +196,50 @@ namespace Belle2 {
     /**
      * function for PSelector
      * @param part const pointer to Particle
+     * @return electron Id
+     */
+    double particleElectrondEdxId(const Particle* part);
+
+    /**
+     * function for PSelector
+     * @param part const pointer to Particle
+     * @return electron Id
+     */
+    double particleElectronTOPId(const Particle* part);
+
+    /**
+     * function for PSelector
+     * @param part const pointer to Particle
+     * @return electron Id
+     */
+    double particleElectronARICHId(const Particle* part);
+    /**
+     * function for PSelector
+     * @param part const pointer to Particle
      * @return muon Id
      */
     double particleMuonId(const Particle* part);
+
+    /**
+     * function for PSelector
+     * @param part const pointer to Particle
+     * @return electron Id
+     */
+    double particleMuondEdxId(const Particle* part);
+
+    /**
+     * function for PSelector
+     * @param part const pointer to Particle
+     * @return electron Id
+     */
+    double particleMuonTOPId(const Particle* part);
+
+    /**
+     * function for PSelector
+     * @param part const pointer to Particle
+     * @return electron Id
+     */
+    double particleMuonARICHId(const Particle* part);
 
     /**
      * function for PSelector
@@ -210,6 +251,27 @@ namespace Belle2 {
     /**
      * function for PSelector
      * @param part const pointer to Particle
+     * @return electron Id
+     */
+    double particlePiondEdxId(const Particle* part);
+
+    /**
+     * function for PSelector
+     * @param part const pointer to Particle
+     * @return electron Id
+     */
+    double particlePionTOPId(const Particle* part);
+
+    /**
+     * function for PSelector
+     * @param part const pointer to Particle
+     * @return electron Id
+     */
+    double particlePionARICHId(const Particle* part);
+
+    /**
+     * function for PSelector
+     * @param part const pointer to Particle
      * @return kaon Id
      */
     double particleKaonId(const Particle* part);
@@ -217,9 +279,52 @@ namespace Belle2 {
     /**
      * function for PSelector
      * @param part const pointer to Particle
+     * @return electron Id
+     */
+    double particleKaondEdxId(const Particle* part);
+
+    /**
+     * function for PSelector
+     * @param part const pointer to Particle
+     * @return electron Id
+     */
+    double particleKaonTOPId(const Particle* part);
+
+    /**
+     * function for PSelector
+     * @param part const pointer to Particle
+     * @return electron Id
+     */
+    double particleKaonARICHId(const Particle* part);
+
+    /**
+     * function for PSelector
+     * @param part const pointer to Particle
      * @return proton Id
      */
     double particleProtonId(const Particle* part);
+
+    /**
+     * function for PSelector
+     * @param part const pointer to Particle
+     * @return electron Id
+     */
+    double particleProtondEdxId(const Particle* part);
+
+    /**
+     * function for PSelector
+     * @param part const pointer to Particle
+     * @return electron Id
+     */
+    double particleProtonTOPId(const Particle* part);
+
+    /**
+     * function for PSelector
+     * @param part const pointer to Particle
+     * @return electron Id
+     */
+    double particleProtonARICHId(const Particle* part);
+
 
     /**
      * function for PSelector
@@ -241,6 +346,29 @@ namespace Belle2 {
      * @return flavor type
      */
     double particleFlavorType(const Particle* part);
+
+
+    /**
+     * function for PSelector
+     * @param part const pointer to Particle
+     * @return sum of signal probabilities of childs
+     */
+    double sumChildProb(const Particle* particle);
+
+    /**
+     * function for PSelector
+     * @param part const pointer to Particle
+     * @return product of signal probabilities of childs
+     */
+    double prodChildProb(const Particle* particle);
+
+    /**
+     * function for PSelector
+     * @param part const pointer to Particle
+     * @return 1 if mc information match pdg code, 0 otherwise
+     */
+    double truth(const Particle* particle);
+
 
   }
 } // Belle2 namespace

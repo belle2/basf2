@@ -19,6 +19,7 @@
 
 // dataobjects
 #include <analysis/dataobjects/Particle.h>
+#include <analysis/dataobjects/ParticleInfo.h>
 #include <generators/dataobjects/MCParticle.h>
 #include <reconstruction/dataobjects/PIDLikelihood.h>
 
@@ -204,14 +205,93 @@ namespace Belle2 {
 
     // PID ---------------------------------------------
 
-    double particleElectronId(const Particle*)
+    double particleElectronId(const Particle* part)
     {
-      return 0.5; //TODO when eId availabe
+      const PIDLikelihood* pid = DataStore::getRelated<PIDLikelihood>(part);
+      if (!pid) return 0.5;
+
+      /*
+      // temporary: use dEdx only below 2.5 GeV/c
+      Const::PIDDetectorSet set = Const::TOP + Const::ARICH;
+      if (part->getP() < 2.5) set += Const::CDC;
+      return pid->getProbability(Const::pion, Const::kaon, set);
+      */
+      return pid->getProbability(Const::electron, Const::pion);
+
     }
 
-    double particleMuonId(const Particle*)
+    double particleElectrondEdxId(const Particle* part)
     {
-      return 0.5; //TODO when muId availabe
+      const PIDLikelihood* pid = DataStore::getRelated<PIDLikelihood>(part);
+      if (!pid) return 0.5;
+
+      Const::PIDDetectorSet set = Const::CDC;
+      return pid->getProbability(Const::electron, Const::pion, set);
+
+    }
+
+    double particleElectronTOPId(const Particle* part)
+    {
+      const PIDLikelihood* pid = DataStore::getRelated<PIDLikelihood>(part);
+      if (!pid) return 0.5;
+
+      Const::PIDDetectorSet set = Const::TOP;
+      return pid->getProbability(Const::electron, Const::pion, set);
+
+    }
+
+    double particleElectronARICHId(const Particle* part)
+    {
+      const PIDLikelihood* pid = DataStore::getRelated<PIDLikelihood>(part);
+      if (!pid) return 0.5;
+
+      Const::PIDDetectorSet set = Const::ARICH;
+      return pid->getProbability(Const::electron, Const::pion, set);
+
+    }
+
+    double particleMuonId(const Particle* part)
+    {
+      const PIDLikelihood* pid = DataStore::getRelated<PIDLikelihood>(part);
+      if (!pid) return 0.5;
+
+      /*
+      // temporary: use dEdx only below 2.5 GeV/c
+      Const::PIDDetectorSet set = Const::TOP + Const::ARICH;
+      if (part->getP() < 2.5) set += Const::CDC;
+      return pid->getProbability(Const::pion, Const::kaon, set);
+      */
+      return pid->getProbability(Const::muon, Const::pion);
+    }
+
+    double particleMuondEdxId(const Particle* part)
+    {
+      const PIDLikelihood* pid = DataStore::getRelated<PIDLikelihood>(part);
+      if (!pid) return 0.5;
+
+      Const::PIDDetectorSet set = Const::CDC;
+      return pid->getProbability(Const::muon, Const::pion, set);
+
+    }
+
+    double particleMuonTOPId(const Particle* part)
+    {
+      const PIDLikelihood* pid = DataStore::getRelated<PIDLikelihood>(part);
+      if (!pid) return 0.5;
+
+      Const::PIDDetectorSet set = Const::TOP;
+      return pid->getProbability(Const::muon, Const::pion, set);
+
+    }
+
+    double particleMuonARICHId(const Particle* part)
+    {
+      const PIDLikelihood* pid = DataStore::getRelated<PIDLikelihood>(part);
+      if (!pid) return 0.5;
+
+      Const::PIDDetectorSet set = Const::ARICH;
+      return pid->getProbability(Const::muon, Const::pion, set);
+
     }
 
     double particlePionId(const Particle* part)
@@ -226,6 +306,36 @@ namespace Belle2 {
       return pid->getProbability(Const::pion, Const::kaon, set);
       */
       return pid->getProbability(Const::pion, Const::kaon);
+
+    }
+
+    double particlePiondEdxId(const Particle* part)
+    {
+      const PIDLikelihood* pid = DataStore::getRelated<PIDLikelihood>(part);
+      if (!pid) return 0.5;
+
+      Const::PIDDetectorSet set = Const::CDC;
+      return pid->getProbability(Const::pion, Const::kaon, set);
+
+    }
+
+    double particlePionTOPId(const Particle* part)
+    {
+      const PIDLikelihood* pid = DataStore::getRelated<PIDLikelihood>(part);
+      if (!pid) return 0.5;
+
+      Const::PIDDetectorSet set = Const::TOP;
+      return pid->getProbability(Const::pion, Const::kaon, set);
+
+    }
+
+    double particlePionARICHId(const Particle* part)
+    {
+      const PIDLikelihood* pid = DataStore::getRelated<PIDLikelihood>(part);
+      if (!pid) return 0.5;
+
+      Const::PIDDetectorSet set = Const::ARICH;
+      return pid->getProbability(Const::pion, Const::kaon, set);
 
     }
 
@@ -244,6 +354,36 @@ namespace Belle2 {
 
     }
 
+    double particleKaondEdxId(const Particle* part)
+    {
+      const PIDLikelihood* pid = DataStore::getRelated<PIDLikelihood>(part);
+      if (!pid) return 0.5;
+
+      Const::PIDDetectorSet set = Const::CDC;
+      return pid->getProbability(Const::kaon, Const::pion, set);
+
+    }
+
+    double particleKaonTOPId(const Particle* part)
+    {
+      const PIDLikelihood* pid = DataStore::getRelated<PIDLikelihood>(part);
+      if (!pid) return 0.5;
+
+      Const::PIDDetectorSet set = Const::TOP;
+      return pid->getProbability(Const::kaon, Const::pion, set);
+
+    }
+
+    double particleKaonARICHId(const Particle* part)
+    {
+      const PIDLikelihood* pid = DataStore::getRelated<PIDLikelihood>(part);
+      if (!pid) return 0.5;
+
+      Const::PIDDetectorSet set = Const::ARICH;
+      return pid->getProbability(Const::kaon, Const::pion, set);
+
+    }
+
     double particleProtonId(const Particle* part)
     {
       const PIDLikelihood* pid = DataStore::getRelated<PIDLikelihood>(part);
@@ -256,6 +396,36 @@ namespace Belle2 {
       return pid->getProbability(Const::proton, Const::pion, set);
       */
       return pid->getProbability(Const::proton, Const::pion);
+    }
+
+    double particleProtondEdxId(const Particle* part)
+    {
+      const PIDLikelihood* pid = DataStore::getRelated<PIDLikelihood>(part);
+      if (!pid) return 0.5;
+
+      Const::PIDDetectorSet set = Const::CDC;
+      return pid->getProbability(Const::proton, Const::pion, set);
+
+    }
+
+    double particleProtonTOPId(const Particle* part)
+    {
+      const PIDLikelihood* pid = DataStore::getRelated<PIDLikelihood>(part);
+      if (!pid) return 0.5;
+
+      Const::PIDDetectorSet set = Const::TOP;
+      return pid->getProbability(Const::proton, Const::pion, set);
+
+    }
+
+    double particleProtonARICHId(const Particle* part)
+    {
+      const PIDLikelihood* pid = DataStore::getRelated<PIDLikelihood>(part);
+      if (!pid) return 0.5;
+
+      Const::PIDDetectorSet set = Const::ARICH;
+      return pid->getProbability(Const::proton, Const::pion, set);
+
     }
 
     // other ------------------------------------------------------------
@@ -273,6 +443,51 @@ namespace Belle2 {
     double particleFlavorType(const Particle* part)
     {
       return part->getFlavorType();
+    }
+
+
+    double sumChildProb(const Particle* particle)
+    {
+      double signalProbabilitySum = 0.0;
+      for (unsigned j = 0; j < particle->getNDaughters(); ++j) {
+        const Particle* daughter = particle->getDaughter(j);
+        const ParticleInfo* daughterInfo = DataStore::getRelated<ParticleInfo>(daughter);
+        if (daughterInfo == nullptr) {
+          B2WARNING("Couldn't get related ParticleInfo: Returning 0 in sumChildProb function")
+          return 0.0;
+        }
+        signalProbabilitySum += daughterInfo->getValue("SignalProbability");
+      }
+      return signalProbabilitySum;
+    }
+
+    double prodChildProb(const Particle* particle)
+    {
+      double signalProbabilityProduct = 1.0;
+      for (unsigned j = 0; j < particle->getNDaughters(); ++j) {
+        const Particle* daughter = particle->getDaughter(j);
+        const ParticleInfo* daughterInfo = DataStore::getRelated<ParticleInfo>(daughter);
+        if (daughterInfo == nullptr) {
+          B2WARNING("Couldn't get related ParticleInfo: Returning 0 in prodChildProb function")
+          return 0.0;
+        }
+        signalProbabilityProduct *= daughterInfo->getValue("SignalProbability");
+      }
+      return signalProbabilityProduct;
+    }
+
+    double truth(const Particle* part)
+    {
+      double result = 1.0;
+      const MCParticle* mc_part = DataStore::getRelated<MCParticle>(part);
+      if (mc_part == nullptr) {
+        for (auto & daughter : part->getDaughters()) {
+          result *= truth(daughter);
+        }
+      } else {
+        result = (part->getPDGCode() == mc_part->getPDG()) ? 1.0 : 0.0;
+      }
+      return result;
     }
 
     REGISTER_VARIABLE("p", particleP, "momentum magnitude");
@@ -311,9 +526,30 @@ namespace Belle2 {
     REGISTER_VARIABLE("Kid", particleKaonId, "kaon identification probability");
     REGISTER_VARIABLE("prid", particleProtonId, "proton identification probability");
 
+    REGISTER_VARIABLE("eid_dEdx", particleElectrondEdxId, "electron identification probability from dEdx measurement");
+    REGISTER_VARIABLE("muid_dEdx", particleMuondEdxId, "muon identification probability from dEdx measurement");
+    REGISTER_VARIABLE("piid_dEdx", particlePiondEdxId, "pion identification probability from dEdx measurement");
+    REGISTER_VARIABLE("Kid_dEdx", particleKaondEdxId, "kaon identification probability from dEdx measurement");
+    REGISTER_VARIABLE("prid_dEdx", particleProtondEdxId, "proton identification probability from dEdx measurement");
+
+    REGISTER_VARIABLE("eid_TOP", particleElectronTOPId, "electron identification probability from TOP");
+    REGISTER_VARIABLE("muid_TOP", particleMuonTOPId, "muon identification probability from TOP");
+    REGISTER_VARIABLE("piid_TOP", particlePionTOPId, "pion identification probability from TOP");
+    REGISTER_VARIABLE("Kid_TOP", particleKaonTOPId, "kaon identification probability from TOP");
+    REGISTER_VARIABLE("prid_TOP", particleProtonTOPId, "proton identification probability from TOP");
+
+    REGISTER_VARIABLE("eid_ARICH", particleElectronARICHId, "electron identification probability from ARICH");
+    REGISTER_VARIABLE("muid_ARICH", particleMuonARICHId, "muon identification probability from ARICH");
+    REGISTER_VARIABLE("piid_ARICH", particlePionARICHId, "pion identification probability from ARICH");
+    REGISTER_VARIABLE("Kid_ARICH", particleKaonARICHId, "kaon identification probability from ARICH");
+    REGISTER_VARIABLE("prid_ARICH", particleProtonARICHId, "proton identification probability from ARICH");
+
     REGISTER_VARIABLE("chiProb", particlePvalue, "chi^2 probability of the fit");
     REGISTER_VARIABLE("nDaughters", particleNDaughters, "number of daughter particles");
     REGISTER_VARIABLE("flavor", particleFlavorType, "flavor type of decay (0=unflavored, 1=flavored)");
+    REGISTER_VARIABLE("sumChildProb", sumChildProb, "sum of signal probabilities of childs");
+    REGISTER_VARIABLE("prodChildProb", prodChildProb, "product of signal probabilities of childs");
+    REGISTER_VARIABLE("truth", truth, "Truth, 1.0 if MCParticle PDG matches assigned Particle PDG");
 
   }
 }

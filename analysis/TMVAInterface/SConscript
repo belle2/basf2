@@ -1,0 +1,12 @@
+Import('env')
+
+env['LIBS'] = ['framework', 'analysis_dataobjects', 'reconstruction_dataobjects',
+               '$ROOT_LIBS']
+
+env.Append(LIBPATH = ['/usr/users/phit/neurobayes/lib/'])
+env.Append(CPPPATH = ['/usr/users/phit/neurobayes/include/'])
+env.Append(LIBS = ['NeuroBayesExpertCPP'])
+env.Append(LIBS = ['NeuroBayesTeacherCPP'])
+env.Append(LIBS = ['TMVA','MLP','XMLIO'])
+
+Return('env')

@@ -3,6 +3,7 @@
 #include <string>
 #include <map>
 #include <vector>
+#include <functional>
 
 namespace Belle2 {
   class Particle;
@@ -35,7 +36,8 @@ namespace Belle2 {
   class VariableManager {
   public:
     /** functions stored take a const Particle* and return double. */
-    typedef double(*FunctionPtr)(const Particle*);
+    typedef std::function<double(const Particle*)> FunctionPtr;
+    //typedef double(*FunctionPtr)(const Particle*);
 
     /** Struct containing the function used for calculation and the description. */
     struct Var {
@@ -62,6 +64,8 @@ namespace Belle2 {
 
     /** Register a variable. */
     void registerVariable(const std::string& name, VariableManager::FunctionPtr f, const std::string& description);
+    void registerParticleInfoVariable(const std::string& name, const std::string& description, bool allowMultipleRegistrations = false);
+
 
   private:
     VariableManager() {};

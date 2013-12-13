@@ -72,13 +72,18 @@ namespace Belle2 {
   class ProcessSubmitter {
 
   public:
-    ProcessSubmitter(ProcessController* con) : _con(con) {}
+    ProcessSubmitter(ProcessController* con, int iopipe[2])
+      : _con(con) {
+      _iopipe[0] = iopipe[0];
+      _iopipe[1] = iopipe[1];
+    }
 
   public:
     void run();
 
   private:
     ProcessController* _con;
+    int _iopipe[2];
 
   };
 

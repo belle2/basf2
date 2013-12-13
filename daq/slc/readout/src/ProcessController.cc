@@ -2,6 +2,7 @@
 
 #include "daq/slc/readout/ProcessLogListener.h"
 #include "daq/slc/readout/ProcessListener.h"
+#include "daq/slc/readout/StdOutListener.h"
 
 #include "daq/slc/system/Executor.h"
 
@@ -9,6 +10,8 @@
 #include <daq/slc/base/Debugger.h>
 
 #include <cstdlib>
+#include <cstdio>
+#include <unistd.h>
 
 using namespace Belle2;
 
@@ -36,7 +39,15 @@ bool ProcessController::load(int timeout)
   if (_name.size() == 0) {
     _name = _callback->getNode()->getName();
   }
-  _fork = Fork(new ProcessSubmitter(this));
+  int iopipe[2];
+  /*
+  if (pipe(iopipe) < 0) {
+    perror("pipe");
+  }
+  PThread(new StdOutListener(this, iopipe));
+  */
+  _fork = Fork(new ProcessSubmitter(this, iopipe));
+  //close(iopipe[1]);
   _thread = PThread(new ProcessListener(this));
   _cond.wait(_mutex, timeout);
   if (_state != State::READY_S) {
@@ -99,8 +110,12 @@ bool ProcessController::abort()
 
 void ProcessSubmitter::run()
 {
-  //close(1);
-  //close(2);
+  /*
+  dup2(_iopipe[1], 1);
+  close(1);
+  close(2);
+  close(_iopipe[0]);
+  */
   Executor executor;
   if (_con->getExecutable().size() == 0) {
     _con->setExecutable("basf2");

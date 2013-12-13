@@ -28,6 +28,10 @@ namespace Belle2 {
     bool reportError(const std::string message);
     bool reportFatal(const std::string message);
     bool create();
+    bool open(const std::string& nodename, int nodeid) {
+      setNode(nodename, nodeid);
+      return open();
+    }
     bool open();
     bool close();
     bool unlink();

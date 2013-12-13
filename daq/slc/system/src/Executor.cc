@@ -5,6 +5,7 @@
 #include <iostream>
 #include <cstdarg>
 #include <cstdio>
+#include <cstring>
 #include <unistd.h>
 
 using namespace Belle2;
@@ -42,13 +43,14 @@ void Executor::addArg(const std::string& arg)
 bool Executor::execute()
 {
   char* argv[30];
-  std::cout << "" << _path.c_str() << " ";
+  argv[0] = (char*)_path.c_str();
+  std::cout << "" << argv[0] << " ";
   for (size_t i = 0; i < _arg_v.size(); i++) {
-    argv[i] = (char*)_arg_v[i].c_str();
-    std::cout << "" << argv[i] << " ";
+    argv[i + 1] = (char*)_arg_v[i].c_str();
+    std::cout << "" << argv[i + 1] << " ";
   }
   std::cout << std::endl;
-  argv[_arg_v.size()] = NULL;
+  argv[_arg_v.size() + 1] = NULL;
   if (execvp(_path.c_str(), argv) == -1) {
     Belle2::debug("Faield to start receiver basf2 script");
     return false;

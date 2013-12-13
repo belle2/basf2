@@ -25,24 +25,30 @@ set_log_level(LogLevel.ERROR)
 
 # input
 input = register_module('DeSerializerFILE')
-#input.param('inputFileName', 'cdc_10kHz_newFEEformat_131206.dat')
-input.param('inputFileName', 'RUN20131206170859.dat')
+# input.param('inputFileName', 'cdc_10kHz_newFEEformat_131206.dat')
+# input.param('inputFileName', 'RUN20131206170859.dat')
+input.param('inputFileName',
+            '/home/usr/yamadas/work/svddummy/RUN19880101061243_wAPVheaderdetection.dat'
+            )
+# input.param('inputFileName', '/home/usr/yamadas/work/svddummy/RUN19880101060100_woAPVheaderdetection.dat')
+# input.param('inputFileName', '/home/usr/yamadas/work/svddummy/RUN19880101143745_transparent.dat')
+
+input.param('inputRepetitionTimes', 0)
 
 # output
-#output = register_module('PrintDataTemplate')
-#output = register_module('Root2Binary')
+# output = register_module('PrintDataTemplate')
+# output = register_module('Root2Binary')
 
 # dump
 dump = register_module('RootOutput')
 dump.param('outputFileName', 'temp.root')
-
 
 # Create main path
 main = create_path()
 
 # Add modules to main path
 main.add_module(input)
-#main.add_module(output)
+# main.add_module(output)
 main.add_module(dump)
 
 # Process all events

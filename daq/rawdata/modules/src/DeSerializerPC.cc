@@ -424,7 +424,7 @@ void DeSerializerPCModule::event()
 #endif
 
     // Dump binary data
-#ifdef DEBUG
+    //#ifdef DEBUG
     printf("********* checksum 0x%.8x : %d\n" , CalcSimpleChecksum(temp_buf, total_buf_nwords - 2), total_buf_nwords);
     printf("\n%.8d : ", 0);
     for (int i = 0; i < total_buf_nwords; i++) {
@@ -435,7 +435,7 @@ void DeSerializerPCModule::event()
     }
     printf("\n");
     printf("\n");
-#endif
+    //#endif
 
 
 #ifdef TIME_MONITOR

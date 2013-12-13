@@ -13,7 +13,7 @@
 //#define DUMMY
 //#define MAXEVTSIZE 400000000
 //#define TIME_MONITOR
-//#define NO_DATA_CHECK
+#define NO_DATA_CHECK
 #define WO_FIRST_EVENUM_CHECK
 
 
@@ -242,7 +242,7 @@ void DeSerializerCOPPERModule::FillNewRawCOPPERHeader(RawCOPPER* raw_copper)
   if (m_prev_ftsweve32 + 1 != cur_ftsw_eve32) {
 #endif
     char err_buf[500];
-    sprintf(err_buf, "Invalid event_number. Exiting...: cur 32bit eve %u preveve %u\n",  cur_ftsw_eve32, m_prev_ftsweve32);
+    sprintf(err_buf, "Invalid event_number. Exiting...: cur 32bit eve %x preveve %x\n",  cur_ftsw_eve32, m_prev_ftsweve32);
     print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
 
     printf("i= %d : num entries %d : Tot words %d\n", 0 , raw_copper->GetNumEntries(), raw_copper->TotalBufNwords());

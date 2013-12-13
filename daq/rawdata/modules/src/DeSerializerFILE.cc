@@ -10,7 +10,8 @@
 using namespace std;
 using namespace Belle2;
 
-
+#define NO_DATA_CHECK
+#define WO_FIRST_EVENUM_CHECK
 
 //-----------------------------------------------------------------
 //                 Register the Module
@@ -28,8 +29,9 @@ DeSerializerFILEModule::DeSerializerFILEModule() : DeSerializerCOPPERModule()
 
   //  setPropertyFlags(c_Input | c_ParallelProcessingCertified);
   //  addParam("FinesseBitFlag", finesse_bit_flag, "finnese (A,B,C,D) -> bit (0,1,2,3)", 15);
-
   addParam("inputFileName", m_fname_in, "Input binary filename", string(""));
+  addParam("inputRepetitionTimes", m_repetition_max,
+           "Input repetition times to read the input file", 0);
 
   //Parameter definition
   B2INFO("DeSerializerFILE: Constructor done.");
@@ -41,9 +43,8 @@ DeSerializerFILEModule::~DeSerializerFILEModule()
 {
 }
 
-void DeSerializerFILEModule::initialize()
+void DeSerializerFILEModule::FileOpen()
 {
-  B2INFO("DeSerializerFILE: initialize() started.");
   m_fp_in = fopen(m_fname_in.c_str(), "r");
   if (!m_fp_in) {
     char    err_buf[500];
@@ -52,7 +53,13 @@ void DeSerializerFILEModule::initialize()
     print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     exit(-1);
   }
+  return;
+}
 
+void DeSerializerFILEModule::initialize()
+{
+  B2INFO("DeSerializerFILE: initialize() started.");
+  FileOpen();
   // Open message handler
   m_msghandler = new MsgHandler(m_compressionLevel);
 
@@ -76,7 +83,9 @@ void DeSerializerFILEModule::initialize()
   StoreArray<RawECL>::registerPersistent();
   StoreArray<RawKLM>::registerPersistent();
 
+  m_start_flag = 0;
 
+  m_repetition_cnt = 0;
   B2INFO("DeSerializerFILE: initialize() done.");
 
 }
@@ -96,12 +105,22 @@ int* DeSerializerFILEModule::ReadOneDataBlock(int* malloc_flag, int* size_word, 
 
   int read_size = 0;
   //  if( read_size = fread( (char*)(&temp_size_word), bytes_to_read, 1, m_fp_in ) < 0 ) {
-  if ((read_size = fread((char*)(&temp_size_word), 1, bytes_to_read, m_fp_in)) != bytes_to_read) {
-    if (feof(m_fp_in)) {
-      return 0x0;
+  while (true) {
+    if ((read_size = fread((char*)(&temp_size_word), 1, bytes_to_read, m_fp_in)) != bytes_to_read) {
+      if (feof(m_fp_in)) {
+        if (m_repetition_max > m_repetition_cnt) {
+          m_repetition_cnt++;
+          fclose(m_fp_in);
+          FileOpen();
+          continue;
+        } else {
+          return 0x0;
+        }
+      }
+      char err_buf[100] = "Failed to read header"; print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      exit(-1);
     }
-    char err_buf[100] = "Failed to read header"; print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-    exit(-1);
+    break;
   }
   recvd_byte += read_size;
 
@@ -173,13 +192,77 @@ int* DeSerializerFILEModule::ReadfromFILE(FILE* fp_in, const int size_word, cons
 
 
 
+int* DeSerializerFILEModule::Modify131213SVDdata(int* buf_in, int buf_in_nwords, int* malloc_flag, unsigned int evenum)
+{
+
+
+
+  // prepare buffer
+  int* buf_out = new int[ buf_in_nwords + 1 ];
+  *malloc_flag = 1;
+  memset(buf_out, 0, sizeof(int) * (buf_in_nwords + 1));
+
+
+  // Copy other part of data
+  int b2lhslb_header_nwords_131213 = 1;
+  int b2lfee_header_nwords_131213 = 4;
+  int offset_in = RawHeader::RAWHEADER_NWORDS + RawCOPPER::SIZE_COPPER_HEADER +
+                  b2lhslb_header_nwords_131213 + b2lfee_header_nwords_131213;
+  int offset_out = RawHeader::RAWHEADER_NWORDS + RawCOPPER::SIZE_COPPER_HEADER +
+                   RawCOPPER::SIZE_B2LHSLB_HEADER + RawCOPPER::SIZE_B2LFEE_HEADER;
+
+
+  memcpy(buf_out, buf_in, (offset_in - b2lfee_header_nwords_131213)* sizeof(int));
+  memcpy(buf_out + offset_out , buf_in + offset_in,
+         (buf_in_nwords - offset_in) * sizeof(int));
+  int* b2lfee_buf_in = &(buf_in[ offset_in - b2lfee_header_nwords_131213 ]);
+  int* b2lfee_buf_out = &(buf_out[ offset_out - RawCOPPER::SIZE_B2LFEE_HEADER ]);
+
+
+  // Fill B2LFEE header part
+  if (evenum == 0) {
+    b2lfee_buf_out[ 0 ] = (b2lfee_buf_in[ 3 ] & 0x7ffffff0) | 0x0000000f;   // ctime & trgtype
+  } else {
+    b2lfee_buf_out[ 0 ] = b2lfee_buf_in[ 3 ] & 0x7ffffff0; // ctime & trgtype
+  }
+  b2lfee_buf_out[ 1 ] = evenum; // b2lfee_buf_in[ 0 ]; // event #
+  b2lfee_buf_out[ 2 ] = b2lfee_buf_in[ 1 ]; // TT-utime
+  b2lfee_buf_out[ 3 ] = b2lfee_buf_in[ 2 ]; // TT-exprun
+  b2lfee_buf_out[ 4 ] = b2lfee_buf_in[ 3 ] & 0x7ffffff0; // B2Lctime & debugflag
+
+
+  // Event # Modification in SVD data
+  RawCOPPER temp_rawcopper;
+  int num_nodes = 1;
+  int num_events = 1;
+  temp_rawcopper.SetBuffer(buf_out, buf_in_nwords + 1, 0, num_events, num_nodes);
+
+  for (int i = 0 ; i < 4; i++) {
+    if (temp_rawcopper.GetFINESSENwords(0, i) > 0) {
+      int* temp_buf = temp_rawcopper.GetDetectorBuffer(0, i);
+      if (temp_buf[ 0 ] != 0xffaa0000) {
+        char    err_buf[500];
+        sprintf(err_buf, "Invalid SVN header magic word %x : Exiting...\n",
+                temp_buf[0]);
+        print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+        exit(-1);
+      }
+      temp_buf[ 1 ] = (((evenum) << 8) & 0xFFFFFF00) | (0x000000FF & temp_buf[ 1 ]);
+    }
+  }
+  return buf_out;
+}
+
 
 
 void DeSerializerFILEModule::event()
 {
 
+  if (m_start_flag == 0) {
+    m_start_flag = 1;
+    m_dummy_evenum = 0;
+  }
 
-  printf("n %d\n", n_basf2evt);
   if (n_basf2evt < 0) {
     B2INFO("DeSerializerFILE: event() started.");
     m_start_time = GetTimeSec();
@@ -212,17 +295,36 @@ void DeSerializerFILEModule::event()
     } else {
       int data_type;
       temp_buf = ReadOneDataBlock(&malloc_flag, &size_word, &data_type);
+
+
       if (temp_buf == 0x0) { // End of File
         printf("End of file\n");
         eof_flag = 1;
         break;
       }
+
+      //
+      // To make a RawSVD dummy file from data sent by Nakamura-san on Dec. 13, 2013
+      //
+      {
+        int* temp_temp_buf = Modify131213SVDdata(temp_buf, size_word, &malloc_flag, m_dummy_evenum);
+        delete temp_buf;
+        temp_buf = temp_temp_buf;
+        m_dummy_evenum++;
+      }
+
       if (data_type == COPPER_DATABLOCK) {
         RawCOPPER temp_rawcopper;
         int num_nodes = 1;
         int num_events = 1;
         temp_rawcopper.SetBuffer(temp_buf, size_word, 0, num_events, num_nodes);
-        temp_rawcopper.GetB2LFEE32bitEventNumber(0);
+
+//  for (int j = 0; j < temp_rawcopper.TotalBufNwords(); j++) {
+//    printf("0x%.8x ", (temp_rawcopper.GetBuffer(0))[ j ]);
+//    if ((j % 10) == 9)printf("\n");
+//    fflush(stdout);
+//  }
+//        temp_rawcopper.GetB2LFEE32bitEventNumber(0);
         FillNewRawCOPPERHeader(&temp_rawcopper);
       }
     }
@@ -270,8 +372,8 @@ void DeSerializerFILEModule::event()
       //  StoreArray<RawCDC> ary;
       //  (ary.appendNew())->SetBuffer(temp_buf, size_word, 1, 1, 1);
       //       } else if (subsysid == SVD_ID) {
-      //  StoreArray<RawSVD> ary;
-      //  (ary.appendNew())->SetBuffer(temp_buf, size_word, 1, 1, 1);
+      StoreArray<RawSVD> ary;
+      (ary.appendNew())->SetBuffer(temp_buf, size_word, 1, 1, 1);
       //       } else if (subsysid == ECL_ID) {
       //  StoreArray<RawECL> ary;
       //  (ary.appendNew())->SetBuffer(temp_buf, size_word, 1, 1, 1);
@@ -285,8 +387,8 @@ void DeSerializerFILEModule::event()
       //  StoreArray<RawKLM> ary;
       //  (ary.appendNew())->SetBuffer(temp_buf, size_word, 1, 1, 1);
       //       } else {
-      StoreArray<RawCOPPER> ary;
-      (ary.appendNew())->SetBuffer(temp_buf, size_word, 1, 1, 1);
+//       StoreArray<RawCOPPER> ary;
+//       (ary.appendNew())->SetBuffer(temp_buf, size_word, 1, 1, 1);
       //      }
 
 

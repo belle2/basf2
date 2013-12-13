@@ -41,11 +41,17 @@ namespace Belle2 {
     //! Module functions to be called from event process
     virtual void event();
 
+    //! open a file
+    virtual void FileOpen();
+
     //! receive data
     virtual int* ReadOneDataBlock(int* malloc_flag, int* m_size_word, int* data_type);
 
     //! read data from file
     virtual int* ReadfromFILE(FILE* fp_in, const int size_word, const int start_word, const int stop_word);
+
+    //! read data from file
+    virtual int* Modify131213SVDdata(int* buf_in, int buf_in_nwords, int* malloc_flag, unsigned int evenum);
 
 
 
@@ -77,6 +83,18 @@ namespace Belle2 {
 
     //!
     ErrorMessage print_err;
+
+    //!
+    int m_start_flag;
+
+    //!
+    int m_dummy_evenum;
+
+    //!
+    int m_repetition_max;
+
+    //!
+    int m_repetition_cnt;
 
     //!
     std::string m_fname_in;

@@ -15,6 +15,7 @@ public class RCCommand extends RCEnum {
 	final static public RCCommand STOP = new RCCommand(104, "STOP", "STOP");
 	final static public RCCommand RESUME = new RCCommand(105, "RESUMEN", "RESUME");
 	final static public RCCommand PAUSE = new RCCommand(106, "PAUSE", "PAUSE");
+	final static public RCCommand RECOVER = new RCCommand(108, "RECOVER", "RECOVER");
 	final static public RCCommand ABORT = new RCCommand(107, "ABORT", "ABORT");
 	final static public RCCommand STATECHECK = new RCCommand(201, "STATECHECK", "STATECHECK");
 	final static public RCCommand STATE = new RCCommand(202, "STATE", "STATE");
@@ -47,6 +48,7 @@ public class RCCommand extends RCEnum {
 		else if (msg.equals(STOP.getLabel())) copy(STOP);
 		else if (msg.equals(RESUME.getLabel())) copy(RESUME);
 		else if (msg.equals(PAUSE.getLabel())) copy(PAUSE);
+		else if (msg.equals(RECOVER.getLabel())) copy(RECOVER);
 		else if (msg.equals(ABORT.getLabel())) copy(ABORT);
 		else if (msg.equals(STATECHECK.getLabel())) copy(STATECHECK);
 		else if (msg.equals(STATE.getLabel())) copy(STATE);
@@ -81,7 +83,7 @@ public class RCCommand extends RCEnum {
 		} else if (equals(RESUME) && state.equals(RCState.PAUSED_S)) {
 			return SUGGESTED;
 		} else if (equals(STATECHECK) || equals(STATE) || equals(OK) || 
-				equals(TRGIFT) || equals(ERROR) || equals(ABORT) || 
+				equals(TRGIFT) || equals(ERROR) || equals(ABORT) || equals(RECOVER) ||
 				equals(DATA) || equals(SAVE) || equals(RECALL) || 
 				equals(ACTIVATE) || equals(INACTIVATE) ) {
 			return ENABLED;
@@ -97,6 +99,20 @@ public class RCCommand extends RCEnum {
 		else if (equals(STOP)) return RCState.READY_S;
 		else if (equals(RESUME)) return RCState.RUNNING_S;
 		else if (equals(PAUSE)) return RCState.PAUSED_S;
+		else if (equals(RECOVER)) return RCState.READY_S;
+		else if (equals(ABORT)) return RCState.INITIAL_S;
+		else return RCState.UNKNOWN;
+	}
+
+	public RCState nextTState() {
+		if (equals(BOOT)) return RCState.BOOTING_TS;
+		else if (equals(LOAD)) return RCState.LOADING_TS;
+		else if (equals(START)) return RCState.STARTING_TS;
+		else if (equals(STOP)) return RCState.STOPPING_TS;
+		else if (equals(RESUME)) return RCState.RUNNING_S;
+		else if (equals(PAUSE)) return RCState.PAUSED_S;
+		else if (equals(RECOVER)) return RCState.RECOVERING_RS;
+		else if (equals(ABORT)) return RCState.ABORTING_RS;
 		else return RCState.UNKNOWN;
 	}
 
@@ -110,6 +126,7 @@ public class RCCommand extends RCEnum {
 		else if (id == STOP.getId()) copy(STOP);
 		else if (id == RESUME.getId()) copy(RESUME);
 		else if (id == PAUSE.getId()) copy(PAUSE);
+		else if (id == RECOVER.getId()) copy(RECOVER);
 		else if (id == ABORT.getId()) copy(ABORT);
 		else if (id == STATECHECK.getId()) copy(STATECHECK);
 		else if (id == STATE.getId()) copy(STATE);

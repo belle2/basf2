@@ -167,12 +167,12 @@ public class SystemButtonPanel extends JPanel implements Updatable {
 		_button_load.setText(_load_command.getAlias());
 		_button_start.setText(_start_command.getAlias());
 		_button_recover.setText(_recover_command.getAlias());
-		_button_boot.setEnabled(_master.getConfig().getConfigNumber() >= 0 && 
+		_button_boot.setEnabled(//_master.getConfig().getConfigNumber() >= 0 && 
 				_boot_command.available(state)>=RCCommand.ENABLED);
-		_button_load.setEnabled(_master.getConfig().getConfigNumber() >= 0 && 
+		_button_load.setEnabled(//_master.getConfig().getConfigNumber() >= 0 && 
 					_load_command.available(state)>=RCCommand.ENABLED);
-		_button_start.setEnabled((_master.getConfig().getConfigNumber() >= 0 || 
-					_start_command.equals(RCCommand.STOP) ) && 
+		_button_start.setEnabled(/*(_master.getConfig().getConfigNumber() >= 0 || 
+					_start_command.equals(RCCommand.STOP) ) &&*/ 
 					_start_command.available(state)>=RCCommand.ENABLED);
 		_button_recover.setEnabled(_recover_command.available(state)>=RCCommand.ENABLED);
 	}

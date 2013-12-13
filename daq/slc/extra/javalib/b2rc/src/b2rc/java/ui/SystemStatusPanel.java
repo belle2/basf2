@@ -170,7 +170,7 @@ public class SystemStatusPanel extends JPanel implements Updatable {
 			DataObject data = node.getData();
 			if ( data != null && data.getObject("ftsw") != null ) {
 				DataObject ftsw = data.getObject("ftsw");
-				setTriggerType(ftsw.getInt("trigger_mode"));
+				setTriggerType(ftsw.getInt("trigger_type"));
 				setDummyRate(ftsw.getInt("dummy_rate"));
 				setTriggerLimit(ftsw.getInt("trigger_limit"));
 			}

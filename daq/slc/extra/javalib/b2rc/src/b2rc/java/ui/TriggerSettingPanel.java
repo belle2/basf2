@@ -108,7 +108,7 @@ public class TriggerSettingPanel extends JPanel {
 					value_v[4] = 0;
 					String data = node.getName();
 					if (node.getData().getObject("ftsw")!= null) {
-						node.getData().getObject("ftsw").setInt("trigger_mode", value_v[0]);
+						node.getData().getObject("ftsw").setInt("trigger_type", value_v[0]);
 						node.getData().getObject("ftsw").setInt("dummy_rate", value_v[1]);
 						node.getData().getObject("ftsw").setInt("trigger_limit", value_v[2]);
 					}

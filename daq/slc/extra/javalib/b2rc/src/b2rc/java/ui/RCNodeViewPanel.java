@@ -59,28 +59,46 @@ public class RCNodeViewPanel extends JPanel implements Updatable {
 					JPopupMenu popup_menu = new JPopupMenu();
 					ArrayList<RCCommand> command_v = new ArrayList<RCCommand>();
 					if (_node.getState().equals(RCState.INITIAL_S)) {
-						if (_node.isUsed()) command_v.add(RCCommand.INACTIVATE);
-						else command_v.add(RCCommand.ACTIVATE);
-						command_v.add(RCCommand.BOOT);
+						if (_node.isUsed()) {
+							command_v.add(RCCommand.INACTIVATE);
+							command_v.add(RCCommand.BOOT);
+						} else {
+							command_v.add(RCCommand.ACTIVATE);
+						}
 					} else if (_node.getState().equals(RCState.CONFIGURED_S)) {
-						if (_node.isUsed()) command_v.add(RCCommand.INACTIVATE);
-						else command_v.add(RCCommand.ACTIVATE);
-						command_v.add(RCCommand.BOOT);
-						command_v.add(RCCommand.LOAD);
+						if (_node.isUsed()) {
+							command_v.add(RCCommand.INACTIVATE);
+							command_v.add(RCCommand.BOOT);
+							command_v.add(RCCommand.LOAD);
+						} else {
+							command_v.add(RCCommand.ACTIVATE);
+						}
 					} else if (_node.getState().equals(RCState.READY_S)) {
-						if (_node.isUsed()) command_v.add(RCCommand.INACTIVATE);
-						else command_v.add(RCCommand.ACTIVATE);
-						command_v.add(RCCommand.BOOT);
-						command_v.add(RCCommand.LOAD);
-						command_v.add(RCCommand.START);
-						command_v.add(RCCommand.TRGIFT);
+						if (_node.isUsed()) {
+							command_v.add(RCCommand.INACTIVATE);
+							command_v.add(RCCommand.BOOT);
+							command_v.add(RCCommand.LOAD);
+							command_v.add(RCCommand.START);
+							if ( _node.getData() != null &&
+								 _node.getData().getObject("ftsw") != null)
+							command_v.add(RCCommand.TRGIFT);
+						} else {
+							command_v.add(RCCommand.ACTIVATE);
+						}
 					} else if (_node.getState().equals(RCState.RUNNING_S)) {
-						command_v.add(RCCommand.STOP);
-						command_v.add(RCCommand.PAUSE);
-						command_v.add(RCCommand.ABORT);
+						if (_node.isUsed()) {
+							command_v.add(RCCommand.STOP);
+							command_v.add(RCCommand.PAUSE);
+							command_v.add(RCCommand.ABORT);
+						}
 					} else if (_node.getState().equals(RCState.PAUSED_S)) {
-						command_v.add(RCCommand.STOP);
-						command_v.add(RCCommand.RESUME);
+						if (_node.isUsed()) {
+							command_v.add(RCCommand.STOP);
+							command_v.add(RCCommand.RESUME);
+						}
+					}
+					if (_node.isUsed()) {
+						command_v.add(RCCommand.RECOVER);
 						command_v.add(RCCommand.ABORT);
 					}
 					JMenu menu = new JMenu("Command");

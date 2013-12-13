@@ -43,7 +43,6 @@ public class RCServerCommunicator {
 		RunControlMessage msg = new RunControlMessage();
 		_master.getNode().setConnection(RCConnection.ONLINE);
 		_master.getNode().setState(RCState.UNKNOWN);
-		//_socket_writer.writeObject(new RunControlMessage(RCCommand.STATECHECK, -1));
 		while (true) {
 			msg.getCommand().copy(_socket_reader.readInt());
  			RCCommand cmd = msg.getCommand();
@@ -63,7 +62,22 @@ public class RCServerCommunicator {
  				} else {
  					_master.getData().getObject(name).readObject(_socket_reader);
  				}
- 			} else if ( cmd.equal(RCCommand.ERROR) ) {
+ 			} else if (cmd.equal(RCCommand.ERROR) ) {
+				String name = _socket_reader.readString();
+				RCNode node = null;
+				if ( name.matches(_master.getNode().getName()) ) {
+					node = _master.getNode();
+				} else {
+					node = _master.getNodeByName(name);
+				}
+				_socket_reader.readObject(msg);
+				_master.getStatus().update();
+				RCState state = node.getState();
+				state.copy(RCState.ERROR_ES);
+				_main_panel.addLog(new Log(node.getName() +
+						" got <span style='font-weight:bold;'>ERROR</span><br />"+
+						msg.getData(), LogLevel.ERROR));
+				_main_panel.update();
 			} else if (cmd.equal(RCCommand.STATE)) {
 				String name = _socket_reader.readString();
 				RCNode node = null;
@@ -81,8 +95,8 @@ public class RCServerCommunicator {
 				_main_panel.update();
 				if (!state.equals(state_org) && _main_panel != null) {
 					if ( state.isError() ) {
-						_main_panel.addLog(new Log("Run Control got <span style='font-weight:bold;'>ERROR</span>",
-								LogLevel.ERROR));
+						_main_panel.addLog(new Log("Run Control got <span style='font-weight:bold;'>ERROR</span><br />"+
+								msg.getData(), LogLevel.ERROR));
 					} else {
 						_main_panel.addLog(new Log("Run control is on "
 								+ "<span style='color:blue;font-weight:bold;'>"

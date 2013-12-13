@@ -511,7 +511,6 @@ int* RawCOPPER::GetExpRunBuf(int n)
 unsigned int RawCOPPER::GetB2LFEE32bitEventNumber(int n)
 {
   ErrorMessage print_err;
-
 #ifndef READ_OLD_B2LFEE_FORMAT_FILE
 
   int err_flag = 0;

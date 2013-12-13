@@ -11,6 +11,7 @@ def get_terminal_width():
     """
     Returns width of terminal in characters, or 80 if unknown.
     """
+
     try:
         pipe = Popen('stty size', shell=True, stdout=PIPE, stderr=PIPE)
         return int(pipe.stdout.read().split()[1])
@@ -34,17 +35,17 @@ def pretty_print_table(table, column_widths, first_row_is_heading=True):
                           as table header and offset it a bit
     """
 
-    #figure out how much space we need for each column (without separators)
+    # figure out how much space we need for each column (without separators)
     act_column_widths = [len(cell) for cell in table[0]]
     for row in table:
-        for col, cell in enumerate(row):
+        for (col, cell) in enumerate(row):
             act_column_widths[col] = max(len(str(cell)),
                     act_column_widths[col])
 
-    #adjust act_column_widths to comply with user-specified widths
+    # adjust act_column_widths to comply with user-specified widths
     total_used_width = 0
     long_column = -1  # index of * column, if found
-    for col, opt in enumerate(column_widths):
+    for (col, opt) in enumerate(column_widths):
         if opt == '*':
             if long_column >= 0:
                 print 'column_widths option "*" can only be used once!'
@@ -73,8 +74,8 @@ def pretty_print_table(table, column_widths, first_row_is_heading=True):
         remaining_space = max(term_width - total_used_width, 10)
         act_column_widths[long_column] = remaining_space
 
-    format_string = ' '.join(['%%-%ss' % length
-            for length in act_column_widths[:-1]])
+    format_string = ' '.join(['%%-%ss' % length for length in
+                             act_column_widths[:-1]])
     # don't print extra spaces at end of each line
     format_string += ' %s'
 
@@ -85,11 +86,11 @@ def pretty_print_table(table, column_widths, first_row_is_heading=True):
     header_shown = False
     for row in table:
         # use automatic word wrapping on module description (last field)
-        wrapped_row = [textwrap.wrap(str(row[i]), width)
-                for i, width in enumerate(act_column_widths)]
+        wrapped_row = [textwrap.wrap(str(row[i]), width) for (i, width) in
+                       enumerate(act_column_widths)]
         max_lines = max([len(col) for col in wrapped_row])
         for line in xrange(max_lines):
-            for i, cell in enumerate(row):
+            for (i, cell) in enumerate(row):
                 if line < len(wrapped_row[i]):
                     row[i] = wrapped_row[i][line]
                 else:
@@ -150,7 +151,7 @@ def nprocess(nproc):
     fw.set_nprocess(nproc)
 
 
-def print_all_modules(moduleList, package=""):
+def print_all_modules(moduleList, package=''):
     """
     Loop over the list of available modules,
     register them and print their information
@@ -162,12 +163,12 @@ def print_all_modules(moduleList, package=""):
     for (moduleName, sharedLib) in sorted(moduleList.iteritems()):
         try:
             current_module = register_module(moduleName)
-            if package == "" or current_module.package() == package:
+            if package == '' or current_module.package() == package:
                 table.append([moduleName, current_module.description()])
         except:
             B2ERROR('The module could not be loaded. This is most likely '
                     + 'caused by a library with missing links.')
-    if package != "" and len(table) == 0:
+    if package != '' and len(table) == 0:
         B2FATAL('Print module information: No module or package named "'
                 + package + '" found!')
 
@@ -179,9 +180,9 @@ def print_all_modules(moduleList, package=""):
     print ''
     print term_width * '-'
     print ''
-    print "To show detailed information on a module, including its parameters,"
+    print 'To show detailed information on a module, including its parameters,'
     print "type \'basf2 -m ModuleName\'. Use \'basf2 -m package\' to only list"
-    print "modules belonging to a given package."
+    print 'modules belonging to a given package.'
 
 
 def print_params(module, print_values=True, shared_lib_path=None):
@@ -202,7 +203,7 @@ def print_params(module, print_values=True, shared_lib_path=None):
     if shared_lib_path is not None:
         print 'Found in:    %s' % shared_lib_path
 
-    #gather output data in table
+    # gather output data in table
     output = []
     if print_values:
         output.append([
@@ -219,10 +220,12 @@ def print_params(module, print_values=True, shared_lib_path=None):
     has_forced_params = False
     paramList = module.available_params()
     for paramItem in paramList:
-        defaultStr = ', '.join(['%s' % defaultItem for defaultItem in
-                               paramItem.default])
-        valueStr = ', '.join(['%s' % valueItem for valueItem in
-                             paramItem.values])
+        # defaultStr = ', '.join(['%s' % defaultItem for defaultItem in
+        #                       paramItem.default])
+        # valueStr = ', '.join(['%s' % valueItem for valueItem in
+        #                     paramItem.values])
+        defaultStr = str(paramItem.default)
+        valueStr = str(paramItem.values)
         forceString = ''
         if paramItem.forceInSteering:
             forceString = '*'
@@ -239,7 +242,7 @@ def print_params(module, print_values=True, shared_lib_path=None):
                 ])
         else:
             output.append([forceString + paramItem.name, paramItem.type,
-                defaultStr, paramItem.description])
+                          defaultStr, paramItem.description])
 
     column_widths = [-25] * len(output[0])
     column_widths[2] = -20  # default values
@@ -336,3 +339,5 @@ def reset_log():
     """
 
     logging.reset()
+
+

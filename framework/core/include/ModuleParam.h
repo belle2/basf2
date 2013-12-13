@@ -11,10 +11,16 @@
 #ifndef MODULEPARAM_H_
 #define MODULEPARAM_H_
 
+#include <boost/python/object.hpp>
+#include <boost/python/list.hpp>
+#include <boost/python/dict.hpp>
+#include <boost/python/extract.hpp>
+
 #include <boost/shared_ptr.hpp>
 
+#include <framework/core/PyObjConvUtils.h>
+
 #include <string>
-#include <typeinfo>
 
 namespace Belle2 {
 
@@ -75,6 +81,26 @@ namespace Belle2 {
      */
     bool isForcedInSteering() const {return m_forceInSteering; }
 
+    /**
+     * Pure virtual function.
+     * Set the value of the parameter from a python object. The derived templated ModuleParam class
+     * calls the converter functions in PyObjConvUtils.h with the right template arguments.
+     * Hence the compiler can automatically infer the right converter.
+     *
+     * @param pyObject The python object which holds the parameter value
+     */
+    virtual void setValueFromPythonObject(const boost::python::object& pyObject) = 0;
+
+    /**
+     * Pure virtual function.
+     * Set the value of a python objects to stored parameter value. The derived templated ModuleParam class
+     * calls the converter functions in PyObjConvUtils.h with the right template arguments.
+     * Hence the compiler can automatically infer the right converters
+     *
+     * @param pyObject The python object which should be filled with the parameter value
+     * @param defaultValues If true, the python object is set to the default value of this parameter.
+     */
+    virtual void setValueToPythonObject(boost::python::object& pyObject, bool defaultValues = false) = 0;
 
   protected:
 
@@ -111,7 +137,7 @@ namespace Belle2 {
      * @param force If true the parameter has to be set by the user in the steering file.
      */
     ModuleParam(T& paramVariable, const std::string& description = "", bool force = false)
-      : ModuleParamBase(typeid(T).name(), description, force), m_paramVariable(paramVariable) {};
+      : ModuleParamBase(PyObjConvUtils::Type<T>::name(), description, force), m_paramVariable(paramVariable) {};
 
     /**
      * Destructor.
@@ -154,6 +180,25 @@ namespace Belle2 {
     T& getDefaultValue() {return m_defaultValue; }
 
     /**
+     * Implements a method for setting boost::python objects.
+     *
+     * The method supports the following types: list, dict, int, double, string, bool
+     * The conversion of the python object to the C++ type and the final storage of the
+     * parameter value is done by PyObjConvUtils::convertPythonObject.
+     *
+     * @param pyObject The object which should be converted and stored as the parameter value.
+     */
+    virtual void setValueFromPythonObject(const boost::python::object& pyObject) { setValue(PyObjConvUtils::convertPythonObject(pyObject, getDefaultValue())); }
+
+    /**
+     * Returns a python object containing the value or the default value of the given parameter.
+     *
+     * @param pyObject Reference to the python object which is set to the parameter value.
+     * @param defaultValues If true returns default value otherwise parameter value.
+     */
+    virtual void setValueToPythonObject(boost::python::object& pyObject, bool defaultValues = false) { pyObject = PyObjConvUtils::convertToPythonObject((defaultValues) ? getDefaultValue() : getValue()); }
+
+    /**
      * Resets the parameter value by assigning the default value to the parameter value.
      */
     void resetValue() {
@@ -180,5 +225,6 @@ namespace Belle2 {
 
 
 } //end of Belle2 namespace
+
 
 #endif /* MODULEPARAM_H_ */

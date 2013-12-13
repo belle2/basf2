@@ -146,30 +146,20 @@ void Module::setReturnValue(bool value)
 }
 
 
-void Module::setParamObject(const std::string& name, const boost::python::object& pyObj)
+void Module::setParamPython(const std::string& name, const boost::python::object& pyObj)
 {
   LogSystem& logSystem = LogSystem::Instance();
   logSystem.setModuleLogConfig(&(getLogConfig()), getName());
 
-  m_moduleParamList.setParamObjectPython(name, pyObj);
+  m_moduleParamList.setParamPython(name, pyObj);
 
   logSystem.setModuleLogConfig(NULL);
 }
 
 
-void Module::setParamListPython(const std::string& name, const boost::python::list& pyList)
+void Module::setParamPythonDict(const boost::python::dict& dictionary)
 {
-  LogSystem& logSystem = LogSystem::Instance();
-  logSystem.setModuleLogConfig(&(getLogConfig()), getName());
 
-  m_moduleParamList.setParamListPython(name, pyList);
-
-  logSystem.setModuleLogConfig(NULL);
-}
-
-
-void Module::setParamDict(const boost::python::dict& dictionary)
-{
   LogSystem& logSystem = LogSystem::Instance();
   logSystem.setModuleLogConfig(&(getLogConfig()), getName());
 
@@ -182,14 +172,8 @@ void Module::setParamDict(const boost::python::dict& dictionary)
     boost::python::extract<std::string> keyProxy(currKey);
 
     if (keyProxy.check()) {
-      boost::python::object currValue = dictionary[currKey];
-      boost::python::extract<boost::python::list> listProxy(currValue);
-
-      if (listProxy.check()) {
-        setParamListPython(keyProxy, listProxy);
-      } else {
-        setParamObject(keyProxy, currValue);
-      }
+      const boost::python::object& currValue = dictionary[currKey];
+      setParamPython(keyProxy, currValue);
     } else {
       B2ERROR("Setting the module parameters from a python dictionary: invalid key in dictionary!");
     }
@@ -238,9 +222,8 @@ void Module::exposePythonAPI()
   .def("package", &Module::getPackage, return_value_policy<copy_const_reference>())
   .def("if_value", &Module::if_value, if_value_overloads())
   .def("if_false", &Module::if_false, if_false_overloads())
-  .def("param", &Module::setParamObject)
-  .def("param", &Module::setParamListPython)
-  .def("param", &Module::setParamDict)
+  .def("param", &Module::setParamPython)
+  .def("param", &Module::setParamPythonDict)
   .def("available_params", &_getParamInfoListPython)
   .add_property("logging",
                 make_function(&Module::getLogConfig, return_value_policy<reference_existing_object>()),

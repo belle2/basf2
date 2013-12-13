@@ -11,9 +11,9 @@
 #ifndef MODULE_H
 #define MODULE_H
 
+#include <framework/core/ModuleParamList.h>
 #include <framework/core/PathElement.h>
 #include <framework/core/CondParser.h>
-#include <framework/core/ModuleParamList.h>
 #include <framework/logging/LogConfig.h>
 
 #include <boost/shared_ptr.hpp>
@@ -454,34 +454,23 @@ namespace Belle2 {
 
     /**
      * Implements a method for setting boost::python objects.
-     * The method supports the following types: int, double, string, bool
+     * The method supports the following types: list, dict, int, double, string, bool
      * The conversion of the python object to the C++ type and the final storage of the
-     * parameter value is done by specializing the template method setParamObjectTemplate().
+     * parameter value is done in the ModuleParam class.
      *
      * @param name The unique name of the parameter.
      * @param pyObj The object which should be converted and stored as the parameter value.
      */
-    void setParamObject(const std::string& name, const boost::python::object& pyObj);
-
-    /**
-     * Implements a method for setting boost::python lists.
-     * The method supports lists of the following types: int, double, string, bool
-     * The conversion of the python list to the std::vector and the final storage of the
-     * parameter value is done by specializing the template method setParamListTemplate().
-     *
-     * @param name The unique name of the parameter.
-     * @param pyList The list which should be converted to a std::vector and stored as the parameter value.
-     */
-    void setParamListPython(const std::string& name, const boost::python::list& pyList);
+    void setParamPython(const std::string& name, const boost::python::object& pyObj);
 
     /**
      * Implements a method for reading the parameter values from a boost::python dictionary.
      * The key of the dictionary has to be the name of the parameter and the value has to
-     * be of one of the supported parameter types (both, single parameters and lists are allowed).
+     * be of one of the supported parameter types.
      *
      * @param dictionary The python dictionary from which the parameter values are read.
      */
-    void setParamDict(const boost::python::dict& dictionary);
+    void setParamPythonDict(const boost::python::dict& dictionary);
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

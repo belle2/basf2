@@ -2,7 +2,7 @@ Import('env')
 
 #2013/06/17 env['CONTINUE'] = False
 
-env['LIBS'] = ['framework', 'trg']
+env['LIBS'] = ['framework']
 #env.Append(CPPDEFINES = {'TRASAN_WINDOW_GTK':None,
 #	                 'TRASAN_WINDOW_GTK_HOUGH':None,
 #	                 'TRASAN_WINDOW_GTK_SZ':None,

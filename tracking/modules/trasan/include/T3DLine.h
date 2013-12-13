@@ -31,38 +31,30 @@
 //
 //-----------------------------------------------------------------------------
 
-#ifdef TRASAN_DEBUG_DETAIL
-#ifndef TRASAN_DEBUG
-#define TRASAN_DEBUG
-#endif
-#endif
 #ifndef T3DLine_FLAG_
 #define T3DLine_FLAG_
-#include "CLHEP/Geometry/Vector3D.h"
 
+#define HEP_SHORT_NAMES
 #define Line3D  32
 // This must be writen in TTrackBase.h
 
-
+#include "CLHEP/Geometry/Vector3D.h"
 #include <string>
-
-#define HEP_SHORT_NAMES
 #ifndef CLHEP_POINT3D_H
 #include "CLHEP/Geometry/Point3D.h"
 #endif
-
 #include "tracking/modules/trasan/THelix.h"
 #include "tracking/modules/trasan/TTrackBase.h"
 
 namespace Belle {
 
-  typedef HepGeom::Point3D<double>  Point3D;
-  class T3DLineFitter;
-  class TTrack;
-  class TLink;
+typedef HepGeom::Point3D<double> Point3D;
+class T3DLineFitter;
+class TTrack;
+class TLink;
 
 /// A class to represent a track in tracking.
-  class T3DLine : public TTrackBase {
+class T3DLine : public TTrackBase {
 
   public:
     /// Constructors
@@ -120,18 +112,25 @@ namespace Belle {
     int approach(TLink&, bool sagCorrection = true) const;
 
     /// caluculate closest points between a line and this track
-    int approach_line(const HepGeom::Point3D<double> &, const HepGeom::Vector3D<double> &,
-                      HepGeom::Point3D<double> & onLine, HepGeom::Point3D<double> & onTrack) const;
+    int approach_line(const HepGeom::Point3D<double> &,
+                      const HepGeom::Vector3D<double> &,
+                      HepGeom::Point3D<double> & onLine,
+                      HepGeom::Point3D<double> & onTrack) const;
 
     /// caluculate closest point between a point and this track
-    int approach_point(const HepGeom::Point3D<double> &, HepGeom::Point3D<double> & onTrack) const;
+    int approach_point(const HepGeom::Point3D<double> &,
+                       HepGeom::Point3D<double> & onTrack) const;
 
   public:// Modifiers
     /// set new pivot
     const HepGeom::Point3D<double>  & pivot(const HepGeom::Point3D<double> &);
 
     /// set track parameters,pivot
-    void set(const HepGeom::Point3D<double> &, double t_dr, double t_phi0, double t_dz, double t_tanl);
+    void set(const HepGeom::Point3D<double> &,
+             double t_dr,
+             double t_phi0,
+             double t_dz,
+             double t_tanl);
 
     /// set track parameters
     CLHEP::HepVector a(const CLHEP::HepVector&);
@@ -159,12 +158,15 @@ namespace Belle {
     static const T3DLineFitter _fitter;
 
     friend class T3DLineFitter;
-  };
+};
 
-  inline unsigned T3DLine::objectType(void) const
-  {
+//-----------------------------------------------------------------------------
+
+inline
+unsigned
+T3DLine::objectType(void) const {
     return Line3D;
-  }
+}
 
 } // namespace Belle
 

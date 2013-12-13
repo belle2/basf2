@@ -102,28 +102,21 @@
 #ifndef TBuilder0_FLAG_
 #define TBuilder0_FLAG_
 
-#ifdef TRASAN_DEBUG_DETAIL
-#ifndef TRASAN_DEBUG
-#define TRASAN_DEBUG
-#endif
-#endif
-
+#define HEP_SHORT_NAMES
 
 #include <string>
-
-#define HEP_SHORT_NAMES
 #include "tracking/modules/trasan/AList.h"
 #include "tracking/modules/trasan/TSelector0.h"
 #include "tracking/modules/trasan/THelixFitter.h"
 
 namespace Belle {
 
-  class TTrack;
-  class TLink;
-  class TSegment;
+class TTrack;
+class TLink;
+class TSegment;
 
 /// A class to build a track.
-  class TBuilder0 {
+class TBuilder0 {
 
   public:
     /// Constructor.
@@ -203,43 +196,27 @@ namespace Belle {
     float _stereoChisq3;
     float _stereoChisq4;
     float _stereoMaxSigma;
-  };
+};
 
 //-----------------------------------------------------------------------------
 
-#ifdef TBuilder0_NO_INLINE
-#define inline
-#else
-#undef inline
-#define TBuilder0_INLINE_DEFINE_HERE
-#endif
-
-#ifdef TBuilder0_INLINE_DEFINE_HERE
-
-  inline
-  const TSelector0&
-  TBuilder0::trackSelector(void) const
-  {
+inline
+const TSelector0&
+TBuilder0::trackSelector(void) const {
     return _trackSelector;
-  }
+}
 
-  inline
-  const std::string&
-  TBuilder0::name(void) const
-  {
+inline
+const std::string&
+TBuilder0::name(void) const {
     return _name;
-  }
+}
 
-  inline
-  int
-  TBuilder0::fit(TTrackBase& a) const
-  {
+inline
+int
+TBuilder0::fit(TTrackBase& a) const {
     return _fitter.fit(a);
-  }
-
-#endif
-
-#undef inline
+}
 
 } // namespace Belle
 

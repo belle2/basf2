@@ -18,10 +18,9 @@
 
 namespace Belle {
 
-  unsigned
-  TSvdBuilder::calTHelix3(double x, double y, double r, double q,
-                          double& dRho, double& phi0, double& kappa)
-  {
+unsigned
+TSvdBuilder::calTHelix3(double x, double y, double r, double q,
+                        double& dRho, double& phi0, double& kappa) {
     double radius = q * std::fabs(r);
     if (radius == 0.)return 0;
     kappa = 222.376063 / radius;
@@ -40,15 +39,14 @@ namespace Belle {
     if (sinPhi0 < 0.)phi0 = 2.*M_PI - phi0;
 
     return 1;
-  }
+}
 
 
-  unsigned
-  TSvdBuilder::calZTanL(double dRho, double phi0, double kappa,
-                        double& dZ, double& tanL, double& chisq,
-                        AList<TSvdHit> hits,
-                        double ipC)
-  {
+unsigned
+TSvdBuilder::calZTanL(double dRho, double phi0, double kappa,
+                      double& dZ, double& tanL, double& chisq,
+                      AList<TSvdHit> hits,
+                      double ipC) {
     double radius = 222.376063 / kappa;
     HepGeom::Point3D<double>  xt(dRho * std::cos(phi0), dRho * std::sin(phi0), 0.);
     HepGeom::Point3D<double>  xc(xt.x() + radius * std::cos(phi0), xt.y() + radius * std::sin(phi0), 0.);
@@ -57,25 +55,25 @@ namespace Belle {
     double sum = 0.;
     double sumX = 0., sumY = 0., sumX2 = 0., sumXY = 0., sumY2 = 0.;
     for (unsigned i = 0; i < (unsigned) hits.length(); ++i) {
-      HepGeom::Point3D<double>  xsvd(hits[i]->position().x(),
-                                     hits[i]->position().y(),
-                                     0.);
-      HepGeom::Point3D<double>  v1 = xsvd - xc;
-      double vCrs = v0.x() * v1.y() - v0.y() * v1.x();
-      double vDot = v0.x() * v1.x() + v0.y() * v1.y();
-      double dPhi = std::atan2(vCrs, vDot);
+        HepGeom::Point3D<double>  xsvd(hits[i]->position().x(),
+                                       hits[i]->position().y(),
+                                       0.);
+        HepGeom::Point3D<double>  v1 = xsvd - xc;
+        double vCrs = v0.x() * v1.y() - v0.y() * v1.x();
+        double vDot = v0.x() * v1.x() + v0.y() * v1.y();
+        double dPhi = std::atan2(vCrs, vDot);
 
-      double x = -radius * dPhi;
-      double y = hits[i]->position().z();
-      sumX  += x;
-      sumY  += y;
-      sumX2 += x * x;
-      sumXY += x * y;
-      sumY2 += y * y;
-      sum += 1.0;
-      /* std::cout << i << ": " << hits[i]->dssd()
-      << " " << hits[i]->position() << std::endl;
-      std::cout << x << ", " << y << std::endl; */
+        double x = -radius * dPhi;
+        double y = hits[i]->position().z();
+        sumX  += x;
+        sumY  += y;
+        sumX2 += x * x;
+        sumXY += x * y;
+        sumY2 += y * y;
+        sum += 1.0;
+        /* std::cout << i << ": " << hits[i]->dssd()
+           << " " << hits[i]->position() << std::endl;
+           std::cout << x << ", " << y << std::endl; */
     }
     sum += ipC; // Ip Constraint if ipC != 0.
     double det = sum * sumX2 - sumX * sumX;
@@ -86,37 +84,35 @@ namespace Belle {
 
     chisq = 0.;
     for (unsigned i = 0; i < (unsigned) hits.length(); ++i) {
-      HepGeom::Point3D<double>  xsvd(hits[i]->position().x(),
-                                     hits[i]->position().y(),
-                                     0.);
-      HepGeom::Point3D<double>  v1 = xsvd - xc;
-      double vCrs = v0.x() * v1.y() - v0.y() * v1.x();
-      double vDot = v0.x() * v1.x() + v0.y() * v1.y();
-      double dPhi = std::atan2(vCrs, vDot);
+        HepGeom::Point3D<double>  xsvd(hits[i]->position().x(),
+                                       hits[i]->position().y(),
+                                       0.);
+        HepGeom::Point3D<double>  v1 = xsvd - xc;
+        double vCrs = v0.x() * v1.y() - v0.y() * v1.x();
+        double vDot = v0.x() * v1.x() + v0.y() * v1.y();
+        double dPhi = std::atan2(vCrs, vDot);
 
-      double x = -radius * dPhi;
-      double y = hits[i]->position().z();
+        double x = -radius * dPhi;
+        double y = hits[i]->position().z();
 
-      double chi = y - tanL * x - dZ;
-      double chi2 = chi * chi;
+        double chi = y - tanL * x - dZ;
+        double chi2 = chi * chi;
 
-      chisq += chi2;
+        chisq += chi2;
     }
     chisq /= sum - 2.;
     return true;
-  }
+}
 
 
-  unsigned
-  TSvdBuilder::calTHelix(double x, double y, double r, double q,
-                         double& dRho, double& phi0, double& kappa,
-                         double& dZ, double& tanL, double& chisq,
-                         AList<TSvdHit> hits,
-                         double ipC)
-  {
+unsigned
+TSvdBuilder::calTHelix(double x, double y, double r, double q,
+                       double& dRho, double& phi0, double& kappa,
+                       double& dZ, double& tanL, double& chisq,
+                       AList<TSvdHit> hits,
+                       double ipC) {
     if (!calTHelix3(x, y, r, q, dRho, phi0, kappa))return 0;
     return calZTanL(dRho, phi0, kappa, dZ, tanL, chisq, hits, ipC);
-  }
+}
 
 } // namespace Belle
-

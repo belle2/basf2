@@ -13,7 +13,7 @@
 namespace Belle {
 #endif
 
-  class TSvdHitsOnDssd {
+class TSvdHitsOnDssd {
   public:
     // constructors
     TSvdHitsOnDssd();
@@ -81,7 +81,7 @@ namespace Belle {
 
     AList<Recsvd_cluster> phiClusters;
     AList<Recsvd_cluster> zClusters;
-  };
+};
 
 
 #if defined(BELLE_NAMESPACE)

@@ -36,24 +36,18 @@
 #ifndef TCIRCLEFITTER_FLAG_
 #define TCIRCLEFITTER_FLAG_
 
-#ifdef TRASAN_DEBUG_DETAIL
-#ifndef TRASAN_DEBUG
-#define TRASAN_DEBUG
-#endif
-#endif
 #define HEP_SHORT_NAMES
-
 
 #include "tracking/modules/trasan/TFitter.h"
 #include "tracking/modules/trasan/THelix.h"
 
 namespace Belle {
 
-  class TLink;
-  class TCircle;
+class TLink;
+class TCircle;
 
 /// A class to fit a TTrackBase object to a circle.
-  class TCircleFitter : public TFitter {
+class TCircleFitter : public TFitter {
 
   public:
     /// Constructor.
@@ -74,22 +68,9 @@ namespace Belle {
     mutable double _charge;
     mutable double _radius;
     mutable HepGeom::Point3D<double>  _center;
-  };
+};
 
 //-----------------------------------------------------------------------------
-
-#ifdef TRASAN_NO_INLINE
-#define inline
-#else
-#undef inline
-#define TCIRCLEFITTER_INLINE_DEFINE_HERE
-#endif
-
-#ifdef TCIRCLEFITTER_INLINE_DEFINE_HERE
-
-#endif
-
-#undef inline
 
 } // namespace Belle
 

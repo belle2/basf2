@@ -51,31 +51,27 @@
 
 namespace Belle {
 
-  TSegmentLinker::TSegmentLinker(unsigned nLayer,
-                                 TSegment0* baseSegment,
-                                 AList<TSegment0> * segmentLists)
+TSegmentLinker::TSegmentLinker(unsigned nLayer,
+                               TSegment0* baseSegment,
+                               AList<TSegment0> * segmentLists)
     : _nLayer(nLayer),
-      _base(baseSegment)
-  {
+      _base(baseSegment) {
     for (unsigned i = 0; i < _nLayer; i++)
-      _list[i] = new AList<TSegment0>(segmentLists[i]);
+        _list[i] = new AList<TSegment0>(segmentLists[i]);
 
     roughSelection();
-  }
+}
 
-  TSegmentLinker::~TSegmentLinker()
-  {
-  }
+TSegmentLinker::~TSegmentLinker() {
+}
 
-  void
-  TSegmentLinker::dump(const std::string&, const std::string&) const
-  {
+void
+TSegmentLinker::dump(const std::string&, const std::string&) const {
     std::cout << "TSegmentLinker::dump ... " << std::endl;
-  }
+}
 
-  AList<TSegment0>
-  TSegmentLinker::bestLink(void)
-  {
+AList<TSegment0>
+TSegmentLinker::bestLink(void) {
 
 // #ifdef TRASAN_DEBUG_DETAIL
 // std::cout << name() << " ... finding cluster linkage" << std::endl;
@@ -118,12 +114,10 @@ namespace Belle {
 //     }
 
     return seeds;
-  }
+}
 
-  void
-  TSegmentLinker::roughSelection(void)
-  {
-  }
+void
+TSegmentLinker::roughSelection(void) {
+}
 
 } // namespace Belle
-

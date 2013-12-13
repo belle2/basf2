@@ -147,11 +147,7 @@
 #ifndef TTrackBase_FLAG_
 #define TTrackBase_FLAG_
 
-#ifdef TRASAN_DEBUG_DETAIL
-#ifndef TRASAN_DEBUG
-#define TRASAN_DEBUG
-#endif
-#endif
+#define HEP_SHORT_NAMES
 
 #define TrackAxialLayer 0
 #define TrackStereoLayer 1
@@ -164,24 +160,17 @@
 #define Track                8
 #define Segment             16
 
-
 #include <string>
-
-#define HEP_SHORT_NAMES
 #include "tracking/modules/trasan/AList.h"
-
-namespace Belle2 {
-  class TRGCDCTrackMC;
-}
 
 namespace Belle {
 
-  class TLink;
-  class TTrackMC;
-  class TFitter;
+class TLink;
+class TTrackMC;
+class TFitter;
 
 /// A virtual class for a track class in tracking.
-  class TTrackBase {
+class TTrackBase {
 
   public:
     /// Constructor.
@@ -205,16 +194,19 @@ namespace Belle {
                       const std::string& prefix = std::string("")) const;
 
   public:// Hit information
-    /// returns a list of masked TLinks assigned to this track. 'mask' will be applied if mask is not 0.
+    /// returns a list of masked TLinks assigned to this track. 'mask'
+    /// will be applied if mask is not 0.
     const AList<TLink> & links(unsigned mask = 0) const;
 
     /// returns \# of masked TLinks assigned to this track object.
     unsigned nLinks(unsigned mask = 0) const;
 
-    /// returns a list of masked TLinks for fit. 'mask' will be applied if mask is not 0.
+    /// returns a list of masked TLinks for fit. 'mask' will be
+    /// applied if mask is not 0.
     const AList<TLink> & cores(unsigned mask = 0) const;
 
-    /// returns \# of masked TLinks for fit. 'mask' will be applied if mask is not 0.
+    /// returns \# of masked TLinks for fit. 'mask' will be applied if
+    /// mask is not 0.
     unsigned nCores(unsigned mask = 0) const;
 
     /// returns fraction of used layers.
@@ -236,10 +228,12 @@ namespace Belle {
     /// appends TLinks.
     void append(const AList<TLink> &);
 
-    /// appends TLinks by approach. 'list' is an input. Unappended TLinks will be removed from 'list' when returned.
+    /// appends TLinks by approach. 'list' is an input. Unappended
+    /// TLinks will be removed from 'list' when returned.
     void appendByApproach(AList<TLink> & list, double maxSigma);
 
-    /// appends TLinks by distance. 'list' is an input. Unappended TLinks will be removed from 'list' when returned.
+    /// appends TLinks by distance. 'list' is an input. Unappended
+    /// TLinks will be removed from 'list' when returned.
     void appendByDistance(AList<TLink> & list, double maxDistance);
 
     /// removes a TLink.
@@ -248,23 +242,28 @@ namespace Belle {
     /// removes TLinks.
     void remove(const AList<TLink> &);
 
-    /// removes bad points by pull. The bad points are removed from the track, and are returned in 'list'.
+    /// removes bad points by pull. The bad points are removed from
+    /// the track, and are returned in 'list'.
     virtual void refine(AList<TLink> & list, double maxSigma);
 
-    /// removes bad points by pull. The bad points are masked not to be used in fit.
+    /// removes bad points by pull. The bad points are masked not to
+    /// be used in fit.
     virtual void refine(double maxSigma);
 
     /// returns distance to a position of TLink in TLink space.
     virtual double distance(const TLink&) const;
 
-    /// calculates the closest approach to a wire in real space. Results are stored in TLink. Return value is negative if error happened.
+    /// calculates the closest approach to a wire in real
+    /// space. Results are stored in TLink. Return value is negative
+    /// if error happened.
     virtual int approach(TLink&) const;
 
     /// returns \# of good hits to be appended.
     unsigned testByApproach(const TLink& list, double sigma) const;
     unsigned testByApproach(const AList<TLink> & list, double sigma) const;
 
-    /// fits itself by a default fitter. Error was happened if return value is not zero.
+    /// fits itself by a default fitter. Error was happened if return
+    /// value is not zero.
     virtual int fit(void);
 
     /// returns a pointer to a default fitter.
@@ -280,10 +279,10 @@ namespace Belle {
     TLink* operator[](unsigned i) const;
 
   public:// MC information
-    /// returns Belle2::TRGCDCTrackMC.
-    const Belle2::TRGCDCTrackMC* hep(void) const;
+    /// returns TTrackMC.
+    const TTrackMC * hep(void) const;
 
-    /// returns \# of contributed Belle2::TRGCDCTrackMC tracks.
+    /// returns \# of contributed TTrackMC tracks.
     unsigned nHeps(void) const;
 
     /// returns a pointer to TTrackMC.
@@ -320,7 +319,7 @@ namespace Belle {
     mutable AList<TLink> _cores;
 
   private:// Always updated when accessed
-    mutable const Belle2::TRGCDCTrackMC* _hep;
+    mutable const TTrackMC * _hep;
     mutable unsigned _nHeps;
 
   private:
@@ -335,118 +334,93 @@ namespace Belle {
   public:
     bool fitted(bool) const;
 #endif
-  };
+};
 
 //-----------------------------------------------------------------------------
 
-#ifdef TTrackBase_NO_INLINE
-#define inline
-#else
-#undef inline
-#define TTrackBase_INLINE_DEFINE_HERE
-#endif
-
-#ifdef TTrackBase_INLINE_DEFINE_HERE
-
-  inline
-  void
-  TTrackBase::remove(TLink& a)
-  {
+inline
+void
+TTrackBase::remove(TLink& a) {
     _links.remove(a);
     _updated = false;
     _fitted = false;
     _fittedWithCathode = false; // mod. by matsu ( 1999/05/24 )
-  }
+}
 
-  inline
-  void
-  TTrackBase::remove(const AList<TLink> & a)
-  {
+inline
+void
+TTrackBase::remove(const AList<TLink> & a) {
     _links.remove(a);
     _updated = false;
     _fitted = false;
     _fittedWithCathode = false; // mod. by matsu ( 1999/05/24 )
-  }
+}
 
-  inline
-  bool
-  TTrackBase::fitted(void) const
-  {
+inline
+bool
+TTrackBase::fitted(void) const {
     return _fitted;
-  }
+}
 
 // added by matsu ( 1999/05/24 )
-  inline
-  void
-  TTrackBase::falseFit()
-  {
+inline
+void
+TTrackBase::falseFit() {
     _fitted = false;
     _fittedWithCathode = false;
-  }
+}
 // end of addition
 
-  inline
-  TLink*
-  TTrackBase::operator[](unsigned i) const
-  {
+inline
+TLink*
+TTrackBase::operator[](unsigned i) const {
     return _links[i];
-  }
+}
 
-  inline
-  bool
-  TTrackBase::fittedWithCathode(void) const
-  {
+inline
+bool
+TTrackBase::fittedWithCathode(void) const {
     return _fittedWithCathode;
-  }
+}
 
-  inline
-  const TTrackMC*
-  TTrackBase::mc(void) const
-  {
+inline
+const TTrackMC*
+TTrackBase::mc(void) const {
     return _mc;
-  }
+}
 
-  inline
-  const TFitter*
-  TTrackBase::fitter(void) const
-  {
+inline
+const TFitter*
+TTrackBase::fitter(void) const {
     return _fitter;
-  }
+}
 
-  inline
-  const TFitter*
-  TTrackBase::fitter(const TFitter* a)
-  {
+inline
+const TFitter*
+TTrackBase::fitter(const TFitter* a) {
     _fitted = false;
     return _fitter = a;
-  }
+}
 
-  inline
-  unsigned
-  TTrackBase::objectType(void) const
-  {
+inline
+unsigned
+TTrackBase::objectType(void) const {
     return TrackBase;
-  }
+}
 
-  inline
-  unsigned
-  TTrackBase::type(void) const
-  {
+inline
+unsigned
+TTrackBase::type(void) const {
     return 0;
-  }
+}
 
 #ifdef TRASAN_DEBUG
-  inline
-  bool
-  TTrackBase::fitted(bool a) const
-  {
+inline
+bool
+TTrackBase::fitted(bool a) const {
     return _fitted = a;
-  }
+}
 #endif
-
-#endif
-
-#undef inline
 
 } // namespace Belle
 

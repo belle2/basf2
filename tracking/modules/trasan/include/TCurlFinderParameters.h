@@ -1,22 +1,15 @@
 #ifndef TCURLFINDERPARAMETERS_FLAG_
 #define TCURLFINDERPARAMETERS_FLAG_
 
-
 #include <iostream>
 
 namespace Belle {
 
-#ifdef TRASAN_DEBUG_DETAIL
-#ifndef TRASAN_DEBUG
-#define TRASAN_DEBUG
-#endif
-#endif
-
-  class TCurlFinderParameter {
+class TCurlFinderParameter {
   public:
     TCurlFinderParameter(void):
-      ALPHA_SAME_WITH_HELIX(222.376063),
-      MIN_RADIUS_OF_STRANGE_TRACK(65.0) {};
+        ALPHA_SAME_WITH_HELIX(222.376063),
+        MIN_RADIUS_OF_STRANGE_TRACK(65.0) {};
 
     ~TCurlFinderParameter(void) {}
 
@@ -114,12 +107,12 @@ namespace Belle {
     double SELECTOR_MAX_SIGMA;
     double SELECTOR_STRANGE_PZ;
     double SELECTOR_REPLACE_DZ;
-  };
+};
 
 //
 // TSegmentCurl.cc
 //
-  const unsigned TCURL_LARGE_SEQUENCE = 4; // 4
+const unsigned TCURL_LARGE_SEQUENCE = 4; // 4
 
 } // namespace Belle
 

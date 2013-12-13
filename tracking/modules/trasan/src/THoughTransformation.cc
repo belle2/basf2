@@ -24,20 +24,16 @@
 
 namespace Belle {
 
-  THoughTransformation::THoughTransformation(const std::string& name)
-    : _name(name)
-  {
-  }
+THoughTransformation::THoughTransformation(const std::string& name)
+    : _name(name) {
+}
 
-  THoughTransformation::~THoughTransformation()
-  {
-  }
+THoughTransformation::~THoughTransformation() {
+}
 
-  TPoint2D
-  THoughTransformation::convert(const TPoint2D& p) const
-  {
+TPoint2D
+THoughTransformation::convert(const TPoint2D& p) const {
     return p;
-  }
+}
 
 } // namespace Belle
-

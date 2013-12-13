@@ -30,24 +30,18 @@
 #ifndef TPeakFinder_FLAG_
 #define TPeakFinder_FLAG_
 
-#ifdef TRASAN_DEBUG_DETAIL
-#ifndef TRASAN_DEBUG
-#define TRASAN_DEBUG
-#endif
-#endif
-
+#define HEP_SHORT_NAMES
 
 #include <string>
-#define HEP_SHORT_NAMES
 #include "tracking/modules/trasan/AList.h"
 
 namespace Belle {
 
-  class TPoint2D;
-  class THoughPlane;
+class TPoint2D;
+class THoughPlane;
 
 /// A class to find peaks in THoughPlan
-  class TPeakFinder {
+class TPeakFinder {
 
   public:
     /// Constructor.
@@ -80,14 +74,15 @@ namespace Belle {
                            bool centerIsPeak = false) const;
 
   private:
-  };
+};
 
-  inline
-  std::string
-  TPeakFinder::name(void) const
-  {
+//-----------------------------------------------------------------------------
+
+inline
+std::string
+TPeakFinder::name(void) const {
     return "TPeakFinder";
-  }
+}
 
 } // namespace Belle
 

@@ -2,7 +2,7 @@
 // $Id: THoughTransformationLine.cc 9932 2006-11-12 14:26:53Z katayama $
 //-----------------------------------------------------------------------------
 // Filename : THoughTransformationLine.cc
-// Section  : Tracking
+// Section  : CDC Tracking trasan
 // Owner    : Yoshihito Iwasaki
 // Email    : yoshihito.iwasaki@kek.jp
 //-----------------------------------------------------------------------------
@@ -21,52 +21,44 @@
 
 #include <math.h>
 #include "tracking/modules/trasan/THoughTransformationLine.h"
-#include "tracking/modules/trasan/TPoint2D.h"
+// #include "tracking/modules/trasan/TPoint2D.h"
 
 namespace Belle {
 
-  THoughTransformationLine::THoughTransformationLine(
-    const std::string& name)
-    : THoughTransformation(name)
-  {
-  }
+THoughTransformationLine::THoughTransformationLine(const std::string & name)
+    : THoughTransformation(name) {
+}
 
-  THoughTransformationLine::~THoughTransformationLine()
-  {
-  }
+THoughTransformationLine::~THoughTransformationLine() {
+}
 
-  float
-  THoughTransformationLine::y(float xReal, float yReal, float x) const
-  {
+float
+THoughTransformationLine::y(float xReal, float yReal, float x) const {
     return (xReal * cos(x) + yReal * sin(x));
-  }
+}
 
-  bool
-  THoughTransformationLine::diverge(float xReal,
-                                    float yReal,
-                                    float x0,
-                                    float x1) const
-  {
+bool
+THoughTransformationLine::diverge(float,
+				  float,
+				  float,
+				  float) const {
     return false;
-  }
+}
 
-  bool
-  THoughTransformationLine::positiveDiverge(float xReal,
-                                            float yReal,
-                                            float x0,
-                                            float x1) const
-  {
+bool
+THoughTransformationLine::positiveDiverge(float,
+					  float,
+					  float,
+					  float) const {
     return false;
-  }
+}
 
-  bool
-  THoughTransformationLine::negativeDiverge(float xReal,
-                                            float yReal,
-                                            float x0,
-                                            float x1) const
-  {
+bool
+THoughTransformationLine::negativeDiverge(float,
+					  float,
+					  float,
+					  float) const {
     return false;
-  }
+}
 
 } // namespace Belle
-

@@ -17,24 +17,20 @@
 #ifndef TWINDOWSZDRAWINGAREA_FLAG_
 #define TWINDOWSZDRAWINGAREA_FLAG_
 
+#define HEP_SHORT_NAMES
 
 #include <gtkmm.h>
-#define HEP_SHORT_NAMES
 #include "tracking/modules/trasan/ConstAList.h"
-
-namespace Belle2 {
-  class TRGCDCWireHit;
-}
 
 namespace Belle {
 
-  class TRGCDCWireHit;
-  class TTrackBase;
-  class TLine;
-  class TLink;
+class TWireHit;
+class TTrackBase;
+class TLine;
+class TLink;
 
 /// Actual class to display tracking objects
-  class TWindowSZDrawingArea : public Gtk::DrawingArea {
+class TWindowSZDrawingArea : public Gtk::DrawingArea {
 
   public:
     /// Default constructor
@@ -96,116 +92,92 @@ namespace Belle {
 
     Glib::RefPtr<Gdk::GC> _gc;
     Gdk::Color _blue, _red, _green, _black, _white, _grey, _yellow;
-  };
+};
 
 //-----------------------------------------------------------------------------
 
-#ifdef TRASAN_NO_INLINE
-#define inline
-#else
-#undef inline
-#define TWINDOWGTK_INLINE_DEFINE_HERE
-#endif
-#ifdef TWINDOWGTK_INLINE_DEFINE_HERE
-
-  inline
-  double
-  TWindowSZDrawingArea::scale(double a)
-  {
+inline
+double
+TWindowSZDrawingArea::scale(double a) {
     return _scale = a;
-  }
+}
 
-  inline
-  double
-  TWindowSZDrawingArea::scale(void) const
-  {
+inline
+double
+TWindowSZDrawingArea::scale(void) const {
     return _scale;
-  }
+}
 
-  inline
-  bool
-  TWindowSZDrawingArea::axial(void) const
-  {
+inline
+bool
+TWindowSZDrawingArea::axial(void) const {
     return _axial;
-  }
+}
 
-  inline
-  bool
-  TWindowSZDrawingArea::axial(bool a)
-  {
+inline
+bool
+TWindowSZDrawingArea::axial(bool a) {
     return _axial = a;
-  }
+}
 
-  inline
-  bool
-  TWindowSZDrawingArea::stereo(void) const
-  {
+inline
+bool
+TWindowSZDrawingArea::stereo(void) const {
     return _stereo;
-  }
+}
 
-  inline
-  bool
-  TWindowSZDrawingArea::stereo(bool a)
-  {
+inline
+bool
+TWindowSZDrawingArea::stereo(bool a) {
     return _stereo = a;
-  }
+}
 
-  inline
-  bool
-  TWindowSZDrawingArea::wireName(void) const
-  {
+inline
+bool
+TWindowSZDrawingArea::wireName(void) const {
     return _wireName;
-  }
+}
 
-  inline
-  bool
-  TWindowSZDrawingArea::wireName(bool a)
-  {
+inline
+bool
+TWindowSZDrawingArea::wireName(bool a) {
     return _wireName = a;
-  }
+}
 
-  inline
-  int
-  TWindowSZDrawingArea::x(double a) const
-  {
+inline
+int
+TWindowSZDrawingArea::x(double a) const {
     /*     std::cout << "_x,_scale,_winw/2,a=" << _x << "," << _scale << "," */
     /*        << _winw/2 << "," << a << std::endl; */
     return int((a - _x) * _scale + _winw / 2);
-  }
+}
 
-  inline
-  int
-  TWindowSZDrawingArea::y(double a) const
-  {
+inline
+int
+TWindowSZDrawingArea::y(double a) const {
     return int((- a - _y) * _scale + _winh / 2);
-  }
+}
 
-  inline
-  int
-  TWindowSZDrawingArea::xR(double a) const
-  {
+inline
+int
+TWindowSZDrawingArea::xR(double a) const {
     return int((a - _winw / 2) / _scale + _x);
-  }
+}
 
-  inline
-  int
-  TWindowSZDrawingArea::yR(double a) const
-  {
+inline
+int
+TWindowSZDrawingArea::yR(double a) const {
     return int((- a - _winh / 2) / _scale + _y);
-  }
+}
 
-  inline
-  void
-  TWindowSZDrawingArea::clear(void)
-  {
+inline
+void
+TWindowSZDrawingArea::clear(void) {
     _objects.removeAll();
     HepAListDeleteAll(_colors);
     HepAListDeleteAll(_selfObjects);
     HepAListDeleteAll(_selfTLinks);
-  }
-
-#endif
-#undef inline
+}
 
 } // namespace Belle
 

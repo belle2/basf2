@@ -677,21 +677,20 @@
 //
 //-----------------------------------------------------------------------------
 
+#define HEP_SHORT_NAMES
+
 #include <cmath>
 #include <cfloat>
 #include <time.h>
-
 //#include "framework/core/ModuleManager.h"
 #include "framework/core/Module.h"
-
-#define HEP_SHORT_NAMES
 #include "tracking/modules/trasan/Strings.h"
 #include "tracking/modules/trasan/THelix.h"
 #include "tracking/modules/trasan/Trasan.h"
-#include "trg/cdc/TRGCDC.h"
-#include "trg/cdc/Wire.h"
-#include "trg/cdc/WireHit.h"
-#include "trg/cdc/TrackMC.h"
+#include "tracking/modules/trasan/TCDC.h"
+#include "tracking/modules/trasan/TWire.h"
+#include "tracking/modules/trasan/TWireHit.h"
+#include "tracking/modules/trasan/TTrackMC.h"
 #include "tracking/modules/trasan/TPerfectFinder.h"
 #include "tracking/modules/trasan/TConformalFinder0.h"
 #include "tracking/modules/trasan/TConformalFinder.h"
@@ -714,20 +713,20 @@
 #ifndef PANTHER_RECCDC_WIRHIT_
 #define PANTHER_RECCDC_WIRHIT_
 struct reccdc_wirhit {
-  int m_panther_dummy_;
-  int m_ID;
-  float m_ddl;
-  float m_ddr;
-  float m_erddl;
-  float m_erddr;
-  float m_pChiSq;
-  int m_lr;
-  int m_stat;
-  int m_geo;
-  int m_dat;
-  int m_trk;
-  float m_tdc;
-  float m_adc;
+    int m_panther_dummy_;
+    int m_ID;
+    float m_ddl;
+    float m_ddr;
+    float m_erddl;
+    float m_erddr;
+    float m_pChiSq;
+    int m_lr;
+    int m_stat;
+    int m_geo;
+    int m_dat;
+    int m_trk;
+    float m_tdc;
+    float m_adc;
 };
 #else
 struct reccdc_wirhit;
@@ -735,208 +734,205 @@ struct reccdc_wirhit;
 #ifndef PANTHER_GEOCDC_LAYER_
 #define PANTHER_GEOCDC_LAYER_
 struct geocdc_layer {
-  int m_panther_dummy_;
-  int m_ID;
-  float m_slant;
-  float m_r;
-  float m_zf;
-  float m_zb;
-  float m_rcsiz1;
-  float m_rcsiz2;
-  float m_pcsiz;
-  float m_div;
-  float m_offset;
-  float m_shift;
-  int m_wirst;
-  int m_sup;
-  float m_fdist;
-  float m_bdist;
-  float m_ft;
-  float m_bt;
-  float m_fpin;
-  float m_bpin;
-  float m_ftwist;
-  float m_btwist;
-  float m_fxoff;
-  float m_fyoff;
-  float m_fzoff;
-  float m_bxoff;
-  float m_byoff;
-  float m_bzoff;
+    int m_panther_dummy_;
+    int m_ID;
+    float m_slant;
+    float m_r;
+    float m_zf;
+    float m_zb;
+    float m_rcsiz1;
+    float m_rcsiz2;
+    float m_pcsiz;
+    float m_div;
+    float m_offset;
+    float m_shift;
+    int m_wirst;
+    int m_sup;
+    float m_fdist;
+    float m_bdist;
+    float m_ft;
+    float m_bt;
+    float m_fpin;
+    float m_bpin;
+    float m_ftwist;
+    float m_btwist;
+    float m_fxoff;
+    float m_fyoff;
+    float m_fzoff;
+    float m_bxoff;
+    float m_byoff;
+    float m_bzoff;
 };
 #endif
 #ifndef PANTHER_GEOCDC_WIRE_
 #define PANTHER_GEOCDC_WIRE_
 struct geocdc_wire {
-  int m_panther_dummy_;
-  int m_ID;
-  float m_xwb;
-  float m_ywb;
-  float m_zwb;
-  float m_xwf;
-  float m_ywf;
-  float m_zwf;
-  float m_slant;
-  int m_cell;
-  int m_layer;
-  int m_stat;
-  int m_lyr;
+    int m_panther_dummy_;
+    int m_ID;
+    float m_xwb;
+    float m_ywb;
+    float m_zwb;
+    float m_xwf;
+    float m_ywf;
+    float m_zwf;
+    float m_slant;
+    int m_cell;
+    int m_layer;
+    int m_stat;
+    int m_lyr;
 };
 #endif
 #ifndef PANTHER_RECCDC_WIRHIT_
 #define PANTHER_RECCDC_WIRHIT_
 struct reccdc_wirhit {
-  int m_panther_dummy_;
-  int m_ID;
-  float m_ddl;
-  float m_ddr;
-  float m_erddl;
-  float m_erddr;
-  float m_pChiSq;
-  int m_lr;
-  int m_stat;
-  int m_geo;
-  int m_dat;
-  int m_trk;
-  float m_tdc;
-  float m_adc;
+    int m_panther_dummy_;
+    int m_ID;
+    float m_ddl;
+    float m_ddr;
+    float m_erddl;
+    float m_erddr;
+    float m_pChiSq;
+    int m_lr;
+    int m_stat;
+    int m_geo;
+    int m_dat;
+    int m_trk;
+    float m_tdc;
+    float m_adc;
 };
 #endif
 #ifndef PANTHER_DATRGCDC_MCWIRHIT_
 #define PANTHER_DATRGCDC_MCWIRHIT_
 struct datcdc_mcwirhit {
-  int m_panther_dummy_;
-  int m_ID;
-  float m_xw;
-  float m_yw;
-  float m_zw;
-  float m_dist;
-  float m_chrg;
-  float m_xin;
-  float m_yin;
-  float m_zin;
-  float m_xout;
-  float m_yout;
-  float m_zout;
-  int m_lr;
-  int m_stat;
-  int m_geo;
-  int m_dat;
-  int m_hep;
-  int m_trk;
-  float m_px;
-  float m_py;
-  float m_pz;
-  float m_pid;
-  float m_tof;
-  float m_tdc;
+    int m_panther_dummy_;
+    int m_ID;
+    float m_xw;
+    float m_yw;
+    float m_zw;
+    float m_dist;
+    float m_chrg;
+    float m_xin;
+    float m_yin;
+    float m_zin;
+    float m_xout;
+    float m_yout;
+    float m_zout;
+    int m_lr;
+    int m_stat;
+    int m_geo;
+    int m_dat;
+    int m_hep;
+    int m_trk;
+    float m_px;
+    float m_py;
+    float m_pz;
+    float m_pid;
+    float m_tof;
+    float m_tdc;
 };
 #endif
 #ifndef PANTHER_RECCDC_TRK_
 #define PANTHER_RECCDC_TRK_
 struct reccdc_trk {
-  int m_panther_dummy_;
-  int m_ID;
-  float m_helix[5];
-  float m_pivot[3];
-  float m_error[15];
-  float m_chiSq;
-  float m_ndf;
-  float m_fiTerm;
-  int m_nhits;
-  int m_nster;
-  int m_nclus;
-  int m_stat;
-  float m_mass;
+    int m_panther_dummy_;
+    int m_ID;
+    float m_helix[5];
+    float m_pivot[3];
+    float m_error[15];
+    float m_chiSq;
+    float m_ndf;
+    float m_fiTerm;
+    int m_nhits;
+    int m_nster;
+    int m_nclus;
+    int m_stat;
+    float m_mass;
 };
 #endif
 #ifndef PANTHER_RECCDC_TRK_ADD_
 #define PANTHER_RECCDC_TRK_ADD_
 struct reccdc_trk_add {
-  int m_panther_dummy_;
-  int m_ID;
-  int m_quality;
-  int m_kind;
-  int m_mother;
-  int m_daughter;
-  int m_decision;
-  float m_likelihood[3];
-  int m_stat;
-  int m_rectrk;
+    int m_panther_dummy_;
+    int m_ID;
+    int m_quality;
+    int m_kind;
+    int m_mother;
+    int m_daughter;
+    int m_decision;
+    float m_likelihood[3];
+    int m_stat;
+    int m_rectrk;
 };
 #endif
 #ifndef PANTHER_RECCDC_MCTRK2HEP_
 #define PANTHER_RECCDC_MCTRK2HEP_
 struct reccdc_mctrk2hep {
-  int m_panther_dummy_;
-  int m_ID;
-  int m_wir;
-  int m_clust;
-  int m_trk;
-  int m_hep;
+    int m_panther_dummy_;
+    int m_ID;
+    int m_wir;
+    int m_clust;
+    int m_trk;
+    int m_hep;
 };
 #endif
 #ifndef PANTHER_RECCDC_MCTRK_
 #define PANTHER_RECCDC_MCTRK_
 struct reccdc_mctrk {
-  int m_panther_dummy_;
-  int m_ID;
-  int m_hep;
-  float m_wirFrac;
-  float m_wirFracHep;
-  int m_charge;
-  float m_ptFrac;
-  float m_pzFrac;
-  int m_quality;
+    int m_panther_dummy_;
+    int m_ID;
+    int m_hep;
+    float m_wirFrac;
+    float m_wirFracHep;
+    int m_charge;
+    float m_ptFrac;
+    float m_pzFrac;
+    int m_quality;
 };
 #endif
 #ifndef PANTHER_RECCDC_TIMING_
 #define PANTHER_RECCDC_TIMING_
 struct reccdc_timing {
-  int m_panther_dummy_;
-  int m_ID;
-  float m_time;
-  int m_quality;
+    int m_panther_dummy_;
+    int m_ID;
+    float m_time;
+    int m_quality;
 };
 #endif
 
 namespace Belle {
 
 //...Globals...
-  Trasan*
-  Trasan::_trasan = 0;
+Trasan*
+Trasan::_trasan = 0;
 
-  int
-  TrasanTest = 0;
+int
+TrasanTest = 0;
 
-  float
-  TrasanTHelixFitterChisqMax = 0;
+float
+TrasanTHelixFitterChisqMax = 0;
 
-  int
-  TrasanTHelixFitterNtrialMax = 20;
+int
+TrasanTHelixFitterNtrialMax = 20;
 
-  const Point3D
-  ORIGIN = Point3D(0., 0., 0.);
+const Point3D
+ORIGIN = Point3D(0., 0., 0.);
 
-  std::string
-  Trasan::version(void) const
-  {
-    return "5.19";
-  }
+std::string
+Trasan::version(void) const {
+    return "5.20";
+}
 
 //...Definitions...
-  Trasan*
-  Trasan::getTrasan(void)
-  {
+Trasan*
+Trasan::getTrasan(void) {
     if (! _trasan) _trasan = new Trasan();
     return _trasan;
-  }
+}
 
-  Trasan::~Trasan()
-  {
-  }
+Trasan::~Trasan() {
+}
 
-  Trasan::Trasan()
+Trasan::Trasan()
     : Belle2::Module::Module(),
       b_cdcVersion(0),       // 0:automatic, 1:normal cell, 2:small cell
       b_fudgeFactor(1.0),
@@ -999,7 +995,7 @@ namespace Belle {
       b_associateSigma(60),
       b_test(0),
 
-  /* For Curl Finder --> */
+      /* For Curl Finder --> */
       //ho      b_doCurlFinder(1),
       b_doCurlFinder(0),
       min_segment(5),
@@ -1041,7 +1037,7 @@ namespace Belle {
       on_correction(0),
       output_2dtracks(0),
       curl_version(2),
-  /* <-- For Curl Finder */
+      /* <-- For Curl Finder */
 
       b_pmCurlFinder(1),
       b_doPMCurlFinder(1),
@@ -1091,13 +1087,13 @@ namespace Belle {
       _houghFinder(0),
       _nEvents(0)
 #ifdef TRASAN_WINDOW_GTK
-      , _w(0),
+    , _w(0),
       _hp(0),
       _hm(0),
       _hc(0),
       _hl(0)
 #endif
-  {
+{
     _trasan = this;
 //    setDescription("Hello World");
     setDescription("Trasan test version");
@@ -1109,20 +1105,19 @@ namespace Belle {
 
 //    int a = 10 / 0;
 
-  }
+}
 
-  void
-  Trasan::initialize()
-  {
+void
+Trasan::initialize() {
 
 #ifdef TRASAN_DEBUG_DETAIL
     b_debugLevel = 2;
     std::cout << "Trasan ... initializing" << std::endl;
 #endif
 
-    //...Create TRGCDC...
+    //...Create TCDC...
     _cdcVersion = "cdc2_test";
-    _cdc = Belle2::TRGCDC::getTRGCDC(_cdcVersion);
+    _cdc = TCDC::getTCDC(_cdcVersion);
     _cdc->debugLevel(b_debugLevel);
 #if defined(TRASAN_DEBUG)
 //  _cdc->dump("geometry superLayers layers wires detail");
@@ -1159,33 +1154,33 @@ namespace Belle {
                                         b_conformalFittingCorrections);
 
     if ((! _confFinder) && (b_conformalFinder == 0)) {
-      _confFinder = new TConformalFinder0(b_conformalMaxSigma,
-                                          b_conformalFraction,
-                                          b_conformalStereoZ3,
-                                          b_conformalStereoZ4,
-                                          b_conformalStereoChisq3,
-                                          b_conformalStereoChisq4,
-                                          b_conformalStereoMaxSigma,
-                                          b_conformalFittingCorrections,
-                                          b_salvageLevel,
-                                          b_doConformalFinderCosmic);
+        _confFinder = new TConformalFinder0(b_conformalMaxSigma,
+                                            b_conformalFraction,
+                                            b_conformalStereoZ3,
+                                            b_conformalStereoZ4,
+                                            b_conformalStereoChisq3,
+                                            b_conformalStereoChisq4,
+                                            b_conformalStereoMaxSigma,
+                                            b_conformalFittingCorrections,
+                                            b_salvageLevel,
+                                            b_doConformalFinderCosmic);
     } else if (! _confFinder) {
-      _confFinder = new TConformalFinder(b_doConformalFastFinder,
-                                         b_doConformalSlowFinder,
-                                         b_conformalPerfectSegmentFinding,
-                                         b_conformalUseSmallCells,
-                                         b_conformalMaxSigma,
-                                         b_conformalStereoMaxSigma,
-                                         b_salvageLevel,
-                                         b_conformalMinNLinksForSegment,
-                                         b_conformalMinNCores,
-                                         b_conformalMinNSegments,
-                                         b_conformalSalvageLoadWidth,
-                                         b_conformalStereoMode,
-                                         b_conformalStereoLoadWidth,
-                                         b_conformalStereoSzSegmentDistance,
-                                         b_conformalStereoSzLinkDistance,
-                                         b_conformalFittingFlag);
+        _confFinder = new TConformalFinder(b_doConformalFastFinder,
+                                           b_doConformalSlowFinder,
+                                           b_conformalPerfectSegmentFinding,
+                                           b_conformalUseSmallCells,
+                                           b_conformalMaxSigma,
+                                           b_conformalStereoMaxSigma,
+                                           b_salvageLevel,
+                                           b_conformalMinNLinksForSegment,
+                                           b_conformalMinNCores,
+                                           b_conformalMinNSegments,
+                                           b_conformalSalvageLoadWidth,
+                                           b_conformalStereoMode,
+                                           b_conformalStereoLoadWidth,
+                                           b_conformalStereoSzSegmentDistance,
+                                           b_conformalStereoSzLinkDistance,
+                                           b_conformalFittingFlag);
     }
     _confFinder->debugLevel(b_debugLevel);
     _confFinder->doStereo(b_doConformalFinderStereo);
@@ -1195,44 +1190,44 @@ namespace Belle {
 
     //...Create curl finder...
     if (! _curlFinder)
-      _curlFinder = new TCurlFinder((unsigned)min_segment,
-                                    (unsigned)min_salvage,
-                                    bad_distance_for_salvage,
-                                    good_distance_for_salvage,
-                                    (unsigned)min_sequence,
-                                    (unsigned)min_fullwire,
-                                    range_for_axial_search,
-                                    range_for_stereo_search,
-                                    (unsigned)superlayer_for_stereo_search,
-                                    range_for_axial_last2d_search,
-                                    range_for_stereo_last2d_search,
-                                    trace2d_distance,
-                                    trace2d_first_distance,
-                                    trace3d_distance,
-                                    (unsigned)determine_one_track,
-                                    selector_max_impact,
-                                    selector_max_sigma,
-                                    selector_strange_pz,
-                                    selector_replace_dz,
-                                    (unsigned)stereo_2dfind,
-                                    (unsigned)merge_exe,
-                                    merge_ratio,
-                                    merge_z_diff,
-                                    mask_distance,
-                                    ratio_used_wire,
-                                    range_for_stereo1,
-                                    range_for_stereo2,
-                                    range_for_stereo3,
-                                    range_for_stereo4,
-                                    range_for_stereo5,
-                                    z_cut,
-                                    z_diff_for_last_attend,
-                                    (unsigned)svd_reconstruction,
-                                    min_svd_electrons,
-                                    (unsigned)on_correction,
-                                    (unsigned)output_2dtracks,
-                                    (unsigned)curl_version,
-                                    b_simulateSmallCell);
+        _curlFinder = new TCurlFinder((unsigned)min_segment,
+                                      (unsigned)min_salvage,
+                                      bad_distance_for_salvage,
+                                      good_distance_for_salvage,
+                                      (unsigned)min_sequence,
+                                      (unsigned)min_fullwire,
+                                      range_for_axial_search,
+                                      range_for_stereo_search,
+                                      (unsigned)superlayer_for_stereo_search,
+                                      range_for_axial_last2d_search,
+                                      range_for_stereo_last2d_search,
+                                      trace2d_distance,
+                                      trace2d_first_distance,
+                                      trace3d_distance,
+                                      (unsigned)determine_one_track,
+                                      selector_max_impact,
+                                      selector_max_sigma,
+                                      selector_strange_pz,
+                                      selector_replace_dz,
+                                      (unsigned)stereo_2dfind,
+                                      (unsigned)merge_exe,
+                                      merge_ratio,
+                                      merge_z_diff,
+                                      mask_distance,
+                                      ratio_used_wire,
+                                      range_for_stereo1,
+                                      range_for_stereo2,
+                                      range_for_stereo3,
+                                      range_for_stereo4,
+                                      range_for_stereo5,
+                                      z_cut,
+                                      z_diff_for_last_attend,
+                                      (unsigned)svd_reconstruction,
+                                      min_svd_electrons,
+                                      (unsigned)on_correction,
+                                      (unsigned)output_2dtracks,
+                                      (unsigned)curl_version,
+                                      b_simulateSmallCell);
     _curlFinder->debugLevel(b_debugLevel);
 
     //...Create pm curl finder...
@@ -1243,28 +1238,28 @@ namespace Belle {
     //...Create Hough finder...
 //  b_conformalSalvageLoadWidth is not used
     if (b_doHoughFinder) {
-      _houghFinder = new THoughFinder(b_doHoughFinderCurlSearch,
-                                      b_houghAxialLoadWidth,
-                                      b_houghAxialLoadWidthCurl,
-                                      b_houghMaxSigma,
-                                      b_houghStereoMaxSigma,
-                                      b_houghSalvageLevel,
-                                      5,
-                                      b_conformalFittingFlag,
-                                      b_conformalStereoLoadWidth,
-                                      // b_conformalStereoLoadWidth * 2,
-                                      b_conformalSalvageLoadWidth,
-                                      b_houghMeshX,
-                                      b_houghMeshY,
-                                      b_houghPtBoundary,
-                                      b_houghThreshold,
-                                      b_houghMeshXLowPt,
-                                      b_houghMeshYLowPt,
-                                      b_houghPtBoundaryLowPt,
-                                      b_houghThresholdLowPt,
-                                      b_houghMode);
-      _houghFinder->debugLevel(b_debugLevel);
-      _houghFinder->init();
+        _houghFinder = new THoughFinder(b_doHoughFinderCurlSearch,
+                                        b_houghAxialLoadWidth,
+                                        b_houghAxialLoadWidthCurl,
+                                        b_houghMaxSigma,
+                                        b_houghStereoMaxSigma,
+                                        b_houghSalvageLevel,
+                                        5,
+                                        b_conformalFittingFlag,
+                                        b_conformalStereoLoadWidth,
+                                        // b_conformalStereoLoadWidth * 2,
+                                        b_conformalSalvageLoadWidth,
+                                        b_houghMeshX,
+                                        b_houghMeshY,
+                                        b_houghPtBoundary,
+                                        b_houghThreshold,
+                                        b_houghMeshXLowPt,
+                                        b_houghMeshYLowPt,
+                                        b_houghPtBoundaryLowPt,
+                                        b_houghThresholdLowPt,
+                                        b_houghMode);
+        _houghFinder->debugLevel(b_debugLevel);
+        _houghFinder->init();
     }
 
     //...Create cathode cluster finder...
@@ -1280,7 +1275,7 @@ namespace Belle {
     _trackManager.debugLevel(b_debugLevel);
     _trackManager.fittingFlag(b_fittingFlag);
     if (b_debugLevel)
-      _trackManager.defineHistograms();
+        _trackManager.defineHistograms();
 
     //...Initialize...
     TUpdater::initialize();
@@ -1340,11 +1335,10 @@ namespace Belle {
 
     TrasanTest = b_test;
     Belle2::StoreArray<genfit::TrackCand>::registerPersistent(_gfTrackCandsName);
-  }
+}
 
-  void
-  Trasan::terminate()
-  {
+void
+Trasan::terminate() {
 
     //...Clear Trasan objects...
     clear(true);
@@ -1360,33 +1354,31 @@ namespace Belle {
 //cnv    if (_clustFinder) delete _clustFinder;
 //cnv    if (_pmCurlFinder) delete _pmCurlFinder;
     if (_houghFinder) delete _houghFinder;
-  }
+}
 
-  void
-  Trasan::disp_stat(const char* m)
-  {
+void
+Trasan::disp_stat(const char* m) {
     std::string msg = m;
     dump(msg);
-  }
+}
 
-  void
-  Trasan::event()
-  {
+void
+Trasan::event() {
 
-    static clock_t time_start = 0;
+//cnv    static clock_t time_start = 0;
 //cnv    static clock_t time_end = 0;
 //cnv    static clock_t time_total = 0;
 
     ++_nEvents;
     if (int(_nEvents) < b_nEventsToSkip) {
-      if (b_debugLevel) {
-        std::cout << "Trasan ... skipping ev# " << _nEvents << std::endl;
-      }
-      return;
+        if (b_debugLevel) {
+            std::cout << "Trasan ... skipping ev# " << _nEvents << std::endl;
+        }
+        return;
     }
     if (b_debugLevel) {
-      time_start = clock();
-      std::cout << "Trasan ... processing ev# " << _nEvents << std::endl;
+//	time_start = clock();
+	std::cout << "Trasan ... processing ev# " << _nEvents << std::endl;
     }
 
 #ifdef TRASAN_WINDOW_GTK
@@ -1418,25 +1410,25 @@ namespace Belle {
 //cnv    if (b_doClustFinder && _cdccat) _cdccat->update();
 
     //...Get lists of hits...
-    unsigned mask = 0;
-    if (! b_useAllHits) mask = CellHitFindingValid;
+    // unsigned mask = 0;
+    // if (! b_useAllHits) mask = CellHitFindingValid;
 //  const AList<TRGCDCWireHit> & axialHits = _cdc->axialHits(mask);
 //  const AList<TRGCDCWireHit> & stereoHits = _cdc->stereoHits(mask);
 //  const AList<TRGCDCWireHit> & allHits = _cdc->hits(mask);
-    CAList<Belle2::TRGCDCWireHit> axialHits;
-    CAList<Belle2::TRGCDCWireHit> stereoHits;
-    CAList<Belle2::TRGCDCWireHit> allHits;
-    const std::vector<const Belle2::TRGCDCWireHit*> hits = _cdc->hits();
+    CAList<TWireHit> axialHits;
+    CAList<TWireHit> stereoHits;
+    CAList<TWireHit> allHits;
+    const std::vector<const TWireHit*> hits = _cdc->hits();
     for (unsigned i = 0; i < hits.size(); i++) {
-      allHits.append(hits[i]);
+        allHits.append(hits[i]);
     }
-    allHits.sort(Belle2::TRGCDCWireHit::sortByWireId);
+    allHits.sort(TWireHit::sortByWireId);
     for (unsigned i = 0; i < (unsigned) allHits.length(); i++) {
-      const Belle2::TRGCDCWireHit* hit = allHits[i];
-      if (hit->wire().axial())
-        axialHits.append(hit);
-      else
-        stereoHits.append(hit);
+	const TWireHit* hit = allHits[i];
+	if (hit->wire().axial())
+	    axialHits.append(hit);
+	else
+	    stereoHits.append(hit);
 
     }
 
@@ -1446,20 +1438,20 @@ namespace Belle {
 
     //...Perfect finder...
     if (b_doPerfectFinder) {
-      _perfectFinder->doit(axialHits, stereoHits, tracks, tracks2D);
-      _trackManager.append(tracks);
+        _perfectFinder->doit(axialHits, stereoHits, tracks, tracks2D);
+        _trackManager.append(tracks);
     }
 
     //...Normal finders..
     else {
 
-      //...Mode 0... (all finders on)
-      if (b_mode == 0)
-        main0(axialHits, stereoHits, allHits, tracks, tracks2D);
+        //...Mode 0... (all finders on)
+        if (b_mode == 0)
+            main0(axialHits, stereoHits, allHits, tracks, tracks2D);
 
-      //...Mode 1... (all finders on)
-      else
-        main1(axialHits, stereoHits, allHits, tracks, tracks2D);
+        //...Mode 1... (all finders on)
+        else
+            main1(axialHits, stereoHits, allHits, tracks, tracks2D);
     }
 
     //...Move a pivot...
@@ -1502,16 +1494,16 @@ namespace Belle {
 
     //...For debug...
     if (b_debugLevel) {
-      std::cout
-          << "Trasan ... ev# " << _nEvents << " processed,"
-          << " #tracks found=" << _trackManager.allTracks().length()
-          << ", #good tracks=" << _trackManager.tracks().length()
-          << ", #2D tracks=" << _trackManager.tracks2D().length()
-          << std::endl;
-      if (b_debugLevel > 1)
-        _trackManager.dump("eventSummary");
-      else if (b_debugLevel > 2)
-        _trackManager.dump("eventSummary hits");
+        std::cout
+            << "Trasan ... ev# " << _nEvents << " processed,"
+            << " #tracks found=" << _trackManager.allTracks().length()
+            << ", #good tracks=" << _trackManager.tracks().length()
+            << ", #2D tracks=" << _trackManager.tracks2D().length()
+            << std::endl;
+        if (b_debugLevel > 1)
+            _trackManager.dump("eventSummary");
+        else if (b_debugLevel > 2)
+            _trackManager.dump("eventSummary hits");
 
     }
 
@@ -1538,7 +1530,7 @@ namespace Belle {
 #ifdef TRASAN_WINDOW_GTK
     AList<TLink> tmp;
     for (unsigned i = 0; i < (unsigned) _trackManager.tracks().length(); i++)
-      tmp.append(_trackManager.tracks()[i]->links());
+        tmp.append(_trackManager.tracks()[i]->links());
     w.endOfEvent();
     w.clear();
     w.stage("Trasan : all finders finished");
@@ -1556,54 +1548,53 @@ namespace Belle {
 //     op->set_export_filename("test.pdf");
 //     Gtk::PrintOperationResult res = op->run(Gtk::PRINT_OPERATION_ACTION_EXPORT);
 #endif
-  }
+}
 
-  void
-  Trasan::mcInformation(void)
-  {
+void
+Trasan::mcInformation(void) {
 
     //...Preparation...
 //  const AList<TTrack> & allTracks = _trackManager.allTracks();
     const AList<TTrack>& allTracks = _trackManager.tracksFinal();
 
-    unsigned nHep = Belle2::TRGCDCTrackMC::list().size();
+    unsigned nHep = TTrackMC::list().size();
     unsigned nTrk = allTracks.length();
     unsigned* N;
     if (NULL == (N = (unsigned*) malloc(nHep * sizeof(unsigned)))) {
-      perror("$Id: Trasan.cc 11152 2010-04-28 01:24:38Z yiwasaki $:N:malloc");
-      exit(1);
+        perror("$Id: Trasan.cc 11152 2010-04-28 01:24:38Z yiwasaki $:N:malloc");
+        exit(1);
     }
     for (unsigned i = 0; i < nHep; i++) N[i] = 0;
 
     //...Loop over all tracks...
     for (unsigned i = 0; i < nTrk; i++) {
-      TTrackMC* mc = allTracks[i]->_mc;
-      if (! mc) {
-        mc = new TTrackMC(* allTracks[i]);
-        _mcTracks.append(mc);
-        allTracks[i]->_mc = mc;
-      }
+        TTrackMC* mc = allTracks[i]->_mc;
+        if (! mc) {
+            mc = new TTrackMC(* allTracks[i]);
+            _mcTracks.append(mc);
+            allTracks[i]->_mc = mc;
+        }
 
-      mc->update();
-      if (mc->hepId() != -1)
-        if (mc->charge())
-          ++N[mc->hepId()];
+        mc->update();
+        if (mc->hepId() != -1)
+            if (mc->charge())
+                ++N[mc->hepId()];
     }
 
     //...Check uniqueness...
     for (unsigned i = 0; i < nHep; i++) {
-      if (N[i] < 2) {
-        for (unsigned j = 0; j < nTrk; j++)
-          if ((unsigned) allTracks[j]->_mc->hepId() == i)
-            allTracks[j]->_mc->_quality += TTrackUnique;
-      }
+        if (N[i] < 2) {
+            for (unsigned j = 0; j < nTrk; j++)
+                if ((unsigned) allTracks[j]->_mc->hepId() == i)
+                    allTracks[j]->_mc->_quality += TTrackUnique;
+        }
     }
 
     //...Good tracks...
     for (unsigned i = 0; i < nTrk; i++) {
-      unsigned& quality = allTracks[i]->_mc->_quality;
-      if ((quality & TTrackGhost) && (quality & TTrackUnique))
-        quality += TTrackGood;
+        unsigned& quality = allTracks[i]->_mc->_quality;
+        if ((quality & TTrackGhost) && (quality & TTrackUnique))
+            quality += TTrackGood;
     }
 
     //...Termination...
@@ -1611,19 +1602,18 @@ namespace Belle {
 
     //...Debug...
     if (b_debugLevel) {
-      std::cout << "Belle2::TRGCDCTrackMC list ..." << std::endl;
-      std::cout << "   id:ptype:mother:p:v" << std::endl;
-      for (unsigned i = 0; i < nHep; i++)
-        (Belle2::TRGCDCTrackMC::list())[i]->dump("", "    ");
-      std::cout << "TTrackMC list ..." << std::endl;
-      for (unsigned i = 0; i < nTrk; i++)
-        allTracks[i]->_mc->dump("", "    ");
+	std::cout << "TTrackMC list ..." << std::endl;
+	std::cout << "   id:ptype:mother:p:v" << std::endl;
+	for (unsigned i = 0; i < nHep; i++)
+	    (TTrackMC::list())[i]->dump("", "    ");
+	std::cout << "TTrackMC list ..." << std::endl;
+	for (unsigned i = 0; i < nTrk; i++)
+	    allTracks[i]->_mc->dump("", "    ");
     }
-  }
+}
 
-  void
-  Trasan::clear(bool termination)
-  {
+void
+Trasan::clear(bool termination) {
 
     //...Clear track candidates of the last event...
     HepAListDeleteAll(_mcTracks);
@@ -1644,17 +1634,15 @@ namespace Belle {
     std::cout << "Trasan::clear ... nTTracks=" << TTrack::nTTracks()
               << ", nTTracksMax=" << TTrack::nTTracksMax() << std::endl;
 #endif
-  }
+}
 
-  void
-  Trasan::fastClear(void)
-  {
+void
+Trasan::fastClear(void) {
     clear();
-  }
+}
 
-  bool
-  Trasan::mcEvent(void) const
-  {
+bool
+Trasan::mcEvent(void) const {
 //cnv     struct belle_event * ev =
 //  (struct belle_event *) BsGetEnt(BELLE_EVENT, 1, BBS_No_Index);
 
@@ -1663,218 +1651,217 @@ namespace Belle {
 //     if (ev->m_ExpMC == 2) return true;
 //     return false;
     return true;
-  }
+}
 
-  void
-  Trasan::dump(const std::string& msg, const std::string& pre) const
-  {
+void
+Trasan::dump(const std::string& msg, const std::string& pre) const {
     bool def = (msg == "") ? true : false;
 
     std::cout << std::endl;
     if (msg.find("summary") != std::string::npos ||
         msg.find("detail") != std::string::npos) {
-      std::cout << "Trasan Summary (" << version() << ")" << std::endl;
-      std::cout << "    Track Manager Summary" << std::endl;
-      if (b_doMCAnalysis)
-        _trackManager.dump("summary MC", "        ");
-      else
-        _trackManager.dump("summary", "        ");
-      if (_confFinder) {
-        std::cout << "    Conformal Finder Summary" << std::endl;
-        _confFinder->dump("summary", "        ");
-      }
+        std::cout << "Trasan Summary (" << version() << ")" << std::endl;
+        std::cout << "    Track Manager Summary" << std::endl;
+        if (b_doMCAnalysis)
+            _trackManager.dump("summary MC", "        ");
+        else
+            _trackManager.dump("summary", "        ");
+        if (_confFinder) {
+            std::cout << "    Conformal Finder Summary" << std::endl;
+            _confFinder->dump("summary", "        ");
+        }
     }
     if (def || msg.find("parameter") != std::string::npos ||
         msg.find("detail") != std::string::npos) {
-      std::string t0 = pre;
-      std::string t1 = pre + "    ";
-      std::string t2 = pre + "        ";
+        std::string t0 = pre;
+        std::string t1 = pre + "    ";
+        std::string t2 = pre + "        ";
 
-      std::cout
-          << t0 << name() << "(" << version() << ")" << " : debug level = "
-          << b_debugLevel << std::endl;
-      if (b_doPerfectFinder != 0) {
         std::cout
-            << t1 << "Perfect finder is active. ";
-        std::cout
-            << "Other finders will not called." << std::endl;
-      }
-      if (b_conformalFinder == 1) {
-        std::cout
-            << t1 << "New trasan(new conf. finder) is active."
-            << std::endl;
-      }
+            << t0 << name() << "(" << version() << ")" << " : debug level = "
+            << b_debugLevel << std::endl;
+        if (b_doPerfectFinder != 0) {
+            std::cout
+                << t1 << "Perfect finder is active. ";
+            std::cout
+                << "Other finders will not called." << std::endl;
+        }
+        if (b_conformalFinder == 1) {
+            std::cout
+                << t1 << "New trasan(new conf. finder) is active."
+                << std::endl;
+        }
 
-      if (_cdc) {
-        std::cout
-            << t1 << _cdc->name() << "(" << _cdc->version() << ")"
-            << std::endl;
-        std::cout
-            << t2 << "cdc version           : " << _cdc->versionCDC()
-            << std::endl;
-        std::cout
-            << t2 << "fudge factor          : " << _cdc->fudgeFactor()
-            << std::endl;
+        if (_cdc) {
+            std::cout
+                << t1 << _cdc->name() << "(" << _cdc->version() << ")"
+                << std::endl;
+            std::cout
+                << t2 << "cdc version           : " << _cdc->versionCDC()
+                << std::endl;
+            std::cout
+                << t2 << "fudge factor          : " << _cdc->fudgeFactor()
+                << std::endl;
 //      std::cout
 //    << t2 << "simulate small cell : "
 //    << _cdc->simulateSmallCell() << std::endl;
-        std::cout
-            << t2 << "simulate small cell : no longer available"
-            << std::endl;
-      } else {
-        std::cout
-            << t1 << "CDC is not created yet" << std::endl;
-      }
+            std::cout
+                << t2 << "simulate small cell : no longer available"
+                << std::endl;
+        } else {
+            std::cout
+                << t1 << "CDC is not created yet" << std::endl;
+        }
 
 //cnv   if (_cdccat)
 //      std::cout
 //    << t1 << _cdccat->name() << "(" << _cdccat->version() << ")"
 //    << std::endl;
 
-      std::cout
-          << t1 << "ignore hit quality      : " << b_useAllHits << std::endl;
-      std::cout
-          << t1 << "do T0 reset             : " << b_doT0Reset << std::endl;
-      std::cout
-          << t1 << "    max number of reset : " << b_nT0ResetMax
-          << std::endl;
-      std::cout
-          << t1 << "MC analysis             : " << b_doMCAnalysis
-          << std::endl;
-      std::cout
-          << t1 << "mode                    : " << b_mode << std::endl;
-      std::cout
-          << t1 << "helix fitter chisq max  : " << b_helixFitterChisqMax
-          << std::endl;
-      std::cout
-          << t1 << "helix fitter max. iterations  : "
-          << b_helixFitterNtrialMax
-          << std::endl;
-      std::cout
-          << t1 << "test flag               : " << b_test << std::endl;
+        std::cout
+            << t1 << "ignore hit quality      : " << b_useAllHits << std::endl;
+        std::cout
+            << t1 << "do T0 reset             : " << b_doT0Reset << std::endl;
+        std::cout
+            << t1 << "    max number of reset : " << b_nT0ResetMax
+            << std::endl;
+        std::cout
+            << t1 << "MC analysis             : " << b_doMCAnalysis
+            << std::endl;
+        std::cout
+            << t1 << "mode                    : " << b_mode << std::endl;
+        std::cout
+            << t1 << "helix fitter chisq max  : " << b_helixFitterChisqMax
+            << std::endl;
+        std::cout
+            << t1 << "helix fitter max. iterations  : "
+            << b_helixFitterNtrialMax
+            << std::endl;
+        std::cout
+            << t1 << "test flag               : " << b_test << std::endl;
 
-      std::cout
-          << t1 << _trackManager.name() << "(" << _trackManager.version()
-          << ") options" << std::endl;
-      std::cout
-          << t2 << "T0 determination      : " << b_doT0Determination
-          << std::endl;
-      std::cout
-          << t2 << "    # of tracks       : " << b_nTracksForT0 << std::endl;
-      std::cout
-          << t2 << "bank sort             : " << b_sortMode << std::endl;
-      std::cout
-          << t2 << "max. momentum allowed : " << b_momentumCut  << " GeV/c"
-          << std::endl;
-      std::cout
-          << t2 << "max. pt allowed       : " << b_ptCut << " GeV/c"
-          << std::endl;
-      std::cout
-          << t2 << "max. tanl allowed     : " << b_tanlCut << " GeV/c"
-          << std::endl;
-      std::cout
-          << t2 << "salvage               : " << b_doSalvage << std::endl;
-      std::cout
-          << t2 << "salvage level         : " << b_salvageLevel << std::endl;
+        std::cout
+            << t1 << _trackManager.name() << "(" << _trackManager.version()
+            << ") options" << std::endl;
+        std::cout
+            << t2 << "T0 determination      : " << b_doT0Determination
+            << std::endl;
+        std::cout
+            << t2 << "    # of tracks       : " << b_nTracksForT0 << std::endl;
+        std::cout
+            << t2 << "bank sort             : " << b_sortMode << std::endl;
+        std::cout
+            << t2 << "max. momentum allowed : " << b_momentumCut  << " GeV/c"
+            << std::endl;
+        std::cout
+            << t2 << "max. pt allowed       : " << b_ptCut << " GeV/c"
+            << std::endl;
+        std::cout
+            << t2 << "max. tanl allowed     : " << b_tanlCut << " GeV/c"
+            << std::endl;
+        std::cout
+            << t2 << "salvage               : " << b_doSalvage << std::endl;
+        std::cout
+            << t2 << "salvage level         : " << b_salvageLevel << std::endl;
 
-      std::cout
-          << t1 << _perfectFinder->name() << "("
-          << _perfectFinder->version() << ") options" << std::endl;
-      std::cout
-          << t2 << "do finding            : " << b_doPerfectFinder
-          << std::endl;
-      std::cout
-          << t2 << "perfect fitting       : " << b_perfectFitting
-          << std::endl;
+        std::cout
+            << t1 << _perfectFinder->name() << "("
+            << _perfectFinder->version() << ") options" << std::endl;
+        std::cout
+            << t2 << "do finding            : " << b_doPerfectFinder
+            << std::endl;
+        std::cout
+            << t2 << "perfect fitting       : " << b_perfectFitting
+            << std::endl;
 
-      std::cout
-          << t1 << _confFinder->name() << "(" << _confFinder->version()
-          << ") options" << std::endl;
-      std::cout
-          << t2 << "do finding            : " << b_doConformalFinder
-          << std::endl;
-      if (b_conformalFinder == 1) {
         std::cout
-            << t2 << "fast finder           : " << b_doConformalFastFinder
+            << t1 << _confFinder->name() << "(" << _confFinder->version()
+            << ") options" << std::endl;
+        std::cout
+            << t2 << "do finding            : " << b_doConformalFinder
             << std::endl;
-        std::cout
-            << t2 << "slow finder           : " << b_doConformalSlowFinder
-            << std::endl;
-        std::cout
-            << t2 << "perfect segment find  : "
-            << b_conformalPerfectSegmentFinding << std::endl;
-        std::cout
-            << t2 << "max sigma             : " << b_conformalMaxSigma
-            << std::endl;
-        std::cout
-            << t2 << "min # hits for segment: "
-            << b_conformalMinNLinksForSegment << std::endl;
-        std::cout
-            << t2 << "min # cores in segment: " << b_conformalMinNCores
-            << std::endl;
-        std::cout
-            << t2 << "min # segments        : " << b_conformalMinNSegments
-            << std::endl;
-        std::cout
-            << t2 << "salvage level         : " << b_salvageLevel
-            << std::endl;
-        std::cout
-            << t2 << "salvage load width    : "
-            << b_conformalSalvageLoadWidth << std::endl;
-        std::cout
-            << t2 << "stereo mode           : " << b_conformalStereoMode
-            << std::endl;
-        std::cout
-            << t2 << "stereo load width     : "
-            << b_conformalStereoLoadWidth << std::endl;
-        std::cout
-            << t2 << "stereo max sigma      : "
-            << b_conformalStereoMaxSigma << std::endl;
-        std::cout
-            << t2 << "stereo segment dist.  : "
-            << b_conformalStereoSzSegmentDistance << std::endl;
-        std::cout
-            << t2 << "stereo link distance  : "
-            << b_conformalStereoSzLinkDistance << std::endl;
-      } else {
-        std::cout
-            << t2 << "Old trasan(old conf. finder) is active."
-            << std::endl;
-        std::cout
-            << t2 << "do stereo finding     : "
-            << b_doConformalFinderStereo << std::endl;
-        std::cout
-            << t2 << "use cosmic builder    : "
-            << b_doConformalFinderCosmic << std::endl;
-        std::cout
-            << t2 << "max sigma             : " << b_conformalMaxSigma
-            << std::endl;
-        std::cout
-            << t2 << "fraction              : " << b_conformalFraction
-            << std::endl;
-        std::cout
-            << t2 << "fitting corrections   : "
-            << b_conformalFittingCorrections << std::endl;
-        std::cout
-            << t2 << "stereo max sigma      : "
-            << b_conformalStereoMaxSigma << std::endl;
-        std::cout
-            << t2 << "stereo z3             : " << b_conformalStereoZ3
-            << std::endl;
-        std::cout
-            << t2 << "stereo z4             : " << b_conformalStereoZ4
-            << std::endl;
-        std::cout
-            << t2 << "stereo chisq 3        : " << b_conformalStereoChisq3
-            << std::endl;
-        std::cout
-            << t2 << "stereo chisq 4        : " << b_conformalStereoChisq4
-            << std::endl;
-      }
-      std::cout << t1 << _curlFinder->name();
-      std::cout << "(" << _curlFinder->version() << ") options" << std::endl;
-      std::cout << t2 << "do finding            : " << b_doCurlFinder
+        if (b_conformalFinder == 1) {
+            std::cout
+                << t2 << "fast finder           : " << b_doConformalFastFinder
                 << std::endl;
+            std::cout
+                << t2 << "slow finder           : " << b_doConformalSlowFinder
+                << std::endl;
+            std::cout
+                << t2 << "perfect segment find  : "
+                << b_conformalPerfectSegmentFinding << std::endl;
+            std::cout
+                << t2 << "max sigma             : " << b_conformalMaxSigma
+                << std::endl;
+            std::cout
+                << t2 << "min # hits for segment: "
+                << b_conformalMinNLinksForSegment << std::endl;
+            std::cout
+                << t2 << "min # cores in segment: " << b_conformalMinNCores
+                << std::endl;
+            std::cout
+                << t2 << "min # segments        : " << b_conformalMinNSegments
+                << std::endl;
+            std::cout
+                << t2 << "salvage level         : " << b_salvageLevel
+                << std::endl;
+            std::cout
+                << t2 << "salvage load width    : "
+                << b_conformalSalvageLoadWidth << std::endl;
+            std::cout
+                << t2 << "stereo mode           : " << b_conformalStereoMode
+                << std::endl;
+            std::cout
+                << t2 << "stereo load width     : "
+                << b_conformalStereoLoadWidth << std::endl;
+            std::cout
+                << t2 << "stereo max sigma      : "
+                << b_conformalStereoMaxSigma << std::endl;
+            std::cout
+                << t2 << "stereo segment dist.  : "
+                << b_conformalStereoSzSegmentDistance << std::endl;
+            std::cout
+                << t2 << "stereo link distance  : "
+                << b_conformalStereoSzLinkDistance << std::endl;
+        } else {
+            std::cout
+                << t2 << "Old trasan(old conf. finder) is active."
+                << std::endl;
+            std::cout
+                << t2 << "do stereo finding     : "
+                << b_doConformalFinderStereo << std::endl;
+            std::cout
+                << t2 << "use cosmic builder    : "
+                << b_doConformalFinderCosmic << std::endl;
+            std::cout
+                << t2 << "max sigma             : " << b_conformalMaxSigma
+                << std::endl;
+            std::cout
+                << t2 << "fraction              : " << b_conformalFraction
+                << std::endl;
+            std::cout
+                << t2 << "fitting corrections   : "
+                << b_conformalFittingCorrections << std::endl;
+            std::cout
+                << t2 << "stereo max sigma      : "
+                << b_conformalStereoMaxSigma << std::endl;
+            std::cout
+                << t2 << "stereo z3             : " << b_conformalStereoZ3
+                << std::endl;
+            std::cout
+                << t2 << "stereo z4             : " << b_conformalStereoZ4
+                << std::endl;
+            std::cout
+                << t2 << "stereo chisq 3        : " << b_conformalStereoChisq3
+                << std::endl;
+            std::cout
+                << t2 << "stereo chisq 4        : " << b_conformalStereoChisq4
+                << std::endl;
+        }
+        std::cout << t1 << _curlFinder->name();
+        std::cout << "(" << _curlFinder->version() << ") options" << std::endl;
+        std::cout << t2 << "do finding            : " << b_doCurlFinder
+                  << std::endl;
 //cnv   if (_clustFinder) {
 //      std::cout << t1 << _clustFinder->name();
 //      std::cout << "(" << _clustFinder->version() << ") options"
@@ -1888,76 +1875,76 @@ namespace Belle {
 //      std::cout << t2 << "cathode cosmic switch : " << b_cathodeCosmic
 //          << std::endl;
 //  }
-      std::cout << t1 << "Patten Matching CurlFinder"
-                << "(0.2beta) options" << std::endl;
-      std::cout << t2 << "do finding                    : "
-                << b_doPMCurlFinder << std::endl;
-      std::cout << t2 << "mode(1=rec, 2=map, 3=plot)    : "
-                << b_pmCurlFinder << std::endl;
-      std::cout << t2 << "min electrons of svd clusters : "
-                << min_svd_electrons_in_pmc << std::endl;
-      std::cout << t1 << "SVD Associator" << "(0.2beta) options"
+        std::cout << t1 << "Patten Matching CurlFinder"
+                  << "(0.2beta) options" << std::endl;
+        std::cout << t2 << "do finding                    : "
+                  << b_doPMCurlFinder << std::endl;
+        std::cout << t2 << "mode(1=rec, 2=map, 3=plot)    : "
+                  << b_pmCurlFinder << std::endl;
+        std::cout << t2 << "min electrons of svd clusters : "
+                  << min_svd_electrons_in_pmc << std::endl;
+        std::cout << t1 << "SVD Associator" << "(0.2beta) options"
+                  << std::endl;
+        std::cout << t2 << "doing : " << b_doSvdAssociator << std::endl;
+        if (_houghFinder) {
+            std::cout
+                << t1 << _houghFinder->name() << "("
+                << _houghFinder->version() << ") options" << std::endl;
+            std::cout
+                << t2 << "do finding            : " << b_doHoughFinder
                 << std::endl;
-      std::cout << t2 << "doing : " << b_doSvdAssociator << std::endl;
-      if (_houghFinder) {
-        std::cout
-            << t1 << _houghFinder->name() << "("
-            << _houghFinder->version() << ") options" << std::endl;
-        std::cout
-            << t2 << "do finding            : " << b_doHoughFinder
-            << std::endl;
-        std::cout
-            << t2 << "do curl search        : "
-            << b_doHoughFinderCurlSearch << std::endl;
-        std::cout
-            << t2 << "mesh size x           : " << b_houghMeshX
-            << std::endl;
-        std::cout
-            << t2 << "mesh size y           : " << b_houghMeshY
-            << std::endl;
-        std::cout
-            << t2 << "Pt boundary           : " << b_houghPtBoundary
-            << std::endl;
-        std::cout
-            << t2 << "threshold             : " << b_houghThreshold
-            << std::endl;
-        std::cout
-            << t2 << "mesh size x (low Pt)  : " << b_houghMeshXLowPt
-            << std::endl;
-        std::cout
-            << t2 << "mesh size y (low Pt)  : " << b_houghMeshYLowPt
-            << std::endl;
-        std::cout
-            << t2 << "Pt boundary (low Pt)  : " << b_houghPtBoundaryLowPt
-            << std::endl;
-        std::cout
-            << t2 << "threshold  (low Pt)   : " << b_houghThresholdLowPt
-            << std::endl;
-        std::cout
-            << t2 << "axial load width      : " << b_houghAxialLoadWidth
-            << std::endl;
-        std::cout
-            << t2 << "axial load width curl : "
-            << b_houghAxialLoadWidthCurl
-            << std::endl;
-        std::cout
-            << t2 << "max sigma             : " << b_houghMaxSigma
-            << std::endl;
-        std::cout
-            << t2 << "max sigma stereo      : " << b_houghStereoMaxSigma
-            << std::endl;
-        std::cout
-            << t2 << "salvage level         : " << b_houghSalvageLevel
-            << std::endl;
-        std::cout
-            << t2 << "mode                  : " << b_houghMode
-            << std::endl;
-      }
+            std::cout
+                << t2 << "do curl search        : "
+                << b_doHoughFinderCurlSearch << std::endl;
+            std::cout
+                << t2 << "mesh size x           : " << b_houghMeshX
+                << std::endl;
+            std::cout
+                << t2 << "mesh size y           : " << b_houghMeshY
+                << std::endl;
+            std::cout
+                << t2 << "Pt boundary           : " << b_houghPtBoundary
+                << std::endl;
+            std::cout
+                << t2 << "threshold             : " << b_houghThreshold
+                << std::endl;
+            std::cout
+                << t2 << "mesh size x (low Pt)  : " << b_houghMeshXLowPt
+                << std::endl;
+            std::cout
+                << t2 << "mesh size y (low Pt)  : " << b_houghMeshYLowPt
+                << std::endl;
+            std::cout
+                << t2 << "Pt boundary (low Pt)  : " << b_houghPtBoundaryLowPt
+                << std::endl;
+            std::cout
+                << t2 << "threshold  (low Pt)   : " << b_houghThresholdLowPt
+                << std::endl;
+            std::cout
+                << t2 << "axial load width      : " << b_houghAxialLoadWidth
+                << std::endl;
+            std::cout
+                << t2 << "axial load width curl : "
+                << b_houghAxialLoadWidthCurl
+                << std::endl;
+            std::cout
+                << t2 << "max sigma             : " << b_houghMaxSigma
+                << std::endl;
+            std::cout
+                << t2 << "max sigma stereo      : " << b_houghStereoMaxSigma
+                << std::endl;
+            std::cout
+                << t2 << "salvage level         : " << b_houghSalvageLevel
+                << std::endl;
+            std::cout
+                << t2 << "mode                  : " << b_houghMode
+                << std::endl;
+        }
     }
     if (def
         || msg.find("tracks") != std::string::npos
         || msg.find("detail") != std::string::npos) {
-      _trackManager.dump("eventSummary");
+        _trackManager.dump("eventSummary");
     }
     if (msg.find("cathode") != std::string::npos
         || msg.find("detail") != std::string::npos) {
@@ -1966,11 +1953,10 @@ namespace Belle {
 // //     _clustFinder->dump("");
 //  }
     }
-  }
+}
 
-  void
-  Trasan::banner(void) const
-  {
+void
+Trasan::banner(void) const {
     std::cout << "\n";
     std::cout << "=========================================================\n";
     std::cout << "      Trasan : Belle Tracking Module                     \n";
@@ -2186,17 +2172,17 @@ namespace Belle {
 #endif
     std::cout << " 5.00     : 29-Sep-2010 : YI : for Belle2\n";
     std::cout << " 5.02     : 07-Dec-2012 : YI : Sorting wires correctly\n";
+    std::cout << " 5.20     : 12-Dec-2013 : YI : Independent from TRG\n";
     std::cout << "=========================================================\n";
     std::cout << version() << " notices " << std::endl;
 //  std::cout << "  This is a test version for the production 2001 summar.\n";
 //  std::cout << "  Last purified : 25-Apr-2001 with 3.00RC6" << std::endl;
 //  std::cout << "  Default finder is still Conformal + Curl Finders\n";
     std::cout << std::endl;
-  }
+}
 
-  void
-  Trasan::beginRun()
-  {
+void
+Trasan::beginRun() {
 
 //cnv   Belle_version_Manager &bvMgr = Belle_version_Manager::get_manager();
 //   if( bvMgr.count() > 0 ) {
@@ -2284,109 +2270,106 @@ namespace Belle {
 //     //...Initialize finders...
 //     if (_houghFinder)
 //  _houghFinder->init();
-  }
+}
 
-  void
-  Trasan::endRun()
-  {
-  }
+void
+Trasan::endRun() {
+}
 
-  void
-  Trasan::selectUnusedHits(const CAList<Belle2::TRGCDCWireHit>& hits,
-                           CAList<Belle2::TRGCDCWireHit>& unusedHits) const
-  {
+void
+Trasan::selectUnusedHits(const CAList<TWireHit> & hits,
+			 CAList<TWireHit> & unusedHits) const {
 
     //...Pick up used hits (3D tracks only)...
-    CAList<Belle2::TRGCDCWireHit> used;
+    CAList<TWireHit> used;
     const AList<TTrack>& tracks = _trackManager.tracks();
     for (unsigned i = 0; i < (unsigned) tracks.length(); i++) {
-      const TTrack& t = * tracks[i];
-      const AList<TLink>& links = t.links();
-      const unsigned n = links.length();
-      for (unsigned j = 0; j < n; j++)
-        used.append((Belle2::TRGCDCWireHit*) links[j]->hit());
+	const TTrack& t = * tracks[i];
+	const AList<TLink> & links = t.links();
+	const unsigned n = links.length();
+	for (unsigned j = 0; j < n; j++)
+	    used.append((TWireHit*) links[j]->hit());
     }
 
     unusedHits = hits;
     unusedHits.remove(used);
-  }
+}
 
-  void
-  Trasan::main0(const CAList<Belle2::TRGCDCWireHit>& axialHits,
-                const CAList<Belle2::TRGCDCWireHit>& stereoHits,
-                const CAList<Belle2::TRGCDCWireHit>& allHits,
-                AList<TTrack>& tracks,
-                AList<TTrack>& tracks2D)
-  {
+void
+Trasan::main0(const CAList<TWireHit> & axialHits,
+	      const CAList<TWireHit> & stereoHits,
+	      const CAList<TWireHit> & allHits,
+	      AList<TTrack> & tracks,
+	      AList<TTrack> & tracks2D) {
 
-start:
+  start:
     unsigned nT0Reset = 0;
 
     //...Conformal finder...
     if (b_doConformalFinder) {
 
-      //...T0 reset option...
-      if (b_doT0Reset) {
-        if ((unsigned) b_nT0ResetMax > nT0Reset)
-          ((TConformalFinder*) _confFinder)->doT0Reset(true);
-        else
-          ((TConformalFinder*) _confFinder)->doT0Reset(false);
-      }
+        //...T0 reset option...
+        if (b_doT0Reset) {
+            if ((unsigned) b_nT0ResetMax > nT0Reset)
+                ((TConformalFinder*) _confFinder)->doT0Reset(true);
+            else
+                ((TConformalFinder*) _confFinder)->doT0Reset(false);
+        }
 
 //      AList<TRGCDCWireHit> unusedAxial;
 //      AList<TRGCDCWireHit> unusedStereo;
 //      selectUnusedHits(axialHits, unusedAxial);
 //      selectUnusedHits(stereoHits, unusedStereo);
 //      _confFinder->doit(unusedAxial, unusedStereo, tracks, tracks2D);
-      _confFinder->doit(axialHits, stereoHits, tracks, tracks2D);
+        _confFinder->doit(axialHits, stereoHits, tracks, tracks2D);
 
-      //...T0 reset...
-      if (b_doT0Reset) {
-        ++nT0Reset;
-        if (((TConformalFinder*) _confFinder)->T0ResetDone()) {
-          clear();
-          goto start;
+        //...T0 reset...
+        if (b_doT0Reset) {
+            ++nT0Reset;
+            if (((TConformalFinder*) _confFinder)->T0ResetDone()) {
+                clear();
+                goto start;
+            }
         }
-      }
 
-      //...Stores tracks...
-      _trackManager.append(tracks);
-      if (curl_version < 2)
-        _trackManager.append2D(tracks2D);
-      if (b_conformalFinder == 0) {
-        if (b_doSalvage == 1) _trackManager.salvage(allHits);
-        if (b_doSalvage) _trackManager.mask();
-      }
+        //...Stores tracks...
+        _trackManager.append(tracks);
+        if (curl_version < 2)
+            _trackManager.append2D(tracks2D);
+        if (b_conformalFinder == 0) {
+            if (b_doSalvage == 1) _trackManager.salvage(allHits);
+            if (b_doSalvage) _trackManager.mask();
+        }
     }
 
     //...Hough finder...
     if (b_doHoughFinder) {
-      ((THoughFinder*) _houghFinder)->
-      doit(axialHits, stereoHits, tracks, tracks2D);
-      _trackManager.append(tracks);
-      _trackManager.append2D(tracks2D);
-      _trackManager.refit();
+        ((THoughFinder*) _houghFinder)->
+            doit(axialHits, stereoHits, tracks, tracks2D);
+        _trackManager.append(tracks);
+        _trackManager.append2D(tracks2D);
+        _trackManager.refit();
     }
 
     //...Curl finder...
     if (b_doCurlFinder) {
-      if ((! b_doSalvage) && (b_conformalFinder == 0)) {
-        _trackManager.maskCurlHits(axialHits,
-                                   stereoHits,
-                                   _trackManager.tracks());
-      }
+        if ((! b_doSalvage) && (b_conformalFinder == 0)) {
+            _trackManager.maskCurlHits(axialHits,
+                                       stereoHits,
+                                       _trackManager.tracks());
+        }
 
 //      AList<TRGCDCWireHit> unusedAxial;
 //      AList<TRGCDCWireHit> unusedStereo;
 //      selectUnusedHits(axialHits, unusedAxial);
 //      selectUnusedHits(stereoHits, unusedStereo);
 
-      AList<TTrack> confTracks = _trackManager.tracks();
-      tracks.append(confTracks);
+        AList<TTrack> confTracks = _trackManager.tracks();
+        tracks.append(confTracks);
 //      _curlFinder->doit(unusedAxial, unusedStereo, tracks, tracks2D);
-      _curlFinder->doit(axialHits, stereoHits, tracks, tracks2D);
-      tracks.remove(confTracks);
-      //_trackManager.append(tracks);
+        _curlFinder->doit(axialHits, stereoHits, tracks, tracks2D);
+        tracks.remove(confTracks);
+        //_trackManager.append(tracks);
     }
 
     //...Finishes tracks...
@@ -2421,67 +2404,66 @@ start:
 
     //...Track merge...
     if (b_mergeTracks)
-      _trackManager.mergeTracks(b_mergeTracks, b_mergeTrackDistance);
+        _trackManager.mergeTracks(b_mergeTracks, b_mergeTrackDistance);
 
     //...Salvage for dE/dx...
     if (b_doAssociation)
-      _trackManager.salvageAssociateHits(allHits, b_associateSigma);
+        _trackManager.salvageAssociateHits(allHits, b_associateSigma);
 
 #ifdef TRASAN_DEBUG_DETAIL
     std::cout << "main0 : Track list after salvage" << std::endl;
     _trackManager.dump("eventSummary helix", Tab(+1));
 #endif
-  }
+}
 
-  void
-  Trasan::main1(const CAList<Belle2::TRGCDCWireHit>& axialHits,
-                const CAList<Belle2::TRGCDCWireHit>& stereoHits,
-                const CAList<Belle2::TRGCDCWireHit>& allHits,
-                AList<TTrack>& tracks,
-                AList<TTrack>& tracks2D)
-  {
+void
+Trasan::main1(const CAList<TWireHit> & axialHits,
+	      const CAList<TWireHit> & stereoHits,
+	      const CAList<TWireHit> & allHits,
+	      AList<TTrack> & tracks,
+	      AList<TTrack> & tracks2D) {
 
     //...Hough finder...
     if (b_doHoughFinder) {
-      ((THoughFinder*) _houghFinder)->
-      doit(axialHits, stereoHits, tracks, tracks2D);
-      _trackManager.append(tracks);
-      _trackManager.append2D(tracks2D);
-      _trackManager.refit();
+        ((THoughFinder*) _houghFinder)->
+            doit(axialHits, stereoHits, tracks, tracks2D);
+        _trackManager.append(tracks);
+        _trackManager.append2D(tracks2D);
+        _trackManager.refit();
     }
 
     //...Conformal finder...
     if (b_doConformalFinder) {
 
-      CAList<Belle2::TRGCDCWireHit> unusedAxial;
-      CAList<Belle2::TRGCDCWireHit> unusedStereo;
-      selectUnusedHits(axialHits, unusedAxial);
-      selectUnusedHits(stereoHits, unusedStereo);
+	CAList<TWireHit> unusedAxial;
+	CAList<TWireHit> unusedStereo;
+	selectUnusedHits(axialHits, unusedAxial);
+	selectUnusedHits(stereoHits, unusedStereo);
 
-      _confFinder->doit(unusedAxial, unusedStereo, tracks, tracks2D);
+        _confFinder->doit(unusedAxial, unusedStereo, tracks, tracks2D);
 
-      //...Stores tracks...
-      _trackManager.append(tracks);
-      if (curl_version < 2)
-        _trackManager.append2D(tracks2D);
-      if (b_conformalFinder == 0) {
-        if (b_doSalvage == 1) _trackManager.salvage(allHits);
-        if (b_doSalvage) _trackManager.mask();
-      }
+        //...Stores tracks...
+        _trackManager.append(tracks);
+        if (curl_version < 2)
+            _trackManager.append2D(tracks2D);
+        if (b_conformalFinder == 0) {
+            if (b_doSalvage == 1) _trackManager.salvage(allHits);
+            if (b_doSalvage) _trackManager.mask();
+        }
     }
 
     //...Curl finder...
     if (b_doCurlFinder) {
-      if ((! b_doSalvage) && (b_conformalFinder == 0)) {
-        _trackManager.maskCurlHits(axialHits,
-                                   stereoHits,
-                                   _trackManager.tracks());
-      }
+        if ((! b_doSalvage) && (b_conformalFinder == 0)) {
+            _trackManager.maskCurlHits(axialHits,
+                                       stereoHits,
+                                       _trackManager.tracks());
+        }
 
-      AList<TTrack> confTracks = _trackManager.tracks();
-      tracks.append(confTracks);
-      _curlFinder->doit(axialHits, stereoHits, tracks, tracks2D);
-      tracks.remove(confTracks);
+        AList<TTrack> confTracks = _trackManager.tracks();
+        tracks.append(confTracks);
+        _curlFinder->doit(axialHits, stereoHits, tracks, tracks2D);
+        tracks.remove(confTracks);
     }
 
     //...Finishes tracks...
@@ -2502,16 +2484,16 @@ start:
 
     //...Track merge...
     if (b_mergeTracks)
-      _trackManager.mergeTracks(b_mergeTracks, b_mergeTrackDistance);
+        _trackManager.mergeTracks(b_mergeTracks, b_mergeTrackDistance);
 
     //...Salvage for dE/dx...
     if (b_doAssociation)
-      _trackManager.salvageAssociateHits(allHits, b_associateSigma);
+        _trackManager.salvageAssociateHits(allHits, b_associateSigma);
 
 #ifdef TRASAN_DEBUG_DETAIL
     std::cout << "main1 : Track list after salvage" << std::endl;
     _trackManager.dump("eventSummary helix", Tab(+1));
 #endif
-  }
+}
 
 } // namespace Belle

@@ -54,6 +54,8 @@
 #ifndef TTrackMC_FLAG_
 #define TTrackMC_FLAG_
 
+#define HEP_SHORT_NAMES
+
 #define TTrackClassified 1
 
 #define TTrackGarbage 1
@@ -70,32 +72,28 @@
 #define TTrackMatchingLoose 4194304
 #define TTrackMatchingTight 8388608
 
-#ifdef TRASAN_DEBUG_DETAIL
-#ifndef TRASAN_DEBUG
-#define TRASAN_DEBUG
-#endif
-#endif
-
-
 #include <string>
-
-#define HEP_SHORT_NAMES
+#include <vector>
 #include "tracking/modules/trasan/AList.h"
 #include "CLHEP/Vector/ThreeVector.h"
 #include "CLHEP/Vector/LorentzVector.h"
 struct reccdc_mctrk;
 
 namespace Belle {
-  class TRGCDCTrackMC;
-}
 
-namespace Belle {
-
-  class Trasan;
-  class TTrack;
+class Trasan;
+class TTrack;
 
 /// A class to have MC information of TTrack.
-  class TTrackMC {
+class TTrackMC {
+
+  public:
+    /// returns a list of TRGCDCTrackMC's.
+    static std::vector<const TTrackMC *> list(void);
+
+  public:
+    /// updates information.
+    void update(void);
 
   private:
     /// Constructor
@@ -112,9 +110,6 @@ namespace Belle {
 
     /// returns HEP ID.
     int hepId(void) const;
-
-    /// returns a pointer to Belle2::TRGCDCTrackMC.
-    const Belle2::TRGCDCTrackMC* const hep(void) const;
 
     /// returns charge matching.
     bool charge(void) const;
@@ -155,10 +150,6 @@ namespace Belle {
     /// returns quality.
     std::string qualityString(void) const;
 
-  public:
-    /// updates information.
-    void update(void);
-
   private:
     /// checks matching of charge.
     void compare(void);
@@ -169,9 +160,8 @@ namespace Belle {
   private:
     unsigned _state;
     unsigned _quality;
-
-    const TTrack& _t;
-    Belle2::TRGCDCTrackMC* _hep;
+    const TTrack & _t;
+    TTrackMC * _hep;
     int _hepID;
     double _wireFraction;
     double _wireFractionHEP;
@@ -185,130 +175,100 @@ namespace Belle {
     double _ptPull;
     double _pzPull;
 
+  private:// static members
+    static std::vector<const TTrackMC *> _list;
+
     friend class Trasan;
-  };
+};
 
-  std::string
-  TrackMCStatus(const TTrackMC&);
+std::string
+TrackMCStatus(const TTrackMC&);
 
-  std::string
-  TrackMCStatus(const reccdc_mctrk&);
+std::string
+TrackMCStatus(const reccdc_mctrk&);
 
-  std::string
-  TrackMCQualityString(unsigned quality);
+std::string
+TrackMCQualityString(unsigned quality);
 
 //-----------------------------------------------------------------------------
 
-#ifdef TRASAN_NO_INLINE
-#define inline
-#else
-#undef inline
-#define TTrackMC_INLINE_DEFINE_HERE
-#endif
-
-#ifdef TTrackMC_INLINE_DEFINE_HERE
-
-  inline
-  int
-  TTrackMC::hepId(void) const
-  {
+inline
+int
+TTrackMC::hepId(void) const {
     return _hepID;
-  }
+}
 
-  inline
-  const Belle2::TRGCDCTrackMC* const
-  TTrackMC::hep(void) const
-  {
-    return _hep;
-  }
-
-  inline
-  bool
-  TTrackMC::charge(void) const
-  {
+inline
+bool
+TTrackMC::charge(void) const {
     return _charge;
-  }
+}
 
-  inline
-  double
-  TTrackMC::ptFraction(void) const
-  {
+inline
+double
+TTrackMC::ptFraction(void) const {
     return _ptFraction;
-  }
+}
 
-  inline
-  double
-  TTrackMC::pzFraction(void) const
-  {
+inline
+double
+TTrackMC::pzFraction(void) const {
     return _pzFraction;
-  }
+}
 
-  inline
-  double
-  TTrackMC::wireFraction(void) const
-  {
+inline
+double
+TTrackMC::wireFraction(void) const {
     return _wireFraction;
-  }
+}
 
-  inline
-  double
-  TTrackMC::wireFractionHEP(void) const
-  {
+inline
+double
+TTrackMC::wireFractionHEP(void) const {
     return _wireFractionHEP;
-  }
+}
 
-  inline
-  unsigned
-  TTrackMC::state(void) const
-  {
+inline
+unsigned
+TTrackMC::state(void) const {
     return _state;
-  }
+}
 
-  inline
-  unsigned
-  TTrackMC::quality(void) const
-  {
+inline
+unsigned
+TTrackMC::quality(void) const {
     return _quality;
-  }
+}
 
-  inline
-  const CLHEP::Hep3Vector&
-  TTrackMC::residual(void) const
-  {
+inline
+const CLHEP::Hep3Vector&
+TTrackMC::residual(void) const {
     return _residual;
-  }
+}
 
-  inline
-  double
-  TTrackMC::ptResidual(void) const
-  {
+inline
+double
+TTrackMC::ptResidual(void) const {
     return _ptResidual;
-  }
+}
 
-  inline
-  double
-  TTrackMC::pzResidual(void) const
-  {
+inline
+double
+TTrackMC::pzResidual(void) const {
     return _pzResidual;
-  }
+}
 
-  inline
-  double
-  TTrackMC::ptPull(void) const
-  {
+inline
+double
+TTrackMC::ptPull(void) const {
     return _ptPull;
-  }
+}
 
-  inline
-  double
-  TTrackMC::pzPull(void) const
-  {
+inline
+double
+TTrackMC::pzPull(void) const {
     return _pzPull;
-  }
-
-#endif
-
-#undef inline
+}
 
 } // namespace Belle
 

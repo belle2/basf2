@@ -33,26 +33,19 @@
 #ifndef TRUNGEFITTER_FLAG_
 #define TRUNGEFITTER_FLAG_
 
-#ifdef TRASAN_DEBUG_DETAIL
-#ifndef TRASAN_DEBUG
-#define TRASAN_DEBUG
-#endif
-#endif
-
+#define HEP_SHORT_NAMES
 
 #include <string>
-
-#define HEP_SHORT_NAMES
 #include "tracking/modules/trasan/THelix.h"
 #include "tracking/modules/trasan/TFitter.h"
 
 namespace Belle {
 
-  class TLink;
-  class TRunge;
+class TLink;
+class TRunge;
 
 /// A class to fit a TTrackBase object to a 3D line.
-  class TRungeFitter : public TFitter {
+class TRungeFitter : public TFitter {
 
   public:
     /// Constructor.
@@ -80,22 +73,9 @@ namespace Belle {
     int _propagation;
     bool _tof;
 
-  };
+};
 
 //-----------------------------------------------------------------------------
-
-#ifdef TRASAN_NO_INLINE
-#define inline
-#else
-#undef inline
-#define TRUNGEFITTER_INLINE_DEFINE_HERE
-#endif
-
-#ifdef TRUNGEFITTER_INLINE_DEFINE_HERE
-
-#endif
-
-#undef inline
 
 } // namespace Belle
 

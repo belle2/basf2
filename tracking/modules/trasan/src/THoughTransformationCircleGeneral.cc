@@ -28,47 +28,41 @@
 
 namespace Belle {
 
-  THoughTransformationCircleGeneral::THoughTransformationCircleGeneral(
+THoughTransformationCircleGeneral::THoughTransformationCircleGeneral(
     const std::string& name)
     : THoughTransformation(name),
-      _r(0)
-  {
-  }
+      _r(0) {
+}
 
-  THoughTransformationCircleGeneral::~THoughTransformationCircleGeneral()
-  {
-  }
+THoughTransformationCircleGeneral::~THoughTransformationCircleGeneral() {
+}
 
-  float
-  THoughTransformationCircleGeneral::y(float xReal,
-                                       float yReal,
-                                       float x) const
-  {
+float
+THoughTransformationCircleGeneral::y(float xReal,
+                                     float yReal,
+                                     float x) const {
     const float a = _r * _r
-                    - 2 * _r * (xReal * cos(x) + yReal * sin(x))
-                    + xReal * xReal + yReal * yReal;
+        - 2 * _r * (xReal * cos(x) + yReal * sin(x))
+        + xReal * xReal + yReal * yReal;
     if (a > 0) return sqrt(a);
 //    if (a > 0) return log10(sqrt(a));
     return 0;
-  }
+}
 
-  TPoint2D
-  THoughTransformationCircleGeneral::circleCenter(const TPoint2D& p) const
-  {
+TPoint2D
+THoughTransformationCircleGeneral::circleCenter(const TPoint2D& p) const {
     return TPoint2D(p.x(), _r);
-  }
+}
 
-  float
-  THoughTransformationCircleGeneral::circleRadius(const TPoint2D& p) const
-  {
+float
+THoughTransformationCircleGeneral::circleRadius(const TPoint2D& p) const {
     return p.y();
-  }
+}
 
-  TPoint2D
-  THoughTransformationCircleGeneral::convert(const TPoint2D& p) const
-  {
+TPoint2D
+THoughTransformationCircleGeneral::convert(const TPoint2D& p) const {
     return TPoint2D(p.x(), log10(p.y()) - _r);
-  }
+}
 
 } // namespace Belle
 

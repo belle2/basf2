@@ -39,22 +39,15 @@
 #ifndef TLINEFITTER_FLAG_
 #define TLINEFITTER_FLAG_
 
-#ifdef TRASAN_DEBUG_DETAIL
-#ifndef TRASAN_DEBUG
-#define TRASAN_DEBUG
-#endif
-#endif
-
+#define HEP_SHORT_NAMES
 
 #include <string>
-
-#define HEP_SHORT_NAMES
 #include "tracking/modules/trasan/TFitter.h"
 
 namespace Belle {
 
 /// A class to fit a TTrackBase object to a line.
-  class TLineFitter : public TFitter {
+class TLineFitter : public TFitter {
 
   public:
     /// Constructor.
@@ -78,43 +71,27 @@ namespace Belle {
     mutable double _a;
     mutable double _b;
     mutable double _det;
-  };
+};
 
 //-----------------------------------------------------------------------------
 
-#ifdef TRASAN_NO_INLINE
-#define inline
-#else
-#undef inline
-#define TLINEFITTER_INLINE_DEFINE_HERE
-#endif
-
-#ifdef TLINEFITTER_INLINE_DEFINE_HERE
-
-  inline
-  double
-  TLineFitter::a(void) const
-  {
+inline
+double
+TLineFitter::a(void) const {
     return _a;
-  }
+}
 
-  inline
-  double
-  TLineFitter::b(void) const
-  {
+inline
+double
+TLineFitter::b(void) const {
     return _b;
-  }
+}
 
-  inline
-  double
-  TLineFitter::det(void) const
-  {
+inline
+double
+TLineFitter::det(void) const {
     return _det;
-  }
-
-#endif
-
-#undef inline
+}
 
 } // namespace Belle
 

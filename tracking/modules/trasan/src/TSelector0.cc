@@ -26,7 +26,7 @@
 
 namespace Belle {
 
-  TSelector0::TSelector0()
+TSelector0::TSelector0()
     : _nLinksDefined(false),
       _nSuperLayersDefined(false),
       _minPtDefined(false),
@@ -38,11 +38,10 @@ namespace Belle {
       _nLinksStereoDefined(false),
       _maxDistanceDefined(false),
       _nLinksStereo(0),
-      _maxDistance(0.)
-  {
-  }
+      _maxDistance(0.) {
+}
 
-  TSelector0::TSelector0(const TSelector0& a)
+TSelector0::TSelector0(const TSelector0& a)
     : _nLinksDefined(a._nLinksDefined),
       _nSuperLayersDefined(a._nSuperLayersDefined),
       _minPtDefined(a._minPtDefined),
@@ -55,114 +54,109 @@ namespace Belle {
       _nLinksStereoDefined(a._nLinksStereoDefined),
       _maxDistanceDefined(a._maxDistanceDefined),
       _nLinksStereo(a._nLinksStereo),
-      _maxDistance(a._maxDistance)
-  {
-  }
+      _maxDistance(a._maxDistance) {
+}
 
-  TSelector0::~TSelector0()
-  {
-  }
+TSelector0::~TSelector0() {
+}
 
-  bool
-  TSelector0::select(TTrackBase& b) const
-  {
+bool
+TSelector0::select(TTrackBase& b) const {
 
 #ifdef TRASAN_DEBUG_DETAIL
     if (! b.fitted()) {
-      std::cout << "    TSelect::select !!! not fitted yet" << std::endl;
+        std::cout << "    TSelect::select !!! not fitted yet" << std::endl;
     }
 #endif
 
     if (b.objectType() == Track) {
-      TTrack& a = (TTrack&) b;
+        TTrack& a = (TTrack&) b;
 
-      if (_minPtDefined) {
-        if (a.pt() < _minPt) {
+        if (_minPtDefined) {
+            if (a.pt() < _minPt) {
 #ifdef TRASAN_DEBUG_DETAIL
-          std::cout << "    TSelect ... rejected by min. pt(";
-          std::cout << a.pt() << ") < ";
-          std::cout << _minPt << std::endl;
+                std::cout << "    TSelect ... rejected by min. pt(";
+                std::cout << a.pt() << ") < ";
+                std::cout << _minPt << std::endl;
 #endif
-          return false;
+                return false;
+            }
         }
-      }
 
-      if (_maxImpactDefined) {
-        if (fabs(a.impact()) > _maxImpact) {
+        if (_maxImpactDefined) {
+            if (fabs(a.impact()) > _maxImpact) {
 #ifdef TRASAN_DEBUG_DETAIL
-          std::cout << "    TSelect ... rejected by max. impact(";
-          std::cout << a.impact() << ") < ";
-          std::cout << _maxImpact << std::endl;
+                std::cout << "    TSelect ... rejected by max. impact(";
+                std::cout << a.impact() << ") < ";
+                std::cout << _maxImpact << std::endl;
 #endif
-          return false;
+                return false;
+            }
         }
-      }
     } else if (b.objectType() == Circle) {
-      TCircle& a = (TCircle&) b;
+        TCircle& a = (TCircle&) b;
 
-      if (_minPtDefined) {
-        if (a.pt() < _minPt) {
+        if (_minPtDefined) {
+            if (a.pt() < _minPt) {
 #ifdef TRASAN_DEBUG_DETAIL
-          std::cout << "    TSelect ... rejected by min. pt(";
-          std::cout << a.pt() << ") < ";
-          std::cout << _minPt << std::endl;
+                std::cout << "    TSelect ... rejected by min. pt(";
+                std::cout << a.pt() << ") < ";
+                std::cout << _minPt << std::endl;
 #endif
-          return false;
+                return false;
+            }
         }
-      }
 
-      if (_maxImpactDefined) {
-        if (fabs(a.impact()) > _maxImpact) {
+        if (_maxImpactDefined) {
+            if (fabs(a.impact()) > _maxImpact) {
 #ifdef TRASAN_DEBUG_DETAIL
-          std::cout << "    TSelect ... rejected by max. impact(";
-          std::cout << a.impact() << ") < ";
-          std::cout << _maxImpact << std::endl;
+                std::cout << "    TSelect ... rejected by max. impact(";
+                std::cout << a.impact() << ") < ";
+                std::cout << _maxImpact << std::endl;
 #endif
-          return false;
+                return false;
+            }
         }
-      }
     } else {
-      std::cout
-          << "TSelector0 !!! Unknown object type" << std::endl;
-      return false;
+        std::cout
+            << "TSelector0 !!! Unknown object type" << std::endl;
+        return false;
     }
 
 #ifdef TRASAN_DEBUG_DETAIL
     std::cout << "    TSelect::select ... accepted" << std::endl;
 #endif
     return true;
-  }
+}
 
-  bool
-  TSelector0::preSelect(const TTrackBase& a) const
-  {
+bool
+TSelector0::preSelect(const TTrackBase& a) const {
     if (_nLinksDefined) {
-      if (a.nLinks() < _nLinks) {
+        if (a.nLinks() < _nLinks) {
 #ifdef TRASAN_DEBUG_DETAIL
-        std::cout << "    TSelect ... rejected by nLinks(";
-        std::cout << a.nLinks() << ") < ";
-        std::cout << _nLinks << std::endl;
+            std::cout << "    TSelect ... rejected by nLinks(";
+            std::cout << a.nLinks() << ") < ";
+            std::cout << _nLinks << std::endl;
 #endif
-        return false;
-      }
+            return false;
+        }
     }
 
     if (_nSuperLayersDefined) {
-      if (TLink::nSuperLayers(a.links()) < _nSuperLayers) {
+        if (TLink::nSuperLayers(a.links()) < _nSuperLayers) {
 #ifdef TRASAN_DEBUG_DETAIL
-        std::cout << "    TSelect ... rejected by nSuperLayers(";
-        std::cout << TLink::nSuperLayers(a.links()) << ") < ";
-        std::cout << _nSuperLayers << std::endl;
+            std::cout << "    TSelect ... rejected by nSuperLayers(";
+            std::cout << TLink::nSuperLayers(a.links()) << ") < ";
+            std::cout << _nSuperLayers << std::endl;
 #endif
-        return false;
-      }
+            return false;
+        }
     }
 
 #ifdef TRASAN_DEBUG_DETAIL
     std::cout << "    TSelect::preSelect ... accepted" << std::endl;
 #endif
     return true;
-  }
+}
 
 } // namespace Belle
-

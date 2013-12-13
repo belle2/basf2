@@ -31,21 +31,18 @@
 //
 //-----------------------------------------------------------------------------
 
-
-
-
 #include "tracking/modules/trasan/T3DLine.h"
 #include "tracking/modules/trasan/T3DLineFitter.h"
-#include "trg/cdc/Wire.h"
+#include "tracking/modules/trasan/TWire.h"
 #include "tracking/modules/trasan/TTrack.h"
 
 namespace Belle {
 
-  extern const HepGeom::Point3D<double>  ORIGIN;
+extern const HepGeom::Point3D<double>  ORIGIN;
 
-  const T3DLineFitter T3DLine::_fitter = T3DLineFitter("T3DLine Default fitter");
+const T3DLineFitter T3DLine::_fitter = T3DLineFitter("T3DLine Default fitter");
 
-  T3DLine::T3DLine()
+T3DLine::T3DLine()
     : TTrackBase(),
       _pivot(ORIGIN),
       _dr(0),
@@ -56,17 +53,16 @@ namespace Belle {
       _chi2(0),
       _ndf(0),
       _cos_phi0(1),
-      _sin_phi0(0)
-  {
+      _sin_phi0(0) {
 
     //...Set a default fitter...
     fitter(& T3DLine::_fitter);
 
     _fitted = false;
     _fittedWithCathode = false;
-  }
+}
 
-  T3DLine::T3DLine(const TTrack& a)
+T3DLine::T3DLine(const TTrack& a)
     : TTrackBase((TTrackBase&) a),
       _pivot(a.helix().pivot()),
       _dr(a.helix().dr()),
@@ -75,8 +71,7 @@ namespace Belle {
       _tanl(a.helix().tanl()),
       _Ea(CLHEP::HepSymMatrix(4, 0)),
       _chi2(0),
-      _ndf(0)
-  {
+      _ndf(0) {
 
     _cos_phi0 = cos(_phi0);
     _sin_phi0 = sin(_phi0);
@@ -86,13 +81,12 @@ namespace Belle {
 
     _fitted = false;
     _fittedWithCathode = false;
-  }
+}
 
-  T3DLine::~T3DLine()
-  {
-  }
+T3DLine::~T3DLine() {
+}
 
-  T3DLine::T3DLine(const T3DLine& a)
+T3DLine::T3DLine(const T3DLine& a)
     : TTrackBase((TTrackBase&) a),
       _pivot(a.pivot()),
       _dr(a.dr()),
@@ -101,8 +95,7 @@ namespace Belle {
       _tanl(a.tanl()),
       _Ea(a.Ea()),
       _chi2(a.chi2()),
-      _ndf(a.ndf())
-  {
+      _ndf(a.ndf()) {
 
     _cos_phi0 = cos(_phi0);
     _sin_phi0 = sin(_phi0);
@@ -112,125 +105,107 @@ namespace Belle {
 
     _fitted = false;
     _fittedWithCathode = false;
-  }
+}
 
-  double T3DLine::dr(void) const
-  {
+double T3DLine::dr(void) const {
     return _dr;
-  }
+}
 
-  double T3DLine::phi0(void) const
-  {
+double T3DLine::phi0(void) const {
     return _phi0;
-  }
+}
 
-  double T3DLine::dz(void) const
-  {
+double T3DLine::dz(void) const {
     return _dz;
-  }
+}
 
-  double T3DLine::tanl(void) const
-  {
+double T3DLine::tanl(void) const {
     return _tanl;
-  }
+}
 
-  double T3DLine::cosPhi0(void) const
-  {
+double T3DLine::cosPhi0(void) const {
     return _cos_phi0;
-  }
+}
 
-  double T3DLine::sinPhi0(void) const
-  {
+double T3DLine::sinPhi0(void) const {
     return _sin_phi0;
-  }
+}
 
-  const Point3D& T3DLine::pivot(void) const
-  {
+const Point3D& T3DLine::pivot(void) const {
     return _pivot;
-  }
+}
 
-  CLHEP::HepVector
-  T3DLine::a(void) const
-  {
+CLHEP::HepVector
+T3DLine::a(void) const {
     CLHEP::HepVector ta(4);
     ta[0] = _dr;
     ta[1] = _phi0;
     ta[2] = _dz;
     ta[3] = _tanl;
     return(ta);
-  }
+}
 
-  const CLHEP::HepSymMatrix& T3DLine::Ea(void) const
-  {
+const CLHEP::HepSymMatrix& T3DLine::Ea(void) const {
     return(_Ea);
-  }
+}
 
-  THelix T3DLine::helix(void) const
-  {
+THelix T3DLine::helix(void) const {
     CLHEP::HepVector a(5);
     a[0] = _dr; a[1] = _phi0; a[2] = 1e-10; a[3] = _dz; a[4] = _tanl;
     THelix _helix(_pivot, a);
     return _helix;
-  }
+}
 
-  unsigned T3DLine::ndf(void) const
-  {
+unsigned T3DLine::ndf(void) const {
     return _ndf;
-  }
+}
 
-  double T3DLine::chi2(void) const
-  {
+double T3DLine::chi2(void) const {
     return _chi2;
-  }
+}
 
-  double T3DLine::reducedchi2(void) const
-  {
+double T3DLine::reducedchi2(void) const {
     if (_ndf == 0) {
-      std::cout << "error at T3DLine::reducedchi2  ndf=0" << std::endl;
-      return 0;
+        std::cout << "error at T3DLine::reducedchi2  ndf=0" << std::endl;
+        return 0;
     }
     return (_chi2 / _ndf);
-  }
+}
 
-  Point3D T3DLine::x(double t) const
-  {
+Point3D T3DLine::x(double t) const {
     double tx = _pivot.x() + _dr * _cos_phi0 - t * _sin_phi0;
     double ty = _pivot.y() + _dr * _sin_phi0 + t * _cos_phi0;
     double tz = _pivot.z() + _dz             + t * _tanl;
     HepGeom::Point3D<double> p(tx, ty, tz);
     return p;
-  }
+}
 
-  Point3D T3DLine::x0(void) const
-  {
+Point3D T3DLine::x0(void) const {
     double tx = _pivot.x() + _dr * _cos_phi0;
     double ty = _pivot.y() + _dr * _sin_phi0;
     double tz = _pivot.z() + _dz;
     HepGeom::Point3D<double> p(tx, ty, tz);
     return p;
-  }
-  HepGeom::Vector3D<double> T3DLine::k(void) const
-  {
+}
+HepGeom::Vector3D<double> T3DLine::k(void) const {
     HepGeom::Point3D<double> p(-_sin_phi0, _cos_phi0, _tanl);
     return p;
-  }
+}
 
-  const Point3D& T3DLine::pivot(const Point3D& newpivot)
-  {
+const Point3D& T3DLine::pivot(const Point3D& newpivot) {
     double dr = (_pivot.x() - newpivot.x()) * _cos_phi0
-                + (_pivot.y() - newpivot.y()) * _sin_phi0 + _dr;
+        + (_pivot.y() - newpivot.y()) * _sin_phi0 + _dr;
     double dz = _pivot.z() - newpivot.z() + _dz
-                + _tanl * ((_pivot.x() - newpivot.x()) * _sin_phi0
-                           + (newpivot.y() - _pivot.y()) * _cos_phi0);
+        + _tanl * ((_pivot.x() - newpivot.x()) * _sin_phi0
+                   + (newpivot.y() - _pivot.y()) * _cos_phi0);
     _dr = dr;
     _dz = dz;
     _pivot = newpivot;
     return _pivot;
-  }
+}
 
-  void T3DLine::set(const Point3D& t_pivot,
-                    double t_dr, double t_phi0, double t_dz, double t_tanl)
-  {
+void T3DLine::set(const Point3D& t_pivot,
+                  double t_dr, double t_phi0, double t_dz, double t_tanl) {
 
     _pivot = t_pivot;
     _dr = t_dr;
@@ -239,10 +214,9 @@ namespace Belle {
     _tanl = t_tanl;
     _cos_phi0 = cos(_phi0);
     _sin_phi0 = sin(_phi0);
-  }
+}
 
-  CLHEP::HepVector T3DLine::a(const CLHEP::HepVector& ta)
-  {
+CLHEP::HepVector T3DLine::a(const CLHEP::HepVector& ta) {
     _dr = ta[0];
     _phi0 = ta[1];
     _dz = ta[2];
@@ -250,18 +224,17 @@ namespace Belle {
     _cos_phi0 = cos(_phi0);
     _sin_phi0 = sin(_phi0);
     return(ta);
-  }
+}
 
-  const CLHEP::HepSymMatrix& T3DLine::Ea(const CLHEP::HepSymMatrix& tEa)
-  {
+const CLHEP::HepSymMatrix& T3DLine::Ea(const CLHEP::HepSymMatrix& tEa) {
     _Ea = tEa;
     return(_Ea);
-  }
+}
 
-  int T3DLine::approach(TLink& l, bool doSagCorrection) const
-  {
+int
+T3DLine::approach(TLink& l, bool doSagCorrection) const {
 
-    const Belle2::TRGCDCWire& w = *l.wire();
+    const TWire & w = * l.wire();
     HepGeom::Point3D<double> xw = w.xyPosition();
     HepGeom::Point3D<double> wireBackwardPosition = w.backwardPosition();
     HepGeom::Vector3D<double> v = w.direction();
@@ -269,14 +242,14 @@ namespace Belle {
     HepGeom::Point3D<double> onWire, onTrack;
 
     if (approach_line(wireBackwardPosition, v, onWire, onTrack) < 0)
-      return(-1);
+	return(-1);
 
     // onWire,onTrack filled
 
     if (!doSagCorrection) {
-      l.positionOnWire(onWire);
-      l.positionOnTrack(onTrack);
-      return(0);        // no sag correction
+	l.positionOnWire(onWire);
+	l.positionOnTrack(onTrack);
+	return(0);        // no sag correction
     }
     // Sag correction
     //   loop for sag correction
@@ -300,11 +273,10 @@ namespace Belle {
     l.positionOnWire(onWire);
     l.positionOnTrack(onTrack);
     return(nTrial);
-  }
+}
 
-  int T3DLine::approach_line(const Point3D& w0, const HepGeom::Vector3D<double> & v,
-                             Point3D& onLine, Point3D& onTrack) const
-  {
+int T3DLine::approach_line(const Point3D& w0, const HepGeom::Vector3D<double> & v,
+                           Point3D& onLine, Point3D& onTrack) const {
     //  line = [w0] + s * [v]    -> [onLine]
     //  trk  = [x0] + t * [k]    -> [onTrack]
     //  if [v]//[k] then return(-1) error
@@ -324,10 +296,9 @@ namespace Belle {
     onLine = w0 + s * v;
     onTrack = x0 + t * k;
     return(0);
-  }
+}
 
-  int T3DLine::approach_point(const Point3D& p0, Point3D& onTrack) const
-  {
+int T3DLine::approach_point(const Point3D& p0, Point3D& onTrack) const {
     //  trk  = [x0] + t * [k]    -> [onTrack]
     //  if [v]//[k] then return(-1) error
 
@@ -338,7 +309,6 @@ namespace Belle {
 
     onTrack = x0 + t * k;
     return(0);
-  }
+}
 
 } // namespace Belle
-

@@ -132,29 +132,20 @@
 #ifndef TConformalFinder0_FLAG_
 #define TConformalFinder0_FLAG_
 
-#ifdef TRASAN_DEBUG_DETAIL
-#ifndef TRASAN_DEBUG
-#define TRASAN_DEBUG
-#endif
-#endif
-
 #include "tracking/modules/trasan/TFinderBase.h"
 #include "tracking/modules/trasan/TBuilder0.h"
-
-namespace Belle2 {
-  class TRGCDCWireHit;
-}
 
 namespace Belle {
 
 
-  class TLink;
-  class THistogram;
-  class TCircle;
-  class TSegment0;
+class TLink;
+class THistogram;
+class TCircle;
+class TSegment0;
+class TWireHit;
 
 /// A class to find tracks with the conformal method.
-  class TConformalFinder0 : public TFinderBase {
+class TConformalFinder0 : public TFinderBase {
 
   public:
     /// Constructor.
@@ -197,20 +188,28 @@ namespace Belle {
     void init(void);
 
     /// finds tracks.
-    int doit(const CAList<Belle2::TRGCDCWireHit> & axialHits,
-             const CAList<Belle2::TRGCDCWireHit> & stereoHits,
+    int doit(const CAList<TWireHit> & axialHits,
+             const CAList<TWireHit> & stereoHits,
              AList<TTrack> & tracks,
              AList<TTrack> & tracks3D);
 
-    /// transforms hits into a conformal plane. 'center' is a center of the transformation. Z position of 'center' must be zero. Transformed positions are newly created, and are stored in 'links'.
-    static void conformalTransformation(const HepGeom::Point3D<double>  & center,
-                                        const CAList<Belle2::TRGCDCWireHit> & hits,
-                                        AList<TLink> & links);
+    /// transforms hits into a conformal plane. 'center' is a center
+    /// of the transformation. Z position of 'center' must be
+    /// zero. Transformed positions are newly created, and are stored
+    /// in 'links'.
+    static void conformalTransformation(
+	const HepGeom::Point3D<double>  & center,
+	const CAList<TWireHit> & hits,
+	AList<TLink> & links);
 
-    /// transforms hits into a conformal plane. 'center' is a center of the transformation. Z position of 'center' must be zero. Transformed positions are newly created, and are stored in 'links'.
-    static void conformalTransformationRphi(const HepGeom::Point3D<double>  & center,
-                                            const CAList<Belle2::TRGCDCWireHit> & hits,
-                                            AList<TLink> & links);
+    /// transforms hits into a conformal plane. 'center' is a center
+    /// of the transformation. Z position of 'center' must be
+    /// zero. Transformed positions are newly created, and are stored
+    /// in 'links'.
+    static void conformalTransformationRphi(
+	const HepGeom::Point3D<double>  & center,
+	const CAList<TWireHit> & hits,
+	AList<TLink> & links);
 
     /// finds segments.
     AList< AList<TSegment0> > findSegments(const AList<TLink> & in) const;
@@ -287,64 +286,45 @@ namespace Belle {
     /// Switches
     bool _doStereo;
     bool _doSalvage;
-  };
+};
 
 //-----------------------------------------------------------------------------
 
-#ifdef TConformalFinder0_NO_INLINE
-#define inline
-#else
-#undef inline
-#define TConformalFinder0_INLINE_DEFINE_HERE
-#endif
-
-#ifdef TConformalFinder0_INLINE_DEFINE_HERE
-
-  inline
-  const AList<TLink> &
-  TConformalFinder0::axialConformalLinks(void) const
-  {
+inline
+const AList<TLink> &
+TConformalFinder0::axialConformalLinks(void) const {
     return _axialConfLinks;
-  }
+}
 
-  inline
-  const AList<TLink> &
-  TConformalFinder0::stereoConformalLinks(void) const
-  {
+inline
+const AList<TLink> &
+TConformalFinder0::stereoConformalLinks(void) const {
     return _stereoConfLinks;
-  }
+}
 
-  inline
-  bool
-  TConformalFinder0::doStereo(bool a)
-  {
+inline
+bool
+TConformalFinder0::doStereo(bool a) {
     return _doStereo = a;
-  }
+}
 
-  inline
-  bool
-  TConformalFinder0::doSalvage(bool a)
-  {
+inline
+bool
+TConformalFinder0::doSalvage(bool a) {
     return _doSalvage = a;
-  }
+}
 
-  inline
-  std::string
-  TConformalFinder0::name(void) const
-  {
+inline
+std::string
+TConformalFinder0::name(void) const {
     return "Conformal Finder 0";
-  }
+}
 
-  inline
-  void
-  TConformalFinder0::init(void)
-  {
+inline
+void
+TConformalFinder0::init(void) {
     return;
-  }
-
-#endif
-
-#undef inline
+}
 
 } // namespace Belle
 

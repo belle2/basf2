@@ -34,48 +34,42 @@
 
 namespace Belle {
 
-  THoughTransformationCircle::THoughTransformationCircle(
+THoughTransformationCircle::THoughTransformationCircle(
     const std::string& name)
-    : THoughTransformation(name)
-  {
-  }
+    : THoughTransformation(name) {
+}
 
-  THoughTransformationCircle::~THoughTransformationCircle()
-  {
-  }
+THoughTransformationCircle::~THoughTransformationCircle() {
+}
 
-  float
-  THoughTransformationCircle::y(float xReal, float yReal, float x) const
-  {
+float
+THoughTransformationCircle::y(float xReal, float yReal, float x) const {
 //    return log10((xReal * xReal + yReal * yReal) /
 //  (2 * xReal * cos(x) + 2 * yReal * sin(x)));
     const float r = (xReal * xReal + yReal * yReal) /
-                    (2 * xReal * cos(x) + 2 * yReal * sin(x));
+        (2 * xReal * cos(x) + 2 * yReal * sin(x));
     if (r > 0)
-      return log10(r);
+        return log10(r);
     else
-      return 0;
-  }
+        return 0;
+}
 
-  TPoint2D
-  THoughTransformationCircle::circleCenter(const TPoint2D& p) const
-  {
+TPoint2D
+THoughTransformationCircle::circleCenter(const TPoint2D& p) const {
 //    return TPoint2D(pow(10, p.y()), p.x());
     return TPoint2D(p.x(), pow(10, p.y()));
-  }
+}
 
-  TPoint2D
-  THoughTransformationCircle::convert(const TPoint2D& p) const
-  {
+TPoint2D
+THoughTransformationCircle::convert(const TPoint2D& p) const {
     return TPoint2D(p.x(), log10(p.y()));
-  }
+}
 
-  bool
-  THoughTransformationCircle::diverge(float xReal,
-                                      float yReal,
-                                      float x0,
-                                      float x1) const
-  {
+bool
+THoughTransformationCircle::diverge(float xReal,
+                                    float yReal,
+                                    float x0,
+                                    float x1) const {
     static const float PI2 = 2 * M_PI;
 
     //...Divergence points...
@@ -89,25 +83,23 @@ namespace Belle {
     if ((x0 < d1) && (d1 < x1)) return true;
 
     return false;
-  }
+}
 
-  bool
-  THoughTransformationCircle::positiveDiverge(float xReal,
-                                              float yReal,
-                                              float x0,
-                                              float x1) const
-  {
+bool
+THoughTransformationCircle::positiveDiverge(float xReal,
+                                            float yReal,
+                                            float x0,
+                                            float x1) const {
     return diverge(xReal, yReal, x0, x1);
-  }
+}
 
-  bool
-  THoughTransformationCircle::negativeDiverge(float xReal,
-                                              float yReal,
-                                              float x0,
-                                              float x1) const
-  {
+bool
+THoughTransformationCircle::negativeDiverge(float xReal,
+                                            float yReal,
+                                            float x0,
+                                            float x1) const {
     return diverge(xReal, yReal, x0, x1);
-  }
+}
 
 } // namespace Belle
 

@@ -87,21 +87,12 @@
 #ifndef TCircle_FLAG_
 #define TCircle_FLAG_
 
-#ifdef TRASAN_DEBUG_DETAIL
-#ifndef TRASAN_DEBUG
-#define TRASAN_DEBUG
-#endif
-#endif
-
-
-#include <string>
-
 #define HEP_SHORT_NAMES
 
+#include <string>
 #ifndef CLHEP_POINT3D_H
 #include "CLHEP/Geometry/Point3D.h"
 #endif
-
 #include "tracking/modules/trasan/TTrackBase.h"
 #include "tracking/modules/trasan/TCircleFitter.h"
 #include "tracking/modules/trasan/TPoint2D.h"
@@ -110,7 +101,7 @@
 namespace Belle {
 
 /// A class to represent a circle in tracking.
-  class TCircle : public TTrackBase {
+class TCircle : public TTrackBase {
 
   public:
     /// Constructor.
@@ -153,13 +144,16 @@ namespace Belle {
     /// fits itself. Error was happened if return value is not zero.
     // int fitx(void);
 
-    /// fits itself only for curl finder. Error was happened if return value is not zero.
+    /// fits itself only for curl finder. Error was happened if return
+    /// value is not zero.
     int fitForCurl(int ipConst = 0);
 
     double charge(double charge);
 
     /// sets circle properties.
-    void property(double charge, double radius, HepGeom::Point3D<double>  center);
+    void property(double charge,
+                  double radius,
+                  HepGeom::Point3D<double> center);
     void property(double charge, double radius, TPoint2D& center);
 
   private:// Updated when fitted
@@ -168,56 +162,43 @@ namespace Belle {
     double _radius;
     HepGeom::Point3D<double>  _center;
     static const TCircleFitter _fitter;
-  };
+};
 
 //-----------------------------------------------------------------------------
 
-#ifdef TCircle_NO_INLINE
-#define inline
-#else
-#undef inline
-#define TCircle_INLINE_DEFINE_HERE
-#endif
-
-#ifdef TCircle_INLINE_DEFINE_HERE
-
-  inline
-  const HepGeom::Point3D<double>  &
-  TCircle::center(void) const
-  {
+inline
+const HepGeom::Point3D<double>  &
+TCircle::center(void) const {
 #ifdef TRASAN_DEBUG
 //     if (! _fitted) std::cout << "TCircle::center !!! fit not performed : "
 //           << "center=" << _center << std::endl;
 #endif
     return _center;
-  }
+}
 
-  inline
-  double
-  TCircle::radius(void) const
-  {
+inline
+double
+TCircle::radius(void) const {
 #ifdef TRASAN_DEBUG
 //     if (! _fitted) std::cout << "TCircle::radius !!! fit not performed : "
 //           << "radius=" << _radius << std::endl;
 #endif
     return _radius;
-  }
+}
 
-  inline
-  double
-  TCircle::pt(void) const
-  {
+inline
+double
+TCircle::pt(void) const {
 #ifdef TRASAN_DEBUG
 //     if (! _fitted) std::cout << "TCircle::pt !!! fit not performed"
 //           << std::endl;
 #endif
     return fabs(_radius) / THelix::ConstantAlpha;
-  }
+}
 
-  inline
-  double
-  TCircle::impact(void) const
-  {
+inline
+double
+TCircle::impact(void) const {
 #ifdef TRASAN_DEBUG
 //     if (! _fitted) std::cout << "TCircle::impact !!! fit not performed"
 //           << std::endl;
@@ -225,54 +206,45 @@ namespace Belle {
     return fabs(sqrt(_center.x() * _center.x() +
                      _center.y() * _center.y())
                 - fabs(_radius));
-  }
+}
 
-  inline
-  double
-  TCircle::charge(void) const
-  {
+inline
+double
+TCircle::charge(void) const {
 #ifdef TRASAN_DEBUG
 //     if (! _fitted) std::cout << "TCircle::charge !!! fit not performed"
 //           << std::endl;
 #endif
     return _charge;
-  }
+}
 
-  inline
-  void
-  TCircle::property(double c, double r, HepGeom::Point3D<double>  e)
-  {
+inline
+void
+TCircle::property(double c, double r, HepGeom::Point3D<double>  e) {
     _charge = c;
     _radius = r;
     _center = e;
-  }
+}
 
-  inline
-  unsigned
-  TCircle::objectType(void) const
-  {
+inline
+unsigned
+TCircle::objectType(void) const {
     return Circle;
-  }
+}
 
-  inline
-  double
-  TCircle::charge(double a)
-  {
+inline
+double
+TCircle::charge(double a) {
     return _charge = a;
-  }
+}
 
-  inline
-  void
-  TCircle::property(double c, double r, TPoint2D& e)
-  {
+inline
+void
+TCircle::property(double c, double r, TPoint2D& e) {
     _charge = c;
     _radius = r;
     _center = HepGeom::Point3D<double> (e.x(), e.y(), 0);
-  }
-
-#endif
-
-#undef inline
+}
 
 } // namespace Belle
 

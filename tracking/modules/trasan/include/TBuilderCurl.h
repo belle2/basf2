@@ -87,16 +87,9 @@
 #ifndef TBuilderCurl_FLAG_
 #define TBuilderCurl_FLAG_
 
-#ifdef TRASAN_DEBUG_DETAIL
-#ifndef TRASAN_DEBUG
-#define TRASAN_DEBUG
-#endif
-#endif
-
+#define HEP_SHORT_NAMES
 
 #include <string>
-
-#define HEP_SHORT_NAMES
 #include "tracking/modules/trasan/AList.h"
 #include "tracking/modules/trasan/TBuilder0.h"
 #include "tracking/modules/trasan/TCurlFinderParameters.h"
@@ -105,11 +98,8 @@
 
 namespace Belle {
 
-  class TRGCDC;
-
-
 /// A class to build a Curl track.
-  class TBuilderCurl : public TBuilder0 {
+class TBuilderCurl : public TBuilder0 {
 
   public:
     /// Constructor.
@@ -126,33 +116,50 @@ namespace Belle {
     //const TSelector & trackSelector(const TSelector &);// not used
     void setParam(const TCurlFinderParameter&);
 
-    TTrack* buildStereo(TTrack& track, const AList<TLink> &, const AList<TLink> &) const;
+    TTrack* buildStereo(TTrack& track,
+                        const AList<TLink> &,
+                        const AList<TLink> &) const;
     bool buildStereo(TTrack& track, double& dZ, double& tanL) const;
 
     void setSvdClusters(void) {
-      /* cnv     m_svdAssociator->clearClusters(); */
-      /*     m_svdAssociator->fillClusters(); */
+        /* cnv     m_svdAssociator->clearClusters(); */
+        /*     m_svdAssociator->fillClusters(); */
     }
   private:
     static void set_smallcell(bool s) {
-      ms_smallcell = s;
+        ms_smallcell = s;
     }
     static void set_superb(bool s) {
-      ms_superb = s;
+        ms_superb = s;
     }
     static int offsetBorder(TLink*);
-    static void makeList(AList<TLink> &layer, AList<TLink> &list, double q, int border, int checkB, TLink* layer0);
+    static void makeList(AList<TLink> &layer,
+                         AList<TLink> &list,
+                         double q,
+                         int border,
+                         int checkB,
+                         TLink* layer0);
     static unsigned findMaxLocalId(unsigned superLayerId);
-    static unsigned isIsolation(unsigned localId, unsigned maxLocalId, unsigned layerId, int lr, const AList<TLink> &allStereoList);
-    static void findTwoHits(AList<TLink> &twoOnLayer, const AList<TLink> &hitsOnLayer, const AList<TLink> &allStereoList);
+    static unsigned isIsolation(unsigned localId,
+                                unsigned maxLocalId,
+                                unsigned layerId,
+                                int lr,
+                                const AList<TLink> &allStereoList);
+    static void findTwoHits(AList<TLink> &twoOnLayer,
+                            const AList<TLink> &hitsOnLayer,
+                            const AList<TLink> &allStereoList);
     static void setLR(AList<TLink> &hitsOnLayer, unsigned LR = 0);
     static bool moveLR(AList<TLink> &hitsOnLayer);
-    static void selectGoodWires(const AList<TLink> &allWires, AList<TLink> &goodWires);
-    static void calVirtualCircle(const TLink& hit, const TTrack& track, const int LR, HepGeom::Point3D<double>  &center, double& radius);
-    static void moveLR(AList<TLink> &hits, const AList<TLink> &hitsOnLayerOrg, const TTrack& track);
-
-    friend class TRGCDC;
-
+    static void selectGoodWires(const AList<TLink> &allWires,
+                                AList<TLink> &goodWires);
+    static void calVirtualCircle(const TLink& hit,
+                                 const TTrack& track,
+                                 const int LR,
+                                 HepGeom::Point3D<double>  &center,
+                                 double& radius);
+    static void moveLR(AList<TLink> &hits,
+                       const AList<TLink> &hitsOnLayerOrg,
+                       const TTrack& track);
 
   private:
     //
@@ -173,26 +180,53 @@ namespace Belle {
                  unsigned) const;
 
     //
-    unsigned appendPoints(AList<TLink>&, AList<TLink>&, double, double, TTrack&, double) const;
+    unsigned appendPoints(AList<TLink>&,
+                          AList<TLink>&,
+                          double,
+                          double,
+                          TTrack&,
+                          double) const;
 
     //
     void resetTHelixFit(THelixFitter*) const;
 
     //
-    void fitLine(AList<TLink>&, double&, double&, double&, AList<TLink>&, AList<HepGeom::Point3D<double> >&, int&) const;
-    void fitLine2(const AList<TLink>&, double&, double&, double&, AList<TLink>&, AList<HepGeom::Point3D<double> >&, int&) const;
+    void fitLine(AList<TLink>&,
+                 double&,
+                 double&,
+                 double&,
+                 AList<TLink>&,
+                 AList<HepGeom::Point3D<double> >&,
+                 int&) const;
+    void fitLine2(const AList<TLink>&,
+                  double&,
+                  double&,
+                  double&,
+                  AList<TLink>&,
+                  AList<HepGeom::Point3D<double> >&,
+                  int&) const;
 
     //
     unsigned check(const TTrack&) const;
 
     //
-    bool fitWDD(double& xc, double& yc, double& r,
+    bool fitWDD(double& xc,
+                double& yc,
+                double& r,
                 AList<TLink> &list) const;
-    int stereoHit(double& xc, double& yc, double& r, double& q,
+    int stereoHit(double& xc,
+                  double& yc,
+                  double& r,
+                  double& q,
                   AList<TLink> & list) const;
 
-    void makeLine(TTrack&, AList<TLink>&, const AList<TLink>&,
-                  AList<TLink>&, double&, double&, double&, AList<HepGeom::Point3D<double> >&) const;
+    void makeLine(TTrack&, AList<TLink>&,
+                  const AList<TLink>&,
+                  AList<TLink>&,
+                  double&,
+                  double&,
+                  double&,
+                  AList<HepGeom::Point3D<double> >&) const;
     int sortByLocalId(AList<TLink> &list) const;
 
     //
@@ -213,22 +247,9 @@ namespace Belle {
     //
     static bool ms_smallcell;
     static bool ms_superb;
-  };
+};
 
 //-----------------------------------------------------------------------------
-
-#ifdef TBuilderCurl_NO_INLINE
-#define inline
-#else
-#undef inline
-#define TBuilderCurl_INLINE_DEFINE_HERE
-#endif
-
-#ifdef TBuilderCurl_INLINE_DEFINE_HERE
-
-#endif
-
-#undef inline
 
 } // namespace Belle
 

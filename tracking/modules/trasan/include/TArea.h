@@ -11,20 +11,20 @@
 //-----------------------------------------------------------------------------
 // $Log$
 // Revision 1.1  2004/02/18 04:07:45  yiwasaki
-// Trasan 3.09 : Option to simualte the small cell CDC with the normal cell CDC added, new classes for Hough finder added
+// Trasan 3.09 : Option to simualte the small cell CDC with the normal
+// cell CDC added, new classes for Hough finder added
 //
 //-----------------------------------------------------------------------------
 
 #ifndef TArea_FLAG_
 #define TArea_FLAG_
 
-
 #include "tracking/modules/trasan/TPoint2D.h"
 
 namespace Belle {
 
 /// A class to represent an 2D area.
-  class TArea {
+class TArea {
 
   public:
     /// Contructor.
@@ -43,17 +43,18 @@ namespace Belle {
 
   private:
     TPoint2D _c[2];
-  };
+};
 
-  inline
-  bool
-  TArea::inArea(const TPoint2D& x) const
-  {
+//-----------------------------------------------------------------------------
+
+inline
+bool
+TArea::inArea(const TPoint2D& x) const {
     if ((x.x() >= _c[0].x()) && (x.x() <= _c[1].x()))
-      if ((x.y() >= _c[0].y()) && (x.y() <= _c[1].y()))
-        return true;
+        if ((x.y() >= _c[0].y()) && (x.y() <= _c[1].y()))
+            return true;
     return false;
-  }
+}
 
 } // namespace Belle
 

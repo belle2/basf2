@@ -8,14 +8,14 @@
 
 namespace Belle {
 
-  class Recsvd_cluster;
+class Recsvd_cluster;
 
-  class TSvdHit {
+class TSvdHit {
   public:
     // Constructor
     TSvdHit(void) : m_position(HepGeom::Point3D<double> (0., 0., 0.)), m_dssd(-1), m_rphi(NULL), m_z(NULL) {};
     TSvdHit(const HepGeom::Point3D<double>  &p, int d, Recsvd_cluster* rphi, Recsvd_cluster* z) :
-      m_position(p), m_dssd(d), m_rphi(rphi), m_z(z) {};
+        m_position(p), m_dssd(d), m_rphi(rphi), m_z(z) {};
 
     // Destructor
     virtual ~TSvdHit(void) {};
@@ -37,13 +37,13 @@ namespace Belle {
     int m_dssd;
     Recsvd_cluster* m_rphi;
     Recsvd_cluster* m_z;
-  };
+};
 
-  class TSvdHitPair {
+class TSvdHitPair {
   public:
     TSvdHit* first;
     TSvdHit* second;
-  };
+};
 
 } // namespace Belle
 

@@ -53,18 +53,15 @@
 
 namespace Belle {
 
-  TLineFitter::TLineFitter(const std::string& name)
-    : TFitter(name), _a(0.), _b(0.), _det(0.)
-  {
-  }
+TLineFitter::TLineFitter(const std::string& name)
+    : TFitter(name), _a(0.), _b(0.), _det(0.) {
+}
 
-  TLineFitter::~TLineFitter()
-  {
-  }
+TLineFitter::~TLineFitter() {
+}
 
-  int
-  TLineFitter::fit(TTrackBase& t) const
-  {
+int
+TLineFitter::fit(TTrackBase& t) const {
 
     //...Already fitted ?...
     if (t.fitted()) return TFitAlreadyFitted;
@@ -74,44 +71,43 @@ namespace Belle {
 
     unsigned n = t.links().length();
     if (_det == 0. && n == 2) {
-      double x0 = t.links()[0]->position().x();
-      double y0 = t.links()[0]->position().y();
-      double x1 = t.links()[1]->position().x();
-      double y1 = t.links()[1]->position().y();
-      if (x0 == x1) return TFitFailed;
-      _a = (y0 - y1) / (x0 - x1);
-      _b = - _a * x1 + y1;
+        double x0 = t.links()[0]->position().x();
+        double y0 = t.links()[0]->position().y();
+        double x1 = t.links()[1]->position().x();
+        double y1 = t.links()[1]->position().y();
+        if (x0 == x1) return TFitFailed;
+        _a = (y0 - y1) / (x0 - x1);
+        _b = - _a * x1 + y1;
     } else {
-      double sum = (double) n;
-      double sumX = 0., sumY = 0., sumX2 = 0., sumXY = 0., sumY2 = 0.;
-      for (unsigned i = 0; i < n; i++) {
-        const HepGeom::Point3D<double> & p = t.links()[i]->position();
-        double x = p.x();
-        double y = p.y();
-        sumX  += x;
-        sumY  += y;
-        sumX2 += x * x;
-        sumXY += x * y;
-        sumY2 += y * y;
-      }
+        double sum = (double) n;
+        double sumX = 0., sumY = 0., sumX2 = 0., sumXY = 0., sumY2 = 0.;
+        for (unsigned i = 0; i < n; i++) {
+            const HepGeom::Point3D<double> & p = t.links()[i]->position();
+            double x = p.x();
+            double y = p.y();
+            sumX  += x;
+            sumY  += y;
+            sumX2 += x * x;
+            sumXY += x * y;
+            sumY2 += y * y;
+        }
 
-      _det = sum * sumX2 - sumX * sumX;
+        _det = sum * sumX2 - sumX * sumX;
 #ifdef TRASAN_DEBUG_DETAIL
-      std::cout << Tab() << "TLineFitter::fit ... det=" << _det << std::endl;
+        std::cout << Tab() << "TLineFitter::fit ... det=" << _det << std::endl;
 #endif
-      if (_det == 0.) {
-        return TFitFailed;
-      } else {
-        _a = (sumXY * sum - sumX * sumY) / _det;
-        _b = (sumX2 * sumY - sumX * sumXY) / _det;
-      }
+        if (_det == 0.) {
+            return TFitFailed;
+        } else {
+            _a = (sumXY * sum - sumX * sumY) / _det;
+            _b = (sumX2 * sumY - sumX * sumXY) / _det;
+        }
     }
 
     if (t.objectType() == Line)
-      ((TLine&) t).property(_a, _b, _det);
+        ((TLine&) t).property(_a, _b, _det);
     fitDone(t);
     return 0;
-  }
+}
 
 } // namespace Belle
-

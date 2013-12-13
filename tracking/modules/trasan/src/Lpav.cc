@@ -37,37 +37,30 @@
 // New trasan/lpar classes
 //
 
-// system include files
-
-
 #include <cmath>
 #include <iostream>
-
-// user include files
 #include "CLHEP/Vector/Sqr.h"
 #include "tracking/modules/trasan/Lpav.h"
-
 
 namespace Belle {
 
 //
 // constants, enums and typedefs
 //
-  extern "C" {
+extern "C" {
     float prob_(float*, int*);
-  }
+}
 
-  static double err_dis_inv(double x, double y, double w, double a, double b)
-  {
+static double err_dis_inv(double x, double y, double w, double a, double b) {
     if (a == 0 && b == 0) {
-      return w;
+        return w;
     } else {
-      double f = x * b - y * a;
-      double rsq = x * x + y * y;
-      f *= f;
-      return w * rsq / f;
+        double f = x * b - y * a;
+        double rsq = x * x + y * y;
+        f *= f;
+        return w * rsq / f;
     }
-  }
+}
 
 //
 // static data member definitions
@@ -76,18 +69,16 @@ namespace Belle {
 //
 // constructors and destructor
 //
-  Lpav::Lpav()
-  {
+Lpav::Lpav() {
     clear();
-  }
+}
 
 // Lpav::Lpav( const Lpav& )
 // {
 // }
 
-  Lpav::~Lpav()
-  {
-  }
+Lpav::~Lpav() {
+}
 
 //
 // assignment operators
@@ -110,8 +101,7 @@ namespace Belle {
 //
 // member functions
 //
-  void Lpav::calculate_average(double xi, double yi, double wi)
-  {
+void Lpav::calculate_average(double xi, double yi, double wi) {
     if (m_wsum <= 0) return;
     m_wsum_temp = m_wsum + wi;
     double rri(xi * xi + yi * yi);
@@ -129,10 +119,9 @@ namespace Belle {
 
     calculate_average_n(xxav, yyav, xyav, xrrav, yrrav, rrrrav);
 
-  }
+}
 
-  void Lpav::calculate_average(void)
-  {
+void Lpav::calculate_average(void) {
     if (m_wsum <= 0) return;
     m_wsum_temp = m_wsum;
     double wsum_inv(1 / m_wsum_temp);
@@ -147,11 +136,10 @@ namespace Belle {
     double rrrrav(m_rrrrsum * wsum_inv);
 
     calculate_average_n(xxav, yyav, xyav, xrrav, yrrav, rrrrav);
-  }
+}
 
-  void Lpav::calculate_average_n(double xxav, double yyav, double xyav,
-                                 double xrrav, double yrrav, double rrrrav)
-  {
+void Lpav::calculate_average_n(double xxav, double yyav, double xyav,
+                               double xrrav, double yrrav, double rrrrav) {
     double xxav_p = xxav - m_xav * m_xav;
     double yyav_p = yyav - m_yav * m_yav;
     double xyav_p = xyav - m_xav * m_yav;
@@ -169,11 +157,11 @@ namespace Belle {
 //C== First require : SIGN(C**2 - S**2) = SIGN(XXAV - YYAV)
 //C
     if (xxav_p <= yyav_p) {
-      m_cosrot = sminus;
-      m_sinrot = splus;
+        m_cosrot = sminus;
+        m_sinrot = splus;
     } else {
-      m_cosrot = splus;
-      m_sinrot = sminus;
+        m_cosrot = splus;
+        m_sinrot = sminus;
     }
 //C
 //C== Require : SIGN(S) = SIGN(XYAV)*SIGN(C) (Assuming SIGN(C) > 0)
@@ -189,8 +177,8 @@ namespace Belle {
 //*  Choose SIGN of C wisely to be able to get the sign of the charge
 //*
     if (m_cosrot* m_xav + m_sinrot* m_yav <= 0) {
-      m_cosrot = - m_cosrot;
-      m_sinrot = - m_sinrot;
+        m_cosrot = - m_cosrot;
+        m_sinrot = - m_sinrot;
     }
     m_rscale = std::sqrt(rrav_p);
     double cos2 = m_cosrot * m_cosrot;
@@ -211,16 +199,15 @@ namespace Belle {
 
     double rrav = xxav + yyav;
     double rrrrav_p = rrrrav
-                      - 2 * m_yav * yrrav - 2 * m_xav * xrrav
-                      + rrav * (xav2 + yav2)
-                      - 2 * m_xav * xrrav_p - xav2 * rrav_p
-                      - 2 * m_yav * yrrav_p - yav2 * rrav_p;
+        - 2 * m_yav * yrrav - 2 * m_xav * xrrav
+        + rrav * (xav2 + yav2)
+        - 2 * m_xav * xrrav_p - xav2 * rrav_p
+        - 2 * m_yav * yrrav_p - yav2 * rrav_p;
     m_rrrravp = rrrrav_p * rrav_p_inv * rrav_p_inv;
     m_xyavp = 0;
-  }
+}
 
-  void Lpav::calculate_average3(double xi, double yi, double wi)
-  {
+void Lpav::calculate_average3(double xi, double yi, double wi) {
     if (m_wsum <= 0) return;
     m_wsum_temp = m_wsum + wi;
     double wsum_inv(1 / m_wsum_temp);
@@ -238,10 +225,9 @@ namespace Belle {
     m_xrravp = (m_xrrsum + xi * wrri) * wsum_inv;
     m_yrravp = (m_yrrsum + yi * wrri) * wsum_inv;
     m_rrrravp = (m_rrrrsum + rri * wrri) * wsum_inv;
-  }
+}
 
-  void Lpav::calculate_average3(void)
-  {
+void Lpav::calculate_average3(void) {
     if (m_wsum <= 0) return;
     m_wsum_temp = m_wsum;
     double wsum_inv(1 / m_wsum_temp);
@@ -257,7 +243,7 @@ namespace Belle {
     m_xrravp = m_xrrsum * wsum_inv;
     m_yrravp = m_yrrsum * wsum_inv;
     m_rrrravp = m_rrrrsum * wsum_inv;
-  }
+}
 
 
 //
@@ -269,8 +255,7 @@ namespace Belle {
 //
 
 
-  std::ostream& operator<<(std::ostream& o, const Lpav& a)
-  {
+std::ostream& operator<<(std::ostream& o, const Lpav& a) {
 //  o << "wsum=" << a.m_wsum << " xsum=" << a.m_xsum << " ysum=" << a.m_ysum
 //  << " xxsum=" << a.m_xxsum << " xysum=" << a.m_xysum
 //  << " yysum=" << a.m_yysum
@@ -284,10 +269,9 @@ namespace Belle {
 //  << std::endl;
     o << " nc=" << a.m_nc << " chisq=" << a.m_chisq << " " << (Lpar&) a;
     return o;
-  }
+}
 
-  double Lpav::solve_lambda(void)
-  {
+double Lpav::solve_lambda(void) {
     if (m_rscale <= 0) return -1;
     double xrrxrr = m_xrravp * m_xrravp;
     double yrryrr = m_yrravp * m_yrravp;
@@ -312,19 +296,18 @@ namespace Belle {
     int itry = 0;
     double dlambda = dlamax;
     while (itry < ntry && std::fabs(dlambda) >= dlamax) {
-      double cpoly = c0 + lambda * (c1 + lambda *
-                                    (c2 + lambda * lambda * c4));
-      double dcpoly = c1 + lambda * (c2d + lambda * lambda * c4d);
-      dlambda = - cpoly / dcpoly;
-      lambda += dlambda;
-      itry ++;
+        double cpoly = c0 + lambda * (c1 + lambda *
+                                      (c2 + lambda * lambda * c4));
+        double dcpoly = c1 + lambda * (c2d + lambda * lambda * c4d);
+        dlambda = - cpoly / dcpoly;
+        lambda += dlambda;
+        itry ++;
     }
     lambda = lambda < 0 ? 0 : lambda;
     return lambda;
-  }
+}
 
-  double Lpav::solve_lambda3(void)
-  {
+double Lpav::solve_lambda3(void) {
     if (m_rscale <= 0) return -1;
     double xrrxrr = m_xrravp * m_xrravp;
     double yrryrr = m_yrravp * m_yrravp;
@@ -334,21 +317,20 @@ namespace Belle {
     double a = m_rrrravp;
     double b = xrrxrr + yrryrr - m_rrrravp * (m_xxavp + m_yyavp);
     double c = m_rrrravp * m_xxavp * m_yyavp
-               - m_yyavp * xrrxrr - m_xxavp * yrryrr
-               + 2 * m_xyavp * m_xrravp * m_yrravp - m_rrrravp * m_xyavp * m_xyavp;
+        - m_yyavp * xrrxrr - m_xxavp * yrryrr
+        + 2 * m_xyavp * m_xrravp * m_yrravp - m_rrrravp * m_xyavp * m_xyavp;
     if (c >= 0 && b <= 0) {
-      return (-b - std::sqrt(b * b - 4 * a * c)) / 2 / a;
+        return (-b - std::sqrt(b * b - 4 * a * c)) / 2 / a;
     } else if (c >= 0 && b > 0) {
-      std::cout << " returning " << -1 << std::endl;
-      return -1;
+        std::cout << " returning " << -1 << std::endl;
+        return -1;
     } else if (c < 0) {
-      return (-b + std::sqrt(b * b - 4 * a * c)) / 2 / a;
+        return (-b + std::sqrt(b * b - 4 * a * c)) / 2 / a;
     }
     return -1;
-  }
+}
 
-  double Lpav::calculate_lpar(void)
-  {
+double Lpav::calculate_lpar(void) {
     double lambda = solve_lambda();
 // changed on Oct-13-93
 //  if (lambda<=0) return -1;
@@ -361,18 +343,18 @@ namespace Belle {
     double h34 = 1 + 2 * lambda;
     double rootsq = (h14 * h14 / h11 / h11) + 4 * h34;
     if (std::fabs(h22) > std::fabs(h24)) {
-      if (h22 == 0.0) return -1;
-      double ratio = h24 / h22;
-      rootsq += ratio * ratio ;
-      m_kappa = 1 / std::sqrt(rootsq);
-      m_beta = - ratio * m_kappa;
+        if (h22 == 0.0) return -1;
+        double ratio = h24 / h22;
+        rootsq += ratio * ratio ;
+        m_kappa = 1 / std::sqrt(rootsq);
+        m_beta = - ratio * m_kappa;
     } else {
-      if (h24 == 0.0) return -1;
-      double ratio = h22 / h24;
-      rootsq = 1 + ratio * ratio * rootsq;
-      m_beta = 1 / std::sqrt(rootsq);
-      m_beta = h24 > 0 ? -m_beta : m_beta;
-      m_kappa = -ratio * m_beta;
+        if (h24 == 0.0) return -1;
+        double ratio = h22 / h24;
+        rootsq = 1 + ratio * ratio * rootsq;
+        m_beta = 1 / std::sqrt(rootsq);
+        m_beta = h24 > 0 ? -m_beta : m_beta;
+        m_kappa = -ratio * m_beta;
     }
     m_alpha = - (h14 / h11) * m_kappa;
     m_gamma = - h34 * m_kappa;
@@ -399,10 +381,9 @@ namespace Belle {
     if (m_yrravp < 0) neg();
     if (lambda >= 0) m_chisq = lambda * m_wsum_temp * m_rscale * m_rscale;
     return lambda;
-  }
+}
 
-  double Lpav::calculate_lpar3(void)
-  {
+double Lpav::calculate_lpar3(void) {
     double lambda = solve_lambda3();
 // changed on Oct-13-93
 //  if (lambda<=0) return -1;
@@ -415,26 +396,26 @@ namespace Belle {
     double h12 = m_xyavp;
     double det = h11 * h22 - h12 * h12;
     if (det != 0) {
-      double r1 = (h14 * h22 - h24 * h12) / (det);
-      double r2 = (h24 * h11 - h14 * h12) / (det);
-      double kinvsq = r1 * r1 + r2 * r2;
-      m_kappa = std::sqrt(1 / kinvsq);
-      if (h11 != 0) m_alpha = -m_kappa * r1;
-      else m_alpha = 1;
-      if (h22 != 0) m_beta = -m_kappa * r2;
-      else m_beta = 1;
+        double r1 = (h14 * h22 - h24 * h12) / (det);
+        double r2 = (h24 * h11 - h14 * h12) / (det);
+        double kinvsq = r1 * r1 + r2 * r2;
+        m_kappa = std::sqrt(1 / kinvsq);
+        if (h11 != 0) m_alpha = -m_kappa * r1;
+        else m_alpha = 1;
+        if (h22 != 0) m_beta = -m_kappa * r2;
+        else m_beta = 1;
     } else {
-      m_kappa = 0;
-      if (h11 != 0 && h22 != 0) {
-        m_beta = 1 / std::sqrt(1 + h12 * h12 / h11 / h11);
-        m_alpha = std::sqrt(1 - m_beta * m_beta);
-      } else if (h11 != 0) {
-        m_beta = 1;
-        m_alpha = 0;
-      } else {
-        m_beta = 0;
-        m_alpha = 1;
-      }
+        m_kappa = 0;
+        if (h11 != 0 && h22 != 0) {
+            m_beta = 1 / std::sqrt(1 + h12 * h12 / h11 / h11);
+            m_alpha = std::sqrt(1 - m_beta * m_beta);
+        } else if (h11 != 0) {
+            m_beta = 1;
+            m_alpha = 0;
+        } else {
+            m_beta = 0;
+            m_alpha = 1;
+        }
     }
     if ((m_alpha * m_xav + m_beta * m_yav) *
         (m_beta * m_xav - m_alpha * m_yav) < 0) neg();
@@ -443,50 +424,42 @@ namespace Belle {
 //    }
     if (lambda >= 0) m_chisq = lambda * m_wsum_temp * m_rscale * m_rscale;
     return lambda;
-  }
+}
 
-  double Lpav::fit(double x, double y, double w)
-  {
+double Lpav::fit(double x, double y, double w) {
     if (m_nc <= 3) return -1;
     m_chisq = -1;
     double q;
     if (m_nc < 4) {
-      calculate_average3(x, y, w);
-      double q = calculate_lpar3();
-      if (q > 0) m_chisq = q * m_wsum_temp * m_rscale * m_rscale;
+        calculate_average3(x, y, w);
+        double q = calculate_lpar3();
+        if (q > 0) m_chisq = q * m_wsum_temp * m_rscale * m_rscale;
     } else {
-      calculate_average(x, y, w);
-      q = calculate_lpar();
-      if (q > 0) m_chisq = q * m_wsum_temp * m_rscale * m_rscale;
+        calculate_average(x, y, w);
+        q = calculate_lpar();
+        if (q > 0) m_chisq = q * m_wsum_temp * m_rscale * m_rscale;
     }
     return m_chisq;
-  }
+}
 
-  double Lpav::fit(void)
-  {
+double Lpav::fit(void) {
     if (m_nc <= 3) return -1;
     m_chisq = -1;
     double q;
     if (m_nc < 4) {
-      calculate_average3();
-      q = calculate_lpar3();
-      if (q > 0) m_chisq = q * m_wsum_temp * m_rscale * m_rscale;
+        calculate_average3();
+        q = calculate_lpar3();
+        if (q > 0) m_chisq = q * m_wsum_temp * m_rscale * m_rscale;
     } else {
-      calculate_average();
-      q = calculate_lpar();
-      if (q > 0) m_chisq = q * m_wsum_temp * m_rscale * m_rscale;
+        calculate_average();
+        q = calculate_lpar();
+        if (q > 0) m_chisq = q * m_wsum_temp * m_rscale * m_rscale;
     }
     return m_chisq;
-  }
+}
 
-  CLHEP::HepSymMatrix Lpav::cov(int inv) const
-#ifdef BELLE_OPTIMIZED_RETURN
-  return vret(4);
-  {
-#else
-  {
+CLHEP::HepSymMatrix Lpav::cov(int inv) const {
     CLHEP::HepSymMatrix vret(4);
-#endif
     vret(1, 1) = m_xxsum;
     vret(2, 1) = m_xysum;
     vret(2, 2) = m_yysum;
@@ -499,51 +472,45 @@ namespace Belle {
     vret(4, 4) = m_rrrrsum;
     if (inv == 0) {
 //    int i=vret.Inv();
-      int i;
-      vret.invert(i);
-      if (i != 0) {
-        std::cout << "Lpav::cov:could not invert nc=" << m_nc << vret;
+        int i;
+        vret.invert(i);
+        if (i != 0) {
+            std::cout << "Lpav::cov:could not invert nc=" << m_nc << vret;
 #ifdef HAVE_EXCEPTION
-        throw new Singular();
+            throw new Singular();
 #endif
-      }
+        }
     }
     return vret;
-  }
+}
 
-  CLHEP::HepSymMatrix Lpav::cov_c(int inv) const
-#ifdef BELLE_OPTIMIZED_RETURN
-  return vret(3);
-  {
-#else
-  {
+CLHEP::HepSymMatrix Lpav::cov_c(int inv) const {
     CLHEP::HepSymMatrix vret(3);
-#endif
+
 #ifdef HAVE_EXCEPTION
     try {
 #endif
-      vret = cov(1).similarity(dldc());
+        vret = cov(1).similarity(dldc());
 #ifdef HAVE_EXCEPTION
     } catch (Lpav::Singular) {
-      throw new Singular_c();
+        throw new Singular_c();
     }
 #endif
     if (inv == 0) {
 //    int i = vret.Inv();
-      int i;
-      vret.invert(i);
-      if (i != 0) {
-        std::cout << "Lpav::cov_c:could not invert " << vret;
+        int i;
+        vret.invert(i);
+        if (i != 0) {
+            std::cout << "Lpav::cov_c:could not invert " << vret;
 #ifdef HAVE_EXCEPTION
-        throw new Singular_c();
+            throw new Singular_c();
 #endif
-      }
+        }
     }
     return vret;
-  }
+}
 
-  int Lpav::extrapolate(double r, double& phi, double& dphi) const
-  {
+int Lpav::extrapolate(double r, double& phi, double& dphi) const {
     double x, y;
     if (m_chisq < 0) return -1;
     if (xy(r, x, y) != 0) return -1;
@@ -561,23 +528,22 @@ namespace Belle {
 //     CLHEP::HepSymMatrix l = cov().similarity(v.T());
 //     //  std::cout << "delta d^2=" << l(1,1);
 //     if (l(1,1)>0) {
-      double l = cov().similarity(v);
-      if (l > 0) {
-        double ls = std::sqrt(l);
-        dphi = ls / r;
-        //    std::cout << " delta d=" << ls << " dphi=" << dphi;
-      }
+        double l = cov().similarity(v);
+        if (l > 0) {
+            double ls = std::sqrt(l);
+            dphi = ls / r;
+            //    std::cout << " delta d=" << ls << " dphi=" << dphi;
+        }
 #ifdef HAVE_EXCEPTION
     } catch (Lpav::Singular) {
-      return -1;
+        return -1;
     }
 #endif
 //  std::cout << std::endl;
     return 0;
-  }
+}
 
-  double Lpav::similarity(double x, double y) const
-  {
+double Lpav::similarity(double x, double y) const {
     if (m_nc <= 3) return -1;
     CLHEP::HepVector v(4);
     v(1) = x;
@@ -588,24 +554,22 @@ namespace Belle {
 #ifdef HAVE_EXCEPTION
     try {
 #endif
-      l = cov().similarity(v);
+        l = cov().similarity(v);
 #ifdef HAVE_EXCEPTION
     } catch (Lpav::Singular) {
-      return -1;
+        return -1;
     }
 #endif
     return l;
-  }
+}
 
-  void Lpav::add(double xi, double yi, double w, double a, double b)
-  {
+void Lpav::add(double xi, double yi, double w, double a, double b) {
     register double wi = err_dis_inv(xi, yi, w, a, b);
     add(xi, yi, wi);
-  }
+}
 
-  void Lpav::add_point(register double xi, register double yi,
-                       register double wi)
-  {
+void Lpav::add_point(register double xi, register double yi,
+                     register double wi) {
     m_wsum += wi;
     m_xsum += wi * xi;
     m_ysum += wi * yi;
@@ -618,10 +582,9 @@ namespace Belle {
     m_yrrsum += wrri * yi;
     m_rrrrsum += wrri * rri;
     m_nc += 1;
-  }
+}
 
-  void Lpav::add_point_frac(double xi, double yi, double w, double a)
-  {
+void Lpav::add_point_frac(double xi, double yi, double w, double a) {
     register double wi = w * a;
     m_wsum += wi;
     m_xsum += wi * xi;
@@ -635,10 +598,9 @@ namespace Belle {
     m_yrrsum += wrri * yi;
     m_rrrrsum += wrri * rri;
     m_nc += a;
-  }
+}
 
-  void Lpav::sub(double xi, double yi, double w, double a, double b)
-  {
+void Lpav::sub(double xi, double yi, double w, double a, double b) {
     register double wi = err_dis_inv(xi, yi, w, a, b);
     m_wsum -= wi;
     m_xsum -= wi * xi;
@@ -652,10 +614,9 @@ namespace Belle {
     m_yrrsum -= wrri * yi;
     m_rrrrsum -= wrri * rri;
     m_nc -= 1;
-  }
+}
 
-  const Lpav& Lpav::operator+=(const Lpav& la1)
-  {
+const Lpav& Lpav::operator+=(const Lpav& la1) {
     m_wsum += la1.m_wsum;
     m_xsum += la1.m_xsum;
     m_ysum += la1.m_ysum;
@@ -667,16 +628,10 @@ namespace Belle {
     m_rrrrsum += la1.m_rrrrsum;
     m_nc += la1.m_nc;
     return *this;
-  }
+}
 
-  Lpav operator+(const Lpav& la1, const Lpav& la2)
-#ifdef BELLE_OPTIMIZED_RETURN
-  return la;
-  {
-#else
-  {
+Lpav operator+(const Lpav& la1, const Lpav& la2) {
     Lpav la;
-#endif
     la.m_wsum = la1.m_wsum + la2.m_wsum;
     la.m_xsum = la1.m_xsum + la2.m_xsum;
     la.m_ysum = la1.m_ysum + la2.m_ysum;
@@ -688,10 +643,9 @@ namespace Belle {
     la.m_rrrrsum = la1.m_rrrrsum + la2.m_rrrrsum;
     la.m_nc = la1.m_nc + la2.m_nc;
     return la;
-  }
+}
 
-  double Lpav::prob() const
-  {
+double Lpav::prob() const {
     if (m_nc <= 3) return 0;
     if (m_chisq < 0) return 0;
 //cnv  float c = m_chisq;
@@ -700,21 +654,19 @@ namespace Belle {
     //  double p = (double) prob_(&c, &nci);
     double p = 0;
     return p;
-  }
+}
 
-  double Lpav::chi_deg() const
-  {
+double Lpav::chi_deg() const {
     if (m_nc <= 3) return -1;
     else return m_chisq / (m_nc - 3);
-  }
+}
 
-  double Lpav::delta_chisq(double x, double y, double w) const
-  {
+double Lpav::delta_chisq(double x, double y, double w) const {
     double sim = similarity(x, y);
     if (sim < 0) return -1;
     double d = d0(x, y);
     double delta = sqr(d) * w / (1 + sim * w);
     return delta;
-  }
+}
 
 } // namespace Belle

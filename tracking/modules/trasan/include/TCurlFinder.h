@@ -24,37 +24,28 @@
 #ifndef TCURLFINDER_FLAG_
 #define TCURLFINDER_FLAG_
 
-#ifdef TRASAN_DEBUG_DETAIL
-#ifndef TRASAN_DEBUG
-#define TRASAN_DEBUG
-#endif
-#endif
 #define HEP_SHORT_NAMES
 
 #include "CLHEP/Matrix/DiagMatrix.h"
 #ifdef TRASAN_WINDOW
 #include "tracking/modules/trasan/TWindow.h"
 #endif
-
 #include "tracking/modules/trasan/TFinderBase.h"
 #include "tracking/modules/trasan/TBuilderCurl.h"
 #include "tracking/modules/trasan/TSelector.h"
 #include "tracking/modules/trasan/TCurlFinderParameters.h"
 
-namespace Belle2 {
-  class TRGCDC;
-  class TRGCDCWire;
-  class TRGCDCWireHit;
-}
-
 namespace Belle {
 
-  class TLink;
-  class TTrack;
-  class TCircle;
-  class TSegmentCurl;
+class TCDC;
+class TWire;
+class TWireHit;
+class TLink;
+class TTrack;
+class TCircle;
+class TSegmentCurl;
 
-  class TCurlFinder : public TFinderBase {
+class TCurlFinder : public TFinderBase {
 
   public:
     TCurlFinder(void);
@@ -102,8 +93,8 @@ namespace Belle {
                 int turnOffInnermost3Layers);
 
     /// main function
-    int doit(const CAList<Belle2::TRGCDCWireHit> & axialHits,
-             const CAList<Belle2::TRGCDCWireHit> & stereoHits,
+    int doit(const CAList<TWireHit> & axialHits,
+             const CAList<TWireHit> & stereoHits,
              AList<TTrack> & tracks,
              AList<TTrack> & tracks2D);
 
@@ -115,12 +106,12 @@ namespace Belle {
 
   private:
     static void set_smallcell(bool s) {
-      ms_smallcell = s;
+        ms_smallcell = s;
     }
     static void set_superb(bool s) {
-      ms_superb = s;
+        ms_superb = s;
     }
-    friend class Belle2::TRGCDC;
+    friend class TCDC;
 
 
   private:
@@ -131,12 +122,15 @@ namespace Belle {
     unsigned maxLocalLayerId(const unsigned) const;
     int      nextSuperAxialLayerId(const unsigned, const int) const;
     int      nextSuperStereoLayerId(const unsigned, const int) const;
-    void makeList(AList<TLink>&, const AList<TSegmentCurl>&, const AList<TLink>&);
+    void makeList(AList<TLink>&,
+                  const AList<TSegmentCurl>&,
+                  const AList<TLink>&);
     void makeList(AList<TLink>&, const AList<TLink>&, const AList<TLink>&);
     unsigned nAxialHits(const double&) const;
 
     /// Sub Main Section #1
-    void makeWireHitsListsSegments(const CAList<Belle2::TRGCDCWireHit>&, const CAList<Belle2::TRGCDCWireHit>&);
+    void makeWireHitsListsSegments(const CAList<TWireHit> &,
+				   const CAList<TWireHit> &);
 
     /// Sub Main Section #2
     int checkSortSegments(void);
@@ -146,8 +140,12 @@ namespace Belle {
                         AList<TTrack> &tracks2D);
 
     /// Utility of #1
-    void linkNeighboringWires(AList<TLink>*, const unsigned, bool stereo = false);
-    void linkNeighboringWiresSmallCell(AList<TLink>*, const unsigned, bool stereo = false);
+    void linkNeighboringWires(AList<TLink>*,
+                              const unsigned,
+                              bool stereo = false);
+    void linkNeighboringWiresSmallCell(AList<TLink>*,
+                                       const unsigned,
+                                       bool stereo = false);
     void setNeighboringWires(TLink*, const TLink*);
     void createSuperLayer(void);
     void createSegments(AList<TLink>&);
@@ -174,13 +172,26 @@ namespace Belle {
     void check2DTracks(void);
 
     /// 2D Track
-    TCircle* make2DTrack(const AList<TLink>&, const AList<TSegmentCurl>&, const unsigned);
-    void searchAxialCand(AList<TLink>&, const AList<TLink>&, const TCircle*,
-                         const int, const unsigned, const double);
-    void searchStereoCand(AList<TLink>&, const AList<TLink>&, const TCircle*,
-                          const int, const unsigned, const double);
+    TCircle* make2DTrack(const AList<TLink>&,
+                         const AList<TSegmentCurl>&,
+                         const unsigned);
+    void searchAxialCand(AList<TLink>&,
+                         const AList<TLink>&,
+                         const TCircle*,
+                         const int,
+                         const unsigned,
+                         const double);
+    void searchStereoCand(AList<TLink>&,
+                          const AList<TLink>&,
+                          const TCircle*,
+                          const int,
+                          const unsigned,
+                          const double);
     unsigned searchHits(const TLink*, const TCircle*, const double) const;
-    unsigned searchHits(AList<TLink>&, const AList<TLink>&, const TCircle*, const double) const;
+    unsigned searchHits(AList<TLink>&,
+                        const AList<TLink>&,
+                        const TCircle*,
+                        const double) const;
     unsigned checkAppendHits(const AList<TLink>&, AList<TLink>&) const;
     double distance(const TTrack&, const TLink&) const;
     int  trace2DTrack(TCircle*);
@@ -191,7 +202,9 @@ namespace Belle {
 
     /// MC
 #ifdef DEBUG_CURL_MC
-    int makeWithMC(const AList<Belle2::TRGCDCWireHit>&, const AList<Belle2::TRGCDCWireHit>&, AList<TTrack>&);
+    int makeWithMC(const AList<TWireHit> &,
+		   const AList<TWireHit> &,
+		   AList<TTrack> &);
 #endif
 
     /// Plot
@@ -230,7 +243,7 @@ namespace Belle {
     AList<TTrack>  m_svdTracks;
     AList<TTrack>  m_2dTracks;
 
-    CAList<Belle2::TRGCDCWireHit>   m_hitsOnInnerSuperLayer;
+    CAList<TWireHit>   m_hitsOnInnerSuperLayer;
 
     AList<TLink> *m_unusedAxialHitsOnEachLayer;
     AList<TLink> *m_unusedStereoHitsOnEachLayer;
@@ -271,14 +284,15 @@ namespace Belle {
     mutable TWindow _cWindow;
     void displayStatus(const std::string& m) const;
 #endif
-  };
+};
 
-  inline
-  void
-  TCurlFinder::init(void)
-  {
+//-----------------------------------------------------------------------------
+
+inline
+void
+TCurlFinder::init(void) {
     return;
-  }
+}
 
 } // namespace Belle
 

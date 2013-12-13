@@ -24,15 +24,14 @@
 #ifndef THoughTransformation_FLAG_
 #define THoughTransformation_FLAG_
 
-
 #include <string>
 
 namespace Belle {
 
-  class TPoint2D;
+class TPoint2D;
 
 /// An abstract class to represent a Hough transformation.
-  class THoughTransformation {
+class THoughTransformation {
 
   public:
     /// Contructor.
@@ -50,34 +49,36 @@ namespace Belle {
 
     /// returns true if Y diverges in given region.
     virtual bool diverge(float xReal, float yReal, float x0, float x1)
-    const = 0;
+        const = 0;
 
     /// returns true if Y diverges in given region.
     virtual bool positiveDiverge(float xReal, float yReal, float x0, float x1)
-    const = 0;
+        const = 0;
 
     /// returns true if Y diverges in given region.
     virtual bool negativeDiverge(float xReal, float yReal, float x0, float x1)
-    const = 0;
+        const = 0;
 
 //     /// returns a gradient at given regsion.
 //     virtual float gradient(float xReal, float yReal, float x) const = 0;
 
-    /// converts Point2D(r, phi) in real plane into Point2D(r, phi) in Hough plane.
+    /// converts Point2D(r, phi) in real plane into Point2D(r, phi) in
+    /// Hough plane.
     virtual TPoint2D convert(const TPoint2D&) const;
 
   public:// Modifiers
 
   private:
     const std::string _name;
-  };
+};
 
-  inline
-  std::string
-  THoughTransformation::name(void) const
-  {
+//-----------------------------------------------------------------------------
+
+inline
+std::string
+THoughTransformation::name(void) const {
     return _name;
-  }
+}
 
 } // namespace Belle
 

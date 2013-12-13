@@ -1,23 +1,24 @@
-#ifndef TSEGMENTRGCDC_FLAG
-#define TSEGMENTRGCDC_FLAG
+#ifndef TSEGMENTCDC_FLAG
+#define TSEGMENTCDC_FLAG
 
 #include "tracking/modules/trasan/TLink.h"
+
 #if defined(BELLE_NAMESPACE)
 namespace Belle {
 #endif
 
-  class TSegmentCDC {
+class TSegmentCDC {
 
   public:
     TSegmentCDC(void) : m_segLayerId(0), m_segId(0),
-      m_movedSegId(0),
-      m_superLayerId(0) {};
+                        m_movedSegId(0),
+                        m_superLayerId(0) {};
     TSegmentCDC(TLink& l) : m_segLayerId(0), m_segId(0),
-      m_movedSegId(0),
-      m_superLayerId(0) { m_list.append(l); }
+                            m_movedSegId(0),
+                            m_superLayerId(0) { m_list.append(l); }
     TSegmentCDC(HepAList<TLink> &l) : m_segLayerId(0), m_segId(0),
-      m_movedSegId(0),
-      m_superLayerId(0) { m_list.append(l); }
+                                      m_movedSegId(0),
+                                      m_superLayerId(0) { m_list.append(l); }
 
     ~TSegmentCDC(void) {};
 
@@ -46,8 +47,10 @@ namespace Belle {
     unsigned m_superLayerId;
 
     HepAList<TLink> m_list;
-  };
+};
+
 #if defined(BELLE_NAMESPACE)
 } // namespace Belle
 #endif
-#endif /* TSEGMENTRGCDC_FLAG */
+
+#endif /* TSEGMENTCDC_FLAG */

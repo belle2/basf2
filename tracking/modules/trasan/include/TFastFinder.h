@@ -40,22 +40,16 @@
 #ifndef TFastFinder_FLAG_
 #define TFastFinder_FLAG_
 
-#ifdef TRASAN_DEBUG_DETAIL
-#ifndef TRASAN_DEBUG
-#define TRASAN_DEBUG
-#endif
-#endif
-
-#include "trg/cdc/WireHit.h"
+#include "tracking/modules/trasan/TWireHit.h"
 #include "tracking/modules/trasan/TFinderBase.h"
 #include "tracking/modules/trasan/TBuilder0.h"
 
 namespace Belle {
 
-  class TLink;
+class TLink;
 
 /// A class to find tracks with the conformal method.
-  class TFastFinder : public TFinderBase {
+class TFastFinder : public TFinderBase {
 
   public:
     /// Constructor.
@@ -80,58 +74,44 @@ namespace Belle {
     void clear(void);
 
     /// finds tracks.
-    int doit(const AList<Belle2::TRGCDCWireHit> & axialHits,
-             const AList<Belle2::TRGCDCWireHit> & stereoHits,
+    int doit(const AList<TWireHit> & axialHits,
+             const AList<TWireHit> & stereoHits,
              AList<TTrack> & tracks);
 
   private:
     /// selects isolated hits.(conf.finder type)
-    void selectHits(const AList<Belle2::TRGCDCWireHit> & axialHits,
-                    const AList<Belle2::TRGCDCWireHit> & stereoHits);
+    void selectHits(const AList<TWireHit> & axialHits,
+                    const AList<TWireHit> & stereoHits);
 
     /// selects isolated hits.(calling selectSimpleSegments)
-    void selectHits2(const AList<Belle2::TRGCDCWireHit> & axialHits,
-                     const AList<Belle2::TRGCDCWireHit> & stereoHits);
+    void selectHits2(const AList<TWireHit> & axialHits,
+                     const AList<TWireHit> & stereoHits);
 
     /// selects simple segments.
-    void selectSimpleSegments(const AList<Belle2::TRGCDCWireHit> & hits,
-                              AList<Belle2::TRGCDCWireHit> & output) const;
+    void selectSimpleSegments(const AList<TWireHit> & hits,
+                              AList<TWireHit> & output) const;
 
     /// finds close hits.
     AList<TLink> findCloseHits(const AList<TLink> & links,
                                const TTrack& track) const;
 
   private:
-    AList<Belle2::TRGCDCWireHit> _axialHits;
-    AList<Belle2::TRGCDCWireHit> _stereoHits;
+    AList<TWireHit> _axialHits;
+    AList<TWireHit> _stereoHits;
     AList<TLink> _axialLinks;
     AList<TLink> _stereoLinks;
 
     TBuilder0 _builder;
     TSelector0 _selector;
-  };
+};
 
 //-----------------------------------------------------------------------------
 
-#ifdef TFastFinder_NO_INLINE
-#define inline
-#else
-#undef inline
-#define TFastFinder_INLINE_DEFINE_HERE
-#endif
-
-#ifdef TFastFinder_INLINE_DEFINE_HERE
-
-  inline
-  std::string
-  TFastFinder::name(void) const
-  {
+inline
+std::string
+TFastFinder::name(void) const {
     return "Fast Finder";
-  }
-
-#endif
-
-#undef inline
+}
 
 } // namespace Belle
 

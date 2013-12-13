@@ -1,20 +1,14 @@
 #ifndef TSegmentCurl_FLAG_
 #define TSegmentCurl_FLAG_
 
-#ifdef TRASAN_DEBUG_DETAIL
-#ifndef TRASAN_DEBUG
-#define TRASAN_DEBUG
-#endif
-#endif
-
 #include "tracking/modules/trasan/TLink.h"
 #include "tracking/modules/trasan/TCurlFinderParameters.h"
 #include "tracking/modules/trasan/AList.h"
 
 namespace Belle {
 
-  class TRGCDC;
-  class TSegmentCurl {
+class TSegmentCurl {
+
   public:
     TSegmentCurl(const unsigned superLayerId = 9999,
                  const unsigned max = 9999);
@@ -63,23 +57,22 @@ namespace Belle {
     void update(void);
   private:
     static void set_smallcell(bool s) {
-      ms_smallcell = s;
+        ms_smallcell = s;
     }
     static void set_superb(bool s) {
-      ms_superb = s;
+        ms_superb = s;
     }
-    friend class TRGCDC;
 
   private:
     struct LayerInfo {
-      unsigned int m_seqOfLayer;
-      unsigned int m_sizeOfLayer;
-      AList<TLink> m_layer;
-      LayerInfo() : m_seqOfLayer(0), m_sizeOfLayer(0) {
-      }
-      ~LayerInfo() {
-        m_layer.removeAll();
-      }
+        unsigned int m_seqOfLayer;
+        unsigned int m_sizeOfLayer;
+        AList<TLink> m_layer;
+        LayerInfo() : m_seqOfLayer(0), m_sizeOfLayer(0) {
+        }
+        ~LayerInfo() {
+            m_layer.removeAll();
+        }
     };
 
 
@@ -114,7 +107,7 @@ namespace Belle {
     //
     static bool ms_smallcell;
     static bool ms_superb;
-  };
+};
 
 } // namespace Belle
 

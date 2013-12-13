@@ -23,19 +23,16 @@
 #include "tracking/modules/trasan/TWindowGTK.h"
 #include "tracking/modules/trasan/TWindowConformalDrawingArea.h"
 
-namespace Belle2 {
-  class TRGCDCWireHit;
-}
-
 namespace Belle {
 
-  class TLink;
-  class TTrackBase;
-  class TSegment;
-  class TTrack;
+class TWireHit;
+class TLink;
+class TTrackBase;
+class TSegment;
+class TTrack;
 
 /// A class to display tracking objects.
-  class TWindowGTKConformal : public TWindowGTK {
+class TWindowGTKConformal : public TWindowGTK {
 
   public:
     /// Default constructor
@@ -49,7 +46,7 @@ namespace Belle {
 
   public: // Tracking stuff
     void clear(void);
-    void append(const CAList<Belle2::TRGCDCWireHit> &,
+    void append(const CAList<TWireHit> &,
                 Gdk::Color color = Gdk::Color("grey"));
     void append(const AList<TLink> &,
                 Gdk::Color color = Gdk::Color("grey"));
@@ -69,55 +66,40 @@ namespace Belle {
 
   private: // GTK stuff
     TWindowConformalDrawingArea _w;
-  };
+};
 
 //-----------------------------------------------------------------------------
 
-#ifdef TRASAN_NO_INLINE
-#define inline
-#else
-#undef inline
-#define TWINDOWGTK_INLINE_DEFINE_HERE
-#endif
-#ifdef TWINDOWGTK_INLINE_DEFINE_HERE
-
-  inline
-  void
-  TWindowGTKConformal::clear(void)
-  {
+inline
+void
+TWindowGTKConformal::clear(void) {
     _w.clear();
     TWindowGTK::clear();
-  }
+}
 
-  inline
-  void
-  TWindowGTKConformal::on_axial(void)
-  {
+inline
+void
+TWindowGTKConformal::on_axial(void) {
     TWindowGTK::on_axial();
     _w.axial(axial());
     _w.on_expose_event((GdkEventExpose*) NULL);
-  }
+}
 
-  inline
-  void
-  TWindowGTKConformal::on_stereo(void)
-  {
+inline
+void
+TWindowGTKConformal::on_stereo(void) {
     TWindowGTK::on_stereo();
     _w.stereo(stereo());
     _w.on_expose_event((GdkEventExpose*) NULL);
-  }
+}
 
-  inline
-  void
-  TWindowGTKConformal::on_wireName(void)
-  {
+inline
+void
+TWindowGTKConformal::on_wireName(void) {
     TWindowGTK::on_wireName();
     _w.wireName(wireName());
     _w.on_expose_event((GdkEventExpose*) NULL);
-  }
-
-#endif
-#undef inline
+}
 
 } // namespace Belle
 

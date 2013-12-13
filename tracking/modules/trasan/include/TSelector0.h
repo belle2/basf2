@@ -18,13 +18,6 @@
 #ifndef TSelector0_FLAG_
 #define TSelector0_FLAG_
 
-#ifdef TRASAN_DEBUG_DETAIL
-#ifndef TRASAN_DEBUG
-#define TRASAN_DEBUG
-#endif
-#endif
-
-
 #include <string>
 #include <iostream>
 
@@ -33,11 +26,11 @@ namespace Belle {
 #define HEP_SHORT_NAMES
 
 
-  class TTrackBase;
-  class TCircle;
+class TTrackBase;
+class TCircle;
 
 /// A class to select a TTrackBase object.
-  class TSelector0 {
+class TSelector0 {
 
   public:
     /// Constructor.
@@ -123,155 +116,128 @@ namespace Belle {
 
     unsigned _nLinksStereo;
     double _maxDistance;
-  };
+};
 
 //-----------------------------------------------------------------------------
 
-#ifdef TSelector0_NO_INLINE
-#define inline
-#else
-#undef inline
-#define TSelector0_INLINE_DEFINE_HERE
-#endif
-
-#ifdef TSelector0_INLINE_DEFINE_HERE
-
-  inline
-  unsigned
-  TSelector0::nLinks(void) const
-  {
+inline
+unsigned
+TSelector0::nLinks(void) const {
 #ifdef TRASAN_DEBUG
     if (! _nLinksDefined)
-      std::cout << "TSelector0 !!! min. nLinks is not defined" << std::endl;
+        std::cout << "TSelector0 !!! min. nLinks is not defined" << std::endl;
 #endif
     return _nLinks;
-  }
+}
 
-  inline
-  unsigned
-  TSelector0::nLinks(unsigned a)
-  {
+inline
+unsigned
+TSelector0::nLinks(unsigned a) {
     _nLinksDefined = true;
     return _nLinks = a;
-  }
+}
 
-  inline
-  unsigned
-  TSelector0::nSuperLayers(void) const
-  {
+inline
+unsigned
+TSelector0::nSuperLayers(void) const {
 #ifdef TRASAN_DEBUG
     if (! _nSuperLayers)
-      std::cout << "TSelector0 !!! min. nSuperLayers is not defined" << std::endl;
+        std::cout << "TSelector0 !!! min. nSuperLayers is not defined" << std::endl;
 #endif
     return _nSuperLayers;
-  }
+}
 
-  inline
-  unsigned
-  TSelector0::nSuperLayers(unsigned a)
-  {
+inline
+unsigned
+TSelector0::nSuperLayers(unsigned a) {
     _nSuperLayersDefined = true;
     return _nSuperLayers = a;
-  }
+}
 
-  inline
-  double
-  TSelector0::minPt(void) const
-  {
+inline
+double
+TSelector0::minPt(void) const {
 #ifdef TRASAN_DEBUG
     if (! _minPtDefined)
-      std::cout << "TSelector0 !!! min. pt is not defined" << std::endl;
+        std::cout << "TSelector0 !!! min. pt is not defined" << std::endl;
 #endif
     return _minPt;
-  }
+}
 
-  inline
-  double
-  TSelector0::minPt(double a)
-  {
+inline
+double
+TSelector0::minPt(double a) {
     _minPtDefined = true;
     return _minPt = a;
-  }
+}
 
-  inline
-  double
-  TSelector0::maxImpact(void) const
-  {
+inline
+double
+TSelector0::maxImpact(void) const {
 #ifdef TRASAN_DEBUG
     if (! _maxImpactDefined)
-      std::cout << "TSelector0 !!! max. impact is not defined" << std::endl;
+        std::cout << "TSelector0 !!! max. impact is not defined" << std::endl;
 #endif
     return _maxImpact;
-  }
+}
 
-  inline
-  double
-  TSelector0::maxImpact(double a)
-  {
+inline
+double
+TSelector0::maxImpact(double a) {
     _maxImpactDefined = true;
     return _maxImpact = a;
-  }
+}
 
-  inline
-  double
-  TSelector0::maxSigma(void) const
-  {
+inline
+double
+TSelector0::maxSigma(void) const {
 #ifdef TRASAN_DEBUG
     if (! _maxSigmaDefined)
-      std::cout << "TSelector0 !!! max. sigma is not defined" << std::endl;
+        std::cout << "TSelector0 !!! max. sigma is not defined" << std::endl;
 #endif
     return _maxSigma;
-  }
+}
 
-  inline
-  double
-  TSelector0::maxSigma(double a)
-  {
+inline
+double
+TSelector0::maxSigma(double a) {
     _maxSigmaDefined = true;
     return _maxSigma = a;
-  }
+}
 
-  inline
-  unsigned
-  TSelector0::nLinksStereo(void) const
-  {
+inline
+unsigned
+TSelector0::nLinksStereo(void) const {
 #ifdef TRASAN_DEBUG
     if (! _nLinksStereoDefined)
-      std::cout << "TSelector0 !!! min. nLinksStereo is not defined" << std::endl;
+        std::cout << "TSelector0 !!! min. nLinksStereo is not defined" << std::endl;
 #endif
     return _nLinksStereo;
-  }
+}
 
-  inline
-  unsigned
-  TSelector0::nLinksStereo(unsigned a)
-  {
+inline
+unsigned
+TSelector0::nLinksStereo(unsigned a) {
     _nLinksStereoDefined = true;
     return _nLinksStereo = a;
-  }
+}
 
-  inline
-  double
-  TSelector0::maxDistance(void) const
-  {
+inline
+double
+TSelector0::maxDistance(void) const {
 #ifdef TRASAN_DEBUG
     if (! _maxDistanceDefined)
-      std::cout << "TSelector0 !!! max. distance is not defined" << std::endl;
+        std::cout << "TSelector0 !!! max. distance is not defined" << std::endl;
 #endif
     return _maxDistance;
-  }
+}
 
-  inline
-  double
-  TSelector0::maxDistance(double a)
-  {
+inline
+double
+TSelector0::maxDistance(double a) {
     _maxDistanceDefined = true;
     return _maxDistance = a;
-  }
-
-#endif
-
-#undef inline
+}
 
 } // namespace Belle
 

@@ -18,7 +18,6 @@
 #ifndef THoughPlaneMulti_FLAG_
 #define THoughPlaneMulti_FLAG_
 
-
 #include "tracking/modules/trasan/THoughPlane.h"
 
 namespace Belle {
@@ -26,7 +25,7 @@ namespace Belle {
 #define N_LAYERS 64
 
 /// A class to represent a Hough parameter plane.
-  class THoughPlaneMulti : public THoughPlane {
+class THoughPlaneMulti : public THoughPlane {
 
   public:
     /// Contructor.
@@ -71,24 +70,24 @@ namespace Belle {
     unsigned _nLayers;
     THoughPlane* _layers[N_LAYERS];
     bool _usage[N_LAYERS];
-  };
+};
 
-  inline
-  void
-  THoughPlaneMulti::clear(void)
-  {
+//-----------------------------------------------------------------------------
+
+inline
+void
+THoughPlaneMulti::clear(void) {
     for (unsigned i = 0; i < N_LAYERS; i++)
-      if (_usage[i])
-        _layers[i]->clear();
+        if (_usage[i])
+            _layers[i]->clear();
     THoughPlane::clear();
-  }
+}
 
-  inline
-  void
-  THoughPlaneMulti::registerPattern(unsigned id)
-  {
+inline
+void
+THoughPlaneMulti::registerPattern(unsigned id) {
     _layers[id]->registerPattern(0);
-  }
+}
 
 inline
 unsigned
@@ -98,12 +97,11 @@ THoughPlaneMulti::nActiveCellsInPattern(unsigned) const {
     return 0;
 }
 
-  inline
-  void
-  THoughPlaneMulti::dump(const std::string& a, const std::string& b) const
-  {
+inline
+void
+THoughPlaneMulti::dump(const std::string& a, const std::string& b) const {
     THoughPlaneBase::dump(a, b);
-  }
+}
 
 } // namespace Belle
 

@@ -1,4 +1,3 @@
-#define OPTNK
 //-----------------------------------------------------------------------------
 // $Id: TTrack.cc 10688 2008-10-14 18:23:50Z hitoshi $
 //-----------------------------------------------------------------------------
@@ -295,6 +294,8 @@
 //
 //-----------------------------------------------------------------------------
 
+#define OPTNK
+
 /* for isnan */
 #if defined(__sparc)
 #  if defined(__EXTENSIONS__)
@@ -315,23 +316,20 @@
 #endif
 #include <cfloat>
 
-
-
 #define HEP_SHORT_NAMES
 #include "tracking/modules/trasan/Strings.h"
 #include "CLHEP/Matrix/Vector.h"
 #include "CLHEP/Matrix/SymMatrix.h"
 #include "CLHEP/Matrix/DiagMatrix.h"
 #include "CLHEP/Matrix/Matrix.h"
-#include "trg/cdc/TRGCDC.h"
+#include "tracking/modules/trasan/TCDC.h"
 #include "tracking/modules/trasan/TFinderBase.h"
 #include "tracking/modules/trasan/TCircle.h"
 #include "tracking/modules/trasan/TLine.h"
 #include "tracking/modules/trasan/TLink.h"
-
-#include "trg/cdc/Wire.h"
-#include "trg/cdc/WireHit.h"
-#include "trg/cdc/WireHitMC.h"
+#include "tracking/modules/trasan/TWire.h"
+#include "tracking/modules/trasan/TWireHit.h"
+#include "tracking/modules/trasan/TWireHitMC.h"
 //cnv #include "trg/cdc/Strip.h"
 #include "tracking/modules/trasan/TTrack.h"
 #include "tracking/modules/trasan/TSegment.h"
@@ -343,20 +341,20 @@
 #ifndef PANTHER_RECCDC_WIRHIT_
 #define PANTHER_RECCDC_WIRHIT_
 struct reccdc_wirhit {
-  int m_panther_dummy_;
-  int m_ID;
-  float m_ddl;
-  float m_ddr;
-  float m_erddl;
-  float m_erddr;
-  float m_pChiSq;
-  int m_lr;
-  int m_stat;
-  int m_geo;
-  int m_dat;
-  int m_trk;
-  float m_tdc;
-  float m_adc;
+    int m_panther_dummy_;
+    int m_ID;
+    float m_ddl;
+    float m_ddr;
+    float m_erddl;
+    float m_erddr;
+    float m_pChiSq;
+    int m_lr;
+    int m_stat;
+    int m_geo;
+    int m_dat;
+    int m_trk;
+    float m_tdc;
+    float m_adc;
 };
 #else
 struct reccdc_wirhit;
@@ -364,392 +362,392 @@ struct reccdc_wirhit;
 #ifndef PANTHER_GEOCDC_LAYER_
 #define PANTHER_GEOCDC_LAYER_
 struct geocdc_layer {
-  int m_panther_dummy_;
-  int m_ID;
-  float m_slant;
-  float m_r;
-  float m_zf;
-  float m_zb;
-  float m_rcsiz1;
-  float m_rcsiz2;
-  float m_pcsiz;
-  float m_div;
-  float m_offset;
-  float m_shift;
-  int m_wirst;
-  int m_sup;
-  float m_fdist;
-  float m_bdist;
-  float m_ft;
-  float m_bt;
-  float m_fpin;
-  float m_bpin;
-  float m_ftwist;
-  float m_btwist;
-  float m_fxoff;
-  float m_fyoff;
-  float m_fzoff;
-  float m_bxoff;
-  float m_byoff;
-  float m_bzoff;
+    int m_panther_dummy_;
+    int m_ID;
+    float m_slant;
+    float m_r;
+    float m_zf;
+    float m_zb;
+    float m_rcsiz1;
+    float m_rcsiz2;
+    float m_pcsiz;
+    float m_div;
+    float m_offset;
+    float m_shift;
+    int m_wirst;
+    int m_sup;
+    float m_fdist;
+    float m_bdist;
+    float m_ft;
+    float m_bt;
+    float m_fpin;
+    float m_bpin;
+    float m_ftwist;
+    float m_btwist;
+    float m_fxoff;
+    float m_fyoff;
+    float m_fzoff;
+    float m_bxoff;
+    float m_byoff;
+    float m_bzoff;
 };
 #endif
 #ifndef PANTHER_GEOCDC_WIRE_
 #define PANTHER_GEOCDC_WIRE_
 struct geocdc_wire {
-  int m_panther_dummy_;
-  int m_ID;
-  float m_xwb;
-  float m_ywb;
-  float m_zwb;
-  float m_xwf;
-  float m_ywf;
-  float m_zwf;
-  float m_slant;
-  int m_cell;
-  int m_layer;
-  int m_stat;
-  int m_lyr;
+    int m_panther_dummy_;
+    int m_ID;
+    float m_xwb;
+    float m_ywb;
+    float m_zwb;
+    float m_xwf;
+    float m_ywf;
+    float m_zwf;
+    float m_slant;
+    int m_cell;
+    int m_layer;
+    int m_stat;
+    int m_lyr;
 };
 #endif
 #ifndef PANTHER_RECCDC_WIRHIT_
 #define PANTHER_RECCDC_WIRHIT_
 struct reccdc_wirhit {
-  int m_panther_dummy_;
-  int m_ID;
-  float m_ddl;
-  float m_ddr;
-  float m_erddl;
-  float m_erddr;
-  float m_pChiSq;
-  int m_lr;
-  int m_stat;
-  int m_geo;
-  int m_dat;
-  int m_trk;
-  float m_tdc;
-  float m_adc;
+    int m_panther_dummy_;
+    int m_ID;
+    float m_ddl;
+    float m_ddr;
+    float m_erddl;
+    float m_erddr;
+    float m_pChiSq;
+    int m_lr;
+    int m_stat;
+    int m_geo;
+    int m_dat;
+    int m_trk;
+    float m_tdc;
+    float m_adc;
 };
 #endif
 #ifndef PANTHER_DATRGCDC_MCWIRHIT_
 #define PANTHER_DATRGCDC_MCWIRHIT_
 struct datcdc_mcwirhit {
-  int m_panther_dummy_;
-  int m_ID;
-  float m_xw;
-  float m_yw;
-  float m_zw;
-  float m_dist;
-  float m_chrg;
-  float m_xin;
-  float m_yin;
-  float m_zin;
-  float m_xout;
-  float m_yout;
-  float m_zout;
-  int m_lr;
-  int m_stat;
-  int m_geo;
-  int m_dat;
-  int m_hep;
-  int m_trk;
-  float m_px;
-  float m_py;
-  float m_pz;
-  float m_pid;
-  float m_tof;
-  float m_tdc;
+    int m_panther_dummy_;
+    int m_ID;
+    float m_xw;
+    float m_yw;
+    float m_zw;
+    float m_dist;
+    float m_chrg;
+    float m_xin;
+    float m_yin;
+    float m_zin;
+    float m_xout;
+    float m_yout;
+    float m_zout;
+    int m_lr;
+    int m_stat;
+    int m_geo;
+    int m_dat;
+    int m_hep;
+    int m_trk;
+    float m_px;
+    float m_py;
+    float m_pz;
+    float m_pid;
+    float m_tof;
+    float m_tdc;
 };
 #endif
 #ifndef PANTHER_RECCDC_TRK_
 #define PANTHER_RECCDC_TRK_
 struct reccdc_trk {
-  int m_panther_dummy_;
-  int m_ID;
-  float m_helix[5];
-  float m_pivot[3];
-  float m_error[15];
-  float m_chiSq;
-  float m_ndf;
-  float m_fiTerm;
-  int m_nhits;
-  int m_nster;
-  int m_nclus;
-  int m_stat;
-  float m_mass;
+    int m_panther_dummy_;
+    int m_ID;
+    float m_helix[5];
+    float m_pivot[3];
+    float m_error[15];
+    float m_chiSq;
+    float m_ndf;
+    float m_fiTerm;
+    int m_nhits;
+    int m_nster;
+    int m_nclus;
+    int m_stat;
+    float m_mass;
 };
 #endif
 #ifndef PANTHER_RECCDC_TRK_ADD_
 #define PANTHER_RECCDC_TRK_ADD_
 struct reccdc_trk_add {
-  int m_panther_dummy_;
-  int m_ID;
-  int m_quality;
-  int m_kind;
-  int m_mother;
-  int m_daughter;
-  int m_decision;
-  float m_likelihood[3];
-  int m_stat;
-  int m_rectrk;
+    int m_panther_dummy_;
+    int m_ID;
+    int m_quality;
+    int m_kind;
+    int m_mother;
+    int m_daughter;
+    int m_decision;
+    float m_likelihood[3];
+    int m_stat;
+    int m_rectrk;
 };
 #endif
 #ifndef PANTHER_RECCDC_MCTRK2HEP_
 #define PANTHER_RECCDC_MCTRK2HEP_
 struct reccdc_mctrk2hep {
-  int m_panther_dummy_;
-  int m_ID;
-  int m_wir;
-  int m_clust;
-  int m_trk;
-  int m_hep;
+    int m_panther_dummy_;
+    int m_ID;
+    int m_wir;
+    int m_clust;
+    int m_trk;
+    int m_hep;
 };
 #endif
 #ifndef PANTHER_RECCDC_MCTRK_
 #define PANTHER_RECCDC_MCTRK_
 struct reccdc_mctrk {
-  int m_panther_dummy_;
-  int m_ID;
-  int m_hep;
-  float m_wirFrac;
-  float m_wirFracHep;
-  int m_charge;
-  float m_ptFrac;
-  float m_pzFrac;
-  int m_quality;
+    int m_panther_dummy_;
+    int m_ID;
+    int m_hep;
+    float m_wirFrac;
+    float m_wirFracHep;
+    int m_charge;
+    float m_ptFrac;
+    float m_pzFrac;
+    int m_quality;
 };
 #endif
 #ifndef PANTHER_RECCDC_TIMING_
 #define PANTHER_RECCDC_TIMING_
 struct reccdc_timing {
-  int m_panther_dummy_;
-  int m_ID;
-  float m_time;
-  int m_quality;
+    int m_panther_dummy_;
+    int m_ID;
+    float m_time;
+    int m_quality;
 };
 #endif
 #ifndef PANTHER_RECTRK_
 #define PANTHER_RECTRK_
 struct rectrk {
-  int m_panther_dummy_;
-  int m_ID;
-  int m_glob[5];
-  int m_zero[5];
-  int m_first[5];
-  int m_last[5];
-  int m_prekal;
+    int m_panther_dummy_;
+    int m_ID;
+    int m_glob[5];
+    int m_zero[5];
+    int m_first[5];
+    int m_last[5];
+    int m_prekal;
 };
 #endif
 #ifndef PANTHER_RECTRK_GLOBAL_
 #define PANTHER_RECTRK_GLOBAL_
 struct rectrk_global {
-  int m_panther_dummy_;
-  int m_ID;
-  float m_mass;
-  float m_chisq[3];
-  int m_ndf[3];
-  float m_pathl;
-  float m_tof;
-  float m_pathl_rd;
-  float m_pathl_ab;
-  int m_stat[2];
-  int m_nhits[5];
-  int m_hit[3];
+    int m_panther_dummy_;
+    int m_ID;
+    float m_mass;
+    float m_chisq[3];
+    int m_ndf[3];
+    float m_pathl;
+    float m_tof;
+    float m_pathl_rd;
+    float m_pathl_ab;
+    int m_stat[2];
+    int m_nhits[5];
+    int m_hit[3];
 };
 #endif
 #ifndef PANTHER_RECTRK_LOCALZ_
 #define PANTHER_RECTRK_LOCALZ_
 struct rectrk_localz {
-  int m_panther_dummy_;
-  int m_ID;
-  float m_pivot[3];
-  float m_helix[5];
-  float m_error[15];
+    int m_panther_dummy_;
+    int m_ID;
+    float m_pivot[3];
+    float m_helix[5];
+    float m_error[15];
 };
 #endif
 #ifndef PANTHER_RECTRK_LOCALF_
 #define PANTHER_RECTRK_LOCALF_
 struct rectrk_localf {
-  int m_panther_dummy_;
-  int m_ID;
-  float m_pivot[3];
-  float m_helix[5];
-  float m_error[15];
+    int m_panther_dummy_;
+    int m_ID;
+    float m_pivot[3];
+    float m_helix[5];
+    float m_error[15];
 };
 #endif
 #ifndef PANTHER_RECTRK_LOCALL_
 #define PANTHER_RECTRK_LOCALL_
 struct rectrk_locall {
-  int m_panther_dummy_;
-  int m_ID;
-  float m_pivot[3];
-  float m_helix[5];
-  float m_error[15];
+    int m_panther_dummy_;
+    int m_ID;
+    float m_pivot[3];
+    float m_helix[5];
+    float m_error[15];
 };
 #endif
 #ifndef PANTHER_RECTRK_LOCALZ_LOWP_
 #define PANTHER_RECTRK_LOCALZ_LOWP_
 struct rectrk_localz_lowp {
-  int m_panther_dummy_;
-  int m_ID;
-  float m_pivot[3];
-  float m_helix[5];
-  float m_error[15];
+    int m_panther_dummy_;
+    int m_ID;
+    float m_pivot[3];
+    float m_helix[5];
+    float m_error[15];
 };
 #endif
 #ifndef PANTHER_RECTRK_V0_
 #define PANTHER_RECTRK_V0_
 struct rectrk_v0 {
-  int m_panther_dummy_;
-  int m_ID;
-  int m_kind;
-  int m_dau[2];
-  float m_vtx[3];
-  float m_P[5];
-  float m_fl;
-  float m_dz;
-  int m_type;
+    int m_panther_dummy_;
+    int m_ID;
+    int m_kind;
+    int m_dau[2];
+    float m_vtx[3];
+    float m_P[5];
+    float m_fl;
+    float m_dz;
+    int m_type;
 };
 #endif
 #ifndef PANTHER_RECTRK_V02_
 #define PANTHER_RECTRK_V02_
 struct rectrk_v02 {
-  int m_panther_dummy_;
-  int m_ID;
-  int m_kind;
-  int m_daut[2];
-  float m_P[4];
-  float m_vtx[3];
-  float m_dz;
-  float m_chisq;
-  int m_type;
-  int m_dau;
+    int m_panther_dummy_;
+    int m_ID;
+    int m_kind;
+    int m_daut[2];
+    float m_P[4];
+    float m_vtx[3];
+    float m_dz;
+    float m_chisq;
+    int m_type;
+    int m_dau;
 };
 #endif
 #ifndef PANTHER_RECTRK_V0_DAUGHTERS_
 #define PANTHER_RECTRK_V0_DAUGHTERS_
 struct rectrk_v0_daughters {
-  int m_panther_dummy_;
-  int m_ID;
-  float m_helix_p[5];
-  float m_helix_m[5];
-  float m_error_p[15];
-  float m_error_m[15];
+    int m_panther_dummy_;
+    int m_ID;
+    float m_helix_p[5];
+    float m_helix_m[5];
+    float m_error_p[15];
+    float m_error_m[15];
 };
 #endif
 #ifndef PANTHER_RECTRK_V0_DAUGHTERS_ADD_
 #define PANTHER_RECTRK_V0_DAUGHTERS_ADD_
 struct rectrk_v0_daughters_add {
-  int m_panther_dummy_;
-  int m_ID;
-  int m_nhits_p[2];
-  int m_hit_p;
-  int m_nhits_m[2];
-  int m_hit_m;
-  int m_v0;
+    int m_panther_dummy_;
+    int m_ID;
+    int m_nhits_p[2];
+    int m_hit_p;
+    int m_nhits_m[2];
+    int m_hit_m;
+    int m_v0;
 };
 #endif
 #ifndef PANTHER_RECTRK_PATHL_
 #define PANTHER_RECTRK_PATHL_
 struct rectrk_pathl {
-  int m_panther_dummy_;
-  int m_ID;
-  int m_layer;
-  int m_trk;
-  float m_xin;
-  float m_yin;
-  float m_zin;
-  float m_xout;
-  float m_yout;
-  float m_zout;
-  float m_pathl;
-  float m_px;
-  float m_py;
-  float m_pz;
-  int m_status;
+    int m_panther_dummy_;
+    int m_ID;
+    int m_layer;
+    int m_trk;
+    float m_xin;
+    float m_yin;
+    float m_zin;
+    float m_xout;
+    float m_yout;
+    float m_zout;
+    float m_pathl;
+    float m_px;
+    float m_py;
+    float m_pz;
+    int m_status;
 };
 #endif
 #ifndef PANTHER_RECCDC_SVD_TRK_
 #define PANTHER_RECCDC_SVD_TRK_
 struct reccdc_svd_trk {
-  int m_panther_dummy_;
-  int m_ID;
-  float m_Helix[5];
-  int m_cdc_trk;
-  int m_svd_cluster[24];
-  int m_Status;
+    int m_panther_dummy_;
+    int m_ID;
+    float m_Helix[5];
+    int m_cdc_trk;
+    int m_svd_cluster[24];
+    int m_Status;
 };
 #endif
 #ifndef PANTHER_RECTRK_TOF_
 #define PANTHER_RECTRK_TOF_
 struct rectrk_tof {
-  int m_panther_dummy_;
-  int m_ID;
-  int m_rectrk;
-  float m_tof;
-  float m_tof_k;
-  float m_tof_p;
+    int m_panther_dummy_;
+    int m_ID;
+    int m_rectrk;
+    float m_tof;
+    float m_tof_k;
+    float m_tof_p;
 };
 #endif
 #ifndef PANTHER_MDST_TRK_
 #define PANTHER_MDST_TRK_
 struct mdst_trk {
-  int m_panther_dummy_;
-  int m_ID;
-  int m_mhyp[5];
-  int m_quality;
-  int m_quality_dedx;
-  float m_dEdx;
-  float m_dEdx_exp[5];
-  float m_sigma_dEdx[5];
-  float m_pid_e;
-  float m_pid_mu;
-  float m_pid_pi;
-  float m_pid_K;
-  float m_pid_p;
+    int m_panther_dummy_;
+    int m_ID;
+    int m_mhyp[5];
+    int m_quality;
+    int m_quality_dedx;
+    float m_dEdx;
+    float m_dEdx_exp[5];
+    float m_sigma_dEdx[5];
+    float m_pid_e;
+    float m_pid_mu;
+    float m_pid_pi;
+    float m_pid_K;
+    float m_pid_p;
 };
 #endif
 #ifndef PANTHER_MDST_TRK_ADD_
 #define PANTHER_MDST_TRK_ADD_
 struct mdst_trk_add {
-  int m_panther_dummy_;
-  int m_ID;
-  int m_stat[10];
-  float m_buff[10];
+    int m_panther_dummy_;
+    int m_ID;
+    int m_stat[10];
+    float m_buff[10];
 };
 #endif
 #ifndef PANTHER_MDST_TRK_EXTRA_
 #define PANTHER_MDST_TRK_EXTRA_
 struct mdst_trk_extra {
-  int m_panther_dummy_;
-  int m_ID;
-  int m_mhyp[5];
-  int m_quality;
+    int m_panther_dummy_;
+    int m_ID;
+    int m_mhyp[5];
+    int m_quality;
 };
 #endif
 #ifndef PANTHER_MDST_TRK_FIT_
 #define PANTHER_MDST_TRK_FIT_
 struct mdst_trk_fit {
-  int m_panther_dummy_;
-  int m_ID;
-  int m_quality;
-  int m_hit_cdc[2];
-  int m_hit_svd;
-  int m_nhits[5];
-  float m_mass;
-  float m_pivot_x;
-  float m_pivot_y;
-  float m_pivot_z;
-  float m_helix[5];
-  float m_error[15];
-  float m_chisq;
-  int m_ndf;
-  float m_first_x;
-  float m_first_y;
-  float m_first_z;
-  float m_last_x;
-  float m_last_y;
-  float m_last_z;
+    int m_panther_dummy_;
+    int m_ID;
+    int m_quality;
+    int m_hit_cdc[2];
+    int m_hit_svd;
+    int m_nhits[5];
+    float m_mass;
+    float m_pivot_x;
+    float m_pivot_y;
+    float m_pivot_z;
+    float m_helix[5];
+    float m_error[15];
+    float m_chisq;
+    int m_ndf;
+    float m_first_x;
+    float m_first_y;
+    float m_first_z;
+    float m_last_x;
+    float m_last_y;
+    float m_last_z;
 };
 #endif
 
@@ -760,45 +758,44 @@ struct mdst_trk_fit {
 
 namespace Belle {
 
-  extern const HepGeom::Point3D<double>  ORIGIN;
+extern const HepGeom::Point3D<double>  ORIGIN;
 
-  TPoint2D TTrack::_points0[100];
-  TPoint2D TTrack::_points1[100];
+TPoint2D TTrack::_points0[100];
+TPoint2D TTrack::_points1[100];
 
 #ifdef TRASAN_DEBUG
 //cnv BelleHistogram * h_nTrial;
-  unsigned TTrack::_nTTracks = 0;
-  unsigned TTrack::_nTTracksMax = 0;
+unsigned TTrack::_nTTracks = 0;
+unsigned TTrack::_nTTracksMax = 0;
 
-  unsigned
-  TTrack::nTTracks(void)
-  {
+unsigned
+TTrack::nTTracks(void) {
     return _nTTracks;
-  }
+}
 
-  unsigned
-  TTrack::nTTracksMax(void)
-  {
+unsigned
+TTrack::nTTracksMax(void) {
     return _nTTracksMax;
-  }
+}
 #endif
 
 
-  const THelixFitter
-  TTrack::_fitter = THelixFitter("TTrack Default THelix Fitter");
+const THelixFitter
+TTrack::_fitter = THelixFitter("TTrack Default THelix Fitter");
 
-  TTrack::TTrack(const TCircle& c)
+TTrack::TTrack(const TCircle& c)
     : TTrackBase(c.links()),
       _state(0),
       _charge(c.charge()),
       _mother(0),
       _daughter(0),
-      _helix(new THelix(ORIGIN, CLHEP::HepVector(5, 0), CLHEP::HepSymMatrix(5, 0))),
+      _helix(new THelix(ORIGIN,
+                        CLHEP::HepVector(5, 0),
+                        CLHEP::HepSymMatrix(5, 0))),
       _ndf(0),
       _chi2(0.),
       _name("none"),
-      _type(0)
-  {
+      _type(0) {
 
     //...Set a defualt fitter...
     fitter(& TTrack::_fitter);
@@ -818,7 +815,7 @@ namespace Belle {
     //...Update links...
     unsigned n = _links.length();
     for (unsigned i = 0; i < n; i++)
-      _links[i]->track(this);
+        _links[i]->track(this);
 
     _fitted = false;
     _fittedWithCathode = false;
@@ -826,11 +823,11 @@ namespace Belle {
 #ifdef TRASAN_DEBUG
     ++_nTTracks;
     if (_nTTracks > _nTTracksMax)
-      _nTTracksMax = _nTTracks;
+        _nTTracksMax = _nTTracks;
 #endif
-  }
+}
 
-  TTrack::TTrack(const TTrack& a)
+TTrack::TTrack(const TTrack& a)
     : TTrackBase((TTrackBase&) a),
       _state(a._state),
       _charge(a._charge),
@@ -841,17 +838,16 @@ namespace Belle {
       _ndf(a._ndf),
       _chi2(a._chi2),
       _name("copy of " + a._name),
-      _type(a._type)
-  {
+      _type(a._type) {
 //cnv  , _catHits(a._catHits) {
 #ifdef TRASAN_DEBUG
     ++_nTTracks;
     if (_nTTracks > _nTTracksMax)
-      _nTTracksMax = _nTTracks;
+        _nTTracksMax = _nTTracks;
 #endif
-  }
+}
 
-  TTrack::TTrack(const THelix& h)
+TTrack::TTrack(const THelix& h)
     : TTrackBase(),
       _state(0),
       _mother(0),
@@ -860,8 +856,7 @@ namespace Belle {
       _ndf(0),
       _chi2(0.),
       _name("none"),
-      _type(0)
-  {
+      _type(0) {
 
     //...Set a defualt fitter...
     fitter(& TTrack::_fitter);
@@ -874,11 +869,11 @@ namespace Belle {
 #ifdef TRASAN_DEBUG
     ++_nTTracks;
     if (_nTTracks > _nTTracksMax)
-      _nTTracksMax = _nTTracks;
+        _nTTracksMax = _nTTracks;
 #endif
-  }
+}
 
-  TTrack::TTrack()
+TTrack::TTrack()
     : TTrackBase(),
       _state(0),
       _charge(1.),
@@ -887,66 +882,62 @@ namespace Belle {
       _helix(new THelix(ORIGIN, CLHEP::HepVector(5, 0), CLHEP::HepSymMatrix(5, 0))),
       _ndf(0),
       _chi2(0.),
-      _name("empty track")
-  {
+      _name("empty track") {
 #ifdef TRASAN_DEBUG
     ++_nTTracks;
     if (_nTTracks > _nTTracksMax)
-      _nTTracksMax = _nTTracks;
+        _nTTracksMax = _nTTracks;
 #endif
-  }
+}
 
-  TTrack::~TTrack()
-  {
+TTrack::~TTrack() {
     delete _helix;
 #ifdef TRASAN_DEBUG
     --_nTTracks;
 #endif
-  }
+}
 
-  void
-  TTrack::dump(const std::string& msg, const std::string& pre0) const
-  {
+void
+TTrack::dump(const std::string& msg, const std::string& pre0) const {
     bool def = false;
     if (msg == "") def = true;
     std::string pre = pre0;
     std::string tab;
     for (unsigned i = 0; i < pre.length(); i++)
-      tab += " ";
+        tab += " ";
 
     std::cout << pre << name() << std::endl;
 
     if (def ||
         msg.find("track") != std::string::npos ||
         msg.find("detail") != std::string::npos) {
-      std::cout << pre
-                << p() << "(pt=" << pt() << ")" << std::endl
-                << tab
-                << "links=" << _links.length()
-                << "(cores=" << nCores()
-                << "),chrg=" << _charge
-                << ",ndf=" << _ndf
-                << ",chi2=" << _chi2
-                << std::endl;
-      pre = tab;
+        std::cout << pre
+                  << p() << "(pt=" << pt() << ")" << std::endl
+                  << tab
+                  << "links=" << _links.length()
+                  << "(cores=" << nCores()
+                  << "),chrg=" << _charge
+                  << ",ndf=" << _ndf
+                  << ",chi2=" << _chi2
+                  << std::endl;
+        pre = tab;
     }
     if (msg.find("helix") != std::string::npos ||
         msg.find("detail") != std::string::npos) {
-      std::cout << pre
-                << "pivot=" << _helix->pivot()
-                << ",center=" << _helix->center() << std::endl
-                << tab
-                << "helix=(" << _helix->a()[0] << "," << _helix->a()[1]
-                << "," << _helix->a()[2] << "," << _helix->a()[3] << ","
-                << _helix->a()[4] << ")" << std::endl;
-      pre = tab;
+        std::cout << pre
+                  << "pivot=" << _helix->pivot()
+                  << ",center=" << _helix->center() << std::endl
+                  << tab
+                  << "helix=(" << _helix->a()[0] << "," << _helix->a()[1]
+                  << "," << _helix->a()[2] << "," << _helix->a()[3] << ","
+                  << _helix->a()[4] << ")" << std::endl;
+        pre = tab;
     }
     if (! def) TTrackBase::dump(msg, pre);
-  }
+}
 
-  void
-  TTrack::movePivot(void)
-  {
+void
+TTrack::movePivot(void) {
 #ifdef TRASAN_DEBUG_DETAIL
     const std::string stage = "TTrack::movePivot";
     EnterStage(stage);
@@ -956,13 +947,13 @@ namespace Belle {
     unsigned n = _links.length();
     if (! n) {
 #ifdef TRASAN_DEBUG
-      std::cout << "TTrack::movePivot !!! can't move a pivot"
-                << " because of no link" << std::endl;
+        std::cout << "TTrack::movePivot !!! can't move a pivot"
+                  << " because of no link" << std::endl;
 #endif
 #ifdef TRASAN_DEBUG_DETAIL
-      LeaveStage(stage);
+        LeaveStage(stage);
 #endif
-      return;
+        return;
     }
 
     //...Check cores...
@@ -975,11 +966,11 @@ namespace Belle {
     unsigned innerMostLayer = (* links)[0]->wire()->layerId();
     n = links->length();
     for (unsigned i = 1; i < n; i++) {
-      TLink* l = (* links)[i];
-      if (l->wire()->layerId() < innerMostLayer) {
-        innerMost = i;
-        innerMostLayer = l->wire()->layerId();
-      }
+        TLink* l = (* links)[i];
+        if (l->wire()->layerId() < innerMostLayer) {
+            innerMost = i;
+            innerMostLayer = l->wire()->layerId();
+        }
     }
 
 #ifdef TRASAN_DEBUG_DETAIL
@@ -997,15 +988,15 @@ namespace Belle {
 #endif
 
     if (quality() & TrackQuality2D)
-      newPivot.setZ(0.);
+        newPivot.setZ(0.);
 #if defined(BELLE_DEBUG)
     try {
 #endif
-      _helix->pivot(newPivot);
+        _helix->pivot(newPivot);
 #if defined(BELLE_DEBUG)
     } catch (std::string& e) {
-      std::cout
-          << "TTrack::helix is invalid" << std::endl;
+        std::cout
+            << "TTrack::helix is invalid" << std::endl;
     }
 #endif
 
@@ -1014,40 +1005,36 @@ namespace Belle {
     dump("helix", Tab(+1));
     LeaveStage(stage);
 #endif
-  }
+}
 
-  int
-  TTrack::approach(TLink& l) const
-  {
+int
+TTrack::approach(TLink & l) const {
     return approach(l, false);
-  }
+}
 
-  void
-  TTrack::refine2D(AList<TLink> & list, float maxSigma)
-  {
+void
+TTrack::refine2D(AList<TLink> & list, float maxSigma) {
     unsigned n = _links.length();
     AList<TLink> bad;
     for (unsigned i = 0; i < n; ++i) {
-      if (_links[i]->pull() > maxSigma) bad.append(_links[i]);
+        if (_links[i]->pull() > maxSigma) bad.append(_links[i]);
     }
     _links.remove(bad);
     if (bad.length()) {
-      _fitted = false;
-      fit2D();
+        _fitted = false;
+        fit2D();
     }
     list.append(bad);
-  }
+}
 
-  int
-  TTrack::HelCyl(double rhole,
-                 double rCyl,
-                 double zb,
-                 double zf,
-                 double epsl,
-                 double& phi,
-                 HepGeom::Point3D<double> & xp) const
-  {
-
+int
+TTrack::HelCyl(double rhole,
+	       double rCyl,
+	       double zb,
+	       double zf,
+	       double epsl,
+	       double & phi,
+	       HepGeom::Point3D<double> & xp) const {
 
     int status(0);  // return value
     //---------------------------------------------------------------------
@@ -1072,8 +1059,8 @@ namespace Belle {
     // Check of Charge
 
     if (int(_charge) == 0) {
-      std::cout << "HelCyl gets a straight line !!" << std::endl;
-      return -1 ;
+	std::cout << "HelCyl gets a straight line !!" << std::endl;
+	return -1 ;
     }
 
     // parameters
@@ -1101,70 +1088,74 @@ namespace Belle {
                      Cross1, Cross2)
         == 2) {
 
-      double phiCyl = atan2(_charge * (CenterTrk.y() - Cross1.y()),
-                            _charge * (CenterTrk.x() - Cross1.x()));
-      phiCyl = (phiCyl > 0.) ? phiCyl : phiCyl + 2. * M_PI;
+	double phiCyl = atan2(_charge * (CenterTrk.y() - Cross1.y()),
+			      _charge * (CenterTrk.x() - Cross1.x()));
+	phiCyl = (phiCyl > 0.) ? phiCyl : phiCyl + 2. * M_PI;
 
-      dPhi = phiCyl - phi0;
+	dPhi = phiCyl - phi0;
 
-      // dPhi region ( at cylinder )
-      //    -pi <= dPhi < pi
+	// dPhi region ( at cylinder )
+	//    -pi <= dPhi < pi
 
 
-      double PhiYobun = 1. / fabs(_helix->radius());
-      double zero = 0.00001;
+	double PhiYobun = 1. / fabs(_helix->radius());
+	double zero = 0.00001;
 
-      if (_charge >= 0.) {
-        if (dPhi > PhiYobun) dPhi -= 2. * M_PI;
-        if (-2. * M_PI  - zero <= dPhi <= (-2.* M_PI + PhiYobun))
-          dPhi += 2. * M_PI;
-      }
+	if (_charge >= 0.) {
+	    if (dPhi > PhiYobun) dPhi -= 2. * M_PI;
+//iw	    if (-2. * M_PI  - zero <= dPhi <= (-2.* M_PI + PhiYobun))
+	    if ((-2. * M_PI  - zero <= dPhi) &&
+		(dPhi <= (-2.* M_PI + PhiYobun)))
+		dPhi += 2. * M_PI;
+	}
 
-      if (_charge < 0.) {
-        if (dPhi < -PhiYobun) dPhi += 2. * M_PI;
-        if (2. * M_PI + zero >= dPhi >= (2. * M_PI - PhiYobun))
-          dPhi -= 2. * M_PI;
-      }
+	if (_charge < 0.) {
+	    if (dPhi < -PhiYobun) dPhi += 2. * M_PI;
+//iw	    if (2. * M_PI + zero >= dPhi >= (2. * M_PI - PhiYobun))
+	    if ((2. * M_PI + zero >= dPhi) &&
+		(dPhi >= (2. * M_PI - PhiYobun)))
+		dPhi -= 2. * M_PI;
+	}
 
-      if (dPhi < - M_PI) dPhi += 2. * M_PI;
-      if (dPhi >= M_PI) dPhi -= 2. * M_PI;
+	if (dPhi < - M_PI) dPhi += 2. * M_PI;
+	if (dPhi >= M_PI) dPhi -= 2. * M_PI;
 
-      //--debug
-      // std::cout << "dPhi = " << dPhi << std::endl;
-      //--debug end
+	//--debug
+	// std::cout << "dPhi = " << dPhi << std::endl;
+	//--debug end
 
-      xp.setX(Cross1.x());
-      xp.setY(Cross1.y());
-      xp.setZ(_helix->x(dPhi).z());
-      //    xp.setZ( zdz - _charge * rTrk * tanl * dPhi );
+	xp.setX(Cross1.x());
+	xp.setY(Cross1.y());
+	xp.setZ(_helix->x(dPhi).z());
+	//    xp.setZ( zdz - _charge * rTrk * tanl * dPhi );
 
-      if (xp.z() > zb && xp.z() < zf) {
-        phi = dPhi;
+	if (xp.z() > zb && xp.z() < zf) {
+	    phi = dPhi;
 //--- debug ---
 // std::cout << "return1 ( ext success )" <<  std::endl;
 // std::cout << " xp:= " << xp.x() << ", " << xp.y() << ", " << xp.z() << std::endl;
-        //--- debug  ----
-        return 1 ;
-      }
+	    //--- debug  ----
+	    return 1 ;
+	}
     }
 
 
     // tracks hitting endcaps
 
     if (fabs(tanl) < 0.1) {
-      //--- debug ---
-      // std::cout << "return0 ( ext failed , |tanl| < 0.1 )" <<  std::endl;
-      // std::cout << " xp:= " << xp.x() << ", " << xp.y() << ", " << xp.z() << std::endl;
-      //--- debug ---
-      return 0;
+	//--- debug ---
+	// std::cout << "return0 ( ext failed , |tanl| < 0.1 )" <<  std::endl;
+	// std::cout << " xp:= " << xp.x() << ", " << xp.y() << ", " << xp.z() << std::endl;
+	//--- debug ---
+	return 0;
     }
 
     if (tanl > 0.) {
-      zee = zf ;
-      status = 3 ;
+	zee = zf ;
+	status = 3 ;
     } else {
-      zee = zb ;
-      status = 2 ;
+	zee = zb ;
+	status = 2 ;
     }
 
     dPhi = _charge * (_helix->x(0.).z() - zee) / rTrk / tanl;
@@ -1173,11 +1164,11 @@ namespace Belle {
     // Requre dPhi < 2*pi
 
     if (fabs(dPhi) > 2. * M_PI) {
-      //--- debug ---
-      // std::cout << " return0 ( ext failed , dPhi > 2pi )" << std::endl;
-      // std::cout << " xp:= " << xp.x() << ", " << xp.y() << ", " << xp.z() << std::endl;
-      //--- debug  ---
-      return 0 ;
+	//--- debug ---
+	// std::cout << " return0 ( ext failed , dPhi > 2pi )" << std::endl;
+	// std::cout << " xp:= " << xp.x() << ", " << xp.y() << ", " << xp.z() << std::endl;
+	//--- debug  ---
+	return 0 ;
     }
 
     xp.setX(_helix->x(dPhi).x());
@@ -1186,11 +1177,11 @@ namespace Belle {
 
     double test = xp.perp2()  - rhole * rhole ;
     if (test < 0.)  {
-      //--- debug ---
-      // std::cout << "return0 ( cannot reach to rhole at z=edge )" << std::endl;
-      // std::cout << " xp:= " << xp.x() << ", " << xp.y() << ", " << xp.z() << std::endl;
-      //--- debug ---
-      return 0 ;
+	//--- debug ---
+	// std::cout << "return0 ( cannot reach to rhole at z=edge )" << std::endl;
+	// std::cout << " xp:= " << xp.x() << ", " << xp.y() << ", " << xp.z() << std::endl;
+	//--- debug ---
+	return 0 ;
     }
 
     phi = dPhi ;
@@ -1201,11 +1192,10 @@ namespace Belle {
 
     return status ;
 
-  }
+}
 
-  void
-  TTrack::findCatHit(unsigned trackid)
-  {
+void
+TTrack::findCatHit(unsigned) {
 
 //cnv //  unsigned i = 0;
 //   //  while ( TRGCDC01CatHit * chit = _cathits.last() ) {
@@ -1251,7 +1241,7 @@ namespace Belle {
 //   // chit->dump(" ", " ") ;
 //   //--- debug end ----
 
-  }
+}
 //--- Nagoya mods. 19981225 end ---------------------------
 
 
@@ -1509,16 +1499,15 @@ namespace Belle {
 //      return err;
 //  }
 
-  int
-  TTrack::dxda(const TLink& link,
-               double dPhi,
-               CLHEP::HepVector& dxda,
-               CLHEP::HepVector& dyda,
-               CLHEP::HepVector& dzda) const
-  {
+int
+TTrack::dxda(const TLink& link,
+             double dPhi,
+             CLHEP::HepVector& dxda,
+             CLHEP::HepVector& dyda,
+             CLHEP::HepVector& dzda) const {
 
     //...Setup...
-    const Belle2::TRGCDCWire& w = * link.wire();
+    const TWire & w = * link.wire();
     CLHEP::HepVector a = _helix->a();
     double dRho  = a[0];
     double phi0  = a[1];
@@ -1534,118 +1523,118 @@ namespace Belle {
 
     //...Axial case...
     if (w.axial()) {
-      Point3D d = _helix->center() - w.xyPosition();
-      double dmag2 = d.mag2();
+        Point3D d = _helix->center() - w.xyPosition();
+        double dmag2 = d.mag2();
 
-      dphida[0] = (sinPhi0 * d.x() - cosPhi0 * d.y()) / dmag2;
-      dphida[1] = (dRho + rho)    * (cosPhi0 * d.x() + sinPhi0 * d.y())
-                  / dmag2 - 1.;
-      dphida[2] = (- rho / kappa) * (sinPhi0 * d.x() - cosPhi0 * d.y())
-                  / dmag2;
-      dphida[3] = 0.;
-      dphida[4] = 0.;
+        dphida[0] = (sinPhi0 * d.x() - cosPhi0 * d.y()) / dmag2;
+        dphida[1] = (dRho + rho)    * (cosPhi0 * d.x() + sinPhi0 * d.y())
+            / dmag2 - 1.;
+        dphida[2] = (- rho / kappa) * (sinPhi0 * d.x() - cosPhi0 * d.y())
+            / dmag2;
+        dphida[3] = 0.;
+        dphida[4] = 0.;
     }
 
     //...Stereo case...
     else {
-      Point3D onTrack = _helix->x(dPhi);
-      Vector3D v = w.direction();
-      CLHEP::HepVector c(3);
-      c = Point3D(w.backwardPosition() - (v * w.backwardPosition()) * v);
+        Point3D onTrack = _helix->x(dPhi);
+        Vector3D v = w.direction();
+        CLHEP::HepVector c(3);
+        c = Point3D(w.backwardPosition() - (v * w.backwardPosition()) * v);
 
-      CLHEP::HepVector x(3);
-      x = onTrack;
+        CLHEP::HepVector x(3);
+        x = onTrack;
 
-      CLHEP::HepVector dxdphi(3);
-      dxdphi[0] =   rho * sinPhi0dPhi;
-      dxdphi[1] = - rho * cosPhi0dPhi;
-      dxdphi[2] = - rho * tanLambda;
+        CLHEP::HepVector dxdphi(3);
+        dxdphi[0] =   rho * sinPhi0dPhi;
+        dxdphi[1] = - rho * cosPhi0dPhi;
+        dxdphi[2] = - rho * tanLambda;
 
-      CLHEP::HepVector d2xdphi2(3);
-      d2xdphi2[0] = rho * cosPhi0dPhi;
-      d2xdphi2[1] = rho * sinPhi0dPhi;
-      d2xdphi2[2] = 0.;
+        CLHEP::HepVector d2xdphi2(3);
+        d2xdphi2[0] = rho * cosPhi0dPhi;
+        d2xdphi2[1] = rho * sinPhi0dPhi;
+        d2xdphi2[2] = 0.;
 
-      double dxdphi_dot_v = dxdphi[0] * v.x() + dxdphi[1] * v.y() + dxdphi[2] * v.z();
-      double x_dot_v      = x[0] * v.x() + x[1] * v.y() + x[2] * v.z();
+        double dxdphi_dot_v = dxdphi[0] * v.x() + dxdphi[1] * v.y() + dxdphi[2] * v.z();
+        double x_dot_v      = x[0] * v.x() + x[1] * v.y() + x[2] * v.z();
 
-      double dfdphi = - (dxdphi[0] - dxdphi_dot_v * v.x()) * dxdphi[0]
-                      - (dxdphi[1] - dxdphi_dot_v * v.y()) * dxdphi[1]
-                      - (dxdphi[2] - dxdphi_dot_v * v.z()) * dxdphi[2]
-                      - (x[0] - c[0] - x_dot_v * v.x()) * d2xdphi2[0]
-                      - (x[1] - c[1] - x_dot_v * v.y()) * d2xdphi2[1];
-      /*  - (x[2] - c[2] - x_dot_v*v.z()) * d2xdphi2[2];  = 0. */
+        double dfdphi = - (dxdphi[0] - dxdphi_dot_v * v.x()) * dxdphi[0]
+            - (dxdphi[1] - dxdphi_dot_v * v.y()) * dxdphi[1]
+            - (dxdphi[2] - dxdphi_dot_v * v.z()) * dxdphi[2]
+            - (x[0] - c[0] - x_dot_v * v.x()) * d2xdphi2[0]
+            - (x[1] - c[1] - x_dot_v * v.y()) * d2xdphi2[1];
+        /*  - (x[2] - c[2] - x_dot_v*v.z()) * d2xdphi2[2];  = 0. */
 
 
-      //dxda_phi, dyda_phi, dzda_phi : phi is fixed
-      CLHEP::HepVector dxda_phi(5);
-      dxda_phi[0] =  cosPhi0;
-      dxda_phi[1] = -(dRho + rho) * sinPhi0 + rho * sinPhi0dPhi;
-      dxda_phi[2] = -(rho / kappa) * (cosPhi0 - cosPhi0dPhi);
-      dxda_phi[3] =  0.;
-      dxda_phi[4] =  0.;
+        //dxda_phi, dyda_phi, dzda_phi : phi is fixed
+        CLHEP::HepVector dxda_phi(5);
+        dxda_phi[0] =  cosPhi0;
+        dxda_phi[1] = -(dRho + rho) * sinPhi0 + rho * sinPhi0dPhi;
+        dxda_phi[2] = -(rho / kappa) * (cosPhi0 - cosPhi0dPhi);
+        dxda_phi[3] =  0.;
+        dxda_phi[4] =  0.;
 
-      CLHEP::HepVector dyda_phi(5);
-      dyda_phi[0] =  sinPhi0;
-      dyda_phi[1] = (dRho + rho) * cosPhi0 - rho * cosPhi0dPhi;
-      dyda_phi[2] = -(rho / kappa) * (sinPhi0 - sinPhi0dPhi);
-      dyda_phi[3] =  0.;
-      dyda_phi[4] =  0.;
+        CLHEP::HepVector dyda_phi(5);
+        dyda_phi[0] =  sinPhi0;
+        dyda_phi[1] = (dRho + rho) * cosPhi0 - rho * cosPhi0dPhi;
+        dyda_phi[2] = -(rho / kappa) * (sinPhi0 - sinPhi0dPhi);
+        dyda_phi[3] =  0.;
+        dyda_phi[4] =  0.;
 
-      CLHEP::HepVector dzda_phi(5);
-      dzda_phi[0] =  0.;
-      dzda_phi[1] =  0.;
-      dzda_phi[2] = (rho / kappa) * tanLambda * dPhi;
-      dzda_phi[3] =  1.;
-      dzda_phi[4] = -rho * dPhi;
+        CLHEP::HepVector dzda_phi(5);
+        dzda_phi[0] =  0.;
+        dzda_phi[1] =  0.;
+        dzda_phi[2] = (rho / kappa) * tanLambda * dPhi;
+        dzda_phi[3] =  1.;
+        dzda_phi[4] = -rho * dPhi;
 
-      CLHEP::HepVector d2xdphida(5);
-      d2xdphida[0] =  0.;
-      d2xdphida[1] =  rho * cosPhi0dPhi;
-      d2xdphida[2] = -(rho / kappa) * sinPhi0dPhi;
-      d2xdphida[3] =  0.;
-      d2xdphida[4] =  0.;
+        CLHEP::HepVector d2xdphida(5);
+        d2xdphida[0] =  0.;
+        d2xdphida[1] =  rho * cosPhi0dPhi;
+        d2xdphida[2] = -(rho / kappa) * sinPhi0dPhi;
+        d2xdphida[3] =  0.;
+        d2xdphida[4] =  0.;
 
-      CLHEP::HepVector d2ydphida(5);
-      d2ydphida[0] = 0.;
-      d2ydphida[1] = rho * sinPhi0dPhi;
-      d2ydphida[2] = (rho / kappa) * cosPhi0dPhi;
-      d2ydphida[3] = 0.;
-      d2ydphida[4] = 0.;
+        CLHEP::HepVector d2ydphida(5);
+        d2ydphida[0] = 0.;
+        d2ydphida[1] = rho * sinPhi0dPhi;
+        d2ydphida[2] = (rho / kappa) * cosPhi0dPhi;
+        d2ydphida[3] = 0.;
+        d2ydphida[4] = 0.;
 
-      CLHEP::HepVector d2zdphida(5);
-      d2zdphida[0] =  0.;
-      d2zdphida[1] =  0.;
-      d2zdphida[2] = (rho / kappa) * tanLambda;
-      d2zdphida[3] =  0.;
-      d2zdphida[4] = -rho;
+        CLHEP::HepVector d2zdphida(5);
+        d2zdphida[0] =  0.;
+        d2zdphida[1] =  0.;
+        d2zdphida[2] = (rho / kappa) * tanLambda;
+        d2zdphida[3] =  0.;
+        d2zdphida[4] = -rho;
 
-      CLHEP::HepVector dfda(5);
-      for (int i = 0; i < 5; i++) {
-        double d_dot_v = v.x() * dxda_phi[i]
-                         + v.y() * dyda_phi[i]
-                         + v.z() * dzda_phi[i];
-        dfda[i] = - (dxda_phi[i] - d_dot_v * v.x()) * dxdphi[0]
-                  - (dyda_phi[i] - d_dot_v * v.y()) * dxdphi[1]
-                  - (dzda_phi[i] - d_dot_v * v.z()) * dxdphi[2]
-                  - (x[0] - c[0] - x_dot_v * v.x()) * d2xdphida[i]
-                  - (x[1] - c[1] - x_dot_v * v.y()) * d2ydphida[i]
-                  - (x[2] - c[2] - x_dot_v * v.z()) * d2zdphida[i];
-        dphida[i] = - dfda[i] / dfdphi;
-      }
+        CLHEP::HepVector dfda(5);
+        for (int i = 0; i < 5; i++) {
+            double d_dot_v = v.x() * dxda_phi[i]
+                + v.y() * dyda_phi[i]
+                + v.z() * dzda_phi[i];
+            dfda[i] = - (dxda_phi[i] - d_dot_v * v.x()) * dxdphi[0]
+                - (dyda_phi[i] - d_dot_v * v.y()) * dxdphi[1]
+                - (dzda_phi[i] - d_dot_v * v.z()) * dxdphi[2]
+                - (x[0] - c[0] - x_dot_v * v.x()) * d2xdphida[i]
+                - (x[1] - c[1] - x_dot_v * v.y()) * d2ydphida[i]
+                - (x[2] - c[2] - x_dot_v * v.z()) * d2zdphida[i];
+            dphida[i] = - dfda[i] / dfdphi;
+        }
     }
 
     dxda[0] = cosPhi0 + rho * sinPhi0dPhi * dphida[0];
     dxda[1] = - (dRho + rho) * sinPhi0 + rho * sinPhi0dPhi * (1. + dphida[1]);
     dxda[2] = - rho / kappa * (cosPhi0 - cosPhi0dPhi)
-              + rho * sinPhi0dPhi * dphida[2];
+        + rho * sinPhi0dPhi * dphida[2];
     dxda[3] = rho * sinPhi0dPhi * dphida[3];
     dxda[4] = rho * sinPhi0dPhi * dphida[4];
 
     dyda[0] = sinPhi0 - rho * cosPhi0dPhi * dphida[0];
     dyda[1] = (dRho + rho) * cosPhi0 - rho * cosPhi0dPhi * (1. + dphida[1]);
     dyda[2] = - rho / kappa * (sinPhi0 - sinPhi0dPhi)
-              - rho * cosPhi0dPhi * dphida[2];
+        - rho * cosPhi0dPhi * dphida[2];
     dyda[3] = - rho * cosPhi0dPhi * dphida[3];
     dyda[4] = - rho * cosPhi0dPhi * dphida[4];
 
@@ -1656,13 +1645,12 @@ namespace Belle {
     dzda[4] = - rho * dPhi - rho * tanLambda * dphida[4];
 
     return 0;
-  }
+}
 
 #define NEW_FIT2D 1
 #if !(NEW_FIT2D)
-  int
-  TTrack::fit2D(void)
-  {
+int
+TTrack::fit2D(void) {
 #ifdef TRASAN_DEBUG_DETAIL
     std::cout << "    TTrack::fit2D(r-phi) ..." << std::endl;
 #endif
@@ -1688,86 +1676,9 @@ namespace Belle {
     //...Fitting loop...
     while (nTrial < 100) {
 #ifdef TRASAN_DEBUG_DETAIL
-      if (a[3] != 0. || a[4] != 0.)std::cout << "Error in 2D functions of TTrack : a = " << a << std::endl;
+        if (a[3] != 0. || a[4] != 0.)std::cout << "Error in 2D functions of TTrack : a = " << a << std::endl;
 #endif
-      //...Set up...
-      chi2 = 0.;
-      for (unsigned j = 0; j < 5; ++j) dchi2da[j] = 0.;
-      d2chi2d2a = CLHEP::HepSymMatrix(5, 0);
-
-      //...Loop with hits...
-      unsigned i = 0;
-      while (TLink* l = _links[i++]) {
-        const Belle2::TRGCDCWireHit& h = * l->hit();
-
-        //...Cal. closest points...
-        approach2D(* l);
-        double dPhi = l->dPhi();
-        const HepGeom::Point3D<double> & onTrack = l->positionOnTrack();
-        const HepGeom::Point3D<double> & onWire = l->positionOnWire();
-#ifdef TRASAN_DEBUG_DETAIL
-        if (onTrack.z() != 0.)std::cout << "Error in 2D functions of TTrack : onTrack = " << onTrack << std::endl;
-        if (onWire.z() != 0.)std::cout << "Error in 2D functions of TTrack : onWire = " << onWire << std::endl;
-#endif
-        HepGeom::Point3D<double> onTrack2(onTrack.x(), onTrack.y(), 0.);
-        HepGeom::Point3D<double> onWire2(onWire.x(), onWire.y(), 0.);
-
-        //...Obtain drift distance and its error...
-        unsigned leftRight = CellHitRight;
-        if (onWire2.cross(onTrack2).z() < 0.) leftRight = CellHitLeft;
-        double distance = h.distance(leftRight);
-        double eDistance = h.dDistance(leftRight);
-        double eDistance2 = eDistance * eDistance;
-
-        //...Residual...
-        Vector3D v = onTrack2 - onWire2;
-        double vmag = v.mag();
-        double dDistance = vmag - distance;
-
-        //...dxda...
-        this->dxda2D(* l, dPhi, dxda, dyda, dzda);
-
-        //...Chi2 related...
-        //HepGeom::Vector3D<double> vw(0.,0.,1.);
-        dDda = (vmag > 0.)
-               ? (v.x() * dxda +
-                  v.y() * dyda) / vmag
-               : CLHEP::HepVector(5, 0);
-        //dDda = (vmag > 0.)
-        //? ((v.x() * (1. - vw.x() * vw.x()) -
-        //    v.y() * vw.x() * vw.y() - v.z() * vw.x() * vw.z())
-        //   * dxda +
-        //   (v.y() * (1. - vw.y() * vw.y()) -
-        //    v.z() * vw.y() * vw.z() - v.x() * vw.y() * vw.x())
-        //   * dyda +
-        //   (v.z() * (1. - vw.z() * vw.z()) -
-        //    v.x() * vw.z() * vw.x() - v.y() * vw.z() * vw.y())
-        //   * dzda) / vmag
-        //:CLHEP::HepVector(5, 0);
-        if (vmag <= 0.0) {
-          std::cout << "    in fit2D " << onTrack << ", " << onWire;
-          h.dump();
-        }
-        dchi2da += (dDistance / eDistance2) * dDda;
-        d2chi2d2a += vT_times_v(dDda) / eDistance2;
-        double pChi2 = dDistance * dDistance / eDistance2;
-        chi2 += pChi2;
-
-        //...Store results...
-        l->update(onTrack2, onWire2, leftRight, pChi2);
-      }
-
-      //...Check condition...
-      double change = chi2Old - chi2;
-      if (fabs(change) < convergence) break;
-      if (change < 0.) {
-#ifdef TRASAN_DEBUG_DETAIL
-        std::cout << "chi2Old, chi2=" << chi2Old << " " << chi2 << std::endl;
-#endif
-        //change to the old value.
-        a += factor * da;
-        _helix->a(a);
-
+        //...Set up...
         chi2 = 0.;
         for (unsigned j = 0; j < 5; ++j) dchi2da[j] = 0.;
         d2chi2d2a = CLHEP::HepSymMatrix(5, 0);
@@ -1775,76 +1686,153 @@ namespace Belle {
         //...Loop with hits...
         unsigned i = 0;
         while (TLink* l = _links[i++]) {
-          const Belle2::TRGCDCWireHit& h = * l->hit();
+            const TWireHit & h = * l->hit();
 
-          //...Cal. closest points...
-          approach2D(* l);
-          double dPhi = l->dPhi();
-          const HepGeom::Point3D<double> & onTrack = l->positionOnTrack();
-          const HepGeom::Point3D<double> & onWire = l->positionOnWire();
-          Point3D onTrack2(onTrack.x(), onTrack.y(), 0.);
-          Point3D onWire2(onWire.x(), onWire.y(), 0.);
-
-          //...Obtain drift distance and its error...
-          unsigned leftRight = CellHitRight;
-          if (onWire2.cross(onTrack2).z() < 0.) leftRight = CellHitLeft;
-          double distance = h.distance(leftRight);
-          double eDistance = h.dDistance(leftRight);
-          double eDistance2 = eDistance * eDistance;
-
-          //...Residual...
-          Vector3D v = onTrack2 - onWire2;
-          double vmag = v.mag();
-          double dDistance = vmag - distance;
-
-          //...dxda...
-          this->dxda2D(* l, dPhi, dxda, dyda, dzda);
-
-          //...Chi2 related...
-          dDda = (vmag > 0.)
-                 ? (v.x() * dxda +
-                    v.y() * dyda) / vmag
-                 : CLHEP::HepVector(5, 0);
-          if (vmag <= 0.0) {
-            std::cout << "    in fit2D " << onTrack << ", " << onWire;
-            h.dump();
-          }
-          dchi2da += (dDistance / eDistance2) * dDda;
-          d2chi2d2a += vT_times_v(dDda) / eDistance2;
-          double pChi2 = dDistance * dDistance / eDistance2;
-          chi2 += pChi2;
-
-          //...Store results...
-          l->update(onTrack2, onWire2, leftRight, pChi2);
-        }
-        //break;
-        factor *= 0.75;
+            //...Cal. closest points...
+            approach2D(* l);
+            double dPhi = l->dPhi();
+            const HepGeom::Point3D<double> & onTrack = l->positionOnTrack();
+            const HepGeom::Point3D<double> & onWire = l->positionOnWire();
 #ifdef TRASAN_DEBUG_DETAIL
-        std::cout << "factor = " << factor << std::endl;
-        std::cout << "chi2 = " << chi2 << std::endl;
+            if (onTrack.z() != 0.)std::cout << "Error in 2D functions of TTrack : onTrack = " << onTrack << std::endl;
+            if (onWire.z() != 0.)std::cout << "Error in 2D functions of TTrack : onWire = " << onWire << std::endl;
 #endif
-        if (factor < 0.01)break;
-      }
+            HepGeom::Point3D<double> onTrack2(onTrack.x(), onTrack.y(), 0.);
+            HepGeom::Point3D<double> onWire2(onWire.x(), onWire.y(), 0.);
 
-      chi2Old = chi2;
+            //...Obtain drift distance and its error...
+            unsigned leftRight = CellHitRight;
+            if (onWire2.cross(onTrack2).z() < 0.) leftRight = CellHitLeft;
+            double distance = h.distance(leftRight);
+            double eDistance = h.dDistance(leftRight);
+            double eDistance2 = eDistance * eDistance;
 
-      //...Cal. helix parameters for next loop...
-      f = dchi2da.sub(1, 3);
-      e = d2chi2d2a.sub(1, 3);
-      f = solve(e, f);
-      da[0] = f[0];
-      da[1] = f[1];
-      da[2] = f[2];
-      da[3] = 0.;
-      da[4] = 0.;
+            //...Residual...
+            Vector3D v = onTrack2 - onWire2;
+            double vmag = v.mag();
+            double dDistance = vmag - distance;
 
-      a -= factor * da;
-      _helix->a(a);
-      // std::cout << nTrial << ": chi2 = " << chi2
-      // << ", helix = (" << a[0] << ", " << a[1]
-      // << ", " << a[2] << ", " << a[3]
-      // << ", " << a[4] << ")" << std::endl;
-      ++nTrial;
+            //...dxda...
+            this->dxda2D(* l, dPhi, dxda, dyda, dzda);
+
+            //...Chi2 related...
+            //HepGeom::Vector3D<double> vw(0.,0.,1.);
+            dDda = (vmag > 0.)
+                ? (v.x() * dxda +
+                   v.y() * dyda) / vmag
+                : CLHEP::HepVector(5, 0);
+            //dDda = (vmag > 0.)
+            //? ((v.x() * (1. - vw.x() * vw.x()) -
+            //    v.y() * vw.x() * vw.y() - v.z() * vw.x() * vw.z())
+            //   * dxda +
+            //   (v.y() * (1. - vw.y() * vw.y()) -
+            //    v.z() * vw.y() * vw.z() - v.x() * vw.y() * vw.x())
+            //   * dyda +
+            //   (v.z() * (1. - vw.z() * vw.z()) -
+            //    v.x() * vw.z() * vw.x() - v.y() * vw.z() * vw.y())
+            //   * dzda) / vmag
+            //:CLHEP::HepVector(5, 0);
+            if (vmag <= 0.0) {
+                std::cout << "    in fit2D " << onTrack << ", " << onWire;
+                h.dump();
+            }
+            dchi2da += (dDistance / eDistance2) * dDda;
+            d2chi2d2a += vT_times_v(dDda) / eDistance2;
+            double pChi2 = dDistance * dDistance / eDistance2;
+            chi2 += pChi2;
+
+            //...Store results...
+            l->update(onTrack2, onWire2, leftRight, pChi2);
+        }
+
+        //...Check condition...
+        double change = chi2Old - chi2;
+        if (fabs(change) < convergence) break;
+        if (change < 0.) {
+#ifdef TRASAN_DEBUG_DETAIL
+            std::cout << "chi2Old, chi2=" << chi2Old << " " << chi2 << std::endl;
+#endif
+            //change to the old value.
+            a += factor * da;
+            _helix->a(a);
+
+            chi2 = 0.;
+            for (unsigned j = 0; j < 5; ++j) dchi2da[j] = 0.;
+            d2chi2d2a = CLHEP::HepSymMatrix(5, 0);
+
+            //...Loop with hits...
+            unsigned i = 0;
+            while (TLink* l = _links[i++]) {
+                const TWireHit & h = * l->hit();
+
+                //...Cal. closest points...
+                approach2D(* l);
+                double dPhi = l->dPhi();
+                const HepGeom::Point3D<double> & onTrack = l->positionOnTrack();
+                const HepGeom::Point3D<double> & onWire = l->positionOnWire();
+                Point3D onTrack2(onTrack.x(), onTrack.y(), 0.);
+                Point3D onWire2(onWire.x(), onWire.y(), 0.);
+
+                //...Obtain drift distance and its error...
+                unsigned leftRight = CellHitRight;
+                if (onWire2.cross(onTrack2).z() < 0.) leftRight = CellHitLeft;
+                double distance = h.distance(leftRight);
+                double eDistance = h.dDistance(leftRight);
+                double eDistance2 = eDistance * eDistance;
+
+                //...Residual...
+                Vector3D v = onTrack2 - onWire2;
+                double vmag = v.mag();
+                double dDistance = vmag - distance;
+
+                //...dxda...
+                this->dxda2D(* l, dPhi, dxda, dyda, dzda);
+
+                //...Chi2 related...
+                dDda = (vmag > 0.)
+                    ? (v.x() * dxda +
+                       v.y() * dyda) / vmag
+                    : CLHEP::HepVector(5, 0);
+                if (vmag <= 0.0) {
+                    std::cout << "    in fit2D " << onTrack << ", " << onWire;
+                    h.dump();
+                }
+                dchi2da += (dDistance / eDistance2) * dDda;
+                d2chi2d2a += vT_times_v(dDda) / eDistance2;
+                double pChi2 = dDistance * dDistance / eDistance2;
+                chi2 += pChi2;
+
+                //...Store results...
+                l->update(onTrack2, onWire2, leftRight, pChi2);
+            }
+            //break;
+            factor *= 0.75;
+#ifdef TRASAN_DEBUG_DETAIL
+            std::cout << "factor = " << factor << std::endl;
+            std::cout << "chi2 = " << chi2 << std::endl;
+#endif
+            if (factor < 0.01)break;
+        }
+
+        chi2Old = chi2;
+
+        //...Cal. helix parameters for next loop...
+        f = dchi2da.sub(1, 3);
+        e = d2chi2d2a.sub(1, 3);
+        f = solve(e, f);
+        da[0] = f[0];
+        da[1] = f[1];
+        da[2] = f[2];
+        da[3] = 0.;
+        da[4] = 0.;
+
+        a -= factor * da;
+        _helix->a(a);
+        // std::cout << nTrial << ": chi2 = " << chi2
+        // << ", helix = (" << a[0] << ", " << a[1]
+        // << ", " << a[2] << ", " << a[3]
+        // << ", " << a[4] << ")" << std::endl;
+        ++nTrial;
     }
 
     //...Cal. error matrix...
@@ -1861,8 +1849,8 @@ namespace Belle {
 
     //...Store information...
     if (! err) {
-      _helix->a(a);
-      _helix->Ea(Ea);
+        _helix->a(a);
+        _helix->Ea(Ea);
     }
 
     _ndf = _links.length() - dim;
@@ -1870,11 +1858,11 @@ namespace Belle {
 
     _fitted = true;
     return err;
-  }
+}
 #endif
 
-  int TTrack::fitWithCathode(float window, int SysCorr)
-  {
+int
+TTrack::fitWithCathode(float, int) {
 
 // #ifdef TRASAN_DEBUG_DETAIL
 //     std::cout<< "    TTrack::fitCathode ..." << std::endl;
@@ -2260,12 +2248,11 @@ namespace Belle {
 
 //     return err;
     return -1;
-  }
+}
 
 #if OLD_STEREO
-  int
-  TTrack::stereoHitForCurl(TLink& link, AList<Point3D> & arcZList) const
-  {
+int
+TTrack::stereoHitForCurl(TLink& link, AList<Point3D> & arcZList) const {
     /*
       ATTENTION!!!!!
       Elements of arcZList are made by "new". We must delete them out of this function!!!!!
@@ -2274,10 +2261,10 @@ namespace Belle {
       "stereoHitForCurl(TLink &link1, TLink &link2, TLink &link3)" only.
       (I(jtanaka) checked it. --> no memory leak!!!)
 
-      */
+    */
 
     // std::cout << "\n\nWire ID = " << link.hit()->wire().id() << std::endl;
-    const Belle2::TRGCDCWireHit& h = *link.hit();
+    const TWireHit & h = *link.hit();
     Vector3D X     = 0.5 * (h.wire().forwardPosition() +
                             h.wire().backwardPosition());
 
@@ -2295,7 +2282,7 @@ namespace Belle {
 
     //...stereo?
     if (vmag == 0.) {
-      return -1;
+        return -1;
     }
 
     double r  = _helix->curv();
@@ -2310,7 +2297,7 @@ namespace Belle {
 
     //...No crossing in R/Phi plane...
     if (d2[0] < 0. && d2[1] < 0.) {
-      return -1;
+        return -1;
     }
 
     bool ok_inner, ok_outer;
@@ -2321,14 +2308,14 @@ namespace Belle {
     d[1] = -1.;
     //...outer
     if (d2[0] >= 0.) {
-      d[0] = sqrt(d2[0]);
+        d[0] = sqrt(d2[0]);
     } else {
-      ok_outer = false;
+        ok_outer = false;
     }
     if (d2[1] >= 0.) {
-      d[1] = sqrt(d2[1]);
+        d[1] = sqrt(d2[1]);
     } else {
-      ok_inner = false;
+        ok_inner = false;
     }
 
     //...Cal. length and z to crossing points...
@@ -2336,75 +2323,75 @@ namespace Belle {
     double z[2][2];
     //...outer
     if (ok_outer) {
-      l[0][0] = (- wv + d[0]) / vmag2; //...= (-wvcos()+d)/v/v = (-wcos() + (r^2 - w^2*sin()^2)^0.5)/v
-      l[1][0] = (- wv - d[0]) / vmag2; //...= (-wvcos()+d)/v/v = (-wcos() - (r^2 - w^2*sin()^2)^0.5)/v
-      z[0][0] = X.z() + l[0][0] * V.z();
-      z[1][0] = X.z() + l[1][0] * V.z();
+        l[0][0] = (- wv + d[0]) / vmag2; //...= (-wvcos()+d)/v/v = (-wcos() + (r^2 - w^2*sin()^2)^0.5)/v
+        l[1][0] = (- wv - d[0]) / vmag2; //...= (-wvcos()+d)/v/v = (-wcos() - (r^2 - w^2*sin()^2)^0.5)/v
+        z[0][0] = X.z() + l[0][0] * V.z();
+        z[1][0] = X.z() + l[1][0] * V.z();
     }
     //...inner
     if (ok_inner) {
-      l[0][1] = (- wv + d[1]) / vmag2; //...= (-wvcos()+d)/v/v = (-wcos() + (r^2 - w^2*sin()^2)^0.5)/v
-      l[1][1] = (- wv - d[1]) / vmag2; //...= (-wvcos()+d)/v/v = (-wcos() - (r^2 - w^2*sin()^2)^0.5)/v
-      z[0][1] = X.z() + l[0][1] * V.z();
-      z[1][1] = X.z() + l[1][1] * V.z();
+        l[0][1] = (- wv + d[1]) / vmag2; //...= (-wvcos()+d)/v/v = (-wcos() + (r^2 - w^2*sin()^2)^0.5)/v
+        l[1][1] = (- wv - d[1]) / vmag2; //...= (-wvcos()+d)/v/v = (-wcos() - (r^2 - w^2*sin()^2)^0.5)/v
+        z[0][1] = X.z() + l[0][1] * V.z();
+        z[1][1] = X.z() + l[1][1] * V.z();
     }
 
     //...Cal. xy position of crossing points...
     Vector3D p[2][2];
     if (ok_outer) {
-      p[0][0] = x + l[0][0] * v;
-      p[1][0] = x + l[1][0] * v;
-      Vector3D tmp_pc = p[0][0] - center;
-      Vector3D pc0 = Vector3D(tmp_pc.x(), tmp_pc.y(), 0.);
-      p[0][0] -= drift / pc0.mag() * pc0;
-      tmp_pc = p[1][0] - center;
-      Vector3D pc1 = Vector3D(tmp_pc.x(), tmp_pc.y(), 0.);
-      p[1][0] -= drift / pc1.mag() * pc1;
+        p[0][0] = x + l[0][0] * v;
+        p[1][0] = x + l[1][0] * v;
+        Vector3D tmp_pc = p[0][0] - center;
+        Vector3D pc0 = Vector3D(tmp_pc.x(), tmp_pc.y(), 0.);
+        p[0][0] -= drift / pc0.mag() * pc0;
+        tmp_pc = p[1][0] - center;
+        Vector3D pc1 = Vector3D(tmp_pc.x(), tmp_pc.y(), 0.);
+        p[1][0] -= drift / pc1.mag() * pc1;
     }
     if (ok_inner) {
-      p[0][1] = x + l[0][1] * v;
-      p[1][1] = x + l[1][1] * v;
-      Vector3D tmp_pc = p[0][1] - center;
-      Vector3D pc0 = Vector3D(tmp_pc.x(), tmp_pc.y(), 0.);
-      p[0][1] += drift / pc0.mag() * pc0;
-      tmp_pc = p[1][1] - center;
-      Vector3D pc1 = Vector3D(tmp_pc.x(), tmp_pc.y(), 0.);
-      p[1][1] += drift / pc1.mag() * pc1;
+        p[0][1] = x + l[0][1] * v;
+        p[1][1] = x + l[1][1] * v;
+        Vector3D tmp_pc = p[0][1] - center;
+        Vector3D pc0 = Vector3D(tmp_pc.x(), tmp_pc.y(), 0.);
+        p[0][1] += drift / pc0.mag() * pc0;
+        tmp_pc = p[1][1] - center;
+        Vector3D pc1 = Vector3D(tmp_pc.x(), tmp_pc.y(), 0.);
+        p[1][1] += drift / pc1.mag() * pc1;
     }
 
     //...boolean
     bool ok_xy[2][2];
     if (ok_outer) {
-      ok_xy[0][0] = true;
-      ok_xy[1][0] = true;
+        ok_xy[0][0] = true;
+        ok_xy[1][0] = true;
     } else {
-      ok_xy[0][0] = false;
-      ok_xy[1][0] = false;
-    }
-    if (ok_inner) {
-      ok_xy[0][1] = true;
-      ok_xy[1][1] = true;
-    } else {
-      ok_xy[0][1] = false;
-      ok_xy[1][1] = false;
-    }
-    if (ok_outer) {
-      if (_charge * (center.x() * p[0][0].y() - center.y() * p[0][0].x())  < 0.)
         ok_xy[0][0] = false;
-      if (_charge * (center.x() * p[1][0].y() - center.y() * p[1][0].x())  < 0.)
         ok_xy[1][0] = false;
     }
     if (ok_inner) {
-      if (_charge * (center.x() * p[0][1].y() - center.y() * p[0][1].x())  < 0.)
+        ok_xy[0][1] = true;
+        ok_xy[1][1] = true;
+    } else {
         ok_xy[0][1] = false;
-      if (_charge * (center.x() * p[1][1].y() - center.y() * p[1][1].x())  < 0.)
         ok_xy[1][1] = false;
     }
+    if (ok_outer) {
+        if (_charge * (center.x() * p[0][0].y() - center.y() * p[0][0].x())  < 0.)
+            ok_xy[0][0] = false;
+        if (_charge * (center.x() * p[1][0].y() - center.y() * p[1][0].x())  < 0.)
+            ok_xy[1][0] = false;
+    }
+    if (ok_inner) {
+        if (_charge * (center.x() * p[0][1].y() - center.y() * p[0][1].x())  < 0.)
+            ok_xy[0][1] = false;
+        if (_charge * (center.x() * p[1][1].y() - center.y() * p[1][1].x())  < 0.)
+            ok_xy[1][1] = false;
+    }
     if (!ok_inner && ok_outer && (!ok_xy[0][0]) && (!ok_xy[1][0])) {
-      return -1;
+        return -1;
     }
     if (ok_inner && !ok_outer && (!ok_xy[0][1]) && (!ok_xy[1][1])) {
-      return -1;
+        return -1;
     }
 
 #if 0
@@ -2417,109 +2404,108 @@ namespace Belle {
 
     //...Check z position...
     if (ok_xy[0][0]) {
-      if (z[0][0] < h.wire().backwardPosition().z() ||
-          z[0][0] > h.wire().forwardPosition().z()) ok_xy[0][0] = false;
+        if (z[0][0] < h.wire().backwardPosition().z() ||
+            z[0][0] > h.wire().forwardPosition().z()) ok_xy[0][0] = false;
     }
     if (ok_xy[1][0]) {
-      if (z[1][0] < h.wire().backwardPosition().z() ||
-          z[1][0] > h.wire().forwardPosition().z()) ok_xy[1][0] = false;
+        if (z[1][0] < h.wire().backwardPosition().z() ||
+            z[1][0] > h.wire().forwardPosition().z()) ok_xy[1][0] = false;
     }
     if (ok_xy[0][1]) {
-      if (z[0][1] < h.wire().backwardPosition().z() ||
-          z[0][1] > h.wire().forwardPosition().z()) ok_xy[0][1] = false;
+        if (z[0][1] < h.wire().backwardPosition().z() ||
+            z[0][1] > h.wire().forwardPosition().z()) ok_xy[0][1] = false;
     }
     if (ok_xy[1][1]) {
-      if (z[1][1] < h.wire().backwardPosition().z() ||
-          z[1][1] > h.wire().forwardPosition().z()) ok_xy[1][1] = false;
+        if (z[1][1] < h.wire().backwardPosition().z() ||
+            z[1][1] > h.wire().forwardPosition().z()) ok_xy[1][1] = false;
     }
     if ((!ok_xy[0][0]) && (!ok_xy[1][0]) &&
         (!ok_xy[0][1]) && (!ok_xy[1][1])) {
-      return -1;
+        return -1;
     }
 
     double cosdPhi, dPhi;
 
     if (ok_xy[0][0]) {
-      //...cal. arc length...
-      cosdPhi = - center.dot((p[0][0] - center).unit()) / center.mag();
-      if (fabs(cosdPhi) < 1.0) {
-        dPhi = acos(cosdPhi);
-      } else if (cosdPhi >= 1.0) {
-        dPhi = 0.;
-      } else {
-        dPhi = M_PI;
-      }
+        //...cal. arc length...
+        cosdPhi = - center.dot((p[0][0] - center).unit()) / center.mag();
+        if (fabs(cosdPhi) < 1.0) {
+            dPhi = acos(cosdPhi);
+        } else if (cosdPhi >= 1.0) {
+            dPhi = 0.;
+        } else {
+            dPhi = M_PI;
+        }
 
-      Point3D* arcZ = new Point3D;
-      arcZ->setX(r * dPhi);
-      arcZ->setY(z[0][0]);
-      arcZList.append(arcZ);
+        Point3D* arcZ = new Point3D;
+        arcZ->setX(r * dPhi);
+        arcZ->setY(z[0][0]);
+        arcZList.append(arcZ);
     }
     if (ok_xy[1][0]) {
-      //...cal. arc length...
-      cosdPhi = - center.dot((p[1][0] - center).unit()) / center.mag();
-      if (fabs(cosdPhi) < 1.0) {
-        dPhi = acos(cosdPhi);
-      } else if (cosdPhi >= 1.0) {
-        dPhi = 0.;
-      } else {
-        dPhi = M_PI;
-      }
+        //...cal. arc length...
+        cosdPhi = - center.dot((p[1][0] - center).unit()) / center.mag();
+        if (fabs(cosdPhi) < 1.0) {
+            dPhi = acos(cosdPhi);
+        } else if (cosdPhi >= 1.0) {
+            dPhi = 0.;
+        } else {
+            dPhi = M_PI;
+        }
 
-      Point3D* arcZ = new Point3D;
-      arcZ->setX(r * dPhi);
-      arcZ->setY(z[1][0]);
-      arcZList.append(arcZ);
+        Point3D* arcZ = new Point3D;
+        arcZ->setX(r * dPhi);
+        arcZ->setY(z[1][0]);
+        arcZList.append(arcZ);
     }
     if (ok_xy[0][1]) {
-      //...cal. arc length...
-      cosdPhi = - center.dot((p[0][1] - center).unit()) / center.mag();
-      if (cosdPhi > 1.0) cosdPhi = 1.0;
-      if (cosdPhi < -1.0) cosdPhi = -1.0;
+        //...cal. arc length...
+        cosdPhi = - center.dot((p[0][1] - center).unit()) / center.mag();
+        if (cosdPhi > 1.0) cosdPhi = 1.0;
+        if (cosdPhi < -1.0) cosdPhi = -1.0;
 
-      if (fabs(cosdPhi) < 1.0) {
-        dPhi = acos(cosdPhi);
-      } else if (cosdPhi >= 1.0) {
-        dPhi = 0.;
-      } else {
-        dPhi = M_PI;
-      }
+        if (fabs(cosdPhi) < 1.0) {
+            dPhi = acos(cosdPhi);
+        } else if (cosdPhi >= 1.0) {
+            dPhi = 0.;
+        } else {
+            dPhi = M_PI;
+        }
 
-      Point3D* arcZ = new Point3D;
-      arcZ->setX(r * dPhi);
-      arcZ->setY(z[0][1]);
-      arcZList.append(arcZ);
+        Point3D* arcZ = new Point3D;
+        arcZ->setX(r * dPhi);
+        arcZ->setY(z[0][1]);
+        arcZList.append(arcZ);
     }
     if (ok_xy[1][1]) {
-      //...cal. arc length...
-      cosdPhi = - center.dot((p[1][1] - center).unit()) / center.mag();
-      if (cosdPhi > 1.0) cosdPhi = 1.0;
-      if (cosdPhi < -1.0) cosdPhi = -1.0;
-      if (fabs(cosdPhi) < 1.0) {
-        dPhi = acos(cosdPhi);
-      } else if (cosdPhi >= 1.0) {
-        dPhi = 0.;
-      } else {
-        dPhi = M_PI;
-      }
+        //...cal. arc length...
+        cosdPhi = - center.dot((p[1][1] - center).unit()) / center.mag();
+        if (cosdPhi > 1.0) cosdPhi = 1.0;
+        if (cosdPhi < -1.0) cosdPhi = -1.0;
+        if (fabs(cosdPhi) < 1.0) {
+            dPhi = acos(cosdPhi);
+        } else if (cosdPhi >= 1.0) {
+            dPhi = 0.;
+        } else {
+            dPhi = M_PI;
+        }
 
-      Point3D* arcZ = new Point3D;
-      arcZ->setX(r * dPhi);
-      arcZ->setY(z[1][1]);
-      arcZList.append(arcZ);
+        Point3D* arcZ = new Point3D;
+        arcZ->setX(r * dPhi);
+        arcZ->setY(z[1][1]);
+        arcZList.append(arcZ);
     }
 
     if (arcZList.length() == 1 ||
         arcZList.length() == 2) {
-      return 0;
+        return 0;
     }
     return -1;
-  }
+}
 
 
-  int
-  TTrack::stereoHitForCurl(TLink& link1, TLink& link2) const
-  {
+int
+TTrack::stereoHitForCurl(TLink& link1, TLink& link2) const {
     int flag1 = 0;
     int flag2 = 0;
     double minZ = 9999999.;
@@ -2527,26 +2513,26 @@ namespace Belle {
     AList<Point3D> arcZList1;
     AList<Point3D> arcZList2;
     if (stereoHitForCurl(link1, arcZList1) == 0) {
-      if (stereoHitForCurl(link2, arcZList2) == 0) {
-        //...finds
-        int n1 = arcZList1.length();
-        int n2 = arcZList2.length();
-        for (int i = 0; i < n1; i++) {
-          for (int j = 0; j < n2; j++) {
-            if (fabs(arcZList1[i]->y() - arcZList2[j]->y()) < minZ) {
-              minZ = fabs(arcZList1[i]->y() - arcZList2[j]->y());
-              flag1 = i;
-              flag2 = j;
+        if (stereoHitForCurl(link2, arcZList2) == 0) {
+            //...finds
+            int n1 = arcZList1.length();
+            int n2 = arcZList2.length();
+            for (int i = 0; i < n1; i++) {
+                for (int j = 0; j < n2; j++) {
+                    if (fabs(arcZList1[i]->y() - arcZList2[j]->y()) < minZ) {
+                        minZ = fabs(arcZList1[i]->y() - arcZList2[j]->y());
+                        flag1 = i;
+                        flag2 = j;
+                    }
+                }
             }
-          }
         }
-      }
     }
 
     if (minZ == 9999999.) {
-      //...deletes
-      deleteListForCurl(arcZList1, arcZList2);
-      return -1;
+        //...deletes
+        deleteListForCurl(arcZList1, arcZList2);
+        return -1;
     }
 
     //...sets the best values
@@ -2557,39 +2543,37 @@ namespace Belle {
     //...deletes
     deleteListForCurl(arcZList1, arcZList2);
     return 0;
-  }
+}
 
 #if defined(__GNUG__)
-  int
-  TArcOrder(const HepGeom::Point3D<double> **a, const HepGeom::Point3D<double> **b)
-  {
+int
+TArcOrder(const HepGeom::Point3D<double> ** a,
+          const HepGeom::Point3D<double> ** b) {
     if ((*a)->x() < (*b)->x()) {
-      return 1;
+        return 1;
     } else if ((*a)->x() == (*b)->x()) {
-      return 0;
+        return 0;
     } else {
-      return -1;
+        return -1;
     }
-  }
+}
 #else
-  extern "C" int
-  TArcOrder(const void* av, const void* bv)
-  {
+extern "C" int
+TArcOrder(const void* av, const void* bv) {
     const HepGeom::Point3D<double> **a((const HepGeom::Point3D<double> **)av);
     const HepGeom::Point3D<double> **b((const HepGeom::Point3D<double> **)bv);
     if ((*a)->x() < (*b)->x()) {
-      return 1;
+        return 1;
     } else if ((*a)->x() == (*b)->x()) {
-      return 0;
+        return 0;
     } else {
-      return -1;
+        return -1;
     }
-  }
+}
 #endif
 
-  int
-  TTrack::stereoHitForCurl(TLink& link1, TLink& link2, TLink& link3) const
-  {
+int
+TTrack::stereoHitForCurl(TLink& link1, TLink& link2, TLink& link3) const {
     //...definition of the return values
     //   -1 = error
     //    0 = normal = can use 3 links
@@ -2616,508 +2600,504 @@ namespace Belle {
         (ok1 != 0 && ok2 == 0 && ok3 != 0) ||
         (ok1 != 0 && ok2 != 0 && ok3 == 0) ||
         (ok1 == 0 && ok2 != 0 && ok3 == 0)) {
-      //...deletes
-      deleteListForCurl(arcZList1, arcZList2, arcZList3);
-      return -1;
+        //...deletes
+        deleteListForCurl(arcZList1, arcZList2, arcZList3);
+        return -1;
     }
 
     if (ok1 == 0 && ok2 == 0 && ok3 == 0) {
-      //...finds
+        //...finds
 //  double checkArc;
-      int n1 = arcZList1.length();
-      int n2 = arcZList2.length();
-      int n3 = arcZList3.length();
-      for (int i = 0; i < n1; i++) {
-        for (int j = 0; j < n2; j++) {
-          for (int k = 0; k < n3; k++) {
-            AList<Point3D> arcZ;
-            arcZ.append(*arcZList1[i]);
-            arcZ.append(*arcZList2[j]);
-            arcZ.append(*arcZList3[k]);
-            arcZ.sort(TArcOrder);
-            double z01 = fabs(arcZ[0]->y() - arcZ[1]->y());
-            double z12 = fabs(arcZ[1]->y() - arcZ[2]->y());
-            if (z01 <= minZ1 && z12 <= minZ2) {
-              minZ1 = z01;
-              minZ2 = z12;
-              flag1 = i;
-              flag2 = j;
-              flag3 = k;
+        int n1 = arcZList1.length();
+        int n2 = arcZList2.length();
+        int n3 = arcZList3.length();
+        for (int i = 0; i < n1; i++) {
+            for (int j = 0; j < n2; j++) {
+                for (int k = 0; k < n3; k++) {
+                    AList<Point3D> arcZ;
+                    arcZ.append(*arcZList1[i]);
+                    arcZ.append(*arcZList2[j]);
+                    arcZ.append(*arcZList3[k]);
+                    arcZ.sort(TArcOrder);
+                    double z01 = fabs(arcZ[0]->y() - arcZ[1]->y());
+                    double z12 = fabs(arcZ[1]->y() - arcZ[2]->y());
+                    if (z01 <= minZ1 && z12 <= minZ2) {
+                        minZ1 = z01;
+                        minZ2 = z12;
+                        flag1 = i;
+                        flag2 = j;
+                        flag3 = k;
+                    }
+                }
             }
-          }
         }
-      }
-      if (minZ1 == 9999999. ||
-          minZ2 == 9999999.) {
+        if (minZ1 == 9999999. ||
+            minZ2 == 9999999.) {
+            deleteListForCurl(arcZList1, arcZList2, arcZList3);
+            return -1;
+        }
+        //...sets the best values
+        HepGeom::Point3D<double> tmp1 = *arcZList1[flag1];
+        HepGeom::Point3D<double> tmp2 = *arcZList2[flag2];
+        HepGeom::Point3D<double> tmp3 = *arcZList3[flag3];
+        link1.position(tmp1);
+        link2.position(tmp2);
+        link3.position(tmp3);
         deleteListForCurl(arcZList1, arcZList2, arcZList3);
-        return -1;
-      }
-      //...sets the best values
-      HepGeom::Point3D<double> tmp1 = *arcZList1[flag1];
-      HepGeom::Point3D<double> tmp2 = *arcZList2[flag2];
-      HepGeom::Point3D<double> tmp3 = *arcZList3[flag3];
-      link1.position(tmp1);
-      link2.position(tmp2);
-      link3.position(tmp3);
-      deleteListForCurl(arcZList1, arcZList2, arcZList3);
-      return 0;
+        return 0;
     } else if (ok1 == 0 && ok2 == 0 && ok3 != 0) {
-      int n1 = arcZList1.length();
-      int n2 = arcZList2.length();
-      for (int i = 0; i < n1; i++) {
-        for (int j = 0; j < n2; j++) {
-          if (fabs(arcZList1[i]->y() - arcZList2[j]->y()) < minZ01) {
-            minZ01 = fabs(arcZList1[i]->y() - arcZList2[j]->y());
-            flag1 = i;
-            flag2 = j;
-          }
+        int n1 = arcZList1.length();
+        int n2 = arcZList2.length();
+        for (int i = 0; i < n1; i++) {
+            for (int j = 0; j < n2; j++) {
+                if (fabs(arcZList1[i]->y() - arcZList2[j]->y()) < minZ01) {
+                    minZ01 = fabs(arcZList1[i]->y() - arcZList2[j]->y());
+                    flag1 = i;
+                    flag2 = j;
+                }
+            }
         }
-      }
-      if (minZ01 == 9999999.) {
+        if (minZ01 == 9999999.) {
+            deleteListForCurl(arcZList1, arcZList2, arcZList3);
+            return -1;
+        }
+        //...sets the best values
+        HepGeom::Point3D<double> tmp1 = *arcZList1[flag1];
+        HepGeom::Point3D<double> tmp2 = *arcZList2[flag2];
+        link1.position(tmp1);
+        link2.position(tmp2);
         deleteListForCurl(arcZList1, arcZList2, arcZList3);
-        return -1;
-      }
-      //...sets the best values
-      HepGeom::Point3D<double> tmp1 = *arcZList1[flag1];
-      HepGeom::Point3D<double> tmp2 = *arcZList2[flag2];
-      link1.position(tmp1);
-      link2.position(tmp2);
-      deleteListForCurl(arcZList1, arcZList2, arcZList3);
-      return 12;
+        return 12;
     } else if (ok1 != 0 && ok2 == 0 && ok3 == 0) {
-      int n2 = arcZList2.length();
-      int n3 = arcZList3.length();
-      for (int i = 0; i < n2; i++) {
-        for (int j = 0; j < n3; j++) {
-          if (fabs(arcZList2[i]->y() - arcZList3[j]->y()) < minZ12) {
-            minZ12 = fabs(arcZList2[i]->y() - arcZList3[j]->y());
-            flag2 = i;
-            flag3 = j;
-          }
+        int n2 = arcZList2.length();
+        int n3 = arcZList3.length();
+        for (int i = 0; i < n2; i++) {
+            for (int j = 0; j < n3; j++) {
+                if (fabs(arcZList2[i]->y() - arcZList3[j]->y()) < minZ12) {
+                    minZ12 = fabs(arcZList2[i]->y() - arcZList3[j]->y());
+                    flag2 = i;
+                    flag3 = j;
+                }
+            }
         }
-      }
-      if (minZ12 == 9999999.) {
+        if (minZ12 == 9999999.) {
+            deleteListForCurl(arcZList1, arcZList2, arcZList3);
+            return -1;
+        }
+        //...sets the best values
+        HepGeom::Point3D<double> tmp2 = *arcZList2[flag2];
+        HepGeom::Point3D<double> tmp3 = *arcZList3[flag3];
+        link1.position(tmp2);
+        link2.position(tmp3);
+        deleteListForCurl(arcZList1, arcZList2, arcZList3);
+        return 23;
+    } else {
         deleteListForCurl(arcZList1, arcZList2, arcZList3);
         return -1;
-      }
-      //...sets the best values
-      HepGeom::Point3D<double> tmp2 = *arcZList2[flag2];
-      HepGeom::Point3D<double> tmp3 = *arcZList3[flag3];
-      link1.position(tmp2);
-      link2.position(tmp3);
-      deleteListForCurl(arcZList1, arcZList2, arcZList3);
-      return 23;
-    } else {
-      deleteListForCurl(arcZList1, arcZList2, arcZList3);
-      return -1;
     }
-  }
+}
 
-  void
-  TTrack::deleteListForCurl(AList<Point3D> &l1,
-                            AList<Point3D> &l2) const
-  {
+void
+TTrack::deleteListForCurl(AList<Point3D> &l1,
+                          AList<Point3D> &l2) const {
     HepAListDeleteAll(l1);
     HepAListDeleteAll(l2);
-  }
+}
 
-  void
-  TTrack::deleteListForCurl(AList<Point3D> &l1,
-                            AList<Point3D> &l2,
-                            AList<Point3D> &l3) const
-  {
+void
+TTrack::deleteListForCurl(AList<Point3D> &l1,
+                          AList<Point3D> &l2,
+                          AList<Point3D> &l3) const {
     HepAListDeleteAll(l1);
     HepAListDeleteAll(l2);
     HepAListDeleteAll(l3);
-  }
+}
 #endif //OLD_STEREO
 
-  int
-  TTrack::stereoHitForCurl(AList<TLink> & list) const
-  {
+int
+TTrack::stereoHitForCurl(AList<TLink> & list) const {
     if (list.length() == 0)return -1;
 
     HepGeom::Point3D<double> center = _helix->center();
     HepGeom::Point3D<double> tmp(-999., -999., 0.);
     double r  = fabs(_helix->curv());
     for (unsigned i = 0, size = list.length(); i < size; ++i) {
-      Belle2::TRGCDCWireHit& h = *const_cast<Belle2::TRGCDCWireHit*>(list[i]->hit());
-      Vector3D X = 0.5 * (h.wire().forwardPosition() +
-                          h.wire().backwardPosition());
-      Vector3D x     = Vector3D(X.x(), X.y(), 0.);
-      Vector3D w     = x - center;
-      Vector3D V     = h.wire().direction();
-      Vector3D v     = Vector3D(V.x(), V.y(), 0.);
-      double   vmag2 = v.mag2();
-      double   vmag  = sqrt(vmag2);
-      //...temporary
-      for (unsigned j = 0; j < 4; ++j)
-        list[i]->arcZ(tmp, j);
+        TWireHit & h = *const_cast<TWireHit *>(list[i]->hit());
+        Vector3D X = 0.5 * (h.wire().forwardPosition() +
+                            h.wire().backwardPosition());
+        Vector3D x     = Vector3D(X.x(), X.y(), 0.);
+        Vector3D w     = x - center;
+        Vector3D V     = h.wire().direction();
+        Vector3D v     = Vector3D(V.x(), V.y(), 0.);
+        double   vmag2 = v.mag2();
+        double   vmag  = sqrt(vmag2);
+        //...temporary
+        for (unsigned j = 0; j < 4; ++j)
+            list[i]->arcZ(tmp, j);
 
-      //...stereo?
-      if (vmag == 0.) continue;
+        //...stereo?
+        if (vmag == 0.) continue;
 
-      double drift = h.drift(CellHitLeft);
-      double R[2] = {r + drift, r - drift};
-      double wv = w.dot(v);
-      double d2[2];
-      d2[0] = vmag2 * R[0] * R[0] + (wv * wv - vmag2 * w.mag2()); //...= v^2*(r^2 - w^2*sin()^2)...outer
-      d2[1] = vmag2 * R[1] * R[1] + (wv * wv - vmag2 * w.mag2()); //...= v^2*(r^2 - w^2*sin()^2)...inner
+        double drift = h.drift(CellHitLeft);
+        double R[2] = {r + drift, r - drift};
+        double wv = w.dot(v);
+        double d2[2];
+        d2[0] = vmag2 * R[0] * R[0] + (wv * wv - vmag2 * w.mag2()); //...= v^2*(r^2 - w^2*sin()^2)...outer
+        d2[1] = vmag2 * R[1] * R[1] + (wv * wv - vmag2 * w.mag2()); //...= v^2*(r^2 - w^2*sin()^2)...inner
 
-      //...No crossing in R/Phi plane...
-      if (d2[0] < 0. && d2[1] < 0.) continue;
+        //...No crossing in R/Phi plane...
+        if (d2[0] < 0. && d2[1] < 0.) continue;
 
-      bool ok_inner(true);
-      bool ok_outer(true);
-      double d[2] = { -1., -1.};
-      //...outer
-      if (d2[0] >= 0.) {
-        d[0] = sqrt(d2[0]);
-      } else {
-        ok_outer = false;
-      }
-      if (d2[1] >= 0.) {
-        d[1] = sqrt(d2[1]);
-      } else {
-        ok_inner = false;
-      }
+        bool ok_inner(true);
+        bool ok_outer(true);
+        double d[2] = { -1., -1.};
+        //...outer
+        if (d2[0] >= 0.) {
+            d[0] = sqrt(d2[0]);
+        } else {
+            ok_outer = false;
+        }
+        if (d2[1] >= 0.) {
+            d[1] = sqrt(d2[1]);
+        } else {
+            ok_inner = false;
+        }
 
-      //...Cal. length and z to crossing points...
-      double l[2][2];
-      double z[2][2];
-      //...outer
-      if (ok_outer) {
-        l[0][0] = (- wv + d[0]) / vmag2; //...= (-wvcos()+d)/v/v = (-wcos() + (r^2 - w^2*sin()^2)^0.5)/v
-        l[1][0] = (- wv - d[0]) / vmag2; //...= (-wvcos()+d)/v/v = (-wcos() - (r^2 - w^2*sin()^2)^0.5)/v
-        z[0][0] = X.z() + l[0][0] * V.z();
-        z[1][0] = X.z() + l[1][0] * V.z();
-      }
-      //...inner
-      if (ok_inner) {
-        l[0][1] = (- wv + d[1]) / vmag2; //...= (-wvcos()+d)/v/v = (-wcos() + (r^2 - w^2*sin()^2)^0.5)/v
-        l[1][1] = (- wv - d[1]) / vmag2; //...= (-wvcos()+d)/v/v = (-wcos() - (r^2 - w^2*sin()^2)^0.5)/v
-        z[0][1] = X.z() + l[0][1] * V.z();
-        z[1][1] = X.z() + l[1][1] * V.z();
-      }
+        //...Cal. length and z to crossing points...
+        double l[2][2];
+        double z[2][2];
+        //...outer
+        if (ok_outer) {
+            l[0][0] = (- wv + d[0]) / vmag2; //...= (-wvcos()+d)/v/v = (-wcos() + (r^2 - w^2*sin()^2)^0.5)/v
+            l[1][0] = (- wv - d[0]) / vmag2; //...= (-wvcos()+d)/v/v = (-wcos() - (r^2 - w^2*sin()^2)^0.5)/v
+            z[0][0] = X.z() + l[0][0] * V.z();
+            z[1][0] = X.z() + l[1][0] * V.z();
+        }
+        //...inner
+        if (ok_inner) {
+            l[0][1] = (- wv + d[1]) / vmag2; //...= (-wvcos()+d)/v/v = (-wcos() + (r^2 - w^2*sin()^2)^0.5)/v
+            l[1][1] = (- wv - d[1]) / vmag2; //...= (-wvcos()+d)/v/v = (-wcos() - (r^2 - w^2*sin()^2)^0.5)/v
+            z[0][1] = X.z() + l[0][1] * V.z();
+            z[1][1] = X.z() + l[1][1] * V.z();
+        }
 
-      //...Cal. xy position of crossing points...
-      Vector3D p[2][2];
+        //...Cal. xy position of crossing points...
+        Vector3D p[2][2];
 #if 1
-      Vector3D tp[2][2];
+        Vector3D tp[2][2];
 #endif
-      if (ok_outer) {
-        p[0][0] = x + l[0][0] * v;
-        p[1][0] = x + l[1][0] * v;
+        if (ok_outer) {
+            p[0][0] = x + l[0][0] * v;
+            p[1][0] = x + l[1][0] * v;
 #if 1
-        tp[0][0] = p[0][0];
-        tp[1][0] = p[1][0];
+            tp[0][0] = p[0][0];
+            tp[1][0] = p[1][0];
 #endif
-        Vector3D tmp_pc = p[0][0] - center;
-        Vector3D pc0 = Vector3D(tmp_pc.x(), tmp_pc.y(), 0.);
-        p[0][0] -= drift / pc0.mag() * pc0;
-        tmp_pc = p[1][0] - center;
-        Vector3D pc1 = Vector3D(tmp_pc.x(), tmp_pc.y(), 0.);
-        p[1][0] -= drift / pc1.mag() * pc1;
-      }
+            Vector3D tmp_pc = p[0][0] - center;
+            Vector3D pc0 = Vector3D(tmp_pc.x(), tmp_pc.y(), 0.);
+            p[0][0] -= drift / pc0.mag() * pc0;
+            tmp_pc = p[1][0] - center;
+            Vector3D pc1 = Vector3D(tmp_pc.x(), tmp_pc.y(), 0.);
+            p[1][0] -= drift / pc1.mag() * pc1;
+        }
 #define JJTEST 0
-      if (ok_inner) {
-        p[0][1] = x + l[0][1] * v;
-        p[1][1] = x + l[1][1] * v;
+        if (ok_inner) {
+            p[0][1] = x + l[0][1] * v;
+            p[1][1] = x + l[1][1] * v;
 #if JJTEST
-        tp[0][1] = p[0][1];
-        tp[1][1] = p[1][1];
+            tp[0][1] = p[0][1];
+            tp[1][1] = p[1][1];
 #endif
-        Vector3D tmp_pc = p[0][1] - center;
-        Vector3D pc0 = Vector3D(tmp_pc.x(), tmp_pc.y(), 0.);
-        p[0][1] += drift / pc0.mag() * pc0;
-        tmp_pc = p[1][1] - center;
-        Vector3D pc1 = Vector3D(tmp_pc.x(), tmp_pc.y(), 0.);
-        p[1][1] += drift / pc1.mag() * pc1;
-      }
+            Vector3D tmp_pc = p[0][1] - center;
+            Vector3D pc0 = Vector3D(tmp_pc.x(), tmp_pc.y(), 0.);
+            p[0][1] += drift / pc0.mag() * pc0;
+            tmp_pc = p[1][1] - center;
+            Vector3D pc1 = Vector3D(tmp_pc.x(), tmp_pc.y(), 0.);
+            p[1][1] += drift / pc1.mag() * pc1;
+        }
 
-      //...boolean
-      bool ok_xy[2][2];
-      if (ok_outer) {
-        ok_xy[0][0] = true;
-        ok_xy[1][0] = true;
-      } else {
-        ok_xy[0][0] = false;
-        ok_xy[1][0] = false;
-      }
-      if (ok_inner) {
-        ok_xy[0][1] = true;
-        ok_xy[1][1] = true;
-      } else {
-        ok_xy[0][1] = false;
-        ok_xy[1][1] = false;
-      }
-      if (ok_outer) {
-        if (_charge * (center.x() * p[0][0].y() - center.y() * p[0][0].x())  < 0.)
-          ok_xy[0][0] = false;
-        if (_charge * (center.x() * p[1][0].y() - center.y() * p[1][0].x())  < 0.)
-          ok_xy[1][0] = false;
-      }
-      if (ok_inner) {
-        if (_charge * (center.x() * p[0][1].y() - center.y() * p[0][1].x())  < 0.)
-          ok_xy[0][1] = false;
-        if (_charge * (center.x() * p[1][1].y() - center.y() * p[1][1].x())  < 0.)
-          ok_xy[1][1] = false;
-      }
-      if (!ok_inner && ok_outer && (!ok_xy[0][0]) && (!ok_xy[1][0])) {
-        continue;
-      }
-      if (ok_inner && !ok_outer && (!ok_xy[0][1]) && (!ok_xy[1][1])) {
-        continue;
-      }
+        //...boolean
+        bool ok_xy[2][2];
+        if (ok_outer) {
+            ok_xy[0][0] = true;
+            ok_xy[1][0] = true;
+        } else {
+            ok_xy[0][0] = false;
+            ok_xy[1][0] = false;
+        }
+        if (ok_inner) {
+            ok_xy[0][1] = true;
+            ok_xy[1][1] = true;
+        } else {
+            ok_xy[0][1] = false;
+            ok_xy[1][1] = false;
+        }
+        if (ok_outer) {
+            if (_charge * (center.x() * p[0][0].y() - center.y() * p[0][0].x())  < 0.)
+                ok_xy[0][0] = false;
+            if (_charge * (center.x() * p[1][0].y() - center.y() * p[1][0].x())  < 0.)
+                ok_xy[1][0] = false;
+        }
+        if (ok_inner) {
+            if (_charge * (center.x() * p[0][1].y() - center.y() * p[0][1].x())  < 0.)
+                ok_xy[0][1] = false;
+            if (_charge * (center.x() * p[1][1].y() - center.y() * p[1][1].x())  < 0.)
+                ok_xy[1][1] = false;
+        }
+        if (!ok_inner && ok_outer && (!ok_xy[0][0]) && (!ok_xy[1][0])) {
+            continue;
+        }
+        if (ok_inner && !ok_outer && (!ok_xy[0][1]) && (!ok_xy[1][1])) {
+            continue;
+        }
 
-      //...Check z position...
-      if (ok_xy[0][0]) {
-        if (z[0][0] < h.wire().backwardPosition().z() ||
-            z[0][0] > h.wire().forwardPosition().z()) ok_xy[0][0] = false;
-      }
-      if (ok_xy[1][0]) {
-        if (z[1][0] < h.wire().backwardPosition().z() ||
-            z[1][0] > h.wire().forwardPosition().z()) ok_xy[1][0] = false;
-      }
-      if (ok_xy[0][1]) {
-        if (z[0][1] < h.wire().backwardPosition().z() ||
-            z[0][1] > h.wire().forwardPosition().z()) ok_xy[0][1] = false;
-      }
-      if (ok_xy[1][1]) {
-        if (z[1][1] < h.wire().backwardPosition().z() ||
-            z[1][1] > h.wire().forwardPosition().z()) ok_xy[1][1] = false;
-      }
-      if ((!ok_xy[0][0]) && (!ok_xy[1][0]) &&
-          (!ok_xy[0][1]) && (!ok_xy[1][1])) {
-        continue;
-      }
-      double cosdPhi, dPhi;
-      unsigned index;
-      index = 0;
-      if (ok_xy[0][0]) {
-        //...cal. arc length...
-        cosdPhi = - center.dot((p[0][0] - center).unit()) / center.mag();
-        if (fabs(cosdPhi) < 1.0) {
-          dPhi = acos(cosdPhi);
-        } else if (cosdPhi >= 1.0) {
-          dPhi = 0.;
-        } else {
-          dPhi = M_PI;
+        //...Check z position...
+        if (ok_xy[0][0]) {
+            if (z[0][0] < h.wire().backwardPosition().z() ||
+                z[0][0] > h.wire().forwardPosition().z()) ok_xy[0][0] = false;
         }
-        list[i]->arcZ(Point3D(r * dPhi, z[0][0], 0.), index);
-        // std::cout << r*dPhi << ", " << z[0][0] << std::endl;
-        ++index;
-      }
-      if (ok_xy[1][0]) {
-        //...cal. arc length...
-        cosdPhi = - center.dot((p[1][0] - center).unit()) / center.mag();
-        if (fabs(cosdPhi) < 1.0) {
-          dPhi = acos(cosdPhi);
-        } else if (cosdPhi >= 1.0) {
-          dPhi = 0.;
-        } else {
-          dPhi = M_PI;
+        if (ok_xy[1][0]) {
+            if (z[1][0] < h.wire().backwardPosition().z() ||
+                z[1][0] > h.wire().forwardPosition().z()) ok_xy[1][0] = false;
         }
-        list[i]->arcZ(Point3D(r * dPhi, z[1][0], 0.), index);
-        // std::cout << r*dPhi << ", " << z[1][0] << std::endl;
-        ++index;
-      }
-      if (ok_xy[0][1]) {
-        //...cal. arc length...
-        cosdPhi = - center.dot((p[0][1] - center).unit()) / center.mag();
-        if (fabs(cosdPhi) < 1.0) {
-          dPhi = acos(cosdPhi);
-        } else if (cosdPhi >= 1.0) {
-          dPhi = 0.;
-        } else {
-          dPhi = M_PI;
+        if (ok_xy[0][1]) {
+            if (z[0][1] < h.wire().backwardPosition().z() ||
+                z[0][1] > h.wire().forwardPosition().z()) ok_xy[0][1] = false;
         }
-        list[i]->arcZ(Point3D(r * dPhi, z[0][1], 0.), index);
-        // std::cout << r*dPhi << ", " << z[0][1] << std::endl;
-        ++index;
-      }
-      if (ok_xy[1][1]) {
-        //...cal. arc length...
-        cosdPhi = - center.dot((p[1][1] - center).unit()) / center.mag();
-        if (fabs(cosdPhi) < 1.0) {
-          dPhi = acos(cosdPhi);
-        } else if (cosdPhi >= 1.0) {
-          dPhi = 0.;
-        } else {
-          dPhi = M_PI;
+        if (ok_xy[1][1]) {
+            if (z[1][1] < h.wire().backwardPosition().z() ||
+                z[1][1] > h.wire().forwardPosition().z()) ok_xy[1][1] = false;
         }
-        list[i]->arcZ(Point3D(r * dPhi, z[1][1], 0.), index);
-        // std::cout << r*dPhi << ", " << z[1][1] << std::endl;
-        ++index;
-      }
+        if ((!ok_xy[0][0]) && (!ok_xy[1][0]) &&
+            (!ok_xy[0][1]) && (!ok_xy[1][1])) {
+            continue;
+        }
+        double cosdPhi, dPhi;
+        unsigned index;
+        index = 0;
+        if (ok_xy[0][0]) {
+            //...cal. arc length...
+            cosdPhi = - center.dot((p[0][0] - center).unit()) / center.mag();
+            if (fabs(cosdPhi) < 1.0) {
+                dPhi = acos(cosdPhi);
+            } else if (cosdPhi >= 1.0) {
+                dPhi = 0.;
+            } else {
+                dPhi = M_PI;
+            }
+            list[i]->arcZ(Point3D(r * dPhi, z[0][0], 0.), index);
+            // std::cout << r*dPhi << ", " << z[0][0] << std::endl;
+            ++index;
+        }
+        if (ok_xy[1][0]) {
+            //...cal. arc length...
+            cosdPhi = - center.dot((p[1][0] - center).unit()) / center.mag();
+            if (fabs(cosdPhi) < 1.0) {
+                dPhi = acos(cosdPhi);
+            } else if (cosdPhi >= 1.0) {
+                dPhi = 0.;
+            } else {
+                dPhi = M_PI;
+            }
+            list[i]->arcZ(Point3D(r * dPhi, z[1][0], 0.), index);
+            // std::cout << r*dPhi << ", " << z[1][0] << std::endl;
+            ++index;
+        }
+        if (ok_xy[0][1]) {
+            //...cal. arc length...
+            cosdPhi = - center.dot((p[0][1] - center).unit()) / center.mag();
+            if (fabs(cosdPhi) < 1.0) {
+                dPhi = acos(cosdPhi);
+            } else if (cosdPhi >= 1.0) {
+                dPhi = 0.;
+            } else {
+                dPhi = M_PI;
+            }
+            list[i]->arcZ(Point3D(r * dPhi, z[0][1], 0.), index);
+            // std::cout << r*dPhi << ", " << z[0][1] << std::endl;
+            ++index;
+        }
+        if (ok_xy[1][1]) {
+            //...cal. arc length...
+            cosdPhi = - center.dot((p[1][1] - center).unit()) / center.mag();
+            if (fabs(cosdPhi) < 1.0) {
+                dPhi = acos(cosdPhi);
+            } else if (cosdPhi >= 1.0) {
+                dPhi = 0.;
+            } else {
+                dPhi = M_PI;
+            }
+            list[i]->arcZ(Point3D(r * dPhi, z[1][1], 0.), index);
+            // std::cout << r*dPhi << ", " << z[1][1] << std::endl;
+            ++index;
+        }
 
 #if JJTEST
-      double gmaxX = -9999. , gminX = 9999.;
-      double gmaxY = -9999. , gminY = 9999.;
-      FILE* gnuplot, *data;
-      double step = 100.;
-      double dStep = 2.*M_PI / step;
-      if ((data = fopen("dat1", "w")) != NULL) {
-        if (ok_xy[0][0]) {
-          for (int ii = 0; ii < step; ++ii) {
-            double X = tp[0][0].x() + drift * cos(dStep * static_cast<double>(ii));
-            double Y = tp[0][0].y() + drift * sin(dStep * static_cast<double>(ii));
+        double gmaxX = -9999. , gminX = 9999.;
+        double gmaxY = -9999. , gminY = 9999.;
+        FILE* gnuplot, *data;
+        double step = 100.;
+        double dStep = 2.*M_PI / step;
+        if ((data = fopen("dat1", "w")) != NULL) {
+            if (ok_xy[0][0]) {
+                for (int ii = 0; ii < step; ++ii) {
+                    double X = tp[0][0].x() + drift * cos(dStep * static_cast<double>(ii));
+                    double Y = tp[0][0].y() + drift * sin(dStep * static_cast<double>(ii));
+                    std::fprintf(data, "%lf, %lf\n", X, Y);
+                    if (gmaxX < X)gmaxX = X;
+                    if (gminX > X)gminX = X;
+                    if (gmaxY < Y)gmaxY = Y;
+                    if (gminY > Y)gminY = Y;
+                }
+            }
+            fclose(data);
+        }
+        if ((data = fopen("dat2", "w")) != NULL) {
+            if (ok_xy[1][0]) {
+                for (int ii = 0; ii < step; ++ii) {
+                    double X = tp[1][0].x() + drift * cos(dStep * static_cast<double>(ii));
+                    double Y = tp[1][0].y() + drift * sin(dStep * static_cast<double>(ii));
+                    std::fprintf(data, "%lf, %lf\n", X, Y);
+                    if (gmaxX < X)gmaxX = X;
+                    if (gminX > X)gminX = X;
+                    if (gmaxY < Y)gmaxY = Y;
+                    if (gminY > Y)gminY = Y;
+                }
+            }
+            fclose(data);
+        }
+        if ((data = fopen("dat3", "w")) != NULL) {
+            if (ok_xy[0][1]) {
+                for (int ii = 0; ii < step; ++ii) {
+                    double X = tp[0][1].x() + drift * cos(dStep * static_cast<double>(ii));
+                    double Y = tp[0][1].y() + drift * sin(dStep * static_cast<double>(ii));
+                    std::fprintf(data, "%lf, %lf\n", X, Y);
+                    if (gmaxX < X)gmaxX = X;
+                    if (gminX > X)gminX = X;
+                    if (gmaxY < Y)gmaxY = Y;
+                    if (gminY > Y)gminY = Y;
+                }
+            }
+            fclose(data);
+        }
+        if ((data = fopen("dat4", "w")) != NULL) {
+            if (ok_xy[1][1]) {
+                for (int ii = 0; ii < step; ++ii) {
+                    double X = tp[1][1].x() + drift * cos(dStep * static_cast<double>(ii));
+                    double Y = tp[1][1].y() + drift * sin(dStep * static_cast<double>(ii));
+                    std::fprintf(data, "%lf, %lf\n", X, Y);
+                    if (gmaxX < X)gmaxX = X;
+                    if (gminX > X)gminX = X;
+                    if (gmaxY < Y)gmaxY = Y;
+                    if (gminY > Y)gminY = Y;
+                }
+            }
+            fclose(data);
+        }
+        Vector3D tX = h.wire().forwardPosition() - h.wire().backwardPosition();
+        Vector3D tDist(tX.x(), tX.y(), 0.);
+        double tD = tDist.mag();
+        double vvvM = 1. / v.mag();
+        Vector3D tDire = vvvM * v;
+        step = 2.;
+        dStep = tD / step;
+        if ((data = fopen("dat5", "w")) != NULL) {
+            for (int ii = 0; ii < step + 1; ++ii) {
+                double X = h.wire().backwardPosition().x() + dStep * static_cast<double>(ii) * tDire.x();
+                double Y = h.wire().backwardPosition().y() + dStep * static_cast<double>(ii) * tDire.y();
+                std::fprintf(data, "%lf, %lf\n", X, Y);
+                if (gmaxX < X)gmaxX = X;
+                if (gminX > X)gminX = X;
+                if (gmaxY < Y)gmaxY = Y;
+                if (gminY > Y)gminY = Y;
+            }
+            fclose(data);
+        }
+        if ((data = fopen("dat6", "w")) != NULL) {
+            double X = h.wire().backwardPosition().x();
+            double Y = h.wire().backwardPosition().y();
             std::fprintf(data, "%lf, %lf\n", X, Y);
             if (gmaxX < X)gmaxX = X;
             if (gminX > X)gminX = X;
             if (gmaxY < Y)gmaxY = Y;
             if (gminY > Y)gminY = Y;
-          }
+            fclose(data);
         }
-        fclose(data);
-      }
-      if ((data = fopen("dat2", "w")) != NULL) {
-        if (ok_xy[1][0]) {
-          for (int ii = 0; ii < step; ++ii) {
-            double X = tp[1][0].x() + drift * cos(dStep * static_cast<double>(ii));
-            double Y = tp[1][0].y() + drift * sin(dStep * static_cast<double>(ii));
+        if ((data = fopen("dat7", "w")) != NULL) {
+            double X = h.wire().forwardPosition().x();
+            double Y = h.wire().forwardPosition().y();
             std::fprintf(data, "%lf, %lf\n", X, Y);
             if (gmaxX < X)gmaxX = X;
             if (gminX > X)gminX = X;
             if (gmaxY < Y)gmaxY = Y;
             if (gminY > Y)gminY = Y;
-          }
+            fclose(data);
         }
-        fclose(data);
-      }
-      if ((data = fopen("dat3", "w")) != NULL) {
-        if (ok_xy[0][1]) {
-          for (int ii = 0; ii < step; ++ii) {
-            double X = tp[0][1].x() + drift * cos(dStep * static_cast<double>(ii));
-            double Y = tp[0][1].y() + drift * sin(dStep * static_cast<double>(ii));
-            std::fprintf(data, "%lf, %lf\n", X, Y);
-            if (gmaxX < X)gmaxX = X;
-            if (gminX > X)gminX = X;
-            if (gmaxY < Y)gmaxY = Y;
-            if (gminY > Y)gminY = Y;
-          }
+        step = 300.;
+        dStep = 2.*M_PI / step;
+        if ((data = fopen("dat8", "w")) != NULL) {
+            for (int ii = 0; ii < step; ++ii) {
+                double X = center.x() + r * cos(dStep * static_cast<double>(ii));
+                double Y = center.y() + r * sin(dStep * static_cast<double>(ii));
+                std::fprintf(data, "%lf, %lf\n", X, Y);
+            }
+            fclose(data);
         }
-        fclose(data);
-      }
-      if ((data = fopen("dat4", "w")) != NULL) {
-        if (ok_xy[1][1]) {
-          for (int ii = 0; ii < step; ++ii) {
-            double X = tp[1][1].x() + drift * cos(dStep * static_cast<double>(ii));
-            double Y = tp[1][1].y() + drift * sin(dStep * static_cast<double>(ii));
-            std::fprintf(data, "%lf, %lf\n", X, Y);
-            if (gmaxX < X)gmaxX = X;
-            if (gminX > X)gminX = X;
-            if (gmaxY < Y)gmaxY = Y;
-            if (gminY > Y)gminY = Y;
-          }
+        if ((data = fopen("dat9", "w")) != NULL) {
+            if (ok_xy[0][0]) {
+                double X = p[0][0].x();
+                double Y = p[0][0].y();
+                std::fprintf(data, "%lf, %lf\n", X, Y);
+            }
+            fclose(data);
         }
-        fclose(data);
-      }
-      Vector3D tX = h.wire().forwardPosition() - h.wire().backwardPosition();
-      Vector3D tDist(tX.x(), tX.y(), 0.);
-      double tD = tDist.mag();
-      double vvvM = 1. / v.mag();
-      Vector3D tDire = vvvM * v;
-      step = 2.;
-      dStep = tD / step;
-      if ((data = fopen("dat5", "w")) != NULL) {
-        for (int ii = 0; ii < step + 1; ++ii) {
-          double X = h.wire().backwardPosition().x() + dStep * static_cast<double>(ii) * tDire.x();
-          double Y = h.wire().backwardPosition().y() + dStep * static_cast<double>(ii) * tDire.y();
-          std::fprintf(data, "%lf, %lf\n", X, Y);
-          if (gmaxX < X)gmaxX = X;
-          if (gminX > X)gminX = X;
-          if (gmaxY < Y)gmaxY = Y;
-          if (gminY > Y)gminY = Y;
+        if ((data = fopen("dat10", "w")) != NULL) {
+            if (ok_xy[1][0]) {
+                double X = p[1][0].x();
+                double Y = p[1][0].y();
+                std::fprintf(data, "%lf, %lf\n", X, Y);
+            }
+            fclose(data);
         }
-        fclose(data);
-      }
-      if ((data = fopen("dat6", "w")) != NULL) {
-        double X = h.wire().backwardPosition().x();
-        double Y = h.wire().backwardPosition().y();
-        std::fprintf(data, "%lf, %lf\n", X, Y);
-        if (gmaxX < X)gmaxX = X;
-        if (gminX > X)gminX = X;
-        if (gmaxY < Y)gmaxY = Y;
-        if (gminY > Y)gminY = Y;
-        fclose(data);
-      }
-      if ((data = fopen("dat7", "w")) != NULL) {
-        double X = h.wire().forwardPosition().x();
-        double Y = h.wire().forwardPosition().y();
-        std::fprintf(data, "%lf, %lf\n", X, Y);
-        if (gmaxX < X)gmaxX = X;
-        if (gminX > X)gminX = X;
-        if (gmaxY < Y)gmaxY = Y;
-        if (gminY > Y)gminY = Y;
-        fclose(data);
-      }
-      step = 300.;
-      dStep = 2.*M_PI / step;
-      if ((data = fopen("dat8", "w")) != NULL) {
-        for (int ii = 0; ii < step; ++ii) {
-          double X = center.x() + r * cos(dStep * static_cast<double>(ii));
-          double Y = center.y() + r * sin(dStep * static_cast<double>(ii));
-          std::fprintf(data, "%lf, %lf\n", X, Y);
+        if ((data = fopen("dat11", "w")) != NULL) {
+            if (ok_xy[0][1]) {
+                double X = p[0][1].x();
+                double Y = p[0][1].y();
+                std::fprintf(data, "%lf, %lf\n", X, Y);
+            }
+            fclose(data);
         }
-        fclose(data);
-      }
-      if ((data = fopen("dat9", "w")) != NULL) {
-        if (ok_xy[0][0]) {
-          double X = p[0][0].x();
-          double Y = p[0][0].y();
-          std::fprintf(data, "%lf, %lf\n", X, Y);
+        if ((data = fopen("dat12", "w")) != NULL) {
+            if (ok_xy[1][1]) {
+                double X = p[1][1].x();
+                double Y = p[1][1].y();
+                std::fprintf(data, "%lf, %lf\n", X, Y);
+            }
+            fclose(data);
         }
-        fclose(data);
-      }
-      if ((data = fopen("dat10", "w")) != NULL) {
-        if (ok_xy[1][0]) {
-          double X = p[1][0].x();
-          double Y = p[1][0].y();
-          std::fprintf(data, "%lf, %lf\n", X, Y);
+        std::cout << "Drift Distance = " << drift << ", xy1cm -> z" << V.z() / v.mag() << "cm, xyDist(cm) = " << tD << std::endl;
+        if (tX.z() < 0.)std::cout << "ERROR : F < B" << std::endl;
+        if ((gnuplot = popen("gnuplot", "w")) != NULL) {
+            std::fprintf(gnuplot, "set size 0.721,1.0 \n");
+            std::fprintf(gnuplot, "set xrange [%f:%f] \n", gminX, gmaxX);
+            std::fprintf(gnuplot, "set yrange [%f:%f] \n", gminY, gmaxY);
+            std::fprintf(gnuplot, "plot \"dat1\" with line, \"dat2\" with line, \"dat3\" with line, \"dat4\" with line, \"dat5\" with line, \"dat6\", \"dat7\", \"dat8\" with line, \"dat9\", \"dat10\", \"dat11\", \"dat12\" \n");
+            fflush(gnuplot);
+            char tmp[8];
+            gets(tmp);
+            pclose(gnuplot);
         }
-        fclose(data);
-      }
-      if ((data = fopen("dat11", "w")) != NULL) {
-        if (ok_xy[0][1]) {
-          double X = p[0][1].x();
-          double Y = p[0][1].y();
-          std::fprintf(data, "%lf, %lf\n", X, Y);
-        }
-        fclose(data);
-      }
-      if ((data = fopen("dat12", "w")) != NULL) {
-        if (ok_xy[1][1]) {
-          double X = p[1][1].x();
-          double Y = p[1][1].y();
-          std::fprintf(data, "%lf, %lf\n", X, Y);
-        }
-        fclose(data);
-      }
-      std::cout << "Drift Distance = " << drift << ", xy1cm -> z" << V.z() / v.mag() << "cm, xyDist(cm) = " << tD << std::endl;
-      if (tX.z() < 0.)std::cout << "ERROR : F < B" << std::endl;
-      if ((gnuplot = popen("gnuplot", "w")) != NULL) {
-        std::fprintf(gnuplot, "set size 0.721,1.0 \n");
-        std::fprintf(gnuplot, "set xrange [%f:%f] \n", gminX, gmaxX);
-        std::fprintf(gnuplot, "set yrange [%f:%f] \n", gminY, gmaxY);
-        std::fprintf(gnuplot, "plot \"dat1\" with line, \"dat2\" with line, \"dat3\" with line, \"dat4\" with line, \"dat5\" with line, \"dat6\", \"dat7\", \"dat8\" with line, \"dat9\", \"dat10\", \"dat11\", \"dat12\" \n");
-        fflush(gnuplot);
-        char tmp[8];
-        gets(tmp);
-        pclose(gnuplot);
-      }
 #endif
     }
     return 0;
-  }
+}
 
 #if !(NEW_FIT2D)
-  int
-  TTrack::approach2D(TLink& l) const
-  {
+int
+TTrack::approach2D(TLink& l) const {
 
     //...Setup...
-    const Belle2::TRGCDCWire& w = * l.wire();
+    const TWire & w = * l.wire();
     CLHEP::HepVector a = _helix->a();
     double kappa = a[2];
     double phi0  = a[1];
@@ -3153,18 +3133,17 @@ namespace Belle {
     l.positionOnWire(x);
     l.dPhi(dPhi);
     return 0;
-  }
+}
 
-  int
-  TTrack::dxda2D(const TLink& link,
-                 double dPhi,
-                 CLHEP::HepVector& dxda,
-                 CLHEP::HepVector& dyda,
-                 CLHEP::HepVector& dzda) const
-  {
+int
+TTrack::dxda2D(const TLink& link,
+               double dPhi,
+               CLHEP::HepVector& dxda,
+               CLHEP::HepVector& dyda,
+               CLHEP::HepVector& dzda) const {
 
     //...Setup...
-    const Belle2::TRGCDCWire& w = * link.wire();
+    const TWire & w = * link.wire();
     CLHEP::HepVector a = _helix->a();
     double dRho  = a[0];
     double phi0  = a[1];
@@ -3183,23 +3162,23 @@ namespace Belle {
 
     dphida[0] = (sinPhi0 * d.x() - cosPhi0 * d.y()) / dmag2;
     dphida[1] = (dRho + rho)    * (cosPhi0 * d.x() + sinPhi0 * d.y())
-                / dmag2 - 1.;
+        / dmag2 - 1.;
     dphida[2] = (- rho / kappa) * (sinPhi0 * d.x() - cosPhi0 * d.y())
-                / dmag2;
+        / dmag2;
     dphida[3] = 0.;
     dphida[4] = 0.;
 
     dxda[0] = cosPhi0 + rho * sinPhi0dPhi * dphida[0];
     dxda[1] = - (dRho + rho) * sinPhi0 + rho * sinPhi0dPhi * (1. + dphida[1]);
     dxda[2] = - rho / kappa * (cosPhi0 - cosPhi0dPhi)
-              + rho * sinPhi0dPhi * dphida[2];
+        + rho * sinPhi0dPhi * dphida[2];
     dxda[3] = rho * sinPhi0dPhi * dphida[3];
     dxda[4] = rho * sinPhi0dPhi * dphida[4];
 
     dyda[0] = sinPhi0 - rho * cosPhi0dPhi * dphida[0];
     dyda[1] = (dRho + rho) * cosPhi0 - rho * cosPhi0dPhi * (1. + dphida[1]);
     dyda[2] = - rho / kappa * (sinPhi0 - sinPhi0dPhi)
-              - rho * cosPhi0dPhi * dphida[2];
+        - rho * cosPhi0dPhi * dphida[2];
     dyda[3] = - rho * cosPhi0dPhi * dphida[3];
     dyda[4] = - rho * cosPhi0dPhi * dphida[4];
 
@@ -3215,59 +3194,55 @@ namespace Belle {
     //dzda[4] = - rho * dPhi - rho * tanLambda * dphida[4];
 
     return 0;
-  }
+}
 #endif
 #if 0
-  int
-  TTrack::svdHitForCurl(AList<TSvdHit>& svdList) const
-  {
+int
+TTrack::svdHitForCurl(AList<TSvdHit>& svdList) const {
     HepGeom::Point3D<double> center = _helix->center();
     double r  = fabs(_helix->curv());
 
     for (unsigned i = 0, size = svdList.length(); i < size; ++i) {
-      HepGeom::Point3D<double> p(svdList[i]->x(), svdList[i]->y(), 0.);
-      double cosdPhi = - center.dot((p - center).unit()) / center.mag();
-      double dPhi;
-      if (fabs(cosdPhi) < 1.0) {
-        dPhi = acos(cosdPhi);
-      } else if (cosdPhi >= 1.0) {
-        dPhi = 0.;
-      } else {
-        dPhi = M_PI;
-      }
-      HepGeom::Point3D<double> tmp(r * dPhi, svdList[i]->z(), 0.);
-      svdList[i]->arcZ(tmp);
+        HepGeom::Point3D<double> p(svdList[i]->x(), svdList[i]->y(), 0.);
+        double cosdPhi = - center.dot((p - center).unit()) / center.mag();
+        double dPhi;
+        if (fabs(cosdPhi) < 1.0) {
+            dPhi = acos(cosdPhi);
+        } else if (cosdPhi >= 1.0) {
+            dPhi = 0.;
+        } else {
+            dPhi = M_PI;
+        }
+        HepGeom::Point3D<double> tmp(r * dPhi, svdList[i]->z(), 0.);
+        svdList[i]->arcZ(tmp);
     }
     return 0;
-  }
+}
 #endif
 
 #if defined(__GNUG__)
-  int
-  TTrack::sortByPt(const TTrack** a, const TTrack** b)
-  {
+int
+TTrack::sortByPt(const TTrack** a, const TTrack** b) {
     if ((* a)->pt() < (* b)->pt()) return 1;
     else if
-    ((* a)->pt() == (* b)->pt()) return 0;
+        ((* a)->pt() == (* b)->pt()) return 0;
     else return -1;
-  }
+}
 #else
-  extern "C" int
-  SortByPt(const void* av, const void* bv)
-  {
+extern "C" int
+SortByPt(const void* av, const void* bv) {
     const TTrack** a((const TTrack**)av);
     const TTrack** b((const TTrack**)bv);
     if ((* a)->pt() < (* b)->pt()) return 1;
     else if
-    ((* a)->pt() == (* b)->pt()) return 0;
+        ((* a)->pt() == (* b)->pt()) return 0;
     else return -1;
-  }
+}
 #endif
 
 #if NEW_FIT2D
-  int
-  TTrack::fit2D(unsigned ipFlag, double ipDistance, double ipError)
-  {
+int
+TTrack::fit2D(unsigned ipFlag, double ipDistance, double ipError) {
 #ifdef TRASAN_DEBUG_DETAIL
     std::cout << "    TTrack::fit2D(r-phi) ..." << std::endl;
 #endif
@@ -3293,116 +3268,7 @@ namespace Belle {
 
     //...Fitting loop...
     while (nTrial < 100) {
-      //...Set up...
-      chi2 = 0.;
-      for (unsigned j = 0; j < 3; ++j) dchi2da[j] = 0.;
-      d2chi2d2a = CLHEP::HepSymMatrix(3, 0);
-      usedWireNumber = 0;
-
-      //...Loop with hits...
-      unsigned i = 0;
-      while (TLink* l = _links[i++]) {
-        if (l->fit2D() == 0)continue;
-        const Belle2::TRGCDCWireHit& h = *l->hit();
-
-        //...Cal. closest points...
-        if (approach2D(*l) != 0)continue;
-        double dPhi = l->dPhi();
-        const HepGeom::Point3D<double> & onTrack = l->positionOnTrack();
-        const HepGeom::Point3D<double> & onWire  = l->positionOnWire();
-        HepGeom::Point3D<double> onTrack2(onTrack.x(), onTrack.y(), 0.);
-        HepGeom::Point3D<double> onWire2(onWire.x(), onWire.y(), 0.);
-
-        //...Obtain drift distance and its error...
-        unsigned leftRight = CellHitRight;
-        if (onWire2.cross(onTrack2).z() < 0.) leftRight = CellHitLeft;
-        double distance   = h.drift(leftRight);
-        double eDistance  = h.dDrift(leftRight);
-        double eDistance2 = eDistance * eDistance;
-        if (eDistance == 0.) {
-          std::cout << "Error(?) : Drift Distance Error = 0 in fit2D of Trasan." << std::endl;
-          continue;
-        }
-
-        //...Residual...
-        Vector3D v = onTrack2 - onWire2;
-        double vmag = v.mag();
-        double dDistance = vmag - distance;
-
-        //...dxda...
-        if (this->dxda2D(*l, dPhi, dxda, dyda) != 0)continue;
-
-        //...Chi2 related...
-        //HepGeom::Vector3D<double> vw(0.,0.,1.);
-        dDda = (vmag > 0.)
-               ? (v.x() * dxda + v.y() * dyda) / vmag
-               : CLHEP::HepVector(3, 0);
-        if (vmag <= 0.0) {
-          std::cout << "    in fit2D " << onTrack << ", " << onWire;
-          h.dump();
-          continue;
-        }
-        dchi2da     += (dDistance / eDistance2) * dDda;
-        d2chi2d2a   += vT_times_v(dDda) / eDistance2;
-        double pChi2 = dDistance * dDistance / eDistance2;
-        chi2        += pChi2;
-
-        //...Store results...
-        l->update(onTrack2, onWire2, leftRight, pChi2);
-        ++usedWireNumber;
-      }
-      if (ipFlag != 0) {
-//    double kappa = _helix->a()[2];
-//    double phi0  = _helix->a()[1];
-        HepGeom::Point3D<double> xc(_helix->center());
-        HepGeom::Point3D<double> onWire(0., 0., 0.);
-        HepGeom::Point3D<double> xt(_helix->x());
-        Vector3D v0(xt - xc);
-        Vector3D v1(onWire - xc);
-        double vCrs = v0.x() * v1.y() - v0.y() * v1.x();
-        double vDot = v0.x() * v1.x() + v0.y() * v1.y();
-        double dPhi = atan2(vCrs, vDot);
-        HepGeom::Point3D<double> onTrack(_helix->x(dPhi).x(), _helix->x(dPhi).y(), 0.);
-        double distance   = ipDistance;
-        double eDistance  = ipError;
-        double eDistance2 = eDistance * eDistance;
-
-        Vector3D v = onTrack - onWire;
-        double vmag = v.mag();
-        double dDistance = vmag - distance;
-
-        if (this->dxda2D(dPhi, dxda, dyda) != 0)goto ipOff;
-
-        dDda = (vmag > 0.)
-               ? (v.x() * dxda + v.y() * dyda) / vmag
-               : CLHEP::HepVector(3, 0);
-        if (vmag <= 0.0) {
-          goto ipOff;
-        }
-        dchi2da     += (dDistance / eDistance2) * dDda;
-        d2chi2d2a   += vT_times_v(dDda) / eDistance2;
-        double pChi2 = dDistance * dDistance / eDistance2;
-        chi2        += pChi2;
-
-        ++usedWireNumber;
-      }
-ipOff:
-      if (usedWireNumber < 4) {
-        err = -2;
-        break;
-      }
-
-      //...Check condition...
-      double change = chi2Old - chi2;
-      if (fabs(change) < convergence)break;
-      if (change < 0.) {
-#ifdef TRASAN_DEBUG_DETAIL
-        std::cout << "chi2Old, chi2=" << chi2Old << " " << chi2 << std::endl;
-#endif
-        //change to the old value.
-        a += factor * da;
-        _helix->a(a);
-
+        //...Set up...
         chi2 = 0.;
         for (unsigned j = 0; j < 3; ++j) dchi2da[j] = 0.;
         d2chi2d2a = CLHEP::HepSymMatrix(3, 0);
@@ -3411,115 +3277,224 @@ ipOff:
         //...Loop with hits...
         unsigned i = 0;
         while (TLink* l = _links[i++]) {
-          if (l->fit2D() == 0)continue;
-          const Belle2::TRGCDCWireHit& h = * l->hit();
+            if (l->fit2D() == 0)continue;
+            const TWireHit & h = *l->hit();
 
-          //...Cal. closest points...
-          if (approach2D(*l) != 0)continue;
-          double dPhi = l->dPhi();
-          const HepGeom::Point3D<double> & onTrack = l->positionOnTrack();
-          const HepGeom::Point3D<double> & onWire  = l->positionOnWire();
-          Point3D onTrack2(onTrack.x(), onTrack.y(), 0.);
-          Point3D onWire2(onWire.x(), onWire.y(), 0.);
+            //...Cal. closest points...
+            if (approach2D(*l) != 0)continue;
+            double dPhi = l->dPhi();
+            const HepGeom::Point3D<double> & onTrack = l->positionOnTrack();
+            const HepGeom::Point3D<double> & onWire  = l->positionOnWire();
+            HepGeom::Point3D<double> onTrack2(onTrack.x(), onTrack.y(), 0.);
+            HepGeom::Point3D<double> onWire2(onWire.x(), onWire.y(), 0.);
 
-          //...Obtain drift distance and its error...
-          unsigned leftRight = CellHitRight;
-          if (onWire2.cross(onTrack2).z() < 0.) leftRight = CellHitLeft;
-          double distance   = h.drift(leftRight);
-          double eDistance  = h.dDrift(leftRight);
-          double eDistance2 = eDistance * eDistance;
+            //...Obtain drift distance and its error...
+            unsigned leftRight = CellHitRight;
+            if (onWire2.cross(onTrack2).z() < 0.) leftRight = CellHitLeft;
+            double distance   = h.drift(leftRight);
+            double eDistance  = h.dDrift(leftRight);
+            double eDistance2 = eDistance * eDistance;
+            if (eDistance == 0.) {
+                std::cout << "Error(?) : Drift Distance Error = 0 in fit2D of Trasan." << std::endl;
+                continue;
+            }
 
-          //...Residual...
-          Vector3D v = onTrack2 - onWire2;
-          double vmag = v.mag();
-          double dDistance = vmag - distance;
+            //...Residual...
+            Vector3D v = onTrack2 - onWire2;
+            double vmag = v.mag();
+            double dDistance = vmag - distance;
 
-          //...dxda...
-          if (this->dxda2D(*l, dPhi, dxda, dyda) != 0)continue;
+            //...dxda...
+            if (this->dxda2D(*l, dPhi, dxda, dyda) != 0)continue;
 
-          //...Chi2 related...
-          dDda = (vmag > 0.)
-                 ? (v.x() * dxda + v.y() * dyda) / vmag
-                 : CLHEP::HepVector(3, 0);
-          if (vmag <= 0.0) {
-            std::cout << "    in fit2D " << onTrack << ", " << onWire;
-            h.dump();
-            continue;
-          }
-          dchi2da     += (dDistance / eDistance2) * dDda;
-          d2chi2d2a   += vT_times_v(dDda) / eDistance2;
-          double pChi2 = dDistance * dDistance / eDistance2;
-          chi2        += pChi2;
+            //...Chi2 related...
+            //HepGeom::Vector3D<double> vw(0.,0.,1.);
+            dDda = (vmag > 0.)
+                ? (v.x() * dxda + v.y() * dyda) / vmag
+                : CLHEP::HepVector(3, 0);
+            if (vmag <= 0.0) {
+                std::cout << "    in fit2D " << onTrack << ", " << onWire;
+                h.dump();
+                continue;
+            }
+            dchi2da     += (dDistance / eDistance2) * dDda;
+            d2chi2d2a   += vT_times_v(dDda) / eDistance2;
+            double pChi2 = dDistance * dDistance / eDistance2;
+            chi2        += pChi2;
 
-          //...Store results...
-          l->update(onTrack2, onWire2, leftRight, pChi2);
-          ++usedWireNumber;
+            //...Store results...
+            l->update(onTrack2, onWire2, leftRight, pChi2);
+            ++usedWireNumber;
         }
         if (ipFlag != 0) {
+//    double kappa = _helix->a()[2];
+//    double phi0  = _helix->a()[1];
+            HepGeom::Point3D<double> xc(_helix->center());
+            HepGeom::Point3D<double> onWire(0., 0., 0.);
+            HepGeom::Point3D<double> xt(_helix->x());
+            Vector3D v0(xt - xc);
+            Vector3D v1(onWire - xc);
+            double vCrs = v0.x() * v1.y() - v0.y() * v1.x();
+            double vDot = v0.x() * v1.x() + v0.y() * v1.y();
+            double dPhi = atan2(vCrs, vDot);
+            HepGeom::Point3D<double> onTrack(_helix->x(dPhi).x(), _helix->x(dPhi).y(), 0.);
+            double distance   = ipDistance;
+            double eDistance  = ipError;
+            double eDistance2 = eDistance * eDistance;
+
+            Vector3D v = onTrack - onWire;
+            double vmag = v.mag();
+            double dDistance = vmag - distance;
+
+            if (this->dxda2D(dPhi, dxda, dyda) != 0)goto ipOff;
+
+            dDda = (vmag > 0.)
+                ? (v.x() * dxda + v.y() * dyda) / vmag
+                : CLHEP::HepVector(3, 0);
+            if (vmag <= 0.0) {
+                goto ipOff;
+            }
+            dchi2da     += (dDistance / eDistance2) * dDda;
+            d2chi2d2a   += vT_times_v(dDda) / eDistance2;
+            double pChi2 = dDistance * dDistance / eDistance2;
+            chi2        += pChi2;
+
+            ++usedWireNumber;
+        }
+      ipOff:
+        if (usedWireNumber < 4) {
+            err = -2;
+            break;
+        }
+
+        //...Check condition...
+        double change = chi2Old - chi2;
+        if (fabs(change) < convergence)break;
+        if (change < 0.) {
+#ifdef TRASAN_DEBUG_DETAIL
+            std::cout << "chi2Old, chi2=" << chi2Old << " " << chi2 << std::endl;
+#endif
+            //change to the old value.
+            a += factor * da;
+            _helix->a(a);
+
+            chi2 = 0.;
+            for (unsigned j = 0; j < 3; ++j) dchi2da[j] = 0.;
+            d2chi2d2a = CLHEP::HepSymMatrix(3, 0);
+            usedWireNumber = 0;
+
+            //...Loop with hits...
+            unsigned i = 0;
+            while (TLink* l = _links[i++]) {
+                if (l->fit2D() == 0)continue;
+                const TWireHit & h = * l->hit();
+
+                //...Cal. closest points...
+                if (approach2D(*l) != 0)continue;
+                double dPhi = l->dPhi();
+                const HepGeom::Point3D<double> & onTrack = l->positionOnTrack();
+                const HepGeom::Point3D<double> & onWire  = l->positionOnWire();
+                Point3D onTrack2(onTrack.x(), onTrack.y(), 0.);
+                Point3D onWire2(onWire.x(), onWire.y(), 0.);
+
+                //...Obtain drift distance and its error...
+                unsigned leftRight = CellHitRight;
+                if (onWire2.cross(onTrack2).z() < 0.) leftRight = CellHitLeft;
+                double distance   = h.drift(leftRight);
+                double eDistance  = h.dDrift(leftRight);
+                double eDistance2 = eDistance * eDistance;
+
+                //...Residual...
+                Vector3D v = onTrack2 - onWire2;
+                double vmag = v.mag();
+                double dDistance = vmag - distance;
+
+                //...dxda...
+                if (this->dxda2D(*l, dPhi, dxda, dyda) != 0)continue;
+
+                //...Chi2 related...
+                dDda = (vmag > 0.)
+                    ? (v.x() * dxda + v.y() * dyda) / vmag
+                    : CLHEP::HepVector(3, 0);
+                if (vmag <= 0.0) {
+                    std::cout << "    in fit2D " << onTrack << ", " << onWire;
+                    h.dump();
+                    continue;
+                }
+                dchi2da     += (dDistance / eDistance2) * dDda;
+                d2chi2d2a   += vT_times_v(dDda) / eDistance2;
+                double pChi2 = dDistance * dDistance / eDistance2;
+                chi2        += pChi2;
+
+                //...Store results...
+                l->update(onTrack2, onWire2, leftRight, pChi2);
+                ++usedWireNumber;
+            }
+            if (ipFlag != 0) {
 //  double kappa = _helix->a()[2];
 //  double phi0  = _helix->a()[1];
-          Point3D xc(_helix->center());
-          Point3D onWire(0., 0., 0.);
-          Point3D xt(_helix->x());
-          Vector3D v0(xt - xc);
-          Vector3D v1(onWire - xc);
-          double vCrs = v0.x() * v1.y() - v0.y() * v1.x();
-          double vDot = v0.x() * v1.x() + v0.y() * v1.y();
-          double dPhi = atan2(vCrs, vDot);
-          Point3D onTrack(_helix->x(dPhi).x(), _helix->x(dPhi).y(), 0.);
-          double distance   = ipDistance;
-          double eDistance  = ipError;
-          double eDistance2 = eDistance * eDistance;
+                Point3D xc(_helix->center());
+                Point3D onWire(0., 0., 0.);
+                Point3D xt(_helix->x());
+                Vector3D v0(xt - xc);
+                Vector3D v1(onWire - xc);
+                double vCrs = v0.x() * v1.y() - v0.y() * v1.x();
+                double vDot = v0.x() * v1.x() + v0.y() * v1.y();
+                double dPhi = atan2(vCrs, vDot);
+                Point3D onTrack(_helix->x(dPhi).x(), _helix->x(dPhi).y(), 0.);
+                double distance   = ipDistance;
+                double eDistance  = ipError;
+                double eDistance2 = eDistance * eDistance;
 
-          Vector3D v = onTrack - onWire;
-          double vmag = v.mag();
-          double dDistance = vmag - distance;
+                Vector3D v = onTrack - onWire;
+                double vmag = v.mag();
+                double dDistance = vmag - distance;
 
-          if (this->dxda2D(dPhi, dxda, dyda) != 0)goto ipOff2;
+                if (this->dxda2D(dPhi, dxda, dyda) != 0)goto ipOff2;
 
-          dDda = (vmag > 0.)
-                 ? (v.x() * dxda + v.y() * dyda) / vmag
-                 : CLHEP::HepVector(3, 0);
-          if (vmag <= 0.0) {
-            goto ipOff2;
-          }
-          dchi2da     += (dDistance / eDistance2) * dDda;
-          d2chi2d2a   += vT_times_v(dDda) / eDistance2;
-          double pChi2 = dDistance * dDistance / eDistance2;
-          chi2        += pChi2;
+                dDda = (vmag > 0.)
+                    ? (v.x() * dxda + v.y() * dyda) / vmag
+                    : CLHEP::HepVector(3, 0);
+                if (vmag <= 0.0) {
+                    goto ipOff2;
+                }
+                dchi2da     += (dDistance / eDistance2) * dDda;
+                d2chi2d2a   += vT_times_v(dDda) / eDistance2;
+                double pChi2 = dDistance * dDistance / eDistance2;
+                chi2        += pChi2;
 
-          ++usedWireNumber;
-        }
-ipOff2:
-        if (usedWireNumber < 4) {
-          err = -2;
-          break;
-        }
-        //break;
-        factor *= 0.75;
+                ++usedWireNumber;
+            }
+          ipOff2:
+            if (usedWireNumber < 4) {
+                err = -2;
+                break;
+            }
+            //break;
+            factor *= 0.75;
 #ifdef TRASAN_DEBUG_DETAIL
-        std::cout << "factor = " << factor << std::endl;
-        std::cout << "chi2 = " << chi2 << std::endl;
+            std::cout << "factor = " << factor << std::endl;
+            std::cout << "chi2 = " << chi2 << std::endl;
 #endif
-        if (factor < 0.01)break;
-      }
+            if (factor < 0.01)break;
+        }
 
-      chi2Old = chi2;
+        chi2Old = chi2;
 
-      //...Cal. helix parameters for next loop...
-      f = solve(d2chi2d2a, dchi2da);
-      da[0] = f[0];
-      da[1] = f[1];
-      da[2] = f[2];
-      da[3] = 0.;
-      da[4] = 0.;
+        //...Cal. helix parameters for next loop...
+        f = solve(d2chi2d2a, dchi2da);
+        da[0] = f[0];
+        da[1] = f[1];
+        da[2] = f[2];
+        da[3] = 0.;
+        da[4] = 0.;
 
-      a -= factor * da;
-      _helix->a(a);
-      ++nTrial;
+        a -= factor * da;
+        _helix->a(a);
+        ++nTrial;
     }
     if (err) {
-      return err;
+        return err;
     }
 
     //...Cal. error matrix...
@@ -3536,10 +3511,10 @@ ipOff2:
 
     //...Store information...
     if (!err) {
-      _helix->a(a);
-      _helix->Ea(Ea);
+        _helix->a(a);
+        _helix->Ea(Ea);
     } else {
-      err = -2;
+        err = -2;
     }
 
     _ndf  = usedWireNumber - dim;
@@ -3555,71 +3530,70 @@ ipOff2:
     double step = 200.;
     double dStep = 2.*M_PI / step;
     for (int i = 0, size = _links.length(); i < size; ++i) {
-      TLink* l = _links[i];
-      double drift = l->hit()->distance(0);
-      char name[100] = "dat";
-      char counter[10] = "";
-      std::sprintf(counter, "%02d", i);
-      strcat(name, counter);
-      if ((data = fopen(name, "w")) != NULL) {
-        for (int ii = 0; ii < step; ++ii) {
-          double X = l->wire().xyPosition().x() + drift * cos(dStep * static_cast<double>(ii));
-          double Y = l->wire()->xyPosition().y() + drift * sin(dStep * static_cast<double>(ii));
-          std::fprintf(data, "%lf, %lf\n", X, Y);
-          if (gmaxX < X)gmaxX = X;
-          if (gminX > X)gminX = X;
-          if (gmaxY < Y)gmaxY = Y;
-          if (gminY > Y)gminY = Y;
+        TLink* l = _links[i];
+        double drift = l->hit()->distance(0);
+        char name[100] = "dat";
+        char counter[10] = "";
+        std::sprintf(counter, "%02d", i);
+        strcat(name, counter);
+        if ((data = fopen(name, "w")) != NULL) {
+            for (int ii = 0; ii < step; ++ii) {
+                double X = l->wire().xyPosition().x() + drift * cos(dStep * static_cast<double>(ii));
+                double Y = l->wire()->xyPosition().y() + drift * sin(dStep * static_cast<double>(ii));
+                std::fprintf(data, "%lf, %lf\n", X, Y);
+                if (gmaxX < X)gmaxX = X;
+                if (gminX > X)gminX = X;
+                if (gmaxY < Y)gmaxY = Y;
+                if (gminY > Y)gminY = Y;
+            }
+            fclose(data);
         }
-        fclose(data);
-      }
     }
     step = 300.;
     dStep = 2.*M_PI / step;
     if ((data = fopen("datc", "w")) != NULL) {
-      for (int ii = 0; ii < step; ++ii) {
-        double X = _helix->center().x() + _helix->radius() * cos(dStep * static_cast<double>(ii));
-        double Y = _helix->center().y() + _helix->radius() * sin(dStep * static_cast<double>(ii));
-        std::fprintf(data, "%lf, %lf\n", X, Y);
-      }
-      fclose(data);
+        for (int ii = 0; ii < step; ++ii) {
+            double X = _helix->center().x() + _helix->radius() * cos(dStep * static_cast<double>(ii));
+            double Y = _helix->center().y() + _helix->radius() * sin(dStep * static_cast<double>(ii));
+            std::fprintf(data, "%lf, %lf\n", X, Y);
+        }
+        fclose(data);
     }
     if ((gnuplot = popen("gnuplot", "w")) != NULL) {
-      std::fprintf(gnuplot, "set size 0.721,1.0 \n");
-      std::fprintf(gnuplot, "set xrange [%f:%f] \n", gminX, gmaxX);
-      std::fprintf(gnuplot, "set yrange [%f:%f] \n", gminY, gmaxY);
-      if (_links.length() == 4) {
-        std::fprintf(gnuplot, "plot \"datc\" with line, \"dat00\" with line, \"dat01\" with line, \"dat02\" with line, \"dat03\" with line \n");
-      } else if (_links.length() == 5) {
-        std::fprintf(gnuplot, "plot \"datc\" with line, \"dat00\" with line, \"dat01\" with line, \"dat02\" with line, \"dat03\" with line, \"dat04\" with line \n");
-      } else if (_links.length() == 6) {
-        std::fprintf(gnuplot, "plot \"datc\" with line, \"dat00\" with line, \"dat01\" with line, \"dat02\" with line, \"dat03\" with line, \"dat04\" with line, \"dat05\" with line \n");
-      } else if (_links.length() == 7) {
-        std::fprintf(gnuplot, "plot \"datc\" with line, \"dat00\" with line, \"dat01\" with line, \"dat02\" with line, \"dat03\" with line, \"dat04\" with line, \"dat05\" with line, \"dat06\" with line \n");
-      } else if (_links.length() == 8) {
-        std::fprintf(gnuplot, "plot \"datc\" with line, \"dat00\" with line, \"dat01\" with line, \"dat02\" with line, \"dat03\" with line, \"dat04\" with line, \"dat05\" with line, \"dat06\" with line, \"dat07\" with line \n");
-      } else if (_links.length() == 9) {
-        std::fprintf(gnuplot, "plot \"datc\" with line, \"dat00\" with line, \"dat01\" with line, \"dat02\" with line, \"dat03\" with line, \"dat04\" with line, \"dat05\" with line, \"dat06\" with line, \"dat07\" with line, \"dat08\" with line \n");
-      } else if (_links.length() == 10) {
-        std::fprintf(gnuplot, "plot \"datc\" with line, \"dat00\" with line, \"dat01\" with line, \"dat02\" with line, \"dat03\" with line, \"dat04\" with line, \"dat05\" with line, \"dat06\" with line, \"dat07\" with line, \"dat08\" with line, \"dat09\" with line \n");
-      } else if (_links.length() >= 11) {
-        std::fprintf(gnuplot, "plot \"datc\" with line, \"dat00\" with line, \"dat01\" with line, \"dat02\" with line, \"dat03\" with line, \"dat04\" with line, \"dat05\" with line, \"dat06\" with line, \"dat07\" with line, \"dat08\" with line, \"dat09\" with line, \"dat10\" with line \n");
-      }
-      fflush(gnuplot);
-      char tmp[8];
-      gets(tmp);
-      pclose(gnuplot);
+        std::fprintf(gnuplot, "set size 0.721,1.0 \n");
+        std::fprintf(gnuplot, "set xrange [%f:%f] \n", gminX, gmaxX);
+        std::fprintf(gnuplot, "set yrange [%f:%f] \n", gminY, gmaxY);
+        if (_links.length() == 4) {
+            std::fprintf(gnuplot, "plot \"datc\" with line, \"dat00\" with line, \"dat01\" with line, \"dat02\" with line, \"dat03\" with line \n");
+        } else if (_links.length() == 5) {
+            std::fprintf(gnuplot, "plot \"datc\" with line, \"dat00\" with line, \"dat01\" with line, \"dat02\" with line, \"dat03\" with line, \"dat04\" with line \n");
+        } else if (_links.length() == 6) {
+            std::fprintf(gnuplot, "plot \"datc\" with line, \"dat00\" with line, \"dat01\" with line, \"dat02\" with line, \"dat03\" with line, \"dat04\" with line, \"dat05\" with line \n");
+        } else if (_links.length() == 7) {
+            std::fprintf(gnuplot, "plot \"datc\" with line, \"dat00\" with line, \"dat01\" with line, \"dat02\" with line, \"dat03\" with line, \"dat04\" with line, \"dat05\" with line, \"dat06\" with line \n");
+        } else if (_links.length() == 8) {
+            std::fprintf(gnuplot, "plot \"datc\" with line, \"dat00\" with line, \"dat01\" with line, \"dat02\" with line, \"dat03\" with line, \"dat04\" with line, \"dat05\" with line, \"dat06\" with line, \"dat07\" with line \n");
+        } else if (_links.length() == 9) {
+            std::fprintf(gnuplot, "plot \"datc\" with line, \"dat00\" with line, \"dat01\" with line, \"dat02\" with line, \"dat03\" with line, \"dat04\" with line, \"dat05\" with line, \"dat06\" with line, \"dat07\" with line, \"dat08\" with line \n");
+        } else if (_links.length() == 10) {
+            std::fprintf(gnuplot, "plot \"datc\" with line, \"dat00\" with line, \"dat01\" with line, \"dat02\" with line, \"dat03\" with line, \"dat04\" with line, \"dat05\" with line, \"dat06\" with line, \"dat07\" with line, \"dat08\" with line, \"dat09\" with line \n");
+        } else if (_links.length() >= 11) {
+            std::fprintf(gnuplot, "plot \"datc\" with line, \"dat00\" with line, \"dat01\" with line, \"dat02\" with line, \"dat03\" with line, \"dat04\" with line, \"dat05\" with line, \"dat06\" with line, \"dat07\" with line, \"dat08\" with line, \"dat09\" with line, \"dat10\" with line \n");
+        }
+        fflush(gnuplot);
+        char tmp[8];
+        gets(tmp);
+        pclose(gnuplot);
     }
 #endif //JJJTEST
 
     return err;
-  }
+}
 
-  int
-  TTrack::approach2D(TLink& l) const
-  {
+int
+TTrack::approach2D(TLink& l) const {
 
-    const Belle2::TRGCDCWire& w = *l.wire();
+    const TWire & w = *l.wire();
 //double kappa = _helix->a()[2];
 //double phi0  = _helix->a()[1];
     HepGeom::Point3D<double> xc(_helix->center());
@@ -3639,22 +3613,21 @@ ipOff2:
     l.positionOnWire(xw);
     l.dPhi(dPhi);
     return 0;
-  }
+}
 
-  int
-  TTrack::dxda2D(const TLink& link,
-                 double dPhi,
-                 CLHEP::HepVector& dxda,
-                 CLHEP::HepVector& dyda) const
-  {
+int
+TTrack::dxda2D(const TLink& link,
+               double dPhi,
+               CLHEP::HepVector& dxda,
+               CLHEP::HepVector& dyda) const {
 
     //...Setup...
     double kappa = (_helix->a())[2];
     if (kappa == 0.) {
-      std::cout << "Error(?) : kappa == 0 in dxda2D of Trasan." << std::endl;
-      return 1;
+        std::cout << "Error(?) : kappa == 0 in dxda2D of Trasan." << std::endl;
+        return 1;
     }
-    const Belle2::TRGCDCWire& w = *link.wire();
+    const TWire & w = *link.wire();
     double dRho  = (_helix->a())[0];
     double phi0  = (_helix->a())[1];
     double rho   = THelix::ConstantAlpha / kappa;
@@ -3670,8 +3643,8 @@ ipOff2:
     double dmag2 = d.mag2();
 
     if (dmag2 == 0.) {
-      std::cout << "Error(?) : Distance(center-xyPosition) == 0 in dxda2D of Trasan." << std::endl;
-      return 1;
+        std::cout << "Error(?) : Distance(center-xyPosition) == 0 in dxda2D of Trasan." << std::endl;
+        return 1;
     }
 
     dphida[0] = (sinPhi0 * d.x() - cosPhi0 * d.y()) / dmag2;
@@ -3687,19 +3660,18 @@ ipOff2:
     dyda[2] = -rho / kappa * (sinPhi0 - sinPhi0dPhi) - rho * cosPhi0dPhi * dphida[2];
 
     return 0;
-  }
+}
 
-  int
-  TTrack::dxda2D(double dPhi,
-                 CLHEP::HepVector& dxda,
-                 CLHEP::HepVector& dyda) const
-  {
+int
+TTrack::dxda2D(double dPhi,
+               CLHEP::HepVector& dxda,
+               CLHEP::HepVector& dyda) const {
 
     //...Setup...
     double kappa = (_helix->a())[2];
     if (kappa == 0.) {
-      std::cout << "Error(?) : kappa == 0 in dxda2D of Trasan." << std::endl;
-      return 1;
+        std::cout << "Error(?) : kappa == 0 in dxda2D of Trasan." << std::endl;
+        return 1;
     }
     double dRho  = (_helix->a())[0];
     double phi0  = (_helix->a())[1];
@@ -3716,8 +3688,8 @@ ipOff2:
     double dmag2 = d.mag2();
 
     if (dmag2 == 0.) {
-      std::cout << "Error(?) : Distance(center-xyPosition) == 0 in dxda2D of Trasan." << std::endl;
-      return 1;
+        std::cout << "Error(?) : Distance(center-xyPosition) == 0 in dxda2D of Trasan." << std::endl;
+        return 1;
     }
 
     dphida[0] = (sinPhi0 * d.x() - cosPhi0 * d.y()) / dmag2;
@@ -3733,12 +3705,11 @@ ipOff2:
     dyda[2] = -rho / kappa * (sinPhi0 - sinPhi0dPhi) - rho * cosPhi0dPhi * dphida[2];
 
     return 0;
-  }
+}
 #endif
 
-  unsigned
-  TTrack::defineType(void) const
-  {
+unsigned
+TTrack::defineType(void) const {
     bool highPt = true;
     if (pt() < 0.25) highPt = false;
     bool fromIP = true;
@@ -3748,27 +3719,26 @@ ipOff2:
     else if (fromIP && (! highPt)) return _type = TrackTypeCurl;
 
     if ((fabs(radius()) * 2. + fabs(impact())) < 87.)
-      return _type = TrackTypeCircle;
+        return _type = TrackTypeCircle;
     return _type = TrackTypeCosmic;
-  }
+}
 
-  std::string
-  TrackType(unsigned type)
-  {
+std::string
+TrackType(unsigned type) {
     switch (type) {
-      case TrackTypeUndefined:
+    case TrackTypeUndefined:
         return std::string("undefined");
-      case TrackTypeNormal:
+    case TrackTypeNormal:
         return std::string("normal");
-      case TrackTypeCurl:
+    case TrackTypeCurl:
         return std::string("curl  ");
-      case TrackTypeCircle:
+    case TrackTypeCircle:
         return std::string("circle");
-      case TrackTypeCosmic:
+    case TrackTypeCosmic:
         return std::string("cosmic");
     }
     return std::string("unknown  ");
-  }
+}
 
 #ifdef OPTNK
 #define t_dot(a,b) (a[0]*b[0]+a[1]*b[1]+a[2]*b[2])
@@ -3777,12 +3747,11 @@ ipOff2:
 #endif
 
 
-  int
-  TTrack::approach(TLink& link, bool doSagCorrection) const
-  {
+int
+TTrack::approach(TLink& link, bool doSagCorrection) const {
 
     //...Cal. dPhi to rotate...
-    const Belle2::TRGCDCWire& w = * link.wire();
+    const TWire & w = * link.wire();
     double wp[3]; w.xyPosition(wp);
     double wb[3]; w.backwardPosition(wb);
     double v[3];
@@ -3792,8 +3761,8 @@ ipOff2:
 
     //...Sag correction...
     if (doSagCorrection) {
-      std::cout << "TTrack::approach !!! sag correction is not implemented"
-                << std::endl;
+        std::cout << "TTrack::approach !!! sag correction is not implemented"
+                  << std::endl;
 //  Vector3D dir = w.direction();
 //  Point3D xw(wp[0], wp[1], wp[2]);
 //  Point3D wireBackwardPosition(wb[0], wb[1], wb[2]);
@@ -3817,20 +3786,20 @@ ipOff2:
 #if defined(BELLE_DEBUG)
     try {
 #endif
-      const HepGeom::Point3D<double> & xc = _helix->center();
-      double xt[3]; _helix->x(0., xt);
-      double x0 = - xc.x();
-      double y0 = - xc.y();
-      double x1 = wp[0] + x0;
-      double y1 = wp[1] + y0;
-      x0 += xt[0];
-      y0 += xt[1];
-      dPhi = atan2(x0 * y1 - y0 * x1, x0 * x1 + y0 * y1);
+        const HepGeom::Point3D<double> & xc = _helix->center();
+        double xt[3]; _helix->x(0., xt);
+        double x0 = - xc.x();
+        double y0 = - xc.y();
+        double x1 = wp[0] + x0;
+        double y1 = wp[1] + y0;
+        x0 += xt[0];
+        y0 += xt[1];
+        dPhi = atan2(x0 * y1 - y0 * x1, x0 * x1 + y0 * y1);
 #if defined(BELLE_DEBUG)
     } catch (std::string& e) {
-      std::cout << "TTrack::helix is invalid" << std::endl;
-      //      dump("Badhelix","Trasan::TTrack::approach");
-      return -1;
+        std::cout << "TTrack::helix is invalid" << std::endl;
+        //      dump("Badhelix","Trasan::TTrack::approach");
+        return -1;
     }
 #endif
 
@@ -3840,12 +3809,12 @@ ipOff2:
 
     //...Axial case...
     if (w.axial()) {
-      link.positionOnTrack(_helix->x(dPhi));
-      Point3D x(wp[0], wp[1], wp[2]);
-      x.setZ(link.positionOnTrack().z());
-      link.positionOnWire(x);
-      link.dPhi(dPhi);
-      return 0;
+        link.positionOnTrack(_helix->x(dPhi));
+        Point3D x(wp[0], wp[1], wp[2]);
+        x.setZ(link.positionOnTrack().z());
+        link.positionOnWire(x);
+        link.dPhi(dPhi);
+        return 0;
     }
 
 #ifdef TRASAN_DEBUG
@@ -3869,74 +3838,74 @@ ipOff2:
     unsigned nTrial = 0;
     while (nTrial < 100) {
 
-      x = link.positionOnTrack(_helix->x(dPhi));
-      t_x[0] = x[0];
-      t_x[1] = x[1];
-      t_x[2] = x[2];
+        x = link.positionOnTrack(_helix->x(dPhi));
+        t_x[0] = x[0];
+        t_x[1] = x[1];
+        t_x[2] = x[2];
 
-      l = v[0] * t_x[0] + v[1] * t_x[1] + v[2] * t_x[2]
-          - v[0] * wb[0] - v[1] * wb[1] - v[2] * wb[2];
+        l = v[0] * t_x[0] + v[1] * t_x[1] + v[2] * t_x[2]
+            - v[0] * wb[0] - v[1] * wb[1] - v[2] * wb[2];
 
-      double rcosPhi = rho * cos(phi0 + dPhi);
-      double rsinPhi = rho * sin(phi0 + dPhi);
-      t_dXdPhi[0] =   rsinPhi;
-      t_dXdPhi[1] = - rcosPhi;
-      t_dXdPhi[2] = - rho * tanLambda;
+        double rcosPhi = rho * cos(phi0 + dPhi);
+        double rsinPhi = rho * sin(phi0 + dPhi);
+        t_dXdPhi[0] =   rsinPhi;
+        t_dXdPhi[1] = - rcosPhi;
+        t_dXdPhi[2] = - rho * tanLambda;
 
-      //...f = d(Distance) / d phi...
-      double t_d2Xd2Phi[2];
-      t_d2Xd2Phi[0] = rcosPhi;
-      t_d2Xd2Phi[1] = rsinPhi;
+        //...f = d(Distance) / d phi...
+        double t_d2Xd2Phi[2];
+        t_d2Xd2Phi[0] = rcosPhi;
+        t_d2Xd2Phi[1] = rsinPhi;
 
-      //...iw new...
-      double n[3];
-      n[0] = t_x[0] - wb[0];
-      n[1] = t_x[1] - wb[1];
-      n[2] = t_x[2] - wb[2];
+        //...iw new...
+        double n[3];
+        n[0] = t_x[0] - wb[0];
+        n[1] = t_x[1] - wb[1];
+        n[2] = t_x[2] - wb[2];
 
-      double a[3];
-      a[0] = n[0] - l * v[0];
-      a[1] = n[1] - l * v[1];
-      a[2] = n[2] - l * v[2];
-      double dfdphi = a[0] * t_dXdPhi[0]
-                      + a[1] * t_dXdPhi[1]
-                      + a[2] * t_dXdPhi[2];
+        double a[3];
+        a[0] = n[0] - l * v[0];
+        a[1] = n[1] - l * v[1];
+        a[2] = n[2] - l * v[2];
+        double dfdphi = a[0] * t_dXdPhi[0]
+            + a[1] * t_dXdPhi[1]
+            + a[2] * t_dXdPhi[2];
 
 #ifdef TRASAN_DEBUG
-      if (nTrial == 0) {
+        if (nTrial == 0) {
 //      break;
-        firstdfdphi = dfdphi;
-      }
+            firstdfdphi = dfdphi;
+        }
 
-      //...Check bad case...
-      if (nTrial > 3) {
-        std::cout << Tab() << "TTrack::approach:" << w.name() << " "
-                  << "dfdphi(0)=" << firstdfdphi
-                  << ",(" << nTrial << ")=" << dfdphi << std::endl;
-      }
+        //...Check bad case...
+        if (nTrial > 3) {
+            std::cout << Tab() << "TTrack::approach:" << w.name() << " "
+                      << "dfdphi(0)=" << firstdfdphi
+                      << ",(" << nTrial << ")=" << dfdphi << std::endl;
+        }
 #endif
 
-      //...Is it converged?...
-      if (fabs(dfdphi) < convergence)
-        break;
+        //...Is it converged?...
+        if (fabs(dfdphi) < convergence)
+            break;
 
-      double dv = v[0] * t_dXdPhi[0]
-                  + v[1] * t_dXdPhi[1]
-                  + v[2] * t_dXdPhi[2];
-      double t0 = t_dXdPhi[0] * t_dXdPhi[0]
-                  + t_dXdPhi[1] * t_dXdPhi[1]
-                  + t_dXdPhi[2] * t_dXdPhi[2];
-      double d2fd2phi = t0 - dv * dv
-                        + a[0] * t_d2Xd2Phi[0]
-                        + a[1] * t_d2Xd2Phi[1];
+        double dv = v[0] * t_dXdPhi[0]
+            + v[1] * t_dXdPhi[1]
+            + v[2] * t_dXdPhi[2];
+        double t0 = t_dXdPhi[0] * t_dXdPhi[0]
+            + t_dXdPhi[1] * t_dXdPhi[1]
+            + t_dXdPhi[2] * t_dXdPhi[2];
+        double d2fd2phi = t0 - dv * dv
+            + a[0] * t_d2Xd2Phi[0]
+            + a[1] * t_d2Xd2Phi[1];
 //      + a[2] * t_d2Xd2Phi[2];
 
-      dPhi -= dfdphi / d2fd2phi;
+        dPhi -= dfdphi / d2fd2phi;
 
 //    std::cout<< "nTrial=" << nTrial << std::endl;
 //      std::cout<< "iw f,df,dphi=" << dfdphi << "," << d2fd2phi << "," << dPhi << std::endl;
 
-      ++nTrial;
+        ++nTrial;
     }
 
     //...Cal. positions...
@@ -3950,11 +3919,10 @@ ipOff2:
 #endif
 
     return nTrial;
-  }
+}
 
-  void
-  TTrack::relationClusterWithWire()
-  {
+void
+TTrack::relationClusterWithWire() {
 //----------------------------------------------------------
 // Note: Selection of associating cluster to TLink is done.
 //       if appropriate cluster was found ,
@@ -4051,11 +4019,11 @@ ipOff2:
 //    j++;
 //    } // TLink loop
 
-  }
+}
 
 // addition by matsu ( 1999/07/05 )
-  void TTrack::relationClusterWithLayer(int SysCorr)
-  {
+void
+TTrack::relationClusterWithLayer(int) {
 
 //     //... selection of cathode cluster
 //     for(unsigned it0=0;it0<3;it0++){
@@ -4095,12 +4063,11 @@ ipOff2:
 //        }
 //      }
 //    }
-  }
+}
 
-  int
-  TTrack::szPosition(TLink& link) const
-  {
-    const Belle2::TRGCDCWireHit& h = * link.hit();
+int
+TTrack::szPosition(TLink& link) const {
+    const TWireHit & h = * link.hit();
     Vector3D X = 0.5 * (h.wire().forwardPosition()
                         + h.wire().backwardPosition());
     //    double theta = atan2(X.y(), X.x());
@@ -4140,13 +4107,13 @@ ipOff2:
     //...No crossing in R/Phi plane... This is too tight...
 
     if (d2 < 0.) {
-      link.position(tmp);
+        link.position(tmp);
 
 #ifdef TRASAN_DEBUG_DETAIL
-      std::cout << "TTrack ... stereo: 0. > d2 = " << d2 << " "
-                << link.leftRight() << std::endl;
+        std::cout << "TTrack ... stereo: 0. > d2 = " << d2 << " "
+                  << link.leftRight() << std::endl;
 #endif
-      return -1;
+        return -1;
     }
     double d = sqrt(d2);
 
@@ -4170,19 +4137,19 @@ ipOff2:
 
     //...Check z position...
     if (link.leftRight() == 2) {
-      if (z[0] < h.wire().backwardPosition().z() - 20.
-          || z[0] > h.wire().forwardPosition().z() + 20.) ok[0] = false;
-      if (z[1] < h.wire().backwardPosition().z() - 20.
-          || z[1] > h.wire().forwardPosition().z() + 20.) ok[1] = false;
+        if (z[0] < h.wire().backwardPosition().z() - 20.
+            || z[0] > h.wire().forwardPosition().z() + 20.) ok[0] = false;
+        if (z[1] < h.wire().backwardPosition().z() - 20.
+            || z[1] > h.wire().forwardPosition().z() + 20.) ok[1] = false;
     } else {
-      if (z[0] < h.wire().backwardPosition().z()
-          || z[0] > h.wire().forwardPosition().z()) ok[0] = false;
-      if (z[1] < h.wire().backwardPosition().z()
-          || z[1] > h.wire().forwardPosition().z()) ok[1] = false;
+        if (z[0] < h.wire().backwardPosition().z()
+            || z[0] > h.wire().forwardPosition().z()) ok[0] = false;
+        if (z[1] < h.wire().backwardPosition().z()
+            || z[1] > h.wire().forwardPosition().z()) ok[1] = false;
     }
     if ((! ok[0]) && (! ok[1])) {
-      link.position(tmp);
-      return -2;
+        link.position(tmp);
+        return -2;
     }
 
     //...Cal. xy position of crossing points...
@@ -4190,15 +4157,15 @@ ipOff2:
     p[0] = x + l[0] * v;
     p[1] = x + l[1] * v;
     if (_charge * (center.x() * p[0].y() - center.y() * p[0].x())  < 0.)
-      ok[0] = false;
+        ok[0] = false;
     if (_charge * (center.x() * p[1].y() - center.y() * p[1].x())  < 0.)
-      ok[1] = false;
+        ok[1] = false;
     if ((! ok[0]) && (! ok[1])) {
-      //        double tmp1 = _charge * (center.x() * p[0].y() - center.y() * p[0].x());
-      //        double tmp2 = _charge * (center.x() * p[1].y() - center.y() * p[1].x()) ;
-      //        if (link.leftRight() == 2) std::cout<<tmp1<<" "<<tmp2<<std::endl;
-      link.position(tmp);
-      return -3;
+        //        double tmp1 = _charge * (center.x() * p[0].y() - center.y() * p[0].x());
+        //        double tmp2 = _charge * (center.x() * p[1].y() - center.y() * p[1].x()) ;
+        //        if (link.leftRight() == 2) std::cout<<tmp1<<" "<<tmp2<<std::endl;
+        link.position(tmp);
+        return -3;
     }
 
     //...Which one is the best?... Study needed...
@@ -4209,11 +4176,11 @@ ipOff2:
     double cosdPhi = - center.dot((p[best] - center).unit()) / center.mag();
     double dPhi;
     if (fabs(cosdPhi) <= 1.0) {
-      dPhi = acos(cosdPhi);
+        dPhi = acos(cosdPhi);
     } else if (cosdPhi > 1.0) {
-      dPhi = 0.0;
+        dPhi = 0.0;
     } else {
-      dPhi = M_PI;
+        dPhi = M_PI;
     }
 
     //...Finish...
@@ -4222,11 +4189,10 @@ ipOff2:
     link.position(tmp);
 
     return 0;
-  }
+}
 
-  int
-  TTrack::szPosition(const TSegment& segment, TLink& a) const
-  {
+int
+TTrack::szPosition(const TSegment& segment, TLink& a) const {
 
     //...Pick up a wire which represents segment position...
     AList<TLink> links = segment.cores();
@@ -4235,10 +4201,10 @@ ipOff2:
     TLink* minL = links[0];
     float minDist = links[0]->drift();
     for (unsigned i = 1; i < n; i++) {
-      if (links[i]->hit()->drift() < minDist) {
-        minDist = links[i]->drift();
-        minL = links[i];
-      }
+        if (links[i]->hit()->drift() < minDist) {
+            minDist = links[i]->drift();
+            minL = links[i];
+        }
     }
 
     //...sz calculation...
@@ -4248,11 +4214,10 @@ ipOff2:
     int err = szPosition(a);
     if (err) return -2;
     return 0;
-  }
+}
 
-  int
-  TTrack::szPosition(const HepGeom::Point3D<double> & p, HepGeom::Point3D<double> & sz) const
-  {
+int
+TTrack::szPosition(const HepGeom::Point3D<double> & p, HepGeom::Point3D<double> & sz) const {
 
     //...Cal. arc length...
     HepGeom::Point3D<double> center = _helix->center();
@@ -4261,11 +4226,11 @@ ipOff2:
     double cosdPhi = - center.dot((xy - center).unit()) / center.mag();
     double dPhi;
     if (fabs(cosdPhi) <= 1.0) {
-      dPhi = acos(cosdPhi);
+        dPhi = acos(cosdPhi);
     } else if (cosdPhi > 1.0) {
-      dPhi = 0.0;
+        dPhi = 0.0;
     } else {
-      dPhi = M_PI;
+        dPhi = M_PI;
     }
 
     //...Finish...
@@ -4274,34 +4239,32 @@ ipOff2:
     sz.setZ(0.);
 
     return 0;
-  }
+}
 
-  void
-  TTrack::assign(unsigned hitMask)
-  {
+void
+TTrack::assign(unsigned hitMask) {
     hitMask |= CellHitUsed;
 
     unsigned n = _links.length();
     for (unsigned i = 0; i < n; i++) {
-      TLink* l = _links[i];
-      const Belle2::TRGCDCWireHit* h = l->hit();
+        TLink* l = _links[i];
+        const TWireHit * h = l->hit();
 
 #ifdef TRASAN_DEBUG
-      if (h->track()) {
-        std::cout << "TTrack::assign !!! hit(" << h->wire().name();
-        std::cout << ") already assigned" << std::endl;
-      }
+        if (h->track()) {
+            std::cout << "TTrack::assign !!! hit(" << h->wire().name();
+            std::cout << ") already assigned" << std::endl;
+        }
 #endif
 
-      //...This function will be moved to TTrackManager...
-      h->track((TTrack*) this);
-      h->state(h->state() | hitMask);
+        //...This function will be moved to TTrackManager...
+        h->track((TTrack*) this);
+        h->state(h->state() | hitMask);
     }
-  }
+}
 
-  THelix
-  TTrack::track2THelix(const rectrk_localz& t)
-  {
+THelix
+TTrack::track2THelix(const rectrk_localz& t) {
     CLHEP::HepVector a(5);
     CLHEP::Hep3Vector p(t.m_pivot[0], t.m_pivot[1], t.m_pivot[2]);
     CLHEP::HepSymMatrix er(5, 0);
@@ -4326,11 +4289,10 @@ ipOff2:
     er(5, 4) = t.m_error[13];
     er(5, 5) = t.m_error[14];
     return THelix(p, a, er);
-  }
+}
 
-  THelix
-  TTrack::track2THelix(const reccdc_trk& t)
-  {
+THelix
+TTrack::track2THelix(const reccdc_trk& t) {
     CLHEP::HepVector a(5);
     CLHEP::Hep3Vector p(t.m_pivot[0], t.m_pivot[1], t.m_pivot[2]);
     CLHEP::HepSymMatrix er(5, 0);
@@ -4355,11 +4317,10 @@ ipOff2:
     er(5, 4) = t.m_error[13];
     er(5, 5) = t.m_error[14];
     return THelix(p, a, er);
-  }
+}
 
-  THelix
-  TTrack::track2THelix(const mdst_trk_fit& t)
-  {
+THelix
+TTrack::track2THelix(const mdst_trk_fit& t) {
     CLHEP::HepVector a(5);
     CLHEP::Hep3Vector p(t.m_pivot_x, t.m_pivot_y, t.m_pivot_z);
     CLHEP::HepSymMatrix er(5, 0);
@@ -4384,11 +4345,10 @@ ipOff2:
     er(5, 4) = t.m_error[13];
     er(5, 5) = t.m_error[14];
     return THelix(p, a, er);
-  }
+}
 
-  std::string
-  TTrack::trackKinematics(const THelix& h)
-  {
+std::string
+TTrack::trackKinematics(const THelix& h) {
     static const HepGeom::Point3D<double> IP(0., 0., 0.);
     THelix hIp = h;
     hIp.pivot(IP);
@@ -4408,62 +4368,58 @@ ipOff2:
     else                                  s += "  ";
 
     for (unsigned i = 0; i < 4; i++) {
-      if (i) s += " ";
+        if (i) s += " ";
 
-      if (x[i] < 0.) s += "-";
-      else           s += " ";
+        if (x[i] < 0.) s += "-";
+        else           s += " ";
 
-      int y = int(fabs(x[i]));
-      s += itostring(y) + ".";
-      float z = fabs(x[i]);
-      for (unsigned j = 0; j < 3; j++) {
-        z *= 10.;
-        y = (int(z) % 10);
-        s += itostring(y);
-      }
+        int y = int(fabs(x[i]));
+        s += itostring(y) + ".";
+        float z = fabs(x[i]);
+        for (unsigned j = 0; j < 3; j++) {
+            z *= 10.;
+            y = (int(z) % 10);
+            s += itostring(y);
+        }
     }
 
     return s;
-  }
+}
 
-  std::string
-  TTrack::trackStatus(const TTrack& t)
-  {
+std::string
+TTrack::trackStatus(const TTrack& t) {
     return trackStatus(t.finder(),
                        t.type(),
                        t.quality(),
                        t.fitting(),
                        0,
                        0);
-  }
+}
 
-  std::string
-  TTrack::trackStatus(const reccdc_trk& c)
-  {
+std::string
+TTrack::trackStatus(const reccdc_trk &) {
 //     const reccdc_trk_add a = reccdc_trk_add::reccdc_trk_add();
 //     return trackStatus(a);
     return("not implemented yet");
-  }
+}
 
-  std::string
-  TTrack::trackStatus(const reccdc_trk_add& a)
-  {
+std::string
+TTrack::trackStatus(const reccdc_trk_add& a) {
     return trackStatus(a.m_decision,
                        a.m_kind,
                        a.m_quality,
                        a.m_stat,
                        a.m_mother,
                        a.m_daughter);
-  }
+}
 
-  std::string
-  TTrack::trackStatus(unsigned md,
-                      unsigned mk,
-                      unsigned mq,
-                      unsigned ms,
-                      unsigned mm,
-                      unsigned ma)
-  {
+std::string
+TTrack::trackStatus(unsigned md,
+                    unsigned mk,
+                    unsigned mq,
+                    unsigned ms,
+                    unsigned mm,
+                    unsigned ma) {
 
     std::string f;
     if (md & TrackOldConformalFinder) f += "o";
@@ -4505,11 +4461,10 @@ ipOff2:
 
     std::string p = " ";
     return f + p + k + p + b + p + s + p + itostring(m) + p + itostring(d);
-  }
+}
 
-  std::string
-  TTrack::trackInformation(const TTrack& t)
-  {
+std::string
+TTrack::trackInformation(const TTrack& t) {
     const AList<TLink> cores = t.cores();
     unsigned n = cores.length();
     unsigned nS = TLink::nStereoHits(cores);
@@ -4519,11 +4474,10 @@ ipOff2:
     //    if (THelixHasNan(t.helix())) p += " NaN";
     if (helixHasNan(t.helix())) p += " Han/Invalid";
     return trackInformation(nA, nS, n, t.chi2()) + p;
-  }
+}
 
-  std::string
-  TTrack::trackInformation(const reccdc_trk& r)
-  {
+std::string
+TTrack::trackInformation(const reccdc_trk& r) {
     std::string p;
     if (positiveDefinite(track2THelix(r))) p = " posi";
     else                                  p = " nega";
@@ -4533,11 +4487,10 @@ ipOff2:
                             r.m_nster,
                             r.m_nhits,
                             r.m_chiSq) + p;
-  }
+}
 
-  std::string
-  TTrack::trackInformation(unsigned nA, unsigned nS, unsigned n, float chisq)
-  {
+std::string
+TTrack::trackInformation(unsigned nA, unsigned nS, unsigned n, float chisq) {
     std::string s;
 
     s += "a" + itostring(int(nA));
@@ -4553,23 +4506,21 @@ ipOff2:
     s += itostring(y) + ".";
     float z = fabs(x);
     for (unsigned j = 0; j < 1; j++) {
-      z *= 10.;
-      y = (int(z) % 10);
-      s += itostring(y);
+        z *= 10.;
+        y = (int(z) % 10);
+        s += itostring(y);
     }
 
     return s;
-  }
+}
 
-  std::string
-  TTrack::trackLayerUsage(const TTrack& t)
-  {
+std::string
+TTrack::trackLayerUsage(const TTrack& t) {
     return TLink::layerUsage(t.links());
-  }
+}
 
-  bool
-  TTrack::positiveDefinite(const THelix& h)
-  {
+bool
+TTrack::positiveDefinite(const THelix& h) {
     const CLHEP::HepSymMatrix& e = h.Ea();
     CLHEP::HepSymMatrix e2 = e.sub(1, 2);
     CLHEP::HepSymMatrix e3 = e.sub(1, 3);
@@ -4582,31 +4533,30 @@ ipOff2:
     else if (e4.determinant() <= 0.) positive = false;
     else if (e.determinant() <= 0.) positive = false;
     return positive;
-  }
+}
 
-  bool
-  TTrack::helixHasNan(const THelix& h)
-  {
+bool
+TTrack::helixHasNan(const THelix& h) {
 #if defined(BELLE_DEBUG)
     try {
 #endif
-      const CLHEP::HepVector& a = h.a();
-      for (unsigned i = 0; i < 5; i++)
-        if (isnan(a[i]))
-          return true;
-      const CLHEP::HepSymMatrix& Ea = h.Ea();
-      for (unsigned i = 0; i < 5; i++)
-        for (unsigned j = 0; j <= i; j++)
-          if (isnan(Ea[i][j]))
-            return true;
-      return false;
+        const CLHEP::HepVector& a = h.a();
+        for (unsigned i = 0; i < 5; i++)
+            if (isnan(a[i]))
+                return true;
+        const CLHEP::HepSymMatrix& Ea = h.Ea();
+        for (unsigned i = 0; i < 5; i++)
+            for (unsigned j = 0; j <= i; j++)
+                if (isnan(Ea[i][j]))
+                    return true;
+        return false;
 #if defined(BELLE_DEBUG)
     } catch (std::string& e) {
-      std::cout << "TTrack::THelixHasNan::helix is invalid" << std::endl;
-      return true;
+        std::cout << "TTrack::THelixHasNan::helix is invalid" << std::endl;
+        return true;
     }
 #endif
-  }
+}
 
 //cnv THelix
 // TTrack::track2THelix(const gen_hepevt & t) {
@@ -4631,18 +4581,19 @@ ipOff2:
 //     return THelix(pos, mom, charge);
 // }
 
-  float
-  TTrack::distance(const TTrack& t0, const TTrack& t1)
-  {
+float
+TTrack::distance(const TTrack & t0, const TTrack & t1) {
 
     //...Check links...
     if (! t0.nCores()) return HUGE_VAL;
     if (! t1.nCores()) return HUGE_VAL;
 
     //...Get cross points to layers...
-    int err = 0;
-    err = TFinderBase::crossPointsByLayer(t0, _points0);
-    err = TFinderBase::crossPointsByLayer(t1, _points1);
+//    int err = 0;
+//    err = TFinderBase::crossPointsByLayer(t0, _points0);
+//    err = TFinderBase::crossPointsByLayer(t1, _points1);
+    TFinderBase::crossPointsByLayer(t0, _points0);
+    TFinderBase::crossPointsByLayer(t1, _points1);
 
     //...Get starting points...
     const unsigned i0 = TLink::innerMost(t0.cores())->wire()->layerId();
@@ -4651,64 +4602,65 @@ ipOff2:
     const unsigned o1 = TLink::outerMost(t1.cores())->wire()->layerId();
 
     //...Clear inner and outer points...
-    const Belle2::TRGCDC& cdc = * Belle2::TRGCDC::getTRGCDC();
+    const TCDC & cdc = * TCDC::getTCDC();
     const unsigned n = cdc.nLayers() + 1;
     for (unsigned i = 0; i < n; i++) {
-      if (i < i0)
-        _points0[i] = Origin;
-      if (i < i1)
-        _points1[i] = Origin;
-      if (i + 1 > o0)
-        _points0[i + 1] = Origin;
-      if (i + 1 > o1)
-        _points1[i + 1] = Origin;
+	if (i < i0)
+	    _points0[i] = Origin;
+	if (i < i1)
+	    _points1[i] = Origin;
+	if (i + 1 > o0)
+	    _points0[i + 1] = Origin;
+	if (i + 1 > o1)
+	    _points1[i + 1] = Origin;
     }
 
     //...Sum up distance in each layer...
     float d = 0;
     unsigned nd = 0;
     for (unsigned i = 0; i < n; i++) {
-      if (_points0[i] == Origin) continue;
-      if (_points1[i] == Origin) continue;
-      TPoint2D dd = _points1[i] - _points0[i];
-      d += dd.mag();
-      ++nd;
+	if (_points0[i] == Origin) continue;
+	if (_points1[i] == Origin) continue;
+	TPoint2D dd = _points1[i] - _points0[i];
+	d += dd.mag();
+	++nd;
 
 #ifdef TRASAN_DEBUG_DETAIL
-      std::cout << "        i=" << i << ",d=" << dd.mag() << std::endl;
+	std::cout << "        i=" << i << ",d=" << dd.mag() << std::endl;
 #endif
     }
 
     //...Average...
     if (nd)
-      d /= float(nd);
+	d /= float(nd);
     else
-      d = HUGE_VAL;
+	d = HUGE_VAL;
 
 #ifdef TRASAN_DEBUG_DETAIL
     std::cout << "        d(av)=" << d << ",n=" << nd << std::endl;
 
     if (d == 0) {
-      t0.dump("detail", "t0  ");
-      t1.dump("detail", "t1  ");
+	t0.dump("detail", "t0  ");
+	t1.dump("detail", "t1  ");
     }
 #endif
 
     return d;
-  }
+}
 
-  float
-  TTrack::distanceB(const TTrack& t0, const TTrack& t1)
-  {
+float
+TTrack::distanceB(const TTrack & t0, const TTrack & t1) {
 
     //...Check links...
     if (! t0.nCores()) return HUGE_VAL;
     if (! t1.nCores()) return HUGE_VAL;
 
     //...Get cross points to layers...
-    int err = 0;
-    err = TFinderBase::crossPointsByLayer(t0, _points0);
-    err = TFinderBase::crossPointsByLayer(t1, _points1);
+    // int err = 0;
+    // err = TFinderBase::crossPointsByLayer(t0, _points0);
+    // err = TFinderBase::crossPointsByLayer(t1, _points1);
+    TFinderBase::crossPointsByLayer(t0, _points0);
+    TFinderBase::crossPointsByLayer(t1, _points1);
 
     //...Get starting points...
     if (! TLink::innerMost(t0.cores())) return HUGE_VAL;
@@ -4721,33 +4673,33 @@ ipOff2:
     const unsigned o1 = TLink::outerMost(t1.cores())->wire()->layerId();
 
     //...Clear inner and outer points...
-    const Belle2::TRGCDC& cdc = * Belle2::TRGCDC::getTRGCDC();
+    const TCDC & cdc = * TCDC::getTCDC();
     const unsigned n = cdc.nLayers() + 1;
     for (unsigned i = 0; i < n; i++) {
-      if (i < i0)
-        _points0[i] = Origin;
-      if (i < i1)
-        _points1[i] = Origin;
-      if (i + 1 > o0)
-        _points0[i + 1] = Origin;
-      if (i + 1 > o1)
-        _points1[i + 1] = Origin;
+	if (i < i0)
+	    _points0[i] = Origin;
+	if (i < i1)
+	    _points1[i] = Origin;
+	if (i + 1 > o0)
+	    _points0[i + 1] = Origin;
+	if (i + 1 > o1)
+	    _points1[i + 1] = Origin;
     }
 
     //...Set minr and maxr...
     float dA = 0;
     unsigned nd = 0;
     for (unsigned i = 0; i < n; i++) {
-      if (_points0[i] == Origin) continue;
-      if (_points1[i] == Origin) continue;
-      TPoint2D dd = _points1[i] - _points0[i];
-      dA += dd.mag();
-      ++nd;
+	if (_points0[i] == Origin) continue;
+	if (_points1[i] == Origin) continue;
+	TPoint2D dd = _points1[i] - _points0[i];
+	dA += dd.mag();
+	++nd;
     }
     if (nd)
-      dA /= float(nd);
+	dA /= float(nd);
     else
-      dA = HUGE_VAL;
+	dA = HUGE_VAL;
 
     if (dA > 3.) return dA;
 
@@ -4760,28 +4712,28 @@ ipOff2:
     unsigned nd_to_1(0), nd_to_0(0);
 
     for (unsigned i = 0; i < n; i++) {
-      if (_points0[i] == Origin) continue;
-      if (_points1[i] == Origin) continue;
+	if (_points0[i] == Origin) continue;
+	if (_points1[i] == Origin) continue;
 
-      float dd_to_1 = std::abs((_points0[i] - c1).mag() - radius1);
-      d_to_1 += dd_to_1;
-      ++nd_to_1;
+	float dd_to_1 = std::abs((_points0[i] - c1).mag() - radius1);
+	d_to_1 += dd_to_1;
+	++nd_to_1;
 
-      float dd_to_0 = std::abs((_points1[i] - c0).mag() - radius0);
-      d_to_0 += dd_to_0;
-      ++nd_to_0;
+	float dd_to_0 = std::abs((_points1[i] - c0).mag() - radius0);
+	d_to_0 += dd_to_0;
+	++nd_to_0;
 
 #ifdef TRASAN_DEBUG_DETAIL
-      std::cout << "        i=" << i << ",dd_to_1,dd_to_0=" << dd_to_1 << " " << dd_to_0 << std::endl;
+	std::cout << "        i=" << i << ",dd_to_1,dd_to_0=" << dd_to_1 << " " << dd_to_0 << std::endl;
 #endif
     }
 
     //...Average...
     float dB = d_to_1 + d_to_0;
     if (nd_to_1 + nd_to_0)
-      dB /= float(nd_to_1 + nd_to_0);
+	dB /= float(nd_to_1 + nd_to_0);
     else
-      dB = HUGE_VAL;
+	dB = HUGE_VAL;
 
     if (dA < dB) dB = dA;
 
@@ -4790,12 +4742,11 @@ ipOff2:
 #endif
 
     return dB;
-  }
+}
 
 // from by jtanaka
-  double
-  TTrack::chisq2confLevel(int n, double chi2)
-  {
+double
+TTrack::chisq2confLevel(int n, double chi2) {
 #define SRTOPI 0.7978846
 #define UPL 340.0
 #define ROOT2I 0.70710678
@@ -4808,69 +4759,68 @@ ipOff2:
     double srty;
 
     if ((n <= 0) || (chi2 < 0.0)) {
-      return prob;
+        return prob;
     }
     if (n > 60) {
-      temp_n = (double)n;
-      srty = sqrt(chi2) - sqrt(temp_n - 0.5);
-      if (srty < 12.0) {
-        prob = 0.5 * erfc(srty);
+        temp_n = (double)n;
+        srty = sqrt(chi2) - sqrt(temp_n - 0.5);
+        if (srty < 12.0) {
+            prob = 0.5 * erfc(srty);
+            return prob;
+        }
         return prob;
-      }
-      return prob;
     }
     if (chi2 > UPL) {
-      return prob;
+        return prob;
     }
     sum = exp(-0.5 * chi2);
     term = sum;
     m = (int)floor(n / 2);
 
     if (2 * m == n) {
-      if (m == 1) {
-        prob = sum;
-        return prob;
-      } else {
-        for (i = 2; i < m + 1; i++) {
-          temp_i = (double)i;
-          term = 0.5 * chi2 * term / (temp_i - 1.0);
-          sum = sum + term;
+        if (m == 1) {
+            prob = sum;
+            return prob;
+        } else {
+            for (i = 2; i < m + 1; i++) {
+                temp_i = (double)i;
+                term = 0.5 * chi2 * term / (temp_i - 1.0);
+                sum = sum + term;
 
+            }
+            prob = sum;
+            return prob;
         }
-        prob = sum;
-        return prob;
-      }
     } else {
-      srty = sqrt(chi2);
-      prob = erfc(ROOT2I * srty);
-      if (n == 1) {
-        return prob;
-      }
-      if (n == 3) {
-        prob = SRTOPI * srty * sum + prob;
-        return prob;
-      } else {
-        k = m - 1;
-        for (i = 1; i < k + 1; i++) {
-          temp_i = (double)i;
-          term = term * chi2 / (2.0 * temp_i + 1.0);
-          sum = sum + term;
+        srty = sqrt(chi2);
+        prob = erfc(ROOT2I * srty);
+        if (n == 1) {
+            return prob;
         }
-        prob = SRTOPI * srty * sum + prob;
-        return prob;
-      }
+        if (n == 3) {
+            prob = SRTOPI * srty * sum + prob;
+            return prob;
+        } else {
+            k = m - 1;
+            for (i = 1; i < k + 1; i++) {
+                temp_i = (double)i;
+                term = term * chi2 / (2.0 * temp_i + 1.0);
+                sum = sum + term;
+            }
+            prob = SRTOPI * srty * sum + prob;
+            return prob;
+        }
     }
-  }
+}
 
-  int
-  TTrack::intersection(const HepGeom::Point3D<double> & c1,
-                       double r1,
-                       const HepGeom::Point3D<double> & c2,
-                       double r2,
-                       double eps,
-                       HepGeom::Point3D<double> & x1,
-                       HepGeom::Point3D<double> & x2)
-  {
+int
+TTrack::intersection(const HepGeom::Point3D<double> & c1,
+                     double r1,
+                     const HepGeom::Point3D<double> & c2,
+                     double r2,
+                     double eps,
+                     HepGeom::Point3D<double> & x1,
+                     HepGeom::Point3D<double> & x2) {
 
     double c0x = c2.x() - c1.x() ;
     double c0y = c2.y() - c1.y() ;
@@ -4883,25 +4833,25 @@ ipOff2:
     // no intersections
 
     if (c0 > Radd + eps || c0 < 0.001 || c0 < Rsub - eps) {
-      //-- debug
-      // std::cout << "Int2Cir return 0 " << std::endl;
-      //-- debug end
-      return 0 ;
+        //-- debug
+        // std::cout << "Int2Cir return 0 " << std::endl;
+        //-- debug end
+        return 0 ;
     }
 
     // single intersection
 
     else {
-      if (c0 > Radd - eps) {
-        x1.setX(c1.x() + rr1 * c0x / c0);
-        x1.setY(c1.y() + rr1 * c0y / c0);
-        x2.setX(0.0);
-        x2.setY(0.0);
-        //--debug
-        // std::cout << "Int2Cir return 1" << std::endl;
-        //--debug end
-        return 1 ;
-      }
+        if (c0 > Radd - eps) {
+            x1.setX(c1.x() + rr1 * c0x / c0);
+            x1.setY(c1.y() + rr1 * c0y / c0);
+            x2.setX(0.0);
+            x2.setY(0.0);
+            //--debug
+            // std::cout << "Int2Cir return 1" << std::endl;
+            //--debug end
+            return 1 ;
+        }
     }
 
     // two intersections
@@ -4918,6 +4868,6 @@ ipOff2:
     //-- debug end
     return 2 ;
 
-  }
+}
 
 } // namespace Belle

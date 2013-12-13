@@ -183,11 +183,6 @@
 #ifndef TConformalFinder_FLAG_
 #define TConformalFinder_FLAG_
 
-#ifdef TRASAN_DEBUG_DETAIL
-#ifndef TRASAN_DEBUG
-#define TRASAN_DEBUG
-#endif
-#endif
 #define HEP_SHORT_NAMES
 
 #include "tracking/modules/trasan/ConstAList.h"
@@ -202,16 +197,12 @@
 #include "tracking/modules/trasan/TWindowGTK.h"
 #endif
 
-namespace Belle2 {
-  class TRGCDC;
-}
-
 namespace Belle {
 
-  class TPoint2D;
+class TPoint2D;
 
 /// A class to find tracks with the conformal method.
-  class TConformalFinder : public TFinderBase {
+class TConformalFinder : public TFinderBase {
 
   public:
     /// Constructor.
@@ -257,8 +248,8 @@ namespace Belle {
     void init(void);
 
     /// finds tracks.
-    int doit(const CAList<Belle2::TRGCDCWireHit> & axialHits,
-             const CAList<Belle2::TRGCDCWireHit> & stereoHits,
+    int doit(const CAList<TWireHit> & axialHits,
+             const CAList<TWireHit> & stereoHits,
              AList<TTrack> & tracks,
              AList<TTrack> & tracks2D);
 
@@ -343,7 +334,8 @@ namespace Belle {
     Vector3D direction(const TSegment&) const;
 
   public:// Utility functions
-    static const Belle2::TRGCDCWire* conformal2Wire(const HepGeom::Point3D<double> & conformalPoint);
+    static const TWire * conformal2Wire(
+	const HepGeom::Point3D<double> & conformalPoint);
 
   private:// Parameters given by arguments
     const bool _fastFinder;
@@ -383,14 +375,14 @@ namespace Belle {
     AList<TTrack> _3DTracks;
 
     struct summary {
-      unsigned _nEvents;
-      unsigned _nTracksFast3D;
-      unsigned _nTracksSlow3D;
-      unsigned _nTracksFast2D;
-      unsigned _nTracksSlow2D;
-      unsigned _nTracksFast2DBadQuality;
-      unsigned _nTracksSlow2DBadQuality;
-      unsigned _dummy;
+        unsigned _nEvents;
+        unsigned _nTracksFast3D;
+        unsigned _nTracksSlow3D;
+        unsigned _nTracksFast2D;
+        unsigned _nTracksSlow2D;
+        unsigned _nTracksFast2DBadQuality;
+        unsigned _nTracksSlow2DBadQuality;
+        unsigned _dummy;
     };
     struct summary* _s;
 
@@ -418,50 +410,33 @@ namespace Belle {
 //           const AList<TSegment> seg[2][6],
 //           const std::string & text) const;
 #endif
-  };
+};
 
 //-----------------------------------------------------------------------------
 
-#ifdef TConformalFinder_NO_INLINE
-#define inline
-#else
-#undef inline
-#define TConformalFinder_INLINE_DEFINE_HERE
-#endif
-
-#ifdef TConformalFinder_INLINE_DEFINE_HERE
-
-  inline
-  std::string
-  TConformalFinder::name(void) const
-  {
+inline
+std::string
+TConformalFinder::name(void) const {
     return "Conformal Finder";
-  }
+}
 
-  inline
-  bool
-  TConformalFinder::doT0Reset(bool a)
-  {
+inline
+bool
+TConformalFinder::doT0Reset(bool a) {
     return _doT0Reset = a;
-  }
+}
 
-  inline
-  bool
-  TConformalFinder::T0ResetDone(void) const
-  {
+inline
+bool
+TConformalFinder::T0ResetDone(void) const {
     return _T0ResetDone;
-  }
+}
 
-  inline
-  void
-  TConformalFinder::init(void)
-  {
+inline
+void
+TConformalFinder::init(void) {
     return;
-  }
-
-#endif
-
-#undef inline
+}
 
 } // namespace Belle
 

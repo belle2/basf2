@@ -34,24 +34,20 @@
 
 namespace Belle {
 
-  TFitter::TFitter(const std::string& name) : _name(name)
-  {
-  }
+TFitter::TFitter(const std::string& name) : _name(name) {
+}
 
-  TFitter::~TFitter()
-  {
-  }
+TFitter::~TFitter() {
+}
 
-  void
-  TFitter::fitDone(TTrackBase& t) const
-  {
+void
+TFitter::fitDone(TTrackBase& t) const {
     t._fitted = true;
-  }
+}
 
-  void
-  TFitter::dump(const std::string&, const std::string&) const
-  {
-  }
+void
+TFitter::dump(const std::string&, const std::string&) const {
+}
 
 } // namespace Belle
 

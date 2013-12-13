@@ -18,13 +18,12 @@
 
 #include <strings.h>
 #include <string>
-
 #include "tracking/modules/trasan/THoughPlaneBase.h"
 
 namespace Belle {
 
 /// A class to represent a Hough parameter plane.
-  class THoughPlaneBoolean : public THoughPlaneBase {
+class THoughPlaneBoolean : public THoughPlaneBase {
 
   public:
     /// Contructor.
@@ -81,92 +80,87 @@ namespace Belle {
     unsigned* _nActive;
 
     friend class THoughPlaneMulti2;
-  };
+};
 
-  inline
-  unsigned
-  THoughPlaneBoolean::setEntry(unsigned serialId, unsigned n)
-  {
+//-----------------------------------------------------------------------------
+
+inline
+unsigned
+THoughPlaneBoolean::setEntry(unsigned serialId, unsigned n) {
     const unsigned b0 = serialId / 32;
     const unsigned b1 = serialId % 32;
 
 #ifdef TRASAN_DEBUG
     if (b0 >= _n)
-      std::cout << "THoughPlaneBoolean !!! given serialId is too large : "
-                << "max=" << _n * 32 << ",serialId=" << serialId << std::endl;
+        std::cout << "THoughPlaneBoolean !!! given serialId is too large : "
+                  << "max=" << _n * 32 << ",serialId=" << serialId << std::endl;
 #endif
 
     if (n > 0)
-      _cell[b0] |= (1 << b1);
+        _cell[b0] |= (1 << b1);
     else
-      _cell[b0] &= (~(1 << b1));
+        _cell[b0] &= (~(1 << b1));
 
     return (_cell[b0] >> b1) & 1;
-  }
+}
 
-  inline
-  void
-  THoughPlaneBoolean::clear(void)
-  {
+inline
+void
+THoughPlaneBoolean::clear(void) {
     bzero(_cell, _n * sizeof(unsigned));
     THoughPlaneBase::clear();
-  }
+}
 
-  inline
-  void
-  THoughPlaneBoolean::vote(float rx,
-                           float ry,
-                           const THoughTransformation& hough,
-                           int weight)
-  {
+inline
+void
+THoughPlaneBoolean::vote(float rx,
+                         float ry,
+                         const THoughTransformation& hough,
+                         int weight) {
     vote(rx, ry, 0, hough, weight);
-  }
+}
 
-  inline
-  unsigned
-  THoughPlaneBoolean::entry(unsigned serialId) const
-  {
+inline
+unsigned
+THoughPlaneBoolean::entry(unsigned serialId) const {
     const unsigned b0 = serialId / 32;
     const unsigned b1 = serialId % 32;
 
 #ifdef TRASAN_DEBUG
     if (b0 >= _n)
-      std::cout << "THoughPlaneBoolean::entry !!! given serialId is too large"
-                << " : "
-                << "max=" << _n * 32 << ",serialId=" << serialId << std::endl;
+        std::cout << "THoughPlaneBoolean::entry !!! given serialId is too large"
+                  << " : "
+                  << "max=" << _n * 32 << ",serialId=" << serialId << std::endl;
 #endif
 
     return (_cell[b0] >> b1) & 1;
-  }
+}
 
-  inline
-  unsigned
-  THoughPlaneBoolean::entry(unsigned x, unsigned y) const
-  {
+inline
+unsigned
+THoughPlaneBoolean::entry(unsigned x, unsigned y) const {
     return entry(nY() * x + y);
-  }
+}
 
-  inline
-  int
-  THoughPlaneBoolean::maxEntry(void) const
-  {
+inline
+int
+THoughPlaneBoolean::maxEntry(void) const {
 #ifdef TRASAN_DEBUG
     std::cout << "THoughPlaneBoolean::maxEntry !!! "
               << " this function has no meaning for THoughPlaneBooolean object"
               << std::endl;
 #endif
     return 1;
-  }
+}
 
-  inline
-  void
-  THoughPlaneBoolean::add(unsigned a, int b)
-  {
+inline
+void
+THoughPlaneBoolean::add(unsigned a, int b) {
     if (b > 0)
-      setEntry(a, 1);
+        setEntry(a, 1);
     else
-      setEntry(a, 0);
-  }
+        setEntry(a, 0);
+}
 
 } // namespace Belle
 

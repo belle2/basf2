@@ -13,14 +13,13 @@
 //-----------------------------------------------------------------------------
 
 
-
 #ifdef TRASAN_WINDOW_GTK
 
 #include <pangomm/init.h>
 #include <iostream>
 #include "tracking/modules/trasan/TWindowConformalDrawingArea.h"
 #include "tracking/modules/trasan/Trasan.h"
-#include "trg/cdc/WireHit.h"
+#include "tracking/modules/trasan/TWireHit.h"
 #include "tracking/modules/trasan/TLink.h"
 #include "tracking/modules/trasan/TTrackBase.h"
 #include "tracking/modules/trasan/TSegment.h"
@@ -66,19 +65,17 @@ TWindowConformalDrawingArea::TWindowConformalDrawingArea(int size,
     add_events(Gdk::EXPOSURE_MASK | Gdk::BUTTON_PRESS_MASK);
 }
 
-  TWindowConformalDrawingArea::~TWindowConformalDrawingArea()
-  {
-  }
+TWindowConformalDrawingArea::~TWindowConformalDrawingArea() {
+}
 
-  void
-  TWindowConformalDrawingArea::on_realize()
-  {
+void
+TWindowConformalDrawingArea::on_realize() {
     Gtk::DrawingArea::on_realize();
     _window = get_window();
     _gc = Gdk::GC::create(_window);
     _window->set_background(_white);
     _window->clear();
-  }
+}
 
 bool
 TWindowConformalDrawingArea::on_expose_event(GdkEventExpose*) {
@@ -90,18 +87,16 @@ TWindowConformalDrawingArea::on_expose_event(GdkEventExpose*) {
     return true;
 }
 
-  bool
-  TWindowConformalDrawingArea::on_button_press_event(GdkEventButton* e)
-  {
+bool
+TWindowConformalDrawingArea::on_button_press_event(GdkEventButton* e) {
     _x = xR(e->x);
     _y = yR(- e->y);
     on_expose_event((GdkEventExpose*) NULL);
     return true;
-  }
+}
 
-  void
-  TWindowConformalDrawingArea::drawCDC(void)
-  {
+void
+TWindowConformalDrawingArea::drawCDC(void) {
 
     //...Axis...
     _gc->set_foreground(_grey);
@@ -167,33 +162,31 @@ TWindowConformalDrawingArea::on_expose_event(GdkEventExpose*) {
                       int(2 * outerR * _scale),
                       0,
                       360 * 64);
-  }
+}
 
-  void
-  TWindowConformalDrawingArea::draw(void)
-  {
+void
+TWindowConformalDrawingArea::draw(void) {
     unsigned n = _objects.length();
     for (unsigned i = 0; i < n; i++) {
-      const TTrackBase& track = * _objects[i];
-      if (track.objectType() == TrackBase)
-        drawBase(track, * _colors[i]);
+        const TTrackBase& track = * _objects[i];
+        if (track.objectType() == TrackBase)
+            drawBase(track, * _colors[i]);
 //  else if (track.objectType() == Line)
 //      drawLine((const TLine &) track, * _colors[i]);
-      else if (track.objectType() == Track)
-        drawTrack((const TTrack&) track, * _colors[i]);
-      else if (track.objectType() == Segment)
-        drawSegment((const TSegment&) track, * _colors[i]);
-      else if (track.objectType() == Circle)
-        drawCircle((const TCircle&) track, * _colors[i]);
-      else
-        std::cout << "TWindowConformalDrawingArea::draw !!! can't display"
-                  << std::endl;
+        else if (track.objectType() == Track)
+            drawTrack((const TTrack&) track, * _colors[i]);
+        else if (track.objectType() == Segment)
+            drawSegment((const TSegment&) track, * _colors[i]);
+        else if (track.objectType() == Circle)
+            drawCircle((const TCircle&) track, * _colors[i]);
+        else
+            std::cout << "TWindowConformalDrawingArea::draw !!! can't display"
+                      << std::endl;
     }
-  }
+}
 
-  void
-  TWindowConformalDrawingArea::drawBase(const TTrackBase& base, Gdk::Color& c)
-  {
+void
+TWindowConformalDrawingArea::drawBase(const TTrackBase& base, Gdk::Color& c) {
     Glib::RefPtr<Gdk::Colormap> colormap = get_default_colormap();
     colormap->alloc_color(c);
     _gc->set_foreground(c);
@@ -205,41 +198,40 @@ TWindowConformalDrawingArea::on_expose_event(GdkEventExpose*) {
     const AList<TLink> & links = base.links();
     unsigned n = links.length();
     for (unsigned i = 0; i < n; i++) {
-      if (links[i]->wire() == NULL) continue;
-      if (! _stereo)
-        if (links[i]->wire()->stereo())
-          continue;
-      if (! _axial)
-        if (links[i]->wire()->axial())
-          continue;
+        if (links[i]->wire() == NULL) continue;
+        if (! _stereo)
+            if (links[i]->wire()->stereo())
+                continue;
+        if (! _axial)
+            if (links[i]->wire()->axial())
+                continue;
 
-      //...Points...
-      const HepGeom::Point3D<double> & p = links[i]->wire()->forwardPosition();
-      //  const HepGeom::Point3D<double> & pz0 = links[i]->wire()->xyPosition();
-      double radius = links[i]->hit()->drift();
-      //  std::cout << "p=" << p << " drift=" << radius << std::endl;
+        //...Points...
+        const HepGeom::Point3D<double> & p = links[i]->wire()->forwardPosition();
+        //  const HepGeom::Point3D<double> & pz0 = links[i]->wire()->xyPosition();
+        double radius = links[i]->hit()->drift();
+        //  std::cout << "p=" << p << " drift=" << radius << std::endl;
 
-      _window->draw_arc(_gc,
-                        0,
-                        x((p.x() - radius) * 10),
-                        y((p.y() + radius) * 10),
-                        int(2 * radius * 10 * _scale),
-                        int(2 * radius * 10 * _scale),
-                        0,
-                        360 * 64);
-      if (_wireName) {
-        Glib::ustring wn = links[i]->wire()->name().c_str();
-        _pl->set_text(wn);
-        _window->draw_layout(_gc, x(p.x() * 10.), y(p.y() * 10.), _pl);
-      }
+        _window->draw_arc(_gc,
+                          0,
+                          x((p.x() - radius) * 10),
+                          y((p.y() + radius) * 10),
+                          int(2 * radius * 10 * _scale),
+                          int(2 * radius * 10 * _scale),
+                          0,
+                          360 * 64);
+        if (_wireName) {
+            Glib::ustring wn = links[i]->wire()->name().c_str();
+            _pl->set_text(wn);
+            _window->draw_layout(_gc, x(p.x() * 10.), y(p.y() * 10.), _pl);
+        }
     }
 
     colormap->free_color(c);
-  }
+}
 
-  void
-  TWindowConformalDrawingArea::drawSegment(const TSegment& base, Gdk::Color& c)
-  {
+void
+TWindowConformalDrawingArea::drawSegment(const TSegment& base, Gdk::Color& c) {
     Glib::RefPtr<Gdk::Colormap> colormap = get_default_colormap();
     colormap->alloc_color(c);
     _gc->set_foreground(c);
@@ -253,64 +245,63 @@ TWindowConformalDrawingArea::on_expose_event(GdkEventExpose*) {
     double lx = 0;
     double ly = 0;
     for (unsigned i = 0; i < n; i++) {
-      if (links[i]->wire() == NULL) continue;
-      if (! _stereo)
-        if (links[i]->wire()->stereo())
-          continue;
-      if (! _axial)
-        if (links[i]->wire()->axial())
-          continue;
+        if (links[i]->wire() == NULL) continue;
+        if (! _stereo)
+            if (links[i]->wire()->stereo())
+                continue;
+        if (! _axial)
+            if (links[i]->wire()->axial())
+                continue;
 
-      //...Points...
-      const HepGeom::Point3D<double> & p = links[i]->wire()->forwardPosition();
-      double radius = links[i]->hit()->drift();
-      _window->draw_arc(_gc,
-                        0,
-                        x((p.x() - radius) * 10),
-                        y((p.y() + radius) * 10),
-                        int(2 * radius * 10 * _scale),
-                        int(2 * radius * 10 * _scale),
-                        0,
-                        360 * 64);
-      if (_wireName) {
-        Glib::ustring wn = links[i]->wire()->name().c_str();
-        _pl->set_text(wn);
-        _window->draw_layout(_gc, x(p.x() * 10.), y(p.y() * 10.), _pl);
-      }
+        //...Points...
+        const HepGeom::Point3D<double> & p = links[i]->wire()->forwardPosition();
+        double radius = links[i]->hit()->drift();
+        _window->draw_arc(_gc,
+                          0,
+                          x((p.x() - radius) * 10),
+                          y((p.y() + radius) * 10),
+                          int(2 * radius * 10 * _scale),
+                          int(2 * radius * 10 * _scale),
+                          0,
+                          360 * 64);
+        if (_wireName) {
+            Glib::ustring wn = links[i]->wire()->name().c_str();
+            _pl->set_text(wn);
+            _window->draw_layout(_gc, x(p.x() * 10.), y(p.y() * 10.), _pl);
+        }
 
-      //...Lines...
-      if (i) {
-        _window->draw_line(_gc,
-                           x(lx * 10),
-                           y(ly * 10),
-                           x(p.x() * 10),
-                           y(p.y() * 10));
-      }
-      lx = p.x();
-      ly = p.y();
+        //...Lines...
+        if (i) {
+            _window->draw_line(_gc,
+                               x(lx * 10),
+                               y(ly * 10),
+                               x(p.x() * 10),
+                               y(p.y() * 10));
+        }
+        lx = p.x();
+        ly = p.y();
     }
 
     //...Draw segment lines...
     const AList<TSegment> & inners = base.innerLinks();
     for (unsigned i = 0; i < (unsigned) inners.length(); i++) {
-      _gc->set_foreground(_grey);
-      const HepGeom::Point3D<double> & p
-        = (inners[i]->outers())[0]->wire()->forwardPosition();
-      const HepGeom::Point3D<double> & q
-        = (base.inners())[0]->wire()->forwardPosition();
-      _window->draw_line(_gc,
-                         x(p.x() * 10),
-                         y(p.y() * 10),
-                         x(q.x() * 10),
-                         y(q.y() * 10));
+        _gc->set_foreground(_grey);
+        const HepGeom::Point3D<double> & p
+            = (inners[i]->outers())[0]->wire()->forwardPosition();
+        const HepGeom::Point3D<double> & q
+            = (base.inners())[0]->wire()->forwardPosition();
+        _window->draw_line(_gc,
+                           x(p.x() * 10),
+                           y(p.y() * 10),
+                           x(q.x() * 10),
+                           y(q.y() * 10));
     }
 
     colormap->free_color(c);
-  }
+}
 
-  void
-  TWindowConformalDrawingArea::drawTrack(const TTrack& t, Gdk::Color& c)
-  {
+void
+TWindowConformalDrawingArea::drawTrack(const TTrack& t, Gdk::Color& c) {
     Glib::RefPtr<Gdk::Colormap> colormap = get_default_colormap();
     colormap->alloc_color(c);
     _gc->set_foreground(c);
@@ -324,39 +315,39 @@ TWindowConformalDrawingArea::on_expose_event(GdkEventExpose*) {
     const AList<TLink> & links = t.links();
     unsigned n = links.length();
     for (unsigned i = 0; i < n; i++) {
-      if (links[i]->wire() == NULL) continue;
-      if (! _stereo)
-        if (links[i]->wire()->stereo())
-          continue;
-      if (! _axial)
-        if (links[i]->wire()->axial())
-          continue;
+        if (links[i]->wire() == NULL) continue;
+        if (! _stereo)
+            if (links[i]->wire()->stereo())
+                continue;
+        if (! _axial)
+            if (links[i]->wire()->axial())
+                continue;
 
-      //...Points...
-      // const HepGeom::Point3D<double> & p =
-      //     links[i]->wire()->forwardPosition();
-      const HepGeom::Point3D<double> & p = links[i]->positionOnWire();
-      double radius = links[i]->hit()->drift();
-      _window->draw_arc(_gc,
-                        0,
-                        x((p.x() - radius) * 10),
-                        y((p.y() + radius) * 10),
-                        int(2 * radius * 10 * _scale),
-                        int(2 * radius * 10 * _scale),
-                        0,
-                        360 * 64);
-      if (_wireName) {
-        Glib::ustring wn = links[i]->wire()->name().c_str();
-        _pl->set_text(wn);
-        _window->draw_layout(_gc, x(p.x() * 10.), y(p.y() * 10.), _pl);
-      }
+        //...Points...
+        // const HepGeom::Point3D<double> & p =
+        //     links[i]->wire()->forwardPosition();
+        const HepGeom::Point3D<double> & p = links[i]->positionOnWire();
+        double radius = links[i]->hit()->drift();
+        _window->draw_arc(_gc,
+                          0,
+                          x((p.x() - radius) * 10),
+                          y((p.y() + radius) * 10),
+                          int(2 * radius * 10 * _scale),
+                          int(2 * radius * 10 * _scale),
+                          0,
+                          360 * 64);
+        if (_wireName) {
+            Glib::ustring wn = links[i]->wire()->name().c_str();
+            _pl->set_text(wn);
+            _window->draw_layout(_gc, x(p.x() * 10.), y(p.y() * 10.), _pl);
+        }
     }
 
     //...Check a track...
     if (t.cores().length() == 0) {
-      t.dump("detail", "Can not draw a track");
-      colormap->free_color(c);
-      return;
+        t.dump("detail", "Can not draw a track");
+        colormap->free_color(c);
+        return;
     }
 
     //...Draw a track...
@@ -365,9 +356,9 @@ TWindowConformalDrawingArea::on_expose_event(GdkEventExpose*) {
     const HepGeom::Point3D<double> & h = hIp.center();
     double radius = fabs(t.radius());
     const HepGeom::Point3D<double> pIn =
-      TLink::innerMost(t.cores())->positionOnTrack() - h;
+        TLink::innerMost(t.cores())->positionOnTrack() - h;
     const HepGeom::Point3D<double> pOut =
-      TLink::outerMost(t.cores())->positionOnTrack() - h;
+        TLink::outerMost(t.cores())->positionOnTrack() - h;
     double a0 = atan2(pIn.y(), pIn.x()) / M_PI * 180;
     double a1 = atan2(pOut.y(), pOut.x()) / M_PI * 180;
     double d = a1 - a0;
@@ -384,7 +375,7 @@ TWindowConformalDrawingArea::on_expose_event(GdkEventExpose*) {
 
     //...Track name...
     const HepGeom::Point3D<double> pn =
-      TLink::outerMost(t.cores())->positionOnTrack();
+        TLink::outerMost(t.cores())->positionOnTrack();
     Glib::ustring wn = t.name();
     _pl->set_text(wn);
     _window->draw_layout(_gc, x(pn.x() * 10.), y(pn.y() * 10.), _pl);
@@ -392,73 +383,67 @@ TWindowConformalDrawingArea::on_expose_event(GdkEventExpose*) {
     colormap->free_color(c);
 
     std::cout << "    a track drawn:" << t.name() << std::endl;
-  }
+}
 
-  void
-  TWindowConformalDrawingArea::resetPosition(void)
-  {
+void
+TWindowConformalDrawingArea::resetPosition(void) {
     if (_winw < _winh)
-      _scale = double(_winw) / _outerR / 2;
+        _scale = double(_winw) / _outerR / 2;
     else
-      _scale = double(_winh) / _outerR / 2;
+        _scale = double(_winh) / _outerR / 2;
 
     _x = _y = 0;
     on_expose_event((GdkEventExpose*) NULL);
-  }
+}
 
-  void
-  TWindowConformalDrawingArea::append(const CAList<Belle2::TRGCDCWireHit> & list,
-                                      Gdk::Color c)
-  {
+void
+TWindowConformalDrawingArea::append(const CAList<TWireHit> & list,
+                                    Gdk::Color c) {
     AList<TLink> links;
     for (unsigned i = 0; i < (unsigned) list.length(); i++)
-      links.append(new TLink(NULL, list[i]));
+        links.append(new TLink(NULL, list[i]));
     _selfTLinks.append(links);
     TTrackBase* base = new TTrackBase(links);
     _selfObjects.append(base);
     _objects.append(base);
     _colors.append(new Gdk::Color(c));
     on_expose_event((GdkEventExpose*) NULL);
-  }
+}
 
-  void
-  TWindowConformalDrawingArea::append(const AList<TLink> & list, Gdk::Color c)
-  {
+void
+TWindowConformalDrawingArea::append(const AList<TLink> & list, Gdk::Color c) {
     TTrackBase* t = new TTrackBase(list);
     _selfObjects.append(t);
     _objects.append(t);
     _colors.append(new Gdk::Color(c));
     on_expose_event((GdkEventExpose*) NULL);
-  }
+}
 
-  void
-  TWindowConformalDrawingArea::append(const AList<TSegment> & list,
-                                      Gdk::Color c)
-  {
+void
+TWindowConformalDrawingArea::append(const AList<TSegment> & list,
+                                    Gdk::Color c) {
     for (unsigned i = 0; i < unsigned(list.length()); i++) {
-      TSegment* s = new TSegment(* list[i]);
-      _selfObjects.append(s);
-      _objects.append(s);
-      _colors.append(new Gdk::Color(c));
+        TSegment* s = new TSegment(* list[i]);
+        _selfObjects.append(s);
+        _objects.append(s);
+        _colors.append(new Gdk::Color(c));
     }
     on_expose_event((GdkEventExpose*) NULL);
-  }
+}
 
-  void
-  TWindowConformalDrawingArea::append(const AList<TTrack> & list, Gdk::Color c)
-  {
+void
+TWindowConformalDrawingArea::append(const AList<TTrack> & list, Gdk::Color c) {
     for (unsigned i = 0; i < unsigned(list.length()); i++) {
-      TTrack* s = new TTrack(* list[i]);
-      _selfObjects.append(s);
-      _objects.append(s);
-      _colors.append(new Gdk::Color(c));
+        TTrack* s = new TTrack(* list[i]);
+        _selfObjects.append(s);
+        _objects.append(s);
+        _colors.append(new Gdk::Color(c));
     }
     on_expose_event((GdkEventExpose*) NULL);
-  }
+}
 
-  void
-  TWindowConformalDrawingArea::drawCircle(const TCircle& t, Gdk::Color& c)
-  {
+void
+TWindowConformalDrawingArea::drawCircle(const TCircle& t, Gdk::Color& c) {
     Glib::RefPtr<Gdk::Colormap> colormap = get_default_colormap();
     colormap->alloc_color(c);
     _gc->set_foreground(c);
@@ -470,26 +455,26 @@ TWindowConformalDrawingArea::on_expose_event(GdkEventExpose*) {
     const AList<TLink> & links = t.links();
     unsigned n = links.length();
     for (unsigned i = 0; i < n; i++) {
-      if (links[i]->wire() == NULL) continue;
-      if (! _stereo)
-        if (links[i]->wire()->stereo())
-          continue;
-      if (! _axial)
-        if (links[i]->wire()->axial())
-          continue;
+        if (links[i]->wire() == NULL) continue;
+        if (! _stereo)
+            if (links[i]->wire()->stereo())
+                continue;
+        if (! _axial)
+            if (links[i]->wire()->axial())
+                continue;
 
-      //...Points...
-      //  const HepGeom::Point3D<double> & p = links[i]->wire()->forwardPosition();
-      const HepGeom::Point3D<double> & p = links[i]->positionOnWire();
-      double radius = links[i]->hit()->drift();
-      _window->draw_arc(_gc,
-                        0,
-                        x((p.x() - radius) * 10),
-                        y((p.y() + radius) * 10),
-                        int(2 * radius * 10 * _scale),
-                        int(2 * radius * 10 * _scale),
-                        0,
-                        360 * 64);
+        //...Points...
+        //  const HepGeom::Point3D<double> & p = links[i]->wire()->forwardPosition();
+        const HepGeom::Point3D<double> & p = links[i]->positionOnWire();
+        double radius = links[i]->hit()->drift();
+        _window->draw_arc(_gc,
+                          0,
+                          x((p.x() - radius) * 10),
+                          y((p.y() + radius) * 10),
+                          int(2 * radius * 10 * _scale),
+                          int(2 * radius * 10 * _scale),
+                          0,
+                          360 * 64);
     }
 
     //...Draw a circle...
@@ -504,20 +489,19 @@ TWindowConformalDrawingArea::on_expose_event(GdkEventExpose*) {
                       0,
                       360 * 64);
     colormap->free_color(c);
-  }
+}
 
-  void
-  TWindowConformalDrawingArea::append(const AList<TCircle> & list,
-                                      Gdk::Color c)
-  {
+void
+TWindowConformalDrawingArea::append(const AList<TCircle> & list,
+                                    Gdk::Color c) {
     for (unsigned i = 0; i < unsigned(list.length()); i++) {
-      TCircle* s = new TCircle(* list[i]);
-      _selfObjects.append(s);
-      _objects.append(s);
-      _colors.append(new Gdk::Color(c));
+        TCircle* s = new TCircle(* list[i]);
+        _selfObjects.append(s);
+        _objects.append(s);
+        _colors.append(new Gdk::Color(c));
     }
     on_expose_event((GdkEventExpose*) NULL);
-  }
+}
 
 } // namespace Belle
 

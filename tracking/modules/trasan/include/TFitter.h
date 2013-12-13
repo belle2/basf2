@@ -36,20 +36,12 @@
 #ifndef TFITTER_FLAG_
 #define TFITTER_FLAG_
 
-#ifdef TRASAN_DEBUG_DETAIL
-#ifndef TRASAN_DEBUG
-#define TRASAN_DEBUG
-#endif
-#endif
-#define HEP_SHORT_NAMES
-
-
 #include <string>
 
 namespace Belle {
 
-  class TTrackBase;
-  class TTrack;
+class TTrackBase;
+class TTrack;
 
 #define TFitAlreadyFitted 1;
 #define TFitErrorFewHits -1;
@@ -57,7 +49,7 @@ namespace Belle {
 #define TFitUnavailable  -3;
 
 /// A class to fit a TTrackBase object.
-  class TFitter {
+class TFitter {
 
   public:
     /// Constructor.
@@ -81,29 +73,15 @@ namespace Belle {
 
   private:
     std::string _name;
-  };
+};
 
 //-----------------------------------------------------------------------------
 
-#ifdef TRASAN_NO_INLINE
-#define inline
-#else
-#undef inline
-#define TFITTER_INLINE_DEFINE_HERE
-#endif
-
-#ifdef TFITTER_INLINE_DEFINE_HERE
-
-  inline
-  const std::string&
-  TFitter::name(void) const
-  {
+inline
+const std::string&
+TFitter::name(void) const {
     return _name;
-  }
-
-#endif
-
-#undef inline
+}
 
 } // namespace Belle
 

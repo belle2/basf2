@@ -20,22 +20,19 @@
 
 namespace Belle {
 
-  TArea::TArea(const TPoint2D& leftBottom, const TPoint2D& rightUpper)
-  {
+TArea::TArea(const TPoint2D& leftBottom, const TPoint2D& rightUpper) {
     _c[0] = leftBottom;
     _c[1] = rightUpper;
-  }
+}
 
-  TArea::~TArea()
-  {
-  }
+TArea::~TArea() {
+}
 
-  void
-  TArea::cross(const TPoint2D& x0,
-               const TPoint2D& x1,
-               unsigned& nFound,
-               TPoint2D crossPoint[2]) const
-  {
+void
+TArea::cross(const TPoint2D& x0,
+             const TPoint2D& x1,
+             unsigned& nFound,
+             TPoint2D crossPoint[2]) const {
 
     //...Parameters...
     const float xDiff = x1.x() - x0.x();
@@ -47,17 +44,17 @@ namespace Belle {
     nFound = 0;
     for (unsigned i = 0; i < 2; i++) {
 
-      TPoint2D p(_c[i].x(), a * _c[i].x() + b);
-      if (inArea(p))
-        crossPoint[nFound++] = p;
-      if (nFound == 2) return;
+        TPoint2D p(_c[i].x(), a * _c[i].x() + b);
+        if (inArea(p))
+            crossPoint[nFound++] = p;
+        if (nFound == 2) return;
 
-      TPoint2D q((_c[i].y() - b) / a, _c[i].y());
-      if (inArea(q))
-        crossPoint[nFound++] = q;
-      if (nFound == 2) return;
+        TPoint2D q((_c[i].y() - b) / a, _c[i].y());
+        if (inArea(q))
+            crossPoint[nFound++] = q;
+        if (nFound == 2) return;
     }
-  }
+}
 
 } // namespace Belle
 

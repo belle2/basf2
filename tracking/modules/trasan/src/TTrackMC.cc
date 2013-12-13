@@ -116,10 +116,10 @@
 // Trasan 1.08 release : stereo finder updated by J.Suzuki, new MC classes added by Y.Iwasaki
 //
 //-----------------------------------------------------------------------------
+
 #include <string>
 #include <exception>
 #include <cfloat>
-
 
 /* for copysign */
 #if defined(__sparc)
@@ -142,11 +142,10 @@
 
 #define TRG_SHORT_NAMES
 
-#include "trg/trg/Utilities.h"
-#include "trg/cdc/TRGCDC.h"
-
-#include "trg/cdc/WireHitMC.h"
-#include "trg/cdc/TrackMC.h"
+#include "tracking/modules/trasan/TCDC.h"
+#include "tracking/modules/trasan/TDebug.h"
+#include "tracking/modules/trasan/TWireHitMC.h"
+#include "tracking/modules/trasan/TTrackMC.h"
 #include "tracking/modules/trasan/Trasan.h"
 #include "tracking/modules/trasan/TTrack.h"
 #include "tracking/modules/trasan/TTrackMC.h"
@@ -154,20 +153,20 @@
 #ifndef PANTHER_RECCDC_WIRHIT_
 #define PANTHER_RECCDC_WIRHIT_
 struct reccdc_wirhit {
-  int m_panther_dummy_;
-  int m_ID;
-  float m_ddl;
-  float m_ddr;
-  float m_erddl;
-  float m_erddr;
-  float m_pChiSq;
-  int m_lr;
-  int m_stat;
-  int m_geo;
-  int m_dat;
-  int m_trk;
-  float m_tdc;
-  float m_adc;
+    int m_panther_dummy_;
+    int m_ID;
+    float m_ddl;
+    float m_ddr;
+    float m_erddl;
+    float m_erddr;
+    float m_pChiSq;
+    int m_lr;
+    int m_stat;
+    int m_geo;
+    int m_dat;
+    int m_trk;
+    float m_tdc;
+    float m_adc;
 };
 #else
 struct reccdc_wirhit;
@@ -175,168 +174,168 @@ struct reccdc_wirhit;
 #ifndef PANTHER_GEOCDC_LAYER_
 #define PANTHER_GEOCDC_LAYER_
 struct geocdc_layer {
-  int m_panther_dummy_;
-  int m_ID;
-  float m_slant;
-  float m_r;
-  float m_zf;
-  float m_zb;
-  float m_rcsiz1;
-  float m_rcsiz2;
-  float m_pcsiz;
-  float m_div;
-  float m_offset;
-  float m_shift;
-  int m_wirst;
-  int m_sup;
-  float m_fdist;
-  float m_bdist;
-  float m_ft;
-  float m_bt;
-  float m_fpin;
-  float m_bpin;
-  float m_ftwist;
-  float m_btwist;
-  float m_fxoff;
-  float m_fyoff;
-  float m_fzoff;
-  float m_bxoff;
-  float m_byoff;
-  float m_bzoff;
+    int m_panther_dummy_;
+    int m_ID;
+    float m_slant;
+    float m_r;
+    float m_zf;
+    float m_zb;
+    float m_rcsiz1;
+    float m_rcsiz2;
+    float m_pcsiz;
+    float m_div;
+    float m_offset;
+    float m_shift;
+    int m_wirst;
+    int m_sup;
+    float m_fdist;
+    float m_bdist;
+    float m_ft;
+    float m_bt;
+    float m_fpin;
+    float m_bpin;
+    float m_ftwist;
+    float m_btwist;
+    float m_fxoff;
+    float m_fyoff;
+    float m_fzoff;
+    float m_bxoff;
+    float m_byoff;
+    float m_bzoff;
 };
 #endif
 #ifndef PANTHER_GEOCDC_WIRE_
 #define PANTHER_GEOCDC_WIRE_
 struct geocdc_wire {
-  int m_panther_dummy_;
-  int m_ID;
-  float m_xwb;
-  float m_ywb;
-  float m_zwb;
-  float m_xwf;
-  float m_ywf;
-  float m_zwf;
-  float m_slant;
-  int m_cell;
-  int m_layer;
-  int m_stat;
-  int m_lyr;
+    int m_panther_dummy_;
+    int m_ID;
+    float m_xwb;
+    float m_ywb;
+    float m_zwb;
+    float m_xwf;
+    float m_ywf;
+    float m_zwf;
+    float m_slant;
+    int m_cell;
+    int m_layer;
+    int m_stat;
+    int m_lyr;
 };
 #endif
 #ifndef PANTHER_RECCDC_WIRHIT_
 #define PANTHER_RECCDC_WIRHIT_
 struct reccdc_wirhit {
-  int m_panther_dummy_;
-  int m_ID;
-  float m_ddl;
-  float m_ddr;
-  float m_erddl;
-  float m_erddr;
-  float m_pChiSq;
-  int m_lr;
-  int m_stat;
-  int m_geo;
-  int m_dat;
-  int m_trk;
-  float m_tdc;
-  float m_adc;
+    int m_panther_dummy_;
+    int m_ID;
+    float m_ddl;
+    float m_ddr;
+    float m_erddl;
+    float m_erddr;
+    float m_pChiSq;
+    int m_lr;
+    int m_stat;
+    int m_geo;
+    int m_dat;
+    int m_trk;
+    float m_tdc;
+    float m_adc;
 };
 #endif
 #ifndef PANTHER_DATRGCDC_MCWIRHIT_
 #define PANTHER_DATRGCDC_MCWIRHIT_
 struct datcdc_mcwirhit {
-  int m_panther_dummy_;
-  int m_ID;
-  float m_xw;
-  float m_yw;
-  float m_zw;
-  float m_dist;
-  float m_chrg;
-  float m_xin;
-  float m_yin;
-  float m_zin;
-  float m_xout;
-  float m_yout;
-  float m_zout;
-  int m_lr;
-  int m_stat;
-  int m_geo;
-  int m_dat;
-  int m_hep;
-  int m_trk;
-  float m_px;
-  float m_py;
-  float m_pz;
-  float m_pid;
-  float m_tof;
-  float m_tdc;
+    int m_panther_dummy_;
+    int m_ID;
+    float m_xw;
+    float m_yw;
+    float m_zw;
+    float m_dist;
+    float m_chrg;
+    float m_xin;
+    float m_yin;
+    float m_zin;
+    float m_xout;
+    float m_yout;
+    float m_zout;
+    int m_lr;
+    int m_stat;
+    int m_geo;
+    int m_dat;
+    int m_hep;
+    int m_trk;
+    float m_px;
+    float m_py;
+    float m_pz;
+    float m_pid;
+    float m_tof;
+    float m_tdc;
 };
 #endif
 #ifndef PANTHER_RECCDC_TRK_
 #define PANTHER_RECCDC_TRK_
 struct reccdc_trk {
-  int m_panther_dummy_;
-  int m_ID;
-  float m_helix[5];
-  float m_pivot[3];
-  float m_error[15];
-  float m_chiSq;
-  float m_ndf;
-  float m_fiTerm;
-  int m_nhits;
-  int m_nster;
-  int m_nclus;
-  int m_stat;
-  float m_mass;
+    int m_panther_dummy_;
+    int m_ID;
+    float m_helix[5];
+    float m_pivot[3];
+    float m_error[15];
+    float m_chiSq;
+    float m_ndf;
+    float m_fiTerm;
+    int m_nhits;
+    int m_nster;
+    int m_nclus;
+    int m_stat;
+    float m_mass;
 };
 #endif
 #ifndef PANTHER_RECCDC_TRK_ADD_
 #define PANTHER_RECCDC_TRK_ADD_
 struct reccdc_trk_add {
-  int m_panther_dummy_;
-  int m_ID;
-  int m_quality;
-  int m_kind;
-  int m_mother;
-  int m_daughter;
-  int m_decision;
-  float m_likelihood[3];
-  int m_stat;
-  int m_rectrk;
+    int m_panther_dummy_;
+    int m_ID;
+    int m_quality;
+    int m_kind;
+    int m_mother;
+    int m_daughter;
+    int m_decision;
+    float m_likelihood[3];
+    int m_stat;
+    int m_rectrk;
 };
 #endif
 #ifndef PANTHER_RECCDC_MCTRK2HEP_
 #define PANTHER_RECCDC_MCTRK2HEP_
 struct reccdc_mctrk2hep {
-  int m_panther_dummy_;
-  int m_ID;
-  int m_wir;
-  int m_clust;
-  int m_trk;
-  int m_hep;
+    int m_panther_dummy_;
+    int m_ID;
+    int m_wir;
+    int m_clust;
+    int m_trk;
+    int m_hep;
 };
 #endif
 #ifndef PANTHER_RECCDC_MCTRK_
 #define PANTHER_RECCDC_MCTRK_
 struct reccdc_mctrk {
-  int m_panther_dummy_;
-  int m_ID;
-  int m_hep;
-  float m_wirFrac;
-  float m_wirFracHep;
-  int m_charge;
-  float m_ptFrac;
-  float m_pzFrac;
-  int m_quality;
+    int m_panther_dummy_;
+    int m_ID;
+    int m_hep;
+    float m_wirFrac;
+    float m_wirFracHep;
+    int m_charge;
+    float m_ptFrac;
+    float m_pzFrac;
+    int m_quality;
 };
 #endif
 #ifndef PANTHER_RECCDC_TIMING_
 #define PANTHER_RECCDC_TIMING_
 struct reccdc_timing {
-  int m_panther_dummy_;
-  int m_ID;
-  float m_time;
-  int m_quality;
+    int m_panther_dummy_;
+    int m_ID;
+    float m_time;
+    int m_quality;
 };
 #endif
 
@@ -347,7 +346,10 @@ namespace Belle {
 #define FLT_MIN 1.175494351E-38F
 #endif
 
-  TTrackMC::TTrackMC(const TTrack& t)
+std::vector<const TTrackMC *>
+TTrackMC::_list = std::vector<const TTrackMC *>();
+
+TTrackMC::TTrackMC(const TTrack& t)
     : _state(0),
       _quality(0),
       _t(t),
@@ -361,94 +363,90 @@ namespace Belle {
       _ptResidual(-999.),
       _pzResidual(-999.),
       _ptPull(-999.),
-      _pzPull(-999.)
-  {
-  }
+      _pzPull(-999.) {
+}
 
-  TTrackMC::~TTrackMC()
-  {
-  }
+TTrackMC::~TTrackMC() {
+}
 
-  void
-  TTrackMC::update(void)
-  {
+void
+TTrackMC::update(void) {
     _state = 0;
     _quality = 0;
 
-    //...Prepare counters...
-//cnv    unsigned nHep = Belle2::TRGCDCTrackMC::list().length();
-    unsigned nHep = 0;
-//  unsigned nTrk = Trasan::getTrasan()->tracks().length();
-    unsigned* N1 = (unsigned*) malloc(nHep * sizeof(unsigned));
-    float* F1 = (float*) malloc(nHep * sizeof(float));
-//cnv    unsigned N2 = 0;
-    for (unsigned i = 0; i < nHep; i++) {
-      N1[i] = 0;
-      F1[i] = 0.;
-    }
+//     //...Prepare counters...
+// //cnv    unsigned nHep = Belle2::TRGCDCTrackMC::list().length();
+//     unsigned nHep = 0;
+// //  unsigned nTrk = Trasan::getTrasan()->tracks().length();
+//     unsigned* N1 = (unsigned*) malloc(nHep * sizeof(unsigned));
+//     float* F1 = (float*) malloc(nHep * sizeof(float));
+// //cnv    unsigned N2 = 0;
+//     for (unsigned i = 0; i < nHep; i++) {
+//         N1[i] = 0;
+//         F1[i] = 0.;
+//     }
 
-    //...Prepare for fraction F1...
-//  const AList<TLink> & cores = _t.cores();
-    const AList<TLink> & cores = _t.finalHits();
-    unsigned nCores = cores.length();
-    for (unsigned i = 0; i < nCores; i++) {
-//cnv TLink * t = cores[i];
-//cnv   if(t && t->hit() && t->hit()->mc() && t->hit()->mc()->hep() ) {
-//    int hepID = t->hit()->mc()->hep()->id();
-//    ++N1[hepID];
-//  }
-    }
+//     //...Prepare for fraction F1...
+// //  const AList<TLink> & cores = _t.cores();
+//     const AList<TLink> & cores = _t.finalHits();
+//     unsigned nCores = cores.length();
+//     for (unsigned i = 0; i < nCores; i++) {
+// //cnv TLink * t = cores[i];
+// //cnv   if(t && t->hit() && t->hit()->mc() && t->hit()->mc()->hep() ) {
+// //    int hepID = t->hit()->mc()->hep()->id();
+// //    ++N1[hepID];
+// //  }
+//     }
 
-    //...Calculate fraction F1 and find the best HEP...
-    int bestHep = -1;
-    float bestF1 = 0.;
-    for (unsigned i = 0; i < nHep; i++) {
-      if (nCores) F1[i] = (float) N1[i] / (float) nCores;
-      if (F1[i] > bestF1) {
-        bestHep = i;
-        bestF1 = F1[i];
-      }
-    }
+//     //...Calculate fraction F1 and find the best HEP...
+//     int bestHep = -1;
+//     float bestF1 = 0.;
+//     for (unsigned i = 0; i < nHep; i++) {
+//         if (nCores) F1[i] = (float) N1[i] / (float) nCores;
+//         if (F1[i] > bestF1) {
+//             bestHep = i;
+//             bestF1 = F1[i];
+//         }
+//     }
 
-    //...Check HEP...
-    float F2 = 0.;
-    Belle2::TRGCDCTrackMC* hep = 0;
-    if (bestHep != -1) {
-//cnv   hep = Belle2::TRGCDCTrackMC::list()[bestHep];
-//  unsigned nAll = 0;
-//  for (unsigned i = 0; i < (unsigned) hep->hits().length(); i++) {
-//      const TRGCDCWireHit * hit = hep->hits()[i]->hit();
-//      if (! hit) continue;
-//      if (hit->state() & WireHitInvalidForFit) continue;
+//     //...Check HEP...
+//     float F2 = 0.;
+//     TTrackMC * hep = 0;
+//     if (bestHep != -1) {
+// //cnv   hep = Belle2::TRGCDCTrackMC::list()[bestHep];
+// //  unsigned nAll = 0;
+// //  for (unsigned i = 0; i < (unsigned) hep->hits().length(); i++) {
+// //      const TRGCDCWireHit * hit = hep->hits()[i]->hit();
+// //      if (! hit) continue;
+// //      if (hit->state() & WireHitInvalidForFit) continue;
 
-//      ++nAll;
-//      if (hit->track() == & _t) ++N2;
-//  }
+// //      ++nAll;
+// //      if (hit->track() == & _t) ++N2;
+// //  }
 
-//  //...Calculate fraction F2...
-//  if (nAll) F2 = (float) N2 / (float) nAll;
-    }
+// //  //...Calculate fraction F2...
+// //  if (nAll) F2 = (float) N2 / (float) nAll;
+//     }
 
-    //...Store results...
-    _hepID = bestHep;
-    _hep = hep;
-    _wireFraction = bestF1;
-    _wireFractionHEP = F2;
+//     //...Store results...
+//     _hepID = bestHep;
+//     _hep = hep;
+//     _wireFraction = bestF1;
+//     _wireFractionHEP = F2;
 
-    //...Compare charge and momentum...
-    compare();
+//     //...Compare charge and momentum...
+//     compare();
 
-    //...Classification...
-    classify();
+//     //...Classification...
+//     classify();
 
-    //...Termination...
-    free(N1);
-    free(F1);
-  }
+//     //...Termination...
+//     free(N1);
+//     free(F1);
+}
 
-  void
-  TTrackMC::dump(const std::string& msg, const std::string& pre) const
-  {
+void
+TTrackMC::dump(const std::string& msg, const std::string& pre) const {
     std::cout << pre << msg;
     std::cout << _t.name() << ":";
     std::cout << "state=" << _state << ":";
@@ -458,16 +456,15 @@ namespace Belle {
     else if (_quality & TTrackCharge) std::cout << "bad    :";
     else if (_quality & TTrackGarbage) std::cout << "garbage:";
     else std::cout << "classification error:";
-    Belle2::TRGUtil::bitDisplay(_quality, 23, 15); std::cout << ":";
+    TDebugUtilities::bitDisplay(_quality, 23, 15); std::cout << ":";
     std::cout << _hepID << ":";
     std::cout << _wireFraction << "," << _wireFractionHEP << ":";
     std::cout << _ptFraction << "," << _pzFraction;
     std::cout << std::endl;
-  }
+}
 
-  void
-  TTrackMC::compare(void)
-  {
+void
+TTrackMC::compare(void) {
     if (! _hep) return;
 
     //...Get charge of HEP particle(This part should be done by LUCHARGE)...
@@ -487,33 +484,33 @@ namespace Belle {
     HepGeom::Vector3D<double> pHep;
     HepGeom::Vector3D<double> vHep;
     for (unsigned i = 0; i < n; i++) {
-      TLink* inner = TLink::innerMost(list);
-      if (inner->hit()->mc()->hep() == _hep) {
-        pHep = inner->hit()->mc()->momentum();
-        vHep = inner->hit()->mc()->entrance();
-        found = true;
-        break;
-      }
-      list.remove(inner);
+        TLink* inner = TLink::innerMost(list);
+        if (inner->hit()->mc()->hep() == _hep) {
+            pHep = inner->hit()->mc()->momentum();
+            vHep = inner->hit()->mc()->entrance();
+            found = true;
+            break;
+        }
+        list.remove(inner);
     }
     THelix hHep = THelix(vHep, pHep, copysign(1., id));
 #if defined(BELLE_DEBUG)
     try {
 #endif
-      hHep.pivot(_t.helix().pivot());
-      pHep = hHep.momentum();
+        hHep.pivot(_t.helix().pivot());
+        pHep = hHep.momentum();
 #if defined(BELLE_DEBUG)
     } catch (std::string& e) {
-      std::cout << "TTrackMC::compare:exception has been thrown:" << e << std::endl;
-      found = false;
+        std::cout << "TTrackMC::compare:exception has been thrown:" << e << std::endl;
+        found = false;
     }
 #endif
     //...For debug...
     if (! found) {
-      std::cout << "TTrackMC::compare !!! something wrong with mc hits"
-                << std::endl;
+        std::cout << "TTrackMC::compare !!! something wrong with mc hits"
+                  << std::endl;
 
-      //...For debug...
+        //...For debug...
 //    list = _t.cores();
 //    for (unsigned i = 0; i < list.length(); i++) {
 //        TLink * inner = innerMost(list);
@@ -527,9 +524,9 @@ namespace Belle {
 //    }
 //    TLink * t = 0;
 //    t->hit();
-      //...For debug end...
+        //...For debug end...
 
-      return;
+        return;
     }
 
     //...Fill caches...
@@ -546,7 +543,7 @@ namespace Belle {
     dPt[2] = - 1. / (h.kappa() * h.kappa());
     double ptError2 = h.Ea().similarity(dPt);
     if (ptError2 < 0.0) {
-      std::cout << h.kappa() << " " << h.Ea() << " dPt=" << dPt << std::endl;
+        std::cout << h.kappa() << " " << h.Ea() << " dPt=" << dPt << std::endl;
     }
     double ptError = (ptError2 > 0.) ? sqrt(ptError2) : (DBL_MIN);
     _ptPull = (ptError2 > 0.) ? (_ptResidual) / ptError : (FLT_MAX);
@@ -561,16 +558,15 @@ namespace Belle {
     dPz[4] = 1. / h.kappa();
     double pzError2 = h.Ea().similarity(dPz);
     if (pzError2 < 0.0) {
-      std::cout << h.kappa() << " " << h.Ea() << " dPz=" << dPz << std::endl;
+        std::cout << h.kappa() << " " << h.Ea() << " dPz=" << dPz << std::endl;
     }
     double pzError = (pzError2 > 0.) ? sqrt(pzError2) : (DBL_MIN);
     _pzPull = (pzError2 > 0.) ? (_pzResidual) / pzError : (FLT_MAX);
     _pzFraction = (abs(pzHep) > FLT_MIN) ? (_pzResidual / pzHep) : (FLT_MAX);
-  }
+}
 
-  void
-  TTrackMC::classify(void)
-  {
+void
+TTrackMC::classify(void) {
     _state |= TTrackClassified;
     _quality = TTrackGarbage;
 
@@ -583,11 +579,11 @@ namespace Belle {
     if ((fabs(_ptFraction) < 0.1) &&
         (fabs(_pzFraction) < 0.1) &&
         (_cosOpen > 0.99))
-      _quality |= TTrackMatchingLoose;
+        _quality |= TTrackMatchingLoose;
     if ((fabs(_ptFraction) < 0.02) &&
         (fabs(_pzFraction) < 0.02) &&
         (_cosOpen > 0.998))
-      _quality |= TTrackMatchingTight;
+        _quality |= TTrackMatchingTight;
 
 //     float momResidual = sqrt(_ptResidual * _ptResidual +
 //            _pzResidual * _pzResidual);
@@ -607,53 +603,54 @@ namespace Belle {
 
     //...Momentum matching...
     if (_quality & TTrackMatchingLoose)
-      _quality |= TTrackGhost;
+        _quality |= TTrackGhost;
 
     //...TTrackGood is set by Trasan after checking uniqueness...
-  }
+}
 
-  std::string
-  TTrackMC::qualityString(void) const
-  {
+std::string
+TTrackMC::qualityString(void) const {
     return TrackMCQualityString(_quality);
-  }
+}
 
-  std::string
-  TrackMCStatus(unsigned quality)
-  {
+std::string
+TrackMCStatus(unsigned quality) {
     //...This is a local function to hide from user...
 
     std::string matching;
     if (quality & TTrackHep) {
-      if (quality & TTrackMatchingTight) matching += "tight";
-      else if (quality & TTrackMatchingLoose) matching += "loose";
-      else matching = "bad";
+        if (quality & TTrackMatchingTight) matching += "tight";
+        else if (quality & TTrackMatchingLoose) matching += "loose";
+        else matching = "bad";
     }
     return TrackMCQualityString(quality) + " " + matching;
-  }
+}
 
-  std::string
-  TrackMCStatus(const TTrackMC& m)
-  {
+std::string
+TrackMCStatus(const TTrackMC& m) {
     return TrackMCStatus(m.quality());
-  }
+}
 
-  std::string
-  TrackMCStatus(const reccdc_mctrk& m)
-  {
+std::string
+TrackMCStatus(const reccdc_mctrk& m) {
     return TrackMCStatus(m.m_quality);
-  }
+}
 
-  std::string
-  TrackMCQualityString(unsigned quality)
-  {
+std::string
+TrackMCQualityString(unsigned quality) {
     if (quality & TTrackGood) return std::string("Good");
     else if (quality & TTrackGhost) return std::string("Ghost");
     else if (quality & TTrackBad) return std::string("Bad");
     else if (quality & TTrackCharge) return std::string("Charge");
     else if (quality & TTrackGarbage) return std::string("Garbage");
     return std::string("Unknown");
-  }
+}
+
+std::vector<const TTrackMC *>
+TTrackMC::list(void) {
+    std::vector<const TTrackMC *> t;
+    t.assign(_list.begin(), _list.end());
+    return t;
+}
 
 } // namespace Belle
-

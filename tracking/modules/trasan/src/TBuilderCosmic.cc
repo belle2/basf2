@@ -60,27 +60,24 @@
 
 namespace Belle {
 
-  TBuilderCosmic::TBuilderCosmic(const std::string& name, float salvageLevel)
-    : TBuilder0(name, salvageLevel), _fitter("TBuilderCosmic Fitter")
-  {
-  }
+TBuilderCosmic::TBuilderCosmic(const std::string& name, float salvageLevel)
+    : TBuilder0(name, salvageLevel), _fitter("TBuilderCosmic Fitter") {
+}
 
-  TBuilderCosmic::~TBuilderCosmic()
-  {
-  }
+TBuilderCosmic::~TBuilderCosmic() {
+}
 
-  TTrack*
-  TBuilderCosmic::buildStereo(TTrack& track, const AList<TLink> & list) const
-  {
+TTrack*
+TBuilderCosmic::buildStereo(TTrack& track, const AList<TLink> & list) const {
 #ifdef TRASAN_DEBUG_DETAIL
     std::cout << name() << "(stereo) ... dump of stereo candidate hits" << std::endl;
     AList<TLink> tmp = list;
     tmp.sort(TLink::sortByWireId);
     std::cout << "    ";
     for (unsigned i = 0; i < (unsigned) tmp.length(); i++) {
-      TLink* l = tmp[i];
-      std::cout << l->wire()->layerId() << "-";
-      std::cout << l->wire()->localId() << ",";
+        TLink* l = tmp[i];
+        std::cout << l->wire()->layerId() << "-";
+        std::cout << l->wire()->localId() << ",";
     }
     std::cout << std::endl;
 #endif
@@ -88,35 +85,35 @@ namespace Belle {
     //...Check # of links...
     if ((unsigned) list.length() < _lineSelector.nLinksStereo()) {
 #ifdef TRASAN_DEBUG_DETAIL
-      std::cout << name() << "(stereo) ... rejected by nLinks(";
-      std::cout << list.length() << ") < ";
-      std::cout << _lineSelector.nLinks() << std::endl;
+        std::cout << name() << "(stereo) ... rejected by nLinks(";
+        std::cout << list.length() << ") < ";
+        std::cout << _lineSelector.nLinks() << std::endl;
 #endif
-      return NULL;
+        return NULL;
     }
 
     //...Calculate s and z for every links...
     unsigned n = list.length();
     AList<TLink> forLine;
     for (unsigned i = 0; i < n; i++) {
-      TLink* l = list[i];
+        TLink* l = list[i];
 
-      //... Require Fitting vaildation
-      if (!(l->hit()->state()& CellHitFittingValid)) continue;
+        //... Require Fitting vaildation
+        if (!(l->hit()->state()& CellHitFittingValid)) continue;
 
-      TLink* t = new TLink(* l);
+        TLink* t = new TLink(* l);
 
-      //...Assuming wire position...
-      t->leftRight(2);
-      int err = track.szPosition(* t);
-      if (err) {
-        delete t;
-        continue;
-      }
+        //...Assuming wire position...
+        t->leftRight(2);
+        int err = track.szPosition(* t);
+        if (err) {
+            delete t;
+            continue;
+        }
 
-      //...Store the sz link...
-      t->link(l);
-      forLine.append(t);
+        //...Store the sz link...
+        t->link(l);
+        forLine.append(t);
     }
 
 #ifdef TRASAN_DEBUG_DETAIL
@@ -125,9 +122,9 @@ namespace Belle {
     tmp = forLine;
     tmp.sort(TLink::sortByWireId);
     for (unsigned i = 0; i < (unsigned) tmp.length(); i++) {
-      TLink* l = tmp[i];
-      std::cout << l->wire()->layerId() << "-";
-      std::cout << l->wire()->localId() << ",";
+        TLink* l = tmp[i];
+        std::cout << l->wire()->layerId() << "-";
+        std::cout << l->wire()->localId() << ",";
     }
     std::cout << std::endl;
 #endif
@@ -135,12 +132,12 @@ namespace Belle {
     //...Check # of sz links...
     if ((unsigned) forLine.length() < _lineSelector.nLinksStereo()) {
 #ifdef TRASAN_DEBUG_DETAIL
-      std::cout << name() << "(stereo) ... rejected by sz nLinks(";
-      std::cout << forLine.length() << ") < ";
-      std::cout << _lineSelector.nLinks() << std::endl;
+        std::cout << name() << "(stereo) ... rejected by sz nLinks(";
+        std::cout << forLine.length() << ") < ";
+        std::cout << _lineSelector.nLinks() << std::endl;
 #endif
-      HepAListDeleteAll(forLine);
-      return NULL;
+        HepAListDeleteAll(forLine);
+        return NULL;
     }
 
     //...Make a line...
@@ -151,11 +148,11 @@ namespace Belle {
     //...Linear fit...
     if (err < 0) {
 #ifdef TRASAN_DEBUG_DETAIL
-      std::cout << name() << "(stereo) ... linear fit failure. nLinks(";
-      std::cout << forLine.length() << ")" << std::endl;
+        std::cout << name() << "(stereo) ... linear fit failure. nLinks(";
+        std::cout << forLine.length() << ")" << std::endl;
 #endif
-      HepAListDeleteAll(forLine);
-      return NULL;
+        HepAListDeleteAll(forLine);
+        return NULL;
     }
 
 #ifdef TRASAN_DEBUG_DETAIL
@@ -165,63 +162,63 @@ namespace Belle {
     //...Decide Left or Right...
     AList<TLink> forNewLine;
     for (unsigned i = 0; i < nLine; i++) {
-      TLink* t = forLine[i];
-      TLink* tl = new TLink(* t);
-      TLink* tr = new TLink(* t);
+        TLink* t = forLine[i];
+        TLink* tl = new TLink(* t);
+        TLink* tr = new TLink(* t);
 
-      tl->leftRight(CellHitLeft);
-      tr->leftRight(CellHitRight);
+        tl->leftRight(CellHitLeft);
+        tr->leftRight(CellHitRight);
 
-      int err = track.szPosition(* tl);
-      if (err) {
-        delete tl;
-        tl = NULL;
-      }
-      err = track.szPosition(* tr);
-      if (err) {
-        delete tr;
-        tr = NULL;
-      }
-      if ((tl == NULL) && (tr == NULL)) continue;
-
-      TLink* best;
-      if (tl == NULL) best = tr;
-      else if (tr == NULL) best = tl;
-      else {
-        if (line.distance(* tl) < line.distance(* tr)) {
-          best = tl;
-          delete tr;
-        } else {
-          best = tr;
-          delete tl;
+        int err = track.szPosition(* tl);
+        if (err) {
+            delete tl;
+            tl = NULL;
         }
-      }
+        err = track.szPosition(* tr);
+        if (err) {
+            delete tr;
+            tr = NULL;
+        }
+        if ((tl == NULL) && (tr == NULL)) continue;
+
+        TLink* best;
+        if (tl == NULL) best = tr;
+        else if (tr == NULL) best = tl;
+        else {
+            if (line.distance(* tl) < line.distance(* tr)) {
+                best = tl;
+                delete tr;
+            } else {
+                best = tr;
+                delete tl;
+            }
+        }
 
 #ifdef TRASAN_DEBUG_DETAIL
-      std::cout << "    ";
-      std::cout << t->wire()->layerId() << "-";
-      std::cout << t->wire()->localId();
-      if (tl != NULL)
-        std::cout << ",left " << tl->position() << "," << line.distance(* tl);
-      if (tr != NULL)
-        std::cout << ",right " << tr->position() << "," << line.distance(* tr);
-      std::cout << std::endl;
+        std::cout << "    ";
+        std::cout << t->wire()->layerId() << "-";
+        std::cout << t->wire()->localId();
+        if (tl != NULL)
+            std::cout << ",left " << tl->position() << "," << line.distance(* tl);
+        if (tr != NULL)
+            std::cout << ",right " << tr->position() << "," << line.distance(* tr);
+        std::cout << std::endl;
 #endif
 
-      best->link(t->link());
-      forNewLine.append(best);
+        best->link(t->link());
+        forNewLine.append(best);
     }
 
     //...Check # of sz links...
     if ((unsigned) forNewLine.length() < _lineSelector.nLinksStereo()) {
 #ifdef TRASAN_DEBUG_DETAIL
-      std::cout << name() << "(stereo) ... rejected by lr nLinks(";
-      std::cout << forNewLine.length() << ") < ";
-      std::cout << _lineSelector.nLinks() << std::endl;
+        std::cout << name() << "(stereo) ... rejected by lr nLinks(";
+        std::cout << forNewLine.length() << ") < ";
+        std::cout << _lineSelector.nLinks() << std::endl;
 #endif
-      HepAListDeleteAll(forLine);
-      HepAListDeleteAll(forNewLine);
-      return NULL;
+        HepAListDeleteAll(forLine);
+        HepAListDeleteAll(forNewLine);
+        return NULL;
     }
 
     //...Create new line...
@@ -237,12 +234,12 @@ namespace Belle {
     //...Linear fit...
     if (err < 0) {
 #ifdef TRASAN_DEBUG_DETAIL
-      std::cout << name() << "(stereo) ... 2nd linear fit failure. nLinks(";
-      std::cout << forNewLine.length() << ")" << std::endl;
+        std::cout << name() << "(stereo) ... 2nd linear fit failure. nLinks(";
+        std::cout << forNewLine.length() << ")" << std::endl;
 #endif
-      HepAListDeleteAll(forLine);
-      HepAListDeleteAll(forNewLine);
-      return NULL;
+        HepAListDeleteAll(forLine);
+        HepAListDeleteAll(forNewLine);
+        return NULL;
     }
 
     //...Remove bad points...
@@ -256,21 +253,21 @@ namespace Belle {
 
     //...Linear fit again...
     if (err < 0) {
-      HepAListDeleteAll(forLine);
-      HepAListDeleteAll(forNewLine);
+        HepAListDeleteAll(forLine);
+        HepAListDeleteAll(forNewLine);
 #ifdef TRASAN_DEBUG_DETAIL
-      std::cout << "    appendStereo cut ... new line 2nd linear fit failure. ";
-      std::cout << "# of links = " << n << "," << nLine;
+        std::cout << "    appendStereo cut ... new line 2nd linear fit failure. ";
+        std::cout << "# of links = " << n << "," << nLine;
 //  std::cout << "," << nNewLine << std::endl;
 #endif
-      return NULL;
+        return NULL;
     }
 
     //...3D fit...
     const AList<TLink> & good = newLine.links();
     unsigned nn = good.length();
     for (unsigned i = 0; i < nn; i++) {
-      track.append(* good[i]->link());
+        track.append(* good[i]->link());
     }
     CLHEP::HepVector a(5);
     a = track.helix().a();
@@ -289,16 +286,15 @@ namespace Belle {
 
     //...Test it...
     if (! _trackSelector.select(track)) {
-      HepAListDeleteAll(forLine);
-      HepAListDeleteAll(forNewLine);
-      return NULL;
+        HepAListDeleteAll(forLine);
+        HepAListDeleteAll(forNewLine);
+        return NULL;
     }
 
     //...Termination...
     HepAListDeleteAll(forLine);
     HepAListDeleteAll(forNewLine);
     return & track;
-  }
+}
 
 } // namespace Belle
-

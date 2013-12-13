@@ -36,21 +36,18 @@
 //
 //-----------------------------------------------------------------------------
 
-
-
-
-#include "trg/cdc/WireHitMC.h"
-#include "trg/cdc/TrackMC.h"
+#include "tracking/modules/trasan/TWireHitMC.h"
+#include "tracking/modules/trasan/TTrackMC.h"
 #include "tracking/modules/trasan/TPerfectFinder.h"
 #include "tracking/modules/trasan/TTrack.h"
 #include "tracking/modules/trasan/THelix.h"
 
 namespace Belle {
 
-  TPerfectFinder::TPerfectFinder(int perfectFitting,
-                                 float maxSigma,
-                                 float maxSigmaStereo,
-                                 unsigned fittingFlag)
+TPerfectFinder::TPerfectFinder(int perfectFitting,
+                               float maxSigma,
+                               float maxSigmaStereo,
+                               unsigned fittingFlag)
     : _perfectFitting(perfectFitting),
       _builder("standard builder",
                maxSigma,
@@ -58,33 +55,28 @@ namespace Belle {
                0,
                0,
                fittingFlag),
-      _fitter("helix fitter")
-  {
-  }
+      _fitter("helix fitter") {
+}
 
-  TPerfectFinder::~TPerfectFinder()
-  {
-  }
+TPerfectFinder::~TPerfectFinder() {
+}
 
-  std::string
-  TPerfectFinder::version(void) const
-  {
+std::string
+TPerfectFinder::version(void) const {
     return "2.04";
-  }
+}
 
-  void
-  TPerfectFinder::dump(const std::string& msg, const std::string& pre) const
-  {
+void
+TPerfectFinder::dump(const std::string& msg, const std::string& pre) const {
     std::cout << pre;
     TFinderBase::dump(msg);
-  }
+}
 
-  int
-  TPerfectFinder::doit(const CAList<Belle2::TRGCDCWireHit> & axialHits,
-                       const CAList<Belle2::TRGCDCWireHit> & stereoHits,
-                       AList<TTrack> & tracks,
-                       AList<TTrack> &)
-  {
+int
+TPerfectFinder::doit(const CAList<TWireHit> &,
+		     const CAList<TWireHit> &,
+		     AList<TTrack> &,
+		     AList<TTrack> &) {
 //cnv
 //     //...Preparations...
 //     static const HepGeom::Point3D<double> dummy(0, 0, 0);
@@ -231,17 +223,15 @@ namespace Belle {
 //  tracks.append(t);
 //     }
     return 0;
-  }
+}
 
-  void
-  TPerfectFinder::clear(void)
-  {
+void
+TPerfectFinder::clear(void) {
     HepAListDeleteAll(_links);
-  }
+}
 
-  float
-  TPerfectFinder::charge(int pType) const
-  {
+float
+TPerfectFinder::charge(int pType) const {
     float chg;
 
     if (pType == 11) chg = -1;
@@ -255,12 +245,11 @@ namespace Belle {
     else if (pType == 2212) chg = 1;
     else if (pType == -2212) chg = -1;
     else {
-      std::cout << "TPerfectFinder !!! charge of particle type=";
-      std::cout << pType << " is unknown" << std::endl;
+        std::cout << "TPerfectFinder !!! charge of particle type=";
+        std::cout << pType << " is unknown" << std::endl;
     }
 
     return chg;
-  }
+}
 
 } // namespace Belle
-

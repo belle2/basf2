@@ -44,45 +44,37 @@
 
 namespace Belle {
 
-  TPoint2D::TPoint2D()
-  {
+TPoint2D::TPoint2D() {
     _p[0] = 0.;
     _p[1] = 0.;
-  }
+}
 
-  TPoint2D::TPoint2D(double x, double y)
-  {
+TPoint2D::TPoint2D(double x, double y) {
     _p[0] = x;
     _p[1] = y;
-  }
+}
 
-  TPoint2D::TPoint2D(const HepGeom::Point3D<double>  & a)
-  {
+TPoint2D::TPoint2D(const HepGeom::Point3D<double>  & a) {
     _p[0] = a.x();
     _p[1] = a.y();
-  }
+}
 
-  TPoint2D::TPoint2D(const HepGeom::Vector3D<double>  & a)
-  {
+TPoint2D::TPoint2D(const HepGeom::Vector3D<double>  & a) {
     _p[0] = a.x();
     _p[1] = a.y();
-  }
+}
 
-  TPoint2D::TPoint2D(const CLHEP::Hep3Vector& a)
-  {
+TPoint2D::TPoint2D(const CLHEP::Hep3Vector& a) {
     _p[0] = a.x();
     _p[1] = a.y();
-  }
+}
 
-  TPoint2D::~TPoint2D()
-  {
-  }
+TPoint2D::~TPoint2D() {
+}
 
-  std::ostream&
-  operator << (std::ostream& s, const TPoint2D& a)
-  {
+std::ostream&
+operator << (std::ostream& s, const TPoint2D& a) {
     return s << "(" << a.x() << "," << a.y() << ")";
-  }
+}
 
 } // namespace Belle
-

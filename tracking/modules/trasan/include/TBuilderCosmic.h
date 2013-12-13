@@ -42,16 +42,9 @@
 #ifndef TBuilderCosmic_FLAG_
 #define TBuilderCosmic_FLAG_
 
-#ifdef TRASAN_DEBUG_DETAIL
-#ifndef TRASAN_DEBUG
-#define TRASAN_DEBUG
-#endif
-#endif
-
+#define HEP_SHORT_NAMES
 
 #include <string>
-
-#define HEP_SHORT_NAMES
 #include "tracking/modules/trasan/AList.h"
 #include "tracking/modules/trasan/TBuilder0.h"
 #include "tracking/modules/trasan/TCosmicFitter.h"
@@ -59,7 +52,7 @@
 namespace Belle {
 
 /// A class to build a cosmic track.
-  class TBuilderCosmic : public TBuilder0 {
+class TBuilderCosmic : public TBuilder0 {
 
   public:
     /// Constructor.
@@ -75,22 +68,9 @@ namespace Belle {
   private:
     // THelixFitter _fitter;
     TCosmicFitter _fitter;
-  };
+};
 
 //-----------------------------------------------------------------------------
-
-#ifdef TBuilderCosmic_NO_INLINE
-#define inline
-#else
-#undef inline
-#define TBuilderCosmic_INLINE_DEFINE_HERE
-#endif
-
-#ifdef TBuilderCosmic_INLINE_DEFINE_HERE
-
-#endif
-
-#undef inline
 
 } // namespace Belle
 

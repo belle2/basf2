@@ -18,16 +18,15 @@
 #ifndef THoughTransformationLine_FLAG_
 #define THoughTransformationLine_FLAG_
 
-
 #include <string>
 #include "tracking/modules/trasan/THoughTransformation.h"
 
 namespace Belle {
 
-  class TPoint2D;
+class TPoint2D;
 
 /// A class to represent line Hough transformation.
-  class THoughTransformationLine : public THoughTransformation {
+class THoughTransformationLine : public THoughTransformation {
 
   public:
     /// Contructor.
@@ -45,12 +44,14 @@ namespace Belle {
 
     /// returns true if Y diverges in given region.
     virtual bool positiveDiverge(float xReal, float yReal, float x0, float x1)
-    const;
+        const;
 
     /// returns true if Y diverges in given region.
     virtual bool negativeDiverge(float xReal, float yReal, float x0, float x1)
-    const;
-  };
+        const;
+};
+
+//-----------------------------------------------------------------------------
 
 } // namespace Belle
 

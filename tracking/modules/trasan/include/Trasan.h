@@ -234,12 +234,6 @@
 #ifndef Trasan_FLAG_
 #define Trasan_FLAG_
 
-#ifdef TRASAN_DEBUG_DETAIL
-#ifndef TRASAN_DEBUG
-#define TRASAN_DEBUG
-#endif
-#endif
-
 #define HEP_SHORT_NAMES
 
 #include <string>
@@ -256,35 +250,35 @@
 #endif
 
 namespace Belle2 {
-  class TrasanModule;
-  class TRGCDC;
-  class TRGCDCWireHit;
+class TrasanModule;
 }
 
 namespace Belle {
 
-  class TRGCDCCat;
-  class TRGCDCClustFinder;
-  class TFinderBase;
-  class TConformalFinder0;
-  class TCurlFinder;
-  class TTrack;
-  class TTrackMC;
-  class TPMCurlFinder;
+class TCDC;
+class TWireHit;
+// class TRGCDCCat;
+// class TRGCDCClustFinder;
+class TFinderBase;
+class TConformalFinder0;
+class TCurlFinder;
+class TTrack;
+class TTrackMC;
+class TPMCurlFinder;
 
-  extern float TrasanTHelixFitterChisqMax;
-  extern int   TrasanTHelixFitterNtrialMax;
-  extern const HepGeom::Point3D<double> ORIGIN;
+extern float TrasanTHelixFitterChisqMax;
+extern int   TrasanTHelixFitterNtrialMax;
+extern const HepGeom::Point3D<double> ORIGIN;
 
 /// A tracking module.
-  class Trasan : public Belle2::Module, TUpdater {
+class Trasan : public Belle2::Module, TUpdater {
 
   public:
     /// returns Trasan.
     static Trasan* getTrasan(void);
 
     virtual Belle2::ModulePtr newModule() {
-      Belle2::ModulePtr nm(new Trasan()); return nm;
+        Belle2::ModulePtr nm(new Trasan()); return nm;
     };
 
 //cnv  private:
@@ -327,8 +321,8 @@ namespace Belle {
     /// returns a pointer to the curl finder.
     const TFinderBase* curlFinder(void) const;
 
-    /// returns a pointer to the cluster finder.
-    const TRGCDCClustFinder* clustFinder(void) const;
+    // /// returns a pointer to the cluster finder.
+    // const TRGCDCClustFinder* clustFinder(void) const;
 
     /// returns a pointer to TTrackManager.
     const TTrackManager& trackManager(void) const;
@@ -337,10 +331,10 @@ namespace Belle {
     const TFinderBase* pmCurlFinder(void) const;
 
   public: // to access information
-    /// clears all TRGCDC information.
+    /// clears all TCDC information.
     void clear(bool termination = false);
 
-    /// clears TRGCDC information.
+    /// clears TCDC information.
     void fastClear(void);
 
     /// returns a list of reconstructed tracks.
@@ -354,22 +348,22 @@ namespace Belle {
     void mcInformation(void);
 
     /// returns unused hits.
-    void selectUnusedHits(const CAList<Belle2::TRGCDCWireHit>& hits,
-                          CAList<Belle2::TRGCDCWireHit>& unusedHits) const;
+    void selectUnusedHits(const CAList<TWireHit> & hits,
+                          CAList<TWireHit> & unusedHits) const;
 
     /// standard main loop.
-    void main0(const CAList<Belle2::TRGCDCWireHit>& axialHits,
-               const CAList<Belle2::TRGCDCWireHit>& stereoHits,
-               const CAList<Belle2::TRGCDCWireHit>& allHits,
-               AList<TTrack>& tracks,
-               AList<TTrack>& tracks2D);
+    void main0(const CAList<TWireHit> & axialHits,
+               const CAList<TWireHit> & stereoHits,
+               const CAList<TWireHit> & allHits,
+               AList<TTrack> & tracks,
+               AList<TTrack> & tracks2D);
 
     /// Hough + Conf + Curl (Conf doesn't use used hits)
-    void main1(const CAList<Belle2::TRGCDCWireHit>& axialHits,
-               const CAList<Belle2::TRGCDCWireHit>& stereoHits,
-               const CAList<Belle2::TRGCDCWireHit>& allHits,
-               AList<TTrack>& tracks,
-               AList<TTrack>& tracks2D);
+    void main1(const CAList<TWireHit> & axialHits,
+               const CAList<TWireHit> & stereoHits,
+               const CAList<TWireHit> & allHits,
+               AList<TTrack> & tracks,
+               AList<TTrack> & tracks2D);
 
   public:// public members for basf interface
 
@@ -527,8 +521,8 @@ namespace Belle {
 
   private:
     static Trasan* _trasan;
-    Belle2::TRGCDC* _cdc;
-    TRGCDCCat* _cdccat;
+    TCDC * _cdc;
+//    TRGCDCCat* _cdccat;
     TFinderBase* _perfectFinder;
     TFinderBase* _confFinder;
     TCurlFinder* _curlFinder;
@@ -564,115 +558,91 @@ namespace Belle {
 #endif
 
     friend class Belle2::TrasanModule;
-  };
+};
 
 //-----------------------------------------------------------------------------
 
-#ifdef TRASAN_NO_INLINE
-#define inline
-#else
-#undef inline
-#define Trasan_INLINE_DEFINE_HERE
-#endif
-
-#ifdef Trasan_INLINE_DEFINE_HERE
-
-  inline
-  const TFinderBase*
-  Trasan::confFinder(void) const
-  {
+inline
+const TFinderBase*
+Trasan::confFinder(void) const {
     return (TFinderBase*) _confFinder;
-  }
+}
 
-  inline
-  const TFinderBase*
-  Trasan::curlFinder(void) const
-  {
+inline
+const TFinderBase*
+Trasan::curlFinder(void) const {
     return (TFinderBase*) _curlFinder;
-  }
+}
 
-  inline
-  const AList<TTrack>&
-  Trasan::tracks(void) const
-  {
+inline
+const AList<TTrack> &
+Trasan::tracks(void) const {
     return _trackManager.tracksFinal();
-  }
+}
 
-  /* inline */
-  /* const TRGCDCClustFinder * */
-  /* Trasan::clustFinder(void) const { */
-  /*     return _clustFinder; */
-  /* } */
+/* inline */
+/* const TRGCDCClustFinder * */
+/* Trasan::clustFinder(void) const { */
+/*     return _clustFinder; */
+/* } */
 
-  inline
-  std::string
-  Trasan::name(void) const
-  {
+inline
+std::string
+Trasan::name(void) const {
     return std::string("Trasan");
-  }
+}
 
-  inline
-  const TTrackManager&
-  Trasan::trackManager(void) const
-  {
+inline
+const TTrackManager&
+Trasan::trackManager(void) const {
     return _trackManager;
-  }
+}
 
-  /* inline */
-  /* const TFinderBase * */
-  /* Trasan::pmCurlFinder(void) const { */
-  /*     return (TFinderBase *) _pmCurlFinder; */
-  /* } */
+/* inline */
+/* const TFinderBase * */
+/* Trasan::pmCurlFinder(void) const { */
+/*     return (TFinderBase *) _pmCurlFinder; */
+/* } */
 
 #ifdef TRASAN_WINDOW_GTK
 
-  inline
-  TWindowGTKConformal&
-  Trasan::w(void)
-  {
+inline
+TWindowGTKConformal&
+Trasan::w(void) {
     return * _w;
-  }
+}
 
-  inline
-  TWindowGTKHough&
-  Trasan::hp(void)
-  {
+inline
+TWindowGTKHough&
+Trasan::hp(void) {
     return * _hp;
-  }
+}
 
-  inline
-  TWindowGTKHough&
-  Trasan::hm(void)
-  {
+inline
+TWindowGTKHough&
+Trasan::hm(void) {
     return * _hm;
-  }
+}
 
-  inline
-  TWindowGTKHough&
-  Trasan::hc(void)
-  {
+inline
+TWindowGTKHough&
+Trasan::hc(void) {
     return * _hc;
-  }
+}
 
-  inline
-  TWindowGTKHough&
-  Trasan::hl(void)
-  {
+inline
+TWindowGTKHough&
+Trasan::hl(void) {
     return * _hl;
-  }
+}
 
-  inline
-  TWindowGTKSZ&
-  Trasan::sz(void)
-  {
+inline
+TWindowGTKSZ&
+Trasan::sz(void) {
     return * _sz;
-  }
+}
 
 #endif
-
-#endif
-
-#undef inline
 
 } // namespace Belle
 

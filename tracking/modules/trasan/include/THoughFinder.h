@@ -36,12 +36,6 @@
 #ifndef THoughFinder_FLAG_
 #define THoughFinder_FLAG_
 
-#ifdef TRASAN_DEBUG_DETAIL
-#ifndef TRASAN_DEBUG
-#define TRASAN_DEBUG
-#endif
-#endif
-
 #define HEP_SHORT_NAMES
 
 #include "tracking/modules/trasan/ConstAList.h"
@@ -56,27 +50,24 @@
 #include "tracking/modules/trasan/TPoint2D.h"
 #include "tracking/modules/trasan/TUtilities.h"
 
-namespace Belle2 {
-  class TRGCDC;
-}
-
 namespace Belle {
 
-  class THoughPlane;
-  class THoughPlaneMulti;
-  class THoughTransformation;
-  class THoughTransformationCircleGeneral;
+class TCDC;
+class THoughPlane;
+class THoughPlaneMulti;
+class THoughTransformation;
+class THoughTransformationCircleGeneral;
 
-  int SortByY(const TPoint2D**, const TPoint2D**);
-  int SortByYReverse(const TPoint2D**, const TPoint2D**);
+int SortByY(const TPoint2D**, const TPoint2D**);
+int SortByYReverse(const TPoint2D**, const TPoint2D**);
 
 #ifdef TRASAN_WINDOW_GTK
-  extern AList<TLink> AXIAL_ALL;
-  extern AList<TLink> STEREO_ALL;
+extern AList<TLink> AXIAL_ALL;
+extern AList<TLink> STEREO_ALL;
 #endif
 
 /// A class to find tracks with the Hough method.
-  class THoughFinder : public TFinderBase {
+class THoughFinder : public TFinderBase {
 
   public:
     /// Constructor.
@@ -122,25 +113,25 @@ namespace Belle {
     void init(void);
 
     /// finds tracks.
-    int doit(const CAList<Belle2::TRGCDCWireHit> & axialHits,
-             const CAList<Belle2::TRGCDCWireHit> & stereoHits,
+    int doit(const CAList<TWireHit> & axialHits,
+             const CAList<TWireHit> & stereoHits,
              AList<TTrack> & tracks,
              AList<TTrack> & tracks2D);
-    int doit0(const CAList<Belle2::TRGCDCWireHit> & axialHits,
-              const CAList<Belle2::TRGCDCWireHit> & stereoHits,
+    int doit0(const CAList<TWireHit> & axialHits,
+              const CAList<TWireHit> & stereoHits,
               AList<TTrack> & tracks,
               AList<TTrack> & tracks2D);
-    int doit1(const CAList<Belle2::TRGCDCWireHit> & axialHits,
-              const CAList<Belle2::TRGCDCWireHit> & stereoHits,
+    int doit1(const CAList<TWireHit> & axialHits,
+              const CAList<TWireHit> & stereoHits,
               AList<TTrack> & tracks,
               AList<TTrack> & tracks2D);
-    int doit2(const CAList<Belle2::TRGCDCWireHit> & axialHits,
-              const CAList<Belle2::TRGCDCWireHit> & stereoHits,
+    int doit2(const CAList<TWireHit> & axialHits,
+              const CAList<TWireHit> & stereoHits,
               AList<TTrack> & tracks,
               AList<TTrack> & tracks2D);
     /// Prepared to reduce duplicated tracks.
-    int doit3(const CAList<Belle2::TRGCDCWireHit> & axialHits,
-              const CAList<Belle2::TRGCDCWireHit> & stereoHits,
+    int doit3(const CAList<TWireHit> & axialHits,
+              const CAList<TWireHit> & stereoHits,
               AList<TTrack> & tracks,
               AList<TTrack> & tracks2D);
 
@@ -148,8 +139,8 @@ namespace Belle {
                    AList<TTrack> & tracks2D);
 
   private:// Modifiers
-    void selectGoodHits(const CAList<Belle2::TRGCDCWireHit> & axial,
-                        const CAList<Belle2::TRGCDCWireHit> & stereo);
+    void selectGoodHits(const CAList<TWireHit> & axial,
+                        const CAList<TWireHit> & stereo);
 
     /// transforms wire hits.
     void houghTransformation(const AList<TLink> & hits,
@@ -266,29 +257,15 @@ namespace Belle {
     unsigned* _nHits2D;
     unsigned* _nHits3D;
     unsigned* _nHitsG;
-  };
+};
 
 //-----------------------------------------------------------------------------
 
-#ifdef THoughFinder_NO_INLINE
-#define inline
-#else
-#undef inline
-#define THoughFinder_INLINE_DEFINE_HERE
-#endif
-
-#ifdef THoughFinder_INLINE_DEFINE_HERE
-
-  inline
-  std::string
-  THoughFinder::name(void) const
-  {
+inline
+std::string
+THoughFinder::name(void) const {
     return "Hough Finder";
-  }
-
-#endif
-
-#undef inline
+}
 
 } // namespace Belle
 

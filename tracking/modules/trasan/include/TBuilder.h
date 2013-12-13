@@ -138,30 +138,23 @@
 #ifndef TBuilder_FLAG_
 #define TBuilder_FLAG_
 
-#ifdef TRASAN_DEBUG_DETAIL
-#ifndef TRASAN_DEBUG
-#define TRASAN_DEBUG
-#endif
-#endif
-
+#define HEP_SHORT_NAMES
 
 #include <string>
-
-#define HEP_SHORT_NAMES
 #include "tracking/modules/trasan/AList.h"
 #include "tracking/modules/trasan/THelixFitter.h"
 
 namespace Belle {
 
-  class TTrack;
-  class TLink;
-  class TLine;
-  class TSegment;
-  class THoughTransformation;
-  class THoughPlane;
+class TTrack;
+class TLink;
+class TLine;
+class TSegment;
+class THoughTransformation;
+class THoughPlane;
 
 /// A class to build a track.
-  class TBuilder {
+class TBuilder {
 
   public:
     /// Constructor with salvage level.
@@ -246,57 +239,39 @@ namespace Belle {
     unsigned _minNCores;
 
     friend class TBuilderConformal;
-  };
+};
 
 //-----------------------------------------------------------------------------
 
-#ifdef TBuilder_NO_INLINE
-#define inline
-#else
-#undef inline
-#define TBuilder_INLINE_DEFINE_HERE
-#endif
-
-#ifdef TBuilder_INLINE_DEFINE_HERE
-
-  inline
-  const std::string&
-  TBuilder::name(void) const
-  {
+inline
+const std::string&
+TBuilder::name(void) const {
     return _name;
-  }
+}
 
-  inline
-  unsigned
-  TBuilder::minNCores(void) const
-  {
+inline
+unsigned
+TBuilder::minNCores(void) const {
     return _minNCores;
-  }
+}
 
-  inline
-  float
-  TBuilder::szLinkDistance(void) const
-  {
+inline
+float
+TBuilder::szLinkDistance(void) const {
     return _szLinkDistance;
-  }
+}
 
-  inline
-  const THelixFitter&
-  TBuilder::helixFitter(void) const
-  {
+inline
+const THelixFitter&
+TBuilder::helixFitter(void) const {
     return _fitter;
-  }
+}
 
-  inline
-  float
-  TBuilder::maxSigmaStereo(void) const
-  {
+inline
+float
+TBuilder::maxSigmaStereo(void) const {
     return _maxSigmaStereo;
-  }
-
-#endif
-
-#undef inline
+}
 
 } // namespace Belle
 

@@ -48,26 +48,26 @@
 
 #ifndef TPOINT2D_FLAG_
 #define TPOINT2D_FLAG_
-#include "CLHEP/Geometry/Point3D.h"
 
-#ifdef TRASAN_DEBUG_DETAIL
-#ifndef TRASAN_DEBUG
-#define TRASAN_DEBUG
-#endif
-#endif
+#define HEP_SHORT_NAMES
 
 #include <cmath>
-#define HEP_SHORT_NAMES
+#include "CLHEP/Geometry/Point3D.h"
 #include "CLHEP/Geometry/Vector3D.h"
 
 namespace Belle {
 
-  typedef HepGeom::Vector3D<double>  Vector3D;
+class TPoint2D;
+
+std::ostream&
+operator << (std::ostream&, const TPoint2D&);
+
+typedef HepGeom::Vector3D<double>  Vector3D;
 
 //  class CLHEP::Hep3Vector;
 
 /// A class to represent a point in 2D.
-  class TPoint2D {
+class TPoint2D {
 
   public:
     /// Constructors
@@ -102,128 +102,100 @@ namespace Belle {
 
   private:
     double _p[2];
-  };
-
-  std::ostream&
-  operator << (std::ostream&, const TPoint2D&);
+};
 
 //-----------------------------------------------------------------------------
 
-#ifdef TPOINT2D_NO_INLINE
-#define inline
-#else
-#undef inline
-#define TPOINT2D_INLINE_DEFINE_HERE
-#endif
-#ifdef TPOINT2D_INLINE_DEFINE_HERE
-
-  inline
-  double
-  TPoint2D::x(void) const
-  {
+inline
+double
+TPoint2D::x(void) const {
     return _p[0];
-  }
+}
 
-  inline
-  double
-  TPoint2D::y(void) const
-  {
+inline
+double
+TPoint2D::y(void) const {
     return _p[1];
-  }
+}
 
-  inline
-  double
-  TPoint2D::x(double a)
-  {
+inline
+double
+TPoint2D::x(double a) {
     return _p[0] = a;
-  }
+}
 
-  inline
-  double
-  TPoint2D::y(double a)
-  {
+inline
+double
+TPoint2D::y(double a) {
     return _p[1] = a;
-  }
+}
 
-  inline
-  double
-  TPoint2D::mag(void) const
-  {
+inline
+double
+TPoint2D::mag(void) const {
     return sqrt(_p[0] * _p[0] + _p[1] * _p[1]);
-  }
+}
 
-  inline
-  double
-  TPoint2D::mag2(void) const
-  {
+inline
+double
+TPoint2D::mag2(void) const {
     return _p[0] * _p[0] + _p[1] * _p[1];
-  }
+}
 
-  inline
-  double
-  TPoint2D::phi(void) const
-  {
+inline
+double
+TPoint2D::phi(void) const {
     if (_p[0] == 0.0 && _p[1] == 0.0) return 0.;
     double a = atan2(_p[1], _p[0]);
     if (a > 0) return a;
     return a + 2. * M_PI;
-  }
+}
 
-  inline
-  double
-  TPoint2D::dot(const TPoint2D& a) const
-  {
+inline
+double
+TPoint2D::dot(const TPoint2D& a) const {
     return _p[0] * a.x() + _p[1] * a.y();
-  }
+}
 
-  inline
-  double
-  TPoint2D::cross(const TPoint2D& a) const
-  {
+inline
+double
+TPoint2D::cross(const TPoint2D& a) const {
     return _p[0] * a.y() - a.x() * _p[1];
-  }
+}
 
-  inline
-  TPoint2D
-  TPoint2D::operator + (const TPoint2D& a) const
-  {
+inline
+TPoint2D
+TPoint2D::operator + (const TPoint2D& a) const {
     return TPoint2D(_p[0] + a.x(), _p[1] + a.y());
-  }
+}
 
-  inline
-  TPoint2D
-  TPoint2D::operator - (const TPoint2D& a) const
-  {
+inline
+TPoint2D
+TPoint2D::operator - (const TPoint2D& a) const {
     return TPoint2D(_p[0] - a.x(), _p[1] - a.y());
-  }
+}
 
-  inline
-  TPoint2D
-  TPoint2D::operator - () const
-  {
+inline
+TPoint2D
+TPoint2D::operator - () const {
     return TPoint2D(- _p[0], - _p[1]);
-  }
+}
 
-  inline
-  bool
-  TPoint2D::operator == (const TPoint2D& a) const
-  {
+inline
+bool
+TPoint2D::operator == (const TPoint2D& a) const {
     if (a.x() == _p[0] && a.y() == _p[1]) return true;
     return false;
-  }
+}
 
-  inline
-  TPoint2D
-  TPoint2D::unit(void) const
-  {
+inline
+TPoint2D
+TPoint2D::unit(void) const {
     double sum2 = _p[0] * _p[0] + _p[1] * _p[1];
     if (sum2 == 0.) return TPoint2D(0., 0.);
     double sum = sqrt(sum2);
     return TPoint2D(_p[0] / sum, _p[1] / sum);
-  }
-
-#endif
-#undef inline
+}
 
 } // namespace Belle
 

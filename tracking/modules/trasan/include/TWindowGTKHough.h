@@ -17,22 +17,16 @@
 #ifndef TWINDOWGTKHOUGH_FLAG_
 #define TWINDOWGTKHOUGH_FLAG_
 
-
 #define HEP_SHORT_NAMES
+
 #include "tracking/modules/trasan/ConstAList.h"
 #include "tracking/modules/trasan/TWindowGTK.h"
 #include "tracking/modules/trasan/TWindowHoughDrawingArea.h"
 
 namespace Belle {
 
-  class TRGCDCWireHit;
-  class TLink;
-  class TTrackBase;
-  class TSegment;
-  class TTrack;
-
 /// A class to display tracking objects.
-  class TWindowGTKHough : public TWindowGTK {
+class TWindowGTKHough : public TWindowGTK {
 
   public:
     /// Default constructor
@@ -55,62 +49,46 @@ namespace Belle {
 
   private: // GTK stuff
     TWindowHoughDrawingArea _w;
-  };
+};
 
 //-----------------------------------------------------------------------------
 
-#ifdef TRASAN_NO_INLINE
-#define inline
-#else
-#undef inline
-#define TWINDOWGTK_INLINE_DEFINE_HERE
-#endif
-#ifdef TWINDOWGTK_INLINE_DEFINE_HERE
-
-  inline
-  void
-  TWindowGTKHough::clear(void)
-  {
+inline
+void
+TWindowGTKHough::clear(void) {
     _w.clear();
     TWindowGTK::clear();
-  }
+}
 
-  inline
-  void
-  TWindowGTKHough::on_axial(void)
-  {
+inline
+void
+TWindowGTKHough::on_axial(void) {
     TWindowGTK::on_axial();
     _w.axial(axial());
     _w.on_expose_event((GdkEventExpose*) NULL);
-  }
+}
 
-  inline
-  void
-  TWindowGTKHough::on_stereo(void)
-  {
+inline
+void
+TWindowGTKHough::on_stereo(void) {
     TWindowGTK::on_stereo();
     _w.stereo(stereo());
     _w.on_expose_event((GdkEventExpose*) NULL);
-  }
+}
 
-  inline
-  void
-  TWindowGTKHough::on_wireName(void)
-  {
+inline
+void
+TWindowGTKHough::on_wireName(void) {
     TWindowGTK::on_wireName();
     _w.wireName(wireName());
     _w.on_expose_event((GdkEventExpose*) NULL);
-  }
+}
 
-  inline
-  void
-  TWindowGTKHough::append(const THoughPlane* const a)
-  {
+inline
+void
+TWindowGTKHough::append(const THoughPlane* const a) {
     _w.append(a);
-  }
-
-#endif
-#undef inline
+}
 
 } // namespace Belle
 

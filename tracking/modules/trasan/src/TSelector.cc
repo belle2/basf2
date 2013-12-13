@@ -56,7 +56,7 @@
 
 namespace Belle {
 
-  TSelector::TSelector()
+TSelector::TSelector()
     : _nLinksDefined(false),
       _nLinksStereoDefined(false),
       _nSuperLayersDefined(false),
@@ -65,11 +65,10 @@ namespace Belle {
       _nLinks(0),
       _nLinksStereo(0),
       _nSuperLayers(0),
-      _minPt(0.)
-  {
-  }
+      _minPt(0.) {
+}
 
-  TSelector::TSelector(const TSelector& a)
+TSelector::TSelector(const TSelector& a)
     : _nLinksDefined(a._nLinksDefined),
       _nLinksStereoDefined(a._nLinksStereoDefined),
       _nSuperLayersDefined(a._nSuperLayersDefined),
@@ -78,45 +77,41 @@ namespace Belle {
       _nLinks(a._nLinks),
       _nLinksStereo(a._nLinksStereo),
       _nSuperLayers(a._nSuperLayers),
-      _minPt(a._minPt)
-  {
-  }
+      _minPt(a._minPt) {
+}
 
-  TSelector::~TSelector()
-  {
-  }
+TSelector::~TSelector() {
+}
 
-  bool
-  TSelector::select(TTrackBase& b) const
-  {
+bool
+TSelector::select(TTrackBase& b) const {
 
     if (_nLinksDefined) {
-      const unsigned n = b.nLinks();
-      if (n < _nLinks) return false;
+        const unsigned n = b.nLinks();
+        if (n < _nLinks) return false;
     }
 
     if (_nLinksStereoDefined) {
-      const unsigned n = TLink::nStereoHits(b.links());
-      if (n < _nLinksStereo) return false;
+        const unsigned n = TLink::nStereoHits(b.links());
+        if (n < _nLinksStereo) return false;
     }
 
     if (_nSuperLayersDefined) {
-      const unsigned n = TLink::nSuperLayers(b.links());
-      if (n < _nSuperLayers) return false;
+        const unsigned n = TLink::nSuperLayers(b.links());
+        if (n < _nSuperLayers) return false;
     }
 
     if (_minPtDefined) {
-      const unsigned type = b.objectType();
-      if (type == Track) {
-        if (((TTrack&) b).pt() < _minPt) return false;
-      }
-      if (type == Circle) {
-        if (((TCircle&) b).pt() < _minPt) return false;
-      }
+        const unsigned type = b.objectType();
+        if (type == Track) {
+            if (((TTrack&) b).pt() < _minPt) return false;
+        }
+        if (type == Circle) {
+            if (((TCircle&) b).pt() < _minPt) return false;
+        }
     }
 
     return true;
-  }
+}
 
 } // namespace Belle
-

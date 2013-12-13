@@ -45,23 +45,18 @@
 #ifndef TCOSMICFITTER_FLAG_
 #define TCOSMICFITTER_FLAG_
 
-#ifdef TRASAN_DEBUG_DETAIL
-#ifndef TRASAN_DEBUG
-#define TRASAN_DEBUG
-#endif
-#endif
-
-#include "tracking/modules/trasan/TFitter.h"
 #define HEP_SHORT_NAMES
+
 #include "CLHEP/Matrix/Vector.h"
+#include "tracking/modules/trasan/TFitter.h"
 #include "tracking/modules/trasan/THelix.h"
 
 namespace Belle {
 
-  class TLink;
+class TLink;
 
 /// A class to fit a TTrackBase object to a helix.
-  class TCosmicFitter : public TFitter {
+class TCosmicFitter : public TFitter {
 
   public:
     /// Constructor.
@@ -93,22 +88,9 @@ namespace Belle {
              int doSagCorrection) const;
 
   private:
-  };
+};
 
 //-----------------------------------------------------------------------------
-
-#ifdef TRASAN_NO_INLINE
-#define inline
-#else
-#undef inline
-#define TCOSMICFITTER_INLINE_DEFINE_HERE
-#endif
-
-#ifdef TCOSMICFITTER_INLINE_DEFINE_HERE
-
-#endif
-
-#undef inline
 
 } // namespace Belle
 

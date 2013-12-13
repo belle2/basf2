@@ -73,28 +73,20 @@
 #ifndef THistogram_FLAG_
 #define THistogram_FLAG_
 
-#ifdef TRASAN_DEBUG_DETAIL
-#ifndef TRASAN_DEBUG
-#define TRASAN_DEBUG
-#endif
-#endif
-
+#define HEP_SHORT_NAMES
 
 #include <string>
-
-#define HEP_SHORT_NAMES
 #include "tracking/modules/trasan/AList.h"
-
 #include "tracking/modules/trasan/TLink.h"
 #include "tracking/modules/trasan/TSegment0.h"
 #include "tracking/modules/trasan/TSegment.h"
 
 namespace Belle {
 
-  class TCircle;
+class TCircle;
 
 /// A class for a histogram used in tracking.
-  class THistogram {
+class THistogram {
 
   public:
     /// Constructor.
@@ -167,74 +159,54 @@ namespace Belle {
     AList<TLink> ** _links;
     AList<TLink> _all;
     float _binSize;
-  };
+};
 
 //-----------------------------------------------------------------------------
 
-#ifdef THistogram_NO_INLINE
-#define inline
-#else
-#undef inline
-#define THistogram_INLINE_DEFINE_HERE
-#endif
-
-#ifdef THistogram_INLINE_DEFINE_HERE
-
-  inline
-  const AList<TLink> *
-  THistogram::bin(unsigned i) const
-  {
+inline
+const AList<TLink> *
+THistogram::bin(unsigned i) const {
     if (i < _nBins) return _links[i];
     return 0;
-  }
+}
 
-  inline
-  const AList<TLink> *
-  THistogram::bin(int i) const
-  {
+inline
+const AList<TLink> *
+THistogram::bin(int i) const {
     while (i < 0) i += _nBins;
     return _links[i % _nBins];
-  }
+}
 
-  inline
-  unsigned
-  THistogram::nBins(void) const
-  {
+inline
+unsigned
+THistogram::nBins(void) const {
     return _nBins;
-  }
+}
 
-  inline
-  void
-  THistogram::mask(unsigned a)
-  {
+inline
+void
+THistogram::mask(unsigned a) {
     _masks[a] = true;
-  }
+}
 
-  inline
-  void
-  THistogram::unmask(void)
-  {
+inline
+void
+THistogram::unmask(void) {
     for (unsigned i = 0; i < _nBins; i++) _masks[i] = false;
-  }
+}
 
-  inline
-  const AList<TLink> &
-  THistogram::contents(void) const
-  {
+inline
+const AList<TLink> &
+THistogram::contents(void) const {
     return _all;
-  }
+}
 
-  inline
-  unsigned
-  THistogram::nBin(unsigned i) const
-  {
+inline
+unsigned
+THistogram::nBin(unsigned i) const {
     if (i < _nBins) return _bins[i];
     return 0;
-  }
-
-#endif
-
-#undef inline
+}
 
 } // namespace Belle
 

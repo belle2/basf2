@@ -2,7 +2,7 @@
 // $Id$
 //-----------------------------------------------------------------------------
 // Filename : TrasanModule.h
-// Section  : TRG CDC
+// Section  : CDC tracking trasan
 // Owner    : Yoshihito Iwasaki
 // Email    : yoshihito.iwasaki@kek.jp
 //-----------------------------------------------------------------------------
@@ -19,13 +19,13 @@
 #include "tracking/modules/trasan/Trasan.h"
 
 namespace Belle {
-  class Trasan;
+class Trasan;
 }
 
 namespace Belle2 {
 
 /// A track finding module using Belle track finder Trasan.
-  class TrasanModule : public Module {
+class TrasanModule : public Module {
 
   public:
 
@@ -60,7 +60,7 @@ namespace Belle2 {
 
     /// Trasan.
     Belle::Trasan _tra;
-  };
+};
 
 } // namespace Belle2
 

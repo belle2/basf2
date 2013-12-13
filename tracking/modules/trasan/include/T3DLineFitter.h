@@ -36,30 +36,22 @@
 
 #ifndef T3DLINEFITTER_FLAG_
 #define T3DLINEFITTER_FLAG_
-#include "CLHEP/Geometry/Point3D.h"
-#include "CLHEP/Geometry/Vector3D.h"
-
-#ifdef TRASAN_DEBUG_DETAIL
-#ifndef TRASAN_DEBUG
-#define TRASAN_DEBUG
-#endif
-#endif
-
-
-#include <string>
 
 #define HEP_SHORT_NAMES
 
+#include <string>
+#include "CLHEP/Geometry/Point3D.h"
+#include "CLHEP/Geometry/Vector3D.h"
 #include "tracking/modules/trasan/THelix.h"
 #include "tracking/modules/trasan/TFitter.h"
 
 namespace Belle {
 
-  class TLink;
-  class T3DLine;
+class TLink;
+class T3DLine;
 
 /// A class to fit a TTrackBase object to a 3D line.
-  class T3DLineFitter : public TFitter {
+class T3DLineFitter : public TFitter {
 
   public:
     /// Constructor.
@@ -103,7 +95,7 @@ namespace Belle {
     int _propagation;
     bool _tof;
 
-  };
+};
 
 //-----------------------------------------------------------------------------
 

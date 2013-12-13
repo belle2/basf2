@@ -18,28 +18,21 @@
 #ifndef TUtilities_FLAG_
 #define TUtilities_FLAG_
 
-
 namespace Belle {
 
-#ifdef TRASAN_DEBUG_DETAIL
-#ifndef TRASAN_DEBUG
-#define TRASAN_DEBUG
-#endif
-#endif
+class TPoint2D;
 
-  class TPoint2D;
+extern const float PI2;
+extern const TPoint2D Origin;
 
-  extern const float PI2;
-  extern const TPoint2D Origin;
+float
+PositiveRadian(float);
 
-  float
-  PositiveRadian(float);
+bool
+InRangeRadian(float phi0, float phi1, float phi);
 
-  bool
-  InRangeRadian(float phi0, float phi1, float phi);
-
-  float
-  DistanceRadian(float a, float b);
+float
+DistanceRadian(float a, float b);
 
 } // namespace Belle
 

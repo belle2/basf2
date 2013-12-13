@@ -33,9 +33,6 @@
 //
 //-----------------------------------------------------------------------------
 
-
-
-
 #include "tracking/modules/trasan/TCircleFitter.h"
 #include "tracking/modules/trasan/TTrackBase.h"
 #include "tracking/modules/trasan/TCircle.h"
@@ -47,18 +44,16 @@
 
 namespace Belle {
 
-  TCircleFitter::TCircleFitter(const std::string& name)
-    : TFitter(name), _charge(0.), _radius(0.), _center(Point3D(0., 0., 0.))
-  {
-  }
+TCircleFitter::TCircleFitter(const std::string& name)
+    : TFitter(name), _charge(0.), _radius(0.), _center(Point3D(0., 0., 0.)) {
+}
 
-  TCircleFitter::~TCircleFitter()
-  {
-  }
+TCircleFitter::~TCircleFitter() {
+}
 
-  int
-  TCircleFitter::fit(TTrackBase& t) const
-  {
+int
+TCircleFitter::fit(TTrackBase& t) const {
+
 #ifdef TRASAN_DEBUG
     const std::string stage = "TCrclFitter::fit";
     EnterStage(stage);
@@ -67,45 +62,45 @@ namespace Belle {
     //...Already fitted ?...
     if (t.fitted()) {
 #ifdef TRASAN_DEBUG
-      LeaveStage(stage);
+	LeaveStage(stage);
 #endif
-      return TFitAlreadyFitted;
+	return TFitAlreadyFitted;
     }
 
     //...Check # of hits...
     if (t.links().length() < 3) {
 #ifdef TRASAN_DEBUG
-      LeaveStage(stage);
+	LeaveStage(stage);
 #endif
-      return TFitErrorFewHits;
+	return TFitErrorFewHits;
     }
 
     //...Hit loop...
     Lpav circle;
     unsigned n = t.links().length();
     for (unsigned i = 0; i < n; i++) {
-      TLink* l = t.links()[i];
-      const Belle2::TRGCDCWireHit* h = l->hit();
+	TLink* l = t.links()[i];
+	const TWireHit* h = l->hit();
 
-      //...Check next hit...
-      Point3D point;
-      if (h->state() & CellHitPatternLeft)
-        point = h->position(CellHitLeft);
-      else if (h->state() & CellHitPatternRight)
-        point = h->position(CellHitRight);
-      else
-        point = h->xyPosition();
-      // float weight = 1. / (h->distance() * h->distance());
-      // float weight = 1. / h->distance();
+	//...Check next hit...
+	Point3D point;
+	if (h->state() & CellHitPatternLeft)
+	    point = h->position(CellHitLeft);
+	else if (h->state() & CellHitPatternRight)
+	    point = h->position(CellHitRight);
+	else
+	    point = h->xyPosition();
+	// float weight = 1. / (h->distance() * h->distance());
+	// float weight = 1. / h->distance();
 
-      circle.add_point(point.x(), point.y()); //, weight);
+	circle.add_point(point.x(), point.y()); //, weight);
     }
 
     if (circle.fit() < 0.0 || circle.kappa() == 0.0) {
 #ifdef TRASAN_DEBUG
-      LeaveStage(stage);
+	LeaveStage(stage);
 #endif
-      return TFitFailed;
+	return TFitFailed;
     }
     CLHEP::HepVector v(circle.center());
     _center.setX(v(1));
@@ -115,22 +110,22 @@ namespace Belle {
     //...Determine charge...Better way???
     int qSum = 0;
     for (unsigned i = 0; i < n; i++) {
-      TLink* l = t.links()[i];
-      if (l == 0) continue;
+	TLink* l = t.links()[i];
+	if (l == 0) continue;
 
-      const Belle2::TRGCDCWireHit* h = l->hit();
-      if (h == 0) continue;
+	const TWireHit* h = l->hit();
+	if (h == 0) continue;
 
-      float q = (_center.cross(h->xyPosition())).z();
-      if (q > 0.) qSum += 1;
-      else        qSum -= 1;
+	float q = (_center.cross(h->xyPosition())).z();
+	if (q > 0.) qSum += 1;
+	else        qSum -= 1;
     }
     if (qSum >= 0) _charge = +1.;
     else           _charge = -1.;
     _radius *= _charge;
 
     if (t.objectType() == Circle)
-      ((TCircle&) t).property(_charge, _radius, _center);
+	((TCircle&) t).property(_charge, _radius, _center);
     fitDone(t);
 
 #ifdef TRASAN_DEBUG
@@ -138,7 +133,7 @@ namespace Belle {
 #endif
 
     return 0;
-  }
+}
 
 } // namespace Belle
 

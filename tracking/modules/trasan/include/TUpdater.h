@@ -40,19 +40,12 @@
 #ifndef TUpdater_FLAG_
 #define TUpdater_FLAG_
 
-#ifdef TRASAN_DEBUG_DETAIL
-#ifndef TRASAN_DEBUG
-#define TRASAN_DEBUG
-#endif
-#endif
-
-
 #include <string>
 
 namespace Belle {
 
 /// A class to handle update timing of static objects of tracking.
-  class TUpdater {
+class TUpdater {
 
   public:
     /// Constructor
@@ -88,43 +81,27 @@ namespace Belle {
     int _runN;
     int _evtN;
     bool _init;
-  };
+};
 
 //-----------------------------------------------------------------------------
 
-#ifdef TRASAN_NO_INLINE
-#define inline
-#else
-#undef inline
-#define TUpdater_INLINE_DEFINE_HERE
-#endif
-
-#ifdef TUpdater_INLINE_DEFINE_HERE
-
-  inline
-  bool
-  TUpdater::initialized(void) const
-  {
+inline
+bool
+TUpdater::initialized(void) const {
     return _init;
-  }
+}
 
-  inline
-  void
-  TUpdater::initialize(void)
-  {
+inline
+void
+TUpdater::initialize(void) {
     _init = true;
-  }
+}
 
-  inline
-  void
-  TUpdater::clear(void)
-  {
+inline
+void
+TUpdater::clear(void) {
     _expN = -1;
-  }
-
-#endif
-
-#undef inline
+}
 
 } // namespace Belle
 

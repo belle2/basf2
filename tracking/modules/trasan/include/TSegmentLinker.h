@@ -36,25 +36,18 @@
 #ifndef TSegmentLinker_FLAG_
 #define TSegmentLinker_FLAG_
 
-#ifdef TRASAN_DEBUG_DETAIL
-#ifndef TRASAN_DEBUG
-#define TRASAN_DEBUG
-#endif
-#endif
-
+#define HEP_SHORT_NAMES
 
 #include <string>
-
-#define HEP_SHORT_NAMES
 #include "tracking/modules/trasan/AList.h"
 
 namespace Belle {
 
-  class Range;
-  class TSegment0;
+class Range;
+class TSegment0;
 
 /// A class to link TSegment0s.
-  class TSegmentLinker {
+class TSegmentLinker {
 
   public:
     /// Constructor.
@@ -81,23 +74,9 @@ namespace Belle {
     unsigned _nLayer;
     TSegment0* _base;
     AList<TSegment0> * _list[11];
-  };
+};
 
 //-----------------------------------------------------------------------------
-
-#ifdef TRASAN_NO_INLINE
-#define inline
-#else
-#undef inline
-#define TSegmentLinker_INLINE_DEFINE_HERE
-#endif
-
-#ifdef TSegmentLinker_INLINE_DEFINE_HERE
-
-
-#endif
-
-#undef inline
 
 } // namespace Belle
 

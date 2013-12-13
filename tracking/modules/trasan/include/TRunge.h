@@ -28,40 +28,33 @@
 //
 //-----------------------------------------------------------------------------
 
-#ifdef TRASAN_DEBUG_DETAIL
-#ifndef TRASAN_DEBUG
-#define TRASAN_DEBUG
-#endif
-#endif
 #ifndef TRUNGE_FLAG_
 #define TRUNGE_FLAG_
-#include "CLHEP/Geometry/Point3D.h"
-#include "CLHEP/Geometry/Vector3D.h"
 
+#define HEP_SHORT_NAMES
 #define Runge 64
 // This must be writen in TTrackBase.h
 
-#define HEP_SHORT_NAMES
-
+#include "CLHEP/Geometry/Point3D.h"
+#include "CLHEP/Geometry/Vector3D.h"
 #ifndef CLHEP_POINT3D_H
 #include "CLHEP/Geometry/Point3D.h"
 #endif
-
 #include "tracking/modules/trasan/THelix.h"
 #include "tracking/modules/trasan/Bfield.h"
 #include "tracking/modules/trasan/TTrackBase.h"
 
 namespace Belle {
 
-  typedef HepGeom::Point3D<double>  Point3D;
-  class TRungeFitter;
-  class TTrack;
-  class TLink;
+typedef HepGeom::Point3D<double>  Point3D;
+class TRungeFitter;
+class TTrack;
+class TLink;
 
 #define TRunge_MAXstep 10000
 
 /// A class to represent a track in tracking.
-  class TRunge : public TTrackBase {
+class TRunge : public TTrackBase {
 
   public:
     /// Constructors
@@ -129,23 +122,34 @@ namespace Belle {
 
   public:// Utilities
     /// calculates the closest approach to a wire in real space.
-    ///  Results are stored in TLink. Return value is negative if error happened.
+    /// Results are stored in TLink. Return value is negative if error
+    /// happened.
     int approach(TLink&, bool sagCorrection = true) const;
     int approach(TLink&, float& tof, HepGeom::Vector3D<double> & p,
                  bool sagCorrection = true) const;
 
     /// caluculate closest points between a line and this track
-    int approach_line(const HepGeom::Point3D<double> &, const HepGeom::Vector3D<double> &,
-                      HepGeom::Point3D<double> & onLine, HepGeom::Point3D<double> & onTrack) const;
-    int approach_line(const HepGeom::Point3D<double> &, const HepGeom::Vector3D<double> &,
-                      HepGeom::Point3D<double> & onLine, HepGeom::Point3D<double> & onTrack,
-                      float& tof, HepGeom::Vector3D<double> & p) const;
-    int approach_line(const HepGeom::Point3D<double> &, const HepGeom::Vector3D<double> &,
-                      HepGeom::Point3D<double> & onLine, HepGeom::Point3D<double> & onTrack,
-                      float& tof, HepGeom::Vector3D<double> & p, unsigned& stepNum) const;
+    int approach_line(const HepGeom::Point3D<double> &,
+                      const HepGeom::Vector3D<double> &,
+                      HepGeom::Point3D<double> & onLine,
+                      HepGeom::Point3D<double> & onTrack) const;
+    int approach_line(const HepGeom::Point3D<double> &,
+                      const HepGeom::Vector3D<double> &,
+                      HepGeom::Point3D<double> & onLine,
+                      HepGeom::Point3D<double> & onTrack,
+                      float& tof,
+                      HepGeom::Vector3D<double> & p) const;
+    int approach_line(const HepGeom::Point3D<double> &,
+                      const HepGeom::Vector3D<double> &,
+                      HepGeom::Point3D<double> & onLine,
+                      HepGeom::Point3D<double> & onTrack,
+                      float& tof,
+                      HepGeom::Vector3D<double> & p,
+                      unsigned& stepNum) const;
 
     /// caluculate closest point between a point and this track
-    int approach_point(const HepGeom::Point3D<double> &, HepGeom::Point3D<double> & onTrack) const;
+    int approach_point(const HepGeom::Point3D<double> &,
+                       HepGeom::Point3D<double> & onTrack) const;
 
   public:// Modifiers
     /// set new pivot
@@ -238,12 +242,15 @@ namespace Belle {
     mutable double _h[TRunge_MAXstep];  //step size in each step
     mutable unsigned _Nstep;    //0:not cached the trajectory
 
-  };
+};
 
-  inline unsigned TRunge::objectType(void) const
-  {
+//-----------------------------------------------------------------------------
+
+inline
+unsigned
+TRunge::objectType(void) const {
     return Runge;
-  }
+}
 
 } // namespace Belle
 

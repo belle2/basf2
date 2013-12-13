@@ -23,21 +23,20 @@
 
 #ifdef TRASAN_WINDOW
 
-
 #ifndef TWINDOWHOUGH_FLAG_
 #define TWINDOWHOUGH_FLAG_
 
 #define HEP_SHORT_NAMES
+
 #include "tracking/modules/trasan/AList.h"
 #include "tracking/modules/trasan/TWindow.h"
-#if defined(BELLE_NAMESPACE)
-namespace Belle {
-#endif
 
-  class THoughPlane;
+namespace Belle {
+
+class THoughPlane;
 
 /// A class to display tracking object in Hough Finder.
-  class TWindowHough : public TWindow {
+class TWindowHough : public TWindow {
 
   public:
     /// Default constructor
@@ -64,29 +63,13 @@ namespace Belle {
 
     /// waits.
     void wait(void);
-  };
+};
 
 //-----------------------------------------------------------------------------
 
-#ifdef TRASAN_NO_INLINE
-#define inline
-#else
-#undef inline
-#define TWINDOW_INLINE_DEFINE_HERE
-#endif
-
-#ifdef TWINDOW_INLINE_DEFINE_HERE
-
-
-
-
-#endif
-
-#undef inline
-
-#if defined(BELLE_NAMESPACE)
 } // namespace Belle
-#endif
+
+
 #endif TWINDOWHOUGH_FLAG_
 
 #endif /* TRASAN_WINDOW */

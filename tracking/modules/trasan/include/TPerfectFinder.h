@@ -29,11 +29,7 @@
 
 #ifndef TPERFECTFINDER_FLAG_
 #define TPERFECTFINDER_FLAG_
-#ifdef TRASAN_DEBUG_DETAIL
-#ifndef TRASAN_DEBUG
-#define TRASAN_DEBUG
-#endif
-#endif
+
 #define HEP_SHORT_NAMES
 
 #include "tracking/modules/trasan/TFinderBase.h"
@@ -43,10 +39,11 @@
 
 namespace Belle {
 
-  template <class T> class AList;
+template <class T> class AList;
+class TWireHit;
 
 /// A class to find tracks using MC info.
-  class TPerfectFinder : public TFinderBase {
+class TPerfectFinder : public TFinderBase {
 
   public:
     /// Constructor.
@@ -80,8 +77,8 @@ namespace Belle {
     void init(void);
 
     /// finds tracks.
-    int doit(const CAList<Belle2::TRGCDCWireHit> & axialHits,
-             const CAList<Belle2::TRGCDCWireHit> & stereoHits,
+    int doit(const CAList<TWireHit> & axialHits,
+             const CAList<TWireHit> & stereoHits,
              AList<TTrack> & tracks,
              AList<TTrack> & tracks2D);
 
@@ -96,43 +93,27 @@ namespace Belle {
     unsigned _fittingFlag;
     TBuilder _builder;
     THelixFitter _fitter;
-  };
+};
 
 //-----------------------------------------------------------------------------
 
-#ifdef TPERFECTFINDER_NO_INLINE
-#define inline
-#else
-#undef inline
-#define TPERFECTFINDER_INLINE_DEFINE_HERE
-#endif
-
-#ifdef TPERFECTFINDER_INLINE_DEFINE_HERE
-
-  inline
-  std::string
-  TPerfectFinder::name(void) const
-  {
+inline
+std::string
+TPerfectFinder::name(void) const {
     return "Perfect Finder";
-  }
+}
 
-  inline
-  bool
-  TPerfectFinder::perfectFitting(bool a)
-  {
+inline
+bool
+TPerfectFinder::perfectFitting(bool a) {
     return _perfectFitting = a;
-  }
+}
 
-  inline
-  void
-  TPerfectFinder::init(void)
-  {
+inline
+void
+TPerfectFinder::init(void) {
     return;
-  }
-
-#endif
-
-#undef inline
+}
 
 } // namespace Belle
 

@@ -60,34 +60,25 @@
 #ifndef TFinderBase_FLAG_
 #define TFinderBase_FLAG_
 
-#ifdef TRASAN_DEBUG_DETAIL
-#ifndef TRASAN_DEBUG
-#define TRASAN_DEBUG
-#endif
-#endif
-
+#define HEP_SHORT_NAMES
 
 #include <string>
-#define HEP_SHORT_NAMES
 #include "tracking/modules/trasan/ConstAList.h"
-
-namespace Belle2 {
-  class TRGCDCWireHit;
-}
 
 namespace Belle {
 
-  class TCircle;
-  class TTrack;
-  class TPoint2D;
-  class TLink;
+class TCircle;
+class TTrack;
+class TPoint2D;
+class TLink;
+class TWireHit;
 
 // extern const float WIDTHXXX[11];
 // extern const float RXXX[12];
 // extern const float R2XXX[12];
 
 /// A virtual class for a track finder in tracking.
-  class TFinderBase {
+class TFinderBase {
 
   public:
     /// Constructor
@@ -126,9 +117,11 @@ namespace Belle {
     /// sets flag to salvage hits.
     virtual bool doSalvage(bool);
 
-    /// finds tracks. 'hits' are used to reconstruct. 'tracks' can be used for both inputs and outputs. Return value = (0, +, -) means (success, warning, fatal error).
-    virtual int doit(const CAList<Belle2::TRGCDCWireHit> & axialHits,
-                     const CAList<Belle2::TRGCDCWireHit> & stereoHits,
+    /// finds tracks. 'hits' are used to reconstruct. 'tracks' can be
+    /// used for both inputs and outputs. Return value = (0, +, -)
+    /// means (success, warning, fatal error).
+    virtual int doit(const CAList<TWireHit> & axialHits,
+                     const CAList<TWireHit> & stereoHits,
                      AList<TTrack> & tracks3D,
                      AList<TTrack> & tracks2D) = 0;
 
@@ -164,50 +157,33 @@ namespace Belle {
     static TPoint2D _points0[100];
     static TPoint2D _points1[100];
     static TPoint2D _points2[100];
-  };
+};
 
 //-----------------------------------------------------------------------------
 
-#ifdef TFinderBase_NO_INLINE
-#define inline
-#else
-#undef inline
-#define TFinderBase_INLINE_DEFINE_HERE
-#endif
-
-#ifdef TFinderBase_INLINE_DEFINE_HERE
-
-  inline
-  int
-  TFinderBase::debugLevel(void) const
-  {
+inline
+int
+TFinderBase::debugLevel(void) const {
     return _debugLevel;
-  }
+}
 
-  inline
-  int
-  TFinderBase::debugLevel(int a)
-  {
+inline
+int
+TFinderBase::debugLevel(int a) {
     return _debugLevel = a;
-  }
+}
 
-  inline
-  bool
-  TFinderBase::doStereo(bool a)
-  {
+inline
+bool
+TFinderBase::doStereo(bool a) {
     return a;
-  }
+}
 
-  inline
-  bool
-  TFinderBase::doSalvage(bool a)
-  {
+inline
+bool
+TFinderBase::doSalvage(bool a) {
     return a;
-  }
-
-#endif
-
-#undef inline
+}
 
 } // namespace Belle
 

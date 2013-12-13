@@ -7,10 +7,10 @@
 
 namespace Belle {
 
-  class TSvdHit;
-  class TSvdDssd;
+class TSvdHit;
+class TSvdDssd;
 
-  class TSvdBuilder {
+class TSvdBuilder {
   public:
     // Constructor
     TSvdBuilder(void) {};
@@ -33,7 +33,7 @@ namespace Belle {
                        AList<TSvdHit> hits,
                        double ipC = 0.);
   private:
-  };
+};
 
 } // namespace Belle
 

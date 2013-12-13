@@ -10,9 +10,9 @@
 namespace Belle {
 #endif
 
-  class Recsvd_cluster;
+class Recsvd_cluster;
 
-  class TSvdDssd {
+class TSvdDssd {
   public:
     // Constructor
     TSvdDssd(void) : m_dssd(-1) {};
@@ -32,13 +32,13 @@ namespace Belle {
     inline int dssd(void) const { return m_dssd; }
 
     Recsvd_cluster* rphi(unsigned index) const {
-      if (index < (unsigned) m_rphi.length())return m_rphi[index];
-      else return NULL;
+        if (index < (unsigned) m_rphi.length())return m_rphi[index];
+        else return NULL;
     }
 
     Recsvd_cluster* z(unsigned index) const {
-      if (index < (unsigned) m_z.length())return m_z[index];
-      else return NULL;
+        if (index < (unsigned) m_z.length())return m_z[index];
+        else return NULL;
     }
 
     unsigned nRphi(void) const { return m_rphi.length(); }
@@ -48,14 +48,14 @@ namespace Belle {
     const AList<Recsvd_cluster> & zList(void) { return m_z; }
 
     void clear(void) {
-      m_rphi.removeAll();
-      m_z.removeAll();
+        m_rphi.removeAll();
+        m_z.removeAll();
     }
   private:
     int m_dssd;
     AList<Recsvd_cluster> m_rphi;
     AList<Recsvd_cluster> m_z;
-  };
+};
 
 #if defined(BELLE_NAMESPACE)
 } // namespace Belle

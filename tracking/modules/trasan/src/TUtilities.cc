@@ -22,49 +22,45 @@
 
 namespace Belle {
 
-  const float PI2 = 2. * M_PI;
+const float PI2 = 2. * M_PI;
 
-  const TPoint2D Origin(0, 0);
+const TPoint2D Origin(0, 0);
 
-  float
-  PositiveRadian(float a)
-  {
+float
+PositiveRadian(float a) {
     while (a < 0)
-      a += PI2;
+        a += PI2;
     return fmod(a, PI2);
-  }
+}
 
-  bool
-  InRangeRadian(float a, float b, float c)
-  {
+bool
+InRangeRadian(float a, float b, float c) {
     float phi0 = PositiveRadian(a);
     float phi1 = PositiveRadian(b);
     const float phi = PositiveRadian(c);
 
     if (phi1 < phi0) {
-      float tmp = phi1;
-      phi1 = phi0;
-      phi0 = tmp;
+        float tmp = phi1;
+        phi1 = phi0;
+        phi0 = tmp;
     }
 
     const float dPhi = phi1 - phi0;
     bool ok = (phi > phi0) && (phi < phi1);
     if (dPhi > M_PI)
-      ok = ! ok;
+        ok = ! ok;
 
     return ok;
-  }
+}
 
-  float
-  DistanceRadian(float a, float b)
-  {
+float
+DistanceRadian(float a, float b) {
     const float phi0 = PositiveRadian(a);
     const float phi1 = PositiveRadian(b);
     const float dPhi = fabs(phi1 - phi0);
     if (dPhi > M_PI)
-      return PI2 - dPhi;
+        return PI2 - dPhi;
     return dPhi;
-  }
+}
 
 } // namespace Belle
-

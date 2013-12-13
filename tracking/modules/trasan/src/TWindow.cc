@@ -2,7 +2,7 @@
 // $Id: TWindow.cc 10002 2007-02-26 06:56:17Z katayama $
 //-----------------------------------------------------------------------------
 // Filename : TWindow.cc
-// Section  : Tracking CDC
+// Section  : Tracking CDC trasan
 // Owner    : Yoshihito Iwasaki
 // Email    : yoshihito.iwasaki@kek.jp
 //-----------------------------------------------------------------------------
@@ -99,10 +99,7 @@
 #ifdef TRASAN_WINDOW
 
 #include <time.h>
-
-
 #include "tracking/modules/trasan/Strings.h"
-#include "trg/cdc/TRGCDC.h"
 #include "tracking/modules/trasan/TWindow.h"
 #include "tracking/modules/trasan/TLink.h"
 #include "tracking/modules/trasan/TTrack.h"
@@ -110,26 +107,24 @@
 #include "tracking/modules/trasan/TSegment.h"
 #include "tracking/modules/trasan/TSegmentCurl.h"
 #include "tracking/modules/trasan/TCircle.h"
-#include "trg/cdc/WireHitMC.h"
 #include "tracking/modules/trasan/TTrackHEP.h"
 #include "tracking/modules/trasan/TConformalFinder0.h"
 
-
 extern struct {
-  int unpack_truncate;
-  int unpackAll;
+    int unpack_truncate;
+    int unpackAll;
 } calcdc_unpack_;
 
 #if defined(BELLE_NAMESPACE)
 namespace Belle {
 #endif
 
-  bool
-  TWindow::_skipAllWindow = false;
+bool
+TWindow::_skipAllWindow = false;
 
-  const TPoint2D AxesOrigin(0, 0);
+const TPoint2D AxesOrigin(0, 0);
 
-  TWindow::TWindow(const TWindow& a)
+TWindow::TWindow(const TWindow& a)
     : _window(600, 600, _name.c_str()),
       _name("copy of " + a._name),
       _xmin(a._xmin),
@@ -157,8 +152,7 @@ namespace Belle {
       _mode(a._mode),
       _targetRun(a._targetRun),
       _targetEvent(a._targetEvent),
-      _nEvents(a._nEvents)
-  {
+      _nEvents(a._nEvents) {
     for (unsigned i = 0; i < 4; i++) _zoomHistory[i] = a._zoomHistory[i];
     _window.set_show_coordinates(_coordinate);
     _window.buttons_per_line(7);
@@ -177,9 +171,9 @@ namespace Belle {
     _segmentPropertyButton = _window.button("sgmt vec");
     _copyButton = _window.button("window cp");
     _window.init(_xmin, _xmax, _ymin);
-  }
+}
 
-  TWindow::TWindow(const std::string& name, int x, int y)
+TWindow::TWindow(const std::string& name, int x, int y)
     : _window(x, y, name.c_str()),
       _name(name),
       _xmin(-100),
@@ -204,8 +198,7 @@ namespace Belle {
       _mode(0),
       _targetRun(0),
       _targetEvent(0),
-      _nEvents(0)
-  {
+      _nEvents(0) {
     _window.set_show_coordinates(_coordinate);
     _window.buttons_per_line(7);
     _closeButton = _window.button("next");
@@ -227,16 +220,14 @@ namespace Belle {
     _zoomHistory[1].push(Vector3D(0., 7., 0.));
     _zoomHistory[2].push(Vector3D(_xmin, _xmax, _ymin));
     _zoomHistory[3].push(Vector3D(-0.28, 0.28, -0.28));
-  }
+}
 
-  TWindow::~TWindow()
-  {
+TWindow::~TWindow() {
     clear();
-  }
+}
 
-  void
-  TWindow::wait(void)
-  {
+void
+TWindow::wait(void) {
     draw();
     if (_skip) return;
     if (_skipAllWindow) return;
@@ -247,80 +238,79 @@ namespace Belle {
 
     while (loop) {
 
-      //...Read input...
-      double x0, y0;
-      int b = _window.read_mouse(x0, y0);
+        //...Read input...
+        double x0, y0;
+        int b = _window.read_mouse(x0, y0);
 
-      //...Close...
-      if (b == _closeButton) loop = false;
-      else if (b == _szButton) {
-        if (_mode != 0) _mode = 0;
-        else if (_mode != 2) _mode = 2;
-        draw();
-      } else if (b == _confButton) {
-        if (_mode != 3) _mode = 3;
-        else if (_mode != 1) _mode = 1;
-        draw();
-      } else if (b == _segmentLinkButton) {
-        _segmentLink = ! _segmentLink;
-        draw();
-      } else if (b == _segmentPropertyButton) {
-        _segmentProperty = ! _segmentProperty;
-        draw();
-      } else if (b == _skipButton) {
-        loop = false;
-        _skip = true;
-      } else if (b == _skipAllButton) {
-        loop = false;
-        _skipAllWindow = true;
-      } else if (b == _coordinateButton) {
-        _coordinate = ! _coordinate;
-        _window.set_show_coordinates(_coordinate);
-      } else if (b == _wireNameButton) {
-        _wireName = ! _wireName;
-        draw();
-      } else if (b == _axialButton) {
-        _axial = ! _axial;
-        draw();
-      } else if (b == _stereoButton) {
-        _stereo = ! _stereo;
-        draw();
-      } else if (b == _copyButton) {
-        TWindow tmp = * this;
-        tmp.wait();
-      } else if (b == _zoomInButton) {
-        zoom = true;
-      } else if (b == _zoomOutButton) {
-        if (zoom) continue;
-        if (_zoomHistory[_mode].size() > 1) {
-          _zoomHistory[_mode].pop();
-        } else {
-          _zoomHistory[_mode].pop();
-          _xmin *= 2.;
-          _xmax *= 2.;
-          _ymin *= 2.;
-          _zoomHistory[_mode].push(Vector3D(_xmin, _xmax, _ymin));
+        //...Close...
+        if (b == _closeButton) loop = false;
+        else if (b == _szButton) {
+            if (_mode != 0) _mode = 0;
+            else if (_mode != 2) _mode = 2;
+            draw();
+        } else if (b == _confButton) {
+            if (_mode != 3) _mode = 3;
+            else if (_mode != 1) _mode = 1;
+            draw();
+        } else if (b == _segmentLinkButton) {
+            _segmentLink = ! _segmentLink;
+            draw();
+        } else if (b == _segmentPropertyButton) {
+            _segmentProperty = ! _segmentProperty;
+            draw();
+        } else if (b == _skipButton) {
+            loop = false;
+            _skip = true;
+        } else if (b == _skipAllButton) {
+            loop = false;
+            _skipAllWindow = true;
+        } else if (b == _coordinateButton) {
+            _coordinate = ! _coordinate;
+            _window.set_show_coordinates(_coordinate);
+        } else if (b == _wireNameButton) {
+            _wireName = ! _wireName;
+            draw();
+        } else if (b == _axialButton) {
+            _axial = ! _axial;
+            draw();
+        } else if (b == _stereoButton) {
+            _stereo = ! _stereo;
+            draw();
+        } else if (b == _copyButton) {
+            TWindow tmp = * this;
+            tmp.wait();
+        } else if (b == _zoomInButton) {
+            zoom = true;
+        } else if (b == _zoomOutButton) {
+            if (zoom) continue;
+            if (_zoomHistory[_mode].size() > 1) {
+                _zoomHistory[_mode].pop();
+            } else {
+                _zoomHistory[_mode].pop();
+                _xmin *= 2.;
+                _xmax *= 2.;
+                _ymin *= 2.;
+                _zoomHistory[_mode].push(Vector3D(_xmin, _xmax, _ymin));
+            }
+            zoom = false;
+            draw();
+        } else if (b == MOUSE_BUTTON(1)) {
+            if (zoom) {
+                double x, y;
+                _window.read_mouse_rect(x0, y0, x, y);
+                double xx(x0 < x ? x0 : x);
+                double xxx(x0 < x ? x : x0);
+                double yy(y0 < y ? y0 : y);
+                _zoomHistory[_mode].push(Vector3D(xx, xxx, yy));
+                draw();
+                zoom = false;
+            }
         }
-        zoom = false;
-        draw();
-      } else if (b == MOUSE_BUTTON(1)) {
-        if (zoom) {
-          double x, y;
-          _window.read_mouse_rect(x0, y0, x, y);
-          double xx(x0 < x ? x0 : x);
-          double xxx(x0 < x ? x : x0);
-          double yy(y0 < y ? y0 : y);
-          _zoomHistory[_mode].push(Vector3D(xx, xxx, yy));
-          draw();
-          zoom = false;
-        }
-      }
     }
-  }
+}
 
-  void
-  TWindow::draw(void)
-  {
+void
+TWindow::draw(void) {
     if (! target()) return;
     if (! _display) open();
 
@@ -345,201 +335,199 @@ namespace Belle {
 
     unsigned n = _objects.length();
     for (unsigned i = 0; i < n; i++) {
-      const TTrackBase& track = * _objects[i];
-      if (track.objectType() == Line)
-        drawLine((const TLine&) track, * _colors[i]);
-      else if (track.objectType() == TrackBase)
-        drawBase(track, * _colors[i]);
-      else if (track.objectType() == Track)
-        drawTrack((const TTrack&) track, * _colors[i]);
-      else if (track.objectType() == Segment)
-        drawSegment((const TSegment&) track, * _colors[i]);
-      else if (track.objectType() == Circle)
-        drawCircle((const TCircle&) track, * _colors[i]);
-      else
-        std::cout << "TWindow::draw !!! can't display" << std::endl;
+        const TTrackBase& track = * _objects[i];
+        if (track.objectType() == Line)
+            drawLine((const TLine&) track, * _colors[i]);
+        else if (track.objectType() == TrackBase)
+            drawBase(track, * _colors[i]);
+        else if (track.objectType() == Track)
+            drawTrack((const TTrack&) track, * _colors[i]);
+        else if (track.objectType() == Segment)
+            drawSegment((const TSegment&) track, * _colors[i]);
+        else if (track.objectType() == Circle)
+            drawCircle((const TCircle&) track, * _colors[i]);
+        else
+            std::cout << "TWindow::draw !!! can't display" << std::endl;
     }
 
     //...Text...
     _window.draw_text(_xPositionText, _yPositionText, _text.c_str());
-  }
+}
 
-  void
-  TWindow::drawBase(const TTrackBase& base, leda_color c)
-  {
+void
+TWindow::drawBase(const TTrackBase& base, leda_color c) {
     const AList<TLink> & links = base.links();
     unsigned n = links.length();
     for (unsigned i = 0; i < n; i++) {
-      if (links[i]->wire() == NULL) continue;
-      if (! _stereo)
-        if (links[i]->wire()->stereo())
-          continue;
-      if (! _axial)
-        if (links[i]->wire()->axial())
-          continue;
+        if (links[i]->wire() == NULL) continue;
+        if (! _stereo)
+            if (links[i]->wire()->stereo())
+                continue;
+        if (! _axial)
+            if (links[i]->wire()->axial())
+                continue;
 
-      //...s-z mode...
-      if (_mode == 2) {
+        //...s-z mode...
+        if (_mode == 2) {
 
-        //...Points...
-        HepGeom::Point3D<double> x = links[i]->position();
-        _window.draw_point(x.x(), x.y(), c);
-        if (_wireName) {
-          std::string n = links[i]->wire()->name() + ":";
+            //...Points...
+            HepGeom::Point3D<double> x = links[i]->position();
+            _window.draw_point(x.x(), x.y(), c);
+            if (_wireName) {
+                std::string n = links[i]->wire()->name() + ":";
 
-          if (links[i]->hit()->mc())
-            n += "("
-                 + itostring(links[i]->hit()->mc()->hep()->id()) + ")";
+                if (links[i]->hit()->mc())
+                    n += "("
+                        + itostring(links[i]->hit()->mc()->hep()->id()) + ")";
 
-          n += itostring(links[i]->leftRight());
-          _window.draw_text(x.x(), x.y(), n.c_str());
+                n += itostring(links[i]->leftRight());
+                _window.draw_text(x.x(), x.y(), n.c_str());
+            }
         }
-      }
 
-      //...Rphi mode...
-      else if (_mode == 0) {
+        //...Rphi mode...
+        else if (_mode == 0) {
 
-        //...Points...
-        HepGeom::Point3D<double> x = links[i]->wire()->forwardPosition();
-        double radius = links[i]->hit()->drift();
-        _window.draw_circle(x.x(), x.y(), radius, c);
-        if (_wireName)
-          _window.draw_text(x.x(),
-                            x.y(),
-                            wireName(* links[i]).c_str());
-      }
-
-      //...Conformal mode...
-      else if (_mode == 1) {
-
-        //...Transformation...
-        AList<TRGCDCWireHit> list;
-        list.append((TRGCDCWireHit*) links[i]->hit());
-        AList<TLink> list2;
-        TConformalFinder0::conformalTransformationRphi(ORIGIN, list, list2);
-
-        //...Points...
-        HepGeom::Point3D<double> x = list2[0]->position();
-        _window.draw_point(x.x(), x.y(), c);
-        if (_wireName) {
-          std::string n = links[i]->wire()->name();
-          _window.draw_text(x.x(), x.y(), n.c_str());
+            //...Points...
+            HepGeom::Point3D<double> x = links[i]->wire()->forwardPosition();
+            double radius = links[i]->hit()->drift();
+            _window.draw_circle(x.x(), x.y(), radius, c);
+            if (_wireName)
+                _window.draw_text(x.x(),
+                                  x.y(),
+                                  wireName(* links[i]).c_str());
         }
-      }
 
-      //...Conformal mode...
-      else if (_mode == 3) {
+        //...Conformal mode...
+        else if (_mode == 1) {
 
-        //...Points...
-        HepGeom::Point3D<double> x = links[i]->position();
-        _window.draw_point(x.x(), x.y(), c);
-        if (_wireName) {
-          std::string n = links[i]->wire()->name();
-          _window.draw_text(x.x(), x.y(), n.c_str());
+            //...Transformation...
+            AList<TWireHit> list;
+            list.append((TWireHit*) links[i]->hit());
+            AList<TLink> list2;
+            TConformalFinder0::conformalTransformationRphi(ORIGIN, list, list2);
+
+            //...Points...
+            HepGeom::Point3D<double> x = list2[0]->position();
+            _window.draw_point(x.x(), x.y(), c);
+            if (_wireName) {
+                std::string n = links[i]->wire()->name();
+                _window.draw_text(x.x(), x.y(), n.c_str());
+            }
         }
-      }
+
+        //...Conformal mode...
+        else if (_mode == 3) {
+
+            //...Points...
+            HepGeom::Point3D<double> x = links[i]->position();
+            _window.draw_point(x.x(), x.y(), c);
+            if (_wireName) {
+                std::string n = links[i]->wire()->name();
+                _window.draw_text(x.x(), x.y(), n.c_str());
+            }
+        }
     }
-  }
+}
 
-  void
-  TWindow::drawSegment(const TSegment& base, leda_color c)
-  {
+void
+TWindow::drawSegment(const TSegment& base, leda_color c) {
     AList<TLink> links = base.links();
     links.sort(SortByWireId);
     unsigned n = links.length();
     HepGeom::Point3D<double> x;
     HepGeom::Point3D<double> y;
     for (unsigned i = 0; i < n; i++) {
-      if (! _stereo)
-        if (links[i]->wire()->stereo())
-          return;
-      if (! _axial)
-        if (links[i]->wire()->axial())
-          return;
+        if (! _stereo)
+            if (links[i]->wire()->stereo())
+                return;
+        if (! _axial)
+            if (links[i]->wire()->axial())
+                return;
 
-      //...s-z mode...
-      if (_mode == 2) {
-        x = links[i]->position();
-        _window.draw_point(x.x(), x.y(), c);
-        if (_wireName) {
-          std::string n = links[i]->wire()->name() + ":"
-                          + itostring(links[i]->leftRight());
-          _window.draw_text(x.x(), x.y(), n.c_str());
+        //...s-z mode...
+        if (_mode == 2) {
+            x = links[i]->position();
+            _window.draw_point(x.x(), x.y(), c);
+            if (_wireName) {
+                std::string n = links[i]->wire()->name() + ":"
+                    + itostring(links[i]->leftRight());
+                _window.draw_text(x.x(), x.y(), n.c_str());
+            }
+            if (i)
+                _window.draw_segment(y.x(), y.y(), x.x(), x.y(), c);
+            y = x;
         }
-        if (i)
-          _window.draw_segment(y.x(), y.y(), x.x(), x.y(), c);
-        y = x;
-      }
 
-      //...Rphi mode...
-      else if (_mode == 0) {
-        x = links[i]->wire()->forwardPosition();
-        double radius = links[i]->hit()->drift();
-        _window.draw_circle(x.x(), x.y(), radius, c);
-        if (_wireName)
-          _window.draw_text(x.x(),
-                            x.y(),
-                            (const char*) wireName(* links[i]).c_str());
-        if (i)
-          _window.draw_segment(y.x(), y.y(), x.x(), x.y(), c);
-        y = x;
-      }
-
-      //...Conformal mode...
-      else if (_mode == 1) {
-
-        //...Transformation...
-        AList<TRGCDCWireHit> list;
-        list.append((TRGCDCWireHit*) links[i]->hit());
-        AList<TLink> list2;
-        TConformalFinder0::conformalTransformationRphi(ORIGIN, list, list2);
-
-        //...Points...
-        HepGeom::Point3D<double> x = list2[0]->position();
-        _window.draw_point(x.x(), x.y(), c);
-        if (_wireName) {
-          std::string n = links[i]->wire()->name();
-          _window.draw_text(x.x(), x.y(), n.c_str());
+        //...Rphi mode...
+        else if (_mode == 0) {
+            x = links[i]->wire()->forwardPosition();
+            double radius = links[i]->hit()->drift();
+            _window.draw_circle(x.x(), x.y(), radius, c);
+            if (_wireName)
+                _window.draw_text(x.x(),
+                                  x.y(),
+                                  (const char*) wireName(* links[i]).c_str());
+            if (i)
+                _window.draw_segment(y.x(), y.y(), x.x(), x.y(), c);
+            y = x;
         }
-        if (i)
-          _window.draw_segment(y.x(), y.y(), x.x(), x.y(), c);
-        y = x;
-        delete list2[0];
-      }
 
-      //...Conformal mode...
-      else if (_mode == 3) {
+        //...Conformal mode...
+        else if (_mode == 1) {
 
-        //...Transformation...
-        AList<TRGCDCWireHit> list;
-        list.append((TRGCDCWireHit*) links[i]->hit());
-        AList<TLink> list2;
-        TConformalFinder0::conformalTransformation(ORIGIN, list, list2);
+            //...Transformation...
+            AList<TWireHit> list;
+            list.append((TWireHit*) links[i]->hit());
+            AList<TLink> list2;
+            TConformalFinder0::conformalTransformationRphi(ORIGIN, list, list2);
 
-        //...Points...
-        HepGeom::Point3D<double> x = list2[0]->position();
-        _window.draw_point(x.x(), x.y(), c);
-        if (_wireName) {
-          std::string n = links[i]->wire()->name();
-          _window.draw_text(x.x(), x.y(), n.c_str());
+            //...Points...
+            HepGeom::Point3D<double> x = list2[0]->position();
+            _window.draw_point(x.x(), x.y(), c);
+            if (_wireName) {
+                std::string n = links[i]->wire()->name();
+                _window.draw_text(x.x(), x.y(), n.c_str());
+            }
+            if (i)
+                _window.draw_segment(y.x(), y.y(), x.x(), x.y(), c);
+            y = x;
+            delete list2[0];
         }
-        if (i)
-          _window.draw_segment(y.x(), y.y(), x.x(), x.y(), c);
-        y = x;
-        delete list2[0];
-      }
+
+        //...Conformal mode...
+        else if (_mode == 3) {
+
+            //...Transformation...
+            AList<TWireHit> list;
+            list.append((TWireHit*) links[i]->hit());
+            AList<TLink> list2;
+            TConformalFinder0::conformalTransformation(ORIGIN, list, list2);
+
+            //...Points...
+            HepGeom::Point3D<double> x = list2[0]->position();
+            _window.draw_point(x.x(), x.y(), c);
+            if (_wireName) {
+                std::string n = links[i]->wire()->name();
+                _window.draw_text(x.x(), x.y(), n.c_str());
+            }
+            if (i)
+                _window.draw_segment(y.x(), y.y(), x.x(), x.y(), c);
+            y = x;
+            delete list2[0];
+        }
     }
 
     if (_segmentProperty) {
-      if (_mode == 3) {
-        float in = links.first()->position().mag();
-        float out = links.last()->position().mag();
-        float length = out - in;
-        HepGeom::Point3D<double> x = base.position() - 0.5 * length * base.direction();
-        HepGeom::Point3D<double> y = base.position() + 0.5 * length * base.direction();
-        _window.draw_segment(y.x(), y.y(), x.x(), x.y(), c);
-        _window.draw_point(base.position().x(), base.position().y(), c);
-      }
+        if (_mode == 3) {
+            float in = links.first()->position().mag();
+            float out = links.last()->position().mag();
+            float length = out - in;
+            HepGeom::Point3D<double> x = base.position() - 0.5 * length * base.direction();
+            HepGeom::Point3D<double> y = base.position() + 0.5 * length * base.direction();
+            _window.draw_segment(y.x(), y.y(), x.x(), x.y(), c);
+            _window.draw_point(base.position().x(), base.position().y(), c);
+        }
     }
 
     //...Links to other segments...
@@ -547,66 +535,65 @@ namespace Belle {
     const AList<TSegment> & innerLinks = base.innerLinks();
     unsigned nLinks = innerLinks.length();
     for (unsigned i = 0; i < nLinks; i++) {
-      if (i == 0) c = leda_blue;
-      else        c = leda_pink;
+        if (i == 0) c = leda_blue;
+        else        c = leda_pink;
 
-      AList<TLink> innerTLinks = innerLinks[i]->links();
-      innerTLinks.sort(SortByWireId);
+        AList<TLink> innerTLinks = innerLinks[i]->links();
+        innerTLinks.sort(SortByWireId);
 
-      //...s-z mode...
-      if (_mode == 2) {
-      }
+        //...s-z mode...
+        if (_mode == 2) {
+        }
 
-      //...Rphi mode...
-      else if (_mode == 0) {
-        x = links[0]->wire()->forwardPosition();
-        y = innerTLinks.last()->wire()->forwardPosition();
-        _window.draw_segment(y.x(), y.y(), x.x(), x.y(), c);
+        //...Rphi mode...
+        else if (_mode == 0) {
+            x = links[0]->wire()->forwardPosition();
+            y = innerTLinks.last()->wire()->forwardPosition();
+            _window.draw_segment(y.x(), y.y(), x.x(), x.y(), c);
 //        if (base.state() & TSegmentCrowd)
 //      _window.draw_text(x.x(), x.y(), "c");
-      }
+        }
 
-      //...Conformal mode...
-      else if (_mode == 1) {
+        //...Conformal mode...
+        else if (_mode == 1) {
 
-        //...Transformation...
-        AList<TRGCDCWireHit> list;
-        list.append((TRGCDCWireHit*) links[0]->hit());
-        list.append((TRGCDCWireHit*) innerTLinks.last()->hit());
-        AList<TLink> list2;
-        TConformalFinder0::conformalTransformation(ORIGIN, list, list2);
+            //...Transformation...
+            AList<TWireHit> list;
+            list.append((TWireHit*) links[0]->hit());
+            list.append((TWireHit*) innerTLinks.last()->hit());
+            AList<TLink> list2;
+            TConformalFinder0::conformalTransformation(ORIGIN, list, list2);
 
 
-        x = list2[0]->position();
-        y = list2[1]->position();
-        _window.draw_segment(y.x(), y.y(), x.x(), x.y(), c);
+            x = list2[0]->position();
+            y = list2[1]->position();
+            _window.draw_segment(y.x(), y.y(), x.x(), x.y(), c);
 //        if (base.state() & TSegmentCrowd)
 //      _window.draw_text(x.x(), x.y(), "c");
-      }
+        }
 
-      //...Conformal mode...
-      else if (_mode == 3) {
+        //...Conformal mode...
+        else if (_mode == 3) {
 
-        //...Transformation...
-        AList<TRGCDCWireHit> list;
-        list.append((TRGCDCWireHit*) links[0]->hit());
-        list.append((TRGCDCWireHit*) innerTLinks.last()->hit());
-        AList<TLink> list2;
-        TConformalFinder0::conformalTransformation(ORIGIN, list, list2);
+            //...Transformation...
+            AList<TWireHit> list;
+            list.append((TWireHit*) links[0]->hit());
+            list.append((TWireHit*) innerTLinks.last()->hit());
+            AList<TLink> list2;
+            TConformalFinder0::conformalTransformation(ORIGIN, list, list2);
 
 
-        x = list2[0]->position();
-        y = list2[1]->position();
-        _window.draw_segment(y.x(), y.y(), x.x(), x.y(), c);
+            x = list2[0]->position();
+            y = list2[1]->position();
+            _window.draw_segment(y.x(), y.y(), x.x(), x.y(), c);
 //        if (base.state() & TSegmentCrowd)
 //      _window.draw_text(x.x(), x.y(), "c");
-      }
+        }
     }
-  }
+}
 
-  void
-  TWindow::drawLine(const TLine& line, leda_color c)
-  {
+void
+TWindow::drawLine(const TLine& line, leda_color c) {
     drawAxes();
     drawBase((const TTrackBase&) line, c);
 
@@ -616,193 +603,188 @@ namespace Belle {
     double ymin = xmin * line.a() + line.b();
     double ymax = xmax * line.a() + line.b();
     _window.draw_segment(xmin, ymin, xmax, ymax, c);
-  }
+}
 
-  bool
-  TWindow::target(void) const
-  {
+bool
+TWindow::target(void) const {
     struct belle_event* ev =
-      (struct belle_event*) BsGetEnt(BELLE_EVENT, 1, BBS_No_Index);
+        (struct belle_event*) BsGetEnt(BELLE_EVENT, 1, BBS_No_Index);
     if (_targetRun == 0 && _targetEvent == 0)
-      return true;
+        return true;
     if ((unsigned) ev->m_RunNo == _targetRun &&
         (unsigned) ev->m_EvtNo == _targetEvent)
-      return true;
+        return true;
     return false;
-  }
+}
 
-  void
-  TWindow::target(unsigned run, unsigned farm, unsigned event)
-  {
+void
+TWindow::target(unsigned run, unsigned farm, unsigned event) {
     _targetRun = run;
     _targetEvent = (farm << 28) + event;
-  }
+}
 
-  void
-  TWindow::drawTrack(const TTrack& t, leda_color c)
-  {
+void
+TWindow::drawTrack(const TTrack& t, leda_color c) {
     if (! _coordinate) {
-      std::string p = t.name() + TrackKinematics(t.helix()) + " " +
-                      LayerUsage(t.links());
-      _window.draw_text(_xPositionText, _yPositionText, p.c_str(), c);
-      _yPositionText += _yPositionStep;
+        std::string p = t.name() + TrackKinematics(t.helix()) + " " +
+            LayerUsage(t.links());
+        _window.draw_text(_xPositionText, _yPositionText, p.c_str(), c);
+        _yPositionText += _yPositionStep;
     }
 
     const AList<TLink> & links = t.links();
     unsigned n = links.length();
     for (unsigned i = 0; i < n; i++) {
-      if (! _stereo)
-        if (links[i]->wire()->stereo())
-          continue;
-      if (! _axial)
-        if (links[i]->wire()->axial())
-          continue;
+        if (! _stereo)
+            if (links[i]->wire()->stereo())
+                continue;
+        if (! _axial)
+            if (links[i]->wire()->axial())
+                continue;
 
-      if (_mode == 0) {
-        HepGeom::Point3D<double> x = links[i]->wire()->forwardPosition();
-        double radius = links[i]->hit()->drift();
-        _window.draw_circle(x.x(), x.y(), radius, c);
-        if (_wireName)
-          _window.draw_text(x.x(),
-                            x.y(),
-                            (const char*) wireName(* links[i]).c_str());
-      }
-
-      else if (_mode == 2) {
-        HepGeom::Point3D<double> x = links[i]->positionOnTrack();
-        HepGeom::Point3D<double> sz;
-        t.szPosition(x, sz);
-        _window.draw_point(sz.x(), sz.y(), c);
-        if (_wireName) {
-          std::string n = links[i]->wire()->name() + ":"
-                          + itostring(links[i]->leftRight());
-          _window.draw_text(sz.x(), sz.y(), n.c_str());
+        if (_mode == 0) {
+            HepGeom::Point3D<double> x = links[i]->wire()->forwardPosition();
+            double radius = links[i]->hit()->drift();
+            _window.draw_circle(x.x(), x.y(), radius, c);
+            if (_wireName)
+                _window.draw_text(x.x(),
+                                  x.y(),
+                                  (const char*) wireName(* links[i]).c_str());
         }
-        x = links[i]->positionOnWire();
-        t.szPosition(x, sz);
-        _window.draw_point(sz.x(), sz.y(), c);
-        if (_wireName) {
-          std::string n = links[i]->wire()->name() + ":"
-                          + itostring(links[i]->leftRight());
-          _window.draw_text(sz.x(), sz.y(), n.c_str());
+
+        else if (_mode == 2) {
+            HepGeom::Point3D<double> x = links[i]->positionOnTrack();
+            HepGeom::Point3D<double> sz;
+            t.szPosition(x, sz);
+            _window.draw_point(sz.x(), sz.y(), c);
+            if (_wireName) {
+                std::string n = links[i]->wire()->name() + ":"
+                    + itostring(links[i]->leftRight());
+                _window.draw_text(sz.x(), sz.y(), n.c_str());
+            }
+            x = links[i]->positionOnWire();
+            t.szPosition(x, sz);
+            _window.draw_point(sz.x(), sz.y(), c);
+            if (_wireName) {
+                std::string n = links[i]->wire()->name() + ":"
+                    + itostring(links[i]->leftRight());
+                _window.draw_text(sz.x(), sz.y(), n.c_str());
+            }
         }
-      }
 
-      //...Conformal mode...
-      else if (_mode == 1) {
+        //...Conformal mode...
+        else if (_mode == 1) {
 
-        //...Transformation...
-        AList<TRGCDCWireHit> list;
-        list.append((TRGCDCWireHit*) links[i]->hit());
-        AList<TLink> list2;
-        TConformalFinder0::conformalTransformationRphi(ORIGIN, list, list2);
+            //...Transformation...
+            AList<TWireHit> list;
+            list.append((TWireHit*) links[i]->hit());
+            AList<TLink> list2;
+            TConformalFinder0::conformalTransformationRphi(ORIGIN, list, list2);
 
-        //...Points...
-        HepGeom::Point3D<double> x = list2[0]->position();
-        _window.draw_point(x.x(), x.y(), c);
-        if (_wireName) {
-          std::string n = links[i]->wire()->name();
-          _window.draw_text(x.x(), x.y(), n.c_str());
+            //...Points...
+            HepGeom::Point3D<double> x = list2[0]->position();
+            _window.draw_point(x.x(), x.y(), c);
+            if (_wireName) {
+                std::string n = links[i]->wire()->name();
+                _window.draw_text(x.x(), x.y(), n.c_str());
+            }
+            delete list2[0];
         }
-        delete list2[0];
-      }
 
-      //...Conformal mode...
-      else if (_mode == 3) {
+        //...Conformal mode...
+        else if (_mode == 3) {
 
-        //...Transformation...
-        AList<TRGCDCWireHit> list;
-        list.append((TRGCDCWireHit*) links[i]->hit());
-        AList<TLink> list2;
-        TConformalFinder0::conformalTransformation(ORIGIN, list, list2);
+            //...Transformation...
+            AList<TWireHit> list;
+            list.append((TWireHit*) links[i]->hit());
+            AList<TLink> list2;
+            TConformalFinder0::conformalTransformation(ORIGIN, list, list2);
 
-        //...Points...
-        HepGeom::Point3D<double> x = list2[0]->position();
-        _window.draw_point(x.x(), x.y(), c);
-        if (_wireName) {
-          std::string n = links[i]->wire()->name();
-          _window.draw_text(x.x(), x.y(), n.c_str());
+            //...Points...
+            HepGeom::Point3D<double> x = list2[0]->position();
+            _window.draw_point(x.x(), x.y(), c);
+            if (_wireName) {
+                std::string n = links[i]->wire()->name();
+                _window.draw_text(x.x(), x.y(), n.c_str());
+            }
+            delete list2[0];
         }
-        delete list2[0];
-      }
     }
 
     if (! n) {
-      _window.draw_text(0., 0., (const char*) "can't display a track");
-      return;
+        _window.draw_text(0., 0., (const char*) "can't display a track");
+        return;
     }
 
     if (_mode == 0) {
 
-      //...Parameters...
-      if (t.cores().length() == 0) {
-        _window.draw_text(0., 0., (const char*) "can't display a track");
-        return;
-      }
-      const HepGeom::Point3D<double> & pIn = InnerMost(t.cores())->positionOnTrack();
-      const HepGeom::Point3D<double> & pOut = OuterMost(t.cores())->positionOnTrack();
-      THelix hIp = t.helix();
-      hIp.pivot(ORIGIN);
-      leda_point ip(hIp.x(0.).x(), hIp.x(0.).y());
-      leda_point in(pIn.x(), pIn.y());
-      leda_point out(pOut.x(), pOut.y());
-      if (in == out) {
-        _window.draw_text(0., 0., (const char*) "can't display a track");
-        return;
-      }
-      _window.draw_arc(ip, in, out, c);
+        //...Parameters...
+        if (t.cores().length() == 0) {
+            _window.draw_text(0., 0., (const char*) "can't display a track");
+            return;
+        }
+        const HepGeom::Point3D<double> & pIn = InnerMost(t.cores())->positionOnTrack();
+        const HepGeom::Point3D<double> & pOut = OuterMost(t.cores())->positionOnTrack();
+        THelix hIp = t.helix();
+        hIp.pivot(ORIGIN);
+        leda_point ip(hIp.x(0.).x(), hIp.x(0.).y());
+        leda_point in(pIn.x(), pIn.y());
+        leda_point out(pOut.x(), pOut.y());
+        if (in == out) {
+            _window.draw_text(0., 0., (const char*) "can't display a track");
+            return;
+        }
+        _window.draw_arc(ip, in, out, c);
 
-      std::string tName = t.name();
-      if (t.hep())
-        tName += ":" + t.hep()->name();
-      _window.draw_text(pOut.x(), pOut.y(), tName.c_str());
+        std::string tName = t.name();
+        if (t.hep())
+            tName += ":" + t.hep()->name();
+        _window.draw_text(pOut.x(), pOut.y(), tName.c_str());
     }
 
     else if (_mode == 2) {
-      THelix hIp = t.helix();
-      hIp.pivot(ORIGIN);
+        THelix hIp = t.helix();
+        hIp.pivot(ORIGIN);
 
-      double xmin = _window.xmin();
-      double xmax = _window.xmax();
-      double ymin = xmin * hIp.tanl() * t.charge() + hIp.dz();
-      double ymax = xmax * hIp.tanl() * t.charge() + hIp.dz();
-      _window.draw_segment(xmin, ymin, xmax, ymax, c);
+        double xmin = _window.xmin();
+        double xmax = _window.xmax();
+        double ymin = xmin * hIp.tanl() * t.charge() + hIp.dz();
+        double ymax = xmax * hIp.tanl() * t.charge() + hIp.dz();
+        _window.draw_segment(xmin, ymin, xmax, ymax, c);
     }
-  }
+}
 
-  void
-  TWindow::drawCircle(const TCircle& t, leda_color c)
-  {
+void
+TWindow::drawCircle(const TCircle& t, leda_color c) {
     const AList<TLink> & links = t.links();
     unsigned n = links.length();
     for (unsigned i = 0; i < n; i++) {
-      if (! _stereo)
-        if (links[i]->wire()->stereo())
-          continue;
-      if (! _axial)
-        if (links[i]->wire()->axial())
-          continue;
+        if (! _stereo)
+            if (links[i]->wire()->stereo())
+                continue;
+        if (! _axial)
+            if (links[i]->wire()->axial())
+                continue;
 
-      if (_mode == 0) {
-        HepGeom::Point3D<double> x = links[i]->wire()->forwardPosition();
-        double radius = links[i]->hit()->drift();
-        _window.draw_circle(x.x(), x.y(), radius, c);
-        if (_wireName)
-          _window.draw_text(x.x(),
-                            x.y(),
-                            (const char*) wireName(* links[i]).c_str());
-      }
+        if (_mode == 0) {
+            HepGeom::Point3D<double> x = links[i]->wire()->forwardPosition();
+            double radius = links[i]->hit()->drift();
+            _window.draw_circle(x.x(), x.y(), radius, c);
+            if (_wireName)
+                _window.draw_text(x.x(),
+                                  x.y(),
+                                  (const char*) wireName(* links[i]).c_str());
+        }
     }
     _window.draw_circle(t.center().x(), t.center().y(), fabs(t.radius()), c);
 
 //     //...For debug...
 // std::cout << "TWindow::drawCircle : center=" << t.center() << ","
 //        << "radius=" << t.radius() << std::endl;
-  }
+}
 
-  void
-  TWindow::drawAxes(const TPoint2D&)
-  {
+void
+TWindow::drawAxes(const TPoint2D&) {
     double xmin = _window.xmin();
     double xmax = _window.xmax();
     _window.draw_segment(xmin, 0, xmax, 0, leda_grey2);
@@ -810,81 +792,75 @@ namespace Belle {
     double ymax = _window.ymax();
     _window.draw_segment(0, ymin, 0, ymax, leda_grey2);
     for (unsigned i = 0; i < (unsigned) _selfAxes.length(); i++) {
-      _window.draw_segment(xmin, _selfAxes[i]->y(), xmax, _selfAxes[i]->y(),
-                           leda_grey1);
-      _window.draw_segment(_selfAxes[i]->x(), ymin, _selfAxes[i]->x(), ymax,
-                           leda_grey1);
+        _window.draw_segment(xmin, _selfAxes[i]->y(), xmax, _selfAxes[i]->y(),
+                             leda_grey1);
+        _window.draw_segment(_selfAxes[i]->x(), ymin, _selfAxes[i]->x(), ymax,
+                             leda_grey1);
     }
-  }
+}
 
-  void
-  TWindow::drawCdc(void)
-  {
+void
+TWindow::drawCdc(void) {
 
     //...Rphi mode...
     if (_mode == 0) {
-      double r = 8.4;
-      _window.draw_circle(0., 0., r);
-      r = 88.;
-      _window.draw_circle(0., 0., r);
-      r = 2.;
-      _window.draw_circle(0., 0., r);
+        double r = 8.4;
+        _window.draw_circle(0., 0., r);
+        r = 88.;
+        _window.draw_circle(0., 0., r);
+        r = 2.;
+        _window.draw_circle(0., 0., r);
     }
-  }
+}
 
-  void
-  TWindow::clear(void)
-  {
+void
+TWindow::clear(void) {
     ++_nEvents;
     _text = "";
     // _skip = false;
     _objects.removeAll();
     if (_canDelete) {
-      HepAListDeleteAll(_colors);
-      HepAListDeleteAll(_selfObjects);
-      HepAListDeleteAll(_selfTLinks);
-      HepAListDeleteAll(_selfAxes);
+        HepAListDeleteAll(_colors);
+        HepAListDeleteAll(_selfObjects);
+        HepAListDeleteAll(_selfTLinks);
+        HepAListDeleteAll(_selfAxes);
     }
-  }
+}
 
-  void
-  TWindow::append(const AList<TRGCDCWireHit> & list, leda_color c)
-  {
+void
+TWindow::append(const AList<TWireHit> & list, leda_color c) {
     AList<TLink> links;
     for (unsigned i = 0; i < (unsigned) list.length(); i++)
-      links.append(new TLink(NULL, list[i]));
+        links.append(new TLink(NULL, list[i]));
     _selfTLinks.append(links);
     TTrackBase* base = new TTrackBase(links);
     _selfObjects.append(base);
     _objects.append(base);
     _colors.append(new leda_color(c));
-  }
+}
 
-  void
-  TWindow::append(const AList<TLink> & list, leda_color c)
-  {
+void
+TWindow::append(const AList<TLink> & list, leda_color c) {
     TTrackBase* t = new TTrackBase(list);
     _objects.append(t);
     _colors.append(new leda_color(c));
     _selfObjects.append(t);
-  }
+}
 
-  std::string
-  TWindow::wireName(const TLink& l) const
-  {
+std::string
+TWindow::wireName(const TLink& l) const {
     unsigned state = l.hit()->state();
     std::string flag;
     if (state & WireHitFindingValid) flag += "o";
     if (state & WireHitFittingValid) flag += "+";
     if (state & WireHitInvalidForFit) flag += "x";
     if (l.hit()->mc())
-      flag += "(" + itostring(l.hit()->mc()->hep()->id()) + ")";
+        flag += "(" + itostring(l.hit()->mc()->hep()->id()) + ")";
     return l.wire()->name() + flag;
-  }
+}
 
-  void
-  TWindow::oneShot(const AList<TLink> & t, leda_color c)
-  {
+void
+TWindow::oneShot(const AList<TLink> & t, leda_color c) {
     TTrackBase& base = * new TTrackBase(t);
     append(base, c);
     wait();
@@ -893,11 +869,10 @@ namespace Belle {
     leda_color* b = _colors[id];
     _colors.remove(id);
     delete b;
-  }
+}
 
-  void
-  TWindow::oneShot(const TTrackBase& t, leda_color c)
-  {
+void
+TWindow::oneShot(const TTrackBase& t, leda_color c) {
     append(t, c);
     wait();
     unsigned id = _objects.length() - 1;
@@ -905,16 +880,15 @@ namespace Belle {
     leda_color* b = _colors[id];
     _colors.remove(id);
     delete b;
-  }
+}
 
-  void
-  TWindow::oneShot(const AList<TSegment> & t, leda_color c)
-  {
+void
+TWindow::oneShot(const AList<TSegment> & t, leda_color c) {
     TTrackBase tmp;
     for (unsigned i = 0; i < (unsigned) t.length(); i++) {
-      const TSegment& s = * t[i];
-      for (unsigned j = 0; j < (unsigned) s.links().length(); j++)
-        tmp.append(* s.links()[j]);
+        const TSegment& s = * t[i];
+        for (unsigned j = 0; j < (unsigned) s.links().length(); j++)
+            tmp.append(* s.links()[j]);
     }
 
     append(tmp, c);
@@ -924,16 +898,15 @@ namespace Belle {
     leda_color* b = _colors[id];
     _colors.remove(id);
     delete b;
-  }
+}
 
-  void
-  TWindow::oneShot(const AList<TSegmentCurl> & t, leda_color c)
-  {
+void
+TWindow::oneShot(const AList<TSegmentCurl> & t, leda_color c) {
     TTrackBase tmp;
     for (unsigned i = 0; i < (unsigned) t.length(); i++) {
-      TSegmentCurl& s = * t[i];
-      for (unsigned j = 0; j < (unsigned) s.list().length(); j++)
-        tmp.append(* s.list()[j]);
+        TSegmentCurl& s = * t[i];
+        for (unsigned j = 0; j < (unsigned) s.list().length(); j++)
+            tmp.append(* s.list()[j]);
     }
 
     append(tmp, c);
@@ -943,67 +916,63 @@ namespace Belle {
     leda_color* b = _colors[id];
     _colors.remove(id);
     delete b;
-  }
+}
 
-  void
-  TWindow::appendSz(const TTrack& t, const AList<TLink> & list, leda_color c)
-  {
+void
+TWindow::appendSz(const TTrack& t, const AList<TLink> & list, leda_color c) {
     unsigned n = list.length();
     for (unsigned i = 0; i < n; i++) {
-      TLink* l0 = new TLink(* list[i]);
-      TLink* l1 = new TLink(* list[i]);
-      TLink* l2 = new TLink(* list[i]);
-      l0->leftRight(WireHitLeft);
-      l1->leftRight(WireHitRight);
-      l2->leftRight(2);
-      int err = t.szPosition(* l0);
-      err = t.szPosition(* l1);
-      err = t.szPosition(* l2);
-      AList<TLink> links;
-      links.append(l0);
-      links.append(l1);
-      links.append(l2);
-      TTrackBase* b = new TTrackBase(links);
-      _objects.append(b);
-      _colors.append(new leda_color(c));
-      _selfTLinks.append(l0);
-      _selfTLinks.append(l1);
-      _selfTLinks.append(l2);
-      _selfObjects.append(b);
+        TLink* l0 = new TLink(* list[i]);
+        TLink* l1 = new TLink(* list[i]);
+        TLink* l2 = new TLink(* list[i]);
+        l0->leftRight(WireHitLeft);
+        l1->leftRight(WireHitRight);
+        l2->leftRight(2);
+        int err = t.szPosition(* l0);
+        err = t.szPosition(* l1);
+        err = t.szPosition(* l2);
+        AList<TLink> links;
+        links.append(l0);
+        links.append(l1);
+        links.append(l2);
+        TTrackBase* b = new TTrackBase(links);
+        _objects.append(b);
+        _colors.append(new leda_color(c));
+        _selfTLinks.append(l0);
+        _selfTLinks.append(l1);
+        _selfTLinks.append(l2);
+        _selfObjects.append(b);
     }
-  }
+}
 
-  void
-  TWindow::appendSz(const TTrack& t,
-                    const AList<TSegment> & list,
-                    leda_color c)
-  {
+void
+TWindow::appendSz(const TTrack& t,
+                  const AList<TSegment> & list,
+                  leda_color c) {
     unsigned n = list.length();
     for (unsigned i = 0; i < n; i++) {
-      TSegment& s = * list[i];
-      TLink* l = new TLink();
-      t.szPosition(s, * l);
-      AList<TLink> links;
-      links.append(l);
-      TTrackBase* b = new TTrackBase(links);
-      _objects.append(b);
-      _colors.append(new leda_color(c));
-      _selfTLinks.append(l);
-      _selfObjects.append(b);
+        TSegment& s = * list[i];
+        TLink* l = new TLink();
+        t.szPosition(s, * l);
+        AList<TLink> links;
+        links.append(l);
+        TTrackBase* b = new TTrackBase(links);
+        _objects.append(b);
+        _colors.append(new leda_color(c));
+        _selfTLinks.append(l);
+        _selfObjects.append(b);
     }
-  }
+}
 
-  void
-  TWindow::draw(const TPoint2D& p, leda_color c)
-  {
+void
+TWindow::draw(const TPoint2D& p, leda_color c) {
     _window.draw_point(p.x(), p.y(), c);
-  }
+}
 
-  void
-  TWindow::drawHeader(void)
-  {
+void
+TWindow::drawHeader(void) {
     struct belle_event* h = (struct belle_event*)
-                            BsGetEnt(BELLE_EVENT, 1, BBS_No_Index);
+        BsGetEnt(BELLE_EVENT, 1, BBS_No_Index);
     if (! h) return;
 
     //static const Hepstd::string sp = " ";
@@ -1020,7 +989,7 @@ namespace Belle {
 
     std::string s0 = "";
     if (calcdc_unpack_.unpack_truncate)
-      s0 += "truncated event";
+        s0 += "truncated event";
     std::string head0 = exp + sp + run + sp + frm + sp + evt;
     std::string head1 = dat;
     std::string head2 = fld + sp + ler + sp + her;
@@ -1041,17 +1010,16 @@ namespace Belle {
     _window.draw_text(x0, y0, head0.c_str());
 
     _window.draw_text(x1, y3, s0.c_str());
-  }
+}
 
-  void
-  TWindow::append(const AList<TSegmentCurl> & a, leda_color b)
-  {
+void
+TWindow::append(const AList<TSegmentCurl> & a, leda_color b) {
     for (unsigned i = 0; i < (unsigned) a.length(); i++) {
-      TTrackBase& base = * (TTrackBase*) new TSegment(a[i]->list());
-      append(base, b);
-      _selfObjects.append(base);
+        TTrackBase& base = * (TTrackBase*) new TSegment(a[i]->list());
+        append(base, b);
+        _selfObjects.append(base);
     }
-  }
+}
 
 #if defined(BELLE_NAMESPACE)
 } // namespace Belle

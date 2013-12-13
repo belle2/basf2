@@ -69,27 +69,17 @@
 #ifndef TLine_FLAG_
 #define TLine_FLAG_
 
-#ifdef TRASAN_DEBUG_DETAIL
-#ifndef TRASAN_DEBUG
-#define TRASAN_DEBUG
-#endif
-#endif
-
-
-#include <string>
-
 #define HEP_SHORT_NAMES
 
+#include <string>
 #include "tracking/modules/trasan/TTrackBase.h"
 #include "tracking/modules/trasan/TLink.h"
 #include "tracking/modules/trasan/TLineFitter.h"
 
 namespace Belle {
 
-
-
 /// A class to represent a track in tracking.
-  class TLine : public TTrackBase {
+class TLine : public TTrackBase {
 
   public:
     /// Constructor.
@@ -130,22 +120,27 @@ namespace Belle {
     /// fits itself. Error was happened if return value is not zero.
     // int fitx(void);
 
-    /// fits itself using isolated hits. Error was happened if return value is not zero.
+    /// fits itself using isolated hits. Error was happened if return
+    /// value is not zero.
     int fit2();
 
-    /// fits itself using single hits in a wire-layer. Error was happened if return value is not zero.
+    /// fits itself using single hits in a wire-layer. Error was
+    /// happened if return value is not zero.
     int fit2s();
 
-    /// fits itself using isolated hits. Error was happened if return value is not zero.
+    /// fits itself using isolated hits. Error was happened if return
+    /// value is not zero.
     int fit2p();
 
-    /// fits itself using single hits in a wire-layer. Error was happened if return value is not zero.
+    /// fits itself using single hits in a wire-layer. Error was
+    /// happened if return value is not zero.
     int fit2sp();
 
     /// remove extremly bad points.
     void removeChits();
 
-    /// remove bad points by chi2. Bad points are returned in a 'list'. fit() should be called before calling this function.
+    /// remove bad points by chi2. Bad points are returned in a
+    /// 'list'. fit() should be called before calling this function.
     void refine(AList<TLink> & list, float maxSigma);
 
     ///
@@ -172,91 +167,72 @@ namespace Belle {
   private:// Updated when fitted and accessed
     mutable double _chi2;
     mutable double _reducedChi2;
-  };
+};
 
 /// Sorter
 #if defined(__GNUG__)
-  int
-  SortByB(const TLine** a, const TLine** b);
+int
+SortByB(const TLine** a, const TLine** b);
 #else
-  extern "C" int
-  SortByB(const void* a, const void* b);
+extern "C" int
+SortByB(const void* a, const void* b);
 #endif
 
 //-----------------------------------------------------------------------------
 
-#ifdef TLine_NO_INLINE
-#define inline
-#else
-#undef inline
-#define TLine_INLINE_DEFINE_HERE
-#endif
-
-#ifdef TLine_INLINE_DEFINE_HERE
-
-  inline
-  double
-  TLine::a(void) const
-  {
+inline
+double
+TLine::a(void) const {
 #ifdef TRASAN_DEBUG
     if (! _fitted) std::cout << "TLine::a !!! fit not performed" << std::endl;
 #endif
     return _a;
-  }
+}
 
-  inline
-  double
-  TLine::b(void) const
-  {
+inline
+double
+TLine::b(void) const {
 #ifdef TRASAN_DEBUG
     if (! _fitted) std::cout << "TLine::b !!! fit not performed" << std::endl;
 #endif
     return _b;
-  }
+}
 
-  inline
-  double
-  TLine::distance(const TLink& l) const
-  {
+inline
+double
+TLine::distance(const TLink& l) const {
 #ifdef TRASAN_DEBUG
     if (! _fitted) std::cout << "TLine::distance !!! fit not performed" << std::endl;
 #endif
     double dy = fabs(_a * l.position().x() + _b - l.position().y());
     double invCos = sqrt(1. + _a * _a);
     return dy / invCos;
-  }
+}
 
-  inline
-  double
-  TLine::distance(const HepGeom::Point3D<double>  & p) const
-  {
+inline
+double
+TLine::distance(const HepGeom::Point3D<double>  & p) const {
 #ifdef TRASAN_DEBUG
     if (! _fitted) std::cout << "TLine::distance !!! fit not performed" << std::endl;
 #endif
     double dy = fabs(_a * p.x() + _b - p.y());
     double invCos = sqrt(1. + _a * _a);
     return dy / invCos;
-  }
+}
 
-  inline
-  void
-  TLine::property(double a, double b, double det)
-  {
+inline
+void
+TLine::property(double a, double b, double det) {
     _a = a;
     _b = b;
     _det = det;
-  }
+}
 
-  inline
-  unsigned
-  TLine::objectType(void) const
-  {
+inline
+unsigned
+TLine::objectType(void) const {
     return Line;
-  }
-
-#endif
-
-#undef inline
+}
 
 } // namespace Belle
 

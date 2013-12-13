@@ -23,28 +23,26 @@
 
 namespace Belle {
 
-  THoughPlane::THoughPlane(const std::string& name,
-                           unsigned nX,
-                           float xMin,
-                           float xMax,
-                           unsigned nY,
-                           float yMin,
-                           float yMax)
+THoughPlane::THoughPlane(const std::string& name,
+                         unsigned nX,
+                         float xMin,
+                         float xMax,
+                         unsigned nY,
+                         float yMin,
+                         float yMax)
     : THoughPlaneBase(name, nX, xMin, xMax, nY, yMin, yMax),
 //    _cell(new unsigned[nX * nY * sizeof(unsigned)]),
       _cell(new int[nX* nY]),
       _patterns(0),
-      _nPatterns(0)
-  {
+      _nPatterns(0) {
     clear();
-  }
+}
 
-  THoughPlane::~THoughPlane()
-  {
+THoughPlane::~THoughPlane() {
     delete [] _cell;
     if (_patterns)
-      delete [] _patterns;
-  }
+        delete [] _patterns;
+}
 
 // void
 // THoughPlane::vote(float x, float y) {
@@ -200,18 +198,17 @@ namespace Belle {
 //     }
 // }
 
-  void
-  THoughPlane::registerPattern(unsigned)
-  {
+void
+THoughPlane::registerPattern(unsigned) {
     if (_patterns) {
-      delete [] _patterns;
-      _nPatterns = 0;
+        delete [] _patterns;
+        _nPatterns = 0;
     }
     const unsigned n = nX() * nY();
 
     //...Check # of active cells...
     for (unsigned i = 0; i < n; i++)
-      if (_cell[i]) ++_nPatterns;
+        if (_cell[i]) ++_nPatterns;
 
     //...Create array...
     _patterns = new unsigned[_nPatterns];
@@ -219,18 +216,17 @@ namespace Belle {
     //...Store them...
     unsigned j = 0;
     for (unsigned i = 0; i < n; i++)
-      if (_cell[i]) _patterns[j++] = i;
-  }
+        if (_cell[i]) _patterns[j++] = i;
+}
 
-  void
-  THoughPlane::voteByPattern(float xOffset, int weight)
-  {
+void
+THoughPlane::voteByPattern(float xOffset, int weight) {
 #ifdef TRASAN_DEBUG
     if (_patterns == 0)
-      std::cout << "THoughPlane::vote !!! pattern is note defined" << std::endl;
+        std::cout << "THoughPlane::vote !!! pattern is note defined" << std::endl;
     if ((xOffset < 0) || (xOffset > 1))
-      std::cout << "THoughPlane::vote !!! xOffset should be (0 - 1). xOffset="
-                << xOffset << std::endl;
+        std::cout << "THoughPlane::vote !!! xOffset should be (0 - 1). xOffset="
+                  << xOffset << std::endl;
 #endif
 
     const unsigned x = unsigned(nX() * xOffset);
@@ -238,9 +234,9 @@ namespace Belle {
     const unsigned n = nX() * nY();
 
     for (unsigned i = 0; i < _nPatterns; i++) {
-      unsigned id = _patterns[i] + p;
-      if (id > n) id -= n;
-      _cell[id] += weight;
+        unsigned id = _patterns[i] + p;
+        if (id > n) id -= n;
+        _cell[id] += weight;
     }
 
 //     const unsigned x = unsigned(nX() * xOffset);
@@ -253,7 +249,6 @@ namespace Belle {
 //  _cell[i] += _pattern[j++] * weight;
 
 //    std::cout << "--------------------------------" << std::endl;
-  }
+}
 
 } // namespace Belle
-

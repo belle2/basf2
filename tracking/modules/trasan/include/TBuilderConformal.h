@@ -21,19 +21,12 @@
 #ifndef TBuilderConformal_FLAG_
 #define TBuilderConformal_FLAG_
 
-#ifdef TRASAN_DEBUG_DETAIL
-#ifndef TRASAN_DEBUG
-#define TRASAN_DEBUG
-#endif
-#endif
-
-
 #include "tracking/modules/trasan/TBuilder.h"
 
 namespace Belle {
 
 /// A class to build a track.
-  class TBuilderConformal : public TBuilder {
+class TBuilderConformal : public TBuilder {
 
   public:
     /// Constructor with salvage level.
@@ -68,7 +61,8 @@ namespace Belle {
                         const AList<TLink> & links) const;
 
   private:
-    /// initializes internal variables for stereo reconstruction. This should be called with new stereo codes.
+    /// initializes internal variables for stereo reconstruction. This
+    /// should be called with new stereo codes.
     bool initializeForStereo(const TTrack&,
                              const AList<TSegment> &,
                              const AList<TSegment> &) const;
@@ -102,24 +96,9 @@ namespace Belle {
     mutable AList<TLink> _links[5];
     mutable AList<TLink> _forLine;
     mutable unsigned _nHits[6];
-  };
+};
 
 //-----------------------------------------------------------------------------
-
-#ifdef TBuilderConformal_NO_INLINE
-#define inline
-#else
-#undef inline
-#define TBuilderConformal_INLINE_DEFINE_HERE
-#endif
-
-#ifdef TBuilderConformal_INLINE_DEFINE_HERE
-
-
-
-#endif
-
-#undef inline
 
 } // namespace Belle
 

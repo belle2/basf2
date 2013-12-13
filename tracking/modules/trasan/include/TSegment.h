@@ -69,35 +69,26 @@
 #ifndef TSegment_FLAG_
 #define TSegment_FLAG_
 
-#ifdef TRASAN_DEBUG_DETAIL
-#ifndef TRASAN_DEBUG
-#define TRASAN_DEBUG
-#endif
-#endif
-
-
 #ifndef CLHEP_POINT3D_H
 #include "CLHEP/Geometry/Point3D.h"
 #endif
-
 #include "CLHEP/Geometry/Vector3D.h"
-
 #include "tracking/modules/trasan/TTrackBase.h"
 #include "tracking/modules/trasan/TLink.h"
 
 namespace Belle {
 
-  typedef HepGeom::Point3D<double>  Point3D;
-  typedef HepGeom::Vector3D<double>  Vector3D;
+typedef HepGeom::Point3D<double>  Point3D;
+typedef HepGeom::Vector3D<double>  Vector3D;
 
-  class TTrack;
-  class Range;
-  template <class T> class CAList;
+class TTrack;
+class Range;
+template <class T> class CAList;
 
 #define TSegmentCrowd 8
 
 /// A class to relate TRGCDCWireHit and TTrack objects.
-  class TSegment : public TTrackBase {
+class TSegment : public TTrackBase {
 
   public:
     /// Constructor.
@@ -125,7 +116,8 @@ namespace Belle {
     /// returns direction.
     const Vector3D& direction(void) const;
 
-    /// calculates distance between two clusters. Smaller value indicates closer.
+    /// calculates distance between two clusters. Smaller value
+    /// indicates closer.
     double distance(const TSegment&) const;
     double distance(const HepGeom::Point3D<double>  &, const Vector3D&) const;
 
@@ -154,10 +146,13 @@ namespace Belle {
     /// returns outer most layer.
     unsigned outerMostLayer(void) const;
 
-    /// returns cluster type. 0:empty, 1:short line, 2:long line, 3:V shage(from outside), 4:A shape, 5:X shape, 6:parallel, 7:complicated.
+    /// returns cluster type. 0:empty, 1:short line, 2:long line, 3:V
+    /// shage(from outside), 4:A shape, 5:X shape, 6:parallel,
+    /// 7:complicated.
     unsigned clusterType(void) const;
 
-    /// returns a list of sub TSegments in this cluster. If cluster type is 1, 2, or 7, no cluster is returned.
+    /// returns a list of sub TSegments in this cluster. If cluster
+    /// type is 1, 2, or 7, no cluster is returned.
     AList<TSegment> split(void) const;
 
     int solveDualHits(void);
@@ -212,213 +207,182 @@ namespace Belle {
     mutable double _duality;
     mutable unsigned _nDual;
     mutable double _angle;
-  };
+};
 
 // Utility functions
 /// returns \# of core links in segments.
-  unsigned NCoreLinks(const CAList<TSegment> & list);
+unsigned NCoreLinks(const CAList<TSegment> & list);
 
 /// returns AList of TLink used for a track.
-  AList<TLink> Links(const TSegment&, const TTrack&);
+AList<TLink> Links(const TSegment&, const TTrack&);
 
 /// returns AList of TLink.
-  AList<TLink> Links(const AList<TSegment> & list);
+AList<TLink> Links(const AList<TSegment> & list);
 
 /// checks property of segments.
-  void
-  CheckSegments(const CAList<TSegment> & segmentList);
+void
+CheckSegments(const CAList<TSegment> & segmentList);
 
 /// checks to link segments.
-  void
-  CheckSegmentLink(const TSegment& base,
-                   const TSegment& next,
-                   float distance,
-                   float dirAngle);
+void
+CheckSegmentLink(const TSegment& base,
+                 const TSegment& next,
+                 float distance,
+                 float dirAngle);
 
 /// returns \# of unique segment links.
-  unsigned
-  NUniqueLinks(const TSegment& a);
+unsigned
+NUniqueLinks(const TSegment& a);
 
 /// returns a list of unique segments in links.
-  AList<TSegment>
-  UniqueLinks(const TSegment& a);
+AList<TSegment>
+UniqueLinks(const TSegment& a);
 
 /// returns a segment to the outer-most unique segment.
-  TSegment*
-  OuterMostUniqueLink(const TSegment& a);
+TSegment*
+OuterMostUniqueLink(const TSegment& a);
 
 /// returns \# of links in the major link.
-  unsigned
-  NMajorLinks(const TSegment& a);
+unsigned
+NMajorLinks(const TSegment& a);
 
 /// returns a list of segments in major links.
-  AList<TSegment>
-  MajorLinks(const TSegment& a);
+AList<TSegment>
+MajorLinks(const TSegment& a);
 
 /// returns \# of link branches in the major link.
-  unsigned
-  NLinkBranches(const TSegment& a);
+unsigned
+NLinkBranches(const TSegment& a);
 
 /// returns isolated and crowded list.
-  void
-  SeparateCrowded(const AList<TSegment> & input,
-                  AList<TSegment> & isolated,
-                  AList<TSegment> & crowded);
+void
+SeparateCrowded(const AList<TSegment> & input,
+                AList<TSegment> & isolated,
+                AList<TSegment> & crowded);
 
 /// returns super layer pattern.
-  unsigned
-  SuperLayer(const AList<TSegment> & list);
+unsigned
+SuperLayer(const AList<TSegment> & list);
 
 //-----------------------------------------------------------------------------
 
-#ifdef TSegment_NO_INLINE
-#define inline
-#else
-#undef inline
-#define TSegment_INLINE_DEFINE_HERE
-#endif
-
-#ifdef TSegment_INLINE_DEFINE_HERE
-
-  inline
-  const AList<TLink> &
-  TSegment::inners(void) const
-  {
+inline
+const AList<TLink> &
+TSegment::inners(void) const {
     if (! _fitted) update();
     return _inners;
-  }
+}
 
-  inline
-  const AList<TLink> &
-  TSegment::outers(void) const
-  {
+inline
+const AList<TLink> &
+TSegment::outers(void) const {
     if (! _fitted) update();
     return _outers;
-  }
+}
 
-  inline
-  const HepGeom::Point3D<double>  &
-  TSegment::position(void) const
-  {
+inline
+const HepGeom::Point3D<double>  &
+TSegment::position(void) const {
     if (! _fitted) update();
     return _position;
-  }
+}
 
-  inline
-  const Vector3D&
-  TSegment::direction(void) const
-  {
+inline
+const Vector3D&
+TSegment::direction(void) const {
     if (! _fitted) update();
     return _direction;
-  }
+}
 
-  inline
-  unsigned
-  TSegment::innerWidth(void) const
-  {
+inline
+unsigned
+TSegment::innerWidth(void) const {
     if (! _fitted) update();
     return _innerWidth;
-  }
+}
 
-  inline
-  unsigned
-  TSegment::outerWidth(void) const
-  {
+inline
+unsigned
+TSegment::outerWidth(void) const {
     if (! _fitted) update();
     return _outerWidth;
-  }
+}
 
-  inline
-  unsigned
-  TSegment::innerMostLayer(void) const
-  {
+inline
+unsigned
+TSegment::innerMostLayer(void) const {
     if (! _fitted) update();
     return _innerMostLayer;
-  }
+}
 
-  inline
-  unsigned
-  TSegment::outerMostLayer(void) const
-  {
+inline
+unsigned
+TSegment::outerMostLayer(void) const {
     if (! _fitted) update();
     return _outerMostLayer;
-  }
+}
 
-  inline
-  unsigned
-  TSegment::clusterType(void) const
-  {
+inline
+unsigned
+TSegment::clusterType(void) const {
     if (! nLinks()) return 0;
     if (_clusterType == 0) updateType();
     return _clusterType;
-  }
+}
 
-  inline
-  double
-  TSegment::duality(void) const
-  {
+inline
+double
+TSegment::duality(void) const {
     return _duality;
-  }
+}
 
-  inline
-  unsigned
-  TSegment::objectType(void) const
-  {
+inline
+unsigned
+TSegment::objectType(void) const {
     return Segment;
-  }
+}
 
-  inline
-  AList<TTrack> &
-  TSegment::tracks(void)
-  {
+inline
+AList<TTrack> &
+TSegment::tracks(void) {
     return _tracks;
-  }
+}
 
-  inline
-  AList<TSegment> &
-  TSegment::innerLinks(void)
-  {
+inline
+AList<TSegment> &
+TSegment::innerLinks(void) {
     return _innerLinks;
-  }
+}
 
-  inline
-  const AList<TSegment> &
-  TSegment::innerLinks(void) const
-  {
+inline
+const AList<TSegment> &
+TSegment::innerLinks(void) const {
     return _innerLinks;
-  }
+}
 
-  inline
-  AList<TSegment> &
-  TSegment::outerLinks(void)
-  {
+inline
+AList<TSegment> &
+TSegment::outerLinks(void) {
     return _outerLinks;
-  }
+}
 
-  inline
-  const AList<TSegment> &
-  TSegment::outerLinks(void) const
-  {
+inline
+const AList<TSegment> &
+TSegment::outerLinks(void) const {
     return _outerLinks;
-  }
+}
 
-  inline
-  unsigned
-  TSegment::state(void) const
-  {
+inline
+unsigned
+TSegment::state(void) const {
     return _state;
-  }
+}
 
-  inline
-  unsigned
-  TSegment::state(unsigned a)
-  {
+inline
+unsigned
+TSegment::state(unsigned a) {
     return _state = a;
-  }
-
-#endif
-
-#undef inline
+}
 
 } // namespace Belle
 

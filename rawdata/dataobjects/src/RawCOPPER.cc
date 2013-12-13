@@ -714,6 +714,7 @@ unsigned int RawCOPPER::FillTopBlockRawHeader(unsigned int m_node_id, unsigned i
     exit(-1);
   }
   memset(m_buffer, 0, sizeof(int) * RawHeader::RAWHEADER_NWORDS);
+  m_buffer[ RawHeader::POS_HDR_NWORDS ] = RawHeader::RAWHEADER_NWORDS;
 
   //
   // Check FINESSEs which containes data
@@ -784,8 +785,7 @@ unsigned int RawCOPPER::FillTopBlockRawHeader(unsigned int m_node_id, unsigned i
 //   rawhdr.SetDataType(m_data_type);   // Fill 8th header word
 //   rawhdr.SetTruncMask(m_trunc_mask);   // Fill 8th header word
   m_buffer[ RawHeader::POS_SUBSYS_ID ] = m_node_id;
-  m_buffer[ RawHeader::POS_SUBSYS_ID ] = m_data_type;
-  m_buffer[ RawHeader::POS_SUBSYS_ID ] = m_trunc_mask;
+  m_buffer[ RawHeader::POS_TRUNC_MASK_DATATYPE ] = ((m_trunc_mask << 32) & 0x80000000) | (m_data_type & 0x7FFFFFFF);
 
   // Offset
 //   rawhdr.SetOffset1stFINESSE(raw_copper->GetOffset1stFINESSE(cprblock) - raw_copper->GetBufferPos(cprblock));          // Fill 9th header word

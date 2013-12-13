@@ -115,11 +115,17 @@ namespace Belle2 {
                            const std::vector<int>& indices);
 
     /**
+     * Check if the particleStack pass all cut requirements
+     * @param particleStack Reference to stack of pointers to Particle
+     * @return True if all requirements are passed, false otherwise
      */
+    bool checkCuts(std::vector<Particle*>& particleStack);
 
     int m_pdg;                /**< PDG code of combined particles */
     std::string m_listName;   /**< output particle list name */
     std::vector<std::string> m_inputListNames; /**< input particle list names */
+    std::map<std::string, std::vector<double> > m_productCuts; /**< variables -> low/high cut on their product. */
+    std::map<std::string, std::vector<double> > m_sumCuts; /**< variables -> low/high cut on their sum. */
     double m_massCutLow;      /**< lower mass cut */
     double m_massCutHigh;     /**< upper mass cut */
     bool m_persistent;  /**< toggle output particle list btw. transient/persistent */

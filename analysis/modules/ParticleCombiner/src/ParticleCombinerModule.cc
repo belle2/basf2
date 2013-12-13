@@ -24,11 +24,14 @@
 // dataobjects
 #include <generators/dataobjects/MCParticle.h>
 #include <analysis/dataobjects/Particle.h>
+#include <analysis/dataobjects/ParticleInfo.h>
 #include <analysis/dataobjects/ParticleList.h>
+#include <analysis/utility/VariableManager.h>
 
 // Own include
 #include <analysis/modules/ParticleCombiner/ParticleCombinerModule.h>
 #include <algorithm>
+
 
 using namespace std;
 
@@ -59,6 +62,9 @@ namespace Belle2 {
              defaultList);
     addParam("MassCutLow", m_massCutLow, "[GeV] lower mass cut", 0.0);
     addParam("MassCutHigh", m_massCutHigh, "[GeV] upper mass cut", 100.0);
+    std::map<std::string, std::vector<double>> defaultMap;
+    addParam("cutsOnProduct", m_productCuts, "Map of Variable and Cut Values. Cuts are performed on the product of the variable value of all daughter particles.", defaultMap);
+    addParam("cutsOnSum", m_sumCuts, "Map of Variable and Cut Values. Cuts are performed on the sum of the variable value of all daughter particles.", defaultMap);
     addParam("persistent", m_persistent,
              "toggle output particle list btw. transient/persistent", false);
 
@@ -202,14 +208,16 @@ namespace Belle2 {
       }
       if (!differentSources(particleStack, Particles)) continue;
 
-      // apply invariant mass cut
+      // Check invariant mass requirements
       TLorentzVector vec(0., 0., 0., 0.);
       for (unsigned i = 0; i < particleStack.size(); i++) {
         vec = vec + particleStack[i]->get4Vector();
       }
       double mass = vec.M();
-      if (mass < m_massCutLow) continue;
-      if (mass > m_massCutHigh) continue;
+      if (mass < m_massCutLow || mass > m_massCutHigh) continue;
+
+      // Check if all (product and sum) cut requirements are fulfilled
+      if (!checkCuts(particleStack)) continue;
 
       // check if the combination is unique (e.g. it's permutation is not on the stack)
       if (!uniqueCombination(indexStack, indices)) continue;
@@ -226,6 +234,46 @@ namespace Belle2 {
 
   }
 
+  bool ParticleCombinerModule::checkCuts(std::vector<Particle*>& particleStack)
+  {
+
+    VariableManager& manager = VariableManager::Instance();
+
+    for (auto & cut : m_productCuts) {
+      // Now calculate the value by multiplying all decay products values,
+      // which are stored in the related ParticleInfo.
+      double value = 1.0;
+      auto var = manager.getVariable(cut.first);
+      if (var == nullptr) {
+        B2INFO("ParticleCombiner: VariableManager doesn't have Variable" <<  cut.first)
+        return false;
+      }
+      for (unsigned i = 0; i < particleStack.size(); i++) {
+        value *= var->function(particleStack[i]);
+      }
+      B2INFO("Product of daughter particles is " << value)
+      if (value < cut.second[0] || value > cut.second[1]) return false;
+    }
+
+    for (auto & cut : m_sumCuts) {
+      // Now calculate the value by summing all decay products values,
+      // which are stored in the related ParticleInfo.
+      double value = 0.0;
+      auto var = manager.getVariable(cut.first);
+      if (var == nullptr) {
+        B2INFO("ParticleCombiner: VariableManager doesn't have Variable" <<  cut.first)
+        return false;
+      }
+      for (unsigned i = 0; i < particleStack.size(); i++) {
+        value += var->function(particleStack[i]);
+      }
+      B2INFO("Sum of daughter particles is " << value)
+      if (value < cut.second[0] || value > cut.second[1]) return false;
+    }
+
+    return true;
+
+  }
 
   bool ParticleCombinerModule::differentSources(std::vector<Particle*> stack,
                                                 StoreArray<Particle>& Particles)

@@ -102,6 +102,17 @@ namespace Belle2 {
     void setGridPitch(double pitchR, double pitchZ) { m_gridPitchR = pitchR; m_gridPitchZ = pitchZ; }
 
 
+    /**
+     * Sets prameter for EKLM
+     * @param srmin minimum radius for the gap in endyoke [cm].
+     * @param zyoke minimum Z of endyoke [cm].
+     * @param gaph height of the gap in endyoke [cm].
+     * param iront thickness of iron plate in endyoke [cm].
+     */
+    void setKlmParameters(double srmin, double zyoke, double gaph, double iront) {
+      m_slotRMin = srmin, m_endyokeZMin = zyoke; m_gapHeight = gaph; m_ironPlateThickness = iront;
+    }
+
   protected:
 
   private:
@@ -115,6 +126,10 @@ namespace Belle2 {
     double m_gridPitchR;       /**< The grid pitch in r. */
     double m_gridPitchZ;       /**< The grid pitch in z. */
 
+    double m_slotRMin;          /**< minimum radius for the gap in endyoke */
+    double m_endyokeZMin;       /**< minimum Z of endyoke */
+    double m_gapHeight;         /**< height of the gap in endyoke */
+    double m_ironPlateThickness;/**< thickness of iron plate in endyoke */
   };
 
 } //end of namespace Belle2

@@ -112,6 +112,36 @@ TVector3 BFieldComponentRadial::calculate(const TVector3& point) const
   double dr = r - floor(r / m_gridPitchR) * m_gridPitchR;
   double dz = z - floor(z / m_gridPitchZ) * m_gridPitchZ;
 
+  // special treatment into the EKLM region
+  // iron gap
+  double dLayer(m_gapHeight + m_ironPlateThickness);
+
+  double dz_eklm = fabs(z - m_mapOffset) - (m_endyokeZMin - m_gapHeight);
+
+  int flag(0);
+  if (r > m_slotRMin && dz_eklm > 0 && dz != 0. && dz != m_gridPitchZ) {
+    int layer = static_cast<int>(floor(dz_eklm / dLayer));
+    if (layer <= 14) {
+      double ddz = dz_eklm - dLayer * layer;
+      ++flag;
+
+      if (r - m_slotRMin < m_gridPitchR && ddz < m_gapHeight) dr = m_gridPitchR;
+
+      if (ddz < m_gridPitchZ || (ddz >= m_gapHeight && ddz - m_gapHeight < m_gridPitchZ)) {
+        if (z > 0)
+          dz = m_gridPitchZ;
+        else
+          dz = 0.;
+      } else if (dLayer - ddz < m_gridPitchZ || (ddz < m_gapHeight && m_gapHeight - ddz < m_gridPitchZ)) {
+        if (z < 0)
+          dz = m_gridPitchZ;
+        else
+          dz = 0.;
+      }
+    }
+  }
+
+
   //Calculate the linear approx. of the magnetic field vector
   double Br1 = m_mapBuffer[ir][iz].r;
   double Br2 = m_mapBuffer[ir][iz + 1].r;

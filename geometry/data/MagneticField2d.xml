@@ -27,8 +27,29 @@
 				<ZMin unit="cm">-353.0</ZMin>
 				<ZMax unit="cm">447.0</ZMax>
 				<ZOffset unit="cm">47.0</ZOffset>
-				<MapFilename>geometry/SolenoidFieldMap.dat.gz</MapFilename>
+                                <SlotRMin unit="cm">130.0</SlotRMin>
+                                <EndyokeZMin unit="cm">230.0</EndyokeZMin>
+                                <GapHeight unit="cm">4.4</GapHeight>
+                                <IronPlateThickness unit="cm">4.7</IronPlateThickness>
+ 				<MapFilename>geometry/SolenoidFieldMap.dat.gz</MapFilename>
 			</Component>
+			<!-- Magnetic field map outside of solenoid
+			     Data of field map is from Belle library.
+			-->
+                        <Component type="Klm1">
+                                <NumberBarrelLayers>15</NumberBarrelLayers>
+                                <NumberEndcapLayers>14</NumberEndcapLayers>
+                                <BarrelRadiusMin unit="cm">201.9</BarrelRadiusMin>
+                                <BarrelZMax unit="cm">222.0</BarrelZMax>
+                                <EdncapRadiusMin unit="cm">174.0</EdncapRadiusMin>
+                                <EndcapZMin unit="cm">230.0</EndcapZMin>
+                                <BarrelGapHeightLayer0>4.14555</BarrelGapHeightLayer0>
+                                <EndcapGapHeight unit="cm">4.4</EndcapGapHeight>
+                                <BarrelIronThickness unit="cm">4.6689</BarrelIronThickness>
+                                <DLayer unit="cm">9.1</DLayer>
+                                <ZOffset unit="cm">47.0</ZOffset>
+                                <MapFilename>geometry/KLMFieldMap_belle1.dat</MapFilename>
+                        </Component>
 		</Components>
 	</Content>
 </DetectorComponent>

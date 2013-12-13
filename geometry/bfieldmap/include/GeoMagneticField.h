@@ -81,6 +81,13 @@ namespace Belle2 {
     void readBeamlineBField(const GearDir& component);
 
 
+    /**
+     * Reads the 2D Bfield map and parameters outside of solenoid and adds the component to the global magnetic field.
+       Magnetic field map in Belle I are used.
+     */
+
+    void readKlm1BField(const GearDir& component);
+
   private:
 
   };

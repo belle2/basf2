@@ -15,6 +15,7 @@
 #include <geometry/bfieldmap/BFieldComponentRadial.h>
 #include <geometry/bfieldmap/BFieldComponentQuad.h>
 #include <geometry/bfieldmap/BFieldComponentBeamline.h>
+#include <geometry/bfieldmap/BFieldComponentKlm1.h>
 #include <geometry/CreatorFactory.h>
 
 
@@ -46,6 +47,7 @@ GeoMagneticField::GeoMagneticField() : CreatorBase()
   m_componentTypeMap.insert(make_pair("Radial",   boost::bind(&GeoMagneticField::readRadialBField,   this, _1)));
   m_componentTypeMap.insert(make_pair("Quad",     boost::bind(&GeoMagneticField::readQuadBField,     this, _1)));
   m_componentTypeMap.insert(make_pair("Beamline", boost::bind(&GeoMagneticField::readBeamlineBField, this, _1)));
+  m_componentTypeMap.insert(make_pair("Klm1", boost::bind(&GeoMagneticField::readKlm1BField, this, _1)));
 }
 
 
@@ -111,12 +113,18 @@ void GeoMagneticField::readRadialBField(const GearDir& component)
   double gridPitchR    = component.getLength("GridPitchR");
   double gridPitchZ    = component.getLength("GridPitchZ");
 
+  double slotRMin      = component.getLength("SlotRMin");
+  double endyokeZMin   = component.getLength("EndyokeZMin");
+  double gapHeight     = component.getLength("GapHeight");
+  double ironThickness = component.getLength("IronPlateThickness");
+
   BFieldComponentRadial& bComp = BFieldMap::Instance().addBFieldComponent<BFieldComponentRadial>();
   bComp.setMapFilename(mapFilename);
   bComp.setMapSize(mapSizeR, mapSizeZ);
   bComp.setMapRegionZ(mapRegionMinZ, mapRegionMaxZ, mapOffset);
   bComp.setMapRegionR(mapRegionMinR, mapRegionMaxR);
   bComp.setGridPitch(gridPitchR, gridPitchZ);
+  bComp.setKlmParameters(slotRMin, endyokeZMin, gapHeight, ironThickness);
 }
 
 void GeoMagneticField::readQuadBField(const GearDir& component)
@@ -162,3 +170,32 @@ void GeoMagneticField::readBeamlineBField(const GearDir& component)
   bComp.setMapRegionR(mapRegionMinR, mapRegionMaxR);
   bComp.setBeamAngle(beamAngle);
 }
+
+void GeoMagneticField::readKlm1BField(const GearDir& component)
+{
+  string mapFilename = component.getString("MapFilename");
+
+  int nBarrelLayers = component.getInt("NumberBarrelLayers");
+  int nEndcapLayers = component.getInt("NumberEndcapLayers");
+
+  double barrelRMin = component.getLength("BarrelRadiusMin");
+  double barrelZMax = component.getLength("BarrelZMax");
+  double mapOffset = component.getLength("ZOffset");
+
+  double endcapRMin = component.getLength("EdncapRadiusMin");
+  double endcapZMin = component.getLength("EndcapZMin");
+
+  double barrelGapHeightLayer0 = component.getLength("BarrelGapHeightLayer0");
+  double barrelIronThickness   = component.getLength("BarrelIronThickness");
+  double endcapGapHeight       = component.getLength("EndcapGapHeight");
+  double dLayer                = component.getLength("DLayer");
+
+
+  BFieldComponentKlm1& bComp = BFieldMap::Instance().addBFieldComponent<BFieldComponentKlm1>();
+  bComp.setMapFilename(mapFilename);
+  bComp.setNLayers(nBarrelLayers, nEndcapLayers);
+  bComp.setBarrelRegion(barrelRMin, barrelZMax, mapOffset);
+  bComp.setEndcapRegion(endcapRMin, endcapZMin);
+  bComp.setLayerParam(barrelGapHeightLayer0, barrelIronThickness, endcapGapHeight, dLayer);
+}
+

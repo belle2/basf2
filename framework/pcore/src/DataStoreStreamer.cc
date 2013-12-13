@@ -78,7 +78,7 @@ DataStoreStreamer::~DataStoreStreamer()
 }
 
 // Stream DataStore
-EvtMessage* DataStoreStreamer::streamDataStore(DataStore::EDurability durability, bool streamTransientObjects)
+EvtMessage* DataStoreStreamer::streamDataStore(DataStore::EDurability durability, bool streamTransientObjects, bool removeEmptyArrays)
 {
   // Clear Message Handler
   m_msghandler->clear();
@@ -93,6 +93,11 @@ EvtMessage* DataStoreStreamer::streamDataStore(DataStore::EDurability durability
     //skip transient objects/arrays?
     if (!streamTransientObjects and entry->isTransient)
       continue;
+
+    //skip empty arrays
+    if (removeEmptyArrays and entry->isArray) {
+      if (((TClonesArray*)entry->object)->GetEntries() == 0) continue;
+    }
 
     //verify that bits are unused
     if (entry->object->TestBit(c_IsTransient)) {

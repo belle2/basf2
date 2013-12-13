@@ -36,44 +36,31 @@ void MsgHandler::clear()
 
 bool MsgHandler::add(const TObject* obj, const string& name)
 {
-  /*
-  if ( obj == NULL ) {
-  //    printf ( "MsgHandler::add : No Object!!\n" );
-    B2INFO ( "MsgHandler::add " << name << " : No Object!!" );
-    return false;
-  }
-  */
-
-  //  printf ( "MsgHandler::add : object class = %s\n", obj->ClassName() );
+  // Initialize TMessage
   TMessage* msg = new TMessage(kMESS_OBJECT);
   msg->Reset();
   msg->SetWriteMode();
   //  msg->EnableSchemaEvolutionForAll();
   msg->SetCompressionLevel(m_complevel);
-  int len = msg->BufferSize();
-  if (msg->CompBuffer()) {
-    // Compression ON
-    len = msg->CompLength();
-  }
+
+  // Write object in TMessage
   msg->WriteObject(obj);
   msg->Compress(); //no effect if m_complevel == 0
   //  msg->ForceWriteInfo(obj->, true );
 
-  // For debug. Decode packed object once:
-  //  TMessage * tmsg = new InMessage(msg->Buffer(), len);
-  //  tmsg->Print();
-  //  tmsg->ReadObjectAny( tmsg->GetClass() );
-
-
+  // Obtain size of streamed object
+  //  int len = msg->BufferSize();
+  int len = msg->Length();
+  if (msg->CompBuffer()) {
+    // Compression ON
+    len = msg->CompLength();
+  }
   //  printf ( "MsgHandler : size of %s = %d (pid=%d)\n", name.c_str(), len, (int)getpid() );
 
-
+  // Store streamed objects in array
   if (len < MAX_OBJECT_SIZE) {
-    //  if ( len < MAX_OBJECT_SIZE || name != "ARICHAeroHits" ||
-    //       name != "ECLSimHits" ) {
     m_buf.push_back(msg);
     m_name.push_back(name);
-    //  printf ( "MsgHandler : %s added\n", name.c_str() );
     return true;
   } else {
     B2INFO("MsgHandler : " << name <<
@@ -89,26 +76,29 @@ EvtMessage* MsgHandler::encode_msg(RECORD_TYPE rectype)
     EvtMessage* eod = new EvtMessage(NULL, 0, rectype);
     return eod;
   }
-
   //  printf ( "MsgHandler : encoding message ..... Nobjs = %d\n", m_buf.size() );
 
+  // Initialize output buffer
   int totlen = 0;
   char* msgbuf = new char[EvtMessage::c_MaxEventSize];
   char* msgptr = msgbuf;
   int nameptr = 0;
+
+  // Loop over streamed objects
   for (vector<TMessage*>::iterator it = m_buf.begin(); it != m_buf.end(); ++it) {
     // Get object
     TMessage* msg = *it;
-    // Put object
-    //    msg->EnableSchemaEvolutionForAll();
+    // Get buffer
     char* buf = msg->Buffer();
-    int len = msg->BufferSize();
+    // Get buffer length
+    //    int len = msg->BufferSize();
+    int len = msg->Length();
     if (msg->CompBuffer()) {
       // Compression ON
       len = msg->CompLength();
       buf = msg->CompBuffer();
     }
-    // Put name of object
+    // Put name of object in output buffer
     string& name = m_name[nameptr];
     int lname = strlen(name.c_str()) + 1;
     memcpy(msgptr, &lname, sizeof(int));
@@ -126,6 +116,8 @@ EvtMessage* MsgHandler::encode_msg(RECORD_TYPE rectype)
     nameptr++;
     delete msg; // test
   }
+
+  // Create EvtMessage
   EvtMessage* evtmsg = new EvtMessage(msgbuf, totlen, rectype);
 
   //  printf ( "encode : msgbuf = %8.8x, %8.8x, %8.8x, %8.8x\n",

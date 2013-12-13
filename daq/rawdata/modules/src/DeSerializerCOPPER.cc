@@ -160,6 +160,7 @@ void DeSerializerCOPPERModule::FillNewRawCOPPERHeader(RawCOPPER* raw_copper)
   int nwords = raw_copper->GetBlockNwords(cprblock);
   rawhdr.SetNwords(nwords);
 
+
   // 2, Set run and exp #
   rawhdr.SetExpRunNumber(raw_copper->GetExpRunBuf(cprblock));       // Fill 3rd header word
 
@@ -305,7 +306,7 @@ int* DeSerializerCOPPERModule::ReadOneEventFromCOPPERFIFO(const int entry, int* 
   // Calcurate data size
   //
   *m_size_word = m_bufary[ entry ][ RawCOPPER::POS_DATA_LENGTH + RawHeader::RAWHEADER_NWORDS ]
-                 + COPPER_HEADER_TRAILER_NWORDS + RawHeader::RAWHEADER_NWORDS + RawTrailer::RAWTRAILER_NWORDS; // 9 words are COPPER haeder and trailer size.
+                 + RawCOPPER::COPPER_HEADER_TRAILER_NWORDS + RawHeader::RAWHEADER_NWORDS + RawTrailer::RAWTRAILER_NWORDS; // 9 words are COPPER haeder and trailer size.
 
   //
   // Allocate buffer if needed
@@ -477,6 +478,7 @@ void DeSerializerCOPPERModule::event()
     temp_rawcopper.SetBuffer(temp_buf, m_size_word, 0, num_events, num_nodes);
 
     // Fill header and trailer
+    //    temp_rawcopper.FillTopBlockRawHeader( m_nodeid, m_data_type, m_trunc_mask );
     FillNewRawCOPPERHeader(&temp_rawcopper);
 
     if (dump_fname.size() > 0) {

@@ -52,8 +52,6 @@ namespace Belle2 {
     //! Module functions to be called from event process
     virtual void event();
 
-    //! Copper data words = ( total_data_length in COPPER header ) + COPPER_HEADER_TRAILER_NWORDS
-    enum { COPPER_HEADER_TRAILER_NWORDS = 9 }; //See COPPER data format
 
     //! Fill RawHeader
     virtual void FillNewRawCOPPERHeader(RawCOPPER* raw_copper);

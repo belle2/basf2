@@ -115,7 +115,7 @@ int* DeSerializerFILEModule::ReadOneDataBlock(int* malloc_flag, int* size_word, 
     stop_word = pos_data_length;
     int* length_buf = ReadfromFILE(m_fp_in, pos_data_length, start_word, stop_word);
 
-    *size_word = length_buf[ pos_data_length - 1 ] + COPPER_HEADER_TRAILER_NWORDS
+    *size_word = length_buf[ pos_data_length - 1 ] + RawCOPPER::COPPER_HEADER_TRAILER_NWORDS
                  + RawHeader::RAWHEADER_NWORDS + RawTrailer::RAWTRAILER_NWORDS;
     start_word = 1 + pos_data_length + RawHeader::RAWHEADER_NWORDS;
     stop_word = *size_word - RawTrailer::RAWTRAILER_NWORDS;

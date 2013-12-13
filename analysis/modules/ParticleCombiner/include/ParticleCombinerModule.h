@@ -14,8 +14,24 @@
 #include <framework/core/Module.h>
 #include <string>
 #include <vector>
+#include <unordered_set>
+
+//Hack: allow defining std::hash for dynamic_bitset
+#define BOOST_DYNAMIC_BITSET_DONT_USE_FRIENDS
+#include <boost/dynamic_bitset.hpp>
+#include <boost/functional/hash.hpp>
+
+namespace std {
+  /** Define hash for dynamic_bitset. */
+  template<> struct hash<boost::dynamic_bitset<> > {
+    std::size_t operator()(const boost::dynamic_bitset<>& bs) const {
+      return boost::hash_value(bs.m_bits);
+    }
+  };
+}
 
 namespace Belle2 {
+
 
   /**
    * particle combiner module
@@ -95,16 +111,11 @@ namespace Belle2 {
      * @param indices combination indices to check
      * @return true if indices not found in the stack; if true indices pushed to stack
      */
-    bool uniqueCombination(std::vector<std::vector<int> >& indexStack,
-                           std::vector<int> indices);
+    bool uniqueCombination(std::unordered_set<boost::dynamic_bitset<> >& indexStack,
+                           const std::vector<int>& indices);
 
     /**
-     * Check that vec1 is the same combination as vec2
-     * @param vec1 reference to a combination
-     * @param vec2 reference to another combination
-     * @return true if vec1 is the same combination as vec2
      */
-    bool sameCombination(std::vector<int>& vec1, std::vector<int>& vec2);
 
     int m_pdg;                /**< PDG code of combined particles */
     std::string m_listName;   /**< output particle list name */

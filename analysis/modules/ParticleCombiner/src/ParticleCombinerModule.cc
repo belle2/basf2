@@ -176,7 +176,7 @@ namespace Belle2 {
 
     // stack needed to check for unique combination
 
-    vector< vector<int> > indexStack;
+    unordered_set<boost::dynamic_bitset<> > indexStack;
 
     // N nested loops
 
@@ -248,30 +248,19 @@ namespace Belle2 {
 
 
   bool ParticleCombinerModule::uniqueCombination(
-    std::vector<std::vector<int> >& indexStack,
-    std::vector<int> indices)
+    std::unordered_set<boost::dynamic_bitset<> >& indexStack,
+    const std::vector<int>& indices)
   {
-    std::sort(indices.begin(), indices.end());
-    int sum = 0;
-    for (unsigned i = 0; i < indices.size(); i++) sum += indices[i];
-    indices.push_back(sum);
-
-    for (unsigned k = 0; k < indexStack.size(); k++) {
-      if (indices.back() != indexStack[k].back()) continue;
-      if (sameCombination(indices, indexStack[k])) return false;
+    int max_element = *std::max_element(indices.begin(), indices.end());
+    boost::dynamic_bitset<> indicesBits(max_element + 1); //all zeroes
+    for (int idx : indices) {
+      indicesBits[idx] = 1;
     }
-    indexStack.push_back(indices);
-    return true;
-  }
 
+    if (indexStack.find(indicesBits) != indexStack.end())
+      return false;
 
-  bool ParticleCombinerModule::sameCombination(std::vector<int>& vec1,
-                                               std::vector<int>& vec2)
-  {
-    if (vec1.size() != vec2.size()) return false;
-    for (unsigned i = 0; i < vec1.size(); i++) {
-      if (vec1[i] != vec2[i]) return false;
-    }
+    indexStack.insert(indicesBits);
     return true;
   }
 

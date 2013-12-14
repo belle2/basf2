@@ -9,10 +9,11 @@
  **************************************************************************/
 
 //first because of python include
-#include <framework/core/ModuleStatistics.h>
+#include <framework/core/Module.h>
 
 #include <framework/core/EventProcessor.h>
 
+#include <framework/core/ModuleStatistics.h>
 #include <framework/core/ModuleManager.h>
 #include <framework/core/PathManager.h>
 #include <framework/core/PathIterator.h>

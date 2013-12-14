@@ -11,9 +11,9 @@
 #ifndef PEVENTPROCESSOR_H_
 #define PEVENTPROCESSOR_H_
 
+#include <framework/core/Module.h>
 #include <framework/core/EventProcessor.h>
 
-#include <framework/core/Module.h>
 #include <framework/core/Path.h>
 
 

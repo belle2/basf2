@@ -11,8 +11,8 @@
 #ifndef PATHMANAGER_H_
 #define PATHMANAGER_H_
 
-#include <framework/core/Path.h>
 #include <framework/core/Module.h>
+#include <framework/core/Path.h>
 
 #include <list>
 

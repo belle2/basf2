@@ -9,8 +9,8 @@
  **************************************************************************/
 
 //first to avoid _XOPEN_SOURCE warnings
-#include <framework/core/Path.h>
 #include <framework/core/Module.h>
+#include <framework/core/Path.h>
 #include <framework/core/ModuleManager.h>
 
 #include <framework/core/DataFlowVisualization.h>

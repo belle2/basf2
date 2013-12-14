@@ -29,30 +29,30 @@ namespace Belle2 {
   TEST_F(VariableTest, VariableManager)
   {
     const VariableManager::Var* v = VariableManager::Instance().getVariable("THISDOESNTEXIST");
-    EXPECT_TRUE(v == NULL);
+    EXPECT_TRUE(v == nullptr);
 
     //this exists
     const VariableManager::Var* pvar = VariableManager::Instance().getVariable("p");
-    EXPECT_TRUE(pvar != NULL);
+    EXPECT_TRUE(pvar != nullptr);
 
     //re-registration not allowed
     EXPECT_FATAL(VariableManager::Instance().registerVariable("p", &dummyVar, "description"));
 
-    EXPECT_FATAL(VariableManager::Instance().registerVariable("something", NULL, "blah"));
+    EXPECT_FATAL(VariableManager::Instance().registerVariable("something", nullptr, "blah"));
 
 
     VariableManager::Instance().registerVariable("testingthedummyvar", &dummyVar, "blah");
     const VariableManager::Var* dummy = VariableManager::Instance().getVariable("testingthedummyvar");
-    EXPECT_TRUE(dummy != NULL);
+    EXPECT_TRUE(dummy != nullptr);
     EXPECT_TRUE(dummy->description == "blah");
-    EXPECT_DOUBLE_EQ(dummy->function(NULL), 42.0);
+    EXPECT_DOUBLE_EQ(dummy->function(nullptr), 42.0);
 
     //also test the macro (with other name)
     REGISTER_VARIABLE("testingthedummyvar2", dummyVar, "something else");
     dummy = VariableManager::Instance().getVariable("testingthedummyvar2");
-    EXPECT_TRUE(dummy != NULL);
+    EXPECT_TRUE(dummy != nullptr);
     EXPECT_TRUE(dummy->description == "something else");
-    EXPECT_DOUBLE_EQ(dummy->function(NULL), 42.0);
+    EXPECT_DOUBLE_EQ(dummy->function(nullptr), 42.0);
 
     //test list
     /*

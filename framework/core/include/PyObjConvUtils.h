@@ -69,6 +69,7 @@ namespace Belle2 {
     template<> struct Type<std::string>;
 
     /**
+     * @{
      * Converts a template argument into a string for corresponding Python type.
      * Partial template specialisations are not allowed for functions, so this needs to be a class.
      */
@@ -96,6 +97,7 @@ namespace Belle2 {
 
     template<typename... Types> struct Type<std::tuple<Types...> > { static std::string name() { return std::string("tuple( ") + GetType<Types...>() + " )"; } };
 
+    /** @} */
 
     /**
      * --------------- From C++ TO Python Converter ------------------------
@@ -146,6 +148,7 @@ namespace Belle2 {
     }
 
     /**
+     * @{
      * TMP (Template Meta Programming )
      * The given python list is filled, and later converted into a python tuple (in convertToPythonObject).
      * To fill the python list frmo the C++ std::tuple we need again TMP methods.
@@ -168,6 +171,7 @@ namespace Belle2 {
       GetTuple(tuple, pyList, SizeT < N - 1 > ());
       pyList.append(convertToPythonObject(std::get < N - 1 > (tuple)));
     }
+    /** @} */
 
     /**
      * Writes content of a std::tuple to a python tuple.
@@ -257,6 +261,7 @@ namespace Belle2 {
 
 
     /**
+     * @{
      * TMP (Template Meta Programming )
      * The given python tuple is written into the given c++ tuple.
      * To fill the C++ std::tuple we need again TMP methods.
@@ -282,6 +287,7 @@ namespace Belle2 {
       SetTuple(tuple, pyTuple, SizeT < N - 1 > ());
       std::get < N - 1 > (tuple) = convertPythonObject(pyTuple[N - 1], std::get < N - 1 > (tuple));
     }
+    /** @} */
 
     /**
      * Reads std::tuple from a python object.

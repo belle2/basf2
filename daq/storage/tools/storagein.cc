@@ -67,7 +67,7 @@ int main(int argc, char** argv)
         }
         //*/
         int irb = 0;
-        bool tried = false;
+        //bool tried = false;
         while (true) {
           irb = rbuf->insq(data.getBuffer(), data.getWordSize());
           if (irb >= 0) break;
@@ -76,7 +76,7 @@ int main(int argc, char** argv)
             sbuf.reportWarning("Ring buffer full. waiting to be available");
             }
           */
-          tried = true;
+          //tried = true;
           usleep(200);
         }
         nrec++;

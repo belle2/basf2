@@ -56,7 +56,7 @@ int main(int argc, char** argv)
     int size = 0;
     try {
       while (true) {
-        bool tried = false;
+        //bool tried = false;
         while ((size = rbuf->remq(data.getBuffer())) == 0) {
           while (use_buf && sbuf.isStopped()) {
             sbuf.waitStarted();

@@ -162,7 +162,7 @@ SeqFile* StorageOutputModule::openDataFile()
   int expno = evtmetadata->getExperiment();
   int runno = evtmetadata->getRun();
   char outfile[1024];
-  sprintf(outfile, "%se%4.4dr%6.6d.sroot",
+  sprintf(outfile, "%s/e%4.4dr%6.6d.sroot",
           m_stordir.c_str(), expno, runno);
   SeqFile* seqfile = new SeqFile(outfile, "w");
   printf("StorageOutput : data file %s initialized\n", outfile);

@@ -36,10 +36,7 @@ int main(int argc, char** argv)
   }
   int neof = atoi(argv[3]);
 
-  RingBuffer* rbuf = new RingBuffer(argv[1], MAXBUF);
-  rbuf->clear();
-  delete rbuf;
-  rbuf = new RingBuffer(argv[1]);
+  RingBuffer* rbuf = new RingBuffer(argv[1]);
   rbuf->dump_db();
 
   char* buf = new char[MAXBUF];

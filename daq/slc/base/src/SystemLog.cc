@@ -39,6 +39,7 @@ const std::string SystemLog::toString() const
     case WARNING: ss << "] [WARNING] "; break;
     case ERROR:   ss << "] [ERROR] "; break;
     case FATAL:   ss << "] [FATAL] "; break;
+    default:      ss << "] [UNKNOWN] "; break;
   }
   ss << _message;
   return ss.str();

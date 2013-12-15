@@ -15,10 +15,10 @@
 
 using namespace Belle2;
 
-bool ProcessController::init()
+bool ProcessController::init(const std::string& name_in)
 {
-  _msg.setNode(_callback->getNode()->getName(),
-               _callback->getNode()->getData()->getId());
+  const std::string name = (name_in.size() > 0) ? name_in : _callback->getNode()->getName();
+  _msg.setNode(name, _callback->getNode()->getData()->getId());
   _state = State::CONFIGURED_S;
   PThread(new ProcessLogListener(this));
   return _msg.create();
@@ -49,12 +49,14 @@ bool ProcessController::load(int timeout)
   _fork = Fork(new ProcessSubmitter(this, iopipe));
   //close(iopipe[1]);
   _thread = PThread(new ProcessListener(this));
-  _cond.wait(_mutex, timeout);
-  if (_state != State::READY_S) {
-    _callback->setReply(Belle2::form("Failed to be ready: %s",
-                                     getMessage().c_str()));
-    _mutex.unlock();
-    return false;
+  if (timeout > 0) {
+    _cond.wait(_mutex, timeout);
+    if (_state != State::READY_S) {
+      _callback->setReply(Belle2::form("Failed to be ready: %s",
+                                       getMessage().c_str()));
+      _mutex.unlock();
+      return false;
+    }
   }
   _mutex.unlock();
   _state = State::READY_S;
@@ -65,6 +67,7 @@ bool ProcessController::start(int timeout)
 {
   _mutex.lock();
   _state = State::STARTING_TS;
+  ///*
   _msg.getInfo().lock();
   _msg.getInfo().setExpNumber(_callback->getExpNumber());
   _msg.getInfo().setColdNumber(_callback->getColdNumber());
@@ -73,12 +76,15 @@ bool ProcessController::start(int timeout)
   _msg.getInfo().setState(1);
   _msg.getInfo().notify();
   _msg.getInfo().unlock();
-  _cond.wait(_mutex, timeout);
-  if (_state != State::RUNNING_S) {
-    _callback->setReply(Belle2::form("Failed to start run: %s",
-                                     getMessage().c_str()));
-    _mutex.unlock();
-    return false;
+  //*/
+  if (timeout > 0) {
+    _cond.wait(_mutex, timeout);
+    if (_state != State::RUNNING_S) {
+      _callback->setReply(Belle2::form("Failed to start run: %s",
+                                       getMessage().c_str()));
+      _mutex.unlock();
+      return false;
+    }
   }
   _mutex.unlock();
   return true;
@@ -89,12 +95,16 @@ bool ProcessController::stop(int timeout)
   _mutex.lock();
   _state = State::STOPPING_TS;
   _msg.getInfo().clear();
-  _cond.wait(_mutex, timeout);
-  if (_state != State::READY_S) {
-    _callback->setReply(Belle2::form("Failed to stop run: %s",
-                                     getMessage().c_str()));
-    _mutex.unlock();
-    return false;
+  if (timeout > 0) {
+    _cond.wait(_mutex, timeout);
+    if (timeout > 0) {
+      if (_state != State::READY_S) {
+        _callback->setReply(Belle2::form("Failed to stop run: %s",
+                                         getMessage().c_str()));
+        _mutex.unlock();
+        return false;
+      }
+    }
   }
   _mutex.unlock();
   return true;

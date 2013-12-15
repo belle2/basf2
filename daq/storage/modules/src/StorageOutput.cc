@@ -33,8 +33,8 @@ StorageOutputModule::StorageOutputModule() : Module()
 
   //Parameter definition
   addParam("compressionLevel", m_compressionLevel, "Compression Level: 0 for no, 1 for low, 9 for high compression. Level 1 usually reduces size by 50%, higher levels have no noticable effect. NOTE: Because of a ROOT bug, enabling this currently causes memory leaks..", 0);
-  addParam("RingBufferName", m_rbufname, "Name of Ring Buffer to dump streamed events",
-           string("DumpRbuf"));
+  addParam("OutputBufferName", m_obufname, "Name of Ring Buffer to dump streamed events",
+           string(""));
   addParam("DumpInterval", m_interval, "Event interval to dump event in RingBuffer",
            100);
   addParam("StorageDir", m_stordir, "Directory to write output files", string(""));
@@ -61,10 +61,11 @@ void StorageOutputModule::initialize()
   m_streamer = new DataStoreStreamer(m_compressionLevel);
 
   // Ring Buffer
-  if (strcmp(m_rbufname.c_str(), "") == 0) {
-    m_rbufout = new RingBuffer(m_rbufname.c_str());
+  if (m_obufname.size() > 0) {
+    B2INFO(m_obufname.c_str());;
+    m_obuf = new RingBuffer(m_obufname.c_str(), 1000000);
   } else
-    m_rbufout = NULL;
+    m_obuf = NULL;
 
   B2INFO("StorageOutput: initialized.");
 
@@ -95,11 +96,17 @@ void StorageOutputModule::event()
   int stat = m_file->write(msg->buffer());
   //  printf("StorageOuput : write = %d\n", stat);
 
+  static int count = 0;
   // Queue EvtMessage in RingBuffer
-  if (m_rbufout != NULL) {
+  if (m_obuf != NULL) {
     if (m_nevt % m_interval == 0) {
       // Free running RingBuffer, no flow control
-      m_rbufout->insq((int*)msg->buffer(), (msg->size() - 1) / 4 + 1);
+      //printf("record %d: size = %d\n", count, *(int*)msg->buffer());
+      //printf("record %d: size = %d\n", count, (msg->size() - 1) / 4 + 1);
+      count++;
+      //printf("%s:%d %d %d\n", __FILE__, __LINE__, (msg->size() - 1) / 4 + 1, *(int*)msg->buffer());
+      m_obuf->insq((int*)msg->buffer(), (msg->size() - 1) / 4 + 1);
+      //m_obuf->insq((int*)msg->buffer(), *(int*)msg->buffer());
     }
   }
   // Clean up EvtMessage
@@ -155,7 +162,8 @@ SeqFile* StorageOutputModule::openDataFile()
   int expno = evtmetadata->getExperiment();
   int runno = evtmetadata->getRun();
   char outfile[1024];
-  sprintf(outfile, "%se%4.4dr%6.6d.sroot", m_stordir.c_str(), expno, runno);
+  sprintf(outfile, "%se%4.4dr%6.6d.sroot",
+          m_stordir.c_str(), expno, runno);
   SeqFile* seqfile = new SeqFile(outfile, "w");
   printf("StorageOutput : data file %s initialized\n", outfile);
   return seqfile;

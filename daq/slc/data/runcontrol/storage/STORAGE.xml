@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<object name="STORAGE" revision="1" >
+  <object name="DSR01" class="Storager" rbname="temp01" />
+</object>

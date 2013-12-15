@@ -43,7 +43,6 @@ bool Cond::broadcast() throw()
 bool Cond::wait(Mutex& mutex) throw()
 {
   if (pthread_cond_wait(&_cond_t, &mutex._mu) != 0) {
-    mutex.unlock();
     return false;
   }
   return true;
@@ -57,11 +56,10 @@ bool Cond::wait(Mutex& mutex, const unsigned int sec, const unsigned int msec) t
   gettimeofday(&now, NULL);
   timeout.tv_sec = now.tv_sec + sec;
   timeout.tv_nsec = now.tv_usec * 1000 + msec;
-  if (pthread_cond_timedwait(&_cond_t, &mutex._mu, &timeout) != 0) {
-    mutex.unlock();
+  int stat = 0;
+  if ((stat = pthread_cond_timedwait(&_cond_t, &mutex._mu, &timeout)) != 0) {
     return false;
   }
-
   return true;
 }
 

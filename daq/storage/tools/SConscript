@@ -1,0 +1,7 @@
+Import('env')
+
+env['TOOLS_LIBS']['file2socket'] = ['daq', 'framework', '$ROOT_LIBS' ]
+env['TOOLS_LIBS']['storagein'] = ['daq', 'framework', '$ROOT_LIBS' ]
+env['TOOLS_LIBS']['storageout'] = ['daq', 'framework', '$ROOT_LIBS' ]
+
+Return('env')

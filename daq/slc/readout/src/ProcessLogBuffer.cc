@@ -12,13 +12,6 @@
 
 using namespace Belle2;
 
-const int ProcessLogBuffer::DEBUG = 1;
-const int ProcessLogBuffer::INFO = 2;
-const int ProcessLogBuffer::NOTICE = 3;
-const int ProcessLogBuffer::WARNING = 4;
-const int ProcessLogBuffer::ERROR = 5;
-const int ProcessLogBuffer::FATAL = 6;
-
 const int ProcessLogBuffer::MAX_MESSAGE = 20;
 
 size_t ProcessLogBuffer::size() throw()
@@ -46,6 +39,7 @@ bool ProcessLogBuffer::open(const std::string& path)
   _rindex = (int*)buf;
   buf += sizeof(int);
   _msg_v = (process_log_message*)buf;
+  _available = true;
   return true;
 }
 
@@ -71,6 +65,7 @@ void ProcessLogBuffer::clear()
 void ProcessLogBuffer::close()
 {
   _memory.close();
+  _available = false;
 }
 
 void ProcessLogBuffer::unlink(const std::string& path)
@@ -79,34 +74,37 @@ void ProcessLogBuffer::unlink(const std::string& path)
   close();
 }
 
-std::string ProcessLogBuffer::recieve(int& priority, int timeout)
+std::string ProcessLogBuffer::recieve(SystemLog::Priority& priority, int timeout)
 {
+  if (!_available) return "";
   _mutex.lock();
   if (*_rindex == MAX_MESSAGE) *_rindex = 0;
   int i = *_rindex;
-  if (_msg_v[i].priority == 0) {
+  if (_msg_v[i].priority == SystemLog::UNKNOWN) {
     _cond.wait(_mutex, timeout);
   }
-  if (_msg_v[i].priority == 0) {
-    priority = -1;
+  if (_msg_v[i].priority == SystemLog::UNKNOWN) {
+    priority = SystemLog::UNKNOWN;
     _mutex.unlock();
     return "";
   }
   (*_rindex)++;
   priority = _msg_v[i].priority;
-  _msg_v[i].priority = 0;
+  _msg_v[i].priority = SystemLog::UNKNOWN;
   std::string message = _msg_v[i].message;
   _cond.signal();
   _mutex.unlock();
   return message;
 }
 
-bool ProcessLogBuffer::send(int priority, const std::string& message)
+bool ProcessLogBuffer::send(SystemLog::Priority priority,
+                            const std::string& message)
 {
+  if (!_available) return false;
   _mutex.lock();
   if (*_windex == MAX_MESSAGE) *_windex = 0;
   int i = *_windex;
-  while (_msg_v[i].priority > 0) {
+  while (_msg_v[i].priority > SystemLog::UNKNOWN) {
     _cond.wait(_mutex);
   }
   (*_windex)++;

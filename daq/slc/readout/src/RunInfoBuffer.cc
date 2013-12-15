@@ -70,21 +70,17 @@ bool RunInfoBuffer::unlock() throw()
 
 bool RunInfoBuffer::wait() throw()
 {
-  _mutex.lock();
-  _cond.wait(_mutex);
-  return _mutex.unlock();
+  return _cond.wait(_mutex);
 }
 
 bool RunInfoBuffer::wait(int time) throw()
 {
-  _mutex.lock();
-  _cond.wait(_mutex, time, 0);
-  return _mutex.unlock();
+  return _cond.wait(_mutex, time, 0);
 }
 
 bool RunInfoBuffer::notify() throw()
 {
-  _mutex.lock();
-  _cond.broadcast();
-  return _mutex.unlock();
+  //_mutex.lock();
+  return _cond.broadcast();
+  //return _mutex.unlock();
 }

@@ -4,15 +4,19 @@
 
 using namespace Belle2;
 
-ProcessStatusBuffer::~ProcessStatusBuffer()
+ProcessStatusBuffer::ProcessStatusBuffer()
 {
-
 }
 
 ProcessStatusBuffer::ProcessStatusBuffer(const std::string& nodename,
                                          int nodeid)
 {
   setNode(nodename, nodeid);
+}
+
+ProcessStatusBuffer::~ProcessStatusBuffer()
+{
+
 }
 
 void ProcessStatusBuffer::setNode(const std::string& nodename,
@@ -36,7 +40,6 @@ bool ProcessStatusBuffer::create()
 
 bool ProcessStatusBuffer::open()
 {
-
   _buf.open(_buf_path);
   _msg.open(_fifo_path);
   return true;
@@ -56,22 +59,63 @@ bool ProcessStatusBuffer::unlink()
   return true;
 }
 
+bool ProcessStatusBuffer::waitStarted()
+{
+  _buf.lock();
+  if (_buf.getState() == 0) {
+    _buf.wait();
+  }
+  _buf.unlock();
+  return true;
+}
+
+bool ProcessStatusBuffer::isStopped()
+{
+  _buf.lock();
+  if (_buf.getState() == 0) {
+    _buf.unlock();
+    return true;
+  }
+  _buf.unlock();
+  return false;
+}
+
 bool ProcessStatusBuffer::reportReady()
 {
-  return _msg.send(ProcessLogBuffer::NOTICE, "READY");
+  return _msg.send(SystemLog::NOTICE, "READY");
 }
 
 bool ProcessStatusBuffer::reportRunning()
 {
-  return _msg.send(ProcessLogBuffer::NOTICE, "RUNNING");
+  return _msg.send(SystemLog::NOTICE, "RUNNING");
+}
+
+bool ProcessStatusBuffer::reportDebug(const std::string message)
+{
+  return _msg.send(SystemLog::DEBUG, message);
+}
+
+bool ProcessStatusBuffer::reportInfo(const std::string message)
+{
+  return _msg.send(SystemLog::INFO, message);
+}
+
+bool ProcessStatusBuffer::reportNotice(const std::string message)
+{
+  return _msg.send(SystemLog::NOTICE, message);
+}
+
+bool ProcessStatusBuffer::reportWarning(const std::string message)
+{
+  return _msg.send(SystemLog::WARNING, message);
 }
 
 bool ProcessStatusBuffer::reportError(const std::string message)
 {
-  return _msg.send(ProcessLogBuffer::ERROR, message);
+  return _msg.send(SystemLog::ERROR, message);
 }
 
 bool ProcessStatusBuffer::reportFatal(const std::string message)
 {
-  return _msg.send(ProcessLogBuffer::FATAL, message);
+  return _msg.send(SystemLog::FATAL, message);
 }

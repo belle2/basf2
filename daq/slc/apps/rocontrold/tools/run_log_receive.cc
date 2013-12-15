@@ -9,15 +9,17 @@
 #include <cstdio>
 #include <cerrno>
 
+using namespace Belle2;
+
 int main(int argc, char** argv)
 {
   const char* path = argv[1];
-  Belle2::ProcessLogBuffer buf;
+  ProcessLogBuffer buf;
   buf.unlink(path);
   buf.create(path);
   int count = 0;
   while (true) {
-    int priority = 0;
+    SystemLog::Priority priority = SystemLog::UNKNOWN;
     std::string ret = "";
     if ((ret = buf.recieve(priority)).size() == 0) {
       perror("read");

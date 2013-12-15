@@ -12,7 +12,7 @@ namespace Belle2 {
 
   public:
     enum Priority {
-      DEBUG, INFO, NOTICE, WARNING, ERROR, FATAL
+      UNKNOWN = 0, DEBUG, INFO, NOTICE, WARNING, ERROR, FATAL
     };
 
   public:

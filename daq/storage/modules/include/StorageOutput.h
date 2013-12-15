@@ -98,8 +98,8 @@ namespace Belle2 {
     double m_size2; /**< sum of squares of data transferred in each event, in kB^2. */
 
     //! Ring Buffer to dump sampled output stream
-    std::string m_rbufname;
-    RingBuffer* m_rbufout;
+    std::string m_obufname;
+    RingBuffer* m_obuf;
 
     //! Event interval to dump output in RingBuffer
     int m_interval;

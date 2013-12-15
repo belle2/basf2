@@ -14,7 +14,9 @@
 #include "framework/dataobjects/EventMetaData.h"
 
 #include <framework/datastore/StoreArray.h>
-#include <rawdata/dataobjects/RawPXD.h>
+#include <pxd/dataobjects/RawPXD.h>
+
+#include <daq/slc/base/Debugger.h>
 
 using namespace Belle2;
 
@@ -34,14 +36,15 @@ StorageDeserializerModule::StorageDeserializerModule() : Module()
 
   setDescription("Encode DataStore into RingBuffer");
 
-  addParam("RingBufferName", m_rbufname, "Name of RingBuffer",
-           std::string("InputRbuf"));
-  addParam("CompressionLevel", m_compressionLevel,
-           "Compression level", 0);
+  addParam("InputBufferName", m_inputbufname, "Name of RingBuffer", std::string(""));
+  addParam("CompressionLevel", m_compressionLevel, "Compression level", 0);
+  addParam("NSMNodeName", m_nsmnodename, "Parent NSM node name", std::string(""));
+  addParam("NSMNodeId", m_nsmnodeid, "Parent NSM node id", -1);
 
-  m_rbuf = NULL;
+  m_inputbuf = NULL;
   m_nrecv = 0;
   m_compressionLevel = 0;
+  m_running = false;
 
   B2INFO("StorageDeserializer: Constructor done.");
 }
@@ -54,13 +57,19 @@ StorageDeserializerModule::~StorageDeserializerModule()
 void StorageDeserializerModule::initialize()
 {
   B2INFO("StorageDeserializer: initialize() started.");
+  B2INFO(m_inputbufname.c_str());
 
-  m_rbuf = new RingBuffer(m_rbufname.c_str());
+  m_inputbuf = new RingBuffer(m_inputbufname.c_str());
   m_streamer = new DataStoreStreamer(m_compressionLevel);
 
   StoreArray<RawPXD>::registerPersistent();
   m_nrecv = -1;
 
+  if (m_nsmnodeid >= 0) {
+    m_status.open(m_nsmnodename, m_nsmnodeid);
+    m_status.reportReady();
+  }
+  m_data.setBuffer(m_evtbuf);
   storeEvent();
   B2INFO("StorageDeserializer: initialize() done.");
 }
@@ -70,6 +79,10 @@ void StorageDeserializerModule::event()
   m_nrecv++;
   // First event is already loaded
   if (m_nrecv == 0) return;
+  if (m_nsmnodeid >= 0 && !m_running) {
+    m_status.reportRunning();
+    m_running = true;
+  }
   storeEvent();
   return;
 }
@@ -94,31 +107,46 @@ void StorageDeserializerModule::terminate()
 void StorageDeserializerModule::storeEvent()
 {
   int size;
-  while ((size = m_rbuf->remq(m_evtbuf)) == 0) {
-    usleep(20);
+  bool tried = false;
+  static int count = 0;
+  while ((size = m_inputbuf->remq(m_data.getBuffer())) == 0) {
+    if (!tried) {
+      //m_status.reportWarning("Ring buffer empty. waiting to be ready");
+      //B2WARNING("Ring buffer empty. waiting to be ready");
+      tried = true;
+    }
+    usleep(200);
   }
-  unsigned int* buf = (unsigned int*)(m_evtbuf);
-  unsigned int* pbuf_hlt = buf + buf[1];
-  EvtMessage* evtmsg = new EvtMessage((char*)(pbuf_hlt + pbuf_hlt[1]));
+  m_data_hlt.setBuffer(m_data.getBody());
+  m_data_pxd.setBuffer(m_data.getBody() + m_data_hlt.getWordSize());
+  EvtMessage* evtmsg = new EvtMessage((char*)m_data_hlt.getBody());
   m_streamer->restoreDataStore(evtmsg);
-  unsigned int* pbuf_pxd = pbuf_hlt + pbuf_hlt[0];
   StoreArray<RawPXD> rawpxdary;
-  RawPXD rawpxd((int*)(pbuf_pxd + pbuf_pxd[1]), pbuf_pxd[0] - pbuf_pxd[1]);
+  RawPXD rawpxd((int*)m_data_pxd.getBody(), m_data_pxd.getByteSize());
   rawpxdary.appendNew(rawpxd);
   delete evtmsg;
-
-  if (buf[4] % 10 == 0) {
-    printf("nw      = %d ", buf[0]);
-    printf("hnw     = %d ", buf[1]);
-    printf("exp_run = %d ", buf[3]);
-    printf("evt no  = %d ", buf[4]);
-    printf("magic   = %x ", buf[buf[0] - 1]);
-    printf("nw2     = %d ", pbuf_hlt[0]);
-    printf("hnw2    = %d ", pbuf_hlt[1]);
-    printf("magic2  = %x ", pbuf_hlt[pbuf_hlt[0] - 1]);
-    printf("nw2     = %d ", pbuf_pxd[0]);
-    printf("hnw2    = %d ", pbuf_pxd[1]);
-    printf("magic2  = %x \n", pbuf_pxd[pbuf_pxd[0] - 1]);
+  ///*
+  if (count % 1000 == 0) {
+    //printf("record %d: event = %d size = %d\n",
+    //     count, m_data.getEventNumber(), m_data.getWordSize());
+    /*
+    //if (m_data.getEventNumber() % 10000 == 0) {
+    printf("evt no0 = %d \n", m_data.getEventNumber());
+    printf("nw1     = %d ", m_data_hlt.getWordSize());
+    printf("hnw1    = %d ", m_data_hlt.getHeaderWordSize());
+    printf("exp no1 = %d ", m_data_hlt.getExpNumber());
+    printf("run no1 = %d ", m_data_hlt.getRunNumber());
+    printf("evt no1 = %d ", m_data_hlt.getEventNumber());
+    printf("magic1  = %x \n", m_data_hlt.getTrailerMagic());
+    printf("nw2     = %d ", m_data_pxd.getWordSize());
+    printf("hnw2    = %d ", m_data_pxd.getHeaderWordSize());
+    printf("exp no2 = %d ", m_data_pxd.getExpNumber());
+    printf("run no2 = %d ", m_data_pxd.getRunNumber());
+    printf("evt no2 = %d ", m_data_pxd.getEventNumber());
+    printf("magic2  = %x \n", m_data_pxd.getTrailerMagic());
+    */
   }
+  count++;
+  //*/
 }
 

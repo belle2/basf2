@@ -20,7 +20,7 @@
 
 using namespace Belle2;
 
-int TCPServerSocket::open(std::string& ip, unsigned short port)
+int TCPServerSocket::open(const std::string& ip, unsigned short port)
 throw(IOException)
 {
   _ip = ip;
@@ -59,6 +59,10 @@ int TCPServerSocket::open() throw(IOException)
     } else {
       host = gethostbyaddr((char*)&ip_address, sizeof(ip_address), AF_INET);
     }
+  }
+  if (host == NULL) {
+    throw (IOException(__FILE__, __LINE__,
+                       std::string("Fail to get host ip: ") + _ip));
   }
   addr.sin_addr.s_addr = (*(unsigned long*) host->h_addr_list[0]);
 

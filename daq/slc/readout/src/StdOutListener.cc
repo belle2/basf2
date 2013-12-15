@@ -25,7 +25,6 @@ using namespace Belle2;
 
 void StdOutListener::run()
 {
-  Belle2::debug("%s:%d %d", __FILE__, __LINE__, _pipe[0]);
   File fd(_pipe[0]);
   PipeReader preader(fd);
   char c;
@@ -53,10 +52,10 @@ void StdOutListener::run()
             std::cerr << std::endl;
             s = ss.str();
             ss.str("");
-            if (s == "DEBUG") priority = ProcessLogBuffer::DEBUG;
-            else if (s == "INFO") priority = ProcessLogBuffer::INFO;
-            else if (s == "ERROR") priority = ProcessLogBuffer::ERROR;
-            else if (s == "FATAL") priority = ProcessLogBuffer::FATAL;
+            if (s == "DEBUG") priority = SystemLog::DEBUG;
+            else if (s == "INFO") priority = SystemLog::INFO;
+            else if (s == "ERROR") priority = SystemLog::ERROR;
+            else if (s == "FATAL") priority = SystemLog::FATAL;
             break;
           }
           ss << c;

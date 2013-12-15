@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<object class="InputRB" revision="2" >
+  <text name="hostname" />
+  <int name="port" />
+  <text name="rbname" />
+</object>

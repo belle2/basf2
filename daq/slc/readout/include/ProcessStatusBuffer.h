@@ -13,7 +13,7 @@ namespace Belle2 {
   class ProcessStatusBuffer {
 
   public:
-    ProcessStatusBuffer() {}
+    ProcessStatusBuffer();
     ProcessStatusBuffer(const std::string& nodename, int nodeid);
     ~ProcessStatusBuffer();
 
@@ -23,8 +23,14 @@ namespace Belle2 {
     int getNodeId() { return _nodeid; }
     RunInfoBuffer& getInfo() { return _buf; }
     ProcessLogBuffer& getLog() { return _msg; }
+    bool waitStarted();
+    bool isStopped();
     bool reportReady();
     bool reportRunning();
+    bool reportDebug(const std::string message);
+    bool reportInfo(const std::string message);
+    bool reportNotice(const std::string message);
+    bool reportWarning(const std::string message);
     bool reportError(const std::string message);
     bool reportFatal(const std::string message);
     bool create();

@@ -9,13 +9,14 @@
 #include <cstdio>
 #include <cerrno>
 
+using namespace Belle2;
+
 int main(int argc, char** argv)
 {
   const char* path = argv[1];
-  Belle2::ProcessLogBuffer buf;
+  ProcessLogBuffer buf;
   buf.open(path);
-  int priority = 1;
-  if (!buf.send(priority, "READY")) {
+  if (!buf.send(SystemLog::INFO, "READY")) {
     perror("write");
   }
   return 0;

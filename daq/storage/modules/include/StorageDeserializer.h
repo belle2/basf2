@@ -15,6 +15,9 @@
 #include <framework/pcore/RingBuffer.h>
 #include <framework/pcore/DataStoreStreamer.h>
 
+#include <daq/slc/readout/ProcessStatusBuffer.h>
+#include <daq/storage/BinData.h>
+
 #include <string>
 #include <vector>
 
@@ -46,13 +49,19 @@ namespace Belle2 {
 
   private:
     int m_evtbuf[MAXEVTSIZE];
-    std::string m_rbufname;
-    RingBuffer* m_rbuf;
+    std::string m_inputbufname;
+    std::string m_nsmnodename;
+    int m_nsmnodeid;
+    RingBuffer* m_inputbuf;
     MsgHandler* m_msghandler;
     DataStoreStreamer* m_streamer;
-
+    ProcessStatusBuffer m_status;
+    bool m_running;
     int m_compressionLevel;
     int m_nrecv;
+    BinData m_data;
+    BinData m_data_hlt;
+    BinData m_data_pxd;
 
   };
 

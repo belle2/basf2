@@ -16,10 +16,10 @@ PostgreSQLInterface::PostgreSQLInterface(const std::string& host,
 
 void PostgreSQLInterface::connect() throw(DBHandlerException)
 {
-  //_sq_conn = PQconnectdb(Belle2::form("host=%s dbname=%s user=%s password=%s",
-  //              _host.c_str(), _database.c_str(),
-  _sq_conn = PQconnectdb(Belle2::form("dbname=%s user=%s password=%s",
-                                      _database.c_str(),
+  _sq_conn = PQconnectdb(Belle2::form("host=%s dbname=%s user=%s password=%s",
+                                      _host.c_str(), _database.c_str(),
+                                      //_sq_conn = PQconnectdb(Belle2::form("dbname=%s user=%s password=%s",
+                                      //_database.c_str(),
                                       _user.c_str(), _password.c_str()).c_str());
   if (PQstatus(_sq_conn) == CONNECTION_BAD) {
     throw (DBHandlerException(__FILE__, __LINE__,

@@ -5,6 +5,8 @@
 #include "daq/slc/readout/MMutex.h"
 #include "daq/slc/readout/MCond.h"
 
+#include "daq/slc/base/SystemLog.h"
+
 #include <string>
 
 namespace Belle2 {
@@ -16,20 +18,12 @@ namespace Belle2 {
 
   public:
     struct process_log_message {
-      int priority;
+      SystemLog::Priority priority;
       char message[60];
     };
 
   public:
-    static const int DEBUG;
-    static const int INFO;
-    static const int NOTICE;
-    static const int WARNING;
-    static const int ERROR;
-    static const int FATAL;
-
-  public:
-    ProcessLogBuffer() {}
+    ProcessLogBuffer() { _available = false; }
     ~ProcessLogBuffer() {}
 
   public:
@@ -39,8 +33,8 @@ namespace Belle2 {
     void close();
     void clear();
     void unlink(const std::string& path = "");
-    std::string recieve(int& priority, int timeout = -1);
-    bool send(int priority, const std::string& message);
+    std::string recieve(SystemLog::Priority& priority, int timeout = -1);
+    bool send(SystemLog::Priority priority, const std::string& message);
 
   private:
     std::string _path;
@@ -50,6 +44,7 @@ namespace Belle2 {
     int* _windex;
     int* _rindex;
     process_log_message* _msg_v;
+    bool _available;
 
   };
 

@@ -27,11 +27,12 @@ set_log_level(LogLevel.INFO)
 
 # Modules
 deserializer = register_module('StorageDeserializer')
-deserializer.param('RingBufferName', argv[1])
-#deserializer.param('CompressionLevel', int(argvs[2])
-output = register_module('SeqRootOutput')
-#output = register_module('RootOutput')
-output.param('outputFileName', argv[2])
+deserializer.param('InputBufferName', argv[1])
+deserializer.param('NSMNodeName', argv[4])
+deserializer.param('NSMNodeId', int(argv[5]))
+output = register_module('StorageOutput')
+output.param('StorageDir', argv[2])
+output.param('OutputBufferName', argv[3])
 
 # Create main path
 main = create_path()

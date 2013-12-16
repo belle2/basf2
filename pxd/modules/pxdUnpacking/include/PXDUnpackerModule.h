@@ -13,7 +13,7 @@
 
 #include <framework/core/Module.h>
 #include <pxd/dataobjects/PXDRawHit.h>
-#include <pxd/dataobjects/RawPXD.h>
+#include <rawdata/dataobjects/RawPXD.h>
 #include <framework/datastore/StoreArray.h>
 
 

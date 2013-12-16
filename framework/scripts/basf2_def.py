@@ -202,6 +202,7 @@ def print_params(module, print_values=True, shared_lib_path=None):
     print 'Description: %s' % module.description()
     if shared_lib_path is not None:
         print 'Found in:    %s' % shared_lib_path
+    print 'Package:     %s' % module.package()
 
     # gather output data in table
     output = []

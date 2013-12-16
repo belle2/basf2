@@ -79,8 +79,8 @@ public class RCNodeViewPanel extends JPanel implements Updatable {
 							command_v.add(RCCommand.BOOT);
 							command_v.add(RCCommand.LOAD);
 							command_v.add(RCCommand.START);
-							if ( _node.getData() != null &&
-								 _node.getData().getObject("ftsw") != null)
+							//if ( _node.getData() != null &&
+							//	 _node.getData().getObject("ftsw") != null)
 							command_v.add(RCCommand.TRGIFT);
 						} else {
 							command_v.add(RCCommand.ACTIVATE);

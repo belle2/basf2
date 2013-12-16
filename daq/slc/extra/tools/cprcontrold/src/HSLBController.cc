@@ -64,7 +64,7 @@ bool HSLBController::reset() throw()
 bool HSLBController::load() throw()
 {
   int board_type, firmware, hardware;
-  /*
+  ///*
   if (_boot_firm) {
     ConfigFile config;
     std::string path = _hslb->getText("firmware");
@@ -78,10 +78,10 @@ bool HSLBController::load() throw()
     printf("[FATAL] Check FEE error\n");
     return false;
   }
-  */
+  //*/
   if (_hslb == NULL) return true;
   int trigger_mode = _hslb->getEnum("trigger_mode");
-  //mgt_execute(_mgt, trigger_mode);
+  mgt_execute(_mgt, trigger_mode);
   Belle2::debug("[DEBUG] Selected trigger mode = %d", trigger_mode);
   for (size_t i = 0; i < _reg_v.size(); i++) {
     HSLBRegister& reg(_reg_v[i]);
@@ -94,9 +94,9 @@ bool HSLBController::load() throw()
     for (size_t i = 0; i < length; i++) {
       if (value_v[i] < 0) continue;
       if (reg.size == 1) {
-        //mgt_set_param(_mgt, address, value_v[i]);
+        mgt_set_param(_mgt, address, value_v[i]);
       } else if (reg.size == 2) {
-        //mgt_set_param2(_mgt, address, value_v[i]);
+        mgt_set_param2(_mgt, address, value_v[i]);
       }
       address += reg.size;
       Belle2::debug("[DEBUG] Register write to address = 0x%x with value = %d",

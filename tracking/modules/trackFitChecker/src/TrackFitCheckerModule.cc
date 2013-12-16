@@ -374,7 +374,7 @@ void TrackFitCheckerModule::event()
     try {
       B2DEBUG(100, "before propagation");
       genfit::MeasuredStateOnPlane state = aTrackPtr->getFittedState();
-      state.extrapolateToPoint(trueVertexPos);
+      state.extrapolateToLine(trueVertexPos, TVector3(0, 0, 1));
       state.getPosMomCov(vertexPos, vertexMom, vertexCov);
       local5DState = state.getState();
       local5DCov = state.getCov();

@@ -88,17 +88,17 @@ bool COPPERCallback::load() throw()
   _con.addArgument(Belle2::form("%d", flag));
   _con.addArgument("1");
   _con.addArgument(_node->getName());
-  return _con.load(10);
+  return _con.load(-1);
 }
 
 bool COPPERCallback::start() throw()
 {
-  return _con.start(10);
+  return _con.start(-1);
 }
 
 bool COPPERCallback::stop() throw()
 {
-  return _con.stop(30);
+  return _con.stop(-1);
 }
 
 bool COPPERCallback::resume() throw()
@@ -111,7 +111,12 @@ bool COPPERCallback::pause() throw()
   return true;
 }
 
+bool COPPERCallback::recover() throw()
+{
+  return _con.abort();
+}
+
 bool COPPERCallback::abort() throw()
 {
-  return _con.stop(0);
+  return _con.abort();
 }

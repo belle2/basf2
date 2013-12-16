@@ -15,7 +15,7 @@ TMPDIR  = ./tmp
 LIBDIR  = ./lib
 
 LIBS    += -lm -lpthread -lrt -lz
-LIBS    += -L$(BELLE2_LIB) -ldaq -ldaq_slc_database
+LIBS    += -L$(BELLE2_LIB) -ldaq
 LIBS    += -L$(BELLE2EX_LIB) -lnsm2_corelib -lnsm2_b2lib
 LIBS    += $(shell xml2-config --libs)
 LIBS    += $(shell mysql_config --libs)

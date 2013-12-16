@@ -17,11 +17,6 @@
 #pragma link C++ class Belle2::RawKLM;
 #pragma link C++ class Belle2::RawFTSW;
 #pragma link C++ class Belle2::ErrorMessage;
-#pragma link C++ class Belle2::PXDSimHit;
-#pragma link C++ class Belle2::PXDDigit;
-#pragma link C++ class Belle2::PXDTrueHit;
-#pragma link C++ class Belle2::PXDCluster;
-#pragma link C++ class Belle2::PXDRawHit;
 #pragma link C++ class Belle2::RawPXD;
 
 #endif

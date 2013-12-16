@@ -6,11 +6,13 @@
 namespace Belle2 {
 
   class RFMaster;
+  class RFMasterCallback;
 
   class RFRunControlCallback : public RCCallback {
 
   public:
-    RFRunControlCallback(NSMNode* node, RFMaster* master);
+    RFRunControlCallback(NSMNode* node, RFMaster* master,
+                         RFMasterCallback* callback);
     virtual ~RFRunControlCallback() throw();
 
   public:
@@ -22,6 +24,7 @@ namespace Belle2 {
 
   private:
     RFMaster* _master;
+    RFMasterCallback* _callback;
 
   };
 

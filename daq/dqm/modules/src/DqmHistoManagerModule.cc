@@ -44,6 +44,7 @@ DqmHistoManagerModule::~DqmHistoManagerModule()
     if (Environment::Instance().getNumberProcesses() > 0 && ProcHandler::EvtProcID() == -1) {
       cout << "DqmHistoManager:: adding histogram files" << endl;
       RbTupleManager::Instance().hadd();
+      cout << "DqmHistoManager:: adding histogram files done" << endl;
     }
   }
 }

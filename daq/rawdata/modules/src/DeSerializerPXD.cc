@@ -24,7 +24,7 @@ REG_MODULE(DeSerializerPXD)
 DeSerializerPXDModule::DeSerializerPXDModule() : Module()
 {
   //Set module properties
-  setDescription("Receives PXD-Data send by an external Socket Programm and stores it as RawPXD in Data Store");
+  setDescription("Receives PXD-Data from ONSEN (or a simulator) and stores it as RawPXD in Data Store");
   //setPropertyFlags(c_Input | c_ParallelProcessingCertified);
 
   addParam("Port", m_port, "default port number", 11112);
@@ -34,7 +34,7 @@ DeSerializerPXDModule::DeSerializerPXDModule() : Module()
   m_buffer = new int[MAXEVTSIZE];
   events_processed = 0;
   //Parameter definition
-  B2INFO("Rx: Constructor done.");
+  B2DEBUG(0, "DeSerializerPXDModule: Constructor done.");
 }
 
 
@@ -57,12 +57,12 @@ void DeSerializerPXDModule::initialize()
   // Initialize Array of RawCOPPER
   StoreArray<RawPXD>::registerPersistent();
 
-  B2INFO("Rx initialized.");
+  B2DEBUG(0, "DeSerializerPXDModule: initialized.");
 }
 
 void DeSerializerPXDModule::beginRun()
 {
-  B2INFO("beginRun called.");
+  B2DEBUG(0, "beginRun called.");
 }
 
 void DeSerializerPXDModule::event()
@@ -123,7 +123,7 @@ void DeSerializerPXDModule::endRun()
 {
   //fill Run data
 
-  B2INFO("endRun done.");
+  B2DEBUG(0, "endRun done.");
 }
 
 

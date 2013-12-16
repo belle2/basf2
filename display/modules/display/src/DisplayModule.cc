@@ -18,9 +18,10 @@
 #include <genfit/MaterialEffects.h>
 #include <genfit/TGeoMaterialInterface.h>
 
-#include "TGeoManager.h"
-#include "TEveManager.h"
-#include "TSystem.h"
+#include <TApplication.h>
+#include <TGeoManager.h>
+#include <TEveManager.h>
+#include <TSystem.h>
 
 using namespace Belle2;
 
@@ -46,6 +47,11 @@ DisplayModule::DisplayModule() : Module(), m_display(0), m_visualizer(0)
   //make sure dictionaries for PXDrecohits are loaded
   //needs to be done here to have dictionaries available during RootInput::initialize()
   gSystem->Load("libpxd");
+
+  //create gApplication so we can use graphics support. Needs to be done before ROOT has a chance to do it for us.
+  if ((!gApplication) || (gApplication && gApplication->TestBit(TApplication::kDefaultApplication))) {
+    new TApplication("ROOT_application", 0, 0);
+  }
 }
 
 

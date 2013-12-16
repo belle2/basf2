@@ -11,7 +11,7 @@
 #include <pxd/modules/pxdUnpacking/PXDUnpackerModule.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/logging/Logger.h>
-#include <pxd/dataobjects/RawPXD.h>
+//#include <rawdata/dataobjects/RawPXD.h>
 
 // for htonl
 #include <arpa/inet.h>
@@ -1197,6 +1197,10 @@ void PXDUnpackerModule::unpack_event(RawPXD& px)
   int fullsize;
   int datafullsize;
 
+  if (px.size() <= 0 || px.size() > 16 * 1024 * 1024) {
+    B2ERROR(" PXD Unpacker --> invalid packet size (32bit words) " << hex << px.size());
+    return;
+  }
   unsigned int data[px.size()];
   fullsize = px.size() * 4; /// in bytes ... rounded up to next 32bit boundary
   memcpy(data, (unsigned int*)px.data(), fullsize);

@@ -70,21 +70,6 @@ namespace Belle2 {
 
     /**
      * @{
-     * Converts a template argument into a string for corresponding Python type.
-     * Partial template specialisations are not allowed for functions, so this needs to be a class.
-     */
-
-    template<typename T> struct Type { static std::string name() { return "???";} };
-    template<typename T> struct Type<std::vector<T> > { static std::string name() { return std::string("list(") + Type<T>::name() + ")"; } };
-    template<typename A, typename B> struct Type<std::map<A, B> > { static std::string name() { return std::string("dict(") + Type<A>::name() + " -> " + Type<B>::name() + ")"; } };
-
-    template<> struct Type<int> { static std::string name() { return "int"; } };
-    template<> struct Type<bool> { static std::string name() { return "bool"; } };
-    template<> struct Type<float> { static std::string name() { return "float"; } };
-    template<> struct Type<double> { static std::string name() { return "float"; } };
-    template<> struct Type<std::string> { static std::string name() { return "str"; } };
-
-    /**
      * TMP (Template Meta Programming )
      * The name of the tuple is generated with recursive definition of the template function GetType,
      * the overloaded argument (type SizeT<>) of the function serves as a counter for the recursion depth.
@@ -94,8 +79,25 @@ namespace Belle2 {
     inline std::string GetType(SizeT<1> = SizeT<1>()) { return std::string(Type<T>::name()); }
     template < typename T, typename... Types>
     inline std::string GetType(SizeT < sizeof...(Types) + 1 > = SizeT < sizeof...(Types) + 1 > ()) { return std::string(Type<T>::name())  + std::string(", ") + GetType<Types...>(SizeT < sizeof...(Types) > ()); }
+    /** @} */
 
-    template<typename... Types> struct Type<std::tuple<Types...> > { static std::string name() { return std::string("tuple( ") + GetType<Types...>() + " )"; } };
+    /**
+     * @{
+     * Converts a template argument into a string for corresponding Python type.
+     * Partial template specialisations are not allowed for functions, so this needs to be a class.
+     */
+
+    template<typename T> struct Type { /** type name. */ static std::string name() { return "???";} };
+    template<typename T> struct Type<std::vector<T> > { /** type name. */ static std::string name() { return std::string("list(") + Type<T>::name() + ")"; } };
+    template<typename A, typename B> struct Type<std::map<A, B> > { /** type name. */ static std::string name() { return std::string("dict(") + Type<A>::name() + " -> " + Type<B>::name() + ")"; } };
+
+    template<> struct Type<int> { /** type name. */ static std::string name() { return "int"; } };
+    template<> struct Type<bool> { /** type name. */ static std::string name() { return "bool"; } };
+    template<> struct Type<float> { /** type name. */ static std::string name() { return "float"; } };
+    template<> struct Type<double> { /** type name. */ static std::string name() { return "float"; } };
+    template<> struct Type<std::string> { /** type name. */ static std::string name() { return "str"; } };
+
+    template<typename... Types> struct Type<std::tuple<Types...> > { /** type name. */ static std::string name() { return std::string("tuple( ") + GetType<Types...>() + " )"; } };
 
     /** @} */
 

@@ -10,6 +10,5 @@
 #pragma link C++ class Belle2::PXDTrueHit;
 #pragma link C++ class Belle2::PXDCluster;
 #pragma link C++ class Belle2::PXDRawHit;
-#pragma link C++ class Belle2::RawPXD;
 
 #endif

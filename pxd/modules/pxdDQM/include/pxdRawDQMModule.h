@@ -15,7 +15,7 @@
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <pxd/dataobjects/PXDRawHit.h>
-#include <pxd/dataobjects/RawPXD.h>
+#include <rawdata/dataobjects/RawPXD.h>
 #include <string>
 #include <TH2.h>
 

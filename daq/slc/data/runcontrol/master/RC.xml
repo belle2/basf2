@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <object name="RC" class="DESY" revision="1" >
-  <object name="TTD" class="TTD" host="ttd3" ftsw="48" synchronize="true" />
   <int name="CDC" value="1" synchronize="true" />
   <int name="HLT" value="1" synchronize="true" />
-  <int name="DR"  value="1" synchronize="true" />
+  <int name="DSR"  value="1" synchronize="true" />
+  <int name="EXPRECO"  value="1" synchronize="true" />
 </object>

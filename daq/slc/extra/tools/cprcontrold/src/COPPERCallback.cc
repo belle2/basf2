@@ -33,7 +33,7 @@ void COPPERCallback::init() throw()
 bool COPPERCallback::boot() throw()
 {
   download();
-  ConfigFile config;
+  ConfigFile config("cdc");
   XMLParser parser;
   DataObject* data = _node->getData();
   size_t length;

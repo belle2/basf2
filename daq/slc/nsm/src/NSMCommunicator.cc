@@ -91,14 +91,17 @@ void NSMCommunicator::init(const std::string& host, int port) throw(NSMHandlerEx
       }
     }
   }
-  ConfigFile config(_config_name);
-  std::string logger_name = config.get("LOG_NSM_NAME");
-  if (logger_name.size() > 0) {
-    _logger_node = new NSMNode(logger_name);
+  ConfigFile config;
+  if (config.get("RC_NSM_NAME") == "") {
+    config = ConfigFile(_config_name);
   }
   std::string rc_name = config.get("RC_NSM_NAME");
   if (rc_name.size() > 0) {
     _rc_node = new NSMNode(rc_name);
+  }
+  std::string logger_name = config.get("LOG_NSM_NAME");
+  if (logger_name.size() > 0) {
+    _logger_node = new NSMNode(logger_name);
   }
   __com_v.push_back(this);
 #else

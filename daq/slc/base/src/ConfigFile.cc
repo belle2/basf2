@@ -59,6 +59,7 @@ void ConfigFile::read(const std::string& filename)
       if (__value_m.find(label) == __value_m.end()) {
         __value_m.insert(std::map<std::string, std::string>::value_type(label, value));
       } else {
+        Belle2::debug("%s %s %s", filename.c_str(), label.c_str(), value.c_str());
         __value_m[label] = value;
       }
     }

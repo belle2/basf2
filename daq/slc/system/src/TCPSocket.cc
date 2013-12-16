@@ -1,5 +1,7 @@
 #include "daq/slc/system/TCPSocket.h"
 
+#include "daq/slc/base/StringUtil.h"
+
 #include <cstdlib>
 #include <cstdio>
 #include <cstring>
@@ -58,7 +60,9 @@ int TCPSocket::connect() throw (IOException)
 
   if (::connect(_fd, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
     close();
-    throw (IOException(__FILE__, __LINE__, "Failed to connect host"));
+    throw (IOException(__FILE__, __LINE__,
+                       Belle2::form("Failed to connect host %s:%d",
+                                    _ip.c_str(), _port)));
   }
 
   return _fd;

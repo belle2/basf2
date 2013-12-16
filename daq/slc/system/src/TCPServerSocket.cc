@@ -1,5 +1,7 @@
 #include "daq/slc/system/TCPServerSocket.h"
 
+#include "daq/slc/base/StringUtil.h"
+
 #include <cstdlib>
 #include <cstdio>
 #include <cstring>
@@ -67,7 +69,9 @@ int TCPServerSocket::open() throw(IOException)
   addr.sin_addr.s_addr = (*(unsigned long*) host->h_addr_list[0]);
 
   if (bind(_fd, (const sockaddr*) & (addr), sizeof(sockaddr_in)) != 0) {
-    throw (IOException(__FILE__, __LINE__, "Fail to bind the socket."));
+    throw (IOException(__FILE__, __LINE__,
+                       Belle2::form("Fail to bind the socket. %s:%d",
+                                    _ip.c_str(), _port)));
   }
   if (listen(_fd, 5) != 0) {
     throw (IOException(__FILE__, __LINE__, "Fail to listen to the socket."));

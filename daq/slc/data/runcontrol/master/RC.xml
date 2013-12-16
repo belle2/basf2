@@ -4,5 +4,4 @@
   <int name="CDC" value="1" synchronize="true" />
   <int name="HLT" value="1" synchronize="true" />
   <int name="DSR"  value="1" synchronize="true" />
-  <int name="EXPRECO"  value="1" synchronize="true" />
 </object>

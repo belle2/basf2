@@ -26,7 +26,7 @@ RCCallback::RCCallback(NSMNode* node) throw()
   add(Command::STATE);
   add(Command::STATECHECK);
   add(Command::TRIGFT);
-  ConfigFile config("slowcontrol");
+  //ConfigFile config("slowcontrol");
 }
 
 void RCCallback::download()

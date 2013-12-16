@@ -36,7 +36,7 @@ bool ROCallback::load() throw()
   _con.addArgument(_dir + _node->getData()->getText("script"));
   _con.addArgument("1");
   _con.addArgument("5101");
-  _con.addArgument(_node->getName());
+  //_con.addArgument(_node->getName());
   return _con.load(10);
 }
 

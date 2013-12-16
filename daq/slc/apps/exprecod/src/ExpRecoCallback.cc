@@ -6,6 +6,8 @@
 
 #include <unistd.h>
 
+#include <sys/stat.h>
+
 using namespace Belle2;
 using namespace std;
 

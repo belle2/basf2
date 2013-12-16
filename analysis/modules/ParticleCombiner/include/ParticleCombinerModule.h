@@ -23,7 +23,7 @@
 #include <vector>
 #include <unordered_set>
 
-//Hack: allow defining std::hash for dynamic_bitset
+//Hack: allow access to m_bits to define hash function
 #define BOOST_DYNAMIC_BITSET_DONT_USE_FRIENDS
 #include <boost/dynamic_bitset.hpp>
 #include <boost/functional/hash.hpp>
@@ -31,6 +31,7 @@
 namespace std {
   /** Define hash for dynamic_bitset. */
   template<> struct hash<boost::dynamic_bitset<> > {
+    /** Create hash by accessing the raw bits (m_bits). */
     std::size_t operator()(const boost::dynamic_bitset<>& bs) const {
       return boost::hash_value(bs.m_bits);
     }

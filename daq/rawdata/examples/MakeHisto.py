@@ -24,20 +24,20 @@ set_log_level(LogLevel.ERROR)
 # set_log_level(LogLevel.INFO)
 
 # input
-#input = register_module('SeqRootInput')
-#input.param('iutputFileName', 'RootOutput1.root')
+# input = register_module('SeqRootInput')
+# input.param('iutputFileName', 'RootOutput1.root')
 input = register_module('RootInput')
 
 # output
 output = register_module('PrintData')
 
 # Histo Module
-#histo = register_module('DqmHistoManager')
+# histo = register_module('DqmHistoManager')
 histo = register_module('HistoManager')
-#histo.param('HostName', 'ropc01')
-#histo.param('Port', 9991)
-#histo.param('DumpInterval', 10)
-#histo.param('HistoFileName', 'ropc_histofile.root')
+# histo.param('HostName', 'ropc01')
+# histo.param('Port', 9991)
+# histo.param('DumpInterval', 10)
+# histo.param('HistoFileName', 'ropc_histofile.root')
 
 # Monitor module
 monitor = register_module('MonitorDataCOPPER')
@@ -49,7 +49,7 @@ main = create_path()
 main.add_module(input)
 main.add_module(histo)
 main.add_module(monitor)
-#main.add_module(output)
+# main.add_module(output)
 
 # Process all events
 process(main)

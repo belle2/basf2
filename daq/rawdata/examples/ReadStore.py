@@ -36,7 +36,7 @@ dump = register_module('RootOutput')
 dump.param('outputFileName', 'temp.root')
 
 # Histogram
-#hist = register_module('HistoExercise1')
+# hist = register_module('HistoExercise1')
 
 # Create main path
 main = create_path()

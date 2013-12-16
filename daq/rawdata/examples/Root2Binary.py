@@ -29,7 +29,7 @@ input = register_module('RootInput')
 # input.param('inputFileName', 'RootOutput1.root')
 
 # dump
-#dump = register_module('PrintDataTemplate')
+# dump = register_module('PrintDataTemplate')
 dump = register_module('Root2Binary')
 dump.param('outputFileName', 'temp.dat')
 
@@ -38,7 +38,7 @@ main = create_path()
 
 # Add modules to main path
 main.add_module(input)
-#main.add_module(output)
+# main.add_module(output)
 main.add_module(dump)
 
 # Process all events

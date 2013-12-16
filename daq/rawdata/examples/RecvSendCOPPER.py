@@ -21,8 +21,8 @@ from basf2 import *
 import sys
 argvs = sys.argv
 
-if len(argvs) != 5:
-    print 'Usage : RecvSendCOPPER.py <COPPER hostname> <COPPER nodeID> <bit flag of FINNESEs> <Use shared memory? yes=1/no=0>'
+if len(argvs) < 6:
+    print 'Usage : RecvSendCOPPER.py <COPPER hostname> <COPPER nodeID> <bit flag of FINNESEs> <Use shared memory? yes=1/no=0> <nodename>'
     sys.exit()
 
 # Set the log level to show only error and fatal messages
@@ -36,6 +36,7 @@ reader.param('NodeID', int(argvs[2]))
 reader.param('FinesseBitFlag', int(argvs[3]))
 use_shm_flag = int(argvs[4])
 reader.param('UseShmFlag', use_shm_flag)
+reader.param('NodeName', argv[5])
 # reader.param('DumpFileName', 'COPPERdump.dat' )
 
 # Histo Module

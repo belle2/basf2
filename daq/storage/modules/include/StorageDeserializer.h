@@ -50,8 +50,6 @@ namespace Belle2 {
   private:
     int m_evtbuf[MAXEVTSIZE];
     std::string m_inputbufname;
-    std::string m_nsmnodename;
-    int m_nsmnodeid;
     RingBuffer* m_inputbuf;
     MsgHandler* m_msghandler;
     DataStoreStreamer* m_streamer;
@@ -62,6 +60,9 @@ namespace Belle2 {
     BinData m_data;
     BinData m_data_hlt;
     BinData m_data_pxd;
+    int m_nodeid;
+    std::string m_nodename;
+    int m_shmflag;
 
   };
 

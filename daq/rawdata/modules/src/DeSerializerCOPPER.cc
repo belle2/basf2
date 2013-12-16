@@ -123,12 +123,13 @@ void DeSerializerCOPPERModule::initialize()
     OpenOutputFile();
   }
 
-  if (m_shmflag != 0) {
-    ShmOpen("/cpr_config", "/cpr_status");
-    // Status format : status_flag
-    m_cfg_buf = ShmGet(m_shmfd_cfg, 4);
-    m_cfg_sta = ShmGet(m_shmfd_sta, 4);
-    m_cfg_sta[ 0 ] = 0; // Status bit is 0 : not ready
+  if (m_shmflag > 0) {
+    if (m_nodename.size() == 0 || m_nodeid < 0) {
+      m_shmflag = 0;
+    } else {
+      m_status.open(m_nodename, m_nodeid);
+      m_status.reportReady();
+    }
   }
 
   memset(time_array0, 0, sizeof(time_array0));
@@ -386,7 +387,8 @@ void DeSerializerCOPPERModule::OpenCOPPER()
   // Open a finesse device
   //
   if ((cpr_fd = open("/dev/copper/copper", O_RDONLY)) == -1) {
-    char err_buf[100] = "Failed to open Finesse. Exiting... ";  print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+    char err_buf[100] = "Failed to open Finesse. Exiting... ";
+    print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     exit(1);
   }
 
@@ -444,15 +446,11 @@ void DeSerializerCOPPERModule::event()
 
     B2INFO("DeSerializerCOPPER: event() started.");
     // Use shared memory to start(for HSLB dummy data)
-    if (m_shmflag != 0) {
-      //      int* cfg_buf = ShmGet(m_shmfd_cfg, 4);
-      m_cfg_sta[ 0 ] = 1; // Status bit is 0 : not ready
+    if (m_shmflag > 0 && m_status.isStopped()) {
       printf("Waiting for Start...\n");
       fflush(stdout);
-      while (1) {
-        if (m_cfg_buf[0] == 1)break;
-        usleep(10000);
-      }
+      m_status.waitStarted();
+      m_status.reportRunning();
     }
 
     OpenCOPPER();

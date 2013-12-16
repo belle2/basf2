@@ -19,16 +19,14 @@
 
 from basf2 import *
 
-
 # Set the log level to show only error and fatal messages
 set_log_level(LogLevel.ERROR)
 # set_log_level(LogLevel.INFO)
 
 # input
 input = register_module('RootInput')
-#input = register_module('SeqRootInput')
-#input.param('iutputFileName', 'RootOutput1.root')
-
+# input = register_module('SeqRootInput')
+# input.param('iutputFileName', 'RootOutput1.root')
 
 # output
 output = register_module('PrintDataTemplate')

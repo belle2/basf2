@@ -104,13 +104,13 @@ void DeSerializerPCModule::initialize()
   ClearNumUsedBuf();
 
   // Shared memory
-  if (m_shmflag != 0) {
-    char temp_char1[100], temp_char2[100];
-    sprintf(temp_char1, "/ropc_config");
-    sprintf(temp_char2, "/ropc_status");
-    ShmOpen(temp_char1, temp_char2);
-    m_cfg_buf = ShmGet(m_shmfd_cfg, 4);
-    m_cfg_sta = ShmGet(m_shmfd_sta, 4);
+  if (m_shmflag > 0) {
+    if (m_nodename.size() == 0 || m_nodeid < 0) {
+      m_shmflag = 0;
+    } else {
+      m_status.open(m_nodename, m_nodeid);
+      m_status.reportReady();
+    }
   }
 
   event_diff = 0;
@@ -367,6 +367,12 @@ void DeSerializerPCModule::event()
   if (n_basf2evt < 0) {
     // Accept requests for connections
     Connect();
+    if (m_shmflag > 0 && m_status.isStopped()) {
+      printf("Waiting for Start...\n");
+      fflush(stdout);
+      m_status.waitStarted();
+      m_status.reportRunning();
+    }
 
     B2INFO("DeSerializerPC: event() started.");
     m_start_time = GetTimeSec();
@@ -656,7 +662,7 @@ void DeSerializerPCModule::event()
   //
   if (m_shmflag != 0) {
     if (n_basf2evt % 10 == 0) {
-      if (m_cfg_buf[ 0 ] == 0) {
+      if (m_status.isStopped()) {
         printf("\033[34m");
         printf("[INFO] RunStop was detected. ( Setting:  Max event # %d MaxTime %lf ) Processed Event %d Elapsed Time %lf[s]\n", max_nevt , max_seconds, n_basf2evt * NUM_EVT_PER_BASF2LOOP_PC, GetTimeSec() - m_start_time);
         printf("\033[0m");

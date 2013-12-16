@@ -69,6 +69,7 @@ bool StoragerCallback::load() throw()
   _con[1].addArgument(orbname);
   _con[1].addArgument(_node->getName());
   _con[1].addArgument("1");
+  _con[1].addArgument("1");
   _con[1].load(10);
 
   return true;

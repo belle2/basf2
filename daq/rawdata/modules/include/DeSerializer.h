@@ -24,6 +24,7 @@
 #include <framework/dataobjects/EventMetaData.h>
 
 #include <daq/dataflow/EvtSocket.h>
+#include <daq/slc/readout/ProcessStatusBuffer.h>
 
 #include <rawdata/dataobjects/RawDataBlock.h>
 #include <rawdata/dataobjects/RawCOPPER.h>
@@ -164,6 +165,9 @@ namespace Belle2 {
     //! Node(PC or COPPER) ID
     int m_nodeid;
 
+    //! Node name
+    std::string m_nodename;
+
     //! run no.
     int m_run_no;
 
@@ -191,11 +195,13 @@ namespace Belle2 {
     //! file descripter for shm
     int m_shmfd_sta;
 
-    //! buffer for shared memory
-    int* m_cfg_buf;
+    //! buffer class to communicate with NSM client
+    ProcessStatusBuffer m_status;
 
     //! buffer for shared memory
-    int* m_cfg_sta;
+    //int* m_cfg_buf;
+    //! buffer for shared memory
+    //int* m_cfg_sta;
 
     int monitor_numeve;
 

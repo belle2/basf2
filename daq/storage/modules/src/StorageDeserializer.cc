@@ -31,15 +31,13 @@ REG_MODULE(StorageDeserializer)
 
 StorageDeserializerModule::StorageDeserializerModule() : Module()
 {
-  //gSystem->Load("libpxd_dataobjects");
-  //gSystem->Load("libdataobjects");
-
   setDescription("Encode DataStore into RingBuffer");
 
   addParam("InputBufferName", m_inputbufname, "Name of RingBuffer", std::string(""));
   addParam("CompressionLevel", m_compressionLevel, "Compression level", 0);
-  addParam("NSMNodeName", m_nsmnodename, "Parent NSM node name", std::string(""));
-  addParam("NSMNodeId", m_nsmnodeid, "Parent NSM node id", -1);
+  addParam("NodeID", m_nodeid, "Node(subsystem) ID", 0);
+  addParam("NodeName", m_nodename, "Node(subsystem) name", std::string(""));
+  addParam("UseShmFlag", m_shmflag, "Use shared memory to communicate with Runcontroller", 0);
 
   m_inputbuf = NULL;
   m_nrecv = 0;
@@ -65,9 +63,13 @@ void StorageDeserializerModule::initialize()
   StoreArray<RawPXD>::registerPersistent();
   m_nrecv = -1;
 
-  if (m_nsmnodeid >= 0) {
-    m_status.open(m_nsmnodename, m_nsmnodeid);
-    m_status.reportReady();
+  if (m_shmflag > 0) {
+    if (m_nodename.size() == 0 || m_nodeid < 0) {
+      m_shmflag = 0;
+    } else {
+      m_status.open(m_nodename, m_nodeid);
+      m_status.reportReady();
+    }
   }
   m_data.setBuffer(m_evtbuf);
   storeEvent();
@@ -79,7 +81,7 @@ void StorageDeserializerModule::event()
   m_nrecv++;
   // First event is already loaded
   if (m_nrecv == 0) return;
-  if (m_nsmnodeid >= 0 && !m_running) {
+  if (m_shmflag > 0) {
     m_status.reportRunning();
     m_running = true;
   }
@@ -110,7 +112,7 @@ void StorageDeserializerModule::storeEvent()
   bool tried = false;
   static int count = 0;
   while ((size = m_inputbuf->remq(m_data.getBuffer())) == 0) {
-    if (!tried) {
+    if (m_shmflag > 0 && !tried) {
       //m_status.reportWarning("Ring buffer empty. waiting to be ready");
       //B2WARNING("Ring buffer empty. waiting to be ready");
       tried = true;
@@ -125,7 +127,6 @@ void StorageDeserializerModule::storeEvent()
   RawPXD rawpxd((int*)m_data_pxd.getBody(), m_data_pxd.getByteSize());
   rawpxdary.appendNew(rawpxd);
   delete evtmsg;
-  ///*
   if (count % 1000 == 0) {
     //printf("record %d: event = %d size = %d\n",
     //     count, m_data.getEventNumber(), m_data.getWordSize());
@@ -147,6 +148,5 @@ void StorageDeserializerModule::storeEvent()
     */
   }
   count++;
-  //*/
 }
 

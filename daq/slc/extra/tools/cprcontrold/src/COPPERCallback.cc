@@ -26,7 +26,7 @@ COPPERCallback::~COPPERCallback() throw()
 
 void COPPERCallback::init() throw()
 {
-  _con.init();
+  _con.init(_node->getName());
   ConfigFile(_rc_config);
 }
 
@@ -86,8 +86,8 @@ bool COPPERCallback::load() throw()
   _con.addArgument(data->getText("host"));
   _con.addArgument(Belle2::form("%d", (int)_node->getData()->getId()));
   _con.addArgument(Belle2::form("%d", flag));
-  _con.addArgument("1");
-  _con.addArgument(_node->getName());
+  _con.addArgument("0");
+  //_con.addArgument(_node->getName());
   return _con.load(-1);
 }
 

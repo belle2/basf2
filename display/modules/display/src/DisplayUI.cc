@@ -20,6 +20,7 @@
 #include <TEveScene.h>
 #include <TEveViewer.h>
 #include <TGButton.h>
+#include <TGFileBrowser.h>
 #include <TGFrame.h>
 #include <TGLabel.h>
 #include <TGNumberEntry.h>
@@ -33,9 +34,6 @@
 #include <TObjString.h>
 #include <TROOT.h>
 #include <TSystem.h>
-
-class TGPictureButton; //missing fwd declaration in root
-#include <TGFileBrowser.h>
 
 #include <boost/scoped_ptr.hpp>
 

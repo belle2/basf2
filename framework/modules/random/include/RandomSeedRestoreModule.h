@@ -16,14 +16,6 @@
 
 namespace Belle2 {
   /**
-   * \addtogroup modules
-   * @{
-   * \addtogroup framework_modules
-   * \ingroup modules
-   * @{ RandomSeedRestoreModule @} @}
-   */
-
-  /**
    * A module that restores the random seed from an output file.
    *
    * This module sets the random number generator seed to the

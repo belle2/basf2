@@ -25,14 +25,6 @@
 
 
 namespace Belle2 {
-  /**
-   * \addtogroup modules
-   * @{
-   * \addtogroup framework_modules
-   * \ingroup modules
-   * @{ RootInputModule @} @}
-   */
-
   /** Module to read TTree data from file into the data store.
    *
    *  For more information consult the TWiki basf2 Software Portal.

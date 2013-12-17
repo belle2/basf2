@@ -19,16 +19,7 @@
 #include <pthread.h>
 
 namespace Belle2 {
-  /**
-   * \addtogroup modules
-   * @{
-   * \addtogroup framework_modules
-   * \ingroup modules
-   * @{ FastSeqRootInputModule @} @}
-   */
-
   /*! A class definition of an input module for Sequential ROOT I/O. */
-
   class FastSeqRootInputModule : public Module {
 
     // Public functions

@@ -16,14 +16,6 @@
 
 namespace Belle2 {
   /**
-   * \addtogroup modules
-   * @{
-   * \addtogroup framework_modules
-   * \ingroup modules
-   * @{ ProgressModule @} @}
-   */
-
-  /**
    * The Progress module.
    *
    * This module periodically writes the number of processed events/runs to the

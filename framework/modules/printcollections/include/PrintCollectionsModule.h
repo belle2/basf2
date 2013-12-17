@@ -15,14 +15,6 @@
 #include <framework/datastore/DataStore.h>
 
 namespace Belle2 {
-  /**
-   * \addtogroup modules
-   * @{
-   * \addtogroup framework_modules
-   * \ingroup modules
-   * @{ PrintCollectionsModule @} @}
-   */
-
   /** The module prints the collections of the DataStore to the log system.
    *
    */

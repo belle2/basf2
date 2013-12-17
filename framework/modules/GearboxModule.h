@@ -19,14 +19,6 @@
 
 namespace Belle2 {
   /**
-   * \addtogroup modules
-   * @{
-   * \addtogroup framework_modules
-   * \ingroup modules
-   * @{ GearboxModule @} @}
-   */
-
-  /**
    * The Gearbox module.
    *
    * This module loads the parameters from the specified backends.

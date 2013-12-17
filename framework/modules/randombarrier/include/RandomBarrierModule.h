@@ -18,14 +18,6 @@
 
 namespace Belle2 {
   /**
-   * \addtogroup modules
-   * @{
-   * \addtogroup framework_modules
-   * \ingroup modules
-   * @{ RandomBarrierModule @} @}
-   */
-
-  /**
    * Sets gRandom to an independent generator for the following modules.
    *
    * E.g. a module chain of the sort [ParticleGun -> RandomBarrier -> FullSim]

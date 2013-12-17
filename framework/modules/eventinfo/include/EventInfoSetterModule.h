@@ -18,14 +18,6 @@
 
 namespace Belle2 {
   /**
-   * \addtogroup modules
-   * @{
-   * \addtogroup framework_modules
-   * \ingroup modules
-   * @{ EventInfoSetterModule @} @}
-   */
-
-  /**
    * Module to set event, run, experiment numbers.
    *
    * This module generates the event meta data information

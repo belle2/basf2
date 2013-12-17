@@ -17,14 +17,6 @@
 
 namespace Belle2 {
   /**
-   * \addtogroup modules
-   * @{
-   * \addtogroup framework_modules
-   * \ingroup modules
-   * @{ ProfileModule @} @}
-   */
-
-  /**
    * A module that measures the execution time and memory usage per event.
    *
    * This module adds a ProfileInfo object to the datastore and records

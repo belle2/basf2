@@ -18,14 +18,6 @@
 #include <sys/time.h>
 
 namespace Belle2 {
-  /**
-   * \addtogroup modules
-   * @{
-   * \addtogroup framework_modules
-   * \ingroup modules
-   * @{ SeqRootInputModule @} @}
-   */
-
   /*! A class definition of an input module for Sequential ROOT I/O. */
 
   class SeqRootInputModule : public Module {

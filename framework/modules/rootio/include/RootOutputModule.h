@@ -25,14 +25,6 @@
 
 
 namespace Belle2 {
-  /**
-   * \addtogroup modules
-   * @{
-   * \addtogroup framework_modules
-   * \ingroup modules
-   * @{ RootOutputModule @} @}
-   */
-
   /** Write objects from DataStore into a ROOT file.
    *
    *  To ensure that all objects/arrays are saved correctly, follow the directions

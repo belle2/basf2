@@ -13,14 +13,6 @@
 #include <string>
 
 namespace Belle2 {
-  /**
-   * \addtogroup modules
-   * @{
-   * \addtogroup framework_modules
-   * \ingroup modules
-   * @{ HistoManagerModule @} @}
-   */
-
   /*! Class definition of HistoManager module */
   class HistoManagerModule : public Module {
   public:

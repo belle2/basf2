@@ -13,14 +13,6 @@
 
 
 namespace Belle2 {
-  /**
-   * \addtogroup modules
-   * @{
-   * \addtogroup framework_modules
-   * \ingroup modules
-   * @{ EventInfoPrinterModule @} @}
-   */
-
   /** The event meta data info module.
    *
    * This module prints the current event meta data information using B2INFO.

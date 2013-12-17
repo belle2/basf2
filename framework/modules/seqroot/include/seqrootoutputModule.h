@@ -20,14 +20,6 @@
 #include <sys/time.h>
 
 namespace Belle2 {
-  /**
-   * \addtogroup modules
-   * @{
-   * \addtogroup framework_modules
-   * \ingroup modules
-   * @{ SeqRootOutputModule @} @}
-   */
-
   /*! Class definition for the output module of Sequential ROOT I/O */
 
   class SeqRootOutputModule : public Module {

@@ -16,14 +16,6 @@
 
 namespace Belle2 {
   /**
-   * \addtogroup modules
-   * @{
-   * \addtogroup framework_modules
-   * \ingroup modules
-   * @{ InteractiveModule @} @}
-   */
-
-  /**
    * Start an interactive python shell in each call of event().
    *
    * Also imports the ROOT.Belle2 namespace for convenience, allowing you

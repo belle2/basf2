@@ -30,7 +30,8 @@ bool HSLBController::boot(int slot, DataObject* hslb,
   } else {
     _slot = slot;
     _hslb = hslb;
-    if (el->getTag() == "object" &&
+    if (_reg_v.size() == 0 &&
+        el->getTag() == "object" &&
         el->getAttribute("extends") == "HSLB") {
       std::vector<XMLElement*> el_v = el->getElements();
       for (size_t i = 0; i < el_v.size(); i++) {

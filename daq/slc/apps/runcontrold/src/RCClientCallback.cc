@@ -48,8 +48,10 @@ bool RCClientCallback::ok() throw()
        it != _master->getNSMNodes().end(); it++) {
     if ((*it)->isUsed() && (*it)->getState() != node->getState())
       synchronized = false;
-    iserror |= node->getState().isError();
-    if (state_low.getId() > node->getState().getId()) {
+    iserror |= node->getState().isError()
+               || node->getConnection() != Connection::ONLINE;
+    if (node->getConnection() == Connection::ONLINE &&
+        state_low.getId() > node->getState().getId()) {
       state_low = node->getState();
     }
   }

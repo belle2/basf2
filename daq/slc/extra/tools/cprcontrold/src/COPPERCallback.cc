@@ -32,6 +32,7 @@ void COPPERCallback::init() throw()
 
 bool COPPERCallback::boot() throw()
 {
+  Belle2::debug("BOOT");
   download();
   ConfigFile config("cdc");
   XMLParser parser;
@@ -57,6 +58,7 @@ bool COPPERCallback::boot() throw()
 
 bool COPPERCallback::load() throw()
 {
+  Belle2::debug("LOAD");
   bool boot_firm = (_confno == (int)getMessage().getParam(0));
   _confno = getMessage().getParam(0);
   download();
@@ -86,18 +88,30 @@ bool COPPERCallback::load() throw()
   _con.addArgument(data->getText("host"));
   _con.addArgument(Belle2::form("%d", (int)_node->getData()->getId()));
   _con.addArgument(Belle2::form("%d", flag));
-  _con.addArgument("0");
-  //_con.addArgument(_node->getName());
-  return _con.load(-1);
+  _con.addArgument("1");
+  _con.addArgument(_node->getName());
+  if (_con.load(5)) {
+    Belle2::debug("(DEBUG) load succeded");
+  } else {
+    Belle2::debug("(DEBUG) load timeout");
+  }
+  return true;
 }
 
 bool COPPERCallback::start() throw()
 {
-  return _con.start(-1);
+  Belle2::debug("START");
+  if (_con.start(5)) {
+    Belle2::debug("(DEBUG) start succeded");
+  } else {
+    Belle2::debug("(DEBUG) start timeout");
+  }
+  return true;
 }
 
 bool COPPERCallback::stop() throw()
 {
+  Belle2::debug("STOP");
   return _con.stop(-1);
 }
 
@@ -113,10 +127,15 @@ bool COPPERCallback::pause() throw()
 
 bool COPPERCallback::recover() throw()
 {
-  return _con.abort();
+  Belle2::debug("RECOVER");
+  if (_con.abort()) {
+    return load();
+  }
+  return false;
 }
 
 bool COPPERCallback::abort() throw()
 {
+  Belle2::debug("ABORT");
   return _con.abort();
 }

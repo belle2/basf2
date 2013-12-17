@@ -69,7 +69,10 @@ void NSMCommunicator::init(const std::string& host, int port) throw(NSMHandlerEx
   }
   if (_nsmc == NULL) {
     _id = -1;
-    throw (NSMHandlerException(__FILE__, __LINE__, "Error during init2"));
+    throw (NSMHandlerException(__FILE__, __LINE__,
+                               Belle2::form("Error during init2 (%s=>%s:%d): %s",
+                                            _node->getName().c_str(), host.c_str(), _port,
+                                            b2nsm_strerror())));
   }
   nsmlib_usesig(_nsmc, 0);
   //b2nsm_logging(stdout);
@@ -180,9 +183,11 @@ void NSMCommunicator::sendLog(const SystemLog& log) throw(NSMHandlerException)
 
 void NSMCommunicator::sendError(const std::string& message) throw(NSMHandlerException)
 {
+#ifdef __NSM_SLC__
   if (_rc_node != NULL) {
     sendRequest(_rc_node, Command::ERROR, 0, NULL, message);
   }
+#endif
 }
 
 void NSMCommunicator::sendState() throw(NSMHandlerException)

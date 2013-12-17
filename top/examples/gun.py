@@ -93,7 +93,8 @@ main.add_module(topdigi)
 
 # TOP reconstruction
 topreco = register_module('TOPReconstructor')
-topreco.param('debugLevel', 1)  # remove this line or set to 0 to suppress printout
+topreco.logging.log_level = LogLevel.DEBUG  # remove or comment to suppress printout
+topreco.logging.debug_level = 2  # or set level to 0 to suppress printout
 main.add_module(topreco)
 
 # Output

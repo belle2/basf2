@@ -440,12 +440,11 @@ namespace Belle2 {
 
       /*! Build quartz bar and insert it into the air */
 
-      G4AssemblyVolume* bar = buildBar(content, moduleID);
       G4RotationMatrix* rota = new G4RotationMatrix(0, 0, 0);
       G4ThreeVector transa(0, 0, 0);
-
-      bar->MakeImprint(air, transa, rota, 100, false);
-
+      //      G4AssemblyVolume* bar = buildBar(content, moduleID);
+      //      bar->MakeImprint(air, transa, rota, 100, false);
+      buildBar(content, moduleID)->MakeImprint(air, transa, rota, 100, false);
 
       //! Add electronics, this part is not finished, just for backgound studies.
       G4Material* PCBMaterial = Materials::get("TOPPCB");

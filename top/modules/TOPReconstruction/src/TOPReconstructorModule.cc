@@ -59,6 +59,7 @@ namespace Belle2 {
     //-----------------------------------------------------------------
 
     TOPReconstructorModule::TOPReconstructorModule() : Module(),
+      m_debugLevel(0),
       m_smearTrack(false),
       m_topgp(TOPGeometryPar::Instance()),
       m_R1(0),
@@ -78,7 +79,6 @@ namespace Belle2 {
       addParam("inputDigits", m_inputDigits, "TOP digits", string(""));
       addParam("inputBarHits", m_inputBarHits, "MCParticle hits at bars", string(""));
       addParam("outputLikelihoods", m_outputLikelihoods, "TOP likelihoods", string(""));
-      addParam("debugLevel", m_debugLevel, "Debug level", 0);
       addParam("minBkgPerBar", m_minBkgPerBar,
                "Minimal number of background photons per bar", 0.0);
       addParam("scaleN0", m_scaleN0, "Scale factor for N0", 1.0);
@@ -100,6 +100,12 @@ namespace Belle2 {
 
     void TOPReconstructorModule::initialize()
     {
+      // check for module debug level
+
+      if (getLogConfig().getLogLevel() == LogConfig::c_Debug) {
+        m_debugLevel = getLogConfig().getDebugLevel();
+      }
+
       // Initialize masses
 
       m_Masses[0] = Const::electron.getMass();
@@ -130,8 +136,7 @@ namespace Belle2 {
       m_R2 = config.getR2();
       m_Z1 = config.getZ1();
       m_Z2 = config.getZ2();
-      if (m_debugLevel != 0) config.print();
-
+      if (m_debugLevel > 0) config.print();
     }
 
     void TOPReconstructorModule::beginRun()
@@ -141,6 +146,7 @@ namespace Belle2 {
 
     void TOPReconstructorModule::event()
     {
+
       // input: digitized photons
 
       StoreArray<TOPDigit> topDigits(m_inputDigits);
@@ -204,7 +210,7 @@ namespace Belle2 {
       for (unsigned int i = 0; i < tracks.size(); i++) {
         // reconstruct
         reco.Reconstruct(tracks[i]);
-        if (m_debugLevel != 0) {
+        if (m_debugLevel > 1) {
           tracks[i].Dump();
           reco.DumpHit(Local);
           reco.DumpLogL(c_Nhyp);

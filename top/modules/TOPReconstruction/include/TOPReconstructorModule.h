@@ -96,14 +96,12 @@ namespace Belle2 {
        */
       void getTracks(std::vector<TOPtrack>& tracks, Const::ChargedStable chargedStable);
 
-      // Module parameters
-
+      // Module steering parameters
       std::string m_inputTracks;       /**< reconstructed tracks (input) */
       std::string m_inputExtHits;      /**< Ext reconstructed hits (input) */
       std::string m_inputDigits;       /**< Digitized data (input) */
       std::string m_inputBarHits;      /**< MC particle hit (to set relation to) */
       std::string m_outputLikelihoods; /**< TOP log likelihoods (output) */
-      int m_debugLevel;         /**< debug level */
       double m_minBkgPerBar;    /**< minimal assumed background photons per bar */
       double m_scaleN0;         /**< scale factor for N0 */
       double m_sigmaRphi;    /**< track smearing in Rphi (r.m.s) */
@@ -112,6 +110,8 @@ namespace Belle2 {
       double m_sigmaPhi;     /**< track smearing in Phi (r.m.s) */
       double m_maxTime;      /**< optional time limit for photons */
 
+      // others
+      int m_debugLevel;      /**< debug level from logger */
       bool m_smearTrack;     /**< set to true, if at least one sigma > 0 */
 
       // Geometry parameters

@@ -101,8 +101,7 @@ namespace Belle2 {
 
     /** Methods that actually interface to Genfit.  */
     //virtual genfit::SharedPlanePtr constructPlane(const genfit::StateOnPlane&) const;
-    virtual std::vector<genfit::MeasurementOnPlane*> constructMeasurementsOnPlane(const genfit::AbsTrackRep*,
-        const genfit::SharedPlanePtr&) const;
+    virtual std::vector<genfit::MeasurementOnPlane*> constructMeasurementsOnPlane(const genfit::StateOnPlane& state) const;
 
     // TODO: use HMatrixPhi for wedge sensors instead of rotating the plane!
     virtual const genfit::AbsHMatrix* constructHMatrix(const genfit::AbsTrackRep*) const { if (m_isU) return new genfit::HMatrixU(); else return new genfit::HMatrixV(); }

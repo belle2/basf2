@@ -102,13 +102,12 @@ genfit::AbsMeasurement* CDCRecoHit::clone() const
 }
 
 
-std::vector<genfit::MeasurementOnPlane*> CDCRecoHit::constructMeasurementsOnPlane(const genfit::AbsTrackRep* rep,
-    const genfit::SharedPlanePtr& pl) const
+std::vector<genfit::MeasurementOnPlane*> CDCRecoHit::constructMeasurementsOnPlane(const genfit::StateOnPlane& state) const
 {
   if (s_update) {
     B2FATAL("The extraction of track/hit parameters for the getMeasurement function has still to be implemented. \n"
             << "Please avoid setting s_update to true for the moment.");
   }
-  return this->genfit::WireMeasurement::constructMeasurementsOnPlane(rep, pl);
+  return this->genfit::WireMeasurement::constructMeasurementsOnPlane(state);
 }
 

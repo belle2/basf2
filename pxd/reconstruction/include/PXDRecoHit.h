@@ -94,8 +94,7 @@ namespace Belle2 {
     genfit::AbsMeasurement* clone() const;
 
     /** Methods that actually interface to Genfit.  */
-    virtual std::vector<genfit::MeasurementOnPlane*> constructMeasurementsOnPlane(const genfit::AbsTrackRep*,
-        const genfit::SharedPlanePtr&) const;
+    virtual std::vector<genfit::MeasurementOnPlane*> constructMeasurementsOnPlane(const genfit::StateOnPlane& state) const;
 
     /** Get the compact ID.*/
     VxdID getSensorID() const { return m_sensorID; }

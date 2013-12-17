@@ -73,8 +73,7 @@ namespace Belle2 {
 
     /** Method, that actually interfaces to Genfit.
      */
-    std::vector<genfit::MeasurementOnPlane*> constructMeasurementsOnPlane(const genfit::AbsTrackRep*,
-        const genfit::SharedPlanePtr&) const;
+    std::vector<genfit::MeasurementOnPlane*> constructMeasurementsOnPlane(const genfit::StateOnPlane& state) const;
 
 
     /** get the pointer to the CDCHit object that was used to create this CDCRecoHit object.

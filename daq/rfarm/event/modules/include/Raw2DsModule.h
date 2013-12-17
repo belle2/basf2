@@ -22,6 +22,7 @@
 
 
 #include <daq/rawdata/modules/DAQConsts.h>
+#include <rawdata/dataobjects/RawFTSW.h>
 #include <rawdata/dataobjects/RawCDC.h>
 #include <rawdata/dataobjects/RawSVD.h>
 #include <rawdata/dataobjects/RawECL.h>

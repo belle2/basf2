@@ -109,11 +109,12 @@ void Raw2DsModule::registerRawCOPPERs()
   int ncprs = sndhdr.GetNumNodesinPacket();
   int nwords = sndhdr.GetTotalNwords() - SendHeader::SENDHDR_NWORDS - SendTrailer::SENDTRL_NWORDS;
 
+  B2INFO("Raw2DS: Ncprs=" << ncprs << " Nwords=" << nwords);
   // Get buffer header
   int* bufbody = evtbuf + SendHeader::SENDHDR_NWORDS;
 
   // Unpack buffer
-  RawCOPPER tempcpr;
+  RawDataBlock tempcpr;
   tempcpr.SetBuffer(bufbody, nwords, false, npackedevts, ncprs);
 
   // Store data contents in Corresponding RawXXXX
@@ -123,7 +124,13 @@ void Raw2DsModule::registerRawCOPPERs()
     int* cprbuf = new int[nwds_buf];
     memcpy(cprbuf, tempcpr.GetBuffer(cprid), nwds_buf * 4);
     // Get subsys id
-    int subsysid = tempcpr.GetSubsysId(cprid);
+    // Check FTSW
+    if (tempcpr.CheckFTSWID(cprid)) {
+      StoreArray<RawFTSW> ary;
+      (ary.appendNew())->SetBuffer(cprbuf, nwds_buf, 1, 1, 1);
+      continue;
+    }
+    int subsysid = ((RawCOPPER&)tempcpr).GetSubsysId(cprid);
     // Switch to each detector and register RawXXX
     if (subsysid == CDC_ID) {
       StoreArray<RawCDC> ary;

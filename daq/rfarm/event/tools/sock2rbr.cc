@@ -35,17 +35,29 @@ int main(int argc, char** argv)
   RevSock2Rb sr(a1, a2, a3, a4, a5);
 
   int ncount = 0;
+  int nevt = 0;
   for (;;) {
     int stat = sr.ReceiveEvent();
     //    printf ( "sock2rb received : %d\n", stat );
     if (stat < 0)
       break;
     else if (stat == 0) {
-      printf("sock2rb : status 0, waiting %d times\n", ncount);
-      sleep(10);
-      ncount++;
-      if (ncount > 100) break;
+      // Reconnection needed
+      int nrepeat = 5000;
+      for (;;) {
+        int rstat = sr.Reconnect(nrepeat);
+        if (rstat == -1)
+          continue;
+        else
+          break;
+      }
     }
+    nevt++;
+    /*
+    if (nevt % 5000 == 0) {
+      printf("sock2rbr : evt = %d\n", nevt);
+    }
+    */
   }
   exit(0);
 }

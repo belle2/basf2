@@ -35,6 +35,9 @@ public:
   /*! Event function */
   int ReceiveEvent(void);
 
+  /*! Reconnect */
+  int Reconnect(int ntry);
+
 private:
   RingBuffer* m_rbuf;
   REvtSocketRecv* m_sock;

@@ -54,3 +54,7 @@ int RevSock2Rb::ReceiveEvent(void)
   return stat;
 }
 
+int RevSock2Rb::Reconnect(int ntimes)
+{
+  return (m_sock->sock())->reconnect(ntimes);
+}

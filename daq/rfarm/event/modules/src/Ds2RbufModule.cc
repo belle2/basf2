@@ -67,6 +67,9 @@ void Ds2RbufModule::event()
 {
   // Stream DataStore in EvtMessage
   EvtMessage* msg = m_streamer->streamDataStore(DataStore::c_Event);
+  //  EvtMessage* msg = m_streamer->streamDataStore(DataStore::c_Event, false, true);
+
+  B2INFO("Ds2Rbuf: msgsize = " << msg->size());
 
   //  printf("message size = %d\n", msg->size());
   // Put the message in ring buffer

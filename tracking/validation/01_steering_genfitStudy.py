@@ -68,55 +68,6 @@ logFileName = rootFileName + '.log'
 
 sys.stdout = open(logFileName, 'w')
 
-# ============ begin of magnetic field change script part 1
-magneticField = '0afterSVD'
-if cdc:
-    magneticField = '0afterCDC'
-
-currentBasf2BaseDir = os.environ['BELLE2_LOCAL_DIR']
-currentWorkingDir = os.getcwd()
-
-os.chdir(currentBasf2BaseDir + '/data/geometry')
-shutil.copyfile('Belle2.xml', 'Belle2.xml.backup')
-belle2xmlFile = open('Belle2.xml', 'r')
-belle2xml = belle2xmlFile.read()
-belle2xmlFile.close()
-# fist deactiave any active mangetic field
-belle2xml = \
-    belle2xml.replace(r'<xi:include href="../geometry/MagneticFieldConstant.xml"/>'
-                      , '')
-belle2xml = \
-    belle2xml.replace(r'<xi:include href="../geometry/MagneticFieldConstant4LimitedRSVD.xml"/>'
-                      , '')
-belle2xml = \
-    belle2xml.replace(r'<xi:include href="../geometry/MagneticFieldConstant4LimitedRCDC.xml"/>'
-                      , '')
-belle2xml = \
-    belle2xml.replace(r'<xi:include href="../geometry/MagneticField2d.xml"/>',
-                      '')
-belle2xml = \
-    belle2xml.replace(r'<xi:include href="../geometry/MagneticField3d.xml"/>',
-                      '')
-# then replace it with the one you want
-if magneticField == 'normal':
-    belle2xml = belle2xml.replace(r'</Detector>',
-                                  r'<xi:include href="../geometry/MagneticFieldConstant.xml"/></Detector>'
-                                  )
-if magneticField == '0afterSVD':
-    belle2xml = belle2xml.replace(r'</Detector>',
-                                  r'<xi:include href="../geometry/MagneticFieldConstant4LimitedRSVD.xml"/></Detector>'
-                                  )
-if magneticField == '0afterCDC':
-    belle2xml = belle2xml.replace(r'</Detector>',
-                                  r'<xi:include href="../geometry/MagneticFieldConstant4LimitedRCDC.xml"/></Detector>'
-                                  )
-
-belle2xmlFile = open('Belle2.xml', 'w')
-belle2xmlFile.write(belle2xml)
-belle2xmlFile.close()
-os.chdir(currentWorkingDir)
-# =============== end of magnetic field change script part 1
-
 # suppress messages and warnings during processing:
 set_log_level(LogLevel.ERROR)
 
@@ -155,13 +106,16 @@ progress = register_module('Progress')
 gearbox = register_module('Gearbox')
 # Create geometry
 geometry = register_module('Geometry')
-componentList = ['MagneticField', 'BeamPipe']
+componentList = ['BeamPipe']
 if pxd:
     componentList.append('PXD')
 if svd:
     componentList.append('SVD')
 if cdc:
     componentList.append('CDC')
+    componentList.append('MagneticField4LimitedRCDC')
+else:
+    componentList.append('MagneticField4LimitedRSVD')
 
 geometry.param('Components', componentList)
 
@@ -254,13 +208,6 @@ output.param('outputFileName', 'GF2Tracks.root')
 
 # Process events
 process(main)
-
-# =============== begin of magnetic field change script part 2
-# undo all changes to the Belle.xml
-os.chdir(currentBasf2BaseDir + '/data/geometry')
-shutil.move('Belle2.xml.backup', 'Belle2.xml')
-os.chdir(currentWorkingDir)
-# =============== end of magnetic field change script part 2
 
 # Print call statistics
 print statistics

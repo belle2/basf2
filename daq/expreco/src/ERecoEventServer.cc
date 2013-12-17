@@ -41,20 +41,24 @@ int ERecoEventServer::server()
   while (m_force_exit == 0) {
     // Pick up a event from RingBuffer (non blocking)
     int size = m_rbuf->remq((int*)evtbuffer);
+    //    printf ( "From RB : size = %d\n", size );
 
     // Check connection request
     int exam_stat = m_man->examine();
+    printf("Examine: exam_stat = %d\n", exam_stat);
     if (exam_stat == 0) {
       printf("Initial connection request detected!\n");
       //      int fd = recvsock[;
     } else if (exam_stat == 1 && size > 0) { //
-      // printf ( "Event data data ready on socket\n" );
+      //      printf ( "Event data data ready on socket\n" );
       vector<int>& recvsock = m_man->connected_socket_list();
+      //      printf ( "size of recvsock = %d\n", recvsock.size() );
       for (vector<int>::iterator it = recvsock.begin();
            it != recvsock.end(); ++it) {
         int fd = *it;
-        if (m_man->connected(fd)) {
+        if (m_man->connected(fd, true)) {
           int is = sio.put(fd, evtbuffer, size * 4);
+          //    printf ( "data put on socket : %d\n", is );
           if (is <= 0) {
             printf("EventServer: fd %d disconnected\n", fd);
             m_man->remove(fd);

@@ -25,7 +25,7 @@ import sys
 import os
 import array
 import time
-from ROOT import std, TCut, TMath
+from ROOT import std, TCut, TMath, TNamed
 
 ROOT.gROOT.SetBatch(True)
 
@@ -154,6 +154,10 @@ h_fitted = ROOT.TH2F(
     )
 h_fitted.SetMinimum(0.)
 h_fitted.SetMaximum(1.)
+description = 'Fraction of tracks which could be fitted.'
+check = 'Should be close to 1.'
+h_fitted.GetListOfFunctions().Add(TNamed('Description', description))
+h_fitted.GetListOfFunctions().Add(TNamed('Check', check))
 histos.append(h_fitted)
 
 # fitting efficiency
@@ -169,6 +173,11 @@ h_fittedConverged = ROOT.TH2F(
     )
 h_fittedConverged.SetMinimum(0.)
 h_fittedConverged.SetMaximum(1.)
+description = \
+    'Fraction of track which could be fitted and where the fit is converged.'
+check = 'Should be close to 1.'
+h_fittedConverged.GetListOfFunctions().Add(TNamed('Description', description))
+h_fittedConverged.GetListOfFunctions().Add(TNamed('Check', check))
 histos.append(h_fittedConverged)
 
 h_NumIterations = ROOT.TH2F(
@@ -184,6 +193,10 @@ h_NumIterations = ROOT.TH2F(
 h_NumIterations.SetMinimum(0.)
 h_NumIterations.SetMaximum(20.)
 histos.append(h_NumIterations)
+description = 'Number of iterations.'
+# check = ''
+h_NumIterations.GetListOfFunctions().Add(TNamed('Description', description))
+# h_NumIterations.GetListOfFunctions().Add(TNamed('Check', check))
 
 # p-values
 h_pValue_b_mean = ROOT.TH2F(
@@ -198,6 +211,10 @@ h_pValue_b_mean = ROOT.TH2F(
     )
 h_pValue_b_mean.SetMinimum(pValue_mean_Ideal - pValue_mean_Range)
 h_pValue_b_mean.SetMaximum(pValue_mean_Ideal + pValue_mean_Range)
+description = 'Mean of p-Value distributions of backward fit.'
+check = 'Should be 0.5.'
+h_pValue_b_mean.GetListOfFunctions().Add(TNamed('Description', description))
+h_pValue_b_mean.GetListOfFunctions().Add(TNamed('Check', check))
 histos.append(h_pValue_b_mean)
 
 h_pValue_b_RMS = ROOT.TH2F(
@@ -212,6 +229,10 @@ h_pValue_b_RMS = ROOT.TH2F(
     )
 h_pValue_b_RMS.SetMinimum(pValue_RMS_Ideal - pValue_RMS_Range)
 h_pValue_b_RMS.SetMaximum(pValue_RMS_Ideal + pValue_RMS_Range)
+description = 'RMS of p-Value distributions of backward fit.'
+check = 'Should be ' + str(pValue_RMS_Ideal) + '.'
+h_pValue_b_RMS.GetListOfFunctions().Add(TNamed('Description', description))
+h_pValue_b_RMS.GetListOfFunctions().Add(TNamed('Check', check))
 histos.append(h_pValue_b_RMS)
 
 h_pValue_f_mean = ROOT.TH2F(
@@ -226,6 +247,10 @@ h_pValue_f_mean = ROOT.TH2F(
     )
 h_pValue_f_mean.SetMinimum(pValue_mean_Ideal - pValue_mean_Range)
 h_pValue_f_mean.SetMaximum(pValue_mean_Ideal + pValue_mean_Range)
+description = 'Mean of p-Value distributions of forward fit.'
+check = 'Should be 0.5.'
+h_pValue_f_mean.GetListOfFunctions().Add(TNamed('Description', description))
+h_pValue_f_mean.GetListOfFunctions().Add(TNamed('Check', check))
 histos.append(h_pValue_f_mean)
 
 h_pValue_f_RMS = ROOT.TH2F(
@@ -240,6 +265,10 @@ h_pValue_f_RMS = ROOT.TH2F(
     )
 h_pValue_f_RMS.SetMinimum(pValue_RMS_Ideal - pValue_RMS_Range)
 h_pValue_f_RMS.SetMaximum(pValue_RMS_Ideal + pValue_RMS_Range)
+description = 'RMS of p-Value distributions of forward fit.'
+check = 'Should be ' + str(pValue_RMS_Ideal) + '.'
+h_pValue_f_RMS.GetListOfFunctions().Add(TNamed('Description', description))
+h_pValue_f_RMS.GetListOfFunctions().Add(TNamed('Check', check))
 histos.append(h_pValue_f_RMS)
 
 # resolutions
@@ -334,6 +363,10 @@ for var in [
         ptL,
         ptU,
         ))
+    description = 'mean of ' + var + ' pull distribution.'
+    check = 'Should be 0.'
+    pullHistos[-1].GetListOfFunctions().Add(TNamed('Description', description))
+    pullHistos[-1].GetListOfFunctions().Add(TNamed('Check', check))
     pullHistos[-1].SetMinimum(-1. * pullRange)
     pullHistos[-1].SetMaximum(pullRange)
 
@@ -347,6 +380,10 @@ for var in [
         ptL,
         ptU,
         ))
+    description = 'RMS of ' + var + ' pull distribution.'
+    check = 'Should be 1.'
+    pullHistos[-1].GetListOfFunctions().Add(TNamed('Description', description))
+    pullHistos[-1].GetListOfFunctions().Add(TNamed('Check', check))
     pullHistos[-1].SetMinimum(1. - RMSRange)
     pullHistos[-1].SetMaximum(1. + RMSRange)
 
@@ -360,6 +397,10 @@ for var in [
         ptL,
         ptU,
         ))
+    description = 'Median of ' + var + ' pull distribution.'
+    check = 'Should be 0.'
+    pullHistos[-1].GetListOfFunctions().Add(TNamed('Description', description))
+    pullHistos[-1].GetListOfFunctions().Add(TNamed('Check', check))
     pullHistos[-1].SetMinimum(-1. * pullRange)
     pullHistos[-1].SetMaximum(pullRange)
 
@@ -373,6 +414,11 @@ for var in [
         ptL,
         ptU,
         ))
+    description = 'Scaled median absolute deviation of ' + var \
+        + ' pull distribution.'
+    check = 'Should be 1.'
+    pullHistos[-1].GetListOfFunctions().Add(TNamed('Description', description))
+    pullHistos[-1].GetListOfFunctions().Add(TNamed('Check', check))
     pullHistos[-1].SetMinimum(1. - RMSRange)
     pullHistos[-1].SetMaximum(1. + RMSRange)
 
@@ -386,6 +432,12 @@ for var in [
         ptL,
         ptU,
         ))
+    description = 'number of outliers of ' + var \
+        + ' pull distribution. It is the number of entries which are outside of ' \
+        + str(outlierCut) + ' times the scaled MAD of the distribution.'
+    check = 'Should be small.'
+    pullHistos[-1].GetListOfFunctions().Add(TNamed('Description', description))
+    pullHistos[-1].GetListOfFunctions().Add(TNamed('Check', check))
     pullHistos[-1].SetMinimum(0.)
     pullHistos[-1].SetMaximum(OutlierMax)
 
@@ -394,25 +446,62 @@ histos.extend(pullHistos)
 # set up 1D histos for storing the data for the bins of the 2D analysis histograms
 anaHistos = []
 anaHistos.append(ROOT.TH1F('histo_p_bu', 'p-value bu', histBins, 0, 1))  # p val
+description = 'p-Value distribution of backward fit.'
+check = 'Should be flat.'
+anaHistos[-1].GetListOfFunctions().Add(TNamed('Description', description))
+anaHistos[-1].GetListOfFunctions().Add(TNamed('Check', check))
+
 anaHistos.append(ROOT.TH1F('histo_p_fu', 'p-value fu', histBins, 0, 1))  # p val
+description = 'p-Value distribution of forward fit.'
+check = 'Should be flat.'
+anaHistos[-1].GetListOfFunctions().Add(TNamed('Description', description))
+anaHistos[-1].GetListOfFunctions().Add(TNamed('Check', check))
+
 anaHistos.append(ROOT.TH1F('histoRes', 'relative momentum resolution',
                  histBins, -1. * histRange * resoScaling, histRange
                  * resoScaling))  # res
 anaHistos.append(ROOT.TH1F('histoPull0', 'Pulls x', histBins, -1. * histRange,
                  histRange))  # x
+description = 'Pull distribution in x.'
+check = 'Should a Gaussian with width 1 centered at 0.'
+anaHistos[-1].GetListOfFunctions().Add(TNamed('Description', description))
+anaHistos[-1].GetListOfFunctions().Add(TNamed('Check', check))
+
 anaHistos.append(ROOT.TH1F('histoPull1', 'Pulls y', histBins, -1. * histRange,
                  histRange))  # y
+description = 'Pull distribution in y.'
+anaHistos[-1].GetListOfFunctions().Add(TNamed('Description', description))
+anaHistos[-1].GetListOfFunctions().Add(TNamed('Check', check))
+
 anaHistos.append(ROOT.TH1F('histoPull2', 'Pulls z', histBins, -1. * histRange,
                  histRange))  # z
+description = 'Pull distribution in z.'
+anaHistos[-1].GetListOfFunctions().Add(TNamed('Description', description))
+anaHistos[-1].GetListOfFunctions().Add(TNamed('Check', check))
+
 anaHistos.append(ROOT.TH1F('histoPull3', 'Pulls p_x', histBins, -1.
                  * histRange, histRange))  # p_x
+description = 'Pull distribution in p_x.'
+anaHistos[-1].GetListOfFunctions().Add(TNamed('Description', description))
+anaHistos[-1].GetListOfFunctions().Add(TNamed('Check', check))
+
 anaHistos.append(ROOT.TH1F('histoPull4', 'Pulls p_y', histBins, -1.
                  * histRange, histRange))  # p_y
+description = 'Pull distribution in p_y.'
+anaHistos[-1].GetListOfFunctions().Add(TNamed('Description', description))
+anaHistos[-1].GetListOfFunctions().Add(TNamed('Check', check))
+
 anaHistos.append(ROOT.TH1F('histoPull5', 'Pulls p_z', histBins, -1.
                  * histRange, histRange))  # p_z
+description = 'Pull distribution in p_z.'
+anaHistos[-1].GetListOfFunctions().Add(TNamed('Description', description))
+anaHistos[-1].GetListOfFunctions().Add(TNamed('Check', check))
 
 anaHistos.append(ROOT.TH1F('histoNIter', 'number of iterations', iterRange, 0,
                  iterRange))
+description = 'Number of iterations.'
+anaHistos[-1].GetListOfFunctions().Add(TNamed('Description', description))
+# anaHistos[-1].GetListOfFunctions().Add(TNamed('Check', check))
 
 absDev = ROOT.TH1D('absDev', 'absDev', histBins, 0, histRange)
 

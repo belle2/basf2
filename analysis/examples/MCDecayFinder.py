@@ -64,7 +64,7 @@ svd_cls = register_module('SVDClusterizer')
 main.add_module(svd_cls)
 
 # ----> MC Trackfinder
-mctrackfinder = register_module('MCTrackFinder')
+mctrackfinder = register_module('TrackFinderMCTruth')
 mctrackfinder.param('UseCDCHits', True)
 mctrackfinder.param('UseSVDHits', True)
 mctrackfinder.param('UsePXDHits', True)

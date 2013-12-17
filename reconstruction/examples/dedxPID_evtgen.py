@@ -49,7 +49,7 @@ main.add_module(register_module('SVDDigitizer'))
 main.add_module(register_module('SVDClusterizer'))
 main.add_module(register_module('CDCDigitizer'))
 
-mctrackfinder = register_module('MCTrackFinder')
+mctrackfinder = register_module('TrackFinderMCTruth')
 mctrackfinder.param('UsePXDHits', use_pxd)
 mctrackfinder.param('UseSVDHits', True)
 mctrackfinder.param('UseCDCHits', True)

@@ -1,6 +1,7 @@
 //+
 // File : DeSerializerPXD.cc
-// Description : Module to receive PXD Data from external socket and store it as RawPXD in Data Store
+// Description : Module to receive PXD Data from external socket and store it as RawPXD in Data Store.
+// This is meant for lab use (standalone testing, debugging) without an event builder.
 //
 // Author : Bjoern Spruck / Klemens Lautenbach
 // Date : 13 - Aug - 2013
@@ -32,7 +33,7 @@ DeSerializerPXDModule::DeSerializerPXDModule() : Module()
   m_nsent = 0;
   m_compressionLevel = 0;
   m_buffer = new int[MAXEVTSIZE];
-  events_processed = 0;
+  //   events_processed = 0;
   //Parameter definition
   B2DEBUG(0, "DeSerializerPXDModule: Constructor done.");
 }

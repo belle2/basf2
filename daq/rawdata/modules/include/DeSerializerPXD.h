@@ -1,7 +1,8 @@
 //+
 // File : DeSerializerPXD.h
 // Description : Module to receive PXD Data from external socket and store it as RawPXD in Data Store
-//
+// This is meant for lab use (standalone testing, debugging) without an event builder.
+
 // Author : Bjoern Spruck / Klemens Lautenbach
 // Date : 13 - Aug - 2013
 //-
@@ -78,10 +79,7 @@ namespace Belle2 {
     int* m_buffer;
 
     // For monitoring
-    timeval m_t0;
-    double m_totbytes;
-    int m_ncycle;
-    int events_processed;
+    // int events_processed;
 
   };
 

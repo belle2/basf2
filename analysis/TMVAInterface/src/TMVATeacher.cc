@@ -7,7 +7,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <TFile.h>
+#include <analysis/TMVAInterface/TMVATeacher.h>
 
 /**
  * TMVA Factory uses a private static variable for storing the given output file.
@@ -22,7 +22,6 @@ void ROOTGlobalVariableWorkaround(TFile* file)
   TMVA::Factory::fgTargetFile = file;
 }
 
-#include <analysis/TMVAInterface/TMVATeacher.h>
 #include <framework/datastore/DataStore.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleInfo.h>
@@ -30,6 +29,7 @@ void ROOTGlobalVariableWorkaround(TFile* file)
 #include <algorithm>
 #include <string>
 
+#include <TFile.h>
 #include <TMVA/Tools.h>
 #include <TTree.h>
 #include <TString.h>

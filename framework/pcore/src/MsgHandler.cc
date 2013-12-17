@@ -13,7 +13,8 @@
 #include <stdlib.h>
 
 
-#define MAX_OBJECT_SIZE 1000000
+/** Maximal size of streamed objects. */
+const static int c_maxObjectSizeBytes = 10000000; //10MB
 
 using namespace std;
 using namespace Belle2;
@@ -58,7 +59,7 @@ bool MsgHandler::add(const TObject* obj, const string& name)
   //  printf ( "MsgHandler : size of %s = %d (pid=%d)\n", name.c_str(), len, (int)getpid() );
 
   // Store streamed objects in array
-  if (len < MAX_OBJECT_SIZE) {
+  if (len < c_maxObjectSizeBytes) {
     m_buf.push_back(msg);
     m_name.push_back(name);
     return true;

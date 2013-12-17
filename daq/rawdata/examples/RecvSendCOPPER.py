@@ -36,7 +36,7 @@ reader.param('NodeID', int(argvs[2]))
 reader.param('FinesseBitFlag', int(argvs[3]))
 use_shm_flag = int(argvs[4])
 reader.param('UseShmFlag', use_shm_flag)
-reader.param('NodeName', argv[5])
+reader.param('NodeName', argvs[5])
 # reader.param('DumpFileName', 'COPPERdump.dat' )
 
 # Histo Module

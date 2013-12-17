@@ -48,7 +48,7 @@ receiver.param('PortFrom', [int(argvs[2]), int(argvs[2])])
 receiver.param('EventDataBufferWords', 4801)
 receiver.param('MaxTime', -1.)
 receiver.param('MaxEventNum', 5000)
-receiver.param('NodeName', argv[3])
+receiver.param('NodeName', argvs[3])
 # receiver.param('MaxEventNum', -1)
 
 use_shm_flag = int(argvs[1])

@@ -145,7 +145,7 @@ def add_mc_reconstruction(path, components=None):
         or 'CDC' in components:
 
         # find MCTracks in CDC, SVD, and PXD
-        mc_trackfinder = register_module('MCTrackFinder')
+        mc_trackfinder = register_module('TrackFinderMCTruth')
         if components == None or 'PXD' in components:
             mc_trackfinder.param('UsePXDHits', 1)
         if components == None or 'SVD' in components:

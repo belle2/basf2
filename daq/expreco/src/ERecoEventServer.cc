@@ -45,7 +45,7 @@ int ERecoEventServer::server()
 
     // Check connection request
     int exam_stat = m_man->examine();
-    printf("Examine: exam_stat = %d\n", exam_stat);
+    //    printf("Examine: exam_stat = %d\n", exam_stat);
     if (exam_stat == 0) {
       printf("Initial connection request detected!\n");
       //      int fd = recvsock[;

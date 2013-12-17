@@ -64,9 +64,8 @@ bool MsgHandler::add(const TObject* obj, const string& name)
     m_name.push_back(name);
     return true;
   } else {
-    B2INFO("MsgHandler : " << name <<
-           " : size too large " << len  << ", dropped.");
-    //    printf ( "MsgHandler : Skipping %s\n", name.c_str() );
+    B2FATAL("MsgHandler : " << name <<
+            " : size too large (" << len  << " bytes), dropped.");
     return false;
   }
 }

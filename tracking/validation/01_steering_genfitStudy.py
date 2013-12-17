@@ -134,7 +134,7 @@ if svd:
 if cdc:
     cdcDigitizer = register_module('CDCDigitizer')
 
-mctrackfinder = register_module('MCTrackFinder')
+mctrackfinder = register_module('TrackFinderMCTruth')
 mctrackfinder.param('UsePXDHits', pxd)
 mctrackfinder.param('UseSVDHits', svd)
 mctrackfinder.param('UseCDCHits', cdc)

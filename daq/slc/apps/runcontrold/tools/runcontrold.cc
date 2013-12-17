@@ -30,7 +30,8 @@ using namespace Belle2;
 int main(int argc, char** argv)
 {
   std::string configname = (argc > 1) ? argv[1] : "runcontrol";
-  ConfigFile config("slowcontrol", configname);
+  ConfigFile config("slowcontrol");
+  config.read(configname);
   const std::string local_host = config.get("NSM_LOCAL_HOST");
   const int local_port = config.getInt("NSM_LOCAL_PORT");
   const std::string global_host = config.get("NSM_GLOBAL_HOST");

@@ -12,6 +12,7 @@ std::map<std::string, std::string> ConfigFile::__value_m;
 
 void ConfigFile::read(const std::string& filename, bool overload)
 {
+  if (filename.size() == 0) return;
   const char* path = getenv("BELLE2_LOCAL_DIR");
   if (path == NULL) {
     Belle2::debug("[ERROR] Enveriment varialble : BELLE_LOCAL_DIR");
@@ -59,7 +60,6 @@ void ConfigFile::read(const std::string& filename, bool overload)
       if (__value_m.find(label) == __value_m.end()) {
         __value_m.insert(std::map<std::string, std::string>::value_type(label, value));
       } else if (overload) {
-        Belle2::debug("%s %s %s", filename.c_str(), label.c_str(), value.c_str());
         __value_m[label] = value;
       }
     }
@@ -75,6 +75,7 @@ const std::string ConfigFile::get(const std::string& label)
     const char* env = getenv(label.c_str());
     if (env != NULL) {
       std::string value = env;
+      Belle2::debug("%s %s", label.c_str(), value.c_str());
       __value_m.insert(std::map<std::string, std::string>::value_type(label, value));
       return value;
     }

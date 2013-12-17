@@ -94,7 +94,8 @@ void NSMCommunicator::init(const std::string& host, int port) throw(NSMHandlerEx
       }
     }
   }
-  ConfigFile config(_config_name, "slowconttrol", false);
+  ConfigFile config(_config_name, false);
+  config.read("slowcontrol", false);
   std::string rc_name = config.get("RC_NSM_NAME");
   if (rc_name.size() > 0) {
     _rc_node = new NSMNode(rc_name);

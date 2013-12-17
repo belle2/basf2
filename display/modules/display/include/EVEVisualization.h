@@ -246,7 +246,8 @@ namespace Belle2 {
      */
     TEveBox* boxCreator(const TVector3& o, TVector3 u, TVector3 v, float ud, float vd, float depth);
 
-    void makeLines(const genfit::StateOnPlane* prevState, const genfit::StateOnPlane* state, const genfit::AbsTrackRep* rep,
+    /** Create hit visualisation for the given options, and add them to 'eveTrack'. */
+    void makeLines(TEveStraightLineSet* eveTrack, const genfit::StateOnPlane* prevState, const genfit::StateOnPlane* state, const genfit::AbsTrackRep* rep,
                    const Color_t& color, const Style_t& style, bool drawMarkers, bool drawErrors, double lineWidth = 2, int markerPos = 1);
 
     /** enable/disable rendering of the volume 'name', or only its daughters if only_daughters is set. */
@@ -301,7 +302,7 @@ namespace Belle2 {
     TEveTrackList* m_tracklist;
 
     /** parent object for reconstructed tracks. */
-    TEveTrackList* m_gftracklist;
+    TEveElementList* m_gftracklist;
 
     /** parent object for track candidates. */
     TEveTrackList* m_trackcandlist;

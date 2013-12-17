@@ -130,7 +130,7 @@ EVEVisualization::EVEVisualization():
   m_gftrackpropagator->SetMagFieldObj(&m_bfield, false);
   m_gftrackpropagator->SetMaxOrbs(0.01); //stop after track markers
 
-  m_gftracklist = new TEveTrackList("Fitted tracks", m_gftrackpropagator);
+  m_gftracklist = new TEveElementList("Fitted tracks");
   m_gftracklist->IncDenyDestroy();
 
   m_calo3d = new TEveCalo3D(NULL, "ECLHits");
@@ -384,6 +384,17 @@ void EVEVisualization::addTrack(const genfit::Track* track, const TString& label
   const MeasuredStateOnPlane* fittedState(NULL);
   const MeasuredStateOnPlane* prevFittedState(NULL);
 
+  TEveStraightLineSet* eveTrack = new TEveStraightLineSet(label.Data());
+  eveTrack->SetTitle(TString::Format("%s\n"
+                                     "#hits: %u\n",
+                                     //"pT=%.3f, pZ=%.3f\n"
+                                     //"pVal: %e",
+                                     label.Data(), numhits
+                                     //track_mom.Pt(), track_mom.Pz(),
+                                     //TMath::Prob(track->getChiSqu(), track->getNDF())));
+                                    ));
+
+
   for (unsigned int j = 0; j < numhits; j++) { // loop over all hits in the track
 
     TrackPoint* tp = track->getPointWithMeasurement(j);
@@ -489,23 +500,25 @@ void EVEVisualization::addTrack(const genfit::Track* track, const TString& label
         box->SetMainColor(kGray);
       }
       box->SetMainTransparency(50);
-      gEve->AddElement(box);
+      eveTrack->AddElement(box);
     }
     // finished drawing planes ------------------------------------------------------------
 
     // draw track if corresponding option is set ------------------------------------------
     if (j > 0) {
-      makeLines(prevFittedState, fittedState, rep, charge > 0 ? kRed : kBlue, 1, drawMarkers, drawErrors, 3);
+      makeLines(eveTrack, prevFittedState, fittedState, rep, charge > 0 ? kRed : kBlue, 1, drawMarkers, drawErrors, 3.0);
       if (drawErrors) { // make sure to draw errors in both directions
-        makeLines(prevFittedState, fittedState, rep, charge > 0 ? kRed : kBlue, 1, false, drawErrors, 0, 0);
+        makeLines(eveTrack, prevFittedState, fittedState, rep, charge > 0 ? kRed : kBlue, 1, false, drawErrors, 3.0, 0);
       }
+      //these are currently disabled.
+      //TODO: if activated, I want to have a separate TEveStraightLineSet instead of eveTrack (different colors/options)
       if (drawForward_)
-        makeLines(prevFi->getForwardUpdate(), fi->getForwardPrediction(), rep, charge > 0 ? kMagenta : kCyan, 1, drawMarkers, drawErrors, 1, 0);
+        makeLines(eveTrack, prevFi->getForwardUpdate(), fi->getForwardPrediction(), rep, charge > 0 ? kMagenta : kCyan, 1, drawMarkers, drawErrors, 1.0, 0);
       if (drawBackward_)
-        makeLines(prevFi->getBackwardPrediction(), fi->getBackwardUpdate(), rep, charge > 0 ? kYellow : kMagenta, 1, drawMarkers, drawErrors, 1);
+        makeLines(eveTrack, prevFi->getBackwardPrediction(), fi->getBackwardUpdate(), rep, charge > 0 ? kYellow : kMagenta, 1, drawMarkers, drawErrors, 1.0);
       // draw reference track if corresponding option is set ------------------------------------------
       if (drawRefTrack_ && fi->hasReferenceState() && prevFi->hasReferenceState())
-        makeLines(prevFi->getReferenceState(), fi->getReferenceState(), rep, charge > 0 ? kRed + 2 : kBlue + 2, 2, drawMarkers, false, 3);
+        makeLines(eveTrack, prevFi->getReferenceState(), fi->getReferenceState(), rep, charge > 0 ? kRed + 2 : kBlue + 2, 2, drawMarkers, false, 3.0);
     }
 
     // draw detectors if option is set, only important for wire hits ----------------------
@@ -529,7 +542,7 @@ void EVEVisualization::addTrack(const genfit::Track* track, const TString& label
         det_shape->SetMainColor(kCyan);
         det_shape->SetMainTransparency(25);
         if ((drawHits && (hit_u + 0.0105 / 2 > 0)) || !drawHits) {
-          gEve->AddElement(det_shape);
+          eveTrack->AddElement(det_shape);
         }
       }
 
@@ -567,7 +580,7 @@ void EVEVisualization::addTrack(const genfit::Track* track, const TString& label
           hit_box->SetName(TString::Format("SVDRecoHit %u", j));
           hit_box->SetMainColor(kYellow);
           hit_box->SetMainTransparency(0);
-          gEve->AddElement(hit_box);
+          eveTrack->AddElement(hit_box);
         } else {
           // calculate eigenvalues to draw error-ellipse ----------------------------
           TMatrixDEigen eigen_values(hit_cov);
@@ -597,7 +610,7 @@ void EVEVisualization::addTrack(const genfit::Track* track, const TString& label
 
           cov_shape->SetMainColor(kYellow);
           cov_shape->SetMainTransparency(0);
-          gEve->AddElement(cov_shape);
+          eveTrack->AddElement(cov_shape);
         }
       }
       // finished drawing planar hits ---------------------------------------------------
@@ -640,7 +653,7 @@ void EVEVisualization::addTrack(const genfit::Track* track, const TString& label
 
         cov_shape->SetMainColor(kYellow);
         cov_shape->SetMainTransparency(10);
-        gEve->AddElement(cov_shape);
+        eveTrack->AddElement(cov_shape);
       }
       // finished drawing spacepoint hits -----------------------------------------------
 
@@ -668,7 +681,7 @@ void EVEVisualization::addTrack(const genfit::Track* track, const TString& label
 
         cov_shape->SetMainColor(kYellow);
         cov_shape->SetMainTransparency(50);
-        gEve->AddElement(cov_shape);
+        eveTrack->AddElement(cov_shape);
       }
       // finished drawing wire hits -----------------------------------------------------
     }
@@ -677,6 +690,7 @@ void EVEVisualization::addTrack(const genfit::Track* track, const TString& label
     prevFittedState = fittedState;
 
   }
+  m_gftracklist->AddElement(eveTrack);
 }
 
 TEveBox* EVEVisualization::boxCreator(const TVector3& o, TVector3 u, TVector3 v, float ud, float vd, float depth)
@@ -704,7 +718,7 @@ TEveBox* EVEVisualization::boxCreator(const TVector3& o, TVector3 u, TVector3 v,
   return box;
 }
 
-void EVEVisualization::makeLines(const genfit::StateOnPlane* prevState, const genfit::StateOnPlane* state, const genfit::AbsTrackRep* rep,
+void EVEVisualization::makeLines(TEveStraightLineSet* eveTrack, const genfit::StateOnPlane* prevState, const genfit::StateOnPlane* state, const genfit::AbsTrackRep* rep,
                                  const Color_t& color, const Style_t& style, bool drawMarkers, bool drawErrors, double lineWidth, int markerPos)
 {
   using namespace genfit;
@@ -721,22 +735,23 @@ void EVEVisualization::makeLines(const genfit::StateOnPlane* prevState, const ge
     distB *= -1.;
   TVector3 intermediate1 = oldPos + 0.3 * distA * oldDir;
   TVector3 intermediate2 = pos - 0.3 * distB * dir;
-  TEveStraightLineSet* ls = new TEveStraightLineSet;
-  ls->AddLine(oldPos(0), oldPos(1), oldPos(2), intermediate1(0), intermediate1(1), intermediate1(2));
-  ls->AddLine(intermediate1(0), intermediate1(1), intermediate1(2), intermediate2(0), intermediate2(1), intermediate2(2));
-  ls->AddLine(intermediate2(0), intermediate2(1), intermediate2(2), pos(0), pos(1), pos(2));
-  ls->SetLineColor(color);
-  ls->SetLineStyle(style);
-  ls->SetLineWidth(lineWidth);
+  eveTrack->AddLine(oldPos(0), oldPos(1), oldPos(2), intermediate1(0), intermediate1(1), intermediate1(2));
+  eveTrack->AddLine(intermediate1(0), intermediate1(1), intermediate1(2), intermediate2(0), intermediate2(1), intermediate2(2));
+  eveTrack->AddLine(intermediate2(0), intermediate2(1), intermediate2(2), pos(0), pos(1), pos(2));
+  eveTrack->SetLineColor(color);
+  eveTrack->SetLineStyle(style);
+  eveTrack->SetLineWidth(lineWidth);
   if (drawMarkers) {
     if (markerPos == 0)
-      ls->AddMarker(oldPos(0), oldPos(1), oldPos(2));
+      eveTrack->AddMarker(oldPos(0), oldPos(1), oldPos(2));
     else
-      ls->AddMarker(pos(0), pos(1), pos(2));
+      eveTrack->AddMarker(pos(0), pos(1), pos(2));
   }
 
-  if (lineWidth > 0)
-    gEve->AddElement(ls);
+  /* what to do with this?
+    if (lineWidth > 0)
+      gEve->AddElement(ls);
+      */
 
 
   if (drawErrors) {
@@ -891,7 +906,7 @@ void EVEVisualization::makeLines(const genfit::StateOnPlane* prevState, const ge
 
       error_shape->SetMainColor(color);
       error_shape->SetMainTransparency(25);
-      gEve->AddElement(error_shape);
+      eveTrack->AddElement(error_shape);
     }
   }
 }
@@ -1097,8 +1112,6 @@ void EVEVisualization::makeTracks()
       m.SetMarkerSize(1); //ignored.
       m_gftrackpropagator->RefPMAtt() = m;
       m_gftrackpropagator->RefFVAtt() = m;
-    } else if (m_options.at(i) == 'T') {
-      m_gftracklist->SetRnrLine(true);
     }
   }
   gEve->AddElement(m_gftracklist);

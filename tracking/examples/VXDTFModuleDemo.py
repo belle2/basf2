@@ -14,7 +14,7 @@ secSetup = ['sectorList_evtNormSecHIGH_SVD', 'sectorList_evtNormSecMED_SVD',
             'sectorList_evtNormSecLOW_SVD']
 
 # secSetup = ['sectorList_evtNormSecHIGH_VXD', 'sectorList_evtNormSecMED_VXD', 'sectorList_evtNormSecLOW_VXD']
-# WARNING if you want to use SVD only, please uncomment secSetup ending with SVD, then comment the VXD-version - and don't forget to set the clusters for the detector type you want in the mcTrackFinder down below!
+# WARNING if you want to use SVD only, please uncomment secSetup ending with SVD, then comment the VXD-version - and don't forget to set the clusters for the detector type you want in the TrackFinderMCTruth down below!
 
 print 'running {events:} events, Seed {theSeed:} - evtGen No BG'.format(events=numEvents,
         theSeed=initialValue)
@@ -59,10 +59,10 @@ param_vxdtf = {'sectorSetup': secSetup}
 # , 'calcQIType': 'kalman'
 vxdtf.param(param_vxdtf)
 
-mctrackfinder = register_module('MCTrackFinder')
-mctrackfinder.logging.log_level = LogLevel.INFO
+track_finder_mc_truth = register_module('TrackFinderMCTruth')
+track_finder_mc_truth.logging.log_level = LogLevel.INFO
 # select which detectors you would like to use
-param_mctrackfinder = {
+param_track_finder_mc_truth = {
     'UseCDCHits': 0,
     'UseSVDHits': 1,
     'UsePXDHits': 0,
@@ -70,7 +70,7 @@ param_mctrackfinder = {
     'WhichParticles': ['primary'],
     'GFTrackCandidatesColName': 'mcTracks',
     }
-mctrackfinder.param(param_mctrackfinder)
+track_finder_mc_truth.param(param_track_finder_mc_truth)
 
 eventCounter = register_module('EventCounter')
 eventCounter.logging.log_level = LogLevel.INFO
@@ -100,7 +100,7 @@ main.add_module(pxdClusterizer)
 main.add_module(svdDigitizer)
 main.add_module(svdClusterizer)
 main.add_module(vxdtf)
-main.add_module(mctrackfinder)
+main.add_module(track_finder_mc_truth)
 main.add_module(analyzer)
 # Process events
 process(main)

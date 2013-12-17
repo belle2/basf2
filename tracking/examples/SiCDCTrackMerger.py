@@ -50,7 +50,7 @@ g4sim.logging.log_level = LogLevel.ERROR
 # digitizer
 cdcDigitizer = register_module('CDCDigitizer')
 
-si_mctrackfinder = register_module('MCTrackFinder')
+si_mctrackfinder = register_module('TrackFinderMCTruth')
 si_mctrackfinder.logging.log_level = LogLevel.WARNING
 
 # select which detectors you would like to use
@@ -66,7 +66,7 @@ si_mctrackfinder_param = {  # ---        'MinimalNDF': 6,
         # 'forceExisting2DClusters4SVD': 0
 si_mctrackfinder.param(si_mctrackfinder_param)
 
-cdc_mctrackfinder = register_module('MCTrackFinder')
+cdc_mctrackfinder = register_module('TrackFinderMCTruth')
 cdc_mctrackfinder.logging.log_level = LogLevel.WARNING
 
 # select which detectors you would like to use

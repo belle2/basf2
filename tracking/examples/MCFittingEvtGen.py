@@ -16,7 +16,7 @@
 # For the PXD and SVD currently the TrueHits are used (created directly by the
 # sensitive detector), will be replaced by realistic clusters later on.
 #
-# MCTrackFinder creates relations between MCParticles and CDCHits/PXDTrueHits/
+# TrackFinderMCTruth creates relations between MCParticles and CDCHits/PXDTrueHits/
 # SVDTrueHits produced by it. GenFitter fits the found MCTracks and created two
 # track collections: GFTracks (Genfit class) and Tracks (class with helix
 # parametrization)
@@ -52,7 +52,7 @@ evtgeninput.param('boost2LAB', True)
 #
 # simulation
 g4sim = register_module('FullSim')
-# this is need for the MCTrackFinder to work correctly
+# this is need for the TrackFinderMCTruth to work correctly
 g4sim.param('StoreAllSecondaries', True)
 # make the simulation less noisy
 g4sim.logging.log_level = LogLevel.ERROR
@@ -61,27 +61,27 @@ g4sim.logging.log_level = LogLevel.ERROR
 cdcDigitizer = register_module('CDCDigitizer')
 
 # find MCTracks
-mctrackfinder = register_module('MCTrackFinder')
+track_finder_mc_truth = register_module('TrackFinderMCTruth')
 
 # select which detectors you would like to use
-param_mctrackfinder = {
+param_track_finder_mc_truth = {
     'UseCDCHits': 1,
     'UseSVDHits': 1,
     'UsePXDHits': 1,
     'UseClusters': False,
     }
-mctrackfinder.param(param_mctrackfinder)
+track_finder_mc_truth.param(param_track_finder_mc_truth)
 # select which particles to use, here as example: only particles which created
 # hits in all tracking detectors (PXD, SVD and CDC) but do not have to be
 # marked as primary
-mctrackfinder.param('WhichParticles', ['PXD', 'SVD', 'CDC'])
+track_finder_mc_truth.param('WhichParticles', ['PXD', 'SVD', 'CDC'])
 
 # fitting
 trackfitting = register_module('GenFitter')
 
 # fit the tracks with one iteration of Kalman filter
 # 'PDGCodes': [] means use the pdgCodes from
-# the MCTrackFinder wich are the correct ones
+# the TrackFinderMCTruth wich are the correct ones
 param_trackfitting = {
     'StoreFailedTracks': 0,
     'FilterId': 0,
@@ -107,7 +107,7 @@ main.add_module(geometry)
 main.add_module(evtgeninput)
 main.add_module(g4sim)
 main.add_module(cdcDigitizer)
-main.add_module(mctrackfinder)
+main.add_module(track_finder_mc_truth)
 main.add_module(trackfitting)
 main.add_module(output)
 

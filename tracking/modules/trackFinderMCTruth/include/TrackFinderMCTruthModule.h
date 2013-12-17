@@ -29,7 +29,7 @@ namespace Belle2 {
    *
    *  @todo: maybe the asingment of planeIds and the true timing information is not 100 % accurate in every use case
    */
-  class MCTrackFinderModule : public Module {
+  class TrackFinderMCTruthModule : public Module {
 
   public:
     /**
@@ -37,10 +37,10 @@ namespace Belle2 {
      *
      * Sets the description of the module.
      */
-    MCTrackFinderModule();
+    TrackFinderMCTruthModule();
 
     /** Destructor of the module. */
-    ~MCTrackFinderModule();
+    ~TrackFinderMCTruthModule();
 
     /** Initialize the Module.
      * This method is called only once before the actual event processing starts.

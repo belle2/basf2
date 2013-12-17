@@ -35,7 +35,7 @@ pGun.param({
     'zVertexParams': [0.0, 0.0],
     })
 g4sim = register_module('FullSim')
-g4sim.param('StoreAllSecondaries', True)  # this is need for the MCTrackFinder to work correctly
+g4sim.param('StoreAllSecondaries', True)  # this is need for the TrackFinderMCTruth to work correctly
 SVDDIGI = register_module('SVDDigitizer')
 # SVDDIGI.logging.log_level = LogLevel.DEBUG
 SVDCLUST = register_module('SVDClusterizer')
@@ -45,15 +45,15 @@ PXDDIGI = register_module('PXDDigitizer')
 # PXDDIGI.logging.log_level = LogLevel.DEBUG
 PXDCLUST = register_module('PXDClusterizer')
 # PXDCLUST.param("AssumeSorted", False)
-mctrackfinder = register_module('MCTrackFinder')
-mctrackfinder.logging.log_level = LogLevel.WARNING
-param_mctrackfinder = {
+track_finder_mc_truth = register_module('TrackFinderMCTruth')
+track_finder_mc_truth.logging.log_level = LogLevel.WARNING
+param_track_finder_mc_truth = {
     'UseCDCHits': 0,
     'UseSVDHits': 1,
     'UsePXDHits': 1,
     'Smearing': 0,
     }
-mctrackfinder.param(param_mctrackfinder)
+track_finder_mc_truth.param(param_track_finder_mc_truth)
 
 # mctrackfinder.logging.log_level = LogLevel.DEBUG
 
@@ -80,7 +80,7 @@ main.add_module(PXDDIGI)
 main.add_module(PXDCLUST)
 main.add_module(SVDDIGI)
 main.add_module(SVDCLUST)
-main.add_module(mctrackfinder)
+main.add_module(track_finder_mc_truth)
 main.add_module(trackfitter)
 main.add_module(trackfitchecker)
 # Process events

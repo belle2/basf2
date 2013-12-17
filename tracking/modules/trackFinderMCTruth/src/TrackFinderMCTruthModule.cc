@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/modules/mctrackfinder/MCTrackFinderModule.h>
+#include <tracking/modules/trackFinderMCTruth/TrackFinderMCTruthModule.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
@@ -46,13 +46,13 @@ using boost::math::sign;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(MCTrackFinder)
+REG_MODULE(TrackFinderMCTruth)
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-MCTrackFinderModule::MCTrackFinderModule() : Module()
+TrackFinderMCTruthModule::TrackFinderMCTruthModule() : Module()
 {
   //Set module properties
   setDescription("Uses the MC information to create genfit::TrackCandidates for primary MCParticles and Relations between them.  Fills the created genfit::TrackCandidates with all information (start values, hit indices) needed for the fitting.");
@@ -88,13 +88,13 @@ MCTrackFinderModule::MCTrackFinderModule() : Module()
 }
 
 
-MCTrackFinderModule::~MCTrackFinderModule()
+TrackFinderMCTruthModule::~TrackFinderMCTruthModule()
 {
 
 }
 
 
-void MCTrackFinderModule::initialize()
+void TrackFinderMCTruthModule::initialize()
 {
   StoreArray<MCParticle>::required();
 
@@ -158,7 +158,7 @@ void MCTrackFinderModule::initialize()
 
 }
 
-void MCTrackFinderModule::beginRun()
+void TrackFinderMCTruthModule::beginRun()
 {
   m_notEnoughtHitsCounter = 0;
   m_noTrueHitCounter = 0;
@@ -166,7 +166,7 @@ void MCTrackFinderModule::beginRun()
 }
 
 
-void MCTrackFinderModule::event()
+void TrackFinderMCTruthModule::event()
 {
   StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
   const int eventCounter = eventMetaDataPtr->getEvent();
@@ -605,7 +605,7 @@ void MCTrackFinderModule::event()
   }//end loop over MCParticles
 }
 
-void MCTrackFinderModule::endRun()
+void TrackFinderMCTruthModule::endRun()
 {
   if (m_notEnoughtHitsCounter != 0) {
     B2WARNING(m_notEnoughtHitsCounter << " tracks had not enough hits to have at least " << m_minimalNdf << " number of degrees of freedom (NDF). No Track Candidates were created from them so they will not be passed to the track fitter");
@@ -616,6 +616,6 @@ void MCTrackFinderModule::endRun()
   B2INFO("The MCTrackFinder created a total of " << m_nTrackCands << " track candidates")
 }
 
-void MCTrackFinderModule::terminate()
+void TrackFinderMCTruthModule::terminate()
 {
 }

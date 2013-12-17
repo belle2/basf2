@@ -7,7 +7,7 @@
 # and perfoms the PXD Data Reduction based on the reconstruction of tracks from SVD-only.
 #
 # After registering the modules needed for the simulation of the detector, the
-# simulation of the event and the reconstruction of the tracks (MCTrackFinder)
+# simulation of the event and the reconstruction of the tracks (TrackFinderMCTruth)
 # we add the PXD Data Reduction Module (PXDDataReduction) and
 # the module that performs the analysis of the PXDDataReduction module performance
 # (PXdDaraRedAnalysis)
@@ -42,12 +42,12 @@ geometry.param('Components', ['MagneticField', 'PXD', 'SVD'])
 g4sim = register_module('FullSim')
 g4sim.param('StoreAllSecondaries', True)
 
-mctrackfinder = register_module('MCTrackFinder')
-mctrackfinder.logging.log_level = LogLevel.INFO
-mctrackfinder.logging.debug_level = 101
+track_finder_mc_truth = register_module('TrackFinderMCTruth')
+track_finder_mc_truth.logging.log_level = LogLevel.INFO
+track_finder_mc_truth.logging.debug_level = 101
 
 # select which detectors you would like to use
-param_mctrackfinder = {
+param_track_finder_mc_truth = {
     'UseCDCHits': 0,
     'UseSVDHits': 1,
     'UsePXDHits': 0,
@@ -56,7 +56,7 @@ param_mctrackfinder = {
     'WhichParticles': ['PXD', 'SVD'],
     'GFTrackCandidatesColName': 'mcTracks',
     }
-mctrackfinder.param(param_mctrackfinder)
+track_finder_mc_truth.param(param_track_finder_mc_truth)
 
 eventCounter = register_module('EventCounter')
 eventCounter.logging.log_level = LogLevel.INFO
@@ -105,7 +105,7 @@ main.add_module(pxdDigitizer)
 main.add_module(pxdClusterizer)
 main.add_module(svdDigitizer)
 main.add_module(svdClusterizer)
-main.add_module(mctrackfinder)
+main.add_module(track_finder_mc_truth)
 main.add_module(pxdDataRed)
 main.add_module(pxdDataRedAnalysis)
 main.add_module(rootOutput)

@@ -37,22 +37,22 @@ param_pGun = {
     # 'yVertexParams': [0.0, vertexStd], 'zVertexParams': [0.0, vertexStd],
 pGun.param(param_pGun)
 g4sim = register_module('FullSim')
-# this is need for the MCTrackFinder to work correctly
+# this is need for the TrackFinderMCTruth to work correctly
 g4sim.param('StoreAllSecondaries', True)
 
 # digitizer
 cdcDigitizer = register_module('CDCDigitizer')
 
 # find MC tracks
-mctrackfinder = register_module('MCTrackFinder')
-param_mctrackfinder = {
+track_finder_mc_truth = register_module('TrackFinderMCTruth')
+param_track_finder_mc_truth = {
     'UseCDCHits': 1,
     'UseSVDHits': 1,
     'UsePXDHits': 1,
     'Smearing': 0,
     'UseClusters': False,
     }
-mctrackfinder.param(param_mctrackfinder)
+track_finder_mc_truth.param(param_track_finder_mc_truth)
 trackfitter = register_module('GenFitter')
 
 trackfitter.logging.log_level = LogLevel.WARNING
@@ -107,7 +107,7 @@ main.add_module(geometry)
 main.add_module(pGun)
 main.add_module(g4sim)
 main.add_module(cdcDigitizer)
-main.add_module(mctrackfinder)
+main.add_module(track_finder_mc_truth)
 main.add_module(trackfitter)
 main.add_module(trackfitchecker)
 main.add_module(vertexer)

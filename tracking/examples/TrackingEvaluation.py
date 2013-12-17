@@ -24,7 +24,7 @@
 # CDCDigitizer creates the detecotor response in the CDC for the simulated
 # Hits.
 #
-# MCTrackFinder creates relations between MCParticles and
+# TrackFinderMCTruth creates relations between MCParticles and
 # CDCHits/PXDTrueHits/SVDTrueHits produced by it. CDCTracking performs pattern
 # recognition in the CDC based on conformal algorithm. GFTrackCandidates with
 # corresponding hit indices and start values are created. GenFitter fits the
@@ -84,21 +84,21 @@ pGun.param(param_pGun)
 g4sim = register_module('FullSim')
 # make simulation less noisy
 g4sim.logging.log_level = LogLevel.ERROR
-g4sim.param('StoreAllSecondaries', True)  # this is need for the MCTrackFinder to work correctly
+g4sim.param('StoreAllSecondaries', True)  # this is need for the TrackFinderMCTruth to work correctly
 # digitizer
 cdcDigitizer = register_module('CDCDigitizer')
 
 # find MCTracks
-mctrackfinder = register_module('MCTrackFinder')
+track_finder_mc_truth = register_module('TrackFinderMCTruth')
 
 # select which detectors you would like to use and select which particles to use: primary particles
-param_mctrackfinder = {
+param_track_finder_mc_truth = {
     'UseCDCHits': 1,
     'UseSVDHits': 0,
     'UsePXDHits': 0,
     'WhichParticles': ['primary'],
     }
-mctrackfinder.param(param_mctrackfinder)
+track_finder_mc_truth.param(param_track_finder_mc_truth)
 
 # fitting of MCTracks
 mcfitting = register_module('GenFitter')
@@ -165,7 +165,7 @@ main.add_module(geometry)
 main.add_module(pGun)
 main.add_module(g4sim)
 main.add_module(cdcDigitizer)
-main.add_module(mctrackfinder)
+main.add_module(track_finder_mc_truth)
 main.add_module(mcfitting)
 main.add_module(cdctracking)
 main.add_module(mcmatching)

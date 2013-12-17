@@ -42,7 +42,7 @@ param_pGun = {  # this angle is only there to prevent curlers
     }
 pGun.param(param_pGun)
 g4sim = register_module('FullSim')
-g4sim.param('StoreAllSecondaries', True)  # this is need for the MCTrackFinder to work correctly
+g4sim.param('StoreAllSecondaries', True)  # this is need for the TrackFinderMCTruth to work correctly
 g4sim.param('UICommands', [  # "/process/inactivate     Transportation",
                              # "/process/inactivate            nKiller",
                              # "/process/inactivate G4ErrorStepLengthLimit",
@@ -109,14 +109,14 @@ g4sim.param('UICommands', [  # "/process/inactivate     Transportation",
     ])
 # "/process/inactivate        StepLimiter"
 
-mctrackfinder = register_module('MCTrackFinder')
-param_mctrackfinder = {
+track_finder_mc_truth = register_module('TrackFinderMCTruth')
+param_track_finder_mc_truth = {
     'UseCDCHits': 0,
     'UseSVDHits': 1,
     'UsePXDHits': 1,
     'Smearing': 0,
     }
-mctrackfinder.param(param_mctrackfinder)
+track_finder_mc_truth.param(param_track_finder_mc_truth)
 trackfitter = register_module('GenFitter2')
 trackfitter.logging.log_level = LogLevel.WARNING
 trackfitter.param('energyLossBetheBloch', False)
@@ -148,7 +148,7 @@ main.add_module(gearbox)
 main.add_module(geometry)
 main.add_module(pGun)
 main.add_module(g4sim)
-main.add_module(mctrackfinder)
+main.add_module(track_finder_mc_truth)
 main.add_module(trackfitter)
 main.add_module(trackfitchecker)
 

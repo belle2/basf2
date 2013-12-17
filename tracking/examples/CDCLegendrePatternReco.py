@@ -113,7 +113,7 @@ geometry.param('Components', ['MagneticField', 'BeamPipe', 'PXD', 'SVD', 'CDC'
 # ---------------------------------------------------------------
 # simulation
 g4sim = register_module('FullSim')
-g4sim.param('StoreAllSecondaries', True)  # this is need for the MCTrackFinder to work correctly
+g4sim.param('StoreAllSecondaries', True)  # this is need for the TrackFinderMCTruth to work correctly
 g4sim.logging.log_level = LogLevel.ERROR
 
 # param_g4sim = {'RegisterOptics': 1, 'PhotonFraction': 0.3,
@@ -144,11 +144,11 @@ param_cdctracking = {
     }
 cdctracking.param(param_cdctracking)
 
-mctrackfinder = register_module('MCTrackFinder')
+track_finder_mc_truth = register_module('TrackFinderMCTruth')
 
 # select which detectors you would like to use
 # select which detectors you would like to use and select which particles to use: primary particles
-param_mctrackfinder = {
+param_track_finder_mc_truth = {
     'WhichParticles': ['primary'],
     'EnergyCut': 0.1,
     'Neutrals': 0,
@@ -157,9 +157,9 @@ param_mctrackfinder = {
     'UsePXDHits': 1,
     'UseClusters': False,
     }
-mctrackfinder.param(param_mctrackfinder)
+track_finder_mc_truth.param(param_track_finder_mc_truth)
 
-mctrackfinder = register_module('MCTrackFinder')
+track_finder_mc_truth = register_module('TrackFinderMCTruth')
 
 # ---------------------------------------------------------------
 # match the found track candidates with MCParticles
@@ -216,7 +216,7 @@ else:
     main.add_module(gearbox)
 
 if options.mcTracking:
-    main.add_module(mctrackfinder)
+    main.add_module(track_finder_mc_truth)
 else:
     main.add_module(cdctracking)
 

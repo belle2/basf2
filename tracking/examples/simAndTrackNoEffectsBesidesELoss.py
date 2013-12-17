@@ -36,7 +36,7 @@ param_pGun = {  # this angle is only there to prevent curlers
     }
 pGun.param(param_pGun)
 g4sim = register_module('FullSim')
-g4sim.param('StoreAllSecondaries', True)  # this is need for the MCTrackFinder to work correctly
+g4sim.param('StoreAllSecondaries', True)  # this is need for the TrackFinderMCTruth to work correctly
 # in this example I am switching off the effects only for Muons because energy
 # loss for Muons is still active which means they still produce secondary
 # particles in the detector. If these particles also do not have any effects
@@ -171,22 +171,22 @@ g4sim.param('UICommands', [  # "/process/inactivate     Transportation mu+",
     '/process/inactivate           Cerenkov mu-',
     '/process/inactivate      Scintillation mu-',
     ])
-g4sim.param('StoreAllSecondaries', True)  # this is need for the MCTrackFinder to work correctly
+g4sim.param('StoreAllSecondaries', True)  # this is need for the TrackFinderMCTruth to work correctly
 # "/process/inactivate        StepLimiter mu-"
 #
 # digitizer
 cdcDigitizer = register_module('CDCDigitizer')
 
-# mctrackfinder
-mctrackfinder = register_module('MCTrackFinder')
-param_mctrackfinder = {
+# TrackFinderMCTruth
+track_finder_mc_truth = register_module('TrackFinderMCTruth')
+param_track_finder_mc_truth = {
     'UseCDCHits': 1,
     'UseSVDHits': 1,
     'UsePXDHits': 1,
     'Smearing': 0,
     }
-mctrackfinder.param(param_mctrackfinder)
-# mctrackfinder.logging.log_level = LogLevel.WARNING
+track_finder_mc_truth.param(param_track_finder_mc_truth)
+# track_finder_mc_truth.logging.log_level = LogLevel.WARNING
 
 trackfitter = register_module('GenFitter2')
 trackfitter.logging.log_level = LogLevel.WARNING
@@ -218,7 +218,7 @@ main.add_module(geometry)
 main.add_module(pGun)
 main.add_module(g4sim)
 main.add_module(cdcDigitizer)
-main.add_module(mctrackfinder)
+main.add_module(track_finder_mc_truth)
 main.add_module(trackfitter)
 main.add_module(trackfitchecker)
 

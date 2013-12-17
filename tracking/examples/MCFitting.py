@@ -16,7 +16,7 @@
 # For the PXD and SVD currently the TrueHits are used (created directly by the
 # sensitive detector), will be replaced by realistic clusters later on.
 #
-# MCTrackFinder creates relations between MCParticles and CDCHits/PXDTrueHits
+# TrackFinderMCTruth creates relations between MCParticles and CDCHits/PXDTrueHits
 # /SVDTrueHits produced by it. GenFitter fits the found MCTracks and created
 # two track collections: GFTracks (Genfit class) and Tracks (class with helix
 # parametrization)
@@ -70,7 +70,7 @@ pGun.param(param_pGun)
 
 # simulation
 g4sim = register_module('FullSim')
-# this is needed for the MCTrackFinder to work correctly
+# this is needed for the TrackFinderMCTruth to work correctly
 g4sim.param('StoreAllSecondaries', True)
 # make the simulation less noisy
 g4sim.logging.log_level = LogLevel.ERROR
@@ -79,17 +79,17 @@ g4sim.logging.log_level = LogLevel.ERROR
 cdcDigitizer = register_module('CDCDigitizer')
 
 # find MCTracks
-mctrackfinder = register_module('MCTrackFinder')
+track_finder_mc_truth = register_module('TrackFinderMCTruth')
 
 # select which detectors you would like to use
-param_mctrackfinder = {  # select which particles to use: primary particles
+param_track_finder_mc_truth = {  # select which particles to use: primary particles
     'UseCDCHits': 1,
     'UseSVDHits': 1,
     'UsePXDHits': 1,
     'UseClusters': False,
     'WhichParticles': ['primary'],
     }
-mctrackfinder.param(param_mctrackfinder)
+track_finder_mc_truth.param(param_track_finder_mc_truth)
 
 # fitting
 cdcfitting = register_module('GenFitter')
@@ -119,7 +119,7 @@ main.add_module(geometry)
 main.add_module(pGun)
 main.add_module(g4sim)
 main.add_module(cdcDigitizer)
-main.add_module(mctrackfinder)
+main.add_module(track_finder_mc_truth)
 main.add_module(cdcfitting)
 main.add_module(output)
 

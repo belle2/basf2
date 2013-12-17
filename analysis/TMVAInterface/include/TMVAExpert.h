@@ -58,10 +58,10 @@ namespace Belle2 {
     float analyse(const Particle*);
 
   private:
-    float* m_inputProxy;
-    std::string m_method;
-    TMVA::Reader* m_reader;
-    std::vector<const VariableManager::Var*> m_input;
+    float* m_inputProxy; /**< Used to store the input data for the TMVA method */
+    std::string m_method; /**< The TMVA method */
+    TMVA::Reader* m_reader; /**< TMVA::Reader steers the booked TMVA method */
+    std::vector<const VariableManager::Var*> m_input; /**< Pointers to the input variables */
   };
 
 }

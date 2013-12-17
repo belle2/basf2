@@ -79,14 +79,14 @@ namespace Belle2 {
     std::string m_identifierName; /**< identifier name for the TFile where the hists are stored */
     std::string m_truth_variable; /**< the name of the truth variable which determines if given Particle is signal or background */
     std::vector< Range> m_hist_variables; /**< the name and range of the variables, for which the signal and background distrbution is determined */
-    bool m_make2dHists;
+    bool m_make2dHists; /**< If true, 2D Histograms are generated for all pairs of input variables */
 
-    std::map< std::string, std::vector< SBHists > > m_hists;
-    std::map< std::string, std::vector< SBHists > > m_hists2d;
-    std::vector< const VariableManager::Var* > m_variables;
-    std::vector< float > m_values;
-    const VariableManager::Var* m_truth;
-    TFile* m_outputFile;
+    std::map< std::string, std::vector< SBHists > > m_hists; /**< Map of listName to vector of Signal/BackgroundHistogramms for the input variables */
+    std::map< std::string, std::vector< SBHists > > m_hists2d; /**<  Map of listName to vector of Signal/BackgroundHistogramms  for all pairs of input variables */
+    std::vector< const VariableManager::Var* > m_variables; /**< Pointers to the input variables */
+    std::vector< float > m_values; /**< Vector for saving the current values of the input variables */
+    const VariableManager::Var* m_truth; /**< Pointer to the truth variables: >0.5 is signal, <0.5 is background */
+    TFile* m_outputFile; /**< The output file stores all generated histograms */
 
   };
 

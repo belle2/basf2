@@ -64,6 +64,8 @@ namespace Belle2 {
 
     /** Register a variable. */
     void registerVariable(const std::string& name, VariableManager::FunctionPtr f, const std::string& description);
+
+    /** Register a variable stored in the related ParticleInfo of a Particle */
     void registerParticleInfoVariable(const std::string& name, const std::string& description, bool allowMultipleRegistrations = false);
 
 

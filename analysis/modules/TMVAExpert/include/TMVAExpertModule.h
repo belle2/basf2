@@ -73,7 +73,7 @@ namespace Belle2 {
     std::string m_methodName; /**< used multivariate analysis method */
     std::string m_identifierName; /**< identifier name for the files created by the TMVA method */
     std::string m_targetName /**< the name of the target variable which is stored in the ParticleInfo */;
-    TMVAExpert* m_method;
+    TMVAExpert* m_method; /**< Method used to calculate the target variable */
 
   };
 

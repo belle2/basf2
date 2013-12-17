@@ -69,11 +69,11 @@ namespace Belle2 {
     void train();
 
   private:
-    std::map<std::string, std::string> m_methods;
-    TMVA::Factory* m_factory;
-    TFile* m_outputFile;
-    std::vector<const VariableManager::Var*> m_input;
-    const VariableManager::Var* m_target;
+    std::map<std::string, std::string> m_methods; /**< Name and Config of methods */
+    TMVA::Factory* m_factory; /**< TMVA::Factory steers the booked methods */
+    TFile* m_outputFile; /**< Output file which stores the generated histogramms */
+    std::vector<const VariableManager::Var*> m_input; /**< Pointers to the input variables */
+    const VariableManager::Var* m_target; /**< Pointer to the target variable */
   };
 }
 

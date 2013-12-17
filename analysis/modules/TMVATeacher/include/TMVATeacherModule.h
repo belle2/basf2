@@ -74,7 +74,7 @@ namespace Belle2 {
     std::string m_identifierName; /**< identifier name for the files created by the TMVA method */
     std::string m_factoryOption; /**< Options which are passed to the TMVA Factory */
 
-    TMVATeacher* m_method;
+    TMVATeacher* m_method; /**< Used TMVA method */
 
   };
 

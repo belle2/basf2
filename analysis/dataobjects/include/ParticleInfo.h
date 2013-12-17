@@ -56,7 +56,7 @@ namespace Belle2 {
 
   private:
 
-    std::map<std::string, float> m_variables;
+    std::map<std::string, float> m_variables;  /**< map which holds the values for every variable */
 
     ClassDef(ParticleInfo, 1)
 

@@ -211,7 +211,7 @@ int DataStoreStreamer::queueEvtMessage(char* evtbuf)
 {
   // EOF case
   if (evtbuf == NULL) {
-    printf("queueEvtMessage : NULL evtbuf detected. %8.8x \n", evtbuf);
+    printf("queueEvtMessage : NULL evtbuf detected. \n");
     for (int i = 0; i < m_maxthread; i++) {
       while (m_evtbuf[i].size() >= MAXQUEUEDEPTH) usleep(10);
       m_evtbuf[m_threadin].push(evtbuf);
@@ -260,7 +260,7 @@ void* DataStoreStreamer::decodeEvtMessage(int id)
 
     // In case of EOF
     if (evtbuf == NULL) {
-      printf("decodeEvtMessage: NULL evtbuf detected %8.8x, nq = %d\n", evtbuf, nqueue);
+      printf("decodeEvtMessage: NULL evtbuf detected, nq = %d\n", nqueue);
       m_nobjs.push(-1);
       return NULL;
     }

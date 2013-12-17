@@ -29,7 +29,7 @@ namespace Belle2 {
 
   /**
    * Python object converter utilities namespace.
-   * Provides Templates for converting python objects to c++ objects and the other way round.
+   * Provides templates for converting python objects to c++ objects and the other way round.
    *
    * This is done by using the type of the value provided by the module as a template parameter.
    * Hence the compiler can infer which converter should be used.
@@ -37,8 +37,8 @@ namespace Belle2 {
    */
   namespace PyObjConvUtils {
 
-    /**
-     * We need Forward Declarations here, because otherwise the compiler ends up calling
+    /*
+     * We need forward declarations here, because otherwise the compiler ends up calling
      * the wrong function!
      */
     template<typename Scalar>
@@ -58,6 +58,10 @@ namespace Belle2 {
     template<typename... Types>
     boost::python::tuple convertToPythonObject(const std::tuple<Types...>& tuple);
 
+    /**
+     * @{
+     * Testing doxygen.
+     */
     template<typename T> struct Type;
     template<typename T> struct Type<std::vector<T> >;
     template<typename A, typename B> struct Type<std::map<A, B> >;
@@ -67,6 +71,7 @@ namespace Belle2 {
     template<> struct Type<float>;
     template<> struct Type<double>;
     template<> struct Type<std::string>;
+    /** @} */
 
     /**
      * @{

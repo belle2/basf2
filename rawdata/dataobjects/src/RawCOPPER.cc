@@ -11,6 +11,8 @@
 using namespace std;
 using namespace Belle2;
 
+#define NO_DATA_CHECK
+
 ClassImp(RawCOPPER);
 
 RawCOPPER::RawCOPPER()
@@ -864,6 +866,52 @@ unsigned int RawCOPPER::FillTopBlockRawHeader(unsigned int m_node_id, unsigned i
 //     exit(-1);
 //   }
 // #endif
+
+#ifndef NO_DATA_CHECK
+
+  int* fpga_trailer_magic = trl - 3;
+  int* driver_trailer_magic = trl - 1;
+  int err_flag = 0;
+  if (copper_buf[ POS_MAGIC_COPPER_1 ] != COPPER_MAGIC_DRIVER_HEADER) {
+    err_flag = 1;
+  } else if (copper_buf[ POS_MAGIC_COPPER_2 ] != COPPER_MAGIC_FPGA_HEADER) {
+    err_flag = 1;
+  } else if (*fpga_trailer_magic != COPPER_MAGIC_FPGA_TRAILER) {
+    err_flag = 1;
+  } else if (*driver_trailer_magic != COPPER_MAGIC_DRIVER_TRAILER) {
+    err_flag = 1;
+  }
+  if (err_flag == 1) {
+    char err_buf[500];
+    sprintf(err_buf, "Invalid Magic word 0x7FFFF0008=%u 0xFFFFFAFA=%u 0xFFFFF5F5=%u 0x7FFF0009=%u\n",
+            raw_copper->GetMagicDriverHeader(0),
+            raw_copper->GetMagicFPGAHeader(0),
+            raw_copper->GetMagicFPGATrailer(0),
+            raw_copper->GetMagicDriverTrailer(0));
+    print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+    sleep(12345678);
+    exit(-1);
+  }
+
+#ifdef WO_FIRST_EVENUM_CHECK
+  if ((prev_eve32 + 1 != cur_ftsw_eve32) && (prev_eve32 != 0xFFFFFFFF)) {
+#else
+  if (prev_eve32 + 1 != cur_ftsw_eve32) {
+#endif
+    char err_buf[500];
+    sprintf(err_buf, "Invalid event_number. Exiting...: cur 32bit eve %u preveve %u\n",  cur_ftsw_eve32, prev_eve32);
+    print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+    printf("i= %d : num entries %d : Tot words %d\n", 0 , GetNumEntries(), TotalBufNwords());
+    for (int j = 0; j < TotalBufNwords(); j++) {
+      printf("0x%.8x ", (GetBuffer(0))[ j ]);
+      if ((j % 10) == 9)printf("\n");
+      fflush(stdout);
+    }
+
+    exit(-1);
+  }
+#endif
+
   return cur_ftsw_eve32;
 
 }

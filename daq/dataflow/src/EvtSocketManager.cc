@@ -67,12 +67,19 @@ vector<int>& EvtSocketManager::connected_socket_list()
   return m_fd;
 }
 
-bool EvtSocketManager::connected(int fd)
+bool EvtSocketManager::connected(int fd, bool wreq)
 {
-  if (FD_ISSET(fd, &m_rset))
-    return true;
-  else
-    return false;
+  if (!wreq) {
+    if (FD_ISSET(fd, &m_rset))
+      return true;
+    else
+      return false;
+  } else {
+    if (FD_ISSET(fd, &m_wset))
+      return true;
+    else
+      return false;
+  }
 }
 
 bool EvtSocketManager::remove(int fd)

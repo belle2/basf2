@@ -25,7 +25,7 @@ namespace Belle2 {
 
     std::vector<int>& connected_socket_list();
 
-    bool connected(int fd);
+    bool connected(int fd, bool wreq = false);
 
     bool remove(int fd);
 

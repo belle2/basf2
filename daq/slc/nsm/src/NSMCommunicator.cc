@@ -173,6 +173,7 @@ throw(NSMHandlerException)
 
 void NSMCommunicator::sendLog(const SystemLog& log) throw(NSMHandlerException)
 {
+#ifdef __NSM_SLC__
   if (_logger_node != NULL &&
       b2nsm_nodeid(_logger_node->getName().c_str()) >= 0) {
     std::string str;
@@ -180,6 +181,7 @@ void NSMCommunicator::sendLog(const SystemLog& log) throw(NSMHandlerException)
     int npar = log.pack((int*)pars, str);
     sendRequest(_logger_node, Command::LOG, npar, pars, str);
   }
+#endif
 }
 
 void NSMCommunicator::sendError(const std::string& message) throw(NSMHandlerException)

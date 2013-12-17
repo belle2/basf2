@@ -1,0 +1,10 @@
+Usage
+% make clean
+% make
+% cd cprdist-0.1.6; make
+% /bin/su
+# ./initd_copper start
+# ./initd_cprfin_fngeneric start
+
+check if drivers are installed.
+% /sbin/lsmod  

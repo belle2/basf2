@@ -1,0 +1,24 @@
+syntax: glob
+*.o
+*.ko
+*.cmd
+*.mod.c
+*.symvers
+*.markers
+*tmp*
+*~
+.DS_Store
+\#*
+*.org
+src/copper-sysreset
+src/data2tcp
+src/freqcheck
+src/jig-start
+src/monitor-copper-register
+src/read-copper-register
+src/read-finesse-register
+src/readadc
+src/readcpr
+src/reset-fifo
+src/reset-fifo-and-finesse
+src/single-read-fifo

@@ -16,10 +16,6 @@
 #include <climits>
 
 namespace Belle2 {
-  /** \addtogroup dataobjects
-   * @{
-   */
-
   /** Class to store a single element of a relation.
    *
    *  Supports 1:n relations with individual weights.
@@ -122,10 +118,9 @@ namespace Belle2 {
     /** weights for to-indices. */
     std::vector<weight_type> m_weights;
 
-    ClassDef(RelationElement, 1); /**< Build ROOT dictionary */
+    ClassDef(RelationElement, 1); /**< Class to store a single element of a relation. */
   };
 
-  /*! @} */
 }
 
 #endif

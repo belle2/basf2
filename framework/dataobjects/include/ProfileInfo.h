@@ -13,10 +13,6 @@
 #include <TObject.h>
 
 namespace Belle2 {
-  /** \addtogroup dataobjects
-   * @{
-   */
-
   /** Store execution time and memory usage.
    *
    *  Class for execution time and memory usage information.
@@ -61,11 +57,8 @@ namespace Belle2 {
      */
     double m_timeInSec;
 
-    /** ROOT Macro to make ProfileInfo a ROOT class.
-     */
-    ClassDef(ProfileInfo, 1);
+    ClassDef(ProfileInfo, 1); /**< Store execution time and memory usage. */
 
   }; //class
-  /*! @} */
 } // namespace Belle2
 #endif

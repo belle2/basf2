@@ -18,10 +18,6 @@
 namespace Belle2 {
   class RelationElement;
 
-  /** \addtogroup dataobjects
-   * @{
-   */
-
   /** Class to store relations between StoreArrays in the DataStore.
    *
    *  This class is only used internally, users should use RelationIndex/RelationArray to access/modify relations.
@@ -113,9 +109,8 @@ namespace Belle2 {
 
     friend class RelationArray;
 
-    ClassDef(RelationContainer, 1); /**< Build ROOT dictionary */
+    ClassDef(RelationContainer, 1); /**< Class to store relations between StoreArrays in the DataStore. */
   };
-  /*! @} */
 }
 
 #endif

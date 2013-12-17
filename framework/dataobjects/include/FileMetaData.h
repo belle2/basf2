@@ -18,11 +18,6 @@
 
 namespace Belle2 {
 
-  /**
-   * \addtogroup dataobjects
-   * @{
-   */
-
   /** Metadata information about a file
    */
   class FileMetaData : public TObject {
@@ -287,13 +282,9 @@ namespace Belle2 {
      */
     std::string m_steering;
 
-    /** ROOT Macro for FileMetaData dictionary.
-     */
-    ClassDef(FileMetaData, 3);
+    ClassDef(FileMetaData, 3); /**< Metadata information about a file. */
 
   }; //class
-
-  /*! @} */
 
 } // namespace Belle2
 #endif // FILEMETADATA

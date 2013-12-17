@@ -13,10 +13,6 @@
 #include <TObject.h>
 
 namespace Belle2 {
-  /** \addtogroup dataobjects
-   * @{
-   */
-
   /** Store event number, run number, and experiment number.
    *
    *  Master modules have to create an object of this type!
@@ -157,11 +153,7 @@ namespace Belle2 {
      */
     double m_generated_weight;
 
-    /** ROOT Macro to make EventMetaData a ROOT class.
-     */
-    ClassDef(EventMetaData, 1);
-
+    ClassDef(EventMetaData, 1); /**< Store event number, run number, and experiment number. */
   }; //class
-  /*! @} */
 } // namespace Belle2
 #endif // EVENTMETADATA

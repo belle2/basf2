@@ -40,17 +40,15 @@ display = register_module('Display')
 #   for each hit
 # H draw track hits
 # M draw track markers - intersections of track with detector planes
-#   (use with T)
 # P draw detector planes
 # S scale manually - spacepoint hits are drawn as spheres and scaled with
 #   errors
-# T draw track (straight line between detector planes)
 #
 # Note that you can always turn off an individual detector component or track
 # interactively by removing its checkmark in the 'Eve' tab.
 #
 # only makes sense when showTrackLevelObjects/showTrackCandidates is used
-display.param('options', 'HTM')  # default
+display.param('options', 'HM')  # default
 
 # should hits always be assigned to a particle with c_PrimaryParticle flag?
 display.param('assignHitsToPrimaries', False)

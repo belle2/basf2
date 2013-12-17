@@ -279,7 +279,6 @@ void EVEVisualization::addTrack(const genfit::Track* track, const TString& label
   bool drawScaleMan = false;
   bool drawMarkers = false;
   bool drawPlanes = false;
-  bool drawTrack = false;
 
   if (m_options != "") {
     for (size_t i = 0; i < m_options.length(); i++) {
@@ -288,7 +287,6 @@ void EVEVisualization::addTrack(const genfit::Track* track, const TString& label
       if (m_options.at(i) == 'M') drawMarkers = true;
       if (m_options.at(i) == 'P') drawPlanes = true;
       if (m_options.at(i) == 'S') drawScaleMan = true;
-      if (m_options.at(i) == 'T') drawTrack = true;
     }
   }
   // finished parsing the option string -------------------------------------------------------------
@@ -497,11 +495,9 @@ void EVEVisualization::addTrack(const genfit::Track* track, const TString& label
 
     // draw track if corresponding option is set ------------------------------------------
     if (j > 0) {
-      if (drawTrack) {
-        makeLines(prevFittedState, fittedState, rep, charge > 0 ? kRed : kBlue, 1, drawMarkers, drawErrors, 3);
-        if (drawErrors) { // make sure to draw errors in both directions
-          makeLines(prevFittedState, fittedState, rep, charge > 0 ? kRed : kBlue, 1, false, drawErrors, 0, 0);
-        }
+      makeLines(prevFittedState, fittedState, rep, charge > 0 ? kRed : kBlue, 1, drawMarkers, drawErrors, 3);
+      if (drawErrors) { // make sure to draw errors in both directions
+        makeLines(prevFittedState, fittedState, rep, charge > 0 ? kRed : kBlue, 1, false, drawErrors, 0, 0);
       }
       if (drawForward_)
         makeLines(prevFi->getForwardUpdate(), fi->getForwardPrediction(), rep, charge > 0 ? kMagenta : kCyan, 1, drawMarkers, drawErrors, 1, 0);

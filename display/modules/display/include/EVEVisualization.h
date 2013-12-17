@@ -216,13 +216,11 @@ namespace Belle2 {
      *      set in setErrScale which is normally 1. See also option 'S'. Normally used in
      *      connection with 'D'.\n\n
      * 'M': Draw track markers. Draw the intersection points between the track and the virtual
-     *      (and/or real) detector planes. Can only be used in connection with 'T'.\n\n
+     *      (and/or real) detector planes.
      * 'P': Draw detector planes. Draws the virtual (and/or real) detector planes.\n\n
      * 'S': Scale manually. This leads to the spacepoint hits (and only them up to now!) being drawn
      *      as spheres with radius 0.5 scaled with the error scale factor. Can be used if the scaling
      *      with errors leads to problems.\n\n
-     * 'T': Draw Track. Draw the track as straight lines between the virtual (and/or real) detector
-     *      planes.\n\n
      */
     void setOptions(const std::string& opts);
 

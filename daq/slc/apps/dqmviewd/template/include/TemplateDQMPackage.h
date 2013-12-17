@@ -11,7 +11,8 @@ namespace Belle2 {
   class TemplateDQMPackage : public DQMPackage {
 
   public:
-    TemplateDQMPackage(const std::string& name);
+    TemplateDQMPackage(const std::string& name,
+                       const std::string& filename);
     virtual ~TemplateDQMPackage() throw() {};
 
   public:
@@ -31,6 +32,7 @@ namespace Belle2 {
     MonLabel* _label_nevt_rate;
     TimedGraph1* _gr_nevt;
     double _time;
+
   };
 
 }

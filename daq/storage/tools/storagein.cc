@@ -42,6 +42,7 @@ int main(int argc, char** argv)
     while (true) {
       try {
         socket.connect();
+        socket.setBufferSize(32 * 1024 * 1024);
         break;
       } catch (const IOException& e) {
         socket.close();

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<system name="DQMViewSever" >
+  <monitor name="Template" class="TemplateDQMPackage" file="temp.root" />
+  <monitor name="PXD" class="PXDDQMPackage" lib="pxd" file="pxd.root" />
+</system>

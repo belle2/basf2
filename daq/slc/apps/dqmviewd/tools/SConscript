@@ -1,7 +1,8 @@
 Import('env')
 
 env['TOOLS_LIBS']['dqmviewd'] = ['pthread', 'dl', '$ROOT_LIBS', 'Geom',
-		                 '$GEANT4_LIBS', 'CLHEP','$PGSQL_LIBS', 
-                                 'daq', 'framework', 'nsm2_b2lib', 'nsm2_corelib']
+				 '$GEANT4_LIBS', 'CLHEP','$PGSQL_LIBS', 
+				 'daq', 'pxd', 'vxd', 'rawdata', 'framework', 	
+				 'nsm2_b2lib', 'nsm2_corelib']
 
 Return('env')

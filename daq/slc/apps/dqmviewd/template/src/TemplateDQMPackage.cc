@@ -14,8 +14,9 @@
 
 using namespace Belle2;
 
-TemplateDQMPackage::TemplateDQMPackage(const std::string& name)
-  : DQMPackage(name)
+TemplateDQMPackage::TemplateDQMPackage(const std::string& name,
+                                       const std::string& filename)
+  : DQMPackage(name, filename)
 {
 
 }

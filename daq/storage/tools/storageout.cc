@@ -43,6 +43,7 @@ int main(int argc, char** argv)
     TCPSocket socket;
     try {
       socket = server_socket.accept();
+      socket.setBufferSize(32 * 1024 * 1024);
     } catch (const IOException& e) {
       sbuf.reportError("Failed to accept express reco");
       socket.close();

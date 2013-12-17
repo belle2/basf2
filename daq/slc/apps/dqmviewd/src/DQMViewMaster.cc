@@ -20,8 +20,8 @@ void DQMViewMaster::run()
 {
   for (size_t i = 0; i < _manager_v.size(); i++) {
     DQMPackage* monitor = (DQMPackage*)_manager_v[i]->getMonitor();
-    _index_m.insert(std::map<std::string, int>::value_type(monitor->getData()->getFileName(), i));
-    std::string path = _directory + "/" + monitor->getData()->getFileName();
+    _index_m.insert(std::map<std::string, int>::value_type(monitor->getFileName(), i));
+    std::string path = _directory + "/" + monitor->getFileName();
     DQMPackageUpdater* updater = new DQMPackageUpdater(i, _manager_v[i], this);
     _updater_v.push_back(updater);
     struct stat st;

@@ -5,16 +5,15 @@ import b2daq.graphics.HtmlColor;
 public class LogLevel {
 	
 	static final public LogLevel UNDEFINED = new LogLevel(-1, "UNDEFINED", HtmlColor.BLACK, HtmlColor.NULL);
-	static final public LogLevel DEBUG = new LogLevel(0, "DEBUG", HtmlColor.GRAY, HtmlColor.NULL);
-	static final public LogLevel INFO = new LogLevel(1, "INFO", new HtmlColor(0, 153, 51), HtmlColor.NULL);
-	static final public LogLevel NOTICE = new LogLevel(2, "NOTICE", HtmlColor.BLUE, HtmlColor.NULL);
-	static final public LogLevel WARNING = new LogLevel(3, "WARNING", HtmlColor.ORANGE, HtmlColor.NULL);
-	static final public LogLevel ERROR = new LogLevel(4, "ERROR", HtmlColor.MAGENTA, HtmlColor.NULL);
-	static final public LogLevel EXCEPTION = new LogLevel(5, "EXCEPTION", HtmlColor.RED, HtmlColor.NULL);
+	static final public LogLevel DEBUG = new LogLevel(1, "DEBUG", HtmlColor.GRAY, HtmlColor.NULL);
+	static final public LogLevel INFO = new LogLevel(2, "INFO", new HtmlColor(0, 153, 51), HtmlColor.NULL);
+	static final public LogLevel NOTICE = new LogLevel(3, "NOTICE", HtmlColor.BLUE, HtmlColor.NULL);
+	static final public LogLevel WARNING = new LogLevel(4, "WARNING", HtmlColor.ORANGE, HtmlColor.NULL);
+	static final public LogLevel ERROR = new LogLevel(5, "ERROR", HtmlColor.MAGENTA, HtmlColor.NULL);
 	static final public LogLevel FATAL = new LogLevel(6, "FATAL", HtmlColor.WHITE, HtmlColor.RED);
 	
 	static public LogLevel [] LIST = {
-		DEBUG, INFO, NOTICE, WARNING, ERROR, EXCEPTION, FATAL
+		DEBUG, INFO, NOTICE, WARNING, ERROR, FATAL
 	};
 	
 	static public LogLevel Get(int n) {

@@ -8,7 +8,8 @@ namespace Belle2 {
   class SimpleDQMPackage : public DQMPackage {
 
   public:
-    SimpleDQMPackage(const std::string& name);
+    SimpleDQMPackage(const std::string& name,
+                     const std::string& filename);
     virtual ~SimpleDQMPackage() throw();
 
   public:

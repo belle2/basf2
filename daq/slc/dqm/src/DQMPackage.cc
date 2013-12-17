@@ -10,11 +10,11 @@
 
 using namespace Belle2;
 
-void DQMPackage::setData(DQMHistMap* data)
+void DQMPackage::setHistMap(DQMHistMap* hist_m)
 {
-  _data = data;
-  for (TH1Map::iterator it = _data->getHists().begin();
-       it != _data->getHists().end(); it++) {
+  _hist_m = hist_m;
+  for (TH1Map::iterator it = _hist_m->getHists().begin();
+       it != _hist_m->getHists().end(); it++) {
     TH1* h = it->second;
     TString class_name = h->ClassName();
     if (class_name.Contains("TH1")) {

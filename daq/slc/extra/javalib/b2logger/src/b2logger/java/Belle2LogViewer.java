@@ -36,7 +36,7 @@ public class Belle2LogViewer extends JavaEntoryPoint {
 		_frame.setVisible(true);
 		_frame.update(new LogMessage("localhost", "GUI",
 				SystemLogLevel.INFO, "Viewer started"));
-		_frame.setPopupLevel("GaibuViewer", SystemLogLevel.EXCEPTION);
+		_frame.setPopupLevel("GaibuViewer", SystemLogLevel.ERROR);
 		while (true) {
 			try {
 				_socket = new Socket(_host_name, _port);
@@ -44,7 +44,7 @@ public class Belle2LogViewer extends JavaEntoryPoint {
 				_reader = new SocketDataReader(_socket);
 				_writer.writeString("GUI");
 				_frame.update(new LogMessage("localhost", "GUI",
-						SystemLogLevel.NOTICE, "Connected with GaibuServer."));
+						SystemLogLevel.NOTICE, "Connected with LogCollecter."));
 				while (true) {
 					LogMessage message = new LogMessage();
 					try {
@@ -80,7 +80,7 @@ public class Belle2LogViewer extends JavaEntoryPoint {
 
 	public static void main(String[] argv) {
 		Belle2LogViewer gui = new Belle2LogViewer();
-		String host = (argv.length > 0) ? argv[0] : "localhost";
+		String host = (argv.length > 0) ? argv[0] : "b2slow2.kek.jp";
 		int port = (argv.length > 1) ? Integer.parseInt(argv[1]) : 50200;
 		gui.init(host, port, "");
 		gui.run();

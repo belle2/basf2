@@ -41,7 +41,7 @@ int main(int argc, char** argv)
   const std::string host = argv[2];
   server_socket.open(host, atoi(argv[3]));
   TCPSocket socket = server_socket.accept();
-
+  socket.setBufferSize(32 * 1024 * 1024);
   char* buf = new char[MAXBUF];
   int nrec = 0;
   while (true) {

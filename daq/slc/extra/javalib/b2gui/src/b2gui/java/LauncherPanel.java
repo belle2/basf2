@@ -87,7 +87,7 @@ public class LauncherPanel extends JPanel {
 						} catch (JSchException e) {
 							e.printStackTrace();
 							LauncherFrame.get().getLog().add(
-									new Log("ssh connection boroken", LogLevel.EXCEPTION));
+									new Log("ssh connection boroken", LogLevel.ERROR));
 						}
 					}
 				}.start();

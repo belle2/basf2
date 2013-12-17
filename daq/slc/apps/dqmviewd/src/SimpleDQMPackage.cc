@@ -7,8 +7,9 @@
 
 using namespace Belle2;
 
-SimpleDQMPackage::SimpleDQMPackage(const std::string& name)
-  : DQMPackage(name)
+SimpleDQMPackage::SimpleDQMPackage(const std::string& name,
+                                   const std::string& filename)
+  : DQMPackage(name, filename)
 {
 
 }

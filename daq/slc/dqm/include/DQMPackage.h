@@ -12,15 +12,19 @@ namespace Belle2 {
   class DQMPackage : public MonitorPackage {
 
   public:
-    DQMPackage(const std::string& name) : MonitorPackage(name) {}
+    DQMPackage(const std::string& name,
+               const std::string file_name)
+      : MonitorPackage(name), _file_name(file_name) {}
     virtual ~DQMPackage() throw() {}
 
   public:
-    void setData(DQMHistMap* data);
-    DQMHistMap* getData() { return _data; }
+    const std::string& getFileName() { return _file_name; }
+    void setHistMap(DQMHistMap* hist_m);
+    DQMHistMap* getHistMap() { return _hist_m; }
 
   private:
-    DQMHistMap* _data;
+    std::string _file_name;
+    DQMHistMap* _hist_m;
 
   };
 

@@ -68,6 +68,20 @@ int TCPSocket::connect() throw (IOException)
   return _fd;
 }
 
+void TCPSocket::setBufferSize(int size) throw(IOException)
+{
+  if (size > 0) {
+    if (setsockopt(_fd, SOL_SOCKET, SO_SNDBUF, &size, sizeof(size)) != 0) {
+      throw (IOException(__FILE__, __LINE__,
+                         Belle2::form("failed to SO_SNDBUF: %s\n", strerror(errno))));
+    }
+    if (setsockopt(_fd, SOL_SOCKET, SO_RCVBUF, &size, sizeof(size)) != 0) {
+      throw (IOException(__FILE__, __LINE__,
+                         Belle2::form("failed to SO_RCVBUF: %s\n", strerror(errno))));
+    }
+  }
+}
+
 size_t TCPSocket::write(const void* buf, size_t count) throw(IOException)
 {
   size_t c = 0;

@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <framework/core/Path.h>
 #include <display/async/AsyncWrapper.h>
+#include <framework/core/Path.h>
 
 #include <framework/core/EventProcessor.h>
 #include <framework/core/PathManager.h>

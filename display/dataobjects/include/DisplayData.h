@@ -22,10 +22,6 @@
 
 
 namespace Belle2 {
-  /** \addtogroup dataobjects
-   * @{
-   */
-
   /** Add custom information to the display.
    *
    * To use it, simply create a DisplayData object using StoreObjPtr and call
@@ -86,5 +82,4 @@ namespace Belle2 {
     friend class EVEVisualization;
 
   }; //class
-  /*! @} */
 } // namespace Belle2

@@ -33,7 +33,7 @@ int main(int, char**)
                             config.getInt("LOG_GUI_PORT"), dbman));
   NSMNode* node = new NSMNode(nodename);
   LogCollectorCallback* callback =
-    new LogCollectorCallback(node);
+    new LogCollectorCallback(node, dbman);
   NSMNodeDaemon* daemon = new NSMNodeDaemon(callback);
   daemon->run();
 

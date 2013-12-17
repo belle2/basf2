@@ -10,16 +10,27 @@ namespace Belle2 {
 
   public:
     ConfigFile(const std::string& file1 = "",
-               const std::string& file2 = "",
-               const std::string& file3 = "") {
-      if (file1.size() > 0) read(file1);
-      if (file2.size() > 0) read(file2);
-      if (file3.size() > 0) read(file3);
+               bool overload = true) {
+      if (file1.size() > 0) read(file1, overload);
+    }
+    ConfigFile(const std::string& file1,
+               const std::string& file2,
+               bool overload = true) {
+      if (file1.size() > 0) read(file1, overload);
+      if (file2.size() > 0) read(file2, overload);
+    }
+    ConfigFile(const std::string& file1,
+               const std::string& file2,
+               const std::string& file3,
+               bool overload = true) {
+      if (file1.size() > 0) read(file1, overload);
+      if (file2.size() > 0) read(file2, overload);
+      if (file3.size() > 0) read(file3, overload);
     }
     ~ConfigFile() {}
 
   public:
-    void read(const std::string& filename);
+    void read(const std::string& filename, bool overload = true);
     const std::string get(const std::string& label);
     int getInt(const std::string& label);
     double getDouble(const std::string& label);

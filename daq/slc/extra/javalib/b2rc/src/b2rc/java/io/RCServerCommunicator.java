@@ -90,6 +90,9 @@ public class RCServerCommunicator {
 				RCState state_org = new RCState(_master.getNode().getState());
 				node.getState().copy(number);
 				node.getConnection().copy(_socket_reader.readInt());
+				if (node.getConnection().equals(RCConnection.OFFLINE)) {
+					node.setState(RCState.UNKNOWN);
+				}
 				RCState state = _master.getNode().getState();
 				_master.getStatus().update();
 				_main_panel.update();

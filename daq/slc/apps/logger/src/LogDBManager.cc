@@ -7,15 +7,19 @@ using namespace Belle2;
 void LogDBManager::createTable() throw(DBHandlerException)
 {
   SystemLog log;
+  _db->connect();
   _db->execute(Belle2::form("create table \"%s_log\" (%s);",
                             _tablename.c_str(), log.toSQLConfig().c_str()));
+  _db->close();
 }
 
 void LogDBManager::writeLog(const SystemLog& log) throw(DBHandlerException)
 {
+  _db->connect();
   _db->execute(Belle2::form("insert into \"%s_log\" (%s) values (%s);",
                             _tablename.c_str(), log.toSQLNames().c_str(),
                             log.toSQLValues().c_str()));
+  _db->close();
 }
 
 std::vector<SystemLog> LogDBManager::readLogs(const std::string& groupname,
@@ -24,6 +28,7 @@ std::vector<SystemLog> LogDBManager::readLogs(const std::string& groupname,
                                               int days, int hours, int mins)
 throw(DBHandlerException)
 {
+  _db->connect();
   std::string opt = "";
   if (groupname != "" && groupname != "ALL") {
     opt += Belle2::form("group = \"%s\"", groupname.c_str());
@@ -62,6 +67,7 @@ throw(DBHandlerException)
     log_v.push_back(log);
   }
   _mutex.lock();
+  _db->close();
   return log_v;
 }
 

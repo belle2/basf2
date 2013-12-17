@@ -10,14 +10,19 @@
 
 namespace Belle2 {
 
+  class LogDBManager;
+
   class LogCollectorCallback : public LogCallback {
 
   public:
-    LogCollectorCallback(NSMNode* node);
+    LogCollectorCallback(NSMNode* node, LogDBManager* man);
     virtual ~LogCollectorCallback() throw();
 
   public:
     virtual bool log() throw();
+
+  private:
+    LogDBManager* _man;
 
   };
 

@@ -91,10 +91,7 @@ void NSMCommunicator::init(const std::string& host, int port) throw(NSMHandlerEx
       }
     }
   }
-  ConfigFile config;
-  if (config.get("RC_NSM_NAME") == "") {
-    config = ConfigFile(_config_name);
-  }
+  ConfigFile config(_config_name, "slowconttrol", false);
   std::string rc_name = config.get("RC_NSM_NAME");
   if (rc_name.size() > 0) {
     _rc_node = new NSMNode(rc_name);
@@ -172,7 +169,8 @@ throw(NSMHandlerException)
 
 void NSMCommunicator::sendLog(const SystemLog& log) throw(NSMHandlerException)
 {
-  if (_logger_node != NULL) {
+  if (_logger_node != NULL &&
+      b2nsm_nodeid(_logger_node->getName().c_str()) >= 0) {
     std::string str;
     unsigned int pars[3];
     int npar = log.pack((int*)pars, str);

@@ -10,7 +10,7 @@ using namespace Belle2;
 
 std::map<std::string, std::string> ConfigFile::__value_m;
 
-void ConfigFile::read(const std::string& filename)
+void ConfigFile::read(const std::string& filename, bool overload)
 {
   const char* path = getenv("BELLE2_LOCAL_DIR");
   if (path == NULL) {
@@ -58,7 +58,7 @@ void ConfigFile::read(const std::string& filename)
       }
       if (__value_m.find(label) == __value_m.end()) {
         __value_m.insert(std::map<std::string, std::string>::value_type(label, value));
-      } else {
+      } else if (overload) {
         Belle2::debug("%s %s %s", filename.c_str(), label.c_str(), value.c_str());
         __value_m[label] = value;
       }
@@ -69,24 +69,29 @@ void ConfigFile::read(const std::string& filename)
 
 const std::string ConfigFile::get(const std::string& label)
 {
-  if (__value_m.find(label) != __value_m.end())
+  if (__value_m.find(label) != __value_m.end()) {
     return __value_m[label];
-  else
-    return "";
+  } else {
+    const char* env = getenv(label.c_str());
+    if (env != NULL) {
+      std::string value = env;
+      __value_m.insert(std::map<std::string, std::string>::value_type(label, value));
+      return value;
+    }
+  }
+  return "";
 }
 
 int ConfigFile::getInt(const std::string& label)
 {
-  if (__value_m.find(label) != __value_m.end())
-    return atoi(__value_m[label].c_str());
-  else
-    return 0;
+  std::string value = get(label);
+  if (value.size() > 0) return atoi(value.c_str());
+  else return 0;
 }
 
 double ConfigFile::getDouble(const std::string& label)
 {
-  if (__value_m.find(label) != __value_m.end())
-    return atof(__value_m[label].c_str());
-  else
-    return 0;
+  std::string value = get(label);
+  if (value.size() > 0) return atof(value.c_str());
+  else return 0;
 }

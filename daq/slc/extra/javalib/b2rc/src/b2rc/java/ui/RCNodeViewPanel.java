@@ -58,33 +58,27 @@ public class RCNodeViewPanel extends JPanel implements Updatable {
 				if (SwingUtilities.isRightMouseButton(e)) {
 					JPopupMenu popup_menu = new JPopupMenu();
 					ArrayList<RCCommand> command_v = new ArrayList<RCCommand>();
+					System.out.println(_node.getName()+" " +_node.getState().getLabel());
+					if (!(_node.getState().equals(RCState.RUNNING_S) || 
+ 						_node.getState().equals(RCState.PAUSED_S))) {
+						if (_node.isUsed()) {
+							command_v.add(RCCommand.INACTIVATE);
+						} else {
+							command_v.add(RCCommand.ACTIVATE);
+						}
+					}
 					if (_node.getState().equals(RCState.INITIAL_S)) {
-						if (_node.isUsed()) {
-							command_v.add(RCCommand.INACTIVATE);
-							command_v.add(RCCommand.BOOT);
-						} else {
-							command_v.add(RCCommand.ACTIVATE);
-						}
+						command_v.add(RCCommand.BOOT);
 					} else if (_node.getState().equals(RCState.CONFIGURED_S)) {
-						if (_node.isUsed()) {
-							command_v.add(RCCommand.INACTIVATE);
-							command_v.add(RCCommand.BOOT);
-							command_v.add(RCCommand.LOAD);
-						} else {
-							command_v.add(RCCommand.ACTIVATE);
-						}
+						command_v.add(RCCommand.BOOT);
+						command_v.add(RCCommand.LOAD);
 					} else if (_node.getState().equals(RCState.READY_S)) {
-						if (_node.isUsed()) {
-							command_v.add(RCCommand.INACTIVATE);
-							command_v.add(RCCommand.BOOT);
-							command_v.add(RCCommand.LOAD);
-							command_v.add(RCCommand.START);
-							//if ( _node.getData() != null &&
-							//	 _node.getData().getObject("ftsw") != null)
-							command_v.add(RCCommand.TRGIFT);
-						} else {
-							command_v.add(RCCommand.ACTIVATE);
-						}
+						command_v.add(RCCommand.BOOT);
+						command_v.add(RCCommand.LOAD);
+						command_v.add(RCCommand.START);
+						if (_node.getData() != null &&
+ 							_node.getData().getObject("ftsw") != null)
+						command_v.add(RCCommand.TRGIFT);
 					} else if (_node.getState().equals(RCState.RUNNING_S)) {
 						if (_node.isUsed()) {
 							command_v.add(RCCommand.STOP);

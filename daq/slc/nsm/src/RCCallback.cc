@@ -26,7 +26,6 @@ RCCallback::RCCallback(NSMNode* node) throw()
   add(Command::STATE);
   add(Command::STATECHECK);
   add(Command::TRIGFT);
-  //ConfigFile config("slowcontrol");
 }
 
 void RCCallback::download()
@@ -36,9 +35,9 @@ void RCCallback::download()
     try {
       ConfigFile config;
       int port = config.getInt("RC_LOCAL_PORT");
-      if (port <= 0) return;
-      socket.connect(config.get("RC_LOCAL_HOST"),
-                     port);
+      std::string host = config.get("RC_LOCAL_HOST");
+      if (port <= 0 || host.size() == 0) return;
+      socket.connect(host, port);
       TCPSocketWriter writer(socket);
       TCPSocketReader reader(socket);
       writer.writeString(_node->getName());

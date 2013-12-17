@@ -66,6 +66,9 @@ public class RCMaster {
 			node.setUsed(_config.getBool(node.getName()+"_used"));
 			node.getState().copy(_status.getInt(node.getName()+"_state"));
 			node.getConnection().copy(_status.getInt(node.getName()+"_connection"));
+			if (node.getConnection().equals(RCConnection.OFFLINE)) {
+				node.setState(RCState.UNKNOWN);
+			}
 		}
 	}
 	

@@ -100,7 +100,7 @@ const std::string SystemLog::toSQLConfig() const
 {
   std::stringstream ss;
   ss << "id serial, record_time timestamp, priority smallint, "
-     << "log_data int, group text, host text, node text, "
+     << "log_date int, groupname text, hostname text, node text, "
      << "refno smallint, message text";
   return ss.str();
 }
@@ -108,8 +108,8 @@ const std::string SystemLog::toSQLConfig() const
 const std::string SystemLog::toSQLNames() const
 {
   std::stringstream ss;
-  ss << "record_time, priority, log_data, group, "
-     << "host, node, refno, message";
+  ss << "record_time, priority, log_date, groupname, "
+     << "hostname, node, refno, message";
   return ss.str();
 }
 

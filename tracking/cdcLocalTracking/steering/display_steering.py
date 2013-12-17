@@ -111,7 +111,7 @@ cdclegendretracking.param(param_cdclegendretracking)
 
 # ---------------------------------------------------------------
 # MC finder
-mctrackfinder = register_module('MCTrackFinder')
+mctrackfinder = register_module('TrackFinderMCTruth')
 param_mctrackfinder = {
     'UseCDCHits': 1,
     'UseSVDHits': 1,

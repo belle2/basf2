@@ -3,7 +3,7 @@
 
 ###########################################################################################################################
 # This steering files tests if track fitting with the full detector geometry works without a crash
-# Track finding is not tested. Only MCTrackFinder is used.
+# Track finding is not tested. Only TrackFinderMCTruth is used.
 ############################################################################################################################
 
 import os
@@ -64,7 +64,7 @@ param_cdcdigi = {'Fraction': 1, 'Resolution1': 0.01, 'Resolution2': 0.0}
 cdcDigitizer.param(param_cdcdigi)
 
 # find MCTracks
-mctrackfinder = register_module('MCTrackFinder')
+mctrackfinder = register_module('TrackFinderMCTruth')
 param_mctrackfinder = {'UseCDCHits': 1, 'UseSVDHits': 1, 'UsePXDHits': 1}
 mctrackfinder.param(param_mctrackfinder)
 mctrackfinder.logging.log_level = LogLevel.INFO

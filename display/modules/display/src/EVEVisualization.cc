@@ -506,9 +506,9 @@ void EVEVisualization::addTrack(const genfit::Track* track, const TString& label
 
     // draw track if corresponding option is set ------------------------------------------
     if (j > 0) {
-      makeLines(eveTrack, prevFittedState, fittedState, rep, charge > 0 ? kRed : kBlue, 1, drawMarkers, drawErrors, 3.0);
+      makeLines(eveTrack, prevFittedState, fittedState, rep, c_trackColor, 1, drawMarkers, drawErrors, 3.0);
       if (drawErrors) { // make sure to draw errors in both directions
-        makeLines(eveTrack, prevFittedState, fittedState, rep, charge > 0 ? kRed : kBlue, 1, false, drawErrors, 3.0, 0);
+        makeLines(eveTrack, prevFittedState, fittedState, rep, c_trackColor, 1, false, drawErrors, 3.0, 0);
       }
       //these are currently disabled.
       //TODO: if activated, I want to have a separate TEveStraightLineSet instead of eveTrack (different colors/options)

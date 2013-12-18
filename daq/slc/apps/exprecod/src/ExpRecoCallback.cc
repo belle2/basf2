@@ -152,7 +152,24 @@ bool ExpRecoCallback::recover() throw()
   m_rbuf->clear();
 
   // Do "load" again
-  load();
+  //  load();
+  // 7. Run basf2
+  char* basf2 = m_conf->getconf("expreco", "basf2script");
+  char* rbufin = m_conf->getconf("expreco", "ringbufin");
+  char* dqmdest = m_conf->getconf("dqmserver", "host");
+  char* dqmport = m_conf->getconf("dqmserver", "port");
+  m_pid_basf2 = m_proc->Execute(basf2, rbufin, dqmdest, dqmport);
+
+  // 8. Run receiver
+  char* receiver = m_conf->getconf("expreco", "recvscript");
+  char* srchost = m_conf->getconf("storage", "host");
+  char* port = m_conf->getconf("storage", "port");
+  m_pid_receiver = m_proc->Execute(receiver, rbufin, srchost, port, "expreco", (char*)"0");
+
+  // 9. Run eventserver
+  char* evs = m_conf->getconf("expreco", "evsscript");
+  char* evsport = m_conf->getconf("expreco", "evsport");
+  m_pid_evs = m_proc->Execute(evs, evsport);
 
   return true;
 }

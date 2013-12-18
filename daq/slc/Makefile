@@ -6,6 +6,7 @@ LIBDIR=./lib
 TMPDIR=./tmp
 
 all: base system nsm xml
+	@ make -C extra/tools
 
 full: all database
 
@@ -27,8 +28,10 @@ dqm:
 nsm:
 	@ mkdir -p $(INCDIR)/$@
 	@ mkdir -p include/nsm2
+	@ mkdir -p bin
 	@ make -C ./extra/nsm2/
-	@ make -C ./extra/nsm2/example
+	@ make -C ./extra/nsm2/daemon 
+	@ make -C ./extra/nsm2/daemon install
 	@ install -m 644 -p ./extra/nsm2/corelib/*.h include/nsm2
 	@ install -m 644 -p ./extra/nsm2/b2lib/*.h include/nsm2
 	@ install -m 644 -p ./extra/nsm2/corelib/*.so $(LIBDIR)
@@ -49,7 +52,8 @@ database:
 
 clean:
 	@ rm -rf include $(LIBDIR) $(TMPDIR) bin
-	@ make -C ./extra/nsm2 clean
+	@ make -C ./extra clean
+	@ make -C ./extra/nsm2/example clean
 	@ rm -rf *~ \#*~ .*~ */*~ */*/*~
 
 # LocalWords:  gui

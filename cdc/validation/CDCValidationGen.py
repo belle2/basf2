@@ -25,7 +25,7 @@ cdcdigi = register_module('CDCDigitizer')
 set_random_seed(3038402)
 
 # Set the number of events to be generate and processed (xxxx events)
-eventinfo.param({'evtNumList': [1000], 'runList': [1]})
+eventinfo.param({'evtNumList': [100], 'runList': [1]})
 
 # Set parameters for particlegun
 particlegun.param({  # Generate 5 tracks (on average)

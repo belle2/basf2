@@ -55,6 +55,13 @@ namespace Belle2 {
 
       //! Gets geometry parameters from gearbox.
       void read();
+
+
+      /**
+       * Read geometry for the reconstuction.
+       * @param[in] GearDir Gear Dir.
+       */
+
       void readGeometry4Recon(const GearDir);
 
 
@@ -509,24 +516,25 @@ namespace Belle2 {
       double m_motherOuterR;  /*!< The outer radius of cdc mother volume. */
       double m_motherLength;  /*!< The length of cdc mother volume. */
 
-      double m_momZ[7];
-      double m_momRmin[7];
+      double m_momZ[7];      /*!< Z-cordinates of the cdc mother volume (7 segments). */
+      double m_momRmin[7];   /*!< R_min of the cdc mother volume  (7 segments).       */
 
       double m_FWirPos[MAX_N_SLAYERS][MAX_N_SCELLS][3]; /*!< Wire position at the forward endplate for each layer and cell. */
       double m_BWirPos[MAX_N_SLAYERS][MAX_N_SCELLS][3]; /*!< Wire position at the backward endplate for each layer and cell. */
 
       double m_WirSagCoef[MAX_N_SLAYERS][MAX_N_SCELLS]; /*!< Wire sag coeffients for each layer and cell. */
 
-      double m_XT[MAX_N_SLAYERS][2][18][9];
-      double m_Sigma[MAX_N_SLAYERS][7];
-      double m_PropSpeedInv[MAX_N_SLAYERS];
+      double m_XT[MAX_N_SLAYERS][2][18][9];  /*! XT-relation coefficients for each layer, Left and Right etc. */
+      double m_Sigma[MAX_N_SLAYERS][7];      /*! position resulution for each layer */
+      double m_PropSpeedInv[MAX_N_SLAYERS];  /*! Inverse of propagation speed of the sense wire */
 
-      unsigned short m_tdcOffset;
-      double m_tdcBinWidth;
-      double m_nominalDriftV, m_nominalDriftVInv;
-      double m_nominalPropSpeed;
-      double m_nominalSpaceResol;
-      double m_maxSpaceResol;
+      unsigned short m_tdcOffset;  /*! TDC off set value (default = 0) .*/
+      double m_tdcBinWidth;        /*! TDC bin width (1 nsec/bin). */
+      double m_nominalDriftV;      /*! Nominal drift velocity (4.0x10^-3 cm/nsec). */
+      double m_nominalDriftVInv;   /*! Inverse of the nominal drift velocity. */
+      double m_nominalPropSpeed;   /*! Nominal propagation speed of the sense wire (27.25 cm/nsec). */
+      double m_nominalSpaceResol;  /*! Nominal spacial resolution (0.01301 cm). */
+      double m_maxSpaceResol;      /*! 10 times Nominal spacial resolution. */
 
       static CDCGeometryPar* m_B4CDCGeometryParDB; /*!< Pointer that saves the instance of this class. */
 
@@ -534,6 +542,12 @@ namespace Belle2 {
     };
 
 //-----------------------------------------------------------------------------
+//
+//  Inline functions
+//
+//-----------------------------------------------------------------------------
+
+
     inline double CDCGeometryPar::motherInnerR() const
     {
       return m_motherInnerR;
@@ -551,7 +565,7 @@ namespace Belle2 {
 
     inline double CDCGeometryPar::momZ(int iBound) const
     {
-      return m_momZ[iBound];
+      returm_momZ[iBound];
     }
 
     inline double CDCGeometryPar::momRmin(int iBound) const

@@ -49,12 +49,14 @@ void CDCGeometryPar::clear()
   m_motherInnerR = 0.;
   m_motherOuterR = 0.;
   m_motherLength = 0.;
+
   // T.Hara added to define the CDC mother volume (temporal)
   for (unsigned i = 0; i < 7; i++) {
     m_momZ[i] = 0.;
     m_momRmin[i] = 0.;
   }
   //
+
   m_version = "unknown";
   m_nSLayer = 0;
   m_nFLayer = 0;
@@ -215,7 +217,7 @@ void CDCGeometryPar::read()
   m_tdcBinWidth = 1.0;  //in ns
   m_nominalDriftV    = 4.e-3;  //in cm/ns
   m_nominalDriftVInv = 1. / m_nominalDriftV; //in ns/cm
-  m_nominalPropSpeed = 27.25;  //in ns/cm (Belle's result, provided by iwasaki san)
+  m_nominalPropSpeed = 27.25;  //in cm/nsec (Belle's result, provided by iwasaki san)
 
   m_nominalSpaceResol = gbxParams.getLength("SenseWire/SpaceResol");
   m_maxSpaceResol = 10. * m_nominalSpaceResol;
@@ -297,10 +299,10 @@ void CDCGeometryPar::readGeometry4Recon(const GearDir gbxParams)
     m_WirSagCoef[iL][iC] = M_PI * m_senseWireDensity * m_senseWireDiameter * m_senseWireDiameter / (8.*(tension));
 
     if (m_debug) {
-      cout << iL << " " << iC;
+      std::cout << iL << " " << iC;
       for (int i = 0; i < np; ++i) cout << " " << back[i];
       for (int i = 0; i < np; ++i) cout << " " << fwrd[i];
-      cout << " " << tension << endl;
+      std::cout << " " << tension << std::endl;
     }
 
   }

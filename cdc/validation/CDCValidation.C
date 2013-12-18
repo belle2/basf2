@@ -178,7 +178,7 @@ void SetLayerID()
 
   //  printf("\n\n");
 
-  return;
+
 }
 
 
@@ -208,9 +208,7 @@ void FillHitPattern(Int_t iLayer)
     SetLayerID();
   }
 
-  Char_t CutLayer[100];
-
-  sprintf(CutLayer, "int(CDCHits.m_eWire&0xfe00)==%d", EncodedLayer[iLayer]);
+  TCut CutLayer =Form("int(CDCHits.m_eWire&0xfe00)==%d", EncodedLayer[iLayer]);
 
   if(hHitPattern[iLayer] == NULL){
 
@@ -225,14 +223,14 @@ void FillHitPattern(Int_t iLayer)
     hHitPattern[iLayer]->GetXaxis()->SetTitle("Cell");
     hHitPattern[iLayer]->GetYaxis()->SetTitle("Entries");
     hHitPattern[iLayer]->SetStats(0);
-    //    SetHistoSizes(hHitPattern[iLayer]);
 
-    tree->Project(chName, "int(CDCHits.m_eWire&0x01ff)", CutLayer);
+    tree->Draw(Form("int(CDCHits.m_eWire&0x01ff)>>%s",chName),CutLayer);
+    hHitPattern[iLayer]->GetListOfFunctions()->Add(new TNamed("Description", chTitle));
   } else {
     printf("Hit pattern for Layer %d is already filled\n", iLayer);
   }
 
-  return;
+
 }
 
 
@@ -243,9 +241,8 @@ void FillTDC(Int_t iLayer)
     SetLayerID();
   }
 
-  Char_t CutLayer[100];
 
-  sprintf(CutLayer, "int(CDCHits.m_eWire&0xfe00)==%d", EncodedLayer[iLayer]);
+  TCut CutLayer =Form("int(CDCHits.m_eWire&0xfe00)==%d", EncodedLayer[iLayer]);
 
   if(hTDC[iLayer] == NULL){
     Char_t chName[100], chTitle[100];
@@ -258,12 +255,13 @@ void FillTDC(Int_t iLayer)
     hTDC[iLayer]->GetXaxis()->SetTitle("TDC count");
     hTDC[iLayer]->GetYaxis()->SetTitle("Entries");
     //    SetHistoSizes(hTDC[iLayer]);
-    tree->Project(chName, "CDCHits.m_tdcCount", CutLayer);
+
+    tree->Draw(Form("CDCHits.m_tdcCount>>%s",chName),CutLayer);
   } else {
     printf("TDC histogram for Layer %d is already filled\n", iLayer);
   }
 
-  return;
+
 }
 
 void FillADC(Int_t iLayer)
@@ -272,10 +270,8 @@ void FillADC(Int_t iLayer)
     SetLayerID();
   }
 
-  Char_t CutLayer[100];
 
-  sprintf(CutLayer, "int(CDCHits.m_eWire&0xfe00)==%d", EncodedLayer[iLayer]);
-
+  TCut CutLayer =Form("int(CDCHits.m_eWire&0xfe00)==%d", EncodedLayer[iLayer]);
   if(hADC[iLayer] == NULL){
     Char_t chName[100], chNameFit[100], chTitle[100];
     
@@ -287,16 +283,16 @@ void FillADC(Int_t iLayer)
     hADC[iLayer] = new TH1D(chName, chTitle, NbinADC, MinADC, MaxADC);
     hADC[iLayer]->GetXaxis()->SetTitle("ADC count");
     hADC[iLayer]->GetYaxis()->SetTitle("Entries");
-    //    SetHistoSizes(hADC[iLayer]);
-    tree->Project(chName, "CDCHits.m_adcCount", CutLayer);
 
+
+    tree->Draw(Form("CDCHits.m_adcCount>>%s",chName),CutLayer);
     hADCfit[iLayer] = (TH1D*) hADC[iLayer]->Clone();
     hADCfit[iLayer]->SetName(chNameFit);
   } else {
     printf("ADC histogram for Layer %d is already filled\n", iLayer);
   }
 
-  return;
+
 }
 
 
@@ -416,7 +412,7 @@ void FitADC(Int_t iLayer, Int_t kDraw)
     }
   }
 
-  return;
+
 }
 
 void FillADCTDC(Int_t iLayer)
@@ -447,7 +443,7 @@ void FillADCTDC(Int_t iLayer)
     printf("ADC vs. TDC 2D histogram for Layer %d is already filled\n", iLayer);  
   }
 
-  return;
+
 }
 
 
@@ -531,7 +527,7 @@ void FillHisto()
   hsigmaADC->GetXaxis()->SetTitle("Layer");
   hsigmaADC->GetYaxis()->SetTitle("Sigma (ADC count)");
 
-  return;
+
 }
 
 
@@ -626,7 +622,7 @@ void PlotHisto()
     lborder_sigma[iSL]->Draw();
   }
 
-  return;
+
 }
 
 
@@ -651,7 +647,6 @@ void PrintHisto()
 
   cvsummary->SaveAs(cOutDrawFinal.c_str());
 
-  return;
 }
 
 
@@ -672,19 +667,15 @@ void WriteHisto()
   hsigmaADC->Write();
 
   flOutRootSL->Close();
-
-  return;
+  delete flOutRootSL;
 }
 
 
-Int_t CDCValidation()
+void CDCValidation()
 {
-
   SetLayerID();
   FillHisto();
   if(kWriteHisto){
     WriteHisto();
   }
-
-  exit(0);
 }

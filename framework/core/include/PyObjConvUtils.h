@@ -58,10 +58,6 @@ namespace Belle2 {
     template<typename... Types>
     boost::python::tuple convertToPythonObject(const std::tuple<Types...>& tuple);
 
-    /**
-     * @{
-     * Testing doxygen.
-     */
     template<typename T> struct Type;
     template<typename T> struct Type<std::vector<T> >;
     template<typename A, typename B> struct Type<std::map<A, B> >;
@@ -71,7 +67,6 @@ namespace Belle2 {
     template<> struct Type<float>;
     template<> struct Type<double>;
     template<> struct Type<std::string>;
-    /** @} */
 
     /**
      * @{
@@ -87,24 +82,28 @@ namespace Belle2 {
     /** @} */
 
     /**
-     * @{
      * Converts a template argument into a string for corresponding Python type.
      * Partial template specialisations are not allowed for functions, so this needs to be a class.
      */
-
     template<typename T> struct Type { /** type name. */ static std::string name() { return "???";} };
+    /** Converts a template argument into a string for corresponding Python type. */
     template<typename T> struct Type<std::vector<T> > { /** type name. */ static std::string name() { return std::string("list(") + Type<T>::name() + ")"; } };
+    /** Converts a template argument into a string for corresponding Python type. */
     template<typename A, typename B> struct Type<std::map<A, B> > { /** type name. */ static std::string name() { return std::string("dict(") + Type<A>::name() + " -> " + Type<B>::name() + ")"; } };
 
+    /** Converts a template argument into a string for corresponding Python type. */
     template<> struct Type<int> { /** type name. */ static std::string name() { return "int"; } };
+    /** Converts a template argument into a string for corresponding Python type. */
     template<> struct Type<bool> { /** type name. */ static std::string name() { return "bool"; } };
+    /** Converts a template argument into a string for corresponding Python type. */
     template<> struct Type<float> { /** type name. */ static std::string name() { return "float"; } };
+    /** Converts a template argument into a string for corresponding Python type. */
     template<> struct Type<double> { /** type name. */ static std::string name() { return "float"; } };
+    /** Converts a template argument into a string for corresponding Python type. */
     template<> struct Type<std::string> { /** type name. */ static std::string name() { return "str"; } };
 
+    /** Converts a template argument into a string for corresponding Python type. */
     template<typename... Types> struct Type<std::tuple<Types...> > { /** type name. */ static std::string name() { return std::string("tuple( ") + GetType<Types...>() + " )"; } };
-
-    /** @} */
 
     /**
      * --------------- From C++ TO Python Converter ------------------------

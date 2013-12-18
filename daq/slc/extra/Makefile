@@ -1,5 +1,7 @@
 
 all:
+	@ make -C nsm2/daemon
+	@ make -C nsm2/daemon install
 	@ make -C tools
 
 full:

@@ -5,6 +5,7 @@
 #include "daq/slc/system/TCPSocketWriter.h"
 #include "daq/slc/system/TCPSocketReader.h"
 
+#include "daq/slc/base/State.h"
 #include "daq/slc/base/ConfigFile.h"
 #include "daq/slc/base/Debugger.h"
 
@@ -26,6 +27,7 @@ RCCallback::RCCallback(NSMNode* node) throw()
   add(Command::STATE);
   add(Command::STATECHECK);
   add(Command::TRIGFT);
+  node->setState(State::INITIAL_S);
 }
 
 void RCCallback::download()

@@ -29,6 +29,7 @@ namespace Belle2 {
     ~ConfigFile() {}
 
   public:
+    void clear();
     void read(const std::string& filename, bool overload = true);
     const std::string get(const std::string& label);
     int getInt(const std::string& label);

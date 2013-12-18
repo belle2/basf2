@@ -1,14 +1,9 @@
 CXX     = g++
-#CXX     = g++44
 RM      = rm -rf
 CP      = cp -f
 
 BELLE2_LIB = $(BELLE2_LOCAL_DIR)/daq/slc/lib
 BELLE2_INC = $(BELLE2_LOCAL_DIR)/daq/slc/include
-#BELLE2_LIB = $(BELLE2_LOCAL_DIR)/lib/$(BELLE2_SUBDIR)
-#BELLE2_INC = $(BELLE2_LOCAL_DIR)/include
-#BELLE2EX_LIB = $(BELLE2_EXTERNALS_DIR)/lib/$(BELLE2_SUBDIR)
-#BELLE2EX_INC = $(BELLE2_EXTERNALS_DIR)/include
 
 BINDIR  = ./bin
 SRCDIR  = ./src

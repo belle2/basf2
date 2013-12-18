@@ -1,12 +1,9 @@
 CXX     = g++
-#CXX     = g++44
 RM      = rm -rf
 CP      = cp -f
 
-BELLE2_LIB = $(BELLE2_LOCAL_DIR)/lib/$(BELLE2_SUBDIR)
-BELLE2_INC = $(BELLE2_LOCAL_DIR)/include
-BELLE2EX_LIB = $(BELLE2_EXTERNALS_DIR)/lib/$(BELLE2_SUBDIR)
-BELLE2EX_INC = $(BELLE2_EXTERNALS_DIR)/include
+BELLE2_LIB = $(BELLE2_LOCAL_DIR)/daq/slc/lib
+BELLE2_INC = $(BELLE2_LOCAL_DIR)/daq/slc/include
 
 BINDIR  = ./bin
 SRCDIR  = ./src
@@ -15,8 +12,8 @@ TMPDIR  = ./tmp
 LIBDIR  = ./lib
 
 LIBS    += -lm -lpthread -lrt -lz
-LIBS    += -L$(BELLE2_LIB) -ldaq
-LIBS    += -L$(BELLE2EX_LIB) -lnsm2_corelib -lnsm2_b2lib
+LIBS    += -L$(BELLE2_LIB) -ldaq_slc_base -ldaq_slc_system -ldaq_slc_nsm -ldaq_slc_xml
+LIBS    += -L$(BELLE2_LIB) -lnsm2_corelib -lnsm2_b2lib
 LIBS    += $(shell xml2-config --libs)
 LIBS    += $(shell mysql_config --libs)
 

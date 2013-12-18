@@ -11,6 +11,20 @@
 using namespace Belle2;
 using namespace std;
 
+static ExpRecoCallback* s_expreco = NULL;
+
+//-----------------------------------------------------------------
+// Rbuf-Read Thread Interface
+//-----------------------------------------------------------------
+void* RunExpRecoLogger(void*)
+{
+  s_expreco->ExpRecoLogger();
+  return NULL;
+}
+
+
+
+
 ExpRecoCallback::ExpRecoCallback(NSMNode* node)
   : RCCallback(node)
 {
@@ -19,6 +33,8 @@ ExpRecoCallback::ExpRecoCallback(NSMNode* node)
 
   // Conf file
   m_conf = new RFConf(getenv("EXPRECO_CONFFILE"));
+
+  s_expreco = this;
 
 }
 
@@ -45,13 +61,42 @@ bool ExpRecoCallback::boot() throw()
   // 2. Initialize process manager
   m_proc = new RFProcessManager(nodename);
 
-  // 3. Initialize local shared memory
+  // 3. Initialize log manager
+  m_log = new RFLogManager(nodename);
+
+  // 4. Initialize local shared memory
   m_shm = new RFSharedMem(nodename);
 
-  // 3. Initialize RingBuffers
+  // 5. Initialize RingBuffers
   char* rbufname = m_conf->getconf("expreco", "ringbufin");
   int rbinsize = m_conf->getconfi("expreco", "ringbufsize");
   m_rbuf = new RingBuffer(rbufname, rbinsize);
+
+  // 6. Start Logger
+  pthread_attr_t thread_attr;
+  pthread_attr_init(&thread_attr);
+  //  pthread_attr_setschedpolicy(&thread_attr , SCHED_FIFO);
+  //  pthread_attr_setdetachstate(&thread_attr , PTHREAD_CREATE_DETACHED);
+  //  pthread_t thr_input;
+  pthread_create(&m_logthread, NULL, RunExpRecoLogger, NULL);
+
+  // 7. Run basf2
+  char* basf2 = m_conf->getconf("expreco", "basf2script");
+  char* rbufin = m_conf->getconf("expreco", "ringbufin");
+  char* dqmdest = m_conf->getconf("dqmserver", "host");
+  char* dqmport = m_conf->getconf("dqmserver", "port");
+  m_pid_basf2 = m_proc->Execute(basf2, rbufin, dqmdest, dqmport);
+
+  // 8. Run receiver
+  char* receiver = m_conf->getconf("expreco", "recvscript");
+  char* srchost = m_conf->getconf("storage", "host");
+  char* port = m_conf->getconf("storage", "port");
+  m_pid_receiver = m_proc->Execute(receiver, rbufin, srchost, port, "expreco", (char*)"0");
+
+  // 9. Run eventserver
+  char* evs = m_conf->getconf("expreco", "evsscript");
+  char* evsport = m_conf->getconf("expreco", "evsport");
+  m_pid_evs = m_proc->Execute(evs, evsport);
 
   debug("BOOT done");
 
@@ -64,18 +109,6 @@ bool ExpRecoCallback::load() throw()
   //  download();
   //  _node->getData()->print();
 
-  // 1. Run basf2
-  char* basf2 = m_conf->getconf("expreco", "basf2script");
-  char* rbufin = m_conf->getconf("expreco", "ringbufin");
-  char* dqmdest = m_conf->getconf("dqmserver", "host");
-  char* dqmport = m_conf->getconf("dqmserver", "port");
-  m_pid_basf2 = m_proc->Execute(basf2, rbufin, dqmdest, dqmport);
-
-  // 2. Run receiver
-  char* receiver = m_conf->getconf("expreco", "recvscript");
-  char* srchost = m_conf->getconf("storage", "host");
-  char* port = m_conf->getconf("storage", "port");
-  m_pid_receiver = m_proc->Execute(receiver, rbufin, srchost, port, "expreco", (char*)"0");
 
   return true;
 }
@@ -110,6 +143,11 @@ bool ExpRecoCallback::recover() throw()
     waitpid(m_pid_receiver, &status, 0);
   }
 
+  if (m_pid_evs != 0) {
+    kill(m_pid_evs, SIGINT);
+    waitpid(m_pid_evs, &status, 0);
+  }
+
   // Clear RingBuffer
   m_rbuf->clear();
 
@@ -127,4 +165,19 @@ bool ExpRecoCallback::trigft() throw()
   Belle2::debug("trigger_limit : %d", (int)getMessage().getParam(2));
   return true;
 }
+
+void ExpRecoCallback::ExpRecoLogger()
+{
+  while (true) {
+    int st = m_proc->CheckOutput();
+    if (st < 0) {
+      perror("ExpRecoLogger::server");
+      //      exit ( -1 );
+    } else if (st > 0) {
+      m_log->ProcessLog(m_proc->GetFd());
+    }
+  }
+}
+
+
 

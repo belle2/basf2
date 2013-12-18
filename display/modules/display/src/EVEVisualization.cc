@@ -276,7 +276,6 @@ void EVEVisualization::addTrack(const genfit::Track* track, const TString& label
   // parse the option string ------------------------------------------------------------------------
   bool drawDetectors = false;
   bool drawHits = false;
-  bool drawScaleMan = false;
   bool drawMarkers = false;
   bool drawPlanes = false;
 
@@ -286,7 +285,6 @@ void EVEVisualization::addTrack(const genfit::Track* track, const TString& label
       if (m_options.at(i) == 'H') drawHits = true;
       if (m_options.at(i) == 'M') drawMarkers = true;
       if (m_options.at(i) == 'P') drawPlanes = true;
-      if (m_options.at(i) == 'S') drawScaleMan = true;
     }
   }
   // finished parsing the option string -------------------------------------------------------------

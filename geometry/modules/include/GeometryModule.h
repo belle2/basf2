@@ -32,6 +32,11 @@ namespace Belle2 {
     std::vector<std::string> m_components;
     /** Components to excluded from creation */
     std::vector<std::string> m_excluded;
+
+    /** Backwards compatibility with the old parameter Components */
+    std::vector<std::string> m_componentsOld;
+    /** Backwards compatibility with the old parameter ExcludedComponents */
+    std::vector<std::string> m_excludedOld;
   };
 } //Belle2 namespace
 #endif

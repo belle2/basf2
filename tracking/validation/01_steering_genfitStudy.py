@@ -113,9 +113,9 @@ if svd:
     componentList.append('SVD')
 if cdc:
     componentList.append('CDC')
-    componentList.append('MagneticField4LimitedRCDC')
+    componentList.append('MagneticFieldConstant4LimitedRCDC')
 else:
-    componentList.append('MagneticField4LimitedRSVD')
+    componentList.append('MagneticFieldConstant4LimitedRSVD')
 
 geometry.param('Components', componentList)
 

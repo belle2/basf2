@@ -23,9 +23,9 @@ evtgeninput.param('boost2LAB', True)
 main.add_module(evtgeninput)
 
 # detector simulation
-bg = []
+bg = None
 if os.environ.has_key('BELLE2_BACKGROUND_DIR'):
-    bg += glob.glob(os.environ['BELLE2_BACKGROUND_DIR'] + '/*.root')
+    bg = glob.glob(os.environ['BELLE2_BACKGROUND_DIR'] + '/*.root')
 add_simulation(main, bkgfiles=bg)
 
 # reconstruction

@@ -79,6 +79,8 @@
 #define NSMD_INITCOUNT_DELTA  2
 #define NSMD_CONNECT_TIMEOUT  5 // this must be smaller than INITCOUNT
 
+#undef SIGRTMIN
+
 // -- global variables --------------------------------------------------
 // ----------------------------------------------------------------------
 uint16      nsmd_port   = NSM2_PORT;
@@ -895,9 +897,13 @@ nsmd_shmopen(int shmkey, time_t now)
 {
   // DBG("nsmd_shmopen(%d)", shmkey);
 
-  int retsys = nsmd_shmget(shmkey,   sizeof(NSMsys), 0755, nsmd_shmsysid,
+  //  int retsys = nsmd_shmget(shmkey,   sizeof(NSMsys), 0755, nsmd_shmsysid,
+  //           (char **)&nsmd_sysp, now);
+  int retsys = nsmd_shmget(shmkey,   sizeof(NSMsys), 0777, nsmd_shmsysid,
                            (char**)&nsmd_sysp, now);
-  int retmem = nsmd_shmget(shmkey + 1, sizeof(NSMmem), 0775, nsmd_shmmemid,
+  //  int retmem = nsmd_shmget(shmkey+1, sizeof(NSMmem), 0775, nsmd_shmmemid,
+  //         (char **)&nsmd_memp, now);
+  int retmem = nsmd_shmget(shmkey + 1, sizeof(NSMmem), 0777, nsmd_shmmemid,
                            (char**)&nsmd_memp, now);
 
   if ((retsys == 0 || retsys == ENOENT) &&
@@ -1457,7 +1463,9 @@ nsmd_tcpsend(NSMcon& con, NSMdmsg& dmsg, NSMDtcpq* qptr, int beforeafter)
         ret = sigqueue((pid_t)con.pid, SIGRTMIN, sv);
         //ret = sigqueue((pid_t)con.pid, SIGRTMIN, (const union sigval)0);
 #else
-        ERRO("SIGRTMIN undefined");
+        const union sigval sv = { 0 };
+        ret = sigqueue((pid_t)con.pid, SIGUSR1, sv);
+        //  ERRO("SIGRTMIN undefined");
 #endif
       }
       if (ret >= 0) break;
@@ -3766,7 +3774,7 @@ nsmd_do_allocmem(NSMcon& con, NSMdmsg& dmsg)
   if ((datid = ntohs(nod.noddat)) != (uint16) - 1) {
     do {
       nodeap = sys.dat + datid;
-    } while ((datid = ntohs(nodeap->nnext)) != (uint16) - 1); //Fixed a BUG : (int16) ->(uint16)
+    } while ((datid = ntohs(nodeap->nnext)) != (int16) - 1);
   }
   int16* nprevp = nodeap ? &nodeap->nnext : &nod.noddat;
 

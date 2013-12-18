@@ -128,7 +128,7 @@ EVEVisualization::EVEVisualization():
   m_gftrackpropagator = new TEveTrackPropagator();
   m_gftrackpropagator->IncDenyDestroy();
   m_gftrackpropagator->SetMagFieldObj(&m_bfield, false);
-  m_gftrackpropagator->SetMaxOrbs(0.01); //stop after track markers
+  m_gftrackpropagator->SetMaxOrbs(0.5); //stop after track markers
 
   m_gftracklist = new TEveElementList("Fitted tracks");
   m_gftracklist->IncDenyDestroy();

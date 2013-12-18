@@ -343,7 +343,8 @@ class TLink {
 
   public:// Static utility functions
     /// returns TRGCDCTrackMC
-    static const TTrackMC& links2HEP(const AList<TLink> & links);
+//  static const TTrackMC & links2HEP(const AList<TLink> & links);
+    static const TTrackMC * links2HEP(const AList<TLink> & links);
 
     /// returns \# of layers.
     static unsigned nSuperLayers(const AList<TLink> & links);

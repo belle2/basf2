@@ -2092,167 +2092,167 @@ TTrackManager::copyTrack(TTrack& t,
                          reccdc_trk** pr,
                          reccdc_trk_add** pra) const {
 
-    static const unsigned GoodHitMask = (CellHitTimeValid |
-                                         CellHitChargeValid |
-                                         CellHitFindingValid |
-                                         CellHitFittingValid);
-    int err = 0;
+//     static const unsigned GoodHitMask = (CellHitTimeValid |
+//                                          CellHitChargeValid |
+//                                          CellHitFindingValid |
+//                                          CellHitFittingValid);
+//     int err = 0;
 
-    //...Hit loop...
-#ifdef TRASAN_DEBUG
-    t.fitted(true);
-#endif
-#ifdef TRASAN_DEBUG_DETAIL
-    cout << "    checking hits ... " << t.name()
-         << " quality = " << t.quality();
-    cout << " : " << t.cores().length() << ", " << t.ndf() << " : ";
-#endif
-//  unsigned j = 0;
-    unsigned nClst = 0;
-    unsigned nStereos = 0;
-    unsigned nOccupied = 0;
-    AList<TLink> hits;
-    AList<TLink> badHits;
-    const unsigned n = t.links().length();
-    for (unsigned i = 0; i < n; i++) {
-        TLink* l = t.links()[i];
-//cnv reccdc_wirhit * h = l->hit()->reccdc();
-        reccdc_wirhit* h = 0;
+//     //...Hit loop...
+// #ifdef TRASAN_DEBUG
+//     t.fitted(true);
+// #endif
+// #ifdef TRASAN_DEBUG_DETAIL
+//     cout << "    checking hits ... " << t.name()
+//          << " quality = " << t.quality();
+//     cout << " : " << t.cores().length() << ", " << t.ndf() << " : ";
+// #endif
+// //  unsigned j = 0;
+//     unsigned nClst = 0;
+//     unsigned nStereos = 0;
+//     unsigned nOccupied = 0;
+//     AList<TLink> hits;
+//     AList<TLink> badHits;
+//     const unsigned n = t.links().length();
+//     for (unsigned i = 0; i < n; i++) {
+//         TLink* l = t.links()[i];
+// //cnv reccdc_wirhit * h = l->hit()->reccdc();
+//         reccdc_wirhit* h = 0;
 
-#ifdef TRASAN_DEBUG_DETAIL
-        cout << l->wire()->name();
-        if (h->m_trk) cout << "(n/a)";
-        if ((l->hit()->state() & GoodHitMask) == GoodHitMask) {
-            if (l->hit()->state() & CellHitInvalidForFit) {
-                if (!(h->m_stat & CellHitInvalidForFit))
-                    cout << "(bad)";
-            }
-        }
-        cout << ",";
-#endif
+// #ifdef TRASAN_DEBUG_DETAIL
+//         cout << l->wire()->name();
+//         if (h->m_trk) cout << "(n/a)";
+//         if ((l->hit()->state() & GoodHitMask) == GoodHitMask) {
+//             if (l->hit()->state() & CellHitInvalidForFit) {
+//                 if (!(h->m_stat & CellHitInvalidForFit))
+//                     cout << "(bad)";
+//             }
+//         }
+//         cout << ",";
+// #endif
 
-        if (h->m_trk) {
-            ++nOccupied;
-            if (!(h->m_stat & CellHitInvalidForFit))
-                continue;
-        }
-        if ((l->hit()->state() & GoodHitMask) == GoodHitMask) {
-            if (l->hit()->state() & CellHitInvalidForFit) {
-                if (!(h->m_stat & CellHitInvalidForFit))
-                    badHits.append(l);
-            } else {
-                hits.append(l);
-                if (l->wire()->stereo()) ++nStereos;
-            }
-        }
-    }
-    t.finalHits(hits);
-#ifdef TRASAN_DEBUG_DETAIL
-    cout << endl;
-#endif
+//         if (h->m_trk) {
+//             ++nOccupied;
+//             if (!(h->m_stat & CellHitInvalidForFit))
+//                 continue;
+//         }
+//         if ((l->hit()->state() & GoodHitMask) == GoodHitMask) {
+//             if (l->hit()->state() & CellHitInvalidForFit) {
+//                 if (!(h->m_stat & CellHitInvalidForFit))
+//                     badHits.append(l);
+//             } else {
+//                 hits.append(l);
+//                 if (l->wire()->stereo()) ++nStereos;
+//             }
+//         }
+//     }
+//     t.finalHits(hits);
+// #ifdef TRASAN_DEBUG_DETAIL
+//     cout << endl;
+// #endif
 
-    //...Check # of hits...
-    if (t.quality() & TrackQuality2D) {
-        if (hits.length() < 3) err = 3;
-        if (nOccupied > 2) err = 4;
-    } else {
-        if (hits.length() < 5) err = 1;
-        if (nStereos < 2) err = 2;
-    }
-    if (err) return err;
+//     //...Check # of hits...
+//     if (t.quality() & TrackQuality2D) {
+//         if (hits.length() < 3) err = 3;
+//         if (nOccupied > 2) err = 4;
+//     } else {
+//         if (hits.length() < 5) err = 1;
+//         if (nStereos < 2) err = 2;
+//     }
+//     if (err) return err;
 
-    //...Create new tables...
-//cnv     * pr = (reccdc_trk *) BsNewEnt(RECCDC_TRK);
-//     * pra = (reccdc_trk_add *) BsNewEnt(RECCDC_TRK_ADD);
-    * pr = 0;
-    * pra = 0;
-    reccdc_trk* r = * pr;
-//  reccdc_trk_add * ra = * pra;
+//     //...Create new tables...
+// //cnv     * pr = (reccdc_trk *) BsNewEnt(RECCDC_TRK);
+// //     * pra = (reccdc_trk_add *) BsNewEnt(RECCDC_TRK_ADD);
+//     * pr = 0;
+//     * pra = 0;
+//     reccdc_trk* r = * pr;
+// //  reccdc_trk_add * ra = * pra;
 
-    //...Copy hit information...
-    // const AList<TLink> & cores = t.cores();
-    // const AList<TLink> & links = t.links();
-    // unsigned allHits = cores.length();
-    // unsigned stereoHits = NStereoHits(cores);
-    // r.m_chiSq = t.chi2();
-    // r.m_confl = t.confidenceLevel();
-    // r.m_ndf = t.ndf();
-    // r.m_nhits = allHits;
-    // r.m_nster = stereoHits;
-    float chisq = 0.;
-    unsigned nHits = hits.length();
-    for (unsigned i = 0; i < nHits; i++) {
-        TLink* l = hits[i];
-//cnv reccdc_wirhit * h = hits[i]->hit()->reccdc();
-        reccdc_wirhit* h = 0;
-        h->m_trk = r->m_ID;
-        h->m_pChiSq = l->pull();
-        h->m_lr = l->leftRight();
-        if (l->usecathode() == 4) ++nClst;
-        chisq += h->m_pChiSq;
+//     //...Copy hit information...
+//     // const AList<TLink> & cores = t.cores();
+//     // const AList<TLink> & links = t.links();
+//     // unsigned allHits = cores.length();
+//     // unsigned stereoHits = NStereoHits(cores);
+//     // r.m_chiSq = t.chi2();
+//     // r.m_confl = t.confidenceLevel();
+//     // r.m_ndf = t.ndf();
+//     // r.m_nhits = allHits;
+//     // r.m_nster = stereoHits;
+//     float chisq = 0.;
+//     unsigned nHits = hits.length();
+//     for (unsigned i = 0; i < nHits; i++) {
+//         TLink* l = hits[i];
+// //cnv reccdc_wirhit * h = hits[i]->hit()->reccdc();
+//         // reccdc_wirhit* h = 0;
+//         // h->m_trk = r->m_ID;
+//         // h->m_pChiSq = l->pull();
+//         // h->m_lr = l->leftRight();
+//         // if (l->usecathode() == 4) ++nClst;
+//         // chisq += h->m_pChiSq;
 
-#ifdef TRASAN_DEBUG_DETAIL
-        cout << "        chisq,sum(" << l->wire()->name() << ")=:"
-             << h->m_pChiSq << "," << chisq << endl;
-#endif
-    }
-    r->m_chiSq = chisq;
-    r->m_nhits = nHits;
-    r->m_nster = nStereos;
-    r->m_ndf = nHits - 5;
-    if (t.quality() & TrackQuality2D)
-        r->m_ndf = nHits - 3;
+// #ifdef TRASAN_DEBUG_DETAIL
+//         cout << "        chisq,sum(" << l->wire()->name() << ")=:"
+//              << h->m_pChiSq << "," << chisq << endl;
+// #endif
+//     }
+//     r->m_chiSq = chisq;
+//     r->m_nhits = nHits;
+//     r->m_nster = nStereos;
+//     r->m_ndf = nHits - 5;
+//     if (t.quality() & TrackQuality2D)
+//         r->m_ndf = nHits - 3;
 
-    //...Bad hits...
-    const unsigned n2 = badHits.length();
-    for (unsigned i = 0; i < n2; i++) {
-//cnv reccdc_wirhit * h = badHits[i]->hit()->reccdc();
-        reccdc_wirhit* h = 0;
-        h->m_trk = r->m_ID;
-        h->m_stat |= CellHitInvalidForFit;
-    }
+//     //...Bad hits...
+//     const unsigned n2 = badHits.length();
+// //     for (unsigned i = 0; i < n2; i++) {
+// // //cnv reccdc_wirhit * h = badHits[i]->hit()->reccdc();
+// // //        reccdc_wirhit* h = 0;
+// //         // h->m_trk = r->m_ID;
+// //         // h->m_stat |= CellHitInvalidForFit;
+// //     }
 
-    //...Cathode...
-    r->m_nclus = nClst;
+//     //...Cathode...
+//     r->m_nclus = nClst;
 
-    //...THelix parameter...
-    const CLHEP::HepVector& a = t.helix().a();
-    const CLHEP::HepSymMatrix& ea = t.helix().Ea();
-    const HepGeom::Point3D<double>& x = t.helix().pivot();
-    r->m_helix[0] = tosingle(a[0]);
-    r->m_helix[1] = tosingle(a[1]);
-    r->m_helix[2] = tosingle(a[2]);
-    r->m_helix[3] = tosingle(a[3]);
-    r->m_helix[4] = tosingle(a[4]);
+//     //...THelix parameter...
+//     const CLHEP::HepVector& a = t.helix().a();
+//     const CLHEP::HepSymMatrix& ea = t.helix().Ea();
+//     const HepGeom::Point3D<double>& x = t.helix().pivot();
+//     r->m_helix[0] = tosingle(a[0]);
+//     r->m_helix[1] = tosingle(a[1]);
+//     r->m_helix[2] = tosingle(a[2]);
+//     r->m_helix[3] = tosingle(a[3]);
+//     r->m_helix[4] = tosingle(a[4]);
 
-    r->m_pivot[0] = tosingle(x.x());
-    r->m_pivot[1] = tosingle(x.y());
-    r->m_pivot[2] = tosingle(x.z());
+//     r->m_pivot[0] = tosingle(x.x());
+//     r->m_pivot[1] = tosingle(x.y());
+//     r->m_pivot[2] = tosingle(x.z());
 
-    r->m_error[0] = tosingle(ea[0][0]);
-    r->m_error[1] = tosingle(ea[1][0]);
-    r->m_error[2] = tosingle(ea[1][1]);
-    r->m_error[3] = tosingle(ea[2][0]);
-    r->m_error[4] = tosingle(ea[2][1]);
-    r->m_error[5] = tosingle(ea[2][2]);
-    r->m_error[6] = tosingle(ea[3][0]);
-    r->m_error[7] = tosingle(ea[3][1]);
-    r->m_error[8] = tosingle(ea[3][2]);
-    r->m_error[9] = tosingle(ea[3][3]);
-    r->m_error[10] = tosingle(ea[4][0]);
-    r->m_error[11] = tosingle(ea[4][1]);
-    r->m_error[12] = tosingle(ea[4][2]);
-    r->m_error[13] = tosingle(ea[4][3]);
-    r->m_error[14] = tosingle(ea[4][4]);
+//     r->m_error[0] = tosingle(ea[0][0]);
+//     r->m_error[1] = tosingle(ea[1][0]);
+//     r->m_error[2] = tosingle(ea[1][1]);
+//     r->m_error[3] = tosingle(ea[2][0]);
+//     r->m_error[4] = tosingle(ea[2][1]);
+//     r->m_error[5] = tosingle(ea[2][2]);
+//     r->m_error[6] = tosingle(ea[3][0]);
+//     r->m_error[7] = tosingle(ea[3][1]);
+//     r->m_error[8] = tosingle(ea[3][2]);
+//     r->m_error[9] = tosingle(ea[3][3]);
+//     r->m_error[10] = tosingle(ea[4][0]);
+//     r->m_error[11] = tosingle(ea[4][1]);
+//     r->m_error[12] = tosingle(ea[4][2]);
+//     r->m_error[13] = tosingle(ea[4][3]);
+//     r->m_error[14] = tosingle(ea[4][4]);
 
-    //...Get outer most hit(=termination point)...
-    TLink* last = TLink::outerMost(hits);
+//     //...Get outer most hit(=termination point)...
+//     TLink* last = TLink::outerMost(hits);
 
-    //...Calculate phi of the termination point...
-    t.approach(* last);
-    r->m_fiTerm = last->dPhi();
+//     //...Calculate phi of the termination point...
+//     t.approach(* last);
+//     r->m_fiTerm = last->dPhi();
 
-    return err;
+//     return err;
 }
 
 int

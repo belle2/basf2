@@ -921,13 +921,13 @@ TLink::nMissingAxialSuperLayers(const AList<TLink> & links) {
     return nMax;
 }
 
-const TTrackMC &
+const TTrackMC *
 TLink::links2HEP(const AList<TLink> & links) {
     const TTrackMC * best = NULL;
     const std::vector<const TTrackMC *> list = TTrackMC::list();
     unsigned nHep = list.size();
 
-    if (! nHep) return * best;
+    if (! nHep) return best;
 
     unsigned* N;
     if (NULL == (N = (unsigned*) malloc(nHep * sizeof(unsigned)))) {
@@ -952,7 +952,10 @@ TLink::links2HEP(const AList<TLink> & links) {
 	}
     }
 
-    return * best;
+    if (N)
+        free(N);
+
+    return best;
 }
 
 void

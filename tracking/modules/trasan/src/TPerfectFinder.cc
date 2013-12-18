@@ -232,7 +232,7 @@ TPerfectFinder::clear(void) {
 
 float
 TPerfectFinder::charge(int pType) const {
-    float chg;
+    float chg = 0;
 
     if (pType == 11) chg = -1;
     else if (pType == -11) chg = 1;

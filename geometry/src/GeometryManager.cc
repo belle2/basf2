@@ -107,6 +107,10 @@ namespace Belle2 {
       //check if all of those names are actually known components
       std::set<std::string> componentNames = m_components;
       std::set<std::string> excludedNames = m_excluded;
+      std::set<std::string> additionalNames = m_additional;
+      if (!m_components.empty() && !m_additional.empty()) {
+        B2WARNING("Additional components are ignored when a list of components is provided.")
+      }
 
       //Now create all subcomponents
       for (const GearDir & component : detectorDir.getNodes("DetectorComponent")) {
@@ -119,13 +123,23 @@ namespace Belle2 {
           B2ERROR("Could not find required element Name or Creator for " << component.getPath());
           continue;
         }
-        //Remove this name from the list of selected or excluded components. At
+        const bool isDefault = component.getBool("@isDefault", true);
+        //Remove this name from the list of selected, excluded or additional components. At
         //the end there should be nothing left in these lists
         componentNames.erase(name);
         excludedNames.erase(name);
+        additionalNames.erase(name);
         if (m_components.size() > 0 && m_components.count(name) == 0) {
           B2INFO("DetectorComponent " << name << " not in list of components, skipping");
           continue;
+        }
+        if (m_components.empty() && !isDefault) {
+          if (m_additional.count(name) == 0) {
+            B2INFO("DectorComponent " << name << " is not enabled by default, skipping");
+            continue;
+          } else {
+            B2INFO("DectorComponent " << name << " is enabled in addition to the default components");
+          }
         }
         if (m_excluded.size() > 0 && m_excluded.count(name) > 0) {
           B2INFO("DetectorComponent " << name << " in list of excluded components, skipping");
@@ -152,16 +166,21 @@ namespace Belle2 {
           m_creators.push_back(creator);
         }
       }
-      //If there is still stuff left in the list of selected components throw
-      //errors because there might be a typo in the component list
-      for (const std::string & name : componentNames) {
-        B2ERROR("'" << name << "' is specified in list of components but could not be found");
-      }
-      //If there is still stuff left in the list of excluded components throw
-      //errors because there might be a typo in the excluded component list
-      for (const std::string & name : excludedNames) {
-        B2ERROR("'" << name << "' is specified in list of excluded components but could not be found");
-      }
+
+      //If there are still names left in the componentNames, excludedNames or
+      //additionalNames there is probably an typo in the respective component
+      //list. Throw an error for each name left using a small lambda function
+      auto checkRemaining = [](const std::string & type, const std::set<std::string> componentNames) {
+        for (const std::string & name : componentNames) {
+          B2ERROR("'" << name << "' is specified in list of "
+                  << type << " but could not be found");
+        }
+      };
+
+      checkRemaining("components", componentNames);
+      checkRemaining("excluded components", excludedNames);
+      checkRemaining("additional components", additionalNames);
+
       int newSolids = G4SolidStore::GetInstance()->size();
       int newLogical = G4LogicalVolumeStore::GetInstance()->size();
       int newPhysical = G4PhysicalVolumeStore::GetInstance()->size();

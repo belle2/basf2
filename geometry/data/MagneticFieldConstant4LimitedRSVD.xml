@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<DetectorComponent name="MagneticField" xmlns:xi="http://www.w3.org/2001/XInclude">
+<DetectorComponent name="MagneticFieldConstant4LimitedRSVD" xmlns:xi="http://www.w3.org/2001/XInclude" isDefault="false">
 	<Description>The magnetic field description for the Belle II Detector</Description>
 	<Version>0</Version>
         <Creator>GeoMagneticField</Creator>

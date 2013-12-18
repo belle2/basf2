@@ -24,10 +24,10 @@
 
   <!-- Magnetic field -->
   <xi:include href="../geometry/MagneticFieldConstant.xml"/>
-  <!--xi:include href="../geometry/MagneticFieldConstant4LimitedRSVD.xml"/-->
-  <!--xi:include href="../geometry/MagneticFieldConstant4LimitedRCDC.xml"/-->
-  <!--xi:include href="../geometry/MagneticField2d.xml"/-->
-  <!--xi:include href="../geometry/MagneticField3d.xml"/-->
+  <xi:include href="../geometry/MagneticFieldConstant4LimitedRSVD.xml"/>
+  <xi:include href="../geometry/MagneticFieldConstant4LimitedRCDC.xml"/>
+  <xi:include href="../geometry/MagneticField2d.xml"/>
+  <xi:include href="../geometry/MagneticField3d.xml"/>
 
   <!-- Accelerator -->
   <xi:include href="SuperKEKB.xml"/>

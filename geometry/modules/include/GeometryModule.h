@@ -32,6 +32,8 @@ namespace Belle2 {
     std::vector<std::string> m_components;
     /** Components to excluded from creation */
     std::vector<std::string> m_excluded;
+    /** Components to be added in addition to the default ones */
+    std::vector<std::string> m_additional;
 
     /** Backwards compatibility with the old parameter Components */
     std::vector<std::string> m_componentsOld;

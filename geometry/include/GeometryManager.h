@@ -86,6 +86,20 @@ namespace Belle2 {
       }
 
       /**
+       * Set the names of addtional components to be added to the default set.
+       * This member allows to set a list of component names. When creating the
+       * the geometry, components matching names in the list will be added if
+       * they are not disabled by default. If a list of components is already
+       * provided this list is ignored.
+       *
+       * @param components List of detector components to be added in addition
+       */
+      void setAdditionalComponents(const std::vector<std::string>& components) {
+        m_additional.clear();
+        m_additional.insert(components.begin(), components.end());
+      }
+
+      /**
        * Delete the existing Geant4 Geometry.
        */
       void clear();
@@ -117,6 +131,8 @@ namespace Belle2 {
       std::set<std::string> m_components;
       /** List of names of components to be excluded from creation */
       std::set<std::string> m_excluded;
+      /** List of additional components to be added to the default set of components */
+      std::set<std::string> m_additional;
 
       /** Allow destruction of instance */
       friend class std::auto_ptr<GeometryManager>;

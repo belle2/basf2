@@ -33,6 +33,8 @@ GeometryModule::GeometryModule()
            "in the parameter file will be ignored", m_components);
   addParam("excludedComponents", m_excluded,
            "Name of the components to excluded from creation", m_excluded);
+  addParam("additionalComponents", m_additional,
+           "Name of components to be created in addition to the default parameters", m_additional);
 
   //TODO: Deprecated parameters, remove in future
   addParam("Components", m_componentsOld,
@@ -46,6 +48,7 @@ void GeometryModule::initialize()
   geometry::GeometryManager& geoManager = geometry::GeometryManager::getInstance();
   geoManager.setDetectorComponents(m_components);
   geoManager.setExcludedComponents(m_excluded);
+  geoManager.setAdditionalComponents(m_additional);
 
   //TODO: Check deprecated parameters, remove in future
   if (getParam<std::vector<std::string>>("Components").isSetInSteering()) {

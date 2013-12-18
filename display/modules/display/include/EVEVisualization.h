@@ -332,12 +332,10 @@ namespace Belle2 {
   {
     // parse the option string ------------------------------------------------------------------------
     bool drawHits = false;
-    bool drawTrack = false;
 
     if (m_options != "") {
       for (size_t i = 0; i < m_options.length(); i++) {
         if (m_options.at(i) == 'H') drawHits = true;
-        if (m_options.at(i) == 'T') drawTrack = true;
       }
     }
     // finished parsing the option string -------------------------------------------------------------
@@ -402,31 +400,26 @@ namespace Belle2 {
       m_trackcandlist->IncDenyDestroy();
     }
 
-    // draw track if corresponding option is set ------------------------------------------
-    if (drawTrack) {
-      TEveRecTrack rectrack;
-      rectrack.fP.Set(track_mom);
-      rectrack.fV.Set(track_pos);
+    TEveRecTrack rectrack;
+    rectrack.fP.Set(track_mom);
+    rectrack.fV.Set(track_pos);
 
-      TEveTrack* track_lines = new TEveTrack(&rectrack, m_gftrackpropagator);
-      track_lines->SetName(label); //popup label set at end of function
-      track_lines->SetPropagator(m_gftrackpropagator);
-      track_lines->SetLineColor(c_trackCandColor);
-      track_lines->SetLineWidth(1);
-      track_lines->SetTitle(TString::Format("%s\n"
-                                            "#hits: %u\n"
-                                            "pT=%.3f, pZ=%.3f",
-                                            label.Data(), numhits,
-                                            track_mom.Pt(), track_mom.Pz()));
+    TEveTrack* track_lines = new TEveTrack(&rectrack, m_gftrackpropagator);
+    track_lines->SetName(label); //popup label set at end of function
+    track_lines->SetPropagator(m_gftrackpropagator);
+    track_lines->SetLineColor(c_trackCandColor);
+    track_lines->SetLineWidth(1);
+    track_lines->SetTitle(TString::Format("%s\n"
+                                          "#hits: %u\n"
+                                          "pT=%.3f, pZ=%.3f",
+                                          label.Data(), numhits,
+                                          track_mom.Pt(), track_mom.Pz()));
 
-      track_lines->SetCharge((int)trackCand->getChargeSeed());
+    track_lines->SetCharge((int)trackCand->getChargeSeed());
 
 
-      track_lines->AddElement(lines);
-      m_trackcandlist->AddElement(track_lines);
-    } else {
-      m_trackcandlist->AddElement(lines);
-    }
+    track_lines->AddElement(lines);
+    m_trackcandlist->AddElement(track_lines);
   }
 }
 #endif

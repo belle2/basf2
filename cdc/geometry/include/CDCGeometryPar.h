@@ -565,7 +565,7 @@ namespace Belle2 {
 
     inline double CDCGeometryPar::momZ(int iBound) const
     {
-      returm m_momZ[iBound];
+      return m_momZ[iBound];
     }
 
     inline double CDCGeometryPar::momRmin(int iBound) const

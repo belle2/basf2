@@ -162,7 +162,11 @@ namespace Belle2 {
           trackToArich.add(track->getTrackID(), last);
           extToArich.add(track->getHitID(), last);
           int aeroIndex = track->getAeroIndex();
-          if (aeroIndex >= 0) aeroHitToArich.add(aeroIndex, last);
+          if (aeroIndex >= 0) {
+            aeroHitToArich.add(aeroIndex, last);
+          } else {
+            B2DEBUG(50, "No AeroHit for Track " << track->getTrackID());
+          }
         }
 
         trackToArich.consolidate();
@@ -197,8 +201,6 @@ namespace Belle2 {
 
         m_ana->smearTracks(arichTracks);
         m_ana->likelihood2(arichTracks);
-
-
 
         for (int iTrack = 0; iTrack < nTracks; ++iTrack) {
           ARICHTrack* track = &arichTracks[iTrack];

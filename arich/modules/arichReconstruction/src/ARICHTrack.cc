@@ -25,7 +25,7 @@ ARICHTrack::ARICHTrack(const ARICHAeroHit& aeroHit)
   m_reconstructedDirection = TVector3(0, 0, 0);
   m_reconstructedMomentum = -1.0;
   m_PDGCharge = 0; // check if aeroHit contains this info
-  m_PDGEncoding = aeroHit.getParticleID();
+  m_PDGEncoding = aeroHit.getPDG();
   m_trackID = aeroHit.getTrackID();
   m_extHitID = -1;
   m_identity = Lund2Type(m_PDGEncoding);

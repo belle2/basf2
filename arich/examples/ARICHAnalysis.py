@@ -22,9 +22,11 @@ parser = OptionParser()
 parser.add_option('-n', '--nevents', dest='nevents', default=10,
                   help='Number of events to process')
 parser.add_option('-f', '--file', dest='filename', default='extArichTest.root')
+parser.add_option('-d', '--debug', dest='debugLevel', default=10)
 (options, args) = parser.parse_args()
 nevents = int(options.nevents)
 filename = options.filename
+debugLevel = int(options.debugLevel)
 
 # suppress messages and warnings during processing DEBUG, INFO, WARNING, ERROR
 set_log_level(LogLevel.INFO)
@@ -70,11 +72,11 @@ particlegun.param('momentumParams', [0.5, 4])
 # Setting the parameters for the random generation
 # of the particle polar angle:
 particlegun.param('thetaGeneration', 'uniformCosinus')
-particlegun.param('thetaParams', [17, 35])
+particlegun.param('thetaParams', [17.0, 35.0])
 particlegun.param('vertexGeneration', 'fixed')
-particlegun.param('xVertexParams', [0])
-particlegun.param('yVertexParams', [0])
-particlegun.param('zVertexParams', [0])
+particlegun.param('xVertexParams', [0.0, 0.0])
+particlegun.param('yVertexParams', [0.0, 0.0])
+particlegun.param('zVertexParams', [0.0, 0.0])
 particlegun.param('independentVertices', False)
 # Print the parameters of the particle gun
 print_params(particlegun)
@@ -83,7 +85,7 @@ main.add_module(particlegun)
 
 # Run simulation
 simulation = register_module('FullSim')
-simulation.param('StoreAllSecondaries', 1)
+simulation.param('StoreAllSecondaries', True)
 main.add_module(simulation)
 
 # PXD digitization & clustering
@@ -128,7 +130,7 @@ main.add_module(arichRECO)
 # my module - reconstruction efficiency analysis
 arichEfficiency = register_module('ARICHAnalysis')
 arichEfficiency.logging.log_level = LogLevel.DEBUG
-arichEfficiency.logging.debug_level = 20
+arichEfficiency.logging.debug_level = debugLevel
 arichEfficiency.param('outputFile', filename)
 arichEfficiency.param('inputTrackType', 0)
 main.add_module(arichEfficiency)

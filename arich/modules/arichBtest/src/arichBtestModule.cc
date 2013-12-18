@@ -452,7 +452,7 @@ int arichBtestModule::readdata(gzFile fp, int rec_id, int)
       // Add new ARIHCAeroHit to datastore
       ARICHAeroHit* newAeroHit = arichAeroHits.appendNew();
       newAeroHit->setTrackID(trackId);
-      newAeroHit->setParticleID(particleId);
+      newAeroHit->setPDG(particleId);
       newAeroHit->setPosition(r);
       newAeroHit->setMomentum(dir);
     }

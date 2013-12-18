@@ -53,13 +53,16 @@ namespace Belle2 {
   //-----------------------------------------------------------------
 
   ARICHAnalysisModule::ARICHAnalysisModule() : Module(),
-    m_eventNo(-1),
+    m_eventNo(0),
     m_trackNo(-1),
     file(new TFile),
     tree(new TTree),
     m_chi2(0),
     m_pdg(0),
-    m_primary(-1),
+    m_charge(999),
+    m_flag(-1),
+    m_daughter(-1),
+    m_lifetime(-1),
     m_detPhotons(0)
 
   {
@@ -76,15 +79,16 @@ namespace Belle2 {
     //    addParam("ListName", m_list, "some list of names", defaultList);
     //    addParam("ModuleType", m_type, "some int number", 0);
 
-    for (int i = 0; i < 3; i++) {
-      m_truePosition[i] = 0;
-      m_position[i] = 0;
-      m_trueMomentum[i] = 0;
-      m_momentum[i] = 0;
+    for (int j = 0; j < 3; j++) {
+      m_decayVertex[j] = 0;
+      m_truePosition[j] = 0;
+      m_position[j] = 0;
+      m_trueMomentum[j] = 0;
+      m_momentum[j] = 0;
     };
-    for (int i = 0; i < 5; i++) {
-      m_logl[i] = 0;
-      m_expPhotons[i] = 0;
+    for (int k = 0; k < 5; k++) {
+      m_logl[k] = 0;
+      m_expPhotons[k] = 0;
     };
 
   }
@@ -106,7 +110,11 @@ namespace Belle2 {
     tree->Branch("m_trackNo", &m_trackNo, "m_trackNo/I");
     tree->Branch("m_chi2", &m_chi2, "m_chi2/F");
     tree->Branch("m_pdg", &m_pdg, "m_pdg/I");
-    tree->Branch("m_primary", &m_primary, "m_primary/I");
+    tree->Branch("m_charge", &m_charge, "m_charge/I");
+    tree->Branch("m_flag", &m_flag, "m_flag/I");
+    tree->Branch("m_daughter", &m_daughter, "m_daughter/I");
+    tree->Branch("m_lifetime", &m_lifetime, "m_lifetime/F");
+    tree->Branch("m_decayVertex", &m_decayVertex, "x/F:y/F:z/F");
     tree->Branch("m_logl", &m_logl, "e/F:mu/F:pi/F:K/F:p/F");
     tree->Branch("m_detPhotons", &m_detPhotons, "m_detPhotons/I");
     tree->Branch("m_expPhotons", &m_expPhotons, "e/F:mu/F:pi/F:K/F:p/F");
@@ -125,35 +133,65 @@ namespace Belle2 {
   void ARICHAnalysisModule::event()
   {
     m_eventNo++;
-    B2DEBUG(50, "Event" << m_eventNo);
+    B2DEBUG(50, "Event number: " << m_eventNo);
 
     if (m_inputTrackType == 0) {
 
       // Input particles
-      StoreArray<Track> tracks;
-      if (!tracks.isValid()) return;
+      StoreArray<ARICHAeroHit> aeroHits;
+      if (!aeroHits.isValid()) return;
 
-      m_trackNo = tracks.getEntries();
-      B2DEBUG(50, "No. of tracks " << m_trackNo);
+      m_trackNo = aeroHits.getEntries();
+      B2DEBUG(50, "No. of hits " << m_trackNo);
 
-      for (int iTrack = 0; iTrack < tracks.getEntries(); iTrack++) {
+      for (int iHit = 0; iHit < aeroHits.getEntries(); iHit++) {
         // Get the track and related DataStore entries
-        const Track* track = tracks[iTrack];
+        const ARICHAeroHit* aeroHit = aeroHits[iHit];
+        const MCParticle* particle = DataStore::getRelated<MCParticle>(aeroHit);
+        if (!particle) {
+          B2DEBUG(50, "No MCParticle for AeroHit!");
+          B2DEBUG(50, "Particle momentum: " << aeroHit->getMomentum().Mag());
+          B2DEBUG(50, "Particle PDG: " << aeroHit->getPDG());
+          continue;
+        }
+        if (!(particle->hasStatus(MCParticle::c_PrimaryParticle) and particle->hasStatus(MCParticle::c_StableInGenerator))) continue;
+        m_pdg = particle->getPDG();
+        B2DEBUG(50, "PDG " << m_pdg);
+        m_charge = particle->getCharge();
+        m_flag = particle->getStatus();
+        B2DEBUG(50, "MC flag: " << m_flag << " flag & 1: " << (m_flag & 1));
+        vector<MCParticle*> daughters = particle->getDaughters();
+        if (daughters.size()) m_daughter = daughters[0]->getPDG();
+        B2DEBUG(50, "daughter pdg " << m_daughter);
+        if (!(m_flag & 1)) B2DEBUG(50, "m_flag & 1: " << (m_flag & 1));
+        m_lifetime = particle->getLifetime();
+        TVector3 decayVertex = particle->getDecayVertex();
+        m_decayVertex[0] = decayVertex.X();
+        m_decayVertex[1] = decayVertex.Y();
+        m_decayVertex[2] = decayVertex.Z();
+
+        const ARICHLikelihood* arich = DataStore::getRelated<ARICHLikelihood>(aeroHit);
+        if (!arich) {
+          B2DEBUG(50, "No ARICHLikelihood related to AeroHit");
+          continue;
+        }
+
+        const Track* track = DataStore::getRelated<Track>(particle);
+        if (!track) {
+          B2DEBUG(50, "No Track relation to MCParticle");
+          B2DEBUG(50, "PDG " << m_pdg);
+          B2DEBUG(50, "Generated momentum: " << particle->getMomentum().Mag());
+          continue;
+        }
         const TrackFitResult* fitResult = track->getTrackFitResult(Const::pion);
         m_chi2 = fitResult->getPValue();
         B2DEBUG(50, "Track.Chi2 probability " << m_chi2);
-        const MCParticle* particle = DataStore::getRelated<MCParticle>(track);
-        if (!particle) continue;
-        m_pdg = particle->getPDG();
-        B2DEBUG(50, "PDG " << m_pdg);
-        m_primary = particle->getStatus(MCParticle::c_PrimaryParticle);
-        B2DEBUG(50, "MC flag: primary " << m_primary);
-        const ARICHLikelihood* arich = DataStore::getRelated<ARICHLikelihood>(track);
-        if (!arich) continue;
-        const ARICHAeroHit* aeroHit = DataStore::getRelated<ARICHAeroHit>(arich);
-        if (!aeroHit) continue;
+
         const ExtHit* extHit = DataStore::getRelated<ExtHit>(arich);
-        if (!extHit) continue;
+        if (!extHit) {
+          B2DEBUG(50, "No extHit related with Track");
+          continue;
+        }
 
         B2DEBUG(50, "ExtHit particle with pion ARICH likelihood: " << arich->getLogL_pi() <<
                 " and PDG: " << extHit->getPdgCode());
@@ -207,8 +245,9 @@ namespace Belle2 {
         }
         m_pdg = particle->getPDG();
         B2DEBUG(50, "PDG " << m_pdg);
-        m_primary = particle->getStatus(MCParticle::c_PrimaryParticle);
-        B2DEBUG(50, "MC flag: primary " << m_primary);
+        m_charge = particle->getCharge();
+        m_flag = particle->getStatus(MCParticle::c_PrimaryParticle);
+        B2DEBUG(50, "MC flag: primary " << m_flag);
         const ARICHLikelihood* arich = DataStore::getRelated<ARICHLikelihood>(aeroHit);
         if (!arich) continue;
 

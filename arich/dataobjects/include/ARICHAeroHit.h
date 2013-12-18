@@ -59,7 +59,7 @@ namespace Belle2 {
     void setTrackID(int trackId) { m_trackID = trackId; }
 
     //! Set particle PDG identity number
-    void setParticleID(int particleId) { m_particleID = particleId; }
+    void setPDG(int particleId) { m_particleID = particleId; }
 
     //! Set track position (at entrance in 1. aerogel plane)
     void setPosition(TVector3 position) { m_position = position; }
@@ -71,7 +71,7 @@ namespace Belle2 {
     int getTrackID() const { return m_trackID; }
 
     //! Get particle PDG identity number
-    int getParticleID() const { return m_particleID; }
+    int getPDG() const { return m_particleID; }
 
     //! Get track position (at entrance in 1. aerogel plane)
     const TVector3& getPosition() const { return m_position; }

@@ -78,6 +78,7 @@ void extArichEfficiency(Float_t rMin=51, Float_t rMax=107,
   Int_t m_eventNo;
   Int_t m_trackNo;
   Int_t m_pdg;
+  Int_t m_charge;
   Int_t m_primary;
   Float_t m_logl[5];
   Int_t m_detPhotons;
@@ -90,7 +91,8 @@ void extArichEfficiency(Float_t rMin=51, Float_t rMax=107,
   tree->SetBranchAddress("m_eventNo", &m_eventNo);
   tree->SetBranchAddress("m_trackNo", &m_trackNo);
   tree->SetBranchAddress("m_pdg", &m_pdg);
-  tree->SetBranchAddress("m_primary", &m_primary);
+  tree->SetBranchAddress("m_charge", &m_charge);
+  tree->SetBranchAddress("m_flag", &m_primary);
   tree->SetBranchAddress("m_logl", &m_logl);
   tree->SetBranchAddress("m_detPhotons", &m_detPhotons);
   tree->SetBranchAddress("m_expPhotons", &m_expPhotons);
@@ -235,7 +237,7 @@ void extArichEfficiency(Float_t rMin=51, Float_t rMax=107,
   canvas1.cd(4);
   h_positionXY->GetYaxis()->SetTitleOffset(1.2);
   h_positionXY->Draw("colz");
-  canvas1.Print("arichEfficiency.pdf(");
+  canvas1.Print("detectionEfficiency1.pdf");
   
   TCanvas canvas2("canvas2", "Detection efficiency 1",1000,1000);
   canvas2.Divide(2,2);
@@ -254,7 +256,7 @@ void extArichEfficiency(Float_t rMin=51, Float_t rMax=107,
   h_pionMomentum->GetYaxis()->SetTitleOffset(1.4);
   h_pionMomentum->Draw();
   h_cuts->Draw("samel");
-  canvas2.Print("arichEfficiency.pdf");
+  canvas2.Print("detectionEfficiency2.pdf");
   
   TCanvas canvas3 = TCanvas("canvas3", "Detection efficiency 2",1000,1000);
   canvas3.Divide(2,2);
@@ -276,13 +278,13 @@ void extArichEfficiency(Float_t rMin=51, Float_t rMax=107,
   canvas3.cd(4);
   p_fakePions->GetYaxis()->SetTitleOffset(1.4);
   p_fakePions->Draw("colz");
-  canvas3.Print("arichEfficiency.pdf");
+  canvas3.Print("detectionEfficiency3.pdf");
   
   TCanvas canvas4("canvas4", "Photons",1000,1000);
   canvas4.cd();
   p_detPhotons->GetYaxis()->SetTitleOffset(1.4);
   p_detPhotons->Draw("colz");
-  canvas4.Print("arichEfficiency.pdf)");
+  canvas4.Print("detectionEfficiency4.pdf");
    
   return;
 }

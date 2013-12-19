@@ -35,51 +35,68 @@ namespace Belle2 {
       /** Uniform distribution of Pt, parameters are min and max value */
       uniformPtDistribution,
       /** Uniform distribution of the cosine of the values, parameters are min and max value */
-      uniformCosinusDistribution,
+      uniformCosDistribution,
       /** Normal distribution, parameters are mean and sigma */
       normalDistribution,
       /** Normal distribution of Pt, parameters are mean and sigma */
       normalPtDistribution,
-      /** Fixed Spectra, parameters are pairs of numbers giving weight and value for each spectrum value */
+      /** Normal distribution of the cosinge, parameters are mean and sigma */
+      normalCosDistribution,
+      /** Discrete spectrum, parameters are first the values and then the weights (non-negative) for each value */
       discreteSpectrum,
+      /** Distribution uniform in the inverse pt distribution, that is uniform in track curvature */
+      inversePtDistribution,
+      /** Distribution given as list of (x,y) points. The Distribution will
+       * follow the line connection all points. Parameters are first the x
+       * coordinates (sorted) and then the y coordinates (non-negative) */
+      polylineDistribution,
+      /** Same as polylineDistribution but for the transverse momentum */
+      polylinePtDistribution,
+      /** Same as polylineDistribution but for the cosine of the angle */
+      polylineCosDistribution
     };
 
     /** Struct to keep all necessary parameters for the particle gun */
     struct Parameters {
       /** Distribution to use for momentum generation */
-      Distribution momentumDist;
+      Distribution momentumDist = fixedValue;
       /** Distribution to use for azimuth angle generation */
-      Distribution phiDist;
+      Distribution phiDist = fixedValue;
       /** Distribution to use for polar angle generation */
-      Distribution thetaDist;
-      /** Distribution to use for vertex generation */
-      Distribution vertexDist;
+      Distribution thetaDist = fixedValue;
+      /** Distribution to use for x vertex generation */
+      Distribution xVertexDist = fixedValue;
+      /** Distribution to use for x vertex generation */
+      Distribution yVertexDist = fixedValue;
+      /** Distribution to use for x vertex generation */
+      Distribution zVertexDist = fixedValue;
       /** Number of tracks to generate per event */
       double nTracks;
       /** List of PDG particle codes to pick from when generating particles */
-      std::vector<int> pdgCodes;
+      std::vector<int> pdgCodes = {};
       /** Parameters for the momentum generation, meaning depends on chosen distribution */
-      std::vector<double> momentumParams;
+      std::vector<double> momentumParams = {0};
       /** Parameters for the azimuth angle generation, meaning depends on chosen distribution */
-      std::vector<double> phiParams;
+      std::vector<double> phiParams = {0};
       /** Parameters for the polar angle generation, meaning depends on chosen distribution */
-      std::vector<double> thetaParams;
+      std::vector<double> thetaParams = {0};
       /** Parameters for the x vertex generation, meaning depends on chosen distribution */
-      std::vector<double> xVertexParams;
+      std::vector<double> xVertexParams = {0};
       /** Parameters for the y vertex generation, meaning depends on chosen distribution */
-      std::vector<double> yVertexParams;
+      std::vector<double> yVertexParams = {0};
       /** Parameters for the z vertex generation, meaning depends on chosen distribution */
-      std::vector<double> zVertexParams;
+      std::vector<double> zVertexParams = {0};
       /** If false, all particles of one event will have the same vertex, if
        * true the vertex of each particle will be generated independently
        */
-      bool independentVertices;
-      /** If true, the number of tracks will fluctuate according to Poisson distribution */
-      bool varyNumberOfTracks;
+      bool independentVertices = false;
+      /** If true, the number of tracks per event will fluctuate according to
+       * Poisson distribution */
+      bool varyNumberOfTracks = true;
     };
 
     /** Default constructor */
-    ParticleGun() {}
+    ParticleGun(): m_params() {}
 
     /** Default destructor */
     ~ParticleGun() {}
@@ -95,7 +112,7 @@ namespace Belle2 {
 
   protected:
     /** Generate a value according to the given distribution with the given parameters */
-    double generateValue(Distribution dist, const std::vector<double> params);
+    double generateValue(Distribution dist, const std::vector<double>& params);
 
     /** All relevant parameters */
     Parameters m_params;

@@ -59,6 +59,12 @@ namespace Belle2 {
     std::string m_thetaDist;
     /** String representation of the vertex distribution */
     std::string m_vertexDist;
+    /** String representation of the x vertex distribution */
+    std::string m_xVertexDist;
+    /** String representation of the y vertex distribution */
+    std::string m_yVertexDist;
+    /** String representation of the z vertex distribution */
+    std::string m_zVertexDist;
     /** Particle graph to generate MCParticle list */
     MCParticleGraph m_particleGraph;
   };

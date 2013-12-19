@@ -17,7 +17,59 @@
 using namespace std;
 using namespace Belle2;
 
-double ParticleGun::generateValue(Distribution dist, const vector<double> params)
+namespace {
+  /** Function to generate a random variable according to a polyline.
+   * params is a list of x and y coordinates, where the x coordinates are
+   * sorted in ascending order and the y coordinates are all >=0. This function
+   * generates an x variable so that x is distributed according to the line
+   * which connects all points using an acceptance-rejection method.
+   *
+   * We use a step function as envelope for the polyline in the
+   * acceptance-rejection method to achieve a worst case efficiency of 50%.
+   *
+   * @param n number of points in the polyline
+   * @param x pointer to the x coordinates
+   * @param y pointer to the y coordinates
+   * @return value within x0 and xn, distributed according to the line
+   *         connecting (xi,yi)
+   */
+  double randomPolyline(size_t n, const double* x, const double* y)
+  {
+    //Calculate the area of the step function which envelops the polyline and
+    //the area in each segment.
+    std::vector<double> weights(n - 1);
+    double sumw(0);
+    for (size_t i = 0; i < n - 1; ++i) {
+      weights[i] = (x[i + 1] - x[i]) * max(y[i], y[i + 1]);
+      sumw += weights[i];
+    }
+    while (true) {
+      //Generate x distributed according to the step function. This can be done
+      //with 100% efficiency
+      double weight = gRandom->Uniform(0, sumw);
+      size_t segment(0);
+      for (; segment < n - 1; ++segment) {
+        weight -= weights[segment];
+        if (weight <= 0) break;
+      }
+      const double x1 = x[segment];
+      const double x2 = x[segment + 1];
+      const double x = gRandom->Uniform(x1, x2);
+      //Now calculate y(x) using line between (x1,y1) and (x2,y2)
+      const double y1 = y[segment];
+      const double y2 = y[segment + 1];
+      const double y = (y2 == y1) ? y1 : y1 + (x - x1) / (x2 - x1) * (y2 - y1);
+      //Generate a random y inside the step function
+      const double randY = gRandom->Uniform(0, max(y1, y2));
+      //And accept the x value if randY lies below the line
+      if (randY < y) return x;
+      //Otherwise repeat generation of x and y
+    }
+  }
+}
+
+
+double ParticleGun::generateValue(Distribution dist, const vector<double>& params)
 {
   double rand(0);
   switch (dist) {
@@ -26,19 +78,33 @@ double ParticleGun::generateValue(Distribution dist, const vector<double> params
     case uniformDistribution:
     case uniformPtDistribution:
       return gRandom->Uniform(params[0], params[1]);
-    case uniformCosinusDistribution:
+    case inversePtDistribution:
+      return 1. / gRandom->Uniform(1. / params[1], 1. / params[0]);
+    case uniformCosDistribution:
       return acos(gRandom->Uniform(cos(params[0]), cos(params[1])));
     case normalDistribution:
     case normalPtDistribution:
       return gRandom->Gaus(params[0], params[1]);
+    case normalCosDistribution:
+      return acos(gRandom->Gaus(params[0], params[1]));
     case discreteSpectrum:
-      for (size_t i = 0; i < params.size() / 2; ++i) rand += params[2 * i];
+      //Create weighted discrete distribution
+      //First we sum all the weights (second half of the array)
+      for (size_t i = params.size() / 2; i < params.size(); ++i) rand += params[i];
+      //Then generate a random variable between 0 and sum of weights
       rand = gRandom->Uniform(0, rand);
-      for (size_t i = 0; i < params.size() / 2; ++i) {
-        rand -= params[2 * i];
-        if (rand <= 0) return params[2 * i + 1];
+      //Go over the weights again and subtract from generated value
+      for (size_t i = params.size() / 2; i < params.size(); ++i) {
+        rand -= params[i];
+        //If the value is negative we found the correct bin, return that value
+        if (rand <= 0) return params[i - (params.size() / 2)];
       }
       B2FATAL("Something wrong with picking fixed spectra values");
+    case polylineDistribution:
+    case polylinePtDistribution:
+      return randomPolyline(params.size() / 2, params.data(), params.data() + params.size() / 2);
+    case polylineCosDistribution:
+      return acos(randomPolyline(params.size() / 2, params.data(), params.data() + params.size() / 2));
     default:
       B2FATAL("Unknown distribution");
   }
@@ -48,9 +114,9 @@ double ParticleGun::generateValue(Distribution dist, const vector<double> params
 bool ParticleGun::generateEvent(MCParticleGraph& graph)
 {
   //generate the event vertex (possible the same for all particles in event)
-  double vx = generateValue(m_params.vertexDist, m_params.xVertexParams);
-  double vy = generateValue(m_params.vertexDist, m_params.yVertexParams);
-  double vz = generateValue(m_params.vertexDist, m_params.zVertexParams);
+  double vx = generateValue(m_params.xVertexDist, m_params.xVertexParams);
+  double vy = generateValue(m_params.yVertexDist, m_params.yVertexParams);
+  double vz = generateValue(m_params.zVertexDist, m_params.zVertexParams);
 
   //Determine number of tracks
   int nTracks = static_cast<int>(m_params.nTracks);
@@ -86,7 +152,8 @@ bool ParticleGun::generateEvent(MCParticleGraph& graph)
     double theta    = generateValue(m_params.thetaDist, m_params.thetaParams);
 
     double pt = momentum * sin(theta);
-    if (m_params.momentumDist == uniformPtDistribution || m_params.momentumDist == normalPtDistribution) {
+    if (m_params.momentumDist == uniformPtDistribution || m_params.momentumDist == normalPtDistribution ||
+        m_params.momentumDist == inversePtDistribution || m_params.momentumDist == polylinePtDistribution) {
       //this means we are actually generating the Pt and not the P, so exchange values
       pt = momentum;
       momentum = (sin(theta) > 0) ? (pt / sin(theta)) : numeric_limits<double>::max();
@@ -105,79 +172,145 @@ bool ParticleGun::generateEvent(MCParticleGraph& graph)
 
     if (m_params.independentVertices) {
       //If we have independent vertices, generate new vertex for next particle
-      vx = generateValue(m_params.vertexDist, m_params.xVertexParams);
-      vy = generateValue(m_params.vertexDist, m_params.yVertexParams);
-      vz = generateValue(m_params.vertexDist, m_params.zVertexParams);
+      vx = generateValue(m_params.xVertexDist, m_params.xVertexParams);
+      vy = generateValue(m_params.yVertexDist, m_params.yVertexParams);
+      vz = generateValue(m_params.zVertexDist, m_params.zVertexParams);
     }
   }// end loop over particles in event
 
   return true;
 }
 
-//Helper macro to check if all distributions make sense
-#define CHECK_DIST(var,dist) \
-  if(p.var##Dist == dist){ \
-    B2ERROR(#dist << " does not make sense for " << #var << " generation"); \
-    ok = false; \
-  }
-
-//Helper macro to check that the number of parameters supplied for a given distribution is correct
-#define CHECK_DIST_NPARAMS(var,dist,params,num) \
-  if(p.var##Dist == dist && p.params##Params.size()<num) { \
-    B2ERROR(#var << " generation: " << #dist << " requires at least " \
-            << num << " parameters, " \
-            << p.params##Params.size() << " given for " << #params); \
-    ok = false; \
-  }
-
-//Helper macro to check that a distribution has the correct number of parameters
-#define CHECK_NPARAMS(var,params) \
-  CHECK_DIST_NPARAMS(var,fixedValue,params,1) \
-  CHECK_DIST_NPARAMS(var,uniformDistribution,params,2) \
-  CHECK_DIST_NPARAMS(var,uniformPtDistribution,params,2) \
-  CHECK_DIST_NPARAMS(var,uniformCosinusDistribution,params,2) \
-  CHECK_DIST_NPARAMS(var,normalDistribution,params,2) \
-  CHECK_DIST_NPARAMS(var,normalPtDistribution,params,2)\
-  CHECK_DIST_NPARAMS(var,discreteSpectrum,params,2)\
-  if(p.var##Dist == discreteSpectrum && p.params##Params.size() % 2 != 0){\
-    B2ERROR(#var << " generation: discreteSpectrum requires an even number of parameters");\
-    ok = false; \
-  }
-
 bool ParticleGun::setParameters(const Parameters& p)
 {
-  //Sanity checks
+  //checking that all parameters are useful is the most complex part of the
+  //whole particle gun. We need to disallow distributions for certain variables
+  //and check the number of parameters and their validity
+
+  //As long as this is true, no error has been found. We could just return but
+  //it's so much nicer to display all possible errors at once so the user does
+  //not need to iterate over this all the time
   bool ok(true);
+
+  //Make an enum -> name mapping for nice error messages
+  std::map<Distribution, std::string> distributionNames = {
+    {fixedValue,              "fixedValue"},
+    {uniformDistribution,     "uniform"},
+    {uniformPtDistribution,   "uniformPt"},
+    {uniformCosDistribution,  "uniformCos"},
+    {normalDistribution,      "normal"},
+    {normalPtDistribution,    "normalPt"},
+    {normalCosDistribution,   "normalCos"},
+    {inversePtDistribution,   "inversePt"},
+    {polylineDistribution,    "polyline"},
+    {polylinePtDistribution,  "polylinePt"},
+    {polylineCosDistribution, "polylineCos"},
+    {discreteSpectrum,        "discrete"},
+  };
+  //Small helper lambda to get the distribution by name
+  auto getDist = [&p](const std::string & dist) -> Distribution {
+    if (dist == "momentum") return p.momentumDist;
+    if (dist == "xVertex")  return p.xVertexDist;
+    if (dist == "yVertex")  return p.yVertexDist;
+    if (dist == "zVertex")  return p.zVertexDist;
+    if (dist == "theta")    return p.thetaDist;
+    if (dist == "phi")      return p.phiDist;
+    throw std::runtime_error("wrong parameter");
+  };
+  //Small helper lambda to get the parameters by name
+  auto getPars = [&p](const std::string & dist) -> const std::vector<double>& {
+    if (dist == "momentum") return p.momentumParams;
+    if (dist == "xVertex")  return p.xVertexParams;
+    if (dist == "yVertex")  return p.yVertexParams;
+    if (dist == "zVertex")  return p.zVertexParams;
+    if (dist == "theta")    return p.thetaParams;
+    if (dist == "phi")      return p.phiParams;
+    throw std::runtime_error("wrong parameter");
+  };
+  //Small helper lambda to produce a nice error message and set the error flag
+  //if the distribution is excluded.
+  auto excludeDistribution = [&](const std::string & dist, Distribution excluded) {
+    if (getDist(dist) == excluded) {
+      B2ERROR(distributionNames[excluded] << " is not allowed for " << dist << " generation");
+      ok = false;
+    }
+  };
+
+  //Exclude some distributions
+  for (auto dist : {"momentum", "xVertex", "yVertex", "zVertex"}) {
+    excludeDistribution(dist, uniformCosDistribution);
+    excludeDistribution(dist, normalCosDistribution);
+    excludeDistribution(dist, polylineCosDistribution);
+  }
+  for (auto dist : {"xVertex", "yVertex", "zVertex", "phi", "theta"}) {
+    excludeDistribution(dist, uniformPtDistribution);
+    excludeDistribution(dist, normalPtDistribution);
+    excludeDistribution(dist, inversePtDistribution);
+    excludeDistribution(dist, polylinePtDistribution);
+  }
 
   //Check that we have some particle ids to generate
   if (p.pdgCodes.empty()) {
     B2ERROR("No pdgCodes specified for generation");
     ok = false;
   }
-  //Check that the distributions make sense, uniformPt for example only makes sense for momentum generation
-  CHECK_DIST(momentum, uniformCosinusDistribution);
-  CHECK_DIST(vertex  , uniformCosinusDistribution);
-  CHECK_DIST(vertex  , uniformPtDistribution);
-  CHECK_DIST(phi     , uniformPtDistribution);
-  CHECK_DIST(theta   , uniformPtDistribution);
-  CHECK_DIST(vertex  , normalPtDistribution);
-  CHECK_DIST(phi     , normalPtDistribution);
-  CHECK_DIST(theta   , normalPtDistribution);
-  if (p.phiDist == uniformCosinusDistribution) {
-    B2WARNING("uniformCosinus distribution not intended for phi, please make sure this is set correctly");
+
+  //Check minimum numbers of parameters
+  for (auto par : {"momentum", "xVertex", "yVertex", "zVertex", "theta", "phi"}) {
+    const Distribution dist = getDist(par);
+    size_t minParams = (dist == fixedValue) ? 1 : 2;
+    if (dist == polylineDistribution || dist == polylinePtDistribution || dist == polylineCosDistribution) minParams = 4;
+    const size_t hasParams = getPars(par).size();
+    if (hasParams < minParams) {
+      B2ERROR(par << " generation: " << distributionNames[dist]
+              << " distribution requires at least " << minParams
+              << " parameters, " << hasParams << " given");
+      ok = false;
+    }
+    //Check even number of parameters for discrete or polyline distributions
+    if (dist == discreteSpectrum || dist == polylineDistribution || dist == polylinePtDistribution || dist == polylineCosDistribution) {
+      if ((hasParams % 2) != 0) {
+        B2ERROR(par << " generation: " << distributionNames[dist] << " requires an even number of parameters");
+        ok = false;
+      } else if (dist == discreteSpectrum || hasParams >= 4) {
+        //Check wellformedness of polyline pdf: ascending x coordinates and positive y coordinates with at least one nonzero value
+        //Discrete spectrum only requires positive weights, no sorting needed
+        const std::vector<double>& p = getPars(par);
+        const std::string parname = (dist == discreteSpectrum) ? "weight" : "y coordinate";
+        //Check for sorting for polylines
+        if (dist != discreteSpectrum) {
+          for (size_t i = 0; i < (hasParams / 2) - 1; ++i) {
+            if (p[i] > p[i + 1]) {
+              B2ERROR(par << " generation: " << distributionNames[dist] << " requires x coordinates in ascending order");
+              ok = false;
+            }
+          }
+        }
+        //Check that values are non-negative and at least one value is positive
+        auto minmax = std::minmax_element(p.begin() + hasParams / 2, p.end());
+        if (*minmax.first < 0) {
+          B2ERROR(par << " generation: " << distributionNames[dist] << " requires "
+                  << parname << "s to be non-negative");
+          ok = false;
+        }
+        if (*minmax.second <= 0) {
+          B2ERROR(par << " generation: " << distributionNames[dist] << " requires at least one "
+                  << parname << " to be positive");
+          ok = false;
+        }
+      }
+    }
   }
-  //Check that the amount of parameters supplied is correct
-  CHECK_NPARAMS(momentum, momentum)
-  CHECK_NPARAMS(phi,      phi)
-  CHECK_NPARAMS(theta,    theta)
-  CHECK_NPARAMS(vertex,   xVertex)
-  CHECK_NPARAMS(vertex,   yVertex)
-  CHECK_NPARAMS(vertex,   zVertex)
+
+  //Finally check that we do not have any problems with the inverse
+  if (p.momentumDist == inversePtDistribution && p.momentumParams.size() >= 2) {
+    if (p.momentumParams[0] == 0 || p.momentumParams[1] == 0) {
+      B2ERROR("inversePt distribution does not allow zero momentum");
+      ok = false;
+    }
+  }
 
   //If everything is ok, set the new parameters, else return false
-  if (ok) {
-    m_params = p;
-    return true;
-  }
-  return false;
+  if (ok) { m_params = p; }
+  return ok;
 }

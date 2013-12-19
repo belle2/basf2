@@ -4,8 +4,6 @@
 # example steering file to generate B \bar B events and show the result,
 # including fitted tracks.
 
-import os
-import random
 from basf2 import *
 
 # register necessary modules
@@ -27,6 +25,8 @@ evtgeninput.param('boost2LAB', True)
 g4sim = register_module('FullSim')
 # make the simulation less noisy
 g4sim.logging.log_level = LogLevel.ERROR
+# and make it store the particle trajectories so we can draw them
+g4sim.param("trajectoryStore", 2)
 
 # create paths
 main = create_path()

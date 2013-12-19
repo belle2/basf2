@@ -42,7 +42,7 @@ namespace Belle2 {
      * @param method the chosen method, the string has to start with a predefined method name, e.g. BDT is predefined, so BDT, BDTWithGradientBoost,  BDT_1, ... are valid names
      * @param identifier identifier which was used to train the method. This class expects that the files weights/$identifier_$method.class.C and weights/$identifier_$method.weights.xml exists.
      */
-    TMVAExpert(std::vector<std::string> variables, std::string method, std::string identifier = "TMVA");
+    TMVAExpert(std::string method, std::string identifier = "TMVA", std::vector<std::string> variables = std::vector<std::string>());
 
     /**
      * Destructor, closes outputFile, deletes TMVA::Reader

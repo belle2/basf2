@@ -58,7 +58,7 @@ namespace Belle2 {
     }
     StoreArray<ParticleInfo>::required();
 
-    m_method = new TMVAExpert(m_variables, m_methodName, m_identifierName);
+    m_method = new TMVAExpert(m_methodName, m_identifierName, m_variables);
     VariableManager::Instance().registerParticleInfoVariable(m_targetName, "TMVA Expert TargetVariable", true);
   }
 

@@ -26,7 +26,7 @@ libs::
 install::
 	install libnsm2_corelib.a $(EXTLIBDIR)
 	install libnsm2_corelib.so $(EXTLIBDIR)
-	mkdir $(EXTINCDIR)/nsm2
+	mkdir -p $(EXTINCDIR)/nsm2
 	install nsmlib2.h $(EXTINCDIR)/nsm2
 
 clean::

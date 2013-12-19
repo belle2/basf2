@@ -917,7 +917,7 @@ nsmd_shmopen(int shmkey, time_t now)
 
   int retsys = nsmd_shmget(shmkey,   sizeof(NSMsys), 0755, nsmd_shmsysid,
                            (char**)&nsmd_sysp, now);
-  int retmem = nsmd_shmget(shmkey + 1, sizeof(NSMmem), 0775, nsmd_shmmemid,
+  int retmem = nsmd_shmget(shmkey + 1, sizeof(NSMmem), 0777, nsmd_shmmemid,
                            (char**)&nsmd_memp, now);
 
   if ((retsys == 0 || retsys == ENOENT) &&

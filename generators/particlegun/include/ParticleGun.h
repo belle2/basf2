@@ -27,49 +27,49 @@ namespace Belle2 {
   class ParticleGun {
   public:
     /** enum containing all known distributions available for generation of values */
-    enum Distribution {
+    enum EDistribution {
       /** Fixed value, no random generation at all, 1 parameter */
-      fixedValue,
+      c_fixedValue,
       /** Uniform distribution, parameters are min and max value */
-      uniformDistribution,
+      c_uniformDistribution,
       /** Uniform distribution of Pt, parameters are min and max value */
-      uniformPtDistribution,
+      c_uniformPtDistribution,
       /** Uniform distribution of the cosine of the values, parameters are min and max value */
-      uniformCosDistribution,
+      c_uniformCosDistribution,
       /** Normal distribution, parameters are mean and sigma */
-      normalDistribution,
+      c_normalDistribution,
       /** Normal distribution of Pt, parameters are mean and sigma */
-      normalPtDistribution,
+      c_normalPtDistribution,
       /** Normal distribution of the cosinge, parameters are mean and sigma */
-      normalCosDistribution,
+      c_normalCosDistribution,
       /** Discrete spectrum, parameters are first the values and then the weights (non-negative) for each value */
-      discreteSpectrum,
+      c_discreteSpectrum,
       /** Distribution uniform in the inverse pt distribution, that is uniform in track curvature */
-      inversePtDistribution,
+      c_inversePtDistribution,
       /** Distribution given as list of (x,y) points. The Distribution will
        * follow the line connection all points. Parameters are first the x
        * coordinates (sorted) and then the y coordinates (non-negative) */
-      polylineDistribution,
+      c_polylineDistribution,
       /** Same as polylineDistribution but for the transverse momentum */
-      polylinePtDistribution,
+      c_polylinePtDistribution,
       /** Same as polylineDistribution but for the cosine of the angle */
-      polylineCosDistribution
+      c_polylineCosDistribution
     };
 
     /** Struct to keep all necessary parameters for the particle gun */
     struct Parameters {
       /** Distribution to use for momentum generation */
-      Distribution momentumDist = fixedValue;
+      EDistribution momentumDist = c_fixedValue;
       /** Distribution to use for azimuth angle generation */
-      Distribution phiDist = fixedValue;
+      EDistribution phiDist = c_fixedValue;
       /** Distribution to use for polar angle generation */
-      Distribution thetaDist = fixedValue;
+      EDistribution thetaDist = c_fixedValue;
       /** Distribution to use for x vertex generation */
-      Distribution xVertexDist = fixedValue;
+      EDistribution xVertexDist = c_fixedValue;
       /** Distribution to use for x vertex generation */
-      Distribution yVertexDist = fixedValue;
+      EDistribution yVertexDist = c_fixedValue;
       /** Distribution to use for x vertex generation */
-      Distribution zVertexDist = fixedValue;
+      EDistribution zVertexDist = c_fixedValue;
       /** Number of tracks to generate per event */
       double nTracks;
       /** List of PDG particle codes to pick from when generating particles */
@@ -112,7 +112,7 @@ namespace Belle2 {
 
   protected:
     /** Generate a value according to the given distribution with the given parameters */
-    double generateValue(Distribution dist, const std::vector<double>& params);
+    double generateValue(EDistribution dist, const std::vector<double>& params);
 
     /** All relevant parameters */
     Parameters m_params;

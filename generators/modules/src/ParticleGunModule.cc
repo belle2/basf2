@@ -119,33 +119,33 @@ ParticleGunModule::ParticleGunModule() : Module()
            "depends on the chosen distribution", m_parameters.zVertexParams);
 }
 
-ParticleGun::Distribution ParticleGunModule::convertDistribution(std::string name)
+ParticleGun::EDistribution ParticleGunModule::convertDistribution(std::string name)
 {
   boost::to_lower(name);
   boost::trim(name);
-  if (name == "fixed")          return ParticleGun::fixedValue;
-  if (name == "uniform")        return ParticleGun::uniformDistribution;
-  if (name == "uniformpt")      return ParticleGun::uniformPtDistribution;
-  if (name == "uniformcos")     return ParticleGun::uniformCosDistribution;
-  if (name == "normal")         return ParticleGun::normalDistribution;
-  if (name == "normalpt")       return ParticleGun::normalPtDistribution;
-  if (name == "normalcos")      return ParticleGun::normalCosDistribution;
-  if (name == "discrete")       return ParticleGun::discreteSpectrum;
-  if (name == "inversept")      return ParticleGun::inversePtDistribution;
-  if (name == "polyline")       return ParticleGun::polylineDistribution;
-  if (name == "polylinept")     return ParticleGun::polylinePtDistribution;
-  if (name == "polylinecos")    return ParticleGun::polylineCosDistribution;
+  if (name == "fixed")          return ParticleGun::c_fixedValue;
+  if (name == "uniform")        return ParticleGun::c_uniformDistribution;
+  if (name == "uniformpt")      return ParticleGun::c_uniformPtDistribution;
+  if (name == "uniformcos")     return ParticleGun::c_uniformCosDistribution;
+  if (name == "normal")         return ParticleGun::c_normalDistribution;
+  if (name == "normalpt")       return ParticleGun::c_normalPtDistribution;
+  if (name == "normalcos")      return ParticleGun::c_normalCosDistribution;
+  if (name == "discrete")       return ParticleGun::c_discreteSpectrum;
+  if (name == "inversept")      return ParticleGun::c_inversePtDistribution;
+  if (name == "polyline")       return ParticleGun::c_polylineDistribution;
+  if (name == "polylinept")     return ParticleGun::c_polylinePtDistribution;
+  if (name == "polylinecos")    return ParticleGun::c_polylineCosDistribution;
   //TODO: backwards compatibility
   if (name == "uniformcosinus") {
     B2WARNING("Name for uniform cos() distribution changed to 'uniformCos'");
-    return ParticleGun::uniformCosDistribution;
+    return ParticleGun::c_uniformCosDistribution;
   }
   if (name == "discretespectrum") {
     B2WARNING("Name for discrete spectrum distribution changed to 'discrete'");
-    return ParticleGun::discreteSpectrum;
+    return ParticleGun::c_discreteSpectrum;
   }
   B2ERROR("Unknown distribution '" << name << "', using fixed");
-  return ParticleGun::fixedValue;
+  return ParticleGun::c_fixedValue;
 }
 
 void ParticleGunModule::initialize()
@@ -171,12 +171,12 @@ void ParticleGunModule::initialize()
   }
 
   //Convert degree to radian
-  if (m_parameters.thetaDist != ParticleGun::polylineCosDistribution &&
-      m_parameters.thetaDist != ParticleGun::normalCosDistribution) {
+  if (m_parameters.thetaDist != ParticleGun::c_polylineCosDistribution &&
+      m_parameters.thetaDist != ParticleGun::c_normalCosDistribution) {
     for (double & angle : m_parameters.thetaParams) angle *= Unit::deg;
   }
-  if (m_parameters.phiDist != ParticleGun::polylineCosDistribution &&
-      m_parameters.phiDist != ParticleGun::normalCosDistribution) {
+  if (m_parameters.phiDist != ParticleGun::c_polylineCosDistribution &&
+      m_parameters.phiDist != ParticleGun::c_normalCosDistribution) {
     for (double & angle : m_parameters.phiParams) angle *= Unit::deg;
   }
 

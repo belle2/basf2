@@ -69,25 +69,25 @@ namespace {
 }
 
 
-double ParticleGun::generateValue(Distribution dist, const vector<double>& params)
+double ParticleGun::generateValue(EDistribution dist, const vector<double>& params)
 {
   double rand(0);
   switch (dist) {
-    case fixedValue:
+    case c_fixedValue:
       return params[0];
-    case uniformDistribution:
-    case uniformPtDistribution:
+    case c_uniformDistribution:
+    case c_uniformPtDistribution:
       return gRandom->Uniform(params[0], params[1]);
-    case inversePtDistribution:
+    case c_inversePtDistribution:
       return 1. / gRandom->Uniform(1. / params[1], 1. / params[0]);
-    case uniformCosDistribution:
+    case c_uniformCosDistribution:
       return acos(gRandom->Uniform(cos(params[0]), cos(params[1])));
-    case normalDistribution:
-    case normalPtDistribution:
+    case c_normalDistribution:
+    case c_normalPtDistribution:
       return gRandom->Gaus(params[0], params[1]);
-    case normalCosDistribution:
+    case c_normalCosDistribution:
       return acos(gRandom->Gaus(params[0], params[1]));
-    case discreteSpectrum:
+    case c_discreteSpectrum:
       //Create weighted discrete distribution
       //First we sum all the weights (second half of the array)
       for (size_t i = params.size() / 2; i < params.size(); ++i) rand += params[i];
@@ -100,10 +100,10 @@ double ParticleGun::generateValue(Distribution dist, const vector<double>& param
         if (rand <= 0) return params[i - (params.size() / 2)];
       }
       B2FATAL("Something wrong with picking fixed spectra values");
-    case polylineDistribution:
-    case polylinePtDistribution:
+    case c_polylineDistribution:
+    case c_polylinePtDistribution:
       return randomPolyline(params.size() / 2, params.data(), params.data() + params.size() / 2);
-    case polylineCosDistribution:
+    case c_polylineCosDistribution:
       return acos(randomPolyline(params.size() / 2, params.data(), params.data() + params.size() / 2));
     default:
       B2FATAL("Unknown distribution");
@@ -152,8 +152,8 @@ bool ParticleGun::generateEvent(MCParticleGraph& graph)
     double theta    = generateValue(m_params.thetaDist, m_params.thetaParams);
 
     double pt = momentum * sin(theta);
-    if (m_params.momentumDist == uniformPtDistribution || m_params.momentumDist == normalPtDistribution ||
-        m_params.momentumDist == inversePtDistribution || m_params.momentumDist == polylinePtDistribution) {
+    if (m_params.momentumDist == c_uniformPtDistribution || m_params.momentumDist == c_normalPtDistribution ||
+        m_params.momentumDist == c_inversePtDistribution || m_params.momentumDist == c_polylinePtDistribution) {
       //this means we are actually generating the Pt and not the P, so exchange values
       pt = momentum;
       momentum = (sin(theta) > 0) ? (pt / sin(theta)) : numeric_limits<double>::max();
@@ -197,22 +197,22 @@ bool ParticleGun::setParameters(const Parameters& p)
   bool ok(true);
 
   //Make an enum -> name mapping for nice error messages
-  std::map<Distribution, std::string> distributionNames = {
-    {fixedValue,              "fixedValue"},
-    {uniformDistribution,     "uniform"},
-    {uniformPtDistribution,   "uniformPt"},
-    {uniformCosDistribution,  "uniformCos"},
-    {normalDistribution,      "normal"},
-    {normalPtDistribution,    "normalPt"},
-    {normalCosDistribution,   "normalCos"},
-    {inversePtDistribution,   "inversePt"},
-    {polylineDistribution,    "polyline"},
-    {polylinePtDistribution,  "polylinePt"},
-    {polylineCosDistribution, "polylineCos"},
-    {discreteSpectrum,        "discrete"},
+  std::map<EDistribution, std::string> distributionNames = {
+    {c_fixedValue,              "fixedValue"},
+    {c_uniformDistribution,     "uniform"},
+    {c_uniformPtDistribution,   "uniformPt"},
+    {c_uniformCosDistribution,  "uniformCos"},
+    {c_normalDistribution,      "normal"},
+    {c_normalPtDistribution,    "normalPt"},
+    {c_normalCosDistribution,   "normalCos"},
+    {c_inversePtDistribution,   "inversePt"},
+    {c_polylineDistribution,    "polyline"},
+    {c_polylinePtDistribution,  "polylinePt"},
+    {c_polylineCosDistribution, "polylineCos"},
+    {c_discreteSpectrum,        "discrete"},
   };
   //Small helper lambda to get the distribution by name
-  auto getDist = [&p](const std::string & dist) -> Distribution {
+  auto getDist = [&p](const std::string & dist) -> EDistribution {
     if (dist == "momentum") return p.momentumDist;
     if (dist == "xVertex")  return p.xVertexDist;
     if (dist == "yVertex")  return p.yVertexDist;
@@ -233,7 +233,7 @@ bool ParticleGun::setParameters(const Parameters& p)
   };
   //Small helper lambda to produce a nice error message and set the error flag
   //if the distribution is excluded.
-  auto excludeDistribution = [&](const std::string & dist, Distribution excluded) {
+  auto excludeDistribution = [&](const std::string & dist, EDistribution excluded) {
     if (getDist(dist) == excluded) {
       B2ERROR(distributionNames[excluded] << " is not allowed for " << dist << " generation");
       ok = false;
@@ -242,15 +242,15 @@ bool ParticleGun::setParameters(const Parameters& p)
 
   //Exclude some distributions
   for (auto dist : {"momentum", "xVertex", "yVertex", "zVertex"}) {
-    excludeDistribution(dist, uniformCosDistribution);
-    excludeDistribution(dist, normalCosDistribution);
-    excludeDistribution(dist, polylineCosDistribution);
+    excludeDistribution(dist, c_uniformCosDistribution);
+    excludeDistribution(dist, c_normalCosDistribution);
+    excludeDistribution(dist, c_polylineCosDistribution);
   }
   for (auto dist : {"xVertex", "yVertex", "zVertex", "phi", "theta"}) {
-    excludeDistribution(dist, uniformPtDistribution);
-    excludeDistribution(dist, normalPtDistribution);
-    excludeDistribution(dist, inversePtDistribution);
-    excludeDistribution(dist, polylinePtDistribution);
+    excludeDistribution(dist, c_uniformPtDistribution);
+    excludeDistribution(dist, c_normalPtDistribution);
+    excludeDistribution(dist, c_inversePtDistribution);
+    excludeDistribution(dist, c_polylinePtDistribution);
   }
 
   //Check that we have some particle ids to generate
@@ -261,9 +261,9 @@ bool ParticleGun::setParameters(const Parameters& p)
 
   //Check minimum numbers of parameters
   for (auto par : {"momentum", "xVertex", "yVertex", "zVertex", "theta", "phi"}) {
-    const Distribution dist = getDist(par);
-    size_t minParams = (dist == fixedValue) ? 1 : 2;
-    if (dist == polylineDistribution || dist == polylinePtDistribution || dist == polylineCosDistribution) minParams = 4;
+    const EDistribution dist = getDist(par);
+    size_t minParams = (dist == c_fixedValue) ? 1 : 2;
+    if (dist == c_polylineDistribution || dist == c_polylinePtDistribution || dist == c_polylineCosDistribution) minParams = 4;
     const size_t hasParams = getPars(par).size();
     if (hasParams < minParams) {
       B2ERROR(par << " generation: " << distributionNames[dist]
@@ -272,17 +272,17 @@ bool ParticleGun::setParameters(const Parameters& p)
       ok = false;
     }
     //Check even number of parameters for discrete or polyline distributions
-    if (dist == discreteSpectrum || dist == polylineDistribution || dist == polylinePtDistribution || dist == polylineCosDistribution) {
+    if (dist == c_discreteSpectrum || dist == c_polylineDistribution || dist == c_polylinePtDistribution || dist == c_polylineCosDistribution) {
       if ((hasParams % 2) != 0) {
         B2ERROR(par << " generation: " << distributionNames[dist] << " requires an even number of parameters");
         ok = false;
-      } else if (dist == discreteSpectrum || hasParams >= 4) {
+      } else if (dist == c_discreteSpectrum || hasParams >= 4) {
         //Check wellformedness of polyline pdf: ascending x coordinates and positive y coordinates with at least one nonzero value
         //Discrete spectrum only requires positive weights, no sorting needed
         const std::vector<double>& p = getPars(par);
-        const std::string parname = (dist == discreteSpectrum) ? "weight" : "y coordinate";
+        const std::string parname = (dist == c_discreteSpectrum) ? "weight" : "y coordinate";
         //Check for sorting for polylines
-        if (dist != discreteSpectrum) {
+        if (dist != c_discreteSpectrum) {
           for (size_t i = 0; i < (hasParams / 2) - 1; ++i) {
             if (p[i] > p[i + 1]) {
               B2ERROR(par << " generation: " << distributionNames[dist] << " requires x coordinates in ascending order");
@@ -307,7 +307,7 @@ bool ParticleGun::setParameters(const Parameters& p)
   }
 
   //Finally check that we do not have any problems with the inverse
-  if (p.momentumDist == inversePtDistribution && p.momentumParams.size() >= 2) {
+  if (p.momentumDist == c_inversePtDistribution && p.momentumParams.size() >= 2) {
     if (p.momentumParams[0] == 0 || p.momentumParams[1] == 0) {
       B2ERROR("inversePt distribution does not allow zero momentum");
       ok = false;

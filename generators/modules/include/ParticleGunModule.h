@@ -45,7 +45,7 @@ namespace Belle2 {
 
   protected:
     /** function to convert the strings the uses sets in the parameter list to the internal encoding */
-    ParticleGun::Distribution convertDistribution(std::string name);
+    ParticleGun::EDistribution convertDistribution(std::string name);
 
     /** Instance of the particle gun */
     ParticleGun m_particleGun;

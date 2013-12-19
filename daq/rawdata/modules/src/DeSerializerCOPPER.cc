@@ -477,7 +477,7 @@ void DeSerializerCOPPERModule::event()
     temp_rawcopper.SetBuffer(temp_buf, m_size_word, 0, num_events, num_nodes);
 
     // Fill header and trailer
-    temp_rawcopper.FillTopBlockRawHeader(m_nodeid, m_data_type, m_trunc_mask);
+    m_prev_ftsweve32 = temp_rawcopper.FillTopBlockRawHeader(m_nodeid, m_data_type, m_trunc_mask, m_prev_ftsweve32);
 
     if (dump_fname.size() > 0) {
       dumpData((char*)temp_buf, m_size_word * sizeof(int));

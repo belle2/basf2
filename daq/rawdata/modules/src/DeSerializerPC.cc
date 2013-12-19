@@ -20,7 +20,7 @@
 //#define DISCARD_DATA
 //#define CHECK_SUM
 
-//#define TIME_MONITOR
+
 //#define DEBUG
 
 #define NO_DATA_CHECK
@@ -400,10 +400,6 @@ void DeSerializerPCModule::event()
     unsigned int eve_copper_1 = 0;
 
 
-#ifdef TIME_MONITOR
-    recordTime(n_basf2evt * NUM_EVT_PER_BASF2LOOP_PC + j, time_array0);
-#endif
-
 
 #ifdef DEBUG
     printf("Read loop : j %d\n", j);
@@ -440,9 +436,6 @@ void DeSerializerPCModule::event()
 #endif
 
 
-#ifdef TIME_MONITOR
-    recordTime(n_basf2evt * NUM_EVT_PER_BASF2LOOP_PC + j, time_array1);
-#endif
 
 #ifndef DISCARD_DATA
 #ifdef CLONE_ARRAY
@@ -652,9 +645,6 @@ void DeSerializerPCModule::event()
 #endif
 #endif // DISCARD_DATA
 
-#ifdef TIME_MONITOR
-    recordTime(n_basf2evt * NUM_EVT_PER_BASF2LOOP_PC + j, time_array2);
-#endif
 
     m_prev_copper_ctr = temp_copper_ctr;
   }

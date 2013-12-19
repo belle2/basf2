@@ -184,10 +184,10 @@ namespace Belle2 {
     int m_shmflag;
 
     //! open shared memory
-    void ShmOpen(char* path_cfg, char* path_sta);
+    void shmOpen(char* path_cfg, char* path_sta);
 
     //! Get shared memory
-    int* ShmGet(int fd, int size_words);
+    int* shmGet(int fd, int size_words);
 
     //! file descripter for shm
     int m_shmfd_cfg;

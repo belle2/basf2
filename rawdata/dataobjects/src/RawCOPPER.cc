@@ -12,6 +12,7 @@ using namespace std;
 using namespace Belle2;
 
 #define NO_DATA_CHECK
+#define WO_FIRST_EVENUM_CHECK
 
 ClassImp(RawCOPPER);
 
@@ -719,7 +720,7 @@ unsigned int RawCOPPER::GetB2LHeaderWord(int n, int finesse_buffer_pos)
 }
 
 
-unsigned int RawCOPPER::FillTopBlockRawHeader(unsigned int m_node_id, unsigned int m_data_type, unsigned int m_trunc_mask)
+unsigned int RawCOPPER::FillTopBlockRawHeader(unsigned int m_node_id, unsigned int m_data_type, unsigned int m_trunc_mask, unsigned int prev_eve32)
 {
 
   ErrorMessage print_err;
@@ -878,7 +879,6 @@ unsigned int RawCOPPER::FillTopBlockRawHeader(unsigned int m_node_id, unsigned i
   trl[ RawTrailer::POS_CHKSUM ] = chksum;
 
 
-
 //   //magic word check
 // #ifndef NO_DATA_CHECK
 // // 3, magic word check
@@ -933,10 +933,10 @@ unsigned int RawCOPPER::FillTopBlockRawHeader(unsigned int m_node_id, unsigned i
   if (err_flag == 1) {
     char err_buf[500];
     sprintf(err_buf, "Invalid Magic word 0x7FFFF0008=%u 0xFFFFFAFA=%u 0xFFFFF5F5=%u 0x7FFF0009=%u\n",
-            raw_copper->GetMagicDriverHeader(0),
-            raw_copper->GetMagicFPGAHeader(0),
-            raw_copper->GetMagicFPGATrailer(0),
-            raw_copper->GetMagicDriverTrailer(0));
+            GetMagicDriverHeader(0),
+            GetMagicFPGAHeader(0),
+            GetMagicFPGATrailer(0),
+            GetMagicDriverTrailer(0));
     print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     sleep(12345678);
     exit(-1);

@@ -206,7 +206,7 @@ namespace Belle2 {
     unsigned int GetB2LFEETtUtime(int n);
 
     //! should be called by DeSerializerCOPPER.cc and fill contents in RawHeader
-    unsigned int FillTopBlockRawHeader(unsigned int m_node_id, unsigned int m_data_type, unsigned int m_trunc_mask);
+    unsigned int FillTopBlockRawHeader(unsigned int m_node_id, unsigned int m_data_type, unsigned int m_trunc_mask, unsigned int prev_eve32);
 
     //! read COPPER driver's checksum value
     unsigned int GetDriverChkSum(int n);

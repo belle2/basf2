@@ -84,7 +84,7 @@ void DeSerializerModule::terminate()
 }
 
 
-void DeSerializerModule::ShmOpen(char*, char*)
+void DeSerializerModule::shmOpen(char*, char*)
 //(char* path_cfg, char* path_sta)
 {
   errno = 0;
@@ -122,7 +122,7 @@ void DeSerializerModule::ShmOpen(char*, char*)
     */
 }
 
-int* DeSerializerModule::ShmGet(int fd, int size_words)
+int* DeSerializerModule::shmGet(int fd, int size_words)
 {
   int offset = 0;
   return (int*)mmap(NULL, size_words * sizeof(int), PROT_READ | PROT_WRITE, MAP_SHARED, fd, offset);
@@ -133,60 +133,6 @@ void DeSerializerModule::event()
 {
 }
 
-
-
-#define POS_HEADER_MAGIC 7
-#define POS_FOOTER_MAGIC 3
-#define POS_EVENT_NUM 16
-int DeSerializerModule::checkData(char* buf, int prev_eve, int* cur_eve)
-{
-
-  int pos_header_magic, pos_footer_magic, pos_event_num;
-
-#ifdef WITH_HEADER_TRAILER
-  pos_header_magic = POS_HEADER_MAGIC + WORD_SENDHEADER + WORD_RAWCPRHEADER;
-  pos_footer_magic = POS_FOOTER_MAGIC + WORD_SENDTRAILER;
-  pos_event_num = POS_EVENT_NUM + WORD_SENDHEADER + WORD_RAWCPRHEADER;
-#else
-  pos_header_magic = POS_HEADER_MAGIC;
-  pos_footer_magic = POS_FOOTER_MAGIC;
-  pos_event_num = POS_EVENT_NUM;
-#endif
-
-  unsigned int* m_buf = (unsigned int*)buf;
-
-  // check footer magic number
-  int word_num = m_buf[ 0 ];
-//   printf("posheader %d\n", pos_header_magic);
-//     for( int i = 0; i < 100; i++){
-//       printf("%.8x ", m_buf[i]);
-//       if( i + 1 % 10 == 0 ) printf("\n");
-//     }
-//     exit(1);
-
-  // check header magic number
-  if (m_buf[ pos_header_magic ] != 0xfffffafa) {
-
-    printf("[ERROR] invalid header magic word : %d 0x%x\n", pos_header_magic, m_buf[ pos_footer_magic ]);
-
-    exit(1);
-  }
-
-
-  // check event number
-  *cur_eve = m_buf[ pos_event_num ];
-  if ((int)prev_eve != -1 && (unsigned int)(m_buf[ pos_event_num ]) != (unsigned int)(prev_eve + 1)) {
-    perror("[ERROR] invalid event number");
-    exit(1);
-  }
-
-  //  printf("%d 0x%x 0x%x\n", m_buf[ POS_EVENT_NUM ], m_buf[ POS_HEADER_MAGIC ], m_buf[ word_num - POS_FOOTER_MAGIC ] );
-  if (m_buf[ word_num - pos_footer_magic ] != 0xfffff5f5) {
-    printf("[ERROR] invalid footer magic word : %d 0x%x\n", word_num - pos_footer_magic, m_buf[ word_num - pos_footer_magic ]);
-    exit(1);
-  }
-  return 0;
-}
 
 
 unsigned int  DeSerializerModule::calcXORChecksum(int* buf, int nwords)

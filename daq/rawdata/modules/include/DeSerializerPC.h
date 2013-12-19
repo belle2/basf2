@@ -110,6 +110,7 @@ namespace Belle2 {
     int event_diff;
 
     unsigned int m_prev_copper_ctr;
+    unsigned int m_prev_evenum;
 
   };
 

@@ -16,14 +16,11 @@
 #define CHECKEVT 5000
 
 #define NOT_USE_SOCKETLIB
-#define CLONE_ARRAY
-//#define DISCARD_DATA
 //#define CHECK_SUM
 
 
 //#define DEBUG
-
-#define NO_DATA_CHECK
+//#define NO_DATA_CHECK
 
 using namespace std;
 using namespace Belle2;
@@ -113,6 +110,10 @@ void DeSerializerPCModule::initialize()
   }
 
   event_diff = 0;
+
+  m_prev_copper_ctr = 0xFFFFFFFF;
+  m_prev_evenum = 0xFFFFFFFF;
+
   B2INFO("DeSerializerPC: initialize() done.");
 }
 
@@ -224,10 +225,7 @@ int* DeSerializerPCModule::recvData(int* malloc_flag, int* total_buf_nwords, int
   // Read header
   for (int i = 0; i < (int)(m_socket.size()); i++) {
 
-
-
     recvFD(m_socket[ i ], (char*)send_hdr_buf, sizeof(int)*SendHeader::SENDHDR_NWORDS, flag);
-
 
     SendHeader send_hdr;
     send_hdr.SetBuffer(send_hdr_buf);
@@ -248,6 +246,7 @@ int* DeSerializerPCModule::recvData(int* malloc_flag, int* total_buf_nwords, int
       exit(1);
 #endif
     }
+
     *num_nodes_in_sendblock += temp_num_nodes;
 
     int rawblk_nwords = send_hdr.GetTotalNwords()
@@ -354,12 +353,8 @@ void DeSerializerPCModule::event()
 
   unsigned int eve_copper_0 = 0;
   unsigned int temp_copper_ctr = 0;
-
-
   clearNumUsedBuf();
 
-  //   printf("EVE %d\n",n_basf2evt);
-  //   fflush(stdout);
   if (n_basf2evt < 0) {
     // Accept requests for connections
     Connect();
@@ -369,15 +364,12 @@ void DeSerializerPCModule::event()
       m_status.waitStarted();
       m_status.reportRunning();
     }
-
     B2INFO("DeSerializerPC: event() started.");
     m_start_time = getTimeSec();
     n_basf2evt = 0;
-
   }
 
   // Make rawdatablk array
-#ifdef CLONE_ARRAY
   raw_datablkarray.create();
   raw_cdcarray.create();
   raw_ftswarray.create();
@@ -388,265 +380,69 @@ void DeSerializerPCModule::event()
   raw_eclarray.create();
   raw_klmarray.create();
 
-#else
-  m_rawdatablk.create();
-#endif
-
-
+  //
+  // Mail loop
+  //
   for (int j = 0; j < NUM_EVT_PER_BASF2LOOP_PC; j++) {
-
     unsigned int eve_ftsw = 0;
     eve_copper_0 = 0;
     unsigned int eve_copper_1 = 0;
 
-
-
-#ifdef DEBUG
-    printf("Read loop : j %d\n", j);
-    fflush(stdout);
-#endif
-
+    //
     // Get a record from socket
+    //
     int total_buf_nwords = 0 ;
     int malloc_flag = 0;
     int num_events_in_sendblock = 0;
     int num_nodes_in_sendblock = 0;
     int* temp_buf = recvData(&malloc_flag, &total_buf_nwords, &num_events_in_sendblock, &num_nodes_in_sendblock);
-
     m_totbytes += total_buf_nwords * sizeof(int);
-#ifdef DEBUG
-    printf("recvd data : %d bytes\n", total_buf_nwords * sizeof(int));
-    fflush(stdout);
-#endif
 
+    //
+    // Set buffer to the RawData class stored in DataStore
+    //
+    RawDataBlock* raw_datablk = raw_datablkarray.appendNew();
+    raw_datablk->SetBuffer((int*)temp_buf, total_buf_nwords, malloc_flag,
+                           num_events_in_sendblock, num_nodes_in_sendblock);
 
-    // Dump binary data
-#ifdef DEBUG
-
-    printf("********* checksum 0x%.8x : %d\n" , CalcSimpleChecksum(temp_buf, total_buf_nwords - 2), total_buf_nwords);
-    printf("\n%.8d : ", 0);
-    for (int i = 0; i < total_buf_nwords; i++) {
-      printf("0x%.8x ", temp_buf[ i ]);
-      if ((i + 1) % 10 == 0) {
-        printf("\n%.8d : ", i + 1);
-      }
-    }
-    printf("\n");
-    printf("\n");
-#endif
-
-
-
-#ifndef DISCARD_DATA
-#ifdef CLONE_ARRAY
-    int temp_malloc_flag = 0;
-    RawDataBlock rawdatablk;
-    rawdatablk.SetBuffer((int*)temp_buf, total_buf_nwords, temp_malloc_flag,
-                         num_events_in_sendblock, num_nodes_in_sendblock);
-
-    RawDataBlock* temp_rawdatablk = raw_datablkarray.appendNew();
-    temp_rawdatablk->SetBuffer((int*)temp_buf, total_buf_nwords, malloc_flag,
-                               num_events_in_sendblock, num_nodes_in_sendblock);
-
-    num_copper_ftsw = rawdatablk.GetNumEntries();
+    //
+    // Data check
+    //
+    num_copper_ftsw = raw_datablk->GetNumEntries();
     int cpr_num = 0;
-
-
-    for (int i = 0; i < rawdatablk.GetNumEntries(); i++) {
-      if (i == 0) {
-        temp_malloc_flag = malloc_flag ;
-      } else {
-        temp_malloc_flag = 0;
-      }
-#ifdef DEBUG
-      printf("==========BODY==========\n");
-      for (int k = 0 ; k < rawdatablk.GetBlockNwords(i); k++) {
-        printf("0x%.8x ", (rawdatablk.GetBuffer(i))[k]);
-        if (k % 10 == 9)printf("\n");
-      }
-      printf("========================\n");
-#endif
-
-
-      if (rawdatablk.CheckFTSWID(i)) {
-        //  temp_rawftsw = raw_ftswarray.appendNew();
+    unsigned int cur_evenum = 0, cur_copper_ctr = 0;
+    for (int i = 0; i < raw_datablk->GetNumEntries(); i++) {
+      if (raw_datablk->CheckFTSWID(i)) {
         RawFTSW* temp_rawftsw = new RawFTSW;
-        temp_rawftsw->SetBuffer((int*)temp_buf + rawdatablk.GetBufferPos(i),
-                                rawdatablk.GetBlockNwords(i), 0, 1, 1);
-        data_size_ftsw = rawdatablk.GetBlockNwords(i);
-        eve_ftsw = (rawdatablk.GetBuffer(i))[ 7 ] & 0xFFFF;
+        temp_rawftsw->SetBuffer((int*)temp_buf + raw_datablk->GetBufferPos(i),
+                                raw_datablk->GetBlockNwords(i), 0, 1, 1);
+        data_size_ftsw = raw_datablk->GetBlockNwords(i);
+        eve_ftsw = (raw_datablk->GetBuffer(i))[ 7 ] & 0xFFFF;
         delete temp_rawftsw;
-      } else if (rawdatablk.CheckTLUID(i)) {
+
+      } else if (raw_datablk->CheckTLUID(i)) {
         // No operation
       } else {
         RawCOPPER* temp_rawcopper = new RawCOPPER;
-        temp_rawcopper->SetBuffer((int*)temp_buf + rawdatablk.GetBufferPos(i),
-                                  rawdatablk.GetBlockNwords(i), 0, 1, 1);
-        temp_copper_ctr = temp_rawcopper->GetEveNo(0);
-
+        temp_rawcopper->SetBuffer((int*)temp_buf + raw_datablk->GetBufferPos(i),
+                                  raw_datablk->GetBlockNwords(i), 0, 1, 1);
 #ifndef NO_DATA_CHECK
-        if (n_basf2evt != 0) {
-          if ((unsigned int)(m_prev_copper_ctr + 1) != temp_copper_ctr) {
-            char err_buf[500];
-            sprintf(err_buf, "Differet COPPER counter : i %d prev 0x%x cur 0x%x : Exiting...\n",
-                    i, m_prev_copper_ctr, temp_rawcopper->GetEveNo(0));
-            //        i, m_prev_copper_ctr, 0 );
-            print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-//             sleep(1234567);
-//             exit(1);
-          }
-        }
+        //  temp_rawcopper->CheckData( 0, m_prev_evenum, m_prev_copper_ctr,
+        //           &cur_evenum, &cur_copper_ctr );
 #endif
-        RawTrailer rawtrl;
-        rawtrl.SetBuffer(temp_rawcopper->GetRawTrlBufPtr(0));
-
-
-#ifdef DEBUG
-        printf("eve %d %d %d %d %d\n",
-               //               temp_rawcopper->GetEveNo(0),
-               temp_rawcopper->Get1stDetectorNwords(0),
-               temp_rawcopper->Get2ndDetectorNwords(0),
-               temp_rawcopper->Get3rdDetectorNwords(0),
-               temp_rawcopper->Get4thDetectorNwords(0)
-              );
-
-        printf("===COPPER BLOCK==============\n");
-        for (int k = 0 ; k < temp_rawcopper->GetBlockNwords(0); k++) {
-          printf("0x%.8x ", (temp_rawcopper->GetBuffer(0))[k]);
-          if (k % 10 == 9)printf("\n");
-        }
-
-        printf("===FINNESSE A ==============\n");
-        for (int k = 0 ; k < temp_rawcopper->Get1stDetectorNwords(0); k++) {
-          printf("0x%.8x ", (temp_rawcopper->Get1stDetectorBuffer(0))[k]);
-          if (k % 10 == 9)printf("\n");
-        }
-
-        printf("===FINNESSE B ==============\n");
-        for (int k = 0 ; k < temp_rawcopper->Get2ndDetectorNwords(0); k++) {
-          printf("0x%.8x ", (temp_rawcopper->Get2ndDetectorBuffer(0))[k]);
-          if (k % 10 == 9)printf("\n");
-        }
-
-        printf("===FINNESSE C ==============\n");
-        for (int k = 0 ; k < temp_rawcopper->Get3rdDetectorNwords(0); k++) {
-          printf("0x%.8x ", (temp_rawcopper->Get3rdDetectorBuffer(0))[k]);
-          if (k % 10 == 9)printf("\n");
-        }
-
-        printf("===FINNESSE D ==============\n");
-        for (int k = 0 ; k < temp_rawcopper->Get4thDetectorNwords(0); k++) {
-          printf("0x%.8x ", (temp_rawcopper->Get4thDetectorBuffer(0))[k]);
-          if (k % 10 == 9)printf("\n");
-        }
-        printf("=== END ==============\n");
-
-#endif
-
-        if (temp_rawcopper->GetDriverChkSum(0) != temp_rawcopper->CalcDriverChkSum(0)) {
-          //#ifndef NO_DATA_CHECK
-          char err_buf[500];
-          printf("==========temp_buf==========\n");
-          for (int k = 0 ; k < 100; k++) {
-            printf("0x%.8x ", temp_buf[k]);
-            if (k % 10 == 9)printf("\n");
-          }
-
-          printf("==========Header==========\n");
-          for (int k = 0 ; k < 100; k++) {
-            printf("0x%.8x ", (temp_rawcopper->GetBuffer(0))[k]);
-            if (k % 10 == 9)printf("\n");
-          }
-
-          printf("Trl 0 0x%.8x\n", (temp_rawcopper->GetRawTrlBufPtr(0))[0]);
-          printf("Trl 1 0x%.8x\n", (temp_rawcopper->GetRawTrlBufPtr(0))[1]);
-          sprintf(err_buf, "COPPER driver checkSum error : block %d : length %d eve 0x%x : Trailer chksum 0x%.8x : calcd. now 0x%.8x\n",
-                  i,
-                  temp_rawcopper->GetBlockNwords(0),
-                  (rawdatablk.GetBuffer(i))[ 3 ],
-                  temp_rawcopper->GetDriverChkSum(0),
-                  temp_rawcopper->CalcDriverChkSum(0));
-
-          print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-          sleep(1234567);
-          exit(-1);
-          //#endif
-        }
-
-
-        if (rawtrl.GetChksum() !=
-            calcXORChecksum(temp_rawcopper->GetBuffer(0),
-                            temp_rawcopper->GetBlockNwords(0) - rawtrl.GetTrlNwords())) {
-
-          //#ifndef NO_DATA_CHECK
-          char err_buf[500];
-          printf("==========temp_buf==========\n");
-          for (int k = 0 ; k < 100; k++) {
-            printf("0x%.8x ", temp_buf[k]);
-            if (k % 10 == 9)printf("\n");
-          }
-
-          printf("==========Header==========\n");
-          for (int k = 0 ; k < 100; k++) {
-            printf("0x%.8x ", (temp_rawcopper->GetBuffer(0))[k]);
-            if (k % 10 == 9)printf("\n");
-          }
-
-          printf("Trl 0 0x%.8x\n", (temp_rawcopper->GetRawTrlBufPtr(0))[0]);
-          printf("Trl 1 0x%.8x\n", (temp_rawcopper->GetRawTrlBufPtr(0))[1]);
-          sprintf(err_buf, "CheckSum error : block %d : length %d eve 0x%x : Trailer chksum 0x%.8x : calcd. now 0x%.8x\n",
-                  i,
-                  temp_rawcopper->GetBlockNwords(0),
-                  (rawdatablk.GetBuffer(i))[ 3 ],
-                  rawtrl.GetChksum(),
-                  calcSimpleChecksum(temp_rawcopper->GetBuffer(0),
-                                     temp_rawcopper->GetBlockNwords(0)
-                                     - rawtrl.GetTrlNwords()));
-
-          print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-          sleep(1234567);
-          exit(-1);
-          //#endif
-        }
-
         if (cpr_num == 0) {
-          data_size_copper_0 = rawdatablk.GetBlockNwords(i);
-          eve_copper_0 = (rawdatablk.GetBuffer(i))[ 3 ];
+          data_size_copper_0 = raw_datablk->GetBlockNwords(i);
+          eve_copper_0 = (raw_datablk->GetBuffer(i))[ 3 ];
         } else if (cpr_num == 1) {
-          data_size_copper_1 = rawdatablk.GetBlockNwords(i);
-          eve_copper_1 = (rawdatablk.GetBuffer(i))[ 3 ];
+          data_size_copper_1 = raw_datablk->GetBlockNwords(i);
+          eve_copper_1 = (raw_datablk->GetBuffer(i))[ 3 ];
         }
         cpr_num++;
         delete temp_rawcopper;
       }
     }
-
-#ifndef NO_DATA_CHECK
-    if (eve_copper_1 != 0 && (eve_copper_0 != eve_copper_1)) {
-      char err_buf[500];
-      sprintf(err_buf, "Differet Event number over COPPERS COPPER0 %u COPPER1 %u\n", eve_copper_0, eve_copper_1);
-      print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-//       sleep(1234567);
-//       exit(-1);
-    }
-
-    if (eve_ftsw != 0 && ((eve_copper_0 & 0xFFFF) != eve_ftsw + (int)event_diff)) {
-      char err_buf[500];
-      event_diff = (eve_copper_0 & 0xFFFF) - eve_ftsw;
-      sprintf(err_buf, "Different Event number c0 %u ftsw %u diff %d\n", (eve_copper_0 & 0xFFFF), eve_ftsw, event_diff);
-      print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-//       sleep(1234567);
-//       exit(-1);
-    }
-#endif
-
-#else
-    //    m_rawdatablk->buffer(temp_buf_body, body_size_word, malloc_flag_body);
-#endif
-#endif // DISCARD_DATA
-
-
-    m_prev_copper_ctr = temp_copper_ctr;
+    m_prev_evenum = cur_evenum;
+    m_prev_copper_ctr = cur_copper_ctr;
   }
 
 
@@ -657,8 +453,6 @@ void DeSerializerPCModule::event()
   m_eventMetaDataPtr->setExperiment(1);
   m_eventMetaDataPtr->setRun(1);
   m_eventMetaDataPtr->setEvent(n_basf2evt);
-
-
 
   //
   // Shsared memory
@@ -686,8 +480,7 @@ void DeSerializerPCModule::event()
       m_eventMetaDataPtr->setEndOfData();
     }
   }
-
-  if (n_basf2evt % 100 == 0) {
+  if (n_basf2evt % 2000 == 0) {
     //  if ( ( n_basf2evt - m_prev_nevt ) > monitor_numeve ) {
     double cur_time = getTimeSec();
     double interval = cur_time - m_prev_time;

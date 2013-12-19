@@ -11,7 +11,7 @@
 using namespace std;
 using namespace Belle2;
 
-#define NO_DATA_CHECK
+//#define NO_DATA_CHECK
 #define WO_FIRST_EVENUM_CHECK
 
 ClassImp(RawCOPPER);
@@ -615,6 +615,172 @@ unsigned int RawCOPPER::GetMagicDriverTrailer(int n)
   return (unsigned int)(m_buffer[ pos_nwords ]);
 }
 
+unsigned int  RawCOPPER::CalcXORChecksum(int* buf, int nwords)
+{
+  unsigned int checksum = 0;
+  for (int i = 0; i < nwords; i++) {
+
+    checksum = checksum ^ buf[ i ];
+  }
+  return checksum;
+}
+
+
+void RawCOPPER::CheckData(int n, unsigned int prev_evenum, unsigned int prev_copper_ctr,
+                          unsigned int* evenum_rawcprhdr, unsigned int* cur_copper_ctr)
+{
+  ErrorMessage print_err;
+
+  int err_flag = 0;
+  //
+  // check Magic words
+  //
+  if (!CheckCOPPERMagic(n)) {
+    char err_buf[500];
+    sprintf(err_buf, "Invalid Magic word 0x7FFFF0008=%u 0xFFFFFAFA=%u 0xFFFFF5F5=%u 0x7FFF0009=%u\n",
+            GetMagicDriverHeader(n),
+            GetMagicFPGAHeader(n),
+            GetMagicFPGATrailer(n),
+            GetMagicDriverTrailer(n));
+    print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+    err_flag = 1;
+  }
+
+  //
+  // Event # check
+  //
+  *evenum_rawcprhdr = GetEveNo(n);
+  unsigned int evenum_feehdr = GetB2LFEE32bitEventNumber(n);
+  if (*evenum_rawcprhdr != evenum_feehdr) {
+    char err_buf[500];
+    sprintf(err_buf, "Event # in RawCOPPER header and FEE header is different : cprhdr 0x%x feehdr 0x%x : Exiting...\n",
+            *evenum_rawcprhdr, evenum_feehdr);
+    print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+    err_flag = 1;
+  }
+
+
+
+
+
+  //
+  // Check incrementation of event #
+  //
+#ifdef WO_FIRST_EVENUM_CHECK
+  if (prev_evenum != 0xFFFFFFFF) {
+#else
+  if (true) {
+#endif
+    if ((unsigned int)(prev_evenum + 1) != *evenum_rawcprhdr) {
+      char err_buf[500];
+      sprintf(err_buf, "Event # jump : i %d prev 0x%x cur 0x%x : Exiting...\n",
+              n, prev_evenum, *evenum_rawcprhdr);
+      print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      err_flag = 1;
+    }
+  }
+
+  *cur_copper_ctr = GetCOPPERCounter(n);
+#ifdef WO_FIRST_EVENUM_CHECK
+  if (prev_copper_ctr != 0xFFFFFFFF) {
+#else
+  if (true) {
+#endif
+    if ((unsigned int)(prev_copper_ctr + 1) != *cur_copper_ctr) {
+      char err_buf[500];
+      sprintf(err_buf, "COPPER counter jump : i %d prev 0x%x cur 0x%x : Exiting...\n",
+              n, prev_copper_ctr, *cur_copper_ctr);
+      print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      err_flag = 1;
+    }
+  }
+
+  //
+  // Check checksum calculated by COPPER driver
+  //
+  if (GetDriverChkSum(n) != CalcDriverChkSum(n)) {
+    char err_buf[500];
+    sprintf(err_buf, "Data corruption : COPPER driver checkSum error : block %d : length %d eve 0x%x : Trailer chksum 0x%.8x : calcd. now 0x%.8x\n",
+            n,
+            GetBlockNwords(n),
+            *evenum_rawcprhdr,
+            GetDriverChkSum(n),
+            CalcDriverChkSum(n));
+    print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+    err_flag = 1;
+  }
+
+
+  //
+  // Check checksum calculated by DeSerializerCOPPER()
+  //
+  RawTrailer rawtrl;
+  rawtrl.SetBuffer(GetRawTrlBufPtr(n));
+  if (rawtrl.GetChksum() !=
+      CalcXORChecksum(GetBuffer(n), GetBlockNwords(n) - rawtrl.GetTrlNwords())) {
+    char err_buf[500];
+    sprintf(err_buf, "Data corruption : RawCOPPER checksum error : block %d : length %d eve 0x%x : Trailer chksum 0x%.8x : calcd. now 0x%.8x\n",
+            n, GetBlockNwords(n), *evenum_rawcprhdr, rawtrl.GetChksum(),
+            CalcXORChecksum(GetBuffer(n), GetBlockNwords(n) - rawtrl.GetTrlNwords()));
+    print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+    err_flag = 1;
+  }
+
+
+#ifdef DEBUG
+  printf("eve %d %d %d %d %d\n",
+         //               GetEveNo( n ),
+         Get1stDetectorNwords(n),
+         Get2ndDetectorNwords(n),
+         Get3rdDetectorNwords(n),
+         Get4thDetectorNwords(n)
+        );
+  printf("===COPPER BLOCK==============\n");
+  for (int k = 0 ; k < GetBlockNwords(n); k++) {
+    printf("0x%.8x ", (GetBuffer(n))[k]);
+    if (k % 10 == 9)printf("\n");
+  }
+
+  printf("===FINNESSE A ==============\n");
+  for (int k = 0 ; k < Get1stDetectorNwords(n); k++) {
+    printf("0x%.8x ", (Get1stDetectorBuffer(n))[k]);
+    if (k % 10 == 9)printf("\n");
+  }
+
+  printf("===FINNESSE B ==============\n");
+  for (int k = 0 ; k < Get2ndDetectorNwords(n); k++) {
+    printf("0x%.8x ", (Get2ndDetectorBuffer(n))[k]);
+    if (k % 10 == 9)printf("\n");
+  }
+
+  printf("===FINNESSE C ==============\n");
+  for (int k = 0 ; k < Get3rdDetectorNwords(n); k++) {
+    printf("0x%.8x ", (Get3rdDetectorBuffer(n))[k]);
+    if (k % 10 == 9)printf("\n");
+  }
+
+  printf("===FINNESSE D ==============\n");
+  for (int k = 0 ; k < Get4thDetectorNwords(n); k++) {
+    printf("0x%.8x ", (Get4thDetectorBuffer(n))[k]);
+    if (k % 10 == 9)printf("\n");
+  }
+  printf("=== END ==============\n");
+
+#endif
+
+  if (err_flag == 1) {
+    printf("========== dump a data blcok : block # %d==========\n", n);
+    for (int k = 0 ; k < GetBlockNwords(n); k++) {
+      printf("0x%.8x ", (GetBuffer(n))[k]);
+      if (k % 10 == 9)printf("\n");
+    }
+    sleep(1234567);
+    exit(-1);
+  }
+
+  return;
+
+}
 
 bool RawCOPPER::CheckCOPPERMagic(int n)
 {
@@ -759,11 +925,11 @@ unsigned int RawCOPPER::FillTopBlockRawHeader(unsigned int m_node_id, unsigned i
 
   // initialize header(header nwords, magic word) and trailer(magic word)
   //   RawHeader rawhdr;
-  //   rawhdr.SetBuffer(raw_copper->GetRawHdrBufPtr(cprblock));
+  //   rawhdr.SetBuffer(GetRawHdrBufPtr( n ));
   //   rawhdr.Initialize(); // Fill 2nd( hdr size) and 20th header word( magic word )
 
   // 1, Set total words info
-  //   int nwords = raw_copper->GetBlockNwords(cprblock);
+  //   int nwords = GetBlockNwords( n );
   //   rawhdr.SetNwords(nwords);
 
   int datablock_nwords =

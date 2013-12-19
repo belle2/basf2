@@ -213,6 +213,14 @@ namespace Belle2 {
 
     //! calc COPPER driver's checksum value
     unsigned int CalcDriverChkSum(int n);
+
+    //! calc XOR checksum
+    unsigned int CalcXORChecksum(int* buf, int nwords);
+
+    //! check data contents
+    void CheckData(int n, unsigned int prev_evenum, unsigned int prev_copper_ctr,
+                   unsigned int* cur_evenum, unsigned int* cur_copper_ctr);
+
     //
     // size of "COPPER front header" and "COPPER trailer"
     //

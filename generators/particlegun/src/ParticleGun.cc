@@ -169,6 +169,10 @@ bool ParticleGun::generateEvent(MCParticleGraph& graph)
     p.setEnergy(e);
     p.setProductionVertex(vx, vy, vz);
     p.addStatus(MCParticle::c_StableInGenerator);
+    //Particle is stable in generator. We could use MCParticleGraph options to
+    //do this automatically but setting it here makes the particle correct
+    //independent of the options
+    p.setDecayTime(numeric_limits<double>::infinity());
 
     if (m_params.independentVertices) {
       //If we have independent vertices, generate new vertex for next particle

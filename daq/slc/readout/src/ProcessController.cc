@@ -17,8 +17,8 @@ using namespace Belle2;
 
 bool ProcessController::init(const std::string& name_in)
 {
-  const std::string name = (name_in.size() > 0) ? name_in : _callback->getNode()->getName();
-  _msg.setNode(name, _callback->getNode()->getData()->getId());
+  _name = (name_in.size() > 0) ? name_in : _callback->getNode()->getName();
+  _msg.setNode(_name, _callback->getNode()->getData()->getId());
   _state = State::CONFIGURED_S;
   PThread(new ProcessLogListener(this));
   return _msg.create();

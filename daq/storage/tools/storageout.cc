@@ -39,7 +39,6 @@ int main(int argc, char** argv)
 
   while (true) {
     sbuf.reportReady();
-    RingBuffer* rbuf = new RingBuffer(argv[1], 1000000);
     TCPSocket socket;
     try {
       socket = server_socket.accept();
@@ -50,6 +49,8 @@ int main(int argc, char** argv)
       return 0;
     }
     if (use_buf) sbuf.waitStarted();
+    //RingBuffer* rbuf = new RingBuffer(argv[1], 10000000);
+    RingBuffer* rbuf = new RingBuffer(argv[1]);
     printf("%s:%d\n", __FILE__, __LINE__);
     sbuf.reportRunning();
     printf("%s:%d\n", __FILE__, __LINE__);
@@ -71,7 +72,7 @@ int main(int argc, char** argv)
             tried = true;
           }
           */
-          usleep(20);
+          usleep(200);
         }
         socket.write(data.getBuffer(), data.getWordSize());
         if (nrec % 100 == 0) {

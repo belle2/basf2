@@ -45,7 +45,7 @@ int main(int argc, char** argv)
   char* buf = new char[MAXBUF];
   int nrec = 0;
   while (true) {
-    int sstat = read(fd, buf, 1024);
+    int sstat = read(fd, buf, MAXBUF);
     //int sstat = read(fd, buf, sizeof(int));
     if (sstat <= 0) break;
     /*

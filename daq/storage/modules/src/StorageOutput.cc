@@ -10,6 +10,8 @@
 
 #include <daq/storage/modules/StorageOutput.h>
 
+#include <stdio.h>
+
 using namespace std;
 using namespace Belle2;
 
@@ -36,7 +38,7 @@ StorageOutputModule::StorageOutputModule() : Module()
   addParam("OutputBufferName", m_obufname, "Name of Ring Buffer to dump streamed events",
            string(""));
   addParam("DumpInterval", m_interval, "Event interval to dump event in RingBuffer",
-           100);
+           10);
   addParam("StorageDir", m_stordir, "Directory to write output files", string(""));
 
   B2DEBUG(1, "StorageOutput: Constructor done.");
@@ -63,7 +65,7 @@ void StorageOutputModule::initialize()
   // Ring Buffer
   if (m_obufname.size() > 0) {
     B2INFO(m_obufname.c_str());;
-    m_obuf = new RingBuffer(m_obufname.c_str(), 1000000);
+    m_obuf = new RingBuffer(m_obufname.c_str(), 10000000);
   } else
     m_obuf = NULL;
 
@@ -96,15 +98,12 @@ void StorageOutputModule::event()
   int stat = m_file->write(msg->buffer());
   //  printf("StorageOuput : write = %d\n", stat);
 
-  static int count = 0;
+  //static int count = 0;
   // Queue EvtMessage in RingBuffer
   if (m_obuf != NULL) {
     if (m_nevt % m_interval == 0) {
       // Free running RingBuffer, no flow control
-      //printf("record %d: size = %d\n", count, *(int*)msg->buffer());
-      //printf("record %d: size = %d\n", count, (msg->size() - 1) / 4 + 1);
-      count++;
-      //printf("%s:%d %d %d\n", __FILE__, __LINE__, (msg->size() - 1) / 4 + 1, *(int*)msg->buffer());
+      //count++;
       m_obuf->insq((int*)msg->buffer(), (msg->size() - 1) / 4 + 1);
       //m_obuf->insq((int*)msg->buffer(), *(int*)msg->buffer());
     }

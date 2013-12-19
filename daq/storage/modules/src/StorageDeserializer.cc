@@ -128,10 +128,11 @@ void StorageDeserializerModule::storeEvent()
   rawpxdary.appendNew(rawpxd);
   delete evtmsg;
   if (count % 1000 == 0) {
-    //printf("record %d: event = %d size = %d\n",
-    //     count, m_data.getEventNumber(), m_data.getWordSize());
-    /*
-    //if (m_data.getEventNumber() % 10000 == 0) {
+    printf("record %d evt no = %d size = %d\n", count,
+           m_data.getEventNumber(), m_data.getWordSize());
+  }
+  /*
+  if (count % 1000 == 0) {
     printf("evt no0 = %d \n", m_data.getEventNumber());
     printf("nw1     = %d ", m_data_hlt.getWordSize());
     printf("hnw1    = %d ", m_data_hlt.getHeaderWordSize());
@@ -145,8 +146,8 @@ void StorageDeserializerModule::storeEvent()
     printf("run no2 = %d ", m_data_pxd.getRunNumber());
     printf("evt no2 = %d ", m_data_pxd.getEventNumber());
     printf("magic2  = %x \n", m_data_pxd.getTrailerMagic());
-    */
   }
+  */
   count++;
 }
 

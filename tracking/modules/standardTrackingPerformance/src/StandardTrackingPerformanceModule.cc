@@ -63,7 +63,10 @@ void StandardTrackingPerformanceModule::initialize()
   StoreArray<TrackFitResult>::required();
 
   m_outputFile = new TFile(m_outputFileName.c_str(), "RECREATE");
+  TDirectory* oldDir = gDirectory;
+  m_outputFile->cd();
   m_dataTree = new TTree("data", "data");
+  oldDir->cd();
 
   setupTree();
 
@@ -156,6 +159,10 @@ genfit::Track* StandardTrackingPerformanceModule::findRelatedTrack(
 
   for (genfit::Track & gfTrack : gfTracks) {
     const genfit::TrackCand* aTrackCandPtr = DataStore::getRelatedToObj<genfit::TrackCand>(&gfTrack);
+    if (!aTrackCandPtr) {
+      B2ERROR("No Track Candidate for track.  Skipping.");
+      continue;
+    }
     if (aTrackCandPtr->getMcTrackId() == iMcParticle
         && aTrackCandPtr->getPdgCode() == mcParticle.getPDG()) {
       B2DEBUG(99, "Found genfit::Track<->MCParticle relation.");
@@ -221,7 +228,11 @@ const TrackFitResult* StandardTrackingPerformanceModule::findRelatedTrackFitResu
 void StandardTrackingPerformanceModule::writeData()
 {
   if (m_dataTree != NULL) {
+    TDirectory* oldDir = gDirectory;
+    if (m_outputFile)
+      m_outputFile->cd();
     m_dataTree->Write();
+    oldDir->cd();
   }
   if (m_outputFile != NULL) {
     m_outputFile->Close();

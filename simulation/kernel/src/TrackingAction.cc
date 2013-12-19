@@ -10,6 +10,7 @@
 
 #include <simulation/kernel/TrackingAction.h>
 #include <simulation/kernel/UserInfo.h>
+#include <simulation/kernel/SensitiveDetectorBase.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Unit.h>
 
@@ -22,8 +23,11 @@
 using namespace Belle2;
 using namespace Belle2::Simulation;
 
-//TrackingAction::TrackingAction(MCParticleGraph& mcParticleGraph): G4UserTrackingAction(), m_mcParticleGraph(mcParticleGraph), m_IgnoreOpticalPhotons(false), m_IgnoreSecondaries(false), m_EnergyCut(0.0)
-TrackingAction::TrackingAction(MCParticleGraph& mcParticleGraph): G4UserTrackingAction(), m_mcParticleGraph(mcParticleGraph), m_IgnoreOpticalPhotons(false), m_IgnoreSecondaries(false)
+TrackingAction::TrackingAction(MCParticleGraph& mcParticleGraph):
+  G4UserTrackingAction(), m_mcParticleGraph(mcParticleGraph),
+  m_IgnoreOpticalPhotons(false), m_IgnoreSecondaries(false),
+  m_storeTrajectories(false), m_angularTolerance(0), m_distanceTolerance(0),
+  m_storeMCTrajectories(), m_relMCTrajectories(StoreArray<MCParticle>(), m_storeMCTrajectories)
 {
 
 }
@@ -34,6 +38,17 @@ TrackingAction::~TrackingAction()
 
 }
 
+void TrackingAction::setStoreTrajectories(int store, double angularTolerance, double distanceTolerance)
+{
+  m_storeTrajectories = store;
+  m_angularTolerance = angularTolerance;
+  m_distanceTolerance = distanceTolerance;
+  if (store) {
+    m_storeMCTrajectories.registerAsPersistent();
+    m_relMCTrajectories.registerAsPersistent();
+    SensitiveDetectorBase::registerMCParticleRelation(m_relMCTrajectories, RelationArray::c_negativeWeight);
+  }
+}
 
 void TrackingAction::PreUserTrackingAction(const G4Track* track)
 {
@@ -78,6 +93,16 @@ void TrackingAction::PreUserTrackingAction(const G4Track* track)
         currParticle.setIgnore(false);  //Store the generator info in the MCParticles block.
     } else {
       currParticle.setSecondaryPhysicsProcess(-1);
+    }
+    //Either we store all trajectories
+    if (m_storeTrajectories > 2 ||
+        //Or only primay ones
+        (m_storeTrajectories == 1 && dynamicParticle->GetPrimaryParticle() != NULL) ||
+        //Or all except optical photons
+        (m_storeTrajectories == 2 && track->GetDefinition() != G4OpticalPhoton::OpticalPhotonDefinition())) {
+      TrackInfo& info = dynamic_cast<TrackInfo&>(*track->GetUserInformation());
+      m_relMCTrajectories.add(track->GetTrackID(), m_storeMCTrajectories.getEntries());
+      info.setTrajectory(m_storeMCTrajectories.appendNew());
     }
 
   } catch (CouldNotFindUserInfo& exc) {
@@ -144,6 +169,13 @@ void TrackingAction::PostUserTrackingAction(const G4Track* track)
     currParticle.setDecayTime(postStep->GetGlobalTime() * Unit::ns);
     currParticle.setValidVertex(true);
 
+    //Check if we can remove some points from the trajectory
+    if (m_storeTrajectories) {
+      MCParticleTrajectory* tr = dynamic_cast<TrackInfo*>(track->GetUserInformation())->getTrajectory();
+      if (tr) {
+        tr->simplify(m_angularTolerance, m_distanceTolerance);
+      }
+    }
   } catch (CouldNotFindUserInfo& exc) {
     B2FATAL(exc.what())
   }

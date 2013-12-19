@@ -9,7 +9,9 @@
  **************************************************************************/
 
 #include <simulation/kernel/SteppingAction.h>
+#include <simulation/kernel/UserInfo.h>
 #include <framework/logging/Logger.h>
+#include <framework/gearbox/Unit.h>
 
 #include <G4UnitsTable.hh>
 #include <G4Track.hh>
@@ -46,8 +48,6 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
     return;
   }
 
-  G4ThreeVector stepPos = step->GetPostStepPoint()->GetPosition();
-
   //---------------------------------------
   // Check for very high number of steps.
   //---------------------------------------
@@ -57,5 +57,29 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
               << "\n position=" << G4BestUnit(track->GetPosition(), "Length") << " momentum=" << G4BestUnit(track->GetMomentum(), "Energy"))
     track->SetTrackStatus(fStopAndKill);
     return;
+  }
+
+  //-----------------------------------------------------------
+  // Check if there is an attached trajectory. If so, fill it.
+  //-----------------------------------------------------------
+  if (m_storeTrajectories) {
+    TrackInfo* info = dynamic_cast<TrackInfo*>(track->GetUserInformation());
+    if (info && info->getTrajectory()) {
+      MCParticleTrajectory& trajectory = *(info->getTrajectory());
+      if (trajectory.empty()) {
+        const G4ThreeVector stepPos = step->GetPreStepPoint()->GetPosition() * Unit::mm;
+        const G4ThreeVector stepMom = step->GetPreStepPoint()->GetMomentum() * Unit::MeV;
+        trajectory.addPoint(
+          stepPos.x(), stepPos.y(), stepPos.z(),
+          stepMom.x(), stepMom.y(), stepMom.z()
+        );
+      }
+      const G4ThreeVector stepPos = step->GetPostStepPoint()->GetPosition() * Unit::mm;
+      const G4ThreeVector stepMom = step->GetPostStepPoint()->GetMomentum() * Unit::MeV;
+      trajectory.addPoint(
+        stepPos.x(), stepPos.y(), stepPos.z(),
+        stepMom.x(), stepMom.y(), stepMom.z()
+      );
+    }
   }
 }

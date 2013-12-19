@@ -41,6 +41,9 @@ namespace Belle2 {
        */
       void setMaxNumberSteps(int maxSteps) { m_maxNumberSteps = maxSteps; };
 
+      /** Sets the trajectory option to enable storing of the simulated particle trajectories */
+      void setStoreTrajectories(bool store) { m_storeTrajectories = store; }
+
       /** The method will be called at each step during simulation.
        * @param step The pointer of current step.
        */
@@ -49,7 +52,9 @@ namespace Belle2 {
 
     protected:
 
-      int m_maxNumberSteps; /*!< The maximum number of steps before the track transportation is stopped and the track is killed. */
+      int m_maxNumberSteps; /**< The maximum number of steps before the track transportation is stopped and the track is killed. */
+      /** if true, check if the track has attached trajectory info and append step information if necessary */
+      bool m_storeTrajectories;
 
     };
 

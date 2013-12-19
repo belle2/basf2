@@ -112,7 +112,7 @@ namespace Belle2 {
       }
     }
 
-    m_outputFile = TFile::Open((m_identifierName + ".root").c_str() , "RECREATE");
+    m_outputFile = TFile::Open((m_identifierName).c_str() , "RECREATE");
 
   }
 

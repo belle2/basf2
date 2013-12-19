@@ -7,7 +7,7 @@
 #include <sys/fcntl.h>
 #include <unistd.h>
 
-#include "nsm2.h"
+#include "nsmparse.h"
 
 static int  nsmparse_errcode;
 static char nsmparse_errstr[256];
@@ -21,8 +21,19 @@ static char nsmparse_errstr[256];
 #define  NSMEPARSENOSTR  (-14)
 #define  NSMEPARSEITEM   (-15)
 
-nsm_data_att_t nsm_data_att_list[256];
-
+/* -- malloc ---------------------------------------------------------- */
+static char *
+nsmparse_malloc(size_t siz, const char *where, const char *text)
+{
+  char *p = (char *)malloc(siz);
+  if (! p) {
+    printf("nsmparse_malloc: can't malloc %d bytes%s%s%s%s\n",
+	   siz,
+	   where ? " in " : "", where ? where : "",
+	   text  ? ": "   : "", text  ? text  : "");
+    exit(1);
+  }
+}
 /* -- readfile -------------------------------------------------------- */
 static char *
 nsmparse_readfile(const char *file, off_t *filelenp)
@@ -34,7 +45,7 @@ nsmparse_readfile(const char *file, off_t *filelenp)
   int len;
   int blksiz = 65536;
   
-  *filelenp = 0;
+  if (filelenp) *filelenp = 0;
 
   if (stat(file, &statbuf) < 0) {
     printf("can't stat file %s\n", file);
@@ -51,7 +62,7 @@ nsmparse_readfile(const char *file, off_t *filelenp)
     return 0;
   }
 
-  filebuf = malloc(statbuf.st_size + 1);
+  filebuf = nsmparse_malloc(statbuf.st_size + 1, "readfile", file);
   if (! filebuf) {
     close(fd);
     printf("can't alloc %ld bytes\n", statbuf.st_size + 1);
@@ -70,7 +81,7 @@ nsmparse_readfile(const char *file, off_t *filelenp)
   }
   close(fd);
 
-  *filelenp = statbuf.st_size;
+  if (filelenp) *filelenp = statbuf.st_size;
   filebuf[statbuf.st_size] = 0;
   return filebuf;
 }
@@ -161,11 +172,7 @@ nsmparse_error(char *fmt, const char *file, char *filebuf, char *p)
   int line = 1;
   for (q = filebuf; q < p; q++) if (*q == '\n') line++;
   for (q = p; isalnum(*q) || *q == '_'; q++);
-  token = malloc(q - p + 1);
-  if (! token) {
-    printf("nsmparse_error: malloc error %d bytes\n", q - p + 1);
-    exit(1);
-  }
+  token = nsmparse_malloc(q - p + 1, "error", file);
   strncpy(token, p, q - p);
   token[q - p] = 0;
   sprintf(nsmparse_errstr, "Error:%s:%d: ", file, line);
@@ -221,60 +228,73 @@ nsmparse_struct(char *filebuf, const char *datname)
   return 0;
 }
 /* -- nsmparse_scan --------------------------------------------------- */
-static char *
-nsmparse_scan(const char *file, char *filebuf, char *start)
+static NSMparse *
+nsmparse_scan(const char *file, char *filebuf, char *start, char *fmtout)
 {
   char *ptr = start;
-  struct types_t { char *name; int siz; char sym; };
+  char *q = 0; /* temporary pointer */
+  struct types_t { char *name; int siz; char sym; char type; };
   struct types_t *typep;
   static struct types_t types[] = {
-    { "int64",  8, 'd' },
-    { "int32",  4, 'i' },
-    { "int16",  2, 's' },
-    { "char",   1, 'a' },
-    { "uint64", 8, 'd' },
-    { "uint32", 4, 'i' },
-    { "uint16", 2, 's' },
-    { "uchar",  1, 'a' },
-    { "byte8",  1, 'a' },
-    { "double", 8, 'd' },
-    { "float",  4, 'i' },
+    { "int64",  8, 'd', 'l' },
+    { "int32",  4, 'i', 'i' },
+    { "int16",  2, 's', 's' },
+    { "char",   1, 'a', 'c' },
+    { "uint64", 8, 'd', 'L' },
+    { "uint32", 4, 'i', 'I' },
+    { "uint16", 2, 's', 'S' },
+    { "uchar",  1, 'a', 'C' },
+    { "byte8",  1, 'a', 'C' },
+    { "double", 8, 'd', 'd' },
+    { "float",  4, 'i', 'f' },
     { 0, 0, 0 }};
   char sym_prev = 0;
   int n_same = 0;
   static char fmtstr[256];
   int fmtlen = 63;
+  int offset = 0;
+  NSMparse *parsetop = 0;
+  NSMparse *parsep = 0;
 
   *fmtstr = 0;
-
-  int offset = 0;
-  memset(nsm_data_att_list, 0, sizeof(nsm_data_att_list));
-  nsm_data_att_t* nsm_data_att_p = nsm_data_att_list;
+  
   while (1) {
     if (*ptr == '}') break;
     for (typep = types; typep->name; typep++) {
       int len = strlen(typep->name);
       if (strncmp(ptr, typep->name, len) == 0 && isspace(ptr[len])) {
-	strcpy(nsm_data_att_p->type, typep->name);
-	nsm_data_att_p->offset = offset;
+	if (parsep) {
+	  parsep->next = (NSMparse *)nsmparse_malloc(sizeof(NSMparse),
+						     "scan", file);
+	  parsep = parsep->next;
+	} else {
+	  parsetop = (NSMparse *)nsmparse_malloc(sizeof(NSMparse),
+						 "scan", file);
+	  parsep = parsetop;
+	}
+	memset(parsep, sizeof(NSMparse), 0);
+	parsep->type = typep->type;
+	parsep->offset = offset;
 	ptr += len+1;
 	break;
       }
     }
     if (! typep->name) {
       nsmparse_error("'%s' is not a valid type", file, filebuf, ptr);
-      return 0;
+      goto parseerr_return;
     }
     if (! isalpha(*ptr) && *ptr != '_') {
       nsmparse_error("valid name not found", file, filebuf, ptr);
-      return 0;
+      goto parseerr_return;
     }
-    char buf[32];
-    while (isalnum(*ptr) || *ptr == '_') {
-      sprintf(buf, "%c", *ptr);
-      strcat(nsm_data_att_p->label, buf);
-      ptr++;
+    for (q = parsep->name; isalnum(*ptr) || *ptr == '_'; ) {
+      *q++ = *ptr++;
+      if (q >= parsep->name + sizeof(parsep->name)) {
+	nsmparse_error("too long variable name", file, filebuf, ptr);
+	goto parseerr_return;
+      }
     }
+    *q = 0;
     if (isspace(*ptr)) ptr++;
     if (*ptr == ';') {
       /* printf("%s %d\n", typep->name, typep->siz); */
@@ -290,29 +310,26 @@ nsmparse_scan(const char *file, char *filebuf, char *start)
 	}
       }
       sym_prev = typep->sym;
-      n_same++;
-      nsm_data_att_p->length = -1;
+      parsep->size = -1; /* for a non-array entry */
       offset += typep->siz;
+      n_same++;
     } else if (*ptr == '[') { /* multi-dim array not supported yet */
       int num;
-      char *q;
       if (isspace(*++ptr)) ++ptr;
       if (! isdigit(*ptr)) {
 	nsmparse_error("invalid array size", file, filebuf, ptr);
-	return 0;
+	goto parseerr_return;
       }
-      num = strtoul(ptr, &q, 0);
-      nsm_data_att_p->length = num;
-      offset += typep->siz * num;
+      num = strtoul(ptr, &q, 0); /* char **endptr = &q */
       if (isspace(*q)) q++;
       if (*q != ']') {
 	nsmparse_error("invalid array size", file, filebuf, ptr);
-	return 0;
+	goto parseerr_return;
       }
       if (isspace(*++q)) ++q;
       if (*q != ';') {
 	nsmparse_error("semicolon not found", file, filebuf, ptr);
-	return 0;
+	goto parseerr_return;
       }
       /* printf("%s %d %d\n", typep->name, typep->siz, num); */
       ptr = q+1;
@@ -324,16 +341,17 @@ nsmparse_scan(const char *file, char *filebuf, char *start)
 	n_same = 0;
 	if (strlen(fmtstr) > fmtlen) {
 	  nsmparse_error("struct size exceeded", file, filebuf, ptr);
-	  return 0;
+	  goto parseerr_return;
 	}
       }
       sym_prev = typep->sym;
+      parsep->size = num; /* for a non-array entry */
+      offset += typep->siz * num;
       n_same += num;
     } else {
       nsmparse_error("semicolon not found", file, filebuf, ptr);
-      return 0;
+      goto parseerr_return;
     }
-    nsm_data_att_p++;
   }
 
   if (n_same) {
@@ -343,14 +361,27 @@ nsmparse_scan(const char *file, char *filebuf, char *start)
 
   if (strlen(fmtstr) > fmtlen) {
     nsmparse_error("struct size exceeded", file, filebuf, ptr);
-    return 0;
+    goto parseerr_return;
   }
 
-  return fmtstr;
+  /*
+    fmtout must have 256 byte size
+  */
+  if (fmtout) strcpy(fmtout, fmtstr);
+  return parsetop;
+
+ parseerr_return:
+  while (parsetop) {
+    parsep = parsetop->next;
+    free(parsetop);
+    parsetop = parsep;
+  }
+  if (fmtout) *fmtout = 0;
+  return 0;
 }
 /* -- nsmparse_findfile ------------------------------------------- */
-char *
-nsmparse_findfile(const char *name, const char *incpath, off_t *filelenp)
+static char *
+nsmparse_findfile(const char *name, const char *incpath)
 {
   int i;
   int len = strlen(name);
@@ -364,13 +395,12 @@ nsmparse_findfile(const char *name, const char *incpath, off_t *filelenp)
       while (1) {
 	q = strchr(p, ':');
 	if (! q) q = p + strlen(p);
-	path = malloc(q - p + len + 4);
+	path = nsmparse_malloc(q - p + len + 4, "findfile", name);
 	strncpy(path, p, q-p);
 	path[q-p] = '/';
 	strcpy(&path[q-p+1], name);
 	strcat(path, ".h");
 	if (stat(path, &statbuf) == 0) {
-	  *filelenp = statbuf.st_size;
 	  return path;
 	}
 	free(path);
@@ -386,115 +416,83 @@ nsmparse_findfile(const char *name, const char *incpath, off_t *filelenp)
   return 0;
 }
 
+/* -- nsmlib_parsestr ------------------------------------------------- */
+static NSMparse *
+nsmlib_parsestr(const char *datname, int revision,
+		const char *filebuf, const char *filepath, char *fmtstr)
+{
+  char *datlist;
+  char *strbegin;
+  int ret;
+  off_t filelen;
+  char *parsebuf;
+  NSMparse *parsep;
+
+  filelen = strlen(filebuf);
+  parsebuf = nsmparse_malloc(filelen + 1, "parsestr", datname);
+  memcpy(parsebuf, filebuf, filelen + 1);
+  
+  if (nsmparse_cleanup(parsebuf, &filelen)) {
+    nsmparse_errcode = NSMEPARSECOM;
+    free(parsebuf);
+    return 0;
+  }
+
+  if ((ret = nsmparse_revision(filepath, parsebuf, datname)) <= 0) {
+    nsmparse_errcode = NSMEPARSENOREV;
+    free(parsebuf);
+    return 0;
+  }
+
+  if (ret != revision) {
+    nsmparse_errcode = NSMEPARSENOREV;
+    sprintf(nsmparse_errstr, "revision mismatch, found %d while expecting %d",
+	    ret, revision);
+    free(parsebuf);
+    return 0;
+  }
+  
+  if (! (strbegin = nsmparse_struct(parsebuf, datname))) {
+    nsmparse_errcode = NSMEPARSENOSTR;
+    free(parsebuf);
+    return 0;
+  }
+  
+  if (! (parsep = nsmparse_scan(filepath, parsebuf, strbegin, fmtstr))) {
+    nsmparse_errcode = NSMEPARSEITEM;
+    free(parsebuf);
+    return 0;
+  }
+  
+  free(parsebuf);
+  return parsep;
+}
 /* -- nsmlib_parse ---------------------------------------------------- */
-char *
-nsmlib_parse(const char *datname, int revision, const char *incpath)
+NSMparse *
+nsmlib_parsefile(const char *datname, int revision, const char *incpath,
+		 char *fmtstr)
 {
   off_t filelen;
   char *filepath;
   char *filebuf;
-  char *datlist;
-  char *strbegin;
-  char *fmtstr;
-  int ret;
+  NSMparse *parsep;
   
-  filepath = nsmparse_findfile(datname, incpath, &filelen);
+  filepath = nsmparse_findfile(datname, incpath);
   if (! filepath) {
     nsmparse_errcode = NSMEPARSENOFILE;
     sprintf(nsmparse_errstr, "%s.h not found in the include path", datname);
     return 0;
   }
 
-  filebuf = nsmparse_readfile(filepath, &filelen);
+  filebuf = nsmparse_readfile(filepath, 0); /* no need to retreive length */
   free(filepath);
   
   if (! filebuf) return 0;
 
-  if (nsmparse_cleanup(filebuf, &filelen)) {
-    nsmparse_errcode = NSMEPARSECOM;
-    free(filebuf);
-    return 0;
-  }
-
-  if ((ret = nsmparse_revision(filepath, filebuf, datname)) <= 0) {
-    nsmparse_errcode = NSMEPARSENOREV;
-    free(filebuf);
-    return 0;
-  }
-
-  if (ret != revision) {
-    nsmparse_errcode = NSMEPARSENOREV;
-    sprintf(nsmparse_errstr, "revision mismatch, found %d while expecting %d",
-	    ret, revision);
-    free(filebuf);
-    return 0;
-  }
-  
-  
-  if (! (strbegin = nsmparse_struct(filebuf, datname))) {
-    nsmparse_errcode = NSMEPARSENOSTR;
-    free(filebuf);
-    return 0;
-  }
-  
-  if (! (fmtstr = nsmparse_scan(filepath, filebuf, strbegin))) {
-    nsmparse_errcode = NSMEPARSEITEM;
-    free(filebuf);
-    return 0;
-  }
-  
+  parsep = nsmlib_parsestr(datname, revision, filebuf, filepath, fmtstr);
   free(filebuf);
-  return fmtstr;
-}
-/* -- nsmlib_parse_str -------------------------------------------------- */
-char *
-nsmlib_parse_str(const char *filebuf_in, const char *filepath, 
-		 const char *datname, int revision)
-{
-  off_t filelen;
-  char *filebuf;
-  char *strbegin;
-  char *fmtstr;
-  int ret;
-  
-  filebuf = malloc(strlen(filebuf_in));
-  if (! filebuf) return 0;
 
-  if (nsmparse_cleanup(filebuf, &filelen)) {
-    nsmparse_errcode = NSMEPARSECOM;
-    free(filebuf);
-    return 0;
-  }
-
-  if ((ret = nsmparse_revision(filepath, filebuf, datname)) <= 0) {
-    nsmparse_errcode = NSMEPARSENOREV;
-    free(filebuf);
-    return 0;
-  }
-
-  if (ret != revision) {
-    nsmparse_errcode = NSMEPARSENOREV;
-    sprintf(nsmparse_errstr, "revision mismatch, found %d while expecting %d",
-	    ret, revision);
-    free(filebuf);
-    return 0;
-  }
-  
-  
-  if (! (strbegin = nsmparse_struct(filebuf, datname))) {
-    nsmparse_errcode = NSMEPARSENOSTR;
-    free(filebuf);
-    return 0;
-  }
-  
-  if (! (fmtstr = nsmparse_scan(filepath, filebuf, strbegin))) {
-    nsmparse_errcode = NSMEPARSEITEM;
-    free(filebuf);
-    return 0;
-  }
-  
-  free(filebuf);
-  return fmtstr;
+  return parsep;
 }
 /* -- nsmlib_parseerr ------------------------------------------------- */
 const char *
@@ -510,8 +508,11 @@ main(int argc, char **argv)
 {
   char *datname;
   char *incpath;
-  const char *fmtstr;
+  char fmtstr[256];
   int revision;
+  NSMparse *parsep;
+
+  memset(fmtstr, sizeof(fmtstr), 0);
   
   if (argc < 3) {
     printf("usage: %s <data-name> <revision> [<path-list>]\n", argv[0]);
@@ -524,22 +525,21 @@ main(int argc, char **argv)
 
   if (revision <= 0) {
     printf("wrong revision %d\n", revision);
-  } else if (fmtstr = nsmlib_parse(datname, revision, incpath)) {
-    printf("fmtstr found: %s\n", fmtstr);
+  } else if (parsep = nsmlib_parsefile(datname, revision, incpath,
+				       fmtstr)) {
+    printf("parsep found: %s\n", fmtstr);
   } else {
     int errcode;
-    fmtstr = nsmlib_parseerr(&errcode);
-    printf("%s (code=%d)\n", fmtstr, errcode);
+    const char *errstr = nsmlib_parseerr(&errcode);
+    printf("%s (code=%d)\n", errstr, errcode);
   }
 
-#if 0
-  filebuf = readfile(argv[1], &filelen);
-  if (filebuf) {
-    datname = getname(argv[1]);
-    /* printf("datname = %s\n", datname); */
-    parse_main(argv[1], datname, filebuf, filelen);
+  while (parsep) {
+    printf("parsep %s %c %d\n", parsep->name, parsep->type, parsep->size,
+	   parsep->offset);
+    parsep = parsep->next;
   }
-#endif
+
   return 0;
 }
 #endif

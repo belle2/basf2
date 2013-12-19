@@ -30,11 +30,11 @@ install::
 	install nsmlib2.h $(EXTINCDIR)/nsm2
 
 clean::
-	-rm -f *.o *.bak *.a *.so *~
+	-rm -f *.o *.a *.so *.bak *~
 
 nsmlib2.o: $(DEPS)
 
 nsmhash.o: $(DEPS)
 
-nsmparse.o: $(DEPS)
+nsmparse.o: $(DEPS) nsmparse.h
 

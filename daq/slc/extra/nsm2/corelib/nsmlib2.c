@@ -5,7 +5,11 @@
    core part, independent of general usage
 
    All external library functions have prefix "nsmlib_".
+
+   20131216 1912 sa_flags fix (work works with gcc 4.1.2)
 \* ---------------------------------------------------------------------- */
+
+const char *nsmlib2_version = "nsmlib2 1.9.12";
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -19,6 +23,7 @@
 #include <sys/types.h>
 #include <sys/ioctl.h>
 #include <sys/select.h>
+#include <sys/stat.h>
 #include <sys/shm.h>
 
 #include "nsm2.h"
@@ -53,13 +58,9 @@ static int   nsmlib_debugflag = 0; /* context independent error code */
 #define DBG    nsmlib_debug
 #define LOG    nsmlib_log
 
-#undef SIGRTMIN
-
 int nsmlib_hash(NSMsys *, int32 *hashtable, int hashmax,
 		const char *key, int create);
 char * nsmlib_parse(const char *datname, int revision, const char *incpath);
-char * nsmlib_parse_str(const char *filebuf_in, const char *filepath,
-			const char *datname, int revision);
 const char *nsmlib_parseerr(int *errcode);
 
 /* -- time1ms -------------------------------------------------------- */
@@ -197,6 +198,48 @@ nsmlib_atoi(const char *a, int def)
     return def;
   } else {
     return (int)strtol(a,0,0);
+  }
+}
+
+/* -- nsmlib_addincpath ---------------------------------------------- */
+int
+nsmlib_addincpath(const char *path)
+{
+  if (! path) {
+    if (nsmlib_incpath) free(nsmlib_incpath);
+    nsmlib_incpath = 0;
+    return 0;
+  } else {
+    /*
+       If "path" is not a directory, take the string up to the last '/'.
+       This is the way to easily add the path of the program, by
+       nsmlib_addincpath(argv[0])
+    */
+    const char *p;
+    int len = nsmlib_incpath ? strlen(nsmlib_incpath) + 1 : 0;
+    struct stat statbuf;
+    while (stat(path, &statbuf) < 0) {
+      if (errno != EINTR) return -1;
+    }
+    
+    if (S_ISDIR(statbuf.st_mode)) {
+      len += strlen(path) + 1;
+      p = path + len;
+    } else {
+      if (! (p = strrchr(path, '/'))) return -1;
+      len += (p - path) + 1;
+    }
+    char *q = (char *)malloc(len);
+    if (! q) ASSERT("nsmlib_addincpath can't malloc %d byte", len);
+    if (nsmlib_incpath) {
+      sprintf(q, "%s:", nsmlib_incpath);
+    } else {
+      *q = 0;
+    }
+    strncat(q, path, p - path);
+    q[len-1] = 0;
+    if (nsmlib_incpath) free(nsmlib_incpath);
+    nsmlib_incpath = q;
   }
 }
 
@@ -740,7 +783,7 @@ nsmlib_handler(int sig)
 
   /* unblock and return */
   /* DBG("nsmlib_handler return"); */
-  sigprocmask(SIG_UNBLOCK, &mask, 0);
+  /* sigprocmask(SIG_UNBLOCK, &mask, 0); */
   return;
 }
 /* -- nsmlib_callbackid ---------------------------------------------- */
@@ -835,16 +878,13 @@ nsmlib_initsig(NSMcontext *nsmc)
 #ifdef SIGRTMIN
   void nsmlib_handler(int signo, siginfo_t *info, void *ignored);
   int  sig = SIGRTMIN;
-#define NSMLIB_SETHANDLER(s,h) (s).sa_sigaction=(h)
+#define NSMLIB_SETHANDLER(s,h) (s).sa_sigaction=(h); (s).sa_flags = SA_SIGINFO
 #else
   void nsmlib_handler(int);
   int  sig = SIGUSR1;
-  //#define NSMLIB_SETHANDLER(a,h) (a).sa_sighandler=(h)
-#define NSMLIB_SETHANDLER(a,h) (a).sa_sigaction=(h)
+#define NSMLIB_SETHANDLER(a,h) (a).sa_sighandler=(h)
 #endif
   struct sigaction action;
-  sigset_t block;
-
   int pipes[2];
 
   nsmc->maxrecursive = NSMLIB_MAXRECURSIVE;
@@ -863,18 +903,16 @@ nsmlib_initsig(NSMcontext *nsmc)
   /* ... and many more to follow ----> */
   
   /* setup signals */
-  //sigemptyset(&action.sa_mask);
-  //sigaddset(&action.sa_mask, sig);
-
-  sigemptyset ( &block );
-  sigaddset( &block, SIGHUP );
-  sigaddset( &block, SIGQUIT );
-  sigaddset( &block, SIGTERM );
-
-  memset ( &action, 0, sizeof (struct sigaction) );
+  memset(&action, 0, sizeof(action));
+  sigemptyset(&action.sa_mask);
+  sigaddset(&action.sa_mask, sig);
   NSMLIB_SETHANDLER(action, nsmlib_handler);
-  action.sa_flags |= SA_RESTART;   // BSD-like behavior
-  //action.sa_flags - 0;
+  /*
+    Don't do: action.sa_flags |= SA_RESTART;
+    Adding SA_RESTART is not a good idea: a blocking read should
+    return with EINTR upon NSM signal, because this NSM signal may be
+    the one to clear the blocking condition.
+  */
   sigaction(sig, &action, 0);
 
   nsmc->usesig = -1; /* undecided */
@@ -1085,9 +1123,9 @@ nsmlib_register_request(NSMcontext *nsmc, const char *name)
 /* -- nsmlib_openmem ------------------------------------------------- */
 void *
 nsmlib_openmem(NSMcontext *nsmc,
-		 const char *datname, const char *fmtname, int revision)
+	       const char *datname, const char *fmtname, int revision)
 {
-  const char *fmtstr;
+  char fmtstr[256];
   NSMsys *sysp = nsmc->sysp;
   NSMmem *memp = nsmc->memp;
   NSMmsg msg;
@@ -1101,78 +1139,7 @@ nsmlib_openmem(NSMcontext *nsmc,
     printf("openmem: revision %d\n", revision);
     return 0;
   }
-  if (! (fmtstr = nsmlib_parse(fmtname, revision, nsmlib_incpath))) {
-    int errcode;
-    const char *errstr = nsmlib_parseerr(&errcode);
-
-    printf("openmem: no fmtstr (%d) %s\n", errcode, errstr);
-    return 0;
-  }
-
-  /* linear search, to be replaced with a hash version */
-  for (datid = 0; datid < NSMSYS_MAX_DAT; datid++) {
-    datp = sysp->dat + datid;
-    if (strcmp(datp->dtnam, datname) == 0) break;
-  }
-  if (datid == NSMSYS_MAX_DAT) {
-    printf("openmem: data %s not found\n", datname);
-    return 0;
-  }
-  if (strcmp(datp->dtfmt, fmtstr) != 0) {
-    printf("openmem: data %s fmt mismatch %s %s\n",
-	   datname, fmtstr, datp->dtfmt);
-    return 0;
-  }
-  if (ntohs(datp->dtrev) != revision) {
-    printf("openmem: data %s revision mismatch %d %d\n",
-	   datname, revision, datp->dtrev);
-    return 0;
-  }
-
-  memset(&msg, 0, sizeof(msg));
-  msg.req = NSMCMD_OPENMEM;
-  msg.node = -1;
-  msg.npar = 1;
-  msg.pars[0] = datid;
-  nsmc->reqwait = msg.req;
-  ret = nsmlib_send(nsmc, &msg);
-  
-  if (ret < 0) {
-    printf("openmem: send error ret=%d\n", ret);
-    nsmc->reqwait = 0;
-    return 0;
-  }
-  ret = nsmlib_recvpar(nsmc);
-  if (ret < 0) {
-    printf("openmem: piperead error ret=%d\n", ret);
-    return 0;
-  }
-  if (ret != datp - sysp->dat) {
-    printf("openmem: datid mismatch %d %d\n", ret, datp - sysp->dat);
-    return 0;
-  }
-  return (char *)memp + ntohl(datp->dtpos);
-}
-/* -- nsmlib_openmem ------------------------------------------------- */
-void *
-nsmlib_openmem_str(NSMcontext *nsmc, const char *filebuf,
-		   const char *datname, const char *fmtname, int revision)
-{
-  const char *fmtstr;
-  NSMsys *sysp = nsmc->sysp;
-  NSMmem *memp = nsmc->memp;
-  NSMmsg msg;
-  int ret;
-  int datid;
-  NSMdat *datp;
-  
-  if (! fmtname) fmtname = datname;
-  
-  if (revision <= 0) {
-    printf("openmem: revision %d\n", revision);
-    return 0;
-  }
-  if (! (fmtstr = nsmlib_parse_str(filebuf, datname, fmtname, revision))) {
+  if (! (nsmlib_parsefile(fmtname, revision, nsmlib_incpath, fmtstr))) {
     int errcode;
     const char *errstr = nsmlib_parseerr(&errcode);
 
@@ -1232,7 +1199,7 @@ nsmlib_allocmem(NSMcontext *nsmc, const char *datname, const char *fmtname,
   NSMmsg msg;
   int ret;
   int reqid;
-  const char *fmtstr;
+  char fmtstr[256];
   char *p;
   NSMsys *sysp = nsmc->sysp;
   NSMmem *memp = nsmc->memp;
@@ -1248,58 +1215,9 @@ nsmlib_allocmem(NSMcontext *nsmc, const char *datname, const char *fmtname,
     return 0;
   }
   
-  if (! (fmtstr = nsmlib_parse(fmtname, revision, nsmlib_incpath))) return 0;
-  if (! (p = malloc(strlen(datname) + strlen(fmtstr) + 2))) return 0;
-
-  sprintf(p, "%s %s", datname, fmtstr);
-
-  memset(&msg, 0, sizeof(msg));
-  msg.req = NSMCMD_ALLOCMEM;
-  msg.node = -1;
-  msg.npar = 2;
-  msg.pars[0] = (cycle != 0) ? (int)(cycle * 100) : 500; /* in 10ms unit */
-  msg.pars[1] = revision;
-  msg.len = strlen(p) + 1;
-  msg.datap = p;
-  nsmc->reqwait = msg.req;
-  ret = nsmlib_send(nsmc, &msg);
-  free(p);
-  if (ret < 0) { nsmc->reqwait = 0; return 0; }
-  DBG("allocmem 2");
-  ret = nsmlib_recvpar(nsmc);
-  DBG("allocmem 3");
-  nsmc->reqwait = 0;
-  if (ret < 0) return 0;
-  printf("allocmem: ret=%d dtpos=%d\n", ret, ntohl(sysp->dat[ret].dtpos));
-  p = (char *)memp + ntohl(sysp->dat[ret].dtpos);
-  return p;
-}
-/* -- nsmlib_allocmem ------------------------------------------------ */
-void *
-nsmlib_allocmem_str(NSMcontext *nsmc, const char *filebuf,
-		    const char *datname, const char *fmtname,
-		    int revision, float cycle)
-{
-  NSMmsg msg;
-  int ret;
-  int reqid;
-  const char *fmtstr;
-  char *p;
-  NSMsys *sysp = nsmc->sysp;
-  NSMmem *memp = nsmc->memp;
-
-  DBG("allocmem 1");
-  
-  if (! fmtname) fmtname = datname;
-  if (! nsmc) { nsmlib_errc = NSMENOINIT; return 0; }
-  if (! datname || revision < 0) { nsmc->errc = NSMEINVPAR; }
-
-  if (revision <= 0) {
-    nsmc->errc = NSMEINVPAR;
+  if (! (nsmlib_parsefile(fmtname, revision, nsmlib_incpath, fmtstr))) {
     return 0;
   }
-  
-  if (! (fmtstr = nsmlib_parse_str(filebuf, datname, fmtname, revision))) return 0;
   if (! (p = malloc(strlen(datname) + strlen(fmtstr) + 2))) return 0;
 
   sprintf(p, "%s %s", datname, fmtstr);

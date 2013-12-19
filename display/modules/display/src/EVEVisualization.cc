@@ -1008,29 +1008,59 @@ EVEVisualization::MCTrack* EVEVisualization::addMCParticle(const MCParticle* par
     mctrack.fIndex = particle->getIndex() - 1;
     m_mcparticleTracks[particle].track = new TEveTrack(&mctrack, m_trackpropagator);
 
-    //add daughter vertices - improves track rendering as lost momentum is taken into account
-    for (int iDaughter = particle->getFirstDaughter(); iDaughter <= particle->getLastDaughter(); iDaughter++) {
-      if (iDaughter == 0)
-        continue; //no actual daughter
-
-      const MCParticle* daughter = StoreArray<MCParticle>()[iDaughter - 1];
-
-      TEvePathMarkD refMark(TEvePathMarkD::kDaughter);
-      refMark.fV.Set(daughter->getProductionVertex());
-      refMark.fP.Set(daughter->getMomentum());
-      refMark.fTime = daughter->getProductionTime();
-      m_mcparticleTracks[particle].track->AddPathMark(refMark);
+    //Check if there is a trajectory stored for this particle
+    const auto mcTrajectories = particle->getRelationsTo<MCParticleTrajectory>();
+    bool hasTrajectory(false);
+    for (auto rel : mcTrajectories.relations()) {
+      //Trajectories with negative weight are from secondary daughters which
+      //were ignored so we don't use them.
+      if (rel.weight <= 0)  continue;
+      //Found one, let's add tose point as reference points to the TEveTrack.
+      //This will force the track propagation to visit all points in order but
+      //provide smooth helix interpolation between the points
+      const MCParticleTrajectory& trajectory = dynamic_cast<const MCParticleTrajectory&>(*rel.object);
+      for (const MCTrajectoryPoint & p : trajectory) {
+        m_mcparticleTracks[particle].track->AddPathMark(
+          TEvePathMark(
+            //Add the last trajectory point as decay point to prevent TEve to
+            //propagate beyond the end of the track. So lets compare the adress
+            //to the address of last point and choose the pathmark accordingly
+            (&p == &trajectory.back()) ? TEvePathMark::kDecay : TEvePathMark::kReference,
+            TEveVector(p.x, p.y, p.z),
+            TEveVector(p.px, p.py, p.pz)
+          ));
+      }
+      //"There can only be One" -> found a trajectory, stop the loop
+      hasTrajectory = true;
+      break;
     }
 
-    //neutrals and very short-lived particles should stop somewhere
-    //(can result in wrong shapes for particles stopped in the detector, so not used there)
-    //also make sure a decay vertex is set, and that it is not set to (0,0,0) (as with particle gun)
-    //last bit is workaround for particlegun bug #937
-    if ((TMath::Nint(particle->getCharge()) == 0 or !particle->hasStatus(MCParticle::c_StoppedInDetector))
-        and mctrack.fDecayed and mctrack.fTDecay != 0.0) {
-      TEvePathMarkD decayMark(TEvePathMarkD::kDecay);
-      decayMark.fV.Set(particle->getDecayVertex());
-      m_mcparticleTracks[particle].track->AddPathMark(decayMark);
+    //If we have the full trajectory there is no need to add additional path marks
+    if (!hasTrajectory) {
+      //add daughter vertices - improves track rendering as lost momentum is taken into account
+      for (int iDaughter = particle->getFirstDaughter(); iDaughter <= particle->getLastDaughter(); iDaughter++) {
+        if (iDaughter == 0)
+          continue; //no actual daughter
+
+        const MCParticle* daughter = StoreArray<MCParticle>()[iDaughter - 1];
+
+        TEvePathMarkD refMark(TEvePathMarkD::kDaughter);
+        refMark.fV.Set(daughter->getProductionVertex());
+        refMark.fP.Set(daughter->getMomentum());
+        refMark.fTime = daughter->getProductionTime();
+        m_mcparticleTracks[particle].track->AddPathMark(refMark);
+      }
+
+      //neutrals and very short-lived particles should stop somewhere
+      //(can result in wrong shapes for particles stopped in the detector, so not used there)
+      //also make sure a decay vertex is set, and that it is not set to (0,0,0) (as with particle gun)
+      //last bit is workaround for particlegun bug #937
+      if ((TMath::Nint(particle->getCharge()) == 0 or !particle->hasStatus(MCParticle::c_StoppedInDetector))
+          and mctrack.fDecayed and mctrack.fTDecay != 0.0) {
+        TEvePathMarkD decayMark(TEvePathMarkD::kDecay);
+        decayMark.fV.Set(particle->getDecayVertex());
+        m_mcparticleTracks[particle].track->AddPathMark(decayMark);
+      }
     }
     TString particle_name(mctrack.GetName());
 
@@ -1038,6 +1068,14 @@ EVEVisualization::MCTrack* EVEVisualization::addMCParticle(const MCParticle* par
     TString momLabel = "";
     if (particle->getMother())
       momLabel = TString::Format("\nMother: Idx=%d, PDG=%d)", particle->getMother()->getIndex() - 1, particle->getMother()->getPDG());
+
+    if (!hasTrajectory) {
+      //Hijack the mother label to show that the track position is only
+      //extrapolated, not known from simulation
+      momLabel += "\n(track estimated from initial momentum)";
+      //Also, show those tracks with dashed lines
+      m_mcparticleTracks[particle].track->SetLineStyle(2);
+    }
 
     m_mcparticleTracks[particle].track->SetTitle(TString::Format(
                                                    "MCParticle Index=%d\n"

@@ -3,6 +3,7 @@
 
 #include <geometry/bfieldmap/BFieldMap.h>
 #include <generators/dataobjects/MCParticle.h>
+#include <simulation/dataobjects/MCParticleTrajectory.h>
 #include <cdc/dataobjects/CDCSimHit.h>
 #include <cdc/dataobjects/CDCHit.h>
 #include <pxd/dataobjects/PXDCluster.h>

@@ -64,6 +64,7 @@ void DisplayModule::initialize()
 {
   //optional inputs
   StoreArray<MCParticle>::optional();
+  StoreArray<MCParticleTrajectory>::optional();
   StoreArray<CDCSimHit>::optional();
   StoreArray<PXDSimHit>::optional();
   StoreArray<SVDSimHit>::optional();

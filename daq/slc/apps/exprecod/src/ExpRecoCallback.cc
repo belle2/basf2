@@ -68,9 +68,12 @@ bool ExpRecoCallback::boot() throw()
   m_shm = new RFSharedMem(nodename);
 
   // 5. Initialize RingBuffers
-  char* rbufname = m_conf->getconf("expreco", "ringbufin");
-  int rbinsize = m_conf->getconfi("expreco", "ringbufsize");
-  m_rbuf = new RingBuffer(rbufname, rbinsize);
+  char* rbinname = m_conf->getconf("expreco", "rbufin");
+  int rbinsize = m_conf->getconfi("expreco", "rbufinsize");
+  m_rbufin = new RingBuffer(rbinname, rbinsize);
+  char* rboutname = m_conf->getconf("expreco", "rbufout");
+  int rboutsize = m_conf->getconfi("expreco", "rbufoutsize");
+  m_rbufout = new RingBuffer(rboutname, rboutsize);
 
   // 6. Start Logger
   pthread_attr_t thread_attr;
@@ -82,21 +85,20 @@ bool ExpRecoCallback::boot() throw()
 
   // 7. Run basf2
   char* basf2 = m_conf->getconf("expreco", "basf2script");
-  char* rbufin = m_conf->getconf("expreco", "ringbufin");
   char* dqmdest = m_conf->getconf("dqmserver", "host");
   char* dqmport = m_conf->getconf("dqmserver", "port");
-  m_pid_basf2 = m_proc->Execute(basf2, rbufin, dqmdest, dqmport);
+  m_pid_basf2 = m_proc->Execute(basf2, rbinname, dqmdest, dqmport);
 
   // 8. Run receiver
   char* receiver = m_conf->getconf("expreco", "recvscript");
   char* srchost = m_conf->getconf("storage", "host");
   char* port = m_conf->getconf("storage", "port");
-  m_pid_receiver = m_proc->Execute(receiver, rbufin, srchost, port, "expreco", (char*)"0");
+  m_pid_receiver = m_proc->Execute(receiver, rbinname, srchost, port, "expreco", (char*)"0");
 
   // 9. Run eventserver
   char* evs = m_conf->getconf("expreco", "evsscript");
   char* evsport = m_conf->getconf("expreco", "evsport");
-  m_pid_evs = m_proc->Execute(evs, evsport);
+  m_pid_evs = m_proc->Execute(evs, rboutname, evsport);
 
   debug("BOOT done");
 
@@ -149,27 +151,29 @@ bool ExpRecoCallback::recover() throw()
   }
 
   // Clear RingBuffer
-  m_rbuf->clear();
+  m_rbufin->clear();
+  m_rbufout->clear();
 
   // Do "load" again
   //  load();
-  // 7. Run basf2
+
+  // Re-run killed processes
+  char* rbinname = m_conf->getconf("expreco", "rbufin");
+  char* rboutname = m_conf->getconf("expreco", "rbufout");
+
   char* basf2 = m_conf->getconf("expreco", "basf2script");
-  char* rbufin = m_conf->getconf("expreco", "ringbufin");
   char* dqmdest = m_conf->getconf("dqmserver", "host");
   char* dqmport = m_conf->getconf("dqmserver", "port");
-  m_pid_basf2 = m_proc->Execute(basf2, rbufin, dqmdest, dqmport);
+  m_pid_basf2 = m_proc->Execute(basf2, rbinname, dqmdest, dqmport);
 
-  // 8. Run receiver
   char* receiver = m_conf->getconf("expreco", "recvscript");
   char* srchost = m_conf->getconf("storage", "host");
   char* port = m_conf->getconf("storage", "port");
-  m_pid_receiver = m_proc->Execute(receiver, rbufin, srchost, port, "expreco", (char*)"0");
+  m_pid_receiver = m_proc->Execute(receiver, rbinname, srchost, port, "expreco", (char*)"0");
 
-  // 9. Run eventserver
   char* evs = m_conf->getconf("expreco", "evsscript");
   char* evsport = m_conf->getconf("expreco", "evsport");
-  m_pid_evs = m_proc->Execute(evs, evsport);
+  m_pid_evs = m_proc->Execute(evs, rboutname, evsport);
 
   return true;
 }

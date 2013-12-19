@@ -76,9 +76,9 @@ namespace Belle2 {
      */
     template < size_t > struct SizeT { };
     template < typename T>
-    inline std::string GetType(SizeT<1> = SizeT<1>()) { return std::string(Type<T>::name()); }
+    inline std::string GetType(SizeT<1> dummy = SizeT<1>()) { (void) dummy; return std::string(Type<T>::name()); }
     template < typename T, typename... Types>
-    inline std::string GetType(SizeT < sizeof...(Types) + 1 > = SizeT < sizeof...(Types) + 1 > ()) { return std::string(Type<T>::name())  + std::string(", ") + GetType<Types...>(SizeT < sizeof...(Types) > ()); }
+    inline std::string GetType(SizeT < sizeof...(Types) + 1 > dummy = SizeT < sizeof...(Types) + 1 > ()) { (void) dummy; return std::string(Type<T>::name())  + std::string(", ") + GetType<Types...>(SizeT < sizeof...(Types) > ()); }
     /** @} */
 
     /**

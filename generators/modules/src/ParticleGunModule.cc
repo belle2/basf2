@@ -11,13 +11,10 @@
 #include <generators/modules/ParticleGunModule.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/datastore/StoreArray.h>
-#include <boost/assign/std/vector.hpp>
 #include <boost/algorithm/string.hpp>
-#include <boost/foreach.hpp>
 
 using namespace std;
 using namespace Belle2;
-using namespace boost::assign;
 
 //-----------------------------------------------------------------
 //                 Register the Module
@@ -35,13 +32,13 @@ ParticleGunModule::ParticleGunModule() : Module()
   setPropertyFlags(c_Input);
 
   //Set default values for parameters
-  m_parameters.pdgCodes       += -11, 11;
-  m_parameters.momentumParams += 0.05, 3.0;
-  m_parameters.phiParams      += 0.0, 360.0;
-  m_parameters.thetaParams    += 17.0, 150.0;
-  m_parameters.xVertexParams  += 0.0, 0.7;
-  m_parameters.yVertexParams  += 0.0, 0.7;
-  m_parameters.zVertexParams  += 0.0, 1.0;
+  m_parameters.pdgCodes       = { -11, 11};
+  m_parameters.momentumParams = {0.05, 3.0};
+  m_parameters.phiParams      = {0.0, 360.0};
+  m_parameters.thetaParams    = {17.0, 150.0};
+  m_parameters.xVertexParams  = {0.0, 0.7};
+  m_parameters.yVertexParams  = {0.0, 0.7};
+  m_parameters.zVertexParams  = {0.0, 1.0};
 
   //Parameter definition
   addParam("nTracks", m_parameters.nTracks,

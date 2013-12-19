@@ -23,7 +23,7 @@
 //#define TIME_MONITOR
 //#define DEBUG
 
-//#define NO_DATA_CHECK
+#define NO_DATA_CHECK
 
 using namespace std;
 using namespace Belle2;
@@ -245,12 +245,14 @@ int* DeSerializerPCModule::RecvData(int* malloc_flag, int* total_buf_nwords, int
     if (i == 0) {
       *num_events_in_sendblock = temp_num_events;
     } else if (*num_events_in_sendblock != temp_num_events) {
+#ifndef NO_DATA_CHECK
       char err_buf[500];
       sprintf(err_buf, "[ERROR] Different # of events or nodes over data sources( %d %d %d %d ). Exiting...\n",
               *num_events_in_sendblock , temp_num_events , *num_nodes_in_sendblock , temp_num_nodes);
       print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
       sleep(1234567);
       exit(1);
+#endif
     }
     *num_nodes_in_sendblock += temp_num_nodes;
 
@@ -429,8 +431,10 @@ void DeSerializerPCModule::event()
     fflush(stdout);
 #endif
 
+
     // Dump binary data
-    //#ifdef DEBUG
+#ifdef DEBUG
+
     printf("********* checksum 0x%.8x : %d\n" , CalcSimpleChecksum(temp_buf, total_buf_nwords - 2), total_buf_nwords);
     printf("\n%.8d : ", 0);
     for (int i = 0; i < total_buf_nwords; i++) {
@@ -441,7 +445,7 @@ void DeSerializerPCModule::event()
     }
     printf("\n");
     printf("\n");
-    //#endif
+#endif
 
 
 #ifdef TIME_MONITOR
@@ -495,18 +499,17 @@ void DeSerializerPCModule::event()
       } else if (rawdatablk.CheckTLUID(i)) {
         // No operation
       } else {
-        //        temp_rawcdc = raw_cdcarray.appendNew();
-        RawCDC* temp_rawcdc = new RawCDC;
-        temp_rawcdc->SetBuffer((int*)temp_buf + rawdatablk.GetBufferPos(i),
-                               rawdatablk.GetBlockNwords(i), 0, 1, 1);
-        temp_copper_ctr = temp_rawcdc->GetEveNo(0);
+        RawCOPPER* temp_rawcopper = new RawCOPPER;
+        temp_rawcopper->SetBuffer((int*)temp_buf + rawdatablk.GetBufferPos(i),
+                                  rawdatablk.GetBlockNwords(i), 0, 1, 1);
+        temp_copper_ctr = temp_rawcopper->GetEveNo(0);
 
 #ifndef NO_DATA_CHECK
         if (n_basf2evt != 0) {
           if ((unsigned int)(m_prev_copper_ctr + 1) != temp_copper_ctr) {
             char err_buf[500];
             sprintf(err_buf, "Differet COPPER counter : i %d prev 0x%x cur 0x%x : Exiting...\n",
-                    i, m_prev_copper_ctr, temp_rawcdc->GetEveNo(0));
+                    i, m_prev_copper_ctr, temp_rawcopper->GetEveNo(0));
             //        i, m_prev_copper_ctr, 0 );
             print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
 //             sleep(1234567);
@@ -515,66 +518,54 @@ void DeSerializerPCModule::event()
         }
 #endif
         RawTrailer rawtrl;
-        rawtrl.SetBuffer(temp_rawcdc->GetRawTrlBufPtr(0));
+        rawtrl.SetBuffer(temp_rawcopper->GetRawTrlBufPtr(0));
 
 
 #ifdef DEBUG
         printf("eve %d %d %d %d %d\n",
-               //               temp_rawcdc->GetEveNo(0),
-               temp_rawcdc->Get1stDetectorNwords(0),
-               temp_rawcdc->Get2ndDetectorNwords(0),
-               temp_rawcdc->Get3rdDetectorNwords(0),
-               temp_rawcdc->Get4thDetectorNwords(0)
+               //               temp_rawcopper->GetEveNo(0),
+               temp_rawcopper->Get1stDetectorNwords(0),
+               temp_rawcopper->Get2ndDetectorNwords(0),
+               temp_rawcopper->Get3rdDetectorNwords(0),
+               temp_rawcopper->Get4thDetectorNwords(0)
               );
 
         printf("===COPPER BLOCK==============\n");
-        for (int k = 0 ; k < temp_rawcdc->GetBlockNwords(0); k++) {
-          printf("0x%.8x ", (temp_rawcdc->GetBuffer(0))[k]);
+        for (int k = 0 ; k < temp_rawcopper->GetBlockNwords(0); k++) {
+          printf("0x%.8x ", (temp_rawcopper->GetBuffer(0))[k]);
           if (k % 10 == 9)printf("\n");
         }
 
         printf("===FINNESSE A ==============\n");
-        for (int k = 0 ; k < temp_rawcdc->Get1stDetectorNwords(0); k++) {
-          printf("0x%.8x ", (temp_rawcdc->Get1stDetectorBuffer(0))[k]);
+        for (int k = 0 ; k < temp_rawcopper->Get1stDetectorNwords(0); k++) {
+          printf("0x%.8x ", (temp_rawcopper->Get1stDetectorBuffer(0))[k]);
           if (k % 10 == 9)printf("\n");
         }
 
         printf("===FINNESSE B ==============\n");
-        for (int k = 0 ; k < temp_rawcdc->Get2ndDetectorNwords(0); k++) {
-          printf("0x%.8x ", (temp_rawcdc->Get2ndDetectorBuffer(0))[k]);
+        for (int k = 0 ; k < temp_rawcopper->Get2ndDetectorNwords(0); k++) {
+          printf("0x%.8x ", (temp_rawcopper->Get2ndDetectorBuffer(0))[k]);
           if (k % 10 == 9)printf("\n");
         }
 
         printf("===FINNESSE C ==============\n");
-        for (int k = 0 ; k < temp_rawcdc->Get3rdDetectorNwords(0); k++) {
-          printf("0x%.8x ", (temp_rawcdc->Get3rdDetectorBuffer(0))[k]);
+        for (int k = 0 ; k < temp_rawcopper->Get3rdDetectorNwords(0); k++) {
+          printf("0x%.8x ", (temp_rawcopper->Get3rdDetectorBuffer(0))[k]);
           if (k % 10 == 9)printf("\n");
         }
 
         printf("===FINNESSE D ==============\n");
-        for (int k = 0 ; k < temp_rawcdc->Get4thDetectorNwords(0); k++) {
-          printf("0x%.8x ", (temp_rawcdc->Get4thDetectorBuffer(0))[k]);
+        for (int k = 0 ; k < temp_rawcopper->Get4thDetectorNwords(0); k++) {
+          printf("0x%.8x ", (temp_rawcopper->Get4thDetectorBuffer(0))[k]);
           if (k % 10 == 9)printf("\n");
         }
         printf("=== END ==============\n");
 
 #endif
 
-        if (rawtrl.GetChksum() != CalcSimpleChecksum(temp_rawcdc->GetBuffer(0),
-                                                     temp_rawcdc->GetBlockNwords(0) - rawtrl.GetTrlNwords())) {
+        if (temp_rawcopper->GetDriverChkSum(0) != temp_rawcopper->CalcDriverChkSum(0)) {
+          //#ifndef NO_DATA_CHECK
           char err_buf[500];
-
-
-
-
-
-          //           printf("==========BODY==========\n");
-          //           for (int k = 0 ; k < temp_rawcdc->GetBlockNwords(0); k++) {
-          //             printf("0x%.8x ", (temp_rawcdc->GetBuffer(0))[k]);
-          //             if (k % 10 == 9)printf("\n");
-
-          //           }
-
           printf("==========temp_buf==========\n");
           for (int k = 0 ; k < 100; k++) {
             printf("0x%.8x ", temp_buf[k]);
@@ -583,24 +574,59 @@ void DeSerializerPCModule::event()
 
           printf("==========Header==========\n");
           for (int k = 0 ; k < 100; k++) {
-            printf("0x%.8x ", (temp_rawcdc->GetBuffer(0))[k]);
+            printf("0x%.8x ", (temp_rawcopper->GetBuffer(0))[k]);
             if (k % 10 == 9)printf("\n");
           }
 
-          printf("Trl 0 0x%.8x\n", (temp_rawcdc->GetRawTrlBufPtr(0))[0]);
-          printf("Trl 1 0x%.8x\n", (temp_rawcdc->GetRawTrlBufPtr(0))[1]);
+          printf("Trl 0 0x%.8x\n", (temp_rawcopper->GetRawTrlBufPtr(0))[0]);
+          printf("Trl 1 0x%.8x\n", (temp_rawcopper->GetRawTrlBufPtr(0))[1]);
+          sprintf(err_buf, "COPPER driver checkSum error : block %d : length %d eve 0x%x : Trailer chksum 0x%.8x : calcd. now 0x%.8x\n",
+                  i,
+                  temp_rawcopper->GetBlockNwords(0),
+                  (rawdatablk.GetBuffer(i))[ 3 ],
+                  temp_rawcopper->GetDriverChkSum(0),
+                  temp_rawcopper->CalcDriverChkSum(0));
+
+          print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+          sleep(1234567);
+          exit(-1);
+          //#endif
+        }
+
+
+        if (rawtrl.GetChksum() !=
+            CalcXORChecksum(temp_rawcopper->GetBuffer(0),
+                            temp_rawcopper->GetBlockNwords(0) - rawtrl.GetTrlNwords())) {
+
+          //#ifndef NO_DATA_CHECK
+          char err_buf[500];
+          printf("==========temp_buf==========\n");
+          for (int k = 0 ; k < 100; k++) {
+            printf("0x%.8x ", temp_buf[k]);
+            if (k % 10 == 9)printf("\n");
+          }
+
+          printf("==========Header==========\n");
+          for (int k = 0 ; k < 100; k++) {
+            printf("0x%.8x ", (temp_rawcopper->GetBuffer(0))[k]);
+            if (k % 10 == 9)printf("\n");
+          }
+
+          printf("Trl 0 0x%.8x\n", (temp_rawcopper->GetRawTrlBufPtr(0))[0]);
+          printf("Trl 1 0x%.8x\n", (temp_rawcopper->GetRawTrlBufPtr(0))[1]);
           sprintf(err_buf, "CheckSum error : block %d : length %d eve 0x%x : Trailer chksum 0x%.8x : calcd. now 0x%.8x\n",
                   i,
-                  temp_rawcdc->GetBlockNwords(0),
+                  temp_rawcopper->GetBlockNwords(0),
                   (rawdatablk.GetBuffer(i))[ 3 ],
                   rawtrl.GetChksum(),
-                  CalcSimpleChecksum(temp_rawcdc->GetBuffer(0),
-                                     temp_rawcdc->GetBlockNwords(0)
+                  CalcSimpleChecksum(temp_rawcopper->GetBuffer(0),
+                                     temp_rawcopper->GetBlockNwords(0)
                                      - rawtrl.GetTrlNwords()));
 
           print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
           sleep(1234567);
           exit(-1);
+          //#endif
         }
 
         if (cpr_num == 0) {
@@ -611,7 +637,7 @@ void DeSerializerPCModule::event()
           eve_copper_1 = (rawdatablk.GetBuffer(i))[ 3 ];
         }
         cpr_num++;
-        delete temp_rawcdc;
+        delete temp_rawcopper;
       }
     }
 

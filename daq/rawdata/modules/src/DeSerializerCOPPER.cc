@@ -218,8 +218,8 @@ void DeSerializerCOPPERModule::FillNewRawCOPPERHeader(RawCOPPER* raw_copper)
   RawTrailer rawtrl;
   rawtrl.SetBuffer(raw_copper->GetRawTrlBufPtr(cprblock));
   rawtrl.Initialize(); // Fill 2nd word : magic word
-  rawtrl.SetChksum(CalcSimpleChecksum(raw_copper->GetBuffer(cprblock),
-                                      raw_copper->GetBlockNwords(cprblock) - rawtrl.GetTrlNwords()));
+  rawtrl.SetChksum(CalcXORChecksum(raw_copper->GetBuffer(cprblock),
+                                   raw_copper->GetBlockNwords(cprblock) - rawtrl.GetTrlNwords()));
 
   //magic word check
 #ifndef NO_DATA_CHECK
@@ -307,7 +307,8 @@ int* DeSerializerCOPPERModule::ReadOneEventFromCOPPERFIFO(const int entry, int* 
   // Calcurate data size
   //
   *m_size_word = m_bufary[ entry ][ RawCOPPER::POS_DATA_LENGTH + RawHeader::RAWHEADER_NWORDS ]
-                 + RawCOPPER::COPPER_HEADER_TRAILER_NWORDS + RawHeader::RAWHEADER_NWORDS + RawTrailer::RAWTRAILER_NWORDS; // 9 words are COPPER haeder and trailer size.
+                 + RawCOPPER::SIZE_COPPER_DRIVER_HEADER + RawCOPPER::SIZE_COPPER_DRIVER_TRAILER
+                 + RawHeader::RAWHEADER_NWORDS + RawTrailer::RAWTRAILER_NWORDS; // 9 words are COPPER haeder and trailer size.
 
   //
   // Allocate buffer if needed
@@ -476,8 +477,7 @@ void DeSerializerCOPPERModule::event()
     temp_rawcopper.SetBuffer(temp_buf, m_size_word, 0, num_events, num_nodes);
 
     // Fill header and trailer
-    //    temp_rawcopper.FillTopBlockRawHeader( m_nodeid, m_data_type, m_trunc_mask );
-    FillNewRawCOPPERHeader(&temp_rawcopper);
+    temp_rawcopper.FillTopBlockRawHeader(m_nodeid, m_data_type, m_trunc_mask);
 
     if (dump_fname.size() > 0) {
       DumpData((char*)temp_buf, m_size_word * sizeof(int));

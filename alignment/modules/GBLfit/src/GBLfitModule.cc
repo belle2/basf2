@@ -95,7 +95,7 @@ GBLfitModule::GBLfitModule() :
   addParam("MCParticlesColName", m_mcParticlesColName,
            "Name of collection holding the MCParticles (need to create relations between found tracks and MCParticles)", string(""));
   //select the filter and set some parameters
-  addParam("FilterId", m_filterId, "Set to 'Kalman' use Kalman Filter, 'DAF' to use the DAF and 'simpleKalman' for the Kalman without reference track", string("DAF"));
+  addParam("FilterId", m_filterId, "Set to 'Kalman' use Kalman Filter, 'DAF' to use the DAF and 'simpleKalman' for the Kalman without reference track", string("GBL"));
   addParam("NMinIterations", m_nMinIter, "Minimum umber of iterations for the Kalman filter", int(3));
   addParam("NMaxIterations", m_nMaxIter, "Maximum umber of iterations for the Kalman filter", int(10));
   addParam("ProbCut", m_probCut, "Probability cut for the DAF. Any value between 0 and 1 possible. Common values are between 0.01 and 0.001", double(0.001));

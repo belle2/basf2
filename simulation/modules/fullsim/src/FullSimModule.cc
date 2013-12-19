@@ -86,6 +86,14 @@ FullSimModule::FullSimModule() : Module(), m_visManager(NULL)
   vector<string> defaultCommands;
   addParam("UICommands", m_uiCommands, "A list of Geant4 UI commands that should be applied before the simulation starts.", defaultCommands);
 
+  addParam("trajectoryStore", m_trajectoryStore, "If non-zero save the full trajectory of 1=primary, 2=non-optical or 3=all particles", 0);
+  addParam("trajectoryAngularTolerance", m_trajectoryAngularTolerance,
+           "If >0 the saved trajectory will be simplified by merging segments "
+           "which change direction by less than this value in radian", 1e-2);
+  addParam("trajectoryDistanceTolerance", m_trajectoryDistanceTolerance,
+           "Maximum deviation from the real trajectory points when merging "
+           "segments (in cm)", 5e-4);
+
   //Make sure the instance of the run manager is created now to initialize some stuff we need for geometry
   RunManager::Instance();
 }
@@ -228,6 +236,12 @@ void FullSimModule::initialize()
     for (vector<string>::iterator iter = m_uiCommands.begin(); iter != m_uiCommands.end(); iter++) {
       uiManager->ApplyCommand(*iter);
     }
+  }
+
+  //Store Trajectories?
+  if (m_trajectoryStore) {
+    trackingAction->setStoreTrajectories(m_trajectoryStore, m_trajectoryAngularTolerance, m_trajectoryDistanceTolerance);
+    steppingAction->setStoreTrajectories(true);
   }
 }
 

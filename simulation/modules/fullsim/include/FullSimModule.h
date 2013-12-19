@@ -102,6 +102,9 @@ namespace Belle2 {
     double m_energyCut;                    /**< kinetic energy cut for the stored Geant secondaries */
     std::string m_magneticField; /**< magnetic field stepper to use */
     double m_magneticCacheDistance; /**< minimal distance for magnetic field lookup. If distance is smaller, return last value */
+    int m_trajectoryStore;                /**< If true, store the trajectories of all primary particles */
+    double m_trajectoryAngularTolerance;   /**< If >0, simplify the trajectory by merging almost parallel steps */
+    double m_trajectoryDistanceTolerance;  /**< Maximum distance to actuall trajectory when merging points */
 
   private:
 

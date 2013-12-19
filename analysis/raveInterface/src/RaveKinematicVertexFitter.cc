@@ -237,6 +237,12 @@ void RaveKinematicVertexFitter::addMother(const Particle* aMotherParticlePtr)
 }
 
 
+void RaveKinematicVertexFitter::setMother(const Particle* aMotherParticlePtr)
+{
+  Particle* tmp = const_cast<Particle*>(aMotherParticlePtr);
+  m_motherParticlePtr = tmp;
+}
+
 
 
 int RaveKinematicVertexFitter::fit(string options)

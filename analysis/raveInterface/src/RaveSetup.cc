@@ -88,6 +88,13 @@ void RaveSetup::setBeamSpot(TVector3 beamSpot, TMatrixDSym beamSpotCov)
   m_useBeamSpot = true;
 }
 
+void RaveSetup::unsetBeamSpot()
+{
+  m_useBeamSpot = false;
+}
+
+
+
 void RaveSetup::Print()
 {
   if (s_instance not_eq NULL) {

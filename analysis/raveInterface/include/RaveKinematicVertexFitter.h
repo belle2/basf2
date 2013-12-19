@@ -46,8 +46,10 @@ namespace Belle2 {
       ~RaveKinematicVertexFitter();
       /** add a track (in the format of a Belle2::Particle) to set of tracks that should be fitted to a vertex */
       void addTrack(const Particle* aParticlePtr);
-      /** All daughters of the argument of this function will be used as input for the vertex fit. Writing back the result directly to the mother particle is not yet supported */
+      /** All daughters of the argument of this function will be used as input for the vertex fit. Writes back the result directly to the mother particle */
       void addMother(const Particle* aMotherParticlePtr);
+      /** Set Mother particle for Vertex/momentum update. Not to be used with addMother */
+      void setMother(const Particle* aMotherParticlePtr);
 
       /** do the vertex fit with all tracks previously added with the addTrack or addMother function. The argument is a string determining the Rave fitting method. See https://rave.hepforge.org/trac/wiki/RaveMethods for the different methods
        * The return value is the number of successfully found vertices (depending on the selected algorithm this can be more then one vertex). Return value 0 means the fit was not successful. -1 means not enough tracks were added*/

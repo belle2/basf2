@@ -95,7 +95,7 @@ def fitVertex(
     list_name,
     confidenceLevel,
     decay_string='',
-    fitter='kfitter',
+    fitter='rave',
     fit_type='vertex',
     with_constraint='',
     path=main,

@@ -58,6 +58,8 @@ namespace Belle2 {
       static void initialize(int verbosity = 1, double MagneticField = 1.5);
       /** The beam spot position and covarance is known you can set it here so that and a vertex in the beam spot should be fitted you can set it here */
       void setBeamSpot(TVector3 beamSpot, TMatrixDSym beamSpotCov);
+      /** unset beam spot constraint */
+      void unsetBeamSpot();
 
       /** Print() writes all RaveSetup member variables to the terminal  */
       static void Print();

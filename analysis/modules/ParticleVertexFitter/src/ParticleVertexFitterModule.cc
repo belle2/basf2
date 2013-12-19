@@ -61,7 +61,7 @@ namespace Belle2 {
     addParam("VertexFitter", m_vertexFitter, "kfitter or rave", string("kfitter"));
     addParam("fitType", m_fitType, "type of the kinematic fit", string("vertex"));
     addParam("withConstraint", m_withConstraint, "additional constraint on vertex", string(""));
-    addParam("decayString", m_decayString, "specifies which daughter particles are included in the kinematic fit", string(""));  // to be implemented
+    addParam("decayString", m_decayString, "specifies which daughter particles are included in the kinematic fit", string(""));
 
 
 
@@ -93,8 +93,8 @@ namespace Belle2 {
       B2WARNING("KFITTER Constraints not implemented ");
 
     if (m_decayString.compare(std::string("")) != 0)
-      B2WARNING("decayString not implemented. All daughters added to the vertex fit");
-
+      //B2WARNING("decayString not implemented. All daughters added to the vertex fit");
+      m_decaydescriptor.init(m_decayString);
   }
 
   void ParticleVertexFitterModule::event()
@@ -270,7 +270,62 @@ namespace Belle2 {
     analysis::RaveKinematicVertexFitter rf;
     if (m_fitType.compare(std::string("mass")) == 0) rf.setVertFit(false);
 
-    rf.addMother(mother);  // change here to implement m_decayString
+
+    if (m_decayString.compare(std::string("")) == 0) {
+      rf.addMother(mother);
+    } else {
+      std::vector<const Particle*> tracksVertex = m_decaydescriptor.getSelectionParticles(mother);
+      std::vector<std::string> tracksName = m_decaydescriptor.getSelectionNames();
+
+      if (allSelectedDaughters(mother, tracksVertex)) {
+        for (unsigned itrack = 0; itrack < tracksVertex.size(); itrack++) {
+          if (tracksVertex[itrack] != mother) rf.addTrack(tracksVertex[itrack]);
+        }
+        rf.setMother(mother);
+      } else {
+
+        analysis::RaveVertexFitter rsf;
+        bool mothSel = false;
+        for (unsigned itrack = 0; itrack < tracksVertex.size(); itrack++) {
+          if (tracksVertex[itrack] != mother) rsf.addTrack(tracksVertex[itrack]);
+          if (tracksVertex[itrack] != mother) B2INFO("ParticleVertexFitterModule: Adding particle " << tracksName[itrack] << " to vertex fit ");
+          if (tracksVertex[itrack] == mother) mothSel = true;
+        }
+
+        int nvert = rsf.fit("kalman");
+
+        TVector3 pos;
+        TMatrixDSym RerrMatrix(3);
+
+        if (nvert > 0) {
+          pos = rsf.getPos(0);
+          RerrMatrix = rsf.getCov(0);
+          double prob = rsf.getPValue(0);
+          TLorentzVector mom(mother->getMomentum(), mother->getEnergy());
+          TMatrixDSym errMatrix(7);
+          for (int i = 0; i < 7; i++) {
+            for (int j = 0; j < 7; j++) {
+              if (i > 3 && j > 3) {errMatrix[i][j] = RerrMatrix[i - 4][j - 4];}
+              else {errMatrix[i][j] = 0;}
+            }
+          }
+          mother->updateMomentum(mom, pos, errMatrix, prob);
+        } else {return false;}
+
+
+        if (mothSel) {
+          analysis::RaveSetup::getInstance()->setBeamSpot(pos, RerrMatrix);
+          rf.addMother(mother);
+          int nKfit = rf.fit("kalman");
+          analysis::RaveSetup::getInstance()->unsetBeamSpot();
+
+          if (nKfit > 0) {return true;}
+          else return false;
+        } else return true;
+      }
+
+    }
+
 
     int nVert = 0;
     bool okFT = false;
@@ -298,7 +353,35 @@ namespace Belle2 {
       return false;
     }
 
+
     return true;
+  }
+
+
+  bool ParticleVertexFitterModule::allSelectedDaughters(const Particle* mother,
+                                                        std::vector<const Particle*> tracksVertex)
+  {
+
+    bool isAll = false;
+    if (mother->getNDaughters() == 0) return false;
+
+    int nNotIncluded = mother->getNDaughters();
+
+    for (unsigned i = 0; i < mother->getNDaughters(); i++) {
+      bool dauOk = false;
+      for (unsigned vi = 0; vi < tracksVertex.size(); vi++) {
+        if (tracksVertex[vi] == mother->getDaughter(i)) {
+          nNotIncluded = nNotIncluded - 1;
+          dauOk = true;
+        }
+      }
+      if (!dauOk) {
+        if (allSelectedDaughters(mother->getDaughter(i), tracksVertex)) nNotIncluded--;
+      }
+    }
+    if (nNotIncluded == 0) isAll = true;
+    return isAll;
+
   }
 
 

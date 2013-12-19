@@ -13,6 +13,7 @@
 
 #include <framework/core/Module.h>
 #include <string>
+#include <analysis/DecayDescriptor/DecayDescriptor.h>
 
 // kfitter
 #include <analysis/KFit/MassFitKFit.h>
@@ -89,6 +90,7 @@ namespace Belle2 {
     std::string m_fitType;        /**< type of the kinematic fit */
     std::string m_withConstraint; /**< additional constraint on vertex */
     std::string m_decayString   ; /**< daughter particles selection */
+    DecayDescriptor m_decaydescriptor; /**< Decay descriptor of decays to look for. */
 
     /**
      * Main steering routine
@@ -113,11 +115,14 @@ namespace Belle2 {
     bool makeKvMother(analysis::VertexFitKFit& kv, Particle* p);
 
     /**
-     * Unconstrained fit using Rave
+     * Fit using Rave
      * @param p pointer to particle
      * @return true for successfull fit and update of mother
      */
     bool doRaveFit(Particle* mother);
+
+    /**  check if all the Daughters (o grand-daugthers) are selected for the vertex fit*/
+    bool allSelectedDaughters(const Particle* mother, std::vector<const Particle*> tracksVertex);
 
   };
 

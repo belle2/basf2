@@ -76,7 +76,7 @@ bool ROCallback::recover() throw()
 {
   Belle2::debug("RECOVER");
   _node->setState(State::CONFIGURED_S);
-  return _con.abort();
+  return (_con.abort() && load());
 }
 
 bool ROCallback::abort() throw()

@@ -90,7 +90,6 @@ void RCGUICommunicator::run()
     while (true) {
       int number = _reader.readInt();
       Command cmd = number;
-      Belle2::debug("number = %d, cmd = %s", number, cmd.getLabel());
       if (cmd == Command::DATA) {
         std::string name = _reader.readString();
         RCMaster* master = _callback->getMaster();

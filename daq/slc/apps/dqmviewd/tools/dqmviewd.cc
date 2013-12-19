@@ -13,12 +13,13 @@
 
 #include <cstdlib>
 #include <dirent.h>
+#include <errno.h>
 
 using namespace Belle2;
 
 typedef SocketAcceptor<PackageSender, DQMViewMaster> DQMUIAcceptor;
 
-typedef void* MonitorFunc_t(const char*, const char*, const char*);
+typedef void* MonitorFunc_t(const char*, const char*);
 
 int main(int argc, char** argv)
 {
@@ -34,6 +35,8 @@ int main(int argc, char** argv)
   const std::string lib_path = config.get("DQM_LIB_PATH");
   const std::string map_path = config.get("DQM_MAP_PATH");
   const std::string config_path = config.get("DQM_CONFIG_PATH");
+  const std::string hostname = config.get("DQM_GUI_HOST");
+  const int port = config.getInt("DQM_GUI_PORT");
   master->setDirectory(map_path);
   DIR* dir = opendir(map_path.c_str());
   if (dir != NULL) {
@@ -47,8 +50,6 @@ int main(int argc, char** argv)
           config.read(map_path + "/" + filename);
           std::string pack_name = config.get("DQM_PACKAGE_NAME");
           if (pack_name.size() == 0) continue;
-          std::string pack_title = config.get("DQM_PACKAGE_TITLE");
-          if (pack_title.size() == 0) pack_title = pack_name;
           std::string pack_map   = config.get("DQM_PACKAGE_MAP");
           std::string pack_lib   = config.get("DQM_PACKAGE_LIB");
           std::string pack_class = config.get("DQM_PACKAGE_CLASS");
@@ -61,8 +62,7 @@ int main(int argc, char** argv)
             MonitorFunc_t* createMonitor =
               (MonitorFunc_t*)dl->load(Belle2::form("create%s", pack_class.c_str()));
             DQMPackage* package =
-              (DQMPackage*)createMonitor(pack_name.c_str(), pack_title.c_str(),
-                                         pack_map.c_str());
+              (DQMPackage*)createMonitor(pack_name.c_str(), pack_map.c_str());
             dl_v.push_back(dl);
             master->add(package);
           } else {
@@ -76,8 +76,7 @@ int main(int argc, char** argv)
     throw (Exception(__FILE__, __LINE__,
                      Belle2::form("Failed to find directory : %s", strerror(errno))));
   }
-  Belle2::PThread(new DQMUIAcceptor(config.get("DQM_GUI_HOST"),
-                                    config.getInt("DQM_GUI_PORT"), master));
+  Belle2::PThread(new DQMUIAcceptor(hostname, port, master));
   master->run();
   return 0;
 }

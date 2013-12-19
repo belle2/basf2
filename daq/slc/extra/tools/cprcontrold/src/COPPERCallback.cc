@@ -128,10 +128,7 @@ bool COPPERCallback::pause() throw()
 bool COPPERCallback::recover() throw()
 {
   Belle2::debug("RECOVER");
-  if (_con.abort()) {
-    return load();
-  }
-  return false;
+  return (_con.abort() && load());
 }
 
 bool COPPERCallback::abort() throw()

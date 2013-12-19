@@ -41,25 +41,16 @@ bool RCClientCallback::ok() throw()
   RCSequencer::notify();
   RCCommunicator* comm = _master->getMasterCommunicator();
   bool synchronized = true;
-  bool iserror = false;
-  State state_low = State::RUNNING_S;;
   State state_org = _master->getNode()->getState();
   for (RCMaster::NSMNodeList::iterator it = _master->getNSMNodes().begin();
        it != _master->getNSMNodes().end(); it++) {
-    if ((*it)->isUsed() && (*it)->getState() != node->getState())
+    if ((*it)->isUsed() && (*it)->getState() != node->getState()) {
       synchronized = false;
-    iserror |= node->getState().isError()
-               || node->getConnection() != Connection::ONLINE;
-    if (node->getConnection() == Connection::ONLINE &&
-        state_low.getId() > node->getState().getId()) {
-      state_low = node->getState();
+      break;
     }
   }
   if (synchronized) {
     _master->getNode()->setState(node->getState());
-  }
-  if (state_org.isError() && !iserror) {
-    _master->getNode()->setState(state_low);
   }
   bool result = (comm != NULL) ? comm->sendState(node) : true;
   if (comm != NULL) comm->sendState(_master->getNode());

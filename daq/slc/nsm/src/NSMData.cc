@@ -7,7 +7,9 @@
 #include "nsm2/belle2nsm.h"
 extern "C" {
 #include "nsm2/nsmlib2.h"
+#if NSM_PACKAGE_VERSION >= 1914
 #include "nsm2/nsmparse.h"
+#endif
 }
 
 #include <iostream>

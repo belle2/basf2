@@ -87,7 +87,7 @@ bool ExpRecoCallback::boot() throw()
   char* basf2 = m_conf->getconf("expreco", "basf2script");
   char* dqmdest = m_conf->getconf("dqmserver", "host");
   char* dqmport = m_conf->getconf("dqmserver", "port");
-  m_pid_basf2 = m_proc->Execute(basf2, rbinname, dqmdest, dqmport);
+  m_pid_basf2 = m_proc->Execute(basf2, rbinname, dqmdest, dqmport, rboutname);
 
   // 8. Run receiver
   char* receiver = m_conf->getconf("expreco", "recvscript");
@@ -164,7 +164,7 @@ bool ExpRecoCallback::recover() throw()
   char* basf2 = m_conf->getconf("expreco", "basf2script");
   char* dqmdest = m_conf->getconf("dqmserver", "host");
   char* dqmport = m_conf->getconf("dqmserver", "port");
-  m_pid_basf2 = m_proc->Execute(basf2, rbinname, dqmdest, dqmport);
+  m_pid_basf2 = m_proc->Execute(basf2, rbinname, dqmdest, dqmport, rboutname);
 
   char* receiver = m_conf->getconf("expreco", "recvscript");
   char* srchost = m_conf->getconf("storage", "host");

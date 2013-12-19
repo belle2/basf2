@@ -85,7 +85,7 @@ void DeSerializerHLTModule::initialize()
 
 
   if (dump_fname.size() > 0) {
-    OpenOutputFile();
+    openOutputFile();
   }
 
 
@@ -95,7 +95,7 @@ void DeSerializerHLTModule::initialize()
   memset(time_array2, 0, sizeof(time_array2));
 
   // initialize buffer number
-  ClearNumUsedBuf();
+  clearNumUsedBuf();
 
   B2INFO("DeSerializerHLT: initialize() done.");
 
@@ -105,11 +105,11 @@ void DeSerializerHLTModule::initialize()
 
 void DeSerializerHLTModule::event()
 {
-  ClearNumUsedBuf();
+  clearNumUsedBuf();
 
   if (n_basf2evt < 0) {
     B2INFO("DeSerializerHLT: event() started.");
-    m_start_time = GetTimeSec();
+    m_start_time = getTimeSec();
     n_basf2evt = 0;
   }
 
@@ -132,7 +132,7 @@ void DeSerializerHLTModule::event()
     int num_nodes_in_sendblock = 0;
 
     // Receive data
-    int* temp_buf = RecvData(&malloc_flag, &total_buf_nwords,
+    int* temp_buf = recvData(&malloc_flag, &total_buf_nwords,
                              &num_events_in_sendblock, &num_nodes_in_sendblock);
     RawCOPPER temp_rawcopper;
     temp_rawcopper.SetBuffer(temp_buf, total_buf_nwords, malloc_flag, num_events_in_sendblock, num_nodes_in_sendblock);
@@ -146,7 +146,7 @@ void DeSerializerHLTModule::event()
 
         int* temp_buf2 = NULL;
         int malloc_flag2 = 0;
-        temp_buf2 = GetBuffer(buf_nwords, &malloc_flag2);
+        temp_buf2 = getBuffer(buf_nwords, &malloc_flag2);
         memcpy(temp_buf2, temp_rawcopper.GetBuffer(index), sizeof(int)*buf_nwords);
         const int temp_num_events = 1;
         const int temp_num_nodes = 1;
@@ -216,7 +216,7 @@ void DeSerializerHLTModule::event()
 
   if (max_nevt >= 0 || max_seconds >= 0.) {
     if ((n_basf2evt * NUM_EVT_PER_BASF2LOOP_PC >= max_nevt && max_nevt > 0)
-        || (GetTimeSec() - m_start_time > max_seconds && max_seconds > 0.)) {
+        || (getTimeSec() - m_start_time > max_seconds && max_seconds > 0.)) {
       m_eventMetaDataPtr->setEndOfData();
     }
   }

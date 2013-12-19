@@ -111,13 +111,13 @@ namespace Belle2 {
 
     //! Module functions to be called from event process
     virtual void event();
-    virtual void PrintCOPPEREvent(RawCOPPER* raw_array, int i);
-    virtual void PrintFTSWEvent(RawDataBlock* raw_array, int i);
-    virtual void PrintData(int* buf, int nwords);
+    virtual void printCOPPEREvent(RawCOPPER* raw_array, int i);
+    virtual void printFTSWEvent(RawDataBlock* raw_array, int i);
+    virtual void printBuffer(int* buf, int nwords);
     virtual void defineHisto();
-    virtual void FillHisto1D(double, int*, int, double, double);
-    virtual void FillHisto2D(double, double, int*, int, double, double,  int, double, double);
-    virtual void Print(int* array, int array_size, double min, double max, const char*);
+    virtual void fillHisto1D(double, int*, int, double, double);
+    virtual void fillHisto2D(double, double, int*, int, double, double,  int, double, double);
+    virtual void printArray(int* array, int array_size, double min, double max, const char*);
     virtual void endRun();
     virtual void terminate();
 

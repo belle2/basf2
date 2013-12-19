@@ -62,7 +62,7 @@ void Root2BinaryModule::terminate()
 }
 
 
-void Root2BinaryModule::write_event(RawDataBlock* raw_dblk, int* first_flag, int* break_flag, int* dblk_pos, unsigned int* dblk_eve)
+void Root2BinaryModule::writeEvent(RawDataBlock* raw_dblk, int* first_flag, int* break_flag, int* dblk_pos, unsigned int* dblk_eve)
 {
   //
   // Data Block
@@ -181,7 +181,7 @@ void Root2BinaryModule::event()
     array_entries = raw_dblkarray.getEntries();
     for (int i = dblk_array; i < array_entries; i++) {
       write_flag = 1;
-      write_event(raw_dblkarray[ i ], &first_flag, &break_flag, &dblk_pos, &dblk_eve);
+      writeEvent(raw_dblkarray[ i ], &first_flag, &break_flag, &dblk_pos, &dblk_eve);
       if (break_flag == 1) {
         dblk_array = i;
         break;
@@ -197,7 +197,7 @@ void Root2BinaryModule::event()
     array_entries = raw_ftswarray.getEntries();
     for (int i = ftsw_array; i < array_entries; i++) {
       write_flag = 1;
-      write_event(raw_ftswarray[ i ], &first_flag, &break_flag, &ftsw_pos, &ftsw_eve);
+      writeEvent(raw_ftswarray[ i ], &first_flag, &break_flag, &ftsw_pos, &ftsw_eve);
       if (break_flag == 1) {
         ftsw_array = i;
         break;
@@ -214,7 +214,7 @@ void Root2BinaryModule::event()
     array_entries = raw_copperarray.getEntries();
     for (int i = copper_array; i < array_entries; i++) {
       write_flag = 1;
-      write_event(raw_copperarray[ i ], &first_flag, &break_flag, &copper_pos, &copper_eve);
+      writeEvent(raw_copperarray[ i ], &first_flag, &break_flag, &copper_pos, &copper_eve);
       if (break_flag == 1) {
         copper_array = i;
         break;
@@ -231,7 +231,7 @@ void Root2BinaryModule::event()
     array_entries = raw_svdarray.getEntries();
     for (int i = svd_array; i < array_entries; i++) {
       write_flag = 1;
-      write_event(raw_svdarray[ i ], &first_flag, &break_flag, &svd_pos, &svd_eve);
+      writeEvent(raw_svdarray[ i ], &first_flag, &break_flag, &svd_pos, &svd_eve);
       if (break_flag == 1) {
         svd_array = i;
         break;
@@ -248,7 +248,7 @@ void Root2BinaryModule::event()
     array_entries = raw_cdcarray.getEntries();
     for (int i = cdc_array; i < array_entries; i++) {
       write_flag = 1;
-      write_event(raw_cdcarray[ i ], &first_flag, &break_flag, &cdc_pos, &cdc_eve);
+      writeEvent(raw_cdcarray[ i ], &first_flag, &break_flag, &cdc_pos, &cdc_eve);
       if (break_flag == 1) {
         cdc_array = i;
         break;
@@ -265,7 +265,7 @@ void Root2BinaryModule::event()
     array_entries = raw_bpidarray.getEntries();
     for (int i = bpid_array; i < array_entries; i++) {
       write_flag = 1;
-      write_event(raw_bpidarray[ i ], &first_flag, &break_flag, &bpid_pos, &bpid_eve);
+      writeEvent(raw_bpidarray[ i ], &first_flag, &break_flag, &bpid_pos, &bpid_eve);
       if (break_flag == 1) {
         bpid_array = i;
         break;
@@ -283,7 +283,7 @@ void Root2BinaryModule::event()
     array_entries = raw_epidarray.getEntries();
     for (int i = epid_array; i < array_entries; i++) {
       write_flag = 1;
-      write_event(raw_epidarray[ i ], &first_flag, &break_flag, &epid_pos, &epid_eve);
+      writeEvent(raw_epidarray[ i ], &first_flag, &break_flag, &epid_pos, &epid_eve);
       if (break_flag == 1) {
         epid_array = i;
         break;
@@ -301,7 +301,7 @@ void Root2BinaryModule::event()
     array_entries = raw_eclarray.getEntries();
     for (int i = ecl_array; i < array_entries; i++) {
       write_flag = 1;
-      write_event(raw_eclarray[ i ], &first_flag, &break_flag, &ecl_pos, &ecl_eve);
+      writeEvent(raw_eclarray[ i ], &first_flag, &break_flag, &ecl_pos, &ecl_eve);
       if (break_flag == 1) {
         ecl_array = i;
         break;
@@ -317,7 +317,7 @@ void Root2BinaryModule::event()
     array_entries = raw_klmarray.getEntries();
     for (int i = klm_array; i < array_entries; i++) {
       write_flag = 1;
-      write_event(raw_klmarray[ i ], &first_flag, &break_flag, &klm_pos, &klm_eve);
+      writeEvent(raw_klmarray[ i ], &first_flag, &break_flag, &klm_pos, &klm_eve);
       if (break_flag == 1) {
         klm_array = i;
         break;

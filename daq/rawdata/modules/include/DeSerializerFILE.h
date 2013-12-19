@@ -42,16 +42,16 @@ namespace Belle2 {
     virtual void event();
 
     //! open a file
-    virtual void FileOpen();
+    virtual void fileOpen();
 
     //! receive data
-    virtual int* ReadOneDataBlock(int* malloc_flag, int* m_size_word, int* data_type);
+    virtual int* readOneDataBlock(int* malloc_flag, int* m_size_word, int* data_type);
 
     //! read data from file
-    virtual int* ReadfromFILE(FILE* fp_in, const int size_word, const int start_word, const int stop_word);
+    virtual int* readfromFILE(FILE* fp_in, const int size_word, const int start_word, const int stop_word);
 
     //! read data from file
-    virtual int* Modify131213SVDdata(int* buf_in, int buf_in_nwords, int* malloc_flag, unsigned int evenum);
+    virtual int* modify131213SVDdata(int* buf_in, int buf_in_nwords, int* malloc_flag, unsigned int evenum);
 
 
 

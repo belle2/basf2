@@ -43,7 +43,7 @@ DeSerializerFILEModule::~DeSerializerFILEModule()
 {
 }
 
-void DeSerializerFILEModule::FileOpen()
+void DeSerializerFILEModule::fileOpen()
 {
   m_fp_in = fopen(m_fname_in.c_str(), "r");
   if (!m_fp_in) {
@@ -59,7 +59,7 @@ void DeSerializerFILEModule::FileOpen()
 void DeSerializerFILEModule::initialize()
 {
   B2INFO("DeSerializerFILE: initialize() started.");
-  FileOpen();
+  fileOpen();
   // Open message handler
   m_msghandler = new MsgHandler(m_compressionLevel);
 
@@ -91,7 +91,7 @@ void DeSerializerFILEModule::initialize()
 }
 
 
-int* DeSerializerFILEModule::ReadOneDataBlock(int* malloc_flag, int* size_word, int* data_type)
+int* DeSerializerFILEModule::readOneDataBlock(int* malloc_flag, int* size_word, int* data_type)
 {
   *malloc_flag = 1;
   //
@@ -111,7 +111,7 @@ int* DeSerializerFILEModule::ReadOneDataBlock(int* malloc_flag, int* size_word, 
         if (m_repetition_max > m_repetition_cnt) {
           m_repetition_cnt++;
           fclose(m_fp_in);
-          FileOpen();
+          fileOpen();
           continue;
         } else {
           return 0x0;
@@ -132,14 +132,14 @@ int* DeSerializerFILEModule::ReadOneDataBlock(int* malloc_flag, int* size_word, 
     int pos_data_length = RawCOPPER::POS_DATA_LENGTH;
     start_word = 0;
     stop_word = pos_data_length;
-    int* length_buf = ReadfromFILE(m_fp_in, pos_data_length, start_word, stop_word);
+    int* length_buf = readfromFILE(m_fp_in, pos_data_length, start_word, stop_word);
 
     *size_word = length_buf[ pos_data_length - 1 ] +
                  RawCOPPER::SIZE_COPPER_DRIVER_HEADER + RawCOPPER::SIZE_COPPER_DRIVER_TRAILER
                  + RawHeader::RAWHEADER_NWORDS + RawTrailer::RAWTRAILER_NWORDS;
     start_word = 1 + pos_data_length + RawHeader::RAWHEADER_NWORDS;
     stop_word = *size_word - RawTrailer::RAWTRAILER_NWORDS;
-    temp_buf = ReadfromFILE(m_fp_in, *size_word, start_word, stop_word);
+    temp_buf = readfromFILE(m_fp_in, *size_word, start_word, stop_word);
 
     temp_buf[ RawHeader::RAWHEADER_NWORDS ] = 0x7fff0008;
     memcpy((temp_buf + RawHeader::RAWHEADER_NWORDS + 1),
@@ -150,14 +150,14 @@ int* DeSerializerFILEModule::ReadOneDataBlock(int* malloc_flag, int* size_word, 
     *size_word = temp_size_word;
     start_word = 1;
     stop_word = *size_word;
-    temp_buf = ReadfromFILE(m_fp_in, *size_word, start_word, stop_word);
+    temp_buf = readfromFILE(m_fp_in, *size_word, start_word, stop_word);
   }
   return temp_buf;
 }
 
 
 
-int* DeSerializerFILEModule::ReadfromFILE(FILE* fp_in, const int size_word, const int start_word, const int stop_word)
+int* DeSerializerFILEModule::readfromFILE(FILE* fp_in, const int size_word, const int start_word, const int stop_word)
 {
   //
   // Allocate buffer if needed
@@ -193,7 +193,7 @@ int* DeSerializerFILEModule::ReadfromFILE(FILE* fp_in, const int size_word, cons
 
 
 
-int* DeSerializerFILEModule::Modify131213SVDdata(int* buf_in, int buf_in_nwords, int* malloc_flag, unsigned int evenum)
+int* DeSerializerFILEModule::modify131213SVDdata(int* buf_in, int buf_in_nwords, int* malloc_flag, unsigned int evenum)
 {
 
 
@@ -266,7 +266,7 @@ void DeSerializerFILEModule::event()
 
   if (n_basf2evt < 0) {
     B2INFO("DeSerializerFILE: event() started.");
-    m_start_time = GetTimeSec();
+    m_start_time = getTimeSec();
     n_basf2evt = 0;
   }
 
@@ -286,7 +286,7 @@ void DeSerializerFILEModule::event()
   while (true) {
     int size_word = 0;
     int malloc_flag = 0;
-    //    int* temp_buf = ReadOneEventFromCOPPERFIFO(j, &malloc_flag, &size_word);
+    //    int* temp_buf = readOneEventFromCOPPERFIFO(j, &malloc_flag, &size_word);
     int* temp_buf;
 
     if (m_prev_buf_flag == 1) {
@@ -295,7 +295,7 @@ void DeSerializerFILEModule::event()
       m_prev_buf_flag = 0;
     } else {
       int data_type;
-      temp_buf = ReadOneDataBlock(&malloc_flag, &size_word, &data_type);
+      temp_buf = readOneDataBlock(&malloc_flag, &size_word, &data_type);
 
 
       if (temp_buf == 0x0) { // End of File
@@ -308,7 +308,7 @@ void DeSerializerFILEModule::event()
       // To make a RawSVD dummy file from data sent by Nakamura-san on Dec. 13, 2013
       //
       {
-        int* temp_temp_buf = Modify131213SVDdata(temp_buf, size_word, &malloc_flag, m_dummy_evenum);
+        int* temp_temp_buf = modify131213SVDdata(temp_buf, size_word, &malloc_flag, m_dummy_evenum);
         delete temp_buf;
         temp_buf = temp_temp_buf;
         m_dummy_evenum++;
@@ -320,13 +320,7 @@ void DeSerializerFILEModule::event()
         int num_events = 1;
         temp_rawcopper.SetBuffer(temp_buf, size_word, 0, num_events, num_nodes);
 
-//  for (int j = 0; j < temp_rawcopper.TotalBufNwords(); j++) {
-//    printf("0x%.8x ", (temp_rawcopper.GetBuffer(0))[ j ]);
-//    if ((j % 10) == 9)printf("\n");
-//    fflush(stdout);
-//  }
-//        temp_rawcopper.GetB2LFEE32bitEventNumber(0);
-        FillNewRawCOPPERHeader(&temp_rawcopper);
+        fillNewRawCOPPERHeader(&temp_rawcopper);
       }
     }
 

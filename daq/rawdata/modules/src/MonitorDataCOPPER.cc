@@ -91,7 +91,7 @@ void MonitorDataCOPPERModule::terminate()
 
 }
 
-double MonitorDataCOPPERModule::GetTimeSec()
+double MonitorDataCOPPERModule::getTimeSec()
 {
   struct timeval t;
   gettimeofday(&t, NULL);
@@ -108,7 +108,7 @@ double MonitorDataCOPPERModule::GetTimeSec()
 void MonitorDataCOPPERModule::event()
 {
   if (m_loop <= 0) {
-    m_start_time = GetTimeSec();
+    m_start_time = getTimeSec();
     m_loop = 0;
     m_nevt = 0;
   }
@@ -133,7 +133,7 @@ void MonitorDataCOPPERModule::event()
   }
 
   if (m_loop % 100 == 99) {
-    double cur_time = GetTimeSec();
+    double cur_time = getTimeSec();
     double tdiff_cur = cur_time - m_start_time;
     double tdiff_prev = m_prev_time - m_start_time;
     double rate = (m_nevt - m_prev_nevt) / (tdiff_cur - tdiff_prev);

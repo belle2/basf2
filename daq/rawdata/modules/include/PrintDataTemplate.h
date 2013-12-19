@@ -69,9 +69,9 @@ namespace Belle2 {
 
     //! Module functions to be called from event process
     virtual void event();
-    virtual void PrintCOPPEREvent(RawCOPPER* raw_array, int i);
-    virtual void PrintFTSWEvent(RawDataBlock* raw_array, int i);
-    virtual void PrintData(int* buf, int nwords);
+    virtual void printCOPPEREvent(RawCOPPER* raw_array, int i);
+    virtual void printFTSWEvent(RawDataBlock* raw_array, int i);
+    virtual void printBuffer(int* buf, int nwords);
 
   protected :
     //!Compression parameter

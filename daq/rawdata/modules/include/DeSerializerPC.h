@@ -71,11 +71,11 @@ namespace Belle2 {
     virtual int Connect();
 
     //! receive data
-    virtual int Recv(int fd, char* buf, int data_size_byte, int flag);
+    virtual int recvFD(int fd, char* buf, int data_size_byte, int flag);
 
 
     //! receive data
-    virtual int* RecvData(int* malloc_flag, int* total_m_size_word, int* num_events_in_sendblock, int* num_nodes_in_sendblock);
+    virtual int* recvData(int* malloc_flag, int* total_m_size_word, int* num_events_in_sendblock, int* num_nodes_in_sendblock);
 
 
 

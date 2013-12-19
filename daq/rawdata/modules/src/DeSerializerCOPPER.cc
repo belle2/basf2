@@ -120,7 +120,7 @@ void DeSerializerCOPPERModule::initialize()
   raw_dblkarray.registerPersistent();
 
   if (dump_fname.size() > 0) {
-    OpenOutputFile();
+    openOutputFile();
   }
 
   if (m_shmflag > 0) {
@@ -147,7 +147,7 @@ void DeSerializerCOPPERModule::initialize()
 
 
 
-void DeSerializerCOPPERModule::FillNewRawCOPPERHeader(RawCOPPER* raw_copper)
+void DeSerializerCOPPERModule::fillNewRawCOPPERHeader(RawCOPPER* raw_copper)
 {
 
   const int cprblock = 0; // On COPPER, 1 COPPER block will be stored in a RawCOPPER.
@@ -218,7 +218,7 @@ void DeSerializerCOPPERModule::FillNewRawCOPPERHeader(RawCOPPER* raw_copper)
   RawTrailer rawtrl;
   rawtrl.SetBuffer(raw_copper->GetRawTrlBufPtr(cprblock));
   rawtrl.Initialize(); // Fill 2nd word : magic word
-  rawtrl.SetChksum(CalcXORChecksum(raw_copper->GetBuffer(cprblock),
+  rawtrl.SetChksum(calcXORChecksum(raw_copper->GetBuffer(cprblock),
                                    raw_copper->GetBlockNwords(cprblock) - rawtrl.GetTrlNwords()));
 
   //magic word check
@@ -273,7 +273,7 @@ void DeSerializerCOPPERModule::FillNewRawCOPPERHeader(RawCOPPER* raw_copper)
 
 
 
-int* DeSerializerCOPPERModule::ReadOneEventFromCOPPERFIFO(const int entry, int* malloc_flag, int* m_size_word)
+int* DeSerializerCOPPERModule::readOneEventFromCOPPERFIFO(const int entry, int* malloc_flag, int* m_size_word)
 {
 
   // prepare buffer
@@ -319,11 +319,11 @@ int* DeSerializerCOPPERModule::ReadOneEventFromCOPPERFIFO(const int entry, int* 
       *malloc_flag = 1;
       temp_buf = new int[ *m_size_word ];
       memcpy(temp_buf, m_bufary[ entry ], recvd_byte);
-      recvd_byte += Read(cpr_fd, (char*)temp_buf + recvd_byte,
-                         (*m_size_word - RawTrailer::RAWTRAILER_NWORDS) * sizeof(int) - recvd_byte);
+      recvd_byte += readFD(cpr_fd, (char*)temp_buf + recvd_byte,
+                           (*m_size_word - RawTrailer::RAWTRAILER_NWORDS) * sizeof(int) - recvd_byte);
     } else {
-      recvd_byte += Read(cpr_fd, (char*)(m_bufary[ entry ]) + recvd_byte,
-                         (*m_size_word - RawTrailer::RAWTRAILER_NWORDS) * sizeof(int) - recvd_byte);
+      recvd_byte += readFD(cpr_fd, (char*)(m_bufary[ entry ]) + recvd_byte,
+                           (*m_size_word - RawTrailer::RAWTRAILER_NWORDS) * sizeof(int) - recvd_byte);
     }
 
     if ((int)((*m_size_word - RawTrailer::RAWTRAILER_NWORDS) * sizeof(int)) != recvd_byte) {
@@ -359,7 +359,7 @@ int* DeSerializerCOPPERModule::ReadOneEventFromCOPPERFIFO(const int entry, int* 
 
 #ifdef TIME_MONITOR
   if (n_basf2evt >= 50000 && n_basf2evt < 50500) {
-    cur_time = GetTimeSec();
+    cur_time = getTimeSec();
     time_array2[ n_basf2evt - 50000 ] = cur_time - m_start_time;
   }
 #endif
@@ -382,7 +382,7 @@ int* DeSerializerCOPPERModule::ReadOneEventFromCOPPERFIFO(const int entry, int* 
 
 
 
-void DeSerializerCOPPERModule::OpenCOPPER()
+void DeSerializerCOPPERModule::openCOPPER()
 {
   //
   // Open a finesse device
@@ -409,13 +409,13 @@ void DeSerializerCOPPERModule::OpenCOPPER()
   ioctl(cpr_fd, CPRIOSET_LEF_WD_AF, &v, sizeof(v));
 
 
-  B2INFO("DeSerializerCOPPER: OpenCOPPER() done.");
+  B2INFO("DeSerializerCOPPER: openCOPPER() done.");
 
 }
 
 
 
-int DeSerializerCOPPERModule::Read(int fd, char* buf, int data_size_byte)
+int DeSerializerCOPPERModule::readFD(int fd, char* buf, int data_size_byte)
 {
 
   int n = 0;
@@ -454,8 +454,8 @@ void DeSerializerCOPPERModule::event()
       m_status.reportRunning();
     }
 
-    OpenCOPPER();
-    m_start_time = GetTimeSec();
+    openCOPPER();
+    m_start_time = getTimeSec();
     n_basf2evt = 0;
   }
 
@@ -466,7 +466,7 @@ void DeSerializerCOPPERModule::event()
   for (int j = 0; j < NUM_EVT_PER_BASF2LOOP_COPPER; j++) {
     int m_size_word = 0;
     int malloc_flag = 0;
-    int* temp_buf = ReadOneEventFromCOPPERFIFO(j, &malloc_flag, &m_size_word);
+    int* temp_buf = readOneEventFromCOPPERFIFO(j, &malloc_flag, &m_size_word);
 
     const int num_nodes = 1;
     const int num_events = 1;
@@ -480,7 +480,7 @@ void DeSerializerCOPPERModule::event()
     temp_rawcopper.FillTopBlockRawHeader(m_nodeid, m_data_type, m_trunc_mask);
 
     if (dump_fname.size() > 0) {
-      DumpData((char*)temp_buf, m_size_word * sizeof(int));
+      dumpData((char*)temp_buf, m_size_word * sizeof(int));
     }
     m_totbytes += m_size_word * sizeof(int);
   }
@@ -501,7 +501,7 @@ void DeSerializerCOPPERModule::event()
   // Print current status
   //
   if (n_basf2evt % 100 == 0) {
-    double cur_time = GetTimeSec();
+    double cur_time = getTimeSec();
     double total_time = cur_time - m_start_time;
     double interval = cur_time - m_prev_time;
     if (n_basf2evt != 0) {

@@ -62,7 +62,7 @@ void PrintDataTemplateModule::initialize()
 //
 
 
-void PrintDataTemplateModule::PrintData(int* buf, int nwords)
+void PrintDataTemplateModule::printBuffer(int* buf, int nwords)
 {
   for (int j = 0; j < nwords; j++) {
     printf(" %.8x", buf[ j ]);
@@ -78,12 +78,12 @@ void PrintDataTemplateModule::PrintData(int* buf, int nwords)
 }
 
 
-void PrintDataTemplateModule::PrintFTSWEvent(RawDataBlock* raw_datablock, int i)
+void PrintDataTemplateModule::printFTSWEvent(RawDataBlock* raw_datablock, int i)
 {
   int* buf  = raw_datablock->GetBuffer(i);
   int nwords =  raw_datablock->GetBlockNwords(i);
   printf("*******FTSW data**********: nwords %d\n", nwords);
-  PrintData(buf, nwords);
+  printBuffer(buf, nwords);
 
   RawFTSW rawftsw;
   int malloc_flag = 0; // No need to free the buffer
@@ -107,7 +107,7 @@ void PrintDataTemplateModule::PrintFTSWEvent(RawDataBlock* raw_datablock, int i)
 }
 
 
-void PrintDataTemplateModule::PrintCOPPEREvent(RawCOPPER* raw_copper, int i)
+void PrintDataTemplateModule::printCOPPEREvent(RawCOPPER* raw_copper, int i)
 {
   RawHeader rawhdr;
   rawhdr.SetBuffer(raw_copper->GetRawHdrBufPtr(i));
@@ -117,7 +117,7 @@ void PrintDataTemplateModule::PrintCOPPEREvent(RawCOPPER* raw_copper, int i)
 
 #ifdef DEBUG
   printf("******* Raw COPPER data block(including Detector Buffer)**********\n");
-  PrintData(raw_copper->GetBuffer(i), raw_copper->GetBlockNwords(i));
+  printBuffer(raw_copper->GetBuffer(i), raw_copper->GetBlockNwords(i));
 #endif
 
 
@@ -126,22 +126,22 @@ void PrintDataTemplateModule::PrintCOPPEREvent(RawCOPPER* raw_copper, int i)
   //
   if (raw_copper->Get1stDetectorNwords(i) > 0) {
     printf("== Detector Buffer(FINESSE A)\n");
-    PrintData(raw_copper->Get1stDetectorBuffer(i), raw_copper->Get1stDetectorNwords(i));
+    printBuffer(raw_copper->Get1stDetectorBuffer(i), raw_copper->Get1stDetectorNwords(i));
   }
 
   if (raw_copper->Get2ndDetectorNwords(i) > 0) {
     printf("== Detector Buffer(FINESSE B)\n");
-    PrintData(raw_copper->Get2ndDetectorBuffer(i), raw_copper->Get2ndDetectorNwords(i));
+    printBuffer(raw_copper->Get2ndDetectorBuffer(i), raw_copper->Get2ndDetectorNwords(i));
   }
 
   if (raw_copper->Get3rdDetectorNwords(i) > 0) {
     printf("== Detector Buffer(FINESSE C)\n");
-    PrintData(raw_copper->Get3rdDetectorBuffer(i), raw_copper->Get3rdDetectorNwords(i));
+    printBuffer(raw_copper->Get3rdDetectorBuffer(i), raw_copper->Get3rdDetectorNwords(i));
   }
 
   if (raw_copper->Get4thDetectorNwords(i) > 0) {
     printf("== Detector Buffer(FINESSE D)\n");
-    PrintData(raw_copper->Get4thDetectorBuffer(i), raw_copper->Get4thDetectorNwords(i));
+    printBuffer(raw_copper->Get4thDetectorBuffer(i), raw_copper->Get4thDetectorNwords(i));
   }
 
   m_ncpr++;
@@ -172,7 +172,7 @@ void PrintDataTemplateModule::event()
         printf("\n===== DataBlock( RawDataBlock(FTSW) ) : Block # %d ", i);
         RawFTSW temp_raw_ftsw;
         temp_raw_ftsw.SetBuffer(temp_buf, nwords, malloc_flag, num_nodes, num_events);
-        PrintFTSWEvent(&temp_raw_ftsw, 0);
+        printFTSWEvent(&temp_raw_ftsw, 0);
       } else if (raw_datablkarray[ i ]->CheckTLUID(j)) {
         // No operation
       } else {
@@ -180,7 +180,7 @@ void PrintDataTemplateModule::event()
         printf("\n===== DataBlock( RawDataBlock(COPPER) ) : Block # %d ", i);
         RawCOPPER temp_raw_copper;
         temp_raw_copper.SetBuffer(temp_buf, nwords, malloc_flag, num_nodes, num_events);
-        PrintCOPPEREvent(&temp_raw_copper, 0);
+        printCOPPEREvent(&temp_raw_copper, 0);
       }
     }
   }
@@ -192,7 +192,7 @@ void PrintDataTemplateModule::event()
   for (int i = 0; i < raw_ftswarray.getEntries(); i++) {
     for (int j = 0; j < raw_ftswarray[ i ]->GetNumEntries(); j++) {
       printf("\n===== DataBlock(RawFTSW): Block # %d ", i);
-      PrintFTSWEvent(raw_ftswarray[ i ], j);
+      printFTSWEvent(raw_ftswarray[ i ], j);
     }
   }
 
@@ -203,7 +203,7 @@ void PrintDataTemplateModule::event()
   for (int i = 0; i < rawcprarray.getEntries(); i++) {
     for (int j = 0; j < rawcprarray[ i ]->GetNumEntries(); j++) {
       printf("\n===== DataBlock(RawCOPPER): Block # %d ", i);
-      PrintCOPPEREvent(rawcprarray[ i ], j);
+      printCOPPEREvent(rawcprarray[ i ], j);
     }
   }
 
@@ -214,7 +214,7 @@ void PrintDataTemplateModule::event()
   for (int i = 0; i < raw_svdarray.getEntries(); i++) {
     for (int j = 0; j < raw_svdarray[ i ]->GetNumEntries(); j++) {
       printf("\n===== DataBlock(RawSVD) : Block # %d ", i);
-      PrintCOPPEREvent(raw_svdarray[ i ], j);
+      printCOPPEREvent(raw_svdarray[ i ], j);
     }
   }
 
@@ -225,7 +225,7 @@ void PrintDataTemplateModule::event()
   for (int i = 0; i < raw_cdcarray.getEntries(); i++) {
     for (int j = 0; j < raw_cdcarray[ i ]->GetNumEntries(); j++) {
       printf("\n===== DataBlock(RawCDC) : Block # %d ", i);
-      PrintCOPPEREvent(raw_cdcarray[ i ], j);
+      printCOPPEREvent(raw_cdcarray[ i ], j);
     }
   }
 

@@ -138,7 +138,7 @@ void DeSerializerModule::event()
 #define POS_HEADER_MAGIC 7
 #define POS_FOOTER_MAGIC 3
 #define POS_EVENT_NUM 16
-int DeSerializerModule::check_data(char* buf, int prev_eve, int* cur_eve)
+int DeSerializerModule::checkData(char* buf, int prev_eve, int* cur_eve)
 {
 
   int pos_header_magic, pos_footer_magic, pos_event_num;
@@ -189,7 +189,7 @@ int DeSerializerModule::check_data(char* buf, int prev_eve, int* cur_eve)
 }
 
 
-unsigned int  DeSerializerModule::CalcXORChecksum(int* buf, int nwords)
+unsigned int  DeSerializerModule::calcXORChecksum(int* buf, int nwords)
 {
   unsigned int checksum = 0;
   for (int i = 0; i < nwords; i++) {
@@ -200,7 +200,7 @@ unsigned int  DeSerializerModule::CalcXORChecksum(int* buf, int nwords)
 }
 
 
-unsigned int  DeSerializerModule::CalcSimpleChecksum(int* buf, int nwords)
+unsigned int  DeSerializerModule::calcSimpleChecksum(int* buf, int nwords)
 {
   unsigned int checksum = 0;
   for (int i = 0; i < nwords; i++) {
@@ -212,7 +212,7 @@ unsigned int  DeSerializerModule::CalcSimpleChecksum(int* buf, int nwords)
 
 
 
-double DeSerializerModule::GetTimeSec()
+double DeSerializerModule::getTimeSec()
 {
   struct timeval t;
   gettimeofday(&t, NULL);
@@ -220,16 +220,16 @@ double DeSerializerModule::GetTimeSec()
 }
 
 
-void DeSerializerModule::RecordTime(int event, double* array)
+void DeSerializerModule::recordTime(int event, double* array)
 {
   if (event >= 10000 && event < 10500) {
-    array[ event - 10000 ] = GetTimeSec() - m_start_time;
+    array[ event - 10000 ] = getTimeSec() - m_start_time;
   }
   return;
 }
 
 
-void DeSerializerModule::OpenOutputFile()
+void DeSerializerModule::openOutputFile()
 {
   if ((fp_dump = fopen(dump_fname.c_str(), "wb")) == NULL) {
     perror("[ERROR] Failed to open file.");
@@ -238,7 +238,7 @@ void DeSerializerModule::OpenOutputFile()
   }
 }
 
-void DeSerializerModule::DumpData(char* buf, int size)
+void DeSerializerModule::dumpData(char* buf, int size)
 {
   if (fwrite(buf, size, 1, fp_dump) <= 0) {
     perror("[ERROR] Failed to write buffer to a file. Exiting...");
@@ -246,7 +246,7 @@ void DeSerializerModule::DumpData(char* buf, int size)
   }
 }
 
-int* DeSerializerModule::GetBuffer(int nwords, int* malloc_flag)
+int* DeSerializerModule::getBuffer(int nwords, int* malloc_flag)
 {
   int* temp_buf = NULL;
   // Prepare buffer
@@ -255,7 +255,7 @@ int* DeSerializerModule::GetBuffer(int nwords, int* malloc_flag)
     *malloc_flag = 1;
     temp_buf = new int[ nwords ];
   } else {
-    if ((temp_buf = GetPreAllocBuf()) == 0x0) {
+    if ((temp_buf = getPreAllocBuf()) == 0x0) {
       printf("[ERROR] Null pointer from GetPreALlocBuf(). Exting...\n");
       sleep(1234567);
       exit(1);
@@ -267,7 +267,7 @@ int* DeSerializerModule::GetBuffer(int nwords, int* malloc_flag)
 
 }
 
-int* DeSerializerModule::GetPreAllocBuf()
+int* DeSerializerModule::getPreAllocBuf()
 {
   int* tempbuf = 0;
   if (m_num_usedbuf < NUM_PREALLOC_BUF) {

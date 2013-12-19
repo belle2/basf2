@@ -37,8 +37,8 @@ namespace Belle2 {
     virtual void terminate();
 
     //!
-    virtual void write_event(RawDataBlock* raw_dblk, int* first_flag, int* break_flag,
-                             int* dblk_pos, unsigned int* dblk_eve);
+    virtual void writeEvent(RawDataBlock* raw_dblk, int* first_flag, int* break_flag,
+                            int* dblk_pos, unsigned int* dblk_eve);
 
   protected :
     //!

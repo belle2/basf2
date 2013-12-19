@@ -1,6 +1,6 @@
 //+
 // File : DeSerializerPC.cc
-// Description : Module to receive data from outside and store it to DataStore
+// Description : Module to receive data from eb0 and send it to eb1tx
 //
 // Author : Satoru Yamada Itoh, IPNS, KEK
 // Date : 2 - Aug - 2013
@@ -47,7 +47,6 @@ DeSerializerPCModule::DeSerializerPCModule() : DeSerializerModule()
   addParam("PortFrom", m_port_from, "port numbers of data sources");
 
   B2INFO("DeSerializerPC: Constructor done.");
-
 }
 
 
@@ -93,7 +92,7 @@ void DeSerializerPCModule::initialize()
   // Initialize Array of RawCOPPER
 
   if (dump_fname.size() > 0) {
-    OpenOutputFile();
+    openOutputFile();
   }
 
   // Initialize arrays for time monitor
@@ -101,7 +100,7 @@ void DeSerializerPCModule::initialize()
   memset(time_array1, 0, sizeof(time_array1));
   memset(time_array2, 0, sizeof(time_array2));
 
-  ClearNumUsedBuf();
+  clearNumUsedBuf();
 
   // Shared memory
   if (m_shmflag > 0) {
@@ -118,7 +117,7 @@ void DeSerializerPCModule::initialize()
 }
 
 
-int DeSerializerPCModule::Recv(int sock, char* buf, int data_size_byte, int flag)
+int DeSerializerPCModule::recvFD(int sock, char* buf, int data_size_byte, int flag)
 {
   int n = 0;
   int read_size = 0;
@@ -202,7 +201,7 @@ int DeSerializerPCModule::Connect()
 
 
 
-int* DeSerializerPCModule::RecvData(int* malloc_flag, int* total_buf_nwords, int* num_events_in_sendblock, int* num_nodes_in_sendblock)
+int* DeSerializerPCModule::recvData(int* malloc_flag, int* total_buf_nwords, int* num_events_in_sendblock, int* num_nodes_in_sendblock)
 {
 
   int* temp_buf = NULL; // buffer for data-body
@@ -210,7 +209,6 @@ int* DeSerializerPCModule::RecvData(int* malloc_flag, int* total_buf_nwords, int
 
   vector <int> each_buf_nwords;
   each_buf_nwords.clear();
-
   *total_buf_nwords = 0;
   *num_nodes_in_sendblock = 0;
   *num_events_in_sendblock = 0;
@@ -219,11 +217,7 @@ int* DeSerializerPCModule::RecvData(int* malloc_flag, int* total_buf_nwords, int
   //
   // Read Header and obtain data size
   //
-
-
-
   int send_hdr_buf[ SendHeader::SENDHDR_NWORDS ];
-
   int temp_num_events = 0;
   int temp_num_nodes = 0;
 
@@ -232,7 +226,7 @@ int* DeSerializerPCModule::RecvData(int* malloc_flag, int* total_buf_nwords, int
 
 
 
-    Recv(m_socket[ i ], (char*)send_hdr_buf, sizeof(int)*SendHeader::SENDHDR_NWORDS, flag);
+    recvFD(m_socket[ i ], (char*)send_hdr_buf, sizeof(int)*SendHeader::SENDHDR_NWORDS, flag);
 
 
     SendHeader send_hdr;
@@ -288,14 +282,14 @@ int* DeSerializerPCModule::RecvData(int* malloc_flag, int* total_buf_nwords, int
   }
 
 
-  temp_buf = GetBuffer(*total_buf_nwords, malloc_flag); // this include only data body
+  temp_buf = getBuffer(*total_buf_nwords, malloc_flag); // this include only data body
   //
   // Read body
   //
   int total_recvd_byte = 0;
   for (int i = 0; i < (int)(m_socket.size()); i++) {
-    total_recvd_byte += Recv(m_socket[ i ], (char*)temp_buf + total_recvd_byte,
-                             each_buf_nwords[ i ] * sizeof(int), flag);
+    total_recvd_byte += recvFD(m_socket[ i ], (char*)temp_buf + total_recvd_byte,
+                               each_buf_nwords[ i ] * sizeof(int), flag);
   }
   if ((int)(*total_buf_nwords * sizeof(int)) != total_recvd_byte) {
     char temp_char[100] = "Receiving data in an invalid unit. Exting...";
@@ -339,7 +333,7 @@ int* DeSerializerPCModule::RecvData(int* malloc_flag, int* total_buf_nwords, int
   // Read Traeiler
   int send_trl_buf[(unsigned int)(SendTrailer::SENDTRL_NWORDS) ];
   for (int i = 0; i < (int)(m_socket.size()); i++) {
-    Recv(m_socket[ i ], (char*)send_trl_buf, SendTrailer::SENDTRL_NWORDS * sizeof(int), flag);
+    recvFD(m_socket[ i ], (char*)send_trl_buf, SendTrailer::SENDTRL_NWORDS * sizeof(int), flag);
   }
 
   return temp_buf;
@@ -362,7 +356,7 @@ void DeSerializerPCModule::event()
   unsigned int temp_copper_ctr = 0;
 
 
-  ClearNumUsedBuf();
+  clearNumUsedBuf();
 
   //   printf("EVE %d\n",n_basf2evt);
   //   fflush(stdout);
@@ -377,7 +371,7 @@ void DeSerializerPCModule::event()
     }
 
     B2INFO("DeSerializerPC: event() started.");
-    m_start_time = GetTimeSec();
+    m_start_time = getTimeSec();
     n_basf2evt = 0;
 
   }
@@ -394,8 +388,6 @@ void DeSerializerPCModule::event()
   raw_eclarray.create();
   raw_klmarray.create();
 
-
-
 #else
   m_rawdatablk.create();
 #endif
@@ -409,7 +401,7 @@ void DeSerializerPCModule::event()
 
 
 #ifdef TIME_MONITOR
-    RecordTime(n_basf2evt * NUM_EVT_PER_BASF2LOOP_PC + j, time_array0);
+    recordTime(n_basf2evt * NUM_EVT_PER_BASF2LOOP_PC + j, time_array0);
 #endif
 
 
@@ -423,11 +415,11 @@ void DeSerializerPCModule::event()
     int malloc_flag = 0;
     int num_events_in_sendblock = 0;
     int num_nodes_in_sendblock = 0;
-    int* temp_buf = RecvData(&malloc_flag, &total_buf_nwords, &num_events_in_sendblock, &num_nodes_in_sendblock);
+    int* temp_buf = recvData(&malloc_flag, &total_buf_nwords, &num_events_in_sendblock, &num_nodes_in_sendblock);
 
     m_totbytes += total_buf_nwords * sizeof(int);
 #ifdef DEBUG
-    printf("Recvd data : %d bytes\n", total_buf_nwords * sizeof(int));
+    printf("recvd data : %d bytes\n", total_buf_nwords * sizeof(int));
     fflush(stdout);
 #endif
 
@@ -449,7 +441,7 @@ void DeSerializerPCModule::event()
 
 
 #ifdef TIME_MONITOR
-    RecordTime(n_basf2evt * NUM_EVT_PER_BASF2LOOP_PC + j, time_array1);
+    recordTime(n_basf2evt * NUM_EVT_PER_BASF2LOOP_PC + j, time_array1);
 #endif
 
 #ifndef DISCARD_DATA
@@ -462,11 +454,6 @@ void DeSerializerPCModule::event()
     RawDataBlock* temp_rawdatablk = raw_datablkarray.appendNew();
     temp_rawdatablk->SetBuffer((int*)temp_buf, total_buf_nwords, malloc_flag,
                                num_events_in_sendblock, num_nodes_in_sendblock);
-
-    //     temp_rawcopper = rawcprarray.appendNew();
-    //     temp_rawcopper->SetBuffer((int*)temp_buf, total_buf_nwords, malloc_flag,
-    //                                num_events_in_sendblock, num_nodes_in_sendblock);
-
 
     num_copper_ftsw = rawdatablk.GetNumEntries();
     int cpr_num = 0;
@@ -595,7 +582,7 @@ void DeSerializerPCModule::event()
 
 
         if (rawtrl.GetChksum() !=
-            CalcXORChecksum(temp_rawcopper->GetBuffer(0),
+            calcXORChecksum(temp_rawcopper->GetBuffer(0),
                             temp_rawcopper->GetBlockNwords(0) - rawtrl.GetTrlNwords())) {
 
           //#ifndef NO_DATA_CHECK
@@ -619,7 +606,7 @@ void DeSerializerPCModule::event()
                   temp_rawcopper->GetBlockNwords(0),
                   (rawdatablk.GetBuffer(i))[ 3 ],
                   rawtrl.GetChksum(),
-                  CalcSimpleChecksum(temp_rawcopper->GetBuffer(0),
+                  calcSimpleChecksum(temp_rawcopper->GetBuffer(0),
                                      temp_rawcopper->GetBlockNwords(0)
                                      - rawtrl.GetTrlNwords()));
 
@@ -666,7 +653,7 @@ void DeSerializerPCModule::event()
 #endif // DISCARD_DATA
 
 #ifdef TIME_MONITOR
-    RecordTime(n_basf2evt * NUM_EVT_PER_BASF2LOOP_PC + j, time_array2);
+    recordTime(n_basf2evt * NUM_EVT_PER_BASF2LOOP_PC + j, time_array2);
 #endif
 
     m_prev_copper_ctr = temp_copper_ctr;
@@ -690,7 +677,7 @@ void DeSerializerPCModule::event()
     if (n_basf2evt % 10 == 0) {
       if (m_status.isStopped()) {
         printf("\033[34m");
-        printf("[INFO] RunStop was detected. ( Setting:  Max event # %d MaxTime %lf ) Processed Event %d Elapsed Time %lf[s]\n", max_nevt , max_seconds, n_basf2evt * NUM_EVT_PER_BASF2LOOP_PC, GetTimeSec() - m_start_time);
+        printf("[INFO] RunStop was detected. ( Setting:  Max event # %d MaxTime %lf ) Processed Event %d Elapsed Time %lf[s]\n", max_nevt , max_seconds, n_basf2evt * NUM_EVT_PER_BASF2LOOP_PC, getTimeSec() - m_start_time);
         printf("\033[0m");
         m_eventMetaDataPtr->setEndOfData();
       }
@@ -702,9 +689,9 @@ void DeSerializerPCModule::event()
   //
   if (max_nevt >= 0 || max_seconds >= 0.) {
     if ((n_basf2evt * NUM_EVT_PER_BASF2LOOP_PC >= max_nevt && max_nevt > 0)
-        || (GetTimeSec() - m_start_time > max_seconds && max_seconds > 0.)) {
+        || (getTimeSec() - m_start_time > max_seconds && max_seconds > 0.)) {
       printf("\033[34m");
-      printf("[INFO] RunStop was detected. ( Setting:  Max event # %d MaxTime %lf ) Processed Event %d Elapsed Time %lf[s]\n", max_nevt , max_seconds, n_basf2evt * NUM_EVT_PER_BASF2LOOP_PC, GetTimeSec() - m_start_time);
+      printf("[INFO] RunStop was detected. ( Setting:  Max event # %d MaxTime %lf ) Processed Event %d Elapsed Time %lf[s]\n", max_nevt , max_seconds, n_basf2evt * NUM_EVT_PER_BASF2LOOP_PC, getTimeSec() - m_start_time);
       printf("\033[0m");
       m_eventMetaDataPtr->setEndOfData();
     }
@@ -712,7 +699,7 @@ void DeSerializerPCModule::event()
 
   if (n_basf2evt % 100 == 0) {
     //  if ( ( n_basf2evt - m_prev_nevt ) > monitor_numeve ) {
-    double cur_time = GetTimeSec();
+    double cur_time = getTimeSec();
     double interval = cur_time - m_prev_time;
     if (n_basf2evt != 0) {
       double multieve = (1. / interval);
@@ -722,7 +709,7 @@ void DeSerializerPCModule::event()
     printf("loop %d eve %u time %lf : # of nodes %d : ftsw words %d  copper0 words %d copper1 words %d\n",
            n_basf2evt,
            eve_copper_0,
-           GetTimeSec() - m_start_time,
+           getTimeSec() - m_start_time,
            num_copper_ftsw,
            data_size_ftsw,
            data_size_copper_0,

@@ -62,9 +62,9 @@ namespace Belle2 {
     virtual void event();
 
     //! Module functions to be called from event process
-    virtual void OpenOutputFile();
+    virtual void openOutputFile();
 
-    virtual void DumpData(char* buf, int size);
+    virtual void dumpData(char* buf, int size);
 
   protected :
 
@@ -109,10 +109,10 @@ namespace Belle2 {
     //    int* m_bufary[NUM_EVT_PER_BASF2LOOP];
 
     //! Getbuffer
-    virtual int* GetPreAllocBuf();
+    virtual int* getPreAllocBuf();
 
     //! Getbuffer
-    virtual int* GetBuffer(int nwords, int* malloc_flag);
+    virtual int* getBuffer(int nwords, int* malloc_flag);
 
     // For monitoring
     timeval m_t0;
@@ -133,21 +133,21 @@ namespace Belle2 {
     int prev_event;
 
     //! store time info.
-    double GetTimeSec();
+    double getTimeSec();
 
     //! store time info.
-    void RecordTime(int event, double* array);
+    void recordTime(int event, double* array);
 
     //! check data
-    int check_data(char* buf, int prev_eve, int* cur_eve);
+    int checkData(char* buf, int prev_eve, int* cur_eve);
 
     //! calculate checksum
-    unsigned int CalcSimpleChecksum(int* buf, int nwords);
+    unsigned int calcSimpleChecksum(int* buf, int nwords);
 
     //! calculate checksum
-    unsigned int CalcXORChecksum(int* buf, int nwords);
+    unsigned int calcXORChecksum(int* buf, int nwords);
 
-    virtual void ClearNumUsedBuf() {
+    virtual void clearNumUsedBuf() {
       m_num_usedbuf = 0;
       return ;
     }

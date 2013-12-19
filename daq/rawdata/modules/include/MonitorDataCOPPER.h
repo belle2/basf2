@@ -60,7 +60,7 @@ namespace Belle2 {
 
     //! Histogram definition
     virtual void defineHisto();
-    virtual double GetTimeSec();
+    virtual double getTimeSec();
     // Data members
 
   private:

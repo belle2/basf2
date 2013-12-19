@@ -67,24 +67,24 @@ namespace Belle2 {
     virtual void endRun();
     virtual void terminate();
 
-    virtual int SendByWriteV(RawDataBlock* rawdblk);
+    virtual int sendByWriteV(RawDataBlock* rawdblk);
     //    virtual void Connect(const char* hostname, const int port);
     virtual void Accept();
 
-    virtual void FillSendHeaderTrailer(SendHeader* hdr, SendTrailer* trl, RawDataBlock* rawdblk);
+    virtual void fillSendHeaderTrailer(SendHeader* hdr, SendTrailer* trl, RawDataBlock* rawdblk);
     // Data members
 
     //! calculate checksum
-    unsigned int CalcXORChecksum(int* buf, int nwords);
+    unsigned int calcXORChecksum(int* buf, int nwords);
 
     //! Use shared memory
     int m_shmflag;
 
     //! open shared memory
-    void ShmOpen(char* path_cfg, char* path_sta);
+    void shmOpen(char* path_cfg, char* path_sta);
 
     //! Get shared memory
-    int* ShmGet(int fd, int size_words);
+    int* shmGet(int fd, int size_words);
 
     //! file descripter for shm
     int m_shmfd_cfg;
@@ -151,10 +151,10 @@ namespace Belle2 {
     int p_method_val;
 
     //! store time info.
-    double GetTimeSec();
+    double getTimeSec();
 
     //! store time info.
-    void RecordTime(int event, double* array);
+    void recordTime(int event, double* array);
 
     //! error message program
     ErrorMessage print_err;

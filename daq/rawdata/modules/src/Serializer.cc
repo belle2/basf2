@@ -61,10 +61,10 @@ void SerializerModule::initialize()
 #endif
 
   if (m_shmflag != 0) {
-    char temp_char1[100] = "/cpr_config"; char temp_char2[100] = "/cpr_status";  ShmOpen(temp_char1, temp_char2);
+    char temp_char1[100] = "/cpr_config"; char temp_char2[100] = "/cpr_status";  shmOpen(temp_char1, temp_char2);
     // Status format : status_flag
-    m_cfg_buf = ShmGet(m_shmfd_cfg, 4);
-    m_cfg_sta = ShmGet(m_shmfd_sta, 4);
+    m_cfg_buf = shmGet(m_shmfd_cfg, 4);
+    m_cfg_sta = shmGet(m_shmfd_sta, 4);
     m_cfg_sta[ 0 ] = 1; // Status bit is 1 : ready before accept()
   }
 
@@ -123,13 +123,13 @@ void SerializerModule::terminate()
 
 
 
-int* SerializerModule::ShmGet(int fd, int size_words)
+int* SerializerModule::shmGet(int fd, int size_words)
 {
   int offset = 0;
   return (int*)mmap(NULL, size_words * sizeof(int), PROT_READ | PROT_WRITE, MAP_SHARED, fd, offset);
 }
 
-void SerializerModule::ShmOpen(char* path_cfg, char* path_sta)
+void SerializerModule::shmOpen(char* path_cfg, char* path_sta)
 {
   errno = 0;
   /*m_shmfd_cfg = shm_open( "/cpr_config2", O_CREAT | O_EXCL | O_RDWR, 0666);
@@ -168,7 +168,7 @@ void SerializerModule::ShmOpen(char* path_cfg, char* path_sta)
 
 
 
-void SerializerModule::FillSendHeaderTrailer(SendHeader* hdr, SendTrailer* trl,
+void SerializerModule::fillSendHeaderTrailer(SendHeader* hdr, SendTrailer* trl,
                                              RawDataBlock* rawdblk)
 {
   const int num_cprblock = 0;
@@ -212,11 +212,11 @@ void SerializerModule::FillSendHeaderTrailer(SendHeader* hdr, SendTrailer* trl,
 }
 
 
-int SerializerModule::SendByWriteV(RawDataBlock* rawdblk)
+int SerializerModule::sendByWriteV(RawDataBlock* rawdblk)
 {
   SendHeader send_header;
   SendTrailer send_trailer;
-  FillSendHeaderTrailer(&send_header, &send_trailer, rawdblk);
+  fillSendHeaderTrailer(&send_header, &send_trailer, rawdblk);
 
   enum {
     NUM_BUFFER = 3
@@ -429,7 +429,7 @@ void SerializerModule::Accept()
 
 }
 
-double SerializerModule::GetTimeSec()
+double SerializerModule::getTimeSec()
 {
   struct timeval t;
   gettimeofday(&t, NULL);
@@ -437,16 +437,16 @@ double SerializerModule::GetTimeSec()
 }
 
 
-void SerializerModule::RecordTime(int event, double* array)
+void SerializerModule::recordTime(int event, double* array)
 {
   if (event >= 50000 && event < 50500) {
-    array[ event - 50000 ] = GetTimeSec() - m_start_time;
+    array[ event - 50000 ] = getTimeSec() - m_start_time;
   }
   return;
 }
 
 
-unsigned int SerializerModule::CalcXORChecksum(int* buf, int nwords)
+unsigned int SerializerModule::calcXORChecksum(int* buf, int nwords)
 {
   unsigned int checksum = 0;
   for (int i = 0; i < nwords; i++) {
@@ -459,13 +459,13 @@ unsigned int SerializerModule::CalcXORChecksum(int* buf, int nwords)
 void SerializerModule::event()
 {
   if (n_basf2evt <= 0) {
-    m_start_time = GetTimeSec();
+    m_start_time = getTimeSec();
     n_basf2evt = 0;
   }
 
 #ifdef TIME_MONITOR
 
-  RecordTime(n_basf2evt, time_array0);
+  recordTime(n_basf2evt, time_array0);
 #endif
 
   //  StoreArray<RawCOPPER> rawcprarray;
@@ -487,7 +487,7 @@ void SerializerModule::event()
 #endif
 
 #ifdef TIME_MONITOR
-    RecordTime(n_basf2evt, time_array1);
+    recordTime(n_basf2evt, time_array1);
 #endif
 
     //
@@ -497,7 +497,7 @@ void SerializerModule::event()
 
 #ifdef NOT_USE_SOCKETLIB
 
-    m_totbytes += SendByWriteV(raw_dblkarray[ j ]);
+    m_totbytes += sendByWriteV(raw_dblkarray[ j ]);
 
 #else //NOT_USE_SOCKETLIB
     // Use basf2 send library
@@ -513,7 +513,7 @@ void SerializerModule::event()
   }
 
 #ifdef TIME_MONITOR
-  RecordTime(n_basf2evt, time_array2);
+  recordTime(n_basf2evt, time_array2);
 #endif
 
 
@@ -521,7 +521,7 @@ void SerializerModule::event()
   // Print current status
   //
   if (n_basf2evt % 100 == 0) {
-    double cur_time = GetTimeSec();
+    double cur_time = getTimeSec();
     double total_time = cur_time - m_start_time;
     double interval = cur_time - m_prev_time;
     if (n_basf2evt != 0) {

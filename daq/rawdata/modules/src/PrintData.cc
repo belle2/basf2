@@ -105,7 +105,7 @@ void PrintDataModule::initialize()
 //
 
 
-void PrintDataModule::PrintData(int* buf, int nwords)
+void PrintDataModule::printBuffer(int* buf, int nwords)
 {
   //  printf("\n%.8d : ", 0);
   //  printf("%.8d : ", 0);
@@ -124,7 +124,7 @@ void PrintDataModule::PrintData(int* buf, int nwords)
 }
 
 
-void PrintDataModule::PrintFTSWEvent(RawDataBlock* raw_datablock, int i)
+void PrintDataModule::printFTSWEvent(RawDataBlock* raw_datablock, int i)
 {
   int* buf  = raw_datablock->GetBuffer(i);
   int nwords =  raw_datablock->GetBlockNwords(i);
@@ -146,7 +146,7 @@ void PrintDataModule::PrintFTSWEvent(RawDataBlock* raw_datablock, int i)
            buf[7] & 0xFFFF, (buf[6] >> 4)  & 0x7FFFFFF,
            (buf[7] >> 16) & 0xFFFF
           );
-    PrintData(buf, nwords);
+    printBuffer(buf, nwords);
 
   }
 
@@ -170,7 +170,7 @@ void PrintDataModule::PrintFTSWEvent(RawDataBlock* raw_datablock, int i)
   return;
 }
 
-void PrintDataModule::Print(int* array, int array_size, double min, double max, const char* title)
+void PrintDataModule::printArray(int* array, int array_size, double min, double max, const char* title)
 {
   printf("\n# %d %lf %lf %s", array_size, min, max, title);
   for (int i = 0; i < array_size ; i++) {
@@ -179,7 +179,7 @@ void PrintDataModule::Print(int* array, int array_size, double min, double max, 
   }
 }
 
-void PrintDataModule::FillHisto1D(double value, int* array, int array_size, double min, double max)
+void PrintDataModule::fillHisto1D(double value, int* array, int array_size, double min, double max)
 {
 
   if (value > max) {
@@ -194,7 +194,7 @@ void PrintDataModule::FillHisto1D(double value, int* array, int array_size, doub
 }
 
 
-void PrintDataModule::FillHisto2D(double value_x, double value_y, int* array,
+void PrintDataModule::fillHisto2D(double value_x, double value_y, int* array,
                                   int array_size_x, double min_x, double max_x,
                                   int array_size_y, double min_y, double max_y
                                  )
@@ -227,36 +227,36 @@ void PrintDataModule::endRun()
 {
   //fill Run data
 
-  Print(m_size_cdc_1, SIZE_CDC_1_NUM, SIZE_CDC_1_MIN, SIZE_CDC_1_MAX,
-        "Data_size/event_CDC_1;Data_size/event/FEE[byte];#_of_events"
-       );
-  Print(m_size_cdc_2, SIZE_CDC_2_NUM, SIZE_CDC_2_MIN, SIZE_CDC_2_MAX,
-        "Data_size/event_CDC_2;Data_size/event/FEE[byte];#_of_events"
-       );
-  Print(m_size_ut3, SIZE_UT3_NUM, SIZE_UT3_MIN, SIZE_UT3_MAX,
-        "Data_size/event_UT3;Data_size/event/FEE[byte];#_of_events"
-       );
+  printArray(m_size_cdc_1, SIZE_CDC_1_NUM, SIZE_CDC_1_MIN, SIZE_CDC_1_MAX,
+             "Data_size/event_CDC_1;Data_size/event/FEE[byte];#_of_events"
+            );
+  printArray(m_size_cdc_2, SIZE_CDC_2_NUM, SIZE_CDC_2_MIN, SIZE_CDC_2_MAX,
+             "Data_size/event_CDC_2;Data_size/event/FEE[byte];#_of_events"
+            );
+  printArray(m_size_ut3, SIZE_UT3_NUM, SIZE_UT3_MIN, SIZE_UT3_MAX,
+             "Data_size/event_UT3;Data_size/event/FEE[byte];#_of_events"
+            );
 
-  Print(m_tdiff_cdc_1, TDIFF_EVE_NUM, TDIFF_EVE_MIN, TDIFF_EVE_MAX,
-        "Time_difference_from_the_previous_event;Time_difference[s];#_of_events"
-       );
-  Print(m_tdiff_cdc_2, TDIFF_EVE_NUM, TDIFF_EVE_MIN, TDIFF_EVE_MAX,
-        "Time_difference_from_the_previous_event;Time_difference[s];#_of_events"
-       );
-  Print(m_tdiff_ut3, TDIFF_EVE_NUM, TDIFF_EVE_MIN, TDIFF_EVE_MAX ,
-        "Time_difference_from_the_previous_event;Time_difference[s];#_of_events"
-       );
-  Print(m_eve_diff, EVEDIFF_NUM, EVEDIFF_MIN, EVEDIFF_MAX,
-        "Event_#_shift;Event_#_difference_from_the_correct_number;#_of_events"
-       );
+  printArray(m_tdiff_cdc_1, TDIFF_EVE_NUM, TDIFF_EVE_MIN, TDIFF_EVE_MAX,
+             "Time_difference_from_the_previous_event;Time_difference[s];#_of_events"
+            );
+  printArray(m_tdiff_cdc_2, TDIFF_EVE_NUM, TDIFF_EVE_MIN, TDIFF_EVE_MAX,
+             "Time_difference_from_the_previous_event;Time_difference[s];#_of_events"
+            );
+  printArray(m_tdiff_ut3, TDIFF_EVE_NUM, TDIFF_EVE_MIN, TDIFF_EVE_MAX ,
+             "Time_difference_from_the_previous_event;Time_difference[s];#_of_events"
+            );
+  printArray(m_eve_diff, EVEDIFF_NUM, EVEDIFF_MIN, EVEDIFF_MAX,
+             "Event_#_shift;Event_#_difference_from_the_correct_number;#_of_events"
+            );
 
-  Print(m_eve_diff_prev, EVEDIFF_NUM, EVEDIFF_MIN, EVEDIFF_MAX,
-        "Event_#_difference_from_prev_Event_#;Event_#_difference;#_of_events"
-       );
+  printArray(m_eve_diff_prev, EVEDIFF_NUM, EVEDIFF_MIN, EVEDIFF_MAX,
+             "Event_#_difference_from_prev_Event_#;Event_#_difference;#_of_events"
+            );
 
-  Print(m_rate, TRGRATE_NUM, TRGRATE_MIN, TRGRATE_MAX,
-        "Trigger_rate;Time_from_Runstart[s];#_of_events/s"
-       );
+  printArray(m_rate, TRGRATE_NUM, TRGRATE_MIN, TRGRATE_MAX,
+             "Trigger_rate;Time_from_Runstart[s];#_of_events/s"
+            );
 
 
 }
@@ -268,7 +268,7 @@ void PrintDataModule::terminate()
 }
 
 
-void PrintDataModule::PrintCOPPEREvent(RawCOPPER* raw_copper, int i)
+void PrintDataModule::printCOPPEREvent(RawCOPPER* raw_copper, int i)
 {
 
 
@@ -310,7 +310,7 @@ void PrintDataModule::PrintCOPPEREvent(RawCOPPER* raw_copper, int i)
 
   m_eve_from_data = raw_copper->GetEveNo(i);
   if (m_eve_cnt >= 0) {
-    FillHisto1D((double)(m_eve_from_data - m_prev_eve_from_data), m_eve_diff_prev,
+    fillHisto1D((double)(m_eve_from_data - m_prev_eve_from_data), m_eve_diff_prev,
                 EVEDIFF_NUM, EVEDIFF_MIN, EVEDIFF_MAX);
     if (m_eve_from_data - m_prev_eve_from_data != 1) {
       printf("daiff eve %d %d %d %d\n", m_eve_from_data , m_prev_eve_from_data , m_eve_from_data - m_prev_eve_from_data,
@@ -324,7 +324,7 @@ void PrintDataModule::PrintCOPPEREvent(RawCOPPER* raw_copper, int i)
     }
   }
   m_prev_eve_from_data = m_eve_from_data;
-  FillHisto1D((double)(m_eve_from_data - m_eve_cnt), m_eve_diff,
+  fillHisto1D((double)(m_eve_from_data - m_eve_cnt), m_eve_diff,
               EVEDIFF_NUM, EVEDIFF_MIN, EVEDIFF_MAX);
 
 
@@ -389,8 +389,8 @@ void PrintDataModule::event()
 #ifdef DEBUG
       printf("\n0==== DataBlock(CDC and TRG) : Block # %d ", i);
 #endif
-      PrintFTSWEvent(raw_ftswarray[ i ], j);
-      PrintCOPPEREvent(raw_cdcarray[ i ], j);
+      printFTSWEvent(raw_ftswarray[ i ], j);
+      printCOPPEREvent(raw_cdcarray[ i ], j);
 #ifdef DEBUG
       printf("\n5==== DataBlock(FTSW): Block # %d\n", i);
 
@@ -403,17 +403,6 @@ void PrintDataModule::event()
 
 
 #endif
-  //    printf("nbasf2 %d\n", n_basf2evt);
-  //   if( n_basf2evt > 10 ){
-  //     m_eventMetaDataPtr.create();
-  //     m_eventMetaDataPtr->setEndOfData();
-  //     printf("EndofData****************\n");
-  //     Print( m_size_cdc_1, SIZE_CDC_1_NUM, SIZE_CDC_1_MIN, SIZE_CDC_1_MAX );
-  //     Print( m_size_cdc_2, SIZE_CDC_2_NUM, SIZE_CDC_2_MIN, SIZE_CDC_2_MAX );
-  //     Print( m_size_ut3, SIZE_UT3_NUM, SIZE_UT3_MIN, SIZE_UT3_MAX );
-
-  //     exit(1);
-  //   }
 
 
   n_basf2evt++;

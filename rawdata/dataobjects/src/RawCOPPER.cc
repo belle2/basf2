@@ -66,8 +66,8 @@ int RawCOPPER::GetBufferPos(int n)
 
     int size = tmp_header.RAWHEADER_NWORDS
                + m_buffer[ pos_nwords + tmp_header.RAWHEADER_NWORDS + POS_DATA_LENGTH ]
-               + SIZE_COPPER_FRONT_HEADER
-               + SIZE_COPPER_TRAILER - 1
+               + SIZE_COPPER_DRIVER_HEADER
+               + SIZE_COPPER_DRIVER_TRAILER
                + tmp_trailer.RAWTRAILER_NWORDS;
     // COPPER's data length include one word from COPPER trailer. so -1 is needed.
 
@@ -78,9 +78,30 @@ int RawCOPPER::GetBufferPos(int n)
     }
   }
   return pos_nwords;
-
 }
 
+
+
+unsigned int RawCOPPER::CalcDriverChkSum(int n)
+{
+  int min = GetBufferPos(n) + RawHeader::RAWHEADER_NWORDS;
+  int max = GetBufferPos(n) + GetBlockNwords(n)
+            - RawTrailer::RAWTRAILER_NWORDS - SIZE_COPPER_DRIVER_TRAILER;
+  unsigned int chksum = 0;
+  for (int i = min; i < max; i++) {
+    chksum ^= m_buffer[ i ];
+  }
+  GetDriverChkSum(n);
+  return chksum;
+}
+
+
+unsigned int RawCOPPER::GetDriverChkSum(int n)
+{
+  int pos_nwords = GetBufferPos(n) + GetBlockNwords(n)
+                   - RawTrailer::RAWTRAILER_NWORDS - SIZE_COPPER_DRIVER_TRAILER;
+  return m_buffer[ pos_nwords ];
+}
 
 int RawCOPPER::GetCOPPERNodeId(int n)
 {
@@ -744,9 +765,12 @@ unsigned int RawCOPPER::FillTopBlockRawHeader(unsigned int m_node_id, unsigned i
   //   int nwords = raw_copper->GetBlockNwords(cprblock);
   //   rawhdr.SetNwords(nwords);
 
-  int datablock_nwords = RawHeader::RAWHEADER_NWORDS +
-                         (copper_buf[ POS_DATA_LENGTH ] + COPPER_HEADER_TRAILER_NWORDS) +
-                         RawTrailer::RAWTRAILER_NWORDS;
+  int datablock_nwords =
+    RawHeader::RAWHEADER_NWORDS +
+    (copper_buf[ POS_DATA_LENGTH ]
+     + SIZE_COPPER_DRIVER_HEADER
+     + SIZE_COPPER_DRIVER_TRAILER)
+    + RawTrailer::RAWTRAILER_NWORDS;
 
   m_buffer[ RawHeader::POS_NWORDS ] = datablock_nwords;
 
@@ -820,12 +844,37 @@ unsigned int RawCOPPER::FillTopBlockRawHeader(unsigned int m_node_id, unsigned i
   //   rawtrl.Initialize(); // Fill 2nd word : magic word
   //   rawtrl.SetChksum(CalcSimpleChecksum(raw_copper->GetBuffer(cprblock),
   //   raw_copper->GetBlockNwords(cprblock) - rawtrl.GetTrlNwords()));
+  unsigned int chksum_top = 0, chksum_body = 0, chksum_bottom = 0;
+  int top_end = RawHeader::RAWHEADER_NWORDS;
+  for (int i = 0; i < top_end; i++) {
+    chksum_top ^= m_buffer[ i ];
+  }
+
+  int body_end = datablock_nwords - SIZE_COPPER_DRIVER_TRAILER - RawTrailer::RAWTRAILER_NWORDS;
+  for (int i = top_end; i < body_end; i++) {
+    chksum_body ^= m_buffer[ i ];
+  }
+  //
+  // check COPPER driver checksum
+  //
+  if (chksum_body != m_buffer[ body_end ]) {
+    char err_buf[500];
+    sprintf(err_buf, "Data corruption : COPPER driver checksum is not consistent.: calcd. %.8x data %.8x\n",
+            chksum_body, m_buffer[ body_end ]);
+    print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+    sleep(12345678);
+    exit(-1);
+
+  }
+
+  int bottom_end = datablock_nwords - RawTrailer::RAWTRAILER_NWORDS;
+  for (int i = body_end; i < bottom_end; i++) {
+    chksum_bottom ^= m_buffer[ i ];
+  }
+
+  unsigned int chksum = chksum_top ^ chksum_body ^ chksum_bottom;
   int* trl = &(m_buffer[ datablock_nwords - RawTrailer::RAWTRAILER_NWORDS ]);
   trl[ RawTrailer::POS_TERM_WORD ] = RawTrailer::MAGIC_WORD_TERM_TRAILER;
-  unsigned int chksum = 0;
-  for (int i = 0; i < datablock_nwords - RawTrailer::RAWTRAILER_NWORDS; i++) {
-    chksum += m_buffer[ i ];
-  }
   trl[ RawTrailer::POS_CHKSUM ] = chksum;
 
 

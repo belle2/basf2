@@ -208,16 +208,19 @@ namespace Belle2 {
     //! should be called by DeSerializerCOPPER.cc and fill contents in RawHeader
     unsigned int FillTopBlockRawHeader(unsigned int m_node_id, unsigned int m_data_type, unsigned int m_trunc_mask);
 
+    //! read COPPER driver's checksum value
+    unsigned int GetDriverChkSum(int n);
+
+    //! calc COPPER driver's checksum value
+    unsigned int CalcDriverChkSum(int n);
     //
     // size of "COPPER front header" and "COPPER trailer"
     //
-    enum {
-      SIZE_COPPER_FRONT_HEADER = 7,
-      SIZE_COPPER_TRAILER = 3
-    };
-
     //! Copper data words = ( total_data_length in COPPER header ) + COPPER_HEADER_TRAILER_NWORDS
-    enum { COPPER_HEADER_TRAILER_NWORDS = 9 }; //See COPPER data format
+    enum {
+      SIZE_COPPER_DRIVER_HEADER = 7,
+      SIZE_COPPER_DRIVER_TRAILER = 2
+    };
 
     //
     // Data Format : "COPPER header"

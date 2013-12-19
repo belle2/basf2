@@ -65,7 +65,8 @@ void NSMCommunicator::init(const std::string& host, int port) throw(NSMHandlerEx
   if (_host.size() == 0 || _port <= 0) {
     _nsmc = b2nsm_init(_node->getName().c_str());
   } else {
-    _nsmc = nsmlib_init(_node->getName().c_str(), host.c_str(), port, port);
+    //_nsmc = nsmlib_init(_node->getName().c_str(), host.c_str(), port, port);
+    _nsmc = b2nsm_init2(_node->getName().c_str(), 0, host.c_str(), port, port);
   }
   if (_nsmc == NULL) {
     _id = -1;

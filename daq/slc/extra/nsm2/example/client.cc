@@ -24,7 +24,6 @@ void
 client_start(NSMmsg* msg, NSMcontext* nsmc)
 {
   printf("START message received\n");
-  printf("text=%s\n", msg->datap);
 
   if (! datap) {
     b2nsm_error(msg, "shared data is not allocated yet");

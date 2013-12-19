@@ -1,5 +1,7 @@
 // ----------------------------------------------------------------------
 // -- nsminfo2.cc
+//
+// 20131218  xforce option [from nsmd 1913]
 // ----------------------------------------------------------------------
 
 // -- include files -----------------------------------------------------
@@ -26,6 +28,8 @@ int nsmd_shmkey = -1; /* == nsmd_port if -1 */
 
 NSMsys* nsmd_sysp = 0;
 NSMmem* nsmd_memp = 0;
+static int xforce = 0;
+static int xverbose = 0;
 
 // -- macros ------------------------------------------------------------
 // ----------------------------------------------------------------------
@@ -216,7 +220,7 @@ nsminfo_head()
            (int)tevent, (int)mem.timevent);
     badmem++;
   }
-  if (badmem) {
+  if (badmem && ! xforce) {
     exit(1);
   }
 
@@ -298,10 +302,18 @@ nsminfo_dat(int all = 0)
 
   for (int idat = 0; idat < NSMSYS_MAX_DAT; idat++) {
     NSMdat& dat = sys.dat[idat];
-    if (dat.dtsiz == 0) continue;
-    printf("DAT  %-3.1d %-31.31s sz=%d nod=%d rev=%d ref=%d fmt=%s\n",
-           idat, dat.dtnam, ntohs(dat.dtsiz), (int16)ntohs(dat.owner),
-           ntohs(dat.dtrev), ntohs(dat.dtref), dat.dtfmt);
+    if (dat.dtsiz == 0 && xverbose == 0) continue;
+    if (xverbose) {
+      printf("DAT  %-3.1d %-31.31s pos=%d sz=%d nod=%d rev=%d ref=%d fmt=%s\n",
+             idat, dat.dtnam, ntohl(dat.dtpos), ntohs(dat.dtsiz),
+             (int16)ntohs(dat.owner), ntohs(dat.dtrev), ntohs(dat.dtref),
+             dat.dtfmt);
+    } else {
+      printf("DAT  %-3.1d %-31.31s sz=%d nod=%d rev=%d ref=%d fmt=%s\n",
+             idat, dat.dtnam, ntohs(dat.dtsiz),
+             (int16)ntohs(dat.owner), ntohs(dat.dtrev), ntohs(dat.dtref),
+             dat.dtfmt);
+    }
   }
 }
 // -- ref ---------------------------------------------------------------
@@ -346,6 +358,18 @@ main(int argc, char** argv)
   while (argc > 1 && argv[1][0] == '-') {
     char opt = argv[1][1];
     char* ap = &argv[1][2];
+
+    switch (opt) {
+      case 'f':
+        xforce = 1;
+        argc--, argv++;
+        continue;
+      case 'v':
+        xverbose = 1;
+        argc--, argv++;
+        continue;
+    }
+
     if (strchr("ps", argv[1][1]) && ! *ap) {
       argc--, argv++;
       ap = argv[1];

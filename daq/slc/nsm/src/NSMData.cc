@@ -7,6 +7,7 @@
 #include "nsm2/belle2nsm.h"
 extern "C" {
 #include "nsm2/nsmlib2.h"
+#include "nsm2/nsmparse.h"
 }
 
 #include <iostream>
@@ -24,7 +25,7 @@ void* NSMData::open(NSMCommunicator* comm) throw(NSMHandlerException)
       == NULL) {
     throw (NSMHandlerException(__FILE__, __LINE__, "Failed to open data memory"));
   }
-  initProperties();
+  parse(NULL, false);
   return _pdata;
 }
 
@@ -35,53 +36,45 @@ void* NSMData::allocate(NSMCommunicator* comm, int interval) throw(NSMHandlerExc
       == NULL) {
     throw (NSMHandlerException(__FILE__, __LINE__, "Failed to allocate data memory"));
   }
-  initProperties();
+  parse(NULL, false);
   return _pdata;
 }
 
-void* NSMData::parse(const char* incpath) throw(NSMHandlerException)
+void* NSMData::parse(const char* incpath, bool maclloc_new) throw(NSMHandlerException)
 {
-#ifdef __NSM_SLC__
-  if (!nsmlib_parse(_format.c_str(), _revision, incpath)) {
+#if NSM_PACKAGE_VERSION >= 1914
+  NSMparse* ptr = NULL;
+  char fmtstr[256];
+  if ((ptr = nsmlib_parsefile(_format.c_str(), _revision, incpath, fmtstr)) == NULL) {
     throw (NSMHandlerException(__FILE__, __LINE__, "Failed to parse header file"));
   }
-  int size = initProperties();
-  return (_pdata = malloc(size));
-#else
-  return NULL;
-#endif
-}
-
-int NSMData::initProperties() throw()
-{
   int size = 0;
-#ifdef __NSM_SLC__
-  nsm_data_att_t* nsm_data_att_p = nsm_data_att_list;
-  while (nsm_data_att_p->length != 0) {
+  while (ptr != NULL) {
     NSMDataProperty pro;
-    int length = nsm_data_att_p->length;
-    std::string type = nsm_data_att_p->type;
-    std::string label = nsm_data_att_p->label;
-    pro.offset = nsm_data_att_p->offset;
-    nsm_data_att_p++;
-    if (type == "int64") pro.type = INT64;
-    else if (type == "int32") pro.type = INT32;
-    else if (type == "int16") pro.type = INT16;
-    else if (type == "char" && length < 0) pro.type = CHAR;
-    else if (type == "char" && length > 0) pro.type = TEXT;
-    else if (type == "uint64") pro.type = UINT64;
-    else if (type == "uint32") pro.type = UINT32;
-    else if (type == "uint16") pro.type = UINT16;
-    else if (type == "byte8" || type == "uchar") pro.type = BYTE8;
-    else if (type == "double") pro.type = DOUBLE;
-    else if (type == "float") pro.type = FLOAT;
+    int length = ptr->size;
+    char type = ptr->type;
+    std::string label = ptr->name;
+    pro.offset = ptr->offset;
+    if (type == 'l') pro.type = INT64;
+    else if (type == 'i') pro.type = INT32;
+    else if (type == 's') pro.type = INT16;
+    else if (type == 'c' && length < 0) pro.type = CHAR;
+    else if (type == 'c' && length > 0) pro.type = TEXT;
+    else if (type == 'L') pro.type = UINT64;
+    else if (type == 'I') pro.type = UINT32;
+    else if (type == 'S') pro.type = UINT16;
+    else if (type == 'C') pro.type = BYTE8;
+    else if (type == 'd') pro.type = DOUBLE;
+    else if (type == 'f') pro.type = FLOAT;
     size += (length < 0) ? pro.type % 100 : (pro.type % 100) * length;
     pro.length = length;
     _pro_m.insert(NSMDataPropertyMap::value_type(label, pro));
     _label_v.push_back(label);
+    ptr = ptr->next;
   }
+  if (size > 0) return malloc(size);
 #endif
-  return size;
+  return NULL;
 }
 
 void* NSMData::get() throw(NSMHandlerException)

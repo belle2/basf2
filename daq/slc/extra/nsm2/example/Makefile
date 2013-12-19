@@ -6,10 +6,10 @@ ALL = client client_wait master readdat
 LIBS      = 
 CC        = gcc
 CXX       = g++
-OPT = -g -I ../corelib -I ../b2lib
-DEPS   = Makefile
+OPT       = -g -I ../corelib -I ../b2lib
+DEPS      = Makefile
 EXTRA_CFLAGS =
-CFLAGS = $(OPT) $(EXTRA_CFLAGS)
+CFLAGS    = $(OPT) $(EXTRA_CFLAGS)
 LIBS = ../corelib/nsmlib2.o \
        ../corelib/nsmhash.o \
        ../corelib/nsmparse.o \
@@ -24,7 +24,7 @@ LIBS = ../corelib/nsmlib2.o \
 all:: $(ALL)
 
 clean::
-	-rm -f client cluent_wait readdat master *.o *.bak *~
+	-rm -f $(ALL) *.o *.bak *~
 
 client: client.o $(LIBS)
 	$(CXX) -o client $(CFLAGS) client.o $(LIBS)
@@ -36,7 +36,7 @@ readdat: readdat.o $(LIBS)
 	$(CXX) -o readdat $(CFLAGS) readdat.o $(LIBS)
 
 master: master.o $(LIBS)
-	$(CXX) -o master $(CFLAGS) master.o $(LIBS) -lreadline -lcurses
+	$(CXX) -o master $(CFLAGS) master.o $(LIBS) -lreadline -ltermcap
 
 client.o: $(DEPS)
 client_wait.o: $(DEPS)

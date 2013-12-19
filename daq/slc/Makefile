@@ -31,7 +31,7 @@ nsm:
 	@ mkdir -p bin
 	@ make -C ./extra/nsm2/
 	@ make -C ./extra/nsm2/daemon 
-	@ make -C ./extra/nsm2/daemon install
+	@ make -C ./extra/nsm2/daemon install EXTBINDIR=$(PWD)/bin EXTINCDIR=$(PWD)/include
 	@ install -m 644 -p ./extra/nsm2/corelib/*.h include/nsm2
 	@ install -m 644 -p ./extra/nsm2/b2lib/*.h include/nsm2
 	@ install -m 644 -p ./extra/nsm2/corelib/*.so $(LIBDIR)

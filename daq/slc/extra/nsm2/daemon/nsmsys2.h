@@ -22,8 +22,8 @@
 #define NSMDENV_PRIORITY "NSMD2_PRIORITY"
 #define NSMDENV_TCPBUF   "NSMD2_TCPBUF"
 
-#ifndef __nsm2_typedef__
-#define __nsm2_typedef__
+#ifndef __nsm2_typedef_nonstdint__
+#define __nsm2_typedef_nonstdint__
 typedef unsigned char      byte8;
 typedef unsigned short     uint16;
 typedef unsigned int       uint32;
@@ -31,10 +31,10 @@ typedef unsigned long long uint64;
 typedef signed   short     int16;
 typedef signed   int       int32;
 typedef signed   long long int64;
-#endif /* nsm2_typedef */
+#endif /* nsm2_typedef_nonstdint */
 
-#ifndef __nsms2_typedef__
-#define __nsms2_typedef__
+#ifndef __nsm2_typedef_sockad__
+#define __nsm2_typedef_sockad__
 typedef struct sockaddr    SOCKAD;
 typedef struct sockaddr_in SOCKAD_IN;
 #endif /* nsms2_typedef */
@@ -293,9 +293,9 @@ typedef struct {
   NSMreg reg[NSMSYS_MAX_REG]; /* set and distributed by master */
 
   /* hash tables (+1 for alignment as MAX_HASH is not even */
-  int32 nodhash[NSMSYS_MAX_HASH + 1]; /* SYSPOS set and distributed by master */
-  int32 dathash[NSMSYS_MAX_HASH + 1]; /* SYSPOS set and distributed by master */
-  int32 reqhash[NSMSYS_MAX_HASH + 1]; /* SYSPOS set and distributed by master */
+  int32 nodhash[NSMSYS_MAX_HASH + 1]; /* set and distributed by master */
+  int32 dathash[NSMSYS_MAX_HASH + 1]; /* set and distributed by master */
+  int32 reqhash[NSMSYS_MAX_HASH + 1]; /* set and distributed by master */
 
   NSMcon con[NSMSYS_MAX_CON];
   NSMsch sch[NSMSYS_MAX_SCH];

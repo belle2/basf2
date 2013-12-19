@@ -2,12 +2,14 @@
 #  Makefile for NSM2 daemon (nsmd2)
 #
 
-BELLE2_SLC_PATH = $(BELLE2_LOCAL_DIR)/daq/slc/bin
-ALL  = nsmd2 nsminfo2
-CC   = gcc
-CXX  = g++
-CFLAGS = -g
-DEPS = nsm2.h nsmsys2.h Makefile
+ALL       = nsmd2 nsminfo2
+LIBS      = 
+CC        = gcc
+CXX       = g++
+OPT       = -g
+DEPS      = nsm2.h nsmsys2.h Makefile
+EXTRA_CFLAGS =
+CFLAGS    = $(OPT) $(EXTRA_CFLAGS)
 
 .c.o:
 	$(CC) $(CFLAGS) -c $<
@@ -18,14 +20,12 @@ DEPS = nsm2.h nsmsys2.h Makefile
 all:: $(ALL)
 
 install::
-	install nsmd2 $(BELLE2_SLC_PATH)/
-	install nsminfo2 $(BELLE2_SLC_PATH)/
-#	install nsm2.h $(EXTINCDIR)/nsm2
-#	install nsmsys2.h $(EXTINCDIR)/nsm2
-
-
+	install nsmd2 $(EXTBINDIR)
+	install nsminfo2 $(EXTBINDIR)
+	install nsm2.h $(EXTINCDIR)/nsm2
+	install nsmsys2.h $(EXTINCDIR)/nsm2
 clean::
-	-rm -f *.o *.bak *~ nsmd2 nsminfo2
+	-rm -f $(ALL) *.o *.bak *~
 
 nsmd2: nsmd2.o nsmhash.o
 	$(CXX) -o nsmd2 $(CFLAGS) nsmd2.o nsmhash.o $(LIBS)

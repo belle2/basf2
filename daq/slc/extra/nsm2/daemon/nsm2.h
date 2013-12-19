@@ -3,9 +3,8 @@
 
 /* -- version info */
 
-#define NSM_PROTOCOL_VERSION 1910 /* protocol version 1.9.10 */
-#define NSM_DAEMON_VERSION   1910 /* daemon   version 1.9.10 */
-#define NSM_PACKAGE_VERSION  1910 /* package  version 1.9.10 */
+#define NSM_PROTOCOL_VERSION 1914 /* protocol version 1.9.14 */
+#define NSM_PACKAGE_VERSION  1914 /* package  version 1.9.14 */
 
 /*
   2012.07.23 1.9.00 --- file created
@@ -21,23 +20,22 @@
  */
 
 /* -- DATA TYPES ----------------------------------------------------- */
-#ifndef __nsm2_typedef__
-#define __nsm2_typedef__
+#ifndef __nsm2_typedef_nonstdint__
+#define __nsm2_typedef_nonstdint__
 typedef unsigned char      byte8;
-typedef unsigned char      uchar;
 typedef unsigned short     uint16;
 typedef unsigned int       uint32;
 typedef unsigned long long uint64;
 typedef signed   short     int16;
 typedef signed   int       int32;
 typedef signed   long long int64;
-#endif /* nsm2_typedef */
+#endif /* nsm2_typedef_nonstdint */
 
-#ifndef __nsmc2_typedef__
-#define __nsmc2_typedef__
+#ifndef __nsm2_typedef_context__
+#define __nsm2_typedef_context__
 struct NSMcontext_struct;
 typedef struct NSMcontext_struct NSMcontext;
-#endif /* nsmc2_typedef */
+#endif /* nsm2_typedef_context */
 
 /* request offset */
 #define NSMREQ_FIRST       (0x1000)
@@ -115,15 +113,6 @@ typedef struct {
 
 typedef void (*NSMcallback_t)(NSMmsg* msg, NSMcontext* nsmc);
 typedef void (*NSMfunc_t)(NSMmsg* msg, NSMcontext* nsmc);
-
-/* obsolete...
-typedef int (*NSMfuncr_t)(int req, int seq, const int *pars, const char *from);
-typedef int (*NSMfuncd_t)(int req, int seq, const int *pars, const char *from,
-        int len, const char *msg);
-typedef int (*NSMfuncm_t)(int req, int seq, const char *msg, const char *from);
-typedef int (*NSMfunce_t)(int req, int seq, const char *msg, const char *from,
-        const char *node);
-*/
 
 /* -- FUNCTIONS ------------------------------------------------------ */
 

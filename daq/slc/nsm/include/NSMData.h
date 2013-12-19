@@ -46,7 +46,7 @@ namespace Belle2 {
     bool isAvailable() throw() { return (_pdata != NULL); }
     void* open(NSMCommunicator* comm) throw(NSMHandlerException);
     void* allocate(NSMCommunicator* comm, int interval = 3) throw(NSMHandlerException);
-    void* parse(const char* inc_dir = NULL) throw(NSMHandlerException);
+    void* parse(const char* inc_dir = NULL, bool maclloc_new = false) throw(NSMHandlerException);
     void* get() throw(NSMHandlerException);
     const void* get() const throw(NSMHandlerException);
     NSMDataPropertyMap& getProperties() { return _pro_m; }

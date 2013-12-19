@@ -71,7 +71,6 @@ main(int argc, char** argv)
   const char* nodename = argv[1]; // need to check before using
   const char* datname = nodename;
   const char* fmtname = "client_data";
-  //const char *fmtname = "/home/tkonno/daq/nsm2/example/client_data.h";
   int ret;
 
   // ARGV check
@@ -85,10 +84,19 @@ main(int argc, char** argv)
     printf("%s: INIT %s", program, b2nsm_strerror());
     return 1;
   }
-  //printf("init done\n");
+  printf("init done\n");
 
   // log message to standard output
   b2nsm_logging(stdout);
+
+  // ALLOCATE shared memory
+  // (datap has to be allocated before callback registration
+  datap = (struct client_data*)
+          b2nsm_allocmem(datname, fmtname, client_data_revision, 3);
+  if (! datap) {
+    printf("%s: allocmem %s\n", program, b2nsm_strerror());
+    return 1;
+  }
 
   // REGISTER callback functions
   if (b2nsm_callback("START", client_start) < 0) {
@@ -97,15 +105,6 @@ main(int argc, char** argv)
   }
   if (b2nsm_callback("STOP", client_stop) < 0) {
     printf("%s: callback(START) %s\n", program, b2nsm_strerror());
-    return 1;
-  }
-
-  // ALLOCATE shared memory
-  // (datap has to be allocated before callback registration
-  datap = (struct client_data*)
-          b2nsm_allocmem("KONNO", fmtname, client_data_revision, 3);
-  if (! datap) {
-    printf("%s: allocmem %s\n", program, b2nsm_strerror());
     return 1;
   }
 
@@ -124,8 +123,6 @@ main(int argc, char** argv)
         datap->evt_number++;
         datap->evt_total++;
       }
-    } else {
-      printf("recieve message");
     }
   }
 

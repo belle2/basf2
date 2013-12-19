@@ -254,13 +254,13 @@ main(int argc, char** argv)
       if (ac < 1) {
         printf("usage: boot <node>\n");
       } else {
-        b2nsm_sendreq_data(av[1], "BOOT", 0, 0, len, text);
+        b2nsm_sendany(av[1], "BOOT", 0, 0, len, text, NULL);
       }
     } else if (strcasecmp(av[0], "load") == 0) {
       if (ac < 1) {
         printf("usage: load <node>\n");
       } else {
-        b2nsm_sendreq_data(av[1], "LOAD", 0, 0, len, text);
+        b2nsm_sendany(av[1], "LOAD", 0, 0, len, text, NULL);
       }
     } else if (strcasecmp(av[0], "start") == 0) {
       if (ac < 4 || ! isdigit(av[2][0]) || ! isdigit(av[3][0])) {
@@ -269,19 +269,19 @@ main(int argc, char** argv)
         int expno = atoi(av[2]);
         int runno = atoi(av[3]);
         int params[2] = { expno, runno };
-        b2nsm_sendreq_data(av[1], "START", 2, params, len, text);
+        b2nsm_sendany(av[1], "START", 2, params, len, text, NULL);
       }
     } else if (strcasecmp(av[0], "stop") == 0) {
       if (ac < 1) {
         printf("usage: stop <node>\n");
       } else {
-        b2nsm_sendreq_data(av[1], "STOP", 0, 0, len, text);
+        b2nsm_sendany(av[1], "STOP", 0, 0, len, text, NULL);
       }
     } else if (strcasecmp(av[0], "recover") == 0) {
       if (ac < 1) {
         printf("usage: recover <node>\n");
       } else {
-        b2nsm_sendreq_data(av[1], "RECOVER", 0, 0, len, text);
+        b2nsm_sendany(av[1], "RECOVER", 0, 0, len, text, NULL);
       }
     } else if (strcasecmp(av[0], "log") == 0) {
       if (ac < 3) {
@@ -289,7 +289,7 @@ main(int argc, char** argv)
       } else {
         len = strlen(av[2]);
         text = av[2];
-        b2nsm_sendreq_data(av[1], "LOG", 0, 0, len, text);
+        b2nsm_sendany(av[1], "LOG", 0, 0, len, text, NULL);
       }
     } else {
       printf("unknown request %s\n", av[0]);

@@ -13,7 +13,6 @@
 #include <string.h>
 #include <time.h>
 #include <sys/time.h>
-#include <arpa/inet.h>
 
 #include "nsm2.h"
 #include "nsmlib2.h"
@@ -43,6 +42,22 @@ xt()
   sprintf(buf, "%02d:%02d:%02d.%03d ",
 	  cur->tm_hour, cur->tm_min, cur->tm_sec, (int)now.tv_usec/1000);
   return buf;
+}
+/* -- b2nsm_nodeid ------------------------------------------------------ */
+int
+b2nsm_nodeid(const char *nodename)
+{
+  char nodename_uprcase[NSMSYS_NAME_SIZ + 1];
+  xuprcpy(nodename_uprcase, nodename, NSMSYS_NAME_SIZ + 1);
+  return nsmlib_nodeid(nsm, nodename_uprcase);
+}
+/* -- b2nsm_nodepid ----------------------------------------------------- */
+int 
+b2nsm_nodepid(const char *nodename)
+{
+  int inod = b2nsm_nodeid(nodename);
+  if (inod < 0) return -1;
+  return ntohl(nsm->sysp->nod[inod].nodpid);
 }
 /* -- b2nsm_loghook ----------------------------------------------------- */
 int
@@ -98,9 +113,10 @@ b2nsm_callback(const char *name, NSMcallback_t callback)
   fflush(logfp);
   return ret;
 }	     
-/* -- b2nsm_sendreq ----------------------------------------------------- */
+/* -- b2nsm_sendany ----------------------------------------------------- */
 int
-b2nsm_sendreq(const char *node, const char *req, int npar, int *pars)
+b2nsm_sendany(const char *node, const char *req, int npar, int *pars,
+	      int len, const char *datp, const char *caller)
 {
   int ret;
   char node_uprcase[NSMSYS_NAME_SIZ+1];
@@ -109,40 +125,23 @@ b2nsm_sendreq(const char *node, const char *req, int npar, int *pars)
   if (! nsm) return -1;
   xuprcpy(node_uprcase, node, NSMSYS_NAME_SIZ+1);
   xuprcpy(req_uprcase,  req, NSMSYS_NAME_SIZ+1);
-  ret = nsmlib_sendreq(nsm, node_uprcase, req_uprcase, npar, pars, 0, 0);
+  ret = nsmlib_sendreq(nsm, node_uprcase, req_uprcase, npar, pars, len, datp);
 
   if (! logfp) return ret;
   if (ret < 0) {
-    fprintf(logfp, "%s%s=>%s sendreq failed: %s\n",
-	    xt(), req, node, b2nsm_strerror());
+    fprintf(logfp, "%s%s=>%s %s failed: %s\n",
+	    xt(), req, node, caller, b2nsm_strerror());
   } else {
     fprintf(logfp, "%s%s=>%s\n", xt(), req, node);
   }
   fflush(logfp);
   return ret;
 }
-/* -- b2nsm_sendreq_data ------------------------------------------------ */
+/* -- b2nsm_sendreq ----------------------------------------------------- */
 int
-b2nsm_sendreq_data(const char *node, const char *req, int npar, int *pars, int len, const char* datap)
+b2nsm_sendreq(const char *node, const char *req, int npar, int *pars)
 {
-  int ret;
-  char node_uprcase[NSMSYS_NAME_SIZ+1];
-  char req_uprcase[NSMSYS_NAME_SIZ+1];
-
-  if (! nsm) return -1;
-  xuprcpy(node_uprcase, node, NSMSYS_NAME_SIZ+1);
-  xuprcpy(req_uprcase,  req, NSMSYS_NAME_SIZ+1);
-  ret = nsmlib_sendreq(nsm, node_uprcase, req_uprcase, npar, pars, len, datap);
-
-  if (! logfp) return ret;
-  if (ret < 0) {
-    fprintf(logfp, "%s%s=>%s sendreq failed: %s\n",
-	    xt(), req, node, b2nsm_strerror());
-  } else {
-    fprintf(logfp, "%s%s=>%s\n", xt(), req, node);
-  }
-  fflush(logfp);
-  return ret;
+  return b2nsm_sendany(node, req, npar, pars, 0, 0, "sendreq");
 }
 /* -- b2nsm_ok ---------------------------------------------------------- */
 int
@@ -154,7 +153,6 @@ b2nsm_ok(NSMmsg *msg, const char *newstate, const char *fmt, ...)
   char *str = 0;
   int  len;
   int  pars[2];
-  int  ret;
   
   if (! nsm || ! msg || ! newstate) return -1;
 
@@ -172,18 +170,7 @@ b2nsm_ok(NSMmsg *msg, const char *newstate, const char *fmt, ...)
   pars[0] = msg->req;
   pars[1] = msg->seq;
   
-  ret = nsmlib_sendreq(nsm, node, "OK", 2, pars, len, buf);
-
-  if (! logfp) return ret;
-  if (ret < 0) {
-    fprintf(logfp, "%sOK=>%s sendreq failed: %s\n",
-	    xt(), node, b2nsm_strerror());
-  } else {
-    fprintf(logfp, "%sOK=>%s (%s)%s%s\n",
-	    xt(), node, buf, str?" ":"", str?str:"");
-  }
-  fflush(logfp);
-  return ret;  
+  return b2nsm_sendany(node, "OK", 2, pars, len, buf, "ok");
 }
 /* -- b2nsm_error ------------------------------------------------------- */
 int
@@ -194,7 +181,6 @@ b2nsm_error(NSMmsg *msg, const char *fmt, ...)
   char buf[256];
   int  len;
   int  pars[2];
-  int  ret;
   
   if (! nsm) return -1;
   if (! msg || ! fmt) return -1;
@@ -211,13 +197,7 @@ b2nsm_error(NSMmsg *msg, const char *fmt, ...)
   pars[0] = msg->req;
   pars[1] = msg->seq;
   
-  ret = nsmlib_sendreq(nsm, node, "ERROR", 2, pars, len, buf);
-
-  if (! logfp) return ret;
-  if (ret < 0) sprintf(buf, "sendreq failed: %s", b2nsm_strerror());
-  fprintf(logfp, "%sERROR=>%s: %s", xt(), node, buf);
-  fflush(logfp);
-  return ret;  
+  return b2nsm_sendany(node, "ERROR", 2, pars, len, buf, "error");
 }
 /* -- b2nsm_openmem ----------------------------------------------------- */
 void *
@@ -299,39 +279,6 @@ b2nsm_init(const char *nodename)
   return b2nsm_init2(nodename, 1, 0, 0, 0);
 }
 /* -- (emacs outline mode setup) ------------------------------------- */
-int 
-b2nsm_nodepid(const char *nodename)
-{
-  int inod;
-  NSMsys *sysp;
-
-  sysp = nsm->sysp;
-  for (inod=0; inod < NSMSYS_MAX_NOD; inod++) {
-    NSMnod *nod = &(sysp->nod[inod]);
-    if (! nod->name[0]) continue;
-    if ( strcmp(nod->name, nodename) == 0 ) {
-      return ntohl(nod->nodpid);
-    }
-  }
-  return 0;
-}
-/* -- (emacs outline mode setup) ------------------------------------- */
-int
-b2nsm_nodeid(const char *nodename)
-{
-  int inod;
-  NSMsys *sysp;
-
-  sysp = nsm->sysp;
-  for (inod=0; inod < NSMSYS_MAX_NOD; inod++) {
-    NSMnod *nod = &(sysp->nod[inod]);
-    if (! nod->name[0]) continue;
-    if ( strcmp(nod->name, nodename) == 0 ) {
-      return inod;
-    }
-  }
-  return -1;
-}
 /*
 b// Local Variables: ***
 // mode:outline-minor ***

@@ -10,6 +10,25 @@
 //   - do_newmaster  (from old-master, when a new master is set up)
 //   - destroyconn   (to -1, when master disappeared)
 // ----------------------------------------------------------------------
+// revisions
+//  20130303  1910 hinamatsuri alpha version
+//  20131025  ---- work resuming
+//  20131028  ---- suppress recv message
+//  20131028  1911 assert no conid case (*1)
+//  20131217  1912 more fix about -1 (and major signal fix in corelib)
+//  20131217  1913 dtpos fix (don't use ntohs!)
+//  20131218  1914 new protocol version, merged with Konno branch
+
+#define NSM_DAEMON_VERSION   1914 /* daemon   version 1.9.14 */
+// ----------------------------------------------------------------------
+
+/*
+  case 1911:
+    host1% nsmd
+    host1% client
+    host2% nsmd
+    host1% kill client => nsmd@host1 dies
+*/
 
 // -- include files -----------------------------------------------------
 // ----------------------------------------------------------------------
@@ -32,6 +51,7 @@
 #include <sys/socket.h>
 #include <sys/ioctl.h>
 #include <net/if.h>
+#include <stdint.h>
 
 #include "nsm2.h"
 #include "nsmsys2.h"
@@ -78,8 +98,6 @@
 #define NSMD_INITCOUNT_SECOND 8 // shortend from 15 for debug
 #define NSMD_INITCOUNT_DELTA  2
 #define NSMD_CONNECT_TIMEOUT  5 // this must be smaller than INITCOUNT
-
-#undef SIGRTMIN
 
 // -- global variables --------------------------------------------------
 // ----------------------------------------------------------------------
@@ -249,7 +267,7 @@ static NSMcmdtbl_t nsmd_cmdtbl[] = {
 #define ExistConid(i)   (i > NSMCON_NON && (nsmd_sysp && i < nsmd_sysp->ncon))
 //#define ExistNode(node) (node >= 0 && (node <= NSMSYS_MAX_NOD) && \
 //                         nsmd_sysp && nsmd_sysp->nod[node].nodeid == node)
-#define NodeIsValid(i)  (nsmd_sysp && i >= 0 && i < NSMSYS_MAX_NOD)
+#define NodeIsValid(i)  (nsmd_sysp && (uint16)(i) < NSMSYS_MAX_NOD)
 #define ExistMaster()   ExistConid(nsmd_sysp->master)
 #define ExistDeputy()   ExistConid(nsmd_sysp->master)
 
@@ -897,13 +915,9 @@ nsmd_shmopen(int shmkey, time_t now)
 {
   // DBG("nsmd_shmopen(%d)", shmkey);
 
-  //  int retsys = nsmd_shmget(shmkey,   sizeof(NSMsys), 0755, nsmd_shmsysid,
-  //           (char **)&nsmd_sysp, now);
-  int retsys = nsmd_shmget(shmkey,   sizeof(NSMsys), 0777, nsmd_shmsysid,
+  int retsys = nsmd_shmget(shmkey,   sizeof(NSMsys), 0755, nsmd_shmsysid,
                            (char**)&nsmd_sysp, now);
-  //  int retmem = nsmd_shmget(shmkey+1, sizeof(NSMmem), 0775, nsmd_shmmemid,
-  //         (char **)&nsmd_memp, now);
-  int retmem = nsmd_shmget(shmkey + 1, sizeof(NSMmem), 0777, nsmd_shmmemid,
+  int retmem = nsmd_shmget(shmkey + 1, sizeof(NSMmem), 0775, nsmd_shmmemid,
                            (char**)&nsmd_memp, now);
 
   if ((retsys == 0 || retsys == ENOENT) &&
@@ -1239,6 +1253,32 @@ nsmd_udpsend_not(SOCKAD_IN* sockadp, NSMdmsg& dmsg)
   udp.osiz += ret;
 }
 #endif
+// -- nsmd_freeq --------------------------------------------------------
+static void
+nsmd_freeq(NSMDtcpq* q)
+{
+  // otherwise queue entry can be freed
+  DBG("freeq before f=%08x(%08x) l=%08x q=%08x",
+      nsmd_tcpqfirst, nsmd_tcpqfirst ? nsmd_tcpqfirst->prevp : 0, nsmd_tcpqlast, q);
+  if (q->prevp) {  // not the first one
+    q->prevp->nextp = q->nextp;
+  } else {         // the first one
+    nsmd_tcpqfirst = q->nextp;
+  }
+  if (q->nextp) {  // not the last one
+    q->nextp->prevp = q->prevp;
+  } else {         // the last one
+    nsmd_tcpqlast = q->prevp;
+  }
+  DBG("freeq after f=%08x(%08x) l=%08x q=%08x",
+      nsmd_tcpqfirst, nsmd_tcpqfirst ? nsmd_tcpqfirst->prevp : 0, nsmd_tcpqlast, q);
+
+  // ????
+  if (q->msglen > NSM_TCPTHRESHOLD)
+    nsmd_free("tcpfreeq(data)", (char*)q->datap);
+
+  nsmd_free("tcpfreeq(q)", (char*)q);
+}
 // -- nsmd_tcpwriteq ----------------------------------------------------
 // process queue in two steps
 // 1. convert to buffer
@@ -1360,23 +1400,7 @@ nsmd_tcpwriteq()
     return 1; // call me again
   }
 
-  // otherwise queue entry can be freed
-  DBG("writeq before f=%08x(%08x) l=%08x q=%08x",
-      nsmd_tcpqfirst, nsmd_tcpqfirst ? nsmd_tcpqfirst->prevp : 0, nsmd_tcpqlast, q);
-  if (q->prevp) {  // not the first one
-    q->prevp->nextp = q->nextp;
-  } else {         // the first one
-    nsmd_tcpqfirst = q->nextp;
-  }
-  if (q->nextp) {  // not the last one
-    q->nextp->prevp = q->prevp;
-  } else {         // the last one
-    nsmd_tcpqlast = q->prevp;
-  }
-  DBG("writeq after f=%08x(%08x) l=%08x q=%08x",
-      nsmd_tcpqfirst, nsmd_tcpqfirst ? nsmd_tcpqfirst->prevp : 0, nsmd_tcpqlast, q);
-  if (q->msglen > NSM_TCPTHRESHOLD)
-    nsmd_free("tcpwriteq", (char*)q);
+  nsmd_freeq(q);
 
   return 1; // call me again to check if there's another queue entry
 }
@@ -1463,9 +1487,7 @@ nsmd_tcpsend(NSMcon& con, NSMdmsg& dmsg, NSMDtcpq* qptr, int beforeafter)
         ret = sigqueue((pid_t)con.pid, SIGRTMIN, sv);
         //ret = sigqueue((pid_t)con.pid, SIGRTMIN, (const union sigval)0);
 #else
-        const union sigval sv = { 0 };
-        ret = sigqueue((pid_t)con.pid, SIGUSR1, sv);
-        //  ERRO("SIGRTMIN undefined");
+        ERRO("SIGRTMIN undefined");
 #endif
       }
       if (ret >= 0) break;
@@ -1705,6 +1727,19 @@ nsmd_delconn(NSMcon& con)
   for (; conid < sys.ncon; conid++) sys.con[conid] = sys.con[conid + 1];
   memset(&sys.con[sys.ncon], 0, sizeof(NSMcon));
   memset(&sys.con[sys.ncon].sockad.sin_addr, -1, sizeof(SOCKAD_IN));
+
+  // clear and shift tcpq
+  NSMDtcpq* q   = nsmd_tcpqfirst;
+  while (q) {
+    if (q->conid == conid) {
+      NSMDtcpq* p = q;
+      q = q->nextp;
+      nsmd_freeq(p);
+    } else {
+      if (q->conid >  conid) q->conid--;
+      q = q->nextp;
+    }
+  }
 
   // and make it dirty to update select fdset
   sys.dirty = 1;
@@ -2977,7 +3012,7 @@ nsmd_do_delclient(NSMcon& con, NSMdmsg& dmsg)
   }
 
   // for an NSM daemon, delete all the clients
-  if (dmsg.src != -1) ASRT("do_delclient invalid src=%d", dmsg.src);
+  if (dmsg.src != (uint16) - 1) ASRT("do_delclient invalid src=%d", dmsg.src);
   for (int nodid = 0; nodid < NSMSYS_MAX_NOD; nodid++) {
     NSMnod& nod = sys.nod[nodid];
     if (nod.ipaddr != ADDR_IP(con.sockad)) continue;
@@ -3289,8 +3324,8 @@ nsmd_do_reqcpymem(NSMcon& con, NSMdmsg& dmsg)
 
   if (opt == 2) {
     datid = pos;
-    siz = (int16)ntohs(sys.dat[datid].dtsiz); // 0 if removed, but don't care
-    pos = (int16)ntohs(sys.dat[datid].dtpos);
+    siz = (int16_t)ntohs(sys.dat[datid].dtsiz); // 0 if removed, but don't care
+    pos = (int32_t)ntohl(sys.dat[datid].dtpos);
   }
 
   memset(&dmsg, 0, sizeof(dmsg));
@@ -3774,7 +3809,7 @@ nsmd_do_allocmem(NSMcon& con, NSMdmsg& dmsg)
   if ((datid = ntohs(nod.noddat)) != (uint16) - 1) {
     do {
       nodeap = sys.dat + datid;
-    } while ((datid = ntohs(nodeap->nnext)) != (int16) - 1);
+    } while ((datid = ntohs(nodeap->nnext)) != (uint16) - 1);
   }
   int16* nprevp = nodeap ? &nodeap->nnext : &nod.noddat;
 
@@ -3789,6 +3824,8 @@ nsmd_do_allocmem(NSMcon& con, NSMdmsg& dmsg)
   int newpos = -1;
   int newpad = -1; // wasting pad size, to be minimized
   int existed = 0;
+
+  DBG("do_allocmem: prevend = %d\n", prevend);
 
   while (datp) {
 
@@ -3822,6 +3859,7 @@ nsmd_do_allocmem(NSMcon& con, NSMdmsg& dmsg)
       // if exist, update
       existed = 1;
       newpos = ntohl(datp->dtpos);
+      DBG("do_allocmem: newpos(dtpos) = %d\n", newpos);
       break;
       /*
       *nprevp = htons(datp - sys.dat);
@@ -3835,6 +3873,7 @@ nsmd_do_allocmem(NSMcon& con, NSMdmsg& dmsg)
     }
 
     prevend = ntohl(datp->dtpos) + ntohs(datp->dtsiz);
+    DBG("do_allocmem: prevend(dtpos+dtsiz) = %d\n", prevend);
     datp_sav = datp;
 
     if (ntohs(datp->anext) == (uint16) - 1) break;
@@ -3853,6 +3892,7 @@ nsmd_do_allocmem(NSMcon& con, NSMdmsg& dmsg)
       }
       datp_aprev = datp_sav; // this may be zero if no other dat
       newpos = prevend;
+      DBG("do_allocmem: newpos(prevend) = %d\n", prevend);
     }
 
     // look for a free sys.dat entry to store
@@ -3885,6 +3925,9 @@ nsmd_do_allocmem(NSMcon& con, NSMdmsg& dmsg)
   datp->nnext = htons(-1);
   datp->owner = htons(&nod - sys.nod);
   datp->dtpos = htonl(newpos);
+
+  DBG("do_allocmem: datp(dtpos) = %d\n", newpos);
+
   datp->dtsiz = htons(fmtsize);
   datp->dtcyc = htons(dmsg.pars[0] ? dmsg.pars[0] : 1000); // 10 second
   if (! existed) datp->dtref = htons(0);
@@ -3925,8 +3968,15 @@ nsmd_command(NSMcon& con, NSMdmsg& dmsg)
           cmd.name, dmsg.seq,
           ADDR_STR(con.sockad), dmsg.len, dmsg.npar, dmsg.datap);
     } else {
-      LOG("recv %s(%d)<=%s  len=%d npar=%d",
-          cmd.name, dmsg.seq, ADDR_STR(con.sockad), dmsg.len, dmsg.npar);
+      int dispflag = 1;
+      if ((cmd.req == NSMCMD_USRCPYMEM ||
+           cmd.req == NSMCMD_FLUSHMEM ||
+           cmd.req == NSMCMD_PING ||
+           cmd.req == NSMCMD_PONG) && !DBGBIT(7)) dispflag = 0;
+      if (dispflag) {
+        LOG("recv %s(%d)<=%s  len=%d npar=%d",
+            cmd.name, dmsg.seq, ADDR_STR(con.sockad), dmsg.len, dmsg.npar);
+      }
     }
     cmd.func(con, dmsg);
     return;

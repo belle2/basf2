@@ -12,17 +12,15 @@ TMPDIR  = ./tmp
 LIBDIR  = ./lib
 
 LIBS    += -lm -lpthread -lrt -lz
-LIBS    += -L$(BELLE2_LIB) -ldaq_slc_base -ldaq_slc_system -ldaq_slc_nsm -ldaq_slc_xml
+LIBS    += -L$(BELLE2_LIB) -ldaq_slc_base -ldaq_slc_system -ldaq_slc_nsm
 LIBS    += -L$(BELLE2_LIB) -lnsm2_corelib -lnsm2_b2lib
 LIBS    += $(shell xml2-config --libs)
-LIBS    += $(shell mysql_config --libs)
 
 CFLAGS   = -g -Wall -fPIC -D_REENTRANT -DB2SLC_DEBUG_MODE #-Wno-deprecated
 CFLAGS  += -I./include 
 CFLAGS  += -I$(BELLE2_INC)
 CFLAGS  += -I$(BELLE2EX_INC)
 CFLAGS  += $(shell xml2-config --cflags)
-CFLAGS  += $(shell mysql_config --cflags)
 
 MAINS   = $(wildcard *.cc)
 TARGETS = $(MAINS:%.cc=$(BINDIR)/%)

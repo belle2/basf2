@@ -34,7 +34,7 @@ main(int argc, char** argv)
   }
 
   // INIT
-  if (! b2nsm_init2(nodename, 0, 0, 0, 0)) {
+  if (! b2nsm_init(nodename)) {
     printf("%s: INIT %s\n", program, b2nsm_strerror());
     return 1;
   }

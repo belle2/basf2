@@ -56,7 +56,7 @@ NSMCommunicator::NSMCommunicator(NSMNode* node, const std::string& host,
 
 void NSMCommunicator::init(const std::string& host, int port) throw(NSMHandlerException)
 {
-#ifdef __NSM_SLC__
+#if NSM_PACKAGE_VERSION >= 1914
   if (_node == NULL) {
     throw (NSMHandlerException(__FILE__, __LINE__, "No node for NSM was registered!"));
   }
@@ -114,10 +114,10 @@ void NSMCommunicator::sendRequest(const NSMNode* node, const Command& command,
                                   int npar, unsigned int* pars,
                                   int len, const char* datap) throw(NSMHandlerException)
 {
-#ifdef __NSM_SLC__
+#if NSM_PACKAGE_VERSION >= 1914
   b2nsm_context(_nsmc);
-  if (b2nsm_sendreq_data(node->getName().c_str(), command.getLabel(),
-                         npar, (int*)pars, len, datap) < 0) {
+  if (b2nsm_sendany(node->getName().c_str(), command.getLabel(),
+                    npar, (int*)pars, len, datap, NULL) < 0) {
     _id = -1;
     throw (NSMHandlerException(__FILE__, __LINE__, "Failed to send request"));
   }
@@ -152,7 +152,7 @@ throw(NSMHandlerException)
 void NSMCommunicator::replyOK(const NSMNode*, const std::string& message)
 throw(NSMHandlerException)
 {
-#ifdef __NSM_SLC__
+#if NSM_PACKAGE_VERSION >= 1914
   b2nsm_context(_nsmc);
   if (b2nsm_ok(_message.getMsg(), _node->getState().getLabel(), message.c_str()) < 0) {
     throw (NSMHandlerException(__FILE__, __LINE__, "Failed to reply OK"));
@@ -163,7 +163,7 @@ throw(NSMHandlerException)
 void NSMCommunicator::replyError(const std::string& message)
 throw(NSMHandlerException)
 {
-#ifdef __NSM_SLC__
+#if NSM_PACKAGE_VERSION >= 1914
   b2nsm_context(_nsmc);
   if (b2nsm_error(_message.getMsg(), message.c_str()) < 0) {
     throw (NSMHandlerException(__FILE__, __LINE__, "Failed to reply error"));
@@ -173,7 +173,7 @@ throw(NSMHandlerException)
 
 void NSMCommunicator::sendLog(const SystemLog& log) throw(NSMHandlerException)
 {
-#ifdef __NSM_SLC__
+#if NSM_PACKAGE_VERSION >= 1914
   if (_logger_node != NULL &&
       b2nsm_nodeid(_logger_node->getName().c_str()) >= 0) {
     std::string str;
@@ -186,7 +186,7 @@ void NSMCommunicator::sendLog(const SystemLog& log) throw(NSMHandlerException)
 
 void NSMCommunicator::sendError(const std::string& message) throw(NSMHandlerException)
 {
-#ifdef __NSM_SLC__
+#if NSM_PACKAGE_VERSION >= 1914
   if (_rc_node != NULL) {
     sendRequest(_rc_node, Command::ERROR, 0, NULL, message);
   }
@@ -243,7 +243,7 @@ bool NSMCommunicator::performCallback() throw(NSMHandlerException)
 int NSMCommunicator::getNodeIdByName(const std::string& name)
 throw(NSMHandlerException)
 {
-#ifdef __NSM_SLC__
+#if NSM_PACKAGE_VERSION >= 1914
   b2nsm_context(_nsmc);
   return b2nsm_nodeid(name.c_str());
 #else
@@ -254,7 +254,7 @@ throw(NSMHandlerException)
 int NSMCommunicator::getNodePidByName(const std::string& name)
 throw(NSMHandlerException)
 {
-#ifdef __NSM_SLC__
+#if NSM_PACKAGE_VERSION >= 1914
   b2nsm_context(_nsmc);
   return b2nsm_nodepid(name.c_str());
 #else

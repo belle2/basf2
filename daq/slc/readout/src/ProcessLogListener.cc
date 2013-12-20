@@ -33,13 +33,17 @@ void ProcessLogListener::run()
     _con->setMessage(message);
     _con->unlock();
     if (message.size() > 0) {
-      Belle2::debug("priority = %d, message = %s", priority, message.c_str());
+      SystemLog::Priority sys_priority = (SystemLog::Priority)priority;
+      Belle2::debug("priority = %d, message = %s",
+                    (int)sys_priority, message.c_str());
+      /*
       SystemLog::Priority sys_priority = SystemLog::DEBUG;
       if (priority == SystemLog::INFO) sys_priority = SystemLog::INFO;
       else if (priority == SystemLog::NOTICE) sys_priority = SystemLog::NOTICE;
       else if (priority == SystemLog::WARNING) sys_priority = SystemLog::WARNING;
       else if (priority == SystemLog::ERROR) sys_priority = SystemLog::ERROR;
       else if (priority == SystemLog::FATAL) sys_priority = SystemLog::FATAL;
+      */
       NSMCommunicator* comm = _con->getCallback()->getCommunicator();
       NSMNode* node = _con->getCallback()->getNode();
       try {

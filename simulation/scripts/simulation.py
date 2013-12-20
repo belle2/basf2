@@ -24,7 +24,7 @@ def add_simulation(path, components=None, bkgfiles=None):
     path.add_module(g4sim)
 
     # background mixing
-    if bkgfiles is not None:
+    if bkgfiles:
         bkgmixer = register_module('MixBkg')
         bkgmixer.param('BackgroundFiles', bkgfiles)
         path.add_module(bkgmixer)

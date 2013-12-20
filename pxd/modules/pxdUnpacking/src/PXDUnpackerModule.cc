@@ -381,7 +381,7 @@ public:
         B2INFO(" DHH Ghost Frame CRC " << hex << c << " == " << crc32);
     } else {
       crc_error++;
-      B2ERROR(" DHH Ghost Frame CRC FAIL " << hex << c << " != " << crc32);
+//       B2ERROR(" DHH Ghost Frame CRC FAIL " << hex << c << " != " << crc32);
       error_flag = true;
     }
     return c;
@@ -408,7 +408,7 @@ public:
   unsigned int crc32;
 
   dhh_end_event_frame(unsigned int wie = 0, unsigned int eo = 0, unsigned int trigger_nr = 0, unsigned int frame_nr = 0, unsigned int dhh_id = 0, unsigned int chip_id_ref = 0):
-    word0(1, DHH_FRAME_HEADER_DATA_TYPE_GHOST, frame_nr, dhh_id, chip_id_ref) {
+    word0(1, DHH_FRAME_HEADER_DATA_TYPE_END_FRM, frame_nr, dhh_id, chip_id_ref) {
     trigger_nr_lo = trigger_nr & 0xFFFF;
     wordsinevent = wie;
     errorinfo = eo;
@@ -647,16 +647,14 @@ public:
     return c;
   };
   bool is_fake(void) {
-    /*      if (word0.data != 0x3000) return false;
-          if (trigger_nr_lo != 0) return false;
-          if (trigger_nr_hi != 0) return false;
-          if (time_tag_lo != 0) return false;
-          if (time_tag_hi != 0) return false;
-          if (sfnr_offset != 0) return false;
-          //if(crc32!=0x87654321) return false;
-          return true;
-          */
-    return false;
+    if (word0.data != 0x5800) return false;
+    if (trigger_nr_lo != 0) return false;
+    if (trigger_nr_hi != 0) return false;
+    if (time_tag_lo_and_type != 0) return false;
+    if (time_tag_mid != 0) return false;
+    if (time_tag_hi != 0) return false;
+    //if(crc32!=0x87654321) return false;
+    return true;
   };
   inline static unsigned int size(void) {
     return 4;// 9 words???
@@ -892,7 +890,7 @@ public:
   unsigned int crc32;
 
 //    dhhc_end_frame(unsigned int wie = 0, unsigned int eo = 0, unsigned int trigger_nr = 0, unsigned int depend = 0):
-//    word0(0, DHHC_FRAME_HEADER_DATA_TYPE_DHH_END, depend) {
+//    word0(0, DHHC_FRAME_HEADER_DATA_TYPE_DHHC_END, depend) {
 //    };
   unsigned int calc_crc(void) {
     unsigned char* d;
@@ -924,13 +922,12 @@ public:
     return 4;
   };
   bool is_fake(void) {
-    /*      if (word0.data != 0xC100) return false;
-          if (trigger_nr_lo != 0) return false;
-          if (wordsinevent != 0) return false;
-          if (errorinfo != 0) return false;
-          //if(crc32!=0x87654321) return false;
-          return true;*/
-    return false;
+    if (word0.data != 0x6000) return false;
+    if (trigger_nr_lo != 0) return false;
+    if (wordsinevent != 0) return false;
+    if (errorinfo != 0) return false;
+    //if(crc32!=0x87654321) return false;
+    return true;
   };
   void print(void) {
     word0.print();
@@ -1193,7 +1190,7 @@ void PXDUnpackerModule::unpack_event(RawPXD& px)
 {
   int last_wie = 0, last_framenr = 0, last_start = 0, last_end = 1;
   static unsigned int last_evtnr = 0;
-  int Frames_per_event;
+  int Frames_in_event;
   int fullsize;
   int datafullsize;
 
@@ -1217,14 +1214,14 @@ void PXDUnpackerModule::unpack_event(RawPXD& px)
 
   unsigned int* tableptr;
   tableptr = &data[2]; // skip header!!!
-  if (m_headerEndianSwap) Frames_per_event = ntohl(data[1]); else Frames_per_event = data[1];
+  if (m_headerEndianSwap) Frames_in_event = ntohl(data[1]); else Frames_in_event = data[1];
 
   unsigned int* dataptr;
-  dataptr = &tableptr[Frames_per_event];
-  datafullsize = fullsize - 2 * 4 - Frames_per_event * 4; // minus header, minus table
+  dataptr = &tableptr[Frames_in_event];
+  datafullsize = fullsize - 2 * 4 - Frames_in_event * 4; // minus header, minus table
 
   int ll = 0; // Offset in dataptr in bytes
-  for (int j = 0; j < Frames_per_event; j++) {
+  for (int j = 0; j < Frames_in_event; j++) {
     int lo;/// len of frame in bytes
     bool pad;
     if (m_headerEndianSwap) lo = ntohl(tableptr[j]); else lo = tableptr[j];
@@ -1248,13 +1245,13 @@ void PXDUnpackerModule::unpack_event(RawPXD& px)
     B2INFO(" unpack DHH frame: " << j << " with size " << lo << " at byte offset in dataptr " << ll);
     endian_swap_frame((unsigned short*)(ll + (char*)dataptr), lo);
     if (m_DHHCmode) {
-      unpack_dhhc_frame(ll + (char*)dataptr, lo, pad, last_wie, last_start, last_end, last_evtnr);
+      unpack_dhhc_frame(ll + (char*)dataptr, lo, pad, last_wie, last_start, last_end, last_evtnr, j, Frames_in_event);
     } else {
-      unpack_frame(ll + (char*)dataptr, lo, pad, last_framenr, last_wie, last_start, last_end, last_evtnr);
+      unpack_frame(ll + (char*)dataptr, lo, pad, last_framenr, last_wie, last_start, last_end, last_evtnr, j, Frames_in_event);
     }
     ll += (lo + 3) & 0xFFFFFFFC; /// round up to next 32 bit boundary
   }
-  if (!last_end) B2ERROR("Error: Last Frame is not an END FRAME!");
+//   if (!last_end) B2ERROR("Error: Last Frame is not an END FRAME!");
 
 }
 
@@ -1428,7 +1425,7 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int len2, unsigned int d
 unsigned int dhh_first_frame_id_lo = 0;
 unsigned int dhh_first_offset = 0;
 
-void PXDUnpackerModule::unpack_frame(void* data, int len, bool pad, int& last_framenr, int& last_wie, int& last_start, int& last_end, unsigned int& last_evtnr)
+void PXDUnpackerModule::unpack_frame(void* data, int len, bool pad, int& last_framenr, int& last_wie, int& last_start, int& last_end, unsigned int& last_evtnr, int Frame_Nr, int Frames_in_event)
 {
   dhh_frame_header_word0* hw;
   error_flag = false;
@@ -1570,15 +1567,36 @@ void PXDUnpackerModule::unpack_frame(void* data, int len, bool pad, int& last_fr
   }
 
   if (evtnr != last_evtnr) {
-    B2ERROR(" Error: Event Nr " << evtnr << " != " << last_evtnr);
+//     B2ERROR(" Error: Event Nr " << evtnr << " != " << last_evtnr);
     evtnr_error++;
     error_flag = true;
   }
   if (lfnr != ((last_framenr + 1) & 0xF)) {
-    B2ERROR(" Error: Frame Nr " << lfnr << " != " << last_framenr << " + 1 ");
+//     B2ERROR(" Error: Frame Nr " << lfnr << " != " << last_framenr << " + 1 ");
     fnr_error++;
     error_flag = true;
   }
+  if (Frame_Nr == 0 && dhh.get_type() != DHH_FRAME_HEADER_DATA_TYPE_EVT_FRM) {
+    B2ERROR("First frame is not a dhh start frame")
+  }
+  if (Frame_Nr == Frames_in_event - 1 && dhh.get_type() != DHH_FRAME_HEADER_DATA_TYPE_END_FRM) {
+    B2ERROR("Last frame is not a dhh end frame");
+  }
+  if (Frame_Nr > 0 || Frame_Nr < Frames_in_event) {
+    int nr_of_dhh_start_frame = 0;
+    int nr_of_dhh_end_frame = 0;
+
+    if (dhh.get_type() == DHH_FRAME_HEADER_DATA_TYPE_EVT_FRM) {
+      nr_of_dhh_start_frame++;
+    }
+    if (dhh.get_type() == DHH_FRAME_HEADER_DATA_TYPE_END_FRM) {
+      nr_of_dhh_end_frame++;
+    }
+    if (Frame_Nr == Frames_in_event - 1 && nr_of_dhh_start_frame < nr_of_dhh_end_frame) {
+      B2ERROR("False order of dhh start and end frames in Event Nr" << evtnr);
+    }
+  }
+
   last_framenr = lfnr;
 
   last_wie += len;
@@ -1587,7 +1605,7 @@ void PXDUnpackerModule::unpack_frame(void* data, int len, bool pad, int& last_fr
   last_start = ls;
 }
 
-void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& last_wie, int& last_start, int& last_end, unsigned int& last_evtnr)
+void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& last_wie, int& last_start, int& last_end, unsigned int& last_evtnr, int Frame_Number, int Frames_in_event)
 {
   dhhc_frame_header_word0* hw;
   error_flag = false;
@@ -1656,7 +1674,7 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& la
         error_flag = true;
       }
       ls = 1;
-      last_wie = 0;
+
 
       if (!fake) {
         if ((evtnr & 0x7FFF) != ((last_evtnr + 1) & 0x7FFF)) {
@@ -1690,7 +1708,7 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& la
       ((dhhc_ghost_frame*)data)->print();
       dhhc.calc_crc();
       stat_ghost++;
-      last_wie -= 2;
+
       break;
     case DHHC_FRAME_HEADER_DATA_TYPE_DHHC_END: {
       bool fake = ((dhhc_end_frame*)data)->is_fake();
@@ -1707,23 +1725,24 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& la
         start_error++;
         error_flag = true;
       }
+
       if (!fake) {
-        /*int w;
-        w = ((dhhc_dhh_end_frame*)data)->get_words() * 2;
+        int w;
+        w = ((dhhc_end_frame*)data)->get_words() * 2;
         last_wie += 2;
         if (verbose) {
-           B2INFO(" last_wie " << last_wie << " w " << w);
+          B2INFO(" last_wie " << last_wie << " w " << w);
         };
         if (last_wie != w) {
-           if (verbose) {
-              B2INFO(" Error: WIE " << hex << last_wie << " vs END " << hex << w << " pad " << pad);
-           };
-           error_flag = true;
-           wie_error++;
+          if (verbose) {
+            B2INFO(" Error: WIE " << hex << last_wie << " vs END " << hex << w << " pad " << pad);
+          };
+          error_flag = true;
+          wie_error++;
         } else {
-           if (verbose)
-              B2INFO(" EVT END: WIE " << hex << last_wie << " == END " << hex << w << " pad " << pad);
-        }*/
+          if (verbose)
+            B2INFO(" EVT END: WIE " << hex << last_wie << " == END " << hex << w << " pad " << pad);
+        }
         dhhc.calc_crc();
       }
       break;
@@ -1758,6 +1777,41 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& la
     B2ERROR(" Error: Event Nr " << evtnr << " != " << last_evtnr);
     evtnr_error++;
     error_flag = true;
+  }
+  if (Frame_Number == 0 && dhhc.get_type() != DHHC_FRAME_HEADER_DATA_TYPE_DHHC_START) {
+    B2ERROR("First frame is not a DHHC start of subevent frame in Event Nr " << evtnr);
+  }
+  if (Frame_Number == Frames_in_event - 1 && dhhc.get_type() != DHHC_FRAME_HEADER_DATA_TYPE_DHHC_END) {
+    B2ERROR("Last frame is not a DHHC end of subevent frame in Event Nr " << evtnr);
+  }
+  if (Frame_Number != 0 && dhhc.get_type() == DHHC_FRAME_HEADER_DATA_TYPE_DHHC_START) {
+    B2ERROR("More than one DHHC start of subevent frame in frame in Event Nr " << evtnr)
+  }
+  if (Frame_Number != Frames_in_event - 1 && dhhc.get_type() == DHHC_FRAME_HEADER_DATA_TYPE_DHHC_END) {
+    B2ERROR("More than one DHHC end of subevent frame in frame in Event Nr " << evtnr)
+  }
+
+  if (Frame_Number == 1 && dhhc.get_type() != DHHC_FRAME_HEADER_DATA_TYPE_DHH_START) {
+    B2ERROR("Second frame is not a DHH start frame in Event Nr" << evtnr)
+  }
+  if (Frame_Number == Frames_in_event - 2 && dhhc.get_type() != DHHC_FRAME_HEADER_DATA_TYPE_DHH_END) {
+    B2ERROR("Last frame before DHHC end frame is not a DHH end frame in Event Nr " << evtnr)
+  }
+
+
+  if (Frame_Number > 1 || Frame_Number < Frames_in_event - 1) {
+    int nr_of_dhh_start_frame = 0;
+    int nr_of_dhh_end_frame = 0;
+//     B2ERROR("j " << j);
+    if (dhhc.get_type() == DHHC_FRAME_HEADER_DATA_TYPE_DHH_START) {
+      nr_of_dhh_start_frame++;
+    }
+    if (dhhc.get_type() == DHHC_FRAME_HEADER_DATA_TYPE_DHH_END) {
+      nr_of_dhh_end_frame++;
+    }
+    if (Frame_Number == Frames_in_event - 1 && nr_of_dhh_start_frame < nr_of_dhh_end_frame) {
+      B2ERROR("False order of dhh start and end frames in Event Nr" << evtnr);
+    }
   }
 
   last_wie += len;

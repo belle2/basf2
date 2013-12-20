@@ -63,13 +63,13 @@ namespace Belle2 {
        * @param data pointer to frame
        * @param len length of frame
        */
-      void unpack_frame(void* data, int len, bool pad, int& last_framenr, int& last_wie, int& last_start, int& last_end, unsigned int& last_evtnr);
+      void unpack_frame(void* data, int len, bool pad, int& last_framenr, int& last_wie, int& last_start, int& last_end, unsigned int& last_evtnr, int Frame_Nr, int Frames_in_event);
 
       /** Unpack one frame (within an event).
        * @param data pointer to frame
        * @param len length of frame
        */
-      void unpack_dhhc_frame(void* data, int len, bool pad, int& last_wie, int& last_start, int& last_end, unsigned int& last_evtnr);
+      void unpack_dhhc_frame(void* data, int len, bool pad, int& last_wie, int& last_start, int& last_end, unsigned int& last_evtnr, int Frame_Number, int Frames_in_event);
 
       /** Unpack DHP data within one DHH frame
        * @param data pointer to dhp data

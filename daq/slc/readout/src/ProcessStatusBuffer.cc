@@ -24,8 +24,9 @@ void ProcessStatusBuffer::setNode(const std::string& nodename,
 {
   _nodeid = nodeid;
   _nodename = nodename;
-  _buf_path = "/run_info_buf_" + _nodename;
-  _fifo_path = "/run_log_fifo_" + _nodename;
+  std::string username = getenv("USER");
+  _buf_path = "/run_info_buf_" + username + "_" + _nodename;
+  _fifo_path = "/run_log_fifo_" + username + "_" + _nodename;
 }
 
 bool ProcessStatusBuffer::create()

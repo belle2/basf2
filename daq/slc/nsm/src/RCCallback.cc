@@ -27,12 +27,13 @@ RCCallback::RCCallback(NSMNode* node) throw()
   add(Command::STATE);
   add(Command::STATECHECK);
   add(Command::TRIGFT);
-  node->setState(State::INITIAL_S);
+  if (node != NULL)
+    node->setState(State::INITIAL_S);
 }
 
 void RCCallback::download()
 {
-  if (_node->getData() != NULL) {
+  if (_node != NULL && _node->getData() != NULL) {
     TCPSocket socket;
     try {
       ConfigFile config;

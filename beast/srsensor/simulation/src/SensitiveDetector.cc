@@ -49,12 +49,12 @@ namespace Belle2 {
       const G4Track& track    = *step->GetTrack();
       const int trackID       = track.GetTrackID();
       const double depEnergy  = step->GetTotalEnergyDeposit() * Unit::MeV;
+      const G4ThreeVector G4tkPos = step->GetTrack()->GetPosition();
+      TVector3 tkPos(G4tkPos.x() * Unit::cm, G4tkPos.y() * Unit::cm, G4tkPos.z() * Unit::cm);
       const int detNb = step->GetTrack()->GetVolume()->GetCopyNo();
 
       //Ignore everything below 1eV
       if (depEnergy < Unit::eV) return false;
-
-
 
       //Get the datastore arrays
       StoreArray<MCParticle>  mcParticles;
@@ -65,6 +65,7 @@ namespace Belle2 {
       const int hitIndex = simHits.getEntries();
       new(simHits.nextFreeAddress()) SrsensorSimHit(
         depEnergy,
+        tkPos,
         detNb
       );
 

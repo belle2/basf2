@@ -32,7 +32,7 @@ namespace Belle2 {
 
     BgoModule::BgoModule() : Module(), m_intParameter(0), m_doubleParameter(0), m_stringParameter("")
     {
-      setDescription("Here you can enter a description of the module which can be displayed during runtime");
+      setDescription("Creates BGO crystals - sub-detector of BEASTII");
 
       //We can define parameters which can be set from the steering file. The arguments are:
       // name, reference to the veriable where the value will be stored, description, default value
@@ -45,6 +45,7 @@ namespace Belle2 {
                "Useless parameter of type string", string(""));
       addParam("doubleListParameter", m_doubleListParameter,
                "Useless parameter of type vector<double>", vector<double>(3, 0));
+
 
       //Valid parameter types are int, double, string, bool and vectors of any of those
     }

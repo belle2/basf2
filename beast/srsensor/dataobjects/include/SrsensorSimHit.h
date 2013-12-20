@@ -33,11 +33,13 @@ namespace Belle2 {
     /** Standard constructor
      * @param energyDep Deposited energy in electrons
      */
-    SrsensorSimHit(float energyDep, int detNb):
-      m_energyDep(energyDep), m_detNb(detNb) {}
+    SrsensorSimHit(float energyDep, TVector3 tkPos, int detNb):
+      m_energyDep(energyDep), m_tkPos(tkPos), m_detNb(detNb) {}
 
     /** Return the energy deposition in electrons */
     float getEnergyDep()      const { return m_energyDep; }
+    /** Return the track position */
+    TVector3 gettkPos()       const { return m_tkPos; }
     /** Return the detector number */
     int getdetNb()  const { return m_detNb; }
 
@@ -45,6 +47,8 @@ namespace Belle2 {
   private:
     /** Deposited energy in srsensor */
     float m_energyDep;
+    /** track position */
+    TVector3 m_tkPos;
     /** detector number */
     int m_detNb;
 

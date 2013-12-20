@@ -32,7 +32,7 @@ namespace Belle2 {
 
     CaveModule::CaveModule() : Module(), m_intParameter(0), m_doubleParameter(0), m_stringParameter("")
     {
-      setDescription("Here you can enter a description of the module which can be displayed during runtime");
+      setDescription("Creates the CAVE of phase 1 - BEASTII");
 
       //We can define parameters which can be set from the steering file. The arguments are:
       // name, reference to the veriable where the value will be stored, description, default value

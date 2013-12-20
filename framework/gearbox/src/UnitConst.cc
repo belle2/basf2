@@ -167,8 +167,7 @@ Const::EDetector Const::DetectorSet::getDetector(unsigned short bit) const
     case 0x0010: return TOP;
     case 0x0020: return ARICH;
     case 0x0040: return ECL;
-    case 0x0080: return BKLM;
-    case 0x0100: return EKLM;
+    case 0x0080: return KLM;
     default: return invalidDetector;
   }
 }
@@ -187,7 +186,7 @@ int Const::DetectorSet::getIndex(EDetector det) const
 Const::EDetector Const::DetectorSet::operator [](int index) const
 {
   if (index < 0) return Const::invalidDetector;
-  for (unsigned short setBit = 1; setBit < 0x200; setBit *= 2) {
+  for (unsigned short setBit = 1; setBit < 0x100; setBit *= 2) {
     if ((m_bits & setBit) != 0) --index;
     if (index < 0) return getDetector(setBit);
   }
@@ -197,7 +196,7 @@ Const::EDetector Const::DetectorSet::operator [](int index) const
 size_t Const::DetectorSet::size() const
 {
   int size = 0;
-  for (unsigned short setBit = 1; setBit < 0x200; setBit *= 2) {
+  for (unsigned short setBit = 1; setBit < 0x100; setBit *= 2) {
     if ((m_bits & setBit) != 0) ++size;
   }
   return size;
@@ -208,10 +207,10 @@ const Const::DetectorSet Const::VXDDetectors::c_set = Const::PXD + Const::SVD;
 
 const Const::DetectorSet Const::TrackingDetectors::c_set = Const::PXD + Const::SVD + Const::CDC;
 
-const Const::DetectorSet Const::PIDDetectors::c_set = Const::SVD + Const::CDC + Const::TOP + Const::ARICH;
+const Const::DetectorSet Const::PIDDetectors::c_set = Const::SVD + Const::CDC + Const::TOP + Const::ARICH + Const::ECL + Const::KLM;
 
 const Const::DetectorSet Const::allDetectors = Const::IR + Const::PXD + Const::SVD + Const::CDC +
-                                               Const::TOP + Const::ARICH + Const::ECL + Const::BKLM + Const::EKLM;
+                                               Const::TOP + Const::ARICH + Const::ECL + Const::KLM;
 
 
 bool Const::ParticleType::operator < (const Const::ParticleType& other) const

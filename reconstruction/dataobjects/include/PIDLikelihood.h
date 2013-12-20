@@ -76,7 +76,7 @@ namespace Belle2 {
 
   private:
 
-    enum {c_PIDDetectorSetSize = 4}; /**< temporary solution for the size */
+    enum {c_PIDDetectorSetSize = 6}; /**< temporary solution for the size */
 
     Const::DetectorSet m_detectors;   /**< set of detectors with PID information */
     float m_logl[c_PIDDetectorSetSize][Const::ChargedStable::c_SetSize]; /**< log likelihoods, FIXME: replace hard coded value */

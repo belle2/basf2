@@ -35,7 +35,7 @@ namespace Belle2 {
     /**
      * The enum for identifying the detector components.
      */
-    enum EDetector {IR, PXD, SVD, CDC, TOP, ARICH, ECL, BKLM, EKLM, invalidDetector};
+    enum EDetector {IR, PXD, SVD, CDC, TOP, ARICH, ECL, KLM, invalidDetector};
 
     /**
      * The DetectorSet class for sets of detector IDs.
@@ -180,6 +180,7 @@ namespace Belle2 {
        * @return  The set of valid detector IDs.
        */
       static DetectorSet set() {return ASetType::set();}
+
     private:
 
       /**

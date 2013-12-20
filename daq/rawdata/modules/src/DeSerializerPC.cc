@@ -11,13 +11,8 @@
 #include <daq/dataobjects/SendTrailer.h>
 
 #include <sys/mman.h>
-
 //#define MAXEVTSIZE 400000000
 #define CHECKEVT 5000
-
-#define NOT_USE_SOCKETLIB
-//#define CHECK_SUM
-
 
 //#define DEBUG
 //#define NO_DATA_CHECK

@@ -77,6 +77,63 @@ namespace Belle2 {
 
     ClassDef(RawTrailer, 1);
   };
+
+
+  inline void RawTrailer::CheckBuffer()
+  {
+    if (m_buffer == NULL) {
+      perror("m_buffer is NULL. Exiting...");
+      exit(1);
+    }
+  }
+
+  inline int* RawTrailer::GetBuffer()
+  {
+    return m_buffer;
+  }
+
+  inline void RawTrailer::SetBuffer(int* bufin)
+  {
+    m_buffer = bufin;
+  }
+
+  inline void RawTrailer::Initialize()
+  {
+    SetMagicWord();
+  }
+
+  inline void RawTrailer::SetChksum(int chksum)
+  {
+    CheckBuffer();
+    m_buffer[ POS_CHKSUM ] = chksum;
+  }
+
+  inline void RawTrailer::SetMagicWord()
+  {
+    CheckBuffer();
+    m_buffer[ POS_TERM_WORD ] = MAGIC_WORD_TERM_TRAILER;
+  }
+
+  inline int RawTrailer::GetMagicWord()
+  {
+    CheckBuffer();
+    return m_buffer[ POS_TERM_WORD ];
+  }
+
+  inline unsigned int RawTrailer::GetChksum()
+  {
+    CheckBuffer();
+    return (unsigned int)(m_buffer[ POS_CHKSUM ]);
+  }
+
+  inline int RawTrailer::GetTrlNwords()
+  {
+    return RAWTRAILER_NWORDS;
+  }
+
+
+
+
 }
 
 #endif

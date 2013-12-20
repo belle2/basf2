@@ -25,24 +25,6 @@ RawCOPPER::~RawCOPPER()
 }
 
 
-int* RawCOPPER::GetRawHdrBufPtr(int n)
-{
-  int pos_nwords = GetBufferPos(n);
-  return &(m_buffer[ pos_nwords ]);
-}
-
-int* RawCOPPER::GetRawTrlBufPtr(int n)
-{
-  int pos_nwords;
-  RawTrailer trl;
-
-  if (n == (m_num_events * m_num_nodes) - 1) {
-    pos_nwords = m_nwords - trl.GetTrlNwords();
-  } else {
-    pos_nwords = GetBufferPos(n + 1) - trl.GetTrlNwords();
-  }
-  return &(m_buffer[ pos_nwords ]);
-}
 
 
 int RawCOPPER::GetBufferPos(int n)
@@ -97,72 +79,65 @@ unsigned int RawCOPPER::CalcDriverChkSum(int n)
 }
 
 
-unsigned int RawCOPPER::GetDriverChkSum(int n)
-{
-  int pos_nwords = GetBufferPos(n) + GetBlockNwords(n)
-                   - RawTrailer::RAWTRAILER_NWORDS - SIZE_COPPER_DRIVER_TRAILER;
-  return m_buffer[ pos_nwords ];
-}
-
-int RawCOPPER::GetCOPPERNodeId(int n)
-{
-  RawHeader hdr;
-  int pos_nwords = GetBufferPos(n) + hdr.POS_SUBSYS_ID;
-  return m_buffer[ pos_nwords ];
-}
+// int RawCOPPER::GetCOPPERNodeId(int n)
+// {
+//   RawHeader hdr;
+//   int pos_nwords = GetBufferPos(n) + hdr.POS_SUBSYS_ID;
+//   return m_buffer[ pos_nwords ];
+// }
 
 
-int RawCOPPER::GetExpNo(int n)
-{
-  RawHeader hdr;
-  hdr.SetBuffer(GetBuffer(n));
-  return hdr.GetExpNo();
-}
+// int RawCOPPER::GetExpNo(int n)
+// {
+//   RawHeader hdr;
+//   hdr.SetBuffer(GetBuffer(n));
+//   return hdr.GetExpNo();
+// }
 
-int RawCOPPER::GetRunNo(int n)
-{
-  RawHeader hdr;
-  hdr.SetBuffer(GetBuffer(n));
-  return hdr.GetRunNo();
-}
+// int RawCOPPER::GetRunNo(int n)
+// {
+//   RawHeader hdr;
+//   hdr.SetBuffer(GetBuffer(n));
+//   return hdr.GetRunNo();
+// }
 
-unsigned int RawCOPPER::GetEveNo(int n)
-{
-  RawHeader hdr;
-  hdr.SetBuffer(GetBuffer(n));
-  return hdr.GetEveNo();
-}
-
-
-int RawCOPPER::GetSubsysId(int n)
-{
-  RawHeader hdr;
-  hdr.SetBuffer(GetBuffer(n));
-  return hdr.GetSubsysId();
-}
+// unsigned int RawCOPPER::GetEveNo(int n)
+// {
+//   RawHeader hdr;
+//   hdr.SetBuffer(GetBuffer(n));
+//   return hdr.GetEveNo();
+// }
 
 
-int RawCOPPER::GetDataType(int n)
-{
-  RawHeader hdr;
-  hdr.SetBuffer(GetBuffer(n));
-  return hdr.GetDataType();
-}
-
-int RawCOPPER::GetTruncMask(int n)
-{
-  RawHeader hdr;
-  hdr.SetBuffer(GetBuffer(n));
-  return hdr.GetTruncMask();
-}
+// int RawCOPPER::GetSubsysId(int n)
+// {
+//   RawHeader hdr;
+//   hdr.SetBuffer(GetBuffer(n));
+//   return hdr.GetSubsysId();
+// }
 
 
-unsigned int RawCOPPER::GetCOPPERCounter(int n)
-{
-  RawHeader hdr;
-  int pos_nwords = GetBufferPos(n) + POS_EVE_NUM_COPPER + hdr.RAWHEADER_NWORDS;
-  return (unsigned int)(m_buffer[ pos_nwords ]);
-}
+// int RawCOPPER::GetDataType(int n)
+// {
+//   RawHeader hdr;
+//   hdr.SetBuffer(GetBuffer(n));
+//   return hdr.GetDataType();
+// }
+
+// int RawCOPPER::GetTruncMask(int n)
+// {
+//   RawHeader hdr;
+//   hdr.SetBuffer(GetBuffer(n));
+//   return hdr.GetTruncMask();
+// }
+
+
+// unsigned int RawCOPPER::GetCOPPERCounter(int n)
+// {
+//   RawHeader hdr;
+//   int pos_nwords = GetBufferPos(n) + POS_EVE_NUM_COPPER + hdr.RAWHEADER_NWORDS;
+//   return (unsigned int)(m_buffer[ pos_nwords ]);
+// }
 
 
 int RawCOPPER::GetNumFINESSEBlock(int n)
@@ -208,57 +183,57 @@ int RawCOPPER::GetDetectorNwords(int n, int finesse_num)
   return 0;
 }
 
-int RawCOPPER::Get1stDetectorNwords(int n)
-{
-#ifdef USE_B2LFEE_FORMAT_BOTH_VER1_AND_2
-  CheckB2LFEEHeaderVersion(n);
-#endif
-  int nwords = 0;
-  if (Get1stFINESSENwords(n) > 0) {
-    nwords = Get1stFINESSENwords(n) -  SIZE_B2LHSLB_HEADER - SIZE_B2LFEE_HEADER
-             - SIZE_B2LFEE_TRAILER - SIZE_B2LHSLB_TRAILER;
-  }
-  return nwords;
-}
+// int RawCOPPER::Get1stDetectorNwords(int n)
+// {
+// #ifdef USE_B2LFEE_FORMAT_BOTH_VER1_AND_2
+//   CheckB2LFEEHeaderVersion(n);
+// #endif
+//   int nwords = 0;
+//   if (Get1stFINESSENwords(n) > 0) {
+//     nwords = Get1stFINESSENwords(n) -  SIZE_B2LHSLB_HEADER - SIZE_B2LFEE_HEADER
+//              - SIZE_B2LFEE_TRAILER - SIZE_B2LHSLB_TRAILER;
+//   }
+//   return nwords;
+// }
 
-int RawCOPPER::Get2ndDetectorNwords(int n)
-{
-#ifdef USE_B2LFEE_FORMAT_BOTH_VER1_AND_2
-  CheckB2LFEEHeaderVersion(n);
-#endif
-  int nwords = 0;
-  if (Get2ndFINESSENwords(n) > 0) {
-    nwords = Get2ndFINESSENwords(n) -  SIZE_B2LHSLB_HEADER -
-             SIZE_B2LFEE_HEADER - SIZE_B2LFEE_TRAILER - SIZE_B2LHSLB_TRAILER;
-  }
-  return nwords;
-}
+// int RawCOPPER::Get2ndDetectorNwords(int n)
+// {
+// #ifdef USE_B2LFEE_FORMAT_BOTH_VER1_AND_2
+//   CheckB2LFEEHeaderVersion(n);
+// #endif
+//   int nwords = 0;
+//   if (Get2ndFINESSENwords(n) > 0) {
+//     nwords = Get2ndFINESSENwords(n) -  SIZE_B2LHSLB_HEADER -
+//              SIZE_B2LFEE_HEADER - SIZE_B2LFEE_TRAILER - SIZE_B2LHSLB_TRAILER;
+//   }
+//   return nwords;
+// }
 
-int RawCOPPER::Get3rdDetectorNwords(int n)
-{
-#ifdef USE_B2LFEE_FORMAT_BOTH_VER1_AND_2
-  CheckB2LFEEHeaderVersion(n);
-#endif
-  int nwords = 0;
-  if (Get3rdFINESSENwords(n) > 0) {
-    nwords = Get3rdFINESSENwords(n) -  SIZE_B2LHSLB_HEADER -
-             SIZE_B2LFEE_HEADER - SIZE_B2LFEE_TRAILER - SIZE_B2LHSLB_TRAILER;
-  }
-  return nwords;
-}
+// int RawCOPPER::Get3rdDetectorNwords(int n)
+// {
+// #ifdef USE_B2LFEE_FORMAT_BOTH_VER1_AND_2
+//   CheckB2LFEEHeaderVersion(n);
+// #endif
+//   int nwords = 0;
+//   if (Get3rdFINESSENwords(n) > 0) {
+//     nwords = Get3rdFINESSENwords(n) -  SIZE_B2LHSLB_HEADER -
+//              SIZE_B2LFEE_HEADER - SIZE_B2LFEE_TRAILER - SIZE_B2LHSLB_TRAILER;
+//   }
+//   return nwords;
+// }
 
-int RawCOPPER::Get4thDetectorNwords(int n)
-{
-#ifdef USE_B2LFEE_FORMAT_BOTH_VER1_AND_2
-  CheckB2LFEEHeaderVersion(n);
-#endif
-  int nwords = 0;
-  if (Get4thFINESSENwords(n) > 0) {
-    nwords = Get4thFINESSENwords(n) -  SIZE_B2LHSLB_HEADER -
-             SIZE_B2LFEE_HEADER - SIZE_B2LFEE_TRAILER - SIZE_B2LHSLB_TRAILER;
-  }
-  return nwords;
-}
+// int RawCOPPER::Get4thDetectorNwords(int n)
+// {
+// #ifdef USE_B2LFEE_FORMAT_BOTH_VER1_AND_2
+//   CheckB2LFEEHeaderVersion(n);
+// #endif
+//   int nwords = 0;
+//   if (Get4thFINESSENwords(n) > 0) {
+//     nwords = Get4thFINESSENwords(n) -  SIZE_B2LHSLB_HEADER -
+//              SIZE_B2LFEE_HEADER - SIZE_B2LFEE_TRAILER - SIZE_B2LHSLB_TRAILER;
+//   }
+//   return nwords;
+// }
 
 
 int RawCOPPER::GetFINESSENwords(int n, int finesse_num)
@@ -290,33 +265,33 @@ int RawCOPPER::GetFINESSENwords(int n, int finesse_num)
 }
 
 
-int RawCOPPER::Get1stFINESSENwords(int n)
-{
-  RawHeader hdr;
-  int pos_nwords = GetBufferPos(n) + hdr.RAWHEADER_NWORDS + POS_CH_A_DATA_LENGTH;
-  return m_buffer[ pos_nwords ];
-}
+// int RawCOPPER::Get1stFINESSENwords(int n)
+// {
+//   RawHeader hdr;
+//   int pos_nwords = GetBufferPos(n) + hdr.RAWHEADER_NWORDS + POS_CH_A_DATA_LENGTH;
+//   return m_buffer[ pos_nwords ];
+// }
 
-int RawCOPPER::Get2ndFINESSENwords(int n)
-{
-  RawHeader hdr;
-  int pos_nwords = GetBufferPos(n) + hdr.RAWHEADER_NWORDS + POS_CH_B_DATA_LENGTH;
-  return m_buffer[ pos_nwords ];
-}
+// int RawCOPPER::Get2ndFINESSENwords(int n)
+// {
+//   RawHeader hdr;
+//   int pos_nwords = GetBufferPos(n) + hdr.RAWHEADER_NWORDS + POS_CH_B_DATA_LENGTH;
+//   return m_buffer[ pos_nwords ];
+// }
 
-int RawCOPPER::Get3rdFINESSENwords(int n)
-{
-  RawHeader hdr;
-  int pos_nwords = GetBufferPos(n) + hdr.RAWHEADER_NWORDS + POS_CH_C_DATA_LENGTH;
-  return m_buffer[ pos_nwords ];
-}
+// int RawCOPPER::Get3rdFINESSENwords(int n)
+// {
+//   RawHeader hdr;
+//   int pos_nwords = GetBufferPos(n) + hdr.RAWHEADER_NWORDS + POS_CH_C_DATA_LENGTH;
+//   return m_buffer[ pos_nwords ];
+// }
 
-int RawCOPPER::Get4thFINESSENwords(int n)
-{
-  RawHeader hdr;
-  int pos_nwords = GetBufferPos(n) + hdr.RAWHEADER_NWORDS + POS_CH_D_DATA_LENGTH;
-  return m_buffer[ pos_nwords ];
-}
+// int RawCOPPER::Get4thFINESSENwords(int n)
+// {
+//   RawHeader hdr;
+//   int pos_nwords = GetBufferPos(n) + hdr.RAWHEADER_NWORDS + POS_CH_D_DATA_LENGTH;
+//   return m_buffer[ pos_nwords ];
+// }
 
 
 
@@ -350,27 +325,27 @@ int RawCOPPER::GetOffsetFINESSE(int n, int finesse_num)
 
 
 
-int RawCOPPER::GetOffset1stFINESSE(int n)
-{
-  RawHeader hdr;
-  int pos_nwords = GetBufferPos(n) + hdr.RAWHEADER_NWORDS + SIZE_COPPER_HEADER;
-  return pos_nwords;
-}
+// int RawCOPPER::GetOffset1stFINESSE(int n)
+// {
+//   RawHeader hdr;
+//   int pos_nwords = GetBufferPos(n) + hdr.RAWHEADER_NWORDS + SIZE_COPPER_HEADER;
+//   return pos_nwords;
+// }
 
-int RawCOPPER::GetOffset2ndFINESSE(int n)
-{
-  return GetOffset1stFINESSE(n) + Get1stFINESSENwords(n);
-}
+// int RawCOPPER::GetOffset2ndFINESSE(int n)
+// {
+//   return GetOffset1stFINESSE(n) + Get1stFINESSENwords(n);
+// }
 
-int RawCOPPER::GetOffset3rdFINESSE(int n)
-{
-  return GetOffset2ndFINESSE(n) + Get2ndFINESSENwords(n);
-}
+// int RawCOPPER::GetOffset3rdFINESSE(int n)
+// {
+//   return GetOffset2ndFINESSE(n) + Get2ndFINESSENwords(n);
+// }
 
-int RawCOPPER::GetOffset4thFINESSE(int n)
-{
-  return GetOffset3rdFINESSE(n) + Get3rdFINESSENwords(n);
-}
+// int RawCOPPER::GetOffset4thFINESSE(int n)
+// {
+//   return GetOffset3rdFINESSE(n) + Get3rdFINESSENwords(n);
+// }
 
 
 
@@ -402,45 +377,45 @@ int* RawCOPPER::GetFINESSEBuffer(int n, int finesse_num)
   return 0;
 }
 
-int* RawCOPPER::Get1stFINESSEBuffer(int n)
-{
-  int pos_nwords = GetOffset1stFINESSE(n);
-  if (pos_nwords >= m_nwords) {
-    printf("Data size is smaller than data position info. Exting...\n");
-    exit(1);
-  }
-  return &(m_buffer[ pos_nwords]);
-}
+// int* RawCOPPER::Get1stFINESSEBuffer(int n)
+// {
+//   int pos_nwords = GetOffset1stFINESSE(n);
+//   if (pos_nwords >= m_nwords) {
+//     printf("Data size is smaller than data position info. Exting...\n");
+//     exit(1);
+//   }
+//   return &(m_buffer[ pos_nwords]);
+// }
 
-int* RawCOPPER::Get2ndFINESSEBuffer(int n)
-{
-  int pos_nwords = GetOffset2ndFINESSE(n);
-  if (pos_nwords >= m_nwords) {
-    printf("Data size is smaller than data position info. Exting...\n");
-    exit(1);
-  }
-  return &(m_buffer[ pos_nwords]);
-}
+// int* RawCOPPER::Get2ndFINESSEBuffer(int n)
+// {
+//   int pos_nwords = GetOffset2ndFINESSE(n);
+//   if (pos_nwords >= m_nwords) {
+//     printf("Data size is smaller than data position info. Exting...\n");
+//     exit(1);
+//   }
+//   return &(m_buffer[ pos_nwords]);
+// }
 
-int* RawCOPPER::Get3rdFINESSEBuffer(int n)
-{
-  int pos_nwords = GetOffset3rdFINESSE(n);
-  if (pos_nwords >= m_nwords) {
-    printf("Data size is smaller than data position info. Exting...\n");
-    exit(1);
-  }
-  return &(m_buffer[ pos_nwords]);
-}
+// int* RawCOPPER::Get3rdFINESSEBuffer(int n)
+// {
+//   int pos_nwords = GetOffset3rdFINESSE(n);
+//   if (pos_nwords >= m_nwords) {
+//     printf("Data size is smaller than data position info. Exting...\n");
+//     exit(1);
+//   }
+//   return &(m_buffer[ pos_nwords]);
+// }
 
-int* RawCOPPER::Get4thFINESSEBuffer(int n)
-{
-  int pos_nwords = GetOffset4thFINESSE(n);
-  if (pos_nwords >= m_nwords) {
-    printf("Data size is smaller than data position info. Exting...\n");
-    exit(1);
-  }
-  return &(m_buffer[ pos_nwords]);
-}
+// int* RawCOPPER::Get4thFINESSEBuffer(int n)
+// {
+//   int pos_nwords = GetOffset4thFINESSE(n);
+//   if (pos_nwords >= m_nwords) {
+//     printf("Data size is smaller than data position info. Exting...\n");
+//     exit(1);
+//   }
+//   return &(m_buffer[ pos_nwords]);
+// }
 
 
 
@@ -474,62 +449,62 @@ int* RawCOPPER::GetDetectorBuffer(int n, int finesse_num)
 }
 
 
-int* RawCOPPER::Get1stDetectorBuffer(int n)
-{
-#ifdef USE_B2LFEE_FORMAT_BOTH_VER1_AND_2
-  CheckB2LFEEHeaderVersion(n);
-#endif
-  if (Get1stFINESSENwords(n) > 0) {
-    int pos_nwords = GetOffset1stFINESSE(n) + SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER;
-    return &(m_buffer[ pos_nwords ]);
-  }
-  return NULL;
-}
+// int* RawCOPPER::Get1stDetectorBuffer(int n)
+// {
+// #ifdef USE_B2LFEE_FORMAT_BOTH_VER1_AND_2
+//   CheckB2LFEEHeaderVersion(n);
+// #endif
+//   if (Get1stFINESSENwords(n) > 0) {
+//     int pos_nwords = GetOffset1stFINESSE(n) + SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER;
+//     return &(m_buffer[ pos_nwords ]);
+//   }
+//   return NULL;
+// }
 
-int* RawCOPPER::Get2ndDetectorBuffer(int n)
-{
-#ifdef USE_B2LFEE_FORMAT_BOTH_VER1_AND_2
-  CheckB2LFEEHeaderVersion(n);
-#endif
-  if (Get2ndFINESSENwords(n) > 0) {
-    int pos_nwords = GetOffset2ndFINESSE(n) + SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER;
-    return &(m_buffer[ pos_nwords ]);
-  }
-  return NULL;
-}
+// int* RawCOPPER::Get2ndDetectorBuffer(int n)
+// {
+// #ifdef USE_B2LFEE_FORMAT_BOTH_VER1_AND_2
+//   CheckB2LFEEHeaderVersion(n);
+// #endif
+//   if (Get2ndFINESSENwords(n) > 0) {
+//     int pos_nwords = GetOffset2ndFINESSE(n) + SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER;
+//     return &(m_buffer[ pos_nwords ]);
+//   }
+//   return NULL;
+// }
 
-int* RawCOPPER::Get3rdDetectorBuffer(int n)
-{
-#ifdef USE_B2LFEE_FORMAT_BOTH_VER1_AND_2
-  CheckB2LFEEHeaderVersion(n);
-#endif
-  if (Get3rdFINESSENwords(n) > 0) {
-    int pos_nwords = GetOffset3rdFINESSE(n) + SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER;
-    return &(m_buffer[ pos_nwords ]);
-  }
-  return NULL;
-}
+// int* RawCOPPER::Get3rdDetectorBuffer(int n)
+// {
+// #ifdef USE_B2LFEE_FORMAT_BOTH_VER1_AND_2
+//   CheckB2LFEEHeaderVersion(n);
+// #endif
+//   if (Get3rdFINESSENwords(n) > 0) {
+//     int pos_nwords = GetOffset3rdFINESSE(n) + SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER;
+//     return &(m_buffer[ pos_nwords ]);
+//   }
+//   return NULL;
+// }
 
-int* RawCOPPER::Get4thDetectorBuffer(int n)
-{
-#ifdef USE_B2LFEE_FORMAT_BOTH_VER1_AND_2
-  CheckB2LFEEHeaderVersion(n);
-#endif
-  if (Get4thFINESSENwords(n) > 0) {
-    int pos_nwords = GetOffset4thFINESSE(n) + SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER;
-    return &(m_buffer[ pos_nwords ]);
-  }
-  return NULL;
-}
+// int* RawCOPPER::Get4thDetectorBuffer(int n)
+// {
+// #ifdef USE_B2LFEE_FORMAT_BOTH_VER1_AND_2
+//   CheckB2LFEEHeaderVersion(n);
+// #endif
+//   if (Get4thFINESSENwords(n) > 0) {
+//     int pos_nwords = GetOffset4thFINESSE(n) + SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER;
+//     return &(m_buffer[ pos_nwords ]);
+//   }
+//   return NULL;
+// }
 
-int* RawCOPPER::GetExpRunBuf(int n)
-{
-#ifdef USE_B2LFEE_FORMAT_BOTH_VER1_AND_2
-  CheckB2LFEEHeaderVersion(n);
-#endif
-  int pos_nwords = GetOffset1stFINESSE(n) + SIZE_B2LHSLB_HEADER + POS_EXP_RUN;
-  return &(m_buffer[ pos_nwords ]);
-}
+// int* RawCOPPER::GetExpRunBuf(int n)
+// {
+// #ifdef USE_B2LFEE_FORMAT_BOTH_VER1_AND_2
+//   CheckB2LFEEHeaderVersion(n);
+// #endif
+//   int pos_nwords = GetOffset1stFINESSE(n) + SIZE_B2LHSLB_HEADER + POS_EXP_RUN;
+//   return &(m_buffer[ pos_nwords ]);
+// }
 
 
 unsigned int RawCOPPER::GetB2LFEE32bitEventNumber(int n)
@@ -587,33 +562,33 @@ unsigned int RawCOPPER::GetB2LFEE32bitEventNumber(int n)
 
 
 
-unsigned int RawCOPPER::GetMagicDriverHeader(int n)
-{
-  RawHeader hdr;
-  int pos_nwords = GetBufferPos(n) + hdr.RAWHEADER_NWORDS + POS_MAGIC_COPPER_1;
-  return (unsigned int)(m_buffer[ pos_nwords ]);
-}
+// unsigned int RawCOPPER::GetMagicDriverHeader(int n)
+// {
+//   RawHeader hdr;
+//   int pos_nwords = GetBufferPos(n) + hdr.RAWHEADER_NWORDS + POS_MAGIC_COPPER_1;
+//   return (unsigned int)(m_buffer[ pos_nwords ]);
+// }
 
-unsigned int RawCOPPER::GetMagicFPGAHeader(int n)
-{
-  RawHeader hdr;
-  int pos_nwords = GetBufferPos(n) + hdr.RAWHEADER_NWORDS + POS_MAGIC_COPPER_2;
-  return (unsigned int)(m_buffer[ pos_nwords ]);
-}
+// unsigned int RawCOPPER::GetMagicFPGAHeader(int n)
+// {
+//   RawHeader hdr;
+//   int pos_nwords = GetBufferPos(n) + hdr.RAWHEADER_NWORDS + POS_MAGIC_COPPER_2;
+//   return (unsigned int)(m_buffer[ pos_nwords ]);
+// }
 
-unsigned int RawCOPPER::GetMagicFPGATrailer(int n)
-{
-  RawTrailer trl;
-  int pos_nwords = GetBufferPos(n) + GetBlockNwords(n) - trl.GetTrlNwords() - 3;
-  return (unsigned int)(m_buffer[ pos_nwords ]);
-}
+// unsigned int RawCOPPER::GetMagicFPGATrailer(int n)
+// {
+//   RawTrailer trl;
+//   int pos_nwords = GetBufferPos(n) + GetBlockNwords(n) - trl.GetTrlNwords() - 3;
+//   return (unsigned int)(m_buffer[ pos_nwords ]);
+// }
 
-unsigned int RawCOPPER::GetMagicDriverTrailer(int n)
-{
-  RawTrailer trl;
-  int pos_nwords = GetBufferPos(n) + GetBlockNwords(n) - trl.GetTrlNwords() - 1;
-  return (unsigned int)(m_buffer[ pos_nwords ]);
-}
+// unsigned int RawCOPPER::GetMagicDriverTrailer(int n)
+// {
+//   RawTrailer trl;
+//   int pos_nwords = GetBufferPos(n) + GetBlockNwords(n) - trl.GetTrlNwords() - 1;
+//   return (unsigned int)(m_buffer[ pos_nwords ]);
+// }
 
 unsigned int  RawCOPPER::CalcXORChecksum(int* buf, int nwords)
 {
@@ -910,7 +885,6 @@ unsigned int RawCOPPER::FillTopBlockRawHeader(unsigned int m_node_id, unsigned i
   // Check FINESSEs which containes data
   //
   int* copper_buf = &(m_buffer[ RawHeader::RAWHEADER_NWORDS ]);
-
   if (copper_buf[ POS_CH_A_DATA_LENGTH ] == 0 &&
       copper_buf[ POS_CH_B_DATA_LENGTH ] == 0 &&
       copper_buf[ POS_CH_C_DATA_LENGTH ] == 0 &&
@@ -1184,3 +1158,5 @@ void RawCOPPER::CheckB2LFEEHeaderVersion(int n)
   return;
 }
 #endif
+
+

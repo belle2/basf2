@@ -13,7 +13,7 @@
 //#define DUMMY
 //#define MAXEVTSIZE 400000000
 //#define TIME_MONITOR
-#define NO_DATA_CHECK
+//#define NO_DATA_CHECK
 #define WO_FIRST_EVENUM_CHECK
 
 
@@ -160,6 +160,7 @@ void DeSerializerCOPPERModule::fillNewRawCOPPERHeader(RawCOPPER* raw_copper)
   // 1, Set total words info
   int nwords = raw_copper->GetBlockNwords(cprblock);
   rawhdr.SetNwords(nwords);
+
 
 
   // 2, Set run and exp #
@@ -318,6 +319,7 @@ int* DeSerializerCOPPERModule::readOneEventFromCOPPERFIFO(const int entry, int* 
     if (*m_size_word >  BUF_SIZE_WORD) {
       *malloc_flag = 1;
       temp_buf = new int[ *m_size_word ];
+
       memcpy(temp_buf, m_bufary[ entry ], recvd_byte);
       recvd_byte += readFD(cpr_fd, (char*)temp_buf + recvd_byte,
                            (*m_size_word - RawTrailer::RAWTRAILER_NWORDS) * sizeof(int) - recvd_byte);
@@ -393,7 +395,7 @@ void DeSerializerCOPPERModule::openCOPPER()
     exit(1);
   }
 
-  int set_regval = 4; // How many events to be stored in COPPER FIFO before request for DMA
+  int set_regval = 100; // How many events to be stored in COPPER FIFO before request for DMA
   //    int set_regval=1;
   ioctl(cpr_fd, CPRIOSET_LEF_WA_FF, &set_regval);
   ioctl(cpr_fd, CPRIOSET_LEF_WB_FF, &set_regval);
@@ -478,7 +480,7 @@ void DeSerializerCOPPERModule::event()
 
     // Fill header and trailer
     m_prev_ftsweve32 = temp_rawcopper.FillTopBlockRawHeader(m_nodeid, m_data_type, m_trunc_mask, m_prev_ftsweve32);
-
+    //    fillNewRawCOPPERHeader( &temp_rawcopper );
     if (dump_fname.size() > 0) {
       dumpData((char*)temp_buf, m_size_word * sizeof(int));
     }

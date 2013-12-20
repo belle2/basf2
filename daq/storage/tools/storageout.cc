@@ -27,10 +27,6 @@ int main(int argc, char** argv)
     printf("rawfile2rb : rbufname hostname port [nodename, nodeid]\n");
     return 1;
   }
-  const std::string host = argv[2];
-  TCPServerSocket server_socket;
-  server_socket.open(host, atoi(argv[3]));
-
   ProcessStatusBuffer sbuf;
   bool use_buf = (argc > 5);
   if (use_buf) sbuf.open(argv[4], atoi(argv[5]));

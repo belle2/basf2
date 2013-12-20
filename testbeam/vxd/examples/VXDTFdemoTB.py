@@ -152,7 +152,7 @@ analyzer.logging.debug_level = 1
 param_analyzer = {'printExtentialAnalysisData': False, 'caTCname': 'caTracks'}
 analyzer.param(param_analyzer)
 
-mctrackfinder = register_module('MCTrackFinder')
+mctrackfinder = register_module('TrackFinderMCTruth')
 mctrackfinder.logging.log_level = LogLevel.INFO
 param_mctrackfinder = {
     'UseCDCHits': 0,

@@ -31,24 +31,28 @@
       
         <Volume name="wienSensor1">
           <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='wienSensor']/*)" />
-          <DX unit="cm">0</DX>
+          <DX unit="cm">250</DX>
         </Volume>
         <Volume name="wienSensor2">
           <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='wienSensor']/*)" />
-          <DX unit="cm">2</DX>
+          <DX unit="cm">252</DX>
         </Volume>
         <Volume name="wienSensor3">
           <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='wienSensor']/*)" />
-          <DX unit="cm">4</DX>
+          <DX unit="cm">254</DX>
         </Volume>
         <Volume name="wienSensor4">
           <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='wienSensor']/*)" />          
-          <DX unit="cm">6</DX>
+          <DX unit="cm">256</DX>
         </Volume>
         <Volume name="wienSensor5">
-          <DX unit="cm">8</DX>
+          <DX unit="cm">258</DX>
           <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='wienSensor']/*)" />
-        </Volume>        
+        </Volume>  
+        <Volume name="wienSensor6">
+          <DX unit="cm">260</DX>
+          <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='wienSensor']/*)" />
+        </Volume>          
 
         <Volume name="BeamScanningSensor">
           <DX unit="cm">-750</DX>
@@ -56,7 +60,11 @@
           <Phi unit="deg">-90</Phi>
           <Psi unit="deg">90</Psi>
           <AlignComponent>7.2.1</AlignComponent>
-          <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='EUDET-SensitiveArea']/*)" />
+          <Material>Si</Material>
+          <Shape>Box</Shape>
+          <HalfX unit="mm">12</HalfX>
+          <HalfY unit="mm">12</HalfY>
+          <HalfZ unit="um">25</HalfZ>
           <Active>
             <SensorID>1</SensorID>
             <Ladder>2</Ladder>

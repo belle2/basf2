@@ -2,10 +2,10 @@
 # -*- coding: utf-8 -*-
 
 # Common PXD&SVD TestBeam Jan 2014 @ DESY Simulation
-# This is the default simulation scenario for VXD beam test without telescopes
+# This is the default simulation scenario for VXD beam test WITH telescopes
 
 # Important parameters of the simulation:
-events = 200  # Number of events to simulate
+events = 10000  # Number of events to simulate
 momentum = 6.0  # GeV/c
 momentum_spread = 0.05  # %
 theta = 90.0  # degrees
@@ -23,7 +23,7 @@ set_log_level(LogLevel.ERROR)
 # ParticleGun
 particlegun = register_module('ParticleGun')
 # number of primaries per event
-particlegun.param('nTracks', 10)
+particlegun.param('nTracks', 1)
 # DESY electrons:
 particlegun.param('pdgCodes', [11])
 # momentum magnitude 2 GeV/c or something above or around.
@@ -31,8 +31,6 @@ particlegun.param('pdgCodes', [11])
 # Beam divergence divergence and spot size is adjusted similar to reality
 # See studies of Benjamin Schwenker
 particlegun.param('momentumGeneration', 'normal')
-momentum = 6.0  # GeV/c
-momentum_spread = 0.05  # %
 particlegun.param('momentumParams', [momentum, momentum * momentum_spread])
 # momentum direction must be around theta=90, phi=180
 particlegun.param('thetaGeneration', 'normal')
@@ -44,9 +42,9 @@ particlegun.param('phiParams', [phi, phi_spread])
 # Plastic 1cm shielding is at 650mm
 # Aluminium target at 750mm to "simulate" 15m air between collimator and TB setup
 particlegun.param('vertexGeneration', 'normal')
-particlegun.param('xVertexParams', [gun_x_position, 0.0])
-particlegun.param('yVertexParams', [0.0, beamspot_size_y])
-particlegun.param('zVertexParams', [0.0, beamspot_size_z])
+particlegun.param('xVertexParams', [gun_x_position, 0.])
+particlegun.param('yVertexParams', [0., beamspot_size_y])
+particlegun.param('zVertexParams', [0., beamspot_size_z])
 particlegun.param('independentVertices', True)
 
 # Create Event information
@@ -93,7 +91,8 @@ PXDClust = register_module('PXDClusterizer')
 PXDClust.param('ClusterCacheSize', 576)
 
 SVDClust = register_module('SVDClusterizer')
-
+SVDClust.param('TanLorentz_electrons', 0.)
+SVDClust.param('TanLorentz_holes', 0.)
 # Save output of simulation
 output = register_module('RootOutput')
 output.param('outputFileName', 'TBSimulation.root')
@@ -105,7 +104,7 @@ geosaver = register_module('ExportGeometry')
 geosaver.param('Filename', 'TBGeometry.root')
 
 # Use truth information to create track candidates
-mctrackfinder = register_module('MCTrackFinder')
+mctrackfinder = register_module('TrackFinderMCTruth')
 mctrackfinder.logging.log_level = LogLevel.WARNING
 param_mctrackfinder = {
     'UseCDCHits': 0,
@@ -113,17 +112,17 @@ param_mctrackfinder = {
     'UsePXDHits': 1,
     'Smearing': 0,
     'UseClusters': True,
-    'WhichParticles': ['primary'],
+    'WhichParticles': ['SVD'],
     }
 mctrackfinder.param(param_mctrackfinder)
 
 # mctrackfinder.logging.log_level = LogLevel.DEBUG
 
 # Fit tracks with GENFIT
-trackfitter = register_module('GenFitter')
+trackfitter = register_module('GBLfit')
 trackfitter.logging.log_level = LogLevel.WARNING
 trackfitter.param('UseClusters', True)
-trackfitter.param('FilterId', 'Kalman')
+# trackfitter.param('FilterId', 'Kalman')
 
 # Check track fitting results
 trackfitchecker = register_module('TrackFitChecker')
@@ -169,7 +168,7 @@ display = register_module('Display')
 # interactively by removing its checkmark in the 'Eve' tab.
 #
 # This option only makes sense when ShowGFTracks is true
-display.param('options', 'HTM')  # default
+display.param('options', 'DHMPST')  # default
 
 # should hits always be assigned to a particle with c_PrimaryParticle flag?
 # with this option off, many tracking hits will be assigned to secondary e-
@@ -179,7 +178,7 @@ display.param('assignHitsToPrimaries', 0)
 display.param('showAllPrimaries', True)
 
 # show all charged MCParticles? (SLOW)
-display.param('showCharged', False)
+display.param('showCharged', True)
 
 # show tracks?
 display.param('showTrackLevelObjects', True)
@@ -218,7 +217,7 @@ main.add_module(trackfitter)
 main.add_module(trackfitchecker)
 main.add_module(geosaver)
 main.add_module(output)
-# main.add_module(display)
+main.add_module(display)
 # Process events
 process(main)
 

@@ -15,6 +15,7 @@ void drawField(){
   ifstream file("field.txt");
   double y, z;
   double px, py, pz;
+  double ex, ey, ez;
 
   // Size of arrow (0.01 seems to be reasonable)
   double arrow = 0.01;
@@ -56,10 +57,15 @@ void drawField(){
   } else {
     // Legend arrow
     TArrow * ar = new TArrow(xmin, ymax + 0.03, xmin + exampleArrowLenMomentum * scale, ymax + 0.03, arrow, "|>");
+    TArrow * ar2 = new TArrow(xmin, ymax + 0.03, xmin, ymax + 0.03 + exampleArrowLenMomentum * scale, arrow, "|>");
     ar->SetLineWidth(2);
     ar->SetLineColor(kRed);
     ar->SetFillColor(kRed);
     ar->Draw();
+    ar2->SetLineWidth(2);
+    ar2->SetLineColor(kRed);
+    ar2->SetFillColor(kRed);
+    ar2->Draw();    
     // Legend arrow label  
     TText * label = new TText(xmin, ymax + 0.05, "5 MeV");
     label->Draw();
@@ -67,7 +73,7 @@ void drawField(){
 
   while (file) {
     // read one data line
-    file >> z >> y >> px >> py >> pz;    
+    file >> z >> y >> px >> py >> pz >> ex >> ey >> ez;    
     // skip very low average pt values (possible if there is just a few of particles in a bin)
     if (abs(px) < 1.0e-9) continue;
     
@@ -84,6 +90,7 @@ void drawField(){
     }
     TArrow * arr = new TArrow(x1, y1, x2, y2, arrow, "|>");
     arr->SetLineWidth(2);
+    //arr->SetFillColor(kWhite);
     arr->Draw();
   }  
 }

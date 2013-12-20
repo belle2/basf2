@@ -15,6 +15,7 @@
 #include <framework/core/ModuleManager.h>
 #include <TVector3.h>
 #include <TH1F.h>
+#include <TAxis.h>
 #include <TMath.h>
 #include <fstream>
 #include <vxd/geometry/GeoCache.h>
@@ -98,6 +99,9 @@ void BeamspotScanModule::event()
 void BeamspotScanModule::endRun()
 {
   if (m_hits == 0) return;
+  double nHitsInHisto = m_hitmap->Integral();
+  if (nHitsInHisto == 0.) return;
+  m_hitmap->Scale(100. / nHitsInHisto);
 
   ofstream file(m_dataFileName);
   ofstream field(m_fieldFileName);
@@ -112,7 +116,7 @@ void BeamspotScanModule::endRun()
   for (int x = 1; x <= m_nBinX; x++) {
     for (int y = 1; y <= m_nBinY; y++) {
       file << x << " " << y << " "
-           << m_hitmap->GetBinContent(x, y) / m_hits << " "
+           << m_hitmap->GetBinContent(x, y) / nHitsInHisto << " "
            << m_mom->GetBinContent(x, y) << " " << m_mom->GetBinError(x, y) << " "
            << m_phi->GetBinContent(x, y) << " " << m_phi->GetBinError(x, y) << " "
            << m_theta->GetBinContent(x, y) << " " << m_theta->GetBinError(x, y) << std::endl;
@@ -131,11 +135,22 @@ void BeamspotScanModule::endRun()
   for (int x = 1; x <= m_nBinX; x++) {
     for (int y = 1; y <= m_nBinY; y++) {
       // data line
-      // z y px px pz
+      // z y px px pz errpx errpy errpz
       field << ((double(x) - 0.5)*binSizeX + m_minX) << " " << ((double(y) - 0.5)*binSizeY + m_minY) << " "
             << m_prof[0]->GetBinContent(x, y) << " "
             << m_prof[1]->GetBinContent(x, y) << " "
-            << m_prof[2]->GetBinContent(x, y) << std::endl;
+            << m_prof[2]->GetBinContent(x, y) << " "
+            << m_prof[0]->GetBinError(x, y) << " "
+            << m_prof[1]->GetBinError(x, y) << " "
+            << m_prof[2]->GetBinError(x, y) << std::endl;
+    }
+  }
+
+  for (int x = 1; x <= m_nBinX; x++) {
+    for (int y = 1; y <= m_nBinY; y++) {
+      m_rmsY->Fill(((double(x) - 0.5)*binSizeX + m_minX), ((double(y) - 0.5)*binSizeY + m_minY), m_prof[1]->GetBinError(x, y) / fabs(m_prof[0]->GetBinContent(x, y)));
+      m_rmsZ->Fill(((double(x) - 0.5)*binSizeX + m_minX), ((double(y) - 0.5)*binSizeY + m_minY), m_prof[2]->GetBinError(x, y) / fabs(m_prof[0]->GetBinContent(x, y)));
+
     }
   }
 
@@ -143,12 +158,38 @@ void BeamspotScanModule::endRun()
 
 void BeamspotScanModule::defineHisto()
 {
+  m_rmsY = new TProfile2D("rmsY", "Average Divergence of Beam Slopes Y [rad]", m_nBinX, m_minX, m_maxX, m_nBinY, m_minY, m_maxY);
+  m_rmsZ = new TProfile2D("rmsZ", "Average Divergence of Beam Slopes Z [rad]", m_nBinX, m_minX, m_maxX, m_nBinY, m_minY, m_maxY);
+
   m_prof[0] = new TProfile2D("scanX", "Average momentum x [GeV]", m_nBinX, m_minX, m_maxX, m_nBinY, m_minY, m_maxY);
   m_prof[1] = new TProfile2D("scanY", "Average momentum y [GeV]", m_nBinX, m_minX, m_maxX, m_nBinY, m_minY, m_maxY);
   m_prof[2] = new TProfile2D("scanZ", "Average momentum z [GeV]", m_nBinX, m_minX, m_maxX, m_nBinY, m_minY, m_maxY);
+  for (auto & h : m_prof) {
+    h->Sumw2();
+    h->Approximate();
+    h->SetErrorOption("s");
+    h->GetXaxis()->SetTitle("Z [cm]");
+    h->GetYaxis()->SetTitle("Y [cm]");
+  }
   m_phi = new TProfile2D("scanPhi", "Average phi angle [deg]", m_nBinX, m_minX, m_maxX, m_nBinY, m_minY, m_maxY);
+  m_phi->GetXaxis()->SetTitle("Z [cm]");
+  m_phi->GetYaxis()->SetTitle("Y [cm]");
+  m_phi->Sumw2();
+  m_phi->Approximate();
+  m_phi->SetErrorOption("s");
   m_theta = new TProfile2D("scanTheta", "Average theta angle [deg]", m_nBinX, m_minX, m_maxX, m_nBinY, m_minY, m_maxY);
+  m_theta->GetXaxis()->SetTitle("Z [cm]");
+  m_theta->GetYaxis()->SetTitle("Y [cm]");
+  m_theta->Sumw2();
+  m_theta->Approximate();
+  m_theta->SetErrorOption("s");
   m_mom = new TProfile2D("scanMom", "Average momentum magnitude [GeV]", m_nBinX, m_minX, m_maxX, m_nBinY, m_minY, m_maxY);
-  m_hitmap = new TH2I("hitmap", "Beam intensity [counts]", m_nBinX, m_minX, m_maxX, m_nBinY, m_minY, m_maxY);
-
+  m_mom->GetXaxis()->SetTitle("Z [cm]");
+  m_mom->GetYaxis()->SetTitle("Y [cm]");
+  m_mom->Sumw2();
+  m_mom->Approximate();
+  m_mom->SetErrorOption("s");
+  m_hitmap = new TH2F("hitmap", "Beam intensity [%]", m_nBinX, m_minX, m_maxX, m_nBinY, m_minY, m_maxY);
+  m_hitmap->GetXaxis()->SetTitle("Z [cm]");
+  m_hitmap->GetYaxis()->SetTitle("Y [cm]");
 }

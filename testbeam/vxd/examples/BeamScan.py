@@ -5,8 +5,8 @@
 # This is the default simulation scenario for VXD beam test without telescopes
 
 # Important parameters of the simulation:
-events = 2000  # Number of events to simulate
-momentum = 6.0  # GeV/c
+events = 4000  # Number of events to simulate
+momentum = 6.  # GeV/c
 momentum_spread = 0.05  # %
 theta = 90.0  # degrees
 theta_spread = 0.00573  # # degrees (sigma of gaussian)
@@ -94,7 +94,7 @@ SVDClust = register_module('SVDClusterizer')
 
 # Save output of simulation
 output = register_module('RootOutput')
-output.param('outputFileName', 'TBSimulation.root')
+output.param('outputFileName', 'BeamScanSimulationOutputWien.root')
 # You can specify branch names to be saved (only), see module doc
 # output.param('branchNames[0]', ['PXDTrueHits', 'SVDTrueHits'])
 
@@ -103,7 +103,7 @@ geosaver = register_module('ExportGeometry')
 geosaver.param('Filename', 'TBGeometry.root')
 
 # Use truth information to create track candidates
-# mctrackfinder = register_module('MCTrackFinder')
+# mctrackfinder = register_module('TrackFinderMCTruth')
 # mctrackfinder.logging.log_level = LogLevel.WARNING
 # param_mctrackfinder = {
 #    'UseCDCHits': 0,
@@ -199,10 +199,16 @@ main.add_module(particlegun)
 main.add_module(simulation)
 
 histoman = register_module('HistoManager')
-histoman.param('histoFileName', 'beamscan.root')
+histoman.param('histoFileName', 'beamscanwien.root')
 main.add_module(histoman)
 
 beamscan = register_module('BeamspotScan')
+beamscan.param('nBinX', 24)
+beamscan.param('nBinY', 24)
+beamscan.param('minX', -1.2)
+beamscan.param('minY', -1.2)
+beamscan.param('maxX', 1.2)
+beamscan.param('maxY', 1.2)
 main.add_module(beamscan)
 
 # main.add_module(PXDDigi)

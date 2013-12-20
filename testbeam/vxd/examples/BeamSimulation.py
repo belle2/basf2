@@ -70,7 +70,7 @@ geosaver = register_module('ExportGeometry')
 geosaver.param('Filename', 'TBGeometry.root')
 
 # Use truth information to create track candidates
-mctrackfinder = register_module('MCTrackFinder')
+mctrackfinder = register_module('TrackFinderMCTruth')
 mctrackfinder.logging.log_level = LogLevel.WARNING
 param_mctrackfinder = {
     'UseCDCHits': 0,

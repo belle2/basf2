@@ -69,7 +69,10 @@ namespace Belle2 {
     TProfile2D* m_phi;  /**< Profile 2D histogram of average phi angle */
     TProfile2D* m_theta;  /**< Profile 2D histogram of average theta angle */
     TProfile2D* m_mom;  /**< Profile 2D histogram of average momentum magnitude */
-    TH2I* m_hitmap;  /**< 2D histogram for hitmap */
+    TProfile2D* m_rmsY;  /**< Profile 2D histogram of average beam slopes divergence in Y */
+    TProfile2D* m_rmsZ;  /**< Profile 2D histogram of average beam slopes divergence in Z */
+
+    TH2F* m_hitmap;  /**< 2D histogram for hitmap */
 
   };
 }

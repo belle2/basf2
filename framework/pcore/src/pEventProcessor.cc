@@ -16,22 +16,50 @@
 #include <framework/pcore/TxModule.h>
 
 #include <signal.h>
+#include <sys/wait.h>
 
 
 using namespace std;
 using namespace Belle2;
 
-static void signalHandler(int)
+/** PID of sub-process killed by some signal. 0 if none. */
+static int s_PIDofKilledChild = 0;
+
+static void signalHandler(int signal)
 {
   //signal handlers are called asynchronously, making many standard functions (including output) dangerous
   //write() is, however, safe, so we'll use that to write to stderr.
-  const char msg[] = "\nProcess died with SIGSEGV (Segmentation fault).\n";
-  const int len = sizeof(msg) / sizeof(char) - 1; //minus NULL byte
+  if (signal == SIGSEGV) {
+    const char msg[] = "\nProcess died with SIGSEGV (Segmentation fault).\n";
+    const int len = sizeof(msg) / sizeof(char) - 1; //minus NULL byte
 
-  int rc = write(STDERR_FILENO, msg, len);
-  (void) rc; //ignore return value (there's nothing we can do about a failed write)
+    int rc = write(STDERR_FILENO, msg, len);
+    (void) rc; //ignore return value (there's nothing we can do about a failed write)
 
-  abort();
+    abort();
+  } else if (signal == SIGCHLD) {
+    if (s_PIDofKilledChild != 0)
+      return; //only once
+
+    //which child died?
+    int status;
+    pid_t pid = waitpid(-1, &status, WNOHANG);
+    if (pid <= 0 || !WIFSIGNALED(status))
+      return; //process exited normally
+
+    //ok, it died because of some signal
+    s_PIDofKilledChild = pid;
+    //int termsig = WTERMSIG(status);
+
+    const char msg[] = "\nOne of our child processes died, stopping execution...\n";
+    const int len = sizeof(msg) / sizeof(char) - 1; //minus NULL byte
+
+    int rc = write(STDERR_FILENO, msg, len);
+    (void) rc; //ignore return value (there's nothing we can do about a failed write)
+
+    //pid=0: send signal to every process in our progress group (ourselves + children)
+    kill(0, SIGTERM);
+  }
 }
 
 pEventProcessor::pEventProcessor(PathManager& pathManager) : EventProcessor(pathManager),
@@ -154,6 +182,11 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
     if (signal(SIGQUIT, SIG_IGN) == SIG_ERR) {
       B2FATAL("Cannot ignore SIGQUIT signal handler for main process\n");
     }
+    //If our children are killed, we want to know. (especially since this may happen in any order)
+    if (signal(SIGCHLD, signalHandler) == SIG_ERR) {
+      B2FATAL("Cannot setup SIGCHLD signal handler\n");
+    }
+
     // 6.0 Build End of data message
     EvtMessage term(NULL, 0, MSG_TERMINATE);
     // 6.1 Wait for input path to terminate
@@ -192,6 +225,13 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
       delete *it;
 
     B2INFO("process: completed");
+
+    //did anything bad happen?
+    if (s_PIDofKilledChild != 0) {
+      //fatal, so we get appropriate return code (IPC cleanup was already done)
+      B2FATAL("Execution stopped, sub-process with PID " << s_PIDofKilledChild << " killed by signal.");
+    }
+
   }
 }
 

@@ -77,11 +77,7 @@ Track::Track(const TrackCand& trackCand, const MeasurementFactory<genfit::AbsMea
   stateSeed_ = trackCand.getStateSeed();
 
   // initial guess for cov
-  double resolution = sqrt(factoryHits[0]->getRawHitCov().Max());
-  for (int i = 0; i < 3; ++i)
-    covSeed_(i,i) = resolution*resolution;
-  for (int i = 3; i < 6; ++i)
-    covSeed_(i,i) = pow(resolution / factoryHits.size() / sqrt(3), 2);
+  covSeed_ = trackCand.getCovSeed();
 
   // fill cache
   fillPointsWithMeasurement();
@@ -115,8 +111,9 @@ Track::Track(AbsTrackRep* trackRep, const TVectorD& stateSeed, const TMatrixDSym
 }
 
 
-Track::Track(const Track& rhs)
-  : cardinalRep_(rhs.cardinalRep_), stateSeed_(rhs.stateSeed_), covSeed_(rhs.covSeed_)
+Track::Track(const Track& rhs) :
+  TObject(rhs),
+  cardinalRep_(rhs.cardinalRep_), stateSeed_(rhs.stateSeed_), covSeed_(rhs.covSeed_)
 {
   assert(rhs.checkConsistency());
 
@@ -615,6 +612,18 @@ bool Track::sort() {
   fillPointsWithMeasurement();
 
   return true;
+}
+
+
+void Track::reverseTrackPoints() {
+
+  std::reverse(trackPoints_.begin(),trackPoints_.end());
+
+  deleteForwardInfo(0, -1);
+  deleteBackwardInfo(0, -1);
+  deleteReferenceInfo(0, -1);
+
+  fillPointsWithMeasurement();
 }
 
 
@@ -1143,6 +1152,11 @@ bool Track::checkConsistency() const {
 
   if (covSeed_.GetNrows() != 6) {
     std::cerr << "Track::checkConsistency(): covSeed_ dimension != 6" << std::endl;
+    retVal = false;
+  }
+
+  if (covSeed_.Max() == 0.) {
+    std::cerr << "Track::checkConsistency(): covSeed_ zero" << std::endl;
     retVal = false;
   }
 

@@ -367,6 +367,19 @@ void GenFitterModule::event()
         factory.addProducer(Const::CDC, CDCProducer);
       }
 
+      // The track fit needs an initial guess for the resolution.  The
+      // values should roughly match the actual resolution (squared),
+      // but it may be that different track-finders, regions of
+      // phasespace and/or subdetectors perform better with different values.
+      TMatrixDSym covSeed(6);
+      covSeed(0, 0) = 1e-3;
+      covSeed(1, 1) = 1e-3;
+      covSeed(2, 2) = 4e-3;
+      covSeed(3, 3) = 0.01e-3;
+      covSeed(4, 4) = 0.01e-3;
+      covSeed(5, 5) = 0.04e-3;
+      aTrackCandPointer->setCovSeed(covSeed);
+
       genfit::Track gfTrack(*aTrackCandPointer, factory, trackRep); //create the track with the corresponding track representation
 
       const int nHitsInTrack = gfTrack.getNumPointsWithMeasurement();

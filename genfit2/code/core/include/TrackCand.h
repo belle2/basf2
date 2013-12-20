@@ -124,6 +124,12 @@ class TrackCand : public TObject {
   /** @brief get the seed value for track: mom. Identical to the last 3 components of getStateSeed*/
   TVector3 getMomSeed() const {return TVector3(state6D_(3), state6D_(4), state6D_(5));}
 
+  /** @brief set the covariance matrix seed (6D).  */
+  void setCovSeed(const TMatrixDSym& cov6D) {cov6D_ = cov6D; /* always 6D, no need to resize */}
+
+  /** @brief get the covariance matrix seed (6D).  */
+  const TMatrixDSym& getCovSeed() const {return cov6D_;}
+
   //! Returns the 6D seed state; should be in global coordinates.
   const TVectorD& getStateSeed() const {return state6D_;}
 
@@ -190,6 +196,7 @@ class TrackCand : public TObject {
   int pdg_; /**< particle data groupe's id for a particle*/
 
   TVectorD state6D_; /**< global 6D position plus momentum state */
+  TMatrixDSym cov6D_; /**< global 6D position plus momentum state */
   double q_; /**< the charge of the particle in units of elementary charge */
 
 

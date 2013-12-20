@@ -32,6 +32,7 @@ TrackCand::TrackCand() :
   mcTrackId_(-1),
   pdg_(0),
   state6D_(6),
+  cov6D_(6),
   q_(0)
 {
   ;
@@ -46,9 +47,11 @@ TrackCand::~TrackCand() {
 
 
 TrackCand::TrackCand( const TrackCand& other ) :
+  TObject(other),
   mcTrackId_(other.mcTrackId_),
   pdg_(other.pdg_),
   state6D_(other.state6D_),
+  cov6D_(other.cov6D_),
   q_(other.q_)
 {
   // deep copy
@@ -71,6 +74,7 @@ void TrackCand::swap(TrackCand& other) {
   std::swap(this->mcTrackId_, other.mcTrackId_);
   std::swap(this->pdg_, other.pdg_);
   std::swap(this->state6D_, other.state6D_);
+  std::swap(this->cov6D_, other.cov6D_);
   std::swap(this->q_, other.q_);
 }
 

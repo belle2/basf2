@@ -868,7 +868,7 @@ unsigned int RawCOPPER::FillTopBlockRawHeader(unsigned int m_node_id, unsigned i
   ErrorMessage print_err;
   //
   // This function only fills RawHeader contents for the first datablock.
-  //
+  // # of block should be 1
   if (m_num_nodes * m_num_events != 1) {
     char err_buf[500];
     sprintf(err_buf,
@@ -878,6 +878,16 @@ unsigned int RawCOPPER::FillTopBlockRawHeader(unsigned int m_node_id, unsigned i
     sleep(12345678);
     exit(-1);
   }
+
+  //////////////////////////////////////////////////
+  //
+  // Fill info in RawHeader
+  //
+  //////////////////////////////////////////////////
+
+  //
+  // Initialize a RawHeader part
+  //
   memset(m_buffer, 0, sizeof(int) * RawHeader::RAWHEADER_NWORDS);
   m_buffer[ RawHeader::POS_HDR_NWORDS ] = RawHeader::RAWHEADER_NWORDS;
 
@@ -897,26 +907,20 @@ unsigned int RawCOPPER::FillTopBlockRawHeader(unsigned int m_node_id, unsigned i
     exit(-1);
   }
 
-
-  // initialize header(header nwords, magic word) and trailer(magic word)
-  //   RawHeader rawhdr;
-  //   rawhdr.SetBuffer(GetRawHdrBufPtr( n ));
-  //   rawhdr.Initialize(); // Fill 2nd( hdr size) and 20th header word( magic word )
-
-  // 1, Set total words info
-  //   int nwords = GetBlockNwords( n );
-  //   rawhdr.SetNwords(nwords);
-
+  //
+  //   Set total words info
+  //
   int datablock_nwords =
     RawHeader::RAWHEADER_NWORDS +
     (copper_buf[ POS_DATA_LENGTH ]
      + SIZE_COPPER_DRIVER_HEADER
      + SIZE_COPPER_DRIVER_TRAILER)
     + RawTrailer::RAWTRAILER_NWORDS;
-
   m_buffer[ RawHeader::POS_NWORDS ] = datablock_nwords;
 
-
+  //
+  // Check the consistency between data length and length in RawHeader
+  //
   if (m_buffer[ RawHeader::POS_NWORDS ] != m_nwords) {
     char err_buf[500];
     sprintf(err_buf,
@@ -927,75 +931,82 @@ unsigned int RawCOPPER::FillTopBlockRawHeader(unsigned int m_node_id, unsigned i
     exit(-1);
   }
 
-  //   // 2, Set run and exp #
-  //   rawhdr.SetExpRunNumber(raw_copper->GetExpRunBuf(cprblock));       // Fill 3rd header word
+  //
+  // Fill offset values
+  //
   int offset_1st_finesse =  RawHeader::RAWHEADER_NWORDS + SIZE_COPPER_HEADER;
   int offset_2nd_finesse = offset_1st_finesse + copper_buf[ POS_CH_A_DATA_LENGTH ];
   int offset_3rd_finesse = offset_2nd_finesse + copper_buf[ POS_CH_B_DATA_LENGTH ];
   int offset_4th_finesse = offset_3rd_finesse + copper_buf[ POS_CH_C_DATA_LENGTH ];
-  int* finesse_buf = &(m_buffer[ offset_1st_finesse ]); // In any finesse implementations, the top finesse buffer should be at offset_1st_finesse;
-  m_buffer[ RawHeader::POS_EXP_RUN_NO ] = finesse_buf[ SIZE_B2LHSLB_HEADER + POS_EXP_RUN ];
-
-  // 3, Make 32bit event number from B2link FEE header
-  //  unsigned int cur_ftsw_eve32 =  raw_copper->GetB2LFEE32bitEventNumber(cprblock);
-  //  rawhdr.SetEveNo(cur_ftsw_eve32);       // Temporarily use COPPER counter   //raw_copper->GetCOPPERCounter()
-  unsigned int cur_ftsw_eve32 =  finesse_buf[ SIZE_B2LHSLB_HEADER + POS_TT_TAG ];
-  m_buffer[ RawHeader::POS_EVE_NO ] = cur_ftsw_eve32;
-
-  // Set FTSW word
-  //  rawhdr.SetFTSW2Words(raw_copper->GetB2LFEETtCtime(cprblock), raw_copper->GetB2LFEETtUtime(cprblock));
-  m_buffer[ RawHeader::POS_HSLB_1 ] = finesse_buf[ SIZE_B2LHSLB_HEADER + POS_TT_CTIME_TYPE ];
-  m_buffer[ RawHeader::POS_HSLB_2 ] = finesse_buf[ SIZE_B2LHSLB_HEADER + POS_TT_UTIME ];
-
-  // Obtain info from SlowController via AddParam or COPPER data
-//   rawhdr.SetSubsysId(m_nodeid);   // Fill 7th header word
-//   rawhdr.SetDataType(m_data_type);   // Fill 8th header word
-//   rawhdr.SetTruncMask(m_trunc_mask);   // Fill 8th header word
-  m_buffer[ RawHeader::POS_SUBSYS_ID ] = m_node_id;
-  m_buffer[ RawHeader::POS_TRUNC_MASK_DATATYPE ] = ((m_trunc_mask << 32) & 0x80000000) | (m_data_type & 0x7FFFFFFF);
-
-  // Offset
-//   rawhdr.SetOffset1stFINESSE(raw_copper->GetOffset1stFINESSE(cprblock) - raw_copper->GetBufferPos(cprblock));          // Fill 9th header word
-//   rawhdr.SetOffset2ndFINESSE(raw_copper->GetOffset2ndFINESSE(cprblock) - raw_copper->GetBufferPos(cprblock));         // Fill 10th header word
-//   rawhdr.SetOffset3rdFINESSE(raw_copper->GetOffset3rdFINESSE(cprblock) - raw_copper->GetBufferPos(cprblock));         // Fill 11th header word
-//   rawhdr.SetOffset4thFINESSE(raw_copper->GetOffset4thFINESSE(cprblock) - raw_copper->GetBufferPos(cprblock));         // Fill 12th header word
   m_buffer[ RawHeader::POS_OFFSET_1ST_FINESSE ] = offset_1st_finesse;
   m_buffer[ RawHeader::POS_OFFSET_2ND_FINESSE ] = offset_2nd_finesse;
   m_buffer[ RawHeader::POS_OFFSET_3RD_FINESSE ] = offset_3rd_finesse;
   m_buffer[ RawHeader::POS_OFFSET_4TH_FINESSE ] = offset_4th_finesse;
 
+  //
+  // Fill Exp/Run value
+  //
+  int* finesse_buf = &(m_buffer[ offset_1st_finesse ]); // In any finesse implementations, the top finesse buffer should be at offset_1st_finesse;
+  m_buffer[ RawHeader::POS_EXP_RUN_NO ] = finesse_buf[ SIZE_B2LHSLB_HEADER + POS_EXP_RUN ];
 
-  // Set magic word
-  //  rawhdr.SetMagicWordEntireHeader();
+  //
+  // Fill event #
+  //
+  unsigned int cur_ftsw_eve32 =  finesse_buf[ SIZE_B2LHSLB_HEADER + POS_TT_TAG ];
+  m_buffer[ RawHeader::POS_EVE_NO ] = cur_ftsw_eve32;
+
+  //
+  // Copy FTSW words from B2LFEE header
+  //
+  m_buffer[ RawHeader::POS_HSLB_1 ] = finesse_buf[ SIZE_B2LHSLB_HEADER + POS_TT_CTIME_TYPE ];
+  m_buffer[ RawHeader::POS_HSLB_2 ] = finesse_buf[ SIZE_B2LHSLB_HEADER + POS_TT_UTIME ];
+
+  //
+  // Set node ID, trunc_mask, data_type
+  //
+  m_buffer[ RawHeader::POS_SUBSYS_ID ] = m_node_id;
+  m_buffer[ RawHeader::POS_TRUNC_MASK_DATATYPE ] = ((m_trunc_mask << 32) & 0x80000000) | (m_data_type & 0x7FFFFFFF);
+
+  //
+  // Set RawHeader magic word
+  //
   m_buffer[ RawHeader::POS_TERM_HEADER ] = RawHeader::MAGIC_WORD_TERM_HEADER;
 
 
+  //
   // Add node-info
-  //  rawhdr.AddNodeInfo(m_nodeid);   // Fill 13th header word
+  //
   if (m_buffer[ RawHeader::POS_NUM_NODES ] < RawHeader::NUM_MAX_NODES) {
     m_buffer[ RawHeader::POS_NODES_1 + m_buffer[ RawHeader::POS_NUM_NODES ] ] = m_node_id;
   }
   m_buffer[ RawHeader::POS_NUM_NODES ]++;
 
 
+
+  //////////////////////////////////////////////////
   //
-  // Fill info in Trailer
+  // Fill info in RawTrailer
   //
-  //   RawTrailer rawtrl;
-  //   rawtrl.SetBuffer(raw_copper->GetRawTrlBufPtr(cprblock));
-  //   rawtrl.Initialize(); // Fill 2nd word : magic word
-  //   rawtrl.SetChksum(CalcSimpleChecksum(raw_copper->GetBuffer(cprblock),
-  //   raw_copper->GetBlockNwords(cprblock) - rawtrl.GetTrlNwords()));
+  //////////////////////////////////////////////////
+
+  //
+  // Calculate XOR checksum
+  //
   unsigned int chksum_top = 0, chksum_body = 0, chksum_bottom = 0;
   int top_end = RawHeader::RAWHEADER_NWORDS;
   for (int i = 0; i < top_end; i++) {
     chksum_top ^= m_buffer[ i ];
   }
-
   int body_end = datablock_nwords - SIZE_COPPER_DRIVER_TRAILER - RawTrailer::RAWTRAILER_NWORDS;
   for (int i = top_end; i < body_end; i++) {
     chksum_body ^= m_buffer[ i ];
   }
+
+  int bottom_end = datablock_nwords - RawTrailer::RAWTRAILER_NWORDS;
+  for (int i = body_end; i < bottom_end; i++) {
+    chksum_bottom ^= m_buffer[ i ];
+  }
+
   //
   // check COPPER driver checksum
   //
@@ -1006,59 +1017,27 @@ unsigned int RawCOPPER::FillTopBlockRawHeader(unsigned int m_node_id, unsigned i
     print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     sleep(12345678);
     exit(-1);
-
   }
 
-  int bottom_end = datablock_nwords - RawTrailer::RAWTRAILER_NWORDS;
-  for (int i = body_end; i < bottom_end; i++) {
-    chksum_bottom ^= m_buffer[ i ];
-  }
-
+  //
+  // Fill trailer info (checksum, magic word)
+  //
   unsigned int chksum = chksum_top ^ chksum_body ^ chksum_bottom;
   int* trl = &(m_buffer[ datablock_nwords - RawTrailer::RAWTRAILER_NWORDS ]);
-  trl[ RawTrailer::POS_TERM_WORD ] = RawTrailer::MAGIC_WORD_TERM_TRAILER;
   trl[ RawTrailer::POS_CHKSUM ] = chksum;
+  trl[ RawTrailer::POS_TERM_WORD ] = RawTrailer::MAGIC_WORD_TERM_TRAILER;
 
 
-//   //magic word check
-// #ifndef NO_DATA_CHECK
-// // 3, magic word check
-//   if (!(raw_copper->CheckCOPPERMagic(cprblock))) {
-//     char err_buf[500];
-//     sprintf(err_buf, "Invalid Magic word 0x7FFFF0008=%u 0xFFFFFAFA=%u 0xFFFFF5F5=%u 0x7FFF0009=%u\n",
-//             raw_copper->GetMagicDriverHeader(cprblock),
-//             raw_copper->GetMagicFPGAHeader(cprblock),
-//             raw_copper->GetMagicFPGATrailer(cprblock),
-//             raw_copper->GetMagicDriverTrailer(cprblock));
-//     print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-//     sleep(12345678);
-//     exit(-1);
-//   }
-
-
-//   // 3, event # increment check
-// #ifdef WO_FIRST_EVENUM_CHECK
-//   if ((m_prev_ftsweve32 + 1 != cur_ftsw_eve32) && (m_prev_ftsweve32 != 0xFFFFFFFF)) {
-// #else
-//   if (m_prev_ftsweve32 + 1 != cur_ftsw_eve32) {
-// #endif
-//     char err_buf[500];
-//     sprintf(err_buf, "Invalid event_number. Exiting...: cur 32bit eve %u preveve %u\n",  cur_ftsw_eve32, m_prev_ftsweve32);
-//     print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-
-//     printf("i= %d : num entries %d : Tot words %d\n", 0 , raw_copper->GetNumEntries(), raw_copper->TotalBufNwords());
-//     for (int j = 0; j < raw_copper->TotalBufNwords(); j++) {
-//       printf("0x%.8x ", (raw_copper->GetBuffer(0))[ j ]);
-//       if ((j % 10) == 9)printf("\n");
-//       fflush(stdout);
-//     }
-
-//     exit(-1);
-//   }
-// #endif
-
+  //////////////////////////////////////////////////
+  //
+  // Data check ( magic word, event incrementation )
+  //
+  //////////////////////////////////////////////////
 #ifndef NO_DATA_CHECK
 
+  //
+  // check magic words
+  //
   int* fpga_trailer_magic = trl - 3;
   int* driver_trailer_magic = trl - 1;
   int err_flag = 0;
@@ -1083,6 +1062,9 @@ unsigned int RawCOPPER::FillTopBlockRawHeader(unsigned int m_node_id, unsigned i
     exit(-1);
   }
 
+  //
+  // check incrementation of event #
+  //
 #ifdef WO_FIRST_EVENUM_CHECK
   if ((prev_eve32 + 1 != cur_ftsw_eve32) && (prev_eve32 != 0xFFFFFFFF)) {
 #else

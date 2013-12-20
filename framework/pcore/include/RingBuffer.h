@@ -78,6 +78,9 @@ namespace Belle2 {
     /** Return number of remq() calls. */
     int remq_counter() const;
 
+    /** Dump buffer info */
+    void DumpInfo();
+
   private:
     /** Convenience class to lock a semaphore on construction, and unlock on destruction. */
     class SemaphoreLocker {

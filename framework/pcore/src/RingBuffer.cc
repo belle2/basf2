@@ -55,7 +55,8 @@ RingBuffer::RingBuffer(const char* name, unsigned int size)
     m_pathname = string("/tmp/") + string(getenv("USER"))
                  + string("_") + string(name);
     //m_pathfd = creat ( m_pathname.c_str(), 0644 );
-    m_pathfd = open(m_pathname.c_str(), O_CREAT | O_EXCL, 0644);
+    //    m_pathfd = open(m_pathname.c_str(), O_CREAT | O_EXCL, 0644);
+    m_pathfd = open(m_pathname.c_str(), O_CREAT | O_EXCL | O_RDWR, 0644);
     //m_pathfd = open ( m_pathname.c_str(), O_EXCL, 0644 );
     if (m_pathfd > 0) {   // a new shared memory file created
       B2INFO("[RingBuffer] Creating a ring buffer with key " << name);
@@ -78,6 +79,18 @@ RingBuffer::RingBuffer(const char* name, unsigned int size)
   }
 
   openSHM(size);
+
+  if (m_pathfd > 0) {
+    B2INFO("First global RingBuffer craetion: writing SHM info to file.");
+    char rbufinfo[256];
+    sprintf(rbufinfo, "%d\n", m_shmid);
+    int is = write(m_pathfd, rbufinfo, strlen(rbufinfo));
+    if (is < 0) perror("write");
+    sprintf(rbufinfo, "%d\n", m_semid);
+    is = write(m_pathfd, rbufinfo, strlen(rbufinfo));
+    if (is < 0) perror("write");
+    close(m_pathfd);
+  }
 
   B2INFO("RingBuffer initialization done with shm=" << m_shmid);
 }
@@ -157,7 +170,7 @@ void RingBuffer::cleanup()
     shmctl(m_shmid, IPC_RMID, (struct shmid_ds*) 0);
     semctl(m_semid, 1, IPC_RMID);
     if (m_file) {
-      close(m_pathfd);
+      //      close(m_pathfd);
       unlink(m_pathname.c_str());
     }
   }
@@ -387,6 +400,26 @@ int RingBuffer::shmid() const
   return m_shmid;
 }
 
+void RingBuffer::DumpInfo()
+{
+  SemaphoreLocker locker(m_semid);
+
+  // Dump control parameters
+  printf("***** Ring Buffer Information ***\n");
+  printf("path = %s\n", m_pathname.c_str());
+  printf("shmsize = %d\n", m_shmsize);
+  printf("[Buffer Info]\n");
+  printf("bufsize = %d\n", m_bufinfo->size);
+  printf("remain = %d\n", m_bufinfo->remain);
+  printf("wptr = %d\n", m_bufinfo->wptr);
+  printf("prevwptr = %d\n", m_bufinfo->prevwptr);
+  printf("rptr = %d\n", m_bufinfo->rptr);
+  printf("nbuf = %d\n", m_bufinfo->nbuf);
+  printf("nattached = %d\n", m_bufinfo->nattached);
+  printf("mode = %d\n", m_bufinfo->mode);
+  printf("ninsq = %d\n", m_bufinfo->ninsq);
+  printf("nremq = %d\n", m_bufinfo->ninsq);
+}
 
 int RingBuffer::SemaphoreLocker::create(key_t semkey)
 {
@@ -431,3 +464,4 @@ void RingBuffer::SemaphoreLocker::unlock()
   //    perror ("semop");
   // printf ( "semaphore unlocked.....\n" );
 }
+

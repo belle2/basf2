@@ -117,12 +117,14 @@ void StorageDeserializerModule::storeEvent()
     usleep(200);
   }
   m_data_hlt.setBuffer(m_data.getBody());
-  m_data_pxd.setBuffer(m_data.getBody() + m_data_hlt.getWordSize());
   EvtMessage* evtmsg = new EvtMessage((char*)m_data_hlt.getBody());
+  if (m_data.getBodyByteSize() > m_data_hlt.getByteSize()) {
+    m_data_pxd.setBuffer(m_data.getBody() + m_data_hlt.getWordSize());
+    StoreArray<RawPXD> rawpxdary;
+    RawPXD rawpxd((int*)m_data_pxd.getBody(), m_data_pxd.getByteSize());
+    rawpxdary.appendNew(rawpxd);
+  }
   m_streamer->restoreDataStore(evtmsg);
-  StoreArray<RawPXD> rawpxdary;
-  RawPXD rawpxd((int*)m_data_pxd.getBody(), m_data_pxd.getByteSize());
-  rawpxdary.appendNew(rawpxd);
   delete evtmsg;
   if (count % 1000 == 0) {
     printf("record %d evt no = %d size = %d\n", count,

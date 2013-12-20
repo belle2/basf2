@@ -100,7 +100,7 @@ namespace Belle2 {
     bool m_noiseBrems;                               /**< Determines if calculation of bremsstrahlung energy loss variance is on/off in Genfit */
     bool m_noEffects;                                /**< switch on/off ALL material effects in Genfit. "true" overwrites "true" flags for the individual effects.*/
     std::string m_mscModel;                          /**< Multiple scattering model */
-    std::string m_resolveWireHitAmbi;                /**< Determines how the ambiguity of wire measurements should be dealt with.  If this is set to 'default', we use 'weightedAverage' for the DAF is, the Kalman fit uses 'unweightedClosestToReference', and the simple Kalman (which doesn't have a reference) uses 'unweightedClosestToPrediction'. */
+    std::string m_resolveWireHitAmbi;                /**< Determines how the ambiguity of wire measurements should be dealt with.  If this is set to 'default', we use 'weightedAverage' for the DAF, the Kalman fit uses 'unweightedClosestToReference', and the simple Kalman (which doesn't have a reference) uses 'unweightedClosestToPrediction'. */
     std::vector<double> m_beamSpot;                  /**< The coordinates of the point whose POCA will define the parameters of the TrackFitResults.  */
   };
 }

@@ -21,6 +21,7 @@
 #include <TFile.h>
 #include <TH1F.h>
 #include <TH2F.h>
+#include <TGraphErrors.h>
 
 namespace Belle2 {
 
@@ -72,6 +73,16 @@ namespace Belle2 {
 
     int m_rootEvent;   /**<  event number*/
 
+    //graphs & histos - results
+    Double_t pt[6]  = {1.5, 0.75, 0.4, 0.25, 0.15, 0.05};
+    Double_t ptErr[6]    = { 0.5, 0.25, 0.1, 0.05, 0.05, 0.05};
+    TGraphErrors* m_gEff;
+    TH1F* m_h1digiIn;
+    TH1F* m_h1digiOut2;
+    TH1F* m_h1digiOut3;
+    TH1F* m_h1digiOut4;
+    TH1F* m_h1digiOut5;
+
     //histograms
     TH1F* m_h1ptAll; /**< distribution of transverse momentum for all PDXDigits*/
     TH1F* m_h1pt; /**< distribution of transverse momentum for PDXDigits contained in a ROI*/
@@ -111,6 +122,12 @@ namespace Belle2 {
     TH1F* m_h1DistVFail;  /**< distribution of distance between ROI and PXDDigits not contained in it in V direction */
     TH2F* m_h2DistUVFail;  /**< distribution of distance between ROI and PXDDigits not contained in it in U,V plane */
 
+    TH1F* m_h1totROIs; /**< distribution of number of ROIs*/
+    TH1F* m_h1nROIs; /**< distribution of number of ROIs*/
+    TH1F* m_h1nROIs_all; /**< distribution of number of ROIs*/
+    TH1F* m_h1redFactor; /**< distribution of number of ROIs*/
+
+    TH1F* m_h1totarea; /**< distribution of ROI areas*/
     TH1F* m_h1area; /**< distribution of ROI areas*/
     TH1F* m_h1areaFail; /**< distribution of ROI areas when PXDDigit is not contained*/
 
@@ -185,6 +202,8 @@ namespace Belle2 {
     unsigned int NtrackNoROI4;
     unsigned int NtrackNoROI5;
 
+
+    int m_nNoMCPart;
   };
 
 }

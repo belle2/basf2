@@ -9,7 +9,7 @@ if env.has_key('HAS_TEVE'):
   env['LIBS'] = ['$ROOT_LIBS', 'display', 'tracking', 'framework', 'geometry',
                  'vxd', 'vxd_dataobjects', 'pxd_dataobjects', 'svd_dataobjects', 'svd', 'cdc_dataobjects',
                  'cdc', 'ecl_dataobjects', 'bklm_dataobjects', 'ecl', 'generators_dataobjects', 'eklm_dataobjects',
-                 'display_dataobjects',
+                 'display_dataobjects', 'simulation_dataobjects',
                  'genfit2'] + env['TEVE_LIBS']
 
 Return('env')

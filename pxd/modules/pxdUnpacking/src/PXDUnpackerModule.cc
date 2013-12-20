@@ -122,7 +122,7 @@ public:
   };
   void print(void) {
     if (verbose)
-      B2INFO(" DHH FRAME TYP " << hex << get_type() << " -> " << dhhc_type_name[get_type()] << " ERR " << get_err() << " data " << data);
+      B2INFO(" DHHC FRAME TYP " << hex << get_type() << " -> " << dhhc_type_name[get_type()] << " ERR " << get_err() << " data " << data);
   };
 };
 
@@ -381,7 +381,7 @@ public:
         B2INFO(" DHH Ghost Frame CRC " << hex << c << " == " << crc32);
     } else {
       crc_error++;
-//       B2ERROR(" DHH Ghost Frame CRC FAIL " << hex << c << " != " << crc32);
+      B2ERROR(" DHH Ghost Frame CRC FAIL " << hex << c << " != " << crc32);
       error_flag = true;
     }
     return c;
@@ -813,16 +813,11 @@ class dhhc_onsen_frame {
   unsigned int trignr2;
   /// plus n* ROIs (64 bit)
   /// plus checksum 32bit
-  unsigned int length;/// not part
+  /// unsigned int length;/// not part
 public:
 //    dhhc_onsen_frame(void) {};
-  void set_length(unsigned int l) {length = l;};
+//  void set_length(unsigned int l) {length = l;};
   void print(void) {
-    if (magic1 == 0x56781234) {
-      B2WARNING("DAVID ROI Framer Error");
-      memmove(&magic1, &trignr1, length - 4);
-      length -= 4;
-    }
     word0.print();
     if (verbose)
       B2INFO("DHHC HLT/ROI Frame " << hex << trignr1 << " ," << trignr2);
@@ -834,8 +829,57 @@ public:
       if (trignr1 != trignr2) B2ERROR("DHHC HLT/ROI Frame Trigger Nr Mismatch $" << hex << trignr1 << "!=$" << trignr2);
     }
   };
-  inline static unsigned int size(void) {
-    return 0;//2;
+//  inline static unsigned int size(void) {
+//    return 0;//2;
+//  };
+
+  unsigned int calc_crc(unsigned int length) {
+    unsigned char* d;
+    dhh_crc_32_type bocrc;
+    char crcbuffer[65536 * 2]; /// 128kB
+    d = (unsigned char*) &magic1;/// without the DHHC header as its only an inner checksum!!!
+
+    if (length > 65536 * 2) {
+      B2WARNING(" DHHC ONSEN HLT/ROI Frame CRC FAIL bacause of too large packet (>128kB)!");
+    } else {
+      for (unsigned int k = 0; k < length - 4; k += 2) { // -4
+        crcbuffer[k] = d[k + 1];
+        crcbuffer[k + 1] = d[k];
+      }
+      bocrc.process_bytes(crcbuffer, length - 8); /// -4
+    }
+    //     unsigned char* d;
+    //     dhh_crc_32_type bocrc;
+    //     d = (unsigned char*)data;
+    //     for (int k = 0; k < length - 4; k++) {
+    //       bocrc.process_byte(((const unsigned char*)d)[(k ^ 1)]);
+    //     }
+    unsigned int c;
+    c = htonl(bocrc.checksum());
+
+    unsigned int crc32;
+    crc32 = *(unsigned int*)(crcbuffer + length - 8); /// -4
+
+    if (c == crc32) {
+      if (verbose)
+        B2INFO(" DHHC ONSEN HLT/ROI Frame CRC OK: " << hex << c << "==" << crc32 << " data "  << * (unsigned int*)(d + length - 8) << " "
+               << * (unsigned int*)(d + length - 6) << " " << * (unsigned int*)(d + length - 4) << " len $" << length);
+    } else {
+      crc_error++;
+      if (verbose) {
+        B2ERROR(" DHHC ONSEN HLT/ROI Frame CRC FAIL: " << hex << c << "!=" << crc32 << " data "  << * (unsigned int*)(d + length - 8) << " "
+                << * (unsigned int*)(d + length - 6) << " " << * (unsigned int*)(d + length - 4) << " len $" << length);
+        /// others would be interessting but possible subjects to access outside of buffer
+        /// << " " << * (unsigned int*)(d + length - 2) << " " << * (unsigned int*)(d + length + 0) << " " << * (unsigned int*)(d + length + 2));
+        if (length <= 64) {
+          for (unsigned int i = 0; i < length / 4; i++) {
+            B2ERROR("== " << i << "  $" << hex << ((unsigned int*)d)[i]);
+          }
+        }
+      };
+      error_flag = true;
+    }
+    return c;
   };
 };
 
@@ -1242,7 +1286,7 @@ void PXDUnpackerModule::unpack_event(RawPXD& px)
       pad = false;
     }
 
-    B2INFO(" unpack DHH frame: " << j << " with size " << lo << " at byte offset in dataptr " << ll);
+    B2INFO(" unpack DHH(C) frame: " << j << " with size " << lo << " at byte offset in dataptr " << ll);
     endian_swap_frame((unsigned short*)(ll + (char*)dataptr), lo);
     if (m_DHHCmode) {
       unpack_dhhc_frame(ll + (char*)dataptr, lo, pad, last_wie, last_start, last_end, last_evtnr, j, Frames_in_event);
@@ -1688,20 +1732,20 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& la
       last_evtnr = evtnr;
 //         dhh_first_frame_id_lo = ((dhhc_start_frame*)data)->get_sfnr();
 //         dhh_first_offset = ((dhhc_start_frame*)data)->get_toffset();
-      if (!fake) dhhc.calc_crc();
+      dhhc.calc_crc();
       stat_start++;
       break;
     };
     case DHHC_FRAME_HEADER_DATA_TYPE_DHH_START: {
-      bool fake = ((dhhc_dhh_start_frame*)data)->is_fake();
-      if (fake) {
-        B2WARNING("Faked DHH START Data -> trigger without Data!");
-      } else {
-        ((dhhc_dhh_start_frame*)data)->print();
-      }
+      //bool fake = ((dhhc_dhh_start_frame*)data)->is_fake();
+      //if (fake) {
+      //  B2WARNING("Faked DHH START Data -> trigger without Data!");
+      //} else {
+      ((dhhc_dhh_start_frame*)data)->print();
+      //}
       dhh_first_frame_id_lo = ((dhhc_dhh_start_frame*)data)->get_sfnr();
       dhh_first_offset = ((dhhc_dhh_start_frame*)data)->get_toffset();
-      if (!fake) dhhc.calc_crc();
+      dhhc.calc_crc();
       break;
     };
     case DHHC_FRAME_HEADER_DATA_TYPE_GHOST:
@@ -1743,27 +1787,26 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& la
           if (verbose)
             B2INFO(" EVT END: WIE " << hex << last_wie << " == END " << hex << w << " pad " << pad);
         }
-        dhhc.calc_crc();
       }
+      dhhc.calc_crc();
       break;
     };
     case DHHC_FRAME_HEADER_DATA_TYPE_DHH_END: {
-      bool fake = ((dhhc_dhh_end_frame*)data)->is_fake();
-      if (fake) {
-        B2WARNING("Faked DHH END Data -> trigger without Data!");
-      } else {
-        ((dhhc_dhh_end_frame*)data)->print();
-      }
-      if (!fake) {
-        dhhc.calc_crc();
-      }
+      //bool fake = ((dhhc_dhh_end_frame*)data)->is_fake();
+      //if (fake) {
+      //  B2WARNING("Faked DHH END Data -> trigger without Data!");
+      //} else {
+      ((dhhc_dhh_end_frame*)data)->print();
+      //}
+      dhhc.calc_crc();
       break;
     };
     case DHHC_FRAME_HEADER_DATA_TYPE_HLTROI:
       hw->print();
-      ((dhhc_onsen_frame*)data)->set_length(len - 4);
+      //((dhhc_onsen_frame*)data)->set_length(len - 4);
       ((dhhc_onsen_frame*)data)->print();
-      //dhh.calc_crc(); /// WILL FAIL anyway
+      ((dhhc_onsen_frame*)data)->calc_crc(len - 4); /// CRC is without the DHHC header
+      dhhc.calc_crc();
       break;
     default:
       B2ERROR(" Error: no data ");

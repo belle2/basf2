@@ -78,6 +78,9 @@ namespace Belle2 {
     /** Overrides Constructor-Setup for magnetic field. if no value is given, magnetic field is assumed to be Belle2-Detector standard of 1.5T */
     void resetMagneticField(double magneticFieldStrength = 1.5) { m_magneticFieldFactor = magneticFieldStrength * 0.00299710; } // pT[GeV/c] = 0.299710*B[T]*r[m] = 0.299710*B[T]*r[cm]/100 = 0.00299710B[T]*r[cm]
 
+    /** returns the set value of the magnetic field in Tesla */
+
+    double getMagneticField() { return m_magneticFieldFactor / 0.00299710; }
     /** calculates the angle between the hits/vectors (3D), returning unit: none (calculation for degrees is incomplete, if you want readable numbers, use fullAngle3D instead) */
     double calcAngle3D() {
       double angle = ((m_x2 + m_y2 + m_z2) / (m_vecAB.Mag2() * m_vecBC.Mag2())); // fullCalc would be acos(m_vecAB.Dot(m_vecBC) / m_vecAB.Mag()*m_vecBC.Mag())

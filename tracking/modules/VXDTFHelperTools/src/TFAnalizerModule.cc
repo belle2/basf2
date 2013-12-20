@@ -483,8 +483,20 @@ void TFAnalizerModule::printInfo(int recoveryState, VXDTrackCandidate& mcTC, VXD
   TVector3 mcSeedHit = mcTC.seedHit;
 
   double px = mcDirection[0] - caDirection[0];
+  if (px > 7 or px < -7) {
+    int i = 0;
+    stringstream hitOutput;
+    hitOutput << "caTC-Hits:\n";
+    for (TVector3 hitPos : caTC.coordinates) { hitOutput << "hit " << i << ": " << hitPos.X() << "/" << hitPos.Y() << "/" << hitPos.Z() << "\n"; ++i;}
+    i = 0;
+    hitOutput << "mcTC-Hits:\n";
+    for (TVector3 hitPos : mcTC.coordinates) { hitOutput << "hit " << i << ": " << hitPos.X() << "/" << hitPos.Y() << "/" << hitPos.Z() << "\n"; ++i;}
+    B2DEBUG(10, "printInfo::event " << m_eventCounter << ": pxResidual got bad value (in GeV/c): " << px << " ,ca: " << caDirection[0] << ", mc: " << mcDirection[0] << "\n" << hitOutput.str())
+  } /// DEBUG
   double py = mcDirection[1] - caDirection[1];
+  if (py > 7 or py < -7) { B2DEBUG(10, "printInfo::event " << m_eventCounter << ": pyResidual got bad value (in GeV/c): " << py << " ,ca: " << caDirection[1] << ", mc: " << mcDirection[1])} /// DEBUG
   double pz = mcDirection[2] - caDirection[2];
+  if (pz > 7 or pz < -7) { B2DEBUG(10, "printInfo::event " << m_eventCounter << ": pzResidual got bad value (in GeV/c): " << pz << " ,ca: " << caDirection[2] << ", mc: " << mcDirection[2])} /// DEBUG
 
   double thetaMC = mcDirection.Angle(zDir) * 180.*TMath::InvPi();
   double thetaCA = caDirection.Angle(zDir) * 180.*TMath::InvPi();
@@ -714,7 +726,7 @@ void TFAnalizerModule::extractHits(genfit::TrackCand* aTC,
         svdTrueHits.push_back(aTrueHit);
       }
     }
-  } /// getting Info for each hit. 1D clusters make the whole thing complicated since it has to be checked, whether two 1D hits form a 2D hit of the track or not
+  } /// getting Info for each hit. 1D clusters make the whole thing complicated since it has to be checked, whether two 1D hits form a 2D hit of the track or not WARNING: for each SVD-Cluster, there is a full hit added to the coordinates-list ->therefore hits are doubled
 
   TcInfoTuple tcInfo = boost::make_tuple(pxdHitIDsOfCurrentTC, svdHitIDsOfCurrentTC, coordinates, svdTrueHits);
 

@@ -84,6 +84,7 @@ namespace Belle2 {
       void JumbleVector(std::vector<unsigned int>& vec);
 
     protected:
+      void doNothing(); /**< simple useless member, delete if you want */
 
       boostNsec m_eventMapStuff; /**< time consumption of the secMap-access-step (events) */
       boostNsec m_fillMapStuff; /**< time consumption of the secMap-creation (initialize) */

@@ -7,8 +7,8 @@ from sys import argv
 from basf2 import *
 from time import time
 
-numEvents = 100
-initialValue = 1
+numEvents = 250
+initialValue = 2
 
 secSetup = ['sectorList_evtNormSecHIGH_SVD', 'sectorList_evtNormSecMED_SVD',
             'sectorList_evtNormSecLOW_SVD']

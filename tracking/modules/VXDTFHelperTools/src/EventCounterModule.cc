@@ -43,7 +43,8 @@ EventCounterModule::~EventCounterModule()
 
 void EventCounterModule::initialize()
 {
-
+  StoreArray<PXDCluster>::optional();
+  StoreArray<SVDCluster>::optional();
 
 }
 
@@ -51,6 +52,8 @@ void EventCounterModule::initialize()
 void EventCounterModule::beginRun()
 {
   m_eventCounter = 0;
+  m_pxdClusterCounter = 0;
+  m_svdClusterCounter = 0;
   B2INFO("################## eventCounter enabled, highlighting every " << m_stepSize << " event ######################");
 }
 
@@ -58,14 +61,24 @@ void EventCounterModule::beginRun()
 void EventCounterModule::event()
 {
   m_eventCounter++;
+
+  StoreArray<PXDCluster> aPxdClusterArray;
+  m_pxdClusterCounter += aPxdClusterArray.getEntries();
+
+  StoreArray<SVDCluster> aSvdClusterArray;
+  m_svdClusterCounter += aSvdClusterArray.getEntries();
+
   if (m_eventCounter % m_stepSize == 0) {
-    B2INFO("EventCounterModule - Event: " << m_eventCounter);
+    B2INFO("EventCounterModule - Event: " << m_eventCounter << " having " << aPxdClusterArray.getEntries() << "/" << aSvdClusterArray.getEntries() << " pxd/svdClusters");
   }
 }
 
 
 void EventCounterModule::endRun()
 {
+  if (m_eventCounter == 0) { m_eventCounter++; } // prevents division by zero
+  double invEvents = 1. / m_eventCounter;
+  B2INFO("EventCounterModule: after " << m_eventCounter << " events there were " << m_pxdClusterCounter << "/" << m_svdClusterCounter << " pxd/svdClusters total and " << double(m_pxdClusterCounter)*invEvents << "/" << double(m_svdClusterCounter)*invEvents << " pxd/svdClusters per event");
 }
 
 

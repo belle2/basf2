@@ -107,7 +107,9 @@ std::pair<TVector3, int> TrackletFilters::calcMomentumSeed(bool useBackwards)
 
   std::pair<double, TVector3> helixFitValues = helixFit(m_hits, useBackwards);
   B2DEBUG(10, "calcMomentumSeed: return values of helixFit: first(radius): " << helixFitValues.first << ", second.Mag(): " << helixFitValues.second.Mag())
-  return make_pair(helixFitValues.second, boost::math::sign(hitC * hitB)); //.first: momentum vector. .second: sign of curvature: is > 0 if angle between vectors is < 90°, < 0 else (rule of scalar product)
+  int sign = boost::math::sign(hitC * hitB); // sign of curvature: is > 0 if angle between vectors is < 90°, < 0 else (rule of scalar product)
+  if (sign == 0) { B2ERROR("trackletFilter::calcMomentumSeed: segments orthogonal! "); sign = 1;}
+  return make_pair(helixFitValues.second, sign); //.first: momentum vector. .second: sign of curvature
 }
 
 
@@ -263,6 +265,7 @@ std::pair<double, TVector3> TrackletFilters::helixFit(const std::vector<Position
 //  B2INFO("onesC nRows: " << onesC.GetNrows() << ", nCols: " << onesC.GetNcols() )
 //  B2INFO("onesR nRows: " << onesR.GetNrows() << ", nCols: " << onesR.GetNcols() )
 
+  bool didNanAppear = false; // if nan appeared at least once, -> didNanAppear = true;
   /** local lambda-function used for checking TMatrixDs, whether there are nan values included, returns true, if there are */
   auto lambdaCheckMatrix4NAN = [](TMatrixD & aMatrix) -> bool { /// testing c++11 lambda functions...
     double totalEntries = 0;
@@ -280,50 +283,31 @@ std::pair<double, TVector3> TrackletFilters::helixFit(const std::vector<Position
 //   lambdaTestMatrix(nHits - 2, 0) = sqrt(-1); // producing 'nan'
 //   B2DEBUG(175, "lambdaCheckMatrix4NAN(lambdaTestMatrix): " << lambdaCheckMatrix4NAN(lambdaTestMatrix) << " (should be 1)")
 
-  if (lambdaCheckMatrix4NAN(inverseCovMatrix) == true) { B2DEBUG(10, "helixFit: inverseCovMatrix got 'nan'-entries!") }
-  if (lambdaCheckMatrix4NAN(X) == true) { B2DEBUG(10, "helixFit: X got 'nan'-entries!") }
+  if (lambdaCheckMatrix4NAN(inverseCovMatrix) == true) { B2DEBUG(1, "helixFit: inverseCovMatrix got 'nan'-entries!"); didNanAppear = true; }
+  if (lambdaCheckMatrix4NAN(X) == true) { B2DEBUG(1, "helixFit: X got 'nan'-entries!"); didNanAppear = true; }
 
 
   /// transform to paraboloid:
   double inverseSumWeights = 1. / sumWeights;
-//  B2INFO("inverseSumWeights: " << inverseSumWeights )
   TMatrixD xBar = onesR * inverseCovMatrix * X * inverseSumWeights; // weighed sample mean values
-  if (lambdaCheckMatrix4NAN(xBar) == true) { B2DEBUG(10, "helixFit: xBar got 'nan'-entries!") }
+  if (lambdaCheckMatrix4NAN(xBar) == true) { B2DEBUG(10, "helixFit: xBar got 'nan'-entries!"); didNanAppear = true; }
 
-//  for (int i = 0; i < xBar.GetNcols(); ++i) { B2WARNING("xBar Rows: " <<  i << ", value: " << xBar(0,i) ) }
-//  TMatrixD xBar = onesR;
-//  B2WARNING("xBar = onesR nRows: " << xBar.GetNrows() << ", nCols: " << xBar.GetNcols() )
-//  xBar *= inverseCovMatrix;
-//  B2WARNING("xBar *= inverseCovMatrix nRows: " << xBar.GetNrows() << ", nCols: " << xBar.GetNcols() )
-//  xBar *= X;
-//  B2WARNING("xBar *= X nRows: " << xBar.GetNrows() << ", nCols: " << xBar.GetNcols() )
-//  xBar *= inverseSumWeights;
-//  B2WARNING("xBar = onesRow * inverseCovMatrix * X * inverseSumWeights")
-//  B2WARNING("xBar nRows: " << xBar.GetNrows() << ", nCols: " << xBar.GetNcols() )
+
   TMatrixD transX = X;
   TMatrixD transxBar = xBar;
   transX.Transpose(transX);
   transxBar.Transpose(transxBar);
-//  B2WARNING("transX nRows: " << transX.GetNrows() << ", nCols: " << transX.GetNcols() )
-//  B2WARNING("transxBar nRows: " << transxBar.GetNrows() << ", nCols: " << transxBar.GetNcols() )
-//  TMatrixD Vx_temp1 = transX*inverseCovMatrix;// - transxBar * xBar * sumWeights; /// X'*W*X-xbar'*xbar*sum(wgtu);
-//  B2WARNING("Vx_temp1 nRows: " << Vx_temp1.GetNrows() << ", nCols: " << Vx_temp1.GetNcols() )
-//  B2WARNING("X nRows: " << X.GetNrows() << ", nCols: " << X.GetNcols() )
-//  TMatrixD Vx_temp2 = Vx_temp1 * X;
+
   TMatrixD weighedSampleCovMatrix = transX * inverseCovMatrix * X - transxBar * xBar * sumWeights;
-  if (lambdaCheckMatrix4NAN(weighedSampleCovMatrix) == true) { B2DEBUG(10, "helixFit: weighedSampleCovMatrix got 'nan'-entries!") }
-//  B2WARNING("weighedSampleCovMatrix = X' * inverseCovMatrix * X - xBar' * xBar * sumWeights")
-//  B2WARNING("weighedSampleCovMatrix nRows: " << weighedSampleCovMatrix.GetNrows() << ", nCols: " << weighedSampleCovMatrix.GetNcols() )
+  if (lambdaCheckMatrix4NAN(weighedSampleCovMatrix) == true) { B2DEBUG(1, "helixFit: weighedSampleCovMatrix got 'nan'-entries!"); didNanAppear = true; }
+
 
   /// find eigenvector to smallest eigenvalue
   TMatrixDEigen eigenCollection(weighedSampleCovMatrix);
   TMatrixD eigenValues = eigenCollection.GetEigenValues();
-  if (lambdaCheckMatrix4NAN(eigenValues) == true) { B2DEBUG(10, "helixFit: eigenValues got 'nan'-entries!") }
+  if (lambdaCheckMatrix4NAN(eigenValues) == true) { B2DEBUG(1, "helixFit: eigenValues got 'nan'-entries!"); didNanAppear = true; }
   TMatrixD eigenVectors = eigenCollection.GetEigenVectors();
-  if (lambdaCheckMatrix4NAN(eigenVectors) == true) { B2DEBUG(10, "helixFit: eigenVectors got 'nan'-entries!") }
-//  B2WARNING("eigenValues nRows: " << eigenValues.GetNrows() << ", nCols: " << eigenValues.GetNcols() )
-//  for (int i = 0; i < eigenValues.GetNcols(); ++i) { B2WARNING("eigenValues Rows: " <<  i << ", value: " << eigenValues(i,i) ) }
-//  B2WARNING("eigenVectors nRows: " << eigenVectors.GetNrows() << ", nCols: " << eigenVectors.GetNcols() )
+  if (lambdaCheckMatrix4NAN(eigenVectors) == true) { B2DEBUG(1, "helixFit: eigenVectors got 'nan'-entries!"); didNanAppear = true; }
 
   double minValue = std::numeric_limits<double>::max();
   int minValueIndex = -1;
@@ -334,69 +318,69 @@ std::pair<double, TVector3> TrackletFilters::helixFit(const std::vector<Position
       minValueIndex = i;
     }
   }
-  if (minValueIndex < 0) { B2FATAL("TrackletFilters::helixFit produced no eigenValue smaller than " << minValue << "!")}
-//  B2WARNING("chosenMinValue: " << minValue << ", index: " << minValueIndex )
-//  TMatrixDColumn eigenVector(eigenVectors,minValueIndex);
+  if (minValueIndex < 0) { B2FATAL("TrackletFilters::helixFit produced eigenValue smaller than 0 (" << minValue << ")!")}
 
   double distanceOfPlane = 0;
-  for (int i = 0; i < nEVs; ++i) {
+  for (int i = 0; i < nEVs; ++i) {// calculating scalar product by hand
     distanceOfPlane += eigenVectors(i, minValueIndex) * xBar(0, i); // eigenVectors(:,minValueIndex) = normal vector of the fitted plane (the normalized eigenvector of the smalles eigenValue of weighedSampleCovMatrix)
+//     distanceOfPlane += xBar(0, i) * eigenVectors(i, minValueIndex); // eigenVectors(:,minValueIndex) = normal vector of the fitted plane (the normalized eigenvector of the smalles eigenValue of weighedSampleCovMatrix)
   }
   distanceOfPlane *= -1.;
-//  B2WARNING("distanceOfPlane: " << distanceOfPlane)
+
   double n1 = eigenVectors(0, minValueIndex),
          n2 = eigenVectors(1, minValueIndex),
          n3 = eigenVectors(2, minValueIndex);
-//  B2WARNING("circle: n1: " << n1 << ", n2: " << n2 << ", n3: " << n3 )
+
+//  double aInv = ;
   double a = 1. / (2.*n3); // temporary value
+
   double xc = -n1 * a; // x coordinate of the origin of the circle
   double yc = -n2 * a; // y coordinate of the origin of the circle
 //  double rho2=(1.-n3*n3-4.*distanceOfPlane*n3)*(a*a);
+
   double rho = sqrt((1. - n3 * n3 - 4.*distanceOfPlane * n3) * (a * a)); // radius of the circle
+/// fix dec8,2013:
+//  double rho = sqrt((1. - n3 * n3 - 4.*distanceOfPlane * n3) * aInv * aInv); // radius of the circle
 
   B2DEBUG(10, "helixFit: circle: origin x: " << xc << ", y: " << yc << ", radius: " << rho  << endl)
-//  double h=distanceOfPlane+R2*n3; // temporary value
+
 
   /// line fit:
-//  B2WARNING("R2 nRows: " << R2.GetNrows() << ", nCols: " << R2.GetNcols() )
   TMatrixD H = distanceOfPlane + R2 * n3; // temporary value
-  if (lambdaCheckMatrix4NAN(H) == true) {B2DEBUG(10, "helixFit: H got 'nan'-entries!") }
-//  B2WARNING("H nRows: " << H.GetNrows() << ", nCols: " << H.GetNcols() )
-//  for (int i = 0; i < H.GetNrows(); ++i) { B2WARNING("H Rows: " <<  i << ", value: " << H(i,0) ) }
+  if (lambdaCheckMatrix4NAN(H) == true) { B2DEBUG(1, "helixFit: H got 'nan'-entries!"); didNanAppear = true; }
+
   TMatrixD H2 = H;
-  for (int i = 0; i < H2.GetNrows(); ++i) { H2(i, 0) *= H2(i, 0); }
-  if (lambdaCheckMatrix4NAN(H2) == true) { B2DEBUG(10, "helixFit: H2 got 'nan'-entries!") }
-//  B2WARNING("H2 nRows: " << H2.GetNrows() << ", nCols: " << H2.GetNcols() )
+  H2.Sqr(); // squares each element
+//   for (int i = 0; i < H2.GetNrows(); ++i) { H2(i, 0) *= H2(i, 0); }
+  if (lambdaCheckMatrix4NAN(H2) == true) { B2DEBUG(10, "helixFit: H2 got 'nan'-entries!"); didNanAppear = true; }
+
   double b = n1 * n1 + n2 * n2; // temporary value
 
-  TMatrixD T = b * R2 - H2; // temporary value
-  B2DEBUG(10, "helixFit: T.min: " << T.Min() << ", T.max: " << T.Max() << ", R2.min: " << R2.Min() << ", R2.max: " << R2.Max() << ", H2.min: " << H2.Min() << ", H2.max: " << H2.Max() << ", H.min: " << H.Min() << ", H.max: " << H.Max() << ", b: " << b)
+  TMatrixD T2 = b * R2 - H2; // temporary value T2 = vector, since b = scalar * vector R2 - Vector H2
+  B2DEBUG(10, "helixFit: T.min: " << T2.Min() << ", T.max: " << T2.Max() << ", R2.min: " << R2.Min() << ", R2.max: " << R2.Max() << ", H2.min: " << H2.Min() << ", H2.max: " << H2.Max() << ", H.min: " << H.Min() << ", H.max: " << H.Max() << ", b: " << b)
 
-  if (lambdaCheckMatrix4NAN(T) == true) { B2DEBUG(10, "helixFit: T got 'nan'-entries!") }
+  if (lambdaCheckMatrix4NAN(T2) == true) {B2DEBUG(1, "helixFit: T got 'nan'-entries!"); didNanAppear = true; }
+
+  TMatrixD T = T2;
+  T.Sqrt(); // take square root of all elements
+//   for (int i = 0; i < T.GetNrows(); ++i) { T(i, 0) = sqrt(T(i, 0)); }
+  if (lambdaCheckMatrix4NAN(T) == true) { B2DEBUG(1, "helixFit: T got 'nan'-entries after Sqrt! Before: T.min: " << T2.Min() << ", T.max: " << T2.Max() << ", after: T.min: " << T.Min() << ", T.max: " << T.Max()); didNanAppear = true; }
+
   b = 1. / b;
 
-  for (int i = 0; i < T.GetNrows(); ++i) { T(i, 0) = sqrt(T(i, 0)); }
-  if (lambdaCheckMatrix4NAN(T) == true) { B2DEBUG(10, "helixFit: T got 'nan'-entries after changes!") }
-//  B2WARNING("T nRows: " << T.GetNrows() << ", nCols: " << T.GetNcols() )
-//  for (int i = 0; i < T.GetNrows(); ++i) { B2WARNING("T Rows: " <<  i << ", value: " << T(i,0) ) }
 
   TMatrixD x1 = (-n1 * H + n2 * T) * b;
-  if (lambdaCheckMatrix4NAN(x1) == true) { B2DEBUG(10, " x1 has got 'nan'-values! n1 " << n1 << ", n2 " << n2 << " b " << b)}
+  if (lambdaCheckMatrix4NAN(x1) == true) { B2DEBUG(10, " x1 has got 'nan'-values! n1 " << n1 << ", n2 " << n2 << " b " << b); didNanAppear = true;}
 
-//  B2WARNING("x1 nRows: " << x1.GetNrows() << ", nCols: " << x1.GetNcols() )
-//  for (int i = 0; i < x1.GetNrows(); ++i) { B2WARNING("x1 Rows: " <<  i << ", value: " << x1(i,0) ) }
   TMatrixD y1 = (-n2 * H - n1 * T) * b;
-  if (lambdaCheckMatrix4NAN(y1) == true) { B2DEBUG(10, " y1 has got 'nan'-values! n1 " << n1 << ", n2 " << n2 << " b " << b)}
-//  B2WARNING("y1 nRows: " << y1.GetNrows() << ", nCols: " << y1.GetNcols() )
-//  for (int i = 0; i < y1.GetNrows(); ++i) { B2WARNING("y1 Rows: " <<  i << ", value: " << y1(i,0) ) }
+  if (lambdaCheckMatrix4NAN(y1) == true) { B2DEBUG(10, " y1 has got 'nan'-values! n1 " << n1 << ", n2 " << n2 << " b " << b); didNanAppear = true;}
+
   TMatrixD x2 = (-n1 * H - n2 * T) * b;
-  if (lambdaCheckMatrix4NAN(x2) == true) { B2DEBUG(10, " x2 has got 'nan'-values! n1 " << n1 << ", n2 " << n2 << " b " << b)}
-//  B2WARNING("x2 nRows: " << x2.GetNrows() << ", nCols: " << x2.GetNcols() )
-//  for (int i = 0; i < x2.GetNrows(); ++i) { B2WARNING("x2 Rows: " <<  i << ", value: " << x2(i,0) ) }
+  if (lambdaCheckMatrix4NAN(x2) == true) { B2DEBUG(10, " x2 has got 'nan'-values! n1 " << n1 << ", n2 " << n2 << " b " << b); didNanAppear = true;}
+
   TMatrixD y2 = (-n2 * H + n1 * T) * b;
-  if (lambdaCheckMatrix4NAN(y2) == true) { B2DEBUG(10, " y2 has got 'nan'-values! n1 " << n1 << ", n2 " << n2 << " b " << b)}
-//  B2WARNING("y2 nRows: " << y2.GetNrows() << ", nCols: " << y2.GetNcols() )
-//  for (int i = 0; i < y2.GetNrows(); ++i) { B2WARNING("y2 Rows: " <<  i << ", value: " << y2(i,0) ) }
+  if (lambdaCheckMatrix4NAN(y2) == true) { B2DEBUG(10, " y2 has got 'nan'-values! n1 " << n1 << ", n2 " << n2 << " b " << b); didNanAppear = true;}
+
 
   double dx1 = 0; // highest deviation of x1 value from estimated line
   double temp = 0;
@@ -435,7 +419,6 @@ std::pair<double, TVector3> TrackletFilters::helixFit(const std::vector<Position
     } else  {
       xs = x1; ys = y1;
     }
-//    xs = x1; ys = y1;
   } else {
     if (lambdaCheckMatrix4NAN(x2) == true or lambdaCheckMatrix4NAN(y2) == true) {
       xs = x1; ys = y1;
@@ -445,7 +428,6 @@ std::pair<double, TVector3> TrackletFilters::helixFit(const std::vector<Position
     } else  {
       xs = x2; ys = y2;
     }
-//    xs = x2; ys = y2;
   }
 
   /// radius vectors
@@ -456,27 +438,29 @@ std::pair<double, TVector3> TrackletFilters::helixFit(const std::vector<Position
 
   TMatrixD s(nHits, 1); // length of arc
   s(0, 0) = 0;
-  bool didNanAppear = false; // simple check whether 'nan' appeared
   for (int i = 1; i < nHits; ++i) {
     double radiusXb = xs(i, 0) - xc;
     double radiusYb = ys(i, 0) - yc;
     double radiusMagb = sqrt(radiusXb * radiusXb + radiusYb * radiusYb);
 
-    s(i, 0) = rho * acos(((radiusX * radiusXb + radiusY * radiusYb) * invRadiusMag) / radiusMagb);
+    s(i, 0) = rho * acos(((radiusX * radiusXb + radiusY * radiusYb) / radiusMag) / radiusMagb); // version 1
+//     s(i, 0) = rho * acos(((radiusX * radiusXb + radiusY * radiusYb) * invRadiusMag) / radiusMagb); // version 2
     if (std::isnan(s(i, 0)) == true) {
       didNanAppear = true;
-      B2DEBUG(10, "helixFit: i: " << i << ", s(i) = 'nan', components - rho: " << rho << ", radiusX: " << radiusX << ", radiusY: " << radiusY << ", radiusXb: " << radiusXb << ", radiusYb: " << radiusYb << ", invRadiusMag: " << invRadiusMag << ", radiusMagb: " << radiusMagb << ", xs(i): " << xs(i, 0) << ", ys(i): " << ys(i, 0))
+      B2DEBUG(1, "helixFit: i: " << i << ", s(i) = 'nan', components - rho: " << rho << ", radiusX: " << radiusX << ", radiusY: " << radiusY << ", radiusXb: " << radiusXb << ", radiusYb: " << radiusYb << ", invRadiusMag: " << invRadiusMag << ", radiusMagb: " << radiusMagb << ", xs(i): " << xs(i, 0) << ", ys(i): " << ys(i, 0))
+//      B2DEBUG(10,
     }
   }
 
-  if (didNanAppear == true) {
-    stringstream hitOutput;
-    int i = 0;
-    for (PositionInfo * hit : *m_hits) {
-      hitOutput << " hit " << i << ": x/y/sigmaX/sigmaY: " << hit->hitPosition.X() << "/" << hit->hitPosition.Y() << "/" << hit->sigmaX << "/" << hit->sigmaY << endl;
-    }
-    B2DEBUG(10, "helixFit: there was a 'nan'-value detected. The following hits were part of this TC: \n" << hitOutput.str())
-  }
+//   if (didNanAppear == true) {
+//     stringstream hitOutput;
+//     int i = 0;
+//     for (PositionInfo * hit : *m_hits) {
+//       hitOutput << " hit " << i << ": x/y/sigmaX/sigmaY: " << hit->hitPosition.X() << "/" << hit->hitPosition.Y() << "/" << hit->sigmaX << "/" << hit->sigmaY << endl;
+//      ++i;
+//     }
+//     B2WARNING("helixFit: there was a 'nan'-value detected. The following hits were part of this TC: \n" << hitOutput.str())
+//   }
 
   /// fit line s versus z
 
@@ -498,15 +482,19 @@ std::pair<double, TVector3> TrackletFilters::helixFit(const std::vector<Position
   AtGA(1, 1) = sumWiSi2;
   TMatrixD AtGAInv = AtGA;
   AtGAInv.Invert();
+  if (lambdaCheckMatrix4NAN(AtGA) == true) {B2DEBUG(10, "helixFit: AtGA got 'nan'-entries!"); didNanAppear = true; }
+  if (lambdaCheckMatrix4NAN(AtGAInv) == true) {B2DEBUG(10, "helixFit: AtGAInv got 'nan'-entries!"); didNanAppear = true; }
+  if (lambdaCheckMatrix4NAN(zValues) == true) {B2DEBUG(10, "helixFit: zValues got 'nan'-entries!"); didNanAppear = true; }
 
   TMatrixD p = AtGAInv * AtG * zValues; // fitted z value in the first point, tan(lambda)
-//  for (int i = 0; i < 2; ++i) {
-//    B2WARNING("p Rows: " <<  i << ", value: " << p(i,0) )
-//  }
+  if (lambdaCheckMatrix4NAN(p) == true) { B2DEBUG(10, "helixFit: p got 'nan'-entries!") }
+
   double thetaVal = M_PI * 0.5 - atan(p(1, 0)); // WARNING: was M_PI*0.5 - atan(p(1,0)), but values were wrong! double-WARNING: but + atan was wrong too!
 
   if (std::isnan(thetaVal) == true) {
+    didNanAppear = true;
     thetaVal = (hits->at(nHits - 1)->hitPosition - hits->at(0)->hitPosition).Theta();
+//    B2DEBUG(1,
     B2DEBUG(1, "helixFit: calculating theta for momentum produced 'nan' -> fallback-solution produces theta: " << thetaVal)
     if (std::isnan(thetaVal) == true) { B2ERROR("helixFit: no usable Theta value could be produced -> serious error telling us that helix fit does not work! bypass is setting the value to 0!"); thetaVal = 0; }
   }
@@ -525,13 +513,42 @@ std::pair<double, TVector3> TrackletFilters::helixFit(const std::vector<Position
   radialVector.SetZ(0.);
   double pT = m_3hitFilterBox.calcPt(rho);
   TVector3 pVector = pT  * (radialVector.Orthogonal()).Unit(); // now it is the pT-Vector, therefore without pZ information
+
+  /** local lambda-function used for checking TVector3s, whether there are nan values included, returns true, if there are */
+  auto lambdaCheckVector4NAN = [](TVector3 & aVector) -> bool { /// testing c++11 lambda functions...
+    return std::isnan(aVector.Mag2()); // if one of them is 'nan', Mag2 will be 'nan' too
+  }; // should be converted to normal function, since feature could be used much more often...
+  if (lambdaCheckVector4NAN(pVector) == true) { B2ERROR("helixFit: pTVector got 'nan'-entries x/y/z: " << pVector.X() << "/" << pVector.Y() << "/" << pVector.Z()); didNanAppear = true; }
+
   double pZ = pT / tan(thetaVal);
   B2DEBUG(10, "helixFit: radius(rho): " << rho << ", theta: " << thetaVal << ", pT: " << pT << ", pZ: " << pZ << ", pVector.Perp: " << pVector.Perp() << ", pVector.Mag: " << pVector.Mag() << ", fitted zValue: " << p(1, 0))
   TVector3 vectorToSecondHit = secondHit - seedHit;
   vectorToSecondHit.SetZ(0);
   if (((useBackwards == true) && (vectorToSecondHit.Angle(pVector) < M_PI * 0.5)) || ((useBackwards == false) && (vectorToSecondHit.Angle(pVector) > M_PI * 0.5))) { pVector *= -1.; }
 //  if ( vectorToSecondHit.Angle(pVector) > M_PI*0.5 ) { pVector *= -1.; }
+
   pVector.SetZ(pZ); // now that track carries full momentum
+  if (lambdaCheckVector4NAN(pVector) == true) { B2ERROR("helixFit: pVector got 'nan'-entries x/y/z: " << pVector.X() << "/" << pVector.Y() << "/" << pVector.Z()); didNanAppear = true; }
+
+  if (didNanAppear == true) {
+    stringstream hitOutput;
+    int i = 0;
+    for (PositionInfo * hit : *m_hits) {
+      hitOutput << " hit " << i << ": x/y/sigmaX/sigmaY: " << hit->hitPosition.X() << "/" << hit->hitPosition.Y() << "/" << hit->sigmaX << "/" << hit->sigmaY << endl;
+      ++i;
+    }
+    B2DEBUG(1, "helixFit: there was a 'nan'-value detected. When using magnetic field of " << m_3hitFilterBox.getMagneticField() << ", the following hits were part of this TC: \n" << hitOutput.str() << "\n pVector  x/y/z: " << pVector.X() << "/" << pVector.Y() << "/" << pVector.Z())
+  }
+
+///   if ( pVector.Mag() > 14. or pVector.Mag() < -14. ) { /// DEBUG
+//    stringstream hitOutput;
+//     int i = 0;
+//     for (PositionInfo * hit : *m_hits) {
+//       hitOutput << " hit " << i << ": x/y/z/sigmaU/sigmaV: " << hit->hitPosition.X() << "/" << hit->hitPosition.Y() << "/" << hit->hitPosition.Z() << "/" << hit->sigmaX << "/" << hit->sigmaY << endl;
+//      ++i;
+//     }
+//     B2WARNING("helixFit: strange pVector (Mag="<<pVector.Mag()<< ") detected. The following hits were part of this TC: \n" << hitOutput.str() << "\n pVector  x/y/z: " << pVector.X()<<"/"<< pVector.Y()<<"/"<< pVector.Z())
+///   }
 //    B2ERROR("again: useBackwards == " << useBackwards << ", seedHit.Mag()/secondHit.Mag(): " << seedHit.Mag()<<"/"<< secondHit.Mag())
 
 //  B2WARNING("Circle: origin x: " << xc << ", y: " << yc << ", radius: " << rho << ", pT: " << pT << ", thetaVal: " << thetaVal << ", p(1,0): " << p(1,0)<< ", pVector: " << pVector.Mag())
@@ -596,12 +613,12 @@ std::pair<double, TVector3> TrackletFilters::helixFit(const std::vector<Position
 // 7.0478994508509487 4.787722223489471 5.4111187877655036 4.707051327516743e-06 4.8015625973494028e-05
 // 8.9823161930530837 5.4741719839834033 6.7053809738159185 4.707051327516743e-06 4.8015625973494028e-05
 // 12.078509159296951 6.1589094409158482 8.6692161655426041 4.707051327516743e-06 4.8015625973494028e-05];
-// // convert to column vectors
+/// convert to column vectors
 // x=event(:,1);y=event(:,2);z=event(:,3);varu=event(:,4);varz=event(:,5);n=length(x);
 // Phi=atan2(y,x);
 // R=sqrt(x.^2+y.^2);
 // RPhi=R.*Phi;
-// // transform to paraboloid
+/// transform to paraboloid
 // R2=R.^2;
 // w=R2;
 // X=[x y w];
@@ -641,7 +658,7 @@ std::pair<double, TVector3> TrackletFilters::helixFit(const std::vector<Position
 //  xs=x2;
 //  ys=y2;
 // end
-// // radius vectors
+/// radius vectors
 // rv1=[xs(1)-xc; ys(1)-yc]
 // s(1)=0;
 // for i=2:n
@@ -649,13 +666,13 @@ std::pair<double, TVector3> TrackletFilters::helixFit(const std::vector<Position
 //  phi=acos(dot(rv1,rv2)/norm(rv1)/norm(rv2));
 //  s(i)=rho*phi;
 // end
-// // chi2 of circle fit
+/// chi2 of circle fit
 // Phis=atan2(ys,xs);
 // Rs=sqrt(xs.^2+ys.^2);
 // RPhis=Rs.*Phis;
 // res=(RPhi-RPhis);
 // chi2=dot(res.^2,wgtu);
-// // fit line s versus z
+/// fit line s versus z
 // A=[ones(n,1) s(:)];
 // G=1./varz';
 // AtG=A'.*repmat(G,2,1);

@@ -19,7 +19,7 @@ beamspot_size_y = 0.3  # cm (sigma of gaussian)
 beamspot_size_z = 0.3  # cm (sigma of gaussian)
 
 numTracks = 1
-numEvents = 25000
+numEvents = 5000
 initialValue = 0  # want random events
 
 # parameters for the secMap-calculation:
@@ -33,16 +33,16 @@ pTcuts = [1.0, 1.5]
 # secConfigU = [0.0, 0.5, 1.0]
 # secConfigV = [0.0, 0.33, 0.67, 1.0]
 
-setupFileName = 'testBeamFine'
-secConfigU = [0., 0.25, 0.5, 0.75, 1.0]
-secConfigV = [
-    0.,
-    0.2,
-    0.4,
-    0.6,
-    0.8,
-    1.0,
-    ]
+# setupFileName = 'testBeamFine'
+# secConfigU = [0., 0.25, 0.5, 0.75, 1.0]
+# secConfigV = [
+    # 0.,
+    # 0.2,
+    # 0.4,
+    # 0.6,
+    # 0.8,
+    # 1.0,
+    # ]
 
 # allows steering initial value and numEvents by sript file
 if len(argv) is 1:
@@ -140,6 +140,7 @@ filterCalc2.logging.log_level = LogLevel.DEBUG
 filterCalc2.logging.debug_level = 1
 param_fCalc2 = {  # -1 = VXD, 0 = PXD, 1 = SVD
                   # # completely different to values of Belle2-detector
+                  # arbitrary origin
     'detectorType': 1,
     'maxXYvertexDistance': 200.,
     'tracksPerEvent': numTracks,
@@ -148,7 +149,7 @@ param_fCalc2 = {  # -1 = VXD, 0 = PXD, 1 = SVD
     'highestAllowedLayer': 6,
     'sectorConfigU': secConfigU,
     'sectorConfigV': secConfigV,
-    'setOrigin': [gun_x_position, 0., 0.],
+    'setOrigin': [gun_x_position * 0.25, 0., 0.],
     'magneticFieldStrength': 0.976,
     'testBeam': 1,
     'secMapWriteToRoot': 1,

@@ -66,6 +66,8 @@ namespace Belle2 {
 
     int m_eventCounter; /**< knows current event number */
     int m_stepSize; /**< Informes the user that  event: (eventCounter-modulo(stepSize)) is currently executed */
+    int m_pxdClusterCounter; /**< counts total number of pxd clusters occured */
+    int m_svdClusterCounter; /**< counts total number of pxd clusters occured */
 
   private:
 

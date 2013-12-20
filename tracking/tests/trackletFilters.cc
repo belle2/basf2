@@ -243,11 +243,12 @@ namespace Belle2 {
 //    pos6.hitPosition = TVector3(1.17998,-0.805218,-0.88255);
 //     pos6.sigmaX = 0.000683021;
 //     pos6.sigmaY = 0.000819625;
+  }
 
 
-
-
-    /// testing Eigen library and comparing results with root TMatrixD:
+  /** testing Eigen library and comparing results with root TMatrixD */
+  TEST_F(TrackletFiltersTest, eigenLibraryTest)
+  {
     int sizeOfMatrix = 4;
     double seed = 4;
     TMatrixD rootMatrix(sizeOfMatrix, sizeOfMatrix);  // testing matrix -root
@@ -263,7 +264,6 @@ namespace Belle2 {
     Eigen::MatrixXd eigenMatrix(sizeOfMatrix, sizeOfMatrix);   // testing matrix -eigenLibrary
     Eigen::MatrixXd eigenMatrix2(sizeOfMatrix, sizeOfMatrix);   // testing matrix -eigenLibrary
     Eigen::MatrixXd eigenVector(1, sizeOfMatrix); // testing vector -eigenLibrary
-
 
 
     for (int i = 0; i < sizeOfMatrix; ++i) {
@@ -296,11 +296,264 @@ namespace Belle2 {
     EXPECT_DOUBLE_EQ(multipliedRoot2.Abs().Max(), multipliedEigen2.array().abs().maxCoeff());
     EXPECT_DOUBLE_EQ(minusRoot.Abs().Max(), minusEigen.array().abs().maxCoeff());
 
-//    for (int i= 0; i < sizeOfMatrix; ++i) {
+
+    //    for (int i= 0; i < sizeOfMatrix; ++i) {
 //      for (int j= 0; j < sizeOfMatrix; ++j) {
 //        EXPECT_DOUBLE_EQ(multipliedRoot2(i,j), multipliedEigen2(i,j));
 //        EXPECT_DOUBLE_EQ(minusRoot(i,j), minusEigen(i,j));
 //      }
 //    }
+  }
+
+
+
+  /** testing helix fit for different cases*/
+  TEST_F(TrackletFiltersTest, helixFitterTest)
+  {
+    TrackletFilters aFilter = TrackletFilters();
+    vector<PositionInfo*> badVec1, badVec2, badVec3, badVec4, badVec5;
+    vector<PositionInfo> tbadVec1, tbadVec2, tbadVec3, tbadVec4, tbadVec5;
+    double clapPhi, clapR, estimatedRadius;
+
+    stringstream HitInfos;
+    HitInfos << "bad p: " << 15.0808 << "\n";
+    /// badVec1
+    TVector3 hit = TVector3(-6.516, -1.05416, 0.134742);
+    PositionInfo posInfo;
+    posInfo.hitPosition = hit;
+    posInfo.sigmaX = 0.0160026;
+    posInfo.sigmaY = 0.0112734;
+    tbadVec1.push_back(posInfo);
+    HitInfos << hit.X() << " " << hit.Y() << " " << hit.Z() << " " << posInfo.sigmaX << " " <<  posInfo.sigmaY << endl;
+
+    hit.SetXYZ(-3.516, -0.986426, 0.14058);
+    posInfo.hitPosition = hit;
+    posInfo.sigmaX = 0.0160026;
+    posInfo.sigmaY = 0.0112734;
+    tbadVec1.push_back(posInfo);
+    HitInfos << hit.X() << " " << hit.Y() << " " << hit.Z() << " " << posInfo.sigmaX << " " <<  posInfo.sigmaY << endl;
+
+//   pVector  x/y/z: -15.0774/-0.319219/0.0254473  { module: VXDTF }
+    hit.SetXYZ(-1.016, -0.930059, 0.142918);
+    posInfo.hitPosition = hit;
+    posInfo.sigmaX = 0.0160026;
+    posInfo.sigmaY = 0.0112734;
+    tbadVec1.push_back(posInfo);
+    HitInfos << hit.X() << " " << hit.Y() << " " << hit.Z() << " " << posInfo.sigmaX << " " <<  posInfo.sigmaY << endl;
+
+    hit.SetXYZ(3.184, -0.839871, 0.14732);
+    posInfo.hitPosition = hit;
+    posInfo.sigmaX = 0.0160026;
+    posInfo.sigmaY = 0.0112734;
+    tbadVec1.push_back(posInfo);
+    HitInfos << hit.X() << " " << hit.Y() << " " << hit.Z() << " " << posInfo.sigmaX << " " <<  posInfo.sigmaY << endl;
+    B2INFO("badVec1: " << HitInfos.str() << endl)
+
+    for (int i = 0; i < int(tbadVec1.size()); ++i) { badVec1.push_back(&(tbadVec1.at(i))); }
+    aFilter.resetValues(&badVec1);
+    aFilter.resetMagneticField(0.976);
+
+    pair<double, TVector3> returnValues = aFilter.helixFit();
+//    EXPECT_FLOAT_EQ(15.0808, returnValues.second.Mag());
+
+    aFilter.circleFit(clapPhi, clapR, estimatedRadius);
+    EXPECT_FLOAT_EQ(returnValues.first, estimatedRadius);
+
+
+
+    /// badVec2
+    stringstream HitInfos1;
+    HitInfos1 << "bad p: " << 258.543 << "\n";
+    hit.SetXYZ(-6.516, -1.05416, 0.134742);
+    posInfo.hitPosition = hit;
+    posInfo.sigmaX = 0.0160026;
+    posInfo.sigmaY = 0.0112734;
+    tbadVec2.push_back(posInfo);
+    HitInfos1 << hit.X() << " " << hit.Y() << " " << hit.Z() << " " << posInfo.sigmaX << " " <<  posInfo.sigmaY << endl;
+//    [WARNING] helixFit: strange pVector (Mag=258.543) detected. The following hits were part of this TC:
+
+//  pVector  x/y/z: -258.477/-5.82419/0.388155  { module: VXDTF }
+
+    hit.SetXYZ(-3.516, -0.986426, 0.14058);
+    posInfo.hitPosition = hit;
+    posInfo.sigmaX = 0.0160026;
+    posInfo.sigmaY = 0.0112734;
+    tbadVec2.push_back(posInfo);
+    HitInfos1 << hit.X() << " " << hit.Y() << " " << hit.Z() << " " << posInfo.sigmaX << " " <<  posInfo.sigmaY << endl;
+
+    hit.SetXYZ(-1.016, -0.930059, 0.142918);
+    posInfo.hitPosition = hit;
+    posInfo.sigmaX = 0.0160026;
+    posInfo.sigmaY = 0.0112734;
+    tbadVec2.push_back(posInfo);
+    HitInfos1 << hit.X() << " " << hit.Y() << " " << hit.Z() << " " << posInfo.sigmaX << " " <<  posInfo.sigmaY << endl;
+
+    B2INFO("badVec2: " << HitInfos1.str() << endl)
+
+    for (int i = 0; i < int(tbadVec2.size()); ++i) { badVec2.push_back(&(tbadVec2.at(i))); }
+    aFilter.resetValues(&badVec2);
+    aFilter.resetMagneticField(0.976);
+
+    aFilter.circleFit(clapPhi, clapR, estimatedRadius);
+
+    returnValues = aFilter.helixFit();
+//    EXPECT_FLOAT_EQ(258.543, returnValues.second.Mag());
+    EXPECT_FLOAT_EQ(returnValues.first, estimatedRadius);
+
+
+
+    /// badVec3
+    stringstream HitInfos2;
+    HitInfos2 << "bad p: " << 25.2143 << "\n";
+    hit.SetXYZ(-6.516, -1.00897, 0.314466);
+    posInfo.hitPosition = hit;
+    posInfo.sigmaX = 0.0160026;
+    posInfo.sigmaY = 0.0112734;
+    tbadVec3.push_back(posInfo);
+    HitInfos2 << hit.X() << " " << hit.Y() << " " << hit.Z() << " " << posInfo.sigmaX << " " <<  posInfo.sigmaY << endl;
+//    [WARNING] helixFit: strange pVector (Mag=25.2143) detected. The following hits were part of this TC:
+//  pVector  x/y/z: -25.208/-0.563156/-0.0166426  { module: VXDTF }
+
+    hit.SetXYZ(-3.516, -0.943345, 0.313504);
+    posInfo.hitPosition = hit;
+    posInfo.sigmaX = 0.0160026;
+    posInfo.sigmaY = 0.0112734;
+    tbadVec3.push_back(posInfo);
+    HitInfos2 << hit.X() << " " << hit.Y() << " " << hit.Z() << " " << posInfo.sigmaX << " " <<  posInfo.sigmaY << endl;
+
+    hit.SetXYZ(-1.016, -0.887857, 0.310771);
+    posInfo.hitPosition = hit;
+    posInfo.sigmaX = 0.0160026;
+    posInfo.sigmaY = 0.0112734;
+    tbadVec3.push_back(posInfo);
+    HitInfos2 << hit.X() << " " << hit.Y() << " " << hit.Z() << " " << posInfo.sigmaX << " " <<  posInfo.sigmaY << endl;
+
+    B2INFO("badVec3: " << HitInfos2.str() << endl)
+
+    for (int i = 0; i < int(tbadVec3.size()); ++i) { badVec3.push_back(&(tbadVec3.at(i))); }
+    aFilter.resetValues(&badVec3);
+    aFilter.resetMagneticField(0.976);
+
+    returnValues = aFilter.helixFit();
+    EXPECT_FLOAT_EQ(25.2143, returnValues.second.Mag());
+
+//    aFilter.circleFit(clapPhi, clapR, estimatedRadius);
+    EXPECT_FLOAT_EQ(returnValues.first, estimatedRadius);
+
+
+
+
+    /// badVec4
+    stringstream HitInfos3;
+    HitInfos3 << "\n bad p: " << 14.8262 << "\n";
+    hit.SetXYZ(-6.516, -0.575024, 0.326773);
+    posInfo.hitPosition = hit;
+    posInfo.sigmaX = 0.0160026;
+    posInfo.sigmaY = 0.0112734;
+    tbadVec4.push_back(posInfo);
+    HitInfos3 << hit.X() << " " << hit.Y() << " " << hit.Z() << " " << posInfo.sigmaX << " " <<  posInfo.sigmaY << endl;
+//    [WARNING] helixFit: strange pVector (Mag=) detected. The following hits were part of this TC:
+//  pVector  x/y/z: -14.8227/-0.318451/-0.000269897  { module: VXDTF }
+    hit.SetXYZ(-3.516, -0.512941, 0.325116);
+    posInfo.hitPosition = hit;
+    posInfo.sigmaX = 0.0160026;
+    posInfo.sigmaY = 0.0112734;
+    tbadVec4.push_back(posInfo);
+    HitInfos3 << hit.X() << " " << hit.Y() << " " << hit.Z() << " " << posInfo.sigmaX << " " <<  posInfo.sigmaY << endl;
+
+    hit.SetXYZ(-1.016, -0.459848, 0.326773);
+    posInfo.hitPosition = hit;
+    posInfo.sigmaX = 0.0160026;
+    posInfo.sigmaY = 0.0112734;
+    tbadVec4.push_back(posInfo);
+
+    HitInfos3 << hit.X() << " " << hit.Y() << " " << hit.Z() << " " << posInfo.sigmaX << " " <<  posInfo.sigmaY << endl;
+    B2INFO("badVec4: " << HitInfos3.str() << endl)
+
+    for (int i = 0; i < int(tbadVec4.size()); ++i) { badVec4.push_back(&(tbadVec4.at(i))); }
+    aFilter.resetValues(&badVec4);
+    aFilter.resetMagneticField(0.976);
+
+    aFilter.circleFit(clapPhi, clapR, estimatedRadius);
+
+    returnValues = aFilter.helixFit();
+//    EXPECT_FLOAT_EQ(14.8262, returnValues.second.Mag());
+    EXPECT_FLOAT_EQ(returnValues.first, estimatedRadius);
+
+
+
+    /// badVec5
+    stringstream HitInfos4;
+    HitInfos4 << "bad p: " << 337657 << "\n";
+    hit.SetXYZ(-6.516, -0.930059, -0.153305);
+    posInfo.hitPosition = hit;
+    posInfo.sigmaX = 0.0160026;
+    posInfo.sigmaY = 0.0112734;
+    tbadVec5.push_back(posInfo);
+    HitInfos4 << hit.X() << " " << hit.Y() << " " << hit.Z() << " " << posInfo.sigmaX << " " <<  posInfo.sigmaY << endl;
+//    [WARNING] helixFit: strange pVector (Mag=) detected. The following hits were part of this TC:
+//  pVector  x/y/z: -337570/-7611.14/906.841  { module: VXDTF }
+    hit.SetXYZ(-3.516, -0.862418, -0.143971);
+    posInfo.hitPosition = hit;
+    posInfo.sigmaX = 0.0160026;
+    posInfo.sigmaY = 0.0112734;
+    tbadVec5.push_back(posInfo);
+    HitInfos4 << hit.X() << " " << hit.Y() << " " << hit.Z() << " " << posInfo.sigmaX << " " <<  posInfo.sigmaY << endl;
+
+    hit.SetXYZ(-1.016, -0.806051, -0.137302);
+    posInfo.hitPosition = hit;
+    posInfo.sigmaX = 0.0160026;
+    posInfo.sigmaY = 0.0112734;
+    tbadVec5.push_back(posInfo);
+    HitInfos4 << hit.X() << " " << hit.Y() << " " << hit.Z() << " " << posInfo.sigmaX << " " <<  posInfo.sigmaY << endl;
+
+    B2INFO("badVec5: " << HitInfos4.str() << endl)
+
+    for (int i = 0; i < int(tbadVec5.size()); ++i) { badVec5.push_back(&(tbadVec5.at(i))); }
+    aFilter.resetValues(&badVec5);
+    aFilter.resetMagneticField(0.976);
+
+    returnValues = aFilter.helixFit();
+//    EXPECT_FLOAT_EQ(337657, returnValues.second.Mag());
+
+    aFilter.circleFit(clapPhi, clapR, estimatedRadius);
+    EXPECT_FLOAT_EQ(estimatedRadius, returnValues.first);
+
+    /*
+
+        [WARNING] helixFit: strange pVector (Mag=15.0808) detected. The following hits were part of this TC:
+     hit 0: x/y/z/sigmaU/sigmaV: -6.516/-1.05416/0.134742/0.0160026/0.0112734
+     hit 1: x/y/z/sigmaU/sigmaV: -3.516/-0.986426/0.14058/0.0160026/0.0112734
+     hit 2: x/y/z/sigmaU/sigmaV: -1.016/-0.930059/0.142918/0.0160026/0.0112734
+     hit 3: x/y/z/sigmaU/sigmaV: 3.184/-0.839871/0.14732/0.0160026/0.0112734
+      pVector  x/y/z: -15.0774/-0.319219/0.0254473  { module: VXDTF }
+
+
+    [WARNING] helixFit: strange pVector (Mag=258.543) detected. The following hits were part of this TC:
+     hit 0: x/y/z/sigmaU/sigmaV: -6.516/-1.05416/0.134742/0.0160026/0.0112734
+     hit 1: x/y/z/sigmaU/sigmaV: -3.516/-0.986426/0.14058/0.0160026/0.0112734
+     hit 2: x/y/z/sigmaU/sigmaV: -1.016/-0.930059/0.142918/0.0160026/0.0112734
+     pVector  x/y/z: -258.477/-5.82419/0.388155  { module: VXDTF }
+
+
+     [WARNING] helixFit: strange pVector (Mag=25.2143) detected. The following hits were part of this TC:
+     hit 0: x/y/z/sigmaU/sigmaV: -6.516/-1.00897/0.314466/0.0160026/0.0112734
+     hit 1: x/y/z/sigmaU/sigmaV: -3.516/-0.943345/0.313504/0.0160026/0.0112734
+     hit 2: x/y/z/sigmaU/sigmaV: -1.016/-0.887857/0.310771/0.0160026/0.0112734
+     pVector  x/y/z: -25.208/-0.563156/-0.0166426  { module: VXDTF }
+
+
+     [WARNING] helixFit: strange pVector (Mag=14.8262) detected. The following hits were part of this TC:
+     hit 0: x/y/z/sigmaU/sigmaV: -6.516/-0.575024/0.326773/0.0160026/0.0112734
+     hit 1: x/y/z/sigmaU/sigmaV: -3.516/-0.512941/0.325116/0.0160026/0.0112734
+     hit 2: x/y/z/sigmaU/sigmaV: -1.016/-0.459848/0.326773/0.0160026/0.0112734
+     pVector  x/y/z: -14.8227/-0.318451/-0.000269897  { module: VXDTF }
+
+
+     [WARNING] helixFit: strange pVector (Mag=337657) detected. The following hits were part of this TC:
+     hit 0: x/y/z/sigmaU/sigmaV: -6.516/-0.930059/-0.153305/0.0160026/0.0112734
+     hit 1: x/y/z/sigmaU/sigmaV: -3.516/-0.862418/-0.143971/0.0160026/0.0112734
+     hit 2: x/y/z/sigmaU/sigmaV: -1.016/-0.806051/-0.137302/0.0160026/0.0112734
+     pVector  x/y/z: -337570/-7611.14/906.841  { module: VXDTF }*/
   }
 }  // namespace

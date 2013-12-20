@@ -14,18 +14,18 @@ import datetime
     # <xi:include href="testBeamSVD-moreThan1500MeV_SVD.xml
 # secSetup = ['testBeamFINE_VXD']  # use 'testBeamFINE_SVD' for svd-only
 # secSetup = ['testBeamFineVXD-moreThan1500MeV_VXD']  # use 'testBeamStdSVD-moreThan1500MeV_SVD' for svd-only
-secSetup = ['testBeamFineSVD-moreThan1500MeV_SVD']  # use 'testBeamStdSVD-moreThan1500MeV_SVD' for svd-only
+# secSetup = ['testBeamFineSVD-moreThan1500MeV_SVD']  # use 'testBeamStdSVD-moreThan1500MeV_SVD' for svd-only
 # secSetup = ['testBeamStdVXD-moreThan1500MeV_VXD']  # use 'testBeamStdSVD-moreThan1500MeV_SVD' for svd-only
 # secSetup = ['testBeamStdSVD-moreThan1500MeV_SVD']  # use 'testBeamStdSVD-moreThan1500MeV_SVD' for svd-only
 # secSetup = ['testBeamMiniVXD-moreThan1500MeV_VXD']  # use 'testBeamStdSVD-moreThan1500MeV_SVD' for svd-only
-# secSetup = ['testBeamMiniSVD-moreThan1500MeV_SVD']  # use 'testBeamStdSVD-moreThan1500MeV_SVD' for svd-only
+secSetup = ['testBeamMiniSVD-moreThan1500MeV_SVD']  # use 'testBeamStdSVD-moreThan1500MeV_SVD' for svd-only
 # or 'testBeamFINE_VXD' for full vxd reco.
 # and don't forget to set the clusters for the detector type you want in the
 # mcTrackFinder down below!
 qiType = 'circleFit'
 filterOverlaps = 'hopfield'
-seed = 1
-numEvents = 500
+seed = 1  # 1, 5, 6
+numEvents = 250
 momentum = 6.0  # GeV/c
 momentum_spread = 0.05  # %
 theta = 90.0  # degrees
@@ -98,8 +98,8 @@ PXDDIGI.param('ElectronicEffects', True)
 PXDCLUST = register_module('PXDClusterizer')
 
 vxdtf = register_module('VXDTF')
-vxdtf.logging.log_level = LogLevel.INFO
-vxdtf.logging.debug_level = 1
+vxdtf.logging.log_level = LogLevel.DEBUG
+vxdtf.logging.debug_level = 2
 # calcQIType:
 # Supports 'kalman', 'circleFit' or 'trackLength.
 # 'circleFit' has best performance at the moment
@@ -110,19 +110,20 @@ vxdtf.logging.debug_level = 1
 param_vxdtf = {  # normally we don't know the particleID, but in the case of the testbeam,
                  # we can expect (anti-?)electrons...
                  # True
-    'activateBaselineTF': 1,
+    'activateBaselineTF': 2,
     'tccMinState': [2],
     'tccMinLayer': [3],
     'standardPdgCode': -11,
     'sectorSetup': secSetup,
     'calcQIType': qiType,
+    'killEventForHighOccupancyThreshold': 50,
     'cleanOverlappingSet': False,
     'filterOverlappingTCs': filterOverlaps,
     'TESTERexpandedTestingRoutines': True,
     'qiSmear': False,
     'smearSigma': 0.000001,
     'GFTrackCandidatesColName': 'caTracks',
-    'tuneCutoffs': 100,
+    'tuneCutoffs': 10,
     'activateDistanceXY': [False],
     'activateAngles3DHioC': [False],
     'activateAnglesXYHioC': [False],
@@ -191,7 +192,7 @@ main.add_module(SVDCLUST)
 main.add_module(vxdtf)
 main.add_module(mctrackfinder)
 main.add_module(analyzer)
-main.add_module(trackfitter)
+# main.add_module(trackfitter)
 main.add_module(eventCounter)
 
 # Process events

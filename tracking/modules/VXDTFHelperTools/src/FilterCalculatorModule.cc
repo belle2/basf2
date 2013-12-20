@@ -340,12 +340,12 @@ void FilterCalculatorModule::event()
   int numOfSvdTrueHits = aSvdTrueHitArray.getEntries();
 
   if (numOfMcParticles == 0) {
-    B2FATAL("event" << m_eventCounter << ": there is no MCParticle!")
+    B2FATAL("event " << m_eventCounter << ": there is no MCParticle!")
   } else if (numOfPxdTrueHits == 0 && m_PARAMdetectorType not_eq Const::SVD) {
-    B2WARNING("event" << m_eventCounter << ": there are no PXDTrueHits")
+    B2WARNING("event " << m_eventCounter << ": there are no PXDTrueHits")
     return;
   } else if (numOfSvdTrueHits == 0 && m_PARAMdetectorType not_eq Const::PXD) {
-    B2WARNING("event" << m_eventCounter << ": there are no SVDTrueHits")
+    B2WARNING("event " << m_eventCounter << ": there are no SVDTrueHits")
     return;
   }
 
@@ -418,7 +418,8 @@ void FilterCalculatorModule::event()
     B2DEBUG(20, "FilterCalculatorModule - event " << m_eventCounter << ": chosenSecMap is " << chosenSecMap << " with lower pt threshold of " << m_PARAMpTcuts.at(chosenSecMap))
     MapOfSectors* thisSecMap = m_sectorMaps.at(chosenSecMap);
 
-    VXDTrack newTrack(iPart);
+    VXDTrack newTrack(iPart); // will now filled with PXD and SVD-Hits from same particle
+
     if (m_PARAMdetectorType not_eq Const::SVD) { // want PXDhits
       B2DEBUG(20, "I'm in PXD and chosen detectorType is: " << m_PARAMdetectorType)
 
@@ -519,7 +520,8 @@ void FilterCalculatorModule::event()
           newTrack.addHit(newHit);
         }
       }
-    }
+    } // finished adding PXD-Hits
+
     if (m_PARAMdetectorType not_eq Const::PXD) { // want SVDhits
       B2DEBUG(20, "I'm in SVD and chosen detectorType is: " << m_PARAMdetectorType)
 
@@ -617,7 +619,21 @@ void FilterCalculatorModule::event()
           newTrack.addHit(newHit);
         }
       } // now each hit knows in which direction the particle goes, in which sector it lies and where it is
+    } // finished adding SVD-hits
+
+    /// before doing useful stuff with that new track, we check for strange behavior ( e.g. we do not want tracks which produce more than one hit at any sensor)
+    list<int> uniIDsOfTrack; // we collect uniIDs of the hits and filter them for double entries, therefore list
+    list<VXDHit> thisTrack = newTrack.getTrack();
+    for (VXDHit & hit : thisTrack) {
+      uniIDsOfTrack.push_back(hit.getUniID());
     }
+    uniIDsOfTrack.sort();
+    uniIDsOfTrack.unique();
+    if (uniIDsOfTrack.size() != thisTrack.size()) { // means that there were more than one hit per sensor
+      B2INFO("event " << m_eventCounter << ": track of particle " << iPart << " had number of hits/traversed sensors: " << thisTrack.size() << "/" << uniIDsOfTrack.size() << " - skipping track!")
+      continue;
+    }
+
 
     string aSectorName = "0_00_0"; // virtual sector for decay vertices.
     MCParticle* mcp = aMcParticleArray[newTrack.getParticleID()];
@@ -633,8 +649,8 @@ void FilterCalculatorModule::event()
     newTrack.sort(); // now all the hits are ordered by their global time, which allows cutting the tracks into tracklets where the momenta of all hits point into the same direction.
 
     tracksOfEvent.push_back(newTrack);
+    thisTrack = newTrack.getTrack(); // reloading track after adding virtual center and sorting hits
 
-    list<VXDHit> thisTrack = newTrack.getTrack();
     if (thisTrack.size() > 30) { B2INFO("event: " << m_eventCounter << " beware, tracklength is " << thisTrack.size()) }
     if (int (thisTrack.size()) > m_numOfLayers * 2) { m_longTrackCounter++; }
     for (VXDHit & hit : thisTrack) {

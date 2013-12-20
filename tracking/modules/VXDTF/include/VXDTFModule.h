@@ -512,7 +512,7 @@ namespace Belle2 {
     std::string m_PARAMgfTrackCandsColName;     /**< TrackCandidates collection name */
     std::string m_PARAMinfoBoardName;           /**< InfoContainer collection name */
     std::string m_PARAMnameOfInstance;           /**< Name of trackFinder, usefull, if there is more than one VXDTF running at the same time. Note: please choose short names */
-    bool m_PARAMactivateBaselineTF; /**< there is a baseline trackfinder which catches events with a very small number of hits, e.g. bhabha, cosmic and single-track-events */
+    int m_PARAMactivateBaselineTF; /**< there is a baseline trackfinder which catches events with a very small number of hits, e.g. bhabha, cosmic and single-track-events. Settings: 0 = deactivate baseLineTF, 1=activate it and use normal TF as fallback, 2= baseline-TF-only */
 
     /// the following variables are nimimal testing routines within the TF
     int m_TESTERnoHitsAtEvent;  /**< counts number of times, where there were no hits at the event */

@@ -210,6 +210,11 @@ bool VXDTFRawSecMap::filterBadSectorCombis(SectorPack& aSector)
       B2DEBUG(30, "filterBadSectorCombis: friend (id/name) " << aCombination.first << "/" << friendSector.getFullSecString() << " of sector (id/name) " << aSector.first << "/" << mainSector.getFullSecString() << " got kicked because of bad layer number (sector/friend): " << mainSector.getLayerNumber() << "/" << friendSector.getLayerNumber())
       continue;
     }
+    if (mainSector.getVxdID() == friendSector.getVxdID()) {
+      badIDs.push_back(aCombination.first);
+      B2DEBUG(30, "filterBadSectorCombis: friend (id/name) " << aCombination.first << "/" << friendSector.getFullSecString() << " of sector (id/name) " << aSector.first << "/" << mainSector.getFullSecString() << " got kicked because of being on the same sensor (sector/friend): " << mainSector.getLayerNumber() << "/" << friendSector.getLayerNumber())
+      continue;
+    }
 
     // next: check for layerJumps
     if (m_maxLayerLevelDifference.first == true) {

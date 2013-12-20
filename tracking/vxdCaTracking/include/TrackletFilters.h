@@ -46,7 +46,7 @@ namespace Belle2 {
     /** Destructor. */
     ~TrackletFilters() {}
 
-    /** Overrides Constructor-Setup. Needed if you want to reuse the instance instead of recreating one. expects a vector of TVector3 formatted hits ordered by magnitude in x-y where the first entry should be the outermost hit */
+    /** Overrides Constructor-Setup. Needed if you want to reuse the instance instead of recreating one. expects a vector of PostitionInof-structs (TVector3 formatted hits + their sigmaU and sigmaV) ordered by magnitude in x-y where the first entry should be the outermost hit */
     void resetValues(const std::vector<PositionInfo*>* hits) {
       m_hits = hits;
       m_numHits = hits->size();

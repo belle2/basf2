@@ -11,6 +11,8 @@
 
 #include <framework/pcore/RingBuffer.h>
 
+#include "daq/rfarm/event/RevRb2Sock.h"
+
 #include <daq/storage/BinData.h>
 
 #include <daq/slc/readout/ProcessStatusBuffer.h>
@@ -35,57 +37,24 @@ int main(int argc, char** argv)
   ProcessStatusBuffer sbuf;
   bool use_buf = (argc > 5);
   if (use_buf) sbuf.open(argv[4], atoi(argv[5]));
-  BinData data(new int[MAXBUF]);
 
+  //while (true) {
+  sbuf.reportReady();
+  RevRb2Sock rs(argv[1], atoi(argv[3]), "DSROUT", -1);
+  if (use_buf) sbuf.waitStarted();
+  sbuf.reportRunning();
+  int nrec = 0;
   while (true) {
-    sbuf.reportReady();
-    TCPSocket socket;
-    try {
-      socket = server_socket.accept();
-      socket.setBufferSize(32 * 1024 * 1024);
-    } catch (const IOException& e) {
-      sbuf.reportError("Failed to accept express reco");
-      socket.close();
-      return 0;
-    }
-    if (use_buf) sbuf.waitStarted();
-    //RingBuffer* rbuf = new RingBuffer(argv[1], 10000000);
-    RingBuffer* rbuf = new RingBuffer(argv[1]);
-    printf("%s:%d\n", __FILE__, __LINE__);
-    sbuf.reportRunning();
-    printf("%s:%d\n", __FILE__, __LINE__);
-    int nrec = 0;
-    int size = 0;
-    try {
-      while (true) {
-        //bool tried = false;
-        while ((size = rbuf->remq(data.getBuffer())) == 0) {
-          while (use_buf && sbuf.isStopped()) {
-            sbuf.waitStarted();
-          }
-          //printf("%s:%d\n", __FILE__, __LINE__);
-          /*
-          if (use_buf) {
-            if (!tried) {
-              sbuf.reportWarning("Ring buffer empty. waiting to be ready");
-            }
-            tried = true;
-          }
-          */
-          usleep(200);
-        }
-        socket.write(data.getBuffer(), data.getWordSize());
-        if (nrec % 100 == 0) {
-          printf("out record %d: size = %d\n", nrec, data.getWordSize());
-        }
-        nrec++;
-      }
-    } catch (const IOException& e) {
+    if (rs.SendEvent() <= 0) {
       sbuf.reportError("Failed to read data. connection broken.");
+      break;
     }
-    socket.close();
-    delete rbuf;
+    if (nrec % 100 == 0) {
+      printf("out record %d\n", nrec);
+    }
+    nrec++;
   }
+  //}
   return 0;
 }
 

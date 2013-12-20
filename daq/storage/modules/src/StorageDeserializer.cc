@@ -73,20 +73,17 @@ void StorageDeserializerModule::initialize()
   }
   m_data.setBuffer(m_evtbuf);
   storeEvent();
+  if (m_shmflag > 0) {
+    m_status.reportRunning();
+    m_running = true;
+  }
   B2INFO("StorageDeserializer: initialize() done.");
 }
 
 void StorageDeserializerModule::event()
 {
   m_nrecv++;
-  // First event is already loaded
-  if (m_nrecv == 0) return;
-  if (m_shmflag > 0) {
-    m_status.reportRunning();
-    m_running = true;
-  }
   storeEvent();
-  return;
 }
 
 void StorageDeserializerModule::beginRun()

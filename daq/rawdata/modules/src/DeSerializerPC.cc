@@ -416,6 +416,9 @@ void DeSerializerPCModule::event()
         RawFTSW* temp_rawftsw = new RawFTSW;
         temp_rawftsw->SetBuffer((int*)temp_buf + raw_datablk->GetBufferPos(i),
                                 raw_datablk->GetBlockNwords(i), 0, 1, 1);
+#ifndef NO_DATA_CHECK
+        temp_rawftsw->CheckData(0, m_prev_evenum, &cur_evenum);
+#endif
         data_size_ftsw = raw_datablk->GetBlockNwords(i);
         eve_ftsw = (raw_datablk->GetBuffer(i))[ 7 ] & 0xFFFF;
         delete temp_rawftsw;
@@ -427,8 +430,8 @@ void DeSerializerPCModule::event()
         temp_rawcopper->SetBuffer((int*)temp_buf + raw_datablk->GetBufferPos(i),
                                   raw_datablk->GetBlockNwords(i), 0, 1, 1);
 #ifndef NO_DATA_CHECK
-        //  temp_rawcopper->CheckData( 0, m_prev_evenum, m_prev_copper_ctr,
-        //           &cur_evenum, &cur_copper_ctr );
+        temp_rawcopper->CheckData(0, m_prev_evenum, m_prev_copper_ctr,
+                                  &cur_evenum, &cur_copper_ctr);
 #endif
         if (cpr_num == 0) {
           data_size_copper_0 = raw_datablk->GetBlockNwords(i);

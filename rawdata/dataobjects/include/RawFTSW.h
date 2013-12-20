@@ -40,6 +40,11 @@ namespace Belle2 {
     //!
     unsigned int GetEveNo(int n);
 
+    //!
+    unsigned int GetMagicTrailer(int n);
+
+    //!
+    void CheckData(int n, unsigned int prev_evenum, unsigned int* cur_evenum);
 
 #ifdef READ_OLD_B2LFEE_FORMAT_FILE
     enum {
@@ -55,6 +60,10 @@ namespace Belle2 {
       POS_FTSW_4 = 9,
       POS_RSVD_1 = 10,
       POS_MAGIC_1 = 11
+    };
+
+    enum {
+      SIZE_FTSW_PACKET = 12
     };
 #else
     //
@@ -75,7 +84,15 @@ namespace Belle2 {
       POS_RSVD_1 = 12,
       POS_MAGIC_1 = 13
     };
+
+    enum {
+      SIZE_FTSW_PACKET = 14
+    };
 #endif
+
+    enum {
+      FTSW_MAGIC_TRAILER = 0x7FFF0000
+    };
 
   protected :
 

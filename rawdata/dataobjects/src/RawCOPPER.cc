@@ -774,6 +774,7 @@ void RawCOPPER::CheckData(int n, unsigned int prev_evenum, unsigned int prev_cop
       printf("0x%.8x ", (GetBuffer(n))[k]);
       if (k % 10 == 9)printf("\n");
     }
+    fflush(stdout);
     sleep(1234567);
     exit(-1);
   }

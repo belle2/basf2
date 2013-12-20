@@ -41,7 +41,7 @@ bool MsgHandler::add(const TObject* obj, const string& name)
   TMessage* msg = new TMessage(kMESS_OBJECT);
   msg->Reset();
   msg->SetWriteMode();
-  //  msg->EnableSchemaEvolutionForAll();
+  msg->EnableSchemaEvolutionForAll();
   msg->SetCompressionLevel(m_complevel);
 
   // Write object in TMessage

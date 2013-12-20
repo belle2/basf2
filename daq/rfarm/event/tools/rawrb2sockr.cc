@@ -33,6 +33,7 @@ int main(int argc, char** argv)
 
   RawRevRb2Sock rs(a1, a2, a3, a4);
 
+  int nevt = 0;
   for (;;) {
     int stat = rs.SendEvent();
     //    printf ( "rb2sock : sending %d\n", stat );
@@ -40,6 +41,10 @@ int main(int argc, char** argv)
       printf("rb2sock : error in sending event. The event is lost. Reconnecting....\n");
       rs.Reconnect();
       printf("rb2sock : reconnected.\n");
+    }
+    nevt++;
+    if (nevt % 5000 == 0) {
+      printf("rawrb2sockr : evt = %d\n", nevt);
     }
   }
   exit(0);

@@ -41,14 +41,6 @@ bool StoragerCallback::boot() throw()
   _con[0].addArgument("1");
   _con[0].load(10);
 
-  _con[2].clearArguments();
-  _con[2].setExecutable("storageout");
-  _con[2].addArgument(orbname);
-  _con[2].addArgument(config.get("DATA_STORAGE_TO_HOST"));
-  _con[2].addArgument(config.get("DATA_STORAGE_TO_PORT"));
-  _con[2].addArgument(orbname);
-  _con[2].addArgument("1");
-  _con[2].load(10);
   return true;
 }
 
@@ -72,6 +64,14 @@ bool StoragerCallback::load() throw()
   _con[1].addArgument("1");
   _con[1].load(10);
 
+  _con[2].clearArguments();
+  _con[2].setExecutable("storageout");
+  _con[2].addArgument(orbname);
+  _con[2].addArgument(config.get("DATA_STORAGE_TO_HOST"));
+  _con[2].addArgument(config.get("DATA_STORAGE_TO_PORT"));
+  _con[2].addArgument(orbname);
+  _con[2].addArgument("1");
+  _con[2].load(10);
   return true;
 }
 

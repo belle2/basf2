@@ -20,9 +20,6 @@
 #include <daq/slc/system/TCPServerSocket.h>
 
 using namespace Belle2;
-using namespace std;
-
-#define MAXBUF 100000000
 
 int main(int argc, char** argv)
 {

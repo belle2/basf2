@@ -74,8 +74,26 @@ namespace Belle2 {
       /// returns radious of helix.
       double radius(void) const;
 
-      /// returns position after rotating angle dPhi in phi direction.
+      /**
+       * returns position after rotating angle dPhi in phi direction.
+       *
+       * x = x0 + dr * cos(phi0) + (alpha / kappa) * (cos(phi0) - cos(phi0+phi))
+       * y = y0 + dr * sin(phi0) + (alpha / kappa) * (sin(phi0) - sin(phi0+phi))
+       * z = z0 + dz             - (alpha / kappa) * tan(lambda) * phi
+       * @return HepPoint3D
+       */
+
       HepPoint3D x(double dPhi = 0.) const;
+
+      /**
+       * returns position after rotating angle dPhi in phi direction.
+       *
+       * x = x0 + dr * cos(phi0) + (alpha / kappa) * (cos(phi0) - cos(phi0+phi))
+       * y = y0 + dr * sin(phi0) + (alpha / kappa) * (sin(phi0) - sin(phi0+phi))
+       * z = z0 + dz             - (alpha / kappa) * tan(lambda) * phi
+       * @return double[3]
+       */
+
       double* x(double dPhi, double p[3]) const;
 
       /// returns position and convariance matrix(Ex) after rotation.
@@ -100,15 +118,15 @@ namespace Belle2 {
       HepLorentzVector momentum(double dPhi, double mass, HepPoint3D& x, HepSymMatrix& Emx) const;
 
     public:// Parametrization dependent functions. Prepared for tracking codes. Users should not use them.
-      /// returns an element of parameters.
-      double dr(void) const;
-      double phi0(void) const;
-      double kappa(void) const;
-      double dz(void) const;
-      double tanl(void) const;
-      double curv(void) const;
-      double sinPhi0(void) const;
-      double cosPhi0(void) const;
+
+      double dr(void) const;      /// Return helix parameter dr.
+      double phi0(void) const;    /// Return helix parameter phi0.
+      double kappa(void) const;   /// Return helix parameter kappa.
+      double dz(void) const;      /// Return helix parameter dz.
+      double tanl(void) const;    /// Return helix parameter tangent lambda.
+      double curv(void) const;    /// Return curvature of helix.
+      double sinPhi0(void) const; /// Return sin phi0.
+      double cosPhi0(void) const; /// Return cos phi0.
 
       /// returns helix parameters.
       const HepVector& a(void) const;
@@ -131,26 +149,50 @@ namespace Belle2 {
                const HepVector& a,
                const HepSymMatrix& Ea);
 
-      /// unsets error matrix. Error calculations will be ignored after this function call until an error matrix be set again. 0 matrix will be return as a return value for error matrix when you call functions which returns an error matrix.
+      /**
+       * Unsets error matrix.
+       * Error calculations will be ignored after this function call
+       * until an error matrix be set again. 0 matrix will be return
+       * as a return value for error matrix when you call functions
+       * which returns an error matrix.
+       */
+
       void ignoreErrorMatrix(void);
 
-      /// sets/returns z componet of the magnetic field.
-      double bFieldZ(double);
+      /**
+       * Sets/returns z componet of the magnetic field.
+       *
+       * @param[in] bz z-component of the magnetic field.
+       * @attention Helix param. alpha is also stored.
+       */
+
+      double bFieldZ(double bz);
+
+      /**
+       * Returns z componet of the magnetic field.
+       *
+       */
       double bFieldZ(void) const;
 
       static void set_limits(const HepVector& a_min, const HepVector& a_max);
       static bool set_exception(bool);
+
+      /**
+       * Set print option for debugging.
+       */
       static bool set_print(bool);
+
     private:
-      static HepVector ms_amin, ms_amax;
+      static HepVector ms_amin;
+      static HepVector ms_amax;
       static bool ms_check_range;
-      static bool ms_print_debug;
+      static bool ms_print_debug;     /// Debug option flag.
       static bool ms_throw_exception;
 
 
     public:// Operators
-      /// Copy operator
-      Helix& operator = (const Helix&);
+
+      Helix& operator = (const Helix&);       /// Copy operator
 
     public:// Mathmatical functions
       HepMatrix delApDelA(const HepVector& ap) const;

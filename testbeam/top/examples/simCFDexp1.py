@@ -71,7 +71,7 @@ gearbox.param('fileName', dbFile)
 
 # Geometry
 geometry = register_module('Geometry')
-geometry.param('Components', ['TOP', tracker])
+geometry.param('components', ['TOP', tracker])
 
 # Simulation
 simulation = register_module('FullSim')

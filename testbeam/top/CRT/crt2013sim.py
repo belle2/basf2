@@ -37,7 +37,7 @@ gearbox.param('fileName', 'testbeam/top/CRT/TOP.xml')
 
 # Geometry
 geometry = register_module('Geometry')
-geometry.param('Components', ['TOP'])
+geometry.param('components', ['TOP'])
 
 # Simulation
 simulation = register_module('FullSim')

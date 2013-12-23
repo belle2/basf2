@@ -80,6 +80,7 @@ beam03 = {
 # specify here the beam setup, number of events to simulate and output file
 # -------------------------------------------------------------------------
 beam = beam01
+tracker = 'TriggerTelescopeExp1'
 nevents = [100]
 outfile = 'LEPS-CFDbeamtest01.root'
 # -------------------------------------------------------------------------
@@ -102,7 +103,7 @@ gearbox.param('fileName', 'testbeam/top/LEPS2013-6/TOP-CFD.xml')
 
 # Geometry
 geometry = register_module('Geometry')
-geometry.param('Components', ['TOP'])
+geometry.param('components', ['TOP', tracker])
 
 # Simulation
 simulation = register_module('FullSim')

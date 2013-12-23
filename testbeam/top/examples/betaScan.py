@@ -39,7 +39,7 @@ gearbox.param('fileName', 'testbeam/top/LEPS2013-6/TOP-CFD.xml')  # for CFD runs
 
 # Geometry
 geometry = register_module('Geometry')
-geometry.param('Components', ['TOP'])
+geometry.param('components', ['TOP'])
 
 # Beta scan
 betaScan = register_module('TOPbetaScan')

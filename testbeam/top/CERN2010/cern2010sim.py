@@ -122,7 +122,7 @@ gearbox.param('fileName', 'testbeam/top/CERN2010/TOP.xml')
 
 # Geometry
 geometry = register_module('Geometry')
-geometry.param('Components', ['TOP'])
+geometry.param('components', ['TOP'])
 
 # Simulation
 simulation = register_module('FullSim')

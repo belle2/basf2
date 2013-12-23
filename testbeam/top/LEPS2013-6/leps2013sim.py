@@ -69,9 +69,10 @@ beam04 = {
 
 # specify here the beam setup, number of events to simulate and output file
 # -------------------------------------------------------------------------
-beam = beam04
+beam = beam02
+tracker = 'TriggerTelescopeExp2'
 nevents = [100]
-outfile = 'LEPSbeamtest04.root'
+outfile = 'LEPSbeamtest02.root'
 # -------------------------------------------------------------------------
 
 # Number of events to generate
@@ -92,8 +93,7 @@ gearbox.param('fileName', 'testbeam/top/LEPS2013-6/TOP.xml')
 
 # Geometry
 geometry = register_module('Geometry')
-geometry.param('Components', ['TOP'])
-# geometry.param('Components', ['TOP', 'TriggerTelescope']) # under development
+geometry.param('components', ['TOP', tracker])
 
 # Simulation
 simulation = register_module('FullSim')

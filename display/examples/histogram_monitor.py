@@ -60,7 +60,7 @@ eventinfosetter.param('evtNumList', [500])
 # create geometry
 gearbox = register_module('Gearbox')
 geometry = register_module('Geometry')
-geometry.param('Components', ['CDC', 'MagneticField'])
+geometry.param('components', ['CDC', 'MagneticField'])
 
 particlegun = register_module('ParticleGun')
 

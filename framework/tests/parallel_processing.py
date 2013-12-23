@@ -138,7 +138,7 @@ progress = register_module('Progress')
 gearbox = register_module('Gearbox')
 # Create geometry
 geometry = register_module('Geometry')
-geometry.param('Components', ['MagneticField', 'BeamPipe', 'PXD'])
+geometry.param('components', ['MagneticField', 'BeamPipe', 'PXD'])
 # Run simulation
 simulation = register_module('FullSim')
 param_g4sim = {'RegisterOptics': 1, 'PhotonFraction': 0.3,

@@ -158,7 +158,7 @@ progress = register_module('Progress')
 gearbox = register_module('Gearbox')
 # Create geometry
 geometry = register_module('Geometry')
-geometry.param('Components', ['MagneticField', 'ARICH'])
+geometry.param('components', ['MagneticField', 'ARICH'])
 geometry.logging.log_level = LogLevel.ERROR  # ignore some warnings
 
 # Run simulation

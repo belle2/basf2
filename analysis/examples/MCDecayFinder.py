@@ -39,7 +39,7 @@ main.add_module(progress)
 gearbox = register_module('Gearbox')
 main.add_module(gearbox)
 geometry = register_module('Geometry')
-geometry.param('Components', ['MagneticField', 'BeamPipe', 'PXD', 'SVD', 'CDC'
+geometry.param('components', ['MagneticField', 'BeamPipe', 'PXD', 'SVD', 'CDC'
                ])
 main.add_module(geometry)
 

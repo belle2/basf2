@@ -458,8 +458,8 @@ void GenFitterModule::event()
           fitSuccess = fitSuccess && fs->isFitConverged();
           kfs = dynamic_cast<genfit::KalmanFitStatus*>(fs);
           //hNit->Fill(kfs->getNumIterations());
-          if (!fitSuccess && kfs)
-            kfs->Print();
+          //if (!fitSuccess && kfs)
+          //kfs->Print();
           fitSuccess = fitSuccess && kfs;
         }
         B2DEBUG(99, "-----> Fit results:");
@@ -480,7 +480,7 @@ void GenFitterModule::event()
           std::stringstream warningStreamFitFailed;
           warningStreamFitFailed << "Event " << eventCounter << ", genfit::TrackCand: " << iCand << ", PDG hypo: " << currentPdgCode <<
                                  ": fit failed. GenFit returned an error (with fitSuccess " << fitSuccess << ").";
-          B2WARNING(warningStreamFitFailed.str());
+          B2DEBUG(99, warningStreamFitFailed.str());
           ++m_failedFitCounter;
           if (m_storeFailed == true) {
             ++trackCounter;

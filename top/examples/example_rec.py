@@ -28,7 +28,7 @@ main.add_module(gearbox)
 
 # Build geometry for track fitting etc...
 geometry = register_module('Geometry')
-geometry.param('Components', components)
+geometry.param('components', components)
 main.add_module(geometry)
 
 # reconstruction

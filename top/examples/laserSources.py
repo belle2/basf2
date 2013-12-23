@@ -22,7 +22,7 @@ main.add_module(gearbox)
 
 # Geometry
 geometry = register_module('Geometry')
-geometry.param('Components', ['TOP'])
+geometry.param('components', ['TOP'])
 main.add_module(geometry)
 
 # Optical sources
@@ -32,10 +32,10 @@ source1.param('startTime', 0)
 source1.param('pulseWidth', 10.0e-3)
 source1.param('numPhotons', 10)
 source1.param('diameter', 10.0e-3)
-source1.param('barID', 1)  # if nonzero, local (bar) frame, otherwise Belle II
+source1.param('barID', 5)  # if nonzero, local (bar) frame, otherwise Belle II
 source1.param('x', -22.6)
 source1.param('y', 0.0)
-source1.param('z', -129)
+source1.param('z', -129.9)
 source1.param('phi', 0.0)
 source1.param('theta', 180.0)
 source1.param('psi', 0.0)
@@ -47,10 +47,10 @@ source2.param('startTime', 0)
 source2.param('pulseWidth', 10.0e-3)
 source2.param('numPhotons', 10)
 source2.param('diameter', 10.0e-3)
-source2.param('barID', 1)  # if nonzero, local (bar) frame, otherwise Belle II
+source2.param('barID', 5)  # if nonzero, local (bar) frame, otherwise Belle II
 source2.param('x', 22.6)
 source2.param('y', 0.0)
-source2.param('z', -129)
+source2.param('z', -129.9)
 source2.param('phi', 0.0)
 source2.param('theta', 180.0)
 source2.param('psi', 0.0)

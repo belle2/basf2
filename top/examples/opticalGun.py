@@ -22,7 +22,7 @@ main.add_module(gearbox)
 
 # Geometry
 geometry = register_module('Geometry')
-geometry.param('Components', ['TOP'])
+geometry.param('components', ['TOP'])
 main.add_module(geometry)
 
 # Optical gun
@@ -33,7 +33,7 @@ opticalgun.param('startTime', 0)
 opticalgun.param('pulseWidth', 10.0e-3)
 opticalgun.param('numPhotons', 10)
 opticalgun.param('diameter', 10.0e-3)
-opticalgun.param('barID', 1)  # if nonzero, local (bar) frame, otherwise Belle II
+opticalgun.param('barID', 5)  # if nonzero, local (bar) frame, otherwise Belle II
 opticalgun.param('x', 22.4)
 opticalgun.param('y', 0.0)
 opticalgun.param('z', 128.0)

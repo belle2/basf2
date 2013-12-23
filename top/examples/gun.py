@@ -27,7 +27,7 @@ main.add_module(gearbox)
 
 # Geometry
 geometry = register_module('Geometry')
-geometry.param('Components', [
+geometry.param('components', [
     'MagneticField',
     'BeamPipe',
     'PXD',
@@ -76,7 +76,7 @@ cdcDigitizer = register_module('CDCDigitizer')
 main.add_module(cdcDigitizer)
 
 # MC track finder (for simplicity)
-mctrackfinder = register_module('MCTrackFinder')
+mctrackfinder = register_module('TrackFinderMCTruth')
 main.add_module(mctrackfinder)
 
 # Track fitting

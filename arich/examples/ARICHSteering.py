@@ -36,7 +36,7 @@ simulation = register_module('FullSim')
 # CDC digitizer
 cdcDigitizer = register_module('CDCDigitizer')
 # MC track finder (for simplicity)
-mctrackfinder = register_module('MCTrackFinder')
+mctrackfinder = register_module('TrackFinderMCTruth')
 # Track fitting
 cdcfitting = register_module('GenFitter')
 # Track extrapolation
@@ -73,7 +73,7 @@ particlegun.param('momentumGeneration', 'uniform')
 particlegun.param('momentumParams', [0.5, 4])
 # Setting the parameters for the random generation
 # of the particle polar angle:
-particlegun.param('thetaGeneration', 'uniformCosinus')
+particlegun.param('thetaGeneration', 'uniformCos')
 particlegun.param('thetaParams', [17, 35])
 # Print the parameters of the particle gun
 print_params(particlegun)
@@ -82,7 +82,7 @@ print_params(particlegun)
 # ============================================================================
 # Geometry parameters
 # Select subdetectors to be built
-geometry.param('Components', [
+geometry.param('components', [
     'MagneticField',
     'BeamPipe',
     'PXD',

@@ -164,7 +164,7 @@ void resolutions(TString filename="extArichTest.root")
   canvas1->cd(3);
   h_positionXY->GetYaxis()->SetTitleOffset(1.4);
   h_positionXY->Draw("colz");
-  canvas1->Print("resolutions1.pdf");
+  canvas1->Print("resolutions1.png");
   
   // Momentum
   TH1D* h_momentumProjection = h_momentumResolution->ProjectionY("Projection at 3.0 GeV",60,60);
@@ -196,7 +196,7 @@ void resolutions(TString filename="extArichTest.root")
   h_momentumResolution_2->GetYaxis()->SetTitleOffset(1.5);
   h_momentumResolution_2->GetYaxis()->SetRangeUser(-0.04,0.04);
   h_momentumResolution_2->Draw();
-  canvas2->Print("resolutions5.pdf");
+  canvas2->Print("resolutions5.png");
 
   // Position resolution
   TF1* f_gaus1 = new TF1("f_gaus1", "gaus", -0.6,0.6);
@@ -248,7 +248,7 @@ void resolutions(TString filename="extArichTest.root")
   h_resPositionMomentumY_2->GetYaxis()->SetTitleOffset(1.5);
   h_resPositionMomentumY_2->GetYaxis()->SetRangeUser(-sigma, sigma);
   h_resPositionMomentumY_2->Draw();
-  canvas4->Print("resolutions2.pdf");
+  canvas4->Print("resolutions2.png");
   
   // Direction resolution
   TF1* f_gaus2 = new TF1("f_gaus2", "gaus", -0.5, 0.5);
@@ -296,7 +296,7 @@ void resolutions(TString filename="extArichTest.root")
   h_phi_2->GetYaxis()->SetTitleOffset(1.5);
   h_phi_2->GetYaxis()->SetRangeUser(-sigma,sigma);
   h_phi_2->Draw();
-  canvas3->Print("resolutions3.pdf");
+  canvas3->Print("resolutions3.png");
   
   //Direction2
   TF1* f_gaus3 = new TF1("f_gaus3", "gaus", -0.2,0.2);
@@ -334,7 +334,7 @@ void resolutions(TString filename="extArichTest.root")
   h_pt_1->Draw();
   canvas31->cd(6);
   h_pt_2->Draw();
-  canvas31->Print("resolutions4.pdf");
+  canvas31->Print("resolutions4.png");
   
   
   

@@ -45,7 +45,7 @@ main.add_module(gearbox)
 
 # Create geometry
 geometry = register_module('Geometry')
-geometry.param('Components', [
+geometry.param('components', [
     'MagneticField',
     'BeamPipe',
     'PXD',
@@ -62,7 +62,7 @@ set_random_seed(1028307)
 # Setting the list of particle codes (PDG codes) for the generated particles
 particlegun.param('pdgCodes', [-211, 211, -321, 321])
 # Setting the number of tracks to be generated per event:
-particlegun.param('nTracks', 1)
+particlegun.param('nTracks', 4)
 # if you set nTracks to 0, then for each PDG code in pdgCodes list a track
 # will be generated on each event.
 # Setting the parameters for the random generation
@@ -71,7 +71,7 @@ particlegun.param('momentumGeneration', 'uniform')
 particlegun.param('momentumParams', [0.5, 4])
 # Setting the parameters for the random generation
 # of the particle polar angle:
-particlegun.param('thetaGeneration', 'uniformCosinus')
+particlegun.param('thetaGeneration', 'uniformCos')
 particlegun.param('thetaParams', [17.0, 35.0])
 particlegun.param('vertexGeneration', 'fixed')
 particlegun.param('xVertexParams', [0.0, 0.0])
@@ -105,7 +105,7 @@ cdcDigitizer = register_module('CDCDigitizer')
 main.add_module(cdcDigitizer)
 
 # MC track finder (for simplicity)
-mctrackfinder = register_module('MCTrackFinder')
+mctrackfinder = register_module('TrackFinderMCTruth')
 main.add_module(mctrackfinder)
 
 # Track fitting

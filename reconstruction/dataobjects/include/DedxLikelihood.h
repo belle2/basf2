@@ -20,10 +20,6 @@
 class TH1F;
 
 namespace Belle2 {
-  /** \addtogroup dataobjects
-   * @{
-   */
-
   /** Container for likelihoods obtained by the dE/dx PID (DedxPIDModule).
    */
   class DedxLikelihood : public RelationsObject {
@@ -63,8 +59,7 @@ namespace Belle2 {
   private:
     float m_logl[Const::ChargedStable::c_SetSize]; /**< log likelihood for each particle, not including momentum prior */
 
-    ClassDef(DedxLikelihood, 3); /**< Build ROOT dictionary */
+    ClassDef(DedxLikelihood, 3); /**< Container for likelihoods obtained by the dE/dx PID (DedxPIDModule). */
   };
-  /*! @} */
 }
 #endif

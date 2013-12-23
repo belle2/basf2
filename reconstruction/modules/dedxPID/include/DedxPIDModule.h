@@ -29,10 +29,6 @@ namespace Belle2 {
   class DedxTrack;
   class HelixHelper;
 
-  /** \addtogroup modules
-   * @{
-   */
-
   /** Extract dE/dx from fitted tracks.
    *
    * If a PDF file is specified using the 'PDFFile' parameter, likelihood values
@@ -121,6 +117,5 @@ namespace Belle2 {
     bool m_ignoreMissingParticles; /**< Ignore particles for which no PDFs are found. */
 
   };
-  /*! @} */
 }
 #endif

@@ -22,10 +22,6 @@ namespace Belle2 {
   class ARICHLikelihood;
   class DedxLikelihood;
 
-  /** \addtogroup dataobjects
-   * @{
-   */
-
   /*! Class to collect log likelihoods from TOP, ARICH and dEdx
    * aimed for output to mdst
    * includes a function to return combined likelihood probability (like Belle1 atc_pid)
@@ -88,11 +84,9 @@ namespace Belle2 {
      */
     double probability(float logl1, float logl2) const;
 
-    ClassDef(PIDLikelihood, 1); /**< ClassDef */
+    ClassDef(PIDLikelihood, 1); /**< Class to collect log likelihoods from TOP, ARICH and dEdx .*/
 
   };
-
-  /** @}*/
 
 } // end namespace Belle2
 

@@ -422,7 +422,7 @@ void GenFitterModule::event()
         // FIXME ... testing
         //fitter.reset(new genfit::DAF(false));
         fitter.reset(new genfit::DAF(true));
-        ((genfit::DAF*)fitter.get())->setProbCut(0.001);
+        ((genfit::DAF*)fitter.get())->setProbCut(m_probCut);
       } else if (m_filterId == "simpleKalman") {
         fitter.reset(new genfit::KalmanFitter(4, 1e-3, 1e3, false));
         fitter->setMultipleMeasurementHandling(genfit::unweightedClosestToPredictionWire);

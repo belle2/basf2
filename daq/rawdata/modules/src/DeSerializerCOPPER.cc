@@ -395,7 +395,7 @@ void DeSerializerCOPPERModule::openCOPPER()
     exit(1);
   }
 
-  int set_regval = 100; // How many events to be stored in COPPER FIFO before request for DMA
+  int set_regval = 15; // How many events to be stored in COPPER FIFO before request for DMA
   //    int set_regval=1;
   ioctl(cpr_fd, CPRIOSET_LEF_WA_FF, &set_regval);
   ioctl(cpr_fd, CPRIOSET_LEF_WB_FF, &set_regval);

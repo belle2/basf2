@@ -292,34 +292,34 @@ int* DeSerializerPCModule::recvData(int* malloc_flag, int* total_buf_nwords, int
     exit(-1);
   }
 
-  if (temp_buf[20] != 0x7fff0008) {
-    //#ifdef DEBUG
-    printf("*******HDR**********\n");
-    printf("\n%.8d : ", 0);
-    for (int i = 0; i < SendHeader::SENDHDR_NWORDS ; i++) {
-      printf("0x%.8x ", send_hdr_buf[ i ]);
-      if ((i + 1) % 10 == 0) {
-        printf("\n%.8d : ", i + 1);
-      }
-    }
-    printf("\n");
-    printf("\n");
-    //#endif
-    //#ifdef DEBUG
-    printf("*******BODY**********\n");
-    printf("\n%.8d : ", 0);
-    //      for (int i = 0; i < *total_buf_nwords; i++) {
-    for (int i = 0; i < 100; i++) {
-      printf("0x%.8x ", temp_buf[ i ]);
-      if ((i + 1) % 10 == 0) {
-        printf("\n%.8d : ", i + 1);
-      }
-    }
-    printf("\n");
-    printf("\n");
-    exit(1);
-    //#endif
-  }
+//   if (temp_buf[20] != 0x7fff0008) {
+//     //#ifdef DEBUG
+//     printf("*******HDR**********\n");
+//     printf("\n%.8d : ", 0);
+//     for (int i = 0; i < SendHeader::SENDHDR_NWORDS ; i++) {
+//       printf("0x%.8x ", send_hdr_buf[ i ]);
+//       if ((i + 1) % 10 == 0) {
+//         printf("\n%.8d : ", i + 1);
+//       }
+//     }
+//     printf("\n");
+//     printf("\n");
+//     //#endif
+//     //#ifdef DEBUG
+//     printf("*******BODY**********\n");
+//     printf("\n%.8d : ", 0);
+//     //      for (int i = 0; i < *total_buf_nwords; i++) {
+//     for (int i = 0; i < 100; i++) {
+//       printf("0x%.8x ", temp_buf[ i ]);
+//       if ((i + 1) % 10 == 0) {
+//         printf("\n%.8d : ", i + 1);
+//       }
+//     }
+//     printf("\n");
+//     printf("\n");
+//     exit(1);
+//     //#endif
+//   }
 
 
 

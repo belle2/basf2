@@ -376,7 +376,9 @@ void SerializerModule::Accept()
   }
 
   if (bind(fd_listen, (struct sockaddr*)&sock_listen, sizeof(struct sockaddr)) < 0) {
-    char temp_char[500] = "Failed to bind. Maybe other programs have already occupied this port. Exiting...";    print_err.PrintError(temp_char, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+    char temp_char[500];
+    sprintf(temp_char, "Failed to bind. Maybe other programs have already occupied this port(%d). Exiting...", m_port_to);
+    print_err.PrintError(temp_char, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     exit(1);
   }
 

@@ -227,7 +227,7 @@ void DeSerializerCOPPERModule::fillNewRawCOPPERHeader(RawCOPPER* raw_copper)
 // 3, magic word check
   if (!(raw_copper->CheckCOPPERMagic(cprblock))) {
     char err_buf[500];
-    sprintf(err_buf, "Invalid Magic word 0x7FFFF0008=%u 0xFFFFFAFA=%u 0xFFFFF5F5=%u 0x7FFF0009=%u\n",
+    sprintf(err_buf, "Invalid Magic word 0x7FFFF0008=%x 0xFFFFFAFA=%x 0xFFFFF5F5=%x 0x7FFF0009=%x\n",
             raw_copper->GetMagicDriverHeader(cprblock),
             raw_copper->GetMagicFPGAHeader(cprblock),
             raw_copper->GetMagicFPGATrailer(cprblock),

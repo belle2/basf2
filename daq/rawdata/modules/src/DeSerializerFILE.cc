@@ -193,31 +193,36 @@ int* DeSerializerFILEModule::readfromFILE(FILE* fp_in, const int size_word, cons
 
 
 
-int* DeSerializerFILEModule::modify131213SVDdata(int* buf_in, int buf_in_nwords, int* malloc_flag, unsigned int evenum)
+int* DeSerializerFILEModule::modify131213SVDdata(int* buf_in, int* buf_in_nwords, int* malloc_flag, unsigned int evenum)
 {
 
 
 
   // prepare buffer
-  int* buf_out = new int[ buf_in_nwords + 1 ];
+  int* buf_out = new int[ *buf_in_nwords + 1 ];
   *malloc_flag = 1;
-  memset(buf_out, 0, sizeof(int) * (buf_in_nwords + 1));
+  memset(buf_out, 0, sizeof(int) * (*buf_in_nwords + 1));
 
 
   // Copy other part of data
   int b2lhslb_header_nwords_131213 = 1;
   int b2lfee_header_nwords_131213 = 4;
+  // old detector buffer's start position
   int offset_in = RawHeader::RAWHEADER_NWORDS + RawCOPPER::SIZE_COPPER_HEADER +
                   b2lhslb_header_nwords_131213 + b2lfee_header_nwords_131213;
+  // new detector buffer's start position
   int offset_out = RawHeader::RAWHEADER_NWORDS + RawCOPPER::SIZE_COPPER_HEADER +
                    RawCOPPER::SIZE_B2LHSLB_HEADER + RawCOPPER::SIZE_B2LFEE_HEADER;
 
-
+  //copy buffer to buf_out before b2lfee header
   memcpy(buf_out, buf_in, (offset_in - b2lfee_header_nwords_131213)* sizeof(int));
+  //copy buffer to buf_out after b2lfee header
   memcpy(buf_out + offset_out , buf_in + offset_in,
-         (buf_in_nwords - offset_in) * sizeof(int));
+         (*buf_in_nwords - offset_in) * sizeof(int));
   int* b2lfee_buf_in = &(buf_in[ offset_in - b2lfee_header_nwords_131213 ]);
   int* b2lfee_buf_out = &(buf_out[ offset_out - RawCOPPER::SIZE_B2LFEE_HEADER ]);
+
+
 
 
   // Fill B2LFEE header part
@@ -231,12 +236,40 @@ int* DeSerializerFILEModule::modify131213SVDdata(int* buf_in, int buf_in_nwords,
   b2lfee_buf_out[ 3 ] = b2lfee_buf_in[ 2 ]; // TT-exprun
   b2lfee_buf_out[ 4 ] = b2lfee_buf_in[ 3 ] & 0x7ffffff0; // B2Lctime & debugflag
 
+  //Modify datalength info in COPPER header(Dec.23, 2013)
+  int* copper_buf = &(buf_out[ RawHeader::RAWHEADER_NWORDS ]);
+  int added_nwords = 0;
+  if (copper_buf[ RawCOPPER::POS_CH_A_DATA_LENGTH ] > 0) {
+    copper_buf[ RawCOPPER::POS_CH_A_DATA_LENGTH ]++;
+    added_nwords++;
+  }
+  if (copper_buf[ RawCOPPER::POS_CH_B_DATA_LENGTH ] > 0) {
+    copper_buf[ RawCOPPER::POS_CH_B_DATA_LENGTH ]++;
+    added_nwords++;
+  }
+  if (copper_buf[ RawCOPPER::POS_CH_C_DATA_LENGTH ] > 0) {
+    copper_buf[ RawCOPPER::POS_CH_C_DATA_LENGTH ]++;
+    added_nwords++;
+  }
+  if (copper_buf[ RawCOPPER::POS_CH_D_DATA_LENGTH ] > 0) {
+    copper_buf[ RawCOPPER::POS_CH_D_DATA_LENGTH ]++;
+    added_nwords++;
+  }
+
+  copper_buf[ RawCOPPER::POS_DATA_LENGTH ] += added_nwords;
+
+  printf("added %d\n", added_nwords); fflush(stdout);
+
+
+  // Increment COPPER counter
+  copper_buf[ RawCOPPER::POS_EVE_NUM_COPPER ] = evenum;
+
 
   // Event # Modification in SVD data
   RawCOPPER temp_rawcopper;
   int num_nodes = 1;
   int num_events = 1;
-  temp_rawcopper.SetBuffer(buf_out, buf_in_nwords + 1, 0, num_events, num_nodes);
+  temp_rawcopper.SetBuffer(buf_out, *buf_in_nwords + 1, 0, num_events, num_nodes);
 
   for (int i = 0 ; i < 4; i++) {
     if (temp_rawcopper.GetFINESSENwords(0, i) > 0) {
@@ -251,6 +284,19 @@ int* DeSerializerFILEModule::modify131213SVDdata(int* buf_in, int buf_in_nwords,
       temp_buf[ 1 ] = (((evenum) << 8) & 0xFFFFFF00) | (0x000000FF & temp_buf[ 1 ]);
     }
   }
+
+  //Increase data length
+  *buf_in_nwords += 1;
+
+  //calculate COPPER driver's checksum
+  unsigned int chksum = 0;
+  int chksum_nwords = *buf_in_nwords - RawHeader::RAWHEADER_NWORDS
+                      - RawTrailer::RAWTRAILER_NWORDS - RawCOPPER::SIZE_COPPER_DRIVER_TRAILER;
+  for (int i = 0 ; i < chksum_nwords; i++) {
+    chksum ^= copper_buf[ i ];
+  }
+  copper_buf[ chksum_nwords ] = chksum;
+
   return buf_out;
 }
 
@@ -308,7 +354,7 @@ void DeSerializerFILEModule::event()
       // To make a RawSVD dummy file from data sent by Nakamura-san on Dec. 13, 2013
       //
       {
-        int* temp_temp_buf = modify131213SVDdata(temp_buf, size_word, &malloc_flag, m_dummy_evenum);
+        int* temp_temp_buf = modify131213SVDdata(temp_buf, &size_word, &malloc_flag, m_dummy_evenum);
         delete temp_buf;
         temp_buf = temp_temp_buf;
         m_dummy_evenum++;
@@ -319,8 +365,11 @@ void DeSerializerFILEModule::event()
         int num_nodes = 1;
         int num_events = 1;
         temp_rawcopper.SetBuffer(temp_buf, size_word, 0, num_events, num_nodes);
-
         fillNewRawCOPPERHeader(&temp_rawcopper);
+        unsigned int temp_cur_evenum = 0, temp_cur_copper_ctr = 0;
+        temp_rawcopper.CheckData(0, m_dummy_evenum - 2, m_dummy_evenum - 2,
+                                 &temp_cur_evenum, &temp_cur_copper_ctr);
+
       }
     }
 

@@ -653,6 +653,9 @@ namespace Belle2 {
   {
     RawTrailer trl;
     int pos_nwords = GetBufferPos(n) + GetBlockNwords(n) - trl.GetTrlNwords() - 3;
+
+    printf("1 %d 2 %d 3 %d\n", GetBufferPos(n), GetBlockNwords(n), trl.GetTrlNwords());
+
     return (unsigned int)(m_buffer[ pos_nwords ]);
   }
 

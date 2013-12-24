@@ -12,6 +12,7 @@ using namespace std;
 using namespace Belle2;
 
 //#define NO_DATA_CHECK
+#define NO_DATA_CHECK_1
 #define WO_FIRST_EVENUM_CHECK
 
 ClassImp(RawCOPPER);
@@ -536,7 +537,7 @@ unsigned int RawCOPPER::GetB2LFEE32bitEventNumber(int n)
   }
 
   if (err_flag == 1) {
-#ifndef NO_DATA_CHECK
+#ifndef NO_DATA_CHECK_1
     char err_buf[500];
     sprintf(err_buf, "Different event number over HSLBs : slot A 0x%x : B 0x%x :C 0x%x : D 0x%x\n",
             eve[ 0 ], eve[ 1 ], eve[ 2 ], eve[ 3 ]);
@@ -602,7 +603,7 @@ unsigned int  RawCOPPER::CalcXORChecksum(int* buf, int nwords)
 
 
 void RawCOPPER::CheckData(int n, unsigned int prev_evenum, unsigned int prev_copper_ctr,
-                          unsigned int* evenum_rawcprhdr, unsigned int* cur_copper_ctr)
+                          unsigned int* cur_evenum_rawcprhdr, unsigned int* cur_copper_ctr)
 {
   ErrorMessage print_err;
 
@@ -624,12 +625,12 @@ void RawCOPPER::CheckData(int n, unsigned int prev_evenum, unsigned int prev_cop
   //
   // Event # check
   //
-  *evenum_rawcprhdr = GetEveNo(n);
+  *cur_evenum_rawcprhdr = GetEveNo(n);
   unsigned int evenum_feehdr = GetB2LFEE32bitEventNumber(n);
-  if (*evenum_rawcprhdr != evenum_feehdr) {
+  if (*cur_evenum_rawcprhdr != evenum_feehdr) {
     char err_buf[500];
     sprintf(err_buf, "Event # in RawCOPPER header and FEE header is different : cprhdr 0x%x feehdr 0x%x : Exiting...\n",
-            *evenum_rawcprhdr, evenum_feehdr);
+            *cur_evenum_rawcprhdr, evenum_feehdr);
     print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     err_flag = 1;
   }
@@ -646,10 +647,10 @@ void RawCOPPER::CheckData(int n, unsigned int prev_evenum, unsigned int prev_cop
 #else
   if (true) {
 #endif
-    if ((unsigned int)(prev_evenum + 1) != *evenum_rawcprhdr) {
+    if ((unsigned int)(prev_evenum + 1) != *cur_evenum_rawcprhdr) {
       char err_buf[500];
       sprintf(err_buf, "Event # jump : i %d prev 0x%x cur 0x%x : Exiting...\n",
-              n, prev_evenum, *evenum_rawcprhdr);
+              n, prev_evenum, *cur_evenum_rawcprhdr);
       print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
       err_flag = 1;
     }
@@ -678,7 +679,7 @@ void RawCOPPER::CheckData(int n, unsigned int prev_evenum, unsigned int prev_cop
     sprintf(err_buf, "Data corruption : COPPER driver checkSum error : block %d : length %d eve 0x%x : Trailer chksum 0x%.8x : calcd. now 0x%.8x\n",
             n,
             GetBlockNwords(n),
-            *evenum_rawcprhdr,
+            *cur_evenum_rawcprhdr,
             GetDriverChkSum(n),
             CalcDriverChkSum(n));
     print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
@@ -695,7 +696,7 @@ void RawCOPPER::CheckData(int n, unsigned int prev_evenum, unsigned int prev_cop
       CalcXORChecksum(GetBuffer(n), GetBlockNwords(n) - rawtrl.GetTrlNwords())) {
     char err_buf[500];
     sprintf(err_buf, "Data corruption : RawCOPPER checksum error : block %d : length %d eve 0x%x : Trailer chksum 0x%.8x : calcd. now 0x%.8x\n",
-            n, GetBlockNwords(n), *evenum_rawcprhdr, rawtrl.GetChksum(),
+            n, GetBlockNwords(n), *cur_evenum_rawcprhdr, rawtrl.GetChksum(),
             CalcXORChecksum(GetBuffer(n), GetBlockNwords(n) - rawtrl.GetTrlNwords()));
     print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     err_flag = 1;
@@ -748,8 +749,9 @@ void RawCOPPER::CheckData(int n, unsigned int prev_evenum, unsigned int prev_cop
     for (int k = 0 ; k < GetBlockNwords(n); k++) {
       printf("0x%.8x ", (GetBuffer(n))[k]);
       if (k % 10 == 9)printf("\n");
+      fflush(stdout);
     }
-    fflush(stdout);
+
     sleep(1234567);
     exit(-1);
   }

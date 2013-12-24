@@ -115,11 +115,23 @@ void PrintDataTemplateModule::printCOPPEREvent(RawCOPPER* raw_copper, int i)
          raw_copper->GetEveNo(i), raw_copper->GetCOPPERNodeId(i),
          raw_copper->GetBlockNwords(i) * sizeof(int));
 
-#ifdef DEBUG
+  //#ifdef DEBUG
   printf("******* Raw COPPER data block(including Detector Buffer)**********\n");
   printBuffer(raw_copper->GetBuffer(i), raw_copper->GetBlockNwords(i));
-#endif
 
+//   if (!(raw_copper->CheckCOPPERMagic( i ))) {
+//     ErrorMessage print_err;
+//     char err_buf[500];
+//     sprintf(err_buf, "Invalid Magic word 0x7FFFF0008=%x 0xFFFFFAFA=%x 0xFFFFF5F5=%x 0x7FFF0009=%x\n",
+//             raw_copper->GetMagicDriverHeader( i ),
+//             raw_copper->GetMagicFPGAHeader( i ),
+//             raw_copper->GetMagicFPGATrailer( i ),
+//             raw_copper->GetMagicDriverTrailer( i ));
+//     print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+//     sleep(12345678);
+//     exit(-1);
+//   }
+  //#endif
 
   //
   // Print data from each FINESSE

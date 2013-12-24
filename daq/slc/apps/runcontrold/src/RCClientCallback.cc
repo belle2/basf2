@@ -91,6 +91,7 @@ void RCClientCallback::selfCheck() throw(NSMHandlerException)
   for (RCMaster::NSMNodeList::iterator it = _master->getNSMNodes().begin();
        it != _master->getNSMNodes().end(); it++) {
     NSMNode* node = *it;
+    if (!node->isUsed()) continue;
     msg.setNode(node);
     try {
       if (!comm->isOnline(node)) {

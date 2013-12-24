@@ -42,6 +42,8 @@ namespace Belle2 {
      */
     virtual ~MillepedeIIalignmentModule();
 
+    virtual void endRun();
+
     /**
      * A function to execute pede
      */

@@ -719,7 +719,7 @@ void GBLfitModule::endRun()
   }
   // Needed to be able to store ROOT data from GBL. During destruction, it is too late.
   // Also the Millepede binary ffile must be closed before running pede (dtor is too late).
-// m_gbl.endRun();
+  m_gbl.endRun();
 }
 
 void GBLfitModule::terminate()

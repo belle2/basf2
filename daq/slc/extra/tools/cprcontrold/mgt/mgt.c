@@ -170,31 +170,48 @@ int mgt_check_FEE(Mgt_t* mgt) {
 }
 
 int mgt_execute(Mgt_t* mgt, int ctl_code) {
+  /*
   int result = 1;
   result |= mgt_write(mgt, CONTROL, 0x05);
   result |= mgt_write(mgt, CONTROL, 0x06);
   result |= mgt_write(mgt, FEE_CONTROL, ctl_code);
   result |= mgt_write(mgt, CONTROL, 0x0a);
   return result;
+  */
+  return (mgt_write(mgt, CONTROL, 0x05) == 0 &&
+	  mgt_write(mgt, CONTROL, 0x06) == 0 &&
+	  mgt_write(mgt, FEE_CONTROL, ctl_code) == 0&&
+	  mgt_write(mgt, CONTROL, 0x0a) == 0);
 }
 
 int mgt_set_param(Mgt_t* mgt, int address, int value) {
+  /*
   int result = 1;
   result |= mgt_write(mgt, CONTROL, 0x05);
   result |= mgt_write(mgt, address, value);
   result |= mgt_write(mgt, CONTROL, 0x0a);
   return result;
+  */
+  return (mgt_write(mgt, CONTROL, 0x05) == 0 &&
+	  mgt_write(mgt, address, value) == 0 &&
+	  mgt_write(mgt, CONTROL, 0x0a) == 0);
 }
 
 int mgt_set_param2(Mgt_t* mgt, int address, int value) {
+  int address2 = address + 1;
+  int value2 = value >> 8;
+  /*
   int result = 1;
   result |= mgt_write(mgt, CONTROL, 0x05);
   result |= mgt_write(mgt, address, value);
-  address += 1;
-  value = value >> 8;
-  result |= mgt_write(mgt, address, value);
+  result |= mgt_write(mgt, address2, value2);
   result |= mgt_write(mgt, CONTROL, 0x0a);
   return result;
+  */
+  return (mgt_write(mgt, CONTROL, 0x05) == 0 &&
+	  mgt_write(mgt, address, value) == 0 &&
+	  mgt_write(mgt, address2, value2) == 0 &&
+	  mgt_write(mgt, CONTROL, 0x0a) == 0);
 }
 
 int mgt_get_param(Mgt_t* mgt, int address) {

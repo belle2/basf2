@@ -90,7 +90,7 @@ bool COPPERCallback::load() throw()
   _con.addArgument(Belle2::form("%d", flag));
   _con.addArgument("1");
   _con.addArgument(_node->getName());
-  if (_con.load(5)) {
+  if (_con.load(20)) {
     Belle2::debug("(DEBUG) load succeded");
   } else {
     Belle2::debug("(DEBUG) load timeout");
@@ -101,7 +101,7 @@ bool COPPERCallback::load() throw()
 bool COPPERCallback::start() throw()
 {
   Belle2::debug("START");
-  if (_con.start(5)) {
+  if (_con.start(20)) {
     Belle2::debug("(DEBUG) start succeded");
   } else {
     Belle2::debug("(DEBUG) start timeout");

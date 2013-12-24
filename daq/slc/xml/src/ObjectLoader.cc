@@ -16,6 +16,7 @@ DataObject* ObjectLoader::load(const std::string& entry, DataObject* obj)
   const std::string data_class = el->getAttribute("class");
   const std::string base_class = el->getAttribute("extends");
   const int revision = atoi(el->getAttribute("revision").c_str());
+  const int confno = atoi(el->getAttribute("confno").c_str());
   if (obj == NULL) {
     obj = new DataObject(data_class, base_class);
     //obj->setName(el->getAttribute("name"));
@@ -23,6 +24,9 @@ DataObject* ObjectLoader::load(const std::string& entry, DataObject* obj)
   }
   if (base_class.size() > 0) {
     load(base_class, obj);
+  }
+  if (confno > 0) {
+    obj->setConfigNumber(confno);
   }
   std::vector<XMLElement*> el_v = el->getElements();
   for (size_t i = 0; i < el_v.size(); i++) {

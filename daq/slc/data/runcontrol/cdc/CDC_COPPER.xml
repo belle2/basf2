@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<object class="CDC_COPPER" revision="2" >
+<object class="CDC_COPPER" revision="1" >
   <text name="host" value="" />
   <text name="script" value="RecvSendCOPPER.py" />
   <bool_array name="hslb_used" length="4" value="true,false,false,false" />

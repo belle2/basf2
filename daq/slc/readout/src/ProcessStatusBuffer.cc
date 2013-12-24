@@ -2,6 +2,8 @@
 
 #include "daq/slc/base/Debugger.h"
 
+#include <stdio.h>
+
 using namespace Belle2;
 
 ProcessStatusBuffer::ProcessStatusBuffer()
@@ -33,7 +35,10 @@ bool ProcessStatusBuffer::create()
 {
   SharedMemory::unlink(_buf_path);
   _msg.unlink(_fifo_path);
-  _buf.open(_buf_path);
+  if (!_buf.open(_buf_path)) {
+    perror("shm_open");
+    Belle2::debug("Failed to open %s", _buf_path.c_str());
+  }
   _buf.init();
   _msg.create(_fifo_path);
   return true;

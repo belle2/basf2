@@ -14,6 +14,8 @@
 
 #include <boost/property_tree/xml_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
+#include <vxd/dataobjects/VxdID.h>
+#include <TMatrixD.h>
 
 #include <string>
 #include <vector>
@@ -59,6 +61,20 @@ namespace Belle2 {
      */
     bool MillepedeIIalignmentWriteXML(const string& xml_filename);
 
+    /**
+     * A function to read results write xml alignment files
+     */
+    void readResWriteXml(const string& xml_filename, int type = 0);
+
+    // MP2 start time
+    time_t MP2startTime;
+    // to hold constraint trafo
+    struct constraintData {
+      unsigned int vxdId;
+      TMatrixD loc2gloMatrix;
+    };
+    // list of constraints
+    std::vector<constraintData> matList;
   };
 
 

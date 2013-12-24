@@ -80,7 +80,7 @@ public class Belle2LogViewer extends JavaEntoryPoint {
 
 	public static void main(String[] argv) {
 		Belle2LogViewer gui = new Belle2LogViewer();
-		String host = (argv.length > 0) ? argv[0] : "b2slow2.kek.jp";
+		String host = (argv.length > 0) ? argv[0] : "localhost";
 		int port = (argv.length > 1) ? Integer.parseInt(argv[1]) : 50200;
 		gui.init(host, port, "");
 		gui.run();

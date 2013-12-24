@@ -74,9 +74,9 @@ public class RCServerCommunicator {
 				_master.getStatus().update();
 				RCState state = node.getState();
 				state.copy(RCState.ERROR_ES);
-				_main_panel.addLog(new Log(node.getName() +
-						" got <span style='font-weight:bold;'>ERROR</span><br />"+
-						msg.getData(), LogLevel.ERROR));
+				String log_text = node.getName() +" got <span style='font-weight:bold;'>ERROR</span>";
+				if (msg.getData().replace(" ","").length() > 0) log_text += "<br />"+ msg.getData();
+				_main_panel.addLog(new Log(log_text, LogLevel.ERROR));
 				_main_panel.update();
 			} else if (cmd.equal(RCCommand.STATE)) {
 				String name = _socket_reader.readString();
@@ -98,8 +98,9 @@ public class RCServerCommunicator {
 				_main_panel.update();
 				if (!state.equals(state_org) && _main_panel != null) {
 					if ( state.isError() ) {
-						_main_panel.addLog(new Log("Run Control got <span style='font-weight:bold;'>ERROR</span><br />"+
-								msg.getData(), LogLevel.ERROR));
+						String log_text = "Run control got <span style='font-weight:bold;'>ERROR</span>";
+						if (msg.getData().replace(" ","").length() > 0) log_text += "<br />"+ msg.getData();
+						_main_panel.addLog(new Log(log_text, LogLevel.ERROR));
 					} else {
 						_main_panel.addLog(new Log("Run control is on "
 								+ "<span style='color:blue;font-weight:bold;'>"

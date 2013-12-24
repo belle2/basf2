@@ -203,7 +203,11 @@ public class SystemStatusPanel extends JPanel implements Updatable {
 	}
 
 	public void setTriggerLimit(int trigger_limit) {
-		_text_trigger_limit.setText(""+trigger_limit);		
+		if (trigger_limit >= 0) {
+			_text_trigger_limit.setText(""+trigger_limit);
+		} else {
+			_text_trigger_limit.setText("No limit");
+		}
 	}
 	
 	private void setGrid(GridBagConstraints gbc, int gridwidth, int gridheight,

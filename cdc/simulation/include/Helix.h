@@ -117,7 +117,11 @@ namespace Belle2 {
       /// returns 4momentum vector after rotating angle dPhi in phi direction.
       HepLorentzVector momentum(double dPhi, double mass, HepPoint3D& x, HepSymMatrix& Emx) const;
 
-    public:// Parametrization dependent functions. Prepared for tracking codes. Users should not use them.
+    public:
+      // Parametrization dependent functions.
+      // Prepared for tracking codes.
+      // Users should not use them.
+      //
 
       double dr(void) const;      /// Return helix parameter dr.
       double phi0(void) const;    /// Return helix parameter phi0.
@@ -128,23 +132,23 @@ namespace Belle2 {
       double sinPhi0(void) const; /// Return sin phi0.
       double cosPhi0(void) const; /// Return cos phi0.
 
-      /// returns helix parameters.
+      /// Returns helix parameters.
       const HepVector& a(void) const;
 
-      /// returns error matrix.
+      /// Returns error matrix.
       const HepSymMatrix& Ea(void) const;
 
     public:// Modifiers
-      /// sets helix parameters.
+      /// Sets helix parameters.
       const HepVector& a(const HepVector& newA);
 
-      /// sets helix paramters and error matrix.
+      /// Sets helix paramters and error matrix.
       const HepSymMatrix& Ea(const HepSymMatrix& newdA);
 
-      /// sets pivot position.
+      /// Sets pivot position.
       const HepPoint3D& pivot(const HepPoint3D& newPivot);
 
-      /// sets helix pivot position, parameters, and error matrix.
+      /// Sets helix pivot position, parameters, and error matrix.
       void set(const HepPoint3D& pivot,
                const HepVector& a,
                const HepSymMatrix& Ea);
@@ -185,14 +189,14 @@ namespace Belle2 {
     private:
       static HepVector ms_amin;
       static HepVector ms_amax;
-      static bool ms_check_range;
+      static bool ms_check_range;     /// Check the helix parameter's range.
       static bool ms_print_debug;     /// Debug option flag.
-      static bool ms_throw_exception;
+      static bool ms_throw_exception; /// Throw exception flag.
 
 
     public:// Operators
 
-      Helix& operator = (const Helix&);       /// Copy operator
+      Helix& operator = (const Helix&);       /// Copy operator.
 
     public:// Mathmatical functions
       HepMatrix delApDelA(const HepVector& ap) const;
@@ -203,31 +207,44 @@ namespace Belle2 {
 
     private:
       void updateCache(void);
+
+      /**
+       * Check whether helix parameters is valid or not.
+       * Sets m_helixValid.
+       *
+       */
       void checkValid(void);
+
+      /**
+       * Print the helix parameters to stdout.
+       */
       void debugPrint(void) const;
+
       void debugHelix(void) const;
     public:
       /// Constant alpha for uniform field.
       static const double ConstantAlpha;
 
     private:
+
       bool m_matrixValid;
-      bool m_helixValid;
-      double m_bField;
-      double m_alpha;
-      HepPoint3D m_pivot;
-      HepVector m_a;
-      HepSymMatrix m_Ea;
+      bool m_helixValid;   /// True: helix valid, False: helix not valid.
+      double m_bField;     /// Magnetic field, assuming uniform Bz in the unit of  kG.
+      double m_alpha;      /// 10000.0/(speed of light)/B.
+      HepPoint3D m_pivot; /// Pivot
+      HepVector m_a;      /// Helix parameter.
+      HepSymMatrix m_Ea;  /// Error of the helix parameter.
 
     private: // caches
+
       HepPoint3D m_center;
-      double m_cp;
-      double m_sp;
+      double m_cp; /// Chache of the cos phi0
+      double m_sp; /// Chache of the sin phi0
       double m_pt;
       double m_r;
-      double m_ac[5];
+      double m_ac[5]; /// Cache of the helix parameter.
 
-      static const std::string invalidhelix;
+      static const std::string invalidhelix; /// String "Invalid Helix".
 
     };
 
@@ -257,7 +274,7 @@ namespace Belle2 {
 #if defined(BELLE_DEBUG)
       if (!m_helixValid) {
         DEBUG_PRINT;
-        if (ms_throw_exception) throw invalidhelix;
+        if (msthrow_exception) throw invalidhelix;
       }
 #endif
       return m_center;

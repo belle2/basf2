@@ -135,8 +135,6 @@ void FitADC(Int_t iLayer, Int_t kDraw);// Filling functions can be used independ
 void FillADCTDC(Int_t iLayer);         // Filling functions can be used independently
 
 void FillHisto();                      // Fill histograms for all the layers
-void PlotHisto();                      // Draw histograms on canvases on the screen
-void PrintHisto();                     // Save drawing files of the canvases for layer histograms
 void WriteHisto();        // Save histograms to a root file
 Int_t CDCValidation();    // Main macro for plotting, printing and saving
 
@@ -225,7 +223,7 @@ void FillHitPattern(Int_t iLayer)
     hHitPattern[iLayer]->SetStats(0);
 
     tree->Draw(Form("int(CDCHits.m_eWire&0x01ff)>>%s",chName),CutLayer);
-    hHitPattern[iLayer]->GetListOfFunctions()->Add(new TNamed("Description", chTitle));
+    //    hHitPattern[iLayer]->GetListOfFunctions()->Add(new TNamed("Description", chTitle));
   } else {
     printf("Hit pattern for Layer %d is already filled\n", iLayer);
   }
@@ -254,9 +252,10 @@ void FillTDC(Int_t iLayer)
     hTDC[iLayer] = new TH1D(chName, chTitle, NbinTDC, MinTDC, MaxTDC);
     hTDC[iLayer]->GetXaxis()->SetTitle("TDC count");
     hTDC[iLayer]->GetYaxis()->SetTitle("Entries");
-    //    SetHistoSizes(hTDC[iLayer]);
+
 
     tree->Draw(Form("CDCHits.m_tdcCount>>%s",chName),CutLayer);
+
   } else {
     printf("TDC histogram for Layer %d is already filled\n", iLayer);
   }
@@ -422,10 +421,8 @@ void FillADCTDC(Int_t iLayer)
     SetLayerID();
   }
 
-  Char_t CutLayer[100];
 
-  sprintf(CutLayer, "int(CDCHits.m_eWire&0xfe00)==%d", EncodedLayer[iLayer]);
-
+  TCut CutLayer =Form("int(CDCHits.m_eWire&0xfe00)==%d", EncodedLayer[iLayer]);
   if(hADCTDC[iLayer] == NULL){
 
     Char_t chName[100], chTitle[100];
@@ -437,7 +434,7 @@ void FillADCTDC(Int_t iLayer)
     hADCTDC[iLayer]->GetXaxis()->SetTitle("ADC count");
     hADCTDC[iLayer]->GetYaxis()->SetTitle("TDC count");
     hADCTDC[iLayer]->SetStats(0);
-    tree->Project(chName, "CDCHits.m_tdcCount:CDCHits.m_adcCount", CutLayer);
+    tree->Draw(Form("CDCHits.m_tdcCount:CDCHits.m_adcCount>>%s",chName),CutLayer);
 
   } else {
     printf("ADC vs. TDC 2D histogram for Layer %d is already filled\n", iLayer);  
@@ -466,39 +463,43 @@ void FillHisto()
 
   iLayer = 0;
   for(Int_t iSL=0; iSL<MAXSUPERLAYER; iSL++){
+
     Char_t Name[100], Title[100];
 
     sprintf(Name, "hHitPatternSL%02d", iSL);
     sprintf(Title, "Hit Pattern (Super Layer %2d)", iSL);
     hHitPatternSL[iSL] = (TH1D*) hHitPattern[iLayer]->Clone();
     hHitPatternSL[iSL]->SetName(Name);
-    hHitPatternSL[iSL]->SetTitle(Title);
+    hHitPatternSL[iSL]->GetListOfFunctions()->Add(new TNamed("Description", Title));
+
     hHitPatternSL[iSL]->SetAxisRange(0, RangeADC);
     hHitPatternSL[iSL]->GetXaxis()->SetTitle("Cell");
     hHitPatternSL[iSL]->GetYaxis()->SetTitle("Entries");
+
 
     sprintf(Name, "hADCSL%02d", iSL);
     sprintf(Title, "ADC (Super Layer %2d)", iSL);
     hADCSL[iSL] = (TH1D*) hADC[iLayer]->Clone();
     hADCSL[iSL]->SetName(Name);
-    hADCSL[iSL]->SetTitle(Title);
+    hADCSL[iSL]->GetListOfFunctions()->Add(new TNamed("Description", Title));
     hADCSL[iSL]->SetAxisRange(0, RangeADC);
     hADCSL[iSL]->GetXaxis()->SetTitle("ADC count");
     hADCSL[iSL]->GetYaxis()->SetTitle("Entries");
+
 
     sprintf(Name, "hTDCSL%02d", iSL);
     sprintf(Title, "TDC (Super Layer %2d)", iSL);
     hTDCSL[iSL] = (TH1D*) hTDC[iLayer]->Clone();
     hTDCSL[iSL]->SetName(Name);
-    hTDCSL[iSL]->SetTitle(Title);
     hTDCSL[iSL]->GetXaxis()->SetTitle("TDC count");
     hTDCSL[iSL]->GetYaxis()->SetTitle("Entries");
+    hTDCSL[iSL]->GetListOfFunctions()->Add(new TNamed("Description", Title));
 
     sprintf(Name, "hADCTDCSL%02d", iSL);
     sprintf(Title, "ADC-TDC (Super Layer %2d)", iSL);
     hADCTDCSL[iSL] = (TH2D*) hADCTDC[iLayer]->Clone();
     hADCTDCSL[iSL]->SetName(Name);
-    hADCTDCSL[iSL]->SetTitle(Title);
+    hADCTDCSL[iSL]->GetListOfFunctions()->Add(new TNamed("Description", Title));
     hADCTDCSL[iSL]->GetXaxis()->SetTitle("ADC count");
     hADCTDCSL[iSL]->GetYaxis()->SetTitle("TDC count");
 
@@ -515,7 +516,8 @@ void FillHisto()
 
   hmeanADC = new TH1D("hmeanADC", "Mean of Landau peak", MAXLAYER, -0.5, MAXLAYER-0.5);
   hsigmaADC =new TH1D("hsigmaADC", "Sigma of Landau peak", MAXLAYER, -0.5, MAXLAYER-0.5);
-  
+  hmeanADC->GetListOfFunctions()->Add(new TNamed("Description", "Mean of Landau peak")); 
+  hsigmaADC->GetListOfFunctions()->Add(new TNamed("Description", "Sigma of Landau peak")); 
   for(iLayer = 0; iLayer < MAXLAYER; iLayer++){
     hmeanADC->Fill(Layer[iLayer], meanADC[iLayer]);
     hsigmaADC->Fill(Layer[iLayer], sigmaADC[iLayer]);
@@ -530,124 +532,6 @@ void FillHisto()
 
 }
 
-
-void PlotHisto()
-{
-  Int_t iLayer=0;
-  TLine *lborder_mean[MAXSUPERLAYER], *lborder_sigma[MAXSUPERLAYER];
-
-  for(Int_t iSL=0; iSL<MAXSUPERLAYER; iSL++){
-    Char_t Name[100], Title[100];
-    sprintf(Name, "cv%02d", iSL);
-    sprintf(Title, "Super Layer %2d", iSL);
-    cv[iSL] = new TCanvas(Name, Title, 800, 1000);
-    gStyle->SetOptFit(1111);
-
-    cv[iSL]->Divide(4, 7);
-    Int_t MaxLL = MaxLocalLayer[iSL];
-    for(Int_t iLL=0; iLL < MaxLL; iLL ++){
-      Int_t cid = iLL*4+1;
-      cv[iSL]->cd(cid); 
-      SetPadMargin();
-      hHitPattern[iLayer]->Draw();
-
-      cid = iLL*4+2;
-      cv[iSL]->cd(cid);
-      SetPadMargin();
-      hTDC[iLayer]->Draw();
-
-      cid = iLL*4+3;
-      cv[iSL]->cd(cid);
-      SetPadMargin();
-      gStyle->SetStatH(0.23);
-      gStyle->SetStatW(0.26);
-      hADCfit[iLayer]->SetAxisRange(0, RangeADC);
-      hADCfit[iLayer]->Draw();
-      hADCfit[iLayer]->GetFunction("ffinal")->Draw("same");
-
-      cid = iLL*4+4;
-      cv[iSL]->cd(cid);
-      hADCTDC[iLayer]->Draw("col");
-      iLayer++;
-    }
-  }
-
-  cvSL = new TCanvas("cvSL", "Histograms per Super Layer", 800, 1000);
-  cvSL->Divide(4, MAXSUPERLAYER);
-  for(Int_t iSL=0; iSL<MAXSUPERLAYER; iSL++){
-    Int_t cid = iSL*4+1;
-    cvSL->cd(cid);
-    hHitPatternSL[iSL]->Draw();
-    cid = iSL*4+2;
-    cvSL->cd(cid);
-    hTDCSL[iSL]->Draw();
-    cid = iSL*4+3;
-    cvSL->cd(cid);
-    hADCSL[iSL]->Draw();
-    cid = iSL*4+4;
-    cvSL->cd(cid);
-    hADCTDCSL[iSL]->Draw("col");
-  }
-  
-
-  cvsummary = new TCanvas("cvsummary", "Summary of Fitting", 700, 800);
-  cvsummary->Divide(1,2);
-  cvsummary->cd(1);
-  hmeanADC->Draw("P");
-  hmeanADC->SetStats(0);
-  hmeanADC->SetMarkerStyle(20);
-  Double_t ymax = hmeanADC->GetMaximum();
-  Double_t ymin = 0;
-  hmeanADC->SetMinimum(0);
-  Double_t xborder;
-  Int_t iborder = 0;
-  for(Int_t iSL =0; iSL<MAXSUPERLAYER ; iSL++){
-    iborder += MaxLocalLayer[iSL];
-    xborder = iborder - 0.5;
-    lborder_mean[iSL] = new TLine(xborder, ymin, xborder, ymax);
-    lborder_mean[iSL]->Draw();
-  }
-  cvsummary->cd(2);
-  hsigmaADC->Draw("P");
-  hsigmaADC->SetStats(0);
-  hsigmaADC->SetMarkerStyle(20);
-  ymax = hsigmaADC->GetMaximum();
-  hsigmaADC->SetMinimum(0);
-  ymin = 0;
-  iborder = 0;
-  for(Int_t iSL =0; iSL<MAXSUPERLAYER ; iSL++){
-    iborder += MaxLocalLayer[iSL];
-    xborder = iborder - 0.5;
-    lborder_sigma[iSL] = new TLine(xborder, ymin, xborder, ymax);
-    lborder_sigma[iSL]->Draw();
-  }
-
-
-}
-
-
-void PrintHisto()
-{
-
-  if(cv[0]==NULL){
-    PlotHisto();
-  }
-
-  if(kDrawFitting){
-    cv[0]->SaveAs(cOutDraw.c_str());
-  } else {
-    cv[0]->SaveAs(cOutDrawInit.c_str());
-  }
-  
-  for(Int_t iSL=1; iSL < MAXSUPERLAYER; iSL++){
-    cv[iSL]->SaveAs(cOutDraw.c_str());
-  }
-
-  cvSL->SaveAs(cOutDraw.c_str());
-
-  cvsummary->SaveAs(cOutDrawFinal.c_str());
-
-}
 
 
 void WriteHisto()

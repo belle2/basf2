@@ -526,7 +526,7 @@ namespace Belle2 {
 
       double m_XT[MAX_N_SLAYERS][2][18][9];  /*! XT-relation coefficients for each layer, Left and Right etc. */
       double m_Sigma[MAX_N_SLAYERS][7];      /*! position resulution for each layer */
-      double m_PropSpeedInv[MAX_N_SLAYERS];  /*! Inverse of propagation speed of the sense wire */
+      double m_PropSpeedInv[MAX_N_SLAYERS];  /*! Inverse of propagation speed of the sense wire. */
 
       unsigned short m_tdcOffset;  /*! TDC off set value (default = 0) .*/
       double m_tdcBinWidth;        /*! TDC bin width (1 nsec/bin). */

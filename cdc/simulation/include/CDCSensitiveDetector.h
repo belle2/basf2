@@ -272,17 +272,27 @@ namespace Belle2 {
       //! Sort wire id
       std::vector<int>  WireId_in_hit_order(int id0, int id1, int nWires);
 
+      /**
+       * Magnetic field is uniform or non-uniform.
+       * 0: uniform B field (1.5 T), 1: non-uniform B field.
+       */
       G4int m_nonUniformField;
-      G4double alpha, brot[3][3];
+      G4double alpha;       /**< Helix parameter alpha     */
+      G4double brot[3][3];
 
     private:
 
+      /**
+       * Threshold energy deposit to be stored.
+       */
       G4double m_thresholdEnergyDeposit;
+
+      /**
+       * Threshold kinetic energy to be stored.
+       */
       G4double m_thresholdKineticEnergy;
 
-      // test
-
-      G4bool m_wireSag;
+      G4bool m_wireSag; /**< Switch to activate wire sag effect. */
 
       int m_hitNumber; /**< The current number of created hits in an event. Used to fill the DataStore CDC array.*/
       int m_EBhitNumber; /**< The current number of created hits in an event. Used to fill the DataStore CDC EB array.*/

@@ -42,9 +42,9 @@ particlegun.param('phiParams', [phi, phi_spread])
 # Plastic 1cm shielding is at 650mm
 # Aluminium target at 750mm to "simulate" 15m air between collimator and TB setup
 particlegun.param('vertexGeneration', 'normal')
-particlegun.param('xVertexParams', [gun_x_position, 0.0])
-particlegun.param('yVertexParams', [0.0 + 0.4, beamspot_size_y])
-particlegun.param('zVertexParams', [0.0, beamspot_size_z])
+particlegun.param('xVertexParams', [gun_x_position, 0.])
+particlegun.param('yVertexParams', [0. + 0.4, beamspot_size_y])
+particlegun.param('zVertexParams', [0., beamspot_size_z])
 particlegun.param('independentVertices', True)
 
 # Create Event information
@@ -62,9 +62,9 @@ gearbox.param('fileName', 'testbeam/vxd/FullVXDTB.xml')
 # Create geometry
 geometry = register_module('Geometry')
 # You can specify components to be created
-geometry.param('Components', ['MagneticField', 'TB'])
+# geometry.param('Components', ['MagneticField', 'TB'])
 # To turn off magnetic field:
-# geometry.param('Components', ['TB'])
+geometry.param('Components', ['TB'])
 
 # Full simulation module
 simulation = register_module('FullSim')
@@ -78,13 +78,18 @@ simulation.param('StoreAllSecondaries', True)
 
 # PXD/SVD digitizer
 PXDDigi = register_module('PXDDigitizer')
+PXDDigi.param('tanLorentz', 0.)
+# PXDDigi.param('SimpleDriftModel', False)
+
 SVDDigi = register_module('SVDDigitizer')
 
 # PXD/SVD clusterizer
 PXDClust = register_module('PXDClusterizer')
+PXDClust.param('TanLorentz', 0.)
 SVDClust = register_module('SVDClusterizer')
 # nor no field, this makes the alignment almost perfect (no or small systematics in SVD)
-# SVDClust.param('TanLorentz_holes', 0.)
+SVDClust.param('TanLorentz_holes', 0.)
+SVDClust.param('TanLorentz_electrons', 0.)
 # Save output of simulation
 output = register_module('RootOutput')
 output.param('outputFileName', 'TBSimulation.root')
@@ -114,7 +119,7 @@ mctrackfinder.param(param_mctrackfinder)
 gblfitter = register_module('GBLfit')
 gblfitter.logging.log_level = LogLevel.WARNING
 gblfitter.param('UseClusters', True)
-# gblfitter.param('FilterId', 'Kalman')
+# gblfitter.param('FilterId', 'GBL')
 
 # Check track fitting results
 trackfitchecker = register_module('TrackFitChecker')
@@ -147,6 +152,8 @@ main.add_module(trackfitchecker)
 main.add_module(geosaver)
 main.add_module(output)
 main.add_module(display)
+alignment = register_module('MillepedeIIalignment')
+main.add_module(alignment)
 # Process events
 process(main)
 

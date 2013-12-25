@@ -66,15 +66,14 @@ namespace Belle2 {
      */
     void readResWriteXml(const string& xml_filename, int type = 0);
 
-    // MP2 start time
-    time_t MP2startTime;
-    // to hold constraint trafo
+
+    time_t MP2startTime; /*< MP2 start time **/
+    /** struct to hold constraint trafos */
     struct constraintData {
-      unsigned int vxdId;
-      TMatrixD loc2gloMatrix;
+      unsigned int vxdId; /**< vxd id of the sensor */
+      TMatrixD loc2gloMatrix; /**< sensor matrix for trafo from local to global alignment parameters */
     };
-    // list of constraints
-    std::vector<constraintData> matList;
+    std::vector<constraintData> matList; /**< list of constraints */
   };
 
 

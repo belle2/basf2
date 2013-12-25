@@ -427,8 +427,13 @@ void GBLfitModule::event()
         fitter.reset(new genfit::KalmanFitter(4, 1e-3, 1e3, false));
         fitter->setMultipleMeasurementHandling(genfit::unweightedClosestToPredictionWire);
       } else if (m_filterId == "GBL") {
-        fitter.reset(new genfit::KalmanFitterRefTrack());
-        fitter->setMultipleMeasurementHandling(genfit::unweightedClosestToPrediction);
+        //fitter.reset(new genfit::KalmanFitterRefTrack());
+        //fitter->setMultipleMeasurementHandling(genfit::unweightedClosestToPrediction);
+        //FIXME: KalmanRefTracks does some problems (chuge ref. track chi2), but DAF is ok
+        // FIXME ... testing
+        //fitter.reset(new genfit::DAF(false));
+        fitter.reset(new genfit::DAF(true));
+        ((genfit::DAF*)fitter.get())->setProbCut(0.001);
       } else {
         B2FATAL("Unknown filter id " << m_filterId << " requested.");
       }
@@ -606,8 +611,8 @@ void GBLfitModule::event()
               genfit::KalmanFitStatus* fs = gfTrack.getKalmanFitStatus();
               newTrackFitResult->setCharge(fs->getCharge());
               newTrackFitResult->setPValue(fs->getBackwardPVal());
-              double Pval = fs->getBackwardPVal();
-              /*hPval->Fill(Pval);
+              /*double Pval = fs->getBackwardPVal();
+              hPval->Fill(Pval);
               if (nPXD == 0 && nSVD == 0)
                  hPvalCDC->Fill(Pval);
                else if (nCDC == 0)

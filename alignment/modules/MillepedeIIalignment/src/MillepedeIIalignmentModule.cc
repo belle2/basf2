@@ -278,7 +278,6 @@ void MillepedeIIalignmentModule::readResWriteXml(const string& xml_filename, int
   }
   if (startComp) {
     xml << "  </Align>" << endl;
-    startComp = false;
   }
   xml << "</Alignment>" << endl;
 }

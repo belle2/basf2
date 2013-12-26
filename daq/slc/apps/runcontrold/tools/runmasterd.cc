@@ -43,22 +43,29 @@ namespace Belle2 {
         Command cmd = number;
         if (cmd == Command::STATE) {
           std::string name = reader.readString();
+          std::cout << name << std::endl;
           NSMNode* node = NULL;
           if (name == _master->getNode()->getName()) {
             node = _master->getNode();
           } else {
             node = _master->getNodeByName(name);
           }
-          int number = reader.readInt();
-          node->setState(State(number));
-          node->setConnection(Connection(reader.readInt()));
-          _master->getStatus()->update();
+          int state_number = reader.readInt();
+          int connection_number = reader.readInt();
+          if (node != NULL) {
+            node->setState(State(state_number));
+            node->setConnection(Connection(connection_number));
+            _master->getStatus()->update();
+          }
         } else if (cmd == Command::DATA) {
           std::string name = reader.readString();
+          std::cout << name << std::endl;
           if (name == _master->getNode()->getName()) {
             _master->getData()->readObject(reader);
           } else {
-            _master->getData()->getObject(name)->readObject(reader);
+            if (!_master->getData()->getObject(name)) {
+              _master->getData()->getObject(name)->readObject(reader);
+            }
           }
         } else if (cmd == Command::UNKNOWN) {
           _master->getNode()->setConnection(Connection::OFFLINE);

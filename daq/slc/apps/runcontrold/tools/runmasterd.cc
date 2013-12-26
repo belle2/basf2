@@ -79,7 +79,7 @@ using namespace Belle2;
 
 int main(int, char**)
 {
-  ConfigFile config("slowcontrol");
+  ConfigFile config("slowcontrol", "runcontrol");
   TCPSocket socket;
   socket.connect(config.get("RC_GLOBAL_HOST"),
                  config.getInt("RC_GLOBAL_PORT"));

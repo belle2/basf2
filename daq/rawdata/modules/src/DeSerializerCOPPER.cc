@@ -448,7 +448,7 @@ void DeSerializerCOPPERModule::event()
 {
 
 
-  if (n_basf2evt < 0) {
+  if (m_start_flag == 0) {
     B2INFO("DeSerializerCOPPER: event() started.");
     // Use shared memory to start(for HSLB dummy data)
     if (m_shmflag > 0 && m_status.isStopped()) {
@@ -459,6 +459,7 @@ void DeSerializerCOPPERModule::event()
     }
     m_start_time = getTimeSec();
     n_basf2evt = 0;
+    m_start_flag = 1;
   }
 
   //  rawcprarray.create();

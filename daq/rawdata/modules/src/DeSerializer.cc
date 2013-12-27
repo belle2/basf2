@@ -49,6 +49,7 @@ DeSerializerModule::DeSerializerModule() : Module()
   m_prev_nevt = -1;
   prev_event = -1;
 
+  m_start_flag  = 0;
 
 
 }

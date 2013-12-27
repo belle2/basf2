@@ -18,8 +18,9 @@
 //  20131217  1912 more fix about -1 (and major signal fix in corelib)
 //  20131217  1913 dtpos fix (don't use ntohs!)
 //  20131218  1914 new protocol version, merged with Konno branch
+//  20131219  1915 uid/gid for MEM shm
 
-#define NSM_DAEMON_VERSION   1914 /* daemon   version 1.9.14 */
+#define NSM_DAEMON_VERSION   1915 /* daemon   version 1.9.15 */
 // ----------------------------------------------------------------------
 
 /*
@@ -52,6 +53,8 @@
 #include <sys/ioctl.h>
 #include <net/if.h>
 #include <stdint.h>
+#include <pwd.h>
+#include <grp.h>
 
 #include "nsm2.h"
 #include "nsmsys2.h"
@@ -112,6 +115,8 @@ const char* nsmd_logdir = ".";
 FILE*       nsmd_logfp = stdout;
 int         nsmd_shmsysid = -1;
 int         nsmd_shmmemid = -1;
+const char* nsmd_usrnam = 0; // default is "nsm", set in nsmd_main
+const char* nsmd_grpnam = 0; // default is "nsm", set in nsmd_main
 NSMsys*     nsmd_sysp = 0;
 NSMmem*     nsmd_memp = 0;
 
@@ -907,6 +912,94 @@ nsmd_shmclean()
   }
   sys.afirst = htons(-1);
 }
+// -- nsmd_setugid ------------------------------------------------------
+//
+// uid and gid to create MEM shared memory
+//
+// uid is chosen in the following priority from
+//   1. "-u" option
+//   2. NSMD2_USER environment variable
+//   3. "nsm" user if exist
+//   4. unchanged
+//
+// gid is chosen in the following priority from
+//   1. "-g" option
+//   2. NSMD2_GROUP environment variable
+//   3. from user if it is given in the form "user.group"
+//   4. from user's gid if user is given
+//   5. "nsm" group if exist
+//   6. unchanged
+//
+// ----------------------------------------------------------------------
+void
+nsmd_setugid()
+{
+  // -- get username and struct passwd
+  errno = 0;
+  char usrnam[256];
+  const char* grpnamp = 0;
+  usrnam[sizeof(usrnam) - 1] = 0;
+  if (nsmd_usrnam) {
+    strncpy(usrnam, nsmd_usrnam, sizeof(usrnam) - 1);
+    if (grpnamp = strchr(usrnam, '.')) * (char*)grpnamp++ = 0;
+  } else {
+    strcpy(usrnam, "nsm");
+  }
+  struct passwd* pwdp = getpwnam(usrnam);
+  if (! pwdp && nsmd_usrnam) {
+    WARN("nsmd cannot find user %s\n", nsmd_usrnam);
+    nsmd_destroy();
+  }
+
+  // -- get groupname and gid
+  gid_t gid = -1;
+  if (nsmd_grpnam) grpnamp = nsmd_grpnam;
+  const char* grpnamp2 = grpnamp;
+
+  if (! grpnamp && pwdp) {
+    gid = pwdp->pw_gid;
+  } else {
+    if (! grpnamp2) grpnamp2 = "nsm";
+    struct group* gidp = getgrnam(grpnamp2);
+    if (! gidp) {
+      if (grpnamp) {
+        WARN("nsmd cannot find group %s\n", grpnamp);
+        nsmd_destroy();
+      }
+    } else {
+      gid = gidp->gr_gid;
+    }
+  }
+
+  // -- set gid if needed
+  if (gid >= 0) {
+    if (setegid(gid) < 0) {
+      if (grpnamp) {
+        WARN("nsmd cannot set gid to group %s\n", grpnamp2);
+        nsmd_destroy();
+      } else {
+        LOG("nsmd cannot set gid to group %s\n", grpnamp2);
+      }
+    } else {
+      LOG("nsmd set gid to group %s gid %d\n", grpnamp2, gid);
+    }
+  }
+
+  // -- set uid if needed
+  if (pwdp) { // simply ignore if "nsm" user does not exist
+    if (seteuid(pwdp->pw_uid) < 0) {
+      if (nsmd_usrnam) {
+        WARN("nsmd cannot set uid to user %s\n", usrnam);
+        nsmd_destroy();
+      } else {
+        LOG("nsmd cannot set uid to user %s\n", usrnam);
+      }
+    } else {
+      LOG("nsmd set uid to user %s uid %d\n", usrnam, pwdp->pw_uid);
+    }
+  }
+  return;
+}
 // -- nsmd_shmopen ------------------------------------------------------
 //    open shared memory
 // ----------------------------------------------------------------------
@@ -915,10 +1008,15 @@ nsmd_shmopen(int shmkey, time_t now)
 {
   // DBG("nsmd_shmopen(%d)", shmkey);
 
-  int retsys = nsmd_shmget(shmkey,   sizeof(NSMsys), 0755, nsmd_shmsysid,
+  int retsys = nsmd_shmget(shmkey,   sizeof(NSMsys), 0644, nsmd_shmsysid,
                            (char**)&nsmd_sysp, now);
-  int retmem = nsmd_shmget(shmkey + 1, sizeof(NSMmem), 0777, nsmd_shmmemid,
+  int euid = geteuid();
+  int egid = getegid();
+  nsmd_setugid();
+  int retmem = nsmd_shmget(shmkey + 1, sizeof(NSMmem), 0664, nsmd_shmmemid,
                            (char**)&nsmd_memp, now);
+  seteuid(euid);
+  setegid(egid);
 
   if ((retsys == 0 || retsys == ENOENT) &&
       (retmem == 0 || retmem == ENOENT)) {
@@ -4483,7 +4581,12 @@ nsmd_loop()
     fd_set fdset;
     NSMsys& sys = *nsmd_sysp;
 
-    if (! busy) nsmd_shmtouch();
+    if (! busy) {
+      nsmd_shmtouch();
+      if (nsmd_logfp && nsmd_logfp != stdout && nsmd_logfp != stderr) {
+        fflush(nsmd_logfp);
+      }
+    }
 
     busy = 0;
 
@@ -4550,6 +4653,7 @@ nsmd_main()
   // -- use the start up time for random seed
   srand(time(0) | nsmd_myip);
 
+  // show protocol version
   int dver = NSM_DAEMON_VERSION;
   int pver = NSM_PROTOCOL_VERSION;
 
@@ -4576,7 +4680,7 @@ main(int argc, char** argv)
   int  ac = 0;           // just to leave useful info in ps output
   char av0[256];         // altered argv[0] to show up ps
   char* argv0 = argv[0]; // original argv[0] to exec
-  int nofork = 1;
+  int nofork = 0;
   int pid    = 0;
   char* logdir = 0;
   char* host = 0;
@@ -4585,6 +4689,8 @@ main(int argc, char** argv)
   int debug  = -1;
   int prio   = -1;
   int tcpbuf = -1;
+  const char* nsmusr = 0;
+  const char* nsmgrp = 0;
 
   av[ac++] = av0; // av0 will be filled later
 
@@ -4592,7 +4698,7 @@ main(int argc, char** argv)
   while (argc > 1 && argv[1][0] == '-') {
     char opt = argv[1][1];
     char* ap = &argv[1][2];
-    if (strchr("pshl", argv[1][1]) && ! *ap) {
+    if (strchr("pshlgu", argv[1][1]) && ! *ap) {
       av[ac++] = argv[1];
       argc--, argv++;
       ap = argv[1];
@@ -4607,22 +4713,26 @@ main(int argc, char** argv)
       case 'p': port   = nsmd_atoi(ap, -1); break;
       case 's': shmkey = nsmd_atoi(ap, -1); break;
       case 't': tcpbuf = nsmd_atoi(ap, 0); break;
-      case 'h': if (*ap) host   = ap; break;
-      case 'l': if (*ap) logdir = ap; break;
+      case 'u': if (ap && *ap) nsmusr = ap; break;
+      case 'g': if (ap && *ap) nsmgrp = ap; break;
+      case 'h': if (ap && *ap) host   = ap; break;
+      case 'l': if (ap && *ap) logdir = ap; break;
       default:
         printf("usage: nsmd2 [options]\n");
-        printf(" -d<num>   set debug level (0-255, default=0).\n");
-        printf(" -d        set debug level to 255.\n");
-        printf(" -f        print message into a log file.\n");
-        printf(" -o        print message into stdout (default).\n");
-        printf(" -b        run as a background process (implies -f).\n");
-        printf(" -p <port> set port number.\n");
-        printf(" -h <host> set host name.\n");
-        printf(" -s <key>  set shmkey number.\n");
-        printf(" -l <log>  set log file directory/prefix.\n");
-        printf(" -m<pri>   set mastership priority (0-100, default=1).\n");
-        printf(" -m        set mastership priority to=10.\n");
-        printf(" -t <size> set TCP buffer size.\n");
+        printf(" -f         print message into a log file.\n");
+        printf(" -o         print message into stdout (default).\n");
+        printf(" -b         run as a background process (implies -f).\n");
+        printf(" -p <port>  set port number.\n");
+        printf(" -h <host>  set host name.\n");
+        printf(" -s <key>   set shmkey number.\n");
+        printf(" -l <log>   set log file directory/prefix.\n");
+        printf(" -t <size>  set TCP buffer size.\n");
+        printf(" -u <user>  shm uid when run as root (default=nsm).\n");
+        printf(" -g <group> shm gid when run as root (default=nsm).\n");
+        printf(" -d<num>    set debug level (0-255, default=0).\n");
+        printf(" -d         set debug level to 255.\n");
+        printf(" -m<pri>    set mastership priority (0-100, default=1).\n");
+        printf(" -m         set mastership priority to=10.\n");
         exit(1);
     }
     av[ac++] = argv[1];
@@ -4641,6 +4751,8 @@ main(int argc, char** argv)
   if (port < 0)   port   = nsmd_atoi(getenv(NSMENV_PORT));
   if (shmkey < 0) shmkey = nsmd_atoi(getenv(NSMENV_SHMKEY), -1);
   if (tcpbuf < 0) shmkey = nsmd_atoi(getenv(NSMDENV_TCPBUF), -1);
+  if (! nsmusr)   nsmusr = getenv(NSMDENV_USER);
+  if (! nsmgrp)   nsmgrp = getenv(NSMDENV_GROUP);
 
   // network related global variables
   memset(nsmd_host, sizeof(nsmd_host), 0);
@@ -4662,6 +4774,8 @@ main(int argc, char** argv)
   if (shmkey >= 0) nsmd_shmkey = shmkey;
   if (nsmd_shmkey < 0) nsmd_shmkey = nsmd_port;
   if (tcpbuf >= 65536) nsmd_tcpsocksiz = tcpbuf;
+  if (nsmusr)      nsmd_usrnam = nsmusr;
+  if (nsmgrp)      nsmd_grpnam = nsmgrp;
 
   /*
   DBG("sizeof(uint16)=%d", sizeof(uint16));

@@ -3,8 +3,8 @@
 
 /* -- version info */
 
-#define NSM_PROTOCOL_VERSION 1914 /* protocol version 1.9.14 */
-#define NSM_PACKAGE_VERSION  1914 /* package  version 1.9.14 */
+#define NSM_PROTOCOL_VERSION 1915 /* protocol version 1.9.15 */
+#define NSM_PACKAGE_VERSION  1915 /* package  version 1.9.15 */
 
 /*
   2012.07.23 1.9.00 --- file created
@@ -17,6 +17,8 @@
   2013.01.17 1.9.08 --- hash fix (***hash in network-byte order)
   2013.02.19 1.9.09 --- first version with usrcpymem (still many bugs)
   2013.03.03 1.9.10 --- alpha version release candidate
+  2013.12.18 1.9.14 --- merged with Konno veresion
+  2013.12.19 1.9.15 --- uid/gid for MEM shm
  */
 
 /* -- DATA TYPES ----------------------------------------------------- */
@@ -99,6 +101,10 @@ typedef struct NSMcontext_struct NSMcontext;
 #define NSMEBADFMT    (-32) /* data format is inconsistent (openmem) */
 #define NSMEOLDREV    (-33) /* data revision is old (openmem) */
 #define NSMENEWREV    (-34) /* data revision is new (openmem) */
+#define NSMESHMUID    (-35) /* given uid does not exist */
+#define NSMEUIDPERM   (-36) /* given uid permission denied */
+#define NSMESHMGID    (-37) /* given gid does not exist */
+#define NSMEGIDPERM   (-38) /* given gid permission denied */
 
 /* NSMmsg (in host byte order) */
 typedef struct {

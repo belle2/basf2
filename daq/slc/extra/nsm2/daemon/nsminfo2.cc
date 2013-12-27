@@ -89,7 +89,7 @@ nsminfo_init(int nsmd_shmkey)
     perror("shmat (sys):");
     exit(1);
   }
-  if ((id = shmget(nsmd_shmkey + 1, sizeof(*nsmd_memp), 0777)) < 0) {
+  if ((id = shmget(nsmd_shmkey + 1, sizeof(*nsmd_memp), 0775)) < 0) {
     if (errno = ENOENT) {
       printf("Cannot open MEM shared memory with key=%d. %s\n",
              nsmd_shmkey + 1, "Something is inconsistent");

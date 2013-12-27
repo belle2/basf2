@@ -149,7 +149,16 @@ nsmlib_strerror(NSMcontext *nsmc)
     switch (nsmlib_errc) {
     case 0: return "NSM is not initialized";
     case NSMESHMGETSYS:
-      sprintf(buf, "shmget(sys): %s", strerror(errno));
+      sprintf(buf, "cannot open NSMsys shared memory: %s", strerror(errno));
+      return buf;
+    case NSMESHMGETMEM:
+      if (errno == EACCES) {
+	strcpy(buf,
+	       "nsmd2 shared memory must have either the same uid or gid");
+      } else {
+	sprintf(buf, "cannot open NSMmem shared memory: %s %d",
+		strerror(errno), errno);
+      }
       return buf;
     default:
       if (*nsmlib_errs) return nsmlib_errs;
@@ -465,7 +474,7 @@ nsmlib_initshm(NSMcontext *nsmc, int shmkey)
   if (nsmc->sysp == (NSMsys *)-1) return NSMESHMATSYS;
 
   /* -- data shared memory (read/write) -- */
-  nsmc->memid = shmget(shmkey+1, sizeof(NSMmem), 0775);
+  nsmc->memid = shmget(shmkey+1, sizeof(NSMmem), 0664);
   if (nsmc->memid < 0) return NSMESHMGETMEM;
 
   nsmc->memp = (NSMmem *)shmat(nsmc->memid, 0, 0);

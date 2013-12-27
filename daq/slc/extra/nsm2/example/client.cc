@@ -85,7 +85,7 @@ main(int argc, char** argv)
 
   // INIT
   if (! b2nsm_init(nodename)) {
-    printf("%s: INIT %s\n", program, b2nsm_strerror());
+    printf("%s: b2nsm_init %s\n", program, b2nsm_strerror());
     return 1;
   }
 

@@ -91,8 +91,8 @@ PXDClust = register_module('PXDClusterizer')
 PXDClust.param('ClusterCacheSize', 576)
 
 SVDClust = register_module('SVDClusterizer')
-SVDClust.param('TanLorentz_electrons', 0.)
-SVDClust.param('TanLorentz_holes', 0.)
+# SVDClust.param('TanLorentz_electrons', 0.)
+# SVDClust.param('TanLorentz_holes', 0.)
 # Save output of simulation
 output = register_module('RootOutput')
 output.param('outputFileName', 'TBSimulation.root')

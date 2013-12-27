@@ -6,6 +6,7 @@
 
 # Important parameters of the simulation:
 events = 10000  # Number of events to simulate
+fieldOn = False  # Turn field on or off (changes geometry components and digi/clust params)
 momentum = 6.0  # GeV/c
 momentum_spread = 0.05  # %
 theta = 90.0  # degrees
@@ -62,9 +63,11 @@ gearbox.param('fileName', 'testbeam/vxd/FullVXDTB.xml')
 # Create geometry
 geometry = register_module('Geometry')
 # You can specify components to be created
-# geometry.param('Components', ['MagneticField', 'TB'])
-# To turn off magnetic field:
-geometry.param('Components', ['TB'])
+if fieldOn:
+    geometry.param('components', ['MagneticField', 'TB'])
+else:
+  # To turn off magnetic field:
+    geometry.param('components', ['TB'])
 
 # Full simulation module
 simulation = register_module('FullSim')
@@ -78,18 +81,31 @@ simulation.param('StoreAllSecondaries', True)
 
 # PXD/SVD digitizer
 PXDDigi = register_module('PXDDigitizer')
-PXDDigi.param('tanLorentz', 0.)
+# turn off Lorentz angle simulation if no field
+if fieldOn:
+    PXDDigi.param('tanLorentz', 0.)
+else:
+    PXDDigi.param('tanLorentz', 0.1625)  # value scaled from 0.25 for 1.5T to 0.975T
+
 # PXDDigi.param('SimpleDriftModel', False)
 
 SVDDigi = register_module('SVDDigitizer')
 
 # PXD/SVD clusterizer
 PXDClust = register_module('PXDClusterizer')
-PXDClust.param('TanLorentz', 0.)
+if fieldOn:
+    PXDClust.param('TanLorentz', 0.)
+else:
+    PXDClust.param('TanLorentz', 0.1625)  # value scaled from 0.25 for 1.5T to 0.975T
+
 SVDClust = register_module('SVDClusterizer')
-# nor no field, this makes the alignment almost perfect (no or small systematics in SVD)
-SVDClust.param('TanLorentz_holes', 0.)
-SVDClust.param('TanLorentz_electrons', 0.)
+if fieldOn:
+    SVDClust.param('TanLorentz_holes', 0.)
+    SVDClust.param('TanLorentz_electrons', 0.)
+else:
+    SVDClust.param('TanLorentz_holes', 0.052)  # value scaled from 0.08 for 1.5T to 0.975T
+    SVDClust.param('TanLorentz_electrons', 0.)
+
 # Save output of simulation
 output = register_module('RootOutput')
 output.param('outputFileName', 'TBSimulation.root')
@@ -115,7 +131,7 @@ mctrackfinder.param(param_mctrackfinder)
 
 # mctrackfinder.logging.log_level = LogLevel.DEBUG
 
-# Fit tracks with GENFIT
+# Fit tracks with GBLfit which produces millepede.dat for alignment
 gblfitter = register_module('GBLfit')
 gblfitter.logging.log_level = LogLevel.WARNING
 gblfitter.param('UseClusters', True)
@@ -152,6 +168,8 @@ main.add_module(trackfitchecker)
 main.add_module(geosaver)
 main.add_module(output)
 main.add_module(display)
+# Alignment with Millepede II. Will use steer.txt file for MP2 steering,
+# which links also automatically generated file with geometry constraints constraints.txt
 alignment = register_module('MillepedeIIalignment')
 main.add_module(alignment)
 # Process events

@@ -68,18 +68,15 @@ namespace Belle2 {
     template<> struct Type<double>;
     template<> struct Type<std::string>;
 
-    /**
-     * @{
-     * TMP (Template Meta Programming )
-     * The name of the tuple is generated with recursive definition of the template function GetType,
-     * the overloaded argument (type SizeT<>) of the function serves as a counter for the recursion depth.
-     */
-    template < size_t > struct SizeT { };
-    template < typename T>
-    inline std::string GetType(SizeT<1> dummy = SizeT<1>()) { (void) dummy; return std::string(Type<T>::name()); }
-    template < typename T, typename... Types>
-    inline std::string GetType(SizeT < sizeof...(Types) + 1 > dummy = SizeT < sizeof...(Types) + 1 > ()) { (void) dummy; return std::string(Type<T>::name())  + std::string(", ") + GetType<Types...>(SizeT < sizeof...(Types) > ()); }
-    /** @} */
+    template< typename T, typename... Types> struct VariadicType;
+    /** Recursively convert multiple types to type names (used for tuples). */
+    template< typename T> struct VariadicType<T> { /** type name. */ static std::string name() { return Type<T>::name(); } };
+    /** Recursively convert multiple types to type names (used for tuples). */
+    template< typename T, typename... Types> struct VariadicType {
+      /** type name. */ static std::string name() {
+        return Type<T>::name() + ", " + VariadicType<Types...>::name();
+      }
+    };
 
     /**
      * Converts a template argument into a string for corresponding Python type.
@@ -102,8 +99,9 @@ namespace Belle2 {
     /** Converts a template argument into a string for corresponding Python type. */
     template<> struct Type<std::string> { /** type name. */ static std::string name() { return "str"; } };
 
+
     /** Converts a template argument into a string for corresponding Python type. */
-    template<typename... Types> struct Type<std::tuple<Types...> > { /** type name. */ static std::string name() { return std::string("tuple( ") + GetType<Types...>() + " )"; } };
+    template<typename... Types> struct Type<std::tuple<Types...> > { /** type name. */ static std::string name() { return std::string("tuple(") + VariadicType<Types...>::name() + ")"; } };
 
     /**
      * --------------- From C++ TO Python Converter ------------------------
@@ -162,6 +160,7 @@ namespace Belle2 {
      * the overloaded argument (type SizeT<>) of the function serves as a counter for the recursion depth.
      */
 
+    template < size_t > struct SizeT { };
     template < typename TupleType >
     inline void GetTuple(const TupleType& tuple, boost::python::list& pyList)
     {

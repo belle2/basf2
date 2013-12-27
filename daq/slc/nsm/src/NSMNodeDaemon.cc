@@ -58,6 +58,7 @@ void NSMNodeDaemon::run() throw()
       } else {
         _callback->selfCheck();
       }
+      Belle2::debug("[DEBUG] %s:%d", __FILE__, __LINE__);
     }
   } catch (const std::exception& e) {
     Belle2::debug("NSM node daemon : Caught exception (%s). Terminate process...",

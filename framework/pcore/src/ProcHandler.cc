@@ -166,76 +166,6 @@ key_t ProcHandler::get_outShmKey()
   return m_kOutShm;
 }
 
-int ProcHandler::isproc(int pid, char* exe)
-{
-  char procfile[80];
-  char pidstr[20];
-  char exename[80];
-  FILE* fp;
-  sprintf(procfile, "/proc/%d/stat", pid);
-
-  if (access(procfile, F_OK) != 0) {
-    return 0;
-  }
-  if (exe == NULL) {
-    return 1;
-  }
-  if ((fp = fopen(procfile, "r")) == NULL)
-    return 0;
-  int rc = fscanf(fp, "%19s %79s", pidstr, exename);
-  fclose(fp);
-  if (rc != 2 || strstr(exename, exe) != NULL)
-    return 1;
-  return 0;
-}
-
-/// @brief Display the status of child processes
-void ProcHandler::display()
-{
-  char procStr[] = "basf2";
-
-  // Update evtproc list
-  int nEvtProc = 0;
-  for (int i = 0; i < m_nEvtProc; i++) {
-    if (!isproc(m_lEvtProc[i], procStr)) {
-      m_lEvtProc[i] = -1;
-      nEvtProc++;
-    }
-  }
-  m_nEvtProc -= nEvtProc;
-
-  int nOutputSrv = 0;
-  for (int i = 0; i < m_nOutputSrv; i++) {
-    if (!isproc(m_lOutputSrv[i], procStr)) {
-      m_lOutputSrv[i] = -1;
-      nOutputSrv++;
-    }
-  }
-  m_nOutputSrv -= nOutputSrv;
-
-  cout << "============================================" << endl;
-  cout << " This process: " << getpid() << endl;
-
-  cout << " # of EvtProc: " <<  m_nEvtProc << endl;
-
-  cout << "      EvtProcs: ";
-  for (int i = 0; i < m_nEvtProc; i++)
-    cout << m_lEvtProc[i] << " ";
-  cout << endl;
-
-  cout << " # of OutputSrv: " << m_nOutputSrv << endl;
-
-  cout << "      OutputSrvs: ";
-  for (int i = 0; i < m_nOutputSrv; i++)
-    cout << m_lOutputSrv[i] << " ";
-  cout << endl;
-  cout << "EvtServer flag: " << m_fEvtServer << endl;
-  cout << "EvtProc flag: " << m_fEvtProc << endl;
-  cout << "OutputSrv flag: " << m_fOutputSrv << endl;
-
-  cout << "============================================" << endl;
-}
-
 // @brief Wait for all the forked processes completed
 int ProcHandler::wait_processes()
 {
@@ -349,9 +279,6 @@ int ProcHandler::wait_event_processes()
   m_lEvtProc.erase(m_lEvtProc.begin(), m_lEvtProc.end());
   return 0;
 }
-
-
-
 
 int ProcHandler::wait_output_server()
 {

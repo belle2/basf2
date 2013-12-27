@@ -53,7 +53,7 @@ void NSMNodeDaemon::run() throw()
   }
   try {
     while (true) {
-      if (_nsm_comm->wait(2)) {
+      if (_nsm_comm->wait(100)) {
         _callback->setMessage(_nsm_comm->getMessage());
         _nsm_comm->performCallback();
       } else {

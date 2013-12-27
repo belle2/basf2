@@ -228,6 +228,7 @@ bool NSMCommunicator::wait(int sec) throw(NSMHandlerException)
   }
   Belle2::debug("[DEBUG] %s %s:%d", Date().toString(), __FILE__, __LINE__);
   if (FD_ISSET(_nsmc->sock, &fds)) {
+    Belle2::debug("[DEBUG] %s %s:%d", Date().toString(), __FILE__, __LINE__);
     _message.read(_nsmc);
     b2nsm_context(_nsmc);
     return true;

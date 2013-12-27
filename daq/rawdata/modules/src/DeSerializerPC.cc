@@ -15,7 +15,7 @@
 #define CHECKEVT 5000
 
 //#define DEBUG
-//#define NO_DATA_CHECK
+#define NO_DATA_CHECK
 
 using namespace std;
 using namespace Belle2;
@@ -414,6 +414,7 @@ void DeSerializerPCModule::event()
 #ifndef NO_DATA_CHECK
         temp_rawftsw->CheckData(0, m_prev_evenum, &cur_evenum);
 #endif
+        //    printf("################SFTW cur %x prev %x\n",cur_evenum,m_prev_evenum);
         data_size_ftsw = raw_datablk->GetBlockNwords(i);
         eve_ftsw = (raw_datablk->GetBuffer(i))[ 7 ] & 0xFFFF;
         delete temp_rawftsw;
@@ -427,6 +428,7 @@ void DeSerializerPCModule::event()
 #ifndef NO_DATA_CHECK
         temp_rawcopper->CheckData(0, m_prev_evenum, m_prev_copper_ctr,
                                   &cur_evenum, &cur_copper_ctr);
+        //    printf("#################COPPER cur %x prev %x\n",cur_evenum,m_prev_evenum);
 #endif
         if (cpr_num == 0) {
           data_size_copper_0 = raw_datablk->GetBlockNwords(i);
@@ -439,6 +441,7 @@ void DeSerializerPCModule::event()
         delete temp_rawcopper;
       }
     }
+
     m_prev_evenum = cur_evenum;
     m_prev_copper_ctr = cur_copper_ctr;
   }

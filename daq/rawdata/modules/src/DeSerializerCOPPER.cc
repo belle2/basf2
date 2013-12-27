@@ -123,14 +123,6 @@ void DeSerializerCOPPERModule::initialize()
     openOutputFile();
   }
 
-  if (m_shmflag > 0) {
-    if (m_nodename.size() == 0 || m_nodeid < 0) {
-      m_shmflag = 0;
-    } else {
-      m_status.open(m_nodename, m_nodeid);
-      m_status.reportReady();
-    }
-  }
 
   memset(time_array0, 0, sizeof(time_array0));
   memset(time_array1, 0, sizeof(time_array1));
@@ -144,6 +136,18 @@ void DeSerializerCOPPERModule::initialize()
   printf("Done.\n");    fflush(stdout);
 
   B2INFO("DeSerializerCOPPER: initialize() done.");
+  //
+  // report ready to SLC
+  //
+  if (m_shmflag > 0) {
+    if (m_nodename.size() == 0 || m_nodeid < 0) {
+      m_shmflag = 0;
+    } else {
+      m_status.open(m_nodename, m_nodeid);
+      m_status.reportReady();
+    }
+  }
+
 
 }
 
@@ -481,6 +485,13 @@ void DeSerializerCOPPERModule::event()
 
     // Fill header and trailer
     m_prev_ftsweve32 = temp_rawcopper.FillTopBlockRawHeader(m_nodeid, m_data_type, m_trunc_mask, m_prev_ftsweve32);
+    printf("####### j %d  loop %d eve %d\n", j, n_basf2evt, m_prev_ftsweve32);
+//   for (int j = 0; j < raw_copper->TotalBufNwords(); j++) {
+//     printf("0x%.8x ", (raw_copper->GetBuffer(0))[ j ]);
+//     if ((j % 10) == 9)printf("\n");
+//     fflush(stdout);
+//   }
+
     //    fillNewRawCOPPERHeader( &temp_rawcopper );
     if (dump_fname.size() > 0) {
       dumpData((char*)temp_buf, m_size_word * sizeof(int));

@@ -271,6 +271,29 @@ main(int argc, char** argv)
         int params[2] = { expno, runno };
         b2nsm_sendany(av[1], "START", 2, params, len, text, NULL);
       }
+    } else if (strcasecmp(av[0], "trigft") == 0) {
+      if (ac < 5 || ! isdigit(av[3][0]) || ! isdigit(av[4][0])) {
+        printf("usage: trigft <node> <trg_mode=in/tlu/pulse/revo/random/possion> <dummy_rate> <trg_limit>\n");
+      } else {
+        int trg_mode = 0;
+        if (strcasecmp(av[2], "in") == 0) {
+          trg_mode = 1;
+        } else if (strcasecmp(av[2], "tlu") == 0) {
+          trg_mode = 2;
+        } else if (strcasecmp(av[2], "pulse") == 0) {
+          trg_mode = 4;
+        } else if (strcasecmp(av[2], "revo") == 0) {
+          trg_mode = 5;
+        } else if (strcasecmp(av[2], "random") == 0) {
+          trg_mode = 6;
+        } else if (strcasecmp(av[2], "possion") == 0) {
+          trg_mode = 7;
+        }
+        int dummy_rate = atoi(av[3]);
+        int trg_limit = atoi(av[4]);
+        int params[3] = { trg_mode, dummy_rate, trg_limit };
+        b2nsm_sendany(av[1], "TRIGFT", 3, params, len, text, NULL);
+      }
     } else if (strcasecmp(av[0], "stop") == 0) {
       if (ac < 1) {
         printf("usage: stop <node>\n");
@@ -282,6 +305,12 @@ main(int argc, char** argv)
         printf("usage: recover <node>\n");
       } else {
         b2nsm_sendany(av[1], "RECOVER", 0, 0, len, text, NULL);
+      }
+    } else if (strcasecmp(av[0], "abort") == 0) {
+      if (ac < 1) {
+        printf("usage: abort <node>\n");
+      } else {
+        b2nsm_sendany(av[1], "ABORT", 0, 0, len, text, NULL);
       }
     } else if (strcasecmp(av[0], "log") == 0) {
       if (ac < 3) {

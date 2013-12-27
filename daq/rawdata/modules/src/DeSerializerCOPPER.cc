@@ -139,6 +139,9 @@ void DeSerializerCOPPERModule::initialize()
   memset(time_array4, 0, sizeof(time_array4));
   memset(time_array5, 0, sizeof(time_array5));
 
+  printf("Opening COPPER...");      fflush(stdout);
+  openCOPPER();
+  printf("Done.\n");    fflush(stdout);
 
   B2INFO("DeSerializerCOPPER: initialize() done.");
 
@@ -446,7 +449,6 @@ void DeSerializerCOPPERModule::event()
 
 
   if (n_basf2evt < 0) {
-
     B2INFO("DeSerializerCOPPER: event() started.");
     // Use shared memory to start(for HSLB dummy data)
     if (m_shmflag > 0 && m_status.isStopped()) {
@@ -455,8 +457,6 @@ void DeSerializerCOPPERModule::event()
       m_status.waitStarted();
       m_status.reportRunning();
     }
-
-    openCOPPER();
     m_start_time = getTimeSec();
     n_basf2evt = 0;
   }

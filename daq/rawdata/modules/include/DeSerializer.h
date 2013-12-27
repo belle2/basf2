@@ -205,6 +205,9 @@ namespace Belle2 {
 
     int monitor_numeve;
 
+    //! start flag
+    int m_start_flag;
+
     // Data members
   private:
 

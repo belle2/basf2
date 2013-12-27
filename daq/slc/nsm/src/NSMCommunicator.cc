@@ -5,6 +5,7 @@
 #include "daq/slc/base/StringUtil.h"
 #include "daq/slc/base/Debugger.h"
 #include "daq/slc/base/ConfigFile.h"
+#include "daq/slc/base/Date.h"
 
 extern "C" {
 #include "nsm2/nsmlib2.h"
@@ -211,7 +212,7 @@ bool NSMCommunicator::wait(int sec) throw(NSMHandlerException)
   FD_SET(_nsmc->sock, &fds);
   int ret;
   while (true) {
-    Belle2::debug("[DEBUG] %s:%d", __FILE__, __LINE__);
+    Belle2::debug("[DEBUG] %s %s:%d", Date().toString(), __FILE__, __LINE__);
     if (sec >= 0) {
       timeval t = {sec, 0};
       ret = ::select(FD_SETSIZE, &fds, NULL, NULL, &t);
@@ -220,12 +221,12 @@ bool NSMCommunicator::wait(int sec) throw(NSMHandlerException)
     }
     if (ret != -1 || (errno != EINTR && errno != EAGAIN)) break;
   }
-  Belle2::debug("[DEBUG] %s:%d", __FILE__, __LINE__);
+  Belle2::debug("[DEBUG] %s %s:%d", Date().toString(),  __FILE__, __LINE__);
   if (ret < 0) {
     perror("select");
     throw (NSMHandlerException(__FILE__, __LINE__, "Failed to select"));
   }
-  Belle2::debug("[DEBUG] %s:%d", __FILE__, __LINE__);
+  Belle2::debug("[DEBUG] %s %s:%d", Date().toString(), __FILE__, __LINE__);
   if (FD_ISSET(_nsmc->sock, &fds)) {
     _message.read(_nsmc);
     b2nsm_context(_nsmc);

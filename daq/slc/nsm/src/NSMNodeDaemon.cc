@@ -2,6 +2,7 @@
 
 #include "daq/slc/base/Debugger.h"
 #include "daq/slc/base/StringUtil.h"
+#include "daq/slc/base/Date.h"
 
 #include <unistd.h>
 
@@ -58,7 +59,7 @@ void NSMNodeDaemon::run() throw()
       } else {
         _callback->selfCheck();
       }
-      Belle2::debug("[DEBUG] %s:%d", __FILE__, __LINE__);
+      Belle2::debug("[DEBUG] %s %s:%d", Date().toString(), __FILE__, __LINE__);
     }
   } catch (const std::exception& e) {
     Belle2::debug("NSM node daemon : Caught exception (%s). Terminate process...",

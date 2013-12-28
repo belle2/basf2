@@ -30,10 +30,12 @@ ErrorMessage::~ErrorMessage()
   closelog();
 }
 
-void ErrorMessage::PrintError(ProcessStatusBuffer* nsm_status, char* err_message, const char* file, const char* func_name, const int line)
+void ErrorMessage::PrintError(const int shmflag, ProcessStatusBuffer* nsm_status, char* err_message, const char* file, const char* func_name, const int line)
 {
   string err_str = err_message;
-  nsm_status->reportFatal(err_str);
+  if (shmflag > 0) {
+    nsm_status->reportFatal(err_str);
+  }
   PrintError(err_message, file, func_name, line);
 }
 

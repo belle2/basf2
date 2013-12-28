@@ -25,7 +25,7 @@
 #include <framework/logging/Logger.h>
 
 // dataobjects
-#include <generators/dataobjects/MCParticle.h>
+#include <mdst/dataobjects/MCParticle.h>
 #include <tracking/dataobjects/Track.h>
 #include <reconstruction/dataobjects/PIDLikelihood.h>
 #include <ecl/dataobjects/ECLGamma.h>

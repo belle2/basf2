@@ -9,7 +9,7 @@
 **************************************************************************/
 
 #include <analysis/NtupleTools/NtupleMCReconstructibleTool.h>
-#include <generators/dataobjects/MCParticle.h>
+#include <mdst/dataobjects/MCParticle.h>
 #include <TBranch.h>
 
 void NtupleMCReconstructibleTool::setupTree()

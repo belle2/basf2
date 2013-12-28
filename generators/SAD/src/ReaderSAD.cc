@@ -13,7 +13,7 @@
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/GearDir.h>
-#include <generators/dataobjects/MCParticle.h>
+#include <mdst/dataobjects/MCParticle.h>
 
 using namespace std;
 using namespace Belle2;
@@ -91,7 +91,7 @@ double ReaderSAD::getSADParticle(MCParticleGraph& graph)
     double zMom2 = m_lostE * m_lostE - m_lostPx * m_lostPx - m_lostPy * m_lostPy ;
     if (zMom2 < 0) printf("zMom2= %f is negative. Skipped!\n", zMom2);
 
-  } while ((fabs(m_lostS) > m_sRange) or(m_lostE * m_lostE - m_lostPx * m_lostPx - m_lostPy * m_lostPy < 0));
+  } while ((fabs(m_lostS) > m_sRange) or (m_lostE * m_lostE - m_lostPx * m_lostPx - m_lostPy * m_lostPy < 0));
 
 //  do {
 //    //Check for end of file

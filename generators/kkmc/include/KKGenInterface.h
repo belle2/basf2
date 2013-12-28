@@ -13,7 +13,7 @@
 
 #include <framework/core/FrameworkExceptions.h>
 #include <framework/logging/Logger.h>
-#include <generators/dataobjects/MCParticleGraph.h>
+#include <mdst/dataobjects/MCParticleGraph.h>
 
 #include <evtgen/EvtGenBase/EvtPDL.hh>
 

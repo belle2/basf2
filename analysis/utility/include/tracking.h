@@ -8,7 +8,7 @@
 #include <genfit/Track.h>
 
 // generator related
-#include <generators/dataobjects/MCParticle.h>
+#include <mdst/dataobjects/MCParticle.h>
 
 // framework related
 #include <framework/datastore/RelationArray.h>

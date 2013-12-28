@@ -19,7 +19,7 @@
 #include <vxd/geometry/GeoCache.h>
 // // #include <vxd/simulation/SensitiveDetector.h>
 
-#include <generators/dataobjects/MCParticle.h>
+#include <mdst/dataobjects/MCParticle.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationIndex.h>
 #include <framework/datastore/StoreObjPtr.h>

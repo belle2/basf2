@@ -7,7 +7,7 @@
 #define MCPARTICLEMATCHING_H
 
 #include <analysis/dataobjects/Particle.h>
-#include <generators/dataobjects/MCParticle.h>
+#include <mdst/dataobjects/MCParticle.h>
 
 #include <vector>
 

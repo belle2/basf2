@@ -16,7 +16,7 @@
 #include <ecl/dataobjects/ECLShower.h>
 #include <ecl/dataobjects/ECLPi0.h>
 #include <tracking/dataobjects/TrackFitResult.h>
-#include <generators/dataobjects/MCParticle.h>
+#include <mdst/dataobjects/MCParticle.h>
 
 void NtupleRecoStatsTool::setupTree()
 {

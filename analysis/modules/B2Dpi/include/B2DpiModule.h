@@ -16,7 +16,7 @@
 #include <string>
 #include <vector>
 
-#include <generators/dataobjects/MCParticle.h>
+#include <mdst/dataobjects/MCParticle.h>
 #include <analysis/dataobjects/Particle.h>
 
 #include <pxd/dataobjects/PXDTrueHit.h>

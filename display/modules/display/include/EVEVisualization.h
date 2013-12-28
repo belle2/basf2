@@ -2,7 +2,7 @@
 #define EVEVISUALIZATION_H
 
 #include <geometry/bfieldmap/BFieldMap.h>
-#include <generators/dataobjects/MCParticle.h>
+#include <mdst/dataobjects/MCParticle.h>
 #include <simulation/dataobjects/MCParticleTrajectory.h>
 #include <cdc/dataobjects/CDCSimHit.h>
 #include <cdc/dataobjects/CDCHit.h>

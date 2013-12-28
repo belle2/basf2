@@ -11,7 +11,7 @@
 #ifndef MCPARTICLEGENERATOR_H_
 #define MCPARTICLEGENERATOR_H_
 
-#include <generators/dataobjects/MCParticleGraph.h>
+#include <mdst/dataobjects/MCParticleGraph.h>
 
 #include <G4VPrimaryGenerator.hh>
 #include <G4PrimaryParticle.hh>

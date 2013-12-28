@@ -16,8 +16,8 @@
 
 #include <generators/bhwide/BHWide.h>
 
-#include <generators/dataobjects/MCParticle.h>
-#include <generators/dataobjects/MCParticleGraph.h>
+#include <mdst/dataobjects/MCParticle.h>
+#include <mdst/dataobjects/MCParticleGraph.h>
 
 #include <vector>
 

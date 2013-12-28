@@ -11,7 +11,7 @@
 #ifndef EVENTACTION_H_
 #define EVENTACTION_H_
 
-#include <generators/dataobjects/MCParticleGraph.h>
+#include <mdst/dataobjects/MCParticleGraph.h>
 
 #include <G4UserEventAction.hh>
 class G4Event;

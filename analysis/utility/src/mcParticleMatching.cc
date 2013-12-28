@@ -12,7 +12,7 @@
 #include <framework/datastore/StoreArray.h>
 
 // dataobjects
-#include <generators/dataobjects/MCParticle.h>
+#include <mdst/dataobjects/MCParticle.h>
 
 void fillGenMothers(const MCParticle* mcP, vector<int>& genMCPMothers)
 {

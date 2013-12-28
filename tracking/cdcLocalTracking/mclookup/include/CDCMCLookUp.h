@@ -17,7 +17,7 @@
 
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/dataobjects/CDCSimHit.h>
-#include <generators/dataobjects/MCParticle.h>
+#include <mdst/dataobjects/MCParticle.h>
 
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/StoreArray.h>

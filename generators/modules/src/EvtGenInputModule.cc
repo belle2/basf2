@@ -10,7 +10,7 @@
 
 #include <generators/modules/EvtGenInputModule.h>
 #include <generators/evtgen/EvtGenInterface.h>
-#include <generators/dataobjects/MCParticleGraph.h>
+#include <mdst/dataobjects/MCParticleGraph.h>
 #include <generators/utilities/cm2LabBoost.h>
 #include <framework/core/Environment.h>
 

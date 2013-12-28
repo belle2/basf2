@@ -15,7 +15,7 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 
-#include <generators/dataobjects/MCParticle.h>
+#include <mdst/dataobjects/MCParticle.h>
 
 #include <cdc/dataobjects/CDCHit.h>
 //#include <cdc/geometry/CDCGeometryPar.h>

@@ -15,7 +15,7 @@
 #include <utility>
 #include <string>
 #include <analysis/dataobjects/Particle.h>
-#include <generators/dataobjects/MCParticle.h>
+#include <mdst/dataobjects/MCParticle.h>
 #include <analysis/DecayDescriptor/DecayString.h>
 #include <analysis/DecayDescriptor/DecayDescriptorParticle.h>
 #include <boost/ptr_container/ptr_vector.hpp>

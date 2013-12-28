@@ -26,7 +26,7 @@
 
 // DataStore classes
 #include <framework/dataobjects/EventMetaData.h>
-#include <generators/dataobjects/MCParticle.h>
+#include <mdst/dataobjects/MCParticle.h>
 #include <top/dataobjects/TOPDigit.h>
 #include <top/dataobjects/TOPBarHit.h>
 

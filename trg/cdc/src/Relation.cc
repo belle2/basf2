@@ -14,7 +14,7 @@
 #define TRGCDC_SHORT_NAMES
 
 #include "framework/datastore/StoreArray.h"
-#include "generators/dataobjects/MCParticle.h"
+#include "mdst/dataobjects/MCParticle.h"
 #include "trg/cdc/Relation.h"
 
 using namespace std;

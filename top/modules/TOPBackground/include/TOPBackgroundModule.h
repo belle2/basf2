@@ -43,7 +43,7 @@
 #include <top/dataobjects/TOPBarHit.h>
 #include <top/dataobjects/TOPSimHit.h>
 #include <simulation/dataobjects/BeamBackHit.h>
-#include <generators/dataobjects/MCParticle.h>
+#include <mdst/dataobjects/MCParticle.h>
 
 
 namespace Belle2 {

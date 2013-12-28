@@ -26,7 +26,7 @@
 #include <ecl/dataobjects/ECLPi0.h>
 
 
-#include <generators/dataobjects/MCParticle.h>
+#include <mdst/dataobjects/MCParticle.h>
 #include <framework/datastore/RelationArray.h>
 
 

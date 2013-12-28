@@ -40,7 +40,7 @@
 // #include "framework/datastore/StoreArray.h"       // unnecessary on kekcc
 // #include "framework/dataobjects/EventMetaData.h"  // unnecessary on kekcc
 // #include "framework/core/InputController.h"
-#include "generators/dataobjects/MCParticle.h"
+#include "mdst/dataobjects/MCParticle.h"
 #include "cdc/geometry/CDCGeometryPar.h"
 #include "cdc/dataobjects/CDCHit.h"
 #include "cdc/dataobjects/CDCSimHit.h"

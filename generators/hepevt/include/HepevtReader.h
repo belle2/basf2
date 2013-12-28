@@ -12,7 +12,7 @@
 #define HEPEVTREADER_H
 
 #include <framework/core/FrameworkExceptions.h>
-#include <generators/dataobjects/MCParticleGraph.h>
+#include <mdst/dataobjects/MCParticleGraph.h>
 #include <boost/tokenizer.hpp>
 
 #include <string>

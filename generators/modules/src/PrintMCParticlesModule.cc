@@ -9,7 +9,7 @@
  **************************************************************************/
 
 #include <generators/modules/PrintMCParticlesModule.h>
-#include <generators/dataobjects/MCParticle.h>
+#include <mdst/dataobjects/MCParticle.h>
 
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>

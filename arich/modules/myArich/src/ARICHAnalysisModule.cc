@@ -21,7 +21,7 @@
 #include <tracking/dataobjects/ExtHit.h>
 #include <arich/dataobjects/ARICHLikelihood.h>
 #include <arich/dataobjects/ARICHAeroHit.h>
-#include <generators/dataobjects/MCParticle.h>
+#include <mdst/dataobjects/MCParticle.h>
 
 // framework - DataStore
 #include <framework/datastore/DataStore.h>

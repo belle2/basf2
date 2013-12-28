@@ -12,7 +12,7 @@
 
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Unit.h>
-#include <generators/dataobjects/MCParticle.h>
+#include <mdst/dataobjects/MCParticle.h>
 
 #include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
@@ -78,7 +78,7 @@ int TouschekReaderTURTLE::getParticles(int number, MCParticleGraph& graph) throw
         fields[index] = boost::lexical_cast<double>(tok);
         index++;
       } catch (boost::bad_lexical_cast) {
-        throw(TouschekConvertFieldError() << m_lineNum << index << tok);
+        throw (TouschekConvertFieldError() << m_lineNum << index << tok);
       }
     }
 

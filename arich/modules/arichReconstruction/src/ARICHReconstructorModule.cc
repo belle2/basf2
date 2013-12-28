@@ -15,7 +15,7 @@
 // Hit classes
 #include <tracking/dataobjects/Track.h>
 #include <tracking/dataobjects/ExtHit.h>
-#include <generators/dataobjects/MCParticle.h>
+#include <mdst/dataobjects/MCParticle.h>
 #include <arich/dataobjects/ARICHAeroHit.h>
 #include <arich/dataobjects/ARICHLikelihood.h>
 #include <arich/modules/arichReconstruction/ARICHTrack.h>

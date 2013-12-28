@@ -9,7 +9,7 @@
 
 #include <beast/ph1sustr/modules/Ph1sustrModule.h>
 #include <beast/ph1sustr/dataobjects/Ph1sustrSimHit.h>
-#include <generators/dataobjects/MCParticle.h>
+#include <mdst/dataobjects/MCParticle.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>

@@ -13,7 +13,7 @@
 #include <tracking/dataobjects/SecMapVector.h> // needed for rootExport
 
 #include <framework/datastore/StoreArray.h>
-#include <generators/dataobjects/MCParticle.h>
+#include <mdst/dataobjects/MCParticle.h>
 #include <framework/datastore/RelationIndex.h>
 #include <framework/gearbox/Const.h>
 #include <pxd/geometry/SensorInfo.h>

@@ -12,7 +12,7 @@
 #define FULLSIMMODULE_H_
 
 #include <framework/core/Module.h>
-#include <generators/dataobjects/MCParticleGraph.h>
+#include <mdst/dataobjects/MCParticleGraph.h>
 
 #include <G4VisManager.hh>
 

@@ -29,7 +29,7 @@
 #include "framework/datastore/StoreArray.h"
 #include "framework/datastore/RelationArray.h"
 #include "cdc/dataobjects/CDCSimHit.h"
-#include "generators/dataobjects/MCParticle.h"
+#include "mdst/dataobjects/MCParticle.h"
 
 using namespace std;
 

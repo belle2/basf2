@@ -4,7 +4,7 @@ env['LIBS'] = ['framework',
                '$ROOT_LIBS','EvtGen','pythia8','PhotosCxxInterface.a', 'HepMC',
                'TauolaCxxInterface', 'TauolaFortran', 'lhapdfdummy', 'hepmcinterface',
                'PhotosFortran', 'EvtGenExternal', 'Geom', 'CLHEP',
-               'generators_dataobjects']
+               'generators_dataobjects', 'mdst_dataobjects']
 
 
 Return('env')

@@ -18,7 +18,7 @@
 #include <cdc/geometry/CDCGeometryPar.h>
 
 //in type
-#include <generators/dataobjects/MCParticle.h>
+#include <mdst/dataobjects/MCParticle.h>
 #include <cdc/dataobjects/CDCSimHit.h>
 #include <cdc/dataobjects/CDCHit.h>
 

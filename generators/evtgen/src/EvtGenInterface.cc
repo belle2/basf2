@@ -13,7 +13,7 @@
 #include <framework/logging/Logger.h>
 #include <generators/evtgen/EvtGenInterface.h>
 #include <generators/utilities/cm2LabBoost.h>
-#include <generators/dataobjects/MCParticleGraph.h>
+#include <mdst/dataobjects/MCParticleGraph.h>
 #include <generators/evtgen/EvtGenModelRegister.h>
 
 #include <string>

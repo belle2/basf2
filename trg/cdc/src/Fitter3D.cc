@@ -21,7 +21,7 @@
 #include "TTree.h"
 #include "framework/datastore/StoreArray.h"
 #include "framework/datastore/RelationArray.h"
-#include "generators/dataobjects/MCParticle.h"
+#include "mdst/dataobjects/MCParticle.h"
 #include "cdc/dataobjects/CDCHit.h"
 #include "cdc/dataobjects/CDCSimHit.h"
 #include "cdc/geometry/CDCGeometryPar.h"

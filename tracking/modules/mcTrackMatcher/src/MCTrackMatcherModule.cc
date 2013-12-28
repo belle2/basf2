@@ -21,7 +21,7 @@
 
 #include <framework/gearbox/Const.h>
 
-#include <generators/dataobjects/MCParticle.h>
+#include <mdst/dataobjects/MCParticle.h>
 #include <genfit/TrackCand.h>
 #include <genfit/TrackCandHit.h>
 

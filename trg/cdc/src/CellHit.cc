@@ -15,7 +15,7 @@
 #define TRGCDC_SHORT_NAMES
 
 #include "framework/datastore/StoreArray.h"
-#include "generators/dataobjects/MCParticle.h"
+#include "mdst/dataobjects/MCParticle.h"
 #include "cdc/dataobjects/CDCSimHit.h"
 #include "cdc/dataobjects/CDCHit.h"
 #include "trg/trg/Utilities.h"

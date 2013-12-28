@@ -1,7 +1,7 @@
 #include <analysis/utility/physics.h>
 
 // generator related
-#include <generators/dataobjects/MCParticle.h>
+#include <mdst/dataobjects/MCParticle.h>
 
 // framework related
 #include <framework/datastore/StoreArray.h>

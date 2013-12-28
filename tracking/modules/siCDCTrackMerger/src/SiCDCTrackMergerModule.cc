@@ -6,7 +6,7 @@
 #include <framework/logging/Logger.h>
 
 #include "genfit/TrackCand.h"
-#include <generators/dataobjects/MCParticle.h>
+#include <mdst/dataobjects/MCParticle.h>
 
 //avoid having to wrap everything in the namespace explicitly
 //only permissible in .cc files!

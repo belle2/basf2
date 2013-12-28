@@ -21,7 +21,7 @@
 #include <ecl/dataobjects/ECLDebugHit.h>
 #include <ecl/geometry/ECLGeometryPar.h>
 
-#include <generators/dataobjects/MCParticle.h>
+#include <mdst/dataobjects/MCParticle.h>
 #include <framework/datastore/RelationArray.h>
 //root
 #include <TVector3.h>

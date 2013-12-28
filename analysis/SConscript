@@ -9,6 +9,7 @@ env['LIBS'] = [
        	    'ecl_dataobjects',
        	    'eklm_dataobjects',
 	    'generators_dataobjects', 
+            'mdst_dataobjects',
        	    'pxd_dataobjects',
 	    'reconstruction_dataobjects',
       	    'svd_dataobjects',

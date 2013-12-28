@@ -11,7 +11,7 @@
 #include <generators/bbbrem/BBBrem.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Const.h>
-#include <generators/dataobjects/MCParticleGraph.h>
+#include <mdst/dataobjects/MCParticleGraph.h>
 
 #include <TRandom3.h>
 //#include <cmath>

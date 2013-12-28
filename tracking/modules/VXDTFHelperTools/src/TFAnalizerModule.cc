@@ -17,7 +17,7 @@
 #include "tracking/modules/VXDTFHelperTools/TFAnalizerModule.h"
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreArray.h>
-#include <generators/dataobjects/MCParticle.h>
+#include <mdst/dataobjects/MCParticle.h>
 #include <framework/datastore/RelationIndex.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <vxd/geometry/GeoCache.h>

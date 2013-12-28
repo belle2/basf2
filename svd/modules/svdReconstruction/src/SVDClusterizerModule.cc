@@ -20,7 +20,7 @@
 #include <vxd/geometry/GeoCache.h>
 #include <svd/geometry/SensorInfo.h>
 
-#include <generators/dataobjects/MCParticle.h>
+#include <mdst/dataobjects/MCParticle.h>
 #include <svd/dataobjects/SVDDigit.h>
 #include <svd/dataobjects/SVDCluster.h>
 #include <svd/dataobjects/SVDTrueHit.h>

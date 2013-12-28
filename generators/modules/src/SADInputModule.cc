@@ -9,7 +9,7 @@
  **************************************************************************/
 
 #include <generators/modules/SADInputModule.h>
-#include <generators/dataobjects/MCParticleGraph.h>
+#include <mdst/dataobjects/MCParticleGraph.h>
 
 #include <framework/logging/Logger.h>
 #include <framework/utilities/FileSystem.h>

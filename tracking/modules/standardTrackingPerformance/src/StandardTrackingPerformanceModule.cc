@@ -16,7 +16,7 @@
 #include <framework/datastore/RelationIndex.h>
 #include <framework/datastore/RelationVector.h>
 
-#include <generators/dataobjects/MCParticle.h>
+#include <mdst/dataobjects/MCParticle.h>
 #include <tracking/dataobjects/Track.h>
 
 #include <genfit/Track.h>

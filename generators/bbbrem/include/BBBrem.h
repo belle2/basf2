@@ -12,7 +12,7 @@
 #define BBBREM_H
 
 #include <framework/gearbox/Unit.h>
-#include <generators/dataobjects/MCParticleGraph.h>
+#include <mdst/dataobjects/MCParticleGraph.h>
 
 #include <TLorentzRotation.h>
 

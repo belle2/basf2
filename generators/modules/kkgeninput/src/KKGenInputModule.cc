@@ -11,7 +11,7 @@
 #include <generators/kkmc/KKGenInterface.h>
 #include <generators/modules/kkgeninput/KKGenInputModule.h>
 
-#include <generators/dataobjects/MCParticleGraph.h>
+#include <mdst/dataobjects/MCParticleGraph.h>
 #include <generators/utilities/cm2LabBoost.h>
 #include <framework/core/Environment.h>
 

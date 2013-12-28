@@ -11,7 +11,7 @@
 #ifndef TRACKINGACTION_H_
 #define TRACKINGACTION_H_
 
-#include <generators/dataobjects/MCParticleGraph.h>
+#include <mdst/dataobjects/MCParticleGraph.h>
 #include <simulation/dataobjects/MCParticleTrajectory.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>

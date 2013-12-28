@@ -19,7 +19,7 @@
 #include <framework/datastore/RelationArray.h>
 
 // dataobjects
-#include <generators/dataobjects/MCParticle.h>
+#include <mdst/dataobjects/MCParticle.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
 

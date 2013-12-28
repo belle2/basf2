@@ -17,7 +17,7 @@
 #include <framework/logging/Logger.h>
 
 // dataobjects
-#include <generators/dataobjects/MCParticle.h>
+#include <mdst/dataobjects/MCParticle.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleInfo.h>
 #include <analysis/utility/VariableManager.h>

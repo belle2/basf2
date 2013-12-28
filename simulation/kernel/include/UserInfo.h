@@ -12,7 +12,7 @@
 #define USERINFO_H_
 
 #include <framework/core/FrameworkExceptions.h>
-#include <generators/dataobjects/MCParticleGraph.h>
+#include <mdst/dataobjects/MCParticleGraph.h>
 #include <simulation/dataobjects/MCParticleTrajectory.h>
 
 #include "G4VUserTrackInformation.hh"

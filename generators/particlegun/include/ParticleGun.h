@@ -12,7 +12,7 @@
 #define PARTICLEGUN_H
 
 #include <framework/core/FrameworkExceptions.h>
-#include <generators/dataobjects/MCParticleGraph.h>
+#include <mdst/dataobjects/MCParticleGraph.h>
 
 #include <vector>
 #include <TRandom3.h>

@@ -15,7 +15,7 @@
 
 #include <simulation/kernel/MCParticleGenerator.h>
 
-#include <generators/dataobjects/MCParticle.h>
+#include <mdst/dataobjects/MCParticle.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 #include <framework/datastore/StoreArray.h>

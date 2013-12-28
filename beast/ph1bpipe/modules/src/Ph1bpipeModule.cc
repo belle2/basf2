@@ -9,7 +9,7 @@
 
 #include <beast/ph1bpipe/modules/Ph1bpipeModule.h>
 #include <beast/ph1bpipe/dataobjects/Ph1bpipeSimHit.h>
-#include <generators/dataobjects/MCParticle.h>
+#include <mdst/dataobjects/MCParticle.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>

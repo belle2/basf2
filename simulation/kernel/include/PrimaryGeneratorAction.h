@@ -11,7 +11,7 @@
 #ifndef PRIMARYGENERATORACTION_H_
 #define PRIMARYGENERATORACTION_H_
 
-#include <generators/dataobjects/MCParticleGraph.h>
+#include <mdst/dataobjects/MCParticleGraph.h>
 
 #include <G4VUserPrimaryGeneratorAction.hh>
 #include <string>

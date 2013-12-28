@@ -16,8 +16,8 @@
 #include <string>
 #include <vector>
 
-#include <generators/dataobjects/MCParticle.h>
-#include <generators/dataobjects/MCParticleGraph.h>
+#include <mdst/dataobjects/MCParticle.h>
+#include <mdst/dataobjects/MCParticleGraph.h>
 #include <generators/evtgen/EvtGenInterface.h>
 
 namespace Belle2 {

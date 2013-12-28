@@ -15,7 +15,7 @@
 #include <framework/datastore/RelationArray.h>
 #include <framework/logging/Logger.h>
 
-#include <generators/dataobjects/MCParticle.h>
+#include <mdst/dataobjects/MCParticle.h>
 #include <pxd/dataobjects/PXDTrueHit.h>
 #include <pxd/reconstruction/Pixel.h>
 

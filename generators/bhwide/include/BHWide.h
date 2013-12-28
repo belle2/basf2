@@ -11,7 +11,7 @@
 #ifndef BHWIDE_H
 #define BHWIDE_H
 
-#include <generators/dataobjects/MCParticleGraph.h>
+#include <mdst/dataobjects/MCParticleGraph.h>
 #include <TLorentzRotation.h>
 #include <utility>
 

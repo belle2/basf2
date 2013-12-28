@@ -12,7 +12,7 @@
 #include <framework/logging/Logger.h>
 
 #include <framework/datastore/DataStore.h>
-#include <generators/dataobjects/MCParticle.h>
+#include <mdst/dataobjects/MCParticle.h>
 
 #include <pxd/dataobjects/PXDSimHit.h>
 #include <svd/dataobjects/SVDSimHit.h>

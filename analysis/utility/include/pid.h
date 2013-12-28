@@ -5,7 +5,7 @@
 #include <tracking/dataobjects/Track.h>
 
 // generator related
-#include <generators/dataobjects/MCParticle.h>
+#include <mdst/dataobjects/MCParticle.h>
 
 // PID Likelihoods
 #include <top/dataobjects/TOPLikelihood.h>

@@ -15,7 +15,7 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
-#pragma link C++ class Belle2::BackgroundInfo;
-#pragma link C++ class Belle2::SimHitBase;
+#pragma link C++ class Belle2::MCParticle;
+#pragma link C++ class vector<Belle2::MCParticle*>;
 
 #endif

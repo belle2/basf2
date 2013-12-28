@@ -12,7 +12,7 @@
 #define TOUSCHEKTURTLEINPUTMODULE_H_
 
 #include <framework/core/Module.h>
-#include <generators/dataobjects/MCParticleGraph.h>
+#include <mdst/dataobjects/MCParticleGraph.h>
 
 #include <TGeoMatrix.h>
 #include <string>

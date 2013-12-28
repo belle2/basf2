@@ -1,0 +1,7 @@
+#!/bin/bash
+ssh belle-rpc1 "cd belle2/release; source ../tools/setup_belle2; setuprel; source daq/slc/extra/bin/nsm2_copper.sh; nsmd2 &> /dev/null&" 
+sleep 3
+ssh cpr010 "cd belle2/release; source ../tools/setup_belle2; setuprel; source daq/slc/extra/bin/nsm2_copper.sh; nsmd2 &> /dev/null&" 
+ssh cpr011 "cd belle2/release; source ../tools/setup_belle2; setuprel; source daq/slc/extra/bin/nsm2_copper.sh; nsmd2 &> /dev/null&" 
+ssh cpr012 "cd belle2/release; source ../tools/setup_belle2; setuprel; source daq/slc/extra/bin/nsm2_copper.sh; nsmd2 &> /dev/null&" 
+ssh cpr013 "cd belle2/release; source ../tools/setup_belle2; setuprel; source daq/slc/extra/bin/nsm2_copper.sh; nsmd2 &> /dev/null&" 

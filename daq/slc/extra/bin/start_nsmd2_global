@@ -1,0 +1,4 @@
+#!/bin/bash
+ssh belle-rpc2 "cd ~/belle2/release; source ../tools/setup_belle2; setuprel; source daq/slc/extra/bin/nsm2_global.sh; nsmd2 &> /dev/null&" 
+ssh belle-rpc1 "cd ~/belle2/release; source ../tools/setup_belle2; setuprel; source daq/slc/extra/bin/nsm2_global.sh; nsmd2 &> /dev/null&"
+

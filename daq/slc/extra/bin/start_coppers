@@ -1,0 +1,31 @@
+#!/bin/bash
+
+restartBySSH() {
+  ssh $1 "killall $2"
+  ssh $1 "cd belle2/release; source ../tools/setup_belle2; setuprel; source daq/slc/extra/bin/nsm2_local.sh; $2 $3 &> /dev/null" &> /dev/null &
+}
+
+label=`date +%Y%M%H%m`
+
+cd ~/belle2/release
+source ../tools/setup_belle2 &> /dev/null
+setuprel &> /dev/null
+
+source ${BELLE2_LOCAL_DIR}/daq/slc/extra/bin/nsm2_global.sh
+mkdir -p  ~/run/runcontrold/belle-rpc1
+kill `ps aux | grep "runcontrold cdc" | grep -v grep | awk '{print $2}'`
+runcontrold cdc &> ~/run/runcontrold/belle-rpc1/${label}.log &
+
+source ${BELLE2_LOCAL_DIR}/daq/slc/extra/bin/nsm2_local.sh
+mkdir -p  ~/run/rocontrold/belle-rpc1
+kill `ps aux | grep "rocontrold ROPC01" | grep -v grep | awk '{print $2}'`
+rocontrold ROPC01 &> ~/run/rocontrold/belle-rpc1/${label}.log &
+
+mkdir -p  ~/run/cprcontrold/belle-rpc1
+restartBySSH cpr010 tempd CPR010 
+restartBySSH cpr011 tempd CPR011 
+restartBySSH cpr012 tempd CPR012 
+restartBySSH cpr013 tempd CPR013
+
+
+cd -

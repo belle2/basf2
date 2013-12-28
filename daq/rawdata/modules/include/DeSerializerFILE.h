@@ -85,9 +85,6 @@ namespace Belle2 {
     ErrorMessage print_err;
 
     //!
-    int m_start_flag;
-
-    //!
     int m_dummy_evenum;
 
     //!

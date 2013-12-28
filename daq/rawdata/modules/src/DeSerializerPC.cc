@@ -121,7 +121,7 @@ int DeSerializerPCModule::recvFD(int sock, char* buf, int data_size_byte, int fl
     if ((read_size = recv(sock, (char*)buf + n, data_size_byte - n , flag)) < 0) {
       char temp_char[100];
       sprintf(temp_char, "Failed to read header");
-      print_err.PrintError(temp_char, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      print_err.PrintError(m_shmflag, &m_status, temp_char, __FILE__, __PRETTY_FUNCTION__, __LINE__);
       sleep(1234567);
       exit(-1);
     } else {
@@ -146,7 +146,7 @@ int DeSerializerPCModule::Connect()
     if (host == NULL) {
       char temp_char[100];
       sprintf(temp_char, "hostname cannot be resolved. Check /etc/hosts. Exiting...");
-      print_err.PrintError(temp_char, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      print_err.PrintError(m_shmflag, &m_status, temp_char, __FILE__, __PRETTY_FUNCTION__, __LINE__);
       sleep(1234567);
       exit(1);
     }
@@ -236,7 +236,7 @@ int* DeSerializerPCModule::recvData(int* malloc_flag, int* total_buf_nwords, int
       char err_buf[500];
       sprintf(err_buf, "[ERROR] Different # of events or nodes over data sources( %d %d %d %d ). Exiting...\n",
               *num_events_in_sendblock , temp_num_events , *num_nodes_in_sendblock , temp_num_nodes);
-      print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      print_err.PrintError(m_shmflag, &m_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
       sleep(1234567);
       exit(1);
 #endif
@@ -264,7 +264,7 @@ int* DeSerializerPCModule::recvData(int* malloc_flag, int* total_buf_nwords, int
 
       char err_buf[500];
       sprintf(err_buf, "Too large event : Header %d %d %d %d\n", i, temp_num_events, temp_num_nodes, send_hdr.GetTotalNwords());
-      print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      print_err.PrintError(m_shmflag, &m_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
       sleep(123456);
       exit(1);
 
@@ -287,7 +287,7 @@ int* DeSerializerPCModule::recvData(int* malloc_flag, int* total_buf_nwords, int
   }
   if ((int)(*total_buf_nwords * sizeof(int)) != total_recvd_byte) {
     char temp_char[100] = "Receiving data in an invalid unit. Exting...";
-    print_err.PrintError(temp_char, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+    print_err.PrintError(m_shmflag, &m_status, temp_char, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     sleep(1234567);
     exit(-1);
   }
@@ -350,7 +350,7 @@ void DeSerializerPCModule::event()
   unsigned int temp_copper_ctr = 0;
   clearNumUsedBuf();
 
-  if (n_basf2evt < 0) {
+  if (m_start_flag == 0) {
     // Accept requests for connections
     Connect();
     if (m_shmflag > 0 && m_status.isStopped()) {
@@ -362,6 +362,7 @@ void DeSerializerPCModule::event()
     B2INFO("DeSerializerPC: event() started.");
     m_start_time = getTimeSec();
     n_basf2evt = 0;
+    m_start_flag = 1;
   }
 
   // Make rawdatablk array

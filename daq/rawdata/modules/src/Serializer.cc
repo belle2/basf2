@@ -38,6 +38,7 @@ SerializerModule::SerializerModule() : Module()
   addParam("EventDataBufferWords", BUF_SIZE_WORD, "DataBuffer words per event", 4800);
 #endif
 
+  m_start_flag = 0;
   n_basf2evt = -1;
   m_compressionLevel = 0;
   //Parameter definition
@@ -460,9 +461,10 @@ unsigned int SerializerModule::calcXORChecksum(int* buf, int nwords)
 
 void SerializerModule::event()
 {
-  if (n_basf2evt <= 0) {
+  if (m_start_flag == 0) {
     m_start_time = getTimeSec();
     n_basf2evt = 0;
+    m_start_flag = 1;
   }
 
 #ifdef TIME_MONITOR

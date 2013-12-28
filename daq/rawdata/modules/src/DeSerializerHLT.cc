@@ -107,10 +107,11 @@ void DeSerializerHLTModule::event()
 {
   clearNumUsedBuf();
 
-  if (n_basf2evt < 0) {
+  if (m_start_flag == 0) {
     B2INFO("DeSerializerHLT: event() started.");
     m_start_time = getTimeSec();
     n_basf2evt = 0;
+    m_start_flag = 1;
   }
 
   raw_datablkarray.create();

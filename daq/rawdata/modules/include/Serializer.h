@@ -162,6 +162,9 @@ namespace Belle2 {
     //! sent data size
     int m_totbytes;
 
+    //! start flag
+    int m_start_flag;
+
   };
 
 } // end namespace Belle2

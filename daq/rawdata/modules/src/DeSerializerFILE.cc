@@ -310,10 +310,11 @@ void DeSerializerFILEModule::event()
     m_dummy_evenum = 0;
   }
 
-  if (n_basf2evt < 0) {
+  if (m_start_flag == 0) {
     B2INFO("DeSerializerFILE: event() started.");
     m_start_time = getTimeSec();
     n_basf2evt = 0;
+    m_start_flag = 1;
   }
 
   //  rawcprarray.create();

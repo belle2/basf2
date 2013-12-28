@@ -81,7 +81,7 @@ void DeSerializerCOPPERModule::initialize()
   //
   if (! use_slot) {
     char err_buf[100] = "Slot is not specified. Exiting...";
-    print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+    print_err.PrintError(m_shmflag, &m_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     exit(1);
   } else {
     int slot;
@@ -147,8 +147,6 @@ void DeSerializerCOPPERModule::initialize()
       m_status.reportReady();
     }
   }
-
-
 }
 
 
@@ -239,7 +237,7 @@ void DeSerializerCOPPERModule::fillNewRawCOPPERHeader(RawCOPPER* raw_copper)
             raw_copper->GetMagicFPGAHeader(cprblock),
             raw_copper->GetMagicFPGATrailer(cprblock),
             raw_copper->GetMagicDriverTrailer(cprblock));
-    print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+    print_err.PrintError(m_shmflag, &m_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     sleep(12345678);
     exit(-1);
   }
@@ -252,7 +250,7 @@ void DeSerializerCOPPERModule::fillNewRawCOPPERHeader(RawCOPPER* raw_copper)
 #endif
     char err_buf[500];
     sprintf(err_buf, "Invalid event_number. Exiting...: cur 32bit eve %x preveve %x\n",  cur_ftsw_eve32, m_prev_ftsweve32);
-    print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+    print_err.PrintError(m_shmflag, &m_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
 
     printf("i= %d : num entries %d : Tot words %d\n", 0 , raw_copper->GetNumEntries(), raw_copper->TotalBufNwords());
     for (int j = 0; j < raw_copper->TotalBufNwords(); j++) {
@@ -302,7 +300,7 @@ int* DeSerializerCOPPERModule::readOneEventFromCOPPERFIFO(const int entry, int* 
       if (read_size == EINTR) {
         continue;
       } else {
-        char err_buf[100] = "Failed to read header"; print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+        char err_buf[100] = "Failed to read header"; print_err.PrintError(m_shmflag, &m_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
         exit(-1);
       }
     } else {
@@ -341,14 +339,14 @@ int* DeSerializerCOPPERModule::readOneEventFromCOPPERFIFO(const int entry, int* 
               recvd_byte,
               *m_size_word * sizeof(int) - RawTrailer::RAWTRAILER_NWORDS * sizeof(int),
               m_bufary[ entry ][ RawCOPPER::POS_DATA_LENGTH ],  RawCOPPER::POS_DATA_LENGTH);
-      print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      print_err.PrintError(m_shmflag, &m_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
       exit(-1);
     }
 
   } else if ((int)((*m_size_word - RawTrailer::RAWTRAILER_NWORDS) * sizeof(int)) < recvd_byte) {
     char    err_buf[500];
     sprintf(err_buf, "Read more than data size. Exiting...: %d %d %d %d %d\n", recvd_byte, *m_size_word * sizeof(int) , RawTrailer::RAWTRAILER_NWORDS * sizeof(int), m_bufary[ entry ][ RawCOPPER::POS_DATA_LENGTH ],  RawCOPPER::POS_DATA_LENGTH);
-    print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+    print_err.PrintError(m_shmflag, &m_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
 
     exit(-1);
   }
@@ -398,7 +396,7 @@ void DeSerializerCOPPERModule::openCOPPER()
   //
   if ((cpr_fd = open("/dev/copper/copper", O_RDONLY)) == -1) {
     char err_buf[100] = "Failed to open Finesse. Exiting... ";
-    print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+    print_err.PrintError(m_shmflag, &m_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     exit(1);
   }
 
@@ -434,7 +432,7 @@ int DeSerializerCOPPERModule::readFD(int fd, char* buf, int data_size_byte)
       if (read_size == EINTR) {
         continue;
       } else {
-        char err_buf[100] = "Failed to read header";   print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+        char err_buf[100] = "Failed to read header";   print_err.PrintError(m_shmflag, &m_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
         exit(-1);
       }
     } else {
@@ -485,7 +483,7 @@ void DeSerializerCOPPERModule::event()
 
     // Fill header and trailer
     m_prev_ftsweve32 = temp_rawcopper.FillTopBlockRawHeader(m_nodeid, m_data_type, m_trunc_mask, m_prev_ftsweve32);
-    printf("####### j %d  loop %d eve %d\n", j, n_basf2evt, m_prev_ftsweve32);
+    //    printf("####### j %d  loop %d eve %d\n", j, n_basf2evt, m_prev_ftsweve32);
 //   for (int j = 0; j < raw_copper->TotalBufNwords(); j++) {
 //     printf("0x%.8x ", (raw_copper->GetBuffer(0))[ j ]);
 //     if ((j % 10) == 9)printf("\n");

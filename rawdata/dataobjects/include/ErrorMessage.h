@@ -14,7 +14,7 @@
 #include <stdlib.h>
 #include <TObject.h>
 #include <string>
-#include <daq/slc/readout/ProcessStatusBuffer.h>
+//#include <daq/slc/readout/ProcessStatusBuffer.h>
 
 namespace Belle2 {
 
@@ -34,7 +34,7 @@ namespace Belle2 {
     void PrintError(char* err_message, const char* file, const char* func_name, const int line);
 
     //!
-    void PrintError(const int shmflag, ProcessStatusBuffer* nsm_status, char* err_message, const char* file, const char* func_name, const int line);
+    //    void PrintError(const int shmflag, ProcessStatusBuffer* nsm_status, char* err_message, const char* file, const char* func_name, const int line);
     //!
     //    void PrintError( ProcessStatusBuffer* nsm_status, char* err_message, const char* file, const char* func_name, const int line);
     //    void PrintError(const std::string err_message, const char* file, const char* func_name, const int line);

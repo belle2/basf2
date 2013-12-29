@@ -53,13 +53,12 @@ void NSMNodeDaemon::run() throw()
   }
   try {
     while (true) {
-      if (_nsm_comm->wait(100)) {
+      if (_nsm_comm->wait(2)) {
         _callback->setMessage(_nsm_comm->getMessage());
         _nsm_comm->performCallback();
       } else {
         _callback->selfCheck();
       }
-      Belle2::debug("[DEBUG] %s %s:%d", Date().toString(), __FILE__, __LINE__);
     }
   } catch (const std::exception& e) {
     Belle2::debug("NSM node daemon : Caught exception (%s). Terminate process...",

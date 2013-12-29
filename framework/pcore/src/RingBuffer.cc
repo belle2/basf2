@@ -43,6 +43,16 @@ RingBuffer::RingBuffer(int size)
 
   openSHM(size);
 
+  // Leave id of shm and semaphore in file name
+  m_strbuf = new char[1024];
+  sprintf(m_strbuf, "/tmp/SHM%d-SEM%d", m_shmid, m_semid);
+  int fd = open(m_strbuf, O_CREAT | O_TRUNC | O_RDWR, 0644);
+  if (fd < 0) {
+    B2INFO("RingBuffer ID file could not be created.");
+  } else {
+    close(fd);
+  }
+
   B2INFO("RingBuffer initialization done");
 }
 
@@ -172,6 +182,8 @@ void RingBuffer::cleanup()
     if (m_file) {
       //      close(m_pathfd);
       unlink(m_pathname.c_str());
+    } else {
+      unlink(m_strbuf);
     }
   }
 }

@@ -9,7 +9,7 @@
 #ifndef ROOT2BINARY_H
 #define ROOT2BINARY_H
 #include <daq/rawdata/modules/PrintDataTemplate.h>
-#include <daq/rawdata/modules/CprErrorMessage.h>
+#include <daq/rawdata/CprErrorMessage.h>
 
 
 namespace Belle2 {

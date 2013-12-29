@@ -25,7 +25,7 @@
 
 #include <daq/dataflow/EvtSocket.h>
 #include <daq/slc/readout/ProcessStatusBuffer.h>
-#include <daq/rawdata/modules/CprErrorMessage.h>
+#include <daq/rawdata/CprErrorMessage.h>
 
 #include <rawdata/dataobjects/RawDataBlock.h>
 #include <rawdata/dataobjects/RawCOPPER.h>

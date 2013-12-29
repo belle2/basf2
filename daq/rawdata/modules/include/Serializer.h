@@ -24,7 +24,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/dataobjects/EventMetaData.h>
 
-#include <daq/rawdata/modules/CprErrorMessage.h>
+#include <daq/rawdata/CprErrorMessage.h>
 #include <daq/rawdata/modules/DAQConsts.h>
 #include <daq/dataobjects/SendHeader.h>
 #include <daq/dataobjects/SendTrailer.h>

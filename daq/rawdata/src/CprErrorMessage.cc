@@ -5,17 +5,16 @@
 // Author : Satoru Yamada, IPNS, KEK
 // Date : 2 - Aug - 2013
 //-
-
-#include <daq/rawdata/modules/CprErrorMessage.h>
-#include <time.h>
+#include <framework/logging/Logger.h>
+#include <daq/rawdata/CprErrorMessage.h>
+// #include <time.h>
 #include <syslog.h>
-#include <framework/core/Module.h>
+// #include <framework/core/Module.h>
 
 using namespace std;
 using namespace Belle2;
 
-ClassImp(CprErrorMessage);
-
+//REG_MODULE(CprErrorMessage)
 // CprErrorMessage::CprErrorMessage( const char* entry_name )
 // {
 //   //  openlog( entry_name, LOG_PERROR, LOG_LOCAL0 );

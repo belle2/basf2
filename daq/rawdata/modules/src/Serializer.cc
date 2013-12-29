@@ -172,7 +172,7 @@ void SerializerModule::shmOpen(char* path_cfg, char* path_sta)
 void SerializerModule::fillSendHeaderTrailer(SendHeader* hdr, SendTrailer* trl,
                                              RawDataBlock* rawdblk)
 {
-  const int num_cprblock = 0;
+
   int total_send_nwords =
     hdr->GetHdrNwords() +
     rawdblk->TotalBufNwords() +

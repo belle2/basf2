@@ -97,7 +97,7 @@ int* DeSerializerFILEModule::readOneDataBlock(int* malloc_flag, int* size_word, 
   //
   // Read 1st word( data size ) of RawDataBlock
   //
-  int n = 0;
+
   //  int recvd_byte = RawHeader::RAWHEADER_NWORDS * sizeof(int);
   int temp_size_word = 0;
   int recvd_byte = 0;
@@ -274,7 +274,7 @@ int* DeSerializerFILEModule::modify131213SVDdata(int* buf_in, int* buf_in_nwords
   for (int i = 0 ; i < 4; i++) {
     if (temp_rawcopper.GetFINESSENwords(0, i) > 0) {
       int* temp_buf = temp_rawcopper.GetDetectorBuffer(0, i);
-      if (temp_buf[ 0 ] != 0xffaa0000) {
+      if ((unsigned int)(temp_buf[ 0 ]) != 0xffaa0000) {
         char    err_buf[500];
         sprintf(err_buf, "Invalid SVN header magic word %x : Exiting...\n",
                 temp_buf[0]);
@@ -384,7 +384,7 @@ void DeSerializerFILEModule::event()
     temp_rawdblk.SetBuffer(temp_buf, size_word, 0, num_nodes, num_events);
     int block_num = 0;
 
-    int eve_num;
+    unsigned int eve_num;
     int subsysid = 0;
 
     if (temp_rawdblk.CheckFTSWID(block_num)) {

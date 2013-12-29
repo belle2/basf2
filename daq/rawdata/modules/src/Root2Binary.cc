@@ -73,7 +73,7 @@ void Root2BinaryModule::writeEvent(RawDataBlock* raw_dblk, int* first_flag, int*
 
   for (int j = *dblk_pos; j < raw_dblk->GetNumEntries(); j++) {
     printf("numentries %d %d\n", raw_dblk->GetNumEntries(), j);
-    int size = 4 * raw_dblk->GetBlockNwords(j);
+
 
     unsigned int prev_eve = *dblk_eve;
     int num_nodes = 1;
@@ -117,8 +117,7 @@ void Root2BinaryModule::event()
 
   B2INFO("Root2Binary: event() started.");
   int array_entries;
-  int num_eve;
-  int num_nodes;
+
 
   //
   // Data Block
@@ -164,7 +163,7 @@ void Root2BinaryModule::event()
   unsigned int klm_eve = 0;
 
 
-  int cnt = 0;
+
   while (true) {
     int write_flag = 0;
 
@@ -173,7 +172,7 @@ void Root2BinaryModule::event()
     //
     int break_flag;
     int first_flag;
-    unsigned int eve;
+
 
     break_flag = 0;
     first_flag = 0;

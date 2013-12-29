@@ -347,7 +347,7 @@ void DeSerializerPCModule::event()
   int data_size_ftsw = -1;
 
   unsigned int eve_copper_0 = 0;
-  unsigned int temp_copper_ctr = 0;
+
   clearNumUsedBuf();
 
   if (m_start_flag == 0) {
@@ -380,9 +380,8 @@ void DeSerializerPCModule::event()
   // Mail loop
   //
   for (int j = 0; j < NUM_EVT_PER_BASF2LOOP_PC; j++) {
-    unsigned int eve_ftsw = 0;
+
     eve_copper_0 = 0;
-    unsigned int eve_copper_1 = 0;
 
     //
     // Get a record from socket
@@ -417,7 +416,6 @@ void DeSerializerPCModule::event()
 #endif
         //    printf("################SFTW cur %x prev %x\n",cur_evenum,m_prev_evenum);
         data_size_ftsw = raw_datablk->GetBlockNwords(i);
-        eve_ftsw = (raw_datablk->GetBuffer(i))[ 7 ] & 0xFFFF;
         delete temp_rawftsw;
 
       } else if (raw_datablk->CheckTLUID(i)) {
@@ -436,7 +434,6 @@ void DeSerializerPCModule::event()
           eve_copper_0 = (raw_datablk->GetBuffer(i))[ 3 ];
         } else if (cpr_num == 1) {
           data_size_copper_1 = raw_datablk->GetBlockNwords(i);
-          eve_copper_1 = (raw_datablk->GetBuffer(i))[ 3 ];
         }
         cpr_num++;
         delete temp_rawcopper;

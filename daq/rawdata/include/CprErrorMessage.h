@@ -12,13 +12,13 @@
 // Includes
 #include <stdio.h>
 #include <stdlib.h>
-#include <TObject.h>
 #include <string>
+//#include <framework/core/Module.h>
 #include <daq/slc/readout/ProcessStatusBuffer.h>
 
 namespace Belle2 {
 
-  class CprErrorMessage : public TObject {
+  class CprErrorMessage {
   public:
     //! Default constructor
     CprErrorMessage();
@@ -39,7 +39,7 @@ namespace Belle2 {
     /*     //! */
     /*     void PrintError(const std::string err_message, const char* file, const char* func_name, const int line); */
 
-    ClassDef(CprErrorMessage, 1);
+
   };
 }
 

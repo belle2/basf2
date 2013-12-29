@@ -292,7 +292,7 @@ int* DeSerializerCOPPERModule::readOneEventFromCOPPERFIFO(const int entry, int* 
   //
   // Read data from HSLB
   //
-  int n = 0;
+
   int recvd_byte = RawHeader::RAWHEADER_NWORDS * sizeof(int);
   while (1) {
     int read_size = 0;
@@ -338,7 +338,7 @@ int* DeSerializerCOPPERModule::readOneEventFromCOPPERFIFO(const int entry, int* 
       sprintf(err_buf, "Read less bytes(%d) than expected(%d:%d). Exiting...\n",
               recvd_byte,
               *m_size_word * sizeof(int) - RawTrailer::RAWTRAILER_NWORDS * sizeof(int),
-              m_bufary[ entry ][ RawCOPPER::POS_DATA_LENGTH ],  RawCOPPER::POS_DATA_LENGTH);
+              m_bufary[ entry ][ RawCOPPER::POS_DATA_LENGTH ]);
       print_err.PrintError(m_shmflag, &m_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
       exit(-1);
     }
@@ -406,7 +406,7 @@ void DeSerializerCOPPERModule::openCOPPER()
   ioctl(cpr_fd, CPRIOSET_LEF_WB_FF, &set_regval);
   ioctl(cpr_fd, CPRIOSET_LEF_WC_FF, &set_regval);
   ioctl(cpr_fd, CPRIOSET_LEF_WD_FF, &set_regval);
-  int ret = ioctl(cpr_fd, CPRIOSET_FINESSE_STA, &use_slot, sizeof(use_slot));
+  ioctl(cpr_fd, CPRIOSET_FINESSE_STA, &use_slot, sizeof(use_slot));
 
   int v = 511 - 32;
 

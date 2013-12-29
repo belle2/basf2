@@ -24,11 +24,12 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/dataobjects/EventMetaData.h>
 
+#include <daq/rawdata/modules/CprErrorMessage.h>
 #include <daq/rawdata/modules/DAQConsts.h>
 #include <daq/dataobjects/SendHeader.h>
 #include <daq/dataobjects/SendTrailer.h>
 #include <rawdata/dataobjects/RawCOPPER.h>
-#include <rawdata/dataobjects/ErrorMessage.h>
+
 
 
 #include <sys/types.h>
@@ -157,7 +158,7 @@ namespace Belle2 {
     void recordTime(int event, double* array);
 
     //! error message program
-    ErrorMessage print_err;
+    CprErrorMessage print_err;
 
     //! sent data size
     int m_totbytes;

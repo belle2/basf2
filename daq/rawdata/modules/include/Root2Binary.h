@@ -9,6 +9,7 @@
 #ifndef ROOT2BINARY_H
 #define ROOT2BINARY_H
 #include <daq/rawdata/modules/PrintDataTemplate.h>
+#include <daq/rawdata/modules/CprErrorMessage.h>
 
 
 namespace Belle2 {
@@ -48,7 +49,7 @@ namespace Belle2 {
     std::string m_fname_out;
 
     //!
-    ErrorMessage print_err;
+    CprErrorMessage print_err;
 
   };
 

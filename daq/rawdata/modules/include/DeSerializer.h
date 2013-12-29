@@ -25,6 +25,7 @@
 
 #include <daq/dataflow/EvtSocket.h>
 #include <daq/slc/readout/ProcessStatusBuffer.h>
+#include <daq/rawdata/modules/CprErrorMessage.h>
 
 #include <rawdata/dataobjects/RawDataBlock.h>
 #include <rawdata/dataobjects/RawCOPPER.h>
@@ -208,12 +209,10 @@ namespace Belle2 {
     //! start flag
     int m_start_flag;
 
-    // Data members
+    //! wrapper for B2LOG system
+    CprErrorMessage print_err;
+
   private:
-
-
-    // Parallel processing parameters
-
 
 
   };

@@ -29,7 +29,6 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <daq/rawdata/modules/DAQConsts.h>
 #include <rawdata/dataobjects/RawCOPPER.h>
-#include <rawdata/dataobjects/ErrorMessage.h>
 #include <daq/rawdata/modules/DeSerializer.h>
 
 
@@ -70,14 +69,24 @@ namespace Belle2 {
 
     // Parallel processing parameters
 
-
     //! COPPER file descripter
     int cpr_fd;
+
+    //! bit flag for available FINESSE slot
     int use_slot;
+
+    //! bit flag for available FINESSE slot
     int finesse_bit_flag;
-    ErrorMessage print_err;
+
+
+
+    //! Event # from data
     unsigned int m_prev_ftsweve32;
+
+    //! exp #
     int m_exp;
+
+    //! run #
     int m_run;
 
 

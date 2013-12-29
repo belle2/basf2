@@ -22,7 +22,6 @@
 #include <framework/datastore/StoreArray.h>
 
 #include <daq/dataflow/EvtSocket.h>
-#include <rawdata/dataobjects/ErrorMessage.h>
 
 #include <rawdata/dataobjects/RawCOPPER.h>
 #include <rawdata/dataobjects/RawCDC.h>
@@ -105,11 +104,11 @@ namespace Belle2 {
     StoreArray<RawKLM> raw_klmarray;
     StoreArray<RawFTSW> raw_ftswarray;
 
-    ErrorMessage print_err;
 
     int event_diff;
 
     unsigned int m_prev_copper_ctr;
+
     unsigned int m_prev_evenum;
 
   };

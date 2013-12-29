@@ -41,7 +41,7 @@ client_start(NSMmsg* msg, NSMcontext* nsmc)
   datap->run_count++;
   datap->run_number = msg->pars[0];
   datap->evt_number = 0;
-  b2nsm_ok(msg, "RUNNING", "run %d started as %dth run",
+  b2nsm_ok(msg, "RUNNING\nRunning", "run %d started as %dth run\n test",
            datap->run_number, datap->run_count);
 }
 // -- client_stop -------------------------------------------------------

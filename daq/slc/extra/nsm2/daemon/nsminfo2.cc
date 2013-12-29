@@ -2,6 +2,7 @@
 // -- nsminfo2.cc
 //
 // 20131218  xforce option [from nsmd 1913]
+// 20131229  shmget permission changed
 // ----------------------------------------------------------------------
 
 // -- include files -----------------------------------------------------
@@ -73,7 +74,7 @@ void
 nsminfo_init(int nsmd_shmkey)
 {
   int id;
-  if ((id = shmget(nsmd_shmkey, sizeof(*nsmd_sysp), 0555)) < 0) {
+  if ((id = shmget(nsmd_shmkey, sizeof(*nsmd_sysp), 0444)) < 0) {
     if (errno = ENOENT) {
       printf("Cannot open SYS shared memory with key=%d.  Is nsmd running?\n",
              nsmd_shmkey);
@@ -89,7 +90,7 @@ nsminfo_init(int nsmd_shmkey)
     perror("shmat (sys):");
     exit(1);
   }
-  if ((id = shmget(nsmd_shmkey + 1, sizeof(*nsmd_memp), 0775)) < 0) {
+  if ((id = shmget(nsmd_shmkey + 1, sizeof(*nsmd_memp), 0664)) < 0) {
     if (errno = ENOENT) {
       printf("Cannot open MEM shared memory with key=%d. %s\n",
              nsmd_shmkey + 1, "Something is inconsistent");

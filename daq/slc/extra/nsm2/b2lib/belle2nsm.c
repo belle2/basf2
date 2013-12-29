@@ -132,7 +132,16 @@ b2nsm_sendany(const char *node, const char *req, int npar, int *pars,
     fprintf(logfp, "%s%s=>%s %s failed: %s\n",
 	    xt(), req, node, caller, b2nsm_strerror());
   } else {
-    fprintf(logfp, "%s%s=>%s\n", xt(), req, node);
+    int i;
+    fprintf(logfp, "%s%s=>%s", xt(), req, node);
+    for (i = 0; i<3 && i<npar; i++) {
+      fprintf(logfp, "%s%d%s", i==0 ? " (" : "", pars[i],
+	      i==npar-1 ? ")" : (i == 2 ? "...)" : ",") );
+    }
+    for (i = 0; datp && i < 80 && i < len && isprint(datp[i]); i++) {
+      fprintf(logfp, "%s%c%s", i==0 ? " " : "", datp[i], i==79 ? "..." : "");
+    }
+    fprintf(logfp, "\n");
   }
   fflush(logfp);
   return ret;

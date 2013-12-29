@@ -19,8 +19,9 @@
 //  20131217  1913 dtpos fix (don't use ntohs!)
 //  20131218  1914 new protocol version, merged with Konno branch
 //  20131219  1915 uid/gid for MEM shm
+//  20131222  1916 printlog infinite loop fix
 
-#define NSM_DAEMON_VERSION   1915 /* daemon   version 1.9.15 */
+#define NSM_DAEMON_VERSION   1916 /* daemon   version 1.9.16 */
 // ----------------------------------------------------------------------
 
 /*
@@ -670,7 +671,7 @@ nsmd_printlog(const char* prompt, const char* str)
   nsmd_logtime(datebuf);
   const char* p = str;
   while (p && *p) {
-    const char* q = strchr(str, '\n');
+    const char* q = strchr(p, '\n');
     fputs(datebuf, nsmd_logfp);
     fputs(prompt, nsmd_logfp);
     if (p != str) fputs("+ ", nsmd_logfp);
@@ -4112,9 +4113,20 @@ nsmd_command(NSMcon& con, NSMdmsg& dmsg)
       }
     }
 
+    char databuf[80];
+    if (dmsg.datap) {
+      int i = 0;
+      while (isprint(dmsg.datap[i]) && i < sizeof(databuf) - 1) {
+        databuf[i] = dmsg.datap[i];
+        i++;
+      }
+      databuf[i] = 0;
+    } else {
+      strcpy(databuf, "(null)");
+    }
+
     DBG("command: req = %04x len = %d npar = %d datap = %s con = %d",
-        dmsg.req, dmsg.len, dmsg.npar,
-        dmsg.datap ? dmsg.datap : "(null)", conid);
+        dmsg.req, dmsg.len, dmsg.npar, databuf, conid);
 
     if (conid != 0) {
       nsmd_tcpsend(sys.con[conid], dmsg);

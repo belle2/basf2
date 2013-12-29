@@ -4,21 +4,23 @@
 /* -- version info */
 
 #define NSM_PROTOCOL_VERSION 1915 /* protocol version 1.9.15 */
-#define NSM_PACKAGE_VERSION  1915 /* package  version 1.9.15 */
+#define NSM_PACKAGE_VERSION  1917 /* package  version 1.9.17 */
 
 /*
-  2012.07.23 1.9.00 --- file created
-  2012.11.15 1.9.03 --- queue based message sending starts working
-  2012.11.17 1.9.04 --- queue based touchsys working for newclient
-  2012.12.18 1.9.05 --- fix delclient
+  20120723 1900 file created
+  20121115 1903 queue based message sending starts working
+  20121117 1904 queue based touchsys working for newclient
+  20121218 1905 fix delclient
   (next is to implement hash)
-  2013.01.16 1.9.06 --- hash implemented
-  2013.01.17 1.9.07 --- hash fix1 (***hash not in network-byte order yet)
-  2013.01.17 1.9.08 --- hash fix (***hash in network-byte order)
-  2013.02.19 1.9.09 --- first version with usrcpymem (still many bugs)
-  2013.03.03 1.9.10 --- alpha version release candidate
-  2013.12.18 1.9.14 --- merged with Konno veresion
-  2013.12.19 1.9.15 --- uid/gid for MEM shm
+  20130116 1906 hash implemented
+  20130117 1907 hash fix1 (***hash not in network-byte order yet)
+  20130117 1908 hash fix (***hash in network-byte order)
+  20130219 1909 first version with usrcpymem (still many bugs)
+  20130303 1910 alpha version release candidate
+  20131218 1914 merged with Konno veresion
+  20131219 1915 uid/gid for MEM shm
+  20131222 1916 printlog infinite loop fix
+  20131229 1917 no change in nsmd2, update in nsminfo2 and b2lib
  */
 
 /* -- DATA TYPES ----------------------------------------------------- */

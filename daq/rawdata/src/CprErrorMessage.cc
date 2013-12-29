@@ -30,6 +30,15 @@ CprErrorMessage::~CprErrorMessage()
   closelog();
 }
 
+
+void CprErrorMessage::PrintError(const int shmflag, ProcessStatusBuffer* nsm_status, string err_str)
+{
+  if (shmflag > 0) {
+    nsm_status->reportFatal(err_str);
+  }
+  PrintError(err_str.c_str());
+}
+
 void CprErrorMessage::PrintError(const int shmflag, ProcessStatusBuffer* nsm_status, char* err_message, const char* file, const char* func_name, const int line)
 {
   string err_str = err_message;
@@ -63,22 +72,19 @@ void CprErrorMessage::PrintError(char* err_message, const char* file, const char
 
 
 
-// void CprErrorMessage::PrintError(const std::string err_message, const char* file, const char* func_name, const int line)
-// {
-//   time_t     current;
-//   time(&current);
+void CprErrorMessage::PrintError(const char* err_message)
+{
+  time_t     current;
+  time(&current);
 
-//   printf("\033[31m");
-//   perror("[ERROR] 0: ");
-//   printf("[ERROR] 1: %s", ctime(&current));
-//   printf("[ERROR] 2: %s\n", err_message.c_str());
-//   printf("[ERROR] 3: [file] %s [Line] %d\n", file, line);
-//   printf("[ERROR] 4: [function] %s\n", func_name);
-//   printf("\033[0m");
-//   fflush(stdout);
-// //     errmsg(LOG_LOCAL0|LOG_ERR,
-// //            "CRITICAL : %s : init_shm() failed to get shmhead ( %p )\n",
-// //            __PRETTY_FUNCTION__, shmhead );
-
-//   return;
-// }
+  printf("\033[31m");
+  printf("\033[47m");
+  //  B2FATAL(err_message);
+  perror("[ERROR] 0: ");
+  printf("[ERROR] 1: %s", ctime(&current));
+  printf("[ERROR] 2: %s\n", err_message);
+  printf("\033[0m");
+  printf("\033[40m");
+  fflush(stdout);
+  return;
+}

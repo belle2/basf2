@@ -482,15 +482,14 @@ void DeSerializerCOPPERModule::event()
     temp_rawcopper.SetBuffer(temp_buf, m_size_word, 0, num_events, num_nodes);
 
     // Fill header and trailer
-    m_prev_ftsweve32 = temp_rawcopper.FillTopBlockRawHeader(m_nodeid, m_data_type, m_trunc_mask, m_prev_ftsweve32);
-    //    printf("####### j %d  loop %d eve %d\n", j, n_basf2evt, m_prev_ftsweve32);
-//   for (int j = 0; j < raw_copper->TotalBufNwords(); j++) {
-//     printf("0x%.8x ", (raw_copper->GetBuffer(0))[ j ]);
-//     if ((j % 10) == 9)printf("\n");
-//     fflush(stdout);
-//   }
+    try {
+      m_prev_ftsweve32 = temp_rawcopper.FillTopBlockRawHeader(m_nodeid, m_data_type, m_trunc_mask, m_prev_ftsweve32);
+      //    fillNewRawCOPPERHeader( &temp_rawcopper );
+    } catch (string err_str) {
+      print_err.PrintError(m_shmflag, &m_status, err_str);
+      exit(1);
+    }
 
-    //    fillNewRawCOPPERHeader( &temp_rawcopper );
     if (dump_fname.size() > 0) {
       dumpData((char*)temp_buf, m_size_word * sizeof(int));
     }

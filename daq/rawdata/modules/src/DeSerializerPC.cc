@@ -412,7 +412,12 @@ void DeSerializerPCModule::event()
         temp_rawftsw->SetBuffer((int*)temp_buf + raw_datablk->GetBufferPos(i),
                                 raw_datablk->GetBlockNwords(i), 0, 1, 1);
 #ifndef NO_DATA_CHECK
-        temp_rawftsw->CheckData(0, m_prev_evenum, &cur_evenum);
+        try {
+          temp_rawftsw->CheckData(0, m_prev_evenum, &cur_evenum);
+        } catch (string err_str) {
+          print_err.PrintError(m_shmflag, &m_status, err_str);
+          exit(1);
+        }
 #endif
         //    printf("################SFTW cur %x prev %x\n",cur_evenum,m_prev_evenum);
         data_size_ftsw = raw_datablk->GetBlockNwords(i);
@@ -425,8 +430,13 @@ void DeSerializerPCModule::event()
         temp_rawcopper->SetBuffer((int*)temp_buf + raw_datablk->GetBufferPos(i),
                                   raw_datablk->GetBlockNwords(i), 0, 1, 1);
 #ifndef NO_DATA_CHECK
-        temp_rawcopper->CheckData(0, m_prev_evenum, m_prev_copper_ctr,
-                                  &cur_evenum, &cur_copper_ctr);
+        try {
+          temp_rawcopper->CheckData(0, m_prev_evenum, m_prev_copper_ctr,
+                                    &cur_evenum, &cur_copper_ctr);
+        } catch (string err_str) {
+          print_err.PrintError(m_shmflag, &m_status, err_str);
+          exit(1);
+        }
         //    printf("#################COPPER cur %x prev %x\n",cur_evenum,m_prev_evenum);
 #endif
         if (cpr_num == 0) {

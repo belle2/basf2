@@ -51,37 +51,31 @@ unsigned int RawFTSW::GetMagicTrailer(int n)
 
 void RawFTSW::CheckData(int n, unsigned int prev_evenum, unsigned int* cur_evenum)
 {
-  ErrorMessage print_err;
   int err_flag = 0;
-
+  char err_buf[500];
   *cur_evenum = GetEveNo(n);
+
 #ifdef WO_FIRST_EVENUM_CHECK
   if (prev_evenum != 0xFFFFFFFF) {
 #else
   if (true) {
 #endif
     if ((unsigned int)(prev_evenum + 1) != *cur_evenum) {
-      char err_buf[500];
-      sprintf(err_buf, "Event # jump : i %d prev 0x%x cur 0x%x : Exiting...\n",
-              n, prev_evenum, *cur_evenum);
-      print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      sprintf(err_buf, "Event # jump : i %d prev 0x%x cur 0x%x : Exiting...\n %s %s %d\n",
+              n, prev_evenum, *cur_evenum, __FILE__, __PRETTY_FUNCTION__, __LINE__);
       err_flag = 1;
     }
   }
 
   if (GetNwords(n) != SIZE_FTSW_PACKET) {
-    char err_buf[500];
-    sprintf(err_buf, "invalid FTSW packet length : block %d nwords %d must be %d : Exiting...\n",
-            n, GetNwords(n), SIZE_FTSW_PACKET);
-    print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+    sprintf(err_buf, "invalid FTSW packet length : block %d nwords %d must be %d : Exiting...\n %s %s %d\n",
+            n, GetNwords(n), SIZE_FTSW_PACKET, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     err_flag = 1;
   }
 
   if (GetMagicTrailer(n) != FTSW_MAGIC_TRAILER) {
-    char err_buf[500];
-    sprintf(err_buf, "invalid magic word : block %d magic word 0x%x must be 0x%x : Exiting...\n",
-            n, GetMagicTrailer(n), FTSW_MAGIC_TRAILER);
-    print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+    sprintf(err_buf, "invalid magic word : block %d magic word 0x%x must be 0x%x : Exiting...\n %s %s %d\n",
+            n, GetMagicTrailer(n), FTSW_MAGIC_TRAILER, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     err_flag = 1;
   }
 
@@ -92,6 +86,7 @@ void RawFTSW::CheckData(int n, unsigned int prev_evenum, unsigned int* cur_evenu
       if (k % 10 == 9)printf("\n");
     }
     fflush(stdout);
+    string err_str = err_buf; throw (err_str);
     sleep(1234567);
     exit(-1);
   }

@@ -40,9 +40,9 @@ output = register_module('PrintData')
 
 # Receiver
 receiver.param('NodeID', 3)
-receiver.param('NumConn', 2)
-# receiver.param('HostNameFrom', ['localhost', 'cpr007'])
-receiver.param('HostNameFrom', ['cpr013', 'cpr014'])
+receiver.param('NumConn', 1)
+receiver.param('HostNameFrom', ['localhost', 'cpr007'])
+# receiver.param('HostNameFrom', ['cpr013', 'cpr014'])
 receiver.param('PortFrom', [int(argvs[2]), int(argvs[2])])
 receiver.param('EventDataBufferWords', 4801)
 receiver.param('MaxTime', -1.)

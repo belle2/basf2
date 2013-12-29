@@ -10,8 +10,8 @@
 using namespace std;
 using namespace Belle2;
 
-#define NO_DATA_CHECK
-#define WO_FIRST_EVENUM_CHECK
+//#define NO_DATA_CHECK
+//#define WO_FIRST_EVENUM_CHECK
 
 //-----------------------------------------------------------------
 //                 Register the Module
@@ -368,8 +368,13 @@ void DeSerializerFILEModule::event()
         temp_rawcopper.SetBuffer(temp_buf, size_word, 0, num_events, num_nodes);
         fillNewRawCOPPERHeader(&temp_rawcopper);
         unsigned int temp_cur_evenum = 0, temp_cur_copper_ctr = 0;
-        temp_rawcopper.CheckData(0, m_dummy_evenum - 2, m_dummy_evenum - 2,
-                                 &temp_cur_evenum, &temp_cur_copper_ctr);
+        try {
+          temp_rawcopper.CheckData(0, m_dummy_evenum - 2, m_dummy_evenum - 2,
+                                   &temp_cur_evenum, &temp_cur_copper_ctr);
+        } catch (string err_str) {
+          print_err.PrintError(m_shmflag, &m_status, err_str);
+          exit(1);
+        }
 
       }
     }

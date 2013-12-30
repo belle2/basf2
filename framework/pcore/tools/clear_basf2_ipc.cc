@@ -27,6 +27,10 @@ int main(int argc, char** argv)
       mode = 1;
     else if (strcmp(argv[1], "unnamed") == 0)
       mode = 2;
+    else if (strcmp(argv[1], "--help") == 0) {
+      printf("Usage : clear_basf2_ipc {all|named|unnamed} \n");
+      printf("all: all IPCs, named: named IPCs only, unnamed: basf2 internal IPCs only(default)\n");
+    }
   }
   //  printf ( "mode = %d\n", mode );
 

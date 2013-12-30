@@ -12,7 +12,6 @@
 // Includes
 #include <stdio.h>
 #include <stdlib.h>
-#include <rawdata/dataobjects/ErrorMessage.h>
 #include <framework/datastore/DataStore.h>
 #include <TObject.h>
 

@@ -16,7 +16,6 @@
 #pragma link C++ class Belle2::RawEPID;
 #pragma link C++ class Belle2::RawKLM;
 #pragma link C++ class Belle2::RawFTSW;
-#pragma link C++ class Belle2::ErrorMessage;
 #pragma link C++ class Belle2::RawPXD;
 
 #endif

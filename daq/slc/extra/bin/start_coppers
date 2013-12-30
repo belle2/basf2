@@ -1,31 +1,23 @@
 #!/bin/bash
 
+label=`date +%Y-%m-%d-%H-%M`
+
 restartBySSH() {
+  mkdir -p ~/run/$2/$1
   ssh $1 "killall $2"
-  ssh $1 "cd belle2/release; source ../tools/setup_belle2; setuprel; source daq/slc/extra/bin/nsm2_local.sh; $2 $3 &> /dev/null" &> /dev/null &
+  ssh $1 "source ~/belle2/release/daq/slc/extra/bin/setup.sh; ~/belle2 release local $2 $3 $4&> ~/run/$2/$1/${label}.log" &
 }
 
-label=`date +%Y%M%H%m`
-
-cd ~/belle2/release
-source ../tools/setup_belle2 &> /dev/null
-setuprel &> /dev/null
-
-source ${BELLE2_LOCAL_DIR}/daq/slc/extra/bin/nsm2_global.sh
 mkdir -p  ~/run/runcontrold/belle-rpc1
-kill `ps aux | grep "runcontrold cdc" | grep -v grep | awk '{print $2}'`
-runcontrold cdc &> ~/run/runcontrold/belle-rpc1/${label}.log &
+kill `ps aux | grep "runcontrold svd" | grep -v grep | awk '{print $2}'`
+source ~/belle2/release/daq/slc/extra/bin/setup.sh; ~/belle2 release global runcontrold svd &> ~/run/runcontrold/belle-rpc1/${label}.log &
 
-source ${BELLE2_LOCAL_DIR}/daq/slc/extra/bin/nsm2_local.sh
 mkdir -p  ~/run/rocontrold/belle-rpc1
 kill `ps aux | grep "rocontrold ROPC01" | grep -v grep | awk '{print $2}'`
-rocontrold ROPC01 &> ~/run/rocontrold/belle-rpc1/${label}.log &
+source ~/belle2/release/daq/slc/extra/bin/setup.sh; ~/belle2 release local rocontrold ROPC01 &> ~/run/rocontrold/belle-rpc1/${label}.log &
 
-mkdir -p  ~/run/cprcontrold/belle-rpc1
-restartBySSH cpr010 tempd CPR010 
-restartBySSH cpr011 tempd CPR011 
-restartBySSH cpr012 tempd CPR012 
-restartBySSH cpr013 tempd CPR013
+restartBySSH cpr010 cprcontrold CPR010 svd
+restartBySSH cpr011 cprcontrold CPR011 svd
 
 
 cd -

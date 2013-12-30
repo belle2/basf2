@@ -1,4 +1,14 @@
 #!/bin/bash
-ssh belle-rpc2 "cd ~/belle2/release; source ../tools/setup_belle2; setuprel; source daq/slc/extra/bin/nsm2_global.sh; nsmd2 &> /dev/null&" 
-ssh belle-rpc1 "cd ~/belle2/release; source ../tools/setup_belle2; setuprel; source daq/slc/extra/bin/nsm2_global.sh; nsmd2 &> /dev/null&"
+
+label=`date +%Y-%m-%d-%H-%M`
+
+startBySSH() {
+  mkdir -p ~/run/$2/$1
+  ssh $1 "source ~/belle2/release/daq/slc/extra/bin/setup.sh; $2 $3 global $4 &> /dev/null &" 
+}
+
+startBySSH belle-rpc1 ~/belle2 release nsmd2
+startBySSH belle-rpc2 ~/belle2 release nsmd2
+startBySSH belle-hltin ~/hlt/belle2 latest nsmd2
+startBySSH belle-reco ~/hlt/belle2 latest nsmd2
 

@@ -1,0 +1,9 @@
+#!/bin/bash
+
+stopBySSH() {
+  ssh $1 "killall $2"
+}
+
+stopBySSH belle-rpc1 nsmd2
+stopBySSH belle-rpc2 nsmd2
+

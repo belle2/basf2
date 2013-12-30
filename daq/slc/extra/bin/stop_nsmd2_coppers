@@ -1,0 +1,13 @@
+#!/bin/bash
+
+stopBySSH() {
+  ssh $1 "killall $2"
+}
+
+stopBySSH belle-rpc1 nsmd2
+sleep 3
+stopBySSH ttd10 nsmd2
+stopBySSH cpr010 nsmd2
+stopBySSH cpr011 nsmd2
+stopBySSH cpr012 nsmd2
+stopBySSH cpr013 nsmd2

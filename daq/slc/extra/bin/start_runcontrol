@@ -1,0 +1,9 @@
+#!/bin/bash
+
+label=`date +%Y-%m-%d-%H-%M`
+
+source ${BELLE2_LOCAL_DIR}/daq/slc/extra/bin/nsm2_global.sh
+mkdir -p  ~/run/runcontrold/${HOSTNAME}
+kill `ps aux | grep "runcontrold runcontrol" | grep -v grep | awk '{print $2}'`
+runcontrold runcontrol &> ~/run/runcontrold/${HOSTNAME}/${label}.log &
+

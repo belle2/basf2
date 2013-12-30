@@ -22,6 +22,7 @@ RCDatabaseManager::RCDatabaseManager(DBInterface* db, RCMaster* master)
 
 void RCDatabaseManager::search(DataObject* data)
 {
+  if (_db == NULL) return;
   if (data == NULL) return;
   if (_data_v_m.find(data->getClassName()) == _data_v_m.end()) {
     _data_v_m.insert(DataObjectSet::value_type(data->getClassName(), DataObjectList()));
@@ -41,6 +42,7 @@ void RCDatabaseManager::search(DataObject* data)
 
 void RCDatabaseManager::createTables()
 {
+  if (_db == NULL) return;
   DBObjectLoader loader(_db);
   try {
     _db->connect();
@@ -61,6 +63,7 @@ void RCDatabaseManager::createTables()
 
 void RCDatabaseManager::dropTables()
 {
+  if (_db == NULL) return;
   DBObjectLoader loader(_db);
   try {
     _db->connect();
@@ -82,6 +85,7 @@ void RCDatabaseManager::dropTables()
 
 int RCDatabaseManager::readConfigs(int confno)
 {
+  if (_db == NULL) return 0;
   try {
     _db->connect();
     DBObjectLoader loader(_db);
@@ -118,6 +122,7 @@ int RCDatabaseManager::readConfigs(int confno)
 
 int RCDatabaseManager::writeConfigs()
 {
+  if (_db == NULL) return 0;
   int confno = 0;
   RunConfig* run_config = _master->getConfig();
   DBObjectLoader loader(_db);
@@ -147,6 +152,7 @@ int RCDatabaseManager::writeConfigs()
 
 int RCDatabaseManager::readConfig(const std::string classname, int confno)
 {
+  if (_db == NULL) return 0;
   try {
     _db->connect();
     DBObjectLoader loader(_db);
@@ -172,6 +178,7 @@ int RCDatabaseManager::readConfig(const std::string classname, int confno)
 
 int RCDatabaseManager::writeConfig(const std::string classname)
 {
+  if (_db == NULL) return 0;
   int confno = 0;
   try {
     _db->connect();
@@ -191,6 +198,7 @@ int RCDatabaseManager::writeConfig(const std::string classname)
 
 int RCDatabaseManager::readStatus(int confno)
 {
+  if (_db == NULL) return 0;
   try {
     _db->connect();
     DBObjectLoader loader(_db);
@@ -212,6 +220,7 @@ int RCDatabaseManager::readStatus(int confno)
 
 int RCDatabaseManager::writeStatus()
 {
+  if (_db == NULL) return 0;
   int confno = 0;
   try {
     _db->connect();

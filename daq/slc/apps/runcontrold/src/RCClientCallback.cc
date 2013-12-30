@@ -38,6 +38,7 @@ bool RCClientCallback::ok() throw()
   NSMNode* node = _master->findNode(id, nsm);
   node->setState(State(nsm.getData()));
   node->setConnection(Connection::ONLINE);
+  //Belle2::debug("[DEBUG] node=%s >> OK", node->getName().c_str());
   RCSequencer::notify();
   RCCommunicator* comm = _master->getMasterCommunicator();
   bool synchronized = true;

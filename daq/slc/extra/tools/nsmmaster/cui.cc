@@ -272,7 +272,7 @@ main(int argc, char** argv)
         b2nsm_sendany(av[1], "START", 2, params, len, text, NULL);
       }
     } else if (strcasecmp(av[0], "trigft") == 0) {
-      if (ac < 5 || ! isdigit(av[3][0]) || ! isdigit(av[4][0])) {
+      if (ac < 5 || ! isdigit(av[3][0])) {
         printf("usage: trigft <node> <trg_mode=in/tlu/pulse/revo/random/possion> <dummy_rate> <trg_limit>\n");
       } else {
         int trg_mode = 0;

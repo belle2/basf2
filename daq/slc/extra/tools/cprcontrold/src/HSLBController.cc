@@ -100,9 +100,9 @@ bool HSLBController::load() throw()
     for (size_t i = 0; i < length; i++) {
       if (value_v[i] < 0) continue;
       if (reg.size == 1) {
-        mgt_set_param(_mgt, address, value_v[i]);
+        //  mgt_set_param(_mgt, address, value_v[i]);
       } else if (reg.size == 2) {
-        mgt_set_param2(_mgt, address, value_v[i]);
+        //  mgt_set_param2(_mgt, address, value_v[i]);
       }
       address += reg.size;
       Belle2::debug("[DEBUG] Register write to address = 0x%x with value = %d",

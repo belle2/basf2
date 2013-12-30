@@ -18,7 +18,7 @@ bool RCNSMCommunicator::sendMessage(const RunControlMessage& msg) throw()
   _nsm_mutex.lock();
   try {
     _comm->sendRequest(msg.getNode(), msg.getCommand(), msg.getMessage().getNParams(),
-                       (unsigned int*)msg.getMessage().getParams(), msg.getMessage().getData());
+                       (int*)msg.getMessage().getParams(), msg.getMessage().getData());
   } catch (const NSMHandlerException& e) {
     ((NSMNode*)msg.getNode())->setConnection(Connection::OFFLINE);
     _nsm_mutex.unlock();

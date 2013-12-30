@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<object name="CDC" revision="1" >
-  <object name="CPR013" host="cpr013" class="CDC_COPPER" script="RecvSendCOPPER.py" synchronized="false" />
-  <object name="CPR014" host="cpr014" class="CDC_COPPER" script="RecvSendCOPPER.py" />
-  <object name="ROPC01" host="ropc01" class="ROPC" script="RecvStream1.py" hosts="ttd3 cpr013 cpr014" synchronized="false" />
+<object name="CDC" revision="2" >
+  <object name="CPR010" host="cpr010" class="CDC_COPPER" script="RecvSendCOPPER.py" synchronized="false" />
+  <object name="CPR011" host="cpr011" class="CDC_COPPER" script="RecvSendCOPPER.py" />
+  <object name="CPR012" host="cpr012" class="CDC_COPPER" script="RecvSendCOPPER.py" />
+  <object name="CPR013" host="cpr013" class="CDC_COPPER" script="RecvSendCOPPER.py" />
+  <object name="ROPC01" host="ropc01" class="ROPC" script="RecvStream1.py" hosts="ttd3 cpr013 cpr014" synchronized="true" />
 </object>

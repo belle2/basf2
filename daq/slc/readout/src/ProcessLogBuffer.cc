@@ -81,7 +81,11 @@ std::string ProcessLogBuffer::recieve(SystemLog::Priority& priority, int timeout
   if (*_rindex == MAX_MESSAGE) *_rindex = 0;
   int i = *_rindex;
   if (_msg_v[i].priority == SystemLog::UNKNOWN) {
-    _cond.wait(_mutex, timeout);
+    if (timeout > 0) {
+      _cond.wait(_mutex, timeout);
+    } else {
+      _cond.wait(_mutex);
+    }
   }
   if (_msg_v[i].priority == SystemLog::UNKNOWN) {
     priority = SystemLog::UNKNOWN;

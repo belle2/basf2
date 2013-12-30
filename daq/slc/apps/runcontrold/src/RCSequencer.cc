@@ -64,12 +64,14 @@ void RCSequencer::run() throw()
             master_comm->sendState(_master->getNode());
 
           }
-        } else if (comm->sendMessage(_msg)) {
+        } else {
+          //Belle2::debug("[DEBUG] node = %s", node->getName().c_str());
+          comm->sendMessage(_msg);
         }
         _master->unlock();
-        if (_synchronized && !_master->isSynchronized(node)) {
-          __cond.wait(__mutex);
-        }
+        //if ( /*_synchronized &&*/ !_master->isSynchronized(node)) {
+        __cond.wait(__mutex);
+        //}
       } else {
         _master->unlock();
       }

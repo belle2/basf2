@@ -59,10 +59,12 @@ int main(int argc, char** argv)
   if (global_port > 0) {
     PThread(new NSMNodeDaemon(callback, global_host, global_port));
   }
-  PostgreSQLInterface* db =
+  PostgreSQLInterface* db = NULL;
+  if (config.getInt("DATABASE_PORT") >= 0) {
     new PostgreSQLInterface(config.get("DATABASE_HOST"), config.get("DATABASE_NAME"),
                             config.get("DATABASE_USER"), config.get("DATABASE_PASS"),
                             config.getInt("DATABASE_PORT"));
+  }
   RCDatabaseManager* dbmanager = new RCDatabaseManager(db, master);
   master->setDBManager(dbmanager);
   dbmanager->createTables();

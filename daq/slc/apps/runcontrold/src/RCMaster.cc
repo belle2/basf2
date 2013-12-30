@@ -127,7 +127,7 @@ void RCMaster::setNodeControl(XMLElement* el)
       NSMNode* node = *it;
       if (elc->getAttribute("name") == node->getName()) {
         node->setUsed(!(Belle2::tolower(elc->getAttribute("used")) == "false"));
-        node->setSynchronized(!(Belle2::tolower(elc->getAttribute("used")) == "false"));
+        node->setSynchronized(!(Belle2::tolower(elc->getAttribute("synchronized")) == "false"));
         break;
       }
     }

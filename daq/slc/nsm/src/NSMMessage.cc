@@ -86,17 +86,17 @@ unsigned short NSMMessage::getNParams() const throw()
   return _nsm_msg.npar;
 }
 
-unsigned int NSMMessage::getParam(int i) const throw()
+int NSMMessage::getParam(int i) const throw()
 {
   return _nsm_msg.pars[i];
 }
 
-const unsigned int* NSMMessage::getParams() const throw()
+const int* NSMMessage::getParams() const throw()
 {
   return _nsm_msg.pars;
 }
 
-unsigned int* NSMMessage::getParams() throw()
+int* NSMMessage::getParams() throw()
 {
   return _nsm_msg.pars;
 }

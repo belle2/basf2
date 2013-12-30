@@ -32,9 +32,9 @@ namespace Belle2 {
     unsigned short getSequenceId() const throw();
     unsigned short getNodeId() const throw();
     unsigned short getNParams() const throw();
-    unsigned int getParam(int i) const throw();
-    unsigned int* getParams() throw();
-    const unsigned int* getParams() const throw();
+    int getParam(int i) const throw();
+    int* getParams() throw();
+    const int* getParams() const throw();
     unsigned int getLength() const throw();
     const std::string& getData() const throw();
     void setRequestId(unsigned short id) throw();

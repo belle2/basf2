@@ -113,7 +113,7 @@ void NSMCommunicator::init(const std::string& host, int port) throw(NSMHandlerEx
 }
 
 void NSMCommunicator::sendRequest(const NSMNode* node, const Command& command,
-                                  int npar, unsigned int* pars,
+                                  int npar, int* pars,
                                   int len, const char* datap) throw(NSMHandlerException)
 {
 #if NSM_PACKAGE_VERSION >= 1914
@@ -127,7 +127,7 @@ void NSMCommunicator::sendRequest(const NSMNode* node, const Command& command,
 }
 
 void NSMCommunicator::sendRequest(const NSMNode* node, const Command& cmd,
-                                  int npar, unsigned int* pars,
+                                  int npar, int* pars,
                                   const std::string& message)
 throw(NSMHandlerException)
 {
@@ -179,8 +179,8 @@ void NSMCommunicator::sendLog(const SystemLog& log) throw(NSMHandlerException)
   if (_logger_node != NULL &&
       b2nsm_nodeid(_logger_node->getName().c_str()) >= 0) {
     std::string str;
-    unsigned int pars[3];
-    int npar = log.pack((int*)pars, str);
+    int pars[3];
+    int npar = log.pack(pars, str);
     sendRequest(_logger_node, Command::LOG, npar, pars, str);
   }
 #endif

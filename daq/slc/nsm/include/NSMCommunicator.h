@@ -37,10 +37,10 @@ namespace Belle2 {
     void init(const std::string& host = "", int port = -1) throw(NSMHandlerException);
     bool wait(int sec) throw(NSMHandlerException);
     void sendRequest(const NSMNode* node, const Command& cmd,
-                     int npar = 0, unsigned int* pars = NULL,
+                     int npar = 0, int* pars = NULL,
                      int len = 0, const char* datap = NULL) throw(NSMHandlerException);
     void sendRequest(const NSMNode* node, const Command& cmd,
-                     int npar, unsigned int* pars,
+                     int npar, int* pars,
                      const std::string& message) throw(NSMHandlerException);
     void sendRequest(const NSMNode* node, const Command& cmd,
                      NSMMessage& message) throw(NSMHandlerException);

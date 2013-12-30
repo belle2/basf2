@@ -32,7 +32,7 @@ int main(int argc, char** argv)
     exit(-1);
   }
   string pathname = string("/tmp/") + string(getenv("USER"))
-                    + string("_") + string(argv[1]);
+                    + string("_RB_") + string(argv[1]);
   FILE* fd = fopen(pathname.c_str(), "r");
   if (fd == NULL) {
     printf("[removerb] No such RingBuffer : %s\n", argv[1]);
@@ -48,6 +48,11 @@ int main(int argc, char** argv)
   semctl(semid, 1, IPC_RMID);
   printf("Removing pathfile = %s\n", pathname.c_str());
   unlink(pathname.c_str());
+
+  // remove id file
+  char fname[1024];
+  sscanf(fname, "/tmp/SHM%d-SEM%d-RB_%s", argv[1]);
+  unlink(fname);
 }
 
 

@@ -48,6 +48,7 @@ namespace Belle2 {
     int m_shmid;
     void* m_shmadr;
     int m_shmsize;
+    char* m_strbuf;
   };
 }
 

@@ -21,5 +21,6 @@ make -C $BELLE2_EXTERNALS_DIR/src/nsm2/b2lib clean
 make -C $BELLE2_EXTERNALS_DIR/src/nsm2/daemon clean
 make -C $BELLE2_EXTERNALS_DIR/src/nsm2 clean
 make -C $BELLE2_EXTERNALS_DIR/src/nsm2 
+rm -f $EXTLIBDIR/nsmd2 $EXTLIBDIR/nsminfo2
 make -C $BELLE2_EXTERNALS_DIR/src/nsm2 install
 

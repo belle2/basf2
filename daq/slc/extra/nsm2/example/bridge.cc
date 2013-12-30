@@ -12,48 +12,148 @@
 //    (no screen output as it conflicts with readline)
 // ----------------------------------------------------------------------
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+
 #include "nsm2.h"
+#include "belle2nsm.h"
+#include "nsmlib2.h"
+#include "bridge_data.h"
 
 // -- global variables --------------------------------------------------
-int is_running = 0;
-client_data* datap;  // shared memory
+int local_nnode = 0;
+char* local_nodes[256];
+int  local_waiting[256];
+int  local_nwaiting = 0;
+int  local_lastreq = 0;
+static NSMmsg lastmsg;
+int  reqid_start;
+int  reqid_stop;
+int  reqid_ok;
+int  reqid_error;
 
-// -- client_start ------------------------------------------------------
-//    callback function for the start request
+bridge_data* gdatap; // shared memory
+NSMcontext* gnsm = 0;
+NSMcontext* lnsm = 0;
+
+// -- waiting_list ------------------------------------------------------
+//    make a waiting list string
 // ----------------------------------------------------------------------
-int
-client_start(NSMmsg* msg, NSMcontext2* nsmc)
+const char*
+waiting_list()
 {
-  if (datap->is_running) {
-    nsm_error(msg.src, "already running");
-    return;
+  static char buf[1024];
+  int count = 0;
+  buf[0] = 0;
+  for (int i = 0; i < local_nnode; i++) {
+    if (local_waiting[i]) {
+      sprintf(buf + strlen(buf), " %s", local_nodes[i]);
+      if (++count == 3) {
+        strcat(buf, "...");
+        break;
+      }
+    }
   }
-  if (msg.npar < 1) {
-    nsm_error(msg.src, "run number is missing");
-    return;
-  }
-  datap->is_running = 1;
-  datap->run_count++;
-  datap->run_number = action.par[0];
-  datap->evt_number = 0;
-  nsm_ok(msg.src, "run %d started as %dth run", run_number, run_count);
-  return 0;
+  return buf;
 }
-// -- client_stop -------------------------------------------------------
-//    callback function for the stop request
+// -- global_handler ----------------------------------------------------
+//    callback function for the start or stop request
 // ----------------------------------------------------------------------
-int
-client_stop(NSMmsg* msg, NSMcontext2* nsmc)
+void
+global_handler(NSMmsg* msg, NSMcontext* nsmc)
 {
-  if (! is_running) {
-    nsm_error(msg.src, "not running");
+  const char* reqname = msg->req == reqid_start ? "START" : "STOP";
+
+  if (local_nwaiting) {
+    b2nsm_error(msg, "%s message received, but%s %s still %s.",
+                reqname, waiting_list(),
+                local_nwaiting == 1 ? "is" : "are",
+                lastmsg.req == reqid_start ? "starting" : "stopping");
+
+  } else {
+    printf("%s message received, distributing to %d local nodes...\n",
+           reqname, local_nnode);
+    b2nsm_context(lnsm);
+    for (int i = 0; i < local_nnode; i++) {
+      local_waiting[i] = 1;
+      local_nwaiting++;
+      printf("sending %s to %s...\n", reqname, local_nodes[i]);
+      b2nsm_sendreq(local_nodes[i], reqname, msg->npar, msg->pars);
+    }
+    lastmsg = *msg;
+    lastmsg.datap = 0; /* datap can't be used later anyway */
+  }
+}
+// -- forget_handler ----------------------------------------------------
+//    callback function for FORGET request
+// ----------------------------------------------------------------------
+void
+forget_handler(NSMmsg* msg, NSMcontext* nsmc)
+{
+  const char* list = waiting_list();
+  const char* req  = local_lastreq == reqid_start ? "START" : "STOP";
+  memset(local_waiting, 0, sizeof(local_waiting));
+  memset(&lastmsg, 0, sizeof(lastmsg));
+  local_nwaiting = 0;
+
+  if (! msg) {
+    ;
+  } else if (*list) {
+    b2nsm_ok(msg, "READY", "nothing to forget");
+  } else {
+    b2nsm_ok(msg, "READY",
+             "forgetting unanswered %s request from %s", req, list);
+  }
+}
+// -- local_handler -----------------------------------------------------
+//    callback function for the OK and ERROR request
+// ----------------------------------------------------------------------
+void
+local_handler(NSMmsg* msg, NSMcontext* nsmc)
+{
+  const char* node = nsmlib_nodename(nsmc, msg->node);
+  const char* req  = msg->req == reqid_ok ? "OK" : "ERROR";
+  int found = -1;
+
+  if (! lastmsg.req) {
+    printf("%s received from %s (ignored)\n", req, node);
     return;
   }
-  nsm_ok(msg.src, "run %d started as %dth run", run_number, run_count);
-  datap->is_running = 0;
-  datap->run_number = -1;
-  return 0;
 
+  if (local_nwaiting) {
+    for (int i = 0; i < local_nnode; i++) {
+      if (strcasecmp(local_nodes[i], node) == 0) {
+        if (local_waiting[i]) {
+          local_waiting[i] = 0;
+          local_nwaiting--;
+          found = i;
+        }
+        break;
+      }
+    }
+  }
+
+  b2nsm_context(gnsm);
+
+  if (msg->req != reqid_ok) {
+    b2nsm_error(&lastmsg, "READY",
+                "%s received from %s, no more waiting for %s",
+                req, node, waiting_list());
+    forget_handler(0, 0);
+  } else if (found < 0) {
+    printf("%s received from %s (ignored)\n", req, node);
+  } else if (local_nwaiting) {
+    printf("%s received from %s (still waiting for%s)\n",
+           req, node, waiting_list());
+  } else {
+    printf("calling b2nsm_ok\n");
+    b2nsm_ok(&lastmsg,
+             lastmsg.req == reqid_start ? "RUNNING" : "READY",
+             "everybody %s",
+             lastmsg.req == reqid_start ? "started" : "stopped");
+    forget_handler(0, 0);
+  }
 }
 // -- nodehostport ------------------------------------------------------
 //
@@ -87,13 +187,24 @@ nodehostport(const char* str, char* node, char* host)
     strncpy(host, p, q - p);
     host[q - p] = 0;
     q++;
-    if (! isdigit(q)) return -1;
+    if (! isdigit(*q)) return -1;
     return atoi(q);
   } else if (strlen(p) >= 256) {
     return -1;
   } else {
     strcpy(host, p);
     return 0;
+  }
+}
+// -- register_callback -------------------------------------------------
+//    set callback and error handling
+// ----------------------------------------------------------------------
+void
+register_callback(const char* reqname, NSMcallback_t handler)
+{
+  if (b2nsm_callback(reqname, handler) < 0) {
+    printf("callback(%s) %s", reqname, b2nsm_strerror());
+    exit(1);
   }
 }
 // -- main --------------------------------------------------------------
@@ -109,10 +220,6 @@ main(int argc, char** argv)
   char local_node[32];
   char local_host[256];
   int  local_port;
-  int  local_nnode;
-  char* local_nodes[256];
-  NSMcontext2* gnsm = 0;
-  NSMcontext2* lnsm = 0;
   int ret;
 
   // ARGV check
@@ -124,65 +231,67 @@ main(int argc, char** argv)
     local_nnode = argc - 3;
     for (int i = 0; i < local_nnode; i++) local_nodes[i] = argv[3 + i];
     local_nodes[local_nnode] = 0;
+    for (int i = 0; i < local_nnode; i++)
+      printf("node[%d] = %s\n", i, local_nodes[i]);
   }
   if (argc < 4 || global_port < 0 || local_port < 0) {
-    printf("usage: %s <global-HNP> <local-HNP> <local-node1> [<local-node2> ...]\n",
-           program);
+    printf("usage: %s <global-HNP> <local-HNP> %s\n",
+           program, "<local-node1> [<local-node2> ...]");
     printf("(NHP: node-host-port in node@host:port format)\n");
     return 1;
   }
 
-  // INIT
-  if (!(gnsm = nsm_init2(global_node, global_host, global_port, 0))) {
-    printf("%s: INIT-global %s", program, nsm_strerror());
+  // INIT with b2nsm_init2(node, usesig, host, port, shmkey)
+  if (!(gnsm = b2nsm_init2(global_node, 0, global_host, global_port, 0))) {
+    printf("%s: INIT-global %s", program, b2nsm_strerror());
     return 1;
   }
-  if (!(lnsm = nsm_init2(local_node, local_host, local_port, 0))) {
-    printf("%s: INIT-local %s", program, nsm_strerror());
+  if (!(lnsm = b2nsm_init2(local_node, 0, local_host, local_port, 0))) {
+    printf("%s: INIT-local %s", program, b2nsm_strerror());
     return 1;
   }
+
+  printf("global NSM2 context at %p, local NSM2 context at %p\n", gnsm, lnsm);
 
   // ALLOCATE shared memory (global)
   // (datap has to be allocated before callback registration
   const char* gdatname = global_node;
   const char* gfmtname = "bridge_data";
-  nsm_context(gnsm);
-  gdatap = nsm_allocmem(gdatname, gfmtname, bridge_data_revision, 3);
+  b2nsm_context(gnsm);
+  gdatap = (bridge_data*)b2nsm_allocmem(gdatname, gfmtname,
+                                        bridge_data_revision, 3);
   if (! gdatap) {
-    printf("%s: allocmem(%s) %s", program, gdatname, nsm_strerror());
+    printf("%s: allocmem(%s) %s", program, gdatname, b2nsm_strerror());
     return 1;
   }
 
   // REGISTER callback functions (global)
-  nsm_context(gnsm);
-  if (nsm_callback("START", 0) < 0) {
-    printf("%s: callback(START) %s", program, nsm_strerror());
-    return 1;
-  }
-  if (nsm_callback("STOP", 0) < 0) {
-    printf("%s: callback(STOP) %s", program, nsm_strerror());
-    return 1;
-  }
-  nsm_context(gnsm);
+  b2nsm_context(gnsm);
+  register_callback("START",  global_handler);
+  register_callback("STOP",   global_handler);
+  register_callback("FORGET", global_handler);
+  reqid_start = nsmlib_reqid(gnsm, "START");
+  reqid_stop  = nsmlib_reqid(gnsm, "STOP");
+  b2nsm_logging2(stdout, "G ");
+
+  b2nsm_context(lnsm);
+  register_callback("OK",    local_handler);
+  register_callback("ERROR", local_handler);
+  reqid_ok    = nsmlib_reqid(lnsm, "OK");
+  reqid_error = nsmlib_reqid(lnsm, "ERROR");
+  b2nsm_logging2(stdout, "L ");
+
+  printf("initialized, entering an infinite loop...\n");
 
   // INFINITE-LOOP
-  NSMcontext2* nsmlist[3];
-  nsmlist[0] = gnsm;
-  nsmlist[1] = lnsm;
-  nsmlist[2] = 0;
-
   while (1) {
-    NSMcontext2* nsm = nsm_select(2, nsmlist, 0.1);
-    if (nsm == (NSMcontext2*) - 1) {
-    } else if (nsm == gnsm) {
-
-    } else if (nsm == lnsm) {
-
-    } else { // time-out
-    }
+    int ret = b2nsm_wait(1);
   }
 
-  return 0; // never reached
+  // error if reached here
+  printf("something wrong, exiting\n");
+
+  return 0;
 }
 // ----------------------------------------------------------------------
 // -- (emacs outline mode setup)

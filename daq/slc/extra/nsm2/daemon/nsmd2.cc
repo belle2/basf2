@@ -20,8 +20,9 @@
 //  20131218  1914 new protocol version, merged with Konno branch
 //  20131219  1915 uid/gid for MEM shm
 //  20131222  1916 printlog infinite loop fix
+//  20131230  1918 argv[0] changed to lower case
 
-#define NSM_DAEMON_VERSION   1916 /* daemon   version 1.9.16 */
+#define NSM_DAEMON_VERSION   1918 /* daemon   version 1.9.18 */
 // ----------------------------------------------------------------------
 
 /*
@@ -4836,7 +4837,7 @@ main(int argc, char** argv)
     return 0; // parent process terminates now
   } else {
     // final touch to the arg list and exec
-    sprintf(av0, "NSMD2:%d", nsmd_port);
+    sprintf(av0, "nsmd2:%d", nsmd_port);
     if (nsmd_shmkey != nsmd_port) {
       sprintf(av0 + strlen(av0), ":%d", nsmd_shmkey);
     }

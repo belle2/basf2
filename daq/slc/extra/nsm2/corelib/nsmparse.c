@@ -1,3 +1,9 @@
+/*
+  nsmparse.c for NSM2
+
+  20131229 stdint.h definitions are added
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -245,6 +251,14 @@ nsmparse_scan(const char *file, char *filebuf, char *start, char *fmtout)
     { "uint16", 2, 's', 'S' },
     { "uchar",  1, 'a', 'C' },
     { "byte8",  1, 'a', 'C' },
+    { "int64_t",  8, 'd', 'l' },
+    { "int32_t",  4, 'i', 'i' },
+    { "int16_t",  2, 's', 's' },
+    { "int8_t",   1, 'a', 'c' },
+    { "uint64_t", 8, 'd', 'L' },
+    { "uint32_t", 4, 'i', 'I' },
+    { "uint16_t", 2, 's', 'S' },
+    { "uint8_t",  1, 'a', 'C' },
     { "double", 8, 'd', 'd' },
     { "float",  4, 'i', 'f' },
     { 0, 0, 0 }};

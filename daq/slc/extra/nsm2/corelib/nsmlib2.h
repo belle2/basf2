@@ -4,6 +4,13 @@
 #include "nsm2.h"
 #include "nsmsys2.h"
 
+#if defined(__cplusplus)
+extern "C" {
+#endif
+#if defined(__dummy_close_bracket_to_cheat_emacs_auto_indent)
+}
+#endif
+
 /* -- DATA TYPES ----------------------------------------------------- */
 #ifndef __nsm2_typedef_context__
 #define __nsm2_typedef_context__
@@ -36,64 +43,68 @@ typedef enum NSMfunctype_enum {
 } NSMfunctype;
 
 typedef struct {
-  int req;
-  NSMfunctype functype;
-  NSMfunc_t callback;
-  char name[64];
+int req;
+NSMfunctype functype;
+NSMfunc_t callback;
+char name[64];
 } NSMrequest;
 
 typedef struct NSMrecvqueue_struct {
-  struct NSMrecvqueue_struct* next;
-  NSMtcphead h;
+struct NSMrecvqueue_struct* next;
+NSMtcphead h;
 } NSMrecvqueue;
 
 struct NSMcontext_struct {
-  /* seq */
-  int  seq;
+/* seq */
+int  seq;
 
-  /* error code (when can't be returned) */
-  int  errc;
-  char errs[1024]; /* error string in case of NSMEUNEXPECTED */
+/* error code (when can't be returned) */
+int  errc;
+char errs[1024]; /* error string in case of NSMEUNEXPECTED */
 
-  /* initnet (network related) */
-  int  initnet_done;
-  int  sock;
-  int  port;
-  int  shmkey;
-  SOCKAD_IN sa;
-  char nodename[NSMSYS_NAME_SIZ + 1];
-  char hostname[1024];
+/* initnet (network related) */
+int  initnet_done;
+int  sock;
+int  port;
+int  shmkey;
+SOCKAD_IN sa;
+char nodename[NSMSYS_NAME_SIZ + 1];
+char hostname[1024];
 
-  /* initshm (shared memory related) */
-  int  initshm_done;
-  int  sysid;
-  NSMsys* sysp;
-  int  memid;
-  NSMmem* memp;
+/* initshm (shared memory related) */
+int  initshm_done;
+int  sysid;
+NSMsys* sysp;
+int  memid;
+NSMmem* memp;
 
-  /* initsig (signal handler related) */
-  int  usesig;
-  int  initsig_done;
-  int  pipe_rd;
-  int  pipe_wr;
-  int  reqwait;
-  int  maxrecursive;
-  int  currecursive;
-  int  nreq;
-  NSMrequest req[NSMLIB_MAX_CALLBACK];
+/* initsig (signal handler related) */
+int  usesig;
+int  initsig_done;
+int  pipe_rd;
+int  pipe_wr;
+int  reqwait;
+int  maxrecursive;
+int  currecursive;
+int  nreq;
+NSMrequest req[NSMLIB_MAX_CALLBACK];
 
-  /* initcli (client related) */
-  int  nodeid;
-  struct NSMcontext_struct* next;
+/* initcli (client related) */
+int  nodeid;
+struct NSMcontext_struct* next;
 
-  /* recv queue */
-  NSMrecvqueue* recvqueue;
+/* recv queue */
+NSMrecvqueue* recvqueue;
 
-  /* callback hook */
-  NSMhook_t hook;
+/* callback hook */
+NSMhook_t hook;
+const void* hookptr;
 };
 
+
+int nsmlib_debuglevel(int val);
 const char* nsmlib_nodename(NSMcontext* nsmc, int nodeid);
+int nsmlib_reqid(NSMcontext* nsmc, const char* reqname);
 const char* nsmlib_reqname(NSMcontext* nsmc, int reqid);
 const char* nsmlib_strerror(NSMcontext* nsmc);
 int nsmlib_callback(NSMcontext* nsmc, const char* name,
@@ -110,8 +121,15 @@ NSMcontext* nsmlib_init(const char* nodename, const char* host,
 void nsmlib_usesig(NSMcontext* nsmc, int usesig);
 NSMcontext* nsmlib_selectc(int usesig, unsigned int msec);
 void nsmlib_call(NSMcontext* nsmc, NSMtcphead* hp);
-//char *nsmlib_parsefile(const char *datname, int revision, const char *incpath,
-//           char *fmtstr);
+//char* nsmlib_parsefile(const char* datname, int revision, const char* incpath,
+//                       char* fmtstr);
+
+#if defined(__dummy_open_bracket_to_cheat_emacs_auto_indent)
+__dummy_open_bracket_to_cheat_emacs_auto_indent {
+#endif
+#if defined(__cplusplus)
+}
+#endif
 
 /* -- (emacs outline mode setup) ------------------------------------- */
 /*

@@ -7,13 +7,15 @@
    All external library functions have prefix "nsmlib_".
 
    20131216 1912 sa_flags fix (work works with gcc 4.1.2)
+   20131230 1918 strerror fix, initnet fix, stdint fix, bridge fix
 \* ---------------------------------------------------------------------- */
 
-const char *nsmlib2_version = "nsmlib2 1.9.12";
+const char *nsmlib2_version   = "nsmlib2 1.9.18";
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
 #include <stdarg.h>
 #include <signal.h>
 #include <unistd.h>
@@ -44,7 +46,7 @@ static char  nsmlib_errs[1024];    /* error string in case of NSMEUNEXPECTED */
 static int   nsmlib_errc = 0;      /* context independent error code */
 static int   nsmlib_debugflag = 0; /* context independent error code */
 
-#define ADDR_N(a)    ((uint32)((a).sin_addr.s_addr))
+#define ADDR_N(a)    ((uint32_t)((a).sin_addr.s_addr))
 
 #define VSPRINTF(buf,fmt,ap)  va_start(ap,fmt);vsprintf(buf,fmt,ap);va_end(ap)
 #define VFPRINTF(fp,fmt,ap)   va_start(ap,fmt);vfprintf(fp,fmt,ap);va_end(ap)
@@ -58,7 +60,7 @@ static int   nsmlib_debugflag = 0; /* context independent error code */
 #define DBG    nsmlib_debug
 #define LOG    nsmlib_log
 
-int nsmlib_hash(NSMsys *, int32 *hashtable, int hashmax,
+int nsmlib_hash(NSMsys *, int32_t *hashtable, int hashmax,
 		const char *key, int create);
 char * nsmlib_parse(const char *datname, int revision, const char *incpath);
 const char *nsmlib_parseerr(int *errcode);
@@ -81,8 +83,8 @@ htonll(uint64 h)
     return h;
   } else {
     uint64 n;
-    int32 *hp = (int32 *)&h;
-    int32 *np = (int32 *)&n;
+    int32_t *hp = (int32_t *)&h;
+    int32_t *np = (int32_t *)&n;
     np[0] = htonl(hp[1]);
     np[1] = htonl(hp[0]);
     return n;
@@ -112,10 +114,12 @@ nsmlib_error(const char *fmt, ...)
   fprintf(nsmlib_logfp, "\n");
 }
 /* -- nsmlib_debuglevel ---------------------------------------------- */
-void
+int
 nsmlib_debuglevel(int val)
 {
+  int prev = nsmlib_debugflag;
   nsmlib_debugflag = val;
+  return prev;
 }
 /* -- nsmlib_debug --------------------------------------------------- */
 static void
@@ -160,37 +164,37 @@ nsmlib_strerror(NSMcontext *nsmc)
 		strerror(errno), errno);
       }
       return buf;
+    case NSMENODENAME: return "invalid nodename";  /* init */
+    case NSMEALLOC:    return "memory allocation error"; /* init, etc */
+    case NSMEHOSTNAME: return "invalid hostname"; /* initnet */
+    case NSMEALREADYP: return "host:port already in use"; /* initnet */
+    case NSMEALREADYS: return "shm key already in use";  /* initnet */
+    case NSMEALREADYH: return "host:port already in use";     /* initnet */
+    case NSMESOCKET:     syserr = "socket";       break; /* initnet */
+    case NSMESOCKREUSE:  syserr = "so_reuseaddr"; break; /* initnet */
+    case NSMESOCKSNDBUF: syserr = "so_sndbuf";    break; /* initnet */
+    case NSMESOCKRCVBUF: syserr = "so_rcvbuf";    break; /* initnet */
+    case NSMENONSMD:   syserr = "cannot connect to NSMD"; break; /* initnet */
+    case NSMERDSELECT: syserr = "read select"; break; /* initnet */
+    case NSMENOUID:    return "uid not received"; /* initnet */
+    case NSMERDUID:    syserr = "uid read error"; break; /* initnet */
+    case NSMERDCLOSE:  return "uid not fully received"; /* initnet */
+    case NSMEACCESS:   return "invalid NSMD uid"; /* initnet */
     default:
       if (*nsmlib_errs) return nsmlib_errs;
       sprintf(buf, "NSM is not initialized (errcode=%d)", nsmlib_errc);
       return buf;
     }
-  }
-
-  switch (nsmc->errc) {
-  case NSMENOERR:    return "no error";
-  case NSMENODENAME: return "invalid nodename";  /* init */
-  case NSMEALLOC:    return "memory allocation error"; /* init, etc */
-  case NSMEHOSTNAME: return "invalid hostname"; /* initnet */
-  case NSMEALREADYP: return "port already in use"; /* initnet */
-  case NSMEALREADYS: return "shm key already in use";  /* initnet */
-  case NSMEALREADYH: return "host already in use";     /* initnet */
-  case NSMESOCKET:     syserr = "socket";       break; /* initnet */
-  case NSMESOCKREUSE:  syserr = "so_reuseaddr"; break; /* initnet */
-  case NSMESOCKSNDBUF: syserr = "so_sndbuf";    break; /* initnet */
-  case NSMESOCKRCVBUF: syserr = "so_rcvbuf";    break; /* initnet */
-  case NSMENONSMD:   syserr = "cannot connect to NSMD"; break; /* initnet */
-  case NSMERDSELECT: syserr = "read select"; break; /* initnet */
-  case NSMENOUID:    return "uid not received"; /* initnet */
-  case NSMERDUID:    syserr = "uid read error"; break; /* initnet */
-  case NSMERDCLOSE:  return "uid not fully received"; /* initnet */
-  case NSMEACCESS:   return "invalid NSMD uid"; /* initnet */
-  case NSMECLOSED:   return "NSMD connection closed"; break; /* recv */
-  default:
-    if (nsmc->errc < 0) {
-      sprintf(buf, "undefined error code=%d", nsmc->errc);
-    } else {
-      sprintf(buf, "no error, code=%d", nsmc->errc);
+  } else {
+    switch (nsmc->errc) {
+    case NSMENOERR:    return "no error";
+    case NSMECLOSED:   return "NSMD connection closed"; break; /* recv */
+    default:
+      if (nsmc->errc < 0) {
+	sprintf(buf, "undefined error code=%d", nsmc->errc);
+      } else {
+	sprintf(buf, "no error, code=%d", nsmc->errc);
+      }
     }
   }
   if (syserr) {
@@ -334,28 +338,28 @@ nsmlib_checkif(NSMcontext *nsmc, SOCKAD_IN *sap)
 #endif
     
     if (! ifr->ifr_name[0]) break;
-    LOG("nsmlib_checkif: checking interface <%s>", ifr->ifr_name);
+    DBG("nsmlib_checkif: checking interface <%s>", ifr->ifr_name);
     
     if (ioctl(sock, SIOCGIFFLAGS, (char *)ifr) < 0) {
       ERROR("nsmlib_checkif: ioctl getflags");
       return NSMEGIFFLAGS;
       
     } else if ((ifr->ifr_flags & IFF_UP) == 0) {
-      LOG("nsmlib_checkif: interface <%s> is down", ifr->ifr_name);
+      DBG("nsmlib_checkif: interface <%s> is down", ifr->ifr_name);
       
     } else if ((ifr->ifr_flags & IFF_BROADCAST) == 0) {
-      LOG("nsmlib_checkif: interface <%s> does not support broadcast",
+      DBG("nsmlib_checkif: interface <%s> does not support broadcast",
 	  ifr->ifr_name);
 
     } else if (ioctl(sock, SIOCGIFADDR, (char *)ifr) < 0) {
-      LOG("nsmlib_checkif: interface <%s> has no address", ifr->ifr_name);
+      DBG("nsmlib_checkif: interface <%s> has no address", ifr->ifr_name);
       
     } else {
       SOCKAD_IN sa;
       memcpy(&sa, (SOCKAD_IN *)&ifr->ifr_addr, sizeof(sa));
     
       if (sa.sin_addr.s_addr != sap->sin_addr.s_addr) {
-	LOG("nsmlib_checkif: address does not match for interface <%s>",
+	DBG("nsmlib_checkif: address does not match for interface <%s>",
 	    ifr->ifr_name);
       } else {
 	close(sock);
@@ -364,7 +368,7 @@ nsmlib_checkif(NSMcontext *nsmc, SOCKAD_IN *sap)
     }
   }
 
-  LOG("nsmlib_checkif: cannot find network interface for %s",
+  DBG("nsmlib_checkif: cannot find network interface for %s",
       inet_ntoa(sap->sin_addr));
   close(sock);
   
@@ -403,9 +407,9 @@ nsmlib_initnet(NSMcontext *nsmc, const char *host, int port)
   /* -- check if this port is already used -- */
   for (nsmcp = nsmlib_context; nsmcp; nsmcp = nsmcp->next) {
     if (nsmc == nsmcp) continue;
-    if (nsmc->port       == nsmcp->port)       return NSMEALREADYP;
     if (nsmc->shmkey     == nsmcp->shmkey)     return NSMEALREADYS;
-    if (ADDR_N(nsmc->sa) == ADDR_N(nsmcp->sa)) return NSMEALREADYH;
+    if (nsmc->port == nsmcp->port &&
+	ADDR_N(nsmc->sa) == ADDR_N(nsmcp->sa)) return NSMEALREADYP;
   }
   
   /* -- open a socket -- */
@@ -464,7 +468,7 @@ nsmlib_initshm(NSMcontext *nsmc, int shmkey)
   nsmc->shmkey = shmkey;
 
   /* -- system shared memory (read-only) -- */
-  LOG("shmkey=%d size=%d\n", shmkey, sizeof(NSMsys));
+  DBG("nsmlib_initshm: key=%d size=%d", shmkey, sizeof(NSMsys));
   nsmc->sysid = shmget(shmkey, sizeof(NSMsys), 0444);
   if (nsmc->sysid < 0) {
     return NSMESHMGETSYS;
@@ -550,13 +554,13 @@ nsmlib_selectc(int usesig, unsigned int msec)
 }
 /* -- nsmlib_pipewrite ----------------------------------------------- */
 /*
-  write one int32 from pipe, to synchronize and get the result
+  write one int32_t from pipe, to synchronize and get the result
  */
 static int
-nsmlib_pipewrite(NSMcontext *nsmc, int32 val)
+nsmlib_pipewrite(NSMcontext *nsmc, int32_t val)
 {
   while (1) {
-    int ret = write(nsmc->pipe_wr, &val, sizeof(int32));
+    int ret = write(nsmc->pipe_wr, &val, sizeof(int32_t));
     if (ret < 0 && errno == EINTR) continue;
     if (ret < 0) ASSERT("nsmlib_pipewrite %s", strerror(errno));
     break;
@@ -565,14 +569,14 @@ nsmlib_pipewrite(NSMcontext *nsmc, int32 val)
 }
 /* -- nsmlib_piperead ------------------------------------------------ */
 /*
-  read one int32 from pipe, to synchronize and get the result
+  read one int32_t from pipe, to synchronize and get the result
  */
 static int
-nsmlib_piperead(NSMcontext *nsmc, int32 *valp)
+nsmlib_piperead(NSMcontext *nsmc, int32_t *valp)
 {
   DBG("piperead 1");
   while (1) {
-    int ret = read(nsmc->pipe_rd, valp, sizeof(int32));
+    int ret = read(nsmc->pipe_rd, valp, sizeof(int32_t));
     if (ret < 0 && errno == EINTR) continue;
     if (ret < 0) return NSMEPIPEREAD;
     break;
@@ -584,7 +588,7 @@ nsmlib_piperead(NSMcontext *nsmc, int32 *valp)
 int
 nsmlib_queue(NSMcontext *nsmc, NSMtcphead *hp)
 {
-  int len = sizeof(NSMtcphead) + sizeof(int32)*hp->npar + htons(hp->len);
+  int len = sizeof(NSMtcphead) + sizeof(int32_t)*hp->npar + htons(hp->len);
   NSMrecvqueue *p = malloc(sizeof(struct NSMtcpqueue *) + len);
   if (! p) return 0;
   
@@ -636,7 +640,7 @@ nsmlib_recv(NSMcontext *nsmc, NSMtcphead *hp, int wait_msec)
     /* for data */
     bufp += recvlen;
     recvlen = 0;
-    datalen = hp->npar * sizeof(int32) + ntohs(hp->len);
+    datalen = hp->npar * sizeof(int32_t) + ntohs(hp->len);
   }
   DBG("recv 6 datalen=%d npar=%d len=%d", datalen, hp->npar, ntohs(hp->len));
   return sizeof(NSMtcphead) + datalen;
@@ -647,7 +651,7 @@ nsmlib_recvpar(NSMcontext *nsmc)
 {
   char buf[NSM_TCPMSGSIZ];
   NSMtcphead *hp = (NSMtcphead *)buf;
-  int32 *hp_pars = (int32 *)(buf + sizeof(NSMtcphead));
+  int32_t *hp_pars = (int32_t *)(buf + sizeof(NSMtcphead));
   int ret = 0;
   int val;
 
@@ -729,9 +733,9 @@ nsmlib_call(NSMcontext *nsmc, NSMtcphead *hp)
   msg.len  = ntohs(hp->len);
   msg.pars[0] = msg.pars[1] = 0; /* to be compatible with NSM1 */
   for (i=0; i < msg.npar; i++) {
-    msg.pars[i] = ntohl(*(int32 *)(recvbuf + i*sizeof(int32)));
+    msg.pars[i] = ntohl(*(int32_t *)(recvbuf + i*sizeof(int32_t)));
   }
-  msg.datap = msg.len ? recvbuf + msg.npar*sizeof(int32) : 0;
+  msg.datap = msg.len ? recvbuf + msg.npar*sizeof(int32_t) : 0;
 
   switch (reqp->functype) {
   case NSMLIB_FNSYS:
@@ -742,13 +746,21 @@ nsmlib_call(NSMcontext *nsmc, NSMtcphead *hp)
     DBG("pipewrite pars0=%d", msg.pars[0]);
     nsmlib_pipewrite(nsmc, msg.pars[0]);
     break;
+
   case NSMLIB_FNSTD:
-    if (nsmc->hook) {
-      if (! nsmc->hook(&msg, nsmc)) {
-	reqp->callback(&msg, nsmc);
-      }
+    if (! nsmc->hook) {
+      DBG("nsmlib_call calling callback without hook");
+      reqp->callback(&msg, nsmc);
+    } else if (! nsmc->hook(&msg, nsmc)) {
+      DBG("nsmlib_call calling callback");
+      reqp->callback(&msg, nsmc);
+    } else {
+      DBG("nsmlib_call hook error");
     }
     break;
+
+  default:
+    DBG("nsmlib_call functype=%d", reqp->functype);
   }
 }
 /* -- nsmlib_handler ------------------------------------------------- */
@@ -956,14 +968,14 @@ nsmlib_send(NSMcontext *nsmc, NSMmsg *msgp)
   hp->npar = msgp->npar;
   hp->len  = htons(msgp->len);
   for (i=0; i<hp->npar; i++) {
-    *(int32 *)datap = htonl(msgp->pars[i]);
-    datap += sizeof(int32);
+    *(int32_t *)datap = htonl(msgp->pars[i]);
+    datap += sizeof(int32_t);
   }
   if (msgp->len && msgp->len <= NSM_TCPTHRESHOLD) {
     memcpy(datap, msgp->datap, msgp->len);
-    writelen = sizeof(NSMtcphead) + msgp->npar*sizeof(int32) + msgp->len;
+    writelen = sizeof(NSMtcphead) + msgp->npar*sizeof(int32_t) + msgp->len;
   } else {
-    writelen = sizeof(NSMtcphead) + msgp->npar*sizeof(int32);
+    writelen = sizeof(NSMtcphead) + msgp->npar*sizeof(int32_t);
   }
   writep = buf;
 
@@ -1053,7 +1065,7 @@ nsmlib_initcli(NSMcontext *nsmc, const char *nodename)
 /* -- nsmlib_sendreqid ----------------------------------------------- */
 int
 nsmlib_sendreqid(NSMcontext *nsmc,
-		 const char *node, uint16 req, uint npar, int *pars,
+		 const char *node, uint16_t req, uint npar, int *pars,
 		 int len, const char *datap)
 {
   NSMmsg msg;
@@ -1064,7 +1076,7 @@ nsmlib_sendreqid(NSMcontext *nsmc,
 
   msg.req = req;
   msg.seq = nsmc->seq++;
-  msg.node = (uint16)nodeid;
+  msg.node = (uint16_t)nodeid;
   msg.npar = npar > 256 ? 0 : npar;
   for (i=0; i<msg.npar; i++) msg.pars[i] = pars[i];
   msg.len = len;
@@ -1248,7 +1260,7 @@ nsmlib_allocmem(NSMcontext *nsmc, const char *datname, const char *fmtname,
   DBG("allocmem 3");
   nsmc->reqwait = 0;
   if (ret < 0) return 0;
-  printf("allocmem: ret=%d dtpos=%d\n", ret, ntohl(sysp->dat[ret].dtpos));
+  DBG("allocmem: ret=%d dtpos=%d\n", ret, ntohl(sysp->dat[ret].dtpos));
   p = (char *)memp + ntohl(sysp->dat[ret].dtpos);
   return p;
 }

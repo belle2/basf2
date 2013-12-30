@@ -255,15 +255,21 @@ main(int argc, char** argv)
       }
     } else if (strcasecmp(av[0], "stop") == 0) {
       if (ac < 2) {
-        printf("usage: stop <node> <run-number>\n");
+        printf("usage: stop <node>\n");
       } else {
         b2nsm_sendreq(av[1], "STOP", 0, 0);
       }
     } else if (strcasecmp(av[0], "config") == 0) {
       if (ac < 2) {
-        printf("usage: config <node> <run-number>\n");
+        printf("usage: config <node>\n");
       } else {
         b2nsm_sendreq(av[1], "CONFIG", 0, 0);
+      }
+    } else if (strcasecmp(av[0], "forget") == 0) {
+      if (ac < 2) {
+        printf("usage: forget <node>\n");
+      } else {
+        b2nsm_sendreq(av[1], "FORGET", 0, 0);
       }
     } else {
       printf("unknown request %s\n", av[0]);

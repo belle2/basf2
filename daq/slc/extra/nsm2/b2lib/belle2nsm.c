@@ -6,7 +6,11 @@
    nsmlib2.c are encapsulated in belle2nsm.c.
 
    All external library functions have prefix "b2nsm_".
+
+   20131230 1918 strerror fix, initnet fix, stdint fix, bridge fix
 \* ---------------------------------------------------------------------- */
+
+const char *belle2nsm_version = "belle2nsm 1.9.18";
 
 #include <stdio.h>
 #include <stdarg.h>
@@ -64,9 +68,25 @@ int
 b2nsm_loghook(NSMmsg *msg, NSMcontext *nsmc)
 {
   if (logfp) {
-    fprintf(logfp, "%s%s<=%s\n",
-	    xt(), nsmlib_reqname(nsmc, msg->req),
+    int i;
+    int    npar = msg->npar;
+    int   *pars = msg->pars;
+    int    len  = msg->len;
+    const char *datp = msg->datap;
+    
+    fprintf(logfp, "%s%s%s<=%s",
+	    xt(), nsmc->hookptr ? (const char *)nsmc->hookptr : "",
+	    nsmlib_reqname(nsmc, msg->req),
 	    nsmlib_nodename(nsmc, msg->node));
+
+    for (i = 0; i < 3 && i < npar; i++) {
+      fprintf(logfp, "%s%d%s", i==0 ? " (" : "", pars[i],
+	      i==npar-1 ? ")" : (i == 2 ? "...)" : ",") );
+    }
+    for (i = 0; datp && i < 80 && i < len && isprint(datp[i]); i++) {
+      fprintf(logfp, "%s%c%s", i==0 ? " " : "", datp[i], i==79 ? "..." : "");
+    }
+    fprintf(logfp, "\n");
     fflush(logfp);
   }
   return 0;
@@ -76,7 +96,20 @@ void
 b2nsm_logging(FILE *fp)
 {
   logfp = fp;
-  if (nsm) nsm->hook = b2nsm_loghook;
+  if (nsm) {
+    nsm->hook = b2nsm_loghook;
+    nsm->hookptr = 0;
+  }
+}
+/* -- b2nsm_logging2 ---------------------------------------------------- */
+void
+b2nsm_logging2(FILE *fp, const char *prefix)
+{
+  logfp = fp;
+  if (nsm) {
+    nsm->hook = b2nsm_loghook;
+    nsm->hookptr = (const void *)prefix;
+  }
 }
 /* -- b2nsm_context ----------------------------------------------------- */
 void
@@ -115,7 +148,7 @@ b2nsm_callback(const char *name, NSMcallback_t callback)
 }	     
 /* -- b2nsm_sendany ----------------------------------------------------- */
 int
-b2nsm_sendany(const char *node, const char *req, int npar, int *pars,
+b2nsm_sendany(const char *node, const char *req, int npar, int32_t *pars,
 	      int len, const char *datp, const char *caller)
 {
   int ret;
@@ -148,7 +181,7 @@ b2nsm_sendany(const char *node, const char *req, int npar, int *pars,
 }
 /* -- b2nsm_sendreq ----------------------------------------------------- */
 int
-b2nsm_sendreq(const char *node, const char *req, int npar, int *pars)
+b2nsm_sendreq(const char *node, const char *req, int npar, int32_t *pars)
 {
   return b2nsm_sendany(node, req, npar, pars, 0, 0, "sendreq");
 }
@@ -255,6 +288,7 @@ b2nsm_wait(float timeout)
   int wait_msec = (int)(timeout * 1000);
   char buf[NSM_TCPMSGSIZ]; /* should not be static */
   NSMcontext *nsmc = nsmlib_selectc(0, wait_msec); /* usesig = 0 */
+  NSMcontext *nsmsav;
 
   if (! nsmc) return 0;
 
@@ -264,7 +298,10 @@ b2nsm_wait(float timeout)
   }
 
   /* callback function */
+  nsmsav = nsm;
+  nsm = nsmc;
   nsmlib_call(nsmc, (NSMtcphead *)buf);
+  nsm = nsmsav;
   return 1;
 }
 /* -- b2nsm_init2 ------------------------------------------------------- */
@@ -272,14 +309,13 @@ NSMcontext *
 b2nsm_init2(const char *nodename, int usesig,
 	    const char *hostname, int port, int shmkey)
 {
-  NSMcontext *nsmc;
   char nodename_uprcase[NSMSYS_NAME_SIZ+1];
   xuprcpy(nodename_uprcase, nodename, NSMSYS_NAME_SIZ+1);
-  nsmc = nsmlib_init(nodename_uprcase, hostname, port, shmkey);
-  if (nsmc == 0) return 0;
-  nsmlib_usesig(nsmc, usesig);
-  if (logfp) nsmc->hook = b2nsm_loghook;
-  return nsm = nsmc;
+  nsm = nsmlib_init(nodename_uprcase, hostname, port, shmkey);
+  if (nsm == 0) return 0;
+  nsmlib_usesig(nsm, usesig);
+  if (logfp) nsm->hook = b2nsm_loghook;
+  return nsm;
 }
 /* -- b2nsm_init -------------------------------------------------------- */
 NSMcontext *

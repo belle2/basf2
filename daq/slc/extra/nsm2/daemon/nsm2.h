@@ -4,7 +4,7 @@
 /* -- version info */
 
 #define NSM_PROTOCOL_VERSION 1915 /* protocol version 1.9.15 */
-#define NSM_PACKAGE_VERSION  1917 /* package  version 1.9.17 */
+#define NSM_PACKAGE_VERSION  1918 /* package  version 1.9.18 */
 
 /*
   20120723 1900 file created
@@ -21,18 +21,20 @@
   20131219 1915 uid/gid for MEM shm
   20131222 1916 printlog infinite loop fix
   20131229 1917 no change in nsmd2, update in nsminfo2 and b2lib
+  20131230 1918 libs: strerror fix, initnet fix, stdint fix, bridge fix
  */
 
 /* -- DATA TYPES ----------------------------------------------------- */
 #ifndef __nsm2_typedef_nonstdint__
 #define __nsm2_typedef_nonstdint__
-typedef unsigned char      byte8;
-typedef unsigned short     uint16;
-typedef unsigned int       uint32;
-typedef unsigned long long uint64;
-typedef signed   short     int16;
-typedef signed   int       int32;
-typedef signed   long long int64;
+#include "stdint.h"
+typedef uint8_t   byte8;
+typedef uint16_t  uint16;
+typedef uint32_t  uint32;
+typedef uint64_t  uint64;
+typedef int16_t   int16;
+typedef int32_t   int32;
+typedef int64_t   int64;
 #endif /* nsm2_typedef_nonstdint */
 
 #ifndef __nsm2_typedef_context__
@@ -110,12 +112,12 @@ typedef struct NSMcontext_struct NSMcontext;
 
 /* NSMmsg (in host byte order) */
 typedef struct {
-  uint16 req;
-  uint16 seq;
-  uint16 node; /* source/destination nodeid, or (-1) if not an NSM client */
-  byte8  npar;
-  uint16 len;
-  uint32 pars[256];
+  uint16_t req;
+  uint16_t seq;
+  int16_t  node; /* source/destination nodeid, or (-1) if not an NSM client */
+  uint8_t  npar;
+  uint16_t len;
+  int32_t  pars[256]; /* signed */
   const char* datap;
 } NSMmsg;
 

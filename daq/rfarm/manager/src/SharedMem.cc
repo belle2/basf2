@@ -51,6 +51,19 @@ SharedMem::SharedMem(char* name, int size)
     return;
   }
   m_shmsize = size;
+
+  // 3. Leave id of shm and semaphore in file name
+  if (m_new) {
+    m_strbuf = new char[1024];
+    sprintf(m_strbuf, "/tmp/SHM%d-SEM%d-SHM_%s", m_shmid, 0, name);
+    int fd = open(m_strbuf, O_CREAT | O_TRUNC | O_RDWR, 0644);
+    if (fd < 0) {
+      printf("SharedMem ID file could not be created.\n");
+    } else {
+      close(fd);
+    }
+  }
+
 }
 
 SharedMem::SharedMem(int shm_id)
@@ -70,6 +83,10 @@ SharedMem::~SharedMem(void)
   //  char idfile[256];
   //  sprintf ( idfile, "%s/.rfshmid", getenv("HOME") );
   //  unlink ( idfile );
+  if (m_new) {
+    unlink(m_strbuf);
+    delete[] m_strbuf;
+  }
 }
 
 void* SharedMem::ptr(void)

@@ -4,7 +4,7 @@ label=`date +%Y-%m-%d-%H-%M`
 
 startBySSH() {
   mkdir -p ~/run/$2/$1
-  ssh $1 "source ~/belle2/release/daq/slc/extra/bin/setup.sh; ~/belle2 release local $2 &> ~/run/$2/$1/${label}.log" &
+  ssh $1 "source ~/belle2/release/daq/slc/extra/bin/setup.sh ~/belle2 release local $2 &> ~/run/$2/$1/${label}.log" &
 }
 
 startBySSH belle-rpc1 nsmd2

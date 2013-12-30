@@ -1,9 +1,11 @@
 #!/bin/bash
 
 stopBySSH() {
-  ssh $1 "killall $2"
+  ssh $1 "~/belle2/release/daq/slc/extra/bin/kill_nsmd2.sh $2"
 }
 
-stopBySSH belle-rpc1 nsmd2
-stopBySSH belle-rpc2 nsmd2
+stopBySSH belle-rpc1 global
+stopBySSH belle-rpc2 global
+stopBySSH belle-hltin global
+stopBySSH belle-reco global
 

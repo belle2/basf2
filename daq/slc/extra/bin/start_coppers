@@ -5,19 +5,17 @@ label=`date +%Y-%m-%d-%H-%M`
 restartBySSH() {
   mkdir -p ~/run/$2/$1
   ssh $1 "killall $2"
-  ssh $1 "source ~/belle2/release/daq/slc/extra/bin/setup.sh; ~/belle2 release local $2 $3 $4&> ~/run/$2/$1/${label}.log" &
+  ssh $1 "source ~/belle2/release/daq/slc/extra/bin/setup.sh ~/belle2 release local $2 $3 $4&> ~/run/$2/$1/${label}.log" &
 }
 
 mkdir -p  ~/run/runcontrold/belle-rpc1
 kill `ps aux | grep "runcontrold svd" | grep -v grep | awk '{print $2}'`
-source ~/belle2/release/daq/slc/extra/bin/setup.sh; ~/belle2 release global runcontrold svd &> ~/run/runcontrold/belle-rpc1/${label}.log &
+source ~/belle2/release/daq/slc/extra/bin/setup.sh ~/belle2 release global runcontrold svd &> ~/run/runcontrold/belle-rpc1/${label}.log &
 
 mkdir -p  ~/run/rocontrold/belle-rpc1
 kill `ps aux | grep "rocontrold ROPC01" | grep -v grep | awk '{print $2}'`
-source ~/belle2/release/daq/slc/extra/bin/setup.sh; ~/belle2 release local rocontrold ROPC01 &> ~/run/rocontrold/belle-rpc1/${label}.log &
+source ~/belle2/release/daq/slc/extra/bin/setup.sh ~/belle2 release local rocontrold ROPC01 &> ~/run/rocontrold/belle-rpc1/${label}.log &
 
 restartBySSH cpr010 cprcontrold CPR010 svd
 restartBySSH cpr011 cprcontrold CPR011 svd
 
-
-cd -

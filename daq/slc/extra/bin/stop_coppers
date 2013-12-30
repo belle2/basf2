@@ -22,5 +22,3 @@ stopBySSH cpr011 tempd CPR011
 stopBySSH cpr012 tempd CPR012 
 stopBySSH cpr013 tempd CPR013
 
-
-cd -

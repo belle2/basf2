@@ -1,13 +1,13 @@
 #!/bin/bash
 
 stopBySSH() {
-  ssh $1 "killall $2"
+  ssh $1 "~/belle2/release/daq/slc/extra/bin/kill_nsmd2.sh $2"
 }
 
-stopBySSH belle-rpc1 nsmd2
+stopBySSH belle-rpc1 local
 sleep 3
-stopBySSH ttd10 nsmd2
-stopBySSH cpr010 nsmd2
-stopBySSH cpr011 nsmd2
-stopBySSH cpr012 nsmd2
-stopBySSH cpr013 nsmd2
+stopBySSH ttd10 local
+stopBySSH cpr010 local
+stopBySSH cpr011 local
+stopBySSH cpr012 local
+stopBySSH cpr013 local

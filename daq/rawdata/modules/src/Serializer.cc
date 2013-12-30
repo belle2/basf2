@@ -243,8 +243,14 @@ int SerializerModule::sendByWriteV(RawDataBlock* rawdblk)
   //  if ( ( n = send(m_socket, (char*)temp_buf, iov[0].iov_len + iov[1].iov_len + iov[2].iov_len, MSG_NOSIGNAL) )
   //      != iov[0].iov_len + iov[1].iov_len + iov[2].iov_len) {
   if ((n = writev(m_socket, iov, NUM_BUFFER)) < 0) {
-    char temp_char[100] = "SEND error1"; print_err.PrintError(temp_char, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-    exit(1);
+    perror("SEND error1");
+    if (errno != EINTR) {
+      char err_buf[500];
+      sprintf(err_buf, "SEND error. Exiting... : sent %d bytes, header %d bytes body %d tailer %d\n" , n,
+              iov[0].iov_len, iov[1].iov_len, iov[2].iov_len);
+      print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      exit(1);
+    }
   }
 
 

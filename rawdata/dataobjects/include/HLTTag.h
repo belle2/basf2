@@ -19,10 +19,10 @@ namespace Belle2 {
 
   enum HLTTrigAlgo { Hadronic, Tautau, LowMulti, Cosmic, Bhabha, Mumu,
                      Random, Inj, Calib1, Calib2, Calib3, Calib4, Calib5,
-                     Calib6, Calib7, Calib8, MAXARGO
+                     Calib6, Calib7, Calib8, MAXALGO
                    };
 
-  class HLTTag : public HLTTag {
+  class HLTTag {
   public:
     //! Default constructor
     HLTTag();
@@ -71,7 +71,7 @@ namespace Belle2 {
     // Bit 3:  algorithm 3 : taken = 1 / discarded = 0
     // Bit 4:  algorithm 4 : taken = 1 / discarded = 0
     //        .....
-    // Bit MAXARGO: argorithm MAXARGO : taken = 1, discard = 0
+    // Bit MAXALGO: argorithm MAXALGO : taken = 1, discard = 0
     // .......
     int m_HLTSummary;
 

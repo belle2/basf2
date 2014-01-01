@@ -15,22 +15,28 @@
 #include <framework/pcore/RingBuffer.h>
 #include <framework/pcore/DataStoreStreamer.h>
 
+#include <daq/slc/system/PThread.h>
 #include <daq/slc/readout/ProcessStatusBuffer.h>
 #include <daq/storage/BinData.h>
 
+#include "daq/storage/modules/StorageRBufferManager.h"
+#include "daq/storage/modules/DataStorePackage.h"
+
+#include <daq/slc/system/Mutex.h>
+#include <daq/slc/system/Cond.h>
+
 #include <string>
 #include <vector>
-
-#define MAXEVTSIZE  400000000
 
 namespace Belle2 {
 
   /*! A class definition of an input module for Sequential ROOT I/O */
   class StorageDeserializerModule : public Module {
 
-    // Public functions
   public:
 
+    // Public functions
+  public:
     //! Constructor / Destructor
     StorageDeserializerModule();
     virtual ~StorageDeserializerModule();
@@ -44,13 +50,14 @@ namespace Belle2 {
     virtual void endRun();
     virtual void terminate();
 
-  private:
+    void queueEvent();
     void storeEvent();
 
   private:
-    int m_evtbuf[MAXEVTSIZE];
+    std::queue<DataStorePackage*> m_package_q;
     std::string m_inputbufname;
     RingBuffer* m_inputbuf;
+    StorageRBufferManager* m_buf;
     MsgHandler* m_msghandler;
     DataStoreStreamer* m_streamer;
     ProcessStatusBuffer m_status;
@@ -63,6 +70,7 @@ namespace Belle2 {
     int m_nodeid;
     std::string m_nodename;
     int m_shmflag;
+    int m_numThread;
 
   };
 

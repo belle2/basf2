@@ -26,8 +26,11 @@ set_log_level(LogLevel.ERROR)
 set_log_level(LogLevel.INFO)
 
 # Modules
+# deserializer = register_module('FastRbuf2Ds')
+# deserializer.param('RingBufferName', argv[1])
 deserializer = register_module('StorageDeserializer')
 deserializer.param('InputBufferName', argv[1])
+deserializer.param('NumThreads', 2)
 # deserializer.param('NodeName', argv[4])
 # deserializer.param('NodeId', int(argv[5]))
 # deserializer.param('UseShmFlag', int(argv[6]))

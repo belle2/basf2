@@ -47,7 +47,10 @@ int main(int argc, char** argv)
   while (true) {
     int sstat = read(fd, buf, MAXBUF);
     //int sstat = read(fd, buf, sizeof(int));
-    if (sstat <= 0) break;
+    if (sstat <= 0) {
+      lseek(fd, 0, SEEK_SET);
+      continue;
+    }
     /*
     int* recsize = (int*)buf;
     int rstat = read(fd, buf + sizeof(int), (*recsize - 1) * 4);
@@ -59,7 +62,7 @@ int main(int argc, char** argv)
     socket.write(buf, *recsize * 4);
     */
     socket.write(buf, sstat);
-    //usleep(200);
+    usleep(1);
     nrec++;
   }
   socket.close();

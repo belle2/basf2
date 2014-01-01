@@ -70,6 +70,7 @@ void StorageOutputModule::initialize()
     m_obuf = NULL;
 
   B2INFO("StorageOutput: initialized.");
+  B2INFO("StorageOutput : KONNO");
 
 }
 
@@ -96,26 +97,18 @@ void StorageOutputModule::event()
 
   // Store EvtMessage
   int stat = m_file->write(msg->buffer());
-  //  printf("StorageOuput : write = %d\n", stat);
-
-  //static int count = 0;
-  // Queue EvtMessage in RingBuffer
   if (m_obuf != NULL) {
     if (m_nevt % m_interval == 0) {
-      // Free running RingBuffer, no flow control
-      //count++;
       m_obuf->insq((int*)msg->buffer(), (msg->size() - 1) / 4 + 1);
-      //m_obuf->insq((int*)msg->buffer(), *(int*)msg->buffer());
     }
   }
-  // Clean up EvtMessage
-  delete msg;
 
   // Statistics
   double dsize = (double)stat / 1000.0;
   m_size += dsize;
   m_size2 += dsize * dsize;
   m_nevt++;
+  delete msg;
 }
 
 void StorageOutputModule::endRun()

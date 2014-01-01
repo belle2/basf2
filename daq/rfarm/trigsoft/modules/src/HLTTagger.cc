@@ -63,7 +63,13 @@ void HLTTaggerModule::event()
   tag->HLTEventID(m_nevt);
   tag->HLTUnitID(m_hltunit);
   tag->HLTSetCurrentTime();
-  tag->SetSummary(1);     // Event is supposed to be accepted by default
+  tag->Accept(HLTTag::Global); // Event is supposed to be accepted by default
+  tag->Accept(HLTTag::BeamTest);
+
+  // For test:
+  //  tag->Accept(HLTTag::Level3);
+  //  if ( tag->Accepted() ) printf ( "Taken!!!!\n" );
+  //  printf ( "HLTTag word = %8.8x\n", tag->GetSummaryWord() );
 
   m_nevt++;
 

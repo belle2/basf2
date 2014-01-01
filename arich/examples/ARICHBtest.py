@@ -97,7 +97,7 @@ paramloader.param('fileName', xmlgeometry)
 #   'file:///net/f9pc137/data0/belle2/rok/local/basf2/test/Belle2-merged.xml');
 # Create Geometry
 geobuilder = register_module('Geometry')
-geobuilder.param('Components', ['ARICHBtest'])
+geobuilder.param('components', ['ARICHBtest'])
 
 btest = register_module('arichBtest')
 btest.param('mwpcTrackMask', [mask])
@@ -133,7 +133,7 @@ geosaver.param('Filename', 'Belle2Geo.root')
 
 arichrec = register_module('ARICHReconstructor')
 arichrec.param('inputTrackType', 1)
-arichrec.param('debug', 3)
+arichrec.param('beamtest', 3)
 arichrec.param('trackPositionResolution', 0.0)
 arichrec.param('trackAngleResolution', 0.0)
 

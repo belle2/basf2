@@ -63,6 +63,7 @@ void Raw2DsModule::initialize()
   StoreArray<RawEPID>::registerPersistent();
   StoreArray<RawECL>::registerPersistent();
   StoreArray<RawKLM>::registerPersistent();
+  StoreArray<RawFTSW>::registerPersistent();
 
   // Read the first event in RingBuffer and restore in DataStore.
   // This is necessary to create object tables before TTree initialization

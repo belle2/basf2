@@ -12,6 +12,8 @@ using namespace Belle2;
 using namespace std;
 
 #define CHECK_BIT(var,pos) (bool)((var) & (1<<(pos)))
+#define SET_BIT(var,pos) ((var) | (1<<(pos)))
+#define CLR_BIT(var,pos) ((var) & ~(1<<(pos)))
 
 HLTTag::HLTTag()
 {
@@ -63,24 +65,36 @@ void HLTTag::HLTSetCurrentTime()
   m_HLTtime = time(NULL);
 }
 
-bool HLTTag::Taken()
+bool HLTTag::Accepted(HLTTrigAlgo algo)
 {
-  return (CHECK_BIT(m_HLTSummary, 0));
+  return (CHECK_BIT(m_HLTSummary, algo));
 }
 
-bool HLTTag::Discarded()
+bool HLTTag::Discarded(HLTTrigAlgo algo)
 {
-  return (!CHECK_BIT(m_HLTSummary, 0));
+  return (!CHECK_BIT(m_HLTSummary, algo));
 }
 
-bool HLTTag::TestAlgo(enum HLTTrigAlgo algo)
-{
-  return CHECK_BIT(m_HLTSummary, (int)algo);
-}
-
-void HLTTag::SetSummary(int sum)
+void HLTTag::SetSummaryWord(int sum)
 {
   m_HLTSummary = sum;
+}
+
+void HLTTag::Accept(HLTTrigAlgo algo)
+{
+  m_HLTSummary = SET_BIT(m_HLTSummary, (int)algo);
+  //  m_HLTSummary = m_HLTSummary | (1<<(int)algo);
+  //  printf ( "algo = %d, m_HLTSummary = %8.8x\n", (int)algo, m_HLTSummary );
+}
+
+void HLTTag::Discard(HLTTrigAlgo algo)
+{
+  m_HLTSummary = CLR_BIT(m_HLTSummary, (int)algo);
+}
+
+int HLTTag::GetSummaryWord()
+{
+  return m_HLTSummary;
 }
 
 int HLTTag::GetAlgoInfo(HLTTrigAlgo algo)

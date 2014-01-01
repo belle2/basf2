@@ -17,12 +17,17 @@
 
 namespace Belle2 {
 
-  enum HLTTrigAlgo { Hadronic, Tautau, LowMulti, Cosmic, Bhabha, Mumu,
-                     Random, Inj, Calib1, Calib2, Calib3, Calib4, Calib5,
-                     Calib6, Calib7, Calib8, MAXALGO
-                   };
-
   class HLTTag : public TObject {
+
+  public:
+    enum HLTTrigAlgo { Global, Level3,
+                       Hadronic, Tautau, LowMulti,
+                       Bhabha, Mumu,
+                       Cosmic, Random, Injection,
+                       Calib1, Calib2, Calib3, Calib4, Calib5,
+                       BeamTest, MAXALGO
+                     };
+
   public:
     //! Default constructor
     HLTTag();
@@ -44,10 +49,14 @@ namespace Belle2 {
     void HLTSetCurrentTime();
 
     //! Access functions to Summary word
-    bool Taken();
-    bool Discarded();
-    bool TestAlgo(HLTTrigAlgo algo);
-    void SetSummary(int summary);
+    bool Accepted(HLTTrigAlgo algo = Global);
+    bool Discarded(HLTTrigAlgo algo = Global);
+
+    void Accept(HLTTrigAlgo algo = Global);
+    void Discard(HLTTrigAlgo algo = Global);
+
+    int GetSummaryWord();
+    void SetSummaryWord(int summary);
 
     //! Access functions to each algorithm word
     int GetAlgoInfo(HLTTrigAlgo algo);

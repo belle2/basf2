@@ -22,7 +22,7 @@ namespace Belle2 {
                      Calib6, Calib7, Calib8, MAXALGO
                    };
 
-  class HLTTag {
+  class HLTTag : public TObject {
   public:
     //! Default constructor
     HLTTag();

@@ -3,7 +3,7 @@ Import('env')
 env['LIBS'] = ['framework', 'geometry', 'simulation',
                '$ROOT_LIBS', 'Geom', 'EG', 'cdc_dataobjects',
                '$GEANT4_LIBS', 'CLHEP','generators_dataobjects',
-	       'simulation_dataobjects','genfit2']
+	       'simulation_dataobjects','genfit2','mdst_dataobjects']
 
 #env.Append(CPPDEFINES = {'CDC_DEBUG':None})
 

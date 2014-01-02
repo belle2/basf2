@@ -9,10 +9,6 @@
  **************************************************************************/
 
 #include <reconstruction/dataobjects/PIDLikelihood.h>
-
-#include <top/dataobjects/TOPLikelihood.h>
-#include <arich/dataobjects/ARICHLikelihood.h>
-#include <reconstruction/dataobjects/DedxLikelihood.h>
 #include <framework/logging/Logger.h>
 
 using namespace std;
@@ -33,44 +29,18 @@ PIDLikelihood::PIDLikelihood()
   }
 }
 
-void PIDLikelihood::setLikelihoods(const TOPLikelihood* logl)
+
+void PIDLikelihood::setLogLikelihood(Const::EDetector det,
+                                     const Const::ChargedStable& part,
+                                     float logl)
 {
-
-  if (logl->getFlag() != 1) return;
-
-  m_detectors += Const::TOP;
-  int index = Const::PIDDetectors::set().getIndex(Const::TOP);
-  m_logl[index][Const::electron.getIndex()] = (float) logl->getLogL_e();
-  m_logl[index][Const::muon.getIndex()] = (float) logl->getLogL_mu();
-  m_logl[index][Const::pion.getIndex()] = (float) logl->getLogL_pi();
-  m_logl[index][Const::kaon.getIndex()] = (float) logl->getLogL_K();
-  m_logl[index][Const::proton.getIndex()] = (float) logl->getLogL_p();
-}
-
-
-void PIDLikelihood::setLikelihoods(const ARICHLikelihood* logl)
-{
-
-  if (logl->getFlag() != 1) return;
-
-  m_detectors += Const::ARICH;
-  int index = Const::PIDDetectors::set().getIndex(Const::ARICH);
-  m_logl[index][Const::electron.getIndex()] = (float) logl->getLogL_e();
-  m_logl[index][Const::muon.getIndex()] = (float) logl->getLogL_mu();
-  m_logl[index][Const::pion.getIndex()] = (float) logl->getLogL_pi();
-  m_logl[index][Const::kaon.getIndex()] = (float) logl->getLogL_K();
-  m_logl[index][Const::proton.getIndex()] = (float) logl->getLogL_p();
-}
-
-
-void PIDLikelihood::setLikelihoods(const DedxLikelihood* logl)
-{
-
-  m_detectors += Const::CDC;
-  int index = Const::PIDDetectors::set().getIndex(Const::CDC);
-  for (Const::ParticleType k = Const::chargedStableSet.begin(); k != Const::chargedStableSet.end(); ++k)
-    m_logl[index][k.getIndex()] = logl->getLogLikelihood(k);
-
+  int index = Const::PIDDetectors::set().getIndex(det);
+  if (index < 0) {
+    B2ERROR("PIDLikelihood::setLogLikelihood: detector is not a PID device");
+    return;
+  }
+  m_detectors += det;
+  m_logl[index][part.getIndex()] = logl;
 }
 
 

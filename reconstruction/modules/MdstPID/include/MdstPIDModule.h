@@ -16,6 +16,11 @@
 
 namespace Belle2 {
 
+  class PIDLikelihood;
+  class TOPLikelihood;
+  class ARICHLikelihood;
+  class DedxLikelihood;
+
   /**
    * a module to fill PIDLikelihoods
    */
@@ -67,6 +72,26 @@ namespace Belle2 {
     void printModuleParams() const;
 
   private:
+
+    /**
+     * Set TOP likelihoods and corresponding reconstruction flag
+     * @param logl TOPLikelihood pointer
+     */
+    void setLikelihoods(const TOPLikelihood* logl);
+
+    /**
+     * Set ARICH likelihoods and corresponding reconstruction flag
+     * @param logl ARICHLikelihood pointer
+     */
+    void setLikelihoods(const ARICHLikelihood* logl);
+
+    /**
+     * Set Dedx likelihoods and corresponding reconstruction flag
+     * @param logl DedxLikelihood pointer
+     */
+    void setLikelihoods(const DedxLikelihood* logl);
+
+    PIDLikelihood* m_pid; /**< pointer to the object to be filled */
 
   };
 

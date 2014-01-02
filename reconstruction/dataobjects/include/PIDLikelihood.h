@@ -12,17 +12,16 @@
 #define PIDLIKELIHOOD_H
 
 #include <framework/datastore/RelationsObject.h>
-
 #include <framework/gearbox/Const.h>
-
 
 namespace Belle2 {
 
-  class TOPLikelihood;
-  class ARICHLikelihood;
-  class DedxLikelihood;
+  /** \addtogroup dataobjects
+   * @{
+   */
 
-  /*! Class to collect log likelihoods from TOP, ARICH and dEdx
+  /**
+   * Class to collect log likelihoods from TOP, ARICH, dEdx, ECL and KLM
    * aimed for output to mdst
    * includes a function to return combined likelihood probability (like Belle1 atc_pid)
    */
@@ -31,38 +30,38 @@ namespace Belle2 {
 
   public:
 
-    /*! default constructor: log likelihoods and flags set to 0 */
+    /**
+     * Default constructor: log likelihoods and flags set to 0
+     */
     PIDLikelihood();
 
-    /*! set TOP likelihoods and corresponding reconstruction flag
-     * @param logl TOPLikelihood pointer
+    /**
+     * Set log likelihood for a given detector and particle
+     * @param det detector enumerator
+     * @param part charged stable particle
+     * @param logl log likelihood
      */
-    void setLikelihoods(const TOPLikelihood* logl);
+    void setLogLikelihood(Const::EDetector det,
+                          const Const::ChargedStable& part,
+                          float logl);
 
-    /*! set ARICH likelihoods and corresponding reconstruction flag
-     * @param logl ARICHLikelihood pointer
-     */
-    void setLikelihoods(const ARICHLikelihood* logl);
-
-    /*! set Dedx likelihoods and corresponding reconstruction flag
-     * @param logl DedxLikelihood pointer
-     */
-    void setLikelihoods(const DedxLikelihood* logl);
-
-    /*! check whether PID information from a given set of detectors is available
+    /**
+     * Check whether PID information from a given set of detectors is available
      * @param set  set of detector IDs
      * @return     true if the given set of detectors contributed to the PID information
      */
     bool isAvailable(Const::PIDDetectorSet set) const {return  m_detectors.contains(set);}
 
-    /*! get log likelihood for a given detector set and particle
+    /**
+     * Return log likelihood for a given detector set and particle
      * @param set  set of detector IDs
      * @param part particle type
      * @return     log likelihood
      */
     float getLogL(const Const::ChargedStable& part, Const::PIDDetectorSet set = Const::PIDDetectorSet::set()) const;
 
-    /*! get combined likelihood probability for particle being p1 and not p2 assuming equal prior probablilites
+    /**
+     * Return combined likelihood probability for particle being p1 and not p2 assuming equal prior probablilites
      * @param p1 particle enumerator
      * @param p2 particle enumerator
      * @param set set of detector IDs
@@ -77,14 +76,15 @@ namespace Belle2 {
     Const::DetectorSet m_detectors;   /**< set of detectors with PID information */
     float m_logl[c_PIDDetectorSetSize][Const::ChargedStable::c_SetSize]; /**< log likelihoods, FIXME: replace hard coded value */
 
-    /*! Calculate likelihood probability from log likelihood difference logl1-logl2 assuming equal prior probablilites
+    /**
+     * Calculate likelihood probability from log likelihood difference logl1-logl2 assuming equal prior probablilites
      * @param logl1 log likelihood
      * @param logl2 log likelihood
      * @return likelihood probability (a value btw. 0 and 1)
      */
     double probability(float logl1, float logl2) const;
 
-    ClassDef(PIDLikelihood, 1); /**< Class to collect log likelihoods from TOP, ARICH and dEdx .*/
+    ClassDef(PIDLikelihood, 2); /**< class definition */
 
   };
 

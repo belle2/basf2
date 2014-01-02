@@ -132,6 +132,7 @@ void Raw2DsModule::registerRawCOPPERs()
       continue;
     }
     int subsysid = ((RawCOPPER&)tempcpr).GetSubsysId(cprid);
+    subsysid = (subsysid & 0xff000000) >> 24;
     // Switch to each detector and register RawXXX
     if (subsysid == CDC_ID) {
       StoreArray<RawCDC> ary;

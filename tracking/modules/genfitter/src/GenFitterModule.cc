@@ -284,8 +284,9 @@ void GenFitterModule::event()
     //there is different information from mctracks and 'real' pattern recognition tracks, e.g. for PR tracks the PDG is unknown
 
     if (m_usePdgCodeFromTrackCand == true) {
+      // The following code assumes PDG code > 0, hence we take the absolute value.
       m_pdgCodes.clear(); //clear the pdg code from the last track
-      m_pdgCodes.push_back(aTrackCandPointer->getPdgCode());
+      m_pdgCodes.push_back(abs(aTrackCandPointer->getPdgCode()));
       B2DEBUG(100, "PDG code from track candidate will be used and it is: " << aTrackCandPointer->getPdgCode());
       if (m_pdgCodes[0] == 0) {
         B2FATAL("The current genfit::TrackCand has no valid PDG code (it is 0) AND you did not set any valid PDG Code in Genfit2Module module to use instead");
@@ -306,7 +307,7 @@ void GenFitterModule::event()
       if (part->Charge() < 0.0) {
         currentPdgCode *= -1; //swap sign
       }
-
+      //std::cout << "fitting with pdg " << currentPdgCode << " for charge " << aTrackCandPointer->getChargeSeed() << std::endl;
       //Find the particle with the correct PDG Code;
       Const::ChargedStable chargedStable = Const::pion;
       try {

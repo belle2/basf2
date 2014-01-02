@@ -29,6 +29,13 @@ source_files = []
 for dir in dirs:
     source_files.append([os.path.join(env['BUILDDIR'], 'genfit2', str(source_file)) for source_file in Glob(os.path.join('code', dir, 'src', '*.cc'))])
 
+# see if it found source files, since this is a list of lists, we have
+# to flatten it, following an example from the Python documentation
+# http://docs.python.org/2/tutorial/datastructures.html
+if len([filename for sublist in source_files for filename in sublist]) == 0:
+  print 'No genfit sources found.  Please check if svn up fills the genfit2/code subdirectory.'
+  Exit(1)
+
 # builder for root dictionaries
 rootcint = Builder(action='rootcint -f $TARGET -c -p $CINTFLAGS $_CPPDEFFLAGS $_CPPINCFLAGS $SOURCES', source_scanner=CScanner())
 env['BUILDERS']['RootCint'] = rootcint

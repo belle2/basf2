@@ -115,7 +115,8 @@ void Raw2DsModule::registerRawCOPPERs()
   int* bufbody = evtbuf + SendHeader::SENDHDR_NWORDS;
 
   // Unpack buffer
-  RawDataBlock tempcpr;
+  //  RawDataBlock tempcpr;
+  RawCOPPER tempcpr;
   tempcpr.SetBuffer(bufbody, nwords, false, npackedevts, ncprs);
 
   // Store data contents in Corresponding RawXXXX
@@ -161,9 +162,9 @@ void Raw2DsModule::registerRawCOPPERs()
 
   StoreObjPtr<EventMetaData> evtmetadata;
   evtmetadata.create();
-  evtmetadata->setExperiment(1);
-  evtmetadata->setRun(1);
-  evtmetadata->setEvent(m_nevt);
+  evtmetadata->setExperiment(tempcpr.GetExpNo(0));
+  evtmetadata->setRun(tempcpr.GetRunNo(0));
+  evtmetadata->setEvent(tempcpr.GetEveNo(0));
   m_nevt++;
   delete[] evtbuf;
 

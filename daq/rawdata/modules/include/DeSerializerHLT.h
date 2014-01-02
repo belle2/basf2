@@ -20,6 +20,7 @@
 #include <rawdata/dataobjects/RawKLM.h>
 #include <rawdata/dataobjects/RawFTSW.h>
 
+/* Obsolete
 #define DETECTOR_MASK 0xFFFFFFFF // tentative
 #define SVD_ID 0x00000001 // tentative
 #define CDC_ID 0x00000002 // tentative
@@ -27,6 +28,7 @@
 #define EPID_ID 0x00000004 // tentative
 #define ECL_ID 0x00000005 // tentative
 #define KLM_ID 0x00000006 // tentative
+*/
 
 namespace Belle2 {
 

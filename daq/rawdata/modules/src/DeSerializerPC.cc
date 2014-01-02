@@ -489,6 +489,7 @@ void DeSerializerPCModule::event()
       m_eventMetaDataPtr->setEndOfData();
     }
   }
+
   if (n_basf2evt % 2000 == 0) {
     //  if ( ( n_basf2evt - m_prev_nevt ) > monitor_numeve ) {
     double cur_time = getTimeSec();

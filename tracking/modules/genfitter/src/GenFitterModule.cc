@@ -519,7 +519,9 @@ void GenFitterModule::event()
             //Create relations
             if (aTrackCandPointer->getMcTrackId() >= 0) {
               mcParticlesToTracks.add(aTrackCandPointer->getMcTrackId(), trackCounter);
-            } else B2WARNING("No MCParticle contributed to this track! No MCParticle<->Track relation will be created!");
+            }
+            //else B2WARNING("No MCParticle contributed to this track! No MCParticle<->Track relation will be created!");
+            //FIXME: disabled, makes no sense with real data.
           }
         } else {            //fit successful
           ++m_successfulFitCounter;
@@ -535,7 +537,8 @@ void GenFitterModule::event()
             gfTracksToMCPart.add(trackCounter, aTrackCandPointer->getMcTrackId());
           }
 
-          else B2WARNING("No MCParticle contributed to this track! No genfit::Track<->MCParticle relation will be created!");
+          //else B2WARNING("No MCParticle contributed to this track! No genfit::Track<->MCParticle relation will be created!");
+          //FIXME: disabled, makes no sense for real data
 
           //Set non-helix parameters
           /*            tracks[trackCounter]->setFitFailed(false);
@@ -680,7 +683,9 @@ void GenFitterModule::event()
             //Create relations
             if (aTrackCandPointer->getMcTrackId() >= 0) {
               mcParticlesToTracks.add(aTrackCandPointer->getMcTrackId(), trackCounter);
-            } else B2WARNING("No MCParticle contributed to this track! No MCParticle<->Track relation will be created!");
+            }
+            //else B2WARNING("No MCParticle contributed to this track! No MCParticle<->Track relation will be created!");
+            //FIXME: disabled, makes no sense for real data
 //              tracks[trackCounter]->setExtrapFailed(true);
           }
 

@@ -20,8 +20,18 @@
 
 #include <TObject.h>
 
-#define USE_B2LFEE_FORMAT_BOTH_VER1_AND_2
+//#define USE_B2LFEE_FORMAT_BOTH_VER1_AND_2
 //#define READ_OLD_B2LFEE_FORMAT_FILE
+
+
+#define DETECTOR_MASK 0xFF000000 // tentative
+#define SVD_ID  0x01000000 // tentative
+#define CDC_ID  0x02000000 // tentative
+#define BPID_ID 0x03000000 // tentative
+#define EPID_ID 0x04000000 // tentative
+#define ECL_ID  0x05000000 // tentative
+#define KLM_ID  0x06000000 // tentative
+
 
 namespace Belle2 {
 

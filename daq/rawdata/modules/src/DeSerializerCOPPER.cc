@@ -14,7 +14,7 @@
 //#define MAXEVTSIZE 400000000
 //#define TIME_MONITOR
 //#define NO_DATA_CHECK
-#define WO_FIRST_EVENUM_CHECK
+//#define WO_FIRST_EVENUM_CHECK
 
 
 using namespace std;
@@ -453,6 +453,12 @@ void DeSerializerCOPPERModule::event()
   if (m_start_flag == 0) {
     B2INFO("DeSerializerCOPPER: event() started.");
     // Use shared memory to start(for HSLB dummy data)
+
+    //
+    // for DESY test
+    //
+    m_nodeid = SVD_ID | m_nodeid  ;
+
     if (m_shmflag > 0 && m_status.isStopped()) {
       printf("Waiting for Start...\n");
       fflush(stdout);
@@ -483,6 +489,7 @@ void DeSerializerCOPPERModule::event()
 
     // Fill header and trailer
     try {
+
       m_prev_ftsweve32 = temp_rawcopper.FillTopBlockRawHeader(m_nodeid, m_data_type, m_trunc_mask, m_prev_ftsweve32);
       //    fillNewRawCOPPERHeader( &temp_rawcopper );
     } catch (string err_str) {

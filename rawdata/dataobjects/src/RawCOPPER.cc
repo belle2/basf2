@@ -12,8 +12,8 @@ using namespace std;
 using namespace Belle2;
 
 //#define NO_DATA_CHECK
-#define NO_DATA_CHECK_1
-#define WO_FIRST_EVENUM_CHECK
+//#define NO_DATA_CHECK_1
+//#define WO_FIRST_EVENUM_CHECK
 
 ClassImp(RawCOPPER);
 
@@ -541,12 +541,15 @@ unsigned int RawCOPPER::GetB2LFEE32bitEventNumber(int n)
   }
 
   if (err_flag == 1) {
-#ifndef NO_DATA_CHECK_1
+
     char err_buf[500];
     sprintf(err_buf, "Different event number over HSLBs : slot A 0x%x : B 0x%x :C 0x%x : D 0x%x\n%s %s %d\n",
             eve[ 0 ], eve[ 1 ], eve[ 2 ], eve[ 3 ],
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
+    printf("[ERROR] %s\n", err_buf);
+#ifndef NO_DATA_CHECK_1
     string err_str = err_buf; throw (err_str);
+
     sleep(12345678);
     exit(-1);
 #endif //NO_DATA_CHECK
@@ -845,12 +848,15 @@ unsigned int RawCOPPER::GetB2LHeaderWord(int n, int finesse_buffer_pos)
 
 
   if (err_flag == 1) {
-#ifndef NO_DATA_CHECK
+
     char err_buf[500];
     sprintf(err_buf, "Different event number over HSLBs : slot A 0x%x : B 0x%x :C 0x%x : D 0x%x\n %s %s %d\n",
             word[ 0 ], word[ 1 ], word[ 2 ], word[ 3 ],
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
+    printf("[ERROR] %s\n", err_buf);
+#ifndef NO_DATA_CHECK
     string err_str = err_buf; throw (err_str);
+
     sleep(12345678);
     exit(-1);
 #endif
@@ -1032,7 +1038,7 @@ unsigned int RawCOPPER::FillTopBlockRawHeader(unsigned int m_node_id, unsigned i
   // Data check ( magic word, event incrementation )
   //
   //////////////////////////////////////////////////
-#ifndef NO_DATA_CHECK
+
 
   //
   // check magic words
@@ -1057,9 +1063,13 @@ unsigned int RawCOPPER::FillTopBlockRawHeader(unsigned int m_node_id, unsigned i
             GetMagicFPGATrailer(0),
             GetMagicDriverTrailer(0),
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
+    printf("[ERROR] %s\n", err_buf);
+#ifndef NO_DATA_CHECK
     string err_str = err_buf; throw (err_str);
+
     sleep(12345678);
     exit(-1);
+#endif
   }
 
   //
@@ -1073,17 +1083,20 @@ unsigned int RawCOPPER::FillTopBlockRawHeader(unsigned int m_node_id, unsigned i
     char err_buf[500];
     sprintf(err_buf, "Invalid event_number. Exiting...: cur 32bit eve %u preveve %u\n %s %s %d\n",  cur_ftsw_eve32, prev_eve32,
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
+    printf("[ERROR] %s\n", err_buf);
+#ifndef NO_DATA_CHECK
     string err_str = err_buf; throw (err_str);
+
     printf("i= %d : num entries %d : Tot words %d\n", 0 , GetNumEntries(), TotalBufNwords());
     for (int j = 0; j < TotalBufNwords(); j++) {
       printf("0x%.8x ", (GetBuffer(0))[ j ]);
       if ((j % 10) == 9)printf("\n");
       fflush(stdout);
     }
-
     exit(-1);
-  }
 #endif
+  }
+
 
   return cur_ftsw_eve32;
 

@@ -35,6 +35,8 @@ DeSerializerModule::DeSerializerModule() : Module()
   addParam("NodeName", m_nodename, "Node(subsystem) name", std::string(""));
   addParam("UseShmFlag", m_shmflag, "Use shared memory to communicate with Runcontroller", 0);
 
+  m_nodeid = m_nodeid << 12; // input value is used as slog ID in subsystemID record
+
   n_basf2evt = -1;
   m_totbytes = 0;
   m_compressionLevel = 0;

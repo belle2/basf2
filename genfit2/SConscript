@@ -8,7 +8,7 @@ from SCons.Scanner.C import CScanner
 dirs = ['core', 'fields', 'finitePlanes', 'fitters', 'GBL', 'GFRave', 'measurements', 'trackReps', 'utilities']
 
 # libraries
-env['LIBS'] = ['$ROOT_LIBS', 'RaveBase']
+env['LIBS'] = ['$ROOT_LIBS', 'RaveBase', 'geometry']
 
 # check for EVE (needed for eventDisplay)
 if env.get('HAS_TEVE', False):

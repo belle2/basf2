@@ -13,6 +13,8 @@
 #include "framework/datastore/StoreObjPtr.h"
 #include "framework/dataobjects/EventMetaData.h"
 
+#define DESY
+
 using namespace std;
 using namespace Belle2;
 
@@ -64,7 +66,9 @@ void Raw2DsModule::initialize()
   StoreArray<RawECL>::registerPersistent();
   StoreArray<RawKLM>::registerPersistent();
   StoreArray<RawFTSW>::registerPersistent();
-
+#ifdef DESY
+  //  StoreArray<RawTLU>::registerPersistent();
+#endif
   // Read the first event in RingBuffer and restore in DataStore.
   // This is necessary to create object tables before TTree initialization
   // if used together with SimpleOutput.
@@ -115,42 +119,44 @@ void Raw2DsModule::registerRawCOPPERs()
   int* bufbody = evtbuf + SendHeader::SENDHDR_NWORDS;
 
   // Unpack buffer
-  //  RawDataBlock tempcpr;
-  RawCOPPER tempcpr;
-  tempcpr.SetBuffer(bufbody, nwords, false, npackedevts, ncprs);
+  RawDataBlock tempdblk;
+  //  RawCOPPER tempdblk;
+  tempdblk.SetBuffer(bufbody, nwords, false, npackedevts, ncprs);
 
   // Store data contents in Corresponding RawXXXX
   for (int cprid = 0; cprid < ncprs; cprid++) {
     // Pick up one COPPER and copy data in a temporary buffer
-    int nwds_buf = tempcpr.GetBlockNwords(cprid);
+    int nwds_buf = tempdblk.GetBlockNwords(cprid);
     int* cprbuf = new int[nwds_buf];
-    memcpy(cprbuf, tempcpr.GetBuffer(cprid), nwds_buf * 4);
+    memcpy(cprbuf, tempdblk.GetBuffer(cprid), nwds_buf * 4);
     // Get subsys id
     // Check FTSW
-    if (tempcpr.CheckFTSWID(cprid)) {
+    if (tempdblk.CheckFTSWID(cprid)) {
       StoreArray<RawFTSW> ary;
       (ary.appendNew())->SetBuffer(cprbuf, nwds_buf, 1, 1, 1);
       continue;
     }
-    int subsysid = ((RawCOPPER&)tempcpr).GetSubsysId(cprid);
-    subsysid = (subsysid & 0xff000000) >> 24;
+    int subsysid = ((RawCOPPER&)tempdblk).GetSubsysId(cprid);
+    //    subsysid = (subsysid & 0xff000000) >> 24;
+    //    printf("#################%.8x\n", subsysid);
+
     // Switch to each detector and register RawXXX
-    if (subsysid == CDC_ID) {
+    if ((subsysid & DETECTOR_MASK) == CDC_ID) {
       StoreArray<RawCDC> ary;
       (ary.appendNew())->SetBuffer(cprbuf, nwds_buf, 1, 1, 1);
-    } else if (subsysid == SVD_ID) {
+    } else if ((subsysid & DETECTOR_MASK) == SVD_ID) {
       StoreArray<RawSVD> ary;
       (ary.appendNew())->SetBuffer(cprbuf, nwds_buf, 1, 1, 1);
-    } else if (subsysid == ECL_ID) {
+    } else if ((subsysid & DETECTOR_MASK) == ECL_ID) {
       StoreArray<RawECL> ary;
       (ary.appendNew())->SetBuffer(cprbuf, nwds_buf, 1, 1, 1);
-    } else if (subsysid == BPID_ID) {
+    } else if ((subsysid & DETECTOR_MASK) == BPID_ID) {
       StoreArray<RawBPID> ary;
       (ary.appendNew())->SetBuffer(cprbuf, nwds_buf, 1, 1, 1);
-    } else if (subsysid == EPID_ID) {
+    } else if ((subsysid & DETECTOR_MASK) == EPID_ID) {
       StoreArray<RawEPID> ary;
       (ary.appendNew())->SetBuffer(cprbuf, nwds_buf, 1, 1, 1);
-    } else if (subsysid == KLM_ID) {
+    } else if ((subsysid & DETECTOR_MASK) == KLM_ID) {
       StoreArray<RawKLM> ary;
       (ary.appendNew())->SetBuffer(cprbuf, nwds_buf, 1, 1, 1);
     } else {
@@ -162,9 +168,11 @@ void Raw2DsModule::registerRawCOPPERs()
 
   StoreObjPtr<EventMetaData> evtmetadata;
   evtmetadata.create();
-  evtmetadata->setExperiment(tempcpr.GetExpNo(0));
-  evtmetadata->setRun(tempcpr.GetRunNo(0));
-  evtmetadata->setEvent(tempcpr.GetEveNo(0));
+  evtmetadata->setExperiment(sndhdr.GetExpNum());
+  evtmetadata->setRun(sndhdr.GetRunNum());
+  evtmetadata->setEvent(sndhdr.GetEventNumber());
+  //  printf ( "ExpNo = %d, RunNo = %d, EvtNo = %d\n", sndhdr.GetExpNum(),
+  //       sndhdr.GetRunNum(), sndhdr.GetEventNumber() );
   m_nevt++;
   delete[] evtbuf;
 

@@ -192,7 +192,6 @@ void SerializerModule::fillSendHeaderTrailer(SendHeader* hdr, SendTrailer* trl,
       hdr->SetEventNumber(rawhdr.GetEveNo());
       hdr->SetNodeID(rawhdr.GetSubsysId());
       hdr->SetExpRunWord(rawhdr.GetExpRunNumberWord());
-
       break;
     }
 
@@ -426,7 +425,6 @@ void SerializerModule::Accept()
 
 //   int flag = 1;
 //   ret = setsockopt(fd_accept, IPPROTO_TCP, TCP_NODELAY, (char*)&flag, sizeof(flag) );
-
   m_socket = fd_accept;
 
 #else
@@ -434,8 +432,6 @@ void SerializerModule::Accept()
   m_recv.push_back(new EvtSocketRecv(m_base_port + i));
   m_socket.push_back(m_recv[ i ]->socket()->sender());
 #endif
-
-
   return;
 
 }
@@ -472,17 +468,14 @@ void SerializerModule::event()
   if (m_start_flag == 0) {
     m_start_time = getTimeSec();
     n_basf2evt = 0;
-    m_start_flag = 1;
+
   }
 
 #ifdef TIME_MONITOR
-
   recordTime(n_basf2evt, time_array0);
 #endif
-
   //  StoreArray<RawCOPPER> rawcprarray;
   StoreArray<RawDataBlock> raw_dblkarray;
-
 
   for (int j = 0; j < raw_dblkarray.getEntries(); j++) {
     //    int* buf;
@@ -506,22 +499,22 @@ void SerializerModule::event()
     // Send data
     //
 #ifndef NOT_SEND
-
+    if (m_start_flag == 0) {
+      B2INFO("SerializerPC: Sending the 1st packet...");
+    }
 #ifdef NOT_USE_SOCKETLIB
-
     m_totbytes += sendByWriteV(raw_dblkarray[ j ]);
-
 #else //NOT_USE_SOCKETLIB
     // Use basf2 send library
     m_sock->send_buffer(m_size_byte, (char*)buf);
-
 #endif //NOT_USE_SOCKETLIB
+    if (m_start_flag == 0) {
+      B2INFO("Done. ");
+      m_start_flag = 1;
+    }
 
     // Not send data
-
 #endif //NOT_SEND
-
-
   }
 
 #ifdef TIME_MONITOR
@@ -540,8 +533,6 @@ void SerializerModule::event()
       double multieve = (1. / interval);
       if (multieve > 2.) multieve = 2.;
     }
-
-
     time_t timer;
     struct tm* t_st;
     time(&timer);
@@ -553,8 +544,5 @@ void SerializerModule::event()
     m_prev_totbytes = m_totbytes;
     m_prev_nevt = n_basf2evt;
   }
-
-
   n_basf2evt++;
-
 }

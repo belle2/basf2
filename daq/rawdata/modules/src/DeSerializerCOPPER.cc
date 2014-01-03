@@ -448,26 +448,19 @@ int DeSerializerCOPPERModule::readFD(int fd, char* buf, int data_size_byte)
 
 void DeSerializerCOPPERModule::event()
 {
-
-
   if (m_start_flag == 0) {
-    B2INFO("DeSerializerCOPPER: event() started.");
     // Use shared memory to start(for HSLB dummy data)
-
     //
     // for DESY test
     //
     m_nodeid = SVD_ID | m_nodeid  ;
-
     if (m_shmflag > 0 && m_status.isStopped()) {
-      printf("Waiting for Start...\n");
-      fflush(stdout);
+      B2INFO("DeSerializerCOPPER: Waiting for Start...");
       m_status.waitStarted();
       m_status.reportRunning();
     }
     m_start_time = getTimeSec();
     n_basf2evt = 0;
-    m_start_flag = 1;
   }
 
   //  rawcprarray.create();
@@ -477,7 +470,14 @@ void DeSerializerCOPPERModule::event()
   for (int j = 0; j < NUM_EVT_PER_BASF2LOOP_COPPER; j++) {
     int m_size_word = 0;
     int malloc_flag = 0;
+    if (m_start_flag == 0) {
+      B2INFO("DeSerializerCOPPER: Reading the 1st event from COPPER FIFO...");
+    }
     int* temp_buf = readOneEventFromCOPPERFIFO(j, &malloc_flag, &m_size_word);
+    if (m_start_flag == 0) {
+      B2INFO("DeSerializerCOPPER: Done. the size of the 1st event is " << m_size_word << "words");
+      m_start_flag = 1;
+    }
 
     const int num_nodes = 1;
     const int num_events = 1;
@@ -486,6 +486,8 @@ void DeSerializerCOPPERModule::event()
     // Fill Header and Trailer
     RawCOPPER temp_rawcopper;
     temp_rawcopper.SetBuffer(temp_buf, m_size_word, 0, num_events, num_nodes);
+
+
 
     // Fill header and trailer
     try {

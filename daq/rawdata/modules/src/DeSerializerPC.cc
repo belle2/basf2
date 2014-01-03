@@ -228,6 +228,12 @@ int* DeSerializerPCModule::recvData(int* malloc_flag, int* total_buf_nwords, int
     temp_num_events = send_hdr.GetNumEventsinPacket();
     temp_num_nodes = send_hdr.GetNumNodesinPacket();
 
+    printf("######## SENDHDR ###############\n");
+    for (int j = 0; j < SendHeader::SENDHDR_NWORDS; j++) {
+      printf("%.8x ", send_hdr_buf[ j ]);
+    }
+    printf("\n");
+
 
     if (i == 0) {
       *num_events_in_sendblock = temp_num_events;
@@ -354,15 +360,13 @@ void DeSerializerPCModule::event()
     // Accept requests for connections
     Connect();
     if (m_shmflag > 0 && m_status.isStopped()) {
-      printf("Waiting for Start...\n");
-      fflush(stdout);
+      B2INFO("DeSerializerPC: Waiting for Start...\n");
       m_status.waitStarted();
       m_status.reportRunning();
     }
-    B2INFO("DeSerializerPC: event() started.");
     m_start_time = getTimeSec();
     n_basf2evt = 0;
-    m_start_flag = 1;
+
   }
 
   // Make rawdatablk array
@@ -390,7 +394,16 @@ void DeSerializerPCModule::event()
     int malloc_flag = 0;
     int num_events_in_sendblock = 0;
     int num_nodes_in_sendblock = 0;
+
+
+    if (m_start_flag == 0) {
+      B2INFO("DeSerializerPC: Reading the 1st packet from eb0...");
+    }
     int* temp_buf = recvData(&malloc_flag, &total_buf_nwords, &num_events_in_sendblock, &num_nodes_in_sendblock);
+    if (m_start_flag == 0) {
+      B2INFO("DeSerializerPC: Done. the size of the 1st packet " << total_buf_nwords << " words");
+      m_start_flag = 1;
+    }
     m_totbytes += total_buf_nwords * sizeof(int);
 
     //

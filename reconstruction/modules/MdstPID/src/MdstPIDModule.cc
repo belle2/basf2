@@ -21,6 +21,7 @@
 #include <arich/dataobjects/ARICHLikelihood.h>
 #include <reconstruction/dataobjects/DedxLikelihood.h>
 #include <tracking/dataobjects/Track.h>
+#include <tracking/dataobjects/Muid.h>
 
 // framework aux
 #include <framework/logging/Logger.h>
@@ -100,6 +101,10 @@ namespace Belle2 {
       const DedxLikelihood* dedx = track->getRelatedTo<DedxLikelihood>();
       if (dedx) setLikelihoods(dedx);
 
+      // set klm likelihoods
+      const Muid* muid = track->getRelatedTo<Muid>();
+      if (muid) setLikelihoods(muid);
+
     }
 
   }
@@ -143,6 +148,35 @@ namespace Belle2 {
   }
 
 
+  void MdstPIDModule::setLikelihoods(const Muid* muid)
+  {
+
+    /* Muid function that returns PDG code is missing!
+    if( abs(muid->getPDGCode()) != abs(Const::muon.getPDGCode()) ) {
+    B2WARNING("MdstPID, Muid: extrapolation with other than muon hypothesis ignored");
+      return;
+    }
+    */
+
+    if (muid->getOutcome() == 0) return; // muon can't reach KLM
+
+    const float minLog = -120.0;
+
+    if (muid->getJunkPDFValue() == 0) { // not an electron
+      float logL_mu = (muid->getMuonPDFValue() > 0.0 ? log(muid->getMuonPDFValue()) : minLog);
+      float logL_pi = (muid->getPionPDFValue() > 0.0 ? log(muid->getPionPDFValue()) : minLog);
+      float logL_K  = (muid->getKaonPDFValue() > 0.0 ? log(muid->getKaonPDFValue()) : minLog);
+      float logL_p = logL_K;
+      m_pid->setLogLikelihood(Const::KLM, Const::electron, minLog);
+      m_pid->setLogLikelihood(Const::KLM, Const::muon, logL_mu);
+      m_pid->setLogLikelihood(Const::KLM, Const::pion, logL_pi);
+      m_pid->setLogLikelihood(Const::KLM, Const::kaon, logL_K);
+      m_pid->setLogLikelihood(Const::KLM, Const::proton, logL_p);
+    } else { // not a muon
+      m_pid->setLogLikelihood(Const::KLM, Const::muon, minLog);
+    }
+
+  }
 
 
 } // Belle2 namespace

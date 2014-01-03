@@ -20,6 +20,7 @@ namespace Belle2 {
   class TOPLikelihood;
   class ARICHLikelihood;
   class DedxLikelihood;
+  class Muid;
 
   /**
    * a module to fill PIDLikelihoods
@@ -90,6 +91,12 @@ namespace Belle2 {
      * @param logl DedxLikelihood pointer
      */
     void setLikelihoods(const DedxLikelihood* logl);
+
+    /**
+     * Set KLM likelihoods and corresponding reconstruction flag
+     * @param muid Muid pointer
+     */
+    void setLikelihoods(const Muid* muid);
 
     PIDLikelihood* m_pid; /**< pointer to the object to be filled */
 

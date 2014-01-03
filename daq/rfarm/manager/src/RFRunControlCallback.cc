@@ -71,3 +71,11 @@ bool RFRunControlCallback::recover() throw()
   return true;
 }
 
+bool RFRunControlCallback::abort() throw()
+{
+  Belle2::debug("ABORT");
+  NSMcontext* nsmc =  _callback->getCommunicator()->getContext();
+  b2nsm_context(nsmc);
+  return true;
+}
+

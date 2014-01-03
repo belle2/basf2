@@ -21,6 +21,7 @@ namespace Belle2 {
     virtual bool start() throw();
     virtual bool stop() throw();
     virtual bool recover() throw();
+    virtual bool abort() throw();
 
   private:
     RFMaster* _master;

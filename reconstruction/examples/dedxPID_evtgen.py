@@ -20,7 +20,7 @@ eventinfoprinter = register_module('EventInfoPrinter')
 # create geometry
 gearbox = register_module('Gearbox')
 geometry = register_module('Geometry')
-geometry.param('ExcludedComponents', ['EKLM'])
+geometry.param('excludedComponents', ['EKLM'])
 
 # EvtGen to provide generic BB events
 evtgeninput = register_module('EvtGenInput')

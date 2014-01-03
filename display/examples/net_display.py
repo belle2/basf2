@@ -22,7 +22,7 @@ gearbox = register_module('Gearbox')
 geometry = register_module('Geometry')
 # Since Geometry is only required for track extrapolation in inner detectors,
 # we'll exclude ECL (saves about 10s in startup time)
-geometry.param('ExcludedComponents', ['ECL'])
+geometry.param('excludedComponents', ['ECL'])
 
 
 # create paths

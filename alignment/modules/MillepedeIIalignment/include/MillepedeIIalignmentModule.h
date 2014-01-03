@@ -67,7 +67,8 @@ namespace Belle2 {
     void readResWriteXml(const string& xml_filename, int type = 0);
 
 
-    time_t MP2startTime; /*< MP2 start time **/
+    // time_t MP2startTime; /**< MP2 start time */
+
     /** struct to hold constraint trafos */
     struct constraintData {
       unsigned int vxdId; /**< vxd id of the sensor */

@@ -49,7 +49,7 @@ void MillepedeIIalignmentModule::endRun()
 bool MillepedeIIalignmentModule::MillepedeIIalignmentExecutePede()
 {
   bool ok(true);
-
+  ofstream positions("sensor_positions.txt");
   // Write constraints file based on current geometry
   VXD::GeoCache& geo = VXD::GeoCache::getInstance();
   // Find all sensors and create a matrix of tranformation from local to global
@@ -60,6 +60,16 @@ bool MillepedeIIalignmentModule::MillepedeIIalignmentExecutePede()
         TMatrixD rotationT(3, 3);
         TMatrixD offset(3, 3);
         TVector3 detPos = geo.get(id).pointToGlobal(TVector3(0., 0., 0.));
+        positions << (unsigned int) id << ": x = " << detPos[0] << " y = " << detPos[1] << " z = " << detPos[2] << endl;
+
+        const double* trans = geo.get(id).getTransformation().GetRotationMatrix();
+        TMatrixD R(3, 3);
+        for (int i = 0; i < 3; i++) {
+          for (int j = 0; j < 3; j++) {
+            R(i, j) = trans[i + j];
+          }
+        }
+        R.Print();
         double xDet = detPos[0];
         double yDet = detPos[1];
         double zDet = detPos[2];
@@ -168,7 +178,7 @@ bool MillepedeIIalignmentModule::MillepedeIIalignmentExecutePede()
   */
   std::cout << "Starting Millepede II Alignment..." << std::endl;
   // store start time of processing
-  time(&MP2startTime);
+  // time(&MP2startTime);
   // execute pede;
   std::system("pede steer.txt");
   // now open millepede.end file to see what happened (we need hiher pede version)
@@ -217,15 +227,15 @@ void MillepedeIIalignmentModule::readResWriteXml(const string& xml_filename, int
   xml << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" << endl;
   xml << "<Alignment xmlns:xi=\"http://www.w3.org/2001/XInclude\">" << endl;
   xml << "  <Millepede>" << endl;
-  xml << "    <StartTime>" << endl << "      " << ctime(&MP2startTime) << "    </StartTime>" << endl;
-
-  time_t now;
-  time(&now);
-
-  xml << "    <EndTime>" << endl << "      " << ctime(&now) << "    </EndTime>" << endl;
-  xml << "    <ExitCode>N/A</ExitCode>" << endl;
-  xml << "    <ExitMessage>Not supported in this version of Millepede</ExitMessage>" << endl;
-  xml << "  </Millepede>" << endl;
+  // xml << "    <StartTime>" << endl << "      " << ctime(&MP2startTime) << "    </StartTime>" << endl;
+  //
+  // time_t now;
+  // time(&now);
+  //
+  // xml << "    <EndTime>" << endl << "      " << ctime(&now) << "    </EndTime>" << endl;
+  // xml << "    <ExitCode>N/A</ExitCode>" << endl;
+  // xml << "    <ExitMessage>Not supported in this version of Millepede</ExitMessage>" << endl;
+  // xml << "  </Millepede>" << endl;
   if (type == 2) xml << "<!-- WARNING: Generated IDEAL alignment. All params zero. -->" << endl;
   if (type == 1) xml << "<!-- WARNING: Randomly generated MISALIGNMENT. -->" << endl;
   unsigned int lastSensor = 0;

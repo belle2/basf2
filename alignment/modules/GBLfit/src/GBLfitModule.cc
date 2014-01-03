@@ -247,11 +247,11 @@ void GBLfitModule::event()
   B2DEBUG(149, "GBLfit: Number of SVDClusters: " << nSVDClusters);
   if (nSVDClusters == 0) {B2DEBUG(100, "GBLfit: SVDClustersCollection is empty!");}
 
-  if (m_filterId == 0) {
-    B2DEBUG(99, "Kalman filter with " << m_nMinIter << " to " << m_nMaxIter << " iterations will be used ");
-  } else {
-    B2DEBUG(99, "DAF with probability cut " << m_probCut << " will be used ");
-  }
+//  if (m_filterId == 0) {
+//    B2DEBUG(99, "Kalman filter with " << m_nMinIter << " to " << m_nMaxIter << " iterations will be used ");
+//  } else {
+//    B2DEBUG(99, "DAF with probability cut " << m_probCut << " will be used ");
+//  }
 
 
   //StoreArrays to store the fit results
@@ -382,8 +382,8 @@ void GBLfitModule::event()
 
       genfit::Track gfTrack(*aTrackCandPointer, factory, trackRep); //create the track with the corresponding track representation
 
-      const int nHitsInTrack = gfTrack.getNumPointsWithMeasurement();
-      B2DEBUG(99, "Total Nr of Hits assigned to the Track: " << nHitsInTrack);
+//      const int nHitsInTrack = gfTrack.getNumPointsWithMeasurement();
+//      B2DEBUG(99, "Total Nr of Hits assigned to the Track: " << nHitsInTrack);
 
 
       //Check which hits are contributing to the track
@@ -462,9 +462,12 @@ void GBLfitModule::event()
 
         //gfTrack.Print();
         bool fitSuccess = gfTrack.hasFitStatus(trackRep);
-        genfit::FitStatus* fs = 0;
-        genfit::KalmanFitStatus* kfs = 0;
+        // genfit::FitStatus* fs = 0;
+        // genfit::KalmanFitStatus* kfs = 0;
         if (fitSuccess) {
+          genfit::FitStatus* fs = 0;
+          genfit::KalmanFitStatus* kfs = 0;
+
           fs = gfTrack.getFitStatus(trackRep);
           fitSuccess = fitSuccess && fs->isFitted();
           fitSuccess = fitSuccess && fs->isFitConverged();
@@ -478,14 +481,14 @@ void GBLfitModule::event()
         B2DEBUG(99, "-----> Fit results:");
         B2DEBUG(99, "       Fitted and converged: " << fitSuccess);
         //hSuccess->Fill(fitSuccess);
-        if (fitSuccess) {
-          B2DEBUG(99, "       Chi2 of the fit: " << kfs->getChi2());
-          //B2DEBUG(99,"       Forward Chi2: "<<gfTrack.getForwardChi2());
-          B2DEBUG(99, "       NDF of the fit: " << kfs->getBackwardNdf());
-          //Calculate probability
-          double pValue = gfTrack.getFitStatus()->getPVal();
-          B2DEBUG(99, "       pValue of the fit: " << pValue);
-        }
+        // if (fitSuccess) {
+        //  B2DEBUG(99, "       Chi2 of the fit: " << kfs->getChi2());
+        //  //B2DEBUG(99,"       Forward Chi2: "<<gfTrack.getForwardChi2());
+        //  B2DEBUG(99, "       NDF of the fit: " << kfs->getBackwardNdf());
+        //  //Calculate probability
+        //  // double pValue = gfTrack.getFitStatus()->getPVal();
+        //  B2DEBUG(99, "       pValue of the fit: " << pValue);
+        // }
         //B2DEBUG(99,"       Covariance matrix: ");
         //gfTrack.getTrackRep(0)->getCov().Print();
 
@@ -628,17 +631,17 @@ void GBLfitModule::event()
 //              tracks[trackCounter]->setErrorMatrix(resultCovariance);
 
             //store position errors
-            double xErr = sqrt(cov(0, 0));
-            double yErr = sqrt(cov(1, 1));
-            double zErr = sqrt(cov(2, 2));
-            B2DEBUG(99, "Position standard deviation: " << xErr << "  " << yErr << "  " << zErr);
+//            double xErr = sqrt(cov(0, 0));
+//            double yErr = sqrt(cov(1, 1));
+//            double zErr = sqrt(cov(2, 2));
+//            B2DEBUG(99, "Position standard deviation: " << xErr << "  " << yErr << "  " << zErr);
 //              tracks[trackCounter]->setVertexErrors(xErr, yErr, zErr);
 
             //store momentum errors
-            double pxErr = sqrt(cov(3, 3));
-            double pyErr = sqrt(cov(4, 4));
-            double pzErr = sqrt(cov(5, 5));
-            B2DEBUG(99, "Momentum standard deviation: " << pxErr << "  " << pyErr << "  " << pzErr);
+//            double pxErr = sqrt(cov(3, 3));
+//            double pyErr = sqrt(cov(4, 4));
+//            double pzErr = sqrt(cov(5, 5));
+//            B2DEBUG(99, "Momentum standard deviation: " << pxErr << "  " << pyErr << "  " << pzErr);
 //              tracks[trackCounter]->setPErrors(pxErr, pyErr, pzErr);
 
 

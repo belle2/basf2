@@ -55,45 +55,83 @@ namespace Belle2 {
     void SetRunNo(int run_no);
 
     void SetEveNo(unsigned int eve_no);    //! set contents of header
+
     void SetSubsysId(int subsys_id);    //! set contents of header
+
     void SetDataType(int data_type);    //! set contents of header
+
     void SetTruncMask(int trunc_mask);    //! set contents of header
+
     void SetB2LFEEHdrPart(unsigned int word1, unsigned int word2);   //! set contents of header
 
     void SetFTSW2Words(int* ftsw_buf);
+
     void SetFTSW2Words(unsigned int word1, unsigned int word2);
+
     void SetExpRunNumber(int* exprun_buf);
 
     void SetOffset1stFINESSE(int offset_1st_FINESSE);    //! set contents of header
+
     void SetOffset2ndFINESSE(int offset_2nd_FINESSE);    //! set contents of header
+
     void SetOffset3rdFINESSE(int offset_3rd_FINESSE);    //! set contents of header
+
     void SetOffset4thFINESSE(int offset_4th_FINESSE);    //! set contents of header
+
     void SetMagicWordEntireHeader(); //! set magic words;
 
     int AddNodeInfo(int node_id);
 
     int GetNwords();  //! get contents of header
+
     int GetHdrNwords();  //! get contents of header
+
     unsigned int GetExpRunNumberWord(); //! get a run/exp number combined word
+
     int GetExpNo();  //! get contents of header
-    int GetRunNo();  //! get contents of header
+
+    int GetRunNoRestartNo();    //! run# (14bit) restart # (8bit)
+
+    int GetRunNo();    //! get run # (14bit)
+
+    int GetRestartNo();    //! get restart #(8bit)
+
     unsigned int GetEveNo();  //! get contents of header
+
     int GetSubsysId();  //! get contents of header
+
     int GetDataType();  //! get contents of header
+
     int GetTruncMask();  //! get contents of header
 
     int GetOffset1stFINESSE();  //! get contents of header
+
     int GetOffset2ndFINESSE();  //! get contents of header
+
     int GetOffset3rdFINESSE();  //! get contents of header
+
     int GetOffset4thFINESSE();  //! get contents of header
+
     int GetNumNodes();  //! get contents of header
+
     int GetNodeInfo(int node_no, int* node_id);    //! get contents of header
+
     unsigned int GetMagicWordEntireHeader();
+
+    /*
+      Experimental(10bit) #, Run#(14bit), restat# bit mask(8bit)
+    */
+    enum {
+      EXP_MASK = 0xFFC00000,
+      EXP_SHIFT = 22,
+      RUNNO_MASK = 0x003FFF00,
+      RUNNO_SHIFT = 8,
+      RESTARTNO_MASK = 0x000000FF
+    };
 
     enum {
       RAWHEADER_NWORDS = 20
     };
-
 
     /* Data Format : Fixed length part*/
     enum {
@@ -295,7 +333,28 @@ namespace Belle2 {
   inline int RawHeader::GetExpNo()
   {
     CheckGetBuffer();
-    return ((m_buffer[ POS_EXP_RUN_NO ] >> 22) & 0x000003FF);
+    return (((unsigned int)(m_buffer[ POS_EXP_RUN_NO ]) & EXP_MASK)
+            >> EXP_SHIFT);
+  }
+
+  inline int RawHeader::GetRunNoRestartNo()
+  {
+    CheckGetBuffer();
+    return ((unsigned int)(m_buffer[ POS_EXP_RUN_NO ]) &
+            (RUNNO_MASK | RESTARTNO_MASK));
+  }
+
+  inline int RawHeader::GetRunNo()
+  {
+    CheckGetBuffer();
+    return (((unsigned int)(m_buffer[ POS_EXP_RUN_NO ]) & RUNNO_MASK)
+            >> RUNNO_SHIFT);
+  }
+
+  inline int RawHeader::GetRestartNo()
+  {
+    CheckGetBuffer();
+    return (m_buffer[ POS_EXP_RUN_NO ] & RESTARTNO_MASK);
   }
 
   inline unsigned int RawHeader::GetExpRunNumberWord()
@@ -304,11 +363,6 @@ namespace Belle2 {
     return ((unsigned int)(m_buffer[ POS_EXP_RUN_NO ]));
   }
 
-  inline int RawHeader::GetRunNo()
-  {
-    CheckGetBuffer();
-    return (m_buffer[ POS_EXP_RUN_NO ]  & 0x003FFFFF);
-  }
 
   inline unsigned int RawHeader::GetEveNo()
   {

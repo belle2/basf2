@@ -116,7 +116,11 @@ namespace Belle2 {
     //
     int GetExpNo(int n);    //! get contents of header
 
-    int GetRunNo(int n);    //! get contents of header
+    int GetRunNoRestartNo(int n);    //! run# (14bit) restart # (8bit)
+
+    int GetRunNo(int n);    //! get run # (14bit)
+
+    int GetRestartNo(int n);    //! get restart #(8bit)
 
     unsigned int GetEveNo(int n);    //! get contents of header
 
@@ -387,6 +391,21 @@ namespace Belle2 {
     RawHeader hdr;
     hdr.SetBuffer(GetBuffer(n));
     return hdr.GetRunNo();
+  }
+
+
+  inline int RawCOPPER::GetRestartNo(int n)
+  {
+    RawHeader hdr;
+    hdr.SetBuffer(GetBuffer(n));
+    return hdr.GetRestartNo();
+  }
+
+  inline int RawCOPPER::GetRunNoRestartNo(int n)
+  {
+    RawHeader hdr;
+    hdr.SetBuffer(GetBuffer(n));
+    return hdr.GetRunNoRestartNo();
   }
 
   inline unsigned int RawCOPPER::GetEveNo(int n)

@@ -48,12 +48,6 @@ namespace Belle2 {
     //! set contents of header
     void SetNwords(int nwords);
 
-    //! set contents of header
-    void SetExpNo(int exp_no);
-
-    //! set contents of header
-    void SetRunNo(int run_no);
-
     void SetEveNo(unsigned int eve_no);    //! set contents of header
 
     void SetSubsysId(int subsys_id);    //! set contents of header
@@ -220,18 +214,6 @@ namespace Belle2 {
     CheckSetBuffer();
     m_buffer[ POS_NWORDS ] = nwords;
 
-  }
-
-  inline void RawHeader::SetExpNo(int exp_no)
-  {
-    CheckSetBuffer();
-    m_buffer[ POS_EXP_RUN_NO ] = (m_buffer[ POS_EXP_RUN_NO ] & 0x003FFFFF) | ((exp_no << 22) & 0xFFC00000);
-  }
-
-  inline void RawHeader::SetRunNo(int run_no)
-  {
-    CheckSetBuffer();
-    m_buffer[ POS_EXP_RUN_NO ] = (m_buffer[ POS_EXP_RUN_NO ] & 0xFFC00000) | (run_no & 0x003FFFFF);
   }
 
   inline void RawHeader::SetEveNo(unsigned int eve_no)

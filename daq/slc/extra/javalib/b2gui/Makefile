@@ -35,11 +35,11 @@ LIB_OBJS = $(patsubst $(SRCDIR)/%.java, $(OUTDIR)/%.class, $(LIB_SRCS))
 
 all : $(LIB_OBJS)
 	@ echo "<< compiling $(MAIN) >>"
-	@ if [ ! -d $(OUTDIR) ];then mkdir $(OUTDIR); fi
+	@ mkdir -p $(OUTDIR)
 	@ $(JCC) $(JFLAG) $(MAIN)
 	@ $(CP) $(SRCDIR)/b2gui/java/*.png $(OUTDIR)/b2gui/java/
 	@ echo '<< creating jar file $(JAREXE) >>'
-	@ if [ ! -d $(JARDIR) ];then mkdir $(JARDIR); fi
+	@ mkdir -p $(JARDIR)
 	@ $(JAR) cfm $(JAREXE) $(MANIFEST) -C $(OUTDIR) $(TARGET)
 	@ $(JAR) uf $(JAREXE) -C $(OUTDIR) com
 	@ $(JAR) uf $(JAREXE) -C $(B2JAVA_PATH)/b2daq/classes b2daq
@@ -50,7 +50,7 @@ all : $(LIB_OBJS)
 
 $(LIB_OBJS) : $(OUTDIR)/%.class: $(SRCDIR)/%.java
 	@ echo '<< compiling $@ >>'
-	@ if [ ! -d $(OUTDIR) ];then mkdir $(OUTDIR); fi
+	@ mkdir -p $(OUTDIR)
 	@ $(JCC) $(JFLAG) $<
 
 clean:

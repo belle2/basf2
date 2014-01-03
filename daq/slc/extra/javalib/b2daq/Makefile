@@ -28,11 +28,11 @@ all : $(OBJS)
 
 jar : 
 	@ echo '<< creating jar file $@ >>'
-	@ if [ ! -d $(JARDIR) ];then mkdir $(JARDIR); fi
+	@ mkdir -p $(JARDIR)
 
 $(OBJS) : $(OUTDIR)/%.class: $(SRCDIR)/%.java
 	@ echo '<< compiling $@ >>'
-	@ if [ ! -d $(OUTDIR) ];then mkdir $(OUTDIR); fi
+	@ mkdir -p $(OUTDIR)
 	@ $(JCC) $(JFLAG) $<
 
 clean:

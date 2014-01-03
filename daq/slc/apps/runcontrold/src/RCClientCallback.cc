@@ -75,7 +75,7 @@ bool RCClientCallback::error() throw()
   bool result = (comm != NULL) ? comm->sendMessage(msg) : true;
   _master->signal();
   _master->unlock();
-  Belle2::debug("%s:%d error()", __FILE__, __LINE__);
+  Belle2::debug("ERROR from %s ()", node->getName().c_str(), nsm.getData().c_str());
   return result;
 }
 

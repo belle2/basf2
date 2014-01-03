@@ -1,0 +1,9 @@
+#!/bin/bash
+
+label=`date +%Y-%m-%d-%H-%M`
+
+source ~/belle2/release/daq/slc/extra/bin/setup.sh ~/belle2 release global
+mkdir -p  ~/run/storagerd/${HOSTNAME}
+killall storagerd
+storagerd DSR &> ~/run/storagerd/${HOSTNAME}/${label}.log &
+

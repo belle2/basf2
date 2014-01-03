@@ -208,3 +208,15 @@ bool RCMasterCallback::abort() throw()
   return distribute(Command::ABORT, 0, 0, 0);
 }
 
+bool RCMasterCallback::pause() throw()
+{
+  Belle2::debug("PAUSE");
+  return distribute(Command::PAUSE, 0, 0, 0);
+}
+
+bool RCMasterCallback::resume() throw()
+{
+  Belle2::debug("RESUME");
+  return distribute(Command::RESUME, 0, 0, 0);
+}
+

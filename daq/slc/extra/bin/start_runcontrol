@@ -2,8 +2,11 @@
 
 label=`date +%Y-%m-%d-%H-%M`
 
-source ${BELLE2_LOCAL_DIR}/daq/slc/extra/bin/nsm2_global.sh
+source ~/belle2/release/daq/slc/extra/bin/setup.sh ~/belle2 release global
 mkdir -p  ~/run/runcontrold/runcontrol/${HOSTNAME}
-kill `ps aux | grep "runcontrold runcontrol" | grep -v grep | awk '{print $2}'`
-runcontrold runcontrol &> ~/run/runcontrold/runcontrol/${HOSTNAME}/${label}.log &
+killall runcontrold
+#kill `ps aux | grep "runcontrold runcontrol" | grep -v grep | awk '{print $2}'`
+runcontrold svd &> ~/run/runcontrold/runcontrol/${HOSTNAME}/svd_${label}.log &
+runcontrold ttd &> ~/run/runcontrold/runcontrol/${HOSTNAME}/ttd_${label}.log &
+runcontrold runcontrol &> ~/run/runcontrold/runcontrol/${HOSTNAME}/runcontrol_${label}.log &
 

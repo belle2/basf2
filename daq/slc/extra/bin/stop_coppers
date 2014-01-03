@@ -13,12 +13,11 @@ kill `ps aux | grep "runcontrold cdc" | grep -v grep | awk '{print $2}'`
 
 source ${BELLE2_LOCAL_DIR}/daq/slc/extra/bin/nsm2_local.sh
 mkdir -p  ~/run/rocontrold/belle-rpc1
-#kill `ps aux | grep "rocontrold ROPC01" | grep -v grep | awk '{print $2}'`
-#rocontrold ROPC01 &> ~/run/rocontrold/belle-rpc1/${label}.log &
+kill `ps aux | grep "rocontrold ROPC01" | grep -v grep | awk '{print $2}'`
+rocontrold ROPC01 &> ~/run/rocontrold/belle-rpc1/${label}.log &
 kill `ps aux | grep "tempd ROPC01" | grep -v grep | awk '{print $2}'`
 
-stopBySSH cpr010 tempd CPR010 
-stopBySSH cpr011 tempd CPR011 
-stopBySSH cpr012 tempd CPR012 
-stopBySSH cpr013 tempd CPR013
+stopBySSH cpr010 cprcontrold CPR010 svd
+stopBySSH cpr011 cprcontrold CPR011 svd
+
 

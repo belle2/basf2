@@ -34,6 +34,8 @@ namespace Belle2 {
     virtual bool trigft() throw();
     virtual bool recover() throw();
     virtual bool abort() throw();
+    virtual bool pause() throw();
+    virtual bool resume() throw();
 
   private:
     RCMaster* _master;

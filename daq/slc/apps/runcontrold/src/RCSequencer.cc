@@ -49,8 +49,27 @@ void RCSequencer::run() throw()
          it != _master->getNSMNodes().end(); it++) {
       NSMNode* node = *it;
       _msg.setNode(node);
+      Command& command(_msg.getCommand());
+      State& state(node->getState());
+      if (command == Command::BOOT && state == State::INITIAL_S) {
+      } else if (command == Command::BOOT && (state == State::CONFIGURED_S ||
+                                              state == State::READY_S)) {
+        continue;
+      } else if (command == Command::LOAD && state == State::CONFIGURED_S) {
+      } else if (command == Command::LOAD && state == State::READY_S) {
+      } else if (command == Command::START && state == State::READY_S) {
+      } else if (command == Command::STOP && (state == State::RUNNING_S ||
+                                              state == State::PAUSED_S)) {
+      } else if (command == Command::PAUSE && state == State::RUNNING_S) {
+      } else if (command == Command::RESUME && state == State::PAUSED_S) {
+      } else if (command == Command::RECOVER || command == Command::ABORT) {
+      } else if (command == Command::STATECHECK) {
+      } else if (state == State::ERROR_ES) {
+      } else {
+        continue;
+      }
       _master->lock();
-      if (_msg.getCommand() == Command::LOAD &&
+      if (command == Command::LOAD &&
           num0 < 0 && node->getData() != NULL) {
         _msg.getMessage().setParam(0, node->getData()->getConfigNumber());
       }

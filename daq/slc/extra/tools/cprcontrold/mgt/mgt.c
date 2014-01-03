@@ -30,6 +30,8 @@
 #include "mgt.h"
 #include "mgt_register.h"
 #include "mgt_control.h"
+#include "mgt_svd.h"
+#include "mt19937ar.h"
 
 Mgt_t* mgt_open(int ch, int mode) {
   char *DEVICE = 0;
@@ -170,28 +172,13 @@ int mgt_check_FEE(Mgt_t* mgt) {
 }
 
 int mgt_execute(Mgt_t* mgt, int ctl_code) {
-  /*
-  int result = 1;
-  result |= mgt_write(mgt, CONTROL, 0x05);
-  result |= mgt_write(mgt, CONTROL, 0x06);
-  result |= mgt_write(mgt, FEE_CONTROL, ctl_code);
-  result |= mgt_write(mgt, CONTROL, 0x0a);
-  return result;
-  */
   return (mgt_write(mgt, CONTROL, 0x05) == 0 &&
 	  mgt_write(mgt, CONTROL, 0x06) == 0 &&
-	  mgt_write(mgt, FEE_CONTROL, ctl_code) == 0&&
+	  mgt_write(mgt, FEE_CONTROL, ctl_code) == 0 &&
 	  mgt_write(mgt, CONTROL, 0x0a) == 0);
 }
 
 int mgt_set_param(Mgt_t* mgt, int address, int value) {
-  /*
-  int result = 1;
-  result |= mgt_write(mgt, CONTROL, 0x05);
-  result |= mgt_write(mgt, address, value);
-  result |= mgt_write(mgt, CONTROL, 0x0a);
-  return result;
-  */
   return (mgt_write(mgt, CONTROL, 0x05) == 0 &&
 	  mgt_write(mgt, address, value) == 0 &&
 	  mgt_write(mgt, CONTROL, 0x0a) == 0);
@@ -200,18 +187,77 @@ int mgt_set_param(Mgt_t* mgt, int address, int value) {
 int mgt_set_param2(Mgt_t* mgt, int address, int value) {
   int address2 = address + 1;
   int value2 = value >> 8;
-  /*
-  int result = 1;
-  result |= mgt_write(mgt, CONTROL, 0x05);
-  result |= mgt_write(mgt, address, value);
-  result |= mgt_write(mgt, address2, value2);
-  result |= mgt_write(mgt, CONTROL, 0x0a);
-  return result;
-  */
   return (mgt_write(mgt, CONTROL, 0x05) == 0 &&
 	  mgt_write(mgt, address, value) == 0 &&
 	  mgt_write(mgt, address2, value2) == 0 &&
 	  mgt_write(mgt, CONTROL, 0x0a) == 0);
+}
+
+int mgt_set_svd_run_mode(Mgt_t* mgt, int mode) {
+  return (mgt_write(mgt, CONTROL, 0x05) == 0 &&
+	  mgt_write(mgt, RUN_MODE, mode) == 0 &&
+	  mgt_write(mgt, ADD_CFR, (mode==0)?0xcf:0x81) == 0 &&
+	  mgt_write(mgt, CONTROL, 0x0a) == 0);
+}
+
+int mgt_svd_init(Mgt_t* mgt) {
+  int index;
+  unsigned int ptr;
+  const int length=4;
+  unsigned long init[length];
+  srand((unsigned int)time(NULL));
+  for (index = 0; index < length; index++) {
+    init[index] = (unsigned long)rand();
+  }
+  init_by_array(init, length);
+
+  mgt_write(mgt, CONTROL, 0x05); //reset address fifo
+  mgt_write(mgt, CONTROL, 0x06);
+  mgt_write(mgt, MT32_CONTROL, 0x03); // assert MT32_TBL_INIT
+  mgt_write(mgt, CONTROL, 0x0a);
+  
+  for ( ptr = 0; ptr < N; ptr++) {
+    mgt_write(mgt, CONTROL, 0x05); //reset address fifo
+    mgt_write(mgt, CONTROL, 0x06);
+    mgt_write(mgt, MT32_POINTER1, (ptr>>0&0xff)); // set pointer[7:0]
+    mgt_write(mgt, MT32_POINTER2, (ptr>>8&0xff)); // set pointer[15:8]
+    mgt_write(mgt, MT32_DATA1, (mt[ptr]>> 0&0xff)); // set data[7:0]
+    mgt_write(mgt, MT32_DATA2, (mt[ptr]>> 8&0xff)); // set data[15:8]
+    mgt_write(mgt, MT32_DATA3, (mt[ptr]>>16&0xff)); // set data[23:16]
+    mgt_write(mgt, MT32_DATA4, (mt[ptr]>>24&0xff)); // set data[31:24]
+    
+    printf("write: add=%03d, data=0x %02x_%02x_%02x_%02x\n",ptr,
+	   (((unsigned int)mt[ptr])>>24&0xff),
+	   (((unsigned int)mt[ptr])>>16&0xff),
+	   (((unsigned int)mt[ptr])>> 8&0xff),
+	   (((unsigned int)mt[ptr])>> 0&0xff));
+
+    mgt_write(mgt, CONTROL, 0x05); //reset address fifo
+    mgt_write(mgt, CONTROL, 0x06);
+    mgt_write(mgt, MT32_CONTROL, 0x05); // assert MT32_TBL_WE
+    mgt_write(mgt, CONTROL, 0x0a);
+    
+    mgt_write(mgt, CONTROL, 0x05); //reset address fifo
+    mgt_write(mgt, CONTROL, 0x06);
+    mgt_write(mgt, MT32_CONTROL, 0x04); // negate MT32_TBL_WE
+    mgt_write(mgt, CONTROL, 0x0a);
+  }
+
+  mgt_write(mgt, CONTROL, 0x05); //reset address fifo
+  mgt_write(mgt, CONTROL, 0x06);
+  mgt_write(mgt, MT32_CONTROL, 0x02); // negate MT32_TBL_INIT
+  mgt_write(mgt, CONTROL, 0x0a);
+
+  mgt_write(mgt, CONTROL, 0x05); //reset address fifo
+  mgt_write(mgt, CONTROL, 0x06);
+  mgt_write(mgt, MT32_CONTROL, 0x01); // assert MT32_RST
+  mgt_write(mgt, CONTROL, 0x0a);
+  
+  mgt_write(mgt, CONTROL, 0x05); //reset address fifo
+  mgt_write(mgt, CONTROL, 0x06);
+  mgt_write(mgt, MT32_CONTROL, 0x00); // negate MT32_RST
+  mgt_write(mgt, CONTROL, 0x0a);
+  return 0;
 }
 
 int mgt_get_param(Mgt_t* mgt, int address) {

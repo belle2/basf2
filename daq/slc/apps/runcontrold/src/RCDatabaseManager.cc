@@ -228,7 +228,9 @@ int RCDatabaseManager::writeStatus()
     confno = loader.getLatestConfig(_master->getStatus()) + 1;
     _master->getStatus()->setConfigNumber(confno);
     loader.write(_master->getStatus());
-  } catch (const DBHandlerException& e) {}
+  } catch (const DBHandlerException& e) {
+    Belle2::debug("ERROR in RCDatabaseManager::writeStatus : %s", e.what());
+  }
   _db->close();
   return confno;
 }

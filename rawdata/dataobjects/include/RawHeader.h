@@ -84,11 +84,11 @@ namespace Belle2 {
 
     int GetExpNo();  //! get contents of header
 
-    int GetRunNoRestartNo();    //! run# (14bit) restart # (8bit)
+    int GetRunNoSubRunNo();    //! run# (14bit) restart # (8bit)
 
     int GetRunNo();    //! get run # (14bit)
 
-    int GetRestartNo();    //! get restart #(8bit)
+    int GetSubRunNo();    //! get restart #(8bit)
 
     unsigned int GetEveNo();  //! get contents of header
 
@@ -120,7 +120,7 @@ namespace Belle2 {
       EXP_SHIFT = 22,
       RUNNO_MASK = 0x003FFF00,
       RUNNO_SHIFT = 8,
-      RESTARTNO_MASK = 0x000000FF
+      SUBRUNNO_MASK = 0x000000FF
     };
 
     enum {
@@ -319,11 +319,11 @@ namespace Belle2 {
             >> EXP_SHIFT);
   }
 
-  inline int RawHeader::GetRunNoRestartNo()
+  inline int RawHeader::GetRunNoSubRunNo()
   {
     CheckGetBuffer();
     return ((unsigned int)(m_buffer[ POS_EXP_RUN_NO ]) &
-            (RUNNO_MASK | RESTARTNO_MASK));
+            (RUNNO_MASK | SUBRUNNO_MASK));
   }
 
   inline int RawHeader::GetRunNo()
@@ -333,10 +333,10 @@ namespace Belle2 {
             >> RUNNO_SHIFT);
   }
 
-  inline int RawHeader::GetRestartNo()
+  inline int RawHeader::GetSubRunNo()
   {
     CheckGetBuffer();
-    return (m_buffer[ POS_EXP_RUN_NO ] & RESTARTNO_MASK);
+    return (m_buffer[ POS_EXP_RUN_NO ] & SUBRUNNO_MASK);
   }
 
   inline unsigned int RawHeader::GetExpRunNumberWord()

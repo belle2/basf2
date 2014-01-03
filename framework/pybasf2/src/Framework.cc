@@ -42,6 +42,12 @@ Framework::Framework()
 Framework::~Framework()
 {
   delete m_pathManager;
+
+  //empty module manager of modules
+  //since modules may contain shared pointers of Path objects created in Python,
+  //these shared pointers have special cleanup hooks that can cause crashes if run
+  //after Py_Finalize(). The framework object is cleaned up before, so this is a good place.
+  ModuleManager::Instance().reset();
 }
 
 

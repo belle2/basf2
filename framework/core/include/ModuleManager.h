@@ -142,6 +142,9 @@ namespace Belle2 {
      */
     std::list< boost::shared_ptr<Module> > getModulesByProperties(const std::list< boost::shared_ptr<Module> >& modulePathList, unsigned int propertyFlags) const;
 
+    /** Delete all created modules. */
+    void reset();
+
 
   private:
 

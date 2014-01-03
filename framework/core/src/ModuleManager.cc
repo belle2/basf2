@@ -195,3 +195,9 @@ ModuleManager::ModuleManager()
 ModuleManager::~ModuleManager()
 {
 }
+
+void ModuleManager::reset()
+{
+  m_createdModulesList.clear();
+}
+

@@ -53,6 +53,11 @@ void SendHeader::SetNwords(int total_data_nwords)
   m_buffer[ POS_NWORDS ] = total_data_nwords;
 }
 
+void SendHeader::SetExpRunWord(unsigned int exp_run)
+{
+  m_buffer[ POS_EXP_RUN_NUM ] = exp_run;
+}
+
 void SendHeader::SetNumEventsinPacket(int num_events)
 {
   m_buffer[ POS_NUM_EVE_NUM_NODES ] =

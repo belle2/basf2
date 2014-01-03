@@ -145,7 +145,7 @@ int DeSerializerPCModule::Connect()
     host = gethostbyname(m_hostname_from[ i ].c_str());
     if (host == NULL) {
       char temp_char[100];
-      sprintf(temp_char, "hostname cannot be resolved. Check /etc/hosts. Exiting...");
+      sprintf(temp_char, "hostname(%s) cannot be resolved. Check /etc/hosts. Exiting...", m_hostname_from[ i ].c_str());
       print_err.PrintError(m_shmflag, &m_status, temp_char, __FILE__, __PRETTY_FUNCTION__, __LINE__);
       sleep(1234567);
       exit(1);

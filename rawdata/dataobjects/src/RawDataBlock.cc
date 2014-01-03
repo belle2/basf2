@@ -81,7 +81,7 @@ int RawDataBlock::CheckTLUID(int n)
   if (m_buffer[ GetBufferPos(n) + TEMP_POS_NWORDS_HEADER ] == OLD_FTSW_NWORDS_HEADER) {
     pos =  POS_FTSW_ID_OLD;
   }
-  if (m_buffer[ GetBufferPos(n) + pos ] == 0x544c5520) {
+  if (m_buffer[ GetBufferPos(n) + pos ] == 0x544c5520) { // "TLU "
     return 1;
   } else {
     return 0;

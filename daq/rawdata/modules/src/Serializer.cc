@@ -191,6 +191,8 @@ void SerializerModule::fillSendHeaderTrailer(SendHeader* hdr, SendTrailer* trl,
       rawhdr.SetBuffer(rawdblk->GetBuffer(i));
       hdr->SetEventNumber(rawhdr.GetEveNo());
       hdr->SetNodeID(rawhdr.GetSubsysId());
+      hdr->SetExpRunWord(rawhdr.GetExpRunNumberWord());
+
       break;
     }
 

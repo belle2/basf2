@@ -276,7 +276,8 @@ int SerializerModule::sendByWriteV(RawDataBlock* rawdblk)
   // Retry sending
   //
   if (n != total_send_bytes) {
-    printf("byte %d tot %d\n", n, total_send_bytes);
+    B2WARNING("Serializer: Sent byte(" << n << "bytes) is not same as the event size (" << total_send_bytes << "bytes). Retyring...");
+    double retry_start = getTimeSec();
     // Send Header
     if (n < (int)(iov[ 0 ].iov_len)) {
       int sent_bytes = n;
@@ -325,17 +326,8 @@ int SerializerModule::sendByWriteV(RawDataBlock* rawdblk)
         if (sent_bytes == (int)(iov[ 2 ].iov_len)) break;
       }
     }
-
-//     print_err.PrintError("Failed to send all data",
-//                          __FILE__, __PRETTY_FUNCTION__, __LINE__);
-//     printf("[ERROR] Sent data length is not consistent. %d %d : Exiting...", n, total_send_bytes);
-//     fflush(stdout);
-//     for( int i = 0; i < total_send_bytes/4 ; i++){
-//       printf("", );
-//     }
-//     sleep(1234567);
-//     exit(1);
-
+    double retry_end = getTimeSec();
+    B2WARNING("Resending ends. It takes " << retry_end - retry_start << "(s)");
   }
   //   printf("n %d total %d\n", n, total_send_bytes);
   //  delete temp_buf;

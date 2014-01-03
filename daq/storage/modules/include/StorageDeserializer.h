@@ -54,7 +54,9 @@ namespace Belle2 {
     void storeEvent();
 
   private:
-    std::queue<DataStorePackage*> m_package_q;
+    DataStorePackage* m_package_q;
+    unsigned int m_package_length;
+    unsigned int m_package_i;
     std::string m_inputbufname;
     RingBuffer* m_inputbuf;
     StorageRBufferManager* m_buf;

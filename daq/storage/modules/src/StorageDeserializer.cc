@@ -53,6 +53,8 @@ StorageDeserializerModule::StorageDeserializerModule() : Module()
   m_inputbuf = NULL;
   m_nrecv = 0;
   m_running = false;
+  m_package_q = new DataStorePackage[StorageWorker::MAX_QUEUES];
+  m_package_length = m_package_i = 0;
 
   B2INFO("StorageDeserializer: Constructor done.");
 }
@@ -104,34 +106,37 @@ void StorageDeserializerModule::initialize()
 void StorageDeserializerModule::event()
 {
   m_nrecv++;
-  while (m_package_q.empty()) {
+  while (m_package_i == m_package_length) {
     StorageWorker::lock();
-    std::queue<DataStorePackage*>& package_q(StorageWorker::getQueue());
-    while (package_q.empty()) {
+    DataStorePackage* package_q = StorageWorker::getQueue();
+    m_package_length = StorageWorker::getQueueIndex();
+    while (m_package_length == 0) {
       StorageWorker::wait();
+      m_package_length = StorageWorker::getQueueIndex();
     }
-    while (!package_q.empty()) {
-      m_package_q.push(package_q.front());
-      package_q.pop();
+    m_package_i = 0;
+    for (size_t i = 0; i < m_package_length; i++) {
+      m_package_q[i].copy(package_q[i]);
     }
+    StorageWorker::setQueueIndex(0);
     StorageWorker::notify();
     StorageWorker::unlock();
   }
-  DataStorePackage* package = m_package_q.front();
-  m_package_q.pop();
-  int length = m_package_q.size();
-  datasize += package->getData().getByteSize();
-  package->restore();
-  if (m_nrecv % 100000 == 0) {
+  DataStorePackage& package(m_package_q[m_package_i++]);
+  int length = m_package_length - m_package_i;
+  datasize += package.getData().getByteSize();
+  package.restore();
+  if (m_nrecv % 10000 == 0) {
     Time t;
-    double freq = 100. / (t.get() - t0.get());
-    double rate = datasize / (t.get() - t0.get()) / 1000.;
-    printf("Serial = %d Freq = %f [kHz], Rate = %f [kB/s], Queue = %d\n",
-           package->getSerial(), freq, rate, length);
+    double freq = 10000. / (t.get() - t0.get()) / 1000. ;
+    double rate = datasize / (t.get() - t0.get()) / 1000000.;
+    std::string has_pxd_s = ((package.getPXDData().getBuffer() != NULL) ? "with PXD" : "no PXD");
+    B2INFO("Serial = " << package.getSerial() << ", Freq = " << freq
+           << " [kHz], Rate = " << rate << " [MB/s], DataSize = "
+           << datasize / 1000. / 1000 << " [kB/event], Queue = " <<  length << " " << has_pxd_s);
     t0 = t;
     datasize = 0;
   }
-  delete package;
 }
 
 void StorageDeserializerModule::beginRun()

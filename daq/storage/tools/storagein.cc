@@ -27,22 +27,23 @@ int main(int argc, char** argv)
     printf("rawfile2rb : rbufname hostname port [nodename, nodeid]\n");
     return 1;
   }
-  system("`ls /tmp/SHM*DSR_IN | sed \"s/\/tmp\///g\" | sed \"s/-/ /g\" | sed \"s/SHM/ipcrm -m /g\" | sed \"s/SEM/ -s/g\"`");
-  system("rm /tmp/*DSR_IN*");
-  RingBuffer* rbuf = new RingBuffer(argv[1], 10000000);
+  RingBuffer* rbuf = new RingBuffer(argv[1], 100000000);
+  rbuf->clear();
+  Belle2::debug("socket connecting");
   RSocketRecv* socket = new RSocketRecv(argv[2], atoi(argv[3]));
-  int* evtbuf = new int[10000000];
+  Belle2::debug("socket connected");
+  int* evtbuf = new int[100000000];
   ProcessStatusBuffer sbuf;
   bool use_buf = (argc > 5);
   if (use_buf) sbuf.open(argv[4], atoi(argv[5]));
   int nrec = 0;
   while (true) {
     sbuf.reportReady();
-    if (use_buf) sbuf.waitStarted();
-    sbuf.reportRunning();
+    //if (use_buf) sbuf.waitStarted();
+    //sbuf.reportRunning();
     while (true) {
-      while (use_buf && sbuf.isStopped()) sbuf.waitStarted();
-      int bufsize = socket->get_wordbuf(evtbuf, 10000000);
+      //while (use_buf && sbuf.isStopped()) sbuf.waitStarted();
+      int bufsize = socket->get_wordbuf(evtbuf, 100000000);
       if (bufsize <= 0) {
         sbuf.reportError("Failed to read data. connection broken.");
         break;
@@ -56,7 +57,7 @@ int main(int argc, char** argv)
         usleep(20);
       }
       nrec++;
-      //if (nrec % 10000 == 0) printf("in :record %d\n", nrec);
+      if (nrec % 10000 == 0) printf("in :record %d\n", nrec);
     }
     while (true) {
       if (socket->reconnect(5000) == -1) {

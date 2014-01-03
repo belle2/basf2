@@ -60,7 +60,7 @@ namespace Belle2 {
       return getByteSize() - sizeof(BinHeader) - sizeof(BinTrailer);
     }
     int getBodyWordSize() const { return (getBodyByteSize() / 4); };
-    int getTrailerMagic() {
+    unsigned int getTrailerMagic() {
       _trailer = (BinTrailer*)(_body + getBodyWordSize());
       return _trailer->magic;
     }

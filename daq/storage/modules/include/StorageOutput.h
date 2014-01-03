@@ -68,8 +68,8 @@ namespace Belle2 {
     // Data members
   private:
     //! Exp number, Run number
-    int m_exp;
-    int m_run;
+    int m_expno;
+    int m_runno;
 
     //! Compression level
     int m_compressionLevel;

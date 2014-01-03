@@ -37,8 +37,8 @@ bool StoragerCallback::boot() throw()
   _con[0].addArgument(irbname);
   _con[0].addArgument(config.get("DATA_STORAGE_FROM_HOST"));
   _con[0].addArgument(config.get("DATA_STORAGE_FROM_PORT"));
-  _con[0].addArgument(irbname);
-  _con[0].addArgument("1");
+  //_con[0].addArgument(irbname);
+  //_con[0].addArgument("1");
   _con[0].load(10);
 
   return true;
@@ -47,11 +47,9 @@ bool StoragerCallback::boot() throw()
 bool StoragerCallback::load() throw()
 {
   Belle2::debug("LOAD");
-  //download();
   ConfigFile config;
   const std::string irbname = _node->getName() + "_IN";
   const std::string orbname = _node->getName() + "_OUT";
-
   _con[1].clearArguments();
   _con[1].addArgument(config.get("BASF2_SCRIPT_DIR")
                       + "/DataStorager.py");
@@ -59,9 +57,9 @@ bool StoragerCallback::load() throw()
   _con[1].addArgument(irbname);
   _con[1].addArgument(config.get("DATA_STORAGE_DIR"));
   _con[1].addArgument(orbname);
-  _con[1].addArgument(_node->getName());
-  _con[1].addArgument("1");
-  _con[1].addArgument("1");
+  //_con[1].addArgument(_node->getName());
+  //_con[1].addArgument("1");
+  //_con[1].addArgument("1");
   _con[1].load(10);
 
   _con[2].clearArguments();
@@ -69,9 +67,11 @@ bool StoragerCallback::load() throw()
   _con[2].addArgument(orbname);
   _con[2].addArgument(config.get("DATA_STORAGE_TO_HOST"));
   _con[2].addArgument(config.get("DATA_STORAGE_TO_PORT"));
-  _con[2].addArgument(orbname);
-  _con[2].addArgument("1");
+  //_con[2].addArgument(orbname);
+  //_con[2].addArgument("1");
   _con[2].load(10);
+
+  //download();
   return true;
 }
 
@@ -80,14 +80,13 @@ bool StoragerCallback::start() throw()
   Belle2::debug("START");
   for (int i = 0; i < 3; i++)
     _con[i].start(-1);
+
   return true;
 }
 
 bool StoragerCallback::stop() throw()
 {
   Belle2::debug("STOP");
-  for (int i = 0; i < 3; i++)
-    _con[i].stop(-1);
   return true;
 }
 

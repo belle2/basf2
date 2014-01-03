@@ -62,16 +62,18 @@ void StorageOutputModule::initialize()
   // DataStoreStreamer
   m_streamer = new DataStoreStreamer(m_compressionLevel);
 
+  m_expno = -1;
+  m_runno = -1;
+
   // Ring Buffer
   if (m_obufname.size() > 0) {
     B2INFO(m_obufname.c_str());;
     m_obuf = new RingBuffer(m_obufname.c_str(), 10000000);
+    m_obuf->clear();
   } else
     m_obuf = NULL;
 
   B2INFO("StorageOutput: initialized.");
-  B2INFO("StorageOutput : KONNO");
-
 }
 
 
@@ -84,14 +86,27 @@ void StorageOutputModule::beginRun()
   m_nevt = 0;
 
   // Open data file by looking at exp/run number
-  if (m_file != NULL) delete m_file;
-  m_file = openDataFile();
+  //if (m_file != NULL) delete m_file;
+  //m_file = openDataFile();
 
   B2INFO("StorageOutput: beginRun called.");
 }
 
 void StorageOutputModule::event()
 {
+  StoreObjPtr<EventMetaData> evtmetadata;
+  int expno = evtmetadata->getExperiment();
+  int runno = evtmetadata->getRun();
+  if (m_runno != runno || m_expno != expno) {
+    if (m_file != NULL) {
+      delete m_file;
+      m_file = NULL;
+    }
+    m_expno = expno;
+    m_runno = runno;
+    m_file = openDataFile();
+  }
+  //printf("Event no = %d\n", evtmetadata->getEvent());
   // Stream DataStore in EvtMessage
   EvtMessage* msg = m_streamer->streamDataStore(DataStore::c_Event);
 
@@ -150,12 +165,12 @@ void StorageOutputModule::terminate()
 
 SeqFile* StorageOutputModule::openDataFile()
 {
-  StoreObjPtr<EventMetaData> evtmetadata;
-  int expno = evtmetadata->getExperiment();
-  int runno = evtmetadata->getRun();
+  // StoreObjPtr<EventMetaData> evtmetadata;
+  // int expno = evtmetadata->getExperiment();
+  // int runno = evtmetadata->getRun();
   char outfile[1024];
   sprintf(outfile, "%s/e%4.4dr%6.6d.sroot",
-          m_stordir.c_str(), expno, runno);
+          m_stordir.c_str(), m_expno, m_runno);
   SeqFile* seqfile = new SeqFile(outfile, "w");
   printf("StorageOutput : data file %s initialized\n", outfile);
   return seqfile;

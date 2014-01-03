@@ -61,9 +61,9 @@ int main(int argc, char** argv)
   }
   PostgreSQLInterface* db = NULL;
   if (config.getInt("DATABASE_PORT") >= 0) {
-    new PostgreSQLInterface(config.get("DATABASE_HOST"), config.get("DATABASE_NAME"),
-                            config.get("DATABASE_USER"), config.get("DATABASE_PASS"),
-                            config.getInt("DATABASE_PORT"));
+    db = new PostgreSQLInterface(config.get("DATABASE_HOST"), config.get("DATABASE_NAME"),
+                                 config.get("DATABASE_USER"), config.get("DATABASE_PASS"),
+                                 config.getInt("DATABASE_PORT"));
   }
   RCDatabaseManager* dbmanager = new RCDatabaseManager(db, master);
   master->setDBManager(dbmanager);

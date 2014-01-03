@@ -32,6 +32,8 @@ void BinData::setBuffer(void* buf)
     _buf = (int*)buf;
     _header = (BinHeader*)buf;
     _body = (unsigned int*)(((char*)buf) + sizeof(BinHeader));
+  } else {
+    _buf = NULL;
   }
 }
 

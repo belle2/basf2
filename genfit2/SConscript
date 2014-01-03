@@ -32,7 +32,7 @@ for dir in dirs:
 # see if it found source files, since this is a list of lists, we have
 # to flatten it, following an example from the Python documentation
 # http://docs.python.org/2/tutorial/datastructures.html
-if len([filename for sublist in source_files for filename in sublist]) == 0:
+if len(Flatten(source_files)) == 0:
   print 'No genfit sources found.  Please check if svn up fills the genfit2/code subdirectory.'
   Exit(1)
 

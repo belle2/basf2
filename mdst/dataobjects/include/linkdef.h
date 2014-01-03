@@ -17,5 +17,6 @@
 
 #pragma link C++ class Belle2::MCParticle;
 #pragma link C++ class vector<Belle2::MCParticle*>;
+#pragma link C++ class Belle2::PIDLikelihood;
 
 #endif

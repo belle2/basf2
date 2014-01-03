@@ -26,7 +26,7 @@
 
 #include <tracking/dataobjects/TrackFitResult.h>
 #include <tracking/dataobjects/Track.h>
-#include <reconstruction/dataobjects/PIDLikelihood.h>
+#include <mdst/dataobjects/PIDLikelihood.h>
 #include <pxd/dataobjects/PXDCluster.h>
 #include <svd/dataobjects/SVDCluster.h>
 #include <top/dataobjects/TOPBarHit.h>

@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <reconstruction/dataobjects/PIDLikelihood.h>
+#include <mdst/dataobjects/PIDLikelihood.h>
 #include <framework/logging/Logger.h>
 
 using namespace std;

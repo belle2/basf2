@@ -21,7 +21,7 @@
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleInfo.h>
 #include <mdst/dataobjects/MCParticle.h>
-#include <reconstruction/dataobjects/PIDLikelihood.h>
+#include <mdst/dataobjects/PIDLikelihood.h>
 
 // framework aux
 #include <framework/gearbox/Unit.h>

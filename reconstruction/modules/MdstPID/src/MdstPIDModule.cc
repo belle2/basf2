@@ -16,7 +16,7 @@
 #include <framework/datastore/RelationArray.h>
 
 // data objects:
-#include <reconstruction/dataobjects/PIDLikelihood.h>
+#include <mdst/dataobjects/PIDLikelihood.h>
 #include <top/dataobjects/TOPLikelihood.h>
 #include <arich/dataobjects/ARICHLikelihood.h>
 #include <reconstruction/dataobjects/DedxLikelihood.h>

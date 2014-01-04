@@ -8,9 +8,10 @@
    All external library functions have prefix "b2nsm_".
 
    20131230 1918 strerror fix, initnet fix, stdint fix, bridge fix
+   20140103 1919 more text into log for b2nsm_ok
 \* ---------------------------------------------------------------------- */
 
-const char *belle2nsm_version = "belle2nsm 1.9.18";
+const char *belle2nsm_version = "belle2nsm 1.9.19";
 
 #include <stdio.h>
 #include <stdarg.h>
@@ -85,6 +86,12 @@ b2nsm_loghook(NSMmsg *msg, NSMcontext *nsmc)
     }
     for (i = 0; datp && i < 80 && i < len && isprint(datp[i]); i++) {
       fprintf(logfp, "%s%c%s", i==0 ? " " : "", datp[i], i==79 ? "..." : "");
+    }
+    if (i < 79 && datp && datp[i] == 0 && len > i+1 && isprint(datp[i+1])) {
+      fprintf(logfp, " ");
+    }
+    for (i++; datp && i < 80 && i < len && isprint(datp[i]); i++) {
+      fprintf(logfp, "%c%s", datp[i], i==79 ? "..." : "");
     }
     fprintf(logfp, "\n");
     fflush(logfp);
@@ -173,6 +180,12 @@ b2nsm_sendany(const char *node, const char *req, int npar, int32_t *pars,
     }
     for (i = 0; datp && i < 80 && i < len && isprint(datp[i]); i++) {
       fprintf(logfp, "%s%c%s", i==0 ? " " : "", datp[i], i==79 ? "..." : "");
+    }
+    if (i < 79 && datp && datp[i] == 0 && len > i+1 && isprint(datp[i+1])) {
+      fprintf(logfp, " ");
+    }
+    for (i++; datp && i < 80 && i < len && isprint(datp[i]); i++) {
+      fprintf(logfp, "%c%s", datp[i], i==79 ? "..." : "");
     }
     fprintf(logfp, "\n");
   }

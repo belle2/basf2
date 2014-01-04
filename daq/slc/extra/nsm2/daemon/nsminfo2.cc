@@ -273,7 +273,7 @@ nsminfo_node(int all = 0)
 
     printf("NODE %-3.1d %-31.31s pid/uid=%-5.1d/%-5.1d @%s %d\n",
            inod, nod.name, (int32)ntohl(nod.nodpid), ntohl(nod.noduid),
-           nsminfo_hoststr(nod.ipaddr), (int16)ntohs(nod.noddat));
+           nsminfo_hoststr(nod.ipaddr), (int16_t)ntohs(nod.noddat));
   }
 }
 // -- req ---------------------------------------------------------------
@@ -307,12 +307,12 @@ nsminfo_dat(int all = 0)
     if (xverbose) {
       printf("DAT  %-3.1d %-31.31s pos=%d sz=%d nod=%d rev=%d ref=%d fmt=%s\n",
              idat, dat.dtnam, ntohl(dat.dtpos), ntohs(dat.dtsiz),
-             (int16)ntohs(dat.owner), ntohs(dat.dtrev), ntohs(dat.dtref),
+             (int16_t)ntohs(dat.owner), ntohs(dat.dtrev), ntohs(dat.dtref),
              dat.dtfmt);
     } else {
       printf("DAT  %-3.1d %-31.31s sz=%d nod=%d rev=%d ref=%d fmt=%s\n",
              idat, dat.dtnam, ntohs(dat.dtsiz),
-             (int16)ntohs(dat.owner), ntohs(dat.dtrev), ntohs(dat.dtref),
+             (int16_t)ntohs(dat.owner), ntohs(dat.dtrev), ntohs(dat.dtref),
              dat.dtfmt);
     }
   }
@@ -330,18 +330,44 @@ nsminfo_ref(int all = 0)
            iref, ntohs(ref.refnod), ntohs(ref.refdat));
   }
 }
-// -- foo ---------------------------------------------------------------
+// -- disid -------------------------------------------------------------
 void
-nsminfo_foo(int all = 0)
+nsminfo_disid(int all = 0)
 {
   NSMsys& sys = *nsmd_sysp;
-  int anext = (int16)ntohs(sys.afirst);
+
+  printf("nsnd = %d\n", sys.nsnd);
+
+  for (int i = 0; i < sys.nsnd; i++) {
+    printf("SND%d disid=%d disnod=%d\n",
+           i, sys.snd[i].disid, sys.snd[i].disnod);
+  }
+}
+// -- conid -------------------------------------------------------------
+void
+nsminfo_conid(int all = 0)
+{
+  NSMsys& sys = *nsmd_sysp;
+  int nnod = (int16_t)ntohs(sys.nnod);
+
+  for (int i = 0; i < nnod; i++) {
+    if ((i % 10) == 0) printf("CONID");
+    printf(" %d=>%d", i, sys.conid[i]);
+    if ((i % 10) == 9 || i == nnod - 1) printf("\n");
+  }
+}
+// -- alist -------------------------------------------------------------
+void
+nsminfo_alist(int all = 0)
+{
+  NSMsys& sys = *nsmd_sysp;
+  int anext = (int16_t)ntohs(sys.afirst);
   int amax = 1024;
 
   printf("alist = %d", anext);
   while (amax-- > 0 && anext != -1) {
     NSMdat& dat = sys.dat[anext];
-    anext = (int16)ntohs(dat.anext);
+    anext = (int16_t)ntohs(dat.anext);
     printf(" %d", anext);
   }
   printf("\n");
@@ -354,6 +380,9 @@ main(int argc, char** argv)
 {
   int port = -1;
   int shmkey = -1;
+  int showalist = 0;
+  int showdisid = 0;
+  int showconid = 0;
 
   // option loop
   while (argc > 1 && argv[1][0] == '-') {
@@ -379,6 +408,9 @@ main(int argc, char** argv)
     switch (opt) {
       case 'p': port   = nsmd_atoi(ap, -1); break;
       case 's': shmkey = nsmd_atoi(ap, -1); break;
+      case 'A': showalist = 1; break;
+      case 'D': showdisid = 1; break;
+      case 'C': showconid = 1; break;
       default:
         printf("usage: nsminfo2 [options]\n");
         printf(" -p <port>   set port number.\n");
@@ -403,7 +435,9 @@ main(int argc, char** argv)
   nsminfo_dat();
   nsminfo_ref();
 
-  nsminfo_foo();
+  if (showalist) nsminfo_alist();
+  if (showdisid) nsminfo_disid();
+  if (showconid) nsminfo_conid();
 }
 // ----------------------------------------------------------------------
 // -- (emacs outline mode setup)

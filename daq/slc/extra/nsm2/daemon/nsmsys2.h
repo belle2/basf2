@@ -57,7 +57,7 @@ typedef struct sockaddr_in SOCKAD_IN;
 
 /*
   udp message size is limited by MTU,
-  tcp message size is limited by length in uint16 and npar in byte8
+  tcp message size is limited by length in uint16_t and npar in byte8
 */
 #define NSM_MTUSIZ     1500
 #define NSM_UDPHEADSIZ    8
@@ -65,52 +65,52 @@ typedef struct sockaddr_in SOCKAD_IN;
 #define NSM_UDPDATSIZ  1484 /* header part */
 
 #define NSM_TCPHEADSIZ 16 /* header */
-#define NSM_TCPPARMAX 256 /* par in uint32 */
-#define NSM_TCPDATSIZ 65536 /* max size by uint16 */
+#define NSM_TCPPARMAX 256 /* par in uint32_t */
+#define NSM_TCPDATSIZ 65536 /* max size by uint16_t */
 #define NSM_TCPBUFSIZ (256*4 + NSM_TCPDATSIZ) /* par + data */
 #define NSM_TCPMSGSIZ (16 + NSM_TCPBUFSIZ) /* header + par + data */
 #define NSM_TCPTHRESHOLD (16 + 256*4) /* at least header + par */
 
 #define NSM_DATCHUNKSIZ 1484 /* MTU - UDPHEAD - udpbuf.head */
 #define NSM_DATMAXCHUNK 44
-#define NSM_DATMAXSIZ   (NSM_DATCHUNKSIZ*NSM_DATMAXCHUNK) /* 65120 in uint16 */
+#define NSM_DATMAXSIZ   (NSM_DATCHUNKSIZ*NSM_DATMAXCHUNK) /* 65120 in uint16_t */
 
 #define NSMD_MAXINVFMT  32
 #define NSMD_TIMINVFMT  3600
 
 /* NSMudpbuf (in network byte order) */
 typedef struct {
-  byte8  req;
-  byte8  npar; /* num of parameters of int32 in dat area */
-  uint16 seq;
-  uint16 par1;
-  uint16 par2;
+  uint8_t  req;
+  uint8_t  npar; /* num of parameters of int32_t in dat area */
+  uint16_t seq;
+  uint16_t par1;
+  uint16_t par2;
   char   dat[NSM_UDPDATSIZ];
 } NSMudpbuf;
 
 /* NSMtcphead (in network byte order) */
 typedef struct {
-  uint16 req;
-  uint16 seq;
-  uint16 src;
-  uint16 dest;
-  byte8  opt;
-  byte8  npar;
-  uint16 len;
-  uint32 from; // source IP, only when the message has to be forwarded
+  uint16_t req;
+  uint16_t seq;
+  uint16_t src;
+  uint16_t dest;
+  uint8_t  opt;
+  uint8_t  npar;
+  uint16_t len;
+  uint32_t from; // source IP, only when the message has to be forwarded
 } NSMtcphead;
 
 /* NSMDmsg (in host byte order) */
 typedef struct {
-  uint16 req;
-  uint16 seq;
-  uint16 src;   // source      NSM nodeid, or (-1) if not an NSM client
-  uint16 dest;  // destination NSM nodeid, or (-1) if not an NSM client
-  byte8  opt;
-  byte8  npar;
-  uint16 len;
-  uint32 from;  // source IP address in network byte order
-  uint32 pars[256];
+  uint16_t req;
+  uint16_t seq;
+  uint16_t src;   // source      NSM nodeid, or (-1) if not an NSM client
+  uint16_t dest;  // destination NSM nodeid, or (-1) if not an NSM client
+  uint8_t  opt;
+  uint8_t  npar;
+  uint16_t len;
+  uint32_t from;  // source IP address in network byte order
+  uint32_t pars[256];
   const char* datap;
 } NSMdmsg;
 
@@ -158,69 +158,69 @@ typedef struct {
 
 typedef struct {
   char  name[NSMSYS_NAME_SIZ + 1]; /* 32 byte, *name == 0 if unavailable */
-  int16 rsvi16;
-  int16 noddat; /* sys.dat index or -1 if unavailable */
-  int16 nodref; /* sys.ref index or -1 if unavailable */
-  int16 nodreg; /* sys.reg index or -1 if unavailable */
-  int32 rsvi32;
-  int32 ipaddr; /* ip address    or -1 if unavailable */
-  int32 nodpid; /* process id */
-  int32 noduid; /* uid */
-  int64 nodtim; /* creation time */
+  int16_t rsvi16;
+  int16_t noddat; /* sys.dat index or -1 if unavailable */
+  int16_t nodref; /* sys.ref index or -1 if unavailable */
+  int16_t nodreg; /* sys.reg index or -1 if unavailable */
+  int32_t rsvi32;
+  int32_t ipaddr; /* ip address    or -1 if unavailable */
+  int32_t nodpid; /* process id */
+  int32_t noduid; /* uid */
+  int64_t nodtim; /* creation time */
 } NSMnod; /* total 56 byte */
 
 typedef struct {
   char  name[NSMSYS_NAME_SIZ + 1]; /* 32 byte, *name == 0 if unavailable */
-  int16 code;
-  int16 regid;
+  int16_t code;
+  int16_t regid;
 } NSMreq; /* total 40 byte */
 
 typedef struct {
-  int16 regnod;
-  int16 regreq;
-  int16 nodnext;
-  int16 reqnext;
+  int16_t regnod;
+  int16_t regreq;
+  int16_t nodnext;
+  int16_t reqnext;
 } NSMreg; /* total 8 byte */
 
 typedef struct {
-  int32 refrsv;
-  int16 refnod; /* sys.nod index */
-  int16 refdat; /* sys.dat index */
-  int64 reftim; /* creation time */
+  int32_t refrsv;
+  int16_t refnod; /* sys.nod index */
+  int16_t refdat; /* sys.dat index */
+  int64_t reftim; /* creation time */
 } NSMref; /* total 16 byte */
 
 typedef struct {
   char   dtnam[NSMSYS_DNAM_SIZ + 1]; /* 32 byte */
   char   dtfmt[NSMSYS_DFMT_SIZ + 1]; /* 64 byte */
-  int16  dtrev; /* data revision */
-  int16  owner;
-  int16  anext; /* next sys.dat index or -1 if last */
+  int16_t  dtrev; /* data revision */
+  int16_t  owner;
+  int16_t  anext; /* next sys.dat index or -1 if last */
   /* anext linked list is an address ascending list which is needed to
      find a free space for a new allocation */
-  int16  nnext; /* next sys.dat index of the same node, or -1 if last */
+  int16_t  nnext; /* next sys.dat index of the same node, or -1 if last */
   /* nnext linked list is needed to find all the data belong to the same
      node */
-  uint16 dtsiz; /* size up to 65120 (=1480*44), or 0 if unavailable */
-  uint16 dtref; /* number of reference count */
-  uint16 dtcyc; /* update cycle in 10msec unit, up to about 10 min */
+  uint16_t dtsiz; /* size up to 65120 (=1480*44), or 0 if unavailable */
+  uint16_t dtref; /* number of reference count */
+  uint16_t dtcyc; /* update cycle in 10msec unit, up to about 10 min */
 
-  int16  dtrsv;
-  int32  dtpos; /* mem.mem index (up to NSM2_MEMSIZ), or -1 if unavailable */
-  int32  rsv32;
-  int64  dttim; /* creation time in 10msec unit */
+  int16_t  dtrsv;
+  int32_t  dtpos; /* mem.mem index (up to NSM2_MEMSIZ), or -1 if unavailable */
+  int32_t  rsv32;
+  int64_t  dttim; /* creation time in 10msec unit */
 } NSMdat; /* total 128 byte */
 
 typedef struct {
-  int16  disid;
-  int16  disnod;
-  int32  discnt; /* update counter */
-  int64  distim; /* time to distribute in 10msec unit */
+  int16_t  disid;
+  int16_t  disnod;
+  int32_t  discnt; /* update counter */
+  int64_t  distim; /* time to distribute in 10msec unit */
 } NSMdat_snd;
 
 typedef struct {
-  int32  rcvcnt;
-  int32  rcvdt1; /* delta time between newest update and dttim */
-  int16  dtddt[44]; /* delta time between newest and each chunk */
+  int32_t  rcvcnt;
+  int32_t  rcvdt1; /* delta time between newest update and dttim */
+  int16_t  dtddt[44]; /* delta time between newest and each chunk */
 } NSMdat_rcv;
 
 
@@ -231,11 +231,11 @@ typedef struct {
 #define NSMCON_OUT  2
 
 typedef struct {
-  int32 sock;
-  int32 pid;
-  int32 nid;
-  int16 status; /* flag for invalid connection: 0=OK, 1=WAITING, 2=NG */
-  int16 ready;  /* flag for ready to become the master */
+  int32_t sock;
+  int32_t pid;
+  int32_t nid;
+  int16_t status; /* flag for invalid connection: 0=OK, 1=WAITING, 2=NG */
+  int16_t ready;  /* flag for ready to become the master */
   /*
     (&udpcon = sys.con[NSMCON_UDP], &tcpcon = sys.con[NSMCON_TCP])
     udpcon.timstart for the start time of the daemon
@@ -243,51 +243,51 @@ typedef struct {
     udpcon.timevent when master/deputy/priority/generation modified
     tcpcon.timevent when nod/ref/dat modified
    */
-  int64 timstart; /* start time reported from remote */
-  int64 timevent; /* when status changed */
+  int64_t timstart; /* start time reported from remote */
+  int64_t timevent; /* when status changed */
   SOCKAD_IN sockad; /* 16 bytes */
-  int32 icnt;  /* how many times recv */
-  int32 ocnt;  /* how many times sent */
-  int64 isiz;  /* how many bytes recv */
-  int64 osiz;  /* how many bytes sent */
-  int64 otim;  /* how much time (in us) select had to wait */
-  int32 osel;  /* how many times select had to wait */
-  int32 rsv32;
-  byte8 sigobs;   /* sigobs=1 if SIGRTMIN is not defined */
-  byte8 priority; /* between 0-100 */
-  byte8 rsv;
+  int32_t icnt;  /* how many times recv */
+  int32_t ocnt;  /* how many times sent */
+  int64_t isiz;  /* how many bytes recv */
+  int64_t osiz;  /* how many bytes sent */
+  int64_t otim;  /* how much time (in us) select had to wait */
+  int32_t osel;  /* how many times select had to wait */
+  int32_t rsv32;
+  uint8_t sigobs;   /* sigobs=1 if SIGRTMIN is not defined */
+  uint8_t priority; /* between 0-100 */
+  uint8_t rsv;
   char  name[13];  /* (only first 12 bytes, total 80 bytes */
 } NSMcon;
 
 typedef struct {
-  int64 when;   /* time_t */
-  int32 opt;    /* option */
-  int16 conid;  /* conid, to remove when connection closed */
-  int16 funcid; /* function to call */
+  int64_t when;   /* time_t */
+  int32_t opt;    /* option */
+  int16_t conid;  /* conid, to remove when connection closed */
+  int16_t funcid; /* function to call */
 } NSMsch;
 
 typedef struct {
   /* first 4 words are common to both NSMmem and NSMsys */
-  int32 ipaddr;
-  int32 pid;
-  int64 timstart;
-  int64 timevent;
+  int32_t ipaddr;
+  int32_t pid;
+  int64_t timstart;
+  int64_t timevent;
   char mem[NSM2_MEMSIZ];
 } NSMmem;
 
 typedef struct {
   /* first 4 words are common to both NSMmem and NSMsys */
-  int32 ipaddr;
-  int32 pid;
-  int64 timstart; /* creation time of NSMsys (may not by me) */
-  int64 timevent; /* last update of NSMsys */
-  uint32 netmask;
-  int16 dirty;  /* connection is updated, but fdset is not updated yet */
-  int16 afirst; /* set and distributed by master */
-  int16 nnod; /* set and distributed by master */
-  int16 nref; /* set and distributed by master */
-  int16 ndat; /* set and distributed by master */
-  int16 nreq; /* set and distributed by master */
+  int32_t ipaddr;
+  int32_t pid;
+  int64_t timstart; /* creation time of NSMsys (may not by me) */
+  int64_t timevent; /* last update of NSMsys */
+  uint32_t netmask;
+  int16_t dirty;  /* connection is updated, but fdset is not updated yet */
+  int16_t afirst; /* set and distributed by master */
+  int16_t nnod; /* set and distributed by master */
+  int16_t nref; /* set and distributed by master */
+  int16_t ndat; /* set and distributed by master */
+  int16_t nreq; /* set and distributed by master */
   NSMnod nod[NSMSYS_MAX_NOD]; /* set and distributed by master */
   NSMref ref[NSMSYS_MAX_REF]; /* set and distributed by master */
   NSMdat dat[NSMSYS_MAX_DAT]; /* set and distributed by master */
@@ -295,32 +295,32 @@ typedef struct {
   NSMreg reg[NSMSYS_MAX_REG]; /* set and distributed by master */
 
   /* hash tables (+1 for alignment as MAX_HASH is not even */
-  int32 nodhash[NSMSYS_MAX_HASH + 1]; /* set and distributed by master */
-  int32 dathash[NSMSYS_MAX_HASH + 1]; /* set and distributed by master */
-  int32 reqhash[NSMSYS_MAX_HASH + 1]; /* set and distributed by master */
+  int32_t nodhash[NSMSYS_MAX_HASH + 1]; /* set and distributed by master */
+  int32_t dathash[NSMSYS_MAX_HASH + 1]; /* set and distributed by master */
+  int32_t reqhash[NSMSYS_MAX_HASH + 1]; /* set and distributed by master */
 
   NSMcon con[NSMSYS_MAX_CON];
   NSMsch sch[NSMSYS_MAX_SCH];
-  int32 ncon;
-  int32 nsch;
-  int16 conid[NSMSYS_MAX_NOD];  /* nod => con mapping */
-  int16 ireg_free; /* cache to make it easier to find new reg slot */
-  int16 nsnd;
-  int16 rsv16[2];
+  int32_t ncon;
+  int32_t nsch;
+  int16_t conid[NSMSYS_MAX_NOD];  /* nod => con mapping */
+  int16_t ireg_free; /* cache to make it easier to find new reg slot */
+  int16_t nsnd;
+  int16_t rsv16[2];
   NSMdat_snd snd[NSMSYS_MAX_DAT];
   NSMdat_rcv rcv[NSMSYS_MAX_DAT];
 
-  int16 generation;
-  int16 master;
-  int16 deputy;
-  int16 ready;
+  int16_t generation;
+  int16_t master;
+  int16_t deputy;
+  int16_t ready;
 
 
   /* copy of global variables for reference (not for use by nsmd) */
-  int16 version;  /* nsmd version */
-  int16 priority;
-  int16 debug;
-  int16 nofork;
+  int16_t version;  /* nsmd version */
+  int16_t priority;
+  int16_t debug;
+  int16_t nofork;
   char  logfile[NSMSYS_LOGNAME_SIZ];
 } NSMsys;
 

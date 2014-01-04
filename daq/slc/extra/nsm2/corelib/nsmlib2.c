@@ -8,9 +8,10 @@
 
    20131216 1912 sa_flags fix (work works with gcc 4.1.2)
    20131230 1918 strerror fix, initnet fix, stdint fix, bridge fix
+   20140104 1919 strerror rearranged
 \* ---------------------------------------------------------------------- */
 
-const char *nsmlib2_version   = "nsmlib2 1.9.18";
+const char *nsmlib2_version   = "nsmlib2 1.9.19";
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -149,54 +150,80 @@ nsmlib_strerror(NSMcontext *nsmc)
 {
   static char buf[256];
   char *syserr = 0;
-  if (! nsmc) {
-    switch (nsmlib_errc) {
-    case 0: return "NSM is not initialized";
-    case NSMESHMGETSYS:
-      sprintf(buf, "cannot open NSMsys shared memory: %s", strerror(errno));
-      return buf;
-    case NSMESHMGETMEM:
-      if (errno == EACCES) {
-	strcpy(buf,
-	       "nsmd2 shared memory must have either the same uid or gid");
-      } else {
-	sprintf(buf, "cannot open NSMmem shared memory: %s %d",
-		strerror(errno), errno);
-      }
-      return buf;
-    case NSMENODENAME: return "invalid nodename";  /* init */
-    case NSMEALLOC:    return "memory allocation error"; /* init, etc */
-    case NSMEHOSTNAME: return "invalid hostname"; /* initnet */
-    case NSMEALREADYP: return "host:port already in use"; /* initnet */
-    case NSMEALREADYS: return "shm key already in use";  /* initnet */
-    case NSMEALREADYH: return "host:port already in use";     /* initnet */
-    case NSMESOCKET:     syserr = "socket";       break; /* initnet */
-    case NSMESOCKREUSE:  syserr = "so_reuseaddr"; break; /* initnet */
-    case NSMESOCKSNDBUF: syserr = "so_sndbuf";    break; /* initnet */
-    case NSMESOCKRCVBUF: syserr = "so_rcvbuf";    break; /* initnet */
-    case NSMENONSMD:   syserr = "cannot connect to NSMD"; break; /* initnet */
-    case NSMERDSELECT: syserr = "read select"; break; /* initnet */
-    case NSMENOUID:    return "uid not received"; /* initnet */
-    case NSMERDUID:    syserr = "uid read error"; break; /* initnet */
-    case NSMERDCLOSE:  return "uid not fully received"; /* initnet */
-    case NSMEACCESS:   return "invalid NSMD uid"; /* initnet */
-    default:
-      if (*nsmlib_errs) return nsmlib_errs;
-      sprintf(buf, "NSM is not initialized (errcode=%d)", nsmlib_errc);
+  int         errc = nsmc ? nsmc->errc : nsmlib_errc;
+  const char *errs = nsmc ? nsmc->errs : nsmlib_errs;
+
+  switch (errc) {
+  case NSMENOERR: return nsmc ? "no error" : "NSM is not initialized";
+  case NSMEALLOC: syserr = "malloc"; break;
+  case NSMESOCKET: syserr = "socket"; break;
+  case NSMESOCKDGRAM: syserr = "socket(sock_dgram)"; break;
+  case NSMEGIFCONF: syserr = "ioctl(SIOCGIFCONF)"; break;
+  case NSMEGIFFLAGS: syserr = "ioctl(SIOCGIFFLAGS)"; break;
+  case NSMESOCKREUSE: syserr = "so_sockreuse"; break;
+  case NSMESOCKSNDBUF: syserr = "so_sndbuf";    break;
+  case NSMESOCKRCVBUF: syserr = "so_rcvbuf";    break;
+  case NSMERDSELECT: syserr = "select(read)"; break;
+  case NSMERDUID:    syserr = "uid read error"; break;
+  case NSMENOPIPE:   syserr = "pipe"; break;
+  case NSMESELECT:   syserr = "select"; break;
+  case NSMETIMEOUT:  return "select timeout";
+  case NSMEWRITE:    syserr = "write(socket)"; break;
+  case NSMEUNEXPECTED: return errs;
+  case NSMECLOSED:   return "NSMD connection closed";
+  case NSMEPIPEREAD: syserr = "read(pipe)"; break;
+  case NSMEPIPEWRITE: syserr = "write(pipe)"; break;
+  case NSMEDATID: return errs;
+    /* possible errors by user parameters */
+  case NSMENOMASTER: return "no NSM master";
+  case NSMEINVNAME: return "invalid name"; /* why unsed? */
+  case NSMEINVPAR: return "invalid parameter";
+  case NSMENODEEXIST: return "node already exist"; /* why unsed? */
+  case NSMEFULNODE: return "no more NSM node"; /* why unsed? */
+  case NSMENODEST: return "destination node is gone"; /* why unsed? */
+  case NSMEINVFMT: return "invalid data format"; /* why unused? */
+  case NSMEMEMEXIST: return "data alraedy exists"; /* why unused? */
+  case NSMENOMOREMEM: return "no more data area"; /* why unused? */
+  case NSMEOPENED: return "already opened"; /* why unused? */
+  case NSMENODENAME: return "invalid node name";
+  case NSMENODELONG: return "node name too long"; /* why unused? */
+  case NSMEHOSTNAME: return "invalid hostname";
+  case NSMEALREADYP: return "host:port already in use";
+  case NSMEALREADYS: return "shm key already in use";
+  case NSMEALREADYH: return "host:port already in use"; /* deprecated */
+  case NSMENOIF: return "network interface not found";
+  case NSMENONSMD: syserr = "cannot connect to NSMD"; break;
+  case NSMENOUID:    return "uid not received";
+  case NSMERDCLOSE:  return "uid not fully received";
+  case NSMEACCESS:   return "invalid NSMD uid";
+  case NSMESHMGETSYS: syserr = "cannot open NSMsys shared memory"; break;
+  case NSMESHMGETMEM:
+    if (errno == EACCES) {
+      strcpy(buf, "nsmd2 shared memory must have either the same uid or gid");
       return buf;
     }
-  } else {
-    switch (nsmc->errc) {
-    case NSMENOERR:    return "no error";
-    case NSMECLOSED:   return "NSMD connection closed"; break; /* recv */
-    default:
-      if (nsmc->errc < 0) {
-	sprintf(buf, "undefined error code=%d", nsmc->errc);
-      } else {
-	sprintf(buf, "no error, code=%d", nsmc->errc);
-      }
+    syserr = "cannot open NSMmem shared memory"; break;
+  case NSMESHMATSYS: syserr = "shmat(NSMsys)"; break;
+  case NSMESHMATMEM: syserr = "shmat(NSMmem)"; break;
+  case NSMENOINIT: return "NSM is not initialized yet";
+  case NSMEPERM: return "operation not allowed for anonymous node";
+  case NSMEINVDATA: return "invalid send data parameter";
+  case NSMEINVFUNC: return "invalid callback function type";
+  case NSMEMAXFUNC: return "no more callback functions";
+  case NSMENOMEM:  return errs; /* openmem */
+  case NSMEBADFMT: return errs; /* openmem */
+  case NSMEBADREV: return errs; /* openmem/allocmem */
+  case NSMEPARSE:  return errs; /* openmem/allocmem */
+  default:
+    if (*errs) return errs;
+    if (! nsmc) {
+      sprintf(buf, "NSM is not initialized (errcode=%d)", errc);
+    } else {
+      sprintf(buf, "undefined error code (errcode=%d)", errc);
     }
+    return buf;
   }
+  
   if (syserr) {
     sprintf(buf, "%s: %s", syserr, strerror(errno));
   }
@@ -1018,7 +1045,7 @@ nsmlib_send(NSMcontext *nsmc, NSMmsg *msgp)
  nsmlib_send_error:
   shutdown(nsmc->sock, 2);
   nsmc->sock = -1;
-  return err;
+  return err; /* nsmc->errc or nsmlib_errc is set in the caller */
 }
 /* -- nsmlib_initcli ------------------------------------------------- */
 static int
@@ -1045,7 +1072,7 @@ nsmlib_initcli(NSMcontext *nsmc, const char *nodename)
   nsmc->reqwait = msg.req;
   if ((ret = nsmlib_send(nsmc, &msg)) < 0) {
     nsmc->reqwait = 0;
-    return ret;
+    return nsmlib_errc = ret;
   }
 
   /* receive request */
@@ -1081,7 +1108,7 @@ nsmlib_sendreqid(NSMcontext *nsmc,
   for (i=0; i<msg.npar; i++) msg.pars[i] = pars[i];
   msg.len = len;
   msg.datap = datap;
-  return nsmlib_send(nsmc, &msg);
+  return (nsmc->errc = nsmlib_send(nsmc, &msg));
 }
 /* -- nsmlib_reqid --------------------------------------------------- */
 int
@@ -1133,8 +1160,8 @@ nsmlib_register_request(NSMcontext *nsmc, const char *name)
   nsmc->reqwait = msg.req;
 
   /* send request */
-  ret = nsmlib_send(nsmc, &msg);
-  if (ret < 0) { nsmc->reqwait = 0; return ret; }
+  nsmc->errc = nsmlib_send(nsmc, &msg);
+  if (ret < 0) { nsmc->reqwait = 0; return nsmc->errc; }
 
   /* receive request */
   ret = nsmlib_recvpar(nsmc);
@@ -1157,14 +1184,16 @@ nsmlib_openmem(NSMcontext *nsmc,
   if (! fmtname) fmtname = datname;
   
   if (revision <= 0) {
-    printf("openmem: revision %d\n", revision);
+    sprintf(nsmc->errs, "invalid revision %d for data %s", revision, datname);
+    nsmc->errc = NSMEINVPAR;
     return 0;
   }
   if (! (nsmlib_parsefile(fmtname, revision, nsmlib_incpath, fmtstr))) {
     int errcode;
     const char *errstr = nsmlib_parseerr(&errcode);
-
-    printf("openmem: no fmtstr (%d) %s\n", errcode, errstr);
+    sprintf(nsmc->errs, "parse error for data %s (%d) %s",
+	    datname, errcode, errstr);
+    nsmc->errc = NSMEPARSE;
     return 0;
   }
 
@@ -1174,17 +1203,20 @@ nsmlib_openmem(NSMcontext *nsmc,
     if (strcmp(datp->dtnam, datname) == 0) break;
   }
   if (datid == NSMSYS_MAX_DAT) {
-    printf("openmem: data %s not found\n", datname);
+    sprintf(nsmc->errs, "data %s not found", datname);
+    nsmc->errc = NSMENOMEM;
     return 0;
   }
   if (strcmp(datp->dtfmt, fmtstr) != 0) {
-    printf("openmem: data %s fmt mismatch %s %s\n",
-	   datname, fmtstr, datp->dtfmt);
+    sprintf(nsmc->errs, "data %s format mismatch %s %s",
+	    datname, fmtstr, datp->dtfmt);
+    nsmc->errc = NSMEBADFMT;
     return 0;
   }
   if (ntohs(datp->dtrev) != revision) {
-    printf("openmem: data %s revision mismatch %d %d\n",
+    sprintf(nsmc->errs, "data %s revision mismatch %d %d\n",
 	   datname, revision, datp->dtrev);
+    nsmc->errc = NSMEBADREV;
     return 0;
   }
 
@@ -1194,20 +1226,16 @@ nsmlib_openmem(NSMcontext *nsmc,
   msg.npar = 1;
   msg.pars[0] = datid;
   nsmc->reqwait = msg.req;
-  ret = nsmlib_send(nsmc, &msg);
-  
-  if (ret < 0) {
-    printf("openmem: send error ret=%d\n", ret);
+  if ((nsmc->errc = nsmlib_send(nsmc, &msg)) < 0) {
     nsmc->reqwait = 0;
     return 0;
   }
-  ret = nsmlib_recvpar(nsmc);
-  if (ret < 0) {
-    printf("openmem: piperead error ret=%d\n", ret);
+  if ((ret = nsmlib_recvpar(nsmc)) < 0) {
     return 0;
   }
   if (ret != datp - sysp->dat) {
-    printf("openmem: datid mismatch %d %d\n", ret, datp - sysp->dat);
+    sprintf(nsmc->errs, "datid mismatch %d %d", ret, datp - sysp->dat);
+    nsmc->errc = NSMEDATID;
     return 0;
   }
   return (char *)memp + ntohl(datp->dtpos);
@@ -1237,9 +1265,16 @@ nsmlib_allocmem(NSMcontext *nsmc, const char *datname, const char *fmtname,
   }
   
   if (! (nsmlib_parsefile(fmtname, revision, nsmlib_incpath, fmtstr))) {
+    int errcode;
+    const char *errstr = nsmlib_parseerr(&errcode);
+    sprintf(nsmc->errs, "parse error for data %s (%d) %s",
+	    datname, errcode, errstr);
+    nsmc->errc = NSMEPARSE;
     return 0;
   }
-  if (! (p = malloc(strlen(datname) + strlen(fmtstr) + 2))) return 0;
+  if (! (p = malloc(strlen(datname) + strlen(fmtstr) + 2))) {
+    return 0;
+  }
 
   sprintf(p, "%s %s", datname, fmtstr);
 
@@ -1252,9 +1287,12 @@ nsmlib_allocmem(NSMcontext *nsmc, const char *datname, const char *fmtname,
   msg.len = strlen(p) + 1;
   msg.datap = p;
   nsmc->reqwait = msg.req;
-  ret = nsmlib_send(nsmc, &msg);
+  nsmc->errc = nsmlib_send(nsmc, &msg);
   free(p);
-  if (ret < 0) { nsmc->reqwait = 0; return 0; }
+  if (nsmc->errc < 0) {
+    nsmc->reqwait = 0;
+    return 0;
+  }
   DBG("allocmem 2");
   ret = nsmlib_recvpar(nsmc);
   DBG("allocmem 3");

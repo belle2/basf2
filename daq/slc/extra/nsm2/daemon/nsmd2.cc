@@ -21,8 +21,9 @@
 //  20131219  1915 uid/gid for MEM shm
 //  20131222  1916 printlog infinite loop fix
 //  20131230  1918 argv[0] changed to lower case
+//  20140104  1919 disid fix, stdint
 
-#define NSM_DAEMON_VERSION   1918 /* daemon   version 1.9.18 */
+#define NSM_DAEMON_VERSION   1919 /* daemon   version 1.9.19 */
 // ----------------------------------------------------------------------
 
 /*
@@ -106,11 +107,11 @@
 
 // -- global variables --------------------------------------------------
 // ----------------------------------------------------------------------
-uint16      nsmd_port   = NSM2_PORT;
+uint16_t      nsmd_port   = NSM2_PORT;
 int         nsmd_shmkey = -1; /* == nsmd_port if -1 */
 int         nsmd_debug  = 0;
 int         nsmd_priority = 0;
-uint32      nsmd_myip   = 0;  /* network byte order */
+uint32_t      nsmd_myip   = 0;  /* network byte order */
 SOCKAD_IN   nsmd_sockad;
 char        nsmd_host[1024];
 const char* nsmd_logdir = ".";
@@ -298,7 +299,7 @@ static void nsmd_setup_daemon(NSMcon& con);
 static void nsmd_destroyconn(NSMcon& con);
 static void nsmd_tcpsend(NSMcon& con, NSMdmsg& dmsg,
                          NSMDtcpq* qptr = 0, int beforeafter = 0);
-extern "C" int nsmlib_hash(NSMsys* sysp, int32* hashtable, int hashmax,
+extern "C" int nsmlib_hash(NSMsys* sysp, int32_t* hashtable, int hashmax,
                            const char* key, int create);
 
 //                   -------------------------
@@ -354,28 +355,28 @@ sleep1ms(int t1ms, int wait = 0)
 // -- htonll ------------------------------------------------------------
 #define ntohll(a) htonll(a)
 static uint64
-htonll(uint64 h)
+htonll(uint64_t h)
 {
-  static uint16 n42 = htons(42); /* 42 is the answer --- Douglas Adams */
+  static uint16_t n42 = htons(42); /* 42 is the answer --- Douglas Adams */
   if (n42 == 42) {
     return h;
   } else {
-    uint64 n;
-    uint32* hp = (uint32*)&h;
-    uint32* np = (uint32*)&n;
+    uint64_t n;
+    uint32_t* hp = (uint32_t*)&h;
+    uint32_t* np = (uint32_t*)&n;
     np[0] = htonl(hp[1]);
     np[1] = htonl(hp[0]);
     return n;
   }
 }
 // -- hlltohl2 ----------------------------------------------------------
-// to send a uint64 as two uint32 words
+// to send a uint64_t as two uint32_t words
 // ----------------------------------------------------------------------
 void
-hlltohl2(uint64 hll, uint32& h0, uint32& h1)
+hlltohl2(uint64_t hll, uint32_t& h0, uint32_t& h1)
 {
-  static uint16 n42 = htons(42); /* 42 is the answer */
-  uint32* hp = (uint32*)&hll;
+  static uint16_t n42 = htons(42); /* 42 is the answer */
+  uint32_t* hp = (uint32_t*)&hll;
   if (n42 == 42) {
     h0 = hp[0];
     h1 = hp[1];
@@ -385,24 +386,24 @@ hlltohl2(uint64 hll, uint32& h0, uint32& h1)
   }
 }
 // -- hlltohl -----------------------------------------------------------
-// to send a uint64 as two uint32 words
+// to send a uint64_t as two uint32_t words
 // ----------------------------------------------------------------------
 uint32
-hlltohl(uint64 hll, int i)
+hlltohl(uint64_t hll, int i)
 {
-  static uint16 n42 = htons(42); /* 42 is the answer */
-  uint32* hp = (uint32*)&hll;
+  static uint16_t n42 = htons(42); /* 42 is the answer */
+  uint32_t* hp = (uint32_t*)&hll;
   return (n42 == 42) ? hp[i & 1] : hp[1 - (i & 1)];
 }
 // -- hl2tohll ----------------------------------------------------------
-// to receive a uint64 as two uint32 words
+// to receive a uint64_t as two uint32_t words
 // ----------------------------------------------------------------------
 uint64
-hl2tohll(uint32 h0, uint32 h1)
+hl2tohll(uint32_t h0, uint32_t h1)
 {
   static int n42 = htons(42); /* 42 is the answer */
-  uint64 h;
-  uint32* hp = (uint32*)&h;
+  uint64_t h;
+  uint32_t* hp = (uint32_t*)&h;
   if (n42 == 42) {
     hp[0] = h0;
     hp[1] = h1;
@@ -416,8 +417,8 @@ hl2tohll(uint32 h0, uint32 h1)
 // a wrapping function for free
 // ----------------------------------------------------------------------
 static int   nsmd_alloctimes = 0;
-static int64 nsmd_alloctotal = 0;
-static int64 nsmd_allocalloc = 0;
+static int64_t nsmd_alloctotal = 0;
+static int64_t nsmd_allocalloc = 0;
 static char  nsmd_longbuf[NSM_TCPBUFSIZ];
 static int   nsmd_longused = 0;
 
@@ -556,8 +557,8 @@ nsmd_destroy(int code = NSMD_EUNEXPCT)
 
   LOG("***** terminating...%s *****", str);
 
-  uint64 now = time10ms();
-  uint64 timeout = now + 500; // +5 sec
+  uint64_t now = time10ms();
+  uint64_t timeout = now + 500; // +5 sec
   int sig = SIGTERM;
   while (nsmd_sysp && now < timeout) {
     if (now >= timeout) sig = SIGKILL;
@@ -616,18 +617,18 @@ nsmd_reopenlog()
       logprefix[strlen(logprefix) - 1] = 0;
     }
     if (stat(logprefix, &statbuf) >= 0 && S_ISDIR(statbuf.st_mode)) {
-      if (nsmd_port == NSM2_PORT) {
-        strcat(logprefix, "/nsmd");
-      } else {
-        sprintf(logprefix + strlen(logprefix), "/nsmd-%d", nsmd_port);
-      }
+      sprintf(logprefix + strlen(logprefix),
+              "/nsmd-%s-%d", nsmd_host, nsmd_port);
     }
   }
 
   sprintf(logfile, "%s.%04d%02d%02d.log", logprefix,
           cur->tm_year + 1900, cur->tm_mon + 1, cur->tm_mday);
   if (nsmd_logfp != stdout) {
-    if (nsmd_logfp) fclose(nsmd_logfp);
+    if (nsmd_logfp) {
+      fprintf(nsmd_logfp, "switching to a new log file %s...\n", logfile);
+      fclose(nsmd_logfp);
+    }
     if (!(nsmd_logfp = fopen(logfile, "a"))) {
       printf("cannot open logfile %s\n", logfile);
       exit(1);
@@ -650,11 +651,18 @@ nsmd_logtime(char* buf)
   cur = localtime((time_t*)&now.tv_sec);
   if (lastday != cur->tm_yday) {
     char datebuf[128];
+    int dver = NSM_DAEMON_VERSION;
+    int pver = NSM_PROTOCOL_VERSION;
     lastday = cur->tm_yday;
     nsmd_reopenlog();
     nsmd_printlog("",
                   "------------------------------------------------------------------");
-    sprintf(datebuf, "Date: %04d.%02d.%02d\n",
+    sprintf(datebuf, "%s version %d.%d.%02d protocol %d.%d.%02d",
+            "nsmd - network shared memory daemon",
+            dver / 1000, (dver / 100) % 10, dver % 100, pver / 1000, (pver / 100) % 10, pver % 100);
+    nsmd_printlog("", datebuf);
+
+    sprintf(datebuf, "date: %04d.%02d.%02d\n",
             cur->tm_year + 1900, cur->tm_mon + 1, cur->tm_mday);
     nsmd_printlog("", datebuf);
   }
@@ -1277,7 +1285,7 @@ nsmd_init()
 // len!=0 to use bufp->dat as raw stream
 static void
 nsmd_udpsend(SOCKAD_IN* sockadp, int req, int par1, int par2,
-             NSMudpbuf* bufp = 0, int len = 0, int npar = 0, uint32* pars = 0)
+             NSMudpbuf* bufp = 0, int len = 0, int npar = 0, uint32_t* pars = 0)
 {
   NSMsys& sys = *nsmd_sysp;
   NSMcon& udp = sys.con[NSMCON_UDP];
@@ -1304,7 +1312,7 @@ nsmd_udpsend(SOCKAD_IN* sockadp, int req, int par1, int par2,
 
   len += (bufp->dat - (char*)bufp) + npar * sizeof(int32);
   for (int i = 0; i < npar; i++) {
-    *(int32*)&buf.dat[i * sizeof(int32)] = ntohl(pars[i]);
+    *(int32_t*)&buf.dat[i * sizeof(int32)] = ntohl(pars[i]);
   }
 
   int ret = sendto(udp.sock, (char*)bufp, len, 0,
@@ -1340,7 +1348,7 @@ nsmd_udpsend_not(SOCKAD_IN* sockadp, NSMdmsg& dmsg)
   buf.seq = ntohs(udpseq++);
   buf.npar = dmsg.npar;
   for (int i = 0; i < dmsg.npar; i++) {
-    *(int32*)&buf.dat[i * sizeof(int32)] = ntohl(dmsg.pars[i]);
+    *(int32_t*)&buf.dat[i * sizeof(int32)] = ntohl(dmsg.pars[i]);
   }
   if (dmsg.len) {
     memcpy(&buf.dat[dmsg.npar * sizeof(int32)], dmsg.datap, dmsg.len);
@@ -1666,7 +1674,7 @@ nsmd_tcpsend(NSMcon& con, NSMdmsg& dmsg, NSMDtcpq* qptr, int beforeafter)
 
   char* datap = (char*)&head + sizeof(head);
   for (int i = 0; i < dmsg.npar; i++) {
-    *(int32*)datap = htonl(dmsg.pars[i]);
+    *(int32_t*)datap = htonl(dmsg.pars[i]);
     datap += sizeof(int32);
   }
 
@@ -1778,7 +1786,7 @@ nsmd_tcpconnect(SOCKAD_IN& sockad, const char* contype)
 // tcpconnect は newconn と reconnect から呼ばれるが、たぶん merge できる?
 // ----------------------------------------------------------------------
 int
-nsmd_newconn(int conid, int32 ip, const char* contype)
+nsmd_newconn(int conid, int32_t ip, const char* contype)
 {
   NSMsys& sys = *nsmd_sysp;
   NSMcon& con = sys.con[conid];
@@ -1905,11 +1913,11 @@ nsmd_destroyconn(NSMcon& con)
   // or leave the deputy undefined until receiving NEWMASTER
   if (! itslocal && IamMaster() && NoDeputy()) { // if I am a new MASTER
     int prio = -1;
-    uint32 ip_h = (uint32) - 1;
+    uint32_t ip_h = (uint32) - 1;
     for (int conid = NSMCON_OUT; conid < sys.ncon; conid++) {
       if (ConidIsLocal(conid)) continue;
       int    newprio = sys.con[conid].priority;
-      uint32 newip_h = ntohl(ADDR_IP(sys.con[conid].sockad));
+      uint32_t newip_h = ntohl(ADDR_IP(sys.con[conid].sockad));
       if (newprio > prio || (newprio == prio && newip_h < ip_h)) {
         sys.deputy = conid;
         ip_h = newip_h;
@@ -1930,7 +1938,7 @@ nsmd_destroyconn(NSMcon& con)
 //                    ---------------
 // -- nsmd_sch_initbcast ------------------------------------------------
 int
-nsmd_sch_initbcast(int16 conid, int32 opt)
+nsmd_sch_initbcast(int16_t conid, int32_t opt)
 {
   NSMsys& sys = *nsmd_sysp;
   int next = -1;
@@ -2059,10 +2067,10 @@ nsmd_fmtcpy(char* buf, int datid, int buftodat, int pos = 0, int len = 0,
     if (loc >= pos) {
       for (int i = 0; i < num; i++) {
         switch (siz) {
-          case 1: *(byte8*)dst = *(byte8*)src;         break;
-          case 2: *(int16*)dst = ntohs(*(int16*)src);  break;
-          case 4: *(int32*)dst = ntohl(*(int32*)src);  break;
-          case 8: *(int64*)dst = ntohll(*(int64*)src); break;
+          case 1: *(uint8_t*)dst = *(uint8_t*)src;         break;
+          case 2: *(int16_t*)dst = ntohs(*(int16_t*)src);  break;
+          case 4: *(int32_t*)dst = ntohl(*(int32_t*)src);  break;
+          case 8: *(int64_t*)dst = ntohll(*(int64_t*)src); break;
         }
         src += siz;
         dst += siz;
@@ -2178,10 +2186,10 @@ nsmd_fmtcpy_old(void* dst, void* src, int siz)
       } else if (siz > 0) {
         siz -= len;
         switch (len) {
-          case 1: *(byte8*)dst = *(byte8*)src;        break;
-          case 2: *(int16*)dst = ntohs(*(int16*)src); break;
-          case 4: *(int32*)dst = ntohl(*(int32*)src); break;
-          case 8: *(int64*)dst = ntohll(*(int64*)src); break;
+          case 1: *(uint8_t*)dst = *(uint8_t*)src;        break;
+          case 2: *(int16_t*)dst = ntohs(*(int16_t*)src); break;
+          case 4: *(int32_t*)dst = ntohl(*(int32_t*)src); break;
+          case 8: *(int64_t*)dst = ntohll(*(int64_t*)src); break;
         }
         src = (char*)src + len;
         dst = (char*)dst + len;
@@ -2204,7 +2212,7 @@ nsmd_shmcast()
 {
   NSMsys& sys = *nsmd_sysp;
   if (! nsmd_sysp) ASRT("shmcast: no sys");
-  uint64 now10ms = time10ms();
+  uint64_t now10ms = time10ms();
 
   for (int i = 0; i < sys.nsnd; i++) {
     NSMdat_snd& snd = sys.snd[i];
@@ -2221,7 +2229,7 @@ nsmd_shmcast()
 
       int offset = 0;
       const int chunksiz = NSM_UDPDATSIZ;
-      uint64 now1ms = time1ms();
+      uint64_t now1ms = time1ms();
 
       while (offset < dtsiz) {
         NSMudpbuf udpbuf;
@@ -2232,7 +2240,7 @@ nsmd_shmcast()
         nsmd_udpsend(0, NSMCMD_USRCPYMEM, snd.disid, offset, &udpbuf, len);
 
         offset += len;
-        uint64 tt = time1ms();
+        uint64_t tt = time1ms();
 
         // QoS to keep 1 Mbyte/s or 1 packet / 1ms
         int dbgcnt = 0;
@@ -2340,8 +2348,8 @@ nsmd_touchsys(NSMcon& con, int pos, int siz)
   char* begp = (char*)&sys + pos;
   char* endp = begp + siz;
   NSMDtcpq* qptr[NSMSYS_MAX_CON];
-  int16 qpos[NSMSYS_MAX_CON];
-  int16 qsiz[NSMSYS_MAX_CON];
+  int16_t qpos[NSMSYS_MAX_CON];
+  int16_t qsiz[NSMSYS_MAX_CON];
   memset(qptr, 0, sys.ncon * sizeof(NSMDtcpq*));
   memset(qpos, 0, sys.ncon * sizeof(int16));
   memset(qsiz, 0, sys.ncon * sizeof(int16));
@@ -2415,7 +2423,7 @@ nsmd_touchsys(NSMcon& con, int pos, int siz)
 // syscpyq based touchsys (old scheme)
 // ----------------------------------------------------------------------
 typedef struct nsmd_syscpyq {
-  uint32 ipaddr;
+  uint32_t ipaddr;
   int pos;
   int siz;
   struct nsmd_syscpyq* nextp;
@@ -2630,7 +2638,7 @@ nsmd_delete_dat(NSMcon& con, int datid)
 {
   NSMsys& sys = *nsmd_sysp;
   NSMdat& dat = sys.dat[datid];
-  int16* aprevp = &sys.afirst;
+  int16_t* aprevp = &sys.afirst;
   int    anext = (int16)ntohs(*aprevp);
   int    nodid = (int16)ntohs(dat.owner);
 
@@ -2640,7 +2648,7 @@ nsmd_delete_dat(NSMcon& con, int datid)
   }
 
   DBG("delete_dat datid=%d", datid);
-  int16* nprevp = &sys.nod[nodid].noddat;
+  int16_t* nprevp = &sys.nod[nodid].noddat;
   int    nnext  = ntohs(*nprevp);
 
 #if 0
@@ -2709,14 +2717,16 @@ nsmd_delete_dat(NSMcon& con, int datid)
   nsmd_touchsys(con, SYSPOS(&dat), sizeof(dat));
 }
 // -- nsmd_delete_nod ---------------------------------------------------
-//
+// delete node and related entry from master's distributed sys area
 // ----------------------------------------------------------------------
 void
-nsmd_delete_nod(NSMcon& con, int nodid, int mode)
+nsmd_delete_nod(NSMcon& con, int nodid)
 {
   NSMsys& sys = *nsmd_sysp;
   NSMnod& nod = sys.nod[nodid];
-  int n_nodid = htons(nodid);
+  int16_t n_nodid = (int16_t)htons(nodid);
+
+  LOG("delete_nod con=%d id=%d mode=%d", &con - sys.con, nodid);
 
   // remove all my refs
   for (int refid = 0; refid < NSMSYS_MAX_REF; refid++) {
@@ -2749,6 +2759,16 @@ nsmd_delete_nod(NSMcon& con, int nodid, int mode)
     nnext = ntohs(dat.nnext);
     nsmd_delete_dat(con, datid);
   }
+}
+// -- nsmd_delete_dis ---------------------------------------------------
+// delete node and related entry from local sys area
+// ----------------------------------------------------------------------
+void
+nsmd_delete_dis(int nodid)
+{
+  NSMsys& sys = *nsmd_sysp;
+
+  LOG("delete_dis nodid=%d", nodid);
 
   // remove all my disid
   for (int i = sys.nsnd - 1; i >= 0; i--) {
@@ -2757,6 +2777,8 @@ nsmd_delete_nod(NSMcon& con, int nodid, int mode)
         memcpy(&sys.snd[i], &sys.snd[i + 1], sizeof(sys.snd[0]) * (sys.nsnd - 1 - i));
       }
       sys.nsnd--;
+      sys.snd[sys.nsnd].disnod = (uint16_t) - 1;
+      sys.snd[sys.nsnd].disid  = (uint16_t) - 1;
     }
   }
 }
@@ -3053,6 +3075,11 @@ nsmd_do_delclient(NSMcon& con, NSMdmsg& dmsg)
 
   DBG("do_delclient");
 
+  // free distribution list
+  if (dmsg.src != (uint16) - 1 && ConIsLocal(con)) {
+    nsmd_delete_dis(dmsg.src);
+  }
+
   // I must be a master (or a deputy when con=master dies)
   if (! IamMaster() && !(IamDeputy() && ConIsMaster(con))) {
     DBG("do_delclient tcpsend");
@@ -3091,7 +3118,7 @@ nsmd_do_delclient(NSMcon& con, NSMdmsg& dmsg)
      */
 
     // free dat area
-    nsmd_delete_nod(con, dmsg.src, 1);
+    nsmd_delete_nod(con, dmsg.src);
 
     // clear nod entry
     LOG("delclient: nod=%s (%d)", nod.name, dmsg.src);
@@ -3169,7 +3196,7 @@ nsmd_do_newdaemon(NSMcon& con, NSMdmsg& dmsg)
   }
 
   // more than one daemons are standing for master
-  int32 fromip = ADDR_IP(con.sockad);
+  int32_t fromip = ADDR_IP(con.sockad);
   if (nsmd_init_count < 0) {
     ASRT("do we need to redo master search?");
     // below is just kept
@@ -3227,14 +3254,14 @@ nsmd_do_ackdaemon(NSMcon& con, NSMdmsg& dmsg)
   }
 
   // check if anything to change
-  int32 newm = htonl(dmsg.pars[0]);  // converted back to network byte order
-  int32 newd = htonl(dmsg.pars[1]);
-  int32 oldm = sys.master ? AddrMaster() : -1;
-  int32 oldd = sys.deputy ? AddrDeputy() : -1;
+  int32_t newm = htonl(dmsg.pars[0]);  // converted back to network byte order
+  int32_t newd = htonl(dmsg.pars[1]);
+  int32_t oldm = sys.master ? AddrMaster() : -1;
+  int32_t oldd = sys.deputy ? AddrDeputy() : -1;
   if (newm && newm == oldm && newd == oldd) return;
 
   // check the message source
-  int32 fromip = ADDR_IP(con.sockad);
+  int32_t fromip = ADDR_IP(con.sockad);
   if (fromip != newm && fromip != newd) {
     WARN("ackdaemon from a non-master/deputy host %s", ADDR_STR(fromip));
     return;
@@ -3487,8 +3514,8 @@ nsmd_do_ready(NSMcon& con, NSMdmsg& dmsg)
   if (opt == 1 && IamDeputy()) { // ready after NSMCMD_SYSCPYMEM
     return;
   } if (opt == 1 && IamMaster()) { // ready after NSMCMD_SYSCPYMEM
-    uint32 masterip = ADDR_IP(sys.con[sys.master].sockad);
-    uint32 deputyip = ADDR_IP(sys.con[sys.deputy].sockad);
+    uint32_t masterip = ADDR_IP(sys.con[sys.master].sockad);
+    uint32_t deputyip = ADDR_IP(sys.con[sys.deputy].sockad);
     int prio  = dmsg.pars[0];
     int deputyprio = sys.con[sys.deputy].priority;
     if (prio > nsmd_priority ||
@@ -3536,7 +3563,7 @@ nsmd_do_newmaster(NSMcon& con, NSMdmsg& dmsg)
 
   LOG("new master=%s/deputy=%s", ADDR_STR(newm), ADDR_STR(newd));
 
-  int64 tim = hl2tohll(dmsg.pars[6], dmsg.pars[7]);
+  int64_t tim = hl2tohll(dmsg.pars[6], dmsg.pars[7]);
   if (tim != sys.con[NSMCON_TCP].timstart) {
     ASRT("do_newmaster: wrong tim=%lx/%lx", tim, sys.con[NSMCON_TCP].timstart);
   }
@@ -3566,10 +3593,10 @@ nsmd_do_newmaster(NSMcon& con, NSMdmsg& dmsg)
 
   // -- find what and who to change
   const char* newtyp = 0;
-  int16*      chgidp = 0;
-  int16*      keepidp = 0;
+  int16_t*      chgidp = 0;
+  int16_t*      keepidp = 0;
   int         newip  = -1;
-  int64       newtim = 0;
+  int64_t       newtim = 0;
 
   if (newm == oldd && newd == oldm) {
     LOG("newmaster: no new connection");
@@ -3829,7 +3856,7 @@ nsmd_do_allocmem(NSMcon& con, NSMdmsg& dmsg)
 {
   NSMsys& sys = *nsmd_sysp;
   NSMmem& mem = *nsmd_memp;
-  uint64 now10ms = time10ms();
+  uint64_t now10ms = time10ms();
   int    datid;
   DBG("do_allocmem");
 
@@ -3850,6 +3877,8 @@ nsmd_do_allocmem(NSMcon& con, NSMdmsg& dmsg)
         if (sys.nsnd >= NSMSYS_MAX_DAT) ASRT("do_allocmem too many disid");
         NSMdat_snd& snd = sys.snd[sys.nsnd++];
         memset(&snd, 0, sizeof(snd));
+        snd.disid  = datid;
+        snd.disnod = dmsg.dest;
         snd.distim = now10ms;
       }
     } else {
@@ -3911,10 +3940,10 @@ nsmd_do_allocmem(NSMcon& con, NSMdmsg& dmsg)
       nodeap = sys.dat + datid;
     } while ((datid = ntohs(nodeap->nnext)) != (uint16) - 1);
   }
-  int16* nprevp = nodeap ? &nodeap->nnext : &nod.noddat;
+  int16_t* nprevp = nodeap ? &nodeap->nnext : &nod.noddat;
 
   // go through the link to find a new or already allocated space
-  uint16 afirst = ntohs(sys.afirst);
+  uint16_t afirst = ntohs(sys.afirst);
   NSMdat* datp  = (afirst == (uint16) - 1) ? 0 : sys.dat + afirst;
   NSMdat* datp_sav   = 0;
   NSMdat* datp_aprev = 0; // one datp before the new space
@@ -4180,7 +4209,7 @@ nsmd_udprecv()
 
   // -- recvfrom
   NSMudpbuf recvbuf;
-  uint32 fromlen = sizeof(SOCKAD_IN);
+  uint32_t fromlen = sizeof(SOCKAD_IN);
   int recvlen = RECVFROM(udp.sock, recvbuf, &fromcon.sockad, &fromlen);
 
   if (recvlen < 0) {  // not in NSM1, probably something different is needed
@@ -4220,7 +4249,7 @@ nsmd_udprecv()
   if (recvbuf.npar) {
     dmsg.npar = recvbuf.npar;
     for (int i = 0; i < dmsg.npar; i++) {
-      dmsg.pars[i] = ntohl(*(int32*)&recvbuf.dat[i * sizeof(int32)]);
+      dmsg.pars[i] = ntohl(*(int32_t*)&recvbuf.dat[i * sizeof(int32)]);
     }
   } else {
     dmsg.npar = 2; // fixed
@@ -4250,7 +4279,7 @@ nsmd_tcpaccept()
   NSMcon& tcp = sys.con[NSMCON_TCP];
   NSMcon& udp = sys.con[NSMCON_UDP];
   SOCKAD_IN sockad;
-  uint32 sockadlen = sizeof(SOCKAD_IN);
+  uint32_t sockadlen = sizeof(SOCKAD_IN);
 
   // accept system call
   int sock = accept(tcp.sock, (SOCKAD*)&sockad, &sockadlen);
@@ -4373,7 +4402,7 @@ nsmd_tcprecv(NSMcon& con)
   const int NO_CONI = -1;
   static char* shortbufp[MAX_CONI];
   static char* longbufp[MAX_CONI];
-  static int32 bsizbuf[MAX_CONI];
+  static int32_t bsizbuf[MAX_CONI];
   int recvlen;
   int recvsiz;
   char* recvp;
@@ -4490,7 +4519,7 @@ nsmd_tcprecv(NSMcon& con)
   dmsg.opt  = head.opt;
   dmsg.npar = head.npar;
   for (int i = 0; i < dmsg.npar; i++) {
-    int32 par = *(int32*)(datap + i * sizeof(int32));
+    int32_t par = *(int32_t*)(datap + i * sizeof(int32));
     dmsg.pars[i]   = ntohl(par);
   }
   dmsg.datap = dmsg.len ? datap + dmsg.npar * sizeof(int32) : 0;
@@ -4623,7 +4652,7 @@ nsmd_loop()
     }
 
     // -- schedule list
-    uint64 now = time10ms();
+    uint64_t now = time10ms();
     for (int i = 0; i < sys.nsch; i++) {
       NSMsch& sch = sys.sch[i];
       if (sch.when > 0 && now >= sch.when) {

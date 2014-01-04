@@ -3,8 +3,8 @@
 
 /* -- version info */
 
-#define NSM_PROTOCOL_VERSION 1915 /* protocol version 1.9.15 */
-#define NSM_PACKAGE_VERSION  1918 /* package  version 1.9.18 */
+#define NSM_PROTOCOL_VERSION 1915 /* protocol version */
+#define NSM_PACKAGE_VERSION  1919 /* package  version */
 
 /*
   20120723 1900 file created
@@ -22,6 +22,7 @@
   20131222 1916 printlog infinite loop fix
   20131229 1917 no change in nsmd2, update in nsminfo2 and b2lib
   20131230 1918 libs: strerror fix, initnet fix, stdint fix, bridge fix
+  20140104 1919 b2libs: b2nsm_ok text, nsmd2: disid fix
  */
 
 /* -- DATA TYPES ----------------------------------------------------- */
@@ -67,7 +68,8 @@ typedef struct NSMcontext_struct NSMcontext;
 #define NSMECLOSED     (-115)
 #define NSMEPIPEREAD   (-116)
 #define NSMEPIPEWRITE  (-117)
-#define NSMEMAXRETRY   (-118)
+/* #define NSMEMAXRETRY   (-118) */
+#define NSMEDATID      (-118)
 #define NSMEUNEXPECTED (-119)
 
 /* possible errors by user parameters */
@@ -103,12 +105,8 @@ typedef struct NSMcontext_struct NSMcontext;
 #define NSMEMAXFUNC   (-30)
 #define NSMENOMEM     (-31) /* data does not exist (openmem) */
 #define NSMEBADFMT    (-32) /* data format is inconsistent (openmem) */
-#define NSMEOLDREV    (-33) /* data revision is old (openmem) */
-#define NSMENEWREV    (-34) /* data revision is new (openmem) */
-#define NSMESHMUID    (-35) /* given uid does not exist */
-#define NSMEUIDPERM   (-36) /* given uid permission denied */
-#define NSMESHMGID    (-37) /* given gid does not exist */
-#define NSMEGIDPERM   (-38) /* given gid permission denied */
+#define NSMEBADREV    (-33) /* data revision is inconsistent (openmem) */
+#define NSMEPARSE     (-34) /* data format parse error (openmem) */
 
 /* NSMmsg (in host byte order) */
 typedef struct {

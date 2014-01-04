@@ -1,15 +1,9 @@
 Import('env')
-import os
 
-if env.has_key('HAS_TEVE'):
-  if not env['HAS_TEVE']:
-    print "DisplayModule disabled, please recompile root with opengl support (on Debian/Ubuntu you'll probably only need to install libglu1-mesa-dev and rebuild)"
-
-  env['CONTINUE'] = env['HAS_TEVE']
-  env['LIBS'] = ['$ROOT_LIBS', 'display', 'tracking', 'framework', 'geometry',
-                 'vxd', 'vxd_dataobjects', 'pxd_dataobjects', 'svd_dataobjects', 'svd', 'cdc_dataobjects',
-                 'cdc', 'ecl_dataobjects', 'bklm_dataobjects', 'ecl', 'mdst_dataobjects', 'eklm_dataobjects',
-                 'display_dataobjects', 'simulation_dataobjects', 'generators_dataobjects',
-                 'genfit2'] + env['TEVE_LIBS']
+env['LIBS'] = ['$ROOT_LIBS', 'display', 'tracking', 'framework', 'geometry',
+               'vxd', 'vxd_dataobjects', 'pxd_dataobjects', 'svd_dataobjects', 'svd', 'cdc_dataobjects',
+               'cdc', 'ecl_dataobjects', 'bklm_dataobjects', 'ecl', 'mdst_dataobjects', 'eklm_dataobjects',
+               'display_dataobjects', 'simulation_dataobjects', 'generators_dataobjects',
+               'genfit2']
 
 Return('env')

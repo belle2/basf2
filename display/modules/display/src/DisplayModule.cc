@@ -1,8 +1,8 @@
 #include <display/modules/display/DisplayModule.h>
 
 #include <display/dataobjects/DisplayData.h>
-#include <display/modules/display/DisplayUI.h>
-#include <display/modules/display/EVEVisualization.h>
+#include <display/DisplayUI.h>
+#include <display/EVEVisualization.h>
 #include <geometry/GeometryManager.h>
 #include <vxd/geometry/GeoCache.h>
 #include <ecl/geometry/ECLGeometryPar.h>

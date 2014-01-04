@@ -1,4 +1,4 @@
-#include <display/modules/display/SplitGLView.h>
+#include <display/SplitGLView.h>
 #include <framework/logging/Logger.h>
 
 #include "TGFrame.h"

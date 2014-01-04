@@ -1,7 +1,7 @@
 //needs to be first
 #include <framework/core/ModuleParam.h>
 
-#include <display/modules/display/DisplayUI.h>
+#include <display/DisplayUI.h>
 
 #include <framework/core/InputController.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -9,8 +9,8 @@
 #include <framework/logging/Logger.h>
 #include <display/dataobjects/DisplayData.h>
 #include <display/async/AsyncWrapper.h>
-#include <display/modules/display/BrowsableWrapper.h>
-#include <display/modules/display/SplitGLView.h>
+#include <display/BrowsableWrapper.h>
+#include <display/SplitGLView.h>
 
 #include <TApplication.h>
 #include <TCanvas.h>

@@ -32,7 +32,7 @@ namespace Belle2 {
     virtual ~SplitGLView();
 
     /** handler for clicks inside GL viewer. */
-    void           itemClicked(TGListTreeItem* item, Int_t btn, Int_t x, Int_t y);
+    void           itemClicked(TGListTreeItem* item, Int_t btn, Int_t x, Int_t y = 43);
     /** menu item handler */
     void           handleMenu(Int_t id);
     /** Save a geometry extract from the current state of the TGeo geometry. */

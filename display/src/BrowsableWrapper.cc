@@ -1,4 +1,4 @@
-#include <display/modules/display/BrowsableWrapper.h>
+#include <display/BrowsableWrapper.h>
 
 #include <framework/logging/Logger.h>
 

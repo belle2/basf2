@@ -17,7 +17,7 @@
    You should have received a copy of the GNU Lesser General Public License
    along with GENFIT.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include <display/modules/display/EVEVisualization.h>
+#include <display/EVEVisualization.h>
 
 #include <display/dataobjects/DisplayData.h>
 

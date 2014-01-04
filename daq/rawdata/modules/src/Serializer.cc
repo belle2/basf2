@@ -240,14 +240,19 @@ int SerializerModule::sendByWriteV(RawDataBlock* rawdblk)
 
   // Send Multiple buffers
   int n = 0;
-  if ((n = writev(m_socket, iov, NUM_BUFFER)) < 0) {
-    if (errno != EINTR) {
-      char err_buf[500];
-      sprintf(err_buf, "SEND error.(%s) Exiting... : sent %d bytes, header %d bytes body %d tailer %d\n" ,
-              strerror(errno), n, iov[0].iov_len, iov[1].iov_len, iov[2].iov_len);
-      print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-      exit(1);
+  while (true) {
+    if ((n = writev(m_socket, iov, NUM_BUFFER)) < 0) {
+      if (errno == EINTR) {
+        continue;
+      } else {
+        char err_buf[500];
+        sprintf(err_buf, "SEND error.(%s) Exiting... : sent %d bytes, header %d bytes body %d tailer %d\n" ,
+                strerror(errno), n, iov[0].iov_len, iov[1].iov_len, iov[2].iov_len);
+        print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+        exit(1);
+      }
     }
+    break;
   }
 
 
@@ -389,14 +394,14 @@ void SerializerModule::Accept()
            htons(sock_accept.sin_port), sock_accept.sin_addr.s_addr, inet_ntoa(sock_accept.sin_addr));
 
     // set timepout option
-    struct timeval timeout;
-    timeout.tv_sec = 100;
-    timeout.tv_usec = 0;
-    ret = setsockopt(fd_accept, SOL_SOCKET, SO_SNDTIMEO, &timeout, (socklen_t)sizeof(timeout));
-    if (ret < 0) {
-      char temp_char[100] = "Failed to set TIMEOUT. Exiting..."; print_err.PrintError(temp_char, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-      exit(-1);
-    }
+//     struct timeval timeout;
+//     timeout.tv_sec = 100;
+//     timeout.tv_usec = 0;
+//     ret = setsockopt(fd_accept, SOL_SOCKET, SO_SNDTIMEO, &timeout, (socklen_t)sizeof(timeout));
+//     if (ret < 0) {
+//       char temp_char[100] = "Failed to set TIMEOUT. Exiting..."; print_err.PrintError(temp_char, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+//       exit(-1);
+//     }
   }
 
 //   int flag = 1;

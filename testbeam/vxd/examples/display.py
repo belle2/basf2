@@ -12,14 +12,14 @@ theta = 90.0  # degrees
 theta_spread = 0.005  # # degrees (sigma of gaussian)
 phi = 180.0  # degrees
 phi_spread = 0.005  # degrees (sigma of gaussian)
-gun_x_position = 100.  # cm ... 100cm ... outside magnet + plastic shielding + Al scatterer (air equiv.)
+gun_x_position = 100.  # cm ... 100cm ... outside magnet + plastic shielding
+# + Al scatterer (air equiv.)
 # gun_x_position = 40. # cm ... 40cm ... inside magnet
 beamspot_size_y = 0.3  # cm (sigma of gaussian)
 beamspot_size_z = 0.3  # cm (sigma of gaussian)
 
 from basf2 import *
-# suppress messages and warnings during processing:
-set_log_level(LogLevel.ERROR)
+
 # ParticleGun
 particlegun = register_module('ParticleGun')
 # number of primaries per event
@@ -42,7 +42,8 @@ particlegun.param('phiParams', [phi, phi_spread])
 # gun position must be in positive values of x.
 # Magnet wall starts at 424mm and ends at 590mm
 # Plastic 1cm shielding is at 650mm
-# Aluminium target at 750mm to "simulate" 15m air between collimator and TB setup
+# Aluminium target at 750mm to "simulate" 15m air between collimator and TB
+# setup
 particlegun.param('vertexGeneration', 'normal')
 particlegun.param('xVertexParams', [gun_x_position, 0.0])
 particlegun.param('yVertexParams', [0.0, beamspot_size_y])
@@ -58,7 +59,8 @@ progress = register_module('Progress')
 
 # Load parameters from xml
 gearbox = register_module('Gearbox')
-# This file contains the VXD (no Telescopes) beam test geometry including the real PCMAG magnetic field
+# This file contains the VXD (no Telescopes) beam test geometry including
+#the real PCMAG magnetic field
 gearbox.param('fileName', 'testbeam/vxd/FullTelescopeVXDTB.xml')
 
 # Create geometry
@@ -70,6 +72,9 @@ geometry.param('Components', ['MagneticField', 'TB'])
 
 # Full simulation module
 simulation = register_module('FullSim')
+simulation.logging.log_level = LogLevel.ERROR
+# and make it store the particle trajectories so we can draw them
+simulation.param("trajectoryStore", 2)
 
 # Uncomment the following lines to get particle tracks visualization
 # simulation.param('EnableVisualization', True)

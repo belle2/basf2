@@ -7,7 +7,7 @@
 #include <daq/slc/system/TCPServerSocket.h>
 #include <daq/slc/system/TCPSocketReader.h>
 
-#include <iostream>
+#include <daq/slc/base/Debugger.h>
 
 using namespace Belle2;
 
@@ -16,7 +16,9 @@ void RCGUIAcceptor::run()
   TCPServerSocket server_socket(_ip, _port);
   server_socket.open();
   while (true) {
+    Belle2::debug("Waiting for new connection..");
     TCPSocket socket = server_socket.accept();
+    Belle2::debug("Accepted new connection..");
     TCPSocketReader reader(socket);
     std::string name = reader.readString();
     if (name == "GUI") {

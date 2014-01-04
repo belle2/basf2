@@ -139,9 +139,13 @@ void NSMCommunicator::sendRequest(const NSMNode* node, const Command& cmd,
                                   NSMMessage& message)
 throw(NSMHandlerException)
 {
+#if NSM_PACKAGE_VERSION >= 1914
   sendRequest(node, cmd, message.getNParams(), message.getParams(),
               message.getData().size(),
               (message.getData().size() == 0) ? NULL : message.getData().c_str());
+#else
+#warning "Wrong version of nsm2. try source daq/slc/extra/nsm2/export.sh"
+#endif
 }
 
 void NSMCommunicator::sendRequest(const NSMNode* node, const Command& cmd,

@@ -72,6 +72,7 @@ int main(int argc, char** argv)
   dbmanager->writeConfigs();
   int port = config.getInt("RC_GLOBAL_PORT");
   if (port > 0) {
+    Belle2::debug("%s:%d", config.get("RC_GLOBAL_HOST").c_str(), port);
     PThread(new RCGUIAcceptor(config.get("RC_GLOBAL_HOST"), port, callback));
   }
   RCClientAcceptor* acceptor =

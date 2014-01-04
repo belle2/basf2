@@ -91,15 +91,28 @@ int NSMMessage::getParam(int i) const throw()
   return _nsm_msg.pars[i];
 }
 
+#if NSM_PACKAGE_VERSION >= 1914
 const int* NSMMessage::getParams() const throw()
 {
-  return (const int*)_nsm_msg.pars;
+  return _nsm_msg.pars;
 }
 
 int* NSMMessage::getParams() throw()
 {
-  return (int*)_nsm_msg.pars;
+  return _nsm_msg.pars;
 }
+#else
+const unsigned int* NSMMessage::getParams() const throw()
+{
+  return _nsm_msg.pars;
+}
+
+unsigned int* NSMMessage::getParams() throw()
+{
+  return _nsm_msg.pars;
+}
+#warning "Wrong version of nsm2. try source daq/slc/extra/nsm2/export.sh"
+#endif
 
 unsigned int NSMMessage::getLength() const throw()
 {

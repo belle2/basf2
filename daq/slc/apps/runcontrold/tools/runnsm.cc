@@ -32,8 +32,13 @@ extern "C" {
 
 using namespace Belle2;
 
-int main(int, char**)
+int main(int argc, char** argv)
 {
+  if (argc < 2) {
+    std::cout << "Usage : runnsm <configname>" << std::endl;
+    return 1;
+  }
+#if NSM_PACKAGE_VERSION >= 1914
   ConfigFile config("slowcontrol", "cdc");
   XMLParser parser;
   XMLElement* el = parser.parse(config.get("RC_XML_PATH") + "/" +
@@ -73,5 +78,8 @@ int main(int, char**)
       nsm_comm->sendRequest(rc_node, cmd, msg.getNParams(), msg.getParams(), str);
     }
   }
+#else
+#warning "Wrong version of nsm2. try source daq/slc/extra/nsm2/export.sh"
+#endif
   return 0;
 }

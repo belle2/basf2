@@ -33,8 +33,13 @@ namespace Belle2 {
     unsigned short getNodeId() const throw();
     unsigned short getNParams() const throw();
     int getParam(int i) const throw();
+#if NSM_PACKAGE_VERSION >= 1914
     int* getParams() throw();
     const int* getParams() const throw();
+#else
+    unsigned int* getParams() throw();
+    const unsigned int* getParams() const throw();
+#endif
     unsigned int getLength() const throw();
     const std::string& getData() const throw();
     void setRequestId(unsigned short id) throw();

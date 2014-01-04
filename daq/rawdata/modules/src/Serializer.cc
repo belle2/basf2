@@ -244,11 +244,10 @@ int SerializerModule::sendByWriteV(RawDataBlock* rawdblk)
   //  if ( ( n = send(m_socket, (char*)temp_buf, iov[0].iov_len + iov[1].iov_len + iov[2].iov_len, MSG_NOSIGNAL) )
   //      != iov[0].iov_len + iov[1].iov_len + iov[2].iov_len) {
   if ((n = writev(m_socket, iov, NUM_BUFFER)) < 0) {
-    perror("SEND error1");
     if (errno != EINTR) {
       char err_buf[500];
-      sprintf(err_buf, "SEND error. Exiting... : sent %d bytes, header %d bytes body %d tailer %d\n" , n,
-              iov[0].iov_len, iov[1].iov_len, iov[2].iov_len);
+      sprintf(err_buf, "SEND error.(%s) Exiting... : sent %d bytes, header %d bytes body %d tailer %d\n" ,
+              strerror(errno), n, iov[0].iov_len, iov[1].iov_len, iov[2].iov_len);
       print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
       exit(1);
     }
@@ -285,7 +284,9 @@ int SerializerModule::sendByWriteV(RawDataBlock* rawdblk)
         int ret = 0;
         if ((ret = send(m_socket, (char*)iov[ 0 ].iov_base + sent_bytes, iov[ 0 ].iov_len - sent_bytes,  MSG_NOSIGNAL)
             ) < 0) {
-          char temp_char[100] = "Failed to send data. Exiting...";  print_err.PrintError(temp_char, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+          char err_buf[500];
+          sprintf(err_buf, "Failed to send data.(%s) Exiting...", strerror(errno));
+          print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
           sleep(1234567);
           exit(1);
         }

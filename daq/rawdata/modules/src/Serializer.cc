@@ -238,11 +238,8 @@ int SerializerModule::sendByWriteV(RawDataBlock* rawdblk)
   iov[2].iov_base = (char*)send_trailer.GetBuffer();
   iov[2].iov_len = sizeof(int) * send_trailer.GetTrlNwords();
 
-  //  char* temp_buf = new char[ iov[0].iov_len + iov[1].iov_len + iov[2].iov_len ];
   // Send Multiple buffers
   int n = 0;
-  //  if ( ( n = send(m_socket, (char*)temp_buf, iov[0].iov_len + iov[1].iov_len + iov[2].iov_len, MSG_NOSIGNAL) )
-  //      != iov[0].iov_len + iov[1].iov_len + iov[2].iov_len) {
   if ((n = writev(m_socket, iov, NUM_BUFFER)) < 0) {
     if (errno != EINTR) {
       char err_buf[500];
@@ -279,53 +276,16 @@ int SerializerModule::sendByWriteV(RawDataBlock* rawdblk)
     double retry_start = getTimeSec();
     // Send Header
     if (n < (int)(iov[ 0 ].iov_len)) {
-      int sent_bytes = n;
-      while (true) {
-        int ret = 0;
-        if ((ret = send(m_socket, (char*)iov[ 0 ].iov_base + sent_bytes, iov[ 0 ].iov_len - sent_bytes,  MSG_NOSIGNAL)
-            ) < 0) {
-          char err_buf[500];
-          sprintf(err_buf, "Failed to send data.(%s) Exiting...", strerror(errno));
-          print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-          sleep(1234567);
-          exit(1);
-        }
-        sent_bytes += ret;
-        if (sent_bytes == (int)(iov[ 0 ].iov_len)) break;
-      }
-      n = sent_bytes;
+      n += Send(m_socket, (char*)iov[ 0 ].iov_base + n, iov[ 0 ].iov_len - n);
     }
 
     if (n < (int)(iov[ 0 ].iov_len + iov[ 1 ].iov_len)) {
-      int sent_bytes = n - iov[ 0 ].iov_len;
-      while (true) {
-        int ret = 0;
-        if ((ret = send(m_socket, (char*)iov[ 1 ].iov_base + sent_bytes, iov[ 1 ].iov_len - sent_bytes,  MSG_NOSIGNAL)
-            ) < 0) {
-          char temp_char[100] = "Failed to send data. Exiting..."; print_err.PrintError(temp_char, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-          sleep(1234567);
-          exit(1);
-        }
-        sent_bytes += ret;
-        if (sent_bytes == (int)(iov[ 1 ].iov_len)) break;
-      }
-      n = iov[ 0 ].iov_len + sent_bytes;
+      n += Send(m_socket, (char*)iov[ 1 ].iov_base + (n - iov[ 0 ].iov_len), iov[ 1 ].iov_len - (n - iov[ 0 ].iov_len));
     }
 
-
     if (n < (int)(iov[ 0 ].iov_len + iov[ 1 ].iov_len + iov[ 2 ].iov_len)) {
-      int sent_bytes = n - iov[ 0 ].iov_len - iov[ 1 ].iov_len;
-      while (true) {
-        int ret = 0;
-        if ((ret = send(m_socket, (char*)iov[ 2 ].iov_base + sent_bytes, iov[ 2 ].iov_len - sent_bytes,  MSG_NOSIGNAL)
-            ) < 0) {
-          char temp_char[100] = "Send error. Exiting..."; print_err.PrintError(temp_char, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-          sleep(1234567);
-          exit(1);
-        }
-        sent_bytes += ret;
-        if (sent_bytes == (int)(iov[ 2 ].iov_len)) break;
-      }
+      n += Send(m_socket, (char*)iov[ 2 ].iov_base + (n - iov[ 0 ].iov_len - iov[ 1 ].iov_len),
+                iov[ 2 ].iov_len - (n - iov[ 0 ].iov_len - iov[ 1 ].iov_len));
     }
     double retry_end = getTimeSec();
     B2WARNING("Resending ends. It takes " << retry_end - retry_start << "(s)");
@@ -337,6 +297,29 @@ int SerializerModule::sendByWriteV(RawDataBlock* rawdblk)
 
 }
 
+
+int SerializerModule::Send(int socket, char* buf, int size_bytes)
+{
+  int sent_bytes = 0;
+  while (true) {
+    int ret = 0;
+    if ((ret = send(socket,
+                    buf + sent_bytes, size_bytes - sent_bytes,  MSG_NOSIGNAL)) < 0) {
+      if (errno == EINTR) {
+        continue;
+      } else {
+        char err_buf[500];
+        sprintf(err_buf, "Failed to send data.(%s) Exiting...", strerror(errno));
+        print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+        sleep(1234567);
+        exit(1);
+      }
+    }
+    sent_bytes += ret;
+    if (sent_bytes == size_bytes) break;
+  }
+  return sent_bytes;
+}
 
 void SerializerModule::Accept()
 {
@@ -539,3 +522,4 @@ void SerializerModule::event()
   }
   n_basf2evt++;
 }
+

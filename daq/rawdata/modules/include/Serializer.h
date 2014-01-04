@@ -87,6 +87,9 @@ namespace Belle2 {
     //! Get shared memory
     int* shmGet(int fd, int size_words);
 
+    //! send buffer
+    int Send(int socket, char* buf, int size_bytes);
+
     //! file descripter for shm
     int m_shmfd_cfg;
 

@@ -102,7 +102,7 @@ int ProcHandler::init_OutServer(int id)
     m_nOutputSrv++;
     B2INFO("ProcHandler: output server forked. pid = " << pid);
   } else if (pid < 0) {
-    B2ERROR("init_EvtServer");
+    B2ERROR("init_OutServer");
     exit(-99);
   } else {
     m_fOutputSrv = 1; // I'm output server
@@ -185,8 +185,11 @@ int ProcHandler::wait_processes()
       if (pid == -1) {
         if (errno == EINTR)
           continue;
+        else if (errno == ECHILD)
+          break;
         else {
           B2ERROR("wait_processes : waitpid");
+          perror("Error");
           return -1;
         }
       } else {
@@ -242,8 +245,11 @@ int ProcHandler::wait_event_server()
       if (pid == -1) {
         if (errno == EINTR)
           continue;
+        else if (errno == ECHILD)
+          break;
         else {
-          B2ERROR("wait_processes : waitpid");
+          B2ERROR("wait_event_server : waitpid");
+          perror("Error");
           return -1;
         }
       } else {
@@ -266,8 +272,11 @@ int ProcHandler::wait_event_processes()
       if (pid == -1) {
         if (errno == EINTR)
           continue;
+        else if (errno == ECHILD)
+          break;
         else {
-          B2ERROR("wait_processes : waitpid");
+          B2ERROR("wait_event_processes : waitpid");
+          perror("Error");
           return -1;
         }
       } else {
@@ -290,8 +299,11 @@ int ProcHandler::wait_output_server()
       if (pid == -1) {
         if (errno == EINTR)
           continue;
+        else if (errno == ECHILD)
+          break;
         else {
-          B2ERROR("wait_processes : waitpid");
+          B2ERROR("wait_output_server : waitpid");
+          perror("Error");
           return -1;
         }
       } else {

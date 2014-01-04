@@ -12,6 +12,15 @@
 
 #include <framework/datastore/StoreArray.h>
 
+#include <geometry/GeometryManager.h>
+#include <tracking/gfbfield/GFGeant4Field.h>
+#include <genfit/Track.h>
+#include <genfit/GFRaveVertex.h>
+#include <genfit/FieldManager.h>
+#include <genfit/MaterialEffects.h>
+#include <genfit/TGeoMaterialInterface.h>
+
+#include <TGeoManager.h>
 
 using namespace Belle2;
 
@@ -36,6 +45,17 @@ GenfitVisModule::GenfitVisModule() : Module()
 
 void GenfitVisModule::initialize()
 {
+  if (!gGeoManager) { //TGeo geometry not initialized, do it ourselves
+    //convert geant4 geometry to TGeo geometry
+    geometry::GeometryManager& geoManager = geometry::GeometryManager::getInstance();
+    geoManager.createTGeoRepresentation();
+
+    //initialize some things for genfit
+    genfit::FieldManager::getInstance()->init(new GFGeant4Field());
+    genfit::MaterialEffects::getInstance()->init(new genfit::TGeoMaterialInterface());
+
+  }
+
   m_display = genfit::EventDisplay::getInstance();
 }
 

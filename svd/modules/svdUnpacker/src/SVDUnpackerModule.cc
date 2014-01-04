@@ -59,12 +59,12 @@ SVDUnpackerModule::~SVDUnpackerModule()
 void SVDUnpackerModule::initialize()
 {
 
-  //RawSVD.h disappeared from the release:
-  // StoreArray<RawSVD>::required(m_rawSVDListName);
+  //RawSVD.h disappeared from the release (reappeared):
+  StoreArray<RawSVD>::required(m_rawSVDListName);
   StoreArray<SVDDigit>::registerPersistent(m_svdDigitListName);
 
   //commented out since no map exists at the moment
-  //  loadMap();
+  loadMap();
 
 }
 
@@ -75,14 +75,14 @@ void SVDUnpackerModule::beginRun()
 void SVDUnpackerModule::event()
 {
 
-  //RawSVD.h disappeared from the release:
-  //  StoreArray<RawSVD> rawSVDList(m_rawSVDListName);
+  //RawSVD.h disappeared from the release (reappeared):
+  StoreArray<RawSVD> rawSVDList(m_rawSVDListName);
   StoreArray<SVDDigit> svdDigits(m_svdDigitListName);
   svdDigits.create();
 
-  //      //RawSVD.h disappeared from the release:
-  /*
-    for (int i = 0; i < rawSVDList.getEntries(); i++) {
+  //RawSVD.h disappeared from the release (reappeared):
+
+  for (int i = 0; i < rawSVDList.getEntries(); i++) {
     for (int j = 0; j < rawSVDList[ i ]->GetNumEntries(); j++) {
 
       //to be used to check the length:
@@ -94,9 +94,8 @@ void SVDUnpackerModule::event()
 
       fillSVDDigitList(data32, &svdDigits);
 
-      }
+    }
   }
-  */
 
 
   /*

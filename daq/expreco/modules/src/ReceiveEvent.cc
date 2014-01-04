@@ -57,6 +57,7 @@ void ReceiveEventModule::initialize()
   // Prefetch first record in ReceiveEvent
   EvtMessage* msg = m_recv->recv();
   if (msg == NULL) {
+    B2FATAL("Did not receive any data, stopping initialization.");
     return;
   }
   m_streamer->restoreDataStore(msg);

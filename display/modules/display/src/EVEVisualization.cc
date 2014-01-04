@@ -86,7 +86,6 @@
 #include <assert.h>
 #include <cmath>
 #include <exception>
-#include <iostream>
 
 
 using namespace Belle2;
@@ -310,7 +309,7 @@ void EVEVisualization::addTrack(const genfit::Track* track, const TString& label
 
 
   if (! track->checkConsistency()) {
-    std::cerr << "track is not consistent" << std::endl;
+    B2ERROR("track is not consistent");
     return;
   }
 
@@ -349,8 +348,7 @@ void EVEVisualization::addTrack(const genfit::Track* track, const TString& label
     try {
       fitter->processTrack(refittedTrack.get(), resort_);
     } catch (genfit::Exception& e) {
-      std::cerr << e.what();
-      std::cerr << "Exception, could not refit track" << std::endl;
+      B2ERROR("Exception (" << e.what() << ") encountered, could not refit track");
       return;
     }
 
@@ -363,12 +361,12 @@ void EVEVisualization::addTrack(const genfit::Track* track, const TString& label
 
   if (drawCardinalRep_) {
     rep = track->getCardinalRep();
-    std::cout << "Draw cardinal rep" << std::endl;
+    B2DEBUG(100, "Draw cardinal rep");
   } else {
     if (repId_ >= track->getNumReps())
       repId_ = track->getNumReps() - 1;
     rep = track->getTrackRep(repId_);
-    std::cout << "Draw rep" << repId_ << std::endl;
+    B2DEBUG(100, "Draw rep" << repId_);
   }
 
   //track->Print();
@@ -387,13 +385,13 @@ void EVEVisualization::addTrack(const genfit::Track* track, const TString& label
 
     TrackPoint* tp = track->getPointWithMeasurement(j);
     if (! tp->hasRawMeasurements()) {
-      std::cerr << "trackPoint has no raw measurements" << std::endl;
+      B2ERROR("trackPoint has no raw measurements");
       continue;
     }
 
     // get the fitter infos ------------------------------------------------------------------
     if (! tp->hasFitterInfo(rep)) {
-      std::cerr << "trackPoint has no fitterInfo for rep" << std::endl;
+      B2ERROR("trackPoint has no fitterInfo for rep");
       continue;
     }
 
@@ -401,18 +399,17 @@ void EVEVisualization::addTrack(const genfit::Track* track, const TString& label
 
     fi = dynamic_cast<KalmanFitterInfo*>(fitterInfo);
     if (fi == NULL) {
-      std::cerr << "can only display KalmanFitterInfo" << std::endl;
+      B2ERROR("can only display KalmanFitterInfo");
       continue;
     }
     if (! fi->hasPredictionsAndUpdates()) {
-      std::cerr << "KalmanFitterInfo does not have all predictions and updates" << std::endl;
+      B2ERROR("KalmanFitterInfo does not have all predictions and updates");
       continue;
     }
     try {
       fittedState = &(fi->getFittedState(true));
     } catch (Exception& e) {
-      std::cerr << e.what();
-      std::cerr << "can not get fitted state" << std::endl;
+      B2ERROR(e.what() << " - can not get fitted state");
       continue;
     }
 
@@ -831,7 +828,7 @@ void EVEVisualization::makeLines(TEveStraightLineSet* eveTrack, const genfit::St
       try {
         rep->extrapolateToPlane(stateCopy, SharedPlanePtr(newPlane));
       } catch (Exception& e) {
-        std::cerr << e.what();
+        B2ERROR(e.what());
         return;
       }
 

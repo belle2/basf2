@@ -30,7 +30,7 @@ GenRawSendModule::GenRawSendModule() : Module()
 {
   //Set module properties
   setDescription("GenRawSendModule module");
-  printf("GenRawSendModule: Constructor called \n");
+  //printf("GenRawSendModule: Constructor called \n");
 
   m_buffer = NULL;
   m_nevt = 0;
@@ -42,13 +42,13 @@ GenRawSendModule::GenRawSendModule() : Module()
   addParam("DestPort", m_port, "Destination port", 1111);
 
 
-  cout << "GenRawSendModule : constructor called" << endl;
+  //cout << "GenRawSendModule : constructor called" << endl;
 }
 
 
 GenRawSendModule::~GenRawSendModule()
 {
-  printf("GenRawSendModule: Destructor called \n");
+  //printf("GenRawSendModule: Destructor called \n");
 
 }
 

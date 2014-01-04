@@ -244,8 +244,7 @@ void EVEVisualization::addGeometry()
   for (int i = 0; i < volumes->GetEntriesFast(); i++) {
     TGeoVolume* volume = static_cast<TGeoVolume*>(volumes->At(i));
     if (TString(volume->GetName()).BeginsWith("Magnet_")) {
-      B2WARNING("set transparency for " << volume->GetName());
-      volume->SetTransparency(95); //0: opaque, 100: fully transparent
+      volume->SetTransparency(97); //0: opaque, 100: fully transparent
     }
   }
 

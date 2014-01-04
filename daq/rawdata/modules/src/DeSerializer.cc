@@ -230,3 +230,29 @@ int* DeSerializerModule::getPreAllocBuf()
   }
   return tempbuf;
 }
+
+
+void DeSerializerModule::RateMonitor(unsigned int nevt)
+{
+  double cur_time = getTimeSec();
+  double total_time = cur_time - m_start_time;
+  double interval = cur_time - m_prev_time;
+  time_t timer;
+  struct tm* t_st;
+  time(&timer);
+  t_st = localtime(&timer);
+  printf("Event %12d Rate %6.2lf[kHz] Recvd Flow %6.2lf[MB/s] RunTime %8.2lf[s] interval %8.4lf[s] %s",
+         nevt,
+         (nevt  - m_prev_nevt) / interval / 1.e3,
+         (m_totbytes - m_prev_totbytes) / interval / 1.e6,
+         total_time,
+         interval,
+         asctime(t_st));
+
+  fflush(stdout);
+  m_prev_time = cur_time;
+  m_prev_totbytes = m_totbytes;
+  m_prev_nevt = nevt;
+
+
+}

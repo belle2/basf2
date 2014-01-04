@@ -228,12 +228,6 @@ int* DeSerializerPCModule::recvData(int* malloc_flag, int* total_buf_nwords, int
     temp_num_events = send_hdr.GetNumEventsinPacket();
     temp_num_nodes = send_hdr.GetNumNodesinPacket();
 
-    printf("######## SENDHDR ###############\n");
-    for (int j = 0; j < SendHeader::SENDHDR_NWORDS; j++) {
-      printf("%.8x ", send_hdr_buf[ j ]);
-    }
-    printf("\n");
-
 
     if (i == 0) {
       *num_events_in_sendblock = temp_num_events;
@@ -504,25 +498,25 @@ void DeSerializerPCModule::event()
   }
 
   if (n_basf2evt % 2000 == 0) {
-    //  if ( ( n_basf2evt - m_prev_nevt ) > monitor_numeve ) {
-    double cur_time = getTimeSec();
-    double interval = cur_time - m_prev_time;
-    if (n_basf2evt != 0) {
-      double multieve = (1. / interval);
-      if (multieve > 2.) multieve = 2.;
-      monitor_numeve = (int)(multieve * monitor_numeve) + 1;
-    }
-    printf("loop %d eve %u time %lf : # of nodes %d : ftsw words %d  copper0 words %d copper1 words %d\n",
-           n_basf2evt,
-           eve_copper_0,
-           getTimeSec() - m_start_time,
-           num_copper_ftsw,
-           data_size_ftsw,
-           data_size_copper_0,
-           data_size_copper_1);
-    fflush(stdout);
-    m_prev_time = cur_time;
-    m_prev_nevt = n_basf2evt;
+    RateMonitor(eve_copper_0);
+//     //  if ( ( n_basf2evt - m_prev_nevt ) > monitor_numeve ) {
+//     double cur_time = getTimeSec();
+//     double interval = cur_time - m_prev_time;
+//     if (n_basf2evt != 0) {
+//       double multieve = (1. / interval);
+//       if (multieve > 2.) multieve = 2.;
+//       monitor_numeve = (int)(multieve * monitor_numeve) + 1;
+//     }
+//     printf("Event %10d EventRate time %lf : # of nodes %d : ftsw words %d  copper0 words %d copper1 words %d\n",
+//            eve_copper_0,
+//            getTimeSec() - m_start_time,
+//            num_copper_ftsw,
+//            data_size_ftsw,
+//            data_size_copper_0,
+//            data_size_copper_1);
+//     fflush(stdout);
+//     m_prev_time = cur_time;
+//     m_prev_nevt = n_basf2evt;
   }
 
   n_basf2evt++;

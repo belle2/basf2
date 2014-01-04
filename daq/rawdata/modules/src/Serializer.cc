@@ -507,24 +507,24 @@ void SerializerModule::event()
   // Print current status
   //
   if (n_basf2evt % 100 == 0) {
-    double cur_time = getTimeSec();
-    double total_time = cur_time - m_start_time;
-    double interval = cur_time - m_prev_time;
-    if (n_basf2evt != 0) {
-      double multieve = (1. / interval);
-      if (multieve > 2.) multieve = 2.;
-    }
-    time_t timer;
-    struct tm* t_st;
-    time(&timer);
-    t_st = localtime(&timer);
-    printf("Event %d TotSent  %.1lf [MB] ElapsedTime %.1lf [s] RcvdRate %.2lf [MB/s] %s",
-           n_basf2evt, m_totbytes / 1.e6, total_time, (m_totbytes - m_prev_totbytes) / interval / 1.e6, asctime(t_st));
-    fflush(stdout);
-    m_prev_time = cur_time;
-    m_prev_totbytes = m_totbytes;
-    m_prev_nevt = n_basf2evt;
+
+//     double cur_time = getTimeSec();
+//     double total_time = cur_time - m_start_time;
+//     double interval = cur_time - m_prev_time;
+//     if (n_basf2evt != 0) {
+//       double multieve = (1. / interval);
+//       if (multieve > 2.) multieve = 2.;
+//     }
+//     time_t timer;
+//     struct tm* t_st;
+//     time(&timer);
+//     t_st = localtime(&timer);
+//     printf("Event %d TotSent  %.1lf [MB] ElapsedTime %.1lf [s] RcvdRate %.2lf [MB/s] %s",
+//            n_basf2evt, m_totbytes / 1.e6, total_time, (m_totbytes - m_prev_totbytes) / interval / 1.e6, asctime(t_st));
+//     fflush(stdout);
+//     m_prev_time = cur_time;
+//     m_prev_totbytes = m_totbytes;
+//     m_prev_nevt = n_basf2evt;
   }
   n_basf2evt++;
 }
-

@@ -14,7 +14,7 @@
 
 
 /** Maximal size of streamed objects. */
-const static int c_maxObjectSizeBytes = 10000000; //10MB
+const static int c_maxObjectSizeBytes = 50000000; //50MB
 
 using namespace std;
 using namespace Belle2;

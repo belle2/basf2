@@ -258,6 +258,8 @@ void EVEVisualization::addGeometry()
   //don't show full geo unless turned on by user
   eve_top_node->SetRnrSelfChildren(m_fullgeo, m_fullgeo);
 
+  //expand geometry in eve list (otherwise one needs three clicks to see that it has children)
+  eve_top_node->ExpandIntoListTreesRecursively();
 
   B2DEBUG(100, "Loading geometry projections...");
 

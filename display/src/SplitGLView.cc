@@ -116,6 +116,8 @@ SplitGLView::SplitGLView() :
   gEve->GetListTree()->Connect("Clicked(TGListTreeItem*, Int_t, Int_t, Int_t)",
                                "Belle2::SplitGLView", this, "itemClicked(TGListTreeItem*, Int_t, Int_t, Int_t)");
 
+  //Without this, our own menu bar entries are not drawn (might appear later)
+  gEve->GetBrowser()->Resize(gEve->GetBrowser()->GetDefaultSize());
 }
 
 SplitGLView::~SplitGLView()

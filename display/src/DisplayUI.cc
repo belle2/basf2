@@ -618,11 +618,9 @@ void DisplayUI::pollNewEvents()
   if (!AsyncWrapper::isAsync())
     return;
 
-  bool gotNewEvent = AsyncWrapper::newEventAvailable();
-  if (gotNewEvent) {
-    B2INFO("loading next event...");
-    next();
-  }
+
+  int numEvents = AsyncWrapper::numAvailableEvents();
+  m_nextButton->SetEnabled(numEvents > 0);
 }
 
 void DisplayUI::closeAndContinue()

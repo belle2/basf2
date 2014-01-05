@@ -30,19 +30,14 @@ using namespace Belle2;
 bool AsyncWrapper::s_isAsync = false;
 RingBuffer* AsyncWrapper::s_currentRingBuffer = NULL;
 
-bool AsyncWrapper::newEventAvailable()
+int AsyncWrapper::numAvailableEvents()
 {
   if (!s_isAsync) {
-    B2ERROR("AsyncWrapper::newEventAvailable() used in synchronous thread??");
+    B2ERROR("AsyncWrapper::numAvailableEvents() used in synchronous thread??");
     return true;
   }
 
-  char* evtbuf = new char[EvtMessage::c_MaxEventSize];
-  int size = s_currentRingBuffer->spyq((int*)evtbuf);
-  delete[] evtbuf;
-
-  return (size != 0);
-
+  return s_currentRingBuffer->numq();
 }
 
 void AsyncWrapper::stopMainProcess()

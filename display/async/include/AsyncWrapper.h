@@ -47,8 +47,8 @@ namespace Belle2 {
     /** returns true if the current process is on the receiving (async) side of an AsyncWrapper. */
     static bool isAsync() { return s_isAsync; }
 
-    /** check wether another event is available in the RingBuffer. */
-    static bool newEventAvailable();
+    /** Retun number of events available in the RingBuffer. */
+    static int numAvailableEvents();
 
     /** send a SIGINT to the main process from asynchronous process. */
     static void stopMainProcess();
@@ -76,7 +76,7 @@ namespace Belle2 {
     /** true if the current process is on the receiving (async) side of an AsyncWrapper. */
     static bool s_isAsync;
 
-    /** if s_isAsync is true, this contains the corresponding RingBuffer, see newEventAvailable(). */
+    /** if s_isAsync is true, this contains the corresponding RingBuffer, see numAvailableEvents(). */
     static RingBuffer* s_currentRingBuffer;
   };
 }

@@ -57,7 +57,7 @@ namespace Belle2 {
     int remq(int* buf);
     /*! Prefetch a buffer from the RingBuffer w/o removing it*/
     int spyq(int* buf) const;
-    /*! Returns number of buffers in the RingBuffer */
+    /*! Returns number of entries/buffers in the RingBuffer */
     int numq() const;
     /*! Clear the RingBuffer */
     int clear();

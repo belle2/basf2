@@ -23,9 +23,9 @@ namespace Belle2 {
     int getNodeId() { return _nodeid; }
     RunInfoBuffer& getInfo() { return _buf; }
     ProcessLogBuffer& getLog() { return _msg; }
-    bool waitStarted();
-    bool isStopped();
-    bool reportReady();
+    void setState(unsigned int state) { _buf.setState(state); }
+    unsigned int getState() { return _buf.getState(); }
+    bool waitRunning(int timeout);
     bool reportRunning();
     bool reportDebug(const std::string message);
     bool reportInfo(const std::string message);
@@ -40,6 +40,7 @@ namespace Belle2 {
     }
     bool open();
     bool close();
+    bool clear();
     bool unlink();
 
   private:

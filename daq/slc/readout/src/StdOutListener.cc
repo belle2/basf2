@@ -14,6 +14,8 @@
 #include <iostream>
 #include <sstream>
 #include <cerrno>
+#include <stdio.h>
+#include <ctype.h>
 
 namespace Belle2 {
 
@@ -30,42 +32,38 @@ void StdOutListener::run()
   char c;
   std::stringstream ss;
   std::string s;
-  int priority = -1;
+  SystemLog::Priority priority = SystemLog::UNKNOWN;
   try {
     while (true) {
       while (true) {
         c = preader.readChar();
-        std::cerr << c;
-        /*
-          if (c == '[') {
-          if (priority > 0) {
+        if (c == '\n') {
           s = ss.str();
           ss.str("");
-          _con->lock();
-          _con->getLog().send(priority, s);
-          _con->unlock();
-        }
-        while (true) {
-          c = preader.readChar();
-          std::cerr << c;
-          if (c == ']') {
-            std::cerr << std::endl;
-            s = ss.str();
-            ss.str("");
-            if (s == "DEBUG") priority = SystemLog::DEBUG;
-            else if (s == "INFO") priority = SystemLog::INFO;
-            else if (s == "ERROR") priority = SystemLog::ERROR;
-            else if (s == "FATAL") priority = SystemLog::FATAL;
-            break;
+          if (priority > 0) {
+            _con->lock();
+            _con->getLog().send(priority, s);
+            _con->unlock();
           }
-          ss << c;
-        }
-            } else {
-        while (preader.readChar() != '\n') {
-        }
+        } else if (isprint(c)) {
+          if (priority > 0 && c == '[') {
+            while (true) {
+              c = preader.readChar();
+              if (c == ']') {
+                s = ss.str();
+                ss.str("");
+                if (s == "DEBUG") priority = SystemLog::DEBUG;
+                else if (s == "INFO") priority = SystemLog::INFO;
+                else if (s == "ERROR") priority = SystemLog::ERROR;
+                else if (s == "FATAL") priority = SystemLog::FATAL;
+                break;
+              }
+              ss << c;
             }
+          } else {
             ss << c;
-            */
+          }
+        }
       }
     }
   } catch (const IOException& e) {

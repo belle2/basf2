@@ -58,6 +58,13 @@ bool ProcessStatusBuffer::close()
   return true;
 }
 
+bool ProcessStatusBuffer::clear()
+{
+  _buf.clear();
+  _msg.clear();
+  return true;
+}
+
 bool ProcessStatusBuffer::unlink()
 {
   SharedMemory::unlink(_buf_path);
@@ -65,35 +72,26 @@ bool ProcessStatusBuffer::unlink()
   return true;
 }
 
-bool ProcessStatusBuffer::waitStarted()
+bool ProcessStatusBuffer::waitRunning(int timeout)
 {
   _buf.lock();
-  if (_buf.getState() == 0) {
-    _buf.wait();
+  if (_buf.getState() != RunInfoBuffer::RUNNING) {
+    if (!_buf.wait(timeout)) {
+      _buf.unlock();
+      return false;
+    }
   }
   _buf.unlock();
   return true;
 }
 
-bool ProcessStatusBuffer::isStopped()
-{
-  _buf.lock();
-  if (_buf.getState() == 0) {
-    _buf.unlock();
-    return true;
-  }
-  _buf.unlock();
-  return false;
-}
-
-bool ProcessStatusBuffer::reportReady()
-{
-  return _msg.send(SystemLog::NOTICE, "READY");
-}
-
 bool ProcessStatusBuffer::reportRunning()
 {
-  return _msg.send(SystemLog::NOTICE, "RUNNING");
+  _buf.lock();
+  _buf.setState(RunInfoBuffer::RUNNING);
+  _buf.notify();
+  _buf.unlock();
+  return true;
 }
 
 bool ProcessStatusBuffer::reportDebug(const std::string message)

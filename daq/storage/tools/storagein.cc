@@ -71,6 +71,9 @@ int main(int argc, char** argv)
         double rate = datasize / (t.get() - t0.get()) / 1000000.;
         t0 = t;
         datasize = 0;
+        std::cout << "Serial = " << nrec << ", Freq = " << freq
+                  << " [kHz], Rate = " << rate << " [MB/s], DataSize = "
+                  << datasize / 1000. / 1000 << " [kB/event]" << std::endl;
       }
     }
     while (true) {

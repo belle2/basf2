@@ -40,13 +40,11 @@ void RCTestModuleModule::initialize()
 {
   m_buf.setNode(m_name, m_id);
   m_buf.open();
-  m_buf.reportReady();
   m_running = false;
 }
 
 void RCTestModuleModule::terminate()
 {
-  m_buf.reportReady();
 }
 
 

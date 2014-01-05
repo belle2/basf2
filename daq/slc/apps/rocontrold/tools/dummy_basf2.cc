@@ -18,7 +18,7 @@ int main(int argc, char** argv)
   Belle2::debug("node = %s, id = %d", nodename, nodeid);
   m_msg.setNode(nodename, nodeid);
   m_msg.open();
-  m_msg.reportReady();
+  m_msg.reportRunning();
   while (true) {
     sleep(5);
     if (m_msg.getInfo().getState() > 0) break;

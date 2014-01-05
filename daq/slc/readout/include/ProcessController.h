@@ -29,8 +29,8 @@ namespace Belle2 {
     bool init(const std::string& name = "");
     void clear();
     bool load(int timeout);
-    bool start(int timeout);
-    bool stop(int timeout);
+    bool start();
+    bool stop();
     bool abort();
     const std::string& getName() { return _name; }
     const std::string& getExecutable() { return _exename; }
@@ -38,9 +38,7 @@ namespace Belle2 {
     RunInfoBuffer& getInfo() { return _msg.getInfo(); }
     ProcessLogBuffer& getLog() { return _msg.getLog(); }
     RCCallback* getCallback() { return _callback; }
-    const State& getState() const { return  _state; }
     const Fork& getFork() const { return  _fork; }
-    void setState(const State& state) { _state = state; }
     void setCallback(RCCallback* callback) { _callback = callback; }
     void setName(const std::string& name) { _name = name; }
     void setExecutable(const std::string& exe) { _exename = exe; }
@@ -50,9 +48,6 @@ namespace Belle2 {
   public:
     void lock() { _mutex.lock(); }
     void unlock() { _mutex.unlock(); }
-    void signal() { _cond.signal(); }
-    const std::string& getMessage() { return _message; }
-    void setMessage(const std::string& msg) { _message = msg; }
 
   private:
     ProcessStatusBuffer _msg;
@@ -63,8 +58,6 @@ namespace Belle2 {
     Fork _fork;
     PThread _thread;
     Mutex _mutex;
-    Cond _cond;
-    State _state;
     std::string _message;
 
   };
@@ -72,18 +65,14 @@ namespace Belle2 {
   class ProcessSubmitter {
 
   public:
-    ProcessSubmitter(ProcessController* con, int iopipe[2])
-      : _con(con) {
-      _iopipe[0] = iopipe[0];
-      _iopipe[1] = iopipe[1];
-    }
+    ProcessSubmitter(ProcessController* con)
+      : _con(con) {}
 
   public:
     void run();
 
   private:
     ProcessController* _con;
-    int _iopipe[2];
 
   };
 

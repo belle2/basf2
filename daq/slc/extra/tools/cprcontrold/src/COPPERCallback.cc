@@ -102,18 +102,13 @@ bool COPPERCallback::load() throw()
 bool COPPERCallback::start() throw()
 {
   Belle2::debug("START");
-  if (_con.start(20)) {
-    Belle2::debug("(DEBUG) start succeded");
-  } else {
-    Belle2::debug("(DEBUG) start timeout");
-  }
-  return true;
+  return _con.start();
 }
 
 bool COPPERCallback::stop() throw()
 {
   Belle2::debug("STOP");
-  return _con.stop(-1);
+  return _con.stop();
 }
 
 bool COPPERCallback::resume() throw()
@@ -129,7 +124,7 @@ bool COPPERCallback::pause() throw()
 bool COPPERCallback::recover() throw()
 {
   Belle2::debug("RECOVER");
-  return (_con.abort() && load());
+  return (abort() && load());
 }
 
 bool COPPERCallback::abort() throw()

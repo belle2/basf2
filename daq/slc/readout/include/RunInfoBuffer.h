@@ -10,6 +10,11 @@ namespace Belle2 {
   class RunInfoBuffer {
 
   public:
+    static const unsigned int NOTREADY = 0;
+    static const unsigned int READY = 1;
+    static const unsigned int RUNNING = 2;
+
+  public:
     RunInfoBuffer() {}
     ~RunInfoBuffer() {}
 
@@ -24,6 +29,7 @@ namespace Belle2 {
     bool wait() throw();
     bool wait(int time) throw();
     bool notify() throw();
+    void clear();
 
   public:
     const std::string getPath() const throw() { return _path; }
@@ -38,7 +44,6 @@ namespace Belle2 {
     void setColdNumber(unsigned int number) { _info[2] = number; }
     void setHotNumber(unsigned int number) { _info[3] = number; }
     void setNodeId(unsigned int id) { _info[4] = id; }
-    void clear();
 
   private:
     std::string _path;

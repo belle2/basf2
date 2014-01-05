@@ -80,22 +80,17 @@ std::string ProcessLogBuffer::recieve(SystemLog::Priority& priority, int timeout
   _mutex.lock();
   if (*_rindex == MAX_MESSAGE) *_rindex = 0;
   int i = *_rindex;
-  if (_msg_v[i].priority == SystemLog::UNKNOWN) {
+  while (_msg_v[i].priority == SystemLog::UNKNOWN) {
     if (timeout > 0) {
       _cond.wait(_mutex, timeout);
     } else {
       _cond.wait(_mutex);
     }
   }
-  if (_msg_v[i].priority == SystemLog::UNKNOWN) {
-    priority = SystemLog::UNKNOWN;
-    _mutex.unlock();
-    return "";
-  }
   (*_rindex)++;
   priority = _msg_v[i].priority;
-  _msg_v[i].priority = SystemLog::UNKNOWN;
   std::string message = _msg_v[i].message;
+  _msg_v[i].priority = SystemLog::UNKNOWN;
   _cond.signal();
   _mutex.unlock();
   return message;

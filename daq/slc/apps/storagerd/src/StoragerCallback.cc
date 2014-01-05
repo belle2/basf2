@@ -21,9 +21,9 @@ StoragerCallback::~StoragerCallback() throw()
 
 void StoragerCallback::init() throw()
 {
-  _con[0].init(_node->getName() + "_IN");
-  _con[1].init(_node->getName());
-  _con[2].init(_node->getName() + "_OUT");
+  _con[0].init("storagein");
+  _con[1].init("basf2");
+  _con[2].init("storageout");
 }
 
 bool StoragerCallback::boot() throw()
@@ -37,8 +37,8 @@ bool StoragerCallback::boot() throw()
   _con[0].addArgument(irbname);
   _con[0].addArgument(config.get("DATA_STORAGE_FROM_HOST"));
   _con[0].addArgument(config.get("DATA_STORAGE_FROM_PORT"));
-  //_con[0].addArgument(irbname);
-  //_con[0].addArgument("1");
+  _con[0].addArgument(irbname);
+  _con[0].addArgument("1");
   _con[0].load(10);
 
   return true;
@@ -53,13 +53,12 @@ bool StoragerCallback::load() throw()
   _con[1].clearArguments();
   _con[1].addArgument(config.get("BASF2_SCRIPT_DIR")
                       + "/DataStorager.py");
-  //+ _node->getData()->getText("script"));
   _con[1].addArgument(irbname);
   _con[1].addArgument(config.get("DATA_STORAGE_DIR"));
   _con[1].addArgument(orbname);
-  //_con[1].addArgument(_node->getName());
-  //_con[1].addArgument("1");
-  //_con[1].addArgument("1");
+  _con[1].addArgument(_node->getName());
+  _con[1].addArgument("1");
+  _con[1].addArgument("1");
   _con[1].load(10);
 
   _con[2].clearArguments();
@@ -67,11 +66,9 @@ bool StoragerCallback::load() throw()
   _con[2].addArgument(orbname);
   _con[2].addArgument(config.get("DATA_STORAGE_TO_HOST"));
   _con[2].addArgument(config.get("DATA_STORAGE_TO_PORT"));
-  //_con[2].addArgument(orbname);
-  //_con[2].addArgument("1");
+  _con[2].addArgument(orbname);
+  _con[2].addArgument("1");
   _con[2].load(10);
-
-  //download();
   return true;
 }
 
@@ -79,7 +76,7 @@ bool StoragerCallback::start() throw()
 {
   Belle2::debug("START");
   for (int i = 0; i < 3; i++)
-    _con[i].start(-1);
+    _con[i].start();
 
   return true;
 }
@@ -103,10 +100,7 @@ bool StoragerCallback::pause() throw()
 bool StoragerCallback::recover() throw()
 {
   Belle2::debug("RECOVER");
-  _node->setState(State::CONFIGURED_S);
-  for (int i = 0; i < 3; i++)
-    _con[i].abort();
-  return true;
+  return abort() && load();
 }
 
 bool StoragerCallback::abort() throw()

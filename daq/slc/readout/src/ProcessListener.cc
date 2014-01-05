@@ -19,15 +19,25 @@ void ProcessListener::run()
     return;
   }
   _con->lock();
-  if (_con->getState() == State::LOADING_TS) {
-    Belle2::debug("[ERROR] Forked process %s was not started", process_name.c_str());
-    _con->getLog().send(SystemLog::ERROR, process_name + " was not started");
-  } else if (_con->getState() == State::RUNNING_S) {
-    Belle2::debug("[ERROR] Forked process %s was crashed", process_name.c_str());
-    _con->getLog().send(SystemLog::ERROR, process_name + " was crashed");
-  } else {
-    Belle2::debug("[INFO] Forked process %s was finished", process_name.c_str());
-    _con->getLog().send(SystemLog::NOTICE, process_name + " was finished");
+  NSMCommunicator* comm = _con->getCallback()->getCommunicator();
+  NSMNode* node = _con->getCallback()->getNode();
+  int state = _con->getMessanger().getState();
+  switch (state) {
+    case RunInfoBuffer::RUNNING:
+      Belle2::debug("[ERROR] Forked process %s was crashed", process_name.c_str());
+      comm->sendError(Belle2::form("Foked process %s was crashed", process_name.c_str()));
+      break;
+    case RunInfoBuffer::READY:
+      Belle2::debug("[ERROR] Forked process %s was not started", process_name.c_str());
+      comm->sendError(Belle2::form("Foked process %s was no started", process_name.c_str()));
+      break;
+    case RunInfoBuffer::NOTREADY:
+    default:
+      Belle2::debug("[INFO] Forked process %s was not started", process_name.c_str());
+      comm->sendLog(SystemLog(node->getName(), SystemLog::INFO,
+                              Belle2::form("Foked process %s was no started",
+                                           process_name.c_str())));
+      break;
   }
   _con->unlock();
 }

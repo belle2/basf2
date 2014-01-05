@@ -100,7 +100,7 @@ void DeSerializerPCModule::initialize()
       m_shmflag = 0;
     } else {
       m_status.open(m_nodename, m_nodeid);
-      m_status.reportReady();
+      m_status.reportRunning();
     }
   }
 
@@ -353,10 +353,8 @@ void DeSerializerPCModule::event()
   if (m_start_flag == 0) {
     // Accept requests for connections
     Connect();
-    if (m_shmflag > 0 && m_status.isStopped()) {
+    if (m_shmflag > 0) {
       B2INFO("DeSerializerPC: Waiting for Start...\n");
-      m_status.waitStarted();
-      m_status.reportRunning();
     }
     m_start_time = getTimeSec();
     n_basf2evt = 0;
@@ -478,12 +476,14 @@ void DeSerializerPCModule::event()
   //
   if (m_shmflag != 0) {
     if (n_basf2evt % 10 == 0) {
+      /*
       if (m_status.isStopped()) {
         printf("\033[34m");
         printf("[INFO] RunStop was detected. ( Setting:  Max event # %d MaxTime %lf ) Processed Event %d Elapsed Time %lf[s]\n", max_nevt , max_seconds, n_basf2evt * NUM_EVT_PER_BASF2LOOP_PC, getTimeSec() - m_start_time);
         printf("\033[0m");
         m_eventMetaDataPtr->setEndOfData();
       }
+      */
     }
   }
 

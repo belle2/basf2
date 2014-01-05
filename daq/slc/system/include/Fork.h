@@ -48,7 +48,10 @@ namespace Belle2 {
       if (_pid < 0) return false;
       return ::waitpid(_pid, NULL, opt);
     }
-    bool cancel() { return kill(SIGQUIT); }
+    bool cancel() {
+      return kill(SIGINT);
+      return kill(SIGQUIT);
+    }
 
   private:
     pid_t _pid;

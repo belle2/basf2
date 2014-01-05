@@ -49,16 +49,17 @@ unsigned int RawFTSW::GetMagicTrailer(int n)
   return m_buffer[  GetBufferPos(n) + POS_MAGIC_1 ];
 }
 
-void RawFTSW::CheckData(int n, unsigned int prev_evenum, unsigned int* cur_evenum)
+void RawFTSW::CheckData(int n, unsigned int prev_evenum, unsigned int* cur_evenum, int prev_run_no, int* cur_run_no)
 {
   int err_flag = 0;
   char err_buf[500];
   *cur_evenum = GetEveNo(n);
+  *cur_run_no = GetRunNo(n);
 
 #ifdef WO_FIRST_EVENUM_CHECK
   if (prev_evenum != 0xFFFFFFFF) {
 #else
-  if (true) {
+  if (prev_run_no == *cur_run_no && prev_run_no >= 0) {
 #endif
     if ((unsigned int)(prev_evenum + 1) != *cur_evenum) {
       sprintf(err_buf, "Event # jump : i %d prev 0x%x cur 0x%x : Exiting...\n %s %s %d\n",

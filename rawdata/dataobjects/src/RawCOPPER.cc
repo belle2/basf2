@@ -612,7 +612,8 @@ unsigned int  RawCOPPER::CalcXORChecksum(int* buf, int nwords)
 
 
 void RawCOPPER::CheckData(int n, unsigned int prev_evenum, unsigned int prev_copper_ctr,
-                          unsigned int* cur_evenum_rawcprhdr, unsigned int* cur_copper_ctr)
+                          unsigned int* cur_evenum_rawcprhdr, unsigned int* cur_copper_ctr,
+                          int prev_run_no, int* cur_run_no)
 {
   char err_buf[500];
   int err_flag = 0;
@@ -644,10 +645,11 @@ void RawCOPPER::CheckData(int n, unsigned int prev_evenum, unsigned int prev_cop
   //
   // Check incrementation of event #
   //
+  *cur_run_no = GetRunNo(n);
 #ifdef WO_FIRST_EVENUM_CHECK
   if (prev_evenum != 0xFFFFFFFF) {
 #else
-  if (true) {
+  if (prev_run_no == *cur_run_no && prev_run_no >= 0) {
 #endif
     if ((unsigned int)(prev_evenum + 1) != *cur_evenum_rawcprhdr) {
       sprintf(err_buf, "Event # jump : i %d prev 0x%x cur 0x%x : Exiting...\n%s %s %d\n",
@@ -656,6 +658,7 @@ void RawCOPPER::CheckData(int n, unsigned int prev_evenum, unsigned int prev_cop
       err_flag = 1;
     }
   }
+
 
   *cur_copper_ctr = GetCOPPERCounter(n);
 #ifdef WO_FIRST_EVENUM_CHECK
@@ -867,9 +870,11 @@ unsigned int RawCOPPER::GetB2LHeaderWord(int n, int finesse_buffer_pos)
 }
 
 
-unsigned int RawCOPPER::FillTopBlockRawHeader(unsigned int m_node_id, unsigned int m_data_type, unsigned int m_trunc_mask, unsigned int prev_eve32)
+unsigned int RawCOPPER::FillTopBlockRawHeader(unsigned int m_node_id, unsigned int m_data_type,
+                                              unsigned int m_trunc_mask, unsigned int prev_eve32,
+                                              int prev_run_no, int* cur_run_no)
 {
-
+  const int cpr_id = 0;
   //
   // This function only fills RawHeader contents for the first datablock.
   // # of block should be 1
@@ -952,6 +957,7 @@ unsigned int RawCOPPER::FillTopBlockRawHeader(unsigned int m_node_id, unsigned i
   //
   int* finesse_buf = &(m_buffer[ offset_1st_finesse ]); // In any finesse implementations, the top finesse buffer should be at offset_1st_finesse;
   m_buffer[ RawHeader::POS_EXP_RUN_NO ] = finesse_buf[ SIZE_B2LHSLB_HEADER + POS_EXP_RUN ];
+
 
   //
   // Fill event #
@@ -1058,10 +1064,10 @@ unsigned int RawCOPPER::FillTopBlockRawHeader(unsigned int m_node_id, unsigned i
   if (err_flag == 1) {
     char err_buf[500];
     sprintf(err_buf, "Invalid Magic word 0x7FFFF0008=%u 0xFFFFFAFA=%u 0xFFFFF5F5=%u 0x7FFF0009=%u\n %s %s %d\n",
-            GetMagicDriverHeader(0),
-            GetMagicFPGAHeader(0),
-            GetMagicFPGATrailer(0),
-            GetMagicDriverTrailer(0),
+            GetMagicDriverHeader(cpr_id),
+            GetMagicFPGAHeader(cpr_id),
+            GetMagicFPGATrailer(cpr_id),
+            GetMagicDriverTrailer(cpr_id),
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("[ERROR] %s\n", err_buf);
 #ifndef NO_DATA_CHECK
@@ -1075,28 +1081,30 @@ unsigned int RawCOPPER::FillTopBlockRawHeader(unsigned int m_node_id, unsigned i
   //
   // check incrementation of event #
   //
+  *cur_run_no = GetRunNo(cpr_id);
+  if (prev_run_no == *cur_run_no && prev_run_no >= 0) {
 #ifdef WO_FIRST_EVENUM_CHECK
-  if ((prev_eve32 + 1 != cur_ftsw_eve32) && (prev_eve32 != 0xFFFFFFFF)) {
+    if ((prev_eve32 + 1 != cur_ftsw_eve32) && (prev_eve32 != 0xFFFFFFFF)) {
 #else
-  if (prev_eve32 + 1 != cur_ftsw_eve32) {
+    if (prev_eve32 + 1 != cur_ftsw_eve32) {
 #endif
-    char err_buf[500];
-    sprintf(err_buf, "Invalid event_number. Exiting...: cur 32bit eve %u preveve %u\n %s %s %d\n",  cur_ftsw_eve32, prev_eve32,
-            __FILE__, __PRETTY_FUNCTION__, __LINE__);
-    printf("[ERROR] %s\n", err_buf);
+      char err_buf[500];
+      sprintf(err_buf, "Invalid event_number. Exiting...: cur 32bit eve %u preveve %u\n %s %s %d\n",  cur_ftsw_eve32, prev_eve32,
+              __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      printf("[ERROR] %s\n", err_buf);
 #ifndef NO_DATA_CHECK
-    string err_str = err_buf; throw (err_str);
+      string err_str = err_buf; throw (err_str);
 
-    printf("i= %d : num entries %d : Tot words %d\n", 0 , GetNumEntries(), TotalBufNwords());
-    for (int j = 0; j < TotalBufNwords(); j++) {
-      printf("0x%.8x ", (GetBuffer(0))[ j ]);
-      if ((j % 10) == 9)printf("\n");
-      fflush(stdout);
-    }
-    exit(-1);
+      printf("i= %d : num entries %d : Tot words %d\n", 0 , GetNumEntries(), TotalBufNwords());
+      for (int j = 0; j < TotalBufNwords(); j++) {
+        printf("0x%.8x ", (GetBuffer(cpr_id))[ j ]);
+        if ((j % 10) == 9)printf("\n");
+        fflush(stdout);
+      }
+      exit(-1);
 #endif
+    }
   }
-
 
   return cur_ftsw_eve32;
 

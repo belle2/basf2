@@ -44,12 +44,15 @@ DeSerializerModule::DeSerializerModule() : Module()
   monitor_numeve = 10;
 
   m_exp_no = 0; // will obtain info from parameter
-  m_run_no = 0; // will obtain info from parameter
+
   m_data_type = 0; // will obtain info from parameter
   m_trunc_mask = 0; // will obtain info from parameter
 
   m_prev_nevt = -1;
   prev_event = -1;
+
+  m_run_no = 0; // will obtain info from data
+  m_prev_run_no = -1;
 
   m_start_flag  = 0;
 

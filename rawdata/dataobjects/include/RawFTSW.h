@@ -44,7 +44,17 @@ namespace Belle2 {
     unsigned int GetMagicTrailer(int n);
 
     //!
-    void CheckData(int n, unsigned int prev_evenum, unsigned int* cur_evenum);
+    void CheckData(int n, unsigned int prev_evenum, unsigned int* cur_evenum, int prev_run_no, int* cur_run_no);
+
+    //!
+    int GetRunNo(int n);
+
+    //!
+    int GetSubRunNo(int n);
+
+    //!
+    int GetRunNoSubRunNo(int n);
+
 
 #ifdef READ_OLD_B2LFEE_FORMAT_FILE
     enum {
@@ -86,6 +96,14 @@ namespace Belle2 {
     };
 
     enum {
+      EXP_MASK = 0xFFC00000,
+      EXP_SHIFT = 22,
+      RUNNO_MASK = 0x003FFF00,
+      RUNNO_SHIFT = 8,
+      SUBRUNNO_MASK = 0x000000FF
+    };
+
+    enum {
       SIZE_FTSW_PACKET = 14
     };
 #endif
@@ -99,6 +117,23 @@ namespace Belle2 {
     ClassDef(RawFTSW, 2);
     // ver.2 Remove m_FTSW_header and introduce a new data format on Nov. 20, 2013
   };
+
+  inline int RawFTSW::GetRunNo(int n)
+  {
+    return (((unsigned int)(m_buffer[ GetBufferPos(n) + POS_EXP_RUN_NO ]) & RUNNO_MASK)
+            >> RUNNO_SHIFT);
+  }
+
+  inline int RawFTSW::GetSubRunNo(int n)
+  {
+    return (m_buffer[ GetBufferPos(n) + POS_EXP_RUN_NO ] & SUBRUNNO_MASK);
+  }
+
+  inline int RawFTSW::GetRunNoSubRunNo(int n)
+  {
+    return ((unsigned int)(m_buffer[ GetBufferPos(n) + POS_EXP_RUN_NO ]) &
+            (RUNNO_MASK | SUBRUNNO_MASK));
+  }
 }
 
 #endif

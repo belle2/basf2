@@ -370,13 +370,15 @@ void DeSerializerFILEModule::event()
         unsigned int temp_cur_evenum = 0, temp_cur_copper_ctr = 0;
         try {
           temp_rawcopper.CheckData(0, m_dummy_evenum - 2, m_dummy_evenum - 2,
-                                   &temp_cur_evenum, &temp_cur_copper_ctr);
+                                   &temp_cur_evenum, &temp_cur_copper_ctr, m_prev_run_no, &m_run_no);
         } catch (string err_str) {
           print_err.PrintError(m_shmflag, &m_status, err_str);
           exit(1);
         }
-
+        m_prev_run_no = m_run_no; // The place of this update depends on # of nodes
       }
+
+
     }
 
     //

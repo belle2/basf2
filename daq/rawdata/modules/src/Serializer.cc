@@ -255,7 +255,6 @@ int SerializerModule::sendByWriteV(RawDataBlock* rawdblk)
     break;
   }
 
-
 #ifdef DEBUG
   printf("*******BODY**********\n");
   printf("\n%.8d : ", 0);
@@ -506,7 +505,7 @@ void SerializerModule::event()
   //
   // Print current status
   //
-  if (n_basf2evt % 100 == 0) {
+  if (n_basf2evt % 1000 == 0) {
 
 //     double cur_time = getTimeSec();
 //     double total_time = cur_time - m_start_time;

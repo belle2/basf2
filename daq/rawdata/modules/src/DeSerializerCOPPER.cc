@@ -493,7 +493,9 @@ void DeSerializerCOPPERModule::event()
     // Fill header and trailer
     try {
 
-      m_prev_ftsweve32 = temp_rawcopper.FillTopBlockRawHeader(m_nodeid, m_data_type, m_trunc_mask, m_prev_ftsweve32);
+      m_prev_ftsweve32 = temp_rawcopper.FillTopBlockRawHeader(m_nodeid, m_data_type, m_trunc_mask,
+                                                              m_prev_ftsweve32, m_prev_run_no, &m_run_no);
+      m_prev_run_no = m_run_no;
       //    fillNewRawCOPPERHeader( &temp_rawcopper );
     } catch (string err_str) {
       print_err.PrintError(m_shmflag, &m_status, err_str);

@@ -220,7 +220,8 @@ namespace Belle2 {
     unsigned int GetB2LFEETtUtime(int n);
 
     //! should be called by DeSerializerCOPPER.cc and fill contents in RawHeader
-    unsigned int FillTopBlockRawHeader(unsigned int m_node_id, unsigned int m_data_type, unsigned int m_trunc_mask, unsigned int prev_eve32);
+    unsigned int FillTopBlockRawHeader(unsigned int m_node_id, unsigned int m_data_type, unsigned int m_trunc_mask,
+                                       unsigned int prev_eve32, int prev_run_no, int* cur_run_no);
 
     //! read COPPER driver's checksum value
     unsigned int GetDriverChkSum(int n);
@@ -233,7 +234,8 @@ namespace Belle2 {
 
     //! check data contents
     void CheckData(int n, unsigned int prev_evenum, unsigned int prev_copper_ctr,
-                   unsigned int* cur_evenum, unsigned int* cur_copper_ctr);
+                   unsigned int* cur_evenum, unsigned int* cur_copper_ctr,
+                   int prev_run_no, int* cur_run_no);
 
     //
     // size of "COPPER front header" and "COPPER trailer"

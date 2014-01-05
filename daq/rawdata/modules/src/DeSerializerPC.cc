@@ -15,7 +15,7 @@
 #define CHECKEVT 5000
 
 //#define DEBUG
-#define NO_DATA_CHECK
+//#define NO_DATA_CHECK
 
 using namespace std;
 using namespace Belle2;
@@ -420,7 +420,7 @@ void DeSerializerPCModule::event()
                                 raw_datablk->GetBlockNwords(i), 0, 1, 1);
 #ifndef NO_DATA_CHECK
         try {
-          temp_rawftsw->CheckData(0, m_prev_evenum, &cur_evenum);
+          temp_rawftsw->CheckData(0, m_prev_evenum, &cur_evenum, m_prev_run_no, &m_run_no);
         } catch (string err_str) {
           print_err.PrintError(m_shmflag, &m_status, err_str);
           exit(1);
@@ -436,10 +436,12 @@ void DeSerializerPCModule::event()
         RawCOPPER* temp_rawcopper = new RawCOPPER;
         temp_rawcopper->SetBuffer((int*)temp_buf + raw_datablk->GetBufferPos(i),
                                   raw_datablk->GetBlockNwords(i), 0, 1, 1);
+
+
 #ifndef NO_DATA_CHECK
         try {
           temp_rawcopper->CheckData(0, m_prev_evenum, m_prev_copper_ctr,
-                                    &cur_evenum, &cur_copper_ctr);
+                                    &cur_evenum, &cur_copper_ctr, m_prev_run_no, &m_run_no);
         } catch (string err_str) {
           print_err.PrintError(m_shmflag, &m_status, err_str);
           exit(1);
@@ -459,6 +461,7 @@ void DeSerializerPCModule::event()
 
     m_prev_evenum = cur_evenum;
     m_prev_copper_ctr = cur_copper_ctr;
+    m_prev_run_no = m_run_no;
   }
 
 

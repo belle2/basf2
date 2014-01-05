@@ -6,7 +6,10 @@
 //
 // Author : Ryosuke Itoh, IPNS, KEK
 // Date : 5 - Sep - 2012
-//-
+
+#include <framework/pcore/EvtMessage.h>
+#include <framework/datastore/DataStore.h>
+
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -17,9 +20,6 @@
 #include <vector>
 #include <queue>
 #include <string>
-
-#include <framework/datastore/DataStore.h>
-#include <framework/pcore/EvtMessage.h>
 
 #define MAXTHREADS 16
 #define MAXQUEUEDEPTH 64
@@ -35,7 +35,6 @@ namespace Belle2 {
      */
     DataStoreStreamer(int complevel = 0, int maxthread = 0);
 
-    // Destructor
     /** destructor */
     ~DataStoreStreamer();
 
@@ -121,7 +120,7 @@ namespace Belle2 {
     pthread_t m_pt[MAXTHREADS];
     int m_id[MAXTHREADS];
     int m_threadin;
-    int m_threadout;
+    //int m_threadout;
     int m_decstat[MAXTHREADS];
     //    char* m_evtbuf[MAXTHREADS];
     std::queue<char*> m_evtbuf[MAXTHREADS];

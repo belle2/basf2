@@ -24,7 +24,7 @@ static DataStoreStreamer* s_streamer = NULL;
 
 static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 static pthread_mutex_t mutex_thread[MAXTHREADS];
-static char* evtbuf_thread[MAXTHREADS];
+//static char* evtbuf_thread[MAXTHREADS];
 
 void* RunDecodeEvtMessage(void* targ)
 {
@@ -44,7 +44,8 @@ DataStoreStreamer& DataStoreStreamer::Instance()
 // Constructor
 DataStoreStreamer::DataStoreStreamer(int complevel, int maxthread) : m_compressionLevel(complevel), m_initStatus(0),
   m_maxthread(maxthread),
-  m_threadin(0), m_threadout(0)
+  m_threadin(0)
+  //, m_threadout(0)
 {
   if (m_maxthread > MAXTHREADS) {
     B2FATAL("DataStoreStreamer : Too many threads " << m_maxthread);

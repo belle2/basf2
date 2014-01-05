@@ -1,7 +1,7 @@
 Import('env')
 
 env['LIBS'] = ['$ROOT_LIBS', 'display', 'tracking', 'framework', 'geometry',
-               'vxd', 'vxd_dataobjects', 'pxd_dataobjects', 'svd_dataobjects', 'svd', 'cdc_dataobjects',
+               'vxd', 'vxd_dataobjects', 'pxd_dataobjects', 'svd_dataobjects', 'cdc_dataobjects',
                'cdc', 'ecl_dataobjects', 'bklm_dataobjects', 'ecl', 'mdst_dataobjects', 'eklm_dataobjects',
                'display_dataobjects', 'simulation_dataobjects', 'generators_dataobjects',
                'genfit2']

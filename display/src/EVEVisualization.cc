@@ -575,8 +575,8 @@ void EVEVisualization::addTrack(const genfit::Track* track, const TString& label
             }
             double depth = sensor.getThickness();
             TEveBox* hit_box = boxCreator(a, u, v, du, dv, depth);
-            hit_box->SetName(TString::Format("SVDRecoHit %u", j));
-            hit_box->SetMainColor(kYellow);
+            hit_box->SetName("SVDRecoHit");
+            hit_box->SetMainColor(c_recoHitColor);
             hit_box->SetMainTransparency(0);
             eveTrack->AddElement(hit_box);
           } else {
@@ -606,7 +606,7 @@ void EVEVisualization::addTrack(const genfit::Track* track, const TString& label
             cov_shape->SetTransMatrix(det_trans);
             // finished rotating and translating --------------------------------------
 
-            cov_shape->SetMainColor(kYellow);
+            cov_shape->SetMainColor(c_recoHitColor);
             cov_shape->SetMainTransparency(0);
             eveTrack->AddElement(cov_shape);
           }
@@ -649,7 +649,7 @@ void EVEVisualization::addTrack(const genfit::Track* track, const TString& label
           cov_shape->SetTransMatrix(det_trans);
           // finished rotating and translating ------------------------------------------
 
-          cov_shape->SetMainColor(kYellow);
+          cov_shape->SetMainColor(c_recoHitColor);
           cov_shape->SetMainTransparency(10);
           eveTrack->AddElement(cov_shape);
         }
@@ -677,7 +677,7 @@ void EVEVisualization::addTrack(const genfit::Track* track, const TString& label
           cov_shape->SetTransMatrix(det_trans);
           // finished rotating and translating ------------------------------------------
 
-          cov_shape->SetMainColor(kYellow);
+          cov_shape->SetMainColor(c_recoHitColor);
           cov_shape->SetMainTransparency(50);
           eveTrack->AddElement(cov_shape);
         }

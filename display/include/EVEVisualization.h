@@ -346,7 +346,7 @@ namespace Belle2 {
     TVector3 track_pos = trackCand->getPosSeed();
     TVector3 track_mom = trackCand->getMomSeed();
 
-    TEveStraightLineSet* lines = new TEveStraightLineSet("RecoHits");
+    TEveStraightLineSet* lines = new TEveStraightLineSet(TString::Format("RecoHits for %s", label.Data()));
     lines->SetMainColor(c_trackCandColor);
     lines->SetMarkerColor(c_trackCandColor);
     lines->SetMarkerStyle(6);

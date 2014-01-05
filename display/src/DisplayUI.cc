@@ -629,7 +629,10 @@ void DisplayUI::pollNewEvents()
 
 
   int numEvents = AsyncWrapper::numAvailableEvents();
-  m_nextButton->SetEnabled(numEvents > 0);
+  bool state = m_nextButton->IsEnabled();
+  //only call SetEnabled() if state changes (interrupts UI interactions otherwise)
+  if (state != (numEvents > 0))
+    m_nextButton->SetEnabled(numEvents > 0);
 }
 
 void DisplayUI::closeAndContinue()

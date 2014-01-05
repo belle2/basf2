@@ -31,24 +31,23 @@ void StorageWorker::run()
   BinData data;
   data.setBuffer(evbuf);
   MsgHandler msghandler(m_compressionLevel);
-  DataStorePackage package;
   while (true) {
     unsigned int serial = m_buf->read(evbuf);
-    package.setSerial(serial);
-    //printf("%d %d\n", serial, data.getEventNumber());
-    package.decode(msghandler, data);
     g_mutex.lock();
-    while (true) {
-      if (g_package_i < MAX_QUEUES &&
-          g_serial == serial - 1) {
-        g_package_q[g_package_i].copy(package);
-        g_package_i++;
-        g_serial++;
-        g_cond.broadcast();
-        break;
-      }
+    if (g_package_i == MAX_QUEUES) {
+      g_package_i = 0;
+    }
+    unsigned int index = g_package_i;
+    g_package_i++;
+    g_mutex.unlock();
+
+    g_mutex.lock();
+    while (g_package_q[index].getSerial() != 0) {
       g_cond.wait(g_mutex);
     }
     g_mutex.unlock();
+    g_package_q[index].decode(msghandler, data);
+    g_package_q[index].setSerial(serial);
+    g_cond.broadcast();
   }
 }

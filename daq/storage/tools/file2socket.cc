@@ -68,7 +68,7 @@ int main(int argc, char** argv)
     socket.write(buf, *recsize * 4);
     */
     socket.write(buf, sstat);
-    usleep(50);
+    usleep(100);
     nrec++;
     datasize += sstat;
     if (nrec % 10000 == 0) {

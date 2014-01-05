@@ -17,6 +17,7 @@
 #include <daq/slc/readout/ProcessStatusBuffer.h>
 
 #include <daq/slc/system/TCPSocket.h>
+#include <daq/slc/system/Time.h>
 #include <daq/slc/base/Debugger.h>
 
 using namespace Belle2;
@@ -37,15 +38,21 @@ int main(int argc, char** argv)
   bool use_buf = (argc > 5);
   if (use_buf) sbuf.open(argv[4], atoi(argv[5]));
   int nrec = 0;
+  bool connected = true;
+  BinData data;
+  data.setBuffer(evtbuf);
+  double datasize = 0;
+  Time t0;
   while (true) {
-    sbuf.reportReady();
+    //sbuf.reportReady();
     //if (use_buf) sbuf.waitStarted();
     //sbuf.reportRunning();
     while (true) {
       //while (use_buf && sbuf.isStopped()) sbuf.waitStarted();
       int bufsize = socket->get_wordbuf(evtbuf, 100000000);
-      if (bufsize <= 0) {
+      if (bufsize <= 0 && connected) {
         sbuf.reportError("Failed to read data. connection broken.");
+        connected = false;
         break;
       } else if (bufsize == 0) {
         break;
@@ -57,10 +64,18 @@ int main(int argc, char** argv)
         usleep(20);
       }
       nrec++;
-      if (nrec % 10000 == 0) printf("in :record %d\n", nrec);
+      datasize += data.getByteSize();
+      if (nrec % 10000 == 0) {
+        Time t;
+        double freq = 10000. / (t.get() - t0.get()) / 1000. ;
+        double rate = datasize / (t.get() - t0.get()) / 1000000.;
+        t0 = t;
+        datasize = 0;
+      }
     }
     while (true) {
       if (socket->reconnect(5000) == -1) {
+        connected = true;
       } else {
         break;
       }

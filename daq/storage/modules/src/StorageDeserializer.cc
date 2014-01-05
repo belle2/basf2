@@ -20,6 +20,7 @@
 #include <rawdata/dataobjects/RawPXD.h>
 
 #include <daq/slc/base/Debugger.h>
+#include <daq/slc/base/StringUtil.h>
 #include <daq/slc/system/Time.h>
 
 #include <cstdlib>
@@ -53,7 +54,7 @@ StorageDeserializerModule::StorageDeserializerModule() : Module()
   m_inputbuf = NULL;
   m_nrecv = 0;
   m_running = false;
-  m_package_q = new DataStorePackage[StorageWorker::MAX_QUEUES];
+  m_package_q = NULL;
   m_package_length = m_package_i = 0;
 
   B2INFO("StorageDeserializer: Constructor done.");
@@ -79,7 +80,7 @@ void StorageDeserializerModule::initialize()
       m_shmflag = 0;
     } else {
       m_status.open(m_nodename, m_nodeid);
-      m_status.reportReady();
+      //m_status.reportReady();
     }
   }
   char* evtbuf = new char[10000000];
@@ -95,45 +96,49 @@ void StorageDeserializerModule::initialize()
   for (int n = 0; n < m_numThread; n++) {
     PThread(new StorageWorker(m_buf, m_compressionLevel));
   }
-
+  /*
   if (m_shmflag > 0) {
     m_status.reportRunning();
     m_running = true;
   }
+  */
   B2INFO("StorageDeserializer: initialize() done.");
 }
 
 void StorageDeserializerModule::event()
 {
   m_nrecv++;
-  while (m_package_i == m_package_length) {
-    StorageWorker::lock();
-    DataStorePackage* package_q = StorageWorker::getQueue();
-    m_package_length = StorageWorker::getQueueIndex();
-    while (m_package_length == 0) {
-      StorageWorker::wait();
-      m_package_length = StorageWorker::getQueueIndex();
-    }
+  if (m_package_i == StorageWorker::MAX_QUEUES) {
     m_package_i = 0;
-    for (size_t i = 0; i < m_package_length; i++) {
-      m_package_q[i].copy(package_q[i]);
-    }
-    StorageWorker::setQueueIndex(0);
-    StorageWorker::notify();
-    StorageWorker::unlock();
   }
-  DataStorePackage& package(m_package_q[m_package_i++]);
-  int length = m_package_length - m_package_i;
+  StorageWorker::lock();
+  DataStorePackage& package(StorageWorker::getQueue()[m_package_i++]);
+  while (package.getSerial() == 0) {
+    StorageWorker::wait();
+  }
+  int length = StorageWorker::getQueueIndex() - m_package_i;
+  StorageWorker::unlock();
   datasize += package.getData().getByteSize();
   package.restore();
+  unsigned int serial = package.getSerial();
+  package.setSerial(0);
+  StorageWorker::notify();
   if (m_nrecv % 10000 == 0) {
     Time t;
     double freq = 10000. / (t.get() - t0.get()) / 1000. ;
     double rate = datasize / (t.get() - t0.get()) / 1000000.;
     std::string has_pxd_s = ((package.getPXDData().getBuffer() != NULL) ? "with PXD" : "no PXD");
-    B2INFO("Serial = " << package.getSerial() << ", Freq = " << freq
+    B2INFO("Serial = " << serial << ", Freq = " << freq
            << " [kHz], Rate = " << rate << " [MB/s], DataSize = "
            << datasize / 1000. / 1000 << " [kB/event], Queue = " <<  length << " " << has_pxd_s);
+    /*
+    if (m_nrecv % 100000 == 0) {
+      if (m_shmflag > 0) {
+    m_status.reportInfo(Belle2::form("Serial = %d, Freq = %f [kHz], Rate = %f [MB/s], DataSize = %f [kB/event], Queue = %d, %s",
+           package.getSerial(), freq, rate, datasize / 1000. / 1000, length, has_pxd_s.c_str()));
+      }
+    }
+    */
     t0 = t;
     datasize = 0;
   }
@@ -146,6 +151,10 @@ void StorageDeserializerModule::beginRun()
 
 void StorageDeserializerModule::endRun()
 {
+  StoreObjPtr<EventMetaData> evtmetadata;
+  int expno = evtmetadata->getExperiment();
+  int runno = evtmetadata->getRun();
+  B2INFO(expno << " " << runno);
   //fill Run data
   B2INFO("StorageDeserializer: endRun done.");
 }

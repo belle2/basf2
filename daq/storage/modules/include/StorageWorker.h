@@ -24,7 +24,7 @@ namespace Belle2 {
     static void setQueueIndex(unsigned int i) { g_package_i = i; }
 
   public:
-    const static unsigned int MAX_QUEUES = 200;
+    const static unsigned int MAX_QUEUES = 40000;
 
   private:
     static Mutex g_mutex;

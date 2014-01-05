@@ -42,7 +42,7 @@ int main(int argc, char** argv)
         //  printf ("%s\n", ent->d_name);
         int shmid, semid;
         char name[256];
-        sscanf(ent->d_name, "SHM%d-SEM%d-%s", &shmid, &semid, name);
+        sscanf(ent->d_name, "SHM%d-SEM%d-%255s", &shmid, &semid, name);
         //  printf ( "name : %s - shmid = %d, semid = %d\n", name, shmid, semid );
         int unnamed = strcmp(name, "UNNAMED");
         bool deleted = false;

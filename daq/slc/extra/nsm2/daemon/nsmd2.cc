@@ -22,8 +22,9 @@
 //  20131222  1916 printlog infinite loop fix
 //  20131230  1918 argv[0] changed to lower case
 //  20140104  1919 disid fix, stdint
+//  20140105  1920 nsminfo2
 
-#define NSM_DAEMON_VERSION   1919 /* daemon   version 1.9.19 */
+#define NSM_DAEMON_VERSION   1920 /* daemon   version 1.9.20 */
 // ----------------------------------------------------------------------
 
 /*
@@ -242,6 +243,11 @@ static NSMcmdtbl_t nsmd_cmdtbl[] = {
 #define ERRO  nsmd_error
 #define ASRT  nsmd_assert
 
+#define VSNPRINTF(buf, ap, fmt) \
+  va_start(ap, fmt); vsnprintf(buf, sizeof(buf), fmt, ap); va_end(ap)
+#define VFPRINTF(fp, ap, fmt) \
+  va_start(ap, fmt); vfprintf(fp, fmt, ap); va_end(ap)
+
 #define SOCKOPT(s,o,v) setsockopt(s,SOL_SOCKET,o,(char *)&(v),sizeof(v))
 #define BIND(s,sap,p) \
   (sap)->sin_port=htons((short)(p)),\
@@ -301,6 +307,7 @@ static void nsmd_tcpsend(NSMcon& con, NSMdmsg& dmsg,
                          NSMDtcpq* qptr = 0, int beforeafter = 0);
 extern "C" int nsmlib_hash(NSMsys* sysp, int32_t* hashtable, int hashmax,
                            const char* key, int create);
+extern void nsminfo2();
 
 //                   -------------------------
 // --                -- low level functions --
@@ -636,6 +643,22 @@ nsmd_reopenlog()
   }
   return 0;
 }
+// -- nsmd_print0 / nsmd_print1 -----------------------------------------
+//    printf to be called from nsminfo2
+// ----------------------------------------------------------------------
+void
+nsmd_print0(const char* fmt, ...)
+{
+  va_list ap;
+  fputs("* ", nsmd_logfp);
+  VFPRINTF(nsmd_logfp, ap, fmt);
+}
+void
+nsmd_print1(const char* fmt, ...)
+{
+  va_list ap;
+  VFPRINTF(nsmd_logfp, ap, fmt);
+}
 // -- nsmd_logtime ------------------------------------------------------
 //    logtime
 // ----------------------------------------------------------------------
@@ -657,14 +680,14 @@ nsmd_logtime(char* buf)
     nsmd_reopenlog();
     nsmd_printlog("",
                   "------------------------------------------------------------------");
-    sprintf(datebuf, "%s version %d.%d.%02d protocol %d.%d.%02d",
-            "nsmd - network shared memory daemon",
-            dver / 1000, (dver / 100) % 10, dver % 100, pver / 1000, (pver / 100) % 10, pver % 100);
-    nsmd_printlog("", datebuf);
+    nsmd_print1("%s version %d.%d.%02d protocol %d.%d.%02d\n",
+                "nsmd - network shared memory daemon",
+                dver / 1000, (dver / 100) % 10, dver % 100,
+                pver / 1000, (pver / 100) % 10, pver % 100);
 
-    sprintf(datebuf, "date: %04d.%02d.%02d\n",
-            cur->tm_year + 1900, cur->tm_mon + 1, cur->tm_mday);
-    nsmd_printlog("", datebuf);
+    nsmd_print1("date: %04d.%02d.%02d\n",
+                cur->tm_year + 1900, cur->tm_mon + 1, cur->tm_mday);
+    nsminfo2();
   }
   sprintf(buf, "%02d:%02d:%02d.%03d ",
           cur->tm_hour, cur->tm_min, cur->tm_sec, (int)now.tv_usec / 1000);
@@ -697,15 +720,12 @@ nsmd_printlog(const char* prompt, const char* str)
 // -- nsmd_error --------------------------------------------------------
 //    system call error and exit
 // ----------------------------------------------------------------------
-#define NSMD_VSNPRINTF(buf, ap, fmt) \
-  va_start(ap, fmt); vsnprintf(buf, sizeof(buf), fmt, ap); va_end(ap)
-
 void
 nsmd_error(const char* fmt, ...)
 {
   char buf[4096];
   va_list ap;
-  NSMD_VSNPRINTF(buf, ap, fmt);
+  VSNPRINTF(buf, ap, fmt);
 
   snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf),
            " (%s)", errno ? strerror(errno) : "errno=0");
@@ -722,7 +742,7 @@ nsmd_assert(const char* fmt, ...)
 {
   char buf[4096];
   va_list ap;
-  NSMD_VSNPRINTF(buf, ap, fmt);
+  VSNPRINTF(buf, ap, fmt);
   nsmd_printlog("[ASSERT] ", buf);
   nsmd_destroy(NSMD_ESYSERR);
 }
@@ -734,7 +754,7 @@ nsmd_dbg(const char* fmt, ...)
 {
   char buf[4096];
   va_list ap;
-  NSMD_VSNPRINTF(buf, ap, fmt);
+  VSNPRINTF(buf, ap, fmt);
   nsmd_printlog("DBG: ", buf);
 }
 // -- nsmd_log ----------------------------------------------------------
@@ -745,7 +765,7 @@ nsmd_log(const char* fmt, ...)
 {
   char buf[4096];
   va_list ap;
-  NSMD_VSNPRINTF(buf, ap, fmt);
+  VSNPRINTF(buf, ap, fmt);
   nsmd_printlog("", buf);
 }
 // -- nsmd_warn ---------------------------------------------------------
@@ -756,7 +776,7 @@ nsmd_warn(const char* fmt, ...)
 {
   char buf[4096];
   va_list ap;
-  NSMD_VSNPRINTF(buf, ap, fmt);
+  VSNPRINTF(buf, ap, fmt);
   nsmd_printlog("[WARNING] ", buf);
 }
 //                   --------------------
@@ -4617,6 +4637,7 @@ void
 nsmd_loop()
 {
   int busy = 0;
+  int64_t t_dumponce = time10ms() + 30 * 100; /* 30s after the start */
 
   while (1) {
 
@@ -4680,6 +4701,12 @@ nsmd_loop()
 
     // -- shared memory update
     nsmd_shmcast();
+
+    // -- nsminfo2
+    if (t_dumponce && now > t_dumponce) {
+      nsminfo2();
+      t_dumponce = 0;
+    }
   }
 }
 //                   ----------

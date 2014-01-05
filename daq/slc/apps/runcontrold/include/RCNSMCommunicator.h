@@ -19,6 +19,7 @@ namespace Belle2 {
     virtual bool sendDataObject(const std::string& name,
                                 DataObject* data) throw();
     virtual bool isOnline(NSMNode* node) throw();
+    virtual void sendLog(const SystemLog& log) throw();
 
   private:
     NSMNode* _rc_node;

@@ -1,3 +1,4 @@
+
 #ifndef _Belle2_RCGUICommunicator_h
 #define _Belle2_RCGUICommunicator_h
 
@@ -24,6 +25,7 @@ namespace Belle2 {
     virtual bool sendDataObject(const std::string& name,
                                 DataObject* data) throw();
     virtual bool isOnline(NSMNode*) throw() { return true; }
+    virtual void sendLog(const SystemLog& log) throw() {}
 
   public:
     void run();

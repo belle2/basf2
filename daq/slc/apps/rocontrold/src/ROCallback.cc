@@ -37,29 +37,36 @@ bool ROCallback::load() throw()
   _con.addArgument("1");
   _con.addArgument("5101");
   _con.addArgument(_node->getName());
+  _con.load(10);
+  /*
   if (_con.load(10)) {
     Belle2::debug("(DEBUG) load succeded");
   } else {
     Belle2::debug("(DEBUG) load timeout");
   }
+  */
   return true;
 }
 
 bool ROCallback::start() throw()
 {
   Belle2::debug("START");
-  if (_con.start(10)) {
+  _con.start(-1);
+  /*
+  if (_con.start(-1)) {
     Belle2::debug("(DEBUG) start succeded");
   } else {
     Belle2::debug("(DEBUG) start timeout");
   }
+  */
   return true;
 }
 
 bool ROCallback::stop() throw()
 {
   Belle2::debug("STOP");
-  return _con.stop(30);
+  _con.stop(-1);
+  return true;
 }
 
 bool ROCallback::resume() throw()
@@ -75,7 +82,6 @@ bool ROCallback::pause() throw()
 bool ROCallback::recover() throw()
 {
   Belle2::debug("RECOVER");
-  _node->setState(State::CONFIGURED_S);
   return (_con.abort() && load());
 }
 

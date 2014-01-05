@@ -5,6 +5,7 @@
 
 #include <daq/slc/base/NSMNode.h>
 #include <daq/slc/base/DataObject.h>
+#include <daq/slc/base/SystemLog.h>
 
 #include "daq/slc/apps/runcontrold/RunControlMessage.h"
 
@@ -22,6 +23,7 @@ namespace Belle2 {
     virtual bool sendDataObject(const std::string& name,
                                 DataObject* data) throw() = 0;
     virtual bool isOnline(NSMNode* node) throw() = 0;
+    virtual void sendLog(const SystemLog& log) throw() = 0;
     bool isReady() throw();
     void setReady(bool ready) throw();
 

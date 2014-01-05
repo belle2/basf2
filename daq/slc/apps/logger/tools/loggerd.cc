@@ -25,6 +25,5 @@ int main(int argc, char** argv)
                                             config.get("NSM_LOCAL_HOST"),
                                             config.getInt("NSM_LOCAL_PORT"));
   daemon->run();
-
   return 0;
 }

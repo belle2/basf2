@@ -76,3 +76,8 @@ bool RCNSMCommunicator::isOnline(NSMNode* node) throw()
   _nsm_mutex.unlock();
   return is_online;
 }
+
+void RCNSMCommunicator::sendLog(const SystemLog& log) throw()
+{
+  _comm->sendLog(log);
+}

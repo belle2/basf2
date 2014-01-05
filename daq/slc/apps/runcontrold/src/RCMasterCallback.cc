@@ -105,7 +105,7 @@ bool RCMasterCallback::load() throw()
   comm->sendDataObject(_master->getStatus()->getClassName(),
                        _master->getStatus());
   _master->unlock();
-  trigft();
+  //trigft();
   return distribute(Command::LOAD, -1, 0, 0);
 }
 

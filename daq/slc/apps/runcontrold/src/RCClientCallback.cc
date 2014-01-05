@@ -7,6 +7,7 @@
 #include "daq/slc/apps/runcontrold/RunControlMessage.h"
 
 #include <daq/slc/base/Debugger.h>
+#include <daq/slc/base/StringUtil.h>
 
 using namespace Belle2;
 
@@ -37,10 +38,15 @@ bool RCClientCallback::ok() throw()
   _master->lock();
   NSMNode* node = _master->findNode(id, nsm);
   node->setState(State(nsm.getData()));
-  node->setConnection(Connection::ONLINE);
+  if (node->getConnection() != Connection::ONLINE) {
+    RCCommunicator* comm = _master->getClientCommunicator();
+    comm->sendLog(SystemLog(getCommunicator()->getNode()->getName(), SystemLog::INFO,
+                            Belle2::form("Node %s connected.", node->getName().c_str())));
+    node->setConnection(Connection::ONLINE);
+  }
+  RCCommunicator* comm = _master->getMasterCommunicator();
   //Belle2::debug("[DEBUG] node=%s >> OK", node->getName().c_str());
   RCSequencer::notify();
-  RCCommunicator* comm = _master->getMasterCommunicator();
   bool synchronized = true;
   State state_org = _master->getNode()->getState();
   for (RCMaster::NSMNodeList::iterator it = _master->getNSMNodes().begin();
@@ -51,7 +57,12 @@ bool RCClientCallback::ok() throw()
     }
   }
   if (synchronized) {
-    _master->getNode()->setState(node->getState());
+    State& state(node->getState());
+    _master->getNode()->setState(state);
+    if (state == State::RUNNING_S) {
+      comm->sendLog(SystemLog(getCommunicator()->getNode()->getName(), SystemLog::INFO,
+                              Belle2::form("New run %d was started.", _master->getStatus()->getColdNumber())));
+    }
   }
   bool result = (comm != NULL) ? comm->sendState(node) : true;
   if (comm != NULL) comm->sendState(_master->getNode());
@@ -99,6 +110,8 @@ void RCClientCallback::selfCheck() throw(NSMHandlerException)
         if (node->getConnection() == Connection::ONLINE) {
           node->setState(State::ERROR_ES);
           node->setConnection(Connection::OFFLINE);
+          comm->sendLog(SystemLog(getCommunicator()->getNode()->getName(), SystemLog::ERROR,
+                                  Belle2::form("Node %s got down.", node->getName().c_str())));
           _master->getNode()->setState(State::ERROR_ES);
           if (master_comm != NULL) {
             master_comm->sendState(node);

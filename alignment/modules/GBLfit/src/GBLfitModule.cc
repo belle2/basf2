@@ -465,13 +465,13 @@ void GBLfitModule::event()
         // genfit::FitStatus* fs = 0;
         // genfit::KalmanFitStatus* kfs = 0;
         if (fitSuccess) {
-          genfit::FitStatus* fs = 0;
-          genfit::KalmanFitStatus* kfs = 0;
+          //genfit::FitStatus* fs = 0;
+          //genfit::KalmanFitStatus* kfs = 0;
 
-          fs = gfTrack.getFitStatus(trackRep);
+          genfit::FitStatus* fs = gfTrack.getFitStatus(trackRep);
           fitSuccess = fitSuccess && fs->isFitted();
           fitSuccess = fitSuccess && fs->isFitConverged();
-          kfs = dynamic_cast<genfit::KalmanFitStatus*>(fs);
+          genfit::KalmanFitStatus* kfs = dynamic_cast<genfit::KalmanFitStatus*>(fs);
           //hNit->Fill(kfs->getNumIterations());
           if (!fitSuccess && kfs)
             kfs->Print();

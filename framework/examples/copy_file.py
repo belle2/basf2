@@ -7,12 +7,6 @@
 
 from basf2 import *
 
-#load additional dictionaries to avoid errors
-from ROOT import gSystem
-gSystem.Load('libvxd')
-gSystem.Load('libtracking')
-gSystem.Load('libgenfit2')
-
 main = create_path()
 
 input = register_module('RootInput')

@@ -58,6 +58,11 @@ SeqRootInputModule::~SeqRootInputModule()
 void SeqRootInputModule::initialize()
 {
   gSystem->Load("libdataobjects");
+  gSystem->Load("libgenfit2");    // Because genfit2 classes need custom streamers.
+  gSystem->Load("libvxd");
+  gSystem->Load("libsvd");
+  gSystem->Load("libpxd");
+  gSystem->Load("libcdc");
 
   const std::vector<std::string>& inputFiles = Environment::Instance().getInputFilesOverride();
   if (!inputFiles.empty()) {

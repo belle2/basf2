@@ -50,7 +50,7 @@ REG_MODULE(FastSeqRootInput)
 FastSeqRootInputModule::FastSeqRootInputModule() : Module()
 {
   //Set module properties
-  setDescription("SeqROOT input module");
+  setDescription("SeqROOT input module (with parallel deserialization)");
   setPropertyFlags(c_Input);
 
   m_file = 0;
@@ -76,6 +76,11 @@ FastSeqRootInputModule::~FastSeqRootInputModule()
 void FastSeqRootInputModule::initialize()
 {
   gSystem->Load("libdataobjects");
+  gSystem->Load("libgenfit2");    // Because genfit2 classes need custom streamers.
+  gSystem->Load("libvxd");
+  gSystem->Load("libsvd");
+  gSystem->Load("libpxd");
+  gSystem->Load("libcdc");
 
   const std::vector<std::string>& inputFiles = Environment::Instance().getInputFilesOverride();
   if (!inputFiles.empty()) {

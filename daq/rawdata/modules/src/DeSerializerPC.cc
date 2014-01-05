@@ -100,7 +100,6 @@ void DeSerializerPCModule::initialize()
       m_shmflag = 0;
     } else {
       m_status.open(m_nodename, m_nodeid);
-      m_status.reportRunning();
     }
   }
 
@@ -355,6 +354,7 @@ void DeSerializerPCModule::event()
     Connect();
     if (m_shmflag > 0) {
       B2INFO("DeSerializerPC: Waiting for Start...\n");
+      m_status.reportRunning();
     }
     m_start_time = getTimeSec();
     n_basf2evt = 0;

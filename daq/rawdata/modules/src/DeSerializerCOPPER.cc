@@ -144,7 +144,6 @@ void DeSerializerCOPPERModule::initialize()
       m_shmflag = 0;
     } else {
       m_status.open(m_nodename, m_nodeid);
-      m_status.reportRunning();
     }
   }
 }
@@ -453,6 +452,7 @@ void DeSerializerCOPPERModule::event()
     // Use shared memory to start(for HSLB dummy data)
     if (m_shmflag > 0) {
       B2INFO("DeSerializerCOPPER: Waiting for Start...\n");
+      m_status.reportRunning();
     }
     //
     // for DESY test

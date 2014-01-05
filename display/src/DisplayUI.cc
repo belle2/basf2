@@ -84,6 +84,8 @@ void DisplayUI::addParameter(const std::string& label, ModuleParam<bool>& param,
 
 void DisplayUI::next()
 {
+  if (!m_nextButton->IsEnabled())
+    return; // periodically called by auto-advance timer, but we don't want to freeze UI if no events are there
   goToEvent(m_currentEntry + 1);
 }
 
@@ -204,7 +206,7 @@ void DisplayUI::togglePlayPause()
     m_timer = new TTimer();
     const int pollIntervalMs = (int)(1000.0 * m_autoAdvanceDelay->GetNumber());
     m_timer->Connect("Timeout()", "Belle2::DisplayUI", this, "next()");
-    m_timer->Start(pollIntervalMs, true); //single-shot, will be restarted after event is loaded
+    m_timer->Start(pollIntervalMs);
     m_playPauseButton->SetPicture(gClient->GetPicture(icondir + "ed_interrupt.png"));
   }
 }
@@ -263,6 +265,13 @@ bool DisplayUI::startDisplay()
   m_reshowCurrentEvent = false;
   if (!m_guiInitialized) {
     makeGui();
+    if (AsyncWrapper::isAsync()) {
+      //continually check for new events and enable/disable '->' button accordingly
+      TTimer* t = new TTimer();
+      const int pollIntervalMs = 300;
+      t->Connect("Timeout()", "Belle2::DisplayUI", this, "pollNewEvents()");
+      t->Start(pollIntervalMs);
+    }
 
     //import the geometry in the projection managers (only needs to be done once)
     TEveScene* gs = gEve->GetGlobalScene();
@@ -286,7 +295,7 @@ bool DisplayUI::startDisplay()
 
     //restart auto-advance timer after loading event (interval already set)
     if (m_timer)
-      m_timer->Start(-1, true);
+      m_timer->Start(-1);
 
     //make display interactive
     gApplication->Run(true); //return from Run()

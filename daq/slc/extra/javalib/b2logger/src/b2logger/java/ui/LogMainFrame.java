@@ -57,16 +57,16 @@ public class LogMainFrame extends JFrame {
 			_side_panel.add(state_panel);
 			_state_panel_m.put(group_name, state_panel);
 		}
-
 		LogViewPanel log_view = null;
 		String node_name = message.getNodeName();
-		if ( _log_view_m.containsKey(node_name) ) {
-			log_view = _log_view_m.get(node_name);
+		String name = group_name+"_"+node_name;
+		if ( _log_view_m.containsKey(name) ) {
+			log_view = _log_view_m.get(name);
 		}
 		if ( log_view == null ) {
 			log_view = new LogViewPanel();
-			_log_view_m.put(node_name, log_view);
-			_popup_level_m.put(node_name, LogLevel.DEBUG);
+			_log_view_m.put(name, log_view);
+			_popup_level_m.put(name, LogLevel.DEBUG);
 			tab_panel.add(node_name, log_view);
 		}
 		String html_message = message.getMessage().replace("<a", "<a style='color:#0000FF;'");

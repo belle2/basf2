@@ -33,8 +33,8 @@ public class RCNodeGroupViewPanel extends JPanel implements Updatable {
 		GridBagConstraints gbc = new GridBagConstraints();
 		setLayout(layout);
 		int i = 0;
-		final int cols = 10; 
-		final int rows = 2; 
+		final int cols = 2; 
+		final int rows = 3; 
 		for (int icols = 0; icols < cols; icols++) {
 			for (int irows = 0; irows < rows; irows++) {
 				if (i >= _master.getNSMNodes().size()) return;

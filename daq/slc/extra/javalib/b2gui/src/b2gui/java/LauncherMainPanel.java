@@ -11,7 +11,7 @@ public class LauncherMainPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
 
 	private LauncherPanel [] _panel_v = {
-			new LauncherPanel("Run controller", 50000, "b2rc.java.Belle2RunController", 
+			new LauncherPanel("Run controller", 60000, "b2rc.java.Belle2RunController", 
 					b2rc.java.Belle2RunController.VERSION),
 			new LauncherPanel("DQM browser", 50100, "b2dqm.java.Belle2DQMBrowser", 
 					b2dqm.java.Belle2DQMBrowser.VERSION),

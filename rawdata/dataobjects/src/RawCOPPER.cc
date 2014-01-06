@@ -11,9 +11,9 @@
 using namespace std;
 using namespace Belle2;
 
-//#define NO_DATA_CHECK
-//#define NO_DATA_CHECK_1
-//#define WO_FIRST_EVENUM_CHECK
+#define NO_DATA_CHECK
+#define NO_DATA_CHECK_1
+#define WO_FIRST_EVENUM_CHECK
 
 ClassImp(RawCOPPER);
 
@@ -647,7 +647,7 @@ void RawCOPPER::CheckData(int n, unsigned int prev_evenum, unsigned int prev_cop
   //
   *cur_runsubrun_no = GetRunNoSubRunNo(n);
 #ifdef WO_FIRST_EVENUM_CHECK
-  if (prev_evenum != 0xFFFFFFFF) {
+  if (prev_evenum != 0xFFFFFFFF && *cur_evenum_rawcprhdr != 0)  {
 #else
   if (prev_runsubrun_no == *cur_runsubrun_no && prev_runsubrun_no >= 0) {
 #endif
@@ -1084,25 +1084,26 @@ unsigned int RawCOPPER::FillTopBlockRawHeader(unsigned int m_node_id, unsigned i
   *cur_runsubrun_no = GetRunNoSubRunNo(cpr_id);
   if (prev_runsubrun_no == *cur_runsubrun_no && prev_runsubrun_no >= 0) {
 #ifdef WO_FIRST_EVENUM_CHECK
-    if ((prev_eve32 + 1 != cur_ftsw_eve32) && (prev_eve32 != 0xFFFFFFFF)) {
+    if ((prev_eve32 + 1 != cur_ftsw_eve32) && (prev_eve32 != 0xFFFFFFFF && cur_ftsw_eve32 != 0)) {
 #else
     if (prev_eve32 + 1 != cur_ftsw_eve32) {
 #endif
       char err_buf[500];
-      sprintf(err_buf, "Invalid event_number. Exiting...: cur 32bit eve %u preveve %u\n %s %s %d\n",  cur_ftsw_eve32, prev_eve32,
+      sprintf(err_buf, "Invalid event_number. Exiting...: cur 32bit eve %u preveve %u prun %d crun %d\n %s %s %d\n",  cur_ftsw_eve32, prev_eve32,
+              prev_runsubrun_no, *cur_runsubrun_no,
               __FILE__, __PRETTY_FUNCTION__, __LINE__);
       printf("[ERROR] %s\n", err_buf);
-#ifndef NO_DATA_CHECK
-      string err_str = err_buf; throw (err_str);
 
+      string err_str = err_buf;
       printf("i= %d : num entries %d : Tot words %d\n", 0 , GetNumEntries(), TotalBufNwords());
       for (int j = 0; j < TotalBufNwords(); j++) {
         printf("0x%.8x ", (GetBuffer(cpr_id))[ j ]);
         if ((j % 10) == 9)printf("\n");
         fflush(stdout);
       }
+      throw (err_str);
       exit(-1);
-#endif
+
     }
   }
 

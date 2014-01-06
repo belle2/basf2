@@ -8,6 +8,8 @@
 
 #include <rawdata/dataobjects/RawFTSW.h>
 //#include <daq/rawdata/modules/DAQConsts.h>
+#define WO_FIRST_EVENUM_CHECK
+//#define NO_DATA_CHECK
 
 using namespace std;
 using namespace Belle2;
@@ -56,8 +58,16 @@ void RawFTSW::CheckData(int n, unsigned int prev_evenum, unsigned int* cur_evenu
   *cur_evenum = GetEveNo(n);
   *cur_runsubrun_no = GetRunNoSubRunNo(n);
 
+//     printf("========== dump a data block : block # %d==========\n", n);
+//     for (int k = 0 ; k < GetBlockNwords(n); k++) {
+//       printf("0x%.8x ", (GetBuffer(n))[k]);
+//       if (k % 10 == 9)printf("\n");
+//     }
+//     fflush(stdout);
+
+#ifndef NO_DATA_CHECK
 #ifdef WO_FIRST_EVENUM_CHECK
-  if (prev_evenum != 0xFFFFFFFF) {
+  if (prev_evenum != 0xFFFFFFFF && *cur_evenum != 0) {
 #else
   if (prev_runsubrun_no == *cur_runsubrun_no && prev_runsubrun_no >= 0) {
 #endif
@@ -67,6 +77,7 @@ void RawFTSW::CheckData(int n, unsigned int prev_evenum, unsigned int* cur_evenu
       err_flag = 1;
     }
   }
+#endif
 
   if (GetNwords(n) != SIZE_FTSW_PACKET) {
     sprintf(err_buf, "invalid FTSW packet length : block %d nwords %d must be %d : Exiting...\n %s %s %d\n",
@@ -79,6 +90,7 @@ void RawFTSW::CheckData(int n, unsigned int prev_evenum, unsigned int* cur_evenu
             n, GetMagicTrailer(n), FTSW_MAGIC_TRAILER, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     err_flag = 1;
   }
+
 
   if (err_flag == 1) {
     printf("========== dump a data block : block # %d==========\n", n);

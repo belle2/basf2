@@ -11,30 +11,82 @@
 #ifndef FADC_APV_MAPPER_H_
 #define FADC_APV_MAPPER_H_
 
-#include <boost/property_tree/xml_parser.hpp>
+#include <svd/dataobjects/SVDDigit.h>
 #include <boost/property_tree/ptree.hpp>
-#include "framework/logging/Logger.h"
+#include <unordered_map>
 
-#include "svd/dataobjects/SVDDigit.h"
-
-#include <string>
-#include <vector>
-
-using namespace std;
-using boost::property_tree::ptree;
 
 namespace Belle2 {
-  /** This class implement the methods to map raw SVD hits to BASF2 SVD hits.
+  /** This class implements the methods to map raw SVD hits to BASF2 SVD hits.
    * Raw SVD hits are identified by: FADC number, APV number, strip number
    * Basf2 SVD hits are identified by PXD Sensor-id, side, strip number
+   * MODIFICATIONS 06/01/2014 by PKvasnick:
+   * The code no longer relies on consecutive numbering of FADCs or APVs.
    */
+
 
   class SVDOnlineToOfflineMap {
   public:
+
+    /** Class to hold FADC+APV25 numbers */
+    class ChipID {
+    public:
+      /** Typedefs of the compound id type and chip number types */
+      typedef unsigned short baseType;
+      typedef unsigned char chipNumberType;
+      /** Constructor taking a compound id */
+      ChipID(baseType id = 0) { m_id.id = id; }
+      /** Constructor taking chip numbers */
+      ChipID(chipNumberType FADC, chipNumberType APV25)
+      { m_id.parts.FADC = FADC; m_id.parts.APV25 = APV25; }
+      /** Copy ctor */
+      ChipID(const ChipID& other): m_id(other.m_id) {}
+      /** Assignment from same type */
+      ChipID& operator=(ChipID other) { m_id.id = other.m_id.id; return *this; }
+      /** Assignment from base type */
+      ChipID& operator=(baseType id) { m_id.id = id; return *this; }
+      /** cast to base type */
+      operator baseType() { return m_id.id; }
+      /** equality */
+      bool operator==(const ChipID& other) const { return (m_id.id == other.m_id.id); }
+      /** ordering */
+      bool operator<(const ChipID& other) const { return (m_id.id < other.m_id.id); }
+      /** Getters */
+      baseType getID() const { return m_id.id; }
+      chipNumberType getFADC() const {return m_id.parts.FADC; }
+      chipNumberType getAPV25() const {return m_id.parts.APV25; }
+      /** Setters */
+      void setID(baseType id) { m_id.id = id; }
+      void setFADC(chipNumberType FADC) { m_id.parts.FADC = FADC; }
+      void setAPV25(chipNumberType APV25) { m_id.parts.APV25 = APV25; }
+    private:
+      union {
+        /** unique id */
+        baseType id : 8 * sizeof(baseType);
+        struct {
+          chipNumberType FADC : 8 * sizeof(chipNumberType);
+          chipNumberType APV25: 8 * sizeof(chipNumberType);
+        } parts;
+      } m_id;
+    }; //ChipID class
+    /** Struct to hold data about an APV25 chip.*/
+    struct ChipInfo {
+      VxdID m_sensorID;           /**< Sensor ID */
+      bool m_uSide;               /**< True if u-side of the sensor */
+      bool m_parallel;            /**< False if numbering is reversed */
+      unsigned short m_channel0;   /**< Strip corresponding to channel 0 */
+      unsigned short m_channel127; /**< Strip corresponding to channel 127 */
+    }; // ChipInfo struct
+
+    // SVDOnlineOffLineMap
+
     /** Constructor
      * @param xml_filename is the name of the xml file containing the map.
      */
     SVDOnlineToOfflineMap(const std::string& xml_filename);
+
+    /** No default constructor */
+    SVDOnlineToOfflineMap() = delete;
 
     /** Return a pointer to a new SVDDigit whose VxdID, isU and cellID is set
      * @param FADC is FADC number from the SVDRawCopper data.
@@ -42,66 +94,36 @@ namespace Belle2 {
      * @param channel is the APV25 channel number from the SVDRawCopper data.
      * @return a pointer to the new SVDDigit owned by the caller whose
      * Position is 0
+     * FIXME: There should be no such function in this mapping class, no dependence
+     * on SVDDigit and its interface.
      */
-    inline SVDDigit* NewDigit(const unsigned char FADC,
-                              const unsigned char APV25,
-                              const unsigned char channel,
-                              const unsigned char charge,
-                              const unsigned char time);
+    SVDDigit* NewDigit(unsigned char FADC, unsigned char APV25,
+                       unsigned char channel, float charge, float time);
 
 
   private:
-    /** Default constructor is private since no one is allowed to use it
-     */
-    SVDOnlineToOfflineMap();
 
     /** Read from the ptree v in the xml file the layer nLayer
      */
-    void ReadLayer(int nLayer,  ptree const& xml_layer);
+    void ReadLayer(int nLayer,  boost::property_tree::ptree const& xml_layer);
 
     /** Read from the ptree xml_ladde the ladder nLadder in layer nLayer
      */
-    void ReadLadder(int nLayer, int nLadder, ptree const& xml_ladder);
+    void ReadLadder(int nLayer, int nLadder, boost::property_tree::ptree const& xml_ladder);
 
     /** Read from the ptree xml_sensor the sensor nSensor in ladder nLadder in layer nLayer
      */
-    void ReadSensor(int nLayer, int nLadder, int nSensor, ptree const& xml_sensor);
+    void ReadSensor(int nLayer, int nLadder, int nSensor, boost::property_tree::ptree const& xml_sensor);
 
     /** Read from the ptree xml_side the U-side, if isU, (the V-side otherwise) of the sensor
      *  nSensor in ladder nLadder in layer nLayer
      */
-    void ReadSensorSide(int nLayer, int nLadder, int nSensor, bool isU, ptree const& xml_side);
+    void ReadSensorSide(int nLayer, int nLadder, int nSensor, bool isU, boost::property_tree::ptree const& xml_side);
 
-    /** m_chipIsInTheDAQ[ FADC ] & ( 1<< APV25) tells us if the APV25 on FADC
-     *  is in the map
+    /** m_chips[ChipID(FADC,APV25)] gives the ChipInfo for the given APV25 on
+     * the given FADC.
      */
-    vector< unsigned long long int >  m_chipIsInTheDAQ;
-
-    /** m_VxdID[ FADC ][ APV25 ] gives the VxdId
-     * of the sensor read by the APV25 attached to the FADC
-     */
-    vector< vector <VxdID> >          m_VxdID;
-
-
-    /** m_isOnUside[ FADC ] & ( 1<< APV25) tells us if the APV25 on FADC
-     *  reads the U side of the sensor
-     */
-    vector< unsigned long long int >  m_isOnUside;
-
-    /** m_channel0Strip[ FADC ][ APV25 ] gives us the strip number
-     *  attached to the channel0 of the APV25 attached to the FADC
-     */
-    vector< vector <unsigned short> > m_channel0Strip;
-
-    /** m_parallel[ FADC ] & ( 1<< APV25) tells us if the APV25 channel
-     *  number increases with the sensor strip number
-     */
-    vector< unsigned long long int >  m_parallel;
-
-
-    /** add FADCn to the map
-     */
-    void addFADC(unsigned char  FADCn);
+    std::unordered_map< ChipID::baseType, ChipInfo > m_chips;
 
     /** add chipN on FADCn to the map
      */
@@ -120,47 +142,6 @@ namespace Belle2 {
 
   };
 
-  inline SVDDigit*
-  SVDOnlineToOfflineMap::NewDigit(const unsigned char FADC,
-                                  const unsigned char APV25,
-                                  const unsigned char channel,
-                                  const unsigned char charge = 0,
-                                  const unsigned char time = 0)
-  {
-
-    if (FADC >= m_VxdID.size()) {
-      B2WARNING(" FADC #" <<  FADC << " not in the SVD On-line to Off-line map "
-                << "whose present lenght is: " << m_chipIsInTheDAQ.size());
-      return NULL;
-    }
-
-    if (APV25 >= m_VxdID [FADC].size()) {
-      B2WARNING(" FADC #" <<  FADC << " and APV25 # " << APV25 << " not in the SVD On-line to Off-line map "
-                << "whose present lenght is: " << m_VxdID[FADC].size());
-      return NULL;
-    }
-
-    if (! m_chipIsInTheDAQ[ FADC ] & (1 << APV25)) {
-      B2WARNING(" FADC #" <<  FADC << " and APV25 # " << APV25 << " not initialized in the SVD On-line to Off-line map");
-      return NULL;
-    }
-
-    if (channel > 127) {
-      B2WARNING(" channel #" <<  channel << " is not supposed to exixst");
-      return NULL;
-    }
-
-
-    return new SVDDigit(m_VxdID [FADC][APV25] ,
-                        (m_isOnUside [FADC] & (1 << APV25)) != 0 ,
-                        m_channel0Strip [FADC][APV25] +
-                        ((short) channel)
-                        * (
-                          (m_parallel[FADC] & (1 << APV25)) ?
-                          1 : -1),
-                        0., charge, time);
-  }
-
-}
+} // namespace Belle2
 #endif
 

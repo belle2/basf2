@@ -296,34 +296,34 @@ int* DeSerializerPCModule::recvData(int* malloc_flag, int* total_buf_nwords, int
     exit(-1);
   }
 
-//   if (temp_buf[20] != 0x7fff0008) {
-//     //#ifdef DEBUG
-//     printf("*******HDR**********\n");
-//     printf("\n%.8d : ", 0);
-//     for (int i = 0; i < SendHeader::SENDHDR_NWORDS ; i++) {
-//       printf("0x%.8x ", send_hdr_buf[ i ]);
-//       if ((i + 1) % 10 == 0) {
-//         printf("\n%.8d : ", i + 1);
-//       }
-//     }
-//     printf("\n");
-//     printf("\n");
-//     //#endif
-//     //#ifdef DEBUG
-//     printf("*******BODY**********\n");
-//     printf("\n%.8d : ", 0);
-//     //      for (int i = 0; i < *total_buf_nwords; i++) {
-//     for (int i = 0; i < 100; i++) {
-//       printf("0x%.8x ", temp_buf[ i ]);
-//       if ((i + 1) % 10 == 0) {
-//         printf("\n%.8d : ", i + 1);
-//       }
-//     }
-//     printf("\n");
-//     printf("\n");
-//     exit(1);
-//     //#endif
-//   }
+  //   if (temp_buf[20] != 0x7fff0008) {
+  //     //#ifdef DEBUG
+  //     printf("*******HDR**********\n");
+  //     printf("\n%.8d : ", 0);
+  //     for (int i = 0; i < SendHeader::SENDHDR_NWORDS ; i++) {
+  //       printf("0x%.8x ", send_hdr_buf[ i ]);
+  //       if ((i + 1) % 10 == 0) {
+  //         printf("\n%.8d : ", i + 1);
+  //       }
+  //     }
+  //     printf("\n");
+  //     printf("\n");
+  //     //#endif
+  //     //#ifdef DEBUG
+  //     printf("*******BODY**********\n");
+  //     printf("\n%.8d : ", 0);
+  //     //      for (int i = 0; i < *total_buf_nwords; i++) {
+  //     for (int i = 0; i < 100; i++) {
+  //       printf("0x%.8x ", temp_buf[ i ]);
+  //       if ((i + 1) % 10 == 0) {
+  //         printf("\n%.8d : ", i + 1);
+  //       }
+  //     }
+  //     printf("\n");
+  //     printf("\n");
+  //     exit(1);
+  //     //#endif
+  //   }
 
 
 
@@ -345,7 +345,7 @@ int* DeSerializerPCModule::recvData(int* malloc_flag, int* total_buf_nwords, int
 void DeSerializerPCModule::event()
 {
   // For data check
-  int num_copper_ftsw = -1;
+
   int data_size_copper_0 = -1;
   int data_size_copper_1 = -1;
   int data_size_ftsw = -1;
@@ -411,57 +411,74 @@ void DeSerializerPCModule::event()
                            num_events_in_sendblock, num_nodes_in_sendblock);
 
     //
-    // Data check
+    // check even # and node # in one Sendblock
     //
-    num_copper_ftsw = raw_datablk->GetNumEntries();
-    int cpr_num = 0;
-    unsigned int cur_evenum = 0, cur_copper_ctr = 0;
-    for (int i = 0; i < raw_datablk->GetNumEntries(); i++) {
-      if (raw_datablk->CheckFTSWID(i)) {
-        RawFTSW* temp_rawftsw = new RawFTSW;
-        temp_rawftsw->SetBuffer((int*)temp_buf + raw_datablk->GetBufferPos(i),
-                                raw_datablk->GetBlockNwords(i), 0, 1, 1);
-#ifndef NO_DATA_CHECK
-        try {
-          temp_rawftsw->CheckData(0, m_prev_evenum, &cur_evenum, m_prev_run_no, &m_run_no);
-        } catch (string err_str) {
-          print_err.PrintError(m_shmflag, &m_status, err_str);
-          exit(1);
-        }
-#endif
-        //    printf("################SFTW cur %x prev %x\n",cur_evenum,m_prev_evenum);
-        data_size_ftsw = raw_datablk->GetBlockNwords(i);
-        delete temp_rawftsw;
-
-      } else if (raw_datablk->CheckTLUID(i)) {
-        // No operation
-      } else {
-        RawCOPPER* temp_rawcopper = new RawCOPPER;
-        temp_rawcopper->SetBuffer((int*)temp_buf + raw_datablk->GetBufferPos(i),
-                                  raw_datablk->GetBlockNwords(i), 0, 1, 1);
-
-
-#ifndef NO_DATA_CHECK
-        try {
-          temp_rawcopper->CheckData(0, m_prev_evenum, m_prev_copper_ctr,
-                                    &cur_evenum, &cur_copper_ctr, m_prev_run_no, &m_run_no);
-        } catch (string err_str) {
-          print_err.PrintError(m_shmflag, &m_status, err_str);
-          exit(1);
-        }
-        //    printf("#################COPPER cur %x prev %x\n",cur_evenum,m_prev_evenum);
-#endif
-        if (cpr_num == 0) {
-          data_size_copper_0 = raw_datablk->GetBlockNwords(i);
-          eve_copper_0 = (raw_datablk->GetBuffer(i))[ 3 ];
-        } else if (cpr_num == 1) {
-          data_size_copper_1 = raw_datablk->GetBlockNwords(i);
-        }
-        cpr_num++;
-        delete temp_rawcopper;
-      }
+    int num_entries = raw_datablk->GetNumEntries();
+    if (num_entries != num_events_in_sendblock * num_nodes_in_sendblock) {
+      char err_buf[500];
+      sprintf(err_buf, "Inconsistent SendHeader value. # of nodes(%d) times # of events(%d) differs from # of entries(%d). Exiting...",
+              num_nodes_in_sendblock, num_events_in_sendblock, num_entries, strerror(errno));
+      print_err.PrintError(m_shmflag, &m_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      sleep(1234567);
+      exit(-1);
     }
 
+    //
+    // Data check
+    //
+    int cpr_num = 0;
+    unsigned int cur_evenum = 0, cur_copper_ctr = 0;
+    for (int k = 0; k < num_events_in_sendblock; k++) {
+
+      for (int l = 0; l < num_nodes_in_sendblock; l++) {
+
+        int entry_id = l + k * num_nodes_in_sendblock;
+
+        if (raw_datablk->CheckFTSWID(entry_id)) {
+          RawFTSW* temp_rawftsw = new RawFTSW;
+          temp_rawftsw->SetBuffer((int*)temp_buf + raw_datablk->GetBufferPos(entry_id),
+                                  raw_datablk->GetBlockNwords(entry_id), 0, 1, 1);
+#ifndef NO_DATA_CHECK
+          try {
+            temp_rawftsw->CheckData(0, m_prev_evenum, &cur_evenum, m_prev_run_no, &m_run_no);
+          } catch (string err_str) {
+            print_err.PrintError(m_shmflag, &m_status, err_str);
+            exit(1);
+          }
+#endif
+          //    printf("################SFTW cur %x prev %x\n",cur_evenum,m_prev_evenum);
+          data_size_ftsw = raw_datablk->GetBlockNwords(entry_id);
+          delete temp_rawftsw;
+
+        } else if (raw_datablk->CheckTLUID(entry_id)) {
+          // No operation
+        } else {
+          RawCOPPER* temp_rawcopper = new RawCOPPER;
+          temp_rawcopper->SetBuffer((int*)temp_buf + raw_datablk->GetBufferPos(entry_id),
+                                    raw_datablk->GetBlockNwords(entry_id), 0, 1, 1);
+
+
+#ifndef NO_DATA_CHECK
+          try {
+            temp_rawcopper->CheckData(0, m_prev_evenum, m_prev_copper_ctr,
+                                      &cur_evenum, &cur_copper_ctr, m_prev_run_no, &m_run_no);
+          } catch (string err_str) {
+            print_err.PrintError(m_shmflag, &m_status, err_str);
+            exit(1);
+          }
+          //    printf("#################COPPER cur %x prev %x\n",cur_evenum,m_prev_evenum);
+#endif
+          if (cpr_num == 0) {
+            data_size_copper_0 = raw_datablk->GetBlockNwords(entry_id);
+            eve_copper_0 = (raw_datablk->GetBuffer(entry_id))[ 3 ];
+          } else if (cpr_num == 1) {
+            data_size_copper_1 = raw_datablk->GetBlockNwords(entry_id);
+          }
+          cpr_num++;
+          delete temp_rawcopper;
+        }
+      }
+    }
     m_prev_evenum = cur_evenum;
     m_prev_copper_ctr = cur_copper_ctr;
     m_prev_run_no = m_run_no;
@@ -507,24 +524,24 @@ void DeSerializerPCModule::event()
 
   if (n_basf2evt % 2000 == 0) {
     RateMonitor(eve_copper_0);
-//     //  if ( ( n_basf2evt - m_prev_nevt ) > monitor_numeve ) {
-//     double cur_time = getTimeSec();
-//     double interval = cur_time - m_prev_time;
-//     if (n_basf2evt != 0) {
-//       double multieve = (1. / interval);
-//       if (multieve > 2.) multieve = 2.;
-//       monitor_numeve = (int)(multieve * monitor_numeve) + 1;
-//     }
-//     printf("Event %10d EventRate time %lf : # of nodes %d : ftsw words %d  copper0 words %d copper1 words %d\n",
-//            eve_copper_0,
-//            getTimeSec() - m_start_time,
-//            num_copper_ftsw,
-//            data_size_ftsw,
-//            data_size_copper_0,
-//            data_size_copper_1);
-//     fflush(stdout);
-//     m_prev_time = cur_time;
-//     m_prev_nevt = n_basf2evt;
+    //     //  if ( ( n_basf2evt - m_prev_nevt ) > monitor_numeve ) {
+    //     double cur_time = getTimeSec();
+    //     double interval = cur_time - m_prev_time;
+    //     if (n_basf2evt != 0) {
+    //       double multieve = (1. / interval);
+    //       if (multieve > 2.) multieve = 2.;
+    //       monitor_numeve = (int)(multieve * monitor_numeve) + 1;
+    //     }
+    //     printf("Event %10d EventRate time %lf : # of nodes %d : ftsw words %d  copper0 words %d copper1 words %d\n",
+    //            eve_copper_0,
+    //            getTimeSec() - m_start_time,
+    //            num_copper_ftsw,
+    //            data_size_ftsw,
+    //            data_size_copper_0,
+    //            data_size_copper_1);
+    //     fflush(stdout);
+    //     m_prev_time = cur_time;
+    //     m_prev_nevt = n_basf2evt;
   }
 
   n_basf2evt++;

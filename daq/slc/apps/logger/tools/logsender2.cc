@@ -1,6 +1,8 @@
 #include <daq/slc/nsm/NSMCommunicator.h>
-
 #include <daq/slc/base/Debugger.h>
+
+#include <nsm2/nsm2.h>
+#include <nsm2/belle2nsm.h>
 
 #include <unistd.h>
 #include <cstring>
@@ -10,14 +12,19 @@ using namespace Belle2;
 int main(int argc, char** argv)
 {
   if (argc < 3) {
-    printf("Usage : ./logsender <name> <priority> <message>\n");
+    printf("Usage : ./logsender2 <name> <priority> <message>\n");
     return 1;
   }
   const char* nodename = argv[1];
   const char* priority_s = argv[2];
   const char* message = argv[3];
-  NSMCommunicator* comm = new NSMCommunicator(new NSMNode(nodename));
-  comm->init();
+  NSMcontext* nsmc = NULL;
+  if ((nsmc = b2nsm_init(nodename)) == 0) {
+    printf("[FATAL] Failed to connect NSM : %s", b2nsm_strerror());
+    return 1;
+  }
+  NSMCommunicator* comm = new NSMCommunicator();
+  comm->setContext(nsmc);
   SystemLog::Priority priority = SystemLog::DEBUG;
   if (strcmp(priority_s, "INFO") == 0) {
     priority = SystemLog::INFO;

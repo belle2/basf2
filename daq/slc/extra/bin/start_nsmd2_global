@@ -7,8 +7,8 @@ startBySSH() {
   ssh $1 "source ~/belle2/release/daq/slc/extra/bin/setup.sh $2 $3 global $4 &> /dev/null"
 }
 
-startBySSH belle-rpc1 ~/belle2 release nsmd2
+#startBySSH belle-rpc1 ~/belle2 release nsmd2
 startBySSH belle-rpc2 ~/belle2 release nsmd2
-startBySSH belle-hltin ~/hlt/belle2 latest nsmd2
+#startBySSH belle-hltin ~/hlt/belle2 latest nsmd2
 startBySSH belle-reco ~/hlt/belle2 latest nsmd2
 

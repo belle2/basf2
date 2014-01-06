@@ -32,16 +32,9 @@ int main(int argc, char** argv)
   bool use_buf = (argc > 5);
   if (use_buf) sbuf.open(argv[4], atoi(argv[5]));
 
-  //while (true) {
-  //printf("%s:%d \n", __FILE__, __LINE__);
-  //sbuf.reportReady();
   RingBuffer* rbuf = new RingBuffer(argv[1]);
   char* evtbuf = new char[10000000];
-  //RevRb2Sock rs(argv[1], atoi(argv[3]), "DSROUT", -1);
-  //if (use_buf) sbuf.waitStarted();
-  //printf("%s:%d \n", __FILE__, __LINE__);
-  //sbuf.reportRunning();
-  //printf("%s:%d \n", __FILE__, __LINE__);
+  sbuf.reportRunning();
   int nrec = 0;
   while (true) {
     printf("Accepting connection \n");

@@ -78,8 +78,10 @@ std::string ProcessLogBuffer::recieve(SystemLog::Priority& priority, int timeout
 {
   if (!_available) return "";
   _mutex.lock();
-  if (*_rindex == MAX_MESSAGE) *_rindex = 0;
-  int i = *_rindex;
+  if (*_rindex == MAX_MESSAGE) {
+    *_rindex = 0;
+  }
+  int i = (*_rindex)++;
   while (_msg_v[i].priority == SystemLog::UNKNOWN) {
     if (timeout > 0) {
       _cond.wait(_mutex, timeout);
@@ -87,11 +89,10 @@ std::string ProcessLogBuffer::recieve(SystemLog::Priority& priority, int timeout
       _cond.wait(_mutex);
     }
   }
-  (*_rindex)++;
   priority = _msg_v[i].priority;
   std::string message = _msg_v[i].message;
   _msg_v[i].priority = SystemLog::UNKNOWN;
-  _cond.signal();
+  _cond.broadcast();
   _mutex.unlock();
   return message;
 }
@@ -101,15 +102,16 @@ bool ProcessLogBuffer::send(SystemLog::Priority priority,
 {
   if (!_available) return false;
   _mutex.lock();
-  if (*_windex == MAX_MESSAGE) *_windex = 0;
-  int i = *_windex;
+  if (*_windex == MAX_MESSAGE) {
+    *_windex = 0;
+  }
+  int i = (*_windex)++;
   while (_msg_v[i].priority > SystemLog::UNKNOWN) {
     _cond.wait(_mutex);
   }
-  (*_windex)++;
   _msg_v[i].priority = priority;
   strcpy(_msg_v[i].message, message.c_str());
-  _cond.signal();
+  _cond.broadcast();
   _mutex.unlock();
   return true;
 }

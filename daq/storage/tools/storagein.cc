@@ -44,11 +44,8 @@ int main(int argc, char** argv)
   double datasize = 0;
   Time t0;
   while (true) {
-    //sbuf.reportReady();
-    //if (use_buf) sbuf.waitStarted();
-    //sbuf.reportRunning();
+    sbuf.reportRunning();
     while (true) {
-      //while (use_buf && sbuf.isStopped()) sbuf.waitStarted();
       int bufsize = socket->get_wordbuf(evtbuf, 100000000);
       if (bufsize <= 0 && connected) {
         sbuf.reportError("Failed to read data. connection broken.");
@@ -65,6 +62,7 @@ int main(int argc, char** argv)
       }
       nrec++;
       datasize += data.getByteSize();
+      /*
       if (nrec % 10000 == 0) {
         Time t;
         double freq = 10000. / (t.get() - t0.get()) / 1000. ;
@@ -75,6 +73,7 @@ int main(int argc, char** argv)
                   << " [kHz], Rate = " << rate << " [MB/s], DataSize = "
                   << datasize / 1000. / 1000 << " [kB/event]" << std::endl;
       }
+      */
     }
     while (true) {
       if (socket->reconnect(5000) == -1) {

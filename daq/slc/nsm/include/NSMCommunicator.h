@@ -29,7 +29,7 @@ namespace Belle2 {
     static std::vector<NSMCommunicator*> __com_v;
 
   public:
-    NSMCommunicator(NSMNode* node, const std::string& host = "",
+    NSMCommunicator(NSMNode* node = NULL, const std::string& host = "",
                     int port = -1, const std::string& config_name = "slowcontrol") throw();
     ~NSMCommunicator() throw() {}
 
@@ -67,6 +67,7 @@ namespace Belle2 {
     bool performCallback() throw(NSMHandlerException);
     int getNodeIdByName(const std::string& name) throw(NSMHandlerException);
     int getNodePidByName(const std::string& name) throw(NSMHandlerException);
+    void setContext(NSMcontext* nsmc) throw(NSMHandlerException);
 
   private:
     std::string _config_name;

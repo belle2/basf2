@@ -237,6 +237,17 @@ bool NSMCommunicator::wait(int sec) throw(NSMHandlerException)
   }
 }
 
+void NSMCommunicator::setContext(NSMcontext* nsmc) throw(NSMHandlerException)
+{
+  if (_nsmc != NULL) {
+    throw (NSMHandlerException(__FILE__, __LINE__, "NSM is already available"));
+  }
+  if (nsmc != NULL) {
+    _nsmc = nsmc;
+    _id = _nsmc->nodeid;
+  }
+}
+
 bool NSMCommunicator::performCallback() throw(NSMHandlerException)
 {
   if (_callback) {

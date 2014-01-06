@@ -35,7 +35,7 @@ void ProcessListener::run()
     default:
       Belle2::debug("[INFO] Forked process %s was finished", process_name.c_str());
       comm->sendLog(SystemLog(node->getName(), SystemLog::INFO,
-                              Belle2::form("Foked process %s was no finished",
+                              Belle2::form("Foked process %s was finished",
                                            process_name.c_str())));
       break;
   }

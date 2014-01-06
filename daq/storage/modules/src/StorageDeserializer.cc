@@ -80,7 +80,6 @@ void StorageDeserializerModule::initialize()
       m_shmflag = 0;
     } else {
       m_status.open(m_nodename, m_nodeid);
-      //m_status.reportReady();
     }
   }
   char* evtbuf = new char[10000000];
@@ -96,12 +95,12 @@ void StorageDeserializerModule::initialize()
   for (int n = 0; n < m_numThread; n++) {
     PThread(new StorageWorker(m_buf, m_compressionLevel));
   }
-  /*
+  ///*
   if (m_shmflag > 0) {
     m_status.reportRunning();
     m_running = true;
   }
-  */
+  //*/
   B2INFO("StorageDeserializer: initialize() done.");
 }
 

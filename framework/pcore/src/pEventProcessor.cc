@@ -253,6 +253,8 @@ void pEventProcessor::analyze_path(const PathPtr& path, Module* inmod, int cstat
     B2DEBUG(0, "Analyze Path: called with condition module");
   }
 
+  int nrbin = 0;
+  int nrbout = 0;
   // Loop over modules on the path
   for (iter = modlist.begin(); iter != modlist.end(); ++iter) {
     ModulePtr modptr = *iter;
@@ -285,8 +287,12 @@ void pEventProcessor::analyze_path(const PathPtr& path, Module* inmod, int cstat
         state = 1;
         if (inlist.size() > 0) {
           // Create RingBuffer
-          RingBuffer* rbuf = new RingBuffer();
+          //          RingBuffer* rbuf = new RingBuffer();
+          char rbname[256];
+          sprintf(rbname, "BASF2RBIN%d", nrbin);
+          RingBuffer* rbuf = new RingBuffer(rbname, RingBuffer::c_DefaultSize);
           m_rbinlist.push_back(rbuf);
+          nrbin++;
           // Insert Tx at the end of current path
           ModulePtr txptr(new TxModule(rbuf));
           TxModule* txmod = (TxModule*)txptr.get();
@@ -322,8 +328,12 @@ void pEventProcessor::analyze_path(const PathPtr& path, Module* inmod, int cstat
         state = 2;
         if (mainlist.size() > 0 || (cstate == 1 && mainlist.size() == 0)) {
           // Create RingBuffer
-          RingBuffer* rbuf = new RingBuffer();
+          //          RingBuffer* rbuf = new RingBuffer();
+          char rbname[256];
+          sprintf(rbname, "BASF2RBOUT%d", nrbout);
+          RingBuffer* rbuf = new RingBuffer(rbname, RingBuffer::c_DefaultSize);
           m_rboutlist.push_back(rbuf);
+          nrbout++;
           // Insert Tx at the end of current path
           ModulePtr txptr(new TxModule(rbuf));
           mainlist.push_back(txptr);

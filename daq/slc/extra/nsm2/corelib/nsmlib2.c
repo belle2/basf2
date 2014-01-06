@@ -9,9 +9,10 @@
    20131216 1912 sa_flags fix (work works with gcc 4.1.2)
    20131230 1918 strerror fix, initnet fix, stdint fix, bridge fix
    20140104 1919 strerror rearranged
+   20140105 1921 fix for incorrect errc in register_request
 \* ---------------------------------------------------------------------- */
 
-const char *nsmlib2_version   = "nsmlib2 1.9.19";
+const char *nsmlib2_version   = "nsmlib2 1.9.21";
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -904,10 +905,15 @@ nsmlib_callback(NSMcontext *nsmc, const char *name,
   int hash = nsmlib_hash(sysp, sysp->reqhash, NSMSYS_MAX_HASH, name, 0);
   NSMreq *reqp = (NSMreq *)MEMPTR(sysp, ntohl(sysp->reqhash[hash]));
 
-  if (hash < 0) return -1;
+  if (hash < 0) {
+    nsmc->errc = NSMEUNEXPECTED;
+    sprintf(nsmc->errs, "hash error for %s", name);
+    return -1;
+  }
 
   if (strcmp(reqp->name, name)) {
-    printf("wrong hash? name %s %s\n", reqp->name, name);
+    nsmc->errc = NSMEUNEXPECTED;
+    sprintf(nsmc->errs, "wrong hash? name %s %s\n", reqp->name, name);
     return -1;
   }
   return nsmlib_callbackid(nsmc, ntohs(reqp->code), name,
@@ -1160,11 +1166,15 @@ nsmlib_register_request(NSMcontext *nsmc, const char *name)
   nsmc->reqwait = msg.req;
 
   /* send request */
+  DBG("register_request: before send");
   nsmc->errc = nsmlib_send(nsmc, &msg);
-  if (ret < 0) { nsmc->reqwait = 0; return nsmc->errc; }
+  DBG("register_request: after send");
+  if (nsmc->errc < 0) { nsmc->reqwait = 0; return nsmc->errc; }
 
   /* receive request */
+  DBG("register_request: before recvpar");
   ret = nsmlib_recvpar(nsmc);
+  DBG("register_request: after recvpar");
   if (ret < 0) return ret;
   return 0;
 }

@@ -9,6 +9,7 @@ export EXTBINDIR=${EXTDIR}/bin/${BELLE2_EXTERNALS_SUBDIR}
 SLC_DIR=${BELLE2_LOCAL_DIR}/daq/slc/extra/nsm2/
 
 cp ${SLC_DIR}/daemon/*.* $BELLE2_EXTERNALS_DIR/src/nsm2/daemon
+cp ${SLC_DIR}/daemon/Makefile $BELLE2_EXTERNALS_DIR/src/nsm2/daemon
 cp ${SLC_DIR}/corelib/Makefile $BELLE2_EXTERNALS_DIR/src/nsm2/corelib
 cp ${SLC_DIR}/corelib/*.c $BELLE2_EXTERNALS_DIR/src/nsm2/corelib
 cp ${SLC_DIR}/corelib/nsmlib2.h $BELLE2_EXTERNALS_DIR/src/nsm2/corelib

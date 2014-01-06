@@ -337,7 +337,8 @@ void SerializerModule::Accept()
   host = gethostbyname(m_hostname_local.c_str());
   if (host == NULL) {
     char temp_buf[500];
-    sprintf(temp_buf, "[ERROR] hostname cannot be resolved. Check /etc/hosts. Exiting...: %s \n", m_hostname_local.c_str());
+    sprintf(temp_buf, "[ERROR] hostname(%s) cannot be resolved(%s). Check /etc/hosts. Exiting...\n",
+            m_hostname_local.c_str(), strerror(errno));
     print_err.PrintError(temp_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     exit(1);
   }
@@ -365,7 +366,8 @@ void SerializerModule::Accept()
 
   if (bind(fd_listen, (struct sockaddr*)&sock_listen, sizeof(struct sockaddr)) < 0) {
     char temp_char[500];
-    sprintf(temp_char, "Failed to bind. Maybe other programs have already occupied this port(%d). Exiting...", m_port_to);
+    sprintf(temp_char, "Failed to bind.(%s) Maybe other programs have already occupied this port(%d). Exiting...",
+            strerror(errno), m_port_to);
     print_err.PrintError(temp_char, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     exit(1);
   }
@@ -374,7 +376,9 @@ void SerializerModule::Accept()
   setsockopt(fd_listen, IPPROTO_TCP, TCP_NODELAY, &val1, (socklen_t)sizeof(val1));
   int backlog = 1;
   if (listen(fd_listen, backlog) < 0) {
-    char temp_char[100] = "Failed in listen"; print_err.PrintError(temp_char, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+    char err_buf[500];
+    sprintf(err_buf, "Failed in listen(%s). Exting...", strerror(errno));
+    print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     exit(-1);
   }
 
@@ -386,7 +390,9 @@ void SerializerModule::Accept()
   printf("Accepting... : port %d server %s\n", m_port_to, m_hostname_local.c_str());
   fflush(stdout);
   if ((fd_accept = accept(fd_listen, (struct sockaddr*) & (sock_accept), &addrlen)) == 0) {
-    char temp_char[100] = "Failed to accept. Exiting..."; print_err.PrintError(temp_char, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+    char err_buf[500];
+    sprintf(err_buf, "Failed to accept(%s). Exiting...", strerror(errno));
+    print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     exit(-1);
   } else {
     printf("Connection is established: port %d from adress %d %s\n",

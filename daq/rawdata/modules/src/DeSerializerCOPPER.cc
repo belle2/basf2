@@ -299,7 +299,9 @@ int* DeSerializerCOPPERModule::readOneEventFromCOPPERFIFO(const int entry, int* 
       if (errno == EINTR) {
         continue;
       } else {
-        char err_buf[100] = "Failed to read header"; print_err.PrintError(m_shmflag, &m_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+        char err_buf[500];
+        sprintf("Failed to read data from COPPER(%s). Exiting...", strerror(errno));
+        print_err.PrintError(m_shmflag, &m_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
         exit(-1);
       }
     } else {
@@ -395,7 +397,8 @@ void DeSerializerCOPPERModule::openCOPPER()
   // Open a finesse device
   //
   if ((cpr_fd = open("/dev/copper/copper", O_RDONLY)) == -1) {
-    char err_buf[100] = "Failed to open Finesse. Exiting... ";
+    char err_buf[500];
+    sprintf("Failed to open Finesse(%s). Exiting... ", strerror(errno));
     print_err.PrintError(m_shmflag, &m_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     exit(1);
   }
@@ -432,7 +435,9 @@ int DeSerializerCOPPERModule::readFD(int fd, char* buf, int data_size_byte)
       if (errno == EINTR) {
         continue;
       } else {
-        char err_buf[100] = "Failed to read header";   print_err.PrintError(m_shmflag, &m_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+        char err_buf[500];
+        sprintf("Failed to read data from COPPER(%s). Exting...", strerror(errno));
+        print_err.PrintError(m_shmflag, &m_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
         exit(-1);
       }
     } else {

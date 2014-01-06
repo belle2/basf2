@@ -38,8 +38,8 @@ void Root2BinaryModule::initialize()
   m_fp_out = fopen(m_fname_out.c_str(), "w");
   if (!m_fp_out) {
     char    err_buf[500];
-    sprintf(err_buf, "Cannot open an output file: %s : Exiting...\n",
-            m_fname_out.c_str());
+    sprintf(err_buf, "Cannot open an output file(%s): %s : Exiting...\n",
+            strerror(errno), m_fname_out.c_str());
     print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     exit(-1);
   }

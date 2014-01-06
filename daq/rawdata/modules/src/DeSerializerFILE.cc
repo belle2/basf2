@@ -48,8 +48,8 @@ void DeSerializerFILEModule::fileOpen()
   m_fp_in = fopen(m_fname_in.c_str(), "r");
   if (!m_fp_in) {
     char    err_buf[500];
-    sprintf(err_buf, "Cannot open an input file: %s : Exiting...\n",
-            m_fname_in.c_str());
+    sprintf(err_buf, "Cannot open an input file(%s): %s : Exiting...\n",
+            strerror(errno), m_fname_in.c_str());
     print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     exit(-1);
   }
@@ -117,7 +117,9 @@ int* DeSerializerFILEModule::readOneDataBlock(int* malloc_flag, int* size_word, 
           return 0x0;
         }
       }
-      char err_buf[100] = "Failed to read header"; print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      char err_buf[500];
+      sprintf(err_buf, "Failed to read header(%s).", strerror(errno));
+      print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
       exit(-1);
     }
     break;
@@ -176,7 +178,9 @@ int* DeSerializerFILEModule::readfromFILE(FILE* fp_in, const int size_word, cons
       delete temp_buf;
       return 0x0;
     }
-    char err_buf[100] = "Failed to read header"; print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+    char err_buf[500];
+    sprintf("Failed to read header(%s). Exiting...", strerror(errno));
+    print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     exit(-1);
   }
   recvd_byte += read_size;

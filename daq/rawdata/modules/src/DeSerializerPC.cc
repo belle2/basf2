@@ -118,12 +118,12 @@ int DeSerializerPCModule::recvFD(int sock, char* buf, int data_size_byte, int fl
   int read_size = 0;
   while (1) {
     if ((read_size = recv(sock, (char*)buf + n, data_size_byte - n , flag)) < 0) {
-      char temp_char[100];
       if (errno == EINTR) {
         continue;
       } else {
-        sprintf(temp_char, "Failed to read header");
-        print_err.PrintError(m_shmflag, &m_status, temp_char, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+        char err_buf[500];
+        sprintf(err_buf, "Failed to receive data(%s). Exiting...", strerror(errno));
+        print_err.PrintError(m_shmflag, &m_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
         sleep(1234567);
         exit(-1);
       }
@@ -147,9 +147,9 @@ int DeSerializerPCModule::Connect()
     struct hostent* host;
     host = gethostbyname(m_hostname_from[ i ].c_str());
     if (host == NULL) {
-      char temp_char[100];
-      sprintf(temp_char, "hostname(%s) cannot be resolved. Check /etc/hosts. Exiting...", m_hostname_from[ i ].c_str());
-      print_err.PrintError(m_shmflag, &m_status, temp_char, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      char err_buf[100];
+      sprintf(err_buf, "hostname(%s) cannot be resolved(%s). Check /etc/hosts. Exiting...", m_hostname_from[ i ].c_str(), strerror(errno));
+      print_err.PrintError(m_shmflag, &m_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
       sleep(1234567);
       exit(1);
     }
@@ -288,6 +288,7 @@ int* DeSerializerPCModule::recvData(int* malloc_flag, int* total_buf_nwords, int
     total_recvd_byte += recvFD(m_socket[ i ], (char*)temp_buf + total_recvd_byte,
                                each_buf_nwords[ i ] * sizeof(int), flag);
   }
+
   if ((int)(*total_buf_nwords * sizeof(int)) != total_recvd_byte) {
     char temp_char[100] = "Receiving data in an invalid unit. Exting...";
     print_err.PrintError(m_shmflag, &m_status, temp_char, __FILE__, __PRETTY_FUNCTION__, __LINE__);

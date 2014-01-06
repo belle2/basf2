@@ -74,8 +74,10 @@ bool RFRunControlCallback::recover() throw()
 bool RFRunControlCallback::abort() throw()
 {
   Belle2::debug("ABORT");
+  NSMmsg* msg = getCommunicator()->getMessage().getMsg();
   NSMcontext* nsmc =  _callback->getCommunicator()->getContext();
   b2nsm_context(nsmc);
+  _master->UnConfigure(msg, nsmc);
   return true;
 }
 

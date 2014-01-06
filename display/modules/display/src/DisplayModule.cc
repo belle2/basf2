@@ -39,8 +39,8 @@ DisplayModule::DisplayModule() : Module(), m_display(0), m_visualizer(0)
   addParam("showCharged", m_showCharged, "If true, all charged MCParticles will be shown, including secondaries (implies disabled assignHitsToPrimaries). May be slow.", false);
   addParam("showNeutrals", m_showNeutrals, "If true, all neutral MCParticles will be shown, including secondaries (implies disabled assignHitsToPrimaries). May be slow.", false);
   addParam("showTrackLevelObjects", m_showTrackLevelObjects, "If true, fitted genfit::Tracks, GFRave Vertices and ECLGamma objects will be shown in the display.", true);
-  addParam("showTrackCandidates", m_showTrackCandidates, "If true, track candidates (genfit::TrackCand) and RecoHits will be shown in the display.", false);
-  addParam("useClusters", m_useClusters, "Use PXD/SVD clusters for track candidate/recohit visualisation (instead of TrueHits).", true);
+  addParam("showTrackCandidates", m_showTrackCandidates, "If true, track candidates (genfit::TrackCand) and reconstructed hitso will be shown in the display.", false);
+  addParam("useClusters", m_useClusters, "Use PXD/SVD clusters for track candidate & hit visualisation (instead of TrueHits).", true);
   addParam("automatic", m_automatic, "Non-interactively save visualisations for each event.", false);
   addParam("fullGeometry", m_fullGeometry, "Show full geometry instead of simplified shapes. Further details can be enabled by changing the VisLevel option for Eve -> Scenes -> Geometry Scene -> Top_1.", false);
 
@@ -106,7 +106,7 @@ void DisplayModule::initialize()
     m_display->addParameter("Show all neutral particles", getParam<bool>("showNeutrals"), 1);
     m_display->addParameter("Hide secondaries", getParam<bool>("hideSecondaries"), 1);
   }
-  m_display->addParameter("Show candidates and RecoHits", getParam<bool>("showTrackCandidates"), 0);
+  m_display->addParameter("Show candidates and rec. hits", getParam<bool>("showTrackCandidates"), 0);
   m_display->addParameter("Show tracks, vertices, gammas", getParam<bool>("showTrackLevelObjects"), 0);
 
 

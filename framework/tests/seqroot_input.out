@@ -6,16 +6,16 @@
 [INFO] DataStore collections in event 0
 [INFO] ============================================================================
 [INFO] 
-[INFO] (Type)    Name                      Number entries                   <Event>
+[INFO] (Type)    Name                             Number of entries         <Event>
 [INFO] ----------------------------------------------------------------------------
 [INFO] (Object)  EventMetaData
 [INFO] (Object)  MCParticlesToARICHAeroHits
 [INFO] (Object)  MCParticlesToARICHSimHits
-[INFO] (Array)   ARICHAeroHits             1
-[INFO] (Array)   ARICHSimHits              72
-[INFO] (Array)   MCParticles               1
+[INFO] (Array)   ARICHAeroHits                    1
+[INFO] (Array)   ARICHSimHits                     72
+[INFO] (Array)   MCParticles                      1
 [INFO] 
-[INFO] (Type)    Name                      Number entries              <Persistent>
+[INFO] (Type)    Name                             Number of entries    <Persistent>
 [INFO] ----------------------------------------------------------------------------
 [INFO] 
 [INFO] ============================================================================
@@ -24,16 +24,16 @@
 [INFO] DataStore collections in event 1
 [INFO] ============================================================================
 [INFO] 
-[INFO] (Type)    Name                      Number entries                   <Event>
+[INFO] (Type)    Name                             Number of entries         <Event>
 [INFO] ----------------------------------------------------------------------------
 [INFO] (Object)  EventMetaData
 [INFO] (Object)  MCParticlesToARICHAeroHits
 [INFO] (Object)  MCParticlesToARICHSimHits
-[INFO] (Array)   ARICHAeroHits             1
-[INFO] (Array)   ARICHSimHits              78
-[INFO] (Array)   MCParticles               1
+[INFO] (Array)   ARICHAeroHits                    1
+[INFO] (Array)   ARICHSimHits                     78
+[INFO] (Array)   MCParticles                      1
 [INFO] 
-[INFO] (Type)    Name                      Number entries              <Persistent>
+[INFO] (Type)    Name                             Number of entries    <Persistent>
 [INFO] ----------------------------------------------------------------------------
 [INFO] 
 [INFO] ============================================================================
@@ -42,16 +42,16 @@
 [INFO] DataStore collections in event 2
 [INFO] ============================================================================
 [INFO] 
-[INFO] (Type)    Name                      Number entries                   <Event>
+[INFO] (Type)    Name                             Number of entries         <Event>
 [INFO] ----------------------------------------------------------------------------
 [INFO] (Object)  EventMetaData
 [INFO] (Object)  MCParticlesToARICHAeroHits
 [INFO] (Object)  MCParticlesToARICHSimHits
-[INFO] (Array)   ARICHAeroHits             1
-[INFO] (Array)   ARICHSimHits              109
-[INFO] (Array)   MCParticles               1
+[INFO] (Array)   ARICHAeroHits                    1
+[INFO] (Array)   ARICHSimHits                     109
+[INFO] (Array)   MCParticles                      1
 [INFO] 
-[INFO] (Type)    Name                      Number entries              <Persistent>
+[INFO] (Type)    Name                             Number of entries    <Persistent>
 [INFO] ----------------------------------------------------------------------------
 [INFO] 
 [INFO] ============================================================================
@@ -60,16 +60,16 @@
 [INFO] DataStore collections in event 3
 [INFO] ============================================================================
 [INFO] 
-[INFO] (Type)    Name                      Number entries                   <Event>
+[INFO] (Type)    Name                             Number of entries         <Event>
 [INFO] ----------------------------------------------------------------------------
 [INFO] (Object)  EventMetaData
 [INFO] (Object)  MCParticlesToARICHAeroHits
 [INFO] (Object)  MCParticlesToARICHSimHits
-[INFO] (Array)   ARICHAeroHits             1
-[INFO] (Array)   ARICHSimHits              56
-[INFO] (Array)   MCParticles               2
+[INFO] (Array)   ARICHAeroHits                    1
+[INFO] (Array)   ARICHSimHits                     56
+[INFO] (Array)   MCParticles                      2
 [INFO] 
-[INFO] (Type)    Name                      Number entries              <Persistent>
+[INFO] (Type)    Name                             Number of entries    <Persistent>
 [INFO] ----------------------------------------------------------------------------
 [INFO] 
 [INFO] ============================================================================
@@ -78,16 +78,16 @@
 [INFO] DataStore collections in event 4
 [INFO] ============================================================================
 [INFO] 
-[INFO] (Type)    Name                      Number entries                   <Event>
+[INFO] (Type)    Name                             Number of entries         <Event>
 [INFO] ----------------------------------------------------------------------------
 [INFO] (Object)  EventMetaData
 [INFO] (Object)  MCParticlesToARICHAeroHits
 [INFO] (Object)  MCParticlesToARICHSimHits
-[INFO] (Array)   ARICHAeroHits             1
-[INFO] (Array)   ARICHSimHits              9
-[INFO] (Array)   MCParticles               9
+[INFO] (Array)   ARICHAeroHits                    1
+[INFO] (Array)   ARICHSimHits                     9
+[INFO] (Array)   MCParticles                      9
 [INFO] 
-[INFO] (Type)    Name                      Number entries              <Persistent>
+[INFO] (Type)    Name                             Number of entries    <Persistent>
 [INFO] ----------------------------------------------------------------------------
 [INFO] 
 [INFO] ============================================================================

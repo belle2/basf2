@@ -13,11 +13,11 @@
 [INFO] DataStore collections in event 0
 [INFO] ============================================================================
 [INFO] 
-[INFO] (Type)    Name                      Number entries                   <Event>
+[INFO] (Type)    Name                             Number of entries         <Event>
 [INFO] ----------------------------------------------------------------------------
 [INFO] (Object)  EventMetaData
 [INFO] 
-[INFO] (Type)    Name                      Number entries              <Persistent>
+[INFO] (Type)    Name                             Number of entries    <Persistent>
 [INFO] ----------------------------------------------------------------------------
 [INFO] 
 [INFO] ============================================================================
@@ -39,11 +39,11 @@
 [INFO] DataStore collections in event 0
 [INFO] ============================================================================
 [INFO] 
-[INFO] (Type)    Name                      Number entries                   <Event>
+[INFO] (Type)    Name                             Number of entries         <Event>
 [INFO] ----------------------------------------------------------------------------
 [INFO] (Object)  EventMetaData
 [INFO] 
-[INFO] (Type)    Name                      Number entries              <Persistent>
+[INFO] (Type)    Name                             Number of entries    <Persistent>
 [INFO] ----------------------------------------------------------------------------
 [INFO] 
 [INFO] ============================================================================

@@ -27,15 +27,13 @@ install::
 clean::
 	-rm -f $(ALL) *.o *.bak *~
 
-nsmd2: nsmd2.o nsmhash.o nsmd2info.o
-	$(CXX) -o nsmd2 $(CFLAGS) nsmd2.o nsmhash.o nsmd2info.o $(LIBS)
+nsmd2: nsmd2.o nsmhash.o
+	$(CXX) -o nsmd2 $(CFLAGS) nsmd2.o nsmhash.o $(LIBS)
 
 nsminfo2: nsminfo2.o nsmhash.o
 	$(CXX) -o nsminfo2 $(CFLAGS) nsminfo2.o nsmhash.o $(LIBS)
 
-nsmd2.o: nsmd2.cc $(DEPS)
-nsminfo2.o: nsminfo2.cc $(DEPS)
-nsmhash.o: nsmhash.c $(DEPS)
+nsmd2.o: $(DEPS)
+nsminfo2.o: $(DEPS)
+nsmhash.o: $(DEPS)
 
-nsmd2info.o: nsminfo2.cc $(DEPS)
-	$(CXX) $(CFLAGS) -DNSMD2INFO -o nsmd2info.o -c nsminfo2.cc

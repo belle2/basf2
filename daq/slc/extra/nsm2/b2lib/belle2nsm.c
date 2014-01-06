@@ -9,13 +9,11 @@
 
    20131230 1918 strerror fix, initnet fix, stdint fix, bridge fix
    20140103 1919 more text into log for b2nsm_ok
-   20140106 1921 wrapptr added
 \* ---------------------------------------------------------------------- */
 
-const char *belle2nsm_version = "belle2nsm 1.9.21";
+const char *belle2nsm_version = "belle2nsm 1.9.19";
 
 #include <stdio.h>
-#include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
 #include <time.h>
@@ -26,13 +24,8 @@ const char *belle2nsm_version = "belle2nsm 1.9.21";
 #include "belle2nsm.h"
 
 NSMcontext *nsm = 0;
-static int b2nsm_errc;
+extern int nsmlib_errcode;
 static FILE *logfp = 0;
-
-typedef struct b2nsm_struct {
-  char default_dest[32];
-  char state[32];
-} b2nsm_t;
 
 /* -- xuprcpy ----------------------------------------------------------- */
 static void
@@ -106,12 +99,6 @@ b2nsm_loghook(NSMmsg *msg, NSMcontext *nsmc)
   return 0;
 }
 /* -- b2nsm_logging ----------------------------------------------------- */
-int
-b2nsm_debuglevel(int val)
-{
-  return nsmlib_debuglevel(val);
-}
-/* -- b2nsm_logging ----------------------------------------------------- */
 void
 b2nsm_logging(FILE *fp)
 {
@@ -141,12 +128,7 @@ b2nsm_context(NSMcontext *context)
 const char *
 b2nsm_strerror()
 {
-  switch (b2nsm_errc) {
-  case NSMEALLOC:
-    return "cannot alloc";
-  default:
-    return nsmlib_strerror(nsm);
-  }
+  return nsmlib_strerror(nsm);
 }
 /* -- b2nsm_callback ---------------------------------------------------- */
 int
@@ -154,10 +136,7 @@ b2nsm_callback(const char *name, NSMcallback_t callback)
 {
   char name_uprcase[NSMSYS_NAME_SIZ+1];
   int ret;
-  if (! nsm) {
-    if (logfp) fprintf(logfp, "NSM is not initialized");
-    return -1;
-  }
+  if (! nsm) return -1;
 
   xuprcpy(name_uprcase, name, NSMSYS_NAME_SIZ+1);
   if (nsmlib_register_request(nsm, name) < 0) return -1;
@@ -234,10 +213,7 @@ b2nsm_ok(NSMmsg *msg, const char *newstate, const char *fmt, ...)
 
   if ((len = strlen(newstate) + 1) > 32) return -1;
   strcpy(buf, newstate);
-  if (nsm->wrapptr) {
-    strcpy(((b2nsm_t *)nsm->wrapptr)->state, "UNKNOWN");
-  }
-  
+
   if (fmt) {
     va_start(ap, fmt);
     vsnprintf(buf + len, 256, fmt, ap);
@@ -347,21 +323,11 @@ b2nsm_init2(const char *nodename, int usesig,
 	    const char *hostname, int port, int shmkey)
 {
   char nodename_uprcase[NSMSYS_NAME_SIZ+1];
-  b2nsm_errc = 0;
   xuprcpy(nodename_uprcase, nodename, NSMSYS_NAME_SIZ+1);
   nsm = nsmlib_init(nodename_uprcase, hostname, port, shmkey);
   if (nsm == 0) return 0;
   nsmlib_usesig(nsm, usesig);
   if (logfp) nsm->hook = b2nsm_loghook;
-  nsm->wrapptr = (void *)malloc(sizeof(b2nsm_t));
-  if (! nsm->wrapptr) {
-    free(nsm);
-    nsm = 0;
-    b2nsm_errc = NSMEALLOC;
-  }
-  memset((char *)nsm->wrapptr, sizeof(b2nsm_t), 0);
-  strcpy(((b2nsm_t *)nsm->wrapptr)->state, "UNKNOWN");
-  
   return nsm;
 }
 /* -- b2nsm_init -------------------------------------------------------- */

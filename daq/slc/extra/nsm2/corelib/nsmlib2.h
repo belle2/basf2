@@ -99,9 +99,6 @@ NSMrecvqueue* recvqueue;
 /* callback hook */
 NSMhook_t hook;
 const void* hookptr;
-
-/* more pointer to be used by a wrapper */
-const void* wrapptr;
 };
 
 

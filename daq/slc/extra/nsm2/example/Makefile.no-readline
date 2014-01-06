@@ -1,8 +1,8 @@
 #
-#  Makefile for NSM2 example clients
+#  Makefile for NSM2 example clients without using readline library
 #
 
-ALL = client client_wait master readdat
+ALL = client client_wait master readdat bridge
 LIBS      = 
 CC        = gcc
 CXX       = g++
@@ -38,9 +38,13 @@ readdat: readdat.o $(LIBS)
 master: master.o $(LIBS)
 	$(CXX) -o master $(CFLAGS) master.o $(LIBS)
 
-client.o: $(DEPS)
-client_wait.o: $(DEPS)
-readdat.o: $(DEPS)
+bridge: bridge.o $(LIBS)
+	$(CXX) -o bridge $(CFLAGS) bridge.o $(LIBS)
 
-master.o: $(DEPS)
+client.o:      client.cc $(DEPS)
+client_wait.o: client_wait.cc $(DEPS)
+readdat.o:     readdat.cc $(DEPS)
+bridge.o:      bridge.cc $(DEPS)
+
+master.o: master.cc $(DEPS)
 	$(CXX) $(CFLAGS) -c -UUSE_READLINE master.cc

@@ -379,9 +379,10 @@ void EVEVisualization::addTrack(const genfit::Track* track, const TString& label
     B2DEBUG(100, "Draw rep" << repId_);
   }
 
+  //const FitStatus* fitStatus = track->getFitStatus(rep);
   //track->Print();
-  track->Print("C");
-  track->getFitStatus(rep)->Print();
+  //track->Print("C");
+  //fitStatus->Print();
 
   unsigned int numpoints = track->getNumPointsWithMeasurement();
 

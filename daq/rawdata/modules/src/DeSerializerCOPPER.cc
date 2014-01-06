@@ -296,7 +296,7 @@ int* DeSerializerCOPPERModule::readOneEventFromCOPPERFIFO(const int entry, int* 
   while (1) {
     int read_size = 0;
     if ((read_size = read(cpr_fd, (char*)m_bufary[entry] + recvd_byte, sizeof(int) *  BUF_SIZE_WORD  - recvd_byte)) < 0) {
-      if (read_size == EINTR) {
+      if (errno == EINTR) {
         continue;
       } else {
         char err_buf[100] = "Failed to read header"; print_err.PrintError(m_shmflag, &m_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
@@ -429,7 +429,7 @@ int DeSerializerCOPPERModule::readFD(int fd, char* buf, int data_size_byte)
   int read_size = 0;
   while (1) {
     if ((read_size = read(fd, (char*)buf + n, data_size_byte - n)) < 0) {
-      if (read_size == EINTR) {
+      if (errno == EINTR) {
         continue;
       } else {
         char err_buf[100] = "Failed to read header";   print_err.PrintError(m_shmflag, &m_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);

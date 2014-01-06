@@ -119,10 +119,14 @@ int DeSerializerPCModule::recvFD(int sock, char* buf, int data_size_byte, int fl
   while (1) {
     if ((read_size = recv(sock, (char*)buf + n, data_size_byte - n , flag)) < 0) {
       char temp_char[100];
-      sprintf(temp_char, "Failed to read header");
-      print_err.PrintError(m_shmflag, &m_status, temp_char, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-      sleep(1234567);
-      exit(-1);
+      if (errno == EINTR) {
+        continue;
+      } else {
+        sprintf(temp_char, "Failed to read header");
+        print_err.PrintError(m_shmflag, &m_status, temp_char, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+        sleep(1234567);
+        exit(-1);
+      }
     } else {
       n += read_size;
       if (n == data_size_byte)break;

@@ -379,7 +379,7 @@ void EVEVisualization::addTrack(const genfit::Track* track, const TString& label
     B2DEBUG(100, "Draw rep" << repId_);
   }
 
-  //const FitStatus* fitStatus = track->getFitStatus(rep);
+  const FitStatus* fitStatus = track->getFitStatus(rep);
   //track->Print();
   //track->Print("C");
   //fitStatus->Print();
@@ -688,12 +688,12 @@ void EVEVisualization::addTrack(const genfit::Track* track, const TString& label
     }
   }
   eveTrack->SetTitle(TString::Format("%s\n"
-                                     "#points: %u\n",
+                                     "#points: %u\n"
                                      //"pT=%.3f, pZ=%.3f\n"
-                                     //"pVal: %e",
-                                     label.Data(), numpoints
+                                     "pVal: %e",
+                                     label.Data(), numpoints,
                                      //track_mom.Pt(), track_mom.Pz(),
-                                     //TMath::Prob(track->getChiSqu(), track->getNDF())));
+                                     fitStatus->getPVal()
                                     ));
 
 

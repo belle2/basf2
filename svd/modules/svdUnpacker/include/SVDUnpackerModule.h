@@ -72,41 +72,45 @@ namespace Belle2 {
 
       SVDOnlineToOfflineMap* m_map;
 
+      // The following assumes i386 byte order: MSB comes last!
       struct MainHeader {
-        unsigned int check : 3; //LSB
-        unsigned int runType : 2;
-        unsigned int evtType : 3;
-        unsigned int FADCnum : 8;
+        unsigned int trgNumber : 8; //LSB
         unsigned int trgTiming : 8;
-        unsigned int trgNumber : 8; //MSB
-
-
+        unsigned int FADCnum : 8;
+        unsigned int evtType : 3;
+        unsigned int runType : 2;
+        unsigned int check : 3; //MSB
       };
 
       struct APVHeader {
-        unsigned int check : 2; //LSB
-        unsigned int APVnum : 6;
-        unsigned int pipelineAddr : 8;
-        unsigned int errorBit : 1;
-        unsigned int reserved : 2;
+        unsigned int CMC1 : 8; //LSB
+
         unsigned int CMC2 : 4;
-        unsigned int CMC1 : 8; //MSB
+        unsigned int reserved : 3;
+        unsigned int errorBit : 1;
+
+        unsigned int pipelineAddr : 8;
+
+        unsigned int APVnum : 6;
+        unsigned int check : 2; //MSB
       };
 
       struct data {
-        unsigned int check : 1; //LSB
+        unsigned char sample[3]; //LSB
         unsigned int stripNum : 7;
-        unsigned char sample[3]; //MSB
+        unsigned int check : 1; //MSB
       };
 
       struct trailer {
-        unsigned int check : 4; //LSB
-        unsigned int error2: 1;
-        unsigned int error1: 1;
-        unsigned int error0: 1;
-        unsigned int wiredOrErr: 1;
+        unsigned int checksum: 16; //LSB
+
         unsigned int emPipeAddr: 8;
-        unsigned int checksum: 16; //MSB
+
+        unsigned int wiredOrErr: 1;
+        unsigned int error0: 1;
+        unsigned int error1: 1;
+        unsigned int error2: 1;
+        unsigned int check : 4; //MSB
       };
 
 
@@ -114,10 +118,10 @@ namespace Belle2 {
 
       void loadMap();
 
-      void fillSVDDigitList(uint32_t* data32, StoreArray<SVDDigit>* svdDigits);
+      void fillSVDDigitList(int nWords, uint32_t* data32_in, StoreArray<SVDDigit>* svdDigits);
 
       //temporary: to check format from Vienna test files:
-      //      void printbitssimple(int n, int nBits);
+      void printbitssimple(int n, int nBits);
 
     };//end class declaration
 

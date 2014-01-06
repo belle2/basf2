@@ -54,10 +54,10 @@ void PrintCollectionsModule::event()
   B2INFO("DataStore collections in event " << eventMetaDataPtr->getEvent());
   B2INFO("============================================================================");
   B2INFO("")
-  B2INFO("(Type)    Name                      Number entries                   <Event>");
+  B2INFO("(Type)    Name                             Number of entries         <Event>");
   printCollections(DataStore::c_Event);
   B2INFO("")
-  B2INFO("(Type)    Name                      Number entries              <Persistent>");
+  B2INFO("(Type)    Name                             Number of entries    <Persistent>");
   printCollections(DataStore::c_Persistent);
   B2INFO("")
   B2INFO("============================================================================");
@@ -96,8 +96,10 @@ void PrintCollectionsModule::printCollections(DataStore::EDurability durability)
       continue;
     const TClonesArray* currCol = dynamic_cast<TClonesArray*>(iter->second->ptr);
 
-    if (currCol != NULL) {
-      B2INFO(boost::format("(Array)   %1% %|35t| %2%") % iter->first % currCol->GetEntriesFast());
-    }
+    long entries = 0;
+    if (currCol != NULL)
+      entries = currCol->GetEntriesFast();
+
+    B2INFO(boost::format("(Array)   %1% %|42t| %2%") % iter->first % entries);
   }
 }

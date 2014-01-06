@@ -613,7 +613,7 @@ unsigned int  RawCOPPER::CalcXORChecksum(int* buf, int nwords)
 
 void RawCOPPER::CheckData(int n, unsigned int prev_evenum, unsigned int prev_copper_ctr,
                           unsigned int* cur_evenum_rawcprhdr, unsigned int* cur_copper_ctr,
-                          int prev_run_no, int* cur_run_no)
+                          int prev_runsubrun_no, int* cur_runsubrun_no)
 {
   char err_buf[500];
   int err_flag = 0;
@@ -645,11 +645,11 @@ void RawCOPPER::CheckData(int n, unsigned int prev_evenum, unsigned int prev_cop
   //
   // Check incrementation of event #
   //
-  *cur_run_no = GetRunNo(n);
+  *cur_runsubrun_no = GetRunNoSubRunNo(n);
 #ifdef WO_FIRST_EVENUM_CHECK
   if (prev_evenum != 0xFFFFFFFF) {
 #else
-  if (prev_run_no == *cur_run_no && prev_run_no >= 0) {
+  if (prev_runsubrun_no == *cur_runsubrun_no && prev_runsubrun_no >= 0) {
 #endif
     if ((unsigned int)(prev_evenum + 1) != *cur_evenum_rawcprhdr) {
       sprintf(err_buf, "Event # jump : i %d prev 0x%x cur 0x%x : Exiting...\n%s %s %d\n",
@@ -872,7 +872,7 @@ unsigned int RawCOPPER::GetB2LHeaderWord(int n, int finesse_buffer_pos)
 
 unsigned int RawCOPPER::FillTopBlockRawHeader(unsigned int m_node_id, unsigned int m_data_type,
                                               unsigned int m_trunc_mask, unsigned int prev_eve32,
-                                              int prev_run_no, int* cur_run_no)
+                                              int prev_runsubrun_no, int* cur_runsubrun_no)
 {
   const int cpr_id = 0;
   //
@@ -1081,8 +1081,8 @@ unsigned int RawCOPPER::FillTopBlockRawHeader(unsigned int m_node_id, unsigned i
   //
   // check incrementation of event #
   //
-  *cur_run_no = GetRunNo(cpr_id);
-  if (prev_run_no == *cur_run_no && prev_run_no >= 0) {
+  *cur_runsubrun_no = GetRunNoSubRunNo(cpr_id);
+  if (prev_runsubrun_no == *cur_runsubrun_no && prev_runsubrun_no >= 0) {
 #ifdef WO_FIRST_EVENUM_CHECK
     if ((prev_eve32 + 1 != cur_ftsw_eve32) && (prev_eve32 != 0xFFFFFFFF)) {
 #else

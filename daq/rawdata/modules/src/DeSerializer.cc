@@ -54,6 +54,9 @@ DeSerializerModule::DeSerializerModule() : Module()
   m_run_no = 0; // will obtain info from data
   m_prev_run_no = -1;
 
+  m_runsubrun_no = 0; // will obtain info from data
+  m_prev_runsubrun_no = -1;
+
   m_start_flag  = 0;
 
 

@@ -361,7 +361,7 @@ void SerializerModule::Accept()
   int flags = 1;
   int ret = setsockopt(fd_listen, SOL_SOCKET, SO_REUSEADDR, &flags, (socklen_t)sizeof(flags));
   if (ret < 0) {
-    perror("Failed to set KEEPALIVE");
+    perror("Failed to set REUSEADDR");
   }
 
   if (bind(fd_listen, (struct sockaddr*)&sock_listen, sizeof(struct sockaddr)) < 0) {

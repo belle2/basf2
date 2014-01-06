@@ -30,7 +30,7 @@ namespace Belle2 {
     /**
      * destructor.
      */
-    virtual ~ROIpayload() { delete m_rootdata; };
+    virtual ~ROIpayload() { delete[] m_rootdata; };
 
     int m_packetLengthByte;
     int m_length;

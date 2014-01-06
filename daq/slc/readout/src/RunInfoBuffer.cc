@@ -80,7 +80,5 @@ bool RunInfoBuffer::wait(int time) throw()
 
 bool RunInfoBuffer::notify() throw()
 {
-  //_mutex.lock();
   return _cond.broadcast();
-  //return _mutex.unlock();
 }

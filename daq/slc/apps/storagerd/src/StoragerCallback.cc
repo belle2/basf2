@@ -37,7 +37,7 @@ bool StoragerCallback::boot() throw()
   _con[0].addArgument(irbname);
   _con[0].addArgument(config.get("DATA_STORAGE_FROM_HOST"));
   _con[0].addArgument(config.get("DATA_STORAGE_FROM_PORT"));
-  _con[0].addArgument(irbname);
+  _con[0].addArgument("storagein");
   _con[0].addArgument("1");
   _con[0].load(10);
 
@@ -56,7 +56,7 @@ bool StoragerCallback::load() throw()
   _con[1].addArgument(irbname);
   _con[1].addArgument(config.get("DATA_STORAGE_DIR"));
   _con[1].addArgument(orbname);
-  _con[1].addArgument(_node->getName());
+  _con[1].addArgument("basf2");
   _con[1].addArgument("1");
   _con[1].addArgument("1");
   _con[1].load(10);
@@ -66,7 +66,7 @@ bool StoragerCallback::load() throw()
   _con[2].addArgument(orbname);
   _con[2].addArgument(config.get("DATA_STORAGE_TO_HOST"));
   _con[2].addArgument(config.get("DATA_STORAGE_TO_PORT"));
-  _con[2].addArgument(orbname);
+  _con[2].addArgument("storageout");
   _con[2].addArgument("1");
   _con[2].load(10);
   return true;

@@ -428,6 +428,8 @@ void DeSerializerPCModule::event()
     //
     int cpr_num = 0;
     unsigned int cur_evenum = 0, cur_copper_ctr = 0;
+    unsigned int eve_array[32];
+    memset(eve_array, 0, sizeof(eve_array));
     for (int k = 0; k < num_events_in_sendblock; k++) {
 
       for (int l = 0; l < num_nodes_in_sendblock; l++) {
@@ -441,6 +443,8 @@ void DeSerializerPCModule::event()
 #ifndef NO_DATA_CHECK
           try {
             temp_rawftsw->CheckData(0, m_prev_evenum, &cur_evenum, m_prev_run_no, &m_run_no);
+            eve_array[ entry_id ] = cur_evenum;
+            //      printf("FTSW prev %d cur %d eve %d node %d\n", m_prev_evenum , cur_evenum, k, l );
           } catch (string err_str) {
             print_err.PrintError(m_shmflag, &m_status, err_str);
             exit(1);
@@ -462,6 +466,8 @@ void DeSerializerPCModule::event()
           try {
             temp_rawcopper->CheckData(0, m_prev_evenum, m_prev_copper_ctr,
                                       &cur_evenum, &cur_copper_ctr, m_prev_run_no, &m_run_no);
+            eve_array[ entry_id ] = cur_evenum;
+            //      printf("COPPER prev %d cur %d eve %d node %d\n", m_prev_evenum , cur_evenum, k, l );
           } catch (string err_str) {
             print_err.PrintError(m_shmflag, &m_status, err_str);
             exit(1);
@@ -478,10 +484,18 @@ void DeSerializerPCModule::event()
           delete temp_rawcopper;
         }
       }
+      if (m_prev_run_no != m_run_no) {
+        printf("##############################################\n");
+        for (int m = 0; m < num_entries ; m++) {
+          printf("%d eve %u prev %u\n", m, eve_array[ m ], m_prev_evenum);
+        }
+        printf("##############################################\n");
+        fflush(stdout);
+      }
+      m_prev_evenum = cur_evenum;
+      m_prev_copper_ctr = cur_copper_ctr;
+      m_prev_run_no = m_run_no;
     }
-    m_prev_evenum = cur_evenum;
-    m_prev_copper_ctr = cur_copper_ctr;
-    m_prev_run_no = m_run_no;
   }
 
 

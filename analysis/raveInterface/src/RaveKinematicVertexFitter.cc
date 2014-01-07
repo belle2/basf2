@@ -272,49 +272,61 @@ int RaveKinematicVertexFitter::fit(string options)
     RaveSetup::s_instance->m_raveVertexFactory->setBeamSpot(rave::Ellipsoid3D(rave::Point3D(bsPos.X(), bsPos.Y(), bsPos.Z()), bsCovRave));
   }
 
-  rave::KinematicConstraint cs = rave::KinematicConstraintBuilder().createMassKinematicConstraint(m_motherParticlePtr->getPDGMass(), 0.);
+  if (m_vertFit && m_massConstFit && m_inputParticles.size() == 2) {
 
-
-  if (m_vertFit) {
-    if (!m_massConstFit) {
-      try {
-        m_fittedResult = RaveSetup::s_instance->m_raveKinematicTreeFactory->useVertexFitter(m_inputParticles);
-        m_fittedParticle = m_fittedResult.topParticle();
-      } catch (...) {
-        nOfVertices = 0;
-      }
-    }
-
-    if (m_massConstFit) {
-      try {
-        m_fittedResult = RaveSetup::s_instance->m_raveKinematicTreeFactory->useVertexFitter(m_inputParticles);
-        std::vector< rave::KinematicParticle > parts; parts.push_back(m_fittedResult.topParticle());
-        std::vector< rave::KinematicParticle > m_fittedResult2 = RaveSetup::s_instance->m_raveKinematicTreeFactory->useParticleFitter(parts, cs, "ppf:lppf");
-        m_fittedParticle = m_fittedResult2[0];
-      } catch (...) {
-        nOfVertices = 0;
-      }
-    }
-
-  }
-
-  if (!m_vertFit && m_massConstFit) {
-
+    rave::KinematicConstraint cs2 = rave::KinematicConstraintBuilder().createTwoTrackMassKinematicConstraint((m_motherParticlePtr->getPDGMass()));
     try {
-      //rave::KinematicConstraint cs2 = rave::KinematicConstraintBuilder().createMassKinematicConstraint(m_motherParticlePtr->getPDGMass(),0.);
-
-      if (m_motherParticlePtr->getMomentumVertexErrorMatrix().Determinant() != 0) {
-
-        std::vector< rave::KinematicParticle > m_fittedResult2 = RaveSetup::s_instance->m_raveKinematicTreeFactory->useParticleFitter(m_inputParticles, cs, "ppf:lppf");
-        m_fittedParticle = m_fittedResult2[0];
-      } else {
-        B2ERROR("[RaveKinematicVertexFitter]: VertexException saying ParentParticleFitter::error inverting covariance matrix occured");
-        nOfVertices = 0;
-      }
+      m_fittedResult = RaveSetup::s_instance->m_raveKinematicTreeFactory->useVertexFitter(m_inputParticles, cs2);
+      m_fittedParticle = m_fittedResult.topParticle();
     } catch (...) {
       nOfVertices = 0;
     }
+  } else {
+
+    rave::KinematicConstraint cs = rave::KinematicConstraintBuilder().createMassKinematicConstraint(m_motherParticlePtr->getPDGMass(), 0.);
+
+    if (m_vertFit) {
+      if (!m_massConstFit) {
+        try {
+          m_fittedResult = RaveSetup::s_instance->m_raveKinematicTreeFactory->useVertexFitter(m_inputParticles);
+          m_fittedParticle = m_fittedResult.topParticle();
+        } catch (...) {
+          nOfVertices = 0;
+        }
+      }
+
+      if (m_massConstFit) {
+        try {
+          m_fittedResult = RaveSetup::s_instance->m_raveKinematicTreeFactory->useVertexFitter(m_inputParticles);
+          std::vector< rave::KinematicParticle > parts; parts.push_back(m_fittedResult.topParticle());
+          std::vector< rave::KinematicParticle > m_fittedResult2 = RaveSetup::s_instance->m_raveKinematicTreeFactory->useParticleFitter(parts, cs, "ppf:lppf");
+          m_fittedParticle = m_fittedResult2[0];
+        } catch (...) {
+          nOfVertices = 0;
+        }
+      }
+
+    }
+
+    if (!m_vertFit && m_massConstFit) {
+
+      try {
+
+        if (m_motherParticlePtr->getMomentumVertexErrorMatrix().Determinant() != 0) {
+
+          std::vector< rave::KinematicParticle > m_fittedResult2 = RaveSetup::s_instance->m_raveKinematicTreeFactory->useParticleFitter(m_inputParticles, cs, "ppf:lppf");
+          m_fittedParticle = m_fittedResult2[0];
+        } else {
+          B2ERROR("[RaveKinematicVertexFitter]: VertexException saying ParentParticleFitter::error inverting covariance matrix occured");
+          nOfVertices = 0;
+        }
+      } catch (...) {
+        nOfVertices = 0;
+      }
+    }
+
   }
+
 
   rave::Vector7D fittedState;
   rave::Covariance7D fittedCov;

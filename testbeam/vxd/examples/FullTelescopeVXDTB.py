@@ -62,9 +62,9 @@ gearbox.param('fileName', 'testbeam/vxd/FullTelescopeVXDTB.xml')
 # Create geometry
 geometry = register_module('Geometry')
 # You can specify components to be created
-geometry.param('Components', ['MagneticField', 'TB'])
+# geometry.param('Components', ['MagneticField', 'TB'])
 # To turn off magnetic field:
-# geometry.param('Components', ['TB'])
+geometry.param('Components', ['TB'])
 
 # Full simulation module
 simulation = register_module('FullSim')
@@ -218,6 +218,10 @@ main.add_module(trackfitchecker)
 main.add_module(geosaver)
 main.add_module(output)
 main.add_module(display)
+# Alignment with Millepede II. Will use steer.txt file for MP2 steering,
+# which links also automatically generated file with geometry constraints constraints.txt
+alignment = register_module('MillepedeIIalignment')
+main.add_module(alignment)
 # Process events
 process(main)
 

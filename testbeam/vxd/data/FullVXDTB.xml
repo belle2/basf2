@@ -102,7 +102,7 @@
                </Volume>
                <Volume name="PXD6-S-sensor_L1">
                   <DX unit="mm">3.71</DX>
-                  <DY unit="mm">1.2</DY>
+                  <DY unit="mm">1.0</DY>
                   <DZ unit="mm">-7.0</DZ>
                   <Theta unit="deg">90</Theta>
                   <Phi unit="deg">90</Phi>

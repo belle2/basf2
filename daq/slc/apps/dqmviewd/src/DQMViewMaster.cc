@@ -39,7 +39,6 @@ void DQMViewMaster::run()
   inotify.open();
   inotify.add(_directory, Inotify::FILE_DELETE |
               Inotify::FILE_CREATE | Inotify::FILE_MODIFY);
-  bool created_new = false;
   while (true) {
     InotifyEventList event_v(inotify.wait(5));
     for (size_t i = 0; i < event_v.size(); i++) {
@@ -48,11 +47,7 @@ void DQMViewMaster::run()
         if (event_v[i].getMask() == Inotify::FILE_DELETE) {
           _updater_v[index]->stop();
           _manager_v[index]->clear();
-          created_new = false;
-        } else if (event_v[i].getMask() == Inotify::FILE_CREATE) {
-          created_new = true;
-        } else if (event_v[i].getMask() == Inotify::FILE_MODIFY &&
-                   created_new == true) {
+        } else if (event_v[i].getMask() == Inotify::FILE_MODIFY) {
           int count = 0;
           while (!_manager_v[index]->init()) {
             sleep(2);
@@ -66,7 +61,6 @@ void DQMViewMaster::run()
           }
           _manager_v[index]->update();
           _updater_v[index]->start();
-          created_new = false;
         }
         signal(index);
       }

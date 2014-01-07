@@ -4,6 +4,7 @@
 #include "daq/slc/dqm/CanvasPanel.h"
 
 #include <daq/slc/base/StringUtil.h>
+#include <daq/slc/base/Debugger.h>
 
 using namespace Belle2;
 
@@ -21,7 +22,6 @@ SimpleDQMPackage:: ~SimpleDQMPackage() throw()
 
 void SimpleDQMPackage::init()
 {
-
 }
 
 void SimpleDQMPackage::update()

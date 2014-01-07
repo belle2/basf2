@@ -1,6 +1,11 @@
 Import('env')
 
-env['TOOLS_LIBS']['dqmviewd'] = ['pthread', 'dl', '$ROOT_LIBS', 'Geom',
+env['TOOLS_LIBS']['dqmviewd'] = ['pthread', 'dl', '$ROOT_LIBS', 'libNew', 'Geom',
+				 '$GEANT4_LIBS', 'CLHEP','$PGSQL_LIBS', 
+				 'daq', 'pxd', 'vxd', 'rawdata_dataobjects',
+				 'framework', 'nsm2_b2lib', 'nsm2_corelib']
+
+env['TOOLS_LIBS']['dqmmaptest'] = ['pthread', 'dl', '$ROOT_LIBS', 'libNew', 'Geom',
 				 '$GEANT4_LIBS', 'CLHEP','$PGSQL_LIBS', 
 				 'daq', 'pxd', 'vxd', 'rawdata_dataobjects',
 				 'framework', 'nsm2_b2lib', 'nsm2_corelib']

@@ -14,5 +14,5 @@ TH1* DQMHistMap::getHist(const std::string& name)
 
 bool DQMHistMap::hasHist(const std::string& name)
 {
-  return _hist_m.find(name) != _hist_m.begin();
+  return _hist_m.find(name) != _hist_m.end();
 }

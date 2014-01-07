@@ -1,6 +1,7 @@
 #include "daq/slc/apps/PackageManager.h"
 
 #include <daq/slc/system/Time.h>
+#include <daq/slc/base/Debugger.h>
 
 using namespace Belle2;
 
@@ -27,11 +28,6 @@ bool PackageManager::init()
 {
   _lock.wrlock();
   _monitor->init();
-  if (getPackage()->getNHistos() == 0) {
-    _available = false;
-    _lock.unlock();
-    return false;
-  }
   _serializer.allocate(getPackage());
   _serializer.update();
   _available = true;

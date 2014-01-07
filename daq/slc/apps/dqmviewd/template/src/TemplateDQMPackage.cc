@@ -25,69 +25,90 @@ void TemplateDQMPackage::init()
 {
   // getting histogram preloaded from mapped file
   HistoPackage* pack = getPackage();
-  _h_ncpr = pack->getHisto("h_ncpr");
-  _h_nevt = pack->getHisto("h_nevt");
-  _h_size = pack->getHisto("h_size");
-  _h_size2d = pack->getHisto("h_size2d");
-  _h_ncpr_cpy = pack->getHisto("h_ncpr_cpy");
-  _h_nevt_cpy = pack->getHisto("h_nevt_cpy");
-  _h_size_cpy = pack->getHisto("h_size_cpy");
+  h1 = pack->getHisto("h1");
+  h1_2 = pack->getHisto("h1_2");
+  h2 = pack->getHisto("h2");
+  h3 = pack->addHisto(new Histo1F("h3", "Histogram 3;X value;Entires", 100, -20, 20));
+  h3->setUpdated(true);
+  h3->setLine(new LineProperty(MonColor::RED, 2));
 
-  // creating monitored objects
-  _label_state = (MonLabel*)pack->addMonObject(new MonLabel("label_state", 20));
-  _label_state->setUpdated(true);
-  _label_state->setBounds(0.3, 0.12, 0.4, 0.06);
+  h3_2 = pack->addHisto(new Histo1F("h3_2", "Histogram 3-2;X value;Entires", 100, -20, 20));
+  h3_2->setLine(new LineProperty(MonColor::BLACK, 2));
+
+  h4 = pack->addHisto(new Histo2F("h4", "2D-Histogram;X value;Y value", 40, -40, 40, 30, -30, 30));
+  h4->setLine(new LineProperty(MonColor::WHITE, 2));
+
+  label_state = (MonLabel*)pack->addMonObject(new MonLabel("label_state", 20));
+  label_state->setUpdated(true);
+  label_state->setBounds(0.3, 0.12, 0.4, 0.06);
   FontProperty* font = new FontProperty(MonColor::WHITE, 1.6);
   font->setAlign("center middle");
-  _label_state->setFont(font);
-  _label_nevt = (MonLabel*)pack->addMonObject(new MonLabel("label_nevt", 25));
-  _label_nevt->setUpdated(true);
-  _label_nevt->setLineColor(MonColor::NON);
-  _label_nevt->setFillColor(MonColor::NON);
-  _label_nevt->setBounds(0.5, 0.25, 0.4, 0.05);
+  label_state->setFont(font);
+
+  label_rate1 = (MonLabel*)pack->addMonObject(new MonLabel("label_rate1", 25));
+  label_rate1->setUpdated(true);
+  label_rate1->setLineColor(MonColor::NON);
+  label_rate1->setFillColor(MonColor::NON);
+  label_rate1->setBounds(0.5, 0.25, 0.4, 0.05);
+  font = new FontProperty(MonColor::ORANGE, 1.4);
+  font->setAlign("left middle");
+  label_rate1->setFont(font);
+
+  label_rate1_2 = (MonLabel*)pack->addMonObject(new MonLabel("label_rate1_2", 25));
+  label_rate1_2->setUpdated(true);
+  label_rate1_2->setLineColor(MonColor::NON);
+  label_rate1_2->setFillColor(MonColor::NON);
+  label_rate1_2->setBounds(0.5, 0.4, 0.4, 0.05);
   font = new FontProperty(MonColor::BLACK, 1.4);
   font->setAlign("left middle");
-  _label_nevt->setFont(font);
-  _label_nevt_rate = (MonLabel*)pack->addMonObject(new MonLabel("label_nevt_rate", 25));
-  _label_nevt_rate->setUpdated(true);
-  _label_nevt_rate->setLineColor(MonColor::NON);
-  _label_nevt_rate->setFillColor(MonColor::NON);
-  _label_nevt_rate->setBounds(0.5, 0.4, 0.4, 0.05);
+  label_rate1_2->setFont(font);
+
+  label_rate1_2 = (MonLabel*)pack->addMonObject(new MonLabel("label_rate1_2", 25));
+  label_rate1_2->setUpdated(true);
+  label_rate1_2->setLineColor(MonColor::NON);
+  label_rate1_2->setFillColor(MonColor::NON);
+  label_rate1_2->setBounds(0.5, 0.4, 0.4, 0.05);
   font = new FontProperty(MonColor::BLACK, 1.4);
   font->setAlign("left middle");
-  _label_nevt_rate->setFont(font);
-  _gr_nevt = (TimedGraph1*)pack->addHisto(new TimedGraph1F("gr_nevt",
-                                                           "Event rate;;event rate [Hz]",
-                                                           62, 0, 60 * 5));
-  _gr_nevt->fixMinimum(0);
-  _gr_nevt->fixMaximum(30);
-  _gr_nevt->setUpdated(true);
-  _gr_nevt->setLine(new LineProperty(MonColor::RED));
-  _gr_nevt->setFill(new FillProperty(MonColor::PINK));
-  _gr_nevt->setDrawOption("AL");
+  label_rate1_2->setFont(font);
+
+  g1 = (TimedGraph1*)pack->addHisto(new TimedGraph1F("g1", "Event rate 1;;event rate [Hz]", 62, 0, 60 * 5));
+  g1->fixMinimum(0);
+  g1->fixMaximum(30);
+  g1->setUpdated(true);
+  g1->setLine(new LineProperty(MonColor::BLACK));
+  g1_2 = (TimedGraph1*)pack->addHisto(new TimedGraph1F("g1_2", "Event rate 2;;event rate [Hz]", 62, 0, 60 * 5));
+  g1_2->setLine(new LineProperty(MonColor::RED));
+  g1_2->setFill(new FillProperty(MonColor::PINK));
+  g1_2->setUpdated(true);
+  g1_2->setDrawOption("AL");
 
   // creating panels
-  TabbedPanel* tabpanel = new TabbedPanel("tab_cdc");
-  TablePanel* table = new TablePanel("table_ncpr", 1, 1);
-  tabpanel->add("Number of COPPERs", table);
-  CanvasPanel* canvas = new CanvasPanel("c_ncpr", "Number of COPPERs");
-  canvas->add(_h_ncpr);
+  TabbedPanel* tabpanel = new TabbedPanel("gause_tab");
+  TablePanel* table = new TablePanel("gaus_table", 2, 1);
+  tabpanel->add("Test1", table);
+  CanvasPanel* canvas = new CanvasPanel("c_test1", "Gaus distribution");
+  canvas->setTitlePosition("left");
+  canvas->add(h1);
+  canvas->add(h1_2);
+  Legend* legend = new Legend("legend", 0.6, 0.02, 0.35, 0.8);
+  legend->add(h1);
+  legend->add(h1_2);
+  canvas->setLegend(legend);
   table->add(canvas);
-  canvas = new CanvasPanel("c_size2d", "Data Size vs. Copper");
-  canvas->add(_h_size2d);
+  canvas = new CanvasPanel("c_test2", "2D Gaus distribution");
+  canvas->add(h2);
   table->add(canvas);
-
-  table = new TablePanel("table_size", 2, 1);
-  tabpanel->add("Number of COPPERs", table);
-  canvas = new CanvasPanel("c_size", "Data Size");
-  canvas->add(_h_size);
+  table = new TablePanel("gaus_table2", 2, 1);
+  tabpanel->add("Test2", table);
+  canvas = new CanvasPanel("c_test3", "Gaus distribution");
+  canvas->add(h3);
+  canvas->add(h3_2);
   table->add(canvas);
-  canvas = new CanvasPanel("c_nevt", "Number of Events");
-  canvas->add(_h_nevt);
+  canvas = new CanvasPanel("c_test4", "2D Gaus distribution");
+  canvas->add(h4);
   table->add(canvas);
-
-  table = new TablePanel("table_nevt", 2, 1);
-  tabpanel->add("Number of COPPERs", table);
+  table = new TablePanel("gaus_analysis", 2, 1);
   canvas = new CanvasPanel("c_labels", "States");
   Text* text = new Text("", "Status summary", 0.5, 0.05);
   font = new FontProperty(MonColor::BLACK, 1.8);
@@ -99,59 +120,69 @@ void TemplateDQMPackage::init()
   font->setAlign("left middle");
   text->setFont(font);
   canvas->add(text);
-  text = new Text("", "Total Events : ", 0.1, 0.425);
+  text = new Text("", "Total Entries : ", 0.1, 0.425);
   font = new FontProperty(MonColor::BLACK, 1.4);
   font->setAlign("left middle");
   text->setFont(font);
   canvas->add(text);
-  canvas->add(_label_state);
-  canvas->add(_label_nevt);
-  canvas->add(_label_nevt_rate);
+  canvas->add(label_state);
+  canvas->add(label_rate1);
+  canvas->add(label_rate1_2);
   table->add(canvas);
   canvas = new CanvasPanel("c_graphs", "Rate stability");
+  canvas->add(g1_2);
+  GAxis* axis_entries = new GAxis("axis_entries", "Integrated entries");
+  axis_entries->setTickLine(new LineProperty(MonColor::RED, 2));
+  axis_entries->setTickFont(new FontProperty(MonColor::RED, 0.9));
+  axis_entries->setLabelFont(new FontProperty(MonColor::RED, 0.9));
+  axis_entries->setFont(new FontProperty(MonColor::RED, 1.2));
+  axis_entries->setMin(0);
+  axis_entries->fixMin(true);
+  g1_2->setLinkedAxis(axis_entries);
+  canvas->setY2Axis(axis_entries);
   GAxis* axis_rate = new GAxis("axis_rate", "Event rate [Hz]");
   axis_rate->setTickLine(new LineProperty(MonColor::BLACK, 1));
   axis_rate->setLabelFont(new FontProperty(MonColor::BLACK, 1.2));
   axis_rate->setFont(new FontProperty(MonColor::BLACK, 1.2));
   axis_rate->setMin(0);
   axis_rate->fixMin(true);
-  _gr_nevt->setLinkedAxis(axis_rate);
+  g1->setLinkedAxis(axis_rate);
   canvas->setYAxis(axis_rate);
-  canvas->add(_gr_nevt);
+  canvas->add(g1);
   table->add(canvas);
+  tabpanel->add("Status", table);
 
   // registering panel contents
   getRootPanel()->add(tabpanel);
 
-  _time = Belle2::Time().getSecond();
+  _time = Belle2::Time().get();
 }
 
 void TemplateDQMPackage::update()
 {
-  double time = Belle2::Time().getSecond();
+  double time = Belle2::Time().get();
   double rate = 0;
-  for (int n = 0; n < _h_nevt->getAxisX().getNbins(); n++) {
-    rate += _h_nevt->getBinContent(n) - _h_nevt_cpy->getBinContent(n);
+  for (int n = 0; n < h1->getAxisX().getNbins(); n++) {
+    rate += h1->getBinContent(n) - h3->getBinContent(n);
   }
   rate /= (time - _time);
-  _h_ncpr_cpy->getData().copy(_h_ncpr->getData());
-  _h_nevt_cpy->getData().copy(_h_nevt->getData());
-  _h_size_cpy->getData().copy(_h_size->getData());
-  _gr_nevt->addPoint(rate);
-  _label_nevt_rate->setText(Belle2::form("%2.2f [Hz]", rate));
-  _label_nevt->setText(Belle2::form("%d events", (int)(_h_nevt->getEntries())));
-  _label_state->setFontColor(MonColor::WHITE);
+  g1->addPoint(rate);
+  g1_2->addPoint(h1->getEntries());
+  h3->getData().copy(h1->getData());
+  label_rate1->setText(Belle2::form("%2.2f [Hz]", rate));
+  label_rate1_2->setText(Belle2::form("%d", (int)(h1->getEntries())));
+  label_state->setFontColor(MonColor::WHITE);
   if (rate > 16.5 && rate < 20.5) {
-    _label_state->setLineColor(MonColor::GREEN);
-    _label_state->setFillColor(MonColor::RUNNING_GREEN);
-    _label_state->setText("STABLE");
+    label_state->setLineColor(MonColor::GREEN);
+    label_state->setFillColor(MonColor::RUNNING_GREEN);
+    label_state->setText("STABLE");
   } else {
-    _label_state->setLineColor(MonColor::PINK);
-    _label_state->setFillColor(MonColor::RED);
+    label_state->setLineColor(MonColor::PINK);
+    label_state->setFillColor(MonColor::RED);
     if (rate > 20.5) {
-      _label_state->setText("HIGH RATE");
+      label_state->setText("HIGH RATE");
     } else {
-      _label_state->setText("LOW RATE");
+      label_state->setText("LOW RATE");
     }
   }
   _time = time;

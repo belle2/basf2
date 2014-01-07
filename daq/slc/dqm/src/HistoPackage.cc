@@ -84,6 +84,14 @@ void HistoPackage::clear() throw()
   _histo_v = std::vector<MonObject*>();
 }
 
+bool HistoPackage::hasHisto(const std::string& name) throw()
+{
+  for (size_t n = 0; n < _histo_v.size(); n++) {
+    if (_histo_v.at(n)->getName() == name) return true;
+  }
+  return false;
+}
+
 std::string HistoPackage::toString() const throw()
 {
   std::stringstream script;

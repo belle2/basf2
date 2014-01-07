@@ -20,17 +20,18 @@ namespace Belle2 {
     virtual void update();
 
   private:
-    Histo* _h_ncpr;
-    Histo* _h_nevt;
-    Histo* _h_size;
-    Histo* _h_size2d;
-    Histo* _h_ncpr_cpy;
-    Histo* _h_nevt_cpy;
-    Histo* _h_size_cpy;
-    MonLabel* _label_state;
-    MonLabel* _label_nevt;
-    MonLabel* _label_nevt_rate;
-    TimedGraph1* _gr_nevt;
+    Histo* h1;
+    Histo* h1_2;
+    Histo* h2;
+    Histo* h3;
+    Histo* h3_2;
+    Histo* h4;
+    MonLabel* label_state;
+    MonLabel* label_rate1;
+    MonLabel* label_rate1_2;
+    MonLabel* label_rate2;
+    TimedGraph1* g1;
+    TimedGraph1* g1_2;
     double _time;
 
   };

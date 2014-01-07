@@ -38,6 +38,7 @@ namespace Belle2 {
 
     const MonObject* getMonObject(int index) const throw() { return _histo_v[index]; }
     const Histo* getHisto(int index) const throw() { return (Histo*) _histo_v[index]; }
+    bool hasHisto(const std::string& name) throw();
 
     MonObject* addMonObject(MonObject* h);
     Histo* addHisto(Histo* h);

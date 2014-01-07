@@ -1,0 +1,300 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Detector xmlns:xi="http://www.w3.org/2001/XInclude">
+   <Name>TBDetector</Name>
+   <Description>Common PXD and SVD TestBeam</Description>
+   <Global>
+      <material>Air</material>
+      <width unit="m">2.0</width>
+      <length unit="m">2.0</length>
+      <height unit="m">2.0</height>
+   </Global>
+   <!-- Define materials -->
+   <xi:include href="../../geometry/BasicMaterials.xml" />
+   <xi:include href="../../pxd/PXD-Materials.xml" />
+   <xi:include href="../../svd/SVD-Materials.xml" />
+   <xi:include href="./TB-Materials.xml" />
+   <!-- Magnetic field inside PCMag @ DESY -->
+   <xi:include href="VXD-MagneticField.xml" />
+   <!-- Subdedectors -->
+   <DetectorComponent name="TB">
+      <Creator library="testbeam">VXDTBCreator</Creator>
+      <Content>
+         <!-- This sets the material used if none is specified for a volume -->
+         <DefaultMaterial>Air</DefaultMaterial>
+         <!-- If this is true, TrueHits will only be created for primary particles, Secondaries produced by Geant4 will not create TrueHits -->
+         <OnlyPrimaryTrueHits>false</OnlyPrimaryTrueHits>
+         <!--Settings for background and exposure studies -->
+         <ActiveChips desc="Set to true to make chips on sensors sensitive">false</ActiveChips>
+         <SeeNeutrons desc="Set to true to make sensitive detectors see neutrons">false</SeeNeutrons>
+         <SensitiveThreshold desc="Minimum deposited energy per geant4 step" unit="eV">1.0</SensitiveThreshold>
+         <Alignment>
+            <xi:include href="FullVXDTB-Alignment.xml" xpointer="xpointer(//*)" />
+         </Alignment>
+         <Volumes>
+            <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='Magnet']/*)" />
+            <Volume name="EUDET-Module1">
+               <DX unit="mm">180.0</DX>
+               <DY unit="mm">0.0</DY>
+               <DZ unit="mm">0.0</DZ>
+               <Theta unit="deg">90</Theta>
+               <Phi unit="deg">-90</Phi>
+               <Psi unit="deg">90</Psi>
+               <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='EUDET-Module']/*)" />
+               <Volume name="EUDET-SensitiveArea">
+                  <AlignComponent>7.2.1</AlignComponent>
+                  <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='EUDET-SensitiveArea']/*)" />
+                  <Active>
+                    <SensorID>1</SensorID>
+                    <Ladder>2</Ladder>
+                    <Layer>7</Layer>
+                    <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='EUDET-Active']/*)" />
+                    </Active>
+               </Volume>
+            </Volume>
+            <Volume name="EUDET-Module2">
+               <DX unit="mm">160.0</DX>
+               <DY unit="mm">0.0</DY>
+               <DZ unit="mm">0.0</DZ>
+               <Theta unit="deg">90</Theta>
+               <Phi unit="deg">-90</Phi>
+               <Psi unit="deg">90</Psi>
+               <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='EUDET-Module']/*)" />
+               <Volume name="EUDET-SensitiveArea">
+                  <AlignComponent>7.2.2</AlignComponent>
+                  <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='EUDET-SensitiveArea']/*)" />
+                  <Active>
+                    <SensorID>2</SensorID>
+                    <Ladder>2</Ladder>
+                    <Layer>7</Layer>
+                    <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='EUDET-Active']/*)" />
+                    </Active>
+               </Volume>
+            </Volume>
+            <Volume name="EUDET-Module3">
+               <DX unit="mm">140.0</DX>
+               <DY unit="mm">0.0</DY>
+               <DZ unit="mm">0.0</DZ>
+               <Theta unit="deg">90</Theta>
+               <Phi unit="deg">-90</Phi>
+               <Psi unit="deg">90</Psi>
+               <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='EUDET-Module']/*)" />
+               <Volume name="EUDET-SensitiveArea">
+                  <AlignComponent>7.2.3</AlignComponent>
+                  <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='EUDET-SensitiveArea']/*)" />
+                  <Active>
+                    <SensorID>3</SensorID>
+                    <Ladder>2</Ladder>
+                    <Layer>7</Layer>
+                    <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='EUDET-Active']/*)" />
+                    </Active>
+               </Volume>
+            </Volume>
+            <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='VXDBox']/*))" />
+            <Volume name="PXD-Envelope">
+               <DX unit="mm">57.0</DX>
+               <!--DY unit="mm">-4.0</DY-->
+               <!-- Shift down for better PXD acceptance at 6GeV -->
+               <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='PXD-Envelope']/*)" />
+               <Volume name="CoolingBlock">
+                  <DY unit="mm">0.0</DY>
+                  <DZ unit="mm">-47.0</DZ>
+                  <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='CoolingBlock']/*)" />
+               </Volume>
+               <Volume name="PCB-Frame">
+                  <DX unit="mm">0.0</DX>
+                  <DY unit="mm">30</DY>
+                  <DZ unit="mm">-60</DZ>
+                  <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='PCB-Frame']/*)" />
+               </Volume>
+               <Volume name="PCB-Board_L2_withCu">
+                  <DX unit="mm">2.75</DX>
+                  <DY unit="mm">30</DY>
+                  <DZ unit="mm">-22</DZ>
+                  <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='PCB-Board_L2_withCu']/*)" />
+               </Volume>
+               <Volume name="PCB-Board_L1_withCu">
+                  <DX unit="mm">-2.75</DX>
+                  <DY unit="mm">30</DY>
+                  <DZ unit="mm">-22</DZ>
+                  <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='PCB-Board_L1_withCu']/*)" />
+               </Volume>
+               <Volume name="PXD6-S-sensor_L1">
+                  <DX unit="mm">3.71</DX>
+                  <DY unit="mm">1.0</DY>
+                  <DZ unit="mm">-7.0</DZ>
+                  <Theta unit="deg">90</Theta>
+                  <Phi unit="deg">90</Phi>
+                  <Psi unit="deg">90</Psi>
+                  <!--xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='PXD6-S-sensor_L1']/*)" /-->
+                  <Volume name="PXD-SensitiveArea">
+                     <AlignComponent>1.1.1</AlignComponent>
+                     <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='airPXD6-S-SensitiveArea_short']/*)" />
+                     <Active>
+                        <SensorID>1</SensorID>
+                        <Ladder>1</Ladder>
+                        <Layer>1</Layer>
+                        <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='PXD6-S_active_L1']/*)" />
+                     </Active>
+                  </Volume>
+               </Volume>
+               <Volume name="PXD6-sensor_L2">
+                  <DX unit="mm">-3.71</DX>
+                  <DY unit="mm">-1.2</DY>
+                  <DZ unit="mm">-7.0</DZ>
+                  <Theta unit="deg">-90</Theta>
+                  <Phi unit="deg">270</Phi>
+                  <Psi unit="deg">90</Psi>
+                  <!--xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='PXD6-sensor_L2']/*)" /-->
+                  <Volume name="PXD-SensitiveArea">
+                     <AlignComponent>2.1.2</AlignComponent>
+                     <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='airPXD-SensitiveArea']/*)" />
+                     <Active>
+                        <SensorID>2</SensorID>
+                        <Ladder>1</Ladder>
+                        <Layer>2</Layer>
+                        <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='PXD_active_L2']/*)" />
+                     </Active>
+                  </Volume>
+               </Volume>
+            </Volume>
+            <Volume name="SVD-Envelope">
+               <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='SVD-Envelope']/*)" />
+               <DX unit="mm">-25.0</DX>
+               <Volume name="SVD_module_1">
+                 <Theta unit="deg">90</Theta>
+                 <Phi unit="deg">90</Phi>
+                 <Psi unit="deg">-90</Psi>
+                  <DX unit="mm">61.84</DX>
+                  <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='SVD_module']/*)" />
+                  <Volume name="SVD_sensor_1">
+                     <AlignComponent>3.1.3</AlignComponent>
+                     <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='SVD_sensor_layer3']/*)" />
+                     <Active>
+                        <SensorID>3</SensorID>
+                        <Ladder>1</Ladder>
+                        <Layer>3</Layer>
+                        <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='SVD_active_layer3']/*)" />
+                     </Active>
+                  </Volume>
+               </Volume>
+               <Volume name="SVD_module_2">
+                  <Theta unit="deg">90</Theta>
+                  <Phi unit="deg">90</Phi>
+                  <Psi unit="deg">-90</Psi>
+                  
+                  <DX unit="mm">19.84</DX>
+                  <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='SVD_module']/*)" />
+                  <Volume name="SVD_sensor_2">
+                     <AlignComponent>4.1.4</AlignComponent>
+                     <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='SVD_sensor']/*)" />
+                     <Active>
+                        <SensorID>4</SensorID>
+                        <Ladder>1</Ladder>
+                        <Layer>4</Layer>
+                        <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='SVD_active']/*)" />
+                     </Active>
+                  </Volume>
+               </Volume>
+               <Volume name="SVD_module_3">
+                  <Theta unit="deg">90</Theta>
+                  <Phi unit="deg">90</Phi>
+                  <Psi unit="deg">-90</Psi>
+                  
+                  <DX unit="mm">-4.16</DX>
+                  <DY unit="mm">-4.8</DY>
+                  
+                  <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='SVD_module']/*)" />
+                  <Volume name="SVD_sensor_3">
+                     <AlignComponent>5.1.5</AlignComponent>
+                     <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='SVD_sensor']/*)" />
+                     <Active>
+                        <SensorID>5</SensorID>
+                        <Ladder>1</Ladder>
+                        <Layer>5</Layer>
+                        <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='SVD_active']/*)" />
+                     </Active>
+                  </Volume>
+               </Volume>
+               <Volume name="SVD_module_4">
+                  <Theta unit="deg">90</Theta>
+                  <Phi unit="deg">90</Phi>
+                  <Psi unit="deg">-90</Psi>
+                  
+                  <DX unit="mm">-35.160</DX>
+                  <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='SVD_module']/*)" />
+                  <Volume name="SVD_sensor_4">
+                     <AlignComponent>6.1.6</AlignComponent>
+                     <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='SVD_sensor']/*)" />
+                     <Active>
+                        <SensorID>6</SensorID>
+                        <Ladder>1</Ladder>
+                        <Layer>6</Layer>
+                        <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='SVD_active']/*)" />
+                     </Active>
+                  </Volume>
+               </Volume>
+            </Volume>
+            <Volume name="EUDET-Module4">
+               <DX unit="mm">-140.0</DX>
+               <DY unit="mm">0.0</DY>
+               <DZ unit="mm">0.0</DZ>
+               <Theta unit="deg">90</Theta>
+               <Phi unit="deg">-90</Phi>
+               <Psi unit="deg">90</Psi>
+               <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='EUDET-Module']/*)" />
+               <Volume name="EUDET-SensitiveArea">
+                  <AlignComponent>7.3.4</AlignComponent>
+                  <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='EUDET-SensitiveArea']/*)" />
+                  <Active>
+                    <SensorID>4</SensorID>
+                    <Ladder>3</Ladder>
+                    <Layer>7</Layer>
+                    <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='EUDET-Active']/*)" />
+                    </Active>
+               </Volume>
+            </Volume>
+            <Volume name="EUDET-Module5">
+               <DX unit="mm">-160.0</DX>
+               <DY unit="mm">0.0</DY>
+               <DZ unit="mm">0.0</DZ>
+               <Theta unit="deg">90</Theta>
+               <Phi unit="deg">-90</Phi>
+               <Psi unit="deg">90</Psi>
+               <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='EUDET-Module']/*)" />
+               <Volume name="EUDET-SensitiveArea">
+                  <AlignComponent>7.3.5</AlignComponent>
+                  <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='EUDET-SensitiveArea']/*)" />
+                  <Active>
+                    <SensorID>5</SensorID>
+                    <Ladder>3</Ladder>
+                    <Layer>7</Layer>
+                    <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='EUDET-Active']/*)" />
+                    </Active>
+               </Volume>
+            </Volume>
+            <Volume name="EUDET-Module6">
+               <DX unit="mm">-180.0</DX>
+               <DY unit="mm">0.0</DY>
+               <DZ unit="mm">0.0</DZ>
+               <Theta unit="deg">90</Theta>
+               <Phi unit="deg">-90</Phi>
+               <Psi unit="deg">90</Psi>
+               <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='EUDET-Module']/*)" />
+               <Volume name="EUDET-SensitiveArea">
+                  <AlignComponent>7.3.6</AlignComponent>
+                  <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='EUDET-SensitiveArea']/*)" />
+                  <Active>
+                    <SensorID>6</SensorID>
+                    <Ladder>3</Ladder>
+                    <Layer>7</Layer>
+                    <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='EUDET-Active']/*)" />
+                    </Active>
+               </Volume>
+            </Volume>
+         </Volumes>
+      </Content>
+   </DetectorComponent>
+   <Tracking>
+      <xi:include href="VXDTFindexTB.xml" />
+   </Tracking>
+</Detector>

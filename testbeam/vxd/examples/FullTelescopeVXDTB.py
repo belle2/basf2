@@ -5,7 +5,7 @@
 # This is the default simulation scenario for VXD beam test WITH telescopes
 
 # Important parameters of the simulation:
-events = 10000  # Number of events to simulate
+events = 1000  # Number of events to simulate
 momentum = 6.0  # GeV/c
 momentum_spread = 0.05  # %
 theta = 90.0  # degrees

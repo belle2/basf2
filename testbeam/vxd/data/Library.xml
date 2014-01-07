@@ -457,6 +457,28 @@
       <HalfY unit="mm">4.8</HalfY>
       <HalfZ unit="um">25</HalfZ>
    </Snippet>
+   <Snippet name="airPXD-SensitiveArea">
+     <Color>#00ff00</Color>
+     <Material>Air</Material>
+     <Shape>Box</Shape>
+     <DX unit="mm">7.0</DX>
+     <DY unit="mm">1.2</DY>
+     <DZ unit="mm">-0.1725</DZ>
+     <HalfX unit="mm">24</HalfX>
+     <HalfY unit="mm">4.8</HalfY>
+     <HalfZ unit="um">25</HalfZ>
+   </Snippet>
+   <Snippet name="airPXD6-S-SensitiveArea_short">
+     <Color>#00ff00</Color>
+     <Material>Air</Material>
+     <Shape>Box</Shape>
+     <DX unit="mm">7.0</DX>
+     <DY unit="mm">1.0</DY>
+     <DZ unit="mm">-0.1725</DZ>
+     <HalfX unit="mm">18.4</HalfX>
+     <HalfY unit="mm">4.8</HalfY>
+     <HalfZ unit="um">25</HalfZ>
+   </Snippet>
    <Snippet name="PXD6-sensor_L2">
       <Color>#006699</Color>
       <Material>Air</Material>

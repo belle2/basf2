@@ -8,7 +8,7 @@
 
 #include <rawdata/dataobjects/RawFTSW.h>
 //#include <daq/rawdata/modules/DAQConsts.h>
-#define WO_FIRST_EVENUM_CHECK
+//#define WO_FIRST_EVENUM_CHECK
 //#define NO_DATA_CHECK
 
 using namespace std;

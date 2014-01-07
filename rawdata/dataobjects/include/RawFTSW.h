@@ -57,6 +57,7 @@ namespace Belle2 {
 
 
 #ifdef READ_OLD_B2LFEE_FORMAT_FILE
+    Warning!!! You are about to use the old format!!!! // it causes compile error
     enum {
       POS_NWORDS = 0,
       POS_HDR_NWORDS = 1,

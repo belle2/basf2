@@ -11,9 +11,8 @@
 using namespace std;
 using namespace Belle2;
 
-#define NO_DATA_CHECK
-#define NO_DATA_CHECK_1
-#define WO_FIRST_EVENUM_CHECK
+//#define NO_DATA_CHECK
+//#define WO_FIRST_EVENUM_CHECK
 
 ClassImp(RawCOPPER);
 
@@ -547,7 +546,7 @@ unsigned int RawCOPPER::GetB2LFEE32bitEventNumber(int n)
             eve[ 0 ], eve[ 1 ], eve[ 2 ], eve[ 3 ],
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("[ERROR] %s\n", err_buf);
-#ifndef NO_DATA_CHECK_1
+#ifndef NO_DATA_CHECK
     string err_str = err_buf; throw (err_str);
 
     sleep(12345678);

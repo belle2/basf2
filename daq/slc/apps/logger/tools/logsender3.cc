@@ -39,7 +39,7 @@ int main(int argc, char** argv)
   sprintf(send_message, ";%s;%s;%s", getenv("HOSTNAME"), nodename, message);
   int len = strlen(send_message);
   if (b2nsm_sendany("LOGGER", "LOG",
-                    3, (int*)pars, len, send_message, NULL) <= 0) {
+                    3, (int*)pars, len, send_message, NULL) < 0) {
     printf("Failed\n");
   } else {
     printf("Succeded\n");

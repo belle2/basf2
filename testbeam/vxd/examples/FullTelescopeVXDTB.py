@@ -2,10 +2,11 @@
 # -*- coding: utf-8 -*-
 
 # Common PXD&SVD TestBeam Jan 2014 @ DESY Simulation
-# This is the default simulation scenario for VXD beam test WITH telescopes
+# This is the default simulation scenario for VXD beam test WITHOUT telescopes
 
 # Important parameters of the simulation:
-events = 1000  # Number of events to simulate
+events = 10000  # Number of events to simulate
+fieldOn = False  # Turn field on or off (changes geometry components and digi/clust params)
 momentum = 6.0  # GeV/c
 momentum_spread = 0.05  # %
 theta = 90.0  # degrees
@@ -62,9 +63,11 @@ gearbox.param('fileName', 'testbeam/vxd/FullTelescopeVXDTB.xml')
 # Create geometry
 geometry = register_module('Geometry')
 # You can specify components to be created
-# geometry.param('Components', ['MagneticField', 'TB'])
-# To turn off magnetic field:
-geometry.param('Components', ['TB'])
+if fieldOn:
+    geometry.param('components', ['MagneticField', 'TB'])
+else:
+  # To turn off magnetic field:
+    geometry.param('components', ['TB'])
 
 # Full simulation module
 simulation = register_module('FullSim')
@@ -78,11 +81,15 @@ simulation.param('StoreAllSecondaries', True)
 
 # PXD/SVD digitizer
 PXDDigi = register_module('PXDDigitizer')
-SVDDigi = register_module('SVDDigitizer')
+# turn off Lorentz angle simulation if no field
+if fieldOn:
+    PXDDigi.param('tanLorentz', 0.)
+else:
+    PXDDigi.param('tanLorentz', 0.1625)  # value scaled from 0.25 for 1.5T to 0.975T
 
-# This module changes specified PXD sensors to binary readout: EUDET emulation
-# It must be before PXDClusterizer in the path!
-EUDET_emulator = register_module('ChangePXDDigitsToBinary')
+# PXDDigi.param('SimpleDriftModel', False)
+
+SVDDigi = register_module('SVDDigitizer')
 
 # PXD/SVD clusterizer
 PXDClust = register_module('PXDClusterizer')
@@ -90,9 +97,19 @@ PXDClust = register_module('PXDClusterizer')
 # Otherwise you will get 'segmentation violation'.
 PXDClust.param('ClusterCacheSize', 576)
 
+if fieldOn:
+    PXDClust.param('TanLorentz', 0.)
+else:
+    PXDClust.param('TanLorentz', 0.1625)  # value scaled from 0.25 for 1.5T to 0.975T
+
 SVDClust = register_module('SVDClusterizer')
-# SVDClust.param('TanLorentz_electrons', 0.)
-# SVDClust.param('TanLorentz_holes', 0.)
+if fieldOn:
+    SVDClust.param('TanLorentz_holes', 0.)
+    SVDClust.param('TanLorentz_electrons', 0.)
+else:
+    SVDClust.param('TanLorentz_holes', 0.052)  # value scaled from 0.08 for 1.5T to 0.975T
+    SVDClust.param('TanLorentz_electrons', 0.)
+
 # Save output of simulation
 output = register_module('RootOutput')
 output.param('outputFileName', 'TBSimulation.root')
@@ -118,11 +135,11 @@ mctrackfinder.param(param_mctrackfinder)
 
 # mctrackfinder.logging.log_level = LogLevel.DEBUG
 
-# Fit tracks with GENFIT
-trackfitter = register_module('GBLfit')
-trackfitter.logging.log_level = LogLevel.WARNING
-trackfitter.param('UseClusters', True)
-# trackfitter.param('FilterId', 'Kalman')
+# Fit tracks with GBLfit which produces millepede.dat for alignment
+gblfitter = register_module('GBLfit')
+gblfitter.logging.log_level = LogLevel.WARNING
+gblfitter.param('UseClusters', True)
+# gblfitter.param('FilterId', 'GBL')
 
 # Check track fitting results
 trackfitchecker = register_module('TrackFitChecker')
@@ -135,61 +152,6 @@ trackfitchecker.param('robustTests', True)
 trackfitchecker.param('writeToRootFile', True)
 
 display = register_module('Display')
-
-# The Options parameter is a combination of:
-# D draw detectors - draw simple detector representation (with different size)
-#   for each hit
-# H draw track hits
-# M draw track markers - intersections of track with detector planes
-#   (use with T)
-# P draw detector planes
-# S scale manually - spacepoint hits are drawn as spheres and scaled with
-#   errors
-# T draw track (straight line between detector planes)
-#
-# Note that you can always turn off an individual detector component or track
-# interactively by removing its checkmark in the 'Eve' tab.
-#
-# This option only makes sense when ShowGFTracks is true
-display = register_module('Display')
-
-# The Options parameter is a combination of:
-# D draw detectors - draw simple detector representation (with different size)
-#   for each hit
-# H draw track hits
-# M draw track markers - intersections of track with detector planes
-#   (use with T)
-# P draw detector planes
-# S scale manually - spacepoint hits are drawn as spheres and scaled with
-#   errors
-# T draw track (straight line between detector planes)
-#
-# Note that you can always turn off an individual detector component or track
-# interactively by removing its checkmark in the 'Eve' tab.
-#
-# This option only makes sense when ShowGFTracks is true
-display.param('options', 'DHMPST')  # default
-
-# should hits always be assigned to a particle with c_PrimaryParticle flag?
-# with this option off, many tracking hits will be assigned to secondary e-
-display.param('assignHitsToPrimaries', 0)
-
-# show all primary MCParticles?
-display.param('showAllPrimaries', True)
-
-# show all charged MCParticles? (SLOW)
-display.param('showCharged', True)
-
-# show tracks?
-display.param('showTrackLevelObjects', True)
-
-# save events non-interactively (without showing window)?
-display.param('automatic', False)
-
-# Use clusters to display tracks
-display.param('useClusters', True)
-
-# Display the testbeam geometry rather than Belle II extract
 display.param('fullGeometry', True)
 
 # Path construction
@@ -200,20 +162,17 @@ main.add_module(gearbox)
 main.add_module(geometry)
 main.add_module(particlegun)
 main.add_module(simulation)
-
-histoman = register_module('HistoManager')
-main.add_module(histoman)
-
-beamscan = register_module('BeamspotScan')
-main.add_module(beamscan)
-
 main.add_module(PXDDigi)
+# This module changes specified PXD sensors to binary readout: EUDET emulation
+# It must be before PXDClusterizer in the path!
+EUDET_emulator = register_module('ChangePXDDigitsToBinary')
 main.add_module(EUDET_emulator)
+
 main.add_module(SVDDigi)
 main.add_module(PXDClust)
 main.add_module(SVDClust)
 main.add_module(mctrackfinder)
-main.add_module(trackfitter)
+main.add_module(gblfitter)
 main.add_module(trackfitchecker)
 main.add_module(geosaver)
 main.add_module(output)

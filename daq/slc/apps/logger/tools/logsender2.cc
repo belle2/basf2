@@ -11,6 +11,7 @@ using namespace Belle2;
 
 int main(int argc, char** argv)
 {
+#if NSM_PACKAGE_VERSION >= 1914
   if (argc < 3) {
     printf("Usage : ./logsender2 <name> <priority> <message>\n");
     return 1;
@@ -38,5 +39,8 @@ int main(int argc, char** argv)
     priority = SystemLog::FATAL;
   }
   comm->sendLog(SystemLog(nodename, priority, message));
+#else
+#warning "Wrong version of nsm2. try source daq/slc/extra/nsm2/export.sh"
+#endif
   return 0;
 }

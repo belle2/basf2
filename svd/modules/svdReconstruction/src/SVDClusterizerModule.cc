@@ -45,7 +45,7 @@ SVDClusterizerModule::SVDClusterizerModule() : Module(), m_elNoise(2000.0),
   m_shapingTimeHoles(60), m_samplingTime(30), m_refTime(0.0), m_assumeSorted(false)
 {
   //Set module properties
-  setDescription("Produce SVDClusters/Hits from SVDDigits");
+  setDescription("Clusterize SVDDigits and reconstruct hits");
   setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
 
   // 1. Collections.
@@ -102,32 +102,40 @@ SVDClusterizerModule::SVDClusterizerModule() : Module(), m_elNoise(2000.0),
 void SVDClusterizerModule::initialize()
 {
   //Register collections
-  StoreArray<SVDCluster>::registerPersistent(m_storeClustersName);
-  RelationArray::registerPersistent<SVDCluster, MCParticle>(m_storeClustersName, m_storeMCParticlesName);
-  RelationArray::registerPersistent<SVDCluster, SVDDigit>(m_storeClustersName, m_storeDigitsName);
-  RelationArray::registerPersistent<SVDCluster, SVDTrueHit>(m_storeClustersName, m_storeTrueHitsName);
+  StoreArray<SVDCluster> storeClusters(m_storeClustersName);
+  StoreArray<SVDDigit> storeDigits(m_storeDigitsName);
+  StoreArray<SVDTrueHit> storeTrueHits(m_storeTrueHitsName);
+  StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
 
-  //Set names in case default was used. This is needed to initialize RalationIndices.
-  m_relDigitMCParticleName   = DataStore::relationName(
-                                 DataStore::arrayName<SVDDigit>(m_storeDigitsName),
-                                 DataStore::arrayName<MCParticle>(m_storeMCParticlesName)
-                               );
-  m_relClusterMCParticleName = DataStore::relationName(
-                                 DataStore::arrayName<SVDCluster>(m_storeClustersName),
-                                 DataStore::arrayName<MCParticle>(m_storeMCParticlesName)
-                               );
-  m_relClusterDigitName      = DataStore::relationName(
-                                 DataStore::arrayName<SVDCluster>(m_storeClustersName),
-                                 DataStore::arrayName<SVDDigit>(m_storeDigitsName)
-                               );
-  m_relDigitTrueHitName      = DataStore::relationName(
-                                 DataStore::arrayName<SVDDigit>(m_storeDigitsName),
-                                 DataStore::arrayName<SVDTrueHit>(m_storeTrueHitsName)
-                               );
-  m_relClusterTrueHitName    = DataStore::relationName(
-                                 DataStore::arrayName<SVDCluster>(m_storeClustersName),
-                                 DataStore::arrayName<SVDTrueHit>(m_storeTrueHitsName)
-                               );
+  storeClusters.registerAsPersistent();
+  storeDigits.required();
+  storeTrueHits.isOptional();
+  storeMCParticles.isOptional();
+
+  RelationArray relClusterDigits(storeClusters, storeDigits);
+  RelationArray relClusterTrueHits(storeClusters, storeTrueHits);
+  RelationArray relClusterMCParticles(storeClusters, storeMCParticles);
+  RelationArray relDigitTrueHits(storeDigits, storeTrueHits);
+  RelationArray relDigitMCParticles(storeDigits, storeMCParticles);
+
+  relClusterDigits.registerAsPersistent();
+  //Relations to simulation objects only if the ancestor relations exist
+  if (relDigitTrueHits.isOptional())
+    relClusterTrueHits.registerAsPersistent();
+  if (relDigitMCParticles.isOptional())
+    relClusterMCParticles.registerAsPersistent();
+
+  //Store names to speed up creation later
+  m_storeClustersName = storeClusters.getName();
+  m_storeDigitsName = storeDigits.getName();
+  m_storeTrueHitsName = storeTrueHits.getName();
+  m_storeMCParticlesName = storeMCParticles.getName();
+
+  m_relClusterDigitName = relClusterDigits.getName();
+  m_relClusterTrueHitName = relClusterTrueHits.getName();
+  m_relClusterMCParticleName = relClusterMCParticles.getName();
+  m_relDigitTrueHitName = relDigitTrueHits.getName();
+  m_relDigitMCParticleName = relDigitMCParticles.getName();
 
   // Report:
   B2INFO("SVDClusterizer Parameters (in default system unit, *=cannot be set directly):");
@@ -185,9 +193,9 @@ inline void SVDClusterizerModule::findCluster(const Sample& sample)
 
 void SVDClusterizerModule::event()
 {
-  StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
-  StoreArray<SVDTrueHit> storeTrueHits(m_storeTrueHitsName);
-  StoreArray<SVDDigit>   storeDigits(m_storeDigitsName);
+  const StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
+  const StoreArray<SVDTrueHit> storeTrueHits(m_storeTrueHitsName);
+  const StoreArray<SVDDigit>   storeDigits(m_storeDigitsName);
   StoreArray<SVDCluster> storeClusters(m_storeClustersName);
 
   if (!storeClusters.isValid())
@@ -195,17 +203,21 @@ void SVDClusterizerModule::event()
   else
     storeClusters.getPtr()->Clear();
 
-  RelationArray relClusterMCParticle(storeClusters, storeMCParticles, m_relClusterMCParticleName);
-  relClusterMCParticle.clear();
+  RelationArray relClusterMCParticle(storeClusters, storeMCParticles,
+                                     m_relClusterMCParticleName);
+  if (relClusterMCParticle) relClusterMCParticle.clear();
 
-  RelationArray relClusterDigit(storeClusters, storeDigits, m_relClusterDigitName);
-  relClusterDigit.clear();
+  RelationArray relClusterDigit(storeClusters, storeDigits,
+                                m_relClusterDigitName);
+  if (relClusterDigit) relClusterDigit.clear();
 
-  RelationArray relClusterTrueHit(storeClusters, storeTrueHits, m_relClusterTrueHitName);
-  relClusterTrueHit.clear();
+  RelationArray relClusterTrueHit(storeClusters, storeTrueHits,
+                                  m_relClusterTrueHitName);
+  if (relClusterTrueHit) relClusterTrueHit.clear();
 
   int nDigits = storeDigits.getEntries();
-  if (nDigits == 0) return;
+  if (nDigits == 0)
+    return;
 
   m_clusters.clear();
   m_cache.clear();
@@ -278,13 +290,15 @@ void SVDClusterizerModule::writeClusters(VxdID sensorID, int side)
   if (m_clusters.empty()) return;
 
   //Get all datastore elements
-  StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
-  StoreArray<SVDDigit>   storeDigits(m_storeDigitsName);
+  const StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
+  const StoreArray<SVDDigit>   storeDigits(m_storeDigitsName);
+  const StoreArray<SVDTrueHit> storeTrueHits(m_storeTrueHitsName);
   StoreArray<SVDCluster> storeClusters(m_storeClustersName);
-  StoreArray<SVDTrueHit> storeTrueHits(m_storeTrueHitsName);
+
   RelationArray relClusterMCParticle(storeClusters, storeMCParticles, m_relClusterMCParticleName);
   RelationArray relClusterDigit(storeClusters, storeDigits, m_relClusterDigitName);
   RelationArray relClusterTrueHit(storeClusters, storeTrueHits, m_relClusterTrueHitName);
+
   RelationIndex<SVDDigit, MCParticle> relDigitMCParticle(storeDigits, storeMCParticles, m_relDigitMCParticleName);
   RelationIndex<SVDDigit, SVDTrueHit> relDigitTrueHit(storeDigits, storeTrueHits, m_relDigitTrueHitName);
 
@@ -293,7 +307,7 @@ void SVDClusterizerModule::writeClusters(VxdID sensorID, int side)
   bool isU = (side == 0);
   double pitch = isU ? info.getUPitch() : info.getVPitch();
 
-  BOOST_FOREACH(ClusterCandidate & cls, m_clusters) {
+  for (ClusterCandidate & cls : m_clusters) {
     //Check for noise cuts
     if (!(cls.size() > 0 && m_noiseMap(cls.getCharge(), m_cutCluster) && m_noiseMap(cls.getSeed(), m_cutSeed))) continue;
 
@@ -392,18 +406,21 @@ void SVDClusterizerModule::writeClusters(VxdID sensorID, int side)
     vector<pair<int, float> > digit_weights;
     digit_weights.reserve(cls.size());
 
-    BOOST_FOREACH(const SVD::Sample & sample, cls.samples()) {
-
-      typedef const RelationIndex<SVDDigit, MCParticle>::Element relMC_type;
-      typedef const RelationIndex<SVDDigit, SVDTrueHit>::Element relTrueHit_type;
+    for (const SVD::Sample & sample : cls.samples()) {
 
       //Fill map with MCParticle relations
-      BOOST_FOREACH(relMC_type & mcRel, relDigitMCParticle.getElementsFrom(sample.getDigit())) {
-        mc_relations[mcRel.indexTo] += mcRel.weight;
+      if (relDigitMCParticle) {
+        typedef const RelationIndex<SVDDigit, MCParticle>::Element relMC_type;
+        for (relMC_type & mcRel : relDigitMCParticle.getElementsFrom(sample.getDigit())) {
+          mc_relations[mcRel.indexTo] += mcRel.weight;
+        };
       };
       //Fill map with SVDTrueHit relations
-      BOOST_FOREACH(relTrueHit_type & trueRel, relDigitTrueHit.getElementsFrom(sample.getDigit())) {
-        truehit_relations[trueRel.indexTo] += trueRel.weight;
+      if (relDigitTrueHit) {
+        typedef const RelationIndex<SVDDigit, SVDTrueHit>::Element relTrueHit_type;
+        for (relTrueHit_type & trueRel : relDigitTrueHit.getElementsFrom(sample.getDigit())) {
+          truehit_relations[trueRel.indexTo] += trueRel.weight;
+        };
       };
       //Add digit to the Cluster->Digit relation list
       digit_weights.push_back(make_pair(sample.getIndex(), sample.getCharge()));
@@ -417,8 +434,12 @@ void SVDClusterizerModule::writeClusters(VxdID sensorID, int side)
                             ));
 
     //Create Relations to this Digit
-    relClusterMCParticle.add(clsIndex, mc_relations.begin(), mc_relations.end());
-    relClusterTrueHit.add(clsIndex, truehit_relations.begin(), truehit_relations.end());
+    if (!mc_relations.empty()) {
+      relClusterMCParticle.add(clsIndex, mc_relations.begin(), mc_relations.end());
+    }
+    if (!truehit_relations.empty()) {
+      relClusterTrueHit.add(clsIndex, truehit_relations.begin(), truehit_relations.end());
+    }
     relClusterDigit.add(clsIndex, digit_weights.begin(), digit_weights.end());
   }
 

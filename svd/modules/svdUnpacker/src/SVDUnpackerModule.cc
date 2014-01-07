@@ -89,9 +89,10 @@ void SVDUnpackerModule::event()
       checksum();
 
       // Skip two words that I don't understand.
-      data32 += 2;
+      //      data32 += 2;
+      //      fillSVDDigitList(nWords - 2, data32, &svdDigits);
 
-      fillSVDDigitList(nWords - 2, data32, &svdDigits);
+      fillSVDDigitList(nWords, data32, &svdDigits);
 
     }
   }
@@ -125,6 +126,17 @@ void SVDUnpackerModule::fillSVDDigitList(int nWords, uint32_t* data32_in,  Store
 {
   uint32_t* data32 = data32_in;
 
+  //read FTB Header:
+  struct FTBHeader* theFTBHeader = (struct FTBHeader*)data32;
+
+  if (theFTBHeader->controlWord != 0xffaa0000) {
+    B2WARNING("OOOOPS: WRONG FTB header format 0x" << std::hex << theFTBHeader->controlWord);
+    return;
+  }
+  B2DEBUG(1, "FTB header format checked");
+
+
+  data32 += 2;
   //read Main Header:
   struct MainHeader* theMainHeader = (struct MainHeader*)data32;
 
@@ -154,6 +166,7 @@ void SVDUnpackerModule::fillSVDDigitList(int nWords, uint32_t* data32_in,  Store
 
   struct data* aSample;
   struct trailer* theTrailer;
+  struct FTBTrailer* theFTBTrailer;
 
   bool trailerFound = false;
 
@@ -193,6 +206,11 @@ void SVDUnpackerModule::fillSVDDigitList(int nWords, uint32_t* data32_in,  Store
       assert(theTrailer->check == 0xe);
       B2DEBUG(1, "Trailer found");
 
+      data32++;
+      theFTBTrailer = (struct FTBTrailer*) data32;
+      assert(theFTBTrailer->controlWord == 0xff55);
+      B2DEBUG(1, "FTBTrailer found");
+
       trailerFound = true;
     } else {
       B2WARNING("OOOOPS: unknown data field, highest four bits: 0x" << std::hex << *data32);
@@ -200,7 +218,7 @@ void SVDUnpackerModule::fillSVDDigitList(int nWords, uint32_t* data32_in,  Store
     }
   }
 
-  if (&data32_in[nWords] != &data32[1]) {
+  if (&data32_in[nWords] != &data32[1] - 1) {
     B2WARNING("OOOOPS: trailer appeared too early, data short by " << &data32_in[nWords] - &data32[1] << " bytes");
   }
 

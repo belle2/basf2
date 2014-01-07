@@ -73,6 +73,14 @@ namespace Belle2 {
       SVDOnlineToOfflineMap* m_map;
 
       // The following assumes i386 byte order: MSB comes last!
+
+      struct FTBHeader {
+        unsigned int controlWord : 32; //LSB
+        unsigned int eventNumber : 24;
+        unsigned int errorsField : 8; //MSB
+      };
+
+
       struct MainHeader {
         unsigned int trgNumber : 8; //LSB
         unsigned int trgTiming : 8;
@@ -111,6 +119,11 @@ namespace Belle2 {
         unsigned int error1: 1;
         unsigned int error2: 1;
         unsigned int check : 4; //MSB
+      };
+
+      struct FTBTrailer {
+        unsigned int crc16 : 16; //LSB
+        unsigned int controlWord : 16; //MSB
       };
 
 

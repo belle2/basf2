@@ -4,7 +4,7 @@
 /* -- version info */
 
 #define NSM_PROTOCOL_VERSION 1915 /* protocol version */
-#define NSM_PACKAGE_VERSION  1919 /* package  version */
+#define NSM_PACKAGE_VERSION  1923 /* package  version */
 
 /*
   20120723 1900 file created
@@ -23,6 +23,10 @@
   20131229 1917 no change in nsmd2, update in nsminfo2 and b2lib
   20131230 1918 libs: strerror fix, initnet fix, stdint fix, bridge fix
   20140104 1919 b2libs: b2nsm_ok text, nsmd2: disid fix
+  20140105 1920 nsminfo2 from nsmd2
+  20140106 1921 destroyconn fix, etc
+  20140107 1922 fixing the case when both master/deputy are killed
+  20140107 1923 fixing priority passing
  */
 
 /* -- DATA TYPES ----------------------------------------------------- */

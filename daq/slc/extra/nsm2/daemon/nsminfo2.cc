@@ -3,6 +3,8 @@
 //
 // 20131218  xforce option [from nsmd 1913]
 // 20131229  shmget permission changed
+// 20140104  disid / conid
+// 20140105  integrating into nsmd2
 // ----------------------------------------------------------------------
 
 // -- include files -----------------------------------------------------
@@ -22,19 +24,45 @@
 #include "nsm2.h"
 #include "nsmsys2.h"
 
-// -- global variables --------------------------------------------------
+// -- standalone or called from nsmd2 -----------------------------------
 // ----------------------------------------------------------------------
+#ifdef NSMD2INFO
+#define P nsmd_print0
+#define PP nsmd_print1
+extern void nsmd_print0(const char* fmt, ...);
+extern void nsmd_print1(const char* fmt, ...);
+extern NSMsys* nsmd_sysp;
+extern NSMmem* nsmd_memp;
+extern int nsmd_shmkey;
+
+static int xforce = 1;
+static int xverbose = 0;
+static int showalist = 1;
+static int showdisid = 1;
+static int showconid = 1;
+
+#else /* ! NSMD2INFO */
+#define P printf
+#define PP printf
+
 int nsmd_port = NSM2_PORT;
 int nsmd_shmkey = -1; /* == nsmd_port if -1 */
 
 NSMsys* nsmd_sysp = 0;
 NSMmem* nsmd_memp = 0;
+
 static int xforce = 0;
 static int xverbose = 0;
+static int showalist = 0;
+static int showdisid = 0;
+static int showconid = 0;
+
+#endif /* NSMD2INFO */
 
 // -- macros ------------------------------------------------------------
 // ----------------------------------------------------------------------
 
+#define S sprintf /* to avoid printf search */
 #define SYSPOS(ptr) ((char *)(ptr) - (char *)nsmd_sysp)
 #define SYSPTR(pos) (((char *)nsmd_sysp)+pos)
 #define MEMPOS(base,ptr) ((char *)(ptr) - (char *)(base))
@@ -56,9 +84,294 @@ static int xverbose = 0;
 extern "C" int nsmlib_hash(NSMsys* sysp, int32* hashtable, int hashmax,
                            const char* key, int create);
 
+// -- hoststr -----------------------------------------------------------
+const char*
+nsminfo_hoststr(int ip, int iponly = 0) // ip: network byte order
+{
+  static char host[16][256];
+  static int ihost = 0;
+  int iph = ntohl(ip);
+
+  memset(host[ihost], 0, sizeof(host[ihost]));
+  char* hostp = host[ihost];
+  ihost = (ihost + 1) % 16;
+
+  iponly = 1;
+
+  if (iponly) {
+    S(hostp, "%d.%d.%d.%d",
+      (iph >> 24) & 255, (iph >> 16) & 255, (iph >> 8) & 255, (iph >> 0) & 255);
+  }
+
+  return hostp;
+}
+// -- timestr -----------------------------------------------------------
+const char*
+nsminfo_timestr(time_t t, int typ = 0)
+{
+  static char timestr[16][256];
+  static int itime = 0;
+
+  memset(timestr[itime], 0, sizeof(timestr[itime]));
+  char* timep = timestr[itime];
+  itime = (itime + 1) % 16;
+
+  if (typ == 0) {
+    if (t == 0) return "unknown";
+
+    time_t now = time(0);
+    int dt = now - t;
+    if (dt < 0) {
+      return "negative-time";
+    } else if (dt < 60) {
+      S(timep, "%ds", dt);
+    } else if (dt < 60 * 60) {
+      S(timep, "%dm%02ds", dt / 60, dt % 60);
+    } else if (dt < 60 * 60 * 24) {
+      S(timep, "%dh%02dm", (dt / 60) / 60, (dt / 60) % 60);
+    } else {
+      S(timep, "%dd%02dh", (dt / 3600) / 24, (dt / 3600) % 24);
+    }
+  } else {
+    if (t == 0) return "unknown-time";
+
+    tm tmbuf;
+    localtime_r(&t, &tmbuf);
+    S(timep, "%04d.%02d.%02d-%02d:%02d:%02d",
+      tmbuf.tm_year + 1900, tmbuf.tm_mon + 1, tmbuf.tm_mday,
+      tmbuf.tm_hour, tmbuf.tm_min, tmbuf.tm_sec);
+  }
+
+  return timep;
+}
+// -- head --------------------------------------------------------------
+void
+nsminfo_head()
+{
+  NSMsys& sys = *nsmd_sysp;
+  NSMmem& mem = *nsmd_memp;
+  pid_t  pid    = sys.pid;
+  time_t tstart = sys.timstart;
+  time_t tevent = sys.timevent;
+  int badmem = 0;
+  NSMcon& master = sys.con[sys.master];
+  NSMcon& udpcon = sys.con[NSMCON_UDP];
+  NSMcon& tcpcon = sys.con[NSMCON_TCP];
+
+  if (sys.master == NSMCON_NON) {
+    P("NSM network is not started yet\n");
+  } else {
+    P("NSM network started at %s (%s ago)\n",
+      nsminfo_timestr(tcpcon.timstart, 1),
+      nsminfo_timestr(tcpcon.timstart));
+  }
+  P("NSMD daemon started at %s (%s ago)\n",
+    nsminfo_timestr(udpcon.timstart, 1),
+    nsminfo_timestr(udpcon.timstart));
+
+  P("MASTER(%d) %s %s, DEPUTY(%d) %s %s, I'm %s nsmd\n",
+    sys.master,
+    sys.master == NSMCON_NON ? "is" : "at",
+    sys.master == NSMCON_NON ? "missing" : nsminfo_hoststr(AddrMaster()),
+    sys.deputy,
+    sys.deputy == NSMCON_NON ? "is" : "at",
+    sys.deputy == NSMCON_NON ? "missing" : nsminfo_hoststr(AddrDeputy()),
+    sys.master == NSMCON_TCP ? "the MASTER" :
+    sys.deputy == NSMCON_TCP ? "the DEPUTY" : "a MEMBER");
+
+  if (sys.ipaddr != mem.ipaddr) {
+    P("inconsistent ipaddr: %s(sys) vs %s(mem)\n",
+      nsminfo_hoststr(sys.ipaddr, 1), nsminfo_hoststr(mem.ipaddr, 1));
+    badmem++;
+  }
+  if (pid != mem.pid) {
+    P("inconsistent process-id: %d vs %d\n", pid, mem.pid);
+    badmem++;
+  }
+  if (tstart != mem.timstart) {
+    P("inconsistent start time: %d vs %d\n",
+      (int)tstart, (int)mem.timstart);
+    badmem++;
+  }
+  if (abs(tevent - mem.timevent) > 1) {
+    P("inconsistent time: %d vs %d\n",
+      (int)tevent, (int)mem.timevent);
+    badmem++;
+  }
+  if (badmem && ! xforce) {
+    exit(1);
+  }
+
+  P("NSMD shmkey = %d, ip = %s, pid = %d\n",
+    nsmd_shmkey, nsminfo_hoststr(sys.ipaddr, 1),
+    nsmd_sysp->pid);
+  P("     created %s ago, last updated %s ago%s\n",
+    nsminfo_timestr(sys.timstart),
+    nsminfo_timestr(sys.timevent),
+    (time(0) - sys.timevent <= 2) ? " (up-to-date)" : "");
+}
+// -- conn --------------------------------------------------------------
+void
+nsminfo_conn(int all = 0)
+{
+  NSMsys& sys = *nsmd_sysp;
+  int ncon = all ? NSMSYS_MAX_CON : sys.ncon;
+
+  for (int icon = NSMCON_OUT; icon < ncon; icon++) {
+    NSMcon& con = sys.con[icon];
+    char name[32];
+
+    if (icon == NSMCON_TCP) {
+      strcpy(name, "name=[TCP]");
+    } else if (icon == NSMCON_UDP) {
+      strcpy(name, "name=[BCAST]");
+    } else if (ItsLocal(icon)) {
+      //S(name, "name=%s", sys->nod[sys->con[i].nid].name);
+      S(name, "nodeid=%d", con.nid);
+    } else {
+      S(name, "host=%s", nsminfo_hoststr(AddrConn(icon)));
+    }
+    P("CONN %-3.1d nid=%3d pid=%5d sock=%2d rtim=%-6.6s %s%s\n",
+      icon,
+      con.nid, con.pid, con.sock, nsminfo_timestr(con.timstart), name,
+      (icon == sys.master) ? " M" : ((icon == sys.deputy) ? " D" : ""));
+  }
+}
+// -- node --------------------------------------------------------------
+void
+nsminfo_node(int all = 0)
+{
+  NSMsys& sys = *nsmd_sysp;
+
+  for (int inod = 0; inod < NSMSYS_MAX_NOD; inod++) {
+    NSMnod& nod = sys.nod[inod];
+    if (! nod.name[0]) continue;
+
+    P("NODE %-3.1d %-31.31s pid/uid=%-5.1d/%-5.1d @%s %d\n",
+      inod, nod.name, (int32)ntohl(nod.nodpid), ntohl(nod.noduid),
+      nsminfo_hoststr(nod.ipaddr), (int16_t)ntohs(nod.noddat));
+  }
+}
+// -- req ---------------------------------------------------------------
+void
+nsminfo_req(int all = 0)
+{
+  NSMsys& sys = *nsmd_sysp;
+
+  for (int ireq = 0; ireq < NSMSYS_MAX_REQ; ireq++) {
+    NSMreq& req = sys.req[ireq];
+    if (! req.code || ! req.name[0]) continue;
+
+    int hash = nsmlib_hash(&sys, sys.reqhash, NSMSYS_MAX_HASH, req.name, 0);
+    int reqpos = ntohl(sys.reqhash[hash]);
+    NSMreq* reqp = (NSMreq*)SYSPTR(reqpos);
+
+    P("REQ  %-3.1d %-31.31s code=%04x hash=%d(%d,%04x)\n",
+      ireq, req.name, ntohs(req.code), hash, reqpos,
+      hash >= 0 && reqpos > 0 && reqpos < sizeof(sys)
+      ? ntohs(reqp->code) : -1);
+  }
+}
+// -- dat ---------------------------------------------------------------
+void
+nsminfo_dat(int all = 0)
+{
+  NSMsys& sys = *nsmd_sysp;
+
+  for (int idat = 0; idat < NSMSYS_MAX_DAT; idat++) {
+    NSMdat& dat = sys.dat[idat];
+    if (dat.dtsiz == 0 && xverbose == 0) continue;
+    if (xverbose) {
+      P("DAT  %-3.1d %-31.31s pos=%d sz=%d nod=%d rev=%d ref=%d fmt=%s\n",
+        idat, dat.dtnam, ntohl(dat.dtpos), ntohs(dat.dtsiz),
+        (int16_t)ntohs(dat.owner), ntohs(dat.dtrev), ntohs(dat.dtref),
+        dat.dtfmt);
+    } else {
+      P("DAT  %-3.1d %-31.31s sz=%d nod=%d rev=%d ref=%d fmt=%s\n",
+        idat, dat.dtnam, ntohs(dat.dtsiz),
+        (int16_t)ntohs(dat.owner), ntohs(dat.dtrev), ntohs(dat.dtref),
+        dat.dtfmt);
+    }
+  }
+}
+// -- ref ---------------------------------------------------------------
+void
+nsminfo_ref(int all = 0)
+{
+  NSMsys& sys = *nsmd_sysp;
+
+  for (int iref = 0; iref < NSMSYS_MAX_DAT; iref++) {
+    NSMref& ref = sys.ref[iref];
+    if (ref.refnod == -1) continue;
+    P("REF  %-3.1d: %-3.1d => %-3.1d\n",
+      iref, ntohs(ref.refnod), ntohs(ref.refdat));
+  }
+}
+// -- disid -------------------------------------------------------------
+void
+nsminfo_disid(int all = 0)
+{
+  NSMsys& sys = *nsmd_sysp;
+
+  P("nsnd = %d\n", sys.nsnd);
+
+  for (int i = 0; i < sys.nsnd; i++) {
+    P("SND%d disid=%d disnod=%d\n",
+      i, sys.snd[i].disid, sys.snd[i].disnod);
+  }
+}
+// -- conid -------------------------------------------------------------
+void
+nsminfo_conid(int all = 0)
+{
+  NSMsys& sys = *nsmd_sysp;
+  int nnod = (int16_t)ntohs(sys.nnod);
+
+  for (int i = 0; i < nnod; i++) {
+    if ((i % 10) == 0) P("CONID");
+    PP(" %d=>%d", i, sys.conid[i]);
+    if ((i % 10) == 9 || i == nnod - 1) PP("\n");
+  }
+}
+// -- alist -------------------------------------------------------------
+void
+nsminfo_alist(int all = 0)
+{
+  NSMsys& sys = *nsmd_sysp;
+  int anext = (int16_t)ntohs(sys.afirst);
+  int amax = 1024;
+
+  P("alist = %d", anext);
+  while (amax-- > 0 && anext != -1) {
+    NSMdat& dat = sys.dat[anext];
+    anext = (int16_t)ntohs(dat.anext);
+    PP(" %d", anext);
+  }
+  PP("\n");
+}
+// -- nsminfo2 ----------------------------------------------------------
+//
+// ----------------------------------------------------------------------
+void
+nsminfo2()
+{
+  if (! nsmd_sysp || ! nsmd_memp) return;
+
+  nsminfo_head();
+  nsminfo_conn();
+  nsminfo_node();
+  nsminfo_req();
+  nsminfo_dat();
+  nsminfo_ref();
+
+  if (showalist) nsminfo_alist();
+  if (showdisid) nsminfo_disid();
+  if (showconid) nsminfo_conid();
+}
 // -- nsmd_atoi ---------------------------------------------------------
 //    a bit more intelligent than atoi
 // ----------------------------------------------------------------------
+#ifndef NSMD2INFO
 int
 nsmd_atoi(const char* a, int def = 0)
 {
@@ -69,9 +382,11 @@ nsmd_atoi(const char* a, int def = 0)
     return (int)strtol(a, 0, 0);
   }
 }
+#endif
 // -- init --------------------------------------------------------------
+#ifndef NSMD2INFO
 void
-nsminfo_init(int nsmd_shmkey)
+nsminfo2_init(int nsmd_shmkey)
 {
   int id;
   if ((id = shmget(nsmd_shmkey, sizeof(*nsmd_sysp), 0444)) < 0) {
@@ -107,282 +422,16 @@ nsminfo_init(int nsmd_shmkey)
     exit(1);
   }
 }
-// -- hoststr -----------------------------------------------------------
-const char*
-nsminfo_hoststr(int ip, int iponly = 0) // ip: network byte order
-{
-  static char host[16][256];
-  static int ihost = 0;
-  int iph = ntohl(ip);
-
-  memset(host[ihost], 0, sizeof(host[ihost]));
-  char* hostp = host[ihost];
-  ihost = (ihost + 1) % 16;
-
-  iponly = 1;
-
-  if (iponly) {
-    sprintf(hostp, "%d.%d.%d.%d",
-            (iph >> 24) & 255, (iph >> 16) & 255, (iph >> 8) & 255, (iph >> 0) & 255);
-  }
-
-  return hostp;
-}
-// -- timestr -----------------------------------------------------------
-const char*
-nsminfo_timestr(time_t t, int typ = 0)
-{
-  static char timestr[16][256];
-  static int itime = 0;
-
-  memset(timestr[itime], 0, sizeof(timestr[itime]));
-  char* timep = timestr[itime];
-  itime = (itime + 1) % 16;
-
-  if (typ == 0) {
-    if (t == 0) return "unknown";
-
-    time_t now = time(0);
-    int dt = now - t;
-    if (dt < 0) {
-      return "negative-time";
-    } else if (dt < 60) {
-      sprintf(timep, "%ds", dt);
-    } else if (dt < 60 * 60) {
-      sprintf(timep, "%dm%02ds", dt / 60, dt % 60);
-    } else if (dt < 60 * 60 * 24) {
-      sprintf(timep, "%dh%02dm", (dt / 60) / 60, (dt / 60) % 60);
-    } else {
-      sprintf(timep, "%dd%02dh", (dt / 3600) / 24, (dt / 3600) % 24);
-    }
-  } else {
-    if (t == 0) return "unknown-time";
-
-    tm tmbuf;
-    localtime_r(&t, &tmbuf);
-    sprintf(timep, "%04d.%02d.%02d-%02d:%02d:%02d",
-            tmbuf.tm_year + 1900, tmbuf.tm_mon + 1, tmbuf.tm_mday,
-            tmbuf.tm_hour, tmbuf.tm_min, tmbuf.tm_sec);
-  }
-
-  return timep;
-}
-// -- head --------------------------------------------------------------
-void
-nsminfo_head()
-{
-  NSMsys& sys = *nsmd_sysp;
-  NSMmem& mem = *nsmd_memp;
-  pid_t  pid    = sys.pid;
-  time_t tstart = sys.timstart;
-  time_t tevent = sys.timevent;
-  int badmem = 0;
-  NSMcon& master = sys.con[sys.master];
-  NSMcon& udpcon = sys.con[NSMCON_UDP];
-  NSMcon& tcpcon = sys.con[NSMCON_TCP];
-
-  if (sys.master == NSMCON_NON) {
-    printf("NSM network is not started yet\n");
-  } else {
-    printf("NSM network started at %s (%s ago)\n",
-           nsminfo_timestr(tcpcon.timstart, 1),
-           nsminfo_timestr(tcpcon.timstart));
-  }
-  printf("NSMD daemon started at %s (%s ago)\n",
-         nsminfo_timestr(udpcon.timstart, 1),
-         nsminfo_timestr(udpcon.timstart));
-
-  printf("MASTER(%d) %s %s, DEPUTY(%d) %s %s, I'm %s nsmd\n",
-         sys.master,
-         sys.master == NSMCON_NON ? "is" : "at",
-         sys.master == NSMCON_NON ? "missing" : nsminfo_hoststr(AddrMaster()),
-         sys.deputy,
-         sys.deputy == NSMCON_NON ? "is" : "at",
-         sys.deputy == NSMCON_NON ? "missing" : nsminfo_hoststr(AddrDeputy()),
-         sys.master == NSMCON_TCP ? "the MASTER" :
-         sys.deputy == NSMCON_TCP ? "the DEPUTY" : "a MEMBER");
-
-  if (sys.ipaddr != mem.ipaddr) {
-    printf("inconsistent ipaddr: %s(sys) vs %s(mem)\n",
-           nsminfo_hoststr(sys.ipaddr, 1), nsminfo_hoststr(mem.ipaddr, 1));
-    badmem++;
-  }
-  if (pid != mem.pid) {
-    printf("inconsistent process-id: %d vs %d\n", pid, mem.pid);
-    badmem++;
-  }
-  if (tstart != mem.timstart) {
-    printf("inconsistent start time: %d vs %d\n",
-           (int)tstart, (int)mem.timstart);
-    badmem++;
-  }
-  if (abs(tevent - mem.timevent) > 1) {
-    printf("inconsistent time: %d vs %d\n",
-           (int)tevent, (int)mem.timevent);
-    badmem++;
-  }
-  if (badmem && ! xforce) {
-    exit(1);
-  }
-
-  printf("NSMD shmkey = %d, ip = %s, pid = %d\n",
-         nsmd_shmkey, nsminfo_hoststr(sys.ipaddr, 1),
-         nsmd_sysp->pid);
-  printf("     created %s ago, last updated %s ago%s\n",
-         nsminfo_timestr(sys.timstart),
-         nsminfo_timestr(sys.timevent),
-         (time(0) - sys.timevent <= 2) ? " (up-to-date)" : "");
-}
-// -- conn --------------------------------------------------------------
-void
-nsminfo_conn(int all = 0)
-{
-  NSMsys& sys = *nsmd_sysp;
-  int ncon = all ? NSMSYS_MAX_CON : sys.ncon;
-
-  for (int icon = NSMCON_OUT; icon < ncon; icon++) {
-    NSMcon& con = sys.con[icon];
-    char name[32];
-
-    if (icon == NSMCON_TCP) {
-      strcpy(name, "name=[TCP]");
-    } else if (icon == NSMCON_UDP) {
-      strcpy(name, "name=[BCAST]");
-    } else if (ItsLocal(icon)) {
-      //sprintf(name, "name=%s", sys->nod[sys->con[i].nid].name);
-      sprintf(name, "nodeid=%d", con.nid);
-    } else {
-      sprintf(name, "host=%s", nsminfo_hoststr(AddrConn(icon)));
-    }
-    printf("CONN %-3.1d nid=%3d pid=%5d sock=%2d rtim=%-6.6s %s%s\n",
-           icon,
-           con.nid, con.pid, con.sock, nsminfo_timestr(con.timstart), name,
-           (icon == sys.master) ? " M" : ((icon == sys.deputy) ? " D" : "")
-          );
-  }
-}
-// -- node --------------------------------------------------------------
-void
-nsminfo_node(int all = 0)
-{
-  NSMsys& sys = *nsmd_sysp;
-
-  for (int inod = 0; inod < NSMSYS_MAX_NOD; inod++) {
-    NSMnod& nod = sys.nod[inod];
-    if (! nod.name[0]) continue;
-
-    printf("NODE %-3.1d %-31.31s pid/uid=%-5.1d/%-5.1d @%s %d\n",
-           inod, nod.name, (int32)ntohl(nod.nodpid), ntohl(nod.noduid),
-           nsminfo_hoststr(nod.ipaddr), (int16_t)ntohs(nod.noddat));
-  }
-}
-// -- req ---------------------------------------------------------------
-void
-nsminfo_req(int all = 0)
-{
-  NSMsys& sys = *nsmd_sysp;
-
-  for (int ireq = 0; ireq < NSMSYS_MAX_REQ; ireq++) {
-    NSMreq& req = sys.req[ireq];
-    if (! req.code || ! req.name[0]) continue;
-
-    int hash = nsmlib_hash(&sys, sys.reqhash, NSMSYS_MAX_HASH, req.name, 0);
-    int reqpos = ntohl(sys.reqhash[hash]);
-    NSMreq* reqp = (NSMreq*)SYSPTR(reqpos);
-
-    printf("REQ  %-3.1d %-31.31s code=%04x hash=%d(%d,%04x)\n",
-           ireq, req.name, ntohs(req.code), hash, reqpos,
-           hash >= 0 && reqpos > 0 && reqpos < sizeof(sys) ? ntohs(reqp->code) : -1);
-  }
-}
-// -- dat ---------------------------------------------------------------
-void
-nsminfo_dat(int all = 0)
-{
-  NSMsys& sys = *nsmd_sysp;
-
-  for (int idat = 0; idat < NSMSYS_MAX_DAT; idat++) {
-    NSMdat& dat = sys.dat[idat];
-    if (dat.dtsiz == 0 && xverbose == 0) continue;
-    if (xverbose) {
-      printf("DAT  %-3.1d %-31.31s pos=%d sz=%d nod=%d rev=%d ref=%d fmt=%s\n",
-             idat, dat.dtnam, ntohl(dat.dtpos), ntohs(dat.dtsiz),
-             (int16_t)ntohs(dat.owner), ntohs(dat.dtrev), ntohs(dat.dtref),
-             dat.dtfmt);
-    } else {
-      printf("DAT  %-3.1d %-31.31s sz=%d nod=%d rev=%d ref=%d fmt=%s\n",
-             idat, dat.dtnam, ntohs(dat.dtsiz),
-             (int16_t)ntohs(dat.owner), ntohs(dat.dtrev), ntohs(dat.dtref),
-             dat.dtfmt);
-    }
-  }
-}
-// -- ref ---------------------------------------------------------------
-void
-nsminfo_ref(int all = 0)
-{
-  NSMsys& sys = *nsmd_sysp;
-
-  for (int iref = 0; iref < NSMSYS_MAX_DAT; iref++) {
-    NSMref& ref = sys.ref[iref];
-    if (ref.refnod == -1) continue;
-    printf("REF  %-3.1d: %-3.1d => %-3.1d\n",
-           iref, ntohs(ref.refnod), ntohs(ref.refdat));
-  }
-}
-// -- disid -------------------------------------------------------------
-void
-nsminfo_disid(int all = 0)
-{
-  NSMsys& sys = *nsmd_sysp;
-
-  printf("nsnd = %d\n", sys.nsnd);
-
-  for (int i = 0; i < sys.nsnd; i++) {
-    printf("SND%d disid=%d disnod=%d\n",
-           i, sys.snd[i].disid, sys.snd[i].disnod);
-  }
-}
-// -- conid -------------------------------------------------------------
-void
-nsminfo_conid(int all = 0)
-{
-  NSMsys& sys = *nsmd_sysp;
-  int nnod = (int16_t)ntohs(sys.nnod);
-
-  for (int i = 0; i < nnod; i++) {
-    if ((i % 10) == 0) printf("CONID");
-    printf(" %d=>%d", i, sys.conid[i]);
-    if ((i % 10) == 9 || i == nnod - 1) printf("\n");
-  }
-}
-// -- alist -------------------------------------------------------------
-void
-nsminfo_alist(int all = 0)
-{
-  NSMsys& sys = *nsmd_sysp;
-  int anext = (int16_t)ntohs(sys.afirst);
-  int amax = 1024;
-
-  printf("alist = %d", anext);
-  while (amax-- > 0 && anext != -1) {
-    NSMdat& dat = sys.dat[anext];
-    anext = (int16_t)ntohs(dat.anext);
-    printf(" %d", anext);
-  }
-  printf("\n");
-}
+#endif /* NSMD2INFO */
 // -- main --------------------------------------------------------------
 //
 // ----------------------------------------------------------------------
+#ifndef NSMD2INFO
 int
 main(int argc, char** argv)
 {
   int port = -1;
   int shmkey = -1;
-  int showalist = 0;
-  int showdisid = 0;
-  int showconid = 0;
 
   // option loop
   while (argc > 1 && argv[1][0] == '-') {
@@ -427,18 +476,10 @@ main(int argc, char** argv)
   if (shmkey >= 0) nsmd_shmkey = shmkey;
   if (nsmd_shmkey < 0) nsmd_shmkey = nsmd_port;
 
-  nsminfo_init(nsmd_shmkey);
-  nsminfo_head();
-  nsminfo_conn();
-  nsminfo_node();
-  nsminfo_req();
-  nsminfo_dat();
-  nsminfo_ref();
-
-  if (showalist) nsminfo_alist();
-  if (showdisid) nsminfo_disid();
-  if (showconid) nsminfo_conid();
+  nsminfo2_init(nsmd_shmkey);
+  nsminfo2();
 }
+#endif /* NSMD2INFO */
 // ----------------------------------------------------------------------
 // -- (emacs outline mode setup)
 // Local Variables: ***

@@ -24,6 +24,7 @@ int b2nsm_sendreq(const char* node, const char* req, int npar, int32_t* pars);
 int b2nsm_ok(NSMmsg* msg, const char* newstate, const char* fmt, ...);
 int b2nsm_error(NSMmsg* msg, const char* fmt, ...);
 int b2nsm_fatal(const char* newstate, const char* fmt, ...);
+int b2nsm_debuglevel(int val);
 void b2nsm_logging(FILE* fp);
 void b2nsm_logging2(FILE* fp, const char* prefix);
 int b2nsm_wait(float timeout);

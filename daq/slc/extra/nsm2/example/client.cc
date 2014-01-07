@@ -9,6 +9,9 @@
 //  - periodically send INFO message
 // ----------------------------------------------------------------------
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
 #include <unistd.h>
 #include "nsm2.h"
 #include "belle2nsm.h"
@@ -83,6 +86,11 @@ main(int argc, char** argv)
     return 1;
   }
 
+  // debug level
+  if (argc > 2 && strncmp(argv[2], "-d", 2) == 0) {
+    b2nsm_debuglevel(isdigit(argv[2][2]) ? atoi(&argv[2][2]) : 1);
+  }
+
   // INIT
   if (! b2nsm_init(nodename)) {
     printf("%s: b2nsm_init %s\n", program, b2nsm_strerror());
@@ -103,12 +111,10 @@ main(int argc, char** argv)
 
   // REGISTER callback functions
   if (b2nsm_callback("START", client_start) < 0) {
-    printf("%s: callback(START) %s\n", program, b2nsm_strerror());
-    return 1;
+    return 1; /* error message is already printed by b2nsm_logging */
   }
   if (b2nsm_callback("STOP", client_stop) < 0) {
-    printf("%s: callback(START) %s\n", program, b2nsm_strerror());
-    return 1;
+    return 1; /* error message is already printed by b2nsm_logging */
   }
 
   // INFINITE-LOOP

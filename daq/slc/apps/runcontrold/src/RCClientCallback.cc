@@ -37,6 +37,10 @@ bool RCClientCallback::ok() throw()
   int id = nsm.getNodeId();
   _master->lock();
   NSMNode* node = _master->findNode(id, nsm);
+  if (node == NULL) {
+    Belle2::debug("Got OK from unknown node (id=%d) ", id);
+    return true;
+  }
   node->setState(State(nsm.getData()));
   if (node->getConnection() != Connection::ONLINE) {
     RCCommunicator* comm = _master->getClientCommunicator();
@@ -78,6 +82,10 @@ bool RCClientCallback::error() throw()
   int id = nsm.getNodeId();
   _master->unlock();
   NSMNode* node = _master->findNode(id, nsm);
+  if (node == NULL) {
+    Belle2::debug("Got OK from unknown node (id=%d) ", id);
+    return true;
+  }
   node->setState(State::ERROR_ES);
   node->setConnection(Connection::ONLINE);
   _master->getStatus()->update();
@@ -86,17 +94,13 @@ bool RCClientCallback::error() throw()
   bool result = (comm != NULL) ? comm->sendMessage(msg) : true;
   _master->signal();
   _master->unlock();
-  Belle2::debug("ERROR from %s ()", node->getName().c_str(), nsm.getData().c_str());
+  Belle2::debug("[ERROR] %s got error (message = %s)", node->getName().c_str(), nsm.getData().c_str());
   return result;
 }
 
 void RCClientCallback::selfCheck() throw(NSMHandlerException)
 {
   _master->lock();
-  if (_master->getNode()->getState() == State::RUNNING_S) {
-    _master->unlock();
-    return;
-  }
   RCCommunicator* comm = _master->getClientCommunicator();
   RunControlMessage msg(NULL, Command::STATECHECK);
   RCCommunicator* master_comm = _master->getMasterCommunicator();
@@ -119,11 +123,15 @@ void RCClientCallback::selfCheck() throw(NSMHandlerException)
           }
         }
       }
-      if (!comm->sendMessage(msg)) {
-        _master->getNode()->setState(State::ERROR_ES);
-        if (master_comm != NULL) {
-          master_comm->sendState(node);
-          master_comm->sendState(_master->getNode());
+      State& state(node->getState());
+      if (state != State::RUNNING_S &&
+          !state.isTransaction() && state.isRecovering()) {
+        if (!comm->sendMessage(msg)) {
+          _master->getNode()->setState(State::ERROR_ES);
+          if (master_comm != NULL) {
+            master_comm->sendState(node);
+            master_comm->sendState(_master->getNode());
+          }
         }
       }
     } catch (const IOException& e) {

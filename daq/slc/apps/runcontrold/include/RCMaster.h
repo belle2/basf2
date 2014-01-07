@@ -55,8 +55,11 @@ namespace Belle2 {
     RunConfig* getConfig() { return _config; }
     RCDatabaseManager* getDBManager() { return _dbmanager; }
     void setDBManager(RCDatabaseManager* manager) { _dbmanager = manager; }
+    bool isSending() const { return _is_sending; }
+    void setSending(bool sending) { _is_sending = sending; }
 
   private:
+    bool _is_sending;
     Mutex _mutex;
     Cond _cond;
     NSMNode* _master_node;

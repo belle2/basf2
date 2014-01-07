@@ -8,7 +8,7 @@ restartBySSH() {
   ssh $1 "source ~/belle2/release/daq/slc/extra/bin/setup.sh ~/belle2 release local $2 $3 $4&> ~/run/$2/$1/${label}.log" &
 }
 
-mkdir -p ~/run/rocontrold/belle-rpc1/logger
+mkdir -p ~/run/logger/belle-rpc1
 kill `ps aux | grep "loggerd SV" | grep -v grep | awk '{print $2}'`
-source ../../../extra/bin/setup.sh ~/belle2 release global logcollectord &> ~/run/rocontrold/belle-rpc1/logger/logcollectord-${label}.log &
+source ~/belle2/release/daq/slc/extra/bin/setup.sh ~/belle2 release global logcollectord &> ~/run/logger/belle-rpc1/logcollectord-${label}.log &
 

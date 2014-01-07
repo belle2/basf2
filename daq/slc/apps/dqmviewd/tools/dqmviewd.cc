@@ -49,7 +49,8 @@ int main(int argc, char** argv)
           config.clear();
           config.read(map_path + "/" + filename);
           std::string pack_name = config.get("DQM_PACKAGE_NAME");
-          if (pack_name.size() == 0) continue;
+          int pack_port = config.getInt("DQM_PACKAGE_PORT");
+          if (pack_name.size() == 0 || pack_port == 0) continue;
           std::string pack_map   = config.get("DQM_PACKAGE_MAP");
           std::string pack_lib   = config.get("DQM_PACKAGE_LIB");
           std::string pack_class = config.get("DQM_PACKAGE_CLASS");

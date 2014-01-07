@@ -5,6 +5,7 @@
 #include "daq/slc/base/Date.h"
 
 #include <unistd.h>
+#include <cstdlib>
 
 using namespace Belle2;
 
@@ -36,21 +37,13 @@ void NSMNodeDaemon::init() throw(NSMHandlerException)
                   _host.c_str(), _port);
     delete _nsm_comm;
     _nsm_comm = NULL;
-    throw (e);
+    exit(1);
   }
+  Belle2::debug("[DEBUG] Connected to NSM2 daemon");
 }
+
 void NSMNodeDaemon::run() throw()
 {
-  while (_nsm_comm == NULL) {
-    try {
-      init();
-      break;
-    } catch (const NSMHandlerException& e) {
-      Belle2::debug("[DEBUG] Failed to connect NSM network (%s:%d). Re-trying to connect...",
-                    _host.c_str(), _port);
-      sleep(3);
-    }
-  }
   try {
     while (true) {
       if (_nsm_comm->wait(2)) {
@@ -61,7 +54,7 @@ void NSMNodeDaemon::run() throw()
       }
     }
   } catch (const std::exception& e) {
-    Belle2::debug("NSM node daemon : Caught exception (%s). Terminate process...",
+    Belle2::debug("[ERROR] NSM node daemon : Caught exception (%s). Terminate process...",
                   e.what());
   }
 }

@@ -19,7 +19,7 @@ ROCallback::~ROCallback() throw()
 
 void ROCallback::init() throw()
 {
-  _con.init();
+  _con.init("basf2");
 }
 
 bool ROCallback::boot() throw()
@@ -36,7 +36,7 @@ bool ROCallback::load() throw()
   _con.addArgument(_dir + _node->getData()->getText("script"));
   _con.addArgument("1");
   _con.addArgument("5101");
-  _con.addArgument(_node->getName());
+  _con.addArgument("basf2");
   if (_con.load(10)) {
     Belle2::debug("(DEBUG) load succeded");
   } else {

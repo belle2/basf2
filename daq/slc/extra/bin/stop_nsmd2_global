@@ -5,7 +5,7 @@ stopBySSH() {
 }
 
 #stopBySSH belle-rpc1 global
-stopBySSH belle-rpc2 global
-stopBySSH belle-hltin global
-stopBySSH belle-reco global
+#stopBySSH belle-rpc2 global
+#stopBySSH belle-hltin global
+#stopBySSH belle-reco global
 

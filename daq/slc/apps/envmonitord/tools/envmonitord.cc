@@ -41,8 +41,10 @@ int main(int argc, char** argv)
 
   ConfigFile config("slowcontrol");
   DBInterface* db =
-    new PostgreSQLInterface(config.get("DATABASE_HOST"), config.get("DATABASE_NAME"),
-                            config.get("DATABASE_USER"), config.get("DATABASE_PASS"),
+    new PostgreSQLInterface(config.get("DATABASE_HOST"),
+                            config.get("DATABASE_NAME"),
+                            config.get("DATABASE_USER"),
+                            config.get("DATABASE_PASS"),
                             config.getInt("DATABASE_PORT"));
   EnvDBRecorder::setDB(db);
 

@@ -12,6 +12,7 @@ RCMaster::RCMaster(NSMNode* node,
   _config = config;
   if (_config != NULL) _config->setMaster(this);
   _status = status;
+  _is_sending = false;
 }
 
 RCMaster::~RCMaster() throw()

@@ -26,7 +26,7 @@ COPPERCallback::~COPPERCallback() throw()
 
 void COPPERCallback::init() throw()
 {
-  _con.init(_node->getName());
+  _con.init("basf2");
   ConfigFile(_rc_config);
 }
 
@@ -86,11 +86,13 @@ bool COPPERCallback::load() throw()
   _con.addArgument(Belle2::form("%s/daq/rawdata/examples/",
                                 getenv("BELLE2_LOCAL_DIR"))
                    + data->getText("script"));
-  _con.addArgument(data->getText("host"));
+  //_con.addArgument(data->getText("host"));
+  _con.addArgument(config.get(Belle2::form("COPPER_HOST_%s",
+                                           _node->getName().c_str())));
   _con.addArgument(Belle2::form("%d", (int)_node->getData()->getId()));
   _con.addArgument(Belle2::form("%d", flag));
   _con.addArgument("1");
-  _con.addArgument(_node->getName());
+  _con.addArgument("basf2");
   if (_con.load(20)) {
     Belle2::debug("(DEBUG) load succeded");
   } else {

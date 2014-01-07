@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <nsm2/nsm2.h>
@@ -27,15 +28,17 @@ int main(int argc, char** argv)
     priority = 6;// FATAL
   }
   NSMcontext* nsmc = NULL;
-  if ((nsmc = b2nsm_init(nodename)) <= 0) {
+  if ((nsmc = b2nsm_init(nodename)) == 0) {
     printf("[FATAL] Failed to connect NSM : %s", b2nsm_strerror());
     return 1;
   }
   int date = time(NULL);
   int pars[3] = {priority, date, 0};
-  int len = strlen(message);
+  char send_message[200];
+  sprintf(send_message, ";%s;%s;%s", getenv("HOSTNAME"), nodename, message);
+  int len = strlen(send_message);
   if (b2nsm_sendany("LOGGER", "LOG",
-                    3, (int*)pars, len, message, NULL) <= 0) {
+                    3, (int*)pars, len, send_message, NULL) <= 0) {
     printf("Failed\n");
   } else {
     printf("Succeded\n");

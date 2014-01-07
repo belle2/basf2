@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <object name="TTD" revision="1" >
-  <object name="TTD" class="TTD" host="ttd10" ftsw="55" synchronize="true" />
+  <object name="TTD" class="TTD" synchronized="true" />
 </object>

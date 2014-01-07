@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <object name="SVD" revision="3" >
-  <object name="CPR010" host="cpr012" class="SVD_COPPER" script="RecvSendCOPPER.py" synchronized="false" />
-  <object name="CPR011" host="cpr013" class="SVD_COPPER" script="RecvSendCOPPER.py" />
-  <object name="ROPC01" host="ropc01" class="ROPC" script="RecvStream1.py" hosts="ttd3 cpr013 cpr014" synchronized="true" />
+  <object name="CPR010" class="SVD_COPPER" script="RecvSendCOPPER.py" synchronized="false" />
+  <object name="CPR011" class="SVD_COPPER" script="RecvSendCOPPER.py" synchronized="false" />
+  <object name="ROPC01" class="ROPC" script="RecvStream1.py" synchronized="true" />
 </object>

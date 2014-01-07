@@ -84,13 +84,13 @@ void RCSequencer::run() throw()
 
           }
         } else {
-          //Belle2::debug("[DEBUG] node = %s", node->getName().c_str());
+          Belle2::debug("[DEBUG] node = %s", node->getName().c_str());
           comm->sendMessage(_msg);
         }
         _master->unlock();
-        //if ( /*_synchronized &&*/ !_master->isSynchronized(node)) {
-        __cond.wait(__mutex);
-        //}
+        if (!_master->isSynchronized(node)) {
+          __cond.wait(__mutex);
+        }
       } else {
         _master->unlock();
       }

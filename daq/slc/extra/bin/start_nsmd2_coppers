@@ -8,13 +8,13 @@ startBySSH() {
 }
 
 startBySSH belle-rpc1 nsmd2
-sleep 3
-startBySSH ttd10 nsmd2
-sleep 1
+sleep 2
 startBySSH cpr010 nsmd2
-sleep 1
+sleep 2
 startBySSH cpr011 nsmd2
-sleep 1
+sleep 2
 startBySSH cpr012 nsmd2
-sleep 1
+sleep 2
 startBySSH cpr013 nsmd2
+sleep 2
+startBySSH ttd10 nsmd2

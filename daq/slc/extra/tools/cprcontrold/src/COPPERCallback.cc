@@ -93,7 +93,7 @@ bool COPPERCallback::load() throw()
   _con.addArgument(Belle2::form("%d", flag));
   _con.addArgument("1");
   _con.addArgument("basf2");
-  if (_con.load(20)) {
+  if (_con.load(30)) {
     Belle2::debug("(DEBUG) load succeded");
   } else {
     Belle2::debug("(DEBUG) load timeout");
@@ -126,7 +126,7 @@ bool COPPERCallback::pause() throw()
 bool COPPERCallback::recover() throw()
 {
   Belle2::debug("RECOVER");
-  return (abort() && load());
+  return (abort() && boot() && load());
 }
 
 bool COPPERCallback::abort() throw()

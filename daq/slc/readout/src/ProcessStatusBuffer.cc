@@ -90,7 +90,6 @@ bool ProcessStatusBuffer::reportRunning()
   _buf.lock();
   _buf.setState(RunInfoBuffer::RUNNING);
   _buf.notify();
-  Belle2::debug("%s:%d", __FILE__, __LINE__);
   _buf.unlock();
   return true;
 }

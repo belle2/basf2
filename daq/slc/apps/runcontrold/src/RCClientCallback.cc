@@ -14,7 +14,7 @@ using namespace Belle2;
 RCClientCallback::RCClientCallback(NSMNode* node, RCMaster* master)
   : RCCallback(node), _master(master)
 {
-
+  _requested_once = false;
 }
 
 RCClientCallback::~RCClientCallback() throw()
@@ -119,18 +119,17 @@ void RCClientCallback::selfCheck() throw(NSMHandlerException)
           _master->getNode()->setState(State::ERROR_ES);
           if (master_comm != NULL) {
             master_comm->sendState(node);
-            master_comm->sendState(_master->getNode());
           }
         }
       }
       State& state(node->getState());
-      if (state != State::RUNNING_S &&
-          !state.isTransaction() && state.isRecovering()) {
+      if (!_requested_once
+          || (state != State::RUNNING_S &&
+              !state.isTransaction() && !state.isRecovering())) {
         if (!comm->sendMessage(msg)) {
           _master->getNode()->setState(State::ERROR_ES);
           if (master_comm != NULL) {
             master_comm->sendState(node);
-            master_comm->sendState(_master->getNode());
           }
         }
       }
@@ -146,5 +145,6 @@ void RCClientCallback::selfCheck() throw(NSMHandlerException)
   if (master_comm != NULL) {
     master_comm->sendState(_master->getNode());
   }
+  _requested_once = true;
   _master->unlock();
 }

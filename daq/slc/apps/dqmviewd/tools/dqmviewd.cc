@@ -66,7 +66,7 @@ int main(int argc, char** argv)
   const std::string hostname = config.get("DQM_GUI_HOST");
   const int port = config.getInt("DQM_GUI_PORT");
   master->setDirectory(map_path);
-  DIR* dir = opendir(map_path.c_str());
+  DIR* dir = opendir(config_path.c_str());
   int count = 0;
   if (dir != NULL) {
     struct dirent* entry;
@@ -75,7 +75,7 @@ int main(int argc, char** argv)
         std::string filename = entry->d_name;
         if (filename.find(".conf") != std::string::npos) {
           config.clear();
-          config.read(map_path + "/" + filename);
+          config.read(config_path + "/" + filename);
           std::string pack_name = config.get("DQM_PACKAGE_NAME");
           int pack_port = config.getInt("DQM_PACKAGE_PORT");
           if (pack_name.size() == 0 || pack_port == 0) continue;

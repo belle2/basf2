@@ -27,6 +27,11 @@ bool PackageManager::init()
 {
   _lock.wrlock();
   _monitor->init();
+  if (getPackage()->getNHistos() == 0) {
+    _available = false;
+    _lock.unlock();
+    return false;
+  }
   _serializer.allocate(getPackage());
   _serializer.update();
   _available = true;

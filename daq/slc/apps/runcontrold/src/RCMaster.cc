@@ -88,6 +88,7 @@ void RCMaster::addNode(NSMNode* node) throw()
 bool RCMaster::isSynchronized(NSMNode* node_in)
 {
   if (node_in == NULL) return false;
+  if (!node_in->isSynchronized()) return true;
   for (RCMaster::NSMNodeList::iterator it = getNSMNodes().begin();
        it != getNSMNodes().end(); it++) {
     NSMNode* node = *it;

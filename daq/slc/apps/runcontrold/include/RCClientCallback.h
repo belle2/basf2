@@ -21,6 +21,7 @@ namespace Belle2 {
 
   private:
     RCMaster* _master;
+    bool _requested_once;
 
   };
 

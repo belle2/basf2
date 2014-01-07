@@ -132,26 +132,26 @@ void SVDUnpackerModule::fillSVDDigitList(int nWords, uint32_t* data32_in,  Store
   if (theFTBHeader->controlWord != 0xffaa0000) {
     B2WARNING("OOOOPS: WRONG FTB header format 0x" << std::hex << theFTBHeader->controlWord);
     return;
-  }
-  B2DEBUG(1, "FTB header format checked");
-
+  } else
+    B2DEBUG(1, "FTB header format checked");
 
   data32 += 2;
+
   //read Main Header:
   struct MainHeader* theMainHeader = (struct MainHeader*)data32;
 
   if (theMainHeader->check != 0x6) {
     B2WARNING("OOOOPS: WRONG main header format 0x" << std::hex << theMainHeader->check);
     return;
-  }
-  B2DEBUG(1, "main header format checked");
+  } else
+    B2DEBUG(1, "main header format checked");
 
   //check run typea
   if (theMainHeader->runType != 0x2) {
     B2WARNING("OOOOPS: WRONG main runType (expected = zero-suppressed), got 0x" << std::hex << theMainHeader->runType);
     return;
-  }
-  B2DEBUG(1, "run type checked (zerosuppressed)");
+  } else
+    B2DEBUG(1, "run type checked (zerosuppressed)");
 
   //read APV Header:
   struct APVHeader* theAPVHeader = (struct APVHeader*)(++data32);
@@ -159,18 +159,18 @@ void SVDUnpackerModule::fillSVDDigitList(int nWords, uint32_t* data32_in,  Store
   if (theAPVHeader->check != 0x2) {
     B2WARNING("OOOOPS: WRONG APV header format 0x" << std::hex << theAPVHeader->check);
     return;
-  }
-  B2DEBUG(1, "APV header format checked");
+  } else
+    B2DEBUG(1, "APV header format checked");
 
   //read data samples (if there):
 
   struct data* aSample;
   struct trailer* theTrailer;
-  struct FTBTrailer* theFTBTrailer;
 
   bool trailerFound = false;
 
   ++data32;
+
   for (; !trailerFound  && (data32 != &data32_in[nWords]); ++data32) {
 
     if (((*data32 >> 31) & 0x1) == 0) {    //zero-suppressed data
@@ -206,24 +206,27 @@ void SVDUnpackerModule::fillSVDDigitList(int nWords, uint32_t* data32_in,  Store
       assert(theTrailer->check == 0xe);
       B2DEBUG(1, "Trailer found");
 
-      data32++;
-      theFTBTrailer = (struct FTBTrailer*) data32;
-      assert(theFTBTrailer->controlWord == 0xff55);
-      B2DEBUG(1, "FTBTrailer found");
-
       trailerFound = true;
+
     } else {
       B2WARNING("OOOOPS: unknown data field, highest four bits: 0x" << std::hex << *data32);
       return;
     }
   }
 
-  if (&data32_in[nWords] != &data32[1] - 1) {
-    B2WARNING("OOOOPS: trailer appeared too early, data short by " << &data32_in[nWords] - &data32[1] << " bytes");
+  if (&data32_in[nWords] != &data32[1]) {
+    B2WARNING("OOOOPS: FADC trailer appeared too early, data short by " << &data32_in[nWords] - &data32[1] << " bytes");
   }
 
-  if (! trailerFound)
-    B2ERROR("OOOOPS: read data block without trailer");
+  struct FTBTrailer* theFTBTrailer;
+
+  if (trailerFound)  {
+    theFTBTrailer = (struct FTBTrailer*) data32++;
+    if (theFTBTrailer->controlWord == 0xff55)
+      B2DEBUG(1, "FTBTrailer found");
+  } else
+    B2ERROR("OOOOPS: read data block without FADC trailer");
+
 }
 
 //temporary: to check format from Vienna test files:

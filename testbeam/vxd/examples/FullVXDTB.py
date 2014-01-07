@@ -44,7 +44,7 @@ particlegun.param('phiParams', [phi, phi_spread])
 # Aluminium target at 750mm to "simulate" 15m air between collimator and TB setup
 particlegun.param('vertexGeneration', 'normal')
 particlegun.param('xVertexParams', [gun_x_position, 0.])
-particlegun.param('yVertexParams', [0. + 0.4, beamspot_size_y])
+particlegun.param('yVertexParams', [0., beamspot_size_y])
 particlegun.param('zVertexParams', [0., beamspot_size_z])
 particlegun.param('independentVertices', True)
 

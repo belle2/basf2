@@ -1,14 +1,23 @@
 Cfiles
-!vxd1.dat   ! the file name
-!positron/vxd.dat
-!noiter/vxd.dat
-millefile.dat
+millefile.dat ! file with binary data (one per line)
 
-!Parameter ! fix some parameters
-! 1 0. -1. ! fix parameter 1
-! Fix all w coordinates and angles alpha, beta
-!Fortranfiles
-constraints.txt
+Parameter ! fix some parameters
+!1 0. -1. ! fix parameter 1
+!2 0. -1. ! fix parameter 2
+!3 0. -1. ! fix parameter 3
+!4 0. -1. ! fix parameter 4
+!5 0. -1. ! fix parameter 5
+!6 0. -1. ! fix parameter 6
+
+!84801 0. -1.
+!84802 0. -1.
+!84803 0. -1.
+!84804 0. -1.
+!84805 0. -1.
+!84806 0. -1.
+
+Fortranfiles
+constraints.txt ! automatically generated file from MP2alignment module with geometry constraints
 
 
 printrecord 150 -1
@@ -27,42 +36,42 @@ method inversion  5  0.010   ! solution by inversion
 end
 
 Parameter
-!84801 0. -1.
-!84802 0. -1.
+84801 0. -1.
+84802 0. -1.
 84803 0. -1.
 84804 0. -1.
 84805 0. -1.
-!84806 0. -1.
-!167041 0. -1.
-!167042 0. -1.
+84806 0. -1.
+167041 0. -1.
+167042 0. -1.
 167043 0. -1.
 167044 0. -1.
 167045 0. -1.
-!167046 0. -1.
-!249281 0. -1.
-!249282 0. -1.
+167046 0. -1.
+249281 0. -1.
+249282 0. -1.
 249283 0. -1.
 249284 0. -1.
 249285 0. -1.
-!249286 0. -1.
-!331521 0. -1.
-!331522 0. -1.
+249286 0. -1.
+331521 0. -1.
+331522 0. -1.
 331523 0. -1.
 331524 0. -1.
 331525 0. -1.
-!331526 0. -1.
-!413761 0. -1.
-!413762 0. -1.
+331526 0. -1.
+413761 0. -1.
+413762 0. -1.
 413763 0. -1.
 413764 0. -1.
 413765 0. -1.
-!413766 0. -1.
-!496001 0. -1.
-!496002 0. -1.
+413766 0. -1.
+496001 0. -1.
+496002 0. -1.
 496003 0. -1.
 496004 0. -1.
 496005 0. -1.
-!496006 0. -1.
+496006 0. -1.
 
 !Telescopes:
 578881 0. -1.

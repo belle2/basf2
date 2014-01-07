@@ -1,993 +1,1056 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Library xmlns:xi="http://www.w3.org/2001/XInclude">
-  <Snippet name="wienSensor">
-    <Shape>Box</Shape>
-    <Material>Si</Material>
-    <HalfX unit="um">160.0</HalfX>
-    <HalfY unit="cm">2.0</HalfY>
-    <HalfZ unit="cm">2.0</HalfZ>  
-  </Snippet>
-  <Snippet name="SVD-Envelope">
-    <Shape>Box</Shape>
-    <HalfX unit="mm">65.0</HalfX>
-    <HalfY unit="mm">70.0</HalfY>
-    <HalfZ unit="mm">200.0</HalfZ> 
-  </Snippet>  
-  <Snippet name="PXD-Envelope">
-    <Shape>Box</Shape>
-    <HalfX unit="mm">15</HalfX>
-    <HalfY unit="mm">200</HalfY>
-    <HalfZ unit="mm">200</HalfZ>
-  </Snippet>   
-  <Snippet name="SupportBox">
+   <Snippet name="wienSensor">
+      <Shape>Box</Shape>
+      <Material>Si</Material>
+      <HalfX unit="um">160.0</HalfX>
+      <HalfY unit="cm">2.0</HalfY>
+      <HalfZ unit="cm">2.0</HalfZ>
+   </Snippet>
+   <Snippet name="SVD-Envelope">
+      <Shape>Box</Shape>
+      <HalfX unit="mm">65.0</HalfX>
+      <HalfY unit="mm">70.0</HalfY>
+      <HalfZ unit="mm">200.0</HalfZ>
+   </Snippet>
+   <Snippet name="PXD-Envelope">
+      <Shape>Box</Shape>
+      <HalfX unit="mm">15</HalfX>
+      <HalfY unit="mm">200</HalfY>
+      <HalfZ unit="mm">200</HalfZ>
+   </Snippet>
+   <Snippet name="SVD_module">
+      <Visible>false</Visible>
+      <Material>Air</Material>
+      <Shape>Box</Shape>
+
+      <HalfX unit="mm">65.00</HalfX>
+      <HalfY unit="mm">30.00</HalfY>
+      <HalfZ unit="mm">1</HalfZ>
+   </Snippet>
+   <Snippet name="SVD_sensor">
+      <Color>#006699</Color>
+      <Material>Si</Material>
+      <Shape>Box</Shape>
+      <DX unit="mm">0</DX>
+      <DY unit="mm">0</DY>
+      <DZ unit="mm">0</DZ>
+      <Theta unit="deg">0</Theta>
+      <Phi unit="deg">0</Phi>
+      <Psi unit="deg">0</Psi>
+      <HalfX unit="mm">61.450</HalfX>
+      <HalfY unit="mm">28.860</HalfY>
+      <HalfZ unit="um">160</HalfZ>
+   </Snippet>
+   <Snippet name="SVD_sensor_layer3">
+     <Color>#006699</Color>
+     <Material>Si</Material>
+     <Shape>Box</Shape>
+     <DX unit="mm">0</DX>
+     <DY unit="mm">0</DY>
+     <DZ unit="mm">0</DZ>
+     <Theta unit="deg">0</Theta>
+     <Phi unit="deg">0</Phi>
+     <Psi unit="deg">0</Psi>
+     <HalfX unit="mm">60.01</HalfX>
+     <HalfY unit="mm">20.2</HalfY>
+     <HalfZ unit="um">160</HalfZ>
+   </Snippet>   
+   <Snippet name="SVD_active">
+      <DetectorType>SVD</DetectorType>
+      <stepSize unit="um">5</stepSize>
+      <stripsU>768</stripsU>
+      <stripsV>512</stripsV>
+      <!-- Sensor operation parameters. -->
+      <DepletionVoltage unit="V">60.0</DepletionVoltage>
+      <BiasVoltage unit="V">150</BiasVoltage>
+      <BackplaneCapacitance unit="pF">0</BackplaneCapacitance>
+      <InterstripCapacitance unit="pF">6</InterstripCapacitance>
+      <CouplingCapacitance unit="pF">120</CouplingCapacitance>
+   </Snippet>
+   <Snippet name="SVD_active_layer3">
+     <DetectorType>SVD</DetectorType>
+     <stepSize unit="um">5</stepSize>
+     <stripsU>768</stripsU>
+     <stripsV>768</stripsV>
+     <!-- Sensor operation parameters. -->
+     <DepletionVoltage unit="V">60.0</DepletionVoltage>
+     <BiasVoltage unit="V">150</BiasVoltage>
+     <BackplaneCapacitance unit="pF">0</BackplaneCapacitance>
+     <InterstripCapacitance unit="pF">6</InterstripCapacitance>
+     <CouplingCapacitance unit="pF">120</CouplingCapacitance>
+   </Snippet>
+   <Snippet name="PXD6-S_active_L1">
+      <DetectorType>PXD</DetectorType>
+      <stepSize unit="um">5</stepSize>
+      <!-- define the number of pixels in rphi direction -->
+      <pixelsR>192</pixelsR>
+      <!-- define the number of pixels in z direction. There are two values since we have two different pixel sizes inside of one module: Larger pixels in the outer area, smaller pixels in the middle -->
+      <pixelsZ>480</pixelsZ>
+      <pixelsZ>0</pixelsZ>
+      <!-- splitLength defines the position inside the active area (starting at the outside) where the pixel size changes. Pixel size is calculated automatically from the size of the active area and the number of pixels -->
+      <splitLength unit="mm">0.0</splitLength>
+      <!-- Parameters describing the physical attributes of the sensor needed for digitization. The voltages might be time dependent and than should be placed somewhere else -->
+      <BulkDoping unit="1/um^3">10.0</BulkDoping>
+      <BackVoltage unit="V">-60.0</BackVoltage>
+      <TopVoltage unit="V">0.0</TopVoltage>
+      <SourceBorder unit="um">3.0</SourceBorder>
+      <ClearBorder unit="um">8.0</ClearBorder>
+      <DrainBorder unit="um">8.0</DrainBorder>
+      <GateDepth unit="um">22</GateDepth>
+      <DoublePixel>true</DoublePixel>
+      <!-- Define the integration window to be 20µs. This probably should go somewhere else -->
+      <IntegrationStart unit="us">-10.0</IntegrationStart>
+      <IntegrationEnd unit="us">10.0</IntegrationEnd>
+   </Snippet>
+   <Snippet name="PXD_active_L2">
+      <DetectorType>PXD</DetectorType>
+      <stepSize unit="um">5</stepSize>
+      <!-- define the number of pixels in rphi direction -->
+      <pixelsR>192</pixelsR>
+      <!-- define the number of pixels in z direction. There are two values since we have two different pixel sizes inside of one module: Larger pixels in the outer area, smaller pixels in the middle -->
+      <pixelsZ>640</pixelsZ>
+      <pixelsZ>0</pixelsZ>
+      <!-- splitLength defines the position inside the active area (starting at the outside) where the pixel size changes. Pixel size is calculated automatically from the size of the active area and the number of pixels -->
+      <splitLength unit="mm">0.0</splitLength>
+      <!-- Parameters describing the physical attributes of the sensor needed for digitization. The voltages might be time dependent and than should be placed somewhere else -->
+      <BulkDoping unit="1/um^3">10.0</BulkDoping>
+      <BackVoltage unit="V">-60.0</BackVoltage>
+      <TopVoltage unit="V">0.0</TopVoltage>
+      <SourceBorder unit="um">3.0</SourceBorder>
+      <ClearBorder unit="um">8.0</ClearBorder>
+      <DrainBorder unit="um">8.0</DrainBorder>
+      <GateDepth unit="um">22</GateDepth>
+      <DoublePixel>true</DoublePixel>
+      <!-- Define the integration window to be 20µs. This probably should go somewhere else -->
+      <IntegrationStart unit="us">-10.0</IntegrationStart>
+      <IntegrationEnd unit="us">10.0</IntegrationEnd>
+   </Snippet>
+   <Snippet name="Magnet">
+      <Volume name="Al_Scatterer">
+         <Color>#006699</Color>
+         <Material>G4_Al</Material>
+         <Shape>Box</Shape>
+         <DX unit="mm">750</DX>
+         <DY unit="mm">0</DY>
+         <DZ unit="mm">0</DZ>
+         <Theta unit="deg">0</Theta>
+         <Phi unit="deg">0</Phi>
+         <Psi unit="deg">0</Psi>
+         <HalfX unit="cm">0.2</HalfX>
+         <HalfY unit="cm">4</HalfY>
+         <HalfZ unit="cm">4</HalfZ>
+      </Volume>
+      <!--Volume>
+    <Name>Al_Scatterer</Name>
     <Color>#006699</Color>
-    <Material>Air</Material>
+    <Material>G4_Al</Material>
     <Shape>Box</Shape>
-    <DX unit="mm">0</DX>
-    <DY unit="mm">0.0</DY>
-    <DZ unit="mm">0</DZ>
-    <Theta unit="deg">0</Theta>
-    <Phi unit="deg">0</Phi>
-    <Psi unit="deg">0</Psi>
-    <HalfX unit="mm">130</HalfX>
-    <HalfY unit="mm">120</HalfY>
-    <HalfZ unit="mm">100</HalfZ>
-  </Snippet>
-  <Snippet name="PXD_module">
-    <Material>Air</Material>
-    <Visible>false</Visible>
-    <Shape>Box</Shape>
-    <DY unit="mm">-6.250</DY>
-    <DZ unit="mm">0</DZ>
-    <Theta unit="deg">90</Theta>
-    <Phi unit="deg">90</Phi>
-    <Psi unit="deg">-90</Psi>
-    <HalfX unit="mm">65.00</HalfX>
-    <HalfY unit="mm">30.00</HalfY>
-    <HalfZ unit="mm">1</HalfZ>
-  </Snippet>
-  <Snippet name="SVD_module">
-    <Visible>false</Visible>
-    <Material>Air</Material>
-    <Shape>Box</Shape>
-    <!--DY unit="mm">-28.860</DY-->
-    <DZ unit="mm">0</DZ>
-    <Theta unit="deg">90</Theta>
-    <Phi unit="deg">90</Phi>
-    <Psi unit="deg">-90</Psi>
-    <HalfX unit="mm">65.00</HalfX>
-    <HalfY unit="mm">30.00</HalfY>
-    <HalfZ unit="mm">1</HalfZ>
-  </Snippet>
-  <Snippet name="PXD_sensor">
-    <Color>#006699</Color>
-    <Material>Si</Material>
-    <Shape>Box</Shape>
-    <DX unit="mm">0</DX>
+    
+    <DX unit="mm">590</DX>
     <DY unit="mm">0</DY>
     <DZ unit="mm">0</DZ>
     <Theta unit="deg">0</Theta>
     <Phi unit="deg">0</Phi>
     <Psi unit="deg">0</Psi>
-    <HalfX unit="mm">22.400</HalfX>
-    <HalfY unit="mm">6.250</HalfY>
-    <HalfZ unit="um">37.25</HalfZ>
-  </Snippet>
-  <Snippet name="SVD_sensor">
-    <Color>#006699</Color>
-    <Material>Si</Material>
-    <Shape>Box</Shape>
-    <DX unit="mm">0</DX>
-    <DY unit="mm">0</DY>
-    <DZ unit="mm">0</DZ>
-    <Theta unit="deg">0</Theta>
-    <Phi unit="deg">0</Phi>
-    <Psi unit="deg">0</Psi>
-    <HalfX unit="mm">61.450</HalfX>
-    <HalfY unit="mm">28.860</HalfY>
-    <HalfZ unit="um">160</HalfZ>
-  </Snippet>
-  <Snippet name="PXD_active">
-    <DetectorType>PXD</DetectorType>
-    <stepSize unit="um">5</stepSize>
-    <!-- define the number of pixels in rphi direction -->
-    <pixelsR>250</pixelsR>
-    <!-- define the number of pixels in z direction. There are two values since we have two different pixel sizes inside of one module: Larger pixels in the outer area, smaller pixels in the middle -->
-    <pixelsZ>512</pixelsZ>
-    <pixelsZ>0</pixelsZ>
-    <!-- splitLength defines the position inside the active area (starting at the outside) where the pixel size changes. Pixel size is calculated automatically from the size of the active area and the number of pixels -->
-    <splitLength unit="mm">0.0</splitLength>
-    <!-- Parameters describing the physical attributes of the sensor needed for digitization. The voltages might be time dependent and than should be placed somewhere else -->
-    <BulkDoping unit="1/um^3">10.0</BulkDoping>
-    <BackVoltage unit="V">-60.0</BackVoltage>
-    <TopVoltage unit="V">0.0</TopVoltage>
-    <SourceBorder unit="um">3.0</SourceBorder>
-    <ClearBorder unit="um">8.0</ClearBorder>
-    <DrainBorder unit="um">8.0</DrainBorder>
-    <GateDepth unit="um">22</GateDepth>
-    <DoublePixel>true</DoublePixel>
-    <!-- Define the integration window to be 20µs. This probably should go somewhere else -->
-    <IntegrationStart unit="us">-10.0</IntegrationStart>
-    <IntegrationEnd unit="us">10.0</IntegrationEnd>
-  </Snippet>
-  <Snippet name="SVD_active">
-    <DetectorType>SVD</DetectorType>
-    <stepSize unit="um">5</stepSize>
-    <stripsU>768</stripsU>
-    <stripsV>512</stripsV>
-    <!-- Sensor operation parameters. -->
-    <DepletionVoltage unit="V">60.0</DepletionVoltage>
-    <BiasVoltage unit="V">150</BiasVoltage>
-    <BackplaneCapacitance unit="pF">0</BackplaneCapacitance>
-    <InterstripCapacitance unit="pF">6</InterstripCapacitance>
-    <CouplingCapacitance unit="pF">120</CouplingCapacitance>
-  </Snippet>
-  <Snippet name="Magnet">
-    <Volume name="Al_Scatterer">
-      
-<Color>#006699</Color>
-<Material>G4_Al</Material>
-<Shape>Box</Shape>
-<DX unit="mm">750</DX>
-<DY unit="mm">0</DY>
-<DZ unit="mm">0</DZ>
-<Theta unit="deg">0</Theta>
-<Phi unit="deg">0</Phi>
-<Psi unit="deg">0</Psi>
-<HalfX unit="cm">0.2</HalfX>
-<HalfY unit="cm">4</HalfY>
-<HalfZ unit="cm">4</HalfZ>
-</Volume>
-<!--Volume>
-<Name>Al_Scatterer</Name>
-<Color>#006699</Color>
-<Material>G4_Al</Material>
-<Shape>Box</Shape>
-
-<DX unit="mm">590</DX>
-<DY unit="mm">0</DY>
-<DZ unit="mm">0</DZ>
-<Theta unit="deg">0</Theta>
-<Phi unit="deg">0</Phi>
-<Psi unit="deg">0</Psi>
-
-<HalfX unit="cm">2.21</HalfX>
-<HalfY unit="cm">4</HalfY>
-<HalfZ unit="cm">4</HalfZ>
-</Volume-->
-<Volume name="Magnet">
-  <Material>Air</Material>
-  
-<Color>#010101</Color>
-<Shape>Tube</Shape>
-<DZ unit="cm">0</DZ>
-<DX unit="cm">0</DX>
-<DY unit="um">0</DY>
-<Theta unit="deg">0</Theta>
-<Phi unit="deg">0</Phi>
-<Psi unit="deg">0</Psi>
-<InnerRadius unit="mm">400.0</InnerRadius>
-<OuterRadius unit="mm">590.0</OuterRadius>
-<Hz unit="cm">80</Hz>
-<Volume name="Magnet_Inner_Wall">
-  <Material>G4_Al</Material>
-  
-<Color>#010101</Color>
-<Shape>Tube</Shape>
-<DZ unit="cm">0</DZ>
-<DX unit="um">0</DX>
-<DY unit="um">0</DY>
-<Theta unit="deg">0</Theta>
-<Phi unit="deg">0</Phi>
-<Psi unit="deg">0</Psi>
-<InnerRadius unit="mm">424.0</InnerRadius>
-<OuterRadius unit="mm">426.0</OuterRadius>
-<Hz unit="cm">80</Hz>
-</Volume>
-<Volume name="Magnet_Outer_Wall">
-  <Material>G4_Al</Material>
-  
-<Color>#010101</Color>
-<Shape>Tube</Shape>
-<DZ unit="cm">0</DZ>
-<DX unit="um">0</DX>
-<DY unit="um">0</DY>
-<Theta unit="deg">0</Theta>
-<Phi unit="deg">0</Phi>
-<Psi unit="deg">0</Psi>
-<InnerRadius unit="mm">585.0</InnerRadius>
-<OuterRadius unit="mm">590.0</OuterRadius>
-<Hz unit="cm">80</Hz>
-</Volume>
-<Volume name="Magnet_Superconducting_Coil">
-  <Material>G4_Al</Material>
-  <Color>#999999</Color>
-  
-<Shape>Tube</Shape>
-<DZ unit="cm">0</DZ>
-<DX unit="um">0</DX>
-<DY unit="um">0</DY>
-<Theta unit="deg">0</Theta>
-<Phi unit="deg">0</Phi>
-<Psi unit="deg">0</Psi>
-<InnerRadius unit="mm">494.6</InnerRadius>
-<OuterRadius unit="mm">500.0</OuterRadius>
-<Hz unit="cm">75</Hz>
-</Volume>
-<Volume name="Magnet_Vacuum_Wall_In_1">
-  <Material>G4_Al</Material>
-  
-<Color>#f00</Color>
-<Shape>Tube</Shape>
-<DZ unit="cm">0</DZ>
-<DX unit="um">0</DX>
-<DY unit="um">0</DY>
-<Theta unit="deg">0</Theta>
-<Phi unit="deg">0</Phi>
-<Psi unit="deg">0</Psi>
-<InnerRadius unit="mm">454.0</InnerRadius>
-<OuterRadius unit="mm">456.1</OuterRadius>
-<Hz unit="cm">78</Hz>
-</Volume>
-<Volume name="Magnet_Vacuum_Wall_In_2">
-  <Material>G4_Al</Material>
-  
-<Color>#f00</Color>
-<Shape>Tube</Shape>
-<DZ unit="cm">0</DZ>
-<DX unit="um">0</DX>
-<DY unit="um">0</DY>
-<Theta unit="deg">0</Theta>
-<Phi unit="deg">0</Phi>
-<Psi unit="deg">0</Psi>
-<InnerRadius unit="mm">474.0</InnerRadius>
-<OuterRadius unit="mm">474.8</OuterRadius>
-<Hz unit="cm">78</Hz>
-</Volume>
-<Volume name="Magnet_Vacuum_Wall_Out_1">
-  <Material>G4_Al</Material>
-  
-<Color>#f00</Color>
-<Shape>Tube</Shape>
-<DZ unit="cm">0</DZ>
-<DX unit="um">0</DX>
-<DY unit="um">0</DY>
-<Theta unit="deg">0</Theta>
-<Phi unit="deg">0</Phi>
-<Psi unit="deg">0</Psi>
-<InnerRadius unit="mm">523</InnerRadius>
-<OuterRadius unit="mm">523.8</OuterRadius>
-<Hz unit="cm">78</Hz>
-</Volume>
-<Volume name="Magnet_Vacuum_Wall_Out_2">
-  <Material>G4_Al</Material>
-  
-<Color>#f00</Color>
-<Shape>Tube</Shape>
-<DZ unit="cm">0</DZ>
-<DX unit="um">0</DX>
-<DY unit="um">0</DY>
-<Theta unit="deg">0</Theta>
-<Phi unit="deg">0</Phi>
-<Psi unit="deg">0</Psi>
-<InnerRadius unit="mm">543</InnerRadius>
-<OuterRadius unit="mm">543.8</OuterRadius>
-<Hz unit="cm">78</Hz>
-</Volume>
-</Volume>
-</Snippet>
-<Snippet name="PXD_sensor2">
-  <Color>#006699</Color>
-  <Material>Si</Material>
-  <Shape>Box</Shape>
-  <DX unit="mm">0</DX>
-  <DY unit="mm">0</DY>
-  <DZ unit="mm">0</DZ>
-  <Theta unit="deg">0</Theta>
-  <Phi unit="deg">0</Phi>
-  <Psi unit="deg">0</Psi>
-  <HalfX unit="mm">5.2992</HalfX>
-  <HalfY unit="mm">10.5984</HalfY>
-  <HalfZ unit="um">25.0</HalfZ>
-</Snippet>
-<Snippet name="PXD_module2">
-  <Visible>false</Visible>
-  <Material>Air</Material>
-  <Shape>Box</Shape>
-  <DY unit="mm">-10.650</DY>
-  <!--DY unit="mm">0.0</DY-->
-  <DZ unit="mm">0</DZ>
-  <Theta unit="deg">90</Theta>
-  <Phi unit="deg">90</Phi>
-  <Psi unit="deg">-90</Psi>
-  <HalfX unit="mm">65.00</HalfX>
-  <HalfY unit="mm">30.00</HalfY>
-  <HalfZ unit="mm">10</HalfZ>
-</Snippet>
-<Snippet name="PXD_active2">
-  <DetectorType>PXD</DetectorType>
-  <stepSize unit="um">5</stepSize>
-  <!-- define the number of pixels in rphi direction -->
-  <pixelsR>576</pixelsR>
-  <!-- define the number of pixels in z direction. There are two values since we have two different pixel sizes inside of one module: Larger pixels in the outer area, smaller pixels in the middle -->
-  <pixelsZ>1152</pixelsZ>
-  <pixelsZ>0</pixelsZ>
-  <!-- splitLength defines the position inside the active area (starting at the outside) where the pixel size changes. Pixel size is calculated automatically from the size of the active area and the number of pixels -->
-  <splitLength unit="mm">0.0</splitLength>
-  <!-- Parameters describing the physical attributes of the sensor needed for digitization. The voltages might be time dependent and than should be placed somewhere else -->
-  <BulkDoping unit="1/um^3">10.0</BulkDoping>
-  <BackVoltage unit="V">-60.0</BackVoltage>
-  <TopVoltage unit="V">0.0</TopVoltage>
-  <SourceBorder unit="um">3.0</SourceBorder>
-  <ClearBorder unit="um">8.0</ClearBorder>
-  <DrainBorder unit="um">8.0</DrainBorder>
-  <GateDepth unit="um">22</GateDepth>
-  <DoublePixel>true</DoublePixel>
-  <!-- Define the integration window to be 20us. This probably should go somewhere else -->
-  <IntegrationStart unit="us">-10.0</IntegrationStart>
-  <IntegrationEnd unit="us">10.0</IntegrationEnd>
-</Snippet>
-
-<Snippet name="EUDET-SensitiveArea">
-  <Material>Si</Material>
-  <Shape>Box</Shape>
-  <HalfX unit="mm">5.2992</HalfX>
-  <HalfY unit="mm">10.5984</HalfY>
-  <HalfZ unit="um">25</HalfZ>
-  
-</Snippet>
-
-<Snippet name="EUDET-Active">
-  <DetectorType>PXD</DetectorType>
-  <stepSize unit="um">5</stepSize>
-  <!-- define the number of pixels in rphi direction -->
-  <pixelsR>576</pixelsR>
-  <!-- define the number of pixels in z direction. There are two values since we have two different pixel sizes inside of one module: Larger pixels in the outer area, smaller pixels in the middle -->
-  <pixelsZ>1152</pixelsZ>
-  <pixelsZ>0</pixelsZ>
-  <!-- splitLength defines the position inside the active area (starting at the outside) where the pixel size changes. Pixel size is calculated automatically from the size of the active area and the number of pixels -->
-  <splitLength unit="mm">0.0</splitLength>
-  <!-- Parameters describing the physical attributes of the sensor needed for digitization. The voltages might be time dependent and than should be placed somewhere else -->
-  <BulkDoping unit="1/um^3">10.0</BulkDoping>
-  <BackVoltage unit="V">-60.0</BackVoltage>
-  <TopVoltage unit="V">0.0</TopVoltage>
-  <SourceBorder unit="um">3.0</SourceBorder>
-  <ClearBorder unit="um">8.0</ClearBorder>
-  <DrainBorder unit="um">8.0</DrainBorder>
-  <GateDepth unit="um">22</GateDepth>
-  <DoublePixel>true</DoublePixel>
-  <!-- Define the integration window to be 20us. This probably should go somewhere else -->
-  <IntegrationStart unit="us">-10.0</IntegrationStart>
-  <IntegrationEnd unit="us">10.0</IntegrationEnd>
-</Snippet>
-
-<Snippet name="EUDET-Module">
-  <Color>#006699</Color>
-  <Material>Air</Material>
-  <Shape>Box</Shape>
-  <HalfX unit="mm">80</HalfX>
-  <HalfY unit="mm">80</HalfY>
-  <HalfZ unit="mm">8</HalfZ>
-  <!--Volume name="EUDET-SensitiveArea">
-  <Material>Si</Material>
-  <Shape>Box</Shape>
-  <HalfX unit="mm">5.2992</HalfX>
-  <HalfY unit="mm">10.5984</HalfY>
-  <HalfZ unit="um">25</HalfZ>
-  </Volume-->       
-  <Volume name="EUDET-PCBoard">
-    <Material>PCB-FR4</Material>       
-    <Shape>Box</Shape>
-    <HalfX unit="mm">68</HalfX>
-    <HalfY unit="mm">68</HalfY>
-    <HalfZ unit="mm">0.75</HalfZ>
-    <Subtract>
-      <Name>EUDET-PCBoardCutWindow</Name>
+    
+    <HalfX unit="cm">2.21</HalfX>
+    <HalfY unit="cm">4</HalfY>
+    <HalfZ unit="cm">4</HalfZ>
+    </Volume-->
+      <Volume name="Magnet">
+         <Material>Air</Material>
+         <Color>#010101</Color>
+         <Shape>Tube</Shape>
+         <DZ unit="cm">0</DZ>
+         <DX unit="cm">0</DX>
+         <DY unit="um">0</DY>
+         <Theta unit="deg">0</Theta>
+         <Phi unit="deg">0</Phi>
+         <Psi unit="deg">0</Psi>
+         <InnerRadius unit="mm">400.0</InnerRadius>
+         <OuterRadius unit="mm">590.0</OuterRadius>
+         <Hz unit="cm">80</Hz>
+         <Volume name="Magnet_Inner_Wall">
+            <Material>G4_Al</Material>
+            <Color>#010101</Color>
+            <Shape>Tube</Shape>
+            <DZ unit="cm">0</DZ>
+            <DX unit="um">0</DX>
+            <DY unit="um">0</DY>
+            <Theta unit="deg">0</Theta>
+            <Phi unit="deg">0</Phi>
+            <Psi unit="deg">0</Psi>
+            <InnerRadius unit="mm">424.0</InnerRadius>
+            <OuterRadius unit="mm">426.0</OuterRadius>
+            <Hz unit="cm">80</Hz>
+         </Volume>
+         <Volume name="Magnet_Outer_Wall">
+            <Material>G4_Al</Material>
+            <Color>#010101</Color>
+            <Shape>Tube</Shape>
+            <DZ unit="cm">0</DZ>
+            <DX unit="um">0</DX>
+            <DY unit="um">0</DY>
+            <Theta unit="deg">0</Theta>
+            <Phi unit="deg">0</Phi>
+            <Psi unit="deg">0</Psi>
+            <InnerRadius unit="mm">585.0</InnerRadius>
+            <OuterRadius unit="mm">590.0</OuterRadius>
+            <Hz unit="cm">80</Hz>
+         </Volume>
+         <Volume name="Magnet_Superconducting_Coil">
+            <Material>G4_Al</Material>
+            <Color>#999999</Color>
+            <Shape>Tube</Shape>
+            <DZ unit="cm">0</DZ>
+            <DX unit="um">0</DX>
+            <DY unit="um">0</DY>
+            <Theta unit="deg">0</Theta>
+            <Phi unit="deg">0</Phi>
+            <Psi unit="deg">0</Psi>
+            <InnerRadius unit="mm">494.6</InnerRadius>
+            <OuterRadius unit="mm">500.0</OuterRadius>
+            <Hz unit="cm">75</Hz>
+         </Volume>
+         <Volume name="Magnet_Vacuum_Wall_In_1">
+            <Material>G4_Al</Material>
+            <Color>#f00</Color>
+            <Shape>Tube</Shape>
+            <DZ unit="cm">0</DZ>
+            <DX unit="um">0</DX>
+            <DY unit="um">0</DY>
+            <Theta unit="deg">0</Theta>
+            <Phi unit="deg">0</Phi>
+            <Psi unit="deg">0</Psi>
+            <InnerRadius unit="mm">454.0</InnerRadius>
+            <OuterRadius unit="mm">456.1</OuterRadius>
+            <Hz unit="cm">78</Hz>
+         </Volume>
+         <Volume name="Magnet_Vacuum_Wall_In_2">
+            <Material>G4_Al</Material>
+            <Color>#f00</Color>
+            <Shape>Tube</Shape>
+            <DZ unit="cm">0</DZ>
+            <DX unit="um">0</DX>
+            <DY unit="um">0</DY>
+            <Theta unit="deg">0</Theta>
+            <Phi unit="deg">0</Phi>
+            <Psi unit="deg">0</Psi>
+            <InnerRadius unit="mm">474.0</InnerRadius>
+            <OuterRadius unit="mm">474.8</OuterRadius>
+            <Hz unit="cm">78</Hz>
+         </Volume>
+         <Volume name="Magnet_Vacuum_Wall_Out_1">
+            <Material>G4_Al</Material>
+            <Color>#f00</Color>
+            <Shape>Tube</Shape>
+            <DZ unit="cm">0</DZ>
+            <DX unit="um">0</DX>
+            <DY unit="um">0</DY>
+            <Theta unit="deg">0</Theta>
+            <Phi unit="deg">0</Phi>
+            <Psi unit="deg">0</Psi>
+            <InnerRadius unit="mm">523</InnerRadius>
+            <OuterRadius unit="mm">523.8</OuterRadius>
+            <Hz unit="cm">78</Hz>
+         </Volume>
+         <Volume name="Magnet_Vacuum_Wall_Out_2">
+            <Material>G4_Al</Material>
+            <Color>#f00</Color>
+            <Shape>Tube</Shape>
+            <DZ unit="cm">0</DZ>
+            <DX unit="um">0</DX>
+            <DY unit="um">0</DY>
+            <Theta unit="deg">0</Theta>
+            <Phi unit="deg">0</Phi>
+            <Psi unit="deg">0</Psi>
+            <InnerRadius unit="mm">543</InnerRadius>
+            <OuterRadius unit="mm">543.8</OuterRadius>
+            <Hz unit="cm">78</Hz>
+         </Volume>
+      </Volume>
+   </Snippet>
+   <Snippet name="EUDET-SensitiveArea">
+      <Material>Si</Material>
       <Shape>Box</Shape>
       <HalfX unit="mm">5.2992</HalfX>
       <HalfY unit="mm">10.5984</HalfY>
-      <HalfZ unit="mm">2</HalfZ>
-    </Subtract> 
-  </Volume>      
-  <Volume name="EUDET-Frame">
-    
-<Color>#006699</Color>
-<Material>G4_Al</Material>
-<Shape>Box</Shape>
-<HalfX unit="mm">80</HalfX>
-<HalfY unit="mm">80</HalfY>
-<HalfZ unit="mm">7.5</HalfZ>
-<Subtract>
-  <Name>EUDET-FrameCutInside</Name>
-  <Shape>Box</Shape>
-  <HalfX unit="mm">79</HalfX>
-  <HalfY unit="mm">79</HalfY>
-  <HalfZ unit="mm">6.5</HalfZ>
-</Subtract>
-<Subtract>
-  <Name>EUDET-FrameCutTroley</Name>
-  <Shape>Box</Shape>
-  <DX unit="mm">60</DX>
-  <DY unit="mm">-76</DY>
-  <HalfX unit="mm">5</HalfX>
-  <HalfY unit="mm">6</HalfY>
-  <HalfZ unit="mm">8.5</HalfZ>
-</Subtract>    
-<Subtract>
-  <Name>EUDET-FrameCutTroley</Name>
-  <Shape>Box</Shape>
-  <DX unit="mm">-60</DX>
-  <DY unit="mm">-76</DY>
-  <HalfX unit="mm">5</HalfX>
-  <HalfY unit="mm">6</HalfY>
-  <HalfZ unit="mm">8.5</HalfZ>
-</Subtract>        
-<Subtract>
-  <Name>EUDET-FrameCutWindow</Name>
-  <Shape>Box</Shape>
-  <HalfX unit="mm">16</HalfX>
-  <HalfY unit="mm">16</HalfY>
-  <HalfZ unit="mm">10</HalfZ>
-</Subtract> 
-</Volume>
-<Volume name="EUDET-KaptonWindow1">
-  <Material>SVD-KaptonClean</Material>
-  
+      <HalfZ unit="um">25</HalfZ>
+   </Snippet>
+   <Snippet name="EUDET-Active">
+      <DetectorType>PXD</DetectorType>
+      <stepSize unit="um">5</stepSize>
+      <!-- define the number of pixels in rphi direction -->
+      <pixelsR>576</pixelsR>
+      <!-- define the number of pixels in z direction. There are two values since we have two different pixel sizes inside of one module: Larger pixels in the outer area, smaller pixels in the middle -->
+      <pixelsZ>1152</pixelsZ>
+      <pixelsZ>0</pixelsZ>
+      <!-- splitLength defines the position inside the active area (starting at the outside) where the pixel size changes. Pixel size is calculated automatically from the size of the active area and the number of pixels -->
+      <splitLength unit="mm">0.0</splitLength>
+      <!-- Parameters describing the physical attributes of the sensor needed for digitization. The voltages might be time dependent and than should be placed somewhere else -->
+      <BulkDoping unit="1/um^3">10.0</BulkDoping>
+      <BackVoltage unit="V">-60.0</BackVoltage>
+      <TopVoltage unit="V">0.0</TopVoltage>
+      <SourceBorder unit="um">3.0</SourceBorder>
+      <ClearBorder unit="um">8.0</ClearBorder>
+      <DrainBorder unit="um">8.0</DrainBorder>
+      <GateDepth unit="um">22</GateDepth>
+      <DoublePixel>true</DoublePixel>
+      <!-- Define the integration window to be 20us. This probably should go somewhere else -->
+      <IntegrationStart unit="us">-10.0</IntegrationStart>
+      <IntegrationEnd unit="us">10.0</IntegrationEnd>
+   </Snippet>
+   <Snippet name="EUDET-Module">
+      <Color>#006699</Color>
+      <Material>Air</Material>
+      <Shape>Box</Shape>
+      <HalfX unit="mm">80</HalfX>
+      <HalfY unit="mm">80</HalfY>
+      <HalfZ unit="mm">8</HalfZ>
+      <!--Volume name="EUDET-SensitiveArea">
+    <Material>Si</Material>
+    <Shape>Box</Shape>
+    <HalfX unit="mm">5.2992</HalfX>
+    <HalfY unit="mm">10.5984</HalfY>
+    <HalfZ unit="um">25</HalfZ>
+    </Volume-->
+      <Volume name="EUDET-PCBoard">
+         <Material>PCB-FR4</Material>
+         <Shape>Box</Shape>
+         <HalfX unit="mm">68</HalfX>
+         <HalfY unit="mm">68</HalfY>
+         <HalfZ unit="mm">0.75</HalfZ>
+         <Subtract>
+            <Name>EUDET-PCBoardCutWindow</Name>
+            <Shape>Box</Shape>
+            <HalfX unit="mm">5.2992</HalfX>
+            <HalfY unit="mm">10.5984</HalfY>
+            <HalfZ unit="mm">2</HalfZ>
+         </Subtract>
+      </Volume>
+      <Volume name="EUDET-Frame">
+         <Color>#006699</Color>
+         <Material>G4_Al</Material>
+         <Shape>Box</Shape>
+         <HalfX unit="mm">80</HalfX>
+         <HalfY unit="mm">80</HalfY>
+         <HalfZ unit="mm">7.5</HalfZ>
+         <Subtract>
+            <Name>EUDET-FrameCutInside</Name>
+            <Shape>Box</Shape>
+            <HalfX unit="mm">79</HalfX>
+            <HalfY unit="mm">79</HalfY>
+            <HalfZ unit="mm">6.5</HalfZ>
+         </Subtract>
+         <Subtract>
+            <Name>EUDET-FrameCutTroley</Name>
+            <Shape>Box</Shape>
+            <DX unit="mm">60</DX>
+            <DY unit="mm">-76</DY>
+            <HalfX unit="mm">5</HalfX>
+            <HalfY unit="mm">6</HalfY>
+            <HalfZ unit="mm">8.5</HalfZ>
+         </Subtract>
+         <Subtract>
+            <Name>EUDET-FrameCutTroley</Name>
+            <Shape>Box</Shape>
+            <DX unit="mm">-60</DX>
+            <DY unit="mm">-76</DY>
+            <HalfX unit="mm">5</HalfX>
+            <HalfY unit="mm">6</HalfY>
+            <HalfZ unit="mm">8.5</HalfZ>
+         </Subtract>
+         <Subtract>
+            <Name>EUDET-FrameCutWindow</Name>
+            <Shape>Box</Shape>
+            <HalfX unit="mm">16</HalfX>
+            <HalfY unit="mm">16</HalfY>
+            <HalfZ unit="mm">10</HalfZ>
+         </Subtract>
+      </Volume>
+      <Volume name="EUDET-KaptonWindow1">
+         <Material>SVD-KaptonClean</Material>
+         <Shape>Box</Shape>
+         <DZ unit="mm">7.50125</DZ>
+         <HalfX unit="mm">20</HalfX>
+         <HalfY unit="mm">20</HalfY>
+         <HalfZ unit="mm">0.00125</HalfZ>
+      </Volume>
+      <Volume name="EUDET-KaptonWindow2">
+         <Material>SVD-KaptonClean</Material>
+         <Shape>Box</Shape>
+         <DZ unit="mm">-7.50125</DZ>
+         <HalfX unit="mm">20</HalfX>
+         <HalfY unit="mm">20</HalfY>
+         <HalfZ unit="mm">0.00125</HalfZ>
+      </Volume>
+   </Snippet>
+   <Snippet name="VXDBox">
+     <!--Color>#006699</Color>
+     <Material>Air</Material>
+     <Shape>Box</Shape>
+     <HalfX unit="mm">127.6</HalfX>
+     <HalfY unit="mm">210</HalfY>
+     <HalfZ unit="mm">210</HalfZ-->
 
-<Shape>Box</Shape>
-<DZ unit="mm">7.51</DZ>
-<HalfX unit="mm">20</HalfX>
-<HalfY unit="mm">20</HalfY>
-<HalfZ unit="mm">0.1</HalfZ>
-</Volume> 
-<Volume name="EUDET-KaptonWindow2">
-  <Material>SVD-KaptonClean</Material>
-  
+     <Volume name="VXDBox-cover">
+       <Color>#006699</Color>
+       <Material>PMMA</Material>
+       <Shape>Box</Shape>
+       <HalfX unit="mm">127.5</HalfX>
+       <HalfY unit="mm">210</HalfY>
+       <HalfZ unit="mm">210</HalfZ>
+       <Subtract>
+         <Name>VXDBox-CutFowWindows</Name>
+         <Shape>Box</Shape>
+         <HalfX unit="mm">128</HalfX>
+         <HalfY unit="mm">50</HalfY>
+         <HalfZ unit="mm">50</HalfZ>
+       </Subtract>
+       <Subtract>
+         <Name>CutInside</Name>
+         <Shape>Box</Shape>
+         <HalfX unit="mm">122.5</HalfX>
+         <HalfY unit="mm">205</HalfY>
+         <HalfZ unit="mm">205</HalfZ>
+       </Subtract>
 
-<Shape>Box</Shape>
-<DZ unit="mm">-7.51</DZ>
-<HalfX unit="mm">20</HalfX>
-<HalfY unit="mm">20</HalfY>
-<HalfZ unit="mm">0.1</HalfZ>
-</Volume>       
-</Snippet>
-
-<Snippet name="PXD-SensitiveArea">
-<Color>#00ff00</Color>  
-<Material>Si</Material>
-<Shape>Box</Shape>
-<DX unit="mm">7.0</DX>
-<DY unit="mm">1.2</DY>
-<DZ unit="mm">-0.1725</DZ>
-<HalfX unit="mm">24</HalfX>
-<HalfY unit="mm">4.8</HalfY>
-<HalfZ unit="um">25</HalfZ>
-</Snippet>
-
-<Snippet name="PXD6-sensor_L1">
-  <Color>#006699</Color>
-  <Material>Air</Material>
-  <Shape>Box</Shape>
-  <HalfX unit="mm">32.9</HalfX>
-  <HalfY unit="mm">7.8</HalfY>
-  <HalfZ unit="mm">0.61</HalfZ>
-  <Volume name="PXD-Frame">
-    
-<Color>#006699</Color>
-<Material>Si</Material>
-<Shape>Box</Shape>
-<HalfX unit="mm">32.9</HalfX>
-<HalfY unit="mm">7.8</HalfY>
-<HalfZ unit="mm">0.21</HalfZ>
-<Subtract>
-  <Name>PXD-Frame_CutForActiveArea</Name>
-  <Shape>Box</Shape>
-  <DX unit="mm">7.0</DX>
-  <DY unit="mm">1.2</DY>
-  <HalfX unit="mm">24</HalfX>
-  <HalfY unit="mm">4.8</HalfY>
-  <HalfZ unit="mm">1.0</HalfZ>
-</Subtract>
-</Volume>
-
-<Volume name="DHH1">
-  
-<DX unit="mm">-27.09</DX>
-<DY unit="mm">4.473</DY>
-<xi:include href="#" xpointer="xpointer(//Snippet[@name='PXD_DHH']/*)" />
-</Volume>
-<Volume name="DHH2">
-  
-<DX unit="mm">-27.09</DX>
-<DY unit="mm">0.597</DY>
-<xi:include href="#" xpointer="xpointer(//Snippet[@name='PXD_DHH']/*)" />
-</Volume>
-<Volume name="DHH3">
-  
-<DX unit="mm">-27.09</DX>
-<DY unit="mm">-3.279</DY>
-<xi:include href="#" xpointer="xpointer(//Snippet[@name='PXD_DHH']/*)" />
-</Volume>
-<Volume name="DCD1">
-  
-<DX unit="mm">-20.939</DX>
-<DY unit="mm">4.473</DY>
-<xi:include href="#" xpointer="xpointer(//Snippet[@name='PXD_DCD']/*)" />
-</Volume>
-<Volume name="DCD2">
-  
-<DX unit="mm">-20.939</DX>
-<DY unit="mm">0.597</DY>
-<xi:include href="#" xpointer="xpointer(//Snippet[@name='PXD_DCD']/*)" />
-</Volume>
-<Volume name="DCD3">
-  
-<DX unit="mm">-20.939</DX>
-<DY unit="mm">-3.279</DY>
-<xi:include href="#" xpointer="xpointer(//Snippet[@name='PXD_DCD']/*)" />
-</Volume>
-<Volume name="Switcher1">
-  
-<DX unit="mm">-12.371</DX>
-<DY unit="mm">-5.134</DY>
-<xi:include href="#" xpointer="xpointer(//Snippet[@name='PXD_Switcher']/*)" />
-</Volume>
-<Volume name="Switcher2">
-  
-<DX unit="mm">-2.83</DX>
-<DY unit="mm">-5.134</DY>
-<xi:include href="#" xpointer="xpointer(//Snippet[@name='PXD_Switcher']/*)" />
-</Volume>
-<Volume name="Switcher3">
-  
-<DX unit="mm">6.711</DX>
-<DY unit="mm">-5.134</DY>
-<xi:include href="#" xpointer="xpointer(//Snippet[@name='PXD_Switcher']/*)" />
-</Volume>
-<Volume name="Switcher4">
-  
-<DX unit="mm">16.252</DX>
-<DY unit="mm">-5.134</DY>
-<xi:include href="#" xpointer="xpointer(//Snippet[@name='PXD_Switcher']/*)" />
-</Volume>
-<Volume name="Switcher5">
-  
-<DX unit="mm">25.793</DX>
-<DY unit="mm">-5.134</DY>
-<xi:include href="#" xpointer="xpointer(//Snippet[@name='PXD_Switcher']/*)" />
-</Volume>
-</Snippet>
-<Snippet name="PXD6-sensor_L2">
-  <Color>#006699</Color>
-  <Material>Air</Material>
-  <Shape>Box</Shape>
-  <HalfX unit="mm">32.9</HalfX>
-  <HalfY unit="mm">7.8</HalfY>
-  <HalfZ unit="mm">0.61</HalfZ>
-  <Volume name="PXD-Frame">
-    
-<Color>#006699</Color>
-<Material>Si</Material>
-<Shape>Box</Shape>
-<HalfX unit="mm">32.9</HalfX>
-<HalfY unit="mm">7.8</HalfY>
-<HalfZ unit="mm">0.21</HalfZ>
-<Subtract>
-  <Name>PXD-Frame_CutForActiveArea</Name>
-  <Shape>Box</Shape>
-  <DX unit="mm">7.0</DX>
-  <DY unit="mm">1.2</DY>
-  <HalfX unit="mm">24</HalfX>
-  <HalfY unit="mm">4.8</HalfY>
-  <HalfZ unit="mm">1.0</HalfZ>
-</Subtract>
-</Volume>
-<Volume name="DHH1">
-  
-<DX unit="mm">-26.994</DX>
-<DY unit="mm">4.5</DY>
-<xi:include href="#" xpointer="xpointer(//Snippet[@name='PXD_DHH']/*)" />
-</Volume>
-<Volume name="DHH2">
-  
-<DX unit="mm">-26.994</DX>
-<DY unit="mm">0.6</DY>
-<xi:include href="#" xpointer="xpointer(//Snippet[@name='PXD_DHH']/*)" />
-</Volume>
-<Volume name="DHH3">
-  
-<DX unit="mm">-26.994</DX>
-<DY unit="mm">-3.3</DY>
-<xi:include href="#" xpointer="xpointer(//Snippet[@name='PXD_DHH']/*)" />
-</Volume>
-<Volume name="DCD1">
-  
-<DX unit="mm">-20.854</DX>
-<DY unit="mm">4.5</DY>
-<xi:include href="#" xpointer="xpointer(//Snippet[@name='PXD_DCD']/*)" />
-</Volume>
-<Volume name="DCD2">
-  
-<DX unit="mm">-20.854</DX>
-<DY unit="mm">0.6</DY>
-<xi:include href="#" xpointer="xpointer(//Snippet[@name='PXD_DCD']/*)" />
-</Volume>
-<Volume name="DCD3">
-  
-<DX unit="mm">-20.854</DX>
-<DY unit="mm">-3.3</DY>
-<xi:include href="#" xpointer="xpointer(//Snippet[@name='PXD_DCD']/*)" />
-</Volume>
-<Volume name="Switcher1">
-  
-<DX unit="mm">-10.696</DX>
-<DY unit="mm">-5.134</DY>
-<xi:include href="#" xpointer="xpointer(//Snippet[@name='PXD_Switcher']/*)" />
-</Volume>
-<Volume name="Switcher2">
-  
-<DX unit="mm">2.104</DX>
-<DY unit="mm">-5.134</DY>
-<xi:include href="#" xpointer="xpointer(//Snippet[@name='PXD_Switcher']/*)" />
-</Volume>
-<Volume name="Switcher3">
-  
-<DX unit="mm">14.904</DX>
-<DY unit="mm">-5.134</DY>
-<xi:include href="#" xpointer="xpointer(//Snippet[@name='PXD_Switcher']/*)" />
-</Volume>
-<Volume name="Switcher4">
-  
-<DX unit="mm">27.704</DX>
-<DY unit="mm">-5.134</DY>
-<xi:include href="#" xpointer="xpointer(//Snippet[@name='PXD_Switcher']/*)" />
-</Volume>
-</Snippet>
-<Snippet name="PXD_DCD">
-  <Color>#006699</Color>
-  <Material>Si</Material>
-  <Shape>Box</Shape>
-  <DZ unit="mm">0.41</DZ>
-  <HalfX unit="mm">2.4845</HalfX>
-  <HalfY unit="mm">1.62</HalfY>
-  <HalfZ unit="mm">0.2</HalfZ>
-</Snippet>
-<Snippet name="PXD_DHH">
-  <Color>#006699</Color>
-  <Material>Si</Material>
-  <Shape>Box</Shape>
-  <DZ unit="mm">0.41</DZ>
-  <HalfX unit="mm">2.1</HalfX>
-  <HalfY unit="mm">1.64</HalfY>
-  <HalfZ unit="mm">0.2</HalfZ>
-</Snippet>
-<Snippet name="PXD_Switcher">
-  <Color>#006699</Color>
-  <Material>Si</Material>
-  <Shape>Box</Shape>
-  <DZ unit="mm">0.41</DZ>
-  <HalfX unit="mm">1.8</HalfX>
-  <HalfY unit="mm">0.735</HalfY>
-  <HalfZ unit="mm">0.2</HalfZ>
-</Snippet>
-<Snippet name="PXD6S-sensor" />
-<Snippet name="PCB-Frame">
-  <Color>#999999</Color>
-  <Material>G4_Al</Material>
-  <Shape>Box</Shape>
-  <HalfX unit="mm">15</HalfX>
-  <HalfY unit="mm">100</HalfY>
-  <HalfZ unit="mm">121</HalfZ>
-  <Subtract>
-    <Shape>Box</Shape>
-    <Name>FrameCutForBoard1</Name>
-    <DX unit="mm">15.0</DX>
-    <DY unit="mm">0.0</DY>
-    <DZ unit="mm">-4.0</DZ>
-    <Theta unit="deg">0</Theta>
-    <Phi unit="deg">0</Phi>
-    <Psi unit="deg">0</Psi>
-    <HalfX unit="mm">13.0</HalfX>
-    <HalfY unit="mm">90</HalfY>
-    <HalfZ unit="mm">121</HalfZ>
-  </Subtract>
-  <Subtract>
-    <Shape>Box</Shape>
-    <Name>FrameCutForBoard2</Name>
-    <DX unit="mm">-15.0</DX>
-    <DY unit="mm">0.0</DY>
-    <DZ unit="mm">-4.0</DZ>
-    <Theta unit="deg">0</Theta>
-    <Phi unit="deg">0</Phi>
-    <Psi unit="deg">0</Psi>
-    <HalfX unit="mm">13.0</HalfX>
-    <HalfY unit="mm">90.01</HalfY>
-    <HalfZ unit="mm">121.01</HalfZ>
-  </Subtract>
-  <Subtract>
-    <Shape>Box</Shape>
-    <Name>FrameHole</Name>
-    <DX unit="mm">0.0</DX>
-    <DY unit="mm">0.0</DY>
-    <DZ unit="mm">50.0</DZ>
-    <Theta unit="deg">0</Theta>
-    <Phi unit="deg">0</Phi>
-    <Psi unit="deg">0</Psi>
-    <HalfX unit="mm">20.0</HalfX>
-    <HalfY unit="mm">70</HalfY>
-    <HalfZ unit="mm">60</HalfZ>
-  </Subtract>
-  <Subtract>
-    <Shape>Box</Shape>
-    <Name>FrameHoleUnderConnections</Name>
-    <DX unit="mm">0.0</DX>
-    <DY unit="mm">0.0</DY>
-    <DZ unit="mm">-50.0</DZ>
-    <Theta unit="deg">0</Theta>
-    <Phi unit="deg">0</Phi>
-    <Psi unit="deg">0</Psi>
-    <HalfX unit="mm">20.0</HalfX>
-    <HalfY unit="mm">89.99</HalfY>
-    <HalfZ unit="mm">49.99</HalfZ>
-  </Subtract>
-  <Subtract>
-    <Name>PCBFrameTopEdgeCut</Name>
-    <Shape>Box</Shape>
-    <DX unit="mm">0.0</DX>
-    <DY unit="mm">100.0</DY>
-    <DZ unit="mm">121.0</DZ>
-    <Theta unit="deg">45</Theta>
-    <Phi unit="deg">0</Phi>
-    <Psi unit="deg">0</Psi>
-    <HalfX unit="mm">20</HalfX>
-    <HalfY unit="mm">8</HalfY>
-    <HalfZ unit="mm">7.5</HalfZ>
-  </Subtract>
-</Snippet>
-<Snippet name="PCB-Board_L2_withCu">
-  <Material>Air</Material>
-  <Shape>Box</Shape>
-  <HalfX unit="mm">0.75</HalfX>
-  <HalfY unit="mm">80</HalfY>
-  <HalfZ unit="mm">75</HalfZ>
-  <Volume name="PCB-Board_L2">
-    <Color>#ee0000</Color>
-    
-<Material>PCB-FR4</Material>
-<Shape>Box</Shape>
-<DX unit="mm">0.0</DX>
-<DY unit="mm">0.0</DY>
-<DZ unit="mm">0.0</DZ>
-<Theta unit="deg">0</Theta>
-<Phi unit="deg">0</Phi>
-<Psi unit="deg">0</Psi>
-<HalfX unit="mm">0.75</HalfX>
-<HalfY unit="mm">80</HalfY>
-<HalfZ unit="mm">75</HalfZ>
-<xi:include href="#" xpointer="xpointer(//Snippet[@name='PCBs-Common-Cuts']/*)" />
-<Subtract>
-  <Name>PCBCutForCuLayer</Name>
-  <DX unit="mm">-0.75</DX>
-  <DY unit="mm">-30.0</DY>
-  <DZ unit="mm">-25.0</DZ>
-  <Theta unit="deg">0</Theta>
-  <Phi unit="deg">0</Phi>
-  <Psi unit="deg">0</Psi>
-  <xi:include href="#" xpointer="xpointer(//Snippet[@name='PCBCutForCuLayer']/*)" />
-</Subtract>
-</Volume>
-<Volume name="PCB_CuLayer">
-  
-<Material>G4_Cu</Material>
-<Shape>Box</Shape>
-<DX unit="mm">-0.6</DX>
-<DY unit="mm">-30.0</DY>
-<DZ unit="mm">-25.0</DZ>
-<Theta unit="deg">0</Theta>
-<Phi unit="deg">0</Phi>
-<Psi unit="deg">0</Psi>
-<HalfX unit="mm">0.125</HalfX>
-<HalfY unit="mm">32</HalfY>
-<HalfZ unit="mm">33</HalfZ>
-<Subtract>
-  <Name>CuTopEdgeCut</Name>
-  <Shape>Box</Shape>
-  <DX unit="mm">0.0</DX>
-  <DY unit="mm">32.0</DY>
-  <DZ unit="mm">33.0</DZ>
-  <Theta unit="deg">45</Theta>
-  <Phi unit="deg">0</Phi>
-  <Psi unit="deg">0</Psi>
-  <HalfX unit="mm">2</HalfX>
-  <HalfY unit="mm">3</HalfY>
-  <HalfZ unit="mm">2.5</HalfZ>
-</Subtract>
-<Subtract>
-  <Name>CuPXDHole</Name>
-  <Shape>Box</Shape>
-  <DX unit="mm">0.0</DX>
-  <DY unit="mm">0.0</DY>
-  <DZ unit="mm">47.0</DZ>
-  <Theta unit="deg">0</Theta>
-  <Phi unit="deg">0</Phi>
-  <Psi unit="deg">0</Psi>
-  <HalfX unit="mm">2</HalfX>
-  <HalfY unit="mm">6.8</HalfY>
-  <HalfZ unit="mm">23.9</HalfZ>
-</Subtract>
-</Volume>
-</Snippet>
-<Snippet name="CoolingBlock">
-  <Material>G4_Cu</Material>
-  <Color>#ff0000</Color>
-  <Shape>Box</Shape>
-  <!--DX unit="mm">-0.6</DX>
-  <DY unit="mm">-30.0</DY>
-  <DZ unit="mm">-25.0</DZ-->
-  <Theta unit="deg">0</Theta>
-  <Phi unit="deg">0</Phi>
-  <Psi unit="deg">0</Psi>
-  <HalfX unit="mm">2</HalfX>
-  <HalfY unit="mm">32</HalfY>
-  <HalfZ unit="mm">33</HalfZ>
-  <Subtract>
-    <Name>CuTopEdgeCut</Name>
-    <Shape>Box</Shape>
-    <DX unit="mm">0.0</DX>
-    <DY unit="mm">32.0</DY>
-    <DZ unit="mm">33.0</DZ>
-    <Theta unit="deg">45</Theta>
-    <Phi unit="deg">0</Phi>
-    <Psi unit="deg">0</Psi>
-    <HalfX unit="mm">3</HalfX>
-    <HalfY unit="mm">3</HalfY>
-    <HalfZ unit="mm">2.5</HalfZ>
-  </Subtract>
-  <Subtract>
-    <Name>CuPXDHole</Name>
-    <Shape>Box</Shape>
-    <DX unit="mm">0.0</DX>
-    <DY unit="mm">0.0</DY>
-    <DZ unit="mm">47.0</DZ>
-    <Theta unit="deg">0</Theta>
-    <Phi unit="deg">0</Phi>
-    <Psi unit="deg">0</Psi>
-    <HalfX unit="mm">3</HalfX>
-    <HalfY unit="mm">6.8</HalfY>
-    <HalfZ unit="mm">23.9</HalfZ>
-  </Subtract>
-</Snippet>
-<Snippet name="PCB-Board_L1_withCu">
-  <Material>Air</Material>
-  <Shape>Box</Shape>
-  <HalfX unit="mm">0.75</HalfX>
-  <HalfY unit="mm">80</HalfY>
-  <HalfZ unit="mm">75</HalfZ>
-  <Volume name="PCB-Board_L1">
-    <Color>#ee0000</Color>
-    
-<Material>PCB-FR4</Material>
-<Shape>Box</Shape>
-<DX unit="mm">0.0</DX>
-<DY unit="mm">0.0</DY>
-<DZ unit="mm">0.0</DZ>
-<Theta unit="deg">0</Theta>
-<Phi unit="deg">0</Phi>
-<Psi unit="deg">0</Psi>
-<HalfX unit="mm">0.75</HalfX>
-<HalfY unit="mm">80</HalfY>
-<HalfZ unit="mm">75</HalfZ>
-<xi:include href="#" xpointer="xpointer(//Snippet[@name='PCBs-Common-Cuts']/*)" />
-<Subtract>
-  <Name>PCBCutForCuLayer</Name>
-  <DX unit="mm">0.75</DX>
-  <DY unit="mm">-30.0</DY>
-  <DZ unit="mm">-25.0</DZ>
-  <Theta unit="deg">0</Theta>
-  <Phi unit="deg">0</Phi>
-  <Psi unit="deg">0</Psi>
-  <xi:include href="#" xpointer="xpointer(//Snippet[@name='PCBCutForCuLayer']/*)" />
-</Subtract>
-</Volume>
-<Volume name="PCB_CuLayer">
-  
-<Material>G4_Cu</Material>
-<Shape>Box</Shape>
-<DX unit="mm">0.6</DX>
-<DY unit="mm">-30.0</DY>
-<DZ unit="mm">-25.0</DZ>
-<Theta unit="deg">0</Theta>
-<Phi unit="deg">0</Phi>
-<Psi unit="deg">0</Psi>
-<HalfX unit="mm">0.125</HalfX>
-<HalfY unit="mm">32</HalfY>
-<HalfZ unit="mm">33</HalfZ>
-<Subtract>
-  <Name>CuTopEdgeCut</Name>
-  <Shape>Box</Shape>
-  <DX unit="mm">0.0</DX>
-  <DY unit="mm">32.0</DY>
-  <DZ unit="mm">33.0</DZ>
-  <Theta unit="deg">45</Theta>
-  <Phi unit="deg">0</Phi>
-  <Psi unit="deg">0</Psi>
-  <HalfX unit="mm">2</HalfX>
-  <HalfY unit="mm">3</HalfY>
-  <HalfZ unit="mm">2.5</HalfZ>
-</Subtract>
-<Subtract>
-  <Name>CuPXDHole</Name>
-  <Shape>Box</Shape>
-  <DX unit="mm">0.0</DX>
-  <DY unit="mm">0.0</DY>
-  <DZ unit="mm">47.0</DZ>
-  <Theta unit="deg">0</Theta>
-  <Phi unit="deg">0</Phi>
-  <Psi unit="deg">0</Psi>
-  <HalfX unit="mm">2</HalfX>
-  <HalfY unit="mm">6.8</HalfY>
-  <HalfZ unit="mm">23.9</HalfZ>
-</Subtract>
-</Volume>
-</Snippet>
-<Snippet name="PCBCutForCuLayer">
-  <Shape>Box</Shape>
-  <HalfX unit="mm">0.25</HalfX>
-  <HalfY unit="mm">32</HalfY>
-  <HalfZ unit="mm">33</HalfZ>
-  <Subtract>
-    <Name>PCBCutForCuLayerTopEdgeCut</Name>
-    <Shape>Box</Shape>
-    <DX unit="mm">0.0</DX>
-    <DY unit="mm">32.0</DY>
-    <DZ unit="mm">33.0</DZ>
-    <Theta unit="deg">45</Theta>
-    <Phi unit="deg">0</Phi>
-    <Psi unit="deg">0</Psi>
-    <HalfX unit="mm">2</HalfX>
-    <HalfY unit="mm">3</HalfY>
-    <HalfZ unit="mm">2.5</HalfZ>
-  </Subtract>
-</Snippet>
-<Snippet name="PCBs-Common-Cuts">
-  <Subtract>
-    <Name>PCBTopEdgeCut</Name>
-    <Shape>Box</Shape>
-    <DX unit="mm">0.0</DX>
-    <DY unit="mm">80.0</DY>
-    <DZ unit="mm">75.0</DZ>
-    <Theta unit="deg">45</Theta>
-    <Phi unit="deg">0</Phi>
-    <Psi unit="deg">0</Psi>
-    <HalfX unit="mm">2</HalfX>
-    <HalfY unit="mm">8</HalfY>
-    <HalfZ unit="mm">7.5</HalfZ>
-  </Subtract>
-  <Subtract>
-    <Name>PCBBottomEdgeCut</Name>
-    <Shape>Box</Shape>
-    <DX unit="mm">0.0</DX>
-    <DY unit="mm">-80.0</DY>
-    <DZ unit="mm">75.0</DZ>
-    <Theta unit="deg">-45</Theta>
-    <Phi unit="deg">0</Phi>
-    <Psi unit="deg">0</Psi>
-    <HalfX unit="mm">2</HalfX>
-    <HalfY unit="mm">3</HalfY>
-    <HalfZ unit="mm">2.5</HalfZ>
-  </Subtract>
-  <Subtract>
-    <Name>PCBPXDHole</Name>
-    <Shape>Box</Shape>
-    <DX unit="mm">0.0</DX>
+     </Volume>
+     <Volume name="VXDBox-Window1">
+       <Material>PMMA</Material>
+       <Shape>Box</Shape>
+       <DX unit="mm">127.505</DX>
+       <HalfX unit="mm">0.005</HalfX>
+       <HalfY unit="mm">51</HalfY>
+       <HalfZ unit="mm">51</HalfZ>
+     </Volume>
+     <Volume name="VXDBox-Window2">
+       <Material>PMMA</Material>
+       <Shape>Box</Shape>
+       <DX unit="mm">-127.505</DX>
+       <HalfX unit="mm">0.005</HalfX>
+       <HalfY unit="mm">51</HalfY>
+       <HalfZ unit="mm">51</HalfZ>
+     </Volume>
+   </Snippet>
+   
+   <Snippet name="PXD-SensitiveArea">
+      <Color>#00ff00</Color>
+      <Material>Si</Material>
+      <Shape>Box</Shape>
+      <DX unit="mm">7.0</DX>
+      <DY unit="mm">1.2</DY>
+      <DZ unit="mm">-0.1725</DZ>
+      <HalfX unit="mm">24</HalfX>
+      <HalfY unit="mm">4.8</HalfY>
+      <HalfZ unit="um">25</HalfZ>
+   </Snippet>
+   <Snippet name="PXD6-S-SensitiveArea_short">
+      <Color>#00ff00</Color>
+      <Material>Si</Material>
+      <Shape>Box</Shape>
+      <DX unit="mm">7.0</DX>
+      <DY unit="mm">1.0</DY>
+      <DZ unit="mm">-0.1725</DZ>
+      <HalfX unit="mm">18.4</HalfX>
+      <HalfY unit="mm">4.8</HalfY>
+      <HalfZ unit="um">25</HalfZ>
+   </Snippet>
+   <Snippet name="PXD6-sensor_L2">
+      <Color>#006699</Color>
+      <Material>Air</Material>
+      <Shape>Box</Shape>
+      <HalfX unit="mm">32.9</HalfX>
+      <HalfY unit="mm">7.8</HalfY>
+      <HalfZ unit="mm">0.61</HalfZ>
+      <Subtract>
+         <Name>removing_overlap_from_air_volume</Name>
+         <Shape>Box</Shape>
+         <HalfX unit="mm">32.9</HalfX>
+         <HalfY unit="mm">7.8</HalfY>
+         <HalfZ unit="mm">0.4</HalfZ>
+         <DZ unit="mm">-0.61</DZ>
+      </Subtract>
+      <Volume name="PXD-Frame">
+         <Color>#006699</Color>
+         <Material>Si</Material>
+         <Shape>Box</Shape>
+         <HalfX unit="mm">32.9</HalfX>
+         <HalfY unit="mm">7.8</HalfY>
+         <HalfZ unit="mm">0.21</HalfZ>
+         <Subtract>
+            <Name>PXD-Frame_CutForActiveArea</Name>
+            <Shape>Box</Shape>
+            <DX unit="mm">7.0</DX>
+            <DY unit="mm">1.2</DY>
+            <HalfX unit="mm">24</HalfX>
+            <HalfY unit="mm">4.8</HalfY>
+            <HalfZ unit="mm">1.0</HalfZ>
+         </Subtract>
+      </Volume>
+      <Volume name="DHH1">
+         <DX unit="mm">-27.09</DX>
+         <DY unit="mm">4.473</DY>
+         <xi:include href="#" xpointer="xpointer(//Snippet[@name='PXD_DHH']/*)" />
+      </Volume>
+      <Volume name="DHH2">
+         <DX unit="mm">-27.09</DX>
+         <DY unit="mm">0.597</DY>
+         <xi:include href="#" xpointer="xpointer(//Snippet[@name='PXD_DHH']/*)" />
+      </Volume>
+      <Volume name="DHH3">
+         <DX unit="mm">-27.09</DX>
+         <DY unit="mm">-3.279</DY>
+         <xi:include href="#" xpointer="xpointer(//Snippet[@name='PXD_DHH']/*)" />
+      </Volume>
+      <Volume name="DCD1">
+         <DX unit="mm">-20.939</DX>
+         <DY unit="mm">4.473</DY>
+         <xi:include href="#" xpointer="xpointer(//Snippet[@name='PXD_DCD']/*)" />
+      </Volume>
+      <Volume name="DCD2">
+         <DX unit="mm">-20.939</DX>
+         <DY unit="mm">0.597</DY>
+         <xi:include href="#" xpointer="xpointer(//Snippet[@name='PXD_DCD']/*)" />
+      </Volume>
+      <Volume name="DCD3">
+         <DX unit="mm">-20.939</DX>
+         <DY unit="mm">-3.279</DY>
+         <xi:include href="#" xpointer="xpointer(//Snippet[@name='PXD_DCD']/*)" />
+      </Volume>
+      <Volume name="Switcher1">
+         <DX unit="mm">-12.371</DX>
+         <DY unit="mm">-5.134</DY>
+         <xi:include href="#" xpointer="xpointer(//Snippet[@name='PXD_Switcher']/*)" />
+      </Volume>
+      <Volume name="Switcher2">
+         <DX unit="mm">-2.83</DX>
+         <DY unit="mm">-5.134</DY>
+         <xi:include href="#" xpointer="xpointer(//Snippet[@name='PXD_Switcher']/*)" />
+      </Volume>
+      <Volume name="Switcher3">
+         <DX unit="mm">6.711</DX>
+         <DY unit="mm">-5.134</DY>
+         <xi:include href="#" xpointer="xpointer(//Snippet[@name='PXD_Switcher']/*)" />
+      </Volume>
+      <Volume name="Switcher4">
+         <DX unit="mm">16.252</DX>
+         <DY unit="mm">-5.134</DY>
+         <xi:include href="#" xpointer="xpointer(//Snippet[@name='PXD_Switcher']/*)" />
+      </Volume>
+      <Volume name="Switcher5">
+         <DX unit="mm">25.793</DX>
+         <DY unit="mm">-5.134</DY>
+         <xi:include href="#" xpointer="xpointer(//Snippet[@name='PXD_Switcher']/*)" />
+      </Volume>
+   </Snippet>
+   <Snippet name="PXD6-S-sensor_L1">
+      <Color>#006699</Color>
+      <Material>Air</Material>
+      <Shape>Box</Shape>
+      <HalfX unit="mm">32.9</HalfX>
+      <HalfY unit="mm">7.8</HalfY>
+      <HalfZ unit="mm">0.61</HalfZ>
+      <Subtract>
+         <Name>removing_overlap_from_air_volume</Name>
+         <Shape>Box</Shape>
+         <HalfX unit="mm">32.9</HalfX>
+         <HalfY unit="mm">7.8</HalfY>
+         <HalfZ unit="mm">0.4</HalfZ>
+         <DZ unit="mm">-0.61</DZ>
+      </Subtract>
+      <Volume name="PXD-Frame">
+         <Color>#006699</Color>
+         <Material>Si</Material>
+         <Shape>Box</Shape>
+         <HalfX unit="mm">27.3</HalfX>
+         <HalfY unit="mm">7.8</HalfY>
+         <HalfZ unit="mm">0.21</HalfZ>
+         <Subtract>
+            <Name>PXD-Frame_CutForActiveArea</Name>
+            <Shape>Box</Shape>
+            <DX unit="mm">7.0</DX>
+            <DY unit="mm">1.0</DY>
+            <HalfX unit="mm">18.4</HalfX>
+            <HalfY unit="mm">4.8</HalfY>
+            <HalfZ unit="mm">1.0</HalfZ>
+         </Subtract>
+      </Volume>
+      <Volume name="DHH1">
+         <DX unit="mm">-20.45</DX>
+         <DY unit="mm">4.501</DY>
+         <xi:include href="#" xpointer="xpointer(//Snippet[@name='PXD_DHH']/*)" />
+      </Volume>
+      <Volume name="DHH2">
+         <DX unit="mm">-20.45</DX>
+         <DY unit="mm">0.601</DY>
+         <xi:include href="#" xpointer="xpointer(//Snippet[@name='PXD_DHH']/*)" />
+      </Volume>
+      <Volume name="DHH3">
+         <DX unit="mm">-20.45</DX>
+         <DY unit="mm">-3.299</DY>
+         <xi:include href="#" xpointer="xpointer(//Snippet[@name='PXD_DHH']/*)" />
+      </Volume>
+      <Volume name="DCD1">
+         <DX unit="mm">-14.31</DX>
+         <DY unit="mm">4.501</DY>
+         <xi:include href="#" xpointer="xpointer(//Snippet[@name='PXD_DCD']/*)" />
+      </Volume>
+      <Volume name="DCD2">
+         <DX unit="mm">-14.31</DX>
+         <DY unit="mm">0.601</DY>
+         <xi:include href="#" xpointer="xpointer(//Snippet[@name='PXD_DCD']/*)" />
+      </Volume>
+      <Volume name="DCD3">
+         <DX unit="mm">-14.31</DX>
+         <DY unit="mm">-3.299</DY>
+         <xi:include href="#" xpointer="xpointer(//Snippet[@name='PXD_DCD']/*)" />
+      </Volume>
+      <Volume name="Switcher1">
+         <DX unit="mm">-5.706</DX>
+         <DY unit="mm">-5.133</DY>
+         <xi:include href="#" xpointer="xpointer(//Snippet[@name='PXD_Switcher']/*)" />
+      </Volume>
+      <Volume name="Switcher2">
+         <DX unit="mm">3.894</DX>
+         <DY unit="mm">-5.133</DY>
+         <xi:include href="#" xpointer="xpointer(//Snippet[@name='PXD_Switcher']/*)" />
+      </Volume>
+      <Volume name="Switcher3">
+         <DX unit="mm">13.494</DX>
+         <DY unit="mm">-5.133</DY>
+         <xi:include href="#" xpointer="xpointer(//Snippet[@name='PXD_Switcher']/*)" />
+      </Volume>
+      <Volume name="Switcher4">
+         <DX unit="mm">23.094</DX>
+         <DY unit="mm">-5.133</DY>
+         <xi:include href="#" xpointer="xpointer(//Snippet[@name='PXD_Switcher']/*)" />
+      </Volume>
+   </Snippet>
+   <Snippet name="PXD6-sensor_L1_NOT_USED">
+      <Color>#006699</Color>
+      <Material>Air</Material>
+      <Shape>Box</Shape>
+      <HalfX unit="mm">32.9</HalfX>
+      <HalfY unit="mm">7.8</HalfY>
+      <HalfZ unit="mm">0.61</HalfZ>
+      <Subtract>
+         <Name>removing_overlap_from_air_volume</Name>
+         <Shape>Box</Shape>
+         <HalfX unit="mm">32.9</HalfX>
+         <HalfY unit="mm">7.8</HalfY>
+         <HalfZ unit="mm">0.4</HalfZ>
+         <DZ unit="mm">-0.61</DZ>
+      </Subtract>
+      <Volume name="PXD-Frame">
+         <Color>#006699</Color>
+         <Material>Si</Material>
+         <Shape>Box</Shape>
+         <HalfX unit="mm">32.9</HalfX>
+         <HalfY unit="mm">7.8</HalfY>
+         <HalfZ unit="mm">0.21</HalfZ>
+         <Subtract>
+            <Name>PXD-Frame_CutForActiveArea</Name>
+            <Shape>Box</Shape>
+            <DX unit="mm">7.0</DX>
+            <DY unit="mm">1.2</DY>
+            <HalfX unit="mm">24</HalfX>
+            <HalfY unit="mm">4.8</HalfY>
+            <HalfZ unit="mm">1.0</HalfZ>
+         </Subtract>
+      </Volume>
+      <Volume name="DHH1">
+         <DX unit="mm">-26.994</DX>
+         <DY unit="mm">4.5</DY>
+         <xi:include href="#" xpointer="xpointer(//Snippet[@name='PXD_DHH']/*)" />
+      </Volume>
+      <Volume name="DHH2">
+         <DX unit="mm">-26.994</DX>
+         <DY unit="mm">0.6</DY>
+         <xi:include href="#" xpointer="xpointer(//Snippet[@name='PXD_DHH']/*)" />
+      </Volume>
+      <Volume name="DHH3">
+         <DX unit="mm">-26.994</DX>
+         <DY unit="mm">-3.3</DY>
+         <xi:include href="#" xpointer="xpointer(//Snippet[@name='PXD_DHH']/*)" />
+      </Volume>
+      <Volume name="DCD1">
+         <DX unit="mm">-20.854</DX>
+         <DY unit="mm">4.5</DY>
+         <xi:include href="#" xpointer="xpointer(//Snippet[@name='PXD_DCD']/*)" />
+      </Volume>
+      <Volume name="DCD2">
+         <DX unit="mm">-20.854</DX>
+         <DY unit="mm">0.6</DY>
+         <xi:include href="#" xpointer="xpointer(//Snippet[@name='PXD_DCD']/*)" />
+      </Volume>
+      <Volume name="DCD3">
+         <DX unit="mm">-20.854</DX>
+         <DY unit="mm">-3.3</DY>
+         <xi:include href="#" xpointer="xpointer(//Snippet[@name='PXD_DCD']/*)" />
+      </Volume>
+      <Volume name="Switcher1">
+         <DX unit="mm">-10.696</DX>
+         <DY unit="mm">-5.134</DY>
+         <xi:include href="#" xpointer="xpointer(//Snippet[@name='PXD_Switcher']/*)" />
+      </Volume>
+      <Volume name="Switcher2">
+         <DX unit="mm">2.104</DX>
+         <DY unit="mm">-5.134</DY>
+         <xi:include href="#" xpointer="xpointer(//Snippet[@name='PXD_Switcher']/*)" />
+      </Volume>
+      <Volume name="Switcher3">
+         <DX unit="mm">14.904</DX>
+         <DY unit="mm">-5.134</DY>
+         <xi:include href="#" xpointer="xpointer(//Snippet[@name='PXD_Switcher']/*)" />
+      </Volume>
+      <Volume name="Switcher4">
+         <DX unit="mm">27.704</DX>
+         <DY unit="mm">-5.134</DY>
+         <xi:include href="#" xpointer="xpointer(//Snippet[@name='PXD_Switcher']/*)" />
+      </Volume>
+   </Snippet>
+   <Snippet name="PXD_DCD">
+      <Color>#006699</Color>
+      <Material>Si</Material>
+      <Shape>Box</Shape>
+      <DZ unit="mm">0.41</DZ>
+      <HalfX unit="mm">2.4845</HalfX>
+      <HalfY unit="mm">1.62</HalfY>
+      <HalfZ unit="mm">0.2</HalfZ>
+   </Snippet>
+   <Snippet name="PXD_DHH">
+      <Color>#006699</Color>
+      <Material>Si</Material>
+      <Shape>Box</Shape>
+      <DZ unit="mm">0.41</DZ>
+      <HalfX unit="mm">2.1</HalfX>
+      <HalfY unit="mm">1.64</HalfY>
+      <HalfZ unit="mm">0.2</HalfZ>
+   </Snippet>
+   <Snippet name="PXD_Switcher">
+      <Color>#006699</Color>
+      <Material>Si</Material>
+      <Shape>Box</Shape>
+      <DZ unit="mm">0.41</DZ>
+      <HalfX unit="mm">1.8</HalfX>
+      <HalfY unit="mm">0.735</HalfY>
+      <HalfZ unit="mm">0.2</HalfZ>
+   </Snippet>
+   <Snippet name="PCB-Frame">
+      <Color>#999999</Color>
+      <Material>G4_Al</Material>
+      <Shape>Box</Shape>
+      <HalfX unit="mm">15</HalfX>
+      <HalfY unit="mm">100</HalfY>
+      <HalfZ unit="mm">121</HalfZ>
+      <Subtract>
+         <Shape>Box</Shape>
+         <Name>FrameCutForBoard1</Name>
+         <DX unit="mm">15.0</DX>
+         <DY unit="mm">0.0</DY>
+         <DZ unit="mm">-4.0</DZ>
+         <Theta unit="deg">0</Theta>
+         <Phi unit="deg">0</Phi>
+         <Psi unit="deg">0</Psi>
+         <HalfX unit="mm">13.0</HalfX>
+         <HalfY unit="mm">90</HalfY>
+         <HalfZ unit="mm">121</HalfZ>
+      </Subtract>
+      <Subtract>
+         <Shape>Box</Shape>
+         <Name>FrameCutForBoard2</Name>
+         <DX unit="mm">-15.0</DX>
+         <DY unit="mm">0.0</DY>
+         <DZ unit="mm">-4.0</DZ>
+         <Theta unit="deg">0</Theta>
+         <Phi unit="deg">0</Phi>
+         <Psi unit="deg">0</Psi>
+         <HalfX unit="mm">13.0</HalfX>
+         <HalfY unit="mm">90.01</HalfY>
+         <HalfZ unit="mm">121.01</HalfZ>
+      </Subtract>
+      <Subtract>
+         <Shape>Box</Shape>
+         <Name>FrameHole</Name>
+         <DX unit="mm">0.0</DX>
+         <DY unit="mm">0.0</DY>
+         <DZ unit="mm">50.0</DZ>
+         <Theta unit="deg">0</Theta>
+         <Phi unit="deg">0</Phi>
+         <Psi unit="deg">0</Psi>
+         <HalfX unit="mm">20.0</HalfX>
+         <HalfY unit="mm">70</HalfY>
+         <HalfZ unit="mm">60</HalfZ>
+      </Subtract>
+      <Subtract>
+         <Shape>Box</Shape>
+         <Name>FrameHoleUnderConnections</Name>
+         <DX unit="mm">0.0</DX>
+         <DY unit="mm">0.0</DY>
+         <DZ unit="mm">-50.0</DZ>
+         <Theta unit="deg">0</Theta>
+         <Phi unit="deg">0</Phi>
+         <Psi unit="deg">0</Psi>
+         <HalfX unit="mm">20.0</HalfX>
+         <HalfY unit="mm">89.99</HalfY>
+         <HalfZ unit="mm">49.99</HalfZ>
+      </Subtract>
+      <Subtract>
+         <Name>PCBFrameTopEdgeCut</Name>
+         <Shape>Box</Shape>
+         <DX unit="mm">0.0</DX>
+         <DY unit="mm">100.0</DY>
+         <DZ unit="mm">121.0</DZ>
+         <Theta unit="deg">45</Theta>
+         <Phi unit="deg">0</Phi>
+         <Psi unit="deg">0</Psi>
+         <HalfX unit="mm">20</HalfX>
+         <HalfY unit="mm">8</HalfY>
+         <HalfZ unit="mm">7.5</HalfZ>
+      </Subtract>
+   </Snippet>
+   <Snippet name="PCB-Board_L2_withCu">
+      <Material>Air</Material>
+      <Shape>Box</Shape>
+      <HalfX unit="mm">0.75</HalfX>
+      <HalfY unit="mm">80</HalfY>
+      <HalfZ unit="mm">75</HalfZ>
+      <Volume name="PCB-Board_L2">
+         <Color>#ee0000</Color>
+         <Material>PCB-FR4</Material>
+         <Shape>Box</Shape>
+         <DX unit="mm">0.0</DX>
+         <DY unit="mm">0.0</DY>
+         <DZ unit="mm">0.0</DZ>
+         <Theta unit="deg">0</Theta>
+         <Phi unit="deg">0</Phi>
+         <Psi unit="deg">0</Psi>
+         <HalfX unit="mm">0.75</HalfX>
+         <HalfY unit="mm">80</HalfY>
+         <HalfZ unit="mm">75</HalfZ>
+         <xi:include href="#" xpointer="xpointer(//Snippet[@name='PCBs-Common-Cuts']/*)" />
+         <Subtract>
+            <Name>PCBCutForCuLayer</Name>
+            <DX unit="mm">-0.75</DX>
+            <DY unit="mm">-30.0</DY>
+            <DZ unit="mm">-25.0</DZ>
+            <Theta unit="deg">0</Theta>
+            <Phi unit="deg">0</Phi>
+            <Psi unit="deg">0</Psi>
+            <xi:include href="#" xpointer="xpointer(//Snippet[@name='PCBCutForCuLayer']/*)" />
+         </Subtract>
+      </Volume>
+      <Volume name="PCB_CuLayer">
+         <Material>G4_Cu</Material>
+         <Shape>Box</Shape>
+         <DX unit="mm">-0.625</DX>
+         <DY unit="mm">-30.0</DY>
+         <DZ unit="mm">-25.0</DZ>
+         <Theta unit="deg">0</Theta>
+         <Phi unit="deg">0</Phi>
+         <Psi unit="deg">0</Psi>
+         <HalfX unit="mm">0.125</HalfX>
+         <HalfY unit="mm">32</HalfY>
+         <HalfZ unit="mm">33</HalfZ>
+         <Subtract>
+            <Name>CuTopEdgeCut</Name>
+            <Shape>Box</Shape>
+            <DX unit="mm">0.0</DX>
+            <DY unit="mm">32.0</DY>
+            <DZ unit="mm">33.0</DZ>
+            <Theta unit="deg">45</Theta>
+            <Phi unit="deg">0</Phi>
+            <Psi unit="deg">0</Psi>
+            <HalfX unit="mm">2</HalfX>
+            <HalfY unit="mm">3</HalfY>
+            <HalfZ unit="mm">2.5</HalfZ>
+         </Subtract>
+         <Subtract>
+            <Name>CuPXDHole</Name>
+            <Shape>Box</Shape>
+            <DX unit="mm">0.0</DX>
+            <DY unit="mm">0.0</DY>
+            <DZ unit="mm">47.0</DZ>
+            <Theta unit="deg">0</Theta>
+            <Phi unit="deg">0</Phi>
+            <Psi unit="deg">0</Psi>
+            <HalfX unit="mm">2</HalfX>
+            <HalfY unit="mm">6.8</HalfY>
+            <HalfZ unit="mm">23.9</HalfZ>
+         </Subtract>
+      </Volume>
+   </Snippet>
+   <Snippet name="CoolingBlock">
+      <Material>G4_Cu</Material>
+      <Color>#ff0000</Color>
+      <Shape>Box</Shape>
+      <!--DX unit="mm">-0.6</DX>
     <DY unit="mm">-30.0</DY>
-    <DZ unit="mm">22.0</DZ>
-    <Theta unit="deg">0</Theta>
-    <Phi unit="deg">0</Phi>
-    <Psi unit="deg">0</Psi>
-    <HalfX unit="mm">2</HalfX>
-    <HalfY unit="mm">6.8</HalfY>
-    <HalfZ unit="mm">23.9</HalfZ>
-  </Subtract>
-</Snippet>
+    <DZ unit="mm">-25.0</DZ-->
+      <Theta unit="deg">0</Theta>
+      <Phi unit="deg">0</Phi>
+      <Psi unit="deg">0</Psi>
+      <HalfX unit="mm">2</HalfX>
+      <HalfY unit="mm">32</HalfY>
+      <HalfZ unit="mm">33</HalfZ>
+      <Subtract>
+         <Name>CuTopEdgeCut</Name>
+         <Shape>Box</Shape>
+         <DX unit="mm">0.0</DX>
+         <DY unit="mm">32.0</DY>
+         <DZ unit="mm">33.0</DZ>
+         <Theta unit="deg">45</Theta>
+         <Phi unit="deg">0</Phi>
+         <Psi unit="deg">0</Psi>
+         <HalfX unit="mm">3</HalfX>
+         <HalfY unit="mm">3</HalfY>
+         <HalfZ unit="mm">2.5</HalfZ>
+      </Subtract>
+      <Subtract>
+         <Name>CuPXDHole</Name>
+         <Shape>Box</Shape>
+         <DX unit="mm">0.0</DX>
+         <DY unit="mm">0.0</DY>
+         <DZ unit="mm">47.0</DZ>
+         <Theta unit="deg">0</Theta>
+         <Phi unit="deg">0</Phi>
+         <Psi unit="deg">0</Psi>
+         <HalfX unit="mm">3</HalfX>
+         <HalfY unit="mm">6.8</HalfY>
+         <HalfZ unit="mm">23.9</HalfZ>
+      </Subtract>
+   </Snippet>
+   <Snippet name="PCB-Board_L1_withCu">
+      <Material>Air</Material>
+      <Shape>Box</Shape>
+      <HalfX unit="mm">0.75</HalfX>
+      <HalfY unit="mm">80</HalfY>
+      <HalfZ unit="mm">75</HalfZ>
+      <Volume name="PCB-Board_L1">
+         <Color>#ee0000</Color>
+         <Material>PCB-FR4</Material>
+         <Shape>Box</Shape>
+         <DX unit="mm">0.0</DX>
+         <DY unit="mm">0.0</DY>
+         <DZ unit="mm">0.0</DZ>
+         <Theta unit="deg">0</Theta>
+         <Phi unit="deg">0</Phi>
+         <Psi unit="deg">0</Psi>
+         <HalfX unit="mm">0.75</HalfX>
+         <HalfY unit="mm">80</HalfY>
+         <HalfZ unit="mm">75</HalfZ>
+         <xi:include href="#" xpointer="xpointer(//Snippet[@name='PCBs-Common-Cuts']/*)" />
+         <Subtract>
+            <Name>PCBCutForCuLayer</Name>
+            <DX unit="mm">0.75</DX>
+            <DY unit="mm">-30.0</DY>
+            <DZ unit="mm">-25.0</DZ>
+            <Theta unit="deg">0</Theta>
+            <Phi unit="deg">0</Phi>
+            <Psi unit="deg">0</Psi>
+            <xi:include href="#" xpointer="xpointer(//Snippet[@name='PCBCutForCuLayer']/*)" />
+         </Subtract>
+      </Volume>
+      <Volume name="PCB_CuLayer">
+         <Material>G4_Cu</Material>
+         <Shape>Box</Shape>
+         <DX unit="mm">0.625</DX>
+         <DY unit="mm">-30.0</DY>
+         <DZ unit="mm">-25.0</DZ>
+         <Theta unit="deg">0</Theta>
+         <Phi unit="deg">0</Phi>
+         <Psi unit="deg">0</Psi>
+         <HalfX unit="mm">0.125</HalfX>
+         <HalfY unit="mm">32</HalfY>
+         <HalfZ unit="mm">33</HalfZ>
+         <Subtract>
+            <Name>CuTopEdgeCut</Name>
+            <Shape>Box</Shape>
+            <DX unit="mm">0.0</DX>
+            <DY unit="mm">32.0</DY>
+            <DZ unit="mm">33.0</DZ>
+            <Theta unit="deg">45</Theta>
+            <Phi unit="deg">0</Phi>
+            <Psi unit="deg">0</Psi>
+            <HalfX unit="mm">2</HalfX>
+            <HalfY unit="mm">3</HalfY>
+            <HalfZ unit="mm">2.5</HalfZ>
+         </Subtract>
+         <Subtract>
+            <Name>CuPXDHole</Name>
+            <Shape>Box</Shape>
+            <DX unit="mm">0.0</DX>
+            <DY unit="mm">0.0</DY>
+            <DZ unit="mm">47.0</DZ>
+            <Theta unit="deg">0</Theta>
+            <Phi unit="deg">0</Phi>
+            <Psi unit="deg">0</Psi>
+            <HalfX unit="mm">2</HalfX>
+            <HalfY unit="mm">6.8</HalfY>
+            <HalfZ unit="mm">23.9</HalfZ>
+         </Subtract>
+      </Volume>
+   </Snippet>
+   <Snippet name="PCBCutForCuLayer">
+      <Shape>Box</Shape>
+      <HalfX unit="mm">0.25</HalfX>
+      <HalfY unit="mm">32</HalfY>
+      <HalfZ unit="mm">33</HalfZ>
+      <Subtract>
+         <Name>PCBCutForCuLayerTopEdgeCut</Name>
+         <Shape>Box</Shape>
+         <DX unit="mm">0.0</DX>
+         <DY unit="mm">32.0</DY>
+         <DZ unit="mm">33.0</DZ>
+         <Theta unit="deg">45</Theta>
+         <Phi unit="deg">0</Phi>
+         <Psi unit="deg">0</Psi>
+         <HalfX unit="mm">2</HalfX>
+         <HalfY unit="mm">3</HalfY>
+         <HalfZ unit="mm">2.5</HalfZ>
+      </Subtract>
+   </Snippet>
+   <Snippet name="PCBs-Common-Cuts">
+      <Subtract>
+         <Name>PCBTopEdgeCut</Name>
+         <Shape>Box</Shape>
+         <DX unit="mm">0.0</DX>
+         <DY unit="mm">80.0</DY>
+         <DZ unit="mm">75.0</DZ>
+         <Theta unit="deg">45</Theta>
+         <Phi unit="deg">0</Phi>
+         <Psi unit="deg">0</Psi>
+         <HalfX unit="mm">2</HalfX>
+         <HalfY unit="mm">8</HalfY>
+         <HalfZ unit="mm">7.5</HalfZ>
+      </Subtract>
+      <Subtract>
+         <Name>PCBBottomEdgeCut</Name>
+         <Shape>Box</Shape>
+         <DX unit="mm">0.0</DX>
+         <DY unit="mm">-80.0</DY>
+         <DZ unit="mm">75.0</DZ>
+         <Theta unit="deg">-45</Theta>
+         <Phi unit="deg">0</Phi>
+         <Psi unit="deg">0</Psi>
+         <HalfX unit="mm">2</HalfX>
+         <HalfY unit="mm">3</HalfY>
+         <HalfZ unit="mm">2.5</HalfZ>
+      </Subtract>
+      <Subtract>
+         <Name>PCBPXDHole</Name>
+         <Shape>Box</Shape>
+         <DX unit="mm">0.0</DX>
+         <DY unit="mm">-30.0</DY>
+         <DZ unit="mm">22.0</DZ>
+         <Theta unit="deg">0</Theta>
+         <Phi unit="deg">0</Phi>
+         <Psi unit="deg">0</Psi>
+         <HalfX unit="mm">2</HalfX>
+         <HalfY unit="mm">6.8</HalfY>
+         <HalfZ unit="mm">23.9</HalfZ>
+      </Subtract>
+   </Snippet>
 </Library>

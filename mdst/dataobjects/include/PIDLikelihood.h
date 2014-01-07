@@ -23,7 +23,7 @@ namespace Belle2 {
   /**
    * Class to collect log likelihoods from TOP, ARICH, dEdx, ECL and KLM
    * aimed for output to mdst
-   * includes a function to return combined likelihood probability (like Belle1 atc_pid)
+   * includes functions to return combined likelihood probability
    */
 
   class PIDLikelihood : public RelationsObject {
@@ -47,27 +47,53 @@ namespace Belle2 {
 
     /**
      * Check whether PID information from a given set of detectors is available
-     * @param set  set of detector IDs
-     * @return     true if the given set of detectors contributed to the PID information
+     * @param set a set of PID detectors
+     * @return true if the given set of detectors contributed to the PID information
      */
     bool isAvailable(Const::PIDDetectorSet set) const {return  m_detectors.contains(set);}
 
     /**
      * Return log likelihood for a given detector set and particle
-     * @param set  set of detector IDs
-     * @param part particle type
-     * @return     log likelihood
+     * @param part charged stable particle
+     * @param set  a set of PID detectors to use
+     * @return log likelihood
      */
-    float getLogL(const Const::ChargedStable& part, Const::PIDDetectorSet set = Const::PIDDetectorSet::set()) const;
+    float getLogL(const Const::ChargedStable& part,
+                  Const::PIDDetectorSet set = Const::PIDDetectorSet::set()) const;
 
     /**
-     * Return combined likelihood probability for particle being p1 and not p2 assuming equal prior probablilites
-     * @param p1 particle enumerator
-     * @param p2 particle enumerator
-     * @param set set of detector IDs
+     * Return combined likelihood probability for particle being p1 and not p2,
+     * assuming equal prior probablilites
+     * @param p1 charged stable particle
+     * @param p2 charged stable particle
+     * @param set  a set of PID detectors to use
      * @return likelihood probability P_{p1/p2} (a value btw. 0 and 1)
      */
-    double getProbability(const Const::ChargedStable& p1, const Const::ChargedStable& p2, Const::PIDDetectorSet set = Const::PIDDetectorSet::set()) const;
+    double getProbability(const Const::ChargedStable& p1,
+                          const Const::ChargedStable& p2,
+                          Const::PIDDetectorSet set = Const::PIDDetectorSet::set()) const;
+
+    /**
+     * Return combined likelihood probability for a particle in a given particle set,
+     * assuming equal prior probablilites.
+     * @param part charged stable particle
+     * @param partSet a set of charged stable particles
+     * @param set  a set of PID detectors to use
+     * @return likelihood probability (a value btw. 0 and 1)
+     */
+    double getProbability(const Const::ChargedStable& part,
+                          const Const::ParticleSet& partSet = Const::chargedStableSet,
+                          Const::PIDDetectorSet set = Const::PIDDetectorSet::set()) const;
+
+    /**
+     * Return most likely particle type in a given particle set,
+     * assuming equal prior probablilites.
+     * @param partSet a set of charged stable particles
+     * @param set  a set of PID detectors to use
+     * @return particle type
+     */
+    Const::ParticleType getMostLikely(const Const::ParticleSet& partSet = Const::chargedStableSet,
+                                      Const::PIDDetectorSet set = Const::PIDDetectorSet::set()) const;
 
   private:
 

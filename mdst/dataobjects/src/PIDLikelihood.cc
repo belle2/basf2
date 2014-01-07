@@ -44,18 +44,87 @@ void PIDLikelihood::setLogLikelihood(Const::EDetector det,
 }
 
 
-float PIDLikelihood::getLogL(const Const::ChargedStable& part, Const::PIDDetectorSet set) const
+float PIDLikelihood::getLogL(const Const::ChargedStable& part,
+                             Const::PIDDetectorSet set) const
 {
   float result = 0;
   for (unsigned int index = 0; index < Const::PIDDetectorSet::set().size(); ++index) {
-    if (set.contains(Const::PIDDetectorSet::set()[index])) result += m_logl[index][part.getIndex()];
+    if (set.contains(Const::PIDDetectorSet::set()[index]))
+      result += m_logl[index][part.getIndex()];
   }
   return result;
 }
 
-double PIDLikelihood::getProbability(const Const::ChargedStable& p1, const Const::ChargedStable& p2, Const::PIDDetectorSet set) const
+
+double PIDLikelihood::getProbability(const Const::ChargedStable& p1,
+                                     const Const::ChargedStable& p2,
+                                     Const::PIDDetectorSet set) const
 {
   return probability(getLogL(p1, set), getLogL(p2, set));
+}
+
+
+double PIDLikelihood::getProbability(const Const::ChargedStable& part,
+                                     const Const::ParticleSet& partSet,
+                                     Const::PIDDetectorSet detSet) const
+{
+
+  if (!partSet.contains(part)) {
+    B2ERROR("PIDLikelihood::getProbability: particle set doesn't contain given particle");
+    return 0;
+  }
+
+  unsigned n = partSet.size();
+  double logL[n];
+  for (unsigned i = 0; i < n; ++i) {
+    double pdgCode = partSet.at(i).getPDGCode();
+    const Const::ChargedStable chargedStable = Const::chargedStableSet.find(pdgCode);
+    if (chargedStable == Const::invalidParticle) {
+      B2ERROR("PIDLikelihood::getProbability: particle set contains invalid particle");
+      return 0;
+    }
+    logL[i] = getLogL(chargedStable, detSet);
+  }
+
+  double logLmax = logL[0];
+  for (unsigned i = 1; i < n; ++i) {
+    if (logL[i] > logLmax) logLmax = logL[i];
+  }
+
+  double norm = 0;
+  for (unsigned i = 0; i < n; ++i) {
+    logL[i] = exp(logL[i] - logLmax);
+    norm += logL[i];
+  }
+
+  int k = partSet.find(part.getPDGCode()).getIndex();
+  return logL[k] / norm;
+
+}
+
+Const::ParticleType PIDLikelihood::getMostLikely(const Const::ParticleSet& partSet,
+                                                 Const::PIDDetectorSet detSet) const
+{
+
+  unsigned n = partSet.size();
+  double logL[n];
+  for (unsigned i = 0; i < n; ++i) {
+    double pdgCode = partSet.at(i).getPDGCode();
+    const Const::ChargedStable chargedStable = Const::chargedStableSet.find(pdgCode);
+    if (chargedStable == Const::invalidParticle) {
+      B2ERROR("PIDLikelihood::getProbability: particle set contains invalid particle");
+      return Const::invalidParticle;
+    }
+    logL[i] = getLogL(chargedStable, detSet);
+  }
+
+  int k = 0;
+  double logLmax = logL[k];
+  for (unsigned i = 0; i < n; ++i) {
+    if (logL[i] > logLmax) {logLmax = logL[i]; k = i;}
+  }
+  return partSet.at(k);
+
 }
 
 

@@ -436,12 +436,33 @@ void DeSerializerPCModule::event()
 
         int entry_id = l + k * num_nodes_in_sendblock;
 
+//  if( l == 0 ){
+//    printf("######DATATBLOCK######### %d %d\n", k, l);
+//    for( int m = 0; m < raw_datablk->GetBlockNwords(entry_id) ; m++){
+//      printf("%.8x ", *( (int*)temp_buf + raw_datablk->GetBufferPos(entry_id) + m ) );
+//      if( m % 10 == 9 ) printf("\n");
+//    }
+//    printf("\n\n");fflush(stdout);
+//  }
         if (raw_datablk->CheckFTSWID(entry_id)) {
           RawFTSW* temp_rawftsw = new RawFTSW;
           temp_rawftsw->SetBuffer((int*)temp_buf + raw_datablk->GetBufferPos(entry_id),
                                   raw_datablk->GetBlockNwords(entry_id), 0, 1, 1);
+
 #ifndef NO_DATA_CHECK
           try {
+            if (temp_rawftsw->GetEveNo(0) < 10 ||
+                (temp_rawftsw->GetEveNo(0) > 32758 && temp_rawftsw->GetEveNo(0) < 32778)
+               ) {
+              printf("######FTSW#########\n");
+              for (int m = 0; m < raw_datablk->GetBlockNwords(entry_id) ; m++) {
+                printf("%.8x ", *((int*)temp_buf + raw_datablk->GetBufferPos(entry_id) + m));
+                if (m % 10 == 9) printf("\n");
+              }
+              printf("\n\n"); fflush(stdout);
+
+            }
+
             temp_rawftsw->CheckData(0, m_prev_evenum, &cur_evenum, m_prev_runsubrun_no, &m_runsubrun_no);
             eve_array[ entry_id ] = cur_evenum;
             //      printf("FTSW prev %d cur %d eve %d node %d\n", m_prev_evenum , cur_evenum, k, l );
@@ -484,6 +505,7 @@ void DeSerializerPCModule::event()
           delete temp_rawcopper;
         }
       }
+
       if (m_prev_runsubrun_no != m_runsubrun_no) {
         printf("##############################################\n");
         for (int m = 0; m < num_entries ; m++) {

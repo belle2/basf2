@@ -24,7 +24,6 @@
 #include <svd/dataobjects/SVDDigit.h>
 #include <svd/dataobjects/SVDCluster.h>
 #include <svd/dataobjects/SVDTrueHit.h>
-#include <boost/foreach.hpp>
 
 using namespace std;
 using namespace Belle2;
@@ -239,7 +238,7 @@ void SVDClusterizerModule::event()
     for (SensorIterator it = sensors.begin(); it != sensors.end(); it++) {
       for (int iSide = 0; iSide < 2; ++iSide) {
         m_noiseMap.setSensorID(it->first);
-        BOOST_FOREACH(const SVD::Sample & sample, it->second[iSide]) {
+        for (const SVD::Sample & sample : it->second[iSide]) {
           if (!m_noiseMap(sample, m_cutAdjacent)) continue;
           findCluster(sample);
         }

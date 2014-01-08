@@ -27,10 +27,12 @@ Ds2RbufModule::Ds2RbufModule() : Module()
   setDescription("Encode DataStore into RingBuffer");
   setPropertyFlags(c_InitializeInProcess);
 
+  vector<string> emptyvector;
   addParam("RingBufferName", m_rbufname, "Name of RingBuffer",
            string("OutputRbuf"));
   addParam("CompressionLevel", m_compressionLevel, "Compression level",
            0);
+  addParam("saveObjs", m_saveobjs, "List of objects to be sent", emptyvector);
 
   m_rbuf = NULL;
   m_nsent = 0;
@@ -52,6 +54,7 @@ void Ds2RbufModule::initialize()
   m_rbuf = new RingBuffer(m_rbufname.c_str());
   //  m_msghandler = new MsgHandler(m_compressionLevel);
   m_streamer = new DataStoreStreamer(m_compressionLevel);
+  m_streamer->registerStreamObjs(m_saveobjs);
 
   B2INFO("Ds2Rbuf initialized.");
 }

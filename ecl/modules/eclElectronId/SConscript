@@ -1,0 +1,6 @@
+Import('env')
+
+env['LIBS'] = ['framework', 'ecl_dataobjects', 'tracking_dataobjects','genfit', 'genfitRK', 
+               '$ROOT_LIBS']
+
+Return('env')

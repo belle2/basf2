@@ -83,6 +83,14 @@ param_vxdtf = {
     }
 vxdtf.param(param_vxdtf)
 
+
+trackfitter = register_module('GenFitter')
+#trackfitter.logging.log_level = LogLevel.WARNING
+trackfitter.param('GFTrackCandidatesColName', 'caTracks')
+trackfitter.param('FilterId', 'Kalman')
+trackfitter.param('UseClusters', True)
+
+
 # SVD DQM module
 svd_dqm = register_module('SVDDQM')
 
@@ -98,6 +106,8 @@ main.add_module(geometry)
 # main.add_module(PXDClust)
 main.add_module(SVDClust)
 main.add_module(vxdtf)
+main.add_module(trackfitter)
+
 main.add_module(svd_dqm)
 
 # Process events

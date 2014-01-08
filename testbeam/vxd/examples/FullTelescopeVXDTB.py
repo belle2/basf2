@@ -7,7 +7,7 @@
 # Important parameters of the simulation:
 events = 1000  # Number of events to simulate
 fieldOn = False  # Turn field on or off (changes geometry components and digi/clust params)
-momentum = 2.0  # GeV/c
+momentum = 6.0  # GeV/c
 momentum_spread = 0.05  # %
 theta = 90.0  # degrees
 theta_spread = 0.005  # # degrees (sigma of gaussian)

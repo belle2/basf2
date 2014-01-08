@@ -5,10 +5,10 @@
 # This is the default simulation scenario for VXD beam test WITHOUT telescopes
 #
 # This steering file prepares simulation data for the SVD DQM module.
+# Magnetic field is off.
 
 # Important parameters of the simulation:
 events = 1000  # Number of events to simulate
-fieldOn = False  # Turn field on or off
 momentum = 6.0  # GeV/c
 momentum_spread = 0.05  # %
 theta = 90.0  # degrees
@@ -63,32 +63,18 @@ gearbox.param('fileName', 'testbeam/vxd/FullVXDTB.xml')
 
 # Create geometry
 geometry = register_module('Geometry')
-# You can specify components to be created
-if fieldOn:
-    geometry.param('components', ['MagneticField', 'TB'])
-else:
-  # To turn off magnetic field:
-    geometry.param('components', ['TB'])
+# No magnetic field
+geometry.param('components', ['TB'])
 
 # Full simulation module
 simulation = register_module('FullSim')
 simulation.param('StoreAllSecondaries', True)
-# Uncomment the following lines to get particle tracks visualization
-# simulation.param('EnableVisualization', True)
-# simulation.param('UICommands', ['/vis/open VRML2FILE', '/vis/drawVolume',
-#                 '/vis/scene/add/axes 0 0 0 100 mm',
-#                 '/vis/scene/add/trajectories smooth',
-#                 '/vis/modeling/trajectories/create/drawByCharge'])
 
 # PXD/SVD digitizer
 PXDDigi = register_module('PXDDigitizer')
-# turn off Lorentz angle simulation if no field
-if fieldOn:
-    PXDDigi.param('tanLorentz', 0.)
-else:
-    PXDDigi.param('tanLorentz', 0.1625)
-
-# PXDDigi.param('SimpleDriftModel', False)
+# turn off Lorentz angle simulation - no field
+PXDDigi.param('tanLorentz', 0.)
+PXDDigi.param('SimpleDriftModel', False)
 
 SVDDigi = register_module('SVDDigitizer')
 

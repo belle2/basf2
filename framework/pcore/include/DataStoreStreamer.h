@@ -20,6 +20,7 @@
 #include <vector>
 #include <queue>
 #include <string>
+#include <algorithm>
 
 #define MAXTHREADS 16
 #define MAXQUEUEDEPTH 64
@@ -62,6 +63,9 @@ namespace Belle2 {
      *  @param msg        EvtMessage to be restored.
      */
     int restoreDataStore(EvtMessage* msg);
+
+    // Set names of objects to be streamed/destreamed
+    void registerStreamObjs(std::vector<std::string>& list);
 
     // Pipelined destreaming of EvtMessage using thread
 
@@ -109,6 +113,12 @@ namespace Belle2 {
      */
     int m_initStatus;
 
+    /** names of object to be streamed
+     *
+     * If size=0, all objects to be streamed
+     */
+    std::vector<std::string> m_streamobjnames;
+
     /** Max. number of threads for asynchronous processing
      *
      * 4 for default
@@ -122,6 +132,7 @@ namespace Belle2 {
     int m_threadin;
     //int m_threadout;
     int m_decstat[MAXTHREADS];
+    MsgHandler* m_pmsghandler[MAXTHREADS];
     //    char* m_evtbuf[MAXTHREADS];
     std::queue<char*> m_evtbuf[MAXTHREADS];
 

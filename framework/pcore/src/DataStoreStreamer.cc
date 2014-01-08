@@ -63,7 +63,10 @@ DataStoreStreamer::DataStoreStreamer(int complevel, int maxthread) : m_compressi
       m_decstat[i] = 0;
       m_pt[i] = (pthread_t)0;
       m_id[i] = i;
+      //      m_pmsghandler[i] = new MsgHandler ( m_compressionLevel );
       mutex_thread[i] = PTHREAD_MUTEX_INITIALIZER;
+    }
+    for (int i = 0; i < m_maxthread; i++) {
       //      args.evtbuf = m_evtbuf[i];
       pthread_create(&m_pt[i], NULL, RunDecodeEvtMessage, (void*)&m_id[i]);
     }
@@ -77,6 +80,12 @@ DataStoreStreamer::~DataStoreStreamer()
 {
   delete m_msghandler;
 }
+
+void DataStoreStreamer::registerStreamObjs(vector<string>& objlist)
+{
+  m_streamobjnames = objlist;
+}
+
 
 // Stream DataStore
 EvtMessage* DataStoreStreamer::streamDataStore(DataStore::EDurability durability, bool streamTransientObjects, bool removeEmptyArrays)
@@ -98,6 +107,16 @@ EvtMessage* DataStoreStreamer::streamDataStore(DataStore::EDurability durability
     //skip empty arrays
     if (removeEmptyArrays and entry->isArray) {
       if (((TClonesArray*)entry->object)->GetEntries() == 0) continue;
+    }
+
+    //skip objects not in the list
+    if (m_streamobjnames.size() != 0) {
+      //      printf ( "selecting %s : ", (it->first).c_str() );
+      //      std::basic_string<char> objname = it->first;
+      vector<string>::iterator pos = std::find(m_streamobjnames.begin(), m_streamobjnames.end(), it->first);
+      //      if ( pos == m_streamobjnames.end() ) { printf ( "\n"); continue; }
+      if (pos == m_streamobjnames.end())  continue;
+      //      printf ( "selected [ %s ]\n", (it->first).c_str() );
     }
 
     //verify that bits are unused
@@ -243,13 +262,18 @@ void* DataStoreStreamer::decodeEvtMessage(int id)
   printf("decodeEvtMessge : started. Thread ID = %d\n", id);
   // Clear Message Handler
   //  m_msghandler->clear();
+  //  MsgHandler* msghandler = new MsgHandler(m_compressionLevel);
+  //  MsgHandler* msghandler = m_pmsghandler[id];
+
   MsgHandler msghandler(m_compressionLevel);
 
   for (;;) {
     // Clear message handler event by event
     //    MsgHandler msghandler(m_compressionLevel);
-    msghandler.clear();
+    //    m_pmsghandler[id]->clear();
     // Wait for event in queue becomes ready
+    msghandler.clear();
+
     while (m_evtbuf[id].size() <= 0) usleep(10);
 
     // Pick up event buffer
@@ -274,7 +298,10 @@ void* DataStoreStreamer::decodeEvtMessage(int id)
     // Decode EvtMessage into Objects
     vector<TObject*> objlist;
     vector<string> namelist;
+
+    //    pthread_mutex_lock(&mutex);     // Lock test
     msghandler.decode_msg(msg, objlist, namelist);
+    //    pthread_mutex_unlock(&mutex);    // Unlock test
 
 
     // Queue them for the registration in DataStore

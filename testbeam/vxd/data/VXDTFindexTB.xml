@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--This is the main index file for sectorMaps/fiendLists used by the VXDTFModule to support new ones, an entry within this list has to be added after adding the friendList-file to this directory-->
 <CATFParameters xmlns:xi="http://www.w3.org/2001/XInclude">
-	<!-- TODO: If you want to use the VXDTFModule, you have to uncomment the following lines! -->
-
 	<xi:include href="testBeamStdVXD-moreThan1500MeV_VXD.xml"/>
 	<xi:include href="testBeamStdSVD-moreThan1500MeV_SVD.xml"/>
 	<xi:include href="testBeamMiniVXD-moreThan1500MeV_VXD.xml"/>
 	<xi:include href="testBeamMiniSVD-moreThan1500MeV_SVD.xml"/>
 	<xi:include href="testBeamFineVXD-moreThan1500MeV_VXD.xml"/>
 	<xi:include href="testBeamFineSVD-moreThan1500MeV_SVD.xml"/>
-	
+	<xi:include href="testBeamMini6GeVVXD-moreThan1500MeV_VXD.xml"/>
+	<xi:include href="testBeamMini6GeVSVD-moreThan1500MeV_SVD.xml"/>
 	
 </CATFParameters>

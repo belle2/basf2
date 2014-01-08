@@ -7,6 +7,7 @@ from subprocess import call
 from sys import argv
 
 # Important parameters of the simulation:
+fieldOn = True  # Turn field on or off (changes geometry components and digi/clust params)
 momentum = 6.0  # GeV/c
 momentum_spread = 0.05  # %
 theta = 90.0  # degrees
@@ -25,9 +26,9 @@ initialValue = 0  # want random events
 # parameters for the secMap-calculation:
 pTcuts = [1.0, 1.5]
 
-# setupFileName = "testBeamMini"
-# secConfigU = [0.0, 1.0]
-# secConfigV = [0.0, 1.0]
+setupFileName = 'testBeamMini6GeV'
+secConfigU = [0., 1.0]
+secConfigV = [0., 1.0]
 
 # setupFileName = "testBeamStd"
 # secConfigU = [0.0, 0.5, 1.0]
@@ -60,15 +61,20 @@ eventinfosetter = register_module('EventInfoSetter')
 eventinfosetter.param('expList', [0])
 eventinfosetter.param('runList', [1])
 eventinfosetter.param('evtNumList', [numEvents])
+
 eventinfoprinter = register_module('EventInfoPrinter')
 
 gearbox = register_module('Gearbox')
 # use simple testbeam geometry
-gearbox.param('fileName', 'testbeam/vxd/VXD-simple-noTels-30Oct13.xml')
+gearbox.param('fileName', 'testbeam/vxd/FullVXDTB.xml')
 
 geometry = register_module('Geometry')
-# only the tracking detectors will be simulated. Makes this example much faster
-geometry.param('Components', ['MagneticField', 'TB'])
+# You can specify components to be created
+if fieldOn:
+    geometry.param('components', ['MagneticField', 'TB'])
+else:
+  # To turn off magnetic field:
+    geometry.param('components', ['TB'])
 
 # ParticleGun
 particlegun = register_module('ParticleGun')
@@ -101,6 +107,9 @@ g4sim = register_module('FullSim')
 # this is needed for the MCTrackFinder to work correctly
 g4sim.param('StoreAllSecondaries', True)
 
+# Show progress of processing
+progress = register_module('Progress')
+
 print ''
 print 'entering createSecMapForVXDTF.py'
 print 'starting {events:} events, analyzing {numTracks:} track(s) per event by using pGseed {theSeed:}. '.format(events=numEvents,
@@ -121,8 +130,8 @@ param_fCalc = {  # -1 = VXD, 0 = PXD, 1 = SVD
     'highestAllowedLayer': 6,
     'sectorConfigU': secConfigU,
     'sectorConfigV': secConfigV,
-    'setOrigin': [gun_x_position, 0., 0.],
-    'magneticFieldStrength': 0.976,
+    'setOrigin': [gun_x_position * 0.25, 0., 0.],
+    'magneticFieldStrength': 0.975,
     'testBeam': 1,
     'secMapWriteToRoot': 1,
     'secMapWriteToAscii': 0,
@@ -150,7 +159,7 @@ param_fCalc2 = {  # -1 = VXD, 0 = PXD, 1 = SVD
     'sectorConfigU': secConfigU,
     'sectorConfigV': secConfigV,
     'setOrigin': [gun_x_position * 0.25, 0., 0.],
-    'magneticFieldStrength': 0.976,
+    'magneticFieldStrength': 0.975,
     'testBeam': 1,
     'secMapWriteToRoot': 1,
     'secMapWriteToAscii': 0,
@@ -176,7 +185,8 @@ eventCounter.param('stepSize', 250)
 main = create_path()
 # Add modules to paths
 main.add_module(eventinfosetter)
-main.add_module(evtmetainfo)
+main.add_module(eventinfoprinter)
+main.add_module(progress)
 main.add_module(gearbox)
 main.add_module(geometry)
 main.add_module(particlegun)

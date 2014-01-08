@@ -64,6 +64,9 @@ namespace Belle2 {
     //! get FTSW ID to check whether this data block is FTSW data or not
     virtual int CheckTLUID(int n);
 
+    //! print data
+    virtual void PrintData(int* buf, int nwords);
+
     enum {
       POS_NWORDS = 0,
       POS_NODE_ID = 6

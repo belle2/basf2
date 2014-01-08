@@ -83,7 +83,7 @@ void DeSerializerPCModule::initialize()
 
   // Initialize Array of RawCOPPER
 
-  if (dump_fname.size() > 0) {
+  if (m_dump_fname.size() > 0) {
     openOutputFile();
   }
 
@@ -253,18 +253,8 @@ int* DeSerializerPCModule::recvData(int* malloc_flag, int* total_buf_nwords, int
     *total_buf_nwords += rawblk_nwords;
 
     if (rawblk_nwords > (int)(2.5e6)) {
-
       printf("*******HDR**********\n");
-      printf("\n%.8d : ", 0);
-      for (int j = 0; j < SendHeader::SENDHDR_NWORDS ; j++) {
-        printf("0x%.8x ", send_hdr_buf[ j ]);
-        if ((j + 1) % 10 == 0) {
-          printf("\n%.8d : ", j + 1);
-        }
-      }
-      printf("\n");
-      printf("\n");
-
+      printData(send_hdr_buf, SendHeader::SENDHDR_NWORDS);
       char err_buf[500];
       sprintf(err_buf, "Too large event : Header %d %d %d %d\n", i, temp_num_events, temp_num_nodes, send_hdr.GetTotalNwords());
       print_err.PrintError(m_shmflag, &m_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
@@ -295,38 +285,6 @@ int* DeSerializerPCModule::recvData(int* malloc_flag, int* total_buf_nwords, int
     sleep(1234567);
     exit(-1);
   }
-
-  //   if (temp_buf[20] != 0x7fff0008) {
-  //     //#ifdef DEBUG
-  //     printf("*******HDR**********\n");
-  //     printf("\n%.8d : ", 0);
-  //     for (int i = 0; i < SendHeader::SENDHDR_NWORDS ; i++) {
-  //       printf("0x%.8x ", send_hdr_buf[ i ]);
-  //       if ((i + 1) % 10 == 0) {
-  //         printf("\n%.8d : ", i + 1);
-  //       }
-  //     }
-  //     printf("\n");
-  //     printf("\n");
-  //     //#endif
-  //     //#ifdef DEBUG
-  //     printf("*******BODY**********\n");
-  //     printf("\n%.8d : ", 0);
-  //     //      for (int i = 0; i < *total_buf_nwords; i++) {
-  //     for (int i = 0; i < 100; i++) {
-  //       printf("0x%.8x ", temp_buf[ i ]);
-  //       if ((i + 1) % 10 == 0) {
-  //         printf("\n%.8d : ", i + 1);
-  //       }
-  //     }
-  //     printf("\n");
-  //     printf("\n");
-  //     exit(1);
-  //     //#endif
-  //   }
-
-
-
 
   // Read Traeiler
   int send_trl_buf[(unsigned int)(SendTrailer::SENDTRL_NWORDS) ];
@@ -436,14 +394,6 @@ void DeSerializerPCModule::event()
 
         int entry_id = l + k * num_nodes_in_sendblock;
 
-//  if( l == 0 ){
-//    printf("######DATATBLOCK######### %d %d\n", k, l);
-//    for( int m = 0; m < raw_datablk->GetBlockNwords(entry_id) ; m++){
-//      printf("%.8x ", *( (int*)temp_buf + raw_datablk->GetBufferPos(entry_id) + m ) );
-//      if( m % 10 == 9 ) printf("\n");
-//    }
-//    printf("\n\n");fflush(stdout);
-//  }
         if (raw_datablk->CheckFTSWID(entry_id)) {
           RawFTSW* temp_rawftsw = new RawFTSW;
           temp_rawftsw->SetBuffer((int*)temp_buf + raw_datablk->GetBufferPos(entry_id),
@@ -455,12 +405,7 @@ void DeSerializerPCModule::event()
                 (temp_rawftsw->GetEveNo(0) > 32758 && temp_rawftsw->GetEveNo(0) < 32778)
                ) {
               printf("######FTSW#########\n");
-              for (int m = 0; m < raw_datablk->GetBlockNwords(entry_id) ; m++) {
-                printf("%.8x ", *((int*)temp_buf + raw_datablk->GetBufferPos(entry_id) + m));
-                if (m % 10 == 9) printf("\n");
-              }
-              printf("\n\n"); fflush(stdout);
-
+              printData((int*)temp_buf + raw_datablk->GetBufferPos(entry_id), raw_datablk->GetBlockNwords(entry_id));
             }
 
             temp_rawftsw->CheckData(0, m_prev_evenum, &cur_evenum, m_prev_runsubrun_no, &m_runsubrun_no);

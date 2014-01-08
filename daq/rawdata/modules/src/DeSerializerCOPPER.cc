@@ -117,7 +117,7 @@ void DeSerializerCOPPERModule::initialize()
   //  rawcprarray.registerPersistent();
   raw_dblkarray.registerPersistent();
 
-  if (dump_fname.size() > 0) {
+  if (m_dump_fname.size() > 0) {
     openOutputFile();
   }
 
@@ -182,11 +182,7 @@ void DeSerializerCOPPERModule::fillNewRawCOPPERHeader(RawCOPPER* raw_copper)
 
 #ifdef debug
   printf("1: i= %d : num entries %d : Tot words %d\n", 0 , raw_copper->GetNumEntries(), raw_copper->TotalBufNwords());
-  for (int j = 0; j < raw_copper->TotalBufNwords(); j++) {
-    printf("0x%.8x ", (raw_copper->GetBuffer(0))[ j ]);
-    if ((j % 10) == 9)printf("\n");
-    fflush(stdout);
-  }
+  printData(raw_copper->GetBuffer(0), raw_copper->TotalBufNwords());
 #endif
 
   // Obtain info from SlowController via AddParam or COPPER data
@@ -208,11 +204,7 @@ void DeSerializerCOPPERModule::fillNewRawCOPPERHeader(RawCOPPER* raw_copper)
 
 #ifdef debug
   printf("2: i= %d : num entries %d : Tot words %d\n", 0 , raw_copper->GetNumEntries(), raw_copper->TotalBufNwords());
-  for (int j = 0; j < raw_copper->TotalBufNwords(); j++) {
-    printf("0x%.8x ", (raw_copper->GetBuffer(0))[ j ]);
-    if ((j % 10) == 9)printf("\n");
-    fflush(stdout);
-  }
+  printData(raw_copper->GetBuffer(0), raw_copper->TotalBufNwords());
 #endif
 
   //
@@ -250,25 +242,16 @@ void DeSerializerCOPPERModule::fillNewRawCOPPERHeader(RawCOPPER* raw_copper)
     print_err.PrintError(m_shmflag, &m_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
 
     printf("i= %d : num entries %d : Tot words %d\n", 0 , raw_copper->GetNumEntries(), raw_copper->TotalBufNwords());
-    for (int j = 0; j < raw_copper->TotalBufNwords(); j++) {
-      printf("0x%.8x ", (raw_copper->GetBuffer(0))[ j ]);
-      if ((j % 10) == 9)printf("\n");
-      fflush(stdout);
-    }
-
+    printData(raw_copper->GetBuffer(0), raw_copper->TotalBufNwords());
     exit(-1);
   }
 #endif
   m_prev_ftsweve32 = cur_ftsw_eve32;
-  // Check magic words are set at proper positions
 
+  // Check magic words are set at proper positions
 #ifdef debug
   printf("3: i= %d : num entries %d : Tot words %d\n", 0 , raw_copper->GetNumEntries(), raw_copper->TotalBufNwords());
-  for (int j = 0; j < raw_copper->TotalBufNwords(); j++) {
-    printf("0x%.8x ", (raw_copper->GetBuffer(0))[ j ]);
-    if ((j % 10) == 9)printf("\n");
-    fflush(stdout);
-  }
+  printData(raw_copper->GetBuffer(0), raw_copper->TotalBufNwords());
 #endif
 
   return;
@@ -503,7 +486,7 @@ void DeSerializerCOPPERModule::event()
       exit(1);
     }
 
-    if (dump_fname.size() > 0) {
+    if (m_dump_fname.size() > 0) {
       dumpData((char*)temp_buf, m_size_word * sizeof(int));
     }
     m_totbytes += m_size_word * sizeof(int);

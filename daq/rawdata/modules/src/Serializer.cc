@@ -198,11 +198,7 @@ void SerializerModule::fillSendHeaderTrailer(SendHeader* hdr, SendTrailer* trl,
     //Error if you cannot find any COPPER block
     if (i == (rawdblk->GetNumEntries() - 1)) {
       printf("i= %d : num entries %d : Tot words %d\n", i , rawdblk->GetNumEntries(), rawdblk->TotalBufNwords());
-      for (int j = 0; j < rawdblk->TotalBufNwords(); j++) {
-        printf("0x%.8x ", (rawdblk->GetBuffer(0))[ j ]);
-        if ((j % 10) == 9)printf("\n");
-        fflush(stdout);
-      }
+      printData(rawdblk->GetBuffer(0), rawdblk->TotalBufNwords());
 
       char err_buf[500] = "No COPPER blocks in RawDataBlock. Exiting...";
       print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
@@ -258,14 +254,7 @@ int SerializerModule::sendByWriteV(RawDataBlock* rawdblk)
 #ifdef DEBUG
   printf("*******BODY**********\n");
   printf("\n%.8d : ", 0);
-  for (int i = 0; i < (iov[1].iov_len) / sizeof(int); i++) {
-    printf("0x%.8x ", (int*)(iov[1].iov_base) + i);
-    if ((i + 1) % 10 == 0) {
-      printf("\n%.8d : ", i + 1);
-    }
-  }
-  printf("\n");
-  printf("\n");
+  printData((int*)(iov[1].iov_base), iov[1].iov_len);
 #endif
 
 
@@ -446,6 +435,18 @@ unsigned int SerializerModule::calcXORChecksum(int* buf, int nwords)
     checksum = checksum ^ buf[ i ];
   }
   return checksum;
+}
+
+
+void SerializerModule::printData(int* buf, int nwords)
+{
+  for (int i = 0; i < nwords; i++) {
+    printf("%.8x ", buf[ i ]);
+    if (i % 10 == 9) printf("\n");
+  }
+  printf("\n");
+  printf("\n");
+  return;
 }
 
 

@@ -40,20 +40,12 @@ int RawCOPPER::GetBufferPos(int n)
   }
   int pos_nwords = 0;
   for (int i = 1; i <= n ; i++) {
-
-//     for( int j = 0; j < 127; j++){
-//       printf("%.8x ", m_buffer[j]);
-//       if(j % 10 == 9) printf("\n");
-//     }
-//     printf("\n\n");
-
     int size = tmp_header.RAWHEADER_NWORDS
                + m_buffer[ pos_nwords + tmp_header.RAWHEADER_NWORDS + POS_DATA_LENGTH ]
                + SIZE_COPPER_DRIVER_HEADER
                + SIZE_COPPER_DRIVER_TRAILER
                + tmp_trailer.RAWTRAILER_NWORDS;
     // COPPER's data length include one word from COPPER trailer. so -1 is needed.
-
     pos_nwords +=  size;
     if (pos_nwords >= m_nwords) {
       printf("value of pos_nwords(%d) is larger than m_nwords(%d). Exiting...", pos_nwords, m_nwords);
@@ -712,46 +704,28 @@ void RawCOPPER::CheckData(int n, unsigned int prev_evenum, unsigned int prev_cop
          Get4thDetectorNwords(n)
         );
   printf("===COPPER BLOCK==============\n");
-  for (int k = 0 ; k < GetBlockNwords(n); k++) {
-    printf("0x%.8x ", (GetBuffer(n))[k]);
-    if (k % 10 == 9)printf("\n");
-  }
+  printData(GetBuffer(n), GetBlockNwords(n));
 
   printf("===FINNESSE A ==============\n");
-  for (int k = 0 ; k < Get1stDetectorNwords(n); k++) {
-    printf("0x%.8x ", (Get1stDetectorBuffer(n))[k]);
-    if (k % 10 == 9)printf("\n");
-  }
+  printData(Get1stDetectorBuffer(n), Get1stDetectorNwords(n));
 
   printf("===FINNESSE B ==============\n");
-  for (int k = 0 ; k < Get2ndDetectorNwords(n); k++) {
-    printf("0x%.8x ", (Get2ndDetectorBuffer(n))[k]);
-    if (k % 10 == 9)printf("\n");
-  }
+  printData(Get2ndDetectorBuffer(n), Get2ndDetectorNwords(n));
 
   printf("===FINNESSE C ==============\n");
-  for (int k = 0 ; k < Get3rdDetectorNwords(n); k++) {
-    printf("0x%.8x ", (Get3rdDetectorBuffer(n))[k]);
-    if (k % 10 == 9)printf("\n");
-  }
+  printData(Get3rdDetectorBuffer(n), Get3rdDetectorNwords(n));
 
   printf("===FINNESSE D ==============\n");
-  for (int k = 0 ; k < Get4thDetectorNwords(n); k++) {
-    printf("0x%.8x ", (Get4thDetectorBuffer(n))[k]);
-    if (k % 10 == 9)printf("\n");
-  }
+  printData(Get4thDetectorBuffer(n), Get4thDetectorNwords(n));
   printf("=== END ==============\n");
 
 #endif
 
   if (err_flag == 1) {
     printf("========== dump a data blcok : block # %d==========\n", n);
-    for (int k = 0 ; k < GetBlockNwords(n); k++) {
-      printf("0x%.8x ", (GetBuffer(n))[k]);
-      if (k % 10 == 9)printf("\n");
-      fflush(stdout);
-    }
-    string err_str = err_buf; throw (err_str);
+    PrintData(GetBuffer(n), GetBlockNwords(n));
+    string err_str = err_buf;
+    throw (err_str);
     sleep(1234567);
     exit(-1);
   }
@@ -1095,11 +1069,7 @@ unsigned int RawCOPPER::FillTopBlockRawHeader(unsigned int m_node_id, unsigned i
 
       string err_str = err_buf;
       printf("i= %d : num entries %d : Tot words %d\n", 0 , GetNumEntries(), TotalBufNwords());
-      for (int j = 0; j < TotalBufNwords(); j++) {
-        printf("0x%.8x ", (GetBuffer(cpr_id))[ j ]);
-        if ((j % 10) == 9)printf("\n");
-        fflush(stdout);
-      }
+      PrintData(GetBuffer(cpr_id), TotalBufNwords());
       throw (err_str);
       exit(-1);
 

@@ -84,7 +84,7 @@ void DeSerializerHLTModule::initialize()
 
 
 
-  if (dump_fname.size() > 0) {
+  if (m_dump_fname.size() > 0) {
     openOutputFile();
   }
 
@@ -190,9 +190,6 @@ void DeSerializerHLTModule::event()
             RawCOPPER* rawcopper;
             rawcopper = rawcprarray.appendNew();
             rawcopper->SetBuffer(temp_buf2, buf_nwords, malloc_flag2, temp_num_events, temp_num_nodes);
-//    hdr.SetBuffer( rawcopper->GetRawHdrBufPtr( 0 ) );
-//    printf("CPR eve %d sysid %d\n", hdr.GetEveNo(), hdr.GetSubsysId() );
-
             break;
         }
         // Fill header and trailer

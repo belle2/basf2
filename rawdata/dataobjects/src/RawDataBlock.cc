@@ -149,3 +149,17 @@ void RawDataBlock::SetBuffer(int* bufin, int nwords, int malloc_flag, int num_ev
 //   m_trailer.SetBuffer(&(bufin[ m_nwords - m_trailer.GetTrlNwords() ]));
 
 }
+
+
+
+void RawDataBlock::PrintData(int* buf, int nwords)
+{
+  for (int i = 0; i < nwords; i++) {
+    printf("%.8x ", buf[ i ]);
+    if (i % 10 == 9) printf("\n");
+  }
+  printf("\n");
+  printf("\n");
+  return;
+}
+

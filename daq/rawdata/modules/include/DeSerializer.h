@@ -65,7 +65,11 @@ namespace Belle2 {
     //! Module functions to be called from event process
     virtual void openOutputFile();
 
+    //! dump binary data
     virtual void dumpData(char* buf, int size);
+
+    //! dump error data
+    virtual void printData(int* buf, int nwords);
 
   protected :
 
@@ -97,10 +101,10 @@ namespace Belle2 {
     int m_prev_nevt;
 
     //! dump filename
-    std::string dump_fname;
+    std::string m_dump_fname;
 
     //! dump file descripter
-    FILE* fp_dump;
+    FILE* m_fp_dump;
 
     //! buffer
     int* m_buffer;

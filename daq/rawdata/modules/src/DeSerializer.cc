@@ -27,34 +27,48 @@ DeSerializerModule::DeSerializerModule() : Module()
   //Set module properties
   setDescription("Encode DataStore into RingBuffer");
 
-  addParam("DumpFileName", dump_fname, "filename to record data", string(""));
+  addParam("DumpFileName", m_dump_fname, "filename to record data", string(""));
+
   addParam("EventDataBufferWords", BUF_SIZE_WORD, "DataBuffer words per event", 4800);
+
   addParam("MaxEventNum", max_nevt, "Maximum event number in one run", -1);
+
   addParam("MaxTime", max_seconds, "Time(s) to stop, DAQ", -1.);
+
   addParam("NodeID", m_nodeid, "Node(subsystem) ID", 0);
+
   addParam("NodeName", m_nodename, "Node(subsystem) name", std::string(""));
+
   addParam("UseShmFlag", m_shmflag, "Use shared memory to communicate with Runcontroller", 0);
 
   m_nodeid = m_nodeid << 12; // input value is used as slog ID in subsystemID record
 
   n_basf2evt = -1;
+
   m_totbytes = 0;
+
   m_compressionLevel = 0;
+
   m_prev_time = 0.;
+
   monitor_numeve = 10;
 
   m_exp_no = 0; // will obtain info from parameter
 
   m_data_type = 0; // will obtain info from parameter
+
   m_trunc_mask = 0; // will obtain info from parameter
 
   m_prev_nevt = -1;
+
   prev_event = -1;
 
   m_run_no = 0; // will obtain info from data
+
   m_prev_run_no = -1;
 
   m_runsubrun_no = 0; // will obtain info from data
+
   m_prev_runsubrun_no = -1;
 
   m_start_flag  = 0;
@@ -86,8 +100,8 @@ void DeSerializerModule::terminate()
     delete[] m_bufary[i];
   }
 
-  if (dump_fname.size() > 0) {
-    fclose(fp_dump);
+  if (m_dump_fname.size() > 0) {
+    fclose(m_fp_dump);
   }
 
 }
@@ -186,19 +200,30 @@ void DeSerializerModule::recordTime(int event, double* array)
 
 void DeSerializerModule::openOutputFile()
 {
-  if ((fp_dump = fopen(dump_fname.c_str(), "wb")) == NULL) {
+  if ((m_fp_dump = fopen(m_dump_fname.c_str(), "wb")) == NULL) {
     perror("[ERROR] Failed to open file.");
-    printf("[ERROR] Failed to open file %s. Exiting...\n", dump_fname.c_str());
+    printf("[ERROR] Failed to open file %s. Exiting...\n", m_dump_fname.c_str());
     exit(-1);
   }
 }
 
 void DeSerializerModule::dumpData(char* buf, int size)
 {
-  if (fwrite(buf, size, 1, fp_dump) <= 0) {
+  if (fwrite(buf, size, 1, m_fp_dump) <= 0) {
     perror("[ERROR] Failed to write buffer to a file. Exiting...");
     exit(-1);
   }
+}
+
+void DeSerializerModule::printData(int* buf, int nwords)
+{
+  for (int i = 0; i < nwords; i++) {
+    printf("%.8x ", buf[ i ]);
+    if (i % 10 == 9) printf("\n");
+  }
+  printf("\n");
+  printf("\n");
+  return;
 }
 
 int* DeSerializerModule::getBuffer(int nwords, int* malloc_flag)

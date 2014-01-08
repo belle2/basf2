@@ -5,9 +5,9 @@
 # This is the default simulation scenario for VXD beam test WITHOUT telescopes
 
 # Important parameters of the simulation:
-events = 10000  # Number of events to simulate
+events = 1000  # Number of events to simulate
 fieldOn = False  # Turn field on or off (changes geometry components and digi/clust params)
-momentum = 6.0  # GeV/c
+momentum = 2.0  # GeV/c
 momentum_spread = 0.05  # %
 theta = 90.0  # degrees
 theta_spread = 0.005  # # degrees (sigma of gaussian)
@@ -83,9 +83,9 @@ simulation.param('StoreAllSecondaries', True)
 PXDDigi = register_module('PXDDigitizer')
 # turn off Lorentz angle simulation if no field
 if fieldOn:
-    PXDDigi.param('tanLorentz', 0.)
+    PXDDigi.param('tanLorentz', 0.1625)
 else:
-    PXDDigi.param('tanLorentz', 0.1625)  # value scaled from 0.25 for 1.5T to 0.975T
+    PXDDigi.param('tanLorentz', 0.)  # value scaled from 0.25 for 1.5T to 0.975T
 
 # PXDDigi.param('SimpleDriftModel', False)
 
@@ -98,16 +98,16 @@ PXDClust = register_module('PXDClusterizer')
 PXDClust.param('ClusterCacheSize', 576)
 
 if fieldOn:
-    PXDClust.param('TanLorentz', 0.)
+    PXDClust.param('TanLorentz', 0.1625)
 else:
-    PXDClust.param('TanLorentz', 0.1625)  # value scaled from 0.25 for 1.5T to 0.975T
+    PXDClust.param('TanLorentz', 0.)  # value scaled from 0.25 for 1.5T to 0.975T
 
 SVDClust = register_module('SVDClusterizer')
 if fieldOn:
-    SVDClust.param('TanLorentz_holes', 0.)
+    SVDClust.param('TanLorentz_holes', 0.052)
     SVDClust.param('TanLorentz_electrons', 0.)
 else:
-    SVDClust.param('TanLorentz_holes', 0.052)  # value scaled from 0.08 for 1.5T to 0.975T
+    SVDClust.param('TanLorentz_holes', 0.)  # value scaled from 0.08 for 1.5T to 0.975T
     SVDClust.param('TanLorentz_electrons', 0.)
 
 # Save output of simulation

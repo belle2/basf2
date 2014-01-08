@@ -83,9 +83,9 @@ simulation.param('StoreAllSecondaries', True)
 PXDDigi = register_module('PXDDigitizer')
 # turn off Lorentz angle simulation if no field
 if fieldOn:
-    PXDDigi.param('tanLorentz', 0.)
+    PXDDigi.param('tanLorentz', 0.1625)
 else:
-    PXDDigi.param('tanLorentz', 0.1625)  # value scaled from 0.25 for 1.5T to 0.975T
+    PXDDigi.param('tanLorentz', 0.)  # value scaled from 0.25 for 1.5T to 0.975T
 
 # PXDDigi.param('SimpleDriftModel', False)
 
@@ -94,16 +94,16 @@ SVDDigi = register_module('SVDDigitizer')
 # PXD/SVD clusterizer
 PXDClust = register_module('PXDClusterizer')
 if fieldOn:
-    PXDClust.param('TanLorentz', 0.)
+    PXDClust.param('TanLorentz', 0.1625)
 else:
-    PXDClust.param('TanLorentz', 0.1625)  # value scaled from 0.25 for 1.5T to 0.975T
+    PXDClust.param('TanLorentz', 0.)  # value scaled from 0.25 for 1.5T to 0.975T
 
 SVDClust = register_module('SVDClusterizer')
 if fieldOn:
-    SVDClust.param('TanLorentz_holes', 0.)
+    SVDClust.param('TanLorentz_holes', 0.052)
     SVDClust.param('TanLorentz_electrons', 0.)
 else:
-    SVDClust.param('TanLorentz_holes', 0.052)  # value scaled from 0.08 for 1.5T to 0.975T
+    SVDClust.param('TanLorentz_holes', 0.)  # value scaled from 0.08 for 1.5T to 0.975T
     SVDClust.param('TanLorentz_electrons', 0.)
 
 # Save output of simulation

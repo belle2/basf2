@@ -95,6 +95,14 @@ param_vxdtf = {
     }
 vxdtf.param(param_vxdtf)
 
+
+trackfitter = register_module('GenFitter')
+#trackfitter.logging.log_level = LogLevel.WARNING
+trackfitter.param('GFTrackCandidatesColName', 'caTracks')
+trackfitter.param('FilterId', 'Kalman')
+trackfitter.param('UseClusters', True)
+
+
 # create the main path
 main = create_path()
 
@@ -141,6 +149,7 @@ main.add_module(SVDClust)
 main.add_module(SVD_DQM)
 
 main.add_module(vxdtf)
+main.add_module(trackfitter)
 
 # Test seqrootoutput
 # output = register_module("SeqRootOutput" )

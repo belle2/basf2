@@ -92,7 +92,7 @@ void SVDDQMModule::defineHisto()
     string title = str(format("Hitmap in U, plane %1%") % iPlane);
     float length = getInfo(i).getLength();
     int nStrips = getInfo(i).getUCells();
-    m_hitMapU[i] = new TH1F(name.c_str(), title.c_str(), nStrips, 0, length);
+    m_hitMapU[i] = new TH1F(name.c_str(), title.c_str(), nStrips, -0.5 * length, 0.5 * length);
     m_hitMapU[i]->GetXaxis()->SetTitle("u position");
     m_hitMapU[i]->GetYaxis()->SetTitle("hits");
   }
@@ -103,7 +103,7 @@ void SVDDQMModule::defineHisto()
     string title = str(format("Hitmap in V, plane %1%") % iPlane);
     float width = getInfo(i).getWidth();
     int nStrips = getInfo(i).getVCells();
-    m_hitMapV[i] = new TH1F(name.c_str(), title.c_str(), nStrips, 0, width);
+    m_hitMapV[i] = new TH1F(name.c_str(), title.c_str(), nStrips, -0.5 * width, 0.5 * width);
     m_hitMapV[i]->GetXaxis()->SetTitle("v position");
     m_hitMapV[i]->GetYaxis()->SetTitle("hits");
   }

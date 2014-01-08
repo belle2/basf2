@@ -72,6 +72,9 @@ namespace Belle2 {
     double m_size; /**< total transferred data, in kB. */
     double m_size2; /**< sum of squares of data transferred in each event, in kB^2. */
 
+    // List of objects to be saved
+    std::vector<std::string> m_saveobjs;
+
   };
 } // end namespace Belle2
 

@@ -94,6 +94,8 @@ trackfitter.param('UseClusters', True)
 # SVD DQM module
 svd_dqm = register_module('SVDDQM')
 
+vxdtf_dqm = register_module('VXDTFDQM')
+
 # Create paths
 main = create_path()
 
@@ -109,6 +111,7 @@ main.add_module(vxdtf)
 main.add_module(trackfitter)
 
 main.add_module(svd_dqm)
+main.add_module(vxdtf_dqm)
 
 # Process events
 process(main)

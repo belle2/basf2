@@ -95,6 +95,8 @@ param_vxdtf = {
     }
 vxdtf.param(param_vxdtf)
 
+# VXDTF DQM module
+vxdtf_dqm = register_module('VXDTFDQM')
 
 trackfitter = register_module('GenFitter')
 #trackfitter.logging.log_level = LogLevel.WARNING
@@ -150,6 +152,8 @@ main.add_module(SVD_DQM)
 
 main.add_module(vxdtf)
 main.add_module(trackfitter)
+main.add_module(vxdtf_dqm)
+
 
 # Test seqrootoutput
 # output = register_module("SeqRootOutput" )

@@ -1,8 +1,8 @@
 Import('env')
 
-env['LIBS'] = ['background_mixbkg', 'generators_dataobjects', 'framework', 
-  'pxd_dataobjects', 'svd_dataobjects', 'vxd_dataobjects', 'cdc_dataobjects',
-  'top_dataobjects', 'arich_dataobjects', 'ecl_dataobjects', 'eklm_dataobjects',
-  'bklm_dataobjects']
+env['LIBS'] = ['background_mixbkg', 'generators_dataobjects',
+  'mdst_dataobjects', 'framework', 'pxd_dataobjects', 'svd_dataobjects',
+  'vxd_dataobjects', 'cdc_dataobjects', 'top_dataobjects', 'arich_dataobjects',
+  'ecl_dataobjects', 'eklm_dataobjects', 'bklm_dataobjects']
 
 Return('env')

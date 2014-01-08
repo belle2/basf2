@@ -3,9 +3,9 @@ import os
 Import('env')
 
 env['SUBLIB'] = True
-env['LIBS'] = ['$ROOT_LIBS', 'generators_dataobjects', 'framework', 
-  'pxd_dataobjects', 'svd_dataobjects', 'vxd_dataobjects','cdc_dataobjects', 
-  'top_dataobjects', 'arich_dataobjects', 'ecl_dataobjects', 
+env['LIBS'] = ['$ROOT_LIBS', 'generators_dataobjects', 'mdst_dataobjects',
+  'framework', 'pxd_dataobjects', 'svd_dataobjects', 'vxd_dataobjects',
+  'cdc_dataobjects', 'top_dataobjects', 'arich_dataobjects', 'ecl_dataobjects', 
   'eklm_dataobjects', 'bklm_dataobjects']
 
 Return('env')

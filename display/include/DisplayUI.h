@@ -124,6 +124,12 @@ namespace Belle2 {
     /** Add user-defined data (histograms, etc.). */
     void showUserData(const DisplayData& displayData);
 
+    /** If true, DisplayModule shouldn't clear previous data (i.e. we want to show multiple events) */
+    bool cumulativeIsOn() const { return m_cumulative; }
+
+    /** toggle cumulative mode. */
+    void toggleCumulative() { m_cumulative = !m_cumulative; }
+
 
   private:
     /** Wraps a module parameter that can be toggled from the UI. */
@@ -153,6 +159,9 @@ namespace Belle2 {
 
     /** If true, disable interactive control and call automaticEvent() instead. */
     bool m_automatic;
+
+    /** If true, DisplayModule shouldn't clear previous data (i.e. we want to show multiple events) */
+    bool m_cumulative;
 
     /** List of run time configurable module parameters. */
     std::vector<Parameter> m_paramList;

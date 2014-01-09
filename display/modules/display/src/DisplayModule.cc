@@ -225,7 +225,9 @@ void DisplayModule::event()
 
 
   bool reshow = m_display->startDisplay();
-  m_visualizer->clearEvent(); //clean up internal state of visualiser
+  if (!m_display->cumulativeIsOn()) {
+    m_visualizer->clearEvent(); //clean up internal state of visualiser
+  }
   m_display->clearEvent(); //clean up event scene, incl. projections
 
   //reprocess current event (maybe some options changed)
@@ -236,8 +238,9 @@ void DisplayModule::event()
 
 void DisplayModule::terminate()
 {
-  if (gEve)
+  if (gEve) {
     gEve->Terminate();
+  }
 
   delete m_visualizer;
   delete m_display;

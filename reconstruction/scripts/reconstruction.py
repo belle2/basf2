@@ -188,7 +188,6 @@ def add_mdst_output(path, mc=True, filename='mdst.root'):
         'ECLPi0s',
         'ECLPi0sToECLGammas',
         'EKLMK0Ls',
-        'MuidLikelihoods',
         ]
     if mc:
         branches += ['MCParticles', 'MCParticlesToTracks',

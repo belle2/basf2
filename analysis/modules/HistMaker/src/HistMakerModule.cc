@@ -35,7 +35,7 @@ namespace Belle2 {
   REG_MODULE(HistMaker)
 
 
-  HistMakerModule::HistMakerModule() : Module()
+  HistMakerModule::HistMakerModule() : Module(), m_truth(nullptr), m_outputFile(nullptr)
   {
     setDescription("Writes out signal and background distributions for given variables and given reconstructed ParticleLists.");
     // We use root TFile, this is propably not usable for parallel processsing

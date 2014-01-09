@@ -7,11 +7,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef HISTMAKER_MODULE_H
-#define HISTMAKER_MODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
-
 #include <map>
 #include <string>
 
@@ -23,8 +21,7 @@ namespace Belle2 {
   class Particle;
 
   /**
-   * This module fills the ParticleInfo with the value calculated by a TMVA method for every Particle in the given ParticleLists
-   * The module depends on the ParticleInfoModule
+   * This module creates Histogramm for given variables registered in VariableManager
    */
 
   class HistMakerModule : public Module {
@@ -72,8 +69,8 @@ namespace Belle2 {
 
   private:
 
-    typedef std::tuple<std::string, int, double, double> Range;
-    typedef std::tuple<TH1*, TH1*> SBHists;
+    typedef std::tuple<std::string, int, double, double> Range; /**< Tuple holding name, amount of bins, lower and upper boundary of a histogram */
+    typedef std::tuple<TH1*, TH1*> SBHists; /**< Tuple holding signal and background Histogramms for a variable */
 
     std::vector<std::string> m_listNames; /**< input particle list names */
     std::string m_identifierName; /**< identifier name for the TFile where the hists are stored */
@@ -92,6 +89,5 @@ namespace Belle2 {
 
 } // Belle2 namespace
 
-#endif
 
 

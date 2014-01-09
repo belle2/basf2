@@ -132,6 +132,10 @@ void VXDTFDQMModule::event()
     m_histoNumHitsUsed->Fill(numOfHits);
     m_histoNumHitsIgnored->Fill(storeClusters.getEntries() - numOfHits);
   }
+  if (numOfCaTCs == 0) { // in this case, the for-loop was not executed
+    m_histoNumHitsUsed->Fill(0);
+    m_histoNumHitsIgnored->Fill(storeClusters.getEntries());
+  }
   m_histoNumTCsPerEvent->Fill(numOfCaTCs);
 
 }

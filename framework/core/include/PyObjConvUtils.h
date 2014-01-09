@@ -277,7 +277,7 @@ namespace Belle2 {
     inline void SetTuple(TupleType& tuple, const boost::python::tuple& pyTuple)
     {
       static const unsigned N = std::tuple_size<TupleType>::value;
-      if (boost::python::len(pyTuple) != N) {
+      if ((unsigned)boost::python::len(pyTuple) != N) {
         B2ERROR("Given python tuple has wrong dimensions expected " << N << " received " << boost::python::len(pyTuple))
       }
       SetTuple(tuple, pyTuple, SizeT<N>());

@@ -92,7 +92,7 @@
             <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='VXDBox']/*))" />
             <Volume name="PXD-Envelope">
                <DX unit="mm">57.0</DX>
-               <!--DY unit="mm">-4.0</DY-->
+               <DY unit="mm">-12.0</DY>
                <!-- Shift down for better PXD acceptance at 6GeV -->
                <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='PXD-Envelope']/*)" />
                <Volume name="CoolingBlock">
@@ -125,6 +125,10 @@
                   <Theta unit="deg">90</Theta>
                   <Phi unit="deg">90</Phi>
                   <Psi unit="deg">90</Psi>
+                  
+                  <HalfX unit="mm">32.9</HalfX>
+                  <HalfY unit="mm">7.8</HalfY>
+                  <HalfZ unit="mm">0.61</HalfZ>
                   <!--xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='PXD6-S-sensor_L1']/*)" /-->
                   <Volume name="PXD-SensitiveArea">
                      <AlignComponent>1.1.1</AlignComponent>
@@ -144,6 +148,10 @@
                   <Theta unit="deg">-90</Theta>
                   <Phi unit="deg">270</Phi>
                   <Psi unit="deg">90</Psi>
+                  
+                  <HalfX unit="mm">32.9</HalfX>
+                  <HalfY unit="mm">7.8</HalfY>
+                  <HalfZ unit="mm">0.61</HalfZ>
                   <!--xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='PXD6-sensor_L2']/*)" /-->
                   <Volume name="PXD-SensitiveArea">
                      <AlignComponent>2.1.2</AlignComponent>
@@ -236,7 +244,7 @@
             </Volume>
             <Volume name="EUDET-Module4">
                <DX unit="mm">-140.0</DX>
-               <DY unit="mm">0.0</DY>
+               <DY unit="mm">-30.0</DY>
                <DZ unit="mm">0.0</DZ>
                <Theta unit="deg">90</Theta>
                <Phi unit="deg">-90</Phi>
@@ -255,7 +263,7 @@
             </Volume>
             <Volume name="EUDET-Module5">
                <DX unit="mm">-160.0</DX>
-               <DY unit="mm">0.0</DY>
+               <DY unit="mm">-30.0</DY>
                <DZ unit="mm">0.0</DZ>
                <Theta unit="deg">90</Theta>
                <Phi unit="deg">-90</Phi>
@@ -274,7 +282,7 @@
             </Volume>
             <Volume name="EUDET-Module6">
                <DX unit="mm">-180.0</DX>
-               <DY unit="mm">0.0</DY>
+               <DY unit="mm">-30.0</DY>
                <DZ unit="mm">0.0</DZ>
                <Theta unit="deg">90</Theta>
                <Phi unit="deg">-90</Phi>

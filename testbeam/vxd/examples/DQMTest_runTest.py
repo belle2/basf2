@@ -55,7 +55,6 @@ param_vxdtf = {
     'TESTERexpandedTestingRoutines': False,
     'qiSmear': False,
     'smearSigma': 0.000001,
-    'GFTrackCandidatesColName': 'caTracks',
     'tuneCutoffs': 5,
     'activateDistanceXY': [False],
     'activateDistance3D': [True],
@@ -86,7 +85,6 @@ vxdtf.param(param_vxdtf)
 
 trackfitter = register_module('GenFitter')
 #trackfitter.logging.log_level = LogLevel.WARNING
-trackfitter.param('GFTrackCandidatesColName', 'caTracks')
 trackfitter.param('FilterId', 'Kalman')
 trackfitter.param('UseClusters', True)
 

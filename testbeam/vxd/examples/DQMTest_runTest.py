@@ -52,7 +52,7 @@ param_vxdtf = {
     'killEventForHighOccupancyThreshold': 75,
     'cleanOverlappingSet': False,
     'filterOverlappingTCs': filterOverlaps,
-    'TESTERexpandedTestingRoutines': True,
+    'TESTERexpandedTestingRoutines': False,
     'qiSmear': False,
     'smearSigma': 0.000001,
     'GFTrackCandidatesColName': 'caTracks',

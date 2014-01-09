@@ -16,13 +16,7 @@
 #include <framework/datastore/RelationIndex.h>
 #include <framework/logging/Logger.h>
 
-//temporary, to read Katsuro's files from Vienna test
-// /*
-#include <arpa/inet.h>
-#include <stdio.h>
-#include <sys/mman.h>
-#include <fcntl.h>
-// */
+#include <iomanip>
 
 using namespace std;
 using namespace Belle2;
@@ -46,9 +40,8 @@ SVDUnpackerModule::SVDUnpackerModule() : Module()
   addParam("rawSVDListName", m_rawSVDListName, "Name of the raw SVD List", string(""));
   addParam("svdDigitListName", m_svdDigitListName, "Name of the SVD Digits List", string(""));
   addParam("xmlMapFileName", m_xmlMapFileName, "path+name of the xml file", string(""));
-
-  //temporary, to read Katsuro's flies from Vienna test:
-  addParam("dataFileName", tmp_dataFileName, "TMP: dat filename", string(""));
+  addParam("APVLatency", m_APVLatency, " APV latency (in ns)", float(0));
+  addParam("APVSamplingTime", m_APVSamplingTime, " APV sampling time (in ns)", float(1));
 
 }
 
@@ -59,47 +52,82 @@ SVDUnpackerModule::~SVDUnpackerModule()
 void SVDUnpackerModule::initialize()
 {
 
-  //RawSVD.h disappeared from the release (reappeared):
   StoreArray<RawSVD>::required(m_rawSVDListName);
   StoreArray<SVDDigit>::registerPersistent(m_svdDigitListName);
 
-  //commented out since no map exists at the moment
   loadMap();
 }
 
 void SVDUnpackerModule::beginRun()
 {
+  //FTB Error Field
+  m_f0 = 0;
+  m_f3 = 0;
+  m_f5 = 0;
+  m_f6 = 0;
+  m_f7 = 0;
+
+  //failed checks
+  m_failedChecks = 0;
+
+  m_wrongFTBHeader = 0;
+  m_wrongFADCTrailer = 0;
+  m_wrongFADCcrc = 0;
+  m_wrongFTBtrailer = 0;
+
+  m_noAPVHeader = 0;
+
 }
 
 void SVDUnpackerModule::event()
 {
-  //RawSVD.h disappeared from the release (reappeared):
   StoreArray<RawSVD> rawSVDList(m_rawSVDListName);
   StoreArray<SVDDigit> svdDigits(m_svdDigitListName);
   svdDigits.create();
 
+  if (! m_map) {
+    B2ERROR("xml map not loaded, going to the next module");
+    return;
+  }
+
   for (int i = 0; i < rawSVDList.getEntries(); i++) {
     for (int j = 0; j < rawSVDList[ i ]->GetNumEntries(); j++) {
 
-      //to be used to check the length:
-      int nWords = rawSVDList[i]->Get1stDetectorNwords(j); // * sizeof(int) bytes
+      int nWords = rawSVDList[i]->Get1stDetectorNwords(j);
       uint32_t* data32 = (uint32_t*)rawSVDList[i]->Get1stDetectorBuffer(j);
 
-      //first check the payload checksum:
-      checksum();
-
-      // Skip two words that I don't understand.
-      //      data32 += 2;
-      //      fillSVDDigitList(nWords - 2, data32, &svdDigits);
-
-      fillSVDDigitList(nWords, data32, &svdDigits);
-
+      if (sanityChecks(nWords, data32))
+        fillSVDDigitList(nWords, data32, &svdDigits);
+      else
+        m_failedChecks++;
     }
   }
+
+
+  //  B2INFO("number of entries of the RawSVD list = "<< rawSVDList.getEntries());
+  //  for (int i = 0; i < rawSVDList.getEntries(); i++)
+  //    B2INFO(" number of entries of the current RawSVD object = "<< rawSVDList[ i ]->GetNumEntries())
+
 }
 
 void SVDUnpackerModule::endRun()
 {
+
+  B2INFO(" total failed checks = " << m_failedChecks);
+  B2INFO("   m_wrongFTBHeader = " <<  m_wrongFTBHeader);
+  B2INFO("   m_wrongFADCTrailer = " << m_wrongFADCTrailer);
+  B2INFO("   m_wrongFADCcrc = " << m_wrongFADCcrc);
+  B2INFO("   m_wrongFTBtrailer = " << m_wrongFTBtrailer);
+
+
+  B2INFO(" m_noAPVHeader = " <<  m_noAPVHeader);
+
+  B2INFO(" FTB Error Field");
+  B2INFO("   m_f0 = " << m_f0);
+  B2INFO("   m_f3 = " << m_f3);
+  B2INFO("   m_f5 = " << m_f5);
+  B2INFO("   m_f6 = " << m_f6);
+  B2INFO("   m_f7 = " << m_f7);
 }
 
 
@@ -116,9 +144,98 @@ void SVDUnpackerModule::loadMap()
 
 }
 
-void SVDUnpackerModule::checksum()
+bool SVDUnpackerModule::sanityChecks(int nWords, uint32_t* data32)
 {
-  //check the checksum
+
+  //first of all verify FTB checksum, then proceed with FTB/FADC headers and trailers
+
+  //read FTB Trailer
+  struct FTBTrailer* theFTBTrailer = (struct FTBTrailer*) &data32[nWords - 1];
+  if (theFTBTrailer->controlWord != 0xff55) {
+    B2ERROR("WRONG FTB Trailer");
+    m_wrongFTBtrailer++;
+    return false;
+  } else
+    B2DEBUG(1, "sanityChecks: FTB Trailer found");
+  // verify FTB checksum
+  if (! verifyFTBcrc())
+    return false;
+
+
+  //read FTB Header:
+  struct FTBHeader* theFTBHeader = (struct FTBHeader*)data32;
+  if (theFTBHeader->controlWord != 0xffaa0000) {
+    B2ERROR("WRONG FTB header format 0x" << std::hex << std::setw(8) << std::setfill('0') << theFTBHeader->controlWord);
+    m_wrongFTBHeader++;
+    return false;
+  } else
+    B2DEBUG(1, "sanityChecks: FTB header format checked");
+
+  //  unsigned int FTBEvtNum = theFTBHeader->eventNumber;
+
+  //check FTB Errors Field
+  if (((theFTBHeader->errorsField >> 4) & 0xf) != 0xf)
+    B2ERROR("WRONG FTB Error Field format 0x" << std::hex << std::setw(8) << std::setfill('0') << theFTBHeader->errorsField)
+    else {
+      if (theFTBHeader->errorsField  == 0xf0)
+        m_f0++;
+      if (theFTBHeader->errorsField  == 0xf3)
+        //  B2WARNING("(FTB Evt Num = TTD Evt Num ) != FADC Evt Num in FTB Evt Numb = " << FTBEvtNum);
+        m_f3++;
+      if (theFTBHeader->errorsField  == 0xf5)
+        //  B2WARNING("(FTB Evt Num = FADC Evt Num ) != TTD Evt Num in FTB Evt Numb = " << FTBEvtNum);
+        m_f5++;
+      if (theFTBHeader->errorsField  == 0xf6)
+        //  B2WARNING("(TTD Evt Num = FADC Evt Num ) != FTB Evt Num in FTB Evt Numb = " << FTBEvtNum);
+        m_f6++;
+      if (theFTBHeader->errorsField  == 0xf7)
+        //  B2WARNING("TTD Evt Num != FADC Evt Num  != FTB Evt Num in FTB Evt Numb = " << FTBEvtNum);
+        m_f7++;
+
+    }
+
+  //read FADC Main Header:
+  struct MainHeader* theMainHeader = (struct MainHeader*) &data32[2];
+  if (theMainHeader->check != 0x6) {
+    B2ERROR("WRONG FADC main header format 0x" << std::hex << std::setw(8) << std::setfill('0') << theMainHeader->check);
+    m_wrongFADCHeader++;
+    return false;
+  } else
+    B2DEBUG(1, "main header format checked");
+  //check the run type
+  if (theMainHeader->runType != 0x2) {
+    B2ERROR("WRONG run type (expected = zero-suppressed), got 0x" << std::hex << std::setw(8) << std::setfill('0') << theMainHeader->runType);
+    m_wrongRunType++;
+    return false;
+  } else
+    B2DEBUG(1, "run type checked (zerosuppressed)");
+
+  //read FADC Trailer
+  struct FADCTrailer* theFADCTrailer = (struct FADCTrailer*) &data32[nWords - 2];
+  if (theFADCTrailer->check != 0xe) {
+    B2ERROR("WRONG FADC Trailer");
+    m_wrongFADCTrailer++;
+    return false;
+  } else
+    B2DEBUG(1, "sanityChecks: FADC Trailer found");
+
+  //check FTB Flags Field
+  if (((theFADCTrailer->FTBFlags >> 5) & 0) != 0)
+    B2ERROR("WRONG FTB Flags Field format 0x" << std::hex << std::setw(8) << std::setfill('0') << theFADCTrailer->FTBFlags)
+    else  if ((theFADCTrailer->FTBFlags & 16) == 16) {
+      //  B2WARNING(" FTB Flag: CRC error = 1");
+      m_wrongFADCcrc++;
+      return false;
+    }
+
+  return true;
+
+}
+
+bool SVDUnpackerModule::verifyFTBcrc()
+{
+  //verify the checksum - to be implemented
+  return true;
 }
 
 
@@ -126,124 +243,76 @@ void SVDUnpackerModule::fillSVDDigitList(int nWords, uint32_t* data32_in,  Store
 {
   uint32_t* data32 = data32_in;
 
-  //read FTB Header:
-  struct FTBHeader* theFTBHeader = (struct FTBHeader*)data32;
-
-  if (theFTBHeader->controlWord != 0xffaa0000) {
-    B2WARNING("OOOOPS: WRONG FTB header format 0x" << std::hex << theFTBHeader->controlWord);
-    return;
-  } else
-    B2DEBUG(1, "FTB header format checked");
-
   data32 += 2;
-
-  //read Main Header:
+  //re-read FADC main header
   struct MainHeader* theMainHeader = (struct MainHeader*)data32;
 
-  if (theMainHeader->check != 0x6) {
-    B2WARNING("OOOOPS: WRONG main header format 0x" << std::hex << theMainHeader->check);
-    return;
-  } else
-    B2DEBUG(1, "main header format checked");
+  data32++;
 
-  //check run typea
-  if (theMainHeader->runType != 0x2) {
-    B2WARNING("OOOOPS: WRONG main runType (expected = zero-suppressed), got 0x" << std::hex << theMainHeader->runType);
-    return;
-  } else
-    B2DEBUG(1, "run type checked (zerosuppressed)");
-
-  //read APV Header:
-  struct APVHeader* theAPVHeader = (struct APVHeader*)(++data32);
-
-  if (theAPVHeader->check != 0x2) {
-    B2WARNING("OOOOPS: WRONG APV header format 0x" << std::hex << theAPVHeader->check);
-    return;
-  } else
-    B2DEBUG(1, "APV header format checked");
-
-  //read data samples (if there):
-
+  //read APV Headers, data samples (if there), and FADC trailer:
+  struct APVHeader* theAPVHeader = 0 ;
   struct data* aSample;
-  struct trailer* theTrailer;
+  struct data* previousSample;
+  float time = m_APVLatency;
 
-  bool trailerFound = false;
+  bool FADCtrailerFound = false;
 
-  ++data32;
+  for (; !FADCtrailerFound  && (data32 != &data32_in[nWords]); ++data32) {
 
-  for (; !trailerFound  && (data32 != &data32_in[nWords]); ++data32) {
+    if (((*data32 >> 30) & 0x3) == 0x2) { //APV header type
 
-    if (((*data32 >> 31) & 0x1) == 0) {    //zero-suppressed data
-
-      aSample = (struct data*) data32;
-
-      assert(aSample->check == 0);
-
-      //add the 3 data samples:
-      if (m_map) //remove check?
-        for (int i = 0; i < 3; i++) {
-          SVDDigit* newDigit = m_map->NewDigit(theMainHeader->FADCnum, theAPVHeader->APVnum, aSample->stripNum, aSample->sample[i], theMainHeader->trgTiming);
-          // Translation can return 0, if wrong FADC/APV combination is encountered.
-          if (!newDigit) {
-            B2WARNING("Unkown FADC #" << theMainHeader->FADCnum << " and APV #" << theAPVHeader->APVnum);
-            continue;
-          }
-          svdDigits->appendNew(*newDigit);
-          delete newDigit;
-        }
-
-
-    } else if (((*data32 >> 30) & 0x3) == 0x2) { //APV header type
       theAPVHeader = (struct APVHeader*) data32;
-      assert(theAPVHeader->check == 2 + 0);
       B2DEBUG(1, "New APV header");
 
-    } else if (((*data32 >> 28) & 0xf) == 0xe) { // trailer type
-
-      //read the trailer
-
-      theTrailer = (struct trailer*) data32;
-      assert(theTrailer->check == 0xe);
-      B2DEBUG(1, "Trailer found");
-
-      trailerFound = true;
-
-    } else {
-      B2WARNING("OOOOPS: unknown data field, highest four bits: 0x" << std::hex << *data32);
-      return;
+      continue;
     }
+
+    if (((*data32 >> 31) & 0x1) == 0) {     //zero-suppressed data
+
+      aSample = (struct data*) data32;
+      previousSample = (struct data*)(data32 - 1);
+
+      if (aSample->stripNum != previousSample->stripNum)
+        time = m_APVLatency;
+
+      //add the 3 data samples:
+      if (theAPVHeader) {
+        for (int i = 0; i < 3; i++) {
+          SVDDigit* newDigit = m_map->NewDigit(theMainHeader->FADCnum, theAPVHeader->APVnum, aSample->stripNum, aSample->sample[i], time);
+          time += m_APVSamplingTime;
+
+          // Translation can return 0, if wrong FADC/APV combination is encountered.
+          if (!newDigit) {
+            B2WARNING("Unknown FADC #" << theMainHeader->FADCnum << " and APV #" << theAPVHeader->APVnum);
+            continue;
+          } else {
+            svdDigits->appendNew(*newDigit);
+            delete newDigit;
+          }
+        }
+      } else
+        m_noAPVHeader++;
+      //  B2WARNING(" FADC data before a valid APV header 0x" << std::hex << std::setw(8) << std::setfill('0') << *data32);
+
+
+      continue;
+    }
+
+    if (((*data32 >> 28) & 0xf) == 0xe) { // FADC trailer type
+
+      B2DEBUG(1, "FADC Trailer found");
+      FADCtrailerFound = true;
+
+      continue;
+    }
+
+    B2WARNING("unknown data field, highest four bits: 0x" << std::hex << std::setw(8) << std::setfill('0') << *data32 << " data check bit is = " << (*data32 >> 31));
+    return;
   }
 
   if (&data32_in[nWords] != &data32[1]) {
-    B2WARNING("OOOOPS: FADC trailer appeared too early, data short by " << &data32_in[nWords] - &data32[1] << " bytes");
+    B2WARNING("FADC trailer appeared too early, data short by " << &data32_in[nWords] - &data32[1] << " bytes");
   }
 
-  struct FTBTrailer* theFTBTrailer;
-
-  if (trailerFound)  {
-    theFTBTrailer = (struct FTBTrailer*) data32++;
-    if (theFTBTrailer->controlWord == 0xff55)
-      B2DEBUG(1, "FTBTrailer found");
-  } else
-    B2ERROR("OOOOPS: read data block without FADC trailer");
 
 }
-
-//temporary: to check format from Vienna test files:
-/*
-  void SVDUnpackerModule::printbitssimple(int n, int nBits) {
- //Print n as a binary number
-
-  unsigned int i;
-
-  i = 1<<(nBits - 1);
-
-  while (i > 0) {
-    if (n & i)
-      printf("1");
-    else
-      printf("0");
-    i >>= 1;
-  }
-}
-*/

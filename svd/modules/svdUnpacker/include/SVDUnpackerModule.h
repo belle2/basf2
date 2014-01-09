@@ -66,7 +66,22 @@ namespace Belle2 {
       std::string m_rawSVDListName;
       std::string m_svdDigitListName;
       std::string m_xmlMapFileName;
-      std::string tmp_dataFileName;
+
+      float m_APVLatency;
+      float m_APVSamplingTime;
+      int m_failedChecks;
+      int m_wrongFTBHeader;
+      int m_noAPVHeader;
+      int m_wrongFADCHeader;
+      int m_wrongRunType;
+      int m_wrongFADCTrailer;
+      int m_wrongFADCcrc;
+      int m_wrongFTBtrailer;
+      int m_f0;
+      int m_f3;
+      int m_f5;
+      int m_f6;
+      int m_f7;
 
     private:
 
@@ -76,8 +91,8 @@ namespace Belle2 {
 
       struct FTBHeader {
         unsigned int controlWord : 32; //LSB
-        unsigned int eventNumber : 24;
-        unsigned int errorsField : 8; //MSB
+        unsigned int errorsField : 8;
+        unsigned int eventNumber : 24; //MSB
       };
 
 
@@ -109,8 +124,8 @@ namespace Belle2 {
         unsigned int check : 1; //MSB
       };
 
-      struct trailer {
-        unsigned int checksum: 16; //LSB
+      struct FADCTrailer {
+        unsigned int FTBFlags: 16; //LSB
 
         unsigned int emPipeAddr: 8;
 
@@ -127,7 +142,9 @@ namespace Belle2 {
       };
 
 
-      void checksum();
+      bool sanityChecks(int nWords, uint32_t* data32);
+
+      bool verifyFTBcrc();
 
       void loadMap();
 

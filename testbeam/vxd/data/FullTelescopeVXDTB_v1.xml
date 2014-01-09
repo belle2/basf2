@@ -92,7 +92,6 @@
             <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='VXDBox']/*))" />
             <Volume name="PXD-Envelope">
                <DX unit="mm">57.0</DX>
-               <DY unit="mm">-12.0</DY>
                <!-- Shift down for better PXD acceptance at 6GeV -->
                <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='PXD-Envelope']/*)" />
                <Volume name="CoolingBlock">
@@ -126,10 +125,23 @@
                   <Phi unit="deg">90</Phi>
                   <Psi unit="deg">90</Psi>
                   
-                  <HalfX unit="mm">32.9</HalfX>
+                  
+                  
+                  <HalfX unit="mm">27.3</HalfX>
                   <HalfY unit="mm">7.8</HalfY>
                   <HalfZ unit="mm">0.61</HalfZ>
+                  <Subtract>
+                    <Name>removing_overlap_from_air_volume</Name>
+                    <Shape>Box</Shape>
+                    <HalfX unit="mm">27.3</HalfX>
+                    <HalfY unit="mm">7.8</HalfY>
+                    <HalfZ unit="mm">0.4</HalfZ>
+                    <DZ unit="mm">-0.61</DZ>
+                  </Subtract>
                   <!--xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='PXD6-S-sensor_L1']/*)" /-->
+                  
+                  
+                  
                   <Volume name="PXD-SensitiveArea">
                      <AlignComponent>1.1.1</AlignComponent>
                      <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='airPXD6-S-SensitiveArea_short']/*)" />
@@ -149,10 +161,23 @@
                   <Phi unit="deg">270</Phi>
                   <Psi unit="deg">90</Psi>
                   
+                  
+                  
                   <HalfX unit="mm">32.9</HalfX>
                   <HalfY unit="mm">7.8</HalfY>
                   <HalfZ unit="mm">0.61</HalfZ>
+                  <Subtract>
+                    <Name>removing_overlap_from_air_volume</Name>
+                    <Shape>Box</Shape>
+                    <HalfX unit="mm">32.9</HalfX>
+                    <HalfY unit="mm">7.8</HalfY>
+                    <HalfZ unit="mm">0.4</HalfZ>
+                    <DZ unit="mm">-0.61</DZ>
+                  </Subtract>
                   <!--xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='PXD6-sensor_L2']/*)" /-->
+                  
+                  
+                  
                   <Volume name="PXD-SensitiveArea">
                      <AlignComponent>2.1.2</AlignComponent>
                      <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='airPXD-SensitiveArea']/*)" />
@@ -244,7 +269,6 @@
             </Volume>
             <Volume name="EUDET-Module4">
                <DX unit="mm">-140.0</DX>
-               <DY unit="mm">-30.0</DY>
                <DZ unit="mm">0.0</DZ>
                <Theta unit="deg">90</Theta>
                <Phi unit="deg">-90</Phi>
@@ -263,7 +287,6 @@
             </Volume>
             <Volume name="EUDET-Module5">
                <DX unit="mm">-160.0</DX>
-               <DY unit="mm">-30.0</DY>
                <DZ unit="mm">0.0</DZ>
                <Theta unit="deg">90</Theta>
                <Phi unit="deg">-90</Phi>
@@ -282,7 +305,6 @@
             </Volume>
             <Volume name="EUDET-Module6">
                <DX unit="mm">-180.0</DX>
-               <DY unit="mm">-30.0</DY>
                <DZ unit="mm">0.0</DZ>
                <Theta unit="deg">90</Theta>
                <Phi unit="deg">-90</Phi>

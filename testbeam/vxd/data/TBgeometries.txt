@@ -1,3 +1,25 @@
-FullVXDTB.xml ... Complete geometry with deactivated telescopes. All sensors centered (expect SVD3 moved by 4.8mm down)
-FullTelescopeVXDTB.xml ... Complete geometry with active telescopes. All sensors centered (expect SVD3 moved by 4.8mm down)
-FullTelescopeVXDTB_v1.xml ... only PXD active areas are present, but made from air (they are active volumes)
+FullVXDTB.xml
+-------------
+... Complete geometry with deactivated telescopes. All sensors centered (expect SVD3 moved by 4.8mm down)
+
+8. Jan 2014 23:55 first version
+
+
+
+FullTelescopeVXDTB.xml 
+----------------------
+... Complete geometry with active telescopes. All sensors centered (expect SVD3 moved by 4.8mm down)
+
+8. Jan 2014 23:55 first version
+
+
+
+FullTelescopeVXDTB_v1.xml
+-------------------------
+... only PXD active areas are present, but made from air (they are active volumes)
+
+9. Jan 2014 18:40 backward telescopes were 3cm under axis, pxd 12mm in last commit. In this version, everything is centered again
+
+9. Jan 2014 11:00 fixed bug in phantom pxds
+
+8. Jan 2014 23:55 first version

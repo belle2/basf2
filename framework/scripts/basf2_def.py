@@ -221,10 +221,6 @@ def print_params(module, print_values=True, shared_lib_path=None):
     has_forced_params = False
     paramList = module.available_params()
     for paramItem in paramList:
-        # defaultStr = ', '.join(['%s' % defaultItem for defaultItem in
-        #                       paramItem.default])
-        # valueStr = ', '.join(['%s' % valueItem for valueItem in
-        #                     paramItem.values])
         defaultStr = str(paramItem.default)
         valueStr = str(paramItem.values)
         forceString = ''
@@ -277,13 +273,7 @@ def print_path(path, defaults=False, description=False):
         for param in module.available_params():
             if not defaults and param.values == param.default:
                 continue
-            values = param.values
-            if not param.type.startswith('List'):
-                if len(values) > 0:
-                    values = values[0]
-                else:
-                    values = ''
-            out = '      %s=%s' % (param.name, values)
+            out = '      %s=%s' % (param.name, param.values)
             if description:
                 out += '  #%s' % param.description
             print out

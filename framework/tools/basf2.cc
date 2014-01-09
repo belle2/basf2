@@ -42,6 +42,7 @@
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 
+#include <unistd.h>
 #include <signal.h>
 #include <cstdlib>
 #include <sys/utsname.h>
@@ -52,6 +53,10 @@
 #include <vector>
 #include <fstream>
 #include <streambuf>
+
+#ifdef HAS_CALLGRIND
+#include <valgrind/valgrind.h>
+#endif
 
 using namespace std;
 using namespace Belle2;
@@ -147,6 +152,9 @@ int main(int argc, char* argv[])
     ("module-io", prog::value<string>(), "Create diagram of inputs and outputs for a single module, saved as ModuleName.dot. To create a PostScript file, use e.g. 'dot ModuleName.dot -Tps -o out.ps'.")
     ("no-stats", "Disable collection of statistics during event processing. Useful for very high-rate applications, but produces empty table with 'print statistics'.")
     ("dry-run", "Read steering file, but do not start any actually start any event processing. Prints information on input/output files that would be used during normal execution.")
+#ifdef HAS_CALLGRIND
+    ("profile", prog::value<string>(), "Name of a module to profile using callgrind. If more than one module of that name is registered only the first one will be profiled.")
+#endif
     ;
 
     prog::options_description cmdlineOptions;
@@ -167,6 +175,56 @@ int main(int argc, char* argv[])
       cout << cmdlineOptions << endl;
       return 0;
     }
+
+    // -p
+    // Do now so that we can override if profiling is requested
+    if (varMap.count("processes")) {
+      int nprocesses = varMap["processes"].as<int>();
+      if (nprocesses < 0) {
+        B2FATAL("Invalid number of processes!");
+        return 1;
+      }
+      Environment::Instance().setNumberProcessesOverride(nprocesses);
+    }
+
+#ifdef HAS_CALLGRIND
+    if (varMap.count("profile")) {
+      string profileModule = varMap["profile"].as<string>();
+      //We want to profile a module so check if we are running under valgrind
+      if (!RUNNING_ON_VALGRIND) {
+        //Apparently not. Ok,  let's call ourself using valgrind
+        cout << "Profiling requested, restarting using callgrind" << endl;
+
+        //Sadly calling processes in C++ is very annoying as we have to
+        //build a command line.
+        vector<char*> cmd;
+        //First we add all valgrind arguments.
+        const vector<string> valgrind_argv {
+          "valgrind", "--tool=callgrind", "--instr-atstart=no", "--trace-children=no",
+          "--callgrind-out-file=callgrind." + profileModule + ".%p",
+        };
+        //As execvp wants non-const char* pointers we have to copy the string contents.
+        for (auto argv : valgrind_argv) { cmd.push_back(strdup(argv.c_str())); }
+        //And now we add our own arguments, including the program name.
+        for (int i = 0; i < argc; ++i)  { cmd.push_back(argv[i]); }
+        //Finally, execvp wants a nullptr as last argument
+        cmd.push_back(nullptr);
+        //And call this thing. Execvp will not return if successful as the
+        //current process will be replaced so we do not need to care about what
+        //happens if succesful
+        if (execvp(cmd[0], cmd.data()) == -1) {
+          int errsv = errno;
+          perror("Problem calling valgrind");
+          return errsv;
+        }
+      }
+      //Ok, running under valgrind, set module name we want to profile in
+      //environment.
+      Environment::Instance().setProfileModuleName(profileModule);
+      //and make sure there is no multiprocessing when profiling
+      Environment::Instance().setNumberProcessesOverride(0);
+    }
+#endif
 
     //Check for steering option
     if (varMap.count("steering")) {
@@ -206,16 +264,6 @@ int main(int argc, char* argv[])
     if (varMap.count("output")) {
       std::string name = varMap["output"].as<string>();
       Environment::Instance().setOutputFileOverride(name);
-    }
-
-    // -p
-    if (varMap.count("processes")) {
-      int nprocesses = varMap["processes"].as<int>();
-      if (nprocesses < 0) {
-        B2FATAL("Invalid number of processes!");
-        return 1;
-      }
-      Environment::Instance().setNumberProcessesOverride(nprocesses);
     }
 
     // -l

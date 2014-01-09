@@ -98,6 +98,7 @@ void Framework::process(PathPtr startPath, long maxEvent)
     already_executed = true;
     if (Environment::Instance().getNumberProcesses() == 0) {
       EventProcessor processor(*m_pathManager);
+      processor.setProfileModuleName(Environment::Instance().getProfileModuleName());
       processor.process(startPath, maxEvent);
     } else {
       pEventProcessor processor(*m_pathManager);

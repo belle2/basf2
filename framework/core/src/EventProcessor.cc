@@ -26,6 +26,22 @@
 
 #ifdef HAS_CALLGRIND
 #include <valgrind/callgrind.h>
+/** Call a module member function and optionally enable valgrind
+ * instrumentation around the function call. We need this to call initialize,
+ * beginRun, event, endRun and terminate and need to distuingish between using
+ * valgrind or not each time. The easiest way to do this is define this short
+ * macro.
+ */
+#define CALL_MODULE(module,x) \
+  if(m_profileModule && m_profileModule==module && RUNNING_ON_VALGRIND){\
+    CALLGRIND_START_INSTRUMENTATION;\
+    module->x();\
+    CALLGRIND_STOP_INSTRUMENTATION;\
+  }else{\
+    module->x();\
+  }
+#else
+#define CALL_MODULE(module, x) module->x()
 #endif
 
 #include <signal.h>
@@ -51,9 +67,6 @@ EventProcessor::~EventProcessor()
 
 void EventProcessor::process(PathPtr startPath, long maxEvent)
 {
-#ifdef HAS_CALLGRIND
-  CALLGRIND_START_INSTRUMENTATION;
-#endif
   //Check whether the number of events was set via command line argument
   int numEventsArgument = Environment::Instance().getNumberEventsOverride();
   if ((numEventsArgument > 0) && ((maxEvent == 0) || (maxEvent > numEventsArgument))) {
@@ -62,6 +75,16 @@ void EventProcessor::process(PathPtr startPath, long maxEvent)
 
   //Get list of modules which could be executed during the data processing.
   ModulePtrList moduleList = m_pathManager.buildModulePathList(startPath);
+
+  //Find the adress of the module we want to profile
+  if (!m_profileModuleName.empty()) {
+    for (auto module : moduleList) {
+      if (module->getName() == m_profileModuleName) {
+        m_profileModule = module.get();
+        break;
+      }
+    }
+  }
 
   //Initialize modules
   processInitialize(moduleList);
@@ -91,9 +114,6 @@ void EventProcessor::process(PathPtr startPath, long maxEvent)
 
   //Terminate modules
   processTerminate(moduleList);
-#ifdef HAS_CALLGRIND
-  CALLGRIND_STOP_INSTRUMENTATION;
-#endif
 
   LogSystem::Instance().printErrorSummary();
 }
@@ -118,9 +138,6 @@ static void signalHandler(int)
 
 void EventProcessor::processInitialize(const ModulePtrList& modulePathList)
 {
-#ifdef HAS_CALLGRIND
-  CALLGRIND_ZERO_STATS;
-#endif
   //store main RNG to be able to restore it later
   m_mainRNG = gRandom;
 
@@ -145,7 +162,7 @@ void EventProcessor::processInitialize(const ModulePtrList& modulePathList)
 
     //Do initialization
     stats.startModule();
-    module->initialize();
+    CALL_MODULE(module, initialize);
     stats.stopModule(*module, ModuleStatistics::c_Init);
 
     //Set the global log level
@@ -159,9 +176,6 @@ void EventProcessor::processInitialize(const ModulePtrList& modulePathList)
   }
   DataStore::Instance().setInitializeActive(false);
   stats.stopGlobal(ModuleStatistics::c_Init);
-#ifdef HAS_CALLGRIND
-  CALLGRIND_DUMP_STATS_AT("initialize");
-#endif
 }
 
 
@@ -170,10 +184,6 @@ void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& moduleP
   if (signal(SIGINT, signalHandler) == SIG_ERR) {
     B2FATAL("Cannot setup SIGINT signal handler\n");
   }
-#ifdef HAS_CALLGRIND
-  CALLGRIND_ZERO_STATS;
-#endif
-
   LogSystem& logSystem = LogSystem::Instance();
 
   //Remember the previous event meta data, and identify end of data meta data
@@ -206,7 +216,7 @@ void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& moduleP
       //Call the event method of the module
       if (collectStats)
         stats.startModule();
-      module->event();
+      CALL_MODULE(module, event);
       if (collectStats)
         stats.stopModule(*module, ModuleStatistics::c_Event);
 
@@ -234,9 +244,6 @@ void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& moduleP
             stats.stopGlobal(ModuleStatistics::c_Event, true);
           //End the previous run
           if (currEvent > 0) {
-#ifdef HAS_CALLGRIND
-            CALLGRIND_DUMP_STATS_AT("event");
-#endif
             EventMetaData newEventMetaData = *eventMetaDataPtr;
             *eventMetaDataPtr = previousEventMetaData;
             processEndRun(modulePathList);
@@ -246,9 +253,6 @@ void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& moduleP
           //Start a new run
           processBeginRun(modulePathList);
 
-#ifdef HAS_CALLGRIND
-          CALLGRIND_ZERO_STATS;
-#endif
           if (collectStats)
             stats.startGlobal();
         }
@@ -288,9 +292,6 @@ void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& moduleP
     if (collectStats)
       stats.stopGlobal(ModuleStatistics::c_Event);
   } //end event loop
-#ifdef HAS_CALLGRIND
-  CALLGRIND_DUMP_STATS_AT("event");
-#endif
 
   //End last run
   if (currEvent > 0 && previousEventMetaData != endEventMetaData) {
@@ -303,9 +304,6 @@ void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& moduleP
 
 void EventProcessor::processTerminate(const ModulePtrList& modulePathList)
 {
-#ifdef HAS_CALLGRIND
-  CALLGRIND_ZERO_STATS;
-#endif
   gRandom = m_mainRNG;
 
   LogSystem& logSystem = LogSystem::Instance();
@@ -321,7 +319,7 @@ void EventProcessor::processTerminate(const ModulePtrList& modulePathList)
 
     //Do termination
     stats.startModule();
-    module->terminate();
+    CALL_MODULE(module, terminate);
     stats.stopModule(*module, ModuleStatistics::c_Term);
 
     //Set the global log level
@@ -331,17 +329,11 @@ void EventProcessor::processTerminate(const ModulePtrList& modulePathList)
   //Delete persistent data in DataStore
   DataStore::Instance().clearMaps(DataStore::c_Persistent);
   stats.stopGlobal(ModuleStatistics::c_Term);
-#ifdef HAS_CALLGRIND
-  CALLGRIND_DUMP_STATS_AT("terminate");
-#endif
 }
 
 
 void EventProcessor::processBeginRun(const ModulePtrList& modulePathList)
 {
-#ifdef HAS_CALLGRIND
-  CALLGRIND_ZERO_STATS;
-#endif
   gRandom = m_mainRNG;
 
   LogSystem& logSystem = LogSystem::Instance();
@@ -357,7 +349,7 @@ void EventProcessor::processBeginRun(const ModulePtrList& modulePathList)
 
     //Do beginRun() call
     stats.startModule();
-    module->beginRun();
+    CALL_MODULE(module, beginRun);
     stats.stopModule(*module, ModuleStatistics::c_BeginRun);
 
     //Set the global log level
@@ -366,17 +358,11 @@ void EventProcessor::processBeginRun(const ModulePtrList& modulePathList)
   gRandom = m_mainRNG;
 
   stats.stopGlobal(ModuleStatistics::c_BeginRun);
-#ifdef HAS_CALLGRIND
-  CALLGRIND_DUMP_STATS_AT("beginRun");
-#endif
 }
 
 
 void EventProcessor::processEndRun(const ModulePtrList& modulePathList)
 {
-#ifdef HAS_CALLGRIND
-  CALLGRIND_ZERO_STATS;
-#endif
   gRandom = m_mainRNG;
 
   LogSystem& logSystem = LogSystem::Instance();
@@ -392,7 +378,7 @@ void EventProcessor::processEndRun(const ModulePtrList& modulePathList)
 
     //Do endRun() call
     stats.startModule();
-    module->endRun();
+    CALL_MODULE(module, endRun);
     stats.stopModule(*module, ModuleStatistics::c_EndRun);
 
     //Set the global log level
@@ -401,7 +387,4 @@ void EventProcessor::processEndRun(const ModulePtrList& modulePathList)
   gRandom = m_mainRNG;
 
   stats.stopGlobal(ModuleStatistics::c_EndRun);
-#ifdef HAS_CALLGRIND
-  CALLGRIND_DUMP_STATS_AT("endRun");
-#endif
 }

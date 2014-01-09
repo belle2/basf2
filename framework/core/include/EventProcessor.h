@@ -50,6 +50,10 @@ namespace Belle2 {
      */
     void process(PathPtr startPath, long maxEvent = 0);
 
+    /** Set the name of the module we want to profile
+     * @param name Name of the module as returned by getName()
+     */
+    void setProfileModuleName(const std::string& name) { m_profileModuleName = name; }
 
   protected:
 
@@ -106,6 +110,11 @@ namespace Belle2 {
     PathManager& m_pathManager; /**< Reference to the path manager, which takes care of creating and handling paths. */
     const Module* m_master;  /**< The master module that determines the experiment/run/event number **/
     TRandom* m_mainRNG; /**< The main random number generator. A copy of the gRandom pointer, to reset it at the beginning of module execution when using RandomBarrierModule. */
+
+    /** Name of the module which should be profiled, empty if no profiling is requested */
+    std::string m_profileModuleName;
+    /** Adress of the module which we want to profile, nullptr if no profiling is requested */
+    Module* m_profileModule = nullptr;
   };
 
 }

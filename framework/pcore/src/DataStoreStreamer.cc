@@ -25,6 +25,17 @@ static DataStoreStreamer* s_streamer = NULL;
 static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 static pthread_mutex_t mutex_thread[MAXTHREADS];
 //static char* evtbuf_thread[MAXTHREADS];
+static int msg_compLevel[MAXTHREADS];
+
+static std::queue<char*> my_evtbuf[MAXTHREADS];
+
+static std::queue<int> my_nobjs;
+static std::queue<int> my_narrays;
+static std::queue<DataStore::EDurability> my_durability;
+static std::queue<std::vector<TObject*>> my_objlist;
+static std::queue<std::vector<std::string>> my_namelist;
+
+static int my_decstat[MAXTHREADS];
 
 void* RunDecodeEvtMessage(void* targ)
 {
@@ -60,11 +71,12 @@ DataStoreStreamer::DataStoreStreamer(int complevel, int maxthread) : m_compressi
     //    pthread_attr_setschedpolicy(&thread_attr , SCHED_FIFO);
     //    pthread_attr_setdetachstate(&thread_attr , PTHREAD_CREATE_DETACHED);
     for (int i = 0; i < m_maxthread; i++) {
-      m_decstat[i] = 0;
+      my_decstat[i] = 0;
       m_pt[i] = (pthread_t)0;
       m_id[i] = i;
       //      m_pmsghandler[i] = new MsgHandler ( m_compressionLevel );
       mutex_thread[i] = PTHREAD_MUTEX_INITIALIZER;
+      msg_compLevel[i] = m_compressionLevel;
     }
     for (int i = 0; i < m_maxthread; i++) {
       //      args.evtbuf = m_evtbuf[i];
@@ -233,17 +245,17 @@ int DataStoreStreamer::queueEvtMessage(char* evtbuf)
   if (evtbuf == NULL) {
     printf("queueEvtMessage : NULL evtbuf detected. \n");
     for (int i = 0; i < m_maxthread; i++) {
-      while (m_evtbuf[i].size() >= MAXQUEUEDEPTH) usleep(10);
-      m_evtbuf[m_threadin].push(evtbuf);
+      while (my_evtbuf[i].size() >= MAXQUEUEDEPTH) usleep(10);
+      my_evtbuf[m_threadin].push(evtbuf);
     }
     return 0;
   }
 
   // Put the event buffer in the queue of current thread
   for (;;) {
-    if (m_evtbuf[m_threadin].size() < MAXQUEUEDEPTH) {
+    if (my_evtbuf[m_threadin].size() < MAXQUEUEDEPTH) {
       pthread_mutex_lock(&mutex_thread[m_threadin]);
-      m_evtbuf[m_threadin].push(evtbuf);
+      my_evtbuf[m_threadin].push(evtbuf);
       pthread_mutex_unlock(&mutex_thread[m_threadin]);
       break;
     }
@@ -251,7 +263,7 @@ int DataStoreStreamer::queueEvtMessage(char* evtbuf)
   }
 
   // Switch to next thread
-  m_decstat[m_threadin] = 1; // Event queued for decoding
+  my_decstat[m_threadin] = 1; // Event queued for decoding
   m_threadin++;
   if (m_threadin >= m_maxthread) m_threadin = 0;
   return 1;
@@ -265,7 +277,9 @@ void* DataStoreStreamer::decodeEvtMessage(int id)
   //  MsgHandler* msghandler = new MsgHandler(m_compressionLevel);
   //  MsgHandler* msghandler = m_pmsghandler[id];
 
-  MsgHandler msghandler(m_compressionLevel);
+  pthread_mutex_lock(&mutex);     // Lock thread
+  MsgHandler msghandler(msg_compLevel[id]);
+  pthread_mutex_unlock(&mutex);    // Unlock thread
 
   for (;;) {
     // Clear message handler event by event
@@ -274,19 +288,19 @@ void* DataStoreStreamer::decodeEvtMessage(int id)
     // Wait for event in queue becomes ready
     msghandler.clear();
 
-    while (m_evtbuf[id].size() <= 0) usleep(10);
+    while (my_evtbuf[id].size() <= 0) usleep(10);
 
     // Pick up event buffer
     pthread_mutex_lock(&mutex_thread[id]);
-    int nqueue = m_evtbuf[id].size();
+    int nqueue = my_evtbuf[id].size();
     if (nqueue <= 0) printf("!!!!! Nqueue = %d\n", nqueue);
-    char* evtbuf = m_evtbuf[id].front(); m_evtbuf[id].pop();
+    char* evtbuf = my_evtbuf[id].front(); my_evtbuf[id].pop();
     pthread_mutex_unlock(&mutex_thread[id]);
 
     // In case of EOF
     if (evtbuf == NULL) {
       printf("decodeEvtMessage: NULL evtbuf detected, nq = %d\n", nqueue);
-      m_nobjs.push(-1);
+      my_nobjs.push(-1);
       return NULL;
     }
 
@@ -305,13 +319,13 @@ void* DataStoreStreamer::decodeEvtMessage(int id)
 
 
     // Queue them for the registration in DataStore
-    while (m_nobjs.size() >= MAXQUEUEDEPTH) usleep(10);
+    while (my_nobjs.size() >= MAXQUEUEDEPTH) usleep(10);
     pthread_mutex_lock(&mutex);     // Lock queueing
-    m_objlist.push(objlist);
-    m_namelist.push(namelist);
-    m_nobjs.push((msg->header())->reserved[1]);
-    m_narrays.push((msg->header())->reserved[2]);
-    m_durability.push((DataStore::EDurability)(msg->header())->reserved[0]);
+    my_objlist.push(objlist);
+    my_namelist.push(namelist);
+    my_nobjs.push((msg->header())->reserved[1]);
+    my_narrays.push((msg->header())->reserved[2]);
+    my_durability.push((DataStore::EDurability)(msg->header())->reserved[0]);
     pthread_mutex_unlock(&mutex);    // Unlock queueing
 
     // Release EvtMessage
@@ -319,7 +333,7 @@ void* DataStoreStreamer::decodeEvtMessage(int id)
     delete[] evtbuf;
 
     // Preparation for next event
-    m_decstat[id]  = 0; // Ready to read next event
+    my_decstat[id]  = 0; // Ready to read next event
 
   }
 
@@ -329,22 +343,22 @@ void* DataStoreStreamer::decodeEvtMessage(int id)
 int DataStoreStreamer::restoreDataStoreAsync()
 {
 // Wait for the queue to become ready
-  while (m_nobjs.empty()) usleep(10);
+  while (my_nobjs.empty()) usleep(10);
 
   // Register decoded objects in DataStore
 
   // Pick up event on the top and remove it from the queue
   pthread_mutex_lock(&mutex);
-  int nobjs = m_nobjs.front(); m_nobjs.pop();
+  int nobjs = my_nobjs.front(); my_nobjs.pop();
   if (nobjs == -1) {
     printf("restoreDataStore: EOF detected. exitting with status 0\n");
     pthread_mutex_unlock(&mutex);
     return 0;
   }
-  int narrays = m_narrays.front(); m_narrays.pop();
-  DataStore::EDurability durability = m_durability.front(); m_durability.pop();
-  vector<TObject*> objlist = m_objlist.front(); m_objlist.pop();
-  vector<string> namelist = m_namelist.front(); m_namelist.pop();
+  int narrays = my_narrays.front(); my_narrays.pop();
+  DataStore::EDurability durability = my_durability.front(); my_durability.pop();
+  vector<TObject*> objlist = my_objlist.front(); my_objlist.pop();
+  vector<string> namelist = my_namelist.front(); my_namelist.pop();
   pthread_mutex_unlock(&mutex);
 
   // Restore objects in DataStore
@@ -398,7 +412,7 @@ int DataStoreStreamer::getMaxThreads()
 int DataStoreStreamer::getDecoderStatus()
 {
   //  printf ( "Decode thread %d = %d\n", m_threadin, m_done_decode[m_threadin] );
-  return (m_decstat[m_threadin]);
+  return (my_decstat[m_threadin]);
 }
 
 void DataStoreStreamer::setDecoderStatus(int val)

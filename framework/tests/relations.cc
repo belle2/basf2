@@ -31,11 +31,7 @@ namespace Belle2 {
 
     /** clear datastore */
     virtual void TearDown() {
-      for (int i = 0; i < DataStore::c_NDurabilityTypes; ++i) {
-        DataStore::Instance().clearMaps((DataStore::EDurability) i);
-        const DataStore::StoreObjMap& map = DataStore::Instance().getStoreObjectMap(DataStore::EDurability(i));
-        const_cast<DataStore::StoreObjMap&>(map).clear();
-      }
+      DataStore::Instance().reset();
     }
 
     void findRelationsCheckContents();

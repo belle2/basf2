@@ -421,9 +421,15 @@ namespace Belle2 {
     /** Frees memory occopied by data store items and removes all objects from the map.
      *
      *  Afterwards, m_storeObjMap[durability] is empty.
-     *  Called by the framework. Users should usually not use this function without a good reason.
+     *  Called by the framework. Users should usually not use this function without good reason.
      */
     void reset(EDurability durability);
+
+    /** Clears contents of the datastore (all durabilities)
+     *
+     *  Called by the framework. Users should usually not use this function without good reason.
+     */
+    void reset();
 
     /** Set the current module
      *

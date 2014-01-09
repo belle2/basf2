@@ -37,6 +37,15 @@ DataStore::DataStore() : m_initializeActive(false)
 DataStore::~DataStore()
 {
   //release all memory in data store
+  reset();
+}
+
+void DataStore::reset()
+{
+  m_initializeActive = false;
+  m_currentModule = "";
+  m_moduleInfo.clear();
+
   for (int i = 0; i < c_NDurabilityTypes; i++)
     reset((EDurability)i);
 }

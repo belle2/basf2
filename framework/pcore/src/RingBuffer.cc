@@ -63,7 +63,7 @@ RingBuffer::RingBuffer(const char* name, unsigned int size)
   if (strcmp(name, "private") != 0) {      // Global
     m_file = true;
     m_pathname = string("/tmp/") + string(getenv("USER"))
-                 + string("_") + string(name);
+                 + string("_RB_") + string(name);
     //m_pathfd = creat ( m_pathname.c_str(), 0644 );
     //    m_pathfd = open(m_pathname.c_str(), O_CREAT | O_EXCL, 0644);
     m_pathfd = open(m_pathname.c_str(), O_CREAT | O_EXCL | O_RDWR, 0644);

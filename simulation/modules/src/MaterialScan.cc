@@ -26,7 +26,6 @@
 #include <G4RayShooter.hh>
 #include <G4Track.hh>
 
-#include <boost/foreach.hpp>
 #include <boost/format.hpp>
 #include <boost/algorithm/string.hpp>
 
@@ -145,6 +144,9 @@ void MaterialScanSpherical::getRay(G4ThreeVector& origin, G4ThreeVector& directi
   origin = m_origin;
   double theta = m_curU * Unit::deg;
   double phi   = m_curV * Unit::deg;
+  if (m_doCosTheta) {
+    theta = acos(m_curU);
+  }
   direction.set(sin(theta) * cos(phi),
                 sin(theta) * sin(phi),
                 cos(theta));
@@ -157,7 +159,7 @@ void MaterialScanPlanar::getRay(G4ThreeVector& origin, G4ThreeVector& direction)
   direction = m_dirW;
 }
 
-MaterialScanModule::MaterialScanModule(): m_rootFile(0), m_sphericalOrigin(3, 0)
+MaterialScanModule::MaterialScanModule(): m_rootFile(0), m_sphericalOrigin(3, 0), m_doCosTheta(false)
 {
   //Set module properties
   setDescription("This Module is intended to scan the material budget of the "
@@ -201,6 +203,8 @@ MaterialScanModule::MaterialScanModule(): m_rootFile(0), m_sphericalOrigin(3, 0)
            "Names of Materials which should be ignored when doing the scan", m_spherical.ignoredMaterials);
   addParam("spherical.splitByMaterials", m_spherical.splitByMaterials,
            "If True, split output by material names instead of by regions", false);
+  addParam("spherical.cosTheta", m_doCosTheta,
+           "If True, perform the spherical scan uniform in cos(theta) instead of theta", false);
 
   addParam("planar",              m_doPlanar,
            "Do a plane scan, that is shooting parallel rays from a defined "
@@ -258,8 +262,8 @@ void MaterialScanModule::initialize()
   }
 
   //Convert plane definition to mm since Geant4 is of course using other units
-  BOOST_FOREACH(double & value, m_customPlane) value /= Unit::mm;
-  BOOST_FOREACH(double & value, m_sphericalOrigin) value /= Unit::mm;
+  for (double & value : m_customPlane) value /= Unit::mm;
+  for (double & value : m_sphericalOrigin) value /= Unit::mm;
 }
 
 void MaterialScanModule::terminate()
@@ -291,7 +295,7 @@ void MaterialScanModule::beginRun()
   vector<MaterialScan*> scans;
   if (m_doSpherical) {
     G4ThreeVector origin(m_sphericalOrigin[0], m_sphericalOrigin[1], m_sphericalOrigin[2]);
-    scans.push_back(new MaterialScanSpherical(m_rootFile, origin, m_spherical));
+    scans.push_back(new MaterialScanSpherical(m_rootFile, origin, m_spherical, m_doCosTheta));
   }
   if (m_doPlanar) {
     G4ThreeVector origin(0, 0, 0);
@@ -309,7 +313,7 @@ void MaterialScanModule::beginRun()
   }
 
   //Do each configured scan
-  BOOST_FOREACH(MaterialScan * scan, scans) {
+  for (MaterialScan * scan : scans) {
     //Set the Scan as steppingaction to see material
     eventManager->SetUserAction(scan);
     //Now we can scan
@@ -341,7 +345,7 @@ void MaterialScanModule::beginRun()
     delete scan;
   }
 
-  //And now we re set the user actions
+  //And now we reset the user actions
   eventManager->SetUserAction(vanillaEventAction);
   eventManager->SetUserAction(vanillaStackingAction);
   eventManager->SetUserAction(vanillaTrackingAction);

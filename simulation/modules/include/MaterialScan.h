@@ -126,14 +126,23 @@ namespace Belle2 {
      * @param origin Origin for the spherical scan
      * @param params Parameters of the scan
      */
-    MaterialScanSpherical(TFile* rootFile, const G4ThreeVector& origin, ScanParams params):
-      MaterialScan(rootFile, "Spherical", "#theta [deg];#phi [deg]", params), m_origin(origin) {}
+    MaterialScanSpherical(TFile* rootFile, const G4ThreeVector& origin, ScanParams params, bool doCosTheta):
+      MaterialScan(rootFile, "Spherical", doCosTheta ? "cos(#theta);#phi [deg]" : "#theta [deg];#phi [deg]", params), m_origin(origin), m_doCosTheta(doCosTheta) {
+      if (doCosTheta) {
+        m_params.minU = cos(m_params.minU * Unit::deg);
+        m_params.maxU = cos(m_params.maxU * Unit::deg);
+        if (m_params.minU > m_params.maxU) std::swap(m_params.minU, m_params.maxU);
+        m_stepU = (m_params.maxU - m_params.minU) / m_params.nU;
+        m_curU  = m_params.minU - m_stepU / 2.;
+      }
+    }
   protected:
     /** Create a ray with the current parameter values according to a spherical distribution */
     void getRay(G4ThreeVector& origin, G4ThreeVector& direction);
 
     /** Origin for the spherical scan */
     G4ThreeVector m_origin;
+    bool m_doCosTheta;
   };
 
   /** Specific implementaion of MaterialScan to scan parallel to a given plane.
@@ -218,6 +227,8 @@ namespace Belle2 {
     /** Custom plane definition if m_planName is "custom" */
     std::vector<double> m_customPlane;       /** Custom plane parameter  */
     std::vector<double> m_sphericalOrigin;   /** original position in spherical coordinate  */
+    /** Perform the spherical scan uniform in cos(theta) instead of theta */
+    bool m_doCosTheta;
   };
 }
 

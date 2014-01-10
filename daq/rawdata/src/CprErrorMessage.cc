@@ -56,13 +56,14 @@ void CprErrorMessage::PrintError(char* err_message, const char* file, const char
 
   printf("\033[31m");
   B2FATAL(err_message);
-  perror("[ERROR] 0: ");
-  printf("[ERROR] 1: %s", ctime(&current));
-  printf("[ERROR] 2: %s\n", err_message);
-  printf("[ERROR] 3: [file] %s [Line] %d\n", file, line);
-  printf("[ERROR] 4: [function] %s\n", func_name);
+
+//   perror("[ERROR] 0: ");
+//   printf("[ERROR] 1: %s", ctime(&current));
+//   printf("[ERROR] 2: %s\n", err_message);
+//   printf("[ERROR] 3: [file] %s [Line] %d\n", file, line);
+//   printf("[ERROR] 4: [function] %s\n", func_name);
   printf("\033[0m");
-  fflush(stdout);
+//   fflush(stdout);
 //     errmsg(LOG_LOCAL0|LOG_ERR,
 //            "CRITICAL : %s : init_shm() failed to get shmhead ( %p )\n",
 //            __PRETTY_FUNCTION__, shmhead );
@@ -76,15 +77,15 @@ void CprErrorMessage::PrintError(const char* err_message)
 {
   time_t     current;
   time(&current);
-
-  printf("\033[31m");
-  printf("\033[47m");
-  //  B2FATAL(err_message);
-  perror("[ERROR] 0: ");
-  printf("[ERROR] 1: %s", ctime(&current));
-  printf("[ERROR] 2: %s\n", err_message);
-  printf("\033[0m");
-  printf("\033[40m");
-  fflush(stdout);
+  B2FATAL(err_message);
+//   printf("\033[31m");
+//   printf("\033[47m");
+//   //  B2FATAL(err_message);
+//   perror("[ERROR] 0: ");
+//   printf("[ERROR] 1: %s", ctime(&current));
+//   printf("[ERROR] 2: %s\n", err_message);
+//   printf("\033[0m");
+//   printf("\033[40m");
+//   fflush(stdout);
   return;
 }

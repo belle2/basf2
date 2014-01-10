@@ -465,9 +465,9 @@ void DeSerializerPCModule::event()
             utime_array[ 0 ] != utime_array[ l ] ||
             ctime_type_array[ 0 ] != ctime_type_array[ l ]) {
           char err_buf[500];
-          B2FATAL("Event or Time record mismatch. Exiting...");
           for (int m = 0; m < num_nodes_in_sendblock; m++) {
-            B2FATAL("node # " << l << " eve# =" << eve_array[ l ] << " utime=" << utime_array[ l ] << " ctime_type=" << ctime_type_array[ l ]);
+            printf("node %d eve # %d utime %x ctime %x\n",
+                   m,  eve_array[ m ], utime_array[ m ], ctime_type_array[ m ]);
           }
           sprintf(err_buf, "Event or Time record mismatch. Exiting...");
           print_err.PrintError(m_shmflag, &m_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);

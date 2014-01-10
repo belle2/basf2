@@ -791,11 +791,11 @@ void RawCOPPER::CheckUtimeCtimeTRGType(int n)
 
   if (err_flag != 0) {
     for (int i = 0; i < 4; i++) {
-      printf("FINESSE #=%d buffsize %d ctimeTRGtype 0x%.8x utime 0x%.8x",
+      printf("FINESSE #=%d buffsize %d ctimeTRGtype 0x%.8x utime 0x%.8x\n",
              i, GetFINESSENwords(n, i), ctime_trgtype[ i ], utime[ i ]);
     }
     char err_buf[500];
-    sprintf(err_buf, "Event timing info. mismatch. Exiting...\n %s %s %d\n",
+    sprintf(err_buf, "Event timing info. mismatch over FINESSEs. Exiting...\n %s %s %d\n",
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     string err_str = err_buf; throw (err_str);
     sleep(1234567);

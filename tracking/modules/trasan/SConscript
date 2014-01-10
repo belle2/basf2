@@ -2,7 +2,16 @@ Import('env')
 
 #2013/06/17 env['CONTINUE'] = False
 
-env['LIBS'] = ['framework', 'cdc', 'CLHEP', 'cdc_dataobjects', 'tracking_dataobjects', 'generators_dataobjects']
+env['LIBS'] = [
+    'CLHEP',
+    'framework',
+    'mdst_dataobjects',
+    'generators_dataobjects',
+    'cdc', 'cdc_dataobjects', 
+    'genfit2',
+    'tracking_dataobjects',
+    ]
+
 #env.Append(CPPDEFINES = {'TRASAN_WINDOW_GTK':None,
 #	                 'TRASAN_WINDOW_GTK_HOUGH':None,
 #	                 'TRASAN_WINDOW_GTK_SZ':None,

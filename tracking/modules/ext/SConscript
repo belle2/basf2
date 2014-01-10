@@ -1,6 +1,16 @@
 Import('env')
 #env['CONTINUE'] = False
-env['LIBS'] = ['framework', 'simulation', 'ecl', 'tracking_dataobjects', 'geometry',
-              '$ROOT_LIBS', '$GEANT4_LIBS', 'CLHEP']
+
+env['LIBS'] = [
+    'CLHEP',
+    '$ROOT_LIBS',
+    '$GEANT4_LIBS',
+    'framework',
+    'geometry',
+    'simulation', 
+    'ecl',
+    'tracking_dataobjects',
+    'genfit2',
+    ]
 
 Return('env')

@@ -1,5 +1,19 @@
 Import('env')
 
-env['LIBS'] = ['framework', 'geometry', 'cdc', 'cdc_dataobjects', 'vxd', 'pxd_dataobjects', 'svd_dataobjects', 'vxd_dataobjects', 'genfit2', '$ROOT_LIBS', 'EG', 'tracking_dataobjects', 'svd', 'generators_dataobjects']
+env['LIBS'] = [
+    '$ROOT_LIBS',
+    'framework',
+    'geometry',
+    'generators_dataobjects',
+    'mdst_dataobjects',
+    'vxd', 'vxd_dataobjects', 
+    'pxd_dataobjects',
+    'svd', 'svd_dataobjects',
+    'cdc', 'cdc_dataobjects',
+    'genfit2',
+    'EG',
+    'tracking_dataobjects', 
+    ]
+
 Return('env')
 

@@ -1,5 +1,14 @@
 Import('env')
 
-env['LIBS'] = ['framework', 'generators_dataobjects', 'vxd', 'pxd', 'svd', 'vxd_dataobjects', 'pxd_dataobjects', 'svd_dataobjects', 'tracking_dataobjects', 'genfit2', 'tracking', 'geometry', 'boost_chrono', 'tracking']
+env['LIBS'] = [
+    'boost_chrono',
+    'framework', 
+    'geometry',
+    'pxd', 'pxd_dataobjects',
+    'svd', 'svd_dataobjects',
+    'vxd', 'vxd_dataobjects',
+    'genfit2',
+    'tracking', 'tracking_dataobjects',
+    ]
 Return('env')
 # ', 'tracking_sharedClasses'

@@ -9,7 +9,9 @@
  **************************************************************************/
 
 #include "tracking/modules/VXDTFHelperTools/EventCounterModule.h"
-#include "tracking/modules/VXDTF/VXDTFModule.h"
+#include <framework/datastore/StoreArray.h>
+#include <pxd/dataobjects/PXDCluster.h>
+#include <svd/dataobjects/SVDCluster.h>
 
 
 using namespace std;

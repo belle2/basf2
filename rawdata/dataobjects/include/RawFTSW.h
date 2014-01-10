@@ -41,10 +41,18 @@ namespace Belle2 {
     unsigned int GetEveNo(int n);
 
     //!
+    unsigned int GetTTUtime(int n);
+
+    //!
+    unsigned int GetTTCtimeTRGType(int n);
+
+    //!
     unsigned int GetMagicTrailer(int n);
 
     //!
-    void CheckData(int n, unsigned int prev_evenum, unsigned int* cur_evenum, int prev_run_no, int* cur_run_no);
+    void CheckData(int n,
+                   unsigned int prev_evenum, unsigned int* cur_evenum,
+                   int prev_run_no, int* cur_run_no);
 
     //!
     int GetRunNo(int n);
@@ -56,27 +64,27 @@ namespace Belle2 {
     int GetRunNoSubRunNo(int n);
 
 
-#ifdef READ_OLD_B2LFEE_FORMAT_FILE
-    Warning!!! You are about to use the old format!!!! // it causes compile error
-    enum {
-      POS_NWORDS = 0,
-      POS_HDR_NWORDS = 1,
-      POS_NUMEVE_NUMNODES = 2,
-      POS_EXP_RUN_NO = 3,
-      POS_EVE_NO = 4,
-      POS_NODE_ID = 5,
-      POS_FTSW_1 = 6,
-      POS_FTSW_2 = 7,
-      POS_FTSW_3 = 8,
-      POS_FTSW_4 = 9,
-      POS_RSVD_1 = 10,
-      POS_MAGIC_1 = 11
-    };
+    /* #ifdef READ_OLD_B2LFEE_FORMAT_FILE */
+    /*     Warning!!! You are about to use the old format!!!! // it causes compile error */
+    /*     enum { */
+    /*       POS_NWORDS = 0, */
+    /*       POS_HDR_NWORDS = 1, */
+    /*       POS_NUMEVE_NUMNODES = 2, */
+    /*       POS_EXP_RUN_NO = 3, */
+    /*       POS_EVE_NO = 4, */
+    /*       POS_NODE_ID = 5, */
+    /*       POS_FTSW_1 = 6, */
+    /*       POS_FTSW_2 = 7, */
+    /*       POS_FTSW_3 = 8, */
+    /*       POS_FTSW_4 = 9, */
+    /*       POS_RSVD_1 = 10, */
+    /*       POS_MAGIC_1 = 11 */
+    /*     }; */
 
-    enum {
-      SIZE_FTSW_PACKET = 12
-    };
-#else
+    /*     enum { */
+    /*       SIZE_FTSW_PACKET = 12 */
+    /*     }; */
+    /* #else */
     //
 
     enum {
@@ -107,7 +115,7 @@ namespace Belle2 {
     enum {
       SIZE_FTSW_PACKET = 14
     };
-#endif
+    //#endif
 
     enum {
       FTSW_MAGIC_TRAILER = 0x7FFF0000

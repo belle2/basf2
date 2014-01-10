@@ -25,6 +25,17 @@ RawFTSW::~RawFTSW()
 }
 
 
+unsigned int RawFTSW::GetTTUtime(int n)
+{
+  return (unsigned int)(m_buffer[ GetBufferPos(n) +  POS_FTSW_1 ]);
+}
+
+unsigned int RawFTSW::GetTTCtimeTRGType(int n)
+{
+  return (unsigned int)(m_buffer[ GetBufferPos(n) +  POS_FTSW_2 ]);
+}
+
+
 int RawFTSW::GetNwords(int n)
 {
   return  m_buffer[ GetBufferPos(n) +  POS_NWORDS ];
@@ -51,7 +62,9 @@ unsigned int RawFTSW::GetMagicTrailer(int n)
   return m_buffer[  GetBufferPos(n) + POS_MAGIC_1 ];
 }
 
-void RawFTSW::CheckData(int n, unsigned int prev_evenum, unsigned int* cur_evenum, int prev_runsubrun_no, int* cur_runsubrun_no)
+void RawFTSW::CheckData(int n,
+                        unsigned int prev_evenum, unsigned int* cur_evenum,
+                        int prev_runsubrun_no, int* cur_runsubrun_no)
 {
   int err_flag = 0;
   char err_buf[500];
@@ -90,6 +103,7 @@ void RawFTSW::CheckData(int n, unsigned int prev_evenum, unsigned int* cur_evenu
             n, GetMagicTrailer(n), FTSW_MAGIC_TRAILER, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     err_flag = 1;
   }
+
 
 
   if (err_flag == 1) {

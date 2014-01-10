@@ -375,7 +375,7 @@ void DeSerializerPCModule::event()
     if (num_entries != num_events_in_sendblock * num_nodes_in_sendblock) {
       char err_buf[500];
       sprintf(err_buf, "Inconsistent SendHeader value. # of nodes(%d) times # of events(%d) differs from # of entries(%d). Exiting...",
-              num_nodes_in_sendblock, num_events_in_sendblock, num_entries, strerror(errno));
+              num_nodes_in_sendblock, num_events_in_sendblock, num_entries);
       print_err.PrintError(m_shmflag, &m_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
       sleep(1234567);
       exit(-1);
@@ -386,37 +386,41 @@ void DeSerializerPCModule::event()
     //
     int cpr_num = 0;
     unsigned int cur_evenum = 0, cur_copper_ctr = 0;
-    unsigned int eve_array[32];
-    memset(eve_array, 0, sizeof(eve_array));
+    unsigned int eve_array[32]; // # of noeds is less than 17
+    unsigned int utime_array[32];// # of noeds is less than 17
+    unsigned int ctime_type_array[32];// # of noeds is less than 17
+
     for (int k = 0; k < num_events_in_sendblock; k++) {
+      memset(eve_array, 0, sizeof(eve_array));
+      memset(utime_array, 0, sizeof(utime_array));
+      memset(ctime_type_array, 0, sizeof(ctime_type_array));
 
       for (int l = 0; l < num_nodes_in_sendblock; l++) {
-
         int entry_id = l + k * num_nodes_in_sendblock;
-
         if (raw_datablk->CheckFTSWID(entry_id)) {
           RawFTSW* temp_rawftsw = new RawFTSW;
           temp_rawftsw->SetBuffer((int*)temp_buf + raw_datablk->GetBufferPos(entry_id),
                                   raw_datablk->GetBlockNwords(entry_id), 0, 1, 1);
+          if (temp_rawftsw->GetEveNo(0) < 10
+              //                || (temp_rawftsw->GetEveNo(0) > 32758 && temp_rawftsw->GetEveNo(0) < 32778)
+             ) {
+            printf("######FTSW#########\n");
+            printData((int*)temp_buf + raw_datablk->GetBufferPos(entry_id), raw_datablk->GetBlockNwords(entry_id));
+          }
+
 
 #ifndef NO_DATA_CHECK
           try {
-            if (temp_rawftsw->GetEveNo(0) < 10 ||
-                (temp_rawftsw->GetEveNo(0) > 32758 && temp_rawftsw->GetEveNo(0) < 32778)
-               ) {
-              printf("######FTSW#########\n");
-              printData((int*)temp_buf + raw_datablk->GetBufferPos(entry_id), raw_datablk->GetBlockNwords(entry_id));
-            }
-
             temp_rawftsw->CheckData(0, m_prev_evenum, &cur_evenum, m_prev_runsubrun_no, &m_runsubrun_no);
             eve_array[ entry_id ] = cur_evenum;
-            //      printf("FTSW prev %d cur %d eve %d node %d\n", m_prev_evenum , cur_evenum, k, l );
           } catch (string err_str) {
             print_err.PrintError(m_shmflag, &m_status, err_str);
             exit(1);
           }
 #endif
-          //    printf("################SFTW cur %x prev %x\n",cur_evenum,m_prev_evenum);
+          utime_array[ entry_id ] = temp_rawftsw->GetTTUtime(0);
+          ctime_type_array[ entry_id ] = temp_rawftsw->GetTTCtimeTRGType(0);
+
           data_size_ftsw = raw_datablk->GetBlockNwords(entry_id);
           delete temp_rawftsw;
 
@@ -430,16 +434,18 @@ void DeSerializerPCModule::event()
 
 #ifndef NO_DATA_CHECK
           try {
-            temp_rawcopper->CheckData(0, m_prev_evenum, m_prev_copper_ctr,
-                                      &cur_evenum, &cur_copper_ctr, m_prev_runsubrun_no, &m_runsubrun_no);
+            temp_rawcopper->CheckData(0, m_prev_evenum, &cur_evenum,
+                                      m_prev_copper_ctr, &cur_copper_ctr,
+                                      m_prev_runsubrun_no, &m_runsubrun_no);
             eve_array[ entry_id ] = cur_evenum;
-            //      printf("COPPER prev %d cur %d eve %d node %d\n", m_prev_evenum , cur_evenum, k, l );
           } catch (string err_str) {
             print_err.PrintError(m_shmflag, &m_status, err_str);
             exit(1);
           }
-          //    printf("#################COPPER cur %x prev %x\n",cur_evenum,m_prev_evenum);
 #endif
+          utime_array[ entry_id ] = temp_rawcopper->GetTTUtime(0);
+          ctime_type_array[ entry_id ] = temp_rawcopper->GetTTCtimeTRGType(0);
+
           if (cpr_num == 0) {
             data_size_copper_0 = raw_datablk->GetBlockNwords(entry_id);
             eve_copper_0 = (raw_datablk->GetBuffer(entry_id))[ 3 ];
@@ -451,6 +457,27 @@ void DeSerializerPCModule::event()
         }
       }
 
+
+#ifndef NO_DATA_CHECK
+      // event #, ctime, utime over nodes
+      for (int l = 1; l < num_nodes_in_sendblock; l++) {
+        if (eve_array[ 0 ] != eve_array[ l ] ||
+            utime_array[ 0 ] != utime_array[ l ] ||
+            ctime_type_array[ 0 ] != ctime_type_array[ l ]) {
+          char err_buf[500];
+          B2FATAL("Event or Time record mismatch. Exiting...");
+          for (int m = 0; m < num_nodes_in_sendblock; m++) {
+            B2FATAL("node # " << l << " eve# =" << eve_array[ l ] << " utime=" << utime_array[ l ] << " ctime_type=" << ctime_type_array[ l ]);
+          }
+          sprintf(err_buf, "Event or Time record mismatch. Exiting...");
+          print_err.PrintError(m_shmflag, &m_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+          sleep(1234567);
+          exit(-1);
+        }
+      }
+#endif
+
+      // Event # monitor in runchange
       if (m_prev_runsubrun_no != m_runsubrun_no) {
         printf("##############################################\n");
         for (int m = 0; m < num_entries ; m++) {

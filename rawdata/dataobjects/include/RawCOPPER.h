@@ -21,7 +21,7 @@
 #include <TObject.h>
 
 //#define USE_B2LFEE_FORMAT_BOTH_VER1_AND_2
-//#define READ_OLD_B2LFEE_FORMAT_FILE
+
 
 
 #define DETECTOR_MASK 0xFF000000 // tentative
@@ -214,10 +214,10 @@ namespace Belle2 {
 #endif
 
     //! Check if COPPER Magic words are correct
-    unsigned int GetB2LFEETtCtime(int n);
+    unsigned int GetTTCtimeTRGType(int n);
 
     //! Check if COPPER Magic words are correct
-    unsigned int GetB2LFEETtUtime(int n);
+    unsigned int GetTTUtime(int n);
 
     //! should be called by DeSerializerCOPPER.cc and fill contents in RawHeader
     unsigned int FillTopBlockRawHeader(unsigned int m_node_id, unsigned int m_data_type, unsigned int m_trunc_mask,
@@ -233,9 +233,13 @@ namespace Belle2 {
     unsigned int CalcXORChecksum(int* buf, int nwords);
 
     //! check data contents
-    void CheckData(int n, unsigned int prev_evenum, unsigned int prev_copper_ctr,
-                   unsigned int* cur_evenum, unsigned int* cur_copper_ctr,
+    void CheckData(int n,
+                   unsigned int prev_evenum, unsigned int* cur_evenum,
+                   unsigned int prev_copper_ctr, unsigned int* cur_copper_ctr,
                    int prev_run_no, int* cur_run_no);
+
+    //! check data contents
+    void CheckUtimeCtimeTRGType(int n);
 
     //
     // size of "COPPER front header" and "COPPER trailer"
@@ -293,17 +297,6 @@ namespace Belle2 {
     };
 
 
-#ifdef READ_OLD_B2LFEE_FORMAT_FILE
-    //    Old version before Nov. 21, 2013
-    enum {
-      POS_FTSW1 = 0,
-      POS_FTSW2 = 1,
-      POS_EXP_RUN = 2,
-      POS_B2L_TIME = 3,
-      SIZE_B2LFEE_HEADER = 4
-    };
-#else
-    //
     // Data Format : "B2Link FEE Header"
     // modified by Nov. 21, 2013, Nakao-san's New firmware?
     enum {
@@ -314,7 +307,7 @@ namespace Belle2 {
       POS_B2L_CTIME = 4,
       SIZE_B2LFEE_HEADER = 5
     };
-#endif
+
 
     //
     // Data Format : B2Link FEE Trailer
@@ -697,6 +690,20 @@ namespace Belle2 {
     return (unsigned int)(m_buffer[ pos_nwords ]);
   }
 
+
+  inline unsigned int RawCOPPER::GetTTCtimeTRGType(int n)
+  {
+    RawHeader hdr;
+    hdr.SetBuffer(GetBuffer(n));
+    return hdr.GetTTCtimeTRGType();
+  }
+
+  inline unsigned int RawCOPPER::GetTTUtime(int n)
+  {
+    RawHeader hdr;
+    hdr.SetBuffer(GetBuffer(n));
+    return hdr.GetTTUtime();
+  }
 
 
 

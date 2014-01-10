@@ -8,6 +8,7 @@
 
 #include <rawdata/dataobjects/RawCOPPER.h>
 
+
 using namespace std;
 using namespace Belle2;
 
@@ -602,10 +603,12 @@ unsigned int  RawCOPPER::CalcXORChecksum(int* buf, int nwords)
 }
 
 
-void RawCOPPER::CheckData(int n, unsigned int prev_evenum, unsigned int prev_copper_ctr,
-                          unsigned int* cur_evenum_rawcprhdr, unsigned int* cur_copper_ctr,
+void RawCOPPER::CheckData(int n,
+                          unsigned int prev_evenum, unsigned int* cur_evenum_rawcprhdr,
+                          unsigned int prev_copper_ctr, unsigned int* cur_copper_ctr,
                           int prev_runsubrun_no, int* cur_runsubrun_no)
 {
+
   char err_buf[500];
   int err_flag = 0;
   //
@@ -664,6 +667,12 @@ void RawCOPPER::CheckData(int n, unsigned int prev_evenum, unsigned int prev_cop
       err_flag = 1;
     }
   }
+
+  //
+  // Check is utime and ctime_trgtype same over different FINESSE data
+  //
+  CheckUtimeCtimeTRGType(n);
+
 
   //
   // Check checksum calculated by COPPER driver
@@ -748,6 +757,53 @@ bool RawCOPPER::CheckCOPPERMagic(int n)
   return true;
 }
 
+void RawCOPPER::CheckUtimeCtimeTRGType(int n)
+{
+
+#ifdef USE_B2LFEE_FORMAT_BOTH_VER1_AND_2
+  CheckB2LFEEHeaderVersion(n);
+#endif
+  int err_flag = 0;
+  int flag = 0;
+  int temp_utime = 0, temp_ctime_trgtype = 0;
+  unsigned int utime[4], ctime_trgtype[4];
+  memset(utime, 0, sizeof(utime));
+  memset(ctime_trgtype, 0, sizeof(ctime_trgtype));
+
+  for (int i = 0; i < 4; i++) {
+    if (GetFINESSENwords(n, i) > 0) {
+      ctime_trgtype[ i ] = m_buffer[ GetOffsetFINESSE(n, i) +
+                                     SIZE_B2LHSLB_HEADER + POS_TT_CTIME_TYPE ];
+      utime[ i ] = m_buffer[ GetOffsetFINESSE(n, i) +
+                             SIZE_B2LHSLB_HEADER + POS_TT_UTIME ];
+      if (flag == 0) {
+        temp_ctime_trgtype = ctime_trgtype[ i ];
+        temp_utime = utime[ i ];
+        flag = 1;
+      } else {
+        if (temp_ctime_trgtype != ctime_trgtype[ i ]
+            || temp_utime != utime[ i ]) {
+          err_flag = 1;
+        }
+      }
+    }
+  }
+
+  if (err_flag != 0) {
+    for (int i = 0; i < 4; i++) {
+      printf("FINESSE #=%d buffsize %d ctimeTRGtype 0x%.8x utime 0x%.8x",
+             i, GetFINESSENwords(n, i), ctime_trgtype[ i ], utime[ i ]);
+    }
+    char err_buf[500];
+    sprintf(err_buf, "Event timing info. mismatch. Exiting...\n %s %s %d\n",
+            __FILE__, __PRETTY_FUNCTION__, __LINE__);
+    string err_str = err_buf; throw (err_str);
+    sleep(1234567);
+    exit(1);
+  }
+  return;
+}
+
 
 
 double RawCOPPER::GetEventUnixTime(int n)
@@ -768,30 +824,6 @@ double RawCOPPER::GetEventUnixTime(int n)
   return 0.;
 #endif
 
-}
-
-
-
-unsigned int RawCOPPER::GetB2LFEETtCtime(int n)
-{
-#ifndef READ_OLD_B2LFEE_FORMAT_FILE
-  return GetB2LHeaderWord(n, SIZE_B2LHSLB_HEADER + POS_TT_CTIME_TYPE);
-#else
-  exit(1);
-  return 0;
-#endif
-}
-
-
-
-unsigned int RawCOPPER::GetB2LFEETtUtime(int n)
-{
-#ifndef READ_OLD_B2LFEE_FORMAT_FILE
-  return GetB2LHeaderWord(n, SIZE_B2LHSLB_HEADER + POS_TT_UTIME);
-#else
-  exit(1);
-  return 0;
-#endif
 }
 
 
@@ -941,8 +973,8 @@ unsigned int RawCOPPER::FillTopBlockRawHeader(unsigned int m_node_id, unsigned i
   //
   // Copy FTSW words from B2LFEE header
   //
-  m_buffer[ RawHeader::POS_HSLB_1 ] = finesse_buf[ SIZE_B2LHSLB_HEADER + POS_TT_CTIME_TYPE ];
-  m_buffer[ RawHeader::POS_HSLB_2 ] = finesse_buf[ SIZE_B2LHSLB_HEADER + POS_TT_UTIME ];
+  m_buffer[ RawHeader::POS_TTCTIME_TRGTYPE ] = finesse_buf[ SIZE_B2LHSLB_HEADER + POS_TT_CTIME_TYPE ];
+  m_buffer[ RawHeader::POS_TTUTIME ] = finesse_buf[ SIZE_B2LHSLB_HEADER + POS_TT_UTIME ];
 
   //
   // Set node ID, trunc_mask, data_type

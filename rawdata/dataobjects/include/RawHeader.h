@@ -56,9 +56,8 @@ namespace Belle2 {
 
     void SetTruncMask(int trunc_mask);    //! set contents of header
 
-    void SetB2LFEEHdrPart(unsigned int word1, unsigned int word2);   //! set contents of header
-
-    void SetFTSW2Words(int* ftsw_buf);
+    //    void SetB2LFEEHdrPart(unsigned int word1, unsigned int word2);   //! set contents of header
+    //     void SetFTSW2Words(int* ftsw_buf);
 
     void SetFTSW2Words(unsigned int word1, unsigned int word2);
 
@@ -110,6 +109,10 @@ namespace Belle2 {
 
     int GetNodeInfo(int node_no, int* node_id);    //! get contents of header
 
+    unsigned int GetTTCtimeTRGType();  //! get contents of header
+
+    unsigned int GetTTUtime();  //! get contents of header
+
     unsigned int GetMagicWordEntireHeader();
 
     /*
@@ -133,8 +136,8 @@ namespace Belle2 {
       POS_HDR_NWORDS = 1,
       POS_EXP_RUN_NO = 2,
       POS_EVE_NO = 3,
-      POS_HSLB_1 = 4,
-      POS_HSLB_2 = 5,
+      POS_TTCTIME_TRGTYPE = 4,
+      POS_TTUTIME = 5,
       POS_SUBSYS_ID = 6,
       POS_TRUNC_MASK_DATATYPE = 7,
       POS_OFFSET_1ST_FINESSE = 8,
@@ -241,11 +244,11 @@ namespace Belle2 {
     m_buffer[ POS_TRUNC_MASK_DATATYPE ] = (trunc_mask << 31) | (m_buffer[ POS_TRUNC_MASK_DATATYPE ] & 0x7FFFFFFF);
   }
 
-  inline void RawHeader::SetB2LFEEHdrPart(unsigned int word1, unsigned int word2)
-  {
-    m_buffer[ POS_HSLB_1 ] = word1;
-    m_buffer[ POS_HSLB_2 ] = word2;
-  }
+  /*   inline void RawHeader::SetB2LFEEHdrPart(unsigned int word1, unsigned int word2) */
+  /*   { */
+  /*     m_buffer[ POS_HSLB_1 ] = word1; */
+  /*     m_buffer[ POS_HSLB_2 ] = word2; */
+  /*   } */
 
 
   inline void RawHeader::SetOffset1stFINESSE(int offset_1st_FINESSE)
@@ -272,18 +275,19 @@ namespace Belle2 {
     m_buffer[ POS_OFFSET_4TH_FINESSE ] = offset_4th_FINESSE;
   }
 
-  inline void RawHeader::SetFTSW2Words(int* ftsw_buf)
-  {
-    CheckSetBuffer();
-    memcpy(&(m_buffer[ POS_HSLB_1 ]), (char*)ftsw_buf, sizeof(int) * 2);
-    return;
-  }
+  /*   inline void RawHeader::SetFTSW2Words(int* ftsw_buf) */
+  /*   { */
+  /*     CheckSetBuffer(); */
+  /*     memcpy(&(m_buffer[ POS_HSLB_1 ]), (char*)ftsw_buf, sizeof(int) * 2); */
+  /*     return; */
+  /*   } */
 
-  inline void RawHeader::SetFTSW2Words(unsigned int word1, unsigned int word2)
+  inline void RawHeader::SetFTSW2Words(unsigned int word1,
+                                       unsigned int word2)
   {
     CheckSetBuffer();
-    m_buffer[ POS_HSLB_1 ] = word1;
-    m_buffer[ POS_HSLB_2 ] = word2;
+    m_buffer[ POS_TTCTIME_TRGTYPE ] = word1;
+    m_buffer[ POS_TTUTIME ] = word2;
     return;
   }
 
@@ -410,11 +414,26 @@ namespace Belle2 {
   }
 
 
+  inline unsigned int RawHeader::GetTTCtimeTRGType()
+  {
+    CheckGetBuffer();
+    return (unsigned int)(m_buffer[ POS_TTCTIME_TRGTYPE ]);
+  }
+
+  inline unsigned int RawHeader::GetTTUtime()
+  {
+    CheckGetBuffer();
+    return (unsigned int)(m_buffer[ POS_TTUTIME ]);
+  }
+
 
   inline unsigned int RawHeader::GetMagicWordEntireHeader()
   {
+    CheckGetBuffer();
     return m_buffer[ POS_TERM_HEADER ];
   }
+
+
 
 
 

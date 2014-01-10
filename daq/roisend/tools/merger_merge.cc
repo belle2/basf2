@@ -263,12 +263,10 @@ main(int argc, char* argv[])
      const unsigned short onsen_port = 24; */
   unsigned short accept_port[MM_MAX_HLTOUT];
 
-
   if (argc < 4) {
     printf("merger_merge : onsenhost onsenport clientpots\n");
-    exit(1);
+    exit(-1);
   }
-
 
   /* environmental variable check */
   {
@@ -300,8 +298,7 @@ main(int argc, char* argv[])
     n_hltout = perl_split_uint16t(':', p, accept_port);
   }
 
-
-  /* accept from HLTOUT client(s) */
+  /* initialize */
   {
     int i;
 
@@ -312,6 +309,13 @@ main(int argc, char* argv[])
     }
 
     signal(SIGPIPE, SIG_IGN);
+
+    sd_con = MM_init_connect_to_onsen(onsen_host, onsen_port);
+    if (sd_con == -1) {
+      ERROR(MM_init_connect_to_onsen);
+      exit(1);
+    }
+    printf("%s:%d: MM_init_connect_to_onsen(): Connected to ONSEN\n", __FILE__, __LINE__);
 
     for (i = 0; i < n_hltout; i++) {
       sd_acc[i] = MM_init_accept_from_hltout2merger(accept_port[i]);
@@ -327,20 +331,6 @@ main(int argc, char* argv[])
   /* forever (recv -> send) */
   for (i = 0;; i++) {
     int j;
-
-
-    /* connect to ONSEN server */
-    {
-      sleep(1);
-
-      if (sd_con == -1) sd_con = MM_init_connect_to_onsen(onsen_host, onsen_port);
-      if (sd_con == -1) {
-        ERROR(MM_init_connect_to_onsen);
-        /* REDO */
-      }
-      printf("%s:%d: MM_init_connect_to_onsen(): Connected to ONSEN\n", __FILE__, __LINE__);
-    }
-
 
     for (j = 0; j < n_hltout; j++) {
       const size_t n_bytes_header  = sizeof(struct h2m_header_t);
@@ -388,15 +378,11 @@ main(int argc, char* argv[])
 
         if (ret == -1) {
           ERROR(b2_send);
-          close(sd_con);
-          sd_con = -1;
-          goto CLEANUP;
+          exit(1);
         }
         if (ret == 0) {
           fprintf(stderr, "%s:%d: b2_send(): Connection closed\n", __FILE__, __LINE__);
-          close(sd_con);
-          sd_con = -1;
-          goto CLEANUP;
+          exit(1);
         }
 
         if (MM_DEBUG > 0) {
@@ -406,10 +392,10 @@ main(int argc, char* argv[])
         }
       }
 
-CLEANUP:
       free(buf);
     }
   }
+
 
   /* termination: never reached */
   {

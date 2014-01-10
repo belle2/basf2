@@ -43,6 +43,9 @@ namespace Belle2 {
     void event(); //< Show genfit::Tracks & hits in event viewer until next event is requested.
     void terminate(); //< terminate gEve to avoid problems with root's cleanup
   private:
+    /** Name of track candidate collection. */
+    std::string m_trackCandidateColName;
+
     /** List of drawing options, a combination of:
      *
      * - A autoscale errors - use when hits are too small to be seen (because of tiny errors)

@@ -73,9 +73,13 @@ void SVDUnpackerModule::beginRun()
   m_wrongFTBHeader = 0;
   m_wrongFADCTrailer = 0;
   m_wrongFADCcrc = 0;
+  m_badEvent = 0;
   m_wrongFTBtrailer = 0;
 
   m_noAPVHeader = 0;
+  m_noNewDigit = 0;
+
+  m_NewDigit = 0;
 
 }
 
@@ -117,10 +121,14 @@ void SVDUnpackerModule::endRun()
   B2INFO("   m_wrongFTBHeader = " <<  m_wrongFTBHeader);
   B2INFO("   m_wrongFADCTrailer = " << m_wrongFADCTrailer);
   B2INFO("   m_wrongFADCcrc = " << m_wrongFADCcrc);
+  B2INFO("   m_badEvent = " << m_badEvent);
   B2INFO("   m_wrongFTBtrailer = " << m_wrongFTBtrailer);
 
 
   B2INFO(" m_noAPVHeader = " <<  m_noAPVHeader);
+
+  B2INFO(" m_noNewDigit = " <<  m_noNewDigit);
+  B2INFO(" m_NewDigit = " <<  m_NewDigit);
 
   B2INFO(" FTB Error Field");
   B2INFO("   m_f0 = " << m_f0);
@@ -144,16 +152,17 @@ void SVDUnpackerModule::loadMap()
 
 }
 
-bool SVDUnpackerModule::sanityChecks(int nWords, uint32_t* data32)
+bool SVDUnpackerModule::sanityChecks(int nWords, uint32_t* data32_in)
 {
 
   //first of all verify FTB checksum, then proceed with FTB/FADC headers and trailers
 
   //read FTB Trailer
-  struct FTBTrailer* theFTBTrailer = (struct FTBTrailer*) &data32[nWords - 1];
+  struct FTBTrailer* theFTBTrailer = (struct FTBTrailer*) &data32_in[nWords - 1];
   if (theFTBTrailer->controlWord != 0xff55) {
     B2ERROR("WRONG FTB Trailer");
     m_wrongFTBtrailer++;
+    //    printDebug(&data32_in[nWords - 1], data32_in, &data32_in[nWords-1], 4 );
     return false;
   } else
     B2DEBUG(1, "sanityChecks: FTB Trailer found");
@@ -163,10 +172,11 @@ bool SVDUnpackerModule::sanityChecks(int nWords, uint32_t* data32)
 
 
   //read FTB Header:
-  struct FTBHeader* theFTBHeader = (struct FTBHeader*)data32;
+  struct FTBHeader* theFTBHeader = (struct FTBHeader*)data32_in;
   if (theFTBHeader->controlWord != 0xffaa0000) {
     B2ERROR("WRONG FTB header format 0x" << std::hex << std::setw(8) << std::setfill('0') << theFTBHeader->controlWord);
     m_wrongFTBHeader++;
+    //    printDebug(data32_in, data32_in, &data32_in[nWords-1], 4 );
     return false;
   } else
     B2DEBUG(1, "sanityChecks: FTB header format checked");
@@ -195,10 +205,11 @@ bool SVDUnpackerModule::sanityChecks(int nWords, uint32_t* data32)
     }
 
   //read FADC Main Header:
-  struct MainHeader* theMainHeader = (struct MainHeader*) &data32[2];
+  struct MainHeader* theMainHeader = (struct MainHeader*) &data32_in[2];
   if (theMainHeader->check != 0x6) {
     B2ERROR("WRONG FADC main header format 0x" << std::hex << std::setw(8) << std::setfill('0') << theMainHeader->check);
     m_wrongFADCHeader++;
+    //    printDebug(&data32_in[2], data32_in, &data32_in[nWords-1], 4 );
     return false;
   } else
     B2DEBUG(1, "main header format checked");
@@ -211,10 +222,11 @@ bool SVDUnpackerModule::sanityChecks(int nWords, uint32_t* data32)
     B2DEBUG(1, "run type checked (zerosuppressed)");
 
   //read FADC Trailer
-  struct FADCTrailer* theFADCTrailer = (struct FADCTrailer*) &data32[nWords - 2];
+  struct FADCTrailer* theFADCTrailer = (struct FADCTrailer*) &data32_in[nWords - 2];
   if (theFADCTrailer->check != 0xe) {
     B2ERROR("WRONG FADC Trailer");
     m_wrongFADCTrailer++;
+    //    printDebug(&data32_in[nWords - 2], data32_in, &data32_in[nWords-1], 4 );
     return false;
   } else
     B2DEBUG(1, "sanityChecks: FADC Trailer found");
@@ -225,6 +237,10 @@ bool SVDUnpackerModule::sanityChecks(int nWords, uint32_t* data32)
     else  if ((theFADCTrailer->FTBFlags & 16) == 16) {
       //  B2WARNING(" FTB Flag: CRC error = 1");
       m_wrongFADCcrc++;
+      return false;
+    } else if ((theFADCTrailer->FTBFlags & 8) == 8) {
+      //  B2WARNING(" FTB Flag: Bad Event = 1");
+      m_badEvent++;
       return false;
     }
 
@@ -262,6 +278,7 @@ void SVDUnpackerModule::fillSVDDigitList(int nWords, uint32_t* data32_in,  Store
     if (((*data32 >> 30) & 0x3) == 0x2) { //APV header type
 
       theAPVHeader = (struct APVHeader*) data32;
+      //      B2INFO(" FADC NUMBER = "<< theMainHeader->FADCnum   <<"   APV NUMBER = "<<theAPVHeader->APVnum);
       B2DEBUG(1, "New APV header");
 
       continue;
@@ -283,17 +300,20 @@ void SVDUnpackerModule::fillSVDDigitList(int nWords, uint32_t* data32_in,  Store
 
           // Translation can return 0, if wrong FADC/APV combination is encountered.
           if (!newDigit) {
-            B2WARNING("Unknown FADC #" << theMainHeader->FADCnum << " and APV #" << theAPVHeader->APVnum);
+            //            B2WARNING("Unknown FADC #" << theMainHeader->FADCnum << " and APV #" << theAPVHeader->APVnum);
+            m_noNewDigit++;
             continue;
           } else {
             svdDigits->appendNew(*newDigit);
+            m_NewDigit++;
             delete newDigit;
           }
         }
-      } else
+      } else {
         m_noAPVHeader++;
-      //  B2WARNING(" FADC data before a valid APV header 0x" << std::hex << std::setw(8) << std::setfill('0') << *data32);
-
+        B2WARNING(" FADC data before a valid APV header 0x" << std::hex << std::setw(8) << std::setfill('0') << *data32);
+        //  printDebug(data32, data32_in, &data32_in[nWords-1], 4 );
+      }
 
       continue;
     }
@@ -307,6 +327,8 @@ void SVDUnpackerModule::fillSVDDigitList(int nWords, uint32_t* data32_in,  Store
     }
 
     B2WARNING("unknown data field, highest four bits: 0x" << std::hex << std::setw(8) << std::setfill('0') << *data32 << " data check bit is = " << (*data32 >> 31));
+    //    printDebug(data32, data32_in, &data32_in[nWords-1], 4 );
+
     return;
   }
 
@@ -314,5 +336,29 @@ void SVDUnpackerModule::fillSVDDigitList(int nWords, uint32_t* data32_in,  Store
     B2WARNING("FADC trailer appeared too early, data short by " << &data32_in[nWords] - &data32[1] << " bytes");
   }
 
+
+}
+
+
+void SVDUnpackerModule::printDebug(uint32_t* data32, uint32_t* data32_min, uint32_t* data32_max, int nWords)
+{
+
+  uint32_t* min = std::max((data32 - nWords), data32_min);
+  uint32_t* max = std::min((data32 + nWords), data32_max);
+
+  uint32_t* ptr = min;
+  int counter = 0;
+
+  while (ptr < max + 1) {
+
+    printf("%.8x ", *ptr);
+    if (counter++ % 10 == 9) printf("\n");
+
+    ptr++;
+  }
+
+  printf("\n");
+  printf("\n");
+  return;
 
 }

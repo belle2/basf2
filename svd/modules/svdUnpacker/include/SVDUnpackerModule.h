@@ -72,10 +72,13 @@ namespace Belle2 {
       int m_failedChecks;
       int m_wrongFTBHeader;
       int m_noAPVHeader;
+      int m_noNewDigit;
+      int m_NewDigit;
       int m_wrongFADCHeader;
       int m_wrongRunType;
       int m_wrongFADCTrailer;
       int m_wrongFADCcrc;
+      int m_badEvent;
       int m_wrongFTBtrailer;
       int m_f0;
       int m_f3;
@@ -150,8 +153,10 @@ namespace Belle2 {
 
       void fillSVDDigitList(int nWords, uint32_t* data32_in, StoreArray<SVDDigit>* svdDigits);
 
+      void printDebug(uint32_t* data32, uint32_t* data32_min, uint32_t* data32_max, int nWords);
+
       //temporary: to check format from Vienna test files:
-      void printbitssimple(int n, int nBits);
+      //      void printbitssimple(int n, int nBits);
 
     };//end class declaration
 

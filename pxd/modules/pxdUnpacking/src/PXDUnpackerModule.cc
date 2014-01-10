@@ -1658,12 +1658,31 @@ void PXDUnpackerModule::unpack_frame(void* data, int len, bool pad, int& last_fr
   last_start = ls;
 }
 
+int nr5bits(int i)
+{
+  const int lut[32] = {
+    0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4,
+    1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5
+  };
+  return lut[i & 0x1F];
+}
+
 void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& last_wie, int& last_start, int& last_end, unsigned int& last_evtnr, int Frame_Number, int Frames_in_event)
 {
-  dhhc_frame_header_word0* hw;
+  static int nr_of_dhh_start_frame = 0; /// could put it as a class member, but is only needed within this function
+  static int nr_of_dhh_end_frame = 0; /// could put it as a class member, but is only needed within this function
+  static int nr_active_dhh = 0;
+  static int mask_active_dhh = 0;
+  static int nr_active_dhp = 0;
+  static int mask_active_dhp = 0;
+
+  dhhc_frame_header_word0* hw = (dhhc_frame_header_word0*)data;
   error_flag = false;
-  hw = (dhhc_frame_header_word0*)data;
-  // printf("len %d", len);
+
+  if (Frame_Number == 0) { /// We reset the counters on the first event
+    nr_of_dhh_start_frame = 0;
+    nr_of_dhh_end_frame = 0;
+  }
 
   dhhc_frames dhhc;
   dhhc.set(data, hw->get_type(), len, pad);
@@ -1679,8 +1698,16 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& la
 
   evtnr = dhhc.get_evtnr();
   int dhh_id = 0x0; //hw->get_dhhid()
+  int type = dhhc.get_type();
 
-  switch (dhhc.get_type()) {
+  if (Frame_Number > 0 && Frame_Number < Frames_in_event - 1) {
+    if (nr_of_dhh_start_frame != nr_of_dhh_end_frame + 1)
+      if (type != DHHC_FRAME_HEADER_DATA_TYPE_HLTROI && type != DHHC_FRAME_HEADER_DATA_TYPE_DHH_START) {
+        B2ERROR("Data Frame outside a DHH START/END");
+      }
+  }
+
+  switch (type) {
     case DHHC_FRAME_HEADER_DATA_TYPE_DHP_RAW: {
 
       ((dhhc_direct_readout_frame_raw*)data)->print();
@@ -1742,7 +1769,11 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& la
 //         dhh_first_frame_id_lo = ((dhhc_start_frame*)data)->get_sfnr();
 //         dhh_first_offset = ((dhhc_start_frame*)data)->get_toffset();
       dhhc.calc_crc();
+      if (nr_of_dhh_start_frame != nr_of_dhh_end_frame) B2ERROR("DHHC_FRAME_HEADER_DATA_TYPE_DHH_START without DHHC_FRAME_HEADER_DATA_TYPE_DHH_END");
       stat_start++;
+
+      mask_active_dhh = ((dhhc_start_frame*)data)->get_active_dhh_mask();
+      nr_active_dhh = nr5bits(mask_active_dhh);
       break;
     };
     case DHHC_FRAME_HEADER_DATA_TYPE_DHH_START: {
@@ -1755,6 +1786,11 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& la
       dhh_first_frame_id_lo = ((dhhc_dhh_start_frame*)data)->get_sfnr();
       dhh_first_offset = ((dhhc_dhh_start_frame*)data)->get_toffset();
       dhhc.calc_crc();
+
+      nr_of_dhh_start_frame++;
+
+      mask_active_dhp = ((dhhc_dhh_start_frame*)data)->get_active_dhp_mask();
+      nr_active_dhp = nr5bits(mask_active_dhp);
       break;
     };
     case DHHC_FRAME_HEADER_DATA_TYPE_GHOST:
@@ -1808,6 +1844,9 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& la
       ((dhhc_dhh_end_frame*)data)->print();
       //}
       dhhc.calc_crc();
+
+      nr_of_dhh_end_frame++;
+      if (nr_of_dhh_start_frame != nr_of_dhh_end_frame) B2ERROR("DHHC_FRAME_HEADER_DATA_TYPE_DHH_END without DHHC_FRAME_HEADER_DATA_TYPE_DHH_START");
       break;
     };
     case DHHC_FRAME_HEADER_DATA_TYPE_HLTROI:
@@ -1830,40 +1869,32 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& la
     evtnr_error++;
     error_flag = true;
   }
-  if (Frame_Number == 0 && dhhc.get_type() != DHHC_FRAME_HEADER_DATA_TYPE_DHHC_START) {
+
+  /// Check that DHHC Start is first Frame
+  if (Frame_Number == 0 && type != DHHC_FRAME_HEADER_DATA_TYPE_DHHC_START) {
     B2ERROR("First frame is not a DHHC start of subevent frame in Event Nr " << evtnr);
   }
-  if (Frame_Number == Frames_in_event - 1 && dhhc.get_type() != DHHC_FRAME_HEADER_DATA_TYPE_DHHC_END) {
-    B2ERROR("Last frame is not a DHHC end of subevent frame in Event Nr " << evtnr);
-  }
-  if (Frame_Number != 0 && dhhc.get_type() == DHHC_FRAME_HEADER_DATA_TYPE_DHHC_START) {
+  /// Check that there is no other DHHC Start
+  if (Frame_Number != 0 && type == DHHC_FRAME_HEADER_DATA_TYPE_DHHC_START) {
     B2ERROR("More than one DHHC start of subevent frame in frame in Event Nr " << evtnr)
   }
-  if (Frame_Number != Frames_in_event - 1 && dhhc.get_type() == DHHC_FRAME_HEADER_DATA_TYPE_DHHC_END) {
+
+  /// Check that DHHC End is last Frame
+  if (Frame_Number == Frames_in_event - 1 && type != DHHC_FRAME_HEADER_DATA_TYPE_DHHC_END) {
+    B2ERROR("Last frame is not a DHHC end of subevent frame in Event Nr " << evtnr);
+  }
+  /// Check that there is no other DHHC End
+  if (Frame_Number != Frames_in_event - 1 && type == DHHC_FRAME_HEADER_DATA_TYPE_DHHC_END) {
     B2ERROR("More than one DHHC end of subevent frame in frame in Event Nr " << evtnr)
   }
 
-  if (Frame_Number == 1 && dhhc.get_type() != DHHC_FRAME_HEADER_DATA_TYPE_DHH_START) {
+  /// Check that (if there is at least one active DHH) the second Frame is DHH Start, actually this is redundant if the other checks work
+  if (Frame_Number == 1 && nr_active_dhh != 0 && type != DHHC_FRAME_HEADER_DATA_TYPE_DHH_START) {
     B2ERROR("Second frame is not a DHH start frame in Event Nr" << evtnr)
   }
-  if (Frame_Number == Frames_in_event - 2 && dhhc.get_type() != DHHC_FRAME_HEADER_DATA_TYPE_DHH_END) {
+  /// Check that (if there is at least one active DHH) the second last Frame is DHH End, actually this is redundant if the other checks work
+  if (Frame_Number == Frames_in_event - 2 && nr_active_dhh != 0 && type != DHHC_FRAME_HEADER_DATA_TYPE_DHH_END) {
     B2ERROR("Last frame before DHHC end frame is not a DHH end frame in Event Nr " << evtnr)
-  }
-
-
-  if (Frame_Number > 1 || Frame_Number < Frames_in_event - 1) {
-    int nr_of_dhh_start_frame = 0;
-    int nr_of_dhh_end_frame = 0;
-//     B2ERROR("j " << j);
-    if (dhhc.get_type() == DHHC_FRAME_HEADER_DATA_TYPE_DHH_START) {
-      nr_of_dhh_start_frame++;
-    }
-    if (dhhc.get_type() == DHHC_FRAME_HEADER_DATA_TYPE_DHH_END) {
-      nr_of_dhh_end_frame++;
-    }
-    if (Frame_Number == Frames_in_event - 1 && nr_of_dhh_start_frame < nr_of_dhh_end_frame) {
-      B2ERROR("False order of dhh start and end frames in Event Nr" << evtnr);
-    }
   }
 
   last_wie += len;

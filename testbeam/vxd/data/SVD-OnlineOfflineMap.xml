@@ -20,10 +20,10 @@
                     <chip n="5" FADCn="1" strip_number_of_ch0="127" strip_number_of_ch127="0"></chip>
                 </side>
                 <side side="v">
-                    <chip n="0" FADCn="129" strip_number_of_ch0="511" strip_number_of_ch127="384"></chip>
-                    <chip n="1" FADCn="129" strip_number_of_ch0="383" strip_number_of_ch127="256"></chip>
-                    <chip n="2" FADCn="129" strip_number_of_ch0="255" strip_number_of_ch127="128"></chip>
-                    <chip n="3" FADCn="129" strip_number_of_ch0="127" strip_number_of_ch127="0"></chip>
+                    <chip n="1" FADCn="129" strip_number_of_ch0="511" strip_number_of_ch127="384"></chip>
+                    <chip n="2" FADCn="129" strip_number_of_ch0="383" strip_number_of_ch127="256"></chip>
+                    <chip n="3" FADCn="129" strip_number_of_ch0="255" strip_number_of_ch127="128"></chip>
+                    <chip n="4" FADCn="129" strip_number_of_ch0="127" strip_number_of_ch127="0"></chip>
                 </side>
             </sensor>
         </ladder>

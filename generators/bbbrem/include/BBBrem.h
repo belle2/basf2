@@ -34,7 +34,38 @@ namespace Belle2 {
   public:
 
     /** Constructor. */
-    BBBrem() : m_applyBoost(false), m_unweighted(true), m_cmsEnergy(10.58), m_photonEFrac(0.000001) {};
+
+    BBBrem() :
+      //m_eventCount(0),
+      m_applyBoost(false),
+      m_unweighted(true),
+      m_maxWeight(0.0),
+      m_maxWeightDelivered(0.0),
+      m_sumWeightDelivered(0.0),
+      m_sumWeightDeliveredSqr(0.0),
+      m_cmsEnergy(10.58),
+      m_photonEFrac(0.000001),
+      m_crossSection(0.0),
+      m_crossSectionError(0.0),
+      alpha(0.0),
+      rme(0.0),
+      s(0.0),
+      rme2(0.0),
+      rme2s(0.0),
+      rls(0.0),
+      z0(0.0),
+      a1(0.0),
+      a2(0.0),
+      ac(0.0),
+      sigapp(0.0),
+      eb(0.0),
+      pb(0.0),
+      rin2pb(0.0),
+      weight(0.0)
+    {for (int i = 0; i < 4; i++) p1[i] = p2[i] = q1[i] = q2[i] = qk[i] = 0.0;}
+
+
+    //BBBrem() : m_applyBoost(false), m_unweighted(true), m_cmsEnergy(10.58), m_photonEFrac(0.000001) {};
 
     /** Destructor. */
     ~BBBrem() {};
@@ -91,6 +122,7 @@ namespace Belle2 {
 
   protected:
 
+    //int m_eventCount;               /**< Internal event counter. Used to calculate the cross-section. */
     bool m_applyBoost;              /**< Apply a boost to the MCParticles. */
     bool m_unweighted;              /**< True if BBBrem should produce unweighted events. */
     long m_weightCount;             /**< Internal weighted event counter. Used to calculate the cross-section. */
@@ -127,22 +159,25 @@ namespace Belle2 {
     static constexpr double twopi = 2.0 * M_PI;         /**< 2*pi. To keep things short. */
 
     //Variable names directly taken from the FORTRAN code. Sorry.
-    double alpha; /**< variable   */
-    double rme;   /**< variable   */
-    double s;     /**< variable   */
-    double rme2;  /**< variable   */
-    double rme2s; /**< variable   */
-    double rls;   /**< variable   */
-    double z0;    /**< variable   */
-    double a1, a2, ac; /**< variable   */
-    double sigapp;  /**< variable   */
-    double eb, pb, rin2pb;  /**< variable   */
-    double p1[4]; /**< variable   */
-    double p2[4]; /**< variable   */
-    double q1[4]; /**< variable   */
-    double q2[4]; /**< variable   */
-    double qk[4]; /**< variable   */
-
+    double alpha;  /**< variable   */
+    double rme;    /**< in MeV */
+    double s;      /**< variable   */
+    double rme2;   /**< variable   */
+    double rme2s;  /**< variable   */
+    double rls;    /**< variable   */
+    double z0;     /**< variable   */
+    double a1;  /**< variable   */
+    double a2;  /**< variable   */
+    double ac;  /**< variable   */
+    double sigapp;      /**< variable   */
+    double eb;     /**< variable   */
+    double pb;     /**< variable   */
+    double rin2pb; /**< variable   */
+    double p1[4];  /**< variable   */
+    double p2[4];  /**< variable   */
+    double q1[4];  /**< variable   */
+    double q2[4];  /**< variable   */
+    double qk[4];  /**< variable   */
     double weight; /**< variable   */
   };
 

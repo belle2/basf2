@@ -74,8 +74,8 @@ namespace Belle2 {
       addParam("outColName", m_outColName, "ARICHLikelihoods collection name",  string(""));
       addParam("trackPositionResolution", m_trackPositionResolution, "Resolution of track position on aerogel plane", 1.0 * Unit::mm);
       addParam("trackAngleResolution", m_trackAngleResolution, "Resolution of track direction angle on aerogel plane", 1.0 * Unit::mrad);
-      addParam("backgroundLevel", m_backgroundLevel, "Background level in photon hits per m^2", 0.0);
-      addParam("singleResolution", m_singleResolution, "Single photon resolution without pad", 0.03 * Unit::mm);
+      addParam("backgroundLevel", m_backgroundLevel, "Background level in photon hits per m^2", 50.0);
+      addParam("singleResolution", m_singleResolution, "Single photon resolution without pad", 0.010 * Unit::rad);
       addParam("aerogelMerit", m_aerogelMerit, "Aerogel figure of merit", defMerit);
       addParam("inputTrackType", m_inputTrackType, "Input tracks switch: tracking (0) or AeroHit (1)", 0);
     }

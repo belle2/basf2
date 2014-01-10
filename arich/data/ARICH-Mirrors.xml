@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Mirrors>
   <Material>ARICH_MirrorQuartz</Material>
-  <nMirrors desc="Mirrors are placed as regular nMirrors-sided polygon">16</nMirrors>
-  <outerRadius desc="Radius of outscribed circle to mirrors polygon" unit="mm">1137</outerRadius>
+  <nMirrors desc="Mirrors are placed as regular nMirrors-sided polygon">18</nMirrors>
+  <outerRadius desc="Radius of outscribed circle to mirrors polygon" unit="mm">1123</outerRadius>
   <mirrorThickness desc="Thickness of mirror plates" unit="mm">3</mirrorThickness>
   <mirrorLength desc="Length of mirror plates" unit="mm">148</mirrorLength>
   <Zposition desc="position of mirrors in Z direction (starting point)" unit="mm">1710</Zposition>
-  <startAngle desc="Angle of the first corner of mirror plates polygon" unit="deg">11.25</startAngle>
+  <startAngle desc="Angle of the first corner of mirror plates polygon" unit="deg">10.0</startAngle>
   <Surface>
     <Properties>
       <Property name="REFLECTIVITY" unit="eV">

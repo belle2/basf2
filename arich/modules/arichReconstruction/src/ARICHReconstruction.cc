@@ -451,13 +451,13 @@ namespace Belle2 {
               TVector3 dirch = TransformToFixed(edir) * photonDirection;
               double fi_cer = dirch.Phi();
               double th_cer = dirch.Theta();
-
+              if (th_cer > 0.5 || th_cer < 0.05) continue;
 
               if (m_beamtest) m_hitstuple->Fill(ncount, iAerogel, mirr, th_cer, fi_cer, hitpos.x(), hitpos.y(), hitpos.z(), epoint.x(), epoint.y(), epoint.z() , edir.x(), edir.y());
               if (m_beamtest > 2) continue;
-              if (fabs(th_cer - thetaCh[track->getIdentity()][0]) < 0.05 && iAerogel == 0 && nfoo == nDetPhotons) nDetPhotons++;
+              if (fabs(th_cer - thetaCh[track->getIdentity()][0]) < 0.042 && iAerogel == 0 && nfoo == nDetPhotons && th_cer > 0.07) nDetPhotons++;
               if (fi_cer < 0) fi_cer += 2 * M_PI;
-              double fii = 0;
+              double fii = fi_cer;
               if (mirr > 0) {
                 double fi_mir = m_arichGeoParameters->getMirrorNormal(mirrors[mirr]).XYvector().Phi();
                 fii = 2 * fi_mir - fi_cer - M_PI;
@@ -498,7 +498,7 @@ namespace Belle2 {
                 if (dr > 0 && thetaCh[iHyp][iAerogel]) {
                   double padSizemm = padSize / Unit::mm;
                   double normalizacija = nSig[iHyp][iAerogel] * padSizemm / (2 * M_PI * dr / Unit::mm);
-                  double integral = SquareInt(padSizemm, pad_fi, dx / Unit::mm, detector_sigma * 0.1);
+                  double integral = SquareInt(padSizemm, pad_fi, dx / Unit::mm, detector_sigma * 10.) / sqrt(2.);
                   // expected number of signal photons in each pixel
                   esigi[iHyp] += normalizacija * integral;
                 }// if (dr>0 && thetaCh[iHyp][iAerogel])
@@ -515,10 +515,7 @@ namespace Belle2 {
 
           for (int iHyp = 0; iHyp < c_noOfHypotheses; iHyp++) {
             double expected = esigi[iHyp] + ebgri;
-            if (expected > 1e-13)    logL[iHyp] += expected + log(1 - exp(-expected));
-            else {
-              logL[iHyp] += 1e-14 + log(1 - exp(-(1e-14)));
-            }
+            logL[iHyp] += expected + log(1 - exp(-expected));
           }
 
           //*******************************************

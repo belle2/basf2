@@ -114,11 +114,14 @@ public:
   dhhc_frame_header_word0(unsigned int error_flag = 0, unsigned int data_typ = 0, unsigned int dependent = 0) {
     data = ((error_flag & 0x1) << 15) | ((data_typ & 0xF) << 11) | (dependent & 0x3FF);
   };
-  int get_type(void) {
+  unsigned int get_type(void) {
     return (data >> 11) & 0xF;
   };
-  int get_err(void) {
+  unsigned int get_err(void) {
     return (data >> 15) & 0x1;
+  };
+  unsigned int get_misc(void) {
+    return data & 0x3FF;
   };
   void print(void) {
     if (verbose)
@@ -192,14 +195,14 @@ public:
   unsigned int calc_crc(void) {
     unsigned char* d;
     dhh_crc_32_type bocrc;
-    char crcbuffer[size() * 4];
+    char crcbuffer[size()];
     d = (unsigned char*)this;
 
-    for (unsigned int k = 0; k < (size() - 1) * 4; k += 2) {
+    for (unsigned int k = 0; k < (size() - 4); k += 2) {
       crcbuffer[k] = d[k + 1];
       crcbuffer[k + 1] = d[k];
     }
-    bocrc.process_bytes(crcbuffer, (size() - 1) * 4);
+    bocrc.process_bytes(crcbuffer, (size() - 4));
     unsigned int c;
     c = htonl(bocrc.checksum());
     if (c == crc32) {
@@ -226,7 +229,7 @@ public:
     return true;
   };
   inline static unsigned int size(void) {
-    return 4;
+    return 16;
   };
   void print(void) {
     word0.print();
@@ -264,7 +267,7 @@ public:
     crc32 = c;
   };
   inline static unsigned int size(void) {
-    return 2 + 96 / 2;
+    return (2 + 96 / 2) * 4;
   };
 };
 
@@ -291,7 +294,7 @@ public:
     crc32 = c;
   };
   inline static unsigned int size(void) {
-    return 0;//2;
+    return 0;// may vary
   };
   void print(void) {
     word0.print();
@@ -326,15 +329,15 @@ class dhh_onsen_frame {
   unsigned int trignr2;
   /// plus n* ROIs (64 bit)
   /// plus checksum 32bit
-  unsigned int length;/// not part
+  //unsigned int length;/// not part
 public:
   dhh_onsen_frame(void) {};
-  void set_length(unsigned int l) {length = l;};
+  //void set_length(unsigned int l) {length = l;};
   void print(void) {
     if (magic1 == 0x56781234) {
-      B2WARNING("DAVID ROI Framer Error");
-      memmove(&magic1, &trignr1, length - 4);
-      length -= 4;
+      B2ERROR("DAVID ROI Framer Error");
+      //memmove(&magic1, &trignr1, length - 4);
+      //length -= 4;
     }
     word0.print();
     if (verbose)
@@ -348,7 +351,7 @@ public:
     }
   };
   inline static unsigned int size(void) {
-    return 0;//2;
+    return 0;// may vary
   };
 };
 
@@ -366,14 +369,14 @@ public:
   unsigned int calc_crc(void) {
     unsigned char* d;
     dhh_crc_32_type bocrc;
-    char crcbuffer[size() * 4];
+    char crcbuffer[size()];
     d = (unsigned char*)this;
 
-    for (unsigned int k = 0; k < (size() - 1) * 4; k += 2) {
+    for (unsigned int k = 0; k < (size() - 4); k += 2) {
       crcbuffer[k] = d[k + 1];
       crcbuffer[k + 1] = d[k];
     }
-    bocrc.process_bytes(crcbuffer, (size() - 1) * 4);
+    bocrc.process_bytes(crcbuffer, (size() - 4));
     unsigned int c;
     c = htonl(bocrc.checksum());
     if (c == crc32) {
@@ -390,7 +393,7 @@ public:
     crc32 = c;
   };
   inline static unsigned int size(void) {
-    return 2;
+    return 8;
   };
   void print(void) {
     word0.print();
@@ -417,14 +420,14 @@ public:
   unsigned int calc_crc(void) {
     unsigned char* d;
     dhh_crc_32_type bocrc;
-    char crcbuffer[size() * 4];
+    char crcbuffer[size()];
     d = (unsigned char*)this;
 
-    for (unsigned int k = 0; k < (size() - 1) * 4; k += 2) {
+    for (unsigned int k = 0; k < (size() - 4); k += 2) {
       crcbuffer[k] = d[k + 1];
       crcbuffer[k + 1] = d[k];
     }
-    bocrc.process_bytes(crcbuffer, (size() - 1) * 4);
+    bocrc.process_bytes(crcbuffer, (size() - 4));
     unsigned int c;
     c = htonl(bocrc.checksum());
     if (c == crc32) {
@@ -450,7 +453,7 @@ public:
     word0.set_framenr(fn);
   };
   inline static unsigned int size(void) {
-    return 4;
+    return 16;
   };
   bool is_fake(void) {
     if (word0.data != 0xC100) return false;
@@ -626,14 +629,14 @@ public:
   unsigned int calc_crc(void) {
     unsigned char* d;
     dhh_crc_32_type bocrc;
-    char crcbuffer[size() * 4];
+    char crcbuffer[size()];
     d = (unsigned char*)this;
 
-    for (unsigned int k = 0; k < (size() - 1) * 4; k += 2) {
+    for (unsigned int k = 0; k < (size() - 4); k += 2) {
       crcbuffer[k] = d[k + 1];
       crcbuffer[k + 1] = d[k];
     }
-    bocrc.process_bytes(crcbuffer, (size() - 1) * 4);
+    bocrc.process_bytes(crcbuffer, (size() - 4));
     unsigned int c;
     c = htonl(bocrc.checksum());
     if (c == crc32) {
@@ -657,7 +660,7 @@ public:
     return true;
   };
   inline static unsigned int size(void) {
-    return 4;// 9 words???
+    return 18;// bytes
   };
   void print(void) {
     word0.print();
@@ -666,6 +669,8 @@ public:
              << " TTHI " << hex << time_tag_hi << " SFNR " << hex << ((sfnr_offset >> 10) & 0x3F) << " OFF " << hex << (sfnr_offset & 0x3FF)
              << " CRC " << hex << crc32 << " (calc)" << calc_crc());*/
   };
+  inline unsigned int get_active_dhh_mask(void) {return word0.get_misc() & 0x1F;};
+  inline unsigned int get_dhhc_id(void) {return (word0.get_misc() >> 5) & 0xF;};
 };
 
 class dhhc_dhh_start_frame {
@@ -692,14 +697,14 @@ public:
   unsigned int calc_crc(void) {
     unsigned char* d;
     dhh_crc_32_type bocrc;
-    char crcbuffer[size() * 4];
+    char crcbuffer[size()];
     d = (unsigned char*)this;
 
-    for (unsigned int k = 0; k < (size() - 1) * 4; k += 2) {
+    for (unsigned int k = 0; k < (size() - 4); k += 2) {
       crcbuffer[k] = d[k + 1];
       crcbuffer[k + 1] = d[k];
     }
-    bocrc.process_bytes(crcbuffer, (size() - 1) * 4);
+    bocrc.process_bytes(crcbuffer, (size() - 4));
     unsigned int c;
     c = htonl(bocrc.checksum());
     if (c == crc32) {
@@ -724,7 +729,7 @@ public:
     return false;
   };
   inline static unsigned int size(void) {
-    return 4;// 7 words
+    return 14;// 7 words
   };
   void print(void) {
     word0.print();
@@ -733,6 +738,8 @@ public:
              << " TTHI " << hex << time_tag_hi << " SFNR " << hex << ((sfnr_offset >> 10) & 0x3F) << " OFF " << hex << (sfnr_offset & 0x3FF)
              << " CRC " << hex << crc32 << " (calc)" << calc_crc());*/
   };
+  inline unsigned int get_active_dhp_mask(void) {return word0.get_misc() & 0xF;};
+  inline unsigned int get_dhh_id(void) {return (word0.get_misc() >> 4) & 0x3F;};
 };
 
 class dhhc_commode_frame {
@@ -756,7 +763,7 @@ public:
     return c;
   };
   inline static unsigned int size(void) {
-    return 2 + 96 / 2;
+    return (2 + 96 / 2) * 4;
   };
 };
 
@@ -778,7 +785,7 @@ public:
     return c;
   };
   inline static unsigned int size(void) {
-    return 0;//2;
+    return 0;// size can vary
   };
   void print(void) {
     word0.print();
@@ -830,7 +837,7 @@ public:
     }
   };
 //  inline static unsigned int size(void) {
-//    return 0;//2;
+//    return 0;// siez can vary
 //  };
 
   unsigned int calc_crc(unsigned int length) {
@@ -895,14 +902,14 @@ public:
   unsigned int calc_crc(void) {
     unsigned char* d;
     dhh_crc_32_type bocrc;
-    char crcbuffer[size() * 4];
+    char crcbuffer[size()];
     d = (unsigned char*)this;
 
-    for (unsigned int k = 0; k < (size() - 1) * 4; k += 2) {
+    for (unsigned int k = 0; k < (size() - 4); k += 2) {
       crcbuffer[k] = d[k + 1];
       crcbuffer[k + 1] = d[k];
     }
-    bocrc.process_bytes(crcbuffer, (size() - 1) * 4);
+    bocrc.process_bytes(crcbuffer, (size() - 4));
     unsigned int c;
     c = htonl(bocrc.checksum());
     if (c == crc32) {
@@ -916,7 +923,7 @@ public:
     return c;
   };
   inline static unsigned int size(void) {
-    return 2;
+    return 8;
   };
   void print(void) {
     word0.print();
@@ -939,14 +946,14 @@ public:
   unsigned int calc_crc(void) {
     unsigned char* d;
     dhh_crc_32_type bocrc;
-    char crcbuffer[size() * 4];
+    char crcbuffer[size()];
     d = (unsigned char*)this;
 
-    for (unsigned int k = 0; k < (size() - 1) * 4; k += 2) {
+    for (unsigned int k = 0; k < (size() - 4); k += 2) {
       crcbuffer[k] = d[k + 1];
       crcbuffer[k + 1] = d[k];
     }
-    bocrc.process_bytes(crcbuffer, (size() - 1) * 4);
+    bocrc.process_bytes(crcbuffer, (size() - 4));
     unsigned int c;
     c = htonl(bocrc.checksum());
     if (c == crc32) {
@@ -963,7 +970,7 @@ public:
     return wordsinevent;
   }
   inline static unsigned int size(void) {
-    return 4;
+    return 16;
   };
   bool is_fake(void) {
     if (word0.data != 0x6000) return false;
@@ -979,6 +986,7 @@ public:
       B2INFO("DHHC End Frame TNRLO " << hex << trigger_nr_lo << " WIEVT " << hex << wordsinevent << " ERR " << hex << errorinfo
              << " CRC " << hex << crc32 << " (calc) " << calc_crc());
   };
+  inline unsigned int get_dhhc_id(void) {return (word0.get_misc() >> 5) & 0xF;};
 };
 
 class dhhc_dhh_end_frame {
@@ -995,14 +1003,14 @@ public:
   unsigned int calc_crc(void) {
     unsigned char* d;
     dhh_crc_32_type bocrc;
-    char crcbuffer[size() * 4];
+    char crcbuffer[size()];
     d = (unsigned char*)this;
 
-    for (unsigned int k = 0; k < (size() - 1) * 4; k += 2) {
+    for (unsigned int k = 0; k < (size() - 4); k += 2) {
       crcbuffer[k] = d[k + 1];
       crcbuffer[k + 1] = d[k];
     }
-    bocrc.process_bytes(crcbuffer, (size() - 1) * 4);
+    bocrc.process_bytes(crcbuffer, (size() - 4));
     unsigned int c;
     c = htonl(bocrc.checksum());
     if (c == crc32) {
@@ -1019,7 +1027,7 @@ public:
     return wordsinevent;
   }
   inline static unsigned int size(void) {
-    return 4;
+    return 16;
   };
   bool is_fake(void) {
     /*      if (word0.data != 0xC100) return false;
@@ -1036,6 +1044,7 @@ public:
       B2INFO("DHHC DHH End Frame TNRLO " << hex << trigger_nr_lo << " WIEVT " << hex << wordsinevent << " ERR " << hex << errorinfo
              << " CRC " << hex << crc32 << " (calc) " << calc_crc());
   };
+  inline unsigned int get_dhh_id(void) {return (word0.get_misc() >> 4) & 0x3F;};
 };
 
 class dhhc_frames {
@@ -1479,7 +1488,7 @@ void PXDUnpackerModule::unpack_frame(void* data, int len, bool pad, int& last_fr
   dhh_frames dhh;
   dhh.set(data, hw->get_type(), len, pad);
   int s;
-  s = dhh.size() * 4;
+  s = dhh.size();
   if (len != s && s != 0) {
     B2WARNING(" Size (real) " << len << " != " << s << " (in data) " << pad);
   }
@@ -1598,7 +1607,7 @@ void PXDUnpackerModule::unpack_frame(void* data, int len, bool pad, int& last_fr
     };
     case DHH_FRAME_HEADER_DATA_TYPE_HLTROI:
       hw->print();
-      ((dhh_onsen_frame*)data)->set_length(len - 4);
+//       ((dhh_onsen_frame*)data)->set_length(len - 4);
       ((dhh_onsen_frame*)data)->print();
       //dhh.calc_crc(); /// WILL FAIL anyway
       break;
@@ -1659,7 +1668,7 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& la
   dhhc_frames dhhc;
   dhhc.set(data, hw->get_type(), len, pad);
   int s;
-  s = dhhc.size() * 4;
+  s = dhhc.size();
   if (len != s && s != 0) {
     B2WARNING(" Size (real) " << len << " != " << s << " (in data) " << pad);
   }

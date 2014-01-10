@@ -54,7 +54,7 @@ namespace Belle2 {
 
       int m_maxNumberSteps; /**< The maximum number of steps before the track transportation is stopped and the track is killed. */
       /** if true, check if the track has attached trajectory info and append step information if necessary */
-      bool m_storeTrajectories;
+      bool m_storeTrajectories = false;
 
     };
 

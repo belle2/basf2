@@ -118,9 +118,9 @@ namespace Belle2 {
       double addNoise(double charge);
 
       /** Save digits to the DataStore
-       * @param time The time when signal sample should be taken and stored.
+       * Saves samples of generated waveforms.
        */
-      void saveDigits(double time);
+      void saveDigits();
 
       /** Save waveforms to the statistics file.
        * This method is only called when storage of waveforms is required.
@@ -138,6 +138,10 @@ namespace Belle2 {
 
     protected:
 
+      /** A small helper function to convert between electons and ADU */
+      inline double eToADU(double charge) const {
+        return round(std::min(m_maxADC, std::max(m_minADC, charge)) / m_unitADC);
+      }
       // Members holding module parameters:
 
       // 1. Collections
@@ -189,10 +193,10 @@ namespace Belle2 {
        * Starting from this time, signal samples are taken in samplingTime intervals.
        */
       double m_startSampling;
-      /** Time window end.
-       * Starting from this time, samples are not taken.
+      /** Number of samples
+       * Number of consecutive APV25 samples
        */
-      double m_stopSampling;
+      int m_nAPV25Samples;
       /** Whether or not to apply random phase sampling.
        * If set to true, the first samples of the event will be taken at a random time point
        * with probability centered around the time when first particle reaches

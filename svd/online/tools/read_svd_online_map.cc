@@ -20,6 +20,6 @@ main(int argc, char** argv)
   printf("%s", digit->isUStrip() ? "u" : "v");
   printf("Strip: %i ", digit->getCellID());
   printf("Charge: %f ", digit->getCharge());
-  printf("Time: %f ", digit->getTime());
+  printf("Time: %i ", digit->getIndex());
   printf("\n");
 }

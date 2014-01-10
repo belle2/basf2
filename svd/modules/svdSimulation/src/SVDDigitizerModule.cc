@@ -22,11 +22,10 @@
 #include <mdst/dataobjects/MCParticle.h>
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <svd/dataobjects/SVDDigit.h>
-#include <boost/foreach.hpp>
 #include <boost/tuple/tuple.hpp>
 #include <vector>
 #include <set>
-#include <math.h>
+#include <cmath>
 #include <root/TMath.h>
 #include <root/TRandom.h>
 
@@ -94,20 +93,20 @@ SVDDigitizerModule::SVDDigitizerModule() :
   addParam("APVShapingTime", m_shapingTime, "APV25 shpaing time in ns",
            double(50.0));
   addParam("ADCSamplingTime", m_samplingTime,
-           "Interval between ADC samples in ns", double(30.0));
+           "Interval between ADC samples in ns", double(31.44));
   addParam("UseIntegrationWindow", m_applyWindow, "Use integration window?",
            bool(true));
-  addParam("WindowStart", m_startSampling,
+  addParam("StartSampling", m_startSampling,
            "Start of the sampling window, in ns", double(0.0));
-  addParam("WindowEnd", m_stopSampling, "End of the sampling window, in ns",
-           double(200.0));
+  addParam("nAPV25Samples", m_nAPV25Samples, "number of APV25 samples",
+           6);
   addParam("RandomPhaseSampling", m_randomPhaseSampling,
            "Start sampling at a random time?", bool(false));
 
   // 5. Processing
-  addParam("ADC", m_applyADC, "Simulate ADC?", bool(false));
-  addParam("ADCLow", m_minADC, "Low end of ADC range", double(-64000.0));
-  addParam("ADCHigh", m_maxADC, "High end of ADC range", double(224000.0));
+  addParam("ADC", m_applyADC, "Simulate ADC?", bool(true));
+  addParam("ADCLow", m_minADC, "Low end of ADC range", double(-96000.0));
+  addParam("ADCHigh", m_maxADC, "High end of ADC range", double(288000.0));
   addParam("ADCbits", m_bitsADC, "Number of ADC bits", int(10));
 
   // 6. Reporting
@@ -182,7 +181,7 @@ void SVDDigitizerModule::initialize()
   B2INFO(" -->  Sampling time:      " << m_samplingTime);
   B2INFO(" -->  IntegrationWindow:  " << (m_applyWindow ? "true" : "false"));
   B2INFO(" -->  Start of int. wind.:" << m_startSampling);
-  B2INFO(" -->  End of int. window: " << m_stopSampling);
+  B2INFO(" -->  Number of samples:  " << m_nAPV25Samples);
   B2INFO(
     " -->  Random phase sampl.:" << (m_randomPhaseSampling ? "true" : "false"));
   B2INFO(" PROCESSING:");
@@ -243,9 +242,9 @@ void SVDDigitizerModule::beginRun()
   //the whole map
   m_sensors.clear();
   VXD::GeoCache& geo = VXD::GeoCache::getInstance();
-  BOOST_FOREACH(VxdID layer, geo.getLayers(SensorInfo::SVD)) {
-    BOOST_FOREACH(VxdID ladder, geo.getLadders(layer)) {
-      BOOST_FOREACH(VxdID sensor, geo.getSensors(ladder)) {
+  for (VxdID layer : geo.getLayers(SensorInfo::SVD)) {
+    for (VxdID ladder : geo.getLadders(layer)) {
+      for (VxdID sensor : geo.getSensors(ladder)) {
         m_sensors[sensor] = Sensor();
       }
     }
@@ -255,7 +254,7 @@ void SVDDigitizerModule::beginRun()
 void SVDDigitizerModule::event()
 {
   //Clear sensors and process SimHits
-  BOOST_FOREACH(Sensors::value_type & sensor, m_sensors) {
+  for (Sensors::value_type & sensor : m_sensors) {
     sensor.second.first.clear();  // u strips
     sensor.second.second.clear(); // v strips
   }
@@ -357,16 +356,8 @@ void SVDDigitizerModule::event()
     m_rootFile->cd();
     saveWaveforms();
   }
-  // Take samples of acquired signals and store as digits.
-  double initTime = m_startSampling;
-  if (m_randomPhaseSampling) {
-    initTime = gRandom->Uniform(0.0, m_samplingTime);
-  }
-  double time = initTime;
-  while (time < m_stopSampling) {
-    saveDigits(time);
-    time += m_samplingTime;
-  }
+
+  saveDigits();
 }
 
 void SVDDigitizerModule::processHit()
@@ -375,10 +366,11 @@ void SVDDigitizerModule::processHit()
     //Ignore hits which are outside of the SVD active time frame.
     //Here we can only discard hits that arrived after the window was closed;
     //we will later start sampling only after the window opened.
+    double stopSampling = m_startSampling + m_nAPV25Samples * m_samplingTime;
     B2DEBUG(30,
-            "Checking if hit is in timeframe " << m_currentHit->getGlobalTime() << " <= " << m_stopSampling);
+            "Checking if hit is in timeframe " << m_currentHit->getGlobalTime() << " <= " << stopSampling);
 
-    if (m_currentHit->getGlobalTime() > m_stopSampling)
+    if (m_currentHit->getGlobalTime() > stopSampling)
       return;
   }
   // Set time of the event
@@ -727,7 +719,7 @@ double SVDDigitizerModule::addNoise(double charge)
   return charge;
 }
 
-void SVDDigitizerModule::saveDigits(double time)
+void SVDDigitizerModule::saveDigits()
 {
   StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
   StoreArray<SVDTrueHit> storeTrueHits(m_storeTrueHitsName);
@@ -740,64 +732,19 @@ void SVDDigitizerModule::saveDigits(double time)
   //Zero suppression cut in electrons
   double charge_threshold = m_SNAdjacent * m_elNoise;
 
-  // Take sample at the desired time, add noise, zero-suppress and save digits.
+  //Set time of the first sample
+  double initTime = m_startSampling;
+  if (m_randomPhaseSampling) {
+    initTime = gRandom->Uniform(0.0, m_samplingTime);
+  }
 
-  BOOST_FOREACH(Sensors::value_type & sensor, m_sensors) {
+  // Take samples at the desired times, add noise, zero-suppress and save digits.
+
+  for (Sensors::value_type & sensor : m_sensors) {
     int sensorID = sensor.first;
     const SensorInfo& info =
       dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(sensorID));
     // u-side digits:
-    // Remember which strips are occupied by signal
-    std::set<short> occupied_u;
-    BOOST_FOREACH(StripSignals::value_type & stripSignal, sensor.second.first) {
-      short int iStrip = stripSignal.first;
-      SVDSignal& s = stripSignal.second;
-      // Read the value
-      double charge;
-      SVDSignal::relations_map particles;
-      SVDSignal::relations_map truehits;
-      boost::tie(charge, particles, truehits) = s(time);
-      // Add noise to charge.
-      double sampleCharge = addNoise(charge);
-      // Zero-suppress if too small signal
-      if (sampleCharge < charge_threshold)
-        continue;
-      //Limit signal to ADC steps
-      if (m_applyADC)
-        sampleCharge = round(
-                         min(m_maxADC, max(m_minADC, sampleCharge)) / m_unitADC)
-                       * m_unitADC;
-      // Remember the strip as occupied
-      occupied_u.insert(iStrip);
-
-      // Save as a new digit
-      int digIndex = storeDigits.getEntries();
-      storeDigits.appendNew(
-        SVDDigit(sensorID, true, iStrip,
-                 info.getUCellPosition(iStrip), sampleCharge, time));
-
-      //If the digit has any relations to MCParticles, add the Relation
-      if (particles.size() > 0) {
-        relDigitMCParticle.add(digIndex, particles.begin(),
-                               particles.end());
-      }
-      //If the digit has any relations to truehits, add the Relations.
-      if (truehits.size() > 0) {
-        relDigitTrueHit.add(digIndex, truehits.begin(), truehits.end());
-        // Add reporting data
-        if (m_signalDist_u) {
-          BOOST_FOREACH(SVDSignal::relation_value_type trueRel, truehits) {
-            int iTrueHit = trueRel.first;
-            float trueWeight = trueRel.second;
-            if (iTrueHit > -1)
-              m_signalDist_u->Fill(
-                (info.getUCellPosition(iStrip)
-                 - storeTrueHits[iTrueHit]->getU())
-                / Unit::um, trueWeight);
-          }
-        }
-      }
-    } // FOREACH stripSignal
     // Add noisy digits
     if (m_applyNoise) {
       double fraction = 1.0 - m_noiseFraction;
@@ -805,70 +752,73 @@ void SVDDigitizerModule::saveDigits(double time)
       int uNoisyStrips = gRandom->Poisson(fraction * nU);
       for (short ns = 0; ns < uNoisyStrips; ++ns) {
         short iStrip = gRandom->Integer(nU);
-        if (occupied_u.count(iStrip) > 0)
-          continue;
-        // Add a noisy digit, no relations.
-        storeDigits.appendNew(
-          SVDDigit(sensorID, true, iStrip,
-                   info.getUCellPosition(iStrip), addNoise(-1.0),
-                   time));
-        // Remember strip as occupied
-        occupied_u.insert(iStrip);
+        sensor.second.first[iStrip].add(0, -1, 0, 0, 0);
       } // for ns
-    } // apply noise
-
-    // v-side digits:
-    // Remember which strips are occupied by signal
-    std::set<short> occupied_v;
-    BOOST_FOREACH(StripSignals::value_type & stripSignal, sensor.second.second) {
+    } // Add noise digits
+    // Cycle through signals and generate samples
+    for (StripSignals::value_type & stripSignal : sensor.second.first) {
       short int iStrip = stripSignal.first;
       SVDSignal& s = stripSignal.second;
-      // Read the value
-      double charge;
-      SVDSignal::relations_map particles;
-      SVDSignal::relations_map truehits;
-      boost::tie(charge, particles, truehits) = s(time);
-      // Add noise to charge.
-      double sampleCharge = addNoise(charge);
-      // Zero-suppress if too small signal
-      if (sampleCharge < charge_threshold)
-        continue;
-      //Limit signal to ADC steps
-      if (m_applyADC)
-        sampleCharge = round(
-                         min(m_maxADC, max(m_minADC, sampleCharge)) / m_unitADC)
-                       * m_unitADC;
-      // Remember the strip as occupied
-      occupied_v.insert(iStrip);
-
-      // Save as a new digit
-      int digIndex = storeDigits.getEntries();
-      storeDigits.appendNew(
-        SVDDigit(sensorID, false, iStrip,
-                 info.getVCellPosition(iStrip), sampleCharge, time));
-
-      //If the digit has any relations to MCParticles, add the Relation
-      if (particles.size() > 0) {
-        relDigitMCParticle.add(digIndex, particles.begin(),
-                               particles.end());
-      }
-      //If the digit has any relations to truehits, add the Relations
-      if (truehits.size() > 0) {
-        relDigitTrueHit.add(digIndex, truehits.begin(), truehits.end());
-        // Add reporting data
-        if (m_signalDist_v) {
-          BOOST_FOREACH(SVDSignal::relation_value_type trueRel, truehits) {
-            int iTrueHit = trueRel.first;
-            float trueWeight = trueRel.second;
-            if (iTrueHit > -1)
-              m_signalDist_v->Fill(
-                (info.getVCellPosition(iStrip)
-                 - storeTrueHits[iTrueHit]->getV())
-                / Unit::um, trueWeight);
-          }
+      // Now generate samples in time and save as digits.
+      vector<double> samples;
+      // For noise digits, just generate random variates on randomly selected samples
+      if (s.isNoise()) {
+        double pSelect = 1.0 / m_nAPV25Samples;
+        for (int iSample = 0; iSample < m_nAPV25Samples; iSample++) {
+          if (gRandom->Uniform() < pSelect)
+            samples.push_back(addNoise(-1));
+          else
+            samples.push_back(gRandom->Gaus(0, m_elNoise));
+        }
+      } else {
+        double t = initTime;
+        for (int iSample = 0; iSample < m_nAPV25Samples; iSample ++) {
+          samples.push_back(addNoise(s(t)));
+          t += m_samplingTime;
         }
       }
-    } // FOREACH stripSignal
+      // Check that at least one sample is over threshold
+      bool isOverThreshold = false;
+      for (double value : samples)
+        isOverThreshold = isOverThreshold || (value > charge_threshold);
+      if (!isOverThreshold) continue;
+      // Save samples and relations
+      SVDSignal::relations_map particles = s.getMCParticleRelations();
+      SVDSignal::relations_map truehits = s.getTrueHitRelations();
+      for (int iSample = 0; iSample < m_nAPV25Samples; iSample++) {
+        double sampleCharge = samples.at(iSample);
+        //Limit signal to ADC steps
+        if (m_applyADC)
+          sampleCharge = eToADU(sampleCharge);
+        // Save as a new digit
+        int digIndex = storeDigits.getEntries();
+        storeDigits.appendNew(
+          SVDDigit(sensorID, true, iStrip,
+                   info.getUCellPosition(iStrip), sampleCharge, iSample));
+        //If the digit has any relations to MCParticles, add the Relation
+        if (particles.size() > 0) {
+          relDigitMCParticle.add(digIndex, particles.begin(), particles.end());
+        }
+        //If the digit has any relations to truehits, add the Relations.
+        if (truehits.size() > 0) {
+          relDigitTrueHit.add(digIndex, truehits.begin(), truehits.end());
+          // Add reporting data
+          if (m_signalDist_u) {
+            for (SVDSignal::relation_value_type trueRel : truehits) {
+              int iTrueHit = trueRel.first;
+              float trueWeight = trueRel.second;
+              if (iTrueHit > -1) {
+                m_signalDist_u->Fill(
+                  (info.getUCellPosition(iStrip)
+                   - storeTrueHits[iTrueHit]->getU())
+                  / Unit::um, trueWeight);
+              } // if iTrieHit
+            } // for trueRel
+          } // if m_signalDist_u
+        } // if truehits.size()
+      } // for iSample
+    } // for stripSignals
+    // v-side digits:
     // Add noisy digits
     if (m_applyNoise) {
       double fraction = 1.0 - m_noiseFraction;
@@ -876,18 +826,72 @@ void SVDDigitizerModule::saveDigits(double time)
       int vNoisyStrips = gRandom->Poisson(fraction * nV);
       for (short ns = 0; ns < vNoisyStrips; ++ns) {
         short iStrip = gRandom->Integer(nV);
-        if (occupied_v.count(iStrip) > 0)
-          continue;
-        // Add a noisy digit, no relations.
+        sensor.second.second[iStrip].add(0, -1, 0, 0, 0);
+      } // for ns
+    } // Add noise digits
+    // Cycle through signals and generate samples
+    for (StripSignals::value_type & stripSignal : sensor.second.second) {
+      short int iStrip = stripSignal.first;
+      SVDSignal& s = stripSignal.second;
+      // Now generate samples in time and save as digits.
+      vector<double> samples;
+      // For noise digits, just generate random variates on randomly selected samples
+      if (s.isNoise()) {
+        double pSelect = 1.0 / m_nAPV25Samples;
+        for (int iSample = 0; iSample < m_nAPV25Samples; iSample++) {
+          if (gRandom->Uniform() < pSelect)
+            samples.push_back(addNoise(-1));
+          else
+            samples.push_back(gRandom->Gaus(0, m_elNoise));
+        }
+      } else {
+        double t = initTime;
+        for (int iSample = 0; iSample < m_nAPV25Samples; iSample ++) {
+          samples.push_back(addNoise(s(t)));
+          t += m_samplingTime;
+        }
+      }
+      // Check that at least one sample is over threshold
+      bool isOverThreshold = false;
+      for (double value : samples)
+        isOverThreshold = isOverThreshold || (value > charge_threshold);
+      if (!isOverThreshold) continue;
+      // Save samples and relations
+      SVDSignal::relations_map particles = s.getMCParticleRelations();
+      SVDSignal::relations_map truehits = s.getTrueHitRelations();
+      for (int iSample = 0; iSample < m_nAPV25Samples; iSample++) {
+        double sampleCharge = samples.at(iSample);
+        //Limit signal to ADC steps
+        if (m_applyADC)
+          sampleCharge = eToADU(sampleCharge);
+        // Save as a new digit
+        int digIndex = storeDigits.getEntries();
         storeDigits.appendNew(
           SVDDigit(sensorID, false, iStrip,
-                   info.getVCellPosition(iStrip), addNoise(-1.0),
-                   time));
-        // Remember strip as occupied
-        occupied_v.insert(iStrip);
-      } // for ns
-    } // apply noise
-
+                   info.getVCellPosition(iStrip), sampleCharge, iSample));
+        //If the digit has any relations to MCParticles, add the Relation
+        if (particles.size() > 0) {
+          relDigitMCParticle.add(digIndex, particles.begin(), particles.end());
+        }
+        //If the digit has any relations to truehits, add the Relations.
+        if (truehits.size() > 0) {
+          relDigitTrueHit.add(digIndex, truehits.begin(), truehits.end());
+          // Add reporting data
+          if (m_signalDist_v) {
+            for (SVDSignal::relation_value_type trueRel : truehits) {
+              int iTrueHit = trueRel.first;
+              float trueWeight = trueRel.second;
+              if (iTrueHit > -1) {
+                m_signalDist_v->Fill(
+                  (info.getVCellPosition(iStrip)
+                   - storeTrueHits[iTrueHit]->getV())
+                  / Unit::um, trueWeight);
+              } // if iTrieHit
+            } // for trueRel
+          } // if m_signalDist_v
+        } // if truehits.size()
+      } // for iSample
+    } // for stripSignals
   } // FOREACH sensor
 }
 
@@ -896,39 +900,31 @@ void SVDDigitizerModule::saveWaveforms()
   //Only store large enough signals
   double charge_threshold = 3. * m_elNoise;
 
-  BOOST_FOREACH(Sensors::value_type & sensor, m_sensors) {
+  for (Sensors::value_type & sensor : m_sensors) {
     tree_vxdID = sensor.first;
     // u-side digits:
     tree_uv = 1;
-    BOOST_FOREACH(StripSignals::value_type & stripSignal, sensor.second.first) {
+    for (StripSignals::value_type & stripSignal : sensor.second.first) {
       tree_strip = stripSignal.first;
       SVDSignal& s = stripSignal.second;
       // Read the value only if the signal is large enough.
       if (s.getCharge() < charge_threshold)
         continue;
-      double charge;
-      SVDSignal::relations_map particles;
-      SVDSignal::relations_map truehits;
       for (int iTime = 0; iTime < 20; ++iTime) {
-        boost::tie(charge, particles, truehits) = s(10 * iTime);
-        tree_signal[iTime] = charge;
+        tree_signal[iTime] = s(10 * iTime);
       }
       m_waveTree->Fill();
     } // FOREACH stripSignal
     // v-side digits:
     tree_uv = 0;
-    BOOST_FOREACH(StripSignals::value_type & stripSignal, sensor.second.second) {
+    for (StripSignals::value_type & stripSignal : sensor.second.second) {
       tree_strip = stripSignal.first;
       SVDSignal& s = stripSignal.second;
       // Read the values only if the signal is large enough
       if (s.getCharge() < charge_threshold)
         continue;
-      double charge;
-      SVDSignal::relations_map particles;
-      SVDSignal::relations_map truehits;
       for (int iTime = 0; iTime < 20; ++iTime) {
-        boost::tie(charge, particles, truehits) = s(10. * iTime);
-        tree_signal[iTime] = charge;
+        tree_signal[iTime] = s(10. * iTime);
       }
       m_waveTree->Fill();
     } // FOREACH stripSignal

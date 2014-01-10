@@ -33,24 +33,22 @@ namespace Belle2 {
 
   public:
 
-    /** Default constructor for the ROOT IO. */
-    SVDDigit():
-      m_sensorID(0), m_isU(true), m_cellID(0), m_cellPosition(0),
-      m_charge(0), m_time(0)
-    {}
-
     /** Useful Constructor.
      * @param sensorID Sensor compact ID.
      * @param isU True if v strip, false if v.
      * @param cellID Strip ID.
      * @param cellPosition Strip mid-line coordinate.
      * @param charge The charge collected on the strip.
-     * @param time The time when the sample was taken.
+     * @param time Index of the sample, e.g., 0 to 5.
      */
     SVDDigit(VxdID sensorID, bool isU, short cellID, float cellPosition,
-             float charge, double time):
+             float charge, short index):
       m_sensorID(sensorID), m_isU(isU), m_cellID(cellID),
-      m_cellPosition(cellPosition), m_charge(charge), m_time(time)
+      m_cellPosition(cellPosition), m_charge(charge), m_index(index)
+    {}
+
+    /** Default constructor for the ROOT IO. */
+    SVDDigit() : SVDDigit(0, true, 0, 0.0, 0.0, 0)
     {}
 
     /** Get the sensor ID.
@@ -81,7 +79,7 @@ namespace Belle2 {
     /** Get time when the sample was taken.
      * @return time when the sample was taken.
      */
-    double getTime() const { return m_time; }
+    short getIndex() const { return m_index; }
 
   private:
 
@@ -90,9 +88,9 @@ namespace Belle2 {
     short m_cellID;            /**< Strip coordinate in pitch units. */
     float m_cellPosition;      /**< Absolute strip position, -temporary-. */
     float m_charge;            /**< Strip signal. */
-    double m_time;             /**< Time when the sampel was taken. */
+    short m_index;             /**< Index of the sample, e.g. 0 to 5. */
 
-    ClassDef(SVDDigit, 1)
+    ClassDef(SVDDigit, 2)
 
   }; // class SVDDigit
 

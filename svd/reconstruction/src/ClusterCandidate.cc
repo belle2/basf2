@@ -10,7 +10,6 @@
 
 #include <svd/reconstruction/ClusterCandidate.h>
 #include <algorithm>
-#include <boost/foreach.hpp>
 
 using namespace std;
 
@@ -22,7 +21,7 @@ namespace Belle2 {
     {
       float charge = sample.getCharge();
       unsigned int strip = sample.getCellID();
-      unsigned int time = sample.getTime();
+      unsigned int time = sample.getSampleIndex();
       if (m_charges.count(strip) > 0) {
         if (charge > m_charges[strip]) {
           m_charge += charge - m_charges[strip];
@@ -49,7 +48,7 @@ namespace Belle2 {
       if (cls.m_seed.getCharge() > m_seed.getCharge()) {
         m_seed = cls.m_seed;
       }
-      BOOST_FOREACH(const Sample & sample, cls.m_samples) {
+      for (const Sample & sample : cls.m_samples) {
         add(sample);
       }
       cls.m_samples.clear();

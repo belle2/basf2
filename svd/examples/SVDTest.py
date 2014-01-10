@@ -64,13 +64,13 @@ output.param('outputFileName', 'SVDTestOutput.root')
 
 # Select subdetectors to be built
 # geometry.param('Components', ['PXD','SVD'])
-geometry.param('Components', ['MagneticField', 'PXD', 'SVD'])
+geometry.param('components', ['MagneticField', 'PXD', 'SVD'])
 
 # SVDDIGI.param('statisticsFilename', 'SVDDiags.root')
 SVDDIGI.param('PoissonSmearing', True)
 SVDDIGI.param('ElectronicEffects', True)
 SVDDIGI.param('statisticsFilename', 'SVDTestDiags.root')
-SVDDIGI.param('storeWaveforms', False)
+SVDDIGI.param('storeWaveforms', True)
 
 # ============================================================================
 # Do the simulation

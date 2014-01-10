@@ -12,8 +12,6 @@
 #define SVDSIGNAL_H
 
 #include <framework/dataobjects/RelationElement.h>
-#include <boost/foreach.hpp>
-#include <boost/tuple/tuple.hpp>
 #include <deque>
 #include <map>
 #include <algorithm>
@@ -81,43 +79,34 @@ namespace Belle2 {
       /** Copy ctor. */
       SVDSignal(const SVDSignal& other) {
         m_charge = other.getCharge();
-        BOOST_FOREACH(Wave wave, other.getFunctions())
-        m_functions.push_back(wave);
+        for (Wave wave : other.getFunctions())
+          m_functions.push_back(wave);
       }
 
+      /** Check whether this is a noise signal.
+       * If charge is negative, there is no useful information in the signal.
+       * @return True if noise signal.
+       */
+      bool isNoise() const { return m_charge < 0; }
+
       /** Add a chargelet to the strip signal.
+       * Negative sign of charge has a special meaning, it designates noise signal
+       * carrying otherwise no useful information.
        * @param charge Charge in electrons to be added
-       * @param time Time of arrival of the chargelet to the sensitive surface of the sensor.
+       * @param initTime Time of arrival of the chargelet to the sensitive surface of the sensor.
        * @param tau Characteristic time of waveform decay.
        * @param particle Index of the particle contributing the charge, -1 for no particle/noise
        * @param truehit Index of the truehit corresponding to the particle that contributed
        * the charge.
        */
       void add(double initTime, double charge, double tau, int particle = -1, int truehit = -1) {
-        m_charge += charge;
-        m_functions.push_back(Wave(initTime, charge, tau, particle, truehit));
-      }
-
-      /** Make the SVDSignals addable.
-       * @param other The SVDSignal to be added.
-       * @return The sum of this signal and the other.
-       */
-      SVDSignal& operator+=(const SVDSignal& other) {
-        m_charge += other.getCharge();
-        BOOST_FOREACH(Wave wave, other.getFunctions())
-        m_functions.push_back(wave);
-        return *this;
-      }
-
-      /** Make the SVDSignals scalable.
-       * @param scale The factor by which all charges wil be multiplied.
-       * @return This signal with all charges multiplied by scale.
-       */
-      SVDSignal& operator*=(double scale) {
-        m_charge *= scale;
-        BOOST_FOREACH(Wave & wave, m_functions)
-        wave.m_charge *= scale;
-        return *this;
+        if (charge > 0) {
+          m_charge += charge;
+          m_functions.push_back(Wave(initTime, charge, tau, particle, truehit));
+          if (particle > -1) m_particles[particle] += static_cast<float>(charge);
+          if (truehit > -1) m_truehits[truehit] += static_cast<float>(charge);
+        } else if (m_charge == 0)
+          m_charge += charge;
       }
 
       /** Make the SVDSignal assignable.
@@ -132,31 +121,37 @@ namespace Belle2 {
       }
 
       /** Waveform shape.
-       * @param time The time at which the function is to be calculated.
+       * @param t The time at which the function is to be calculated.
        * @param initTime The initial time of the waveform.
        * @param charge The total charge of the waveform.
        * @param tau The decay time of the waveform.
-       * @return Value of the waveform at time time.
+       * @return Value of the waveform at time.
        */
-      double waveform(double time, double initTime, double charge, double tau) const {
-        if ((tau <= 0.0) || (time < initTime)) return 0;
-        double z = (time - initTime) / tau; return charge * z * exp(1.0 - z);
+      double waveform(double t, double initTime, double charge, double tau) const {
+        if ((tau <= 0.0) || (t < initTime)) return 0;
+        double z = (t - initTime) / tau; return charge * z * exp(1.0 - z);
       }
 
       /** Waveform taking parameters from a Wave struct.
-       * @param time The time at which the function is to be calculated.
+       * @param t The time at which the function is to be calculated.
        * @param wave The SVDSignal::Wave struct with parameters of a waveform.
        * @return THe value of the waveform at time time.
        */
-      double waveform(double time, const Wave& wave) const
-      { return waveform(time, wave.m_initTime, wave.m_charge, wave.m_tau); }
+      double waveform(double t, const Wave& wave) const
+      { return waveform(t, wave.m_initTime, wave.m_charge, wave.m_tau); }
 
       /** Make the SVDSignal a functor.
-       * @param time The time at which output is to be calculated.
+       * @param t The time at which output is to be calculated.
        * @return Boost tuple containing the summary value of the waveform (observable),
        * and the relation maps of MCParticles and TrueHits.
        */
-      boost::tuple<double, const relations_map&, const relations_map&> operator()(double time);
+      double operator()(double t) const {
+        double wave_sum = 0;
+        for (SVDSignal::Wave wave : m_functions) {
+          wave_sum += waveform(t, wave);
+        }
+        return wave_sum;
+      }
 
       /** Return the charge collected in the strip.
        * @return Total charge of the waveform.
@@ -168,17 +163,25 @@ namespace Belle2 {
        */
       const function_list& getFunctions() const { return m_functions; }
 
+      /** Return the list of MCParticle relations.
+       * @return SVDSignal::relations_map with MCParticle relations of the signal.
+       */
+      const relations_map& getMCParticleRelations() const { return m_particles; }
+
+      /** Return the list of TrueHit relations.
+       * @return SVDSignal::relations_map with TrueHit relations of the signal.
+       */
+      const relations_map& getTrueHitRelations() const { return m_truehits; }
+
     protected:
 
       /** charge of the pixel */
       double m_charge;
-
       /** list of elementary waveform parameters.*/
       function_list m_functions;
-
-      /** Return map of MCParticle associations.*/
+      /** Map of MCParticle associations.*/
       relations_map m_particles;
-      /** Return map of TrueHit associations. */
+      /** Map of TrueHit associations. */
       relations_map m_truehits;
 
     }; // class SVDDigit

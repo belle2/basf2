@@ -22,6 +22,7 @@
 #include <deque>
 #include <set>
 #include <boost/array.hpp>
+#include <cmath>
 
 namespace Belle2 {
 
@@ -60,6 +61,7 @@ namespace Belle2 {
       virtual void event();
 
     protected:
+
       /** Find the cluster a given sample belongs to.
        * For this to work correctly, the samples have to be passed sorted by
        * sensor,strip direction, strip number, and time.
@@ -98,9 +100,19 @@ namespace Belle2 {
       /** LorentzAngle, holes. */
       double m_tanLorentzAngle_holes;
 
-      //3. Noise
+      //3. Noise and ADC
       /** Noise in number of electrons */
       double m_elNoise;
+      /** Apply ADC conversion? */
+      bool m_applyADC;
+      /** Low limit of ADC range in electrons. */
+      double m_minADC;
+      /** High limit of ADC range in electrons. */
+      double m_maxADC;
+      /** Number of ADC bits. */
+      int m_bitsADC;
+      /** Number of ADU in ADC range. */
+      double m_unitADC;
 
       //4. Clustering
       /** Seed cut in units of m_elNoise. */
@@ -124,6 +136,8 @@ namespace Belle2 {
       double m_shapingTimeHoles;
       /** Interval between two consecutive signal samples (30 ns). */
       double m_samplingTime;
+      /** Base (zero) time of APV25. */
+      double m_refTime;
       /** Whether or not to apply a time window cut */
       bool   m_applyWindow;
       /** Time of the trigger. */
@@ -133,10 +147,6 @@ namespace Belle2 {
        * (m_triggerTime, m_triggerTime+m_acceptance) will be accepted.
        */
       double m_acceptance;
-
-      /** The reference time for discretization (taken as the time of the first
-       * encountered digit. */
-      double m_refTime;
 
       /** Pointer to the geometry info of the currently active Sensor */
       SensorInfo* m_geometry;

@@ -12,7 +12,6 @@
 
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationIndex.h>
 #include <framework/logging/Logger.h>
@@ -39,9 +38,10 @@ REG_MODULE(SVDClusterizer)
 //-----------------------------------------------------------------
 
 SVDClusterizerModule::SVDClusterizerModule() : Module(), m_elNoise(2000.0),
-  m_cutSeed(5.0), m_cutAdjacent(2.5), m_cutCluster(8.0), m_sizeHeadTail(3),
-  c_minSamples(3), m_timeTolerance(30), m_shapingTimeElectrons(55),
-  m_shapingTimeHoles(60), m_samplingTime(30), m_refTime(0.0), m_assumeSorted(false)
+  m_minADC(-96000), m_maxADC(386000), m_bitsADC(10), m_unitADC(375), m_cutSeed(5.0),
+  m_cutAdjacent(2.5), m_cutCluster(8.0), m_sizeHeadTail(3), c_minSamples(1),
+  m_timeTolerance(30), m_shapingTimeElectrons(55), m_shapingTimeHoles(60),
+  m_samplingTime(31.44), m_refTime(-31.44), m_assumeSorted(false)
 {
   //Set module properties
   setDescription("Clusterize SVDDigits and reconstruct hits");
@@ -68,6 +68,11 @@ SVDClusterizerModule::SVDClusterizerModule() : Module(), m_elNoise(2000.0),
   // 3. Noise
   addParam("ElectronicNoise", m_elNoise,
            "RMS signal noise, set in ENC", m_elNoise);
+  // 5. Processing
+  addParam("ADC", m_applyADC, "Signals in ADU?", bool(true));
+  addParam("ADCLow", m_minADC, "Low end of ADC range", double(-96000.0));
+  addParam("ADCHigh", m_maxADC, "High end of ADC range", double(288000.0));
+  addParam("ADCbits", m_bitsADC, "Number of ADC bits", 10);
 
   // 4. Clustering
   addParam("NoiseSN", m_cutAdjacent,
@@ -88,6 +93,8 @@ SVDClusterizerModule::SVDClusterizerModule() : Module(), m_elNoise(2000.0),
            "Typical decay time for signals of holes", m_shapingTimeHoles);
   addParam("SamplingTime", m_samplingTime,
            "Time between two consecutive signal samples", m_samplingTime);
+  addParam("APV_t0", m_refTime,
+           "Zero time of APV25",  m_refTime);
   /** Whether or not to apply a time window cut */
   addParam("Apply time window", m_applyWindow,
            "Whether or not to apply an acceptance window based on trigger time", bool(false));
@@ -136,6 +143,11 @@ void SVDClusterizerModule::initialize()
   m_relDigitTrueHitName = relDigitTrueHits.getName();
   m_relDigitMCParticleName = relDigitMCParticles.getName();
 
+  // Convert things to appropriate units:
+  if (m_applyADC) {
+    m_unitADC = (m_maxADC - m_minADC) / pow(2, m_bitsADC);
+    m_elNoise = m_elNoise / m_unitADC;
+  }
   // Report:
   B2INFO("SVDClusterizer Parameters (in default system unit, *=cannot be set directly):");
 
@@ -176,17 +188,19 @@ void SVDClusterizerModule::initialize()
   // right time. E.g., do we have different noise levels on the two sides of a
   // a sensor? on different sensor types?
   m_noiseMap.setNoiseLevel(m_elNoise);
+
 }
+
 
 inline void SVDClusterizerModule::findCluster(const Sample& sample)
 {
-  ClusterCandidate* prev = m_cache.findCluster(sample.getTime(), sample.getCellID());
+  ClusterCandidate* prev = m_cache.findCluster(sample.getSampleIndex(), sample.getCellID());
   if (!prev) {
     m_clusters.push_back(ClusterCandidate());
     prev = &m_clusters.back();
   }
   prev->add(sample);
-  m_cache.setLast(sample.getTime(), sample.getCellID(), prev);
+  m_cache.setLast(sample.getSampleIndex(), sample.getCellID(), prev);
 }
 
 
@@ -230,8 +244,13 @@ void SVDClusterizerModule::event()
       VxdID sensorID = sample.getDigit()->getSensorID();
       int side = sample.getDigit()->isUStrip() ? 0 : 1;
       std::pair<SensorSide::iterator, bool> it = sensors[sensorID][side].insert(sample);
-      if (!it.second) B2ERROR("Sample (" << sample.getTime() << "," << sample.getCellID() << "/" << (sample.isUStrip() ? 0 : 1) << ") in sensor "
-                                << (string)sensorID << " is already set, ignoring second occurrence.");
+      if (!it.second) {
+        B2WARNING("Sample (" << sample.getSampleIndex() << ", "
+                  << sample.getCellID() << "/" << (sample.isUStrip() ? 0 : 1)
+                  << ") in sensor " << static_cast<unsigned short>(sensorID)
+                  << " is already set, ignoring second occurrence.");
+        continue;
+      }
     }
 
     //Now we loop over sensors and cluster each sensor in turn
@@ -252,7 +271,8 @@ void SVDClusterizerModule::event()
     //we write out all existing clusters and continue
     VxdID sensorID;
     bool uSide(true);
-    unsigned int lastTime(0), lastStrip(0);
+    int lastTime(0);
+    unsigned int lastStrip(0);
     for (int i = 0; i < nDigits; i++) {
       Sample sample(storeDigits[i], i);
       //Load the correct noise map for the first pixel
@@ -261,11 +281,11 @@ void SVDClusterizerModule::event()
       if (!m_noiseMap(sample, m_cutAdjacent)) continue;
 
       //Check for sorting as precaution
-      if (lastStrip > sample.getCellID() || (lastStrip == sample.getCellID() && lastTime > sample.getTime())) {
+      if (lastStrip > sample.getCellID() || (lastStrip == sample.getCellID() && lastTime > sample.getSampleIndex())) {
         B2FATAL("Digits are not sorted correctly, please change the assumeSorted parameter "
                 "to false or fix the input to be ordered by strip number and time in ascending order");
       }
-      lastTime = sample.getTime();
+      lastTime = sample.getSampleIndex();
       lastStrip = sample.getCellID();
 
       //Other side or new sensor: write clusters
@@ -388,7 +408,8 @@ void SVDClusterizerModule::writeClusters(VxdID sensorID, int side)
       }
     }
     clusterTiimeStd = sqrt(clusterTiimeStd / restrictedCharge);
-    clusterTime += m_refTime;
+    // Only now we scale the time properly
+    clusterTime = m_refTime + m_samplingTime * clusterTime;
     // discard if not within acceptance
     if (m_applyWindow && ((clusterTime < m_triggerTime) || (clusterTime > m_triggerTime + m_acceptance)))
       continue;
@@ -422,7 +443,7 @@ void SVDClusterizerModule::writeClusters(VxdID sensorID, int side)
         };
       };
       //Add digit to the Cluster->Digit relation list
-      digit_weights.push_back(make_pair(sample.getIndex(), sample.getCharge()));
+      digit_weights.push_back(make_pair(sample.getArrayIndex(), sample.getCharge()));
     }
 
     //Store Cluster into Datastore ...

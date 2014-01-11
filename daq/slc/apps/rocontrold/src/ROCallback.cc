@@ -72,7 +72,7 @@ bool ROCallback::pause() throw()
 bool ROCallback::recover() throw()
 {
   Belle2::debug("RECOVER");
-  return (abort() && load());
+  return (abort() && boot() && load());
 }
 
 bool ROCallback::abort() throw()

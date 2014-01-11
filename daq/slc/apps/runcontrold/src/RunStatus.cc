@@ -16,6 +16,7 @@ RunStatus::RunStatus(const std::string& data_name, int revision) throw()
   addInt("end_time", -1);
   addInt("run_config", 0);
   addText("operators", "", 64);
+  addText("comment", "", 512);
 }
 
 int RunStatus::incrementExpNumber() throw()

@@ -14,7 +14,7 @@ RCGUICommunicator::RCGUICommunicator(const TCPSocket& socket,
 {
   RCMaster* master = _callback->getMaster();
   master->lock();
-  master->setMasterCommunicator(this);
+  master->addMasterCommunicator(this);
   master->unlock();
 }
 
@@ -22,7 +22,7 @@ RCGUICommunicator::~RCGUICommunicator() throw()
 {
   RCMaster* master = _callback->getMaster();
   master->lock();
-  master->setMasterCommunicator(NULL);
+  master->removeMasterCommunicator(NULL);
   master->unlock();
 }
 
@@ -147,6 +147,6 @@ void RCGUICommunicator::run()
       }
     }
   } catch (const IOException& e) {
-    //Belle2::debug("%s:%d %s", __FILE__, __LINE__, e.what());
+    Belle2::debug("%s:%d %s", __FILE__, __LINE__, e.what());
   }
 }

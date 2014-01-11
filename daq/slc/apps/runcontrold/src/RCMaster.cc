@@ -1,4 +1,5 @@
 #include "daq/slc/apps/runcontrold/RCMaster.h"
+#include "daq/slc/apps/runcontrold/RCCommunicator.h"
 
 #include <daq/slc/base/Debugger.h>
 #include <daq/slc/base/StringUtil.h>
@@ -38,6 +39,60 @@ void RCMaster::wait() throw()
 void RCMaster::signal() throw()
 {
   _cond.signal();
+}
+
+void RCMaster::addMasterCommunicator(RCCommunicator* comm)
+{
+  _mutex_comm.lock();
+  _master_comm_v.push_back(comm);
+  _mutex_comm.unlock();
+}
+void RCMaster::removeMasterCommunicator(RCCommunicator* comm)
+{
+  _mutex_comm.lock();
+  _master_comm_v.remove(comm);
+  _mutex_comm.unlock();
+}
+
+void RCMaster::sendMessageToMaster(const RunControlMessage& msg) throw()
+{
+  _mutex_comm.lock();
+  for (std::list<RCCommunicator*>::iterator it = _master_comm_v.begin();
+       it != _master_comm_v.end(); it++) {
+    (*it)->sendMessage(msg);
+  }
+  _mutex_comm.unlock();
+}
+
+void RCMaster::sendStateToMaster(NSMNode* node) throw()
+{
+  _mutex_comm.lock();
+  for (std::list<RCCommunicator*>::iterator it = _master_comm_v.begin();
+       it != _master_comm_v.end(); it++) {
+    (*it)->sendState(node);
+  }
+  _mutex_comm.unlock();
+}
+
+void RCMaster::sendDataObjectToMaster(const std::string& name,
+                                      DataObject* data) throw()
+{
+  _mutex_comm.lock();
+  for (std::list<RCCommunicator*>::iterator it = _master_comm_v.begin();
+       it != _master_comm_v.end(); it++) {
+    (*it)->sendDataObject(name, data);
+  }
+  _mutex_comm.unlock();
+}
+
+void RCMaster::sendLogToMaster(const SystemLog& log) throw()
+{
+  _mutex_comm.lock();
+  for (std::list<RCCommunicator*>::iterator it = _master_comm_v.begin();
+       it != _master_comm_v.end(); it++) {
+    (*it)->sendLog(log);
+  }
+  _mutex_comm.unlock();
 }
 
 NSMNode* RCMaster::findNode(int id, const NSMMessage& msg) throw()

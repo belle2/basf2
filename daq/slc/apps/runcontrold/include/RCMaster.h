@@ -13,8 +13,10 @@
 
 #include <daq/slc/base/NSMNode.h>
 #include <daq/slc/base/DataObject.h>
+#include <daq/slc/base/SystemLog.h>
 
 #include <vector>
+#include <list>
 
 namespace Belle2 {
 
@@ -47,9 +49,14 @@ namespace Belle2 {
     void wait() throw();
     void signal() throw();
     RCCommunicator* getClientCommunicator() { return _client_comm; }
-    RCCommunicator* getMasterCommunicator() { return _master_comm; }
     void setClientCommunicator(RCCommunicator* comm) { _client_comm = comm; }
-    void setMasterCommunicator(RCCommunicator* comm) { _master_comm = comm; }
+    void addMasterCommunicator(RCCommunicator* comm);
+    void removeMasterCommunicator(RCCommunicator* comm);
+    void sendMessageToMaster(const RunControlMessage& msg) throw();
+    void sendStateToMaster(NSMNode* node) throw();
+    void sendDataObjectToMaster(const std::string& name,
+                                DataObject* data) throw();
+    void sendLogToMaster(const SystemLog& log) throw();
     NSMNode* getNode() { return _master_node; }
     RunStatus* getStatus() { return _status; }
     RunConfig* getConfig() { return _config; }
@@ -66,7 +73,9 @@ namespace Belle2 {
     RunStatus* _status;
     RunConfig* _config;
     DataObject* _data;
-    RCCommunicator* _master_comm;
+    //RCCommunicator* _master_comm;
+    std::list<RCCommunicator*> _master_comm_v;
+    Mutex _mutex_comm;
     RCCommunicator* _client_comm;
     NSMNodeList _node_v;
     std::map<int, NSMNode*> _node_id_m;

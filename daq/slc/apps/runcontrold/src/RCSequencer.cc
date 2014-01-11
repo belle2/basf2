@@ -42,7 +42,6 @@ void RCSequencer::run() throw()
 {
   __mutex.lock();
   RCCommunicator* comm = _master->getClientCommunicator();
-  RCCommunicator* master_comm = _master->getMasterCommunicator();
   try {
     int num0 = _msg.getMessage().getParam(0);
     for (RCMaster::NSMNodeList::iterator it = _master->getNSMNodes().begin();
@@ -78,9 +77,9 @@ void RCSequencer::run() throw()
           if (node->getConnection() == Connection::ONLINE) {
             node->setState(State::ERROR_ES);
             node->setConnection(Connection::OFFLINE);
-            master_comm->sendState(node);
+            _master->sendStateToMaster(node);
             _master->getNode()->setState(State::ERROR_ES);
-            master_comm->sendState(_master->getNode());
+            _master->sendStateToMaster(_master->getNode());
 
           }
         } else {

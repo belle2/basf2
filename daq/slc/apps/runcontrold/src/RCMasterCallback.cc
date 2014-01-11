@@ -1,3 +1,4 @@
+
 #include "daq/slc/apps/runcontrold/RCMasterCallback.h"
 
 #include "daq/slc/apps/runcontrold/RCCommunicator.h"
@@ -14,6 +15,8 @@
 #include <daq/slc/base/State.h>
 #include <daq/slc/base/StringUtil.h>
 #include <daq/slc/base/Debugger.h>
+
+#include <sstream>
 
 using namespace Belle2;
 
@@ -33,7 +36,7 @@ void RCMasterCallback::init() throw()
   RCNSMCommunicator* com = new RCNSMCommunicator(getNode(),
                                                  getCommunicator());
   _master->lock();
-  _master->setMasterCommunicator(com);
+  _master->addMasterCommunicator(com);
   _master->unlock();
 }
 
@@ -51,7 +54,6 @@ bool RCMasterCallback::distribute(Command command,
   }
   if (node != NULL) {
     RCCommunicator* comm = _master->getClientCommunicator();
-    RCCommunicator* master_comm = _master->getMasterCommunicator();
     if (command == Command::LOAD &&
         num0 < 0 && node->getData() != NULL) {
       msg.getMessage().setParam(0, node->getData()->getConfigNumber());
@@ -61,7 +63,7 @@ bool RCMasterCallback::distribute(Command command,
         if (node->getConnection() == Connection::ONLINE) {
           node->setState(State::ERROR_ES);
           node->setConnection(Connection::OFFLINE);
-          master_comm->sendState(node);
+          _master->sendStateToMaster(node);
         }
       } else {
         if (!comm->sendMessage(msg)) {
@@ -71,7 +73,7 @@ bool RCMasterCallback::distribute(Command command,
           if (state != State::UNKNOWN)
             node->setState(state);
         }
-        master_comm->sendState(node);
+        _master->sendStateToMaster(node);
       }
     } catch (const NSMHandlerException& e) {
       setReply("NSM error");
@@ -93,17 +95,17 @@ bool RCMasterCallback::boot() throw()
 
 bool RCMasterCallback::load() throw()
 {
+  Belle2::debug("LOAD");
   _master->lock();
   _master->getStatus()->update();
   int confno = (getMessage().getNParams() > 0) ? getMessage().getParam(0) : -1;
   confno = _master->getDBManager()->readConfigs(confno);
-  RCCommunicator* comm = _master->getMasterCommunicator();
-  comm->sendDataObject(_master->getNode()->getName(),
-                       _master->getData());
-  comm->sendDataObject(_master->getConfig()->getClassName(),
-                       _master->getConfig());
-  comm->sendDataObject(_master->getStatus()->getClassName(),
-                       _master->getStatus());
+  _master->sendDataObjectToMaster(_master->getNode()->getName(),
+                                  _master->getData());
+  _master->sendDataObjectToMaster(_master->getConfig()->getClassName(),
+                                  _master->getConfig());
+  _master->sendDataObjectToMaster(_master->getStatus()->getClassName(),
+                                  _master->getStatus());
   _master->unlock();
   //trigft();
   return distribute(Command::LOAD, -1, 0, 0);
@@ -111,6 +113,7 @@ bool RCMasterCallback::load() throw()
 
 bool RCMasterCallback::start() throw()
 {
+  Belle2::debug("START");
   NSMMessage& nsm(getMessage());
   int exp_no = nsm.getParam(0);
   int cold_no = nsm.getParam(1);
@@ -118,7 +121,19 @@ bool RCMasterCallback::start() throw()
   _master->lock();
   RunStatus* status = _master->getStatus();
   std::vector<std::string> str_v = Belle2::split(nsm.getData(), ' ');
-  if (str_v.size() > 1) status->setOperators(str_v[1]);
+  if (str_v.size() > 1) {
+    status->setOperators(str_v[1]);
+    std::stringstream ss;
+    for (size_t i = 2; i < str_v.size(); i++) {
+      std::string s = Belle2::replace(str_v[1], "\'", "");
+      s = Belle2::replace(s, "\"", "");
+      s = Belle2::replace(s, "\r\n", "<br/>");
+      s = Belle2::replace(s, "\n", "<br/>");
+      s = Belle2::replace(s, "\r", "<br/>");
+      ss << s << " ";
+    }
+    status->setComment(ss.str());
+  }
   if (exp_no < 0) exp_no = 0;
   if (cold_no < 0) cold_no = status->getColdNumber() + 1;
   status->setExpNumber(exp_no);
@@ -127,29 +142,28 @@ bool RCMasterCallback::start() throw()
   status->setStartTime(Time().getSecond());
   status->setEndTime(-1);
   _master->getDBManager()->writeStatus();
-  RCCommunicator* comm = _master->getMasterCommunicator();
-  comm->sendDataObject(status->getClassName(), status);
+  _master->sendDataObjectToMaster(status->getClassName(), status);
   _master->unlock();
   return distribute(Command::START, exp_no, cold_no, hot_no);
 }
 
 bool RCMasterCallback::stop() throw()
 {
+  Belle2::debug("STOP");
   _master->lock();
   RunStatus* status = _master->getStatus();
   status ->setEndTime(Time().getSecond());
   _master->getDBManager()->writeStatus();
-  RCCommunicator* comm = _master->getMasterCommunicator();
-  comm->sendDataObject(status ->getClassName(), status);
+  _master->sendDataObjectToMaster(status->getClassName(), status);
   _master->unlock();
   return distribute(Command::STOP, 0, 0, 0);
 }
 
 bool RCMasterCallback::trigft() throw()
 {
+  Belle2::debug("TRIGFT");
   _master->lock();
   RCCommunicator* comm = _master->getClientCommunicator();
-  RCCommunicator* master_comm = _master->getMasterCommunicator();
   for (RCMaster::NSMNodeList::iterator it = _master->getNSMNodes().begin();
        it != _master->getNSMNodes().end(); it++) {
     NSMNode* node = *it;
@@ -157,7 +171,7 @@ bool RCMasterCallback::trigft() throw()
       if (node->getConnection() == Connection::ONLINE) {
         node->setState(State::ERROR_ES);
         node->setConnection(Connection::OFFLINE);
-        master_comm->sendState(node);
+        _master->sendStateToMaster(node);
       }
     } else if (node->getData() != NULL && node->getData()->hasObject("ftsw")) {
       DataObject* ftsw = node->getData()->getObject("ftsw");

@@ -48,8 +48,6 @@ bool RCClientCallback::ok() throw()
                             Belle2::form("Node %s connected.", node->getName().c_str())));
     node->setConnection(Connection::ONLINE);
   }
-  RCCommunicator* comm = _master->getMasterCommunicator();
-  //Belle2::debug("[DEBUG] node=%s >> OK", node->getName().c_str());
   RCSequencer::notify();
   bool synchronized = true;
   State state_org = _master->getNode()->getState();
@@ -64,16 +62,16 @@ bool RCClientCallback::ok() throw()
     State& state(node->getState());
     _master->getNode()->setState(state);
     if (state == State::RUNNING_S) {
-      comm->sendLog(SystemLog(getCommunicator()->getNode()->getName(), SystemLog::INFO,
-                              Belle2::form("New run %d was started.", _master->getStatus()->getColdNumber())));
+      _master->sendLogToMaster(SystemLog(getCommunicator()->getNode()->getName(), SystemLog::INFO,
+                                         Belle2::form("New run %d was started.", _master->getStatus()->getColdNumber())));
     }
   }
-  bool result = (comm != NULL) ? comm->sendState(node) : true;
-  if (comm != NULL) comm->sendState(_master->getNode());
+  _master->sendStateToMaster(node);
+  _master->sendStateToMaster(_master->getNode());
   _master->getStatus()->update();
   _master->signal();
   _master->unlock();
-  return result;
+  return true;
 }
 
 bool RCClientCallback::error() throw()
@@ -89,13 +87,12 @@ bool RCClientCallback::error() throw()
   node->setState(State::ERROR_ES);
   node->setConnection(Connection::ONLINE);
   _master->getStatus()->update();
-  RCCommunicator* comm = _master->getMasterCommunicator();
   RunControlMessage msg(node, Command::ERROR, nsm);
-  bool result = (comm != NULL) ? comm->sendMessage(msg) : true;
+  _master->sendMessageToMaster(msg);
   _master->signal();
   _master->unlock();
   Belle2::debug("[ERROR] %s got error (message = %s)", node->getName().c_str(), nsm.getData().c_str());
-  return result;
+  return true;
 }
 
 void RCClientCallback::selfCheck() throw(NSMHandlerException)
@@ -103,7 +100,6 @@ void RCClientCallback::selfCheck() throw(NSMHandlerException)
   _master->lock();
   RCCommunicator* comm = _master->getClientCommunicator();
   RunControlMessage msg(NULL, Command::STATECHECK);
-  RCCommunicator* master_comm = _master->getMasterCommunicator();
   for (RCMaster::NSMNodeList::iterator it = _master->getNSMNodes().begin();
        it != _master->getNSMNodes().end(); it++) {
     NSMNode* node = *it;
@@ -117,9 +113,7 @@ void RCClientCallback::selfCheck() throw(NSMHandlerException)
           comm->sendLog(SystemLog(getCommunicator()->getNode()->getName(), SystemLog::ERROR,
                                   Belle2::form("Node %s got down.", node->getName().c_str())));
           _master->getNode()->setState(State::ERROR_ES);
-          if (master_comm != NULL) {
-            master_comm->sendState(node);
-          }
+          _master->sendStateToMaster(node);
         }
       }
       State& state(node->getState());
@@ -128,23 +122,18 @@ void RCClientCallback::selfCheck() throw(NSMHandlerException)
               !state.isTransaction() && !state.isRecovering())) {
         if (!comm->sendMessage(msg)) {
           _master->getNode()->setState(State::ERROR_ES);
-          if (master_comm != NULL) {
-            master_comm->sendState(node);
-          }
+          _master->sendStateToMaster(node);
         }
       }
     } catch (const IOException& e) {
       Belle2::debug("%s:%d %s", __FILE__, __LINE__, e.what());
       _master->getNode()->setState(State::ERROR_ES);
-      if (master_comm != NULL)
-        master_comm->sendState(_master->getNode());
+      _master->sendStateToMaster(_master->getNode());
       _master->unlock();
       return;
     }
   }
-  if (master_comm != NULL) {
-    master_comm->sendState(_master->getNode());
-  }
+  _master->sendStateToMaster(_master->getNode());
   _requested_once = true;
   _master->unlock();
 }

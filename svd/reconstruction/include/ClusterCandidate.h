@@ -27,7 +27,7 @@ namespace Belle2 {
     class ClusterCandidate {
     public:
       /** Constructor to create an empty Cluster */
-      ClusterCandidate(): m_charge(0), m_seed(0, 0) {};
+      ClusterCandidate(): m_charge(0), m_seed() {};
 
       /** Merge a cluster with this one.
        * Discard all samples of the other cluster and set its charge to 0

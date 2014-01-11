@@ -32,33 +32,40 @@ namespace Belle2 {
        * @param digit Pointer to the digit to be wrapped by this pixel
        * @param index Index of the SVDDigit in the collection
        */
-      Sample(SVDDigit* digit, unsigned int index): m_digit(digit), m_arrayIndex(index) {}
+      Sample(SVDDigit* digit, unsigned int index):
+        m_arrayIndex(index), m_cellID(digit->getCellID()), m_iTime(digit->getIndex()),
+        m_charge(digit->getCharge()) {}
+      /** Bare constructor,
+       * to construct an empty sample, eg. for a seed in ClusterCandidate.
+       */
+      Sample():
+        m_arrayIndex(0), m_cellID(0), m_iTime(0), m_charge(0) {}
       /** Comparison operator */
-      bool operator<(const Sample& b)  const { return getCellID() < b.getCellID() || (getCellID() == b.getCellID() && getSampleIndex() < b.getSampleIndex()); }
+      bool operator<(const Sample& b)  const {
+        return (m_cellID < b.getCellID()) || (m_cellID == b.getCellID() && m_iTime < b.getSampleIndex());
+      }
       /** Equality operator */
-      bool operator==(const Sample& b) const { return getCellID() == b.getCellID() && getSampleIndex() == b.getSampleIndex(); }
-      /** Return the sensorID of the pixel */
-      VxdID getSensorID() const { return m_digit ? m_digit->getSensorID() : VxdID(0); }
-      /** Check whether we have u- or v-strip. */
-      bool isUStrip() const { return m_digit ? m_digit->isUStrip() : true; }
+      bool operator==(const Sample& b) const {
+        return m_cellID == b.getCellID() && m_iTime == b.getSampleIndex();
+      }
       /** Shorthand to get the sample time */
-      short getSampleIndex() const
-      { return m_digit ? m_digit->getIndex() : -1; }
+      short getSampleIndex() const { return m_iTime; }
       /** Shorthand to get the strip ID */
-      unsigned int getCellID() const { return m_digit ? m_digit->getCellID() : -1; }
+      unsigned int getCellID() const { return m_cellID; }
       /** Shorthand to get the sample charge */
-      float getCharge() const { return m_digit ? m_digit->getCharge() : 0;  }
-      /** Return pointer to the wrapped Digit */
-      SVDDigit* getDigit() const { return m_digit; }
+      float getCharge() const { return m_charge; }
       /** Return the index of the Digit in the collection */
       unsigned int getArrayIndex() const { return m_arrayIndex; }
 
     protected:
-      /** Pointer to the wrapped digit */
-      SVDDigit* m_digit;
-      /** Index of the wrapped digit */
+      /** StoreArray index of the digit */
       unsigned int m_arrayIndex;
-
+      /** Strip number of the digit */
+      unsigned int m_cellID;
+      /** Sample number of the digit */
+      unsigned short m_iTime;
+      /** Charge of the digit */
+      float m_charge;
     };
 
   }

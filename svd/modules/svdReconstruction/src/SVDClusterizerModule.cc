@@ -241,12 +241,12 @@ void SVDClusterizerModule::event()
     //Fill sensors
     for (int i = 0; i < nDigits; i++) {
       Sample sample(storeDigits[i], i);
-      VxdID sensorID = sample.getDigit()->getSensorID();
-      int side = sample.getDigit()->isUStrip() ? 0 : 1;
+      VxdID sensorID = storeDigits[i]->getSensorID();
+      int side = storeDigits[i]->isUStrip() ? 0 : 1;
       std::pair<SensorSide::iterator, bool> it = sensors[sensorID][side].insert(sample);
       if (!it.second) {
         B2WARNING("Sample (" << sample.getSampleIndex() << ", "
-                  << sample.getCellID() << "/" << (sample.isUStrip() ? 0 : 1)
+                  << sample.getCellID() << "(" << side
                   << ") in sensor " << static_cast<unsigned short>(sensorID)
                   << " is already set, ignoring second occurrence.");
         continue;
@@ -262,7 +262,7 @@ void SVDClusterizerModule::event()
           findCluster(sample);
         }
         writeClusters(it->first, iSide);
-        it->second[iSide].clear();
+        //it->second[iSide].clear();
       }
     }
   } else {
@@ -275,8 +275,10 @@ void SVDClusterizerModule::event()
     unsigned int lastStrip(0);
     for (int i = 0; i < nDigits; i++) {
       Sample sample(storeDigits[i], i);
+      VxdID thisSensorID = storeDigits[i]->getSensorID();
+      bool thisSide = storeDigits[i]->isUStrip();
       //Load the correct noise map for the first pixel
-      if (i == 0) m_noiseMap.setSensorID(sample.getSensorID());
+      if (i == 0) m_noiseMap.setSensorID(thisSensorID);
       //Ignore digits with insufficient signal
       if (!m_noiseMap(sample, m_cutAdjacent)) continue;
 
@@ -289,11 +291,11 @@ void SVDClusterizerModule::event()
       lastStrip = sample.getCellID();
 
       //Other side or new sensor: write clusters
-      if ((uSide != sample.isUStrip()) || (sensorID != sample.getSensorID())) {
+      if ((uSide != thisSide) || (sensorID != thisSensorID)) {
         writeClusters(sensorID, uSide ? 0 : 1);
         // Reset the guards
-        uSide = sample.isUStrip();
-        sensorID = sample.getSensorID();
+        uSide = thisSide;
+        sensorID = thisSensorID;
         //Load the correct noise map for the new sensor
         m_noiseMap.setSensorID(sensorID);
       }
@@ -431,14 +433,14 @@ void SVDClusterizerModule::writeClusters(VxdID sensorID, int side)
       //Fill map with MCParticle relations
       if (relDigitMCParticle) {
         typedef const RelationIndex<SVDDigit, MCParticle>::Element relMC_type;
-        for (relMC_type & mcRel : relDigitMCParticle.getElementsFrom(sample.getDigit())) {
+        for (relMC_type & mcRel : relDigitMCParticle.getElementsFrom(storeDigits[sample.getArrayIndex()])) {
           mc_relations[mcRel.indexTo] += mcRel.weight;
         };
       };
       //Fill map with SVDTrueHit relations
       if (relDigitTrueHit) {
         typedef const RelationIndex<SVDDigit, SVDTrueHit>::Element relTrueHit_type;
-        for (relTrueHit_type & trueRel : relDigitTrueHit.getElementsFrom(sample.getDigit())) {
+        for (relTrueHit_type & trueRel : relDigitTrueHit.getElementsFrom(storeDigits[sample.getArrayIndex()])) {
           truehit_relations[trueRel.indexTo] += trueRel.weight;
         };
       };
@@ -449,7 +451,7 @@ void SVDClusterizerModule::writeClusters(VxdID sensorID, int side)
     //Store Cluster into Datastore ...
     int clsIndex = storeClusters.getEntries();
     storeClusters.appendNew(SVDCluster(
-                              clusterSeed.getDigit()->getSensorID(), isU, clusterPosition, clusterPositionError, clusterTime, clusterTiimeStd,
+                              sensorID, side == 0, clusterPosition, clusterPositionError, clusterTime, clusterTiimeStd,
                               clusterSeed.getCharge(), clusterCharge, clusterSize
                             ));
 

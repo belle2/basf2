@@ -71,7 +71,7 @@ namespace Belle2 {
     public:
       enum {
         /** Default maximum number of samples per strip that the cache can handle */
-        MAX_SAMPLES = 10
+        MAX_SAMPLES = 50
       };
       /** Create a new cache */
       ClusterCache(unsigned int maxSamples = MAX_SAMPLES);

@@ -44,7 +44,6 @@ namespace Belle2 {
     void ClusterCandidate::merge(ClusterCandidate& cls)
     {
       if (&cls == this) return;
-
       if (cls.m_seed.getCharge() > m_seed.getCharge()) {
         m_seed = cls.m_seed;
       }

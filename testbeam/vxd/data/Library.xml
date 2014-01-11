@@ -38,8 +38,8 @@
       <Theta unit="deg">0</Theta>
       <Phi unit="deg">0</Phi>
       <Psi unit="deg">0</Psi>
-      <HalfX unit="mm">61.450</HalfX>
-      <HalfY unit="mm">28.860</HalfY>
+      <HalfX unit="mm">61.440</HalfX>
+      <HalfY unit="mm">28.8</HalfY>
       <HalfZ unit="um">160</HalfZ>
    </Snippet>
    <Snippet name="SVD_sensor_layer3">
@@ -52,8 +52,8 @@
      <Theta unit="deg">0</Theta>
      <Phi unit="deg">0</Phi>
      <Psi unit="deg">0</Psi>
-     <HalfX unit="mm">60.01</HalfX>
-     <HalfY unit="mm">20.2</HalfY>
+     <HalfX unit="mm">61.44</HalfX>
+     <HalfY unit="mm">19.2</HalfY>
      <HalfZ unit="um">160</HalfZ>
    </Snippet>   
    <Snippet name="SVD_active">

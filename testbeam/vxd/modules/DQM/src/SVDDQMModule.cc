@@ -95,7 +95,7 @@ void SVDDQMModule::defineHisto()
     int iPlane = indexToPlane(i);
     string name = str(format("hHitmapU%1%") % iPlane);
     string title = str(format("Hitmap in U, plane %1%") % iPlane);
-    float length = getInfo(i).getLength();
+    float length = getInfo(i).getWidth();
     int nStrips = getInfo(i).getUCells();
     m_hitMapU[i] = new TH1F(name.c_str(), title.c_str(), nStrips, -0.5 * length, 0.5 * length);
     m_hitMapU[i]->GetXaxis()->SetTitle("u position");
@@ -106,7 +106,7 @@ void SVDDQMModule::defineHisto()
     int iPlane = indexToPlane(i);
     string name = str(format("hHitmapV%1%") % iPlane);
     string title = str(format("Hitmap in V, plane %1%") % iPlane);
-    float width = getInfo(i).getWidth();
+    float width = getInfo(i).getLength();
     int nStrips = getInfo(i).getVCells();
     m_hitMapV[i] = new TH1F(name.c_str(), title.c_str(), nStrips, -0.5 * width, 0.5 * width);
     m_hitMapV[i]->GetXaxis()->SetTitle("v position");
@@ -188,15 +188,15 @@ void SVDDQMModule::defineHisto()
   // Correlations in U + V, 2D Hitmaps
   for (int i = 0; i < c_nSVDPlanes; i++) {
     int iPlane1 = indexToPlane(i);
-    float length1 = getInfo(i).getLength();
+    float length1 = getInfo(i).getWidth();
     int nStripsU1 = getInfo(i).getUCells();
-    float width1 = getInfo(i).getWidth();
+    float width1 = getInfo(i).getLength();
     int nStripsV1 = getInfo(i).getVCells();
     for (int j = 0; j < c_nSVDPlanes; j++) {
       int iPlane2 = indexToPlane(j);
-      float length2 = getInfo(j).getLength();
+      float length2 = getInfo(j).getWidth();
       int nStripsU2 = getInfo(j).getUCells();
-      float width2 = getInfo(j).getWidth();
+      float width2 = getInfo(j).getLength();
       int nStripsV2 = getInfo(j).getVCells();
       if (i == j) {  // hit maps
         string name = str(format("h2HitmapUV%1%") % iPlane2);

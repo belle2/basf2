@@ -11,13 +11,13 @@
 #include "svd/online/SVDOnlineToOfflineMap.h"
 #include <boost/property_tree/xml_parser.hpp>
 #include <framework/logging/Logger.h>
-
+#include <framework/utilities/FileSystem.h>
 using namespace Belle2;
 using namespace std;
 using boost::property_tree::ptree;
 
 
-SVDOnlineToOfflineMap::SVDOnlineToOfflineMap(const string& xml_filename)
+SVDOnlineToOfflineMap::SVDOnlineToOfflineMap(const string& xmlFilename)
 {
 
   // Create an empty property tree object
@@ -26,14 +26,48 @@ SVDOnlineToOfflineMap::SVDOnlineToOfflineMap(const string& xml_filename)
 
   // Load the XML file into the property tree. If reading fails
   // (cannot open file, parse error), an exception is thrown.
-  read_xml(xml_filename, propertyTree);
+  string xmlFullPath = FileSystem::findFile(xmlFilename);
 
-  // traverse pt: let us navigate through the daughters of <SVD>
-  for (ptree::value_type const & v : propertyTree.get_child("SVD")) {
-    // if the daughter is a <layer> then read it!
-    if (v.first == "layer")
-      ReadLayer(v.second.get<int>("<xmlattr>.n"), v.second);
+  if (! FileSystem::fileExists(xmlFullPath)) {
+    B2ERROR("The xml filename: " << xmlFilename << endl <<
+            "resolved to: " << xmlFullPath << endl <<
+            "by FileSystem::findFile does not exist." << endl <<
+            "SVD online to offline map cannot be initialized." << endl <<
+            "Be aware: no SVDDigit will be produced by this module." << endl
+           );
+    return;
   }
+
+  try {
+    read_xml(xml_filename, propertyTree);
+  } catch (std::exception const& ex) {
+    B2ERROR("STD excpetion rised during xml parsing " << ex.what() << endl <<
+            "SVD online to offline map cannot be initialized." << endl <<
+            "Be aware: no SVDDigits will be produced by this module." << endl);
+    return;
+  } catch (...) {
+    B2ERROR("Unknown excpetion rised during xml parsing "
+            "SVD online to offline map cannot be initialized." << endl <<
+            "Be aware: no SVDDigits will be produced by this module." << endl);
+    return;
+  }
+
+  try {
+    // traverse pt: let us navigate through the daughters of <SVD>
+    for (ptree::value_type const & v : propertyTree.get_child("SVD")) {
+      // if the daughter is a <layer> then read it!
+      if (v.first == "layer")
+        ReadLayer(v.second.get<int>("<xmlattr>.n"), v.second);
+    }
+  } catch (...) {
+    B2ERROR("Unknown excpetion rised during map initialization! "
+            "SVD online to offline map corrupted." << endl <<
+            "Be aware: the SVDDigits will be unreliable." << endl);
+    // To Do: rise an exception so that the calling module will skip the
+    // SVDDigits filling
+    return;
+  }
+
 }
 
 

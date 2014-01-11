@@ -201,6 +201,15 @@ void NSMCommunicator::sendError(const std::string& message) throw(NSMHandlerExce
 #endif
 }
 
+void NSMCommunicator::sendFatal(const std::string& message) throw(NSMHandlerException)
+{
+#if NSM_PACKAGE_VERSION >= 1914
+  if (_rc_node != NULL) {
+    sendRequest(_rc_node, Command::FATAL, 0, NULL, message);
+  }
+#endif
+}
+
 void NSMCommunicator::sendState() throw(NSMHandlerException)
 {
   if (_rc_node != NULL) {

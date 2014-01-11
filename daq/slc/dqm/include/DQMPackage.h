@@ -3,6 +3,8 @@
 
 #include "daq/slc/dqm/MonitorPackage.h"
 #include "daq/slc/dqm/DQMHistMap.h"
+#include <daq/slc/dqm/MonColor.h>
+#include <daq/slc/dqm/Histo.h>
 
 #include <string>
 #include <map>
@@ -21,6 +23,10 @@ namespace Belle2 {
     const std::string& getFileName() { return _file_name; }
     void setHistMap(DQMHistMap* hist_m);
     DQMHistMap* getHistMap() { return _hist_m; }
+
+  private:
+    Histo* makeHisto(TH1* h) throw();
+    MonColor makeColor(int num) throw();
 
   private:
     std::string _file_name;

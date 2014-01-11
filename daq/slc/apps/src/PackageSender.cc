@@ -71,24 +71,32 @@ void PackageSender::run()
     _xml_v = std::vector<std::string>();
     _update_id_v = std::vector<int>();
 
-    writer.writeInt(FLAG_LIST);
-    writer.writeInt((int)_master->getManagers().size());
+    std::vector<PackageManager*> manager_v;
     for (size_t i = 0; i < _master->getManagers().size(); i++) {
-      PackageManager* manager = _master->getManager(i);
-      writer.writeString(manager->getName());
+      if (_master->getManager(i)->isAvailable()) {
+        manager_v.push_back(_master->getManager(i));
+      }
+    }
+    writer.writeInt(FLAG_LIST);
+    writer.writeInt((int)manager_v.size());
+    for (size_t i = 0; i < manager_v.size(); i++) {
+      if (manager_v[i]->isAvailable())
+        writer.writeString(manager_v[i]->getName());
     }
     std::vector<bool> monitored_v;
     int npacks = 0;
     std::map<int, int> id_m;
-    for (size_t i = 0; i < _master->getManagers().size(); i++) {
-      bool monitored = (bool)reader.readChar();
-      monitored_v.push_back(monitored);
-      id_m.insert(std::map<int, int>::value_type(i, npacks));
-      if (monitored) npacks++;
+    for (size_t i = 0; i < manager_v.size(); i++) {
+      if (manager_v[i]->isAvailable()) {
+        bool monitored = (bool)reader.readChar();
+        monitored_v.push_back(monitored);
+        id_m.insert(std::map<int, int>::value_type(i, npacks));
+        if (monitored) npacks++;
+      }
     }
 
-    for (size_t i = 0; i < _master->getManagers().size(); i++) {
-      PackageManager* manager = _master->getManager(i);
+    for (size_t i = 0; i < manager_v.size(); i++) {
+      PackageManager* manager = manager_v[i];
       size_t size = 0, count;
       char* buf = manager->createConfig(size);
       count = manager->copyConfig(buf, size);

@@ -4,7 +4,11 @@ using namespace Belle2;
 
 void DQMHistMap::addHist(TH1* hist)
 {
-  _hist_m.insert(TH1Map::value_type(hist->GetName(), hist));
+  if (!hasHist(hist->GetName())) {
+    _hist_m.insert(TH1Map::value_type(hist->GetName(), hist));
+  } else {
+    _hist_m[hist->GetName()] = hist;
+  }
 }
 
 TH1* DQMHistMap::getHist(const std::string& name)

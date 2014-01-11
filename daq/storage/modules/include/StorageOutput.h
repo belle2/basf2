@@ -21,6 +21,8 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 
+#include <daq/slc/system/Time.h>
+
 #include <string>
 
 #include <sys/time.h>
@@ -81,17 +83,13 @@ namespace Belle2 {
     SeqFile* m_file;
 
     //! Total nr. of events in the file
-    int m_nevt;
+    int m_nevts;
 
     //! Messaage handler
     MsgHandler* m_msghandler;
 
     //! DataStoreStreamer
     DataStoreStreamer* m_streamer;
-
-    //! Time
-    struct timeval m_t0; /**< time at begin of current run. */
-    struct timeval m_tend; /**< time at end of current run. */
 
     //! Data flow
     double m_size; /**< total transferred data, in kB. */
@@ -103,6 +101,9 @@ namespace Belle2 {
 
     //! Event interval to dump output in RingBuffer
     int m_interval;
+    Time m_t0;
+    double m_datasize;
+    Time m_tend;
 
   };
 } // end namespace Belle2

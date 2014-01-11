@@ -16,7 +16,7 @@
 #include <framework/pcore/DataStoreStreamer.h>
 
 #include <daq/slc/system/PThread.h>
-#include <daq/slc/readout/ProcessStatusBuffer.h>
+#include <daq/slc/readout/RunInfoBuffer.h>
 #include <daq/storage/BinData.h>
 
 #include "daq/storage/modules/StorageRBufferManager.h"
@@ -62,7 +62,7 @@ namespace Belle2 {
     StorageRBufferManager* m_buf;
     MsgHandler* m_msghandler;
     DataStoreStreamer* m_streamer;
-    ProcessStatusBuffer m_status;
+    RunInfoBuffer m_info;
     bool m_running;
     int m_compressionLevel;
     int m_nrecv;

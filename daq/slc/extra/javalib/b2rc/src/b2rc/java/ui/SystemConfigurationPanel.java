@@ -1,5 +1,6 @@
 package b2rc.java.ui;
 
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
@@ -22,6 +23,8 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
 import javax.swing.border.EtchedBorder;
@@ -39,6 +42,8 @@ import b2rc.java.io.RunTypeConfigTree;
 public class SystemConfigurationPanel extends JPanel implements Updatable {
 
 	private static final long serialVersionUID = 1L;
+	private static final String BR = System.getProperty("line.separator");
+
 	private JTextField _text_operator1;
 	private JTextField _text_operator2;
 	private JButton _button_run_type;
@@ -46,7 +51,7 @@ public class SystemConfigurationPanel extends JPanel implements Updatable {
 	private ControlMainPanel _main_panel;
 	private JLabel _label_run_type;
 	private JComboBox _combo_version;
-	private JLabel _label_description_contents;
+	private JTextArea _label_description_contents;
 	private HashMap<String, ArrayList<Integer>> _run_type_v_m;
 	private int _version_old = 0;
 	private int _version_max = -1;
@@ -80,22 +85,22 @@ public class SystemConfigurationPanel extends JPanel implements Updatable {
 		GridBagLayout layout = new GridBagLayout();
 		GridBagConstraints gbc = new GridBagConstraints();
 		setLayout(layout);
-
+		/*
 		setGrid(gbc, 0, 0, 0.2d, 0.1d, GridBagConstraints.BOTH,
 				GridBagConstraints.WEST, new Insets(0, 5, 0, 5));
 		JLabel label_operation_mode = new JLabel("Operation mode:");
 		label_operation_mode.setFont(new Font("Sans", Font.PLAIN, 13));
 		layout.setConstraints(label_operation_mode, gbc);
 		add(label_operation_mode);
-
-		setGrid(gbc, 0, 1, 0.2d, 0.1d, GridBagConstraints.BOTH,
+		 */
+		setGrid(gbc, 0, 0, 0.2d, 0.1d, GridBagConstraints.BOTH,
 				GridBagConstraints.LINE_START, new Insets(0, 5, 0, 5));
 		JLabel label_operators = new JLabel("Operators:");
 		label_operators.setFont(new Font("Sans", Font.PLAIN, 13));
 		layout.setConstraints(label_operators, gbc);
 		add(label_operators);
 
-		setGrid(gbc, 1, 1, 0.2d, 0.1d, GridBagConstraints.NONE,
+		setGrid(gbc, 1, 0, 0.2d, 0.1d, GridBagConstraints.NONE,
 				GridBagConstraints.LINE_START, new Insets(0, 5, 0, 5));
 		_text_operator1 = new JTextField();
 		_text_operator1.setPreferredSize(new Dimension(180, 30));
@@ -115,7 +120,7 @@ public class SystemConfigurationPanel extends JPanel implements Updatable {
 		layout.setConstraints(_text_operator1, gbc);
 		add(_text_operator1);
 
-		setGrid(gbc, 1, 2, 0.2d, 0.1d, GridBagConstraints.NONE,
+		setGrid(gbc, 1, 1, 0.2d, 0.1d, GridBagConstraints.NONE,
 				GridBagConstraints.LINE_START, new Insets(0, 5, 0, 5));
 		_text_operator2 = new JTextField();
 		_text_operator2.setPreferredSize(new Dimension(180, 30));
@@ -135,7 +140,7 @@ public class SystemConfigurationPanel extends JPanel implements Updatable {
 		layout.setConstraints(_text_operator2, gbc);
 		add(_text_operator2);
 
-		setGrid(gbc, 0, 3, 0.2d, 0.1d, GridBagConstraints.NONE,
+		setGrid(gbc, 0, 2, 0.2d, 0.1d, GridBagConstraints.NONE,
 				GridBagConstraints.LINE_START, new Insets(0, 5, 0, 5));
 		_button_run_type = new JButton("Run type");
 		_button_run_type.setFont(new Font("Sans", Font.PLAIN, 13));
@@ -199,21 +204,21 @@ public class SystemConfigurationPanel extends JPanel implements Updatable {
 		layout.setConstraints(_button_run_type, gbc);
 		add(_button_run_type);
 
-		setGrid(gbc, 1, 3, 0.2d, 0.1d, GridBagConstraints.BOTH,
+		setGrid(gbc, 1, 2, 0.2d, 0.1d, GridBagConstraints.BOTH,
 				GridBagConstraints.LINE_START, new Insets(0, 5, 0, 5));
 		_label_run_type = new JLabel("empty");
 		_label_run_type.setFont(new Font("Sans", Font.BOLD, 13));
 		layout.setConstraints(_label_run_type, gbc);
 		add(_label_run_type);
 
-		setGrid(gbc, 0, 4, 0.2d, 0.1d, GridBagConstraints.BOTH,
+		setGrid(gbc, 0, 3, 0.2d, 0.1d, GridBagConstraints.BOTH,
 				GridBagConstraints.LINE_START, new Insets(0, 5, 0, 5));
 		JLabel label_version = new JLabel("Version:");
 		label_version.setFont(new Font("Sans", Font.PLAIN, 13));
 		layout.setConstraints(label_version, gbc);
 		add(label_version);
 
-		setGrid(gbc, 1, 4, 0.2d, 0.1d, GridBagConstraints.NONE,
+		setGrid(gbc, 1, 3, 0.2d, 0.1d, GridBagConstraints.NONE,
 				GridBagConstraints.LINE_START, new Insets(0, 5, 0, 5));
 		String[] combodata = { "latest", "0" };
 		DefaultComboBoxModel model_version = new DefaultComboBoxModel(combodata);
@@ -245,19 +250,34 @@ public class SystemConfigurationPanel extends JPanel implements Updatable {
 
 		setGrid(gbc, 2, 1, 0, 5, 0.2d, 0.1d, GridBagConstraints.BOTH,
 				GridBagConstraints.LINE_START, new Insets(0, 5, 0, 5));
-		JLabel label_description = new JLabel("Description:");
+		JLabel label_description = new JLabel("Comment:");
 		label_description.setFont(new Font("Sans", Font.PLAIN, 13));
 		layout.setConstraints(label_description, gbc);
 		add(label_description);
 
-		setGrid(gbc, 2, 1, 0, 6, 0.2d, 0.6d, GridBagConstraints.NONE,
-				GridBagConstraints.FIRST_LINE_START, new Insets(0, 20, 0, 10));
-		_label_description_contents = new JLabel("");
+		setGrid(gbc, 2, 1, 0, 6, 0.2d, 0.6d, GridBagConstraints.BOTH,
+				GridBagConstraints.FIRST_LINE_START, new Insets(0, 10, 10, 10));
+		_label_description_contents = new JTextArea("");
 		_label_description_contents.setFont(new Font("Sans", Font.PLAIN, 13));
-		layout.setConstraints(_label_description_contents, gbc);
-		add(_label_description_contents);
+		JScrollPane scrollpanel = new JScrollPane();
+		scrollpanel.setViewportView(_label_description_contents);
+		scrollpanel.setCursor(Cursor.getPredefinedCursor(Cursor.TEXT_CURSOR));
+		layout.setConstraints(scrollpanel, gbc);
+		add(scrollpanel);
 		setOperators(_master.getStatus().getOperators());
-		setDescription(_master.getConfig().getDescription());
+		setDescription(_master.getStatus().getComment());
+		_label_description_contents.addKeyListener(new KeyListener() {
+			public void keyPressed(KeyEvent arg0) {
+			}
+
+			public void keyReleased(KeyEvent arg0) {
+				_master.getStatus().setComment(_label_description_contents.getText().replace(BR, "<br/>"));
+				update();
+			}
+
+			public void keyTyped(KeyEvent arg0) {
+			}
+		});
 	}
 
 	private void setDescription(String description) {
@@ -274,14 +294,16 @@ public class SystemConfigurationPanel extends JPanel implements Updatable {
 			_text_operator2.setEditable(true);
 			_button_run_type.setEnabled(_master.getStatus().getOperators().length()>0);
 			_combo_version.setEnabled(_version_old >= 0);
+			_label_description_contents.setEnabled(true);
 		} else {
 			_text_operator1.setEditable(false);
 			_text_operator2.setEditable(false);
+			_label_description_contents.setEnabled(false);
 			_button_run_type.setEnabled(false);
 			_combo_version.setEnabled(false);
 		}
 		_label_run_type.setText(_master.getConfig().getRunType());
-		setDescription(_master.getConfig().getDescription());
+		//setDescription(_master.getConfig().getDescription());
 	}
 
 	public JComboBox getComboVersion() {

@@ -31,19 +31,19 @@ CprErrorMessage::~CprErrorMessage()
 }
 
 
-void CprErrorMessage::PrintError(const int shmflag, ProcessStatusBuffer* nsm_status, string err_str)
+void CprErrorMessage::PrintError(const int shmflag, RunInfoBuffer* nsm_status, string err_str)
 {
   if (shmflag > 0) {
-    nsm_status->reportFatal(err_str);
+    nsm_status->reportError();
   }
   PrintError(err_str.c_str());
 }
 
-void CprErrorMessage::PrintError(const int shmflag, ProcessStatusBuffer* nsm_status, char* err_message, const char* file, const char* func_name, const int line)
+void CprErrorMessage::PrintError(const int shmflag, RunInfoBuffer* nsm_status, char* err_message, const char* file, const char* func_name, const int line)
 {
   string err_str = err_message;
   if (shmflag > 0) {
-    nsm_status->reportFatal(err_str);
+    nsm_status->reportError();
   }
   PrintError(err_message, file, func_name, line);
 }

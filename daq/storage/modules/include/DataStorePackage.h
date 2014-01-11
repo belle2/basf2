@@ -18,6 +18,9 @@ namespace Belle2 {
 
   class DataStorePackage {
 
+  public:
+    static const unsigned int MAX_BUFFER_WORDS = 40000;
+
   private:
     static Mutex g_mutex;
     static bool g_init;
@@ -32,8 +35,11 @@ namespace Belle2 {
       m_data.setBuffer(m_buf);
       m_data_hlt.setBuffer(NULL);
       m_data_pxd.setBuffer(NULL);
+      m_buf = new int [MAX_BUFFER_WORDS];
     }
-    ~DataStorePackage() {}
+    ~DataStorePackage() {
+      delete m_buf;
+    }
 
   public:
     void decode(MsgHandler& msghandler, BinData& data);
@@ -60,7 +66,7 @@ namespace Belle2 {
     BinData m_data;
     BinData m_data_hlt;
     BinData m_data_pxd;
-    int m_buf[20000];
+    int* m_buf;
 
   };
 

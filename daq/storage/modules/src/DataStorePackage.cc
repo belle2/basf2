@@ -21,7 +21,7 @@ bool DataStorePackage::g_init = false;
 
 void DataStorePackage::decode(MsgHandler& msghandler, BinData& data)
 {
-  if (sizeof(m_buf) < data.getByteSize()) {
+  if (data.getWordSize() > MAX_BUFFER_WORDS) {
     B2ERROR(__FILE__ << ":" << __LINE__ << " Too large data size " << data.getByteSize());
     return ;
   }
@@ -29,7 +29,8 @@ void DataStorePackage::decode(MsgHandler& msghandler, BinData& data)
   m_data.setBuffer(m_buf);
   m_data_hlt.setBuffer(m_data.getBody());
   bool contains_sub = true;
-  if (m_data_hlt.getTrailerMagic() != BinData::TRAILER_MAGIC) {
+  if (m_data_hlt.getWordSize() > MAX_BUFFER_WORDS ||
+      m_data_hlt.getTrailerMagic() != BinData::TRAILER_MAGIC) {
     m_data_hlt.setBuffer(m_data.getBuffer());
     contains_sub = false;
   }
@@ -41,7 +42,7 @@ void DataStorePackage::decode(MsgHandler& msghandler, BinData& data)
   m_narrays = (msg->header())->reserved[2];
   m_durability = (DataStore::EDurability)(msg->header())->reserved[0];
   if (contains_sub && m_data.getBodyByteSize() > m_data_hlt.getByteSize()) {
-    m_data_pxd.setBuffer(m_data.getBody() + m_data_hlt.getWordSize());
+    m_data_pxd.setBuffer(m_data.getBuffer() + m_data_hlt.getWordSize() + m_data.getHeaderWordSize());
   } else {
     m_data_pxd.setBuffer(NULL);
   }
@@ -83,7 +84,10 @@ void DataStorePackage::restore()
   }
   if (m_data_pxd.getBuffer() != NULL) {
     StoreArray<RawPXD> rawpxdary;
-    rawpxdary.appendNew(RawPXD((int*)m_data_pxd.getBody(), m_data_pxd.getByteSize()));
+    //printf("%04x %04x %04x %d\n", m_data_pxd.getBuffer()[0],
+    //m_data_pxd.getBuffer()[11], m_data_pxd.getBuffer()[13], m_data_pxd.getByteSize());
+    //rawpxdary.appendNew(RawPXD((int*)m_data_pxd.getBuffer(), m_data_pxd.getByteSize()));
+    rawpxdary.appendNew(RawPXD((int*)m_data_pxd.getBody(), m_data_pxd.getBodyByteSize()));
   }
   g_mutex.unlock();
 }
@@ -105,8 +109,8 @@ void DataStorePackage::copy(DataStorePackage& package)
   m_narrays = package.m_narrays;
   m_durability = package.m_durability;
   if (contains_sub && package.m_data_pxd.getBuffer() != NULL) {
-    int nword = package.m_data_hlt.getWordSize();
-    m_data_pxd.setBuffer(m_data.getBody() + nword);
+    int nword = package.m_data_hlt.getWordSize() + package.m_data.getHeaderWordSize();
+    m_data_pxd.setBuffer(m_data.getBuffer() + nword);
   } else {
     m_data_pxd.setBuffer(NULL);
   }

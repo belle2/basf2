@@ -40,7 +40,7 @@ public class RCMainFrame extends JFrame implements Updatable {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		setSize(820, 720);
+		setSize(940, 720);
 		setTitle("Belle-II Run controller version " + Belle2RunController.VERSION);
 		setLocationRelativeTo(null);
 		setIconImage(Toolkit.getDefaultToolkit().createImage(getClass().getResource("runcontrol.png")));

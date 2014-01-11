@@ -76,7 +76,7 @@ public class SystemButtonPanel extends JPanel implements Updatable {
 					pars[0] = -1;
 					pars[1] = -1;
 					if (_command.equals(RCCommand.START) ) {
-						data +=  " " + _master.getStatus().getOperators();
+						data +=  " " + _master.getStatus().getOperators() + " " + _master.getStatus().getComment();
 					}
 					com.sendMessage(new RunControlMessage(_command, pars, data));
 				}

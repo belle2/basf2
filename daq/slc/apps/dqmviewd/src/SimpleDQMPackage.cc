@@ -22,10 +22,6 @@ SimpleDQMPackage:: ~SimpleDQMPackage() throw()
 
 void SimpleDQMPackage::init()
 {
-}
-
-void SimpleDQMPackage::update()
-{
   TabbedPanel* tabpanel = new TabbedPanel("tab_main");
   getRootPanel()->add(tabpanel);
   for (int i = 0; i < getPackage()->getNHistos(); i++) {
@@ -35,4 +31,8 @@ void SimpleDQMPackage::update()
     canvas->add(histo);
     tabpanel->add(histo->getTitle(), canvas);
   }
+}
+
+void SimpleDQMPackage::update()
+{
 }

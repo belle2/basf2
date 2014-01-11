@@ -1,7 +1,7 @@
 #ifndef _Belle2_ProcessController_h
 #define _Belle2_ProcessController_h
 
-#include "daq/slc/readout/ProcessStatusBuffer.h"
+#include "daq/slc/readout/RunInfoBuffer.h"
 
 #include "daq/slc/nsm/RCCallback.h"
 
@@ -34,9 +34,7 @@ namespace Belle2 {
     bool abort();
     const std::string& getName() { return _name; }
     const std::string& getExecutable() { return _exename; }
-    ProcessStatusBuffer& getMessanger() { return _msg; }
-    RunInfoBuffer& getInfo() { return _msg.getInfo(); }
-    ProcessLogBuffer& getLog() { return _msg.getLog(); }
+    RunInfoBuffer& getInfo() { return _info; }
     RCCallback* getCallback() { return _callback; }
     const Fork& getFork() const { return  _fork; }
     void setCallback(RCCallback* callback) { _callback = callback; }
@@ -44,13 +42,15 @@ namespace Belle2 {
     void setExecutable(const std::string& exe) { _exename = exe; }
     void addArgument(const std::string& arg) { _arg_v.push_back(arg); }
     void clearArguments() { _arg_v = std::vector<std::string>(); }
+    const State& getState() const { return _state; }
+    void setState(const State& state) { _state = state; }
 
   public:
     void lock() { _mutex.lock(); }
     void unlock() { _mutex.unlock(); }
 
   private:
-    ProcessStatusBuffer _msg;
+    RunInfoBuffer _info;
     std::string _name;
     RCCallback* _callback;
     std::string _exename;
@@ -59,20 +59,25 @@ namespace Belle2 {
     PThread _thread;
     Mutex _mutex;
     std::string _message;
+    State _state;
 
   };
 
   class ProcessSubmitter {
 
   public:
-    ProcessSubmitter(ProcessController* con)
-      : _con(con) {}
+    ProcessSubmitter(ProcessController* con, int iopipe[2])
+      : _con(con) {
+      _iopipe[0] = iopipe[0];
+      _iopipe[1] = iopipe[1];
+    }
 
   public:
     void run();
 
   private:
     ProcessController* _con;
+    int _iopipe[2];
 
   };
 

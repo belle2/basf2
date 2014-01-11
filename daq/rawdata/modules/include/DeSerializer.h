@@ -24,7 +24,7 @@
 #include <framework/dataobjects/EventMetaData.h>
 
 #include <daq/dataflow/EvtSocket.h>
-#include <daq/slc/readout/ProcessStatusBuffer.h>
+#include <daq/slc/readout/RunInfoBuffer.h>
 #include <daq/rawdata/CprErrorMessage.h>
 
 #include <rawdata/dataobjects/RawDataBlock.h>
@@ -211,7 +211,7 @@ namespace Belle2 {
     int m_shmfd_sta;
 
     //! buffer class to communicate with NSM client
-    ProcessStatusBuffer m_status;
+    RunInfoBuffer m_status;
 
     //! buffer for shared memory
     //int* m_cfg_buf;

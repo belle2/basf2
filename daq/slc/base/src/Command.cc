@@ -24,6 +24,7 @@ const Command Command::ACTIVATE(404, "ACTIVATE", "ACTIVATE");
 const Command Command::INACTIVATE(405, "INACTIVATE", "INACTIVATE");
 const Command Command::OK(1, "OK", "OK");
 const Command Command::ERROR(2, "ERROR", "ERROR");
+const Command Command::FATAL(3, "FATAL", "FATAL");
 
 const Command& Command::operator=(const std::string& label) throw()
 {
@@ -41,6 +42,7 @@ const Command& Command::operator=(const std::string& label) throw()
   else if (label == LOG._label) *this = LOG;
   else if (label == OK.getLabel()) *this = OK;
   else if (label == ERROR.getLabel()) *this = ERROR;
+  else if (label == FATAL.getLabel()) *this = FATAL;
   else if (label == DATA.getLabel()) *this = DATA;
   else if (label == SAVE.getLabel()) *this = SAVE;
   else if (label == RECALL.getLabel()) *this = RECALL;
@@ -66,6 +68,7 @@ const Command& Command::operator=(int id) throw()
   else if (id == LOG._id) *this = LOG;
   else if (id == OK.getId()) *this = OK;
   else if (id == ERROR.getId()) *this = ERROR;
+  else if (id == FATAL.getId()) *this = FATAL;
   else if (id == DATA.getId()) *this = DATA;
   else if (id == SAVE.getId()) *this = SAVE;
   else if (id == RECALL.getId()) *this = RECALL;
@@ -105,7 +108,7 @@ int Command::isAvailable(const State& state) const throw()
   } else if (*this == RECOVER || *this == STATECHECK || *this == STATE ||
              *this == OK || *this == TRIGFT || *this == DATA ||
              *this == SAVE || *this == RECALL || *this == ACTIVATE ||
-             *this == INACTIVATE || *this == RECOVER ||
+             *this == INACTIVATE || *this == RECOVER || *this == FATAL ||
              *this == ERROR || *this == ABORT || *this == LOG) {
     return ENABLED;
   } else if (state == State::ERROR_ES) {

@@ -15,6 +15,7 @@ public class SystemControlSummaryPanel extends JPanel implements Updatable {
 
 	private SystemConfigurationPanel _sys_config_panel;
 	private SystemStatusPanel _sys_status_panel;
+	private RCNodeGroupViewPanel _node_state_panel;
 	private RCMaster _master;
 	private ControlMainPanel _main_panel;
 
@@ -22,6 +23,8 @@ public class SystemControlSummaryPanel extends JPanel implements Updatable {
 		_main_panel = main_panel;
 		_master = master;
 		_sys_status_panel = new SystemStatusPanel(_master);
+		_node_state_panel = new RCNodeGroupViewPanel(_master);
+
 		GridBagLayout layout = new GridBagLayout();
 		GridBagConstraints gbc = new GridBagConstraints();
 		setLayout(layout);
@@ -43,11 +46,22 @@ public class SystemControlSummaryPanel extends JPanel implements Updatable {
 		gbc.insets = new Insets(5, 5, 5, 5);
 		layout.setConstraints(_sys_status_panel, gbc);
 		add(_sys_status_panel);
+
+		_node_state_panel.init();
+		gbc.gridx = 2;
+		gbc.gridy = 0;
+		gbc.weightx = 0.8d;
+		gbc.weighty = 1.0d;
+		gbc.fill = GridBagConstraints.BOTH;
+		gbc.insets = new Insets(5, 5, 5, 5);
+		layout.setConstraints(_node_state_panel, gbc);
+		add(_node_state_panel);
 	}
 
 	public void update() {
 		_sys_config_panel.update();
 		_sys_status_panel.update();
+		_node_state_panel.update();
 	}
 
 	public SystemConfigurationPanel getConfigurationPanel() {

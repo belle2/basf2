@@ -6,7 +6,9 @@
 // Date : 2 - Aug - 2013
 //-
 #include <daq/rawdata/modules/MonitorDataCOPPER.h>
+#include <rawdata/dataobjects/RawSVD.h>
 
+#include <cstdio>
 
 using namespace std;
 using namespace Belle2;
@@ -116,7 +118,8 @@ void MonitorDataCOPPERModule::event()
 
   //StoreArray<RawCOPPER> rawcprarray;
   //StoreArray<RawCDC> raw_dblkarray;
-  StoreArray<RawDataBlock> raw_dblkarray;
+  //StoreArray<RawDataBlock> raw_dblkarray;
+  StoreArray<RawSVD> raw_dblkarray;
 
   int ncpr = raw_dblkarray.getEntries();
   for (int j = 0; j < ncpr; j++) {

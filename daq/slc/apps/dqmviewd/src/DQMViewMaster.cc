@@ -21,9 +21,9 @@ void DQMViewMaster::run()
 {
   std::vector<DQMFileReader*> reader_v;
   for (size_t i = 0; i < _manager_v.size(); i++) {
-    DQMPackageUpdater* updater = new DQMPackageUpdater(i, _manager_v[i], this);
-    _updater_v.push_back(updater);
-    PThread((DQMPackageUpdater*)updater);
+    //DQMPackageUpdater* updater = new DQMPackageUpdater(i, _manager_v[i], this);
+    //_updater_v.push_back(updater);
+    //PThread((DQMPackageUpdater*)updater);
     reader_v.push_back(NULL);
   }
   while (true) {
@@ -35,18 +35,20 @@ void DQMViewMaster::run()
       if (::stat(filename.c_str(), &st) == 0) {
         if (!_manager_v[i]->isAvailable()) {
           DQMFileReader* reader = new DQMFileReader();
-          if (!reader->init(filename.c_str(), _manager_v[i]->getPackage())) {
+          if (!reader->init(filename.c_str())) {
             delete reader;
             Belle2::debug("No entry was found in %s", filename.c_str());
             continue;
           }
           Belle2::debug("Histo entries was found in %s", filename.c_str());
+          monitor->setHistMap(reader->getHistMap());
           reader_v[i] = reader;
           _manager_v[i]->init();
-          _updater_v[i]->start();
+          //_updater_v[i]->start();
         }
         if (reader_v[i] != NULL) {
           reader_v[i]->update(_manager_v[i]->getPackage());
+          _manager_v[i]->update();
           signal(i);
         }
       }

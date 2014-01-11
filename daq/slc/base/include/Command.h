@@ -14,6 +14,7 @@ namespace Belle2 {
     static const Command UNKNOWN;
     static const Command OK;
     static const Command ERROR;
+    static const Command FATAL;
     static const Command BOOT;
     static const Command LOAD;
     static const Command START;

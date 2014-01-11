@@ -35,6 +35,7 @@
 #include <rawdata/dataobjects/RawEPID.h>
 #include <rawdata/dataobjects/RawECL.h>
 #include <rawdata/dataobjects/RawKLM.h>
+#include <rawdata/dataobjects/RawPXD.h>
 
 #include <daq/dataobjects/SendHeader.h>
 #include <daq/dataobjects/SendTrailer.h>
@@ -72,6 +73,7 @@ namespace Belle2 {
     virtual void printCOPPEREvent(RawCOPPER* raw_array, int i);
     virtual void printFTSWEvent(RawDataBlock* raw_array, int i);
     virtual void printBuffer(int* buf, int nwords);
+    virtual void printPXDEvent(RawPXD* raw_pxd);
 
   protected :
     //!Compression parameter

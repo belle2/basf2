@@ -5,6 +5,8 @@
 #include "daq/slc/nsm/RCCallback.h"
 #include "daq/slc/nsm/NSMCommunicator.h"
 
+#include "daq/slc/system/LogFile.h"
+
 #include "daq/slc/base/Debugger.h"
 #include "daq/slc/base/StringUtil.h"
 
@@ -15,25 +17,28 @@ void ProcessListener::run()
   Fork forkid = _con->getFork();
   std::string process_name = _con->getName();
   if (forkid.wait() < 0) {
-    Belle2::debug("[DEBU] Failed to wait for forked process %s", process_name.c_str());
+    LogFile::fatal("Failed to wait forked process %s", process_name.c_str());
     return;
   }
   _con->lock();
   NSMCommunicator* comm = _con->getCallback()->getCommunicator();
   NSMNode* node = _con->getCallback()->getNode();
-  int state = _con->getMessanger().getState();
+  unsigned int state = _con->getInfo().getState();
   switch (state) {
+    case RunInfoBuffer::ERROR:
     case RunInfoBuffer::RUNNING:
-      Belle2::debug("[ERROR] Forked process %s was crashed", process_name.c_str());
+      LogFile::error("Forked process %s was crashed", process_name.c_str());
       comm->sendError(Belle2::form("Foked process %s was crashed", process_name.c_str()));
+      _con->setState(State::ERROR_ES);
       break;
     case RunInfoBuffer::READY:
-      Belle2::debug("[ERROR] Forked process %s was not started", process_name.c_str());
+      LogFile::warning("Forked process %s was not started", process_name.c_str());
       comm->sendError(Belle2::form("Foked process %s was no started", process_name.c_str()));
+      _con->setState(State::ERROR_ES);
       break;
     case RunInfoBuffer::NOTREADY:
     default:
-      Belle2::debug("[INFO] Forked process %s was finished", process_name.c_str());
+      LogFile::debug("Forked process %s was finished", process_name.c_str());
       comm->sendLog(SystemLog(node->getName(), SystemLog::INFO,
                               Belle2::form("Foked process %s was finished",
                                            process_name.c_str())));

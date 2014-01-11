@@ -126,6 +126,7 @@ public class RCServerCommunicator {
 								+ "Run # = " + _master.getStatus().getColdNumber() + "<br/>"
 								+ "Run type = " + _master.getConfig().getRunType() + " (version = "+_master.getConfig().getConfigNumber()+")<br/>"
 								+ "Operators = " + _master.getStatus().getOperators().replace(":", " / ") + "<br/>"
+								+ ((_master.getStatus().getComment().length()>0)? "Comment = <br/>" + _master.getStatus().getComment() + "<br/>" :"Comment = <br/>") 
 								+ "Start time = " + new Time(_master.getStatus().getStartTime()).toDateString() + "<br/>"
 								+ "End time = " + ((_master.getStatus().getEndTime()<0)?"on going":new Time(_master.getStatus().getEndTime()).toDateString()) + "<br/>"
 								+ "State = " + state.getAlias() + "</span>", LogLevel.NOTICE));

@@ -60,6 +60,8 @@ throw(NSMHandlerException)
     return ok();
   } else if (cmd == Command::ERROR) {
     return error();
+  } else if (cmd == Command::FATAL) {
+    return fatal();
   }
   if (cmd.isAvailable(_node->getState()) == 0) {
     return false;

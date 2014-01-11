@@ -37,9 +37,6 @@ REG_MODULE(StorageDeserializer)
 //                 Implementation
 //-----------------------------------------------------------------
 
-Time t0;
-double datasize = 0;
-
 StorageDeserializerModule::StorageDeserializerModule() : Module()
 {
   setDescription("Encode DataStore into RingBuffer");
@@ -68,8 +65,6 @@ StorageDeserializerModule::~StorageDeserializerModule()
 void StorageDeserializerModule::initialize()
 {
   B2INFO("StorageDeserializer: initialize() started.");
-  B2INFO(m_inputbufname.c_str());
-
   m_inputbuf = new RingBuffer(m_inputbufname.c_str());
   if (m_buf == NULL) {
     m_buf = new StorageRBufferManager(m_inputbuf);
@@ -79,7 +74,7 @@ void StorageDeserializerModule::initialize()
     if (m_nodename.size() == 0 || m_nodeid < 0) {
       m_shmflag = 0;
     } else {
-      m_status.open(m_nodename, m_nodeid);
+      m_info.open(m_nodename);
     }
   }
   char* evtbuf = new char[10000000];
@@ -95,12 +90,10 @@ void StorageDeserializerModule::initialize()
   for (int n = 0; n < m_numThread; n++) {
     PThread(new StorageWorker(m_buf, m_compressionLevel));
   }
-  ///*
   if (m_shmflag > 0) {
-    m_status.reportRunning();
+    m_info.reportRunning();
     m_running = true;
   }
-  //*/
   B2INFO("StorageDeserializer: initialize() done.");
 }
 
@@ -115,32 +108,10 @@ void StorageDeserializerModule::event()
   while (package.getSerial() == 0) {
     StorageWorker::wait();
   }
-  int length = StorageWorker::getQueueIndex() - m_package_i;
   StorageWorker::unlock();
-  datasize += package.getData().getByteSize();
   package.restore();
-  unsigned int serial = package.getSerial();
   package.setSerial(0);
   StorageWorker::notify();
-  if (m_nrecv % 10000 == 0) {
-    Time t;
-    double freq = 10000. / (t.get() - t0.get()) / 1000. ;
-    double rate = datasize / (t.get() - t0.get()) / 1000000.;
-    std::string has_pxd_s = ((package.getPXDData().getBuffer() != NULL) ? "with PXD" : "no PXD");
-    B2INFO("Serial = " << serial << ", Freq = " << freq
-           << " [kHz], Rate = " << rate << " [MB/s], DataSize = "
-           << datasize / 1000. / 1000 << " [kB/event], Queue = " <<  length << " " << has_pxd_s);
-    /*
-    if (m_nrecv % 100000 == 0) {
-      if (m_shmflag > 0) {
-    m_status.reportInfo(Belle2::form("Serial = %d, Freq = %f [kHz], Rate = %f [MB/s], DataSize = %f [kB/event], Queue = %d, %s",
-           package.getSerial(), freq, rate, datasize / 1000. / 1000, length, has_pxd_s.c_str()));
-      }
-    }
-    */
-    t0 = t;
-    datasize = 0;
-  }
 }
 
 void StorageDeserializerModule::beginRun()
@@ -153,8 +124,6 @@ void StorageDeserializerModule::endRun()
   StoreObjPtr<EventMetaData> evtmetadata;
   int expno = evtmetadata->getExperiment();
   int runno = evtmetadata->getRun();
-  B2INFO(expno << " " << runno);
-  //fill Run data
   B2INFO("StorageDeserializer: endRun done.");
 }
 

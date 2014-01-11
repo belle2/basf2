@@ -36,6 +36,7 @@ namespace Belle2 {
     virtual void init() throw() {}
     virtual bool ok() { return true; }
     virtual bool error() { return true; }
+    virtual bool fatal() { return true; }
     virtual void selfCheck() throw(NSMHandlerException) {}
     bool isReady() const throw();
 

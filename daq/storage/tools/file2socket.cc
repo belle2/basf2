@@ -50,37 +50,38 @@ int main(int argc, char** argv)
   int nrec = 0;
   Time t0;
   double datasize = 0;
-  while (true) {
-    int sstat = read(fd, buf, MAXBUF);
-    //int sstat = read(fd, buf, sizeof(int));
-    if (sstat <= 0) {
-      lseek(fd, 0, SEEK_SET);
-      continue;
-    }
-    /*
-    int* recsize = (int*)buf;
-    int rstat = read(fd, buf + sizeof(int), (*recsize - 1) * 4);
-    if (rstat <= 0) break;
-    if (nrec % 1000 == 0) {
-      printf("record %d: size = %d event = %d\n",
-       nrec, recsize[0], recsize[4]);
-    }
-    socket.write(buf, *recsize * 4);
-    */
-    socket.write(buf, sstat);
-    usleep(100);
-    nrec++;
-    datasize += sstat;
-    if (nrec % 10000 == 0) {
-      Time t;
-      double freq = 10000. / (t.get() - t0.get()) / 1000. ;
-      double rate = datasize / (t.get() - t0.get()) / 1000000.;
-      printf("Serial = %d Freq = %f [kHz], Rate = %f [MB/s], DataSize = %f [kB/event]\n",
-             nrec, freq, rate, datasize / 1000. / 1000);
-      t0 = t;
-      datasize = 0;
-    }
+  //while (true) {
+  int sstat = read(fd, buf, MAXBUF);
+  //int sstat = read(fd, buf, sizeof(int));
+  if (sstat <= 0) {
+    lseek(fd, 0, SEEK_SET);
+    return 0;
+    //      continue;
   }
+  /*
+  int* recsize = (int*)buf;
+  int rstat = read(fd, buf + sizeof(int), (*recsize - 1) * 4);
+  if (rstat <= 0) break;
+  if (nrec % 1000 == 0) {
+    printf("record %d: size = %d event = %d\n",
+     nrec, recsize[0], recsize[4]);
+  }
+  socket.write(buf, *recsize * 4);
+  */
+  socket.write(buf, sstat);
+  usleep(100);
+  nrec++;
+  datasize += sstat;
+  if (nrec % 10000 == 0) {
+    Time t;
+    double freq = 10000. / (t.get() - t0.get()) / 1000. ;
+    double rate = datasize / (t.get() - t0.get()) / 1000000.;
+    printf("Serial = %d Freq = %f [kHz], Rate = %f [MB/s], DataSize = %f [kB/event]\n",
+           nrec, freq, rate, datasize / 1000. / 1000);
+    t0 = t;
+    datasize = 0;
+  }
+  // }
   socket.close();
   return 0;
 }

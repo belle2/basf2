@@ -45,7 +45,7 @@ public class Belle2DQMBrowser extends JavaEntoryPoint {
 
 	public void run() {
 		try {
-			TimeZone.setDefault(TimeZone.getTimeZone("Asia/Tokyo"));
+			//TimeZone.setDefault(TimeZone.getTimeZone("Asia/Tokyo"));
 		} catch (Exception e) {}
 		try {
 			_socket = new Socket(__host, __port);

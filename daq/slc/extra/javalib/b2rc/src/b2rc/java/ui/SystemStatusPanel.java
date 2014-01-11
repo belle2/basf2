@@ -178,11 +178,11 @@ public class SystemStatusPanel extends JPanel implements Updatable {
 	}
 
 	public void setTriggerType(int trigger_mode) {
-		String [] type = new String [10]; 
+		String [] type = new String [10];
 		type[0] = "NONE";
-		type[1] = "IN";
-		type[2] = "TLU";
-		type[3] = "--";
+		type[1] = "AUX";
+		type[2] = "I";
+		type[3] = "TLU";
 		type[4] = "PULSE";
 		type[5] = "REVO";
 		type[6] = "RANDOM";
@@ -194,7 +194,7 @@ public class SystemStatusPanel extends JPanel implements Updatable {
 
 	public void setDummyRate(int dummy_rate) {
 		if ( dummy_rate < 0 ) {
-			_text_dummy_rate.setText("no dummy trigger");
+			_text_dummy_rate.setText("---");
 		} else if ( dummy_rate < 10000 ) {
 			_text_dummy_rate.setText(""+(dummy_rate/1000.0)+"Hz");
 		} else {

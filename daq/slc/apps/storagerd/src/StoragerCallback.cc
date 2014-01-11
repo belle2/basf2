@@ -1,5 +1,7 @@
 #include "daq/slc/apps/storagerd/StoragerCallback.h"
 
+#include "daq/slc/system/LogFile.h"
+
 #include "daq/slc/base/Debugger.h"
 #include "daq/slc/base/StringUtil.h"
 #include "daq/slc/base/ConfigFile.h"
@@ -21,6 +23,7 @@ StoragerCallback::~StoragerCallback() throw()
 
 void StoragerCallback::init() throw()
 {
+  LogFile::open("storage");
   _con[0].init("storagein");
   _con[1].init("basf2");
   _con[2].init("storageout");
@@ -100,7 +103,7 @@ bool StoragerCallback::pause() throw()
 bool StoragerCallback::recover() throw()
 {
   Belle2::debug("RECOVER");
-  return abort() && load();
+  return abort() && boot() && load();
 }
 
 bool StoragerCallback::abort() throw()

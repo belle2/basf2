@@ -9,6 +9,7 @@ NSMCallback::NSMCallback(NSMNode* node) throw()
 {
   add(Command::OK);
   add(Command::ERROR);
+  add(Command::FATAL);
 }
 
 bool NSMCallback::isReady() const throw()

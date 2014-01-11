@@ -6,6 +6,7 @@
 // Date : 2 - Aug - 2013
 //-
 #include <daq/rawdata/modules/DAQConsts.h>
+#include <rawdata/dataobjects/RawPXD.h>
 #include <daq/rawdata/modules/PrintDataTemplate.h>
 #include <framework/core/InputController.h>
 
@@ -160,6 +161,14 @@ void PrintDataTemplateModule::printCOPPEREvent(RawCOPPER* raw_copper, int i)
 
 }
 
+void PrintDataTemplateModule::printPXDEvent(RawPXD* raw_pxd)
+{
+  printf(": block size %d bytes : bebafeca = %04x :\n",
+         (int)raw_pxd->size(), raw_pxd->data()[0]);
+  printf("******* Raw PXD data block (including Detector Buffer) **********\n");
+  printBuffer(raw_pxd->data(), raw_pxd->size());
+}
+
 void PrintDataTemplateModule::event()
 {
 
@@ -241,6 +250,14 @@ void PrintDataTemplateModule::event()
     }
   }
 
+  //
+  // Data from COPPER named as RawPXD by software
+  //
+  StoreArray<RawPXD> raw_pxdarray;
+  for (int i = 0; i < raw_pxdarray.getEntries(); i++) {
+    printf("\n===== DataBlock(RawPXD) : Block # %d ", i);
+    printPXDEvent(raw_pxdarray[ i ]);
+  }
   StoreArray<RawBPID> raw_bpidarray;
   StoreArray<RawEPID> raw_epidarray;
   StoreArray<RawKLM> raw_klmarray;

@@ -9,6 +9,7 @@
 //-
 
 #include <daq/storage/modules/StorageOutput.h>
+#include <daq/storage/modules/MonitorStorage.h>
 
 #include <stdio.h>
 
@@ -50,11 +51,6 @@ StorageOutputModule::~StorageOutputModule() { }
 void StorageOutputModule::initialize()
 {
   // Open output file
-  /*
-  m_file = new SeqFile(m_outputFileName.c_str(), "w");
-  if ( m_file == 0 )
-    B2FATAL ( "Error to open output file" );
-  */
 
   // Message handler to encode serialized object
   m_msghandler = new MsgHandler(m_compressionLevel);
@@ -80,14 +76,9 @@ void StorageOutputModule::initialize()
 void StorageOutputModule::beginRun()
 {
   // Statistics
-  gettimeofday(&m_t0, 0);
   m_size = 0.0;
   m_size2 = 0.0;
-  m_nevt = 0;
-
-  // Open data file by looking at exp/run number
-  //if (m_file != NULL) delete m_file;
-  //m_file = openDataFile();
+  m_nevts = 0;
 
   B2INFO("StorageOutput: beginRun called.");
 }
@@ -96,7 +87,8 @@ void StorageOutputModule::event()
 {
   StoreObjPtr<EventMetaData> evtmetadata;
   int expno = evtmetadata->getExperiment();
-  int runno = evtmetadata->getRun();
+  int runno = evtmetadata->getRun() >> 8;
+  int subno = evtmetadata->getRun() & 0xFF;
   if (m_runno != runno || m_expno != expno) {
     if (m_file != NULL) {
       delete m_file;
@@ -104,16 +96,23 @@ void StorageOutputModule::event()
     }
     m_expno = expno;
     m_runno = runno;
+    MonitorStorageModule::g_expno = expno;
+    MonitorStorageModule::g_runno = runno;
+    MonitorStorageModule::g_subno = subno;
+    m_t0 = Time();
+    MonitorStorageModule::g_curtime =
+      MonitorStorageModule::g_starttime = m_t0.get();
     m_file = openDataFile();
+    m_nevts = 0;
   }
-  //printf("Event no = %d\n", evtmetadata->getEvent());
+
   // Stream DataStore in EvtMessage
   EvtMessage* msg = m_streamer->streamDataStore(DataStore::c_Event);
 
   // Store EvtMessage
   int stat = m_file->write(msg->buffer());
   if (m_obuf != NULL) {
-    if (m_nevt % m_interval == 0) {
+    if (m_nevts % m_interval == 0) {
       m_obuf->insq((int*)msg->buffer(), (msg->size() - 1) / 4 + 1);
     }
   }
@@ -122,8 +121,26 @@ void StorageOutputModule::event()
   double dsize = (double)stat / 1000.0;
   m_size += dsize;
   m_size2 += dsize * dsize;
-  m_nevt++;
+  m_nevts++;
   delete msg;
+
+  m_datasize += stat;
+  if (m_nevts % 1000 == 0) {
+    Time t;
+    double freq = 1000. / (t.get() - m_t0.get()) / 1000. ;
+    double rate = m_datasize / (t.get() - m_t0.get()) / 1000000.;
+    B2INFO("Serial = " << m_nevts << ", Freq = " << freq
+           << " [kHz], Rate = " << rate << " [MB/s], DataSize = "
+           << m_datasize / 10000. / 1000 << " [kB/event]");
+    MonitorStorageModule::g_evtno = evtmetadata->getEvent();
+    MonitorStorageModule::g_nevts = m_nevts;
+    MonitorStorageModule::g_datasize += m_datasize;
+    MonitorStorageModule::g_curtime = t.get() - MonitorStorageModule::g_starttime;
+    MonitorStorageModule::g_freq = freq;
+    MonitorStorageModule::g_rate = rate;
+    m_t0 = t;
+    m_datasize = 0;
+  }
 }
 
 void StorageOutputModule::endRun()
@@ -131,22 +148,21 @@ void StorageOutputModule::endRun()
   //fill Run data
 
   // End time
-  gettimeofday(&m_tend, 0);
-  double etime = (double)((m_tend.tv_sec - m_t0.tv_sec) * 1000000 +
-                          (m_tend.tv_usec - m_t0.tv_usec));
+  m_tend = Time();
+  double etime = (m_tend.get() - m_t0.get()) * 1000000;
 
   // Statistics
   // Sigma^2 = Sum(X^2)/n - (Sum(X)/n)^2
 
   double flowmb = m_size / etime * 1000.0;
-  double avesize = m_size / (double)m_nevt;
-  double avesize2 = m_size2 / (double)m_nevt;
+  double avesize = m_size / (double)m_nevts;
+  double avesize2 = m_size2 / (double)m_nevts;
   double sigma2 = avesize2 - avesize * avesize;
   double sigma = sqrt(sigma2);
 
   //  printf ( "m_size = %f, m_size2 = %f, m_nevt = %d\n", m_size, m_size2, m_nevt );
   //  printf ( "avesize2 = %f, avesize = %f, avesize*avesize = %f\n", avesize2, avesize, avesize*avesize );
-  B2INFO("StorageOutput :  " << m_nevt << " events written with total bytes of " << m_size << " kB");
+  B2INFO("StorageOutput :  " << m_nevts << " events written with total bytes of " << m_size << " kB");
   B2INFO("StorageOutput : flow rate = " << flowmb << " (MB/s)");
   B2INFO("StorageOutput : event size = " << avesize << " +- " << sigma << " (kB)");
 

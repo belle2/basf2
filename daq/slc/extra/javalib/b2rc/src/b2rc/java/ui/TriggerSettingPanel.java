@@ -31,9 +31,9 @@ public class TriggerSettingPanel extends JPanel {
 		super();
 		String [] type = new String [10];
 		type[0] = "NONE";
-		type[1] = "IN";
-		type[2] = "TLU";
-		type[3] = "--";
+		type[1] = "AUX";
+		type[2] = "I";
+		type[3] = "TLU";
 		type[4] = "PULSE";
 		type[5] = "REVO";
 		type[6] = "RANDOM";

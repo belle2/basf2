@@ -30,6 +30,13 @@ public class ComboBoxPanel extends JPanel {
 		add(Box.createRigidArea(new Dimension(10, 30)));
 	}
 
+	public ComboBoxPanel(String title, String [] text_v, 
+			int label_width, int label_height, int field_width, int field_height) {
+		this(title, text_v);
+		setLabelSize(label_width, label_height);
+		setFieldSize(field_width, field_height);
+	}
+
 	public String getText() {
 		return _text_combo.getSelectedItem().toString();
 	}

@@ -51,6 +51,7 @@ namespace Belle2 {
     void replyError(const std::string& message = "") throw(NSMHandlerException);
     void sendLog(const SystemLog& log) throw(NSMHandlerException);
     void sendError(const std::string& message) throw(NSMHandlerException);
+    void sendFatal(const std::string& message) throw(NSMHandlerException);
     void sendState() throw(NSMHandlerException);
 
   public:

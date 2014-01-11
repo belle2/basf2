@@ -34,7 +34,7 @@ bool COPPERCallback::boot() throw()
 {
   Belle2::debug("BOOT");
   download();
-  ConfigFile config("svd");
+  ConfigFile config(_rc_config);
   XMLParser parser;
   DataObject* data = _node->getData();
   size_t length;
@@ -61,7 +61,7 @@ bool COPPERCallback::load() throw()
   Belle2::debug("LOAD");
   bool boot_firm = (_confno == (int)getMessage().getParam(0));
   _confno = getMessage().getParam(0);
-  ConfigFile config("slowcontrol");
+  ConfigFile config(_rc_config);
   download();
   int flag = 0;
   DataObject* data = _node->getData();

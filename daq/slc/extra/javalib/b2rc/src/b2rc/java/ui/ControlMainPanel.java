@@ -20,7 +20,7 @@ public class ControlMainPanel extends JPanel implements Updatable {
 
 	private static final long serialVersionUID = 1L;
 	private SystemControlSummaryPanel _sys_summary_panel;
-	private RCNodeGroupViewPanel _node_state_panel;
+	//private RCNodeGroupViewPanel _node_state_panel;
 	private SystemButtonPanel _sys_button_panel;
 	private LogViewPanel _log_view_panel = new LogViewPanel();
 	private RCMaster _master;
@@ -28,17 +28,16 @@ public class ControlMainPanel extends JPanel implements Updatable {
 	public ControlMainPanel(RCMaster master) {
 		_master = master;
 		_sys_summary_panel = new SystemControlSummaryPanel(this, _master);
-		_node_state_panel = new RCNodeGroupViewPanel(_master);
+		//_node_state_panel = new RCNodeGroupViewPanel(_master);
 		_sys_button_panel = new SystemButtonPanel(_master);
-		_node_state_panel.init();
 		
 		GridBagLayout layout = new GridBagLayout();
 		GridBagConstraints gbc = new GridBagConstraints();
 		setLayout(layout);
 
-		DnDTabbedPane tab_panel = new DnDTabbedPane();
-		tab_panel.addTab("Summary", _sys_summary_panel);
-		tab_panel.addTab("Nodes", _node_state_panel);
+		//DnDTabbedPane tab_panel = new DnDTabbedPane();
+		//tab_panel.addTab("Summary", _sys_summary_panel);
+		//tab_panel.addTab("Nodes", _node_state_panel);
 		
 		gbc.gridwidth = 2;
 		gbc.gridx = 0;
@@ -47,8 +46,8 @@ public class ControlMainPanel extends JPanel implements Updatable {
 		gbc.weighty = 1.0d;
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.insets = new Insets(5, 5, 5, 5);
-		layout.setConstraints(tab_panel, gbc);
-		add(tab_panel);
+		layout.setConstraints(_sys_summary_panel, gbc);
+		add(_sys_summary_panel);
 
 		gbc.gridwidth = 1;
 		gbc.gridx = 0;
@@ -81,13 +80,12 @@ public class ControlMainPanel extends JPanel implements Updatable {
 	}
 
 	public SystemControlSummaryPanel getControlSummaryPanel() { return _sys_summary_panel; }
-	public RCNodeGroupViewPanel getNodeSummaryPanel() { return _node_state_panel; }
+	//public RCNodeGroupViewPanel getNodeSummaryPanel() { return _node_state_panel; }
 	public SystemButtonPanel getButtonPanel() { return _sys_button_panel; }
 	public LogViewPanel getLogPanel() { return _log_view_panel; }
 
 	public void update() {
 		_sys_summary_panel.update();
-		_node_state_panel.update();
 		_sys_button_panel.update();
 	}
 

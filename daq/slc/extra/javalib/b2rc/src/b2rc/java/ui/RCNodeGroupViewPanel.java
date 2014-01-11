@@ -6,6 +6,8 @@ import java.awt.Insets;
 import java.util.ArrayList;
 
 import javax.swing.JPanel;
+import javax.swing.border.EtchedBorder;
+import javax.swing.border.TitledBorder;
 
 import b2daq.ui.Updatable;
 import b2rc.core.RCMaster;
@@ -29,12 +31,14 @@ public class RCNodeGroupViewPanel extends JPanel implements Updatable {
 	}
 
 	public void init() {
+		setBorder(new TitledBorder(new EtchedBorder(), "Node status",
+				TitledBorder.LEFT, TitledBorder.TOP));
 		GridBagLayout layout = new GridBagLayout();
 		GridBagConstraints gbc = new GridBagConstraints();
 		setLayout(layout);
 		int i = 0;
-		final int cols = 2; 
-		final int rows = 3; 
+		final int cols = 1; 
+		final int rows = 6; 
 		for (int icols = 0; icols < cols; icols++) {
 			for (int irows = 0; irows < rows; irows++) {
 				if (i >= _master.getNSMNodes().size()) return;

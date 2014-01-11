@@ -1,10 +1,10 @@
 #include "daq/slc/readout/ProcessController.h"
 
-#include "daq/slc/readout/ProcessLogListener.h"
 #include "daq/slc/readout/ProcessListener.h"
-#include "daq/slc/readout/StdOutListener.h"
+#include "daq/slc/readout/LogListener.h"
 
 #include "daq/slc/system/Executor.h"
+#include "daq/slc/system/LogFile.h"
 
 #include "daq/slc/base/StringUtil.h"
 #include <daq/slc/base/Debugger.h>
@@ -18,27 +18,32 @@ using namespace Belle2;
 bool ProcessController::init(const std::string& name_in)
 {
   _name = (name_in.size() > 0) ? name_in : _callback->getNode()->getName();
-  _msg.setNode(_name, _callback->getNode()->getData()->getId());
-  PThread(new ProcessLogListener(this));
-  return _msg.create();
+  LogFile::open(_name);
+  if (!_info.open(_name, true)) {
+    return false;
+  }
+  _info.init();
+  return true;
 }
 
 void ProcessController::clear()
 {
-  _msg.clear();
+  _info.clear();
 }
 
 bool ProcessController::load(int timeout)
 {
-  _msg.getInfo().clear();
+  _info.clear();
   _fork.cancel();
-  if (_name.size() == 0) {
-    _name = _callback->getNode()->getName();
+  int iopipe[2];
+  if (pipe(iopipe) < 0) {
+    perror("pipe");
   }
-  _fork = Fork(new ProcessSubmitter(this));
-  _thread = PThread(new ProcessListener(this));
+  _fork = Fork(new ProcessSubmitter(this, iopipe));
+  PThread(new LogListener(this, iopipe));
+  close(iopipe[1]);
   if (timeout > 0) {
-    if (_msg.waitRunning(timeout)) {
+    if (!_info.waitRunning(timeout)) {
       _callback->setReply(std::string("Failed to start ") + _name);
       return false;
     }
@@ -48,35 +53,40 @@ bool ProcessController::load(int timeout)
 
 bool ProcessController::start()
 {
-  _msg.getInfo().lock();
-  _msg.getInfo().setExpNumber(_callback->getExpNumber());
-  _msg.getInfo().setColdNumber(_callback->getColdNumber());
-  _msg.getInfo().setHotNumber(_callback->getHotNumber());
-  _msg.getInfo().setNodeId(_callback->getNode()->getData()->getId());
-  if (_msg.getState() != RunInfoBuffer::RUNNING) {
+  _info.lock();
+  _info.setExpNumber(_callback->getExpNumber());
+  _info.setColdNumber(_callback->getColdNumber());
+  _info.setHotNumber(_callback->getHotNumber());
+  _info.setNodeId(_callback->getNode()->getData()->getId());
+  if (_info.getState() != RunInfoBuffer::RUNNING) {
     _callback->setReply(_name + " is not running");
-    _msg.getInfo().unlock();
+    _info.unlock();
     return false;
   }
-  _msg.getInfo().unlock();
+  _info.unlock();
   return true;
 }
 
 bool ProcessController::stop()
 {
-  _msg.getInfo().clear();
+  _info.clear();
   return true;
 }
 
 bool ProcessController::abort()
 {
-  _msg.clear();
+  _info.clear();
   _fork.cancel();
   return true;
 }
 
 void ProcessSubmitter::run()
 {
+  close(1);
+  dup2(_iopipe[1], 1);
+  //close(2);
+  //dup2(_iopipe[1], 2);
+  close(_iopipe[0]);
   Executor executor;
   if (_con->getExecutable().size() == 0) {
     _con->setExecutable("basf2");

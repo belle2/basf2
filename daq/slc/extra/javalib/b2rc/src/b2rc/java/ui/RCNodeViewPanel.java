@@ -48,7 +48,7 @@ public class RCNodeViewPanel extends JPanel implements Updatable {
 		add(label_nodename);
 
 		setGrid(gbc, 1, 0, 0.2d, 0.1d, GridBagConstraints.NONE,
-				GridBagConstraints.LINE_START, new Insets(0, 5, 0, 5));
+				GridBagConstraints.LINE_END, new Insets(0, 5, 0, 5));
 		layout.setConstraints(_state, gbc);
 		add(_state);
 
@@ -182,6 +182,7 @@ public class RCNodeViewPanel extends JPanel implements Updatable {
 		}
 
 		public void actionPerformed(ActionEvent arg0) {
+			//ConfigEdiftorPanel.showLoginDialog(_panel, _node.getData().getObject("ftsw"));
 			TriggerSettingPanel.showLoginDialog(_panel, _node);
 		}
 	}

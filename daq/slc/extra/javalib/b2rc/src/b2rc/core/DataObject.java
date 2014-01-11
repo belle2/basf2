@@ -376,7 +376,7 @@ public class DataObject implements SerializableObject {
 							break;
 						enum_m.put(label, reader.readInt());
 					}
-					if (_enum_m_m.containsKey(name))
+					if (!_enum_m_m.containsKey(name))
 						_enum_m_m.put(name, enum_m);
 				}
 				if (info.buf == null) {
@@ -705,6 +705,10 @@ public class DataObject implements SerializableObject {
 		_enum_m_m.put(name, enum_m);
 		add(name, null, ENUM, length);
 		setValue(name, value);
+	}
+
+	public HashMap<String, Integer> getEnumList(String name) {
+		return _enum_m_m.get(name);
 	}
 
 	void addText(String name, String value, int length) {

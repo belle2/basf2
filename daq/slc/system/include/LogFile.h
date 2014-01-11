@@ -18,7 +18,7 @@ namespace Belle2 {
 
   private:
     static std::string __filepath;
-    static std::fstream __stream;
+    static std::ofstream __stream;
     static unsigned int __filesize;
     static Mutex __mutex;
     static SystemLog::Priority __threshold;
@@ -33,9 +33,10 @@ namespace Belle2 {
     static void warning(const std::string& msg, ...);
     static void error(const std::string& msg, ...);
     static void fatal(const std::string& msg, ...);
+    static void put(SystemLog::Priority priority, const std::string& msg, ...);
 
   private:
-    static int put(const std::string& msg, SystemLog::Priority priority, va_list ap);
+    static int put_impl(const std::string& msg, SystemLog::Priority priority, va_list ap);
 
   };
 

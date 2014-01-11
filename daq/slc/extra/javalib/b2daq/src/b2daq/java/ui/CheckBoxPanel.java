@@ -4,17 +4,17 @@ import java.awt.Dimension;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 
-public class TextBoxPanel extends JPanel {
+public class CheckBoxPanel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 	private JLabel _label;
-	private JTextField _text_field;
+	private JCheckBox _checkbox;
 
-	public TextBoxPanel(String title, String text) {
+	public CheckBoxPanel(String title, boolean enabled) {
 		super();
 		setMaximumSize(new Dimension(300, 30));
 		setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
@@ -22,32 +22,32 @@ public class TextBoxPanel extends JPanel {
 		_label.setMaximumSize(new Dimension(90, 30));
 		add(Box.createRigidArea(new Dimension(10, 30)));
 		add(_label);
-		_text_field = new JTextField(text);
-		_text_field.setMaximumSize(new Dimension(150, 30));
-		_text_field.setPreferredSize(new Dimension(150, 30));
+		_checkbox = new JCheckBox("", enabled);
+		_checkbox.setMaximumSize(new Dimension(150, 30));
+		_checkbox.setPreferredSize(new Dimension(150, 30));
 		add(Box.createRigidArea(new Dimension(10, 30)));
-		add(_text_field);
+		add(_checkbox);
 		add(Box.createRigidArea(new Dimension(10, 30)));
 	}
 
-	public TextBoxPanel(String title, String text, 
+	public CheckBoxPanel(String title, boolean enabled, 
 			int label_width, int label_height, int field_width, int field_height) {
-		this(title, text);
+		this(title, enabled);
 		setLabelSize(label_width, label_height);
 		setFieldSize(field_width, field_height);
 	}
 
 	public void setText(String text) {
-		_text_field.setText(text);
+		_checkbox.setText(text);
 	}
 
 	public String getText() {
-		return _text_field.getText();
+		return _checkbox.getText();
 	}
 
 	public void setFieldSize(int width, int height) {
-		_text_field.setMaximumSize(new Dimension(width, height));
-		_text_field.setPreferredSize(new Dimension(width, height));
+		_checkbox.setMaximumSize(new Dimension(width, height));
+		_checkbox.setPreferredSize(new Dimension(width, height));
 	}
 	
 	public void setLabelSize(int width, int height) {
@@ -56,7 +56,7 @@ public class TextBoxPanel extends JPanel {
 	}
 	
 	public void setEnabled(boolean enabled) {
-		_text_field.setEnabled(enabled);
+		_checkbox.setEnabled(enabled);
 	}
 
 }

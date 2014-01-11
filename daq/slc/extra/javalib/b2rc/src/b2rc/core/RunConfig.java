@@ -22,19 +22,19 @@ public class RunConfig extends DataObject {
 	public String getRunType() {
 		return getText("run_type");
 	}
-
+/*
 	public String getDescription() {
 		return getText("description");
 	}
-
+*/
 	public void setRunType(String run_type) {
 		setText("run_type", run_type);
 	}
-
+/*
 	public void setDescription(String description) {
 		setText("_description", description);
 	}
-
+*/
 	public void add(HashMap<String, DataObject> data_m,
 					  ArrayList<RCNode> node_v) {
 		for (String name : data_m.keySet()) {

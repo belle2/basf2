@@ -1,6 +1,15 @@
+Library.xml
+-----------
+... file with individuall components the geometry is created of.
+
+11. Jan 2014 18:00 Bug corrected: flipped number of strips in U/V in SVD layer 4,5,6. Smaller SVD module layer3
+
+11. Jan 2014 12:00 first tracked version
+
+
 FullVXDTB.xml
 -------------
-... Complete geometry with deactivated telescopes. All sensors centered (expect SVD3 moved by 4.8mm down)
+... Complete geometry with deactivated telescopes. All sensors centered (except SVD3 moved by 4.8mm down)
 
 8. Jan 2014 23:55 first version
 
@@ -8,7 +17,7 @@ FullVXDTB.xml
 
 FullTelescopeVXDTB.xml 
 ----------------------
-... Complete geometry with active telescopes. All sensors centered (expect SVD3 moved by 4.8mm down)
+... Complete geometry with active telescopes. All sensors centered (except SVD3 moved by 4.8mm down)
 
 8. Jan 2014 23:55 first version
 
@@ -16,10 +25,20 @@ FullTelescopeVXDTB.xml
 
 FullTelescopeVXDTB_v1.xml
 -------------------------
-... only PXD active areas are present, but made from air (they are active volumes)
+... from PXD only active areas are present, but made from air (they are active volumes) ... for ROI testing purposes
+
+11. Jan 2014 18:00 Flipped SVD orientation to comply with strip counting
+
+10. Jan 2014 18:00 Removed pxd frame, cooling block, etc. as it is not present in the real geometry
 
 9. Jan 2014 18:40 backward telescopes were 3cm under axis, pxd 12mm in last commit. In this version, everything is centered again
 
 9. Jan 2014 11:00 fixed bug in phantom pxds
 
 8. Jan 2014 23:55 first version
+
+
+
+FullTelescopeVXDTB_v2.xml
+-------------------------
+coming soon...

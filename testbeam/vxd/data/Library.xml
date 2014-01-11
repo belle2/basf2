@@ -59,8 +59,8 @@
    <Snippet name="SVD_active">
       <DetectorType>SVD</DetectorType>
       <stepSize unit="um">5</stepSize>
-      <stripsU>768</stripsU>
-      <stripsV>512</stripsV>
+      <stripsU>512</stripsU>
+      <stripsV>768</stripsV>
       <!-- Sensor operation parameters. -->
       <DepletionVoltage unit="V">60.0</DepletionVoltage>
       <BiasVoltage unit="V">150</BiasVoltage>
@@ -571,13 +571,13 @@
       <Color>#006699</Color>
       <Material>Air</Material>
       <Shape>Box</Shape>
-      <HalfX unit="mm">32.9</HalfX>
+      <HalfX unit="mm">27.3</HalfX>
       <HalfY unit="mm">7.8</HalfY>
       <HalfZ unit="mm">0.61</HalfZ>
       <Subtract>
          <Name>removing_overlap_from_air_volume</Name>
          <Shape>Box</Shape>
-         <HalfX unit="mm">32.9</HalfX>
+         <HalfX unit="mm">27.3</HalfX>
          <HalfY unit="mm">7.8</HalfY>
          <HalfZ unit="mm">0.4</HalfZ>
          <DZ unit="mm">-0.61</DZ>

@@ -295,7 +295,7 @@ void SVDUnpackerModule::fillSVDDigitList(int nWords, uint32_t* data32_in,  Store
       //add the 3 data samples:
       if (theAPVHeader) {
         for (int i = 0; i < 3; i++) {
-          SVDDigit* newDigit = m_map->NewDigit(theMainHeader->FADCnum, theAPVHeader->APVnum, aSample->stripNum, aSample->sample[i], time);
+          SVDDigit* newDigit = m_map->NewDigit(theMainHeader->FADCnum, theAPVHeader->APVnum, aSample->stripNum, aSample->sample[i], int(time) % 6);
           time += m_APVSamplingTime;
 
           // Translation can return 0, if wrong FADC/APV combination is encountered.

@@ -19,6 +19,15 @@
       <HalfY unit="mm">200</HalfY>
       <HalfZ unit="mm">200</HalfZ>
    </Snippet>
+   <Snippet name="SVD_module_layer3">
+     <Visible>false</Visible>
+     <Material>Air</Material>
+     <Shape>Box</Shape>
+     
+     <HalfX unit="mm">65.00</HalfX>
+     <HalfY unit="mm">20.00</HalfY>
+     <HalfZ unit="mm">1</HalfZ>
+   </Snippet>
    <Snippet name="SVD_module">
       <Visible>false</Visible>
       <Material>Air</Material>

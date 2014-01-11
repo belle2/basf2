@@ -8,10 +8,12 @@
 #include <daq/dqm/modules/DqmHistoManagerModule.h>
 #endif
 #include <vxd/dataobjects/VxdID.h>
+#include <pxd/geometry/SensorInfo.h>
 #include <svd/geometry/SensorInfo.h>
 #include <vxd/geometry/GeoCache.h>
 #include <vector>
 #include "TH1F.h"
+#include "TH2F.h"
 
 namespace Belle2 {
 
@@ -27,6 +29,9 @@ namespace Belle2 {
       c_nSVDPlanes = 4,
       c_firstSVDPlane = 3,
       c_lastSVDPlane = 6,
+      c_nVXDPlanes = 6,
+      c_firstVXDPlane = 1,
+      c_lastVXDPlane = 6,
     };
 
     /** Constructor */
@@ -57,23 +62,39 @@ namespace Belle2 {
     inline int planeToIndex(int iPlane) const {
       return iPlane - c_firstSVDPlane;
     }
+    inline int indexToPlaneVXD(int indexVXD) const {
+      return c_firstVXDPlane + indexVXD;
+    }
+    inline int planeToIndexVXD(int iPlaneVXD) const {
+      return iPlaneVXD - c_firstVXDPlane;
+    }
     /** This is a shortcut to getting SVD::SensorInfo from the GeoCache.
      * @param index Index of the sensor (0,1,2,3), _not_ layer number!
      * @return SensorInfo object for the desired plane.
      */
     inline const SVD::SensorInfo& getInfo(int index) const;
 
-    std::string m_storeDigitsName;      /**< SVDDigits StoreArray name */
-    std::string m_storeClustersName;    /**< SVDClusters StoreArray name */
-    std::string m_relClusterDigitName;  /**< SVDClustersToSVDDigits RelationArray name */
+    std::string m_storeDigitsName;        /**< SVDDigits StoreArray name */
+    std::string m_storeClustersName;      /**< SVDClusters StoreArray name */
+    std::string m_relClusterDigitName;    /**< SVDClustersToSVDDigits RelationArray name */
 
     // +1 in dimensions to protect against noisy VXDID values.
-    TH1F* m_firedU[c_nSVDPlanes];       /**< Fired u strips per event by plane */
-    TH1F* m_firedV[c_nSVDPlanes];       /**< Fired v strips per event by plane */
+    TH1F* m_firedU[c_nSVDPlanes];         /**< Fired u strips per event by plane */
+    TH1F* m_firedV[c_nSVDPlanes];         /**< Fired v strips per event by plane */
     TH1F* m_clustersU[c_nSVDPlanes];      /**< u clusters per event by plane */
     TH1F* m_clustersV[c_nSVDPlanes];      /**< v clusters per event by plane */
     TH1F* m_hitMapU[c_nSVDPlanes];        /**< Hitmaps for u-strips by plane */
     TH1F* m_hitMapV[c_nSVDPlanes];        /**< Hitmaps for v-strips by plane */
+    TH1F* m_chargeU[c_nSVDPlanes];        /**< u charge by plane */
+    TH1F* m_chargeV[c_nSVDPlanes];        /**< v charge by plane */
+    TH1F* m_seedU[c_nSVDPlanes];          /**< u seed by plane */
+    TH1F* m_seedV[c_nSVDPlanes];          /**< v seed by plane */
+    TH1F* m_sizeU[c_nSVDPlanes];          /**< u size by plane */
+    TH1F* m_sizeV[c_nSVDPlanes];          /**< v size by plane */
+    TH1F* m_timeU[c_nSVDPlanes];          /**< u time by plane */
+    TH1F* m_timeV[c_nSVDPlanes];          /**< v time by plane */
+    // TH2F* m_corellationsHitMaps[c_nSVDPlanes * c_nSVDPlanes];  /**< Corellations and hit maps */
+    TH2F* m_corellationsHitMaps[c_nVXDPlanes* c_nVXDPlanes];   /**< Corellations and hit maps */
   };
 
   inline const SVD::SensorInfo& SVDDQMModule::getInfo(int index) const

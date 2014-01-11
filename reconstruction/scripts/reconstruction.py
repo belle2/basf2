@@ -40,6 +40,10 @@ def add_posttracking_reconstruction(path, components=None):
         pi0_rec = register_module('ECLPi0Reconstructor')
         path.add_module(pi0_rec)
 
+        # track shower matching
+        ecl_track_match = register_module('ECLTrackShowerMatch')
+        path.add_module(ecl_track_match)
+
         # electron ID
         electron_id = register_module('ECLElectronId')
         path.add_module(electron_id)

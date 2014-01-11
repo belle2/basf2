@@ -39,7 +39,7 @@ SVDOnlineToOfflineMap::SVDOnlineToOfflineMap(const string& xmlFilename)
   }
 
   try {
-    read_xml(xml_filename, propertyTree);
+    read_xml(xmlFullPath, propertyTree);
   } catch (std::exception const& ex) {
     B2ERROR("STD excpetion rised during xml parsing " << ex.what() << endl <<
             "SVD online to offline map cannot be initialized." << endl <<

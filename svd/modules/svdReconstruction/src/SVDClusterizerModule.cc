@@ -50,6 +50,8 @@ SVDClusterizerModule::SVDClusterizerModule() : Module(), m_elNoise(2000.0),
   // 1. Collections.
   addParam("Digits", m_storeDigitsName,
            "Digits collection name", string(""));
+  addParam("digitsSorted", m_assumeSorted,
+           "Digits are sorted by sensor/strip/time", m_assumeSorted);
   addParam("Clusters", m_storeClustersName,
            "Cluster collection name", string(""));
   addParam("TrueHits", m_storeTrueHitsName,
@@ -277,6 +279,19 @@ void SVDClusterizerModule::event()
       Sample sample(storeDigits[i], i);
       VxdID thisSensorID = storeDigits[i]->getSensorID();
       bool thisSide = storeDigits[i]->isUStrip();
+
+      //Other side or new sensor: write clusters
+      if ((uSide != thisSide) || (sensorID != thisSensorID)) {
+        writeClusters(sensorID, uSide ? 0 : 1);
+        // Reset the guards
+        uSide = thisSide;
+        sensorID = thisSensorID;
+        lastStrip = 0;
+        lastTime = 0;
+        //Load the correct noise map for the new sensor
+        m_noiseMap.setSensorID(sensorID);
+      }
+
       //Load the correct noise map for the first pixel
       if (i == 0) m_noiseMap.setSensorID(thisSensorID);
       //Ignore digits with insufficient signal
@@ -290,15 +305,6 @@ void SVDClusterizerModule::event()
       lastTime = sample.getSampleIndex();
       lastStrip = sample.getCellID();
 
-      //Other side or new sensor: write clusters
-      if ((uSide != thisSide) || (sensorID != thisSensorID)) {
-        writeClusters(sensorID, uSide ? 0 : 1);
-        // Reset the guards
-        uSide = thisSide;
-        sensorID = thisSensorID;
-        //Load the correct noise map for the new sensor
-        m_noiseMap.setSensorID(sensorID);
-      }
       //Find the correct cluster and add sample to cluster
       findCluster(sample);
     }

@@ -29,6 +29,9 @@ namespace Belle2 {
       c_nSVDPlanes = 4,
       c_firstSVDPlane = 3,
       c_lastSVDPlane = 6,
+      c_nPXDPlanes = 2,
+      c_firstPXDPlane = 1,
+      c_lastPXDPlane = 2,
       c_nVXDPlanes = 6,
       c_firstVXDPlane = 1,
       c_lastVXDPlane = 6,
@@ -62,6 +65,12 @@ namespace Belle2 {
     inline int planeToIndex(int iPlane) const {
       return iPlane - c_firstSVDPlane;
     }
+    inline int indexToPlanePXD(int indexPXD) const {
+      return c_firstPXDPlane + indexPXD;
+    }
+    inline int planeToIndexPXD(int iPlanePXD) const {
+      return iPlanePXD - c_firstPXDPlane;
+    }
     inline int indexToPlaneVXD(int indexVXD) const {
       return c_firstVXDPlane + indexVXD;
     }
@@ -73,8 +82,14 @@ namespace Belle2 {
      * @return SensorInfo object for the desired plane.
      */
     inline const SVD::SensorInfo& getInfo(int index) const;
+    /** This is a shortcut to getting PXD::SensorInfo from the GeoCache.
+     * @param index Index of the sensor (0,1), _not_ layer number!
+     * @return SensorInfo object for the desired plane.
+     */
+    inline const PXD::SensorInfo& getInfoPXD(int index) const;
 
     std::string m_storeDigitsName;        /**< SVDDigits StoreArray name */
+    std::string m_storePXDClustersName;   /**< PXDClusters StoreArray name */
     std::string m_storeClustersName;      /**< SVDClusters StoreArray name */
     std::string m_relClusterDigitName;    /**< SVDClustersToSVDDigits RelationArray name */
 
@@ -103,6 +118,14 @@ namespace Belle2 {
     VxdID sensorID(iPlane, 1, iPlane);
     return dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(sensorID));
   }
+
+  inline const PXD::SensorInfo& SVDDQMModule::getInfoPXD(int index) const
+  {
+    int iPlane = indexToPlanePXD(index);
+    VxdID sensorID(iPlane, 1, iPlane);
+    return dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID));
+  }
+
 }
 #endif
 

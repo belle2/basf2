@@ -27,12 +27,12 @@ RawFTSW::~RawFTSW()
 
 unsigned int RawFTSW::GetTTUtime(int n)
 {
-  return (unsigned int)(m_buffer[ GetBufferPos(n) +  POS_FTSW_1 ]);
+  return (unsigned int)(m_buffer[ GetBufferPos(n) +  POS_TT_UTIME ]);
 }
 
 unsigned int RawFTSW::GetTTCtimeTRGType(int n)
 {
-  return (unsigned int)(m_buffer[ GetBufferPos(n) +  POS_FTSW_2 ]);
+  return (unsigned int)(m_buffer[ GetBufferPos(n) +  POS_TT_CTIME_TYPE ]);
 }
 
 

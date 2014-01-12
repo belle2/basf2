@@ -41,6 +41,7 @@ namespace Belle2 {
     ROIrawID::baseType* m_data64; //! transient value
 
     void setPayloadLength(int length);
+    void setPayloadLength();
     void setHeader();
     void setTriggerNumber(unsigned long int triggerNumber);
     //    void addROIraw(ROIrawID roiraw);

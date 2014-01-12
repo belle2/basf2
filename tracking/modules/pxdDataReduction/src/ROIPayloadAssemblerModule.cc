@@ -93,17 +93,16 @@ void ROIPayloadAssemblerModule::event()
 
   B2DEBUG(1, " number of ROIs in the set = " << orderedROIraw.size());
 
+  // The payload is created with a buffer long enough to contains all
+  // the ROIs but the actual payload will contains max 32 ROIs per pxd
+  // sensor per event as required by the Onsens specifications
   ROIpayload* payload = new ROIpayload(4 + 2 * ROIListSize);
 
   StoreObjPtr<ROIpayload> payloadPtr(m_ROIpayloadName);
 
   payloadPtr.assign(payload);
 
-  long long int payloadLength = 12 + 8 * ROIListSize;
-
-  payload->setPayloadLength(payloadLength);
   payload->setHeader();
-
 
   StoreObjPtr<EventMetaData> eventMetaDataPtr;
   payload->setTriggerNumber(eventMetaDataPtr->getEvent());
@@ -124,7 +123,8 @@ void ROIPayloadAssemblerModule::event()
       payload->addROIraw(itOrderedROIraw->getBigEndian());
       addROI++;
     } else
-      B2INFO(" ROI rejected, exceeding the number of ROIs per event (32)");
+      B2ERROR("A ROI on DHHID " << itOrderedROIraw->getDHHID() << endl <<
+              " is rejected because the max number of ROIs per pxd sensor per event (32) was exceeded.");
 
     tmpDHHID = itOrderedROIraw->getDHHID();
 
@@ -133,6 +133,7 @@ void ROIPayloadAssemblerModule::event()
   for (itOrderedROIraw = orderedROIraw.begin(); itOrderedROIraw != orderedROIraw.end(); ++itOrderedROIraw)
     B2DEBUG(1, "ordered DHHID: " << itOrderedROIraw->getDHHID());
 
+  payload->setPayloadLength();
   payload->setCRC();
 
   B2DEBUG(1, " number of ROIs in payload = " << addROI);

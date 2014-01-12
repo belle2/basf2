@@ -11,8 +11,8 @@
 #include <tracking/dataobjects/ROIpayload.h>
 #include <arpa/inet.h>
 #include <boost/crc.hpp>
-#include <assert.h>
 #include <stdio.h>
+#include <framework/logging/Logger.h>
 //#define _BSD_SOURCE
 //#include <endian.h>
 
@@ -45,6 +45,21 @@ void ROIpayload::setPayloadLength(int length)
   m_packetLengthByte = length + sizeof(uint32_t);
 }
 
+void ROIpayload::setPayloadLength()
+{
+  unsigned int lengthInBytes =
+    sizeof(uint32_t) +           // The header
+    sizeof(uint32_t) +           // The trigger number
+    m_index * sizeof(uint64_t) + // The rois
+    sizeof(uint32_t);            // The CRC
+
+  m_data32[0] = htonl(lengthInBytes);
+  m_packetLengthByte =
+    lengthInBytes +
+    sizeof(uint32_t);  // The space for payload lenght
+
+}
+
 void ROIpayload::setHeader()
 {
 
@@ -65,7 +80,11 @@ void ROIpayload::setTriggerNumber(unsigned long int triggerNumber)
 void ROIpayload::addROIraw(unsigned long int roiraw)
 {
 
-  assert((int*)(m_data64 + m_index) < m_rootdata + m_length);
+  if ((int*)(m_data64 + m_index) >= m_rootdata + m_length) {
+    B2ERROR("Adding too many ROIs to the ROIpayload." << std::endl <<
+            "Something really fishy is going on");
+    return;
+  }
 
   m_data64[m_index++] = roiraw; //.getBigEndian();
 
@@ -74,7 +93,12 @@ void ROIpayload::addROIraw(unsigned long int roiraw)
 void ROIpayload::setCRC()
 {
 
-  assert((int*)(m_data64 + m_index) ==  m_rootdata + m_length - 1);
+  //  assert((int*)(m_data64 + m_index) ==  m_rootdata + m_length - 1);
+
+  if ((int*)(m_data32 + m_index * 2 + 3) >= m_rootdata + m_length) {
+    B2ERROR("No space left on the ROI payload to write the CRC." << std::endl);
+    return;
+  }
 
   crc_optimal<32, 0x04C11DB7, 0, 0, false, false> dhh_crc_32;
 

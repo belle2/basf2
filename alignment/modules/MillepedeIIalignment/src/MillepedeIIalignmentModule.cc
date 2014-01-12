@@ -32,9 +32,8 @@ REG_MODULE(MillepedeIIalignment)
 MillepedeIIalignmentModule::MillepedeIIalignmentModule() :
   Module()
 {
-  // addParam("GBLBinaryFile", &GBLBinaryFile,
-  //          "GBLBinaryFile", GBLBinaryFile);
-  //MillepedeIIalignmentExecutePede();
+  addParam("steeringFileName", m_steeringFileName, "Name of the steering file to run Millepede II alignment", string("steer.txt"));
+
 }
 
 void MillepedeIIalignmentModule::endRun()

@@ -104,6 +104,10 @@ namespace Belle2 {
     std::string m_resolveWireHitAmbi;                /**< Determines how the ambiguity of wire measurements should be dealt with.  If this is set to 'default', we use 'weightedAverage' for the DAF is, the Kalman fit uses 'unweightedClosestToReference', and the simple Kalman (which doesn't have a reference) uses 'unweightedClosestToPrediction'. */
     std::vector<double> m_beamSpot;                  /**< The coordinates of the point whose POCA will define the parameters of the TrackFitResults.  */
     genfit::GFGbl m_gbl;                             /**< General Broken Line interface class object. */
+    std::string m_gblInternalIterations;             /**< GBL internal downweighting setting */
+    double m_gblPvalueCut;                           /**< GBL p-value cut to output track to millepede file */
+    int m_gblMinNdf;                                 /**< GBL minimum NDF to output track to millepede file */
+    std::string m_gblMilleFileName;                  /**< GBL: Name of the mille binary file to be produced for alignment */
   };
 }
 

@@ -123,6 +123,12 @@ GBLfitModule::GBLfitModule() :
 
   // keep GFExceptions quiet or not
   genfit::Exception::quiet(m_suppressGFExceptionOutput);
+
+  addParam("internalIterations", m_gblInternalIterations, "GBL internal downweighting setting", std::string("THC"));
+  addParam("pValueCut", m_gblPvalueCut, "GBL p-value cut to output track to millepede file", 0.0);
+  addParam("minNdf", m_gblMinNdf, "GBL minimum NDF to output track to millepede file", 1);
+  addParam("milleFileName", m_gblMilleFileName, "GBL: Name of the mille binary file to be produced for alignments", std::string("millefile.dat"));
+
 }
 
 GBLfitModule::~GBLfitModule()
@@ -198,11 +204,17 @@ void GBLfitModule::initialize()
   // Create new Translators and give them to the CDCRecoHits.
   // The way, I'm going to do it here will produce some small resource leak, but this will stop, once we go to ROOT 6 and have the possibility to use sharead_ptr
   CDCRecoHit::setTranslators(new LinearGlobalADCCountTranslator(), new IdealCDCGeometryTranslator(), new SimpleTDCCountTranslator());
+
+  // Set GBL parameters
+  if (m_filterId == "GBL") {
+    m_gbl.setGBLOptions("THC");
+    m_gbl.setMP2Options(0., 1, "millefile.dat");
+  }
 }
 
 void GBLfitModule::beginRun()
 {
-
+  if (m_filterId == "GBL") m_gbl.beginRun();
 }
 
 void GBLfitModule::event()

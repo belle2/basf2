@@ -44,6 +44,9 @@ namespace Belle2 {
      */
     virtual ~MillepedeIIalignmentModule();
 
+    /**
+     * endRun procedure to start alignment
+     */
     virtual void endRun();
 
     /**
@@ -66,7 +69,7 @@ namespace Belle2 {
      */
     void readResWriteXml(const string& xml_filename, int type = 0);
 
-
+  private:
     // time_t MP2startTime; /**< MP2 start time */
 
     /** struct to hold constraint trafos */
@@ -75,6 +78,9 @@ namespace Belle2 {
       TMatrixD loc2gloMatrix; /**< sensor matrix for trafo from local to global alignment parameters */
     };
     std::vector<constraintData> matList; /**< list of constraints */
+
+
+    std::string m_steeringFileName;  /**< Name of the steering file for running Millepede II alignment */
   };
 
 

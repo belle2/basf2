@@ -22,6 +22,9 @@ geometry = register_module('Geometry')
 # No magnetic field for this test,
 geometry.param('components', ['TB'])
 
+# PXD digit sorter: no need for simulation, but needed for real data.
+PXDSort = register_module('PXDDigitSorter')
+PXDSort.param('merge', True)
 # PXD/SVD clusterizer
 PXDClust = register_module('PXDClusterizer')
 PXDClust.param('TanLorentz', 0.)

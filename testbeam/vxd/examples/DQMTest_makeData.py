@@ -72,8 +72,6 @@ simulation.param('StoreAllSecondaries', True)
 
 # PXD/SVD digitizer
 PXDDigi = register_module('PXDDigitizer')
-# turn off Lorentz angle simulation - no field
-PXDDigi.param('tanLorentz', 0.)
 PXDDigi.param('SimpleDriftModel', False)
 
 SVDDigi = register_module('SVDDigitizer')

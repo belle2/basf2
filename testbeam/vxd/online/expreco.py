@@ -25,7 +25,7 @@ fieldOn = False
 # Load Geometry module
 gearbox = register_module('Gearbox')
 # Telescopes, magnetic field, daemon PXD (air), SVD
-gearbox.param('fileName', 'testbeam/vxd/FullTelescopeVXDTB_v1.xml')
+gearbox.param('fileName', 'testbeam/vxd/FullTelescopeVXDTB_v2.xml')
 
 geometry = register_module('Geometry')
 if fieldOn:

@@ -298,7 +298,7 @@ void SVDDQMModule::beginRun()
     m_hitMapU[i]->Reset();
     m_hitMapV[i]->Reset();
   }
-  for (int i = 0; i < c_nSVDPlanes * c_nSVDPlanes; i++) {
+  for (int i = 0; i < c_nVXDPlanes * c_nVXDPlanes; i++) {
     m_correlationsHitMaps[i]->Reset();
   }
 }
@@ -375,8 +375,8 @@ void SVDDQMModule::event()
   // Threshold for acceptance hit signal to correlation, for every plane, every direction
   // Threshold for acceptance hit time distance to correlation, common for all SVD, not PXD
   // Finaly should be read from external xml cfg file for test beam
-  float CutDQMCorrelSigU[c_nSVDPlanes];
-  float CutDQMCorrelSigV[c_nSVDPlanes];
+  float CutDQMCorrelSigU[c_nVXDPlanes];
+  float CutDQMCorrelSigV[c_nVXDPlanes];
   float CutDQMCorrelTime;
   for (int i = 0; i < c_nPXDPlanes; i++) {  // PXD
     CutDQMCorrelSigU[i] = 0;

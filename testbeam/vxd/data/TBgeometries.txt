@@ -2,6 +2,8 @@ Library.xml
 -----------
 ... file with individuall components the geometry is created of.
 
+12. Jan 2014 16:00 Updated VXDBox with hole for better visibility of detectors from side and moved a bit to more precise position
+
 11. Jan 2014 18:00 Bug corrected: flipped number of strips in U/V in SVD layer 4,5,6. Smaller SVD module layer3
 
 11. Jan 2014 12:00 first tracked version
@@ -26,6 +28,10 @@ FullTelescopeVXDTB.xml
 FullTelescopeVXDTB_v1.xml
 -------------------------
 ... from PXD only active areas are present, but made from air (they are active volumes) ... for ROI testing purposes
+This file should be used for testbeam analysis from Jan 6 to PXD installation (expected Jan 13)
+WARNING: The position of the telescopes is approximate (with tolerance up to 1cm)
+
+12. Jan 2014 16:00 Telescopes moved to more realistic positions
 
 11. Jan 2014 18:00 Flipped SVD orientation to comply with strip counting
 
@@ -41,4 +47,7 @@ FullTelescopeVXDTB_v1.xml
 
 FullTelescopeVXDTB_v2.xml
 -------------------------
-coming soon...
+... this is the setup with PXD6-S (4 switchers) facing SVD layer 3. PCBoard and sensor from layer 2 (facing front telescopes) is removed.
+WARNING: the position of the telescopes is not final, will be fixed once setup will be completed.
+
+12. Jan 2014 first version

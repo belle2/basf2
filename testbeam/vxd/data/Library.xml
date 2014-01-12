@@ -407,6 +407,8 @@
        <Color>#006699</Color>
        <Material>PMMA</Material>
        <Shape>Box</Shape>
+       <DX unit="mm">7.0</DX>
+       
        <HalfX unit="mm">127.5</HalfX>
        <HalfY unit="mm">210</HalfY>
        <HalfZ unit="mm">210</HalfZ>
@@ -422,14 +424,14 @@
          <Shape>Box</Shape>
          <HalfX unit="mm">122.5</HalfX>
          <HalfY unit="mm">205</HalfY>
-         <HalfZ unit="mm">205</HalfZ>
+         <HalfZ unit="mm">215</HalfZ>
        </Subtract>
 
      </Volume>
      <Volume name="VXDBox-Window1">
        <Material>PMMA</Material>
        <Shape>Box</Shape>
-       <DX unit="mm">127.505</DX>
+       <DX unit="mm">134.505</DX>
        <HalfX unit="mm">0.005</HalfX>
        <HalfY unit="mm">51</HalfY>
        <HalfZ unit="mm">51</HalfZ>
@@ -437,7 +439,7 @@
      <Volume name="VXDBox-Window2">
        <Material>PMMA</Material>
        <Shape>Box</Shape>
-       <DX unit="mm">-127.505</DX>
+       <DX unit="mm">-120.505</DX>
        <HalfX unit="mm">0.005</HalfX>
        <HalfY unit="mm">51</HalfY>
        <HalfZ unit="mm">51</HalfZ>

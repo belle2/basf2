@@ -33,7 +33,7 @@
          <Volumes>
             <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='Magnet']/*)" />
             <Volume name="EUDET-Module1">
-               <DX unit="mm">360.0</DX>
+               <DX unit="mm">180.0</DX>
                <DY unit="mm">0.0</DY>
                <DZ unit="mm">0.0</DZ>
                <Theta unit="deg">90</Theta>
@@ -52,7 +52,7 @@
                </Volume>
             </Volume>
             <Volume name="EUDET-Module2">
-               <DX unit="mm">258.0</DX>
+               <DX unit="mm">160.0</DX>
                <DY unit="mm">0.0</DY>
                <DZ unit="mm">0.0</DZ>
                <Theta unit="deg">90</Theta>
@@ -71,7 +71,7 @@
                </Volume>
             </Volume>
             <Volume name="EUDET-Module3">
-               <DX unit="mm">156.0</DX>
+               <DX unit="mm">140.0</DX>
                <DY unit="mm">0.0</DY>
                <DZ unit="mm">0.0</DZ>
                <Theta unit="deg">90</Theta>
@@ -91,10 +91,13 @@
             </Volume>
             <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='VXDBox']/*))" />
             <Volume name="PXD-Envelope">
+               <Phi unit="deg">180</Phi>
+               <Psi unit="deg">0</Psi>
+               <Theta unit="deg">180</Theta>
+            
                <DX unit="mm">57.0</DX>
-               <!-- Shift down for better PXD acceptance at 6GeV -->
                <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='PXD-Envelope']/*)" />
-               <!--Volume name="CoolingBlock">
+               <Volume name="CoolingBlock">
                   <DY unit="mm">0.0</DY>
                   <DZ unit="mm">-47.0</DZ>
                   <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='CoolingBlock']/*)" />
@@ -111,7 +114,7 @@
                   <DZ unit="mm">-22</DZ>
                   <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='PCB-Board_L2_withCu']/*)" />
                </Volume>
-               <Volume name="PCB-Board_L1_withCu">
+               <!--Volume name="PCB-Board_L1_withCu">
                   <DX unit="mm">-2.75</DX>
                   <DY unit="mm">30</DY>
                   <DZ unit="mm">-22</DZ>
@@ -125,23 +128,7 @@
                   <Phi unit="deg">90</Phi>
                   <Psi unit="deg">90</Psi>
                   
-                  
-                  
-                  <HalfX unit="mm">27.3</HalfX>
-                  <HalfY unit="mm">7.8</HalfY>
-                  <HalfZ unit="mm">0.61</HalfZ>
-                  <Subtract>
-                    <Name>removing_overlap_from_air_volume</Name>
-                    <Shape>Box</Shape>
-                    <HalfX unit="mm">27.3</HalfX>
-                    <HalfY unit="mm">7.8</HalfY>
-                    <HalfZ unit="mm">0.4</HalfZ>
-                    <DZ unit="mm">-0.61</DZ>
-                  </Subtract>
-                  <!--xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='PXD6-S-sensor_L1']/*)" /-->
-                  
-                  
-                  
+                  <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='PXD6-S-sensor_L1']/*)" />                                   
                   <Volume name="PXD-SensitiveArea">
                      <AlignComponent>1.1.1</AlignComponent>
                      <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='airPXD6-S-SensitiveArea_short']/*)" />
@@ -153,31 +140,14 @@
                      </Active>
                   </Volume>
                </Volume>
-               <Volume name="PXD6-sensor_L2">
+               <!--Volume name="PXD6-sensor_L2">
                   <DX unit="mm">-3.71</DX>
                   <DY unit="mm">-1.2</DY>
                   <DZ unit="mm">-7.0</DZ>
                   <Theta unit="deg">-90</Theta>
                   <Phi unit="deg">270</Phi>
                   <Psi unit="deg">90</Psi>
-                  
-                  
-                  
-                  <HalfX unit="mm">32.9</HalfX>
-                  <HalfY unit="mm">7.8</HalfY>
-                  <HalfZ unit="mm">0.61</HalfZ>
-                  <Subtract>
-                    <Name>removing_overlap_from_air_volume</Name>
-                    <Shape>Box</Shape>
-                    <HalfX unit="mm">32.9</HalfX>
-                    <HalfY unit="mm">7.8</HalfY>
-                    <HalfZ unit="mm">0.4</HalfZ>
-                    <DZ unit="mm">-0.61</DZ>
-                  </Subtract>
-                  <!--xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='PXD6-sensor_L2']/*)" /-->
-                  
-                  
-                  
+                  <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='PXD6-sensor_L2']/*)" />
                   <Volume name="PXD-SensitiveArea">
                      <AlignComponent>2.1.2</AlignComponent>
                      <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='airPXD-SensitiveArea']/*)" />
@@ -188,7 +158,7 @@
                         <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='PXD_active_L2']/*)" />
                      </Active>
                   </Volume>
-               </Volume>
+               </Volume-->
             </Volume>
             <Volume name="SVD-Envelope">
                <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='SVD-Envelope']/*)" />
@@ -268,7 +238,7 @@
                </Volume>
             </Volume>
             <Volume name="EUDET-Module4">
-               <DX unit="mm">-156.5</DX>
+               <DX unit="mm">-140.0</DX>
                <DZ unit="mm">0.0</DZ>
                <Theta unit="deg">90</Theta>
                <Phi unit="deg">-90</Phi>
@@ -286,7 +256,7 @@
                </Volume>
             </Volume>
             <Volume name="EUDET-Module5">
-               <DX unit="mm">-256.5</DX>
+               <DX unit="mm">-160.0</DX>
                <DZ unit="mm">0.0</DZ>
                <Theta unit="deg">90</Theta>
                <Phi unit="deg">-90</Phi>
@@ -304,7 +274,7 @@
                </Volume>
             </Volume>
             <Volume name="EUDET-Module6">
-               <DX unit="mm">-359.5</DX>
+               <DX unit="mm">-180.0</DX>
                <DZ unit="mm">0.0</DZ>
                <Theta unit="deg">90</Theta>
                <Phi unit="deg">-90</Phi>

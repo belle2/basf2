@@ -33,6 +33,16 @@ if fieldOn:
 else:
     geometry.param('components', ['TB'])
 
+# PXD digit sorter
+PXDSort = register_module('PXDDigitSorter')
+PXDSort.param('merge', False)
+
+# PXD clusterizer
+PXDClust = register_module('PXDClusterizer')
+
+#PXD DQM module
+PXD_DQM = register_module('PXDDQMModule')
+
 # SVD clusterizer
 SVDClust = register_module('SVDClusterizer')
 if fieldOn:
@@ -142,16 +152,18 @@ main.add_module(ds2sample)
 main.add_module(gearbox)
 main.add_module(geometry)
 
-# Add SVD clusterizer
-main.add_module(SVDClust)
+# PXD: sorter, clusterizer, dqm
+main.add_module(PXDSort)
+main.add_module(PXDClust)
+main.add_module(PXD_DQM)
 
-# Add SVD DQM module
+# SVD: clusterizer, dqm
+main.add_module(SVDClust)
 main.add_module(SVD_DQM)
 
 main.add_module(vxdtf)
 main.add_module(trackfitter)
 main.add_module(vxdtf_dqm)
-
 
 # Test seqrootoutput
 # output = register_module("SeqRootOutput" )

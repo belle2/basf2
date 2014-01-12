@@ -75,7 +75,7 @@ void PXDDQMModule::defineHisto()
     float length = getInfo(i).getLength();
     int nPixels = getInfo(i).getUCells();
     m_hitMapU[i] = new TH1F(name.c_str(), title.c_str(), nPixels, -0.5 * length, 0.5 * length);
-    m_hitMapU[i]->GetXaxis()->SetTitle("u position");
+    m_hitMapU[i]->GetXaxis()->SetTitle("u position [cm]");
     m_hitMapU[i]->GetYaxis()->SetTitle("hits");
   }
   // Hitmaps in V
@@ -86,7 +86,7 @@ void PXDDQMModule::defineHisto()
     float width = getInfo(i).getWidth();
     int nPixels = getInfo(i).getVCells();
     m_hitMapV[i] = new TH1F(name.c_str(), title.c_str(), nPixels, -0.5 * width, 0.5 * width);
-    m_hitMapV[i]->GetXaxis()->SetTitle("v position");
+    m_hitMapV[i]->GetXaxis()->SetTitle("v position [cm]");
     m_hitMapV[i]->GetYaxis()->SetTitle("hits");
   }
   // Hitmaps in UV
@@ -99,8 +99,8 @@ void PXDDQMModule::defineHisto()
     float widthV = getInfo(i).getWidth();
     int nPixelsV = getInfo(i).getVCells();
     m_hitMapUV[i] = new TH2F(name.c_str(), title.c_str(), nPixelsU, -0.5 * lengthU, 0.5 * lengthU, nPixelsV, -0.5 * widthV, 0.5 * widthV);
-    m_hitMapUV[i]->GetXaxis()->SetTitle("u position");
-    m_hitMapUV[i]->GetYaxis()->SetTitle("v position");
+    m_hitMapUV[i]->GetXaxis()->SetTitle("u position [cm]");
+    m_hitMapUV[i]->GetYaxis()->SetTitle("v position [cm]");
     m_hitMapUV[i]->GetZaxis()->SetTitle("hits");
   }
   // charge by plane
@@ -109,7 +109,7 @@ void PXDDQMModule::defineHisto()
     string name = str(format("hPXDCharge%1%") % iPlane);
     string title = str(format("PXD cluster charge, plane %1%") % iPlane);
     m_charge[i] = new TH1F(name.c_str(), title.c_str(), 50, 0, 10000);
-    m_charge[i]->GetXaxis()->SetTitle("cluster charge");
+    m_charge[i]->GetXaxis()->SetTitle("cluster charge [ADU]");
     m_charge[i]->GetYaxis()->SetTitle("count");
   }
   // seed by plane
@@ -118,7 +118,7 @@ void PXDDQMModule::defineHisto()
     string name = str(format("hPXDSeed%1%") % iPlane);
     string title = str(format("PXD seed charge, plane %1%") % iPlane);
     m_seed[i] = new TH1F(name.c_str(), title.c_str(), 50, 0, 10000);
-    m_seed[i]->GetXaxis()->SetTitle("cluster seed");
+    m_seed[i]->GetXaxis()->SetTitle("seed charge [ADU]");
     m_seed[i]->GetYaxis()->SetTitle("count");
   }
   // u size by plane
@@ -127,7 +127,7 @@ void PXDDQMModule::defineHisto()
     string name = str(format("hPXDSizeU%1%") % iPlane);
     string title = str(format("PXD cluster size in U, plane %1%") % iPlane);
     m_sizeU[i] = new TH1F(name.c_str(), title.c_str(), 10, 0, 10);
-    m_sizeU[i]->GetXaxis()->SetTitle("cluster size in u");
+    m_sizeU[i]->GetXaxis()->SetTitle("cluster size in u [pitch units]");
     m_sizeU[i]->GetYaxis()->SetTitle("count");
   }
   // v size by plane
@@ -136,7 +136,7 @@ void PXDDQMModule::defineHisto()
     string name = str(format("hPXDSizeV%1%") % iPlane);
     string title = str(format("PXD cluster size in V, plane %1%") % iPlane);
     m_sizeV[i] = new TH1F(name.c_str(), title.c_str(), 10, 0, 10);
-    m_sizeV[i]->GetXaxis()->SetTitle("cluster size in v");
+    m_sizeV[i]->GetXaxis()->SetTitle("cluster size in v [pitch units]");
     m_sizeV[i]->GetYaxis()->SetTitle("count");
   }
   // size by plane
@@ -145,7 +145,7 @@ void PXDDQMModule::defineHisto()
     string name = str(format("hPXDSize%1%") % iPlane);
     string title = str(format("PXD cluster size, plane %1%") % iPlane);
     m_size[i] = new TH1F(name.c_str(), title.c_str(), 10, 0, 10);
-    m_size[i]->GetXaxis()->SetTitle("cluster size");
+    m_size[i]->GetXaxis()->SetTitle("cluster size [pitch units]");
     m_size[i]->GetYaxis()->SetTitle("count");
   }
   // start raw by plane

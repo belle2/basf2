@@ -403,7 +403,7 @@ void SVDClusterizerModule::writeClusters(VxdID sensorID, int side)
     double restrictedCharge = 0.0;
     for (unsigned int strip = stripLow; strip <= stripHigh; ++strip) {
       double charge = stripCharges.find(strip)->second; // safe
-      clusterTime += m_samplingTime * charge * stripMaxima.find(strip)->second;
+      clusterTime += charge * stripMaxima.find(strip)->second;
       restrictedCharge += charge;
     }
     clusterTime /= restrictedCharge;
@@ -411,13 +411,14 @@ void SVDClusterizerModule::writeClusters(VxdID sensorID, int side)
     if (clusterSize > 1) {
       for (unsigned int strip = stripLow; strip <= stripHigh; ++strip) {
         double charge = stripCharges.find(strip)->second; // safe
-        double diff = m_samplingTime * stripMaxima.find(strip)->second - clusterTime;
+        double diff = stripMaxima.find(strip)->second - clusterTime;
         clusterTiimeStd += charge * diff * diff;
       }
     }
     clusterTiimeStd = sqrt(clusterTiimeStd / restrictedCharge);
     // Only now we scale the time properly
-    clusterTime = m_refTime + m_samplingTime * clusterTime;
+    double shapingTime = isU ? m_shapingTimeHoles : m_shapingTimeElectrons;
+    clusterTime = m_refTime + m_samplingTime * clusterTime - shapingTime;
     // discard if not within acceptance
     if (m_applyWindow && ((clusterTime < m_triggerTime) || (clusterTime > m_triggerTime + m_acceptance)))
       continue;

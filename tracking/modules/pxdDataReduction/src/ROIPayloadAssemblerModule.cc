@@ -38,7 +38,7 @@ ROIPayloadAssemblerModule::ROIPayloadAssemblerModule() : Module()
   setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
 
   addParam("ROIListName", m_ROIListName, "name of the list of ROIs", std::string(""));
-  addParam("ROIpayloadName", m_ROIpayloadName, "name of the payload of ROIs", std::string("pippo"));
+  addParam("ROIpayloadName", m_ROIpayloadName, "name of the payload of ROIs", std::string(""));
 
 }
 

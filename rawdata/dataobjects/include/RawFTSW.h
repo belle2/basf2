@@ -12,6 +12,8 @@
 // Includes
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/time.h>
+
 #include <rawdata/dataobjects/RawDataBlock.h>
 #include <framework/datastore/DataStore.h>
 
@@ -41,10 +43,16 @@ namespace Belle2 {
     unsigned int GetEveNo(int n);
 
     //!
-    unsigned int GetTTUtime(int n);
+    unsigned int GetTTCtimeTRGType(int n);
 
     //!
-    unsigned int GetTTCtimeTRGType(int n);
+    unsigned int GetTTUtime(int n);
+
+    //! Get ctime
+    int GetTTCtime(int n);
+
+    //! Get timeval
+    void GetTimeVal(int n, struct timeval* tv);
 
     //!
     unsigned int GetMagicTrailer(int n);
@@ -62,6 +70,7 @@ namespace Belle2 {
 
     //!
     int GetRunNoSubRunNo(int n);
+
 
 
     /* #ifdef READ_OLD_B2LFEE_FORMAT_FILE */
@@ -96,7 +105,7 @@ namespace Belle2 {
       POS_NA_1 = 5,
       POS_NODE_ID = 6,
       POS_NA_2 = 7,
-      POS_TT_CTIME_TYPE = 8,
+      POS_TT_CTIME_TRGTYPE = 8,
       POS_TT_UTIME = 9,
       POS_FTSW_3 = 10,
       POS_FTSW_4 = 11,
@@ -109,7 +118,9 @@ namespace Belle2 {
       EXP_SHIFT = 22,
       RUNNO_MASK = 0x003FFF00,
       RUNNO_SHIFT = 8,
-      SUBRUNNO_MASK = 0x000000FF
+      SUBRUNNO_MASK = 0x000000FF,
+      TTCTIME_MASK = 0x7FFFFFF0,
+      TTCTIME_SHIFT = 4
     };
 
     enum {

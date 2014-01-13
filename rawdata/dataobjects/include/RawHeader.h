@@ -165,6 +165,12 @@ namespace Belle2 {
       MAGIC_WORD_TERM_HEADER = 0x7fff0005
     };
 
+    /* To extract ctime */
+    enum {
+      TTCTIME_MASK = 0x7FFFFFF0,
+      TTCTIME_SHIFT = 4
+    };
+
   private:
 
     int* m_buffer; //! do not record buffer ( RawCOPPER includes buffer of RawHeader and RawTrailer )

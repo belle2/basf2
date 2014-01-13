@@ -25,14 +25,28 @@ RawFTSW::~RawFTSW()
 }
 
 
+
+unsigned int RawFTSW::GetTTCtimeTRGType(int n)
+{
+  return (unsigned int)(m_buffer[ GetBufferPos(n) +  POS_TT_CTIME_TRGTYPE ]);
+}
+
+
+int RawFTSW::GetTTCtime(int n)
+{
+  return (int)((GetTTCtimeTRGType(n) & TTCTIME_MASK) >> TTCTIME_SHIFT);
+}
+
 unsigned int RawFTSW::GetTTUtime(int n)
 {
   return (unsigned int)(m_buffer[ GetBufferPos(n) +  POS_TT_UTIME ]);
 }
 
-unsigned int RawFTSW::GetTTCtimeTRGType(int n)
+void RawFTSW::GetTimeVal(int n, struct timeval* tv)
 {
-  return (unsigned int)(m_buffer[ GetBufferPos(n) +  POS_TT_CTIME_TYPE ]);
+  tv->tv_sec = GetTTUtime(n);
+  tv->tv_usec = GetTTCtime(n);
+  return ;
 }
 
 

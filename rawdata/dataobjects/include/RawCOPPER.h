@@ -12,11 +12,13 @@
 // Includes
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/time.h>
 
 #include <rawdata/dataobjects/RawDataBlock.h>
 #include <rawdata/dataobjects/RawHeader.h>
 #include <rawdata/dataobjects/RawTrailer.h>
 #include <framework/datastore/DataStore.h>
+
 
 #include <TObject.h>
 
@@ -241,6 +243,12 @@ namespace Belle2 {
     //! check data contents
     void CheckUtimeCtimeTRGType(int n);
 
+    //! Get ctime
+    int GetTTCtime(int n);
+
+    //! Get timeval
+    void GetTimeVal(int n, struct timeval* tv);
+
     //
     // size of "COPPER front header" and "COPPER trailer"
     //
@@ -268,6 +276,8 @@ namespace Belle2 {
 
       SIZE_COPPER_HEADER = 13
     };
+
+
 
     //
     // Data Format : "COPPER Trailer"
@@ -705,6 +715,19 @@ namespace Belle2 {
     return hdr.GetTTUtime();
   }
 
+
+  inline int RawCOPPER::GetTTCtime(int n)
+  {
+    return (int)((GetTTCtimeTRGType(n) & RawHeader::TTCTIME_MASK) >> RawHeader::TTCTIME_SHIFT);
+  }
+
+
+  inline void RawCOPPER::GetTimeVal(int n, struct timeval* tv)
+  {
+    tv->tv_sec = GetTTUtime(n);
+    tv->tv_usec = GetTTCtime(n);
+    return ;
+  }
 
 
 

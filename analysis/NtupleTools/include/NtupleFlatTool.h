@@ -15,6 +15,7 @@
 
 #include <framework/datastore/StoreArray.h>
 #include <TTree.h>
+#include <string>
 
 using namespace std;
 using namespace Belle2;
@@ -27,11 +28,15 @@ namespace Belle2 {
     TTree* m_tree;
     /** DecayDescriptor for this tree. */
     DecayDescriptor m_decaydescriptor;
+    /** Option for this tool. */
+    string m_strOption;
     /** Create branches in m_tree - this function should be called by the constructor only. */
     virtual void setupTree() = 0;
   public:
     /** Constructor. */
     NtupleFlatTool(TTree* tree, DecayDescriptor& decaydescriptor);
+    /** Constructor with option. */
+    NtupleFlatTool(TTree* tree, DecayDescriptor& decaydescriptor, string strOption);
     /** Destructor. */
     virtual ~NtupleFlatTool() {}
     /** Calculate branch variables from provided Particle. */

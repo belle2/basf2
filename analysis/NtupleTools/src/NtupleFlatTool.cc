@@ -16,3 +16,10 @@ NtupleFlatTool::NtupleFlatTool(TTree* tree, DecayDescriptor& decaydescriptor)
   m_tree = tree;
   m_decaydescriptor = decaydescriptor;
 }
+
+NtupleFlatTool::NtupleFlatTool(TTree* tree, DecayDescriptor& decaydescriptor, string strOption)
+{
+  m_tree = tree;
+  m_decaydescriptor = decaydescriptor;
+  m_strOption = strOption;
+}

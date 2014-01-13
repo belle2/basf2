@@ -89,7 +89,6 @@ void PXDRawHitSorterModule::event()
     if (m_mergeFrames) frameCounter = 0;
     sensorID.setSegmentNumber(frameCounter); // should be 0 anyway...
     sensors[sensorID].insert(px);
-    B2WARNING("Sensor " << sensorID << " got " << rawhit->getFrameNr() << " set " << frameCounter)
   }
 
   unsigned int index(0);

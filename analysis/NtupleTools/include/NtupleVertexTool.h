@@ -31,6 +31,12 @@ namespace Belle2 {
     float* m_fDY;
     /** Vertex position Z*/
     float* m_fDZ;
+    /** Vertex position error X*/
+    float* m_fDEX;
+    /** Vertex position error Y*/
+    float* m_fDEY;
+    /** Vertex position error Z*/
+    float* m_fDEZ;
     /** Vertex position Sqrt(X^2+Y^2)*/
     float* m_fDRho;
     /** Vertex fit P-value */

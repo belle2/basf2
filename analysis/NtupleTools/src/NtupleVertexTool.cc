@@ -26,13 +26,19 @@ void NtupleVertexTool::setupTree()
   m_fDX     = new float[nDecayProducts];
   m_fDY     = new float[nDecayProducts];
   m_fDZ     = new float[nDecayProducts];
+  m_fDEX     = new float[nDecayProducts];
+  m_fDEY     = new float[nDecayProducts];
+  m_fDEZ     = new float[nDecayProducts];
   m_fDRho   = new float[nDecayProducts];
   m_fPvalue = new float[nDecayProducts];
 
   for (int iProduct = 0; iProduct < nDecayProducts; iProduct++) {
     m_tree->Branch((strNames[iProduct] + "_X").c_str(), &m_fDX[iProduct], (strNames[iProduct] + "_X/F").c_str());
+    m_tree->Branch((strNames[iProduct] + "_ErrX").c_str(), &m_fDEX[iProduct], (strNames[iProduct] + "_ErrX/F").c_str());
     m_tree->Branch((strNames[iProduct] + "_Y").c_str(), &m_fDY[iProduct], (strNames[iProduct] + "_Y/F").c_str());
+    m_tree->Branch((strNames[iProduct] + "_ErrY").c_str(), &m_fDEY[iProduct], (strNames[iProduct] + "_ErrY/F").c_str());
     m_tree->Branch((strNames[iProduct] + "_Z").c_str(), &m_fDZ[iProduct], (strNames[iProduct] + "_Z/F").c_str());
+    m_tree->Branch((strNames[iProduct] + "_ErrZ").c_str(), &m_fDEZ[iProduct], (strNames[iProduct] + "_ErrZ/F").c_str());
     m_tree->Branch((strNames[iProduct] + "_Rho").c_str(), &m_fDRho[iProduct], (strNames[iProduct] + "_Rho/F").c_str());
     m_tree->Branch((strNames[iProduct] + "_Pval").c_str(), &m_fPvalue[iProduct], (strNames[iProduct] + "_Pval/F").c_str());
   }
@@ -50,11 +56,14 @@ void NtupleVertexTool::eval(const Particle* particle)
 
   int nDecayProducts = selparticles.size();
   for (int iProduct = 0; iProduct < nDecayProducts; iProduct++) {
-    m_fDX[iProduct]     = analysis::particleDX(selparticles[iProduct]);
-    m_fDY[iProduct]     = analysis::particleDY(selparticles[iProduct]);
-    m_fDZ[iProduct]     = analysis::particleDZ(selparticles[iProduct]);
-    m_fDRho[iProduct]   = analysis::particleDRho(selparticles[iProduct]);
-    m_fPvalue[iProduct] = analysis::particlePvalue(selparticles[iProduct]);
+    m_fDX[iProduct]     = selparticles[iProduct]->getX();
+    m_fDY[iProduct]     = selparticles[iProduct]->getY();
+    m_fDZ[iProduct]     = selparticles[iProduct]->getZ();
+    m_fDEX[iProduct]     = TMath::Sqrt(selparticles[iProduct]->getVertexErrorMatrix()[0][0]);
+    m_fDEY[iProduct]     = TMath::Sqrt(selparticles[iProduct]->getVertexErrorMatrix()[1][1]);
+    m_fDEZ[iProduct]     = TMath::Sqrt(selparticles[iProduct]->getVertexErrorMatrix()[2][2]);
+    m_fDRho[iProduct]   = TMath::Sqrt(selparticles[iProduct]->getX() * selparticles[iProduct]->getX() + selparticles[iProduct]->getY() * selparticles[iProduct]->getY());
+    m_fPvalue[iProduct] = selparticles[iProduct]->getPValue();
   }
 }
 

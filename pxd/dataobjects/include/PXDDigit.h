@@ -12,6 +12,7 @@
 #define PXDDIGIT_H
 
 #include <vxd/dataobjects/VxdID.h>
+#include <pxd/dataobjects/PXDRawHit.h>
 
 #include <TObject.h>
 
@@ -29,14 +30,6 @@ namespace Belle2 {
   class PXDDigit : public TObject {
   public:
 
-    /** Default constructor for the ROOT IO. */
-    PXDDigit():
-      m_sensorID(0),
-      m_uCellID(-1), m_vCellID(-1),
-      m_uCellPosition(0), m_vCellPosition(0),
-      m_charge(0)
-    {;}
-
     /** Useful Constructor.
      * @param sensorID Sensor compact ID.
      * @param uCellID Cell ID in "r-phi".
@@ -51,6 +44,23 @@ namespace Belle2 {
       m_uCellPosition(uCellPosition), m_vCellPosition(vCellPosition),
       m_charge(charge)
     {;}
+
+    /** Default constructor for the ROOT IO. */
+    PXDDigit(): PXDDigit(0, -1, -1, 0, 0, 0) {}
+
+    /** Get frame number of this digit.
+     * @return frame number of the digit.
+     */
+    short int getFrameNumber() const { return VxdID(m_sensorID).getSegmentNumber(); }
+
+    /** Set frame number of this digit.
+     * @param frame Frame number to be set.
+     */
+    void setFrameNumber(unsigned short frame) {
+      VxdID id(m_sensorID);
+      id.setSegmentNumber(frame);
+      m_sensorID = id;
+    }
 
     /** Get the sensor ID.
      * @return ID of the sensor.
@@ -96,7 +106,7 @@ namespace Belle2 {
     float m_vCellPosition;     /**< Absolute cell position in z. */
     float m_charge;            /**< Deposited charge (units depend on user selection). */
 
-    ClassDef(PXDDigit, 1)
+    ClassDef(PXDDigit, 2)
 
   }; // class PXDDigit
 

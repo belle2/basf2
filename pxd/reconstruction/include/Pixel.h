@@ -11,6 +11,7 @@
 #ifndef PXD_PIXEL_H
 #define PXD_PIXEL_H
 
+#include <pxd/dataobjects/PXDRawHit.h>
 #include <pxd/dataobjects/PXDDigit.h>
 
 namespace Belle2 {
@@ -19,25 +20,31 @@ namespace Belle2 {
     /**
      * Class to represent one pixel, used in clustering for fast access
      *
-     * This class is a wrapper around PXDDigit to provide ordered access.
-     * Ordering is rowwise: first all digits belonging to the first row,
-     * ordered by column in ascending order.
+     * This class is a wrapper around PXDDigit or PXDRawHit to provide ordered
+     * access. Ordering is row-wise: first all digits/rawhits belonging to the
+     * first row, ordered by column in ascending order.
      *
-     * It contains a copy of the essential values of the PXDDigit to speed up
-     * lookup during clustering. PXDDigit is not used directly as
-     * a) we need the index of the digit after the clustering and the digit
+     * The Pixel object contains a copy of the essential values of the PXDDigit
+     * or PXDRawHit to speed up lookup during sorting or clustering. PXDDigit
+     * or RawHit is not used directly as
+     * a) we need the index of the digit after clustering and the digit
      * does not keep its own index and
-     * b) Inheriting from TObject makes the PXDDigit more than three times
-     * larger than this small class
+     * b) Inheriting from TObject makes the PXDDigit/PXDRawHit more than three
+     * times larger than this small class
      */
     class Pixel {
     public:
-      /** Construct using only an index, used for testing */
-      Pixel(unsigned int index = 0): m_index(index), m_u(0), m_v(0), m_charge(0) {}
+      /** Construct using only an index, used for testing. */
+      Pixel(unsigned int index = 0): m_index(index), m_u(0), m_v(0),
+        m_charge(0) {}
       /** Construct from a given PXDDigit and its store index */
       Pixel(const PXDDigit* digit, unsigned int index): m_index(index),
         m_u(digit->getUCellID()), m_v(digit->getVCellID()),
         m_charge(digit->getCharge()) {}
+      /** Construct from a given PXDRawHit and its store index */
+      Pixel(const PXDRawHit* rawhit, unsigned int index): m_index(index),
+        m_u(rawhit->getColumn()), m_v(rawhit->getRow()),
+        m_charge(rawhit->getCharge()) {}
 
       /** Comparison operator, sorting by row,column in ascending order */
       bool operator<(const Pixel& b) const { return m_v < b.m_v || (m_v == b.m_v && m_u < b.m_u); }

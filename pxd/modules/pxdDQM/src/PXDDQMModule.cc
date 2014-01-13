@@ -154,9 +154,19 @@ void PXDDQMModule::defineHisto()
     int iPlane = indexToPlane(i);
     string name = str(format("hPXDstartRow%1%") % iPlane);
     string title = str(format("PXD readout start row, plane %1%") % iPlane);
-    m_startRow[i] = new TH1F(name.c_str(), title.c_str(), getInfo(i).getVCells(), 0, getInfo(i).getVCells());
+    m_startRow[i] = new TH1F(name.c_str(), title.c_str(), getInfo(i).getVCells() / 4, 0, getInfo(i).getVCells());
     m_startRow[i]->GetXaxis()->SetTitle("start row");
     m_startRow[i]->GetYaxis()->SetTitle("count");
+  }
+
+  // cluster seed charge by distance from the start row and by plane
+  for (int i = 0; i < c_nPXDPlanes; i++) {
+    int iPlane = indexToPlane(i);
+    string name = str(format("hPXDChargeByStartRow%1%") % iPlane);
+    string title = str(format("Seed charge by distance from the start row, PXD plane %1%") % iPlane);
+    m_chargeByStartRow[i] = new TH1F(name.c_str(), title.c_str(), getInfo(i).getVCells() / 4, -0.5 * getInfo(i).getVCells(), 0.5 * getInfo(i).getVCells());
+    m_chargeByStartRow[i]->GetXaxis()->SetTitle("distance from the start row [pitch units]");
+    m_chargeByStartRow[i]->GetYaxis()->SetTitle("total cluster charge [ADU]");
   }
 }
 
@@ -195,6 +205,7 @@ void PXDDQMModule::beginRun()
     m_sizeV[i]->Reset();
     m_size[i]->Reset();
     m_startRow[i]->Reset();
+    m_chargeByStartRow[i]->Reset();
   }
 }
 
@@ -248,14 +259,30 @@ void PXDDQMModule::event()
     m_sizeV[index]->Fill(cluster.getVSize());
     m_size[index]->Fill(cluster.getSize());
   }
-  // Start rows
+
   if (storeFrames && storeFrames.getEntries()) {
+    // Start rows
     for (const PXDFrame & frame : storeFrames) {
       int iPlane = frame.getSensorID().getLayerNumber();
       if ((iPlane < c_firstPXDPlane) || (iPlane > c_lastPXDPlane)) continue;
       int index = planeToIndex(iPlane);
       m_startRow[index]->Fill(frame.getStartRow());
     }
+
+    // Cluster seed charge by start row
+    std::map<VxdID, unsigned short> startRows;
+    for (auto frame : storeFrames)
+      startRows.insert(std::make_pair(frame.getSensorID(), frame.getStartRow()));
+    for (auto cluster : storeClusters) {
+      int iPlane = cluster.getSensorID().getLayerNumber();
+      if ((iPlane < c_firstPXDPlane) || (iPlane > c_lastPXDPlane)) continue;
+      int index = planeToIndex(iPlane);
+      m_chargeByStartRow[index]->Fill(
+        getInfo(index).getVCellID(cluster.getV()) - startRows[cluster.getSensorID()],
+        cluster.getSeedCharge());
+    }
+
+
   }
 
 }

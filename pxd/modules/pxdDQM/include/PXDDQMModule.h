@@ -81,6 +81,7 @@ namespace Belle2 {
     TH1F* m_sizeV[c_nPXDPlanes];          /**< v size by plane */
     TH1F* m_size[c_nPXDPlanes];           /**< size by plane */
     TH1F* m_startRow[c_nPXDPlanes];       /**< start row by plane */
+    TH1F* m_chargeByStartRow[c_nPXDPlanes]; /** side charge by distance from start row */
   };
 
   inline const PXD::SensorInfo& PXDDQMModule::getInfo(int index) const

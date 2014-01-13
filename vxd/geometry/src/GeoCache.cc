@@ -35,6 +35,7 @@ namespace Belle2 {
     }
     const SensorInfoBase& GeoCache::getSensorInfo(VxdID id) const
     {
+      id.setSegmentNumber(0);
       SensorInfoMap::const_iterator info = m_sensorInfo.find(id);
       if (info == m_sensorInfo.end()) B2FATAL("VXD Sensor " << id << " does not exist.");
       return *(info->second);
@@ -145,6 +146,7 @@ namespace Belle2 {
       //We only index by layer, so set everything else to 0
       layer.setLadderNumber(0);
       layer.setSensorNumber(0);
+      layer.setSegmentNumber(0);
       SensorHierachy::const_iterator info = m_ladders.find(layer);
       if (info == m_ladders.end()) B2FATAL("VXD Layer " << layer << "does not exist.");
       return info->second;
@@ -154,6 +156,7 @@ namespace Belle2 {
     {
       //We only index by layer and ladder, set sensor to 0
       ladder.setSensorNumber(0);
+      ladder.setSegmentNumber(0);
       SensorHierachy::const_iterator info = m_sensors.find(ladder);
       if (info == m_sensors.end()) B2FATAL("VXD Ladder " << ladder << "does not exist.");
       return info->second;

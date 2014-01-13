@@ -22,8 +22,7 @@ namespace Belle2 {
    * - Ladder, Layer and Sensor all start at 1
    * - Ladders are numbered with increasing phi
    * - Sensors are numbered from front to back
-   * - Segment ID is not used at the moment but foreseen for tracking and or
-   *   alignment subdivisions of one sensor.
+   * - Segment ID is used for PXD to encode frame number. Currently no use for SVD.
    *
    * Internal use of a union gets rid of all the bit shifting which would be
    * neccessary to represent the id as one baseType and get all the

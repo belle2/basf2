@@ -431,6 +431,16 @@ void DeSerializerPCModule::event()
           temp_rawcopper->SetBuffer((int*)temp_buf + raw_datablk->GetBufferPos(entry_id),
                                     raw_datablk->GetBlockNwords(entry_id), 0, 1, 1);
 
+          struct timeval tv;
+          temp_rawcopper->GetTTCtime(0);
+          temp_rawcopper->GetTTTimeVal(0, &tv);
+          printf("eve %d utime %d ctime %d %x %d %d\n",
+                 temp_rawcopper->GetEveNo(0),
+                 temp_rawcopper->GetTTUtime(0),
+                 temp_rawcopper->GetTTCtime(0),
+                 temp_rawcopper->GetTTCtimeTRGType(0),
+                 tv.tv_sec, tv.tv_usec
+                );
 
 #ifndef NO_DATA_CHECK
           try {

@@ -26,7 +26,8 @@ import b2rc.java.io.RunControlMessage;
 public class SystemButtonPanel extends JPanel implements Updatable {
 
 	private static final long serialVersionUID = 1L;
-
+	private static final String BR = System.getProperty("line.separator");
+	
 	private RCMaster _master;
 	private JButton _button_boot;
 	private JButton _button_load;
@@ -76,8 +77,11 @@ public class SystemButtonPanel extends JPanel implements Updatable {
 					pars[0] = -1;
 					pars[1] = -1;
 					if (_command.equals(RCCommand.START) ) {
-						data +=  " " + _master.getStatus().getOperators() + " " + _master.getStatus().getComment();
+						String comment = _master.getStatus().getComment();
+						comment = comment.replace(BR, "<br/>");
+						data +=  " " + _master.getStatus().getOperators() + ":" + comment;
 					}
+					System.out.println(data);
 					com.sendMessage(new RunControlMessage(_command, pars, data));
 				}
 				com.getControlPanel().addLog(new Log("Pushed command: "+ _command.getAlias(), LogLevel.INFO));

@@ -11,7 +11,7 @@ import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 
 import b2daq.core.Log;
-import b2daq.java.ui.DnDTabbedPane;
+//import b2daq.java.ui.DnDTabbedPane;
 import b2daq.java.ui.LogViewPanel;
 import b2daq.ui.Updatable;
 import b2rc.core.RCMaster;

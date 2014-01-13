@@ -33,16 +33,15 @@ public class RCServerCommunicator {
 		__com = this;
 	}
 
-	public void setSocket(Socket socket) throws IOException {
+	public void setSocket(Socket socket, SocketDataWriter writer, SocketDataReader reader) 
+			throws IOException {
 		_socket = socket;
-		_socket_writer = new SocketDataWriter(_socket);
-		_socket_reader = new SocketDataReader(_socket);
+		_socket_writer = writer;
+		_socket_reader = reader;
 	}
 	
 	public void run() throws Exception {
 		RunControlMessage msg = new RunControlMessage();
-		_master.getNode().setConnection(RCConnection.ONLINE);
-		_master.getNode().setState(RCState.UNKNOWN);
 		while (true) {
 			msg.getCommand().copy(_socket_reader.readInt());
  			RCCommand cmd = msg.getCommand();
@@ -51,13 +50,12 @@ public class RCServerCommunicator {
  				if ( name.matches(_master.getNode().getName()) ) {
  					_master.getData().readObject(_socket_reader);
  				} else if ( name.matches(_master.getConfig().getClassName()) ) {
- 					_master.getConfig().print();
  					_master.getConfig().readObject(_socket_reader);
- 					_master.getConfig().print();
+ 					//_master.getConfig().print();
  					//_master.load();
  				} else if ( name.matches(_master.getStatus().getClassName()) ) {
  					_master.getStatus().readObject(_socket_reader);
- 					_master.getStatus().print();
+ 					//_master.getStatus().print();
  					//_master.load();
  				} else {
  					_master.getData().getObject(name).readObject(_socket_reader);

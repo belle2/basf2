@@ -5,7 +5,7 @@ import java.awt.Toolkit;
 import javax.swing.JFrame;
 import javax.swing.UIManager;
 
-import b2daq.java.ui.DnDTabbedPane;
+//import b2daq.java.ui.DnDTabbedPane;
 import b2daq.ui.Updatable;
 import b2rc.core.RCMaster;
 import b2rc.java.Belle2RunController;
@@ -40,17 +40,17 @@ public class RCMainFrame extends JFrame implements Updatable {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		setSize(940, 720);
+		setSize(960, 720);
 		setTitle("Belle-II Run controller version " + Belle2RunController.VERSION);
 		setLocationRelativeTo(null);
 		setIconImage(Toolkit.getDefaultToolkit().createImage(getClass().getResource("runcontrol.png")));
 
-		DnDTabbedPane main_tab = new DnDTabbedPane();
+		//DnDTabbedPane main_tab = new DnDTabbedPane();
 		//_editor_panel = new EditorMainPanel(_system);
 		_control_panel = new ControlMainPanel(/*_editor_panel,*/ _master);
-		main_tab.addTab("Control", _control_panel);
+		//main_tab.addTab("Control", _control_panel);
 		//main_tab.addTab("Editor", _editor_panel);
-		add(main_tab);
+		add(_control_panel);
 		//_editor_panel.init();
 		setVisible(true);
 	}

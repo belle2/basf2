@@ -718,14 +718,17 @@ namespace Belle2 {
 
   inline int RawCOPPER::GetTTCtime(int n)
   {
-    return (int)((GetTTCtimeTRGType(n) & RawHeader::TTCTIME_MASK) >> RawHeader::TTCTIME_SHIFT);
+    RawHeader hdr;
+    hdr.SetBuffer(GetBuffer(n));
+    return hdr.GetTTCtime();
   }
 
 
   inline void RawCOPPER::GetTTTimeVal(int n, struct timeval* tv)
   {
-    tv->tv_sec = GetTTUtime(n);
-    tv->tv_usec = (int)(((double)GetTTCtime(n)) / 127.216);
+    RawHeader hdr;
+    hdr.SetBuffer(GetBuffer(n));
+    hdr.GetTTTimeVal(tv);
     return ;
   }
 

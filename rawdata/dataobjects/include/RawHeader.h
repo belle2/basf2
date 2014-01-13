@@ -109,9 +109,14 @@ namespace Belle2 {
 
     int GetNodeInfo(int node_no, int* node_id);    //! get contents of header
 
+
     unsigned int GetTTCtimeTRGType();  //! get contents of header
 
+    int GetTTCtime();  //! get contents of header
+
     unsigned int GetTTUtime();  //! get contents of header
+
+    void GetTTTimeVal(struct  timeval* tv);    //! get contents of header
 
     unsigned int GetMagicWordEntireHeader();
 
@@ -419,17 +424,29 @@ namespace Belle2 {
     return m_buffer[ POS_NUM_NODES ];
   }
 
-
   inline unsigned int RawHeader::GetTTCtimeTRGType()
   {
     CheckGetBuffer();
     return (unsigned int)(m_buffer[ POS_TTCTIME_TRGTYPE ]);
   }
 
+  inline int RawHeader::GetTTCtime()
+  {
+    CheckGetBuffer();
+    return (int)((GetTTCtimeTRGType() & TTCTIME_MASK) >> TTCTIME_SHIFT);
+  }
+
   inline unsigned int RawHeader::GetTTUtime()
   {
     CheckGetBuffer();
     return (unsigned int)(m_buffer[ POS_TTUTIME ]);
+  }
+
+  inline void RawHeader::GetTTTimeVal(struct timeval* tv)
+  {
+    tv->tv_sec = GetTTUtime();
+    tv->tv_usec = (int)(((double)GetTTCtime()) / 127.216);
+    return ;
   }
 
 

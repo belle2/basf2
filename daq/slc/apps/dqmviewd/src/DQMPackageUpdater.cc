@@ -33,7 +33,7 @@ bool DQMPackageUpdater::isStopped()
 void DQMPackageUpdater::run()
 {
   while (true) {
-    sleep(5);
+    sleep(2);
     if (!isStopped()) {
       if (_manager->isAvailable()) {
         _manager->update();

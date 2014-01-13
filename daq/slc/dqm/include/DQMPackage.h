@@ -36,6 +36,12 @@ namespace Belle2 {
 
 }
 
+#define REGISTER_DQM_PACKAGE(classname) \
+  extern "C" void* create##classname(const char* name, const char* filename)\
+  {\
+    return new Belle2::classname(name, filename);\
+  }
+
 #endif
 
 

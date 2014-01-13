@@ -22,7 +22,7 @@ void MonitorMaster::addManager(PackageManager* manager)
 void MonitorMaster::signal(int index)
 {
   _mutex.lock();
-  _index = index;
+  _index = index + 1;
   _cond.broadcast();
   _mutex.unlock();
 }
@@ -30,7 +30,7 @@ void MonitorMaster::signal(int index)
 int MonitorMaster::wait(int sec)
 {
   _mutex.lock();
-  int index = -1;
+  int index = 0;
   if (_cond.wait(_mutex, sec, 0)) {
     index = _index;
   }

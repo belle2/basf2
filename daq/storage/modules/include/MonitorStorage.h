@@ -27,11 +27,15 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/dataobjects/EventMetaData.h>
 
-#include <daq/rawdata/modules/DAQConsts.h>
 #include <rawdata/dataobjects/RawCDC.h>
 #include <rawdata/dataobjects/RawCOPPER.h>
+
+#include <daq/rawdata/modules/DAQConsts.h>
+
 #include <daq/dataobjects/SendHeader.h>
 #include <daq/dataobjects/SendTrailer.h>
+
+#include <daq/storage/storager_data.h>
 
 #include "TH1F.h"
 #include "TH2F.h"
@@ -62,16 +66,10 @@ namespace Belle2 {
     virtual void defineHisto();
 
   public:
-    static int g_expno;
-    static int g_runno;
-    static int g_subno;
-    static int g_evtno;
-    static int g_nevts;
-    static double g_starttime;
-    static double g_datasize;
-    static double g_curtime;
-    static double g_freq;
-    static double g_rate;
+    static storager_data& getData() { return g_data; }
+
+  private:
+    static storager_data g_data;
 
   private:
 

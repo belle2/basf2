@@ -15,6 +15,7 @@
 
 using namespace Belle2;
 
+bool LogFile::__opened = false;
 std::string LogFile::__filepath;
 std::ofstream LogFile::__stream;
 unsigned int LogFile::__filesize = 0;
@@ -23,16 +24,18 @@ SystemLog::Priority LogFile::__threshold;
 
 void LogFile::open(const std::string& filename, SystemLog::Priority threshold)
 {
-  if (!__stream) {
+  if (!__opened) {
     ConfigFile config("slowcontrol");
     __filepath = config.get("LOGFILE_DIR") + "/" + filename + ".log";
     __threshold = threshold;
+    __opened = true;
     open();
   }
 }
 
 void LogFile::open()
 {
+  if (!__opened) return;
   struct stat st;
   if (stat(__filepath.c_str(), &st) == 0) {
     __filesize = st.st_blksize;
@@ -132,9 +135,11 @@ int LogFile::put_impl(const std::string& msg, SystemLog::Priority priority, va_l
   ss << s << std::endl;
   std::string str = ss.str();
   std::cerr << str;
-  __stream << str;
-  __stream.flush();
-  __filesize += str.size();
+  if (__opened) {
+    __stream << str;
+    __stream.flush();
+    __filesize += str.size();
+  }
   __mutex.unlock();
   return (int) str.size();
 }

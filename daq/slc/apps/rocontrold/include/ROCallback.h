@@ -10,11 +10,12 @@ namespace Belle2 {
   class ROCallback : public RCCallback {
 
   public:
-    ROCallback(NSMNode* node, const std::string& dir);
+    ROCallback(NSMNode* node, const std::string& config);
     virtual ~ROCallback() throw();
 
   public:
     virtual void init() throw();
+    virtual void term() throw();
     virtual bool boot() throw();
     virtual bool load() throw();
     virtual bool start() throw();
@@ -26,7 +27,7 @@ namespace Belle2 {
 
   private:
     ProcessController _con;
-    std::string _dir;
+    std::string _path;
 
   };
 

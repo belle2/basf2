@@ -26,7 +26,8 @@ namespace Belle2 {
 
   public:
     State wait(int timeout);
-    bool init(const std::string& name = "");
+    bool init(const std::string& name,
+              int nreserved = 0);
     void clear();
     bool load(int timeout);
     bool start();

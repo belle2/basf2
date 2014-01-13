@@ -23,7 +23,6 @@ using namespace Belle2;
 RCMasterCallback::RCMasterCallback(NSMNode* node)
   : RCCallback(node)
 {
-  node->setState(State::INITIAL_S);
 }
 
 RCMasterCallback::~RCMasterCallback() throw()
@@ -89,13 +88,11 @@ bool RCMasterCallback::distribute(Command command,
 
 bool RCMasterCallback::boot() throw()
 {
-  Belle2::debug("BOOT");
   return distribute(Command::BOOT, 0, 0, 0);
 }
 
 bool RCMasterCallback::load() throw()
 {
-  Belle2::debug("LOAD");
   _master->lock();
   _master->getStatus()->update();
   int confno = (getMessage().getNParams() > 0) ? getMessage().getParam(0) : -1;
@@ -113,7 +110,6 @@ bool RCMasterCallback::load() throw()
 
 bool RCMasterCallback::start() throw()
 {
-  Belle2::debug("START");
   NSMMessage& nsm(getMessage());
   int exp_no = nsm.getParam(0);
   int cold_no = nsm.getParam(1);
@@ -149,7 +145,6 @@ bool RCMasterCallback::start() throw()
 
 bool RCMasterCallback::stop() throw()
 {
-  Belle2::debug("STOP");
   _master->lock();
   RunStatus* status = _master->getStatus();
   status ->setEndTime(Time().getSecond());
@@ -161,7 +156,6 @@ bool RCMasterCallback::stop() throw()
 
 bool RCMasterCallback::trigft() throw()
 {
-  Belle2::debug("TRIGFT");
   _master->lock();
   RCCommunicator* comm = _master->getClientCommunicator();
   for (RCMaster::NSMNodeList::iterator it = _master->getNSMNodes().begin();
@@ -212,25 +206,21 @@ bool RCMasterCallback::trigft() throw()
 
 bool RCMasterCallback::recover() throw()
 {
-  Belle2::debug("RECOVER");
   return distribute(Command::RECOVER, 0, 0, 0);
 }
 
 bool RCMasterCallback::abort() throw()
 {
-  Belle2::debug("ABORT");
   return distribute(Command::ABORT, 0, 0, 0);
 }
 
 bool RCMasterCallback::pause() throw()
 {
-  Belle2::debug("PAUSE");
   return distribute(Command::PAUSE, 0, 0, 0);
 }
 
 bool RCMasterCallback::resume() throw()
 {
-  Belle2::debug("RESUME");
   return distribute(Command::RESUME, 0, 0, 0);
 }
 

@@ -1,8 +1,6 @@
 #include "daq/slc/database/PostgreSQLInterface.h"
-///*
-#include <daq/slc/base/StringUtil.h>
 
-#include <iostream>
+#include <daq/slc/base/StringUtil.h>
 
 using namespace Belle2;
 
@@ -18,8 +16,6 @@ void PostgreSQLInterface::connect() throw(DBHandlerException)
 {
   _sq_conn = PQconnectdb(Belle2::form("host=%s dbname=%s user=%s password=%s",
                                       _host.c_str(), _database.c_str(),
-                                      //_sq_conn = PQconnectdb(Belle2::form("dbname=%s user=%s password=%s",
-                                      //_database.c_str(),
                                       _user.c_str(), _password.c_str()).c_str());
   if (PQstatus(_sq_conn) == CONNECTION_BAD) {
     throw (DBHandlerException(__FILE__, __LINE__,
@@ -36,16 +32,15 @@ throw(DBHandlerException)
   ExecStatusType status = PQresultStatus(_sq_result);
   if (status == PGRES_FATAL_ERROR) {
     throw (DBHandlerException(__FILE__, __LINE__,
-                              Belle2::form("Failed to execute command : %s (%s)", command.c_str(),
-                                           PQerrorMessage(_sq_conn))));
+                              Belle2::form("Failed to execute command : %s (%s)",
+                                           command.c_str(), PQerrorMessage(_sq_conn))));
   }
 }
 
 DBRecordList& PostgreSQLInterface::loadRecords() throw(DBHandlerException)
 {
   if (PQresultStatus(_sq_result) != PGRES_TUPLES_OK) {
-    throw (DBHandlerException(__FILE__, __LINE__,
-                              "Failed to get records"));
+    throw (DBHandlerException(__FILE__, __LINE__, "Failed to get records"));
   }
   const size_t nrecords = PQntuples(_sq_result);
   const size_t nfields = PQnfields(_sq_result);
@@ -81,4 +76,4 @@ void PostgreSQLInterface::close() throw(DBHandlerException)
   clear();
   PQfinish(_sq_conn);
 }
-//*/
+

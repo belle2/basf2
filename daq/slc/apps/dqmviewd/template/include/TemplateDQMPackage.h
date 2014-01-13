@@ -17,7 +17,7 @@ namespace Belle2 {
 
   public:
     virtual void init();
-    virtual void update();
+    virtual bool update();
 
   private:
     Histo* h1;

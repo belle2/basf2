@@ -14,7 +14,7 @@ namespace Belle2 {
 
   public:
     virtual void init() = 0;
-    virtual void update() = 0;
+    virtual bool update() = 0;
 
   public:
     HistoPackage* getPackage() throw() { return m_package; }

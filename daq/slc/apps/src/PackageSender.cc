@@ -32,24 +32,20 @@ bool PackageSender::sendUpdates(Writer& writer,
 throw(IOException)
 {
   PackageManager* manager = _master->getManager(i);
-  if (!manager->isAvailable()) {
-    writer.writeInt(-(1 + i));
-  } else {
-    int id = _update_id_v[i];
-    size_t count = manager->copyContents(_contents_v[i].buf,
-                                         _contents_v[i].size, id);
-    _contents_v[i].count = count;
-    if (count > 0) {
-      writer.writeInt(FLAG_UPDATE);
-      writer.writeInt(n);
-      writer.writeInt(_contents_v[i].count);
-      writer.write(_contents_v[i].buf, _contents_v[i].count);
-      if (_update_id_v[i] > id) {
-        _update_id_v[i] = id;
-        return true;
-      }
+  int id = _update_id_v[i];
+  size_t count = manager->copyContents(_contents_v[i].buf,
+                                       _contents_v[i].size, id);
+  _contents_v[i].count = count;
+  if (count > 0) {
+    writer.writeInt(FLAG_UPDATE);
+    writer.writeInt(n);
+    writer.writeInt(_contents_v[i].count);
+    writer.write(_contents_v[i].buf, _contents_v[i].count);
+    if (_update_id_v[i] > id) {
       _update_id_v[i] = id;
+      return true;
     }
+    _update_id_v[i] = id;
   }
   return false;
 }
@@ -71,14 +67,13 @@ void PackageSender::run()
     _xml_v = std::vector<std::string>();
     _update_id_v = std::vector<int>();
 
-    std::vector<PackageManager*> manager_v;
-    for (size_t i = 0; i < _master->getManagers().size(); i++) {
-      if (_master->getManager(i)->isAvailable()) {
-        manager_v.push_back(_master->getManager(i));
-      }
+    std::vector<PackageManager*>& manager_v(_master->getManagers());
+    size_t nman = 0;
+    for (size_t i = 0; i < manager_v.size(); i++) {
+      if (manager_v[i]->isAvailable()) nman++;
     }
     writer.writeInt(FLAG_LIST);
-    writer.writeInt((int)manager_v.size());
+    writer.writeInt((int)nman);
     for (size_t i = 0; i < manager_v.size(); i++) {
       if (manager_v[i]->isAvailable())
         writer.writeString(manager_v[i]->getName());
@@ -97,7 +92,7 @@ void PackageSender::run()
 
     for (size_t i = 0; i < manager_v.size(); i++) {
       PackageManager* manager = manager_v[i];
-      size_t size = 0, count;
+      size_t size = 0, count = 0;
       char* buf = manager->createConfig(size);
       count = manager->copyConfig(buf, size);
       zipped_buf conf = {buf, size, count};
@@ -131,18 +126,19 @@ void PackageSender::run()
 
     try {
       while (true) {
-        int i = _master->wait(10);
-        if (i < 0) continue;
-        if (monitored_v[i] && sendUpdates(writer, i, id_m[i])) break;
-        bool breaked = false;
-        for (i = 0; i < (int)_contents_v.size(); i++) {
-          if (monitored_v[i] &&
-              (breaked = sendUpdates(writer, i, id_m[i])))
-            break;
+        int id = _master->wait(10);
+        if (id == 0) continue;
+        if (id < 0) break;
+        id--;
+        if (monitored_v[id]) sendUpdates(writer, id, id_m[id]);
+        for (id = 0; id < (int)_contents_v.size(); id++) {
+          if (monitored_v[id]) sendUpdates(writer, id, id_m[id]);
         }
-        if (breaked) break;
       }
-    } catch (const IOException& e) { return; }
+    } catch (const IOException& e) {
+      _socket.close();
+      return;
+    }
   }
 }
 

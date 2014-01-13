@@ -1,7 +1,10 @@
 #include "daq/slc/nsm/NSMNodeDaemon.h"
 
+#include "daq/slc/system/LogFile.h"
+
 #include "daq/slc/base/Debugger.h"
 #include "daq/slc/base/StringUtil.h"
+
 #include "daq/slc/base/Date.h"
 
 #include <unistd.h>
@@ -33,13 +36,13 @@ void NSMNodeDaemon::init() throw(NSMHandlerException)
     if (_wdata != NULL) _wdata->allocate(_nsm_comm);
     _callback->init();
   } catch (const NSMHandlerException& e) {
-    Belle2::debug("[DEBUG] Failed to connect NSM network (%s:%d)",
-                  _host.c_str(), _port);
+    LogFile::fatal("Failed to connect NSM network (%s:%d). Terminating process ",
+                   _host.c_str(), _port);
     delete _nsm_comm;
     _nsm_comm = NULL;
     exit(1);
   }
-  Belle2::debug("[DEBUG] Connected to NSM2 daemon");
+  LogFile::debug("Connected to NSM2 daemon");
 }
 
 void NSMNodeDaemon::run() throw()
@@ -54,7 +57,7 @@ void NSMNodeDaemon::run() throw()
       }
     }
   } catch (const std::exception& e) {
-    Belle2::debug("[ERROR] NSM node daemon : Caught exception (%s). Terminate process...",
-                  e.what());
+    LogFile::fatal("NSM node daemon : Caught exception (%s). Terminate process...",
+                   e.what());
   }
 }

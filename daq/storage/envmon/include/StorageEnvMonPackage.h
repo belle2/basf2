@@ -1,26 +1,26 @@
-#ifndef _Belle2_StorageDQMPackage_h
-#define _Belle2_StorageDQMPackage_h
+#ifndef _Belle2_StorageEnvMonPackage_h
+#define _Belle2_StorageEnvMonPackage_h
 
-#include <daq/slc/dqm/DQMPackage.h>
+#include <daq/storage/storager_data.h>
 
+#include <daq/slc/dqm/EnvMonitorPackage.h>
 #include <daq/slc/dqm/MonLabel.h>
 #include <daq/slc/dqm/TimedGraph1.h>
 
 namespace Belle2 {
 
-  class StorageDQMPackage : public DQMPackage {
+  class StorageEnvMonPackage : public EnvMonitorPackage {
 
   public:
-    StorageDQMPackage(const std::string& name,
-                      const std::string& filename);
-    virtual ~StorageDQMPackage() throw() {};
+    StorageEnvMonPackage(const std::string& name);
+    virtual ~StorageEnvMonPackage() throw() {};
 
   public:
     virtual void init();
     virtual bool update();
 
   private:
-    Histo* m_h_runinfo;
+    storager_data* m_data;
     MonLabel* m_label_expno;
     MonLabel* m_label_runno;
     MonLabel* m_label_subno;

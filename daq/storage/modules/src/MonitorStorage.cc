@@ -25,16 +25,7 @@ REG_MODULE(MonitorStorage)
 //                 Implementation
 //-----------------------------------------------------------------
 
-int MonitorStorageModule::g_expno = 0;
-int MonitorStorageModule::g_runno = 0;
-int MonitorStorageModule::g_subno = 0;
-int MonitorStorageModule::g_evtno = 0;
-int MonitorStorageModule::g_nevts = 0;
-double MonitorStorageModule::g_starttime = 0;
-double MonitorStorageModule::g_datasize = 0;
-double MonitorStorageModule::g_curtime = 0;
-double MonitorStorageModule::g_freq = 0;
-double MonitorStorageModule::g_rate = 0;
+storager_data MonitorStorageModule::g_data;
 
 MonitorStorageModule::MonitorStorageModule() : HistoModule()
 {
@@ -86,14 +77,14 @@ void MonitorStorageModule::terminate()
 
 void MonitorStorageModule::event()
 {
-  m_h_runinfo->SetBinContent(1, g_expno);
-  m_h_runinfo->SetBinContent(2, g_runno);
-  m_h_runinfo->SetBinContent(3, g_subno);
-  m_h_runinfo->SetBinContent(4, g_evtno);
-  m_h_runinfo->SetBinContent(5, g_nevts);
-  m_h_runinfo->SetBinContent(6, g_starttime);
-  m_h_runinfo->SetBinContent(7, g_curtime);
-  m_h_runinfo->SetBinContent(8, g_datasize);
-  m_h_runinfo->SetBinContent(9, g_freq);
-  m_h_runinfo->SetBinContent(10, g_rate);
+  m_h_runinfo->SetBinContent(1, g_data.expno);
+  m_h_runinfo->SetBinContent(2, g_data.runno);
+  m_h_runinfo->SetBinContent(3, g_data.subno);
+  m_h_runinfo->SetBinContent(4, g_data.evtno);
+  m_h_runinfo->SetBinContent(5, g_data.nevts);
+  m_h_runinfo->SetBinContent(6, g_data.starttime);
+  m_h_runinfo->SetBinContent(7, g_data.curtime);
+  m_h_runinfo->SetBinContent(8, g_data.datasize);
+  m_h_runinfo->SetBinContent(9, g_data.freq);
+  m_h_runinfo->SetBinContent(10, g_data.rate);
 }

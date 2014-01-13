@@ -2,17 +2,17 @@
 
 using namespace Belle2;
 
-NSMData* EnvMonitorPackage::getData(const std::string& name)
+EnvMonitorPackage::~EnvMonitorPackage() throw()
 {
-  return (hasData(name)) ? _data_m[name] : NULL;
 }
 
-void EnvMonitorPackage::addData(NSMData* data)
+NSMData* EnvMonitorPackage::getData()
 {
-  _data_m.insert(NSMDataMap::value_type(data->getName(), data));
+  return _data;
 }
 
-bool EnvMonitorPackage::hasData(const std::string& name)
+void EnvMonitorPackage::setData(NSMData* data)
 {
-  return _data_m.find(name) != _data_m.begin();
+  _data = data;
 }
+

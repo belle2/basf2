@@ -2,6 +2,7 @@
 
 using namespace Belle2;
 
+const State State::UNKNOWN(Enum::UNKNOWN);
 const State State::INITIAL_S(101, "INITIAL", "INITIAL");
 const State State::CONFIGURED_S(102, "CONFIGURED", "CONFIGURED");
 const State State::READY_S(103, "READY", "READY");

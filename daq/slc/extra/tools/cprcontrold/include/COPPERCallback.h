@@ -20,6 +20,7 @@ namespace Belle2 {
 
   public:
     virtual void init() throw();
+    virtual void term() throw();
     virtual bool boot() throw();
     virtual bool load() throw();
     virtual bool start() throw();
@@ -30,10 +31,11 @@ namespace Belle2 {
     virtual bool abort() throw();
 
   private:
-    std::string _rc_config;
     ProcessController _con;
     HSLBController _hslbcon_v[4];
     int _confno;
+    std::string _path;
+    std::string _hostname;
     XMLElement* _el_v[4];
 
   };

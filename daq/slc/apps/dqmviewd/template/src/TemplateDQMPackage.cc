@@ -14,6 +14,8 @@
 
 using namespace Belle2;
 
+REGISTER_DQM_PACKAGE(TemplateDQMPackage)
+
 TemplateDQMPackage::TemplateDQMPackage(const std::string& name,
                                        const std::string& filename)
   : DQMPackage(name, filename)
@@ -158,7 +160,7 @@ void TemplateDQMPackage::init()
   _time = Belle2::Time().get();
 }
 
-void TemplateDQMPackage::update()
+bool TemplateDQMPackage::update()
 {
   double time = Belle2::Time().get();
   double rate = 0;
@@ -186,4 +188,5 @@ void TemplateDQMPackage::update()
     }
   }
   _time = time;
+  return true;
 }

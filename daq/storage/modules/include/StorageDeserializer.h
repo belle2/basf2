@@ -34,6 +34,10 @@ namespace Belle2 {
   class StorageDeserializerModule : public Module {
 
   public:
+    static RunInfoBuffer* getInfo() { return g_info; }
+
+  private:
+    static RunInfoBuffer* g_info;
 
     // Public functions
   public:
@@ -62,7 +66,7 @@ namespace Belle2 {
     StorageRBufferManager* m_buf;
     MsgHandler* m_msghandler;
     DataStoreStreamer* m_streamer;
-    RunInfoBuffer m_info;
+    RunInfoBuffer* m_info;
     bool m_running;
     int m_compressionLevel;
     int m_nrecv;

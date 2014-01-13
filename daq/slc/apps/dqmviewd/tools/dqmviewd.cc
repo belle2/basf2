@@ -8,11 +8,13 @@
 #include <daq/slc/system/Fork.h>
 #include <daq/slc/system/Executor.h>
 #include <daq/slc/system/DynamicLoader.h>
+#include <daq/slc/system/LogFile.h>
 
 #include <daq/slc/base/StringUtil.h>
 #include <daq/slc/base/Debugger.h>
 #include <daq/slc/base/ConfigFile.h>
 
+#include <cstring>
 #include <cstdlib>
 #include <dirent.h>
 #include <errno.h>
@@ -54,6 +56,7 @@ int main(int argc, char** argv)
     Belle2::debug("Usage: ./dqmserver <name> [<config>]");
     return 1;
   }
+  LogFile::open("dqmviewd");
   system("killall hserver");
   //const char* name = argv[1];
   ConfigFile config((argc > 2) ? argv[2] : "dqm");
@@ -73,18 +76,16 @@ int main(int argc, char** argv)
     while ((entry = readdir(dir)) != NULL) {
       if (entry->d_type == DT_REG) {
         std::string filename = entry->d_name;
-        if (filename.find(".conf") != std::string::npos) {
+        if (filename.find(".conf") != std::string::npos &&
+            filename.find("~") == std::string::npos) {
           config.clear();
           config.read(config_path + "/" + filename);
           std::string pack_name = config.get("DQM_PACKAGE_NAME");
           int pack_port = config.getInt("DQM_PACKAGE_PORT");
           if (pack_name.size() == 0 || pack_port == 0) continue;
           std::string pack_map   = config.get("DQM_PACKAGE_MAP");
-          Belle2::debug("DQM config (%d): %s", count++, filename.c_str());
-          Belle2::debug("DQM name = %s, port = %d, map file = %s",
-                        pack_name.c_str(), pack_port, pack_map.c_str());
-          Belle2::debug("booting hserver with port = %d mapfile = %s/%s",
-                        pack_port, map_path.c_str(), pack_map.c_str());
+          LogFile::debug("Open hserver for %s (port = %d, map file = %s)",
+                         pack_name.c_str(), pack_port, pack_map.c_str());
           Fork(new HSeverExecutor(pack_port, pack_map, map_path));
           std::string pack_lib   = config.get("DQM_PACKAGE_LIB");
           std::string pack_class = config.get("DQM_PACKAGE_CLASS");
@@ -108,11 +109,12 @@ int main(int argc, char** argv)
     }
     closedir(dir);
   } else {
-    throw (Exception(__FILE__, __LINE__,
-                     Belle2::form("Failed to find directory : %s", strerror(errno))));
+    std::string emsg = Belle2::form("Failed to find directory : %s", strerror(errno));
+    LogFile::fatal(emsg.c_str());
+    throw (Exception(__FILE__, __LINE__, emsg));
   }
-  Belle2::PThread(new DQMUIAcceptor(hostname, port, master));
-  Belle2::debug("Start socket acception from GUIs");
+  PThread(new DQMUIAcceptor(hostname, port, master));
+  LogFile::debug("Start socket acception from GUIs");
   master->run();
   return 0;
 }

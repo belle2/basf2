@@ -5,10 +5,10 @@
 
 #include "daq/slc/nsm/NSMCommunicator.h"
 
+#include "daq/slc/system/LogFile.h"
+
 #include "daq/slc/base/SystemLog.h"
 #include "daq/slc/base/Debugger.h"
-
-#include <iostream>
 
 using namespace Belle2;
 
@@ -20,7 +20,7 @@ LogCollectorCallback::LogCollectorCallback(NSMNode* node,
     try {
       _man->createTable();
     } catch (const DBHandlerException& e) {
-      Belle2::debug(e.what());
+      LogFile::debug(e.what());
     }
   }
 }
@@ -43,10 +43,10 @@ bool LogCollectorCallback::log() throw()
     try {
       _man->writeLog(log);
     } catch (const DBHandlerException& e) {
-      Belle2::debug(e.what());
+      LogFile::fatal("Failed to write new log : %s", e.what());
     }
   }
-  std::cout << log.toString() << std::endl;
+  LogFile::debug(log.toString());
   return true;
 }
 

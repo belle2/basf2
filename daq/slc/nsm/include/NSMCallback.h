@@ -25,8 +25,12 @@ namespace Belle2 {
       Command cmd;
     };
 
+  public:
+    static void terminate(int sig);
+
   private:
     typedef std::vector<NSMRequestId> NSMRequestList;
+    static std::vector<NSMCallback*> __callback_v;
 
   public:
     NSMCallback(NSMNode* node) throw();
@@ -34,6 +38,7 @@ namespace Belle2 {
 
   public:
     virtual void init() throw() {}
+    virtual void term() throw() {}
     virtual bool ok() { return true; }
     virtual bool error() { return true; }
     virtual bool fatal() { return true; }

@@ -2,11 +2,14 @@
 
 #include <daq/slc/nsm/NSMNodeDaemon.h>
 
+#include <daq/slc/system/LogFile.h>
+
 #include <daq/slc/base/Debugger.h>
 #include <daq/slc/base/StringUtil.h>
 #include <daq/slc/base/ConfigFile.h>
 
 #include <cstdlib>
+#include <unistd.h>
 
 using namespace Belle2;
 
@@ -16,12 +19,12 @@ int main(int argc, char** argv)
     Belle2::debug("Usage : ./storagerd <name>");
     return 1;
   }
+  daemon(0, 0);
+  LogFile::open("storage");
   const char* name = argv[1];
   NSMNode* node = new NSMNode(name);
   ConfigFile config("slowcontrol", "storage");
-  const std::string dir = Belle2::form("%s/daq/storage/examples/",
-                                       getenv("BELLE2_LOCAL_DIR"));
-  StoragerCallback* callback = new StoragerCallback(node, dir);
+  StoragerCallback* callback = new StoragerCallback(node);
   NSMNodeDaemon* daemon = new NSMNodeDaemon(callback);
   daemon->run();
 

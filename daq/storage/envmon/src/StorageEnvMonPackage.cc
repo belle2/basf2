@@ -1,4 +1,4 @@
-#include "daq/storage/dqm/StorageDQMPackage.h"
+#include "daq/storage/envmon/StorageEnvMonPackage.h"
 
 #include <daq/slc/dqm/Histo1F.h>
 #include <daq/slc/dqm/Histo2F.h>
@@ -16,78 +16,78 @@
 
 using namespace Belle2;
 
-REGISTER_DQM_PACKAGE(StorageDQMPackage)
+REGISTER_ENV_PACKAGE(StorageEnvMonPackage)
 
-StorageDQMPackage::StorageDQMPackage(const std::string& name,
-                                     const std::string& filename)
-  : DQMPackage(name, filename)
+StorageEnvMonPackage::StorageEnvMonPackage(const std::string& name)
+  : EnvMonitorPackage(name)
 {
 
 }
 
-void StorageDQMPackage::init()
+void StorageEnvMonPackage::init()
 {
-  // get histogram preloaded from mapped file
   HistoPackage* pack = getPackage();
-  m_h_runinfo = pack->getHisto("h_runinfo");
+  // get pointer to nsm data;
+  m_data = (storager_data*)(getData()->get());
 
   // create and register extra objects
-  m_label_expno = (MonLabel*)pack->addMonObject(new MonLabel("m_label_expno", 20));
+  m_label_expno = (MonLabel*)pack->addMonObject(new MonLabel("label_expno", 20));
   m_label_expno->setUpdated(true);
   FontProperty* font = new FontProperty(MonColor::WHITE, 1.4);
   font->setAlign("right middle");
   m_label_expno->setFont(font);
 
-  m_label_runno = (MonLabel*)pack->addMonObject(new MonLabel("m_label_runno", 20));
+  m_label_runno = (MonLabel*)pack->addMonObject(new MonLabel("label_runno", 20));
   m_label_runno->setUpdated(true);
   font = new FontProperty(MonColor::WHITE, 1.4);
   font->setAlign("right middle");
   m_label_runno->setFont(font);
 
-  m_label_starttime = (MonLabel*)pack->addMonObject(new MonLabel("m_label_starttime", 20));
+  m_label_starttime = (MonLabel*)pack->addMonObject(new MonLabel("label_starttime", 20));
   m_label_starttime->setUpdated(true);
   font = new FontProperty(MonColor::WHITE, 1.4);
   font->setAlign("right middle");
   m_label_starttime->setFont(font);
 
-  m_label_runlength = (MonLabel*)pack->addMonObject(new MonLabel("m_label_runlength", 20));
+  m_label_runlength = (MonLabel*)pack->addMonObject(new MonLabel("label_runlength", 20));
   m_label_runlength->setUpdated(true);
   font = new FontProperty(MonColor::WHITE, 1.4);
   font->setAlign("right middle");
   m_label_runlength->setFont(font);
 
-  m_label_event_rate = (MonLabel*)pack->addMonObject(new MonLabel("m_label_event_rate", 20));
+  m_label_event_rate = (MonLabel*)pack->addMonObject(new MonLabel("label_event_rate", 20));
   m_label_event_rate->setUpdated(true);
   font = new FontProperty(MonColor::WHITE, 1.4);
   font->setAlign("right middle");
   m_label_event_rate->setFont(font);
 
-  m_label_nevts = (MonLabel*)pack->addMonObject(new MonLabel("m_label_nevts", 20));
+  m_label_nevts = (MonLabel*)pack->addMonObject(new MonLabel("label_nevts", 20));
   m_label_nevts->setUpdated(true);
   font = new FontProperty(MonColor::WHITE, 1.4);
   font->setAlign("right middle");
   m_label_nevts->setFont(font);
 
-  m_label_data_rate = (MonLabel*)pack->addMonObject(new MonLabel("m_label_data_rate", 20));
+  m_label_data_rate = (MonLabel*)pack->addMonObject(new MonLabel("label_data_rate", 20));
   m_label_data_rate->setUpdated(true);
   font = new FontProperty(MonColor::WHITE, 1.4);
   font->setAlign("right middle");
   m_label_data_rate->setFont(font);
 
-  m_label_data_size = (MonLabel*)pack->addMonObject(new MonLabel("m_label_data_size", 20));
+  m_label_data_size = (MonLabel*)pack->addMonObject(new MonLabel("label_data_size", 20));
   m_label_data_size->setUpdated(true);
   font = new FontProperty(MonColor::WHITE, 1.4);
   font->setAlign("right middle");
   m_label_data_size->setFont(font);
 
-  m_g_event_rate = (TimedGraph1*)pack->addHisto(new TimedGraph1F("m_g_event_rate",
-                                                "Event rate 1;;Event rate [kHz]", 300, 0, 60 * 5));
+  m_g_event_rate = (TimedGraph1*)pack->addHisto(new TimedGraph1F("g_event_rate",
+                                                "Event rate 1;;Event rate [kHz]",
+                                                300, 0, 60 * 5));
   m_g_event_rate->fixMinimum(0);
   m_g_event_rate->fixMaximum(15);
   m_g_event_rate->setUpdated(true);
   m_g_event_rate->setLine(new LineProperty(MonColor::BLACK));
 
-  m_g_data_rate = (TimedGraph1*)pack->addHisto(new TimedGraph1F("m_g_data_rate",
+  m_g_data_rate = (TimedGraph1*)pack->addHisto(new TimedGraph1F("g_data_rate",
                                                "Data rate 1;;Data rate [MB/s]", 300, 0, 60 * 5));
   m_g_data_rate->fixMinimum(0);
   m_g_data_rate->fixMaximum(100);
@@ -195,33 +195,24 @@ void StorageDQMPackage::init()
 
 }
 
-bool StorageDQMPackage::update()
+bool StorageEnvMonPackage::update()
 {
-  TH1* h_runinfo = getHistMap()->getHist("h_runinfo");
-  int expno = (int)h_runinfo->GetBinContent(1);
-  int runno = (int)h_runinfo->GetBinContent(2);
-  int subno = (int)h_runinfo->GetBinContent(3);
-  //int evtno = h_runinfo->GetBinContent(4);
-  double nevts = h_runinfo->GetBinContent(5);
-  long long starttime = (long long)h_runinfo->GetBinContent(6);
-  long long curtime = (long long)h_runinfo->GetBinContent(7) + starttime;
-  int runlength = (int)(curtime - starttime);
-  double data_size = h_runinfo->GetBinContent(8);
-  double freq = h_runinfo->GetBinContent(9);
-  double rate = h_runinfo->GetBinContent(10);
-  long long record_time = Time(curtime).getSecond();
-  m_g_event_rate->addPoint(record_time, freq);
-  m_g_data_rate->addPoint(record_time, rate);
-  m_label_event_rate->setText(Belle2::form("%2.2f [kHz]", freq));
-  m_label_nevts->setText(Belle2::form("%d", (int)nevts));
-  m_label_runno->setText(Belle2::form("%04d.%04d.%04d", expno, runno, subno));
-  m_label_starttime->setText(Date(starttime).toString());
-  m_label_runlength->setText(Belle2::form("%02d:%02d:%02d",
+  unsigned long long runlength = (m_data->curtime - m_data->starttime);
+  m_g_event_rate->addPoint(m_data->curtime, m_data->freq);
+  m_g_data_rate->addPoint(m_data->curtime, m_data->rate);
+  m_label_event_rate->setText(Belle2::form("%2.2f [kHz]", m_data->freq));
+  m_label_nevts->setText(Belle2::form("%d", m_data->nevts));
+  m_label_runno->setText(Belle2::form("%04d.%04d.%04d", m_data->expno,
+                                      m_data->runno, m_data->subno));
+  m_label_starttime->setText(Date(m_data->starttime).toString());
+  m_label_runlength->setText(Belle2::form("%02ld:%02ld:%02ld",
                                           (runlength / 60 / 60),
                                           ((runlength / 60) % 60),
                                           (runlength % 60)));
-  m_label_data_rate->setText(Belle2::form("%2.2f [MB/s]", data_size / runlength / 1000. / 1000.));
-  m_label_data_size->setText(Belle2::form("%2.2f [kB/event]", data_size / nevts / 1000.));
-  getPackage()->setUpdateTime(record_time);
+  m_label_data_rate->setText(Belle2::form("%2.2f [MB/s]",
+                                          m_data->datasize / runlength / 1000000.));
+  m_label_data_size->setText(Belle2::form("%2.2f [kB/event]",
+                                          m_data->datasize / m_data->nevts / 1000.));
+  getPackage()->setUpdateTime(m_data->curtime);
   return true;
 }

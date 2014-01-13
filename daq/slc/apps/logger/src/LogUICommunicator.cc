@@ -1,6 +1,7 @@
 #include "daq/slc/apps/logger/LogUICommunicator.h"
 
 #include "daq/slc/system/TCPServerSocket.h"
+#include "daq/slc/system/LogFile.h"
 
 #include "daq/slc/base/State.h"
 #include "daq/slc/base/Connection.h"
@@ -60,7 +61,7 @@ void LogUICommunicator::run()
       _writer.writeString(str);
     }
   } catch (const IOException& e) {
-    Belle2::debug("[DEBUG] %s:%d: Connection broken", __FILE__, __LINE__);
+    LogFile::debug("Connection to GUI closed ");
   }
   _is_ready = false;
   _socket.close();

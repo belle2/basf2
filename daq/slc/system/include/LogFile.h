@@ -17,6 +17,7 @@ namespace Belle2 {
     ~LogFile() {}
 
   private:
+    static bool __opened;
     static std::string __filepath;
     static std::ofstream __stream;
     static unsigned int __filesize;
@@ -25,7 +26,7 @@ namespace Belle2 {
 
     // member functions
   public:
-    static void open(const std::string& filename, SystemLog::Priority priority = SystemLog::DEBUG);
+    static void open(const std::string& filename, SystemLog::Priority priority = SystemLog::UNKNOWN);
     static void open();
     static void debug(const std::string& msg, ...);
     static void info(const std::string& msg, ...);

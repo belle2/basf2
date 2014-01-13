@@ -172,41 +172,57 @@ throw(NSMHandlerException)
 #endif
 }
 
-void NSMCommunicator::sendLog(const SystemLog& log) throw(NSMHandlerException)
+bool NSMCommunicator::sendLog(const SystemLog& log)
 {
 #if NSM_PACKAGE_VERSION >= 1914
-  if (_logger_node == NULL) {
-    ConfigFile config("slowcontrol", false);
-    std::string logger_name = config.get("LOG_NSM_NAME");
-    if (logger_name.size() > 0) {
-      _logger_node = new NSMNode(logger_name);
+  try {
+    if (_logger_node == NULL) {
+      ConfigFile config("slowcontrol", false);
+      std::string logger_name = config.get("LOG_NSM_NAME");
+      if (logger_name.size() > 0) {
+        _logger_node = new NSMNode(logger_name);
+      }
     }
-  }
-  if (_logger_node != NULL &&
-      b2nsm_nodeid(_logger_node->getName().c_str()) >= 0) {
-    std::string str;
-    int pars[3];
-    int npar = log.pack(pars, str);
-    sendRequest(_logger_node, Command::LOG, npar, pars, str);
-  }
-#endif
-}
-
-void NSMCommunicator::sendError(const std::string& message) throw(NSMHandlerException)
-{
-#if NSM_PACKAGE_VERSION >= 1914
-  if (_rc_node != NULL) {
-    sendRequest(_rc_node, Command::ERROR, 0, NULL, message);
+    if (_logger_node != NULL &&
+        b2nsm_nodeid(_logger_node->getName().c_str()) >= 0) {
+      std::string str;
+      int pars[3];
+      int npar = log.pack(pars, str);
+      sendRequest(_logger_node, Command::LOG, npar, pars, str);
+    }
+  } catch (const NSMHandlerException& e) {
+    return false;
   }
 #endif
 }
 
-void NSMCommunicator::sendFatal(const std::string& message) throw(NSMHandlerException)
+bool NSMCommunicator::sendError(const std::string& message)
 {
 #if NSM_PACKAGE_VERSION >= 1914
-  if (_rc_node != NULL) {
-    sendRequest(_rc_node, Command::FATAL, 0, NULL, message);
+  try {
+    _node->setState(State::ERROR_ES);
+    if (_rc_node != NULL) {
+      sendRequest(_rc_node, Command::ERROR, 0, NULL, message);
+    }
+  } catch (const NSMHandlerException& e) {
+    return false;
   }
+  return true;
+#endif
+}
+
+bool NSMCommunicator::sendFatal(const std::string& message)
+{
+#if NSM_PACKAGE_VERSION >= 1914
+  try {
+    _node->setState(State::FATAL_ES);
+    if (_rc_node != NULL) {
+      sendRequest(_rc_node, Command::FATAL, 0, NULL, message);
+    }
+  } catch (const NSMHandlerException& e) {
+    return false;
+  }
+  return true;
 #endif
 }
 

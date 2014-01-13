@@ -16,12 +16,17 @@ namespace Belle2 {
     static const unsigned int ERROR = 3;
 
   public:
-    RunInfoBuffer() {}
+    RunInfoBuffer() {
+      _nreserved = 0;
+      _buf = NULL;
+    }
     ~RunInfoBuffer() {}
 
   public:
     size_t size() throw();
-    bool open(const std::string& nodename, bool recreate = false);
+    bool open(const std::string& nodename,
+              int nreserved = 0,
+              bool recreate = false);
     bool init();
     bool close();
     bool unlink();
@@ -34,17 +39,18 @@ namespace Belle2 {
 
   public:
     const std::string getPath() const throw() { return _path; }
-    unsigned int* getParams() throw() { return _info; }
-    unsigned int getState() const throw() { return _info[0]; }
-    unsigned int getExpNumber() const throw() { return _info[1]; }
-    unsigned int getColdNumber() const throw() { return _info[2]; }
-    unsigned int getHotNumber() const throw() { return _info[3]; }
-    unsigned int getNodeId() const throw() { return _info[4]; }
-    void setState(unsigned int state) { _info[0] = state; }
-    void setExpNumber(unsigned int number) { _info[1] = number; }
-    void setColdNumber(unsigned int number) { _info[2] = number; }
-    void setHotNumber(unsigned int number) { _info[3] = number; }
-    void setNodeId(unsigned int id) { _info[4] = id; }
+    unsigned int* getParams() throw() { return _buf; }
+    unsigned int getState() const throw() { return _buf[0]; }
+    unsigned int getExpNumber() const throw() { return _buf[1]; }
+    unsigned int getColdNumber() const throw() { return _buf[2]; }
+    unsigned int getHotNumber() const throw() { return _buf[3]; }
+    unsigned int getNodeId() const throw() { return _buf[4]; }
+    unsigned int* getReserved() throw() { return _buf + 5; }
+    void setState(unsigned int state) { _buf[0] = state; }
+    void setExpNumber(unsigned int number) { _buf[1] = number; }
+    void setColdNumber(unsigned int number) { _buf[2] = number; }
+    void setHotNumber(unsigned int number) { _buf[3] = number; }
+    void setNodeId(unsigned int id) { _buf[4] = id; }
     bool waitRunning(int timeout);
     bool reportRunning();
     bool reportError();
@@ -53,10 +59,11 @@ namespace Belle2 {
 
   private:
     std::string _path;
+    int _nreserved;
     SharedMemory _memory;
+    unsigned int* _buf;
     MMutex _mutex;
     MCond _cond;
-    unsigned int* _info;
 
   };
 

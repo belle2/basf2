@@ -9,6 +9,7 @@
 //-
 
 #include <daq/storage/modules/StorageOutput.h>
+#include <daq/storage/modules/StorageDeserializer.h>
 #include <daq/storage/modules/MonitorStorage.h>
 
 #include <stdio.h>
@@ -35,13 +36,10 @@ StorageOutputModule::StorageOutputModule() : Module()
   m_streamer = 0;
 
   //Parameter definition
-  addParam("compressionLevel", m_compressionLevel, "Compression Level: 0 for no, 1 for low, 9 for high compression. Level 1 usually reduces size by 50%, higher levels have no noticable effect. NOTE: Because of a ROOT bug, enabling this currently causes memory leaks..", 0);
-  addParam("OutputBufferName", m_obufname, "Name of Ring Buffer to dump streamed events",
-           string(""));
-  addParam("DumpInterval", m_interval, "Event interval to dump event in RingBuffer",
-           10);
+  addParam("compressionLevel", m_compressionLevel, "Compression Level", 0);
+  addParam("OutputBufferName", m_obufname, "Name of Ring Buffer for express reco", string(""));
+  addParam("DumpInterval", m_interval, "Event interval to send express reco", 10);
   addParam("StorageDir", m_stordir, "Directory to write output files", string(""));
-
   B2DEBUG(1, "StorageOutput: Constructor done.");
 }
 
@@ -50,20 +48,13 @@ StorageOutputModule::~StorageOutputModule() { }
 
 void StorageOutputModule::initialize()
 {
-  // Open output file
-
-  // Message handler to encode serialized object
   m_msghandler = new MsgHandler(m_compressionLevel);
-
-  // DataStoreStreamer
   m_streamer = new DataStoreStreamer(m_compressionLevel);
 
   m_expno = -1;
   m_runno = -1;
 
-  // Ring Buffer
   if (m_obufname.size() > 0) {
-    B2INFO(m_obufname.c_str());;
     m_obuf = new RingBuffer(m_obufname.c_str(), 10000000);
     m_obuf->clear();
   } else
@@ -75,7 +66,6 @@ void StorageOutputModule::initialize()
 
 void StorageOutputModule::beginRun()
 {
-  // Statistics
   m_size = 0.0;
   m_size2 = 0.0;
   m_nevts = 0;
@@ -90,18 +80,19 @@ void StorageOutputModule::event()
   int runno = evtmetadata->getRun() >> 8;
   int subno = evtmetadata->getRun() & 0xFF;
   if (m_runno != runno || m_expno != expno) {
+    storager_data& data(MonitorStorageModule::getData());
     if (m_file != NULL) {
       delete m_file;
       m_file = NULL;
     }
     m_expno = expno;
     m_runno = runno;
-    MonitorStorageModule::g_expno = expno;
-    MonitorStorageModule::g_runno = runno;
-    MonitorStorageModule::g_subno = subno;
-    m_t0 = Time();
-    MonitorStorageModule::g_curtime =
-      MonitorStorageModule::g_starttime = m_t0.get();
+    data.expno = expno;
+    data.runno = runno;
+    data.subno = subno;
+    Time t;
+    data.starttime = t.getSecond();
+    data.curtime = t.get();
     m_file = openDataFile();
     m_nevts = 0;
   }
@@ -125,20 +116,29 @@ void StorageOutputModule::event()
   delete msg;
 
   m_datasize += stat;
-  if (m_nevts % 1000 == 0) {
+  if (m_nevts % 10000 == 0) {
+    storager_data& data(MonitorStorageModule::getData());
     Time t;
-    double freq = 1000. / (t.get() - m_t0.get()) / 1000. ;
-    double rate = m_datasize / (t.get() - m_t0.get()) / 1000000.;
-    B2INFO("Serial = " << m_nevts << ", Freq = " << freq
-           << " [kHz], Rate = " << rate << " [MB/s], DataSize = "
+    double curtime = t.get();
+    double length = curtime - data.curtime;
+    data.curtime = t.getSecond();
+    data.freq = (m_nevts - data.nevts) / length / 1000. ;
+    data.evtsize = m_datasize / (m_nevts - data.nevts);
+    data.datasize += m_datasize;
+    data.rate = m_datasize / length / 1000000.;
+    B2INFO("Count = " << m_nevts << ", Freq = " << data.freq << " [kHz], "
+           << "Rate = " << data.rate << " [MB/s], DataSize = "
            << m_datasize / 10000. / 1000 << " [kB/event]");
-    MonitorStorageModule::g_evtno = evtmetadata->getEvent();
-    MonitorStorageModule::g_nevts = m_nevts;
-    MonitorStorageModule::g_datasize += m_datasize;
-    MonitorStorageModule::g_curtime = t.get() - MonitorStorageModule::g_starttime;
-    MonitorStorageModule::g_freq = freq;
-    MonitorStorageModule::g_rate = rate;
-    m_t0 = t;
+    data.evtno = evtmetadata->getEvent();
+    data.nevts = m_nevts;
+    RunInfoBuffer* info = StorageDeserializerModule::getInfo();
+    if (info != NULL) {
+      storager_data* p_data = (storager_data*)info->getReserved();
+      info->lock();
+      memcpy(p_data, &data, sizeof(data));
+      info->notify();
+      info->unlock();
+    }
     m_datasize = 0;
   }
 }
@@ -148,8 +148,8 @@ void StorageOutputModule::endRun()
   //fill Run data
 
   // End time
-  m_tend = Time();
-  double etime = (m_tend.get() - m_t0.get()) * 1000000;
+  storager_data& data(MonitorStorageModule::getData());
+  double etime = (Time().get() - data.starttime) * 1000000;
 
   // Statistics
   // Sigma^2 = Sum(X^2)/n - (Sum(X)/n)^2
@@ -160,13 +160,8 @@ void StorageOutputModule::endRun()
   double sigma2 = avesize2 - avesize * avesize;
   double sigma = sqrt(sigma2);
 
-  //  printf ( "m_size = %f, m_size2 = %f, m_nevt = %d\n", m_size, m_size2, m_nevt );
-  //  printf ( "avesize2 = %f, avesize = %f, avesize*avesize = %f\n", avesize2, avesize, avesize*avesize );
-  B2INFO("StorageOutput :  " << m_nevts << " events written with total bytes of " << m_size << " kB");
-  B2INFO("StorageOutput : flow rate = " << flowmb << " (MB/s)");
-  B2INFO("StorageOutput : event size = " << avesize << " +- " << sigma << " (kB)");
-
-  B2INFO("StorageOutput: endRun done.");
+  B2INFO("StorageOutput :  " << m_nevts << " events written with total bytes of " << m_size <<
+         " kB, flow rate = " << flowmb << " (MB/s) event size = " << avesize << " +- " << sigma << " (kB)");
 }
 
 

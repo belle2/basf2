@@ -1,8 +1,24 @@
 #include "daq/slc/nsm/NSMCallback.h"
 
+#include "daq/slc/system/LogFile.h"
+
 #include "daq/slc/nsm/NSMCommunicator.h"
 
+#include <signal.h>
+#include <string.h>
+
 using namespace Belle2;
+
+void NSMCallback::terminate(int sig)
+{
+  LogFile::debug("%s: terminate process", strsignal(sig));
+  for (size_t i = 0; i < __callback_v.size(); i++) {
+    __callback_v[i]->term();
+  }
+  exit(1);
+}
+
+std::vector<NSMCallback*>  NSMCallback::__callback_v;
 
 NSMCallback::NSMCallback(NSMNode* node) throw()
   : _node(node), _comm(NULL)
@@ -10,6 +26,9 @@ NSMCallback::NSMCallback(NSMNode* node) throw()
   add(Command::OK);
   add(Command::ERROR);
   add(Command::FATAL);
+  signal(SIGINT, terminate);
+  signal(SIGQUIT, terminate);
+  signal(SIGTERM, terminate);
 }
 
 bool NSMCallback::isReady() const throw()

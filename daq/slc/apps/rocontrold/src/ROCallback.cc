@@ -1,16 +1,21 @@
 #include "daq/slc/apps/rocontrold/ROCallback.h"
 
+#include "daq/slc/system/LogFile.h"
+
 #include "daq/slc/base/Debugger.h"
 #include "daq/slc/base/StringUtil.h"
+#include "daq/slc/base/ConfigFile.h"
 
 using namespace Belle2;
 
-ROCallback::ROCallback(NSMNode* node, const std::string& dir)
-  : RCCallback(node), _dir(dir)
+ROCallback::ROCallback(NSMNode* node, const std::string& configname)
+  : RCCallback(node)
 {
   node->setData(new DataObject());
   node->setState(State::INITIAL_S);
   _con.setCallback(this);
+  ConfigFile config(configname);
+  _path = config.get("ROPC_BASF2_PATH");
 }
 
 ROCallback::~ROCallback() throw()
@@ -22,39 +27,40 @@ void ROCallback::init() throw()
   _con.init("basf2");
 }
 
+void ROCallback::term() throw()
+{
+  _con.abort();
+  _con.getInfo().unlink();
+}
+
 bool ROCallback::boot() throw()
 {
-  Belle2::debug("BOOT");
   return true;
 }
 
 bool ROCallback::load() throw()
 {
-  Belle2::debug("LOAD");
-  download();
   _con.clearArguments();
-  _con.addArgument(_dir + _node->getData()->getText("script"));
+  _con.addArgument(_path);
   _con.addArgument("1");
   _con.addArgument("5101");
   _con.addArgument("basf2");
-  if (_con.load(10)) {
-    Belle2::debug("(DEBUG) load succeded");
+  if (_con.load(20)) {
+    LogFile::debug("load succeded");
   } else {
-    Belle2::debug("(DEBUG) load timeout");
+    LogFile::debug("load timeout");
   }
   return true;
 }
 
 bool ROCallback::start() throw()
 {
-  Belle2::debug("START");
   _con.start();
   return true;
 }
 
 bool ROCallback::stop() throw()
 {
-  Belle2::debug("STOP");
   _con.stop();
   return true;
 }
@@ -71,13 +77,11 @@ bool ROCallback::pause() throw()
 
 bool ROCallback::recover() throw()
 {
-  Belle2::debug("RECOVER");
   return (abort() && boot() && load());
 }
 
 bool ROCallback::abort() throw()
 {
-  Belle2::debug("ABORT");
   return _con.abort();
 }
 

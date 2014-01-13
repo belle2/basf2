@@ -10,11 +10,15 @@ namespace Belle2 {
   class StoragerCallback : public RCCallback {
 
   public:
-    StoragerCallback(NSMNode* node, const std::string& dir);
+    StoragerCallback(NSMNode* node);
     virtual ~StoragerCallback() throw();
 
   public:
+    ProcessController& getController(int n) { return _con[n]; }
+
+  public:
     virtual void init() throw();
+    virtual void term() throw();
     virtual bool boot() throw();
     virtual bool load() throw();
     virtual bool start() throw();
@@ -26,7 +30,6 @@ namespace Belle2 {
 
   private:
     ProcessController _con[3];
-    std::string _dir;
 
   };
 

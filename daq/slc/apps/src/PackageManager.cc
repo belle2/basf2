@@ -9,6 +9,7 @@ PackageManager::PackageManager(MonitorPackage* monitor)
 {
   _monitor = monitor;
   _available = false;
+  _updateid = -1;
   _lock.init();
 }
 
@@ -31,20 +32,22 @@ bool PackageManager::init()
   _serializer.allocate(getPackage());
   _serializer.update();
   _available = true;
+  _updateid = -1;
   _lock.unlock();
   return true;
 }
 
-int PackageManager::update()
+bool PackageManager::update()
 {
   _lock.wrlock();
-  getPackage()->incrementUpdateId();
   getPackage()->setUpdateTime(Belle2::Time().getSecond());
-  _monitor->update();
-  int id = getPackage()->getUpdateId();
-  _serializer.update();
+  bool updated = _monitor->update();
+  if (updated) {
+    getPackage()->incrementUpdateId();
+    _serializer.update();
+  }
   _lock.unlock();
-  return id;
+  return updated;
 }
 
 void PackageManager::setAvailable(bool available)

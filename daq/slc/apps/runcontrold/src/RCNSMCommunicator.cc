@@ -20,7 +20,6 @@ bool RCNSMCommunicator::sendMessage(const RunControlMessage& msg) throw()
     _comm->sendRequest(msg.getNode(), msg.getCommand(), msg.getMessage().getNParams(),
                        (int*)msg.getMessage().getParams(), msg.getMessage().getData());
   } catch (const NSMHandlerException& e) {
-    ((NSMNode*)msg.getNode())->setConnection(Connection::OFFLINE);
     _nsm_mutex.unlock();
     return false;
   }
@@ -31,9 +30,8 @@ bool RCNSMCommunicator::sendMessage(const RunControlMessage& msg) throw()
 bool RCNSMCommunicator::sendState(NSMNode* node) throw()
 {
   _nsm_mutex.lock();
-  /*
   try {
-    unsigned int pars[2];
+    int pars[2];
     int npar = sizeof(pars) / sizeof(int);
     pars[0] = node->getState().getId();
     pars[1] = node->getConnection().getId();
@@ -43,7 +41,6 @@ bool RCNSMCommunicator::sendState(NSMNode* node) throw()
     _nsm_mutex.unlock();
     return false;
   }
-  */
   _nsm_mutex.unlock();
   return true;
 }

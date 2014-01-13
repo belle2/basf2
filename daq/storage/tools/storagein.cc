@@ -37,6 +37,7 @@ int main(int argc, char** argv)
   delete rbuf;
   rbuf = new RingBuffer(argv[1], 100000000);
   RSocketRecv* socket = new RSocketRecv(argv[2], atoi(argv[3]));
+  B2INFO("storagein: Connected to eb2.");
   info.reportRunning();
   int* evtbuf = new int[100000000];
   int nrec = 0;
@@ -49,7 +50,7 @@ int main(int argc, char** argv)
     while (true) {
       int bufsize = socket->get_wordbuf(evtbuf, 100000000);
       if (bufsize <= 0 && connected) {
-        B2ERROR("Failed to read data. connection broken.");
+        B2WARNING("storagein: Connection to eb2 broken.");
         connected = false;
         break;
       } else if (bufsize == 0) {
@@ -68,11 +69,12 @@ int main(int argc, char** argv)
       if (socket->reconnect(5000) == -1) {
         connected = false;
       } else {
-        if (use_info) info.reportRunning();
+        info.reportRunning();
         connected = true;
         break;
       }
     }
+    B2INFO("storagein: Reconnected to eb2.");
   }
   return 0;
 }

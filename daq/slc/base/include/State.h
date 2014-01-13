@@ -8,6 +8,7 @@ namespace Belle2 {
   class State : public Enum {
 
   public:
+    static const State UNKNOWN;
     static const State INITIAL_S;
     static const State CONFIGURED_S;
     static const State READY_S;

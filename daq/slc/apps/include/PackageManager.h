@@ -36,12 +36,13 @@ namespace Belle2 {
   public:
     void clear();
     bool init();
-    int update();
+    bool update();
 
   protected:
     MonitorPackage* _monitor;
     PackageSerializer _serializer;
     bool _available;
+    int _updateid;
     Belle2::RWLock _lock;
 
   };

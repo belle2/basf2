@@ -15,11 +15,12 @@
 
 using namespace Belle2;
 
-bool ProcessController::init(const std::string& name_in)
+bool ProcessController::init(const std::string& name_in,
+                             int nreserved)
 {
   _name = (name_in.size() > 0) ? name_in : _callback->getNode()->getName();
   LogFile::open(_name);
-  if (!_info.open(_name, true)) {
+  if (!_info.open(_name, nreserved, true)) {
     return false;
   }
   _info.init();
@@ -44,7 +45,6 @@ bool ProcessController::load(int timeout)
   close(iopipe[1]);
   if (timeout > 0) {
     if (!_info.waitRunning(timeout)) {
-      _callback->setReply(std::string("Failed to start ") + _name);
       return false;
     }
   }

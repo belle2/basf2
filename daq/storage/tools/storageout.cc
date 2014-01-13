@@ -37,6 +37,7 @@ int main(int argc, char** argv)
   int nrec = 0;
   while (true) {
     REvtSocketSend* socket = new REvtSocketSend(atoi(argv[3]));
+    B2INFO("Connected to expreco.");
     info.reportRunning();
     while (true) {
       int size;
@@ -47,7 +48,7 @@ int main(int argc, char** argv)
       int is = socket->send(msg);
       delete msg;
       if (is <= 0) {
-        B2ERROR("Failed to read data. connection broken.");
+        B2WARNING("Connection to expreco broken.");
         info.reportError();
         break;
       }

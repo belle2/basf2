@@ -8,8 +8,8 @@
 //-
 
 #include <daq/storage/modules/StorageDeserializer.h>
-#include <TSystem.h>
 
+#include "daq/storage/storager_data.h"
 #include "daq/storage/modules/StorageWorker.h"
 #include "daq/storage/modules/DataStorePackage.h"
 
@@ -22,6 +22,8 @@
 #include <daq/slc/base/Debugger.h>
 #include <daq/slc/base/StringUtil.h>
 #include <daq/slc/system/Time.h>
+
+#include <TSystem.h>
 
 #include <cstdlib>
 #include <unistd.h>
@@ -36,6 +38,8 @@ REG_MODULE(StorageDeserializer)
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
+
+RunInfoBuffer* StorageDeserializerModule::g_info = NULL;
 
 StorageDeserializerModule::StorageDeserializerModule() : Module()
 {
@@ -74,7 +78,9 @@ void StorageDeserializerModule::initialize()
     if (m_nodename.size() == 0 || m_nodeid < 0) {
       m_shmflag = 0;
     } else {
-      m_info.open(m_nodename);
+      m_info = new RunInfoBuffer();
+      m_info->open(m_nodename, sizeof(storager_data) / 4);
+      g_info = m_info;
     }
   }
   char* evtbuf = new char[10000000];
@@ -91,7 +97,7 @@ void StorageDeserializerModule::initialize()
     PThread(new StorageWorker(m_buf, m_compressionLevel));
   }
   if (m_shmflag > 0) {
-    m_info.reportRunning();
+    m_info->reportRunning();
     m_running = true;
   }
   B2INFO("StorageDeserializer: initialize() done.");
@@ -121,9 +127,6 @@ void StorageDeserializerModule::beginRun()
 
 void StorageDeserializerModule::endRun()
 {
-  StoreObjPtr<EventMetaData> evtmetadata;
-  int expno = evtmetadata->getExperiment();
-  int runno = evtmetadata->getRun();
   B2INFO("StorageDeserializer: endRun done.");
 }
 

@@ -22,15 +22,12 @@ void EnvMonitorMaster::run()
     for (size_t i = 0; i < _manager_v.size(); i++) {
       if (!_manager_v[i]->isAvailable()) {
         EnvMonitorPackage* monitor = (EnvMonitorPackage*)_manager_v[i]->getMonitor();
-        for (NSMDataMap::iterator it = monitor->getDataMap().begin();
-             it != monitor->getDataMap().end(); it++) {
-          NSMData* data = it->second;
-          if (!data->isAvailable()) {
-            try {
-              data->open(_comm);
-            } catch (const NSMHandlerException& e) {
-              break;
-            }
+        NSMData* data = monitor->getData();
+        if (!data->isAvailable()) {
+          try {
+            data->open(_comm);
+          } catch (const NSMHandlerException& e) {
+            break;
           }
         }
         _manager_v[i]->init();

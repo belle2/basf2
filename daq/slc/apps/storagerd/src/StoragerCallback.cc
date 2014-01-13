@@ -1,4 +1,5 @@
 #include "daq/slc/apps/storagerd/StoragerCallback.h"
+#include "daq/slc/apps/storagerd/StoragerMonitor.h"
 
 #include "daq/slc/system/LogFile.h"
 
@@ -8,11 +9,10 @@
 
 using namespace Belle2;
 
-StoragerCallback::StoragerCallback(NSMNode* node, const std::string& dir)
-  : RCCallback(node), _dir(dir)
+StoragerCallback::StoragerCallback(NSMNode* node)
+  : RCCallback(node)
 {
   node->setData(new DataObject());
-  node->setState(State::INITIAL_S);
   for (int i = 0; i < 3; i++)
     _con[i].setCallback(this);
 }
@@ -27,11 +27,19 @@ void StoragerCallback::init() throw()
   _con[0].init("storagein");
   _con[1].init("basf2");
   _con[2].init("storageout");
+  PThread(new StoragerMonitor(this));
+}
+
+void StoragerCallback::term() throw()
+{
+  for (int i = 0; i < 3; i++) {
+    _con[i].abort();
+    _con[i].getInfo().unlink();
+  }
 }
 
 bool StoragerCallback::boot() throw()
 {
-  Belle2::debug("BOOT");
   ConfigFile config;
   const std::string irbname = _node->getName() + "_IN";
   const std::string orbname = _node->getName() + "_OUT";
@@ -42,27 +50,36 @@ bool StoragerCallback::boot() throw()
   _con[0].addArgument(config.get("DATA_STORAGE_FROM_PORT"));
   _con[0].addArgument("storagein");
   _con[0].addArgument("1");
-  _con[0].load(10);
-
+  if (!_con[0].load(20)) {
+    std::string emsg = "Failed to start storagein";
+    setReply(emsg);
+    LogFile::error(emsg);
+    return false;
+  }
+  LogFile::debug("Booted storagein");
   return true;
 }
 
 bool StoragerCallback::load() throw()
 {
-  Belle2::debug("LOAD");
   ConfigFile config;
   const std::string irbname = _node->getName() + "_IN";
   const std::string orbname = _node->getName() + "_OUT";
   _con[1].clearArguments();
-  _con[1].addArgument(config.get("BASF2_SCRIPT_DIR")
-                      + "/DataStorager.py");
+  _con[1].addArgument(config.get("BASF2_SCRIPT_PATH"));
   _con[1].addArgument(irbname);
   _con[1].addArgument(config.get("DATA_STORAGE_DIR"));
   _con[1].addArgument(orbname);
   _con[1].addArgument("basf2");
   _con[1].addArgument("1");
   _con[1].addArgument("1");
-  _con[1].load(10);
+  if (!_con[1].load(10)) {
+    std::string emsg = "Failed to start basf2";
+    setReply(emsg);
+    LogFile::error(emsg);
+    return false;
+  }
+  LogFile::debug("Booted basf2");
 
   _con[2].clearArguments();
   _con[2].setExecutable("storageout");
@@ -71,22 +88,33 @@ bool StoragerCallback::load() throw()
   _con[2].addArgument(config.get("DATA_STORAGE_TO_PORT"));
   _con[2].addArgument("storageout");
   _con[2].addArgument("1");
-  _con[2].load(10);
+  if (!_con[2].load(10)) {
+    std::string emsg = "Failed to start storageout";
+    setReply(emsg);
+    LogFile::error(emsg);
+    return false;
+  }
+  LogFile::debug("Booted storageout");
   return true;
 }
 
 bool StoragerCallback::start() throw()
 {
-  Belle2::debug("START");
-  for (int i = 0; i < 3; i++)
-    _con[i].start();
-
+  std::string name[3] = {"storagein", "basf2", "storageout"};
+  for (int i = 0; i < 3; i++) {
+    if (!_con[i].start()) {
+      std::string emsg = name[i] + " is not started";
+      setReply(emsg);
+      LogFile::error(emsg);
+      return false;
+    }
+    LogFile::debug(name[i] + " started");
+  }
   return true;
 }
 
 bool StoragerCallback::stop() throw()
 {
-  Belle2::debug("STOP");
   return true;
 }
 
@@ -102,13 +130,11 @@ bool StoragerCallback::pause() throw()
 
 bool StoragerCallback::recover() throw()
 {
-  Belle2::debug("RECOVER");
   return abort() && boot() && load();
 }
 
 bool StoragerCallback::abort() throw()
 {
-  Belle2::debug("ABORT");
   for (int i = 0; i < 3; i++)
     _con[i].abort();
   return true;

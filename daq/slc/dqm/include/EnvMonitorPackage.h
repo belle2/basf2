@@ -9,8 +9,6 @@
 
 namespace Belle2 {
 
-  typedef std::map<std::string, NSMData*> NSMDataMap;
-
   class EnvMonitorPackage : public MonitorPackage {
 
     friend class EnvMonitorMaster;
@@ -21,17 +19,21 @@ namespace Belle2 {
     virtual ~EnvMonitorPackage() throw();
 
   public:
-    NSMData* getData(const std::string& name);
-    void addData(NSMData* data);
-    bool hasData(const std::string& name);
-    NSMDataMap& getDataMap() { return _data_m; }
+    NSMData* getData();
+    void setData(NSMData* data);
 
   private:
-    NSMDataMap _data_m;
+    NSMData* _data;
 
   };
 
 }
+
+#define REGISTER_ENV_PACKAGE(classname) \
+  extern "C" void* create##classname(const char* name)\
+  {\
+    return new Belle2::classname(name);\
+  }
 
 #endif
 

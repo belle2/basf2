@@ -33,6 +33,7 @@ void SimpleDQMPackage::init()
   }
 }
 
-void SimpleDQMPackage::update()
+bool SimpleDQMPackage::update()
 {
+  return true;
 }

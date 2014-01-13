@@ -247,7 +247,7 @@ namespace Belle2 {
     int GetTTCtime(int n);
 
     //! Get timeval
-    void GetTimeVal(int n, struct timeval* tv);
+    void GetTTTimeVal(int n, struct timeval* tv);
 
     //
     // size of "COPPER front header" and "COPPER trailer"
@@ -722,10 +722,10 @@ namespace Belle2 {
   }
 
 
-  inline void RawCOPPER::GetTimeVal(int n, struct timeval* tv)
+  inline void RawCOPPER::GetTTTimeVal(int n, struct timeval* tv)
   {
     tv->tv_sec = GetTTUtime(n);
-    tv->tv_usec = GetTTCtime(n);
+    tv->tv_usec = (int)(((double)GetTTCtime(n)) / 127.216);
     return ;
   }
 

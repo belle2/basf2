@@ -52,7 +52,7 @@ namespace Belle2 {
     int GetTTCtime(int n);
 
     //! Get timeval
-    void GetTimeVal(int n, struct timeval* tv);
+    void GetTTTimeVal(int n, struct timeval* tv);
 
     //!
     unsigned int GetMagicTrailer(int n);

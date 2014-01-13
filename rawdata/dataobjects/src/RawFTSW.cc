@@ -42,10 +42,11 @@ unsigned int RawFTSW::GetTTUtime(int n)
   return (unsigned int)(m_buffer[ GetBufferPos(n) +  POS_TT_UTIME ]);
 }
 
-void RawFTSW::GetTimeVal(int n, struct timeval* tv)
+void RawFTSW::GetTTTimeVal(int n, struct timeval* tv)
 {
   tv->tv_sec = GetTTUtime(n);
-  tv->tv_usec = GetTTCtime(n);
+  tv->tv_usec = (int)(((double)GetTTCtime(n)) / 127.216);
+
   return ;
 }
 

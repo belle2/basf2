@@ -67,6 +67,7 @@ namespace Belle2 {
     std::string m_storeDigitsName;        /**< PXDDigits StoreArray name */
     std::string m_storeClustersName;      /**< PXDClusters StoreArray name */
     std::string m_relClusterDigitName;    /**< PXDClustersToPXDDigits RelationArray name */
+    std::string m_storeFramesName;        /**< PXDFrames StoreArray name */
 
     // +1 in dimensions to protect against noisy VXDID values.
     TH1F* m_fired[c_nPXDPlanes];         /**< Fired in u pixels per event by plane */
@@ -79,7 +80,7 @@ namespace Belle2 {
     TH1F* m_sizeU[c_nPXDPlanes];          /**< u size by plane */
     TH1F* m_sizeV[c_nPXDPlanes];          /**< v size by plane */
     TH1F* m_size[c_nPXDPlanes];           /**< size by plane */
-    TH1F* m_startRow[c_nPXDPlanes];       /**< start raw by plane */
+    TH1F* m_startRow[c_nPXDPlanes];       /**< start row by plane */
   };
 
   inline const PXD::SensorInfo& PXDDQMModule::getInfo(int index) const

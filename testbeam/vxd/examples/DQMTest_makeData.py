@@ -76,11 +76,14 @@ PXDDigi.param('SimpleDriftModel', False)
 
 SVDDigi = register_module('SVDDigitizer')
 
+#PXD DAQ produces PXDRawHits, not PXDDigits.
+PXDConv = register_module("PXDRawHitProducer")
+
 # Save output of simulation
 output = register_module('RootOutput')
 output.param('outputFileName', 'TBSimulation.root')
 # Save only digits for the DQM test.
-output.param('branchNames', ['PXDDigits', 'SVDDigits'])
+output.param('branchNames', ['PXDRawHits', 'SVDDigits'])
 
 # Path construction
 main = create_path()
@@ -91,6 +94,7 @@ main.add_module(geometry)
 main.add_module(particlegun)
 main.add_module(simulation)
 main.add_module(PXDDigi)
+main.add_module(PXDConv)
 main.add_module(SVDDigi)
 main.add_module(output)
 # Process events

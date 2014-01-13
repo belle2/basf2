@@ -7,6 +7,7 @@
 #include <framework/datastore/RelationArray.h>
 
 #include <pxd/dataobjects/PXDDigit.h>
+#include <pxd/dataobjects/PXDFrame.h>
 #include <pxd/dataobjects/PXDCluster.h>
 
 #include <vector>
@@ -148,12 +149,12 @@ void PXDDQMModule::defineHisto()
     m_size[i]->GetXaxis()->SetTitle("cluster size [pitch units]");
     m_size[i]->GetYaxis()->SetTitle("count");
   }
-  // start raw by plane
+  // start row by plane
   for (int i = 0; i < c_nPXDPlanes; i++) {
     int iPlane = indexToPlane(i);
     string name = str(format("hPXDstartRow%1%") % iPlane);
-    string title = str(format("PXD Start Row, plane %1%") % iPlane);
-    m_startRow[i] = new TH1F(name.c_str(), title.c_str(), getInfo(i).getUCells(), 0, getInfo(i).getUCells());
+    string title = str(format("PXD readout start row, plane %1%") % iPlane);
+    m_startRow[i] = new TH1F(name.c_str(), title.c_str(), getInfo(i).getVCells(), 0, getInfo(i).getVCells());
     m_startRow[i]->GetXaxis()->SetTitle("start row");
     m_startRow[i]->GetYaxis()->SetTitle("count");
   }
@@ -168,9 +169,7 @@ void PXDDQMModule::initialize()
   //Register collections
   StoreArray<PXDCluster> storeClusters(m_storeClustersName);
   StoreArray<PXDDigit> storeDigits(m_storeDigitsName);
-
-  //storeClusters.required();
-  //storeDigits.required();
+  StoreArray<PXDFrame> storeFrames(m_storeFramesName);
 
   RelationArray relClusterDigits(storeClusters, storeDigits);
 
@@ -178,6 +177,7 @@ void PXDDQMModule::initialize()
   m_storeClustersName = storeClusters.getName();
   m_storeDigitsName = storeDigits.getName();
   m_relClusterDigitName = relClusterDigits.getName();
+  m_storeFramesName = storeFrames.getName();
 }
 
 void PXDDQMModule::beginRun()
@@ -204,9 +204,12 @@ void PXDDQMModule::event()
 
   const StoreArray<PXDDigit> storeDigits(m_storeDigitsName);
   const StoreArray<PXDCluster> storeClusters(m_storeClustersName);
+  const StoreArray<PXDFrame> storeFrames(m_storeFramesName);
 
   const RelationArray relClusterDigits(storeClusters, storeDigits, m_relClusterDigitName);
 
+  // If there are no pixels, leave
+  if (!storeDigits || !storeDigits.getEntries()) return;
   // Fired pixels
   vector<int> pixel_count(c_nPXDPlanes);
   for (int i = 0; i < c_nPXDPlanes; i++) pixel_count[i] = 0;
@@ -244,8 +247,17 @@ void PXDDQMModule::event()
     m_sizeU[index]->Fill(cluster.getUSize());
     m_sizeV[index]->Fill(cluster.getVSize());
     m_size[index]->Fill(cluster.getSize());
-//    m_startRow[index]->Fill(cluster.getStartRaw());
   }
+  // Start rows
+  if (storeFrames && storeFrames.getEntries()) {
+    for (const PXDFrame & frame : storeFrames) {
+      int iPlane = frame.getSensorID().getLayerNumber();
+      if ((iPlane < c_firstPXDPlane) || (iPlane > c_lastPXDPlane)) continue;
+      int index = planeToIndex(iPlane);
+      m_startRow[index]->Fill(frame.getStartRow());
+    }
+  }
+
 }
 
 

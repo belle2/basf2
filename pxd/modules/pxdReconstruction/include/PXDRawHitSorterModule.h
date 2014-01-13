@@ -14,6 +14,7 @@
 #include <framework/core/Module.h>
 #include <pxd/dataobjects/PXDRawHit.h>
 #include <pxd/dataobjects/PXDDigit.h>
+#include <pxd/dataobjects/PXDFrame.h>
 #include <string>
 
 namespace Belle2 {
@@ -46,6 +47,8 @@ namespace Belle2 {
       std::string m_storeRawHitsName;
       /** Name of the collection to use for the PXDDigits */
       std::string m_storeDigitsName;
+      /** Name of the collection to use for the PXDFrames */
+      std::string m_storeFramesName;
       /** Mode: if true, merge duplicate pixels, otherwise only keep the first. */
       bool m_mergeDuplicates;
       /** Mode: if true, merge frames, otherwise keep separate frames */

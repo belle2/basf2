@@ -12,7 +12,6 @@
 #define PXDDIGIT_H
 
 #include <vxd/dataobjects/VxdID.h>
-#include <pxd/dataobjects/PXDRawHit.h>
 
 #include <TObject.h>
 

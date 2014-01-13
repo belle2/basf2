@@ -25,9 +25,10 @@ geometry = register_module('Geometry')
 # No magnetic field for this test,
 geometry.param('components', ['TB'])
 
-# PXD digit sorter: no need for simulation, but needed for real data.
-PXDSort = register_module('PXDDigitSorter')
-PXDSort.param('merge', True)
+# PXD rawhit sorter: convert PXDRawHits to PXDDigits. .
+PXDSort = register_module('PXDRawHitSorter')
+PXDSort.param('mergeDuplicates', False)
+PXDSort.param('mergeFrames', False)
 # PXD/SVD clusterizer
 PXDClust = register_module('PXDClusterizer')
 PXDClust.param('TanLorentz', 0.)
@@ -110,6 +111,7 @@ main.add_module(histo)  # immediately after master module
 main.add_module(progress)
 main.add_module(gearbox)
 main.add_module(geometry)
+main.add_module(PXDSort)
 main.add_module(PXDClust)
 main.add_module(SVDClust)
 main.add_module(pxd_dqm)

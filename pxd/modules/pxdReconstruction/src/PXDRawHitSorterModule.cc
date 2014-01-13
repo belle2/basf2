@@ -17,6 +17,8 @@
 
 #include <pxd/reconstruction/Pixel.h>
 
+#include <set>
+
 using namespace std;
 using namespace Belle2;
 using namespace Belle2::PXD;
@@ -42,6 +44,7 @@ PXDRawHitSorterModule::PXDRawHitSorterModule() : Module()
   addParam("mergeFrames", m_mergeFrames, "If true, produce a single frame containing digits of all input frames.", true);
   addParam("rawHits", m_storeRawHitsName, "PXDRawHit collection name", string(""));
   addParam("digits", m_storeDigitsName, "PXDDigit collection name", string(""));
+  addParam("frames", m_storeFramesName, "PXDFrames collection name", string(""));
 }
 
 
@@ -54,20 +57,26 @@ void PXDRawHitSorterModule::initialize()
   StoreArray<PXDDigit> storeDigits(m_storeDigitsName);
   storeDigits.registerAsPersistent();
 
+  StoreArray<PXDFrame> storeFrames(m_storeFramesName);
+  storeFrames.registerAsPersistent();
+
   m_storeRawHitsName = storeRawHits.getName();
   m_storeDigitsName = storeDigits.getName();
+  m_storeFramesName = storeFrames.getName();
 }
 
 void PXDRawHitSorterModule::event()
 {
   StoreArray<PXDRawHit> storeRawHits(m_storeRawHitsName);
   StoreArray<PXDDigit> storeDigits(m_storeDigitsName);
+  StoreArray<PXDFrame> storeFrames(m_storeFramesName);
 
   // if no input, nothing to do
   if (!storeRawHits || !storeRawHits.getEntries()) return;
 
   //Mapping of Pixel information to sort according to VxdID, row, column
   std::map<VxdID, std::multiset<Pixel>> sensors;
+  std::map<VxdID, std::set<unsigned short>> startRows;
 
   // Fill sensor information to get sorted Pixel indices
   const int nPixels = storeRawHits.getEntries();
@@ -88,7 +97,11 @@ void PXDRawHitSorterModule::event()
     }
     if (m_mergeFrames) frameCounter = 0;
     sensorID.setSegmentNumber(frameCounter); // should be 0 anyway...
-    sensors[sensorID].insert(px);
+    // We need some protection against crap data
+    if (sensorID.getLayerNumber() && sensorID.getLadderNumber() && sensorID.getSensorNumber()) {
+      sensors[sensorID].insert(px);
+      startRows[sensorID].insert(rawhit->getStartRow());
+    }
   }
 
   unsigned int index(0);
@@ -113,6 +126,8 @@ void PXDRawHitSorterModule::event()
         } //Otherwise delete the second pixel by forgetting about it.
       }
       lastpx = &px;
+      for (unsigned short startRow : startRows[sensorID])
+        storeFrames.appendNew(sensorID, startRow);
     }
   }
 }

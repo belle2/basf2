@@ -108,7 +108,7 @@ void PXDDQMModule::defineHisto()
     int iPlane = indexToPlane(i);
     string name = str(format("hPXDCharge%1%") % iPlane);
     string title = str(format("PXD cluster charge, plane %1%") % iPlane);
-    m_charge[i] = new TH1F(name.c_str(), title.c_str(), 50, 0, 10000);
+    m_charge[i] = new TH1F(name.c_str(), title.c_str(), 50, 0, 150);
     m_charge[i]->GetXaxis()->SetTitle("cluster charge [ADU]");
     m_charge[i]->GetYaxis()->SetTitle("count");
   }
@@ -117,7 +117,7 @@ void PXDDQMModule::defineHisto()
     int iPlane = indexToPlane(i);
     string name = str(format("hPXDSeed%1%") % iPlane);
     string title = str(format("PXD seed charge, plane %1%") % iPlane);
-    m_seed[i] = new TH1F(name.c_str(), title.c_str(), 50, 0, 10000);
+    m_seed[i] = new TH1F(name.c_str(), title.c_str(), 50, 0, 150);
     m_seed[i]->GetXaxis()->SetTitle("seed charge [ADU]");
     m_seed[i]->GetYaxis()->SetTitle("count");
   }

@@ -33,9 +33,10 @@ if fieldOn:
 else:
     geometry.param('components', ['TB'])
 
-# PXD digit sorter
-PXDSort = register_module('PXDDigitSorter')
-PXDSort.param('merge', False)
+# PXD rawhit converter
+PXDSort = register_module('PXDRawHitSorter')
+PXDSort.param('mergeDuplicates', True)
+PXDSort.param("mergeFrames", False)
 
 # PXD clusterizer
 PXDClust = register_module('PXDClusterizer')

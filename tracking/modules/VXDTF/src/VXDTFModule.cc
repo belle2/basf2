@@ -3972,6 +3972,10 @@ bool VXDTFModule::baselineTF(vector<ClusterInfo>& clusters, PassData* passInfo)
     for (HitExtra & bundle : listOfHitExtras) { // collecting hits by distance to chosen origin
       newTC->addHits(bundle.second);
     }
+  } else if (maxCounts < 1) {
+    B2WARNING(m_PARAMnameOfInstance << " - event " << m_eventCounter << " baseline TF: after creating TC, maxCounts got strange number: " << maxCounts << " (should not occur), stopping baseline TF!")
+    delete newTC;
+    return false;
   } else { // case of more than one hit per layer (e.g. overlapping hits, bhabha scattering, cosmic particle, background (last point not surpressed!))
     TVector3 seedPosition = *(*listOfHitExtras.begin()).second->getHitCoordinates();
 

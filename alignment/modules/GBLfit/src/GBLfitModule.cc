@@ -207,14 +207,14 @@ void GBLfitModule::initialize()
 
   // Set GBL parameters
   if (m_filterId == "GBL") {
-    //m_gbl.setGBLOptions("THC");
-    //m_gbl.setMP2Options(0., 1, "millefile.dat");
+    m_gbl.setGBLOptions(m_gblInternalIterations);
+    m_gbl.setMP2Options(m_gblPvalueCut, m_gblMinNdf, m_gblMilleFileName);
   }
 }
 
 void GBLfitModule::beginRun()
 {
-  //if (m_filterId == "GBL") m_gbl.beginRun();
+  if (m_filterId == "GBL") m_gbl.beginRun();
 }
 
 void GBLfitModule::event()

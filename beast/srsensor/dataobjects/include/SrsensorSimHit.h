@@ -27,7 +27,7 @@ namespace Belle2 {
   class SrsensorSimHit : public TObject {
   public:
     /** default constructor for ROOT */
-    SrsensorSimHit(): m_energyDep(0), m_detNb(0) {}
+    SrsensorSimHit():  m_energyDep(0), m_energyNiel(0), m_tkPDG(0), m_tkKEnergy(0), m_detNb(0) {}
 
 
     /** Standard constructor

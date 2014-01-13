@@ -52,7 +52,7 @@ PXDDigitizerModule::PXDDigitizerModule() :
   addParam("ElectronicEffects", m_applyNoise, "Apply electronic effects?",
            true);
   addParam("ElectronicNoise", m_elNoise,
-           "Noise added by the electronics, set in ENC", 200.0);
+           "Noise added by the electronics, set in ENC", 300.0);
   addParam("NoiseSN", m_SNAdjacent,
            "SN for digits to be considered for clustering", 4.0);
 
@@ -79,11 +79,8 @@ PXDDigitizerModule::PXDDigitizerModule() :
   addParam("ElectronMaxSteps", m_elMaxSteps,
            "Maximum number of steps when propagating electrons", 200);
 
-  addParam("ADC", m_applyADC, "Simulate ADC?", false);
-  addParam("ADCRange", m_rangeADC,
-           "Set analog-to-digital converter range 0 - ? (in e)", 31e3);
-  addParam("ADCBits", m_bitsADC, "Set how many bits the ADC uses", 5.0);
-
+  addParam("ADC", m_applyADC, "Simulate ADC?", true);
+  addParam("eToADU", m_eToADU, "ENC equivalent of 1 ADU", 200.0);
   addParam("SimpleDriftModel", m_useSimpleDrift,
            "Use deprecated drift model?", true);
   addParam("Diffusion", m_diffusionCoefficient,
@@ -127,8 +124,6 @@ void PXDDigitizerModule::initialize()
   m_elNoise *= Unit::e;
   m_elStepTime *= Unit::ns;
   m_segmentLength *= Unit::mm;
-  m_rangeADC = m_rangeADC * Unit::e;
-  m_unitADC = m_rangeADC / (pow(2.0, m_bitsADC) - 1);
   m_diffusionCoefficient *= Unit::mm;
   m_noiseFraction = TMath::Freq(m_SNAdjacent);
   m_hallFactor = (1.13 + 0.0008 * (m_temperature - 273));
@@ -158,9 +153,7 @@ void PXDDigitizerModule::initialize()
   B2INFO(" -->  ElectronStepTime:   " << m_elStepTime);
   B2INFO(" -->  ElectronMaxSteps:   " << m_elMaxSteps);
   B2INFO(" -->  ADC:                " << (m_applyADC ? "true" : "false"));
-  B2INFO(" -->  ADCRange:           " << m_rangeADC);
-  B2INFO(" -->  ADCBits:            " << m_bitsADC);
-  B2INFO(" --> *ADCUnit:            " << m_unitADC);
+  B2INFO(" -->  ADU unit:           " << m_eToADU);
   B2INFO(
     " -->  SimpleDriftModel:   " << (m_useSimpleDrift ? "true" : "false"));
   B2INFO(" -->  Diffusion:          " << m_diffusionCoefficient);
@@ -704,14 +697,12 @@ void PXDDigitizerModule::saveDigits()
       //Add Noise where applicable
       double charge = addNoise(v.charge());
 
-      //Limit electrons to ADC steps
-      if (m_applyADC)
-        charge = round(min(m_rangeADC, max(0.0, charge)) / m_unitADC)
-                 * m_unitADC;
-
       //Zero suppresion cut
       if (charge < charge_threshold)
         continue;
+
+      //Limit electrons to ADC steps
+      if (m_applyADC) charge = round(charge / m_eToADU);
 
       //Add the digit to datastore
       int digIndex = storeDigits.getEntries();

@@ -89,6 +89,10 @@ namespace Belle2 {
 
       /** Noise in number of electrons */
       double m_elNoise;
+      /** ENC equivalent of 1 ADU */
+      double m_eToADU;
+      /** Charge expressed in ADU? */
+      bool m_useADC;
       /** Seed cut in sigma */
       double m_cutSeed;
       /** Noise cut in sigma */

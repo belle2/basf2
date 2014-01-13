@@ -202,12 +202,8 @@ namespace Belle2 {
 
       /** Whether or not to apply discrete ADC */
       bool   m_applyADC;
-      /** Maximum value of the ADC in electrons */
-      double m_rangeADC;
-      /** Number of available bits of the ADC */
-      double m_bitsADC;
-      /** Number of electrons per ADC step */
-      double m_unitADC;
+      /** ENC equivalent of 1 ADU */
+      double m_eToADU;
 
       /** Whether of not to use simple drift model */
       bool   m_useSimpleDrift;

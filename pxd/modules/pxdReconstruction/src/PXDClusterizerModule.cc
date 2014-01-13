@@ -38,7 +38,7 @@ REG_MODULE(PXDClusterizer);
 //-----------------------------------------------------------------
 
 PXDClusterizerModule::PXDClusterizerModule() :
-  Module(), m_elNoise(200.0), m_cutSeed(5.0), m_cutAdjacent(3.0), m_cutCluster(
+  Module(), m_elNoise(300.0), m_eToADU(200), m_cutSeed(5.0), m_cutAdjacent(3.0), m_cutCluster(
     8.0), m_sizeHeadTail(3), m_clusterCacheSize(0)
 {
   //Set module properties
@@ -52,11 +52,13 @@ PXDClusterizerModule::PXDClusterizerModule() :
   addParam("SeedSN", m_cutSeed, "SN for digits to be considered as seed",
            m_cutSeed);
   addParam("ClusterSN", m_cutCluster, "Minimum SN for clusters", m_cutCluster);
+  addParam("eToADU", m_eToADU, "ENC equvalent of 1 ADU", m_eToADU);
   addParam("ClusterCacheSize", m_clusterCacheSize,
            "Maximum desired number of sensor rows", 0);
   addParam("HeadTailSize", m_sizeHeadTail,
            "Minimum cluster size to switch to Analog head tail algorithm for cluster center",
            m_sizeHeadTail);
+  addParam("useADC", m_useADC, "Use ADU as unit of charge?", true);
 
   addParam("Digits", m_storeDigitsName, "Digits collection name", string(""));
   addParam("Clusters", m_storeClustersName, "Cluster collection name",
@@ -133,6 +135,7 @@ void PXDClusterizerModule::initialize()
   B2INFO(" -->  TanLorentz:         " << m_tanLorentzAngle);
 
   //This is still static noise for all pixels, should be done more sophisticated in the future
+  if (m_useADC) m_elNoise = m_elNoise / m_eToADU;
   m_noiseMap.setNoiseLevel(m_elNoise);
   m_cutElectrons = m_elNoise * m_cutAdjacent;
   if (m_clusterCacheSize > 0)

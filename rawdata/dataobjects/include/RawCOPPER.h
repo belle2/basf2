@@ -36,8 +36,15 @@
 
 
 namespace Belle2 {
+  /** \addtogroup dataobjects
+    * @{
+    */
 
-
+  /**
+   * The Raw COPPER class
+   * This class stores data received by COPPER via belle2linkt
+   * Data from all detectors except PXD are stored in this class
+   */
   class RawCOPPER : public RawDataBlock {
   public:
     //! Default constructor

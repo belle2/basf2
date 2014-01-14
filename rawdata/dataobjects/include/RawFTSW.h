@@ -20,7 +20,15 @@
 #include <TObject.h>
 
 namespace Belle2 {
+  /** \addtogroup dataobjects
+    * @{
+    */
 
+  /**
+   * The Raw FTSW class.
+   *
+   * This class stores the RAW data containing FTSW data(event #, trg time ).
+   */
   class RawFTSW : public RawDataBlock {
   public:
     //! Default constructor

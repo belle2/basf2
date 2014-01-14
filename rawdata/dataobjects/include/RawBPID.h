@@ -21,6 +21,15 @@
 #include <TObject.h>
 
 namespace Belle2 {
+  /** \addtogroup dataobjects
+    * @{
+    */
+
+  /**
+   * The Raw BPID class
+   * Class for RawCOPPER class data taken by BPID
+   * Currently, this class is almost same as RawCOPPER class.
+   */
 
   class RawBPID : public RawCOPPER {
   public:

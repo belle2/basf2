@@ -20,7 +20,15 @@
 #include <TObject.h>
 
 namespace Belle2 {
+  /** \addtogroup dataobjects
+    * @{
+    */
 
+  /**
+   * The Raw SVD class
+   * Class for RawCOPPER class data taken by SVD
+   * Currently, this class is almost same as RawCOPPER class.
+   */
   class RawSVD : public RawCOPPER {
   public:
     //! Default constructor

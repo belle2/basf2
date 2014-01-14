@@ -28,8 +28,15 @@
 
 
 namespace Belle2 {
+  /** \addtogroup dataobjects
+    * @{
+    */
 
-  //  class RawTrailer{
+  /**
+   * The Raw Trailer class
+   * This class defines the format of the trailer of RawCOPPER class data
+   * and used for extracting trailer info from RawCOPPER object
+   */
   class RawTrailer : public TObject {
   public:
     //! Default constructor

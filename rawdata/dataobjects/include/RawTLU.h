@@ -19,6 +19,15 @@
 #include <TObject.h>
 
 namespace Belle2 {
+  /** \addtogroup dataobjects
+    * @{
+    */
+
+  /**
+   * The Raw TLU class
+   * Class for data from DAQ PC for TLU(Trigger Logic Unit)
+   * It is supposed to be used only in the DESY beam test
+   */
 
   class RawTLU : public RawDataBlock {
   public:

@@ -20,6 +20,15 @@
 #include <TObject.h>
 
 namespace Belle2 {
+  /** \addtogroup dataobjects
+    * @{
+    */
+
+  /**
+   * The Raw CDC class
+   * Class for RawCOPPER class data taken by CDC
+   * Currently, this class is almost same as RawCOPPER class.
+   */
 
   class RawCDC : public RawCOPPER {
   public:

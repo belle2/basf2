@@ -20,6 +20,15 @@
 #include <TObject.h>
 
 namespace Belle2 {
+  /** \addtogroup dataobjects
+    * @{
+    */
+
+  /**
+   * The Raw KLM class
+   * Class for RawCOPPER class data taken by KLM.
+   * Currently, this class is almost same as RawCOPPER class.
+   */
 
   class RawKLM : public RawCOPPER {
   public:

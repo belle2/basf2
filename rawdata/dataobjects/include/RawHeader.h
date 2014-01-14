@@ -19,6 +19,15 @@
 //#define HEADER_SIZE 16
 
 namespace Belle2 {
+  /** \addtogroup dataobjects
+    * @{
+    */
+
+  /**
+   * The Raw Header class
+   * This class defines the format of the header of RawCOPPER class data
+   * and used for extracting header info from RawCOPPER object
+   */
 
   class RawHeader : public TObject {
   public:

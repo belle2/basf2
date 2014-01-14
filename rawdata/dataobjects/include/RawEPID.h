@@ -20,6 +20,15 @@
 #include <TObject.h>
 
 namespace Belle2 {
+  /** \addtogroup dataobjects
+    * @{
+    */
+
+  /**
+   * The Raw EPID class
+   * Class for RawCOPPER class data taken by EPID
+   * Currently, this class is almost same as RawCOPPER class.
+   */
 
   class RawEPID : public RawCOPPER {
   public:

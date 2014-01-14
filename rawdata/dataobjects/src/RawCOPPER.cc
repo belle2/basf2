@@ -414,7 +414,7 @@ void RawCOPPER::CheckData(int n,
 
 #ifdef DEBUG
   printf("eve %d %d %d %d %d\n",
-         //               GetEveNo( n ),
+         GetEveNo(n),
          Get1stDetectorNwords(n),
          Get2ndDetectorNwords(n),
          Get3rdDetectorNwords(n),
@@ -473,7 +473,7 @@ void RawCOPPER::CheckUtimeCtimeTRGType(int n)
 #endif
   int err_flag = 0;
   int flag = 0;
-  int temp_utime = 0, temp_ctime_trgtype = 0;
+  unsigned int temp_utime = 0, temp_ctime_trgtype = 0;
   unsigned int utime[4], ctime_trgtype[4];
   memset(utime, 0, sizeof(utime));
   memset(ctime_trgtype, 0, sizeof(ctime_trgtype));
@@ -517,13 +517,10 @@ void RawCOPPER::CheckUtimeCtimeTRGType(int n)
 double RawCOPPER::GetEventUnixTime(int n)
 {
 #ifndef READ_OLD_B2LFEE_FORMAT_FILE
-  int pos, run;
   double retval;
 #ifdef USE_B2LFEE_FORMAT_BOTH_VER1_AND_2
   CheckB2LFEEHeaderVersion(n);
 #endif
-  pos = GetOffset1stFINESSE(n) + SIZE_B2LHSLB_HEADER + POS_EXP_RUN;
-  run = m_buffer[ pos ] & 0x3FFFFF;
   retval = (double)(m_buffer[ GetOffset1stFINESSE(n) + SIZE_B2LHSLB_HEADER + POS_TT_UTIME ]) +
            (double)((m_buffer[ GetOffset1stFINESSE(n) + SIZE_B2LHSLB_HEADER + POS_TT_CTIME_TYPE ] >> 4) & 0x7FFFFFF) / 1.27e8;
   return retval;

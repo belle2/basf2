@@ -17,7 +17,22 @@
 #include <framework/gearbox/InputHandler.h>
 #include <framework/core/MRUCache.h>
 
+#include "framework/gearbox/types.h"
+#include "framework/gearbox/Backend.h"
+#include "framework/gearbox/GBResult.h"
+
 #include <map>
+#include <list>
+#include <vector>
+#include <string>
+#include <boost/variant.hpp>
+#include <boost/shared_ptr.hpp>
+
+namespace boost {
+  namespace python {
+    class dict;
+  }
+}
 
 namespace Belle2 {
   namespace gearbox {
@@ -156,6 +171,64 @@ namespace Belle2 {
       getInstance().m_registeredHandlers[prefix] = factory;
     }
 
+    /**
+     * Create a new Backend
+     * @param backendType the type of the backend that is to be created
+     * @param params configuration params passed to the backend
+     * @return Pointer to the newly created backend
+     */
+    gearbox::BackendPtr createBackend(std::string backendType, const gearbox::BackendConfigParamSet& params);
+
+    /** Wrapper for createBackend for python export
+     * @param backendType the type of the backend that is to be created
+     * @param parameters configuration params to be converted from the python dict and passed to the backend
+     * @return Pointer to the newly created backend
+     * */
+    gearbox::BackendPtr createBackend(std::string backendType, const boost::python::dict& parameters);
+
+    /**
+     * Mount a backend to a certain path
+     * @param backend the backend, that is to be mounted
+     * @param mountPath the path within the backend, that is to be mounted on the mountpoint
+     * @param mountPoint the path within the global hierarchy, where the Backend's content should be visible
+     * @param mountMode the mount mode (overlay or merge nodes)
+     * @return a handle to the specific Backend mount state
+     */
+    gearbox::BackendMountHandlePtr mountBackend(gearbox::BackendPtr backend, std::string mountPath, std::string mountPoint, gearbox::EMountMode mountMode);
+
+    /**
+     * Wrapper for mountBackend without return value (for python export)
+     * @param backend the backend, that is to be mounted
+     * @param mountPath the path within the backend, that is to be mounted on the mountpoint
+     * @param mountPoint the path within the global hierarchy, where the Backend's content should be visible
+     * @param mountMode the mount mode (overlay or merge nodes)
+     * @param mountMode
+     */
+    void mountBackendAndForgetHandle(gearbox::BackendPtr backend, std::string mountPath, std::string mountPoint, gearbox::EMountMode mountMode);
+
+    /**
+     * Unmounts a backend (but does not destroy it!)
+     * @param the mount handle, which was originally returned by mountBackend
+     */
+    void unmountBackend(gearbox::BackendMountHandlePtr);
+
+    /**
+     * Performs a query and prints its results
+     * @param the XPath query, that is to be performed
+     */
+    void testQuery(std::string);
+
+
+    /** Actually exports Python API. */
+    static void exposePythonAPI();
+
+    /**
+     * Query the Interface and the matching backend
+     * @param xpath the XPath query to be performed
+     * @return the result set of the query
+     */
+    boost::shared_ptr<gearbox::QryResultSet> query(const std::string& xpath);
+
   private:
     /** Singleton: private constructor */
     Gearbox();
@@ -181,6 +254,46 @@ namespace Belle2 {
     std::vector<gearbox::InputHandler*> m_handlers;
     /** Map of registered InputHandlers */
     std::map<std::string, gearbox::InputHandler::Factory*> m_registeredHandlers;
+
+    /**
+     * The existing Backends
+     */
+    std::vector<gearbox::Backend> backends;
+
+    /**
+     * Information regarding the active mounts
+     */
+    std::list<gearbox::BackendMountHandle> mountInfo;
+
+    /**
+     * Dispatch Query among backends
+     * @param xpath the query to be dispatched
+     * @param the result set to which the matching nodes should be added
+     */
+    void dispatchQuery(std::string xpath, gearbox::GBResult&);
+
+    /**
+     * Shows by how many mounts a backend is used
+     * @param The backend that is to be investigated
+     */
+    void printBackendUseCount(gearbox::BackendPtr p);
+
+    /**
+     * Checks, whether a XPath query could match a certain path
+     * @param xPath The xPath, that is to be analyzed
+     * @param path The path, against that the matching process should take place
+     * @param xPath_matchLevel How many labels (parts of the paths from the beginning) are consumed by the match
+     * @return whether it matched or not
+     */
+    bool matchXPath2Path(const std::string& xPath, const std::string& path, int& xPath_matchLevel);
+
+    /**
+     * removes conditions from xpath and return its path-like parts
+     * @param path the (x)Path to work on
+     * @return the individual parts without conditions
+     */
+    std::vector<std::string> getSimplePathParts(std::string path);
+
 
     /**
      * friend to internal c-like function to interface libxml2 callback

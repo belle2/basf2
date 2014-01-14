@@ -1,7 +1,13 @@
-#include <framework/gearbox/Gearbox.h>
-#include <framework/gearbox/GearDir.h>
-#include <framework/logging/Logger.h>
-#include <framework/utilities/Stream.h>
+#include <boost/python/scope.hpp>
+#include <boost/python/class.hpp>
+#include <boost/python/enum.hpp>
+#include <boost/python/dict.hpp>
+#include <boost/python/manage_new_object.hpp>
+
+#include "framework/gearbox/Gearbox.h"
+#include "framework/gearbox/GearDir.h"
+#include "framework/logging/Logger.h"
+#include "framework/utilities/Stream.h"
 
 #include <libxml/parser.h>
 #include <libxml/xinclude.h>
@@ -10,8 +16,14 @@
 #include <cstring>
 #include <boost/algorithm/string.hpp>
 #include <boost/foreach.hpp>
+#include <boost/regex.hpp>
+#include <list>
 
-#include <TObject.h>
+#include "framework/gearbox/Backend_Postgres1.h"
+#include "framework/gearbox/Backend_Postgres2.h"
+#include "framework/gearbox/Backend_Xml.h"
+
+#include <root/TObject.h>
 
 using namespace std;
 
@@ -60,6 +72,9 @@ namespace Belle2 {
     LIBXML_TEST_VERSION;
     xmlRegisterInputCallbacks(gearbox::matchXmlUri, gearbox::openXmlUri,
                               gearbox::readXmlData, gearbox::closeXmlContext);
+    // do random seed only once
+    gearbox::randomSeed();
+
   }
 
   Gearbox& Gearbox::getInstance()
@@ -226,4 +241,252 @@ namespace Belle2 {
   {
     return GearDir("/Detector/DetectorComponent[@name='" + component + "']/Content");
   }
+
+
+
+  gearbox::BackendPtr Gearbox::createBackend(std::string backendType, const gearbox::BackendConfigParamSet& params)
+  {
+
+    gearbox::BackendPtr ret;
+
+    try {
+
+      if (backendType == "Postgres1") {
+        ret = gearbox::BackendPtr(new gearbox::Backend_Postgres1(params));
+      } else if (backendType == "Postgres2") {
+        ret = gearbox::BackendPtr(new gearbox::Backend_Postgres2(params));
+      } else if (backendType == "Xml") {
+        ret = gearbox::BackendPtr(new gearbox::Backend_Xml(params));
+      } else {
+        throw (std::string("Unknown Backend Type. Valid Types are 'Postgres1', 'Postgres2' and 'Xml' (case sensitive)"));
+      }
+
+    } catch (std::string& s) {
+      B2ERROR("Gearbox::create_backend: Could not create backend of type " + backendType + ". Reason: " + s);
+      exit(1);
+    }
+
+    return ret;
+
+  }
+
+
+
+  gearbox::BackendPtr Gearbox::createBackend(std::string backendType, const boost::python::dict& parameters)
+  {
+    boost::python::list dictKeys = parameters.keys();
+    int nKey = boost::python::len(dictKeys);
+    gearbox::BackendConfigParamSet paramMap;
+
+    //Loop over all keys in the dictionary
+    for (int iKey = 0; iKey < nKey; ++iKey) {
+      boost::python::object currKey = dictKeys[iKey];
+      boost::python::extract<std::string> keyProxy(currKey);
+
+      if (keyProxy.check()) {
+        boost::python::object currValue = parameters[currKey];
+        //I don't see why this doesn't work (proxy.check() always returns false)
+        //boost::python::extract<gearbox::BackendConfigParam> valueProxy(currValue);
+        boost::python::extract<int> intProxy(currValue);
+        boost::python::extract<double> dblProxy(currValue);
+        boost::python::extract<std::string> strProxy(currValue);
+
+        //check types, from more strict to less strict
+        gearbox::BackendConfigParam variant;
+        if (intProxy.check()) {
+          variant = intProxy();
+        } else if (dblProxy.check()) {
+          variant = dblProxy();
+        } else if (strProxy.check()) {
+          variant = strProxy();
+        } else {
+          B2ERROR("Setting the backend parameters from a python dictionary: invalid value for key '" << keyProxy() << "')!");
+          throw std::exception();
+        }
+
+        //ok, add to map
+        paramMap[keyProxy()] = variant;
+      } else {
+        B2ERROR("Setting the backend parameters from a python dictionary: invalid key in dictionary!");
+        throw std::exception();
+      }
+    }
+
+    return  createBackend(backendType, paramMap);
+  }
+
+  void Gearbox::exposePythonAPI()
+  {
+    using namespace boost::python;
+
+    //Not creatable by user
+    class_<gearbox::Backend, gearbox::BackendPtr, boost::noncopyable>("Backend", no_init);
+    class_<gearbox::BackendMountHandlePtr, boost::noncopyable>("BackendMountHandle", no_init);
+
+    gearbox::BackendPtr(Gearbox::*createBackendPython)(std::string, const boost::python::dict&) = &Gearbox::createBackend;
+
+    enum_<gearbox::EMountMode>("EMountMode")
+    .value("overlay", gearbox::EMountMode::overlay)
+    .value("merge", gearbox::EMountMode::merge)
+    ;
+
+    class_<Gearbox, boost::noncopyable>("Gearbox", no_init)
+    .def("create_backend", createBackendPython, return_value_policy<boost::python::manage_new_object>())
+    .def("mount_backend", &Gearbox::mountBackendAndForgetHandle) // even with boost::python::iterator the BackendMountHandle (which is a list iterator) can not get exported or unsufficient documentation
+    .def("testQuery", &Gearbox::testQuery)
+    .def("unmount_backend", &Gearbox::unmountBackend)
+    .def("printBackendUseCount", &Gearbox::printBackendUseCount)
+    ;
+
+    //export global object 'gearbox'
+    scope global;
+    Gearbox& instance = Gearbox::getInstance();
+    global.attr("gearbox") = object(ptr(&instance));
+  }
+
+  void Gearbox::mountBackendAndForgetHandle(gearbox::BackendPtr backend, std::string mountPath, std::string mountPoint, gearbox::EMountMode mountMode)
+  {
+    this->mountBackend(backend, std::move(mountPath), std::move(mountPoint), mountMode);
+  }
+
+
+  void Gearbox::printBackendUseCount(gearbox::BackendPtr p)
+  {
+    // subtract by 1 in order to hide the increased use count due to this function itself
+    // makes only sense if BackendPtr is a shared_ptr
+    // TODO
+    //B2INFO("Use count of shared_ptr is '"+ std::to_string(p.use_count()-1) +"' (python itself consumes 1)");
+  }
+
+  gearbox::BackendMountHandlePtr Gearbox::mountBackend(gearbox::BackendPtr backend, std::string mountPath, std::string mountPoint, gearbox::EMountMode mountMode)
+  {
+
+    if (mountPath.front() != '/')
+      B2ERROR("Gearbox::mountBackend: Invalid mountPath '" + mountPath + "' - has to begin with '/' character");
+
+    if (mountPoint.front() != '/')
+      B2ERROR("Gearbox::mountBackend: Invalid mountPoint '" + mountPoint + "' - has to begin with '/' character");
+
+    if (mountPath.back() != '/')
+      mountPath.append("/");
+
+    if (mountPoint.back() != '/')
+      mountPoint.append("/");
+
+    this->mountInfo.emplace_back(backend, mountPath, mountPoint, mountMode);
+
+    return --this->mountInfo.end();
+
+  }
+
+  void Gearbox::unmountBackend(gearbox::BackendMountHandlePtr m)
+  {
+    this->mountInfo.erase(m);
+  }
+
+  void Gearbox::testQuery(std::string qry)
+  {
+
+    gearbox::printResultSet(*this->query(qry));
+
+  }
+
+  boost::shared_ptr<gearbox::QryResultSet> Gearbox::query(const std::string& xpath)
+  {
+
+    std::vector<std::string> xpath_parts;
+    boost::split(xpath_parts, xpath, boost::is_any_of("|"));
+
+    gearbox::GBResult res;
+
+    for (auto & xp_single : xpath_parts) {
+      this->dispatchQuery(xp_single, res);
+    }
+
+    return res.getResultSetPtr();
+
+  }
+
+  std::vector<std::string> Gearbox::getSimplePathParts(std::string path)
+  {
+
+    // remove xpath's square-bracket conditions (we cannot evaluate them now)
+    path = boost::regex_replace(path, boost::regex("\\[[^\\]]\\]"), "");
+
+    // remove first slash
+    path.erase(0, 1);
+
+    std::vector<std::string> path_parts;
+    boost::split(path_parts, path, boost::is_any_of("/"));
+
+    return path_parts;
+
+  }
+
+  bool Gearbox::matchXPath2Path(const std::string& xPath, const std::string& path, int& xPath_matchLevel)
+  {
+
+    std::vector<std::string> xPath_parts(this->getSimplePathParts(xPath));
+    std::vector<std::string> path_parts(this->getSimplePathParts(path));
+
+    xPath_matchLevel = 0;
+    auto path_actPart = path_parts.begin();
+
+    for (auto xPath_actPart = xPath_parts.cbegin(); xPath_actPart != xPath_parts.cend(); ++xPath_actPart) {
+
+      B2DEBUG(2, "Gearbox::matchXPath2Path: matchlevel '" + std::to_string(xPath_matchLevel) + "' xPath_actPart is '" + *xPath_actPart + "' and path_actPart is '" + *path_actPart + "'");
+
+      if ((*xPath_actPart == "" && xPath_actPart == xPath_parts.cend() - 1)
+          ||      // xpath or path have an empty label at the end => is not relevant for comparison!
+          (*path_actPart == "" && path_actPart == path_parts.end() - 1)
+         )
+        break;
+
+      if (*xPath_actPart == "") // having xpath like "test1//test2" => "//" consumes complete path => match
+        break;
+      else if (*xPath_actPart == "*" || *xPath_actPart == *path_actPart) { // xpath wildcard label or label identical
+        xPath_matchLevel++;
+        path_actPart++;
+      } else {  // we do not need to continue comparison, because path won't match anymore
+        return false;
+      }
+
+    }
+
+    return true;
+
+  }
+
+
+  void Gearbox::dispatchQuery(std::string xPath, gearbox::GBResult& res)
+  {
+
+    int matchlevel;
+
+    // loop forwards over all mounts and check,
+    // whether they match the query
+    for (auto & mI : this->mountInfo) {
+
+      if (this->matchXPath2Path(xPath, mI.mountPoint, matchlevel)) {
+
+        boost::iterator_range<std::string::iterator> matchedRange = boost::algorithm::find_nth(xPath, "/", matchlevel);
+
+        B2INFO("Gearbox::dispatchQuery: found Backend: mountpath '" + mI.mountPath + "', mountpoint '" + mI.mountPoint
+               + "', matchlevel '" + std::to_string(matchlevel) + "', matched range '" + std::string(matchedRange.begin(), matchedRange.end())
+               + "', rest '" + std::string(matchedRange.end(), xPath.end()) + "'");
+
+
+        if (mI.mountMode == gearbox::EMountMode::overlay) {
+          res.erasePath(mI.mountPoint);
+        }
+
+        mI.backend->query(mI.mountPath + std::string(matchedRange.end(), xPath.end()), res.ensurePath(mI.mountPoint), mI.mountPath, res);
+
+      }
+
+    }
+
+  }
+
+
 }

@@ -20,6 +20,7 @@
 #include <framework/core/ModuleParamInfoPython.h>
 #include <framework/core/FileCatalog.h>
 #include <framework/dataobjects/FileMetaData.h>
+#include <framework/gearbox/Gearbox.h>
 
 #include <TFile.h>
 #include <TTree.h>
@@ -84,6 +85,7 @@ BOOST_PYTHON_MODULE(pybasf2)
   ModuleStatistics::exposePythonAPI();
   LogPythonInterface::exposePythonAPI();
   RandomNumbers::exposePythonAPI();
+  Gearbox::exposePythonAPI();
   FileMetaData::exposePythonAPI();
   def("update_file_metadata", &updateFileMetaData);
 }

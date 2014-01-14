@@ -66,6 +66,7 @@ void Raw2DsModule::initialize()
   StoreArray<RawECL>::registerPersistent();
   StoreArray<RawKLM>::registerPersistent();
   StoreArray<RawFTSW>::registerPersistent();
+  StoreArray<RawTLU>::registerPersistent();
 #ifdef DESY
   //  StoreArray<RawTLU>::registerPersistent();
 #endif
@@ -133,6 +134,10 @@ void Raw2DsModule::registerRawCOPPERs()
     // Check FTSW
     if (tempdblk.CheckFTSWID(cprid)) {
       StoreArray<RawFTSW> ary;
+      (ary.appendNew())->SetBuffer(cprbuf, nwds_buf, 1, 1, 1);
+      continue;
+    } else if (tempdblk.CheckTLUID(cprid)) {
+      StoreArray<RawTLU> ary;
       (ary.appendNew())->SetBuffer(cprbuf, nwds_buf, 1, 1, 1);
       continue;
     }

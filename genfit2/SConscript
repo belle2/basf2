@@ -5,7 +5,7 @@ from SCons.Script import *
 from SCons.Scanner.C import CScanner
 
 # the main directory where the genfit svn is checked out into
-src_dir = 'code'
+src_dir = 'code2'
 
 # genfit2 directories
 dirs = ['core', 'fields', 'finitePlanes', 'fitters', 'GBL', 'GFRave', 'measurements', 'trackReps', 'utilities']

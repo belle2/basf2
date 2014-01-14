@@ -4,6 +4,9 @@ import os
 from SCons.Script import *
 from SCons.Scanner.C import CScanner
 
+# the main directory where the genfit svn is checked out into
+src_dir = 'code'
+
 # genfit2 directories
 dirs = ['core', 'fields', 'finitePlanes', 'fitters', 'GBL', 'GFRave', 'measurements', 'trackReps', 'utilities']
 
@@ -21,19 +24,19 @@ else:
 env.Append(CPPPATH = os.path.join(env['INCDIR'], 'genfit'))
 
 # install header files
-includes = env.Install(os.path.join(env['INCDIR'], 'genfit'), Glob(os.path.join('code', '*', 'include', '*.h')))
+includes = env.Install(os.path.join(env['INCDIR'], 'genfit'), Glob(os.path.join(src_dir, '*', 'include', '*.h')))
 env.Alias('genfit2', includes)
 
 # collect source files
 source_files = []
 for dir in dirs:
-    source_files.append([os.path.join(env['BUILDDIR'], 'genfit2', str(source_file)) for source_file in Glob(os.path.join('code', dir, 'src', '*.cc'))])
+    source_files.append([os.path.join(env['BUILDDIR'], 'genfit2', str(source_file)) for source_file in Glob(os.path.join(src_dir, dir, 'src', '*.cc'))])
 
 # see if it found source files, since this is a list of lists, we have
 # to flatten it, following an example from the Python documentation
 # http://docs.python.org/2/tutorial/datastructures.html
 if len(Flatten(source_files)) == 0:
-  print 'No genfit sources found.  Please check if svn up fills the genfit2/code subdirectory.'
+  print "No genfit sources found.  Please check if svn up fills the genfit2/$src_dir subdirectory."
   Exit(1)
 
 # builder for root dictionaries
@@ -44,16 +47,16 @@ rootcint.action.cmdstr = '${ROOTCINTCOMSTR}'
 # generate, build, and collect dictionary files
 dict_files = []
 for dir in dirs:
-    linkdef_files = Glob(os.path.join('code', dir, 'src', '*LinkDef.h'))
+    linkdef_files = Glob(os.path.join(src_dir, dir, 'src', '*LinkDef.h'))
     for linkdef_file in linkdef_files:
         dict_filename = str(linkdef_file).replace(os.sep, '_')[:-9] + 'Dict.cc'
-        header_files = Glob(os.path.join('code', dir, 'include', '*.h'))
+        header_files = Glob(os.path.join(src_dir, dir, 'include', '*.h'))
         if dir == 'core':
-            header_files += Glob(os.path.join('code', 'finitePlanes', 'include', '*.h'))
+            header_files += Glob(os.path.join(src_dir, 'finitePlanes', 'include', '*.h'))
         elif dir == 'GBL':
-    	    header_files = [os.path.join('code', dir, 'include', 'GFGbl.h')]
+    	    header_files = [os.path.join(src_dir, dir, 'include', 'GFGbl.h')]
         elif dir == 'GFRave':
-            header_files = [os.path.join('code', dir, 'include', 'GFRaveVertex.h'), os.path.join('code', dir, 'include', 'GFRaveTrackParameters.h')]
+            header_files = [os.path.join(src_dir, dir, 'include', 'GFRaveVertex.h'), os.path.join(src_dir, dir, 'include', 'GFRaveTrackParameters.h')]
         header_files = [os.path.join(env['INCDIR'], 'genfit', os.path.basename(str(header_file))) for header_file in header_files]
         dict_file = env.RootCint(os.path.join(env['BUILDDIR'], dict_filename), header_files + [linkdef_file])
         dict_files.append(env.SharedObject(dict_file, CPPPATH=['#'] + env['CPPPATH']))

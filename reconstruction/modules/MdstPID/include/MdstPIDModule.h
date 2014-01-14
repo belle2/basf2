@@ -20,6 +20,7 @@ namespace Belle2 {
   class TOPLikelihood;
   class ARICHLikelihood;
   class DedxLikelihood;
+  class ECLPidLikelihood;
   class Muid;
 
   /**
@@ -75,25 +76,31 @@ namespace Belle2 {
   private:
 
     /**
-     * Set TOP likelihoods and corresponding reconstruction flag
+     * Set TOP log likelihoods and corresponding reconstruction flag
      * @param logl TOPLikelihood pointer
      */
     void setLikelihoods(const TOPLikelihood* logl);
 
     /**
-     * Set ARICH likelihoods and corresponding reconstruction flag
+     * Set ARICH log likelihoods and corresponding reconstruction flag
      * @param logl ARICHLikelihood pointer
      */
     void setLikelihoods(const ARICHLikelihood* logl);
 
     /**
-     * Set Dedx likelihoods and corresponding reconstruction flag
+     * Set Dedx log likelihoods and corresponding reconstruction flag
      * @param logl DedxLikelihood pointer
      */
     void setLikelihoods(const DedxLikelihood* logl);
 
     /**
-     * Set KLM likelihoods and corresponding reconstruction flag
+     * Set ECL log likelihoods and corresponding reconstruction flag
+     * @param logl ECLPidLikelihood pointer
+     */
+    void setLikelihoods(const ECLPidLikelihood* logl);
+
+    /**
+     * Set KLM log likelihoods and corresponding reconstruction flag
      * @param muid Muid pointer
      */
     void setLikelihoods(const Muid* muid);

@@ -20,6 +20,7 @@
 #include <top/dataobjects/TOPLikelihood.h>
 #include <arich/dataobjects/ARICHLikelihood.h>
 #include <reconstruction/dataobjects/DedxLikelihood.h>
+#include <ecl/dataobjects/ECLPidLikelihood.h>
 #include <tracking/dataobjects/Track.h>
 #include <tracking/dataobjects/Muid.h>
 
@@ -101,6 +102,10 @@ namespace Belle2 {
       const DedxLikelihood* dedx = track->getRelatedTo<DedxLikelihood>();
       if (dedx) setLikelihoods(dedx);
 
+      // set ecl likelihoods
+      const ECLPidLikelihood* ecl = track->getRelatedTo<ECLPidLikelihood>();
+      if (ecl) setLikelihoods(ecl);
+
       // set klm likelihoods
       const Muid* muid = track->getRelatedTo<Muid>();
       if (muid) setLikelihoods(muid);
@@ -145,6 +150,13 @@ namespace Belle2 {
   {
     for (Const::ParticleType k = Const::chargedStableSet.begin(); k != Const::chargedStableSet.end(); ++k)
       m_pid->setLogLikelihood(Const::CDC, k, logl->getLogLikelihood(k));
+  }
+
+
+  void MdstPIDModule::setLikelihoods(const ECLPidLikelihood* logl)
+  {
+    for (Const::ParticleType k = Const::chargedStableSet.begin(); k != Const::chargedStableSet.end(); ++k)
+      m_pid->setLogLikelihood(Const::ECL, k, logl->getLogLikelihood(k));
   }
 
 

@@ -10,10 +10,13 @@
 #include <daq/slc/nsm/NSMNodeDaemon.h>
 #include <daq/slc/nsm/NSMCommunicator.h>
 
+#include <daq/slc/system/PThread.h>
+#include <daq/slc/system/LogFile.h>
+
 #include <daq/slc/base/Debugger.h>
 #include <daq/slc/base/ConfigFile.h>
 
-#include <daq/slc/system/PThread.h>
+#include <unistd.h>
 
 using namespace Belle2;
 
@@ -21,6 +24,8 @@ typedef SocketAcceptor<LogUICommunicator, LogDBManager> LogUIAcceptor;
 
 int main(int, char**)
 {
+  LogFile::open("logcollectord");
+  daemon(0, 0);
   ConfigFile config("slowcontrol");
   std::string nodename = config.get("LOG_NSM_NAME");
   DBInterface* db = new PostgreSQLInterface(config.get("DATABASE_HOST"),

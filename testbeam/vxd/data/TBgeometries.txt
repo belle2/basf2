@@ -50,4 +50,6 @@ FullTelescopeVXDTB_v2.xml
 ... this is the setup with PXD6-S (4 switchers) facing SVD layer 3. PCBoard and sensor from layer 2 (facing front telescopes) is removed.
 WARNING: the position of the telescopes is not final, will be fixed once setup will be completed.
 
+14. Jan 2014 9:30 Correted vxdId + first pxd from air (only sensitive), second is real
+
 12. Jan 2014 first version

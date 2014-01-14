@@ -4,6 +4,7 @@
 // ******************************************************************
 
 #include <analysis/utility/mcParticleMatching.h>
+#include <analysis/utility/MCMatchStatus.h>
 
 #include <analysis/utility/VariableManager.h>
 
@@ -114,6 +115,83 @@ bool setMCTruth(const Particle* particle)
   return result;
 }
 
+int getMCTruthStatus(const Particle* particle, const MCParticle* mcParticle)
+{
+  int status = 0;
+
+  if (!mcParticle)
+    return -2;
+
+  unsigned nChildren = particle->getNDaughters();
+
+  if (nChildren == 0) {
+    if (particle->getPDGCode() != mcParticle->getPDG())
+      status |= MCMatchStatus::c_MisID;
+    return status;
+  }
+
+  int genMotherPDG = mcParticle->getPDG();
+  // TODO: fix this (aim for no hard coded values)
+  if (genMotherPDG == 10022 || genMotherPDG == 300553 || genMotherPDG == 9000553)
+    return -1;
+
+  // Ks doesn't have daughters in gen_hepevt table
+  // TODO: is there any better way
+  //if (genMotherPDG == 310)
+  //return 1;
+
+  // fill vectors of reconstructed and generated final state particles
+  vector<const Particle*>   recFSPs;
+  vector<const MCParticle*> genFSPs;
+
+  appendFSP(particle,   recFSPs);
+  appendFSP(mcParticle, genFSPs);
+
+  vector<int> missingParticles;
+  findMissingGeneratedParticles(recFSPs, genFSPs, missingParticles);
+
+  // TODO: do something
+  if (genFSPs.size() == 0)
+    return -2;
+
+  if (recFSPs.size() > recFSPs.size())
+    return -3;
+
+  // determine the status bits
+  bool missFSR            = false;
+  bool misID              = false;
+  bool missGamma          = false;
+  bool missMasiveParticle = false;
+  bool missKlong          = false;
+  bool missNeutrino       = false;
+
+  if (missingParticles.size()) {
+    missFSR      = missingFSRPhoton(genFSPs, missingParticles);
+    missGamma    = missingRadiativePhoton(genFSPs, missingParticles);
+    missNeutrino = missingNeutrino(genFSPs, missingParticles);
+    missMasiveParticle = missingMassiveParticle(genFSPs, missingParticles);
+    missKlong    = missingKlong(genFSPs, missingParticles);
+  }
+
+  misID = isMissidentified(recFSPs, genFSPs);
+
+  if (missFSR)
+    status |= MCMatchStatus::c_MissFSR;
+  if (misID)
+    status |= MCMatchStatus::c_MisID;
+  if (missGamma)
+    status |= MCMatchStatus::c_MissGamma;
+  if (missMasiveParticle)
+    status |= MCMatchStatus::c_MissMassiveParticle;
+  if (missNeutrino)
+    status |= MCMatchStatus::c_MissNeutrino;
+  if (missKlong)
+    status |= MCMatchStatus::c_MissKlong;
+
+  return status;
+}
+
+
 // number and type of final state particles should be the same
 // Flags
 // -11 : gen_hepevt link of one of children not found in list of daughters of matched gen_hepevt (something wrong)
@@ -167,10 +245,15 @@ int getMCTruthFlag(const Particle* particle, const MCParticle* mcParticle)
   appendFSP(particle,   recFSPs);
   appendFSP(mcParticle, genFSPs);
 
-  if (genFSPs.size() == 0)
-    return -2;
+  vector<int> missingParticles;
+  findMissingGeneratedParticles(recFSPs, genFSPs, missingParticles);
+
+  // TODO: do something
+  //if (genFSPs.size() == 0)
+  //  return -2;
 
   int truth = compareFinalStates(recFSPs, genFSPs);
+
   return truth;
 }
 
@@ -214,7 +297,13 @@ int isFSP(const MCParticle* P)
       return 1;
     case 11:
       return 1;
+    case 12:
+      return 1;
     case 13:
+      return 1;
+    case 14:
+      return 1;
+    case 16:
       return 1;
     case 22:
       return 1;
@@ -340,6 +429,134 @@ int compareFinalStates(vector<const Particle*> reconstructed, vector<const MCPar
   } else
     return -5;
 }
+
+void findMissingGeneratedParticles(vector<const Particle*>   reconstructed,
+                                   vector<const MCParticle*> generated,
+                                   std::vector<int>& missP)
+{
+
+
+  if (reconstructed.size() >= generated.size())
+    return;
+
+  for (int i = 0; i < (int)generated.size(); ++i) {
+    int link = 0;
+
+    for (int j = 0; j < (int)reconstructed.size(); ++j) {
+      const MCParticle* mcParticle = DataStore::getRelated<MCParticle>(reconstructed[j]);
+
+      if (mcParticle)
+        if (mcParticle->getIndex() == generated[i]->getIndex()) {
+          link = 1;
+          break;
+        }
+    }
+
+    if (!link)
+      missP.push_back(i);
+  }
+}
+
+bool missingFSRPhoton(vector<const MCParticle*> generated, std::vector<int> missP)
+{
+  bool status = false;
+
+  for (int i = 0; i < (int)missP.size(); ++i) {
+    if (generated[missP[i]]->getPDG() == 22) {
+      if (generated[missP[i]]->getMother()) {
+        int ndaug = (generated[missP[i]]->getMother()->getLastDaughter() - generated[missP[i]]->getMother()->getFirstDaughter()) + 1;
+        if (ndaug > 2) {
+          status = true;
+          break;
+        }
+      }
+    }
+  }
+  return status;
+}
+
+bool missingRadiativePhoton(vector<const MCParticle*> generated, std::vector<int> missP)
+{
+  bool status = false;
+
+  for (int i = 0; i < (int)missP.size(); ++i) {
+    if (generated[missP[i]]->getPDG() == 22) {
+      if (generated[missP[i]]->getMother()) {
+        int ndaug = (generated[missP[i]]->getMother()->getLastDaughter() - generated[missP[i]]->getMother()->getFirstDaughter()) + 1;
+        if (ndaug == 2) {
+          status = true;
+          break;
+        }
+      }
+    }
+  }
+  return status;
+}
+
+bool missingNeutrino(vector<const MCParticle*> generated, std::vector<int> missP)
+{
+  bool status = false;
+
+  for (int i = 0; i < (int)missP.size(); ++i) {
+    // TODO: avoid hard coded values
+    if (abs(generated[missP[i]]->getPDG()) == 12 || abs(generated[missP[i]]->getPDG()) == 14 || abs(generated[missP[i]]->getPDG()) == 16) {
+      status = true;
+      break;
+    }
+  }
+  return status;
+}
+
+bool missingMassiveParticle(vector<const MCParticle*> generated, std::vector<int> missP)
+{
+  bool status = false;
+
+  for (int i = 0; i < (int)missP.size(); ++i) {
+    // TODO: avoid hard coded values
+    if (abs(generated[missP[i]]->getPDG()) != 12
+        && abs(generated[missP[i]]->getPDG()) != 14
+        && abs(generated[missP[i]]->getPDG()) != 16
+        && generated[missP[i]]->getPDG() != 22) {
+      status = true;
+      break;
+    }
+  }
+  return status;
+}
+
+bool missingKlong(vector<const MCParticle*> generated, std::vector<int> missP)
+{
+  bool status = false;
+
+  for (int i = 0; i < (int)missP.size(); ++i) {
+    // TODO: avoid hard coded values
+    if (abs(generated[missP[i]]->getPDG()) == 130) {
+      status = true;
+      break;
+    }
+  }
+  return status;
+}
+
+bool isMissidentified(vector<const Particle*> reconstructed, vector<const MCParticle*> generated)
+{
+  bool status = false;
+
+  for (int i = 0; i < (int)reconstructed.size(); ++i) {
+    const MCParticle* mcParticle = DataStore::getRelated<MCParticle>(reconstructed[i]);
+
+    for (int j = 0; j < (int)generated.size(); ++j) {
+      if (mcParticle->getIndex() == generated[j]->getIndex()) {
+        if (reconstructed[i]->getPDGCode() != generated[j]->getPDG()) {
+          status = true;
+          break;
+        }
+      }
+    }
+  }
+  return status;
+}
+
 
 double mcTruthFlag(const Particle* part)
 {

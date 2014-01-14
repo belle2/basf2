@@ -33,6 +33,22 @@ def outputMdst(filename, path=main):
     path.add_module(rooutput)
 
 
+def generate(noEvents, filename, path=main):
+    evtnumbers = register_module('EventInfoSetter')
+    evtnumbers.param('evtNumList', [noEvents])
+    evtnumbers.param('runList', [1])
+    evtnumbers.param('expList', [1])
+    evtgeninput = register_module('EvtGenInput')
+    evtgeninput.param('userDECFile', filename)
+    evtgeninput.param('boost2LAB', True)
+    paramloader = register_module('Gearbox')
+    geobuilder = register_module('Geometry')
+    path.add_module(evtnumbers)
+    path.add_module(paramloader)
+    path.add_module(geobuilder)
+    path.add_module(evtgeninput)
+
+
 def loadMCParticles(path=main):
     ploader = register_module('ParticleLoader')
     ploader.param('UseMCParticles', True)

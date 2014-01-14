@@ -29,6 +29,28 @@ using namespace std;
 bool setMCTruth(const Particle* particle);
 
 /**
+ * Returns the status (quality indicator) of the match. The status is given as a bit pattern,
+ * where the individual bits indicate the following (see MCMatchStatus enum):
+ *
+ * - bit 0 [c_MissFSR]             : Final State Radiation (FSR) photon is missing
+ * - bit 1 [c_MisID]               : One of the charged final state particles is mis-identified
+ * - bit 2 [c_MissGamma]           : Photon (radiative photon and not FSR photon) is missing
+ * - bit 3 [c_MissMassiveParticle] : Massive particle is missing
+ * - bit 4 [c_MissNeutrino]        : Neutrino is missing
+ * - bit 5 [c_MissKlong]           : Klong is missing
+ *
+ * Status equal to 0 indicates the perfect MC match (evrything OK).
+ *
+ * Status smaller than 0 indicates an error in matching.
+ *
+ * @param pointer to the particle
+ * @param pointer to the matched MCParticle
+ *
+ * @return status (bit pattern) of the mc match
+ */
+int getMCTruthStatus(const Particle* particle, const MCParticle* mcParticle);
+
+/**
  * Returns the flag (quality indicator) of the match. Possible values and meaning are:
  * -11 : gen_hepevt link of one of children not found in list of daughters of matched gen_hepevt (something wrong)
  * -10 : one of children has not link to gen_hepevt (something wrong)
@@ -105,5 +127,77 @@ int isFSP(const MCParticle* P);
  * @return the mc match flag
  */
 int compareFinalStates(vector<const Particle*> reconstructed, vector<const MCParticle*> generated);
+
+/**
+ * Finds final stat particles given in vector of generated particles that
+ * are not given in vector of reconstructed final state particles (in other
+ * words: finds out missing what are the missing particles) and saves their
+ * indices.
+ *
+ * @param vector of reconstructed final state particles
+ * @param vector of generated final state particles
+ * @param vector of indices of the missing generated final state particles (holds results of this algorithm)
+ */
+void findMissingGeneratedParticles(vector<const Particle*> reconstructed, vector<const MCParticle*> generated, std::vector<int>& missP);
+
+/**
+ * Determines whether (true) or not (false) the reconstructed particle misses generated Final State Radiation (FSR) photon.
+ *
+ * @param vector of generated final state particles
+ * @param vector of indices of the missing generated final state particles
+ *
+ * @return whether (true) or not (false) the reconstructed particle misses generated Final State Radiation (FSR) photon
+ */
+bool missingFSRPhoton(vector<const MCParticle*> generated, std::vector<int> missP);
+
+/**
+ * Determines whether (true) or not (false) the reconstructed particle misses generated radiative photon.
+ *
+ * @param vector of generated final state particles
+ * @param vector of indices of the missing generated final state particles
+ *
+ * @return whether (true) or not (false) the reconstructed particle misses radiative photon
+ */
+bool missingRadiativePhoton(vector<const MCParticle*> generated, std::vector<int> missP);
+
+/**
+ * Determines whether (true) or not (false) the reconstructed particle misses generated neutrino.
+ *
+ * @param vector of generated final state particles
+ * @param vector of indices of the missing generated final state particles
+ *
+ * @return whether (true) or not (false) the reconstructed particle misses neutrino
+ */
+bool missingNeutrino(vector<const MCParticle*> generated, std::vector<int> missP);
+
+/**
+ * Determines whether (true) or not (false) the reconstructed particle misses massive particle.
+ *
+ * @param vector of generated final state particles
+ * @param vector of indices of the missing generated final state particles
+ *
+ * @return whether (true) or not (false) the reconstructed particle misses massive particle
+ */
+bool missingMassiveParticle(vector<const MCParticle*> generated, std::vector<int> missP);
+
+/**
+ * Determines whether (true) or not (false) the reconstructed particle misses Klong.
+ *
+ * @param vector of generated final state particles
+ * @param vector of indices of the missing generated final state particles
+ *
+ * @return whether (true) or not (false) the reconstructed particle misses Klong
+ */
+bool missingKlong(vector<const MCParticle*> generated, std::vector<int> missP);
+
+/**
+ * Determines whether (true) or not (false) any of the final state particles is mis-identified.
+ *
+ * @param vector of reconstructed final state particles
+ * @param vector of generated final state particles
+ *
+ * @return whether (true) or not (false) any of the final state particles is mis-identified
+ */
+bool isMissidentified(vector<const Particle*> reconstructed, vector<const MCParticle*> generated);
 
 #endif // MCPARTICLEMATCHING

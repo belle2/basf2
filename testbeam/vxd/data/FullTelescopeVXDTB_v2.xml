@@ -130,35 +130,46 @@
                   
                   <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='PXD6-S-sensor_L1']/*)" />                                   
                   <Volume name="PXD-SensitiveArea">
-                     <AlignComponent>1.1.1</AlignComponent>
-                     <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='airPXD6-S-SensitiveArea_short']/*)" />
+                     <AlignComponent>2.1.2</AlignComponent>
+                     <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='PXD6-S-SensitiveArea_short']/*)" />
                      <Active>
-                        <SensorID>1</SensorID>
+                        <SensorID>2</SensorID>
                         <Ladder>1</Ladder>
-                        <Layer>1</Layer>
+                        <Layer>2</Layer>
                         <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='PXD6-S_active_L1']/*)" />
                      </Active>
                   </Volume>
                </Volume>
-               <!--Volume name="PXD6-sensor_L2">
+               <Volume name="PXD6-sensor_L2">
                   <DX unit="mm">-3.71</DX>
                   <DY unit="mm">-1.2</DY>
                   <DZ unit="mm">-7.0</DZ>
                   <Theta unit="deg">-90</Theta>
                   <Phi unit="deg">270</Phi>
                   <Psi unit="deg">90</Psi>
-                  <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='PXD6-sensor_L2']/*)" />
+                  <HalfX unit="mm">32.9</HalfX>
+                  <HalfY unit="mm">7.8</HalfY>
+                  <HalfZ unit="mm">0.61</HalfZ>
+                  <Subtract>
+                    <Name>removing_overlap_from_air_volume</Name>
+                    <Shape>Box</Shape>
+                    <HalfX unit="mm">32.9</HalfX>
+                    <HalfY unit="mm">7.8</HalfY>
+                    <HalfZ unit="mm">0.4</HalfZ>
+                    <DZ unit="mm">-0.61</DZ>
+                  </Subtract>
+                  <!--xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='PXD6-sensor_L2']/*)" /-->
                   <Volume name="PXD-SensitiveArea">
-                     <AlignComponent>2.1.2</AlignComponent>
+                     <AlignComponent>1.1.1</AlignComponent>
                      <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='airPXD-SensitiveArea']/*)" />
                      <Active>
-                        <SensorID>2</SensorID>
+                        <SensorID>1</SensorID>
                         <Ladder>1</Ladder>
-                        <Layer>2</Layer>
+                        <Layer>1</Layer>
                         <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='PXD_active_L2']/*)" />
                      </Active>
                   </Volume>
-               </Volume-->
+               </Volume>
             </Volume>
             <Volume name="SVD-Envelope">
                <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='SVD-Envelope']/*)" />

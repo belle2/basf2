@@ -85,8 +85,10 @@ public class RCServerCommunicator {
 					node = _master.getNodeByName(name);
 				}
 				int number = _socket_reader.readInt();
+				if (number < 0) continue;
 				RCState state_org = new RCState(_master.getNode().getState());
 				node.getState().copy(number);
+				System.out.println("STATE = " + name + " " + number + ":"+node.getState().getAlias());
 				node.getConnection().copy(_socket_reader.readInt());
 				if (node.getConnection().equals(RCConnection.OFFLINE)) {
 					node.setState(RCState.UNKNOWN);

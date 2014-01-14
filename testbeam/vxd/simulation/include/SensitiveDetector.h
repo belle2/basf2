@@ -18,7 +18,7 @@
 
 namespace Belle2 {
   /** Namespace to encapsulate code needed for simulation and reconstruction of the TB */
-  namespace TB {
+  namespace TEL {
     /** The TB Sensitive Detector class. */
     typedef VXD::SensitiveDetector<TelSimHit, TelTrueHit> SensitiveDetector;
   } //end of namespace TB

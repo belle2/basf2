@@ -45,10 +45,11 @@ TelClusterizerModule::TelClusterizerModule() :
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("ClusterCacheSize", m_clusterCacheSize,
-           "Maximum desired number of sensor rows", 0);
+           "Maximum desired number of sensor rows", 1200);
   addParam("Digits", m_storeDigitsName, "Digits collection name", string(""));
   addParam("Clusters", m_storeClustersName, "Cluster collection name",
-           string(""));
+           string("TelCusters"));
+  // CAUTION: Be always explicit about whether we store into PXDClusters or to a separate collection?
   addParam("TrueHits", m_storeTrueHitsName, "TrueHit collection name",
            string(""));
   addParam("MCParticles", m_storeMCParticlesName, "MCParticles collection name",
@@ -56,8 +57,8 @@ TelClusterizerModule::TelClusterizerModule() :
 
   addParam("TanLorentz", m_tanLorentzAngle, "Tangent of the Lorentz angle",
            double(0.25));
+  addParam("cutElectrons", m_cutElectrons, "ENC equivalent of threshold cut", double(1200));
 }
-
 void TelClusterizerModule::initialize()
 {
   //Register collections
@@ -106,7 +107,7 @@ void TelClusterizerModule::initialize()
   B2INFO(
     " -->  Digits:             " << DataStore::arrayName<TelDigit>(m_storeDigitsName));
   B2INFO(
-    " -->  Clusters:           " << DataStore::arrayName<TelCluster>(m_storeClustersName));
+    " -->  Clusters:           " << DataStore::arrayName<PXDCluster>(m_storeClustersName));
   B2INFO(
     " -->  TrueHits:           " << DataStore::arrayName<TelTrueHit>(m_storeTrueHitsName));
   B2INFO(" -->  DigitMCRel:         " << m_relDigitMCParticleName);
@@ -127,7 +128,7 @@ void TelClusterizerModule::event()
   const StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
   const StoreArray<TelTrueHit> storeTrueHits(m_storeTrueHitsName);
   const StoreArray<TelDigit> storeDigits(m_storeDigitsName);
-  StoreArray<TelCluster> storeClusters(m_storeClustersName);
+  StoreArray<PXDCluster> storeClusters(m_storeClustersName);
 
   if (!storeClusters.isValid())
     storeClusters.create();
@@ -225,7 +226,7 @@ void TelClusterizerModule::writeClusters(VxdID sensorID)
   const StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
   const StoreArray<TelDigit> storeDigits(m_storeDigitsName);
   const StoreArray<TelTrueHit> storeTrueHits(m_storeTrueHitsName);
-  StoreArray<TelCluster> storeClusters(m_storeClustersName);
+  StoreArray<PXDCluster> storeClusters(m_storeClustersName);
   RelationArray relClusterMCParticle(storeClusters, storeMCParticles,
                                      m_relClusterMCParticleName);
   RelationArray relClusterDigit(storeClusters, storeDigits,

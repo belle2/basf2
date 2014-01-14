@@ -29,7 +29,7 @@ namespace Belle2 {
     public:
       enum {
         /** Reserve space for this number of pixels on construction */
-        c_defaultCapacity = 10,
+        c_defaultCapacity = 100,
         /** If the capacity exceeds this value, shrink the vector back to c_defaultCapacity after clearing */
         c_maxCapacity = 4 * c_defaultCapacity
       };

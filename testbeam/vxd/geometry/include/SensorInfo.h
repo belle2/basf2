@@ -42,7 +42,7 @@ namespace Belle2 {
       /** Return the end of the integration window, the timeframe the telescope is sensitive */
       double getIntegrationEnd() const { return m_integrationEnd; }
       /** Return the magnetic field at the given local sensor position.*/
-      const TVector3 getBField(const TVector3& point) const
+      const TVector3 getBField(const TVector3& point) const;
 
 
 

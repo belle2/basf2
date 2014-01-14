@@ -29,6 +29,7 @@ namespace Belle2 {
     {
       m_pxdLayers.clear();
       m_svdLayers.clear();
+      m_telLayers.clear();
       m_ladders.clear();
       m_sensors.clear();
       m_sensorInfo.clear();
@@ -108,6 +109,9 @@ namespace Belle2 {
             case SensorInfoBase::SVD:
               m_svdLayers.insert(layerID);
               break;
+            case SensorInfoBase::TEL:
+              m_telLayers.insert(layerID);
+              break;
             default:
               B2FATAL("Cannot use anything else as SensorType PXD or SVD when creating VXD Sensors");
           }
@@ -134,9 +138,12 @@ namespace Belle2 {
           return m_pxdLayers;
         case SensorInfoBase::SVD:
           return m_svdLayers;
+        case SensorInfoBase::TEL:
+          return m_telLayers;
         default:
           std::set<VxdID> allLayers = m_pxdLayers;
           allLayers.insert(m_svdLayers.begin(), m_svdLayers.end());
+          allLayers.insert(m_telLayers.begin(), m_telLayers.end());
           return allLayers;
       }
     }

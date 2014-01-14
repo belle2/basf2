@@ -21,7 +21,7 @@ beamspot_size_z = 0.3  # cm (sigma of gaussian)
 
 from basf2 import *
 # suppress messages and warnings during processing:
-set_log_level(LogLevel.ERROR)
+set_log_level(LogLevel.WARNING)
 # ParticleGun
 particlegun = register_module('ParticleGun')
 # number of primaries per event
@@ -59,7 +59,7 @@ progress = register_module('Progress')
 # Load parameters from xml
 gearbox = register_module('Gearbox')
 # VXD (no Telescopes) plus the real PCMAG magnetic field
-gearbox.param('fileName', 'testbeam/vxd/FullVXDTB.xml')
+gearbox.param('fileName', 'testbeam/vxd/FullTelescopeVXDTB.xml')
 
 # Create geometry
 geometry = register_module('Geometry')
@@ -70,11 +70,14 @@ geometry.param('components', ['TB'])
 simulation = register_module('FullSim')
 simulation.param('StoreAllSecondaries', True)
 
-# PXD/SVD digitizer
+# PXD/SVD/Tel digitizer
 PXDDigi = register_module('PXDDigitizer')
 PXDDigi.param('SimpleDriftModel', False)
 
 SVDDigi = register_module('SVDDigitizer')
+
+TelDigi = register_module('TelDigitizer')
+TelDigi.param("NoiseSN", 4.0)
 
 #PXD DAQ produces PXDRawHits, not PXDDigits.
 PXDConv = register_module("PXDRawHitProducer")
@@ -83,7 +86,7 @@ PXDConv = register_module("PXDRawHitProducer")
 output = register_module('RootOutput')
 output.param('outputFileName', 'TBSimulation.root')
 # Save only digits for the DQM test.
-output.param('branchNames', ['PXDRawHits', 'SVDDigits'])
+# output.param('branchNames', ['PXDRawHits', 'SVDDigits', 'TelDigits'])
 
 # Path construction
 main = create_path()
@@ -96,6 +99,7 @@ main.add_module(simulation)
 main.add_module(PXDDigi)
 main.add_module(PXDConv)
 main.add_module(SVDDigi)
+main.add_module(TelDigi)
 main.add_module(output)
 # Process events
 process(main)

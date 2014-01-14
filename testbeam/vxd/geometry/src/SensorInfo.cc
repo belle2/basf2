@@ -5,6 +5,7 @@
  *      Author: kvasnicka
  */
 
+#include <framework/gearbox/Unit.h>
 #include <testbeam/vxd/geometry/SensorInfo.h>
 #include <geometry/bfieldmap/BFieldMap.h>
 

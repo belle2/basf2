@@ -75,10 +75,10 @@ namespace Belle2 {
       }
       m_sensitivePXD.clear();
 
-      BOOST_FOREACH(TB::SensitiveDetector * sensitive, m_sensitiveTB) {
+      BOOST_FOREACH(TEL::SensitiveDetector * sensitive, m_sensitiveTEL) {
         delete sensitive;
       }
-      m_sensitiveTB.clear();
+      m_sensitiveTEL.clear();
     }
 
     G4LogicalVolume* GeoTBCreator::getLogicalVolume(const GearDir& content)
@@ -156,11 +156,11 @@ namespace Belle2 {
         volume->SetSensitiveDetector(sensitive);
       }
       if (detectorType == "TEL") {
-        TB::SensorInfo sensorInfo(sensorID, aWidth, aLength, aHeight, content.getInt("pixelsR"), content.getInt("pixelsZ[1]"), content.getLength("splitLength", 0), content.getInt("pixelsZ[2]", 0));
+        TEL::SensorInfo sensorInfo(sensorID, aWidth, aLength, aHeight, content.getInt("pixelsR"), content.getInt("pixelsZ[1]"), content.getLength("splitLength", 0), content.getInt("pixelsZ[2]", 0));
 
-        TB::SensorInfo* newInfo = new TB::SensorInfo(sensorInfo);
-        TB::SensitiveDetector* sensitive = new TB::SensitiveDetector(newInfo, m_seeNeutrons, m_onlyPrimaryTrueHits, m_sensitiveThreshold);
-        m_sensitiveTB.push_back(sensitive);
+        TEL::SensorInfo* newInfo = new TEL::SensorInfo(sensorInfo);
+        TEL::SensitiveDetector* sensitive = new TEL::SensitiveDetector(newInfo, m_seeNeutrons, m_onlyPrimaryTrueHits, m_sensitiveThreshold);
+        m_sensitiveTEL.push_back(sensitive);
 
         volume->SetSensitiveDetector(sensitive);
       }

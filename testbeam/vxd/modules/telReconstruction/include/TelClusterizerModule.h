@@ -108,8 +108,10 @@ namespace Belle2 {
 
       /** LorentzAngle , FIXME: should be determined directly from B-Field */
       double m_tanLorentzAngle;
-      /** Head-tail minimum cluster size. For smaller sizes, CoG is used. */
+      /** FIXME: This has no real meaning here, can be substantially simplified. */
       int m_sizeHeadTail;
+      /** Threshold cut in electrons. May help to estimate position error. */
+      double m_cutElectrons;
 
       /** Size of cluster Cache (0 = default) */
       int m_clusterCacheSize;

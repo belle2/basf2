@@ -18,7 +18,7 @@ progress = register_module('Progress')
 # Load parameters from xml
 gearbox = register_module('Gearbox')
 # VXD (no Telescopes), and the real PCMAG magnetic field
-gearbox.param('fileName', 'testbeam/vxd/FullVXDTB.xml')
+gearbox.param('fileName', 'testbeam/vxd/FullTelescopeVXDTB_v2.xml')
 
 # Create geometry
 geometry = register_module('Geometry')
@@ -37,11 +37,18 @@ SVDClust = register_module('SVDClusterizer')
 SVDClust.param('TanLorentz_holes', 0.)
 SVDClust.param('TanLorentz_electrons', 0.)
 
+TelClust = register_module('TelClusterizer')
+TelClust.param('Clusters', "TelClusters")
+
 # PXD DQM module
 pxd_dqm = register_module('PXDDQM')
 
 # SVD DQM module
 svd_dqm = register_module('SVDDQM')
+
+# TEL DQM module
+tel_dqm = register_module('TelDQM')
+tel_dqm.param('Clusters', 'TelClusters')
 
 # VXDTF:
 ## parameters:
@@ -114,8 +121,10 @@ main.add_module(geometry)
 main.add_module(PXDSort)
 main.add_module(PXDClust)
 main.add_module(SVDClust)
+main.add_module(TelClust)
 main.add_module(pxd_dqm)
 main.add_module(svd_dqm)
+main.add_module(tel_dqm)
 main.add_module(vxdtf)
 main.add_module(trackfitter)
 main.add_module(vxdtf_dqm)

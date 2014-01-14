@@ -288,7 +288,7 @@
       <HalfZ unit="um">25</HalfZ>
    </Snippet>
    <Snippet name="EUDET-Active">
-      <DetectorType>PXD</DetectorType>
+      <DetectorType>TEL</DetectorType>
       <stepSize unit="um">5</stepSize>
       <!-- define the number of pixels in rphi direction -->
       <pixelsR>576</pixelsR>

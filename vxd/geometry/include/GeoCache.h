@@ -23,7 +23,7 @@
 class G4VPhysicalVolume;
 
 namespace Belle2 {
-  /** Namespace to provide code needed by both Vertex Detectors, PXD and SVD */
+  /** Namespace to provide code needed by both Vertex Detectors, PXD and SVD, and also testbeam telescopes */
   namespace VXD {
     /**
      * Class to faciliate easy access to sensor information of the VXD like
@@ -92,6 +92,8 @@ namespace Belle2 {
       std::set<Belle2::VxdID> m_pxdLayers;
       /** Set of all SVD layer IDs */
       std::set<Belle2::VxdID> m_svdLayers;
+      /** Set of all Tel layer IDs */
+      std::set<Belle2::VxdID> m_telLayers;
       /** Map of all Ladder IDs belonging to a given Layer ID */
       SensorHierachy m_ladders;
       /** Map of all Sensor IDs belonging to a given Ladder ID */

@@ -106,7 +106,7 @@ namespace Belle2 {
       /** List of all created SVD sensitive detector instances */
       std::vector<SVD::SensitiveDetector*> m_sensitiveSVD;
       /** List of all created telescope sensitive detector instances */
-      std::vector<TB::SensitiveDetector*> m_sensitiveTB;
+      std::vector<TEL::SensitiveDetector*> m_sensitiveTEL;
 
       /** Make also chips sensitive. */
       bool m_activeChips;

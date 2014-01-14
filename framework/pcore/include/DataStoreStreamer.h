@@ -132,7 +132,7 @@ namespace Belle2 {
     int m_threadin;
     //int m_threadout;
     int m_decstat[MAXTHREADS];
-    MsgHandler* m_pmsghandler[MAXTHREADS];
+    //MsgHandler* m_pmsghandler[MAXTHREADS];
     //    char* m_evtbuf[MAXTHREADS];
     std::queue<char*> m_evtbuf[MAXTHREADS];
 

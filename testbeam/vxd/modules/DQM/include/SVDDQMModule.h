@@ -92,6 +92,7 @@ namespace Belle2 {
     std::string m_storePXDClustersName;   /**< PXDClusters StoreArray name */
     std::string m_storeClustersName;      /**< SVDClusters StoreArray name */
     std::string m_relClusterDigitName;    /**< SVDClustersToSVDDigits RelationArray name */
+    std::string m_histogramDirectoryName; /**< Name of the ROOT file directory for these histograms */
 
     // +1 in dimensions to protect against noisy VXDID values.
     TH1F* m_firedU[c_nSVDPlanes];         /**< Fired u strips per event by plane */

@@ -17,6 +17,7 @@
 #include "TH1F.h"
 #include "TH2F.h"
 #include "TVector3.h"
+#include "TDirectory.h"
 
 using namespace std;
 using boost::format;
@@ -37,6 +38,8 @@ PXDDQMModule::PXDDQMModule() : HistoModule()
   //Set module properties
   setDescription("PXD DQM module");
   setPropertyFlags(c_ParallelProcessingCertified);  // specify this flag if you need parallel processing
+  addParam("histgramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed", std::string("pxd"));
+
 }
 
 
@@ -50,6 +53,9 @@ PXDDQMModule::~PXDDQMModule()
 
 void PXDDQMModule::defineHisto()
 {
+  // Create a separate histogram directory and cd into it.
+  TDirectory* oldDir = gDirectory;
+  oldDir->mkdir(m_histogramDirectoryName.c_str())->cd();
   // Fired pixel counts U
   for (int i = 0; i < c_nPXDPlanes; i++) {
     int iPlane = indexToPlane(i);
@@ -168,6 +174,9 @@ void PXDDQMModule::defineHisto()
     m_chargeByStartRow[i]->GetXaxis()->SetTitle("distance from the start row [pitch units]");
     m_chargeByStartRow[i]->GetYaxis()->SetTitle("total cluster charge [ADU]");
   }
+
+  // cd back to root directory
+  oldDir->cd();
 }
 
 

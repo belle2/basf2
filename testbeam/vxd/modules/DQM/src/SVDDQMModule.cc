@@ -19,6 +19,7 @@
 #include "TH1F.h"
 #include "TH2F.h"
 #include "TVector3.h"
+#include "TDirectory.h"
 
 using namespace std;
 using boost::format;
@@ -39,6 +40,7 @@ SVDDQMModule::SVDDQMModule() : HistoModule()
   //Set module properties
   setDescription("SVD DQM module");
   setPropertyFlags(c_ParallelProcessingCertified);  // specify this flag if you need parallel processing
+  addParam("histgramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed", std::string("svd"));
 }
 
 
@@ -52,6 +54,9 @@ SVDDQMModule::~SVDDQMModule()
 
 void SVDDQMModule::defineHisto()
 {
+  // Create a separate histogram directory and cd into it.
+  TDirectory* oldDir = gDirectory;
+  oldDir->mkdir(m_histogramDirectoryName.c_str())->cd();
   //----------------------------------------------------------------
   // Number of fired strips per frame : hFired[U/V][PlaneNo]
   //----------------------------------------------------------------
@@ -263,6 +268,8 @@ void SVDDQMModule::defineHisto()
       }
     }
   }
+
+  oldDir->cd();
 }
 
 

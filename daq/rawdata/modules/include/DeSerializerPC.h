@@ -31,6 +31,7 @@
 #include <rawdata/dataobjects/RawBPID.h>
 #include <rawdata/dataobjects/RawKLM.h>
 #include <rawdata/dataobjects/RawFTSW.h>
+#include <rawdata/dataobjects/RawTLU.h>
 
 
 //#include <rawdata/RawROPC.h>

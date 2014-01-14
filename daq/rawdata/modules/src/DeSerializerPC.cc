@@ -306,7 +306,7 @@ void DeSerializerPCModule::event()
 
   int data_size_copper_0 = -1;
   int data_size_copper_1 = -1;
-  int data_size_ftsw = -1;
+
 
   unsigned int eve_copper_0 = 0;
 
@@ -397,12 +397,15 @@ void DeSerializerPCModule::event()
 
       for (int l = 0; l < num_nodes_in_sendblock; l++) {
         int entry_id = l + k * num_nodes_in_sendblock;
+
+        //
+        // RawFTSW
+        //
         if (raw_datablk->CheckFTSWID(entry_id)) {
           RawFTSW* temp_rawftsw = new RawFTSW;
           temp_rawftsw->SetBuffer((int*)temp_buf + raw_datablk->GetBufferPos(entry_id),
                                   raw_datablk->GetBlockNwords(entry_id), 0, 1, 1);
           if (temp_rawftsw->GetEveNo(0) < 10
-              //                || (temp_rawftsw->GetEveNo(0) > 32758 && temp_rawftsw->GetEveNo(0) < 32778)
              ) {
             printf("######FTSW#########\n");
             printData((int*)temp_buf + raw_datablk->GetBufferPos(entry_id), raw_datablk->GetBlockNwords(entry_id));
@@ -420,27 +423,50 @@ void DeSerializerPCModule::event()
 #endif
           utime_array[ entry_id ] = temp_rawftsw->GetTTUtime(0);
           ctime_type_array[ entry_id ] = temp_rawftsw->GetTTCtimeTRGType(0);
-
-          data_size_ftsw = raw_datablk->GetBlockNwords(entry_id);
           delete temp_rawftsw;
 
+          //
+          // RawTLU
+          //
         } else if (raw_datablk->CheckTLUID(entry_id)) {
-          // No operation
+
+          RawTLU* temp_rawtlu = new RawTLU;
+          temp_rawtlu->SetBuffer((int*)temp_buf + raw_datablk->GetBufferPos(entry_id),
+                                 raw_datablk->GetBlockNwords(entry_id), 0, 1, 1);
+          if (temp_rawtlu->GetEveNo(0) < 10
+             ) {
+            printf("######TLU#########\n");
+            printData((int*)temp_buf + raw_datablk->GetBufferPos(entry_id), raw_datablk->GetBlockNwords(entry_id));
+          }
+
+#ifndef NO_DATA_CHECK
+          try {
+            temp_rawtlu->CheckData(0, m_prev_evenum, &cur_evenum);
+            eve_array[ entry_id ] = cur_evenum;
+          } catch (string err_str) {
+            print_err.PrintError(m_shmflag, &m_status, err_str);
+            exit(1);
+          }
+#endif
+          delete temp_rawtlu;
+          //
+          // RawCOPPER
+          //
         } else {
           RawCOPPER* temp_rawcopper = new RawCOPPER;
           temp_rawcopper->SetBuffer((int*)temp_buf + raw_datablk->GetBufferPos(entry_id),
                                     raw_datablk->GetBlockNwords(entry_id), 0, 1, 1);
 
-          struct timeval tv;
-          temp_rawcopper->GetTTCtime(0);
-          temp_rawcopper->GetTTTimeVal(0, &tv);
-          printf("eve %d utime %d ctime %d %x %d %d\n",
-                 temp_rawcopper->GetEveNo(0),
-                 temp_rawcopper->GetTTUtime(0),
-                 temp_rawcopper->GetTTCtime(0),
-                 temp_rawcopper->GetTTCtimeTRGType(0),
-                 tv.tv_sec, tv.tv_usec
-                );
+//           struct timeval tv;
+//           temp_rawcopper->GetTTCtime(0);
+//           temp_rawcopper->GetTTTimeVal(0, &tv);
+//           printf("eve %d utime %d ctime %d %x %d %d\n",
+//                  temp_rawcopper->GetEveNo(0),
+//                  temp_rawcopper->GetTTUtime(0),
+//                  temp_rawcopper->GetTTCtime(0),
+//                  temp_rawcopper->GetTTCtimeTRGType(0),
+//                  (int)tv.tv_sec, (int)tv.tv_usec
+//                 );
 
 #ifndef NO_DATA_CHECK
           try {

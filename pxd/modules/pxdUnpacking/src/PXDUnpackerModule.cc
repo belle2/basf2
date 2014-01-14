@@ -71,11 +71,15 @@ typedef crc_optimal<32, 0x04C11DB7, 0, 0, false, false> dhh_crc_32_type;
 
 unsigned int type_error = 0, crc_error = 0, magic_error = 0, zerodata_error = 0;
 unsigned int queue_error = 0, fnr_error = 0, wie_error = 0, end_error = 0, evt_skip_error = 0, start_error = 0, evtnr_error = 0;
-unsigned long long evt_counter = 0;
+// unsigned long long evt_counter = 0;
 unsigned int stat_start = 0, stat_end = 0, stat_ghost = 0, stat_raw = 0, stat_zsd = 0;
 unsigned int dhp_size_error = 0, dhp_pixel_error = 0, dhp_warning = 0;
 bool verbose = true;
 bool error_flag = false;
+
+///*********************************************************************************
+///************************** old DHH Code starts here *****************************
+///*********************************************************************************
 
 char* dhh_type_name[8] = {
   (char*)"DHP_RAW",
@@ -86,47 +90,6 @@ char* dhh_type_name[8] = {
   (char*)"DHP_ZSD",
   (char*)"COMMODE",
   (char*)"HLTROI ",
-};
-
-char* dhhc_type_name[16] = {
-  (char*)"DHP_RAW",
-  (char*)"FCE_RAW",
-  (char*)"GHOST  ",
-  (char*)"H_START",
-  (char*)"H_END  ",
-  (char*)"DHP_ZSD",
-  (char*)"COMMODE",
-  (char*)"undef  ",
-  (char*)"undef  ",
-  (char*)"FCE_ONS",
-  (char*)"undef  ",
-  (char*)"C_START",
-  (char*)"C_END  ",
-  (char*)"DHP_ONS",
-  (char*)"undef  ",
-  (char*)"HLTROI "
-};
-
-
-class dhhc_frame_header_word0 {
-public:
-  unsigned short data;
-  dhhc_frame_header_word0(unsigned int error_flag = 0, unsigned int data_typ = 0, unsigned int dependent = 0) {
-    data = ((error_flag & 0x1) << 15) | ((data_typ & 0xF) << 11) | (dependent & 0x3FF);
-  };
-  unsigned int get_type(void) {
-    return (data >> 11) & 0xF;
-  };
-  unsigned int get_err(void) {
-    return (data >> 15) & 0x1;
-  };
-  unsigned int get_misc(void) {
-    return data & 0x3FF;
-  };
-  void print(void) {
-    if (verbose)
-      B2INFO(" DHHC FRAME TYP " << hex << get_type() << " -> " << dhhc_type_name[get_type()] << " ERR " << get_err() << " data " << data);
-  };
 };
 
 class dhh_frame_header_word0 {
@@ -516,7 +479,7 @@ public:
     d = (unsigned char*)data;
 
     if (length > 65536 * 16) {
-      B2WARNING(" DHH Data Frame CRC FAIL bacause of too large packet (>1MB)!");
+      B2WARNING("DHH Data Frame CRC FAIL bacause of too large packet (>1MB)!");
     } else {
       for (int k = 0; k < length - 4; k += 2) {
         crcbuffer[k] = d[k + 1];
@@ -610,6 +573,51 @@ public:
 };
 
 
+///*********************************************************************************
+///***************************** DHHC Code starts here *****************************
+///*********************************************************************************
+
+char* dhhc_type_name[16] = {
+  (char*)"DHP_RAW",
+  (char*)"FCE_RAW",
+  (char*)"GHOST  ",
+  (char*)"H_START",
+  (char*)"H_END  ",
+  (char*)"DHP_ZSD",
+  (char*)"COMMODE",
+  (char*)"undef  ",
+  (char*)"undef  ",
+  (char*)"FCE_ONS",
+  (char*)"undef  ",
+  (char*)"C_START",
+  (char*)"C_END  ",
+  (char*)"DHP_ONS",
+  (char*)"undef  ",
+  (char*)"HLTROI "
+};
+
+
+class dhhc_frame_header_word0 {
+public:
+  unsigned short data;
+  dhhc_frame_header_word0(unsigned int error_flag = 0, unsigned int data_typ = 0, unsigned int dependent = 0) {
+    data = ((error_flag & 0x1) << 15) | ((data_typ & 0xF) << 11) | (dependent & 0x3FF);
+  };
+  unsigned int get_type(void) {
+    return (data >> 11) & 0xF;
+  };
+  unsigned int get_err(void) {
+    return (data >> 15) & 0x1;
+  };
+  unsigned int get_misc(void) {
+    return data & 0x3FF;
+  };
+  void print(void) {
+    if (verbose)
+      B2INFO(" DHHC FRAME TYP " << hex << get_type() << " -> " << dhhc_type_name[get_type()] << " ERR " << get_err() << " data " << data);
+  };
+};
+
 class dhhc_start_frame {
 public:
   dhhc_frame_header_word0 word0;
@@ -618,8 +626,10 @@ public:
   unsigned short time_tag_lo_and_type;
   unsigned short time_tag_mid;
   unsigned short time_tag_hi;
-  unsigned short nr_words_in_frame;
-  unsigned int crc32;
+  unsigned short nr_frames_in_event;
+  unsigned short crc32lo;
+  unsigned short crc32hi;
+//  unsigned int crc32;
 
 //    dhhc_start_frame(unsigned int time_tag = 0, unsigned int trigger_nr = 0, unsigned int depend = 0): word0(0, DHH_FRAME_HEADER_DATA_TYPE_EVT_FRM, depend) {
 //    };
@@ -639,6 +649,7 @@ public:
     bocrc.process_bytes(crcbuffer, (size() - 4));
     unsigned int c;
     c = htonl(bocrc.checksum());
+    unsigned int crc32 = (crc32hi << 16) | crc32lo;
     if (c == crc32) {
       if (verbose)
         B2INFO(" DHHC Start Frame CRC " << hex << c << " == " << hex << crc32);
@@ -650,13 +661,15 @@ public:
     return c;
   };
   bool is_fake(void) {
+    unsigned int crc32 = (crc32hi << 16) | crc32lo;
     if (word0.data != 0x5800) return false;
     if (trigger_nr_lo != 0) return false;
     if (trigger_nr_hi != 0) return false;
     if (time_tag_lo_and_type != 0) return false;
     if (time_tag_mid != 0) return false;
     if (time_tag_hi != 0) return false;
-    //if(crc32!=0x87654321) return false;
+    if (nr_frames_in_event != 0) return false;
+    if (crc32 != 0x2DA167EF) return false;
     return true;
   };
   inline static unsigned int size(void) {
@@ -664,10 +677,12 @@ public:
   };
   void print(void) {
     word0.print();
-    /*      if (verbose)
-             B2INFO(" DHHC Start Frame TNRLO " << hex << trigger_nr_lo << " TNRHI " << hex << trigger_nr_hi << " TTLO " << hex << time_tag_lo
-             << " TTHI " << hex << time_tag_hi << " SFNR " << hex << ((sfnr_offset >> 10) & 0x3F) << " OFF " << hex << (sfnr_offset & 0x3FF)
-             << " CRC " << hex << crc32 << " (calc)" << calc_crc());*/
+    if (verbose) {
+      unsigned int crc32 = (crc32hi << 16) | crc32lo;
+      B2INFO(" DHHC Start Frame TNRLO $" << hex << trigger_nr_lo << " TNRHI $" << hex << trigger_nr_hi << " TTLO $" << hex << time_tag_lo_and_type
+             << " TTMID $" << hex << time_tag_mid << " TTHI $" << hex << time_tag_hi << " Frames in Event " << dec << nr_frames_in_event
+             << " CRC $" << hex << crc32 << " (calc) $" << calc_crc());
+    }
   };
   inline unsigned int get_active_dhh_mask(void) {return word0.get_misc() & 0x1F;};
   inline unsigned int get_dhhc_id(void) {return (word0.get_misc() >> 5) & 0xF;};
@@ -716,17 +731,6 @@ public:
       error_flag = true;
     }
     return c;
-  };
-  bool is_fake(void) {
-    /*if (word0.data != 0x3000) return false;
-    if (trigger_nr_lo != 0) return false;
-    if (trigger_nr_hi != 0) return false;
-    if (time_tag_lo != 0) return false;
-    if (time_tag_hi != 0) return false;
-    if (sfnr_offset != 0) return false;
-    //if(crc32!=0x87654321) return false;
-    return true;*/
-    return false;
   };
   inline static unsigned int size(void) {
     return 14;// 7 words
@@ -792,6 +796,9 @@ public:
     if (verbose)
       B2INFO(" DHHC Direct Readout (Raw|ZSD) Frame TNRLO " << hex << trigger_nr_lo << " CRC " << calc_crc());
   };
+  inline unsigned short get_dhh_id(void) {return (word0.get_misc() >> 4) & 0x3F;};
+  inline unsigned short get_dhp_port(void) {return (word0.get_misc()) & 0x3;};
+  inline bool get_reformat_flag(void) {return (word0.get_misc() >> 3) & 0x1;};
 };
 
 class dhhc_direct_readout_frame_raw : public dhhc_direct_readout_frame {
@@ -847,7 +854,7 @@ public:
     d = (unsigned char*) &magic1;/// without the DHHC header as its only an inner checksum!!!
 
     if (length > 65536 * 2) {
-      B2WARNING(" DHHC ONSEN HLT/ROI Frame CRC FAIL bacause of too large packet (>128kB)!");
+      B2WARNING("DHHC ONSEN HLT/ROI Frame CRC FAIL bacause of too large packet (>128kB)!");
     } else {
       for (unsigned int k = 0; k < length - 4; k += 2) { // -4
         crcbuffer[k] = d[k + 1];
@@ -928,8 +935,10 @@ public:
   void print(void) {
     word0.print();
     if (verbose)
-      B2INFO(" DHHC Ghost Frame TNRLO " << hex << trigger_nr_lo << " CRC "  << crc32 << " (calc) "  << calc_crc());
+      B2INFO(" DHHC Ghost Frame TNRLO " << hex << trigger_nr_lo << " DHH ID $" << get_dhh_id() << " DHP port $" << get_dhp_port() << " CRC $"  << crc32 << " (calc) "  << calc_crc());
   };
+  inline unsigned short get_dhh_id(void) {return (word0.get_misc() >> 4) & 0x3F;};
+  inline unsigned short get_dhp_port(void) {return (word0.get_misc()) & 0x3;};
 };
 
 class dhhc_end_frame {
@@ -977,7 +986,7 @@ public:
     if (trigger_nr_lo != 0) return false;
     if (wordsinevent != 0) return false;
     if (errorinfo != 0) return false;
-    //if(crc32!=0x87654321) return false;
+    if (crc32 != 0xF7BCA507) return false;
     return true;
   };
   void print(void) {
@@ -1028,15 +1037,6 @@ public:
   }
   inline static unsigned int size(void) {
     return 16;
-  };
-  bool is_fake(void) {
-    /*      if (word0.data != 0xC100) return false;
-          if (trigger_nr_lo != 0) return false;
-          if (wordsinevent != 0) return false;
-          if (errorinfo != 0) return false;
-          //if(crc32!=0x87654321) return false;
-          return true;*/
-    return false;
   };
   void print(void) {
     word0.print();
@@ -1092,7 +1092,7 @@ public:
     d = (unsigned char*)data;
 
     if (length > 65536 * 16) {
-      B2WARNING(" DHHC Data Frame CRC FAIL bacause of too large packet (>1MB)!");
+      B2WARNING("DHHC Data Frame CRC FAIL bacause of too large packet (>1MB)!");
     } else {
       for (int k = 0; k < length - 4; k += 2) {
         crcbuffer[k] = d[k + 1];
@@ -1190,6 +1190,10 @@ public:
   };
 
 };
+
+///******************************************************************
+///*********************** Main inpacker code ***********************
+///******************************************************************
 
 PXDUnpackerModule::PXDUnpackerModule() :
   Module(),
@@ -1298,7 +1302,7 @@ void PXDUnpackerModule::unpack_event(RawPXD& px)
     B2INFO(" unpack DHH(C) frame: " << j << " with size " << lo << " at byte offset in dataptr " << ll);
     endian_swap_frame((unsigned short*)(ll + (char*)dataptr), lo);
     if (m_DHHCmode) {
-      unpack_dhhc_frame(ll + (char*)dataptr, lo, pad, last_wie, last_start, last_end, last_evtnr, j, Frames_in_event);
+      unpack_dhhc_frame(ll + (char*)dataptr, lo, pad, last_wie, last_evtnr, j, Frames_in_event);
     } else {
       unpack_frame(ll + (char*)dataptr, lo, pad, last_framenr, last_wie, last_start, last_end, last_evtnr, j, Frames_in_event);
     }
@@ -1475,22 +1479,23 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int len2, unsigned int d
 //    if (cid == -2) dhp_pixel_error++;
 };
 
-unsigned int dhh_first_frame_id_lo = 0;
-unsigned int dhh_first_offset = 0;
-
 void PXDUnpackerModule::unpack_frame(void* data, int len, bool pad, int& last_framenr, int& last_wie, int& last_start, int& last_end, unsigned int& last_evtnr, int Frame_Nr, int Frames_in_event)
 {
   dhh_frame_header_word0* hw;
   error_flag = false;
   hw = (dhh_frame_header_word0*)data;
-// printf("len %d", len);
+
+  static unsigned int dhh_first_frame_id_lo = 0;
+  static unsigned int dhh_first_offset = 0;
+
+  // printf("len %d", len);
 
   dhh_frames dhh;
   dhh.set(data, hw->get_type(), len, pad);
   int s;
   s = dhh.size();
   if (len != s && s != 0) {
-    B2WARNING(" Size (real) " << len << " != " << s << " (in data) " << pad);
+    B2WARNING("Size (real) " << len << " != " << s << " (in data) " << pad);
   }
 
   int le = 0, ls = last_start;
@@ -1512,7 +1517,7 @@ void PXDUnpackerModule::unpack_frame(void* data, int len, bool pad, int& last_fr
     case DHH_FRAME_HEADER_DATA_TYPE_DHP_ZSD:
 
       hw->print();
-//       B2WARNING(" Size (real) " << len << " != " << s << " (in data) " << pad);
+//       B2WARNING("Size (real) " << len << " != " << s << " (in data) " << pad);
       dhh.calc_crc();
       stat_zsd++;
 
@@ -1551,7 +1556,7 @@ void PXDUnpackerModule::unpack_frame(void* data, int len, bool pad, int& last_fr
         if ((evtnr & 0x7FFF) != ((last_evtnr + 1) & 0x7FFF)) {
           evt_skip_error++;
           if (verbose) {
-            B2WARNING(" Event skipped: " << evtnr << " != " << last_evtnr << " + 1 ");
+            B2WARNING("Event skipped: " << evtnr << " != " << last_evtnr << " + 1 ");
           };
           error_flag = true;
         }
@@ -1646,7 +1651,7 @@ void PXDUnpackerModule::unpack_frame(void* data, int len, bool pad, int& last_fr
       nr_of_dhh_end_frame++;
     }
     if (Frame_Nr == Frames_in_event - 1 && nr_of_dhh_start_frame < nr_of_dhh_end_frame) {
-      B2ERROR("False order of dhh start and end frames in Event Nr" << evtnr);
+      B2ERROR("False order of dhh start and end frames in Event Nr " << evtnr);
     }
   }
 
@@ -1660,6 +1665,7 @@ void PXDUnpackerModule::unpack_frame(void* data, int len, bool pad, int& last_fr
 
 int nr5bits(int i)
 {
+  /// too lazy to count the bits myself, thus using a small lookup table
   const int lut[32] = {
     0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4,
     1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5
@@ -1667,7 +1673,7 @@ int nr5bits(int i)
   return lut[i & 0x1F];
 }
 
-void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& last_wie, int& last_start, int& last_end, unsigned int& last_evtnr, int Frame_Number, int Frames_in_event)
+void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& last_wie, unsigned int& last_evtnr, int Frame_Number, int Frames_in_event)
 {
   static int nr_of_dhh_start_frame = 0; /// could put it as a class member, but is only needed within this function
   static int nr_of_dhh_end_frame = 0; /// could put it as a class member, but is only needed within this function
@@ -1675,6 +1681,11 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& la
   static int mask_active_dhh = 0;
   static int nr_active_dhp = 0;
   static int mask_active_dhp = 0;
+  static int found_mask_active_dhp = 0;
+
+  static unsigned int dhh_first_frame_id_lo = 0;
+  static unsigned int dhh_first_offset = 0;
+
 
   dhhc_frame_header_word0* hw = (dhhc_frame_header_word0*)data;
   error_flag = false;
@@ -1689,10 +1700,8 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& la
   int s;
   s = dhhc.size();
   if (len != s && s != 0) {
-    B2WARNING(" Size (real) " << len << " != " << s << " (in data) " << pad);
+    B2ERROR("Fixed frame type size " << len << " != " << s << " (in data) " << pad);
   }
-
-  int le = 0, ls = last_start;
 
   unsigned int evtnr;
 
@@ -1712,6 +1721,8 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& la
 
       ((dhhc_direct_readout_frame_raw*)data)->print();
       dhhc.calc_crc();
+      found_mask_active_dhp |= 1 << ((dhhc_direct_readout_frame*)data)->get_dhp_port();
+
       stat_raw++;
       dhhc.write_pedestal();
       break;
@@ -1719,12 +1730,11 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& la
     case DHHC_FRAME_HEADER_DATA_TYPE_DHP_ZSD: {
 
       hw->print();
-      //       B2WARNING(" Size (real) " << len << " != " << s << " (in data) " << pad);
+      //       B2WARNING("Size (real) " << len << " != " << s << " (in data) " << pad);
       dhhc.calc_crc();
+      found_mask_active_dhp |= 1 << ((dhhc_direct_readout_frame*)data)->get_dhp_port();
       stat_zsd++;
-
       unpack_dhp(data, len - 4, dhh_first_frame_id_lo, dhh_id, dhh_first_offset);
-
       break;
     };
     case DHHC_FRAME_HEADER_DATA_TYPE_FCE_RAW: {
@@ -1746,28 +1756,19 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& la
       } else {
         ((dhhc_start_frame*)data)->print();
       }
-      if (last_end == 0) {
-        end_error++;
-        if (verbose) {
-          B2ERROR(" Error: Start without End ");
-        };
-        error_flag = true;
-      }
-      ls = 1;
 
-
-      if (!fake) {
+      /*
+       /// For parallel processing this will happens always!!!
+       if (!fake) {
         if ((evtnr & 0x7FFF) != ((last_evtnr + 1) & 0x7FFF)) {
           evt_skip_error++;
           if (verbose) {
-            B2WARNING(" Event skipped: " << evtnr << " != " << last_evtnr << " + 1 ");
+            B2WARNING("Event skipped: " << evtnr << " != " << last_evtnr << " + 1 ");
           };
           error_flag = true;
         }
-      }
+      }*/
       last_evtnr = evtnr;
-//         dhh_first_frame_id_lo = ((dhhc_start_frame*)data)->get_sfnr();
-//         dhh_first_offset = ((dhhc_start_frame*)data)->get_toffset();
       dhhc.calc_crc();
       if (nr_of_dhh_start_frame != nr_of_dhh_end_frame) B2ERROR("DHHC_FRAME_HEADER_DATA_TYPE_DHH_START without DHHC_FRAME_HEADER_DATA_TYPE_DHH_END");
       stat_start++;
@@ -1777,24 +1778,22 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& la
       break;
     };
     case DHHC_FRAME_HEADER_DATA_TYPE_DHH_START: {
-      //bool fake = ((dhhc_dhh_start_frame*)data)->is_fake();
-      //if (fake) {
-      //  B2WARNING("Faked DHH START Data -> trigger without Data!");
-      //} else {
       ((dhhc_dhh_start_frame*)data)->print();
-      //}
       dhh_first_frame_id_lo = ((dhhc_dhh_start_frame*)data)->get_sfnr();
       dhh_first_offset = ((dhhc_dhh_start_frame*)data)->get_toffset();
       dhhc.calc_crc();
 
       nr_of_dhh_start_frame++;
 
+      found_mask_active_dhp = 0;
       mask_active_dhp = ((dhhc_dhh_start_frame*)data)->get_active_dhp_mask();
       nr_active_dhp = nr5bits(mask_active_dhp);
       break;
     };
     case DHHC_FRAME_HEADER_DATA_TYPE_GHOST:
       ((dhhc_ghost_frame*)data)->print();
+      /// Attention: Firmware might be changed such, that ghostframe come for all DHPs, not only active ones...
+      found_mask_active_dhp |= 1 << ((dhhc_ghost_frame*)data)->get_dhp_port();
       dhhc.calc_crc();
       stat_ghost++;
 
@@ -1806,14 +1805,7 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& la
       } else {
         ((dhhc_end_frame*)data)->print();
       }
-      ls = 0;
-      le = 1;
       stat_end++;
-      if (last_start == 0) {
-        B2ERROR(" Error: End without Start ");
-        start_error++;
-        error_flag = true;
-      }
 
       if (!fake) {
         int w;
@@ -1837,20 +1829,14 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& la
       break;
     };
     case DHHC_FRAME_HEADER_DATA_TYPE_DHH_END: {
-      //bool fake = ((dhhc_dhh_end_frame*)data)->is_fake();
-      //if (fake) {
-      //  B2WARNING("Faked DHH END Data -> trigger without Data!");
-      //} else {
       ((dhhc_dhh_end_frame*)data)->print();
-      //}
       dhhc.calc_crc();
-
+      if (found_mask_active_dhp != mask_active_dhp) B2ERROR("DHH_END: DHP active mask $" << hex << mask_active_dhp << " != $" << hex << found_mask_active_dhp << " mask of found dhp/ghost frames");
       nr_of_dhh_end_frame++;
       if (nr_of_dhh_start_frame != nr_of_dhh_end_frame) B2ERROR("DHHC_FRAME_HEADER_DATA_TYPE_DHH_END without DHHC_FRAME_HEADER_DATA_TYPE_DHH_START");
       break;
     };
     case DHHC_FRAME_HEADER_DATA_TYPE_HLTROI:
-      hw->print();
       //((dhhc_onsen_frame*)data)->set_length(len - 4);
       ((dhhc_onsen_frame*)data)->print();
       ((dhhc_onsen_frame*)data)->calc_crc(len - 4); /// CRC is without the DHHC header
@@ -1870,27 +1856,30 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& la
     error_flag = true;
   }
 
-  /// Check that DHHC Start is first Frame
-  if (Frame_Number == 0 && type != DHHC_FRAME_HEADER_DATA_TYPE_DHHC_START) {
-    B2ERROR("First frame is not a DHHC start of subevent frame in Event Nr " << evtnr);
-  }
-  /// Check that there is no other DHHC Start
-  if (Frame_Number != 0 && type == DHHC_FRAME_HEADER_DATA_TYPE_DHHC_START) {
-    B2ERROR("More than one DHHC start of subevent frame in frame in Event Nr " << evtnr)
-  }
+  if (Frame_Number == 0) {
+    /// Check that DHHC Start is first Frame
+    if (type != DHHC_FRAME_HEADER_DATA_TYPE_DHHC_START) B2ERROR("First frame is not a DHHC start of subevent frame in Event Nr " << evtnr);
+  } else { // (Frame_Number != 0 &&
+    /// Check that there is no other DHHC Start
+    if (type == DHHC_FRAME_HEADER_DATA_TYPE_DHHC_START) B2ERROR("More than one DHHC start of subevent frame in frame in Event Nr " << evtnr)
+    }
 
-  /// Check that DHHC End is last Frame
-  if (Frame_Number == Frames_in_event - 1 && type != DHHC_FRAME_HEADER_DATA_TYPE_DHHC_END) {
-    B2ERROR("Last frame is not a DHHC end of subevent frame in Event Nr " << evtnr);
-  }
-  /// Check that there is no other DHHC End
-  if (Frame_Number != Frames_in_event - 1 && type == DHHC_FRAME_HEADER_DATA_TYPE_DHHC_END) {
-    B2ERROR("More than one DHHC end of subevent frame in frame in Event Nr " << evtnr)
-  }
+  if (Frame_Number == Frames_in_event - 1) {
+    /// Check that DHHC End is last Frame
+    if (type != DHHC_FRAME_HEADER_DATA_TYPE_DHHC_END) B2ERROR("Last frame is not a DHHC end of subevent frame in Event Nr " << evtnr);
+
+    /// As we now have processed the whole event, we can do some more consistency checks!
+    if (nr_of_dhh_start_frame != nr_of_dhh_end_frame || nr_of_dhh_start_frame != nr_active_dhh)
+      B2ERROR("The number of DHH Start/End does not match the number of active DHH in DHHC Header! Header: " << nr_active_dhh << " Start: " << nr_of_dhh_start_frame << " End: " << nr_of_dhh_end_frame << " Mask: $" << hex << mask_active_dhh << " in Event Nr " << evtnr);
+
+  } else { //  (Frame_Number != Frames_in_event - 1 &&
+    /// Check that there is no other DHHC End
+    if (type == DHHC_FRAME_HEADER_DATA_TYPE_DHHC_END) B2ERROR("More than one DHHC end of subevent frame in frame in Event Nr " << evtnr)
+    }
 
   /// Check that (if there is at least one active DHH) the second Frame is DHH Start, actually this is redundant if the other checks work
   if (Frame_Number == 1 && nr_active_dhh != 0 && type != DHHC_FRAME_HEADER_DATA_TYPE_DHH_START) {
-    B2ERROR("Second frame is not a DHH start frame in Event Nr" << evtnr)
+    B2ERROR("Second frame is not a DHH start frame in Event Nr " << evtnr)
   }
   /// Check that (if there is at least one active DHH) the second last Frame is DHH End, actually this is redundant if the other checks work
   if (Frame_Number == Frames_in_event - 2 && nr_active_dhh != 0 && type != DHHC_FRAME_HEADER_DATA_TYPE_DHH_END) {
@@ -1899,8 +1888,6 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& la
 
   last_wie += len;
 
-  last_end = le;
-  last_start = ls;
 }
 
 

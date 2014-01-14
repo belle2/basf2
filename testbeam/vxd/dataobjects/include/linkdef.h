@@ -6,6 +6,7 @@
 #pragma link C++ nestedclasses;
 
 #pragma link C++ class Belle2::TelSimHit;
+#pragma link C++ class Belle2::TelDigit;
 #pragma link C++ class Belle2::TelTrueHit;
 #pragma link C++ class Belle2::TelCluster;
 

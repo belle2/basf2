@@ -15,7 +15,7 @@
 
 namespace Belle2 {
   /** Namespace to encapsulate code needed for simulation and reconstruction of VXD testbeams */
-  namespace TB {
+  namespace TEL {
     /** Specific implementation of SensorInfo for telescope sensors which provides additional specific information.
      * This implementation is mostly meant for EuTel MAPS sensors.
      */
@@ -41,6 +41,10 @@ namespace Belle2 {
       double getIntegrationStart() const { return m_integrationStart; }
       /** Return the end of the integration window, the timeframe the telescope is sensitive */
       double getIntegrationEnd() const { return m_integrationEnd; }
+      /** Return the magnetic field at the given local sensor position.*/
+      const TVector3 getBField(const TVector3& point) const
+
+
 
     protected:
       /** The start of the integration window, the time frame the telescope is sensitive */
@@ -49,6 +53,6 @@ namespace Belle2 {
       double m_integrationEnd;
     };
 
-  } // TB namespace
+  } // TEL namespace
 } //Belle2 namespace
 #endif

@@ -16,6 +16,7 @@ public class RunStatus extends DataObject {
 		addInt("start_time", 0);
 		addInt("end_time", -1);
 		addInt("run_config", 0);
+		addText("run_type", "", 64);
 		addText("operators", "", 64);
 		addText("comment", "", 512);
 	}
@@ -48,6 +49,10 @@ public class RunStatus extends DataObject {
 		return getInt("run_config");
 	}
 
+	public String getRunType() {
+		return getText("run_type");
+	}
+
 	public String getOperators() {
 		return getText("operators");
 	}
@@ -78,6 +83,10 @@ public class RunStatus extends DataObject {
 
 	public void setRunConfig(int run_config) {
 		setInt("run_config", run_config);
+	}
+
+	public void setRunType(String run_type) {
+		setText("run_type", run_type);
 	}
 
 	public void setOperators(String operators) {

@@ -30,7 +30,7 @@ public class LauncherFrame extends JFrame {
 
 	private LauncherFrame() {
 		String hostname = System.getenv("B2SC_SERVER_HOST");
-		if (hostname == null) hostname = "localhost";
+		if (hostname == null) hostname = "belle-rpc1";
 		_login_panel = new LauncherLoginPane(
 				hostname, hostname, 22, "");
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);

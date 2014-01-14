@@ -43,7 +43,7 @@ public class TriggerSettingPanel extends JPanel {
 		_trigger_type = new ComboBoxPanel("Trigger type : ", type);
 		_trigger_type.setFieldSize(80, 30);
 		_dummy_rate = new TextBoxPanel("Dummy rate [Hz]: ", ""+(-1));
-		_trigger_limit = new TextBoxPanel("Trigger limit : ", ""+0);
+		_trigger_limit = new TextBoxPanel("Trigger limit : ", ""+(-1));
 		_trigger_type.setLabelSize(120, 30);
 		_dummy_rate.setLabelSize(120, 30);
 		_trigger_limit.setLabelSize(120, 30);

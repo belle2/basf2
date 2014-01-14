@@ -38,7 +38,7 @@ public class RCNodeGroupViewPanel extends JPanel implements Updatable {
 		setLayout(layout);
 		int i = 0;
 		final int cols = 1; 
-		final int rows = 6; 
+		final int rows = 10; 
 		for (int icols = 0; icols < cols; icols++) {
 			for (int irows = 0; irows < rows; irows++) {
 				if (i >= _master.getNSMNodes().size()) return;

@@ -150,6 +150,26 @@ public class SystemConfigurationPanel extends JPanel implements Updatable {
 				RunTypeConfigTree tree = new RunTypeConfigTree();
 				try {
 					_run_type_v_m = new HashMap<String, ArrayList<Integer>>();
+					_run_type_v_m.put("TEST:DAQ:DEBUG:TRIGGER", new ArrayList<Integer>());
+					_run_type_v_m.get("TEST:DAQ:DEBUG:TRIGGER").add(0);
+					_run_type_v_m.put("TEST:DAQ:DEBUG:HLT", new ArrayList<Integer>());
+					_run_type_v_m.get("TEST:DAQ:DEBUG:HLT").add(0);
+					_run_type_v_m.put("TEST:DAQ:DEBUG:COPPER", new ArrayList<Integer>());
+					_run_type_v_m.get("TEST:DAQ:DEBUG:COPPER").add(0);
+					_run_type_v_m.put("TEST:DAQ:DEBUG:EB", new ArrayList<Integer>());
+					_run_type_v_m.get("TEST:DAQ:DEBUG:EB").add(0);
+					_run_type_v_m.put("TEST:PXD:DEBUG:CONTROL", new ArrayList<Integer>());
+					_run_type_v_m.get("TEST:PXD:DEBUG:CONTROL").add(0);
+					_run_type_v_m.put("TEST:SVD:DEBUG", new ArrayList<Integer>());
+					_run_type_v_m.get("TEST:SVD:DEBUG").add(0);
+					_run_type_v_m.put("TEST:PXD:DEBUG", new ArrayList<Integer>());
+					_run_type_v_m.get("TEST:PXD:DEBUG").add(0);
+					_run_type_v_m.put("PHYSICS:BEAM:1GEV", new ArrayList<Integer>());
+					_run_type_v_m.get("PHYSICS:BEAM:1GEV").add(0);
+					_run_type_v_m.put("PHYSICS:BEAM:3GEV", new ArrayList<Integer>());
+					_run_type_v_m.get("PHYSICS:BEAM:3GEV").add(0);
+					_run_type_v_m.put("PHYSICS:BEAM:5GEV", new ArrayList<Integer>());
+					_run_type_v_m.get("PHYSICS:BEAM:5GEV").add(0);
 					/*
 					ResultSet result_v = RCDBManager.get().executeQuery("select version, run_type from version_control;");
 					while ( result_v.next() ) {
@@ -178,6 +198,7 @@ public class SystemConfigurationPanel extends JPanel implements Updatable {
 						break;
 					} 
 					_master.getConfig().setRunType(run_type);
+					_master.getStatus().setRunType(run_type);
 					_label_run_type.setText(run_type);
 					_main_panel.addLog(new Log("Set run type: " + "<span style='color:blue;font-weight:bold;'>"
 							+ run_type + "</span>", LogLevel.INFO));
@@ -211,13 +232,14 @@ public class SystemConfigurationPanel extends JPanel implements Updatable {
 		layout.setConstraints(_label_run_type, gbc);
 		add(_label_run_type);
 
+/*
 		setGrid(gbc, 0, 3, 0.2d, 0.1d, GridBagConstraints.BOTH,
 				GridBagConstraints.LINE_START, new Insets(0, 5, 0, 5));
 		JLabel label_version = new JLabel("Version:");
 		label_version.setFont(new Font("Sans", Font.PLAIN, 13));
 		layout.setConstraints(label_version, gbc);
 		add(label_version);
-
+*/
 		setGrid(gbc, 1, 3, 0.2d, 0.1d, GridBagConstraints.NONE,
 				GridBagConstraints.LINE_START, new Insets(0, 5, 0, 5));
 		String[] combodata = { "latest", "0" };
@@ -237,16 +259,19 @@ public class SystemConfigurationPanel extends JPanel implements Updatable {
 				_version_old = _master.getStatus().getRunConfig();
 				if ( _version_old < 0 ) return;
 				readDatabase(_version_old);
-				_main_panel.addLog(new Log("Set run type version: "
+				/*
+ 				_main_panel.addLog(new Log("Set run type version: "
+ 
 						+ "<span style='color:blue;font-weight:bold;'>"
 						+ _version_max + ((_version_old==_version_max)?" (latest)":"")
 						+ "</span>", LogLevel.INFO));
 				_main_panel.update();
+				*/
 			}
 		});
 		_combo_version.setEditable(false);
-		layout.setConstraints(_combo_version, gbc);
-		add(_combo_version);
+		//layout.setConstraints(_combo_version, gbc);
+		//add(_combo_version);
 
 		setGrid(gbc, 2, 1, 0, 5, 0.2d, 0.1d, GridBagConstraints.BOTH,
 				GridBagConstraints.LINE_START, new Insets(0, 5, 0, 5));

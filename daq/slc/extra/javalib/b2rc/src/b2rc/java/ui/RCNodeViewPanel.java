@@ -58,7 +58,7 @@ public class RCNodeViewPanel extends JPanel implements Updatable {
 				if (SwingUtilities.isRightMouseButton(e)) {
 					JPopupMenu popup_menu = new JPopupMenu();
 					ArrayList<RCCommand> command_v = new ArrayList<RCCommand>();
-					System.out.println(_node.getName()+" " +_node.getState().getLabel());
+					//System.out.println(_node.getName()+" " +_node.getState().getLabel());
 					if (!(_node.getState().equals(RCState.RUNNING_S) || 
  						_node.getState().equals(RCState.PAUSED_S))) {
 						if (_node.isUsed()) {
@@ -76,8 +76,8 @@ public class RCNodeViewPanel extends JPanel implements Updatable {
 						command_v.add(RCCommand.BOOT);
 						command_v.add(RCCommand.LOAD);
 						command_v.add(RCCommand.START);
-						if (_node.getData() != null &&
- 							_node.getData().getObject("ftsw") != null)
+						//if (_node.getData() != null &&
+						//_node.getData().getObject("ftsw") != null)
 						command_v.add(RCCommand.TRGIFT);
 					} else if (_node.getState().equals(RCState.RUNNING_S)) {
 						if (_node.isUsed()) {

@@ -79,7 +79,8 @@ public class SystemButtonPanel extends JPanel implements Updatable {
 					if (_command.equals(RCCommand.START) ) {
 						String comment = _master.getStatus().getComment();
 						comment = comment.replace(BR, "<br/>");
-						data +=  " " + _master.getStatus().getOperators() + ":" + comment;
+						data +=  " " + _master.getStatus().getRunType() + 
+						"|" + _master.getStatus().getOperators() + "|" + comment;
 					}
 					System.out.println(data);
 					com.sendMessage(new RunControlMessage(_command, pars, data));

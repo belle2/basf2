@@ -25,7 +25,7 @@ public class LauncherLoginPane extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
-	private TextBoxPanel _host_name_panel = new TextBoxPanel("Host name : ", "127.0.0.1");
+	private TextBoxPanel _host_name_panel = new TextBoxPanel("Host name : ", "belle-rpc1");
 	private RemoteHostPanel _remote_host_panel;
 	private JCheckBox _check_box = new JCheckBox("use ssh tunneling");
 
@@ -128,7 +128,7 @@ public class LauncherLoginPane extends JPanel {
 							"Port for ssh= " + login_panel.getSSHPort() + "<br />" +
 							"Account = " + login_panel.getAccount() + "<br />" +
 							"Password = " + hidden_pass));
-					frame.setHostName("127.0.0.1");
+					frame.setHostName("belle-rpc1");
 					frame.setEnableButtons(true);
 				} catch (Exception e) {
 					e.printStackTrace();

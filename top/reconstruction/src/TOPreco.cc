@@ -19,7 +19,8 @@
 namespace Belle2 {
   namespace TOP {
 
-    TOPreco::TOPreco(int Num, double Masses[], double BkgPerQbar, double ScaleN0)
+    TOPreco::TOPreco(int Num, double Masses[], double BkgPerQbar, double ScaleN0):
+      m_HYP(0), m_beta(0.0)
     {
       data_clear_();
       rtra_clear_();
@@ -30,7 +31,6 @@ namespace Belle2 {
       rtra_set_hypo_(&Num, masses);
       float b = (float) BkgPerQbar; float s = (float) ScaleN0;
       set_top_par_(&b, &s);
-      m_HYP = 0;
     }
 
     void TOPreco::SetHypID(int NumHyp, int HypID[])

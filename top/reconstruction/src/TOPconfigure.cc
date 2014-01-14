@@ -85,7 +85,6 @@ namespace Belle2 {
       double Dphi = 2 * M_PI / n;
       double Phi = m_topgp->getPhi0() - 0.5 * M_PI;
 
-      int id;
       double R = m_topgp->getRadius();          // innner bar surface radius
       double MirrR = m_topgp->getMirradius();   // Mirror radius
       double MirrXc = m_topgp->getMirposx();    // Mirror X center of curvature
@@ -110,7 +109,7 @@ namespace Belle2 {
       setEdgeRoughness(0);
 
       for (int i = 0; i < n; i++) {
-        id = setQbar(A, B, z1, z2, R, 0, Phi, PMT, SphericM);
+        int id = setQbar(A, B, z1, z2, R, 0, Phi, PMT, SphericM);
         setMirrorRadius(id, MirrR);
         setMirrorCenter(id, MirrXc, MirrYc);
         addExpansionVolume(id, Left, Prism, DzExp - Wflat, B / 2, B / 2 - YsizExp,

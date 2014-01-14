@@ -11,6 +11,8 @@
 using namespace std;
 using namespace Belle2;
 
+// #define DESY
+
 RFMaster::RFMaster(string conffile)
 {
   // 0. Initialize configuration manager
@@ -138,7 +140,11 @@ int RFMaster::UnConfigure(NSMmsg*, NSMcontext*)
       nnodes++;
     }
   }
+#ifdef DESY
+  sleep(5)
+#else
   while (RFNSM_Status::Instance().get_flag() != nnodes) sleep(1);
+#endif
 
   // Unconfigure distributor
   char* distributor = m_conf->getconf("distributor", "nodename");

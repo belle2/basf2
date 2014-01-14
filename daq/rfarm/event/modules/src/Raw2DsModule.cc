@@ -66,9 +66,9 @@ void Raw2DsModule::initialize()
   StoreArray<RawECL>::registerPersistent();
   StoreArray<RawKLM>::registerPersistent();
   StoreArray<RawFTSW>::registerPersistent();
-  StoreArray<RawTLU>::registerPersistent();
+
 #ifdef DESY
-  //  StoreArray<RawTLU>::registerPersistent();
+  StoreArray<RawTLU>::registerPersistent();
 #endif
   // Read the first event in RingBuffer and restore in DataStore.
   // This is necessary to create object tables before TTree initialization
@@ -136,11 +136,15 @@ void Raw2DsModule::registerRawCOPPERs()
       StoreArray<RawFTSW> ary;
       (ary.appendNew())->SetBuffer(cprbuf, nwds_buf, 1, 1, 1);
       continue;
-    } else if (tempdblk.CheckTLUID(cprid)) {
+    }
+#ifdef DESY
+    if (tempdblk.CheckTLUID(cprid)) {
       StoreArray<RawTLU> ary;
       (ary.appendNew())->SetBuffer(cprbuf, nwds_buf, 1, 1, 1);
       continue;
     }
+#endif
+
     int subsysid = ((RawCOPPER&)tempdblk).GetSubsysId(cprid);
     //    subsysid = (subsysid & 0xff000000) >> 24;
     //    printf("#################%.8x\n", subsysid);

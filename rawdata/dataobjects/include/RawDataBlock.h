@@ -80,17 +80,17 @@ namespace Belle2 {
     };
 
   protected :
-    int m_nwords;
+    int m_nwords; // number of words of buffer
 
-    int m_num_nodes;
+    int m_num_nodes; // number of nodes in this object
 
-    int m_num_events;
+    int m_num_events; // number of events in this object
 
     int* m_buffer; //[m_nwords]
 
-    int m_use_prealloc_buf; //! Not record
+    int m_use_prealloc_buf; //! flag for deleting m_buffer in destructer(1:delete, 0: not delete)
 
-    int m_which_part; //! Not record
+    int m_which_part; //! no longer used
 
     ClassDef(RawDataBlock, 1);
 

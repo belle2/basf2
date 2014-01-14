@@ -38,7 +38,7 @@ namespace Belle2 {
     //! Destructor
     virtual ~RawBPID();
 
-    ClassDef(RawBPID, 1);
+    ClassDef(RawBPID, 1); // not modified yet
   };
 }
 

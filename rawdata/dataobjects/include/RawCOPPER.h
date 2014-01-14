@@ -123,13 +123,14 @@ namespace Belle2 {
     //
     // Get information from "RawCOPPER header" attached by DAQ software
     //
-    int GetExpNo(int n);    //! get contents of header
+
+    int GetExpNo(int n);    //! get Experimental # from header
 
     int GetRunNoSubRunNo(int n);    //! run# (14bit) restart # (8bit)
 
     int GetRunNo(int n);    //! get run # (14bit)
 
-    int GetSubRunNo(int n);    //! get restart #(8bit)
+    int GetSubRunNo(int n);    //! get subrun #(8bit)
 
     unsigned int GetEveNo(int n);    //! get contents of header
 

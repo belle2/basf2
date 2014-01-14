@@ -36,6 +36,7 @@ namespace Belle2 {
 
     //! Constructor using existing pointer to raw data buffer
     RawHeader(int*);
+
     //! Destructor
     ~RawHeader();
 
@@ -48,7 +49,7 @@ namespace Belle2 {
     //! initialize header
     void CheckSetBuffer();
 
-    //!
+    //! check if m_buffer exists
     void CheckGetBuffer();
 
     //! initialize header
@@ -68,8 +69,10 @@ namespace Belle2 {
     //    void SetB2LFEEHdrPart(unsigned int word1, unsigned int word2);   //! set contents of header
     //     void SetFTSW2Words(int* ftsw_buf);
 
+    // Set values of FTSW info( trigger timing)
     void SetFTSW2Words(unsigned int word1, unsigned int word2);
 
+    // Set a word consists of exp #, run # and subrun #
     void SetExpRunNumber(int* exprun_buf);
 
     void SetOffset1stFINESSE(int offset_1st_FINESSE);    //! set contents of header
@@ -82,6 +85,7 @@ namespace Belle2 {
 
     void SetMagicWordEntireHeader(); //! set magic words;
 
+    // Add nodeinfo in trace area
     int AddNodeInfo(int node_id);
 
     int GetNwords();  //! get contents of header
@@ -118,7 +122,6 @@ namespace Belle2 {
 
     int GetNodeInfo(int node_no, int* node_id);    //! get contents of header
 
-
     unsigned int GetTTCtimeTRGType();  //! get contents of header
 
     int GetTTCtime();  //! get contents of header
@@ -127,6 +130,7 @@ namespace Belle2 {
 
     void GetTTTimeVal(struct  timeval* tv);    //! get contents of header
 
+    // Get magic word to check the data corruption
     unsigned int GetMagicWordEntireHeader();
 
     /*

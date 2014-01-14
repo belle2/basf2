@@ -55,13 +55,13 @@ namespace Belle2 {
 
     void SetChksum(int chksum);   //! initialize header
 
-    void SetMagicWord(); //!
+    void SetMagicWord(); //! Set magic word
 
-    int GetTrlNwords(); //!
+    int GetTrlNwords(); //! Set # of trailer words
 
     unsigned int GetChksum();   //! initialize header
 
-    int GetMagicWord(); //!
+    int GetMagicWord(); //! Get magic word
 
     enum {
       RAWTRAILER_NWORDS = 2

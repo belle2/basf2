@@ -38,45 +38,45 @@ namespace Belle2 {
     //! Destructor
     virtual ~RawFTSW();
 
-    //!
+    //! Get # of words in this buffer
     int GetNwords(int n);
 
-    //!
+    //! Get # of words of header
     int GetNwordsHeader(int n);
 
-    //!
+    //! Get Node # ( should be "TTD " )
     int GetFTSWNodeID(int n);
 
-    //!
+    //! Get event #
     unsigned int GetEveNo(int n);
 
-    //!
+    //! Get a word containing ctime and trigger type info
     unsigned int GetTTCtimeTRGType(int n);
 
-    //!
+    //! get unixtime of the trigger
     unsigned int GetTTUtime(int n);
 
-    //! Get ctime
+    //! Get ctime of the trigger
     int GetTTCtime(int n);
 
-    //! Get timeval
+    //! Get timeval from ctime and utime
     void GetTTTimeVal(int n, struct timeval* tv);
 
-    //!
+    //! Get magic number for data corruption check
     unsigned int GetMagicTrailer(int n);
 
-    //!
+    //! check the data contents
     void CheckData(int n,
                    unsigned int prev_evenum, unsigned int* cur_evenum,
                    int prev_run_no, int* cur_run_no);
 
-    //!
+    //! Get run #
     int GetRunNo(int n);
 
-    //!
+    //! Get subrun #
     int GetSubRunNo(int n);
 
-    //!
+    //! get a word cotaining run # and subrun #
     int GetRunNoSubRunNo(int n);
 
 

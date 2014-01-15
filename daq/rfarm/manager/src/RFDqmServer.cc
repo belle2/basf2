@@ -51,6 +51,19 @@ int RFDqmServer::Configure(NSMmsg*, NSMcontext*)
 
   m_pid_dqm = m_proc->Execute(dqmserver, port, mapfile);
 
+  // 2. Run Dqm Histogram Relay
+  char* relayhost = m_conf->getconf("dqmserver", "historelay", "host");
+  char* relayport = m_conf->getconf("dqmserver", "historelay", "port");
+  char* hrelay = m_conf->getconf("dqmserver", "historelay", "script");
+  char* interval = m_conf->getconf("dqmserver", "historelay", "interval");
+
+  if (strcmp(relayhost, "none") != 0) {
+    printf("DqmServer : command = %s %s %s %s %s\n",
+           hrelay, mapfile, relayhost, relayport, interval);
+    m_pid_relay = m_proc->Execute(hrelay, mapfile, relayhost, relayport,
+                                  interval);
+  }
+
   return 0;
 
 }
@@ -62,8 +75,13 @@ int RFDqmServer::UnConfigure(NSMmsg*, NSMcontext*)
     int status;
     kill(m_pid_dqm, SIGINT);
     waitpid(m_pid_dqm, &status, 0);
-    printf("Unconfigre : done\n");
   }
+  if (m_pid_relay != 0) {
+    int status;
+    kill(m_pid_relay, SIGINT);
+    waitpid(m_pid_relay, &status, 0);
+  }
+  printf("Unconfigure : done\n");
   return 0;
 }
 

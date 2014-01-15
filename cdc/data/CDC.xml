@@ -14,7 +14,7 @@
     <Debug desc="true: print out; false: not print out.">false</Debug>
 
     <!-- Switch for reading x-t etc. (from disk) to be used in simulation -->
-    <XTetc desc="true: read x-t etc. params. from disk; false: not read.">true</XTetc>
+    <XTetc desc="true: read x-t etc. params. from disk; false: not read.">false</XTetc>
     <xtFileName desc="file which contains x-t relation">xt_v0.dat</xtFileName>
     <sigmaFileName desc="file which contains space resol.">sigma_v0.dat</sigmaFileName>
     <propSpeedFileName desc="file which contains propagation speed">propspeed_v0.dat</propSpeedFileName>

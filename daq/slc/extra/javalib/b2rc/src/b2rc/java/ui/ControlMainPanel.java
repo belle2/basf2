@@ -11,6 +11,7 @@ import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 
 import b2daq.core.Log;
+import b2daq.core.LogLevel;
 //import b2daq.java.ui.DnDTabbedPane;
 import b2daq.java.ui.LogViewPanel;
 import b2daq.ui.Updatable;
@@ -77,6 +78,9 @@ public class ControlMainPanel extends JPanel implements Updatable {
 		log_panel.add(_log_view_panel);
 		layout.setConstraints(_log0_panel, gbc);
 		add(_log0_panel);
+		if(!enabled) {
+			addLog(new Log("other UIs are connected to runcontrol. Disabled conttrol from this GUI.", LogLevel.NOTICE));
+		}
 	}
 
 	public SystemControlSummaryPanel getControlSummaryPanel() { return _sys_summary_panel; }

@@ -230,7 +230,7 @@ void PXDValidation()
   hValidParticleMovementThru->GetXaxis()->SetBinLabel(6,"particle flying thru the same side (drection +)");
   hValidParticleMovementThru->GetXaxis()->SetBinLabel(7,"particle growth and die inside (should be 0)");
   hValidParticleMovementThru->GetListOfFunctions()->Add(new TNamed("Description", "Validation: Statistics particle movement thru detector."));
-  hValidParticleMovementThru->GetListOfFunctions()->Add(new TNamed("Check", "Validation: Check ..., should ... ."));
+  hValidParticleMovementThru->GetListOfFunctions()->Add(new TNamed("Check", "Validation: Check bin content, should first be highest, res of bins less 1 percent."));
   hValidParticleMovementThru->Write();
 
 // -----------------------------------------------------
@@ -249,7 +249,7 @@ void PXDValidation()
     TString cond(Form("pixel_type==%i",ipixtype));
     treeDigit->Draw(expr,cond);
     hValidDigitSignalToNoise[ipixtype]->GetListOfFunctions()->Add(new TNamed("Description", title.Data()));
-    hValidDigitSignalToNoise[ipixtype]->GetListOfFunctions()->Add(new TNamed("Check", "Validation: Check ....., should be ......"));
+    hValidDigitSignalToNoise[ipixtype]->GetListOfFunctions()->Add(new TNamed("Check", "Validation: Check shape, should have visible maxima in 20."));
     hValidDigitSignalToNoise[ipixtype]->Write();
   }
 
@@ -314,7 +314,7 @@ void PXDValidation()
       cValidErrorDistrU->cd(ipixtype*nPixSizeGroups+iclsize+1);
       tree->Draw(exprU1,cond);
       hValidErrorDistrU[ipixtype*nPixSizeGroups+iclsize]->GetListOfFunctions()->Add(new TNamed("Description", title.Data()));
-      hValidErrorDistrU[ipixtype*nPixSizeGroups+iclsize]->GetListOfFunctions()->Add(new TNamed("Check", "Validation: Check ....., should be ......"));
+      hValidErrorDistrU[ipixtype*nPixSizeGroups+iclsize]->GetListOfFunctions()->Add(new TNamed("Check", "Validation: Check RMS, should be less 2.0."));
       hValidErrorDistrU[ipixtype*nPixSizeGroups+iclsize]->Write();
       // v direction
       TString title2(Form("Validation: Error distribution in v, for cluster size in v: %s, pixel size in v: %i microns, layer %i, region %i",textclsize[iclsize].Data(),(int)(PixSizeV[ipixtype]*cmToMicron+0.1),(int)(ipixtype/2),ipixtype%2));
@@ -332,7 +332,7 @@ void PXDValidation()
       cValidErrorDistrV->cd(ipixtype*nPixSizeGroups+iclsize+1);
       tree->Draw(exprV1,cond2);
       hValidErrorDistrV[ipixtype*nPixSizeGroups+iclsize]->GetListOfFunctions()->Add(new TNamed("Description", title2.Data()));
-      hValidErrorDistrV[ipixtype*nPixSizeGroups+iclsize]->GetListOfFunctions()->Add(new TNamed("Check", "Validation: Check ....., should be ......"));
+      hValidErrorDistrV[ipixtype*nPixSizeGroups+iclsize]->GetListOfFunctions()->Add(new TNamed("Check", "Validation: Check RMS, should be less 2.0."));
       hValidErrorDistrV[ipixtype*nPixSizeGroups+iclsize]->Write();
     }
   }
@@ -379,7 +379,7 @@ void PXDValidation()
     }
     hValidEtaDistU[ipixtype]->SetLineColor(kRed);
     hValidEtaDistU[ipixtype]->GetListOfFunctions()->Add(new TNamed("Description", title.Data()));
-    hValidEtaDistU[ipixtype]->GetListOfFunctions()->Add(new TNamed("Check", "Validation: Check ....., should be ......"));
+    hValidEtaDistU[ipixtype]->GetListOfFunctions()->Add(new TNamed("Check", "Validation: Check shape, should be peak in middle and rest of bins flat."));
     hValidEtaDistU[ipixtype]->Write();
     // v direction
     TString title2(Form("Validation: Reconstructed in-pixel eta distribution in v, for pixel size in v: %i microns, layer %i, region %i",(int)(PixSizeV[ipixtype]*cmToMicron+0.1),(int)(ipixtype/2),ipixtype%2));
@@ -403,7 +403,7 @@ void PXDValidation()
       tree->Draw(exprV1,cond);
     }
     hValidEtaDistV[ipixtype]->GetListOfFunctions()->Add(new TNamed("Description", title2.Data()));
-    hValidEtaDistV[ipixtype]->GetListOfFunctions()->Add(new TNamed("Check", "Validation: Check ....., should be ......"));
+    hValidEtaDistV[ipixtype]->GetListOfFunctions()->Add(new TNamed("Check", "Validation: Check shape, should be peak in middle and rest of bins flat."));
     hValidEtaDistV[ipixtype]->Write();
   }
   cValidEtaDist->Write();

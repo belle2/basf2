@@ -29,10 +29,12 @@ public class RCNodeViewPanel extends JPanel implements Updatable {
 	private static final long serialVersionUID = 1L;
 	private RCNode _node;
 	private RCNodeStateLabel _state;
-
-	public RCNodeViewPanel(RCNode node) {
+	private boolean _enabled = true;
+	
+	public RCNodeViewPanel(RCNode node, boolean enabled) {
 		_node = node;
 		_state = new RCNodeStateLabel(node);
+		_enabled = enabled;
 	}
 
 	public void init() {
@@ -55,6 +57,7 @@ public class RCNodeViewPanel extends JPanel implements Updatable {
 		addMouseListener(new MouseListener() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
+				if (!_enabled) return;
 				if (SwingUtilities.isRightMouseButton(e)) {
 					JPopupMenu popup_menu = new JPopupMenu();
 					ArrayList<RCCommand> command_v = new ArrayList<RCCommand>();
@@ -76,9 +79,9 @@ public class RCNodeViewPanel extends JPanel implements Updatable {
 						command_v.add(RCCommand.BOOT);
 						command_v.add(RCCommand.LOAD);
 						command_v.add(RCCommand.START);
-						//if (_node.getData() != null &&
-						//_node.getData().getObject("ftsw") != null)
-						command_v.add(RCCommand.TRGIFT);
+						if (_node.getData() != null &&
+								_node.getData().getObject("ftsw") != null)
+							command_v.add(RCCommand.TRGIFT);
 					} else if (_node.getState().equals(RCState.RUNNING_S)) {
 						if (_node.isUsed()) {
 							command_v.add(RCCommand.STOP);

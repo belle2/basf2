@@ -17,9 +17,11 @@ public class RCNodeGroupViewPanel extends JPanel implements Updatable {
 	private static final long serialVersionUID = 1L;
 	private ArrayList<RCNodeViewPanel> _panel_v = new ArrayList<RCNodeViewPanel>();
 	private RCMaster _master;
-
-	public RCNodeGroupViewPanel(RCMaster master) {
+	private boolean _enabled;
+	
+	public RCNodeGroupViewPanel(RCMaster master, boolean enabled) {
 		_master = master;
+		_enabled = enabled;
 	}
 
 	public ArrayList<RCNodeViewPanel> getpanels() {
@@ -42,7 +44,7 @@ public class RCNodeGroupViewPanel extends JPanel implements Updatable {
 		for (int icols = 0; icols < cols; icols++) {
 			for (int irows = 0; irows < rows; irows++) {
 				if (i >= _master.getNSMNodes().size()) return;
-				RCNodeViewPanel panel = new RCNodeViewPanel(_master.getNSMNodes().get(i));
+				RCNodeViewPanel panel = new RCNodeViewPanel(_master.getNSMNodes().get(i), _enabled);
 				panel.init();
 				setGrid(gbc, icols, irows, 0.1d, 0.1d, GridBagConstraints.BOTH,
 						GridBagConstraints.LINE_START, new Insets(0, 5, 0, 5));

@@ -55,6 +55,7 @@ public class SystemConfigurationPanel extends JPanel implements Updatable {
 	private HashMap<String, ArrayList<Integer>> _run_type_v_m;
 	private int _version_old = 0;
 	private int _version_max = -1;
+	private boolean _enabled;
 	
 	private void setGrid(GridBagConstraints gbc, int gridwidth, int gridheight,
 			int gridx, int gridy, double weightx, double weighty, int fill,
@@ -77,9 +78,10 @@ public class SystemConfigurationPanel extends JPanel implements Updatable {
 	}
 
 	public SystemConfigurationPanel(ControlMainPanel main_panel, 
-			RCMaster master) {
+			RCMaster master, boolean enabled) {
 		_main_panel = main_panel;
 		_master = master;
+		_enabled = enabled;
 		setBorder(new TitledBorder(new EtchedBorder(), "System configuration",
 				TitledBorder.LEFT, TitledBorder.TOP));
 		GridBagLayout layout = new GridBagLayout();
@@ -312,9 +314,9 @@ public class SystemConfigurationPanel extends JPanel implements Updatable {
 	public void update() {
 		RCNode node = _master.getNode();
 		RCState state = node.getState();
-		if ( state.equals(RCState.INITIAL_S) || 
+		if ( _enabled && (state.equals(RCState.INITIAL_S) || 
 			 state.equals(RCState.CONFIGURED_S) || 
-			 state.equals(RCState.READY_S) ) {
+			 state.equals(RCState.READY_S)) ) {
 			_text_operator1.setEditable(true);
 			_text_operator2.setEditable(true);
 			_button_run_type.setEnabled(_master.getStatus().getOperators().length()>0);

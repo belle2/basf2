@@ -13,6 +13,7 @@ import b2rc.java.Belle2RunController;
 public class RCMainFrame extends JFrame implements Updatable {
 	
 	private static RCMainFrame __main = null;
+	private boolean _enabled = true;
 	
 	private static final long serialVersionUID = 1L;
 	
@@ -24,10 +25,11 @@ public class RCMainFrame extends JFrame implements Updatable {
 	private ControlMainPanel _control_panel;
 	//private EditorMainPanel _editor_panel;
 	
-	public RCMainFrame(RCMaster master) {
+	public RCMainFrame(RCMaster master, boolean enabled) {
 		_master = master;
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		__main = this;
+		_enabled = enabled;
 	}
 	
 	public void dispose() {
@@ -47,7 +49,7 @@ public class RCMainFrame extends JFrame implements Updatable {
 
 		//DnDTabbedPane main_tab = new DnDTabbedPane();
 		//_editor_panel = new EditorMainPanel(_system);
-		_control_panel = new ControlMainPanel(/*_editor_panel,*/ _master);
+		_control_panel = new ControlMainPanel(/*_editor_panel,*/ _master, _enabled);
 		//main_tab.addTab("Control", _control_panel);
 		//main_tab.addTab("Editor", _editor_panel);
 		add(_control_panel);

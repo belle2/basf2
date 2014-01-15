@@ -25,11 +25,11 @@ public class ControlMainPanel extends JPanel implements Updatable {
 	private LogViewPanel _log_view_panel = new LogViewPanel();
 	private RCMaster _master;
 
-	public ControlMainPanel(RCMaster master) {
+	public ControlMainPanel(RCMaster master, boolean enabled) {
 		_master = master;
-		_sys_summary_panel = new SystemControlSummaryPanel(this, _master);
+		_sys_summary_panel = new SystemControlSummaryPanel(this, _master, enabled);
 		//_node_state_panel = new RCNodeGroupViewPanel(_master);
-		_sys_button_panel = new SystemButtonPanel(_master);
+		_sys_button_panel = new SystemButtonPanel(_master, enabled);
 		
 		GridBagLayout layout = new GridBagLayout();
 		GridBagConstraints gbc = new GridBagConstraints();

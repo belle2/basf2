@@ -18,13 +18,15 @@ public class SystemControlSummaryPanel extends JPanel implements Updatable {
 	private RCNodeGroupViewPanel _node_state_panel;
 	private RCMaster _master;
 	private ControlMainPanel _main_panel;
-
-	public SystemControlSummaryPanel(ControlMainPanel main_panel, RCMaster master) {
+	private boolean _enabled = false;
+	
+	public SystemControlSummaryPanel(ControlMainPanel main_panel, RCMaster master, boolean enabled) {
 		_main_panel = main_panel;
 		_master = master;
 		_sys_status_panel = new SystemStatusPanel(_master);
-		_node_state_panel = new RCNodeGroupViewPanel(_master);
-
+		_node_state_panel = new RCNodeGroupViewPanel(_master, enabled);
+		_enabled = enabled;
+		
 		GridBagLayout layout = new GridBagLayout();
 		GridBagConstraints gbc = new GridBagConstraints();
 		setLayout(layout);
@@ -34,7 +36,7 @@ public class SystemControlSummaryPanel extends JPanel implements Updatable {
 		gbc.weighty = 1.0d;
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.insets = new Insets(5, 5, 5, 5);
-		_sys_config_panel = new SystemConfigurationPanel(_main_panel, _master);
+		_sys_config_panel = new SystemConfigurationPanel(_main_panel, _master, enabled);
 		layout.setConstraints(_sys_config_panel, gbc);
 		add(_sys_config_panel);
 

@@ -37,7 +37,8 @@ public class SystemButtonPanel extends JPanel implements Updatable {
 	private RCCommand _load_command = new RCCommand(RCCommand.LOAD);
 	private RCCommand _start_command = new RCCommand(RCCommand.START);
 	private RCCommand _pause_command = new RCCommand(RCCommand.PAUSE);
-
+	private boolean _enabled;
+	
 	private void setGrid(GridBagConstraints gbc, int gridwidth, int gridheight,
 			int gridx, int gridy, double weightx, double weighty, int fill,
 			int anchor, Insets insets) {
@@ -93,8 +94,9 @@ public class SystemButtonPanel extends JPanel implements Updatable {
 		}
 	}
 	
-	public SystemButtonPanel(RCMaster master) {
+	public SystemButtonPanel(RCMaster master, boolean enabled) {
 		_master = master;
+		_enabled = enabled;
 		setBorder(new TitledBorder(new EtchedBorder(), "System configuration",
 				TitledBorder.LEFT, TitledBorder.TOP));
 		GridBagLayout layout = new GridBagLayout();
@@ -177,14 +179,14 @@ public class SystemButtonPanel extends JPanel implements Updatable {
 		_button_load.setText(_load_command.getAlias());
 		_button_start.setText(_start_command.getAlias());
 		_button_pause.setText(_pause_command.getAlias());
-		_button_boot.setEnabled(//_master.getConfig().getConfigNumber() >= 0 && 
+		_button_boot.setEnabled(_enabled &&//_master.getConfig().getConfigNumber() >= 0 && 
 				_boot_command.available(state)>=RCCommand.ENABLED);
-		_button_load.setEnabled(//_master.getConfig().getConfigNumber() >= 0 && 
+		_button_load.setEnabled(_enabled &&//_master.getConfig().getConfigNumber() >= 0 && 
 					_load_command.available(state)>=RCCommand.ENABLED);
-		_button_start.setEnabled(/*(_master.getConfig().getConfigNumber() >= 0 || 
+		_button_start.setEnabled(_enabled &&/*(_master.getConfig().getConfigNumber() >= 0 || 
 					_start_command.equals(RCCommand.STOP) ) &&*/ 
 					_start_command.available(state)>=RCCommand.ENABLED);
-		_button_pause.setEnabled(state.equals(RCState.RUNNING_S) || state.equals(RCState.PAUSED_S));
+		_button_pause.setEnabled(_enabled && (state.equals(RCState.RUNNING_S) || state.equals(RCState.PAUSED_S)));
 	}
 
 }

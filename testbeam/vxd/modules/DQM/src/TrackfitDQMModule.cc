@@ -85,6 +85,7 @@ void TrackfitDQMModule::defineHisto()
     m_hNormalizedResidualSVDV[i] = getHist(name, title, 1000, -2, 2);
   }
 
+#if 0
   for (int i = 0; i < 5; ++i) {
     const char* varName[5] = { "u", "v", "u'", "v'", "q/p", };
     double lower[5] = { -3., -3., -.1, -.1, -1., };
@@ -95,7 +96,7 @@ void TrackfitDQMModule::defineHisto()
     title = (boost::format("seed vs. trackfit result for %1%") % varName[i]).str();
     //m_hSeedQuality[i] = getHist(name, title, 100, lower[i], upper[i], 100, lower[i], upper[i]);
   }
-
+#endif
   oldDir->cd();
 }
 
@@ -158,7 +159,7 @@ void TrackfitDQMModule::event()
     m_hPval->Fill(fs->getPVal());
     // Only consider tracks fit with enough NDFs.  Unbiases residuals
     // don't make much sense otherwise.
-    if (fs->getNdf() < 1)
+    if (fs->getNdf() < 3)
       continue;
     for (unsigned int i = 0; i < track->getNumPoints(); ++i) {
       const genfit::TrackPoint* tp = track->getPoint(i);

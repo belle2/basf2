@@ -115,6 +115,8 @@ trackfitter = register_module('GenFitter')
 trackfitter.param('FilterId', 'Kalman')
 trackfitter.param('UseClusters', True)
 
+trackfit_dqm = register_module('TrackfitDQM')
+
 # create the main path
 main = create_path()
 
@@ -166,6 +168,7 @@ main.add_module(SVD_DQM)
 main.add_module(vxdtf)
 main.add_module(trackfitter)
 main.add_module(vxdtf_dqm)
+main.add_module(trackfit_dqm)
 
 # Test seqrootoutput
 # output = register_module("SeqRootOutput" )

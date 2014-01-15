@@ -191,7 +191,7 @@ void SerializerModule::fillSendHeaderTrailer(SendHeader* hdr, SendTrailer* trl,
       fprintf(stderr, "i= %d : num entries %d : Tot words %d\n", i , rawdblk->GetNumEntries(), rawdblk->TotalBufNwords());
       printData(rawdblk->GetBuffer(0), rawdblk->TotalBufNwords());
 
-      char err_buf[500] = "DATA CORRUPTION: No COPPER blocks in RawDataBlock. Exiting...";
+      char err_buf[500] = "CORRUPTED DATA: No COPPER blocks in RawDataBlock. Exiting...";
       print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
       sleep(1234567);
       exit(-1);

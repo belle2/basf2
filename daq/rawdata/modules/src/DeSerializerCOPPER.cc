@@ -221,7 +221,7 @@ void DeSerializerCOPPERModule::fillNewRawCOPPERHeader(RawCOPPER* raw_copper)
 // 3, magic word check
   if (!(raw_copper->CheckCOPPERMagic(cprblock))) {
     char err_buf[500];
-    sprintf(err_buf, "DATA CORRUPTION: Invalid Magic word 0x7FFFF0008=%x 0xFFFFFAFA=%x 0xFFFFF5F5=%x 0x7FFF0009=%x\n",
+    sprintf(err_buf, "CORRUPTED DATA: Invalid Magic word 0x7FFFF0008=%x 0xFFFFFAFA=%x 0xFFFFF5F5=%x 0x7FFF0009=%x\n",
             raw_copper->GetMagicDriverHeader(cprblock),
             raw_copper->GetMagicFPGAHeader(cprblock),
             raw_copper->GetMagicFPGATrailer(cprblock),
@@ -238,7 +238,7 @@ void DeSerializerCOPPERModule::fillNewRawCOPPERHeader(RawCOPPER* raw_copper)
   if (m_prev_ftsweve32 + 1 != cur_ftsw_eve32) {
 #endif
     char err_buf[500];
-    sprintf(err_buf, "DATA CORRUPTION: Invalid event_number. Exiting...: cur 32bit eve %x preveve %x\n",  cur_ftsw_eve32, m_prev_ftsweve32);
+    sprintf(err_buf, "CORRUPTED DATA: Invalid event_number. Exiting...: cur 32bit eve %x preveve %x\n",  cur_ftsw_eve32, m_prev_ftsweve32);
     print_err.PrintError(m_shmflag, &m_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
 
     fprintf(stderr, "i= %d : num entries %d : Tot words %d\n", 0 , raw_copper->GetNumEntries(), raw_copper->TotalBufNwords());
@@ -318,7 +318,7 @@ int* DeSerializerCOPPERModule::readOneEventFromCOPPERFIFO(const int entry, int* 
 
     if ((int)((*m_size_word - RawTrailer::RAWTRAILER_NWORDS) * sizeof(int)) != recvd_byte) {
       char    err_buf[500];
-      sprintf(err_buf, "DATA CORRUPTION: Read less bytes(%d) than expected(%d:%d). Exiting...\n",
+      sprintf(err_buf, "CORRUPTED DATA: Read less bytes(%d) than expected(%d:%d). Exiting...\n",
               recvd_byte,
               *m_size_word * sizeof(int) - RawTrailer::RAWTRAILER_NWORDS * sizeof(int),
               m_bufary[ entry ][ RawCOPPER::POS_DATA_LENGTH ]);
@@ -328,7 +328,7 @@ int* DeSerializerCOPPERModule::readOneEventFromCOPPERFIFO(const int entry, int* 
 
   } else if ((int)((*m_size_word - RawTrailer::RAWTRAILER_NWORDS) * sizeof(int)) < recvd_byte) {
     char    err_buf[500];
-    sprintf(err_buf, "DATA CORRUPTION: Read more than data size. Exiting...: %d %d %d %d %d\n", recvd_byte, *m_size_word * sizeof(int) , RawTrailer::RAWTRAILER_NWORDS * sizeof(int), m_bufary[ entry ][ RawCOPPER::POS_DATA_LENGTH ],  RawCOPPER::POS_DATA_LENGTH);
+    sprintf(err_buf, "CORRUPTED DATA: Read more than data size. Exiting...: %d %d %d %d %d\n", recvd_byte, *m_size_word * sizeof(int) , RawTrailer::RAWTRAILER_NWORDS * sizeof(int), m_bufary[ entry ][ RawCOPPER::POS_DATA_LENGTH ],  RawCOPPER::POS_DATA_LENGTH);
     print_err.PrintError(m_shmflag, &m_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
 
     exit(-1);

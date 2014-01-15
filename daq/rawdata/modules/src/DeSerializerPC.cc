@@ -237,7 +237,7 @@ int* DeSerializerPCModule::recvData(int* malloc_flag, int* total_buf_nwords, int
     } else if (*num_events_in_sendblock != temp_num_events) {
 #ifndef NO_DATA_CHECK
       char err_buf[500];
-      sprintf(err_buf, "DATA CORRUPTION: Different # of events or nodes over data sources( %d %d %d %d ). Exiting...\n",
+      sprintf(err_buf, "CORRUPTED DATA: Different # of events or nodes over data sources( %d %d %d %d ). Exiting...\n",
               *num_events_in_sendblock , temp_num_events , *num_nodes_in_sendblock , temp_num_nodes);
       print_err.PrintError(m_shmflag, &m_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
       sleep(1234567);
@@ -256,7 +256,7 @@ int* DeSerializerPCModule::recvData(int* malloc_flag, int* total_buf_nwords, int
       fprintf(stderr, "*******HDR**********\n");
       printData(send_hdr_buf, SendHeader::SENDHDR_NWORDS);
       char err_buf[500];
-      sprintf(err_buf, "DATA CORRUPTION: Too large event : Header %d %d %d %d\n", i, temp_num_events, temp_num_nodes, send_hdr.GetTotalNwords());
+      sprintf(err_buf, "CORRUPTED DATA: Too large event : Header %d %d %d %d\n", i, temp_num_events, temp_num_nodes, send_hdr.GetTotalNwords());
       print_err.PrintError(m_shmflag, &m_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
       sleep(123456);
       exit(1);
@@ -281,7 +281,7 @@ int* DeSerializerPCModule::recvData(int* malloc_flag, int* total_buf_nwords, int
 
   if ((int)(*total_buf_nwords * sizeof(int)) != total_recvd_byte) {
     char err_buf[500];
-    sprintf(err_buf, "DATA CORRUPTION: Received data size (%d byte) is not same as expected one (%d) from Sendheader. Exting...",
+    sprintf(err_buf, "CORRUPTED DATA: Received data size (%d byte) is not same as expected one (%d) from Sendheader. Exting...",
             total_recvd_byte, (int)(*total_buf_nwords * sizeof(int)));
     print_err.PrintError(m_shmflag, &m_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     sleep(1234567);
@@ -378,7 +378,7 @@ void DeSerializerPCModule::event()
     int num_entries = raw_datablk->GetNumEntries();
     if (num_entries != num_events_in_sendblock * num_nodes_in_sendblock) {
       char err_buf[500];
-      sprintf(err_buf, "DATA CORRUPTION: Inconsistent SendHeader value. # of nodes(%d) times # of events(%d) differs from # of entries(%d). Exiting...",
+      sprintf(err_buf, "CORRUPTED DATA: Inconsistent SendHeader value. # of nodes(%d) times # of events(%d) differs from # of entries(%d). Exiting...",
               num_nodes_in_sendblock, num_events_in_sendblock, num_entries);
       print_err.PrintError(m_shmflag, &m_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
       sleep(1234567);
@@ -499,7 +499,7 @@ void DeSerializerPCModule::event()
             fprintf(stderr, "node %d eve # %d utime %x ctime %x\n",
                     m,  eve_array[ m ], utime_array[ m ], ctime_type_array[ m ]);
           }
-          sprintf(err_buf, "DATA CORRUPTION: Event or Time record mismatch. Exiting...");
+          sprintf(err_buf, "CORRUPTED DATA: Event or Time record mismatch. Exiting...");
           print_err.PrintError(m_shmflag, &m_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
           sleep(1234567);
           exit(-1);

@@ -100,7 +100,7 @@ void RawFTSW::CheckData(int n,
   if (prev_runsubrun_no == *cur_runsubrun_no && prev_runsubrun_no >= 0) {
 #endif
     if ((unsigned int)(prev_evenum + 1) != *cur_evenum) {
-      sprintf(err_buf, "DATA CORRUPTION: Event # jump : i %d prev 0x%x cur 0x%x : Exiting...\n %s %s %d\n",
+      sprintf(err_buf, "CORRUPTED DATA: Event # jump : i %d prev 0x%x cur 0x%x : Exiting...\n %s %s %d\n",
               n, prev_evenum, *cur_evenum, __FILE__, __PRETTY_FUNCTION__, __LINE__);
       err_flag = 1;
     }
@@ -108,13 +108,13 @@ void RawFTSW::CheckData(int n,
 #endif
 
   if (GetNwords(n) != SIZE_FTSW_PACKET) {
-    sprintf(err_buf, "DATA CORRUPTION: invalid FTSW packet length : block %d nwords %d must be %d : Exiting...\n %s %s %d\n",
+    sprintf(err_buf, "CORRUPTED DATA: invalid FTSW packet length : block %d nwords %d must be %d : Exiting...\n %s %s %d\n",
             n, GetNwords(n), SIZE_FTSW_PACKET, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     err_flag = 1;
   }
 
   if (GetMagicTrailer(n) != FTSW_MAGIC_TRAILER) {
-    sprintf(err_buf, "DATA CORRUPTION: invalid magic word : block %d magic word 0x%x must be 0x%x : Exiting...\n %s %s %d\n",
+    sprintf(err_buf, "CORRUPTED DATA: invalid magic word : block %d magic word 0x%x must be 0x%x : Exiting...\n %s %s %d\n",
             n, GetMagicTrailer(n), FTSW_MAGIC_TRAILER, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     err_flag = 1;
   }

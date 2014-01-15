@@ -44,7 +44,7 @@ int RawDataBlock::GetBufferPos(int n)
   int pos_nwords = 0;
   for (int i = 1; i <= n ; i++) {
     if (m_buffer[ pos_nwords ] <= 0) {
-      fprintf(stderr, "DATA CORRUPTION: length of this data block is strange ( %d words ). Maybe data is corrupted or RawHeader info has not been filled yet. Exiting...", m_buffer[ pos_nwords ]);
+      fprintf(stderr, "CORRUPTED DATA: length of this data block is strange ( %d words ). Maybe data is corrupted or RawHeader info has not been filled yet. Exiting...", m_buffer[ pos_nwords ]);
       sleep(1234567);
       exit(1);
     } else {
@@ -52,7 +52,7 @@ int RawDataBlock::GetBufferPos(int n)
     }
     if (pos_nwords >= m_nwords) {
       char err_buf[500];
-      sprintf(err_buf, "DATA CORRUPTION: value of pos_nwords(%d) is larger than m_nwords(%d). Exiting...\n %s %s %d\n",
+      sprintf(err_buf, "CORRUPTED DATA: value of pos_nwords(%d) is larger than m_nwords(%d). Exiting...\n %s %s %d\n",
               pos_nwords, m_nwords, __FILE__, __PRETTY_FUNCTION__, __LINE__);
       string err_str = err_buf;     throw (err_str);
       exit(1);

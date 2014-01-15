@@ -57,6 +57,7 @@ public class Belle2RunController extends JavaEntoryPoint {
 			run_config.readObject(socket_reader);
 			//run_config.print();
 			boolean viewmode = !socket_reader.readBoolean();
+			viewmode = false;
 			master.load();
 			_frame = new RCMainFrame(master, !viewmode);
 			_frame.init();

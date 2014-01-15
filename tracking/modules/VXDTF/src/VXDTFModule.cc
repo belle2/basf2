@@ -1246,6 +1246,21 @@ void VXDTFModule::the_real_event()
 
     numOfClusterCombis = clusterHitList.size();
 
+    if (numOfClusterCombis > m_PARAMkillEventForHighOccupancyThreshold) {
+      B2WARNING(m_PARAMnameOfInstance << " event " << m_eventCounter << ": total number of clusterCombis: " << numOfClusterCombis << ", terminating event! There were " << numOfPxdClusters << "/" << numOfSvdClusters << "/" << numOfClusterCombis << " PXD-clusters/SVD-clusters/SVD-cluster-combinations.")
+      m_TESTERbrokenEventsCtr++;
+
+      /** cleaning part **/
+      for (PassData * currentPass : m_passSetupVector) {
+        cleanEvent(currentPass);
+      }
+      stopTimer = boostClock::now();
+      thisInfoPackage.totalTime = boost::chrono::duration_cast<boostNsec>(stopTimer - beginEvent);
+      B2DEBUG(3, "event: " << m_eventCounter << ", duration : " << thisInfoPackage.totalTime.count() << "ns");
+      m_TESTERlogEvents.push_back(thisInfoPackage);
+      return;
+    }
+
     for (ClusterHit & aClusterCombi : clusterHitList) {
       ClusterInfo* uClusterInfo = aClusterCombi.uCluster;
       ClusterInfo* vClusterInfo = aClusterCombi.vCluster;
@@ -1375,28 +1390,8 @@ void VXDTFModule::the_real_event()
     thisInfoPackage.sectionConsumption.segFinder += boost::chrono::duration_cast<boostNsec>(stopTimer - timeStamp);
     /** Section 4 - end **/
 
-
-
-    /** Section 5 - NEIGHBOURFINDER **/
-    timeStamp = boostClock::now();
-    int totalActiveCells = 0;
-    B2DEBUG(5, "pass " << passNumber << ": starting neighbourFinder...");
-    discardedSegments = neighbourFinder(currentPass);                       /// calling funtion "neighbourFinder"
-    activatedSegments = currentPass->activeCellList.size();
-    m_TESTERtotalsegmentsNFCtr += activatedSegments;
-    m_TESTERdiscardedSegmentsNFCtr += discardedSegments;
-    B2DEBUG(3, "VXDTF-event " << m_eventCounter << ", pass" << passNumber << " @ nbfinder - " << activatedSegments << " segments activated, " << discardedSegments << " discarded");
-    thisInfoPackage.nbFinderActivated += activatedSegments;
-    thisInfoPackage.nbFinderDiscarded += discardedSegments;
-    totalActiveCells += activatedSegments;
-    stopTimer = boostClock::now();
-    m_TESTERtimeConsumption.nbFinder += boost::chrono::duration_cast<boostNsec>(stopTimer - timeStamp);
-    thisInfoPackage.sectionConsumption.nbFinder += boost::chrono::duration_cast<boostNsec>(stopTimer - timeStamp);
-    /** Section 5 - end **/
-
-
-    if (totalActiveCells > m_PARAMkillEventForHighOccupancyThreshold) {
-      B2ERROR(m_PARAMnameOfInstance << " event " << m_eventCounter << ": total number of activated segments: " << totalActiveCells << ", terminating event! There were " << numOfPxdClusters << "/" << numOfSvdClusters << "/" << numOfClusterCombis << " PXD-clusters/SVD-clusters/SVD-cluster-combinations.")
+    if (activatedSegments > m_PARAMkillEventForHighOccupancyThreshold) {
+      B2WARNING(m_PARAMnameOfInstance << " event " << m_eventCounter << ": total number of activated segments: " << activatedSegments << ", terminating event! There were " << numOfPxdClusters << "/" << numOfSvdClusters << "/" << numOfClusterCombis << " PXD-clusters/SVD-clusters/SVD-cluster-combinations.")
       m_TESTERbrokenEventsCtr++;
 
       /** cleaning part **/
@@ -1408,16 +1403,45 @@ void VXDTFModule::the_real_event()
       B2DEBUG(3, "event: " << m_eventCounter << ", duration : " << thisInfoPackage.totalTime.count() << "ns");
       m_TESTERlogEvents.push_back(thisInfoPackage);
       return;
-    } /// WARNING: hardcoded filter for events containing huge number of segments
+    }
 
 
+    /** Section 5 - NEIGHBOURFINDER **/
+    timeStamp = boostClock::now();
+    B2DEBUG(5, "pass " << passNumber << ": starting neighbourFinder...");
+    discardedSegments = neighbourFinder(currentPass);                       /// calling funtion "neighbourFinder"
+    activatedSegments = currentPass->activeCellList.size();
+    m_TESTERtotalsegmentsNFCtr += activatedSegments;
+    m_TESTERdiscardedSegmentsNFCtr += discardedSegments;
+    B2DEBUG(3, "VXDTF-event " << m_eventCounter << ", pass" << passNumber << " @ nbfinder - " << activatedSegments << " segments activated, " << discardedSegments << " discarded");
+    thisInfoPackage.nbFinderActivated += activatedSegments;
+    thisInfoPackage.nbFinderDiscarded += discardedSegments;
+    stopTimer = boostClock::now();
+    m_TESTERtimeConsumption.nbFinder += boost::chrono::duration_cast<boostNsec>(stopTimer - timeStamp);
+    thisInfoPackage.sectionConsumption.nbFinder += boost::chrono::duration_cast<boostNsec>(stopTimer - timeStamp);
+    /** Section 5 - end **/
+
+    if (activatedSegments > m_PARAMkillEventForHighOccupancyThreshold) {
+      B2WARNING(m_PARAMnameOfInstance << " event " << m_eventCounter << ": after nbFinder, total number of activated segments: " << activatedSegments << ", terminating event! There were " << numOfPxdClusters << "/" << numOfSvdClusters << "/" << numOfClusterCombis << " PXD-clusters/SVD-clusters/SVD-cluster-combinations.")
+      m_TESTERbrokenEventsCtr++;
+
+      /** cleaning part **/
+      for (PassData * currentPass : m_passSetupVector) {
+        cleanEvent(currentPass);
+      }
+      stopTimer = boostClock::now();
+      thisInfoPackage.totalTime = boost::chrono::duration_cast<boostNsec>(stopTimer - beginEvent);
+      B2DEBUG(3, "event: " << m_eventCounter << ", duration : " << thisInfoPackage.totalTime.count() << "ns");
+      m_TESTERlogEvents.push_back(thisInfoPackage);
+      return;
+    }
 
     /** Section 6 - Cellular Automaton**/
     timeStamp = boostClock::now();
     int numRounds = cellularAutomaton(currentPass);
     B2DEBUG(3, "pass " << passNumber << ": cellular automaton finished in " << numRounds << " rounds");
     if (numRounds < 0) {
-      B2ERROR(m_PARAMnameOfInstance << " event " << m_eventCounter << ": cellular automaton entered an infinite loop, therefore aborted, terminating event! There were " << numOfPxdClusters << "/" << numOfSvdClusters << "/" << numOfClusterCombis << " PXD-clusters/SVD-clusters/SVD-cluster-combinations, total number of activated segments: " << totalActiveCells)
+      B2ERROR(m_PARAMnameOfInstance << " event " << m_eventCounter << ": cellular automaton entered an infinite loop, therefore aborted, terminating event! There were " << numOfPxdClusters << "/" << numOfSvdClusters << "/" << numOfClusterCombis << " PXD-clusters/SVD-clusters/SVD-cluster-combinations, total number of activated segments: " << activatedSegments)
       m_TESTERbrokenEventsCtr++;
 
       /** cleaning part **/
@@ -1454,7 +1478,7 @@ void VXDTFModule::the_real_event()
     m_TESTERtimeConsumption.tcc += boost::chrono::duration_cast<boostNsec>(stopTimer - timeStamp);
     thisInfoPackage.sectionConsumption.tcc += boost::chrono::duration_cast<boostNsec>(stopTimer - timeStamp);
     if (totalTCs > m_PARAMkillEventForHighOccupancyThreshold / 3) {
-      B2ERROR(m_PARAMnameOfInstance << " event " << m_eventCounter << ": total number of tcs after tcc: " << totalTCs << ", terminating event! There were " << numOfPxdClusters << "/" << numOfSvdClusters << "/" << numOfClusterCombis << " PXD-clusters/SVD-clusters/SVD-cluster-combinations, total number of activated segments: " << totalActiveCells)
+      B2WARNING(m_PARAMnameOfInstance << " event " << m_eventCounter << ": total number of tcs after tcc: " << totalTCs << ", terminating event! There were " << numOfPxdClusters << "/" << numOfSvdClusters << "/" << numOfClusterCombis << " PXD-clusters/SVD-clusters/SVD-cluster-combinations, total number of activated segments: " << activatedSegments)
       m_TESTERbrokenEventsCtr++;
 
       /** cleaning part **/
@@ -1678,8 +1702,8 @@ void VXDTFModule::the_real_event()
     isOB = aCluster.isOverbooked();
     if (isOB == true) { countOverbookedClusters++; }
   } // now each TC knows whether it is overbooked or not (aCluster.isOverbooked() implicitly checked this)
-  if (countOverbookedClusters != 0) {
-    B2ERROR("after pass loop (and Hopfield there): there are " << countOverbookedClusters << " clusters of " << clustersOfEvent.size() << " marked as 'overbooked'...")
+  if (countOverbookedClusters != 0 and m_filterOverlappingTCs != 0) {
+    B2ERROR("after pass loop (and Hopfield/greedy there): there are " << countOverbookedClusters << " clusters of " << clustersOfEvent.size() << " marked as 'overbooked'...")
   }
 
 
@@ -1744,6 +1768,7 @@ void VXDTFModule::the_real_event()
   totalIndices.unique();
 
   int nReducedIndices = totalIndices.size();
+  int nFinalTCs = finalTrackCandidates.getEntries();
 
   if ((LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 1, PACKAGENAME()) == true)) {
     int tcPos = 0, numOfFinalTCs = 0;
@@ -1754,7 +1779,7 @@ void VXDTFModule::the_real_event()
       numOfFinalTCs++;
       tcPos++;
     }
-    B2DEBUG(3, m_PARAMnameOfInstance << " - event " << m_eventCounter << ": " << finalTrackCandidates.getEntries() << " final track candidates determined! Having a total number of hit indices: "  << nTotalIndices << ", and after doube entry removal: " << nReducedIndices)
+    B2DEBUG(3, m_PARAMnameOfInstance << " - event " << m_eventCounter << ": " << nFinalTCs << " final track candidates determined! Having a total number of hit indices: "  << nTotalIndices << ", and after doube entry removal: " << nReducedIndices)
   }
 
   if (nReducedIndices != nTotalIndices) {
@@ -1762,11 +1787,15 @@ void VXDTFModule::the_real_event()
     for (int index : tempIndices) {
       aStream << " " << index;
     }
-    B2ERROR(m_PARAMnameOfInstance << " - event " << m_eventCounter << ": " << finalTrackCandidates.getEntries() << " final TCs determined. Having a total number of hit indices: "  << nTotalIndices << ", and after doube entry removal: " << nReducedIndices << "!\n before unique, totalIndices had the following entries: " << aStream.str())
+    if (m_filterOverlappingTCs == 0) {
+      B2DEBUG(1, m_PARAMnameOfInstance << " - event " << m_eventCounter << ": " << nFinalTCs << " final TCs determined. Having a total number of hit indices: "  << nTotalIndices << ", and after doube entry removal: " << nReducedIndices << "!\n before unique, totalIndices had the following entries: " << aStream.str() << "\n, is allowed since filtering overlaps is deactivated...")
+    } else {
+      B2ERROR(m_PARAMnameOfInstance << " - event " << m_eventCounter << ": " << nFinalTCs << " final TCs determined. Having a total number of hit indices: "  << nTotalIndices << ", and after doube entry removal: " << nReducedIndices << "!\n before unique, totalIndices had the following entries: " << aStream.str() << "\n, should not occur (check hopfield or greedy)!")
+    }
   }
 
-  m_TESTERcountTotalTCsFinal += finalTrackCandidates.getEntries();
-  thisInfoPackage.numTCsfinal += finalTrackCandidates.getEntries();
+  m_TESTERcountTotalTCsFinal += nFinalTCs;
+  thisInfoPackage.numTCsfinal += nFinalTCs;
   /** Section 13 - end */
 
 
@@ -2698,6 +2727,7 @@ int VXDTFModule::segFinder(PassData* currentPass)
   bool accepted = false; // recycled return value of the filters
   int simpleSegmentQI; // considers only min and max cutoff values, but could be weighed by order of relevance
   int discardedSegmentsCounter = 0;
+  int activatedSegmentsCounter = 0;
   MapOfSectors::iterator mainSecIter;
   MapOfSectors::iterator currentFriendSecIter;
   for (SectorNameAndPointerPair & aSecPair : currentPass->sectorSequence) {
@@ -2850,6 +2880,12 @@ int VXDTFModule::segFinder(PassData* currentPass)
         mainSecIter->second->addInnerSegmentCell(pCell);
         currentFriendSecIter->second->addOuterSegmentCell(pCell);
         oldFriendID = currentFriendID;
+        ++activatedSegmentsCounter;
+
+        if (activatedSegmentsCounter > m_PARAMkillEventForHighOccupancyThreshold) {
+          B2DEBUG(1, "number of activated segments reached threshold " << activatedSegmentsCounter << ", stopping segFinder now") // TODO: set to B2DEBUG
+          return discardedSegmentsCounter;
+        } // security check
       } //iterating through all my friendHits
     }
   } // iterating through all active sectors - segFinder
@@ -3954,6 +3990,12 @@ bool VXDTFModule::baselineTF(vector<ClusterInfo>& clusters, PassData* passInfo)
     listOfHitExtras.push_back(make_pair((*hit.getHitCoordinates() - passInfo->origin).Mag(),  &hit));    // first is distance of hit to chosen origin
 //    listOfHitExtras.push_back( boost::make_tuple( (*hit.getHitCoordinates() - passInfo->origin).Mag(), 0.,  &hit) ); // distance to seedHit can not be calculated yet, since we don't know the seed yet
   }
+
+  if (int(listOfHitExtras.size()) == 0 or maxCounts < 1) {
+    B2WARNING(m_PARAMnameOfInstance << " - event " << m_eventCounter << " baseline TF: got maxCount of VXDHits per layer: " << maxCounts << " while having " << clusters.size() << ", stopping baseline TF since no reconstruction possible")
+    return false;
+  }
+
   listOfHitExtras.sort(); // std-sorting starts with first entry, therefore it sorts by distance to origin
   listOfHitExtras.reverse(); // now hits with highest distance to origin are the outermost
 
@@ -3972,10 +4014,6 @@ bool VXDTFModule::baselineTF(vector<ClusterInfo>& clusters, PassData* passInfo)
     for (HitExtra & bundle : listOfHitExtras) { // collecting hits by distance to chosen origin
       newTC->addHits(bundle.second);
     }
-  } else if (maxCounts < 1) {
-    B2WARNING(m_PARAMnameOfInstance << " - event " << m_eventCounter << " baseline TF: after creating TC, maxCounts got strange number: " << maxCounts << " (should not occur), stopping baseline TF!")
-    delete newTC;
-    return false;
   } else { // case of more than one hit per layer (e.g. overlapping hits, bhabha scattering, cosmic particle, background (last point not surpressed!))
     TVector3 seedPosition = *(*listOfHitExtras.begin()).second->getHitCoordinates();
 

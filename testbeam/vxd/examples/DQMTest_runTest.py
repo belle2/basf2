@@ -38,7 +38,7 @@ SVDClust.param('TanLorentz_holes', 0.)
 SVDClust.param('TanLorentz_electrons', 0.)
 
 TelClust = register_module('TelClusterizer')
-TelClust.param('Clusters', "TelClusters")
+TelClust.param('Clusters', 'TelClusters')
 
 # PXD DQM module
 pxd_dqm = register_module('PXDDQM')
@@ -54,11 +54,11 @@ tel_dqm.param('Clusters', 'TelClusters')
 ## parameters:
 secSetup = ['testBeamMini6GeVSVD-moreThan1500MeV_SVD']
 qiType = 'circleFit'
-filterOverlaps = 'hopfield'
+filterOverlaps = 'none'  # hopfield
 #
 vxdtf = register_module('VXDTF')
 vxdtf.logging.log_level = LogLevel.INFO
-vxdtf.logging.debug_level = 2
+vxdtf.logging.debug_level = 1
 param_vxdtf = {
     'activateBaselineTF': 1,
     'tccMinState': [2],
@@ -67,14 +67,16 @@ param_vxdtf = {
     'sectorSetup': secSetup,
     'calcQIType': qiType,
     'killEventForHighOccupancyThreshold': 75,
+    'highOccupancyThreshold': 85,
     'cleanOverlappingSet': False,
     'filterOverlappingTCs': filterOverlaps,
     'TESTERexpandedTestingRoutines': False,
     'qiSmear': False,
     'smearSigma': 0.000001,
     'GFTrackCandidatesColName': 'caTracks',
-    'tuneCutoffs': 5,
+    'tuneCutoffs': 4,
     'activateDistanceXY': [False],
+    'activateDistanceZ': [True],
     'activateDistance3D': [True],
     'activateAngles3DHioC': [False],
     'activateAnglesXYHioC': [False],
@@ -86,17 +88,16 @@ param_vxdtf = {
     'activateDeltaDistance2IPHioC': [False],
     'activateAngles3D': [True],
     'activateAnglesXY': [False],
-    'activateAnglesRZ': [False],
+    'activateAnglesRZ': [True],
     'activateDeltaSlopeRZ': [False],
     'activateDistance2IP': [False],
     'activatePT': [False],
     'activateHelixFit': [False],
     'activateZigZagXY': [False],
-    'activateDeltaPt': [True],
-    'activateCircleFit': [False],
-    'tuneCircleFit': [0.00000001],
-    'tuneAngles3D': [-0.1],
-    'tuneDistance3D': [-0.1],
+    'activateDeltaPt': [False],
+    'activateCircleFit': [True],
+    'tuneCircleFit': [0],
+    'tuneDistanceZ': [1.2],
     }
 vxdtf.param(param_vxdtf)
 

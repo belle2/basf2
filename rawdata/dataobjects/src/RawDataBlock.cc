@@ -32,19 +32,19 @@ RawDataBlock::~RawDataBlock()
 int RawDataBlock::GetBufferPos(int n)
 {
   if (m_buffer == NULL || m_nwords <= 0) {
-    printf("RawDataBlock buffer is not available.\n");
+    fprintf(stderr, "RawDataBlock buffer is not available.\n");
     exit(1);
   }
 
   if (n >= (m_num_events * m_num_nodes)) {
-    printf("Invalid COPPER block No. (%d : max %d ) is specified. Exiting... ", n, (m_num_events * m_num_nodes));
+    fprintf(stderr, "Invalid COPPER block No. (%d : max %d ) is specified. Exiting... ", n, (m_num_events * m_num_nodes));
     exit(1);
   }
 
   int pos_nwords = 0;
   for (int i = 1; i <= n ; i++) {
     if (m_buffer[ pos_nwords ] <= 0) {
-      printf("length of this data block is strange ( %d words ). Maybe data is corrupted or RawHeader info has not been filled yet. Exiting...", m_buffer[ pos_nwords ]);
+      fprintf(stderr, "DATA CORRUPTION: length of this data block is strange ( %d words ). Maybe data is corrupted or RawHeader info has not been filled yet. Exiting...", m_buffer[ pos_nwords ]);
       sleep(1234567);
       exit(1);
     } else {
@@ -52,7 +52,7 @@ int RawDataBlock::GetBufferPos(int n)
     }
     if (pos_nwords >= m_nwords) {
       char err_buf[500];
-      sprintf(err_buf, "value of pos_nwords(%d) is larger than m_nwords(%d). Exiting...\n %s %s %d\n",
+      sprintf(err_buf, "DATA CORRUPTION: value of pos_nwords(%d) is larger than m_nwords(%d). Exiting...\n %s %s %d\n",
               pos_nwords, m_nwords, __FILE__, __PRETTY_FUNCTION__, __LINE__);
       string err_str = err_buf;     throw (err_str);
       exit(1);
@@ -124,7 +124,7 @@ int* RawDataBlock::GetBuffer(int n)
 void RawDataBlock::SetBuffer(int* bufin, int nwords, int malloc_flag, int num_events, int num_nodes)
 {
   if (bufin == NULL) {
-    printf("bufin is NULL. Exting...\n");
+    fprintf(stderr, "bufin is NULL. Exting...\n");
     exit(1);
   }
 
@@ -158,11 +158,11 @@ void RawDataBlock::SetBuffer(int* bufin, int nwords, int malloc_flag, int num_ev
 void RawDataBlock::PrintData(int* buf, int nwords)
 {
   for (int i = 0; i < nwords; i++) {
-    printf("%.8x ", buf[ i ]);
-    if (i % 10 == 9) printf("\n");
+    fprintf(stderr, "%.8x ", buf[ i ]);
+    if (i % 10 == 9) fprintf(stderr, "\n");
   }
-  printf("\n");
-  printf("\n");
+  fprintf(stderr, "\n");
+  fprintf(stderr, "\n");
   return;
 }
 

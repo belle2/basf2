@@ -32,12 +32,12 @@ RawCOPPER::~RawCOPPER()
 int RawCOPPER::GetBufferPos(int n)
 {
   if (m_buffer == NULL || m_nwords <= 0) {
-    printf("[ERROR] RawPacket buffer(%p) is not available or length(%d) is not set.\n", m_buffer, m_nwords);
+    fprintf(stderr, "[ERROR] RawPacket buffer(%p) is not available or length(%d) is not set.\n", m_buffer, m_nwords);
     exit(1);
   }
 
   if (n >= (m_num_events * m_num_nodes)) {
-    printf("Invalid COPPER block No. (%d : max %d ) is specified. Exiting... ", n, (m_num_events * m_num_nodes));
+    fprintf(stderr, "Invalid COPPER block No. (%d : max %d ) is specified. Exiting... ", n, (m_num_events * m_num_nodes));
     exit(1);
   }
   int pos_nwords = 0;
@@ -51,7 +51,7 @@ int RawCOPPER::GetBufferPos(int n)
     pos_nwords +=  size;
     if (pos_nwords >= m_nwords) {
       char err_buf[500];
-      sprintf(err_buf, "value of pos_nwords(%d) is larger than m_nwords(%d). Exiting...\n %s %s %d\n",
+      sprintf(err_buf, "DATA CORRUPTION: value of pos_nwords(%d) is larger than m_nwords(%d). Exiting...\n %s %s %d\n",
               pos_nwords, m_nwords, __FILE__, __PRETTY_FUNCTION__, __LINE__);
       string err_str = err_buf;     throw (err_str);
       exit(1);
@@ -275,10 +275,10 @@ unsigned int RawCOPPER::GetB2LFEE32bitEventNumber(int n)
   if (err_flag == 1) {
 
     char err_buf[500];
-    sprintf(err_buf, "Different event number over HSLBs : slot A 0x%x : B 0x%x :C 0x%x : D 0x%x\n%s %s %d\n",
+    sprintf(err_buf, "DATA CORRUPTION: Different event number over HSLBs : slot A 0x%x : B 0x%x :C 0x%x : D 0x%x\n%s %s %d\n",
             eve[ 0 ], eve[ 1 ], eve[ 2 ], eve[ 3 ],
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
-    printf("[ERROR] %s\n", err_buf);
+    fprintf(stderr, "[ERROR] %s\n", err_buf);
 #ifndef NO_DATA_CHECK
     string err_str = err_buf; throw (err_str);
 
@@ -327,7 +327,7 @@ void RawCOPPER::CheckData(int n,
   // check Magic words
   //
   if (!CheckCOPPERMagic(n)) {
-    sprintf(err_buf, "Invalid Magic word 0x7FFFF0008=%u 0xFFFFFAFA=%u 0xFFFFF5F5=%u 0x7FFF0009=%u\n%s %s %d\n",
+    sprintf(err_buf, "DATA CORRUPTION: Invalid Magic word 0x7FFFF0008=%u 0xFFFFFAFA=%u 0xFFFFF5F5=%u 0x7FFF0009=%u\n%s %s %d\n",
             GetMagicDriverHeader(n),
             GetMagicFPGAHeader(n),
             GetMagicFPGATrailer(n),
@@ -342,7 +342,7 @@ void RawCOPPER::CheckData(int n,
   *cur_evenum_rawcprhdr = GetEveNo(n);
   unsigned int evenum_feehdr = GetB2LFEE32bitEventNumber(n);
   if (*cur_evenum_rawcprhdr != evenum_feehdr) {
-    sprintf(err_buf, "Event # in RawCOPPER header and FEE header is different : cprhdr 0x%x feehdr 0x%x : Exiting...\n%s %s %d\n",
+    sprintf(err_buf, "DATA CORRUPTION: Event # in RawCOPPER header and FEE header is different : cprhdr 0x%x feehdr 0x%x : Exiting...\n%s %s %d\n",
             *cur_evenum_rawcprhdr, evenum_feehdr,
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     err_flag = 1;
@@ -358,7 +358,7 @@ void RawCOPPER::CheckData(int n,
   if (prev_runsubrun_no == *cur_runsubrun_no && prev_runsubrun_no >= 0) {
 #endif
     if ((unsigned int)(prev_evenum + 1) != *cur_evenum_rawcprhdr) {
-      sprintf(err_buf, "Event # jump : i %d prev 0x%x cur 0x%x : Exiting...\n%s %s %d\n",
+      sprintf(err_buf, "DATA CORRUPTION: Event # jump : i %d prev 0x%x cur 0x%x : Exiting...\n%s %s %d\n",
               n, prev_evenum, *cur_evenum_rawcprhdr,
               __FILE__, __PRETTY_FUNCTION__, __LINE__);
       err_flag = 1;
@@ -381,7 +381,7 @@ void RawCOPPER::CheckData(int n,
       //
       // In DESY test, we ignore this error
       //
-      printf("[INFO] %s", err_buf);
+      fprintf(stderr, "[INFO] %s", err_buf);
 #else
       err_flag = 1;
 #endif
@@ -399,7 +399,7 @@ void RawCOPPER::CheckData(int n,
   // Check checksum calculated by COPPER driver
   //
   if (GetDriverChkSum(n) != CalcDriverChkSum(n)) {
-    sprintf(err_buf, "Data corruption : COPPER driver checkSum error : block %d : length %d eve 0x%x : Trailer chksum 0x%.8x : calcd. now 0x%.8x\n%s %s %d\n",
+    sprintf(err_buf, "DATA CORRUPTION: COPPER driver checkSum error : block %d : length %d eve 0x%x : Trailer chksum 0x%.8x : calcd. now 0x%.8x\n%s %s %d\n",
             n,
             GetBlockNwords(n),
             *cur_evenum_rawcprhdr,
@@ -417,7 +417,7 @@ void RawCOPPER::CheckData(int n,
   rawtrl.SetBuffer(GetRawTrlBufPtr(n));
   if (rawtrl.GetChksum() !=
       CalcXORChecksum(GetBuffer(n), GetBlockNwords(n) - rawtrl.GetTrlNwords())) {
-    sprintf(err_buf, "Data corruption : RawCOPPER checksum error : block %d : length %d eve 0x%x : Trailer chksum 0x%.8x : calcd. now 0x%.8x\n %s %s %d\n",
+    sprintf(err_buf, "DATA CORRUPTION: RawCOPPER checksum error : block %d : length %d eve 0x%x : Trailer chksum 0x%.8x : calcd. now 0x%.8x\n %s %s %d\n",
             n, GetBlockNwords(n), *cur_evenum_rawcprhdr, rawtrl.GetChksum(),
             CalcXORChecksum(GetBuffer(n), GetBlockNwords(n) - rawtrl.GetTrlNwords()),
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
@@ -426,33 +426,33 @@ void RawCOPPER::CheckData(int n,
 
 
 #ifdef DEBUG
-  printf("eve %d %d %d %d %d\n",
-         GetEveNo(n),
-         Get1stDetectorNwords(n),
-         Get2ndDetectorNwords(n),
-         Get3rdDetectorNwords(n),
-         Get4thDetectorNwords(n)
-        );
-  printf("===COPPER BLOCK==============\n");
+  fprintf(stderr, "eve %d %d %d %d %d\n",
+          GetEveNo(n),
+          Get1stDetectorNwords(n),
+          Get2ndDetectorNwords(n),
+          Get3rdDetectorNwords(n),
+          Get4thDetectorNwords(n)
+         );
+  fprintf(stderr, "===COPPER BLOCK==============\n");
   printData(GetBuffer(n), GetBlockNwords(n));
 
-  printf("===FINNESSE A ==============\n");
+  fprintf(stderr, "===FINNESSE A ==============\n");
   printData(Get1stDetectorBuffer(n), Get1stDetectorNwords(n));
 
-  printf("===FINNESSE B ==============\n");
+  fprintf(stderr, "===FINNESSE B ==============\n");
   printData(Get2ndDetectorBuffer(n), Get2ndDetectorNwords(n));
 
-  printf("===FINNESSE C ==============\n");
+  fprintf(stderr, "===FINNESSE C ==============\n");
   printData(Get3rdDetectorBuffer(n), Get3rdDetectorNwords(n));
 
-  printf("===FINNESSE D ==============\n");
+  fprintf(stderr, "===FINNESSE D ==============\n");
   printData(Get4thDetectorBuffer(n), Get4thDetectorNwords(n));
-  printf("=== END ==============\n");
+  fprintf(stderr, "=== END ==============\n");
 
 #endif
 
   if (err_flag == 1) {
-    printf("========== dump a data blcok : block # %d==========\n", n);
+    fprintf(stderr, "========== dump a data blcok : block # %d==========\n", n);
     PrintData(GetBuffer(n), GetBlockNwords(n));
     string err_str = err_buf;
     throw (err_str);
@@ -512,11 +512,11 @@ void RawCOPPER::CheckUtimeCtimeTRGType(int n)
 
   if (err_flag != 0) {
     for (int i = 0; i < 4; i++) {
-      printf("FINESSE #=%d buffsize %d ctimeTRGtype 0x%.8x utime 0x%.8x\n",
-             i, GetFINESSENwords(n, i), ctime_trgtype[ i ], utime[ i ]);
+      fprintf(stderr, "FINESSE #=%d buffsize %d ctimeTRGtype 0x%.8x utime 0x%.8x\n",
+              i, GetFINESSENwords(n, i), ctime_trgtype[ i ], utime[ i ]);
     }
     char err_buf[500];
-    sprintf(err_buf, "Event timing info. mismatch over FINESSEs. Exiting...\n %s %s %d\n",
+    sprintf(err_buf, "DATA CORRUPTION: mismatch over FINESSEs. Exiting...\n %s %s %d\n",
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     string err_str = err_buf; throw (err_str);
     sleep(1234567);
@@ -576,10 +576,10 @@ unsigned int RawCOPPER::GetB2LHeaderWord(int n, int finesse_buffer_pos)
   if (err_flag == 1) {
 
     char err_buf[500];
-    sprintf(err_buf, "Different event number over HSLBs : slot A 0x%x : B 0x%x :C 0x%x : D 0x%x\n %s %s %d\n",
+    sprintf(err_buf, "DATA CORRUPTION: Different event number over HSLBs : slot A 0x%x : B 0x%x :C 0x%x : D 0x%x\n %s %s %d\n",
             word[ 0 ], word[ 1 ], word[ 2 ], word[ 3 ],
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
-    printf("[ERROR] %s\n", err_buf);
+    fprintf(stderr, "[ERROR] %s\n", err_buf);
 #ifndef NO_DATA_CHECK
     string err_str = err_buf; throw (err_str);
 
@@ -655,7 +655,7 @@ unsigned int RawCOPPER::FillTopBlockRawHeader(unsigned int m_node_id, unsigned i
   if (m_buffer[ RawHeader::POS_NWORDS ] != m_nwords) {
     char err_buf[500];
     sprintf(err_buf,
-            "Data length is inconsistent m_nwords %d : nwords from COPPER data %d\n %s %s %d\n",
+            "DATA CORRUPTION: Data length is inconsistent m_nwords %d : nwords from COPPER data %d\n %s %s %d\n",
             m_nwords, m_buffer[ RawHeader::POS_NWORDS ],
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     string err_str = err_buf; throw (err_str);
@@ -745,7 +745,7 @@ unsigned int RawCOPPER::FillTopBlockRawHeader(unsigned int m_node_id, unsigned i
   //
   if (chksum_body != (unsigned int)(m_buffer[ body_end ])) {
     char err_buf[500];
-    sprintf(err_buf, "Data corruption : COPPER driver checksum is not consistent.: calcd. %.8x data %.8x\n %s %s %d\n",
+    sprintf(err_buf, "DATA CORRUPTION: COPPER driver checksum is not consistent.: calcd. %.8x data %.8x\n %s %s %d\n",
             chksum_body, m_buffer[ body_end ],
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     string err_str = err_buf; throw (err_str);
@@ -786,13 +786,13 @@ unsigned int RawCOPPER::FillTopBlockRawHeader(unsigned int m_node_id, unsigned i
   }
   if (err_flag == 1) {
     char err_buf[500];
-    sprintf(err_buf, "Invalid Magic word 0x7FFFF0008=%u 0xFFFFFAFA=%u 0xFFFFF5F5=%u 0x7FFF0009=%u\n %s %s %d\n",
+    sprintf(err_buf, "DATA CORRUPTION: Invalid Magic word 0x7FFFF0008=%u 0xFFFFFAFA=%u 0xFFFFF5F5=%u 0x7FFF0009=%u\n %s %s %d\n",
             GetMagicDriverHeader(cpr_id),
             GetMagicFPGAHeader(cpr_id),
             GetMagicFPGATrailer(cpr_id),
             GetMagicDriverTrailer(cpr_id),
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
-    printf("[ERROR] %s\n", err_buf);
+    fprintf(stderr, "[ERROR] %s\n", err_buf);
 #ifndef NO_DATA_CHECK
     string err_str = err_buf; throw (err_str);
 
@@ -812,13 +812,13 @@ unsigned int RawCOPPER::FillTopBlockRawHeader(unsigned int m_node_id, unsigned i
     if (prev_eve32 + 1 != cur_ftsw_eve32) {
 #endif
       char err_buf[500];
-      sprintf(err_buf, "Invalid event_number. Exiting...: cur 32bit eve %u preveve %u prun %d crun %d\n %s %s %d\n",  cur_ftsw_eve32, prev_eve32,
+      sprintf(err_buf, "DATA CORRUPTION: Invalid event_number. Exiting...: cur 32bit eve %u preveve %u prun %d crun %d\n %s %s %d\n",  cur_ftsw_eve32, prev_eve32,
               prev_runsubrun_no, *cur_runsubrun_no,
               __FILE__, __PRETTY_FUNCTION__, __LINE__);
-      printf("[ERROR] %s\n", err_buf);
+      fprintf(stderr, "[ERROR] %s\n", err_buf);
 
       string err_str = err_buf;
-      printf("i= %d : num entries %d : Tot words %d\n", 0 , GetNumEntries(), TotalBufNwords());
+      fprintf(stderr, "i= %d : num entries %d : Tot words %d\n", 0 , GetNumEntries(), TotalBufNwords());
       PrintData(GetBuffer(cpr_id), TotalBufNwords());
       throw (err_str);
       exit(-1);
@@ -845,16 +845,16 @@ void RawCOPPER::CheckB2LFEEHeaderVersion(int n)
 #ifdef TEMP
         // this word for exp/run
         flag = 1; // old one (ver.1) used for SPring8 test in 2013
-        printf("\033[31m");
-        printf("===Firmware ver. ERROR===\n ");
-        printf("FTSW and b2tt firmwares was updated on Nov.22, 2013 and the header format attached by B2link was changed in the new firmwares.\n");
-        printf("If you are going to take data now, Please update the firmware.\n");
-        printf("For details, please see Nakao-san's e-mail [b2link_ml:0111] Re: [daq2ml:0159] beta version of trigger timing receiver firmware (b2tt) on bdaq SVN\n");
-        printf("Or if you are going to read data taken before the update, please use basf2 software before rev. 7419 in  https://belle2.cc.kek.jp/svn/trunk/software/daq/\n");
-        printf("About the format please see Nakao-san's B2GM slides(p. 13 and 15) http://kds.kek.jp/getFile.py/access?contribId=143&sessionId=38&resId=0&materialId=slides&confId=13911.\n");
-        printf("Sorry for inconvenience.\n");
-        printf("\033[0m");
-        fflush(stdout);
+        fprintf(stderr, "\033[31m");
+        fprintf(stderr, "===Firmware ver. ERROR===\n ");
+        fprintf(stderr, "FTSW and b2tt firmwares was updated on Nov.22, 2013 and the header format attached by B2link was changed in the new firmwares.\n");
+        fprintf(stderr, "If you are going to take data now, Please update the firmware.\n");
+        fprintf(stderr, "For details, please see Nakao-san's e-mail [b2link_ml:0111] Re: [daq2ml:0159] beta version of trigger timing receiver firmware (b2tt) on bdaq SVN\n");
+        fprintf(stderr, "Or if you are going to read data taken before the update, please use basf2 software before rev. 7419 in  https://belle2.cc.kek.jp/svn/trunk/software/daq/\n");
+        fprintf(stderr, "About the format please see Nakao-san's B2GM slides(p. 13 and 15) http://kds.kek.jp/getFile.py/access?contribId=143&sessionId=38&resId=0&materialId=slides&confId=13911.\n");
+        fprintf(stderr, "Sorry for inconvenience.\n");
+        fprintf(stderr, "\033[0m");
+        fflush(stderr);
         char err_buf[500];
         sprintf(err_buf, "FTSW and b2tt firmwares are old. Exiting...\n %s %s %d\n",
                 __FILE__, __PRETTY_FUNCTION__, __LINE__);

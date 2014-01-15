@@ -53,10 +53,10 @@ void CprErrorMessage::PrintError(char* err_message, const char* file, const char
 {
   time_t     current;
   time(&current);
-
   printf("\033[31m");
-  B2FATAL(err_message);
 
+  fprintf(stderr, "[FATAL] %s", err_message);
+  B2FATAL(err_message);
 //   perror("[ERROR] 0: ");
 //   printf("[ERROR] 1: %s", ctime(&current));
 //   printf("[ERROR] 2: %s\n", err_message);
@@ -77,7 +77,9 @@ void CprErrorMessage::PrintError(const char* err_message)
 {
   time_t     current;
   time(&current);
+  fprintf(stderr, "[FATAL] %s", err_message);
   B2FATAL(err_message);
+
 //   printf("\033[31m");
 //   printf("\033[47m");
 //   //  B2FATAL(err_message);

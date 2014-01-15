@@ -97,12 +97,12 @@ void RawTLU::CheckData(int n,
   }
 
   if (err_flag == 1) {
-    printf("========== dump a data block : block # %d==========\n", n);
+    fprintf(stderr, "========== dump a data block : block # %d==========\n", n);
     for (int k = 0 ; k < GetBlockNwords(n); k++) {
-      printf("0x%.8x ", (GetBuffer(n))[k]);
-      if (k % 10 == 9)printf("\n");
+      fprintf(stderr, "0x%.8x ", (GetBuffer(n))[k]);
+      if (k % 10 == 9) fprintf(stderr, "\n");
     }
-    fflush(stdout);
+    fflush(stderr);
     string err_str = err_buf; throw (err_str);
     sleep(1234567);
     exit(-1);

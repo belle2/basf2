@@ -209,10 +209,10 @@ namespace Belle2 {
   inline void RawHeader::CheckGetBuffer()
   {
     if (m_buffer == NULL || m_buffer[ POS_TERM_HEADER ] != MAGIC_WORD_TERM_HEADER) {
-      printf("m_buffer is NULL(%p) or magic word is invalid(0x%x). Data is corrupted or header info has not yet filled. Exiting...",
-             m_buffer,
-             m_buffer[ POS_TERM_HEADER ]
-            );
+      fprintf(stderr, "m_buffer is NULL(%p) or magic word is invalid(0x%x). Data is corrupted or header info has not yet filled. Exiting...",
+              m_buffer,
+              m_buffer[ POS_TERM_HEADER ]
+             );
       exit(1);
     }
   }

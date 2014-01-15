@@ -262,7 +262,7 @@ int* DeSerializerFILEModule::modify131213SVDdata(int* buf_in, int* buf_in_nwords
 
   copper_buf[ RawCOPPER::POS_DATA_LENGTH ] += added_nwords;
 
-  printf("added %d\n", added_nwords); fflush(stdout);
+  fprintf(stderr, "added %d\n", added_nwords); fflush(stderr);
 
 
   // Increment COPPER counter
@@ -350,7 +350,7 @@ void DeSerializerFILEModule::event()
 
 
       if (temp_buf == 0x0) { // End of File
-        printf("End of file\n");
+        fprintf(stderr, "End of file\n");
         eof_flag = 1;
         break;
       }
@@ -469,7 +469,7 @@ void DeSerializerFILEModule::event()
   }
 
   if (n_basf2evt % 100 == 0) {
-    printf("Processing Evt # %d...\n", prev_eve_num);
+    fprintf(stderr, "Processing Evt # %d...\n", prev_eve_num);
   }
 
   n_basf2evt++;

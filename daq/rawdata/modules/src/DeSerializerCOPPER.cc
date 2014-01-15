@@ -86,9 +86,9 @@ void DeSerializerCOPPERModule::initialize()
   } else {
     int slot;
     for (slot = 0; slot < 4; slot++) {
-      if (use_slot & (1 << slot)) printf(" %c", 'A' + slot);
+      if (use_slot & (1 << slot)) fprintf(stderr, " %c", 'A' + slot);
     }
-    printf("\n");
+    fprintf(stderr, "\n");
   }
 
 
@@ -129,9 +129,9 @@ void DeSerializerCOPPERModule::initialize()
   memset(time_array4, 0, sizeof(time_array4));
   memset(time_array5, 0, sizeof(time_array5));
 
-  printf("Opening COPPER...");      fflush(stdout);
+  B2INFO("Opening COPPER...");      fflush(stderr);
   openCOPPER();
-  printf("Done.\n");    fflush(stdout);
+  B2INFO("Done.\n");    fflush(stderr);
 
   B2INFO("DeSerializerCOPPER: initialize() done.");
   //
@@ -181,7 +181,7 @@ void DeSerializerCOPPERModule::fillNewRawCOPPERHeader(RawCOPPER* raw_copper)
   rawhdr.SetFTSW2Words(raw_copper->GetTTCtimeTRGType(cprblock), raw_copper->GetTTUtime(cprblock));
 
 #ifdef debug
-  printf("1: i= %d : num entries %d : Tot words %d\n", 0 , raw_copper->GetNumEntries(), raw_copper->TotalBufNwords());
+  fprintf(stderr, "1: i= %d : num entries %d : Tot words %d\n", 0 , raw_copper->GetNumEntries(), raw_copper->TotalBufNwords());
   printData(raw_copper->GetBuffer(0), raw_copper->TotalBufNwords());
 #endif
 
@@ -203,7 +203,7 @@ void DeSerializerCOPPERModule::fillNewRawCOPPERHeader(RawCOPPER* raw_copper)
   rawhdr.AddNodeInfo(m_nodeid);   // Fill 13th header word
 
 #ifdef debug
-  printf("2: i= %d : num entries %d : Tot words %d\n", 0 , raw_copper->GetNumEntries(), raw_copper->TotalBufNwords());
+  fprintf(stderr, "2: i= %d : num entries %d : Tot words %d\n", 0 , raw_copper->GetNumEntries(), raw_copper->TotalBufNwords());
   printData(raw_copper->GetBuffer(0), raw_copper->TotalBufNwords());
 #endif
 
@@ -221,7 +221,7 @@ void DeSerializerCOPPERModule::fillNewRawCOPPERHeader(RawCOPPER* raw_copper)
 // 3, magic word check
   if (!(raw_copper->CheckCOPPERMagic(cprblock))) {
     char err_buf[500];
-    sprintf(err_buf, "Invalid Magic word 0x7FFFF0008=%x 0xFFFFFAFA=%x 0xFFFFF5F5=%x 0x7FFF0009=%x\n",
+    sprintf(err_buf, "DATA CORRUPTION: Invalid Magic word 0x7FFFF0008=%x 0xFFFFFAFA=%x 0xFFFFF5F5=%x 0x7FFF0009=%x\n",
             raw_copper->GetMagicDriverHeader(cprblock),
             raw_copper->GetMagicFPGAHeader(cprblock),
             raw_copper->GetMagicFPGATrailer(cprblock),
@@ -238,10 +238,10 @@ void DeSerializerCOPPERModule::fillNewRawCOPPERHeader(RawCOPPER* raw_copper)
   if (m_prev_ftsweve32 + 1 != cur_ftsw_eve32) {
 #endif
     char err_buf[500];
-    sprintf(err_buf, "Invalid event_number. Exiting...: cur 32bit eve %x preveve %x\n",  cur_ftsw_eve32, m_prev_ftsweve32);
+    sprintf(err_buf, "DATA CORRUPTION: Invalid event_number. Exiting...: cur 32bit eve %x preveve %x\n",  cur_ftsw_eve32, m_prev_ftsweve32);
     print_err.PrintError(m_shmflag, &m_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
 
-    printf("i= %d : num entries %d : Tot words %d\n", 0 , raw_copper->GetNumEntries(), raw_copper->TotalBufNwords());
+    fprintf(stderr, "i= %d : num entries %d : Tot words %d\n", 0 , raw_copper->GetNumEntries(), raw_copper->TotalBufNwords());
     printData(raw_copper->GetBuffer(0), raw_copper->TotalBufNwords());
     exit(-1);
   }
@@ -250,7 +250,7 @@ void DeSerializerCOPPERModule::fillNewRawCOPPERHeader(RawCOPPER* raw_copper)
 
   // Check magic words are set at proper positions
 #ifdef debug
-  printf("3: i= %d : num entries %d : Tot words %d\n", 0 , raw_copper->GetNumEntries(), raw_copper->TotalBufNwords());
+  fprintf(stderr, "3: i= %d : num entries %d : Tot words %d\n", 0 , raw_copper->GetNumEntries(), raw_copper->TotalBufNwords());
   printData(raw_copper->GetBuffer(0), raw_copper->TotalBufNwords());
 #endif
 
@@ -318,7 +318,7 @@ int* DeSerializerCOPPERModule::readOneEventFromCOPPERFIFO(const int entry, int* 
 
     if ((int)((*m_size_word - RawTrailer::RAWTRAILER_NWORDS) * sizeof(int)) != recvd_byte) {
       char    err_buf[500];
-      sprintf(err_buf, "Read less bytes(%d) than expected(%d:%d). Exiting...\n",
+      sprintf(err_buf, "DATA CORRUPTION: Read less bytes(%d) than expected(%d:%d). Exiting...\n",
               recvd_byte,
               *m_size_word * sizeof(int) - RawTrailer::RAWTRAILER_NWORDS * sizeof(int),
               m_bufary[ entry ][ RawCOPPER::POS_DATA_LENGTH ]);
@@ -328,7 +328,7 @@ int* DeSerializerCOPPERModule::readOneEventFromCOPPERFIFO(const int entry, int* 
 
   } else if ((int)((*m_size_word - RawTrailer::RAWTRAILER_NWORDS) * sizeof(int)) < recvd_byte) {
     char    err_buf[500];
-    sprintf(err_buf, "Read more than data size. Exiting...: %d %d %d %d %d\n", recvd_byte, *m_size_word * sizeof(int) , RawTrailer::RAWTRAILER_NWORDS * sizeof(int), m_bufary[ entry ][ RawCOPPER::POS_DATA_LENGTH ],  RawCOPPER::POS_DATA_LENGTH);
+    sprintf(err_buf, "DATA CORRUPTION: Read more than data size. Exiting...: %d %d %d %d %d\n", recvd_byte, *m_size_word * sizeof(int) , RawTrailer::RAWTRAILER_NWORDS * sizeof(int), m_bufary[ entry ][ RawCOPPER::POS_DATA_LENGTH ],  RawCOPPER::POS_DATA_LENGTH);
     print_err.PrintError(m_shmflag, &m_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
 
     exit(-1);
@@ -507,7 +507,7 @@ void DeSerializerCOPPERModule::event()
   //
   // Print current status
   //
-  if (n_basf2evt % 100 == 0) {
+  if (n_basf2evt % 100 == 0 || n_basf2evt < 10) {
     RateMonitor(m_prev_ftsweve32);
   }
 

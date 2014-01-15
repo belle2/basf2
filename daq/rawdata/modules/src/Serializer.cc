@@ -188,10 +188,10 @@ void SerializerModule::fillSendHeaderTrailer(SendHeader* hdr, SendTrailer* trl,
 
     //Error if you cannot find any COPPER block
     if (i == (rawdblk->GetNumEntries() - 1)) {
-      printf("i= %d : num entries %d : Tot words %d\n", i , rawdblk->GetNumEntries(), rawdblk->TotalBufNwords());
+      fprintf(stderr, "i= %d : num entries %d : Tot words %d\n", i , rawdblk->GetNumEntries(), rawdblk->TotalBufNwords());
       printData(rawdblk->GetBuffer(0), rawdblk->TotalBufNwords());
 
-      char err_buf[500] = "No COPPER blocks in RawDataBlock. Exiting...";
+      char err_buf[500] = "DATA CORRUPTION: No COPPER blocks in RawDataBlock. Exiting...";
       print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
       sleep(1234567);
       exit(-1);
@@ -233,7 +233,7 @@ int SerializerModule::sendByWriteV(RawDataBlock* rawdblk)
         continue;
       } else {
         char err_buf[500];
-        sprintf(err_buf, "SEND error.(%s) Exiting... : sent %d bytes, header %d bytes body %d tailer %d\n" ,
+        sprintf(err_buf, "WRITEV error.(%s) Exiting... : sent %d bytes, header %d bytes body %d tailer %d\n" ,
                 strerror(errno), n, iov[0].iov_len, iov[1].iov_len, iov[2].iov_len);
         print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
         sleep(1234567);
@@ -244,8 +244,8 @@ int SerializerModule::sendByWriteV(RawDataBlock* rawdblk)
   }
 
 #ifdef DEBUG
-  printf("*******BODY**********\n");
-  printf("\n%.8d : ", 0);
+  fprintf(stderr, "*******BODY**********\n");
+  fprintf(stderr, "\n%.8d : ", 0);
   printData((int*)(iov[1].iov_base), iov[1].iov_len);
 #endif
 
@@ -275,7 +275,7 @@ int SerializerModule::sendByWriteV(RawDataBlock* rawdblk)
     double retry_end = getTimeSec();
     B2WARNING("Resending ends. It takes " << retry_end - retry_start << "(s)");
   }
-  //   printf("n %d total %d\n", n, total_send_bytes);
+  //   fprintf( stderr, "n %d total %d\n", n, total_send_bytes);
   //  delete temp_buf;
 
   return total_send_bytes;
@@ -294,7 +294,7 @@ int SerializerModule::Send(int socket, char* buf, int size_bytes)
         continue;
       } else {
         char err_buf[500];
-        sprintf(err_buf, "Failed to send data.(%s) Exiting...", strerror(errno));
+        sprintf(err_buf, "SEND ERROR.(%s) Exiting...", strerror(errno));
         print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
         sleep(1234567);
         exit(1);
@@ -369,16 +369,18 @@ void SerializerModule::Accept()
   //
   int fd_accept;
   struct sockaddr_in sock_accept;
-  printf("Accepting... : port %d server %s\n", m_port_to, m_hostname_local.c_str());
-  fflush(stdout);
+  //  fprintf( stderr, "Accepting... : port %d server %s\n", m_port_to, m_hostname_local.c_str());
+  //  fflush(stderr);
+  //  B2INFO("Accepting... : port " << m_port_to << " server " << m_hostname_local.c_str() );
+  B2INFO("Accepting...");
   if ((fd_accept = accept(fd_listen, (struct sockaddr*) & (sock_accept), &addrlen)) == 0) {
     char err_buf[500];
     sprintf(err_buf, "Failed to accept(%s). Exiting...", strerror(errno));
     print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     exit(-1);
   } else {
-    printf("Connection is established: port %d from adress %d %s\n",
-           htons(sock_accept.sin_port), sock_accept.sin_addr.s_addr, inet_ntoa(sock_accept.sin_addr));
+    //    B2INFO("Connection is established: port " << htons(sock_accept.sin_port) << " address " <<  sock_accept.sin_addr.s_addr );
+    B2INFO("Done.");
 
     // set timepout option
 //     struct timeval timeout;
@@ -434,11 +436,11 @@ unsigned int SerializerModule::calcXORChecksum(int* buf, int nwords)
 void SerializerModule::printData(int* buf, int nwords)
 {
   for (int i = 0; i < nwords; i++) {
-    printf("%.8x ", buf[ i ]);
-    if (i % 10 == 9) printf("\n");
+    fprintf(stderr, "%.8x ", buf[ i ]);
+    if (i % 10 == 9) fprintf(stderr, "\n");
   }
-  printf("\n");
-  printf("\n");
+  fprintf(stderr, "\n");
+  fprintf(stderr, "\n");
   return;
 }
 
@@ -460,7 +462,7 @@ void SerializerModule::event()
   for (int j = 0; j < raw_dblkarray.getEntries(); j++) {
     //    int* buf;
     //    int m_size_byte = 0;
-    //    printf("sent %d bytes\n", m_size_byte);
+    //    fprintf( stderr, "sent %d bytes\n", m_size_byte);
 #ifndef DUMMY_DATA
     //  StoreObjPtr<RawCOPPER> rawcopper;
     //    buf = rawcprarray[ j ]->GetWholeBuffer();
@@ -518,9 +520,9 @@ void SerializerModule::event()
 //     struct tm* t_st;
 //     time(&timer);
 //     t_st = localtime(&timer);
-//     printf("Event %d TotSent  %.1lf [MB] ElapsedTime %.1lf [s] RcvdRate %.2lf [MB/s] %s",
+//     fprintf( stderr, "Event %d TotSent  %.1lf [MB] ElapsedTime %.1lf [s] RcvdRate %.2lf [MB/s] %s",
 //            n_basf2evt, m_totbytes / 1.e6, total_time, (m_totbytes - m_prev_totbytes) / interval / 1.e6, asctime(t_st));
-//     fflush(stdout);
+//     fflush(stderr);
 //     m_prev_time = cur_time;
 //     m_prev_totbytes = m_totbytes;
 //     m_prev_nevt = n_basf2evt;

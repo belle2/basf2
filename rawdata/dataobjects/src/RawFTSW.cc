@@ -86,12 +86,12 @@ void RawFTSW::CheckData(int n,
   *cur_evenum = GetEveNo(n);
   *cur_runsubrun_no = GetRunNoSubRunNo(n);
 
-//     printf("========== dump a data block : block # %d==========\n", n);
+//     fprintf( stderr, "========== dump a data block : block # %d==========\n", n);
 //     for (int k = 0 ; k < GetBlockNwords(n); k++) {
-//       printf("0x%.8x ", (GetBuffer(n))[k]);
-//       if (k % 10 == 9)printf("\n");
+//       fprintf( stderr, "0x%.8x ", (GetBuffer(n))[k]);
+//       if (k % 10 == 9) fprintf( stderr, "\n");
 //     }
-//     fflush(stdout);
+//     fflush(stderr);
 
 #ifndef NO_DATA_CHECK
 #ifdef WO_FIRST_EVENUM_CHECK
@@ -100,7 +100,7 @@ void RawFTSW::CheckData(int n,
   if (prev_runsubrun_no == *cur_runsubrun_no && prev_runsubrun_no >= 0) {
 #endif
     if ((unsigned int)(prev_evenum + 1) != *cur_evenum) {
-      sprintf(err_buf, "Event # jump : i %d prev 0x%x cur 0x%x : Exiting...\n %s %s %d\n",
+      sprintf(err_buf, "DATA CORRUPTION: Event # jump : i %d prev 0x%x cur 0x%x : Exiting...\n %s %s %d\n",
               n, prev_evenum, *cur_evenum, __FILE__, __PRETTY_FUNCTION__, __LINE__);
       err_flag = 1;
     }
@@ -108,13 +108,13 @@ void RawFTSW::CheckData(int n,
 #endif
 
   if (GetNwords(n) != SIZE_FTSW_PACKET) {
-    sprintf(err_buf, "invalid FTSW packet length : block %d nwords %d must be %d : Exiting...\n %s %s %d\n",
+    sprintf(err_buf, "DATA CORRUPTION: invalid FTSW packet length : block %d nwords %d must be %d : Exiting...\n %s %s %d\n",
             n, GetNwords(n), SIZE_FTSW_PACKET, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     err_flag = 1;
   }
 
   if (GetMagicTrailer(n) != FTSW_MAGIC_TRAILER) {
-    sprintf(err_buf, "invalid magic word : block %d magic word 0x%x must be 0x%x : Exiting...\n %s %s %d\n",
+    sprintf(err_buf, "DATA CORRUPTION: invalid magic word : block %d magic word 0x%x must be 0x%x : Exiting...\n %s %s %d\n",
             n, GetMagicTrailer(n), FTSW_MAGIC_TRAILER, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     err_flag = 1;
   }
@@ -122,12 +122,12 @@ void RawFTSW::CheckData(int n,
 
 
   if (err_flag == 1) {
-    printf("========== dump a data block : block # %d==========\n", n);
+    fprintf(stderr, "========== dump a data block : block # %d==========\n", n);
     for (int k = 0 ; k < GetBlockNwords(n); k++) {
-      printf("0x%.8x ", (GetBuffer(n))[k]);
-      if (k % 10 == 9)printf("\n");
+      fprintf(stderr, "0x%.8x ", (GetBuffer(n))[k]);
+      if (k % 10 == 9) fprintf(stderr, "\n");
     }
-    fflush(stdout);
+    fflush(stderr);
     string err_str = err_buf; throw (err_str);
     sleep(1234567);
     exit(-1);

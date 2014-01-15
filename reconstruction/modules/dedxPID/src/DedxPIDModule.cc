@@ -334,7 +334,6 @@ void DedxPIDModule::event()
         const bool helix_accurate = (hit_pos - hit_pos_helix).Perp() <= m_trackDistanceThreshhold;
 
         if (!track_extrapolation_failed && !helix_accurate) {
-          //TVector3 poca, dir_in_poca, poca_on_wire;
           try {
             TVector3 wire_dir = (wire_pos_b - wire_pos_f).Unit();
             trackrep->extrapolateToLine(pocaState, wire_pos_f, wire_dir);
@@ -344,7 +343,8 @@ void DedxPIDModule::event()
             //update cdchelix
             cdchelix = HelixHelper(poca, pocaMom, dedxTrack->m_charge);
 
-            TVector3 poca_on_wire = wire_pos_f + (poca - wire_pos_f).Dot(wire_dir) * wire_pos_f;
+            TVector3 poca_on_wire = wire_pos_f + (poca - wire_pos_f).Dot(wire_dir) * wire_dir;
+
 
             local_momentum = pocaMom;
             hit_pos_helix = poca;

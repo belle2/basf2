@@ -46,7 +46,7 @@ namespace boost {
        * @return the QryResultNode, that has been produced using that value
        */
       internal_type put_value(const external_type& value) {
-        return internal_type(Belle2::gearbox::nodeId_t(Belle2::gearbox::genRandomString(16), Belle2::gearbox::nodeValue_t(value)));
+        return internal_type(Belle2::gearbox::nodeId_t(Belle2::gearbox::genRandomString(16)), Belle2::gearbox::nodeValue_t(value));
       }
 
     };

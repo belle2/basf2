@@ -3,6 +3,7 @@
 #include <cmath>
 #include <TMath.h>
 
+using namespace std;
 using namespace Belle2;
 
 void  ECLPionPdf::init()
@@ -22,16 +23,20 @@ void  ECLPionPdf::init()
     pi_prm.mu3 = map.param(name("pions_mu3_", i));
     pi_prm.sigma3 = map.param(name("pions_sigma3_", i));
     pi_prm.fraction = map.param(name("pions_fraction2_", i));
-  }
 
+    m_muonlike.m_integral1[i] = 0.5 * (1 - TMath::Erf(- prm.mu1  / prm.sigma1l / s_sqrt2));
+    m_muonlike.m_integral2[i] = 0.5 * (1 - TMath::Erf(- prm.mu2  / prm.sigma2 / s_sqrt2));
+    m_integralPion[i] = 0.5 * (1 - TMath::Erf(-pi_prm.mu3 / pi_prm.sigma3 / s_sqrt2));
+    cerr << "integral pion " << m_integralPion[i] << endl;
+  }
 }
 
 double ECLPionPdf::pdf(double eop, double p) const
 {
   int i = int(p / 0.250);
-  if (i == 0) return 1e-20;
+  if (i == 0) i = 1;
   if (i > 7) i = 7;
   const Parameters& prm = m_params[i];
   return prm.fraction * m_muonlike.pdf(eop , p) +
-         (1 - prm.fraction) * TMath::Gaus(eop, prm.mu3, prm.sigma3, true);
+         (1 - prm.fraction) * TMath::Gaus(eop, prm.mu3, prm.sigma3, true) / m_integralPion[i];
 }

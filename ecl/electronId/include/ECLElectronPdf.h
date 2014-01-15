@@ -20,7 +20,9 @@ namespace Belle2 {
     };
 
     Parameters m_params[8];
-    double m_norms[8];
+    double m_integral1[8];
+    double m_integral2[8];
+
   };
 }
 #endif

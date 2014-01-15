@@ -17,6 +17,7 @@ namespace Belle2 {
     };
     Parameters m_params[8];
     ECLMuonPdf m_muonlike;
+    double m_integralPion[8];
   };
 }
 #endif

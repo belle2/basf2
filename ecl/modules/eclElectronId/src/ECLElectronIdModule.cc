@@ -70,6 +70,7 @@ void ECLElectronIdModule::event()
   for (int t = 0; t < Tracks.getEntries(); ++t) {
     const Track* track = Tracks[t];
     auto relShowers = track->getRelationsTo<ECLShower>();
+    if (relShowers.size() == 0) continue;
     double energy = 0;
     for (auto sh : relShowers) energy += sh.GetEnergy();
 
@@ -83,8 +84,8 @@ void ECLElectronIdModule::event()
       if (fitRes != 0) {
         double p = fitRes  -> getMomentum() . Mag();
         double eop = energy / p;
-        likelihoods[hypo.getIndex()] = m_pdf[hypo.getIndex()]->pdf(eop, p);
-      } else likelihoods[hypo.getIndex()] = 1.e-20;
+        likelihoods[hypo.getIndex()] = log(m_pdf[hypo.getIndex()]->pdf(eop, p));
+      } else likelihoods[hypo.getIndex()] = -700;
 
     } // end loop on hypo
 

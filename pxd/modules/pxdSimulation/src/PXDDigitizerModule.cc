@@ -23,7 +23,6 @@
 #include <mdst/dataobjects/MCParticle.h>
 #include <pxd/dataobjects/PXDTrueHit.h>
 #include <pxd/dataobjects/PXDDigit.h>
-#include <boost/foreach.hpp>
 #include <cmath>
 
 #include <TRandom.h>
@@ -183,12 +182,15 @@ void PXDDigitizerModule::beginRun()
 {
   //Fill map with all possible sensors This is too slow to be done every event so
   //we fill it once and only clear the content of the sensors per event, not
-  //the whole map
+  //the whole map.
+  // NOTE: Some VXDIDs will be added to the map on the way if we have multiple
+  // frames, but they will stay and will be cleared appropriately, so this is not
+  // a problem, and after a few events the performance will stabilize.
   m_sensors.clear();
   VXD::GeoCache& geo = VXD::GeoCache::getInstance();
-  BOOST_FOREACH(VxdID layer, geo.getLayers(SensorInfo::PXD)) {
-    BOOST_FOREACH(VxdID ladder, geo.getLadders(layer)) {
-      BOOST_FOREACH(VxdID sensor, geo.getSensors(ladder)) {
+  for (VxdID layer : geo.getLayers(SensorInfo::PXD)) {
+    for (VxdID ladder : geo.getLadders(layer)) {
+      for (VxdID sensor : geo.getSensors(ladder)) {
         m_sensors[sensor] = Sensor();
       }
     }
@@ -198,7 +200,7 @@ void PXDDigitizerModule::beginRun()
 void PXDDigitizerModule::event()
 {
   //Clear sensors and process SimHits
-  BOOST_FOREACH(Sensors::value_type & sensor, m_sensors) {
+  for (Sensors::value_type & sensor : m_sensors) {
     sensor.second.clear();
   }
   m_currentSensor = 0;
@@ -649,7 +651,7 @@ void PXDDigitizerModule::addNoiseDigits()
     return;
 
   double fraction = 1 - m_noiseFraction;
-  BOOST_FOREACH(Sensors::value_type & sensor, m_sensors) {
+  for (Sensors::value_type & sensor : m_sensors) {
     Sensor& s = sensor.second;
     //FIXME: Backwards compatible
     //if (s.size() == 0) continue;
@@ -686,11 +688,11 @@ void PXDDigitizerModule::saveDigits()
   //Zero supression cut in electrons
   double charge_threshold = m_SNAdjacent * m_elNoise;
 
-  BOOST_FOREACH(Sensors::value_type & sensor, m_sensors) {
+  for (Sensors::value_type & sensor : m_sensors) {
     int sensorID = sensor.first;
     const SensorInfo& info =
       dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(sensorID));
-    BOOST_FOREACH(Sensor::value_type & digit, sensor.second) {
+    for (Sensor::value_type & digit : sensor.second) {
       const Digit& d = digit.first;
       const DigitValue& v = digit.second;
 
@@ -728,6 +730,14 @@ void PXDDigitizerModule::saveDigits()
 void PXDDigitizerModule::terminate()
 {
   if (m_rootFile) {
+    m_histSteps->GetListOfFunctions()->Add(new TNamed("Description", "Validation: Diffusion steps;number of steps."));
+    m_histSteps->GetListOfFunctions()->Add(new TNamed("Check", "Validation: Check shape, should be mostly zero in about 40 steps."));
+    m_histDiffusion->GetListOfFunctions()->Add(new TNamed("Description", "Validation: Diffusion distance;u [um];v [um];."));
+    m_histDiffusion->GetListOfFunctions()->Add(new TNamed("Check", "Validation: Check spot shape, should be homogeniouse arround and sharp peak in middle."));
+    m_histLorentz_u->GetListOfFunctions()->Add(new TNamed("Description", "Validation: Lorentz angle, u."));
+    m_histLorentz_u->GetListOfFunctions()->Add(new TNamed("Check", "Validation: Check peak position, should be on range 0.1 .. 0.3, because magnetic field."));
+    m_histLorentz_v->GetListOfFunctions()->Add(new TNamed("Description", "Validation: Lorentz angle, v."));
+    m_histLorentz_v->GetListOfFunctions()->Add(new TNamed("Check", "Validation: Check peak position, should be on middle, because no magnet field on this direction."));
     m_rootFile->Write();
     m_rootFile->Close();
   }

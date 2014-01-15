@@ -12,6 +12,7 @@
 using namespace std;
 using namespace Belle2;
 
+#define DESY
 //#define NO_DATA_CHECK
 //#define WO_FIRST_EVENUM_CHECK
 
@@ -49,7 +50,10 @@ int RawCOPPER::GetBufferPos(int n)
     // COPPER's data length include one word from COPPER trailer. so -1 is needed.
     pos_nwords +=  size;
     if (pos_nwords >= m_nwords) {
-      printf("value of pos_nwords(%d) is larger than m_nwords(%d). Exiting...", pos_nwords, m_nwords);
+      char err_buf[500];
+      sprintf(err_buf, "value of pos_nwords(%d) is larger than m_nwords(%d). Exiting...\n %s %s %d\n",
+              pos_nwords, m_nwords, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      string err_str = err_buf;     throw (err_str);
       exit(1);
     }
   }
@@ -372,7 +376,16 @@ void RawCOPPER::CheckData(int n,
       sprintf(err_buf, "COPPER counter jump : i %d prev 0x%x cur 0x%x : Exiting...\n%s %s %d\n",
               n, prev_copper_ctr, *cur_copper_ctr,
               __FILE__, __PRETTY_FUNCTION__, __LINE__);
+
+#ifdef DESY
+      //
+      // In DESY test, we ignore this error
+      //
+      printf("[INFO] %s", err_buf);
+#else
       err_flag = 1;
+#endif
+
     }
   }
 

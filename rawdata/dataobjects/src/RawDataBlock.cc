@@ -51,7 +51,10 @@ int RawDataBlock::GetBufferPos(int n)
       pos_nwords +=      m_buffer[ pos_nwords ];
     }
     if (pos_nwords >= m_nwords) {
-      printf("value of pos_nwords(%d) is larger than m_nwords(%d). Exiting...", pos_nwords, m_nwords);
+      char err_buf[500];
+      sprintf(err_buf, "value of pos_nwords(%d) is larger than m_nwords(%d). Exiting...\n %s %s %d\n",
+              pos_nwords, m_nwords, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      string err_str = err_buf;     throw (err_str);
       exit(1);
     }
   }

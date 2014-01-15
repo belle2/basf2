@@ -247,10 +247,10 @@ void SVDClusterizerModule::event()
       int side = storeDigits[i]->isUStrip() ? 0 : 1;
       std::pair<SensorSide::iterator, bool> it = sensors[sensorID][side].insert(sample);
       if (!it.second) {
-        B2WARNING("Sample (" << sample.getSampleIndex() << ", "
-                  << sample.getCellID() << "(" << side
-                  << ") in sensor " << static_cast<unsigned short>(sensorID)
-                  << " is already set, ignoring second occurrence.");
+        B2INFO("Sample (" << sample.getSampleIndex() << ", "
+               << sample.getCellID() << "(" << side
+               << ") in sensor " << static_cast<unsigned short>(sensorID)
+               << " is already set, ignoring second occurrence.");
         continue;
       }
     }

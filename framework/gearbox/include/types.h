@@ -15,7 +15,7 @@ namespace Belle2 {
   namespace gearbox {
 
     class Backend;
-    class BackendMountHandle;
+    struct BackendMountHandle;
 
 
     /** one backend configuration parameter */

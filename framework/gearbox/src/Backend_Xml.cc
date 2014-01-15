@@ -2,6 +2,55 @@
 
 #include <boost/regex.hpp>
 
+#include <libxml/tree.h>
+#include <libxml/xpath.h>
+#include <libxml/xpathInternals.h>
+
+#ifndef xmlChildElementCount
+/**
+* xmlChildElementCount:
+* @parent: the parent node
+*
+* Finds the current number of child nodes of that element which are
+* element nodes.
+* Note the handling of entities references is different than in
+* the W3C DOM element traversal spec since we don't have back reference
+* from entities content to entities references.
+*
+* Returns the count of element child or 0 if not available
+*
+* IMPORTED FROM LIBXML2 CODE
+*
+*/
+unsigned long xmlChildElementCount(xmlNodePtr parent)
+{
+  unsigned long ret = 0;
+  xmlNodePtr cur = NULL;
+
+  if (parent == NULL)
+    return (0);
+  switch (parent->type) {
+    case XML_ELEMENT_NODE:
+    case XML_ENTITY_NODE:
+    case XML_DOCUMENT_NODE:
+    case XML_HTML_DOCUMENT_NODE:
+      cur = parent->children;
+      break;
+    default:
+      return (0);
+  }
+  while (cur != NULL) {
+    if (cur->type == XML_ELEMENT_NODE)
+      ret++;
+    cur = cur->next;
+  }
+  return (ret);
+
+}
+
+#endif
+
+
 namespace Belle2 {
   namespace gearbox {
 

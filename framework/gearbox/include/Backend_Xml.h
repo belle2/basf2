@@ -3,10 +3,7 @@
 
 #include "framework/gearbox/Backend.h"
 
-#include <libxml/tree.h>
 #include <libxml/parser.h>
-#include <libxml/xpath.h>
-#include <libxml/xpathInternals.h>
 #include <vector>
 
 #define IFCTL_NAMESPACE_URI "urn:X-belle2:interface-control"

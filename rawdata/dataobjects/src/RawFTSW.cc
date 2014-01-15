@@ -86,10 +86,10 @@ void RawFTSW::CheckData(int n,
   *cur_evenum = GetEveNo(n);
   *cur_runsubrun_no = GetRunNoSubRunNo(n);
 
-//     fprintf( stderr, "========== dump a data block : block # %d==========\n", n);
+//     printf("[DEBUG] ========== dump a data block : block # %d==========\n", n);
 //     for (int k = 0 ; k < GetBlockNwords(n); k++) {
-//       fprintf( stderr, "0x%.8x ", (GetBuffer(n))[k]);
-//       if (k % 10 == 9) fprintf( stderr, "\n");
+//       printf("0x%.8x ", (GetBuffer(n))[k]);
+//       if (k % 10 == 9) printf("\n[DEBUG] ");
 //     }
 //     fflush(stderr);
 
@@ -122,10 +122,11 @@ void RawFTSW::CheckData(int n,
 
 
   if (err_flag == 1) {
-    fprintf(stderr, "========== dump a data block : block # %d==========\n", n);
+    printf("[DEBUG] ========== dump a data block : block # %d==========\n", n);
+    printf("[DEBUG] ");
     for (int k = 0 ; k < GetBlockNwords(n); k++) {
-      fprintf(stderr, "0x%.8x ", (GetBuffer(n))[k]);
-      if (k % 10 == 9) fprintf(stderr, "\n");
+      printf("0x%.8x ", (GetBuffer(n))[k]);
+      if (k % 10 == 9) printf("\n[DEBUG] ");
     }
     fflush(stderr);
     string err_str = err_buf; throw (err_str);

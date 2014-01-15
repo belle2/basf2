@@ -577,7 +577,7 @@ namespace Belle2 {
   {
     int pos_nwords = GetOffset1stFINESSE(n);
     if (pos_nwords >= m_nwords) {
-      fprintf(stderr, "Data size is smaller than data position info. Exting...\n");
+      printf("[DEBUG] Data size is smaller than data position info. Exting...\n");
       exit(1);
     }
     return &(m_buffer[ pos_nwords]);
@@ -587,7 +587,7 @@ namespace Belle2 {
   {
     int pos_nwords = GetOffset2ndFINESSE(n);
     if (pos_nwords >= m_nwords) {
-      fprintf(stderr, "Data size is smaller than data position info. Exting...\n");
+      printf("[DEBUG] Data size is smaller than data position info. Exting...\n");
       exit(1);
     }
     return &(m_buffer[ pos_nwords]);
@@ -597,7 +597,7 @@ namespace Belle2 {
   {
     int pos_nwords = GetOffset3rdFINESSE(n);
     if (pos_nwords >= m_nwords) {
-      fprintf(stderr, "Data size is smaller than data position info. Exting...\n");
+      printf("[DEBUG] Data size is smaller than data position info. Exting...\n");
       exit(1);
     }
     return &(m_buffer[ pos_nwords]);
@@ -607,7 +607,7 @@ namespace Belle2 {
   {
     int pos_nwords = GetOffset4thFINESSE(n);
     if (pos_nwords >= m_nwords) {
-      fprintf(stderr, "Data size is smaller than data position info. Exting...\n");
+      printf("[DEBUG] Data size is smaller than data position info. Exting...\n");
       exit(1);
     }
     return &(m_buffer[ pos_nwords]);
@@ -696,7 +696,7 @@ namespace Belle2 {
     RawTrailer trl;
     int pos_nwords = GetBufferPos(n) + GetBlockNwords(n) - trl.GetTrlNwords() - 3;
 
-    //    fprintf( stderr, "1 %d 2 %d 3 %d\n", GetBufferPos(n), GetBlockNwords(n), trl.GetTrlNwords());
+    //    printf( "[DEBUG] 1 %d 2 %d 3 %d\n", GetBufferPos(n), GetBlockNwords(n), trl.GetTrlNwords());
 
     return (unsigned int)(m_buffer[ pos_nwords ]);
   }

@@ -32,19 +32,19 @@ RawDataBlock::~RawDataBlock()
 int RawDataBlock::GetBufferPos(int n)
 {
   if (m_buffer == NULL || m_nwords <= 0) {
-    fprintf(stderr, "RawDataBlock buffer is not available.\n");
+    printf("[DEBUG] RawDataBlock buffer is not available.\n");
     exit(1);
   }
 
   if (n >= (m_num_events * m_num_nodes)) {
-    fprintf(stderr, "Invalid COPPER block No. (%d : max %d ) is specified. Exiting... ", n, (m_num_events * m_num_nodes));
+    printf("[DEBUG] Invalid COPPER block No. (%d : max %d ) is specified. Exiting... ", n, (m_num_events * m_num_nodes));
     exit(1);
   }
 
   int pos_nwords = 0;
   for (int i = 1; i <= n ; i++) {
     if (m_buffer[ pos_nwords ] <= 0) {
-      fprintf(stderr, "CORRUPTED DATA: length of this data block is strange ( %d words ). Maybe data is corrupted or RawHeader info has not been filled yet. Exiting...", m_buffer[ pos_nwords ]);
+      printf("[DEBUG] CORRUPTED DATA: length of this data block is strange ( %d words ). Maybe data is corrupted or RawHeader info has not been filled yet. Exiting...", m_buffer[ pos_nwords ]);
       sleep(1234567);
       exit(1);
     } else {
@@ -124,7 +124,7 @@ int* RawDataBlock::GetBuffer(int n)
 void RawDataBlock::SetBuffer(int* bufin, int nwords, int malloc_flag, int num_events, int num_nodes)
 {
   if (bufin == NULL) {
-    fprintf(stderr, "bufin is NULL. Exting...\n");
+    printf("[DEBUG] bufin is NULL. Exting...\n");
     exit(1);
   }
 
@@ -157,12 +157,13 @@ void RawDataBlock::SetBuffer(int* bufin, int nwords, int malloc_flag, int num_ev
 
 void RawDataBlock::PrintData(int* buf, int nwords)
 {
+  printf("[DEBUG] ");
   for (int i = 0; i < nwords; i++) {
-    fprintf(stderr, "%.8x ", buf[ i ]);
-    if (i % 10 == 9) fprintf(stderr, "\n");
+    printf("%.8x ", buf[ i ]);
+    if (i % 10 == 9) printf("\n[DEBUG] ");
   }
-  fprintf(stderr, "\n");
-  fprintf(stderr, "\n");
+  printf("\n[DEBUG] ");
+  printf("\n");
   return;
 }
 

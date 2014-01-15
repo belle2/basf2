@@ -85,10 +85,11 @@ void DeSerializerCOPPERModule::initialize()
     exit(1);
   } else {
     int slot;
+    printf("[DEBUG] ");
     for (slot = 0; slot < 4; slot++) {
-      if (use_slot & (1 << slot)) fprintf(stderr, " %c", 'A' + slot);
+      if (use_slot & (1 << slot)) printf(" %c", 'A' + slot);
     }
-    fprintf(stderr, "\n");
+    printf("\n");
   }
 
 
@@ -181,7 +182,7 @@ void DeSerializerCOPPERModule::fillNewRawCOPPERHeader(RawCOPPER* raw_copper)
   rawhdr.SetFTSW2Words(raw_copper->GetTTCtimeTRGType(cprblock), raw_copper->GetTTUtime(cprblock));
 
 #ifdef debug
-  fprintf(stderr, "1: i= %d : num entries %d : Tot words %d\n", 0 , raw_copper->GetNumEntries(), raw_copper->TotalBufNwords());
+  printf("[DEBUG] 1: i= %d : num entries %d : Tot words %d\n", 0 , raw_copper->GetNumEntries(), raw_copper->TotalBufNwords());
   printData(raw_copper->GetBuffer(0), raw_copper->TotalBufNwords());
 #endif
 
@@ -203,7 +204,7 @@ void DeSerializerCOPPERModule::fillNewRawCOPPERHeader(RawCOPPER* raw_copper)
   rawhdr.AddNodeInfo(m_nodeid);   // Fill 13th header word
 
 #ifdef debug
-  fprintf(stderr, "2: i= %d : num entries %d : Tot words %d\n", 0 , raw_copper->GetNumEntries(), raw_copper->TotalBufNwords());
+  printf("[DEBUG] 2: i= %d : num entries %d : Tot words %d\n", 0 , raw_copper->GetNumEntries(), raw_copper->TotalBufNwords());
   printData(raw_copper->GetBuffer(0), raw_copper->TotalBufNwords());
 #endif
 
@@ -241,7 +242,7 @@ void DeSerializerCOPPERModule::fillNewRawCOPPERHeader(RawCOPPER* raw_copper)
     sprintf(err_buf, "CORRUPTED DATA: Invalid event_number. Exiting...: cur 32bit eve %x preveve %x\n",  cur_ftsw_eve32, m_prev_ftsweve32);
     print_err.PrintError(m_shmflag, &m_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
 
-    fprintf(stderr, "i= %d : num entries %d : Tot words %d\n", 0 , raw_copper->GetNumEntries(), raw_copper->TotalBufNwords());
+    printf("[DEBUG] i= %d : num entries %d : Tot words %d\n", 0 , raw_copper->GetNumEntries(), raw_copper->TotalBufNwords());
     printData(raw_copper->GetBuffer(0), raw_copper->TotalBufNwords());
     exit(-1);
   }
@@ -250,7 +251,7 @@ void DeSerializerCOPPERModule::fillNewRawCOPPERHeader(RawCOPPER* raw_copper)
 
   // Check magic words are set at proper positions
 #ifdef debug
-  fprintf(stderr, "3: i= %d : num entries %d : Tot words %d\n", 0 , raw_copper->GetNumEntries(), raw_copper->TotalBufNwords());
+  printf("[DEBUG] 3: i= %d : num entries %d : Tot words %d\n", 0 , raw_copper->GetNumEntries(), raw_copper->TotalBufNwords());
   printData(raw_copper->GetBuffer(0), raw_copper->TotalBufNwords());
 #endif
 

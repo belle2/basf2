@@ -160,13 +160,13 @@ int DeSerializerPCModule::Connect()
     int val1 = 0;
     setsockopt(sd, IPPROTO_TCP, TCP_NODELAY, &val1, sizeof(val1));
 
-    fprintf(stderr, "Connecting to %s port %d ...\n", m_hostname_from[ i ].c_str(), m_port_from[ i ]);
+    printf("[DEBUG] Connecting to %s port %d ...\n", m_hostname_from[ i ].c_str(), m_port_from[ i ]);
     while (1) {
       if (connect(sd, (struct sockaddr*)(&socPC), sizeof(socPC)) < 0) {
         perror("Failed to connect. Retrying...");
         usleep(500000);
       } else {
-        fprintf(stderr, "Done\n");
+        printf("[DEBUG] Done\n");
         break;
       }
     }
@@ -177,23 +177,23 @@ int DeSerializerPCModule::Connect()
     len = sizeof(val);
     getsockopt(m_socket[ i ], SOL_SOCKET, SO_RCVBUF, &val, (socklen_t*)&len);
 #ifdef DEBUG
-    fprintf(stderr, "SO_RCVBUF %d\n", val);
+    printf("[DEBUG] SO_RCVBUF %d\n", val);
 #endif
     getsockopt(m_socket[ i ], SOL_SOCKET, SO_SNDBUF, &val, (socklen_t*)&len);
 #ifdef DEBUG
-    fprintf(stderr, "SO_SNDBUF %d\n", val);
+    printf("[DEBUG] SO_SNDBUF %d\n", val);
 #endif
     getsockopt(m_socket[ i ], IPPROTO_TCP, TCP_MAXSEG, &val, (socklen_t*)&len);
 #ifdef DEBUG
-    fprintf(stderr, "TCP_MAXSEG %d\n", val);
+    printf("[DEBUG] TCP_MAXSEG %d\n", val);
 #endif
     getsockopt(m_socket[ i ], IPPROTO_TCP, TCP_NODELAY, &val, (socklen_t*)&len);
 #ifdef DEBUG
-    fprintf(stderr, "TCP_NODELAY %d\n", val);
+    printf("[DEBUG] TCP_NODELAY %d\n", val);
 #endif
 
   }
-  fprintf(stderr, "Initialization finished\n");
+  printf("[DEBUG] Initialization finished\n");
   return 0;
 
 }
@@ -253,7 +253,7 @@ int* DeSerializerPCModule::recvData(int* malloc_flag, int* total_buf_nwords, int
     *total_buf_nwords += rawblk_nwords;
 
     if (rawblk_nwords > (int)(2.5e6)) {
-      fprintf(stderr, "*******HDR**********\n");
+      printf("[DEBUG] *******HDR**********\n");
       printData(send_hdr_buf, SendHeader::SENDHDR_NWORDS);
       char err_buf[500];
       sprintf(err_buf, "CORRUPTED DATA: Too large event : Header %d %d %d %d\n", i, temp_num_events, temp_num_nodes, send_hdr.GetTotalNwords());
@@ -411,7 +411,7 @@ void DeSerializerPCModule::event()
                                   raw_datablk->GetBlockNwords(entry_id), 0, 1, 1);
           if (temp_rawftsw->GetEveNo(0) < 10
              ) {
-            fprintf(stderr, "######FTSW#########\n");
+            printf("[DEBUG] ######FTSW#########\n");
             printData((int*)temp_buf + raw_datablk->GetBufferPos(entry_id), raw_datablk->GetBlockNwords(entry_id));
           }
 
@@ -439,7 +439,7 @@ void DeSerializerPCModule::event()
                                  raw_datablk->GetBlockNwords(entry_id), 0, 1, 1);
           if (temp_rawtlu->GetEveNo(0) < 10
              ) {
-            fprintf(stderr, "######TLU#########\n");
+            printf("[DEBUG] ######TLU#########\n");
             printData((int*)temp_buf + raw_datablk->GetBufferPos(entry_id), raw_datablk->GetBlockNwords(entry_id));
           }
 
@@ -496,8 +496,8 @@ void DeSerializerPCModule::event()
             ctime_type_array[ 0 ] != ctime_type_array[ l ]) {
           char err_buf[500];
           for (int m = 0; m < num_nodes_in_sendblock; m++) {
-            fprintf(stderr, "node %d eve # %d utime %x ctime %x\n",
-                    m,  eve_array[ m ], utime_array[ m ], ctime_type_array[ m ]);
+            printf("[DEBUG] node %d eve # %d utime %x ctime %x\n",
+                   m,  eve_array[ m ], utime_array[ m ], ctime_type_array[ m ]);
           }
           sprintf(err_buf, "CORRUPTED DATA: Event or Time record mismatch. Exiting...");
           print_err.PrintError(m_shmflag, &m_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
@@ -509,11 +509,11 @@ void DeSerializerPCModule::event()
 
       // Event # monitor in runchange
       if (m_prev_runsubrun_no != m_runsubrun_no) {
-        fprintf(stderr, "##############################################\n");
+        printf("[DEBUG] ##############################################\n");
         for (int m = 0; m < num_entries ; m++) {
-          fprintf(stderr, "%d eve %u prev %u\n", m, eve_array[ m ], m_prev_evenum);
+          printf("[DEBUG] %d eve %u prev %u\n", m, eve_array[ m ], m_prev_evenum);
         }
-        fprintf(stderr, "##############################################\n");
+        printf("[DEBUG] ##############################################\n");
         fflush(stderr);
       }
       m_prev_evenum = cur_evenum;
@@ -537,9 +537,7 @@ void DeSerializerPCModule::event()
   //   if (m_shmflag != 0) {
   //     if (n_basf2evt % 10 == 0) {
   //       if (m_status.isStopped()) {
-  //         fprintf( stderr, "\033[34m");
-  //         fprintf( stderr, "[INFO] RunStop was detected. ( Setting:  Max event # %d MaxTime %lf ) Processed Event %d Elapsed Time %lf[s]\n", max_nevt , max_seconds, n_basf2evt * NUM_EVT_PER_BASF2LOOP_PC, getTimeSec() - m_start_time);
-  //         fprintf( stderr, "\033[0m");
+  //         printf("[DEBUG] [INFO] RunStop was detected. ( Setting:  Max event # %d MaxTime %lf ) Processed Event %d Elapsed Time %lf[s]\n", max_nevt , max_seconds, n_basf2evt * NUM_EVT_PER_BASF2LOOP_PC, getTimeSec() - m_start_time);
   //         m_eventMetaDataPtr->setEndOfData();
   //       }
   //     }
@@ -551,9 +549,7 @@ void DeSerializerPCModule::event()
   if (max_nevt >= 0 || max_seconds >= 0.) {
     if ((n_basf2evt * NUM_EVT_PER_BASF2LOOP_PC >= max_nevt && max_nevt > 0)
         || (getTimeSec() - m_start_time > max_seconds && max_seconds > 0.)) {
-      fprintf(stderr, "\033[34m");
-      fprintf(stderr, "[INFO] RunStop was detected. ( Setting:  Max event # %d MaxTime %lf ) Processed Event %d Elapsed Time %lf[s]\n", max_nevt , max_seconds, n_basf2evt * NUM_EVT_PER_BASF2LOOP_PC, getTimeSec() - m_start_time);
-      fprintf(stderr, "\033[0m");
+      printf("[DEBUG] RunStop was detected. ( Setting:  Max event # %d MaxTime %lf ) Processed Event %d Elapsed Time %lf[s]\n", max_nevt , max_seconds, n_basf2evt * NUM_EVT_PER_BASF2LOOP_PC, getTimeSec() - m_start_time);
       m_eventMetaDataPtr->setEndOfData();
     }
   }

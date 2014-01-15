@@ -119,7 +119,7 @@ void DeSerializerModule::shmOpen(char*, char*)
     }
   m_shmfd_cfg = shm_open(path_cfg, O_RDWR, 0666);
   if (m_shmfd_cfg < 0) {
-    fprintf( stderr, "%s\n", path_cfg);
+    printf( "[DEBUG] %s\n", path_cfg);
     perror("[ERROR] shm_open2");
     exit(1);
   }
@@ -134,7 +134,7 @@ void DeSerializerModule::shmOpen(char*, char*)
     }
   m_shmfd_sta = shm_open(path_sta , O_RDWR, 0666);
   if (m_shmfd_sta < 0) {
-    fprintf( stderr, "%s\n", path_sta);
+    printf( "[DEBUG] %s\n", path_sta);
     perror("[ERROR] shm_open2");
     exit(1);
   }
@@ -174,7 +174,7 @@ unsigned int  DeSerializerModule::calcSimpleChecksum(int* buf, int nwords)
   unsigned int checksum = 0;
   for (int i = 0; i < nwords; i++) {
     checksum = checksum + (unsigned int)buf[ i ];
-    //    fprintf( stderr, "i %.4d 0x%.8x 0x%.8x\n", i, checksum, buf[i]);
+    //    printf( "[DEBUG] i %.4d 0x%.8x 0x%.8x\n", i, checksum, buf[i]);
   }
   return checksum;
 }
@@ -201,7 +201,9 @@ void DeSerializerModule::recordTime(int event, double* array)
 void DeSerializerModule::openOutputFile()
 {
   if ((m_fp_dump = fopen(m_dump_fname.c_str(), "wb")) == NULL) {
-    fprintf(stderr, "[ERROR] Failed to open file %s. Exiting...\n", m_dump_fname.c_str());
+    char err_buf[500];
+    sprintf(err_buf, "Failed to open file %s. Exiting...\n", m_dump_fname.c_str());
+    print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     exit(-1);
   }
 }
@@ -209,19 +211,22 @@ void DeSerializerModule::openOutputFile()
 void DeSerializerModule::dumpData(char* buf, int size)
 {
   if (fwrite(buf, size, 1, m_fp_dump) <= 0) {
-    perror("[ERROR] Failed to write buffer to a file. Exiting...");
+    char err_buf[500];
+    sprintf(err_buf, "Failed to write buffer to a file. Exiting...\n");
+    print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     exit(-1);
   }
 }
 
 void DeSerializerModule::printData(int* buf, int nwords)
 {
+  printf("[DEBUG]");
   for (int i = 0; i < nwords; i++) {
-    fprintf(stderr, "%.8x ", buf[ i ]);
-    if (i % 10 == 9) fprintf(stderr, "\n");
+    printf("%.8x ", buf[ i ]);
+    if (i % 10 == 9) printf("\n[DEBUG]");
   }
-  fprintf(stderr, "\n");
-  fprintf(stderr, "\n");
+  printf("\n[DEBUG]");
+  printf("\n");
   return;
 }
 
@@ -229,13 +234,15 @@ int* DeSerializerModule::getBuffer(int nwords, int* malloc_flag)
 {
   int* temp_buf = NULL;
   // Prepare buffer
-  //  fprintf( stderr, "############ %d %d %d %d\n", nwords, BUF_SIZE_WORD, m_num_usedbuf, NUM_PREALLOC_BUF );
+  //  printf( "[DEBUG] ############ %d %d %d %d\n", nwords, BUF_SIZE_WORD, m_num_usedbuf, NUM_PREALLOC_BUF );
   if (nwords >  BUF_SIZE_WORD) {
     *malloc_flag = 1;
     temp_buf = new int[ nwords ];
   } else {
     if ((temp_buf = getPreAllocBuf()) == 0x0) {
-      fprintf(stderr, "[ERROR] Null pointer from GetPreALlocBuf(). Exting...\n");
+      char err_buf[500];
+      sprintf(err_buf, "Null pointer from GetPreALlocBuf(). Exting...\n");
+      print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
       sleep(1234567);
       exit(1);
     } else {
@@ -253,8 +260,10 @@ int* DeSerializerModule::getPreAllocBuf()
     tempbuf = m_bufary[ m_num_usedbuf  ];
     m_num_usedbuf++;
   } else {
-    fprintf(stderr, "[ERROR] No pre-allocated buffers are left. %d > %d \n", m_num_usedbuf, NUM_PREALLOC_BUF);
-    fprintf(stderr, "[ERROR] Not enough buffers are allocated or memory leak or forget to call ClearNumUsedBuf every event loop. Exting...\n");
+    char err_buf[500];
+    sprintf(err_buf, "No pre-allocated buffers are left. %d > %d. Not enough buffers are allocated or memory leak or forget to call ClearNumUsedBuf every event loop. Exting...",
+            m_num_usedbuf, NUM_PREALLOC_BUF);
+    print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     sleep(1234567);
     exit(1);
   }
@@ -271,14 +280,14 @@ void DeSerializerModule::RateMonitor(unsigned int nevt)
   struct tm* t_st;
   time(&timer);
   t_st = localtime(&timer);
-  fprintf(stderr, "Event %12d Rate %6.2lf[kHz] Recvd Flow %6.2lf[MB/s] RunTime %8.2lf[s] interval %8.4lf[s] %s",
-          nevt, (nevt  - m_prev_nevt) / interval / 1.e3,
-          (m_totbytes - m_prev_totbytes) / interval / 1.e6,
-          total_time,
-          interval,
-          asctime(t_st));
+  printf("[DEBUG] Event %12d Rate %6.2lf[kHz] Recvd Flow %6.2lf[MB/s] RunTime %8.2lf[s] interval %8.4lf[s] %s",
+         nevt, (nevt  - m_prev_nevt) / interval / 1.e3,
+         (m_totbytes - m_prev_totbytes) / interval / 1.e6,
+         total_time,
+         interval,
+         asctime(t_st));
 
-  fflush(stderr);
+  fflush(stdout);
   m_prev_time = cur_time;
   m_prev_totbytes = m_totbytes;
   m_prev_nevt = nevt;

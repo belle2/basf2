@@ -419,33 +419,33 @@ namespace Belle2 {
     std::vector<bool> m_PARAMactivateDeltaPtHioC; /**< activates/deactivates current filter dPt (high occupancy mode) for each pass individually */
     std::vector<bool> m_PARAMactivateDeltaDistance2IPHioC; /**< activates/deactivates current filter dd2IP (high occupancy mode) for each pass individually*/
 
-    std::vector<double> m_PARAMtuneDistance3D; /**< tunes current filter d3D for each pass individually */
-    std::vector<double> m_PARAMtuneDistanceXY; /**< tunes current filter dXY for each pass individually */
-    std::vector<double> m_PARAMtuneDistanceZ; /**< tunes current filter dZ for each pass individually */
-    std::vector<double> m_PARAMtuneNormedDistance3D; /**< tunes current nd3D filter for each pass individually */
-    std::vector<double> m_PARAMtuneSlopeRZ; /**< tunes current filter slopeRZ for each pass individually */
-    std::vector<double> m_PARAMtuneAngles3D; /**< tunes current filter a3D for each pass individually */
-    std::vector<double> m_PARAMtuneAnglesXY; /**< tunes current filter aXY for each pass individually */
-    std::vector<double> m_PARAMtuneAnglesRZ; /**< tunes current filter aRZ for each pass individually */
-    std::vector<double> m_PARAMtuneDeltaSlopeRZ; /**< tunes current filter dslopeRZ for each pass individually */
-    std::vector<double> m_PARAMtuneDistance2IP; /**< tunes current filter d2IP for each pass individually */
-    std::vector<double> m_PARAMtunePT; /**< tunes current filter PT for each pass individually */
-    std::vector<double> m_PARAMtuneHelixFit; /**< tunes current filter HelixFit for each pass individually */
-    std::vector<double> m_PARAMtuneZigZagXY; /**< tunes current filter zzXY for each pass individually */
-    std::vector<double> m_PARAMtuneZigZagRZ; /**< tunes current filter zzRZ for each pass individually */
-    std::vector<double> m_PARAMtuneDeltaPt; /**< tunes current filter dPt for each pass individually */
-    std::vector<double> m_PARAMtuneDeltaDistance2IP; /**< tunes current filter dd2IP for each pass individually */
+    std::vector<double> m_PARAMtuneDistance3D; /**< tunes current filter d3D for each pass individually, formula: min: cut = cut-tuneValue*cut, max: cut = cut + tuneValue*cut -> tuneValue of 0, no changes, 1, stretch by 100% of own size... */
+    std::vector<double> m_PARAMtuneDistanceXY; /**< tunes current filter dXY for each pass individually, same formula as in tuneDistance3D */
+    std::vector<double> m_PARAMtuneDistanceZ; /**< tunes current filter dZ for each pass individually, same formula as in tuneDistance3D */
+    std::vector<double> m_PARAMtuneNormedDistance3D; /**< tunes current nd3D filter for each pass individually, same formula as in tuneDistance3D */
+    std::vector<double> m_PARAMtuneSlopeRZ; /**< tunes current filter slopeRZ for each pass individually, same formula as in tuneDistance3D */
+    std::vector<double> m_PARAMtuneAngles3D; /**< tunes current filter a3D for each pass individually, same formula as in tuneDistance3D */
+    std::vector<double> m_PARAMtuneAnglesXY; /**< tunes current filter aXY for each pass individually, same formula as in tuneDistance3D */
+    std::vector<double> m_PARAMtuneAnglesRZ; /**< tunes current filter aRZ for each pass individually, same formula as in tuneDistance3D */
+    std::vector<double> m_PARAMtuneDeltaSlopeRZ; /**< tunes current filter dslopeRZ for each pass individually, same formula as in tuneDistance3D */
+    std::vector<double> m_PARAMtuneDistance2IP; /**< tunes current filter d2IP for each pass individually, same formula as in tuneDistance3D */
+    std::vector<double> m_PARAMtunePT; /**< tunes current filter PT for each pass individually, same formula as in tuneDistance3D */
+    std::vector<double> m_PARAMtuneHelixFit; /**< tunes current filter HelixFit for each pass individually, same formula as in tuneDistance3D */
+    std::vector<double> m_PARAMtuneZigZagXY; /**< tunes current filter zzXY for each pass individually, same formula as in tuneDistance3D */
+    std::vector<double> m_PARAMtuneZigZagRZ; /**< tunes current filter zzRZ for each pass individually, same formula as in tuneDistance3D */
+    std::vector<double> m_PARAMtuneDeltaPt; /**< tunes current filter dPt for each pass individually, same formula as in tuneDistance3D */
+    std::vector<double> m_PARAMtuneDeltaDistance2IP; /**< tunes current filter dd2IP for each pass individually, same formula as in tuneDistance3D */
     std::vector<double> m_PARAMtuneCircleFit; /**< tunes current filter CircleFit for each pass individually, here it is the global threshold value for the chi2-values produced by the fit which is stored */
-    std::vector<double> m_PARAMtuneAngles3DHioC; /**< tunes current filter a3D (high occupancy mode) for each pass individually */
-    std::vector<double> m_PARAMtuneAnglesXYHioC; /**< tunes current filter aXY (high occupancy mode) for each pass individually */
-    std::vector<double> m_PARAMtuneAnglesRZHioC; /**< tunes current filter aRZ (high occupancy mode) for each pass individually */
-    std::vector<double> m_PARAMtuneDeltaSlopeRZHioC; /**< tunes current filter dslopeRZ (high occupancy mode) for each pass individually */
-    std::vector<double> m_PARAMtuneDistanceDeltaZHioC; /**< tunes current filter ddZ (high occupancy mode) for each pass individually */
-    std::vector<double> m_PARAMtuneDistance2IPHioC; /**< tunes current filter d2IP (high occupancy mode) for each pass individually */
-    std::vector<double> m_PARAMtunePTHioC; /**< tunes current filter PT (high occupancy mode) for each pass individually */
-    std::vector<double> m_PARAMtuneHelixFitHioC; /**< tunes current filter HelixFit (high occupancy mode) for each pass individually */
-    std::vector<double> m_PARAMtuneDeltaPtHioC; /**< tunes current filter dPt (high occupancy mode) for each pass individually */
-    std::vector<double> m_PARAMtuneDeltaDistance2IPHioC; /**< tunes current filter dd2IP (high occupancy mode) for each pass individually */
+    std::vector<double> m_PARAMtuneAngles3DHioC; /**< tunes current filter a3D (high occupancy mode) for each pass individually, same formula as in tuneDistance3D */
+    std::vector<double> m_PARAMtuneAnglesXYHioC; /**< tunes current filter aXY (high occupancy mode) for each pass individually, same formula as in tuneDistance3D */
+    std::vector<double> m_PARAMtuneAnglesRZHioC; /**< tunes current filter aRZ (high occupancy mode) for each pass individually, same formula as in tuneDistance3D */
+    std::vector<double> m_PARAMtuneDeltaSlopeRZHioC; /**< tunes current filter dslopeRZ (high occupancy mode) for each pass individually, same formula as in tuneDistance3D */
+    std::vector<double> m_PARAMtuneDistanceDeltaZHioC; /**< tunes current filter ddZ (high occupancy mode) for each pass individually, same formula as in tuneDistance3D */
+    std::vector<double> m_PARAMtuneDistance2IPHioC; /**< tunes current filter d2IP (high occupancy mode) for each pass individually, same formula as in tuneDistance3D */
+    std::vector<double> m_PARAMtunePTHioC; /**< tunes current filter PT (high occupancy mode) for each pass individually, same formula as in tuneDistance3D */
+    std::vector<double> m_PARAMtuneHelixFitHioC; /**< tunes current filter HelixFit (high occupancy mode) for each pass individually, same formula as in tuneDistance3D */
+    std::vector<double> m_PARAMtuneDeltaPtHioC; /**< tunes current filter dPt (high occupancy mode) for each pass individually, same formula as in tuneDistance3D */
+    std::vector<double> m_PARAMtuneDeltaDistance2IPHioC; /**< tunes current filter dd2IP (high occupancy mode) for each pass individually, same formula as in tuneDistance3D */
 
 
     std::vector<double> m_PARAMsetupWeigh; /**< allows to individually weigh (level of surpression) each setup/pass. Please choose between 0 and -100 (%), higher momentum setups are more reliable, therefore should be weighed best */
@@ -529,6 +529,7 @@ namespace Belle2 {
     int m_TESTERcountTotalTCsAfterTCC; /**< counts number of TCs found by TCC */
     int m_TESTERcountTotalTCsAfterTCCFilter; /**< counts number of TCs which survived the tcc filter */
     int m_TESTERcountTotalTCsFinal; /**< counts number of TCs which survived until the end of event */
+    int m_TESTERcountTotalUsedIndicesFinal; /**< counts number of indices used by TCs which survived until the end of event */
     int m_TESTERbadHopfieldCtr; /**< counts number of events, where no TC survived the Hopfield network */
     int m_TESTERHopfieldLetsOverbookedTCsAliveCtr;/**< counts number of times, where TC survived the Hopfield network although being still overbooked */
     int m_TESTERfilteredBadSeedTCs; /**< counts number of TCs which were filtered by calcInitialValues4TCs because of bad seed properties */

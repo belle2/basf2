@@ -119,7 +119,7 @@ print ''
 setupFileNamevxd = setupFileName + 'VXD'
 filterCalc = register_module('FilterCalculator')
 filterCalc.logging.log_level = LogLevel.DEBUG
-filterCalc.logging.debug_level = 1
+filterCalc.logging.debug_level = 10
 param_fCalc = {  # -1 = VXD, 0 = PXD, 1 = SVD
                  # # completely different to values of Belle2-detector
     'detectorType': -1,
@@ -146,7 +146,7 @@ filterCalc.param(param_fCalc)
 setupFileNamesvd = setupFileName + 'SVD'
 filterCalc2 = register_module('FilterCalculator')
 filterCalc2.logging.log_level = LogLevel.DEBUG
-filterCalc2.logging.debug_level = 1
+filterCalc2.logging.debug_level = 10
 param_fCalc2 = {  # -1 = VXD, 0 = PXD, 1 = SVD
                   # # completely different to values of Belle2-detector
                   # arbitrary origin

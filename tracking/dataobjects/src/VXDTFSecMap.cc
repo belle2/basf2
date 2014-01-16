@@ -70,6 +70,8 @@ void VXDTFSecMap::importRawSectorMap(Belle2::VXDTFRawSecMap& rawMap)
 
   setMagneticFieldStrength(rawMap.getMagneticFieldStrength());
 
+  setDistances(rawMap.getDistances());
+
   stringstream originPos;
   originPos << " x: " << getOrigin()[0] << ", y: " << getOrigin()[1] << ", z: " << getOrigin()[2];
   B2DEBUG(1, " now the following parameters are set: mapName " << getMapName() << ", detectorType " << getDetectorType() << ", magneticFieldStrength " << getMagneticFieldStrength() << ", origin " << originPos.str())

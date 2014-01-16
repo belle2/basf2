@@ -60,6 +60,13 @@ namespace Belle2 {
     /** setter - addOuterSegmentCell adds a VXDSegmentCell to member vector carrying inner Cells. 'outer' means, that these Cells are connected with sectors of outer layers. */
     void addOuterSegmentCell(VXDSegmentCell* newSegment) { m_outerSegmentCells.push_back(newSegment); }
 
+    /** setter - set distance of sector to origin defined by sectorMap */
+    void setDistance(double distance) { m_distance2Origin = distance; }
+
+
+    /** getter - get distance of sector to origin defined by sectorMap */
+    double getDistance() { return m_distance2Origin; }
+
     /** getter - getSecID returns the ID of the sector (for definition of secID, see m_sectorID). */
     unsigned int getSecID() const { return m_sectorID; }
 
@@ -102,6 +109,8 @@ namespace Belle2 {
     std::vector<VXDSegmentCell*> m_outerSegmentCells; /**< vector of VXDSegmentCells connected to this sector pointing away from the IP */
 
     FriendMap m_friendMap; /**< map of compatible sectors (where neighbouring hits can be retrieved) */
+
+    double m_distance2Origin; /**< especially relevant for testbeam- and other testing scenarios. Defines distance of the sector to the origin defined by the sectorMap. Needed for the CA (directed graph) if layerNumbers are not consecutive */
   };
 
   /** @}*/

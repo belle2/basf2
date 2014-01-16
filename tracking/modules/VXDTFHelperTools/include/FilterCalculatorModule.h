@@ -58,8 +58,8 @@ namespace Belle2 {
       m_secID(fullSecID),
       m_uniID(aUniID),
       m_timeStamp(0),
-      m_pxdHit(NULL),
-      m_svdHit(NULL),
+//       m_pxdHit(NULL),
+//       m_svdHit(NULL),
       m_pdg(pdg) { checkDirectionOfFlight(hit, mom); }
 
     /** Operator '<' overloaded using hit-time-information for comparison */
@@ -81,11 +81,11 @@ namespace Belle2 {
     /** returns timeStamp of current hit */
     float getTimeStamp() const { return m_timeStamp; }
 
-    /** returns pointer of trueHit, only valid if this the VXDHit is a svdHit */
-    const SVDTrueHit* getSVDHit() const { return m_svdHit; }
+//     /** returns pointer of trueHit, only valid if this the VXDHit is a svdHit */
+//     const SVDTrueHit* getSVDHit() const { return m_svdHit; }
 
-    /** returns pointer of trueHit, only valid if this the VXDHit is a pxdHit */
-    const PXDTrueHit* getPXDHit() const { return m_pxdHit; }
+//     /** returns pointer of trueHit, only valid if this the VXDHit is a pxdHit */
+//     const PXDTrueHit* getPXDHit() const { return m_pxdHit; }
 
     /** returns global hit position of current hit */
     TVector3 getHitPosition() { return m_hitPos; } // global coordinates
@@ -96,23 +96,16 @@ namespace Belle2 {
     /** returns uniID of sensor containing this hit */
     int getUniID() { return m_uniID; }
 
-    /** setter for svdHit */
-    void setSVDHit(const SVDTrueHit* aHit) {
-      if (m_type == Const::SVD) {
-        m_svdHit = aHit;
-        m_timeStamp = aHit->getGlobalTime();
-        //        std::cout << " global timestamp: " << m_timeStamp << std::endl;
-      } else { B2ERROR("Class VXDHit of FilterCalculatorModule: input type != hitType(SVD)!") }
-    }
+//    template<class aTmpl>
+//     void setTrueHit(const aTmpl* aHit) { // TODO why can't I use this? (it complains about being the wrong type...)
+//      m_timeStamp = aHit->getGlobalTime();
+//       if (m_type == Const::SVD) {
+//         m_svdHit = aHit;
+//       } else if (m_type == Const::PXD) {
+//         m_pxdHit = aHit;
+//       } else { B2ERROR("Class VXDHit of FilterCalculatorModule: input type is neither hitType(SVD) nor hitType(PXD)") }
+//     } /**< setter for the TrueHit */
 
-    /** setter for pxdHit */
-    void setPXDHit(const PXDTrueHit* aHit) {
-      if (m_type == Const::PXD) {
-        m_pxdHit = aHit;
-        m_timeStamp = aHit->getGlobalTime();
-        //        std::cout << " global timestamp: " << m_timeStamp << std::endl;
-      } else { B2ERROR("Class VXDHit of FilterCalculatorModule: input type != hitType(PXD)!") }
-    }
 
     /** setHit to vertex*/
     void setVertex() {
@@ -135,8 +128,8 @@ namespace Belle2 {
     std::string m_secID; /**< ID of sector containing this hit */
     int m_uniID; /**< ID of sensor containing this hit */
     float m_timeStamp; /**< timestamp of hit (real info, needed for sorting) */
-    const PXDTrueHit* m_pxdHit; /**< pointer to pxdHit (only set if it is a pxdHit) */
-    const SVDTrueHit* m_svdHit; /**< pointer to svdHit (only set if it is a svdHit) */
+//     const PXDTrueHit* m_pxdHit; /**< pointer to pxdHit (only set if it is a pxdHit) */
+//     const SVDTrueHit* m_svdHit; /**< pointer to svdHit (only set if it is a svdHit) */
     int m_pdg; /**< pdgCode of particle causing hit */
     TVector3 m_hitPos; /**< global hit position */
   };
@@ -300,13 +293,14 @@ namespace Belle2 {
     typedef std::pair<std::string, FMSectorFriends> MapEntry;  /**< Entry of sectorMap */
 
     /** constructor */
-    Sector(float v1, float v2, float u1v1, float u1v2, float u2v1, float u2v2, std::string myName):
+    Sector(float v1, float v2, float u1v1, float u1v2, float u2v1, float u2v2, double distance, std::string myName):
       m_usageCounter(1),
       m_secName(myName),
       m_edgeO(std::make_pair(u1v1, v1)),
       m_edgeU(std::make_pair(u2v1, v1)),
       m_edgeV(std::make_pair(u1v2, v2)),
-      m_edgeUV(std::make_pair(u2v2, v2)) {
+      m_edgeUV(std::make_pair(u2v2, v2)),
+      m_distanceToOrigin(distance) {
       m_friendMap.clear();
     }
 
@@ -343,6 +337,12 @@ namespace Belle2 {
       return completeInfoOfSector;
     }
 
+    /** returns name of sector */
+    std::string getName() { return m_secName; }
+
+    /** returns name of sector */
+    std::string getSectorID() { return m_secName; }
+
     /** increases usage counter */
     void increaseCounter() { m_usageCounter++; }
 
@@ -361,6 +361,9 @@ namespace Belle2 {
     /** returns edgeUV (local coordinates) */
     std::pair<float, float> getEdgeUV() { return m_edgeUV; }
 
+    /** returns distance of sector to origin of current secMap-geometry */
+    double getDistance2Origin() { return m_distanceToOrigin; }
+
   protected:
     int m_usageCounter; /**< counts number of times current sector is used */
     std::string m_secName; /**< name of sector  */
@@ -369,6 +372,7 @@ namespace Belle2 {
     std::pair<float, float> m_edgeV; /**< local coordinates of edge lying in V-direction compared to edgeO */
     std::pair<float, float> m_edgeUV; /**< local coordinates of diagonally lied edge compared to edgeO */
     std::map<std::string, FMSectorFriends> m_friendMap; /**< map of friends attached to thisSector */
+    double m_distanceToOrigin; /**< stores Info of distance of this sector (using the the center of the sector) to the origin for current sector map (used by TB-version of VXDTF to determine where are the innermost and where are the outermost sectors) */
   };
 
 
@@ -399,6 +403,9 @@ namespace Belle2 {
 
     virtual void terminate();
 
+    template<class Tmpl>
+    bool createSectorAndHit(Belle2::Const::EDetector detectorID, int pdg, const Tmpl* aSiTrueHitPtr, VXDTrack& newTrack, MapOfSectors* thisSecMap); /**< internal member - takes hit, calculates sector (and creates it if it is not existing yet) and creates internal VXDHit for further calculation. If return value is true, everything worked fine. If not, then hit was not created (no info about the sector-creation) */
+
   protected:
     MapOfSectors m_sectorMap; /**< sectormap contains full info about sectors (will always be calculated) */
     std::vector <MapOfSectors*>  m_sectorMaps; /**< vector contains sectormap for each range of transverse momentum chosen by m_pTcuts */
@@ -426,7 +433,7 @@ namespace Belle2 {
     double m_PARAMmaxXYvertexDistance; /**< allows to abort particles having their production vertex too far away from the origin (XY-plane) */
     double m_PARAMmaxZvertexDistance; /**< allows to abort particles having their production vertex too far away from the origin (z-dist) */
     std::vector<double> m_PARAMsetOrigin; /**< allows to reset orign (e.g. usefull for special cases like testbeams), only valid if 3 entries are found */
-    bool m_PARAMtestBeam; /**< some things which are important for the real detector are a problem for testbeams, if you want to use the filterCalculator and the testBeam = false does not work, then try setting the parameter to true */
+    int m_PARAMtestBeam; /**< some things which are important for the real detector are a problem for testbeams, if you want to use the filterCalculator and the testBeam = false does not work, then try setting the parameter to true */
     double m_PARAMmagneticFieldStrength; /**< strength of magnetic field in Tesla, standard is 1.5T */
 
     bool m_PARAMsecMapWriteToAscii; /**< if true, secMap data is stored to ascii files (standard setting is true)*/
@@ -488,6 +495,7 @@ namespace Belle2 {
     int m_pxdHitCounter; /**< counts total number of pxd true hits */
     int m_svdHitCounter; /**< counts total number of svd true hits */
     std::vector<int> m_trackletMomentumCounter;  /**< counts the number of tracklets for each sectorSetup */
+    TVector3 m_origin; /**< this point in space is assumed to be the interaction point (no matter whether the real IP lies there) */
   private:
   };
 }

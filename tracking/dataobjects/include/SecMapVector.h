@@ -26,7 +26,7 @@ namespace Belle2 {
    * @{
    */
 
-  /** A simple TObject-wrapper for std::vector of VXDTFRawSecMap
+  /** A simple TObject-wrapper for std::vector of VXDTFRawSecMap (contains full raw SecMap info created in filterCalculatorModule)
    */
   class SecMapVector: public TObject {
   public:

@@ -43,6 +43,7 @@ REG_MODULE(FilterCalculator)
 //                 Implementation
 //-----------------------------------------------------------------
 
+
 /// /// /// /// /// /// /// /// CONSTRUCTOR /// /// /// /// /// /// /// ///
 FilterCalculatorModule::FilterCalculatorModule() : Module()
 {
@@ -91,7 +92,7 @@ FilterCalculatorModule::FilterCalculatorModule() : Module()
 
   addParam("setOrigin", m_PARAMsetOrigin, "standard origin is (0,0,0). If you want to have the map calculated for another origin, set here(x,y,z) - WARNING for testbeam cases, this is a typical source for strange results", originVec);
 
-  addParam("testBeam", m_PARAMtestBeam, "if normal mode does not produce a full sectormap, try setting it to testBeam-mode = true (testbeam true does not assume that the IP is at the origin and ignores curler)", bool(false));
+  addParam("testBeam", m_PARAMtestBeam, "if normal mode does not produce a full sectormap, try setting it to testBeam-mode = 1 (testbeam true does not assume that the IP is at the origin and ignores curler) or even testBeam-mode = 2 (next to mode 1 features it ignores tracks jumping e.g. from layer 1 to 7 (telescopes), should only be used with care since some bad cases can not be caught that way)", int(0));
 
   addParam("magneticFieldStrength", m_PARAMmagneticFieldStrength, "set strength of magnetic field in Tesla, standard is 1.5T", double(1.5));
 
@@ -154,10 +155,14 @@ FilterCalculatorModule::FilterCalculatorModule() : Module()
 
 }
 
+
+
 /// /// /// /// /// /// /// /// DESTRUCTOR /// /// /// /// /// /// /// ///
 FilterCalculatorModule::~FilterCalculatorModule()
 {
 }
+
+
 
 /// /// /// /// /// /// /// /// INITIALIZE /// /// /// /// /// /// /// ///
 void FilterCalculatorModule::initialize()
@@ -169,6 +174,7 @@ void FilterCalculatorModule::initialize()
     m_PARAMsetOrigin.push_back(0);
     m_PARAMsetOrigin.push_back(0);
   }
+  m_origin.SetXYZ(m_PARAMsetOrigin.at(0), m_PARAMsetOrigin.at(1), m_PARAMsetOrigin.at(2));
 
   if (m_PARAMminTrackletLength < 2) {
     B2ERROR("FilterCalculatorModule::initialize: minTrackletLength is set to " << m_PARAMminTrackletLength << " which can't produce any usefull results, setting value to 2, but consider setting the parameter to 3 which is the recommended minimal length")
@@ -176,17 +182,10 @@ void FilterCalculatorModule::initialize()
   }
 
 
-  /** WARNING TODO
-   *
-   * MapName so ändern, dass es mit neuem Berechnungssystem kompatibel gemacht werden kann (sodass auch der VXDTF damit was anfangen kann).
-   * teste neue Map mit neuer Geometrie
-   * repariere, falls was net passt
-   * backup der lokalen files
-   * test der üblichen example-Files (evtl noch neues Skript schreiben, welches für commits brav alles testet)
-   * update des lokalen FWs
-   * schau, ob immer noch alles funzt
-   * commits*/
-
+  if (m_PARAMtestBeam < 0 or m_PARAMtestBeam > 2) {
+    B2ERROR("FilterCalculatorModule::initialize: testbeam-parameter set to " << m_PARAMtestBeam << " which is not allowed. Setting to 0. If you do not know the correct choice, please type 'basf2 -m VXDTF' and read the description.")
+    m_PARAMtestBeam = 0;
+  }
 
 
   if (m_PARAManalysisWriteToRoot == true) { // preparing output of analysis data:
@@ -211,6 +210,8 @@ void FilterCalculatorModule::initialize()
   StoreArray<PXDTrueHit>::required();
   StoreArray<SVDTrueHit>::required();
 }
+
+
 
 /// /// /// /// /// /// /// /// BEGIN RUN /// /// /// /// /// /// /// ///
 void FilterCalculatorModule::beginRun()
@@ -305,6 +306,7 @@ void FilterCalculatorModule::beginRun()
     m_rootFilePtr = NULL;
     m_treeEventWisePtr = NULL;
   }
+
   /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ reset counters ~~~~~~~~~~~~~~~~ ///
   m_eventCounter = 0;
   m_badHitsCounter = 0;
@@ -318,13 +320,12 @@ void FilterCalculatorModule::beginRun()
   m_badFilterValueCtr = 0;
 }
 
+
+
 /// /// /// /// /// /// /// /// EVENT /// /// /// /// /// /// /// ///
 void FilterCalculatorModule::event()
 {
-  double pMaxInMeV = 10000., pMinInMeV = 10.;
-  TVector3 origin(m_PARAMsetOrigin.at(0), m_PARAMsetOrigin.at(1), m_PARAMsetOrigin.at(2));
-
-  VXD::GeoCache& geometry = VXD::GeoCache::getInstance();
+  double pMaxInMeV = 10000., pMinInMeV = 10.; /// WARNING hardcoded values!
 
   //get the data
   StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
@@ -340,7 +341,8 @@ void FilterCalculatorModule::event()
   int numOfSvdTrueHits = aSvdTrueHitArray.getEntries();
 
   if (numOfMcParticles == 0) {
-    B2FATAL("event " << m_eventCounter << ": there is no MCParticle!")
+    B2WARNING("event " << m_eventCounter << ": there is no MCParticle!")
+    return;
   } else if (numOfPxdTrueHits == 0 && m_PARAMdetectorType not_eq Const::SVD) {
     B2WARNING("event " << m_eventCounter << ": there are no PXDTrueHits")
     return;
@@ -350,9 +352,7 @@ void FilterCalculatorModule::event()
   }
 
   RelationIndex<MCParticle, PXDTrueHit> relationMcPxdTrueHit;
-//   int sizeOfRelMcPxdTrueHit = relationMcPxdTrueHit.size();
   RelationIndex<MCParticle, SVDTrueHit> relationMcSvdTrueHit;
-//  int sizeOfRelMcSvdTrueHit = relationMcSvdTrueHit.size();
 
   if (m_PARAMtracksPerEvent > numOfMcParticles) {
     B2ERROR("FilterCalculatorModule: input parameter wrong (tracks per event) - reset to maximum value")
@@ -415,7 +415,7 @@ void FilterCalculatorModule::event()
     }
 
 
-    B2DEBUG(20, "FilterCalculatorModule - event " << m_eventCounter << ": chosenSecMap is " << chosenSecMap << " with lower pt threshold of " << m_PARAMpTcuts.at(chosenSecMap))
+    B2DEBUG(20, "FilterCalculatorModule - event " << m_eventCounter << ": chosenSecMap is " << chosenSecMap << " with lower pt threshold of " << m_PARAMpTcuts.at(chosenSecMap) << " with particle id/pdg: " << iPart << "/" << pdg << " having pT: " << mcMomValue)
     MapOfSectors* thisSecMap = m_sectorMaps.at(chosenSecMap);
 
     VXDTrack newTrack(iPart); // will now filled with PXD and SVD-Hits from same particle
@@ -426,100 +426,14 @@ void FilterCalculatorModule::event()
       RelationIndex<MCParticle, PXDTrueHit>::range_from iterPairMcPxd = relationMcPxdTrueHit.getElementsFrom(aMcParticlePtr);
       for (const auto & relElement : iterPairMcPxd) {
         const PXDTrueHit* const aSiTrueHitPtr = relElement.to;
-        double uTrue = aSiTrueHitPtr->getU();
-        double vTrue = aSiTrueHitPtr->getV();
-        double u = uTrue;
-        double v = vTrue;
-        pLocal = aSiTrueHitPtr->getMomentum();
 
-        VxdID aVxdID = aSiTrueHitPtr->getSensorID();
-        VXD::SensorInfoBase aSensorInfo = geometry.getSensorInfo(aVxdID);
+        bool creatingHitSuccessfull = createSectorAndHit(Const::PXD, pdg, aSiTrueHitPtr, newTrack, thisSecMap);/// createSectorAndHit
 
-        // local(0,0,0) is the center of the sensorplane
-        double vSize1 = 0.5 * aSensorInfo.getVSize();
-        double uSizeAtHit = 0.5 * aSensorInfo.getUSize(v);
-
-        if (m_PARAMsmearHits == true) {
-          const PXD::SensorInfo& geometryPXD = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(aVxdID));
-          double sigmaU = geometryPXD.getUPitch(uTrue) * m_PARAMuniSigma;
-          double sigmaV = geometryPXD.getVPitch(vTrue) * m_PARAMuniSigma;
-
-          B2DEBUG(100, "sigU sigV: " << sigmaU << " " << sigmaV);
-          u = gRandom->Gaus(uTrue, sigmaU);
-          v = gRandom->Gaus(vTrue, sigmaV);
-
-          if (v + vSize1 < 0 or v > vSize1) { v = vTrue; }
-          uSizeAtHit = 0.5 * aSensorInfo.getUSize(v);
-
-          if (u + uSizeAtHit < 0 or u > uSizeAtHit) { u = uTrue; }
-        }
-
-        hitLocal.SetXYZ(u, v, 0);
-        hitGlobal = aSensorInfo.pointToGlobal(hitLocal);
-        pGlobal = aSensorInfo.vectorToGlobal(pLocal);
-
-        double uCoord = hitLocal[0] + uSizeAtHit; // *0,5 putting (0,0) from the center to the edge of the plane (considers the trapeziodal shape)
-        double vCoord = hitLocal[1] + vSize1;
-
-        m_totalGlobalCoordValue += hitGlobal[0] + hitGlobal[1] + hitGlobal[2];
-        m_totalLocalCoordValue += uCoord + vCoord;
-        m_totalHitCounter++;
-
-        double sectorEdgeV1 = 0, sectorEdgeV2 = 0, uSizeAtv1 = 0, uSizeAtv2 = 0, sectorEdgeU1OfV1 = 0, sectorEdgeU1OfV2 = 0, sectorEdgeU2OfV1 = 0, sectorEdgeU2OfV2 = 0;
-
-        int aUniID = aVxdID.getID();
-        int aLayerID = aVxdID.getLayerNumber();
-        B2DEBUG(20, "local pxd hit coordinates (u,v): (" << hitLocal[0] << "," << hitLocal[1] << ") @layer: " << aLayerID);
-        unsigned int aSecID = 0;
-        string aSectorName;
-
-        // searching for sector:
-        for (int j = 0; j != int(m_PARAMsectorConfigU.size() - 1); ++j) {
-
-          if (uCoord >= (m_PARAMsectorConfigU.at(j)*uSizeAtHit * 2) && uCoord <= (m_PARAMsectorConfigU.at(j + 1)*uSizeAtHit * 2)) {
-
-            for (int k = 0; k != int(m_PARAMsectorConfigV.size() - 1); ++k) {
-
-              if (vCoord >= (m_PARAMsectorConfigV.at(k)*vSize1 * 2) && vCoord <= (m_PARAMsectorConfigV.at(k + 1)*vSize1 * 2)) {
-                aSecID = k + 1 + j * (m_PARAMsectorConfigV.size() - 1);
-                B2DEBUG(20, "I have found a SecID: " << aSecID);
-
-                sectorEdgeV1 = m_PARAMsectorConfigV.at(k) * vSize1 * 2 - vSize1;
-                sectorEdgeV2 = m_PARAMsectorConfigV.at(k + 1) * vSize1 * 2 - vSize1;
-                uSizeAtv1 = 0.5 * aSensorInfo.getUSize(sectorEdgeV1);
-                uSizeAtv2 = 0.5 * aSensorInfo.getUSize(sectorEdgeV2);
-                sectorEdgeU1OfV1 = m_PARAMsectorConfigU.at(j) * uSizeAtv1 * 2 - uSizeAtv1;
-                sectorEdgeU1OfV2 = m_PARAMsectorConfigU.at(j) * uSizeAtv2 * 2 - uSizeAtv2;
-                sectorEdgeU2OfV1 = m_PARAMsectorConfigU.at(j + 1) * uSizeAtv1 * 2 - uSizeAtv1;
-                sectorEdgeU2OfV2 = m_PARAMsectorConfigU.at(j + 1) * uSizeAtv2 * 2 - uSizeAtv2;
-
-                B2DEBUG(100, "Sector edges: O(" << sectorEdgeU1OfV1 << "," << sectorEdgeV1 << "), U(" << sectorEdgeU2OfV1 << "," << sectorEdgeV1 << "), V(" << sectorEdgeU1OfV2 << "," << sectorEdgeV2 << "), UV(" << sectorEdgeU2OfV2 << "," << sectorEdgeV2 << ")")
-                aSectorName = (boost::format("%1%_%2%_%3%") % aLayerID % aUniID % aSecID).str();
-                if (thisSecMap->find(aSectorName) == thisSecMap->end()) { // fallback solution using one secMap for whole range of pT
-                  Sector newSector(sectorEdgeV1, sectorEdgeV2, sectorEdgeU1OfV1, sectorEdgeU1OfV2, sectorEdgeU2OfV1, sectorEdgeU2OfV2, aSectorName);
-                  thisSecMap->insert(make_pair(aSectorName, newSector));
-                } else {
-                  thisSecMap->find(aSectorName)->second.increaseCounter();
-                }
-              }
-            }
-          }
-        } //sector-searching loop
-
-        if (aLayerID <= m_PARAMhighestAllowedLayer) {
+        if (creatingHitSuccessfull == true) {
           m_pxdHitCounter++;
           B2DEBUG(20, "adding new PXD hit of track " << iPart)
-          VXDHit newHit(Const::PXD, aSectorName, aUniID, hitGlobal, pGlobal, pdg); // (0 = PXD hit)
-          if (m_PARAManalysisWriteToRoot == true /*and m_PARAMstoreExtraAnalysis == true*/) {
-            if (aLayerID == 1) {
-              m_rootmomValuesInLayer1.push_back(pGlobal.Mag());
-              m_rootpTValuesInLayer1.push_back(pGlobal.Perp());
-            } // TODO here for layer 2 too, if anyone wants to analyze that
-          }
-          newHit.setPXDHit(aSiTrueHitPtr);
-          newTrack.addHit(newHit);
         }
-      }
+      } // now each hit knows in which direction the particle goes, in which sector it lies and where it is
     } // finished adding PXD-Hits
 
     if (m_PARAMdetectorType not_eq Const::PXD) { // want SVDhits
@@ -528,97 +442,14 @@ void FilterCalculatorModule::event()
       RelationIndex<MCParticle, SVDTrueHit>::range_from iterPairMcSvd = relationMcSvdTrueHit.getElementsFrom(aMcParticlePtr);
       for (const auto & relElement : iterPairMcSvd) {
         const SVDTrueHit* const aSiTrueHitPtr = relElement.to;
-        double uTrue = aSiTrueHitPtr->getU();
-        double vTrue = aSiTrueHitPtr->getV();
-        double u = uTrue;
-        double v = vTrue;
-        pLocal = aSiTrueHitPtr->getMomentum();
 
-        VxdID aVxdID = aSiTrueHitPtr->getSensorID();
-        VXD::SensorInfoBase aSensorInfo = geometry.getSensorInfo(aVxdID);
+        bool creatingHitSuccessfull = createSectorAndHit(Const::SVD, pdg, aSiTrueHitPtr, newTrack, thisSecMap);/// createSectorAndHit
 
-        // local(0,0,0) is the center of the sensorplane
-        double vSize1 = 0.5 * aSensorInfo.getVSize();
-        double uSizeAtHit = 0.5 * aSensorInfo.getUSize(v);
-
-        if (m_PARAMsmearHits == true) {
-          const SVD::SensorInfo& geometrySVD = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(aVxdID));
-          double sigmaU = geometrySVD.getUPitch(uTrue) * m_PARAMuniSigma;
-          double sigmaV = geometrySVD.getVPitch(vTrue) * m_PARAMuniSigma;
-
-          B2DEBUG(100, "sigU sigV: " << sigmaU << " " << sigmaV);
-          u = gRandom->Gaus(uTrue, sigmaU);
-          v = gRandom->Gaus(vTrue, sigmaV);
-
-          if (v + vSize1 < 0 or v > vSize1) { v = vTrue; }
-          uSizeAtHit = 0.5 * aSensorInfo.getUSize(v);
-
-          if (u + uSizeAtHit < 0 or u > uSizeAtHit) { u = uTrue; }
-        }
-
-        hitLocal.SetXYZ(u, v, 0);
-        hitGlobal = aSensorInfo.pointToGlobal(hitLocal);
-
-        double uCoord = hitLocal[0] + uSizeAtHit; // *0,5 putting (0,0) from the center to the edge of the plane (considers the trapeziodal shape)
-        double vCoord = hitLocal[1] + vSize1;
-
-        m_totalGlobalCoordValue += hitGlobal[0] + hitGlobal[1] + hitGlobal[2];
-        m_totalLocalCoordValue += uCoord + vCoord;
-        m_totalHitCounter++;
-
-        double sectorEdgeV1 = 0, sectorEdgeV2 = 0, uSizeAtv1 = 0, uSizeAtv2 = 0, sectorEdgeU1OfV1 = 0, sectorEdgeU1OfV2 = 0, sectorEdgeU2OfV1 = 0, sectorEdgeU2OfV2 = 0;
-
-
-        int aUniID = aVxdID.getID();
-        int aLayerID = aVxdID.getLayerNumber();
-
-        B2DEBUG(20, "local svd hit coordinates (u,v): (" << hitLocal[0] << "," << hitLocal[1] << ") @layer: " << aLayerID);
-        unsigned int aSecID = 0;
-        string aSectorName;
-        // searching for sector:
-        for (int j = 0; j != int(m_PARAMsectorConfigU.size() - 1); ++j) {
-          B2DEBUG(150, "uCuts(j)*uSize: " << m_PARAMsectorConfigU.at(j)*uSizeAtHit << " uCuts(j+1)*uSize: " << m_PARAMsectorConfigU.at(j + 1)*uSizeAtHit);
-
-          if (uCoord >= (m_PARAMsectorConfigU.at(j)*uSizeAtHit * 2) && uCoord <= (m_PARAMsectorConfigU.at(j + 1)*uSizeAtHit * 2)) {
-
-            for (int k = 0; k != int(m_PARAMsectorConfigV.size() - 1); ++k) {
-              B2DEBUG(150, " vCuts(k)*vSize: " << m_PARAMsectorConfigV.at(k)*vSize1 << " vCuts(k+1)*vSize: " << m_PARAMsectorConfigV.at(k + 1)*vSize1);
-
-              if (vCoord >= (m_PARAMsectorConfigV.at(k)*vSize1 * 2) && vCoord <= (m_PARAMsectorConfigV.at(k + 1)*vSize1 * 2)) {
-                aSecID = k + 1 + j * (m_PARAMsectorConfigV.size() - 1);
-                B2DEBUG(20, "I have found a SecID: " << aSecID);
-
-                sectorEdgeV1 = m_PARAMsectorConfigV.at(k) * vSize1 * 2 - vSize1;
-                sectorEdgeV2 = m_PARAMsectorConfigV.at(k + 1) * vSize1 * 2 - vSize1;
-                uSizeAtv1 = 0.5 * aSensorInfo.getUSize(sectorEdgeV1);
-                uSizeAtv2 = 0.5 * aSensorInfo.getUSize(sectorEdgeV2);
-                sectorEdgeU1OfV1 = m_PARAMsectorConfigU.at(j) * uSizeAtv1 * 2 - uSizeAtv1;
-                sectorEdgeU1OfV2 = m_PARAMsectorConfigU.at(j) * uSizeAtv2 * 2 - uSizeAtv2;
-                sectorEdgeU2OfV1 = m_PARAMsectorConfigU.at(j + 1) * uSizeAtv1 * 2 - uSizeAtv1;
-                sectorEdgeU2OfV2 = m_PARAMsectorConfigU.at(j + 1) * uSizeAtv2 * 2 - uSizeAtv2;
-
-                B2DEBUG(150, "Sector edges: O(" << sectorEdgeU1OfV1 << "," << sectorEdgeV1 << "), U(" << sectorEdgeU2OfV1 << "," << sectorEdgeV1 << "), V(" << sectorEdgeU1OfV2 << "," << sectorEdgeV2 << "), UV(" << sectorEdgeU2OfV2 << "," << sectorEdgeV2 << ")")
-
-                aSectorName = (boost::format("%1%_%2%_%3%") % aLayerID % aUniID % aSecID).str();
-                if (thisSecMap->find(aSectorName) == thisSecMap->end()) { // fallback solution using one secMap for whole range of pT
-                  Sector newSector(sectorEdgeV1, sectorEdgeV2, sectorEdgeU1OfV1, sectorEdgeU1OfV2, sectorEdgeU2OfV1, sectorEdgeU2OfV2, aSectorName);
-                  thisSecMap->insert(make_pair(aSectorName, newSector));
-                } else {
-                  thisSecMap->find(aSectorName)->second.increaseCounter();
-                }
-              }
-            }
-          }
-        } //sector-searching loop
-
-        if (aLayerID <= m_PARAMhighestAllowedLayer) {
+        if (creatingHitSuccessfull == true) {
           m_svdHitCounter++;
           B2DEBUG(20, "adding new SVD hit of track " << iPart)
-          VXDHit newHit(Const::SVD, aSectorName, aUniID, hitGlobal, pGlobal, pdg); // (1 = SVD hit)
-          newHit.setSVDHit(aSiTrueHitPtr);
-          newTrack.addHit(newHit);
         }
-      } // now each hit knows in which direction the particle goes, in which sector it lies and where it is
+      }
     } // finished adding SVD-hits
 
     /// before doing useful stuff with that new track, we check for strange behavior ( e.g. we do not want tracks which produce more than one hit at any sensor)
@@ -636,9 +467,13 @@ void FilterCalculatorModule::event()
 
 
     string aSectorName = "0_00_0"; // virtual sector for decay vertices.
+    if (thisSecMap->find(aSectorName) == thisSecMap->end()) { // fallback solution using one secMap for whole range of pT
+      Sector newSector(0, 0, 0, 0, 0, 0, 0, aSectorName);
+      thisSecMap->insert(make_pair(aSectorName, newSector));
+    }
     MCParticle* mcp = aMcParticleArray[newTrack.getParticleID()];
 //      TVector3 mcvertex = mcp->getVertex();
-    TVector3 mcvertex = origin; /// we do not know the real vertex, therefore  we are storing the origin assumed by the setup!
+    TVector3 mcvertex = m_origin; /// we do not know the real vertex, therefore  we are storing the origin assumed by the setup!
     TVector3 mcmom = mcp->getMomentum();
     int mcPdg = mcp->getPDG();
     VXDHit newHit(Const::IR, aSectorName, 0, mcvertex, mcmom, mcPdg);
@@ -670,10 +505,10 @@ void FilterCalculatorModule::event()
 
       B2DEBUG(20, "copying track-segment into tracklet")
       ++riter;
-      if (m_PARAMtestBeam == true) { // does not care for particle movement since the particles do not come from the origin but from some arbritrary point of the coord system
+      if (m_PARAMtestBeam != 0) { // does not care for particle movement since the particles do not come from the origin but from some arbritrary point of the coord system
         while (riter != thisTrack.rend()) {
           friendUniID = riter->getUniID();
-          if (thisUniID != friendUniID) {
+          if (thisUniID != friendUniID) { // do not want to add two hits of same track on same sensor...
             if (dynamic_cast<VXDHit*>(&(*riter)) != NULL) { newTracklet.addHit(*riter); }
           } else {
             string thisSecName = riter->getSectorID();
@@ -687,18 +522,17 @@ void FilterCalculatorModule::event()
         if (riter != thisTrack.rend()) {
           if (direction != riter->getParticleMovement()) { continue; }
           while (direction == riter->getParticleMovement()) {
-            if (riter != thisTrack.rend()) {
-              friendUniID = riter->getUniID();
-              if (thisUniID != friendUniID) {
-                if (dynamic_cast<VXDHit*>(&(*riter)) != NULL) { newTracklet.addHit(*riter); }
-              } else {
-                string thisSecName = riter->getSectorID();
-                B2DEBUG(5, "at event " << m_eventCounter << ": track " << newTrack.getParticleID() << " with momentum of " << newTrack.getPt() << "GeV/c has got two trueHits with same direction of flight, distance of " << (oldRiter->getHitPosition() - riter->getHitPosition()).Mag() << " of each other and deltatimestamp " << (oldRiter->getTimeStamp() - riter->getTimeStamp()) << " in the same sensor :" << thisSecName << ". Hit discarded!")
-                thisSecMap->find(thisSecName)->second.decreaseCounter();
-                m_badHitsCounter++;
-              }
-              oldRiter = riter; ++riter; thisUniID = friendUniID;
-            } else { break; }
+            if (riter == thisTrack.rend()) { break; }
+            friendUniID = riter->getUniID();
+            if (thisUniID != friendUniID) {
+              if (dynamic_cast<VXDHit*>(&(*riter)) != NULL) { newTracklet.addHit(*riter); }
+            } else {
+              string thisSecName = riter->getSectorID();
+              B2DEBUG(5, "at event " << m_eventCounter << ": track " << newTrack.getParticleID() << " with momentum of " << newTrack.getPt() << "GeV/c has got two trueHits with same direction of flight, distance of " << (oldRiter->getHitPosition() - riter->getHitPosition()).Mag() << " of each other and deltatimestamp " << (oldRiter->getTimeStamp() - riter->getTimeStamp()) << " in the same sensor :" << thisSecName << ". Hit discarded!")
+              thisSecMap->find(thisSecName)->second.decreaseCounter();
+              m_badHitsCounter++;
+            }
+            oldRiter = riter; ++riter; thisUniID = friendUniID;
           }
         }
       }
@@ -730,7 +564,8 @@ void FilterCalculatorModule::event()
             friendIt = hitList.end();
             ++countedFails;
           } else {
-            if (currentSector.at(0) < friendSector.at(0)) {
+            if ((currentSector.at(0) < friendSector.at(0)) and (m_PARAMtestBeam < 2)) {
+              // Testbeam has got mixed layer numbers when using telescope
               B2WARNING("FilterCalculatorModule event " << m_eventCounter << ": tracklet has invalid sector-combination (outer/inner sector): " << currentSector << "/" << friendSector << "pID: " << newTracklet.getParticleID() << ", pT: " << newTracklet.getPt() << ", deleting friendHit")
               friendIt = hitList.erase(friendIt);
               ++countedFails;
@@ -786,7 +621,11 @@ void FilterCalculatorModule::event()
     } // slicing current track into moouth sized tracklets
   } // looping through particles
 
-  B2DEBUG(5, "finished tracklet-generation. " << trackletsOfEvent.size() << " tracklets and " << tracksOfEvent.size() << " tracks found")
+  int nTotalHits = 0;
+  for (auto tracklet : trackletsOfEvent) {
+    nTotalHits += tracklet.getTrack().size();
+  }
+  B2DEBUG(5, "finished tracklet-generation. " << trackletsOfEvent.size() << " tracklets and " << tracksOfEvent.size() << " tracks found having mean of " << float(nTotalHits) / float(trackletsOfEvent.size()))
   string currentSector, friendSector;
 //4hit-variables:
   TVector3 hitG, moHitG, graMoHitG, greGraMoHitG;
@@ -846,7 +685,7 @@ void FilterCalculatorModule::event()
             if (m_PARAMlogDeltaPt == true) {
               deltapT = m_fourHitFilterBox.deltapT();
               if (std::isnan(deltapT) == false) {
-                B2DEBUG(50, "4-hit-filter in event " << m_eventCounter << ": calculated deltapT-Value: " << deltapT << " gets stored ")
+                B2DEBUG(50, "4-hit-filter in event " << m_eventCounter << ": calculated deltapT-Value: " << deltapT << " gets stored in sector " << thisSectorPos->second.getSectorID())
                 thisSectorPos->second.addValue(friendSector, FilterID::deltapT, deltapT);
               } else {
                 m_badFilterValueCtr++; B2WARNING("4-hit-filter in event " << m_eventCounter << ": calculated deltapT-Value: " << deltapT << " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
@@ -857,7 +696,7 @@ void FilterCalculatorModule::event()
             if (m_PARAMlogDeltaDistCircleCenter == true) {
               deltaDistCircleCenter =  m_fourHitFilterBox.deltaDistCircleCenter();
               if (std::isnan(deltaDistCircleCenter) == false) {
-                B2DEBUG(50, "4-hit-filter in event " << m_eventCounter << ": calculated deltaDistCircleCenter-Value: " << deltaDistCircleCenter << " gets stored ")
+                B2DEBUG(50, "4-hit-filter in event " << m_eventCounter << ": calculated deltaDistCircleCenter-Value: " << deltaDistCircleCenter << " gets stored in sector " << thisSectorPos->second.getSectorID())
                 thisSectorPos->second.addValue(friendSector, FilterID::deltaDistance2IP, deltaDistCircleCenter);
               } else {
                 m_badFilterValueCtr++; B2WARNING("4-hit-filter in event " << m_eventCounter << ": calculated deltaDistCircleCenter-Value: " << deltaDistCircleCenter << " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
@@ -877,26 +716,26 @@ void FilterCalculatorModule::event()
           grandMotherHitGlobal = iter->getHitPosition();
 
           /// high occupancy mode for 3+1 hits
-          m_fourHitFilterBox.resetValues(hitGlobal, motherHitGlobal, grandMotherHitGlobal, origin); // outerhit, centerhit, innerhit
-          B2DEBUG(50, "3-hit and hioc 3+1: outer -> innerHit Perp and SecID \n" << hitGlobal.Perp() << "/" << currentSector << " " << motherHitGlobal.Perp() << "/" << friendSector << " " << grandMotherHitGlobal.Perp() << "/" << iter->getSectorID() << " " << origin.Perp())
-          if (m_PARAMlogDeltaPtHighOccupancy == true && lastRun == false) {
+          m_fourHitFilterBox.resetValues(hitGlobal, motherHitGlobal, grandMotherHitGlobal, m_origin); // outerhit, centerhit, innerhit
+          B2DEBUG(50, "3-hit and hioc 3+1: outer -> innerHit Perp and SecID \n" << hitGlobal.Perp() << "/" << currentSector << " " << motherHitGlobal.Perp() << "/" << friendSector << " " << grandMotherHitGlobal.Perp() << "/" << iter->getSectorID() << " " << m_origin.Perp())
+          if (m_PARAMlogDeltaPtHighOccupancy == true and lastRun == false) {
             deltapT = m_fourHitFilterBox.deltapT();
             if (std::isnan(deltapT) == false) {
-              B2DEBUG(50, "4-hit-filter in event " << m_eventCounter << ": calculated deltapTHighOccupancy-Value: " << deltapT << " gets stored ")
+              B2DEBUG(50, "4-hit-filter in event " << m_eventCounter << ": calculated deltapTHighOccupancy-Value: " << deltapT << " gets stored in sector " << thisSectorPos->second.getSectorID())
               thisSectorPos->second.addValue(friendSector, FilterID::deltapTHighOccupancy, deltapT);
             } else {
               m_badFilterValueCtr++; B2WARNING("4-hit-filter in event " << m_eventCounter << ": calculated deltapTHighOccupancy-Value: " << deltapT << " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
-              hitGlobal.Print(); motherHitGlobal.Print(); grandMotherHitGlobal.Print(); origin.Print();
+              hitGlobal.Print(); motherHitGlobal.Print(); grandMotherHitGlobal.Print(); m_origin.Print();
             }
           }
-          if (m_PARAMlogDeltaDistCircleCenterHighOccupancy == true && lastRun == false) {
+          if (m_PARAMlogDeltaDistCircleCenterHighOccupancy == true and lastRun == false) {
             deltaDistCircleCenter =  m_fourHitFilterBox.deltaDistCircleCenter();
             if (std::isnan(deltaDistCircleCenter) == false) {
-              B2DEBUG(50, "4-hit-filter in event " << m_eventCounter << ": calculated deltaDistCircleCenterHighOccupancy-Value: " << deltaDistCircleCenter << " gets stored ")
+              B2DEBUG(50, "4-hit-filter in event " << m_eventCounter << ": calculated deltaDistCircleCenterHighOccupancy-Value: " << deltaDistCircleCenter << " gets stored in sector " << thisSectorPos->second.getSectorID())
               thisSectorPos->second.addValue(friendSector, FilterID::deltaDistanceHighOccupancy2IP, deltaDistCircleCenter);
             } else {
               m_badFilterValueCtr++; B2WARNING("4-hit-filter in event " << m_eventCounter << ": calculated deltaDistCircleCenterHighOccupancy-Value: " << deltaDistCircleCenter << " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
-              hitGlobal.Print(); motherHitGlobal.Print(); grandMotherHitGlobal.Print(); origin.Print();
+              hitGlobal.Print(); motherHitGlobal.Print(); grandMotherHitGlobal.Print(); m_origin.Print();
             }
           }
           /// high occupancy mode - end
@@ -906,18 +745,18 @@ void FilterCalculatorModule::event()
           if (m_PARAMlogTRadiustoIPDistance == true) {
             dist2IP = m_threeHitFilterBox.calcCircleDist2IP();
             if (std::isnan(dist2IP) == false) {
-              B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated dist2IP-Value: " << dist2IP << " gets stored ")
+              B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated dist2IP-Value: " << dist2IP << " gets stored in sector " << thisSectorPos->second.getSectorID())
               thisSectorPos->second.addValue(friendSector, FilterID::distance2IP, dist2IP);
             } else {
               m_badFilterValueCtr++; B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculated dist2IP-Value: " << dist2IP << " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
-              hitGlobal.Print(); motherHitGlobal.Print(); grandMotherHitGlobal.Print(); origin.Print();
+              hitGlobal.Print(); motherHitGlobal.Print(); grandMotherHitGlobal.Print(); m_origin.Print();
             }
           }
 
           if (m_PARAMlogPt == true) {
             pT = m_threeHitFilterBox.calcPt();
             if (std::isnan(pT) == false) {
-              B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated pT-Value: " << pT << " gets stored ")
+              B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated pT-Value: " << pT << " gets stored in sector " << thisSectorPos->second.getSectorID())
               thisSectorPos->second.addValue(friendSector, FilterID::pT, pT);
             } else {
               m_badFilterValueCtr++; B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculated pT-Value: " << pT << " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
@@ -933,7 +772,7 @@ void FilterCalculatorModule::event()
           if (m_PARAMlogDeltaSlopeRZ == true) {
             deltaSlopeRZ = m_threeHitFilterBox.calcDeltaSlopeRZ();
             if (std::isnan(deltaSlopeRZ) == false) {
-              B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated deltaSlopeRZ-Value: " << deltaSlopeRZ << " gets stored ")
+              B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated deltaSlopeRZ-Value: " << deltaSlopeRZ << " gets stored in sector " << thisSectorPos->second.getSectorID())
               thisSectorPos->second.addValue(friendSector, FilterID::deltaSlopeRZ, deltaSlopeRZ);
             } else {
               m_badFilterValueCtr++; B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculated deltaSlopeRZ-Value: " << deltaSlopeRZ << " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
@@ -944,7 +783,7 @@ void FilterCalculatorModule::event()
           if (m_PARAMlogAngles3D == true) {
             angles3D = m_threeHitFilterBox.calcAngle3D();
             if (std::isnan(angles3D) == false) {
-              B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated angles3D-Value: " << angles3D << " gets stored ")
+              B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated angles3D-Value: " << angles3D << " gets stored in sector " << thisSectorPos->second.getSectorID())
               thisSectorPos->second.addValue(friendSector, FilterID::angles3D, angles3D);
             } else {
               m_badFilterValueCtr++; B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculated angles3D-Value: " << angles3D << " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
@@ -955,7 +794,7 @@ void FilterCalculatorModule::event()
           if (m_PARAMlogAnglesXY == true) {
             anglesXY = m_threeHitFilterBox.calcAngleXY();
             if (std::isnan(anglesXY) == false) {
-              B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated anglesXY-Value: " << anglesXY << " gets stored ")
+              B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated anglesXY-Value: " << anglesXY << " gets stored in sector " << thisSectorPos->second.getSectorID())
               thisSectorPos->second.addValue(friendSector, FilterID::anglesXY, anglesXY);
             }  else {
               m_badFilterValueCtr++; B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculated anglesXY-Value: " << anglesXY << " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
@@ -966,7 +805,7 @@ void FilterCalculatorModule::event()
           if (m_PARAMlogAnglesRZ == true) {
             anglesRZ = m_threeHitFilterBox.calcAngleRZ();
             if (std::isnan(anglesRZ) == false) {
-              B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated anglesRZ-Value: " << anglesRZ << " gets stored ")
+              B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated anglesRZ-Value: " << anglesRZ << " gets stored in sector " << thisSectorPos->second.getSectorID())
               thisSectorPos->second.addValue(friendSector, FilterID::anglesRZ, anglesRZ);
             } else {
               m_badFilterValueCtr++; B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculated anglesRZ-Value: " << anglesRZ << " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
@@ -977,7 +816,7 @@ void FilterCalculatorModule::event()
           if (m_PARAMlogHelixFit == true) {
             helixFit = m_threeHitFilterBox.calcHelixFit();
             if (std::isnan(helixFit) == false) {
-              B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated helixFit-Value: " << helixFit << " gets stored ")
+              B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated helixFit-Value: " << helixFit << " gets stored in sector " << thisSectorPos->second.getSectorID())
               thisSectorPos->second.addValue(friendSector, FilterID::helixFit, helixFit);
             } else {
               m_badFilterValueCtr++; B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculated helixFit-Value: " << helixFit << " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
@@ -993,6 +832,8 @@ void FilterCalculatorModule::event()
         friendSector = iter->getSectorID();
         thisSectorPos = thisSecMap->find(currentSector);
 
+        if (thisSectorPos == thisSecMap->end()) { B2ERROR(" sector " << currentSector << " not found...")} /// WARNING TODO WTF?!?
+
         if (typeid(string).name() != typeid(friendSector).name()) {
           B2WARNING("FilterCalculator event " << m_eventCounter << ": type of friendSector is no string, aborting tracklet...")
           continue;
@@ -1000,78 +841,78 @@ void FilterCalculatorModule::event()
 
         hitGlobal = it2HitsFilter->getHitPosition();
         motherHitGlobal = iter->getHitPosition();
-        B2DEBUG(50, "2-hit and hioc 2+1: outer -> innerHit Perp and SecID \n" << hitGlobal.Perp() << "/" << currentSector << " " << motherHitGlobal.Perp() << "/" << friendSector << " " << origin.Perp())
+        B2DEBUG(50, "2-hit and hioc 2+1: outer -> innerHit Perp and SecID \n" << hitGlobal.Perp() << "/" << currentSector << " " << motherHitGlobal.Perp() << "/" << friendSector << " " << m_origin.Perp())
 
         /// high occupancy mode for 2+1 hits
-        m_threeHitFilterBox.resetValues(hitGlobal, motherHitGlobal, origin); // outerhit, centerhit, innerhit
-        if (m_PARAMlogTRadiusHighOccupancytoIPDistance == true && lastRun == false) {
+        m_threeHitFilterBox.resetValues(hitGlobal, motherHitGlobal, m_origin); // outerhit, centerhit, innerhit
+        if (m_PARAMlogTRadiusHighOccupancytoIPDistance == true and lastRun == false) {
           dist2IP = m_threeHitFilterBox.calcCircleDist2IP();
           if (std::isnan(dist2IP) == false) {
-            B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated distHighOccupancy2IP-Value: " << dist2IP << " gets stored ")
+            B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated distHighOccupancy2IP-Value(FilterID " << FilterID::distanceHighOccupancy2IP << "): " << dist2IP << " for sector " << FullSecID(friendSector).getFullSecString() << " gets stored in sector " << thisSectorPos->second.getSectorID())
             thisSectorPos->second.addValue(friendSector, FilterID::distanceHighOccupancy2IP, dist2IP);
           } else {
             m_badFilterValueCtr++; B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculated distHighOccupancy2IP-Value: " << dist2IP << " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
-            hitGlobal.Print(); motherHitGlobal.Print(); origin.Print();
+            hitGlobal.Print(); motherHitGlobal.Print(); m_origin.Print();
           }
         }
-        if (m_PARAMlogPtHighOccupancy == true && lastRun == false) {
+        if (m_PARAMlogPtHighOccupancy == true and lastRun == false) {
           pT = m_threeHitFilterBox.calcPt();
           if (std::isnan(pT) == false) {
-            B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated pTHighOccupancy-Value: " << pT << " gets stored ")
+            B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated pTHighOccupancy-Value: " << pT << " gets stored in sector " << thisSectorPos->second.getSectorID())
             thisSectorPos->second.addValue(friendSector, FilterID::pTHighOccupancy, pT);
           } else {
             m_badFilterValueCtr++; B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculated pTHighOccupancy-Value: " << pT << " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
-            hitGlobal.Print(); motherHitGlobal.Print(); origin.Print();
+            hitGlobal.Print(); motherHitGlobal.Print(); m_origin.Print();
           }
         }
-        if (m_PARAMlogDeltaSlopeHighOccupancyRZ == true && lastRun == false) {
+        if (m_PARAMlogDeltaSlopeHighOccupancyRZ == true and lastRun == false) {
           deltaSlopeRZ = m_threeHitFilterBox.calcDeltaSlopeRZ();
           if (std::isnan(deltaSlopeRZ) == false) {
-            B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated deltaSlopeHighOccupancyRZ-Value: " << deltaSlopeRZ << " gets stored ")
+            B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated deltaSlopeHighOccupancyRZ-Value: " << deltaSlopeRZ << " gets stored in sector " << thisSectorPos->second.getSectorID())
             thisSectorPos->second.addValue(friendSector, FilterID::deltaSlopeHighOccupancyRZ, deltaSlopeRZ);
           } else {
             m_badFilterValueCtr++; B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculated deltaSlopeHighOccupancyRZ-Value: " << deltaSlopeRZ << " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
-            hitGlobal.Print(); motherHitGlobal.Print(); origin.Print();
+            hitGlobal.Print(); motherHitGlobal.Print(); m_origin.Print();
           }
         }
-        if (m_PARAMlogAnglesHighOccupancy3D == true && lastRun == false) {
+        if (m_PARAMlogAnglesHighOccupancy3D == true and lastRun == false) {
           angles3D = m_threeHitFilterBox.calcAngle3D();
           if (std::isnan(angles3D) == false) {
-            B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated anglesHighOccupancy3D-Value: " << angles3D << " gets stored ")
+            B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated anglesHighOccupancy3D-Value: " << angles3D << " gets stored in sector " << thisSectorPos->second.getSectorID())
             thisSectorPos->second.addValue(friendSector, FilterID::anglesHighOccupancy3D, angles3D);
           } else {
             m_badFilterValueCtr++; B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculated anglesHighOccupancy3D-Value: " << angles3D << " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
-            hitGlobal.Print(); motherHitGlobal.Print(); origin.Print();
+            hitGlobal.Print(); motherHitGlobal.Print(); m_origin.Print();
           }
         }
-        if (m_PARAMlogAnglesHighOccupancyXY == true && lastRun == false) {
+        if (m_PARAMlogAnglesHighOccupancyXY == true and lastRun == false) {
           anglesXY = m_threeHitFilterBox.calcAngleXY();
           if (std::isnan(anglesXY) == false) {
-            B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated anglesHighOccupancyXY-Value: " << anglesXY << " gets stored ")
+            B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated anglesHighOccupancyXY-Value: " << anglesXY << " gets stored in sector " << thisSectorPos->second.getSectorID())
             thisSectorPos->second.addValue(friendSector, FilterID::anglesHighOccupancyXY, anglesXY);
           }  else {
             m_badFilterValueCtr++; B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculated anglesHighOccupancyXY-Value: " << anglesXY << " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
-            hitGlobal.Print(); motherHitGlobal.Print(); origin.Print();
+            hitGlobal.Print(); motherHitGlobal.Print(); m_origin.Print();
           }
         }
-        if (m_PARAMlogAnglesHighOccupancyRZ == true && lastRun == false) {
+        if (m_PARAMlogAnglesHighOccupancyRZ == true and lastRun == false) {
           anglesRZ = m_threeHitFilterBox.calcAngleRZ();
           if (std::isnan(anglesRZ) == false) {
-            B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated anglesHighOccupancyRZ-Value: " << anglesRZ << " gets stored ")
+            B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated anglesHighOccupancyRZ-Value: " << anglesRZ << " gets stored in sector " << thisSectorPos->second.getSectorID())
             thisSectorPos->second.addValue(friendSector, FilterID::anglesHighOccupancyRZ, anglesRZ);
           } else {
             m_badFilterValueCtr++; B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculated anglesHighOccupancyRZ-Value: " << anglesRZ << " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
-            hitGlobal.Print(); motherHitGlobal.Print(); origin.Print();
+            hitGlobal.Print(); motherHitGlobal.Print(); m_origin.Print();
           }
         }
-        if (m_PARAMlogHelixHighOccupancyFit == true && lastRun == false) {
+        if (m_PARAMlogHelixHighOccupancyFit == true and lastRun == false) {
           helixFit = m_threeHitFilterBox.calcHelixFit();
           if (std::isnan(helixFit) == false) {
-            B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated helixHighOccupancyFit-Value: " << helixFit << " gets stored ")
+            B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated helixHighOccupancyFit-Value: " << helixFit << " gets stored in sector " << thisSectorPos->second.getSectorID())
             thisSectorPos->second.addValue(friendSector, FilterID::helixHighOccupancyFit, helixFit);
           } else {
             m_badFilterValueCtr++; B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculated helixHighOccupancyFit-Value: " << helixFit << " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
-            hitGlobal.Print(); motherHitGlobal.Print(); origin.Print();
+            hitGlobal.Print(); motherHitGlobal.Print(); m_origin.Print();
           }
         }
         /// high occupancy mode - end
@@ -1081,7 +922,7 @@ void FilterCalculatorModule::event()
         if (m_PARAMlogDistanceXY == true) {
           distanceXY = m_twoHitFilterBox.calcDistXY();
           if (std::isnan(distanceXY) == false) {
-            B2DEBUG(50, "2-hit-filter in event " << m_eventCounter << ": calculated distanceXY-Value: " << distanceXY << " gets stored ")
+            B2DEBUG(50, "2-hit-filter in event " << m_eventCounter << ": calculated distanceXY-Value: " << distanceXY << " gets stored in sector " << thisSectorPos->second.getSectorID())
             thisSectorPos->second.addValue(friendSector, FilterID::distanceXY, distanceXY);
           } else {
             m_badFilterValueCtr++; B2WARNING("2-hit-filter in event " << m_eventCounter << ": calculated distanceXY-Value: " << distanceXY << " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
@@ -1092,7 +933,7 @@ void FilterCalculatorModule::event()
         if (m_PARAMlogDistanceZ == true) {
           distanceZ = m_twoHitFilterBox.calcDistZ();
           if (std::isnan(distanceZ) == false) {
-            B2DEBUG(50, "2-hit-filter in event " << m_eventCounter << ": calculated distanceZ-Value: " << distanceZ << " gets stored ")
+            B2DEBUG(50, "2-hit-filter in event " << m_eventCounter << ": calculated distanceZ-Value: " << distanceZ << " gets stored in sector " << thisSectorPos->second.getSectorID())
             thisSectorPos->second.addValue(friendSector, FilterID::distanceZ, distanceZ);
           } else {
             m_badFilterValueCtr++; B2WARNING("2-hit-filter in event " << m_eventCounter << ": calculated distanceZ-Value: " << distanceZ << " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
@@ -1103,7 +944,7 @@ void FilterCalculatorModule::event()
         if (m_PARAMlogDistance3D == true) {
           distance3D = m_twoHitFilterBox.calcDist3D();
           if (std::isnan(distance3D) == false) {
-            B2DEBUG(50, "2-hit-filter in event " << m_eventCounter << ": calculated distance3D-Value: " << distance3D << " gets stored ")
+            B2DEBUG(50, "2-hit-filter in event " << m_eventCounter << ": calculated distance3D-Value: " << distance3D << " gets stored in sector " << thisSectorPos->second.getSectorID())
             thisSectorPos->second.addValue(friendSector, FilterID::distance3D, distance3D);
           } else {
             m_badFilterValueCtr++; B2WARNING("2-hit-filter in event " << m_eventCounter << ": calculated distance3D-Value: " << distance3D << " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
@@ -1114,7 +955,7 @@ void FilterCalculatorModule::event()
         if (m_PARAMlogNormedDistance3D == true) {
           normedDistance3D = m_twoHitFilterBox.calcNormedDist3D();
           if (std::isnan(normedDistance3D) == false) {
-            B2DEBUG(50, "2-hit-filter in event " << m_eventCounter << ": calculated normedDistance3D-Value: " << normedDistance3D << " gets stored ")
+            B2DEBUG(50, "2-hit-filter in event " << m_eventCounter << ": calculated normedDistance3D-Value: " << normedDistance3D << " gets stored in sector " << thisSectorPos->second.getSectorID())
             thisSectorPos->second.addValue(friendSector, FilterID::normedDistance3D, normedDistance3D);
           } else {
             m_badFilterValueCtr++; B2WARNING("2-hit-filter in event " << m_eventCounter << ": calculated normedDistance3D-Value: " << normedDistance3D << " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
@@ -1125,7 +966,7 @@ void FilterCalculatorModule::event()
         if (m_PARAMlogSlopeRZ == true) {
           slopeRZ = m_twoHitFilterBox.calcSlopeRZ();
           if (std::isnan(slopeRZ) == false) {
-            B2DEBUG(50, "2-hit-filter in event " << m_eventCounter << ": calculated slopeRZ-Value: " << slopeRZ << " gets stored ")
+            B2DEBUG(50, "2-hit-filter in event " << m_eventCounter << ": calculated slopeRZ-Value: " << slopeRZ << " gets stored in sector " << thisSectorPos->second.getSectorID())
             thisSectorPos->second.addValue(friendSector, FilterID::slopeRZ, slopeRZ);
           } else {
             m_badFilterValueCtr++; B2WARNING("2-hit-filter in event " << m_eventCounter << ": calculated slopeRZ-Value: " << slopeRZ << " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
@@ -1145,6 +986,8 @@ void FilterCalculatorModule::event()
   }
   B2DEBUG(5, "FilterCalculator - event " << m_eventCounter << ", calculations done!")
 }
+
+
 
 /// /// /// /// /// /// /// /// END RUN /// /// /// /// /// /// /// ///
 void FilterCalculatorModule::endRun()
@@ -1185,6 +1028,7 @@ void FilterCalculatorModule::endRun()
     B2INFO("writing " << secMapSize << " entries of secmap " << m_PARAMsecMapNames.at(smCtr))
 
     VXDTFRawSecMap::StrippedRawSecMap rootSecMap;
+    VXDTFRawSecMap::SectorDistancesMap distanceOfSectorsMap; // stores the secID in .first and the value for the distances in .second
 
     for (SecMapEntry thisEntry : *thisMap) {
       if (secMapSize > 10) {
@@ -1205,6 +1049,7 @@ void FilterCalculatorModule::endRun()
           rootSecMap.push_back(make_pair(FullSecID(thisEntry.first).getFullSecID(), thisEntry.second.exportFriendsRoot()));
         }
 
+        distanceOfSectorsMap.push_back(make_pair(FullSecID(thisEntry.first).getFullSecID(), thisEntry.second.getDistance2Origin()));
         thisEntry.second.clearFriends();
         ctr++;
       } else {
@@ -1212,10 +1057,17 @@ void FilterCalculatorModule::endRun()
       }
     }
 
+    stringstream sectorDistances;
+
+    for (VXDTFRawSecMap::SectorDistance aValue : distanceOfSectorsMap) {
+      sectorDistances << FullSecID(aValue.first).getFullSecString() << "/" << aValue.second << "\n";
+    }
+    B2DEBUG(1, "the following sectors had the following distances to the chosen origin:\n" << sectorDistances.str())
+
     if (m_PARAMsecMapWriteToRoot == true and rootSecMap.size() != 0) {
 
       bool doNotAddMapAgain = false;
-      if (doNotAddMapAgain == false) {   /// TODO why shouldn't I add a map?
+      if (doNotAddMapAgain == false) {   /// TODO why shouldn't I add a map? ATM these two lines are pretty useless...
 
         // fill in data:
         VXDTFRawSecMap newTemporarySecMap;
@@ -1232,10 +1084,10 @@ void FilterCalculatorModule::endRun()
         }
         newTemporarySecMap.setSectorConfigU(m_PARAMsectorConfigU);
         newTemporarySecMap.setSectorConfigV(m_PARAMsectorConfigV);
-        TVector3 origin(m_PARAMsetOrigin.at(0), m_PARAMsetOrigin.at(1), m_PARAMsetOrigin.at(2));
-        newTemporarySecMap.setOrigin(origin);
+        newTemporarySecMap.setOrigin(m_origin);
         newTemporarySecMap.setMagneticFieldStrength(m_PARAMmagneticFieldStrength);
         newTemporarySecMap.setLowerMomentumThreshold(m_PARAMpTcuts.at(smCtr));
+        newTemporarySecMap.addDistances(distanceOfSectorsMap);
         if (smCtr + 1 > int(m_PARAMpTcuts.size())) {
           newTemporarySecMap.setHigherMomentumThreshold(std::numeric_limits<double>::max());
         } else {
@@ -1285,9 +1137,134 @@ void FilterCalculatorModule::endRun()
   B2INFO("~~~~~~~~~~~FilterCalculator - end of endRun ~~~~~~~~~~")
 }
 
+
+
 /// /// /// /// /// /// /// /// TERMINATE /// /// /// /// /// /// /// ///
 void FilterCalculatorModule::terminate()
 {
   B2INFO(" FilterCalculatorModule, everything is done. Terminating.")
 }
 
+
+
+template<class Tmpl>
+bool FilterCalculatorModule::createSectorAndHit(Belle2::Const::EDetector detectorID, int pdg, const Tmpl* const aSiTrueHitPtr, VXDTrack& newTrack, MapOfSectors* thisSecMap)
+{
+  bool success = false; // tells us whether everything went fine
+
+  double uTrue = aSiTrueHitPtr->getU();
+  double vTrue = aSiTrueHitPtr->getV();
+  double u = uTrue;
+  double v = vTrue;
+
+  VxdID aVxdID = aSiTrueHitPtr->getSensorID();
+  VXD::GeoCache& geometry = VXD::GeoCache::getInstance();
+  VXD::SensorInfoBase aSensorInfo = geometry.getSensorInfo(aVxdID);
+
+  // local(0,0,0) is the center of the sensorplane
+  double vSize1 = 0.5 * aSensorInfo.getVSize();
+  double uSizeAtHit = 0.5 * aSensorInfo.getUSize(v);
+
+  if (m_PARAMsmearHits == true) {
+    double sigmaU = 0, sigmaV = 0;
+    if (detectorID == Const::PXD) {
+      const PXD::SensorInfo& geometryPXD = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(aVxdID));
+      sigmaU = geometryPXD.getUPitch(uTrue) * m_PARAMuniSigma;
+      sigmaV = geometryPXD.getVPitch(vTrue) * m_PARAMuniSigma;
+
+    } else if (detectorID == Const::SVD) {
+      const SVD::SensorInfo& geometrySVD = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(aVxdID));
+      sigmaU = geometrySVD.getUPitch(uTrue) * m_PARAMuniSigma;
+      sigmaV = geometrySVD.getVPitch(vTrue) * m_PARAMuniSigma;
+
+    }
+    B2DEBUG(100, "smearing hits using sigU, sigV: " << sigmaU << " " << sigmaV << " at DetectorID: " << detectorID);
+    u = gRandom->Gaus(uTrue, sigmaU);
+    v = gRandom->Gaus(vTrue, sigmaV);
+
+    if (v + vSize1 < 0 or v > vSize1) { v = vTrue; } // boundary checks
+    uSizeAtHit = 0.5 * aSensorInfo.getUSize(v);
+
+    if (u + uSizeAtHit < 0 or u > uSizeAtHit) { u = uTrue; }  // boundary checks
+  }
+
+  TVector3 hitLocal(u, v, 0);
+  TVector3 hitGlobal = aSensorInfo.pointToGlobal(hitLocal);
+  TVector3 pGlobal = aSiTrueHitPtr->getMomentum(); // yet it is pLocal, simply reusing the vector
+  pGlobal = aSensorInfo.vectorToGlobal(pGlobal);
+
+  double uCoord = hitLocal[0] + uSizeAtHit; // *0,5 putting (0,0) from the center to the edge of the plane (considers the trapeziodal shape)
+  double vCoord = hitLocal[1] + vSize1;
+
+  m_totalGlobalCoordValue += hitGlobal[0] + hitGlobal[1] + hitGlobal[2];
+  m_totalLocalCoordValue += uCoord + vCoord;
+  m_totalHitCounter++;
+
+  double sectorEdgeV1 = 0, sectorEdgeV2 = 0, uSizeAtv1 = 0, uSizeAtv2 = 0, sectorEdgeU1OfV1 = 0, sectorEdgeU1OfV2 = 0, sectorEdgeU2OfV1 = 0, sectorEdgeU2OfV2 = 0, centerU = 0, centerV = 0, dist2Origin = 0;
+  TVector3 centerOfSector;
+
+
+  int aUniID = aVxdID.getID();
+  int aLayerID = aVxdID.getLayerNumber();
+  B2DEBUG(20, "local svd hit coordinates (u,v): (" << hitLocal[0] << "," << hitLocal[1] << ") @layer: " << aLayerID);
+  unsigned int aSecID = 0;
+  string aSectorName;
+
+  // searching for sector:
+  for (int j = 0; j != int(m_PARAMsectorConfigU.size() - 1); ++j) {
+    B2DEBUG(150, "uCuts(j)*uSize: " << m_PARAMsectorConfigU.at(j)*uSizeAtHit << " uCuts(j+1)*uSize: " << m_PARAMsectorConfigU.at(j + 1)*uSizeAtHit);
+
+    if (uCoord >= (m_PARAMsectorConfigU.at(j)*uSizeAtHit * 2) && uCoord <= (m_PARAMsectorConfigU.at(j + 1)*uSizeAtHit * 2)) {
+
+      for (int k = 0; k != int(m_PARAMsectorConfigV.size() - 1); ++k) {
+        B2DEBUG(150, " vCuts(k)*vSize: " << m_PARAMsectorConfigV.at(k)*vSize1 << " vCuts(k+1)*vSize: " << m_PARAMsectorConfigV.at(k + 1)*vSize1);
+
+        if (vCoord >= (m_PARAMsectorConfigV.at(k)*vSize1 * 2) && vCoord <= (m_PARAMsectorConfigV.at(k + 1)*vSize1 * 2)) {
+          aSecID = k + 1 + j * (m_PARAMsectorConfigV.size() - 1);
+
+          sectorEdgeV1 = m_PARAMsectorConfigV.at(k) * vSize1 * 2 - vSize1;
+          sectorEdgeV2 = m_PARAMsectorConfigV.at(k + 1) * vSize1 * 2 - vSize1;
+          uSizeAtv1 = 0.5 * aSensorInfo.getUSize(sectorEdgeV1);
+          uSizeAtv2 = 0.5 * aSensorInfo.getUSize(sectorEdgeV2);
+          sectorEdgeU1OfV1 = m_PARAMsectorConfigU.at(j) * uSizeAtv1 * 2 - uSizeAtv1;
+          sectorEdgeU1OfV2 = m_PARAMsectorConfigU.at(j) * uSizeAtv2 * 2 - uSizeAtv2;
+          sectorEdgeU2OfV1 = m_PARAMsectorConfigU.at(j + 1) * uSizeAtv1 * 2 - uSizeAtv1;
+          sectorEdgeU2OfV2 = m_PARAMsectorConfigU.at(j + 1) * uSizeAtv2 * 2 - uSizeAtv2;
+          centerV = sectorEdgeV2 + 0.5 * (sectorEdgeV1 - sectorEdgeV2); /// WARNING Berechnung falsch!
+          centerU = aSensorInfo.getUSize(centerV); // uSizeAtCenterU
+          centerU = m_PARAMsectorConfigU.at(j) * centerU - m_PARAMsectorConfigU.at(j + 1) * centerU ;
+          centerOfSector.SetXYZ(centerU, centerV, 0);
+          centerOfSector = aSensorInfo.pointToGlobal(centerOfSector);
+          dist2Origin = (centerOfSector - m_origin).Mag();
+
+          aSectorName = (boost::format("%1%_%2%_%3%") % aLayerID % aUniID % aSecID).str();
+          B2DEBUG(20, "I have found a SecID: " << aSectorName << " with centerU/V: " << centerU << "/" << centerV);
+          B2DEBUG(100, "Sector edges: O(" << sectorEdgeU1OfV1 << "," << sectorEdgeV1 << "), U(" << sectorEdgeU2OfV1 << "," << sectorEdgeV1 << "), V(" << sectorEdgeU1OfV2 << "," << sectorEdgeV2 << "), UV(" << sectorEdgeU2OfV2 << "," << sectorEdgeV2 << "), centerU/V: " << centerU << "/" << centerV)
+
+          if (thisSecMap->find(aSectorName) == thisSecMap->end()) { // fallback solution using one secMap for whole range of pT
+            Sector newSector(sectorEdgeV1, sectorEdgeV2, sectorEdgeU1OfV1, sectorEdgeU1OfV2, sectorEdgeU2OfV1, sectorEdgeU2OfV2, dist2Origin, aSectorName);
+            thisSecMap->insert(make_pair(aSectorName, newSector));
+          } else {
+            thisSecMap->find(aSectorName)->second.increaseCounter();
+          }
+        }
+      }
+    }
+  } //sector-searching loop
+
+  if (aLayerID <= m_PARAMhighestAllowedLayer) {
+    VXDHit newHit(detectorID, aSectorName, aUniID, hitGlobal, pGlobal, pdg);
+//    newHit.setTrueHit(aSiTrueHitPtr);
+    newTrack.addHit(newHit);
+    success = true;
+
+    if (m_PARAManalysisWriteToRoot == true /*and m_PARAMstoreExtraAnalysis == true*/) {
+      if (aLayerID == 1) {
+        m_rootmomValuesInLayer1.push_back(pGlobal.Mag());
+        m_rootpTValuesInLayer1.push_back(pGlobal.Perp());
+      } // optional TODO here for the other layers too, if anyone wants to analyze that
+    }
+  }
+
+  return success;
+} /**< internal member - checks if given value is < threshold, if it is, reset to threshold */

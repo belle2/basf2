@@ -40,6 +40,8 @@ namespace Belle2 {
     typedef std::pair<unsigned int, SectorValues> SectorPack; /**< .first is secID of current sector, second is SectorValue */
     typedef std::vector < SectorPack > StrippedRawSecMap; /**< stores all Sectors and a raw version of the data (no calculated cutoffs yet)*/
     typedef std::vector< unsigned int > IDVector; /**< stores IDs of sectors or friends */
+    typedef std::pair<unsigned int, double> SectorDistance; /**< stores distance to origin (.second) for sector (.first) */
+    typedef std::vector< SectorDistance > SectorDistancesMap; /**< stores vector of SectorDistanceInfo */
     // well, without typedef this would be:
     // vector< pair< unsigned int, vector< pair< unsigned int, vector< pair< unsigned int, vector<double> > > > > > > .... hail typedefs -.-
 
@@ -104,6 +106,11 @@ namespace Belle2 {
 
     /** getter - returns full sectorMapInformation */
     StrippedRawSecMap& getSectorMap() { return m_sectorMap; }
+
+
+
+    /** getter - returns information for each sector carrying the distance between chosen origin and the center of the sector plane */
+    SectorDistancesMap& getDistances() { return m_dist2OriginMap; }
 
 
 
@@ -237,6 +244,11 @@ namespace Belle2 {
 
     /** setter - set lower threshold for transverse momentum stored in that map */
     void setLowerMomentumThreshold(double newInfo) { m_lowPt = newInfo; }
+
+
+
+    /** setter - add new distance map (nformation for each sector carrying the distance between chosen origin and the center of the sector plane) to current one. If current one is empty, it will get replaced by new one */
+    void addDistances(SectorDistancesMap& aMap);
 
 
 
@@ -392,7 +404,9 @@ namespace Belle2 {
     std::pair<bool, double> m_rareSectorCombinations; /**< .first allows check for rare sectorCombinations if true, .second is the rareness-threshold (examples: 1. = 100%, 0.001 = 0.1%) if a sector-friend-combination occurs less than threshold value compared to total occurrence of current sector, it gets deleted*/
     std::pair<bool, int> m_maxLayerLevelDifference; /**< .first allows check for maximum difference in level of layers for current sector-friend-combination, .second sets max level difference (example: .second is 2, layerID of sector is 6, of friend is 3 -> more than threshold -> friend gets kicked) missing layers by choice of detector type are considered */
     bool m_removeDeadSectorChains; /**< if true, not only sectors having no friends after first filtering iteration are deleted but also all combinations where dead sectors were friends. If these combinations can lead to kill more sectors and therefore the map gets holey but clean of non-existing cases */
-    ClassDef(VXDTFRawSecMap, 1)
+    SectorDistancesMap m_dist2OriginMap; /**< stores the secID in .first and the value for the distances in .second */
+
+    ClassDef(VXDTFRawSecMap, 2)
   };
 
   /** @}*/

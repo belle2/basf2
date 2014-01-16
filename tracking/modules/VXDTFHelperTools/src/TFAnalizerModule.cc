@@ -735,14 +735,14 @@ void TFAnalizerModule::extractHits(genfit::TrackCand* aTC,
 //  TVector3 dirSeed = aTC->getDirSeed();
 //  double qOverP = aTC->getQoverPseed();
 //  double pOverQ = 1./qOverP;
-  TVector3 momentum, momentum_t, vertex, seedHit; // = pOverQ*dirSeed;
+  TVector3 momentum, /*momentum_t,*/ vertex, seedHit; // = pOverQ*dirSeed;
   momentum[0] = stateSeed(3); momentum[1] = stateSeed(4); momentum[2] = stateSeed(5);
   vertex[0] = stateSeed(0); vertex[1] = stateSeed(1); vertex[2] = stateSeed(2);
   seedHit = vertex; // for CATC seedHit is innermost hit of TC, for MCTC it is the vertex or the innermost hit
   double pValue = momentum.Mag();
-  momentum_t = momentum;
-  momentum_t.SetZ(0.);
-  double pT = momentum_t.Mag();
+//   momentum_t = momentum;
+//   momentum_t.SetZ(0.);
+  double pT = momentum.Perp();
   int pdgCode = aTC->getPdgCode();
   B2DEBUG(10, " tc number " << index << " with isMCTC " << isMCTC << " has got initial pValue " << pValue << ", pdgCode " << pdgCode << " and " << int(aTC->getNHits()) << " hits")
 

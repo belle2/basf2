@@ -49,7 +49,7 @@ eventinfoprinter = register_module('EventInfoPrinter')
 
 gearbox = register_module('Gearbox')
 # use simple testbeam geometry
-gearbox.param('fileName', 'testbeam/vxd/FullVXDTB.xml')
+gearbox.param('fileName', 'testbeam/vxd/FullTelescopeVXDTB.xml')  # FullTelescopeVXDTB # FullVXDTB
 
 geometry = register_module('Geometry')
 # only the tracking detectors will be simulated. Makes the example much faster
@@ -111,7 +111,7 @@ vxdtf.logging.debug_level = 2
 param_vxdtf = {  # normally we don't know the particleID, but in the case of the testbeam,
                  # we can expect (anti-?)electrons...
                  # True
-    'activateBaselineTF': 1,
+    'activateBaselineTF': 2,
     'tccMinState': [2],
     'tccMinLayer': [3],
     'standardPdgCode': -11,
@@ -124,8 +124,9 @@ param_vxdtf = {  # normally we don't know the particleID, but in the case of the
     'qiSmear': False,
     'smearSigma': 0.000001,
     'GFTrackCandidatesColName': 'caTracks',
-    'tuneCutoffs': 10,
+    'tuneCutoffs': 5,
     'activateDistanceXY': [False],
+    'activateDistance3D': [True],
     'activateAngles3DHioC': [False],
     'activateAnglesXYHioC': [False],
     'activateDeltaSlopeRZHioC': [False],
@@ -142,11 +143,11 @@ param_vxdtf = {  # normally we don't know the particleID, but in the case of the
     'activatePT': [False],
     'activateHelixFit': [False],
     'activateZigZagXY': [False],
-    'activateDeltaPt': [False],
+    'activateDeltaPt': [True],
     'activateCircleFit': [False],
     'tuneCircleFit': [0.00000001],
-    'tuneAngles3D': [0.1],
-    'tuneDistance3D': [0.1],
+    'tuneAngles3D': [-0.1],
+    'tuneDistance3D': [-0.1],
     }
 vxdtf.param(param_vxdtf)
 

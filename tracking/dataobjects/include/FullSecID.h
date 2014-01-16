@@ -22,17 +22,11 @@ namespace Belle2 {
   /** Class to identify a sector inside of the VXD.
    *
    * It allows to uniquely identify a SecID within the Vxd-SectorMap:
-   *  There are three representations for this: <br>
-   *  - Super-Layer, Layer within the Super-Layer, Wire within the Layer as documented
-   *  <a href="http://ekpbelle2.physik.uni-karlsruhe.de/~twiki/pub/Detector/CDC/WebHome/cdc_cell_num.pdf">here</a>, <br>
-   *  - Layer as continuous counted through all Super-Layers, Wire within the Layer, <br>
-   *  - Wire number encoded into a single unsigned short. This works as following: <br>
-   *  Layer: bits 0 -  3 (Values 0-6, calculated using shift: 28)           <br>
-   *  SubLayer:      bits 4 (Values 0,1, calculated using: 27)   <br>
-   *  VxdID:       bits 5 - 21 (Values: whole range of VxdIDs, calculated using: 11)           <br>
-   *  SecID:        bits 22 - 32 ( Values: 0 up to )
-   *
-   * Possible speed improvement: using bitshift instead of decimal operations. But interface stays the same, therefore can be done any time in the future
+   * The following information is coded into the FullSecID:
+   *  Layer: bits 0 -  3 (Values 0-15, calculated using shift: 28)
+   *  SubLayer:      bits 4 (Values 0,1, calculated using: 27)
+   *  VxdID:       bits 5 - 21 (Values: whole range of VxdIDs, calculated using: 11)
+   *  SecID:        bits 22 - 32 ( Values: 0 up to 2047)
    */
   class FullSecID {
   public:

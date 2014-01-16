@@ -376,3 +376,44 @@ void VXDTFRawSecMap::repairSecMap()
     B2DEBUG(20, "repairSecMap: secMap " << getMapName() << " had the following bad sectors (id/name): " << badSectors.str())
   }
 }
+
+
+
+void VXDTFRawSecMap::addDistances(SectorDistancesMap& aMap)
+{
+  if (int(aMap.size()) == 0) {
+    B2DEBUG(1, "addDistances: incoming map was empty");
+    return;
+  }
+
+  int oldSize = m_dist2OriginMap.size();
+  if (oldSize == 0) {
+//    for (SectorDistance aMapEntry: aMap) {
+//      B2WARNING(" aMapEntry f/s: " << aMapEntry.first <<"/" << aMapEntry.second)
+//    }
+    m_dist2OriginMap = aMap;
+    B2DEBUG(1, "addDistances: old map was empty, but new one is not (sectors: " << m_dist2OriginMap.size() << ") - replacing old map");
+//    for (SectorDistance aMapEntry: m_dist2OriginMap) {
+//      B2WARNING(" m_dist2OriginMap.Entry f/s: " << aMapEntry.first <<"/" << aMapEntry.second)
+//    }
+    return;
+  } // easy case, fully copy the new map
+  B2DEBUG(1, "addDistances: existing map had " << oldSize << " entries, importedMap has " << aMap.size() << " entries ")
+
+  // check old map (m_dist2OriginMap) for each entry of the new one whether there is already an entry. If there is not, add new entry
+  bool entryFound = false;
+  for (SectorDistance aMapEntry : aMap) {
+    for (SectorDistance oldMapEntry : m_dist2OriginMap) {
+      B2WARNING(" aMapEntry f/s: " << aMapEntry.first << "/" << aMapEntry.second << ", oldMapEntry f/s: " << oldMapEntry.first << "/" << oldMapEntry.second)
+      if (aMapEntry == oldMapEntry) { entryFound = true; break; }
+    }
+
+    if (entryFound == false) { m_dist2OriginMap.push_back(aMapEntry); }
+    entryFound = false;
+  }
+
+  B2DEBUG(1, "addDistances: " << m_dist2OriginMap.size() - oldSize << " entries were imported")
+  for (SectorDistance aMapEntry : m_dist2OriginMap) {
+    B2WARNING("after import: m_dist2OriginMap.Entry f/s: " << aMapEntry.first << "/" << aMapEntry.second)
+  }
+}

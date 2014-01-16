@@ -51,6 +51,11 @@ namespace Belle2 {
 
 
 
+    /** getter - returns information for each sector carrying the distance between chosen origin and the center of the sector plane */
+    VXDTFRawSecMap::SectorDistancesMap& getDistances() { return m_dist2OriginMap; }
+
+
+
     /** getter - returns name of sectorMap */
     std::string getMapName() const { return m_nameOfSecMap; }
 
@@ -116,6 +121,11 @@ namespace Belle2 {
 
 
 
+    /** setter - set DistanceMap (full explanation in RawSecMap ) */
+    void setDistances(VXDTFRawSecMap::SectorDistancesMap aMap) { m_dist2OriginMap = aMap; }
+
+
+
     /** setter - set name of detectorType */
     void setDetectorType(std::string newName) { m_detectorType = newName; }
 
@@ -175,7 +185,8 @@ namespace Belle2 {
     TVector3 m_origin; /**< defines the position of the assumed primary vertex */
     double m_magneticFieldStrength; /**< strength of magnetic field in Tesla, standard is 1.5T */
     std::string m_additionalInfo; /**< this variable is reserved for extra info which shall be stored in the container, e.g. date of production or other useful info for the user(it shall be formatted before storing it), this info will be displayed by the VXDTF on Info-level */
+    VXDTFRawSecMap::SectorDistancesMap m_dist2OriginMap; /**< stores the secID in .first and the value for the distances in .second */
 
-    ClassDef(VXDTFSecMap, 1)
+    ClassDef(VXDTFSecMap, 2)
   };
 }

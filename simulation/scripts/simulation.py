@@ -16,7 +16,7 @@ def add_simulation(path, components=None, bkgfiles=None):
     # detector geometry
     geometry = register_module('Geometry')
     if components:
-        geometry.param('Components', components)
+        geometry.param('components', components)
     path.add_module(geometry)
 
     # detector simulation

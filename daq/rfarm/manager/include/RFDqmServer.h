@@ -45,6 +45,7 @@ namespace Belle2 {
     RFLogManager*      m_log;
 
     int m_pid_dqm;
+    int m_pid_relay;
 
   };
 }

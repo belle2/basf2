@@ -37,7 +37,7 @@ namespace Belle2 {
   namespace TOPTB {
 
     SensitiveScintillator::SensitiveScintillator(int detectorID, EDetectorType type):
-      Simulation::SensitiveDetectorBase("TOP", SensitiveScintillator::Other),
+      Simulation::SensitiveDetectorBase("TOP", Const::invalidDetector),
       m_detectorID(detectorID), m_type(type), m_energyDeposit(0),
       m_meanTime(0), m_meanX(0), m_meanY(0), m_meanZ(0), m_trackID(0)
     {

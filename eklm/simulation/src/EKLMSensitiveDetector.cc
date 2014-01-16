@@ -23,7 +23,7 @@ using namespace Belle2;
 
 EKLM::EKLMSensitiveDetector::
 EKLMSensitiveDetector(G4String name, enum EKLMSensitiveType type)
-: Simulation::SensitiveDetectorBase(name, KLM)
+: Simulation::SensitiveDetectorBase(name, Const::KLM)
 {
   m_type = type;
   GearDir gd = GearDir("/Detector/DetectorComponent[@name=\"EKLM\"]/Content");

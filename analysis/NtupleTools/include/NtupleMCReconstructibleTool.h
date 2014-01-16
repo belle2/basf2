@@ -37,10 +37,12 @@ namespace Belle2 {
     int* m_iSeenInCDC;
     /** Particle seen in the TOP **/
     int* m_iSeenInTOP;
+    /** Particle seen in the ARICH **/
+    int* m_iSeenInARICH;
     /** Particle seen in the ECL **/
-    int* m_iLastSeenInECL;
+    int* m_iSeenInECL;
     /** Particle seen in the KLM **/
-    int* m_iLastSeenInKLM;
+    int* m_iSeenInKLM;
 
     /** Create branches in m_tree - this function should be called by the constructor only. */
     void setupTree();

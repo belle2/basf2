@@ -21,8 +21,9 @@ void NtupleMCReconstructibleTool::setupTree()
   m_iSeenInSVD = new int[nDecayProducts];
   m_iSeenInCDC = new int[nDecayProducts];
   m_iSeenInTOP = new int[nDecayProducts];
-  m_iLastSeenInECL = new int[nDecayProducts];
-  m_iLastSeenInKLM = new int[nDecayProducts];
+  m_iSeenInARICH = new int[nDecayProducts];
+  m_iSeenInECL = new int[nDecayProducts];
+  m_iSeenInKLM = new int[nDecayProducts];
 
   for (int iProduct = 0; iProduct < nDecayProducts; iProduct++) {
     m_tree->Branch((strNames[iProduct] + "_Reconstructible").c_str(), &m_iReconstructible[iProduct], (strNames[iProduct] + "_Reconstructible/I").c_str());
@@ -30,8 +31,9 @@ void NtupleMCReconstructibleTool::setupTree()
     m_tree->Branch((strNames[iProduct] + "_SeenInSVD").c_str(), &m_iSeenInSVD[iProduct], (strNames[iProduct] + "_SeenInSVD/I").c_str());
     m_tree->Branch((strNames[iProduct] + "_SeenInCDC").c_str(), &m_iSeenInCDC[iProduct], (strNames[iProduct] + "_SeenInCDC/I").c_str());
     m_tree->Branch((strNames[iProduct] + "_SeenInTOP").c_str(), &m_iSeenInTOP[iProduct], (strNames[iProduct] + "_SeenInTOP/I").c_str());
-    m_tree->Branch((strNames[iProduct] + "_LastSeenInECL").c_str(), &m_iLastSeenInECL[iProduct], (strNames[iProduct] + "_LastSeenInECL/I").c_str());
-    m_tree->Branch((strNames[iProduct] + "_LastSeenInKLM").c_str(), &m_iLastSeenInKLM[iProduct], (strNames[iProduct] + "_LastSeenInKLM/I").c_str());
+    m_tree->Branch((strNames[iProduct] + "_SeenInARICH").c_str(), &m_iSeenInARICH[iProduct], (strNames[iProduct] + "_SeenInARICH/I").c_str());
+    m_tree->Branch((strNames[iProduct] + "_SeenInECL").c_str(), &m_iSeenInECL[iProduct], (strNames[iProduct] + "_SeenInECL/I").c_str());
+    m_tree->Branch((strNames[iProduct] + "_SeenInKLM").c_str(), &m_iSeenInKLM[iProduct], (strNames[iProduct] + "_SeenInKLM/I").c_str());
   }
 }
 
@@ -52,8 +54,9 @@ void NtupleMCReconstructibleTool::eval(const Particle* particle)
     m_iSeenInSVD[iProduct] = 0;
     m_iSeenInCDC[iProduct] = 0;
     m_iSeenInTOP[iProduct] = 0;
-    m_iLastSeenInECL[iProduct] = 0;
-    m_iLastSeenInKLM[iProduct] = 0;
+    m_iSeenInARICH[iProduct] = 0;
+    m_iSeenInECL[iProduct] = 0;
+    m_iSeenInKLM[iProduct] = 0;
 
     const MCParticle* mcparticle = DataStore::getRelated<MCParticle>(selparticles[iProduct]);
     if (selparticles[iProduct]->getParticleType() == 6/*c_Composite*/) {
@@ -64,21 +67,22 @@ void NtupleMCReconstructibleTool::eval(const Particle* particle)
       m_iReconstructible[iProduct] =  0;
       /* if it is a track make sure it went through the SVD for now */
       if (abs(mcparticle->getCharge()) > 0) {
-        m_iReconstructible[iProduct] = (int) mcparticle->hasStatus(MCParticle::c_SeenInSVD);
+        m_iReconstructible[iProduct] = (int) mcparticle->hasSeenInDetector(Const::SVD);
         /* if it is a photon make sure it hit the ECL */
       } else if (abs(mcparticle->getPDG()) == 22) {
-        m_iReconstructible[iProduct] = (int) mcparticle->hasStatus(MCParticle::c_LastSeenInECL);
+        m_iReconstructible[iProduct] = (int) mcparticle->hasSeenInDetector(Const::ECL);
         /* if it is a klong make sure it hit the ECL */
       } else if (abs(mcparticle->getPDG()) == 130) {
-        m_iReconstructible[iProduct] = (int) mcparticle->hasStatus(MCParticle::c_LastSeenInECL);
+        m_iReconstructible[iProduct] = (int) mcparticle->hasSeenInDetector(Const::ECL);
       }
 
-      m_iSeenInPXD[iProduct] = (int)mcparticle->hasStatus(MCParticle::c_SeenInPXD);
-      m_iSeenInSVD[iProduct] = (int)mcparticle->hasStatus(MCParticle::c_SeenInSVD);
-      m_iSeenInCDC[iProduct] = (int)mcparticle->hasStatus(MCParticle::c_SeenInCDC);
-      m_iSeenInTOP[iProduct] = (int)mcparticle->hasStatus(MCParticle::c_SeenInTOP);
-      m_iLastSeenInECL[iProduct] = (int)mcparticle->hasStatus(MCParticle::c_LastSeenInECL);
-      m_iLastSeenInKLM[iProduct] = (int)mcparticle->hasStatus(MCParticle::c_LastSeenInKLM);
+      m_iSeenInPXD[iProduct] = (int)mcparticle->hasSeenInDetector(Const::PXD);
+      m_iSeenInSVD[iProduct] = (int)mcparticle->hasSeenInDetector(Const::SVD);
+      m_iSeenInCDC[iProduct] = (int)mcparticle->hasSeenInDetector(Const::CDC);
+      m_iSeenInTOP[iProduct] = (int)mcparticle->hasSeenInDetector(Const::TOP);
+      m_iSeenInARICH[iProduct] = (int)mcparticle->hasSeenInDetector(Const::ARICH);
+      m_iSeenInECL[iProduct] = (int)mcparticle->hasSeenInDetector(Const::ECL);
+      m_iSeenInKLM[iProduct] = (int)mcparticle->hasSeenInDetector(Const::KLM);
 
 
     }

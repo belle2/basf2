@@ -31,7 +31,7 @@ namespace Belle2 {
 
 
   BkgSensitiveDetector::BkgSensitiveDetector(const char* subDett, int iden):
-    Simulation::SensitiveDetectorBase("BKG", Simulation::SensitiveDetectorBase::Other), m_trackID(0), m_startPos(0., 0., 0.), m_startMom(0., 0., 0.), m_startTime(0), m_startEnergy(0), m_energyDeposit(0), m_trackLength(0.)
+    Simulation::SensitiveDetectorBase("BKG", Const::invalidDetector), m_trackID(0), m_startPos(0., 0., 0.), m_startMom(0., 0., 0.), m_startTime(0), m_startEnergy(0), m_energyDeposit(0), m_trackLength(0.)
   {
     StoreArray<MCParticle> mcParticles;
     StoreArray<BeamBackHit> beamBackHits;

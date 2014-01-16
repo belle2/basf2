@@ -74,7 +74,7 @@ TrackFinderMCTruthModule::TrackFinderMCTruthModule() : Module()
 
   //choose for which particles a track candidate should be created
   //this is just an attempt to find out what is the most suitable way to select particles, if you have other/better ideas, communicate it to the tracking group...
-  addParam("WhichParticles", m_whichParticles, "List of keywords to mark what properties particles must have to get a track candidate. If several properties are given all of them must be true: \"primary\" particle must come from the generator, \"PXD\", \"SVD\", \"CDC\", \"TOP\", \"ECL\" or \"KLM\" particle must have hits in the subdetector with that name. \"is:X\" where X is a PDG code: particle must have this code. \"from:X\" any of the particles's ancestors must have this (X) code" , vector<string>(1, "primary"));
+  addParam("WhichParticles", m_whichParticles, "List of keywords to mark what properties particles must have to get a track candidate. If several properties are given all of them must be true: \"primary\" particle must come from the generator, \"PXD\", \"SVD\", \"CDC\", \"TOP\", \"ARICH\", \"ECL\" or \"KLM\" particle must have hits in the subdetector with that name. \"is:X\" where X is a PDG code: particle must have this code. \"from:X\" any of the particles's ancestors must have this (X) code" , vector<string>(1, "primary"));
   addParam("EnergyCut", m_energyCut, "Track candidates are only created for MCParticles with energy larger than this cut ", double(0.1));
   addParam("Neutrals", m_neutrals, "Set true if track candidates should be created also for neutral particles", bool(false));
 
@@ -118,10 +118,12 @@ void TrackFinderMCTruthModule::initialize()
       m_particleProperties += 8;
     } else if (m_whichParticles[i] == "TOP") {
       m_particleProperties += 16;
-    } else if (m_whichParticles[i] == "ECL") {
+    } else if (m_whichParticles[i] == "ARICH") {
       m_particleProperties += 32;
-    } else if (m_whichParticles[i] == "KLM") {
+    } else if (m_whichParticles[i] == "ECL") {
       m_particleProperties += 64;
+    } else if (m_whichParticles[i] == "KLM") {
+      m_particleProperties += 128;
     } else if (m_whichParticles[i].substr(0, 3) == "is:") {
       string pdgCodeString = m_whichParticles[i].substr(3);
       stringstream(pdgCodeString) >> aPdgCode;
@@ -252,23 +254,26 @@ void TrackFinderMCTruthModule::event()
     if (aMcParticlePtr->hasStatus(MCParticle::c_PrimaryParticle)) {
       mcParticleProperties += 1;
     }
-    if (aMcParticlePtr->hasStatus(MCParticle::c_SeenInPXD)) {
+    if (aMcParticlePtr->hasSeenInDetector(Const::PXD)) {
       mcParticleProperties += 2;
     }
-    if (aMcParticlePtr->hasStatus(MCParticle::c_SeenInSVD)) {
+    if (aMcParticlePtr->hasSeenInDetector(Const::SVD)) {
       mcParticleProperties += 4;
     }
-    if (aMcParticlePtr->hasStatus(MCParticle::c_SeenInCDC)) {
+    if (aMcParticlePtr->hasSeenInDetector(Const::CDC)) {
       mcParticleProperties += 8;
     }
-    if (aMcParticlePtr->hasStatus(MCParticle::c_SeenInTOP)) {
+    if (aMcParticlePtr->hasSeenInDetector(Const::TOP)) {
       mcParticleProperties += 16;
     }
-    if (aMcParticlePtr->hasStatus(MCParticle::c_LastSeenInECL)) {
+    if (aMcParticlePtr->hasSeenInDetector(Const::ARICH)) {
       mcParticleProperties += 32;
     }
-    if (aMcParticlePtr->hasStatus(MCParticle::c_LastSeenInKLM)) {
+    if (aMcParticlePtr->hasSeenInDetector(Const::ECL)) {
       mcParticleProperties += 64;
+    }
+    if (aMcParticlePtr->hasSeenInDetector(Const::KLM)) {
+      mcParticleProperties += 128;
     }
     // check all "seen in" properties that the mcparticle should have in one line.
     if ((mcParticleProperties bitand m_particleProperties) != m_particleProperties) {

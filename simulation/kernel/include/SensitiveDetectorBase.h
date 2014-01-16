@@ -27,24 +27,24 @@ namespace Belle2 {
     /** Base class for all Sensitive Detectors to create hits during simulation. */
     class SensitiveDetectorBase : public G4VSensitiveDetector {
     public:
-      /** Enum to specify all subdetectors which could produce Hits in the simulation.
-       * Used to automatically set the SeenIn-flags of the MCParticles
-       */
-      enum DetectorComponent {
-        PXD = MCParticle::c_SeenInPXD,      /**< Pixel detector */
-        SVD = MCParticle::c_SeenInSVD,      /**< Strip detector */
-        CDC = MCParticle::c_SeenInCDC,      /**< Drift chamber  */
-        TOP = MCParticle::c_SeenInTOP,      /**< Time of Propagation */
-        ECL = MCParticle::c_LastSeenInECL,  /**< Calorimeter */
-        KLM = MCParticle::c_LastSeenInKLM,  /**< KLM */
-        Other = 0                           /**< Any other component */
-      };
+//      /** Enum to specify all subdetectors which could produce Hits in the simulation.
+//       * Used to automatically set the SeenIn-flags of the MCParticles
+//       */
+      //      enum DetectorComponent {
+      //        PXD = MCParticle::c_SeenInPXD,      /**< Pixel detector */
+      //        SVD = MCParticle::c_SeenInSVD,      /**< Strip detector */
+      //        CDC = MCParticle::c_SeenInCDC,      /**< Drift chamber  */
+      //        TOP = MCParticle::c_SeenInTOP,      /**< Time of Propagation */
+      //        ECL = MCParticle::c_LastSeenInECL,  /**< Calorimeter */
+      //        KLM = MCParticle::c_LastSeenInKLM,  /**< KLM */
+      //        Other = 0                           /**< Any other component */
+      //      };
 
       /** Create a new Sensitive detecor with a given name and belonging to a given subdetector.
        * @param name name of the sensitive detector
        * @param subdetector subdetector the sensitive detector class belongs to
        */
-      SensitiveDetectorBase(const std::string& name, DetectorComponent subdetector):
+      SensitiveDetectorBase(const std::string& name, Const::EDetector subdetector):
         G4VSensitiveDetector(name), m_subdetector(subdetector) {}
 
       /** virtual destructor for inheritance */
@@ -96,14 +96,15 @@ namespace Belle2 {
       /** Static bool which indicates wether recording of hits is enabled */
       static bool s_active;
       /** Subdetector the class belongs to */
-      DetectorComponent m_subdetector;
+      Const::EDetector m_subdetector;
     };
 
     inline bool SensitiveDetectorBase::ProcessHits(G4Step* aStep, G4TouchableHistory* aROhist)
     {
       if (!s_active) return false;
       bool result = step(aStep, aROhist);
-      if (result && m_subdetector) TrackInfo::getInfo(*aStep->GetTrack()).addStatus(m_subdetector);
+      // Do not include hits from invalid detector (beast,teastbeam, etc.)
+      if (result && (m_subdetector != Const::invalidDetector)) TrackInfo::getInfo(*aStep->GetTrack()).addSeenInDetector(m_subdetector);
       return result;
     }
 

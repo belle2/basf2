@@ -50,7 +50,7 @@ namespace Belle2 {
   namespace ECL {
 
     SensitiveDetector::SensitiveDetector(G4String name, G4double thresholdEnergyDeposit, G4double thresholdKineticEnergy):
-      Simulation::SensitiveDetectorBase(name, ECL), m_thresholdEnergyDeposit(thresholdEnergyDeposit),
+      Simulation::SensitiveDetectorBase(name, Const::ECL), m_thresholdEnergyDeposit(thresholdEnergyDeposit),
       m_thresholdKineticEnergy(thresholdKineticEnergy)
     {
       m_simhitNumber = 0;

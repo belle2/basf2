@@ -24,7 +24,7 @@ namespace Belle2 {
   namespace microtpc {
 
     SensitiveDetector::SensitiveDetector():
-      Simulation::SensitiveDetectorBase("MicrotpcSensitiveDetector", Simulation::SensitiveDetectorBase::Other)
+      Simulation::SensitiveDetectorBase("MicrotpcSensitiveDetector", Const::invalidDetector)
     {
       //Make sure all collections are registered
       StoreArray<MCParticle>   mcParticles;

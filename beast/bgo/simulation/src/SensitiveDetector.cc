@@ -24,7 +24,7 @@ namespace Belle2 {
   namespace bgo {
 
     SensitiveDetector::SensitiveDetector():
-      Simulation::SensitiveDetectorBase("BgoSensitiveDetector", Simulation::SensitiveDetectorBase::Other)
+      Simulation::SensitiveDetectorBase("BgoSensitiveDetector", Const::invalidDetector)
     {
       //Make sure all collections are registered
       StoreArray<MCParticle>   mcParticles;

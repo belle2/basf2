@@ -24,7 +24,7 @@ namespace Belle2 {
   namespace ph1sustr {
 
     SensitiveDetector::SensitiveDetector():
-      Simulation::SensitiveDetectorBase("Ph1sustrSensitiveDetector", Simulation::SensitiveDetectorBase::Other)
+      Simulation::SensitiveDetectorBase("Ph1sustrSensitiveDetector", Const::invalidDetector)
     {
       //Make sure all collections are registered
       StoreArray<MCParticle>   mcParticles;

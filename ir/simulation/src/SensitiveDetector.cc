@@ -36,7 +36,7 @@ namespace Belle2 {
   namespace ir {
 
     SensitiveDetector::SensitiveDetector() :
-      Simulation::SensitiveDetectorBase("IR ", Simulation::SensitiveDetectorBase::Other)
+      Simulation::SensitiveDetectorBase("IR ", Const::IR)
     {
       StoreArray<MCParticle> mcParticles;
       StoreArray<IRSimHit>  irSimHits;

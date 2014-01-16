@@ -11,6 +11,7 @@
 #ifndef MCPARTICLE_H
 #define MCPARTICLE_H
 
+#include <framework/gearbox/Const.h>
 #include <framework/core/FrameworkExceptions.h>
 
 #include <TObject.h>
@@ -47,13 +48,7 @@ namespace Belle2 {
       c_StableInGenerator = 2,   /**< bit 1:  Particle is stable in the generator. */
       c_LeftDetector      = 4,   /**< bit 2:  Particle left the detector. */
       c_StoppedInDetector = 8,   /**< bit 3:  Particle was stopped in detector. */
-      c_SeenInPXD         = 16,  /**< bit 4:  Particle was seen in the PXD. */
-      c_SeenInSVD         = 32,  /**< bit 5:  Particle was seen in the SVD. */
-      c_SeenInCDC         = 64,  /**< bit 6:  Particle was seen in the drift chamber (CDC). */
-      c_SeenInTOP         = 128, /**< bit 7:  Particle was seen in the time of propagation counter. */
-      c_LastSeenInECL     = 256, /**< bit 8:  Particle was seen in the elm calorimeter. */
-      c_LastSeenInKLM     = 512, /**< bit 9:  Particle was seen in the klm. */
-      c_IsVirtual         = 1024 /**< bit 10: Particle is virtual and not going to Geant4 */
+      c_IsVirtual         = 16   /**< bit 4:  Particle is virtual and not going to Geant4 */
     };
 
     /** This enum is more a less a copy from EvtSpinType. Except we explicitly set the
@@ -90,7 +85,8 @@ namespace Belle2 {
       m_decayVertex_y(0), m_decayVertex_z(0),
       m_mother(0),
       m_firstDaughter(0), m_lastDaughter(0), m_spinType(c_NOTSET),
-      m_secondaryPhysicsProcess(0) {}
+      m_secondaryPhysicsProcess(0),
+      m_seenIn(0) {}
 
     /**
      * Construct MCParticle from a another MCParticle and the TClonesArray it is stored in.
@@ -111,7 +107,8 @@ namespace Belle2 {
       m_decayVertex_y(p.m_decayVertex_y), m_decayVertex_z(p.m_decayVertex_z),
       m_mother(p.m_mother),
       m_firstDaughter(p.m_firstDaughter), m_lastDaughter(p.m_lastDaughter), m_spinType(p.m_spinType),
-      m_secondaryPhysicsProcess(p.m_secondaryPhysicsProcess) {}
+      m_secondaryPhysicsProcess(p.m_secondaryPhysicsProcess),
+      m_seenIn(p.m_seenIn) {}
 
     /**
      * Return PDG code of particle.
@@ -127,14 +124,14 @@ namespace Belle2 {
      *         and it matches the the status it returns the value of the
      *         bitmask and 0 if not.
      */
-    unsigned int getStatus(unsigned int bitmask = UINT_MAX) const { return m_status & bitmask; }
+    unsigned int getStatus(unsigned short int bitmask = USHRT_MAX) const { return m_status & bitmask; }
 
     /**
      * Return if specific status bit is set.
      * @param bitmask The bitmask which is compared to the status of the particle.
      * @return Returns true if the bitmask matches the status code of the particle.
      */
-    bool hasStatus(unsigned int bitmask) const { return (m_status & bitmask) == bitmask; }
+    bool hasStatus(unsigned short int bitmask) const { return (m_status & bitmask) == bitmask; }
 
     /**
      * Return the particle mass in GeV.
@@ -302,6 +299,19 @@ namespace Belle2 {
     int getSecondaryPhysicsProcess() const {return m_secondaryPhysicsProcess;}
 
     /**
+     * Return the seen-in flags of the entire Belle II subdetectors for an MC particle.
+     * @return Returns the entire seen-in flags
+     */
+    unsigned int getSeenInDetectors() const { return m_seenIn; }
+
+    /**
+     * Return if the seen-in flag for a specific subdetector is set or not.
+     * @param detectorID The numerical subdetector ID.
+     * @return Returns true if the corresponding bit is set.
+     */
+    bool hasSeenInDetector(Const::EDetector detectorID) const { return (m_seenIn & (1 << detectorID)); }
+
+    /**
      * Check if particle is virtual
      *
      */
@@ -327,21 +337,21 @@ namespace Belle2 {
      * Set Status code for the particle.
      * @param status The status code of the MonteCarlo particle.
      */
-    void setStatus(unsigned int status) { m_status = status; }
+    void setStatus(unsigned short int status) { m_status = status; }
 
     /**
      * Add bitmask to current status.
      * @param bitmask The status code which should be added to the existing
      *        MonteCarlo particle status code.
      */
-    void addStatus(unsigned int bitmask) { m_status |= bitmask; }
+    void addStatus(unsigned short int bitmask) { m_status |= bitmask; }
 
     /**
      * Remove bitmask from current status.
      * @param bitmask The status code which should be removed from the existing
      *        MonteCarlo particle status code.
      */
-    void removeStatus(unsigned int bitmask) { m_status &= (!bitmask); }
+    void removeStatus(unsigned short int bitmask) { m_status &= (!bitmask); }
 
     /**
      * Set particle mass.
@@ -461,6 +471,24 @@ namespace Belle2 {
     void setSecondaryPhysicsProcess(int physicsProcess) { m_secondaryPhysicsProcess = physicsProcess; }
 
     /**
+     * Set the seen-in flags for the entire Belle II subdetectors for an Monte Carlo particle.
+     * @param seenInFlags The entire seen-in flags of the MC particle.
+     */
+    void setSeenInDetectors(unsigned short int seenInFlags) { m_seenIn = seenInFlags; }
+
+    /**
+     * Flag/Add a bit if the MC particle is seen in a specific subdetector.
+     * @param detectorID The numerical ID of a subdetector
+     */
+    void addSeenInDetector(Const::EDetector detectorID) { m_seenIn |= 1 << detectorID; }
+
+    /**
+     * Unflag/Remove the bit if the MC particle is not seen in a specific subdetector.
+     * @param detectorID The numerical ID of a subdetector
+     */
+    void removeSeenInDetector(Const::EDetector detectorID) { m_seenIn &= ~(1 << detectorID); }
+
+    /**
      * Search the DataStore for the corresponding MCParticle array.
      *
      * This function should not be needed by normal users and is called
@@ -492,10 +520,10 @@ namespace Belle2 {
      */
     int m_index; //! transient 1-based index of particle
 
-    unsigned int m_status;      /**< status code */
+    unsigned short int m_status;      /**< status code */
     int m_pdg;                  /**< PDG-Code of the particle */
     float m_mass;               /**< mass of the particle */
-    float m_charge;               /**< charge of the particle */
+    float m_charge;             /**< charge of the particle */
     float m_energy;             /**< energy of the particle */
     float m_momentum_x;         /**< momentum of particle, x component */
     float m_momentum_y;         /**< momentum of particle, y component */
@@ -514,13 +542,15 @@ namespace Belle2 {
     float m_decayVertex_z;      /**< decay vertex of particle, z component */
 
     int m_mother;               /**< 1-based index of the mother particle */
-    int m_firstDaughter;       /**< 1-based index of first daughter particle in collection, 0 if no daughters */
-    int m_lastDaughter;        /**< 1-based index of last daughter particle in collection, 0 if no daughters */
+    int m_firstDaughter;        /**< 1-based index of first daughter particle in collection, 0 if no daughters */
+    int m_lastDaughter;         /**< 1-based index of last daughter particle in collection, 0 if no daughters */
     static const double c_epsilon;  /**< limit of precision for two doubles to be the same. */
 
     EspinType m_spinType;        /**< Spin type of the particle as provided by the generator. */
 
     int m_secondaryPhysicsProcess;  /**< physics process type of a secondary particle */
+
+    unsigned short int m_seenIn;  /**< Each bit is a seen-in flag for the corresoponding subdetector of Belle II */
 
     /** Class definition required for the creation of the ROOT dictionary. */
     ClassDef(MCParticle, 2);

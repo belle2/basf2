@@ -24,7 +24,7 @@ namespace Belle2 {
   namespace cave {
 
     SensitiveDetector::SensitiveDetector():
-      Simulation::SensitiveDetectorBase("CaveSensitiveDetector", Simulation::SensitiveDetectorBase::Other)
+      Simulation::SensitiveDetectorBase("CaveSensitiveDetector", Const::invalidDetector)
     {
       //Make sure all collections are registered
       StoreArray<MCParticle>   mcParticles;

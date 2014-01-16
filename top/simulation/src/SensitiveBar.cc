@@ -37,7 +37,7 @@ namespace Belle2 {
   namespace TOP {
 
     SensitiveBar::SensitiveBar():
-      Simulation::SensitiveDetectorBase("TOP", SensitiveBar::TOP),
+      Simulation::SensitiveDetectorBase("TOP", Const::TOP),
       m_topgp(TOPGeometryPar::Instance())
     {
       // registration

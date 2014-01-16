@@ -24,7 +24,7 @@ namespace Belle2 {
   namespace he3tube {
 
     SensitiveDetector::SensitiveDetector():
-      Simulation::SensitiveDetectorBase("He3tubeSensitiveDetector", Simulation::SensitiveDetectorBase::Other)
+      Simulation::SensitiveDetectorBase("He3tubeSensitiveDetector", Const::invalidDetector)
     {
       //Make sure all collections are registered
       StoreArray<MCParticle>   mcParticles;

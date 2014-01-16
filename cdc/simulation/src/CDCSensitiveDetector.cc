@@ -48,7 +48,7 @@ namespace Belle2 {
   using namespace CDC;
 
   CDCSensitiveDetector::CDCSensitiveDetector(G4String name, G4double thresholdEnergyDeposit, G4double thresholdKineticEnergy):
-    SensitiveDetectorBase(name, CDC), m_thresholdEnergyDeposit(thresholdEnergyDeposit),
+    SensitiveDetectorBase(name, Const::CDC), m_thresholdEnergyDeposit(thresholdEnergyDeposit),
     m_thresholdKineticEnergy(thresholdKineticEnergy), m_hitNumber(0), m_EBhitNumber(0)
   {
     StoreArray<MCParticle> mcParticles;

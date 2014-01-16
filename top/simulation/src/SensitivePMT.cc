@@ -36,7 +36,7 @@ namespace Belle2 {
   namespace TOP {
 
     SensitivePMT::SensitivePMT():
-      Simulation::SensitiveDetectorBase("TOP", SensitivePMT::TOP),
+      Simulation::SensitiveDetectorBase("TOP", Const::TOP),
       m_topgp(TOPGeometryPar::Instance())
     {
       // registration

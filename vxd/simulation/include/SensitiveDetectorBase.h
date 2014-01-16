@@ -29,7 +29,7 @@ namespace Belle2 {
        * instance
        */
       SensitiveDetectorBase(SensorInfoBase* info):
-        Simulation::SensitiveDetectorBase((info->getType() == SensorInfoBase::PXD ? "PXD " : "SVD ") + (std::string)info->getID(), info->getType() == SensorInfoBase::PXD ? Simulation::SensitiveDetectorBase::PXD : Simulation::SensitiveDetectorBase::SVD), m_info(info) {};
+        Simulation::SensitiveDetectorBase((info->getType() == SensorInfoBase::PXD ? "PXD " : "SVD ") + (std::string)info->getID(), info->getType() == SensorInfoBase::PXD ? Const::PXD : Const::SVD), m_info(info) {};
 
       /** Destructor freeing the sensor Info */
       virtual ~SensitiveDetectorBase() {

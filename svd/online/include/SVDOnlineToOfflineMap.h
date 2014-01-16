@@ -11,6 +11,7 @@
 #ifndef FADC_APV_MAPPER_H_
 #define FADC_APV_MAPPER_H_
 
+#include <vxd/dataobjects/VxdID.h>
 #include <svd/dataobjects/SVDDigit.h>
 #include <boost/property_tree/ptree.hpp>
 #include <unordered_map>
@@ -100,6 +101,22 @@ namespace Belle2 {
     SVDDigit* NewDigit(unsigned char FADC, unsigned char APV25,
                        unsigned char channel, float charge, float time);
 
+    /** Get ChipInfo for a given FADC/APV combination.
+     * @param FADC is FADC number from the SVDRawCopper data.
+     * @param APV25 is the APV25 number from the SVDRawCopper data.
+     * @return a reference to the corresponding ChipInfo object, all-zero if
+     * nonsensical input.
+     */
+    const ChipInfo& getChipInfo(unsigned char FADC, unsigned char APV25);
+
+    /** Convert APV channel number to a strip number using a ChipInfo object.
+     * @param channel APV25 channel
+     * @param info Const reference to ChipInfo object.
+     * @return The corresponding strip number, -1 if nonsensical input
+     */
+    short getStripNumber(unsigned char channel, const ChipInfo& info) const
+    { return (info.m_channel0 + ((unsigned short)channel) * (info.m_parallel ? 1 : -1)); }
+
 
   private:
 
@@ -139,6 +156,7 @@ namespace Belle2 {
                  bool           isParallel
                 );
 
+    ChipInfo m_currentChipInfo; /**< internal instance of chipinfo used by the getter */
 
   };
 

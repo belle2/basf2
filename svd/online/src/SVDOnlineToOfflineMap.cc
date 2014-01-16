@@ -71,9 +71,8 @@ SVDOnlineToOfflineMap::SVDOnlineToOfflineMap(const string& xmlFilename)
 }
 
 
-SVDDigit* SVDOnlineToOfflineMap::NewDigit(unsigned char FADC,
-                                          unsigned char APV25, unsigned char channel, float charge = 0.0,
-                                          float time = 0.0)
+const SVDOnlineToOfflineMap::ChipInfo& SVDOnlineToOfflineMap::getChipInfo(
+  unsigned char FADC, unsigned char APV25)
 {
 
   ChipID id(FADC, APV25);
@@ -81,16 +80,28 @@ SVDDigit* SVDOnlineToOfflineMap::NewDigit(unsigned char FADC,
   if (chipIter == m_chips.end()) {
     B2WARNING(" FADC #" <<  int(FADC) << " and " << "APV # " << int(APV25) <<
               " : combination not found in the SVD On-line to Off-line map ");
-    return NULL;
+    m_currentChipInfo.m_sensorID = 0;
+    m_currentChipInfo.m_channel0 = 0;
+    m_currentChipInfo.m_channel127 = 0;
+    return m_currentChipInfo;
   }
+  m_currentChipInfo = chipIter->second;
+  return m_currentChipInfo;
+}
 
+
+SVDDigit* SVDOnlineToOfflineMap::NewDigit(unsigned char FADC,
+                                          unsigned char APV25, unsigned char channel, float charge = 0.0,
+                                          float time = 0.0)
+{
+  // Issue a warning, we'll be sending out a null pointer.
   if (channel > 127) {
     B2WARNING(" channel #" <<  int(channel) << " out of range (0-127).");
     return NULL;
   }
+  const ChipInfo& info = getChipInfo(FADC, APV25);
+  short strip = getStripNumber(channel, info);
 
-  ChipInfo info = chipIter->second;
-  short strip = info.m_channel0 + ((unsigned short)channel) * (info.m_parallel ? 1 : -1);
   return new SVDDigit(info.m_sensorID, info.m_uSide, strip, 0., charge, time);
 }
 

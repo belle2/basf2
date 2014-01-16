@@ -685,6 +685,7 @@ public:
   };
   inline unsigned int get_active_dhh_mask(void) {return word0.get_misc() & 0x1F;};
   inline unsigned int get_dhhc_id(void) {return (word0.get_misc() >> 5) & 0xF;};
+  inline unsigned int get_dhhc_nr_frames(void) {return nr_frames_in_event;};
 };
 
 class dhhc_dhh_start_frame {
@@ -699,13 +700,13 @@ public:
 
 //    dhhc_dhh_start_frame(unsigned int time_tag = 0, unsigned int trigger_nr = 0, unsigned int depend = 0): word0(0, DHH_FRAME_HEADER_DATA_TYPE_EVT_FRM, depend) {
 //    };
-  unsigned short get_evtnr(void) {
+  inline unsigned short get_evtnr(void) {
     return trigger_nr_lo;
   };
-  unsigned short get_sfnr(void) {// last DHP fraem before trigger
+  inline unsigned short get_sfnr(void) {// last DHP fraem before trigger
     return (sfnr_offset >> 10) & 0x3F;
   };
-  unsigned short get_toffset(void) {// and trigger row offset
+  inline unsigned short get_toffset(void) {// and trigger row offset
     return sfnr_offset & 0x3FF;
   };
   unsigned int calc_crc(void) {
@@ -1678,6 +1679,8 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& la
 {
   static int nr_of_dhh_start_frame = 0; /// could put it as a class member, but is only needed within this function
   static int nr_of_dhh_end_frame = 0; /// could put it as a class member, but is only needed within this function
+  static int nr_of_frames_dhhc = 0;
+  static int nr_of_frames_counted = 0;
   static int nr_active_dhh = 0;
   static int mask_active_dhh = 0;
   static int nr_active_dhp = 0;
@@ -1719,6 +1722,7 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& la
 
   switch (type) {
     case DHHC_FRAME_HEADER_DATA_TYPE_DHP_RAW: {
+      nr_of_frames_counted++;
 
       ((dhhc_direct_readout_frame_raw*)data)->print();
       dhhc.calc_crc();
@@ -1729,6 +1733,7 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& la
       break;
     };
     case DHHC_FRAME_HEADER_DATA_TYPE_DHP_ZSD: {
+      nr_of_frames_counted++;
 
       hw->print();
       //       B2WARNING("Size (real) " << len << " != " << s << " (in data) " << pad);
@@ -1739,12 +1744,14 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& la
       break;
     };
     case DHHC_FRAME_HEADER_DATA_TYPE_FCE_RAW: {
+      nr_of_frames_counted++;
 
       hw->print();
       dhhc.calc_crc();
       break;
     };
     case DHHC_FRAME_HEADER_DATA_TYPE_COMMODE: {
+      nr_of_frames_counted++;
 
       hw->print();
       dhhc.calc_crc();
@@ -1770,8 +1777,9 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& la
         }
       }*/
       last_evtnr = evtnr;
+      nr_of_frames_dhhc = ((dhhc_start_frame*)data)->get_dhhc_nr_frames();
+      nr_of_frames_counted = 1;
       dhhc.calc_crc();
-      if (nr_of_dhh_start_frame != nr_of_dhh_end_frame) B2ERROR("DHHC_FRAME_HEADER_DATA_TYPE_DHH_START without DHHC_FRAME_HEADER_DATA_TYPE_DHH_END");
       stat_start++;
 
       mask_active_dhh = ((dhhc_start_frame*)data)->get_active_dhh_mask();
@@ -1779,11 +1787,13 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& la
       break;
     };
     case DHHC_FRAME_HEADER_DATA_TYPE_DHH_START: {
+      nr_of_frames_counted++;
       ((dhhc_dhh_start_frame*)data)->print();
       dhh_first_frame_id_lo = ((dhhc_dhh_start_frame*)data)->get_sfnr();
       dhh_first_offset = ((dhhc_dhh_start_frame*)data)->get_toffset();
       dhhc.calc_crc();
 
+      if (nr_of_dhh_start_frame != nr_of_dhh_end_frame) B2ERROR("DHHC_FRAME_HEADER_DATA_TYPE_DHH_START without DHHC_FRAME_HEADER_DATA_TYPE_DHH_END");
       nr_of_dhh_start_frame++;
 
       found_mask_active_dhp = 0;
@@ -1792,6 +1802,7 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& la
       break;
     };
     case DHHC_FRAME_HEADER_DATA_TYPE_GHOST:
+      nr_of_frames_counted++;
       ((dhhc_ghost_frame*)data)->print();
       /// Attention: Firmware might be changed such, that ghostframe come for all DHPs, not only active ones...
       found_mask_active_dhp |= 1 << ((dhhc_ghost_frame*)data)->get_dhp_port();
@@ -1801,6 +1812,7 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& la
       break;
     case DHHC_FRAME_HEADER_DATA_TYPE_DHHC_END: {
       bool fake = ((dhhc_end_frame*)data)->is_fake();
+      nr_of_frames_counted++;
       if (fake) {
         B2WARNING("Faked DHHC END Data -> trigger without Data!");
       } else {
@@ -1808,6 +1820,9 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& la
       }
       stat_end++;
 
+      if (!fake) {
+        if (nr_of_frames_counted != nr_of_frames_dhhc)  B2ERROR("Number of DHHC Frames in Header " << nr_of_frames_dhhc << " != " << nr_of_frames_counted << " Counted");
+      }
       if (!fake) {
         int w;
         w = ((dhhc_end_frame*)data)->get_words() * 2;
@@ -1830,6 +1845,7 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& la
       break;
     };
     case DHHC_FRAME_HEADER_DATA_TYPE_DHH_END: {
+      nr_of_frames_counted++;
       ((dhhc_dhh_end_frame*)data)->print();
       dhhc.calc_crc();
       if (found_mask_active_dhp != mask_active_dhp) B2ERROR("DHH_END: DHP active mask $" << hex << mask_active_dhp << " != $" << hex << found_mask_active_dhp << " mask of found dhp/ghost frames");
@@ -1838,13 +1854,14 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& la
       break;
     };
     case DHHC_FRAME_HEADER_DATA_TYPE_HLTROI:
+      //nr_of_frames_counted++;/// DO NOT COUNT!!!!
       //((dhhc_onsen_frame*)data)->set_length(len - 4);
       ((dhhc_onsen_frame*)data)->print();
       ((dhhc_onsen_frame*)data)->calc_crc(len - 4); /// CRC is without the DHHC header
       dhhc.calc_crc();
       break;
     default:
-      B2ERROR("Error: no data ");
+      B2ERROR("UNKNOWN DHHC frame type");
       type_error++;
       hw->print();
       error_flag = true;

@@ -42,6 +42,8 @@ PXDRawHitSorterModule::PXDRawHitSorterModule() : Module()
 
   addParam("mergeDuplicates", m_mergeDuplicates, "If true, add charges of multiple instances of the same fired pixel. Otherwise only keep the first..", true);
   addParam("mergeFrames", m_mergeFrames, "If true, produce a single frame containing digits of all input frames.", true);
+  addParam("zeroSuppressionCut", m_0cut, "Minimum charge for a digit to carry", -1000.0);
+  addParam("acceptFake", m_acceptFake, "If true, VxdID 0 in rawhits will be replaced with 1.1.1.", false);
   addParam("rawHits", m_storeRawHitsName, "PXDRawHit collection name", string(""));
   addParam("digits", m_storeDigitsName, "PXDDigit collection name", string(""));
   addParam("frames", m_storeFramesName, "PXDFrames collection name", string(""));
@@ -85,8 +87,12 @@ void PXDRawHitSorterModule::event()
   unsigned short frameCounter(1); // to recode frame numbers to small integers
   for (int i = 0; i < nPixels; i++) {
     const PXDRawHit* const rawhit = storeRawHits[i];
+    // Zero-suppression cut
+    if (rawhit->getCharge() < m_0cut) continue;
     Pixel px(rawhit, i);
     VxdID sensorID = rawhit->getSensorID();
+    // For fake data, suuply a reasonable VxdID when VxdID is 0
+    if (m_acceptFake && sensorID.getID() == 0) sensorID = 8480;
     if (sensorID != currentSensorID) {
       currentSensorID = sensorID;
       frameCounter = 1;

@@ -56,7 +56,11 @@ void PXDDQMModule::defineHisto()
   // Create a separate histogram directory and cd into it.
   TDirectory* oldDir = gDirectory;
   oldDir->mkdir(m_histogramDirectoryName.c_str())->cd();
+  //----------------------------------------------------------------
+  // Number of fired pixels per frame : hPXDFired[PlaneNo]
+  //----------------------------------------------------------------
   // Fired pixel counts U
+  //----------------------------------------------------------------
   for (int i = 0; i < c_nPXDPlanes; i++) {
     int iPlane = indexToPlane(i);
     string name = str(format("hPXDFired%1%") % iPlane);
@@ -65,6 +69,9 @@ void PXDDQMModule::defineHisto()
     m_fired[i]->GetXaxis()->SetTitle("# of fired pixels");
     m_fired[i]->GetYaxis()->SetTitle("count");
   }
+  //----------------------------------------------------------------
+  // Number of clusters per frame : hPXDClusters[PlaneNo]
+  //----------------------------------------------------------------
   // Number of clusters
   for (int i = 0; i < c_nPXDPlanes; i++) {
     int iPlane = indexToPlane(i);
@@ -74,6 +81,9 @@ void PXDDQMModule::defineHisto()
     m_clusters[i]->GetXaxis()->SetTitle("# of clusters");
     m_clusters[i]->GetYaxis()->SetTitle("count");
   }
+  //----------------------------------------------------------------
+  // Hitmaps: Number of clusters by coordinate : hPXDHitmap[U/V/UV][PlaneNo]
+  //----------------------------------------------------------------
   // Hitmaps in U
   for (int i = 0; i < c_nPXDPlanes; i++) {
     int iPlane = indexToPlane(i);
@@ -110,24 +120,45 @@ void PXDDQMModule::defineHisto()
     m_hitMapUV[i]->GetYaxis()->SetTitle("v position [cm]");
     m_hitMapUV[i]->GetZaxis()->SetTitle("hits");
   }
+  //----------------------------------------------------------------
+  // Charge of digits : hPXDDigitCharge[PlaneNo]
+  //----------------------------------------------------------------
   // charge by plane
   for (int i = 0; i < c_nPXDPlanes; i++) {
     int iPlane = indexToPlane(i);
-    string name = str(format("hPXDCharge%1%") % iPlane);
-    string title = str(format("PXD cluster charge, plane %1%") % iPlane);
-    m_charge[i] = new TH1F(name.c_str(), title.c_str(), 50, 0, 150);
-    m_charge[i]->GetXaxis()->SetTitle("cluster charge [ADU]");
-    m_charge[i]->GetYaxis()->SetTitle("count");
+    string name = str(format("hPXDDigitCharge%1%") % iPlane);
+    string title = str(format("PXD pixel charge, plane %1%") % iPlane);
+    m_digitCharge[i] = new TH1F(name.c_str(), title.c_str(), 50, 0, 500);
+    m_digitCharge[i]->GetXaxis()->SetTitle("pixel charge [ADU]");
+    m_digitCharge[i]->GetYaxis()->SetTitle("count");
   }
+  //----------------------------------------------------------------
+  // Charge of clusters : hPXDClusterCharge[PlaneNo]
+  //----------------------------------------------------------------
+  // charge by plane
+  for (int i = 0; i < c_nPXDPlanes; i++) {
+    int iPlane = indexToPlane(i);
+    string name = str(format("hPXDClusterCharge%1%") % iPlane);
+    string title = str(format("PXD cluster charge, plane %1%") % iPlane);
+    m_clusterCharge[i] = new TH1F(name.c_str(), title.c_str(), 50, 0, 500);
+    m_clusterCharge[i]->GetXaxis()->SetTitle("cluster charge [ADU]");
+    m_clusterCharge[i]->GetYaxis()->SetTitle("count");
+  }
+  //----------------------------------------------------------------
+  // Cluster seed charge distribution : hPXDSeed[PlaneNo]
+  //----------------------------------------------------------------
   // seed by plane
   for (int i = 0; i < c_nPXDPlanes; i++) {
     int iPlane = indexToPlane(i);
     string name = str(format("hPXDSeed%1%") % iPlane);
     string title = str(format("PXD seed charge, plane %1%") % iPlane);
-    m_seed[i] = new TH1F(name.c_str(), title.c_str(), 50, 0, 150);
+    m_seed[i] = new TH1F(name.c_str(), title.c_str(), 50, 0, 500);
     m_seed[i]->GetXaxis()->SetTitle("seed charge [ADU]");
     m_seed[i]->GetYaxis()->SetTitle("count");
   }
+  //----------------------------------------------------------------
+  // Cluster size distribution : hPXDSize[U/V/UV][PlaneNo]
+  //----------------------------------------------------------------
   // u size by plane
   for (int i = 0; i < c_nPXDPlanes; i++) {
     int iPlane = indexToPlane(i);
@@ -155,6 +186,9 @@ void PXDDQMModule::defineHisto()
     m_size[i]->GetXaxis()->SetTitle("cluster size [pitch units]");
     m_size[i]->GetYaxis()->SetTitle("count");
   }
+  //----------------------------------------------------------------
+  // Start row distribution : hPXDstartRow[PlaneNo]
+  //----------------------------------------------------------------
   // start row by plane
   for (int i = 0; i < c_nPXDPlanes; i++) {
     int iPlane = indexToPlane(i);
@@ -165,6 +199,9 @@ void PXDDQMModule::defineHisto()
     m_startRow[i]->GetYaxis()->SetTitle("count");
   }
 
+  //----------------------------------------------------------------
+  // Cluster seed charge by distance from the start row : hPXDChargeByStartRow[PlaneNo]
+  //----------------------------------------------------------------
   // cluster seed charge by distance from the start row and by plane
   for (int i = 0; i < c_nPXDPlanes; i++) {
     int iPlane = indexToPlane(i);
@@ -173,6 +210,11 @@ void PXDDQMModule::defineHisto()
     m_chargeByStartRow[i] = new TH1F(name.c_str(), title.c_str(), getInfo(i).getVCells() / 4, -0.5 * getInfo(i).getVCells(), 0.5 * getInfo(i).getVCells());
     m_chargeByStartRow[i]->GetXaxis()->SetTitle("distance from the start row [pitch units]");
     m_chargeByStartRow[i]->GetYaxis()->SetTitle("total cluster charge [ADU]");
+    string nameRef = str(format("hPXDChargeByStartRowRef%1%") % iPlane);
+    string titleRef = str(format("Seed charge by distance from the start row RefHitMap, PXD plane %1%") % iPlane);
+    m_chargeByStartRowRef[i] = new TH1F(nameRef.c_str(), titleRef.c_str(), getInfo(i).getVCells() / 4, 0.0, getInfo(i).getVCells());
+    m_chargeByStartRowRef[i]->GetXaxis()->SetTitle("distance from the start row [pitch units]");
+    m_chargeByStartRowRef[i]->GetYaxis()->SetTitle("total cluster charge [ADU]");
   }
 
   // cd back to root directory
@@ -208,13 +250,15 @@ void PXDDQMModule::beginRun()
     m_hitMapU[i]->Reset();
     m_hitMapV[i]->Reset();
     m_hitMapUV[i]->Reset();
-    m_charge[i]->Reset();
+    m_digitCharge[i]->Reset();
+    m_clusterCharge[i]->Reset();
     m_seed[i]->Reset();
     m_sizeU[i]->Reset();
     m_sizeV[i]->Reset();
     m_size[i]->Reset();
     m_startRow[i]->Reset();
     m_chargeByStartRow[i]->Reset();
+    m_chargeByStartRowRef[i]->Reset();
   }
 }
 
@@ -254,6 +298,15 @@ void PXDDQMModule::event()
     m_clusters[i]->Fill(cluster_count[i]);
   }
 
+  // Digit charge
+  for (const PXDDigit & digit : storeDigits) {
+    int iPlane = digit.getSensorID().getLayerNumber();
+    if ((iPlane < c_firstPXDPlane) || (iPlane > c_lastPXDPlane)) continue;
+    int index = planeToIndex(iPlane);
+    m_digitCharge[index]->Fill(digit.getCharge());
+  }
+
+
   // Hitmaps, Charge, Seed, Size, Time
   for (const PXDCluster & cluster : storeClusters) {
     int iPlane = cluster.getSensorID().getLayerNumber();
@@ -262,7 +315,7 @@ void PXDDQMModule::event()
     m_hitMapU[index]->Fill(cluster.getU());
     m_hitMapV[index]->Fill(cluster.getV());
     m_hitMapUV[index]->Fill(cluster.getU(), cluster.getV());
-    m_charge[index]->Fill(cluster.getCharge());
+    m_clusterCharge[index]->Fill(cluster.getCharge());
     m_seed[index]->Fill(cluster.getSeedCharge());
     m_sizeU[index]->Fill(cluster.getUSize());
     m_sizeV[index]->Fill(cluster.getVSize());
@@ -286,9 +339,10 @@ void PXDDQMModule::event()
       int iPlane = cluster.getSensorID().getLayerNumber();
       if ((iPlane < c_firstPXDPlane) || (iPlane > c_lastPXDPlane)) continue;
       int index = planeToIndex(iPlane);
-      m_chargeByStartRow[index]->Fill(
-        getInfo(index).getVCellID(cluster.getV()) - startRows[cluster.getSensorID()],
-        cluster.getSeedCharge());
+      float fDistance = getInfo(index).getVCellID(cluster.getV()) - startRows[cluster.getSensorID()];
+      if (fDistance < 0) fDistance += getInfo(index).getVCells();
+      m_chargeByStartRow[index]->Fill(fDistance, cluster.getSeedCharge());
+      m_chargeByStartRowRef[index]->Fill(fDistance);
     }
 
 
@@ -299,6 +353,10 @@ void PXDDQMModule::event()
 
 void PXDDQMModule::endRun()
 {
+  // Make average value on histogram
+  for (int i = 0; i < c_nPXDPlanes; i++) {
+    m_chargeByStartRow[i]->Divide(m_chargeByStartRowRef[i]);
+  }
 }
 
 

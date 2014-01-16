@@ -76,13 +76,15 @@ namespace Belle2 {
     TH1F* m_hitMapU[c_nPXDPlanes];        /**< Hitmaps for u-pixels by plane */
     TH1F* m_hitMapV[c_nPXDPlanes];        /**< Hitmaps for v-pixels by plane */
     TH2F* m_hitMapUV[c_nPXDPlanes];       /**< Hitmaps for pixels by plane */
-    TH1F* m_charge[c_nPXDPlanes];         /**< charge by plane */
+    TH1F* m_digitCharge[c_nPXDPlanes];  /**< Digit charge by plane */
+    TH1F* m_clusterCharge[c_nPXDPlanes];  /**< Cluster charge by plane */
     TH1F* m_seed[c_nPXDPlanes];           /**< seed by plane */
     TH1F* m_sizeU[c_nPXDPlanes];          /**< u size by plane */
     TH1F* m_sizeV[c_nPXDPlanes];          /**< v size by plane */
     TH1F* m_size[c_nPXDPlanes];           /**< size by plane */
     TH1F* m_startRow[c_nPXDPlanes];       /**< start row by plane */
     TH1F* m_chargeByStartRow[c_nPXDPlanes]; /** side charge by distance from start row */
+    TH1F* m_chargeByStartRowRef[c_nPXDPlanes]; /** side charge by distance from start row - ref */
   };
 
   inline const PXD::SensorInfo& PXDDQMModule::getInfo(int index) const

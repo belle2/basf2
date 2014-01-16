@@ -35,3 +35,5 @@ file = TFile('root_output_test.root')
 tree = file.Get('tree')
 if tree.GetEntries() != 200:
     B2FATAL('Created output file contains wrong number of events!')
+
+os.remove('root_output_test.root')

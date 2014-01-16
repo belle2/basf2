@@ -176,3 +176,6 @@ file = TFile('parallel_processing_test.root')
 tree = file.Get('tree')
 if tree.GetEntries() != 5:
     B2FATAL('Created output file contains wrong number of events!')
+
+import os
+os.remove('parallel_processing_test.root')

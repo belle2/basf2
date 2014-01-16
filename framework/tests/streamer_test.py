@@ -61,3 +61,9 @@ tree.Project("", "abs(MCParticles.m_pdg)")
 # wether TTreeFormula chokes on something depends on alphabetical order...
 # so this should get it to iterate over the entire contents
 tree.Project("", "ZZZ.Doesnt.Exist")
+
+# also test using some class members
+tree.Project("", "GF2Tracks.getNumPoints()")
+
+import os
+os.remove('streamer_test.root')

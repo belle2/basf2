@@ -35,9 +35,13 @@ int main(int argc, char* argv[])
     std::cerr << "If OUTPUT_FILE is not given, histograms will be drawn instead of being saved.\n";
     return 1;
   }
-  gSystem->Load("libtracking");
   gSystem->Load("libgenfit2");
+  gSystem->Load("libtracking");
   gSystem->Load("libvxd");
+  gSystem->Load("libpxd");
+  gSystem->Load("libsvd");
+  gSystem->Load("libcdc");
+  gSystem->Load("libdataobjects");
 
   const TString input_filename(argv[1]);
   TString output_filename;

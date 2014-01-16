@@ -8,7 +8,7 @@ using namespace Belle2;
 
 void  ECLElectronPdf::init()
 {
-  ParameterMap map("ecl/data/electrons.dat");
+  ParameterMap map("data/ecl/electrons.dat");
 
   for (int i = 1; i < 8; ++i) {
     Parameters& prm = m_params[i];

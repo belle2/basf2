@@ -9,7 +9,7 @@ using namespace Belle2;
 void  ECLPionPdf::init()
 {
 
-  ParameterMap map("ecl/data/pions.dat");
+  ParameterMap map("data/ecl/pions.dat");
 
   for (int i = 1; i < 8; ++i) {
     ECLMuonPdf::Parameters& prm = m_muonlike.m_params[i];
@@ -27,7 +27,7 @@ void  ECLPionPdf::init()
     m_muonlike.m_integral1[i] = 0.5 * (1 - TMath::Erf(- prm.mu1  / prm.sigma1l / s_sqrt2));
     m_muonlike.m_integral2[i] = 0.5 * (1 - TMath::Erf(- prm.mu2  / prm.sigma2 / s_sqrt2));
     m_integralPion[i] = 0.5 * (1 - TMath::Erf(-pi_prm.mu3 / pi_prm.sigma3 / s_sqrt2));
-    cerr << "integral pion " << m_integralPion[i] << endl;
+
   }
 }
 

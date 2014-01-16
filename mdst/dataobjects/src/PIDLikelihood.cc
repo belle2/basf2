@@ -56,88 +56,109 @@ float PIDLikelihood::getLogL(const Const::ChargedStable& part,
 }
 
 
-double PIDLikelihood::getProbability(const Const::ChargedStable& p1,
-                                     const Const::ChargedStable& p2,
-                                     Const::PIDDetectorSet set) const
+double PIDLikelihood::getProbability(const Const::ChargedStable& part,
+                                     const float* fractions,
+                                     Const::PIDDetectorSet detSet) const
 {
-  return probability(getLogL(p1, set), getLogL(p2, set));
+  unsigned n = Const::chargedStableSet.size();
+  double frac[n];
+  if (fractions) {
+    frac[Const::electron.getIndex()] = fractions[0];
+    frac[Const::muon.getIndex()]     = fractions[1];
+    frac[Const::pion.getIndex()]     = fractions[2];
+    frac[Const::kaon.getIndex()]     = fractions[3];
+    frac[Const::proton.getIndex()]   = fractions[4];
+  } else {
+    for (unsigned i = 0; i < n; ++i) frac[i] = 1.0; // normalization not needed
+  }
+  double prob[n];
+  probability(n, frac, prob, detSet);
+
+  int k = part.getIndex();
+  if (k < 0) return 0;
+
+  return prob[k];
+
+}
+
+Const::ChargedStable PIDLikelihood::getMostLikely(const float* fractions,
+                                                  Const::PIDDetectorSet detSet) const
+{
+  unsigned n = Const::chargedStableSet.size();
+  double frac[n];
+  if (fractions) {
+    frac[Const::electron.getIndex()] = fractions[0];
+    frac[Const::muon.getIndex()]     = fractions[1];
+    frac[Const::pion.getIndex()]     = fractions[2];
+    frac[Const::kaon.getIndex()]     = fractions[3];
+    frac[Const::proton.getIndex()]   = fractions[4];
+  } else {
+    for (unsigned i = 0; i < n; ++i) frac[i] = 1.0; // normalization not needed
+  }
+  double prob[n];
+  probability(n, frac, prob, detSet);
+
+  int k = 0;
+  double maxProb = prob[k];
+  for (unsigned i = 0; i < n; ++i) {
+    if (prob[i] > maxProb) {maxProb = prob[i]; k = i;}
+  }
+  return Const::chargedStableSet.at(k);
+
 }
 
 
-double PIDLikelihood::getProbability(const Const::ChargedStable& part,
-                                     const Const::ParticleSet& partSet,
-                                     Const::PIDDetectorSet detSet) const
+double PIDLikelihood::probability(float logl1, float logl2, double ratio) const
 {
-
-  if (!partSet.contains(part)) {
-    B2ERROR("PIDLikelihood::getProbability: particle set doesn't contain given particle");
+  if (ratio < 0) {
+    B2ERROR("PIDLikelihood::probability argument 'ratio' is given with negative value");
     return 0;
   }
+  if (ratio == 0) return 0;
 
-  unsigned n = partSet.size();
+  double dlogl = logl2 - logl1;
+  if (dlogl < 0) {
+    double elogl = exp(dlogl);
+    return ratio / (ratio + elogl);
+  } else {
+    double elogl = exp(-dlogl) * ratio; // to prevent overflow for very large dlogl
+    return elogl / (1.0 + elogl);
+  }
+}
+
+
+void PIDLikelihood::probability(unsigned n,
+                                double frac[],
+                                double prob[],
+                                Const::PIDDetectorSet detSet) const
+{
   double logL[n];
+  unsigned i0 = 0;
   for (unsigned i = 0; i < n; ++i) {
-    double pdgCode = partSet.at(i).getPDGCode();
-    const Const::ChargedStable chargedStable = Const::chargedStableSet.find(pdgCode);
-    if (chargedStable == Const::invalidParticle) {
-      B2ERROR("PIDLikelihood::getProbability: particle set contains invalid particle");
-      return 0;
+    logL[i] = 0;
+    if (frac[i] > 0) {
+      logL[i] = getLogL(Const::chargedStableSet.at(i), detSet);
+      i0 = i;
     }
-    logL[i] = getLogL(chargedStable, detSet);
   }
 
-  double logLmax = logL[0];
-  for (unsigned i = 1; i < n; ++i) {
-    if (logL[i] > logLmax) logLmax = logL[i];
+  double logLmax = logL[i0];
+  for (unsigned i = 0; i < n; ++i) {
+    if (frac[i] > 0 && logL[i] > logLmax) logLmax = logL[i];
   }
 
   double norm = 0;
   for (unsigned i = 0; i < n; ++i) {
-    logL[i] = exp(logL[i] - logLmax);
-    norm += logL[i];
+    prob[i] = 0;
+    if (frac[i] > 0) prob[i] = exp(logL[i] - logLmax) * frac[i];
+    norm += prob[i];
   }
+  if (norm == 0) return;
 
-  int k = partSet.find(part.getPDGCode()).getIndex();
-  return logL[k] / norm;
-
-}
-
-Const::ParticleType PIDLikelihood::getMostLikely(const Const::ParticleSet& partSet,
-                                                 Const::PIDDetectorSet detSet) const
-{
-
-  unsigned n = partSet.size();
-  double logL[n];
   for (unsigned i = 0; i < n; ++i) {
-    double pdgCode = partSet.at(i).getPDGCode();
-    const Const::ChargedStable chargedStable = Const::chargedStableSet.find(pdgCode);
-    if (chargedStable == Const::invalidParticle) {
-      B2ERROR("PIDLikelihood::getProbability: particle set contains invalid particle");
-      return Const::invalidParticle;
-    }
-    logL[i] = getLogL(chargedStable, detSet);
+    prob[i] /= norm;
   }
 
-  int k = 0;
-  double logLmax = logL[k];
-  for (unsigned i = 0; i < n; ++i) {
-    if (logL[i] > logLmax) {logLmax = logL[i]; k = i;}
-  }
-  return partSet.at(k);
-
-}
-
-
-double PIDLikelihood::probability(float logl1, float logl2) const
-{
-  double dlogl = logl2 - logl1;
-  if (dlogl < 0) {
-    double elogl = exp(dlogl);
-    return 1.0 / (1.0 + elogl);
-  } else {
-    double elogl = exp(-dlogl); // to prevent overflow for very large dlogl
-    return elogl / (1.0 + elogl);
-  }
 }
 
 

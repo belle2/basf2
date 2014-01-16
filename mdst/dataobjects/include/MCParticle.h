@@ -553,7 +553,7 @@ namespace Belle2 {
     unsigned short int m_seenIn;  /**< Each bit is a seen-in flag for the corresoponding subdetector of Belle II */
 
     /** Class definition required for the creation of the ROOT dictionary. */
-    ClassDef(MCParticle, 2);
+    ClassDef(MCParticle, 3);
   };
 
 

@@ -34,9 +34,12 @@ namespace Belle2 {
     const std::string get(const std::string& label);
     int getInt(const std::string& label);
     double getDouble(const std::string& label);
+    void cd() { __base = ""; }
+    void cd(const std::string& dir) { __base += dir + "."; }
 
   private:
     static std::map<std::string, std::string> __value_m;
+    std::string __base;
 
   };
 

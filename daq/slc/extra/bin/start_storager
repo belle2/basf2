@@ -4,7 +4,7 @@ label=`date +%Y-%m-%d-%H-%M`
 
 killall storagerd
 sleep 2
-source ~/belle2/release/daq/slc/extra/bin/setup.sh ~/belle2 release global
-mkdir -p ~/run/storagerd/${HOSTNAME}
-storagerd DSR &> ~/run/storagerd/${HOSTNAME}/${label}.log &
+source ~/belle2/release/daq/slc/extra/bin/setup.sh ~/belle2 release global 
+storagerd STORAGE
+
 

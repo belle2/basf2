@@ -1,5 +1,7 @@
 #include "daq/slc/apps/dqmviewd/DQMFileReader.h"
 
+#include <daq/slc/system/LogFile.h>
+
 #include <daq/slc/dqm/HistoPackage.h>
 #include <daq/slc/dqm/Histo.h>
 #include <daq/slc/dqm/Histo1D.h>
@@ -33,6 +35,7 @@ TH1* DQMFileReader::getHist(const std::string& name)
 bool DQMFileReader::init(const char* file_path)
 {
   if (_file) _file->Close();
+  LogFile::debug(file_path);
   _file = TMapFile::Create(file_path);
   _hist_m->clear();
   TMapRec* mr = _file->GetFirst();

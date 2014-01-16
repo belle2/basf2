@@ -57,7 +57,7 @@ int main(int argc, char** argv)
     return 1;
   }
   LogFile::open("dqmviewd");
-  system("killall hserver");
+  //system("killall hserver");
   //const char* name = argv[1];
   ConfigFile config((argc > 2) ? argv[2] : "dqm");
 
@@ -82,11 +82,11 @@ int main(int argc, char** argv)
           config.read(config_path + "/" + filename);
           std::string pack_name = config.get("DQM_PACKAGE_NAME");
           int pack_port = config.getInt("DQM_PACKAGE_PORT");
-          if (pack_name.size() == 0 || pack_port == 0) continue;
+          if (pack_name.size() == 0 || pack_port <= 0) continue;
           std::string pack_map   = config.get("DQM_PACKAGE_MAP");
           LogFile::debug("Open hserver for %s (port = %d, map file = %s)",
                          pack_name.c_str(), pack_port, pack_map.c_str());
-          Fork(new HSeverExecutor(pack_port, pack_map, map_path));
+          //Fork(new HSeverExecutor(pack_port, pack_map, map_path));
           std::string pack_lib   = config.get("DQM_PACKAGE_LIB");
           std::string pack_class = config.get("DQM_PACKAGE_CLASS");
           if (pack_class.size() > 0) {

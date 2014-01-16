@@ -108,7 +108,7 @@ void PackageSender::run()
 
     writer.writeInt(FLAG_ALL);
     writer.writeInt(npacks);
-    for (size_t i = 0; i < _conf_v.size(); i++) {
+    for (size_t i = 0; i < manager_v.size(); i++) {
       if (monitored_v[i]) {
         try {
           writer.writeInt(_conf_v[i].count);

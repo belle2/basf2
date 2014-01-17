@@ -105,6 +105,7 @@ namespace Belle2 {
      * @param graph Reference to the graph which should be filled with the information from the SAD file.
      */
     void addAllSADParticles(MCParticleGraph& graph);
+    TGeoHMatrix SADtoGeant(ReaderSAD::AcceleratorRings accRing, double s);
 
 
   protected:
@@ -155,7 +156,23 @@ namespace Belle2 {
     int calculateRealParticleNumber(double rate);
 
     /** Calculates the transformation matrix from local SAD to global geant4 space. */
-    TGeoHMatrix SADtoGeant(ReaderSAD::AcceleratorRings accRing, double s);
+//    TGeoHMatrix SADtoGeant(ReaderSAD::AcceleratorRings accRing, double s);
+
+    struct straightElement {
+      double x0;
+      double z0;
+      double l;
+      double phi;
+    };
+
+    struct bendingElement {
+      double rt;
+      double x0;
+      double z0;
+      double sphi;
+      double dphi;
+    };
+
   };
 
 }

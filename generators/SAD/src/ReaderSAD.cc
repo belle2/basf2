@@ -292,266 +292,87 @@ TGeoHMatrix ReaderSAD::SADtoGeant(ReaderSAD::AcceleratorRings accRing, double s)
   //get parameters from .xml file
   static GearDir content = Gearbox::getInstance().getDetectorComponent("FarBeamLine");
 
-  //--------------
-  //-   LHR1
+  map<string, straightElement> straights;
+  map<string, bendingElement> bendings;
+  BOOST_FOREACH(const GearDir & element, content.getNodes("Straight")) {
 
-  //  static GearDir content("/Detector/DetectorComponent[@name=\"FarBeamLine\"]/Content");
-  static GearDir cLHR1(content, "LHR1/");
-  static double LHR1_X0 = cLHR1.getLength("X0");
-  static double LHR1_Z0 = cLHR1.getLength("Z0");
-  static double LHR1_L = cLHR1.getLength("L");
-  static double LHR1_PHI = cLHR1.getLength("PHI");
+    string name = element.getString("@name");
+    string type = element.getString("@type");
 
-  //--------------
-  //-   BLC2REtube
+    if (type != "pipe") continue;
 
-  //get parameters from .xml file
-  static GearDir cBLC2REtube(content, "BLC2REtube/");
-  static double BLC2REtube_RT = cBLC2REtube.getLength("RT");
-  static double BLC2REtube_X0 = cBLC2REtube.getLength("X0");
-  static double BLC2REtube_Z0 = cBLC2REtube.getLength("Z0");
-  static double BLC2REtube_SPHI = cBLC2REtube.getLength("SPHI");
-  static double BLC2REtube_DPHI = cBLC2REtube.getLength("DPHI");
+    straightElement straight;
 
-  //--------------
-  //-   LHR2
+    straight.x0 = element.getLength("X0");
+    straight.z0 = element.getLength("Z0");
+    straight.l = element.getLength("L");
+    straight.phi = element.getLength("PHI");
 
-  //get parameters from .xml file
-  static GearDir cLHR2(content, "LHR2/");
-  static double LHR2_L = cLHR2.getLength("L");
-  static double LHR2_X0 = cLHR2.getLength("X0");
-  static double LHR2_Z0 = cLHR2.getLength("Z0");
-  static double LHR2_PHI = cLHR2.getLength("PHI");
+    straights[name] = straight;
+  }
 
-  //--------------
-  //-   LLR1
+  string str_checklist[] = {"LHR1", "LHR2", "LLR1", "LLR2", "LLR3", "LLR4", "LLR5", "LHL1", "LHL2", "LLL1", "LLL2", "LLL3", "LLL4"};
+  BOOST_FOREACH(const string & str, str_checklist) {
+    if (straights.count(str) == 0)
+      B2FATAL("You need FarBeamLine.xml to run SADInput module. Please include FarBeamLine.xml in Belle2.xml. You also need to change 'length' in Belle2.xml to be 40m.");
+  }
 
-  //get parameters from .xml file
-  static GearDir cLLR1(content, "LLR1/");
-  static double LLR1_L = cLLR1.getLength("L");
-  static double LLR1_X0 = cLLR1.getLength("X0");
-  static double LLR1_Z0 = cLLR1.getLength("Z0");
-  static double LLR1_PHI = cLLR1.getLength("PHI");
+  BOOST_FOREACH(const GearDir & element, content.getNodes("Bending")) {
 
-  //--------------
-  //-   BC1RPtube
+    string name = element.getString("@name");
+    string type = element.getString("@type");
 
-  //get parameters from .xml file
-  static GearDir cBC1RPtube(content, "BC1RPtube/");
-  static double BC1RPtube_RT = cBC1RPtube.getLength("RT");
-  static double BC1RPtube_X0 = cBC1RPtube.getLength("X0");
-  static double BC1RPtube_Z0 = cBC1RPtube.getLength("Z0");
-  static double BC1RPtube_SPHI = cBC1RPtube.getLength("SPHI");
-  static double BC1RPtube_DPHI = cBC1RPtube.getLength("DPHI");
+    if (type != "pipe") continue;
 
-  //--------------
-  //-   LLR2
+    bendingElement bending;
 
-  //get parameters from .xml file
-  static GearDir cLLR2(content, "LLR2/");
-  static double LLR2_L = cLLR2.getLength("L");
-  static double LLR2_X0 = cLLR2.getLength("X0");
-  static double LLR2_Z0 = cLLR2.getLength("Z0");
-  static double LLR2_PHI = cLLR2.getLength("PHI");
+    bending.rt = element.getLength("RT");
+    bending.x0 = element.getLength("X0");
+    bending.z0 = element.getLength("Z0");
+    bending.sphi = element.getLength("SPHI");
+    bending.dphi = element.getLength("DPHI");
 
-  //--------------
-  //-   BLCWRPtube
+    bendings[name] = bending;
+  }
 
-  //get parameters from .xml file
-  static GearDir cBLCWRPtube(content, "BLCWRPtube/");
-  static double BLCWRPtube_RT = cBLCWRPtube.getLength("RT");
-  static double BLCWRPtube_X0 = cBLCWRPtube.getLength("X0");
-  static double BLCWRPtube_Z0 = cBLCWRPtube.getLength("Z0");
-  static double BLCWRPtube_SPHI = cBLCWRPtube.getLength("SPHI");
-  static double BLCWRPtube_DPHI = cBLCWRPtube.getLength("DPHI");
-
-  //--------------
-  //-   LLR3
-
-  //get parameters from .xml file
-  static GearDir cLLR3(content, "LLR3/");
-  static double LLR3_L = cLLR3.getLength("L");
-  static double LLR3_X0 = cLLR3.getLength("X0");
-  static double LLR3_Z0 = cLLR3.getLength("Z0");
-  static double LLR3_PHI = cLLR3.getLength("PHI");
-
-  //--------------
-  //-   BLC1RPtube
-
-  //get parameters from .xml file
-  static GearDir cBLC1RPtube(content, "BLC1RPtube/");
-  static double BLC1RPtube_RT = cBLC1RPtube.getLength("RT");
-  static double BLC1RPtube_X0 = cBLC1RPtube.getLength("X0");
-  static double BLC1RPtube_Z0 = cBLC1RPtube.getLength("Z0");
-  static double BLC1RPtube_SPHI = cBLC1RPtube.getLength("SPHI");
-  static double BLC1RPtube_DPHI = cBLC1RPtube.getLength("DPHI");
-
-  //--------------
-  //-   LLR4
-
-  //get parameters from .xml file
-  static GearDir cLLR4(content, "LLR4/");
-  static double LLR4_L = cLLR4.getLength("L");
-  static double LLR4_X0 = cLLR4.getLength("X0");
-  static double LLR4_Z0 = cLLR4.getLength("Z0");
-  static double LLR4_PHI = cLLR4.getLength("PHI");
-
-  //--------------
-  //-   BLC2RPtube
-
-  //get parameters from .xml file
-  static GearDir cBLC2RPtube(content, "BLC2RPtube/");
-  static double BLC2RPtube_RT = cBLC2RPtube.getLength("RT");
-  static double BLC2RPtube_X0 = cBLC2RPtube.getLength("X0");
-  static double BLC2RPtube_Z0 = cBLC2RPtube.getLength("Z0");
-  static double BLC2RPtube_SPHI = cBLC2RPtube.getLength("SPHI");
-  static double BLC2RPtube_DPHI = cBLC2RPtube.getLength("DPHI");
-
-  //--------------
-  //-   LLR5
-
-  //get parameters from .xml file
-  static GearDir cLLR5(content, "LLR5/");
-  static double LLR5_L = cLLR5.getLength("L");
-  static double LLR5_X0 = cLLR5.getLength("X0");
-  static double LLR5_Z0 = cLLR5.getLength("Z0");
-  static double LLR5_PHI = cLLR5.getLength("PHI");
-
-  //--------------
-  //-   LHL1
-
-  //get parameters from .xml file
-  static GearDir cLHL1(content, "LHL1/");
-  static double LHL1_L = cLHL1.getLength("L");
-  static double LHL1_X0 = cLHL1.getLength("X0");
-  static double LHL1_Z0 = cLHL1.getLength("Z0");
-  static double LHL1_PHI = cLHL1.getLength("PHI");
-
-  //--------------
-  //-   BLC1LEtube
-
-  //get parameters from .xml file
-  static GearDir cBLC1LEtube(content, "BLC1LEtube/");
-  static double BLC1LEtube_RT = cBLC1LEtube.getLength("RT");
-  static double BLC1LEtube_X0 = cBLC1LEtube.getLength("X0");
-  static double BLC1LEtube_Z0 = cBLC1LEtube.getLength("Z0");
-  static double BLC1LEtube_SPHI = cBLC1LEtube.getLength("SPHI");
-  static double BLC1LEtube_DPHI = cBLC1LEtube.getLength("DPHI");
-
-  //--------------
-  //-   LHL2
-
-  //get parameters from .xml file
-  static GearDir cLHL2(content, "LHL2/");
-  static double LHL2_L = cLHL2.getLength("L");
-  static double LHL2_X0 = cLHL2.getLength("X0");
-  static double LHL2_Z0 = cLHL2.getLength("Z0");
-  static double LHL2_PHI = cLHL2.getLength("PHI");
-
-  //--------------
-  //-   LLL1
-
-  //get parameters from .xml file
-  static GearDir cLLL1(content, "LLL1/");
-  static double LLL1_L = cLLL1.getLength("L");
-  static double LLL1_X0 = cLLL1.getLength("X0");
-  static double LLL1_Z0 = cLLL1.getLength("Z0");
-  static double LLL1_PHI = cLLL1.getLength("PHI");
-
-  //--------------
-  //-   BC1LPtube
-
-  //get parameters from .xml file
-  static GearDir cBC1LPtube(content, "BC1LPtube/");
-  static double BC1LPtube_RT = cBC1LPtube.getLength("RT");
-  static double BC1LPtube_X0 = cBC1LPtube.getLength("X0");
-  static double BC1LPtube_Z0 = cBC1LPtube.getLength("Z0");
-  static double BC1LPtube_SPHI = cBC1LPtube.getLength("SPHI");
-  static double BC1LPtube_DPHI = cBC1LPtube.getLength("DPHI");
-
-  //--------------
-  //-   LLL2
-
-  //get parameters from .xml file
-  static GearDir cLLL2(content, "LLL2/");
-  static double LLL2_L = cLLL2.getLength("L");
-  static double LLL2_X0 = cLLL2.getLength("X0");
-  static double LLL2_Z0 = cLLL2.getLength("Z0");
-  static double LLL2_PHI = cLLL2.getLength("PHI");
-
-  //--------------
-  //-   BLC1LPtube
-
-  //get parameters from .xml file
-  static GearDir cBLC1LPtube(content, "BLC1LPtube/");
-  static double BLC1LPtube_RT = cBLC1LPtube.getLength("RT");
-  static double BLC1LPtube_X0 = cBLC1LPtube.getLength("X0");
-  static double BLC1LPtube_Z0 = cBLC1LPtube.getLength("Z0");
-  static double BLC1LPtube_SPHI = cBLC1LPtube.getLength("SPHI");
-  static double BLC1LPtube_DPHI = cBLC1LPtube.getLength("DPHI");
-
-  //--------------
-  //-   LLL3
-
-  //get parameters from .xml file
-  static GearDir cLLL3(content, "LLL3/");
-  static double LLL3_L = cLLL3.getLength("L");
-  static double LLL3_X0 = cLLL3.getLength("X0");
-  static double LLL3_Z0 = cLLL3.getLength("Z0");
-  static double LLL3_PHI = cLLL3.getLength("PHI");
-
-  //--------------
-  //-   BLC2LPtube
-
-  //get parameters from .xml file
-  static GearDir cBLC2LPtube(content, "BLC2LPtube/");
-  static double BLC2LPtube_RT = cBLC2LPtube.getLength("RT");
-  static double BLC2LPtube_X0 = cBLC2LPtube.getLength("X0");
-  static double BLC2LPtube_Z0 = cBLC2LPtube.getLength("Z0");
-  static double BLC2LPtube_SPHI = cBLC2LPtube.getLength("SPHI");
-  static double BLC2LPtube_DPHI = cBLC2LPtube.getLength("DPHI");
-
-  //--------------
-  //-   LLL4
-
-  //get parameters from .xml file
-  static GearDir cLLL4(content, "LLL4/");
-  static double LLL4_L = cLLL4.getLength("L");
-  static double LLL4_X0 = cLLL4.getLength("X0");
-  static double LLL4_Z0 = cLLL4.getLength("Z0");
-  static double LLL4_PHI = cLLL4.getLength("PHI");
+  string bend_checklist[] = {"BLC2RE", "BC1RP", "BLCWRP", "BLC1RP", "BLC2RP", "BLC1LE", "BC1LP", "BLC1LP", "BLC2LP"};
+  BOOST_FOREACH(const string & bnd, bend_checklist) {
+    if (bendings.count(bnd) == 0)
+      B2FATAL("You need FarBeamLine.xml to run SADInput module. Please include FarBeamLine.xml in Belle2.xml. You also need to change 'length' in Belle2.xml to be 40m.");
+  }
 
   static double her_breakpoints[6];
   static double ler_breakpoints[16];
-  // positive s
-  her_breakpoints[0] = LHL1_L;
-  her_breakpoints[1] = her_breakpoints[0] + BLC1LEtube_RT * BLC1LEtube_DPHI;
-  her_breakpoints[2] = her_breakpoints[1] + LHL2_L;
-
-  // negative s
-  her_breakpoints[3] = -LHR1_L;
-  her_breakpoints[4] = her_breakpoints[3] - BLC2REtube_RT * BLC2REtube_DPHI;
-  her_breakpoints[5] = her_breakpoints[4] - LHR2_L;
 
   // positive s
-  ler_breakpoints[0] = LLL1_L;
-  ler_breakpoints[1] = ler_breakpoints[0] + BC1LPtube_RT * BC1LPtube_DPHI;
-  ler_breakpoints[2] = ler_breakpoints[1] + LLL2_L;
-  ler_breakpoints[3] = ler_breakpoints[2] + BLC1LPtube_RT * BLC1LPtube_DPHI;
-  ler_breakpoints[4] = ler_breakpoints[3] + LLL3_L;
-  ler_breakpoints[5] = ler_breakpoints[4] + BLC2LPtube_RT * BLC2LPtube_DPHI;
-  ler_breakpoints[6] = ler_breakpoints[5] + LLL4_L;
+  her_breakpoints[0] = straights["LHL1"].l;
+  her_breakpoints[1] = her_breakpoints[0] + bendings["BLC1LE"].rt * bendings["BLC1LE"].dphi;
+  her_breakpoints[2] = her_breakpoints[1] + straights["LHL2"].l;
 
   // negative s
-  ler_breakpoints[7] = -LLR1_L;
-  ler_breakpoints[8] = ler_breakpoints[7] - BC1RPtube_RT * BC1RPtube_DPHI;
-  ler_breakpoints[9] = ler_breakpoints[8] - LLR2_L;
-  ler_breakpoints[10] = ler_breakpoints[9] - BLCWRPtube_RT * BLCWRPtube_DPHI;
-  ler_breakpoints[11] = ler_breakpoints[10] - LLR3_L;
-  ler_breakpoints[12] = ler_breakpoints[11] - BLC1RPtube_RT * BLC1RPtube_DPHI;
-  ler_breakpoints[13] = ler_breakpoints[12] - LLR4_L;
-  ler_breakpoints[14] = ler_breakpoints[13] - BLC2RPtube_RT * BLC2RPtube_DPHI;
-  ler_breakpoints[15] = ler_breakpoints[14] - LLR5_L;
+  her_breakpoints[3] = -straights["LHR1"].l;
+  her_breakpoints[4] = her_breakpoints[3] - bendings["BLC2RE"].rt * bendings["BLC2RE"].dphi;
+  her_breakpoints[5] = her_breakpoints[4] - straights["LHR2"].l;
+
+  // positive s
+  ler_breakpoints[0] = straights["LLL1"].l;
+  ler_breakpoints[1] = ler_breakpoints[0] + bendings["BC1LP"].rt * bendings["BC1LP"].dphi;
+  ler_breakpoints[2] = ler_breakpoints[1] + straights["LLL2"].l;
+  ler_breakpoints[3] = ler_breakpoints[2] + bendings["BLC1LP"].rt * bendings["BLC1LP"].dphi;
+  ler_breakpoints[4] = ler_breakpoints[3] + straights["LLL3"].l;
+  ler_breakpoints[5] = ler_breakpoints[4] + bendings["BLC2LP"].rt * bendings["BLC2LP"].dphi;
+  ler_breakpoints[6] = ler_breakpoints[5] + straights["LLL4"].l;
+
+  // negative s
+  ler_breakpoints[7] = -straights["LLR1"].l;
+  ler_breakpoints[8] = ler_breakpoints[7] - bendings["BC1RP"].rt * bendings["BC1RP"].dphi;
+  ler_breakpoints[9] = ler_breakpoints[8] - straights["LLR2"].l;
+  ler_breakpoints[10] = ler_breakpoints[9] - bendings["BLCWRP"].rt * bendings["BLCWRP"].dphi;
+  ler_breakpoints[11] = ler_breakpoints[10] - straights["LLR3"].l;
+  ler_breakpoints[12] = ler_breakpoints[11] - bendings["BLC1RP"].rt * bendings["BLC1RP"].dphi;
+  ler_breakpoints[13] = ler_breakpoints[12] - straights["LLR4"].l;
+  ler_breakpoints[14] = ler_breakpoints[13] - bendings["BLC2RP"].rt * bendings["BLC2RP"].dphi;
+  ler_breakpoints[15] = ler_breakpoints[14] - straights["LLR5"].l;
 
   double dx = 0;
   double dz = 0;
@@ -559,37 +380,37 @@ TGeoHMatrix ReaderSAD::SADtoGeant(ReaderSAD::AcceleratorRings accRing, double s)
   if (accRing == c_LER) {
     // LER
     // positive s
-    if (400.0 < s) {
+    if (400.0 * Unit::cm < s) {
       if (s < ler_breakpoints[0]) {
-        phi = LLL1_PHI;
-        dx = LLL1_X0 + s * sin(phi);
-        dz = LLL1_Z0 + s * cos(phi);
+        phi = straights["LLL1"].phi;
+        dx = straights["LLL1"].x0 + s * sin(phi);
+        dz = straights["LLL1"].z0 + s * cos(phi);
       } else if (s < ler_breakpoints[1]) {
         double sloc = s - ler_breakpoints[0];
-        phi = BC1LPtube_SPHI + sloc / BC1LPtube_RT;
+        phi = bendings["BC1LP"].sphi + sloc / bendings["BC1LP"].rt;
         // Torus is created in x-y plain.
         // It is then rotated to x-z plain,
         // and its direction changes to reversed,
         // thus phi_real=-phi_xml
         phi = -phi;
-        dx = BC1LPtube_X0 + BC1LPtube_RT * cos(-phi);
-        dz = BC1LPtube_Z0 + BC1LPtube_RT * sin(-phi);
+        dx = bendings["BC1LP"].x0 + bendings["BC1LP"].rt * cos(-phi);
+        dz = bendings["BC1LP"].z0 + bendings["BC1LP"].rt * sin(-phi);
       } else if (s < ler_breakpoints[2]) {
         double sloc = s - ler_breakpoints[1];
-        phi = LLL2_PHI;
-        dx = LLL2_X0 + sloc * sin(phi);
-        dz = LLL2_Z0 + sloc * cos(phi);
+        phi = straights["LLL2"].phi;
+        dx = straights["LLL2"].x0 + sloc * sin(phi);
+        dz = straights["LLL2"].z0 + sloc * cos(phi);
       } else if (s < ler_breakpoints[3]) {
         double sloc = s - ler_breakpoints[2];
-        phi = BLC1LPtube_SPHI + sloc / BLC1LPtube_RT;
+        phi = bendings["BLC1LP"].sphi + sloc / bendings["BLC1LP"].rt;
         phi = -phi;
-        dx = BLC1LPtube_X0 + BLC1LPtube_RT * cos(-phi);
-        dz = BLC1LPtube_Z0 + BLC1LPtube_RT * sin(-phi);
+        dx = bendings["BLC1LP"].x0 + bendings["BLC1LP"].rt * cos(-phi);
+        dz = bendings["BLC1LP"].z0 + bendings["BLC1LP"].rt * sin(-phi);
       } else if (s < ler_breakpoints[4]) {
         double sloc = s - ler_breakpoints[3];
-        phi = LLL3_PHI;
-        dx = LLL3_X0 + sloc * sin(phi);
-        dz = LLL3_Z0 + sloc * cos(phi);
+        phi = straights["LLL3"].phi;
+        dx = straights["LLL3"].x0 + sloc * sin(phi);
+        dz = straights["LLL3"].z0 + sloc * cos(phi);
       } else if (s < ler_breakpoints[5]) {
         double sloc = s - ler_breakpoints[4];
         // Torus dphi may be only positive,
@@ -597,16 +418,16 @@ TGeoHMatrix ReaderSAD::SADtoGeant(ReaderSAD::AcceleratorRings accRing, double s)
         // and we need to use -s and not change phi.
         // Since we add pi to phi later,
         // we subtract it now for this element.
-        phi = BLC2LPtube_SPHI + BLC2LPtube_DPHI - sloc / BLC2LPtube_RT;
+        phi = bendings["BLC2LP"].sphi + bendings["BLC2LP"].dphi - sloc / bendings["BLC2LP"].rt;
         phi = -phi;
-        dx = BLC2LPtube_X0 + BLC2LPtube_RT * cos(-phi);
-        dz = BLC2LPtube_Z0 + BLC2LPtube_RT * sin(-phi);
+        dx = bendings["BLC2LP"].x0 + bendings["BLC2LP"].rt * cos(-phi);
+        dz = bendings["BLC2LP"].z0 + bendings["BLC2LP"].rt * sin(-phi);
         phi -= M_PI;
       } else if (s < ler_breakpoints[6]) {
         double sloc = s - ler_breakpoints[5];
-        phi = LLL4_PHI;
-        dx = LLL4_X0 + sloc * sin(phi);
-        dz = LLL4_Z0 + sloc * cos(phi);
+        phi = straights["LLL4"].phi;
+        dx = straights["LLL4"].x0 + sloc * sin(phi);
+        dz = straights["LLL4"].z0 + sloc * cos(phi);
       }
       // For this direction rotation angle of elements changes to negative,
       // while SAD coordinates keep orientation.
@@ -614,102 +435,102 @@ TGeoHMatrix ReaderSAD::SADtoGeant(ReaderSAD::AcceleratorRings accRing, double s)
       phi += M_PI;
     }
     // negative s
-    else if (s < -400.0) {
+    else if (s < -400.0 * Unit::cm) {
       if (s > ler_breakpoints[7]) {
         double sloc = -s;
-        phi = LLR1_PHI;
-        dx = LLR1_X0 + sloc * sin(phi);
-        dz = LLR1_Z0 + sloc * cos(phi);
+        phi = straights["LLR1"].phi;
+        dx = straights["LLR1"].x0 + sloc * sin(phi);
+        dz = straights["LLR1"].z0 + sloc * cos(phi);
       } else if (s > ler_breakpoints[8]) {
         double sloc = ler_breakpoints[7] - s;
-        phi = BC1RPtube_SPHI + BC1RPtube_DPHI - sloc / BC1RPtube_RT;
+        phi = bendings["BC1RP"].sphi + bendings["BC1RP"].dphi - sloc / bendings["BC1RP"].rt;
         phi = -phi;
-        dx = BC1RPtube_X0 + BC1RPtube_RT * cos(-phi);
-        dz = BC1RPtube_Z0 + BC1RPtube_RT * sin(-phi);
+        dx = bendings["BC1RP"].x0 + bendings["BC1RP"].rt * cos(-phi);
+        dz = bendings["BC1RP"].z0 + bendings["BC1RP"].rt * sin(-phi);
         phi += M_PI;
       } else if (s > ler_breakpoints[9]) {
         double sloc = ler_breakpoints[8] - s;
-        phi = LLR2_PHI;
-        dx = LLR2_X0 + sloc * sin(phi);
-        dz = LLR2_Z0 + sloc * cos(phi);
+        phi = straights["LLR2"].phi;
+        dx = straights["LLR2"].x0 + sloc * sin(phi);
+        dz = straights["LLR2"].z0 + sloc * cos(phi);
       } else if (s > ler_breakpoints[10]) {
         double sloc = ler_breakpoints[9] - s;
-        phi = BLCWRPtube_SPHI + BLCWRPtube_DPHI - sloc / BLCWRPtube_RT;
+        phi = bendings["BLCWRP"].sphi + bendings["BLCWRP"].dphi - sloc / bendings["BLCWRP"].rt;
         phi = -phi;
-        dx = BLCWRPtube_X0 + BLCWRPtube_RT * cos(-phi);
-        dz = BLCWRPtube_Z0 + BLCWRPtube_RT * sin(-phi);
+        dx = bendings["BLCWRP"].x0 + bendings["BLCWRP"].rt * cos(-phi);
+        dz = bendings["BLCWRP"].z0 + bendings["BLCWRP"].rt * sin(-phi);
         phi += M_PI;
       } else if (s > ler_breakpoints[11]) {
         double sloc = ler_breakpoints[10] - s;
-        phi = LLR3_PHI;
-        dx = LLR3_X0 + sloc * sin(phi);
-        dz = LLR3_Z0 + sloc * cos(phi);
+        phi = straights["LLR3"].phi;
+        dx = straights["LLR3"].x0 + sloc * sin(phi);
+        dz = straights["LLR3"].z0 + sloc * cos(phi);
       } else if (s > ler_breakpoints[12]) {
         double sloc = ler_breakpoints[11] - s;
-        phi = BLC1RPtube_SPHI + BLC1RPtube_DPHI - sloc / BLC1RPtube_RT;
+        phi = bendings["BLC1RP"].sphi + bendings["BLC1RP"].dphi - sloc / bendings["BLC1RP"].rt;
         phi = -phi;
-        dx = BLC1RPtube_X0 + BLC1RPtube_RT * cos(-phi);
-        dz = BLC1RPtube_Z0 + BLC1RPtube_RT * sin(-phi);
+        dx = bendings["BLC1RP"].x0 + bendings["BLC1RP"].rt * cos(-phi);
+        dz = bendings["BLC1RP"].z0 + bendings["BLC1RP"].rt * sin(-phi);
         phi += M_PI;
       } else if (s > ler_breakpoints[13]) {
         double sloc = ler_breakpoints[12] - s;
-        phi = LLR4_PHI;
-        dx = LLR4_X0 + sloc * sin(phi);
-        dz = LLR4_Z0 + sloc * cos(phi);
+        phi = straights["LLR4"].phi;
+        dx = straights["LLR4"].x0 + sloc * sin(phi);
+        dz = straights["LLR4"].z0 + sloc * cos(phi);
       } else if (s > ler_breakpoints[14]) {
         double sloc = ler_breakpoints[13] - s;
-        phi = BLC2RPtube_SPHI + sloc / BLC2RPtube_RT;
+        phi = bendings["BLC2RP"].sphi + sloc / bendings["BLC2RP"].rt;
         phi = -phi;
-        dx = BLC2RPtube_X0 + BLC2RPtube_RT * cos(-phi);
-        dz = BLC2RPtube_Z0 + BLC2RPtube_RT * sin(-phi);
+        dx = bendings["BLC2RP"].x0 + bendings["BLC2RP"].rt * cos(-phi);
+        dz = bendings["BLC2RP"].z0 + bendings["BLC2RP"].rt * sin(-phi);
       } else if (s > ler_breakpoints[15]) {
         double sloc = ler_breakpoints[14] - s;
-        phi = LLR5_PHI;
-        dx = LLR5_X0 + sloc * sin(phi);
-        dz = LLR5_Z0 + sloc * cos(phi);
+        phi = straights["LLR5"].phi;
+        dx = straights["LLR5"].x0 + sloc * sin(phi);
+        dz = straights["LLR5"].z0 + sloc * cos(phi);
       }
     }
   }
   if (accRing == c_HER) {
     // HER
     // positive s
-    if (400.0 < s) {
+    if (400.0 * Unit::cm < s) {
       if (s < her_breakpoints[0]) {
-        phi = LHL1_PHI;
-        dx = LHL1_X0 + s * sin(phi);
-        dz = LHL1_Z0 + s * cos(phi);
+        phi = straights["LHL1"].phi;
+        dx = straights["LHL1"].x0 + s * sin(phi);
+        dz = straights["LHL1"].z0 + s * cos(phi);
       } else if (s < her_breakpoints[1]) {
         double sloc = s - her_breakpoints[0];
-        phi = BLC1LEtube_SPHI + sloc / BLC1LEtube_RT;
+        phi = bendings["BLC1LE"].sphi + sloc / bendings["BLC1LE"].rt;
         phi = -phi;
-        dx = BLC1LEtube_X0 + BLC1LEtube_RT * cos(-phi);
-        dz = BLC1LEtube_Z0 + BLC1LEtube_RT * sin(-phi);
+        dx = bendings["BLC1LE"].x0 + bendings["BLC1LE"].rt * cos(-phi);
+        dz = bendings["BLC1LE"].z0 + bendings["BLC1LE"].rt * sin(-phi);
       } else if (s < her_breakpoints[2]) {
         double sloc = s - her_breakpoints[1];
-        phi = LHL2_PHI;
-        dx = LHL2_X0 + sloc * sin(phi);
-        dz = LHL2_Z0 + sloc * cos(phi);
+        phi = straights["LHL2"].phi;
+        dx = straights["LHL2"].x0 + sloc * sin(phi);
+        dz = straights["LHL2"].z0 + sloc * cos(phi);
       }
       phi += M_PI;
     }
     // negative s
-    else if (s < -400.0) {
+    else if (s < -400.0 * Unit::cm) {
       if (s > her_breakpoints[3]) {
         double sloc = -s;
-        phi = LHR1_PHI;
-        dx = LHR1_X0 + sloc * sin(phi);
-        dz = LHR1_Z0 + sloc * cos(phi);
+        phi = straights["LHR1"].phi;
+        dx = straights["LHR1"].x0 + sloc * sin(phi);
+        dz = straights["LHR1"].z0 + sloc * cos(phi);
       } else if (s > her_breakpoints[4]) {
         double sloc = her_breakpoints[3] - s;
-        phi = BLC2REtube_SPHI + sloc / BLC2REtube_RT;
+        phi = bendings["BLC2RE"].sphi + sloc / bendings["BLC2RE"].rt;
         phi = -phi;
-        dx = BLC2REtube_X0 + BLC2REtube_RT * cos(-phi);
-        dz = BLC2REtube_Z0 + BLC2REtube_RT * sin(-phi);
+        dx = bendings["BLC2RE"].x0 + bendings["BLC2RE"].rt * cos(-phi);
+        dz = bendings["BLC2RE"].z0 + bendings["BLC2RE"].rt * sin(-phi);
       } else if (s > her_breakpoints[5]) {
         double sloc = her_breakpoints[4] - s;
-        phi = LHR2_PHI;
-        dx = LHR2_X0 + sloc * sin(phi);
-        dz = LHR2_Z0 + sloc * cos(phi);
+        phi = straights["LHR2"].phi;
+        dx = straights["LHR2"].x0 + sloc * sin(phi);
+        dz = straights["LHR2"].z0 + sloc * cos(phi);
       }
     }
   }

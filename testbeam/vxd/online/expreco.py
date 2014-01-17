@@ -8,6 +8,8 @@ from basf2 import *
 # from simulation import register_simulation
 # from reconstruction import register_reconstruction
 
+from setup_vxdtf import setup_vxdtf
+
 set_log_level(LogLevel.WARNING)
 
 argvs = sys.argv
@@ -57,55 +59,8 @@ else:
 SVD_DQM = register_module('SVDDQM')
 
 # VXDTF:
-## parameters:
-secSetup = ['testBeamMini6GeVSVD-moreThan1500MeV_SVD']
-qiType = 'circleFit'
-filterOverlaps = 'none'  # hopfield
-#
-vxdtf = register_module('VXDTF')
-vxdtf.logging.log_level = LogLevel.INFO
-vxdtf.logging.debug_level = 1
-param_vxdtf = {
-    'activateBaselineTF': 1,
-    'tccMinState': [2],
-    'tccMinLayer': [3],
-    'standardPdgCode': -11,
-    'sectorSetup': secSetup,
-    'calcQIType': qiType,
-    'killEventForHighOccupancyThreshold': 75,
-    'highOccupancyThreshold': 85,
-    'cleanOverlappingSet': False,
-    'filterOverlappingTCs': filterOverlaps,
-    'TESTERexpandedTestingRoutines': False,
-    'qiSmear': False,
-    'smearSigma': 0.000001,
-    'GFTrackCandidatesColName': 'caTracks',
-    'tuneCutoffs': 4,
-    'activateDistanceXY': [False],
-    'activateDistanceZ': [True],
-    'activateDistance3D': [True],
-    'activateAngles3DHioC': [False],
-    'activateAnglesXYHioC': [False],
-    'activateDeltaSlopeRZHioC': [False],
-    'activateDistance2IPHioC': [False],
-    'activatePTHioC': [False],
-    'activateHelixFitHioC': [False],
-    'activateDeltaPtHioC': [False],
-    'activateDeltaDistance2IPHioC': [False],
-    'activateAngles3D': [True],
-    'activateAnglesXY': [False],
-    'activateAnglesRZ': [True],
-    'activateDeltaSlopeRZ': [False],
-    'activateDistance2IP': [False],
-    'activatePT': [False],
-    'activateHelixFit': [False],
-    'activateZigZagXY': [False],
-    'activateDeltaPt': [False],
-    'activateCircleFit': [True],
-    'tuneCircleFit': [0],
-    'tuneDistanceZ': [1.2],
-    }
-vxdtf.param(param_vxdtf)
+# get a VXDTF with standard settings that writes TrackCands to caTracks
+vxdtf = setup_vxdtf('caTracks')
 
 # VXDTF DQM module
 vxdtf_dqm = register_module('VXDTFDQM')

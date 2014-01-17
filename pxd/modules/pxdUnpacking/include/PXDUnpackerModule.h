@@ -45,6 +45,8 @@ namespace Belle2 {
       bool m_headerEndianSwap;
       /**  Run in DHHC mode yes/no */
       bool m_DHHCmode;
+      /** Event Number and compare mask grabbed from FTSW for now */
+      unsigned int ftsw_evt_nr, ftsw_evt_mask;
       /** Output array for Raw Hits. */
       StoreArray<PXDRawHit> m_storeRawHits;
 

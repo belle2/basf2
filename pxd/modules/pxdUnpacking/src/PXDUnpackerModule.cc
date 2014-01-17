@@ -1220,9 +1220,6 @@ void PXDUnpackerModule::initialize()
 
 }
 
-unsigned int ftsw_evt_nr = 0;
-bool ftsw_evt_nr_valide = false;
-
 void PXDUnpackerModule::event()
 {
   StoreArray<RawPXD> storeRaws;
@@ -1234,10 +1231,10 @@ void PXDUnpackerModule::event()
   };
 
   ftsw_evt_nr = 0;
-  ftsw_evt_nr_valide = false;
+  ftsw_evt_mask = 0;
   for (auto & it : storeFTSW) {
     ftsw_evt_nr = it.GetEveNo(0);
-    ftsw_evt_nr_valide = true;
+    ftsw_evt_mask = 0x7FFF;
     B2INFO("PXD Unpacker --> FTSW Event Number: $" << hex << ftsw_evt_nr);
     break;
   }
@@ -1717,12 +1714,14 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& la
   int s;
   s = dhhc.size();
   if (len != s && s != 0) {
-    B2ERROR("Fixed frame type size " << len << " != " << s << " (in data) " << pad);
+    B2ERROR("Fixed frame type size does not match specs: expect " << len << " != " << s << " (in data) " << pad);
   }
 
   unsigned int evtnr;
 
   evtnr = dhhc.get_evtnr();
+  if ((evtnr & ftsw_evt_mask) != (ftsw_evt_nr & ftsw_evt_mask)) B2ERROR("Event Numbers do not match for this frame $" << hex << evtnr << "!=$" << ftsw_evt_nr << "(FTSW) mask $" << ftsw_evt_mask);
+
   int dhh_id = 0x0; //hw->get_dhhid()
   int type = dhhc.get_type();
 

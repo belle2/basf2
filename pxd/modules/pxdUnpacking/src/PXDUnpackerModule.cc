@@ -12,6 +12,7 @@
 #include <framework/datastore/DataStore.h>
 #include <framework/logging/Logger.h>
 //#include <rawdata/dataobjects/RawPXD.h>
+#include <rawdata/dataobjects/RawFTSW.h>
 
 // for htonl
 #include <arpa/inet.h>
@@ -1219,15 +1220,27 @@ void PXDUnpackerModule::initialize()
 
 }
 
+unsigned int ftsw_evt_nr = 0;
+bool ftsw_evt_nr_valide = false;
+
 void PXDUnpackerModule::event()
 {
   StoreArray<RawPXD> storeRaws;
+  StoreArray<RawFTSW> storeFTSW;
 
   int nRaws = storeRaws.getEntries();
   if (verbose) {
     B2INFO("PXD Unpacker --> RawPXD Objects in event: " << nRaws);
   };
 
+  ftsw_evt_nr = 0;
+  ftsw_evt_nr_valide = false;
+  for (auto & it : storeFTSW) {
+    ftsw_evt_nr = it.GetEveNo(0);
+    ftsw_evt_nr_valide = true;
+    B2INFO("PXD Unpacker --> FTSW Event Number: $" << hex << ftsw_evt_nr);
+    break;
+  }
   for (auto & it : storeRaws) {
     if (verbose) {
       B2INFO("PXD Unpacker --> Unpack Objects: ");

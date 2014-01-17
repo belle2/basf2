@@ -688,6 +688,22 @@ std::pair<double, TVector3> TrackletFilters::helixFit(const std::vector<Position
 }
 
 
+
+pair<double, TVector3> TrackletFilters::lineFit3D(const vector<PositionInfo*>* hits)
+{
+  double chi2 = 0;
+  TVector3 directionVector;
+  TVector3 meanXYZ;
+  int nHits = hits->size();
+
+  for (const PositionInfo * aHit : *hits) {
+    meanXYZ += aHit->hitPosition;
+  }
+  meanXYZ *= (1. / double(nHits));
+
+  return make_pair(chi2, directionVector);
+}
+
 /*
  NOTE: old version for calculating momentum seed (maybe fallback?)
 TVector3 radialVector = (center - seedHit);

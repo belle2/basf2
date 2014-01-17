@@ -61,7 +61,7 @@ namespace Belle2 {
     /** checks whether chain of segments are zigg-zagging (changing sign of curvature of neighbouring segments) in the R-Z-plane, returns true, if they are ziggzagging */
     bool ziggZaggRZ();
 
-    /** using circleFit(double, double) but neglects clap (closest approach of fitted circle to origin), so if your are not interested in the coordinates of clap, use this one */
+    /** using circleFit(double, double) but neglects clap (closest approach of fitted circle to origin), so if your are not interested in the coordinates of clap, use this one (return value is the chi2) */
     double circleFit() {
       double phiValue, rValue;
       return circleFit(phiValue, rValue, m_radius);
@@ -75,6 +75,12 @@ namespace Belle2 {
 
     /** using paper "Effective circle fitting for particle trajectories" from V. Karimäki (Nucl.Instr.and Meth. in Physics Research, A305 (1991), Elsevier) to calculate chi2-value of a circle including these hits. Return value is chi2, input parameters are the future r-phi-coordinates of clap (closest approach of fitted circle to origin), which will be calculated during process */
     double circleFit(double& clapPhi, double& clapR, double& radius);
+
+    /** a straight line fit in 3D calculating a direction for a seed value. The return values are chi2 (.first) and direction vector (.second, similar to momentum vector of the helixFit) */
+    std::pair<double, TVector3> lineFit3D() { return lineFit3D(m_hits); }
+
+    /** straight line fits expecting the hits stored in a vector of PositionInfo */
+    std::pair<double, TVector3> lineFit3D(const std::vector<PositionInfo*>* hits);
 
     /** producing a reasonable guess for the pT of the tracklet */
     double calcPt() {

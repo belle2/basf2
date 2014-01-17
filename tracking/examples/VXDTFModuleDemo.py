@@ -13,8 +13,8 @@ initialValue = 2
 secSetup = ['sectorList_evtNormSecHIGH_SVD', 'sectorList_evtNormSecMED_SVD',
             'sectorList_evtNormSecLOW_SVD']
 
-# secSetup = ['evtGenStdSVD-moreThan350MeV_SVD', 'evtGenStdSVD-100to350MeV_SVD',
-            # 'evtGenStdSVD-30to100MeV_SVD']
+# secSetup = ['evtGenStdVXD-moreThan350MeV_VXD', 'evtGenStdVXD-100to350MeV_VXD',
+            # 'evtGenStdVXD-30to100MeV_VXD']
 
 # secSetup = ['sectorList_evtNormSecHIGH_VXD', 'sectorList_evtNormSecMED_VXD', 'sectorList_evtNormSecLOW_VXD']
 # WARNING if you want to use SVD only, please uncomment secSetup ending with SVD, then comment the VXD-version - and don't forget to set the clusters for the detector type you want in the TrackFinderMCTruth down below!

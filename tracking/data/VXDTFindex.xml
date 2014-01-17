@@ -10,4 +10,16 @@
 	<xi:include href="../tracking/sectorList_evtNormSecHIGH_VXD.xml"/>
 	<xi:include href="../tracking/sectorList_evtNormSecMED_VXD.xml"/>
 
+<!-- 	<xi:include href="../tracking/miniSVD-moreThan30MeV_SVD.xml"/> -->
+<!-- 	<xi:include href="../tracking/miniVXD-moreThan30MeV_VXD.xml"/> -->
+	
+	<xi:include href="../tracking/evtGenStdSVD-30to100MeV_SVD.xml"/>
+	<xi:include href="../tracking/evtGenStdSVD-100to350MeV_SVD.xml"/>
+	<xi:include href="../tracking/evtGenStdSVD-moreThan350MeV_SVD.xml"/>
+	<xi:include href="../tracking/evtGenStdVXD-30to100MeV_VXD.xml"/>
+	<xi:include href="../tracking/evtGenStdVXD-100to350MeV_VXD.xml"/>
+	<xi:include href="../tracking/evtGenStdVXD-moreThan350MeV_VXD.xml"/>
+	
+	
+	
 </CATFParameters>

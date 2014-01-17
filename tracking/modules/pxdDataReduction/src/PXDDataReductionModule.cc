@@ -48,7 +48,7 @@ PXDDataReductionModule::PXDDataReductionModule() : Module()
   addParam("gfTrackListName", m_gfTracksListName, " name of the list of the fitted tracks", std::string("gfTracks"));
   addParam("badTrackListName", m_badTracksListName, " name of the list of the bad_track_status tracks", std::string("badTracks"));
 
-  addParam("numIterKalmanFilter", m_numIterKalmanFilter, " number of iterations of the kalman filter ", int(2));
+  addParam("numIterKalmanFilter", m_numIterKalmanFilter, " number of iterations of the kalman filter ", int(5));
 
   addParam("sigmaSystU", m_sigmaSystU, " systematic sigma in the u local coordinate ", double(0.025));
   addParam("sigmaSystV", m_sigmaSystV, " systematic sigma in the V local coordinate ", double(0.025));
@@ -122,7 +122,8 @@ void PXDDataReductionModule::event()
   StoreArray<PXDIntercept> PXDInterceptList(m_PXDInterceptListName);
   PXDInterceptList.create();
   StoreArray<ROIid> ROIList(m_ROIListName);
-  ROIList.create();
+  ROIList.create(true);
+  //  ROIList.create();
 
   StoreArray<genfit::TrackCand> trackCandList(m_gfTrackCandsColName);
   B2DEBUG(1, "%%%%%%%% EVENT # of tracks =  " << trackCandList.getEntries());

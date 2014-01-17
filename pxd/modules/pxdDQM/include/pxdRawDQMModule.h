@@ -17,6 +17,7 @@
 #include <pxd/dataobjects/PXDRawHit.h>
 #include <rawdata/dataobjects/RawPXD.h>
 #include <string>
+//#include <map>
 #include <TH2.h>
 
 namespace Belle2 {
@@ -56,9 +57,13 @@ namespace Belle2 {
       /** Histogram pixelcount/??? */
       TH1F* hrawPxdHitsCount;
       /** Histogram 2d hitmap */
-      TH2F* hrawPxdHits;
+      TH2F* hrawPxdHits[10];
       /** Histogram raw pixel charge */
-      TH1F* hrawPxdHitsCharge;
+      TH1F* hrawPxdHitsCharge[10];
+      /** Histogram raw pixel common mode */
+      TH1F* hrawPxdHitsCommonMode[10];
+
+      //map<int,int> sensor_to_histindex;
 
       virtual void defineHisto();
 

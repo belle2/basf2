@@ -10,6 +10,7 @@
 
 #include <pxd/modules/pxdDQM/pxdRawDQMModule.h>
 
+#include <string>
 
 using namespace std;
 using namespace Belle2;
@@ -33,12 +34,16 @@ pxdRawDQMModule::pxdRawDQMModule() : HistoModule() , m_storeRawPxdrarray() , m_s
 
 void pxdRawDQMModule::defineHisto()
 {
-  hrawPxdHits  = new TH2F("hrawPxdHits", "Pxd Raw Hit Map;row;column", 256, 0, 256, 256, 0, 256);
-  hrawPxdHitsCharge  = new TH1F("hrawPxdHitsCharge", "Pxd Raw Hit Charge;Charge", 256, 0, 256);
-  hrawPxdHitsCount  = new TH1F("hrawPxdCount", "Pxd Raw Count;Nr per Event", 256, 0, 256);
   hrawPxdPackets = new TH1F("hrawPxdPackets", "Pxd Raw Packet Nr;Nr per Event", 16, 0, 16);
   hrawPxdPacketSize = new TH1F("hrawPxdPacketSize", "Pxd Raw Packetsize;Words per packet", 1024, 0, 1024);
 
+  hrawPxdHitsCount = new TH1F("hrawPxdCount", "Pxd Raw Count ;Nr per Event", 256, 0, 256);
+  for (auto i = 0; i < 10; i++) {
+    std::string s = std::to_string(i);
+    hrawPxdHits[i]  = new TH2F(("hrawPxdHits" + s).c_str(), ("Pxd Raw Hit Map " + s + ";row;column").c_str(), 256, 0, 256, 256, 0, 256);
+    hrawPxdHitsCharge[i]  = new TH1F(("hrawPxdHitsCharge" + s).c_str(), ("Pxd Raw Hit Charge " + s + ";Charge").c_str(), 256, 0, 256);
+    hrawPxdHitsCommonMode[i]  = new TH1F(("hrawPxdHitsCommonMode" + s).c_str(), ("Pxd Raw Hit Common Mode " + s + ";Value").c_str(), 256, 0, 256);
+  }
 }
 
 void pxdRawDQMModule::initialize()
@@ -57,7 +62,10 @@ void pxdRawDQMModule::event()
   hrawPxdHitsCount->Fill(m_storeRawHits.getEntries());
 
   for (auto & it : m_storeRawHits) {
-    hrawPxdHits->Fill(it.getRow(), it.getColumn());
-    hrawPxdHitsCharge->Fill(it.getCharge());
+    int i;
+    i = it.getSensorID() % 10;
+    hrawPxdHits[i]->Fill(it.getRow(), it.getColumn());
+    hrawPxdHitsCharge[i]->Fill(it.getCharge());
+    hrawPxdHitsCommonMode[i]->Fill(it.getCommonMode());
   }
 }

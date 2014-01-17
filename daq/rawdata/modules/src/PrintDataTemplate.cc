@@ -86,18 +86,24 @@ void PrintDataTemplateModule::printFTSWEvent(RawDataBlock* raw_datablock, int i)
   printf("*******FTSW data**********: nwords %d\n", nwords);
   printBuffer(buf, nwords);
 
+
   RawFTSW rawftsw;
   int malloc_flag = 0; // No need to free the buffer
   int num_event = 1;
   int num_nodes = 1;
   rawftsw.SetBuffer(buf, nwords, malloc_flag, num_event, num_nodes);
 
+
+  timeval tv;
   int n = 0;
-  printf("eve %d : %d %d %.8x\n",
+  rawftsw.GetTTTimeVal(n , &tv);
+  printf("eve %d TLU %d: %d %d %.8x: tv %d %d\n",
          rawftsw.GetEveNo(n),
+         rawftsw.Get15bitTLUTag(n),
          rawftsw.GetNwords(n),
          rawftsw.GetNwordsHeader(n),
-         rawftsw.GetFTSWNodeID(n)
+         rawftsw.GetFTSWNodeID(n),
+         tv.tv_sec, tv.tv_usec
         );
 
 

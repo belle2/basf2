@@ -33,7 +33,6 @@
 #include <rawdata/dataobjects/RawFTSW.h>
 #include <rawdata/dataobjects/RawTLU.h>
 
-
 //#include <rawdata/RawROPC.h>
 #include <daq/rawdata/modules/DAQConsts.h>
 #include <framework/dataobjects/EventMetaData.h>

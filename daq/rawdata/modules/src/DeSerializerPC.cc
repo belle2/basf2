@@ -208,9 +208,16 @@ int* DeSerializerPCModule::recvData(int* malloc_flag, int* total_buf_nwords, int
 
   vector <int> each_buf_nwords;
   each_buf_nwords.clear();
+  vector <int> each_buf_nodes;
+  each_buf_nodes.clear();
+  vector <int> each_buf_events;
+  each_buf_events.clear();
+
   *total_buf_nwords = 0;
   *num_nodes_in_sendblock = 0;
   *num_events_in_sendblock = 0;
+
+
 
 
   //
@@ -230,6 +237,7 @@ int* DeSerializerPCModule::recvData(int* malloc_flag, int* total_buf_nwords, int
 
     temp_num_events = send_hdr.GetNumEventsinPacket();
     temp_num_nodes = send_hdr.GetNumNodesinPacket();
+
 
 
     if (i == 0) {
@@ -252,6 +260,9 @@ int* DeSerializerPCModule::recvData(int* malloc_flag, int* total_buf_nwords, int
                         - SendTrailer::SENDTRL_NWORDS;
     *total_buf_nwords += rawblk_nwords;
 
+    //
+    // Data size check1
+    //
     if (rawblk_nwords > (int)(2.5e6)) {
       printf("[DEBUG] *******HDR**********\n");
       printData(send_hdr_buf, SendHeader::SENDHDR_NWORDS);
@@ -263,8 +274,9 @@ int* DeSerializerPCModule::recvData(int* malloc_flag, int* total_buf_nwords, int
 
     }
 
-
     each_buf_nwords.push_back(rawblk_nwords);
+    each_buf_events.push_back(temp_num_events);
+    each_buf_nodes.push_back(temp_num_nodes);
 
   }
 
@@ -277,6 +289,24 @@ int* DeSerializerPCModule::recvData(int* malloc_flag, int* total_buf_nwords, int
   for (int i = 0; i < (int)(m_socket.size()); i++) {
     total_recvd_byte += recvFD(m_socket[ i ], (char*)temp_buf + total_recvd_byte,
                                each_buf_nwords[ i ] * sizeof(int), flag);
+
+    //
+    // Data length check
+    //
+    int temp_length = 0;
+    for (int j = 0; j < each_buf_nodes[ i ] * each_buf_events[ i ]; j++) {
+      int this_length = *((int*)((char*)temp_buf + total_recvd_byte - each_buf_nwords[ i ] * sizeof(int) + temp_length));
+      temp_length += this_length * sizeof(int);
+    }
+    if (temp_length != each_buf_nwords[ i ] * sizeof(int)) {
+      char err_buf[500];
+      sprintf(err_buf, "CORRUPTED DATA: Length written on SendHeader(%d) is invalid. Actual data size is %d. Exting...",
+              total_recvd_byte, (int)(*total_buf_nwords * sizeof(int)));
+      print_err.PrintError(m_shmflag, &m_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      sleep(1234567);
+      exit(-1);
+    }
+
   }
 
   if ((int)(*total_buf_nwords * sizeof(int)) != total_recvd_byte) {

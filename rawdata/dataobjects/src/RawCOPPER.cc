@@ -373,7 +373,7 @@ void RawCOPPER::CheckData(int n,
   if (true) {
 #endif
     if ((unsigned int)(prev_copper_ctr + 1) != *cur_copper_ctr) {
-      sprintf(err_buf, "COPPER counter jump : i %d prev 0x%x cur 0x%x : Exiting...\n%s %s %d\n",
+      sprintf(err_buf, "COPPER counter jump : i %d prev 0x%x cur 0x%x :\n%s %s %d\n",
               n, prev_copper_ctr, *cur_copper_ctr,
               __FILE__, __PRETTY_FUNCTION__, __LINE__);
 

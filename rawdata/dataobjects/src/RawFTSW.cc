@@ -25,6 +25,10 @@ RawFTSW::~RawFTSW()
 }
 
 
+int RawFTSW::Get15bitTLUTag(int n)
+{
+  return (int)((unsigned int)(m_buffer[ GetBufferPos(n) +  POS_FTSW_4 ]) & 0x00007FFF);
+}
 
 unsigned int RawFTSW::GetTTCtimeTRGType(int n)
 {

@@ -79,6 +79,8 @@ namespace Belle2 {
     //! get a word cotaining run # and subrun #
     int GetRunNoSubRunNo(int n);
 
+    //! DESY test only
+    int Get15bitTLUTag(int n);
 
 
     /* #ifdef READ_OLD_B2LFEE_FORMAT_FILE */

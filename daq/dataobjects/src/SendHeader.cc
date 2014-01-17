@@ -140,6 +140,13 @@ int SendHeader::GetSubRunNum()
   return ((unsigned int)(m_buffer[ POS_EXP_RUN_NUM ]) & RawHeader::SUBRUNNO_MASK);
 }
 
+int SendHeader::GetRunNumSubrunNum()
+{
+  return ((unsigned int)(m_buffer[ POS_EXP_RUN_NUM ]) &
+          (RawHeader::RUNNO_MASK | RawHeader::SUBRUNNO_MASK));
+}
+
+
 int SendHeader::GetExpNum()
 {
   return (((unsigned int)(m_buffer[ POS_EXP_RUN_NUM ]) & RawHeader::EXP_MASK) >> RawHeader::EXP_SHIFT);

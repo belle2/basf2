@@ -277,6 +277,7 @@ void SVDUnpackerModule::fillSVDDigitList(int nWords, uint32_t* data32_in,  Store
 
     if (((*data32 >> 30) & 0x3) == 0x2) { //APV header type
 
+      time = m_APVLatency;
       theAPVHeader = (struct APVHeader*) data32;
       //      B2INFO(" FADC NUMBER = "<< theMainHeader->FADCnum   <<"   APV NUMBER = "<<theAPVHeader->APVnum);
       B2DEBUG(1, "New APV header");
@@ -293,14 +294,19 @@ void SVDUnpackerModule::fillSVDDigitList(int nWords, uint32_t* data32_in,  Store
         time = m_APVLatency;
 
       //add the 3 data samples:
-      if (theAPVHeader) {
+      if (theAPVHeader)  {
         for (int i = 0; i < 3; i++) {
-          SVDDigit* newDigit = m_map->NewDigit(theMainHeader->FADCnum, theAPVHeader->APVnum, aSample->stripNum, aSample->sample[i], int(time) % 6);
+          SVDDigit* newDigit = m_map->NewDigit(theMainHeader->FADCnum, theAPVHeader->APVnum, aSample->stripNum, aSample->sample[i], int(time));
+
+          if (time > m_APVLatency + 5 * m_APVSamplingTime) {
+            B2WARNING(" More than 6 consecutive (" << time << ") data samples associate to the same strip in FADC evt number = " << theMainHeader->trgNumber);
+            continue;
+          }
+
           time += m_APVSamplingTime;
 
           // Translation can return 0, if wrong FADC/APV combination is encountered.
           if (!newDigit) {
-            //            B2WARNING("Unknown FADC #" << theMainHeader->FADCnum << " and APV #" << theAPVHeader->APVnum);
             m_noNewDigit++;
             continue;
           } else {
@@ -314,9 +320,9 @@ void SVDUnpackerModule::fillSVDDigitList(int nWords, uint32_t* data32_in,  Store
         B2WARNING(" FADC data before a valid APV header 0x" << std::hex << std::setw(8) << std::setfill('0') << *data32);
         //  printDebug(data32, data32_in, &data32_in[nWords-1], 4 );
       }
-
       continue;
     }
+
 
     if (((*data32 >> 28) & 0xf) == 0xe) { // FADC trailer type
 
@@ -332,9 +338,9 @@ void SVDUnpackerModule::fillSVDDigitList(int nWords, uint32_t* data32_in,  Store
     return;
   }
 
-  if (&data32_in[nWords] != &data32[1]) {
+  if (&data32_in[nWords] != &data32[1])
     B2WARNING("FADC trailer appeared too early, data short by " << &data32_in[nWords] - &data32[1] << " bytes");
-  }
+
 
 
 }

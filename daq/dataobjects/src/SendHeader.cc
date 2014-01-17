@@ -7,6 +7,7 @@
 //-
 
 #include "daq/dataobjects/SendHeader.h"
+#include "rawdata/dataobjects/RawHeader.h"
 
 using namespace std;
 using namespace Belle2;
@@ -85,6 +86,34 @@ void SendHeader::SetNodeID(int node_id)
 }
 
 
+void SendHeader::SetRunNum(int run_num)
+{
+  unsigned int inv_mask = ~((unsigned int)(RawHeader::RUNNO_MASK));
+  m_buffer[ POS_EXP_RUN_NUM ] =
+    ((unsigned int)m_buffer[ POS_EXP_RUN_NUM ] & inv_mask) |
+    (((unsigned int)run_num << RawHeader::RUNNO_SHIFT) & RawHeader::RUNNO_MASK);
+  return;
+}
+
+void SendHeader::SetSubRunNum(int subrun_num)
+{
+  unsigned int inv_mask = ~((unsigned int)(RawHeader::SUBRUNNO_MASK));
+  m_buffer[ POS_EXP_RUN_NUM ] =
+    ((unsigned int)m_buffer[ POS_EXP_RUN_NUM ] & inv_mask) | ((unsigned int)subrun_num & RawHeader::SUBRUNNO_MASK);
+  return;
+}
+
+void SendHeader::SetExpNum(int exp_num)
+{
+  unsigned int inv_mask = ~((unsigned int)(RawHeader::EXP_MASK));
+  m_buffer[ POS_EXP_RUN_NUM ] =
+    ((unsigned int)m_buffer[ POS_EXP_RUN_NUM ] & inv_mask) |
+    (((unsigned int)exp_num << RawHeader::EXP_SHIFT) & RawHeader::EXP_MASK);
+  return;
+}
+
+
+
 // Get Values
 
 int SendHeader::GetTotalNwords() {  return m_buffer[ POS_NWORDS ];}
@@ -101,8 +130,19 @@ int SendHeader::GetEventNumber() { return m_buffer[ POS_EVE_NUM ]; }
 
 int SendHeader::GetNodeID() { return m_buffer[ POS_NODE_ID ]; }
 
-int SendHeader::GetRunNum() { return (m_buffer[ POS_EXP_RUN_NUM ] & 0x3FFFFF); }
+int SendHeader::GetRunNum()
+{
+  return (((unsigned int)(m_buffer[ POS_EXP_RUN_NUM ]) & RawHeader::RUNNO_MASK) >> RawHeader::RUNNO_SHIFT);
+}
 
-int SendHeader::GetExpNum() { return ((m_buffer[ POS_EXP_RUN_NUM ] >> 22) & 0x3FF); }
+int SendHeader::GetSubRunNum()
+{
+  return ((unsigned int)(m_buffer[ POS_EXP_RUN_NUM ]) & RawHeader::SUBRUNNO_MASK);
+}
+
+int SendHeader::GetExpNum()
+{
+  return (((unsigned int)(m_buffer[ POS_EXP_RUN_NUM ]) & RawHeader::EXP_MASK) >> RawHeader::EXP_SHIFT);
+}
 
 

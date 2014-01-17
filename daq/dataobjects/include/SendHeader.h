@@ -46,6 +46,11 @@ namespace Belle2 {
 
     void SetExpRunWord(unsigned int exp_run);
 
+
+    void SetRunNum(int run_num);   //!
+    void SetSubRunNum(int subrun_num);  //!
+    void SetExpNum(int exp_num);   //!
+
     int GetTotalNwords();  //! get contents of Header
     int GetHdrNwords();  //! get contents of Header
     int GetNumEventsinPacket();
@@ -54,8 +59,8 @@ namespace Belle2 {
     int GetNodeID();
 
     int GetRunNum(); //!
+    int GetSubRunNum(); //!
     int GetExpNum(); //!
-
 
     /* Data Format : Node info */
     enum {

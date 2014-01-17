@@ -83,13 +83,14 @@ void PXDRawHitSorterModule::event()
   // Fill sensor information to get sorted Pixel indices
   const int nPixels = storeRawHits.getEntries();
   unsigned short currentFrameNumber(0);
+  unsigned short currentStartRow(0);
   VxdID currentSensorID(0);
   unsigned short frameCounter(1); // to recode frame numbers to small integers
   for (int i = 0; i < nPixels; i++) {
     const PXDRawHit* const rawhit = storeRawHits[i];
     // Zero-suppression cut
     if (rawhit->getCharge() < m_0cut) continue;
-    Pixel px(rawhit, i);
+    Pixel px(rawhit, rawhit->getStartRow());
     VxdID sensorID = rawhit->getSensorID();
     // For fake data, suuply a reasonable VxdID when VxdID is 0
     if (m_acceptFake && sensorID.getID() == 0) sensorID = 8480;
@@ -132,8 +133,9 @@ void PXDRawHitSorterModule::event()
         } //Otherwise delete the second pixel by forgetting about it.
       }
       lastpx = &px;
-      for (unsigned short startRow : startRows[sensorID])
-        storeFrames.appendNew(sensorID, startRow);
     }
+    for (unsigned short startRow : startRows[sensorID])
+      storeFrames.appendNew(sensorID, startRow);
+
   }
 }

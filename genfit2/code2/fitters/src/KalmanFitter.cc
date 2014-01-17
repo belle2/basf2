@@ -38,9 +38,9 @@
 using namespace genfit;
 
 
-void KalmanFitter::fitTrack(Track* tr, const AbsTrackRep* rep,
+bool KalmanFitter::fitTrack(Track* tr, const AbsTrackRep* rep,
     double& chi2, double& ndf,
-    int startId, int endId)
+    int startId, int endId, int& nFailedHits)
 {
 
   if (multipleMeasurementHandling_ == unweightedClosestToReference ||
@@ -64,29 +64,46 @@ void KalmanFitter::fitTrack(Track* tr, const AbsTrackRep* rep,
   chi2 = 0;
   ndf = -1. * rep->getDim();
 
+  nFailedHits = 0;
+
   if (debugLvl_ > 0) {
     std::cout << tr->getNumPointsWithMeasurement() << " TrackPoints w/ measurement in this track." << std::endl;
   }
   for (int i = startId; ; i+=direction) {
     TrackPoint *tp = tr->getPointWithMeasurement(i);
-    KalmanFitterInfo* fi;
     assert(direction == +1 || direction == -1);
-
-    if (! tp->hasFitterInfo(rep)) {
-      fi = new KalmanFitterInfo(tp, rep);
-      tp->setFitterInfo(fi);
-    }
-    else
-      fi = static_cast<KalmanFitterInfo*>(tp->getFitterInfo(rep));
 
     if (debugLvl_ > 0) {
       std::cout << " process TrackPoint nr. " << i << " (" << tp << ")\n";
     }
-    processTrackPoint(tr, tp, fi, rep, chi2, ndf, direction);
+
+    try {
+      processTrackPoint(tr, tp, rep, chi2, ndf, direction);
+    }
+    catch (Exception& e) {
+      std::cerr << e.what();
+
+      ++nFailedHits;
+      if (maxFailedHits_<0 || nFailedHits <= maxFailedHits_) {
+        tr->getPoint(i)->deleteFitterInfo(rep);
+
+        if (i == endId)
+          break;
+
+        if (debugLvl_ > 0)
+          std::cout << "There was an exception, try to continue with next TrackPoint " << i+direction << " \n";
+
+        continue;
+      }
+
+      return false;
+    }
 
     if (i == endId)
       break;
   }
+
+  return true;
 }
 
 
@@ -141,6 +158,8 @@ void KalmanFitter::processTrackWithRep(Track* tr, const AbsTrackRep* rep, bool r
   double chi2FW(0), ndfFW(0);
   double chi2BW(0), ndfBW(0);
 
+  int nFailedHitsForward(0), nFailedHitsBackward(0);
+
 
   KalmanFitStatus* status = new KalmanFitStatus();
   tr->setFitStatus(status, rep);
@@ -154,7 +173,13 @@ void KalmanFitter::processTrackWithRep(Track* tr, const AbsTrackRep* rep, bool r
         std::cout << "\033[0mfitting" << std::endl;
       }
 
-      fitTrack(tr, rep, chi2FW, ndfFW, 0, -1);
+      if (!fitTrack(tr, rep, chi2FW, ndfFW, 0, -1, nFailedHitsForward)) {
+        status->setIsFitted(false);
+        status->setIsFitConvergedFully(false);
+        status->setIsFitConvergedPartially(false);
+        status->setNFailedPoints(nFailedHitsForward);
+        return;
+      }
 
       if (debugLvl_ > 0) {
         std::cout << "\033[1;21mstate post forward" << std::endl;
@@ -165,7 +190,13 @@ void KalmanFitter::processTrackWithRep(Track* tr, const AbsTrackRep* rep, bool r
       // Backwards iteration:
       currentState_->blowUpCov(blowUpFactor_);  // blow up cov
 
-      fitTrack(tr, rep, chi2BW, ndfBW, -1, 0);
+      if (!fitTrack(tr, rep, chi2BW, ndfBW, -1, 0, nFailedHitsBackward)) {
+        status->setIsFitted(false);
+        status->setIsFitConvergedFully(false);
+        status->setIsFitConvergedPartially(false);
+        status->setNFailedPoints(nFailedHitsBackward);
+        return;
+      }
 
       if (debugLvl_ > 0) {
         std::cout << "\033[1;21mstate post backward" << std::endl;
@@ -208,7 +239,16 @@ void KalmanFitter::processTrackWithRep(Track* tr, const AbsTrackRep* rep, bool r
             std::cout << "Fit is converged! ";
           std::cout << "\n";
         }
-        status->setIsFitConverged(converged);
+
+        if (nFailedHitsForward == 0 && nFailedHitsBackward == 0)
+          status->setIsFitConvergedFully(converged);
+        else
+          status->setIsFitConvergedFully(false);
+
+        status->setIsFitConvergedPartially(converged);
+
+        status->setNFailedPoints(std::max(nFailedHitsForward, nFailedHitsBackward));
+
         break;
       }
       else {
@@ -227,16 +267,25 @@ void KalmanFitter::processTrackWithRep(Track* tr, const AbsTrackRep* rep, bool r
         break;
       }
     }
-    catch(Exception& e) {
+    catch(Exception& e) { // should not happen, but I leave it in for safety
       std::cerr << e.what();
       status->setIsFitted(false);
-      status->setIsFitConverged(false);
+      status->setIsFitConvergedFully(false);
+      status->setIsFitConvergedPartially(false);
+      status->setNFailedPoints(std::max(nFailedHitsForward, nFailedHitsBackward));
       return;
     }
   }
 
   status->setIsFitted();
-  status->setCharge(rep->getCharge(*static_cast<KalmanFitterInfo*>(tr->getPointWithMeasurement(0)->getFitterInfo(rep))->getBackwardUpdate()));
+  double charge(0);
+  TrackPoint* tp = tr->getPointWithMeasurementAndFitterInfo(0, rep);
+  if (tp != NULL) {
+    if (static_cast<KalmanFitterInfo*>(tp->getFitterInfo(rep))->hasBackwardUpdate())
+      charge = static_cast<KalmanFitterInfo*>(tp->getFitterInfo(rep))->getBackwardUpdate()->getCharge();
+  }
+  status->setNFailedPoints(std::max(nFailedHitsForward, nFailedHitsBackward));
+  status->setCharge(charge);
   status->setNumIterations(nIt);
   status->setForwardChi2(chi2FW);
   status->setBackwardChi2(chi2BW);
@@ -309,25 +358,21 @@ KalmanFitter::processTrackPartially(Track* tr, const AbsTrackRep* rep, int start
       std::cout << "blow up seed \n";
   }
 
-  try {
-    if (debugLvl_ > 0) {
-      std::cout << "\033[1;21mstate pre" << std::endl;
-      currentState_->Print();
-      std::cout << "\033[0mfitting" << std::endl;
-    }
+  if (debugLvl_ > 0) {
+    std::cout << "\033[1;21mstate pre" << std::endl;
+    currentState_->Print();
+    std::cout << "\033[0mfitting" << std::endl;
+  }
 
-    double chi2, ndf;
-    fitTrack(tr, rep, chi2, ndf, startId, endId);
-  }
-  catch(Exception& e) {
-    std::cerr << e.what();
-    return;
-  }
+  double chi2, ndf;
+  int nFailedHits;
+  fitTrack(tr, rep, chi2, ndf, startId, endId, nFailedHits); // return value has no consequences here
+
 }
 
 
 void
-KalmanFitter::processTrackPoint(Track* tr, TrackPoint* tp, KalmanFitterInfo* fi,
+KalmanFitter::processTrackPoint(Track* tr, TrackPoint* tp,
     const AbsTrackRep* rep, double& chi2, double& ndf, int direction)
 {
   assert(direction == -1 || direction == +1);
@@ -335,12 +380,23 @@ KalmanFitter::processTrackPoint(Track* tr, TrackPoint* tp, KalmanFitterInfo* fi,
   if (!tp->hasRawMeasurements())
     return;
 
+  bool newFi(false);
+
+  KalmanFitterInfo* fi;
+  if (! tp->hasFitterInfo(rep)) {
+    fi = new KalmanFitterInfo(tp, rep);
+    tp->setFitterInfo(fi);
+    newFi = true;
+  }
+  else
+    fi = static_cast<KalmanFitterInfo*>(tp->getFitterInfo(rep));
+
   SharedPlanePtr plane;
   bool oldWeightsFixed(false);
   std::vector<double> oldWeights;
 
   // construct measurementsOnPlane if forward fit
-  if (direction == 1) {
+  if (newFi) {
     // remember old weights
     oldWeights = fi->getWeights();
     oldWeightsFixed = fi->areWeightsFixed();
@@ -374,7 +430,7 @@ KalmanFitter::processTrackPoint(Track* tr, TrackPoint* tp, KalmanFitterInfo* fi,
 
 
   // construct new MeasurementsOnPlane
-  if (direction == 1) {
+  if (newFi) {
     const std::vector< genfit::AbsMeasurement* >& rawMeasurements =  tp->getRawMeasurements();
     for (std::vector< genfit::AbsMeasurement* >::const_iterator it = rawMeasurements.begin(); it != rawMeasurements.end(); ++it) {
       fi->addMeasurementsOnPlane((*it)->constructMeasurementsOnPlane(*state));

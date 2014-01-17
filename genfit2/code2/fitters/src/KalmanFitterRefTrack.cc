@@ -113,6 +113,7 @@ void KalmanFitterRefTrack::processTrackWithRep(Track* tr, const AbsTrackRep* rep
   double oldPvalBW = 0.;
   double chi2FW(0), ndfFW(0);
   double chi2BW(0), ndfBW(0);
+  int nFailedHits(0);
 
   KalmanFitStatus* status = new KalmanFitStatus();
   tr->setFitStatus(status, rep);
@@ -128,11 +129,20 @@ void KalmanFitterRefTrack::processTrackWithRep(Track* tr, const AbsTrackRep* rep
         << " (id == " << tr->getIdForRep(rep) << ")"<< ", iteration nr. " << nIt << "\n";
 
       // prepare
-      if (!prepareTrack(tr, rep, resortHits) && !refitAll_) {
+      if (!prepareTrack(tr, rep, resortHits, nFailedHits) && !refitAll_) {
         if (debugLvl_ > 0)
           std::cout << "KalmanFitterRefTrack::processTrack. Track preparation did not change anything!\n";
+
         status->setIsFitted();
-        status->setIsFitConverged();
+
+        status->setIsFitConvergedPartially();
+        if (nFailedHits == 0)
+          status->setIsFitConvergedFully();
+        else
+          status->setIsFitConvergedFully(false);
+
+        status->setNFailedPoints(nFailedHits);
+
         status->setHasTrackChanged(false);
         status->setCharge(rep->getCharge(*static_cast<KalmanFitterInfo*>(tr->getPointWithMeasurement(0)->getFitterInfo(rep))->getBackwardUpdate()));
         status->setNumIterations(nIt);
@@ -158,7 +168,8 @@ void KalmanFitterRefTrack::processTrackWithRep(Track* tr, const AbsTrackRep* rep
             std::cout << "KalmanFitterRefTrack::processTrack. Resorted Track:";
             tr->Print("C");
           }
-          prepareTrack(tr, rep, resortHits);// re-prepare if order of hits has changed!
+          prepareTrack(tr, rep, resortHits, nFailedHits);// re-prepare if order of hits has changed!
+          status->setNFailedPoints(nFailedHits);
           if (debugLvl_ > 0) {
             std::cout << "KalmanFitterRefTrack::processTrack. Prepared resorted Track:";
             tr->Print("C");
@@ -232,7 +243,15 @@ void KalmanFitterRefTrack::processTrackWithRep(Track* tr, const AbsTrackRep* rep
             std::cout << "Fit is converged! ";
           std::cout << "\n";
         }
-        status->setIsFitConverged(converged);
+
+        if (nFailedHits == 0)
+          status->setIsFitConvergedFully(converged);
+        else
+          status->setIsFitConvergedFully(false);
+
+        status->setIsFitConvergedPartially(converged);
+        status->setNFailedPoints(nFailedHits);
+
         break;
       }
       else {
@@ -253,7 +272,9 @@ void KalmanFitterRefTrack::processTrackWithRep(Track* tr, const AbsTrackRep* rep
     catch(Exception& e) {
       std::cerr << e.what();
       status->setIsFitted(false);
-      status->setIsFitConverged(false);
+      status->setIsFitConvergedFully(false);
+      status->setIsFitConvergedPartially(false);
+      status->setNFailedPoints(nFailedHits);
       if (debugLvl_ > 0)
         status->Print();
       return;
@@ -263,16 +284,22 @@ void KalmanFitterRefTrack::processTrackWithRep(Track* tr, const AbsTrackRep* rep
 
 
   TrackPoint* tp = tr->getPointWithMeasurementAndFitterInfo(0, rep);
-  if (tp != NULL &&
-      static_cast<KalmanFitterInfo*>(tp->getFitterInfo(rep))->hasBackwardUpdate())
-    status->setCharge(rep->getCharge(*static_cast<KalmanFitterInfo*>(tr->getPointWithMeasurement(0)->getFitterInfo(rep))->getBackwardUpdate()));
+
+  double charge(0);
+  if (tp != NULL) {
+    if (static_cast<KalmanFitterInfo*>(tp->getFitterInfo(rep))->hasBackwardUpdate())
+      charge = static_cast<KalmanFitterInfo*>(tp->getFitterInfo(rep))->getBackwardUpdate()->getCharge();
+  }
+  status->setCharge(charge);
 
   if (tp != NULL) {
     status->setIsFitted();
   }
   else { // none of the trackPoints has a fitterInfo
     status->setIsFitted(false);
-    status->setIsFitConverged(false);
+    status->setIsFitConvergedFully(false);
+    status->setIsFitConvergedPartially(false);
+    status->setNFailedPoints(nFailedHits);
   }
 
   status->setHasTrackChanged(false);
@@ -287,7 +314,7 @@ void KalmanFitterRefTrack::processTrackWithRep(Track* tr, const AbsTrackRep* rep
 }
 
 
-bool KalmanFitterRefTrack::prepareTrack(Track* tr, const AbsTrackRep* rep, bool setSortingParams) {
+bool KalmanFitterRefTrack::prepareTrack(Track* tr, const AbsTrackRep* rep, bool setSortingParams, int& nFailedHits) {
 
   if (debugLvl_ > 0)
     std::cout << "KalmanFitterRefTrack::prepareTrack \n";
@@ -327,11 +354,16 @@ bool KalmanFitterRefTrack::prepareTrack(Track* tr, const AbsTrackRep* rep, bool 
 
 
   unsigned int i=0;
+  nFailedHits = 0;
 
-  try {
 
-    // loop over TrackPoints
-    for (; i<nPoints; ++i) {
+  // loop over TrackPoints
+  for (; i<nPoints; ++i) {
+
+    try {
+
+      if (debugLvl_ > 0)
+        std::cout << "Prepare TrackPoint " << i << "\n";
 
       TrackPoint* trackPoint = tr->getPoint(i);
 
@@ -341,6 +373,9 @@ bool KalmanFitterRefTrack::prepareTrack(Track* tr, const AbsTrackRep* rep, bool 
           std::cout << "TrackPoint has no rawMeasurements -> continue \n";
         continue;
       }
+
+      bool newRefStateTemp = newRefState;
+      newRefState = false; // is set here already because exceptions may be raised
 
 
       // get fitterInfo
@@ -369,6 +404,10 @@ bool KalmanFitterRefTrack::prepareTrack(Track* tr, const AbsTrackRep* rep, bool 
       // get smoothedState if available
       if (fitterInfo->hasPredictionsAndUpdates()) {
         smoothedState = &(fitterInfo->getFittedState(true));
+        if (debugLvl_ > 0) {
+          std::cout << "got smoothed state \n";
+          //smoothedState->Print();
+        }
       }
       else {
         smoothedState = NULL;
@@ -378,16 +417,19 @@ bool KalmanFitterRefTrack::prepareTrack(Track* tr, const AbsTrackRep* rep, bool 
       if (fitterInfo->hasReferenceState()) {
 
         referenceState = fitterInfo->getReferenceState();
+
+        // set since we continue in this block in any case
         prevFitterInfo = fitterInfo;
         prevSmoothedState = smoothedState;
 
-        if (!newRefState) {
+        if (!newRefStateTemp) {
           if (debugLvl_ > 0)
             std::cout << "TrackPoint already has referenceState and previous referenceState has not been altered -> continue \n";
-          prevReferenceState = referenceState;
           trackLen += referenceState->getForwardSegmentLength();
           if (setSortingParams)
             trackPoint->setSortingParameter(trackLen);
+
+          prevReferenceState = referenceState;
           continue;
         }
 
@@ -431,14 +473,10 @@ bool KalmanFitterRefTrack::prepareTrack(Track* tr, const AbsTrackRep* rep, bool 
         if (setSortingParams)
           trackPoint->setSortingParameter(trackLen);
 
-
         prevReferenceState = referenceState;
-        newRefState = false;
 
         continue;
       }
-
-      newRefState = false;
 
 
       // Construct plane
@@ -449,8 +487,10 @@ bool KalmanFitterRefTrack::prepareTrack(Track* tr, const AbsTrackRep* rep, bool 
         plane = trackPoint->getRawMeasurement(0)->constructPlane(*smoothedState);
       }
       else if (prevSmoothedState != NULL) {
-        if (debugLvl_ > 0)
+        if (debugLvl_ > 0) {
           std::cout << "construct plane with prevSmoothedState \n";
+          //prevSmoothedState->Print();
+        }
         plane = trackPoint->getRawMeasurement(0)->constructPlane(*prevSmoothedState);
       }
       else if (prevReferenceState != NULL) {
@@ -586,7 +626,6 @@ bool KalmanFitterRefTrack::prepareTrack(Track* tr, const AbsTrackRep* rep, bool 
 
 
       // create new reference state
-      newRefState = true;
       referenceState = new ReferenceStateOnPlane(stateToExtrapolate->getState(),
              stateToExtrapolate->getPlane(),
              stateToExtrapolate->getRep(),
@@ -616,43 +655,54 @@ bool KalmanFitterRefTrack::prepareTrack(Track* tr, const AbsTrackRep* rep, bool 
       }
 
       changedSmthg = true;
+      newRefState = true;
 
       prevReferenceState = referenceState;
       prevFitterInfo = fitterInfo;
       prevSmoothedState = smoothedState;
 
-    } // end loop over TrackPoints
+    }
+    catch (Exception& e) {
 
-  }
-  catch (Exception& e) {
+      if (debugLvl_ > 0) {
+        std::cout << "exception at hit " << i << "\n";
+        std::cerr << e.what();
+      }
 
-    if (debugLvl_ > 0) {
-      std::cout << "exception at hit " << i << "\n";
-      std::cerr << e.what();
+
+      ++nFailedHits;
+      if (maxFailedHits_<0 || nFailedHits <= maxFailedHits_) {
+        referenceState = NULL;
+        smoothedState = NULL;
+        tr->getPoint(i)->deleteFitterInfo(rep);
+
+        if (setSortingParams)
+          tr->getPoint(i)->setSortingParameter(trackLen);
+
+        if (debugLvl_ > 0)
+          std::cout << "There was an exception, try to continue with next TrackPoint " << i+1 << " \n";
+
+        continue;
+      }
+
+
+      // clean up
+      removeForwardBackwardInfo(tr, rep, notChangedUntil, notChangedFrom);
+
+      // set sorting parameters of rest of TrackPoints and remove FitterInfos
+      for (; i<nPoints; ++i) {
+        TrackPoint* trackPoint = tr->getPoint(i);
+
+        if (setSortingParams)
+          trackPoint->setSortingParameter(trackLen);
+
+        trackPoint->deleteFitterInfo(rep);
+      }
+      return true;
+
     }
 
-    // clean up
-    removeForwardBackwardInfo(tr, rep, notChangedUntil, notChangedFrom);
-
-    // set sorting parameters of TrackPoints where no reference state could be calculated
-    for (; i<nPoints; ++i) {
-      TrackPoint* trackPoint = tr->getPoint(i);
-
-      if (setSortingParams)
-        trackPoint->setSortingParameter(trackLen);
-
-      trackPoint->deleteFitterInfo(rep);
-    }
-
-    //prevReferenceState->resetForward();
-    //referenceState->resetBackward();
-
-    //Exception exc("KalmanFitterRefTrack::prepareTrack: got an exception.",__LINE__,__FILE__);
-    //exc.setFatal();
-    //throw exc;
-
-    return true;
-  }
+  } // end loop over TrackPoints
 
 
 
@@ -660,8 +710,8 @@ bool KalmanFitterRefTrack::prepareTrack(Track* tr, const AbsTrackRep* rep, bool 
   removeForwardBackwardInfo(tr, rep, notChangedUntil, notChangedFrom);
 
   if (firstBackwardUpdate) {
-    KalmanFitterInfo* fi = static_cast<KalmanFitterInfo*>(tr->getPointWithMeasurement(0)->getFitterInfo(rep));
-    if (! fi->hasForwardPrediction()) {
+    KalmanFitterInfo* fi = static_cast<KalmanFitterInfo*>(tr->getPointWithMeasurementAndFitterInfo(0, rep)->getFitterInfo(rep));
+    if (fi && ! fi->hasForwardPrediction()) {
       if (debugLvl_ > 0)
         std::cout << "set backwards update of first point as forward prediction (with blown up cov) \n";
       if (fi->getPlane() != firstBackwardUpdate->getPlane()) {

@@ -178,7 +178,7 @@ void Raw2DsModule::registerRawCOPPERs()
   StoreObjPtr<EventMetaData> evtmetadata;
   evtmetadata.create();
   evtmetadata->setExperiment(sndhdr.GetExpNum());
-  evtmetadata->setRun(sndhdr.GetRunNum());
+  evtmetadata->setRun(sndhdr.GetRunNumSubRunNum());
   evtmetadata->setEvent(sndhdr.GetEventNumber());
   //  printf ( "ExpNo = %d, RunNo = %d, EvtNo = %d\n", sndhdr.GetExpNum(),
   //       sndhdr.GetRunNum(), sndhdr.GetEventNumber() );

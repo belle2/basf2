@@ -61,7 +61,7 @@ namespace Belle2 {
     int GetRunNum(); //!
     int GetSubRunNum(); //!
     int GetExpNum(); //!
-    int GetRunNumSubrunNum(); //!
+    int GetRunNumSubRunNum(); //!
 
     /* Data Format : Node info */
     enum {

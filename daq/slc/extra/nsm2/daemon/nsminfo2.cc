@@ -5,6 +5,9 @@
 // 20131229  shmget permission changed
 // 20140104  disid / conid
 // 20140105  integrating into nsmd2
+// 20140113  fix: mem shared memory mode 0664 -> 0644
+// 20140115  nsmd/protocol versions
+// 20140117  color version
 // ----------------------------------------------------------------------
 
 // -- include files -----------------------------------------------------
@@ -20,9 +23,20 @@
 #include <sys/ipc.h>
 #include <sys/shm.h>
 #include <arpa/inet.h>
+#include <unistd.h>
 
 #include "nsm2.h"
 #include "nsmsys2.h"
+
+#define BLACK()  if (color) printf("\033[m")
+#define BOLD()   if (color) printf("\033[0;1m")
+#define RED()    if (color) printf("\033[40;31;1m")
+#define CYAN()   if (color) printf("\033[40;36;1m")
+#define GREEN()  if (color) printf("\033[40;32;1m")
+#define YELLOW() if (color) printf("\033[40;33;1m")
+#define BLUE()   if (color) printf("\033[47;34;1m")
+#define MAGENTA() if (color) printf("\033[35;1m")
+
 
 // -- standalone or called from nsmd2 -----------------------------------
 // ----------------------------------------------------------------------
@@ -85,7 +99,7 @@ extern "C" int nsmlib_hash(NSMsys* sysp, int32* hashtable, int hashmax,
                            const char* key, int create);
 
 // -- hoststr -----------------------------------------------------------
-const char*
+static const char*
 nsminfo_hoststr(int ip, int iponly = 0) // ip: network byte order
 {
   static char host[16][256];
@@ -106,7 +120,7 @@ nsminfo_hoststr(int ip, int iponly = 0) // ip: network byte order
   return hostp;
 }
 // -- timestr -----------------------------------------------------------
-const char*
+static const char*
 nsminfo_timestr(time_t t, int typ = 0)
 {
   static char timestr[16][256];
@@ -145,29 +159,56 @@ nsminfo_timestr(time_t t, int typ = 0)
   return timep;
 }
 // -- head --------------------------------------------------------------
-void
-nsminfo_head()
+static int
+nsminfo_head(int color)
 {
   NSMsys& sys = *nsmd_sysp;
   NSMmem& mem = *nsmd_memp;
   pid_t  pid    = sys.pid;
   time_t tstart = sys.timstart;
   time_t tevent = sys.timevent;
+  int16_t dver = sys.version;
+  int16_t pver = sys.protocol;
   int badmem = 0;
   NSMcon& master = sys.con[sys.master];
   NSMcon& udpcon = sys.con[NSMCON_UDP];
   NSMcon& tcpcon = sys.con[NSMCON_TCP];
 
-  if (sys.master == NSMCON_NON) {
+  if (tstart == (time_t) - 1) {
+    // so far not successful to gracefully reattach to newly
+    // restarted nsmd2
+    time_t now = time(0);
+    if (now - tevent >= 0 && now - tevent < 3600) {
+      P("NSMD has terminated at %s (%s ago).\n",
+        nsminfo_timestr(tevent, 1),
+        nsminfo_timestr(tevent));
+    } else {
+      P("NSMD has terminated.\n");
+    }
+    exit(1);
+  } else if (sys.master == NSMCON_NON) {
     P("NSM network is not started yet\n");
   } else {
-    P("NSM network started at %s (%s ago)\n",
+    P("NSM network v%d.%d.%02d started at %s (%s ago)\n",
+      pver / 1000, (pver % 1000) / 100, pver % 100,
       nsminfo_timestr(tcpcon.timstart, 1),
       nsminfo_timestr(tcpcon.timstart));
   }
-  P("NSMD daemon started at %s (%s ago)\n",
+  P("NSMD daemon v%d.%d.%02d started at %s (%s ago) priority=%d\n",
+    dver / 1000, (dver % 1000) / 100, dver % 100,
     nsminfo_timestr(udpcon.timstart, 1),
-    nsminfo_timestr(udpcon.timstart));
+    nsminfo_timestr(udpcon.timstart),
+    sys.priority);
+
+  if (sys.master == NSMCON_NON) {
+    RED();
+  } else if (sys.master == NSMCON_TCP) {
+    CYAN();
+  } else if (sys.deputy == NSMCON_TCP) {
+    GREEN();
+  } else {
+    YELLOW();
+  }
 
   P("MASTER(%d) %s %s, DEPUTY(%d) %s %s, I'm %s nsmd\n",
     sys.master,
@@ -179,6 +220,7 @@ nsminfo_head()
     sys.master == NSMCON_TCP ? "the MASTER" :
     sys.deputy == NSMCON_TCP ? "the DEPUTY" : "a MEMBER");
 
+  RED();
   if (sys.ipaddr != mem.ipaddr) {
     P("inconsistent ipaddr: %s(sys) vs %s(mem)\n",
       nsminfo_hoststr(sys.ipaddr, 1), nsminfo_hoststr(mem.ipaddr, 1));
@@ -198,6 +240,7 @@ nsminfo_head()
       (int)tevent, (int)mem.timevent);
     badmem++;
   }
+  BLACK();
   if (badmem && ! xforce) {
     exit(1);
   }
@@ -209,10 +252,12 @@ nsminfo_head()
     nsminfo_timestr(sys.timstart),
     nsminfo_timestr(sys.timevent),
     (time(0) - sys.timevent <= 2) ? " (up-to-date)" : "");
+
+  return 0;
 }
 // -- conn --------------------------------------------------------------
-void
-nsminfo_conn(int all = 0)
+static void
+nsminfo_conn(int color, int all = 0)
 {
   NSMsys& sys = *nsmd_sysp;
   int ncon = all ? NSMSYS_MAX_CON : sys.ncon;
@@ -220,6 +265,16 @@ nsminfo_conn(int all = 0)
   for (int icon = NSMCON_OUT; icon < ncon; icon++) {
     NSMcon& con = sys.con[icon];
     char name[32];
+
+    if (icon == sys.master) {
+      CYAN();
+    } else if (icon == sys.deputy) {
+      GREEN();
+    } else if (ItsLocal(icon)) {
+      BOLD();
+    } else {
+      YELLOW();
+    }
 
     if (icon == NSMCON_TCP) {
       strcpy(name, "name=[TCP]");
@@ -231,15 +286,19 @@ nsminfo_conn(int all = 0)
     } else {
       S(name, "host=%s", nsminfo_hoststr(AddrConn(icon)));
     }
-    P("CONN %-3.1d nid=%3d pid=%5d sock=%2d rtim=%-6.6s %s%s\n",
+    P("CONN %-3.1d nid=%3d pid=%5d sock=%2d rtim=%-6.6s ev=%-6.6s %s%s\n",
       icon,
-      con.nid, con.pid, con.sock, nsminfo_timestr(con.timstart), name,
+      con.nid, con.pid, con.sock,
+      nsminfo_timestr(con.timstart),
+      nsminfo_timestr(con.timevent),
+      name,
       (icon == sys.master) ? " M" : ((icon == sys.deputy) ? " D" : ""));
   }
+  BLACK();
 }
 // -- node --------------------------------------------------------------
-void
-nsminfo_node(int all = 0)
+static void
+nsminfo_node(int color, int all = 0)
 {
   NSMsys& sys = *nsmd_sysp;
 
@@ -247,13 +306,17 @@ nsminfo_node(int all = 0)
     NSMnod& nod = sys.nod[inod];
     if (! nod.name[0]) continue;
 
+    if (nod.ipaddr) MAGENTA();
+
     P("NODE %-3.1d %-31.31s pid/uid=%-5.1d/%-5.1d @%s %d\n",
       inod, nod.name, (int32)ntohl(nod.nodpid), ntohl(nod.noduid),
       nsminfo_hoststr(nod.ipaddr), (int16_t)ntohs(nod.noddat));
+
+    BLACK();
   }
 }
 // -- req ---------------------------------------------------------------
-void
+static void
 nsminfo_req(int all = 0)
 {
   NSMsys& sys = *nsmd_sysp;
@@ -273,14 +336,19 @@ nsminfo_req(int all = 0)
   }
 }
 // -- dat ---------------------------------------------------------------
-void
-nsminfo_dat(int all = 0)
+static void
+nsminfo_dat(int color, int all = 0)
 {
   NSMsys& sys = *nsmd_sysp;
 
   for (int idat = 0; idat < NSMSYS_MAX_DAT; idat++) {
     NSMdat& dat = sys.dat[idat];
     if (dat.dtsiz == 0 && xverbose == 0) continue;
+    if (dat.owner == (int16_t) - 1) {
+      RED();
+    } else {
+      MAGENTA();
+    }
     if (xverbose) {
       P("DAT  %-3.1d %-31.31s pos=%d sz=%d nod=%d rev=%d ref=%d fmt=%s\n",
         idat, dat.dtnam, ntohl(dat.dtpos), ntohs(dat.dtsiz),
@@ -292,10 +360,11 @@ nsminfo_dat(int all = 0)
         (int16_t)ntohs(dat.owner), ntohs(dat.dtrev), ntohs(dat.dtref),
         dat.dtfmt);
     }
+    BLACK();
   }
 }
 // -- ref ---------------------------------------------------------------
-void
+static void
 nsminfo_ref(int all = 0)
 {
   NSMsys& sys = *nsmd_sysp;
@@ -308,7 +377,7 @@ nsminfo_ref(int all = 0)
   }
 }
 // -- disid -------------------------------------------------------------
-void
+static void
 nsminfo_disid(int all = 0)
 {
   NSMsys& sys = *nsmd_sysp;
@@ -321,7 +390,7 @@ nsminfo_disid(int all = 0)
   }
 }
 // -- conid -------------------------------------------------------------
-void
+static void
 nsminfo_conid(int all = 0)
 {
   NSMsys& sys = *nsmd_sysp;
@@ -334,7 +403,7 @@ nsminfo_conid(int all = 0)
   }
 }
 // -- alist -------------------------------------------------------------
-void
+static void
 nsminfo_alist(int all = 0)
 {
   NSMsys& sys = *nsmd_sysp;
@@ -353,15 +422,18 @@ nsminfo_alist(int all = 0)
 //
 // ----------------------------------------------------------------------
 void
-nsminfo2()
+nsminfo2(int color)
 {
-  if (! nsmd_sysp || ! nsmd_memp) return;
+  if (! nsmd_sysp || ! nsmd_memp) {
+    P("nsminfo2: no shared memory.\n");
+    return;
+  }
 
-  nsminfo_head();
-  nsminfo_conn();
-  nsminfo_node();
+  if (nsminfo_head(color) < 0) return;
+  nsminfo_conn(color);
+  nsminfo_node(color);
   nsminfo_req();
-  nsminfo_dat();
+  nsminfo_dat(color);
   nsminfo_ref();
 
   if (showalist) nsminfo_alist();
@@ -391,8 +463,7 @@ nsminfo2_init(int nsmd_shmkey)
   int id;
   if ((id = shmget(nsmd_shmkey, sizeof(*nsmd_sysp), 0444)) < 0) {
     if (errno = ENOENT) {
-      printf("Cannot open SYS shared memory with key=%d.  Is nsmd running?\n",
-             nsmd_shmkey);
+      printf("nsmd2 is not running at port %d\n", nsmd_shmkey);
     } else {
       printf("shmkey (sys) = %d\n", nsmd_shmkey);
       perror("shmget (sys):");
@@ -405,7 +476,7 @@ nsminfo2_init(int nsmd_shmkey)
     perror("shmat (sys):");
     exit(1);
   }
-  if ((id = shmget(nsmd_shmkey + 1, sizeof(*nsmd_memp), 0664)) < 0) {
+  if ((id = shmget(nsmd_shmkey + 1, sizeof(*nsmd_memp), 0644)) < 0) {
     if (errno = ENOENT) {
       printf("Cannot open MEM shared memory with key=%d. %s\n",
              nsmd_shmkey + 1, "Something is inconsistent");
@@ -432,6 +503,8 @@ main(int argc, char** argv)
 {
   int port = -1;
   int shmkey = -1;
+  int interval = -1;
+  int color = 0;
 
   // option loop
   while (argc > 1 && argv[1][0] == '-') {
@@ -449,21 +522,25 @@ main(int argc, char** argv)
         continue;
     }
 
-    if (strchr("ps", argv[1][1]) && ! *ap) {
+    if (strchr("psi", argv[1][1]) && ! *ap) {
       argc--, argv++;
       ap = argv[1];
     }
 
     switch (opt) {
-      case 'p': port   = nsmd_atoi(ap, -1); break;
-      case 's': shmkey = nsmd_atoi(ap, -1); break;
+      case 'i': interval  = nsmd_atoi(ap,  2); color = 1; break;
+      case 'c': color     = 1; break;
+      case 'C': color     = 0; break;
+      case 'p': port      = nsmd_atoi(ap, -1); break;
+      case 's': shmkey    = nsmd_atoi(ap, -1); break;
       case 'A': showalist = 1; break;
       case 'D': showdisid = 1; break;
-      case 'C': showconid = 1; break;
+      case 'X': showconid = 1; break;
       default:
         printf("usage: nsminfo2 [options]\n");
         printf(" -p <port>   set port number.\n");
         printf(" -s <shmkey> set shmkey number.\n");
+        printf(" -i[<n>] repeat every n(default=2) seconds\n");
         exit(1);
     }
     argc--, argv++;
@@ -476,8 +553,18 @@ main(int argc, char** argv)
   if (shmkey >= 0) nsmd_shmkey = shmkey;
   if (nsmd_shmkey < 0) nsmd_shmkey = nsmd_port;
 
+
   nsminfo2_init(nsmd_shmkey);
-  nsminfo2();
+
+  if (interval > 0) {
+    while (1) {
+      printf("\033[H\033[2J");
+      nsminfo2(color);
+      sleep(interval);
+    }
+  } else {
+    nsminfo2(color);
+  }
 }
 #endif /* NSMD2INFO */
 // ----------------------------------------------------------------------

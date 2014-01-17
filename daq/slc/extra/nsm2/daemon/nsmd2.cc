@@ -26,8 +26,10 @@
 //  20140106  1921 destroyconn fix
 //  20140107  1922 fix when master/daemon killed together
 //  20140107  1923 priority fix in do_ready
+//  20140117  1924 check error before going background, many crucial bug
+//                 fixes on nsmd master/deputy switching
 
-#define NSM_DAEMON_VERSION   1923 /* daemon   version 1.9.23 */
+#define NSM_DAEMON_VERSION   1924 /* daemon   version 1.9.24 */
 // ----------------------------------------------------------------------
 
 // -- include files -----------------------------------------------------
@@ -103,11 +105,11 @@
 
 // -- global variables --------------------------------------------------
 // ----------------------------------------------------------------------
-uint16_t      nsmd_port   = NSM2_PORT;
+uint16_t    nsmd_port   = NSM2_PORT;
 int         nsmd_shmkey = -1; /* == nsmd_port if -1 */
 int         nsmd_debug  = 0;
 int         nsmd_priority = 0;
-uint32_t      nsmd_myip   = 0;  /* network byte order */
+uint32_t    nsmd_myip   = 0;  /* network byte order */
 SOCKAD_IN   nsmd_sockad;
 char        nsmd_host[1024];
 const char* nsmd_logdir = ".";
@@ -255,7 +257,7 @@ static NSMcmdtbl_t nsmd_cmdtbl[] = {
 
 #define ADDR_STR(a)  nsmd_addrstr(a)
 #define NODE_STR(a)  nsmd_nodestr(a)
-#define CON_ID(c)    (nsmd_sysp ? (&(c) - nsmd_sysp->con) : -1)
+#define CON_ID(c)    (nsmd_sysp ? (&(c) - nsmd_sysp->con) : NSMCON_NON)
 
 
 /* -- other shorthands -- */
@@ -296,13 +298,13 @@ void nsmd_warn(const char* fmt, ...);
 void nsmd_error(const char* fmt, ...);
 void nsmd_assert(const char* fmt, ...);
 
-static void nsmd_setup_daemon(NSMcon& con);
-static void nsmd_destroyconn(NSMcon& con);
+static void nsmd_setup_daemon(NSMcon& con, int exception = NSMCON_NON);
+static void nsmd_destroyconn(NSMcon& con, int delcli, const char* bywhom);
 static void nsmd_tcpsend(NSMcon& con, NSMdmsg& dmsg,
                          NSMDtcpq* qptr = 0, int beforeafter = 0);
 extern "C" int nsmlib_hash(NSMsys* sysp, int32_t* hashtable, int hashmax,
                            const char* key, int create);
-extern void nsminfo2();
+extern void nsminfo2(int color);
 
 //                   -------------------------
 // --                -- low level functions --
@@ -418,11 +420,11 @@ hl2tohll(uint32_t h0, uint32_t h1)
 // -- nsmd_free ---------------------------------------------------------
 // a wrapping function for free
 // ----------------------------------------------------------------------
-static int   nsmd_alloctimes = 0;
+static int     nsmd_alloctimes = 0;
 static int64_t nsmd_alloctotal = 0;
 static int64_t nsmd_allocalloc = 0;
-static char  nsmd_longbuf[NSM_TCPBUFSIZ];
-static int   nsmd_longused = 0;
+static char    nsmd_longbuf[NSM_TCPBUFSIZ];
+static int     nsmd_longused = 0;
 
 void
 nsmd_free(const char* where, const char* p)
@@ -563,6 +565,7 @@ nsmd_destroy(int code = NSMD_EUNEXPCT)
   char str[32];
   int exit_code = 0; // normal exit
   NSMsys& sys = *nsmd_sysp;
+  NSMmem& mem = *nsmd_memp;
 
   switch (code) {
       // internal errors
@@ -584,9 +587,20 @@ nsmd_destroy(int code = NSMD_EUNEXPCT)
 
   LOG("calling nsminfo2");
 
-  nsminfo2();
+  nsminfo2(0);
 
   LOG("***** terminating...%s *****", str);
+
+  // for nsminfo2 which may be grabbing the screen
+  time_t now = time(0);
+  if (nsmd_memp) {
+    mem.timstart = (time_t) - 1;
+    mem.timevent = now;
+  }
+  if (nsmd_sysp) {
+    sys.timstart = (time_t) - 1;
+    sys.timevent = now;
+  }
 
   nsmd_destroy_clients();
 
@@ -1021,13 +1035,13 @@ nsmd_setugid()
   if (gid >= 0) {
     if (setegid(gid) < 0) {
       if (grpnamp) {
-        WARN("nsmd cannot set gid to group %s\n", grpnamp2);
+        WARN("nsmd cannot set gid to group %s", grpnamp2);
         nsmd_destroy();
       } else {
-        LOG("nsmd cannot set gid to group %s\n", grpnamp2);
+        LOG("nsmd cannot set gid to group %s (ignored)", grpnamp2);
       }
     } else {
-      LOG("nsmd set gid to group %s gid %d\n", grpnamp2, gid);
+      LOG("nsmd set gid to group %s gid %d", grpnamp2, gid);
     }
   }
 
@@ -1266,9 +1280,10 @@ nsmd_tcpopen(int port)
 }
 // -- nsmd_init ---------------------------------------------------------
 //    initialization main
+//    (void return -- any error will terminate the program)
 // ----------------------------------------------------------------------
-int
-nsmd_init()
+void
+nsmd_init(int dryrun)
 {
   // trap signals
   signal(SIGINT,  nsmd_destroy);
@@ -1288,6 +1303,16 @@ nsmd_init()
   time_t now = time(0);
   nsmd_shmopen(nsmd_shmkey, now);
 
+  if (dryrun) {
+    close(udpsock);
+    close(tcpsock);
+    if (nsmd_sysp) shmdt(nsmd_sysp);
+    if (nsmd_memp) shmdt(nsmd_memp);
+    nsmd_sysp = 0;
+    nsmd_memp = 0;
+    return;
+  }
+
   // set up shared memory
   NSMsys& sys = *nsmd_sysp;
   NSMcon& udpcon = sys.con[NSMCON_UDP];
@@ -1304,13 +1329,16 @@ nsmd_init()
   udpcon.pid = tcpcon.pid = sys.pid;
   sys.ncon = 2;
   sys.master = sys.deputy = NSMCON_NON;
+  sys.version  = NSM_DAEMON_VERSION;
+  sys.protocol = NSM_PROTOCOL_VERSION;
+  sys.priority = nsmd_priority;
 
   //sys.master = NSMCON_TCP; //
   nsmd_init_count = NSMD_INITCOUNT_FIRST;
   nsmd_schedule(NSMCON_NON, NSMSCH_INITBCAST, 0, 0, 0);
 
   // OK
-  return 0;
+  return;
 }
 //                   ---------------
 // --                -- send calls --
@@ -1515,7 +1543,8 @@ nsmd_tcpwriteq()
     int npar = head.npar;
     int req  = ntohs(head.req);
     int len  = ntohs(head.len);
-    DBG("tcpwriteq req=%x len=%d npar=%d p=[%d,%d] buf=%x writep=%x",
+    DBG("tcpwriteq(%d,%d) req=%x len=%d npar=%d p=[%d,%d] buf=%x writep=%x",
+        con.sock, q->conid,
         req, len, npar, ntohl(p[0]), ntohl(p[1]), q->buf, writep);
   }
 
@@ -1523,10 +1552,12 @@ nsmd_tcpwriteq()
   while (1) { // just for EINTR and EAGAIN
     if ((ret = write(con.sock, writep, writelen)) >= 0) break;
     if (errno == EINTR || errno == EAGAIN) continue;
-    ERRO("tcpwriteq: write %d bytes", writelen); // unexpected
+    ERRO("tcpwriteq(%d,%d) write %d bytes",
+         con.sock, q->conid, writelen); // unexpected
   }
   if (ret == 0) ASRT("tcpwriteq: write returns 0 for con=%d", q->conid);
-  DBG("tcpwriteq: write = %d/%d %x", ret, writelen, writep);
+  DBG("tcpwriteq(%d,%d) = %d/%d %x",
+      con.sock, q->conid, ret, writelen, writep);
 
   // free datap if allocated elsewhere
   if (ret == writelen && q->datap) {
@@ -1639,7 +1670,7 @@ nsmd_tcpsend(NSMcon& con, NSMdmsg& dmsg, NSMDtcpq* qptr, int beforeafter)
       if (errno == EINTR || errno == EAGAIN) continue;
       if (errno == ESRCH) { // remove client if process is gone
         LOG("DESTROY non-existing process pid=%d", con.pid);
-        nsmd_destroyconn(con);
+        nsmd_destroyconn(con, 1, "tcpsend");
         return;
       }
       ERRO("cannot send signal to pid=%d", con.pid);
@@ -1685,7 +1716,8 @@ nsmd_tcpsend(NSMcon& con, NSMdmsg& dmsg, NSMDtcpq* qptr, int beforeafter)
     if (qptr == nsmd_tcpqlast) nsmd_tcpqlast = q;
     qptr->nextp = q;
   }
-  DBG("tcpsend f=%08x(%08x) l=%08x q=%08x %d",
+  DBG("tcpsend(%d,%d) f=%08x(%08x) l=%08x q=%08x %d",
+      con.sock, CON_ID(con),
       nsmd_tcpqfirst, nsmd_tcpqfirst ? nsmd_tcpqfirst->prevp : 0, nsmd_tcpqlast,
       q, beforeafter);
 
@@ -1818,9 +1850,10 @@ nsmd_tcpconnect(SOCKAD_IN& sockad, const char* contype)
   return sock;
 }
 // -- nsmd_newconn ------------------------------------------------------
-//
-// - tcpconnect
-// tcpconnect は newconn と reconnect から呼ばれるが、たぶん merge できる?
+// - TCP connection is made only to master/deputy and
+//   called from do_ackdaemon and do_newmaster
+// - conid = sys.ncon in do_newmaster to create a new connection,
+//   and sys.ncon++ for a successful connection
 // ----------------------------------------------------------------------
 int
 nsmd_newconn(int conid, int32_t ip, const char* contype)
@@ -1854,7 +1887,7 @@ void
 nsmd_delconn(NSMcon& con)
 {
   NSMsys& sys = *nsmd_sysp;
-  int conid = CON_ID(con);
+  const int conid = CON_ID(con);
 
   // sch list and push list have to be updated
   //   :
@@ -1862,14 +1895,16 @@ nsmd_delconn(NSMcon& con)
   //   :
 
   // remove or adjust master/deputy
-  if (sys.master == conid) { LOG("removing master"); sys.master = -1; }
+  if (sys.master == conid) { LOG("removing master"); sys.master = NSMCON_NON; }
   if (sys.master >  conid) sys.master--;
-  if (sys.deputy == conid) { LOG("removing deputy"); sys.deputy = -1; }
+  if (sys.deputy == conid) { LOG("removing deputy"); sys.deputy = NSMCON_NON; }
   if (sys.deputy >  conid) sys.deputy--;
 
   // shift the connection list
   sys.ncon--;
-  for (; conid < sys.ncon; conid++) sys.con[conid] = sys.con[conid + 1];
+  // bug! conid should not be modified as it is used to manipulate
+  // tcpq -- for (; conid < sys.ncon; conid++) sys.con[conid] = sys.con[conid + 1];
+  for (int i = conid; i < sys.ncon; i++) sys.con[i] = sys.con[i + 1];
   memset(&sys.con[sys.ncon], 0, sizeof(NSMcon));
   memset(&sys.con[sys.ncon].sockad.sin_addr, -1, sizeof(SOCKAD_IN));
 
@@ -1898,13 +1933,14 @@ nsmd_delconn(NSMcon& con)
 // - con is MEMBER and I'm a
 // ----------------------------------------------------------------------
 static void
-nsmd_destroyconn(NSMcon& con)
+nsmd_destroyconn(NSMcon& con, int delcli, const char* bywhom)
 {
   NSMsys& sys = *nsmd_sysp;
   int itslocal = ConIsLocal(con);
   int sock_save = con.sock;
 
-  LOG("connection is lost for sock=%d at %s", sock_save,
+  LOG("destroyconn by %s sock=%d at %s",
+      bywhom, sock_save,
       itslocal ? "local" : ADDR_STR(con.sockad));
   DBG("con.nid = %d\n", con.nid);
 
@@ -1918,6 +1954,8 @@ nsmd_destroyconn(NSMcon& con)
       dmsg.req = NSMCMD_DELCLIENT;
       dmsg.src = con.nid;
       nsmd_do_delclient(con, dmsg);
+    } else if (sys.ready <= 0) {
+      LOG("nsmd is not ready yet");
     } else {
       WARN("node is not found for local connection");
     }
@@ -1925,11 +1963,13 @@ nsmd_destroyconn(NSMcon& con)
     int conid = CON_ID(con);
 
     // delete client nodes that belong to con
-    NSMdmsg dmsg;
-    memset(&dmsg, 0, sizeof(dmsg));
-    dmsg.req = NSMCMD_DELCLIENT;
-    dmsg.src = -1;
-    nsmd_do_delclient(con, dmsg);
+    if (delcli) {
+      NSMdmsg dmsg;
+      memset(&dmsg, 0, sizeof(dmsg));
+      dmsg.req = NSMCMD_DELCLIENT;
+      dmsg.src = -1;
+      nsmd_do_delclient(con, dmsg);
+    }
 
     if (NoMaster()) {
       WARN("destroyconn: master is missing");
@@ -1953,6 +1993,11 @@ nsmd_destroyconn(NSMcon& con)
     shutdown(con.sock, 2);
     close(con.sock);
     nsmd_delconn(con);
+  }
+
+  // connection to local client connecting before ready
+  if (itslocal && sys.ready <= 0) {
+    return;
   }
 
   // find new deputy if I am a MASTER
@@ -2010,7 +2055,7 @@ nsmd_sch_initbcast(int16_t, int32_t)
     } else {
       nsmd_init_count--;
       next = 75 + (int)(rand() * 75.0 / RAND_MAX); // ~1 sec (0.75 to 1.5 sec)
-      LOG("standing for new daemon (%d) next=%d", nsmd_init_count, next);
+      LOG("standing for new master (%d) next=%d", nsmd_init_count, next);
     }
   } else if (sys.master < 0) { // nsmd_init_count == 0
     LOG("select myself as MASTER");
@@ -2319,7 +2364,7 @@ nsmd_shmcast()
 //
 // - I'm master or deputy, and sys.master is always available
 void
-nsmd_setup_daemon(NSMcon& con)
+nsmd_setup_daemon(NSMcon& con, int exception)
 {
   NSMsys& sys = *nsmd_sysp;
   NSMcon& master = sys.con[sys.master];
@@ -2330,10 +2375,10 @@ nsmd_setup_daemon(NSMcon& con)
   if (NoMaster()) ASRT("setup_daemon: no master");
 
   // send an answer
-  LOG("setup %s master=%s/deputy=%s",
-      &con == &tcpcon ? "everybody" : ADDR_STR(con.sockad),
+  LOG("setup_daemon M=%s/D=%s => %s",
       ADDR_STR(master.sockad),
-      sys.deputy >= 0 ? ADDR_STR(deputy.sockad) : "(none)");
+      sys.deputy >= 0 ? ADDR_STR(deputy.sockad) : "(none)",
+      &con == &tcpcon ? "everybody" : ADDR_STR(con.sockad));
 
   memset(&dmsg, 0, sizeof(dmsg));
   dmsg.src  = dmsg.dest = -1;
@@ -2357,6 +2402,7 @@ nsmd_setup_daemon(NSMcon& con)
   } else if (&con == &tcpcon) {
     dmsg.req = NSMCMD_NEWMASTER;
     for (int conid = NSMCON_OUT; conid < sys.ncon; conid++) {
+      if (conid == exception) continue;
       if (ConidIsLocal(conid)) continue;
       if (conid == sys.master || conid == sys.deputy) continue;
       nsmd_tcpsend(sys.con[conid], dmsg);
@@ -2691,8 +2737,8 @@ nsmd_delete_dat(NSMcon& con, int datid)
   NSMsys& sys = *nsmd_sysp;
   NSMdat& dat = sys.dat[datid];
   int16_t* aprevp = &sys.afirst;
-  int    anext = (int16_t)ntohs(*aprevp);
-  int    nodid = (int16_t)ntohs(dat.owner);
+  int      anext = (int16_t)ntohs(*aprevp);
+  int      nodid = (int16_t)ntohs(dat.owner);
 
   if (nodid == -1) {
     DBG("delete_dat datid=%d no owner", datid);
@@ -2701,7 +2747,7 @@ nsmd_delete_dat(NSMcon& con, int datid)
 
   DBG("delete_dat datid=%d", datid);
   int16_t* nprevp = &sys.nod[nodid].noddat;
-  int    nnext  = ntohs(*nprevp);
+  int      nnext  = ntohs(*nprevp);
 
 #if 0
   // look for nprevp in nodp
@@ -2897,7 +2943,7 @@ nsmd_do_newreq(NSMcon& con, NSMdmsg& dmsg)
          dmsg.src, dmsg.dest, CON_ID(con));
 
   // master is needed
-  if (sys.master == -1) {
+  if (sys.master == NSMCON_NON) {
     DBG("do_newreq no master");
     nsmd_tcpreply(con, dmsg, dmsg.src, NSMENOMASTER);
     return;
@@ -2962,7 +3008,7 @@ nsmd_do_delreq(NSMcon& con, NSMdmsg& dmsg)
          dmsg.src, dmsg.dest, CON_ID(con));
 
   // master is needed
-  if (sys.master == -1) {
+  if (sys.master == NSMCON_NON) {
     DBG("do_delreq no master");
     nsmd_tcpreply(con, dmsg, dmsg.src, NSMENOMASTER);
     return;
@@ -3049,7 +3095,7 @@ nsmd_do_newclient(NSMcon& con, NSMdmsg& dmsg)
   }
 
   // from here we need a master
-  if (sys.master == -1) {
+  if (sys.master == NSMCON_NON) {
     DBG("do_newclient no master");
     dmsg.pars[0] = NSMENOMASTER;
     nsmd_tcpsend(con, dmsg);
@@ -3058,7 +3104,10 @@ nsmd_do_newclient(NSMcon& con, NSMdmsg& dmsg)
 
   // if from local, keep pid (and signal type) for later use
   if (ConIsLocal(con)) {
+    time_t now = time(0);
     con.pid = dmsg.pars[1];
+    con.timevent = now;
+    con.timstart = now;
 
     // and if I'm not master, just forward the new client from local
     if (! IamMaster()) {
@@ -3224,7 +3273,7 @@ nsmd_do_newdaemon(NSMcon& con, NSMdmsg& dmsg)
   // check if somebody is running a different version of nsmd
   if (version != NSM_PROTOCOL_VERSION) {
     const char* comp = version > NSM_PROTOCOL_VERSION ? "newer" : "older";
-    const char* verb = sys.ready > 0 ? "starting" : "running";
+    const char* verb = sys.ready > 0 ? "running" : "starting";
     LOG("nsmd of %s version (%d.%d.%02d) is %s at %s",
         comp, version / 1000, (version / 100) % 10, version % 100, verb,
         ADDR_STR(dmsg.from));
@@ -3324,7 +3373,7 @@ nsmd_do_ackdaemon(NSMcon& con, NSMdmsg& dmsg)
   if (nsmd_newconn(sys.ncon, newm, "master") < 0) {
     // if it cannot connect, it may be because the master have
     // disappeared just now
-    sys.master = -1;
+    sys.master = NSMCON_NON;
     WARN("Cannot connect to master at %s", ADDR_STR(newm));
   } else {
     sys.master = sys.ncon++;
@@ -3334,7 +3383,7 @@ nsmd_do_ackdaemon(NSMcon& con, NSMdmsg& dmsg)
   // connect to deputy if any
   if (! NoMaster() && newd != -1) {
     if (nsmd_newconn(sys.ncon, newd, "deputy") < 0) {
-      sys.deputy = -1;
+      sys.deputy = NSMCON_NON;
       WARN("Cannot connect to deputy at %s", ADDR_STR(newd));
     } else {
       sys.deputy = sys.ncon++;
@@ -3344,7 +3393,7 @@ nsmd_do_ackdaemon(NSMcon& con, NSMdmsg& dmsg)
 
   // if cannot connect to master, find the master again.
   // if a new master is found, start copying memory
-  if (sys.master == -1) {
+  if (sys.master == NSMCON_NON) {
     nsmd_init_count = NSMD_INITCOUNT_FIRST;
     nsmd_schedule(NSMCON_NON, NSMSCH_INITBCAST, 0, 0, 1);
   } else {
@@ -3397,14 +3446,16 @@ nsmd_do_syscpymem(NSMcon& con, NSMdmsg& dmsg)
   const int tcpdatmax = NSM_TCPDATSIZ - 4 * sizeof(int32_t); // 64k - 16byte
   static int datid = -1;
 
-  DBG("syscpymem opt=%d pos=%d siz=%d", opt, pos, siz);
+  DBG("syscpymem opt=%d pos=%d siz=%d%s", opt, pos, siz,
+      ConIsMaster(con) ? " master" : "");
 
   if (! ConIsMaster(con)) return;
 
   if (pos == -1 && siz == 0) {
     // called from ackdaemon to initiate REQCPYMEM cycle
     if (opt != 3) ASRT("do_syscpymem opt=%d, not from ackdaemon?", opt);
-    pos = (char*)&sys.nod[0] - (char*)&sys;
+    pos = (char*)&sys.afirst - (char*)&sys;
+    // BUG! pos = (char *)&sys.nod[0] - (char *)&sys;
     siz = tcpdatmax;
     datid = -1;
   } else {
@@ -3541,6 +3592,7 @@ void
 nsmd_do_ready(NSMcon& con, NSMdmsg& dmsg)
 {
   NSMsys& sys = *nsmd_sysp;
+  int olddeputy = NSMCON_NON;
 
   DBG("do_ready %d from conid=%d@%s",
       dmsg.opt, CON_ID(con), ADDR_STR(con.sockad));
@@ -3580,11 +3632,13 @@ nsmd_do_ready(NSMcon& con, NSMdmsg& dmsg)
     if (prio > nsmd_priority ||
         (prio == nsmd_priority && ntohl(conip) < ntohl(masterip))) {
       sys.master = conid;
+      olddeputy  = sys.deputy;
       sys.deputy = NSMCON_TCP;
       DBG("new master, conid=%d prio=%d/%d ip=%08x/%08x", conid,
           prio, nsmd_priority, ntohl(conip), ntohl(masterip));
     } else if (NoDeputy() || prio > deputyprio ||
                prio == deputyprio && ntohl(conip) < ntohl(deputyip)) {
+      olddeputy  = sys.deputy;
       sys.deputy = conid;
       DBG("new deputy, conid=%d prio=%d/%d/%d ip=%08x/%08x/%08x", conid,
           prio, nsmd_priority, deputyprio,
@@ -3597,11 +3651,24 @@ nsmd_do_ready(NSMcon& con, NSMdmsg& dmsg)
     }
   }
 
+#if 0 // probably bug?
   if (opt == 1) {
     nsmd_setup_daemon(con);
   } else if (ConIsMaster(con) || ConIsDeputy(con)) {
     nsmd_setup_daemon(sys.con[NSMCON_TCP]);
   }
+#else
+  if (opt == 1) {
+    nsmd_setup_daemon(con);
+  }
+  if (ConIsMaster(con) || ConIsDeputy(con)) {
+    if (olddeputy != NSMCON_NON) {
+      olddeputy  = sys.deputy;
+      nsmd_setup_daemon(sys.con[olddeputy]);
+    }
+    nsmd_setup_daemon(sys.con[NSMCON_TCP], olddeputy);
+  }
+#endif
 }
 // -- nsmd_do_newmaster -------------------------------------------------
 //
@@ -3627,7 +3694,153 @@ nsmd_do_newmaster(NSMcon& con, NSMdmsg& dmsg)
   int itwasme = (oldm == nsmd_myip || oldd == nsmd_myip) ? 1 : 0;
   int itsme   = (newm == nsmd_myip || newd == nsmd_myip) ? 1 : 0;
 
-  LOG("new master=%s/deputy=%s", ADDR_STR(newm), ADDR_STR(newd));
+  LOG("newmaster new=%s/%s old=%s/%s",
+      ADDR_STR(newm), ADDR_STR(newd), ADDR_STR(oldm), ADDR_STR(oldd));
+
+  int64_t tim = hl2tohll(dmsg.pars[6], dmsg.pars[7]);
+  if (tim != sys.con[NSMCON_TCP].timstart) {
+    ASRT("do_newmaster: wrong tim=%lx/%lx", tim, sys.con[NSMCON_TCP].timstart);
+  }
+  if (abs(dmsg.pars[8] - sys.generation) > 1) {
+    ASRT("do_newmaster: generation leap=%d/%d", sys.generation, dmsg.pars[8]);
+  }
+  sys.generation = dmsg.pars[8];
+
+  // -- check if unchanged
+  if (newm == oldm && newd == oldd) {
+    LOG("do_newmaster: no change");
+    return;
+  }
+
+  // -- check typical errorneous combinations
+  if (newm == newd) ASRT("do_newmaster: pars=%x/%x", newm, newd);
+  if (! newm || newm == -1) ASRT("do_newmaster: invalid newm=%x", newm);
+  if (! newd || newd == -1) ASRT("do_newmaster: invalid newd=%x", newd);
+  if (newm != oldm && newm != oldd && newd != oldm && newd != oldd) {
+    ASRT("do_newmaster: too many changes %08x %08x => %08x %08x",
+         oldm, oldd, newm, newd);
+  }
+
+  // -- check if disconnection is needed
+  if (! itsme) {
+    if (itwasme) {
+      for (int conid = sys.ncon - 1; conid >= NSMCON_OUT; conid--) {
+        if (ConidIsLocal(conid)) continue;
+        int conip = AddrConid(conid);
+        if (conip != newm && conip != newd) {
+          nsmd_destroyconn(sys.con[conid], 0, "newmaster");
+        }
+      }
+    } else {
+      if (oldd != NSMCON_NON && oldd != newd && oldd != newm) {
+        nsmd_destroyconn(sys.con[sys.deputy], 0, "newmaster");
+      }
+      if (oldm != NSMCON_NON && oldm != newm && oldm != newd) {
+        nsmd_destroyconn(sys.con[sys.master], 0, "newmaster");
+      }
+    }
+  }
+
+  // -- swap master and deputy
+  if (newm == oldd || newd == oldm) {
+    int tmp    = sys.deputy;
+    sys.deputy = sys.master;
+    sys.master = tmp;
+    if (newm != oldd) sys.master = NSMCON_NON;
+    if (newd != oldm) sys.deputy = NSMCON_NON;
+  } else {
+    if (newm != oldm) sys.master = NSMCON_NON;
+    if (newd != oldd) sys.deputy = NSMCON_NON;
+  }
+
+  // -- reassign if found in existing con
+  for (int conid = NSMCON_OUT; conid < sys.ncon; conid++) {
+    if (sys.master != NSMCON_NON && sys.deputy != NSMCON_NON) break;
+    if (ConidIsLocal(conid)) continue;
+    int conip = AddrConid(conid);
+    if (sys.master == NSMCON_NON && conip == newm) sys.master = conid;
+    if (sys.deputy == NSMCON_NON && conip == newd) sys.deputy = conid;
+  }
+
+#if 0
+  if (newm == oldd || newd == oldm) {
+    int tmp    = sys.deputy;
+    sys.deputy = sys.master;
+    sys.master = tmp;
+  }
+#endif
+
+  // -- connect to missing master and deputy
+  int cons_to_send_ready[2];
+  cons_to_send_ready[0] = NSMCON_NON;
+  cons_to_send_ready[1] = NSMCON_NON;
+
+  if (newm == nsmd_myip && sys.master != NSMCON_TCP) {
+    sys.con[NSMCON_UDP].timevent = time(0);
+    sys.master = NSMCON_TCP;
+  } else if (sys.master == NSMCON_NON) {
+    if (nsmd_newconn(sys.ncon, newm, "MASTER") < 0) {
+      ASRT("do_newmaster: failed to connect to master=%08x", newm);
+    }
+    sys.master = sys.ncon++;
+    sys.con[sys.master].timstart = hl2tohll(dmsg.pars[2], dmsg.pars[3]);
+    cons_to_send_ready[0] = sys.master;
+  }
+
+  if (newd == nsmd_myip && sys.deputy != NSMCON_TCP) {
+    sys.con[NSMCON_UDP].timevent = time(0);
+    sys.deputy = NSMCON_TCP;
+  } else if (sys.deputy == NSMCON_NON) {
+    if (nsmd_newconn(sys.ncon, newd, "DEPUTY") < 0) {
+      ASRT("do_newmaster: failed to connect to deputy=%08x", newd);
+    }
+    sys.deputy = sys.ncon++;
+    sys.con[sys.deputy].timstart = hl2tohll(dmsg.pars[4], dmsg.pars[5]);
+    cons_to_send_ready[1] = sys.deputy;
+  }
+
+  // -- send ready
+  for (int i = 0; i < 2; i++) {
+    int conid = cons_to_send_ready[i];
+    if (conid != NSMCON_NON) {
+      memset(&dmsg, 0, sizeof(dmsg));
+      dmsg.req = NSMCMD_READY;
+      dmsg.npar = 3;
+      // TODO: opt to nonzero when connection error handling is implemented
+      dmsg.opt  = 0;
+      dmsg.pars[0] = nsmd_priority;
+      dmsg.pars[1] = hlltohl(sys.con[NSMCON_UDP].timstart, 0);
+      dmsg.pars[2] = hlltohl(sys.con[NSMCON_UDP].timstart, 1);
+      nsmd_tcpsend(sys.con[conid], dmsg);
+    }
+  }
+}
+// -- nsmd_do_newmaster -------------------------------------------------
+//
+// - newm==oldm, newd==oldd (should not happen, just redundant)
+// - newm==oldm, oldd==-1   (first deputy)
+// - newm==oldm, newd!=oldd (new deputy)
+// - newm==oldd, newd==oldm (master<->deputy exchange)
+// - newm!=oldd, newd==oldm (new master, deputy is old master)
+// ----------------------------------------------------------------------
+void
+nsmd_do_newmaster_old_and_buggy(NSMcon& con, NSMdmsg& dmsg)
+{
+  NSMsys& sys = *nsmd_sysp;
+
+  //DBG("do_newmaster");
+
+  if (dmsg.npar != 9) ASRT("do_newmaster: dmsg.npar(%d) != 9", dmsg.npar);
+
+  int oldm = NoMaster() ? -1 : ADDR_IP(sys.con[sys.master].sockad);
+  int oldd = NoDeputy() ? -1 : ADDR_IP(sys.con[sys.deputy].sockad);
+  int newm = htonl(dmsg.pars[0]);
+  int newd = htonl(dmsg.pars[1]);
+  int itwasme = (oldm == nsmd_myip || oldd == nsmd_myip) ? 1 : 0;
+  int itsme   = (newm == nsmd_myip || newd == nsmd_myip) ? 1 : 0;
+
+  LOG("new master=%s/deputy=%s (old=%s/%s)",
+      ADDR_STR(newm), ADDR_STR(newd), ADDR_STR(oldm), ADDR_STR(oldd));
 
   int64_t tim = hl2tohll(dmsg.pars[6], dmsg.pars[7]);
   if (tim != sys.con[NSMCON_TCP].timstart) {
@@ -3659,10 +3872,10 @@ nsmd_do_newmaster(NSMcon& con, NSMdmsg& dmsg)
 
   // -- find what and who to change
   const char* newtyp = 0;
-  int16_t*      chgidp = 0;
-  int16_t*      keepidp = 0;
+  int16_t*    chgidp = 0;
+  int16_t*    keepidp = 0;
   int         newip  = -1;
-  int64_t       newtim = 0;
+  int64_t     newtim = 0;
 
   if (newm == oldd && newd == oldm) {
     LOG("newmaster: no new connection");
@@ -3717,7 +3930,7 @@ nsmd_do_newmaster(NSMcon& con, NSMdmsg& dmsg)
           *chgidp = conid;
           continue;
         }
-        nsmd_destroyconn(sys.con[conid]);
+        nsmd_destroyconn(sys.con[conid], 0, "nomore_used_code");
       }
 
       // - it may happen that new MASTER/DEPUTY hasn't been connected to
@@ -3735,7 +3948,7 @@ nsmd_do_newmaster(NSMcon& con, NSMdmsg& dmsg)
       // - newip should not be there
       if (*chgidp >= NSMCON_OUT) {
         LOG("newmaster: it's not me, disconnecting con=%d", *chgidp);
-        nsmd_destroyconn(sys.con[*chgidp]);
+        nsmd_destroyconn(sys.con[*chgidp], 0, "nomore_used_code");
       } else {
         LOG("newmaster: it's not me, old %s is already gone", newtyp);
       }
@@ -3755,10 +3968,15 @@ nsmd_do_newmaster(NSMcon& con, NSMdmsg& dmsg)
         *chgidp = NSMCON_NON;
         conp = &sys.con[*keepidp];
         newopt = 1;
+        ASRT("do_newmaster: failed to connect");
       } else {
         conp = &sys.con[*chgidp];
         conp->timstart = newtim;
         sys.ncon++;
+        if (sys.master == NSMCON_NON || sys.deputy == NSMCON_NON) {
+          ASRT("do_newmaster: master=%d deputy=%d ncon=%d",
+               sys.master, sys.deputy, sys.ncon);
+        }
       }
     }
   }
@@ -3799,7 +4017,7 @@ nsmd_sysmsgchk(const char* func, NSMcon& con, NSMdmsg& dmsg,
          dmsg.src, dmsg.dest, CON_ID(con));
 
   // master is needed
-  if (sys.master == -1) {
+  if (sys.master == NSMCON_NON) {
     DBG("%s no master", func);
     nsmd_tcpreply(con, dmsg, dmsg.src, NSMENOMASTER);
     return -1;
@@ -3923,7 +4141,7 @@ nsmd_do_allocmem(NSMcon& con, NSMdmsg& dmsg)
   NSMsys& sys = *nsmd_sysp;
   NSMmem& mem = *nsmd_memp;
   uint64_t now10ms = time10ms();
-  int    datid;
+  int      datid;
   DBG("do_allocmem");
 
   if (nsmd_sysmsgchk("do_allocmem", con, dmsg, 1, 2, 0, -1) < 0)
@@ -4474,17 +4692,6 @@ nsmd_tcprecv(NSMcon& con)
   char* recvp;
   char* datap = 0;
 
-#if 0
-  const int SIZ_SHORTBUF = 240;
-  const int SIZ_LONGBUF  = 256 * 4 + 65536;
-  static NSMtcphead headbuf[MAX_CONI];
-  static char  shortbuf[MAX_CONI][SIZ_SHORTBUF]; // up to 256 byte
-  static char  longbuf[NSM_TCPBUFSIZ];
-  static char* longbufp[MAX_CONI];
-  static int   longconi = NO_CONI;
-  static int nalloc = 0;
-#endif
-
   if (coni < 0 || coni >= MAX_CONI)
     ASRT("tcprecv conid=%d", coni + NSMCON_OUT);
 
@@ -4553,7 +4760,8 @@ nsmd_tcprecv(NSMcon& con)
   // just print log and return if not fully received
   if (recvlen < recvsiz) {
     bsiz += recvlen;
-    DBG("tcprecv recvlen=%d/%d recvp=%x", recvlen, recvsiz, recvp);
+    DBG("tcprecv(%d,%d) recvlen=%d/%d recvp=%x",
+        con.sock, CON_ID(con), recvlen, recvsiz, recvp);
     return;
   }
   if (bsiz + recvlen == sizeof(NSMtcphead) &&
@@ -4571,7 +4779,8 @@ nsmd_tcprecv(NSMcon& con)
     int len  = ntohs(head.len);
     int src  = ntohs(head.src);
     int dest = ntohs(head.dest);
-    DBG("tcprecv req=%x %d=>%d len=%d npar=%d p=[%d,%d] coni=%d",
+    DBG("tcprecv(%d,%d) req=%x %d=>%d len=%d npar=%d p=[%d,%d] coni=%d",
+        con.sock, CON_ID(con),
         req, src, dest, len, npar, ntohl(p[0]), ntohl(p[1]), coni);
   }
 
@@ -4639,7 +4848,10 @@ disconnect_return:
   }
 #endif
 
-  nsmd_destroyconn(con);
+  if (IamMaster())
+    nsmd_destroyconn(con, 1, "tcprecv");
+  else
+    nsmd_destroyconn(con, 0, "tcprecv");
 }
 //                   ---------------
 // --                -- main loop --
@@ -4764,9 +4976,11 @@ nsmd_loop()
       tbuf.tm_min = 0;
       tbuf.tm_sec = 0;
       LOG("nsminfo");
-      nsminfo2();
+      nsminfo2(0);
       tinfo_in10ms = (uint64_t)mktime(&tbuf) * 100;
-      LOG("tinfo: now %lld next %lld", now_in10ms, tinfo_in10ms);
+      LOG("tinfo: now %lld.%02d next %lld.%02d",
+          now_in10ms / 100, now_in10ms % 100,
+          tinfo_in10ms / 100, tinfo_in10ms % 100);
     }
   }
 }
@@ -4777,8 +4991,8 @@ nsmd_loop()
 // -- nsmd_main ---------------------------------------------------------
 //    call init and mainloop
 // ----------------------------------------------------------------------
-int
-nsmd_main()
+void
+nsmd_main(int dryrun = 0)
 {
   // -- use the start up time for random seed
   srand(time(0) | nsmd_myip);
@@ -4793,14 +5007,12 @@ nsmd_main()
       dver/1000, (dver/100)%10, dver%100, pver/1000, (pver/100)%10, pver%100);
   */
 
-  int ret = nsmd_init();
+  nsmd_init(dryrun);
 
-  if (ret >= 0) {
+  if (! dryrun) {
     LOG("nsmd started, pid=%d, priority=%d.", getpid(), nsmd_priority);
     nsmd_loop();
   }
-
-  return ret;
 }
 // -- main --------------------------------------------------------------
 //    option analysis and process fork
@@ -4909,38 +5121,15 @@ main(int argc, char** argv)
   if (nsmusr)      nsmd_usrnam = nsmusr;
   if (nsmgrp)      nsmd_grpnam = nsmgrp;
 
-  /*
-  DBG("sizeof(uint16_t)=%d", sizeof(uint16_t));
-  DBG("sizeof(uint32_t)=%d", sizeof(uint32_t));
-  DBG("sizeof(uint64_t)=%d", sizeof(uint64_t));
-  DBG("sizeof(int16_t)=%d",  sizeof(int16_t));
-  DBG("sizeof(int32_t)=%d",  sizeof(int32_t));
-  DBG("sizeof(int64_t)=%d",  sizeof(int64_t));
-
-  DBG("sizeof(NSMnod)=%d", sizeof(NSMnod));
-  DBG("sizeof(NSMref)=%d", sizeof(NSMref));
-  DBG("sizeof(NSMdat)=%d", sizeof(NSMdat));
-  DBG("sizeof(NSMreq)=%d", sizeof(NSMreq));
-  DBG("sizeof(NSMreg)=%d", sizeof(NSMreg));
-
-  DBG("sizeof(NSMcon)=%d", sizeof(NSMcon));
-  DBG("sizeof(NSMsch)=%d", sizeof(NSMsch));
-  DBG("sizeof(NSMdat_snd)=%d", sizeof(NSMdat_snd));
-  DBG("sizeof(NSMdat_rcv)=%d", sizeof(NSMdat_rcv));
-
-  NSMsys s;
-  DBG("sys.nod %d\n", (char *)s.nod - (char *)&s);
-  DBG("sys.nodhash %d\n", (char *)s.nodhash - (char *)&s);
-  DBG("sys.con %d\n", (char *)s.con - (char *)&s);
-  DBG("sys.conid %d\n", (char *)&s.conid - (char *)&s);
-  DBG("sys.snd %d\n", (char *)&s.snd - (char *)&s);
-  DBG("sys.logfile %d\n", (char *)s.logfile - (char *)&s);
-  */
-
   // start process
   if (nofork) {
-    return nsmd_main();
+    nsmd_main(0);
+    return 0; // will not reach here
+
   } else {
+    // dry run to check if it can initialize successfully
+    nsmd_main(1);
+
     if ((pid = fork()) < 0) {
       printf("nsmd2: cannnot fork\n");
       exit(1);
@@ -4949,10 +5138,12 @@ main(int argc, char** argv)
 
   // exec myself again if forked
   if (pid) {
-    /* To-be-reconsidered(nakao):
-       there must be a better way to wait until the child process
+    /* there may be a better way to wait until the child process
        is properly started than just sleep 1 second. */
     sleep10ms(100, 1);
+    LOG("nsmd started in background, pid=%d, priority=%d.",
+        pid, nsmd_priority);
+
     return 0; // parent process terminates now
   } else {
     // final touch to the arg list and exec

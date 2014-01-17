@@ -315,13 +315,12 @@ typedef struct {
   int16_t deputy;
   int16_t ready;
 
-
   /* copy of global variables for reference (not for use by nsmd) */
   int16_t version;  /* nsmd version */
+  int16_t protocol; /* protocol version */
   int16_t priority;
   int16_t debug;
-  int16_t nofork;
-  char  logfile[NSMSYS_LOGNAME_SIZ];
+  char    logfile[NSMSYS_LOGNAME_SIZ];
 } NSMsys;
 
 /* NSMDtcpq for queuing of tcp-write messages */

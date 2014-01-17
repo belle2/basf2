@@ -3,8 +3,8 @@
 
 /* -- version info */
 
-#define NSM_PROTOCOL_VERSION 1915 /* protocol version */
-#define NSM_PACKAGE_VERSION  1923 /* package  version */
+#define NSM_PROTOCOL_VERSION 1924 /* protocol version */
+#define NSM_PACKAGE_VERSION  1924 /* package  version */
 
 /*
   20120723 1900 file created
@@ -27,6 +27,9 @@
   20140106 1921 destroyconn fix, etc
   20140107 1922 fixing the case when both master/deputy are killed
   20140107 1923 fixing priority passing
+  20140114 1924 rewrite of nsmd_do_newmaster
+  20140117 1924 nsmd2 check error before going background, many crucial bug
+                fixes on nsmd master/deputy switching, color nsminfo2
  */
 
 /* -- DATA TYPES ----------------------------------------------------- */

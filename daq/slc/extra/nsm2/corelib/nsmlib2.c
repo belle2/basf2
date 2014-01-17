@@ -10,9 +10,10 @@
    20131230 1918 strerror fix, initnet fix, stdint fix, bridge fix
    20140104 1919 strerror rearranged
    20140105 1921 fix for incorrect errc in register_request
+   20140108 1922 initcli error message fix
 \* ---------------------------------------------------------------------- */
 
-const char *nsmlib2_version   = "nsmlib2 1.9.21";
+const char *nsmlib2_version   = "nsmlib2 1.9.22";
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -177,15 +178,15 @@ nsmlib_strerror(NSMcontext *nsmc)
   case NSMEDATID: return errs;
     /* possible errors by user parameters */
   case NSMENOMASTER: return "no NSM master";
-  case NSMEINVNAME: return "invalid name"; /* why unsed? */
+  case NSMEINVNAME: return "invalid name"; /* from nsmd2, shouldn't happen */
   case NSMEINVPAR: return "invalid parameter";
-  case NSMENODEEXIST: return "node already exist"; /* why unsed? */
-  case NSMEFULNODE: return "no more NSM node"; /* why unsed? */
+  case NSMENODEEXIST: return errs; /* "node already exist" from nsmd2 */
+  case NSMEFULNODE:   return errs; /* "no more NSM node"   from nsmd2 */
   case NSMENODEST: return "destination node is gone"; /* why unsed? */
-  case NSMEINVFMT: return "invalid data format"; /* why unused? */
+  case NSMEINVFMT: return "invalid data format"; /* from nsmd2 */
   case NSMEMEMEXIST: return "data alraedy exists"; /* why unused? */
   case NSMENOMOREMEM: return "no more data area"; /* why unused? */
-  case NSMEOPENED: return "already opened"; /* why unused? */
+  case NSMEOPENED: return "already opened"; /* from nsmd2 */
   case NSMENODENAME: return "invalid node name";
   case NSMENODELONG: return "node name too long"; /* why unused? */
   case NSMEHOSTNAME: return "invalid hostname";
@@ -196,7 +197,7 @@ nsmlib_strerror(NSMcontext *nsmc)
   case NSMENONSMD: syserr = "cannot connect to NSMD"; break;
   case NSMENOUID:    return "uid not received";
   case NSMERDCLOSE:  return "uid not fully received";
-  case NSMEACCESS:   return "invalid NSMD uid";
+  case NSMEACCESS:   return "NSMD is running under different uid";
   case NSMESHMGETSYS: syserr = "cannot open NSMsys shared memory"; break;
   case NSMESHMGETMEM:
     if (errno == EACCES) {
@@ -1085,11 +1086,21 @@ nsmlib_initcli(NSMcontext *nsmc, const char *nodename)
   ret = nsmlib_recvpar(nsmc);
   DBG("initcli: recvpar=%d", ret);
   if (ret < 0) {
-    sprintf(nsmlib_errs, "initcli: recvpar error=%d", ret);
-    return nsmlib_errc = NSMEUNEXPECTED;
+    switch (ret) {
+    case NSMENODEEXIST:
+      sprintf(nsmlib_errs, "node %s already exists", nodename);
+      break;
+    case NSMEFULNODE:
+      sprintf(nsmlib_errs, "no more place for node %s", nodename);
+      break;
+    default:
+      /* errs just in case when errc is unknown */
+      sprintf(nsmlib_errs, "initcli: recvpar error=%d", ret);
+    }
+    return nsmlib_errc = ret;
   }
   if (ret > NSMSYS_MAX_NOD) {
-    sprintf(nsmlib_errs, "initcli: invalid nodeid=%d", ret);
+    sprintf(nsmlib_errs, "invalid nodeid=%d returned from nsmd2", ret);
     return nsmlib_errc = NSMEUNEXPECTED;
   }
   nsmc->nodeid = ret;

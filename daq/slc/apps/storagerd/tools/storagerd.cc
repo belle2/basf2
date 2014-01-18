@@ -19,7 +19,7 @@ int main(int argc, char** argv)
     Belle2::debug("Usage : ./storagerd <name>");
     return 1;
   }
-  daemon(0, 0);
+  //daemon(0, 0);
   LogFile::open("storage");
   const char* name = argv[1];
   NSMNode* node = new NSMNode(name);

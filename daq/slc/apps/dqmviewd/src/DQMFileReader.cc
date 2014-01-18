@@ -10,13 +10,15 @@
 #include <daq/slc/base/Debugger.h>
 
 #include "TH2.h"
+#include "TFile.h"
 
 #include <iostream>
 
 using namespace Belle2;
 
-DQMFileReader::DQMFileReader() : _file(NULL)
+DQMFileReader::DQMFileReader(const std::string& name) : _file(NULL)
 {
+  _name = name;
   _hist_m = new DQMHistMap();
 }
 
@@ -80,5 +82,23 @@ void DQMFileReader::update(HistoPackage* pack)
       histo->setUpdated(true);
     }
   }
+}
+
+bool DQMFileReader::dump(const std::string& dir,
+                         unsigned int expno, unsigned int runno)
+{
+  std::string filepath = Form("%s/DQM_%s_%04d_%06d.root",
+                              dir.c_str(), _name.c_str(), expno, runno);
+  LogFile::debug("created DQM dump file: %s", filepath.c_str());
+  TFile* file = new TFile(filepath.c_str(), "recreate");
+  for (TH1Map::iterator it = _hist_m->getHists().begin();
+       it != _hist_m->getHists().end(); it++) {
+    TObject* obj = _file->Get(it->first.c_str());
+    obj->Write();
+  }
+  file->Close();
+  delete file;
+  _file->cd();
+  return true;
 }
 

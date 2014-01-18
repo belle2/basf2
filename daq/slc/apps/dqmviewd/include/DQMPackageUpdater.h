@@ -2,19 +2,19 @@
 #define _Belle2_DQMPackageUpdaer_hh
 
 #include <daq/slc/system/Mutex.h>
+#include <daq/slc/system/Cond.h>
 
 namespace Belle2 {
 
-  class PackageManager;
+  class DQMViewCallback;
   class DQMViewMaster;
 
   class DQMPackageUpdater {
 
   public:
-    DQMPackageUpdater(int index, PackageManager* manager,
+    DQMPackageUpdater(DQMViewCallback* callback,
                       DQMViewMaster* master)
-      : _index(index), _manager(manager),
-        _master(master), _stopped(true) {}
+      : _callback(callback), _master(master) {}
     ~DQMPackageUpdater() {}
 
   public:
@@ -24,11 +24,8 @@ namespace Belle2 {
     void run();
 
   private:
-    int _index;
-    PackageManager* _manager;
+    DQMViewCallback* _callback;
     DQMViewMaster* _master;
-    bool _stopped;
-    Mutex _mutex;
 
   };
 

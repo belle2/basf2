@@ -1,12 +1,13 @@
-#include "daq/slc/apps/dqmviewd/DQMViewMaster.h"
+#include "daq/slc/apps/dqmviewd/DQMViewCallback.h"
+
 #include "daq/slc/apps/dqmviewd/SimpleDQMPackage.h"
 
 #include <daq/slc/apps/PackageSender.h>
 #include <daq/slc/apps/SocketAcceptor.h>
 
+#include <daq/slc/nsm/NSMNodeDaemon.h>
+
 #include <daq/slc/system/PThread.h>
-#include <daq/slc/system/Fork.h>
-#include <daq/slc/system/Executor.h>
 #include <daq/slc/system/DynamicLoader.h>
 #include <daq/slc/system/LogFile.h>
 
@@ -19,31 +20,7 @@
 #include <dirent.h>
 #include <errno.h>
 #include <unistd.h>
-
-namespace Belle2 {
-
-  class HSeverExecutor {
-  public:
-    HSeverExecutor(int port, const std::string& mapfile, const std::string& dir)
-      : _port(port), _mapfile(mapfile), _dir(dir) {}
-
-  public:
-    void run() {
-      Executor executor;
-      executor.setExecutable("hserver");
-      executor.addArg(Belle2::form("%d", _port));
-      executor.addArg(_dir + "/" + _mapfile);
-      executor.execute();
-    }
-
-  private:
-    int _port;
-    std::string _mapfile;
-    std::string _dir;
-
-  };
-
-}
+#include <iostream>
 
 using namespace Belle2;
 
@@ -57,12 +34,12 @@ int main(int argc, char** argv)
     Belle2::debug("Usage: ./dqmserver <name> [<config>]");
     return 1;
   }
-  daemon(0, 0);
+  //daemon(0, 0);
   LogFile::open("dqmviewd");
-  system("killall hserver");
-  //const char* name = argv[1];
-  ConfigFile config("dqm");
+  //system("killall hserver");
+  const char* name = argv[1];
 
+  ConfigFile config("dqm");
   std::vector<DynamicLoader*> dl_v;
   DQMViewMaster* master = new DQMViewMaster();
   const std::string lib_path = config.get("DQM_LIB_PATH");
@@ -70,7 +47,6 @@ int main(int argc, char** argv)
   const std::string config_path = config.get("DQM_CONFIG_PATH");
   const std::string hostname = config.get("DQM_GUI_HOST");
   const int port = config.getInt("DQM_GUI_PORT");
-  master->setDirectory(map_path);
   DIR* dir = opendir(config_path.c_str());
   if (dir != NULL) {
     struct dirent* entry;
@@ -84,10 +60,8 @@ int main(int argc, char** argv)
           std::string pack_name = config.get("DQM_PACKAGE_NAME");
           int pack_port = config.getInt("DQM_PACKAGE_PORT");
           if (pack_name.size() == 0 || pack_port <= 0) continue;
+          std::string emsg = Belle2::form("Added DQM for %s", pack_name.c_str());
           std::string pack_map   = config.get("DQM_PACKAGE_MAP");
-          LogFile::debug("Open hserver for %s (port = %d, map file = %s)",
-                         pack_name.c_str(), pack_port, pack_map.c_str());
-          Fork(new HSeverExecutor(pack_port, pack_map, map_path));
           std::string pack_lib   = config.get("DQM_PACKAGE_LIB");
           std::string pack_class = config.get("DQM_PACKAGE_CLASS");
           if (pack_class.size() > 0) {
@@ -101,9 +75,9 @@ int main(int argc, char** argv)
             DQMPackage* package =
               (DQMPackage*)createMonitor(pack_name.c_str(), pack_map.c_str());
             dl_v.push_back(dl);
-            master->add(package);
+            master->add(pack_map, pack_port, package);
           } else {
-            master->add(new SimpleDQMPackage(pack_name, pack_map));
+            master->add(pack_map, pack_port, new SimpleDQMPackage(pack_name, pack_map));
           }
         }
       }
@@ -116,7 +90,11 @@ int main(int argc, char** argv)
   }
   PThread(new DQMUIAcceptor(hostname, port, master));
   LogFile::debug("Start socket acception from GUIs");
-  master->run();
+
+  NSMNode* node = new NSMNode(name);
+  DQMViewCallback* callback = new DQMViewCallback(node, master);
+  NSMNodeDaemon* daemon = new NSMNodeDaemon(callback);
+  daemon->run();
   return 0;
 }
 

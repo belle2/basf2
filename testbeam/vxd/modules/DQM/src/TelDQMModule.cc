@@ -89,9 +89,9 @@ void TelDQMModule::defineHisto()
     int iPlane = indexToPlane(i);
     string name = str(format("hTELHitmapU%1%") % iPlane);
     string title = str(format("TEL Hitmap in U, plane %1%") % iPlane);
-    float length = getInfo(i).getLength();
+    float width = getInfo(i).getWidth();
     int nPixels = getInfo(i).getUCells();
-    m_hitMapU[i] = new TH1F(name.c_str(), title.c_str(), nPixels, -0.5 * length, 0.5 * length);
+    m_hitMapU[i] = new TH1F(name.c_str(), title.c_str(), nPixels, -0.5 * width, 0.5 * width);
     m_hitMapU[i]->GetXaxis()->SetTitle("u position [cm]");
     m_hitMapU[i]->GetYaxis()->SetTitle("hits");
   }
@@ -100,9 +100,9 @@ void TelDQMModule::defineHisto()
     int iPlane = indexToPlane(i);
     string name = str(format("hTELHitmapV%1%") % iPlane);
     string title = str(format("TEL Hitmap in V, plane %1%") % iPlane);
-    float width = getInfo(i).getWidth();
+    float length = getInfo(i).getLength();
     int nPixels = getInfo(i).getVCells();
-    m_hitMapV[i] = new TH1F(name.c_str(), title.c_str(), nPixels, -0.5 * width, 0.5 * width);
+    m_hitMapV[i] = new TH1F(name.c_str(), title.c_str(), nPixels, -0.5 * length, 0.5 * length);
     m_hitMapV[i]->GetXaxis()->SetTitle("v position [cm]");
     m_hitMapV[i]->GetYaxis()->SetTitle("hits");
   }
@@ -155,14 +155,14 @@ void TelDQMModule::defineHisto()
       if (i == j) {  // hit maps
         string name = str(format("h2TELHitmapUV%1%") % iPlane2);
         string title = str(format("Hitmap TEL in U x V, plane %1%") % iPlane2);
-        m_correlationsHitMaps[c_nTELPlanes * j + i] = new TH2F(name.c_str(), title.c_str(), nStripsU2, -0.5 * length2, 0.5 * length2, nStripsV2, -0.5 * width2, 0.5 * width2);
+        m_correlationsHitMaps[c_nTELPlanes * j + i] = new TH2F(name.c_str(), title.c_str(), nStripsU2, -0.5 * width2, 0.5 * width2, nStripsV2, -0.5 * length2, 0.5 * length2);
         m_correlationsHitMaps[c_nTELPlanes * j + i]->GetXaxis()->SetTitle("u position [cm]");
         m_correlationsHitMaps[c_nTELPlanes * j + i]->GetYaxis()->SetTitle("v position [cm]");
         m_correlationsHitMaps[c_nTELPlanes * j + i]->GetZaxis()->SetTitle("hits");
       } else if (i < j) { // correlations for u
         string name = str(format("h2TELCorrelationmapU%1%%2%") % iPlane1 % iPlane2);
         string title = str(format("Correlationmap TEL in U, plane %1%, plane %2%") % iPlane1 % iPlane2);
-        m_correlationsHitMaps[c_nTELPlanes * j + i] = new TH2F(name.c_str(), title.c_str(), nStripsU1, -0.5 * length1, 0.5 * length1, nStripsU2, -0.5 * length2, 0.5 * length2);
+        m_correlationsHitMaps[c_nTELPlanes * j + i] = new TH2F(name.c_str(), title.c_str(), nStripsU1, -0.5 * width1, 0.5 * width1, nStripsU2, -0.5 * width2, 0.5 * width2);
         string axisxtitle = str(format("u position, plane %1% [cm]") % iPlane1);
         string axisytitle = str(format("u position, plane %1% [cm]") % iPlane2);
         m_correlationsHitMaps[c_nTELPlanes * j + i]->GetXaxis()->SetTitle(axisxtitle.c_str());
@@ -171,7 +171,7 @@ void TelDQMModule::defineHisto()
       } else {            // correlations for v
         string name = str(format("h2TELCorrelationmapV%1%%2%") % iPlane2 % iPlane1);
         string title = str(format("Correlationmap TEL in V, plane %1%, plane %2%") % iPlane2 % iPlane1);
-        m_correlationsHitMaps[c_nTELPlanes * j + i] = new TH2F(name.c_str(), title.c_str(), nStripsV2, -0.5 * width2, 0.5 * width2, nStripsV1, -0.5 * width1, 0.5 * width1);
+        m_correlationsHitMaps[c_nTELPlanes * j + i] = new TH2F(name.c_str(), title.c_str(), nStripsV2, -0.5 * length2, 0.5 * length2, nStripsV1, -0.5 * length1, 0.5 * length1);
         string axisxtitle = str(format("v position, plane %1% [cm]") % iPlane2);
         string axisytitle = str(format("v position, plane %1% [cm]") % iPlane1);
         m_correlationsHitMaps[c_nTELPlanes * j + i]->GetXaxis()->SetTitle(axisxtitle.c_str());
@@ -270,13 +270,13 @@ void TelDQMModule::event()
   for (int i1 = 0; i1 < storeClusters.getEntries(); i1++) {
     // preparing of first value for correlation plots with postfix "1":
     const PXDCluster& cluster1 = *storeClusters[i1];
-    int iPlane1 = cluster1.getSensorID().getLayerNumber();
+    int iPlane1 = cluster1.getSensorID().getSensorNumber();
     if ((iPlane1 < c_firstTELPlane) || (iPlane1 > c_lastTELPlane)) continue;
     int index1 = planeToIndex(iPlane1);
     for (int i2 = 0; i2 < storeClusters.getEntries(); i2++) {
       // preparing of second value for correlation plots with postfix "2":
       const PXDCluster& cluster2 = *storeClusters[i2];
-      int iPlane2 = cluster2.getSensorID().getLayerNumber();
+      int iPlane2 = cluster2.getSensorID().getSensorNumber();
       if ((iPlane2 < c_firstTELPlane) || (iPlane2 > c_lastTELPlane)) continue;
       int index2 = planeToIndex(iPlane2);
       // ready to fill correlation histograms and hit maps:

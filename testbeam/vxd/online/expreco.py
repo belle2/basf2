@@ -37,8 +37,15 @@ else:
 
 # PXD rawhit converter
 PXDSort = register_module('PXDRawHitSorter')
-PXDSort.param('mergeDuplicates', True)
-PXDSort.param('mergeFrames', False)
+# If the same pixel appears again in data, merge the two by adding their
+# charges, or discard the following occurrences?
+# Setting to True may lead to pixels with over-range charge when there are
+# several repetitions of data.
+PXDSort.param('mergeDuplicates', False)
+# True is conservative with respect to downstream processing chain in case
+# some parts do not support PXD frames. There is always a single frame,
+# though information on number of frames and start rows is propagated.
+PXDSort.param('mergeFrames', True)
 
 # PXD clusterizer
 PXDClust = register_module('PXDClusterizer')

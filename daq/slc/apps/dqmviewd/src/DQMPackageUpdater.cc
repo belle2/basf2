@@ -31,8 +31,6 @@ void DQMPackageUpdater::run()
     //_callback->lock();
     if (expno != _master->getExpNumber() ||
         runno != _master->getRunNumber()) {
-      expno = _master->getExpNumber();
-      runno = _master->getRunNumber();
       Belle2::debug("creating new DQM records for run # %04d.%06d",
                     (int)expno, (int)runno);
       for (size_t i = 0; i < manager_v.size(); i++) {
@@ -40,6 +38,8 @@ void DQMPackageUpdater::run()
           reader_v[i]->dump(dumppath, expno, runno);
         }
       }
+      expno = _master->getExpNumber();
+      runno = _master->getRunNumber();
     }
     //_callback->unlock();
     for (size_t index = 0; index < manager_v.size(); index++) {

@@ -332,6 +332,14 @@ void SVDDQMModule::beginRun()
     m_clustersV[i]->Reset();
     m_hitMapU[i]->Reset();
     m_hitMapV[i]->Reset();
+    m_chargeU[i]->Reset();
+    m_chargeV[i]->Reset();
+    m_seedU[i]->Reset();
+    m_seedV[i]->Reset();
+    m_sizeU[i]->Reset();
+    m_sizeV[i]->Reset();
+    m_timeU[i]->Reset();
+    m_timeV[i]->Reset();
   }
   for (int i = 0; i < c_nVXDPlanes * c_nVXDPlanes; i++) {
     m_correlationsHitMaps[i]->Reset();

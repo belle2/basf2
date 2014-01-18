@@ -165,7 +165,7 @@ void PXDDQMModule::defineHisto()
     string name = str(format("hPXDSizeU%1%") % iPlane);
     string title = str(format("PXD cluster size in U, plane %1%") % iPlane);
     m_sizeU[i] = new TH1F(name.c_str(), title.c_str(), 10, 0, 10);
-    m_sizeU[i]->GetXaxis()->SetTitle("cluster size in u [pitch units]");
+    m_sizeU[i]->GetXaxis()->SetTitle("cluster size in u");
     m_sizeU[i]->GetYaxis()->SetTitle("count");
   }
   // v size by plane
@@ -174,7 +174,7 @@ void PXDDQMModule::defineHisto()
     string name = str(format("hPXDSizeV%1%") % iPlane);
     string title = str(format("PXD cluster size in V, plane %1%") % iPlane);
     m_sizeV[i] = new TH1F(name.c_str(), title.c_str(), 10, 0, 10);
-    m_sizeV[i]->GetXaxis()->SetTitle("cluster size in v [pitch units]");
+    m_sizeV[i]->GetXaxis()->SetTitle("cluster size in v");
     m_sizeV[i]->GetYaxis()->SetTitle("count");
   }
   // size by plane
@@ -183,7 +183,7 @@ void PXDDQMModule::defineHisto()
     string name = str(format("hPXDSize%1%") % iPlane);
     string title = str(format("PXD cluster size, plane %1%") % iPlane);
     m_size[i] = new TH1F(name.c_str(), title.c_str(), 10, 0, 10);
-    m_size[i]->GetXaxis()->SetTitle("cluster size [pitch units]");
+    m_size[i]->GetXaxis()->SetTitle("cluster size");
     m_size[i]->GetYaxis()->SetTitle("count");
   }
   //----------------------------------------------------------------
@@ -193,9 +193,9 @@ void PXDDQMModule::defineHisto()
   for (int i = 0; i < c_nPXDPlanes; i++) {
     int iPlane = indexToPlane(i);
     string name = str(format("hPXDstartRow%1%") % iPlane);
-    string title = str(format("PXD readout start row, plane %1%") % iPlane);
+    string title = str(format("PXD readout start row distribution, plane %1%") % iPlane);
     m_startRow[i] = new TH1F(name.c_str(), title.c_str(), getInfo(i).getVCells() / 4, 0, getInfo(i).getVCells());
-    m_startRow[i]->GetXaxis()->SetTitle("start row");
+    m_startRow[i]->GetXaxis()->SetTitle("start row [pitch units]");
     m_startRow[i]->GetYaxis()->SetTitle("count");
   }
 
@@ -214,7 +214,7 @@ void PXDDQMModule::defineHisto()
     string titleRef = str(format("Seed charge count by distance from the start row, PXD plane %1%") % iPlane);
     m_chargeByStartRowCount[i] = new TH1F(nameRef.c_str(), titleRef.c_str(), getInfo(i).getVCells() / 4, 0.0, getInfo(i).getVCells());
     m_chargeByStartRowCount[i]->GetXaxis()->SetTitle("distance from the start row [pitch units]");
-    m_chargeByStartRowCount[i]->GetYaxis()->SetTitle("total cluster charge [ADU]");
+    m_chargeByStartRowCount[i]->GetYaxis()->SetTitle("count");
   }
 
   //----------------------------------------------------------------
@@ -226,24 +226,24 @@ void PXDDQMModule::defineHisto()
     string name = str(format("hPXDAverageSeedByU%1%") % iPlane);
     string title = str(format("Average seed charge by u, PXD plane %1%") % iPlane);
     m_averageSeedByU[i] = new TH1F(name.c_str(), title.c_str(), getInfo(i).getUCells(), 0.0, getInfo(i).getUCells());
-    m_averageSeedByU[i]->GetXaxis()->SetTitle("distance from the start row [pitch units]");
-    m_averageSeedByU[i]->GetYaxis()->SetTitle("total cluster charge [ADU]");
+    m_averageSeedByU[i]->GetXaxis()->SetTitle("u position [pitch units]");
+    m_averageSeedByU[i]->GetYaxis()->SetTitle("average cluster seed by u [ADU]");
     string nameRef = str(format("hPXDSeedCountsByU%1%") % iPlane);
     string titleRef = str(format("Seed charge count by u, PXD plane %1%") % iPlane);
     m_seedCountsByU[i] = new TH1F(nameRef.c_str(), titleRef.c_str(), getInfo(i).getUCells(), 0.0, getInfo(i).getUCells());
-    m_seedCountsByU[i]->GetXaxis()->SetTitle("distance from the start row [pitch units]");
-    m_seedCountsByU[i]->GetYaxis()->SetTitle("total cluster charge [ADU]");
+    m_seedCountsByU[i]->GetXaxis()->SetTitle("u position [pitch units]");
+    m_seedCountsByU[i]->GetYaxis()->SetTitle("count");
 
     string nameV = str(format("hPXDAverageSeedByV%1%") % iPlane);
     string titleV = str(format("Average seed charge by v, PXD plane %1%") % iPlane);
     m_averageSeedByV[i] = new TH1F(nameV.c_str(), titleV.c_str(), getInfo(i).getVCells(), 0.0, getInfo(i).getVCells());
-    m_averageSeedByV[i]->GetXaxis()->SetTitle("distance from the start row [pitch units]");
-    m_averageSeedByV[i]->GetYaxis()->SetTitle("total cluster charge [ADU]");
+    m_averageSeedByV[i]->GetXaxis()->SetTitle("v position [pitch units]");
+    m_averageSeedByV[i]->GetYaxis()->SetTitle("average cluster seed by v [ADU]");
     string nameRefV = str(format("hPXDSeedCountsByV%1%") % iPlane);
     string titleRefV = str(format("Seed charge count by v, PXD plane %1%") % iPlane);
     m_seedCountsByV[i] = new TH1F(nameRefV.c_str(), titleRefV.c_str(), getInfo(i).getVCells(), 0.0, getInfo(i).getVCells());
-    m_seedCountsByV[i]->GetXaxis()->SetTitle("distance from the start row [pitch units]");
-    m_seedCountsByV[i]->GetYaxis()->SetTitle("total cluster charge [ADU]");
+    m_seedCountsByV[i]->GetXaxis()->SetTitle("v position [pitch units]");
+    m_seedCountsByV[i]->GetYaxis()->SetTitle("count");
   }
 
   // cd back to root directory

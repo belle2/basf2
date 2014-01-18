@@ -109,7 +109,7 @@ void StorageDeserializerModule::initialize()
 
 void StorageDeserializerModule::event()
 {
-  0   m_nrecv++;
+  m_nrecv++;
   if (m_package_i == StorageWorker::MAX_QUEUES) {
     m_package_i = 0;
   }

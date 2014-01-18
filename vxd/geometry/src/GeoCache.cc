@@ -34,6 +34,14 @@ namespace Belle2 {
       m_sensors.clear();
       m_sensorInfo.clear();
     }
+
+    bool GeoCache::validSensorID(Belle2::VxdID id) const
+    {
+      id.setSegmentNumber(0);
+      SensorInfoMap::const_iterator info = m_sensorInfo.find(id);
+      return (info != m_sensorInfo.end());
+    }
+
     const SensorInfoBase& GeoCache::getSensorInfo(VxdID id) const
     {
       id.setSegmentNumber(0);
@@ -113,7 +121,7 @@ namespace Belle2 {
               m_telLayers.insert(layerID);
               break;
             default:
-              B2FATAL("Cannot use anything else as SensorType PXD or SVD when creating VXD Sensors");
+              B2FATAL("Cannot use anything else as SensorTypes PXD, SVD, or TEL when creating VXD Sensors");
           }
           m_ladders[layerID].insert(ladderID);
           m_sensors[ladderID].insert(sensorID);

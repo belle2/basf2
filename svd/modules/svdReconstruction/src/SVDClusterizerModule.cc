@@ -237,6 +237,8 @@ void SVDClusterizerModule::event()
   m_clusters.clear();
   m_cache.clear();
 
+  const VXD::GeoCache& geo = VXD::GeoCache::getInstance();
+
   if (!m_assumeSorted) {
     //If the pixels are in random order, we have to sort them first before we can cluster them
     Sensors sensors;
@@ -244,6 +246,11 @@ void SVDClusterizerModule::event()
     for (int i = 0; i < nDigits; i++) {
       Sample sample(storeDigits[i], i);
       VxdID sensorID = storeDigits[i]->getSensorID();
+      // If malformed object, drop it. Only here, for sorted digits the check will be done in sorter module.
+      if (!geo.validSensorID(sensorID)) {
+        B2WARNING("Malformed SVDDigit, VxdID " << sensorID.getID() << ", dropping.")
+        continue;
+      }
       int side = storeDigits[i]->isUStrip() ? 0 : 1;
       std::pair<SensorSide::iterator, bool> it = sensors[sensorID][side].insert(sample);
       if (!it.second) {

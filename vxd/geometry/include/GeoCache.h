@@ -64,6 +64,12 @@ namespace Belle2 {
       /** Return a set of all sensor IDs belonging to a given ladder */
       const std::set<Belle2::VxdID>& getSensors(Belle2::VxdID ladder) const;
 
+      /** Check that id is a valid sensor number.
+       * @param id sensor id to be checked against current GeoCache information
+       * @true if there is a SensorInfo associated with id, otherwise false.
+       */
+      bool validSensorID(Belle2::VxdID id) const;
+
       /** Return a referecne to the SensorInfo of a given SensorID */
       const SensorInfoBase& getSensorInfo(Belle2::VxdID id) const;
 
@@ -72,7 +78,9 @@ namespace Belle2 {
        */
       static const SensorInfoBase& get(Belle2::VxdID id) { return getInstance().getSensorInfo(id); }
       /** Return a reference to the singleton instance */
+
       static GeoCache& getInstance();
+
     private:
 #ifndef __CINT__
       /** Hash map to store pointers to all existing SensorInfos with constant lookup complexity */

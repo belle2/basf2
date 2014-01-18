@@ -55,10 +55,6 @@ namespace Belle2 {
       bool m_mergeFrames;
       /** Minimum charge for which a digit is created. */
       double m_0cut;
-      /** Accept fake data by replacing VxdID 0 with an inconspicuous VxdID 1.1.1.
-       * It is not advisable to turn this on unless expressly intended.
-       */
-      bool m_acceptFake;
     };//end class declaration
 
     /** @}*/

@@ -109,7 +109,8 @@ namespace Belle2 {
     TH1F* m_sizeV[c_nSVDPlanes];          /**< v size by plane */
     TH1F* m_timeU[c_nSVDPlanes];          /**< u time by plane */
     TH1F* m_timeV[c_nSVDPlanes];          /**< v time by plane */
-    TH2F* m_correlationsHitMaps[c_nVXDPlanes* c_nVXDPlanes];   /**< Correlations and hit maps */
+    TH2F* m_correlationsHitMaps[c_nVXDPlanes* c_nVXDPlanes];   /**< Correlations and hit maps from local uv coordinates*/
+    TH2F* m_correlationsHitMapsSP[c_nVXDPlanes* c_nVXDPlanes]; /**< Correlations and hit maps from space points */
   };
 
   inline const SVD::SensorInfo& SVDDQMModule::getInfo(int index) const

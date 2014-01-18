@@ -29,7 +29,7 @@ void SimpleDQMPackage::init()
     std::string c_name = Belle2::form("c_%s", histo->getName().c_str());
     CanvasPanel* canvas = new CanvasPanel(c_name, histo->getTitle());
     canvas->add(histo);
-    tabpanel->add(histo->getTitle(), canvas);
+    tabpanel->add(histo->getName(), canvas);
   }
 }
 

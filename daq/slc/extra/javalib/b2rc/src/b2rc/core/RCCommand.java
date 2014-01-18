@@ -76,7 +76,8 @@ public class RCCommand extends RCEnum {
 		} else if (equals(START) && state.equals(RCState.READY_S)) {
 			return SUGGESTED;
 		} else if (equals(STOP) && 
-				(state.equals(RCState.RUNNING_S) || state.equals(RCState.PAUSED_S))) {
+				(state.equals(RCState.ERROR_ES) || state.equals(RCState.FATAL_ES) ||  
+				 state.equals(RCState.RUNNING_S) || state.equals(RCState.PAUSED_S))) {
 			return SUGGESTED;
 		} else if (equals(PAUSE) && state.equals(RCState.RUNNING_S)) {
 			return ENABLED;

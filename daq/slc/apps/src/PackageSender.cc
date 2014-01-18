@@ -39,7 +39,7 @@ throw(IOException)
   if (count > 0) {
     writer.writeInt(FLAG_UPDATE);
     writer.writeInt(n);
-    writer.writeInt(_contents_v[i].count);
+    //writer.writeInt(_contents_v[i].count);
     writer.write(_contents_v[i].buf, _contents_v[i].count);
     if (_update_id_v[i] > id) {
       _update_id_v[i] = id;
@@ -111,9 +111,9 @@ void PackageSender::run()
     for (size_t i = 0; i < manager_v.size(); i++) {
       if (monitored_v[i]) {
         try {
-          writer.writeInt(_conf_v[i].count);
+          //writer.writeInt(_conf_v[i].count);
           writer.write(_conf_v[i].buf, _conf_v[i].count);
-          writer.writeInt(_contents_v[i].count);
+          //writer.writeInt(_contents_v[i].count);
           writer.write(_contents_v[i].buf, _contents_v[i].count);
           writer.write(_xml_v[i].c_str(), _xml_v[i].size());
           writer.writeChar('\0');

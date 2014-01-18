@@ -30,7 +30,8 @@ namespace Belle2 {
 
   protected:
     HistoPackage* _pack;
-    Belle2::ZipDeflater* _writer;
+    Belle2::BufferedWriter* _writer;
+    //Belle2::ZipDeflater* _writer;
     Belle2::RWLock _lock;
 
   };

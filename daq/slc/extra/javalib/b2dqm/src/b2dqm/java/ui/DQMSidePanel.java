@@ -60,7 +60,7 @@ public class DQMSidePanel extends JPanel implements Updatable {
         panel.add(southBox,  BorderLayout.SOUTH);
         panel.setMinimumSize(new Dimension(120, 0));
         add(panel);
-        setPreferredSize(new Dimension(320, 240));
+        setPreferredSize(new Dimension(420, 240));
     }
     
     private void initComps(List<HistoListPanel> list, ExpansionEvent e) {

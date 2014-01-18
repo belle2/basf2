@@ -51,7 +51,7 @@ public class Belle2DQMBrowser extends JavaEntoryPoint {
 			_socket = new Socket(__host, __port);
 			SocketDataWriter socket_writer = new SocketDataWriter(_socket);
 			SocketDataReader socket_reader = new SocketDataReader(_socket);
-			ZlibInflater inflater = new ZlibInflater();
+			//ZlibInflater inflater = new ZlibInflater();
 			while (true) {
 				int flag = socket_reader.readInt();
 				switch ( flag ) {
@@ -67,7 +67,7 @@ public class Belle2DQMBrowser extends JavaEntoryPoint {
 					}
 					ArrayList<Boolean> monitored_v = PackageSelectPanel.showPane(_pack_v);
 					for ( int n = 0; n < monitored_v.size(); n++ ) {
-						System.out.println("n");
+						//System.out.println("n");
 						socket_writer.writeByte(monitored_v.get(n)?(byte)1:0);
 					}
 				}
@@ -80,10 +80,12 @@ public class Belle2DQMBrowser extends JavaEntoryPoint {
 					ArrayList<InputStream> istream_v = new ArrayList<InputStream>();
 					for (int n = 0; n < npacks; n++) {
 						HistoPackage pack = new HistoPackage();
-						inflater.readBuffer(socket_reader);
-						pack.readConfig(inflater);
-						inflater.readBuffer(socket_reader);
-						pack.readContents(inflater);
+						//inflater.readBuffer(socket_reader);
+						//pack.readConfig(inflater);
+						//inflater.readBuffer(socket_reader);
+						//pack.readContents(inflater);
+						pack.readConfig(socket_reader);
+						pack.readContents(socket_reader);
 						pack.setUpdateTime(0);
 						_pack_v.add(pack);
 						PackageInfo info = new PackageInfo();
@@ -95,7 +97,7 @@ public class Belle2DQMBrowser extends JavaEntoryPoint {
 								istream_v.add(new ByteArrayInputStream(buf.toString().getBytes()));
 								break;
 							} else {
-								System.out.print(c);
+								//System.out.print(c);
 								buf.append(c);
 							}
 						}
@@ -106,8 +108,7 @@ public class Belle2DQMBrowser extends JavaEntoryPoint {
 				case FLAG_UPDATE : {
 					int id = socket_reader.readInt();
 					if ( id >= 0 ) {
-						inflater.readBuffer(socket_reader);
-						_pack_v.get(id).readContents(inflater);
+						_pack_v.get(id).readContents(socket_reader);
 						_frame.update();
 					}
 				}
@@ -131,7 +132,7 @@ public class Belle2DQMBrowser extends JavaEntoryPoint {
 	
 	public static void main(String[] argv) {
 		Belle2DQMBrowser gui = new Belle2DQMBrowser();
-		String host = (argv.length > 0)? argv[0]:"localhost";//"130.87.227.252";//
+		String host = (argv.length > 0)? argv[0]:"192.168.99.45";//"130.87.227.252";//
 		int port = (argv.length > 1)? Integer.parseInt(argv[1]):50100;
 		gui.init(host, port, "");
 		gui.run();

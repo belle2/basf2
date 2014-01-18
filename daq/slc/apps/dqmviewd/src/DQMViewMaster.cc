@@ -27,11 +27,11 @@ void DQMViewMaster::run()
     DQMPackage* monitor = (DQMPackage*)_manager_v[i]->getMonitor();
     index_m.insert(std::map<std::string, int>::value_type(monitor->getFileName(), i));
   }
-  Inotify inotify;
-  inotify.open();
-  inotify.add(_directory, Inotify::FILE_DELETE | Inotify::FILE_MODIFY);
+  //Inotify inotify;
+  //inotify.open();
+  //inotify.add(_directory, Inotify::FILE_DELETE | Inotify::FILE_MODIFY);
   while (true) {
-    sleep(2);
+    sleep(10);
     for (size_t index = 0; index < _manager_v.size(); index++) {
       //InotifyEventList event_v(inotify.wait(5));
       //for (size_t i = 0; i < event_v.size(); i++) {
@@ -46,7 +46,7 @@ void DQMViewMaster::run()
           delete reader;
           continue;
         }
-        LogFile::debug("Histo entries was found in %s", filename.c_str());
+        LogFile::debug("Hist entries was found in %s", filename.c_str());
         monitor->setHistMap(reader->getHistMap());
         reader_v[index] = reader;
         _manager_v[index]->init();

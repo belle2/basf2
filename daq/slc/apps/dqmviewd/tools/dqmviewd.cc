@@ -18,6 +18,7 @@
 #include <cstdlib>
 #include <dirent.h>
 #include <errno.h>
+#include <unistd.h>
 
 namespace Belle2 {
 
@@ -56,10 +57,11 @@ int main(int argc, char** argv)
     Belle2::debug("Usage: ./dqmserver <name> [<config>]");
     return 1;
   }
+  daemon(0, 0);
   LogFile::open("dqmviewd");
-  //system("killall hserver");
+  system("killall hserver");
   //const char* name = argv[1];
-  ConfigFile config((argc > 2) ? argv[2] : "dqm");
+  ConfigFile config("dqm");
 
   std::vector<DynamicLoader*> dl_v;
   DQMViewMaster* master = new DQMViewMaster();
@@ -70,7 +72,6 @@ int main(int argc, char** argv)
   const int port = config.getInt("DQM_GUI_PORT");
   master->setDirectory(map_path);
   DIR* dir = opendir(config_path.c_str());
-  int count = 0;
   if (dir != NULL) {
     struct dirent* entry;
     while ((entry = readdir(dir)) != NULL) {
@@ -86,7 +87,7 @@ int main(int argc, char** argv)
           std::string pack_map   = config.get("DQM_PACKAGE_MAP");
           LogFile::debug("Open hserver for %s (port = %d, map file = %s)",
                          pack_name.c_str(), pack_port, pack_map.c_str());
-          //Fork(new HSeverExecutor(pack_port, pack_map, map_path));
+          Fork(new HSeverExecutor(pack_port, pack_map, map_path));
           std::string pack_lib   = config.get("DQM_PACKAGE_LIB");
           std::string pack_class = config.get("DQM_PACKAGE_CLASS");
           if (pack_class.size() > 0) {

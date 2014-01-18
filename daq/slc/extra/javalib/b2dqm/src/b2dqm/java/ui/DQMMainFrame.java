@@ -56,8 +56,8 @@ public class DQMMainFrame extends JFrame {
 		_panel.add(_main_panel);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		_main_panel.setPreferredSize(new Dimension(1000, 720));
-		_side_panel.setPreferredSize(new Dimension(240, 720));
-		_side_panel.setMaximumSize(new Dimension(240, 720));
+		_side_panel.setPreferredSize(new Dimension(300, 720));
+		_side_panel.setMaximumSize(new Dimension(300, 720));
 		setSize(1240, 720);
 		setTitle("Belle-II DQM browser version " + Belle2DQMBrowser.VERSION);
 		setJMenuBar(new DQMMenuBar(this));

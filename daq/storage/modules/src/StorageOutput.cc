@@ -81,7 +81,7 @@ void StorageOutputModule::event()
   int expno = evtmetadata->getExperiment();
   int runno = evtmetadata->getRun();
   int subno = 0;//evtmetadata->getRun() & 0xFF;
-  if (m_runno != runno || m_expno != expno) {
+  if (m_runno < runno || m_expno < expno) {
     storager_data& data(MonitorStorageModule::getData());
     if (m_file != NULL) {
       delete m_file;
@@ -97,6 +97,8 @@ void StorageOutputModule::event()
     data.curtime = t.get();
     m_file = openDataFile();
     m_nevts = 0;
+    //} else if (m_runno > runno) {
+    //  return;
   }
 
   // Stream DataStore in EvtMessage

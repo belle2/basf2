@@ -14,6 +14,9 @@
 #include <framework/pcore/MsgHandler.h>
 #include <framework/pcore/RingBuffer.h>
 #include <framework/pcore/DataStoreStreamer.h>
+#include <framework/datastore/StoreArray.h>
+
+#include <rawdata/dataobjects/RawPXD.h>
 
 #include <daq/slc/system/PThread.h>
 #include <daq/slc/readout/RunInfoBuffer.h>
@@ -35,9 +38,11 @@ namespace Belle2 {
 
   public:
     static RunInfoBuffer* getInfo() { return g_info; }
+    static DataStorePackage* getPackage() { return g_package; }
 
   private:
     static RunInfoBuffer* g_info;
+    static DataStorePackage* g_package;
 
     // Public functions
   public:
@@ -58,6 +63,7 @@ namespace Belle2 {
     void storeEvent();
 
   private:
+    DataStorePackage* m_package;
     DataStorePackage* m_package_q;
     unsigned int m_package_length;
     unsigned int m_package_i;
@@ -77,6 +83,7 @@ namespace Belle2 {
     std::string m_nodename;
     int m_shmflag;
     int m_numThread;
+    StoreArray<RawPXD> m_raw_pxds;
 
   };
 

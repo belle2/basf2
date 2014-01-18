@@ -1,4 +1,5 @@
 #include "daq/storage/modules/DataStorePackage.h"
+#include "daq/storage/ONSENBinData.h"
 
 #include <framework/logging/Logger.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -8,6 +9,8 @@
 
 #include <framework/datastore/StoreArray.h>
 #include <rawdata/dataobjects/RawPXD.h>
+
+#include <daq/slc/base/StringUtil.h>
 
 #include <TClonesArray.h>
 #include <TClass.h>
@@ -19,11 +22,11 @@ using namespace Belle2;
 Mutex DataStorePackage::g_mutex;
 bool DataStorePackage::g_init = false;
 
-void DataStorePackage::decode(MsgHandler& msghandler, BinData& data)
+bool DataStorePackage::decode(MsgHandler& msghandler, BinData& data)
 {
   if (data.getWordSize() > MAX_BUFFER_WORDS) {
     B2ERROR(__FILE__ << ":" << __LINE__ << " Too large data size " << data.getByteSize());
-    return ;
+    return false;
   }
   memcpy(m_buf, data.getBuffer(), data.getByteSize());
   m_data.setBuffer(m_buf);
@@ -32,6 +35,10 @@ void DataStorePackage::decode(MsgHandler& msghandler, BinData& data)
   if (m_data_hlt.getWordSize() > MAX_BUFFER_WORDS ||
       m_data_hlt.getTrailerMagic() != BinData::TRAILER_MAGIC) {
     m_data_hlt.setBuffer(m_data.getBuffer());
+    if (m_data_hlt.getTrailerMagic() != BinData::TRAILER_MAGIC) {
+      B2ERROR(__FILE__ << ":" << __LINE__ << " Bad tarailer magic for HLT = " << m_data_hlt.getTrailerMagic());
+      return false;
+    }
     contains_sub = false;
   }
   m_objlist = std::vector<TObject*>();
@@ -43,10 +50,19 @@ void DataStorePackage::decode(MsgHandler& msghandler, BinData& data)
   m_durability = (DataStore::EDurability)(msg->header())->reserved[0];
   if (contains_sub && m_data.getBodyByteSize() > m_data_hlt.getByteSize()) {
     m_data_pxd.setBuffer(m_data.getBuffer() + m_data_hlt.getWordSize() + m_data.getHeaderWordSize());
+    if (m_data_pxd.getBody()[0] != ONSENBinData::MAGIC) {
+      B2ERROR(__FILE__ << ":" << __LINE__ << " Bad ONSEN magic for PXD = " << m_data_pxd.getTrailerMagic());
+      return false;
+    }
+    if (m_data_pxd.getTrailerMagic() != BinData::TRAILER_MAGIC) {
+      B2ERROR(__FILE__ << ":" << __LINE__ << " Bad tarailer magic for PXD = " << m_data_pxd.getTrailerMagic());
+      return false;
+    }
   } else {
     m_data_pxd.setBuffer(NULL);
   }
   delete msg;
+  return true;
 }
 
 void DataStorePackage::restore()
@@ -79,16 +95,11 @@ void DataStorePackage::restore()
       B2ERROR("restoreDS: " << (is_array ? "Array" : "Object") << ": " << m_namelist.at(i) << " is NULL!");
     }
   }
-  if (!g_init) {
-    g_init = true;
-  }
   if (m_data_pxd.getBuffer() != NULL) {
     StoreArray<RawPXD> rawpxdary;
-    //printf("%04x %04x %04x %d\n", m_data_pxd.getBuffer()[0],
-    //m_data_pxd.getBuffer()[11], m_data_pxd.getBuffer()[13], m_data_pxd.getByteSize());
-    //rawpxdary.appendNew(RawPXD((int*)m_data_pxd.getBuffer(), m_data_pxd.getByteSize()));
     rawpxdary.appendNew(RawPXD((int*)m_data_pxd.getBody(), m_data_pxd.getBodyByteSize()));
   }
+  if (!g_init) g_init = true;
   g_mutex.unlock();
 }
 

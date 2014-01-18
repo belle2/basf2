@@ -1,4 +1,3 @@
-
 //+
 // File : StorageDeserializer.cc
 // Description : Module to receive data from eb2rx and store online disk
@@ -17,7 +16,6 @@
 #include "framework/dataobjects/EventMetaData.h"
 
 #include <framework/datastore/StoreArray.h>
-#include <rawdata/dataobjects/RawPXD.h>
 
 #include <daq/slc/base/Debugger.h>
 #include <daq/slc/base/StringUtil.h>
@@ -40,6 +38,7 @@ REG_MODULE(StorageDeserializer)
 //-----------------------------------------------------------------
 
 RunInfoBuffer* StorageDeserializerModule::g_info = NULL;
+DataStorePackage* StorageDeserializerModule::g_package = NULL;
 
 StorageDeserializerModule::StorageDeserializerModule() : Module()
 {
@@ -57,7 +56,8 @@ StorageDeserializerModule::StorageDeserializerModule() : Module()
   m_running = false;
   m_package_q = NULL;
   m_package_length = m_package_i = 0;
-
+  m_package = new DataStorePackage();
+  g_package = m_package;
   B2INFO("StorageDeserializer: Constructor done.");
 }
 
@@ -73,7 +73,6 @@ void StorageDeserializerModule::initialize()
   if (m_buf == NULL) {
     m_buf = new StorageRBufferManager(m_inputbuf);
   }
-  StoreArray<RawPXD>::registerPersistent();
   if (m_shmflag > 0) {
     if (m_nodename.size() == 0 || m_nodeid < 0) {
       m_shmflag = 0;
@@ -83,29 +82,34 @@ void StorageDeserializerModule::initialize()
       g_info = m_info;
     }
   }
-  char* evtbuf = new char[10000000];
-  m_data.setBuffer(evtbuf);
-  int size = 0;
-  while ((size = m_inputbuf->remq((int*)evtbuf)) == 0) {
-    usleep(20);
-  }
-  DataStorePackage package;
-  MsgHandler handler(m_compressionLevel);
-  package.decode(handler, m_data);
-  package.restore();
-  for (int n = 0; n < m_numThread; n++) {
-    PThread(new StorageWorker(m_buf, m_compressionLevel));
-  }
+  StoreArray<RawPXD>::registerPersistent();
   if (m_shmflag > 0) {
     m_info->reportRunning();
     m_running = true;
   }
+  char* evtbuf = new char[10000000];
+  m_data.setBuffer(evtbuf);
+  int size = 0;
+  while (true) {
+    while ((size = m_inputbuf->remq((int*)evtbuf)) == 0) {
+      usleep(20);
+    }
+    MsgHandler handler(m_compressionLevel);
+    if (m_package->decode(handler, m_data)) {
+      m_package->restore();
+      break;
+    }
+  }
+  for (int n = 0; n < m_numThread; n++) {
+    PThread(new StorageWorker(m_buf, m_compressionLevel));
+  }
+
   B2INFO("StorageDeserializer: initialize() done.");
 }
 
 void StorageDeserializerModule::event()
 {
-  m_nrecv++;
+  0   m_nrecv++;
   if (m_package_i == StorageWorker::MAX_QUEUES) {
     m_package_i = 0;
   }
@@ -114,10 +118,14 @@ void StorageDeserializerModule::event()
   while (package.getSerial() == 0) {
     StorageWorker::wait();
   }
-  StorageWorker::unlock();
-  package.restore();
+  //printf("2: block size %d bytes : %04x :\n",
+  //   (int)m_package->getPXDData().getWordSize(),
+  //   m_package->getPXDData().getBody());
+  m_package->copy(package);
   package.setSerial(0);
   StorageWorker::notify();
+  StorageWorker::unlock();
+  m_package->restore();
 }
 
 void StorageDeserializerModule::beginRun()

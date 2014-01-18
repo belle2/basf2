@@ -25,19 +25,36 @@ argv = sys.argv
 set_log_level(LogLevel.ERROR)
 set_log_level(LogLevel.INFO)
 
+gearbox = register_module('Gearbox')
+SVDUnpack = register_module('SVDUnpacker')
+SVDClust = register_module('SVDClusterizer')
+vxdtf = register_module('VXDTF')
+SVD_DQM = register_module('SVDDQM')
+vxdtf_dqm = register_module('VXDTFDQM')
+trackfitter = register_module('GenFitter')
+roiprod = register_module('PXDDataReduction')
+roipayload = register_module('ROIPayloadAssembler')
+
 # Modules
 # deserializer = register_module('FastRbuf2Ds')
 # deserializer.param('RingBufferName', argv[1])
 deserializer = register_module('StorageDeserializer')
 deserializer.param('InputBufferName', argv[1])
-deserializer.param('NumThreads', 2)
+deserializer.param('NumThreads', 1)
 if len(argv) >= 6:
     deserializer.param('NodeName', argv[4])
-#    deserializer.param('NodeId', int(argv[5]))
     deserializer.param('UseShmFlag', int(argv[6]))
+#    deserializer.param('NodeId', int(argv[5]))
 output = register_module('StorageOutput')
 output.param('StorageDir', argv[2])
 output.param('OutputBufferName', argv[3])
+
+# histo = register_module('DqmHistoManager')
+# histo.param('HostName', 'belle-rpc2')
+# histo.param('Port', 40010)
+
+# Monitor module
+# monitor = register_module('MonitorStorage')
 
 # Create main path
 main = create_path()
@@ -45,6 +62,8 @@ main = create_path()
 # Add modules to main path
 main.add_module(deserializer)
 main.add_module(output)
+# main.add_module(histo)
+# main.add_module(monitor)
 
 # Process all events
 process(main)

@@ -26,16 +26,24 @@ unsigned int ONSENBinData::getTrigger() const
 
 unsigned int ONSENBinData::getTimetag() const
 {
-  return (ntohs(_start_frame->timetag_hi) << 16)
-         + ntohs(_start_frame->timetag_lo);
+  uint64_t retval =
+    ((uint64_t)ntohs(_start_frame->time_tag_hi) << 32)
+    | ((uint64_t)ntohs(_start_frame->time_tag_mid) << 16)
+    | (uint64_t)ntohs(_start_frame->time_tag_lo_and_type);
+  return (retval >> 4);
 }
 
 unsigned int ONSENBinData::getEventNumber() const
 {
   unsigned int nframe = getFrameNumber();
   if (nframe > MAX_PXD_FRAMES) return 0;
-  _start_frame = (StartFrame*)(_body + nframe + 2);
+  _start_frame = (sose_frame_t*)(_body + nframe + 2);
   return getTrigger();
+}
+
+unsigned int ONSENBinData::getTriggerType() const
+{
+  return (ntohs(_start_frame->time_tag_lo_and_type) & 0xF);
 }
 
 unsigned int ONSENBinData::getFrameNumber() const

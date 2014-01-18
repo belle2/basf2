@@ -19,7 +19,7 @@ namespace Belle2 {
   class DataStorePackage {
 
   public:
-    static const unsigned int MAX_BUFFER_WORDS = 40000;
+    static const unsigned int MAX_BUFFER_WORDS = 4000000;
 
   private:
     static Mutex g_mutex;
@@ -42,7 +42,7 @@ namespace Belle2 {
     }
 
   public:
-    void decode(MsgHandler& msghandler, BinData& data);
+    bool decode(MsgHandler& msghandler, BinData& data);
     void restore();
     void copy(DataStorePackage& package);
     unsigned int getSerial() const { return m_serial; }

@@ -8,6 +8,8 @@
 //         9 - Dec - 2013, Modification for DAQ use
 //-
 
+#include <rawdata/dataobjects/RawPXD.h>
+
 #include <daq/storage/modules/StorageOutput.h>
 #include <daq/storage/modules/StorageDeserializer.h>
 #include <daq/storage/modules/MonitorStorage.h>
@@ -77,8 +79,8 @@ void StorageOutputModule::event()
 {
   StoreObjPtr<EventMetaData> evtmetadata;
   int expno = evtmetadata->getExperiment();
-  int runno = evtmetadata->getRun() >> 8;
-  int subno = evtmetadata->getRun() & 0xFF;
+  int runno = evtmetadata->getRun();
+  int subno = 0;//evtmetadata->getRun() & 0xFF;
   if (m_runno != runno || m_expno != expno) {
     storager_data& data(MonitorStorageModule::getData());
     if (m_file != NULL) {
@@ -116,7 +118,7 @@ void StorageOutputModule::event()
   delete msg;
 
   m_datasize += stat;
-  if (m_nevts % 10000 == 0) {
+  if (m_nevts % 1000 == 0) {
     storager_data& data(MonitorStorageModule::getData());
     Time t;
     double curtime = t.get();
@@ -167,9 +169,9 @@ void StorageOutputModule::endRun()
 
 void StorageOutputModule::terminate()
 {
-  delete m_msghandler;
-  delete m_streamer;
-  delete m_file;
+  //delete m_msghandler;
+  //delete m_streamer;
+  //delete m_file;
 
   B2INFO("terminate called")
 }

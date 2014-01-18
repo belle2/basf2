@@ -14,6 +14,8 @@
 #include <daq/slc/base/StringUtil.h>
 #include <daq/slc/base/Date.h>
 
+#include <iostream>
+
 using namespace Belle2;
 
 REGISTER_DQM_PACKAGE(StorageDQMPackage)
@@ -204,14 +206,15 @@ bool StorageDQMPackage::update()
   //int evtno = h_runinfo->GetBinContent(4);
   double nevts = h_runinfo->GetBinContent(5);
   long long starttime = (long long)h_runinfo->GetBinContent(6);
-  long long curtime = (long long)h_runinfo->GetBinContent(7) + starttime;
+  long long curtime = (long long)h_runinfo->GetBinContent(7);
   int runlength = (int)(curtime - starttime);
   double data_size = h_runinfo->GetBinContent(8);
   double freq = h_runinfo->GetBinContent(9);
   double rate = h_runinfo->GetBinContent(10);
-  long long record_time = Time(curtime).getSecond();
-  m_g_event_rate->addPoint(record_time, freq);
-  m_g_data_rate->addPoint(record_time, rate);
+  //long long record_time = Time(curtime).getSecond();
+  std::cout << curtime << " " << Date(curtime).toString() << " " << freq << " " << rate << std::endl;
+  m_g_event_rate->addPoint(curtime, freq);
+  m_g_data_rate->addPoint(curtime, rate);
   m_label_event_rate->setText(Belle2::form("%2.2f [kHz]", freq));
   m_label_nevts->setText(Belle2::form("%d", (int)nevts));
   m_label_runno->setText(Belle2::form("%04d.%04d.%04d", expno, runno, subno));
@@ -222,6 +225,6 @@ bool StorageDQMPackage::update()
                                           (runlength % 60)));
   m_label_data_rate->setText(Belle2::form("%2.2f [MB/s]", data_size / runlength / 1000. / 1000.));
   m_label_data_size->setText(Belle2::form("%2.2f [kB/event]", data_size / nevts / 1000.));
-  getPackage()->setUpdateTime(record_time);
+  getPackage()->setUpdateTime(curtime);
   return true;
 }

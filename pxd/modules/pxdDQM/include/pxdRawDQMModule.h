@@ -41,6 +41,8 @@ namespace Belle2 {
 
       virtual void initialize();
 
+      virtual void beginRun();
+
       virtual void event();
 
     private:

@@ -51,6 +51,19 @@ void pxdRawDQMModule::initialize()
   REG_HISTOGRAM
 }
 
+void pxdRawDQMModule::beginRun()
+{
+  // Just to make sure, reset all the histograms.
+  hrawPxdPackets->Reset();
+  hrawPxdPacketSize->Reset();
+  hrawPxdHitsCount->Reset();
+  for (int i = 0; i < 10; i++) {
+    hrawPxdHits[i]->Reset();
+    hrawPxdHitsCharge[i]->Reset();
+    hrawPxdHitsCommonMode[i]->Reset();
+  }
+}
+
 void pxdRawDQMModule::event()
 {
   hrawPxdPackets->Fill(m_storeRawPxdrarray.getEntries());

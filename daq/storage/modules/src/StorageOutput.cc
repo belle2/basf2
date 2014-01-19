@@ -120,6 +120,11 @@ void StorageOutputModule::event()
   delete msg;
 
   m_datasize += stat;
+  if (m_nevts < 10000 && (m_nevts < 10 || (m_nevts > 10 && m_nevts < 100 && m_nevts % 10 == 0) ||
+                          (m_nevts > 100 && m_nevts < 1000 && m_nevts % 100 == 0) ||
+                          (m_nevts > 1000 && m_nevts < 10000 && m_nevts % 1000 == 0))) {
+    B2INFO("Storage count = " << m_nevts);
+  }
   if (m_nevts % 1000 == 0) {
     storager_data& data(MonitorStorageModule::getData());
     Time t;

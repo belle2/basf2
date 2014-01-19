@@ -31,15 +31,17 @@ namespace Belle2 {
 
   public:
     int getExpNumber() const { return (_header->exp_run >> 22) & 0x3FF; };
-    int getRunNumber() const { return (_header->exp_run & 0x3FFFFF); };
+    int getRunNumber() const { return (_header->exp_run & 0x3FFFFF) >> 8; };
+    int getSubNumber() const { return (_header->exp_run & 0x3FFFFF) & 0xFF; };
     int getEventNumber() const { return _header->event_number; };
     int setEventNumber(int number) { return _header->event_number = number; };
     int setExpNumber(int exp_no) {
       _header->exp_run = ((exp_no & 0x3FF) << 22) | (_header->exp_run & 0x3FFFFF);
       return getExpNumber();
     };
-    int setRunNumber(int run_no) {
-      _header->exp_run = (_header->exp_run & 0xFFC00000) | (run_no & 0x3FFFFF);
+    int setRunNumber(int run_no, int sub_no) {
+      _header->exp_run = (_header->exp_run & 0xFFC00000) |
+                         (run_no & 0x3FFFFF) << 8 | (sub_no & 0xFF);
       return getRunNumber();
     };
     int getNEvent() const { return (_header->nevent_nboard >> 16); };

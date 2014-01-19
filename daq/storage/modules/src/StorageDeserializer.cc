@@ -100,9 +100,9 @@ void StorageDeserializerModule::initialize()
       break;
     }
   }
-  for (int n = 0; n < m_numThread; n++) {
-    PThread(new StorageWorker(m_buf, m_compressionLevel));
-  }
+  //for (int n = 0; n < m_numThread; n++) {
+  //  PThread(new StorageWorker(m_buf, m_compressionLevel));
+  //}
 
   B2INFO("StorageDeserializer: initialize() done.");
 }
@@ -110,6 +110,18 @@ void StorageDeserializerModule::initialize()
 void StorageDeserializerModule::event()
 {
   m_nrecv++;
+  int size = 0;
+  while (true) {
+    while ((size = m_inputbuf->remq((int*)m_data.getBuffer())) == 0) {
+      usleep(20);
+    }
+    MsgHandler handler(m_compressionLevel);
+    if (m_package->decode(handler, m_data)) {
+      m_package->restore();
+      break;
+    }
+  }
+  /*
   if (m_package_i == StorageWorker::MAX_QUEUES) {
     m_package_i = 0;
   }
@@ -118,14 +130,21 @@ void StorageDeserializerModule::event()
   while (package.getSerial() == 0) {
     StorageWorker::wait();
   }
-  //printf("2: block size %d bytes : %04x :\n",
-  //   (int)m_package->getPXDData().getWordSize(),
-  //   m_package->getPXDData().getBody());
   m_package->copy(package);
   package.setSerial(0);
   StorageWorker::notify();
   StorageWorker::unlock();
   m_package->restore();
+  */
+  StoreObjPtr<EventMetaData> evtmetadata;
+  if (evtmetadata.isValid()) {
+    m_expno = evtmetadata->getExperiment();
+    m_runno = evtmetadata->getRun();
+    m_evtno = evtmetadata->getEvent();
+  } else {
+    B2WARNING("NO event meta data " << m_data.getExpNumber() << "." << m_data.getRunNumber() << "." << m_data.getEventNumber());
+    B2WARNING("Last event meta data " << m_expno << "." << m_runno << "." << m_evtno);
+  }
 }
 
 void StorageDeserializerModule::beginRun()

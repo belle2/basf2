@@ -84,6 +84,9 @@ namespace Belle2 {
     int m_shmflag;
     int m_numThread;
     StoreArray<RawPXD> m_raw_pxds;
+    unsigned int m_expno;
+    unsigned int m_runno;
+    unsigned int m_evtno;
 
   };
 

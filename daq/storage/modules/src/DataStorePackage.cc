@@ -44,6 +44,11 @@ bool DataStorePackage::decode(MsgHandler& msghandler, BinData& data)
   m_objlist = std::vector<TObject*>();
   m_namelist = std::vector<std::string>();
   EvtMessage* msg = new EvtMessage((char*)m_data_hlt.getBody());
+  if (msg->type() == MSG_TERMINATE) {
+    B2INFO("Got Termination message");
+    delete msg;
+    return false;
+  }
   msghandler.decode_msg(msg, m_objlist, m_namelist);
   m_nobjs = (msg->header())->reserved[1];
   m_narrays = (msg->header())->reserved[2];

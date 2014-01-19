@@ -46,6 +46,9 @@ int main(int argc, char** argv)
   data.setBuffer(evtbuf);
   double datasize = 0;
   Time t0;
+  unsigned int expno = 0;
+  unsigned int runno = 0;
+  unsigned int evtno = 0;
   while (true) {
     while (true) {
       int bufsize = socket->get_wordbuf(evtbuf, 100000000);
@@ -55,6 +58,14 @@ int main(int argc, char** argv)
         break;
       } else if (bufsize == 0) {
         break;
+      }
+      if (expno > data.getExpNumber() || runno > data.getRunNumber()) {
+        B2INFO("old run event detected : exp=" << data.getExpNumber() << " runno=" << data.getRunNumber() <<
+               " current = (" << expno << "," << runno << ")");
+        continue;
+      } else if (expno < data.getExpNumber() || runno < data.getRunNumber()) {
+        expno = data.getExpNumber();
+        runno = data.getRunNumber();
       }
       int stat = 0;
       while (true) {

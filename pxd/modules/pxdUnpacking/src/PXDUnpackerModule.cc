@@ -1150,6 +1150,7 @@ public:
       case DHHC_FRAME_HEADER_DATA_TYPE_DHP_RAW:
         s = ((dhhc_direct_readout_frame_raw*)data)->size();
         break;
+      case DHHC_FRAME_HEADER_DATA_TYPE_DHP_ONS:
       case DHHC_FRAME_HEADER_DATA_TYPE_DHP_ZSD:
         s = ((dhhc_direct_readout_frame_zsd*)data)->size();
         break;
@@ -1207,8 +1208,8 @@ PXDUnpackerModule::PXDUnpackerModule() :
   setDescription("Unpack Raw PXD Hits");
   setPropertyFlags(c_ParallelProcessingCertified);
 
-  addParam("HeaderEndianSwap", m_headerEndianSwap, "Swap the endianess of the ONSEN header", false);
-  addParam("DHHCmode", m_DHHCmode, "Run in DHHC mode", false);
+  addParam("HeaderEndianSwap", m_headerEndianSwap, "Swap the endianess of the ONSEN header", true);
+  addParam("DHHCmode", m_DHHCmode, "Run in DHHC mode", true);
   addParam("IgnoreDATCON", m_ignoreDATCON, "Ignore missing  DATCON", true);
 }
 
@@ -1748,6 +1749,7 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& la
       dhhc.write_pedestal();
       break;
     };
+    case DHHC_FRAME_HEADER_DATA_TYPE_DHP_ONS:
     case DHHC_FRAME_HEADER_DATA_TYPE_DHP_ZSD: {
       nr_of_frames_counted++;
 

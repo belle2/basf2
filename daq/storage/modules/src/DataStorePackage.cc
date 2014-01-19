@@ -49,9 +49,27 @@ bool DataStorePackage::decode(MsgHandler& msghandler, BinData& data)
     delete msg;
     return false;
   }
+  bool hasEvtMetaData = false;
   msghandler.decode_msg(msg, m_objlist, m_namelist);
   m_nobjs = (msg->header())->reserved[1];
   m_narrays = (msg->header())->reserved[2];
+  for (int i = 0; i < m_nobjs + m_narrays; i++) {
+    if (m_objlist.at(i) != NULL && m_namelist.at(i) == "EventMetaData") {
+      hasEvtMetaData = true;
+      break;
+    }
+  }
+  if (!hasEvtMetaData) {
+    B2WARNING("No event meta data found");
+    for (int i = 0; i < m_nobjs + m_narrays; i++) {
+      if (m_objlist.at(i) != NULL) {
+        TObject* obj = m_objlist.at(i);
+        delete obj;
+      }
+    }
+    delete msg;
+    return false;
+  }
   m_durability = (DataStore::EDurability)(msg->header())->reserved[0];
   if (contains_sub && m_data.getBodyByteSize() > m_data_hlt.getByteSize()) {
     m_data_pxd.setBuffer(m_data.getBuffer() + m_data_hlt.getWordSize() + m_data.getHeaderWordSize());

@@ -18,6 +18,8 @@
 
 #include <rawdata/dataobjects/RawPXD.h>
 
+#include <daq/storage/SharedEventBuffer.h>
+
 #include <daq/slc/system/PThread.h>
 #include <daq/slc/readout/RunInfoBuffer.h>
 #include <daq/storage/BinData.h>
@@ -68,6 +70,7 @@ namespace Belle2 {
     unsigned int m_package_length;
     unsigned int m_package_i;
     std::string m_inputbufname;
+    SharedEventBuffer* m_shared;
     RingBuffer* m_inputbuf;
     StorageRBufferManager* m_buf;
     MsgHandler* m_msghandler;

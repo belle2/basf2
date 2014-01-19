@@ -42,9 +42,11 @@ bool ProcessController::load(int timeout)
   }
   _fork = Fork(new ProcessSubmitter(this, iopipe));
   PThread(new LogListener(this, iopipe));
+  PThread(new ProcessListener(this));
   close(iopipe[1]);
   if (timeout > 0) {
     if (!_info.waitRunning(timeout)) {
+      _callback->setReply("Failed to boot " + _name);
       return false;
     }
   }
@@ -69,7 +71,6 @@ bool ProcessController::start()
 
 bool ProcessController::stop()
 {
-  _info.clear();
   return true;
 }
 
@@ -84,8 +85,8 @@ void ProcessSubmitter::run()
 {
   close(1);
   dup2(_iopipe[1], 1);
-  //close(2);
-  //dup2(_iopipe[1], 2);
+  close(2);
+  dup2(_iopipe[1], 2);
   close(_iopipe[0]);
   Executor executor;
   if (_con->getExecutable().size() == 0) {

@@ -8,7 +8,7 @@ namespace Belle2 {
   class ECLPionPdf : public ECLAbsPdf {
   public:
     double pdf(double eop, double p) const;
-    void init();
+    void init(const char* parametersFileName);
 
     struct Parameters {
       double fraction;

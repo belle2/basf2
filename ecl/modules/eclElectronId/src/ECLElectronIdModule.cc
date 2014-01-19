@@ -19,7 +19,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
-
+#include <framework/utilities/FileSystem.h>
 #include <ecl/electronId/ECLMuonPdf.h>
 #include <ecl/electronId/ECLElectronPdf.h>
 #include <ecl/electronId/ECLPionPdf.h>
@@ -51,11 +51,18 @@ void ECLElectronIdModule::initialize()
   StoreArray<ECLPidLikelihood>::registerPersistent();
   RelationArray::registerPersistent<Track, ECLPidLikelihood>();
 
-  (m_pdf[ Const::electron.getIndex() ] = new ECLElectronPdf) -> init();
-  (m_pdf[ Const::muon.getIndex() ] = new ECLMuonPdf) ->init();
+  string eParams = FileSystem::findFile("/data/ecl/electrons.dat");
+  string muParams = FileSystem::findFile("/data/ecl/muons.dat");
+  string piParams = FileSystem::findFile("/data/ecl/pions.dat");
+
+  if (eParams.empty()  || muParams.empty() || piParams.empty())
+    B2FATAL("Electron ID pdfs parameter files not found.");
+
+  (m_pdf[ Const::electron.getIndex() ] = new ECLElectronPdf) -> init(eParams.c_str());
+  (m_pdf[ Const::muon.getIndex() ] = new ECLMuonPdf) ->init(muParams.c_str());
   (m_pdf[ Const::proton.getIndex() ] =
      m_pdf[ Const::kaon.getIndex() ] =
-       m_pdf[ Const::pion.getIndex() ] = new ECLPionPdf) ->init();
+       m_pdf[ Const::pion.getIndex() ] = new ECLPionPdf) ->init(piParams.c_str());
 }
 
 void ECLElectronIdModule::beginRun()

@@ -7,7 +7,7 @@ namespace Belle2 {
   class ECLMuonPdf : public ECLAbsPdf {
   public:
     double pdf(double eop, double p) const;
-    void init() ;
+    void init(const char* parametersFileName) ;
 
     struct Parameters {
       double mu1;

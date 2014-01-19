@@ -6,10 +6,10 @@
 using namespace std;
 using namespace Belle2;
 
-void  ECLPionPdf::init()
+void  ECLPionPdf::init(const char* parametersFileName)
 {
 
-  ParameterMap map("data/ecl/pions.dat");
+  ParameterMap map(parametersFileName);
 
   for (int i = 1; i < 8; ++i) {
     ECLMuonPdf::Parameters& prm = m_muonlike.m_params[i];

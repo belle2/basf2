@@ -6,9 +6,9 @@
 
 using namespace Belle2;
 
-void  ECLMuonPdf::init()
+void  ECLMuonPdf::init(const char* parametersFileName)
 {
-  ParameterMap map("data/ecl/muons.dat");
+  ParameterMap map(parametersFileName);
   for (int i = 1; i < 8; ++i) {
     Parameters& prm = m_params[i];
     prm.mu1 = map.param(name("muons_mu1_", i));

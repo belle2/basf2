@@ -33,15 +33,15 @@ int main(int argc, char** argv)
   RunInfoBuffer info;
   bool use_info = (argc > 4);
   if (use_info) info.open(argv[4]);
-  ///*
+  /*
   RingBuffer* rbuf = new RingBuffer(argv[1], 100000000);
   rbuf->cleanup();
   delete rbuf;
   rbuf = new RingBuffer(argv[1], 100000000);
-  //*/
-  // SharedEventBuffer* buf = new SharedEventBuffer();
-  //buf->open(argv[1], 1000000, true);
-  //buf->init();
+  */
+  SharedEventBuffer* buf = new SharedEventBuffer();
+  buf->open(argv[1], 1000000, true);
+  buf->init();
   RSocketRecv* socket = new RSocketRecv(argv[2], atoi(argv[3]));
   B2INFO("storagein: Connected to eb2.");
   info.reportRunning();
@@ -73,13 +73,15 @@ int main(int argc, char** argv)
         expno = data.getExpNumber();
         runno = data.getRunNumber();
       }
+      /*
       int stat = 0;
       while (true) {
         stat = rbuf->insq(evtbuf, bufsize);
         if (stat >= 0) break;
         usleep(20);
       }
-      //buf->write(evtbuf, bufsize);
+      */
+      buf->write(evtbuf, bufsize);
       nrec++;
       datasize += data.getByteSize();
     }

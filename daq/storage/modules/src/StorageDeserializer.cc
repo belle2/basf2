@@ -69,9 +69,9 @@ StorageDeserializerModule::~StorageDeserializerModule()
 void StorageDeserializerModule::initialize()
 {
   B2INFO("StorageDeserializer: initialize() started.");
-  //m_shared = new SharedEventBuffer();
-  //m_shared->open(m_inputbufname, 1000000);
-  m_inputbuf = new RingBuffer(m_inputbufname.c_str());
+  m_shared = new SharedEventBuffer();
+  m_shared->open(m_inputbufname, 1000000);
+  //m_inputbuf = new RingBuffer(m_inputbufname.c_str());
   if (m_buf == NULL) {
     m_buf = new StorageRBufferManager(m_inputbuf);
   }
@@ -93,8 +93,8 @@ void StorageDeserializerModule::initialize()
   m_data.setBuffer(evtbuf);
   int size = 0;
   while (true) {
-    while ((size = m_inputbuf->remq((int*)evtbuf)) == 0) {
-      //while ((size = m_shared->read((int*)evtbuf)) == 0) {
+    //while ((size = m_inputbuf->remq((int*)evtbuf)) == 0) {
+    while ((size = m_shared->read((int*)evtbuf)) == 0) {
       usleep(20);
     }
     MsgHandler handler(m_compressionLevel);
@@ -116,8 +116,8 @@ void StorageDeserializerModule::event()
     m_nrecv++;
     int size = 0;
     while (true) {
-      while ((size = m_inputbuf->remq((int*)m_data.getBuffer())) == 0) {
-        //while ((size = m_shared->read((int*)m_data.getBuffer())) == 0) {
+      //while ((size = m_inputbuf->remq((int*)m_data.getBuffer())) == 0) {
+      while ((size = m_shared->read((int*)m_data.getBuffer())) == 0) {
         usleep(20);
       }
       MsgHandler handler(m_compressionLevel);

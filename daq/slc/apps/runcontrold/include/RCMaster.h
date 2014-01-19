@@ -50,6 +50,7 @@ namespace Belle2 {
     void signal() throw();
     RCCommunicator* getClientCommunicator() { return _client_comm; }
     void setClientCommunicator(RCCommunicator* comm) { _client_comm = comm; }
+    bool hasMasterCommunicator();
     void addMasterCommunicator(RCCommunicator* comm);
     void removeMasterCommunicator(RCCommunicator* comm);
     void sendMessageToMaster(const RunControlMessage& msg) throw();
@@ -64,6 +65,8 @@ namespace Belle2 {
     void setDBManager(RCDatabaseManager* manager) { _dbmanager = manager; }
     bool isSending() const { return _is_sending; }
     void setSending(bool sending) { _is_sending = sending; }
+    bool isGlobal() const { return _is_global; }
+    void setGlobal(bool is_global) { _is_global = is_global; }
 
   private:
     bool _is_sending;
@@ -81,6 +84,7 @@ namespace Belle2 {
     std::map<int, NSMNode*> _node_id_m;
     std::map<std::string, NSMNode*> _node_name_m;
     RCDatabaseManager* _dbmanager;
+    bool _is_global;
 
   };
 

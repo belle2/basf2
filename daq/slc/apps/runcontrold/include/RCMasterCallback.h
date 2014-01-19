@@ -36,9 +36,11 @@ namespace Belle2 {
     virtual bool abort() throw();
     virtual bool pause() throw();
     virtual bool resume() throw();
+    virtual bool stateCheck() throw();
 
   private:
     RCMaster* _master;
+    NSMNode* _rc_node;
 
   };
 

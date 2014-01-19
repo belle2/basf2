@@ -2,7 +2,10 @@
 
 #include "daq/slc/apps/runcontrold/RCMaster.h"
 #include "daq/slc/apps/runcontrold/RCCommunicator.h"
-#include "daq/slc/base/Debugger.h"
+
+#include <daq/slc/system/LogFile.h>
+
+#include <daq/slc/base/Debugger.h>
 
 #include <unistd.h>
 
@@ -80,10 +83,8 @@ void RCSequencer::run() throw()
             _master->sendStateToMaster(node);
             _master->getNode()->setState(State::ERROR_ES);
             _master->sendStateToMaster(_master->getNode());
-
           }
         } else {
-          Belle2::debug("[DEBUG] node = %s", node->getName().c_str());
           comm->sendMessage(_msg);
         }
         _master->unlock();

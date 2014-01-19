@@ -16,6 +16,7 @@
 #include <daq/slc/nsm/NSMNodeDaemon.h>
 
 #include <daq/slc/system/PThread.h>
+#include <daq/slc/system/LogFile.h>
 
 #include <daq/slc/base/ConfigFile.h>
 #include <daq/slc/base/Debugger.h>
@@ -30,8 +31,11 @@ using namespace Belle2;
 int main(int argc, char** argv)
 {
   std::string configname = (argc > 1) ? argv[1] : "runcontrol";
+  daemon(0, 0);
+  LogFile::open("runcontrold_" + configname);
   ConfigFile config("slowcontrol");
   config.read(configname);
+  bool is_global = config.getInt("GLOBAL_CONTROL") > 0;
   const std::string local_host = config.get("NSM_LOCAL_HOST");
   const int local_port = config.getInt("NSM_LOCAL_PORT");
   const std::string global_host = config.get("NSM_GLOBAL_HOST");
@@ -49,6 +53,7 @@ int main(int argc, char** argv)
   RunStatus* run_status = new RunStatus(name + "_status", revision);
   run_status->setConfig(run_config);
   RCMaster* master = new RCMaster(node_master, run_config, run_status);
+  master->setGlobal(is_global);
   master->setData(data);
   master->setNodeControl(el);
   run_config->add(oloader.getClassList(), master->getNSMNodes());
@@ -69,10 +74,19 @@ int main(int argc, char** argv)
   master->setDBManager(dbmanager);
   dbmanager->createTables();
   dbmanager->readStatus();
+  if (is_global) {
+    config.read("runnumber");
+    const int runno = config.getInt("RUN_NUMBER");
+    const int expno = config.getInt("EXP_NUMBER");
+    if (runno > 0) {
+      master->getStatus()->setExpNumber(expno);
+      master->getStatus()->setColdNumber(runno);
+    }
+  }
   dbmanager->writeConfigs();
   int port = config.getInt("RC_GLOBAL_PORT");
   if (port > 0) {
-    Belle2::debug("%s:%d", config.get("RC_GLOBAL_HOST").c_str(), port);
+    Belle2::debug("wait connection from GUI (%s:%d)", config.get("RC_GLOBAL_HOST").c_str(), port);
     PThread(new RCGUIAcceptor(config.get("RC_GLOBAL_HOST"), port, callback));
   }
   RCClientAcceptor* acceptor =

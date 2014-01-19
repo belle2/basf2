@@ -3,6 +3,7 @@
 
 #include <daq/slc/base/Debugger.h>
 #include <daq/slc/base/StringUtil.h>
+#include <daq/slc/system/LogFile.h>
 
 using namespace Belle2;
 
@@ -41,16 +42,27 @@ void RCMaster::signal() throw()
   _cond.signal();
 }
 
+bool RCMaster::hasMasterCommunicator()
+{
+  _mutex_comm.lock();
+  bool has_comm = _master_comm_v.size() > 0;
+  _mutex_comm.unlock();
+  return has_comm;
+}
+
 void RCMaster::addMasterCommunicator(RCCommunicator* comm)
 {
   _mutex_comm.lock();
   _master_comm_v.push_back(comm);
+  LogFile::debug("added MasterCommunitor: # of connection = %d", _master_comm_v.size());
   _mutex_comm.unlock();
 }
+
 void RCMaster::removeMasterCommunicator(RCCommunicator* comm)
 {
   _mutex_comm.lock();
   _master_comm_v.remove(comm);
+  LogFile::debug("removeed MasterCommunitor: # of connection = %d", _master_comm_v.size());
   _mutex_comm.unlock();
 }
 

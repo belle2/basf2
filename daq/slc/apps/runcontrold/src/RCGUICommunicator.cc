@@ -4,6 +4,8 @@
 #include "daq/slc/apps/runcontrold/RCMaster.h"
 #include "daq/slc/apps/runcontrold/RCDatabaseManager.h"
 
+#include <daq/slc/system/LogFile.h>
+
 #include <daq/slc/base/Debugger.h>
 
 using namespace Belle2;
@@ -22,7 +24,7 @@ RCGUICommunicator::~RCGUICommunicator() throw()
 {
   RCMaster* master = _callback->getMaster();
   master->lock();
-  master->removeMasterCommunicator(NULL);
+  master->removeMasterCommunicator(this);
   master->unlock();
 }
 
@@ -30,6 +32,8 @@ bool RCGUICommunicator::sendMessage(const RunControlMessage& msg) throw()
 {
   _socket_mutex.lock();
   try {
+    LogFile::debug("send message to GUI (%s<<%s)",
+                   msg.getNode()->getName().c_str(), msg.getCommand().getAlias());
     _writer.writeInt(msg.getCommand().getId());
     _writer.writeString(msg.getNode()->getName());
     _writer.writeInt(msg.getMessage().getNParams());
@@ -51,6 +55,8 @@ bool RCGUICommunicator::sendState(NSMNode* node) throw()
 {
   _socket_mutex.lock();
   try {
+    LogFile::debug("send state to GUI (%s=%s)", node->getName().c_str(),
+                   node->getState().getAlias());
     _writer.writeInt(Command::STATE.getId());
     _writer.writeString(node->getName());
     _writer.writeInt(node->getState().getId());
@@ -140,6 +146,8 @@ void RCGUICommunicator::run()
         master->unlock();
       } else {
         _reader.readObject(msg);
+        LogFile::debug(msg.getData());
+        _callback->setForce(msg.getData().find("ALL") == std::string::npos);
         _callback->setMessage(msg);
         if (_callback->perform(cmd, msg)) {
 
@@ -147,6 +155,7 @@ void RCGUICommunicator::run()
       }
     }
   } catch (const IOException& e) {
-    Belle2::debug("%s:%d %s", __FILE__, __LINE__, e.what());
+    _socket.close();
+    LogFile::debug("Closed connection to GUI");
   }
 }

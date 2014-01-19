@@ -6,6 +6,8 @@
 
 #include <daq/slc/system/TCPServerSocket.h>
 #include <daq/slc/system/TCPSocketReader.h>
+#include <daq/slc/system/PThread.h>
+#include <daq/slc/system/LogFile.h>
 
 #include <daq/slc/base/Debugger.h>
 
@@ -16,12 +18,12 @@ void RCGUIAcceptor::run()
   TCPServerSocket server_socket(_ip, _port);
   server_socket.open();
   while (true) {
-    Belle2::debug("Waiting for new connection..");
+    LogFile::debug("waiting for new connection..");
     TCPSocket socket = server_socket.accept();
-    Belle2::debug("Accepted new connection..");
+    LogFile::debug("accepted new connection..");
     TCPSocketReader reader(socket);
     std::string name = reader.readString();
-    if (name == "GUI") {
+    if (name == "GUI" || name == "CUI") {
       TCPSocketWriter writer(socket);
       RCMaster* master = _callback->getMaster();
       master->lock();
@@ -29,11 +31,16 @@ void RCGUIAcceptor::run()
       master->getData()->writeObject(writer);
       master->getStatus()->writeObject(writer);
       master->getConfig()->writeObject(writer);
+      writer.writeBool(!master->hasMasterCommunicator());
       master->unlock();
       RCGUICommunicator* comm = new RCGUICommunicator(socket, _callback);
-      comm->run();
-      delete comm;
+      master->getNode()->setConnection(Connection::ONLINE);
+      comm->sendState(master->getNode());
+      PThread((RCGUICommunicator*)comm);
+      //comm->run();
+      //delete comm;
     }
+    //socket.close();
   }
 }
 

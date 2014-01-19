@@ -11,11 +11,13 @@
 
 #include <daq/slc/system/PThread.h>
 #include <daq/slc/system/Time.h>
+#include <daq/slc/system/LogFile.h>
 
 #include <daq/slc/base/State.h>
 #include <daq/slc/base/StringUtil.h>
 #include <daq/slc/base/Debugger.h>
 
+#include <fstream>
 #include <sstream>
 
 using namespace Belle2;
@@ -23,6 +25,7 @@ using namespace Belle2;
 RCMasterCallback::RCMasterCallback(NSMNode* node)
   : RCCallback(node)
 {
+  _rc_node = NULL;
 }
 
 RCMasterCallback::~RCMasterCallback() throw()
@@ -32,11 +35,6 @@ RCMasterCallback::~RCMasterCallback() throw()
 
 void RCMasterCallback::init() throw()
 {
-  RCNSMCommunicator* com = new RCNSMCommunicator(getNode(),
-                                                 getCommunicator());
-  _master->lock();
-  _master->addMasterCommunicator(com);
-  _master->unlock();
 }
 
 bool RCMasterCallback::distribute(Command command,
@@ -75,6 +73,7 @@ bool RCMasterCallback::distribute(Command command,
         _master->sendStateToMaster(node);
       }
     } catch (const NSMHandlerException& e) {
+      LogFile::fatal("NSM error : %s", e.what());
       setReply("NSM error");
       _master->unlock();
       return false;
@@ -88,11 +87,13 @@ bool RCMasterCallback::distribute(Command command,
 
 bool RCMasterCallback::boot() throw()
 {
+  _node->setState(State::BOOTING_TS);
   return distribute(Command::BOOT, 0, 0, 0);
 }
 
 bool RCMasterCallback::load() throw()
 {
+  _node->setState(State::LOADING_TS);
   _master->lock();
   _master->getStatus()->update();
   int confno = (getMessage().getNParams() > 0) ? getMessage().getParam(0) : -1;
@@ -110,41 +111,87 @@ bool RCMasterCallback::load() throw()
 
 bool RCMasterCallback::start() throw()
 {
+  _node->setState(State::STARTING_TS);
   NSMMessage& nsm(getMessage());
-  int exp_no = nsm.getParam(0);
-  int cold_no = nsm.getParam(1);
-  int hot_no = 0;
+  int expno = nsm.getParam(0);
+  int runno = nsm.getParam(1);
+  int subno = 0;
   _master->lock();
   RunStatus* status = _master->getStatus();
-  std::vector<std::string> str_v = Belle2::split(nsm.getData(), ' ');
-  if (str_v.size() > 1) {
-    status->setOperators(str_v[1]);
-    std::stringstream ss;
-    for (size_t i = 2; i < str_v.size(); i++) {
-      std::string s = Belle2::replace(str_v[1], "\'", "");
-      s = Belle2::replace(s, "\"", "");
+  std::string data = nsm.getData();
+  std::string nodename, run_typre, operators, comment;
+  int index = 0;
+  std::stringstream ss;
+  LogFile::debug(nsm.getData());
+  for (size_t i = 0; i < data.size(); i++) {
+    char c = data.at(i);
+    if (index == 0 && c == ' ') {
+      nsm.setData(ss.str());
+      ss.str("");
+      index++;
+      continue;
+    }
+    if (index == 1 && c == '|') {
+      status->setRunType(ss.str());
+      ss.str("");
+      index++;
+      continue;
+    }
+    if (index == 2 && c == '|') {
+      std::string s = Belle2::replace(ss.str(), "\'", "\\\'");
+      s = Belle2::replace(s, "\"", "\\\"");
       s = Belle2::replace(s, "\r\n", "<br/>");
       s = Belle2::replace(s, "\n", "<br/>");
       s = Belle2::replace(s, "\r", "<br/>");
-      ss << s << " ";
+      status->setOperators(s);
+      ss.str("");
+      index++;
+      continue;
     }
-    status->setComment(ss.str());
+    ss << c;
   }
-  if (exp_no < 0) exp_no = 0;
-  if (cold_no < 0) cold_no = status->getColdNumber() + 1;
-  status->setExpNumber(exp_no);
-  status->setColdNumber(cold_no);
-  status->setHotNumber(hot_no);
+  if (index > 2 && ss.str().size() > 0) {
+    std::string s = Belle2::replace(ss.str(), "\'", "\\\'");
+    s = Belle2::replace(s, "\"", "\\\"");
+    s = Belle2::replace(s, "\r\n", "<br/>");
+    s = Belle2::replace(s, "\n", "<br/>");
+    s = Belle2::replace(s, "\r", "<br/>");
+    status->setComment(s);
+  }
+  if (expno < 0) expno = 0;
+  if (runno < 0) runno = status->getColdNumber() + 1;
+  if (_master->isGlobal()) {
+    std::ofstream fout(Belle2::form("%s/daq/slc/data/config/runnumber.conf",
+                                    getenv("BELLE2_LOCAL_DIR")).c_str());
+    fout << "#" << std::endl
+         << "#" << std::endl
+         << "#" << std::endl
+         << "" << std::endl
+         << "EXP_NUMBER  : " << expno << std::endl
+         << "RUN_NUMBER  : " << runno << std::endl
+         << "" << std::endl
+         << "#" << std::endl
+         << "#" << std::endl
+         << "#" << std::endl;
+    fout.close();
+  }
+  status->setExpNumber(expno);
+  status->setColdNumber(runno);
+  status->setHotNumber(subno);
   status->setStartTime(Time().getSecond());
   status->setEndTime(-1);
   _master->getDBManager()->writeStatus();
   _master->sendDataObjectToMaster(status->getClassName(), status);
+  LogFile::info("New run status: run#%04d.%06d.%04d, opearator=%s, comment=%s",
+                expno, runno, subno, status->getOperators().c_str(),
+                status->getComment().c_str());
   _master->unlock();
-  return distribute(Command::START, exp_no, cold_no, hot_no);
+  return distribute(Command::START, expno, runno, subno);
 }
 
 bool RCMasterCallback::stop() throw()
 {
+  _node->setState(State::STOPPING_TS);
   _master->lock();
   RunStatus* status = _master->getStatus();
   status ->setEndTime(Time().getSecond());
@@ -165,6 +212,7 @@ bool RCMasterCallback::trigft() throw()
       if (node->getConnection() == Connection::ONLINE) {
         node->setState(State::ERROR_ES);
         node->setConnection(Connection::OFFLINE);
+        _master->getNode()->setState(State::ERROR_ES);
         _master->sendStateToMaster(node);
       }
     } else if (node->getData() != NULL && node->getData()->hasObject("ftsw")) {
@@ -193,6 +241,7 @@ bool RCMasterCallback::trigft() throw()
         try {
           comm->sendMessage(msg);
         } catch (const NSMHandlerException& e) {
+          LogFile::fatal("NSM error : %s", e.what());
           setReply("NSM error");
           _master->unlock();
           return false;
@@ -206,11 +255,13 @@ bool RCMasterCallback::trigft() throw()
 
 bool RCMasterCallback::recover() throw()
 {
+  _node->setState(State::RECOVERING_RS);
   return distribute(Command::RECOVER, 0, 0, 0);
 }
 
 bool RCMasterCallback::abort() throw()
 {
+  _node->setState(State::ABORTING_RS);
   return distribute(Command::ABORT, 0, 0, 0);
 }
 
@@ -222,5 +273,17 @@ bool RCMasterCallback::pause() throw()
 bool RCMasterCallback::resume() throw()
 {
   return distribute(Command::RESUME, 0, 0, 0);
+}
+
+bool RCMasterCallback::stateCheck() throw()
+{
+  if (_rc_node == NULL) {
+    _rc_node = new NSMNode(getMessage().getNodeName());
+    RCNSMCommunicator* com = new RCNSMCommunicator(getCommunicator(), _rc_node);
+    _master->lock();
+    _master->addMasterCommunicator(com);
+    _master->unlock();
+  }
+  return true;
 }
 

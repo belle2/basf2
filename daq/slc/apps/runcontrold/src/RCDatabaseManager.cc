@@ -2,6 +2,8 @@
 
 #include "daq/slc/apps/runcontrold/RCMaster.h"
 
+#include <daq/slc/system/LogFile.h>
+
 #include <daq/slc/base/Debugger.h>
 
 using namespace Belle2;

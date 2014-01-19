@@ -3,6 +3,7 @@
 
 #include <daq/slc/base/DataObject.h>
 #include <daq/slc/base/NSMNode.h>
+#include <daq/slc/system/LogFile.h>
 
 namespace Belle2 {
 
@@ -22,14 +23,19 @@ namespace Belle2 {
     int getStartTime() const throw() { return getInt("start_time"); }
     int getEndTime() const throw() { return getInt("end_time"); }
     int getRunConfig() const throw() { return getInt("run_config"); }
+    const std::string getRunType() const throw() {return getText("run_type"); }
     const std::string getOperators() const throw() {return getText("operators"); }
     const std::string getComment() const throw() {return getText("comment"); }
     void setExpNumber(int exp_number) throw() { setInt("exp_number", exp_number); }
-    void setColdNumber(int run_number) throw() { setInt("cold_number", run_number); }
+    void setColdNumber(int run_number) throw() {
+      LogFile::debug("run_number = %d", run_number);
+      setInt("cold_number", run_number);
+    }
     void setHotNumber(int run_number) throw() { setInt("hot_number", run_number); }
     void setStartTime(int start_time) throw() { setInt("start_time", start_time); }
     void setEndTime(int end_time) throw() { setInt("end_time", end_time); }
     void setRunConfig(int run_config) throw() { setInt("run_config", run_config); }
+    void setRunType(const std::string& run_type) throw() { setText("run_type", run_type); }
     void setOperators(const std::string& operators) throw() { setText("operators", operators); }
     void setComment(const std::string& comment) throw() { setText("comment", comment); }
     int incrementExpNumber() throw();

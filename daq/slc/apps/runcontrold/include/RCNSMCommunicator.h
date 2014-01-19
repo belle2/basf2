@@ -10,7 +10,7 @@ namespace Belle2 {
   class RCNSMCommunicator : public RCCommunicator {
 
   public:
-    RCNSMCommunicator(NSMNode* rc_node, NSMCommunicator* comm);
+    RCNSMCommunicator(NSMCommunicator* comm, NSMNode* node = NULL);
     virtual ~RCNSMCommunicator() throw();
 
   public:

@@ -15,6 +15,7 @@ RunStatus::RunStatus(const std::string& data_name, int revision) throw()
   addInt("start_time", 0);
   addInt("end_time", -1);
   addInt("run_config", 0);
+  addText("run_type", "", 64);
   addText("operators", "", 64);
   addText("comment", "", 512);
 }

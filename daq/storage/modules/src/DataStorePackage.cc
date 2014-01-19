@@ -30,16 +30,15 @@ bool DataStorePackage::decode(MsgHandler& msghandler, BinData& data)
   }
   memcpy(m_buf, data.getBuffer(), data.getByteSize());
   m_data.setBuffer(m_buf);
-  m_data_hlt.setBuffer(m_data.getBody());
-  bool contains_sub = true;
-  if (m_data_hlt.getWordSize() > MAX_BUFFER_WORDS ||
-      m_data_hlt.getTrailerMagic() != BinData::TRAILER_MAGIC) {
+  int nboard = m_data.getNBoard();
+  if (nboard == 1) {
     m_data_hlt.setBuffer(m_data.getBuffer());
-    if (m_data_hlt.getTrailerMagic() != BinData::TRAILER_MAGIC) {
-      B2ERROR(__FILE__ << ":" << __LINE__ << " Bad tarailer magic for HLT = " << m_data_hlt.getTrailerMagic());
-      return false;
-    }
-    contains_sub = false;
+  } else if (nboard > 1) {
+    m_data_hlt.setBuffer(m_data.getBody());
+  }
+  if (m_data_hlt.getBuffer() == NULL || m_data_hlt.getTrailerMagic() != BinData::TRAILER_MAGIC) {
+    B2ERROR(__FILE__ << ":" << __LINE__ << " Bad tarailer magic for HLT = " << m_data_hlt.getTrailerMagic());
+    return false;
   }
   m_objlist = std::vector<TObject*>();
   m_namelist = std::vector<std::string>();
@@ -71,7 +70,7 @@ bool DataStorePackage::decode(MsgHandler& msghandler, BinData& data)
     return false;
   }
   m_durability = (DataStore::EDurability)(msg->header())->reserved[0];
-  if (contains_sub && m_data.getBodyByteSize() > m_data_hlt.getByteSize()) {
+  if (nboard > 1) {
     m_data_pxd.setBuffer(m_data.getBuffer() + m_data_hlt.getWordSize() + m_data.getHeaderWordSize());
     if (m_data_pxd.getBody()[0] != ONSENBinData::MAGIC) {
       B2ERROR(__FILE__ << ":" << __LINE__ << " Bad ONSEN magic for PXD = " << m_data_pxd.getTrailerMagic());
@@ -132,17 +131,12 @@ void DataStorePackage::copy(DataStorePackage& package)
   memcpy(m_buf, package.m_buf, package.m_data.getByteSize());
   m_data.setBuffer(m_buf);
   m_data_hlt.setBuffer(m_data.getBody());
-  bool contains_sub = true;
-  if (m_data_hlt.getTrailerMagic() != BinData::TRAILER_MAGIC) {
-    m_data_hlt.setBuffer(m_data.getBuffer());
-    contains_sub = false;
-  }
   m_objlist = package.m_objlist;
   m_namelist = package.m_namelist;
   m_nobjs = package.m_nobjs;
   m_narrays = package.m_narrays;
   m_durability = package.m_durability;
-  if (contains_sub && package.m_data_pxd.getBuffer() != NULL) {
+  if (m_data.getNBoard() > 1 && package.m_data_pxd.getBuffer() != NULL) {
     int nword = package.m_data_hlt.getWordSize() + package.m_data.getHeaderWordSize();
     m_data_pxd.setBuffer(m_data.getBuffer() + nword);
   } else {

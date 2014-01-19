@@ -1,6 +1,7 @@
 Library.xml
 -----------
 ... file with individuall components the geometry is created of.
+19. Jan 2014 2:40 Corrected some materials a bit: PolyEthylen
 
 12. Jan 2014 16:00 Updated VXDBox with hole for better visibility of detectors from side and moved a bit to more precise position
 
@@ -48,7 +49,8 @@ WARNING: The position of the telescopes is approximate (with tolerance up to 1cm
 FullTelescopeVXDTB_v2.xml
 -------------------------
 ... this is the setup with PXD6-S (4 switchers) facing SVD layer 3. PCBoard and sensor from layer 2 (facing front telescopes) is removed.
-WARNING: the position of the telescopes is not final, will be fixed once setup will be completed.
+
+19. Jan 2014 2:40 Improved position of telescopes by info from LOG book. Corrected some materials a bit.
 
 14. Jan 2014 9:30 Correted vxdId + first pxd from air (only sensitive), second is real
 

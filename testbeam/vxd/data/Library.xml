@@ -405,7 +405,7 @@
 
      <Volume name="VXDBox-cover">
        <Color>#006699</Color>
-       <Material>PMMA</Material>
+       <Material>PolyEthylen</Material>
        <Shape>Box</Shape>
        <DX unit="mm">7.0</DX>
        
@@ -437,7 +437,7 @@
        <HalfZ unit="mm">51</HalfZ>
      </Volume>
      <Volume name="VXDBox-Window2">
-       <Material>PMMA</Material>
+       <Material>PolyEthylen</Material>
        <Shape>Box</Shape>
        <DX unit="mm">-120.505</DX>
        <HalfX unit="mm">0.005</HalfX>

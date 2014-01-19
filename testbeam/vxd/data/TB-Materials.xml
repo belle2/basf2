@@ -4,9 +4,18 @@
     <state>Solid</state>
     <density unit="g/cm3">1.18</density>
     <Components>
-      <Element fraction="0.0805">H</Element>
-      <Element fraction="0.6">C</Element>
-      <Element fraction="0.3195">O</Element>
+      <Element fraction="0.0805000000">H</Element>
+      <Element fraction="0.6000000000">C</Element>
+      <Element fraction="0.3195000000">O</Element>
+    </Components>
+  </Material>
+  
+  <Material name="PolyEthylen">
+    <state>Solid</state>
+    <density unit="g/cm3">0.94</density>
+    <Components>
+      <Element fraction="0.14372282027">H</Element>
+      <Element fraction="0.85627717972">C</Element>
     </Components>
   </Material>
 

@@ -33,7 +33,7 @@
          <Volumes>
             <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='Magnet']/*)" />
             <Volume name="EUDET-Module1">
-               <DX unit="mm">180.0</DX>
+               <DX unit="mm">174.5</DX>
                <DY unit="mm">0.0</DY>
                <DZ unit="mm">0.0</DZ>
                <Theta unit="deg">90</Theta>
@@ -52,7 +52,7 @@
                </Volume>
             </Volume>
             <Volume name="EUDET-Module2">
-               <DX unit="mm">160.0</DX>
+               <DX unit="mm">169.5</DX>
                <DY unit="mm">0.0</DY>
                <DZ unit="mm">0.0</DZ>
                <Theta unit="deg">90</Theta>
@@ -71,7 +71,7 @@
                </Volume>
             </Volume>
             <Volume name="EUDET-Module3">
-               <DX unit="mm">140.0</DX>
+               <DX unit="mm">154.5</DX>
                <DY unit="mm">0.0</DY>
                <DZ unit="mm">0.0</DZ>
                <Theta unit="deg">90</Theta>
@@ -249,7 +249,7 @@
                </Volume>
             </Volume>
             <Volume name="EUDET-Module4">
-               <DX unit="mm">-140.0</DX>
+               <DX unit="mm">-140.5</DX>
                <DZ unit="mm">0.0</DZ>
                <Theta unit="deg">90</Theta>
                <Phi unit="deg">-90</Phi>
@@ -267,7 +267,7 @@
                </Volume>
             </Volume>
             <Volume name="EUDET-Module5">
-               <DX unit="mm">-160.0</DX>
+               <DX unit="mm">-155.5</DX>
                <DZ unit="mm">0.0</DZ>
                <Theta unit="deg">90</Theta>
                <Phi unit="deg">-90</Phi>
@@ -285,7 +285,7 @@
                </Volume>
             </Volume>
             <Volume name="EUDET-Module6">
-               <DX unit="mm">-180.0</DX>
+               <DX unit="mm">-170.5</DX>
                <DZ unit="mm">0.0</DZ>
                <Theta unit="deg">90</Theta>
                <Phi unit="deg">-90</Phi>

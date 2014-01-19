@@ -1,0 +1,4 @@
+#!/bin/bash
+
+ssh ttd10 "source ~/belle2/release/daq/slc/extra/bin/nsm2_local.sh;cd ~/run/pocket_ttd; ~/sbin/pocket_ttd 55 33000 ttd10 >/dev/null&"
+

@@ -276,10 +276,12 @@ main(int argc, char** argv)
         printf("usage: trigft <node> <trg_mode=in/tlu/pulse/revo/random/possion> <dummy_rate> <trg_limit>\n");
       } else {
         int trg_mode = 0;
-        if (strcasecmp(av[2], "in") == 0) {
+        if (strcasecmp(av[2], "aux") == 0) {
           trg_mode = 1;
-        } else if (strcasecmp(av[2], "tlu") == 0) {
+        } else if (strcasecmp(av[2], "i") == 0) {
           trg_mode = 2;
+        } else if (strcasecmp(av[2], "tlu") == 0) {
+          trg_mode = 3;
         } else if (strcasecmp(av[2], "pulse") == 0) {
           trg_mode = 4;
         } else if (strcasecmp(av[2], "revo") == 0) {

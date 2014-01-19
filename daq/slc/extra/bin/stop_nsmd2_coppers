@@ -10,8 +10,4 @@ stopBySSH cpr010 local
 sleep 2
 stopBySSH cpr011 local
 sleep 2
-stopBySSH cpr012 local
-sleep 2
-stopBySSH cpr013 local
-sleep 2
 stopBySSH ttd10 local

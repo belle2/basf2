@@ -98,10 +98,10 @@ bool COPPERCallback::load() throw()
   _con.addArgument("basf2");
   if (_con.load(30)) {
     LogFile::debug("load succeded");
-  } else {
-    LogFile::debug("load timeout");
+    return true;
   }
-  return true;
+  LogFile::debug("load timeout");
+  return false;
 }
 
 bool COPPERCallback::start() throw()
@@ -126,10 +126,16 @@ bool COPPERCallback::pause() throw()
 
 bool COPPERCallback::recover() throw()
 {
-  return (abort() && boot() && load());
+  if (abort() && boot() && load()) {
+    _node->setState(State::READY_S);
+    return true;
+  }
+  return false;
 }
 
 bool COPPERCallback::abort() throw()
 {
-  return _con.abort();
+  _con.abort();
+  _node->setState(State::INITIAL_S);
+  return true;
 }

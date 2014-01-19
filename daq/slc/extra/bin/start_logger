@@ -1,6 +1,6 @@
 #!/bin/bash
 
-label=`date +%Y-%m-%d-%H-%M`
+source ~/belle2/release/daq/slc/extra/bin/setup.sh ~/belle2 release global logcollectord &
 
 restartBySSH() {
   mkdir -p ~/run/$2/$1

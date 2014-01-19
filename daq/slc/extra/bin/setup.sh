@@ -103,9 +103,9 @@ fi
 
 cd ../$2
 
-setuprel &> /dev/null
+setuprel #&> /dev/null
 
-source $BELLE2_LOCAL_DIR/daq/slc/extra/bin/nsm2_$3.sh &> /dev/null
+source $1/$2/daq/slc/extra/bin/nsm2_$3.sh #&> /dev/null
 
 cd $CUR_DIR
 

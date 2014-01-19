@@ -2,9 +2,6 @@
 # -*- coding: utf-8 -*-
 
 # Example steering file for reconstruction of Testbeam data.
-# Some data files contain additional branches from the HLT trigger
-# that interfere with the full reocnstruction done here.  These have
-# to be preprocessed with the companion steering file cleanup.py
 #
 # Note that due to the way the SVD mapping works, you must execute
 # this steering file WHILE IN YOUR MAIN basf2 DIRECTORY, i.e. your
@@ -33,7 +30,7 @@ fieldOn = False
 havePXD = True
 
 # data file
-inputFileName = 'cleaned_up_220.root'
+inputFileName = '~/Dropbox/Public/daq/data/RawData_0000_000220.root'
 
 # histogram file
 histoFileName = 'histofile_000220.root'
@@ -136,9 +133,18 @@ trackfit_dqm.param('GFTrackCandidatesColName', 'caTracks')
 # create the main path
 main = create_path()
 
-# Add input module
+# Add input module.  Since we redo the full reconstruction, we don't
+# read a few StoreArrays instead regenerating them on the fly.
 input = register_module('RootInput')
 input.param('inputFileName', inputFileName)
+input.param('excludeBranchNames', [
+        'SVDClusters',
+        'SVDDigits',
+        'SVDClustersToSVDDigits',
+        'TrackCands',
+        'TrackFitResults',
+        'Tracks',
+        ])
 main.add_module(input)
 
 hman = register_module('HistoManager')

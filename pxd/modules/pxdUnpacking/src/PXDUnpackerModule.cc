@@ -77,6 +77,7 @@ unsigned int stat_start = 0, stat_end = 0, stat_ghost = 0, stat_raw = 0, stat_zs
 unsigned int dhp_size_error = 0, dhp_pixel_error = 0, dhp_warning = 0;
 bool verbose = true;
 bool error_flag = false;
+bool ignore_datcon_flag = true;
 
 ///*********************************************************************************
 ///************************** old DHH Code starts here *****************************
@@ -841,7 +842,7 @@ public:
     if ((magic1 & 0xFFFF) != 0xCAFE) B2ERROR("DHHC HLT/ROI Magic 1 error $" << hex << magic1);
     if ((magic2 & 0xFFFF) != 0xCAFE) B2ERROR("DHHC HLT/ROI Magic 2 error $" << hex << magic2);
     if (magic2 == 0x0000CAFE && trignr2 == 0x00000000) {
-      B2WARNING("DHHC HLT/ROI Frame: No DATCON data " << hex << trignr1 << "!=$" << trignr2);
+      if (!ignore_datcon_flag) B2WARNING("DHHC HLT/ROI Frame: No DATCON data " << hex << trignr1 << "!=$" << trignr2);
     } else {
       if (trignr1 != trignr2) B2ERROR("DHHC HLT/ROI Frame Trigger Nr Mismatch $" << hex << trignr1 << "!=$" << trignr2);
     }
@@ -1208,6 +1209,7 @@ PXDUnpackerModule::PXDUnpackerModule() :
 
   addParam("HeaderEndianSwap", m_headerEndianSwap, "Swap the endianess of the ONSEN header", false);
   addParam("DHHCmode", m_DHHCmode, "Run in DHHC mode", false);
+  addParam("IgnoreDATCON", m_ignoreDATCON, "Ignore missing  DATCON", true);
 }
 
 void PXDUnpackerModule::initialize()
@@ -1217,6 +1219,8 @@ void PXDUnpackerModule::initialize()
   /// actually, later we do not want o store it into output file ...  aside from debugging
   B2INFO("HeaderEndianSwap: " << m_headerEndianSwap);
   B2INFO("DHHCmode: " << m_DHHCmode);
+  B2INFO("Ignore(missing)DATCON: " << m_ignoreDATCON);
+  ignore_datcon_flag = m_ignoreDATCON;
 
 }
 

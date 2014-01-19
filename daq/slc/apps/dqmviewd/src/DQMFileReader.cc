@@ -69,10 +69,12 @@ void DQMFileReader::update(HistoPackage* pack)
       TH1* h = (TH1*)obj;
       _hist_m->addHist(h);
       if (histo->getDim() == 1) {
+        Belle2::debug("histogram : %s (entries=%d)", h->GetName(), h->Integral());
         for (int nbinx = 0; nbinx < h->GetNbinsX(); nbinx++) {
           histo->setBinContent(nbinx, h->GetBinContent(nbinx + 1));
         }
       } else if (histo->getDim() == 2) {
+        Belle2::debug("histogram : %s (entries=%d)", h->GetName(), h->Integral());
         for (int nbiny = 0; nbiny < h->GetNbinsY(); nbiny++) {
           for (int nbinx = 0; nbinx < h->GetNbinsX(); nbinx++) {
             histo->setBinContent(nbinx, nbiny, h->GetBinContent(nbinx + 1, nbiny + 1));

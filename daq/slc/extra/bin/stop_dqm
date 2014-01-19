@@ -1,0 +1,2 @@
+killall hserver
+killall dqmviewd

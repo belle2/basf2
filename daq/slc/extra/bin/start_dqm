@@ -1,0 +1,11 @@
+#!/bin/bash
+
+label=`date +%Y-%m-%d-%H-%M`
+
+echo "killing DQM daemon"
+killall dqmviewd
+sleep 2
+echo "booting DQM daemon (dqmviewd)"
+source ~/belle2/release/daq/slc/extra/bin/setup.sh ~/belle2 release global 
+dqmviewd DQM
+echo "booted"

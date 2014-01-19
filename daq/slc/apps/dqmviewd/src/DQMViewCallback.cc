@@ -20,6 +20,7 @@ void DQMViewCallback::init() throw()
 
 bool DQMViewCallback::boot() throw()
 {
+  _master->signal(-2);
   _master->boot();
   return true;
 }

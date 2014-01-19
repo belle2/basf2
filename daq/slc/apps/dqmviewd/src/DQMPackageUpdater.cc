@@ -28,7 +28,6 @@ void DQMPackageUpdater::run()
     reader_v.push_back(NULL);
   }
   while (true) {
-    //_callback->lock();
     if (expno != _master->getExpNumber() ||
         runno != _master->getRunNumber()) {
       Belle2::debug("creating new DQM records for run # %04d.%06d",
@@ -41,7 +40,6 @@ void DQMPackageUpdater::run()
       expno = _master->getExpNumber();
       runno = _master->getRunNumber();
     }
-    //_callback->unlock();
     for (size_t index = 0; index < manager_v.size(); index++) {
       DQMPackage* monitor = (DQMPackage*)manager_v[index]->getMonitor();
       std::string filename = monitor->getFileName();
@@ -56,7 +54,8 @@ void DQMPackageUpdater::run()
         reader_v[index] = reader;
         manager_v[index]->init();
         _master->signal(-2);
-      } else if (reader_v[index] != NULL) {
+      }
+      if (reader_v[index] != NULL) {
         reader_v[index]->update(manager_v[index]->getPackage());
         if (manager_v[index]->update()) {
           _master->signal(index);

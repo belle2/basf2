@@ -12,10 +12,9 @@ ROCallback::ROCallback(NSMNode* node, const std::string& configname)
   : RCCallback(node)
 {
   node->setData(new DataObject());
-  node->setState(State::INITIAL_S);
   _con.setCallback(this);
   ConfigFile config(configname);
-  _path = config.get("ROPC_BASF2_PATH");
+  _path = config.get("ROPC_BASF2_SCRIPT");
 }
 
 ROCallback::~ROCallback() throw()
@@ -45,12 +44,13 @@ bool ROCallback::load() throw()
   _con.addArgument("1");
   _con.addArgument("5101");
   _con.addArgument("basf2");
-  if (_con.load(20)) {
+  if (_con.load(30)) {
     LogFile::debug("load succeded");
+    return true;
   } else {
-    LogFile::debug("load timeout");
   }
-  return true;
+  LogFile::debug("load timeout");
+  return false;
 }
 
 bool ROCallback::start() throw()
@@ -77,11 +77,17 @@ bool ROCallback::pause() throw()
 
 bool ROCallback::recover() throw()
 {
-  return (abort() && boot() && load());
+  if (abort() && boot() && load()) {
+    _node->setState(State::READY_S);
+    return true;
+  }
+  return false;
 }
 
 bool ROCallback::abort() throw()
 {
-  return _con.abort();
+  _con.abort();
+  _node->setState(State::INITIAL_S);
+  return true;
 }
 

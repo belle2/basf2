@@ -262,7 +262,12 @@ void DedxPIDModule::event()
     //get momentum (at origin) from fit result
     const TVector3& poca = fitResult->getPosition();
     const TVector3& poca_momentum = fitResult->getMomentum();
-    genfit::StateOnPlane pocaState = gftrack->getPointWithMeasurement(0)->getFitterInfo(trackrep)->getFittedState(true);
+    const genfit::AbsFitterInfo* fitterInfo = gftrack->getPointWithMeasurement(0)->getFitterInfo(trackrep);
+    if (!fitterInfo) {
+      B2ERROR("No fitterInfo found, skipping track.")
+      continue;
+    }
+    genfit::StateOnPlane pocaState = fitterInfo->getFittedState(true);
 
     dedxTrack->m_pdg_hyp = fitResult->getParticleType().getPDGCode();
     dedxTrack->m_chi2 = gftrack->getFitStatus(trackrep)->getChi2();

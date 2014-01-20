@@ -1,5 +1,7 @@
 #include "daq/slc/nsm/NSMCommunicator.h"
 
+#include "daq/slc/system/LogFile.h"
+
 #include "daq/slc/nsm/NSMCallback.h"
 
 #include "daq/slc/base/StringUtil.h"
@@ -66,7 +68,6 @@ void NSMCommunicator::init(const std::string& host, int port) throw(NSMHandlerEx
   if (_host.size() == 0 || _port <= 0) {
     _nsmc = b2nsm_init(_node->getName().c_str());
   } else {
-    //_nsmc = nsmlib_init(_node->getName().c_str(), host.c_str(), port, port);
     _nsmc = b2nsm_init2(_node->getName().c_str(), 0, host.c_str(), port, port);
   }
   if (_nsmc == NULL) {
@@ -102,6 +103,7 @@ void NSMCommunicator::init(const std::string& host, int port) throw(NSMHandlerEx
     _rc_node = new NSMNode(rc_name);
   }
   __com_v.push_back(this);
+  LogFile::debug("%s:%d", __FILE__, __LINE__);
 #else
 #warning "Wrong version of nsm2. try source daq/slc/extra/nsm2/export.sh"
 #endif
@@ -194,6 +196,7 @@ bool NSMCommunicator::sendLog(const SystemLog& log)
     return false;
   }
 #endif
+  return true;
 }
 
 bool NSMCommunicator::sendError(const std::string& message)

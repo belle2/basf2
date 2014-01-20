@@ -64,6 +64,7 @@ namespace Belle2 {
     void setMessage(NSMMessage& msg) throw() { _message = msg; }
     void setId(int id) throw() { _id = id; }
     void setNode(NSMNode* node) throw() { _node = node; }
+    void setRCNode(NSMNode* node) throw() { _rc_node = node; }
     void setCallback(NSMCallback* callback) throw() { _callback = callback; }
     bool performCallback() throw(NSMHandlerException);
     int getNodeIdByName(const std::string& name) throw(NSMHandlerException);

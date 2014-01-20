@@ -42,7 +42,7 @@ void NSMNodeDaemon::init() throw(NSMHandlerException)
     _nsm_comm = NULL;
     exit(1);
   }
-  LogFile::debug("Connected to NSM2 daemon");
+  LogFile::debug("Connected to NSM2 daemon (%s:%d)", _host.c_str(), _port);
 }
 
 void NSMNodeDaemon::run() throw()
@@ -57,7 +57,8 @@ void NSMNodeDaemon::run() throw()
       }
     }
   } catch (const std::exception& e) {
-    LogFile::fatal("NSM node daemon : Caught exception (%s). Terminate process...",
-                   e.what());
+    LogFile::fatal("NSM node daemon : Caught exception (%s:%d %s). Terminate process...",
+                   _host.c_str(), _port, e.what());
+    exit(1);
   }
 }

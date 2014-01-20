@@ -24,10 +24,19 @@ namespace Belle2 {
     virtual bool pause()  throw() { return true; }
     virtual bool abort()  throw() { return true; }
     virtual bool trigft()  throw() { return true; }
+    virtual bool stateCheck()  throw() { return true; }
 
   public:
     virtual bool perform(const Command& cmd, NSMMessage& msg)
     throw(NSMHandlerException);
+    void setForce(bool force) { _force = force; }
+
+  protected:
+    NSMNode* getRCNode() { return _rc_node; }
+
+  private:
+    NSMNode* _rc_node;
+    bool _force;
 
   };
 

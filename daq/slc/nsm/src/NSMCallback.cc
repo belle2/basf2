@@ -26,9 +26,9 @@ NSMCallback::NSMCallback(NSMNode* node) throw()
   add(Command::OK);
   add(Command::ERROR);
   add(Command::FATAL);
-  signal(SIGINT, terminate);
-  signal(SIGQUIT, terminate);
-  signal(SIGTERM, terminate);
+  //signal(SIGINT, terminate);
+  //signal(SIGQUIT, terminate);
+  //signal(SIGTERM, terminate);
 }
 
 bool NSMCallback::isReady() const throw()

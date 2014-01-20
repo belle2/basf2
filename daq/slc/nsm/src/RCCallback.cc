@@ -53,60 +53,61 @@ void RCCallback::download()
   }
 }
 
-bool RCCallback::perform(const Command& cmd, NSMMessage&)
+bool RCCallback::perform(const Command& cmd, NSMMessage& msg)
 throw(NSMHandlerException)
 {
   setReply("");
   if (cmd == Command::OK) {
     return ok();
   } else if (cmd == Command::ERROR) {
-    LogFile::debug("ERROR");
+    LogFile::debug("ERROR from %s", msg.getNodeName());
     return error();
   } else if (cmd == Command::FATAL) {
-    LogFile::debug("FATAL");
+    LogFile::debug("FATAL from %s", msg.getNodeName());
     return fatal();
   }
-  if (cmd.isAvailable(_node->getState()) == 0) {
+  if (!_force && cmd.isAvailable(_node->getState()) == 0) {
     return false;
   }
   State state_org = _node->getState();
   bool result = false;
   NSMCommunicator* com = getCommunicator();
   if (cmd == Command::BOOT) {
-    LogFile::debug("BOOT");
+    LogFile::debug("BOOT from %s", msg.getNodeName());
     result = boot();
   } else if (cmd == Command::LOAD) {
-    LogFile::debug("LOAD");
+    LogFile::debug("LOAD from %s", msg.getNodeName());
     result = load();
   } else if (cmd == Command::START) {
-    LogFile::debug("START");
+    LogFile::debug("START from %s", msg.getNodeName());
     result = start();
   } else if (cmd == Command::STOP) {
-    LogFile::debug("STOP");
+    LogFile::debug("STOP from %s", msg.getNodeName());
     result = stop();
   } else if (cmd == Command::RECOVER) {
-    LogFile::debug("RECOVER");
+    LogFile::debug("RECOVER from %s", msg.getNodeName());
     result = recover();
   } else if (cmd == Command::RESUME) {
-    LogFile::debug("RESUME");
+    LogFile::debug("RESUME from %s", msg.getNodeName());
     result = resume();
   } else if (cmd == Command::PAUSE) {
-    LogFile::debug("PAUSE");
+    LogFile::debug("PAUSE from %s", msg.getNodeName());
     result = pause();
   } else if (cmd == Command::ABORT) {
-    LogFile::debug("ABORT");
+    LogFile::debug("ABORT from %s", msg.getNodeName());
     result = abort();
   } else if (cmd == Command::TRIGFT) {
-    LogFile::debug("TRGFT");
+    LogFile::debug("TRGFT from %s", msg.getNodeName());
     result = trigft();
   } else if (cmd == Command::STATECHECK) {
     if (com != NULL) com->replyOK(_node, "");
-    return true;
+    return stateCheck();
   } else if (cmd == Command::STATE) {
     return true;
   }
   if (result) {
-    if (cmd != Command::TRIGFT && _node->getState() == state_org) {
+    if (cmd != Command::TRIGFT && _node->getState() == state_org
+        && state_org != State::ERROR_ES) {
       _node->setState(cmd.nextState());
     }
     if (com != NULL) com->replyOK(_node, _reply);

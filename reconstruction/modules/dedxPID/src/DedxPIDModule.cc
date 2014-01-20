@@ -91,7 +91,14 @@ void DedxPIDModule::initialize()
   m_trackID = 0;
   m_numExtrapolations = 0;
 
-  m_pdfFile = FileSystem::findFile(m_pdfFile);
+  if (!m_pdfFile.empty()) {
+
+    std::string fullPath = FileSystem::findFile(m_pdfFile);
+    if (fullPath.empty()) {
+      B2ERROR("PDF file " << m_pdfFile << " not found!");
+    }
+    m_pdfFile = fullPath;
+  }
   if (!m_enableDebugOutput and m_pdfFile.empty()) {
     B2ERROR("No PDFFile given and debug output disabled. DedxPID module will produce no output!");
   }

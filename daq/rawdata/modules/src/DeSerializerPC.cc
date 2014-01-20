@@ -299,9 +299,13 @@ int* DeSerializerPCModule::recvData(int* malloc_flag, int* total_buf_nwords, int
       temp_length += this_length * sizeof(int);
     }
     if (temp_length != each_buf_nwords[ i ] * sizeof(int)) {
+      printf("[DEBUG]*******SENDHDR*********** \n");
+      printData(send_hdr_buf, SendHeader::SENDHDR_NWORDS);
+      printf("[DEBUG]*******BODY***********\n ");
+      printData(temp_buf, (int)(total_recvd_byte / sizeof(int)));
       char err_buf[500];
       sprintf(err_buf, "CORRUPTED DATA: Length written on SendHeader(%d) is invalid. Actual data size is %d. Exting...",
-              total_recvd_byte, (int)(*total_buf_nwords * sizeof(int)));
+              (int)(*total_buf_nwords * sizeof(int)), temp_length);
       print_err.PrintError(m_shmflag, &m_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
       sleep(1234567);
       exit(-1);

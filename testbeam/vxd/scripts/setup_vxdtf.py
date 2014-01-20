@@ -15,7 +15,7 @@ def setup_vxdtf(
     candName='',
     secSetup=['TB6GeVNoMagnetSVD-moreThan1500MeV_SVD'],
     filterOverlaps='hopfield',
-    baseLineTF='1',
+    baseLineTF=1,
     ):
 
     # VXDTF:

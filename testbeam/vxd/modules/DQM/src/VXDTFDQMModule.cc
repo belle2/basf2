@@ -8,6 +8,8 @@
 #include "TVector3.h"
 #include "TVectorD.h"
 
+#include "TDirectory.h"
+
 using namespace std;
 using namespace Belle2;
 
@@ -26,6 +28,11 @@ VXDTFDQMModule::VXDTFDQMModule() : HistoModule()
   //Set module properties
   setDescription("VXDTF DQM module");
   setPropertyFlags(c_ParallelProcessingCertified);  // specify this flag if you need parallel processing
+
+  addParam("GFTrackCandidatesColName", m_storeTrackCandsName,
+           "Name of collection holding the genfit::TrackCandidates", std::string("caTracks"));
+  addParam("histogramDirectoryName", m_histogramDirectoryName,
+           "Track fit Validation histograms will be put into this directory", std::string("vxdtf"));
 }
 
 
@@ -39,6 +46,9 @@ VXDTFDQMModule::~VXDTFDQMModule()
 
 void VXDTFDQMModule::defineHisto()
 {
+  TDirectory* oldDir = gDirectory;
+//  oldDir->cd();
+  oldDir->mkdir(m_histogramDirectoryName.c_str())->cd();
 //  gStyle->SetOptStat(111111); // includes extra info like underflow and overflow into the legend of the histogram
 
   m_histoMomentum = new TH1F("VXDTFMomentum", "VXDTF: Total momentum estimated", 100, 0, 50);
@@ -69,10 +79,17 @@ void VXDTFDQMModule::defineHisto()
   m_histoNumHitsIgnored->GetXaxis()->SetTitle("Difference in num of hits");
   m_histoNumHitsIgnored->GetYaxis()->SetTitle("count");
 
-  m_histoNumTCsPerEvent = new TH1I("VXDTFNTCs", "VXDTF: Total num of TCs per event", 20, -0.5, 18.5);
+  m_histoNumTCsPerEvent = new TH1I("VXDTFNTCs", "VXDTF: Total num of TCs per event", 20, -0.51, 18.5);
   m_histoNumHitsIgnored->GetXaxis()->SetTitle("num of TCs per event");
   m_histoNumHitsIgnored->GetYaxis()->SetTitle("count");
 
+
+  /// WARNING TODO:
+  /**
+   * 2D-Hist: vorhandene Cluster gegen benützte Cluster
+   *  - " - nur für jeden layer einzeln...
+   * */
+  oldDir->cd();
 }
 
 
@@ -82,12 +99,14 @@ void VXDTFDQMModule::initialize()
   REG_HISTOGRAM
 
   //Register collections
-  StoreArray<SVDCluster> storeClusters(m_storeClustersName);
-  StoreArray<genfit::TrackCand> caTrackCandidates(m_storeTrackCandsName);
+  StoreArray<SVDCluster>::required();
+//   StoreArray<SVDCluster> storeClusters(m_storeClustersName);
+  StoreArray<genfit::TrackCand>::required(m_storeTrackCandsName);
+//   StoreArray<genfit::TrackCand> caTrackCandidates(m_storeTrackCandsName);
 
   //Store names to speed up creation later
-  m_storeClustersName = storeClusters.getName();
-  m_storeTrackCandsName = caTrackCandidates.getName();
+//   m_storeClustersName = storeClusters.getName();
+//   m_storeTrackCandsName = caTrackCandidates.getName();
 
 }
 
@@ -107,15 +126,16 @@ void VXDTFDQMModule::beginRun()
 
 void VXDTFDQMModule::event()
 {
-  const StoreArray<genfit::TrackCand> caTrackCandidates("caTracks");
+  const StoreArray<genfit::TrackCand> caTrackCandidates(m_storeTrackCandsName);
   const StoreArray<SVDCluster> storeClusters(m_storeClustersName);
 
 
   // collecting info from TCs (estimated momentum, nHits, ..)
-  int numOfCaTCs = caTrackCandidates.getEntries();
+  int nCaTCs = caTrackCandidates.getEntries();
+  int nSVDClusters = storeClusters.getEntries();
   TVector3 momentum;
   for (const auto aTrackCand : caTrackCandidates) {
-    int numOfHits = aTrackCand.getNHits();
+    int nHits = aTrackCand.getNHits();
     TVectorD stateSeed = aTrackCand.getStateSeed();
     momentum[0] = stateSeed(3); momentum[1] = stateSeed(4); momentum[2] = stateSeed(5);
     double fullMomentum = momentum.Mag();
@@ -129,14 +149,14 @@ void VXDTFDQMModule::event()
     m_histoMomentumX->Fill(momentumX);
     m_histoMomentumY->Fill(momentumY);
     m_histoMomentumZ->Fill(momentumZ);
-    m_histoNumHitsUsed->Fill(numOfHits);
-    m_histoNumHitsIgnored->Fill(storeClusters.getEntries() - numOfHits);
+    m_histoNumHitsUsed->Fill(nHits);
+    m_histoNumHitsIgnored->Fill(nSVDClusters - nHits);
   }
-  if (numOfCaTCs == 0) { // in this case, the for-loop was not executed
+  if (nCaTCs == 0) { // in this case, the for-loop was not executed
     m_histoNumHitsUsed->Fill(0);
-    m_histoNumHitsIgnored->Fill(storeClusters.getEntries());
+    m_histoNumHitsIgnored->Fill(nSVDClusters);
   }
-  m_histoNumTCsPerEvent->Fill(numOfCaTCs);
+  m_histoNumTCsPerEvent->Fill(nCaTCs);
 
 }
 

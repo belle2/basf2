@@ -40,6 +40,9 @@ namespace Belle2 {
 
     std::string m_storeTrackCandsName;      /**< genfit::trackCand StoreArray name */
     std::string m_storeClustersName;    /**< SVDClusters StoreArray name */
+    std::string m_histogramDirectoryName;   /**< subdir where to place the histograms */
+
+//     std::vector<TH1*> m_allHistos;          /**< All histograms for easy deletion */
 
     TH1F* m_histoMomentum;          /**< Total momentum estimated */
     TH1F* m_histoPT;                /**< Transverse momentum estimated */

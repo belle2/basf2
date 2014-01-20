@@ -18,7 +18,7 @@ progress = register_module('Progress')
 # Load parameters from xml
 gearbox = register_module('Gearbox')
 # VXD (no Telescopes), and the real PCMAG magnetic field
-gearbox.param('fileName', 'testbeam/vxd/FullTelescopeVXDTB_v2.xml')
+gearbox.param('fileName', 'testbeam/vxd/FullTelescopeVXDTB_v1.xml')
 
 # Create geometry
 geometry = register_module('Geometry')
@@ -52,9 +52,9 @@ tel_dqm.param('Clusters', 'TelClusters')
 
 # VXDTF:
 ## parameters:
-secSetup = ['testBeamMini6GeVSVD-moreThan1500MeV_SVD']
+secSetup = ['TB6GeVNoMagnetSVD-moreThan1500MeV_SVD']
 qiType = 'circleFit'
-filterOverlaps = 'none'  # hopfield
+filterOverlaps = 'hopfield'  # hopfield
 #
 vxdtf = register_module('VXDTF')
 vxdtf.logging.log_level = LogLevel.INFO
@@ -64,6 +64,7 @@ param_vxdtf = {
     'tccMinState': [2],
     'tccMinLayer': [3],
     'standardPdgCode': -11,
+    'artificialMomentum': 5.,
     'sectorSetup': secSetup,
     'calcQIType': qiType,
     'killEventForHighOccupancyThreshold': 75,

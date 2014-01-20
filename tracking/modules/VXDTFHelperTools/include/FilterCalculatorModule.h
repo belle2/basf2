@@ -42,7 +42,7 @@
 namespace Belle2 {
 
 
-  class VXDHit; /**< internal datastore for Hits */
+//   class VXDHit; /**< internal datastore for Hits */
   class VXDTrack; /**< internal datastore for tracks */
   class Sector;   /**< sector is a subunit of a sensor, please check low momentum trackfinder for more details (VXDTF) */
   class FMSectorFriends;  /**< info about compatible sectors to main sector */
@@ -53,14 +53,15 @@ namespace Belle2 {
   class VXDHit {
   public:
     /** Constructor of class VXDHit*/
-    VXDHit(short int hitType, std::string fullSecID, int aUniID, TVector3 hit, TVector3 mom, int pdg):
+    VXDHit(short int hitType, std::string fullSecID, int aUniID, TVector3 hit, TVector3 mom, int pdg, TVector3 origin, float timeVal):
       m_type(hitType),
       m_secID(fullSecID),
       m_uniID(aUniID),
-      m_timeStamp(0),
+      m_pdg(pdg),
+      m_timeStamp(timeVal)// value set by member setTrueHit(...)
 //       m_pxdHit(NULL),
 //       m_svdHit(NULL),
-      m_pdg(pdg) { checkDirectionOfFlight(hit, mom); }
+    { checkDirectionOfFlight(origin, hit, mom); }
 
     /** Operator '<' overloaded using hit-time-information for comparison */
     bool operator<(const VXDHit& b) const { return this->getTimeStamp() < b.getTimeStamp(); }
@@ -99,11 +100,7 @@ namespace Belle2 {
 //    template<class aTmpl>
 //     void setTrueHit(const aTmpl* aHit) { // TODO why can't I use this? (it complains about being the wrong type...)
 //      m_timeStamp = aHit->getGlobalTime();
-//       if (m_type == Const::SVD) {
-//         m_svdHit = aHit;
-//       } else if (m_type == Const::PXD) {
-//         m_pxdHit = aHit;
-//       } else { B2ERROR("Class VXDHit of FilterCalculatorModule: input type is neither hitType(SVD) nor hitType(PXD)") }
+//      m_trueHit = aHit;
 //     } /**< setter for the TrueHit */
 
 
@@ -114,12 +111,14 @@ namespace Belle2 {
     }
 
   protected:
-    /** checks whether particle was flying towards the IR or away from IR when producing this hit*/
-    void checkDirectionOfFlight(TVector3 hitPos, TVector3 momVec) {
+    /** checks whether particle was flying towards the IR/origin or away from IR/origin when producing this hit*/
+    void checkDirectionOfFlight(TVector3 origin, TVector3 hitPos, TVector3 momVec) {
       m_hitPos = hitPos;
-      double hitMag = hitPos.Mag();
-      double momMag = (hitPos + momVec).Mag();
-      if (hitMag > momMag) { m_points2IP = true; }
+      origin -= hitPos; // vector hit <-> origin
+      double hitMag = origin.Mag();
+      double momMag = (origin + momVec).Mag();
+//       if (hitMag > momMag) { m_points2IP = true; }
+      if (hitMag < momMag) { m_points2IP = true; }
       else { m_points2IP = false; }
     }
 
@@ -128,6 +127,8 @@ namespace Belle2 {
     std::string m_secID; /**< ID of sector containing this hit */
     int m_uniID; /**< ID of sensor containing this hit */
     float m_timeStamp; /**< timestamp of hit (real info, needed for sorting) */
+//     template<class TemplateTrueHit>
+//     const TemplateTrueHit* m_trueHit; /**< pointer to trueHit */
 //     const PXDTrueHit* m_pxdHit; /**< pointer to pxdHit (only set if it is a pxdHit) */
 //     const SVDTrueHit* m_svdHit; /**< pointer to svdHit (only set if it is a svdHit) */
     int m_pdg; /**< pdgCode of particle causing hit */
@@ -406,6 +407,7 @@ namespace Belle2 {
     template<class Tmpl>
     bool createSectorAndHit(Belle2::Const::EDetector detectorID, int pdg, const Tmpl* aSiTrueHitPtr, VXDTrack& newTrack, MapOfSectors* thisSecMap); /**< internal member - takes hit, calculates sector (and creates it if it is not existing yet) and creates internal VXDHit for further calculation. If return value is true, everything worked fine. If not, then hit was not created (no info about the sector-creation) */
 
+    TVector3 getOrigin() { return m_origin; }
   protected:
     MapOfSectors m_sectorMap; /**< sectormap contains full info about sectors (will always be calculated) */
     std::vector <MapOfSectors*>  m_sectorMaps; /**< vector contains sectormap for each range of transverse momentum chosen by m_pTcuts */

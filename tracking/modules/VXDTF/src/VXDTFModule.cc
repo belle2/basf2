@@ -281,6 +281,8 @@ VXDTFModule::VXDTFModule() : Module()
   //for testing purposes:
   addParam("highestAllowedLayer", m_PARAMhighestAllowedLayer, "set value below 6 if you want to exclude outer layers (standard is 6)", highestAllowedLayer);
   addParam("standardPdgCode", m_PARAMpdGCode, "standard value is 211 (pi+), ATTENTION, instead of using inconsistent sign of PdGList, in this module positively charged particles are always positive and negatively charged ones are negative (relevant for leptons)", int(211));
+  addParam("artificialMomentum", m_PARAMartificialMomentum, "standard value is 0. if StandardValue is changed to a nonZero value, the magnitude of the momentum seed is set artificially using this value, if value < 0, not only the magnitude is set using the norm of the value, but direction of momentum is reversed too, if you want to change charge, use parameter 'standardPdgCode'", double(0));
+
 
   addParam("cleanOverlappingSet", m_PARAMcleanOverlappingSet, "when true, TCs which are found more than once (possible because of multipass) will get filtered", bool(true));
 
@@ -423,11 +425,14 @@ void VXDTFModule::initialize()
   if (m_PARAMwriteToRoot == true) {
     m_PARAMrootFileName.at(0) += ".root";
     m_rootFilePtr = new TFile(m_PARAMrootFileName.at(0).c_str(), m_PARAMrootFileName.at(1).c_str()); // alternative: UPDATE
-    m_treeTrackWisePtr = new TTree("m_treeTrackWisePtr", "aTrackWiseTree");
+
     m_treeEventWisePtr = new TTree("m_treeEventWisePtr", "anEventWiseTree");
     m_treeEventWisePtr->Branch("duration", &m_rootTimeConsumption);
+
+    m_treeTrackWisePtr = new TTree("m_treeTrackWisePtr", "aTrackWiseTree");
     m_treeTrackWisePtr->Branch("pValues", &m_rootPvalues);
     m_treeTrackWisePtr->Branch("chi2Values", &m_rootChi2);
+    m_treeTrackWisePtr->Branch("circleRadii", &m_rootCircleRadius);
     m_treeTrackWisePtr->Branch("ndfValues", &m_rootNdf);
   } else {
     m_rootFilePtr = NULL;
@@ -934,7 +939,7 @@ void VXDTFModule::beginRun()
   if (m_baselinePass.circleFit.first == true) { countActivatedTCTests++; }
   m_baselinePass.activatedTccFilterTests = countActivatedTCTests; // pT, zzXY, circleFit
 
-  m_globalizedErrorContainer = Belle2::getGlobalizedHitErrors(); // storing errors of the vxd
+//   m_globalizedErrorContainer = Belle2::getGlobalizedHitErrors(); // storing errors of the vxd
   m_errorContainer = getHitErrors();
 
 
@@ -1025,11 +1030,11 @@ void VXDTFModule::the_real_event()
     currentPass->centerSector = centerSector;
     vertexInfo.hitPosition = currentPass->origin;
     if (vertexInfo.hitPosition.Mag() > 0.5) { // probably no Belle2-VXD-Setup -> Vertex not known
-      vertexInfo.sigmaX = 1.5; //0.1;
-      vertexInfo.sigmaY = 1.5; //0.1;
+      vertexInfo.sigmaU = 1.5; //0.1;
+      vertexInfo.sigmaV = 1.5; //0.1;
     } else {
-      vertexInfo.sigmaX = 0.15;
-      vertexInfo.sigmaY = 0.15;
+      vertexInfo.sigmaU = 0.15;
+      vertexInfo.sigmaV = 0.15;
     }
     VXDTFHit* vertexHit = new VXDTFHit(vertexInfo, passNumber, 0, 0, 0, Const::IR, centerSector, centerVxdID, 0.0); // has no position in HitList, because it doesn't exist...
     MapOfSectors::iterator secIt = currentPass->sectorMap.find(centerSector);
@@ -1079,11 +1084,11 @@ void VXDTFModule::the_real_event()
     m_baselinePass.centerSector = centerSector;
     vertexInfo.hitPosition = m_baselinePass.origin;
     if (vertexInfo.hitPosition.Mag() > 0.5) { // probably no Belle2-VXD-Setup -> Vertex not known
-      vertexInfo.sigmaX = 1.5; //0.1;
-      vertexInfo.sigmaY = 1.5; //0.1;
+      vertexInfo.sigmaU = 1.5; //0.1;
+      vertexInfo.sigmaV = 1.5; //0.1;
     } else {
-      vertexInfo.sigmaX = 0.15;
-      vertexInfo.sigmaY = 0.15;
+      vertexInfo.sigmaU = 0.15;
+      vertexInfo.sigmaV = 0.15;
     }
     VXDTFHit* baseLineVertexHit = new VXDTFHit(vertexInfo, 0, 0, 0, 0, Const::IR, centerSector, centerVxdID, 0.0);
     MapOfSectors::iterator secIt = m_baselinePass.sectorMap.find(centerSector);
@@ -1178,8 +1183,8 @@ void VXDTFModule::the_real_event()
     aLayerID = aVxdID.getLayerNumber();
     VXD::SensorInfoBase aSensorInfo = geometry.getSensorInfo(aVxdID);
     hitInfo.hitPosition = aSensorInfo.pointToGlobal(hitLocal);
-    hitInfo.sigmaX = m_errorContainer.at(aLayerID - 1).first;
-    hitInfo.sigmaY = m_errorContainer.at(aLayerID - 1).second;
+    hitInfo.sigmaU = m_errorContainer.at(aLayerID - 1).first;
+    hitInfo.sigmaV = m_errorContainer.at(aLayerID - 1).second;
 
     // local(0,0,0) is the _center_ of the sensorplane, not at the edge!
     vSize = 0.5 * aSensorInfo.getVSize();
@@ -1291,8 +1296,8 @@ void VXDTFModule::the_real_event()
 
       hitInfo.hitPosition = aSensorInfo.pointToGlobal(hitLocal);
       B2DEBUG(100, " VXDTF-event SVD hits: m_errorContainer.size(): " << m_errorContainer.size() << ", layerID-1: " << aLayerID - 1)
-      hitInfo.sigmaX = m_errorContainer.at(aLayerID - 1).first;
-      hitInfo.sigmaY = m_errorContainer.at(aLayerID - 1).second;
+      hitInfo.sigmaU = m_errorContainer.at(aLayerID - 1).first;
+      hitInfo.sigmaV = m_errorContainer.at(aLayerID - 1).second;
 
       // local(0,0,0) is the center of the sensorplane
       vSize = 0.5 * aSensorInfo.getVSize();
@@ -3596,7 +3601,7 @@ void VXDTFModule::calcInitialValues4TCs(PassData* currentPass)
     const vector<PositionInfo*>* currentHits = aTC->getPositionInfos();
 
     currentPass->trackletFilterBox.resetValues(currentHits);
-    seedValue = currentPass->trackletFilterBox.calcMomentumSeed(m_KFBackwardFilter);
+    seedValue = currentPass->trackletFilterBox.calcMomentumSeed(m_KFBackwardFilter, m_PARAMartificialMomentum);
 
     pdgCode = seedValue.second * m_PARAMpdGCode * m_chargeSignFactor;
 
@@ -3654,14 +3659,9 @@ void VXDTFModule::calcQIbyKalman(TCsOfEvent& tcVector, StoreArray<PXDCluster>& p
 {
   /// produce GFTrackCands for each currently living TC and calculate real kalman-QI's
   genfit::KalmanFitter kalmanFilter;
-  //kalmanFilter.setBlowUpFactor(500.0); // TODO: hardcoded values should be set as steering file-parameter
 
   for (VXDTFTrackCandidate * currentTC : tcVector) {
     if (currentTC->getCondition() == false) { continue; }
-
-    TVector3 momErrors(0.01, 0.01, 0.04); // rather generic values for a rough start
-
-    TVector3 posErrors(1, 1, 1);
 
     genfit::AbsTrackRep* trackRep = new genfit::RKTrackRep(currentTC->getPDGCode());
 
@@ -3685,8 +3685,11 @@ void VXDTFModule::calcQIbyKalman(TCsOfEvent& tcVector, StoreArray<PXDCluster>& p
         PXDRecoHit* newRecoHit = new PXDRecoHit(pxdClusters[clusters[tfHit->getClusterIndexUV()].getRealIndex()]);
         track.insertMeasurement(newRecoHit);
       } else if (tfHit->getDetectorType() == Const::SVD) {
-        TVector3 pos = *(tfHit->getHitCoordinates());
-        SVDRecoHit2D* newRecoHit = new SVDRecoHit2D(tfHit->getVxdID(), pos[0], pos[1]);
+//         TVector3 pos = *(tfHit->getHitCoordinates()); // jan192014, old way, global coordinates
+//         SVDRecoHit2D* newRecoHit = new SVDRecoHit2D(tfHit->getVxdID(), pos[0], pos[1]);
+        SVDRecoHit2D* newRecoHit = new SVDRecoHit2D(tfHit->getVxdID(),
+                                                    tfHit->getClusterInfoU()->getSVDCluster()->getPosition(),
+                                                    tfHit->getClusterInfoV()->getSVDCluster()->getPosition()); /// WARNING test jan192014: local instead of global coordinates
         track.insertMeasurement(newRecoHit);
       } else {
         B2ERROR("VXDTFModule::calcQIbyKalman: event " << m_eventCounter << " a hit has unknown detector type ( " << tfHit->getDetectorType() << ") discarding hit")
@@ -3714,19 +3717,23 @@ void VXDTFModule::calcQIbyKalman(TCsOfEvent& tcVector, StoreArray<PXDCluster>& p
       if (m_KFBackwardFilter)
         direction = -1;
       double pVal = kalmanFilter.getPVal(&track, trackRep, direction);
-      B2DEBUG(10, "calcQI4TC succeeded: calculated kalmanQI: " << kalmanFilter.getChiSqu(&track, trackRep, direction) << ", forward-QI: " << kalmanFilter.getChiSqu(&track, trackRep, 1) << " with NDF: " << kalmanFilter.getNdf(&track, trackRep, 1) << ", p-value: " << pVal << ", numOfHits: " <<  currentTC->getPXDHitIndices().size() + currentTC->getSVDHitIndices().size())
+      double chi2 = kalmanFilter.getChiSqu(&track, trackRep, direction);
+      int ndf = kalmanFilter.getNdf(&track, trackRep, 1) + kalmanFilter.getChiSqu(&track, trackRep, 1);
+      B2DEBUG(10, "calcQI4TC succeeded: calculated kalmanQI: " << chi2 << ", forward-QI: " << kalmanFilter.getChiSqu(&track, trackRep, 1) << " with NDF: " << ndf << ", p-value: " << pVal << ", numOfHits: " <<  currentTC->getPXDHitIndices().size() + currentTC->getSVDHitIndices().size())
 //       RKTrackRep::getPosMomCov
       if (pVal < 0.000001 and m_PARAMqiSmear == true) {
         currentTC->setTrackQuality(m_littleHelperBox.smearNormalizedGauss(pVal));
       } else {
         currentTC->setTrackQuality(pVal);
       }
+      writeToRootFile(pVal, chi2, currentTC->getEstRadius(), ndf); // possible TODO: could try to get a fitted radius value by the Kalman
 
       currentTC->setFitSucceeded(true);
       m_TESTERgoodFitsCtr++;
     } else {
       B2DEBUG(10, "calcQI4TC failed...")
       m_TESTERbadFitsCtr++;
+      writeToRootFile(0, 0, currentTC->getEstRadius(), 0); // possible TODO: could try to get a fitted radius value by the Kalman
       currentTC->setFitSucceeded(false);
       if (m_PARAMqiSmear == true) {
         currentTC->setTrackQuality(m_littleHelperBox.smearNormalizedGauss(0.));
@@ -3798,19 +3805,6 @@ genfit::TrackCand VXDTFModule::generateGFTrackCand(VXDTFTrackCandidate* currentT
     B2WARNING("pdgCode: " << pdgCode << ", stateSeed0-5: " << stateSeed(0) << "/" << stateSeed(1) << "/" << stateSeed(2) << "/" << stateSeed(3) << "/" << stateSeed(4) << "/" << stateSeed(5) << ", hitID/mag: " << hitIndices.str())
   }
 
-//  int numHits = currentTC->size();
-//  if(numHits > 4 ) { /// DEBUG, TB only!
-//    stringstream hitOutput;
-//    for (VXDTFHit* aHit : currentTC->getHits()) {
-//      hitOutput << aHit->getSectorString() << " " << aHit->getHitCoordinates()->Mag() << endl;
-//    }
-//    hitOutput << "\n PXDIDs: ";
-//    for ( int hitIndex : pxdHits ) { hitOutput << hitIndex << " "; }
-//    hitOutput << "\n SVDIDs: ";
-//    for ( int hitIndex : svdHits ) { hitOutput << hitIndex << " "; }
-//
-//    B2INFO("event " << m_eventCounter <<": TC " << currentTC->getTrackNumber() << " got " << numHits << " hits with following values:\n" << hitOutput.str())
-//  }
   newGFTrackCand.set6DSeedAndPdgCode(stateSeed, pdgCode);
 
   vector<int> hitIDs; // for checking hitIDs
@@ -3943,8 +3937,8 @@ bool VXDTFModule::baselineTF(vector<ClusterInfo>& clusters, PassData* passInfo)
       aLayerID = aVxdID.getLayerNumber();
       const VXD::SensorInfoBase& aSensorInfo = dynamic_cast<const VXD::SensorInfoBase&>(VXD::GeoCache::get(aVxdID));
       newPosition.hitPosition = aSensorInfo.pointToGlobal(hitLocal);
-      newPosition.sigmaX = m_errorContainer.at(aLayerID - 1).first;
-      newPosition.sigmaY = m_errorContainer.at(aLayerID - 1).second;
+      newPosition.sigmaU = m_errorContainer.at(aLayerID - 1).first;
+      newPosition.sigmaV = m_errorContainer.at(aLayerID - 1).second;
       FullSecID aSecID = FullSecID(aVxdID, false, 0);
       VXDTFHit newHit = VXDTFHit(newPosition, 1, NULL, NULL, &aClusterInfo, Const::PXD, aSecID.getFullSecID(), aVxdID, 0);
       passInfo->fullHitsVector.push_back(newHit);
@@ -4188,12 +4182,10 @@ VXDTFHit VXDTFModule::deliverVXDTFHitWrappedSVDHit(ClusterInfo* uClusterInfo, Cl
   /// WARNING we are ignoring the case of a missing cluster at a wedge sensor (at least for the calculation of the error. For the Kalman filter, this should be unimportant since it is working with local coordinates and an axis transformation (where the problem of the dependency of clusters at both side does not occur), this will be a problem for the circleFitter, which is working with global coordinates, where the dependeny is still there!)
   if (vClusterInfo != NULL) {
     hitLocal.SetY(vClusterInfo->getSVDCluster()->getPosition()); // always correct
-    newPosition.sigmaY = m_errorContainer.at(aLayerID - 1).second;
+    newPosition.sigmaV = m_errorContainer.at(aLayerID - 1).second;
   } else {
     hitLocal.SetY(0.); // is center of the plane
-//     newPosition.sigmaY = sqrt(aSensorInfo.getLength() * 0.0833333); // std deviation of uniformly distributed value
-    ///sigma fix fix dec11-2013: old: sqrt(sensorWidth/12)=sqrt(sensorWidth*0.08333), new: sensorWidth/sqrt(12)=sensorWidth*0.288675135 TODO: check whether this is correct
-    newPosition.sigmaY = aSensorInfo.getLength() * 0.288675135; // std deviation of uniformly distributed value (b-a)*sqrt(1/12)
+    newPosition.sigmaV = aSensorInfo.getBackwardWidth() * 0.288675135; // std deviation of uniformly distributed value (b-a)/sqrt(12)
   }
 
   if (uClusterInfo != NULL) {
@@ -4202,12 +4194,10 @@ VXDTFHit VXDTFModule::deliverVXDTFHitWrappedSVDHit(ClusterInfo* uClusterInfo, Cl
     } else { // rectangular Sensor and/or no 2D-info (in this case the X-value of the center of the sensor is taken)
       hitLocal.SetX(uClusterInfo->getSVDCluster()->getPosition());
     }
-    newPosition.sigmaX = m_errorContainer.at(aLayerID - 1).first;
+    newPosition.sigmaU = m_errorContainer.at(aLayerID - 1).first;
   } else {
     hitLocal.SetX(0.); // is center of the plane
-    ///sigma fix fix dec11-2013: old: sqrt(sensorWidth/12)=sqrt(sensorWidth*0.08333), new: sensorWidth/sqrt(12)=sensorWidth*0.288675135 TODO: check whether this is correct
-//    newPosition.sigmaX = sqrt(aSensorInfo.getBackwardWidth() * 0.0833333); // std deviation of uniformly distributed value sqrt((b-a)/12)
-    newPosition.sigmaX = aSensorInfo.getBackwardWidth() * 0.288675135; // std deviation of uniformly distributed value (b-a)*sqrt(1/12)
+    newPosition.sigmaU = aSensorInfo.getLength() * 0.288675135; // std deviation of uniformly distributed value (b-a)/sqrt(12)
   }
 
   newPosition.hitPosition = aSensorInfo.pointToGlobal(hitLocal);
@@ -4336,11 +4326,11 @@ bool VXDTFModule::doTheCircleFit(PassData* thisPass, VXDTFTrackCandidate* aTc, i
     B2DEBUG(20, "TCC filter: tc " << tcCtr << " rejected by circleFit! ");
     m_TESTERtriggeredCircleFit++; tcCtr++;
     aTc->setCondition(false);
-    writeToRootFile(probability, chi2, nHits - 3 + addDegreesOfFreedom);
+    writeToRootFile(probability, chi2, estimatedRadius, nHits - 3 + addDegreesOfFreedom);
     return false;
   }
   if (m_calcQiType == 2) {
-    writeToRootFile(probability, chi2, nHits - 3 + addDegreesOfFreedom);
+    writeToRootFile(probability, chi2, estimatedRadius, nHits - 3 + addDegreesOfFreedom);
     if (m_PARAMqiSmear == true) { probability = m_littleHelperBox.smearNormalizedGauss(probability); }
     aTc->setTrackQuality(probability);
     aTc->setFitSucceeded(true);

@@ -17,7 +17,7 @@
 #include <iostream>
 #include <limits>       // std::numeric_limits
 #include <stdio.h>
-#include <math.h>       // isnan
+#include <math.h>       // isnan, pow 
 #include <fstream>
 #include <iomanip>      // std::setprecision
 #include <utility>
@@ -89,7 +89,7 @@ bool TrackletFilters::ziggZaggRZ()
 }
 
 
-std::pair<TVector3, int> TrackletFilters::calcMomentumSeed(bool useBackwards)
+std::pair<TVector3, int> TrackletFilters::calcMomentumSeed(bool useBackwards, double setMomentumMagnitude)
 {
 
   if (m_numHits < 3) {
@@ -105,7 +105,7 @@ std::pair<TVector3, int> TrackletFilters::calcMomentumSeed(bool useBackwards)
   hitB.SetZ(0.);
   hitC = hitC.Orthogonal();
 
-  std::pair<double, TVector3> helixFitValues = helixFit(m_hits, useBackwards);
+  std::pair<double, TVector3> helixFitValues = helixFit(m_hits, useBackwards, setMomentumMagnitude);
   B2DEBUG(10, "calcMomentumSeed: return values of helixFit: first(radius): " << helixFitValues.first << ", second.Mag(): " << helixFitValues.second.Mag())
   int sign = boost::math::sign(hitC * hitB); // sign of curvature: is > 0 if angle between vectors is < 90°, < 0 else (rule of scalar product)
   if (sign == 0) { B2ERROR("trackletFilter::calcMomentumSeed: segments orthogonal! "); sign = 1;}
@@ -117,19 +117,19 @@ std::pair<TVector3, int> TrackletFilters::calcMomentumSeed(bool useBackwards)
 double TrackletFilters::circleFit(double& clapPhi, double& clapR, double& radius)
 {
   if (m_hits == NULL) { B2FATAL(" TrackletFilters::circleFit hits not set, therefore no calculation possible - please check that!") }
-  double stopper = 0.000000001;
+  double stopper = 0.000000001; /// WARNING hardcoded values!
   double meanX = 0, meanY = 0, meanX2 = 0, meanY2 = 0, meanR2 = 0, meanR4 = 0, meanXR2 = 0, meanYR2 = 0, meanXY = 0; //mean values
   double r2 = 0, x = 0, y = 0, x2 = 0, y2 = 0; // coords
   double weight;// weight of each hit, so far no difference in hit quality
-  double sumWeights = 0, divisor; // sumWeights is sum of weights, divisor is 1/sumWeights;
+  double sumWeights = 0, divisor, weightNormalizer = 0; // sumWeights is sum of weights, divisor is 1/sumWeights;
   double tuningParameter = 1.; //0.02; // this parameter is for internal tuning of the weights, since at the moment, the error seams highly overestimated at the moment. 1 means no influence of parameter.
 
   // looping over all hits and do the division afterwards
   for (PositionInfo * hit : *m_hits) {
-    weight = 1. / ((hit->sigmaX) * (hit->sigmaX) * tuningParameter);
-    B2DEBUG(100, " current hitSigma: " << hit->sigmaX << ", weight: " << weight)
+    weight = 1. / ((hit->sigmaV) * (hit->sigmaV) * tuningParameter);
+    B2DEBUG(100, " current hitSigma: " << hit->sigmaU << ", weight: " << weight)
     sumWeights += weight;
-    if (hit->sigmaX < stopper) B2FATAL("TrackletFilters::circleFit, chosen sigma is too small (is/threshold: " << hit->sigmaX << "/" << stopper << ")")
+    if (hit->sigmaV < stopper) B2FATAL("TrackletFilters::circleFit, chosen sigma is too small (is/threshold: " << hit->sigmaV << "/" << stopper << ")")
       x = hit->hitPosition.X();
     y = hit->hitPosition.Y();
     x2 = x * x;
@@ -184,7 +184,7 @@ double TrackletFilters::circleFit(double& clapPhi, double& clapR, double& radius
 
 
 
-std::pair<double, TVector3> TrackletFilters::helixFit(const std::vector<PositionInfo*>* hits, bool useBackwards)
+std::pair<double, TVector3> TrackletFilters::helixFit(const std::vector<PositionInfo*>* hits, bool useBackwards, double setMomentumMagnitude)
 {
   if (hits == NULL) { B2FATAL(" TrackletFilters::circleFit hits not set, therefore no calculation possible - please check that!") }
 
@@ -203,18 +203,19 @@ std::pair<double, TVector3> TrackletFilters::helixFit(const std::vector<Position
    * - implementing Info into tuning parameters
    * - detailed check whether results are okay
    * */
+
   double  x = 0, // current x variable
           y = 0,
           z = 0,
           varU = 0, // variance of U
-          varV = 0, // variance of V
+          varV = 0, // variance of V = xy-plane
 ///         phi = 0, // angle phi  // not used yet, but will be needed for some calculations which are not implemented yet
           r2 = 0, // radius^2
 //          tempRadius = 0,
 //          r = 0,
 ///         rPhi = 0,  // not used yet, but will be needed for some calculations which are not implemented yet
-          sumWeights = 0, // the sum of the weights U
-          inverseVarianceU = 0; // current inverse of variance U
+          sumWeights = 0, // the sum of the weights V
+          inverseVarianceV = 0; // current inverse of variance V
 
   TMatrixD inverseCovMatrix(nHits, nHits); // carries inverse of varU in its diagonal elements
   TMatrixD X(nHits, 3); // carries mapped hits, column 0 = x variables, column 1 = y variables, col 2 = r2 variables
@@ -236,18 +237,18 @@ std::pair<double, TVector3> TrackletFilters::helixFit(const std::vector<Position
     x = hit->hitPosition.X();
     y = hit->hitPosition.Y();
     z = hit->hitPosition.Z();
-    varU = hit->sigmaX;
-    varV = hit->sigmaY;
+    varU = hit->sigmaU;
+    varV = hit->sigmaV;
     invVarVvalues(index, 0) = 1. / varV;
-    B2DEBUG(10, "helixFit: hit.X(): " << hit->hitPosition.X() << ", hit.Y(): " << hit->hitPosition.Y() << ", hit.Z(): " << hit->hitPosition.Z() << ", hit.sigmaX: " << hit->sigmaX << ", hit.sigmaY: " << hit->sigmaY)
+    B2DEBUG(10, "helixFit: hit.X(): " << hit->hitPosition.X() << ", hit.Y(): " << hit->hitPosition.Y() << ", hit.Z(): " << hit->hitPosition.Z() << ", hit.sigmaU: " << varU << ", hit.sigmaV: " << varV)
 
 //    hitsFileStream << setprecision(14) << x << " " << y << " " << z << " " << varU << " " << varV << endl;
 ///   phi = atan2(y , x);  // not used yet, but will be needed for some calculations which are not implemented yet
     r2 = x * x + y * y;
 ///     rPhi = phi*sqrt(r2); // not used yet, but will be needed for some calculations which are not implemented yet
-    inverseVarianceU = 1. / varU;
-    sumWeights += inverseVarianceU;
-    inverseCovMatrix(index, index) = inverseVarianceU;
+    inverseVarianceV = 1. / varV; // v carries xy-info, u is for z
+    sumWeights += inverseVarianceV;
+    inverseCovMatrix(index, index) = inverseVarianceV;
     R2(index, 0) = r2;
     X(index, 0) = x;
     X(index, 1) = y;
@@ -456,7 +457,7 @@ std::pair<double, TVector3> TrackletFilters::helixFit(const std::vector<Position
 //     stringstream hitOutput;
 //     int i = 0;
 //     for (PositionInfo * hit : *m_hits) {
-//       hitOutput << " hit " << i << ": x/y/sigmaX/sigmaY: " << hit->hitPosition.X() << "/" << hit->hitPosition.Y() << "/" << hit->sigmaX << "/" << hit->sigmaY << endl;
+//       hitOutput << " hit " << i << ": x/y/sigmaU/sigmaV: " << hit->hitPosition.X() << "/" << hit->hitPosition.Y() << "/" << hit->sigmaU << "/" << hit->sigmaV << endl;
 //      ++i;
 //     }
 //     B2WARNING("helixFit: there was a 'nan'-value detected. The following hits were part of this TC: \n" << hitOutput.str())
@@ -512,7 +513,12 @@ std::pair<double, TVector3> TrackletFilters::helixFit(const std::vector<Position
   radialVector = radialVector - seedHit; // now it's the radialVector
   radialVector.SetZ(0.);
   double pT = m_3hitFilterBox.calcPt(rho);
-  TVector3 pVector = pT  * (radialVector.Orthogonal()).Unit(); // now it is the pT-Vector, therefore without pZ information
+  TVector3 pVector;
+  if (setMomentumMagnitude == 0) {
+    pVector = pT  * (radialVector.Orthogonal()).Unit(); // now it is the pT-Vector, therefore without pZ information
+  } else { // means we want to set the magnitude of the momentum artificially
+    pVector = setMomentumMagnitude * (radialVector.Orthogonal()).Unit(); // now it is the pT-Vector, therefore without pZ information
+  }
 
   /** local lambda-function used for checking TVector3s, whether there are nan values included, returns true, if there are */
   auto lambdaCheckVector4NAN = [](TVector3 & aVector) -> bool { /// testing c++11 lambda functions...
@@ -534,7 +540,7 @@ std::pair<double, TVector3> TrackletFilters::helixFit(const std::vector<Position
     stringstream hitOutput;
     int i = 0;
     for (PositionInfo * hit : *m_hits) {
-      hitOutput << " hit " << i << ": x/y/sigmaX/sigmaY: " << hit->hitPosition.X() << "/" << hit->hitPosition.Y() << "/" << hit->sigmaX << "/" << hit->sigmaY << endl;
+      hitOutput << " hit " << i << ": x/y/sigmaU/sigmaV: " << hit->hitPosition.X() << "/" << hit->hitPosition.Y() << "/" << hit->sigmaU << "/" << hit->sigmaV << endl;
       ++i;
     }
     B2DEBUG(1, "helixFit: there was a 'nan'-value detected. When using magnetic field of " << m_3hitFilterBox.getMagneticField() << ", the following hits were part of this TC: \n" << hitOutput.str() << "\n pVector  x/y/z: " << pVector.X() << "/" << pVector.Y() << "/" << pVector.Z())
@@ -544,7 +550,7 @@ std::pair<double, TVector3> TrackletFilters::helixFit(const std::vector<Position
 //    stringstream hitOutput;
 //     int i = 0;
 //     for (PositionInfo * hit : *m_hits) {
-//       hitOutput << " hit " << i << ": x/y/z/sigmaU/sigmaV: " << hit->hitPosition.X() << "/" << hit->hitPosition.Y() << "/" << hit->hitPosition.Z() << "/" << hit->sigmaX << "/" << hit->sigmaY << endl;
+//       hitOutput << " hit " << i << ": x/y/z/sigmaU/sigmaV: " << hit->hitPosition.X() << "/" << hit->hitPosition.Y() << "/" << hit->hitPosition.Z() << "/" << hit->sigmaU << "/" << hit->sigmaV << endl;
 //      ++i;
 //     }
 //     B2WARNING("helixFit: strange pVector (Mag="<<pVector.Mag()<< ") detected. The following hits were part of this TC: \n" << hitOutput.str() << "\n pVector  x/y/z: " << pVector.X()<<"/"<< pVector.Y()<<"/"<< pVector.Z())
@@ -689,20 +695,68 @@ std::pair<double, TVector3> TrackletFilters::helixFit(const std::vector<Position
 
 
 
-pair<double, TVector3> TrackletFilters::lineFit3D(const vector<PositionInfo*>* hits)
+pair<double, TVector3> TrackletFilters::simpleLineFit3D(const vector<PositionInfo*>* hits)
 {
+  /**
+   * Coords:   Sensors:
+   * ^        ./| ./| ./|
+   * |   ^    | | | | | |
+   * |Y /Z    | | | | | |
+   * |/       |/  |/  |/
+   * -------> X
+   *
+   * beam parallel to x. Measurement errors in y & z (v&u)
+   * With these conditions, the following approach using 2 independent 2D line fits is acceptable (if rotation is the same for all sensors)
+   * */
   double chi2 = 0;
   TVector3 directionVector;
-  TVector3 meanXYZ;
+  TVector3 meanVal; // xBar, yBar, zBar
+  double SSxy = 0, SSxz = 0, SSyy = 0, SSzz = 0; // sum of squares -> SSxy = Sum(x*y)^2 - n*xBar*yBar
+  double a = 0, b = 0, c = 0, d = 0; // parameters to be estimated (2 2D fits -> 4 parameters), x1 = a + b*y    x2 = d + c*z
+  double chi2xy = 0, chi2xz = 0; // two fits mean two chi2-values, later they can be added
   int nHits = hits->size();
 
   for (const PositionInfo * aHit : *hits) {
-    meanXYZ += aHit->hitPosition;
+    meanVal += aHit->hitPosition;
   }
-  meanXYZ *= (1. / double(nHits));
+  meanVal *= (1. / double(nHits));
+
+  for (const PositionInfo * aHit : *hits) {
+    SSxy += aHit->hitPosition.X() * aHit->hitPosition.Y();
+  }
+  for (const PositionInfo * aHit : *hits) {
+    SSxz += aHit->hitPosition.X() * aHit->hitPosition.Z();
+  }
+  for (const PositionInfo * aHit : *hits) {
+    SSyy += aHit->hitPosition.Y() * aHit->hitPosition.Y();
+  }
+  for (const PositionInfo * aHit : *hits) {
+    SSzz += aHit->hitPosition.Z() * aHit->hitPosition.Z();
+  }
+
+  SSxy -= nHits * meanVal.X() * meanVal.Y();
+  SSxz -= nHits * meanVal.X() * meanVal.Z();
+  SSyy -= nHits * meanVal.Y() * meanVal.Y();
+  SSzz -= nHits * meanVal.Z() * meanVal.Z();
+
+  // now we use the values from above to calculate parameters for the two 2D-fits:
+  b = SSxy / SSyy;
+  c = SSxz / SSzz;
+  a = meanVal.X() - b * meanVal.Y();
+  d = meanVal.X() - d * meanVal.Z();
+
+  // now calculating the chi2s independently...
+  for (const PositionInfo * aHit : *hits) {
+    chi2xy += (aHit->hitPosition.X() - a - b * aHit->hitPosition.Y()) * (aHit->hitPosition.X() - a - b * aHit->hitPosition.Y()) / aHit->sigmaU;
+  }
+
+  for (const PositionInfo * aHit : *hits) {
+    chi2xz += (aHit->hitPosition.Z() - d - c * aHit->hitPosition.Z()) * (aHit->hitPosition.Z() - d - c * aHit->hitPosition.Z()) / aHit->sigmaV;
+  }
 
   return make_pair(chi2, directionVector);
 }
+
 
 /*
  NOTE: old version for calculating momentum seed (maybe fallback?)

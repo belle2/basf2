@@ -35,8 +35,10 @@ namespace Belle2 {
 
         const VXD::SensorInfoBase& aSensorInfo = aGeometry.getSensorInfo(sensorID);
 
-        double sigmaU = aSensorInfo.getUPitch(0.); // error at center of sensor
-        TVector3 localError = TVector3(sigmaU, 0., 0.);
+//         double sigmaU = aSensorInfo.getUPitch(0.); // error at center of sensor /// WARNING ausgetauscht
+//        TVector3 localError = TVector3(sigmaU, 0., 0.);
+        double sigmaV = aSensorInfo.getVPitch(0.); // error at center of sensor
+        TVector3 localError = TVector3(0., sigmaV, 0.);
         TVector3 globalError = aSensorInfo.vectorToGlobal(localError);
 
         layerErrors.push_back(make_pair(globalError.X(), globalError.Y()));
@@ -65,8 +67,10 @@ namespace Belle2 {
       VxdID sensor = *sensors.begin();
       const VXD::SensorInfoBase& aSensorInfo = aGeometry.getSensorInfo(sensor);
 
-      double sigmaU = aSensorInfo.getUPitch(0.); // error at center of sensor
-      double sigmaV = aSensorInfo.getVPitch(0.); // error at center of sensor
+      double sigmaU = aSensorInfo.getUPitch(0.); // error at center of sensor  /// WARNING ausgetauscht
+      double sigmaV = aSensorInfo.getVPitch(0.); // error at center of sensor  /// WARNING ausgetauscht
+//      double sigmaV = aSensorInfo.getUPitch(0.); // error at center of sensor
+//       double sigmaU = aSensorInfo.getVPitch(0.); // error at center of sensor
       errorContainer.push_back(make_pair(sigmaU, sigmaV));
       B2DEBUG(5, " getHitErrors at layer " << layer << ", sigmaU/V" << sigmaU << "/" << sigmaV << " [unit cm?]")
     }

@@ -343,10 +343,10 @@ void FilterCalculatorModule::event()
   if (numOfMcParticles == 0) {
     B2WARNING("event " << m_eventCounter << ": there is no MCParticle!")
     return;
-  } else if (numOfPxdTrueHits == 0 && m_PARAMdetectorType not_eq Const::SVD) {
+  } else if (numOfPxdTrueHits == 0 && m_PARAMdetectorType not_eq Const::SVD) { // WARNING needs to be updated for telescope support
     B2WARNING("event " << m_eventCounter << ": there are no PXDTrueHits")
     return;
-  } else if (numOfSvdTrueHits == 0 && m_PARAMdetectorType not_eq Const::PXD) {
+  } else if (numOfSvdTrueHits == 0 && m_PARAMdetectorType not_eq Const::PXD) { // WARNING needs to be updated for telescope support
     B2WARNING("event " << m_eventCounter << ": there are no SVDTrueHits")
     return;
   }
@@ -476,7 +476,7 @@ void FilterCalculatorModule::event()
     TVector3 mcvertex = m_origin; /// we do not know the real vertex, therefore  we are storing the origin assumed by the setup!
     TVector3 mcmom = mcp->getMomentum();
     int mcPdg = mcp->getPDG();
-    VXDHit newHit(Const::IR, aSectorName, 0, mcvertex, mcmom, mcPdg);
+    VXDHit newHit(Const::IR, aSectorName, 0, mcvertex, mcmom, mcPdg, mcvertex, 0);
     newHit.setVertex();
     newTrack.setPt(mcmom.Perp()); // needed for dynamic classifying of sectormap
     newTrack.addHit(newHit); /// OPTIONAL: instead of attaching virtual hit only to track, it could be attached to tracklets, but in this case, a tracklet (curler) recognition using 2D-Filters has to be implemented
@@ -489,7 +489,7 @@ void FilterCalculatorModule::event()
     if (thisTrack.size() > 30) { B2INFO("event: " << m_eventCounter << " beware, tracklength is " << thisTrack.size()) }
     if (int (thisTrack.size()) > m_numOfLayers * 2) { m_longTrackCounter++; }
     for (VXDHit & hit : thisTrack) {
-      B2DEBUG(20, "track has a hit in the following sector: " << hit.getSectorID())
+      B2DEBUG(20, "track has a hit in sector: " << hit.getSectorID())
     }
     int thisUniID, friendUniID;
     list<VXDHit>::reverse_iterator riter, oldRiter;
@@ -590,7 +590,7 @@ void FilterCalculatorModule::event()
 
 
         if (countedFails > 0) {   // such strange tracks are extremely uncommon and wont be able to be reconstructed anyway, therefore they will be neglected anyway
-          B2ERROR("FilterCalculatorModule event " << m_eventCounter << ": tracklet with pID: " << newTracklet.getParticleID() << ", has now following entries:")
+          B2ERROR("FilterCalculatorModule event " << m_eventCounter << ": tracklet failed with pID: " << newTracklet.getParticleID() << ", has now following entries:")
           string values;
           for (VXDHit & hit : hitList) {
             values += hit.getSectorID() + " ";
@@ -1253,10 +1253,11 @@ bool FilterCalculatorModule::createSectorAndHit(Belle2::Const::EDetector detecto
   } //sector-searching loop
 
   if (aLayerID <= m_PARAMhighestAllowedLayer) {
-    VXDHit newHit(detectorID, aSectorName, aUniID, hitGlobal, pGlobal, pdg);
+    VXDHit newHit(detectorID, aSectorName, aUniID, hitGlobal, pGlobal, pdg, getOrigin(), aSiTrueHitPtr->getGlobalTime());
 //    newHit.setTrueHit(aSiTrueHitPtr);
     newTrack.addHit(newHit);
     success = true;
+    B2DEBUG(11, "newHit addet to track. secID: " << aSectorName << ", detectorID: " << detectorID << ", timeStamp: " << aSiTrueHitPtr->getGlobalTime())
 
     if (m_PARAManalysisWriteToRoot == true /*and m_PARAMstoreExtraAnalysis == true*/) {
       if (aLayerID == 1) {

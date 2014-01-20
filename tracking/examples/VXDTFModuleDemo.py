@@ -13,11 +13,8 @@ initialValue = 2
 secSetup = ['sectorList_evtNormSecHIGH_SVD', 'sectorList_evtNormSecMED_SVD',
             'sectorList_evtNormSecLOW_SVD']
 
-# secSetup = ['evtGenStdVXD-moreThan350MeV_VXD', 'evtGenStdVXD-100to350MeV_VXD',
-            # 'evtGenStdVXD-30to100MeV_VXD']
-
 # secSetup = ['sectorList_evtNormSecHIGH_VXD', 'sectorList_evtNormSecMED_VXD', 'sectorList_evtNormSecLOW_VXD']
-# WARNING if you want to use SVD only, please uncomment secSetup ending with SVD, then comment the VXD-version - and don't forget to set the clusters for the detector type you want in the TrackFinderMCTruth down below!
+# WARNING if you want to use SVD only, please uncomment secSetup ending with SVD, then comment the VXD-version (of vice versa if you want to have the svd version)
 
 print 'running {events:} events, Seed {theSeed:} - evtGen No BG'.format(events=numEvents,
         theSeed=initialValue)
@@ -58,9 +55,13 @@ g4sim.param('StoreAllSecondaries', True)
 vxdtf = register_module('VXDTF')
 vxdtf.logging.log_level = LogLevel.DEBUG
 vxdtf.logging.debug_level = 1
-param_vxdtf = {'sectorSetup': secSetup}
+param_vxdtf = {'sectorSetup': secSetup, 'GFTrackCandidatesColName': 'caTracks'}
 # , 'calcQIType': 'kalman'
 vxdtf.param(param_vxdtf)
+
+# VXDTF DQM module
+vxdtf_dqm = register_module('VXDTFDQM')
+vxdtf_dqm.param('GFTrackCandidatesColName', 'caTracks')
 
 track_finder_mc_truth = register_module('TrackFinderMCTruth')
 track_finder_mc_truth.logging.log_level = LogLevel.INFO
@@ -75,6 +76,12 @@ param_track_finder_mc_truth = {
     }
 track_finder_mc_truth.param(param_track_finder_mc_truth)
 
+trackfitter = register_module('GenFitter')
+# trackfitter.logging.log_level = LogLevel.WARNING
+trackfitter.param('GFTrackCandidatesColName', 'caTracks')
+trackfitter.param('FilterId', 'Kalman')
+trackfitter.param('UseClusters', True)
+
 eventCounter = register_module('EventCounter')
 eventCounter.logging.log_level = LogLevel.INFO
 eventCounter.param('stepSize', 25)
@@ -82,12 +89,14 @@ eventCounter.param('stepSize', 25)
 analyzer = register_module('TFAnalizer')
 analyzer.logging.log_level = LogLevel.INFO
 analyzer.logging.debug_level = 11
-param_analyzer = {'printExtentialAnalysisData': False}
+param_analyzer = {'printExtentialAnalysisData': False, 'caTCname': 'caTracks'}
 analyzer.param(param_analyzer)
 
 # Create paths
 main = create_path()
-
+histo = register_module('HistoManager')
+histo.param('histoFileName', 'DQM-VXDTFdemo.root')  # File to save histograms
+main.add_module(histo)
 # Add modules to paths
 
 # main.add_module(inputM)
@@ -105,6 +114,8 @@ main.add_module(eventCounter)
 main.add_module(vxdtf)
 main.add_module(track_finder_mc_truth)
 main.add_module(analyzer)
+main.add_module(trackfitter)
+main.add_module(vxdtf_dqm)
 # Process events
 process(main)
 

@@ -83,7 +83,7 @@ namespace Belle2 {
     for (TVector3 & hit : highPtMaxi) {
       PositionInfo posInfo;
       posInfo.hitPosition = hit;
-      posInfo.sigmaX = sigma;
+      posInfo.sigmaU = sigma;
       tempMaxiStuff.push_back(posInfo);
     }
     for (PositionInfo & hit : tempMaxiStuff) {
@@ -93,7 +93,7 @@ namespace Belle2 {
     for (TVector3 & hit : highPtMini) {
       PositionInfo posInfo;
       posInfo.hitPosition = hit;
-      posInfo.sigmaX = sigma;
+      posInfo.sigmaU = sigma;
       tempMiniStuff.push_back(posInfo);
     }
     for (PositionInfo & hit : tempMiniStuff) {
@@ -112,7 +112,7 @@ namespace Belle2 {
     for (TVector3 & hit : testVector) {
       PositionInfo posInfo;
       posInfo.hitPosition = hit;
-      posInfo.sigmaX = sigma;
+      posInfo.sigmaU = sigma;
       tempTestStuff.push_back(posInfo);
     }
     for (PositionInfo & hit : tempTestStuff) {
@@ -171,8 +171,8 @@ namespace Belle2 {
     for (TVector3 & hit : hits) {
       PositionInfo posInfo;
       posInfo.hitPosition = hit;
-      posInfo.sigmaX = 0.001;
-      posInfo.sigmaY = 0.001;
+      posInfo.sigmaU = 0.001;
+      posInfo.sigmaV = 0.001;
 
       myfile << hit.X() << " " << hit.Y() << " " << hit.Z() << " " << 0.001 << " " << 0.001 << endl;
 
@@ -221,28 +221,28 @@ namespace Belle2 {
     /// testing realistic values of b2fw:
 //    PositionInfo pos1, pos2, pos3, pos4, pos5, pos6;
 //    pos1.hitPosition = TVector3(4.30225,-9.65892,-1.448);
-//     pos1.sigmaX = 0.00201488;
-//     pos1.sigmaY = 0.0005161;
+//     pos1.sigmaU = 0.00201488;
+//     pos1.sigmaV = 0.0005161;
 //
 //    pos2.hitPosition = TVector3(3.64093,-13.1215,-6.748);
-//     pos2.sigmaX = 0.00168024;
-//     pos2.sigmaY = 0.000568051;
+//     pos2.sigmaU = 0.00168024;
+//     pos2.sigmaV = 0.000568051;
 //
 //    pos3.hitPosition = TVector3(4.03147,-6.97929,3.244);
-//     pos3.sigmaX = 0.00161568;
-//     pos3.sigmaY = 0.00188476;
+//     pos3.sigmaU = 0.00161568;
+//     pos3.sigmaV = 0.00188476;
 //
 //    pos4.hitPosition = TVector3(1.90634,-3.32975,-3.4);
-//     pos4.sigmaX = 0.0100725;
-//     pos4.sigmaY = 0.000319435;
+//     pos4.sigmaU = 0.0100725;
+//     pos4.sigmaV = 0.000319435;
 //
 //    pos5.hitPosition = TVector3(1.32762,-1.76951,-1.21305);
-//     pos5.sigmaX = 0.000644498;
-//     pos5.sigmaY = 0.00109565;
+//     pos5.sigmaU = 0.000644498;
+//     pos5.sigmaV = 0.00109565;
 //
 //    pos6.hitPosition = TVector3(1.17998,-0.805218,-0.88255);
-//     pos6.sigmaX = 0.000683021;
-//     pos6.sigmaY = 0.000819625;
+//     pos6.sigmaU = 0.000683021;
+//     pos6.sigmaV = 0.000819625;
   }
 
 
@@ -321,32 +321,32 @@ namespace Belle2 {
     TVector3 hit = TVector3(-6.516, -1.05416, 0.134742);
     PositionInfo posInfo;
     posInfo.hitPosition = hit;
-    posInfo.sigmaX = 0.0160026;
-    posInfo.sigmaY = 0.0112734;
+    posInfo.sigmaU = 0.0160026;
+    posInfo.sigmaV = 0.0112734;
     tbadVec1.push_back(posInfo);
-    HitInfos << hit.X() << " " << hit.Y() << " " << hit.Z() << " " << posInfo.sigmaX << " " <<  posInfo.sigmaY << endl;
+    HitInfos << hit.X() << " " << hit.Y() << " " << hit.Z() << " " << posInfo.sigmaU << " " <<  posInfo.sigmaV << endl;
 
     hit.SetXYZ(-3.516, -0.986426, 0.14058);
     posInfo.hitPosition = hit;
-    posInfo.sigmaX = 0.0160026;
-    posInfo.sigmaY = 0.0112734;
+    posInfo.sigmaU = 0.0160026;
+    posInfo.sigmaV = 0.0112734;
     tbadVec1.push_back(posInfo);
-    HitInfos << hit.X() << " " << hit.Y() << " " << hit.Z() << " " << posInfo.sigmaX << " " <<  posInfo.sigmaY << endl;
+    HitInfos << hit.X() << " " << hit.Y() << " " << hit.Z() << " " << posInfo.sigmaU << " " <<  posInfo.sigmaV << endl;
 
 //   pVector  x/y/z: -15.0774/-0.319219/0.0254473  { module: VXDTF }
     hit.SetXYZ(-1.016, -0.930059, 0.142918);
     posInfo.hitPosition = hit;
-    posInfo.sigmaX = 0.0160026;
-    posInfo.sigmaY = 0.0112734;
+    posInfo.sigmaU = 0.0160026;
+    posInfo.sigmaV = 0.0112734;
     tbadVec1.push_back(posInfo);
-    HitInfos << hit.X() << " " << hit.Y() << " " << hit.Z() << " " << posInfo.sigmaX << " " <<  posInfo.sigmaY << endl;
+    HitInfos << hit.X() << " " << hit.Y() << " " << hit.Z() << " " << posInfo.sigmaU << " " <<  posInfo.sigmaV << endl;
 
     hit.SetXYZ(3.184, -0.839871, 0.14732);
     posInfo.hitPosition = hit;
-    posInfo.sigmaX = 0.0160026;
-    posInfo.sigmaY = 0.0112734;
+    posInfo.sigmaU = 0.0160026;
+    posInfo.sigmaV = 0.0112734;
     tbadVec1.push_back(posInfo);
-    HitInfos << hit.X() << " " << hit.Y() << " " << hit.Z() << " " << posInfo.sigmaX << " " <<  posInfo.sigmaY << endl;
+    HitInfos << hit.X() << " " << hit.Y() << " " << hit.Z() << " " << posInfo.sigmaU << " " <<  posInfo.sigmaV << endl;
     B2INFO("badVec1: " << HitInfos.str() << endl)
 
     for (int i = 0; i < int(tbadVec1.size()); ++i) { badVec1.push_back(&(tbadVec1.at(i))); }
@@ -366,27 +366,27 @@ namespace Belle2 {
     HitInfos1 << "bad p: " << 258.543 << "\n";
     hit.SetXYZ(-6.516, -1.05416, 0.134742);
     posInfo.hitPosition = hit;
-    posInfo.sigmaX = 0.0160026;
-    posInfo.sigmaY = 0.0112734;
+    posInfo.sigmaU = 0.0160026;
+    posInfo.sigmaV = 0.0112734;
     tbadVec2.push_back(posInfo);
-    HitInfos1 << hit.X() << " " << hit.Y() << " " << hit.Z() << " " << posInfo.sigmaX << " " <<  posInfo.sigmaY << endl;
+    HitInfos1 << hit.X() << " " << hit.Y() << " " << hit.Z() << " " << posInfo.sigmaU << " " <<  posInfo.sigmaV << endl;
 //    [WARNING] helixFit: strange pVector (Mag=258.543) detected. The following hits were part of this TC:
 
 //  pVector  x/y/z: -258.477/-5.82419/0.388155  { module: VXDTF }
 
     hit.SetXYZ(-3.516, -0.986426, 0.14058);
     posInfo.hitPosition = hit;
-    posInfo.sigmaX = 0.0160026;
-    posInfo.sigmaY = 0.0112734;
+    posInfo.sigmaU = 0.0160026;
+    posInfo.sigmaV = 0.0112734;
     tbadVec2.push_back(posInfo);
-    HitInfos1 << hit.X() << " " << hit.Y() << " " << hit.Z() << " " << posInfo.sigmaX << " " <<  posInfo.sigmaY << endl;
+    HitInfos1 << hit.X() << " " << hit.Y() << " " << hit.Z() << " " << posInfo.sigmaU << " " <<  posInfo.sigmaV << endl;
 
     hit.SetXYZ(-1.016, -0.930059, 0.142918);
     posInfo.hitPosition = hit;
-    posInfo.sigmaX = 0.0160026;
-    posInfo.sigmaY = 0.0112734;
+    posInfo.sigmaU = 0.0160026;
+    posInfo.sigmaV = 0.0112734;
     tbadVec2.push_back(posInfo);
-    HitInfos1 << hit.X() << " " << hit.Y() << " " << hit.Z() << " " << posInfo.sigmaX << " " <<  posInfo.sigmaY << endl;
+    HitInfos1 << hit.X() << " " << hit.Y() << " " << hit.Z() << " " << posInfo.sigmaU << " " <<  posInfo.sigmaV << endl;
 
     B2INFO("badVec2: " << HitInfos1.str() << endl)
 
@@ -407,26 +407,26 @@ namespace Belle2 {
     HitInfos2 << "bad p: " << 25.2143 << "\n";
     hit.SetXYZ(-6.516, -1.00897, 0.314466);
     posInfo.hitPosition = hit;
-    posInfo.sigmaX = 0.0160026;
-    posInfo.sigmaY = 0.0112734;
+    posInfo.sigmaU = 0.0160026;
+    posInfo.sigmaV = 0.0112734;
     tbadVec3.push_back(posInfo);
-    HitInfos2 << hit.X() << " " << hit.Y() << " " << hit.Z() << " " << posInfo.sigmaX << " " <<  posInfo.sigmaY << endl;
+    HitInfos2 << hit.X() << " " << hit.Y() << " " << hit.Z() << " " << posInfo.sigmaU << " " <<  posInfo.sigmaV << endl;
 //    [WARNING] helixFit: strange pVector (Mag=25.2143) detected. The following hits were part of this TC:
 //  pVector  x/y/z: -25.208/-0.563156/-0.0166426  { module: VXDTF }
 
     hit.SetXYZ(-3.516, -0.943345, 0.313504);
     posInfo.hitPosition = hit;
-    posInfo.sigmaX = 0.0160026;
-    posInfo.sigmaY = 0.0112734;
+    posInfo.sigmaU = 0.0160026;
+    posInfo.sigmaV = 0.0112734;
     tbadVec3.push_back(posInfo);
-    HitInfos2 << hit.X() << " " << hit.Y() << " " << hit.Z() << " " << posInfo.sigmaX << " " <<  posInfo.sigmaY << endl;
+    HitInfos2 << hit.X() << " " << hit.Y() << " " << hit.Z() << " " << posInfo.sigmaU << " " <<  posInfo.sigmaV << endl;
 
     hit.SetXYZ(-1.016, -0.887857, 0.310771);
     posInfo.hitPosition = hit;
-    posInfo.sigmaX = 0.0160026;
-    posInfo.sigmaY = 0.0112734;
+    posInfo.sigmaU = 0.0160026;
+    posInfo.sigmaV = 0.0112734;
     tbadVec3.push_back(posInfo);
-    HitInfos2 << hit.X() << " " << hit.Y() << " " << hit.Z() << " " << posInfo.sigmaX << " " <<  posInfo.sigmaY << endl;
+    HitInfos2 << hit.X() << " " << hit.Y() << " " << hit.Z() << " " << posInfo.sigmaU << " " <<  posInfo.sigmaV << endl;
 
     B2INFO("badVec3: " << HitInfos2.str() << endl)
 
@@ -451,26 +451,26 @@ namespace Belle2 {
     HitInfos3 << "\n bad p: " << 14.8262 << "\n";
     hit.SetXYZ(-6.516, -0.575024, 0.326773);
     posInfo.hitPosition = hit;
-    posInfo.sigmaX = 0.0160026;
-    posInfo.sigmaY = 0.0112734;
+    posInfo.sigmaU = 0.0160026;
+    posInfo.sigmaV = 0.0112734;
     tbadVec4.push_back(posInfo);
-    HitInfos3 << hit.X() << " " << hit.Y() << " " << hit.Z() << " " << posInfo.sigmaX << " " <<  posInfo.sigmaY << endl;
+    HitInfos3 << hit.X() << " " << hit.Y() << " " << hit.Z() << " " << posInfo.sigmaU << " " <<  posInfo.sigmaV << endl;
 //    [WARNING] helixFit: strange pVector (Mag=) detected. The following hits were part of this TC:
 //  pVector  x/y/z: -14.8227/-0.318451/-0.000269897  { module: VXDTF }
     hit.SetXYZ(-3.516, -0.512941, 0.325116);
     posInfo.hitPosition = hit;
-    posInfo.sigmaX = 0.0160026;
-    posInfo.sigmaY = 0.0112734;
+    posInfo.sigmaU = 0.0160026;
+    posInfo.sigmaV = 0.0112734;
     tbadVec4.push_back(posInfo);
-    HitInfos3 << hit.X() << " " << hit.Y() << " " << hit.Z() << " " << posInfo.sigmaX << " " <<  posInfo.sigmaY << endl;
+    HitInfos3 << hit.X() << " " << hit.Y() << " " << hit.Z() << " " << posInfo.sigmaU << " " <<  posInfo.sigmaV << endl;
 
     hit.SetXYZ(-1.016, -0.459848, 0.326773);
     posInfo.hitPosition = hit;
-    posInfo.sigmaX = 0.0160026;
-    posInfo.sigmaY = 0.0112734;
+    posInfo.sigmaU = 0.0160026;
+    posInfo.sigmaV = 0.0112734;
     tbadVec4.push_back(posInfo);
 
-    HitInfos3 << hit.X() << " " << hit.Y() << " " << hit.Z() << " " << posInfo.sigmaX << " " <<  posInfo.sigmaY << endl;
+    HitInfos3 << hit.X() << " " << hit.Y() << " " << hit.Z() << " " << posInfo.sigmaU << " " <<  posInfo.sigmaV << endl;
     B2INFO("badVec4: " << HitInfos3.str() << endl)
 
     for (int i = 0; i < int(tbadVec4.size()); ++i) { badVec4.push_back(&(tbadVec4.at(i))); }
@@ -490,25 +490,25 @@ namespace Belle2 {
     HitInfos4 << "bad p: " << 337657 << "\n";
     hit.SetXYZ(-6.516, -0.930059, -0.153305);
     posInfo.hitPosition = hit;
-    posInfo.sigmaX = 0.0160026;
-    posInfo.sigmaY = 0.0112734;
+    posInfo.sigmaU = 0.0160026;
+    posInfo.sigmaV = 0.0112734;
     tbadVec5.push_back(posInfo);
-    HitInfos4 << hit.X() << " " << hit.Y() << " " << hit.Z() << " " << posInfo.sigmaX << " " <<  posInfo.sigmaY << endl;
+    HitInfos4 << hit.X() << " " << hit.Y() << " " << hit.Z() << " " << posInfo.sigmaU << " " <<  posInfo.sigmaV << endl;
 //    [WARNING] helixFit: strange pVector (Mag=) detected. The following hits were part of this TC:
 //  pVector  x/y/z: -337570/-7611.14/906.841  { module: VXDTF }
     hit.SetXYZ(-3.516, -0.862418, -0.143971);
     posInfo.hitPosition = hit;
-    posInfo.sigmaX = 0.0160026;
-    posInfo.sigmaY = 0.0112734;
+    posInfo.sigmaU = 0.0160026;
+    posInfo.sigmaV = 0.0112734;
     tbadVec5.push_back(posInfo);
-    HitInfos4 << hit.X() << " " << hit.Y() << " " << hit.Z() << " " << posInfo.sigmaX << " " <<  posInfo.sigmaY << endl;
+    HitInfos4 << hit.X() << " " << hit.Y() << " " << hit.Z() << " " << posInfo.sigmaU << " " <<  posInfo.sigmaV << endl;
 
     hit.SetXYZ(-1.016, -0.806051, -0.137302);
     posInfo.hitPosition = hit;
-    posInfo.sigmaX = 0.0160026;
-    posInfo.sigmaY = 0.0112734;
+    posInfo.sigmaU = 0.0160026;
+    posInfo.sigmaV = 0.0112734;
     tbadVec5.push_back(posInfo);
-    HitInfos4 << hit.X() << " " << hit.Y() << " " << hit.Z() << " " << posInfo.sigmaX << " " <<  posInfo.sigmaY << endl;
+    HitInfos4 << hit.X() << " " << hit.Y() << " " << hit.Z() << " " << posInfo.sigmaU << " " <<  posInfo.sigmaV << endl;
 
     B2INFO("badVec5: " << HitInfos4.str() << endl)
 

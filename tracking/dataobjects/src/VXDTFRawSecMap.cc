@@ -404,7 +404,7 @@ void VXDTFRawSecMap::addDistances(SectorDistancesMap& aMap)
   bool entryFound = false;
   for (SectorDistance aMapEntry : aMap) {
     for (SectorDistance oldMapEntry : m_dist2OriginMap) {
-      B2WARNING(" aMapEntry f/s: " << aMapEntry.first << "/" << aMapEntry.second << ", oldMapEntry f/s: " << oldMapEntry.first << "/" << oldMapEntry.second)
+//       B2WARNING(" aMapEntry f/s: " << aMapEntry.first << "/" << aMapEntry.second << ", oldMapEntry f/s: " << oldMapEntry.first << "/" << oldMapEntry.second)
       if (aMapEntry == oldMapEntry) { entryFound = true; break; }
     }
 
@@ -413,7 +413,7 @@ void VXDTFRawSecMap::addDistances(SectorDistancesMap& aMap)
   }
 
   B2DEBUG(1, "addDistances: " << m_dist2OriginMap.size() - oldSize << " entries were imported")
-  for (SectorDistance aMapEntry : m_dist2OriginMap) {
-    B2WARNING("after import: m_dist2OriginMap.Entry f/s: " << aMapEntry.first << "/" << aMapEntry.second)
-  }
+//   for (SectorDistance aMapEntry : m_dist2OriginMap) {
+//     B2WARNING("after import: m_dist2OriginMap.Entry f/s: " << aMapEntry.first << "/" << aMapEntry.second)
+//   }
 }

@@ -68,7 +68,7 @@ namespace Belle2 {
     } // if you do not want to have the coordinates of the point of closest approach, use this one
 
     /** does a complete helixFit of the given hits */
-    std::pair<double, TVector3> helixFit(const std::vector<PositionInfo*>* hits, bool useBackwards = false);
+    std::pair<double, TVector3> helixFit(const std::vector<PositionInfo*>* hits, bool useBackwards = false, double setMomentumMagnitude = 0);
 
     /** using paper "Helix fitting by an extended Riemann fit" from R. Frühwirth, (Nucl.Instr.and Meth. in Physics Research, A490 (2002), Elsevier) does a full fit onto a helix and calculates the chi2 value (.first) including the momentum vector (.second) */
     std::pair<double, TVector3> helixFit() { return helixFit(m_hits); }
@@ -76,11 +76,11 @@ namespace Belle2 {
     /** using paper "Effective circle fitting for particle trajectories" from V. Karimäki (Nucl.Instr.and Meth. in Physics Research, A305 (1991), Elsevier) to calculate chi2-value of a circle including these hits. Return value is chi2, input parameters are the future r-phi-coordinates of clap (closest approach of fitted circle to origin), which will be calculated during process */
     double circleFit(double& clapPhi, double& clapR, double& radius);
 
-    /** a straight line fit in 3D calculating a direction for a seed value. The return values are chi2 (.first) and direction vector (.second, similar to momentum vector of the helixFit) */
-    std::pair<double, TVector3> lineFit3D() { return lineFit3D(m_hits); }
+    /** a straight line fit for 3D coordinates (in fact, it is using 2 2D-Fits and ignores covariances (due to nonparallel and nonrotated sensors) and only expects errors in 1D per 2D-fit) calculating a direction for a seed value. The return values are chi2 (.first) and direction vector (.second, similar to momentum vector of the helixFit) */
+    std::pair<double, TVector3> simpleLineFit3D() { return simpleLineFit3D(m_hits); }
 
     /** straight line fits expecting the hits stored in a vector of PositionInfo */
-    std::pair<double, TVector3> lineFit3D(const std::vector<PositionInfo*>* hits);
+    std::pair<double, TVector3> simpleLineFit3D(const std::vector<PositionInfo*>* hits);
 
     /** producing a reasonable guess for the pT of the tracklet */
     double calcPt() {
@@ -90,7 +90,7 @@ namespace Belle2 {
     }
 
     /** calculates the momentum vector on first or last hitPosition in the hitVector. This means, you can define the hit to be chosen by two ways: fast: if useBackwards = true, then the first hit in the hitList is taken (check VXDTrackCandidate.h for the sequence of hits), if useBackwards = false, the last hit will be taken. The second method means that you have to sort your hits beforehand and therefore you can place the hit of your choice in the front or back-position... Return values: .first: Momentum-vector of seed, .second, sign-curvature */
-    std::pair<TVector3, int> calcMomentumSeed(bool useBackwards = false);
+    std::pair<TVector3, int> calcMomentumSeed(bool useBackwards = false, double setMomentumMagnitude = 0);
 
   protected:
 

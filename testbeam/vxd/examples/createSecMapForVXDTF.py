@@ -118,7 +118,7 @@ print ''
 
 setupFileNamevxd = setupFileName + 'VXD'
 filterCalc = register_module('FilterCalculator')
-filterCalc.logging.log_level = LogLevel.DEBUG
+filterCalc.logging.log_level = LogLevel.INFO
 filterCalc.logging.debug_level = 10
 param_fCalc = {  # -1 = VXD, 0 = PXD, 1 = SVD
                  # # completely different to values of Belle2-detector
@@ -130,8 +130,8 @@ param_fCalc = {  # -1 = VXD, 0 = PXD, 1 = SVD
     'highestAllowedLayer': 6,
     'sectorConfigU': secConfigU,
     'sectorConfigV': secConfigV,
-    'setOrigin': [gun_x_position * 0.25, 0., 0.],
-    'magneticFieldStrength': 0.975,
+    'setOrigin': [gun_x_position * 0.4, 0., 0.],
+    'magneticFieldStrength': 0.01,
     'testBeam': 1,
     'secMapWriteToRoot': 1,
     'secMapWriteToAscii': 0,
@@ -145,7 +145,7 @@ filterCalc.param(param_fCalc)
 
 setupFileNamesvd = setupFileName + 'SVD'
 filterCalc2 = register_module('FilterCalculator')
-filterCalc2.logging.log_level = LogLevel.DEBUG
+filterCalc2.logging.log_level = LogLevel.INFO
 filterCalc2.logging.debug_level = 10
 param_fCalc2 = {  # -1 = VXD, 0 = PXD, 1 = SVD
                   # # completely different to values of Belle2-detector
@@ -158,8 +158,8 @@ param_fCalc2 = {  # -1 = VXD, 0 = PXD, 1 = SVD
     'highestAllowedLayer': 6,
     'sectorConfigU': secConfigU,
     'sectorConfigV': secConfigV,
-    'setOrigin': [gun_x_position * 0.25, 0., 0.],
-    'magneticFieldStrength': 0.975,
+    'setOrigin': [gun_x_position * 0.4, 0., 0.],
+    'magneticFieldStrength': 0.01,
     'testBeam': 1,
     'secMapWriteToRoot': 1,
     'secMapWriteToAscii': 0,

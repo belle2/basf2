@@ -111,13 +111,15 @@ vxdtf.logging.debug_level = 2
 param_vxdtf = {  # normally we don't know the particleID, but in the case of the testbeam,
                  # we can expect (anti-?)electrons...
                  # True
-    'activateBaselineTF': 2,
+                 # 'artificialMomentum': 5., ## uncomment if there is no magnetic field!
+    'activateBaselineTF': 1,
     'tccMinState': [2],
     'tccMinLayer': [3],
     'standardPdgCode': -11,
     'sectorSetup': secSetup,
     'calcQIType': qiType,
     'killEventForHighOccupancyThreshold': 75,
+    'highOccupancyThreshold': 85,
     'cleanOverlappingSet': False,
     'filterOverlappingTCs': filterOverlaps,
     'TESTERexpandedTestingRoutines': True,
@@ -151,6 +153,10 @@ param_vxdtf = {  # normally we don't know the particleID, but in the case of the
     }
 vxdtf.param(param_vxdtf)
 
+# VXDTF DQM module
+vxdtf_dqm = register_module('VXDTFDQM')
+vxdtf_dqm.param('GFTrackCandidatesColName', 'caTracks')
+
 analyzer = register_module('TFAnalizer')
 analyzer.logging.log_level = LogLevel.INFO
 analyzer.logging.debug_level = 1
@@ -183,6 +189,9 @@ eventCounter.param('stepSize', 25)
 
 # Create paths
 main = create_path()
+histo = register_module('HistoManager')
+histo.param('histoFileName', 'vxdtfTBdemoHist.root')  # File to save histograms
+main.add_module(histo)
 # Add modules to paths
 main.add_module(eventinfosetter)
 main.add_module(eventinfoprinter)
@@ -199,7 +208,7 @@ main.add_module(mctrackfinder)
 main.add_module(analyzer)
 main.add_module(trackfitter)
 main.add_module(eventCounter)
-
+main.add_module(vxdtf_dqm)
 # Process events
 process(main)
 

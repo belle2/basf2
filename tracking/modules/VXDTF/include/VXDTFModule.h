@@ -329,10 +329,11 @@ namespace Belle2 {
 
 
     /** general Function to write data into a root file*/
-    void writeToRootFile(double pValue, double chi2, int ndf) {
+    void writeToRootFile(double pValue, double chi2, double circleRadius, int ndf) {
       if (m_PARAMwriteToRoot == true) {
         m_rootPvalues = pValue;
         m_rootChi2 = chi2;
+        m_rootCircleRadius = circleRadius;
         m_rootNdf = ndf;
         m_treeTrackWisePtr->Fill();
       }
@@ -456,6 +457,7 @@ namespace Belle2 {
 
 
     int m_PARAMpdGCode; /**< tandard value is 211 (pi+), ATTENTION, instead of using inconsistent sign of PdGList, in this module positively charged particles are always positive and negatively charged ones are negative (relevant for leptons) */
+    double m_PARAMartificialMomentum; /**< "standard value is 0. if StandardValue is changed to a nonZero value, the magnitude of the momentum seed is set artificially using this value, if value < 0, not only the magnitude is set using the norm of the value, but direction of momentum is reversed too, if you want to change charge, use parameter 'standardPdgCode'"*/
 
     LittleHelper m_littleHelperBox; /**< bundles small but often used functions for smearing and others.  */
 
@@ -502,10 +504,12 @@ namespace Belle2 {
     long long int m_rootTimeConsumption; /**< used for storing duration of event in a root file */
     double m_rootPvalues; /**< used for storing pValues in a root file */
     double m_rootChi2; /**< used for storing chi2values in a root file */
+    double m_rootCircleRadius; /**< used for storing the circle radii calculated by the circle fitter in a root file */
     int m_rootNdf; /**< used for storing numbers of degrees of freedom in a root file */
-    std::vector<double>  m_rootVecPvalues; /**< used for storing grouped pValues in a root file */
-    std::vector<double> m_rootVecChi2; /**< used for storing grouped chi2values in a root file */
-    std::vector<int> m_rootVecNdf; /**< used for storing grouped numbers of degrees of freedom in a root file */
+//     std::vector<double>  m_rootVecPvalues; /**< used for storing grouped pValues in a root file */
+//     std::vector<double> m_rootVecChi2; /**< used for storing grouped chi2values in a root file */
+//     std::vector<double> m_rootVecCircleRadius; /**< used for storing grouped CircleRadius-values in a root file */
+//     std::vector<int> m_rootVecNdf; /**< used for storing grouped numbers of degrees of freedom in a root file */
 
     std::string m_PARAMcalcQIType; /**< allows you to chose the way, the QI's of the TC's shall be calculated. currently supported: 'kalman','trackLength', 'circleFit' */
     int m_calcQiType; /**< is set by m_PARAMcalcQIType and defines which qi type shall be calculated */

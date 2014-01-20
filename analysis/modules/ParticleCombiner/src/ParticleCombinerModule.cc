@@ -52,9 +52,8 @@ namespace Belle2 {
     vector<string> defaultList;
     addParam("InputListNames", m_inputListNames, "list of input particle list names",
              defaultList);
-    addParam("MassCutLow", m_massCutLow, "[GeV] lower mass cut", 0.0);
-    addParam("MassCutHigh", m_massCutHigh, "[GeV] upper mass cut", 100.0);
-    std::map<std::string, std::vector<double>> defaultMap;
+    addParam("MassCut", m_massCut, "[GeV] tuple of lower and upper mass cut", std::make_tuple(0.0, 100.0));
+    std::map<std::string, std::tuple<double, double>> defaultMap;
     addParam("cutsOnProduct", m_productCuts, "Map of Variable and Cut Values. Cuts are performed on the product of the variable value of all daughter particles.", defaultMap);
     addParam("cutsOnSum", m_sumCuts, "Map of Variable and Cut Values. Cuts are performed on the sum of the variable value of all daughter particles.", defaultMap);
     addParam("persistent", m_persistent,
@@ -179,6 +178,10 @@ namespace Belle2 {
 
     unordered_set<boost::dynamic_bitset<> > indexStack;
 
+    double massCutLow = 0.0;
+    double massCutHigh = 0.0;
+    std::tie(massCutLow, massCutHigh) = m_massCut;
+
     // N nested loops
 
     for (int loop = 0; loop < nLoop; loop++) {
@@ -206,7 +209,8 @@ namespace Belle2 {
         vec = vec + particleStack[i]->get4Vector();
       }
       double mass = vec.M();
-      if (mass < m_massCutLow || mass > m_massCutHigh) continue;
+
+      if (mass < massCutLow || mass > massCutHigh) continue;
 
       // Check if all (product and sum) cut requirements are fulfilled
       if (!checkCuts(particleStack)) continue;
@@ -244,7 +248,7 @@ namespace Belle2 {
         value *= var->function(particleStack[i]);
       }
       B2INFO("Product of daughter particles is " << value)
-      if (value < cut.second[0] || value > cut.second[1]) return false;
+      if (value < std::get<0>(cut.second) || value > std::get<1>(cut.second)) return false;
     }
 
     for (auto & cut : m_sumCuts) {
@@ -260,7 +264,7 @@ namespace Belle2 {
         value += var->function(particleStack[i]);
       }
       B2INFO("Sum of daughter particles is " << value)
-      if (value < cut.second[0] || value > cut.second[1]) return false;
+      if (value < std::get<0>(cut.second) || value > std::get<1>(cut.second)) return false;
     }
 
     return true;

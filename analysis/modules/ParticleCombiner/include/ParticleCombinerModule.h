@@ -22,6 +22,7 @@
 #include <string>
 #include <vector>
 #include <unordered_set>
+#include <tuple>
 
 //Hack: allow access to m_bits to define hash function
 #define BOOST_DYNAMIC_BITSET_DONT_USE_FRIENDS
@@ -132,10 +133,9 @@ namespace Belle2 {
     int m_pdg;                /**< PDG code of combined particles */
     std::string m_listName;   /**< output particle list name */
     std::vector<std::string> m_inputListNames; /**< input particle list names */
-    std::map<std::string, std::vector<double> > m_productCuts; /**< variables -> low/high cut on their product. */
-    std::map<std::string, std::vector<double> > m_sumCuts; /**< variables -> low/high cut on their sum. */
-    double m_massCutLow;      /**< lower mass cut */
-    double m_massCutHigh;     /**< upper mass cut */
+    std::map<std::string, std::tuple<double, double> > m_productCuts; /**< variables -> low/high cut on their product. */
+    std::map<std::string, std::tuple<double, double> > m_sumCuts; /**< variables -> low/high cut on their sum. */
+    std::tuple<double, double> m_massCut; /**< lower and upper mass cut */
     bool m_persistent;  /**< toggle output particle list btw. transient/persistent */
 
   };

@@ -101,8 +101,7 @@ def makeParticle(
     pmake.param('PDG', PDGcode)
     pmake.param('ListName', list_name)
     pmake.param('InputListNames', list_of_lists)
-    pmake.param('MassCutLow', mL)
-    pmake.param('MassCutHigh', mH)
+    pmake.param('MassCut', (mL, mH))
     pmake.param('persistent', persistent)
     path.add_module(pmake)
 

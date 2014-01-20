@@ -94,3 +94,18 @@ ostream& operator<< (ostream& out, const LogMessage& logMessage)
 {
   return logMessage.print(out);
 }
+
+namespace Belle2 {
+  size_t hash(const LogMessage& msg)
+  {
+    return (
+             std::hash<std::string>()(msg.m_message)
+             ^ std::hash<std::string>()(msg.m_module)
+             ^ std::hash<std::string>()(msg.m_package)
+             ^ std::hash<std::string>()(msg.m_function)
+             ^ std::hash<std::string>()(msg.m_file)
+             ^ msg.m_line
+             ^ msg.m_logLevel
+           );
+  }
+}

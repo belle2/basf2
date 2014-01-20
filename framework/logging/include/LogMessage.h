@@ -94,7 +94,11 @@ namespace Belle2 {
 
     unsigned int m_logInfo;   /**< kind of information to show (ORed combination of LogConfig::ELogInfo flags). */
 
+
+    friend size_t hash(const LogMessage& msg);
   };
+  /** Calculate hash of this message, for unordered_map etc. */
+  size_t hash(const LogMessage& msg);
 
 } // end namespace Belle2
 

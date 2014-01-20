@@ -20,6 +20,7 @@
 
 #include <iostream>
 #include <algorithm>
+#include <unordered_map>
 
 using namespace Belle2;
 using namespace std;
@@ -163,7 +164,7 @@ LogSystem::LogSystem() :
 
   addLogConnection(new LogConnectionIOStream(std::cout, useColor));
 
-  m_errorLog.reserve(50);
+  m_errorLog.reserve(100);
 }
 
 void LogSystem::printErrorSummary()
@@ -184,20 +185,26 @@ void LogSystem::printErrorSummary()
   B2INFO("================================================================================");
   B2INFO("Error summary: " << numLogError << " errors and " << numLogWarn << " warnings occurred.");
 
-  std::vector<LogMessage> errorLog = m_errorLog;
-  m_errorLog.clear();
+
+  //TODO: specify hash function with type
+  //start with 100 entries in hash map
+  std::unordered_map<LogMessage, int, decltype(&hash)> errorCount(100, hash);
+
   //log in chronological order, with repetitions removed
   std::vector<LogMessage> uniqueLog;
-  for (unsigned int i = 0; i < errorLog.size(); i++) {
-    const LogMessage& msg = errorLog[i];
-    if (find(uniqueLog.begin(), uniqueLog.end(), msg) == uniqueLog.end())
+  uniqueLog.reserve(100);
+
+  for (const LogMessage & msg : m_errorLog) {
+    int count = errorCount[msg]++;
+    if (count == 1) //this is the first time we see this message
       uniqueLog.push_back(msg);
   }
+  m_errorLog.clear();
 
-  for (unsigned int i = 0; i < uniqueLog.size(); i++) {
-    sendMessage(uniqueLog[i]);
+  for (const LogMessage & msg : uniqueLog) {
+    sendMessage(msg);
 
-    int count = std::count(errorLog.begin(), errorLog.end(), uniqueLog[i]);
+    int count = errorCount[msg];
     if (count != 1) {
       B2INFO(" (last message occurred " << count << " times in total)");
     }

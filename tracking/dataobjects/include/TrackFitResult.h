@@ -249,6 +249,6 @@ namespace Belle2 {
      */
     void cartesianCovToHelixCov(const TVector3& position, const TVector3& momentum, const short int& charge, const TMatrixF& covariance);
 
-    ClassDef(TrackFitResult, 1);
+    ClassDef(TrackFitResult, 2);
   };
 }

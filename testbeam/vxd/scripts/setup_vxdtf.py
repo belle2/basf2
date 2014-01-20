@@ -11,9 +11,12 @@ from basf2 import *
 # that the user can change the settings.
 
 
-def setup_vxdtf(candName='',
-                secSetup=['testBeamMini6GeVSVD-moreThan1500MeV_SVD'],
-                filterOverlaps='hopfield'):
+def setup_vxdtf(
+    candName='',
+    secSetup=['TB6GeVNoMagnetSVD-moreThan1500MeV_SVD'],
+    filterOverlaps='hopfield',
+    baseLineTF='1',
+    ):
 
     # VXDTF:
     # # parameters:
@@ -23,10 +26,11 @@ def setup_vxdtf(candName='',
     vxdtf.logging.log_level = LogLevel.INFO
     vxdtf.logging.debug_level = 1
     param_vxdtf = {
-        'activateBaselineTF': 1,
+        'activateBaselineTF': baseLineTF,
         'tccMinState': [2],
         'tccMinLayer': [3],
         'standardPdgCode': -11,
+        'artificialMomentum': 5.,
         'sectorSetup': secSetup,
         'calcQIType': qiType,
         'killEventForHighOccupancyThreshold': 75,

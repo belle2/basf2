@@ -122,7 +122,7 @@ TH1F *hsimchhits = new TH1F("hsimchhits","Number of hits in +-3 sigma;hits;N", 3
 
 int nhits=0;
 int nchhits=0;
-int allhits;
+int allhits=0;
 float thetac=0;
 for( Int_t idx=0; idx<neve; ++idx ) {
   hits->GetEntry( idx );

@@ -9,7 +9,7 @@
  **************************************************************************/
 
 #ifndef ARICHBTESTMODULE_H
-#define ARCIHBTESTMODULE_H
+#define ARICHBTESTMODULE_H
 
 #include <framework/core/Module.h>
 

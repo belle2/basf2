@@ -96,8 +96,6 @@ namespace Belle2 {
       B2INFO("GeoARICHBtestCreator::create");
       StoreObjPtr<EventMetaData> eventMetaDataPtr;
 
-
-      int exp = 1;
       int run = 68;
       PyObject* m = PyImport_AddModule(strdup("__main__"));
       if (m) {
@@ -109,9 +107,7 @@ namespace Belle2 {
         B2INFO("GeoARICHBtestCreator::create runno = " << run);
       }
 
-
       B2INFO("eventMetaDataPtr run:" << run);
-      B2INFO("eventMetaDataPtr exp:" << exp);
       // eventMetaDataPtr->setEndOfData();
 
 

@@ -38,7 +38,6 @@ namespace Belle2 {
       double V = fabs(x);
       double H = 0;
       double Y = 0;
-      int c1 = 0;
 
       if (V < HF) {
         Y = V * V;
@@ -47,7 +46,7 @@ namespace Belle2 {
         if (V < 4) {
           double AP = P2[4];
           double AQ = Q2[4];
-          for (c1 = 3; c1 >= 0; c1--) {
+          for (int c1 = 3; c1 >= 0; c1--) {
             AP = P2[c1] + V * AP;
             AQ = Q2[c1] + V * AQ;
           }
@@ -183,8 +182,8 @@ namespace Belle2 {
       double cf = aa * cos(fi);
 
       double a[4], b[4];
-      double n0 = 2 * cf;
-      n0 = 2 * aa * aa / (cf + sf); // A.Petelin 21.12.2006
+      //double n0 = 2*cf;
+      double  n0 = 2 * aa * aa / (cf + sf); // A.Petelin 21.12.2006
 
       const double sq2pi      = 1 / sqrt(2.*M_PI);
       double sqrt2sigma = 1 / (M_SQRT2 * sigma);
@@ -208,8 +207,8 @@ namespace Belle2 {
       if (fabs(dx) > dsf && fabs(dy) > dsf) {
 
         double k = dy / dx + dx / dy;
-        double n = k * cf - sf;
-        n = k * cf;   // A.Petelin 21.12.2006
+        // double n = k * cf - sf;
+        double n = k * cf;   // A.Petelin 21.12.2006
         //                        +sf    -sf    +cf    -cf
         gint +=
           sq2pi      * k * sigma * (-b[0]  - b[1]  + b[2]  + b[3]) +

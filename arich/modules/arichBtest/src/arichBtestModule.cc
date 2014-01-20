@@ -412,10 +412,9 @@ int arichBtestModule::readdata(gzFile fp, int rec_id, int)
 
   TVector3 r;
   TVector3 dir;
-  int retval = 0;
   if (rec_id == 1) {
     readmwpc(data, len);
-    retval = getTrack(*(m_MwpcTrackMask.begin()), r, dir);
+    int retval = getTrack(*(m_MwpcTrackMask.begin()), r, dir);
     //dir = TVector3(0,0,1);
 
     if (!retval) {
@@ -522,14 +521,14 @@ void arichBtestModule::event()
     case BEGIN_RECORD_TYPE: {
       gzread(m_fp, &beginrec, sizeof(beginrec));
       time_t t = beginrec.time;
-      sprintf(msg, "BeginRec run %d time %s", beginrec.runno, ctime(&t));
+      sprintf(msg, "BeginRec run %u time %s", beginrec.runno, ctime(&t));
       B2INFO(msg);
       break;
     }
     case END_RECORD_TYPE: {
       gzread(m_fp, &endrec, sizeof(endrec));
       time_t t = endrec.time;
-      sprintf(msg, "EndRec run %d time %s", endrec.runno, ctime(&t));
+      sprintf(msg, "EndRec run %u time %s", endrec.runno, ctime(&t));
       B2INFO(msg);
       break;
     }
@@ -538,7 +537,7 @@ void arichBtestModule::event()
       print = !(rec.evtno % 10000);
       time_t t = rec.time;
       if (print) {
-        sprintf(msg, "EventRec run %d evt %d mstime %d, time %s", rec.runno, rec.evtno, rec.mstime, ctime(&t));
+        sprintf(msg, "EventRec run %u evt %u mstime %u, time %s", rec.runno, rec.evtno, rec.mstime, ctime(&t));
         B2INFO(msg);
       }
       /* if you just want to jump to the end */
@@ -580,9 +579,10 @@ void arichBtestModule::endRun()
 
 void arichBtestModule::terminate()
 {
-  int i = 0;
+  int i = 1;
   BOOST_FOREACH(const string & fname, m_runList) {
-    B2INFO(m_eveList[i++] << " events processed from file " << fname);
+    B2INFO(m_eveList[i] << " events processed from file " << fname);
+    i++;
   }
   for (int i = 0; i < 4; i++) {
     //ARICHTracking* w = &m_mwpc[i];

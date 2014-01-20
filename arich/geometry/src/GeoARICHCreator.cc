@@ -91,14 +91,13 @@ namespace Belle2 {
       //Build envelope
       G4LogicalVolume* envelope(0);
       GearDir envelopeParams(content, "Envelope");
-      double zEnvFront(0), zEnvBack(0);
       G4ThreeVector envOrigin(0, 0, 0);
       if (!envelopeParams) {
         B2WARNING("Could not find definition for ARICH Envelope, continuing without envelope (note that no photons will be propagated)");
         envelope = &topVolume;
       } else {
-        zEnvFront = envelopeParams.getLength("zFront") / Unit::mm;
-        zEnvBack = envelopeParams.getLength("zBack") / Unit::mm;
+        double zEnvFront = envelopeParams.getLength("zFront") / Unit::mm;
+        double zEnvBack = envelopeParams.getLength("zBack") / Unit::mm;
         double innerR = envelopeParams.getLength("innerRadius") / Unit::mm;
         double outerR = envelopeParams.getLength("outerRadius") / Unit::mm;
         G4Tubs* envelopeTube = new G4Tubs("Envelope", innerR, outerR, (zEnvBack - zEnvFront) / 2., 0, 2 * M_PI);
@@ -122,7 +121,7 @@ namespace Belle2 {
       // Initializing geometry parametrisation; m_arichgp contains photon detectors positions, ...
       m_arichgp->Initialize(content);
 
-      double boardThick(0), supportThick(0), moduleThick(0), detectorZ(0), detectorRout(0), detectorRin(0);
+      double boardThick(0), moduleThick(0), detectorZ(0), detectorRout(0), detectorRin(0);
 
       detectorZ = content.getLength("Detector/Plane/zPosition") / Unit::mm;
       detectorRout = content.getLength("Detector/Plane/tubeOuterRadius") / Unit::mm;
@@ -163,7 +162,7 @@ namespace Belle2 {
 
       // place detectors support plate
       if (lsupport) {
-        supportThick =  supportParam.getLength("thickness") / Unit::mm;
+        double supportThick =  supportParam.getLength("thickness") / Unit::mm;
         G4ThreeVector supportPos = G4ThreeVector(0, 0, detectorZ + moduleThick + boardThick + supportThick / 2.) - envOrigin;
         G4Transform3D transform3 = G4Translate3D(supportPos);
         new G4PVPlacement(transform3, lsupport, "ARICH.DetectorSupportPlate", envelope, false, 1);

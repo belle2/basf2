@@ -105,26 +105,24 @@ namespace Belle2 {
       //  z[n-1] .. 2nd aerogel exit
       //  z[n-1] .. 2nd aerogel exit
 
-      double rmir = 0; double angmir = 0; int section[2] = {0, 0}; double dangle = 0;
-      double trkangle = 0;
+      double rmir = 0; double angmir = 0; int section[2] = {0, 0};
+
       int nmir = m_arichGeoParameters->getNMirrors();
       if (nmir > 0) {
         rmir = m_arichGeoParameters->getMirrorPoint(0).XYvector().Mod();
         angmir = m_arichGeoParameters->getMirrorsStartAngle();
-        dangle = 2 * M_PI / nmir;
-        trkangle = r.XYvector().Phi() - angmir;
+        double dangle = 2 * M_PI / nmir;
+        double trkangle = r.XYvector().Phi() - angmir;
         if (trkangle < 0) trkangle += 2 * M_PI;
         section[1]  = int(trkangle / dangle);
       }
-      double path = 0;
-      double rind = 0;
 
       bool reflok = false; bool refl = false;
-      path = (z[0] - r.z()) / dirf.z();
+      double path = (z[0] - r.z()) / dirf.z();
       r   += dirf * path;
 
       for (int a = 1; a <= n + 1 ; a++) {
-        rind = refractiveInd[a] / refractiveInd[a - 1];
+        double rind = refractiveInd[a] / refractiveInd[a - 1];
         dirf = Refraction(dirf, rind);
         if (dirf.Mag() == 0) return TVector3();
         path = (z[a] - r.z()) / dirf.z();
@@ -219,7 +217,6 @@ namespace Belle2 {
       rf0[0] = r;
       rf0[1] = rf;
 
-      double path = 0;
       double rind = 0;
 
       for (int iter = 0; iter < niter; iter++) {
@@ -236,7 +233,7 @@ namespace Belle2 {
           dirf0[a] = Refraction(dirf0[a + 1], rind);
         }
 
-        path = (z[0] - r.z()) / dirf0[0].z();
+        double path = (z[0] - r.z()) / dirf0[0].z();
         double x1 = rf0[1].x();
         double y1 = rf0[1].y();
         for (int a = 0; a < n ; a++) {
@@ -587,12 +584,11 @@ namespace Belle2 {
 
       int nmir = m_arichGeoParameters->getNMirrors();
       double path = 0;
-      double rind = 0;
       bool reflok = false; bool refl = false;
       path = (z[0] - r.z()) / dirf.z();
       r   += dirf * path;
       for (int a = 1; a <= n + 1 ; a++) {
-        rind = refractiveInd[a] / refractiveInd[a - 1];
+        double rind = refractiveInd[a] / refractiveInd[a - 1];
         dirf = Refraction(dirf, rind);
         if (dirf.Mag() == 0) return TVector3();
         path = (z[a] - r.z()) / dirf.z();

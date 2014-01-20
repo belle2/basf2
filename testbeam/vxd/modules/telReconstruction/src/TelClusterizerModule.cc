@@ -48,7 +48,7 @@ TelClusterizerModule::TelClusterizerModule() :
            "Maximum desired number of sensor rows", 1200);
   addParam("Digits", m_storeDigitsName, "Digits collection name", string(""));
   addParam("Clusters", m_storeClustersName, "Cluster collection name",
-           string("TelCusters"));
+           string("PXDClusters"));
   // CAUTION: Be always explicit about whether we store into PXDClusters or to a separate collection?
   addParam("TrueHits", m_storeTrueHitsName, "TrueHit collection name",
            string(""));
@@ -159,6 +159,8 @@ void TelClusterizerModule::event()
 
   m_cache->clear();
 
+  const VXD::GeoCache& geo = VXD::GeoCache::getInstance();
+
   //We require all pixels are already sorted and directly cluster them. Once
   //the sensorID changes, we write out all existing clusters and continue.
   VxdID sensorID(0);
@@ -166,6 +168,11 @@ void TelClusterizerModule::event()
   Pixel lastPixel;
   for (int i = 0; i < nPixels; i++) {
     const TelDigit* const digit = storeDigits[i];
+    // If malformed data, drop the digit.
+    if (!geo.validSensorID(digit->getSensorID())) {
+      B2WARNING("Malformed TelDigit, sensorID " << digit->getSensorID() << ". Dropping.");
+      continue;
+    }
     Pixel px(digit, i);
     //New sensor, write clusters
     if (sensorID != digit->getSensorID()) {
@@ -184,7 +191,7 @@ void TelClusterizerModule::event()
 
     //Ignore digits with not enough signal. Has to be done after the check of
     //the SensorID to make sure we compare to the correct noise level
-    if (!m_noiseMap(px, 1)) continue;
+    if (!m_noiseMap(px, 0.1)) continue;
 
     // Find correct cluster and add pixel to cluster
     m_cache->findCluster(px.getU(), px.getV()).add(px);

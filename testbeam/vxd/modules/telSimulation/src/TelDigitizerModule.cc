@@ -418,9 +418,7 @@ void TelDigitizerModule::saveDigits()
       //Add the digit to datastore
       int digIndex = storeDigits.getEntries();
       storeDigits.appendNew(
-        TelDigit(sensorID, d.u(), d.v(),
-                 info.getUCellPosition(d.u()),
-                 info.getVCellPosition(d.v())));
+        TelDigit(sensorID, d.u(), d.v()));
 
       //If the digit has any relations to MCParticles, add the Relation
       if (v.particles().size() > 0) {

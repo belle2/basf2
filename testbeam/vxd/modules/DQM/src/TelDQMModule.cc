@@ -38,7 +38,7 @@ TelDQMModule::TelDQMModule() : HistoModule()
   setDescription("TEL DQM module");
   setPropertyFlags(c_ParallelProcessingCertified);  // specify this flag if you need parallel processing
   addParam("Clusters", m_storeClustersName, "Name of the telescopes cluster collection",
-           std::string("TelClusters")); // always be explicit about this, can cause trouble
+           std::string("PXDClusters")); // always be explicit about this, can cause trouble
   addParam("histgramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed", std::string("eutel"));
 }
 

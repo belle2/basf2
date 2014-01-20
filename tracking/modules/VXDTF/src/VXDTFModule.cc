@@ -3813,7 +3813,8 @@ genfit::TrackCand VXDTFModule::generateGFTrackCand(VXDTFTrackCandidate* currentT
     hitIDs.push_back(hitIndex);
   }
   std::sort(hitIDs.begin(), hitIDs.end());
-  std::unique(hitIDs.begin(), hitIDs.end());
+  auto itPxd = std::unique(hitIDs.begin(), hitIDs.end());
+  hitIDs.resize(std::distance(hitIDs.begin(), itPxd));
   if (pxdHits.size() != hitIDs.size()) { B2FATAL("generateGFTrackCand event " << m_eventCounter << ": tc got same PXDhit several times!")}
   hitIDs.clear();
 
@@ -3822,7 +3823,8 @@ genfit::TrackCand VXDTFModule::generateGFTrackCand(VXDTFTrackCandidate* currentT
     hitIDs.push_back(hitIndex);
   }
   std::sort(hitIDs.begin(), hitIDs.end());
-  std::unique(hitIDs.begin(), hitIDs.end());
+  auto itSvd = std::unique(hitIDs.begin(), hitIDs.end());
+  hitIDs.resize(std::distance(hitIDs.begin(), itSvd));
   if (svdHits.size() != hitIDs.size()) { B2FATAL("generateGFTrackCand event " << m_eventCounter << ": tc got same SVDhit several times!")}
   hitIDs.clear();
 

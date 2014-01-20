@@ -126,12 +126,12 @@ namespace Belle2 {
     bool m_points2IP;  /**< true, if momentum vector of current hit points to the interaction point (particle is flying inwards at that moment), false if not*/
     std::string m_secID; /**< ID of sector containing this hit */
     int m_uniID; /**< ID of sensor containing this hit */
-    float m_timeStamp; /**< timestamp of hit (real info, needed for sorting) */
 //     template<class TemplateTrueHit>
 //     const TemplateTrueHit* m_trueHit; /**< pointer to trueHit */
 //     const PXDTrueHit* m_pxdHit; /**< pointer to pxdHit (only set if it is a pxdHit) */
 //     const SVDTrueHit* m_svdHit; /**< pointer to svdHit (only set if it is a svdHit) */
     int m_pdg; /**< pdgCode of particle causing hit */
+    float m_timeStamp; /**< timestamp of hit (real info, needed for sorting) */
     TVector3 m_hitPos; /**< global hit position */
   };
 

@@ -36,7 +36,7 @@ namespace Belle2 {
     //     typedef std::map<std::string, ScopeMap*> CutoffTypeMap; // key is type of cutoff
 
     /** minimalconstructor (produces useless sectors)*/
-    VXDSector(): m_sectorID(0) { m_friends.clear(); }
+    VXDSector(): m_sectorID(0), m_distance2Origin(0) { m_friends.clear(); }
 
     /** useful constructor */
     VXDSector(unsigned int secID): m_sectorID(secID) { m_friends.clear(); } // default values

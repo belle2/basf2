@@ -16,6 +16,11 @@
 #include <framework/datastore/RelationIndex.h>
 #include <framework/logging/Logger.h>
 
+#include <arpa/inet.h>
+#include <boost/crc.hpp>      // for boost::crc_basic, boost::augmented_crc
+#include <boost/cstdint.hpp>  // for boost::uint16_t
+#define CRC16POLYREV 0x8005         // CRC-16 polynomial, normal representation 
+
 #include <iomanip>
 
 using namespace std;
@@ -73,6 +78,7 @@ void SVDUnpackerModule::beginRun()
   m_wrongFTBHeader = 0;
   m_wrongFADCTrailer = 0;
   m_wrongFADCcrc = 0;
+  m_wrongFTBcrc = 0;
   m_badEvent = 0;
   m_wrongFTBtrailer = 0;
 
@@ -121,6 +127,7 @@ void SVDUnpackerModule::endRun()
   B2INFO("   m_wrongFTBHeader = " <<  m_wrongFTBHeader);
   B2INFO("   m_wrongFADCTrailer = " << m_wrongFADCTrailer);
   B2INFO("   m_wrongFADCcrc = " << m_wrongFADCcrc);
+  B2INFO("   m_wrongFTBcrc = " << m_wrongFTBcrc);
   B2INFO("   m_badEvent = " << m_badEvent);
   B2INFO("   m_wrongFTBtrailer = " << m_wrongFTBtrailer);
 
@@ -166,9 +173,14 @@ bool SVDUnpackerModule::sanityChecks(int nWords, uint32_t* data32_in)
     return false;
   } else
     B2DEBUG(1, "sanityChecks: FTB Trailer found");
+
   // verify FTB checksum
-  if (! verifyFTBcrc())
+  if (! verifyFTBcrc(nWords - 1, data32_in, theFTBTrailer->crc16)) {
+    B2ERROR("sanityChecks: FTB checksum NOT VERIFIED");
+    m_wrongFTBcrc++;
     return false;
+  } else
+    B2DEBUG(1, "sanityChecks: FTB checksum verified");
 
 
   //read FTB Header:
@@ -212,7 +224,7 @@ bool SVDUnpackerModule::sanityChecks(int nWords, uint32_t* data32_in)
     //    printDebug(&data32_in[2], data32_in, &data32_in[nWords-1], 4 );
     return false;
   } else
-    B2DEBUG(1, "main header format checked");
+    B2DEBUG(1, "FADC main header format checked");
   //check the run type
   if (theMainHeader->runType != 0x2) {
     B2ERROR("WRONG run type (expected = zero-suppressed), got 0x" << std::hex << std::setw(8) << std::setfill('0') << theMainHeader->runType);
@@ -248,10 +260,26 @@ bool SVDUnpackerModule::sanityChecks(int nWords, uint32_t* data32_in)
 
 }
 
-bool SVDUnpackerModule::verifyFTBcrc()
+bool SVDUnpackerModule::verifyFTBcrc(int nWords, uint32_t* data32_start, unsigned int crc16)
 {
-  //verify the checksum - to be implemented
-  return true;
+
+  //first swap all 32-bits word -> big endian
+  uint32_t tmpBuffer[nWords];
+  for (int i = 0; i < nWords; i++)
+    tmpBuffer[i] = htonl(data32_start[i]);
+
+  //  B2DEBUG(1,"FTB crc = "<<std::hex << std::setw(8) << std::setfill('0') << crc16);
+
+  //compute crc
+  boost::crc_basic<16> bcrc(0x8005, 0xffff, 0, false, false);
+  bcrc.process_block(tmpBuffer, tmpBuffer + nWords);
+  unsigned int checkCRC = bcrc.checksum();
+  //  B2DEBUG(1,"OUR crc = "<<std::hex << std::setw(8) << std::setfill('0') << checkCRC);
+
+  //check crc
+  bool result = (checkCRC == crc16);
+
+  return result;
 }
 
 

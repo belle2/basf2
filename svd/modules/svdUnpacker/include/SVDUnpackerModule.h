@@ -17,7 +17,6 @@
 
 #include <framework/datastore/StoreArray.h>
 #include <vxd/dataobjects/VxdID.h>
-//disappeared from the release:
 #include <rawdata/dataobjects/RawSVD.h>
 #include <svd/dataobjects/SVDDigit.h>
 
@@ -78,6 +77,7 @@ namespace Belle2 {
       int m_wrongRunType;
       int m_wrongFADCTrailer;
       int m_wrongFADCcrc;
+      int m_wrongFTBcrc;
       int m_badEvent;
       int m_wrongFTBtrailer;
       int m_f0;
@@ -147,7 +147,7 @@ namespace Belle2 {
 
       bool sanityChecks(int nWords, uint32_t* data32);
 
-      bool verifyFTBcrc();
+      bool verifyFTBcrc(int nWords, uint32_t* data32_start, unsigned int crc16);
 
       void loadMap();
 

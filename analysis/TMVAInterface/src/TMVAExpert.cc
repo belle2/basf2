@@ -31,7 +31,7 @@
 
 namespace Belle2 {
 
-  TMVAExpert::TMVAExpert(std::string identifier, std::string method, std::vector<std::string> variables) : m_method(method)
+  TMVAExpert::TMVAExpert(std::string identifier, std::string method) : m_method(method)
   {
 
     // Initialize TMVA and ROOT stuff
@@ -45,32 +45,17 @@ namespace Belle2 {
     TString weightfile = dir + prefix + TString("_") + TString(m_method) + TString(".weights.xml");
 
     // Read out variables
-    std::vector<std::string> varnames;
+    std::vector<std::string> variables;
     try {
       boost::property_tree::ptree pt;
       boost::property_tree::xml_parser::read_xml(std::string(weightfile), pt);
       for (const auto & f : pt.get_child("MethodSetup.Variables")) {
         if (f.first.data() != std::string("Variable")) continue;
-        varnames.push_back(f.second.get<std::string>("<xmlattr>.Expression"));
+        variables.push_back(f.second.get<std::string>("<xmlattr>.Expression"));
       }
     } catch (const std::exception& ex) {
       B2ERROR("There was an error during the readout of the file " <<  weightfile << " : " << ex.what())
     }
-
-    // Check if varnames match given variable names, or if variables vector is empty
-    if (not variables.empty()) {
-      if (variables.size() != varnames.size()) {
-        B2ERROR("Given number of variables doesn't match number of variables the weightfile was trained with!");
-      }
-      for (unsigned int i = 0; i < variables.size(); ++i) {
-        if (variables[i] != varnames[i]) {
-          B2WARNING("Given variable " << variables[i] << " doesn't match the corresponding variable " << varnames[i] << " from the training")
-        }
-      }
-    } else {
-      variables = varnames;
-    }
-
 
     // Get Pointers to VariableManager::Var for every provided variable name
     VariableManager& manager = VariableManager::Instance();

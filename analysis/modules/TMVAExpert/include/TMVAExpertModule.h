@@ -69,7 +69,6 @@ namespace Belle2 {
   private:
 
     std::vector<std::string> m_listNames; /**< input particle list names */
-    std::vector<std::string> m_variables; /**< input variables for the TMVA method, the names have to correspond to a registered variable in the VariableManager */
     std::string m_methodName; /**< used multivariate analysis method */
     std::string m_identifier; /**< identifier name for the files created by the TMVA method */
     std::string m_targetName /**< the name of the target variable which is stored in the ParticleInfo */;

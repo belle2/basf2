@@ -27,43 +27,18 @@ particleinfo = register_module('ParticleInfo')
 particleinfo.param('InputListNames', ['e-'])
 main.add_module(particleinfo)
 
-variables = [
-    'eid',
-    'eid_dEdx',
-    'eid_TOP',
-    'eid_ARICH',
-    'Kid',
-    'Kid_dEdx',
-    'Kid_TOP',
-    'Kid_ARICH',
-    'prid',
-    'prid_dEdx',
-    'prid_TOP',
-    'prid_ARICH',
-    'muid',
-    'muid_dEdx',
-    'muid_TOP',
-    'muid_ARICH',
-    'p',
-    'pt',
-    'p_CMS',
-    'pt_CMS',
-    'chiProb',
-    ]
-
 methods = ['Fisher', 'NeuroBayes', 'BDTGradient', 'PDEFoamBoost']
 
 for method in methods:
     expert = register_module('TMVAExpert')
-    expert.param('file', 'TMVA')
+    expert.param('identifier', 'TMVA')
     expert.param('method', method)
-    expert.param('variables', variables)
     expert.param('listNames', ['e-'])
     expert.param('target', method + '_Probability')
     main.add_module(expert)
 
     histMaker = register_module('HistMaker')
-    histMaker.param('file', method + '_hist')
+    histMaker.param('file', method + '_hist.root')
     mass = 511e-6
     histMaker.param('histVariables', [(method + '_Probability', 100, 0, 1),
                     ('p_CMS', 100, 0, 1), ('eid', 100, 0, 1), ('chiProb', 100,

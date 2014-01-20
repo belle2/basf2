@@ -40,9 +40,8 @@ namespace Belle2 {
     /**
      * @param identifier identifier which was used to train the method. This class expects that the files weights/$identifier_$method.class.C and weights/$identifier_$method.weights.xml exists.
      * @param method the chosen method
-     * @param variables the names of the variables (registered in VariableManager), which are used as input for the chosen TMVA method
      */
-    TMVAExpert(std::string identifier, std::string method, std::vector<std::string> variables = std::vector<std::string>());
+    TMVAExpert(std::string identifier, std::string method);
 
     /**
      * Destructor, closes outputFile, deletes TMVA::Reader

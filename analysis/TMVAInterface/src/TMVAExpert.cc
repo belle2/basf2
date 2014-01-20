@@ -31,7 +31,7 @@
 
 namespace Belle2 {
 
-  TMVAExpert::TMVAExpert(std::string method, std::string identifier, std::vector<std::string> variables) : m_method(method)
+  TMVAExpert::TMVAExpert(std::string identifier, std::string method, std::vector<std::string> variables) : m_method(method)
   {
 
     // Initialize TMVA and ROOT stuff
@@ -80,16 +80,12 @@ namespace Belle2 {
         B2ERROR("Couldn't find variable " << variable << " via the VariableManager. Check the name!")
         continue;
       }
-      m_input.push_back(x);
+      m_input.insert(std::make_pair(x, 0));
     }
 
     // Add variables to the reader, the readers expects that the variable values are stored in m_inputProxy
-    m_inputProxy = new float[m_input.size()];
-    {
-      int i = 0;
-      for (auto & var : m_input) {
-        m_reader->AddVariable(var->name, &(m_inputProxy[i++]));
-      }
+    for (auto & pair : m_input) {
+      m_reader->AddVariable(pair.first->name, &pair.second);
     }
 
     // For the NeuroBayes method we load the TMVA::NeuroBayes interface at runtime as via the TPluginManager of ROOT
@@ -105,11 +101,8 @@ namespace Belle2 {
 
   float TMVAExpert::analyse(const Particle* particle)
   {
-    {
-      int i = 0;
-      for (auto & x : m_input) {
-        m_inputProxy[i++] = x->function(particle);
-      }
+    for (auto & pair : m_input) {
+      pair.second = pair.first->function(particle);
     }
 
     // Return Signal Probability of given Particle
@@ -121,7 +114,6 @@ namespace Belle2 {
 
   TMVAExpert::~TMVAExpert()
   {
-    delete[] m_inputProxy;
     delete m_reader;
   }
 

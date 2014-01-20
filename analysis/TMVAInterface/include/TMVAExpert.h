@@ -38,11 +38,11 @@ namespace Belle2 {
   public:
 
     /**
-     * @param variables the names of the variables (registered in VariableManager), which are used as input for the chosen TMVA method
-     * @param method the chosen method, the string has to start with a predefined method name, e.g. BDT is predefined, so BDT, BDTWithGradientBoost,  BDT_1, ... are valid names
      * @param identifier identifier which was used to train the method. This class expects that the files weights/$identifier_$method.class.C and weights/$identifier_$method.weights.xml exists.
+     * @param method the chosen method
+     * @param variables the names of the variables (registered in VariableManager), which are used as input for the chosen TMVA method
      */
-    TMVAExpert(std::string method, std::string identifier = "TMVA", std::vector<std::string> variables = std::vector<std::string>());
+    TMVAExpert(std::string identifier, std::string method, std::vector<std::string> variables = std::vector<std::string>());
 
     /**
      * Destructor, closes outputFile, deletes TMVA::Reader
@@ -58,10 +58,9 @@ namespace Belle2 {
     float analyse(const Particle*);
 
   private:
-    float* m_inputProxy; /**< Used to store the input data for the TMVA method */
     std::string m_method; /**< The TMVA method */
     TMVA::Reader* m_reader; /**< TMVA::Reader steers the booked TMVA method */
-    std::vector<const VariableManager::Var*> m_input; /**< Pointers to the input variables */
+    std::map<const VariableManager::Var*, float> m_input; /**< Pointers to the input variables */
   };
 
 }

@@ -9,19 +9,6 @@
 
 #include <analysis/TMVAInterface/TMVATeacher.h>
 
-/**
- * TMVA Factory uses a private static variable for storing the given output file.
- * This transforms the Factory into a Singleton! And because the variable is private one can do nothing about it.
- * Except for...
- */
-#define private public
-#include <TMVA/Factory.h>
-#undef private
-void ROOTGlobalVariableWorkaround(TFile* file)
-{
-  TMVA::Factory::fgTargetFile = file;
-}
-
 #include <framework/datastore/DataStore.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleInfo.h>
@@ -30,7 +17,6 @@ void ROOTGlobalVariableWorkaround(TFile* file)
 #include <string>
 
 #include <TFile.h>
-#include <TMVA/Tools.h>
 #include <TTree.h>
 #include <TString.h>
 #include <TSystem.h>
@@ -38,19 +24,27 @@ void ROOTGlobalVariableWorkaround(TFile* file)
 #include <TRandom.h>
 #include <TPluginManager.h>
 
+#include <TMVA/Factory.h>
+#include <TMVA/Tools.h>
+
 
 namespace Belle2 {
 
-  TMVATeacher::TMVATeacher(std::vector<std::string> variables, std::string target, std::map<std::string, std::string> methods, std::string identifier, std::string factory_option) : m_methods(methods)
+  TMVAMethod::TMVAMethod(std::string name, std::string type, std::string config) : m_name(name), m_config(config)
   {
 
-    // Intitialize TMVA and ROOT stuff
-    TMVA::Tools::Instance();
-    TString outfileName(identifier + ".root");
-    TString factoryName(identifier);
+    if (type == "NeuroBayes") {
+      gPluginMgr->AddHandler("TMVA@@MethodBase", ".*_NeuroBayes.*", "TMVA::MethodNeuroBayes", "TMVANeuroBayes", "MethodNeuroBayes(DataSetInfo&,TString)");
+      gPluginMgr->AddHandler("TMVA@@MethodBase", ".*NeuroBayes.*", "TMVA::MethodNeuroBayes", "TMVANeuroBayes",  "MethodNeuroBayes(TString&,TString&,DataSetInfo&,TString&)");
+      m_type = TMVA::Types::kPlugins;
+    } else {
+      m_type = TMVA::Types::Instance().GetMethodType(type);
+    }
 
-    m_outputFile = TFile::Open(outfileName, "RECREATE");
-    m_factory = new TMVA::Factory(factoryName, m_outputFile, factory_option);
+  }
+
+  TMVATeacher::TMVATeacher(std::string identifier, std::vector<std::string> variables, std::string target, std::vector<TMVAMethod> methods) : m_identifier(identifier), m_methods(methods)
+  {
 
     // Get Pointers to VariableManager::Var for every provided variable name
     VariableManager& manager = VariableManager::Instance();
@@ -60,7 +54,7 @@ namespace Belle2 {
         B2ERROR("Couldn't find variable " << variable << " via the VariableManager. Check the name!")
         continue;
       }
-      m_input.push_back(x);
+      m_input.insert(std::make_pair(x, 0));
     }
 
     // Get Pointer to VariableManager::Var for the provided target name
@@ -68,84 +62,69 @@ namespace Belle2 {
     if (targetVar == nullptr) {
       B2ERROR("Couldn't find variable " << targetVar << " via the VariableManager. Check the name!")
     }
-    m_target = targetVar;
+    m_target = {targetVar, 0};
 
-    // Add variables to the factory
-    for (auto & var : m_input) {
-      m_factory->AddVariable(var->name);
+    m_signal_tree = new TTree((m_identifier + "_signal_tree").c_str(), (m_identifier + "_signal_tree").c_str());
+    m_bckgrd_tree = new TTree((m_identifier + "_bckgrd_tree").c_str(), (m_identifier + "_bckgrd_tree").c_str());
+
+    for (auto & pair : m_input) {
+      m_signal_tree->Branch(pair.first->name.c_str(), &pair.second, "F");
+      m_bckgrd_tree->Branch(pair.first->name.c_str(), &pair.second, "F");
     }
-    //factory->AddTarget(m_target->name);
-
+    m_signal_tree->Branch(m_target.first->name.c_str(), &m_target.second, "F");
+    m_bckgrd_tree->Branch(m_target.first->name.c_str(), &m_target.second, "F");
 
   }
 
   TMVATeacher::~TMVATeacher()
   {
-    delete m_factory;
-    m_outputFile->Close();
+    delete m_signal_tree;
+    delete m_bckgrd_tree;
   }
 
   void TMVATeacher::addSample(const Particle* particle)
   {
 
-    std::vector<double> input;
-    for (auto & x : m_input) {
-      input.push_back(x->function(particle));
+    for (auto & pair : m_input) {
+      pair.second = pair.first->function(particle);
     }
-    double target = m_target->function(particle);
+    m_target.second = m_target.first->function(particle);
 
-    if (target > 0.5) {
-      if (gRandom->Rndm() > 0.5) {
-        m_factory->AddSignalTrainingEvent(input);
-      } else {
-        m_factory->AddSignalTestEvent(input);
-      }
+    if (m_target.second > 0.5) {
+      m_signal_tree->Fill();
     } else {
-      if (gRandom->Rndm() > 0.5) {
-        m_factory->AddBackgroundTrainingEvent(input);
-      } else {
-        m_factory->AddBackgroundTestEvent(input);
-      }
+      m_bckgrd_tree->Fill();
     }
   }
 
-  void TMVATeacher::train()
+  void TMVATeacher::train(std::string factoryOption, std::string prepareOption)
   {
 
-    ROOTGlobalVariableWorkaround(m_outputFile);
-    TCut mycut = "";
-    m_factory->PrepareTrainingAndTestTree(mycut, "SplitMode=random:!V");
+    TFile* file = TFile::Open((m_identifier + ".root").c_str(), "RECREATE");
+    {
+      // Intitialize TMVA and ROOT stuff
+      TMVA::Tools::Instance();
+      TMVA::Factory factory(m_identifier, file, factoryOption);
 
-    // This lambda function checks if provided method name begins with a predefined method
-    auto is_method = [](const std::string & name, const std::string & method) -> bool { return name.compare(0, method.size(), method.c_str()) == 0; };
-
-    for (auto & method : m_methods) {
-      if (is_method(method.first, "KNN"))      m_factory->BookMethod(TMVA::Types::kKNN, method.first, method.second);
-      else if (is_method(method.first, "Fisher"))  m_factory->BookMethod(TMVA::Types::kFisher, method.first, method.second);
-      else if (is_method(method.first, "MLP"))     m_factory->BookMethod(TMVA::Types::kMLP, method.first, method.second);
-      else if (is_method(method.first, "SVM"))     m_factory->BookMethod(TMVA::Types::kSVM, method.first, method.second);
-      else if (is_method(method.first, "BDT"))     m_factory->BookMethod(TMVA::Types::kBDT, method.first, method.second);
-      else if (is_method(method.first, "RuleFit")) m_factory->BookMethod(TMVA::Types::kRuleFit, method.first, method.second);
-      else if (is_method(method.first, "Cuts"))    m_factory->BookMethod(TMVA::Types::kCuts, method.first, method.second);
-      else if (is_method(method.first, "Likelihood")) m_factory->BookMethod(TMVA::Types::kLikelihood, method.first, method.second);
-      else if (is_method(method.first, "PDERS"))      m_factory->BookMethod(TMVA::Types::kPDERS, method.first, method.second);
-      else if (is_method(method.first, "PDEFoam"))    m_factory->BookMethod(TMVA::Types::kPDEFoam, method.first, method.second);
-      else if (is_method(method.first, "HMatrix"))    m_factory->BookMethod(TMVA::Types::kHMatrix, method.first, method.second);
-      else if (is_method(method.first, "FDA"))        m_factory->BookMethod(TMVA::Types::kFDA, method.first, method.second);
-      else if (is_method(method.first, "CFMlpANN"))   m_factory->BookMethod(TMVA::Types::kCFMlpANN, method.first, method.second);
-      else if (is_method(method.first, "TMlpANN"))    m_factory->BookMethod(TMVA::Types::kTMlpANN, method.first, method.second);
-      else if (is_method(method.first, "NeuroBayes")) {
-        gPluginMgr->AddHandler("TMVA@@MethodBase", ".*_NeuroBayes.*", "TMVA::MethodNeuroBayes", "TMVANeuroBayes", "MethodNeuroBayes(DataSetInfo&,TString)");
-        gPluginMgr->AddHandler("TMVA@@MethodBase", ".*NeuroBayes.*", "TMVA::MethodNeuroBayes", "TMVANeuroBayes",  "MethodNeuroBayes(TString&,TString&,DataSetInfo&,TString&)");
-        m_factory->BookMethod(TMVA::Types::kPlugins, method.first, method.second);
-      } else {
-        B2ERROR("Requested Method " << method.first  << " not found.")
+      // Add variables to the factory
+      for (auto & pair : m_input) {
+        factory.AddVariable(pair.first->name);
       }
+
+      factory.AddSignalTree(m_signal_tree);
+      factory.AddBackgroundTree(m_bckgrd_tree);
+      factory.PrepareTrainingAndTestTree(TCut(""), prepareOption);
+
+      for (auto & method : m_methods) {
+        factory.BookMethod(method.getType(), method.getName(), method.getConfig());
+      }
+
+      factory.TrainAllMethods();
+      factory.TestAllMethods();
+      factory.EvaluateAllMethods();
     }
 
-    m_factory->TrainAllMethods();
-    m_factory->TestAllMethods();
-    m_factory->EvaluateAllMethods();
+    file->Close();
   }
 
 }

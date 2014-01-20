@@ -7,8 +7,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef TMVATEACHER_H
-#define TMVATEACHER_H
+#pragma once
 
 #include <analysis/utility/VariableManager.h>
 #include <framework/logging/Logger.h>
@@ -21,15 +20,50 @@
  * Forward declaration
  */
 class TFile;
-namespace TMVA {
+class TTree;
 
-  class Factory;
-
-}
+#include <TMVA/Types.h>
 
 namespace Belle2 {
 
   class Particle;
+
+  /**
+   * Represents a TMVA Method, containing name, type and config of the method
+   */
+  class TMVAMethod {
+
+  public:
+    /**
+     * @param name name of the TMVA method
+     * @param type string representation of type, see TMVA::Types::EMVA for pissible names (dicarding the leading k)
+     * @param config string with the config which is given to the TMVA method when its booked. See TMVA UserGuide for possible options
+     */
+    TMVAMethod(std::string name, std::string type, std::string config);
+
+    /**
+     * Getter for name
+     * @return name
+     */
+    std::string getName() { return m_name; }
+
+    /**
+     * Getter for type
+     * @return type
+     */
+    TMVA::Types::EMVA getType() { return m_type; }
+
+    /**
+     * Getter for config
+     * @return config
+     */
+    std::string getConfig() { return m_config; }
+
+  private:
+    std::string m_name; /**< name of the method */
+    TMVA::Types::EMVA m_type; /**< type of the method */
+    std::string m_config; /**< config string given to the method */
+  };
 
   /**
    * Interface to ROOT TMVA Factory.
@@ -38,24 +72,17 @@ namespace Belle2 {
 
   public:
     /**
+     * @param identifier which used to identify the outputted training files weights/$identifier_$method.class.C and weights/$identifier_$method.weights.xml
      * @param variables the names of the variables (registered in VariableManager), which are used as input for the chosen TMVA method
      * @param target the name of the target variable (registered in VariableManager), which is used as expected output for the chosen TMVA method
-     * @param methods map with the chosen methods and options passed to this methods, the method name has to start with a predefined method name, e.g. BDT is predefined, so BDT, BDTWithGradientBoost,  BDT_1, ... are valid names.
-     * @param identifier identifier which used to identify the outputted training files weights/$identifier_$method.class.C and weights/$identifier_$method.weights.xml
-     * @param factory_options options which are passed to the TMVA::Factory constructor, in most cases default options should be fine.
+     * @param methods vector of TMVAMethod
      */
-    TMVATeacher(std::vector<std::string> variables, std::string target, std::map<std::string, std::string> methods, std::string identifier = "TMVA",  std::string factory_option = "!V:!Silent:Color:DrawProgressBar:AnalysisType=Classification");
+    TMVATeacher(std::string identifier, std::vector<std::string> variables, std::string target, std::vector<TMVAMethod> methods);
 
     /**
      * Destructor, closes outputFile, deletes TMVA::Factory
      */
     ~TMVATeacher();
-
-    /**
-     * Returns Pointer to TMVA::Factory, useful to access the factory directly and set signal and background trees
-     * @return Pointer to TMVA::Factory
-     */
-    TMVA::Factory* getFactory() { return m_factory; }
 
     /**
      * Adds a training sample. The necessary variables are calculated from the provided particle
@@ -65,16 +92,20 @@ namespace Belle2 {
 
     /**
      * Train, test and evaluate all methods
+     * @param factoryOption options which are passed to the TMVA::Factory constructor, in most cases default options should be fine.
+     * @param prepareOption options which are passed to the TMVA::Factory::PrepareTrainingAndTestTree, in most cases default options should be fine.
      */
-    void train();
+    void train(std::string factoryOption = "!V:!Silent:Color:DrawProgressBar:AnalysisType=Classification", std::string prepareOption = "SplitMode=random:!V");
 
   private:
-    std::map<std::string, std::string> m_methods; /**< Name and Config of methods */
-    TMVA::Factory* m_factory; /**< TMVA::Factory steers the booked methods */
-    TFile* m_outputFile; /**< Output file which stores the generated histogramms */
-    std::vector<const VariableManager::Var*> m_input; /**< Pointers to the input variables */
-    const VariableManager::Var* m_target; /**< Pointer to the target variable */
+    std::string m_identifier; /**< used to identify the outputted training files weights/$identifier_$method.class.C and weights/$identifier_$method.weights.xml */
+    std::vector<TMVAMethod> m_methods; /**< Name, Type and Config of methods */
+
+    TTree* m_signal_tree; /**< holds training and test signal samples */
+    TTree* m_bckgrd_tree; /**< holds training and test background samples */
+
+    std::map<const VariableManager::Var*, float> m_input; /**< Pointers to the input variables */
+    std::pair<const VariableManager::Var*, float> m_target; /**< Pointer to the target variable */
   };
 }
 
-#endif

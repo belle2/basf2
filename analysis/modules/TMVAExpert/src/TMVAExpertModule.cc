@@ -40,7 +40,7 @@ namespace Belle2 {
     std::vector<std::string> defaultList;
     addParam("listNames", m_listNames, "Input particle list names as list", defaultList);
     addParam("method", m_methodName, "Method which is used to calculate the target variable. The name has to start with a valid method. Valid methods are: BDT, KNN, NeuroBayes, Fisher. Valid names are therefore BDT, BDTWithGradientBoost, BDT_MySecondBDTWhichDoesntOverwriteMyFirstOne,...");
-    addParam("file", m_identifierName, "Identifier which is used by the TMVA method to read the files weights/$identifier_$method.class.C and weights/$identifier_$method.weights.xml with additional information");
+    addParam("identifier", m_identifier, "Identifier which is used by the TMVA method to read the files weights/$identifier_$method.class.C and weights/$identifier_$method.weights.xml with additional information");
     addParam("variables", m_variables, "Input variables used by the method", defaultList);
     addParam("target", m_targetName, "Name of the target variable, which is stored in the related ParticleInfo of the particle");
 
@@ -58,7 +58,7 @@ namespace Belle2 {
     }
     StoreArray<ParticleInfo>::required();
 
-    m_method = new TMVAExpert(m_methodName, m_identifierName, m_variables);
+    m_method = new TMVAExpert(m_identifier, m_methodName, m_variables);
     VariableManager::Instance().registerParticleInfoVariable(m_targetName, "TMVA Expert TargetVariable", true);
   }
 

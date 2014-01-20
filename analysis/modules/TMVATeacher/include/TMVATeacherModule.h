@@ -7,11 +7,10 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef TMVATEACHER_MODULE_H
-#define TMVATEACHER_MODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
-
+#include <analysis/TMVAInterface/TMVATeacher.h>
 
 namespace Belle2 {
 
@@ -70,9 +69,10 @@ namespace Belle2 {
     std::vector<std::string> m_listNames; /**< input particle list names */
     std::vector<std::string> m_variables; /**< input variables for the TMVA method */
     std::string m_target; /**< target used by multivariate analysis method */
-    std::map<std::string, std::string> m_methodNames; /**< used multivariate analysis methods */
-    std::string m_identifierName; /**< identifier name for the files created by the TMVA method */
+    std::vector<std::tuple<std::string, std::string, std::string>> m_methods; /**< tuple(name, type, config) for every method */
+    std::string m_identifier; /**< identifier name for the files created by the TMVA method */
     std::string m_factoryOption; /**< Options which are passed to the TMVA Factory */
+    std::string m_prepareOption; /**< Options which are passed to the TMVA Factory::PrepareTrainingAndTestTree */
 
     TMVATeacher* m_method; /**< Used TMVA method */
 
@@ -80,5 +80,4 @@ namespace Belle2 {
 
 } // Belle2 namespace
 
-#endif
 

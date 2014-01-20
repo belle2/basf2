@@ -35,11 +35,12 @@ namespace Belle2 {
     // Add parameters
     std::vector<std::string> defaultList;
     addParam("listNames", m_listNames, "Input particle list names as list", defaultList);
-    addParam("methods", m_methodNames, "Dictonary with MethodName and OptionString pairs. The MethodName has to start with a valid method. Valid methods are: BDT, KNN, NeuroBayes, Fisher. Valid names are therefore BDT, BDTWithGradientBo    ost, BDT_MySecondBDTWhichDoesntOverwriteMyFirstOne,... The OptionString is passed to the TMVA Method and is documented in the TMVA UserGuide.");
-    addParam("file", m_identifierName, "Identifier which is used by the TMVA method to write the files weights/$identifier_$method.class.C and weights/$identifier_$method.weights.xml with additional information");
+    addParam("methods", m_methods, "Vector of Tuples with (Name, Type, Config) of the methods. Valid types are: BDT, KNN, NeuroBayes, Fisher. The Config is passed to the TMVA Method and is documented in the TMVA UserGuide.");
+    addParam("identifier", m_identifier, "Identifier which is used by the TMVA method to write the files weights/$identifier_$method.class.C and weights/$identifier_$method.weights.xml with additional information");
     addParam("variables", m_variables, "Input variables used by the TMVA method", defaultList);
     addParam("target", m_target, "Target used by the method");
-    addParam("factoryOption", m_factoryOption, "Option passed to TMVA::FactoryName", std::string("!V:!Silent:Color:DrawProgressBar:Transformations=I;D;P;G,D:AnalysisType=Classification"));
+    addParam("factoryOption", m_factoryOption, "Option passed to TMVA::Factory", std::string("!V:!Silent:Color:DrawProgressBar:Transformations=I;D;P;G,D:AnalysisType=Classification"));
+    addParam("prepareOption", m_prepareOption, "Option passed to TMVA::Factory::PrepareTrainingAndTestTree", std::string("SplitMode=random:!V"));
 
     m_method = nullptr;
   }
@@ -58,13 +59,16 @@ namespace Belle2 {
 
   void TMVATeacherModule::beginRun()
   {
-    m_method = new TMVATeacher(m_variables, m_target, m_methodNames, m_identifierName, m_factoryOption);
+    std::vector<TMVAMethod> methods;
+    for (auto & x : m_methods) {
+      methods.push_back(TMVAMethod(std::get<0>(x), std::get<1>(x), std::get<2>(x)));
+    }
+    m_method = new TMVATeacher(m_identifier, m_variables, m_target, methods);
   }
 
   void TMVATeacherModule::endRun()
   {
-    //TODO Where to put this train method, maybe endRun() is better
-    m_method->train();
+    m_method->train(m_factoryOption, m_prepareOption);
     if (m_method !=  nullptr) {
       delete m_method;
       m_method = nullptr;

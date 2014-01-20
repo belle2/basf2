@@ -170,7 +170,7 @@ class Particle:
         selectParticle(pdg.to_name(self.pdg), self.pdg, [], path=path)
 
         # Because anti-particles aren't handled properly yet we have to select
-        # the change conjugate particles by hand. For Pi0 and Photons this
+        # the charge conjugate particles by hand. For Pi0 and Photons this
         # doesn't make sense, so we exclude them here by hand.
         if not self.pdg == 111 and not self.pdg == 22:
             selectParticle(pdg.to_name(-self.pdg), -self.pdg, [], path=path)
@@ -264,8 +264,9 @@ class Particle:
                 expert.param('identifier', self.to_string(channel) + '_'
                              + hash)
                 expert.param('method', method[0])
-                expert.param('variables', self.variables)
-                expert.param('target', method[0])
+                # TODO All methods use the same target variable at the moment we
+                # want to use different targets for different methods later
+                expert.param('target', 'SignalProbability')
                 expert.param('listNames', [self.to_string(channel)])
                 path.add_module(expert)
 

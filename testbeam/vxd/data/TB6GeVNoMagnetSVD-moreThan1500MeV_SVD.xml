@@ -1,0 +1,1210 @@
+<TB6GeVNoMagnetSVD-moreThan1500MeV_SVD>
+<![CDATA[<Object class="Belle2__VXDTFSecMap">
+  <Belle2__VXDTFSecMap version="2">
+    <TObject fUniqueID="0" fBits="2000000"/>
+    <m_sectorMap>
+      <Version v="9"/>
+      <Int_t v="4"/>
+      <Object class="pair_unsigned_int_vector_pair_unsigned_int_vector_pair_unsigned_int_pair_double_double___________">
+        <pair_unsigned_int_vector_pair_unsigned_int_vector_pair_unsigned_int_pair_double_double___________ version="1">
+          <first v="856358913"/>
+          <second>
+            <Version v="9"/>
+            <Int_t v="1"/>
+            <Object class="pair_unsigned_int_vector_pair_unsigned_int_pair_double_double_______">
+              <pair_unsigned_int_vector_pair_unsigned_int_pair_double_double_______ version="1">
+                <first v="0"/>
+                <second>
+                  <Version v="9"/>
+                  <Int_t v="5"/>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="3"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="1.318852e+03"/>
+                          <second v="1.318852e+03"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="4"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="1.318852e+03"/>
+                          <second v="1.318852e+03"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="5"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="-1.901171e+00"/>
+                          <second v="-1.837803e+00"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="7"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="-1.709191e+06"/>
+                          <second v="-1.647257e+06"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="11"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="9.944050e-01"/>
+                          <second v="9.948077e-01"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                </second>
+              </pair_unsigned_int_vector_pair_unsigned_int_pair_double_double_______>
+            </Object>
+          </second>
+        </pair_unsigned_int_vector_pair_unsigned_int_vector_pair_unsigned_int_pair_double_double___________>
+      </Object>
+      <Object class="pair_unsigned_int_vector_pair_unsigned_int_vector_pair_unsigned_int_pair_double_double___________">
+        <pair_unsigned_int_vector_pair_unsigned_int_vector_pair_unsigned_int_pair_double_double___________ version="1">
+          <first v="1141637121"/>
+          <second>
+            <Version v="9"/>
+            <Int_t v="2"/>
+            <Object class="pair_unsigned_int_vector_pair_unsigned_int_pair_double_double_______">
+              <pair_unsigned_int_vector_pair_unsigned_int_pair_double_double_______ version="1">
+                <first v="0"/>
+                <second>
+                  <Version v="9"/>
+                  <Int_t v="5"/>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="3"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="1.613060e+03"/>
+                          <second v="1.678899e+03"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="4"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="1.612829e+03"/>
+                          <second v="1.678659e+03"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="5"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="-5.623470e+00"/>
+                          <second v="-5.402942e+00"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="7"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="-3.967474e+04"/>
+                          <second v="-3.811887e+04"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="11"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="9.622428e-01"/>
+                          <second v="1.001518e+00"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                </second>
+              </pair_unsigned_int_vector_pair_unsigned_int_pair_double_double_______>
+            </Object>
+            <Object class="pair_unsigned_int_vector_pair_unsigned_int_pair_double_double_______">
+              <pair_unsigned_int_vector_pair_unsigned_int_pair_double_double_______ version="1">
+                <first v="856358913"/>
+                <second>
+                  <Version v="9"/>
+                  <Int_t v="19"/>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="0"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="6.492443e-03"/>
+                          <second v="6.513240e-03"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="1"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="6.513993e-03"/>
+                          <second v="6.515941e-03"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="2"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="6.542865e-03"/>
+                          <second v="6.543315e-03"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="3"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="1.764000e+01"/>
+                          <second v="1.764000e+01"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="4"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="1.764000e+01"/>
+                          <second v="1.764000e+01"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="5"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="-1.844783e-01"/>
+                          <second v="-1.694279e-01"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="6"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="-9.483803e+03"/>
+                          <second v="-8.677177e+03"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="7"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="-1.119874e+06"/>
+                          <second v="-9.862053e+05"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="8"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="-1.053621e+03"/>
+                          <second v="-9.875843e+02"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="9"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="8.807161e-03"/>
+                          <second v="8.837183e-03"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="11"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="9.955361e-01"/>
+                          <second v="9.957074e-01"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="12"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="2.136573e+02"/>
+                          <second v="2.150985e+02"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="14"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="6.492443e-03"/>
+                          <second v="6.513240e-03"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="15"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="6.542865e-03"/>
+                          <second v="6.543315e-03"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="16"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="6.513993e-03"/>
+                          <second v="6.515941e-03"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="17"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="2.136573e+02"/>
+                          <second v="2.150985e+02"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="18"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="-1.053621e+03"/>
+                          <second v="-9.875843e+02"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="19"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="8.807161e-03"/>
+                          <second v="8.837183e-03"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="20"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="-9.483803e+03"/>
+                          <second v="-8.677177e+03"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                </second>
+              </pair_unsigned_int_vector_pair_unsigned_int_pair_double_double_______>
+            </Object>
+          </second>
+        </pair_unsigned_int_vector_pair_unsigned_int_vector_pair_unsigned_int_pair_double_double___________>
+      </Object>
+      <Object class="pair_unsigned_int_vector_pair_unsigned_int_vector_pair_unsigned_int_pair_double_double___________">
+        <pair_unsigned_int_vector_pair_unsigned_int_vector_pair_unsigned_int_pair_double_double___________ version="1">
+          <first v="1426915329"/>
+          <second>
+            <Version v="9"/>
+            <Int_t v="1"/>
+            <Object class="pair_unsigned_int_vector_pair_unsigned_int_pair_double_double_______">
+              <pair_unsigned_int_vector_pair_unsigned_int_pair_double_double_______ version="1">
+                <first v="1141637121"/>
+                <second>
+                  <Version v="9"/>
+                  <Int_t v="23"/>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="0"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="1.026065e-02"/>
+                          <second v="1.026295e-02"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="1"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="1.026492e-02"/>
+                          <second v="1.026670e-02"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="2"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="1.026384e-02"/>
+                          <second v="1.026428e-02"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="3"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="5.760000e+00"/>
+                          <second v="5.760000e+00"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="4"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="5.760000e+00"/>
+                          <second v="5.760000e+00"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="5"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="-1.246037e-01"/>
+                          <second v="-1.198592e-01"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="6"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="-1.967564e+02"/>
+                          <second v="-1.820225e+02"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="7"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="-1.176258e+05"/>
+                          <second v="-9.652133e+04"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="8"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="-1.337777e+03"/>
+                          <second v="-1.286883e+03"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="9"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="3.436896e-03"/>
+                          <second v="3.621665e-03"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="10"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="3.493615e-03"/>
+                          <second v="3.544371e-03"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="11"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="9.957046e-01"/>
+                          <second v="9.957911e-01"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="12"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="8.475839e+01"/>
+                          <second v="8.701495e+01"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="13"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="1.920719e+00"/>
+                          <second v="2.201372e+00"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="14"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="1.018625e-02"/>
+                          <second v="1.019733e-02"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="15"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="1.025212e-02"/>
+                          <second v="1.025548e-02"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="16"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="1.020850e-02"/>
+                          <second v="1.020992e-02"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="17"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="2.178707e+02"/>
+                          <second v="2.187522e+02"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="18"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="-4.506704e+03"/>
+                          <second v="-4.285915e+03"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="19"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="8.976781e-03"/>
+                          <second v="9.054143e-03"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="20"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="-7.717879e+03"/>
+                          <second v="-7.602328e+03"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="21"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="3.493615e-03"/>
+                          <second v="3.544371e-03"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="22"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="1.920719e+00"/>
+                          <second v="2.201372e+00"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                </second>
+              </pair_unsigned_int_vector_pair_unsigned_int_pair_double_double_______>
+            </Object>
+          </second>
+        </pair_unsigned_int_vector_pair_unsigned_int_vector_pair_unsigned_int_pair_double_double___________>
+      </Object>
+      <Object class="pair_unsigned_int_vector_pair_unsigned_int_vector_pair_unsigned_int_pair_double_double___________">
+        <pair_unsigned_int_vector_pair_unsigned_int_vector_pair_unsigned_int_pair_double_double___________ version="1">
+          <first v="1712193537"/>
+          <second>
+            <Version v="9"/>
+            <Int_t v="2"/>
+            <Object class="pair_unsigned_int_vector_pair_unsigned_int_pair_double_double_______">
+              <pair_unsigned_int_vector_pair_unsigned_int_pair_double_double_______ version="1">
+                <first v="1141637121"/>
+                <second>
+                  <Version v="9"/>
+                  <Int_t v="19"/>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="0"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="4.285886e-03"/>
+                          <second v="4.460820e-03"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="1"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="4.311357e-03"/>
+                          <second v="4.487331e-03"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="2"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="4.357784e-03"/>
+                          <second v="4.535653e-03"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="3"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="2.966041e+01"/>
+                          <second v="3.087104e+01"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="4"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="2.964534e+01"/>
+                          <second v="3.085535e+01"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="5"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="-7.716567e-01"/>
+                          <second v="-7.413957e-01"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="6"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="3.366106e-01"/>
+                          <second v="3.503499e-01"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="7"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="-6.049247e+03"/>
+                          <second v="-5.812022e+03"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="8"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="6.368935e-01"/>
+                          <second v="6.628892e-01"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="9"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="3.618275e-03"/>
+                          <second v="3.765960e-03"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="11"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="9.618298e-01"/>
+                          <second v="1.001088e+00"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="12"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="8.558780e+01"/>
+                          <second v="8.908118e+01"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="14"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="4.285886e-03"/>
+                          <second v="4.460820e-03"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="15"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="4.357784e-03"/>
+                          <second v="4.535653e-03"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="16"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="4.311357e-03"/>
+                          <second v="4.487331e-03"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="17"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="8.558780e+01"/>
+                          <second v="8.908118e+01"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="18"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="6.368935e-01"/>
+                          <second v="6.628892e-01"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="19"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="3.618275e-03"/>
+                          <second v="3.765960e-03"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="20"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="3.366106e-01"/>
+                          <second v="3.503499e-01"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                </second>
+              </pair_unsigned_int_vector_pair_unsigned_int_pair_double_double_______>
+            </Object>
+            <Object class="pair_unsigned_int_vector_pair_unsigned_int_pair_double_double_______">
+              <pair_unsigned_int_vector_pair_unsigned_int_pair_double_double_______ version="1">
+                <first v="1426915329"/>
+                <second>
+                  <Version v="9"/>
+                  <Int_t v="23"/>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="0"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="1.333776e-01"/>
+                          <second v="1.334611e-01"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="1"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="1.333892e-01"/>
+                          <second v="1.334621e-01"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="2"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="1.340823e-01"/>
+                          <second v="1.341354e-01"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="3"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="9.610000e+00"/>
+                          <second v="9.610000e+00"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="4"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="9.610000e+00"/>
+                          <second v="9.610000e+00"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="5"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="-1.619902e-01"/>
+                          <second v="-1.607948e-01"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="6"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="-3.423283e+02"/>
+                          <second v="-3.183861e+02"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="7"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="-4.179558e+05"/>
+                          <second v="-3.762180e+05"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="8"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="-1.371834e+02"/>
+                          <second v="-1.333375e+02"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="9"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="3.541495e-03"/>
+                          <second v="3.759775e-03"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="10"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="3.727455e-03"/>
+                          <second v="5.195597e-03"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="11"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="9.958877e-01"/>
+                          <second v="9.960497e-01"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="12"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="8.784832e+01"/>
+                          <second v="9.049739e+01"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="13"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="1.986694e+00"/>
+                          <second v="2.150880e+00"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="14"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="7.456663e-03"/>
+                          <second v="7.461277e-03"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="15"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="7.497115e-03"/>
+                          <second v="7.497771e-03"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="16"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="7.463047e-03"/>
+                          <second v="7.468961e-03"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="17"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="2.411222e+02"/>
+                          <second v="2.496061e+02"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="18"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="-2.418143e+03"/>
+                          <second v="-2.086986e+03"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="19"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="9.844865e-03"/>
+                          <second v="1.023963e-02"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="20"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="-9.338887e+03"/>
+                          <second v="-7.624985e+03"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="21"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="3.043318e-03"/>
+                          <second v="3.190212e-03"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                  <Object class="pair_unsigned_int_pair_double_double___">
+                    <pair_unsigned_int_pair_double_double___ version="1">
+                      <first v="22"/>
+                      <second>
+                        <pair_double_double_ version="1">
+                          <first v="1.528422e+00"/>
+                          <second v="1.635907e+00"/>
+                        </pair_double_double_>
+                      </second>
+                    </pair_unsigned_int_pair_double_double___>
+                  </Object>
+                </second>
+              </pair_unsigned_int_vector_pair_unsigned_int_pair_double_double_______>
+            </Object>
+          </second>
+        </pair_unsigned_int_vector_pair_unsigned_int_vector_pair_unsigned_int_pair_double_double___________>
+      </Object>
+    </m_sectorMap>
+    <m_nameOfSecMap>
+      <Version v="9"/>
+      <UChar_t v="37"/>
+      <CharStar v="TB6GeVNoMagnetSVD-moreThan1500MeV_SVD"/>
+    </m_nameOfSecMap>
+    <m_detectorType>
+      <Version v="9"/>
+      <UChar_t v="3"/>
+      <CharStar v="SVD"/>
+    </m_detectorType>
+    <m_sectorConfigU>
+      <Version v="9"/>
+      <Int_t v="2"/>
+      <Array>
+        <Double_t v="0.000000e+00"/>
+        <Double_t v="1.000000e+00"/>
+      </Array>
+    </m_sectorConfigU>
+    <m_sectorConfigV>
+      <Version v="9"/>
+      <Int_t v="2"/>
+      <Array>
+        <Double_t v="0.000000e+00"/>
+        <Double_t v="1.000000e+00"/>
+      </Array>
+    </m_sectorConfigV>
+    <m_origin>
+      <TVector3 version="3">
+        <TObject fUniqueID="0" fBits="2000000"/>
+        <fX v="4.000000e+01"/>
+        <fY v="0.000000e+00"/>
+        <fZ v="0.000000e+00"/>
+      </TVector3>
+    </m_origin>
+    <m_magneticFieldStrength v="1.000000e-02"/>
+    <m_additionalInfo>
+      <Version v="9"/>
+      <UChar_t v="49"/>
+      <CharStar v=" lower pT threshold: 1.5, upper pT threshold: 1.5"/>
+    </m_additionalInfo>
+    <m_dist2OriginMap>
+      <Version v="9"/>
+      <Int_t v="5"/>
+      <Object class="pair_unsigned_int_double_">
+        <pair_unsigned_int_double_ version="1">
+          <first v="0"/>
+          <second v="0.000000e+00"/>
+        </pair_unsigned_int_double_>
+      </Object>
+      <Object class="pair_unsigned_int_double_">
+        <pair_unsigned_int_double_ version="1">
+          <first v="856358913"/>
+          <second v="3.833858e+01"/>
+        </pair_unsigned_int_double_>
+      </Object>
+      <Object class="pair_unsigned_int_double_">
+        <pair_unsigned_int_double_ version="1">
+          <first v="1141637121"/>
+          <second v="4.233841e+01"/>
+        </pair_unsigned_int_double_>
+      </Object>
+      <Object class="pair_unsigned_int_double_">
+        <pair_unsigned_int_double_ version="1">
+          <first v="1426915329"/>
+          <second v="4.464312e+01"/>
+        </pair_unsigned_int_double_>
+      </Object>
+      <Object class="pair_unsigned_int_double_">
+        <pair_unsigned_int_double_ version="1">
+          <first v="1712193537"/>
+          <second v="4.762843e+01"/>
+        </pair_unsigned_int_double_>
+      </Object>
+    </m_dist2OriginMap>
+  </Belle2__VXDTFSecMap>
+</Object>
+]]>
+</TB6GeVNoMagnetSVD-moreThan1500MeV_SVD>

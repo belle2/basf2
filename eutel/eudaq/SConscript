@@ -1,0 +1,7 @@
+Import('env')
+
+env['LIBS'] = ['$ROOT_LIBS', 'framework', 'vxd_dataobjects', 'testbeam_vxd_dataobjects']
+
+env['SUBLIB'] = True
+
+Return('env')

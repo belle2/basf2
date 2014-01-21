@@ -72,8 +72,13 @@ namespace Belle2 {
       /** Unpack DHP data within one DHH frame
        * @param data pointer to dhp data
        * @param len length of dhp data
+       * @param dhh_first_readout_frame_lo 16 bit of the first readout frame from DHH Start
+       * @param dhh_ID raw DHH ID from DHHC frame
+       * @param dhh_DHPport raw DHP port from DHHC frame
+       * @param dhh_reformat flag if DHH did reformatting
+       * @param toffset triggered row (offset)
        */
-      void unpack_dhp(void* data, unsigned int len, unsigned int dhh_first_frame_id_lo, unsigned int dhh_ID, unsigned short toffset);
+      void unpack_dhp(void* data, unsigned int len, unsigned int dhh_first_readout_frame_lo, unsigned int dhh_ID, unsigned dhh_DHPport, unsigned dhh_reformat, unsigned short toffset);
 
     };//end class declaration
 

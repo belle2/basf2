@@ -64,6 +64,8 @@ namespace Belle2 {
       TH1F* hrawPxdHitsCharge[10];
       /** Histogram raw pixel common mode */
       TH1F* hrawPxdHitsCommonMode[10];
+      /** Histogram raw pixel trigger window */
+      TH1F* hrawPxdHitsTimeWindow[10];
 
       //map<int,int> sensor_to_histindex;
 

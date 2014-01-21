@@ -866,10 +866,12 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int len2, unsigned int d
           B2ERROR("Error: Pix without Row!!! skip dhp data ");
           dhp_pixel_error++;
           return;
-          // return -2;
         } else {
           dhp_row = (dhp_row & 0xFFE) | ((dhp_pix[i] >> 14) & 0x001);
-          dhp_col = ((dhp_pix[i] >> 8) & 0x3F) + dhp_offset;
+          dhp_col = ((dhp_pix[i] >> 8) & 0x3F);
+          ///  remapping flag
+          if (dhh_reformat == 0) dhp_col ^= 0x3C ; /// 0->60 61 62 63 4->56 57 58 59 ...
+          dhp_col += dhp_offset;
           dhp_adc = dhp_pix[i] & 0xFF;
           if (printflag)
             B2INFO("SetPix: Row " << hex << dhp_row << " Col " << hex << dhp_col << " ADC " << hex << dhp_adc

@@ -1,3 +1,12 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2013 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Tobias Schlüter                                          *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
 #ifndef TrackfitDQMModule_H_
 #define TrackfitDQMModule_H_
 
@@ -11,11 +20,18 @@
 #include <vxd/dataobjects/VxdID.h>
 #include <svd/geometry/SensorInfo.h>
 #include <vxd/geometry/GeoCache.h>
+#include <vxd/dataobjects/VxdID.h>
+#include <tracking/pxdDataReductionClasses/ROIDetPlane.h>
 
 #include <string>
 
 #include "TH1.h"
 #include "TH2.h"
+#include "TProfile.h"
+
+namespace genfit {
+  class Track;
+}
 
 namespace Belle2 {
 
@@ -85,6 +101,12 @@ namespace Belle2 {
       m_allHistos.push_back(h);
       return h;
     }
+    TProfile* getHistProfile(const char* name, const char* title,
+                             int nBins, double x0, double x1) {
+      TProfile* h = new TProfile(name, title, nBins, x0, x1);
+      m_allHistos.push_back(h);
+      return h;
+    }
     TH2* getHist(const char* name, const char* title,
                  int nBinsX, double x0, double x1,
                  int nBinsY, double y0, double y1) {
@@ -96,6 +118,10 @@ namespace Belle2 {
                  int nBins, double x0, double x1) {
       return getHist(name.c_str(), title.c_str(), nBins, x0, x1);
     }
+    TProfile* getHistProfile(const std::string& name, const std::string& title,
+                             int nBins, double x0, double x1) {
+      return getHistProfile(name.c_str(), title.c_str(), nBins, x0, x1);
+    }
     TH2* getHist(const std::string& name, const std::string& title,
                  int nBinsX, double x0, double x1,
                  int nBinsY, double y0, double y1) {
@@ -106,17 +132,38 @@ namespace Belle2 {
     TH1* m_hNDF;
     TH1* m_hChi2;
     TH1* m_hPval;
+    TH2* m_hNDFChi2;
+    TH2* m_hNDFPval;
 
     /** Residuals in cm.  */
     TH1* m_hResidualSVDU[c_nSVDPlanes];
     TH1* m_hResidualSVDV[c_nSVDPlanes];
+    TH2* m_hNDFResidualSVDU[c_nSVDPlanes];
+    TH2* m_hNDFResidualSVDV[c_nSVDPlanes];
 
     /** Residuals normalized with tracking error.  */
     TH1* m_hNormalizedResidualSVDU[c_nSVDPlanes];
     TH1* m_hNormalizedResidualSVDV[c_nSVDPlanes];
+    TH2* m_hNDFNormalizedResidualSVDU[c_nSVDPlanes];
+    TH2* m_hNDFNormalizedResidualSVDV[c_nSVDPlanes];
+
+    /** The pseudo efficiencies := number of total reco tracks hitting the
+    plane (y = 0), number of reco tracks with associated hits in this
+    plane (y = 2, because denominator double-counts).  */
+    TH1* m_hPseudoEfficienciesU;
+    TH1* m_hPseudoEfficienciesV;
 
     /** Correlation between seed and fitted track for five parameters in the first plane.  */
-    TH2* m_hSeedQuality[5];
+    TH2* m_hSeedQuality[6];
+
+    void findPlanes();
+    std::vector<ROIDetPlane> m_vPlanes;
+
+    void plotResiduals(const genfit::Track* track);
+    void plotPseudoEfficiencies(const genfit::Track* track);
+    void plotSeedQuality(const genfit::Track* track);
+
+    bool m_fillExpertHistos;
   };
 
 }

@@ -80,6 +80,7 @@ void DisplayModule::initialize()
   StoreArray<PXDCluster>::optional();
   StoreArray<SVDCluster>::optional();
   StoreArray<CDCHit>::optional();
+  StoreArray<ROIid>::optional();
 
   if (!gGeoManager) { //TGeo geometry not initialized, do it ourselves
     //convert geant4 geometry to TGeo geometry
@@ -181,6 +182,7 @@ void DisplayModule::event()
       } else {
         m_visualizer->addTrackCandidate(gftrackcands[i], TString::Format("genfit::TrackCand %d", i),
                                         StoreArray<PXDTrueHit>(), StoreArray<SVDTrueHit>(), StoreArray<CDCHit>());
+
       }
     }
 
@@ -193,6 +195,11 @@ void DisplayModule::event()
       m_visualizer->addUnassignedRecoHits(StoreArray<SVDTrueHit>());
     }
     m_visualizer->addUnassignedRecoHits(StoreArray<CDCHit>());
+
+    StoreArray<ROIid> ROIs;
+    for (int i = 0 ; i < ROIs.getEntries(); i++)
+      m_visualizer->addROI(ROIs[i], "ROIs_" + i);
+
   }
 
   if (m_showTrackLevelObjects) {

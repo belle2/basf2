@@ -429,7 +429,7 @@ void EVEVisualization::addTrack(const genfit::Track* track, const TString& label
     double charge = rep->getCharge(*fittedState);
 
     // draw track if corresponding option is set ------------------------------------------
-    if (prevFittedState != NULL) {
+    if (j > 0) {
       makeLines(eveTrack, prevFittedState, fittedState, rep, c_trackColor, 1, drawMarkers, drawErrors, 3.0);
       if (drawErrors) { // make sure to draw errors in both directions
         makeLines(eveTrack, prevFittedState, fittedState, rep, c_trackColor, 1, false, drawErrors, 3.0, 0);
@@ -1280,6 +1280,37 @@ void EVEVisualization::addGamma(const ECLGamma* gamma, const TString& name)
   gammaVis->SetMainColor(kGreen + 2);
   gammaVis->SetLineWidth(2.0);
   m_calo3d->AddElement(gammaVis);
+}
+
+void EVEVisualization::addROI(const ROIid* roi, const TString& name)
+{
+
+  VXD::GeoCache& aGeometry = VXD::GeoCache::getInstance();
+
+  VxdID sensorID = roi->getSensorID();
+  const VXD::SensorInfoBase& aSensorInfo = aGeometry.getSensorInfo(sensorID);
+
+  double minU = aSensorInfo.getUCellPosition(roi->getMinUid(), roi->getMinVid());
+  double minV = aSensorInfo.getVCellPosition(roi->getMinVid());
+  double maxU = aSensorInfo.getUCellPosition(roi->getMaxUid(), roi->getMaxVid());
+  double maxV = aSensorInfo.getVCellPosition(roi->getMaxVid());
+
+  TVector3 localA(minU, minV, 0);
+  TVector3 localB(minU, maxV, 0);
+  TVector3 localC(maxU, minV, 0);
+
+  TVector3 globalA = aSensorInfo.pointToGlobal(localA);
+  TVector3 globalB = aSensorInfo.pointToGlobal(localB);
+  TVector3 globalC = aSensorInfo.pointToGlobal(localC);
+
+  TEveBox* ROIbox = boxCreator((globalB + globalC) * 0.5 , globalB - globalA, globalC - globalA, maxU - minU, maxV - minV, 0.01);
+
+  ROIbox->SetName(name);
+  ROIbox->SetMainColor(kSpring - 9);
+  ROIbox->SetMainTransparency(50);
+
+  m_gftracklist->AddElement(ROIbox);
+
 }
 
 void EVEVisualization::addRecoHit(const SVDCluster* hit, TEveStraightLineSet* lines)

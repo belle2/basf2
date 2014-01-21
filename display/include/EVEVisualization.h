@@ -18,6 +18,7 @@
 #include <ecl/dataobjects/ECLHit.h>
 #include <vxd/geometry/GeoCache.h>
 #include <cdc/geometry/CDCGeometryPar.h>
+#include <tracking/dataobjects/ROIid.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Const.h>
@@ -167,6 +168,9 @@ namespace Belle2 {
 
     /** Add a reconstructed photon in the ECL. */
     void addGamma(const ECLGamma* gamma, const TString& name);
+
+    /** Add a Region Of Interest, computed by the PXDDataReduction module */
+    void addROI(const ROIid* roi, const TString& name);
 
     /** After adding recohits for tracks/candidates, this function adds the remaining hits in a global collection. */
     template <class T> void addUnassignedRecoHits(const StoreArray<T>& hits) {

@@ -1,4 +1,5 @@
 #include "daq/slc/system/ZipDeflater.h"
+#include "daq/slc/system/LogFile.h"
 
 #include <stdio.h>
 #include <zlib.h>
@@ -43,6 +44,8 @@ void ZipDeflater::deflate(int level) throw(IOException)
 void ZipDeflater::writeObject(Writer& writer) throw(IOException)
 {
   writer.writeInt(_comp_size);
+  LogFile::debug("ZipDeflater compressed = %d, original = %d",
+                 _comp_size, _comp_buf_size);
   writer.write(_comp_buf, _comp_size);
   seekTo(0);
 }

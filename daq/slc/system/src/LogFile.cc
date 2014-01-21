@@ -127,8 +127,8 @@ int LogFile::put_impl(const std::string& msg, SystemLog::Priority priority, va_l
     case SystemLog::NOTICE:  ss << "] [NOTICE] "; break;
     case SystemLog::WARNING: ss << "] [WARNING] "; break;
     case SystemLog::ERROR:   ss << "] [ERROR] "; break;
-    case SystemLog::FATAL:   ss << "][FATAL] "; break;
-    default:                 ss << "][UNKNOWN] "; break;
+    case SystemLog::FATAL:   ss << "] [FATAL] "; break;
+    default:                 ss << "] [UNKNOWN] "; break;
   }
   char s[1024];
   vsprintf(s, msg.c_str(), ap);

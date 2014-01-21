@@ -50,6 +50,17 @@ bool PackageManager::update()
   return updated;
 }
 
+void PackageManager::reset()
+{
+  _lock.wrlock();
+  getPackage()->reset();
+  getPackage()->setUpdateId(0);
+  getPackage()->setUpdateTime(Belle2::Time().getSecond());
+  _monitor->update();
+  _serializer.update();
+  _lock.unlock();
+}
+
 void PackageManager::setAvailable(bool available)
 {
   _lock.wrlock();

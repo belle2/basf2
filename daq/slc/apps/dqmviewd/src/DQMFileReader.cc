@@ -16,30 +16,24 @@
 
 using namespace Belle2;
 
-DQMFileReader::DQMFileReader(const std::string& name) : _file(NULL)
-{
-  _name = name;
-  _hist_m = new DQMHistMap();
-}
-
 DQMFileReader::~DQMFileReader()
 {
-  delete _hist_m;
   if (_file) _file->Close();
   _file = NULL;
 }
 
 TH1* DQMFileReader::getHist(const std::string& name)
 {
-  return _hist_m->getHist(name);
+  return _hist_m.getHist(name);
 }
 
-bool DQMFileReader::init(const char* file_path)
+bool DQMFileReader::init()
 {
+  _mutex.lock();
   if (_file) _file->Close();
-  LogFile::debug(file_path);
-  _file = TMapFile::Create(file_path);
-  _hist_m->clear();
+  LogFile::debug("Reading TMapfile: %s", _hist_m.getFileName().c_str());
+  _file = TMapFile::Create(_hist_m.getFileName().c_str());
+  _hist_m.clear();
   TMapRec* mr = _file->GetFirst();
   while (_file->OrgAddress(mr)) {
     TObject* obj = _file->Get(mr->GetName());
@@ -47,60 +41,64 @@ bool DQMFileReader::init(const char* file_path)
       TString class_name = obj->ClassName();
       if (class_name.Contains("TH1") ||  class_name.Contains("TH2")) {
         TH1* h = (TH1*)obj;
-        _hist_m->addHist(h);
+        LogFile::debug("%s in %s", h->GetName(), _name.c_str());
+        _hist_m.addHist(h);
       }
     }
     mr = mr->GetNext();
   }
-  return (_ready = _hist_m->getHists().size() > 0);
+  bool ready = _ready = _hist_m.getHists().size() > 0;
+  _mutex.unlock();
+  return ready;
 }
 
-void DQMFileReader::update(HistoPackage* pack)
+int DQMFileReader::update()
 {
-  if (pack == NULL) return;
+  _mutex.lock();
   _file->Update();
-  for (TH1Map::iterator it = _hist_m->getHists().begin();
-       it != _hist_m->getHists().end(); it++) {
+  _updateid++;
+  for (TH1Map::iterator it = _hist_m.getHists().begin();
+       it != _hist_m.getHists().end(); it++) {
     std::string name = it->first;
-    Histo* histo = (Histo*)pack->getHisto(name);
-    if (histo != NULL && _hist_m->hasHist(name)) {
-      delete it->second;
-      TObject* obj = _file->Get(name.c_str());
-      TH1* h = (TH1*)obj;
-      _hist_m->addHist(h);
-      if (histo->getDim() == 1) {
-        Belle2::debug("histogram : %s (entries=%d)", h->GetName(), h->Integral());
-        for (int nbinx = 0; nbinx < h->GetNbinsX(); nbinx++) {
-          histo->setBinContent(nbinx, h->GetBinContent(nbinx + 1));
-        }
-      } else if (histo->getDim() == 2) {
-        Belle2::debug("histogram : %s (entries=%d)", h->GetName(), h->Integral());
-        for (int nbiny = 0; nbiny < h->GetNbinsY(); nbiny++) {
-          for (int nbinx = 0; nbinx < h->GetNbinsX(); nbinx++) {
-            histo->setBinContent(nbinx, nbiny, h->GetBinContent(nbinx + 1, nbiny + 1));
-          }
-        }
-      }
-      histo->setUpdated(true);
+    TH1* h_copy = (TH1*)(it->second)->Clone();
+    delete it->second;
+    TObject* obj = _file->Get(name.c_str());
+    TH1* h = (TH1*)obj;
+    TString class_name = h->ClassName();
+    if (strcmp(h_copy->ClassName(), h->ClassName()) != 0 ||
+        ((class_name.Contains("TH1") && (h->GetNbinsX() != h_copy->GetNbinsX())) ||
+         ((class_name.Contains("TH2") && (h->GetNbinsX() != h_copy->GetNbinsX() ||
+                                          h->GetNbinsY() != h_copy->GetNbinsY()))))) {
+      _updateid = 0;
     }
+    if (_updateid % 10 == 0) {
+      LogFile::debug("Entries of %s = %d", h->GetName(), (int)h->GetEntries());
+    }
+    delete h_copy;
+    _hist_m.addHist(h);
   }
+  int updateid = _updateid;
+  _mutex.unlock();
+  return updateid;
 }
 
 bool DQMFileReader::dump(const std::string& dir,
                          unsigned int expno, unsigned int runno)
 {
+  _mutex.lock();
   std::string filepath = Form("%s/DQM_%s_%04d_%06d.root",
                               dir.c_str(), _name.c_str(), expno, runno);
   LogFile::debug("created DQM dump file: %s", filepath.c_str());
   TFile* file = new TFile(filepath.c_str(), "recreate");
-  for (TH1Map::iterator it = _hist_m->getHists().begin();
-       it != _hist_m->getHists().end(); it++) {
+  for (TH1Map::iterator it = _hist_m.getHists().begin();
+       it != _hist_m.getHists().end(); it++) {
     TObject* obj = _file->Get(it->first.c_str());
     obj->Write();
   }
   file->Close();
   delete file;
   _file->cd();
+  _mutex.unlock();
   return true;
 }
 

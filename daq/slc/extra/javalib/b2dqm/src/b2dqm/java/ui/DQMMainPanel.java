@@ -1,20 +1,15 @@
 package b2dqm.java.ui;
 
 import java.awt.Component;
-import java.io.InputStream;
 import java.util.ArrayList;
 
 import javax.swing.JComponent;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
-import org.w3c.dom.Document;
 
 import b2daq.java.ui.DnDTabbedPane;
 import b2daq.java.ui.UTabPanel;
 import b2daq.ui.Updatable;
+import b2dqm.core.Histo;
 import b2dqm.core.HistoPackage;
-import b2dqm.java.xml.XMLPanelFactory;
 
 public class DQMMainPanel extends DnDTabbedPane implements Updatable {
 
@@ -32,34 +27,23 @@ public class DQMMainPanel extends DnDTabbedPane implements Updatable {
 	}
 
 	public void initPanels(ArrayList<HistoPackage> pack_v,
-			DQMSidePanel side_panel,
-			ArrayList<InputStream> istream_v) {
+						   DQMSidePanel side_panel) {
 		removeAll();
 		_pack_v = pack_v;
 		_side_panel = side_panel;
 		_side_panel.setMainPanel(this);
-		try {
-			for ( int n = 0; n < _pack_v.size() && n < istream_v.size(); n++ ) {
-				HistoPackage pack = _pack_v.get(n);
-				InputStream istream = istream_v.get(n);
-				JComponent panel;
-				if (istream != null) {
-					XMLPanelFactory fact = new XMLPanelFactory();
-					fact.setPackage(pack);
-					DocumentBuilderFactory dbfactory = DocumentBuilderFactory.newInstance();
-					DocumentBuilder builder;
-					try {
-						builder = dbfactory.newDocumentBuilder();
-						Document doc = builder.parse(istream);
-						panel = fact.createPanel(doc.getDocumentElement());
-						addTab(panel.getName(), panel);
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
+		for ( int n = 0; n < _pack_v.size(); n++ ) {
+			HistoPackage pack = _pack_v.get(n);
+			UTabPanel tab = new UTabPanel();
+			tab.setName(pack.getName());
+			for ( int i = 0; i < pack.getNHistos(); i++ ) {
+				Histo h = (Histo)pack.getHisto(i);
+				CanvasPanel canvas = new CanvasPanel(h.getName(), h.getTitle());
+				canvas.getCanvas().addHisto(h);
+				canvas.getCanvas().resetPadding();
+				tab.addTab(h.getName(), canvas);
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
+			addTab(pack.getName(), tab);
 		}
 	}
 
@@ -82,7 +66,7 @@ public class DQMMainPanel extends DnDTabbedPane implements Updatable {
 			for ( int i = 0; i < com_v.length; i++ ) {
 				if ( lookfor(com_v[i], name) ) {
 					if ( com instanceof UTabPanel == true ) {
-						((UTabPanel)jcom).setSelectedComponent(com_v[i]);
+						((UTabPanel)com).setSelectedComponent(com_v[i]);
 					}
 					return true;
 				}
@@ -94,7 +78,7 @@ public class DQMMainPanel extends DnDTabbedPane implements Updatable {
 	public Component getPanel(String name) {
 		for ( int n = 0; n < this.getComponentCount(); n++ ) {
 			Component com = getComponentAt(n);
-			if ( name.matches(com.getName()) ) {
+			if ( com.getName() != null && name.matches(com.getName()) ) {
 				return com;
 			}
 		}

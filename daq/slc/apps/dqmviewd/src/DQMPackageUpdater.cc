@@ -15,53 +15,21 @@ using namespace Belle2;
 
 void DQMPackageUpdater::run()
 {
-  ConfigFile config("dqm");
-  const std::string dumppath = config.get("DQM_DUMP_PATH");
-  const std::string mappath = config.get("DQM_MAP_PATH");
-  LogFile::debug("DQM_DUMP_PATH=%s", dumppath.c_str());
-  LogFile::debug("DQM_MAP_PATH=%s", mappath.c_str());
-  unsigned int expno = 0;
-  unsigned int runno = 0;
-  std::vector<DQMFileReader*> reader_v;
-  std::vector<PackageManager*>& manager_v(_master->getManagers());
-  for (size_t i = 0; i < manager_v.size(); i++) {
-    reader_v.push_back(NULL);
-  }
+  std::vector<DQMFileReader>& reader_v(_master->getReaders());
   while (true) {
-    if (expno != _master->getExpNumber() ||
-        runno != _master->getRunNumber()) {
-      Belle2::debug("creating new DQM records for run # %04d.%06d",
-                    (int)expno, (int)runno);
-      for (size_t i = 0; i < manager_v.size(); i++) {
-        if (reader_v[i] != NULL) {
-          reader_v[i]->dump(dumppath, expno, runno);
-        }
-      }
-      expno = _master->getExpNumber();
-      runno = _master->getRunNumber();
-    }
-    for (size_t index = 0; index < manager_v.size(); index++) {
-      DQMPackage* monitor = (DQMPackage*)manager_v[index]->getMonitor();
-      std::string filename = monitor->getFileName();
-      if (reader_v[index] == NULL) {
-        DQMFileReader* reader = new DQMFileReader(monitor->getPackage()->getName());
-        if (!reader->init((mappath + "/" + filename).c_str())) {
-          delete reader;
-          continue;
-        }
+    _master->lock();
+    for (size_t index = 0; index < reader_v.size(); index++) {
+      DQMFileReader& reader(reader_v[index]);
+      std::string filename = reader.getFileName();
+      if (!reader.isReady() && reader.init()) {
         LogFile::debug("Hist entries was found in %s", filename.c_str());
-        monitor->setHistMap(reader->getHistMap());
-        reader_v[index] = reader;
-        manager_v[index]->init();
-        _master->signal(-2);
       }
-      if (reader_v[index] != NULL) {
-        reader_v[index]->update(manager_v[index]->getPackage());
-        if (manager_v[index]->update()) {
-          _master->signal(index);
-        }
+      if (reader.isReady()) {
+        LogFile::debug("Updating %s", reader.getName().c_str());
+        reader.update();
       }
     }
+    _master->unlock();
     sleep(5);
   }
 }

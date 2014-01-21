@@ -134,7 +134,7 @@ class HistoListPanel extends JPanel {
         	try {
         		Histo h = (Histo)obj;
         		buf.append(" - <a href='"+pack.getName()+":"+obj.getName()+"'>" + 
-        				h.getTitle() +" ("+h.getName() +")"+"</a><br/>");
+        				h.getTitle() /*+" ("+h.getName() +")"*/+"</a><br/>");
         	} catch (Exception e) {
         	//	e.printStackTrace();
         	}
@@ -149,6 +149,7 @@ class HistoListPanel extends JPanel {
             	if ( !DQMMainFrame.get().isSeparated() ) {
             		Component com = _side_panel.getMainPanel().getPanel(name_v[0]);
             		if ( com != null ) {
+                		System.out.println(name_v[1]);
             			_side_panel.getMainPanel().setSelectedComponent(com);
             			DQMMainPanel.lookfor(com, name_v[1]);
             		}

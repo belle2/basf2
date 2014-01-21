@@ -37,6 +37,7 @@ namespace Belle2 {
     void clear();
     bool init();
     bool update();
+    void reset();
 
   protected:
     MonitorPackage* _monitor;

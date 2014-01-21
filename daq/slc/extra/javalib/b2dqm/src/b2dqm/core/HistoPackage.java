@@ -210,4 +210,8 @@ public class HistoPackage implements SerializableObject {
 		}
 	}
 
+	public int getNHistos() {
+		return _histo_v.size();
+	}
+
 }

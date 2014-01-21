@@ -20,13 +20,21 @@ import b2daq.graphics.HtmlColor;
 
 public class JavaGCanvas extends GCanvas {
 	
+	static private Color [][][] __color_list = new Color [256][256][256];
+
 	private Graphics2D _graphics;
 	private Font _j_font;
-	private int _font_real_size = 12;
-	
+	private int _font_real_size = 10;
+
 	public static Color convert(HtmlColor color) {
 		if ( color.isNull() ) return null;
-		return new Color(color.getRed(), color.getGreen(), color.getBlue());
+		int r = color.getRed();
+		int g = color.getGreen();
+		int b = color.getBlue();
+		Color c = __color_list[r][g][b];
+		if ( c != null) return c;
+		else __color_list[r][g][b] = new Color(r, g, b);
+		return __color_list[r][g][b];
 	}
 	
 	public JavaGCanvas(int width, int height) {

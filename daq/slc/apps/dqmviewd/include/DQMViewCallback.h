@@ -23,8 +23,11 @@ namespace Belle2 {
   public:
     virtual void init() throw();
     virtual bool boot() throw();
+    virtual bool load() throw();
     virtual bool start() throw();
     virtual bool stop() throw();
+    virtual bool pause() throw();
+    virtual bool recover() throw();
     virtual bool abort() throw();
     void lock() { _mutex.lock(); }
     void unlock() { _mutex.unlock(); }
@@ -35,7 +38,6 @@ namespace Belle2 {
     unsigned int _runno;
     unsigned int _count;
     Mutex _mutex;
-    Cond _cond;
 
   };
 

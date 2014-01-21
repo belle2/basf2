@@ -108,13 +108,17 @@ public class GHisto2 extends GHisto {
 					color = HtmlColor.WHITE;
 				}
 				canvas.store();
-				canvas.getFill().setColor(color);
-				canvas.getLine().setColor(HtmlColor.NULL);
-				canvas.drawRect(X, Y - height*1.2, width*1.2, height*1.2);
-				canvas.getFill().setColor(HtmlColor.NULL);
-				canvas.getLine().setColor(getLineColor());
-				canvas.getLine().setWidth(getLineWidth());
-				canvas.drawRect(X, Y - height*1.2, width*1.2, height*1.2);
+				if (!color.isNull()) {
+					canvas.getFill().setColor(color);
+					canvas.getLine().setColor(HtmlColor.NULL);
+					canvas.drawRect(X, Y - height*1.2, width*1.2, height*1.2);
+				}
+				if (!getLineColor().isNull()) {
+					canvas.getFill().setColor(HtmlColor.NULL);
+					canvas.getLine().setColor(getLineColor());
+					canvas.getLine().setWidth(getLineWidth());
+					canvas.drawRect(X, Y - height*1.2, width*1.2, height*1.2);
+				}
 				canvas.restore();
 			}
 		}

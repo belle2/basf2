@@ -46,11 +46,10 @@ public class DQMMainFrame extends JFrame {
 	}
 	
 	public void init(ArrayList<HistoPackage> pack_v, 
-			ArrayList<InputStream> istream_v, 
 			ArrayList<PackageInfo> info_v) {
 		_panel.setLayout(new BoxLayout(_panel,BoxLayout.X_AXIS));
 		add(_panel);
-		_main_panel.initPanels(pack_v, _side_panel, istream_v);
+		_main_panel.initPanels(pack_v, _side_panel);
 		_side_panel.init(pack_v);
 		_panel.add(_side_panel);
 		_panel.add(_main_panel);

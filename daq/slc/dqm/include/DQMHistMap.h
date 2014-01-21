@@ -24,7 +24,8 @@ namespace Belle2 {
     TH1* getHist(const std::string& name);
     bool hasHist(const std::string& name);
     TH1Map& getHists() { return _hist_m; }
-    void clear() { _hist_m = TH1Map(); }
+    const TH1Map& getHists() const { return _hist_m; }
+    void clear();
 
   private:
     std::string _file_name;

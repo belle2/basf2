@@ -1,40 +1,47 @@
 #ifndef _Belle2_DQMViewMaster_h
 #define _Belle2_DQMViewMaster_h
 
-#include "daq/slc/apps/MonitorMaster.h"
-
-#include <daq/slc/dqm/DQMPackage.h>
+#include "daq/slc/apps/dqmviewd/DQMFileReader.h"
 
 #include <daq/slc/system/Fork.h>
+#include <daq/slc/system/Cond.h>
+
+#include <daq/slc/base/State.h>
 
 #include <string>
 #include <vector>
-#include <map>
 
 namespace Belle2 {
 
-  class DQMViewMaster : public MonitorMaster {
+  class DQMViewMaster {
 
   public:
-    void add(const std::string mapname, int port,
-             DQMPackage* monitor) {
-      _mapname_v.push_back(mapname);
+    void add(const std::string& pack_name, int port,
+             const std::string& file_path) {
+      _reader_v.push_back(DQMFileReader(pack_name, file_path));
       _port_v.push_back(port);
-      addManager(new PackageManager(monitor));
     }
     bool boot();
     bool abort();
+    std::vector<DQMFileReader>& getReaders() { return _reader_v; }
     void setRunNumbers(unsigned int expno, unsigned int runno) {
       _expno = expno;
       _runno = runno;
     }
-    unsigned int getExpNumber() const {  return _expno; }
-    unsigned int getRunNumber() const {  return _runno; }
+    State& getState() { return _state; }
+    void setState(State state) { _state = state; }
+    unsigned int getExpNumber() const { return _expno; }
+    unsigned int getRunNumber() const { return _runno; }
+    void lock() { _mutex.lock(); }
+    void unlock() { _mutex.unlock(); }
 
   private:
+    Mutex _mutex;
+    Cond _cond;
+    State _state;
     unsigned int _expno;
     unsigned int _runno;
-    std::vector<std::string> _mapname_v;
+    std::vector<DQMFileReader> _reader_v;
     std::vector<int> _port_v;
     std::vector<Fork> _fork_v;
 

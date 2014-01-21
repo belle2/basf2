@@ -42,6 +42,7 @@ int HistoRelay::collect()
       //      printf ( "HistoRelay : obj = %s\n", h1->GetName() );
       nobjs++;
     }
+    delete obj;
     mr = mr->GetNext();
   }
   m_map->Close();

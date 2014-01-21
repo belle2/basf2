@@ -196,7 +196,8 @@ void LogSystem::printErrorSummary()
 
   for (const LogMessage & msg : m_errorLog) {
     int count = errorCount[msg]++;
-    if (count == 1) //this is the first time we see this message
+
+    if (count == 0) //this is the first time we see this message
       uniqueLog.push_back(msg);
   }
   m_errorLog.clear();

@@ -586,31 +586,37 @@ void GenFitterModule::event()
               mcParticlesToTracks.add(aTrackCandPointer->getMcTrackId(), trackCounter);
             }
 
-            TrackFitResult* newTrackFitResult = trackFitResults.appendNew();
-            newTrackFitResult->setCharge(0);
-            newTrackFitResult->setParticleType(chargedStable);
-            newTrackFitResult->setMomentum(dirInPoca);
-            newTrackFitResult->setPosition(poca);
-            newTrackFitResult->setCovariance6(newResultCovariance);
-            newTrackFitResult->setPValue(1);
+            genfit::KalmanFitStatus* fitStatus = gfTrack.getKalmanFitStatus();
+            double pValue = fitStatus->getBackwardPVal();
+            double charge = fitStatus->getCharge();
+
+            TrackFitResult newTrackFitResult(poca, dirInPoca, charge, newResultCovariance,
+                                             chargedStable.getPDGCode(), pValue);
+            TrackFitResult* storedTrackFitResult = trackFitResults.appendNew(newTrackFitResult);
+//            newTrackFitResult->setCharge(0);
+//            newTrackFitResult->setParticleType(chargedStable);
+//            newTrackFitResult->setMomentum(dirInPoca);
+//            newTrackFitResult->setPosition(poca);
+//            newTrackFitResult->setCovariance6(newResultCovariance);
+//            newTrackFitResult->setPValue(1);
             gfTracksToTrackFitResults.add(trackCounter, trackFitResultCounter);
             gfTrackCandidatesToTrackFitResults.add(iCand, trackFitResultCounter);
             gfTrackCandidatesTogfTracks.add(iCand, trackCounter);
             trackFitResultCounter++;
 
-            if (fitSuccess) {
-              genfit::KalmanFitStatus* fs = gfTrack.getKalmanFitStatus();
-              newTrackFitResult->setCharge(fs->getCharge());
-              newTrackFitResult->setPValue(fs->getBackwardPVal());
-              double Pval = fs->getBackwardPVal();
-              /*hPval->Fill(Pval);
-              if (nPXD == 0 && nSVD == 0)
-                 hPvalCDC->Fill(Pval);
-               else if (nCDC == 0)
-                 hPvalVXD->Fill(Pval);
-              else
-                hPvalFull->Fill(Pval);*/
-            }
+//            if (fitSuccess) {
+//              genfit::KalmanFitStatus* fs = gfTrack.getKalmanFitStatus();
+//              newTrackFitResult->setCharge(fs->getCharge());
+//              newTrackFitResult->setPValue(fs->getBackwardPVal());
+//              double Pval = fs->getBackwardPVal();
+//              /*hPval->Fill(Pval);
+//              if (nPXD == 0 && nSVD == 0)
+//                 hPvalCDC->Fill(Pval);
+//               else if (nCDC == 0)
+//                 hPvalVXD->Fill(Pval);
+//              else
+//                hPvalFull->Fill(Pval);*/
+//            }
 
 
             // store position

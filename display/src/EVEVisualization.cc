@@ -1295,6 +1295,7 @@ void EVEVisualization::addROI(const ROIid* roi, const TString& name)
   double maxU = aSensorInfo.getUCellPosition(roi->getMaxUid(), roi->getMaxVid());
   double maxV = aSensorInfo.getVCellPosition(roi->getMaxVid());
 
+
   TVector3 localA(minU, minV, 0);
   TVector3 localB(minU, maxV, 0);
   TVector3 localC(maxU, minV, 0);
@@ -1303,7 +1304,7 @@ void EVEVisualization::addROI(const ROIid* roi, const TString& name)
   TVector3 globalB = aSensorInfo.pointToGlobal(localB);
   TVector3 globalC = aSensorInfo.pointToGlobal(localC);
 
-  TEveBox* ROIbox = boxCreator((globalB + globalC) * 0.5 , globalB - globalA, globalC - globalA, maxU - minU, maxV - minV, 0.01);
+  TEveBox* ROIbox = boxCreator((globalB + globalC) * 0.5 , globalB - globalA, globalC - globalA, 1, 1, 0.01);
 
   ROIbox->SetName(name);
   ROIbox->SetMainColor(kSpring - 9);

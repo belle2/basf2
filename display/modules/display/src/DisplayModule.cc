@@ -198,7 +198,7 @@ void DisplayModule::event()
 
     StoreArray<ROIid> ROIs;
     for (int i = 0 ; i < ROIs.getEntries(); i++)
-      m_visualizer->addROI(ROIs[i], "ROIs_" + i);
+      m_visualizer->addROI(ROIs[i], TString::Format("ROIs_%d", i));
 
   }
 

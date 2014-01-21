@@ -30,11 +30,14 @@ class Particle:
         decay channels use addChannel method.
         name is the correct pdg name as a string of the particle
         variables is a list of variables which are used to classify the
-        particle methods is a list of tuples (name, type, config) of the
-        methods used to classify the particle.
+            particle 
+        methods is a list of tuples (name, type, config) of the
+            methods used to classify the particle.
         """
 
+        # # The name of the particle as correct pdg name e.g. K+, pi-, D*0
         self.name = name
+        # # PDG code of the particle
         self.pdg = pdg.from_name(name)
         # Set variables and method to empty list, if None were given.
         # We can't use [] directly as default parameter, because this would
@@ -44,14 +47,19 @@ class Particle:
             variables = []
         if methods is None:
             methods = []
+        # # A list of variables which are used to classify the particle
         self.variables = variables
+        # # A list of tuples (name, type, config) of the  methods used to
+        # # classify the particle.
         self.methods = methods
         # At this point there are no known decay channels.
         # If a particle has no decay channels by the time you reconstruct it, it
         # is considered as a final state particle.
+        # # Decay channels, added by addChannel method, each channel is a list of
+        # # pdg particle names
         self.channels = []
-        # The hashseed is set by the FullReconstruction class to implement the
-        # dependency of the particle to the previous stages.
+        # # The hashseed is set by the FullReconstruction class to implement the
+        # # dependency of the particle to the previous stages.
         self.hashseed = ''
 
     def addChannel(self, channel):
@@ -289,6 +297,7 @@ class FullReconstruction:
         particles to the FullReoncstruction setup
         """
 
+        # # A list of particle objects, added with addParticle
         self.particles = []
 
     def addParticle(self, particle):

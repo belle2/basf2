@@ -10,10 +10,10 @@ import java.util.zip.Inflater;
 
 public class ZlibInflater extends DataReader {
 
-	private byte[] _comp_buf = new byte[1024*2000];
+	private byte[] _comp_buf = new byte[1024*1024*125];
 	private int _comp_size;
 	private Inflater _inflater = new Inflater();
-	private byte[] _buffer = new byte[1024*2000];
+	private byte[] _buffer = new byte[1024*1024*250];
 	private ByteArrayOutputStream _byte_stream = new ByteArrayOutputStream();
 
 	public void setBufferSize(int size) {
@@ -33,7 +33,6 @@ public class ZlibInflater extends DataReader {
 
 	public void readBuffer(DataReader reader) throws Exception {
 		int count = reader.readInt();
-		//System.out.println("readBuffer::count="+count);
 		if (count > _comp_buf.length) {
 			_comp_buf = new byte[count];
 		}
@@ -49,6 +48,7 @@ public class ZlibInflater extends DataReader {
 		_byte_stream.reset();
 		//int count = 0;
 		while ( true ) {
+			System.out.println(_comp_size);
 			int size = _inflater.inflate(_buffer, 0, _comp_size);
 			//count += size;
 			_byte_stream.write(_buffer, 0, size);

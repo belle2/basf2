@@ -54,7 +54,6 @@ REG_MODULE(PXDUnpacker)
 //                 Implementation
 //-----------------------------------------------------------------
 
-
 using boost::crc_optimal;
 typedef crc_optimal<32, 0x04C11DB7, 0, 0, false, false> dhh_crc_32_type;
 
@@ -732,19 +731,34 @@ void PXDUnpackerModule::unpack_event(RawPXD& px)
   fullsize = px.size() * 4; /// in bytes ... rounded up to next 32bit boundary
   memcpy(data, (unsigned int*)px.data(), fullsize);
 
+  if (fullsize < 8) {
+    B2ERROR("Data is to small to hold a valid Header! Will not unpack anything. Size:" << fullsize);
+    return;
+  }
+
+  if (data[0] != 0xCAFEBABE && data[0] != 0xBEBAFECA) {
+    B2ERROR("Magic invalid: Will not unpack anything. Header corrupted! " << hex << data[0]);
+    return;
+  }
+
+  if (m_headerEndianSwap) Frames_in_event = ntohl(data[1]); else Frames_in_event = data[1];
+  if (Frames_in_event < 0 || Frames_in_event > 256) {
+    B2ERROR("Number of Frames invalid: Will not unpack anything. Header corrupted! Frames in event: " << Frames_in_event);
+    return;
+  }
+
   /// NEW format
   if (verbose) {
     B2INFO("PXD Unpacker --> data[0]: <-- Magic " << hex << data[0]);
     B2INFO("PXD Unpacker --> data[1]: <-- #Frames " << hex << data[1]);
-    if (data[1] >= 1) B2INFO("PXD Unpacker --> data[2]: <-- Frame 1 len " << hex << data[2]);
-    if (data[1] >= 2) B2INFO("PXD Unpacker --> data[3]: <-- Frame 2 len " << hex << data[3]);
-    if (data[1] >= 3) B2INFO("PXD Unpacker --> data[4]: <-- Frame 3 len " << hex << data[4]);
-    if (data[1] >= 4) B2INFO("PXD Unpacker --> data[5]: <-- Frame 4 len " << hex << data[5]);
+    if (data[1] >= 1 && fullsize < 12) B2INFO("PXD Unpacker --> data[2]: <-- Frame 1 len " << hex << data[2]);
+    if (data[1] >= 2 && fullsize < 16) B2INFO("PXD Unpacker --> data[3]: <-- Frame 2 len " << hex << data[3]);
+    if (data[1] >= 3 && fullsize < 20) B2INFO("PXD Unpacker --> data[4]: <-- Frame 3 len " << hex << data[4]);
+    if (data[1] >= 4 && fullsize < 24) B2INFO("PXD Unpacker --> data[5]: <-- Frame 4 len " << hex << data[5]);
   };
 
   unsigned int* tableptr;
   tableptr = &data[2]; // skip header!!!
-  if (m_headerEndianSwap) Frames_in_event = ntohl(data[1]); else Frames_in_event = data[1];
 
   unsigned int* dataptr;
   dataptr = &tableptr[Frames_in_event];

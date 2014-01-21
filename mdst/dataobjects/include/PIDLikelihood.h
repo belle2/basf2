@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Staric                                             *
+ * Contributors: Marko Staric, Thomas Kuhr                                *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -15,10 +15,6 @@
 #include <framework/gearbox/Const.h>
 
 namespace Belle2 {
-
-  /** \addtogroup dataobjects
-   * @{
-   */
 
   /**
    * Class to collect log likelihoods from TOP, ARICH, dEdx, ECL and KLM

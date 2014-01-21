@@ -1918,9 +1918,11 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& la
     B2ERROR("Second frame is not a DHH start frame in Event Nr " << evtnr)
   }
   /// Check that (if there is at least one active DHH) the second last Frame is DHH End, actually this is redundant if the other checks work
-  if (Frame_Number == Frames_in_event - 2 && nr_active_dhh != 0 && type != DHHC_FRAME_HEADER_DATA_TYPE_DHH_END) {
-    B2ERROR("Last frame before DHHC end frame is not a DHH end frame in Event Nr " << evtnr)
-  }
+//   if (Frame_Number == Frames_in_event - 2 && nr_active_dhh != 0 && type != DHHC_FRAME_HEADER_DATA_TYPE_DHH_END) {
+/// this check does not work as there could be an ONSEN frame in here!!!!
+//     B2ERROR("Last frame before DHHC end frame is not a DHH end frame in Event Nr " << evtnr)
+//   }
+
 
   last_wie += len;
 

@@ -1,4 +1,4 @@
-/**************************************************************************
+/* *************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
@@ -1887,7 +1887,7 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& la
   }
 
   if (evtnr != last_evtnr) {
-    B2ERROR("Error: Event Nr " << evtnr << " != " << last_evtnr);
+    B2ERROR("Error: Event Nr $" << hex << evtnr << " != $" << last_evtnr);
     evtnr_error++;
     error_flag = true;
   }

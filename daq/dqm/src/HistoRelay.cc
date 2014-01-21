@@ -41,8 +41,8 @@ int HistoRelay::collect()
       m_msg->add(h1, h1->GetName());
       //      printf ( "HistoRelay : obj = %s\n", h1->GetName() );
       nobjs++;
+      delete obj;
     }
-    delete obj;
     mr = mr->GetNext();
   }
   m_map->Close();

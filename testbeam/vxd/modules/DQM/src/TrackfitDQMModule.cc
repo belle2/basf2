@@ -100,6 +100,18 @@ void TrackfitDQMModule::defineHisto()
     name = (boost::format("hResidualsSVDV%1%") % iLayer).str();
     title = (boost::format("unnormalized, unbiased residuals along V in layer %1%;cm;Tracks") % iLayer).str();
     m_hResidualSVDV[i] = getHist(name, title, 1000, -residualRange, residualRange);
+    name = (boost::format("hResidualSVDVvsU%1%") % iLayer).str();
+    title = (boost::format("unnormalized, unbiased residuals along V vs U in layer %1%;res V [cm];U [cm];Tracks") % iLayer).str();
+    m_hResidualSVDVvsU[i] = getHist(name, title, 100, -residualRange, residualRange, 100, -5, 5);
+    name = (boost::format("hResidualSVDUvsV%1%") % iLayer).str();
+    title = (boost::format("unnormalized, unbiased residuals along U vs V in layer %1%;res U [cm];V [cm];Tracks") % iLayer).str();
+    m_hResidualSVDUvsV[i] = getHist(name, title, 100, -residualRange, residualRange, 100, -5, 5);
+    name = (boost::format("hResidualSVDUvsU%1%") % iLayer).str();
+    title = (boost::format("unnormalized, unbiased residuals along U vs U in layer %1%;res U [cm];U [cm];Tracks") % iLayer).str();
+    m_hResidualSVDUvsU[i] = getHist(name, title, 100, -residualRange, residualRange, 100, -5, 5);
+    name = (boost::format("hResidualSVDVvsV%1%") % iLayer).str();
+    title = (boost::format("unnormalized, unbiased residuals along V vs V in layer %1%;res V [cm];V [cm];Tracks") % iLayer).str();
+    m_hResidualSVDVvsV[i] = getHist(name, title, 100, -residualRange, residualRange, 100, -5, 5);
     name = (boost::format("hNormalizedResidualsSVDU%1%") % iLayer).str();
     title = (boost::format("normalized, unbiased residuals in layer %1%;#sigma;Tracks") % iLayer).str();
     m_hNormalizedResidualSVDU[i] = getHist(name, title, 1000, -2, 2);
@@ -126,13 +138,14 @@ void TrackfitDQMModule::defineHisto()
   m_hPseudoEfficienciesV = getHistProfile("hPseudoEfficienciesV", "pseudo efficiencies V;layer;pseudo efficiency", 6, 1, 7);
 
   for (int i = 0; i < 6; ++i) {
-    const char* varName[6] = { "u", "v", "u'", "v'", "q/p", "pz", };
+    const char* varName[6] = { "x", "y", "z", "px", "py", "pz", };
+    const char* varTitle[6] = { "x", "y", "z", "p_{x}", "p_{y}", "p_{z}", };
     double lower[6] = { -1., -3., -3, -6, -1., -1., };
     double upper[6] = {  1.,  3.,  3,  6,  1.,  1., };
 
     std::string name, title;
-    name = (boost::format("hSeedQuality%1%") % i).str();
-    title = (boost::format("seed vs. trackfit result for %1%;seed;reco track;events") % varName[i]).str();
+    name = (boost::format("hSeedQuality%1%") % varName[i]).str();
+    title = (boost::format("seed vs. trackfit result for %1%;seed;reco track;events") % varTitle[i]).str();
     m_hSeedQuality[i] = getHist(name, title, 100, lower[i], upper[i], 100, lower[i], upper[i]);
   }
   oldDir->cd();
@@ -260,15 +273,27 @@ void TrackfitDQMModule::plotResiduals(const genfit::Track* track)
     if (!kfi)
       continue;
 
+    double u = 0;
+    double v = 0;
+    double resU = 0;
+    double resV = 0;
+    bool haveU = false;
+    bool haveV = false;
+
     unsigned int nMeasurements = kfi->getNumMeasurements();
     for (unsigned int iMeas = 0; iMeas < nMeasurements; ++iMeas) {
       const genfit::MeasurementOnPlane& res = kfi->getResidual(iMeas, false);
       const genfit::AbsHMatrix* h = kfi->getMeasurementOnPlane(iMeas)->getHMatrix();
-      if (dynamic_cast<const genfit::HMatrixU*>(h)) {
+      bool isU = dynamic_cast<const genfit::HMatrixU*>(h);
+      bool isV = dynamic_cast<const genfit::HMatrixV*>(h);
+      if (isU) {
         if (NDF > 2) {
-          m_hResidualSVDU[index]->Fill(res.getState()(0),
+          haveU = haveU || isU;
+          u = kfi->getFittedState().getState()(3);
+          resU = res.getState()(0);
+          m_hResidualSVDU[index]->Fill(resU,
                                        res.getWeight());
-          m_hNormalizedResidualSVDU[index]->Fill(res.getState()(0) / sqrt(res.getCov()(0, 0)),
+          m_hNormalizedResidualSVDU[index]->Fill(resU / sqrt(res.getCov()(0, 0)),
                                                  res.getWeight());
         }
         if (m_fillExpertHistos) {
@@ -279,11 +304,14 @@ void TrackfitDQMModule::plotResiduals(const genfit::Track* track)
                                                     res.getState()(0) / sqrt(res.getCov()(0, 0)),
                                                     res.getWeight());
         }
-      } else if (dynamic_cast<const genfit::HMatrixV*>(h)) {
+      } else if (isV) {
         if (NDF > 2) {
-          m_hResidualSVDV[index]->Fill(res.getState()(0),
+          haveV = haveV || isV;
+          v = kfi->getFittedState().getState()(4);
+          resV = res.getState()(0);
+          m_hResidualSVDV[index]->Fill(resV,
                                        res.getWeight());
-          m_hNormalizedResidualSVDV[index]->Fill(res.getState()(0) / sqrt(res.getCov()(0, 0)),
+          m_hNormalizedResidualSVDV[index]->Fill(resV / sqrt(res.getCov()(0, 0)),
                                                  res.getWeight());
         }
         if (m_fillExpertHistos) {
@@ -296,6 +324,14 @@ void TrackfitDQMModule::plotResiduals(const genfit::Track* track)
         }
       }
     }
+    if (haveU && haveV) {
+      m_hResidualSVDUvsV[index]->Fill(resU, v);
+      m_hResidualSVDVvsU[index]->Fill(resV, u);
+    }
+    if (haveU)
+      m_hResidualSVDUvsU[index]->Fill(resU, u);
+    if (haveV)
+      m_hResidualSVDVvsV[index]->Fill(resV, v);
   }
 }
 

@@ -141,6 +141,11 @@ namespace Belle2 {
     TH2* m_hNDFResidualSVDU[c_nSVDPlanes];
     TH2* m_hNDFResidualSVDV[c_nSVDPlanes];
 
+    TH2* m_hResidualSVDUvsV[c_nSVDPlanes];
+    TH2* m_hResidualSVDVvsU[c_nSVDPlanes];
+    TH2* m_hResidualSVDUvsU[c_nSVDPlanes];
+    TH2* m_hResidualSVDVvsV[c_nSVDPlanes];
+
     /** Residuals normalized with tracking error.  */
     TH1* m_hNormalizedResidualSVDU[c_nSVDPlanes];
     TH1* m_hNormalizedResidualSVDV[c_nSVDPlanes];

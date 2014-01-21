@@ -7,132 +7,151 @@ from array import array
 import ROOT
 
 
-def determine(filename, channels):
+class CutDeterminator:
+
     """
     Determines the optimal cuts for all given decay channels using the
     histograms in the given file
-    filename is name of the file with the histograms created by the HistMaker module
-    channels is a list of channel names
     """
 
-    # First we open the given .root file
-    file = ROOT.TFile(filename)
+    def __init__(
+        self,
+        filename,
+        channels,
+        ratio=0.1,
+        ):
+        """
+        filename is name of the file with the histograms created by the HistMaker module
+        channels is a list of channel names
+        ratio is the amount of additional signal divide by additional background
+            which is just acceptable.
+        """
 
-    # Extract cuts on different variable from the histograms stored in the file
-    cut_maps = []
-    cut_maps.append(determine_prodChildProb_cut(file, channels, filename))
-    cut_maps.append(determine_invariantMass_cut(file, channels))
+        # # Filename of the ROOT files which stores the histograms
+        self.filename = filename
+        # # ROOT File which stores the histograms
+        self.file = ROOT.TFile(self.filename)
+        # # channels for which the cuts are determined
+        self.channels = channels
+        # # ratio is the amount of additional signal divide by additional
+        # # background which is just acceptable.
+        self.ratio = ratio
 
-    # Now we need to convert the result into a map from channelname -> map of
-    # cuts from variable name -> cut range, this result can later be used as
-    # input for the cutsOnProduct parameter of the ParticleCombiner module.
-    result = {}
-    for var in cut_maps:
-        for (channel, cuts) in var.iteritems():
-            result.setdefault(channel, {})
-            result[channel].update(cuts)
-    return result
+    def getCutOn(self, var):
+        """
+        Determines the optimal cut values for the given variable.
+        """
 
+        # First extract the needed histograms from the file for signal and
+        # background for every channel.
 
-def determine_invariantMass_cut(file, channels):
-    """
-    This determines the optimal cut values on the invariant mass
-    """
+        print 'Determine cuts for'
+        for c in self.channels:
+            print c + '_' + var + '_signal_histogram'
 
-    # First extract the needed histograms from the file. Here we need the
-    # distribution of prodChildProb for signal and background for every channel.
-    signal_hists = {}
-    for d in channels:
-        signal_hists[d] = file.Get(d + '_M_signal_histogram')
-    background_hists = {}
-    for d in channels:
-        background_hists[d] = file.Get(str(d) + '_M_background_histogram')
+        signal_hists = dict([(c, self.file.Get(c + '_' + var
+                            + '_signal_histogram')) for c in self.channels])
+        bckgrd_hists = dict([(c, self.file.Get(c + '_' + var
+                            + '_background_histogram')) for c in
+                            self.channels])
 
-    # TODO determine cut
-    result = {}
-    for d in channels:
-        result[d] = {'M': (0.0, 100.0)}
+        # Create ratio hists
+        ratio_hists = dict([(c, signal_hists[c].Clone(c + '_' + var
+                           + '_ratio_histogram')) for c in self.channels])
 
-    return result
+        result = {}
 
-
-def determine_prodChildProb_cut(file, channels, filename):
-    """
-    This determines the optimal cut values on the prodChildProb variable using
-    the same technique as in Belle 1. We create a plot of the signal and
-    background amount for different cut values. Then cut values with the same slope for all
-    channels are chosen, so a dirty channel is going to get a harder cut then a
-    clan channel.
-    """
-
-    probability_slope = 10
-
-    # First extract the needed histograms from the file. Here we need the
-    # distribution of prodChildProb for signal and background for every channel.
-    signal_hists = {}
-    for d in channels:
-        signal_hists[d] = file.Get(d + '_prodChildProb_signal_histogram')
-    background_hists = {}
-    for d in channels:
-        background_hists[d] = file.Get(str(d)
-                                       + '_prodChildProb_background_histogram')
-
-    result = {}
-
-    # Create slope curves
-    c = ROOT.TCanvas('mycanvas', 'Slope Curves - Background vs. Signal')
-    multigraph = ROOT.TMultiGraph()
-
-    # Create one curve per channel with a different color and marker shape per
-    # channel (-> steered by color)
-    color = 0
-    for d in channels:
-        color += 1
-
-        # TGraph size doesn't accept lists, we have to use pythons array class
-        x = array('f')
-        y = array('f')
-        size = signal_hists[d].GetNbinsX()
-
-        for i in range(0, size):
-            x.append(signal_hists[d].Integral(0, i + 1))
-            y.append(background_hists[d].Integral(0, i + 1))
-
-        graph = ROOT.TGraph(size, x, y)
-        graph.SetName(d)
-        graph.SetTitle(d)
-        graph.SetMarkerStyle(21 + color)
-        graph.SetFillStyle(0)
-        graph.SetLineColor(color)
-        graph.SetLineWidth(4)
-        graph.SetMarkerColor(color)
-        graph.Fit('pol4')
-        graph.GetFunction('pol4').SetLineColor(color)
-        multigraph.Add(graph)
-
-        # Determine Cut
-        # Look for slope probability slope
-        cut = 1
-        for i in reversed(range(1, size)):
-            try:
-                if (y[i] - y[i - 1]) / (x[i] - x[i - 1]) > probability_slope:
-                    cut = i
+        for c in channels:
+            ratio_hists[c].Divide(bckgrd_hists[c])
+            # Position of maximum
+            max_pos = ratio_hist[c].GetMaximumBin()
+            # DetermineCut positions
+            low_cut_pos = 0
+            high_cut_pos = size
+            for i in range(max_pos + 1, size + 1):
+                if ratio_hist[c].GetBinContent(i) < ratio:
                     break
-            except:
-                cut = i
-        result[d] = {'SignalProbability': [1.0 / size * cut, 1]}
-        print d, cut
+                else:
+                    high_cut_pos = i
+            for i in reversed(range(0, max_pos)):
+                if ratio_hist[c].GetBinContent(i) < ratio:
+                    break
+                else:
+                    low_cut_pos = i
+            result[c] = (ratio_hist[c].GetBinCenter(low_cut_pos),
+                         ratio_hist[c].GetBinCenter(high_cut_pos))
 
-    # Draw curves
-    multigraph.Draw('AP')
-    multigraph.GetXaxis().SetTitle('Signal Events')
-    multigraph.GetYaxis().SetTitleOffset(1.4)
-    multigraph.GetYaxis().SetTitle('Background Events')
-    c.BuildLegend()
-    c.Update()
-    c.SaveAs(filename + '.png')
-    c.Close()
+        return result
 
-    return result
+    def getCutOn_Slope(self, var):
+        """
+        This determines the optimal cut values on the prodChildProb variable using
+        the same technique as in Belle 1. We create a plot of the signal and
+        background amount for different cut values. Then cut values with the same slope for all
+        channels are chosen, so a dirty channel is going to get a harder cut then a
+        clan channel.
+        """
+
+        # First extract the needed histograms from the file for signal and
+        # background for every channel.
+        signal_hists = dict([(c, self.file.Get(c + '_' + var
+                            + '_signal_histogram')) for c in self.channels])
+        bckgrd_hists = dict([(c, self.file.Get(c + '_' + var
+                            + '_background_histogram')) for c in
+                            self.channels])
+
+        result = {}
+
+        # Create slope curves
+        c = ROOT.TCanvas('mycanvas', 'Slope Curves - Background vs. Signal')
+        multigraph = ROOT.TMultiGraph()
+
+        # Create one curve per channel with a different color and marker shape per
+        # channel (-> steered by index)
+        for (index, d) in enumerate(channels):
+            # TGraph size doesn't accept lists, we have to use pythons array class
+            x = array('f')
+            y = array('f')
+            size = signal_hists[d].GetNbinsX()
+
+            for i in range(0, size):
+                x.append(signal_hists[d].Integral(0, i + 1))
+                y.append(bckgrd_hists[d].Integral(0, i + 1))
+
+            graph = ROOT.TGraph(size, x, y)
+            graph.SetName(d)
+            graph.SetTitle(d)
+            graph.SetMarkerStyle(21 + index)
+            graph.SetFillStyle(0)
+            graph.SetLineColor(index)
+            graph.SetLineWidth(4)
+            graph.SetMarkerColor(index)
+            graph.Fit('pol4')
+            graph.GetFunction('pol4').SetLineColor(index)
+            multigraph.Add(graph)
+
+            # Determine Cut
+            # Look for slope probability slope
+            cut = 1
+            for i in reversed(range(1, size)):
+                try:
+                    if (y[i] - y[i - 1]) / (x[i] - x[i - 1]) > 1 / self.ratio:
+                        cut = i
+                        break
+                except:
+                    cut = i
+            result[d] = (1.0 / size * cut, 1)
+
+        # Draw curves
+        multigraph.Draw('AP')
+        multigraph.GetXaxis().SetTitle('Signal Events')
+        multigraph.GetYaxis().SetTitleOffset(1.4)
+        multigraph.GetYaxis().SetTitle('Background Events')
+        c.BuildLegend()
+        c.Update()
+        c.SaveAs(self.filename + '.png')
+        c.Close()
+
+        return result
 
 

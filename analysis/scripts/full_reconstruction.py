@@ -160,17 +160,18 @@ class Particle:
             # This module gets the filename with the histograms and the decay
             # channel identifiers, and returns the optimal cuts for every
             # channel as a map.
-            cuts = cut_determination.determine(filename, [self.to_string(c)
-                    for c in self.channels])
+            cut_determinator = cut_determination.CutDeterminator(filename,
+                    [self.to_string(c) for c in self.channels])
+            cuts = {}
+            mass_cut = cut_determinator.getCutOn('M')
             for channel in self.channels:
                 pmake = register_module('ParticleCombiner')
                 pmake.set_name('ParticleCombiner_' + self.to_string(channel))
                 pmake.param('PDG', self.pdg)
                 pmake.param('ListName', self.to_string(channel))
                 pmake.param('InputListNames', pdg.to_names(channel))
-                pmake.param('MassCut', (mass - mass / 10.0, mass + mass
-                            / 10.0))
-                pmake.param('cutsOnProduct', cuts[self.to_string(channel)])
+                pmake.param('MassCut', mass_cut[self.to_string(channel)])
+                # pmake.param('cutsOnProduct', mass_cut[self.to_string(channel)])
                 path.add_module(pmake)
 
         # Now select all the reconstructed (or loaded) particles with this pdg

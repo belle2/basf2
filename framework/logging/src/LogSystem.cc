@@ -21,6 +21,7 @@
 #include <iostream>
 #include <algorithm>
 #include <unordered_map>
+#include <functional>
 
 using namespace Belle2;
 using namespace std;
@@ -186,9 +187,10 @@ void LogSystem::printErrorSummary()
   B2INFO("Error summary: " << numLogError << " errors and " << numLogWarn << " warnings occurred.");
 
 
-  //TODO: specify hash function with type
+
   //start with 100 entries in hash map
-  std::unordered_map<LogMessage, int, decltype(&hash)> errorCount(100, hash);
+  std::function<size_t (const LogMessage&)> hashFunction = &hash;
+  std::unordered_map<LogMessage, int, decltype(hashFunction)> errorCount(100, hashFunction);
 
   //log in chronological order, with repetitions removed
   std::vector<LogMessage> uniqueLog;

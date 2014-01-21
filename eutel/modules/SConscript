@@ -1,6 +1,6 @@
 Import('env')
 
-env['LIBS'] = ['$ROOT_LIBS', 'framework', 'eutel_eudaq', 
+env['LIBS'] = ['$ROOT_LIBS', 'framework', 'eutel_eudaq', 'vxd',
 'vxd_dataobjects', 'testbeam_vxd_dataobjects']
 
 Return('env')

@@ -235,7 +235,11 @@ public:
     word0.print();
     if (verbose) {
       unsigned int crc32 = (crc32hi << 16) | crc32lo;
-      B2INFO("DHHC Event Frame TNRLO $" << hex << trigger_nr_lo  << " DTTLO $" << hex << dhh_time_tag_lo << " DTTHI $" << hex << dhh_time_tag_hi << " SFNR $" << hex << ((sfnr_offset >> 10) & 0x3F) << " OFF $" << hex << (sfnr_offset & 0x3FF)
+      B2INFO("DHHC Event Frame TNRLO $" << hex << trigger_nr_lo  << " DTTLO $" << hex << dhh_time_tag_lo << " DTTHI $" << hex << dhh_time_tag_hi
+             << " DHHID $" << hex << get_dhh_id()
+             << " DHPMASK $" << hex << get_active_dhp_mask()
+             << " SFNR $" << hex << get_sfnr()
+             << " OFF $" << hex << get_toffset()
              << " CRC " << hex << crc32 << " (calc)" << calc_crc());
     }
   };
@@ -800,6 +804,7 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int len2, unsigned int d
   unsigned int dhh_header_id_I = 0;
   unsigned int dhh_header_error = 0;
   unsigned int dhh_header_type = 0;
+  unsigned int dhh_reformat = 0;
   unsigned int dhh_dhh_id = 0;
   unsigned int dhh_dhp_id = 0;
 
@@ -814,6 +819,7 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int len2, unsigned int d
   bool rowflag = false;
 
   if (anzahl < 4) {
+    B2ERROR("DHP frame size error (too small) " << anzahl);
     dhp_size_error++;
     return;
     //return -1;
@@ -826,20 +832,22 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int len2, unsigned int d
 
   if (printflag)
     B2INFO("DHH Header     |  " << hex << dhp_pix[0] << " ( " << dec << dhp_pix[0] << " ) ");
-  dhh_header_error = (dhp_pix[0] >> 10) & 0x3F;
-  dhh_header_type  = (dhp_pix[0] >> 8) & 0x03;
-  dhh_dhh_id   = (dhp_pix[0] >> 2) & 0x3F;
-  dhh_dhp_id           = dhp_pix[0] & 0x03;
+  dhh_header_error = (dhp_pix[0] >> 15) & 0x1;
+  dhh_header_type  = (dhp_pix[0] >> 11) & 0x0F;
+  dhh_dhh_id       = (dhp_pix[0] >> 3) & 0x3F;
+  dhh_reformat     = (dhp_pix[0] >> 2) & 0x1;
+  dhh_dhp_id       = dhp_pix[0] & 0x03;
 
   //if (dhp_id != 0) {// onyl for testbeam with one dhp
   //  B2INFO("DECODE ERROR ... DHP ID !=0  " << hex << dhp_pix[0]);
   //  printflag = true;
   //}
   if (printflag) {
-    B2INFO("error     |   " << hex << dhh_header_error << " ( " << hex << dhh_header_error << " ) ");
+    B2INFO("error     |   " << hex << dhh_header_error);
     B2INFO("type     |   " << hex << dhh_header_type << " ( " << hex << dhh_header_type << " ) ");
     B2INFO("DHH ID     |   " << hex << dhh_dhh_id << " ( " << hex << dhh_dhh_id << " ) ");
-    B2INFO("chip ID     |   " << hex << dhh_dhp_id << " ( " << hex << dhh_dhp_id << " ) ");
+    B2INFO("DHH Reformat |   " << hex << dhh_reformat);
+    B2INFO("chip ID     |   " << hex << dhh_dhp_id);
   }
 
   dhh_header_id_I  = dhp_pix[1] & 0xFFFF;

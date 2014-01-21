@@ -94,9 +94,7 @@ char* dhhc_type_name[16] = {
 class dhhc_frame_header_word0 {
 public:
   unsigned short data;
-  dhhc_frame_header_word0(unsigned int error_flag = 0, unsigned int data_typ = 0, unsigned int dependent = 0) {
-    data = ((error_flag & 0x1) << 15) | ((data_typ & 0xF) << 11) | (dependent & 0x3FF);
-  };
+  /// fixed length
   unsigned int get_type(void) {
     return (data >> 11) & 0xF;
   };
@@ -123,6 +121,7 @@ public:
   unsigned short nr_frames_in_event;
   unsigned short crc32lo;/// Changed to 2*16 because of automatic compiler alignment
   unsigned short crc32hi;
+  /// fixed length
 
   unsigned short get_evtnr_lo(void) {
     return trigger_nr_lo;
@@ -189,9 +188,8 @@ public:
   unsigned short sfnr_offset;
   unsigned short crc32lo;/// Changed to 2*16 because of automatic compiler alignment
   unsigned short crc32hi;
+  /// fixed length
 
-//    dhhc_dhh_start_frame(unsigned int time_tag = 0, unsigned int trigger_nr = 0, unsigned int depend = 0): word0(0, DHH_FRAME_HEADER_DATA_TYPE_EVT_FRM, depend) {
-//    };
   inline unsigned short get_evtnr_lo(void) {
     return trigger_nr_lo;
   };
@@ -250,6 +248,7 @@ public:
   unsigned short trigger_nr_lo;
   unsigned short data[96];
   unsigned int crc32;
+  /// fixed length
 
   inline unsigned short get_evtnr_lo(void) {
     return trigger_nr_lo;
@@ -300,7 +299,6 @@ class dhhc_onsen_frame {
   unsigned int trignr2;
   /// plus n* ROIs (64 bit)
   /// plus checksum 32bit
-  /// unsigned int length;/// not part
 public:
   inline unsigned short get_trig_nr0(void) {
     return trignr0;
@@ -376,6 +374,7 @@ public:
   dhhc_frame_header_word0 word0;
   unsigned short trigger_nr_lo;
   unsigned int crc32;
+  /// fixed length
 
   unsigned int calc_crc(void) {
     unsigned char* d;
@@ -419,6 +418,7 @@ public:
   unsigned int wordsinevent;
   unsigned int errorinfo;
   unsigned int crc32;
+  /// fixed length
 
   unsigned int calc_crc(void) {
     unsigned char* d;
@@ -473,6 +473,7 @@ public:
   unsigned int wordsinevent;
   unsigned int errorinfo;
   unsigned int crc32;
+  /// fixed length
 
   unsigned int calc_crc(void) {
     unsigned char* d;
@@ -884,7 +885,7 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int len2, unsigned int d
           };*/
 
           m_storeRawHits.appendNew(dhh_ID, dhp_row, dhp_col, dhp_adc,
-                                   dhp_readout_frame_lo - dhh_first_readout_frame_id_lo, toffset, dhp_cm
+                                   toffset, (dhp_readout_frame_lo - dhh_first_readout_frame_id_lo) & 0x3F, dhp_cm
                                   );
         }
       }

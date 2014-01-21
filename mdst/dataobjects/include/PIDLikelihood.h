@@ -85,7 +85,7 @@ namespace Belle2 {
     double getProbability(const Const::ChargedStable& p1,
                           const Const::ChargedStable& p2,
                           Const::PIDDetectorSet set = Const::PIDDetectorSet::set()) const {
-      return probability(getLogL(p1, set), getLogL(p2, set), 1.0);
+      return getProbability(p1, p2, 1.0, set);
     }
 
     /**
@@ -99,60 +99,45 @@ namespace Belle2 {
     double getProbability(const Const::ChargedStable& p1,
                           const Const::ChargedStable& p2,
                           double ratio,
-                          Const::PIDDetectorSet set = Const::PIDDetectorSet::set()) const {
-      return probability(getLogL(p1, set), getLogL(p2, set), ratio);
-    }
+                          Const::PIDDetectorSet set = Const::PIDDetectorSet::set()) const;
 
 
     /**
      * Return combined likelihood probability for a particle according to chargedStableSet;
      * if prior fractions not given equal prior probabilities assumed.
      * @param part charged stable particle
-     * @param fractions array of prior probabilities in the order e,mu,pi,K,p
+     * @param fractions array of prior probabilities in the order defined in Const::ChargedStable
      * @param set  a set of PID detectors to use
      * @return likelihood probability (a value btw. 0 and 1)
      */
     double getProbability(const Const::ChargedStable& part,
-                          const float* fractions = 0,
+                          const double* fractions = 0,
                           Const::PIDDetectorSet set = Const::PIDDetectorSet::set()) const;
 
     /**
      * Return most likely particle among chargedStableSet;
      * if prior fractions not given equal prior probabilities assumed.
-     * @param fractions array of prior probabilities in the order e,mu,pi,K,p
+     * @param fractions array of prior probabilities in the order defined in Const::ChargedStable
      * @param set  a set of PID detectors to use
      * @return particle type
      */
-    Const::ChargedStable getMostLikely(const float* fractions = 0,
+    Const::ChargedStable getMostLikely(const double* fractions = 0,
                                        Const::PIDDetectorSet set =
                                          Const::PIDDetectorSet::set()) const;
 
   private:
 
-    enum {c_PIDDetectorSetSize = 6}; /**< temporary solution for the size */
-
     Const::DetectorSet m_detectors;   /**< set of detectors with PID information */
-    float m_logl[c_PIDDetectorSetSize][Const::ChargedStable::c_SetSize]; /**< log likelihoods, FIXME: replace hard coded value */
-
-    /**
-     * Calculate likelihood probability from log likelihood difference logl1-logl2
-     * @param logl1 log likelihood
-     * @param logl2 log likelihood
-     * @param ratio ratio of prior probabilities (p1/p2)
-     * @return likelihood probability (a value btw. 0 and 1)
-     */
-    double probability(float logl1, float logl2, double ratio) const;
+    float m_logl[Const::PIDDetectors::c_size][Const::ChargedStable::c_SetSize]; /**< log likelihoods */
 
     /**
      * Calculate likelihood probabilities
-     * @param n size of arrays (must be equal to Const::chargedStableSet.size())
      * @param fractions array of prior fractions (not needed to be normalized)
      * @param probabilities array of resulting probabilities
      * @param detSet  a set of PID detectors to use
      */
-    void probability(unsigned n,
-                     double fractions[],
-                     double probabilities[],
+    void probability(double probabilities[],
+                     const double* fractions,
                      Const::PIDDetectorSet detSet) const;
 
 

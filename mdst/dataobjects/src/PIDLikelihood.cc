@@ -16,13 +16,7 @@ using namespace Belle2;
 
 PIDLikelihood::PIDLikelihood()
 {
-  //  for (unsigned short i = 0; i < Const::PIDDetectors::set().size(); i++) {
-  //    for (unsigned int k = 0; k < Const::chargedStableSet.size(); ++k) {
-
-  if (Const::PIDDetectors::set().size() > c_PIDDetectorSetSize)
-    B2FATAL("PIDLikelihood::m_logl[][] first dimension too small");
-
-  for (unsigned short i = 0; i < c_PIDDetectorSetSize; i++) {
+  for (unsigned short i = 0; i < Const::PIDDetectors::c_size; i++) {
     for (unsigned int k = 0; k < Const::ChargedStable::c_SetSize; k++) {
       m_logl[i][k] = 0.0;
     }
@@ -56,23 +50,34 @@ float PIDLikelihood::getLogL(const Const::ChargedStable& part,
 }
 
 
+double PIDLikelihood::getProbability(const Const::ChargedStable& p1,
+                                     const Const::ChargedStable& p2,
+                                     double ratio,
+                                     Const::PIDDetectorSet set) const
+{
+  if (ratio < 0) {
+    B2ERROR("PIDLikelihood::probability argument 'ratio' is given with negative value");
+    return 0;
+  }
+  if (ratio == 0) return 0;
+
+  double dlogl = getLogL(p2, set) - getLogL(p1, set);
+  if (dlogl < 0) {
+    double elogl = exp(dlogl);
+    return ratio / (ratio + elogl);
+  } else {
+    double elogl = exp(-dlogl) * ratio; // to prevent overflow for very large dlogl
+    return elogl / (1.0 + elogl);
+  }
+}
+
 double PIDLikelihood::getProbability(const Const::ChargedStable& part,
-                                     const float* fractions,
+                                     const double* fractions,
                                      Const::PIDDetectorSet detSet) const
 {
-  unsigned n = Const::chargedStableSet.size();
-  double frac[n];
-  if (fractions) {
-    frac[Const::electron.getIndex()] = fractions[0];
-    frac[Const::muon.getIndex()]     = fractions[1];
-    frac[Const::pion.getIndex()]     = fractions[2];
-    frac[Const::kaon.getIndex()]     = fractions[3];
-    frac[Const::proton.getIndex()]   = fractions[4];
-  } else {
-    for (unsigned i = 0; i < n; ++i) frac[i] = 1.0; // normalization not needed
-  }
+  const unsigned int n = Const::chargedStableSet.size();
   double prob[n];
-  probability(n, frac, prob, detSet);
+  probability(prob, fractions, detSet);
 
   int k = part.getIndex();
   if (k < 0) return 0;
@@ -81,22 +86,12 @@ double PIDLikelihood::getProbability(const Const::ChargedStable& part,
 
 }
 
-Const::ChargedStable PIDLikelihood::getMostLikely(const float* fractions,
+Const::ChargedStable PIDLikelihood::getMostLikely(const double* fractions,
                                                   Const::PIDDetectorSet detSet) const
 {
-  unsigned n = Const::chargedStableSet.size();
-  double frac[n];
-  if (fractions) {
-    frac[Const::electron.getIndex()] = fractions[0];
-    frac[Const::muon.getIndex()]     = fractions[1];
-    frac[Const::pion.getIndex()]     = fractions[2];
-    frac[Const::kaon.getIndex()]     = fractions[3];
-    frac[Const::proton.getIndex()]   = fractions[4];
-  } else {
-    for (unsigned i = 0; i < n; ++i) frac[i] = 1.0; // normalization not needed
-  }
+  const unsigned int n = Const::chargedStableSet.size();
   double prob[n];
-  probability(n, frac, prob, detSet);
+  probability(prob, fractions, detSet);
 
   int k = 0;
   double maxProb = prob[k];
@@ -108,55 +103,41 @@ Const::ChargedStable PIDLikelihood::getMostLikely(const float* fractions,
 }
 
 
-double PIDLikelihood::probability(float logl1, float logl2, double ratio) const
-{
-  if (ratio < 0) {
-    B2ERROR("PIDLikelihood::probability argument 'ratio' is given with negative value");
-    return 0;
-  }
-  if (ratio == 0) return 0;
-
-  double dlogl = logl2 - logl1;
-  if (dlogl < 0) {
-    double elogl = exp(dlogl);
-    return ratio / (ratio + elogl);
-  } else {
-    double elogl = exp(-dlogl) * ratio; // to prevent overflow for very large dlogl
-    return elogl / (1.0 + elogl);
-  }
-}
-
-
-void PIDLikelihood::probability(unsigned n,
-                                double frac[],
-                                double prob[],
+void PIDLikelihood::probability(double probabilities[],
+                                const double* fractions,
                                 Const::PIDDetectorSet detSet) const
 {
-  double logL[n];
-  unsigned i0 = 0;
-  for (unsigned i = 0; i < n; ++i) {
-    logL[i] = 0;
-    if (frac[i] > 0) {
-      logL[i] = getLogL(Const::chargedStableSet.at(i), detSet);
-      i0 = i;
-    }
+  const unsigned int n = Const::chargedStableSet.size();
+  double frac[n];
+  if (!fractions) {
+    for (unsigned int i = 0; i < n; ++i) frac[i] = 1.0; // normalization not needed
+    fractions = frac;
   }
 
-  double logLmax = logL[i0];
+  double logL[n];
+  double logLmax = 0;
+  bool hasMax = false;
   for (unsigned i = 0; i < n; ++i) {
-    if (frac[i] > 0 && logL[i] > logLmax) logLmax = logL[i];
+    logL[i] = 0;
+    if (fractions[i] > 0) {
+      logL[i] = getLogL(Const::chargedStableSet.at(i), detSet);
+      if (!hasMax || logL[i] > logLmax) {
+        logLmax = logL[i];
+        hasMax = true;
+      }
+    }
   }
 
   double norm = 0;
   for (unsigned i = 0; i < n; ++i) {
-    prob[i] = 0;
-    if (frac[i] > 0) prob[i] = exp(logL[i] - logLmax) * frac[i];
-    norm += prob[i];
+    probabilities[i] = 0;
+    if (fractions[i] > 0) probabilities[i] = exp(logL[i] - logLmax) * fractions[i];
+    norm += probabilities[i];
   }
   if (norm == 0) return;
 
   for (unsigned i = 0; i < n; ++i) {
-    prob[i] /= norm;
+    probabilities[i] /= norm;
   }
 
 }

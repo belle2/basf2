@@ -222,6 +222,7 @@ namespace Belle2 {
     public:
       static DetectorSet set() {return c_set;}  /**< Accessor function for the set of valid detectors */
       static const DetectorSet c_set;           /**< The set of valid PID detectors */
+      static const size_t c_size = 6;           /**< Number of PID detectors, temporary workaround */
     };
     /** Typedef for set of PID detectors. */
     typedef RestrictedDetectorSet<PIDDetectors> PIDDetectorSet;

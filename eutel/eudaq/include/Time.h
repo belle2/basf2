@@ -55,8 +55,8 @@ namespace eudaq {
       return tv_sec > other.tv_sec ||
              (tv_sec == other.tv_sec && tv_usec > other.tv_usec);
     }
-    operator const timeval() const {
-      static timeval tv;
+    operator timeval() const {
+      timeval tv;
       tv.tv_sec = tv_sec;
       tv.tv_usec = tv_usec;
       return tv;

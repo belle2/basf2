@@ -27,7 +27,7 @@ fieldOn = False
 # Load Geometry module
 gearbox = register_module('Gearbox')
 # Telescopes, magnetic field, daemon PXD (air), SVD
-gearbox.param('fileName', 'testbeam/vxd/FullTelescopeVXDTB_v2.xml')
+gearbox.param('fileName', 'testbeam/vxd/FullTelescopeVXDTB_v1.xml')
 
 geometry = register_module('Geometry')
 if fieldOn:
@@ -45,7 +45,10 @@ PXDSort.param('mergeDuplicates', False)
 # True is conservative with respect to downstream processing chain in case
 # some parts do not support PXD frames. There is always a single frame,
 # though information on number of frames and start rows is propagated.
-PXDSort.param('mergeFrames', True)
+PXDSort.param('mergeFrames', False)
+# PXD Unpacker currently doesn't provide valid sensor IDs. So the following
+# feature is enabled by default, but I mention it explicitly:
+PXDSort.param('assignID', True)
 
 # PXD clusterizer
 PXDClust = register_module('PXDClusterizer')
@@ -56,9 +59,9 @@ PXD_DQM = register_module('PXDDQMModule')
 # SVD digit sorter
 SVDSort = register_module('SVDDigitSorter')
 SVDSort.param('mergeDuplicates', False)
-# Map of ignored strips
+# Map of ignored strips - working, but not approved widely
 #SVDSort.param('ignoredStripsListName', \
-#'testbeam/svd/data/SVD-IgnoredStripsList.xml')
+#    'testbeam/svd/data/SVD-IgnoredStripsList.xml')
 
 # SVD clusterizer
 SVDClust = register_module('SVDClusterizer')

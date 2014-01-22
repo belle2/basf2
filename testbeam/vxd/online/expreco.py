@@ -53,6 +53,13 @@ PXDClust = register_module('PXDClusterizer')
 # PXD DQM module
 PXD_DQM = register_module('PXDDQMModule')
 
+# SVD digit sorter
+SVDSort = register_module('SVDDigitSorter')
+SVDSort.param('mergeDuplicates', False)
+# Map of ignored strips
+#SVDSort.param('ignoredStripsListName', \
+#'testbeam/svd/data/SVD-IgnoredStripsList.xml')
+
 # SVD clusterizer
 SVDClust = register_module('SVDClusterizer')
 if fieldOn:
@@ -124,6 +131,7 @@ main.add_module(PXDClust)
 main.add_module(PXD_DQM)
 
 # SVD: clusterizer, dqm
+main.add_module(SVDSort)
 main.add_module(SVDClust)
 main.add_module(SVD_DQM)
 

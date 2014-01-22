@@ -21,6 +21,12 @@ using boost::property_tree::ptree;
 SVDIgnoredStripsMap::SVDIgnoredStripsMap(const string& xmlFilename):
   m_Map(12), m_lastSensorID(0)
 {
+  // If the xmlFilename is empty, the user apparently doesn't want the map.
+  // So keep low-profile, don't bother.
+  if (xmlFilename == "") {
+    B2INFO("No xml list of ignored strips specified.");
+    return;
+  }
   // Create an empty property tree object
 
   ptree propertyTree;
@@ -30,23 +36,23 @@ SVDIgnoredStripsMap::SVDIgnoredStripsMap(const string& xmlFilename):
   string xmlFullPath = FileSystem::findFile(xmlFilename);
 
   if (! FileSystem::fileExists(xmlFullPath)) {
-    B2ERROR("The xml filename: " << xmlFilename << endl <<
-            "resolved to: " << xmlFullPath << endl <<
-            "by FileSystem::findFile does not exist." << endl <<
-            "SVD ignored strips map cannot be initialized." << endl
-           );
+    B2WARNING("The xml filename: " << xmlFilename << endl <<
+              "resolved to: " << xmlFullPath << endl <<
+              "by FileSystem::findFile does not exist." << endl <<
+              "SVD ignored strips map cannot be initialized." << endl
+             );
     return;
   }
 
   try {
     read_xml(xmlFullPath, propertyTree);
   } catch (std::exception const& ex) {
-    B2ERROR("STD excpetion rised during xml parsing " << ex.what() << endl <<
-            "SVD ignored strips map cannot be initialized." << endl);
+    B2WARNING("STD excpetion raised during xml parsing " << ex.what() << endl <<
+              "SVD ignored strips map cannot be initialized." << endl);
     return;
   } catch (...) {
-    B2ERROR("Unknown excpetion raised during xml parsing "
-            "SVD ignored strips map cannot be initialized." << endl);
+    B2WARNING("Unknown excpetion raised during xml parsing "
+              "SVD ignored strips map cannot be initialized." << endl);
     return;
   }
 
@@ -68,18 +74,24 @@ SVDIgnoredStripsMap::SVDIgnoredStripsMap(const string& xmlFilename):
                     sensorID.setSegmentNumber((tagSide == "U" || tagSide == "u") ? 1 : 0);
                     // We have complete VxdID, now we read the list of strips.
                     IgnoredStripsSet strips;
-                    for (ptree::value_type const & strip : side.second)
-                      if (strip.first == "strip") {
-                        strips.insert(strip.second.get_value<unsigned short>());
-                      } // if strip
+                    for (ptree::value_type const & tag : side.second)
+                      if (tag.first == "strip") {
+                        strips.insert(tag.second.get<unsigned short>("<xmlattr>.stripNo"));
+                      } else if (tag.first == "stripsFromTo") {
+                        auto limits = tag.second;
+                        unsigned short fromStrip = limits.get<unsigned short>("<xmlattr>.fromStrip");
+                        unsigned short toStrip   = limits.get<unsigned short>("<xmlattr>.toStrip");
+                        for (unsigned short iStrip = fromStrip; iStrip <= toStrip; iStrip++)
+                          strips.insert(iStrip);
+                      }
                     m_Map.insert(std::pair<unsigned short, IgnoredStripsSet>(sensorID.getID(), strips));
                   } // if side
               } // if sensor
           } // if ladder
       }  // if sensor
   } catch (...) {
-    B2ERROR("Unknown excpetion raised during map initialization! "
-            "SVD ignored strips map may be corrupted." << endl);
+    B2WARNING("Unknown excpetion raised during map initialization! "
+              "SVD ignored strips map may be corrupted." << endl);
     return;
   }
 }

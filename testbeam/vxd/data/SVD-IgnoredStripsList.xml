@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Meta>
-    <Date>16.01.2014</Date>
+    <Date>22.01.2014</Date>
     <Description short="Ignore strip list for SVD planes in 2014 VXD beam test">
-        The list contains bad strips, for which digits will be disregarded.
+        Crude initial list of bad strips
     </Description>
     <Author>Peter Kvasnicka</Author>
 </Meta>
@@ -11,13 +11,13 @@
         <ladder n="1">
             <sensor n="3">
                 <side side="u">
-                    <strip>3131</strip>
-                    <strip>1</strip>
+                    <stripsFromTo fromStrip = "620" toStrip = "767"></stripsFromTo>
+                    <!-- Individual strips can be masked, too -->
+                    <strip stripNo = "621"></strip>
                 </side>
                 <side side="v">
-                    <strip>3130</strip>
-                    <strip>2</strip>
-                    <strip>3</strip>
+                    <stripsFromTo fromStrip = "000" toStrip = "150"></stripsFromTo>
+                    <stripsFromTo fromStrip = "470" toStrip = "767"></stripsFromTo>
                 </side>
             </sensor>
         </ladder>
@@ -26,10 +26,12 @@
         <ladder n="1">
             <sensor n="4">
                 <side side="u">
-                    <strip>4141</strip>
+                    <stripsFromTo fromStrip = "000" toStrip = "8"></stripsFromTo>
+                    <stripsFromTo fromStrip = "600" toStrip = "767"></stripsFromTo>
                 </side>
                 <side side="v">
-                    <strip>4140</strip>
+                    <stripsFromTo fromStrip = "000" toStrip = "150"></stripsFromTo>
+                    <stripsFromTo fromStrip = "470" toStrip = "767"></stripsFromTo>
                 </side>
             </sensor>
         </ladder>
@@ -38,10 +40,14 @@
         <ladder n="1">
             <sensor n="5">
                 <side side="u">
-                    <strip>5151</strip>
+                    <stripsFromTo fromStrip = "000" toStrip = "20"></stripsFromTo>
+                    <stripsFromTo fromStrip = "600" toStrip = "767"></stripsFromTo>
                 </side>
                 <side side="v">
-                    <strip>5150</strip>
+                    <stripsFromTo fromStrip = "000" toStrip = "150"></stripsFromTo>
+                    <stripsFromTo fromStrip = "110" toStrip = "114"></stripsFromTo>
+                    <stripsFromTo fromStrip = "300" toStrip = "309"></stripsFromTo>
+                    <stripsFromTo fromStrip = "470" toStrip = "767"></stripsFromTo>
                 </side>
             </sensor>
         </ladder>
@@ -50,10 +56,14 @@
         <ladder n="1">
             <sensor n="6">
                 <side side="u">
-                    <strip>6161</strip>
+                    <stripsFromTo fromStrip = "000" toStrip = "008"></stripsFromTo>
+                    <stripsFromTo fromStrip = "115" toStrip = "129"></stripsFromTo>
+                    <stripsFromTo fromStrip = "400" toStrip = "404"></stripsFromTo>
+                    <stripsFromTo fromStrip = "600" toStrip = "767"></stripsFromTo>
                 </side>
                 <side side="v">
-                    <strip>6160</strip>
+                    <stripsFromTo fromStrip = "000" toStrip = "150"></stripsFromTo>
+                    <stripsFromTo fromStrip = "470" toStrip = "767"></stripsFromTo>
                 </side>
             </sensor>
         </ladder>

@@ -29,10 +29,15 @@ geometry.param('components', ['TB'])
 PXDSort = register_module('PXDRawHitSorter')
 PXDSort.param('mergeDuplicates', False)
 PXDSort.param('mergeFrames', False)
-# PXD/SVD clusterizer
+# PXD clusterizer
 PXDClust = register_module('PXDClusterizer')
 PXDClust.param('TanLorentz', 0.)
-
+#SVD sorter
+SVDSort = register_module('SVDDigitSorter')
+SVDSort.param('mergeDuplicates', False)
+# Use the list of ignored strips. _Verbatim_ path, this is not Gear.
+SVDSort.param('ignoredStripsListName', \
+    'testbeam/vxd/data/SVD-IgnoredStripsList.xml')
 SVDClust = register_module('SVDClusterizer')
 SVDClust.param('TanLorentz_holes', 0.)
 SVDClust.param('TanLorentz_electrons', 0.)
@@ -122,6 +127,7 @@ main.add_module(gearbox)
 main.add_module(geometry)
 main.add_module(PXDSort)
 main.add_module(PXDClust)
+main.add_module(SVDSort)
 main.add_module(SVDClust)
 main.add_module(TelClust)
 main.add_module(pxd_dqm)

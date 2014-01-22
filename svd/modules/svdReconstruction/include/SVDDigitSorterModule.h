@@ -13,7 +13,9 @@
 
 #include <framework/core/Module.h>
 #include <svd/dataobjects/SVDDigit.h>
+#include <svd/online/SVDIgnoredStripsMap.h>
 #include <string>
+#include <memory>
 
 namespace Belle2 {
   namespace SVD {
@@ -55,6 +57,11 @@ namespace Belle2 {
       std::vector<SVDDigit> m_digitcopy;
       /** Mode: if true, merge duplicate pixels, otherwise delete all but the first occurence */
       bool m_mergeDuplicates;
+      /** Name of the ignored strips list xml */
+      std::string m_ignoredStripsListName;
+      /** Ignored strips list manager class */
+      std::unique_ptr<SVDIgnoredStripsMap> m_ignoredStripsList;
+
     };//end class declaration
 
     /** @}*/

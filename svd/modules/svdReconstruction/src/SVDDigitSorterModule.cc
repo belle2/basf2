@@ -42,6 +42,7 @@ SVDDigitSorterModule::SVDDigitSorterModule() : Module()
                  "a properly sorted digit collection.");
   setPropertyFlags(c_ParallelProcessingCertified);
   addParam("mergeDuplicates", m_mergeDuplicates, "If true, merge Sample information if more than one digit exists for the same address", true);
+  addParam("ignoredStripsListName", m_ignoredStripsListName, "Name of the xml with ignored strips list", string(""));
   addParam("digits", m_storeDigitsName, "SVDDigit collection name", string(""));
   addParam("truehits", m_storeTrueHitsName, "SVDTrueHit collection name", string(""));
   addParam("particles", m_storeMCParticlesName, "MCParticle collection name", string(""));
@@ -72,6 +73,8 @@ void SVDDigitSorterModule::initialize()
 
   m_relDigitTrueHitName = relDigitTrueHits.getName();
   m_relDigitMCParticleName = relDigitMCParticles.getName();
+
+  m_ignoredStripsList = unique_ptr<SVDIgnoredStripsMap>(new SVDIgnoredStripsMap(m_ignoredStripsListName));
 }
 
 void SVDDigitSorterModule::event()
@@ -97,7 +100,10 @@ void SVDDigitSorterModule::event()
     // Re-use segment part of VXDID to distinguish u and v strips.
     // u-strps will have segment number 1
     if (digit->isUStrip()) sensorID.setSegmentNumber(1);
-    sensors[sensorID].insert(sample);
+    // filter out digits from ignored strips
+    if (m_ignoredStripsList->stripOK(digit->getSensorID(), digit->getCellID())) {
+      sensors[sensorID].insert(sample);
+    }
   }
 
   // Now we loop over sensors and reorder the digits list

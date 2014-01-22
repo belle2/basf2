@@ -9,8 +9,10 @@
  **************************************************************************/
 
 #include <analysis/dataobjects/Particle.h>
+#include <analysis/dataobjects/ParticleExtraInfoMap.h>
 
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 
 #include <ecl/dataobjects/ECLShower.h>
 #include <ecl/dataobjects/ECLGamma.h>
@@ -24,6 +26,7 @@
 
 #include <iostream>
 #include <iomanip>
+#include <exception>
 
 using namespace Belle2;
 
@@ -531,6 +534,71 @@ void Particle::print() const
   std::cout << std::endl;
   std::cout << std::setprecision(prec);
 
+  StoreObjPtr<ParticleExtraInfoMap> extraInfoMap;
+  std::cout << " extra info=( ";
+  if (!m_extraInfo.empty() and !extraInfoMap) {
+    B2FATAL("ParticleExtraInfoMap not available, but needed for storing extra info in Particle!");
+  } else {
+    const ParticleExtraInfoMap::IndexMap& map = extraInfoMap->getMap(m_extraInfo[0]);
+    const unsigned int nVars = m_extraInfo.size();
+    for (const auto & pair : map) {
+      if (pair.second < nVars) {
+        std::cout << pair.first << "=" << m_extraInfo[pair.second] << " ";
+      }
+    }
+
+  }
+  std::cout << ") " << std::endl;
+
+}
+
+float Particle::getExtraInfo(const std::string& name) const
+{
+  if (m_extraInfo.empty())
+    throw std::runtime_error(std::string("getExtraInfo: Value '") + name + "' not found in Particle!");
+
+  //get index for name
+  const unsigned int mapID = (unsigned int)m_extraInfo[0];
+  StoreObjPtr<ParticleExtraInfoMap> extraInfoMap;
+  if (!extraInfoMap) {
+    B2FATAL("ParticleExtraInfoMap not available, but needed for storing extra info in Particle!");
+  }
+  unsigned int index = extraInfoMap->getIndex(mapID, name);
+  if (index == 0 or index >= m_extraInfo.size()) //actualy indices start at 1
+    throw std::runtime_error(std::string("getExtraInfo: Value '") + name + "' not found in Particle!");
+
+  return m_extraInfo[index];
+
+}
+
+void Particle::addExtraInfo(const std::string& name, float value)
+{
+  //check if var is set already, throw if it is
+  bool found = false;
+  try {
+    getExtraInfo(name);
+    found = true;
+  } catch (...) {
+    //not found. that's good.
+  }
+  if (found)
+    throw std::runtime_error(std::string("addExtraInfo: Value '") + name + "' already set!");
+
+  StoreObjPtr<ParticleExtraInfoMap> extraInfoMap;
+  if (!extraInfoMap)
+    extraInfoMap.create();
+  if (m_extraInfo.empty()) {
+    unsigned int mapID = extraInfoMap->getMapForNewVar(name);
+    m_extraInfo.push_back(mapID);
+    m_extraInfo.push_back(value);
+  } else {
+    unsigned int oldMapID = m_extraInfo[0];
+    unsigned int insertIndex = m_extraInfo.size();
+    unsigned int mapID = extraInfoMap->getMapForNewVar(name, oldMapID, insertIndex);
+
+    m_extraInfo[0] = mapID; //update map
+    m_extraInfo.push_back(value); //add value
+  }
 }
 
 

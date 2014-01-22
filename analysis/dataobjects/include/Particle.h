@@ -489,6 +489,18 @@ namespace Belle2 {
      */
     void print() const;
 
+    /** Return given value if set.
+     *
+     * throws std::runtime_error if variable is not set.
+     */
+    float getExtraInfo(const std::string& name) const;
+
+    /** Sets the user-defined data of given name to the given value.
+     *
+     * throws std::runtime_error if variable is already set.
+     */
+    void addExtraInfo(const std::string& name, float value);
+
 
   private:
 
@@ -507,6 +519,13 @@ namespace Belle2 {
     unsigned m_flavorType;  /**< flavor type: 0=unflavored, 1=flavored */
     EParticleType m_particleType;  /**< particle type */
     unsigned m_mdstIndex;  /**< 0-based index of MDST store array object */
+
+    /** Stores associated user defined values.
+     *
+     * Order is given by string -> index mapping in ParticleExtraInfoMap.
+     * entry 0 is reserved specifies which map to use.
+     */
+    std::vector<float> m_extraInfo;
 
     // transient data members
     /**
@@ -552,7 +571,7 @@ namespace Belle2 {
      */
     void setFlavorType();
 
-    ClassDef(Particle, 3); /**< class definition */
+    ClassDef(Particle, 4); /**< Class to store reconstructed particles. */
   };
 
   /** @}*/

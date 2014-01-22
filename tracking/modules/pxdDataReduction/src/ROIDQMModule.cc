@@ -109,7 +109,7 @@ void ROIDQMModule::event()
   harea->Fill((double)ROIarea);
 
   hredFactor->Fill((double)redFactor);
-  cout << " o  DQM: area = " << ROIarea << "  redFactor = " << redFactor << endl;
+  //  cout << " o  DQM: area = " << ROIarea << "  redFactor = " << redFactor << endl;
 
   for (auto it = hROIDictionaryEvt.begin(); it != hROIDictionaryEvt.end(); ++it) {
     ROIHistoAccumulateAndFill aROIHistoAccumulateAndFill = it->second;

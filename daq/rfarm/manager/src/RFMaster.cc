@@ -141,7 +141,7 @@ int RFMaster::UnConfigure(NSMmsg*, NSMcontext*)
     }
   }
 #ifdef DESY
-  sleep(5)
+  sleep(5);
 #else
   while (RFNSM_Status::Instance().get_flag() != nnodes) sleep(1);
 #endif

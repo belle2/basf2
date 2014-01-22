@@ -34,6 +34,7 @@ REG_MODULE(ECLTrackShowerMatch)
 ECLTrackShowerMatchModule::ECLTrackShowerMatchModule() : Module()
 {
   setDescription("Set the Track --> ECLShower Relation.");
+  setPropertyFlags(c_ParallelProcessingCertified);
 }
 
 

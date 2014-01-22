@@ -26,6 +26,8 @@
 #include <utility>
 #include <functional>
 #include <TH1.h>
+#include <TH1F.h>
+#include <TH2F.h>
 #include <TFile.h>
 #include <iostream>
 
@@ -50,6 +52,8 @@ namespace Belle2 {
     virtual void event();
 
     virtual void endRun();
+
+    std::string m_PXDDigitsName;
 
   private:
 

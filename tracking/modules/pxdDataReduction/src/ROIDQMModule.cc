@@ -9,7 +9,7 @@
  **************************************************************************/
 
 #include <tracking/modules/pxdDataReduction/ROIDQMModule.h>
-
+#include <pxd/dataobjects/PXDDigit.h>
 #include <vxd/geometry/GeoCache.h>
 
 using namespace std;
@@ -34,6 +34,9 @@ ROIDQMModule::ROIDQMModule()
   setDescription("Monitor of the  ROIs creation on HLT");
   setPropertyFlags(c_ParallelProcessingCertified);
 
+  addParam("PXDDigitsName", m_PXDDigitsName,
+           "name of the list of PXDDigits", std::string(""));
+
   addParam("InterceptsName", m_InterceptsName,
            "name of the list of interceptions", std::string(""));
 
@@ -51,13 +54,16 @@ void ROIDQMModule::defineHisto()
   hnInter  = new TH1F("hnInter", "number of intercepts", 1000, 0, 10000);
   hnROIs  = new TH1F("hnROIs", "number of ROIs", 100, 0, 100);
   harea = new TH1F("harea", "ROIs area", 100, 0, 100000);
+
   hredFactor = new TH1F("hredFactor", "ROI reduction factor", 1000, 0, 1);
+
 }
 
 void ROIDQMModule::initialize()
 {
   REG_HISTOGRAM
 
+  StoreArray<PXDDigit>::optional();
   StoreArray<ROIid>::required(m_ROIsName);
   StoreArray<PXDIntercept>::required(m_InterceptsName);
 
@@ -191,6 +197,70 @@ void ROIDQMModule::createHistosDictionaries()
                                   )
                                 )
                                );
+        // scatter plot: U,V intercept in cm VS U,V cell ID
+
+        name = "hUIntercept_vs_UDigit_" + sensorid;
+        title = "U intercept (cm) vs U Digit (ID) " + sensorid;
+        TH2F* tmp = new TH2F(name.c_str(), title.c_str(), 100, -5, 5, 1024, 0, 1024);
+        tmp->GetXaxis()->SetTitle("intercept U coor (cm)");
+        tmp->GetYaxis()->SetTitle("U cell ID");
+        hInterDictionary.insert(pair< Belle2::VxdID, InterHistoAndFill >
+                                (
+                                  (Belle2::VxdID)*itPxdSensors,
+                                  InterHistoAndFill(
+                                    tmp,
+        [this, itPxdSensors](TH1 * hPtr, const PXDIntercept * inter) {
+          StoreArray<PXDDigit> PXDDigits(this->m_PXDDigitsName);
+
+          for (auto & it : PXDDigits)
+            if ((int)it.getSensorID() == (int)inter->getSensorID())
+              hPtr->Fill(inter->getCoorU(), it.getUCellID());
+        }
+                                  )
+                                )
+                               );
+
+        name = "hVIntercept_vs_VDigit_" + sensorid;
+        title = "V intercept (cm) vs V Digit (ID) " + sensorid;
+        tmp = new TH2F(name.c_str(), title.c_str(), 100, -5, 5, 1024, 0, 1024);
+        tmp->GetXaxis()->SetTitle("intercept V coor (cm)");
+        tmp->GetYaxis()->SetTitle("V cell ID");
+        hInterDictionary.insert(pair< Belle2::VxdID, InterHistoAndFill >
+                                (
+                                  (Belle2::VxdID)*itPxdSensors,
+                                  InterHistoAndFill(
+                                    tmp,
+        [this, itPxdSensors](TH1 * hPtr, const PXDIntercept * inter) {
+          StoreArray<PXDDigit> PXDDigits(this->m_PXDDigitsName);
+
+          for (auto & it : PXDDigits) {
+            //              cout<<"   pxd sensor "<< (int)it.getSensorID()<<" vs " <<(int)inter->getSensorID()<<endl;
+            if ((int)it.getSensorID() == (int)inter->getSensorID())
+              hPtr->Fill(inter->getCoorV(), it.getVCellID());
+          }
+        }
+                                  )
+                                )
+                               );
+
+        // Intercept U vs V coordinate
+        name = "hUIntercept_vs_VIntercept_" + sensorid;
+        title = "U vs V intercept (cm) " + sensorid;
+        tmp = new TH2F(name.c_str(), title.c_str(), 100, -5, 5, 100, -5, 5);
+        tmp->GetXaxis()->SetTitle("intercept U coor (cm)");
+        tmp->GetYaxis()->SetTitle("intercept V coor (cm)");
+        hInterDictionary.insert(pair< Belle2::VxdID, InterHistoAndFill >
+                                (
+                                  (Belle2::VxdID)*itPxdSensors,
+                                  InterHistoAndFill(
+                                    tmp,
+        [](TH1 * hPtr, const PXDIntercept * inter) { hPtr->Fill(inter->getCoorU(), inter->getCoorV()); }
+                                  )
+                                )
+                               );
+
+
+
 
 
         // ------ HISTOGRAMS WITH A FILL PER ROI -------

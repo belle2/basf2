@@ -98,7 +98,7 @@ SVDClusterizerModule::SVDClusterizerModule() : Module(), m_elNoise(2000.0),
   addParam("APV_t0", m_refTime,
            "Zero time of APV25",  m_refTime);
   /** Whether or not to apply a time window cut */
-  addParam("Apply time window", m_applyWindow,
+  addParam("applyTimeWindow", m_applyWindow,
            "Whether or not to apply an acceptance window based on trigger time", bool(false));
   /** Time of the trigger. */
   addParam("TriggerTime", m_triggerTime,

@@ -195,7 +195,7 @@ void SVDDQMModule::defineHisto()
     int iPlane = indexToPlane(i);
     string name = str(format("hSVDClusterTimeU%1%") % iPlane);
     string title = str(format("SVD cluster time in U, plane %1%") % iPlane);
-    m_timeU[i] = new TH1F(name.c_str(), title.c_str(), 50, 0, 200);
+    m_timeU[i] = new TH1F(name.c_str(), title.c_str(), 50, -50, 150);
     m_timeU[i]->GetXaxis()->SetTitle("time of u clusters [ns]");
     m_timeU[i]->GetYaxis()->SetTitle("count");
   }
@@ -204,7 +204,7 @@ void SVDDQMModule::defineHisto()
     int iPlane = indexToPlane(i);
     string name = str(format("hSVDClusterTimeV%1%") % iPlane);
     string title = str(format("SVD cluster time in V, plane %1%") % iPlane);
-    m_timeV[i] = new TH1F(name.c_str(), title.c_str(), 50, 0, 200);
+    m_timeV[i] = new TH1F(name.c_str(), title.c_str(), 50, -50, 150);
     m_timeV[i]->GetXaxis()->SetTitle("time of v clusters [ns]");
     m_timeV[i]->GetYaxis()->SetTitle("count");
   }

@@ -101,9 +101,9 @@ SVDClusterizerModule::SVDClusterizerModule() : Module(), m_elNoise(2000.0),
   addParam("applyTimeWindow", m_applyWindow,
            "Whether or not to apply an acceptance window based on trigger time", bool(false));
   /** Time of the trigger. */
-  addParam("TriggerTime", m_triggerTime,
+  addParam("triggerTime", m_triggerTime,
            "Time of the trigger", double(0.0));
-  addParam("Acceptance window size", m_acceptance,
+  addParam("acceptanceWindowSize", m_acceptance,
            "Size of the acceptance window following the trigger", double(100));
 }
 

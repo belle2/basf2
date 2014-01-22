@@ -32,7 +32,7 @@ namespace Belle2 {
        * @param digit Pointer to the digit to be wrapped by this pixel
        * @param index Index of the SVDDigit in the collection
        */
-      Sample(SVDDigit* digit, unsigned int index):
+      Sample(const SVDDigit* digit, unsigned int index):
         m_arrayIndex(index), m_cellID(digit->getCellID()), m_iTime(digit->getIndex()),
         m_charge(digit->getCharge()) {}
       /** Bare constructor,
@@ -44,6 +44,10 @@ namespace Belle2 {
       bool operator<(const Sample& b)  const {
         return (m_cellID < b.getCellID()) || (m_cellID == b.getCellID() && m_iTime < b.getSampleIndex());
       }
+      bool operator>(const Sample& b)  const {
+        return (m_cellID > b.getCellID()) || (m_cellID == b.getCellID() && m_iTime > b.getSampleIndex());
+      }
+      /** Greater than operator */
       /** Equality operator */
       bool operator==(const Sample& b) const {
         return m_cellID == b.getCellID() && m_iTime == b.getSampleIndex();

@@ -37,6 +37,7 @@ PXDDIGI = register_module('PXDDigitizer')
 SVDDIGI = register_module('SVDDigitizer')
 # SVD clusterizer
 SVDCLUST = register_module('SVDClusterizer')
+SVDCLUST.param('digitsSorted', False)
 # Save output of simulation
 output = register_module('RootOutput')
 

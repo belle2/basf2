@@ -41,7 +41,7 @@ SVDClusterizerModule::SVDClusterizerModule() : Module(), m_elNoise(2000.0),
   m_minADC(-96000), m_maxADC(386000), m_bitsADC(10), m_unitADC(375), m_cutSeed(5.0),
   m_cutAdjacent(2.5), m_cutCluster(8.0), m_sizeHeadTail(3), c_minSamples(1),
   m_timeTolerance(30), m_shapingTimeElectrons(55), m_shapingTimeHoles(60),
-  m_samplingTime(31.44), m_refTime(-31.44), m_assumeSorted(false)
+  m_samplingTime(31.44), m_refTime(-31.44), m_assumeSorted(true)
 {
   //Set module properties
   setDescription("Clusterize SVDDigits and reconstruct hits");
@@ -190,6 +190,13 @@ void SVDClusterizerModule::initialize()
   // right time. E.g., do we have different noise levels on the two sides of a
   // a sensor? on different sensor types?
   m_noiseMap.setNoiseLevel(m_elNoise);
+
+  // Discourage users from using this option.
+  if (!m_assumeSorted)
+    B2WARNING("SVDClusterizer::digitsSorted: This feature is deprecated and will be removed soon. " <<
+              "For unsorted data or to filter simulation data, use the SVDDigitSorter module in front of " <<
+              "the SVDCluserizer instead. For general use, SVDDigitzer produces sorted digits, so no " <<
+              "action is required.");
 
 }
 

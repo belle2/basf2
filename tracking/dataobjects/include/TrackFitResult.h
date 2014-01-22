@@ -16,7 +16,6 @@
 #include <TMatrixF.h>
 #include <cstdlib>
 #include <vector>
-#include <genfit/AbsTrackRep.h>
 
 //class GFAbsTrackRep;
 //#include cmath

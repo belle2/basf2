@@ -10,7 +10,6 @@
 #include <tracking/dataobjects/TrackFitResult.h>
 #include <cmath>
 #include <TMath.h>
-#include <genfit/AbsTrackRep.h>
 
 using namespace Belle2;
 

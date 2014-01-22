@@ -18,6 +18,7 @@
 #include <framework/pcore/pEventProcessor.h>
 
 #include <framework/logging/Logger.h>
+#include <framework/logging/LogSystem.h>
 
 #include <boost/python/list.hpp>
 #include <boost/python/dict.hpp>
@@ -32,6 +33,7 @@ using namespace Belle2;
 
 Framework::Framework()
 {
+  LogSystem::Instance().enableErrorSummary(true);
   m_pathManager = new PathManager();
 
   RandomNumbers::initialize();

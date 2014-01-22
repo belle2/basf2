@@ -139,7 +139,7 @@ const LogConfig& LogSystem::getCurrentLogConfig(const std::string& package) cons
 LogSystem::LogSystem() :
   m_logConfig(LogConfig::c_Info, 100),
   m_moduleLogConfig(0),
-  m_printErrorSummary(true) //TODO
+  m_printErrorSummary(false)
 {
   unsigned int logInfo = LogConfig::c_Level + LogConfig::c_Message;
   unsigned int warnLogInfo = LogConfig::c_Level + LogConfig::c_Message + LogConfig::c_Module;
@@ -170,6 +170,9 @@ LogSystem::LogSystem() :
 
 void LogSystem::printErrorSummary()
 {
+  if (!m_printErrorSummary)
+    return; //disabled
+
   int numLogWarn = getMessageCounter(LogConfig::c_Warning);
   int numLogError = getMessageCounter(LogConfig::c_Error);
   if (m_errorLog.empty())

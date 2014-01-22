@@ -158,8 +158,17 @@ namespace Belle2 {
     /**
      * Print error/warning summary at end of execution.
      *
+     * Does nothing if m_printErrorSummary is false.
      */
     void printErrorSummary();
+
+    /** enable/disable error/warning summary after successful execution and B2FATAL.
+     *
+     * During normal basf2 execution, this is turned on by the Framework object.
+     * For unit tests (i.e. without a Framework object), the default is used instead (off).
+     */
+    void enableErrorSummary(bool on) { m_printErrorSummary = on; }
+
 
 
   private:

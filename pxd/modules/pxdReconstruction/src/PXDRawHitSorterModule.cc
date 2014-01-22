@@ -45,6 +45,7 @@ PXDRawHitSorterModule::PXDRawHitSorterModule() : Module()
   addParam("mergeDuplicates", m_mergeDuplicates, "If true, add charges of multiple instances of the same fired pixel. Otherwise only keep the first..", true);
   addParam("mergeFrames", m_mergeFrames, "If true, produce a single frame containing digits of all input frames.", true);
   addParam("zeroSuppressionCut", m_0cut, "Minimum charge for a digit to carry", -1000.0);
+  addParam("assignID", m_assignID, "Assign VxdID to RAwHits that don't have it", true);
   addParam("rawHits", m_storeRawHitsName, "PXDRawHit collection name", string(""));
   addParam("digits", m_storeDigitsName, "PXDDigit collection name", string(""));
   addParam("frames", m_storeFramesName, "PXDFrames collection name", string(""));
@@ -92,10 +93,15 @@ void PXDRawHitSorterModule::event()
     const PXDRawHit* const rawhit = storeRawHits[i];
     // If malformed object, drop it.
     VxdID sensorID = rawhit->getSensorID();
-    if (!geo.validSensorID(sensorID)) {
-      B2WARNING("Malformed PXDRawHit, VxdID " << sensorID.getID() << ", dropping.")
-      continue;
-    }
+    if (!geo.validSensorID(sensorID))
+      if (m_assignID) {
+        sensorID.setLayerNumber(2);
+        sensorID.setLadderNumber(1);
+        sensorID.setSensorNumber(2);
+      } else {
+        B2WARNING("Malformed PXDRawHit, VxdID " << sensorID.getID() << ", dropping.");
+        continue;
+      }
     // Zero-suppression cut
     if (rawhit->getCharge() < m_0cut) continue;
     Pixel px(rawhit, rawhit->getStartRow());

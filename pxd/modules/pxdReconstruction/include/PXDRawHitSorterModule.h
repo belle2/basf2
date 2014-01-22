@@ -55,6 +55,8 @@ namespace Belle2 {
       bool m_mergeFrames;
       /** Minimum charge for which a digit is created. */
       double m_0cut;
+      /** Assign VXDID to data that don't have it. */
+      bool m_assignID;
     };//end class declaration
 
     /** @}*/

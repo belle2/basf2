@@ -10,6 +10,7 @@
 
 #include <analysis/modules/MCDecayFinder/MCDecayFinderModule.h>
 #include <analysis/dataobjects/ParticleList.h>
+#include <analysis/dataobjects/ParticleExtraInfoMap.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
@@ -37,7 +38,7 @@ void MCDecayFinderModule::initialize()
 {
   B2WARNING("This is an untested prototype. Do not use for any production purposes.");
 
-  if (m_strDecay.empty()) B2ERROR("No decay descritor string provided.");
+  if (m_strDecay.empty()) B2ERROR("No decay descriptor string provided.");
   m_decaydescriptor.init(m_strDecay);
   if (m_strListName.empty()) B2ERROR("No name of output particle list provided.");
 
@@ -49,11 +50,13 @@ void MCDecayFinderModule::initialize()
   if (m_persistent) {
     StoreObjPtr<ParticleList>::registerPersistent(m_strListName);
     StoreArray<Particle>::registerPersistent(m_particleStore);
+    StoreObjPtr<ParticleExtraInfoMap>::registerPersistent();
     RelationArray::registerPersistent<Particle, MCParticle>(m_particleStore,
                                                             string("MCParticles"));
   } else {
     StoreObjPtr<ParticleList>::registerTransient(m_strListName);
     StoreArray<Particle>::registerTransient(m_particleStore);
+    StoreObjPtr<ParticleExtraInfoMap>::registerTransient();
     RelationArray::registerTransient<Particle, MCParticle>(m_particleStore,
                                                            string("MCParticles"));
   }

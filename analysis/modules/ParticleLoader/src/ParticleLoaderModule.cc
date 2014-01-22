@@ -33,6 +33,7 @@
 #include <ecl/dataobjects/ECLShower.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
+#include <analysis/dataobjects/ParticleExtraInfoMap.h>
 
 #include <utility>
 
@@ -55,7 +56,7 @@ namespace Belle2 {
   {
     // set module description (e.g. insert text)
     setDescription("Loads mdst particles to StoreArray<Particle>");
-    setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
+    setPropertyFlags(c_ParallelProcessingCertified);
 
     // Add parameters
     addParam("UseMCParticles", m_useMCParticles, "use MCParticles", false);
@@ -68,6 +69,7 @@ namespace Belle2 {
   void ParticleLoaderModule::initialize()
   {
     StoreArray<Particle>::registerPersistent();
+    StoreObjPtr<ParticleExtraInfoMap>::registerPersistent();
     RelationArray::registerPersistent<Particle, PIDLikelihood>();
     RelationArray::registerPersistent<Particle, MCParticle>();
   }

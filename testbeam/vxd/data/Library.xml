@@ -429,7 +429,7 @@
 
      </Volume>
      <Volume name="VXDBox-Window1">
-       <Material>PMMA</Material>
+       <Material>PolyEthylen</Material>
        <Shape>Box</Shape>
        <DX unit="mm">134.505</DX>
        <HalfX unit="mm">0.005</HalfX>

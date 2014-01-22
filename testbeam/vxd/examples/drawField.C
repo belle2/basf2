@@ -4,7 +4,7 @@
 
 void drawField(){
   static int ci = 0;
-  bool displayAngles = false;
+  bool displayAngles = true;
   // set here your file name
   // The file format is as follows:
   // 1st line:

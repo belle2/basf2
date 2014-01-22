@@ -31,10 +31,6 @@ namespace Belle2 {
   class Track;
   class MCParticle;
 
-  /** \addtogroup dataobjects
-   * @{
-   */
-
   /**
    * Class to store reconstructed particles.
    * This class is a common representation of all particle types, e.g.:
@@ -573,8 +569,6 @@ namespace Belle2 {
 
     ClassDef(Particle, 4); /**< Class to store reconstructed particles. */
   };
-
-  /** @}*/
 
 } // end namespace Belle2
 

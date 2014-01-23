@@ -13,9 +13,9 @@
 
 #include <framework/core/Module.h>
 #include <pxd/dataobjects/PXDRawHit.h>
+#include <vxd/dataobjects/VxdID.h>
 #include <rawdata/dataobjects/RawPXD.h>
 #include <framework/datastore/StoreArray.h>
-
 
 namespace Belle2 {
 
@@ -47,6 +47,9 @@ namespace Belle2 {
       bool m_DHHCmode;
       /**  ignore missing DATCON */
       bool m_ignoreDATCON;
+      bool m_ignore_headernrframes;
+      bool m_ignore_dhpmask;
+      bool m_ignore_dhpportdiffer;
       /** Event Number and compare mask grabbed from FTSW for now */
       unsigned int ftsw_evt_nr, ftsw_evt_mask;
       /** Output array for Raw Hits. */
@@ -78,7 +81,7 @@ namespace Belle2 {
        * @param dhh_reformat flag if DHH did reformatting
        * @param toffset triggered row (offset)
        */
-      void unpack_dhp(void* data, unsigned int len, unsigned int dhh_first_readout_frame_lo, unsigned int dhh_ID, unsigned dhh_DHPport, unsigned dhh_reformat, unsigned short toffset);
+      void unpack_dhp(void* data, unsigned int len, unsigned int dhh_first_readout_frame_lo, unsigned int dhh_ID, unsigned dhh_DHPport, unsigned dhh_reformat, unsigned short toffset, VxdID vxd_id);
 
     };//end class declaration
 

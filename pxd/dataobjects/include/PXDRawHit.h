@@ -103,7 +103,7 @@ namespace Belle2 {
     }
 
   protected:
-    unsigned short m_sensorID; /**< Compressed sensor identifier.*/
+    unsigned short m_sensorID; /**< Compressed sensor identifier. actually a VxdID object*/
     short m_row;         /**< Absolute pixel position in u. */
     short m_column;         /**< Absolute pixel position in v. */
     short m_charge;           /**< Deposited charge in pixel. */

@@ -11,7 +11,6 @@
 #include <pxd/modules/pxdUnpacking/PXDUnpackerModule.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/logging/Logger.h>
-//#include <rawdata/dataobjects/RawPXD.h>
 #include <rawdata/dataobjects/RawFTSW.h>
 
 // for htonl
@@ -667,6 +666,9 @@ PXDUnpackerModule::PXDUnpackerModule() :
   addParam("HeaderEndianSwap", m_headerEndianSwap, "Swap the endianess of the ONSEN header", true);
   addParam("DHHCmode", m_DHHCmode, "Run in DHHC mode", true);
   addParam("IgnoreDATCON", m_ignoreDATCON, "Ignore missing  DATCON", true);
+  m_ignore_headernrframes = true;
+  m_ignore_dhpmask = true;
+  m_ignore_dhpportdiffer = true;
 }
 
 void PXDUnpackerModule::initialize()
@@ -800,7 +802,7 @@ void PXDUnpackerModule::unpack_event(RawPXD& px)
 
 }
 
-void PXDUnpackerModule::unpack_dhp(void* data, unsigned int len2, unsigned int dhh_first_readout_frame_id_lo, unsigned int dhh_ID, unsigned dhh_DHPport, unsigned dhh_reformat, unsigned short toffset)
+void PXDUnpackerModule::unpack_dhp(void* data, unsigned int len2, unsigned int dhh_first_readout_frame_id_lo, unsigned int dhh_ID, unsigned dhh_DHPport, unsigned dhh_reformat, unsigned short toffset, VxdID vxd_id)
 {
   unsigned int anzahl = len2 / 2; // len2 in bytes!!!
   bool printflag = false;
@@ -841,7 +843,7 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int len2, unsigned int d
   }
 
   if (dhh_ID != dhp_dhh_id) B2ERROR("DHH ID in DHH and DHP header differ ($" << hex << dhh_ID << " != $" << dhp_dhh_id);
-  if (dhh_DHPport != dhp_dhp_id) B2ERROR("DHP ID (Chip/Port) in DHH and DHP header differ ($" << hex << dhh_DHPport << " != $" << dhp_dhp_id);
+  if (dhh_DHPport != dhp_dhp_id && !m_ignore_dhpportdiffer) B2ERROR("DHP ID (Chip/Port) in DHH and DHP header differ ($" << hex << dhh_DHPport << " != $" << dhp_dhp_id);
 
   static int offtab[4] = {0, 64, 128, 192};
   dhp_offset = offtab[dhp_dhp_id];
@@ -886,7 +888,7 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int len2, unsigned int d
             B2INFO("toffset " << toffset);
           };*/
 
-          m_storeRawHits.appendNew(dhh_ID, dhp_row, dhp_col, dhp_adc,
+          m_storeRawHits.appendNew(vxd_id, dhp_row, dhp_col, dhp_adc,
                                    toffset, (dhp_readout_frame_lo - dhh_first_readout_frame_id_lo) & 0x3F, dhp_cm
                                   );
         }
@@ -931,6 +933,7 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& la
   static unsigned int dhh_first_readout_frame_id_lo = 0;
   static unsigned int dhh_first_offset = 0;
   static unsigned int current_dhh_id = 0xFFFF;
+  static unsigned int currentVxdId = 0;
 
 
   dhhc_frame_header_word0* hw = (dhhc_frame_header_word0*)data;
@@ -991,7 +994,7 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& la
                  ((dhhc_direct_readout_frame*)data)->get_dhh_id(),
                  ((dhhc_direct_readout_frame*)data)->get_dhp_port(),
                  ((dhhc_direct_readout_frame*)data)->get_reformat_flag(),
-                 dhh_first_offset);
+                 dhh_first_offset, currentVxdId);
       break;
     };
     case DHHC_FRAME_HEADER_DATA_TYPE_FCE_RAW: {
@@ -1042,6 +1045,23 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& la
       found_mask_active_dhp = 0;
       mask_active_dhp = ((dhhc_dhh_start_frame*)data)->get_active_dhp_mask();
       nr_active_dhp = nr5bits(mask_active_dhp);
+
+      // calculate the VXDID for DHH and save them for DHP unpacking
+      {
+        /// refering to BelleII Note Nr 0010, the numbers run from ... to
+        ///   unsigned int layer, ladder, sensor;
+        ///   layer= vxdid.getLayerNumber();/// 1 ... 2
+        ///   ladder= vxdid.getLadderNumber();/// 1 ... 8 and 1 ... 12
+        ///   sensor= vxdid.getSensorNumber();/// 1 ... 2
+        ///   dhh_id = ((layer-1)<<5) | ((ladder)<<1) | (sensor-1);
+        unsigned short sensor, ladder, layer;
+        sensor = (current_dhh_id & 0x1) + 1;
+        ladder = (current_dhh_id & 0x1E) >> 1; // no +1
+        layer = ((current_dhh_id & 0x20) >> 5) + 1;
+        currentVxdId = VxdID(layer, ladder, sensor);
+      }
+      //currentVxdId = current_dhh_id;
+
       break;
     };
     case DHHC_FRAME_HEADER_DATA_TYPE_GHOST:
@@ -1065,7 +1085,7 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& la
       stat_end++;
 
       if (!fake) {
-        if (nr_of_frames_counted != nr_of_frames_dhhc)  B2ERROR("Number of DHHC Frames in Header " << nr_of_frames_dhhc << " != " << nr_of_frames_counted << " Counted");
+        if (nr_of_frames_counted != nr_of_frames_dhhc && !m_ignore_headernrframes)  B2ERROR("Number of DHHC Frames in Header " << nr_of_frames_dhhc << " != " << nr_of_frames_counted << " Counted");
       }
       if (!fake) {
         int w;
@@ -1093,8 +1113,9 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& la
       ((dhhc_dhh_end_frame*)data)->print();
       if (current_dhh_id != ((dhhc_dhh_end_frame*)data)->get_dhh_id()) B2ERROR("DHH ID from DHH Start and this frame do not match $" << hex << current_dhh_id << " != $" << ((dhhc_dhh_end_frame*)data)->get_dhh_id());
       current_dhh_id = 0xFFFF;
+      currentVxdId = 0; /// invalid
       dhhc.calc_crc();
-      if (found_mask_active_dhp != mask_active_dhp) B2ERROR("DHH_END: DHP active mask $" << hex << mask_active_dhp << " != $" << hex << found_mask_active_dhp << " mask of found dhp/ghost frames");
+      if (found_mask_active_dhp != mask_active_dhp && !m_ignore_dhpmask) B2ERROR("DHH_END: DHP active mask $" << hex << mask_active_dhp << " != $" << hex << found_mask_active_dhp << " mask of found dhp/ghost frames");
       nr_of_dhh_end_frame++;
       if (nr_of_dhh_start_frame != nr_of_dhh_end_frame) B2ERROR("DHHC_FRAME_HEADER_DATA_TYPE_DHH_END without DHHC_FRAME_HEADER_DATA_TYPE_DHH_START");
       break;

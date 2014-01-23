@@ -92,9 +92,10 @@ bool StoragerCallback::load() throw()
   if (!_con[2].load(10)) {
     //std::string emsg = "Failed to start storageout";
     std::string emsg = "storageout: Not accepted connection from EXPRECO";
-    setReply(emsg);
-    LogFile::error(emsg);
-    return false;
+    //setReply(emsg);
+    //LogFile::error(emsg);
+    //return false;
+    LogFile::warning(emsg);
   }
   LogFile::debug("Booted storageout");
   return true;
@@ -105,10 +106,15 @@ bool StoragerCallback::start() throw()
   std::string name[3] = {"storagein", "basf2", "storageout"};
   for (int i = 0; i < 3; i++) {
     if (!_con[i].start()) {
-      std::string emsg = name[i] + " is not started";
-      setReply(emsg);
-      LogFile::error(emsg);
-      return false;
+      if (i < 2) {
+        std::string emsg = name[i] + " is not started";
+        setReply(emsg);
+        LogFile::error(emsg);
+        return false;
+      } else {
+        std::string emsg = "storageout: Not accepted connection from EXPRECO yet";
+        LogFile::warning(emsg);
+      }
     }
     LogFile::debug(name[i] + " started");
   }

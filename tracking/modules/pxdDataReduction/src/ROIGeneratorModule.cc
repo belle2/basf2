@@ -65,7 +65,7 @@ void ROIGeneratorModule::event()
 
   VxdID sensorID;
   sensorID.setLayerNumber(1);
-  sensorID.setLadderNumber(1);
+  sensorID.setLadderNumber(0);
   sensorID.setSensorNumber(1);
 
   int minU;

@@ -33,7 +33,7 @@ int main(int argc, char** argv)
   }
   daemon(0, 0);
   LogFile::open("dqmviewd");
-  system("killall hserver");
+  //system("killall hserver");
   const char* name = argv[1];
 
   ConfigFile config("dqm");

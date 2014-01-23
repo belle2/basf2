@@ -2,6 +2,8 @@
 
 label=`date +%Y-%m-%d-%H-%M`
 
+echo "killing hservers"
+killall hserver
 echo "killing DQM daemon"
 killall dqmviewd
 sleep 2

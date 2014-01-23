@@ -51,7 +51,8 @@ bool StoragerCallback::boot() throw()
   _con[0].addArgument("storagein");
   _con[0].addArgument("1");
   if (!_con[0].load(20)) {
-    std::string emsg = "Failed to start storagein";
+    //std::string emsg = "Failed to start storagein";
+    std::string emsg = "storagein: Failed to connect to eb2rx";
     setReply(emsg);
     LogFile::error(emsg);
     return false;
@@ -89,7 +90,8 @@ bool StoragerCallback::load() throw()
   _con[2].addArgument("storageout");
   _con[2].addArgument("1");
   if (!_con[2].load(10)) {
-    std::string emsg = "Failed to start storageout";
+    //std::string emsg = "Failed to start storageout";
+    std::string emsg = "storageout: Not accepted connection from EXPRECO";
     setReply(emsg);
     LogFile::error(emsg);
     return false;

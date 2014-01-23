@@ -4,6 +4,7 @@
 
 #include <daq/slc/system/TCPSocketWriter.h>
 #include <daq/slc/system/TCPSocketReader.h>
+#include <daq/slc/system/LogFile.h>
 
 #include <daq/slc/base/Debugger.h>
 
@@ -67,10 +68,12 @@ void PackageSender::run()
     _xml_v = std::vector<std::string>();
     _update_id_v = std::vector<int>();
 
-    std::vector<PackageManager*>& manager_v(_master->getManagers());
     size_t nman = 0;
+    std::vector<PackageManager*>& manager_v(_master->getManagers());
     for (size_t i = 0; i < manager_v.size(); i++) {
-      if (manager_v[i]->isAvailable()) nman++;
+      if (manager_v[i]->isAvailable()) {
+        nman++;
+      }
     }
     writer.writeInt(FLAG_LIST);
     writer.writeInt((int)nman);
@@ -91,19 +94,21 @@ void PackageSender::run()
     }
 
     for (size_t i = 0; i < manager_v.size(); i++) {
-      PackageManager* manager = manager_v[i];
-      size_t size = 0, count = 0;
-      char* buf = manager->createConfig(size);
-      count = manager->copyConfig(buf, size);
-      zipped_buf conf = {buf, size, count};
-      _conf_v.push_back(conf);
-      buf = manager->createContentsAll(size);
-      int id = 0;
-      count = manager->copyContentsAll(buf, size, id);
-      zipped_buf contents = {buf, size, count};
-      _contents_v.push_back(contents);
-      _xml_v.push_back(manager->createXML());
-      _update_id_v.push_back(id);
+      if (manager_v[i]->isAvailable()) {
+        PackageManager* manager = manager_v[i];
+        size_t size = 0, count = 0;
+        char* buf = manager->createConfig(size);
+        count = manager->copyConfig(buf, size);
+        zipped_buf conf = {buf, size, count};
+        _conf_v.push_back(conf);
+        buf = manager->createContentsAll(size);
+        int id = 0;
+        count = manager->copyContentsAll(buf, size, id);
+        zipped_buf contents = {buf, size, count};
+        _contents_v.push_back(contents);
+        _xml_v.push_back(manager->createXML());
+        _update_id_v.push_back(id);
+      }
     }
 
     writer.writeInt(FLAG_ALL);
@@ -130,9 +135,14 @@ void PackageSender::run()
         if (id == 0) continue;
         if (id < 0) break;
         id--;
-        if (monitored_v[id]) sendUpdates(writer, id, id_m[id]);
-        for (id = 0; id < (int)_contents_v.size(); id++) {
+        if (manager_v[id]->isAvailable()) {
+          LogFile::debug("send update : %s (updateid=%d)",
+                         manager_v[id]->getPackage()->getName().c_str(),
+                         manager_v[id]->getPackage()->getUpdateId());
           if (monitored_v[id]) sendUpdates(writer, id, id_m[id]);
+          for (id = 0; id < (int)_contents_v.size(); id++) {
+            if (monitored_v[id]) sendUpdates(writer, id, id_m[id]);
+          }
         }
       }
     } catch (const IOException& e) {

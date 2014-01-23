@@ -114,10 +114,12 @@ int LogFile::put_impl(const std::string& msg, SystemLog::Priority priority, va_l
   }
   Date date;
   if (__filesize >= 1024 * 1024 * 2) {
+    /*
     __stream.close();
     rename(__filepath.c_str(),
            (__filepath + "." + date.toString("%Y.%m.%d.%H.%M")).c_str());
     open();
+    */
   }
   std::stringstream ss;
   ss << "[" << date.toString();

@@ -106,8 +106,8 @@ namespace Belle2 {
     /** alias for savePicture(true). */
     void saveHiResPicture() { savePicture(true); }
 
-    /** return viewer class. */
-    SplitGLView* getViewer() { return m_viewer; }
+    /** return right-side pane with viewers. */
+    SplitGLView* getViewPane() { return m_viewPane; }
 
     /** Check if new events are available, and go to next event.
      *
@@ -193,8 +193,8 @@ namespace Belle2 {
     /** List of event data, including projections. */
     TEveElementList* m_eventData;
 
-    /** pointer to viewer class. */
-    SplitGLView* m_viewer;
+    /** pointer to right-side pane with viewers. */
+    SplitGLView* m_viewPane;
 
     /** Polling/auto-advance timer. */
     TTimer* m_timer;

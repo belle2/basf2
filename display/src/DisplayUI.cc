@@ -62,7 +62,7 @@ DisplayUI::DisplayUI(bool automatic):
   TEveBrowser* browser = gEve->GetBrowser();
   browser->HideBottomTab();
   browser->StartEmbedding(TRootBrowser::kRight);
-  m_viewer = new SplitGLView();
+  m_viewPane = new SplitGLView();
   browser->StopEmbedding();
 
   m_eventData = new TEveElementList();
@@ -279,11 +279,11 @@ bool DisplayUI::startDisplay()
 
     //import the geometry in the projection managers (only needs to be done once)
     TEveScene* gs = gEve->GetGlobalScene();
-    TEveProjectionManager* rphiManager = getViewer()->getRPhiMgr();
+    TEveProjectionManager* rphiManager = getViewPane()->getRPhiMgr();
     if (rphiManager) {
       rphiManager->ImportElements(gs);
     }
-    TEveProjectionManager* rhozManager = getViewer()->getRhoZMgr();
+    TEveProjectionManager* rhozManager = getViewPane()->getRhoZMgr();
     if (rhozManager) {
       rhozManager->ImportElements(gs);
     }
@@ -291,8 +291,8 @@ bool DisplayUI::startDisplay()
 
   updateUI(); //update button state
 
-  m_eventData->AddElement(m_viewer->getRPhiMgr()->ImportElements((TEveElement*)gEve->GetEventScene()));
-  m_eventData->AddElement(m_viewer->getRhoZMgr()->ImportElements((TEveElement*)gEve->GetEventScene()));
+  m_eventData->AddElement(getViewPane()->getRPhiMgr()->ImportElements((TEveElement*)gEve->GetEventScene()));
+  m_eventData->AddElement(getViewPane()->getRhoZMgr()->ImportElements((TEveElement*)gEve->GetEventScene()));
 
   if (!m_automatic) {
     gEve->Redraw3D(false); //do not reset camera when redrawing
@@ -571,7 +571,7 @@ void DisplayUI::savePicture(bool highres)
   new TGFileDialog(gEve->GetBrowser()->GetClient()->GetDefaultRoot(), gEve->GetBrowser(), kFDSave, &fi);
   if (!fi.fFilename)
     return; //cancelled
-  TGLViewer* v = m_viewer->getActiveGLViewer();
+  TGLViewer* v = getViewPane()->getActiveGLViewer();
   bool success = false;
   if (!highres) {
     success = v->SavePicture(fi.fFilename);

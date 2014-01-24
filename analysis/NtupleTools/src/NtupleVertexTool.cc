@@ -14,7 +14,6 @@
 #include <TBranch.h>
 #include <TLorentzVector.h>
 #include <TVector3.h>
-#include <analysis/utility/physics.h>
 
 void NtupleVertexTool::setupTree()
 {

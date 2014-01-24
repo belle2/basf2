@@ -37,7 +37,7 @@ Raw2DsModule::Raw2DsModule() : Module()
            string("InputRbuf"));
 
   m_rbuf = NULL;
-  m_nevt = 0;
+  m_nevt = -1;
 
   //Parameter definition
   B2INFO("Rx: Constructor done.");
@@ -88,6 +88,10 @@ void Raw2DsModule::beginRun()
 
 void Raw2DsModule::event()
 {
+  m_nevt++;
+  // Skip first event since it is read in initialize();
+  if (m_nevt == 0) return;
+
   registerRawCOPPERs();
 }
 
@@ -182,7 +186,6 @@ void Raw2DsModule::registerRawCOPPERs()
   evtmetadata->setEvent(sndhdr.GetEventNumber());
   //  printf ( "ExpNo = %d, RunNo = %d, EvtNo = %d\n", sndhdr.GetExpNum(),
   //       sndhdr.GetRunNum(), sndhdr.GetEventNumber() );
-  m_nevt++;
   delete[] evtbuf;
 
   B2INFO("Raw2Ds: DataStore Restored!!");

@@ -89,7 +89,7 @@ void PXDDQMModule::defineHisto()
     int iPlane = indexToPlane(i);
     string name = str(format("hPXDHitmapU%1%") % iPlane);
     string title = str(format("PXD Hitmap in U, plane %1%") % iPlane);
-    float width = getInfo(i).getWidth();
+    float width = getInfo(i).getUSize();
     int nPixels = getInfo(i).getUCells();
     m_hitMapU[i] = new TH1F(name.c_str(), title.c_str(), nPixels, -0.5 * width, 0.5 * width);
     m_hitMapU[i]->GetXaxis()->SetTitle("u position [cm]");
@@ -100,7 +100,7 @@ void PXDDQMModule::defineHisto()
     int iPlane = indexToPlane(i);
     string name = str(format("hPXDHitmapV%1%") % iPlane);
     string title = str(format("PXD Hitmap in V, plane %1%") % iPlane);
-    float length = getInfo(i).getLength();
+    float length = getInfo(i).getVSize();
     int nPixels = getInfo(i).getVCells();
     m_hitMapV[i] = new TH1F(name.c_str(), title.c_str(), nPixels, -0.5 * length, 0.5 * length);
     m_hitMapV[i]->GetXaxis()->SetTitle("v position [cm]");
@@ -111,11 +111,11 @@ void PXDDQMModule::defineHisto()
     int iPlane = indexToPlane(i);
     string name = str(format("h2PXDHitmapUV%1%") % iPlane);
     string title = str(format("PXD Hitmap in U x V, plane %1%") % iPlane);
-    float length = getInfo(i).getLength();
+    float uSize = getInfo(i).getUSize();
     int nPixelsU = getInfo(i).getUCells();
-    float width = getInfo(i).getWidth();
+    float vSize = getInfo(i).getVSize();
     int nPixelsV = getInfo(i).getVCells();
-    m_hitMapUV[i] = new TH2F(name.c_str(), title.c_str(), nPixelsU, -0.5 * width, 0.5 * width, nPixelsV, -0.5 * length, 0.5 * length);
+    m_hitMapUV[i] = new TH2F(name.c_str(), title.c_str(), nPixelsU, -0.5 * uSize, 0.5 * uSize, nPixelsV, -0.5 * vSize, 0.5 * vSize);
     m_hitMapUV[i]->GetXaxis()->SetTitle("u position [cm]");
     m_hitMapUV[i]->GetYaxis()->SetTitle("v position [cm]");
     m_hitMapUV[i]->GetZaxis()->SetTitle("hits");

@@ -93,7 +93,7 @@ void PXDRawHitSorterModule::event()
     const PXDRawHit* const rawhit = storeRawHits[i];
     // If malformed object, drop it.
     VxdID sensorID = rawhit->getSensorID();
-    if (!geo.validSensorID(sensorID))
+    if (!geo.validSensorID(sensorID)) {
       if (m_assignID) {
         sensorID.setLayerNumber(2);
         sensorID.setLadderNumber(1);
@@ -102,10 +102,10 @@ void PXDRawHitSorterModule::event()
         B2WARNING("Malformed PXDRawHit, VxdID " << sensorID.getID() << ", dropping.");
         continue;
       }
+    }
     // Zero-suppression cut
     if (rawhit->getCharge() < m_0cut) continue;
     Pixel px(rawhit, rawhit->getStartRow());
-
     if (sensorID != currentSensorID) {
       currentSensorID = sensorID;
       frameCounter = 1;

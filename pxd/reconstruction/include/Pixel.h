@@ -43,7 +43,7 @@ namespace Belle2 {
         m_charge(digit->getCharge()) {}
       /** Construct from a given PXDRawHit and its store index */
       Pixel(const PXDRawHit* rawhit, unsigned int index): m_index(index),
-        m_u(rawhit->getColumn()), m_v(rawhit->getRow()),
+        m_u(rawhit->getRow()), m_v(rawhit->getColumn()),
         m_charge(rawhit->getCharge()) {}
 
       /** Comparison operator, sorting by row,column in ascending order */

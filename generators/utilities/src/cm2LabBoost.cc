@@ -63,3 +63,22 @@ TLorentzRotation getBoost(double Eher, double Eler, double cross_angle, double a
 
   return cms2labBoostRotZ;
 }
+
+double getBeamEnergySpreadCM(double E1, double dE1,
+                             double E2, double dE2,
+                             double crossing_angle)
+{
+  // To get fluctuation of root(s) from
+  // the beam energy, its energy spread and crossing angle
+  // at the lab. frame.
+  double m = Const::electronMass;
+  double ca = cos(crossing_angle);
+
+  double P1 = sqrt(E1 * E1 - m * m);
+  double P2 = sqrt(E2 * E2 - m * m);
+  Double_t Etotcm = sqrt(2.*m * m + 2.*(E1 * E2 + P1 * P2 * ca));
+  Double_t dEdE1 = (P1 * E2 + P2 * E1 * ca) / P1 / Etotcm;
+  Double_t dEdE2 = (P1 * E2 * ca + P2 * E1) / P2 / Etotcm;
+  Double_t dEtotcm = sqrt((dE1 * dEdE1) * (dE1 * dEdE1) + (dE2 * dEdE2) * (dE2 * dEdE2));
+  return dEtotcm;
+}

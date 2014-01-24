@@ -481,21 +481,6 @@ namespace Belle2 {
       return signalProbabilityProduct;
     }
 
-    double truth(const Particle* part)
-    {
-      B2WARNING("The implementation of this variable (truth) has BUGS! Stop using it. Use isSignal() instead. This function will be removed soon!");
-      double result = 1.0;
-      const MCParticle* mc_part = DataStore::getRelated<MCParticle>(part);
-      if (mc_part == nullptr) {
-        for (auto & daughter : part->getDaughters()) {
-          result *= truth(daughter);
-        }
-      } else {
-        result = (part->getPDGCode() == mc_part->getPDG()) ? 1.0 : 0.0;
-      }
-      return result;
-    }
-
     double isSignal(const Particle* part)
     {
       double result = 0.0;
@@ -682,7 +667,8 @@ namespace Belle2 {
     REGISTER_VARIABLE("flavor", particleFlavorType, "flavor type of decay (0=unflavored, 1=flavored)");
     REGISTER_VARIABLE("sumChildProb", sumChildProb, "sum of signal probabilities of childs");
     REGISTER_VARIABLE("prodChildProb", prodChildProb, "product of signal probabilities of childs");
-    REGISTER_VARIABLE("truth", truth, "Truth, 1.0 if MCParticle PDG matches assigned Particle PDG");
+
+    REGISTER_VARIABLE("isSignal", isSignal, "1.0 if Particle is correctly reconstructed (SIGNAL), 0.0 otherwise");
 
     REGISTER_VARIABLE("nROETracks",  nROETracks,  "number of remaining tracks as given by the related RestOfEvent object");
     REGISTER_VARIABLE("nROEShowers", nROEShowers, "number of remaining ECL showers as given by the related RestOfEvent object");

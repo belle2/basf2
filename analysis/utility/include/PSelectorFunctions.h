@@ -365,13 +365,6 @@ namespace Belle2 {
     /**
      * function for PSelector
      * @param part const pointer to Particle
-     * @return 1 if mc information match pdg code, 0 otherwise
-     */
-    double truth(const Particle* particle);
-
-    /**
-     * function for PSelector
-     * @param part const pointer to Particle
      * @return 1 if Particle is correctly reconstructed (SIGNAL), 0 otherwise
      */
     double isSignal(const Particle* particle);

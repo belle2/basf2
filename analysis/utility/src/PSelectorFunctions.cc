@@ -11,6 +11,7 @@
 // Own include
 #include <analysis/utility/PSelectorFunctions.h>
 #include <analysis/utility/PCmsLabTransform.h>
+#include <analysis/utility/mcParticleMatching.h>
 
 #include <analysis/utility/VariableManager.h>
 
@@ -482,6 +483,7 @@ namespace Belle2 {
 
     double truth(const Particle* part)
     {
+      B2WARNING("The implementation of this variable (truth) has BUGS! Stop using it. Use isSignal() instead. This function will be removed soon!");
       double result = 1.0;
       const MCParticle* mc_part = DataStore::getRelated<MCParticle>(part);
       if (mc_part == nullptr) {
@@ -491,6 +493,29 @@ namespace Belle2 {
       } else {
         result = (part->getPDGCode() == mc_part->getPDG()) ? 1.0 : 0.0;
       }
+      return result;
+    }
+
+    double isSignal(const Particle* part)
+    {
+      double result = 0.0;
+
+      const MCParticle* mcparticle = DataStore::getRelated<MCParticle>(part);
+
+      if (mcparticle == nullptr)
+        return result;
+
+      int mcPDGCode = mcparticle->getPDG();
+      int status    = getMCTruthStatus(part, mcparticle);
+
+      if (!(status == 1 || status == 0))
+        return result;
+
+      if (part->getFlavorType() && mcPDGCode == part->getPDGCode())
+        result = 1.0;
+      else if (!part->getFlavorType() && abs(mcPDGCode) == abs(part->getPDGCode()))
+        result = 1.0;
+
       return result;
     }
 

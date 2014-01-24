@@ -371,6 +371,13 @@ namespace Belle2 {
 
     /**
      * function for PSelector
+     * @param part const pointer to Particle
+     * @return 1 if Particle is correctly reconstructed (SIGNAL), 0 otherwise
+     */
+    double isSignal(const Particle* particle);
+
+    /**
+     * function for PSelector
      * requires that RestOfEvent <-> Particle relation exists (returns -1 if it doesn't)
      *
      * @param part const pointer to Particle

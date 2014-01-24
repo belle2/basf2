@@ -78,7 +78,7 @@ namespace Belle2 {
       virtual ~EveVisBField() { }
 
       /** return field strength at given coordinates, using Eve conventions. */
-      virtual TEveVector GetField(Float_t x, Float_t y, Float_t z) const {
+      virtual TEveVector GetField(Float_t x, Float_t y, Float_t z) const override {
         TEveVector v;
 
         v.Set(BFieldMap::Instance().getBField(TVector3(x, y, z)));
@@ -88,7 +88,7 @@ namespace Belle2 {
         return v;
       }
       /** maximal field strength (is this correct?) */
-      virtual Float_t GetMaxFieldMag() const { return 1.5; }
+      virtual Float_t GetMaxFieldMag() const override { return 1.5; }
     };
 
 

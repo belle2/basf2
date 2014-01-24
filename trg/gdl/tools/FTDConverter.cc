@@ -358,13 +358,38 @@ getInput(char b[800]) {
     inputSizes.push_back(b1 - b0);
 
     if (b0 != b1) {
-	for (unsigned i = b0; i <= b1; i++) {
-	    char n[2];
-	    n[0] = '0' + i;
-	    n[1] = 0;
-	    inputBits.push_back(string(w) + "[" + string(n) + "]");
-	    inputNames.push_back(string(w) + string(n));
-	}
+        if ((b1 - b0) < 10) {
+            for (unsigned i = b0; i <= b1; i++) {
+                char n[2];
+                n[0] = '0' + i;
+                n[1] = 0;
+                inputBits.push_back(string(w) + "[" + string(n) + "]");
+                inputNames.push_back(string(w) + string(n));
+            }
+        }
+        else {
+            for (unsigned i = b0; i <= b1; i++) {
+                if (i < 10) {
+                    char n[2];
+                    n[0] = '0' + i;
+                    n[1] = 0;
+                    inputBits.push_back(string(w) + "[" + string(n) + "]");
+                    inputNames.push_back(string(w) + string(n));
+                }
+                //...Assuming less than 20...
+                else {
+                    char n[3];
+                    n[0] = '1';
+                    n[1] = '0' + i - 10;
+                    n[2] = 0;
+                    inputBits.push_back(string(w) + "[" + string(n) + "]");
+                    inputNames.push_back(string(w) + string(n));
+                }
+            }
+            if (DebugLevel) {
+//              cout << inputNames.last() << endl;
+            }
+        }
     }
     else {
 	inputBits.push_back(string(w));

@@ -14,5 +14,7 @@
 #pragma link C++ class Belle2::ParticleExtraInfoMap+;
 #pragma link C++ class map<string, unsigned int>+;
 #pragma link C++ class vector<map<string, unsigned int> >+;
+//not actually used, but root complains if it's missing
+#pragma link C++ class pair<string, unsigned int>+;
 
 #endif

@@ -17,6 +17,7 @@ namespace Belle2 {
    *
    *  Master modules have to create an object of this type!
    *
+   *  @sa EventInfoSetterModule, EventInfoPrinterModule
    *  @author <a href="mailto:martin.heck@kit.edu?subject=EventMetaData">Martin Heck</a>
    */
   class EventMetaData : public TObject {
@@ -54,10 +55,13 @@ namespace Belle2 {
 
     /** Marks the end of the data processing.
      *
-     * Can be used by non-master modules to halt event processing.
+     * Can be used by any module to safely halt event processing.
+     * After this is set on StoreObjPtr<EventMetaData> and  your event() function returns,
+     * no further modules in the path will * be called and normal cleanup will
+     * be done (i.e. endRun(), terminate()).
      *
-     * Sets the values for the experiment, run and event to
-     * values indicating the end of data.
+     * Using this will produce a warning that your module stopped execution early,
+     * so you might want to add an explanatory message of your own.
      */
     void setEndOfData();
 
@@ -103,7 +107,7 @@ namespace Belle2 {
 
     /** Parent Index Getter.
      *
-     *  @return The index of the current parent file.
+     *  @return The index of the current parent file, or UINT_MAX if not set.
      */
     int getParentIndex() const {
       return m_parent_index;

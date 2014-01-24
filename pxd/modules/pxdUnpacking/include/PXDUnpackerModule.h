@@ -13,6 +13,7 @@
 
 #include <framework/core/Module.h>
 #include <pxd/dataobjects/PXDRawHit.h>
+#include <pxd/dataobjects/PXDRawROIs.h>
 #include <vxd/dataobjects/VxdID.h>
 #include <rawdata/dataobjects/RawPXD.h>
 #include <framework/datastore/StoreArray.h>
@@ -47,13 +48,18 @@ namespace Belle2 {
       bool m_DHHCmode;
       /**  ignore missing DATCON */
       bool m_ignoreDATCON;
+      /**  ignore wrong nr of frames info in DHHC Start*/
       bool m_ignore_headernrframes;
+      /**  ignore missing DHPs from DHP mask in DHH Start*/
       bool m_ignore_dhpmask;
+      /**  ignore wrong DHP ports in DHH header vs DHP header */
       bool m_ignore_dhpportdiffer;
       /** Event Number and compare mask grabbed from FTSW for now */
       unsigned int ftsw_evt_nr, ftsw_evt_mask;
       /** Output array for Raw Hits. */
       StoreArray<PXDRawHit> m_storeRawHits;
+      /** Output array for Raw Hits. */
+      StoreArray<PXDRawROIs> m_storeROIs;
 
       /** Unpack one event (several frames) stored in RawPXD object.
        * @param px RawPXD data object

@@ -366,6 +366,12 @@ public:
     }
     return c;
   };
+  void save(StoreArray<PXDRawROIs>& sa, unsigned int length, int* data) {
+    unsigned int l;
+    l = (length - 4 - 4 - 4 * 4) / 8;
+    sa.appendNew(l, magic1, trignr1, magic2, trignr2, &data[5]);
+  }
+
 };
 
 class dhhc_ghost_frame {
@@ -657,7 +663,8 @@ public:
 
 PXDUnpackerModule::PXDUnpackerModule() :
   Module(),
-  m_storeRawHits()
+  m_storeRawHits(),
+  m_storeROIs()
 {
   //Set module properties
   setDescription("Unpack Raw PXD Hits");
@@ -665,16 +672,17 @@ PXDUnpackerModule::PXDUnpackerModule() :
 
   addParam("HeaderEndianSwap", m_headerEndianSwap, "Swap the endianess of the ONSEN header", true);
   addParam("DHHCmode", m_DHHCmode, "Run in DHHC mode", true);
-  addParam("IgnoreDATCON", m_ignoreDATCON, "Ignore missing  DATCON", true);
-  m_ignore_headernrframes = true;
-  m_ignore_dhpmask = true;
-  m_ignore_dhpportdiffer = true;
+  addParam("IgnoreDATCON", m_ignoreDATCON, "Ignore missing DATCON ROIs", true);
+  addParam("IgnoreDHHCFrameNr", m_ignore_headernrframes, "Ignore Wrong Nr Frames in DHHC Start", true);
+  addParam("IgnoreDHPMask", m_ignore_dhpmask, "Ignore missing DHP from DHH Start mask", true);
+  addParam("IgnoreDHPPortDiffer", m_ignore_dhpportdiffer, "Ignore if DHP port differ in DHH and DHP header", true);
 }
 
 void PXDUnpackerModule::initialize()
 {
   //Register output collections
   m_storeRawHits.registerAsPersistent();
+  m_storeROIs.registerAsPersistent();
   /// actually, later we do not want o store it into output file ...  aside from debugging
   B2INFO("HeaderEndianSwap: " << m_headerEndianSwap);
   B2INFO("DHHCmode: " << m_DHHCmode);
@@ -1125,6 +1133,7 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& la
       //((dhhc_onsen_frame*)data)->set_length(len - 4);
       ((dhhc_onsen_frame*)data)->print();
       ((dhhc_onsen_frame*)data)->calc_crc(len - 4); /// CRC is without the DHHC header
+      ((dhhc_onsen_frame*)data)->save(m_storeROIs, len, (int*)data);
       dhhc.calc_crc();
       break;
     default:

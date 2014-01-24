@@ -363,6 +363,22 @@ const std::vector<const Belle2::Particle*> Particle::getFinalStateDaughters() co
   return fspDaughters;
 }
 
+std::vector<int> Particle::getMdstArrayIndices(EParticleType type) const
+{
+  std::vector<int> mdstIndices;
+  std::vector<const Particle*> fspDaughters = this->getFinalStateDaughters();
+
+  for (unsigned i = 0; i < fspDaughters.size(); i++) {
+    const Particle* fsp = fspDaughters[i];
+
+    // is this FSP daughter constructed from given MDST type
+    if (fsp->getParticleType() == type)
+      mdstIndices.push_back(fsp->getMdstArrayIndex());
+  }
+  return mdstIndices;
+}
+
+
 void Particle::appendDaughter(const Particle* daughter)
 {
   // it's a composite particle

@@ -474,6 +474,14 @@ namespace Belle2 {
     //Need namespace qualifier because ROOT CINT has troubles otherwise
 
     /**
+     * Returns a vector of StoreArray indices of given MDST dataobjects
+     *
+     * @param EParticleType corresponding to a given MDST dataobject
+     * @return vector of StoreArray indices of a given MDST dataobjects
+     */
+    std::vector<int> getMdstArrayIndices(EParticleType type) const;
+
+    /**
      * Returns true if final state ancessors of oParticle overlap
      * @param oParticle pointer to particle
      * @return true if overlap, otherwise false

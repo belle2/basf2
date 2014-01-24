@@ -28,7 +28,8 @@ path.add_module(root_input)
 gearbox = register_module('Gearbox')
 path.add_module(gearbox)
 
-components = ['MagneticField', 'BeamPipe', 'PXD', 'SVD', 'CDC']
+components = ['MagneticFieldConstant4LimitedRCDC', 'BeamPipe', 'PXD', 'SVD',
+              'CDC']
 print components
 print
 geometry = register_module('Geometry')
@@ -37,7 +38,7 @@ path.add_module(geometry)
 
 add_reconstruction(path, components)
 
-output_file_name = '../trackingEfficiency_FinalData.root'
+output_file_name = '../14999_trackingEfficiency_FinalData.root'
 tracking_efficiency = register_module('StandardTrackingPerformance')
 # tracking_efficiency.logging.log_level = LogLevel.DEBUG
 tracking_efficiency.param('outputFileName', output_file_name)

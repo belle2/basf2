@@ -24,7 +24,7 @@ def run_simulation(path, pt_value, output_filename):
     # In order to avoid, that tracks came back in the cdc after they have left
     # TOP is added in the simulation
     components = [
-        'MagneticField',
+        'MagneticFieldConstant4LimitedRCDC',
         'BeamPipe',
         'PXD',
         'SVD',

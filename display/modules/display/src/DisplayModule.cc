@@ -116,6 +116,10 @@ void DisplayModule::initialize()
   m_visualizer->setOptions(m_options);
   m_visualizer->showFullGeo(m_fullGeometry);
   m_visualizer->addGeometry();
+
+  //allow UI to get additional info on the represented objects
+  m_display->setVisualRepMap(m_visualizer->getVisualRepMap());
+
 }
 
 

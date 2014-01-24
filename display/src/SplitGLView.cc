@@ -205,9 +205,9 @@ void SplitGLView::onClicked(TObject* obj)
 {
   // Handle click events in GL viewer
 
-  if (obj)
+  if (obj) {
     m_statusBar->SetText(Form("User clicked on: \"%s\"", obj->GetName()), 1);
-  else
+  } else
     m_statusBar->SetText("", 1);
 
   // change the active GL viewer to the one who emitted the signal

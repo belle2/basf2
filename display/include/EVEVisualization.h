@@ -47,6 +47,7 @@ class TEveTrackList;
 
 namespace Belle2 {
   class DisplayData;
+  class VisualRepMap;
 
   /** Produces visualisation for MCParticles, simhits, genfit::Tracks, geometry and other things.
    *
@@ -191,6 +192,14 @@ namespace Belle2 {
       }
     }
 
+    /** Generic function to keep track of which objects have which visual representation.
+     *
+     * Should be called by functions adding TEveElements to the event scene
+     * (Hits are currently excluded).
+     */
+    void addObject(const TObject* dataStoreObject, TEveElement* visualRepresentation);
+
+
     /** Add user-defined data (labels, points, etc.) */
     void showUserData(const DisplayData& displayData);
 
@@ -240,6 +249,9 @@ namespace Belle2 {
 
     /** Show full geometry instead of simplified shapes. */
     void showFullGeo(bool on) { m_fullgeo = on; }
+
+    /** Get TObject <-> TEveElement mapping. */
+    const VisualRepMap* getVisualRepMap() const { return m_visualRepMap; }
 
 
   private:
@@ -329,6 +341,9 @@ namespace Belle2 {
 
     /** Unassigned recohits. */
     TEveStraightLineSet* m_unassignedRecoHits;
+
+    /** Map TObject <-> TEveElement, shared with UI */
+    VisualRepMap* m_visualRepMap;
 
   };
 
@@ -425,6 +440,7 @@ namespace Belle2 {
 
     track_lines->AddElement(lines);
     m_trackcandlist->AddElement(track_lines);
+    addObject(trackCand, track_lines);
   }
 }
 #endif

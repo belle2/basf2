@@ -8,6 +8,7 @@
 #include <vector>
 
 class TEveBox;
+class TEveElement;
 class TEveElementList;
 class TGButton;
 class TGPictureButton;
@@ -21,6 +22,7 @@ namespace Belle2 {
   template <class T> class ModuleParam;
   class SplitGLView;
   class DisplayData;
+  class VisualRepMap;
 
   /** Control TEve browser user interface.
    *
@@ -130,6 +132,12 @@ namespace Belle2 {
     /** toggle cumulative mode. */
     void toggleCumulative() { m_cumulative = !m_cumulative; }
 
+    /** Set the TObject <-> TEveElement map (to be filled by EVEVisualization). */
+    void setVisualRepMap(const VisualRepMap* visualRepMap) { m_visualRepMap = visualRepMap; }
+
+    /** Handle special actions when objects are selected. */
+    void selectionHandler(TEveElement* eveObj);
+
 
   private:
     /** Wraps a module parameter that can be toggled from the UI. */
@@ -198,6 +206,9 @@ namespace Belle2 {
 
     /** Polling/auto-advance timer. */
     TTimer* m_timer;
+
+    /** Map TObject <-> TEveElement */
+    const VisualRepMap* m_visualRepMap;
 
 
     /** Dictionary needed for signal/slot mechanism (0 to disable I/O). */

@@ -2,9 +2,12 @@
 #include <framework/core/ModuleParam.h>
 
 #include <display/DisplayUI.h>
+#include <display/VisualRepMap.h>
 
 #include <framework/core/InputController.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/datastore/DataStore.h>
+#include <framework/datastore/RelationVector.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/logging/Logger.h>
 #include <display/dataobjects/DisplayData.h>
@@ -17,6 +20,7 @@
 #include <TEveBrowser.h>
 #include <TEveManager.h>
 #include <TEveEventManager.h>
+#include <TEveSelection.h>
 #include <TEveScene.h>
 #include <TEveViewer.h>
 #include <TGButton.h>
@@ -30,6 +34,7 @@
 #include <TGTextEntry.h>
 #include <TGLViewer.h>
 #include <TMacro.h>
+#include <TObject.h>
 #include <TObjArray.h>
 #include <TObjString.h>
 #include <TROOT.h>
@@ -264,6 +269,25 @@ void DisplayUI::clearEvent()
   }
 }
 
+void DisplayUI::selectionHandler(TEveElement* eveObj)
+{
+  const TObject* representedObject = m_visualRepMap->getDataStoreObject(eveObj);
+  if (representedObject) {
+    //representedObject->Dump();
+
+    const RelationVector<TObject>& relatedObjects = DataStore::Instance().getRelationsWithObj<TObject>(representedObject, "ALL");
+    for (const TObject & relObj : relatedObjects) {
+      //relObj.Print();
+      TEveElement* relObjRep = m_visualRepMap->getEveElement(&relObj);
+      if (relObjRep and !gEve->GetSelection()->HasChild(relObjRep)) {
+        //select this object in addition to existing selection
+        gEve->GetSelection()->UserPickedElement(relObjRep, true);
+      }
+    }
+  }
+
+}
+
 bool DisplayUI::startDisplay()
 {
   m_reshowCurrentEvent = false;
@@ -287,6 +311,9 @@ bool DisplayUI::startDisplay()
     if (rhozManager) {
       rhozManager->ImportElements(gs);
     }
+
+    //We want to do special things when objects are selected
+    gEve->GetSelection()->Connect("SelectionAdded(TEveElement*)", "Belle2::DisplayUI", this, "selectionHandler(TEveElement*)");
   }
 
   updateUI(); //update button state

@@ -20,6 +20,7 @@
 #include <display/EVEVisualization.h>
 
 #include <display/dataobjects/DisplayData.h>
+#include <display/VisualRepMap.h>
 
 #include <framework/logging/Logger.h>
 #include <framework/utilities/FileSystem.h>
@@ -97,7 +98,8 @@ EVEVisualization::EVEVisualization():
   m_assignToPrimaries(false),
   m_trackcandlist(0),
   m_eclsimhitdata(0),
-  m_unassignedRecoHits(0)
+  m_unassignedRecoHits(0),
+  m_visualRepMap(new VisualRepMap())
 {
   setErrScale();
 
@@ -160,6 +162,7 @@ EVEVisualization::~EVEVisualization()
   delete m_trackpropagator;
   delete m_gftrackpropagator;
   delete m_calo3d;
+  delete m_visualRepMap;
 }
 
 void EVEVisualization::enableVolume(const char* name, bool only_daughters, bool enable)
@@ -698,6 +701,7 @@ void EVEVisualization::addTrack(const genfit::Track* track, const TString& label
 
 
   m_gftracklist->AddElement(eveTrack);
+  addObject(track, eveTrack);
 }
 
 TEveBox* EVEVisualization::boxCreator(const TVector3& o, TVector3 u, TVector3 v, float ud, float vd, float depth)
@@ -1126,6 +1130,7 @@ EVEVisualization::MCTrack* EVEVisualization::addMCParticle(const MCParticle* par
     m_mcparticleTracks[particle].simhits->SetMainColor(m_mcparticleTracks[particle].track->GetLineColor());
     //m_mcparticleTracks[particle].simhits->SetMainTransparency(50);
     m_mcparticleTracks[particle].track->AddElement(m_mcparticleTracks[particle].simhits);
+    addObject(particle, m_mcparticleTracks[particle].track);
   }
   return &m_mcparticleTracks[particle];
 }
@@ -1177,12 +1182,16 @@ void EVEVisualization::clearEvent()
 {
   if (!gEve)
     return;
+
+  m_visualRepMap->clear();
   m_mcparticleTracks.clear();
   m_shownRecohits.clear();
   m_tracklist->DestroyElements();
   m_gftracklist->DestroyElements();
   if (m_trackcandlist)
     m_trackcandlist->DestroyElements();
+
+
 
 
   //remove ECL data from event
@@ -1256,6 +1265,7 @@ void EVEVisualization::addVertex(const genfit::GFRaveVertex* vertex, const TStri
 
   vertexPoint->AddElement(det_shape);
   gEve->AddElement(vertexPoint);
+  addObject(vertex, vertexPoint);
 }
 
 
@@ -1280,6 +1290,7 @@ void EVEVisualization::addGamma(const ECLGamma* gamma, const TString& name)
   gammaVis->SetMainColor(kGreen + 2);
   gammaVis->SetLineWidth(2.0);
   m_calo3d->AddElement(gammaVis);
+  addObject(gamma, gammaVis);
 }
 
 void EVEVisualization::addROI(const ROIid* roi, const TString& name)
@@ -1311,6 +1322,7 @@ void EVEVisualization::addROI(const ROIid* roi, const TString& name)
   ROIbox->SetMainTransparency(50);
 
   m_gftracklist->AddElement(ROIbox);
+  addObject(roi, ROIbox);
 
 }
 
@@ -1366,4 +1378,8 @@ void EVEVisualization::showUserData(const DisplayData& displayData)
     gEve->AddElement(points);
   }
 
+}
+void EVEVisualization::addObject(const TObject* dataStoreObject, TEveElement* visualRepresentation)
+{
+  m_visualRepMap->add(dataStoreObject, visualRepresentation);
 }

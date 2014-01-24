@@ -15,6 +15,9 @@
 #include <analysis/NtupleTools/NtupleVertexTool.h>
 #include <analysis/NtupleTools/NtupleMCVertexTool.h>
 #include <analysis/NtupleTools/NtupleCustomFloatsTool.h>
+#include <analysis/NtupleTools/NtupleROEMultiplicitiesTool.h>
+#include <analysis/NtupleTools/NtupleRecoilKinematicsTool.h>
+#include <analysis/NtupleTools/NtupleExtraEnergyTool.h>
 
 using namespace Belle2;
 using namespace std;
@@ -60,6 +63,9 @@ NtupleFlatTool* NtupleToolList::create(string strName, TTree* tree, DecayDescrip
   else if (strToolName.compare("Vertex") == 0) return new NtupleVertexTool(tree, d);
   else if (strToolName.compare("MCVertex") == 0) return new NtupleMCVertexTool(tree, d);
   else if (strToolName.compare("CustomFloats") == 0) return new NtupleCustomFloatsTool(tree, d, strOption);
+  else if (strToolName.compare("ROEMultiplicities") == 0) return new NtupleROEMultiplicitiesTool(tree, d);
+  else if (strToolName.compare("RecoilKinematics") == 0) return new NtupleRecoilKinematicsTool(tree, d);
+  else if (strToolName.compare("ExtraEnergy") == 0) return new NtupleExtraEnergyTool(tree, d);
 
   B2WARNING("NtupleTool " << strToolName << " is not available!");
   return NULL;

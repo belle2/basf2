@@ -369,6 +369,80 @@ namespace Belle2 {
      */
     double truth(const Particle* particle);
 
+    /**
+     * function for PSelector
+     * requires that RestOfEvent <-> Particle relation exists (returns -1 if it doesn't)
+     *
+     * @param part const pointer to Particle
+     * @return number of remaining tracks as given by the related RestOfEvent object
+     */
+    double nROETracks(const Particle* particle);
+
+    /**
+     * function for PSelector
+     * requires that RestOfEvent <-> Particle relation exists (returns -1 if it doesn't)
+     *
+     * @param part const pointer to Particle
+     * @return number of remaining ECL showers as given by the related RestOfEvent object
+     */
+    double nROEShowers(const Particle* particle);
+
+    /**
+     * function for PSelector
+     * requires that RestOfEvent <-> Particle relation exists (returns -1 if it doesn't)
+     *
+     * @param part const pointer to Particle
+     * @return number of remaining ECL gammas as given by the related RestOfEvent object
+     */
+    double nROEGammas(const Particle* particle);
+
+    /**
+     * function for PSelector
+     * @param part const pointer to Particle
+     * @return number of remaining pi0s as given by the related RestOfEvent object
+     */
+    double nROEPi0s(const Particle* particle);
+
+    /**
+     * function for PSelector
+     *
+     * @param part const pointer to Particle
+     * @return magnitude of 3-momentum recoiling against given Particle
+     */
+    double recoilMomentum(const Particle* particle);
+
+    /**
+     * function for PSelector
+     *
+     * @param part const pointer to Particle
+     * @return energy recoiling against given Particle
+     */
+    double recoilEnergy(const Particle* particle);
+
+    /**
+     * function for PSelector
+     *
+     * @param part const pointer to Particle
+     * @return invariant mass of the system recoiling against given Particle
+     */
+    double recoilMass(const Particle* particle);
+
+    /**
+     * function for PSelector
+     *
+     * @param part const pointer to Particle
+     * @return invarian mass squared of the system recoiling against given Particle
+     */
+    double recoilMassSquared(const Particle* particle);
+
+    /**
+     * function for PSelector
+     * requires that RestOfEvent <-> Particle relation exists (returns -1 if it doesn't)
+     *
+     * @param part const pointer to Particle
+     * @return extra energy in the calorimeter that is not associated to the given Particle
+     */
+    double extraEnergy(const Particle* particle);
 
   }
 } // Belle2 namespace

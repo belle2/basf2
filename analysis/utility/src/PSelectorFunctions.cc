@@ -16,12 +16,16 @@
 
 // framework - DataStore
 #include <framework/datastore/DataStore.h>
+#include <framework/datastore/StoreArray.h>
 
 // dataobjects
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleInfo.h>
+#include <analysis/dataobjects/RestOfEvent.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
+
+#include <ecl/dataobjects/ECLGamma.h>
 
 // framework aux
 #include <framework/gearbox/Unit.h>
@@ -490,6 +494,110 @@ namespace Belle2 {
       return result;
     }
 
+    double nROETracks(const Particle* particle)
+    {
+      double result = -1.0;
+
+      const RestOfEvent* roe = DataStore::getRelated<RestOfEvent>(particle);
+
+      if (roe)
+        result = roe->getNTracks();
+
+      return result;
+    }
+
+    double nROEShowers(const Particle* particle)
+    {
+      double result = -1.0;
+
+      const RestOfEvent* roe = DataStore::getRelated<RestOfEvent>(particle);
+
+      if (roe)
+        result = roe->getNECLShowers();
+
+      return result;
+    }
+
+    double nROEGammas(const Particle* particle)
+    {
+      double result = -1.0;
+
+      const RestOfEvent* roe = DataStore::getRelated<RestOfEvent>(particle);
+
+      if (roe)
+        result = roe->getNECLGammas();
+
+      return result;
+    }
+
+    double nROEPi0s(const Particle* particle)
+    {
+      double result = -1.0;
+
+      const RestOfEvent* roe = DataStore::getRelated<RestOfEvent>(particle);
+
+      if (roe)
+        result = roe->getNECLPi0s();
+
+      return result;
+    }
+
+    double recoilMomentum(const Particle* particle)
+    {
+      PCmsLabTransform T;
+
+      // Initial state (e+e- momentum in LAB)
+      TLorentzVector pIN  = T.getBoostVector();
+
+      return (pIN - particle->get4Vector()).P();
+    }
+
+    double recoilEnergy(const Particle* particle)
+    {
+      PCmsLabTransform T;
+
+      // Initial state (e+e- momentum in LAB)
+      TLorentzVector pIN  = T.getBoostVector();
+
+      return (pIN - particle->get4Vector()).E();
+    }
+
+    double recoilMass(const Particle* particle)
+    {
+      PCmsLabTransform T;
+
+      // Initial state (e+e- momentum in LAB)
+      TLorentzVector pIN  = T.getBoostVector();
+
+      return (pIN - particle->get4Vector()).M();
+    }
+
+    double recoilMassSquared(const Particle* particle)
+    {
+      PCmsLabTransform T;
+
+      // Initial state (e+e- momentum in LAB)
+      TLorentzVector pIN  = T.getBoostVector();
+
+      return (pIN - particle->get4Vector()).M2();
+    }
+
+    double extraEnergy(const Particle* particle)
+    {
+      double result = -1.0;
+
+      const RestOfEvent* roe = DataStore::getRelated<RestOfEvent>(particle);
+      if (!roe)
+        return result;
+
+      const std::vector<ECLGamma*> remainECLGammas = roe->getECLGammas();
+      result = 0.0;
+      for (unsigned i = 0; i < remainECLGammas.size(); i++)
+        result += remainECLGammas[i]->getEnergy();
+
+      return result;
+    }
+
     REGISTER_VARIABLE("p", particleP, "momentum magnitude");
     REGISTER_VARIABLE("px", particlePx, "momentum component x");
     REGISTER_VARIABLE("py", particlePy, "momentum component y");
@@ -551,6 +659,17 @@ namespace Belle2 {
     REGISTER_VARIABLE("prodChildProb", prodChildProb, "product of signal probabilities of childs");
     REGISTER_VARIABLE("truth", truth, "Truth, 1.0 if MCParticle PDG matches assigned Particle PDG");
 
+    REGISTER_VARIABLE("nROETracks",  nROETracks,  "number of remaining tracks as given by the related RestOfEvent object");
+    REGISTER_VARIABLE("nROEShowers", nROEShowers, "number of remaining ECL showers as given by the related RestOfEvent object");
+    REGISTER_VARIABLE("nROEGammas",  nROEGammas,  "number of remaining ECL gammas as given by the related RestOfEvent object");
+    REGISTER_VARIABLE("nROEPi0s",    nROEPi0s,    "number of remaining ECL pi0s as given by the related RestOfEvent object");
+
+    REGISTER_VARIABLE("pRecoil",  recoilMomentum,    "magnitude of 3-momentum recoiling against given Particle");
+    REGISTER_VARIABLE("eRecoil",  recoilEnergy,      "energy recoiling against given Particle");
+    REGISTER_VARIABLE("mRecoil",  recoilMass,        "invariant mass of the system recoiling against given Particle");
+    REGISTER_VARIABLE("m2Recoil", recoilMassSquared, "invariant mass squared of the system recoiling against given Particle");
+
+    REGISTER_VARIABLE("eextra", extraEnergy, "extra energy in the calorimeter that is not associated to the given Particle");
   }
 }
 

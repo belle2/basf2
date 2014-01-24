@@ -33,7 +33,7 @@ def outputMdst(filename, path=main):
     path.add_module(rooutput)
 
 
-def generate(noEvents, filename, path=main):
+def generateEvents(noEvents, filename, path=main):
     evtnumbers = register_module('EventInfoSetter')
     evtnumbers.param('evtNumList', [noEvents])
     evtnumbers.param('runList', [1])
@@ -41,12 +41,13 @@ def generate(noEvents, filename, path=main):
     evtgeninput = register_module('EvtGenInput')
     evtgeninput.param('userDECFile', filename)
     evtgeninput.param('boost2LAB', True)
-    paramloader = register_module('Gearbox')
-    geobuilder = register_module('Geometry')
     path.add_module(evtnumbers)
-    path.add_module(paramloader)
-    path.add_module(geobuilder)
     path.add_module(evtgeninput)
+
+
+def loadGearbox(path=main):
+    paramloader = register_module('Gearbox')
+    path.add_module(paramloader)
 
 
 def loadMCParticles(path=main):
@@ -183,5 +184,12 @@ def matchMCTruth(list_name, path=main):
     mcMatch.set_name('MCMatching_' + list_name)
     mcMatch.param('ListName', list_name)
     path.add_module(mcMatch)
+
+
+def buildRestOfEvent(list_name, path=main):
+    roeBuilder = register_module('RestOfEventBuilder')
+    roeBuilder.set_name('ROEBuilder_' + list_name)
+    roeBuilder.param('particleList', list_name)
+    path.add_module(roeBuilder)
 
 

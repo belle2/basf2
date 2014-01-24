@@ -71,7 +71,6 @@ void StorageDeserializerModule::initialize()
   B2INFO("StorageDeserializer: initialize() started.");
   m_shared = new SharedEventBuffer();
   m_shared->open(m_inputbufname, 1000000);
-  //m_inputbuf = new RingBuffer(m_inputbufname.c_str());
   if (m_buf == NULL) {
     m_buf = new StorageRBufferManager(m_inputbuf);
   }
@@ -93,7 +92,6 @@ void StorageDeserializerModule::initialize()
   m_data.setBuffer(evtbuf);
   int size = 0;
   while (true) {
-    //while ((size = m_inputbuf->remq((int*)evtbuf)) == 0) {
     while ((size = m_shared->read((int*)evtbuf)) == 0) {
       usleep(20);
     }
@@ -103,20 +101,18 @@ void StorageDeserializerModule::initialize()
       break;
     }
   }
-  //for (int n = 0; n < m_numThread; n++) {
-  //  PThread(new StorageWorker(m_buf, m_compressionLevel));
-  //}
-
   B2INFO("StorageDeserializer: initialize() done.");
 }
 
 void StorageDeserializerModule::event()
 {
+  m_nrecv++;
+  if (m_nrecv == 0) {
+    return;
+  }
   while (true) {
-    m_nrecv++;
     int size = 0;
     while (true) {
-      //while ((size = m_inputbuf->remq((int*)m_data.getBuffer())) == 0) {
       while ((size = m_shared->read((int*)m_data.getBuffer())) == 0) {
         usleep(20);
       }
@@ -126,21 +122,6 @@ void StorageDeserializerModule::event()
         break;
       }
     }
-    /*
-      if (m_package_i == StorageWorker::MAX_QUEUES) {
-      m_package_i = 0;
-      }
-      StorageWorker::lock();
-      DataStorePackage& package(StorageWorker::getQueue()[m_package_i++]);
-      while (package.getSerial() == 0) {
-      StorageWorker::wait();
-      }
-      m_package->copy(package);
-      package.setSerial(0);
-      StorageWorker::notify();
-      StorageWorker::unlock();
-      m_package->restore();
-    */
     StoreObjPtr<EventMetaData> evtmetadata;
     if (evtmetadata.isValid()) {
       m_expno = evtmetadata->getExperiment();
@@ -158,6 +139,7 @@ void StorageDeserializerModule::event()
 
 void StorageDeserializerModule::beginRun()
 {
+  m_nrecv = -1;
   B2INFO("StorageDeserializer: beginRun called.");
 }
 

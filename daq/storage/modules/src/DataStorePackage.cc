@@ -104,8 +104,8 @@ void DataStorePackage::restore()
       }
       bool is_null = !obj->TestBit(c_IsNull);
       if (is_null) {
-        DataStore::Instance().createObject(obj, true,
-                                           StoreAccessorBase(m_namelist.at(i), m_durability, cl, is_array));
+        DataStore::Instance().createObject(obj, true, StoreAccessorBase(m_namelist.at(i),
+                                           m_durability, cl, is_array));
         B2DEBUG(100, "restoreDS: " << (is_array ? "Array" : "Object") << ": " << m_namelist.at(i) << " stored");
 
         obj->SetBit(c_IsTransient, false);

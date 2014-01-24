@@ -366,9 +366,10 @@ public:
     }
     return c;
   };
-  void save(StoreArray<PXDRawROIs>& sa, unsigned int length, int* data) {
+  void save(StoreArray<PXDRawROIs>& sa, unsigned int length, unsigned int* data) {
     unsigned int l;
     l = (length - 4 - 4 - 4 * 4) / 8;
+    // for(unsigned int i=0; i<l*2; i++) data[5+i]=((data[5+i]>>16)&0xFFFF)| ((data[5+i]&0xFFFF)<<16);// dont do it here ... CRC will fail
     sa.appendNew(l, magic1, trignr1, magic2, trignr2, &data[5]);
   }
 
@@ -1133,7 +1134,7 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& la
       //((dhhc_onsen_frame*)data)->set_length(len - 4);
       ((dhhc_onsen_frame*)data)->print();
       ((dhhc_onsen_frame*)data)->calc_crc(len - 4); /// CRC is without the DHHC header
-      ((dhhc_onsen_frame*)data)->save(m_storeROIs, len, (int*)data);
+      ((dhhc_onsen_frame*)data)->save(m_storeROIs, len, (unsigned int*) data);
       dhhc.calc_crc();
       break;
     default:

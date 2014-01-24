@@ -34,10 +34,10 @@ namespace Belle2 {
     /**
      * @param nr rois.
      */
-    PXDRawROIs(unsigned int nrroi, unsigned int h1, unsigned int h2, unsigned int h3, unsigned int h4, int* data):
+    PXDRawROIs(unsigned int nrroi, unsigned int h1, unsigned int h2, unsigned int h3, unsigned int h4, unsigned int* data):
       m_2timesNrROIs(2 * nrroi), m_header1(h1), m_header2(h2), m_header3(h3), m_header4(h4), m_rois(0) {
       m_rois = new int[m_2timesNrROIs];
-      memcpy(m_rois, data, m_2timesNrROIs * sizeof(int));
+      for (unsigned int i = 0; i < m_2timesNrROIs; i++) m_rois[i] = ((data[i] >> 16) & 0xFFFF) | ((data[i] & 0xFFFF) << 16); // word swap
     };
 
     /** Get the nr of ROIs.

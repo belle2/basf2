@@ -91,6 +91,7 @@ void StorageDeserializerModule::initialize()
   char* evtbuf = new char[10000000];
   m_data.setBuffer(evtbuf);
   int size = 0;
+  m_nrecv = -1;
   while (true) {
     while ((size = m_shared->read((int*)evtbuf)) == 0) {
       usleep(20);
@@ -139,7 +140,6 @@ void StorageDeserializerModule::event()
 
 void StorageDeserializerModule::beginRun()
 {
-  m_nrecv = -1;
   B2INFO("StorageDeserializer: beginRun called.");
 }
 

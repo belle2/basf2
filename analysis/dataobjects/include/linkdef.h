@@ -9,6 +9,7 @@
 #pragma link C++ class vector<Belle2::Particle*>;
 #pragma link C++ class Belle2::ParticleList;
 #pragma link C++ class Belle2::ParticleInfo;
+#pragma link C++ class Belle2::RestOfEvent;
 
 #pragma link C++ class Belle2::ParticleExtraInfoMap+;
 #pragma link C++ class map<string, unsigned int>+;

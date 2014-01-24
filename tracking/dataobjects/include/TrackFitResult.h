@@ -11,12 +11,11 @@
 
 #include <framework/gearbox/Const.h>
 #include <framework/datastore/RelationsObject.h>
+#include <tracking/dataobjects/HitPatternCDC.h>
+#include <tracking/dataobjects/HitPatternVXD.h>
 #include <TVector3.h>
 #include <TMatrixF.h>
 #include <cstdlib>
-//class GFAbsTrackRep;
-
-//#include <bitset>
 
 namespace Belle2 {
 
@@ -24,19 +23,22 @@ namespace Belle2 {
    */
   class TrackFitResult : public RelationsObject {
   public:
-    /** Constructor for I/O purpuses.
-     */
+    /** Constructor initializing everything to zero. */
     TrackFitResult();
-
-    /** Constructor taking an object used during the fitting process.
-     */
-//    TrackFitResult(const GFAbsTrackRep& gfAbsTrackRep);
 
     // This class should be able to give back Helix information either in Perigee Parametrisation
     // or as starting position + momentum.
+
+    /** Getter for vector of position at closest approach of track in r/phi projection.*/
     TVector3 getPosition() const;
+
+    /** Setter for position vector.*/
     void setPosition(const TVector3& position);
+
+    /** Getter for vector of momentum at closest approach of track in r/phi projection.*/
     TVector3 getMomentum() const;
+
+    /** Setter for momentum vector.*/
     void setMomentum(const TVector3& momentum);
 
     /** Position and Momentum Covariance Matrix.
@@ -47,25 +49,11 @@ namespace Belle2 {
      *  @TODO Study if double precision matrix is needed and if TMatrixSym helps somewhere.
      */
     TMatrixF getCovariance6() const;
+
+    /** Setter for Covariance matrix of position and momentum.*/
     void setCovariance6(const TMatrixF& covariance);
 
-
-    /* Is this necessary at this stage ?! or would above parametrization be just enough?
-     * Internally it is definitivaly needed to reduce the space requirement, but it would be possible to
-     * not hand this parametrization out.
-     */
-    /*    float getD0()  const;
-        float getPhi() const;
-        float getOmega() const;
-        float getZ0() const;
-        float getCotTheta() const;
-        TMatrixF getCovariance5() const;
-    */
-
-
-
-
-    /** Get back a ParticleCode of the hypothesis of the track fit. */
+    /** Get back a ParticleCode of the hypothesis of the track fit.*/
     Const::ParticleType getParticleType() const {
       return Const::ParticleType(m_pdg);
     }
@@ -94,6 +82,7 @@ namespace Belle2 {
     float getPValue() const {
       return m_pValue;
     }
+
     /** Setter for Chi2 Probability of the track fit. */
     void setPValue(float pValue) {
       m_pValue = pValue;
@@ -193,6 +182,7 @@ namespace Belle2 {
     //---------------------------------------------------------------------------------------------------------------------------
 //    float m_perigeeParams [5] ;
 //    float m_perigeeUncertainties [15];
+
 
     ClassDef(TrackFitResult, 1);
   };

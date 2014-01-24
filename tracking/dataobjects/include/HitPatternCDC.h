@@ -8,7 +8,6 @@
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 #pragma once
-#include <framework/logging/Logger.h>
 #include <bitset>
 #include <algorithm>
 
@@ -23,42 +22,73 @@ namespace Belle2 {
    *  which can be set to indicate, that at least one of the layers has two hits for the track.
    *  This is the idea at the moment. Perhaps we will later decide to switch this to some
    *  better description of the outermost super-layer...
+   *  Note, that super Layer counting goes from 0 to 8.
+   *  GENERAL COMMENT: I think the non-static members and the interface are largely OK,
+   *                   but the backend implementation maybe not so great.
    */
   class HitPatternCDC {
   public:
-    /** Create empty pattern.
-     */
+    /** Create empty pattern.*/
     HitPatternCDC() {}
 
-    /** Initialize the pattern with some long int.
-     */
+    /** Initialize the pattern with some long int.*/
     HitPatternCDC(const unsigned long& initValue) : m_pattern(initValue)
     {}
 
-    /** Get the Total Number of CDC hits in the fit.
+    /** Get the approximate total Number of CDC hits in the fit.
+     *
+     *  If in a Super-Layer there are more than two layers with two or more hits,
+     *  this results in undercounting of the number of hits.
      */
-    short getNHits() {
-      return static_cast<short>(m_pattern.count());
+    unsigned short getNHits() const {
+      return static_cast<unsigned short>(m_pattern.count());
     }
 
-    /** Setter for single wire.
+    /** Set bit corresponding to layer to true.
      *
      *  This function may throw an out-of-range exception.
+     *  @return Value of the bit before setting. This maybe relevant
+     *          e.g. to set double occupation bit.
      */
-    void setLayer(unsigned short layer) {
+    bool setLayer(const unsigned short layer) {
+      //The return value may be nonsense, if out-of range...
+      bool valueBefore = m_pattern[layer];
       m_pattern.set(layer);
+      return valueBefore;
     }
 
-    /** Getter for single wire.
+    /** Set bit corresponding to layer to false.
+     *
+     *  This function may throw an out-of-range exception.
+     *  @return Value of the bit before setting. This maybe relevant
+     *          e.g. to set double occupation bit.
      */
-    bool getLayer(unsigned short layer) {
+    bool resetLayer(const unsigned short layer) {
+      bool valueBefore = m_pattern[layer];
+      m_pattern.reset(layer);
+      return valueBefore;
+    }
+
+    /** Set bit without range check or readout. */
+    void setLayerFast(const unsigned short layer, const bool value = true) {
+      m_pattern[layer] = value;
+    }
+
+    /** Getter for single layer.*/
+    bool hasLayer(const unsigned short layer) const {
       return m_pattern[layer];
     }
 
-    /** Getter for Super-Layer match.
-     */
-    bool getSLayer(unsigned short sLayer) {
+    /** Getter for Super-Layer match.*/
+    bool hasSLayer(const unsigned short sLayer) const {
       return ((m_pattern & s_sLayerMasks[sLayer]).any());
+    }
+
+    /** Unset complete superLayer, e.g. because segment shouldn't belong to that track.*/
+    void resetSLayer(const unsigned short sLayer) {
+      for (unsigned short int ii = 0; ii < m_pattern.size(); ++ii) {
+        if ((s_sLayerMasks[sLayer])[ii]) {resetLayer(ii);}
+      }
     }
 
     /** Getter for the approximate number of hits in one super-layer.
@@ -66,8 +96,29 @@ namespace Belle2 {
      *  In case of multiple layers with two or more hits or
      *  any layers with more than two hits leads to under-counting.
      */
-    unsigned short getNSLayer(unsigned short sLayer) {
+    unsigned short getSLayerNHits(const unsigned short sLayer) const {
       return static_cast<unsigned short>((m_pattern & s_sLayerMasks[sLayer]).count());
+    }
+
+    /** True, if at least one axial layer is true.*/
+    bool hasAxialLayer() const {
+      return ((s_sLayerMasks[0] | s_sLayerMasks[2] | s_sLayerMasks[4] | s_sLayerMasks[6] | s_sLayerMasks[8])
+              & m_pattern).any();
+    }
+
+    /** True, if at least one axial layer is true.*/
+    bool hasStereoLayer() const {
+      return ((s_sLayerMasks[1] | s_sLayerMasks[3] | s_sLayerMasks[5] | s_sLayerMasks[7])
+              & m_pattern).any();
+    }
+
+    /** Getter for longest run of consecutive layers with hits in the Super-Layer.
+     *
+     *  @TODO Not yet implemented, perhaps having statics of the Super-Layer boundaries
+     *        is vastly superior to bit logic here?
+     */
+    unsigned short getLongestContRunInSL(const unsigned short /*sLayer*/) const {
+      return 0;
     }
 
   private:

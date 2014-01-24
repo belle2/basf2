@@ -35,7 +35,7 @@ REG_MODULE(RootInput)
 RootInputModule::RootInputModule() : Module(), m_counterNumber(0), m_tree(0), m_persistent(0)
 {
   //Set module properties
-  setDescription("Reads objects/arrays from one or more .root files and makes them available through the DataStore.");
+  setDescription("Reads objects/arrays from one or more .root files and makes them available through the DataStore. Files do not necessarily have to be local, http:// and root:// (for files in xrootd) URLs are supported as well.");
   setPropertyFlags(c_Input);
 
   //Parameter definition

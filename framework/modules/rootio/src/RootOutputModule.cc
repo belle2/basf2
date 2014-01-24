@@ -18,6 +18,7 @@
 #include <framework/core/RandomNumbers.h>
 #include <framework/utilities/Utils.h>
 
+#include <TCint.h>
 #include <TClonesArray.h>
 #include <TBaseClass.h>
 #include <TTreeIndex.h>
@@ -44,7 +45,7 @@ RootOutputModule::RootOutputModule() : Module(), m_file(0), m_experimentLow(1), 
   m_experimentHigh(0), m_runHigh(0), m_eventHigh(0)
 {
   //Set module properties
-  setDescription("Writes DataStore objects into a .root file. Use RootInput to read them again.");
+  setDescription("Writes DataStore objects into a .root file. Data is stored in a TTree 'tree' for event-dependent and in 'persistent' for peristent data. You can use RootInput to read the files back into basf2.");
   setPropertyFlags(c_Output);
 
   //Initialization of some member variables
@@ -55,7 +56,7 @@ RootOutputModule::RootOutputModule() : Module(), m_file(0), m_experimentLow(1), 
   //Parameter definition
   addParam("outputFileName"  , m_outputFileName, "Name of the output file. Can be overridden using the -o argument to basf2.", string("RootOutput.root"));
   addParam("compressionLevel", m_compressionLevel, "Compression Level: 0 for no, 1 for low, 9 for high compression. Level 1 usually reduces size by 50%, higher levels have no noticeable effect.", 1);
-  addParam("splitLevel", m_splitLevel, "Branch split level.", 99);
+  addParam("splitLevel", m_splitLevel, "Branch split level. For arrays or objects with custom streamers, -1 is used instead to ensure the streamers are used.", 99);
   addParam("updateFileCatalog", m_updateFileCatalog, "Flag that specifies whether the file metadata catalog is updated.", true);
 
   vector<string> emptyvector;
@@ -134,13 +135,18 @@ void RootOutputModule::initialize()
       if (!hasStreamers(entryClass))
         B2ERROR("The version number in the ClassDef() macro for class " << entryClass->GetName() << " must be at least 1 to enable I/O!");
 
-      if (iter->second->isArray
-          && !strcmp(entryClass->GetName(), "genfit::Track")) {
-        static_cast<TClonesArray*>(iter->second->object)->BypassStreamer(kFALSE);
-        m_tree[ii]->Branch(branchName.c_str(), &iter->second->object, bufsize, -1);
-      } else {
-        m_tree[ii]->Branch(branchName.c_str(), &iter->second->object, bufsize, m_splitLevel);
+      //does this class have a custom streamer? (magic from from TTree.cxx)
+      int splitLevel = m_splitLevel;
+      if (gCint->ClassInfo_RootFlag(entryClass->GetClassInfo()) & 1) {
+        B2DEBUG(100, entryClass->GetName() << " has custom streamer, setting split level -1 for this branch.");
+
+        splitLevel = -1;
+        if (iter->second->isArray) {
+          //for arrays, we also don't want TClonesArray to go around our streamer
+          static_cast<TClonesArray*>(iter->second->object)->BypassStreamer(kFALSE);
+        }
       }
+      m_tree[ii]->Branch(branchName.c_str(), &iter->second->object, bufsize, splitLevel);
       m_tree[ii]->SetBranchAddress(branchName.c_str(), &iter->second->object);
       m_entries[ii].push_back(iter->second);
       B2DEBUG(150, "The branch " << branchName << " was created.");

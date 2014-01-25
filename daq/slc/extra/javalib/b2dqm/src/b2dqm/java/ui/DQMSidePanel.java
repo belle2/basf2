@@ -42,6 +42,7 @@ public class DQMSidePanel extends JPanel implements Updatable {
     }
     
     public void init(ArrayList<HistoPackage> pack_v) {
+		System.out.println("DQMSidePanel::init");
         JPanel panel = new JPanel(new BorderLayout());
         for ( HistoPackage pack : pack_v ) {
         	panelList.add(new HistoListPanel(pack, this));
@@ -61,6 +62,7 @@ public class DQMSidePanel extends JPanel implements Updatable {
         panel.setMinimumSize(new Dimension(120, 0));
         add(panel);
         setPreferredSize(new Dimension(420, 240));
+		System.out.println("DQMSidePanel::init");
     }
     
     private void initComps(List<HistoListPanel> list, ExpansionEvent e) {

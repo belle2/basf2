@@ -47,6 +47,7 @@ public class DQMMainFrame extends JFrame {
 	
 	public void init(ArrayList<HistoPackage> pack_v, 
 			ArrayList<PackageInfo> info_v) {
+		System.out.println("DQMMainFrame::init done");
 		_panel.setLayout(new BoxLayout(_panel,BoxLayout.X_AXIS));
 		add(_panel);
 		_main_panel.initPanels(pack_v, _side_panel);
@@ -63,6 +64,7 @@ public class DQMMainFrame extends JFrame {
 		setLocationRelativeTo(null);
 		setIconImage(Toolkit.getDefaultToolkit().createImage(getClass().getResource("monitor.png")));
 		setVisible(true);
+		System.out.println("DQMMainFrame::init done");
 	}
 	
 	public boolean openSidePanel() {

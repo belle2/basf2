@@ -6,6 +6,7 @@
 
 #include <signal.h>
 #include <string.h>
+#include <cstdlib>
 
 using namespace Belle2;
 

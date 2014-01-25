@@ -65,9 +65,16 @@ void HistSender::run()
           monitored_v.push_back(monitored);
           id_m.insert(std::map<int, int>::value_type(i, npacks));
           if (monitored) npacks++;
+        } else {
+          monitored_v.push_back(false);
         }
       }
     } catch (const IOException& e) {
+      return;
+    }
+    if (npacks == 0) {
+      LogFile::debug("HistoSender: No package selected.");
+      _socket.close();
       return;
     }
     try {

@@ -28,6 +28,7 @@ public class DQMMainPanel extends DnDTabbedPane implements Updatable {
 
 	public void initPanels(ArrayList<HistoPackage> pack_v,
 						   DQMSidePanel side_panel) {
+		System.out.println("DQMMainPanel::initPanels");
 		removeAll();
 		_pack_v = pack_v;
 		_side_panel = side_panel;
@@ -42,9 +43,11 @@ public class DQMMainPanel extends DnDTabbedPane implements Updatable {
 				canvas.getCanvas().addHisto(h);
 				canvas.getCanvas().resetPadding();
 				tab.addTab(h.getName(), canvas);
+				System.out.println("DQMMainPanel::initPanels " + h.getName());
 			}
 			addTab(pack.getName(), tab);
 		}
+		System.out.println("DQMMainPanel::initPanels done");
 	}
 
 	public void update() {

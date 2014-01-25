@@ -73,8 +73,9 @@ public class Belle2DQMBrowser extends JavaEntoryPoint {
 				}
 				break;
 				case FLAG_CONFIG : {
+					System.out.println("CONFIG done");
 					int npacks = socket_reader.readInt();
-					//System.out.println("npacks="+npacks);
+					System.out.println("npacks="+npacks);
 					_pack_v = new ArrayList<HistoPackage>();
 					_info_v = new ArrayList<PackageInfo>();
 					for (int n = 0; n < npacks; n++) {
@@ -116,7 +117,9 @@ public class Belle2DQMBrowser extends JavaEntoryPoint {
 					if (magic != 0x7FFF) {
 						throw new Exception("Wrong magic:" + magic);
 					}
+					System.out.println("CONFIG done");
 					_frame.init(_pack_v, _info_v);
+					System.out.println("CONFIG done");
 				}
 				break;
 				case FLAG_UPDATE : {

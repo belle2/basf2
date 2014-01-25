@@ -16,6 +16,7 @@
 #include <framework/datastore/StoreArray.h>
 
 #include <vxd/geometry/SensorInfoBase.h>
+#include <vxd/geometry/GeoCache.h>
 
 #include <tracking/dataobjects/ROIid.h>
 #include <tracking/dataobjects/PXDIntercept.h>
@@ -57,8 +58,13 @@ namespace Belle2 {
 
   private:
 
-    std::string m_ROIsName;
-    std::string m_InterceptsName;
+    VXD::GeoCache& m_aGeometry = VXD::GeoCache::getInstance();
+
+    std::string m_ROIsName; /**< Name of the ROIid StoreArray */
+    std::string m_InterceptsName; /**< Name of the PXDIntercept StoreArray */
+
+    TDirectory* m_InterDir;
+    TDirectory* m_ROIDir;
 
     //map of histograms to be filled once per intercept
     typedef std::pair< TH1*, std::function< void(TH1* , const PXDIntercept*) > > InterHistoAndFill;

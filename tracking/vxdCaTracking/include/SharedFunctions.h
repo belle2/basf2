@@ -53,6 +53,7 @@ ss << std::endl;
 
   struct PositionInfo {
     TVector3 hitPosition; /**< contains global hitPosition */
+    TVector3 hitSigma; /**< contains errors in global coordinates */
     double sigmaU; /**< error in (u-direction locally)x-direction of hitPosition in global coordinates */
     double sigmaV; /**< error of y-direction of hitPosition in global coordinates */
   }; /**< will be used by VXDTF to store information about the position of the hit. It is also in use for faster import of hit information for circleFitter (part of trackletFilter) */

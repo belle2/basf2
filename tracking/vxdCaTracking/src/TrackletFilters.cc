@@ -126,11 +126,11 @@ double TrackletFilters::circleFit(double& clapPhi, double& clapR, double& radius
 
   // looping over all hits and do the division afterwards
   for (PositionInfo * hit : *m_hits) {
-    weight = 1. / ((hit->sigmaV) * (hit->sigmaV) * tuningParameter);
-    B2DEBUG(100, " current hitSigma: " << hit->sigmaU << ", weight: " << weight)
+    weight = 1. / (sqrt(hit->hitSigma.X() * hit->hitSigma.X() + hit->hitSigma.Y() * hit->hitSigma.Y()) * tuningParameter);
+    B2DEBUG(100, " current hitSigmaU/V/X/Y: " << hit->sigmaU << "/" << hit->sigmaV << "/" << hit->hitSigma.X() << "/" << hit->hitSigma.Y() << ", weight: " << weight)
     sumWeights += weight;
-    if (hit->sigmaV < stopper) B2FATAL("TrackletFilters::circleFit, chosen sigma is too small (is/threshold: " << hit->sigmaV << "/" << stopper << ")")
-      x = hit->hitPosition.X();
+    if (std::isnan(weight) or std::isinf(weight) == true) { B2ERROR("TrackletFilters::circleFit, chosen sigma is 'nan': " << weight << ", setting arbitrary error: " << stopper << ")"); weight = stopper; }
+    x = hit->hitPosition.X();
     y = hit->hitPosition.Y();
     x2 = x * x;
     y2 = y * y;
@@ -207,23 +207,23 @@ std::pair<double, TVector3> TrackletFilters::helixFit(const std::vector<Position
   double  x = 0, // current x variable
           y = 0,
           z = 0,
-          varU = 0, // variance of U
-          varV = 0, // variance of V = xy-plane
+          //      varXY = 0, // variance of XY
+          invVarZ = 0, // inverse variance of Z
 ///         phi = 0, // angle phi  // not used yet, but will be needed for some calculations which are not implemented yet
           r2 = 0, // radius^2
 //          tempRadius = 0,
 //          r = 0,
 ///         rPhi = 0,  // not used yet, but will be needed for some calculations which are not implemented yet
-          sumWeights = 0, // the sum of the weights V
-          inverseVarianceV = 0; // current inverse of variance V
+          sumWeights = 0, // the sum of the weightsXY
+          inverseVarianceXY = 0; // current inverse of varianceXY
 
-  TMatrixD inverseCovMatrix(nHits, nHits); // carries inverse of varU in its diagonal elements
+  TMatrixD inverseCovMatrix(nHits, nHits); // carries inverse of the variances for the circle fit in its diagonal elements
   TMatrixD X(nHits, 3); // carries mapped hits, column 0 = x variables, column 1 = y variables, col 2 = r2 variables
   TMatrixD onesC(nHits, 1); // column vector of ones
   TMatrixD onesR(1, nHits); // row vector of ones
   TMatrixD R2(nHits, 1); // column vector of radii^2
   TMatrixD zValues(nHits, 1); // column vector of z values
-  TMatrixD invVarVvalues(nHits, 1); // column vector of radii^2
+  TMatrixD invVarZvalues(nHits, 1); // carries inverse of the variances for the line fit
 
   int index = 0;
 //  ofstream hitsFileStream;
@@ -237,18 +237,19 @@ std::pair<double, TVector3> TrackletFilters::helixFit(const std::vector<Position
     x = hit->hitPosition.X();
     y = hit->hitPosition.Y();
     z = hit->hitPosition.Z();
-    varU = hit->sigmaU;
-    varV = hit->sigmaV;
-    invVarVvalues(index, 0) = 1. / varV;
-    B2DEBUG(10, "helixFit: hit.X(): " << hit->hitPosition.X() << ", hit.Y(): " << hit->hitPosition.Y() << ", hit.Z(): " << hit->hitPosition.Z() << ", hit.sigmaU: " << varU << ", hit.sigmaV: " << varV)
+    invVarZ = 1. / hit->hitSigma.Z();
+    if (std::isnan(invVarZ) == true or std::isinf(invVarZ) == true) { B2ERROR("TrackletFilters::helixFit, chosen varZ is 'nan': " << invVarZ << ", setting arbitrary error: " << 0.000001 << ")"); invVarZ = 0.000001; }
+    invVarZvalues(index, 0) = invVarZ;
+    B2DEBUG(10, "helixFit: hit.X(): " << hit->hitPosition.X() << ", hit.Y(): " << hit->hitPosition.Y() << ", hit.Z(): " << hit->hitPosition.Z() << ", hit.sigmaU: " << hit->sigmaU << ", hit.sigmaV: " << hit->sigmaV << ", hit.hitSigma X/Y/Z: " << hit->hitSigma.X() << "/" << hit->hitSigma.Y() << "/" << hit->hitSigma.Z())
 
 //    hitsFileStream << setprecision(14) << x << " " << y << " " << z << " " << varU << " " << varV << endl;
 ///   phi = atan2(y , x);  // not used yet, but will be needed for some calculations which are not implemented yet
     r2 = x * x + y * y;
 ///     rPhi = phi*sqrt(r2); // not used yet, but will be needed for some calculations which are not implemented yet
-    inverseVarianceV = 1. / varV; // v carries xy-info, u is for z
-    sumWeights += inverseVarianceV;
-    inverseCovMatrix(index, index) = inverseVarianceV;
+    inverseVarianceXY = 1. / sqrt(hit->hitSigma.X() * hit->hitSigma.X() + hit->hitSigma.Y() * hit->hitSigma.Y());
+    if (std::isnan(inverseVarianceXY) == true or std::isinf(inverseVarianceXY) == true) { B2ERROR("TrackletFilters::helixFit, chosen inverseVarianceXY is 'nan': " << inverseVarianceXY << ", setting arbitrary error: " << 0.000001 << ")"); inverseVarianceXY = 0.000001; }
+    sumWeights += inverseVarianceXY;
+    inverseCovMatrix(index, index) = inverseVarianceXY;
     R2(index, 0) = r2;
     X(index, 0) = x;
     X(index, 1) = y;
@@ -258,6 +259,7 @@ std::pair<double, TVector3> TrackletFilters::helixFit(const std::vector<Position
     onesR(0, index) = 1;
 
     ++index;
+    B2DEBUG(10, "helixFit: index: " << index << ", invVarZ: " << invVarZ << ", invVarianceXY: " << inverseVarianceXY << ", x: " << x << ", y: " << y << ", z: " << z << ", r2: " << r2)
   }
 
 //  hitsFileStream.close();
@@ -469,13 +471,13 @@ std::pair<double, TVector3> TrackletFilters::helixFit(const std::vector<Position
   TMatrixD AtG(2, nHits);
   double sumWi = 0, sumWiSi = 0, sumWiSi2 = 0, sw = 0;
   for (int i = 0; i < nHits; ++i) {
-    sumWi += invVarVvalues(i, 0);
-    sw = invVarVvalues(i, 0) * s(i, 0);
+    sumWi += invVarZvalues(i, 0);
+    sw = invVarZvalues(i, 0) * s(i, 0);
     sumWiSi += sw;
-    sumWiSi2 += invVarVvalues(i, 0) * s(i, 0) * s(i, 0);
-    AtG(0, i) = invVarVvalues(i, 0);
+    sumWiSi2 += invVarZvalues(i, 0) * s(i, 0) * s(i, 0);
+    AtG(0, i) = invVarZvalues(i, 0);
     AtG(1, i) = sw;
-    B2DEBUG(10, "hit i: " <<  i << ", sumWi: " << sumWi << ", sw: " << sw << ", sumWiSi: " << sumWiSi << ", sumWiSi2: " << sumWiSi2 << ", s(i): " << s(i, 0) << ", invVarVvalues(i): " << invVarVvalues(i, 0))
+    B2DEBUG(10, "hit i: " <<  i << ", sumWi: " << sumWi << ", sw: " << sw << ", sumWiSi: " << sumWiSi << ", sumWiSi2: " << sumWiSi2 << ", s(i): " << s(i, 0) << ", invVarZvalues(i): " << invVarZvalues(i, 0))
   }
   AtGA(0, 0) = sumWi;
   AtGA(0, 1) = sumWiSi;

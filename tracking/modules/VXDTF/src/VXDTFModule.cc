@@ -1032,9 +1032,11 @@ void VXDTFModule::the_real_event()
     if (vertexInfo.hitPosition.Mag() > 0.5) { // probably no Belle2-VXD-Setup -> Vertex not known
       vertexInfo.sigmaU = 1.5; //0.1;
       vertexInfo.sigmaV = 1.5; //0.1;
+      vertexInfo.hitSigma.SetXYZ(1.5, 1.5, 2.5);
     } else {
       vertexInfo.sigmaU = 0.15;
       vertexInfo.sigmaV = 0.15;
+      vertexInfo.hitSigma.SetXYZ(0.15, 0.15, 2.5);
     }
     VXDTFHit* vertexHit = new VXDTFHit(vertexInfo, passNumber, 0, 0, 0, Const::IR, centerSector, centerVxdID, 0.0); // has no position in HitList, because it doesn't exist...
     MapOfSectors::iterator secIt = currentPass->sectorMap.find(centerSector);
@@ -1164,7 +1166,7 @@ void VXDTFModule::the_real_event()
 
   B2DEBUG(3, "VXDTF event " << m_eventCounter << ": size of arrays, PXDCluster: " << numOfPxdClusters << ", SVDCLuster: " << numOfSvdClusters << ", clustersOfEvent: " << clustersOfEvent.size());
 
-  TVector3 hitLocal, transformedHitLocal, localSensorSize;
+  TVector3 hitLocal, transformedHitLocal, localSensorSize, hitSigma;
   PositionInfo hitInfo;
   double vSize, uSizeAtHit, uCoord, vCoord;
   unsigned int aSecID;
@@ -1178,6 +1180,7 @@ void VXDTFModule::the_real_event()
     B2DEBUG(100, " pxdCluster has clusterIndexUV: " << iPart << " with collected charge: " << aClusterPtr->getCharge() << " and their infoClass is at: " << iPart << " with collected charge: " << aPxdClusterArray[iPart]->getCharge())
 
     hitLocal.SetXYZ(aClusterPtr->getU(), aClusterPtr->getV(), 0);
+    hitSigma.SetXYZ(aClusterPtr->getUSigma(), aClusterPtr->getVSigma(), 0);
 
     aVxdID = aClusterPtr->getSensorID();
     aLayerID = aVxdID.getLayerNumber();
@@ -1185,6 +1188,8 @@ void VXDTFModule::the_real_event()
     hitInfo.hitPosition = aSensorInfo.pointToGlobal(hitLocal);
     hitInfo.sigmaU = m_errorContainer.at(aLayerID - 1).first;
     hitInfo.sigmaV = m_errorContainer.at(aLayerID - 1).second;
+    hitInfo.hitSigma = aSensorInfo.vectorToGlobal(hitSigma);
+    B2DEBUG(10, " pxdluster got global pos X/Y/Z: " << hitInfo.hitPosition.X() << "/" << hitInfo.hitPosition.Y() << "/" << hitInfo.hitPosition.Z() << ", global var X/Y/Z: " << hitInfo.hitSigma.X() << "/" << hitInfo.hitSigma.Y() << "/" << hitInfo.hitSigma.Z()) /// WARNING TODO: set to debug level 100
 
     // local(0,0,0) is the _center_ of the sensorplane, not at the edge!
     vSize = 0.5 * aSensorInfo.getVSize();
@@ -1293,11 +1298,15 @@ void VXDTFModule::the_real_event()
       }
       hitLocal.SetY(vClusterPtr->getPosition()); // always correct
       hitLocal.SetZ(0.);
+      hitSigma.SetXYZ(uClusterPtr->getPositionSigma(), vClusterPtr->getPositionSigma(), 0);
 
       hitInfo.hitPosition = aSensorInfo.pointToGlobal(hitLocal);
+      hitInfo.hitSigma = aSensorInfo.vectorToGlobal(hitSigma);
       B2DEBUG(100, " VXDTF-event SVD hits: m_errorContainer.size(): " << m_errorContainer.size() << ", layerID-1: " << aLayerID - 1)
       hitInfo.sigmaU = m_errorContainer.at(aLayerID - 1).first;
       hitInfo.sigmaV = m_errorContainer.at(aLayerID - 1).second;
+
+      B2DEBUG(10, " pxdluster got global pos X/Y/Z: " << hitInfo.hitPosition.X() << "/" << hitInfo.hitPosition.Y() << "/" << hitInfo.hitPosition.Z() << ", global var X/Y/Z: " << hitInfo.hitSigma.X() << "/" << hitInfo.hitSigma.Y() << "/" << hitInfo.hitSigma.Z()) /// WARNING TODO: set to debug level 100
 
       // local(0,0,0) is the center of the sensorplane
       vSize = 0.5 * aSensorInfo.getVSize();
@@ -1565,7 +1574,7 @@ void VXDTFModule::the_real_event()
     /// since KF is rather slow, Kf will not be used when there are many overlapping TCs. In this case, the simplified QI-calculator will be used.
     bool allowKalman = false;
     if (m_calcQiType == 1) { allowKalman = true; }
-    if (totalOverlaps > m_PARAMkillEventForHighOccupancyThreshold / 4) {
+    if (totalOverlaps > m_PARAMkillEventForHighOccupancyThreshold / 3) {
       B2DEBUG(1, m_PARAMnameOfInstance << " event " << m_eventCounter << ": total number of overlapping track candidates: " << totalOverlaps << ", termitating event!\nthere were " << numOfPxdClusters << "/" << numOfSvdClusters << "/" << numOfClusterCombis << " PXD-clusters/SVD-clusters/SVD-cluster-combinations.")
       m_TESTERbrokenEventsCtr++;
 
@@ -3149,7 +3158,7 @@ int VXDTFModule::neighbourFinder(PassData* currentPass)
         } else { B2DEBUG(175, " helixFit is not activated for pass: " << currentPass->sectorSetup << "!") }
 
         if (simpleSegmentQI < currentPass->activatedNbFinderTests) {
-          B2DEBUG(50, "neighbourFINDER: segment discarded! simpleSegmentQI = " << simpleSegmentQI);
+          B2DEBUG(50, "neighbourFINDER: segment discarded! simpleSegmentQI = " << simpleSegmentQI << " in " << FullSecID(outerSegments[thisOuterSegment]->getOuterHit()->getSectorName()).getFullSecString() << " got friend in " << FullSecID(currentFriendID).getFullSecString());
           continue;
         }
         if (m_highOccupancyCase == true) {
@@ -3260,7 +3269,7 @@ int VXDTFModule::cellularAutomaton(PassData* currentPass)
 
       goodNeighbours = 0;
       list<VXDSegmentCell*>& currentNeighbourList = currentSeg->getInnerNeighbours();
-      B2DEBUG(100, "CAstep: cell with outer/inner hit at sectors: " << currentSeg->getOuterHit()->getSectorString() << "/" << currentSeg->getInnerHit()->getSectorString() << " has inner/outer friend at " << currentSeg->getInnerNeighbours().size() << "/" << currentSeg->getOuterNeighbours().size() << ", only innerNeighbours count!")
+      B2DEBUG(50, "CAstep: cell with outer/inner hit at sectors: " << currentSeg->getOuterHit()->getSectorString() << "/" << currentSeg->getInnerHit()->getSectorString() << " has inner/outer friend at " << currentSeg->getInnerNeighbours().size() << "/" << currentSeg->getOuterNeighbours().size() << ", only innerNeighbours count!")
 
       list<VXDSegmentCell*>::iterator currentNeighbour = currentNeighbourList.begin();
       while (currentNeighbour != currentNeighbourList.end()) {
@@ -3280,12 +3289,12 @@ int VXDTFModule::cellularAutomaton(PassData* currentPass)
 
     /// Updatestep:
     for (VXDSegmentCell * currentSeg : currentPass->activeCellList) {
-      B2DEBUG(100, "Updatestep: cell with outer/inner hit at sectors: " << currentSeg->getOuterHit()->getSectorString() << "/" << currentSeg->getInnerHit()->getSectorString() << " has inner/outer friend at " << currentSeg->getInnerNeighbours().size() << "/" << currentSeg->getOuterNeighbours().size() << "!")
+      B2DEBUG(50, "Updatestep: cell with outer/inner hit at sectors: " << currentSeg->getOuterHit()->getSectorString() << "/" << currentSeg->getInnerHit()->getSectorString() << " has inner/outer friend at " << currentSeg->getInnerNeighbours().size() << "/" << currentSeg->getOuterNeighbours().size() << "!")
       if (currentSeg->isUpgradeAllowed() == false) { continue; }
 
       currentSeg->allowStateUpgrade(false);
       currentSeg->increaseState();
-      B2DEBUG(100, "good cell  with outer/inner hit at sectors: " << currentSeg->getOuterHit()->getSectorString() << "/" << currentSeg->getInnerHit()->getSectorString() << " upgraded!")
+      B2DEBUG(50, "good cell  with outer/inner hit at sectors: " << currentSeg->getOuterHit()->getSectorString() << "/" << currentSeg->getInnerHit()->getSectorString() << " upgraded!")
       if (currentSeg->getState() > highestCellState) { highestCellState = currentSeg->getState(); }
     }
 
@@ -3920,6 +3929,7 @@ bool VXDTFModule::baselineTF(vector<ClusterInfo>& clusters, PassData* passInfo)
    **/
   PositionInfo newPosition;
   TVector3 hitLocal;
+  TVector3 sigmaVec; // stores globalized vector for sigma values
   VxdID aVxdID;
   int aLayerID, nHits;
   ActiveSensorsOfEvent activatedSensors;
@@ -3934,11 +3944,14 @@ bool VXDTFModule::baselineTF(vector<ClusterInfo>& clusters, PassData* passInfo)
     if (isPXD == true) { // there are pxdHits, only if PXDHits were allowed. pxd-hits are easy, can be stored right away
 
       hitLocal.SetXYZ(aClusterInfo.getPXDCluster()->getU(), aClusterInfo.getPXDCluster()->getV(), 0);
+      sigmaVec.SetXYZ(aClusterInfo.getPXDCluster()->getUSigma(), aClusterInfo.getPXDCluster()->getVSigma(), 9);
 
       aVxdID = aClusterInfo.getPXDCluster()->getSensorID();
       aLayerID = aVxdID.getLayerNumber();
       const VXD::SensorInfoBase& aSensorInfo = dynamic_cast<const VXD::SensorInfoBase&>(VXD::GeoCache::get(aVxdID));
       newPosition.hitPosition = aSensorInfo.pointToGlobal(hitLocal);
+      newPosition.hitSigma = aSensorInfo.vectorToGlobal(sigmaVec);
+      B2DEBUG(10, " baselineTF: pxdluster got global pos X/Y/Z: " << newPosition.hitPosition.X() << "/" << newPosition.hitPosition.Y() << "/" << newPosition.hitPosition.Z() << ", global var X/Y/Z: " << newPosition.hitSigma.X() << "/" << newPosition.hitSigma.Y() << "/" << newPosition.hitSigma.Z()) /// WARNING TODO: set to debug level 100
       newPosition.sigmaU = m_errorContainer.at(aLayerID - 1).first;
       newPosition.sigmaV = m_errorContainer.at(aLayerID - 1).second;
       FullSecID aSecID = FullSecID(aVxdID, false, 0);
@@ -4165,6 +4178,7 @@ VXDTFHit VXDTFModule::deliverVXDTFHitWrappedSVDHit(ClusterInfo* uClusterInfo, Cl
 {
   float timeStampU = 0, timeStampV = 0;
   TVector3 hitLocal;
+  TVector3 sigmaVec; // stores globalized vector for sigma values
   PositionInfo newPosition;
   VxdID aVxdID;
 
@@ -4185,9 +4199,11 @@ VXDTFHit VXDTFModule::deliverVXDTFHitWrappedSVDHit(ClusterInfo* uClusterInfo, Cl
   if (vClusterInfo != NULL) {
     hitLocal.SetY(vClusterInfo->getSVDCluster()->getPosition()); // always correct
     newPosition.sigmaV = m_errorContainer.at(aLayerID - 1).second;
+    sigmaVec.SetY(vClusterInfo->getSVDCluster()->getPositionSigma());
   } else {
     hitLocal.SetY(0.); // is center of the plane
     newPosition.sigmaV = aSensorInfo.getBackwardWidth() * 0.288675135; // std deviation of uniformly distributed value (b-a)/sqrt(12)
+    sigmaVec.SetY(aSensorInfo.getBackwardWidth() * 0.288675135);
   }
 
   if (uClusterInfo != NULL) {
@@ -4197,12 +4213,16 @@ VXDTFHit VXDTFModule::deliverVXDTFHitWrappedSVDHit(ClusterInfo* uClusterInfo, Cl
       hitLocal.SetX(uClusterInfo->getSVDCluster()->getPosition());
     }
     newPosition.sigmaU = m_errorContainer.at(aLayerID - 1).first;
+    sigmaVec.SetX(uClusterInfo->getSVDCluster()->getPositionSigma());
   } else {
     hitLocal.SetX(0.); // is center of the plane
     newPosition.sigmaU = aSensorInfo.getLength() * 0.288675135; // std deviation of uniformly distributed value (b-a)/sqrt(12)
+    sigmaVec.SetX(aSensorInfo.getLength() * 0.288675135);
   }
 
   newPosition.hitPosition = aSensorInfo.pointToGlobal(hitLocal);
+  newPosition.hitSigma = aSensorInfo.vectorToGlobal(sigmaVec);
+  B2DEBUG(10, "deliverVXDTFHitWrappedSVDHit: got global pos X/Y/Z: " << newPosition.hitPosition.X() << "/" << newPosition.hitPosition.Y() << "/" << newPosition.hitPosition.Z() << ", global var X/Y/Z: " << newPosition.hitSigma.X() << "/" << newPosition.hitSigma.Y() << "/" << newPosition.hitSigma.Z()) /// WARNING TODO: set to debug level 100
 
   FullSecID aSecID = FullSecID(aVxdID, false, 0);
   return VXDTFHit(newPosition, 1, uClusterInfo, vClusterInfo, NULL, Const::SVD, aSecID.getFullSecID(), aVxdID, 0.5 * (timeStampU + timeStampV));

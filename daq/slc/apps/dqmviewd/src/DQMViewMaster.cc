@@ -39,6 +39,6 @@ void HSeverExecutor::run()
   Executor executor;
   executor.setExecutable("hserver");
   executor.addArg(Belle2::form("%d", _port));
-  executor.addArg(_dir + "/" + _mapfile);
+  executor.addArg(/*_dir + "/" +*/ _mapfile);
   executor.execute();
 }

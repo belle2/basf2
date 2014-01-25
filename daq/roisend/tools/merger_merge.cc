@@ -1,4 +1,4 @@
-/* merger_merge.c */
+/* merger_merge.cc */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -19,11 +19,8 @@ using namespace std;
 #define HRP_MALLOC_BUFFER_SIZE (ROI_MAX_PACKET_SIZE * 64) /* byte */
 
 
-/* MM_DEBUG<=0 ... no debug, MM_DEBUG==1 ... data dump to file, MM_DEBUG==2 ... data dump to stderr */
-#define MM_DEBUG (0)
-
-
-FILE* MM_debug_fp;
+#define LOG_FPRINTF (fprintf)
+#define ERR_FPRINTF (fprintf)
 
 
 static const int
@@ -49,7 +46,7 @@ MM_init_connect_to_onsen(const char* host, const unsigned int port)
       return -1;
 
     case  0:
-      fprintf(stderr, "%s:%d: connect(): Connection timed out\n", __FILE__, __LINE__);
+      ERR_FPRINTF(stderr, "merger_merge: connect(): Connection timed out\n");
       return -1;
 
     case  1: {
@@ -63,7 +60,7 @@ MM_init_connect_to_onsen(const char* host, const unsigned int port)
         return -1;
       }
       if (connection_error) {
-        fprintf(stderr, "%s:%d: connect(): %s\n", __FILE__, __LINE__, strerror(errno));
+        ERR_FPRINTF(stderr, "merger_merge: connect(): %s\n", strerror(errno));
         return -1;
       }
 
@@ -71,7 +68,7 @@ MM_init_connect_to_onsen(const char* host, const unsigned int port)
     }
 
     default:
-      fprintf(stderr, "%s:%d: poll(): Unexpected error\n", __FILE__, __LINE__);
+      ERR_FPRINTF(stderr, "merger_merge: poll(): Unexpected error\n");
       return -1;
   }
 
@@ -93,6 +90,8 @@ MM_init_accept_from_hltout2merger(const unsigned int port)
   int one = 1, ret;
   struct pollfd fds;
 
+
+  LOG_FPRINTF(stderr, "hltout2merger: Waiting for connection on %d\n", port);
 
   sd = b2_create_accept_socket(port);
   if (sd == -1) {
@@ -122,7 +121,7 @@ MM_init_accept_from_hltout2merger(const unsigned int port)
       return -1;
 
     case  0:
-      fprintf(stderr, "%s:%d: accept(): Connection timed out\n", __FILE__, __LINE__);
+      ERR_FPRINTF(stderr, "merger_merge: accept(): Connection timed out\n");
       return -1;
 
     case  1: {
@@ -136,7 +135,7 @@ MM_init_accept_from_hltout2merger(const unsigned int port)
         return -1;
       }
       if (connection_error) {
-        fprintf(stderr, "%s:%d: accept(): %s\n", __FILE__, __LINE__, strerror(errno));
+        ERR_FPRINTF(stderr, "merger_merge: accept(): %s\n", strerror(errno));
         return -1;
       }
 
@@ -144,7 +143,7 @@ MM_init_accept_from_hltout2merger(const unsigned int port)
     }
 
     default:
-      fprintf(stderr, "%s:%d: poll(): Unexpected error\n", __FILE__, __LINE__);
+      ERR_FPRINTF(stderr, "merger_merge: poll(): Unexpected error\n");
       return -1;
   }
 
@@ -177,11 +176,11 @@ MM_get_packet(const int sd_acc, unsigned char* buf)
 
   ret = recv(sd_acc, &n_words_from_hltout, sizeof(unsigned int), MSG_PEEK);
   if (ret == -1 && (errno == EAGAIN || errno == EWOULDBLOCK)) {
-    fprintf(stderr, "%s:%d: recv(): Packet receive timed out\n", __FILE__, __LINE__);
+    ERR_FPRINTF(stderr, "merger_merge: recv(): Packet receive timed out\n");
     return -1;
   }
   if (ret != sizeof(unsigned int)) {
-    fprintf(stderr, "%s:%d: recv(): Unexpected return value (%d)\n", __FILE__, __LINE__, ret);
+    ERR_FPRINTF(stderr, "merger_merge: recv(): Unexpected return value (%d)\n", ret);
     return -1;
   }
 
@@ -190,11 +189,11 @@ MM_get_packet(const int sd_acc, unsigned char* buf)
 
   ret = b2_recv(sd_acc, buf, n_bytes_from_hltout);
   if (ret == -1 && (errno == EAGAIN || errno == EWOULDBLOCK)) {
-    fprintf(stderr, "%s:%d: recv(): Packet receive timed out\n", __FILE__, __LINE__);
+    ERR_FPRINTF(stderr, "merger_merge: recv(): Packet receive timed out\n");
     return -1;
   }
   if (ret != n_bytes_from_hltout) {
-    fprintf(stderr, "%s:%d: b2_recv(): Unexpected return value (%d)\n", __FILE__, __LINE__, ret);
+    ERR_FPRINTF(stderr, "merger_merge: b2_recv(): Unexpected return value (%d)\n", ret);
     return -1;
   }
 
@@ -248,74 +247,51 @@ perl_split_uint16t(char d, const char* string, unsigned short ret[])
 int
 main(int argc, char* argv[])
 {
-  int i;
+  int j;
   int n_hltout = 0;
-  int sd_acc[MM_MAX_HLTOUT], sd_con;
-  /* local test */
-  //  char *onsen_host;
+  int sd_acc[MM_MAX_HLTOUT], sd_con = -1;
+  int need_reconnection_to_onsen = 1;
+  int event_count = 0;
+
   char onsen_host[1024];
   unsigned short onsen_port;
   /* PC test */
-  /* const char *onsen_host = "10.10.10.1";
-     const unsigned short onsen_port = 1024; */
+  /* strcpy(onsen_host, "10.10.10.1");  */
+  /* onsen_port = 1024; */
   /* real ONSEN */
-  /* const char *onsen_host = "10.10.10.80";
-     const unsigned short onsen_port = 24; */
+  /* strcpy(onsen_host, "10.10.10.80"); */
+  /* onsen_port = 24;   */
   unsigned short accept_port[MM_MAX_HLTOUT];
 
+
+  LOG_FPRINTF(stderr, "merger_merge: Process invoked [verB]\n");
+
   if (argc < 4) {
-    printf("merger_merge : onsenhost onsenport clientpots\n");
-    exit(-1);
+    ERR_FPRINTF(stderr, "merger_merge: Usage: merger_merge onsen-host onsen-port client-port#1[:client-port#2[:...]]\n");
+    exit(1);
   }
 
-  /* environmental variable check */
+  /* argv copy */
   {
     char* p;
     size_t n_ports;
 
     p = argv[1];
-    //    p = getenv("ROI_ONSEN_HOST");
-    if (!p) {
-      fprintf(stderr, "%s:%d: main(): export \"ROI_ONSEN_HOST\"\n", __FILE__, __LINE__);
-      exit(1);
-    }
     strcpy(onsen_host, p);
 
     p = argv[2];
-    //    p = getenv("ROI_ONSEN_PORT");
-    if (!p) {
-      fprintf(stderr, "%s:%d: main(): export \"ROI_ONSEN_PORT\"\n", __FILE__, __LINE__);
-      exit(1);
-    }
     onsen_port = atoi(p);
 
     p = argv[3];
-    //    p = getenv("ROI_CLIENT_PORTS");
-    if (!p) {
-      fprintf(stderr, "%s:%d: main(): export \"ROI_CLIENT_PORTS\"\n", __FILE__, __LINE__);
-      exit(1);
-    }
     n_hltout = perl_split_uint16t(':', p, accept_port);
   }
 
-  /* initialize */
+
+  /* acceot from hlt */
   {
     int i;
 
-    if (MM_DEBUG > 0) {
-      char buf[256];
-      sprintf(buf, "./data.merger_merge.%05d.dat", getpid());
-      MM_debug_fp = MM_DEBUG > 1 ? stderr : fopen(buf, "w");
-    }
-
     signal(SIGPIPE, SIG_IGN);
-
-    sd_con = MM_init_connect_to_onsen(onsen_host, onsen_port);
-    if (sd_con == -1) {
-      ERROR(MM_init_connect_to_onsen);
-      exit(1);
-    }
-    printf("%s:%d: MM_init_connect_to_onsen(): Connected to ONSEN\n", __FILE__, __LINE__);
 
     for (i = 0; i < n_hltout; i++) {
       sd_acc[i] = MM_init_accept_from_hltout2merger(accept_port[i]);
@@ -323,15 +299,39 @@ main(int argc, char* argv[])
         ERROR(MM_init_accept_from_hltout2merger);
         exit(1);
       }
-      printf("%s:%d: MM_init_connect_to_onsen()[%d]: Connection from HLTOUT\n", __FILE__, __LINE__, i);
+      LOG_FPRINTF(stderr, "merger_merge: MM_init_accept_from_hltout2merger()[%d]: Connection from HLTOUT\n", __FILE__, __LINE__, i);
     }
   }
 
 
-  /* forever (recv -> send) */
-  for (i = 0;; i++) {
-    int j;
+  /* keep connected to ONSEN as possible */
+  for (;;) {
+    if (need_reconnection_to_onsen) {
+      /* incase of sd_con is connected, disconnect it */
+      if (sd_con != -1) close(sd_con);
 
+      /* connect to onsen untill connected */
+      {
+        int sleep_sec = 2;
+
+        sd_con = MM_init_connect_to_onsen(onsen_host, onsen_port);
+        if (sd_con != -1) {
+          /* connected: move to the recv->send loop */
+          need_reconnection_to_onsen = 0;
+          event_count = 0;
+          break;
+        }
+
+        ERR_FPRINTF(stderr, "merger_merge: connection to onsen failed: reconnect in %d second(s)\n", sleep_sec);
+        sleep(sleep_sec);
+
+        /* retry connection */
+        continue;
+      }
+    }
+
+
+    /* forever (recv -> send) */
     for (j = 0; j < n_hltout; j++) {
       const size_t n_bytes_header  = sizeof(struct h2m_header_t);
       const size_t n_bytes_footer  = sizeof(struct h2m_footer_t);
@@ -351,56 +351,70 @@ main(int argc, char* argv[])
 
       /* packet setup */
       {
-        int ret;
+        /* recv packet */
+        {
+          int ret;
+          ret = MM_get_packet(sd_acc[j], buf);
+          if (ret == -1) {
+            ERR_FPRINTF(stderr, "merger_merge: MM_get_packet()[%d]: %s\n", j, strerror(errno));
+            /* connection from HLT is lost */
+            exit(1);
+          }
+          n_bytes_from_hltout = ret;
 
-        ret = MM_get_packet(sd_acc[j], buf);
-        if (ret == -1) {
-          fprintf(stderr, "%s:%d: MM_get_packet()[%d]: %s\n", __FILE__, __LINE__, j, strerror(errno));
-          exit(1);
+          if (event_count < 40 || event_count % 10000 == 0) {
+            LOG_FPRINTF(stderr, "merger_merge: ---- [%d] received event from ROI transmitter\n", event_count);
+            LOG_FPRINTF(stderr, "merger_merge: MM_get_packet() Returned %d\n", n_bytes_from_hltout);
+            dump_binary(stderr, buf, n_bytes_from_hltout);
+          }
         }
 
-        n_bytes_from_hltout = ret;
+        /* send packet */
+        {
+          int ret;
+          unsigned char* ptr_head_to_onsen = buf + n_bytes_header;
 
-        if (MM_DEBUG > 0) {
-          static int event = 1;
-          fprintf(MM_debug_fp, "---- received event [%d]\n", event++);
-          dump_binary(MM_debug_fp, buf, n_bytes_from_hltout);
-        }
-      }
+          n_bytes_to_onsen = n_bytes_from_hltout - n_bytes_header - n_bytes_footer;
+          ret = b2_send(sd_con, ptr_head_to_onsen, n_bytes_to_onsen);
 
-      /* send packet */
-      {
-        int ret;
-        unsigned char* ptr_head_to_onsen = buf + n_bytes_header;
+          if (ret == -1) {
+            ERROR(b2_send);
+            need_reconnection_to_onsen = 1;
+            event_count = 0;
+            free(buf);
+            goto ERROR_HANDLING;
+            // exit(1);
+          }
+          if (ret == 0) {
+            ERR_FPRINTF(stderr, "merger_merge: b2_send(): Connection closed\n");
+            need_reconnection_to_onsen = 1;
+            event_count = 0;
+            free(buf);
+            goto ERROR_HANDLING;
+            // exit(1);
+          }
 
-        n_bytes_to_onsen = n_bytes_from_hltout - n_bytes_header - n_bytes_footer;
-        ret = b2_send(sd_con, ptr_head_to_onsen, n_bytes_to_onsen);
-
-        if (ret == -1) {
-          ERROR(b2_send);
-          exit(1);
-        }
-        if (ret == 0) {
-          fprintf(stderr, "%s:%d: b2_send(): Connection closed\n", __FILE__, __LINE__);
-          exit(1);
-        }
-
-        if (MM_DEBUG > 0) {
-          static int event = 1;
-          fprintf(MM_debug_fp, "---- sent event [%d]\n", event++);
-          dump_binary(MM_debug_fp, ptr_head_to_onsen, n_bytes_to_onsen);
+          if (event_count < 40 || event_count % 10000 == 0) {
+            LOG_FPRINTF(stderr, "merger_merge: ---- [%d] sent event to ONSEN\n", event_count);
+            dump_binary(stderr, ptr_head_to_onsen, n_bytes_to_onsen);
+          }
         }
       }
 
       free(buf);
     }
+
+    event_count++;
+    continue;
+
+ERROR_HANDLING:
+    1;
   }
 
 
   /* termination: never reached */
   {
     int i;
-
     MM_term_connect_to_onsen(sd_con);
     for (i = 0; i < n_hltout; i++) MM_term_accept_from_hltout2merger(sd_acc[i]);
   }

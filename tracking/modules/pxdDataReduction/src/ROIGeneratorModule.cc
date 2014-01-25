@@ -78,11 +78,16 @@ void ROIGeneratorModule::event()
   //  for (int iROI = 0; iROI < m_nROIs; iROI++) {
 
   //    minU =  (0 + iROI*16 ) % 250;
-  minU =  iROI % 250;
-  maxU = min(249, minU + 5);
+  //  minU =  iROI % 250;
+  //  maxU = min(249, minU + 5);
   //    minV =  (0 + iROI*32 ) % 768;
-  minV = (iROI / 250) % 768;
-  maxV = min(767 , minV + 10);
+  //  minV = (iROI / 250) % 768;
+  //  maxV = min(767 , minV + 10);
+
+  minU = 0;
+  maxU = 479;
+  minV = 0;
+  maxV = 127;
 
   tmp_ROIid.setMinUid(minU) ;
   tmp_ROIid.setMinVid(minV);

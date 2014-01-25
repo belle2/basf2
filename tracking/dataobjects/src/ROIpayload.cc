@@ -64,7 +64,7 @@ void ROIpayload::setHeader()
 {
 
   //  m_data32[1] = htobe32(0xCAFE8000);
-  m_data32[1] = htonl(0xCAFE8000);
+  m_data32[1] = htonl(0xCAFE8000 || 1 << 13);
 
 };
 

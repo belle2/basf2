@@ -9,5 +9,6 @@ killall dqmviewd
 sleep 2
 echo "booting DQM daemon (dqmviewd)"
 source ~/belle2/release/daq/slc/extra/bin/setup.sh ~/belle2 release global 
-dqmviewd DQM
+dqmviewd DQM &> /x01/b2daq/slc/dqm.log &
+#ssh belle-rpc2 "source ~/belle2/release/daq/slc/extra/bin/setup.sh ~/belle2 release global dqmviewd DQM &> /x01/b2daq/slc/dqm.log " &
 echo "booted"

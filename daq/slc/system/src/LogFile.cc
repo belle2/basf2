@@ -26,7 +26,7 @@ void LogFile::open(const std::string& filename, SystemLog::Priority threshold)
 {
   if (!__opened) {
     ConfigFile config("slowcontrol");
-    __filepath = config.get("LOGFILE_DIR") + "/" + filename + ".log";
+    __filepath = config.get("LOGFILE_DIR") + "/" + filename + "." +  Date().toString("%Y.%m.%d") + ".log";
     __threshold = threshold;
     __opened = true;
     open();
@@ -107,6 +107,7 @@ void LogFile::put(SystemLog::Priority priority, const std::string& msg, ...)
 
 int LogFile::put_impl(const std::string& msg, SystemLog::Priority priority, va_list ap)
 {
+  if (!__opened) return 0;
   __mutex.lock();
   if (__threshold > priority) {
     __mutex.unlock();

@@ -128,6 +128,10 @@ GBLfitModule::GBLfitModule() :
   addParam("pValueCut", m_gblPvalueCut, "GBL p-value cut to output track to millepede file", 0.0);
   addParam("minNdf", m_gblMinNdf, "GBL minimum NDF to output track to millepede file", 1);
   addParam("milleFileName", m_gblMilleFileName, "GBL: Name of the mille binary file to be produced for alignments", std::string("millefile.dat"));
+  addParam("chi2Cut", m_chi2Cut, "GBL: Cut on single measurement Chi2", double(50.));
+  addParam("enableScatterers", m_enableScatterers, "GBL: Enable scattering in GBL trajectory", bool(true));
+  addParam("enableIntermediateScatterer", m_enableIntermediateScatterer, "GBL: Enable intermediate scatterers for simulation of thick scatterer", bool(true));
+
 
 }
 
@@ -146,21 +150,21 @@ void GBLfitModule::initialize()
 
   StoreArray<genfit::TrackCand>::required(m_gfTrackCandsColName);
 
-  StoreArray<Track>::registerPersistent();
-  StoreArray<TrackFitResult>::registerPersistent();
-  StoreArray < genfit::Track >::registerPersistent(m_gfTracksColName);
-  StoreArray < genfit::TrackCand >::registerPersistent();
+  //StoreArray<Track>::registerPersistent();
+  //StoreArray<TrackFitResult>::registerPersistent();
+  //StoreArray < genfit::Track >::registerPersistent(m_gfTracksColName);
+  //StoreArray < genfit::TrackCand >::registerPersistent();
 
   if (!m_tracksColName.empty() and m_tracksColName != "Tracks") {
     B2ERROR("Setting a collection name with TracksColName is not implemented.");
     //TODO: implementation might also need different name for TrackFitResults?
   }
 
-  RelationArray::registerPersistent<genfit::Track, MCParticle>(m_gfTracksColName, m_mcParticlesColName);
-  RelationArray::registerPersistent<MCParticle, Track> ();
-  RelationArray::registerPersistent<genfit::Track, TrackFitResult>(m_gfTracksColName, "");
-  RelationArray::registerPersistent<genfit::TrackCand, TrackFitResult>(m_gfTrackCandsColName, "");
-  RelationArray::registerPersistent<genfit::TrackCand, genfit::Track>(m_gfTrackCandsColName, m_gfTracksColName);
+  //RelationArray::registerPersistent<genfit::Track, MCParticle>(m_gfTracksColName, m_mcParticlesColName);
+  //RelationArray::registerPersistent<MCParticle, Track> ();
+  //RelationArray::registerPersistent<genfit::Track, TrackFitResult>(m_gfTracksColName, "");
+  //RelationArray::registerPersistent<genfit::TrackCand, TrackFitResult>(m_gfTrackCandsColName, "");
+  //RelationArray::registerPersistent<genfit::TrackCand, genfit::Track>(m_gfTrackCandsColName, m_gfTracksColName);
 
 
   if (m_createTextFile) {
@@ -206,15 +210,14 @@ void GBLfitModule::initialize()
   CDCRecoHit::setTranslators(new LinearGlobalADCCountTranslator(), new IdealCDCGeometryTranslator(), new SimpleTDCCountTranslator());
 
   // Set GBL parameters
-  if (m_filterId == "GBL") {
-    m_gbl.setGBLOptions(m_gblInternalIterations);
-    m_gbl.setMP2Options(m_gblPvalueCut, m_gblMinNdf, m_gblMilleFileName);
-  }
+  m_gbl.setGBLOptions(m_gblInternalIterations, m_enableScatterers, m_enableIntermediateScatterer);
+  m_gbl.setMP2Options(m_gblPvalueCut, m_gblMinNdf, m_gblMilleFileName, m_chi2Cut);
+
 }
 
 void GBLfitModule::beginRun()
 {
-  if (m_filterId == "GBL") m_gbl.beginRun();
+  m_gbl.beginRun();
 }
 
 void GBLfitModule::event()
@@ -268,11 +271,11 @@ void GBLfitModule::event()
 
   //StoreArrays to store the fit results
   StoreArray < Track > tracks;
-  tracks.create();
+  //tracks.create();
   StoreArray <TrackFitResult> trackFitResults;
-  trackFitResults.create();
+  //trackFitResults.create();
   StoreArray < genfit::Track > gfTracks(m_gfTracksColName);
-  gfTracks.create();
+  //gfTracks.create();
 
   //Relations for Tracks
   RelationArray mcParticlesToTracks(mcParticles, tracks);
@@ -286,7 +289,7 @@ void GBLfitModule::event()
 
   //counter for fitted tracks, the number of fitted tracks may differ from the number of trackCandidates if the fit fails for some of them
   int trackCounter = -1;
-  int trackFitResultCounter = 0;
+  //int trackFitResultCounter = 0;
 
   for (int iCand = 0; iCand < trackCandidates.getEntries(); ++iCand) { //loop over all track candidates
     B2DEBUG(99, "#############  Fit track candidate Nr. : " << iCand << "  ################");
@@ -470,7 +473,7 @@ void GBLfitModule::event()
         // Let's try to pass the track to GBL even if Kalman will fail.
         // Reference state (and planes) will still be constructed
         // and that is the only thing GBL needs
-        if (m_filterId == "GBL") m_gbl.processTrack(&gfTrack);
+        m_gbl.processTrack(&gfTrack);
 
         //gfTrack.Print();
         bool fitSuccess = gfTrack.hasFitStatus(trackRep);
@@ -485,8 +488,8 @@ void GBLfitModule::event()
           fitSuccess = fitSuccess && fs->isFitConverged();
           genfit::KalmanFitStatus* kfs = dynamic_cast<genfit::KalmanFitStatus*>(fs);
           //hNit->Fill(kfs->getNumIterations());
-          if (!fitSuccess && kfs)
-            kfs->Print();
+          //if (!fitSuccess && kfs)
+          //kfs->Print();
           fitSuccess = fitSuccess && kfs;
           //if (m_filterId == "GBL") m_gbl.processTrack(&gfTrack);
         }
@@ -514,12 +517,12 @@ void GBLfitModule::event()
             ++trackCounter;
 
             //Create output tracks
-            gfTracks.appendNew(gfTrack);  //genfit::Track can be assigned directly
-            tracks.appendNew(); //Track is created empty, helix parameters are not available because the fit failed, but other variables may give some hint on the reason for the failure
+            //gfTracks.appendNew(gfTrack);  //genfit::Track can be assigned directly
+            //tracks.appendNew(); //Track is created empty, helix parameters are not available because the fit failed, but other variables may give some hint on the reason for the failure
 
             //Create relation
             if (aTrackCandPointer->getMcTrackId() >= 0) {
-              gfTracksToMCPart.add(trackCounter, aTrackCandPointer->getMcTrackId());
+              //gfTracksToMCPart.add(trackCounter, aTrackCandPointer->getMcTrackId());
             }
 
             else B2WARNING("No MCParticle contributed to this track! No genfit::Track<->MCParticle relation will be created!");
@@ -545,7 +548,7 @@ void GBLfitModule::event()
                           */
             //Create relations
             if (aTrackCandPointer->getMcTrackId() >= 0) {
-              mcParticlesToTracks.add(aTrackCandPointer->getMcTrackId(), trackCounter);
+              //mcParticlesToTracks.add(aTrackCandPointer->getMcTrackId(), trackCounter);
             } else B2WARNING("No MCParticle contributed to this track! No MCParticle<->Track relation will be created!");
           }
         } else {            //fit successful
@@ -554,12 +557,12 @@ void GBLfitModule::event()
 
           candFitted = true;
           //Create output tracks
-          gfTracks.appendNew(gfTrack);  //genfit::Track can be assigned directly
-          tracks.appendNew(); //Track is created empty, parameters are set later on
+          //gfTracks.appendNew(gfTrack);  //genfit::Track can be assigned directly
+          //tracks.appendNew(); //Track is created empty, parameters are set later on
 
           //Create relation
           if (aTrackCandPointer->getMcTrackId() >= 0) {
-            gfTracksToMCPart.add(trackCounter, aTrackCandPointer->getMcTrackId());
+            //gfTracksToMCPart.add(trackCounter, aTrackCandPointer->getMcTrackId());
           }
 
           else B2WARNING("No MCParticle contributed to this track! No genfit::Track<->MCParticle relation will be created!");
@@ -602,40 +605,40 @@ void GBLfitModule::event()
                 newResultCovariance(ii, jj) = cov(ii, jj);
               }
             }
+            /*
+                        //MH: this is new stuff...
+                        tracks[trackCounter]->setTrackFitResultIndex(chargedStable, trackFitResultCounter);
+                        //Create relations
+                        if (aTrackCandPointer->getMcTrackId() >= 0) {
+                          mcParticlesToTracks.add(aTrackCandPointer->getMcTrackId(), trackCounter);
+                        }
 
-            //MH: this is new stuff...
-            tracks[trackCounter]->setTrackFitResultIndex(chargedStable, trackFitResultCounter);
-            //Create relations
-            if (aTrackCandPointer->getMcTrackId() >= 0) {
-              mcParticlesToTracks.add(aTrackCandPointer->getMcTrackId(), trackCounter);
-            }
+                        TrackFitResult* newTrackFitResult = trackFitResults.appendNew();
+                        newTrackFitResult->setCharge(0);
+                        newTrackFitResult->setParticleType(chargedStable);
+                        newTrackFitResult->setMomentum(dirInPoca);
+                        newTrackFitResult->setPosition(poca);
+                        newTrackFitResult->setCovariance6(newResultCovariance);
+                        newTrackFitResult->setPValue(1);
+                        gfTracksToTrackFitResults.add(trackCounter, trackFitResultCounter);
+                        gfTrackCandidatesToTrackFitResults.add(iCand, trackFitResultCounter);
+                        gfTrackCandidatesTogfTracks.add(iCand, trackCounter);
+                        trackFitResultCounter++;
 
-            TrackFitResult* newTrackFitResult = trackFitResults.appendNew();
-            newTrackFitResult->setCharge(0);
-            newTrackFitResult->setParticleType(chargedStable);
-            newTrackFitResult->setMomentum(dirInPoca);
-            newTrackFitResult->setPosition(poca);
-            newTrackFitResult->setCovariance6(newResultCovariance);
-            newTrackFitResult->setPValue(1);
-            gfTracksToTrackFitResults.add(trackCounter, trackFitResultCounter);
-            gfTrackCandidatesToTrackFitResults.add(iCand, trackFitResultCounter);
-            gfTrackCandidatesTogfTracks.add(iCand, trackCounter);
-            trackFitResultCounter++;
-
-            if (fitSuccess) {
-              genfit::KalmanFitStatus* fs = gfTrack.getKalmanFitStatus();
-              newTrackFitResult->setCharge(fs->getCharge());
-              newTrackFitResult->setPValue(fs->getBackwardPVal());
-              /*double Pval = fs->getBackwardPVal();
-              hPval->Fill(Pval);
-              if (nPXD == 0 && nSVD == 0)
-                 hPvalCDC->Fill(Pval);
-               else if (nCDC == 0)
-                 hPvalVXD->Fill(Pval);
-              else
-                hPvalFull->Fill(Pval);*/
-            }
-
+                        if (fitSuccess) {
+                          genfit::KalmanFitStatus* fs = gfTrack.getKalmanFitStatus();
+                          newTrackFitResult->setCharge(fs->getCharge());
+                          newTrackFitResult->setPValue(fs->getBackwardPVal());
+                          double Pval = fs->getBackwardPVal();
+                          hPval->Fill(Pval);
+                          if (nPXD == 0 && nSVD == 0)
+                             hPvalCDC->Fill(Pval);
+                           else if (nCDC == 0)
+                             hPvalVXD->Fill(Pval);
+                          else
+                            hPvalFull->Fill(Pval);
+                        }
+            */
 
             // store position
 //              tracks[trackCounter]->setPosition(resultPosition);
@@ -706,7 +709,7 @@ void GBLfitModule::event()
             B2WARNING("Something went wrong during the extrapolation of fit results!");
             //Create relations
             if (aTrackCandPointer->getMcTrackId() >= 0) {
-              mcParticlesToTracks.add(aTrackCandPointer->getMcTrackId(), trackCounter);
+              //mcParticlesToTracks.add(aTrackCandPointer->getMcTrackId(), trackCounter);
             } else B2WARNING("No MCParticle contributed to this track! No MCParticle<->Track relation will be created!");
 //              tracks[trackCounter]->setExtrapFailed(true);
           }

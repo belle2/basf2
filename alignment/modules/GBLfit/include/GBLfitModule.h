@@ -108,6 +108,10 @@ namespace Belle2 {
     double m_gblPvalueCut;                           /**< GBL p-value cut to output track to millepede file */
     int m_gblMinNdf;                                 /**< GBL minimum NDF to output track to millepede file */
     std::string m_gblMilleFileName;                  /**< GBL: Name of the mille binary file to be produced for alignment */
+    double m_chi2Cut;                                /**< GBL: Cut on single measurement Chi2", double(50.)) */
+    bool m_enableScatterers;                          /**< GBL: Enable scattering in GBL trajectory", bool(true)) */
+    bool m_enableIntermediateScatterer;              /**< GBL: Enable intermediate scatterers for simulation of thick scatterer", bool(true)) */
+
   };
 }
 

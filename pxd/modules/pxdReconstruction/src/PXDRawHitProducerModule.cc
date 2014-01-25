@@ -78,7 +78,7 @@ void PXDRawHitProducerModule::event()
     }
     if (frameCounter == 2 && digit.getVCellID() >= startRow) frameCounter = 1;
     storeRawHits.appendNew(
-      sensorID, digit.getVCellID(), digit.getUCellID(), digit.getCharge(),
+      sensorID, digit.getUCellID(), digit.getVCellID(), digit.getCharge(),
       startRow, frameCounter, 0);
   }
   // That's not all, folks. We have to destroy all current PXDDigits.

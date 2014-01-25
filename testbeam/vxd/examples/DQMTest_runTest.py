@@ -36,8 +36,6 @@ PXDClust.param('TanLorentz', 0.)
 SVDSort = register_module('SVDDigitSorter')
 SVDSort.param('mergeDuplicates', False)
 # Use the list of ignored strips. _Verbatim_ path, this is not Gear.
-SVDSort.param('ignoredStripsListName', \
-    'testbeam/vxd/data/SVD-IgnoredStripsList.xml')
 SVDClust = register_module('SVDClusterizer')
 SVDClust.param('TanLorentz_holes', 0.)
 SVDClust.param('TanLorentz_electrons', 0.)
@@ -116,6 +114,10 @@ trackfitter.param('UseClusters', True)
 # VXDTF DQM module
 vxdtf_dqm = register_module('VXDTFDQM')
 
+# Save output of simulation
+output = register_module('RootOutput')
+output.param('outputFileName', 'DQMTest_output.root')
+
 # Create paths
 main = create_path()
 
@@ -136,6 +138,7 @@ main.add_module(tel_dqm)
 main.add_module(vxdtf)
 main.add_module(trackfitter)
 main.add_module(vxdtf_dqm)
+main.add_module(output)
 
 # Process events
 process(main)

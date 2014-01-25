@@ -173,9 +173,6 @@ namespace Belle2 {
       /** Name of the relation between TelDigits and TelTrueHits */
       std::string m_relDigitTrueHitName;
 
-      /** Whether or not to apply a time window cut */
-      bool   m_applyWindow;
-
       /** Max. Segment length to use for charge drifting */
       double m_segmentLength;
 

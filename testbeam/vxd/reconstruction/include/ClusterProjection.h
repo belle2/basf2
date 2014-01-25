@@ -25,7 +25,7 @@ namespace Belle2 {
     class ClusterProjection {
     public:
       /** Constructor */
-      ClusterProjection(): m_pos(0), m_min(-1), m_max(0), m_minCharge(0),
+      ClusterProjection(): m_pos(0), m_min(2000), m_max(-2000), m_minCharge(0),
         m_maxCharge(0), m_minPos(0), m_maxPos(0), m_error(0), m_charge(0),
         m_size(0) {}
 
@@ -108,7 +108,7 @@ namespace Belle2 {
         m_minCharge += 1;
       }
       //Same as above for maximum cell.
-      if (cell > m_max || m_max == 0) {
+      if (cell > m_max) {
         m_max = cell;
         m_maxCharge = 1;
         m_maxPos = position;

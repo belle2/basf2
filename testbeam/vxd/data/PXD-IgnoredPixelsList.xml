@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Meta>
+    <Date>24.01.2014</Date>
+    <Description short="Ignored pixels list for PXD plane(s) in 2014 VXD beam test">
+        Crude initial list of bad pixels
+    </Description>
+    <Author>Peter Kvasnicka</Author>
+</Meta>
+<PXD>
+    <layer n="1">
+        <ladder n="1">
+            <sensor n="1">
+                <rows side="v"></rows>
+                <columnes side="u"></columns>
+                <pixels></pixels>
+            </sensor>
+        </ladder>
+    </layer>
+    <layer n="2">
+        <ladder n="1">
+            <sensor n="2">
+                <rows side="v">
+                    <fromTo from = "000" to = "8"></fromTo>
+                </rows>
+                <columns side="u">
+                    <fromTo from = "000" to = "150"></fromTo>
+                </columns>
+                <pixels>
+                    <pixel column = "1" row = "1"></pixel>
+                </pixels>
+            </sensor>
+        </ladder>
+    </layer>
+ </PXD>

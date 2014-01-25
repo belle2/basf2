@@ -53,10 +53,6 @@ TelDigitizerModule::TelDigitizerModule() : Module(),
            "Noise added by the electronics, set in ENC", 300.0);
   addParam("NoiseSN", m_SNThreshold,
            "SN for digits to be considered for clustering", 5.0);
-
-  addParam("IntegrationWindow", m_applyWindow, "Use integration window?",
-           true);
-
   addParam("SegmentLength", m_segmentLength, "Maximum segment length (in mm)",
            0.01);
   addParam("Diffusion", m_diffusionCoefficient,
@@ -124,7 +120,6 @@ void TelDigitizerModule::initialize()
   B2INFO(" -->  DigitMCRel:         " << m_relDigitMCParticleName);
   B2INFO(" -->  TrueSimRel:         " << m_relTrueHitSimHitName);
   B2INFO(" -->  DigitTrueRel:       " << m_relDigitTrueHitName);
-  B2INFO(" -->  IntegrationWindow:  " << (m_applyWindow ? "true" : "false"));
   B2INFO(" -->  SegmentLength:      " << m_segmentLength);
   B2INFO(" -->  Diffusion:          " << m_diffusionCoefficient);
   B2INFO(" -->  widthOfDiffusCloud: " << m_widthOfDiffusCloud);
@@ -230,21 +225,6 @@ void TelDigitizerModule::event()
 
 void TelDigitizerModule::processHit()
 {
-  if (m_applyWindow) {
-    //Ignore hits which are outside of the Tel active time frame
-    B2DEBUG(30,
-            "Checking if hit is in timeframe "
-            << m_currentSensorInfo->getIntegrationStart()
-            << " <= " << m_currentHit->getGlobalTime()
-            << " <= " << m_currentSensorInfo->getIntegrationEnd());
-
-    if (m_currentHit->getGlobalTime()
-        < m_currentSensorInfo->getIntegrationStart()
-        || m_currentHit->getGlobalTime()
-        > m_currentSensorInfo->getIntegrationEnd())
-      return;
-  }
-
   //Get Steplength and direction
   const TVector3& startPoint = m_currentHit->getPosIn();
   const TVector3& stopPoint = m_currentHit->getPosOut();
@@ -403,8 +383,6 @@ void TelDigitizerModule::saveDigits()
 
   for (Sensors::value_type & sensor : m_sensors) {
     int sensorID = sensor.first;
-    const SensorInfo& info =
-      dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(sensorID));
     for (Sensor::value_type & digit : sensor.second) {
       const Digit& d = digit.first;
       const DigitValue& v = digit.second;

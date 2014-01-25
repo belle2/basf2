@@ -77,6 +77,7 @@ PXDDigi.param('SimpleDriftModel', False)
 SVDDigi = register_module('SVDDigitizer')
 
 TelDigi = register_module('TelDigitizer')
+TelDigi.param('ElectronicNoise', 200)
 TelDigi.param("NoiseSN", 4.0)
 
 #PXD DAQ produces PXDRawHits, not PXDDigits.

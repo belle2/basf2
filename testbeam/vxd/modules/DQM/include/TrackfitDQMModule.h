@@ -47,6 +47,12 @@ namespace Belle2 {
       c_nSVDPlanes = 4,
       c_firstSVDPlane = 3,
       c_lastSVDPlane = 6,
+
+      c_nPXDPlanes = 1,
+      c_firstPXDPlane = 2,
+      c_lastPXDPlane = 2,
+
+      c_nPlanes = c_nPXDPlanes + c_nSVDPlanes,
     };
 
     /** Constructor */
@@ -73,16 +79,17 @@ namespace Belle2 {
      * and to protect against range errors.
      */
     inline int indexToPlane(int index) const {
-      return c_firstSVDPlane + index;
+      return c_firstPXDPlane + index;
     }
     inline int planeToIndex(int iPlane) const {
-      return iPlane - c_firstSVDPlane;
+      return iPlane - c_firstPXDPlane;
     }
+
     /** This is a shortcut to getting SVD::SensorInfo from the GeoCache.
      * @param index Index of the sensor (0,1,2,3), _not_ layer number!
      * @return SensorInfo object for the desired plane.
      */
-    const SVD::SensorInfo& getInfo(int index) const;
+    const VXD::SensorInfoBase& getInfo(int index) const;
 
     std::string m_storeTrackName;           /**< genfit::Track StoreArray name */
     std::string m_storeTrackCandName;      /**< genfit::TrackCand StoreArray name */
@@ -136,21 +143,21 @@ namespace Belle2 {
     TH2* m_hNDFPval;
 
     /** Residuals in cm.  */
-    TH1* m_hResidualSVDU[c_nSVDPlanes];
-    TH1* m_hResidualSVDV[c_nSVDPlanes];
-    TH2* m_hNDFResidualSVDU[c_nSVDPlanes];
-    TH2* m_hNDFResidualSVDV[c_nSVDPlanes];
+    TH1* m_hResidualU[c_nPlanes];
+    TH1* m_hResidualV[c_nPlanes];
+    TH2* m_hNDFResidualU[c_nPlanes];
+    TH2* m_hNDFResidualV[c_nPlanes];
 
-    TH2* m_hResidualSVDUvsV[c_nSVDPlanes];
-    TH2* m_hResidualSVDVvsU[c_nSVDPlanes];
-    TH2* m_hResidualSVDUvsU[c_nSVDPlanes];
-    TH2* m_hResidualSVDVvsV[c_nSVDPlanes];
+    TH2* m_hResidualUvsV[c_nPlanes];
+    TH2* m_hResidualVvsU[c_nPlanes];
+    TH2* m_hResidualUvsU[c_nPlanes];
+    TH2* m_hResidualVvsV[c_nPlanes];
 
     /** Residuals normalized with tracking error.  */
-    TH1* m_hNormalizedResidualSVDU[c_nSVDPlanes];
-    TH1* m_hNormalizedResidualSVDV[c_nSVDPlanes];
-    TH2* m_hNDFNormalizedResidualSVDU[c_nSVDPlanes];
-    TH2* m_hNDFNormalizedResidualSVDV[c_nSVDPlanes];
+    TH1* m_hNormalizedResidualU[c_nPlanes];
+    TH1* m_hNormalizedResidualV[c_nPlanes];
+    TH2* m_hNDFNormalizedResidualU[c_nPlanes];
+    TH2* m_hNDFNormalizedResidualV[c_nPlanes];
 
     /** The pseudo efficiencies := number of total reco tracks hitting the
     plane (y = 0), number of reco tracks with associated hits in this

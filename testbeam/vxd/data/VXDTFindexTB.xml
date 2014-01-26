@@ -10,6 +10,10 @@
 	<xi:include href="testBeamMini6GeVVXD-moreThan1500MeV_VXD.xml"/>
 	<xi:include href="testBeamMini6GeVSVD-moreThan1500MeV_SVD.xml"/>
 	<xi:include href="TB6GeVNoMagnetSVD-moreThan1500MeV_SVD.xml"/>
+	<xi:include href="TB6GeVNoMagnetFineSVD-moreThan1500MeV_SVD.xml"/>
+	<xi:include href="TB4GeV1TRun500SVD-moreThan1500MeV_SVD.xml"/>
+	<xi:include href="TB4GeV1TRun500PXD-moreThan1500MeV_VXD.xml"/>
+	
 	
 <!-- 	<xi:include href="TBTelescope6GeVNoMagnetVXD-moreThan1500MeV_VXD.xml"/> -->
 <!-- 	<xi:include href="TBTelescope6GeVNoMagnetSVD-moreThan1500MeV_SVD.xml"/> -->

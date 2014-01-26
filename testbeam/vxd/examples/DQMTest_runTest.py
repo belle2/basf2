@@ -3,10 +3,21 @@
 
 import os
 from basf2 import *
+# This is testbeam/vxd/scripts/setup_vxdtf.py
+from setup_vxdtf import *
+
+# fieldOn = True
+fieldOn = True
+
+# flag to use if the PXD is in place and should be used in the Reconstruction
+havePXD = False
 
 # Register modules
 input = register_module('RootInput')
-input.param('inputFileName', 'TBSimulation.root')
+if fieldOn:
+    input.param('inputFileName', 'TBSimulationWBfield.root')
+else:
+    input.param('inputFileName', 'TBSimulation.root')
 
 # Histogram manager immediately after master module
 histo = register_module('HistoManager')
@@ -18,12 +29,18 @@ progress = register_module('Progress')
 # Load parameters from xml
 gearbox = register_module('Gearbox')
 # VXD (no Telescopes), and the real PCMAG magnetic field
-gearbox.param('fileName', 'testbeam/vxd/FullTelescopeVXDTB_v1.xml')
+if havePXD:
+    gearbox.param('fileName', 'testbeam/vxd/FullTelescopeVXDTB_v2.xml')
+else:
+    gearbox.param('fileName', 'testbeam/vxd/FullTelescopeVXDTB_v1.xml')
 
 # Create geometry
 geometry = register_module('Geometry')
 # No magnetic field for this test,
-geometry.param('components', ['TB'])
+if fieldOn:
+    geometry.param('components', ['MagneticField', 'TB'])
+else:
+    geometry.param('components', ['TB'])
 
 # PXD rawhit sorter: convert PXDRawHits to PXDDigits. .
 PXDSort = register_module('PXDRawHitSorter')
@@ -32,7 +49,7 @@ PXDSort.param('mergeFrames', False)
 # PXD clusterizer
 PXDClust = register_module('PXDClusterizer')
 PXDClust.param('TanLorentz', 0.)
-#SVD sorter
+# SVD sorter
 SVDSort = register_module('SVDDigitSorter')
 SVDSort.param('mergeDuplicates', False)
 # Use the list of ignored strips. _Verbatim_ path, this is not Gear.
@@ -55,55 +72,20 @@ tel_dqm.param('Clusters', 'TelClusters')
 
 # VXDTF:
 ## parameters:
-secSetup = ['TB6GeVNoMagnetSVD-moreThan1500MeV_SVD']
-qiType = 'circleFit'
-filterOverlaps = 'hopfield'  # hopfield
-#
-vxdtf = register_module('VXDTF')
-vxdtf.logging.log_level = LogLevel.INFO
-vxdtf.logging.debug_level = 1
-param_vxdtf = {
-    'activateBaselineTF': 1,
-    'tccMinState': [2],
-    'tccMinLayer': [3],
-    'standardPdgCode': -11,
-    'artificialMomentum': 5.,
-    'sectorSetup': secSetup,
-    'calcQIType': qiType,
-    'killEventForHighOccupancyThreshold': 75,
-    'highOccupancyThreshold': 85,
-    'cleanOverlappingSet': False,
-    'filterOverlappingTCs': filterOverlaps,
-    'TESTERexpandedTestingRoutines': False,
-    'qiSmear': False,
-    'smearSigma': 0.000001,
-    'GFTrackCandidatesColName': 'caTracks',
-    'tuneCutoffs': 4,
-    'activateDistanceXY': [False],
-    'activateDistanceZ': [True],
-    'activateDistance3D': [True],
-    'activateAngles3DHioC': [False],
-    'activateAnglesXYHioC': [False],
-    'activateDeltaSlopeRZHioC': [False],
-    'activateDistance2IPHioC': [False],
-    'activatePTHioC': [False],
-    'activateHelixFitHioC': [False],
-    'activateDeltaPtHioC': [False],
-    'activateDeltaDistance2IPHioC': [False],
-    'activateAngles3D': [True],
-    'activateAnglesXY': [False],
-    'activateAnglesRZ': [True],
-    'activateDeltaSlopeRZ': [False],
-    'activateDistance2IP': [False],
-    'activatePT': [False],
-    'activateHelixFit': [False],
-    'activateZigZagXY': [False],
-    'activateDeltaPt': [False],
-    'activateCircleFit': [True],
-    'tuneCircleFit': [0],
-    'tuneDistanceZ': [1.2],
-    }
-vxdtf.param(param_vxdtf)
+if havePXD:
+    if fieldOn:
+        VXDTF = setup_vxdtf1T('caTracks',
+                              ['TB4GeV1TRun500PXD-moreThan1500MeV_VXD'])
+    else:
+        VXDTF = setup_vxdtf('caTracks',
+                            ['TB6GeVNoMagnetVXD-moreThan1500MeV_VXD'])
+else:
+    if fieldOn:
+        VXDTF = setup_vxdtf1T('caTracks',
+                              ['TB4GeV1TRun500SVD-moreThan1500MeV_SVD'])
+    else:
+        VXDTF = setup_vxdtf('caTracks',
+                            ['TB6GeVNoMagnetSVD-moreThan1500MeV_SVD'])
 
 trackfitter = register_module('GenFitter')
 # trackfitter.logging.log_level = LogLevel.WARNING
@@ -135,7 +117,7 @@ main.add_module(TelClust)
 main.add_module(pxd_dqm)
 main.add_module(svd_dqm)
 main.add_module(tel_dqm)
-main.add_module(vxdtf)
+main.add_module(VXDTF)
 main.add_module(trackfitter)
 main.add_module(vxdtf_dqm)
 main.add_module(output)

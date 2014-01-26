@@ -74,18 +74,18 @@ tel_dqm.param('Clusters', 'TelClusters')
 ## parameters:
 if havePXD:
     if fieldOn:
-        VXDTF = setup_vxdtf1T('caTracks',
-                              ['TB4GeV1TRun500PXD-moreThan1500MeV_VXD'])
+        VXDTF = setup_vxdtf('caTracks',
+                            ['TB4GeV1TRun500PXD-moreThan1500MeV_VXD'])  # WARNING not working yet!
     else:
         VXDTF = setup_vxdtf('caTracks',
-                            ['TB6GeVNoMagnetVXD-moreThan1500MeV_VXD'])
+                            ['testBeamMini6GeVVXD-moreThan1500MeV_VXD'])
 else:
     if fieldOn:
         VXDTF = setup_vxdtf1T('caTracks',
                               ['TB4GeV1TRun500SVD-moreThan1500MeV_SVD'])
     else:
-        VXDTF = setup_vxdtf('caTracks',
-                            ['TB6GeVNoMagnetSVD-moreThan1500MeV_SVD'])
+        VXDTF = setup_vxdtf1T('caTracks',
+                              ['TB6GeVNoMagnetSVD-moreThan1500MeV_SVD'])
 
 trackfitter = register_module('GenFitter')
 # trackfitter.logging.log_level = LogLevel.WARNING

@@ -75,7 +75,7 @@ tel_dqm.param('Clusters', 'TelClusters')
 if havePXD:
     if fieldOn:
         VXDTF = setup_vxdtf('caTracks',
-                            ['TB4GeV1TRun500PXD-moreThan1500MeV_VXD'])  # WARNING not working yet!
+                            ['TB4GeV1TRun500VXD-moreThan1500MeV_VXD'])  # WARNING not working yet!
     else:
         VXDTF = setup_vxdtf('caTracks',
                             ['testBeamMini6GeVVXD-moreThan1500MeV_VXD'])

@@ -264,7 +264,7 @@ main(int argc, char* argv[])
   unsigned short accept_port[MM_MAX_HLTOUT];
 
 
-  LOG_FPRINTF(stderr, "merger_merge: Process invoked [verB]\n");
+  LOG_FPRINTF(stderr, "merger_merge: Process invoked [ver(%s %s)]\n", __DATE__, __TIME__);
 
   if (argc < 4) {
     ERR_FPRINTF(stderr, "merger_merge: Usage: merger_merge onsen-host onsen-port client-port#1[:client-port#2[:...]]\n");
@@ -299,7 +299,7 @@ main(int argc, char* argv[])
         ERROR(MM_init_accept_from_hltout2merger);
         exit(1);
       }
-      LOG_FPRINTF(stderr, "merger_merge: MM_init_accept_from_hltout2merger()[%d]: Connection from HLTOUT\n", __FILE__, __LINE__, i);
+      LOG_FPRINTF(stderr, "merger_merge: MM_init_accept_from_hltout2merger()[%d]: Connection from HLTOUT\n", i);
     }
   }
 
@@ -311,7 +311,7 @@ main(int argc, char* argv[])
       if (sd_con != -1) close(sd_con);
 
       /* connect to onsen untill connected */
-      {
+      for (;;) {
         int sleep_sec = 2;
 
         sd_con = MM_init_connect_to_onsen(onsen_host, onsen_port);
@@ -319,6 +319,7 @@ main(int argc, char* argv[])
           /* connected: move to the recv->send loop */
           need_reconnection_to_onsen = 0;
           event_count = 0;
+          LOG_FPRINTF(stderr, "merger_merge: MM_init_connect_to_onsen(): Connected to ONSEN\n");
           break;
         }
 
@@ -408,6 +409,7 @@ main(int argc, char* argv[])
     continue;
 
 ERROR_HANDLING:
+    ERR_FPRINTF(stderr, "merger_merge: Error -- retry\n");
     1;
   }
 

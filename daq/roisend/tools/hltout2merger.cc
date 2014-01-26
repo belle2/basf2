@@ -1,4 +1,4 @@
-/* hltout2merger.cc */
+/* hltout_roi_pass.c */
 
 #include <stdio.h>
 #include <unistd.h>
@@ -22,8 +22,11 @@
 using namespace std;
 
 
-#define LOG_FPRINTF (fprintf)
-#define ERR_FPRINTF (fprintf)
+/* HRP_DEBUG<=0 ... no debug, HRP_DEBUG==1 ... data dump to file, HRP_DEBUG==2 ... data dump to stderr */
+#define HRP_DEBUG (0)
+
+
+FILE* HRP_debug_fp;
 
 
 /* connect */
@@ -49,7 +52,7 @@ HRP_init_connect_to_merger_meger(const char* host, const unsigned short port)
       return -1;
 
     case  0:
-      ERR_FPRINTF(stderr, "hltout2merger: connect(): Connection timed out (%d secs)\n", NETWORK_ESTABLISH_TIMEOUT);
+      fprintf(stderr, "%s:%d: connect(): Connection timed out (%d secs)\n", NETWORK_ESTABLISH_TIMEOUT);
       return -1;
 
     case  1: {
@@ -63,7 +66,7 @@ HRP_init_connect_to_merger_meger(const char* host, const unsigned short port)
         return -1;
       }
       if (connection_error) {
-        ERR_FPRINTF(stderr, "hltout2merger: connect(): %s\n", strerror(errno));
+        fprintf(stderr, "%s:%d: connect(): %s\n", __FILE__, __LINE__, strerror(errno));
         return -1;
       }
 
@@ -71,7 +74,7 @@ HRP_init_connect_to_merger_meger(const char* host, const unsigned short port)
     }
 
     default:
-      ERR_FPRINTF(stderr, "hltout2merger: poll(): Unexpected error\n");
+      fprintf(stderr, "%s:%d: poll(): Unexpected error\n", __FILE__, __LINE__);
       return -1;
   }
 
@@ -97,8 +100,6 @@ HRP_init_mqueue(void)
 
   if (name[0] != '/' || strchr(name + 1, '/')) { errno = EINVAL; return -1;}
 
-#if 1
-
   ret = mq_unlink(name);
   if (ret == (mqd_t) - 1 && errno != ENOENT) {
     ERROR(mq_unlink);
@@ -117,18 +118,6 @@ HRP_init_mqueue(void)
     return (mqd_t) - 1;
   }
 
-#else
-
-  ret = mq_open(name, O_RDONLY);
-  if (ret == (mqd_t) - 1) {
-    ERROR(mq_open);
-    return (mqd_t) - 1;
-  }
-
-#endif
-
-  LOG_FPRINTF(stderr, "hltout2merger: mq_open(): Succeeded\n");
-
 
   return ret;
 }
@@ -144,6 +133,7 @@ HRP_build_header(struct h2m_header_t* h, const unsigned char* roi, const size_t 
   h->h_n_words           = htonl(n_words_total);
   h->h_n_words_in_header = htonl(sizeof(struct h2m_header_t) / sizeof(unsigned int));
   h->h_reserved[0]       = 0x02701144;
+  h->h_reserved[1]       = 0x02410835;
   h->h_marker            = 0x5f5f5f5f;
 
 
@@ -183,7 +173,7 @@ HRP_roi_get(const mqd_t mqd, void* buf, const int timeout /* secs */)
 
     ret = mq_timedreceive(mqd, (char*)ptr, ROI_MAX_PACKET_SIZE, 0 /* priority */, &ts);
     if (ret == (mqd_t) - 1 && errno == ETIMEDOUT) {
-      ERR_FPRINTF(stderr, "hltout2merger: mq_timedreceive(): Message time out (%d secs)\n", timeout);
+      fprintf(stderr, "%s:%d: mq_timedreceive(): Message time out (%d secs)\n", __FILE__, __LINE__, timeout);
       return (ssize_t) - 1;
     }
   }
@@ -227,26 +217,40 @@ main(int argc, char* argv[])
   unsigned short merger_port;
 
 
-  LOG_FPRINTF(stderr, "hltout2merger: Process invoked [verC]\n");
-
   if (argc < 3) {
-    ERR_FPRINTF(stderr, "hltout2merger: Usage: hltout2merger merger-host merger-port\n");
-    exit(1);
+    printf("hltout2merger : mergerhost mergerport\n");
+    exit(-1);
   }
 
-  /* argv copy */
+  /* environmental variable check */
   {
     char* p;
     p = argv[1];
+    //    p = getenv("ROI_MERGER_HOST");
+    if (!p) {
+      fprintf(stderr, "%s:%d: main(): export \"ROI_MERGER_HOST\"\n", __FILE__, __LINE__);
+      exit(1);
+    }
     strcpy(merger_host, p);
 
     p = argv[2];
+    //    p = getenv("ROI_MERGER_PORT");
+    if (!p) {
+      fprintf(stderr, "%s:%d: main(): export \"ROI_MERGER_PORT\"\n", __FILE__, __LINE__);
+      exit(1);
+    }
     merger_port = atoi(p);
   }
 
 
   /* initialization */
   {
+    if (HRP_DEBUG > 0) {
+      char buf[256];
+      sprintf(buf, "./data.roi.%05d.dat", getpid());
+      HRP_debug_fp = HRP_DEBUG > 1 ? stderr : fopen(buf, "w");
+    }
+
     signal(SIGPIPE, SIG_IGN);
 
     sd = HRP_init_connect_to_merger_meger(merger_host, merger_port);
@@ -254,14 +258,14 @@ main(int argc, char* argv[])
       ERROR(HRP_init_connect_to_merger_meger);
       exit(1);
     }
-    LOG_FPRINTF(stderr, "hltout2merger: Connected to MERGER_MERGE\n");
+    printf("%s:%d: main(): Connected to MERGER_MERGE\n", __FILE__, __LINE__);
 
     mqd = HRP_init_mqueue();
     if (mqd == (mqd_t) - 1) {
       ERROR(HRP_init_mqueue);
       exit(1);
     }
-    LOG_FPRINTF(stderr, "hltout2merger: Ready to accept RoI\n");
+    printf("%s:%d: main(): Ready to accept RoI\n", __FILE__, __LINE__);
   }
 
   /* forever (mq_receive -> send) */
@@ -290,19 +294,9 @@ main(int argc, char* argv[])
 
       ptr_roi        = buf + n_bytes_header;
       n_bytes_roi    = HRP_roi_get(mqd, ptr_roi, ROI_IO_TIMEOUT);
-
       if (n_bytes_roi == -1) {
         ERROR(n_bytes_roi);
         exit(1);
-      }
-
-      if (i < 40 || i % 10000 == 0)
-        // if( i%10==0 )
-      {
-        LOG_FPRINTF(stderr, "hltout2merger: ---- [%d] mq_received event from ROI queue\n", i);
-        LOG_FPRINTF(stderr, "hltout2merger: HRP_roi_get() Returned %d\n", n_bytes_roi);
-
-        dump_binary(stderr, ptr_roi, n_bytes_roi);
       }
 
       ptr_header     = buf;
@@ -313,6 +307,12 @@ main(int argc, char* argv[])
 
       ptr_packet     = buf;
       n_bytes_packet = n_bytes_header + n_bytes_roi + n_bytes_footer;
+
+      if (HRP_DEBUG > 0) {
+        static int event = 1;
+        fprintf(HRP_debug_fp, "---- mq_received event [%d]\n", event++);
+        dump_binary(HRP_debug_fp, ptr_packet, n_bytes_packet);
+      }
     }
 
     /* send packet */
@@ -325,15 +325,14 @@ main(int argc, char* argv[])
         exit(1);
       }
       if (ret == 0) {
-        ERR_FPRINTF(stderr, "hltout2merger: b2_send(): Connection closed\n");
+        fprintf(stderr, "%s:%d: b2_send(): Connection closed\n", __FILE__, __LINE__);
         exit(1);
       }
 
-      if (i < 40 || i % 10000 == 0)
-        // if( i%10==0 )
-      {
-        LOG_FPRINTF(stderr, "hltout2merger: ---- [%d] b2_send event\n", i);
-        dump_binary(stderr, ptr_packet, n_bytes_packet);
+      if (HRP_DEBUG > 0) {
+        static int event = 1;
+        fprintf(HRP_debug_fp, "---- b2_send event [%d]\n", event++);
+        dump_binary(HRP_debug_fp, ptr_packet, n_bytes_packet);
       }
     }
 

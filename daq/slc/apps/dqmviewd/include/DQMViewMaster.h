@@ -3,7 +3,8 @@
 
 #include "daq/slc/apps/dqmviewd/DQMFileReader.h"
 
-#include <daq/slc/system/Fork.h>
+#include "daq/slc/readout/ProcessController.h"
+
 #include <daq/slc/system/Cond.h>
 
 #include <daq/slc/base/State.h>
@@ -21,6 +22,7 @@ namespace Belle2 {
       _reader_v.push_back(DQMFileReader(pack_name, file_path));
       _port_v.push_back(port);
     }
+    void init();
     bool boot();
     bool abort();
     std::vector<DQMFileReader>& getReaders() { return _reader_v; }
@@ -42,25 +44,8 @@ namespace Belle2 {
     unsigned int _expno;
     unsigned int _runno;
     std::vector<DQMFileReader> _reader_v;
+    std::vector<ProcessController> _con_v;
     std::vector<int> _port_v;
-    std::vector<Fork> _fork_v;
-
-  };
-
-  class HSeverExecutor {
-
-  public:
-    HSeverExecutor(int port, const std::string& mapfile,
-                   const std::string& dir)
-      : _port(port), _mapfile(mapfile), _dir(dir) {}
-
-  public:
-    void run();
-
-  private:
-    int _port;
-    std::string _mapfile;
-    std::string _dir;
 
   };
 

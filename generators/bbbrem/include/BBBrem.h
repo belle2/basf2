@@ -36,7 +36,7 @@ namespace Belle2 {
     /** Constructor. */
 
     BBBrem() :
-      //m_eventCount(0),
+      m_eventCount(0),
       m_applyBoost(false),
       m_unweighted(true),
       m_maxWeight(0.0),
@@ -122,7 +122,7 @@ namespace Belle2 {
 
   protected:
 
-    //int m_eventCount;               /**< Internal event counter. Used to calculate the cross-section. */
+    int m_eventCount;               /**< Internal event counter. Used to calculate the cross-section. */
     bool m_applyBoost;              /**< Apply a boost to the MCParticles. */
     bool m_unweighted;              /**< True if BBBrem should produce unweighted events. */
     long m_weightCount;             /**< Internal weighted event counter. Used to calculate the cross-section. */

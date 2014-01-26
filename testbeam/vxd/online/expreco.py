@@ -6,7 +6,7 @@ import sys
 
 from basf2 import *
 # This is testbeam/vxd/scripts/setup_vxdtf.py
-from setup_vxdtf import setup_vxdtf
+from setup_vxdtf import *
 # from simulation import register_simulation
 # from reconstruction import register_reconstruction
 

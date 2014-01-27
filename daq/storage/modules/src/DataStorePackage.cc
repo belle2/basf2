@@ -19,17 +19,8 @@
 
 using namespace Belle2;
 
-Mutex DataStorePackage::g_mutex;
-bool DataStorePackage::g_init = false;
-
-bool DataStorePackage::decode(MsgHandler& msghandler, BinData& data)
+bool DataStorePackage::decode(MsgHandler& msghandler)
 {
-  if (data.getWordSize() > MAX_BUFFER_WORDS) {
-    B2ERROR(__FILE__ << ":" << __LINE__ << " Too large data size " << data.getByteSize());
-    return false;
-  }
-  memcpy(m_buf, data.getBuffer(), data.getByteSize());
-  m_data.setBuffer(m_buf);
   int nboard = m_data.getNBoard();
   if (nboard == 1) {
     m_data_hlt.setBuffer(m_data.getBuffer());
@@ -87,9 +78,8 @@ bool DataStorePackage::decode(MsgHandler& msghandler, BinData& data)
   return true;
 }
 
-void DataStorePackage::restore()
+void DataStorePackage::restore(bool init)
 {
-  g_mutex.lock();
   bool is_array = false;
   for (int i = 0; i < m_nobjs + m_narrays; i++) {
     if (m_objlist.at(i) != NULL) {
@@ -98,7 +88,7 @@ void DataStorePackage::restore()
       const TClass* cl = obj->IsA();
       if (is_array)
         cl = static_cast<TClonesArray*>(obj)->GetClass();
-      if (!g_init) {
+      if (!init) {
         bool is_transient = obj->TestBit(c_IsTransient);
         DataStore::Instance().createEntry(m_namelist.at(i), m_durability, cl, is_array, is_transient, false);
       }
@@ -121,8 +111,6 @@ void DataStorePackage::restore()
     StoreArray<RawPXD> rawpxdary;
     rawpxdary.appendNew(RawPXD((int*)m_data_pxd.getBody(), m_data_pxd.getBodyByteSize()));
   }
-  if (!g_init) g_init = true;
-  g_mutex.unlock();
 }
 
 void DataStorePackage::copy(DataStorePackage& package)

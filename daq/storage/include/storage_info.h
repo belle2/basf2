@@ -4,14 +4,15 @@
 const int storage_info_revision = 1;
 
 struct storage_info {
+  unsigned int nodeid;
   unsigned int expno;
   unsigned int runno;
   unsigned int subno;
   unsigned int evtno;
-  unsigned int nevts;
-  unsigned int nfiles;
-  unsigned long long start_time_tag;
-  unsigned long long time_tag;
+  unsigned long long stime;
+  unsigned long long ctime;
+  unsigned int count_in;
+  unsigned int count_out;
   unsigned long long nword_in;
   unsigned long long nword_out;
 };

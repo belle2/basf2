@@ -40,7 +40,6 @@ roipayload = register_module('ROIPayloadAssembler')
 # deserializer.param('RingBufferName', argv[1])
 deserializer = register_module('StorageDeserializer')
 deserializer.param('InputBufferName', argv[1])
-deserializer.param('NumThreads', 1)
 if len(argv) >= 6:
     deserializer.param('NodeName', argv[4])
     deserializer.param('UseShmFlag', int(argv[6]))

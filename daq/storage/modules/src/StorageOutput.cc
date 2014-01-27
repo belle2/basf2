@@ -137,17 +137,9 @@ void StorageOutputModule::event()
     data.rate = m_datasize / length / 1000000.;
     B2INFO("Count = " << m_nevts << ", Freq = " << data.freq << " [kHz], "
            << "Rate = " << data.rate << " [MB/s], DataSize = "
-           << m_datasize / 10000. / 1000 << " [kB/event]");
+           << data.evtsize / 1000. << " [kB/event]");
     data.evtno = evtmetadata->getEvent();
     data.nevts = m_nevts;
-    RunInfoBuffer* info = StorageDeserializerModule::getInfo();
-    if (info != NULL) {
-      storager_data* p_data = (storager_data*)info->getReserved();
-      info->lock();
-      memcpy(p_data, &data, sizeof(data));
-      info->notify();
-      info->unlock();
-    }
     m_datasize = 0;
   }
 }

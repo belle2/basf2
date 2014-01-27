@@ -9,9 +9,7 @@
 #include <unistd.h>
 #include <cstdlib>
 
-#include <framework/pcore/RingBuffer.h>
 #include <framework/logging/Logger.h>
-#include "daq/rfarm/event/RawRevSock2Rb.h"
 
 #include <daq/storage/BinData.h>
 #include <daq/storage/SharedEventBuffer.h>
@@ -19,6 +17,7 @@
 #include <daq/slc/readout/RunInfoBuffer.h>
 
 #include <daq/slc/system/TCPSocket.h>
+#include <daq/slc/system/TCPSocketReader.h>
 #include <daq/slc/system/Time.h>
 #include <daq/slc/base/Debugger.h>
 
@@ -31,70 +30,77 @@ int main(int argc, char** argv)
     return 1;
   }
   RunInfoBuffer info;
+  storage_info* sinfo = NULL;
   bool use_info = (argc > 4);
-  if (use_info) info.open(argv[4]);
-  /*
-  RingBuffer* rbuf = new RingBuffer(argv[1], 100000000);
-  rbuf->cleanup();
-  delete rbuf;
-  rbuf = new RingBuffer(argv[1], 100000000);
-  */
+  if (use_info) {
+    info.open(argv[4], sizeof(storage_info) / sizeof(int));
+    sinfo = (storage_info*)info.getReserved();
+    sinfo->nodeid = atoi(argv[5]);
+  }
   SharedEventBuffer* buf = new SharedEventBuffer();
-  buf->open(argv[1], 1000000, true);
+  buf->open(argv[1], 25000000, true);
   buf->init();
-  RSocketRecv* socket = new RSocketRecv(argv[2], atoi(argv[3]));
+  TCPSocket socket(argv[2], atoi(argv[3]));
   B2INFO("storagein: Connected to eb2.");
   info.reportRunning();
-  int* evtbuf = new int[100000000];
-  int nrec = 0;
-  bool connected = true;
+  int* evtbuf = new int[1000000];
   BinData data;
   data.setBuffer(evtbuf);
-  double datasize = 0;
+  unsigned long long nword = 0;
   Time t0;
-  unsigned int expno = 0;
-  unsigned int runno = 0;
-  unsigned int evtno = 0;
+  unsigned int count = 0;
+  int expno = 0;
+  int runno = 0;
+  int ntry = 0;
   while (true) {
-    while (true) {
-      int bufsize = socket->get_wordbuf(evtbuf, 100000000);
-      if (bufsize <= 0 && connected) {
-        B2WARNING("storagein: Connection to eb2 broken.");
-        connected = false;
-        break;
-      } else if (bufsize == 0) {
-        break;
-      }
-      if (expno > data.getExpNumber() || runno > data.getRunNumber()) {
-        B2INFO("old run event detected : exp=" << data.getExpNumber() << " runno=" << data.getRunNumber() <<
-               " current = (" << expno << "," << runno << ")");
-        continue;
-      } else if (expno < data.getExpNumber() || runno < data.getRunNumber()) {
-        expno = data.getExpNumber();
-        runno = data.getRunNumber();
-      }
-      /*
-      int stat = 0;
+    try {
+      socket.connect();
+      socket.setBufferSize(4 * 1024 * 1024);
+      ntry = 0;
+    } catch (const IOException& e) {
+      socket.close();
+      B2WARNING("storagein: failed to connect to eb2 (try=" << ntry++ << ")");
+      sleep(5);
+      continue;
+    }
+    try {
+      TCPSocketReader reader(socket);
+      B2INFO("storagein: Cconnected to eb2.");
       while (true) {
-        stat = rbuf->insq(evtbuf, bufsize);
-        if (stat >= 0) break;
-        usleep(20);
+        reader.read(evtbuf, sizeof(int));
+        reader.read((evtbuf + 1), (evtbuf[0] - 1) * sizeof(int));
+        if (expno > data.getExpNumber() || runno > data.getRunNumber()) {
+          B2INFO("storagein: old run event detected : exp=" << data.getExpNumber() <<
+                 " runno=" << data.getRunNumber() <<
+                 " current = (" << expno << "," << runno << ")");
+          continue;
+        } else if (expno < data.getExpNumber() || runno < data.getRunNumber()) {
+          expno = data.getExpNumber();
+          runno = data.getRunNumber();
+          B2INFO("storagein: new run detected : exp=" << expno << " runno=" << runno);
+          if (sinfo != NULL) {
+            sinfo->expno = expno;
+            sinfo->runno = runno;
+            sinfo->subno = 0;
+            sinfo->stime = Time().getSecond();
+            count = 0;
+          }
+        }
+        buf->write(evtbuf, evtbuf[0]);
+        count++;
+        nword += data.getWordSize();
+        if (sinfo != NULL && count % 1000 == 0) {
+          sinfo->evtno = data.getEventNumber();
+          sinfo->nword_in = sinfo->nword_out = nword;
+          sinfo->count_in = sinfo->count_out = count;
+          sinfo->ctime = Time().getSecond();
+        }
       }
-      */
-      buf->write(evtbuf, bufsize);
-      nrec++;
-      datasize += data.getByteSize();
+    } catch (const IOException& e) {
+      socket.close();
+      B2WARNING("storagein: Connection to eb2 broken.");
+      sleep(5);
     }
-    while (true) {
-      if (socket->reconnect(5000) == -1) {
-        connected = false;
-      } else {
-        info.reportRunning();
-        connected = true;
-        break;
-      }
-    }
-    B2INFO("storagein: Reconnected to eb2.");
   }
   return 0;
 }

@@ -11,23 +11,27 @@ namespace Belle2 {
 
   class SharedEventBuffer {
 
-  private:
-    static const int MAX_BUFFERS = 1000;
+  public:
+    struct Header {
+      unsigned int count_in;
+      unsigned int count_out;
+      unsigned long long nword_in;
+      unsigned long long nword_out;
+    };
 
   public:
     SharedEventBuffer() {
-      _buf = new int* [MAX_BUFFERS];
+      _buf = NULL;
       _nword = 0;
     }
     ~SharedEventBuffer() {
-      delete [] _buf;
+      if (_buf != NULL) _memory.close();
     }
 
   public:
     size_t size() throw();
     bool open(const std::string& nodename,
-              size_t nreserved = 0,
-              bool recreate = false);
+              size_t nword, bool recreate = false);
     bool init();
     bool close();
     bool unlink();
@@ -40,23 +44,21 @@ namespace Belle2 {
 
   public:
     const std::string getPath() const throw() { return _path; }
-    storage_info* getInfo() throw() { return _info; }
-    char* getPtr() throw() { return _ptr; }
-    int write(const void* buf, size_t nword);
-    int read(void* buf);
+    Header* getHeader() throw() { return _header; }
+    int* getBuffer() throw() { return _buf; }
+    bool isWritable(int nword) throw();
+    bool isReadable(int nword) throw();
+    unsigned int write(const int* buf, unsigned int nword, unsigned int serial = 0);
+    unsigned int read(int* buf);
 
   private:
     std::string _path;
     SharedMemory _memory;
-    char* _ptr;
     MMutex _mutex;
     MCond _cond;
-    storage_info* _info;
-    int* _i_read;
-    int* _i_write;
-    int* _ready;
-    int** _buf;
-    size_t _nword;
+    Header* _header;
+    int* _buf;
+    unsigned int _nword;
 
   };
 

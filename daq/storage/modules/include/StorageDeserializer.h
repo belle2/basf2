@@ -10,15 +10,10 @@
 #define STORAGEDESERIALIZER_H
 
 #include <framework/core/Module.h>
-#include <framework/pcore/EvtMessage.h>
-#include <framework/pcore/MsgHandler.h>
-#include <framework/pcore/RingBuffer.h>
-#include <framework/pcore/DataStoreStreamer.h>
 #include <framework/datastore/StoreArray.h>
 
-#include <rawdata/dataobjects/RawPXD.h>
-
 #include <daq/storage/SharedEventBuffer.h>
+#include <daq/storage/storage_info.h>
 
 #include <daq/slc/system/PThread.h>
 #include <daq/slc/readout/RunInfoBuffer.h>
@@ -38,13 +33,12 @@ namespace Belle2 {
   /*! A class definition of an input module for Sequential ROOT I/O */
   class StorageDeserializerModule : public Module {
 
-  public:
-    static RunInfoBuffer* getInfo() { return g_info; }
-    static DataStorePackage* getPackage() { return g_package; }
-
   private:
-    static RunInfoBuffer* g_info;
-    static DataStorePackage* g_package;
+    static StorageDeserializerModule* g_module;
+
+  public:
+    static DataStorePackage& getPackage() { return g_module->m_package; }
+    static RunInfoBuffer& getInfo() { return g_module->m_info; }
 
     // Public functions
   public:
@@ -61,35 +55,21 @@ namespace Belle2 {
     virtual void endRun();
     virtual void terminate();
 
-    void queueEvent();
-    void storeEvent();
-
   private:
-    DataStorePackage* m_package;
-    DataStorePackage* m_package_q;
-    unsigned int m_package_length;
-    unsigned int m_package_i;
-    std::string m_inputbufname;
-    SharedEventBuffer* m_shared;
-    RingBuffer* m_inputbuf;
-    StorageRBufferManager* m_buf;
-    MsgHandler* m_msghandler;
-    DataStoreStreamer* m_streamer;
-    RunInfoBuffer* m_info;
-    bool m_running;
+    DataStorePackage m_package;
+    std::string m_ibuf_name;
+    SharedEventBuffer m_ibuf;
+    RunInfoBuffer m_info;
+    storage_info* m_sinfo;
     int m_compressionLevel;
-    int m_nrecv;
-    BinData m_data;
-    BinData m_data_hlt;
-    BinData m_data_pxd;
     int m_nodeid;
     std::string m_nodename;
     int m_shmflag;
-    int m_numThread;
-    StoreArray<RawPXD> m_raw_pxds;
+    unsigned int m_count;
     unsigned int m_expno;
     unsigned int m_runno;
     unsigned int m_evtno;
+    unsigned long long m_datasize;
 
   };
 

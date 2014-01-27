@@ -8,14 +8,12 @@
 
 #include <daq/storage/modules/StorageDeserializer.h>
 
-#include "daq/storage/storager_data.h"
-#include "daq/storage/modules/StorageWorker.h"
-#include "daq/storage/modules/DataStorePackage.h"
-
-#include "framework/datastore/StoreObjPtr.h"
-#include "framework/dataobjects/EventMetaData.h"
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/dataobjects/EventMetaData.h>
 
 #include <framework/datastore/StoreArray.h>
+
+#include <rawdata/dataobjects/RawPXD.h>
 
 #include <daq/slc/base/Debugger.h>
 #include <daq/slc/base/StringUtil.h>
@@ -37,28 +35,21 @@ REG_MODULE(StorageDeserializer)
 //                 Implementation
 //-----------------------------------------------------------------
 
-RunInfoBuffer* StorageDeserializerModule::g_info = NULL;
-DataStorePackage* StorageDeserializerModule::g_package = NULL;
+StorageDeserializerModule* StorageDeserializerModule::g_module = NULL;
 
 StorageDeserializerModule::StorageDeserializerModule() : Module()
 {
   setDescription("Encode DataStore into RingBuffer");
 
   addParam("CompressionLevel", m_compressionLevel, "Compression level", 0);
-  addParam("InputBufferName", m_inputbufname, "Name of RingBuffer", std::string(""));
+  addParam("InputBufferName", m_ibuf_name, "Input buffer name", std::string(""));
   addParam("NodeID", m_nodeid, "Node(subsystem) ID", 0);
   addParam("NodeName", m_nodename, "Node(subsystem) name", std::string(""));
   addParam("UseShmFlag", m_shmflag, "Use shared memory to communicate with Runcontroller", 0);
-  addParam("NumThreads", m_numThread, "Number of threads for object decoding", 1);
 
-  m_inputbuf = NULL;
-  m_nrecv = 0;
-  m_running = false;
-  m_package_q = NULL;
-  m_package_length = m_package_i = 0;
-  m_package = new DataStorePackage();
-  g_package = m_package;
+  m_count = 0;
   B2INFO("StorageDeserializer: Constructor done.");
+  g_module = this;
 }
 
 
@@ -69,36 +60,30 @@ StorageDeserializerModule::~StorageDeserializerModule()
 void StorageDeserializerModule::initialize()
 {
   B2INFO("StorageDeserializer: initialize() started.");
-  m_shared = new SharedEventBuffer();
-  m_shared->open(m_inputbufname, 1000000);
-  if (m_buf == NULL) {
-    m_buf = new StorageRBufferManager(m_inputbuf);
-  }
+  m_ibuf.open(m_ibuf_name, 25000000);
   if (m_shmflag > 0) {
     if (m_nodename.size() == 0 || m_nodeid < 0) {
       m_shmflag = 0;
     } else {
-      m_info = new RunInfoBuffer();
-      m_info->open(m_nodename, sizeof(storager_data) / 4);
-      g_info = m_info;
+      m_info.open(m_nodename, sizeof(storage_info) / sizeof(int));
+      m_sinfo = (storage_info*)m_info.getReserved();
+      memset(m_sinfo, 0, sizeof(storage_info));
     }
   }
   StoreArray<RawPXD>::registerPersistent();
   if (m_shmflag > 0) {
-    m_info->reportRunning();
-    m_running = true;
+    m_info.reportRunning();
   }
-  char* evtbuf = new char[10000000];
-  m_data.setBuffer(evtbuf);
-  int size = 0;
-  m_nrecv = -1;
+  m_count = 0;
   while (true) {
-    while ((size = m_shared->read((int*)evtbuf)) == 0) {
-      usleep(20);
-    }
+    m_package.setSerial(m_ibuf.read((int*)m_package.getData().getBuffer()));
     MsgHandler handler(m_compressionLevel);
-    if (m_package->decode(handler, m_data)) {
-      m_package->restore();
+    if (m_package.decode(handler)) {
+      m_package.restore(false);
+      if (m_info.isAvailable()) {
+        m_sinfo->count_in = 1;
+        m_sinfo->nword_in = m_package.getData().getWordSize();
+      }
       break;
     }
   }
@@ -107,19 +92,21 @@ void StorageDeserializerModule::initialize()
 
 void StorageDeserializerModule::event()
 {
-  m_nrecv++;
-  if (m_nrecv == 0) {
+  if (m_count == 0) {
+    m_count++;
     return;
   }
+  m_count++;
   while (true) {
-    int size = 0;
     while (true) {
-      while ((size = m_shared->read((int*)m_data.getBuffer())) == 0) {
-        usleep(20);
-      }
+      m_package.setSerial(m_ibuf.read((int*)m_package.getData().getBuffer()));
       MsgHandler handler(m_compressionLevel);
-      if (m_package->decode(handler, m_data)) {
-        m_package->restore();
+      if (m_package.decode(handler)) {
+        m_package.restore();
+        if (m_info.isAvailable()) {
+          m_sinfo->count_in++;
+          m_sinfo->nword_in += m_package.getData().getWordSize();
+        }
         break;
       }
     }
@@ -130,8 +117,11 @@ void StorageDeserializerModule::event()
       m_evtno = evtmetadata->getEvent();
       break;
     } else {
-      B2WARNING("NO event meta data " << m_data.getExpNumber() << "." << m_data.getRunNumber() << "." <<
-                m_data.getEventNumber() << " nword = " << m_data.getWordSize());
+      BinData& data();
+      B2WARNING("NO event meta data " << m_package.getData().getExpNumber() << "." <<
+                m_package.getData().getRunNumber() << "." <<
+                m_package.getData().getEventNumber() << " nword = " <<
+                m_package.getData().getWordSize());
       B2WARNING("Last event meta data " << m_expno << "." << m_runno << "." << m_evtno);
       DataStore::Instance().reset();
     }

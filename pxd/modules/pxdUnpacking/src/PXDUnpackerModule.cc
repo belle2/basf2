@@ -51,34 +51,34 @@ REG_MODULE(PXDUnpacker)
 
 unsigned int error_mask = 0;
 
-#define ONSEN_ERR_FLAG_FTSW_DHHC_MM 0x00000001
-#define ONSEN_ERR_FLAG_DHHC_DHH_MM  0x00000002
-#define ONSEN_ERR_FLAG_DHHC_DHP_MM  0x00000004
-#define ONSEN_ERR_FLAG_DHHC_START 0x00000008
-#define ONSEN_ERR_FLAG_DHHC_END   0x00000010
-#define ONSEN_ERR_FLAG_DHH_START  0x00000020
-#define ONSEN_ERR_FLAG_DHH_END    0x00000040
-#define ONSEN_ERR_FLAG_DATA_OUTSIDE 0x00000080
-#define ONSEN_ERR_FLAG_DHHC_START2  0x00000100
-#define ONSEN_ERR_FLAG_DHHC_END2  0x00000200
-#define ONSEN_ERR_FLAG_FIX_SIZE   0x00000400
-#define ONSEN_ERR_FLAG_DHH_CRC    0x00000800
-#define ONSEN_ERR_FLAG_DHHC_UNKNOWN   0x00001000
-#define ONSEN_ERR_FLAG_MERGER_CRC   0x00002000
-#define ONSEN_ERR_FLAG_PACKET_SIZE  0x00004000
-#define ONSEN_ERR_FLAG_MAGIC    0x00008000
-#define ONSEN_ERR_FLAG_FRAME_NR   0x00010000
-#define ONSEN_ERR_FLAG_FRAME_SIZE 0x00020000
-#define ONSEN_ERR_FLAG_HLTROI_MAGIC 0x00040000
-#define ONSEN_ERR_FLAG_MERGER_TRIGNR  0x00080000
-#define ONSEN_ERR_FLAG_DHP_SIZE   0x00100000
-#define ONSEN_ERR_FLAG_DHH_DHP_DHHID  0x00200000
-#define ONSEN_ERR_FLAG_DHH_DHP_PORT 0x00400000
-#define ONSEN_ERR_FLAG_DHP_PIX_WO_ROW 0x00800000
-#define ONSEN_ERR_FLAG_DHH_START_END_ID 0x01000000
-#define ONSEN_ERR_FLAG_DHH_START_ID 0x02000000
-#define ONSEN_ERR_FLAG_DHH_START_WO_END 0x04000000
-#define ONSEN_ERR_FLAG_NO_PXD   0x08000000
+#define ONSEN_ERR_FLAG_FTSW_DHHC_MM 0x00000001ul
+#define ONSEN_ERR_FLAG_DHHC_DHH_MM  0x00000002ul
+#define ONSEN_ERR_FLAG_DHHC_DHP_MM  0x00000004ul
+#define ONSEN_ERR_FLAG_DHHC_START 0x00000008ul
+#define ONSEN_ERR_FLAG_DHHC_END   0x00000010ul
+#define ONSEN_ERR_FLAG_DHH_START  0x00000020ul
+#define ONSEN_ERR_FLAG_DHH_END    0x00000040ul
+#define ONSEN_ERR_FLAG_DATA_OUTSIDE 0x00000080ul
+#define ONSEN_ERR_FLAG_DHHC_START2  0x00000100ul
+#define ONSEN_ERR_FLAG_DHHC_END2  0x00000200ul
+#define ONSEN_ERR_FLAG_FIX_SIZE   0x00000400ul
+#define ONSEN_ERR_FLAG_DHH_CRC    0x00000800ul
+#define ONSEN_ERR_FLAG_DHHC_UNKNOWN   0x00001000ul
+#define ONSEN_ERR_FLAG_MERGER_CRC   0x00002000ul
+#define ONSEN_ERR_FLAG_PACKET_SIZE  0x00004000ul
+#define ONSEN_ERR_FLAG_MAGIC    0x00008000ul
+#define ONSEN_ERR_FLAG_FRAME_NR   0x00010000ul
+#define ONSEN_ERR_FLAG_FRAME_SIZE 0x00020000ul
+#define ONSEN_ERR_FLAG_HLTROI_MAGIC 0x00040000ul
+#define ONSEN_ERR_FLAG_MERGER_TRIGNR  0x00080000ul
+#define ONSEN_ERR_FLAG_DHP_SIZE   0x00100000ul
+#define ONSEN_ERR_FLAG_DHH_DHP_DHHID  0x00200000ul
+#define ONSEN_ERR_FLAG_DHH_DHP_PORT 0x00400000ul
+#define ONSEN_ERR_FLAG_DHP_PIX_WO_ROW 0x00800000ul
+#define ONSEN_ERR_FLAG_DHH_START_END_ID 0x01000000ul
+#define ONSEN_ERR_FLAG_DHH_START_ID 0x02000000ul
+#define ONSEN_ERR_FLAG_DHH_START_WO_END 0x04000000ul
+#define ONSEN_ERR_FLAG_NO_PXD   0x08000000ul
 
 string error_name[ONSEN_MAX_TYPE_ERR] = {
   "FTSW/DHHC mismatch: ", "DHHC/DHH mismatch: ", "DHHC/DHP mismatch: ", "DHHC_START missing: ",
@@ -88,7 +88,7 @@ string error_name[ONSEN_MAX_TYPE_ERR] = {
   "Event Header Frame Count Error: ", "Event header Frame Size Error: ", "HLTROI Magic Error: ", "Merger TrigNr Mismatch: ",
   "DHP Size too small: ", "DHP-DHH DHHID mismatch: ", "DHP-DHH Port mismatch", "DHP Pix w/o row: ",
   "DHH START/END ID mismatch: ", "???", "DHH_START w/o prev END: ", "Nr PXD data !=1: ",
-  "unused: ", "unused: ", "unused: ", "unused: "
+  "unused: ", "unused: ", "unused: ", "(nr events) "
 };
 //-----------------------------------------------------------------
 //                 Implementation
@@ -355,18 +355,18 @@ public:
       B2INFO("DHHC HLT/ROI Frame " << hex << trignr1 << " ," << trignr2);
     if ((magic1 & 0xFFFF) != 0xCAFE) {
       B2ERROR("DHHC HLT/ROI Magic 1 error $" << hex << magic1);
-      error_flag |= ONSEN_ERR_FLAG_HLTROI_MAGIC;
+      error_mask |= ONSEN_ERR_FLAG_HLTROI_MAGIC;
     }
     if ((magic2 & 0xFFFF) != 0xCAFE) {
       B2ERROR("DHHC HLT/ROI Magic 2 error $" << hex << magic2);
-      error_flag |= ONSEN_ERR_FLAG_HLTROI_MAGIC;
+      error_mask |= ONSEN_ERR_FLAG_HLTROI_MAGIC;
     }
     if (magic2 == 0x0000CAFE && trignr2 == 0x00000000) {
       if (!ignore_datcon_flag) B2WARNING("DHHC HLT/ROI Frame: No DATCON data " << hex << trignr1 << "!=$" << trignr2);
     } else {
       if (trignr1 != trignr2) {
         B2ERROR("DHHC HLT/ROI Frame Trigger Nr Mismatch $" << hex << trignr1 << "!=$" << trignr2);
-        error_flag |= ONSEN_ERR_FLAG_MERGER_TRIGNR;
+        error_mask |= ONSEN_ERR_FLAG_MERGER_TRIGNR;
       }
     }
   };
@@ -401,7 +401,7 @@ public:
                << * (unsigned int*)(d + length - 6) << " " << * (unsigned int*)(d + length - 4) << " len $" << length);
     } else {
       crc_error++;
-      error_flag |= ONSEN_ERR_FLAG_MERGER_CRC;
+      error_mask |= ONSEN_ERR_FLAG_MERGER_CRC;
       if (verbose) {
         B2ERROR("DHHC ONSEN HLT/ROI Frame CRC FAIL: " << hex << c << "!=" << crc32 << " data "  << * (unsigned int*)(d + length - 8) << " "
                 << * (unsigned int*)(d + length - 6) << " " << * (unsigned int*)(d + length - 4) << " len $" << length);
@@ -640,7 +640,7 @@ public:
                << * (unsigned int*)(d + length - 6) << " " << * (unsigned int*)(d + length - 4) << " pad " << pad << " len $" << length);
     } else {
       crc_error++;
-      error_flag |= ONSEN_ERR_FLAG_DHH_CRC;
+      error_mask |= ONSEN_ERR_FLAG_DHH_CRC;
       if (verbose) {
         B2ERROR("DHHC Data Frame CRC FAIL: " << hex << c << "!=" << crc32 << " data "  << * (unsigned int*)(d + length - 8) << " "
                 << * (unsigned int*)(d + length - 6) << " " << * (unsigned int*)(d + length - 4) << " pad " << pad << " len $" << length);
@@ -750,12 +750,15 @@ void PXDUnpackerModule::initialize()
 
 void PXDUnpackerModule::terminate()
 {
-  bool flag = false;
-  for (int i = 0; i < ONSEN_MAX_TYPE_ERR; i++) flag |= (error_counter[i] != 0);
-  if (flag) {
+  int flag = 0;
+  for (int i = 0; i < ONSEN_MAX_TYPE_ERR; i++) flag |= error_counter[i];
+  if (flag != 0) {
     B2ERROR("PXD Unpacker --> Error Statistics (counted once per event!) in Events: " << unpacked_events);
     for (int i = 0; i < ONSEN_MAX_TYPE_ERR; i++) {
-      if (error_counter[i]) B2ERROR(error_name[i] << ": " << error_counter[i]);
+      if (error_counter[i]) {
+        B2ERROR(error_name[i] << ": " << error_counter[i]);
+        //printf("%s %d\n",error_name[i].c_str(), error_counter[i]);
+      }
     }
   } else {
     B2INFO("PXD Unpacker --> No Error found.");
@@ -791,11 +794,13 @@ void PXDUnpackerModule::event()
     nsr++;
   }
 
-  if (nsr != 1) error_flag |= ONSEN_ERR_FLAG_NO_PXD;
+  if (nsr != 1) error_mask |= ONSEN_ERR_FLAG_NO_PXD;
 
   unpacked_events++;
-  for (int i = 0, j = 1; i < ONSEN_MAX_TYPE_ERR; i++, j += j) {
+  error_mask |= 0x80000000;
+  for (unsigned int i = 0, j = 1; i < ONSEN_MAX_TYPE_ERR; i++) {
     if (error_mask & j) error_counter[i]++;
+    j += j;
   }
 }
 
@@ -817,7 +822,7 @@ void PXDUnpackerModule::unpack_event(RawPXD& px)
 
   if (px.size() <= 0 || px.size() > 16 * 1024 * 1024) {
     B2ERROR("PXD Unpacker --> invalid packet size (32bit words) " << hex << px.size());
-    error_flag |= ONSEN_ERR_FLAG_PACKET_SIZE;
+    error_mask |= ONSEN_ERR_FLAG_PACKET_SIZE;
     return;
   }
   unsigned int data[px.size()];
@@ -826,20 +831,20 @@ void PXDUnpackerModule::unpack_event(RawPXD& px)
 
   if (fullsize < 8) {
     B2ERROR("Data is to small to hold a valid Header! Will not unpack anything. Size:" << fullsize);
-    error_flag |= ONSEN_ERR_FLAG_PACKET_SIZE;
+    error_mask |= ONSEN_ERR_FLAG_PACKET_SIZE;
     return;
   }
 
   if (data[0] != 0xCAFEBABE && data[0] != 0xBEBAFECA) {
     B2ERROR("Magic invalid: Will not unpack anything. Header corrupted! " << hex << data[0]);
-    error_flag |= ONSEN_ERR_FLAG_MAGIC;
+    error_mask |= ONSEN_ERR_FLAG_MAGIC;
     return;
   }
 
   if (m_headerEndianSwap) Frames_in_event = ntohl(data[1]); else Frames_in_event = data[1];
   if (Frames_in_event < 0 || Frames_in_event > 256) {
     B2ERROR("Number of Frames invalid: Will not unpack anything. Header corrupted! Frames in event: " << Frames_in_event);
-    error_flag |= ONSEN_ERR_FLAG_FRAME_NR;
+    error_mask |= ONSEN_ERR_FLAG_FRAME_NR;
     return;
   }
 
@@ -867,12 +872,12 @@ void PXDUnpackerModule::unpack_event(RawPXD& px)
     if (m_headerEndianSwap) lo = ntohl(tableptr[j]); else lo = tableptr[j];
     if (lo <= 0) {
       B2ERROR("size of frame invalid: " << j << "size " << lo << " at byte offset in dataptr " << ll);
-      error_flag |= ONSEN_ERR_FLAG_FRAME_SIZE;
+      error_mask |= ONSEN_ERR_FLAG_FRAME_SIZE;
       return;
     }
     if (ll + lo > datafullsize) {
       B2ERROR("frames exceed packet size: " << j  << " size " << lo << " at byte offset in dataptr " << ll << " of datafullsize " << datafullsize << " of fullsize " << fullsize);
-      error_flag |= ONSEN_ERR_FLAG_FRAME_SIZE;
+      error_mask |= ONSEN_ERR_FLAG_FRAME_SIZE;
       return;
     }
     if (lo & 0x3) {
@@ -913,7 +918,7 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int len2, unsigned int d
 
   if (anzahl < 4) {
     B2ERROR("DHP frame size error (too small) " << anzahl);
-    error_flag |= ONSEN_ERR_FLAG_DHP_SIZE;
+    error_mask |= ONSEN_ERR_FLAG_DHP_SIZE;
     dhp_size_error++;
     return;
     //return -1;
@@ -938,11 +943,11 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int len2, unsigned int d
 
   if (dhh_ID != dhp_dhh_id) {
     B2ERROR("DHH ID in DHH and DHP header differ ($" << hex << dhh_ID << " != $" << dhp_dhh_id);
-    error_flag |= ONSEN_ERR_FLAG_DHH_DHP_DHHID;
+    error_mask |= ONSEN_ERR_FLAG_DHH_DHP_DHHID;
   }
   if (dhh_DHPport != dhp_dhp_id && !m_ignore_dhpportdiffer) {
     B2ERROR("DHP ID (Chip/Port) in DHH and DHP header differ ($" << hex << dhh_DHPport << " != $" << dhp_dhp_id);
-    error_flag |= ONSEN_ERR_FLAG_DHH_DHP_PORT;
+    error_mask |= ONSEN_ERR_FLAG_DHH_DHP_PORT;
   }
 
   static int offtab[4] = {0, 64, 128, 192};
@@ -965,8 +970,8 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int len2, unsigned int d
           B2INFO("SetRow: " << hex << dhp_row << " CM " << hex << dhp_cm);
       } else {
         if (!rowflag) {
-          B2ERROR("Error: Pix without Row!!! skip dhp data ");
-          error_flag |= ONSEN_ERR_FLAG_DHP_PIX_WO_ROW;
+          B2ERROR("DHP Unpacking: Pix without Row!!! skip dhp data ");
+          error_mask |= ONSEN_ERR_FLAG_DHP_PIX_WO_ROW;
           dhp_pixel_error++;
           return;
         } else {
@@ -1051,7 +1056,7 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& la
   s = dhhc.size();
   if (len != s && s != 0) {
     B2ERROR("Fixed frame type size does not match specs: expect " << len << " != " << s << " (in data) " << pad);
-    error_flag |= ONSEN_ERR_FLAG_FIX_SIZE;
+    error_mask |= ONSEN_ERR_FLAG_FIX_SIZE;
   }
 
   unsigned int evtnr;
@@ -1059,7 +1064,7 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& la
   evtnr = dhhc.get_evtnr_lo();
   if ((evtnr & ftsw_evt_mask) != (ftsw_evt_nr & ftsw_evt_mask)) {
     B2ERROR("Event Numbers do not match for this frame $" << hex << evtnr << "!=$" << ftsw_evt_nr << "(FTSW) mask $" << ftsw_evt_mask);
-    error_flag |= ONSEN_ERR_FLAG_FTSW_DHHC_MM;
+    error_mask |= ONSEN_ERR_FLAG_FTSW_DHHC_MM;
 //#define ONSEN_ERR_FLAG_DHHC_DHP_MM      0x00000004
   }
 
@@ -1069,7 +1074,7 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& la
     if (nr_of_dhh_start_frame != nr_of_dhh_end_frame + 1)
       if (type != DHHC_FRAME_HEADER_DATA_TYPE_HLTROI && type != DHHC_FRAME_HEADER_DATA_TYPE_DHH_START) {
         B2ERROR("Data Frame outside a DHH START/END");
-        error_flag |= ONSEN_ERR_FLAG_DATA_OUTSIDE;
+        error_mask |= ONSEN_ERR_FLAG_DATA_OUTSIDE;
       }
   }
 
@@ -1080,7 +1085,7 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& la
       ((dhhc_direct_readout_frame_raw*)data)->print();
       if (current_dhh_id != ((dhhc_direct_readout_frame_raw*)data)->get_dhh_id()) {
         B2ERROR("DHH ID from DHH Start and this frame do not match $" << hex << current_dhh_id << " != $" << ((dhhc_direct_readout_frame_raw*)data)->get_dhh_id());
-        error_flag |= ONSEN_ERR_FLAG_DHH_START_END_ID;
+        error_mask |= ONSEN_ERR_FLAG_DHH_START_END_ID;
       }
       dhhc.calc_crc();
       found_mask_active_dhp |= 1 << ((dhhc_direct_readout_frame*)data)->get_dhp_port();
@@ -1096,7 +1101,7 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& la
       ((dhhc_direct_readout_frame*)data)->print();
       if (current_dhh_id != ((dhhc_direct_readout_frame_raw*)data)->get_dhh_id()) {
         B2ERROR("DHH ID from DHH Start and this frame do not match $" << hex << current_dhh_id << " != $" << ((dhhc_direct_readout_frame_raw*)data)->get_dhh_id());
-        error_flag |= ONSEN_ERR_FLAG_DHH_START_ID;
+        error_mask |= ONSEN_ERR_FLAG_DHH_START_ID;
       }
       dhhc.calc_crc();
       found_mask_active_dhp |= 1 << ((dhhc_direct_readout_frame*)data)->get_dhp_port();
@@ -1156,7 +1161,7 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& la
 
       if (nr_of_dhh_start_frame != nr_of_dhh_end_frame) {
         B2ERROR("DHHC_FRAME_HEADER_DATA_TYPE_DHH_START without DHHC_FRAME_HEADER_DATA_TYPE_DHH_END");
-        error_flag |= ONSEN_ERR_FLAG_DHH_START_WO_END;
+        error_mask |= ONSEN_ERR_FLAG_DHH_START_WO_END;
       }
       nr_of_dhh_start_frame++;
 

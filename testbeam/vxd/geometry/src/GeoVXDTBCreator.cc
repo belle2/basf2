@@ -202,8 +202,8 @@ namespace Belle2 {
         B2FATAL("Only 'Box' shape can host a sensitive volume (Active node) for supported detectors");
 
       // get size of the volume from parent node GearDir (these are half-sizes - multiply by 2)
-      double aWidth = 2.0 * parentContent.getLength("HalfX");// Unit::mm/10.0;
-      double aLength = 2.0 * parentContent.getLength("HalfY");// Unit::mm/10.0;
+      double aWidth = 2.0 * parentContent.getLength("HalfY");// Unit::mm/10.0;
+      double aLength = 2.0 * parentContent.getLength("HalfX");// Unit::mm/10.0;
       double aHeight = 2.0 * parentContent.getLength("HalfZ");// Unit::mm/10.0;
 
       unsigned short sensorID = content.getInt("SensorID");
@@ -352,6 +352,7 @@ namespace Belle2 {
 
       GearDir volumes(content, "Volumes");
       readAddVolumes(volumes, &topVolume);
+
     }
 
   } // namespace TB

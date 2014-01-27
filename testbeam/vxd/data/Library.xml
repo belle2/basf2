@@ -68,8 +68,8 @@
    <Snippet name="SVD_active">
       <DetectorType>SVD</DetectorType>
       <stepSize unit="um">5</stepSize>
-      <stripsU>512</stripsU>
-      <stripsV>768</stripsV>
+      <stripsU>768</stripsU><!-- This is long side -->
+      <stripsV>512</stripsV><!-- This is short side -->
       <!-- Sensor operation parameters. -->
       <DepletionVoltage unit="V">60.0</DepletionVoltage>
       <BiasVoltage unit="V">150</BiasVoltage>

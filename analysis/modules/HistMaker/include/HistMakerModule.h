@@ -9,9 +9,12 @@
 
 #pragma once
 
+#include <analysis/utility/VariableManager.h>
 #include <framework/core/Module.h>
+
 #include <map>
 #include <string>
+#include <vector>
 
 class TH1;
 class TFile;

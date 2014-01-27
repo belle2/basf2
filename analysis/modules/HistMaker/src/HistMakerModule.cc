@@ -8,26 +8,24 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <framework/core/ModuleManager.h>
+#include <analysis/modules/HistMaker/HistMakerModule.h>
+#include <analysis/dataobjects/Particle.h>
+#include <analysis/dataobjects/ParticleList.h>
 
-// framework - DataStore
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
-#include <analysis/dataobjects/Particle.h>
-#include <analysis/dataobjects/ParticleList.h>
 #include <framework/logging/Logger.h>
-
-#include <analysis/utility/VariableManager.h>
-#include <analysis/modules/HistMaker/HistMakerModule.h>
-#include <boost/algorithm/string.hpp>
-
-#include <fstream>
 
 #include <TGraph.h>
 #include <TH1F.h>
 #include <TH2F.h>
 #include <TFile.h>
+
+#include <boost/algorithm/string.hpp>
+
+#include <fstream>
+
 
 namespace Belle2 {
 

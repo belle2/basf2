@@ -9,8 +9,8 @@
 
 #pragma once
 
-#include <framework/core/Module.h>
 #include <analysis/TMVAInterface/TMVATeacher.h>
+#include <framework/core/Module.h>
 
 namespace Belle2 {
 

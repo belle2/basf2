@@ -8,18 +8,15 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <framework/core/ModuleManager.h>
-
-// framework - DataStore
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <analysis/dataobjects/ParticleInfo.h>
+#include <analysis/modules/TMVATeacher/TMVATeacherModule.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
-#include <framework/logging/Logger.h>
-
 #include <analysis/TMVAInterface/TMVATeacher.h>
-#include <analysis/modules/TMVATeacher/TMVATeacherModule.h>
+
+#include <framework/datastore/DataStore.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/logging/Logger.h>
+#include <framework/core/ModuleManager.h>
 
 namespace Belle2 {
 
@@ -29,7 +26,7 @@ namespace Belle2 {
   TMVATeacherModule::TMVATeacherModule() : Module()
   {
     setDescription("Trains multivariate analysis method with given particle lists as training samples.");
-    // We use root TFile and TMVA so, this is propably not usable for parallel processsing
+    // This module isn't cabable of parallel processing due to the use of TMVA
     //setPropertyFlags(c_ParallelProcessingCertified);
 
     // Add parameters

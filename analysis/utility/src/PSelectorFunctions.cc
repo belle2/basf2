@@ -14,6 +14,7 @@
 #include <analysis/utility/mcParticleMatching.h>
 
 #include <analysis/utility/VariableManager.h>
+#include <analysis/utility/mcParticleMatching.h>
 
 // framework - DataStore
 #include <framework/datastore/DataStore.h>
@@ -21,7 +22,6 @@
 
 // dataobjects
 #include <analysis/dataobjects/Particle.h>
-#include <analysis/dataobjects/ParticleInfo.h>
 #include <analysis/dataobjects/RestOfEvent.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
@@ -455,13 +455,7 @@ namespace Belle2 {
     {
       double signalProbabilitySum = 0.0;
       for (unsigned j = 0; j < particle->getNDaughters(); ++j) {
-        const Particle* daughter = particle->getDaughter(j);
-        const ParticleInfo* daughterInfo = DataStore::getRelated<ParticleInfo>(daughter);
-        if (daughterInfo == nullptr) {
-          B2WARNING("Couldn't get related ParticleInfo: Returning 0 in sumChildProb function")
-          return 0.0;
-        }
-        signalProbabilitySum += daughterInfo->getValue("SignalProbability");
+        signalProbabilitySum += particle->getDaughter(j)->getExtraInfo("SignalProbability");
       }
       return signalProbabilitySum;
     }
@@ -470,13 +464,7 @@ namespace Belle2 {
     {
       double signalProbabilityProduct = 1.0;
       for (unsigned j = 0; j < particle->getNDaughters(); ++j) {
-        const Particle* daughter = particle->getDaughter(j);
-        const ParticleInfo* daughterInfo = DataStore::getRelated<ParticleInfo>(daughter);
-        if (daughterInfo == nullptr) {
-          B2WARNING("Couldn't get related ParticleInfo: Returning 0 in prodChildProb function")
-          return 0.0;
-        }
-        signalProbabilityProduct *= daughterInfo->getValue("SignalProbability");
+        signalProbabilityProduct *= particle->getDaughter(j)->getExtraInfo("SignalProbability");
       }
       return signalProbabilityProduct;
     }

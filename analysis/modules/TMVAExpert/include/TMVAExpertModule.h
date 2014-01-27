@@ -19,8 +19,7 @@ namespace Belle2 {
   class TMVAExpert;
 
   /**
-   * This module fills the ParticleInfo with the value calculated by a TMVA method for every Particle in the given ParticleLists
-   * The module depends on the ParticleInfoModule
+   * This module fills the ExtraInfo of the Particle object with the value calculated by a TMVA method for every Particle in the given ParticleLists
    */
 
   class TMVAExpertModule : public Module {
@@ -71,7 +70,7 @@ namespace Belle2 {
     std::vector<std::string> m_listNames; /**< input particle list names */
     std::string m_methodName; /**< used multivariate analysis method */
     std::string m_identifier; /**< identifier name for the files created by the TMVA method */
-    std::string m_targetName /**< the name of the target variable which is stored in the ParticleInfo */;
+    std::string m_targetName /**< the name of the target variable which is stored in the ExtraInfo of the Particle object */;
     TMVAExpert* m_method; /**< Method used to calculate the target variable */
 
   };

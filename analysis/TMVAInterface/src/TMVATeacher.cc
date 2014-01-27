@@ -8,13 +8,11 @@
  **************************************************************************/
 
 #include <analysis/TMVAInterface/TMVATeacher.h>
-
-#include <framework/datastore/DataStore.h>
 #include <analysis/dataobjects/Particle.h>
-#include <analysis/dataobjects/ParticleInfo.h>
+#include <framework/datastore/DataStore.h>
 
-#include <algorithm>
-#include <string>
+#include <TMVA/Factory.h>
+#include <TMVA/Tools.h>
 
 #include <TFile.h>
 #include <TTree.h>
@@ -24,9 +22,8 @@
 #include <TRandom.h>
 #include <TPluginManager.h>
 
-#include <TMVA/Factory.h>
-#include <TMVA/Tools.h>
-
+#include <algorithm>
+#include <string>
 
 namespace Belle2 {
 

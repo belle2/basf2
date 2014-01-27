@@ -89,7 +89,7 @@ void ParticleList::removeMarked()
   }
 }
 
-const Particle* ParticleList::getParticle(unsigned i) const
+Particle* ParticleList::getParticle(unsigned i) const
 {
   StoreArray<Particle> Particles(m_particleStore);
   if (i < m_list[0].size()) {

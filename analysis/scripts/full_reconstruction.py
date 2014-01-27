@@ -10,6 +10,8 @@ import os
 import hashlib
 import cut_determination
 
+import argparse
+
 
 class Particle:
 
@@ -87,11 +89,56 @@ class Particle:
         """
 
         string = pdg.to_name(self.pdg)
-        if len(channel) > 0:
+        if len(channel) > 1:
             string += ' ->'
             for d in channel:
                 string += ' ' + pdg.to_name(d)
         return string
+
+    def getHistHash(self):
+        """
+        Determine hash for the cut histograms, the hash depends on the
+        previous stages (hashseed) and on the decay channels.
+        """
+
+        return hashlib.sha1(self.hashseed + str(self.channels)).hexdigest()
+
+    def getHistFilename(self):
+        return 'HistMaker_{pdg}_{hash}.root'.format(pdg=self.pdg,
+                hash=self.getHistHash())
+
+    def getWeightHash(self):
+        """
+        Hash includes the dependencies of the previous stages (hashseed), the
+        channels, variables and the method tuples (name, type, config) of the
+        used classifiers.
+        """
+
+        return hashlib.sha1(self.hashseed + str(self.channels)
+                            + str(self.variables)
+                            + str(self.methods)).hexdigest()
+
+    def getWeightFilename(self, channel, method):
+        return 'weights/{channel}_{hash}_{name}.weights.xml'.format(channel=self.to_string(channel),
+                name=method[0], hash=self.getWeightHash())
+
+    def getCuts(self):
+        """
+        Since the cut determination is a bit lengthy we do this in a
+        sepeterate module called cut_determination.py.
+        This module gets the filename with the histograms and the decay
+        channel identifiers, and returns the optimal cuts for every
+        channel as a map.
+        """
+
+        cuts = {}
+        # If this is not a final state particle and cut determination histogram
+        # is available we calculate the correct cuts
+        if not self.channels == [] and os.path.isfile(self.getHistFilename()):
+            cuts['M'] = cut_determination.getCutOnMass(0.01,
+                    self.getHistFilename(), [self.to_string(c) for c in
+                    self.channels])
+        return cuts
 
     def reconstruct(self, path):
         """
@@ -108,15 +155,12 @@ class Particle:
         """
 
         mass = pdg.get(self.pdg).Mass()
+        width = pdg.get(self.pdg).Width()
 
-        # Determine hash for the cut histograms, the hash depends on the
-        # previous stages (hashseed) and on the decay channels.
-        hash = hashlib.sha1(self.hashseed + str(self.channels)).hexdigest()
-        filename = 'HistMaker_{pdg}_{hash}.root'.format(pdg=self.pdg,
-                hash=hash)
         # If this is not a final state particle and no cut determination
         # histograms available we have to gennerate the histograms first
-        if not self.channels == [] and not os.path.isfile(filename):
+        if not self.channels == [] \
+            and not os.path.isfile(self.getHistFilename()):
 
             # So first we combine the daughter particles to candidates
             # and apply very loose cuts
@@ -126,23 +170,29 @@ class Particle:
                 pmake.param('PDG', self.pdg)
                 pmake.param('ListName', self.to_string(channel))
                 pmake.param('InputListNames', pdg.to_names(channel))
-                pmake.param('MassCut', (mass - mass / 10.0, mass + mass
-                            / 10.0))
-                pmake.param('cutsOnProduct', {'SignalProbability': (0.01,
-                            1.0)})
+                pmake.param('MassCut', (mass - mass * 1.0 / 10.0, mass + mass
+                            * 1.0 / 10.0))
+                # pmake.param('cutsOnProduct', {'SignalProbability': (0.01,
+                #            1.0)})
                 path.add_module(pmake)
+
+                # As a last thing we match the MCTruth, so we have the
+                # information if the particle was reconstructed correctly
+                # available at the next stage.
+                matchMCTruth(self.to_string(channel), path=path)
 
             # Now we can create histograms of the invariant mass distribution,
             # for all the candidates of the different decay channels.
             # From this histograms we determine the optimal cuts per channel
             # later.
             histMaker = register_module('HistMaker')
-            histMaker.set_name(filename)
-            histMaker.param('file', filename)
+            histMaker.set_name(self.getHistFilename())
+            histMaker.param('file', self.getHistFilename())
             histMaker.param('histVariables', [('prodChildProb', 100, 0, 1),
-                            ('M', 100, mass * 9.0 / 10.0, mass * 11.0 / 10.0)])
+                            ('M', 100, mass - mass * 1.0 / 10.0, mass + mass
+                            * 1.0 / 10.0), ('mcTruthFlag', 100, -10, 10)])
             histMaker.param('make2dHists', True)
-            histMaker.param('truthVariable', 'truth')
+            histMaker.param('truthVariable', 'isSignal')
             histMaker.param('listNames', [self.to_string(c) for c in
                             self.channels])
             path.add_module(histMaker)
@@ -155,38 +205,29 @@ class Particle:
         # If not a final state particle we determine the cuts and reconstruct
         # the particle in all of its decay channels.
         if not self.channels == []:
-            # Since the cut determination is a bit lengthy we do this in a
-            # sepeterate module called cut_determination.py.
-            # This module gets the filename with the histograms and the decay
-            # channel identifiers, and returns the optimal cuts for every
-            # channel as a map.
-            cut_determinator = cut_determination.CutDeterminator(filename,
-                    [self.to_string(c) for c in self.channels])
-            cuts = {}
-            mass_cut = cut_determinator.getCutOn('M')
+            cuts = self.getCuts()
             for channel in self.channels:
                 pmake = register_module('ParticleCombiner')
                 pmake.set_name('ParticleCombiner_' + self.to_string(channel))
                 pmake.param('PDG', self.pdg)
                 pmake.param('ListName', self.to_string(channel))
                 pmake.param('InputListNames', pdg.to_names(channel))
-                pmake.param('MassCut', mass_cut[self.to_string(channel)])
-                # pmake.param('cutsOnProduct', mass_cut[self.to_string(channel)])
+                pmake.param('MassCut', cuts['M'][self.to_string(channel)])
                 path.add_module(pmake)
 
         # Now select all the reconstructed (or loaded) particles with this pdg
         # into one list.
         selectParticle(pdg.to_name(self.pdg), self.pdg, [], path=path)
 
+        # As a last thing we match the MCTruth, so we have the information if
+        # the particle was reconstructed correctly available at the next stage.
+        matchMCTruth(pdg.to_name(self.pdg), path=path)
+
         # Because anti-particles aren't handled properly yet we have to select
         # the charge conjugate particles by hand. For Pi0 and Photons this
         # doesn't make sense, so we exclude them here by hand.
         if not self.pdg == 111 and not self.pdg == 22:
             selectParticle(pdg.to_name(-self.pdg), -self.pdg, [], path=path)
-
-        # As a last thing we match the MCTruth, so we have the information if
-        # the particle was reconstructed correctly available at the next stage.
-        matchMCTruth(pdg.to_name(self.pdg), path=path)
 
         # Return True, since the particle can be reconstructed and we can go on
         # with the next stage.
@@ -218,19 +259,12 @@ class Particle:
         else:
             channels = self.channels
 
-        # Hash includes the dependencies of the previous stages (hashseed), the
-        # channels, variables and the method tuples (name, type, config) of the
-        # used classifiers.
-        hash = hashlib.sha1(self.hashseed + str(self.channels)
-                            + str(self.variables)
-                            + str(self.methods)).hexdigest()
-
         # So for every channel we train all the classifiers seperatly.
         for channel in channels:
             # Check first if all methods are available, by checking if the
             # weight files are present
-            if any([not os.path.isfile('weights/{channel}_{hash}_{name}.weights.xml'.format(channel=self.to_string(channel),
-                   name=method[0], hash=hash)) for method in self.methods]):
+            if any([not os.path.isfile(self.getWeightFilename(channel,
+                   method)) for method in self.methods]):
 
                 # If one or more files are missing we retrain all methods (this
                 # has the advantage that we can easily compare the methods in
@@ -240,10 +274,10 @@ class Particle:
                 teacher = register_module('TMVATeacher')
                 teacher.set_name('TMVATeacher_' + self.to_string(channel))
                 teacher.param('identifier', self.to_string(channel) + '_'
-                              + hash)
+                              + self.getWeightHash())
                 teacher.param('methods', self.methods)
                 teacher.param('variables', self.variables)
-                teacher.param('target', 'truth')
+                teacher.param('target', 'isSignal')
                 teacher.param('listNames', [self.to_string(channel)])
                 path.add_module(teacher)
 
@@ -257,13 +291,6 @@ class Particle:
         # If all the needed experts are present, we classify alle the particle
         # candidates.
         for channel in channels:
-            # Create ParticleInfo for the particle lists which are going to be
-            # classified. TODO This won't be necessary in the future as the
-            # ParticleInfo is merged into the Particle class of BASF2 directly.
-            particleinfo = register_module('ParticleInfo')
-            particleinfo.param('InputListNames', [self.to_string(channel)])
-            path.add_module(particleinfo)
-
             # For every method we add a TMVAExpert module to the path, the
             # target variable has the same name as the method.
             for method in self.methods:
@@ -271,7 +298,7 @@ class Particle:
                 expert.set_name('TMVAEXPERT_' + self.to_string(channel) + '_'
                                 + method[0])
                 expert.param('identifier', self.to_string(channel) + '_'
-                             + hash)
+                             + self.getWeightHash())
                 expert.param('method', method[0])
                 # TODO All methods use the same target variable at the moment we
                 # want to use different targets for different methods later
@@ -300,6 +327,22 @@ class FullReconstruction:
 
         # # A list of particle objects, added with addParticle
         self.particles = []
+
+        parser = argparse.ArgumentParser()
+        parser.add_argument('-n', '--retrain-stage', dest='retrain_stage',
+                            type=int, help='Retrain networks in given stage')
+        parser.add_argument('-m', '--recreate-stage', dest='recreate_stage',
+                            type=int, help='Recreate histograms in given stage'
+                            )
+        parser.add_argument('-c', '--print-cuts', dest='print_cuts',
+                            action='store_true',
+                            help='Output cuts for given stage only')
+        parser.add_argument('-a', '--recreate-all', dest='recreate_all',
+                            action='store_true',
+                            help="""
+                            Retrain all networs and recreate all histograms
+                            """)
+        self.args = parser.parse_args()
 
     def addParticle(self, particle):
         """
@@ -376,8 +419,37 @@ class FullReconstruction:
                 hashseed += str(p.methods) + str(p.channels) + str(p.variables)
             hashseed = hashlib.sha1(hashseed).hexdigest()
 
+        # Process options
+        for (i, stage) in enumerate(stages):
+            if self.args.retrain_stage and self.args.retrain_stage == i \
+                or self.args.recreate_stage and self.args.recreate_stage == i \
+                or self.args.recreate_all:
+                for pdg in stage:
+                    p = pdg_to_particle[pdg]
+                    for method in p.methods:
+                        for channel in p.channels:
+                            if os.path.isfile(p.getWeightFilename(channel,
+                                    method)):
+                                print 'Remove ' + p.getWeightFilename(channel,
+                                        method)
+                                os.remove(p.getWeightFilename(channel, method))
+            if self.args.recreate_stage and self.args.recreate_stage == i \
+                or self.args.recreate_all:
+                for pdg in stage:
+                    p = pdg_to_particle[pdg]
+                    if os.path.isfile(p.getHistFilename()):
+                        print 'Remove ' + p.getHistFilename()
+                        os.remove(p.getHistFilename())
+
         # Run every stage until a stage stops
         for (i, stage) in enumerate(stages):
+            # Output only the cuts for the different channels
+            if self.args.print_cuts:
+                for pdg in stage:
+                    p = pdg_to_particle[pdg]
+                    print p.getCuts()
+                continue
+
             # First we reconstruct all the particles in the current stage, so we
             # create a list of particle candidates from the given decay
             # channels. If not all particles can be reconstructed, then we
@@ -385,15 +457,19 @@ class FullReconstruction:
             # So some histograms have to be generated first.
             if not all([pdg_to_particle[pdg].reconstruct(path) for pdg in
                        stage]):
-                B2WARNING('Missing cuts for a particle at stage {i}generating cut determination histograms.'.format(i=i))
+                B2WARNING('Missing cuts for a particle at stage'
+                          + ' {i} generating cut'.format(i=i)
+                          + ' determination histograms.')
                 break
+
             # Secondly we classify the reconstructed particle candidates with
             # the given methods (e.g. BDTs or NeuroBayes). These multivariate
             # methods have to be trained first. So if not all training files
             # (experts) are present yet, we stop the evaluation at this stage
             # and generate these experts first.
             if not all([pdg_to_particle[pdg].classify(path) for pdg in stage]):
-                B2WARNING('Missing experts for a particle at stage {i}generating experts.'.format(i=i))
+                B2WARNING('Missing experts for a particle at stage'
+                          + ' {i} generating experts.'.format(i=i))
                 break
 
 

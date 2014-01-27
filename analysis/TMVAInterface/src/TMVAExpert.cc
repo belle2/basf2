@@ -9,12 +9,8 @@
 
 
 #include <analysis/TMVAInterface/TMVAExpert.h>
-#include <framework/datastore/DataStore.h>
 #include <analysis/dataobjects/Particle.h>
-#include <analysis/dataobjects/ParticleInfo.h>
-
-#include <algorithm>
-#include <string>
+#include <framework/datastore/DataStore.h>
 
 #include <TMVA/Reader.h>
 #include <TMVA/Tools.h>
@@ -28,6 +24,10 @@
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
+
+#include <algorithm>
+#include <string>
+
 
 namespace Belle2 {
 

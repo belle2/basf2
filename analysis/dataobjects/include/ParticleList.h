@@ -157,9 +157,9 @@ namespace Belle2 {
     /**
      * Returns i-th particle from the list
      * @param i list index (i < getListSize())
-     * @return const pointer to Particle or NULL
+     * @return pointer to Particle or NULL
      */
-    const Particle* getParticle(unsigned i) const;
+    Particle* getParticle(unsigned i) const;
 
     /**
      * Returns number of particles in the list

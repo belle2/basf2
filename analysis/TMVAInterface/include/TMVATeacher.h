@@ -12,6 +12,8 @@
 #include <analysis/utility/VariableManager.h>
 #include <framework/logging/Logger.h>
 
+#include <TMVA/Types.h>
+
 #include <map>
 #include <vector>
 #include <string>
@@ -22,7 +24,6 @@
 class TFile;
 class TTree;
 
-#include <TMVA/Types.h>
 
 namespace Belle2 {
 

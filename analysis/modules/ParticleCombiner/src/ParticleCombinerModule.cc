@@ -19,7 +19,6 @@
 // dataobjects
 #include <mdst/dataobjects/MCParticle.h>
 #include <analysis/dataobjects/Particle.h>
-#include <analysis/dataobjects/ParticleInfo.h>
 #include <analysis/utility/VariableManager.h>
 
 #include <algorithm>
@@ -237,7 +236,6 @@ namespace Belle2 {
 
     for (auto & cut : m_productCuts) {
       // Now calculate the value by multiplying all decay products values,
-      // which are stored in the related ParticleInfo.
       double value = 1.0;
       auto var = manager.getVariable(cut.first);
       if (var == nullptr) {
@@ -253,7 +251,6 @@ namespace Belle2 {
 
     for (auto & cut : m_sumCuts) {
       // Now calculate the value by summing all decay products values,
-      // which are stored in the related ParticleInfo.
       double value = 0.0;
       auto var = manager.getVariable(cut.first);
       if (var == nullptr) {

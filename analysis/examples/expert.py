@@ -23,10 +23,6 @@ selector.param('PDG', 11)
 selector.param('ListName', 'e-')
 main.add_module(selector)
 
-particleinfo = register_module('ParticleInfo')
-particleinfo.param('InputListNames', ['e-'])
-main.add_module(particleinfo)
-
 methods = ['Fisher', 'NeuroBayes', 'BDTGradient', 'PDEFoamBoost']
 
 for method in methods:

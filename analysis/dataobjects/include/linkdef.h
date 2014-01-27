@@ -6,7 +6,9 @@
 #pragma link C++ nestedclasses;
 
 #pragma link C++ class Belle2::Particle;
+//these two are needed when using these types (returned by Particle) in PyROOT
 #pragma link C++ class vector<Belle2::Particle*>;
+#pragma link C++ class vector<const Belle2::Particle*>;
 #pragma link C++ class Belle2::ParticleList;
 #pragma link C++ class Belle2::RestOfEvent;
 

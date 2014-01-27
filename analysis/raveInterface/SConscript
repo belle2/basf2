@@ -1,5 +1,5 @@
 Import('env')
 #env['CONTINUE'] = False
-env['LIBS'] = ['framework','analysis','geometry','tracking','genfit2', 'RaveBase','$ROOT_LIBS', 'EG']
+env['LIBS'] = ['framework','analysis','tracking','RaveBase','$ROOT_LIBS', 'EG']
 
 Return('env')

@@ -4,8 +4,6 @@ env['LIBS'] = [
        'analysis', 
        'framework', 
        'analysis_dataobjects', 
-       'tracking_dataobjects', 
-       'genfit2', 
-       'CLHEP']
+       'tracking_dataobjects']
 Return('env')
 

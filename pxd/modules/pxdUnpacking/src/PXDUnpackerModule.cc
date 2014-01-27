@@ -943,7 +943,7 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& la
 
   static unsigned int dhh_first_readout_frame_id_lo = 0;
   static unsigned int dhh_first_offset = 0;
-  static unsigned int current_dhh_id = 0xFFFF;
+  static unsigned int current_dhh_id = 0xFFFFFFFF;
   static unsigned int currentVxdId = 0;
 
 
@@ -1033,6 +1033,8 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& la
       }
 
       last_evtnr = evtnr;
+      current_dhh_id = 0xFFFFFFFF;
+      currentVxdId = 0; /// invalid
       nr_of_frames_dhhc = ((dhhc_start_frame*)data)->get_dhhc_nr_frames();
       nr_of_frames_counted = 1;
       dhhc.calc_crc();
@@ -1088,6 +1090,8 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& la
     case DHHC_FRAME_HEADER_DATA_TYPE_DHHC_END: {
       bool fake = ((dhhc_end_frame*)data)->is_fake();
       nr_of_frames_counted++;
+      current_dhh_id = 0xFFFFFFFF;
+      currentVxdId = 0; /// invalid
       if (fake) {
         B2WARNING("Faked DHHC END Data -> trigger without Data!");
       } else {
@@ -1123,7 +1127,7 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& la
       nr_of_frames_counted++;
       ((dhhc_dhh_end_frame*)data)->print();
       if (current_dhh_id != ((dhhc_dhh_end_frame*)data)->get_dhh_id()) B2ERROR("DHH ID from DHH Start and this frame do not match $" << hex << current_dhh_id << " != $" << ((dhhc_dhh_end_frame*)data)->get_dhh_id());
-      current_dhh_id = 0xFFFF;
+      current_dhh_id = 0xFFFFFFFF;
       currentVxdId = 0; /// invalid
       dhhc.calc_crc();
       if (found_mask_active_dhp != mask_active_dhp && !m_ignore_dhpmask) B2ERROR("DHH_END: DHP active mask $" << hex << mask_active_dhp << " != $" << hex << found_mask_active_dhp << " mask of found dhp/ghost frames");

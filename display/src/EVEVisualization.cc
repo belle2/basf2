@@ -432,7 +432,7 @@ void EVEVisualization::addTrack(const genfit::Track* track, const TString& label
     double charge = rep->getCharge(*fittedState);
 
     // draw track if corresponding option is set ------------------------------------------
-    if (j > 0) {
+    if (prevFittedState != NULL) {
       makeLines(eveTrack, prevFittedState, fittedState, rep, c_trackColor, 1, drawMarkers, drawErrors, 3.0);
       if (drawErrors) { // make sure to draw errors in both directions
         makeLines(eveTrack, prevFittedState, fittedState, rep, c_trackColor, 1, false, drawErrors, 3.0, 0);

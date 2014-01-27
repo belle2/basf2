@@ -154,7 +154,7 @@ int getMCTruthStatus(const Particle* particle, const MCParticle* mcParticle)
   if (genFSPs.size() == 0)
     return -2;
 
-  if (recFSPs.size() > recFSPs.size())
+  if (recFSPs.size() > genFSPs.size())
     return -3;
 
   // determine the status bits

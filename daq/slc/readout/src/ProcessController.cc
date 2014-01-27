@@ -23,7 +23,6 @@ bool ProcessController::init(const std::string& name_in,
   if (!_info.open(_name, nreserved, true)) {
     return false;
   }
-  _info.init();
   return true;
 }
 

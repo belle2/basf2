@@ -34,6 +34,7 @@ bool RunInfoBuffer::open(const std::string& nodename,
   _cond = MCond(buf);
   buf += _cond.size();
   _buf = (unsigned int*)buf;
+  if (recreate) init();
   return true;
 }
 

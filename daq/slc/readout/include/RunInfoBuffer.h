@@ -39,6 +39,7 @@ namespace Belle2 {
 
   public:
     const std::string getPath() const throw() { return _path; }
+    bool isAvailable() const throw() { return _buf != NULL; }
     unsigned int* getParams() throw() { return _buf; }
     unsigned int getState() const throw() { return _buf[0]; }
     unsigned int getExpNumber() const throw() { return _buf[1]; }

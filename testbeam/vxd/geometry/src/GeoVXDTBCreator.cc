@@ -202,8 +202,8 @@ namespace Belle2 {
         B2FATAL("Only 'Box' shape can host a sensitive volume (Active node) for supported detectors");
 
       // get size of the volume from parent node GearDir (these are half-sizes - multiply by 2)
-      double aWidth = 2.0 * parentContent.getLength("HalfY");// Unit::mm/10.0;
-      double aLength = 2.0 * parentContent.getLength("HalfX");// Unit::mm/10.0;
+      double aWidth = 2.0 * parentContent.getLength("HalfX");// Unit::mm/10.0;
+      double aLength = 2.0 * parentContent.getLength("HalfY");// Unit::mm/10.0;
       double aHeight = 2.0 * parentContent.getLength("HalfZ");// Unit::mm/10.0;
 
       unsigned short sensorID = content.getInt("SensorID");
@@ -220,10 +220,11 @@ namespace Belle2 {
                                    aWidth,
                                    aLength,
                                    aHeight,
-                                   content.getInt("pixelsR"),
-                                   content.getInt("pixelsZ[1]"),
-                                   content.getLength("splitLength", 0),
-                                   content.getInt("pixelsZ[2]", 0));
+                                   content.getInt("pixelsZ[1]"),//!!!exchanged
+                                   content.getInt("pixelsR"),//!!!exchanged
+                                   0., //content.getLength("splitLength", 0),
+                                   0 //content.getInt("pixelsZ[2]", 0)
+                                  );
         sensorInfo.setDEPFETParams(
           content.getDouble("BulkDoping") / (Unit::um * Unit::um * Unit::um),
           content.getWithUnit("BackVoltage"),
@@ -251,8 +252,8 @@ namespace Belle2 {
                                    aWidth,
                                    aLength,
                                    aHeight,
-                                   content.getInt("stripsU"),
-                                   content.getInt("stripsV"),
+                                   content.getInt("stripsV"),//!!! exchanged
+                                   content.getInt("stripsU"),//!!! exchanged
                                    content.getLength("width2", 0));
         const double unit_pF = 1000 * Unit::fC / Unit::V; // picofarad
         sensorInfo.setSensorParams(
@@ -275,10 +276,11 @@ namespace Belle2 {
                                    aWidth,
                                    aLength,
                                    aHeight,
-                                   content.getInt("pixelsR"),
                                    content.getInt("pixelsZ[1]"),
-                                   content.getLength("splitLength", 0),
-                                   content.getInt("pixelsZ[2]", 0));
+                                   content.getInt("pixelsR"),
+                                   0.,//content.getLength("splitLength", 0),
+                                   0 //content.getInt("pixelsZ[2]", 0)
+                                  );
 
         TEL::SensorInfo* newInfo = new TEL::SensorInfo(sensorInfo);
         TEL::SensitiveDetector* sensitive = new TEL::SensitiveDetector(newInfo, m_seeNeutrons, m_onlyPrimaryTrueHits, m_sensitiveThreshold);

@@ -54,6 +54,8 @@ namespace Belle2 {
       bool m_ignore_dhpmask;
       /**  ignore wrong DHP ports in DHH header vs DHP header */
       bool m_ignore_dhpportdiffer;
+      /** Only unpack, but Do Not Store anything to file */
+      bool m_doNotStore;
       /** Event Number and compare mask grabbed from FTSW for now */
       unsigned int ftsw_evt_nr, ftsw_evt_mask;
       /** Output array for Raw Hits. */

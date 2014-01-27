@@ -13,7 +13,7 @@
 #include <framework/logging/Logger.h>
 #include <rawdata/dataobjects/RawFTSW.h>
 
-// for htonl
+// // for htonl
 #include <arpa/inet.h>
 
 #include <boost/foreach.hpp>
@@ -677,6 +677,8 @@ PXDUnpackerModule::PXDUnpackerModule() :
   addParam("IgnoreDHHCFrameNr", m_ignore_headernrframes, "Ignore Wrong Nr Frames in DHHC Start", true);
   addParam("IgnoreDHPMask", m_ignore_dhpmask, "Ignore missing DHP from DHH Start mask", true);
   addParam("IgnoreDHPPortDiffer", m_ignore_dhpportdiffer, "Ignore if DHP port differ in DHH and DHP header", true);
+  addParam("DoNotStore", m_doNotStore, "only unpack and check, but do not store", false);
+
 }
 
 void PXDUnpackerModule::initialize()
@@ -897,9 +899,9 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int len2, unsigned int d
             B2INFO("toffset " << toffset);
           };*/
 
-          m_storeRawHits.appendNew(vxd_id, dhp_row, dhp_col, dhp_adc,
-                                   toffset, (dhp_readout_frame_lo - dhh_first_readout_frame_id_lo) & 0x3F, dhp_cm
-                                  );
+          if (!m_doNotStore) m_storeRawHits.appendNew(vxd_id, dhp_row, dhp_col, dhp_adc,
+                                                        toffset, (dhp_readout_frame_lo - dhh_first_readout_frame_id_lo) & 0x3F, dhp_cm
+                                                       );
         }
       }
     }
@@ -1134,8 +1136,8 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& la
       //((dhhc_onsen_frame*)data)->set_length(len - 4);
       ((dhhc_onsen_frame*)data)->print();
       ((dhhc_onsen_frame*)data)->calc_crc(len - 4); /// CRC is without the DHHC header
-      ((dhhc_onsen_frame*)data)->save(m_storeROIs, len, (unsigned int*) data);
       dhhc.calc_crc();
+      if (!m_doNotStore)((dhhc_onsen_frame*)data)->save(m_storeROIs, len, (unsigned int*) data);
       break;
     default:
       B2ERROR("UNKNOWN DHHC frame type");

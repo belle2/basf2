@@ -28,7 +28,71 @@
          <SeeNeutrons desc="Set to true to make sensitive detectors see neutrons">false</SeeNeutrons>
          <SensitiveThreshold desc="Minimum deposited energy per geant4 step" unit="eV">1.0</SensitiveThreshold>
          <Alignment>
-            <xi:include href="FullVXDTB-Alignment.xml" xpointer="xpointer(//*)" />
+            <!--xi:include href="FullVXDTB-Alignment.xml" xpointer="xpointer(//*)" /-->
+            <Align component="3.1.3">
+              <du unit="cm" error="6.6874e-05">-0.078214</du>
+              <dv unit="cm" error="2.5517e-05">0.011518</dv>
+              <dw fixed="true" unit="cm" error="2.5517e-05">0</dw>
+              <alpha fixed="true" unit="rad" error="2.5517e-05">0</alpha>
+              <beta fixed="true" unit="rad" error="2.5517e-05">0</beta>
+              <gamma unit="rad" error="5.3737e-05">-0.0031699</gamma>
+            </Align>
+            <Align component="4.1.4">
+              <du unit="cm" error="7.41e-05">-0.0015081</du>
+              <dv unit="cm" error="2.7125e-05">0.0001915</dv>
+              <dw fixed="true" unit="cm" error="2.7125e-05">0</dw>
+              <alpha fixed="true" unit="rad" error="2.7125e-05">0</alpha>
+              <beta fixed="true" unit="rad" error="2.7125e-05">0</beta>
+              <gamma unit="rad" error="6.4291e-05">0.00012185</gamma>
+            </Align>
+            <Align component="5.1.5">
+              <du unit="cm" error="8.7849e-05">0.023001</du>
+              <dv unit="cm" error="2.8695e-05">-0.002962</dv>
+              <dw fixed="true" unit="cm" error="2.8695e-05">0</dw>
+              <alpha fixed="true" unit="rad" error="2.8695e-05">0</alpha>
+              <beta fixed="true" unit="rad" error="2.8695e-05">0</beta>
+              <gamma unit="rad" error="6.4217e-05">-0.0018787</gamma>
+            </Align>
+            <Align component="6.1.6">
+              <du unit="cm" error="0.0001265">-0.0009045</du>
+              <dv unit="cm" error="4.6726e-05">0.00032171</dv>
+              <dw fixed="true" unit="cm" error="4.6726e-05">0</dw>
+              <alpha fixed="true" unit="rad" error="4.6726e-05">0</alpha>
+              <beta fixed="true" unit="rad" error="4.6726e-05">0</beta>
+              <gamma unit="rad" error="0.000103">-0.00043423</gamma>
+            </Align>
+            <!--Align component="3.1.3">
+              <du unit="cm" error="6.6874e-05">-0.083141</du>
+              <dv unit="cm" error="2.5517e-05">0.0205663</dv>
+              <dw fixed="true" unit="cm" error="2.5517e-05">0</dw>
+              <alpha fixed="true" unit="rad" error="2.5517e-05">0</alpha>
+              <beta fixed="true" unit="rad" error="2.5517e-05">0</beta>
+              <gamma unit="rad" error="5.3737e-05">-0.0058899</gamma>
+            </Align>
+            <Align component="4.1.4">
+              <du unit="cm" error="7.41e-05">-0.0011259</du>
+              <dv unit="cm" error="2.7125e-05">-0.001559</dv>
+              <dw fixed="true" unit="cm" error="2.7125e-05">0</dw>
+              <alpha fixed="true" unit="rad" error="2.7125e-05">0</alpha>
+              <beta fixed="true" unit="rad" error="2.7125e-05">0</beta>
+              <gamma unit="rad" error="6.4291e-05">0.00172655</gamma>
+            </Align>
+            <Align component="5.1.5">
+              <du unit="cm" error="8.7849e-05">0.02214998</du>
+              <dv unit="cm" error="2.8695e-05">-0.004485</dv>
+              <dw fixed="true" unit="cm" error="2.8695e-05">0</dw>
+              <alpha fixed="true" unit="rad" error="2.8695e-05">0</alpha>
+              <beta fixed="true" unit="rad" error="2.8695e-05">0</beta>
+              <gamma unit="rad" error="6.4217e-05">-0.0030525</gamma>
+            </Align>
+            <Align component="6.1.6">
+              <du unit="cm" error="0.0001265">-0.0022914</du>
+              <dv unit="cm" error="4.6726e-05">-0.00537669</dv>
+              <dw fixed="true" unit="cm" error="4.6726e-05">0</dw>
+              <alpha fixed="true" unit="rad" error="4.6726e-05">0</alpha>
+              <beta fixed="true" unit="rad" error="4.6726e-05">0</beta>
+              <gamma unit="rad" error="0.000103">-0.00051273</gamma>
+            </Align-->
          </Alignment>
          <Volumes>
             <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='Magnet']/*)" />
@@ -125,7 +189,7 @@
                   <DY unit="mm">1.0</DY>
                   <DZ unit="mm">-7.0</DZ>
                   <Theta unit="deg">90</Theta>
-                  <Phi unit="deg">90</Phi>
+                  <Phi unit="deg">270</Phi>
                   <Psi unit="deg">90</Psi>
                   
                   <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='PXD6-S-sensor_L1']/*)" />                                   

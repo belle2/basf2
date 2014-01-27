@@ -72,7 +72,7 @@ namespace Belle2 {
      *
      * @param vector of SoreArray indices of unused Tracks
      */
-    void addTracks(const std::vector<int> indices);
+    void addTracks(const std::vector<int>& indices);
 
     /**
      * Add StoreArray index of given ECLShower to the list of unused ECL showers in the event.
@@ -86,7 +86,7 @@ namespace Belle2 {
      *
      * @param vector of SoreArray indices of unused Showers
      */
-    void addECLShowers(const std::vector<int> indices);
+    void addECLShowers(const std::vector<int>& indices);
 
     /**
      * Add StoreArray index of given ECLGamma to the list of unused ECL gammas in the event.
@@ -100,7 +100,7 @@ namespace Belle2 {
      *
      * @param vector of SoreArray indices of unused Gammas
      */
-    void addECLGammas(const std::vector<int> indices);
+    void addECLGammas(const std::vector<int>& indices);
 
     /**
      * Add StoreArray index of given ECLPi0 to the list of unused ECL pi0s in the event.
@@ -114,7 +114,7 @@ namespace Belle2 {
     *
     * @param vector of SoreArray indices of unused Pi0s
     */
-    void addECLPi0s(const std::vector<int> indices);
+    void addECLPi0s(const std::vector<int>& indices);
 
     // getters
     /**
@@ -204,7 +204,7 @@ namespace Belle2 {
     /**
      * Copies indices (elements) from "from" vector to "to" set
      */
-    void addIndices(const std::vector<int> from, std::set<int>& to) {
+    void addIndices(const std::vector<int>& from, std::set<int>& to) {
       for (unsigned i = 0; i < from.size(); i++)
         to.insert(from[i]);
     }

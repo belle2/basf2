@@ -42,22 +42,22 @@ void RestOfEvent::addECLGamma(const ECLGamma* gamma)
   m_eclGammaIndices.insert(gamma->getArrayIndex());
 }
 
-void RestOfEvent::addTracks(const std::vector<int> indices)
+void RestOfEvent::addTracks(const std::vector<int>& indices)
 {
   addIndices(indices, m_trackIndices);
 }
 
-void RestOfEvent::addECLShowers(const std::vector<int> indices)
+void RestOfEvent::addECLShowers(const std::vector<int>& indices)
 {
   addIndices(indices, m_eclShowerIndices);
 }
 
-void RestOfEvent::addECLGammas(const std::vector<int> indices)
+void RestOfEvent::addECLGammas(const std::vector<int>& indices)
 {
   addIndices(indices, m_eclGammaIndices);
 }
 
-void RestOfEvent::addECLPi0s(const std::vector<int> indices)
+void RestOfEvent::addECLPi0s(const std::vector<int>& indices)
 {
   addIndices(indices, m_eclPi0Indices);
 }

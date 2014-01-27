@@ -45,9 +45,6 @@ namespace Belle2 {
      */
     void setBlockingInsert(bool block) { m_blockingInsert = block; }
 
-    /** set interval to wait 2nd event is sent */
-    void setWaitInterval(int wtime) { m_wait = wtime; }
-
   private:
 
     //!Compression parameter
@@ -64,9 +61,6 @@ namespace Belle2 {
 
     /** Wether to block until we can insert data into the ring buffer in event(). */
     bool m_blockingInsert;
-
-    /** Wait interval between 1st and 2nd- events to wait for 1st event is processed by output path */
-    int m_wait;
 
   };
 

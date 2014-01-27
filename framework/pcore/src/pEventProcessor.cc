@@ -301,8 +301,6 @@ void pEventProcessor::analyze_path(const PathPtr& path, Module* inmod, int cstat
           nrbin++;
           // Insert Tx at the end of current path
           ModulePtr txptr(new TxModule(rbuf));
-          TxModule* txmod = (TxModule*)txptr.get();
-          txmod->setWaitInterval(5);     // Wait for 5sec to wait the first event is processed by output path
           inlist.push_back(txptr);
           // Inserv Rx at the top of next path
           ModulePtr rxptr(new RxModule(rbuf));

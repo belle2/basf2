@@ -20,6 +20,11 @@ from ROOT import Belle2
 class PyTrigger(Module):
     """Returns 1 if current event contains at least one K_L^0, 0 otherwise"""
 
+    def initialize(self):
+        """reimplementation of Module::initialize()."""
+
+        Belle2.PyStoreObj("DisplayData").registerAsPersistent()
+
     def event(self):
         """reimplementation of Module::event()."""
 
@@ -29,6 +34,11 @@ class PyTrigger(Module):
             if abs(p.getPDG()) == 130:
                 B2INFO('found a K_L!')
                 self.return_value(1)
+
+                # also select the object in the display
+                displayData = Belle2.PyStoreObj("DisplayData")
+                displayData.create()
+                displayData.obj().select(p)
                 break
 
 

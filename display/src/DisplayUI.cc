@@ -7,6 +7,7 @@
 #include <framework/core/InputController.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/DataStore.h>
+#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationVector.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/logging/Logger.h>
@@ -711,50 +712,60 @@ void DisplayUI::showUserData(const DisplayData& displayData)
     entry.second = NULL;
   }
 
-  if (displayData.m_histograms.empty())
-    return; //nothing to show
-
-  if (!fileBrowser) {
-    gEve->GetBrowser()->StartEmbedding(0);
-    fileBrowser = gEve->GetBrowser()->MakeFileBrowser();
-    gEve->GetBrowser()->StopEmbedding("Histograms");
+  if (!displayData.m_histograms.empty()) {
+    if (!fileBrowser) {
+      gEve->GetBrowser()->StartEmbedding(0);
+      fileBrowser = gEve->GetBrowser()->MakeFileBrowser();
+      gEve->GetBrowser()->StopEmbedding("Histograms");
 
 
-    //create new tab with canvas
-    gEve->GetBrowser()->StartEmbedding(TRootBrowser::kRight);
-    TEveWindowSlot* slot = TEveWindow::CreateWindowMainFrame();
-    gEve->GetBrowser()->StopEmbedding();
-    slot->StartEmbedding();
-    new TCanvas;
-    slot->StopEmbedding("Canvas");
-  }
-
-  //invert pad -> name map
-  const std::map<TVirtualPad*, std::string>& padMap = BrowsableWrapper::getPads();
-  std::map<std::string, TVirtualPad*> nameMap;
-  for (const auto & entry : padMap) {
-    nameMap[entry.second] = entry.first;
-  }
-
-  for (unsigned int i = 0; i < displayData.m_histograms.size(); i++) {
-    std::string name(displayData.m_histograms.at(i)->GetName());
-    if (!wrapperMap[name])
-      wrapperMap[name] = new BrowsableWrapper(displayData.m_histograms.at(i));
-    else
-      wrapperMap[name]->setWrapped(displayData.m_histograms.at(i));
-    BrowsableWrapper* wrapper = wrapperMap[name];
-
-    if (nameMap.find(name) != nameMap.end()) {
-      TVirtualPad* oldGpad = gPad;
-      //redraw
-      nameMap[name]->cd();
-      wrapper->Browse(fileBrowser->Browser());
-
-      //restore state
-      oldGpad->cd();
+      //create new tab with canvas
+      gEve->GetBrowser()->StartEmbedding(TRootBrowser::kRight);
+      TEveWindowSlot* slot = TEveWindow::CreateWindowMainFrame();
+      gEve->GetBrowser()->StopEmbedding();
+      slot->StartEmbedding();
+      new TCanvas;
+      slot->StopEmbedding("Canvas");
     }
-    fileBrowser->Add(wrapper);
 
+    //invert pad -> name map
+    const std::map<TVirtualPad*, std::string>& padMap = BrowsableWrapper::getPads();
+    std::map<std::string, TVirtualPad*> nameMap;
+    for (const auto & entry : padMap) {
+      nameMap[entry.second] = entry.first;
+    }
+
+    for (unsigned int i = 0; i < displayData.m_histograms.size(); i++) {
+      std::string name(displayData.m_histograms.at(i)->GetName());
+      if (!wrapperMap[name])
+        wrapperMap[name] = new BrowsableWrapper(displayData.m_histograms.at(i));
+      else
+        wrapperMap[name]->setWrapped(displayData.m_histograms.at(i));
+      BrowsableWrapper* wrapper = wrapperMap[name];
+
+      if (nameMap.find(name) != nameMap.end()) {
+        TVirtualPad* oldGpad = gPad;
+        //redraw
+        nameMap[name]->cd();
+        wrapper->Browse(fileBrowser->Browser());
+
+        //restore state
+        oldGpad->cd();
+      }
+      fileBrowser->Add(wrapper);
+
+    }
+  }
+
+  for (const auto & pair : displayData.m_selectedObjects) {
+    //convert the name, index pair back into pointer
+    StoreArray<TObject> array(pair.first);
+    const TObject* obj = array[pair.second];
+    if (obj) {
+      select(array[pair.second]);
+    } else {
+      B2WARNING("Cannot select object " << pair.first << "[" << pair.second << "], not found. Is the array available?");
+    }
   }
 
   /*
@@ -771,4 +782,13 @@ void DisplayUI::showUserData(const DisplayData& displayData)
     m->SetName("Add canvas to active window");
     fileBrowser->Add(m);
     */
+}
+
+void DisplayUI::select(const TObject* object)
+{
+  TEveElement* elem = m_visualRepMap->getEveElement(object);
+  if (elem and !gEve->GetSelection()->HasChild(elem)) {
+    //select this object in addition to existing selection
+    gEve->GetSelection()->UserPickedElement(elem, true);
+  }
 }

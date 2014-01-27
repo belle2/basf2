@@ -9,6 +9,9 @@
  **************************************************************************/
 #include <display/dataobjects/DisplayData.h>
 
+#include <framework/datastore/DataStore.h>
+#include <framework/logging/Logger.h>
+
 using namespace Belle2;
 
 ClassImp(DisplayData)
@@ -37,4 +40,17 @@ void DisplayData::addHistogram(const std::string& name, const TH1* hist)
   TH1* newhist = static_cast<TH1*>(hist->Clone(name.c_str()));
   newhist->SetDirectory(0);
   m_histograms.push_back(newhist);
+}
+void DisplayData::select(const TObject* object)
+{
+  //where is this thing stored?
+  DataStore::StoreEntry* storeEntry = 0;
+  int index = -1;
+  DataStore::Instance().findStoreEntry(object, storeEntry, index);
+
+  if (storeEntry) {
+    m_selectedObjects.push_back(std::make_pair(storeEntry->name, index));
+  } else {
+    B2WARNING("DisplayData::select(): object must be part of a StoreArray!");
+  }
 }

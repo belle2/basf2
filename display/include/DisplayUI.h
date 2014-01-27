@@ -135,11 +135,16 @@ namespace Belle2 {
     /** Set the TObject <-> TEveElement map (to be filled by EVEVisualization). */
     void setVisualRepMap(const VisualRepMap* visualRepMap) { m_visualRepMap = visualRepMap; }
 
+    /** Select the representation of the given object. */
+    void select(const TObject* object);
+
+
+  public: // slots, don't call these manually
     /** Handle special actions when objects are selected. */
     void selectionHandler(TEveElement* eveObj);
 
-
   private:
+
     /** Wraps a module parameter that can be toggled from the UI. */
     struct Parameter {
       std::string m_label; /**< Label shown in UI. */

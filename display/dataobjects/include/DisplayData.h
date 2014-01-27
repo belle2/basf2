@@ -69,6 +69,14 @@ namespace Belle2 {
      */
     void addHistogram(const std::string& name, const TH1* hist);
 
+    /** Select the given object in the display.
+     *
+     * Only has an effect if the object actually has a visualisation.
+     * Can be called multiple times to select more than one object.
+     *
+     * @param object object to select, must be inside a StoreArray
+     */
+    void select(const TObject* object);
   private:
 
     std::map<std::string, std::vector<TVector3> > m_pointSets; /**< name -> points map */
@@ -76,7 +84,9 @@ namespace Belle2 {
     /** Histograms to be shown in Eve. */
     std::vector<TH1*> m_histograms; //->
 
-    ClassDef(DisplayData, 1); /**< Add custom information to the display. */
+    std::vector<std::pair<std::string, unsigned int> > m_selectedObjects; /**< List of selected objects (array name, index). */
+
+    ClassDef(DisplayData, 2); /**< Add custom information to the display. */
 
     friend class DisplayUI;
     friend class EVEVisualization;

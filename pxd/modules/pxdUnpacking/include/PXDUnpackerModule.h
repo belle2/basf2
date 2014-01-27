@@ -21,6 +21,9 @@
 namespace Belle2 {
 
   namespace PXD {
+
+#define ONSEN_MAX_TYPE_ERR  32
+
     /** \addtogroup modules
      * @{
      */
@@ -39,6 +42,8 @@ namespace Belle2 {
       virtual void initialize();
       /** do the unpacking */
       virtual void event();
+      /** Terminate the module */
+      virtual void terminate();
 
     private:
 
@@ -58,6 +63,10 @@ namespace Belle2 {
       bool m_doNotStore;
       /** Event Number and compare mask grabbed from FTSW for now */
       unsigned int ftsw_evt_nr, ftsw_evt_mask;
+      /** Event counter */
+      unsigned int unpacked_events;
+      /** Error counters */
+      unsigned int error_counter[ONSEN_MAX_TYPE_ERR];
       /** Output array for Raw Hits. */
       StoreArray<PXDRawHit> m_storeRawHits;
       /** Output array for Raw Hits. */

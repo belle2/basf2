@@ -78,11 +78,19 @@ public abstract class Histo extends AbstractHisto {
 		double mean = 0;
 		for (int n = 0; n < _axis_x.getNbins(); n++) {
 			bin = getBinContent(n);
-			mean += bin * (n + 0.5) * (_axis_x.getMax() - _axis_x.getMin())
-					/ _axis_x.getNbins();
+			mean += bin * ((n + 0.5) * (_axis_x.getMax() - _axis_x.getMin())
+					/ _axis_x.getNbins() + _axis_x.getMin());
 			entries += bin;
 		}
 		return mean / entries;
+	}
+
+	public double getEntries() {
+		int entries = 0;
+		for (int n = 0; n < _axis_x.getNbins(); n++) {
+			entries += getBinContent(n);
+		}
+		return entries;
 	}
 
 	public double getRMS() {

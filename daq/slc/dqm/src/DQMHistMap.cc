@@ -2,12 +2,12 @@
 
 using namespace Belle2;
 
-void DQMHistMap::addHist(TH1* hist)
+void DQMHistMap::addHist(TH1* hist, const char* name)
 {
-  if (!hasHist(hist->GetName())) {
-    _hist_m.insert(TH1Map::value_type(hist->GetName(), hist));
+  if (!hasHist(name)) {
+    _hist_m.insert(TH1Map::value_type(name, hist));
   } else {
-    _hist_m[hist->GetName()] = hist;
+    _hist_m[name] = hist;
   }
 }
 

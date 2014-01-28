@@ -3,6 +3,7 @@
 
 #include <daq/slc/system/TCPServerSocket.h>
 #include <daq/slc/system/PThread.h>
+#include <daq/slc/system/LogFile.h>
 
 #include <string>
 
@@ -23,6 +24,7 @@ namespace Belle2 {
       server_socket.open();
       while (true) {
         TCPSocket socket = server_socket.accept();
+        LogFile::debug("new connection accepted (%s:%d)", _ip.c_str(), _port);
         PThread(new WORKER(socket, _arg));
       }
     }

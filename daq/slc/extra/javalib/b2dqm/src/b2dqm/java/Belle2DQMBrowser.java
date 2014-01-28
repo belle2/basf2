@@ -123,7 +123,14 @@ public class Belle2DQMBrowser extends JavaEntoryPoint {
 				}
 				break;
 				case FLAG_UPDATE : {
+					int size = socket_reader.readInt();
+					inflater.setBufferSize(size);
 					inflater.readBuffer(socket_reader);
+					int expno = inflater.readInt();
+					int runno = inflater.readInt();
+					int stateno = inflater.readInt();
+					_frame.getStatusPnale().update(expno, runno, stateno);
+					System.out.println(expno+"."+runno+":"+stateno);
 					int npacks = inflater.readInt();
 					for (int n = 0; n < npacks; n++) {
 						HistoPackage pack = _pack_v.get(n);

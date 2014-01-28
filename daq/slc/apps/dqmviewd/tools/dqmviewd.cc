@@ -27,14 +27,17 @@ typedef void* MonitorFunc_t(const char*, const char*);
 
 int main(int argc, char** argv)
 {
-  if (argc < 1) {
-    Belle2::debug("Usage: ./dqmviewd");
+  if (argc < 2) {
+    Belle2::debug("Usage: ./dqmviewd <nodename> [-d] ");
     return 1;
   }
-  //daemon(0, 0);
-  LogFile::open("dqmviewd");
-  //system("killall hserver");
   const char* name = argv[1];
+  bool debugmode = (argc > 2);
+  LogFile::open("dqmviewd");
+  if (!debugmode) {
+    daemon(0, 0);
+    system("killall hserver");
+  }
 
   ConfigFile config("dqm");
   DQMViewMaster* master = new DQMViewMaster();
@@ -59,7 +62,9 @@ int main(int argc, char** argv)
           if (pack_name.size() == 0 || pack_port <= 0 || pack_map.size() == 0)
             continue;
           std::string emsg = Belle2::form("Added DQM for %s", pack_name.c_str());
-          master->add(pack_name, pack_port, map_path + "/" + pack_map);
+          std::string mapfile = map_path + "/" + pack_map;
+          ::unlink(mapfile.c_str());
+          master->add(pack_name, pack_port, mapfile);
         }
       }
     }
@@ -74,12 +79,13 @@ int main(int argc, char** argv)
 
   NSMNode* node = new NSMNode(name);
   DQMViewCallback* callback = new DQMViewCallback(node, master);
-  /*
-  callback->init();
-  while (true) { sleep(10); }
-  */
-  NSMNodeDaemon* daemon = new NSMNodeDaemon(callback);
-  daemon->run();
+  if (debugmode) {
+    callback->init();
+    while (true) { sleep(10); }
+  } else {
+    NSMNodeDaemon* daemon = new NSMNodeDaemon(callback);
+    daemon->run();
+  }
   return 0;
 }
 

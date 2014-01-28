@@ -20,7 +20,7 @@ namespace Belle2 {
 
   public:
     const std::string& getFileName() { return _file_name; }
-    void addHist(TH1* hist);
+    void addHist(TH1* hist, const char* name);
     TH1* getHist(const std::string& name);
     bool hasHist(const std::string& name);
     TH1Map& getHists() { return _hist_m; }

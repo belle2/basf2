@@ -13,11 +13,12 @@ public class ZlibInflater extends DataReader {
 	private byte[] _comp_buf = new byte[1024*1024*125];
 	private int _comp_size;
 	private Inflater _inflater = new Inflater();
-	private byte[] _buffer = new byte[1024*1024*250];
+	private byte[] _buffer = new byte[1024*1024*10];
 	private ByteArrayOutputStream _byte_stream = new ByteArrayOutputStream();
 
 	public void setBufferSize(int size) {
-		_buffer = new byte[size];
+		if (_buffer.length < size)
+			_buffer = new byte[size];
 	}
 
 	public void setInput(byte[] buf) {

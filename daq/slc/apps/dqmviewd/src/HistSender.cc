@@ -89,9 +89,10 @@ void HistSender::run()
           for (TH1Map::iterator it = reader.getHists().begin();
                it != reader.getHists().end(); it++) {
             TH1* h = (TH1*)it->second;
+            std::string name = it->first;
             TString class_name = h->ClassName();
             socket_writer.writeString(class_name.Data());
-            socket_writer.writeString(h->GetName());
+            socket_writer.writeString(name);
             socket_writer.writeString(std::string(h->GetTitle()) + ";" +
                                       h->GetXaxis()->GetTitle()  + ";" +
                                       h->GetYaxis()->GetTitle());
@@ -118,6 +119,9 @@ void HistSender::run()
     }
 
     StreamSizeCounter counter;
+    counter.writeInt(0);
+    counter.writeInt(0);
+    counter.writeInt(0);
     counter.writeInt(npacks);
     _master->lock();
     for (size_t i = 0; i < reader_v.size(); i++) {
@@ -146,7 +150,11 @@ void HistSender::run()
           break;
         }
         socket_writer.writeInt(FLAG_UPDATE);
+        socket_writer.writeInt(buf.getBufferSize());
         buf.seekTo(0);
+        buf.writeInt(_master->getExpNumber());
+        buf.writeInt(_master->getRunNumber());
+        buf.writeInt(_master->getState().getId());
         buf.writeInt(npacks);
         for (size_t i = 0; i < reader_v.size(); i++) {
           if (monitored_v[i]) {
@@ -175,9 +183,10 @@ throw(IOException)
   writer.writeInt(reader.getHists().size());
   for (TH1Map::iterator it = reader.getHists().begin();
        it != reader.getHists().end(); it++) {
+    std::string name = it->first;
     TH1* h = (TH1*)it->second;
     TString class_name = h->ClassName();
-    writer.writeString(h->GetName());
+    writer.writeString(name);
     const int nbinsx = h->GetXaxis()->GetNbins();
     if (class_name.Contains("TH1")) {
       for (int nx = 0; nx < nbinsx; nx++) {

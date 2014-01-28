@@ -18,19 +18,19 @@ void DQMViewCallback::init() throw()
   _master->setCallback(this);
   _master->init();
   _master->boot();
-  //_master->setState(State::INITIAL_S);
+  _master->setState(State::INITIAL_S);
   PThread(new DQMPackageUpdater(this, _master));
 }
 
 bool DQMViewCallback::boot() throw()
 {
-  //_master->setState(State::CONFIGURED_S);
+  _master->setState(State::CONFIGURED_S);
   return true;
 }
 
 bool DQMViewCallback::load() throw()
 {
-  //_master->setState(State::READY_S);
+  _master->setState(State::READY_S);
   return true;
 }
 
@@ -40,7 +40,7 @@ bool DQMViewCallback::start() throw()
   _expno = nsm.getParam(0);
   _runno = nsm.getParam(1);
   _master->setRunNumbers(_expno, _runno);
-  //_master->setState(State::RUNNING_S);
+  _master->setState(State::RUNNING_S);
   return true;
 }
 
@@ -54,18 +54,18 @@ bool DQMViewCallback::stop() throw()
   for (size_t i = 0; i < reader_v.size(); i++) {
     reader_v[i].dump(dumppath, _expno, _runno);
   }
-  //_master->setState(State::READY_S);
+  _master->setState(State::READY_S);
   return true;
 }
 
 bool DQMViewCallback::pause() throw()
 {
-  //_master->setState(State::PAUSED_S);
+  _master->setState(State::PAUSED_S);
 }
 
 bool DQMViewCallback::abort() throw()
 {
-  //_master->setState(State::INITIAL_S);
+  _master->setState(State::INITIAL_S);
   return true;//_master->abort();
 }
 

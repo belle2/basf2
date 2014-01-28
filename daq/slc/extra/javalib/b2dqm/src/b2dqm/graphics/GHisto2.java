@@ -1,15 +1,8 @@
 package b2dqm.graphics;
 
-import java.util.Iterator;
-
-import b2daq.core.NumberString;
 import b2daq.graphics.GCanvas;
-import b2daq.graphics.GRect;
-import b2daq.graphics.GText;
 import b2daq.graphics.HtmlColor;
-import b2dqm.core.Histo;
 import b2dqm.core.Histo2;
-
 
 public class GHisto2 extends GHisto {
 
@@ -85,11 +78,12 @@ public class GHisto2 extends GHisto {
 		double max = _axis_y.get().getMax();
 		double min = _axis_y.get().getMin();
 		double X, Y, width, height;
-		int n_digit = 1;
+		/*int n_digit = 1;
 		if ( _histo.getDataType().matches(".*I") ||
 			 _histo.getDataType().matches(".*C") || _histo.getDataType().matches(".*S")) {
-			n_digit = 0;			
+			//n_digit = 0;			
 		}
+		*/
 		for ( int ny = 0; ny < _histo.getAxisY().getNbins(); ny++ ) {
 			for ( int nx = 0; nx < _histo.getAxisX().getNbins(); nx++ ) {
 				X = x0 + _canvas.getAxisX().eval( dbinx * nx + xmin );
@@ -109,15 +103,19 @@ public class GHisto2 extends GHisto {
 				}
 				canvas.store();
 				if (!color.isNull()) {
+					HtmlColor c = canvas.getLine().getColor();
 					canvas.getFill().setColor(color);
 					canvas.getLine().setColor(HtmlColor.NULL);
 					canvas.drawRect(X, Y - height*1.2, width*1.2, height*1.2);
+					canvas.getLine().setColor(c);
 				}
 				if (!getLineColor().isNull()) {
+					HtmlColor c = canvas.getFill().getColor();
 					canvas.getFill().setColor(HtmlColor.NULL);
 					canvas.getLine().setColor(getLineColor());
 					canvas.getLine().setWidth(getLineWidth());
 					canvas.drawRect(X, Y - height*1.2, width*1.2, height*1.2);
+					canvas.getFill().setColor(c);
 				}
 				canvas.restore();
 			}

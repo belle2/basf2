@@ -30,9 +30,8 @@ public class CanvasPanel extends JPanel implements Updatable {
 	
 	private Canvas _canvas;
 	private JavaGCanvas _graphics = null;
-
 	private BufferedImage _image_buffer = null;
-
+	
 	public CanvasPanel(Canvas canvas, int width, int height){
 		if (width < WIDTH_MIN) width = WIDTH_MIN;
 		if (height < HEIGHT_MIN) height = HEIGHT_MIN;

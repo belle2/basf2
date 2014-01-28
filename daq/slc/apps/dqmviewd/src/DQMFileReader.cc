@@ -42,7 +42,9 @@ bool DQMFileReader::init()
       if (class_name.Contains("TH1") ||  class_name.Contains("TH2")) {
         TH1* h = (TH1*)obj;
         LogFile::debug("%s in %s", h->GetName(), _name.c_str());
-        _hist_m.addHist(h);
+        TString name = h->GetName();
+        h = (TH1*)h->Clone(name + "_copy");
+        _hist_m.addHist(h, name);
       }
     }
     mr = mr->GetNext();
@@ -60,23 +62,16 @@ int DQMFileReader::update()
   for (TH1Map::iterator it = _hist_m.getHists().begin();
        it != _hist_m.getHists().end(); it++) {
     std::string name = it->first;
-    TH1* h_copy = (TH1*)(it->second)->Clone();
-    delete it->second;
-    TObject* obj = _file->Get(name.c_str());
-    TH1* h = (TH1*)obj;
-    TString class_name = h->ClassName();
-    if (strcmp(h_copy->ClassName(), h->ClassName()) != 0 ||
-        ((class_name.Contains("TH1") && (h->GetNbinsX() != h_copy->GetNbinsX())) ||
-         ((class_name.Contains("TH2") && (h->GetNbinsX() != h_copy->GetNbinsX() ||
-                                          h->GetNbinsY() != h_copy->GetNbinsY()))))) {
-      _updateid = 0;
+    TH1* h = it->second;
+    h->Reset();
+    TH1* h0 = (TH1*)_file->Get(name.c_str());
+    h->Add(h0);
+    delete h0;
+    if (_updateid % 1 == 0) {
+      LogFile::debug("Entries of %s = %d", name.c_str(), (int)h->GetEntries());
     }
-    if (_updateid % 10 == 0) {
-      LogFile::debug("Entries of %s = %d", h->GetName(), (int)h->GetEntries());
-    }
-    delete h_copy;
-    _hist_m.addHist(h);
   }
+
   int updateid = _updateid;
   _mutex.unlock();
   return updateid;
@@ -92,12 +87,13 @@ bool DQMFileReader::dump(const std::string& dir,
   TFile* file = new TFile(filepath.c_str(), "recreate");
   for (TH1Map::iterator it = _hist_m.getHists().begin();
        it != _hist_m.getHists().end(); it++) {
-    TObject* obj = _file->Get(it->first.c_str());
-    obj->Write();
+    //TObject* obj = _file->Get(it->first.c_str());
+    //obj->Write();
+    it->second->Write();
   }
   file->Close();
   delete file;
-  _file->cd();
+  //_file->cd();
   _mutex.unlock();
   return true;
 }

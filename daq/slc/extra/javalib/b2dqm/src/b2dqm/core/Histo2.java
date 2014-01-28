@@ -70,6 +70,48 @@ public abstract class Histo2 extends Histo {
 		}
 	}
 
+	public double getMeanX() {
+		int entries = 0;
+		double bin = 0;
+		double mean = 0;
+		for (int nx = 0; nx < _axis_x.getNbins(); nx++) {
+			bin = 0;
+			for (int ny = 0; ny < _axis_y.getNbins(); ny++) {
+				bin += getBinContent(nx, ny);
+			}
+			mean += bin * ((nx + 0.5) * (_axis_x.getMax() - _axis_x.getMin())
+					/ _axis_x.getNbins() + _axis_x.getMin());
+			entries += bin;
+		}
+		return mean / entries;
+	}
+	
+	public double getMeanY() {
+		int entries = 0;
+		double bin = 0;
+		double mean = 0;
+		for (int ny = 0; ny < _axis_y.getNbins(); ny++) {
+			bin = 0;
+			for (int nx = 0; nx < _axis_x.getNbins(); nx++) {
+				bin += getBinContent(nx, ny);
+			}
+			mean += bin * ((ny + 0.5) * (_axis_y.getMax() - _axis_y.getMin())
+					/ _axis_y.getNbins() + _axis_y.getMin());
+			entries += bin;
+		}
+		return mean / entries;
+	}
+	
+	public double getEntries() {
+		int entries = 0;
+		for ( int ny = 0;  ny < _axis_y.getNbins(); ny++) {
+			for ( int nx = 0;  nx < _axis_x.getNbins(); nx++) {
+				entries += getBinContent(nx, ny);
+			}
+		}
+		return entries;
+	}
+
 	@Override
 	public void readConfig(Reader reader) throws Exception {
 		setTabId(reader.readChar());

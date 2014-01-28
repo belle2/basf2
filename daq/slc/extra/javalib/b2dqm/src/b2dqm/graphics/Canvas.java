@@ -38,12 +38,17 @@ public class Canvas extends GRect {
 	private String _title_position = "center";
 	private boolean _use_pad = false;
 	private long _update_time = -1;
+	private GRect _stat_rect;
+	private GText _stat_name;
+	private GText _stat_update;
+	private GText _stat_entries;
+	private Histo _stat_histo = null;
 	
 	public Canvas(String name, String title, int width, int height) {
 		super(0, 0, 1, 1);
 		setName(name);
 		_title.setText(title);
-		setFont(new FontProperty(HtmlColor.BLACK, "Arial", 1.2, FontProperty.WEIGHT_BOLD));
+		setFont(new FontProperty(HtmlColor.BLACK, "Arial", 1.1, FontProperty.WEIGHT_BOLD));
 		resetPadding();
 		setFillColor(HtmlColor.WHITE);
 	}
@@ -110,6 +115,18 @@ public class Canvas extends GRect {
 				if ( getTitle().length() == 0 ) {
 					setTitle(h.getTitle());
 				}
+				_stat_histo  = h;
+				_stat_rect = new GRect(0.71, 0.02, 0.28, 0.12, HtmlColor.WHITE, HtmlColor.BLACK);
+				addShape(_stat_rect);
+				_stat_name = new GText(h.getName(), 0.85, 0.055, "center");
+				_stat_name.setFontSize(0.52);
+				addShape(_stat_name);
+				_stat_update = new GText("mean     : ", 0.72, 0.088, "left");
+				_stat_update.setFontSize(0.52);
+				addShape(_stat_update);
+				_stat_entries = new GText("entries : "+h.getEntries(), 0.72, 0.128, "left");
+				_stat_entries.setFontSize(0.52);
+				addShape(_stat_entries);
 			} catch (Exception e) {}
 		}
 		GMonObject dh = null;
@@ -184,6 +201,18 @@ public class Canvas extends GRect {
 	public void update() {
 		for ( GMonObject histo : _histo_v ) {
 			histo.update();
+		}
+		if ( _stat_histo != null) {
+			if (_stat_histo.getDim() == 1) {
+				String label = String.format("%1$.3f", _stat_histo.getMean());
+				_stat_update.setText("mean     : " + label);
+			} else if (_stat_histo.getDim() == 2) {
+				Histo2 h = (Histo2)_stat_histo;
+				String label = String.format("(%1$.3f, ", h.getMeanX());
+				label += String.format("%1$.3f)", h.getMeanY());
+				_stat_update.setText("mean     : " + label);
+			}
+			   _stat_entries.setText("integral : " + ((int)_stat_histo.getEntries()));
 		}
 	}
 	

@@ -55,7 +55,7 @@ public abstract class GAxis extends GShape {
 	protected GLine _border_line1 = new GLine(0, 0, 0, 0, HtmlColor.BLACK);
 	protected String _label_align;
 	private String _time_format = "";
-	private int _ndivisions = 5;
+	private int _ndivisions = 10;
 
 	public GAxis() {
 		super();

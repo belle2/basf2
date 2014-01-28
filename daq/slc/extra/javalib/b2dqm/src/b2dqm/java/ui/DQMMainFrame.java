@@ -3,7 +3,6 @@ package b2dqm.java.ui;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Toolkit;
-import java.io.InputStream;
 import java.util.ArrayList;
 
 import javax.swing.BoxLayout;
@@ -23,9 +22,9 @@ public class DQMMainFrame extends JFrame {
 	private DQMMainPanel _main_panel = new DQMMainPanel();
 	private DQMSidePanel _side_panel = new DQMSidePanel();
 	private ArrayList<JFrame> _child_frame_v = new ArrayList<JFrame>(); 
-	
 	private JPanel _panel = new JPanel();
 	private boolean _is_separated = false;
+	private DQMStatusPanel _status_panel;
 	
 	public static DQMMainFrame get() {
 		return __main;
@@ -47,9 +46,14 @@ public class DQMMainFrame extends JFrame {
 	
 	public void init(ArrayList<HistoPackage> pack_v, 
 			ArrayList<PackageInfo> info_v) {
-		System.out.println("DQMMainFrame::init done");
+		System.out.println("DQMMainFrame::init");
+		JPanel panel = new JPanel();
+		add(panel);
+		panel.setLayout(new BoxLayout(panel,BoxLayout.Y_AXIS));
+		_status_panel = new DQMStatusPanel();
+		panel.add(_status_panel);
 		_panel.setLayout(new BoxLayout(_panel,BoxLayout.X_AXIS));
-		add(_panel);
+		panel.add(_panel);
 		_main_panel.initPanels(pack_v, _side_panel);
 		_side_panel.init(pack_v);
 		_panel.add(_side_panel);
@@ -58,7 +62,7 @@ public class DQMMainFrame extends JFrame {
 		_main_panel.setPreferredSize(new Dimension(1000, 720));
 		_side_panel.setPreferredSize(new Dimension(300, 720));
 		_side_panel.setMaximumSize(new Dimension(300, 720));
-		setSize(1240, 720);
+		setSize(1040, 720);
 		setTitle("Belle-II DQM browser version " + Belle2DQMBrowser.VERSION);
 		setJMenuBar(new DQMMenuBar(this));
 		setLocationRelativeTo(null);
@@ -82,6 +86,10 @@ public class DQMMainFrame extends JFrame {
 	
 	public ArrayList<JFrame> getChildFrames() {
 		return _child_frame_v;	
+	}
+
+	public DQMStatusPanel getStatusPnale() {
+		return _status_panel;
 	}
 	
 	public boolean separatePanels() {

@@ -32,8 +32,8 @@ public class GColorAxis extends GAxisY {
           canvas.getFill().setColor(_color_patrern[nz]);
           canvas.drawRect(X, Y, _padding_x * 1.05, px_height * 1.05);
 		}
+       canvas.restore();
 		super.draw(canvas);
-        canvas.restore();
 	}
 
 	public boolean hit(double x, double y) {

@@ -48,7 +48,7 @@ RingBuffer::RingBuffer(int size)
   sprintf(m_strbuf, "/tmp/SHM%d-SEM%d-UNNAMED", m_shmid, m_semid);
   int fd = open(m_strbuf, O_CREAT | O_TRUNC | O_RDWR, 0644);
   if (fd < 0) {
-    B2INFO("RingBuffer ID file could not be created.");
+    B2WARNING("RingBuffer ID file could not be created.");
   } else {
     close(fd);
   }
@@ -91,7 +91,7 @@ RingBuffer::RingBuffer(const char* name, unsigned int size)
   openSHM(size);
 
   if (m_pathfd > 0) {
-    B2INFO("First global RingBuffer craetion: writing SHM info to file.");
+    B2INFO("First global RingBuffer creation: writing SHM info to file.");
     char rbufinfo[256];
     sprintf(rbufinfo, "%d\n", m_shmid);
     int is = write(m_pathfd, rbufinfo, strlen(rbufinfo));
@@ -108,7 +108,7 @@ RingBuffer::RingBuffer(const char* name, unsigned int size)
     sprintf(m_strbuf, "/tmp/SHM%d-SEM%d-RB_%s", m_shmid, m_semid, name);
     int fd = open(m_strbuf, O_CREAT | O_TRUNC | O_RDWR, 0644);
     if (fd < 0) {
-      B2INFO("RingBuffer ID file could not be created.");
+      B2WARNING("RingBuffer ID file could not be created.");
     } else {
       close(fd);
     }
@@ -218,8 +218,7 @@ int RingBuffer::insq(const int* buf, int size)
     m_bufinfo->wptr = 0;
     m_bufinfo->rptr = 0;
     if (size > m_bufinfo->size + 2) {
-      B2INFO("[RingBuffer::insq ()] Inserted item is too large! ("
-             << m_bufinfo->size + 2 << " < " << size << ")");
+      B2ERROR("[RingBuffer::insq ()] Inserted item is too large! (" << m_bufinfo->size + 2 << " < " << size << ")");
       return -1;
     }
     m_bufinfo->mode = 0;
@@ -238,7 +237,7 @@ int RingBuffer::insq(const int* buf, int size)
   } else if (m_bufinfo->wptr > m_bufinfo->rptr) {
     if (m_bufinfo->mode != 4 &&
         m_bufinfo->mode != 3 && m_bufinfo->mode != 0) {
-      printf("insq: Error in mode 0; current=%d\n", m_bufinfo->mode);
+      B2ERROR("insq: Error in mode 0; current=" << m_bufinfo->mode);
       return -1;
     }
     if (m_bufinfo->mode == 3) {
@@ -266,7 +265,7 @@ int RingBuffer::insq(const int* buf, int size)
     } else {
       if (m_bufinfo->rptr >= size + 2) { // buffer full and wptr>rptr
         if (m_bufinfo->mode != 0) {
-          printf("insq: Error in mode 1; current=%d\n", m_bufinfo->mode);
+          B2ERROR("insq: Error in mode 1; current=" << m_bufinfo->mode);
           return -1;
         }
         m_bufinfo->mode = 1;
@@ -300,8 +299,8 @@ int RingBuffer::insq(const int* buf, int size)
         size + 2 < m_bufinfo->size - m_bufinfo->rptr) {
       if (m_bufinfo->mode != 1 && m_bufinfo->mode != 2 &&
           m_bufinfo->mode != 3) {
-        printf("insq: Error in mode 2; current=%d\n", m_bufinfo->mode);
-        return (-1);
+        B2ERROR("insq: Error in mode 2; current=" << m_bufinfo->mode);
+        return -1;
       }
       m_bufinfo->mode = 2;
       int* wptr = m_buftop + m_bufinfo->wptr;

@@ -20,7 +20,7 @@ public class DQMStateLabel extends JavaGCanvasPanel {
 		setPreferredSize(new Dimension(150, 30));
 		setMaximumSize(new Dimension(150, 30));
 		setMinimumSize(new Dimension(150, 30));
-		_text.setFontSize(2.05);
+		_text.setFontSize(1.5);
 		_rect.setLineWidth(2);
 		add(_rect);
 		add(_text);
@@ -44,7 +44,7 @@ public class DQMStateLabel extends JavaGCanvasPanel {
 			_text.setFontColor(HtmlColor.GRAY);
 			_text.setText("");
 		} else {
-			_text.setFontSize(1.25);
+			_text.setFontSize(1.5);
 			if ( _state.equals(DQMState.RUNNING_S)) {
 				_rect.setLineColor(HtmlColor.GREEN);
 				_rect.setFillColor(HtmlColor.RUNNING_GREEN);

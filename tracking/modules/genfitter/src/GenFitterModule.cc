@@ -558,6 +558,7 @@ void GenFitterModule::event()
 
           //Find the point of closest approach of the track to the origin
           TVector3 pos(m_beamSpot.at(0), m_beamSpot.at(1), m_beamSpot.at(2)); //origin
+          TVector3 lineDirection(0, 0, 1); // beam axis
           TVector3 poca(0., 0., 0.); //point of closest approach
           TVector3 dirInPoca(0., 0., 0.); //direction of the track at the point of closest approach
           TMatrixDSym cov(6);
@@ -565,7 +566,7 @@ void GenFitterModule::event()
           try {
             //extrapolate the track to the origin, the results are stored directly in poca and dirInPoca
             genfit::MeasuredStateOnPlane mop = gfTrack.getFittedState();
-            mop.extrapolateToPoint(pos);
+            mop.extrapolateToLine(pos, lineDirection);
             mop.getPosMomCov(poca, dirInPoca, cov);
 
             B2DEBUG(149, "Point of closest approach: " << poca.x() << "  " << poca.y() << "  " << poca.z());

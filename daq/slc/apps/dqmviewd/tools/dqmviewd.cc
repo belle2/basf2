@@ -31,7 +31,7 @@ int main(int argc, char** argv)
     Belle2::debug("Usage: ./dqmviewd");
     return 1;
   }
-  daemon(0, 0);
+  //daemon(0, 0);
   LogFile::open("dqmviewd");
   //system("killall hserver");
   const char* name = argv[1];

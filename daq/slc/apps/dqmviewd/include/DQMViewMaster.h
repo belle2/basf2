@@ -14,6 +14,8 @@
 
 namespace Belle2 {
 
+  class RCCallback;
+
   class DQMViewMaster {
 
   public:
@@ -34,6 +36,7 @@ namespace Belle2 {
     void setState(State state) { _state = state; }
     unsigned int getExpNumber() const { return _expno; }
     unsigned int getRunNumber() const { return _runno; }
+    void setCallback(RCCallback* callback) { _callback = callback; }
     void lock() { _mutex.lock(); }
     void unlock() { _mutex.unlock(); }
 
@@ -46,6 +49,7 @@ namespace Belle2 {
     std::vector<DQMFileReader> _reader_v;
     std::vector<ProcessController> _con_v;
     std::vector<int> _port_v;
+    RCCallback* _callback;
 
   };
 

@@ -16,6 +16,7 @@ void DQMViewMaster::init()
   }
   for (size_t i = 0; i < _reader_v.size(); i++) {
     const std::string name = _reader_v[i].getName();
+    _con_v[i].setCallback(_callback);
     _con_v[i].init("hserver_" + name);
   }
 }

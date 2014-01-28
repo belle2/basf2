@@ -1059,16 +1059,16 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& la
     error_mask |= ONSEN_ERR_FLAG_FIX_SIZE;
   }
 
-  unsigned int evtnr;
-
-  evtnr = dhhc.get_evtnr_lo();
-  if ((evtnr & ftsw_evt_mask) != (ftsw_evt_nr & ftsw_evt_mask)) {
-    B2ERROR("Event Numbers do not match for this frame $" << hex << evtnr << "!=$" << ftsw_evt_nr << "(FTSW) mask $" << ftsw_evt_mask);
-    error_mask |= ONSEN_ERR_FLAG_FTSW_DHHC_MM;
-//#define ONSEN_ERR_FLAG_DHHC_DHP_MM      0x00000004
-  }
-
+  unsigned int evtnr = dhhc.get_evtnr_lo();
   int type = dhhc.get_type();
+
+  if ((evtnr & ftsw_evt_mask) != (ftsw_evt_nr & ftsw_evt_mask)) {
+    if (!(type == DHHC_FRAME_HEADER_DATA_TYPE_DHHC_START && ((dhhc_start_frame*)data)->is_fake())
+        && !(type == DHHC_FRAME_HEADER_DATA_TYPE_DHHC_END && ((dhhc_end_frame*)data)->is_fake())) {
+      B2ERROR("Event Numbers do not match for this frame $" << hex << evtnr << "!=$" << ftsw_evt_nr << "(FTSW) mask $" << ftsw_evt_mask);
+      error_mask |= ONSEN_ERR_FLAG_FTSW_DHHC_MM;
+    }
+  }
 
   if (Frame_Number > 0 && Frame_Number < Frames_in_event - 1) {
     if (nr_of_dhh_start_frame != nr_of_dhh_end_frame + 1)

@@ -147,10 +147,6 @@ namespace Belle2 {
   {
   }
 
-  void ParticleCombinerModule::printModuleParams() const
-  {
-  }
-
   void ParticleCombinerModule::combination(StoreObjPtr<ParticleList>& outputList,
                                            vector<StoreObjPtr<ParticleList> >& plists,
                                            unsigned chargeState)

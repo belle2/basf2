@@ -25,6 +25,9 @@ namespace Belle2 {
 
 REG_MODULE(TRGGDL);
 
+TRGGDL *
+TRGGDLModule::_gdl = 0;
+
 string
 TRGGDLModule::version() const {
     return string("TRGGDLModule 0.00");
@@ -88,18 +91,27 @@ TRGGDLModule::initialize() {
 void
 TRGGDLModule::beginRun() {
 
-    //...CDC trigger config. name...
-    static string cfn = _configFilename;
+    //...GDL config. name...
+    string cfn = _configFilename;
 
-    //...CDC trigger...
-    if ((cfn != _configFilename) || (_gdl == 0))
-	_gdl = TRGGDL::getTRGGDL(_configFilename,
+    //...GDL...
+    if (_gdl == 0) {
+	_gdl = TRGGDL::getTRGGDL(cfn,
 				 _simulationMode,
 				 _fastSimulationMode,
 				 _firmwareSimulationMode);
+    }
+    else if (cfn != _gdl->configFile()) {
+	_gdl = TRGGDL::getTRGGDL(cfn,
+				 _simulationMode,
+				 _fastSimulationMode,
+				 _firmwareSimulationMode);
+    }
 
-    if (TRGDebug::level())
+    if (TRGDebug::level()) {
 	cout << "TRGGDLModule ... beginRun called " << endl;
+        cout << "                 configFile = " << cfn << endl;
+    }
 }
 
 void
@@ -110,7 +122,7 @@ TRGGDLModule::event() {
 //      _gdl->dump("geometry superLayers layers detail");
     }
 
-    //...CDC trigger simulation...
+    //...GDL simulation...
     _gdl->update(true);
     _gdl->simulate();
 }

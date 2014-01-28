@@ -16,6 +16,8 @@
 
 #define TRGGDL_UNDEFINED 999999
 
+#include <fstream>
+#include <iostream>
 #include <vector>
 #include "trg/trg/Clock.h"
 
@@ -81,6 +83,9 @@ class TRGGDL {
     /// returns version.
     std::string version(void) const;
 
+    /// returns configuration file name.
+    std::string configFile(void) const;
+
     /// returns simulation mode.
     unsigned mode(void) const;
 
@@ -131,6 +136,15 @@ class TRGGDL {
     /// Firmware simulation
     void firmwareSimulation(void);
 
+    /// Read input data definition.
+    void getInput(std::ifstream & ifs);
+
+    /// Read output data definition.
+    void getOutput(std::ifstream & ifs);
+
+    /// Read algorithm data definition.
+    void getAlgorithm(std::ifstream & ifs);
+
   private:
 
     /// GDL singleton.
@@ -159,6 +173,15 @@ class TRGGDL {
 
     /// All serial links.
     std::vector<TRGLink *> _links;
+
+    /// Input names.
+    std::vector<std::string> _input;
+
+    /// Output names.
+    std::vector<std::string> _output;
+
+    /// Algorithm
+    std::vector<std::string> _algorithm;
 
     friend class TRGGDLModule;
 };
@@ -194,6 +217,13 @@ unsigned
 TRGGDL::firmwareSimulationMode(void) const {
     return _firmwareSimulationMode;
 }
+
+inline
+std::string
+TRGGDL::configFile(void) const {
+    return _configFilename;
+}
+
 
 } // namespace Belle2
 

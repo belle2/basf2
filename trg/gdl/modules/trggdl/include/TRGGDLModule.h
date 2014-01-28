@@ -74,7 +74,7 @@ class TRGGDLModule : public Module {
   private:
 
     /// A pointer to a TRGGDL;
-    TRGGDL * _gdl;
+    static TRGGDL * _gdl;
 };
 
 } // namespace Belle2

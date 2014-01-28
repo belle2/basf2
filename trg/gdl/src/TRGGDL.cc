@@ -100,6 +100,7 @@ TRGGDL::TRGGDL(const string & configFile,
 
 void
 TRGGDL::initialize(void) {
+    configure();
 }
 
 void
@@ -157,26 +158,144 @@ TRGGDL::firmwareSimulation(void) {
 void
 TRGGDL::configure(void) {
 
-    //...Open configuration file...
-    ifstream infile(_configFilename.c_str(), ios::in);
+    //...Open input data definition...
+    const string fni = _configFilename + ".inp";
+    ifstream infile(fni.c_str(), ios::in);
     if (infile.fail()) {
-        cout << "TRGGDL !!! can not open file" << endl
-             << "    " << _configFilename << endl;
+        cout << "TRGGDL !!! can not open file : " << fni << endl;
         return;
     }
+    getInput(infile);
+    infile.close();
 
-    //...Read configuration data...
+    //...Open output data definition...
+    const string fno = _configFilename + ".oup";
+    ifstream outfile(fno.c_str(), ios::in);
+    if (outfile.fail()) {
+        cout << "TRGGDL !!! can not open file : " << fno << endl;
+        return;
+    }
+    getOutput(outfile);
+    outfile.close();
+
+    //...Open algorithm data definition...
+    const string fna = _configFilename + ".alg";
+    ifstream algfile(fna.c_str(), ios::in);
+    if (algfile.fail()) {
+        cout << "TRGGDL !!! can not open file : " << fna << endl;
+        return;
+    }
+    getAlgorithm(algfile);
+    algfile.close();
+
+    //...Summary...
+    if (TRGDebug::level()) {
+        cout << "TRGGDL Input Bits" << endl;
+        for (unsigned i = 0; i < _input.size(); i++)
+            cout << TRGDebug::tab(4) << i << " : " << _input[i] << endl;
+        cout << "TRGGDL Output Bits" << endl;
+        for (unsigned i = 0; i < _output.size(); i++)
+            cout << TRGDebug::tab(4) << i << " : " << _output[i]
+                 << " : " << _algorithm[i] << endl;
+    }
+}
+
+void
+TRGGDL::getInput(ifstream & ifs) {
+
+    if (TRGDebug::level()) {
+         cout << "TRGGDL::getInput ... reading input data" << endl;
+    }
+
     char b[800];
     unsigned lines = 0;
-    string cdcVersion = "";
-    string configVersion = "";
-    while (! infile.eof()) {
-        infile.getline(b, 800);
-        const string l(b);
-        string cdr = l;
+    while (! ifs.eof()) {
+        ifs.getline(b, 800);
+
+        //...The first word should be input bit number...
+        const string w0 = TRGUtilities::carstring(b);
+
+        //...Bit name...
+        string cdr = TRGUtilities::cdrstring(b);
+        const string w1 = TRGUtilities::carstring(cdr);
+
+        if (w1.size())
+            _input.push_back(w1);
+
+        
+        // if (TRGDebug::level()) {
+        //     cout << w0 << "," << w1 << endl;
+        // }
+
         ++lines;
     }
-    infile.close();
+
+}
+
+void
+TRGGDL::getOutput(ifstream & ifs) {
+
+    if (TRGDebug::level()) {
+         cout << "TRGGDL::getOutput ... reading output data" << endl;
+    }
+
+    char b[800];
+    unsigned lines = 0;
+    while (! ifs.eof()) {
+        ifs.getline(b, 800);
+
+        //...The first word should be input bit number...
+        const string w0 = TRGUtilities::carstring(b);
+
+        //...Bit name...
+        string cdr = TRGUtilities::cdrstring(b);
+        const string w1 = TRGUtilities::carstring(cdr);
+
+        if (w1.size())
+            _output.push_back(w1);
+
+        // if (TRGDebug::level()) {
+        //     cout << w0 << "," << w1 << endl;
+        // }
+
+        ++lines;
+    }
+
+}
+
+void
+TRGGDL::getAlgorithm(ifstream & ifs) {
+
+    if (TRGDebug::level()) {
+         cout << "TRGGDL::getAlgorithm ... reading algorithm data" << endl;
+    }
+
+    char b[800];
+    unsigned lines = 0;
+    while (! ifs.eof()) {
+        ifs.getline(b, 800);
+
+        //...The first word should be input bit number...
+        const string w0 = TRGUtilities::carstring(b);
+
+        //...':'...
+        string cdr = TRGUtilities::cdrstring(b);
+        const string w1 = TRGUtilities::carstring(cdr);
+
+        //...Algorithm...
+        cdr = TRGUtilities::cdrstring(cdr);
+        const string w2 = cdr;
+
+        if (w2.size())
+            _algorithm.push_back(w2);
+
+         if (TRGDebug::level()) {
+             cout << w0 << "," << w1 << "," << w2 << endl;
+         }
+
+        ++lines;
+    }
+
 }
 
 } // namespace Belle2

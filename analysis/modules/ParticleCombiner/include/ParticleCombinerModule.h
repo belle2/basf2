@@ -123,7 +123,7 @@ namespace Belle2 {
      * @param particleStack Reference to stack of pointers to Particle
      * @return True if all requirements are passed, false otherwise
      */
-    bool checkCuts(std::vector<Particle*>& particleStack);
+    bool checkCuts(const std::vector<Particle*>& particleStack);
 
     int m_pdg;                /**< PDG code of combined particles */
     std::string m_listName;   /**< output particle list name */

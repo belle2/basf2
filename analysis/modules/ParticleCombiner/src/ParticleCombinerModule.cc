@@ -225,38 +225,36 @@ namespace Belle2 {
 
   }
 
-  bool ParticleCombinerModule::checkCuts(std::vector<Particle*>& particleStack)
+  bool ParticleCombinerModule::checkCuts(const std::vector<Particle*>& particleStack)
   {
 
     VariableManager& manager = VariableManager::Instance();
 
     for (auto & cut : m_productCuts) {
-      // Now calculate the value by multiplying all decay products values,
+      // Now calculate the value by multiplying all decay product values,
       double value = 1.0;
       auto var = manager.getVariable(cut.first);
       if (var == nullptr) {
-        B2INFO("ParticleCombiner: VariableManager doesn't have Variable" <<  cut.first)
+        B2INFO("ParticleCombiner: VariableManager doesn't have variable" <<  cut.first)
         return false;
       }
       for (unsigned i = 0; i < particleStack.size(); i++) {
         value *= var->function(particleStack[i]);
       }
-      B2INFO("Product of daughter particles is " << value)
       if (value < std::get<0>(cut.second) || value > std::get<1>(cut.second)) return false;
     }
 
     for (auto & cut : m_sumCuts) {
-      // Now calculate the value by summing all decay products values,
+      // Now calculate the value by adding all decay product values,
       double value = 0.0;
       auto var = manager.getVariable(cut.first);
       if (var == nullptr) {
-        B2INFO("ParticleCombiner: VariableManager doesn't have Variable" <<  cut.first)
+        B2INFO("ParticleCombiner: VariableManager doesn't have variable" <<  cut.first)
         return false;
       }
       for (unsigned i = 0; i < particleStack.size(); i++) {
         value += var->function(particleStack[i]);
       }
-      B2INFO("Sum of daughter particles is " << value)
       if (value < std::get<0>(cut.second) || value > std::get<1>(cut.second)) return false;
     }
 

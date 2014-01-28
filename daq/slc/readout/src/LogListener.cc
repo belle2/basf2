@@ -41,7 +41,7 @@ void LogListener::run()
     while (true) {
       c = preader.readChar();
       if (c == '\n' && count > 0) {
-        s = ss.str();
+        s = _con->getName() + " : " + ss.str();
         ss.str("");
         _con->lock();
         LogFile::put(priority, s);

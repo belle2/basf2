@@ -19,7 +19,7 @@ bool RunInfoBuffer::open(const std::string& nodename,
   _nreserved = nreserved;
   std::string username = getenv("USER");
   _path = "/run_info_" + username + "_" + nodename;
-  if (recreate) SharedMemory::unlink(_path);
+  //if (recreate) SharedMemory::unlink(_path);
   if (!_memory.open(_path, size())) {
     perror("shm_open");
     LogFile::fatal("Failed to open %s", _path.c_str());

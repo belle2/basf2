@@ -1063,8 +1063,11 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& la
   int type = dhhc.get_type();
 
   if ((evtnr & ftsw_evt_mask) != (ftsw_evt_nr & ftsw_evt_mask)) {
-    if (!(type == DHHC_FRAME_HEADER_DATA_TYPE_DHHC_START && ((dhhc_start_frame*)data)->is_fake())
-        && !(type == DHHC_FRAME_HEADER_DATA_TYPE_DHHC_END && ((dhhc_end_frame*)data)->is_fake())) {
+    if ((type == DHHC_FRAME_HEADER_DATA_TYPE_DHHC_START && ((dhhc_start_frame*)data)->is_fake()) ||
+        (type == DHHC_FRAME_HEADER_DATA_TYPE_DHHC_END && ((dhhc_end_frame*)data)->is_fake())) {
+      // We have afake and shoudl set the trigger nr by hand to prevent further errors
+      evtnr = ftsw_evt_nr & ftsw_evt_mask; // masking might be a problem as we cannore recover all bits
+    } else {
       B2ERROR("Event Numbers do not match for this frame $" << hex << evtnr << "!=$" << ftsw_evt_nr << "(FTSW) mask $" << ftsw_evt_mask);
       error_mask |= ONSEN_ERR_FLAG_FTSW_DHHC_MM;
     }

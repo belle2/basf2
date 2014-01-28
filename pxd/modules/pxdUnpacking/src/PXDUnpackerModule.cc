@@ -761,7 +761,7 @@ void PXDUnpackerModule::terminate()
       }
     }
   } else {
-    B2INFO("PXD Unpacker --> No Error found.");
+    B2INFO("PXD Unpacker --> No Error found in Events: " << unpacked_events);
   }
 }
 

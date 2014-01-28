@@ -22,65 +22,68 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 
-#include <daq/dataflow/EvtSocket.h>
-
 #include <framework/dataobjects/EventMetaData.h>
 #include <rawdata/dataobjects/RawPXD.h>
 
 namespace Belle2 {
 
-  /*! A class definition of an input module for Sequential ROOT I/O */
+  namespace PXD {
 
-  class PXDReadRawONSENModule : public Module {
+    /*! A class definition of an input module for Sequential ROOT I/O */
 
-    // Public functions
-  public:
+#define MAXEVTSIZE (4*1024*1024)
 
-    //! Constructor / Destructor
-    PXDReadRawONSENModule();
-    virtual ~PXDReadRawONSENModule();
+    class PXDReadRawONSENModule : public Module {
 
-    //! Module functions to be called from main process
-    virtual void initialize();
+      // Public functions
+    public:
 
-    //! Module functions to be called from event process
-    virtual void beginRun();
-    virtual void event();
-    virtual void endRun();
-    virtual void terminate();
+      //! Constructor / Destructor
+      PXDReadRawONSENModule();
+      virtual ~PXDReadRawONSENModule();
 
-    // Data members
-  private:
+      //! Module functions to be called from main process
+      virtual void initialize();
 
-    // Parallel processing parameters
+      //! Module functions to be called from event process
+      virtual void beginRun();
+      virtual void event();
+      virtual void endRun();
+      virtual void terminate();
 
-    // Event Meta Data
-    StoreObjPtr<EventMetaData> m_eventMetaDataPtr;
+      // Data members
+    private:
 
-    //Sender Name
-    std::string m_filename;
+      // Parallel processing parameters
 
-    //! Messaage handler
-    MsgHandler* m_msghandler;
+      // Event Meta Data
+      StoreObjPtr<EventMetaData> m_eventMetaDataPtr;
 
-    //! Compression Level
-    int m_compressionLevel;
+      //Sender Name
+      std::string m_filename;
 
-    //! No. of sent events
-    int m_nread;
+      //! Messaage handler
+      MsgHandler* m_msghandler;
 
-    //! buffer
-    int* m_buffer;
+      //! Compression Level
+      int m_compressionLevel;
 
-    // For monitoring
-    // int events_processed;
+      //! No. of sent events
+      int m_nread;
 
-    FILE* fh;
+      //! buffer
+      int* m_buffer;
 
-    int readOneEvent(void);
-    int read_data(char* data, size_t len);
-  };
+      // For monitoring
+      // int events_processed;
 
+      FILE* fh;
+
+      int readOneEvent(void);
+      int read_data(char* data, size_t len);
+    };
+
+  } // end namespace PXD
 } // end namespace Belle2
 
 #endif // PXDEADdRAWONSEN_H

@@ -8,10 +8,11 @@
 //-
 
 #include <pxd/modules/pxdUnpacking/PXDReadRawONSEN.h>
-
+#include <arpa/inet.h>
 
 using namespace std;
 using namespace Belle2;
+using namespace PXD;
 
 //-----------------------------------------------------------------
 //                 Register the Module
@@ -91,7 +92,7 @@ int PXDReadRawONSENModule::readOneEvent()
   int framenr = 0, tablelen = 0, datalen = 0;
   int br = read_data(data, headerlen);
   if (br <= 0) return br;
-  if (pxdheader[0] != htonl(0xCAFEBABE)) {
+  if (pxdheader[0] != (int) htonl(0xCAFEBABE)) {
     printf("pxdheader wrong : Magic %X , Frames %X \n", pxdheader[0], ntohl(pxdheader[1]));
     exit(0);
   }

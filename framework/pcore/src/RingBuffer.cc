@@ -467,11 +467,14 @@ void RingBuffer::SemaphoreLocker::lock()
   sb.sem_num = 0;
   sb.sem_op = -1;
   sb.sem_flg = 0;
-  if (semop(m_id, &sb, 1) == -1)
-    fprintf(stderr, "Ringbuffer: error in SemaphoreLocker::lock(semop) %d, %s\n",
-            m_id, strerror(errno));
-
-// printf ( "semaphore locked.....\n" );
+  while (semop(m_id, &sb, 1) == -1) {
+    if (errno == EINTR) {
+      //interrupted by signal (e.g. window size changed), try again
+      continue;
+    } else {
+      B2FATAL("Ringbuffer: error in SemaphoreLocker::lock(semop), semaphore " << m_id << ", error: " << strerror(errno));
+    }
+  }
 }
 
 void RingBuffer::SemaphoreLocker::unlock()
@@ -480,11 +483,13 @@ void RingBuffer::SemaphoreLocker::unlock()
   sb.sem_num = 0;
   sb.sem_op = 1;
   sb.sem_flg = 0;
-  if (semop(m_id, &sb, 1) == -1)
-    if (semop(m_id, &sb, 1) == -1)
-      fprintf(stderr, "Ringbuffer: error in SemaphoreLocker::unlock(semop) %d, %s\n",
-              m_id, strerror(errno));
-  //    perror ("semop");
-  // printf ( "semaphore unlocked.....\n" );
+  while (semop(m_id, &sb, 1) == -1) {
+    if (errno == EINTR) {
+      //interrupted by signal (e.g. window size changed), try again
+      continue;
+    } else {
+      B2FATAL("Ringbuffer: error in SemaphoreLocker::unlock(semop), semaphore " << m_id << ", error: " << strerror(errno));
+    }
+  }
 }
 

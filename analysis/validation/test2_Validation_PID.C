@@ -9,7 +9,7 @@
 //
 gSystem->Load("libRooFit.so");
 using namespace RooFit ;
-void test2_Validation_PID(int region=0, bool runOffline=False){//0=all,1=forward,2=barrel,3=backward,4=endcap
+void test2_Validation_PID(int region=0, bool runOffline=false){//0=all,1=forward,2=barrel,3=backward,4=endcap
 
   if(runOffline){
     SetBelle2Style();
@@ -91,9 +91,9 @@ void test2_Validation_PID(int region=0, bool runOffline=False){//0=all,1=forward
     float fpi_PIDe;  
     float fpi_PIDmu;  
     float fpi_PIDp;  
-    int ipi_TruthID;  
+    int ipi_mcID;  
     recoTree->SetBranchAddress("pi_TruthP",  &fpi_TruthP);  
-    recoTree->SetBranchAddress("pi_TruthID", &ipi_TruthID);  
+    recoTree->SetBranchAddress("pi_mcID", &ipi_mcID);  
     recoTree->SetBranchAddress("pi_P4",      &fpi_P4);  
     recoTree->SetBranchAddress("pi_PIDpi",   &fpi_PIDpi);  
     recoTree->SetBranchAddress("pi_PIDk",    &fpi_PIDk);  
@@ -106,7 +106,7 @@ void test2_Validation_PID(int region=0, bool runOffline=False){//0=all,1=forward
       TLorentzVector lv_pi_temp(fpi_P4);  
       //Recalculate the particle 4 vector for different hypotheses
       TLorentzVector lv_pi(lv_pi_temp.Px(),lv_pi_temp.Py(),lv_pi_temp.Pz(),sqrt(lv_pi_temp.E()*lv_pi_temp.E() - pdgmasses[0]*pdgmasses[0] + pdgmasses[i]*pdgmasses[i]));
-      int pdgid=abs(ipi_TruthID);
+      int pdgid=abs(ipi_mcID);
 
       if(region==1 && (lv_pi.Theta()<0.21 || lv_pi.Theta()>0.58) ) continue; //forward
       if(region==2 && (lv_pi.Theta()<0.58 || lv_pi.Theta()>2.23) ) continue; //barrel

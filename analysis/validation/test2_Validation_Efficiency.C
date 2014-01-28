@@ -269,7 +269,7 @@ void test2_Validation_Efficiency(int region=0, bool runOffline=false){ // region
   h_Pgamma->SetLineStyle(2);
   h_Pgamma->Draw("same");
   if(runOffline)BELLE2Label(0.4,0.9,"Simulation (Preliminary)");
-  maincanvas->Print("efficiency.pdf(","Title:Photon p_{T} truth and reco");
+  maincanvas->Print("efficiency.pdf","Title:Photon p_{T} truth and reco");
 
   h_ThgammaTruthLowE->SetMaximum(h_ThgammaTruthLowE->GetMaximum()*1.2);
   h_ThgammaTruthLowE->SetMinimum(0);
@@ -347,7 +347,7 @@ void test2_Validation_Efficiency(int region=0, bool runOffline=false){ // region
   Eff_PhotonPhLowE->SetFillColor(kBlue);
   Eff_PhotonPhLowE->Draw("2");
   if(runOffline)BELLE2Label(0.4,0.9,"Simulation (Preliminary)");
-  maincanvas->Print("efficiency.pdf)","Title:Photon efficiency #phi, E<500 MeV");
+  maincanvas->Print("efficiency.pdf","Title:Photon efficiency #phi, E<500 MeV");
 
   TGraphAsymmErrors *Eff_PhotonPhHighE = new TGraphAsymmErrors();
   Eff_PhotonPhHighE  -> Divide(h_PhgammaHighE ,h_PhgammaTruthHighE ,"cl=0.683 b(1,1) mode");
@@ -432,9 +432,9 @@ void test2_Validation_Efficiency_Reco(TString filename){
   float fpi_TruthP4[4];  
   float fpi_P4[4];  
   float fpi_dz;  
-  int ipi_TruthID;  
+  int ipi_mcID;  
   int iCand;  
-  recoTree->SetBranchAddress("pi_TruthID", &ipi_TruthID);  
+  recoTree->SetBranchAddress("pi_mcID", &ipi_mcID);  
   recoTree->SetBranchAddress("pi_TruthP4", &fpi_TruthP4);  
   recoTree->SetBranchAddress("pi_P4",      &fpi_P4);  
   recoTree->SetBranchAddress("pi_dz",      &fpi_dz);  
@@ -455,7 +455,7 @@ void test2_Validation_Efficiency_Reco(TString filename){
     }
     if(lv_pi_truth.Theta()>2.62 || lv_pi_truth.Theta()<0.3) continue;
 
-    int pdgid=abs(ipi_TruthID);
+    int pdgid=abs(ipi_mcID);
     if(pdgid==pid[pion]){
       cache_p[count_pi]=lv_pi_truth.Pt();
       h_Ppi->Fill(lv_pi_truth.Pt());
@@ -529,9 +529,9 @@ void test2_Validation_Efficiency_Photon_Reco(TString filename, int region){
   float fgamma_TruthP;  
   float fgamma_P;  
   float fgamma_dz;  
-  int igamma_TruthID;  
+  int igamma_mcID;  
   int iCand;  
-  recoTree->SetBranchAddress("gamma_TruthID", &igamma_TruthID);  
+  recoTree->SetBranchAddress("gamma_mcID", &igamma_mcID);  
   recoTree->SetBranchAddress("gamma_TruthP4", &fgamma_TruthP4);  
   recoTree->SetBranchAddress("gamma_P4",      &fgamma_P4);  
   recoTree->SetBranchAddress("gamma_TruthP",  &fgamma_TruthP);  
@@ -558,7 +558,7 @@ void test2_Validation_Efficiency_Photon_Reco(TString filename, int region){
     if((lv_gamma_truth.Theta()>0.58 || lv_gamma_truth.Theta()<0.21) && region==2) continue; //forward
     if((lv_gamma_truth.Theta()>2.71 || lv_gamma_truth.Theta()<2.23) && region==3) continue; //backward
 
-    int pdgid=abs(igamma_TruthID);
+    int pdgid=abs(igamma_mcID);
     if(pdgid==22){
       if(iCand>0 && fabs(cache_p-lv_gamma_truth.Rho())<epsilon_p) continue;
       cache_p=lv_gamma_truth.Rho();

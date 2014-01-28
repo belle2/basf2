@@ -65,9 +65,9 @@ void test2_Validation_B2Dpi(){
   float fB_mbc;  
   float fB_deltae;  
 
-  int iB_pi_TruthID;  
-  int iB_D0_K_TruthID;  
-  int iB_D0_pi_TruthID;  
+  int iB_pi_mcID;  
+  int iB_D0_K_mcID;  
+  int iB_D0_pi_mcID;  
 
   int iB_pi_MC_MOTHER_ID;  
   int iB_D0_K_MC_MOTHER_ID;  
@@ -88,9 +88,9 @@ void test2_Validation_B2Dpi(){
   recoTree->SetBranchAddress("B_mbc",     &fB_mbc);  
   recoTree->SetBranchAddress("B_deltae",  &fB_deltae);  
   
-  recoTree->SetBranchAddress("B_pi_TruthID",   &iB_pi_TruthID);  
-  recoTree->SetBranchAddress("B_D0_K_TruthID",  &iB_D0_K_TruthID);  
-  recoTree->SetBranchAddress("B_D0_pi_TruthID", &iB_D0_pi_TruthID);  
+  recoTree->SetBranchAddress("B_pi_mcID",   &iB_pi_mcID);  
+  recoTree->SetBranchAddress("B_D0_K_mcID",  &iB_D0_K_mcID);  
+  recoTree->SetBranchAddress("B_D0_pi_mcID", &iB_D0_pi_mcID);  
 
   recoTree->SetBranchAddress("B_pi_MC_MOTHER_ID",   &iB_pi_MC_MOTHER_ID);  
   recoTree->SetBranchAddress("B_D0_K_MC_MOTHER_ID",  &iB_D0_K_MC_MOTHER_ID);  
@@ -114,9 +114,9 @@ void test2_Validation_B2Dpi(){
     h_deltae->Fill(fB_deltae);
     
     //Simple Truth Match of the Tracks and their mothers
-    if(abs(iB_pi_TruthID)!=pid[pion])continue;
-    if(abs(iB_D0_K_TruthID)!=pid[kaon])continue;
-    if(abs(iB_D0_pi_TruthID)!=pid[pion])continue;
+    if(abs(iB_pi_mcID)!=pid[pion])continue;
+    if(abs(iB_D0_K_mcID)!=pid[kaon])continue;
+    if(abs(iB_D0_pi_mcID)!=pid[pion])continue;
 
     if(abs(iB_pi_MC_MOTHER_ID)!=pid[bplus])continue;
     if(abs(iB_D0_pi_MC_MOTHER_ID)!=pid[d0])continue;
@@ -246,9 +246,9 @@ void test2_Validation_B2Kstgamma(){
 
   float fB0_KST0_K_PIDk;  
 
-  int iB0_gamma_TruthID;  
-  int iB0_KST0_K_TruthID;  
-  int iB0_KST0_pi_TruthID;  
+  int iB0_gamma_mcID;  
+  int iB0_KST0_K_mcID;  
+  int iB0_KST0_pi_mcID;  
 
   int iB0_gamma_MC_MOTHER_ID;  
   int iB0_KST0_K_MC_MOTHER_ID;  
@@ -271,9 +271,9 @@ void test2_Validation_B2Kstgamma(){
 
   recoTree->SetBranchAddress("B0_KST0_K_PIDk",     &fB0_KST0_K_PIDk);  
   
-  recoTree->SetBranchAddress("B0_gamma_TruthID",   &iB0_gamma_TruthID);  
-  recoTree->SetBranchAddress("B0_KST0_K_TruthID",  &iB0_KST0_K_TruthID);  
-  recoTree->SetBranchAddress("B0_KST0_pi_TruthID", &iB0_KST0_pi_TruthID);  
+  recoTree->SetBranchAddress("B0_gamma_mcID",   &iB0_gamma_mcID);  
+  recoTree->SetBranchAddress("B0_KST0_K_mcID",  &iB0_KST0_K_mcID);  
+  recoTree->SetBranchAddress("B0_KST0_pi_mcID", &iB0_KST0_pi_mcID);  
 
   recoTree->SetBranchAddress("B0_gamma_MC_MOTHER_ID",   &iB0_gamma_MC_MOTHER_ID);  
   recoTree->SetBranchAddress("B0_KST0_K_MC_MOTHER_ID",  &iB0_KST0_K_MC_MOTHER_ID);  
@@ -307,9 +307,9 @@ void test2_Validation_B2Kstgamma(){
 
 
     //Simple Truth Match of the Tracks and their mothers
-    //if(abs(iB0_gamma_TruthID)!=pid[photon])continue;
-    if(abs(iB0_KST0_K_TruthID)!=pid[kaon])continue;
-    if(abs(iB0_KST0_pi_TruthID)!=pid[pion])continue;
+    //if(abs(iB0_gamma_mcID)!=pid[photon])continue;
+    if(abs(iB0_KST0_K_mcID)!=pid[kaon])continue;
+    if(abs(iB0_KST0_pi_mcID)!=pid[pion])continue;
 
     //if(abs(iB0_gamma_MC_MOTHER_ID)!=pid[bzero])continue;
     if(abs(iB0_KST0_pi_MC_MOTHER_ID)!=pid[kstar])continue;
@@ -405,10 +405,10 @@ void test2_Validation_B2JpsiKS(){
   float fB0_mbc;  
   float fB0_deltae;  
 
-  int iB0_JPsi_mu0_TruthID;  
-  int iB0_JPsi_mu1_TruthID;  
-  int iB0_KS0_pi0_TruthID;  
-  int iB0_KS0_pi1_TruthID;  
+  int iB0_JPsi_mu0_mcID;  
+  int iB0_JPsi_mu1_mcID;  
+  int iB0_KS0_pi0_mcID;  
+  int iB0_KS0_pi1_mcID;  
 
   int iB0_JPsi_mu0_MC_MOTHER_ID;  
   int iB0_JPsi_mu1_MC_MOTHER_ID;  
@@ -430,10 +430,10 @@ void test2_Validation_B2JpsiKS(){
   recoTree->SetBranchAddress("B0_mbc",     &fB0_mbc);  
   recoTree->SetBranchAddress("B0_deltae",  &fB0_deltae);  
 
-  recoTree->SetBranchAddress("B0_JPsi_mu0_TruthID",   &iB0_JPsi_mu0_TruthID);  
-  recoTree->SetBranchAddress("B0_JPsi_mu1_TruthID",   &iB0_JPsi_mu1_TruthID);  
-  recoTree->SetBranchAddress("B0_KS0_pi0_TruthID",  &iB0_KS0_pi0_TruthID);  
-  recoTree->SetBranchAddress("B0_KS0_pi1_TruthID", &iB0_KS0_pi1_TruthID);  
+  recoTree->SetBranchAddress("B0_JPsi_mu0_mcID",   &iB0_JPsi_mu0_mcID);  
+  recoTree->SetBranchAddress("B0_JPsi_mu1_mcID",   &iB0_JPsi_mu1_mcID);  
+  recoTree->SetBranchAddress("B0_KS0_pi0_mcID",  &iB0_KS0_pi0_mcID);  
+  recoTree->SetBranchAddress("B0_KS0_pi1_mcID", &iB0_KS0_pi1_mcID);  
 
   recoTree->SetBranchAddress("B0_JPsi_mu0_MC_MOTHER_ID",   &iB0_JPsi_mu0_MC_MOTHER_ID);  
   recoTree->SetBranchAddress("B0_JPsi_mu1_MC_MOTHER_ID",   &iB0_JPsi_mu1_MC_MOTHER_ID);  
@@ -466,10 +466,10 @@ void test2_Validation_B2JpsiKS(){
 
 
     //Simple Truth Match of the Tracks and their mothers
-    if(abs(iB0_JPsi_mu0_TruthID)!=pid[muon])continue;
-    if(abs(iB0_JPsi_mu1_TruthID)!=pid[muon])continue;
-    if(abs(iB0_KS0_pi0_TruthID)!=pid[pion])continue;
-    if(abs(iB0_KS0_pi1_TruthID)!=pid[pion])continue;
+    if(abs(iB0_JPsi_mu0_mcID)!=pid[muon])continue;
+    if(abs(iB0_JPsi_mu1_mcID)!=pid[muon])continue;
+    if(abs(iB0_KS0_pi0_mcID)!=pid[pion])continue;
+    if(abs(iB0_KS0_pi1_mcID)!=pid[pion])continue;
 
     if(abs(iB0_JPsi_mu0_MC_MOTHER_ID)!=pid[jpsi])continue;
     if(abs(iB0_JPsi_mu1_MC_MOTHER_ID)!=pid[jpsi])continue;

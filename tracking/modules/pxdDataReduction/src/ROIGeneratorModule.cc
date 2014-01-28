@@ -37,6 +37,19 @@ ROIGeneratorModule::ROIGeneratorModule() : Module()
   addParam("ROIListName", m_ROIListName, "name of the list of ROIs", std::string(""));
   addParam("nROIs", m_nROIs, "number of generated ROIs", 1);
 
+  addParam("TrigDivider", m_divider, "Generates one ROI every TrigDivider events", 2);
+  addParam("Layer"      , m_layer  , "on layer", 2);
+  addParam("Ladder"     , m_ladder , " ladder " , 1);
+  addParam("Sensor"     , m_sensor , " sensor " , 1);
+
+  addParam("MinU"       , m_minU   , " min U (pixel column hopefully) ", 0);
+  addParam("MaxU"       , m_maxU   , " max U (pixel column hopefully) ", 479);
+
+
+  addParam("MinV"       , m_minV   , " min V (pixel column hopefully) ", 0);
+  addParam("MaxV"       , m_maxV   , " max v (pixel column hopefully) ", 192);
+
+
 }
 
 ROIGeneratorModule::~ROIGeneratorModule()
@@ -47,7 +60,9 @@ ROIGeneratorModule::~ROIGeneratorModule()
 void ROIGeneratorModule::initialize()
 {
   StoreObjPtr<EventMetaData>::required();
-  StoreArray<ROIid>::registerPersistent(m_ROIListName);
+  StoreArray<ROIid>::registerPersistent(m_ROIListName,
+                                        DataStore::c_Event,
+                                        false); // does not report error if ROIid exists
 }
 
 void ROIGeneratorModule::beginRun()
@@ -59,22 +74,27 @@ void ROIGeneratorModule::event()
 {
 
   StoreArray<ROIid> ROIList(m_ROIListName);
-  ROIList.create();
+
+  StoreObjPtr<EventMetaData> eventMetaDataPtr;
+  int iROI = eventMetaDataPtr->getEvent(); // trigger number
+
+  if (iROI % m_divider != 0)
+    return ;
+
+  ROIList.create(true);
 
   ROIid tmp_ROIid;
 
   VxdID sensorID;
-  sensorID.setLayerNumber(1);
-  sensorID.setLadderNumber(0);
-  sensorID.setSensorNumber(1);
+  sensorID.setLayerNumber(m_layer);
+  sensorID.setLadderNumber(m_ladder);
+  sensorID.setSensorNumber(m_sensor);
 
   int minU;
   int minV;
   int maxU;
   int maxV;
 
-  StoreObjPtr<EventMetaData> eventMetaDataPtr;
-  int iROI = eventMetaDataPtr->getEvent();
   //  for (int iROI = 0; iROI < m_nROIs; iROI++) {
 
   //    minU =  (0 + iROI*16 ) % 250;
@@ -84,15 +104,11 @@ void ROIGeneratorModule::event()
   //  minV = (iROI / 250) % 768;
   //  maxV = min(767 , minV + 10);
 
-  minU = 0;
-  maxU = 479;
-  minV = 0;
-  maxV = 127;
 
-  tmp_ROIid.setMinUid(minU) ;
-  tmp_ROIid.setMinVid(minV);
-  tmp_ROIid.setMaxUid(maxU);
-  tmp_ROIid.setMaxVid(maxV);
+  tmp_ROIid.setMinUid(m_minU);
+  tmp_ROIid.setMinVid(m_minV);
+  tmp_ROIid.setMaxUid(m_maxU);
+  tmp_ROIid.setMaxVid(m_maxV);
   tmp_ROIid.setSensorID(sensorID);
 
   ROIList.appendNew(tmp_ROIid);

@@ -174,9 +174,25 @@ void SerializerModule::fillSendHeaderTrailer(SendHeader* hdr, SendTrailer* trl,
   hdr->SetNumEventsinPacket(rawdblk->GetNumEvents());
   hdr->SetNumNodesinPacket(rawdblk->GetNumNodes());
 
+  //
+  // For bug check
+  //
+  if (rawdblk->GetNumEntries() == 1) {
+    if (total_send_nwords != (rawdblk->GetBuffer(0))[ 0 ] + 8) {
+      char err_buf[500];
+      sprintf(err_buf, "Length error. total length %d rawdblk length %d. Exting...\n" ,
+              total_send_nwords, (rawdblk->GetBuffer(0))[ 0 ]);
+      printData(rawdblk->GetBuffer(0), rawdblk->TotalBufNwords());
+      print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      sleep(1234567);
+      exit(-1);
+    }
+  }
+
+
   for (int i = 0; i < rawdblk->GetNumEntries(); i++) {
 
-    //copy event # from a top COPPER block
+    //copy event # from a tonp COPPER block
     if (!(rawdblk->CheckFTSWID(i)) && !(rawdblk->CheckTLUID(i))) {
       RawHeader rawhdr;
       rawhdr.SetBuffer(rawdblk->GetBuffer(i));

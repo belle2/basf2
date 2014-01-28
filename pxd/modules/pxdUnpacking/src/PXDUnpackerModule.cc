@@ -79,16 +79,18 @@ unsigned int error_mask = 0;
 #define ONSEN_ERR_FLAG_DHH_START_ID 0x02000000ul
 #define ONSEN_ERR_FLAG_DHH_START_WO_END 0x04000000ul
 #define ONSEN_ERR_FLAG_NO_PXD   0x08000000ul
+#define ONSEN_ERR_FLAG_NO_DATCON   0x10000000ul
+#define ONSEN_ERR_FLAG_FAKE_NO_DATA_TRIG   0x20000000ul
 
 string error_name[ONSEN_MAX_TYPE_ERR] = {
-  "FTSW/DHHC mismatch: ", "DHHC/DHH mismatch: ", "DHHC/DHP mismatch: ", "DHHC_START missing: ",
-  "DHHC_END missing: ", "DHH_START missing: ", "DHH_END missing: ", "DATA outside of DHH",
-  "Second DHHC_START: ", "Second DHHC_END: ", "Fixed size frame wrong size: ", "DHH CRC Error:",
-  "Unknown DHHC type: ", "Merger CRC Error: ", "Event Header Full Packet Size Error: ", "Event Header Magic Error: ",
-  "Event Header Frame Count Error: ", "Event header Frame Size Error: ", "HLTROI Magic Error: ", "Merger TrigNr Mismatch: ",
-  "DHP Size too small: ", "DHP-DHH DHHID mismatch: ", "DHP-DHH Port mismatch", "DHP Pix w/o row: ",
-  "DHH START/END ID mismatch: ", "???", "DHH_START w/o prev END: ", "Nr PXD data !=1: ",
-  "unused: ", "unused: ", "unused: ", "(nr events) "
+  "FTSW/DHHC mismatch", "DHHC/DHH mismatch", "DHHC/DHP mismatch", "DHHC_START missing",
+  "DHHC_END missing", "DHH_START missing", "DHH_END missing", "DATA outside of DHH",
+  "Second DHHC_START", "Second DHHC_END", "Fixed size frame wrong size", "DHH CRC Error:",
+  "Unknown DHHC type", "Merger CRC Error", "Event Header Full Packet Size Error", "Event Header Magic Error",
+  "Event Header Frame Count Error", "Event header Frame Size Error", "HLTROI Magic Error", "Merger HLT/DATCON TrigNr Mismatch",
+  "DHP Size too small", "DHP-DHH DHHID mismatch", "DHP-DHH Port mismatch", "DHP Pix w/o row",
+  "DHH START/END ID mismatch", "???", "DHH_START w/o prev END", "Nr PXD data !=1",
+  "Missing Datcon", "NO DHHC data for Trigger", "unused", "(nr events) "
 };
 //-----------------------------------------------------------------
 //                 Implementation
@@ -363,6 +365,7 @@ public:
     }
     if (magic2 == 0x0000CAFE && trignr2 == 0x00000000) {
       if (!ignore_datcon_flag) B2WARNING("DHHC HLT/ROI Frame: No DATCON data " << hex << trignr1 << "!=$" << trignr2);
+      error_mask |= ONSEN_ERR_FLAG_NO_DATCON;
     } else {
       if (trignr1 != trignr2) {
         B2ERROR("DHHC HLT/ROI Frame Trigger Nr Mismatch $" << hex << trignr1 << "!=$" << trignr2);
@@ -1138,6 +1141,7 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& la
       bool fake = ((dhhc_start_frame*)data)->is_fake();
       if (fake) {
         B2WARNING("Faked DHHC START Data -> trigger without Data!");
+        error_mask |= ONSEN_ERR_FLAG_FAKE_NO_DATA_TRIG;
       } else {
         ((dhhc_start_frame*)data)->print();
       }
@@ -1209,6 +1213,7 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& la
       currentVxdId = 0; /// invalid
       if (fake) {
         B2WARNING("Faked DHHC END Data -> trigger without Data!");
+        error_mask |= ONSEN_ERR_FLAG_FAKE_NO_DATA_TRIG;
       } else {
         ((dhhc_end_frame*)data)->print();
       }

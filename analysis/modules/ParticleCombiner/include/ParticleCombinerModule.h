@@ -107,7 +107,7 @@ namespace Belle2 {
      * @return true if all FS particles of a combination differ
      */
     bool differentSources(std::vector<Particle*> stack,
-                          StoreArray<Particle>& Particles);
+                          const StoreArray<Particle>& Particles);
 
     /**
      * Check that the combination is unique

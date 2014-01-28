@@ -43,7 +43,7 @@ namespace Belle2 {
   {
     // set module description (e.g. insert text)
     setDescription("Makes particle combinations");
-    setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
+    setPropertyFlags(c_ParallelProcessingCertified);
 
     // Add parameters
     addParam("PDG", m_pdg, "PDG code", 0);
@@ -263,7 +263,7 @@ namespace Belle2 {
   }
 
   bool ParticleCombinerModule::differentSources(std::vector<Particle*> stack,
-                                                StoreArray<Particle>& Particles)
+                                                const StoreArray<Particle>& Particles)
   {
     vector<int> sources; // stack for particle sources
 

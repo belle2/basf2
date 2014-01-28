@@ -82,10 +82,19 @@ void ROIPayloadAssemblerModule::event()
 
     m_roiraw.setSystemFlag(0);
     m_roiraw.setDHHID(((layer) << 5) | ((ladder) << 1) | (sensor));
-    m_roiraw.setRowMin(ROIList[iROI]->getMinVid());
-    m_roiraw.setRowMax(ROIList[iROI]->getMaxVid());
-    m_roiraw.setColMin(ROIList[iROI]->getMinUid());
-    m_roiraw.setColMax(ROIList[iROI]->getMaxUid());
+
+    // ToDo!!! Code elsewhere the translation for u v row and column
+
+    unsigned int row1 = std::min(ROIList[iROI]->getMinUid(), ROIList[iROI]->getMaxUid());
+    unsigned int row2 = std::max(ROIList[iROI]->getMinUid(), ROIList[iROI]->getMaxUid());
+
+    unsigned int column1 = std::min(ROIList[iROI]->getMinVid(), ROIList[iROI]->getMaxVid());
+    unsigned int column2 = std::max(ROIList[iROI]->getMinVid(), ROIList[iROI]->getMaxVid());
+
+    m_roiraw.setRowMin(row1);
+    m_roiraw.setRowMax(row2);
+    m_roiraw.setColMin(column1);
+    m_roiraw.setColMax(column2);
 
     orderedROIraw.insert(m_roiraw);
 

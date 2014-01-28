@@ -33,7 +33,7 @@
 			<Component type="Constant">
 				<X>0</X>
 				<Y>0</Y>
-				<Z>0.975</Z>				
+				<Z>-0.975</Z>				
 				<MaxR unit="mm">599.9</MaxR>
 				<MinZ unit="mm">-799.9</MinZ>
 				<MaxZ unit="mm">799.9</MaxZ>

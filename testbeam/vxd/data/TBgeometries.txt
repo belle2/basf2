@@ -1,6 +1,10 @@
 Library.xml
 -----------
 ... file with individuall components the geometry is created of.
+
+27. Jan 2014 21:00 The number of SVD strips in U/V is changed back to the convention of Belle2. But it goes to "our conventional" TB directions.
+                   Nothing should be affected by this change.
+
 19. Jan 2014 2:40 Corrected some materials a bit: PolyEthylen
 
 12. Jan 2014 16:00 Updated VXDBox with hole for better visibility of detectors from side and moved a bit to more precise position
@@ -50,8 +54,22 @@ FullTelescopeVXDTB_v2.xml
 -------------------------
 ... this is the setup with PXD6-S (4 switchers) facing SVD layer 3. PCBoard and sensor from layer 2 (facing front telescopes) is removed.
 
+28. Jan 2014 12:00 Re-centering PXD layer to after the rotation from previous commit
+
+27. Jan 2014 21:00 Additional rotation by 180deg introduced to PXD layer 2 to have right correlations with SVD.
+                   WARNING: whole sensor is rotated instead just a sensitive area. This will be fixed after test of HLT ROIs.
+                            It now only affects a bit dead material distribution.
+
 19. Jan 2014 2:40 Improved position of telescopes by info from LOG book. Corrected some materials a bit.
 
 14. Jan 2014 9:30 Correted vxdId + first pxd from air (only sensitive), second is real
 
 12. Jan 2014 first version
+
+
+
+VXD-MagneticField.xml
+---------------------
+... magnetic field for PCMag ... currently constant B(z)=-0.975 T
+
+28. Jan 2014 12:00 The sign of the field was flipped (from B(z)=0.975T to B(z)=-0.975T ... so electrons go up.

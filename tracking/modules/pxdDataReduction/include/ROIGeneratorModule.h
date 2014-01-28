@@ -54,16 +54,16 @@ namespace Belle2 {
   protected:
 
     std::string m_ROIListName;
-    unsigned int m_divider;
-    unsigned int m_layer  ;
-    unsigned int m_ladder ;
-    unsigned int m_sensor ;
+    int m_divider;
+    int m_layer  ;
+    int m_ladder ;
+    int m_sensor ;
 
-    unsigned int m_minU   ;
-    unsigned int m_maxU   ;
+    int m_minU   ;
+    int m_maxU   ;
 
-    unsigned int m_minV   ;
-    unsigned int m_maxV   ;
+    int m_minV   ;
+    int m_maxV   ;
 
 
     int m_nROIs;

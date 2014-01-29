@@ -305,10 +305,10 @@ public class Canvas extends GRect {
 	public void setTitle(String title) {
 		_title.setText(title);
 		if (title.length() > 20) setTitlePosition("left");
-		if (title.length() > 25) _title.setFontSize(1.0);
-		if (title.length() > 30) _title.setFontSize(0.9);
-		if (title.length() > 35) _title.setFontSize(0.8);
-		if (title.length() > 40) _title.setFontSize(0.7);
+		if (title.length() > 25) setFontSize(1.0);
+		if (title.length() > 30) setFontSize(0.9);
+		if (title.length() > 35) setFontSize(0.8);
+		if (title.length() > 40) setFontSize(0.7);
 	}
 	
 	public void setAxisY2(GAxis axis) {

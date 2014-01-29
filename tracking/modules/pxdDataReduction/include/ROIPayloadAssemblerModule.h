@@ -59,7 +59,7 @@ namespace Belle2 {
 
     std::string m_ROIListName; /**< name of the ROI list */
     std::string m_ROIpayloadName; /**< name of the payload to be sent to ONSEN */
-
+    int m_divider;
   };
 }
 #endif

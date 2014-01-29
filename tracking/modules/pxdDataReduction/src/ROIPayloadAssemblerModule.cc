@@ -18,6 +18,9 @@
 #include <stdlib.h>
 #include <set>
 
+#include <vxd/geometry/GeoCache.h>
+#include <vxd/geometry/SensorInfoBase.h>
+
 using namespace std;
 using namespace Belle2;
 
@@ -39,7 +42,7 @@ ROIPayloadAssemblerModule::ROIPayloadAssemblerModule() : Module()
 
   addParam("ROIListName", m_ROIListName, "name of the list of ROIs", std::string(""));
   addParam("ROIpayloadName", m_ROIpayloadName, "name of the payload of ROIs", std::string(""));
-
+  addParam("TrigDivider", m_divider, "Generates one ROI every TrigDivider events", 2);
 }
 
 ROIPayloadAssemblerModule::~ROIPayloadAssemblerModule()
@@ -65,9 +68,40 @@ void ROIPayloadAssemblerModule::beginRun()
 void ROIPayloadAssemblerModule::event()
 {
 
+  VXD::GeoCache& aGeometry = VXD::GeoCache::getInstance();
+
   StoreArray<ROIid> ROIList(m_ROIListName);
 
   int ROIListSize = ROIList.getEntries();
+
+  StoreObjPtr<EventMetaData> eventMetaDataPtr;
+  int trgNum = eventMetaDataPtr->getEvent(); // trigger number
+
+  if (trgNum % m_divider != 0)
+    for (int iROI = 0; iROI < ROIListSize; iROI++) {
+
+      const VXD::SensorInfoBase& aSensorInfo = aGeometry.getSensorInfo(ROIList[iROI]->getSensorID());
+      const int nPixelsU = aSensorInfo.getUCells() - 1;
+      const int nPixelsV = aSensorInfo.getVCells() - 1;
+
+      ROIid tmpROIid;
+
+      tmpROIid.setSensorID(ROIList[iROI]->getSensorID());
+      unsigned int tmpRowMin = nPixelsU - ROIList[iROI]->getMinUid();
+      unsigned int tmpRowMax =  nPixelsU - ROIList[iROI]->getMaxUid();
+      unsigned int tmpColMin =  nPixelsV - ROIList[iROI]->getMinVid();
+      unsigned int tmpColMax = nPixelsV -  ROIList[iROI]->getMaxVid();
+
+      tmpROIid.setMinUid(std::min(tmpRowMin, tmpRowMax));
+      tmpROIid.setMaxUid(std::max(tmpRowMin, tmpRowMax));
+      tmpROIid.setMinVid(std::min(tmpColMin, tmpColMax));
+      tmpROIid.setMaxVid(std::max(tmpColMin, tmpColMax));
+
+      ROIList.appendNew(tmpROIid);
+    }
+
+
+  ROIListSize = ROIList.getEntries();
 
   set<ROIrawID, ROIrawID> orderedROIraw;
   set<ROIrawID, ROIrawID>::iterator itOrderedROIraw;
@@ -84,12 +118,17 @@ void ROIPayloadAssemblerModule::event()
     m_roiraw.setDHHID(((layer) << 5) | ((ladder) << 1) | (sensor));
 
     // ToDo!!! Code elsewhere the translation for u v row and column
+    unsigned int tmpRowMin = ROIList[iROI]->getMinUid();
+    unsigned int tmpRowMax = ROIList[iROI]->getMaxUid();
 
-    unsigned int row1 = std::min(ROIList[iROI]->getMinUid(), ROIList[iROI]->getMaxUid());
-    unsigned int row2 = std::max(ROIList[iROI]->getMinUid(), ROIList[iROI]->getMaxUid());
+    unsigned int tmpColMin = ROIList[iROI]->getMinVid();
+    unsigned int tmpColMax = ROIList[iROI]->getMaxVid();
 
-    unsigned int column1 = std::min(ROIList[iROI]->getMinVid(), ROIList[iROI]->getMaxVid());
-    unsigned int column2 = std::max(ROIList[iROI]->getMinVid(), ROIList[iROI]->getMaxVid());
+    unsigned int row1 = std::min(tmpRowMin, tmpRowMax);
+    unsigned int row2 = std::max(tmpRowMin, tmpRowMax);
+
+    unsigned int column1 = std::min(tmpColMin, tmpColMax);
+    unsigned int column2 = std::max(tmpColMin, tmpColMax);
 
     m_roiraw.setRowMin(row1);
     m_roiraw.setRowMax(row2);
@@ -113,7 +152,7 @@ void ROIPayloadAssemblerModule::event()
 
   payload->setHeader();
 
-  StoreObjPtr<EventMetaData> eventMetaDataPtr;
+  //  StoreObjPtr<EventMetaData> eventMetaDataPtr;
   payload->setTriggerNumber(eventMetaDataPtr->getEvent());
 
   int tmpDHHID = -1;

@@ -25,7 +25,7 @@ public class LauncherLoginPane extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
-	private TextBoxPanel _host_name_panel = new TextBoxPanel("Host name : ", "belle-rpc1");
+	private TextBoxPanel _host_name_panel = new TextBoxPanel("Host name : ", "localhost");
 	private RemoteHostPanel _remote_host_panel;
 	private JCheckBox _check_box = new JCheckBox("use ssh tunneling");
 

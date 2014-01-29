@@ -86,4 +86,31 @@ public abstract class Histo1 extends Histo {
 		writeAxis(writer, getAxisX());
 		writer.writeString(getAxisY().getTitle());
 	}
+
+	public Histo clone() {
+		try {
+			Histo1 h = (Histo1) HistoFactory.create(getDataType());
+			h.setName(getName());
+			h.setTitle(getTitle());
+			h.getAxisX().copy(getAxisX());
+			h.getAxisY().copy(getAxisY());
+			h.getData().copy(getData());
+			return h;
+		} catch (WrongDataTypeException e) {
+			e.printStackTrace();
+			return null;
+		} 
+	}
+
+	public void add(Histo h, double scale) {
+		if (h.getAxisX().getNbins() == getAxisX().getNbins() &&
+			 h.getAxisX().getMin() == getAxisX().getMin() && 
+			 h.getAxisX().getMax() == getAxisX().getMax() ) {
+			for (int nx = 0; nx < getAxisX().getNbins(); nx++) {
+				setBinContent(nx, getBinContent(nx) + h.getBinContent(nx) * scale);
+			}
+		}
+		setMaxAndMin();
+	}
+
 }

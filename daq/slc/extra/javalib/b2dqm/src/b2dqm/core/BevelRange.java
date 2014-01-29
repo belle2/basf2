@@ -18,4 +18,5 @@ public class BevelRange extends Range {
 	public String getDataType() {
 		return "R1B";
 	}
+
 }

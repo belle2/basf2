@@ -17,5 +17,5 @@ public class Histo1C extends Histo1 {
 	public String getDataType() {
 		return "H1C";
 	}
-	
+
 }

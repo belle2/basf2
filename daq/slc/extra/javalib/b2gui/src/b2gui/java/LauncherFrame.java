@@ -29,10 +29,8 @@ public class LauncherFrame extends JFrame {
 	private boolean _use_ssh;
 
 	private LauncherFrame() {
-		String hostname = System.getenv("B2SC_SERVER_HOST");
-		if (hostname == null) hostname = "belle-rpc1";
-		_login_panel = new LauncherLoginPane(
-				hostname, hostname, 22, "");
+		String hostname = "localhost";
+		_login_panel = new LauncherLoginPane(hostname, hostname, 22, "");
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {

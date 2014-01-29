@@ -18,4 +18,5 @@ public class VerticalRange extends Range {
 	public String getDataType() {
 		return "R1V";
 	}
+	
 }

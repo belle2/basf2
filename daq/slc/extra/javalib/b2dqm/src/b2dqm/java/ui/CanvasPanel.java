@@ -49,6 +49,7 @@ public class CanvasPanel extends JPanel implements Updatable {
 		CanvasMouseListener listener = new CanvasMouseListener(_canvas);
 		addMouseListener(listener);
 		addMouseMotionListener(listener);
+		setDoubleBuffered(true);
 	}
 	
 	public CanvasPanel(String name, String title, int width, int height){
@@ -68,6 +69,7 @@ public class CanvasPanel extends JPanel implements Updatable {
 		CanvasMouseListener listener = new CanvasMouseListener(_canvas);
 		addMouseListener(listener);
 		addMouseMotionListener(listener);
+		setDoubleBuffered(true);
 	}
 
 	public CanvasPanel() { this("", "", 100, 100); }

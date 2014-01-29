@@ -31,7 +31,8 @@ public class LauncherPanel extends JPanel {
 	private int _count = 0;
 	private String _version = "0.0.0";
 		
-	public LauncherPanel(String title, int port, String main_class, String version) {
+	public LauncherPanel(String title, String host, int port, String main_class, String version) {
+		_host = host;
 		_port = port;
 		_main_class  = main_class;
 		_version = version;

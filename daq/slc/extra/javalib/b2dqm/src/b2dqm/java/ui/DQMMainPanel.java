@@ -28,7 +28,6 @@ public class DQMMainPanel extends DnDTabbedPane implements Updatable {
 
 	public void initPanels(ArrayList<HistoPackage> pack_v,
 						   DQMSidePanel side_panel) {
-		System.out.println("DQMMainPanel::initPanels");
 		removeAll();
 		_pack_v = pack_v;
 		_side_panel = side_panel;
@@ -37,17 +36,31 @@ public class DQMMainPanel extends DnDTabbedPane implements Updatable {
 			HistoPackage pack = _pack_v.get(n);
 			UTabPanel tab = new UTabPanel();
 			tab.setName(pack.getName());
+			ArrayList<Histo> histo_v = new ArrayList<Histo>();
 			for ( int i = 0; i < pack.getNHistos(); i++ ) {
 				Histo h = (Histo)pack.getHisto(i);
 				CanvasPanel canvas = new CanvasPanel(h.getName(), h.getTitle());
 				canvas.getCanvas().addHisto(h);
 				canvas.getCanvas().resetPadding();
-				tab.addTab(h.getName(), canvas);
-				System.out.println("DQMMainPanel::initPanels " + h.getName());
+				UTabPanel subtab = new UTabPanel();
+				subtab.addTab("Total", canvas);
+				tab.addTab(h.getName(), subtab);
+				Histo h1 = (Histo)h.clone();
+				h1.setName(h.getName()+"_diff");
+				canvas = new CanvasPanel(h1.getName(), h1.getTitle());
+				canvas.getCanvas().addHisto(h1);
+				canvas.getCanvas().resetPadding();
+				subtab.addTab("Difference", canvas);
+				histo_v.add(h1);
+				h1 = (Histo)h.clone();
+				h1.setName(h.getName()+"_tmp");
+				histo_v.add(h1);
+			}
+			for (Histo h: histo_v) {
+				pack.addHisto(h);
 			}
 			addTab(pack.getName(), tab);
 		}
-		System.out.println("DQMMainPanel::initPanels done");
 	}
 
 	public void update() {

@@ -122,6 +122,7 @@ public abstract class Histo extends AbstractHisto {
 
 	public void reset() {
 		_data_v.setAll(0);
+		setMaximum(0);
 	}
 
 	@Override
@@ -158,6 +159,18 @@ public abstract class Histo extends AbstractHisto {
 		str += _axis_x.getXML("axis-x");
 		str += _axis_y.getXML("axis-y");
 		return str;
+	}
+
+	public Histo clone() {
+		return null;
+	}
+
+	public void add(Histo h) {
+		add(h, 1);
+	}
+	
+	public void add(Histo h, double scale) {
+		
 	}
 	
 }

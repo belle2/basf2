@@ -37,6 +37,14 @@ public class HistoPackage implements SerializableObject {
 		return _histo_v.get(index);
 	}
 
+	public MonObject getHisto(String name) {
+		for (int n = 0; n < _histo_v.size(); n++) {
+			if (name.matches(_histo_v.get(n).getName())) {
+				return _histo_v.get(n);
+			}
+		}
+		return null;
+	}
 	public ArrayList<MonObject> getMonObjects() {
 		return _histo_v;
 	}

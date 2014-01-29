@@ -144,4 +144,35 @@ public abstract class Histo2 extends Histo {
 		return str;
 	}
 
+	public Histo clone() {
+		try {
+			Histo2 h = (Histo2) HistoFactory.create(getDataType());
+			h.setName(getName());
+			h.setTitle(getTitle());
+			h.getAxisX().copy(getAxisX());
+			h.getAxisY().copy(getAxisY());
+			h.getAxisZ().copy(getAxisZ());
+			h.getData().copy(getData());
+			return h;
+		} catch (WrongDataTypeException e) {
+			e.printStackTrace();
+			return null;
+		} 
+	}
+
+	public void add(Histo h, double scale) {
+		if (h.getAxisY().getNbins() == getAxisY().getNbins() &&
+				h.getAxisY().getMin() == getAxisY().getMin() && 
+				h.getAxisY().getMax() == getAxisY().getMax() &&
+				h.getAxisX().getNbins() == getAxisX().getNbins() &&
+				h.getAxisX().getMin() == getAxisX().getMin() && 
+				h.getAxisX().getMax() == getAxisX().getMax() ) {
+			for (int ny = 0; ny < getAxisY().getNbins(); ny++) {
+				for (int nx = 0; nx < getAxisX().getNbins(); nx++) {
+					setBinContent(nx, ny, getBinContent(nx, ny) + h.getBinContent(nx, ny) * scale);
+				}
+			}
+		}
+	}
+
 }

@@ -46,7 +46,6 @@ public class DQMMainFrame extends JFrame {
 	
 	public void init(ArrayList<HistoPackage> pack_v, 
 			ArrayList<PackageInfo> info_v) {
-		System.out.println("DQMMainFrame::init");
 		JPanel panel = new JPanel();
 		add(panel);
 		panel.setLayout(new BoxLayout(panel,BoxLayout.Y_AXIS));
@@ -61,14 +60,13 @@ public class DQMMainFrame extends JFrame {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		_main_panel.setPreferredSize(new Dimension(1000, 720));
 		_side_panel.setPreferredSize(new Dimension(300, 720));
-		_side_panel.setMaximumSize(new Dimension(300, 720));
+		//_side_panel.setMaximumSize(new Dimension(300, 720));
 		setSize(1040, 720);
 		setTitle("Belle-II DQM browser version " + Belle2DQMBrowser.VERSION);
 		setJMenuBar(new DQMMenuBar(this));
 		setLocationRelativeTo(null);
 		setIconImage(Toolkit.getDefaultToolkit().createImage(getClass().getResource("monitor.png")));
 		setVisible(true);
-		System.out.println("DQMMainFrame::init done");
 	}
 	
 	public boolean openSidePanel() {

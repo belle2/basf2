@@ -1071,9 +1071,10 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& la
 
   if ((evtnr & ftsw_evt_mask) != (ftsw_evt_nr & ftsw_evt_mask)) {
     if ((type == DHHC_FRAME_HEADER_DATA_TYPE_DHHC_START && ((dhhc_start_frame*)data)->is_fake()) ||
-        (type == DHHC_FRAME_HEADER_DATA_TYPE_DHHC_END && ((dhhc_end_frame*)data)->is_fake()) || is_fake_event) {
-      // the order in this if is important
-      // We have afake and shoudl set the trigger nr by hand to prevent further errors
+        (type != DHHC_FRAME_HEADER_DATA_TYPE_DHHC_START && is_fake_event)) {
+      /// If ist a start, check if its a fake event, if its not a start, the fake flag is already (re)set. As logn as the data structure is not messed up completly.
+      /// no need to explicitly check the DHHC_END or HLT/ROI
+      /// We have afake and shoudl set the trigger nr by hand to prevent further errors
       evtnr = ftsw_evt_nr & ftsw_evt_mask; // masking might be a problem as we cannore recover all bits
     } else {
       B2ERROR("Event Numbers do not match for this frame $" << hex << evtnr << "!=$" << ftsw_evt_nr << "(FTSW) mask $" << ftsw_evt_mask);

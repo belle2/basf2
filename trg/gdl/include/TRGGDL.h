@@ -20,6 +20,8 @@
 #include <iostream>
 #include <vector>
 #include "trg/trg/Clock.h"
+#include "trg/trg/SignalVector.h"
+#include "trg/trg/SignalBundle.h"
 
 namespace HepGeom {
 template <class T> class Point3D;
@@ -125,6 +127,9 @@ class TRGGDL {
     /// returns the system offset in MC.
     double systemOffsetMC(void) const;
 
+    /// Makes bit pattern(state) using input bit pattern(state).
+    static TRGState decision(const TRGState & input);
+
   private:
 
     /// updates TRGGDL information for MC.
@@ -182,6 +187,12 @@ class TRGGDL {
 
     /// Algorithm
     std::vector<std::string> _algorithm;
+
+    /// Input signal bundle.
+    TRGSignalBundle * _isb;
+
+    /// Output signal bundle.
+    TRGSignalBundle * _osb;
 
     friend class TRGGDLModule;
 };

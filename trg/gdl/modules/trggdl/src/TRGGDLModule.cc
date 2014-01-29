@@ -37,7 +37,7 @@ TRGGDLModule::TRGGDLModule()
     : Module::Module(),
       _debugLevel(0),
       _configFilename("TRGGDLConfig.dat"),
-      _simulationMode(1),
+      _simulationMode(2),
       _fastSimulationMode(0),
       _firmwareSimulationMode(0) {
 
@@ -116,15 +116,13 @@ TRGGDLModule::beginRun() {
 
 void
 TRGGDLModule::event() {
-
-    if (TRGDebug::level()) {
-//      _gdl->dump("geometry superLayers layers wires detail");
-//      _gdl->dump("geometry superLayers layers detail");
-    }
+    TRGDebug::enterStage("TRGGDLModule event");
 
     //...GDL simulation...
     _gdl->update(true);
     _gdl->simulate();
+
+    TRGDebug::leaveStage("TRGGDLModule event");
 }
 
 void

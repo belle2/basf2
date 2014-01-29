@@ -82,7 +82,9 @@ TRGGDL::TRGGDL(const string & configFile,
       _fastSimulationMode(fastSimulationMode),
       _firmwareSimulationMode(firmwareSimulationMode),
       _clock(Belle2_GDL::GDLSystemClock),
-      _offset(15.3) {
+      _offset(15.3),
+      _isb(0),
+      _osb(0) {
 
     if (TRGDebug::level()) {
         cout << "TRGGDL ... TRGGDL initializing with " << _configFilename
@@ -131,6 +133,11 @@ TRGGDL::fastClear(void) {
 
 void
 TRGGDL::update(bool) {
+    TRGDebug::enterStage("TRGGDL update");
+
+    cout << TRGDebug::tab() << "do nothing..." << endl;
+    
+    TRGDebug::leaveStage("TRGGDL update");
 }
 
 TRGGDL::~TRGGDL() {
@@ -149,10 +156,86 @@ TRGGDL::simulate(void) {
 
 void
 TRGGDL::fastSimulation(void) {
+    TRGDebug::enterStage("TRGGDL fastSim");
+
+    cout << TRGDebug::tab() << "do nothing..." << endl;
+    
+    TRGDebug::leaveStage("TRGGDL fastSim");
 }
 
 void
 TRGGDL::firmwareSimulation(void) {
+    TRGDebug::enterStage("TRGGDL firmSim");
+
+    if (TRGDebug::level())
+        cout << TRGDebug::tab() << "Making dummy input signals" << endl;
+
+    //...Clear signal bundles...
+    if (_isb) {
+        for (unsigned i = 0; i < _isb->size(); i++)
+            delete (* _isb)[i];
+        delete _isb;
+    }
+    if (_osb) {
+        for (unsigned i = 0; i < _osb->size(); i++)
+            delete (* _osb)[i];
+        delete _osb;
+    }
+
+    //...Input bits...
+    const unsigned nInput = _input.size();
+    TRGSignalVector & input = * new TRGSignalVector(name() + "InputSignals",
+                                                    _clock);
+    for (unsigned i = 0; i < nInput; i++) {
+
+        //...Create dummy timing signal for even number input bits...
+        if ((i % 2) == 0) {
+            int tdcCount = 100;
+            TRGTime rise = TRGTime(tdcCount, true, _clock, _input[i]);
+            TRGTime fall = rise;
+            fall.shift(1).reverse();
+            TRGSignal s = TRGSignal(rise & fall);
+            s.name(_input[i]);
+
+            //...Add to a signal vector...
+            input += s;
+        }
+
+        //...Create dummy timing signal for odd number input bits...
+        else {
+            int tdcCount = 130;
+            TRGTime rise = TRGTime(tdcCount, true, _clock, _input[i]);
+            TRGTime fall = rise;
+            fall.shift(1).reverse();
+            TRGSignal s = TRGSignal(rise & fall);
+            s.name(_input[i]);
+
+            //...Add to a signal vector...
+            input += s;
+        }
+    }
+
+    //...Make input signal bundle...
+    const string ni = name() + "InputSignalBundle";
+    _isb = new TRGSignalBundle(ni, _clock);
+    _isb->push_back(& input);
+
+    //...Make output signal bundle...
+    const string no = name() + "OutputSignalBundle";
+    _osb = new TRGSignalBundle(no,
+                               _clock,
+                               * _isb,
+                               TRGGDL::decision);
+
+
+    if (TRGDebug::level()) {
+        if (input.active()) {
+            _isb->dump("detail", TRGDebug::tab());
+            _osb->dump("detail", TRGDebug::tab());
+        }
+    }
+
+    TRGDebug::leaveStage("TRGGDL firmSim");
 }
 
 void
@@ -289,13 +372,39 @@ TRGGDL::getAlgorithm(ifstream & ifs) {
         if (w2.size())
             _algorithm.push_back(w2);
 
-         if (TRGDebug::level()) {
-             cout << w0 << "," << w1 << "," << w2 << endl;
-         }
+         // if (TRGDebug::level()) {
+         //     cout << w0 << "," << w1 << "," << w2 << endl;
+         // }
 
         ++lines;
     }
 
+}
+
+TRGState
+TRGGDL::decision(const TRGState & input) {
+
+    //...Prepare states for output...
+    TRGState s(13);
+
+    //...Set up bool array...
+    bool * b = new bool[input.size()];
+    input.copy2bool(b);
+
+    //...Simulate output bit 4...
+    s.set(4, b[15] & (! b[18]) & b[33] & (! b[51]));
+
+    //...Simulate output bit 10...
+    s.set(10, b[46]);
+
+    if (TRGDebug::level()) {
+        input.dump("detail", TRGDebug::tab() + "GDL in ");
+        s.dump("detail", TRGDebug::tab() + "GDL out ");
+    }
+
+    //...Termination...
+    delete[] b;
+    return s;
 }
 
 } // namespace Belle2

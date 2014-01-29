@@ -82,7 +82,7 @@ int HistoServer::server()
     }
     usleep(1000);
     loop_counter++;
-    if (loop_counter % 100 == 0) {
+    if (loop_counter % MERGE_INTERVAL == 0) {
       //      printf("HistoServer: merging histograms\n");
       //      m_mapfile->AcquireSemaphore();
       m_hman->merge();

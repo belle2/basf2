@@ -107,7 +107,9 @@ void DqmHistoManagerModule::event()
     TKey* key = 0;
     TKey* oldkey = 0;
     int nobjs = 0;
+    int nkeys = 0;
     while ((key = (TKey*)nextkey())) {
+      nkeys++;
       if (oldkey && !strcmp(oldkey->GetName(), key->GetName())) continue;
       //      TObject* obj = key->ReadObj();
       TObject* obj = gDirectory->FindObject(key->GetName());
@@ -122,6 +124,9 @@ void DqmHistoManagerModule::event()
     (msg->header())->reserved[0] = 0;
     (msg->header())->reserved[1] = nobjs;
     (msg->header())->reserved[2] = 0;
+
+    printf("DqmHistoManger: dumping histos.....%d (of %d) histos\n",
+           nobjs, nkeys);
 
     m_sock->send(msg);
 

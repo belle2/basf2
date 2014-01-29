@@ -49,7 +49,6 @@ public class ZlibInflater extends DataReader {
 		_byte_stream.reset();
 		//int count = 0;
 		while ( true ) {
-			System.out.println(_comp_size);
 			int size = _inflater.inflate(_buffer, 0, _comp_size);
 			//count += size;
 			_byte_stream.write(_buffer, 0, size);

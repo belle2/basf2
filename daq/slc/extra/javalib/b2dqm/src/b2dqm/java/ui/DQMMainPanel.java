@@ -46,14 +46,14 @@ public class DQMMainPanel extends DnDTabbedPane implements Updatable {
 				subtab.addTab("Total", canvas);
 				tab.addTab(h.getName(), subtab);
 				Histo h1 = (Histo)h.clone();
-				h1.setName(h.getName()+"_diff");
+				h1.setName(h.getName()+":diff");
 				canvas = new CanvasPanel(h1.getName(), h1.getTitle());
 				canvas.getCanvas().addHisto(h1);
 				canvas.getCanvas().resetPadding();
 				subtab.addTab("Difference", canvas);
 				histo_v.add(h1);
 				h1 = (Histo)h.clone();
-				h1.setName(h.getName()+"_tmp");
+				h1.setName(h.getName()+":tmp");
 				histo_v.add(h1);
 			}
 			for (Histo h: histo_v) {

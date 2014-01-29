@@ -1,7 +1,9 @@
 package b2dqm.java.ui;
 
 import java.awt.Component;
-import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.Toolkit;
 import java.util.ArrayList;
 
@@ -9,6 +11,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JComponent;
+import javax.swing.JSplitPane;
 
 import b2dqm.core.HistoPackage;
 import b2dqm.core.PackageInfo;
@@ -22,7 +25,7 @@ public class DQMMainFrame extends JFrame {
 	private DQMMainPanel _main_panel = new DQMMainPanel();
 	private DQMSidePanel _side_panel = new DQMSidePanel();
 	private ArrayList<JFrame> _child_frame_v = new ArrayList<JFrame>(); 
-	private JPanel _panel = new JPanel();
+	private JSplitPane _panel;
 	private boolean _is_separated = false;
 	private DQMStatusPanel _status_panel;
 	
@@ -46,21 +49,34 @@ public class DQMMainFrame extends JFrame {
 	
 	public void init(ArrayList<HistoPackage> pack_v, 
 			ArrayList<PackageInfo> info_v) {
-		JPanel panel = new JPanel();
-		add(panel);
-		panel.setLayout(new BoxLayout(panel,BoxLayout.Y_AXIS));
-		_status_panel = new DQMStatusPanel();
-		panel.add(_status_panel);
-		_panel.setLayout(new BoxLayout(_panel,BoxLayout.X_AXIS));
-		panel.add(_panel);
 		_main_panel.initPanels(pack_v, _side_panel);
 		_side_panel.init(pack_v);
-		_panel.add(_side_panel);
-		_panel.add(_main_panel);
+		JPanel panel = new JPanel();
+		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+		
+		_status_panel = new DQMStatusPanel();
+		panel.add(_status_panel);
+
+		JPanel panel1 = new JPanel();
+		GridBagLayout layout = new GridBagLayout();
+		GridBagConstraints gbc = new GridBagConstraints();
+		panel1.setLayout(layout);
+		_panel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, _side_panel, _main_panel);
+		_panel.setDividerLocation(280);
+		_panel.setDividerSize(5);
+		gbc.gridwidth = 1;
+		gbc.gridx = 0;
+		gbc.gridy = 1;
+		gbc.weightx = 0.2d;
+		gbc.weighty = 1.0d;
+		gbc.fill = GridBagConstraints.BOTH;
+		gbc.insets = new Insets(2, 2, 2, 2);
+		layout.setConstraints(_panel, gbc);
+		panel1.add(_panel);
+		panel.add(panel1);
+
+		add(panel);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		_main_panel.setPreferredSize(new Dimension(1000, 720));
-		_side_panel.setPreferredSize(new Dimension(300, 720));
-		//_side_panel.setMaximumSize(new Dimension(300, 720));
 		setSize(1040, 720);
 		setTitle("Belle-II DQM browser version " + Belle2DQMBrowser.VERSION);
 		setJMenuBar(new DQMMenuBar(this));

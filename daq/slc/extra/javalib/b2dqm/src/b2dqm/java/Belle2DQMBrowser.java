@@ -149,8 +149,8 @@ public class Belle2DQMBrowser extends JavaEntoryPoint {
 						for (int i = 0; i < nhists; i++) {
 							name = inflater.readString();
 							Histo h = (Histo)pack.getHisto(i);
-							Histo h_diff = (Histo)pack.getHisto(h.getName()+"_diff");
-							Histo h_tmp = (Histo)pack.getHisto(h.getName()+"_tmp");
+							Histo h_diff = (Histo)pack.getHisto(h.getName()+":diff");
+							Histo h_tmp = (Histo)pack.getHisto(h.getName()+":tmp");
 							if (!name.matches(h.getName())) {
 								throw new Exception("Wrong histo name :" + name + " for " + h.getName());
 							}

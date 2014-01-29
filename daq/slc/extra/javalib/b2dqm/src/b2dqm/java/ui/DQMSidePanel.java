@@ -58,9 +58,8 @@ public class DQMSidePanel extends JPanel implements Updatable {
     	panel.add(northBox,  BorderLayout.NORTH);
     	panel.add(centerBox);
     	panel.add(southBox,  BorderLayout.SOUTH);
-    	//panel.setMinimumSize(new Dimension(120, 0));
     	add(panel);
-    	//setPreferredSize(new Dimension(420, 240));
+    	setPreferredSize(new Dimension(420, 240));
     }
     
     private void initComps(List<HistoListPanel> list, ExpansionEvent e) {
@@ -134,7 +133,7 @@ class HistoListPanel extends JPanel {
     	for ( MonObject obj: _pack.getMonObjects() ) {
     		try {
     			Histo h = (Histo)obj;
-    			if (h.getName().endsWith("_diff") || h.getName().endsWith("_tmp")) continue;
+    			if (h.getName().endsWith(":diff") || h.getName().endsWith(":tmp")) continue;
         		buf.append(" - <a href='"+pack.getName()+":"+obj.getName()+"'>" + 
         				h.getTitle() /*+" ("+h.getName() +")"*/+"</a><br/>");
     		} catch (Exception e) {

@@ -50,13 +50,23 @@ namespace Belle2 {
 
       /** Histogram 2d hitmap */
       TH1F* hrawROIcount;     /** Histogram  */
-      TH2F* hrawROImap;      /** Histogram  */
-      TH1F* hrawROIDHHID;     /** Histogram  */
       TH1F* hrawROItype;     /** Histogram  */
-      TH1F* hrawROIrow1;     /** Histogram  */
-      TH1F* hrawROIrow2; /** Histogram  */
-      TH1F* hrawROIcol1; /** Histogram  */
-      TH1F* hrawROIcol2; /** Histogram  */
+
+      TH2F* hrawROIHLTmap;      /** Histogram  */
+      TH2F* hrawROIHLTsize;      /** Histogram  */
+      TH1F* hrawROIHLT_DHHID;     /** Histogram  */
+      TH1F* hrawROIHLTrow1;     /** Histogram  */
+      TH1F* hrawROIHLTrow2; /** Histogram  */
+      TH1F* hrawROIHLTcol1; /** Histogram  */
+      TH1F* hrawROIHLTcol2; /** Histogram  */
+
+      TH2F* hrawROIDCmap;      /** Histogram  */
+      TH2F* hrawROIDCsize;      /** Histogram  */
+      TH1F* hrawROIDC_DHHID;     /** Histogram  */
+      TH1F* hrawROIDCrow1;     /** Histogram  */
+      TH1F* hrawROIDCrow2; /** Histogram  */
+      TH1F* hrawROIDCcol1; /** Histogram  */
+      TH1F* hrawROIDCcol2; /** Histogram  */
 
       //map<int,int> sensor_to_histindex;
 

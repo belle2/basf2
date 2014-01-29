@@ -140,6 +140,8 @@ void TrackfitDQMModule::defineHisto()
   m_hPseudoEfficienciesU = getHistProfile("hPseudoEfficienciesU", "pseudo efficiencies U;layer;pseudo efficiency", 6, 1, 7);
   m_hPseudoEfficienciesV = getHistProfile("hPseudoEfficienciesV", "pseudo efficiencies V;layer;pseudo efficiency", 6, 1, 7);
 
+  m_hMomentum = getHist("hMomentum", "reconstructed momentum at first TrackPoint", 1000, 0, 6);
+
   for (int i = 0; i < 6; ++i) {
     const char* varName[6] = { "x", "y", "z", "px", "py", "pz", };
     const char* varTitle[6] = { "x", "y", "z", "p_{x}", "p_{y}", "p_{z}", };
@@ -219,14 +221,25 @@ void TrackfitDQMModule::event()
       m_hNDFPval->Fill(NDF, fs->getPVal());
     }
 
+    bool haveFittedState = true;
+    genfit::MeasuredStateOnPlane mop = 0;
+    try { mop = track->getFittedState(); } catch (...) { haveFittedState = false; }
+    if (haveFittedState) {
+      m_hMomentum->Fill(mop.getMomMag());
+    }
+
     // Unbiased residuals don't make much sense with less d-o-f than
     // the dimension of the hit being removed.
     if (NDF < 1)
       continue;
 
-    plotResiduals(track);
-    plotPseudoEfficiencies(track);
-    plotSeedQuality(track);
+    try {
+      plotResiduals(track);
+      plotPseudoEfficiencies(track);
+      plotSeedQuality(track);
+    } catch (...) {
+      // Skip.
+    }
   }
 }
 

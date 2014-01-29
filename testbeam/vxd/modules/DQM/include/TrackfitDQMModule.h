@@ -165,6 +165,8 @@ namespace Belle2 {
     TH1* m_hPseudoEfficienciesU;
     TH1* m_hPseudoEfficienciesV;
 
+    TH1* m_hMomentum;
+
     /** Correlation between seed and fitted track for five parameters in the first plane.  */
     TH2* m_hSeedQuality[6];
 

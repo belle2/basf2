@@ -38,7 +38,7 @@ path.add_module(geometry)
 
 add_reconstruction(path, components)
 
-output_file_name = '../14999_trackingEfficiency_FinalData.root'
+output_file_name = '../trackingEfficiency_FinalData.root'
 tracking_efficiency = register_module('StandardTrackingPerformance')
 # tracking_efficiency.logging.log_level = LogLevel.DEBUG
 tracking_efficiency.param('outputFileName', output_file_name)

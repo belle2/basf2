@@ -93,6 +93,11 @@ namespace Belle2 {
     TH1F* hnInter;
     TH1F* harea;
     TH1F* hredFactor;
+    TH2F* hCellUV;
+    int n_events;
+
+    TH2F* h_HitRow_CellU;
+    TH2F* h_HitCol_CellV;
 
     virtual void defineHisto();
 

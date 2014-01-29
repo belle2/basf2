@@ -10,7 +10,12 @@
 
 #include <tracking/modules/pxdDataReduction/ROIDQMModule.h>
 #include <pxd/dataobjects/PXDDigit.h>
+#include <pxd/dataobjects/PXDRawHit.h>
+#include <rawdata/dataobjects/RawFTSW.h>
 #include <vxd/geometry/GeoCache.h>
+
+#include "time.h"
+#include "TDirectory.h"
 
 using namespace std;
 using namespace Belle2;
@@ -43,19 +48,39 @@ ROIDQMModule::ROIDQMModule()
   addParam("ROIsName", m_ROIsName,
            "name of the list of ROIs", std::string(""));
 
-
 }
 
 void ROIDQMModule::defineHisto()
 {
 
-  createHistosDictionaries();
+  // Create a separate histogram directory and cd into it.
+  TDirectory* oldDir = gDirectory;
+  m_InterDir = oldDir->mkdir("intercept");
+  m_ROIDir = oldDir->mkdir("roi");
 
-  hnInter  = new TH1F("hnInter", "number of intercepts", 1000, 0, 10000);
+  hCellUV  = new TH2F("hCellU_vs_CellV", "CellID U vs CellID V", 480, 0, 480, 480, 0, 480);
+  hCellUV->GetXaxis()->SetTitle("U cell ID");
+  hCellUV->GetYaxis()->SetTitle("V cell ID");
+
+  h_HitRow_CellU  = new TH2F("hHitRow_vs_CellU", "PXDRawHit ROW  vs CellID U", 480, 0, 480, 480, 0, 480);
+  h_HitRow_CellU->GetXaxis()->SetTitle("U cell ID");
+  h_HitRow_CellU->GetYaxis()->SetTitle("ROW ID");
+
+  h_HitCol_CellV  = new TH2F("hHitCol_vs_CellV", "PXDRawHit COL vs CellID V", 480, 0, 480, 480, 0, 480);
+  h_HitCol_CellV->GetXaxis()->SetTitle("V cell ID");
+  h_HitCol_CellV->GetYaxis()->SetTitle("COL ID");
+
+  m_InterDir->cd();
+  hnInter  = new TH1F("hnInter", "number of intercepts", 100, 0, 100);
+
+  m_ROIDir->cd();
   hnROIs  = new TH1F("hnROIs", "number of ROIs", 100, 0, 100);
   harea = new TH1F("harea", "ROIs area", 100, 0, 100000);
-
   hredFactor = new TH1F("hredFactor", "ROI reduction factor", 1000, 0, 1);
+
+
+  createHistosDictionaries();
+
 
 }
 
@@ -63,23 +88,41 @@ void ROIDQMModule::initialize()
 {
   REG_HISTOGRAM
 
+  StoreArray<RawFTSW>::optional();
   StoreArray<PXDDigit>::optional();
+  StoreArray<PXDRawHit>::optional();
   StoreArray<ROIid>::required(m_ROIsName);
   StoreArray<PXDIntercept>::required(m_InterceptsName);
+
+  n_events = 0;
+
 
 }
 
 void ROIDQMModule::event()
 {
+  n_events++;
 
-  VXD::GeoCache& aGeometry = VXD::GeoCache::getInstance();
+  //  m_aGeometry = VXD::GeoCache::getInstance();
   StoreArray<ROIid> ROIs(m_ROIsName);
+  StoreArray<PXDRawHit> PXDRawHits;
   StoreArray<PXDIntercept> Intercepts(m_InterceptsName);
+
+  StoreArray<PXDDigit> PXDDigits(m_PXDDigitsName);
+  for (auto & it : PXDDigits)
+    hCellUV->Fill(it.getUCellID(), it.getVCellID());
+
+  for (auto & itd : PXDDigits)
+    for (auto & itr : PXDRawHits) {
+      h_HitRow_CellU->Fill(itd.getUCellID(), itr.getRow());
+      h_HitCol_CellV->Fill(itd.getVCellID(), itr.getColumn());
+    }
 
   hnInter->Fill(Intercepts.getEntries());
 
   for (auto & it : Intercepts)
     fillSensorInterHistos(&it);
+
 
   for (auto it = hROIDictionaryEvt.begin(); it != hROIDictionaryEvt.end(); ++it)
     (it->second).value = 0;
@@ -95,7 +138,7 @@ void ROIDQMModule::event()
 
     fillSensorROIHistos(&it);
 
-    const VXD::SensorInfoBase& aSensorInfo = aGeometry.getSensorInfo(it.getSensorID());
+    const VXD::SensorInfoBase& aSensorInfo = m_aGeometry.getSensorInfo(it.getSensorID());
     const int nPixelsU = aSensorInfo.getUCells();
     const int nPixelsV = aSensorInfo.getVCells();
 
@@ -127,31 +170,33 @@ void ROIDQMModule::event()
 void ROIDQMModule::createHistosDictionaries()
 {
 
-  VXD::GeoCache& aGeometry = VXD::GeoCache::getInstance();
+  //  VXD::GeoCache& aGeometry = VXD::GeoCache::getInstance();
 
   string name; //name of the histogram
   string title; //title of the histogram
+  TH2F* tmp2D; //temporary 2D histo used to set axis title
+  TH1F* tmp1D; //temporary 1D histo used to set axis title
 
   m_numModules = 0;
 
-  std::set<Belle2::VxdID> pxdLayers = aGeometry.getLayers(VXD::SensorInfoBase::PXD);
+  std::set<Belle2::VxdID> pxdLayers = m_aGeometry.getLayers(VXD::SensorInfoBase::PXD);
   std::set<Belle2::VxdID>::iterator itPxdLayers = pxdLayers.begin();
 
   while (itPxdLayers != pxdLayers.end()) {
 
-    std::set<Belle2::VxdID> pxdLadders = aGeometry.getLadders(*itPxdLayers);
+    std::set<Belle2::VxdID> pxdLadders = m_aGeometry.getLadders(*itPxdLayers);
     std::set<Belle2::VxdID>::iterator itPxdLadders = pxdLadders.begin();
 
     while (itPxdLadders != pxdLadders.end()) {
 
-      std::set<Belle2::VxdID> pxdSensors = aGeometry.getSensors(*itPxdLadders);
+      std::set<Belle2::VxdID> pxdSensors = m_aGeometry.getSensors(*itPxdLadders);
       std::set<Belle2::VxdID>::iterator itPxdSensors = pxdSensors.begin();
 
       while (itPxdSensors != pxdSensors.end()) {
 
         m_numModules++; //counting the total number of modules
 
-        const VXD::SensorInfoBase& aSensorInfo = aGeometry.getSensorInfo(*itPxdSensors);
+        const VXD::SensorInfoBase& aSensorInfo = m_aGeometry.getSensorInfo(*itPxdSensors);
 
         const int nPixelsU = aSensorInfo.getUCells();
         const int nPixelsV = aSensorInfo.getVCells();
@@ -159,6 +204,7 @@ void ROIDQMModule::createHistosDictionaries()
 
 
         // ------ HISTOGRAMS WITH AN ACCUMULATE PER ROI AND A FILL PER EVENT -------
+        m_ROIDir->cd();
 
         name = "hNROIs_" + sensorid;
         title = "number of ROIs for sensor " + sensorid;
@@ -172,10 +218,55 @@ void ROIDQMModule::createHistosDictionaries()
         hROIDictionaryEvt.insert(pair< Belle2::VxdID, ROIHistoAccumulateAndFill& > ((Belle2::VxdID)*itPxdSensors, *aHAAF));
 
 
+
+
         // ------ HISTOGRAMS WITH A FILL PER INTERCEPT -------
+        m_InterDir->cd();
+
+        // coor U and V
+        name = "hCoorU_" + sensorid;
+        title = "U coordinate of the extrapolation in U for sensor " + sensorid;
+        hInterDictionary.insert(pair< Belle2::VxdID, InterHistoAndFill >
+                                (
+                                  (Belle2::VxdID)*itPxdSensors,
+                                  InterHistoAndFill(
+                                    new TH1F(name.c_str(), title.c_str(), 100, -5, 5),
+        [](TH1 * hPtr, const PXDIntercept * inter) { hPtr->Fill(inter->getCoorU()); }
+                                  )
+                                )
+                               );
+
+        name = "hCoorV_" + sensorid;
+        title = "V coordinate of the extrapolation in V for sensor " + sensorid;
+        hInterDictionary.insert(pair< Belle2::VxdID, InterHistoAndFill >
+                                (
+                                  (Belle2::VxdID)*itPxdSensors,
+                                  InterHistoAndFill(
+                                    new TH1F(name.c_str(), title.c_str(), 100, -5, 5),
+        [](TH1 * hPtr, const PXDIntercept * inter) { hPtr->Fill(inter->getCoorV()); }
+                                  )
+                                )
+                               );
+
+        // Intercept U vs V coordinate
+        name = "hCoorU_vs_CoorV_" + sensorid;
+        title = "U vs V intercept (cm) " + sensorid;
+        tmp2D = new TH2F(name.c_str(), title.c_str(), 100, -5, 5, 100, -5, 5);
+        tmp2D->GetXaxis()->SetTitle("intercept U coor (cm)");
+        tmp2D->GetYaxis()->SetTitle("intercept V coor (cm)");
+        hInterDictionary.insert(pair< Belle2::VxdID, InterHistoAndFill >
+                                (
+                                  (Belle2::VxdID)*itPxdSensors,
+                                  InterHistoAndFill(
+                                    tmp2D,
+        [](TH1 * hPtr, const PXDIntercept * inter) { hPtr->Fill(inter->getCoorU(), inter->getCoorV()); }
+                                  )
+                                )
+                               );
+
 
         // sigma U and V
-        name = "hsigmaU_" + sensorid;
+        name = "hStatErrU_" + sensorid;
         title = "stat error of the extrapolation in U for sensor " + sensorid;
         hInterDictionary.insert(pair< Belle2::VxdID, InterHistoAndFill >
                                 (
@@ -186,7 +277,7 @@ void ROIDQMModule::createHistosDictionaries()
                                   )
                                 )
                                );
-        name = "hsigmaV_" + sensorid;
+        name = "hStatErrV_" + sensorid;
         title = "stat error of the extrapolation in V for sensor " + sensorid;
         hInterDictionary.insert(pair< Belle2::VxdID, InterHistoAndFill >
                                 (
@@ -197,73 +288,419 @@ void ROIDQMModule::createHistosDictionaries()
                                   )
                                 )
                                );
-        // scatter plot: U,V intercept in cm VS U,V cell ID
 
-        name = "hUIntercept_vs_UDigit_" + sensorid;
-        title = "U intercept (cm) vs U Digit (ID) " + sensorid;
-        TH2F* tmp = new TH2F(name.c_str(), title.c_str(), 100, -5, 5, 1024, 0, 1024);
-        tmp->GetXaxis()->SetTitle("intercept U coor (cm)");
-        tmp->GetYaxis()->SetTitle("U cell ID");
+        //1D residuals
+        name = "hResidU_" + sensorid;
+        title = "U residuals = intercept - digit,  for sensor " + sensorid;
+        tmp1D = new TH1F(name.c_str(), title.c_str(), 1000, -5, 5);
         hInterDictionary.insert(pair< Belle2::VxdID, InterHistoAndFill >
                                 (
                                   (Belle2::VxdID)*itPxdSensors,
                                   InterHistoAndFill(
-                                    tmp,
-        [this, itPxdSensors](TH1 * hPtr, const PXDIntercept * inter) {
+                                    tmp1D,
+        [this](TH1 * hPtr, const PXDIntercept * inter) {
           StoreArray<PXDDigit> PXDDigits(this->m_PXDDigitsName);
 
           for (auto & it : PXDDigits)
-            if ((int)it.getSensorID() == (int)inter->getSensorID())
-              hPtr->Fill(inter->getCoorU(), it.getUCellID());
+            if ((int)it.getSensorID() == (int)inter->getSensorID()) {
+              const VXD::SensorInfoBase& aSensorInfo = m_aGeometry.getSensorInfo(it.getSensorID());
+              hPtr->Fill(inter->getCoorU() - aSensorInfo.getUCellPosition(it.getUCellID(), it.getVCellID()));
+            }
         }
                                   )
                                 )
                                );
 
-        name = "hVIntercept_vs_VDigit_" + sensorid;
-        title = "V intercept (cm) vs V Digit (ID) " + sensorid;
-        tmp = new TH2F(name.c_str(), title.c_str(), 100, -5, 5, 1024, 0, 1024);
-        tmp->GetXaxis()->SetTitle("intercept V coor (cm)");
-        tmp->GetYaxis()->SetTitle("V cell ID");
+        name = "hResidV_" + sensorid;
+        title = "V residuals = intercept - digit,  for sensor " + sensorid;
+        tmp1D = new TH1F(name.c_str(), title.c_str(), 1000, -5, 5);
         hInterDictionary.insert(pair< Belle2::VxdID, InterHistoAndFill >
                                 (
                                   (Belle2::VxdID)*itPxdSensors,
                                   InterHistoAndFill(
-                                    tmp,
+                                    tmp1D,
+        [this](TH1 * hPtr, const PXDIntercept * inter) {
+          StoreArray<PXDDigit> PXDDigits(this->m_PXDDigitsName);
+
+          for (auto & it : PXDDigits)
+            if ((int)it.getSensorID() == (int)inter->getSensorID()) {
+              const VXD::SensorInfoBase& aSensorInfo = m_aGeometry.getSensorInfo(it.getSensorID());
+              hPtr->Fill(inter->getCoorV() - aSensorInfo.getVCellPosition(it.getVCellID()));
+            }
+        }
+                                  )
+                                )
+                               );
+
+        name = "hResidV_vs_ResidU_" + sensorid;
+        title = "V vs U residuals = intercept - digit,  for sensor " + sensorid;
+        tmp2D = new TH2F(name.c_str(), title.c_str(), 1000, -5, 5, 1000, -5, 5);
+        tmp2D->GetXaxis()->SetTitle("U resid (cm)");
+        tmp2D->GetYaxis()->SetTitle("V resid (cm)");
+        hInterDictionary.insert(pair< Belle2::VxdID, InterHistoAndFill >
+                                (
+                                  (Belle2::VxdID)*itPxdSensors,
+                                  InterHistoAndFill(
+                                    tmp2D,
+        [this](TH1 * hPtr, const PXDIntercept * inter) {
+          StoreArray<PXDDigit> PXDDigits(this->m_PXDDigitsName);
+
+          for (auto & it : PXDDigits)
+            if ((int)it.getSensorID() == (int)inter->getSensorID()) {
+              const VXD::SensorInfoBase& aSensorInfo = m_aGeometry.getSensorInfo(it.getSensorID());
+              double residU = inter->getCoorU() - aSensorInfo.getUCellPosition(it.getUCellID(), it.getVCellID());
+              double residV = inter->getCoorV() - aSensorInfo.getVCellPosition(it.getVCellID());
+              //    double residU = inter->getCoorU() + it.getVCellID()*75e-4 ;
+              //    double residV = inter->getCoorV() + it.getUCellID()*50e-4 ;
+              hPtr->Fill(residU, residV);
+            }
+        }
+                                  )
+                                )
+                               );
+
+        name = "hResidVm_vs_ResidU_" + sensorid;
+        title = "V vs U residuals = intercept - digit,  for sensor " + sensorid;
+        tmp2D = new TH2F(name.c_str(), title.c_str(), 1000, -5, 5, 1000, -5, 5);
+        tmp2D->GetXaxis()->SetTitle("U resid (cm)");
+        tmp2D->GetYaxis()->SetTitle("V* resid (cm)");
+        hInterDictionary.insert(pair< Belle2::VxdID, InterHistoAndFill >
+                                (
+                                  (Belle2::VxdID)*itPxdSensors,
+                                  InterHistoAndFill(
+                                    tmp2D,
+        [this](TH1 * hPtr, const PXDIntercept * inter) {
+          StoreArray<PXDDigit> PXDDigits(this->m_PXDDigitsName);
+
+          for (auto & it : PXDDigits)
+            if ((int)it.getSensorID() == (int)inter->getSensorID()) {
+              const VXD::SensorInfoBase& aSensorInfo = m_aGeometry.getSensorInfo(it.getSensorID());
+              double residU = inter->getCoorU() - aSensorInfo.getUCellPosition(it.getUCellID(), it.getVCellID());
+              double residV = inter->getCoorV() + aSensorInfo.getVCellPosition(it.getVCellID());
+              hPtr->Fill(residU, residV);
+            }
+        }
+                                  )
+                                )
+                               );
+
+        name = "hResidV_vs_ResidUm_" + sensorid;
+        title = "V vs U residuals = intercept - digit,  for sensor " + sensorid;
+        tmp2D = new TH2F(name.c_str(), title.c_str(), 1000, -5, 5, 1000, -5, 5);
+        tmp2D->GetXaxis()->SetTitle("U* resid (cm)");
+        tmp2D->GetYaxis()->SetTitle("V resid (cm)");
+        hInterDictionary.insert(pair< Belle2::VxdID, InterHistoAndFill >
+                                (
+                                  (Belle2::VxdID)*itPxdSensors,
+                                  InterHistoAndFill(
+                                    tmp2D,
+        [this](TH1 * hPtr, const PXDIntercept * inter) {
+          StoreArray<PXDDigit> PXDDigits(this->m_PXDDigitsName);
+
+          for (auto & it : PXDDigits)
+            if ((int)it.getSensorID() == (int)inter->getSensorID()) {
+              const VXD::SensorInfoBase& aSensorInfo = m_aGeometry.getSensorInfo(it.getSensorID());
+              double residU = inter->getCoorU() + aSensorInfo.getUCellPosition(it.getUCellID(), it.getVCellID());
+              double residV = inter->getCoorV() - aSensorInfo.getVCellPosition(it.getVCellID());
+              hPtr->Fill(residU, residV);
+            }
+        }
+                                  )
+                                )
+                               );
+
+        name = "hResidVm_vs_ResidUm_" + sensorid;
+        title = "V vs U residuals = intercept - digit,  for sensor " + sensorid;
+        tmp2D = new TH2F(name.c_str(), title.c_str(), 1000, -5, 5, 1000, -5, 5);
+        tmp2D->GetXaxis()->SetTitle("U* resid (cm)");
+        tmp2D->GetYaxis()->SetTitle("V* resid (cm)");
+        hInterDictionary.insert(pair< Belle2::VxdID, InterHistoAndFill >
+                                (
+                                  (Belle2::VxdID)*itPxdSensors,
+                                  InterHistoAndFill(
+                                    tmp2D,
+        [this](TH1 * hPtr, const PXDIntercept * inter) {
+          StoreArray<PXDDigit> PXDDigits(this->m_PXDDigitsName);
+
+          for (auto & it : PXDDigits)
+            if ((int)it.getSensorID() == (int)inter->getSensorID()) {
+              const VXD::SensorInfoBase& aSensorInfo = m_aGeometry.getSensorInfo(it.getSensorID());
+              double residU = inter->getCoorU() + aSensorInfo.getUCellPosition(it.getUCellID(), it.getVCellID());
+              double residV = inter->getCoorV() + aSensorInfo.getVCellPosition(it.getVCellID());
+              hPtr->Fill(residU, residV);
+            }
+        }
+                                  )
+                                )
+                               );
+
+        //residual U,V vs coordinate U,V
+        name = "hResidU_vs_CoorU_" + sensorid;
+        title = "U residual (cm) vs coor U (cm) " + sensorid;
+        tmp2D = new TH2F(name.c_str(), title.c_str(), 1000, -5, 5, 1000, -5, 5);
+        tmp2D->GetYaxis()->SetTitle("U resid (cm)");
+        tmp2D->GetXaxis()->SetTitle("U coor (cm)");
+        hInterDictionary.insert(pair< Belle2::VxdID, InterHistoAndFill >
+                                (
+                                  (Belle2::VxdID)*itPxdSensors,
+                                  InterHistoAndFill(
+                                    tmp2D,
+        [this](TH1 * hPtr, const PXDIntercept * inter) {
+          StoreArray<PXDDigit> PXDDigits(this->m_PXDDigitsName);
+
+          for (auto & it : PXDDigits)
+            if ((int)it.getSensorID() == (int)inter->getSensorID()) {
+              const VXD::SensorInfoBase& aSensorInfo = m_aGeometry.getSensorInfo(it.getSensorID());
+              double resid = inter->getCoorU() - aSensorInfo.getUCellPosition(it.getUCellID(), it.getVCellID());
+              hPtr->Fill(inter->getCoorU(), resid);
+            }
+        }
+                                  )
+                                )
+                               );
+
+        name = "hResidV_vs_CoorV_" + sensorid;
+        title = "V residual (cm) vs coor V (cm) " + sensorid;
+        tmp2D = new TH2F(name.c_str(), title.c_str(), 1000, -5, 5, 1000, -5, 5);
+        tmp2D->GetYaxis()->SetTitle("V resid (cm)");
+        tmp2D->GetXaxis()->SetTitle("V coor (cm)");
+        hInterDictionary.insert(pair< Belle2::VxdID, InterHistoAndFill >
+                                (
+                                  (Belle2::VxdID)*itPxdSensors,
+                                  InterHistoAndFill(
+                                    tmp2D,
+        [this](TH1 * hPtr, const PXDIntercept * inter) {
+          StoreArray<PXDDigit> PXDDigits(this->m_PXDDigitsName);
+
+          for (auto & it : PXDDigits)
+            if ((int)it.getSensorID() == (int)inter->getSensorID()) {
+              const VXD::SensorInfoBase& aSensorInfo = m_aGeometry.getSensorInfo(it.getSensorID());
+              double resid = inter->getCoorV() - aSensorInfo.getVCellPosition(it.getVCellID());
+              hPtr->Fill(inter->getCoorV(), resid);
+            }
+        }
+                                  )
+                                )
+                               );
+
+        //residual U,V vs coordinate V,U
+        name = "hResidU_vs_CoorV_" + sensorid;
+        title = "U residual (cm) vs coor V (cm) " + sensorid;
+        tmp2D = new TH2F(name.c_str(), title.c_str(), 1000, -5, 5, 1000, -5, 5);
+        tmp2D->GetYaxis()->SetTitle("U resid (cm)");
+        tmp2D->GetXaxis()->SetTitle("V coor (cm)");
+        hInterDictionary.insert(pair< Belle2::VxdID, InterHistoAndFill >
+                                (
+                                  (Belle2::VxdID)*itPxdSensors,
+                                  InterHistoAndFill(
+                                    tmp2D,
+        [this](TH1 * hPtr, const PXDIntercept * inter) {
+          StoreArray<PXDDigit> PXDDigits(this->m_PXDDigitsName);
+
+          for (auto & it : PXDDigits)
+            if ((int)it.getSensorID() == (int)inter->getSensorID()) {
+              const VXD::SensorInfoBase& aSensorInfo = m_aGeometry.getSensorInfo(it.getSensorID());
+              double resid = inter->getCoorU() - aSensorInfo.getUCellPosition(it.getUCellID(), it.getVCellID());
+              hPtr->Fill(inter->getCoorV(), resid);
+            }
+        }
+                                  )
+                                )
+                               );
+
+        name = "hResidV_vs_CoorU_" + sensorid;
+        title = "V residual (cm) vs coor U (cm) " + sensorid;
+        tmp2D = new TH2F(name.c_str(), title.c_str(), 1000, -5, 5, 1000, -5, 5);
+        tmp2D->GetYaxis()->SetTitle("V resid (cm)");
+        tmp2D->GetXaxis()->SetTitle("U coor (cm)");
+        hInterDictionary.insert(pair< Belle2::VxdID, InterHistoAndFill >
+                                (
+                                  (Belle2::VxdID)*itPxdSensors,
+                                  InterHistoAndFill(
+                                    tmp2D,
+        [this](TH1 * hPtr, const PXDIntercept * inter) {
+          StoreArray<PXDDigit> PXDDigits(this->m_PXDDigitsName);
+
+          for (auto & it : PXDDigits)
+            if ((int)it.getSensorID() == (int)inter->getSensorID()) {
+              const VXD::SensorInfoBase& aSensorInfo = m_aGeometry.getSensorInfo(it.getSensorID());
+              double resid = inter->getCoorV() - aSensorInfo.getVCellPosition(it.getVCellID());
+              hPtr->Fill(inter->getCoorU(), resid);
+            }
+        }
+                                  )
+                                )
+                               );
+
+
+        // scatter plot: U,V residuals VS time
+        name = "hResidU_vs_time_" + sensorid;
+        title = "U residual (cm) vs time " + sensorid;
+        tmp2D = new TH2F(name.c_str(), title.c_str(), 100, 0, 1e6, 100, -5, 5);
+        tmp2D->GetYaxis()->SetTitle("U resid (cm)");
+        tmp2D->GetXaxis()->SetTitle("time (folded in 1us)");
+        hInterDictionary.insert(pair< Belle2::VxdID, InterHistoAndFill >
+                                (
+                                  (Belle2::VxdID)*itPxdSensors,
+                                  InterHistoAndFill(
+                                    tmp2D,
+        [this](TH1 * hPtr, const PXDIntercept * inter) {
+          StoreArray<PXDDigit> PXDDigits(this->m_PXDDigitsName);
+          StoreArray<RawFTSW> rawFTSW;
+
+          struct timeval triggerTime;
+          rawFTSW[0]->GetTTTimeVal(0, & triggerTime);
+          //    int time =  int (   (triggerTime.tv_sec *1e6  + triggerTime.tv_usec  ) ) % 100000;
+          long int time =  triggerTime.tv_usec;
+
+          for (auto & it : PXDDigits)
+            if ((int)it.getSensorID() == (int)inter->getSensorID()) {
+              const VXD::SensorInfoBase& aSensorInfo = m_aGeometry.getSensorInfo(it.getSensorID());
+              double resid = inter->getCoorU() - aSensorInfo.getUCellPosition(it.getUCellID(), it.getVCellID());
+              hPtr->Fill(time, resid);
+            }
+        }
+                                  )
+                                )
+                               );
+
+        name = "hResidV_vs_time_" + sensorid;
+        title = "V residual (cm) vs time " + sensorid;
+        tmp2D = new TH2F(name.c_str(), title.c_str(), 100, 0, 1e6, 100, -5, 5);
+        tmp2D->GetYaxis()->SetTitle("V resid (cm)");
+        tmp2D->GetXaxis()->SetTitle("time (folded in 1us)");
+        hInterDictionary.insert(pair< Belle2::VxdID, InterHistoAndFill >
+                                (
+                                  (Belle2::VxdID)*itPxdSensors,
+                                  InterHistoAndFill(
+                                    tmp2D,
+        [this](TH1 * hPtr, const PXDIntercept * inter) {
+          StoreArray<PXDDigit> PXDDigits(this->m_PXDDigitsName);
+          StoreArray<RawFTSW> rawFTSW;
+
+          struct timeval triggerTime;
+          rawFTSW[0]->GetTTTimeVal(0, & triggerTime);
+          //    int time =  int (   (triggerTime.tv_sec *1e6  + triggerTime.tv_usec  ) ) % 100000;
+          long int time =  triggerTime.tv_usec;
+
+          for (auto & it : PXDDigits)
+            if ((int)it.getSensorID() == (int)inter->getSensorID()) {
+              const VXD::SensorInfoBase& aSensorInfo = m_aGeometry.getSensorInfo(it.getSensorID());
+              double resid = inter->getCoorV() - aSensorInfo.getVCellPosition(it.getVCellID());
+              hPtr->Fill(time, resid);
+            }
+        }
+                                  )
+                                )
+                               );
+
+        //residual vs charge
+        name = "hResidU_vs_charge_" + sensorid;
+        title = "U residual (cm) vs charge " + sensorid;
+        tmp2D = new TH2F(name.c_str(), title.c_str(), 250, 0, 250, 100, -5, 5);
+        tmp2D->GetYaxis()->SetTitle("U resid (cm)");
+        tmp2D->GetXaxis()->SetTitle("charge");
+        hInterDictionary.insert(pair< Belle2::VxdID, InterHistoAndFill >
+                                (
+                                  (Belle2::VxdID)*itPxdSensors,
+                                  InterHistoAndFill(
+                                    tmp2D,
+        [this](TH1 * hPtr, const PXDIntercept * inter) {
+          StoreArray<PXDDigit> PXDDigits(this->m_PXDDigitsName);
+
+          for (auto & it : PXDDigits)
+            if ((int)it.getSensorID() == (int)inter->getSensorID()) {
+              const VXD::SensorInfoBase& aSensorInfo = m_aGeometry.getSensorInfo(it.getSensorID());
+              double resid = inter->getCoorU() - aSensorInfo.getUCellPosition(it.getUCellID(), it.getVCellID());
+              hPtr->Fill(it.getCharge(), resid);
+            }
+        }
+                                  )
+                                )
+                               );
+
+        name = "hResidV_vs_charge_" + sensorid;
+        title = "V residual (cm) vs charge " + sensorid;
+        tmp2D = new TH2F(name.c_str(), title.c_str(), 250, 0, 250, 100, -5, 5);
+        tmp2D->GetYaxis()->SetTitle("V resid (cm)");
+        tmp2D->GetXaxis()->SetTitle("charge");
+        hInterDictionary.insert(pair< Belle2::VxdID, InterHistoAndFill >
+                                (
+                                  (Belle2::VxdID)*itPxdSensors,
+                                  InterHistoAndFill(
+                                    tmp2D,
+        [this](TH1 * hPtr, const PXDIntercept * inter) {
+          StoreArray<PXDDigit> PXDDigits(this->m_PXDDigitsName);
+
+          for (auto & it : PXDDigits)
+            if ((int)it.getSensorID() == (int)inter->getSensorID()) {
+              const VXD::SensorInfoBase& aSensorInfo = m_aGeometry.getSensorInfo(it.getSensorID());
+              double resid = inter->getCoorV() - aSensorInfo.getVCellPosition(it.getVCellID());
+              hPtr->Fill(it.getCharge(), resid);
+            }
+        }
+                                  )
+                                )
+                               );
+
+
+        // scatter plot: U,V intercept in cm VS U,V cell position
+        name = "hCoorU_vs_UDigit_" + sensorid;
+        title = "U intercept (cm) vs U Digit (ID) " + sensorid;
+        TH2F* tmp2D = new TH2F(name.c_str(), title.c_str(), 1000, -5, 5, 1000, -5, 5);
+        tmp2D->GetXaxis()->SetTitle("intercept U coor (cm)");
+        tmp2D->GetYaxis()->SetTitle("digit U coor (cm)");
+        hInterDictionary.insert(pair< Belle2::VxdID, InterHistoAndFill >
+                                (
+                                  (Belle2::VxdID)*itPxdSensors,
+                                  InterHistoAndFill(
+                                    tmp2D,
+        [this](TH1 * hPtr, const PXDIntercept * inter) {
+          StoreArray<PXDDigit> PXDDigits(this->m_PXDDigitsName);
+
+          for (auto & it : PXDDigits)
+            if ((int)it.getSensorID() == (int)inter->getSensorID()) {
+              const VXD::SensorInfoBase& aSensorInfo = m_aGeometry.getSensorInfo(it.getSensorID());
+              hPtr->Fill(inter->getCoorU(), aSensorInfo.getUCellPosition(it.getUCellID(), it.getVCellID()));
+              //        hPtr->Fill( inter->getCoorU(), it.getVCellID()*75e-4 );
+            }
+        }
+                                  )
+                                )
+                               );
+
+        name = "hCoorV_vs_VDigit_" + sensorid;
+        title = "V intercept (cm) vs V Digit (ID) " + sensorid;
+        tmp2D = new TH2F(name.c_str(), title.c_str(), 1000, -5, 5, 1000, -5, 5);
+        tmp2D->GetXaxis()->SetTitle("intercept V coor (cm)");
+        tmp2D->GetYaxis()->SetTitle("digi V coor (cm)");
+        hInterDictionary.insert(pair< Belle2::VxdID, InterHistoAndFill >
+                                (
+                                  (Belle2::VxdID)*itPxdSensors,
+                                  InterHistoAndFill(
+                                    tmp2D,
         [this, itPxdSensors](TH1 * hPtr, const PXDIntercept * inter) {
           StoreArray<PXDDigit> PXDDigits(this->m_PXDDigitsName);
 
           for (auto & it : PXDDigits) {
-            //              cout<<"   pxd sensor "<< (int)it.getSensorID()<<" vs " <<(int)inter->getSensorID()<<endl;
-            if ((int)it.getSensorID() == (int)inter->getSensorID())
-              hPtr->Fill(inter->getCoorV(), it.getVCellID());
+            if ((int)it.getSensorID() == (int)inter->getSensorID()) {
+              const VXD::SensorInfoBase& aSensorInfo = m_aGeometry.getSensorInfo(it.getSensorID());
+              hPtr->Fill(inter->getCoorV(), aSensorInfo.getVCellPosition(it.getVCellID()));
+              //        hPtr->Fill( inter->getCoorV(), it.getUCellID()*50e-4  );
+            }
           }
         }
                                   )
                                 )
                                );
 
-        // Intercept U vs V coordinate
-        name = "hUIntercept_vs_VIntercept_" + sensorid;
-        title = "U vs V intercept (cm) " + sensorid;
-        tmp = new TH2F(name.c_str(), title.c_str(), 100, -5, 5, 100, -5, 5);
-        tmp->GetXaxis()->SetTitle("intercept U coor (cm)");
-        tmp->GetYaxis()->SetTitle("intercept V coor (cm)");
-        hInterDictionary.insert(pair< Belle2::VxdID, InterHistoAndFill >
-                                (
-                                  (Belle2::VxdID)*itPxdSensors,
-                                  InterHistoAndFill(
-                                    tmp,
-        [](TH1 * hPtr, const PXDIntercept * inter) { hPtr->Fill(inter->getCoorU(), inter->getCoorV()); }
-                                  )
-                                )
-                               );
 
 
 
 
 
         // ------ HISTOGRAMS WITH A FILL PER ROI -------
+        m_ROIDir->cd();
 
         // MIN in U and V
         name = "hminU_" + sensorid;
@@ -377,6 +814,8 @@ void ROIDQMModule::fillSensorROIHistos(const ROIid* roi)
 
 void ROIDQMModule::endRun()
 {
+
+  hCellUV->Scale((double)1 / n_events);
 
   for (auto it = hROIDictionaryEvt.begin(); it != hROIDictionaryEvt.end(); ++it)
     delete &(it->second);

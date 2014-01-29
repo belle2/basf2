@@ -897,7 +897,7 @@ macro main wait=wait baseRise=197 baseFall=293
     atit 'cdc_bb' ' '
 
 *...FTD 8...
-*    e_high & n_t2=0 & n_t3=0 
+*    e_high & !n_t2[0] & !n_t2[1] & !n_t2[2] & !n_t3[0] & !n_t3[1] & !n_t3[2] 
 [wait]
     zone 1 6 1
     title 'gg 1/1'

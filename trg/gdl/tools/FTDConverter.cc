@@ -20,6 +20,7 @@
 #include <vector>
 #include <map>
 #include <string.h>
+#include "trg/trg/Utilities.h"
 
 unsigned DebugLevel = 1;
 
@@ -33,10 +34,12 @@ vector<string> outputs;
 map<string, string> logics;
 vector<string> expanded;
 vector<string> expanded2;
+vector<string> expandedcc;
 
 void shrink(char b[800]);
 void shrink(string &);
 void cosmetic(string &);
+void tocc(string &);
 void chopWord(char b[800], char c[800]);
 void chopWord(string &, string &);
 void removeComments(char b[800]);
@@ -44,6 +47,7 @@ void getInput(char b[800]);
 void getOutput(char b[800]);
 void getLogic(char b[800]);
 void getLogicGND(string &);
+void tofunc(string &);
 string breakup(const string & logic);
 string decodeLogic(const string & logic);
 void kumacOutput(ofstream &, string logic, string ftd);
@@ -139,8 +143,10 @@ main(int argc, char * argv[]) {
     for (unsigned i = 0; i < outputs.size(); i++) {
 	string logic = decodeLogic(logics[outputs[i]]);
 	shrink(logic);
-
 	expanded.push_back(logic);
+        string logic_cc = logic;
+
+        //...For algorithm file...
 	for (unsigned j = 0; j < inputBits.size(); j++) {
 	    while (1) {
 		char crep[10];
@@ -158,8 +164,32 @@ main(int argc, char * argv[]) {
 	cosmetic(logic);
 	expanded2.push_back(logic);
 
+        //...For cc file...
+	for (unsigned j = 0; j < inputBits.size(); j++) {
+	    while (1) {
+		char crep[10];
+		sprintf(crep, "i[%d]", j);
+		string inp = inputBits[j];
+		string rep = crep;
+                string::size_type p = logic_cc.find(inp);
+		if (p != string::npos)
+		    logic_cc.replace(p, inp.size(), rep, 0, rep.size());
+		else
+		    break;
+	    }
+	}
+
+        shrink(logic_cc);
+        cosmetic(logic_cc);
+        tocc(logic_cc);
+        string right_cc = "b[" + Belle2::TRGUtilities::itostring(i) + "] = (";
+        logic_cc = right_cc + logic_cc + ");";
+        
+        expandedcc.push_back(logic_cc);
+
         if (DebugLevel) {
             cout << "->" << logic << "<-" << endl;
+            cout << "->" << logic_cc << "<-" << endl;
             
         }
     }
@@ -235,6 +265,23 @@ main(int argc, char * argv[]) {
 	aFile << i << " : ( " << expanded2[i] << " )" << endl;
     }
     aFile.close();
+
+    //...C++ alg file...
+    string cFilename = filename + ".cc";
+    string funcname = filename;
+    tofunc(funcname);
+    cout << "    c++ file   :" << cFilename << endl;
+    ofstream cFile(cFilename.c_str(), ios::out);
+    if (! cFile.is_open()) {
+ 	cout << "    !!! can not open file : " << cFile << endl;
+ 	exit(-3);
+    }
+    cFile << "void " << funcname << "(bool * b, bool * i) {" << endl;
+    for (unsigned i = 0; i < expandedcc.size(); i++) {
+	cFile << expandedcc[i] << endl;
+    }
+    cFile << "}" << endl;
+    cFile.close();
 
     //...Summary for paw...
     string kFilename = filename + ".kumac";
@@ -448,7 +495,8 @@ breakup(const string & logic) {
 	    (c == '|') ||
 	    (c == '>') ||
 	    (c == '<') ||
-	    (c == '!')) {
+	    (c == '!') ||
+            (c == '=')) {
 	    string d = s.substr(i, 1);
 
 	    if (i == 0) {
@@ -456,6 +504,11 @@ breakup(const string & logic) {
 	    }
 	    else if (i == int(s.size())) {
 		s.insert(i, sp);
+	    }
+	    else if (c == '=') {
+                // assuming only "=="
+		s.insert(i - 1, sp);
+		s.insert(i + 2, sp);
 	    }
 	    else {
 		s.insert(i, sp);
@@ -519,7 +572,7 @@ decodeLogic(const string & logic) {
 		}
 	    }
 	    unsigned width = inputSizes[n] + 1;
-	    string x;
+	    string x = "( ";
 	    if (cw[0] == '0') {
 		char b = '0';
 		for (unsigned i = 0; i < width; i++) {
@@ -564,6 +617,8 @@ decodeLogic(const string & logic) {
 		cout << "                " << logic << endl;
 	    }
 
+            x += " )";
+
             if (DebugLevel) {
                 cout << "    s=" << p1 << " " << p0 << " " << cw
                           << endl;
@@ -581,6 +636,48 @@ decodeLogic(const string & logic) {
 	else if (p0[0] == '<') {
 	    cout << "decodeLogic !!! [> with 4] is not supported"
 		      << endl;
+	}
+
+	//...'='...
+	else if (p0[0] == '=') {
+
+	    //...Search for width...
+	    string name = p1;
+	    unsigned n = 999;
+	    for (unsigned i = 0; i < inputs.size(); i++) {
+		if (inputs[i] == p1) {
+		    n = i;
+		    break;
+		}
+	    }
+	    unsigned width = inputSizes[n] + 1;
+	    string x = "( ";
+	    if (cw[0] == '0') {
+		char b = '0';
+		for (unsigned i = 0; i < width; i++) {
+		    if (i) x += " & ";
+		    x += "!" + name + "[" + char(b + i) + "]";
+		}
+	    }
+	    else {
+		cout << "decodeLogic !!! '== n' is not supported"
+			  << endl;
+		cout << "                " << logic << endl;
+	    }
+
+            if (DebugLevel) {
+                cout << "    s=" << p1 << " " << p0 << " " << cw
+                          << endl;
+                cout << "    name=" << name << ",width=" << width
+                          << endl;
+                cout << "    x={" << x << "}" << endl;
+            }
+
+            x += " )";
+
+	    strcpy(p1, x.c_str());
+	    strcpy(p0, "");
+	    strcpy(cw, "");
 	}
 
 	if (f.size() && (p1[0] != 0)) f += " ";
@@ -730,9 +827,9 @@ Term::expand(void) {
 	    _expanded = s0 + p + s1;
 	}
 
-// 	cout << "--->" << endl;
-// 	cout << _expanded << endl;
-// 	cout << "<---" << endl;
+ 	// cout << "--->" << endl;
+ 	// cout << _expanded << endl;
+ 	// cout << "<---" << endl;
    }
 }
 
@@ -858,4 +955,28 @@ chopWord(string & b, string & c) {
 	b = b.substr(i + 1, l);
     else
 	b = "";
+}
+
+void
+tocc(string & s) {
+    while(s.find("*") != string::npos) {
+        const unsigned n = s.size();
+        for (unsigned i = 0; i < n; i++)
+            if (s[i] == '*')
+                s.replace(i, 2, "&& ", 0, 3);
+    }
+    while(s.find("+") != string::npos) {
+        const unsigned n = s.size();
+        for (unsigned i = 0; i < n; i++)
+            if (s[i] == '+')
+                s.replace(i, 2, ") || ( ", 0, 6);
+    }
+}
+
+void
+tofunc(string & s) {
+    const unsigned n = s.size();
+    for (unsigned i = 0; i < n; i++)
+        if (s[i] == '.')
+            s.replace(i, 1, "_", 0, 1);
 }

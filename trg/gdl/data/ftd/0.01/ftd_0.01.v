@@ -66,6 +66,7 @@ reg          pseude_rand; // 50
 reg                 veto; // 51
 reg           [2:0] n_t3; // 52  // := # of track count of full and short
 reg           [2:0] n_t2; // 52  // := # of track count of full and short
+
 //.............
 //   Outputs
 //.............
@@ -169,7 +170,7 @@ c4         = (n_clus>3) & (!veto);                                   //  5
 bhabha     = ecl_bha & (!veto);                                       //  6
 bhabha_trk = ecl_bha & (n_t2>1) & cdc_bb;
 
-gg         = e_high & (n_t2=0) & (n_t3=0);
+gg         = e_high & (n_t2==0) & (n_t3==0);
 
 mu_pair    = (n_klm>0) & (n_t2>1);
 

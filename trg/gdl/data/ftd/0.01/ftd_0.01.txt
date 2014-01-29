@@ -7,7 +7,7 @@
 5 : c4 = (n_clus>3) & (!veto) 
 6 : bhabha = ecl_bha & (!veto) 
 7 : bhabha_trk = ecl_bha & (n_t2>1) & cdc_bb 
-8 : gg = e_high & (n_t2=0) & (n_t3=0) 
+8 : gg = e_high & (n_t2==0) & (n_t3==0) 
 9 : mu_pair = (n_klm>0) & (n_t2>1) 
 10 : revolution = revo 
 11 : random = pseude_rand 
@@ -97,8 +97,8 @@
     ecl_bha & n_t2[1] & cdc_bb | ecl_bha & n_t2[2] & cdc_bb
     18 * 56 * 12 + 18 * 57 * 12
 8 : gg
-    e_high & n_t2=0 & n_t3=0 
-    15 * n_t2=0 * n_t3=0 
+    e_high & !n_t2[0] & !n_t2[1] & !n_t2[2] & !n_t3[0] & !n_t3[1] & !n_t3[2] 
+    15 * !55 * !56 * !57 * !52 * !53 * !54 
 9 : mu_pair
     n_klm[0] & n_t2[1] | n_klm[0] & n_t2[2] | n_klm[1] & n_t2[1] | n_klm[1] & n_t2[2] | n_klm[2] & n_t2[1] | n_klm[2] & n_t2[2] 
     43 * 56 + 43 * 57 + 44 * 56 + 44 * 57 + 45 * 56 + 45 * 57 
@@ -145,9 +145,9 @@
     ecl_bha & n_t2[1] & cdc_bb | ecl_bha & n_t2[2] & cdc_bb
     18 * 56 * 12 + 18 * 57 * 12
 8 : gg
-    e_high & (n_t2=0) & (n_t3=0) 
-    e_high & n_t2=0 & n_t3=0 
-    15 * n_t2=0 * n_t3=0 
+    e_high & (n_t2==0) & (n_t3==0) 
+    e_high & !n_t2[0] & !n_t2[1] & !n_t2[2] & !n_t3[0] & !n_t3[1] & !n_t3[2] 
+    15 * !55 * !56 * !57 * !52 * !53 * !54 
 9 : mu_pair
     (n_klm>0) & (n_t2>1) 
     n_klm[0] & n_t2[1] | n_klm[0] & n_t2[2] | n_klm[1] & n_t2[1] | n_klm[1] & n_t2[2] | n_klm[2] & n_t2[1] | n_klm[2] & n_t2[2] 

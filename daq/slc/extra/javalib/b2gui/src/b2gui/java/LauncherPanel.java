@@ -75,10 +75,11 @@ public class LauncherPanel extends JPanel {
 							.replace("file:", "").replace("!", "")
 							.replace("/b2gui/java/Belle2GUILauncherJavaGUI.class", "");
 							try {
-								String[] option_v = { "java", "-classpath", 
+								String[] option_v = { "java", "-Xms1024m", "-Xmx1024m", "-classpath", 
 										URLDecoder.decode(path, "UTF-8"), 
 										_main_class, _host, ""+getPort()};
-								System.out.println("java -classpath " + URLDecoder.decode(path, "UTF-8") + " " + _main_class + " " + _host + " " + getPort());
+								System.out.println("java -Xms1024m -Xmx1024m-classpath " + 
+										URLDecoder.decode(path, "UTF-8") + " " + _main_class + " " + _host + " " + getPort());
 								LauncherFrame.get().addProcess(Runtime.getRuntime().exec(option_v));
 							} catch (Exception e) {
 								e.printStackTrace();

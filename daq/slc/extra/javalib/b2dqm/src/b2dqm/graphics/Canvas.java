@@ -48,6 +48,9 @@ public class Canvas extends GRect {
 		super(0, 0, 1, 1);
 		setName(name);
 		_title.setText(title);
+		if (title.length() > 20) setTitlePosition("left");
+		if (title.length() > 25) _title.setFontSize(1.0);
+		if (title.length() > 30) _title.setFontSize(0.9);
 		setFont(new FontProperty(HtmlColor.BLACK, "Arial", 1.1, FontProperty.WEIGHT_BOLD));
 		resetPadding();
 		setFillColor(HtmlColor.WHITE);
@@ -117,15 +120,16 @@ public class Canvas extends GRect {
 				}
 				_stat_histo  = h;
 				_stat_rect = new GRect(0.71, 0.02, 0.28, 0.12, HtmlColor.WHITE, HtmlColor.BLACK);
-				addShape(_stat_rect);
 				_stat_name = new GText(h.getName(), 0.85, 0.055, "center");
 				_stat_name.setFontSize(0.52);
-				addShape(_stat_name);
+				if (_stat_name.getText().length() > 20) _stat_name.setFontSize(0.47);
 				_stat_update = new GText("mean     : ", 0.72, 0.088, "left");
 				_stat_update.setFontSize(0.52);
-				addShape(_stat_update);
 				_stat_entries = new GText("entries : "+h.getEntries(), 0.72, 0.128, "left");
 				_stat_entries.setFontSize(0.52);
+				addShape(_stat_rect);
+				addShape(_stat_name);
+				addShape(_stat_update);
 				addShape(_stat_entries);
 			} catch (Exception e) {}
 		}

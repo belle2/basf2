@@ -23,6 +23,8 @@
 #include "trg/trg/Utilities.h"
 #include "trg/gdl/TRGGDL.h"
 
+void ftd_0_01(bool * b, bool * i);
+
 using namespace std;
 
 namespace Belle2 {
@@ -388,14 +390,20 @@ TRGGDL::decision(const TRGState & input) {
     TRGState s(13);
 
     //...Set up bool array...
-    bool * b = new bool[input.size()];
-    input.copy2bool(b);
+    bool * in = new bool[input.size()];
+    bool * ou = new bool[13];
+    input.copy2bool(in);
 
-    //...Simulate output bit 4...
-    s.set(4, b[15] & (! b[18]) & b[33] & (! b[51]));
+    // //...Simulate output bit 4...
+    // s.set(4, in[15] & (! in[18]) & in[33] & (! in[51]));
 
-    //...Simulate output bit 10...
-    s.set(10, b[46]);
+    // //...Simulate output bit 10...
+    // s.set(10, in[46]);
+
+    //...FTD logic...
+    ftd_0_01(ou, in);
+    for (unsigned i = 0; i < 13; i++)
+        s.set(i, ou[i]);
 
     if (TRGDebug::level()) {
         input.dump("detail", TRGDebug::tab() + "GDL in ");
@@ -403,7 +411,8 @@ TRGGDL::decision(const TRGState & input) {
     }
 
     //...Termination...
-    delete[] b;
+    delete[] in;
+    delete[] ou;
     return s;
 }
 

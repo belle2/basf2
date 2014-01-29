@@ -19,7 +19,10 @@ BufferedWriter::BufferedWriter(const BufferedWriter& writer) throw()
   ::memcpy(_memory, writer._memory, _size);
 }
 
-BufferedWriter::~BufferedWriter() throw() {}
+BufferedWriter::~BufferedWriter() throw()
+{
+  if (_memory != NULL) delete [] _memory;
+}
 
 const BufferedWriter& BufferedWriter::operator=(const BufferedWriter& writer) throw()
 {

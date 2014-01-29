@@ -19,7 +19,12 @@ BufferedReader::BufferedReader(const BufferedReader& reader) throw()
 BufferedReader::BufferedReader(size_t size) throw()
   : _memory(new unsigned char[size]), _size(size), _pos(0) {}
 
-BufferedReader::~BufferedReader() throw() {}
+BufferedReader::~BufferedReader() throw()
+{
+  if (_memory != NULL) {
+    delete [] _memory;
+  }
+}
 
 const BufferedReader& BufferedReader::operator=(const BufferedReader& reader) throw()
 {

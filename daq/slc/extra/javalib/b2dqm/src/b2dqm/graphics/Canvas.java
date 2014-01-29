@@ -289,11 +289,11 @@ public class Canvas extends GRect {
 			_title.setAligment("center top");
 		} else if (pos.matches("left")) {
 			_title_position = pos;
-			_title.setX(0.025);
+			_title.setX(0.04);
 			_title.setAligment("left top");
 		} else if (pos.matches("right")) {
 			_title_position = pos;
-			_title.setX(0.925);
+			_title.setX(0.96);
 			_title.setAligment("right top");
 		}
 	}
@@ -309,6 +309,7 @@ public class Canvas extends GRect {
 		if (title.length() > 30) setFontSize(0.9);
 		if (title.length() > 35) setFontSize(0.8);
 		if (title.length() > 40) setFontSize(0.7);
+		if (title.length() > 45) setFontSize(0.6);
 	}
 	
 	public void setAxisY2(GAxis axis) {

@@ -310,6 +310,7 @@ public class Canvas extends GRect {
 		if (title.length() > 35) setFontSize(0.8);
 		if (title.length() > 40) setFontSize(0.7);
 		if (title.length() > 45) setFontSize(0.6);
+		if (title.length() > 50) setFontSize(0.55);
 	}
 	
 	public void setAxisY2(GAxis axis) {

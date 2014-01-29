@@ -5,11 +5,14 @@ import java.util.ArrayList;
 
 import javax.swing.JComponent;
 
+//import b2daq.java.io.ConfigFile;
 import b2daq.java.ui.DnDTabbedPane;
 import b2daq.java.ui.UTabPanel;
 import b2daq.ui.Updatable;
 import b2dqm.core.Histo;
 import b2dqm.core.HistoPackage;
+//import b2dqm.graphics.GHisto;
+//import b2dqm.io.GHistoProperty;
 
 public class DQMMainPanel extends DnDTabbedPane implements Updatable {
 
@@ -32,15 +35,19 @@ public class DQMMainPanel extends DnDTabbedPane implements Updatable {
 		_pack_v = pack_v;
 		_side_panel = side_panel;
 		_side_panel.setMainPanel(this);
+		//ConfigFile config = new ConfigFile("/home/tkonno/test.conf");
 		for ( int n = 0; n < _pack_v.size(); n++ ) {
 			HistoPackage pack = _pack_v.get(n);
 			UTabPanel tab = new UTabPanel();
 			tab.setName(pack.getName());
 			ArrayList<Histo> histo_v = new ArrayList<Histo>();
+			//GHistoProperty pro = new GHistoProperty(config);
 			for ( int i = 0; i < pack.getNHistos(); i++ ) {
 				Histo h = (Histo)pack.getHisto(i);
 				CanvasPanel canvas = new CanvasPanel(h.getName(), h.getTitle());
+				//GHisto gh = (GHisto) 
 				canvas.getCanvas().addHisto(h);
+				//pro.put(gh, h.getName());
 				canvas.getCanvas().resetPadding();
 				UTabPanel subtab = new UTabPanel();
 				subtab.addTab("Total", canvas);
@@ -48,7 +55,9 @@ public class DQMMainPanel extends DnDTabbedPane implements Updatable {
 				Histo h1 = (Histo)h.clone();
 				h1.setName(h.getName()+":diff");
 				canvas = new CanvasPanel(h1.getName(), h1.getTitle());
+				//gh = (GHisto)
 				canvas.getCanvas().addHisto(h1);
+				//pro.put(gh, h.getName());
 				canvas.getCanvas().resetPadding();
 				subtab.addTab("Difference", canvas);
 				histo_v.add(h1);

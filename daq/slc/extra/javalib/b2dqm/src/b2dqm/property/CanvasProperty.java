@@ -8,7 +8,6 @@ import b2daq.graphics.HtmlColor;
 import b2dqm.core.HistoPackage;
 import b2dqm.graphics.Canvas;
 
-
 public class CanvasProperty extends GRectProperty {
 
 	public final static String ELEMENT_LABEL = "canvas";
@@ -29,7 +28,7 @@ public class CanvasProperty extends GRectProperty {
 	@Override
 	public void put(String key, String value) {
 		if ( _canvas == null ) return;
-		if ( key.matches("fill-color") ) {
+		if ( key.matches("fill.color") ) {
 			FillProperty fill = _canvas.getFill();
 			if (value.matches("none")) fill.setColor(HtmlColor.NULL);
 			else fill.setColor(new HtmlColor(value));
@@ -42,11 +41,11 @@ public class CanvasProperty extends GRectProperty {
 		if ( key.matches("title") ) {
 			_canvas.setTitle(value);
 		}
-		if ( key.matches("title-offset") ) {
+		if ( key.matches("title.offset") ) {
 			double offset = Double.parseDouble(value);
 			_canvas.setTitleOffset(offset);
 		}
-		if ( key.matches("title-position") ) {
+		if ( key.matches("title.position") ) {
 			_canvas.setTitlePosition(value);
 		}
 	}

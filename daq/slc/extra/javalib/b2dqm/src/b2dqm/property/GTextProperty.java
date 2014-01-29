@@ -36,10 +36,10 @@ public class GTextProperty extends GShapeProperty {
 			_text.setText(value);
 		} else if ( key.matches("align") ) {
 			_text.setAligment(value);
-		} else if ( key.matches("font-weight") ) {
+		} else if ( key.matches("font.weight") ) {
 			if ( value.matches("bold") ) _text.setFontWeight(FontProperty.WEIGHT_BOLD);
 			if ( value.matches("normal") ) _text.setFontWeight(FontProperty.WEIGHT_NORMAL);
-		} else if ( key.matches("font-color") ) {
+		} else if ( key.matches("font.color") ) {
 			_text.setFontColor(new HtmlColor(value));
 		}
 	}

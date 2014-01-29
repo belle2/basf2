@@ -21,22 +21,22 @@ public abstract class GShapeProperty extends GProperty {
 			if ( value.length() > 0 ) {
 				_shape.setName(value);
 			}
-		} else if ( key.matches("line-color") ) {
+		} else if ( key.matches("line.color") ) {
 			if (value.matches("none")) _shape.setLineColor(HtmlColor.NULL);
 			else _shape.setLineColor(new HtmlColor(value));
-		} else if ( key.matches("line-width") ) {
+		} else if ( key.matches("line.width") ) {
 			_shape.setLineWidth(Integer.parseInt(value));
-		} else if ( key.matches("fill-color") ) {
+		} else if ( key.matches("fill.color") ) {
 			if (value.matches("none")) _shape.setFillColor(HtmlColor.NULL);
 			else _shape.setFillColor(new HtmlColor(value));
-		} else if ( key.matches("font-color") ) {
+		} else if ( key.matches("font.color") ) {
 			if (value.matches("none")) _shape.setFontColor(HtmlColor.NULL);
 			else _shape.setFontColor(new HtmlColor(value));
-		} else if ( key.matches("font-size") ) {
+		} else if ( key.matches("font.size") ) {
 			_shape.setFontSize(Double.parseDouble(value));
-		} else if ( key.matches("font-family") ) {
+		} else if ( key.matches("font.family") ) {
 			_shape.setFontFamily(value);
-		} else if ( key.matches("font-weight") ) {
+		} else if ( key.matches("font.weight") ) {
 			if ( value.matches("normal") ) {
 				_shape.setFontWeight(FontProperty.WEIGHT_NORMAL);
 			} else if ( value.matches("bold") ) {

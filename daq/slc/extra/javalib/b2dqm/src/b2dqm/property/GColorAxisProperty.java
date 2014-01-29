@@ -26,7 +26,7 @@ public class GColorAxisProperty extends GAxisProperty {
 	public void put(String key, String value) {
 		if (_axis == null) return;
 		super.put(key, value);
-		if ( key.matches("color-pattern") ) {
+		if ( key.matches("pattern") ) {
 			String [] scolor_v = value.replaceAll(" ", "").split(",");
 			if ( scolor_v.length > 0 ) {
 				HtmlColor [] color_v = new HtmlColor [scolor_v.length];

@@ -49,28 +49,28 @@ public class GMonShapeProperty extends GProperty {
 				GMonLabel label = (GMonLabel)_shape;
 				label.getText().setAligment(value);
 			} catch(Exception e) {}
-		} else if ( key.matches("line-color") ) {
+		} else if ( key.matches("line.color") ) {
 			_shape.setLineColor(new HtmlColor(value));
-		} else if ( key.matches("line-width") ) {
+		} else if ( key.matches("line.width") ) {
 			_shape.setLineWidth((int)Double.parseDouble(value));
-		} else if ( key.matches("fill-color") ) {
+		} else if ( key.matches("fill.color") ) {
 			_shape.setFillColor(new HtmlColor(value));
-		} else if ( key.matches("font-size") ) {
+		} else if ( key.matches("font.size") ) {
 			try {
 				GMonLabel label = (GMonLabel)_shape;
 				label.getText().setFontSize(Double.parseDouble(value));
 			} catch(Exception e) {}
-		} else if ( key.matches("font-weight") ) {
+		} else if ( key.matches("font.weight") ) {
 			GMonLabel label = (GMonLabel)_shape;
 			if ( value.matches("normal") ) {
 				label.getText().setFontWeight(FontProperty.WEIGHT_NORMAL);
 			} else if ( value.matches("bold") ) {
 				label.getText().setFontWeight(FontProperty.WEIGHT_BOLD);
 			}
-		} else if ( key.matches("font-color") ) {
+		} else if ( key.matches("font.color") ) {
 			if (value.matches("none")) _shape.setFontColor(HtmlColor.NULL);
 			else _shape.setFontColor(new HtmlColor(value));
-		} else if ( key.matches("text-align") ) {
+		} else if ( key.matches("text.align") ) {
 			GMonLabel label = (GMonLabel)_shape;
 			label.setTextAlign(value);
 		}

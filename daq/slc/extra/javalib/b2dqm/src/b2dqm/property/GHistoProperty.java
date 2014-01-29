@@ -55,26 +55,26 @@ public class GHistoProperty extends GProperty {
 			h.fixMaximum(Double.parseDouble(value), true);
 		} else if ( key.matches("minimum") ) {
 			h.fixMinimum(Double.parseDouble(value), true);
-		} else if ( key.matches("line-color") ) {
+		} else if ( key.matches("line.color") ) {
 			_histo.setLineColor(new HtmlColor(value));
-		} else if ( key.matches("line-width") ) {
+		} else if ( key.matches("line.width") ) {
 			_histo.setLineWidth((int)Double.parseDouble(value));
-		} else if ( key.matches("fill-color") ) {
+		} else if ( key.matches("fill.color") ) {
 			_histo.setFillColor(new HtmlColor(value));
-		} else if ( key.matches("font-color") ) {
+		} else if ( key.matches("font.color") ) {
 			_histo.setFontColor(new HtmlColor(value));
-		} else if ( key.matches("font-size") ) {
+		} else if ( key.matches("font.size") ) {
 			_histo.setFontSize(Double.parseDouble(value));
-		} else if ( key.matches("font-family") ) {
+		} else if ( key.matches("font.family") ) {
 			_histo.setFontFamily(value);
-		} else if ( key.matches("draw-option") ) {
+		} else if ( key.matches("draw.option") ) {
 			_histo.setDrawOption(value);
-		} else if ( key.matches("linked-axis") ) {
+		} else if ( key.matches("linked.axis") ) {
 			_linked_axis_name = value;
 		} 
 	}
 	
-	public GHisto set (Canvas canvas, HistoPackage pack) {
+	public GHisto set(Canvas canvas, HistoPackage pack) {
 		if ( _histo != null ) {
 			if ( _linked_axis_name.length() > 0 ) {
 				GAxis axis = canvas.getAxisX();

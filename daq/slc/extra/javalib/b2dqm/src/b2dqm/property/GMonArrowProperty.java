@@ -32,17 +32,17 @@ public class GMonArrowProperty extends GProperty {
 	public void put(String key, String value) {
 		if ( _shape == null ) return;
 		try {
-			if ( key.matches("position-x") ) {
+			if ( key.matches("position.x") ) {
 				_shape.getArrow().setPositionX(Double.parseDouble(value));
-			} else if ( key.matches("position-y") ) {
+			} else if ( key.matches("position.y") ) {
 				_shape.getArrow().setPositionY(Double.parseDouble(value));
 			} else if ( key.matches("length") ) {
 				_shape.getArrow().setLength(Double.parseDouble(value));
 			} else if ( key.matches("width") ) {
 				_shape.getArrow().setWidth(Double.parseDouble(value));
-			} else if ( key.matches("head-width") ) {
+			} else if ( key.matches("head.width") ) {
 				_shape.getArrow().setHeadWidth(Double.parseDouble(value));
-			} else if ( key.matches("head-length") ) {
+			} else if ( key.matches("head.length") ) {
 				_shape.getArrow().setHeadLength(Double.parseDouble(value));
 			} else if ( key.matches("direction") ) {
 				if ( value.matches("up") || value.matches(""+GArrow.DIRECT_UP))
@@ -53,11 +53,11 @@ public class GMonArrowProperty extends GProperty {
 					_shape.getArrow().setDirection(GArrow.DIRECT_RIGHT);
 				else if ( value.matches("right") || value.matches(""+GArrow.DIRECT_RIGHT))
 					_shape.getArrow().setDirection(GArrow.DIRECT_LEFT);
-			} else if ( key.matches("line-color") ) {
+			} else if ( key.matches("line.color") ) {
 				_shape.getArrow().setLineColor(new HtmlColor(value));
-			} else if ( key.matches("line-width") ) {
+			} else if ( key.matches("line.width") ) {
 				_shape.getArrow().setLineWidth((int)Double.parseDouble(value));
-			} else if ( key.matches("fill-color") ) {
+			} else if ( key.matches("fill.color") ) {
 				_shape.getArrow().setFillColor(new HtmlColor(value));
 			}
 		} catch (Exception e) {}

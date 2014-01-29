@@ -47,8 +47,8 @@ public class Canvas extends GRect {
 	public Canvas(String name, String title, int width, int height) {
 		super(0, 0, 1, 1);
 		setName(name);
-		setTitle(title);
 		setFont(new FontProperty(HtmlColor.BLACK, "Arial", 1.1, FontProperty.WEIGHT_BOLD));
+		setTitle(title);
 		resetPadding();
 		setFillColor(HtmlColor.WHITE);
 	}

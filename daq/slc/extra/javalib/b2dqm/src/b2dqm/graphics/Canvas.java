@@ -47,10 +47,7 @@ public class Canvas extends GRect {
 	public Canvas(String name, String title, int width, int height) {
 		super(0, 0, 1, 1);
 		setName(name);
-		_title.setText(title);
-		if (title.length() > 20) setTitlePosition("left");
-		if (title.length() > 25) _title.setFontSize(1.0);
-		if (title.length() > 30) _title.setFontSize(0.9);
+		setTitle(title);
 		setFont(new FontProperty(HtmlColor.BLACK, "Arial", 1.1, FontProperty.WEIGHT_BOLD));
 		resetPadding();
 		setFillColor(HtmlColor.WHITE);
@@ -292,7 +289,7 @@ public class Canvas extends GRect {
 			_title.setAligment("center top");
 		} else if (pos.matches("left")) {
 			_title_position = pos;
-			_title.setX(0.075);
+			_title.setX(0.025);
 			_title.setAligment("left top");
 		} else if (pos.matches("right")) {
 			_title_position = pos;
@@ -307,6 +304,11 @@ public class Canvas extends GRect {
 
 	public void setTitle(String title) {
 		_title.setText(title);
+		if (title.length() > 20) setTitlePosition("left");
+		if (title.length() > 25) _title.setFontSize(1.0);
+		if (title.length() > 30) _title.setFontSize(0.9);
+		if (title.length() > 35) _title.setFontSize(0.8);
+		if (title.length() > 40) _title.setFontSize(0.7);
 	}
 	
 	public void setAxisY2(GAxis axis) {

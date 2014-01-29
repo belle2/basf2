@@ -756,7 +756,7 @@ void PXDUnpackerModule::initialize()
 void PXDUnpackerModule::terminate()
 {
   int flag = 0;
-  string errstr = "Statistic ( ";
+  string errstr = "Statistic ( ;";
   errstr += to_string(unpacked_events) + ";";
   for (int i = 0; i < ONSEN_MAX_TYPE_ERR; i++) { errstr += to_string(error_counter[i]) + ";"; flag |= error_counter[i];}
   if (flag != 0) {
@@ -1042,11 +1042,11 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& la
   ///  static int nr_active_dhp = 0;// unused
   static int mask_active_dhp = 0;
   static int found_mask_active_dhp = 0;
-
   static unsigned int dhh_first_readout_frame_id_lo = 0;
   static unsigned int dhh_first_offset = 0;
   static unsigned int current_dhh_id = 0xFFFFFFFF;
   static unsigned int currentVxdId = 0;
+  static bool is_fake_event = false;
 
 
   dhhc_frame_header_word0* hw = (dhhc_frame_header_word0*)data;
@@ -1071,7 +1071,8 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& la
 
   if ((evtnr & ftsw_evt_mask) != (ftsw_evt_nr & ftsw_evt_mask)) {
     if ((type == DHHC_FRAME_HEADER_DATA_TYPE_DHHC_START && ((dhhc_start_frame*)data)->is_fake()) ||
-        (type == DHHC_FRAME_HEADER_DATA_TYPE_DHHC_END && ((dhhc_end_frame*)data)->is_fake())) {
+        (type == DHHC_FRAME_HEADER_DATA_TYPE_DHHC_END && ((dhhc_end_frame*)data)->is_fake()) || is_fake_event) {
+      // the order in this if is important
       // We have afake and shoudl set the trigger nr by hand to prevent further errors
       evtnr = ftsw_evt_nr & ftsw_evt_mask; // masking might be a problem as we cannore recover all bits
     } else {
@@ -1148,8 +1149,8 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& la
       break;
     };
     case DHHC_FRAME_HEADER_DATA_TYPE_DHHC_START: {
-      bool fake = ((dhhc_start_frame*)data)->is_fake();
-      if (fake) {
+      is_fake_event = ((dhhc_start_frame*)data)->is_fake();
+      if (is_fake_event) {
         B2WARNING("Faked DHHC START Data -> trigger without Data!");
         error_mask |= ONSEN_ERR_FLAG_FAKE_NO_DATA_TRIG;
       } else {
@@ -1218,11 +1219,13 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& la
 
       break;
     case DHHC_FRAME_HEADER_DATA_TYPE_DHHC_END: {
-      bool fake = ((dhhc_end_frame*)data)->is_fake();
+      if (((dhhc_end_frame*)data)->is_fake() != is_fake_event) {
+        B2ERROR("DHHC END is but no Fake event OR Fake Event but DHH END is not.");
+      }
       nr_of_frames_counted++;
       current_dhh_id = 0xFFFFFFFF;
       currentVxdId = 0; /// invalid
-      if (fake) {
+      if (is_fake_event) {
         B2WARNING("Faked DHHC END Data -> trigger without Data!");
         error_mask |= ONSEN_ERR_FLAG_FAKE_NO_DATA_TRIG;
       } else {
@@ -1230,13 +1233,13 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& la
       }
       stat_end++;
 
-      if (!fake) {
+      if (!is_fake_event) {
         if (nr_of_frames_counted != nr_of_frames_dhhc) {
           if (!m_ignore_headernrframes) B2ERROR("Number of DHHC Frames in Header " << nr_of_frames_dhhc << " != " << nr_of_frames_counted << " Counted");
           error_mask |= ONSEN_ERR_FLAG_DHHC_FRAMECOUNT;
         }
       }
-      if (!fake) {
+      if (!is_fake_event) {
         int w;
         w = ((dhhc_end_frame*)data)->get_words() * 2;
         last_wie += 2;

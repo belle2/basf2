@@ -756,9 +756,12 @@ void PXDUnpackerModule::initialize()
 void PXDUnpackerModule::terminate()
 {
   int flag = 0;
-  for (int i = 0; i < ONSEN_MAX_TYPE_ERR; i++) flag |= error_counter[i];
+  string errstr = "Statistic ( ";
+  errstr += to_string(unpacked_events) + ";";
+  for (int i = 0; i < ONSEN_MAX_TYPE_ERR; i++) { errstr += to_string(error_counter[i]) + ";"; flag |= error_counter[i];}
   if (flag != 0) {
     B2ERROR("PXD Unpacker --> Error Statistics (counted once per event!) in Events: " << unpacked_events);
+    B2ERROR(errstr + " )");
     for (int i = 0; i < ONSEN_MAX_TYPE_ERR; i++) {
       if (error_counter[i]) {
         B2ERROR(error_name[i] << ": " << error_counter[i]);

@@ -276,10 +276,12 @@ main(int argc, char * argv[]) {
  	cout << "    !!! can not open file : " << cFile << endl;
  	exit(-3);
     }
+    cFile << "namespace Belle2 {" << endl;
     cFile << "void " << funcname << "(bool * b, bool * i) {" << endl;
     for (unsigned i = 0; i < expandedcc.size(); i++) {
 	cFile << expandedcc[i] << endl;
     }
+    cFile << "}" << endl;
     cFile << "}" << endl;
     cFile.close();
 

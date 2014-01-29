@@ -130,6 +130,9 @@ class TRGGDL {
     /// Makes bit pattern(state) using input bit pattern(state).
     static TRGState decision(const TRGState & input);
 
+    /// Function to simulate final trigger decision.
+    static void (* _ftd)(bool * out, bool * in);
+
   private:
 
     /// updates TRGGDL information for MC.

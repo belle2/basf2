@@ -23,11 +23,17 @@
 #include "trg/trg/Utilities.h"
 #include "trg/gdl/TRGGDL.h"
 
-void ftd_0_01(bool * b, bool * i);
-
 using namespace std;
 
 namespace Belle2 {
+
+void ftd_0_01(bool * b, bool * i);
+
+TRGGDL *
+TRGGDL::_gdl = 0;
+
+void
+(* TRGGDL::_ftd)(bool * b, bool * i) = 0;
 
 string
 TRGGDL::name(void) const {
@@ -38,9 +44,6 @@ string
 TRGGDL::version(void) const {
     return string("TRGGDL 0.00");
 }
-
-TRGGDL *
-TRGGDL::_gdl = 0;
 
 TRGGDL*
 TRGGDL::getTRGGDL(const string & configFile,
@@ -229,7 +232,6 @@ TRGGDL::firmwareSimulation(void) {
                                * _isb,
                                TRGGDL::decision);
 
-
     if (TRGDebug::level()) {
         if (input.active()) {
             _isb->dump("detail", TRGDebug::tab());
@@ -273,8 +275,19 @@ TRGGDL::configure(void) {
     getAlgorithm(algfile);
     algfile.close();
 
+    //...FTD function...
+    string ftd = _configFilename;
+    string::size_type s = ftd.find_last_of("/");
+    if (s != string::npos)
+	ftd = ftd.substr(s + 1);
+    if (ftd == "ftd_0.01") {
+        _ftd = ftd_0_01;
+    }
+    
     //...Summary...
     if (TRGDebug::level()) {
+        cout << "TRGGDL Config file = " << _configFilename << endl;
+        cout << "    ftd=" << ftd << endl;
         cout << "TRGGDL Input Bits" << endl;
         for (unsigned i = 0; i < _input.size(); i++)
             cout << TRGDebug::tab(4) << i << " : " << _input[i] << endl;
@@ -401,7 +414,7 @@ TRGGDL::decision(const TRGState & input) {
     // s.set(10, in[46]);
 
     //...FTD logic...
-    ftd_0_01(ou, in);
+    _ftd(ou, in);
     for (unsigned i = 0; i < 13; i++)
         s.set(i, ou[i]);
 

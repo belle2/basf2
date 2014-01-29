@@ -32,14 +32,14 @@ class Particle:
         decay channels use addChannel method.
         name is the correct pdg name as a string of the particle
         variables is a list of variables which are used to classify the
-            particle 
+            particle
         methods is a list of tuples (name, type, config) of the
             methods used to classify the particle.
         """
 
-        # # The name of the particle as correct pdg name e.g. K+, pi-, D*0
+        ## The name of the particle as correct pdg name e.g. K+, pi-, D*0
         self.name = name
-        # # PDG code of the particle
+        ## PDG code of the particle
         self.pdg = pdg.from_name(name)
         # Set variables and method to empty list, if None were given.
         # We can't use [] directly as default parameter, because this would
@@ -49,25 +49,25 @@ class Particle:
             variables = []
         if methods is None:
             methods = []
-        # # A list of variables which are used to classify the particle
+        ## A list of variables which are used to classify the particle
         self.variables = variables
-        # # A list of tuples (name, type, config) of the  methods used to
-        # # classify the particle.
+        ## A list of tuples (name, type, config) of the  methods used to
+        ## classify the particle.
         self.methods = methods
         # At this point there are no known decay channels.
-        # If a particle has no decay channels by the time you reconstruct it, it
-        # is considered as a final state particle.
-        # # Decay channels, added by addChannel method, each channel is a list of
-        # # pdg particle names
+        # If a particle has no decay channels by the time you reconstruct it,
+        # it is considered as a final state particle.
+        ## Decay channels, added by addChannel method, each channel is a list
+        ## pdg particle names
         self.channels = []
-        # # The hashseed is set by the FullReconstruction class to implement the
-        # # dependency of the particle to the previous stages.
+        ## The hashseed is set by the FullReconstruction class to implement
+        ## the dependency of the particle to the previous stages.
         self.hashseed = ''
 
     def addChannel(self, channel):
         """
-        Appends a new decay channel to the Particle object. A decay channel is a
-        list of pdg particle names
+        Appends a new decay channel to the Particle object. A decay channel is
+        a list of pdg particle names
         """
 
         self.channels.append(channel)
@@ -119,7 +119,8 @@ class Particle:
                             + str(self.methods)).hexdigest()
 
     def getWeightFilename(self, channel, method):
-        return 'weights/{channel}_{hash}_{name}.weights.xml'.format(channel=self.to_string(channel),
+        return 'weights/{channel}_{hash}_{name}.weights.xml'.format(
+                channel=self.to_string(channel),
                 name=method[0], hash=self.getWeightHash())
 
     def getCuts(self):
@@ -135,23 +136,23 @@ class Particle:
         # If this is not a final state particle and cut determination histogram
         # is available we calculate the correct cuts
         if not self.channels == [] and os.path.isfile(self.getHistFilename()):
-            cuts['M'] = cut_determination.getCutOnMass(0.01,
+            cuts['M'] = cut_determination.getCutOnMass(0.0001,
                     self.getHistFilename(), [self.to_string(c) for c in
                     self.channels])
         return cuts
 
     def reconstruct(self, path):
         """
-        Reconstruct the particle in all given decay channels. A particle without
-        decay channels is considered as a final state particle.
+        Reconstruct the particle in all given decay channels. A particle
+        without decay channels is considered as a final state particle.
         If the histograms, from which the intermediate cuts are determined,
         don't exists we create them first.
         The function returns:
             False - if not all data is available at the moment to reconstruct
-                the particle -> the needed modules to generate this information
-                are loaded into the path.
-            True - if the particle can be reconstructed -> the needed modules to
-                reconstruct the particle are loaded into the path
+                the particle -> the needed modules to generate this
+                information are loaded into the path.
+            True - if the particle can be reconstructed -> the needed modules
+                to reconstruct the particle are loaded into the path
         """
 
         mass = pdg.get(self.pdg).Mass()
@@ -235,20 +236,21 @@ class Particle:
 
     def classify(self, path):
         """
-        Classify the particle candidates with the given methods and variables in
-        all given decay channels.
-        If the experts for the different methods (so weight files for NeuroBayes
-        or BDTs) aren't available yet, we need to create them first.
+        Classify the particle candidates with the given methods and variables
+        in all given decay channels.
+        If the experts for the different methods (so weight files for
+        NeuroBayes or BDTs) aren't available yet, we need to create them
+        first.
         The function returns:
             False - if not all data is available at the moment to classify
-                the particle -> the needed modules to generate this information
-                are loaded into the path.
+                the particle -> the needed modules to generate this
+                information are loaded into the path.
             True - if the particle can be calssified -> the needed modules to
                 classify the particle are loaded into the path
         """
 
-        # This variable will be set to True, if we encounter a classifier which
-        # need to be retrained. If so we can't go on with the next stage.
+        # This variable will be set to True, if we encounter a classifier
+        # which need to be retrained. If so we can't go on with the next stage.
         training_required = False
 
         # We also have a classifier for final state particles, which don't have
@@ -266,11 +268,11 @@ class Particle:
             if any([not os.path.isfile(self.getWeightFilename(channel,
                    method)) for method in self.methods]):
 
-                # If one or more files are missing we retrain all methods (this
-                # has the advantage that we can easily compare the methods in
-                # the test phase of the full reconstruction, later in production
-                # phase we will have only one method anyway, so this won't make
-                # a difference)
+                # If one or more files are missing we retrain all methods
+                # (this has the advantage that we can easily compare the
+                # methods in the test phase of the full reconstruction,
+                # later in production phase we will have only one method
+                # anyway, so this won't make a difference)
                 teacher = register_module('TMVATeacher')
                 teacher.set_name('TMVATeacher_' + self.to_string(channel))
                 teacher.param('identifier', self.to_string(channel) + '_'
@@ -300,8 +302,8 @@ class Particle:
                 expert.param('identifier', self.to_string(channel) + '_'
                              + self.getWeightHash())
                 expert.param('method', method[0])
-                # TODO All methods use the same target variable at the moment we
-                # want to use different targets for different methods later
+                # TODO All methods use the same target variable at the moment
+                # we want to use different targets for different methods later
                 expert.param('target', 'SignalProbability')
                 expert.param('listNames', [self.to_string(channel)])
                 path.add_module(expert)
@@ -325,7 +327,7 @@ class FullReconstruction:
         particles to the FullReoncstruction setup
         """
 
-        # # A list of particle objects, added with addParticle
+        ## A list of particle objects, added with addParticle
         self.particles = []
 
         parser = argparse.ArgumentParser()
@@ -353,34 +355,35 @@ class FullReconstruction:
 
     def run(self, path):
         """
-        All the added Particle objects are arranged in stages according to their
-        dependencies. Every stage is then reconstructed. The reconstruction
-        stops if a stage is missing some information (cut histograms or
-        classifiers) to be successfully reconstructed. The needed modules
-        to create this information are added to the path. So you need to
-        run the FullReconstruction several times, to train all stages.
+        All the added Particle objects are arranged in stages according to
+        their dependencies. Every stage is then reconstructed. The
+        reconstruction stops if a stage is missing some information
+        (cut histograms or classifiers) to be successfully reconstructed.
+        The needed modules to create this information are added to the path.
+        So you need to run the FullReconstruction several times, to train
+        all stages.
         """
 
         # Create a map from abs(pdg code) to the Particle object
         # abs is necessary because charge conjugated particles are handlet
         # automatically inside basf2.
-        # We use the old dict comprehension syntax because fixstyle crashs with
-        # the new one :-(
+        # We use the old dict comprehension syntax because fixstyle crashs
+        # with the new one :-(
         pdg_to_particle = dict((abs(p.pdg), p) for p in self.particles)
 
         # Arrange given particles into stages according to their dependencies
         # First create a map from abs(pdg code) -> list(daughter particle pdg
         # codes) for all the particles
-        # We use the old dict comprehension syntax because fixstyle crashs with
-        # the new one :-(
+        # We use the old dict comprehension syntax because fixstyle crashs
+        # with the new one :-(
         dependencies = dict((abs(p.pdg), p.dependencies()) for p in
                             self.particles)
         stages = []
-        # Loop over the dependencies as long as their are still particles which
-        # aren#t added into a stage.
+        # Loop over the dependencies as long as their are still particles
+        # which aren't added into a stage.
         while len(dependencies) > 0:
-            # Add  pdg codes to the next stage which don't have any dependencies
-            # left
+            # Add  pdg codes to the next stage which don't have any
+            # dependencies left
             stages.append([pdg for (pdg, d) in dependencies.iteritems()
                           if len(d) == 0])
             # Keep only dependencies to pdg codes which weren't added to the
@@ -401,15 +404,15 @@ class FullReconstruction:
             print i, stage
 
         # Create hashseed for all the particles.
-        # A particle should depend on all the particles in the lower stages. So
-        # if one added for example a new variable to the training of a kaon, all
-        # particles in the higher stages, which depend on the reconstruction of
-        # the kaon are retrained too.
+        # A particle should depend on all the particles in the lower stages.
+        # So if one added for example a new variable to the training of a
+        # kaon, all particles in the higher stages, which depend on the
+        # reconstruction of the kaon are retrained too.
         # For final state particles the hashseed is empty.
         hashseed = ''
         for (i, stage) in enumerate(stages):
-            # Set current hashseed, which depends on the previous stages to all
-            # the particles in the current stage
+            # Set current hashseed, which depends on the previous stages to
+            # all the particles in the current stage
             for pdg in stage:
                 pdg_to_particle[pdg].hashseed = hashseed
             # Update hashseed, append information about the used methods,
@@ -450,11 +453,11 @@ class FullReconstruction:
                     print p.getCuts()
                 continue
 
-            # First we reconstruct all the particles in the current stage, so we
-            # create a list of particle candidates from the given decay
+            # First we reconstruct all the particles in the current stage, so
+            # we create a list of particle candidates from the given decay
             # channels. If not all particles can be reconstructed, then we
-            # missing information about the intermediate cuts we want to apply.
-            # So some histograms have to be generated first.
+            # missing information about the intermediate cuts we want to
+            # apply. So some histograms have to be generated first.
             if not all([pdg_to_particle[pdg].reconstruct(path) for pdg in
                        stage]):
                 B2WARNING('Missing cuts for a particle at stage'
@@ -471,5 +474,3 @@ class FullReconstruction:
                 B2WARNING('Missing experts for a particle at stage'
                           + ' {i} generating experts.'.format(i=i))
                 break
-
-

@@ -9,16 +9,20 @@ import ROOT
 class ChannelCut:
 
     def __init__(self, file, channel):
-        self.channel = channel
+        ## Distribution of invariant mass for signal events
         self.signal = file.Get(channel + '_M_signal_histogram')
+        ## Distribution of invariant mass for background events
         self.bckgrd = file.Get(channel + '_M_background_histogram')
-
+        ## Signal to Background Ration for invariant mass
         self.ratio = self.signal.Clone(channel + '_M_ratio_histogram')
         self.ratio.Divide(self.bckgrd)
         self.ratio.Write('', ROOT.TObject.kOverwrite)
+        ## Spline fit of Signal to Backgruond Ratio
         self.spline = ROOT.TSpline3(self.ratio)
-
+        ## Position of maximum of Signal to Background Ratio
+        ## This should coincidence with the nominal mass of the particle
         self.maxpos = self.signal.GetBinCenter(self.signal.GetMaximumBin())
+        ## ROOT TF1 function wrapping the spline fit
         self.func = ROOT.TF1(str(id(channel)) + '_M_func', lambda x: \
                              self.spline.Eval(x[0]), 0, 100, 0)
 
@@ -45,6 +49,7 @@ class GlobalCut:
         channels is a list of channel names
         """
 
+        # # List of ChannelCut objects for each channel
         self.channel_cuts = [ChannelCut(file, channel) for channel in channels]
 
     def getCuts(self, d):
@@ -54,10 +59,7 @@ class GlobalCut:
         return sum([c.getNEvent() for c in self.channel_cuts])
 
     def __call__(self, d):
-        return d[0]
-
-
-        # return sum([c.getNEventCut(d[0]) for c in self.channel_cuts])
+        return sum([c.getNEventCut(d[0]) for c in self.channel_cuts])
 
 
 def getCutOnMass(percentage, filename, channels):
@@ -67,5 +69,3 @@ def getCutOnMass(percentage, filename, channels):
     nevent = percentage * global_cuts.getNEvent()
     d = func.GetX(nevent, 0.0, 1.0)
     return global_cuts.getCuts(d)
-
-

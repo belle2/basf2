@@ -13,6 +13,9 @@ namespace Belle2 {
 
   public:
     struct Header {
+      unsigned int expno;
+      unsigned int runno;
+      unsigned int subno;
       unsigned int count_in;
       unsigned int count_out;
       unsigned long long nword_in;

@@ -5,6 +5,8 @@
 
 #include "daq/slc/nsm/RCCallback.h"
 
+#include <vector>
+
 namespace Belle2 {
 
   class StoragerCallback : public RCCallback {
@@ -14,6 +16,7 @@ namespace Belle2 {
     virtual ~StoragerCallback() throw();
 
   public:
+    size_t getNControllers() const { return _con.size(); }
     ProcessController& getController(int n) { return _con[n]; }
 
   public:
@@ -29,7 +32,7 @@ namespace Belle2 {
     virtual bool abort() throw();
 
   private:
-    ProcessController _con[3];
+    std::vector<ProcessController> _con;
 
   };
 

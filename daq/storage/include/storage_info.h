@@ -8,13 +8,9 @@ struct storage_info {
   unsigned int expno;
   unsigned int runno;
   unsigned int subno;
-  unsigned int evtno;
   unsigned long long stime;
-  unsigned long long ctime;
-  unsigned int count_in;
-  unsigned int count_out;
-  unsigned long long nword_in;
-  unsigned long long nword_out;
+  unsigned int count;
+  unsigned long long nbyte;
 };
 
 #endif

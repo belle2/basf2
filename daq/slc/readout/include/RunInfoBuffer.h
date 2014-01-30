@@ -38,6 +38,7 @@ namespace Belle2 {
     void clear();
 
   public:
+    const std::string getName() const throw() { return _nodename; }
     const std::string getPath() const throw() { return _path; }
     bool isAvailable() const throw() { return _buf != NULL; }
     unsigned int* getParams() throw() { return _buf; }
@@ -59,6 +60,7 @@ namespace Belle2 {
     bool reportNotReady();
 
   private:
+    std::string _nodename;
     std::string _path;
     int _nreserved;
     SharedMemory _memory;

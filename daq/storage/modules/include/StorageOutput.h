@@ -21,6 +21,8 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 
+#include <daq/storage/SharedEventBuffer.h>
+
 #include <daq/slc/system/Time.h>
 
 #include <string>
@@ -61,29 +63,10 @@ namespace Belle2 {
     virtual void endRun();
     virtual void terminate();
 
-    //! open data file by looking at exp/run number
-    SeqFile* openDataFile();
-    //! Function to close file from outside
-    //    void closeDataFile();
-
-
     // Data members
   private:
-    //! Exp number, Run number
-    int m_expno;
-    int m_runno;
-
     //! Compression level
     int m_compressionLevel;
-
-    //! Storage directory
-    std::string m_stordir;
-
-    //! Blocked file handler
-    SeqFile* m_file;
-
-    //! Total nr. of events in the file
-    int m_nevts;
 
     //! Messaage handler
     MsgHandler* m_msghandler;
@@ -91,19 +74,17 @@ namespace Belle2 {
     //! DataStoreStreamer
     DataStoreStreamer* m_streamer;
 
-    //! Data flow
-    double m_size; /**< total transferred data, in kB. */
-    double m_size2; /**< sum of squares of data transferred in each event, in kB^2. */
-
     //! Ring Buffer to dump sampled output stream
     std::string m_obufname;
-    RingBuffer* m_obuf;
+    SharedEventBuffer m_obuf;
 
-    //! Event interval to dump output in RingBuffer
-    int m_interval;
-    Time m_t0;
-    double m_datasize;
-    Time m_tend;
+    //! Exp number, Run number
+    unsigned int m_count;
+    unsigned int m_count_0;
+    unsigned int m_expno;
+    unsigned int m_runno;
+    unsigned long long m_nbyte;
+    double m_ctime;
 
   };
 } // end namespace Belle2

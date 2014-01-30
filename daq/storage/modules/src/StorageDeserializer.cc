@@ -43,8 +43,8 @@ StorageDeserializerModule::StorageDeserializerModule() : Module()
 
   addParam("CompressionLevel", m_compressionLevel, "Compression level", 0);
   addParam("InputBufferName", m_ibuf_name, "Input buffer name", std::string(""));
-  addParam("NodeID", m_nodeid, "Node(subsystem) ID", 0);
   addParam("NodeName", m_nodename, "Node(subsystem) name", std::string(""));
+  addParam("NodeID", m_nodeid, "Node(subsystem) ID", 0);
   addParam("UseShmFlag", m_shmflag, "Use shared memory to communicate with Runcontroller", 0);
 
   m_count = 0;
@@ -60,12 +60,12 @@ StorageDeserializerModule::~StorageDeserializerModule()
 void StorageDeserializerModule::initialize()
 {
   B2INFO("StorageDeserializer: initialize() started.");
-  m_ibuf.open(m_ibuf_name, 25000000);
+  m_ibuf.open(m_ibuf_name, 250000000);
   if (m_shmflag > 0) {
     if (m_nodename.size() == 0 || m_nodeid < 0) {
       m_shmflag = 0;
     } else {
-      m_info.open(m_nodename, sizeof(storage_info) / sizeof(int));
+      m_info.open(m_nodename, sizeof(storage_info) / sizeof(int), m_shmflag > 1);
       m_sinfo = (storage_info*)m_info.getReserved();
       memset(m_sinfo, 0, sizeof(storage_info));
     }
@@ -80,10 +80,6 @@ void StorageDeserializerModule::initialize()
     MsgHandler handler(m_compressionLevel);
     if (m_package.decode(handler)) {
       m_package.restore(false);
-      if (m_info.isAvailable()) {
-        m_sinfo->count_in = 1;
-        m_sinfo->nword_in = m_package.getData().getWordSize();
-      }
       break;
     }
   }
@@ -92,21 +88,14 @@ void StorageDeserializerModule::initialize()
 
 void StorageDeserializerModule::event()
 {
-  if (m_count == 0) {
-    m_count++;
-    return;
-  }
   m_count++;
+  if (m_count == 1) return;
   while (true) {
     while (true) {
       m_package.setSerial(m_ibuf.read((int*)m_package.getData().getBuffer()));
       MsgHandler handler(m_compressionLevel);
       if (m_package.decode(handler)) {
         m_package.restore();
-        if (m_info.isAvailable()) {
-          m_sinfo->count_in++;
-          m_sinfo->nword_in += m_package.getData().getWordSize();
-        }
         break;
       }
     }
@@ -117,7 +106,6 @@ void StorageDeserializerModule::event()
       m_evtno = evtmetadata->getEvent();
       break;
     } else {
-      BinData& data();
       B2WARNING("NO event meta data " << m_package.getData().getExpNumber() << "." <<
                 m_package.getData().getRunNumber() << "." <<
                 m_package.getData().getEventNumber() << " nword = " <<

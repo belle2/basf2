@@ -65,7 +65,7 @@ namespace Belle2 {
     int m_nodeid;
     std::string m_nodename;
     int m_shmflag;
-    unsigned int m_count;
+    unsigned long long m_count;
     unsigned int m_expno;
     unsigned int m_runno;
     unsigned int m_evtno;

@@ -1,11 +1,11 @@
 #include "daq/slc/apps/storagerd/StoragerMonitor.h"
 
-#include "daq/storage/storagein_data.h"
-#include "daq/storage/storager_data.h"
-#include "daq/storage/storageout_data.h"
+#include "daq/slc/apps/storagerd/storage_info_all.h"
 
 #include <daq/slc/nsm/NSMData.h>
 #include <daq/slc/base/ConfigFile.h>
+
+#include "daq/storage/storage_info.h"
 
 #include <unistd.h>
 #include <cstring>
@@ -14,28 +14,29 @@ using namespace Belle2;
 
 void StoragerMonitor::run()
 {
-  ConfigFile config("envmon");
-  const std::string config_path = config.get("ENV_CONFIG_PATH");
-  config.read(config_path + "/storage.conf");
-  std::string nsmdata_name = config.get("ENV_NSMDATA_NAME");
-  std::string nsmdata_format = config.get("ENV_NSMDATA_FORMAT");
-  const int nsmdata_revision = config.getInt("ENV_NSMDATA_REVISION");
-  NSMData* nsm = new NSMData(nsmdata_name, nsmdata_format, nsmdata_revision);
-  storager_data* nsm_data = (storager_data*)nsm->allocate(_callback->getCommunicator());
-  memset(nsm_data, 0, sizeof(storager_data));
-  storager_data* data = NULL;
-  ProcessController& con(_callback->getController(1));
+  NSMData* nsm = new NSMData("STORAGE_INFO", "storage_info_all", 1);
+  /*
+  storage_info_all* data = (storage_info_all*)nsm->allocate(_callback->getCommunicator());
+  memset(data, 0, sizeof(storage_info_all));
   while (true) {
     sleep(1);
-    if (data == NULL && con.getInfo().getParams() != NULL) {
-      data = (storager_data*)con.getInfo().getReserved();
-    }
-    if (data != NULL) {
-      con.getInfo().lock();
-      if (data->nevts > nsm_data->nevts) {
-        memcpy(nsm_data, data, sizeof(storager_data));
+    for (size_t i = 0; i < _callback->getNControllers(); i++) {
+      ProcessController& con(_callback->getController(i));
+      if (con.getInfo().isAvailable()) {
+  storage_info* info = (storage_info*)con.getInfo().getReserved();
+  data->nodeid[i] = info->nodeid;
+  data->expno[i] = info->expno;
+  data->runno[i] = info->runno;
+  data->subno[i] = info->subno;
+  data->stime[i] = info->stime;
+  data->ctime[i] = info->ctime;
+  data->count[i] = info->count;
+  data->nbyte[i] = info->nbyte;
+  data->freq[i] = info->freq;
+  data->evtsize[i] = info->evtsize;
+  data->rate[i] = info->rate;
       }
-      con.getInfo().unlock();
     }
   }
+  */
 }

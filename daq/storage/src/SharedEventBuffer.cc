@@ -5,6 +5,7 @@
 
 #include <cstring>
 #include <cstdio>
+#include <unistd.h>
 
 using namespace Belle2;
 
@@ -38,9 +39,7 @@ bool SharedEventBuffer::open(const std::string& nodename,
   _header = (Header*)buf;
   buf += sizeof(Header);
   _buf = (int*)buf;
-  if (recreate) {
-    init();
-  }
+  if (recreate) init();
   return true;
 }
 
@@ -110,7 +109,7 @@ bool SharedEventBuffer::isWritable(int nword) throw()
 {
   if (_buf == NULL) return false;
   _mutex.lock();
-  bool writable = (_header->nword_out - _header->nword_in) - nword;
+  bool writable = _header->nword_in - _header->nword_out < _nword - (nword + 1);
   _mutex.unlock();
   return writable;
 }
@@ -119,7 +118,7 @@ bool SharedEventBuffer::isReadable(int nword) throw()
 {
   if (_buf == NULL) return false;
   _mutex.lock();
-  bool readable = (_header->nword_in - _header->nword_out) - nword;
+  bool readable = _header->nword_in - _header->nword_out >= _nword - (nword + 1);
   _mutex.unlock();
   return readable;
 

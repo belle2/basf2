@@ -16,6 +16,7 @@ size_t RunInfoBuffer::size() throw()
 bool RunInfoBuffer::open(const std::string& nodename,
                          int nreserved, bool recreate)
 {
+  _nodename = nodename;
   _nreserved = nreserved;
   std::string username = getenv("USER");
   _path = "/run_info_" + username + "_" + nodename;

@@ -33,33 +33,32 @@ int main(int argc, char** argv)
   storage_info* sinfo = NULL;
   bool use_info = (argc > 4);
   if (use_info) {
-    info.open(argv[4], sizeof(storage_info) / sizeof(int));
+    info.open(argv[4], sizeof(storage_info) / sizeof(int), argc > 6);
     sinfo = (storage_info*)info.getReserved();
     sinfo->nodeid = atoi(argv[5]);
   }
-  SharedEventBuffer* buf = new SharedEventBuffer();
-  buf->open(argv[1], 25000000, true);
-  buf->init();
+  SharedEventBuffer ibuf;
+  ibuf.open(argv[1], 250000000, true);
   TCPSocket socket(argv[2], atoi(argv[3]));
   B2INFO("storagein: Connected to eb2.");
   info.reportRunning();
   int* evtbuf = new int[1000000];
   BinData data;
   data.setBuffer(evtbuf);
-  unsigned long long nword = 0;
+  unsigned long long nbyte = 0;
   Time t0;
   unsigned int count = 0;
   int expno = 0;
   int runno = 0;
-  int ntry = 0;
+  int ntried = 0;
   while (true) {
     try {
       socket.connect();
       socket.setBufferSize(4 * 1024 * 1024);
-      ntry = 0;
+      ntried = 0;
     } catch (const IOException& e) {
       socket.close();
-      B2WARNING("storagein: failed to connect to eb2 (try=" << ntry++ << ")");
+      B2WARNING("storagein: failed to connect to eb2 (try=" << ntried++ << ")");
       sleep(5);
       continue;
     }
@@ -86,14 +85,13 @@ int main(int argc, char** argv)
             count = 0;
           }
         }
-        buf->write(evtbuf, evtbuf[0]);
+        ibuf.write(evtbuf, evtbuf[0]);
         count++;
-        nword += data.getWordSize();
-        if (sinfo != NULL && count % 1000 == 0) {
-          sinfo->evtno = data.getEventNumber();
-          sinfo->nword_in = sinfo->nword_out = nword;
-          sinfo->count_in = sinfo->count_out = count;
-          sinfo->ctime = Time().getSecond();
+        nbyte += data.getByteSize();
+        if (sinfo != NULL && count % 10 == 0) {
+          sinfo->count = count;
+          sinfo->nbyte += nbyte;
+          nbyte = 0;
         }
       }
     } catch (const IOException& e) {

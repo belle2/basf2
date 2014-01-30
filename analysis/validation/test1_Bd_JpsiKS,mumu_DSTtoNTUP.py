@@ -23,7 +23,7 @@ makeParticle('B0toJpsiKS', 511, ['jpsi', 'KS0'], 5.2, 5.4)
 matchMCTruth('B0toJpsiKS')
 
 # ----> NtupleMaker module
-ntupleFile('ntuples/Bd_JpsiKS,mumu.ntup.root')
+ntupleFile('../Bd_JpsiKS,mumu.ntup.root')
 tools = [
     'EventMetaData',
     'B0',

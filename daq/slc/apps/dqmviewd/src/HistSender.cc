@@ -140,15 +140,21 @@ void HistSender::run()
         socket_writer.writeInt(_master->getExpNumber());
         socket_writer.writeInt(_master->getRunNumber());
         socket_writer.writeInt(_master->getState().getId());
-        socket_writer.writeInt(npacks);
+        int ic = 0;
         for (size_t i = 0; i < reader_v.size(); i++) {
           if (monitored_v[i]) {
-            buf.seekTo(0);
-            sendContents(reader_v[i], buf);
-            buf.deflate();
-            buf.writeObject(socket_writer);
+            if (reader_v[i].getUpdateId() != updateid_v[i]) {
+              updateid_v[i] = reader_v[i].getUpdateId();
+              buf.seekTo(0);
+              socket_writer.writeInt(ic);
+              sendContents(reader_v[i], buf);
+              buf.deflate();
+              buf.writeObject(socket_writer);
+            }
+            ic++;
           }
         }
+        socket_writer.writeInt(-1);
         _master->wait();
         _master->unlock();
       }

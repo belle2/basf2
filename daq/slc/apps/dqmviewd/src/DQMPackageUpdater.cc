@@ -31,6 +31,6 @@ void DQMPackageUpdater::run()
     }
     _master->notify();
     _master->unlock();
-    sleep(5);
+    sleep(10);
   }
 }

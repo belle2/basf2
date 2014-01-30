@@ -89,10 +89,9 @@ void TelDQMModule::defineHisto()
     int iPlane = indexToPlane(i);
     string name = str(format("hTELHitmapU%1%") % iPlane);
     string title = str(format("TEL Hitmap in U, plane %1%") % iPlane);
-    float width = getInfo(i).getWidth();
     int nPixels = getInfo(i).getUCells();
-    m_hitMapU[i] = new TH1F(name.c_str(), title.c_str(), nPixels, -0.5 * width, 0.5 * width);
-    m_hitMapU[i]->GetXaxis()->SetTitle("u position [cm]");
+    m_hitMapU[i] = new TH1F(name.c_str(), title.c_str(), nPixels, 0, nPixels);
+    m_hitMapU[i]->GetXaxis()->SetTitle("u position [pitch units]");
     m_hitMapU[i]->GetYaxis()->SetTitle("hits");
   }
   // Hitmaps in V
@@ -100,10 +99,9 @@ void TelDQMModule::defineHisto()
     int iPlane = indexToPlane(i);
     string name = str(format("hTELHitmapV%1%") % iPlane);
     string title = str(format("TEL Hitmap in V, plane %1%") % iPlane);
-    float length = getInfo(i).getLength();
     int nPixels = getInfo(i).getVCells();
-    m_hitMapV[i] = new TH1F(name.c_str(), title.c_str(), nPixels, -0.5 * length, 0.5 * length);
-    m_hitMapV[i]->GetXaxis()->SetTitle("v position [cm]");
+    m_hitMapV[i] = new TH1F(name.c_str(), title.c_str(), nPixels, 0, nPixels);
+    m_hitMapV[i]->GetXaxis()->SetTitle("v position [pitch units]");
     m_hitMapV[i]->GetYaxis()->SetTitle("hits");
   }
   //----------------------------------------------------------------
@@ -115,7 +113,7 @@ void TelDQMModule::defineHisto()
     string name = str(format("hTELSizeU%1%") % iPlane);
     string title = str(format("TEL cluster size in U, plane %1%") % iPlane);
     m_sizeU[i] = new TH1F(name.c_str(), title.c_str(), 10, 0, 10);
-    m_sizeU[i]->GetXaxis()->SetTitle("cluster size in u [pitch units]");
+    m_sizeU[i]->GetXaxis()->SetTitle("cluster size in u");
     m_sizeU[i]->GetYaxis()->SetTitle("count");
   }
   // v size by plane
@@ -124,7 +122,7 @@ void TelDQMModule::defineHisto()
     string name = str(format("hTELSizeV%1%") % iPlane);
     string title = str(format("TEL cluster size in V, plane %1%") % iPlane);
     m_sizeV[i] = new TH1F(name.c_str(), title.c_str(), 10, 0, 10);
-    m_sizeV[i]->GetXaxis()->SetTitle("cluster size in v [pitch units]");
+    m_sizeV[i]->GetXaxis()->SetTitle("cluster size in v");
     m_sizeV[i]->GetYaxis()->SetTitle("count");
   }
   // size by plane
@@ -133,7 +131,7 @@ void TelDQMModule::defineHisto()
     string name = str(format("hTELSize%1%") % iPlane);
     string title = str(format("TEL cluster size, plane %1%") % iPlane);
     m_size[i] = new TH1F(name.c_str(), title.c_str(), 10, 0, 10);
-    m_size[i]->GetXaxis()->SetTitle("cluster size [pitch units]");
+    m_size[i]->GetXaxis()->SetTitle("cluster size");
     m_size[i]->GetYaxis()->SetTitle("count");
   }
   //----------------------------------------------------------------
@@ -142,27 +140,27 @@ void TelDQMModule::defineHisto()
   // Correlations in U + V, 2D Hitmaps
   for (int i = 0; i < c_nTELPlanes; i++) {
     int iPlane1 = indexToPlane(i);
-    float length1 = getInfo(i).getLength();
+    float vSize1 = getInfo(i).getVSize();
     int nStripsU1 = getInfo(i).getUCells();
-    float width1 = getInfo(i).getWidth();
+    float uSize1 = getInfo(i).getUSize();
     int nStripsV1 = getInfo(i).getVCells();
     for (int j = 0; j < c_nTELPlanes; j++) {
       int iPlane2 = indexToPlane(j);
-      float length2 = getInfo(j).getLength();
+      float vSize2 = getInfo(j).getVSize();
       int nStripsU2 = getInfo(j).getUCells();
-      float width2 = getInfo(j).getWidth();
+      float uSize2 = getInfo(j).getUSize();
       int nStripsV2 = getInfo(j).getVCells();
       if (i == j) {  // hit maps
         string name = str(format("h2TELHitmapUV%1%") % iPlane2);
         string title = str(format("Hitmap TEL in U x V, plane %1%") % iPlane2);
-        m_correlationsHitMaps[c_nTELPlanes * j + i] = new TH2F(name.c_str(), title.c_str(), nStripsU2, -0.5 * width2, 0.5 * width2, nStripsV2, -0.5 * length2, 0.5 * length2);
+        m_correlationsHitMaps[c_nTELPlanes * j + i] = new TH2F(name.c_str(), title.c_str(), nStripsU2, -0.5 * uSize2, 0.5 * uSize2, nStripsV2, -0.5 * vSize2, 0.5 * vSize2);
         m_correlationsHitMaps[c_nTELPlanes * j + i]->GetXaxis()->SetTitle("u position [cm]");
         m_correlationsHitMaps[c_nTELPlanes * j + i]->GetYaxis()->SetTitle("v position [cm]");
         m_correlationsHitMaps[c_nTELPlanes * j + i]->GetZaxis()->SetTitle("hits");
       } else if (i < j) { // correlations for u
         string name = str(format("h2TELCorrelationmapU%1%%2%") % iPlane1 % iPlane2);
         string title = str(format("Correlationmap TEL in U, plane %1%, plane %2%") % iPlane1 % iPlane2);
-        m_correlationsHitMaps[c_nTELPlanes * j + i] = new TH2F(name.c_str(), title.c_str(), nStripsU1, -0.5 * width1, 0.5 * width1, nStripsU2, -0.5 * width2, 0.5 * width2);
+        m_correlationsHitMaps[c_nTELPlanes * j + i] = new TH2F(name.c_str(), title.c_str(), nStripsU1, -0.5 * uSize1, 0.5 * uSize1, nStripsU2, -0.5 * uSize2, 0.5 * uSize2);
         string axisxtitle = str(format("u position, plane %1% [cm]") % iPlane1);
         string axisytitle = str(format("u position, plane %1% [cm]") % iPlane2);
         m_correlationsHitMaps[c_nTELPlanes * j + i]->GetXaxis()->SetTitle(axisxtitle.c_str());
@@ -171,7 +169,7 @@ void TelDQMModule::defineHisto()
       } else {            // correlations for v
         string name = str(format("h2TELCorrelationmapV%1%%2%") % iPlane2 % iPlane1);
         string title = str(format("Correlationmap TEL in V, plane %1%, plane %2%") % iPlane2 % iPlane1);
-        m_correlationsHitMaps[c_nTELPlanes * j + i] = new TH2F(name.c_str(), title.c_str(), nStripsV2, -0.5 * length2, 0.5 * length2, nStripsV1, -0.5 * length1, 0.5 * length1);
+        m_correlationsHitMaps[c_nTELPlanes * j + i] = new TH2F(name.c_str(), title.c_str(), nStripsV2, -0.5 * vSize2, 0.5 * vSize2, nStripsV1, -0.5 * vSize1, 0.5 * vSize1);
         string axisxtitle = str(format("v position, plane %1% [cm]") % iPlane2);
         string axisytitle = str(format("v position, plane %1% [cm]") % iPlane1);
         m_correlationsHitMaps[c_nTELPlanes * j + i]->GetXaxis()->SetTitle(axisxtitle.c_str());
@@ -259,8 +257,8 @@ void TelDQMModule::event()
     int iPlane = cluster.getSensorID().getSensorNumber();
     if ((iPlane < c_firstTELPlane) || (iPlane > c_lastTELPlane)) continue;
     int index = planeToIndex(iPlane);
-    m_hitMapU[index]->Fill(cluster.getU());
-    m_hitMapV[index]->Fill(cluster.getV());
+    m_hitMapU[index]->Fill(getInfo(index).getUCellID(cluster.getU()));
+    m_hitMapV[index]->Fill(getInfo(index).getVCellID(cluster.getV()));
     m_sizeU[index]->Fill(cluster.getUSize());
     m_sizeV[index]->Fill(cluster.getVSize());
     m_size[index]->Fill(cluster.getSize());

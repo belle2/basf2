@@ -25,7 +25,7 @@ namespace Belle2 {
     class ClusterProjection {
     public:
       /** Constructor */
-      ClusterProjection(): m_pos(0), m_min(2000), m_max(-2000), m_minCharge(0),
+      ClusterProjection(): m_pos(0), m_min(2000), m_max(0), m_minCharge(0),
         m_maxCharge(0), m_minPos(0), m_maxPos(0), m_error(0), m_charge(0),
         m_size(0) {}
 

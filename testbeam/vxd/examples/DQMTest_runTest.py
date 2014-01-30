@@ -70,6 +70,9 @@ svd_dqm = register_module('SVDDQM')
 tel_dqm = register_module('TelDQM')
 tel_dqm.param('Clusters', 'TelClusters')
 
+# TB DQM module adds correlations between telescopes and nearest VXD sensors.
+telvxd_dqm = register_module('TelxVXD')
+
 # VXDTF:
 ## parameters:
 if havePXD:
@@ -117,6 +120,7 @@ main.add_module(TelClust)
 main.add_module(pxd_dqm)
 main.add_module(svd_dqm)
 main.add_module(tel_dqm)
+main.add_module(telvxd_dqm)
 main.add_module(VXDTF)
 main.add_module(trackfitter)
 main.add_module(vxdtf_dqm)

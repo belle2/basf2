@@ -18,7 +18,7 @@ public class DQMStatusPanel extends JPanel implements Updatable {
 	private JLabel _runno_label;
 	private DQMStateLabel _state_label;
 	private JLabel _date_label;
-	private SimpleDateFormat _data_format = new SimpleDateFormat("yyyy/MMM/dd HH:mm:ss");  
+	private SimpleDateFormat _data_format = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");  
 	
 	public DQMStatusPanel() {
 		JPanel panel = new JPanel();

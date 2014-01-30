@@ -37,6 +37,8 @@ namespace Belle2 {
     unsigned int getExpNumber() const { return _expno; }
     unsigned int getRunNumber() const { return _runno; }
     void setCallback(RCCallback* callback) { _callback = callback; }
+    void notify() { _cond.broadcast(); }
+    void wait() { _cond.wait(_mutex); }
     void lock() { _mutex.lock(); }
     void unlock() { _mutex.unlock(); }
 

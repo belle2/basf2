@@ -58,20 +58,23 @@ int DQMFileReader::update()
 {
   _mutex.lock();
   _file->Update();
-  _updateid++;
+  bool updated = false;
   for (TH1Map::iterator it = _hist_m.getHists().begin();
        it != _hist_m.getHists().end(); it++) {
     std::string name = it->first;
     TH1* h = it->second;
-    h->Reset();
     TH1* h0 = (TH1*)_file->Get(name.c_str());
-    h->Add(h0);
+    if (h->GetEntries() != h0->GetEntries()) {
+      h->Reset();
+      h->Add(h0);
+      updated = true;
+    }
     delete h0;
     if (_updateid % 10 == 0) {
       LogFile::debug("Entries of %s = %d", name.c_str(), (int)h->GetEntries());
     }
   }
-
+  if (updated) _updateid++;
   int updateid = _updateid;
   _mutex.unlock();
   return updateid;

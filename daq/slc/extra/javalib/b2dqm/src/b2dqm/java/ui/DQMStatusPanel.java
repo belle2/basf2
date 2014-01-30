@@ -2,13 +2,14 @@ package b2dqm.java.ui;
 
 import java.awt.Dimension;
 import java.awt.Font;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import b2daq.core.Time;
 import b2daq.ui.Updatable;
 
 public class DQMStatusPanel extends JPanel implements Updatable {
@@ -17,6 +18,7 @@ public class DQMStatusPanel extends JPanel implements Updatable {
 	private JLabel _runno_label;
 	private DQMStateLabel _state_label;
 	private JLabel _date_label;
+	private SimpleDateFormat _data_format = new SimpleDateFormat("yyyy/MMM/dd HH:mm:ss");  
 	
 	public DQMStatusPanel() {
 		JPanel panel = new JPanel();
@@ -30,7 +32,7 @@ public class DQMStatusPanel extends JPanel implements Updatable {
 		_runno_label.setFont(new Font("Sans", Font.PLAIN, 15));
 		JLabel label = new JLabel("DQM state : ");
 		label.setFont(new Font("Sans", Font.PLAIN, 15));
-		_date_label = new JLabel("updated at : --:--:--");
+		_date_label = new JLabel("updated at : ----/--/-- --:--:--");
 		_date_label.setFont(new Font("Sans", Font.PLAIN, 15));
 		panel.add(Box.createRigidArea(new Dimension(10,10)));
 		panel.add(label);
@@ -52,7 +54,7 @@ public class DQMStatusPanel extends JPanel implements Updatable {
 		_state_label.setState(stateno);
 		_runno_label.setText("run # : "+String.format("%04d", expno)+
 				"." + String.format("%06d", runno));
-		_date_label.setText("updated at : "+ new Time().toDateString());
+		_date_label.setText("updated at : "+ _data_format.format(new Date()));
 		update();
 	}
 	

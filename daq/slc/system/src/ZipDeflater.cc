@@ -39,13 +39,14 @@ void ZipDeflater::deflate(int level) throw(IOException)
     }
     throw (IOException(__FILE__, __LINE__, "Failed to deflate"));
   }
+  seekTo(0);
 }
 
 void ZipDeflater::writeObject(Writer& writer) throw(IOException)
 {
+  writer.writeInt(_comp_buf_size);
   writer.writeInt(_comp_size);
   LogFile::debug("ZipDeflater compressed = %d, original = %d",
                  _comp_size, _comp_buf_size);
   writer.write(_comp_buf, _comp_size);
-  seekTo(0);
 }

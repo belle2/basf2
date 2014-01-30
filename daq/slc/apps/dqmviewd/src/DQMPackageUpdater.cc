@@ -29,6 +29,7 @@ void DQMPackageUpdater::run()
         reader.update();
       }
     }
+    _master->notify();
     _master->unlock();
     sleep(5);
   }

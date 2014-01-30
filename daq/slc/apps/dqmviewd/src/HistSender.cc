@@ -118,54 +118,39 @@ void HistSender::run()
       return;
     }
 
-    StreamSizeCounter counter;
-    counter.writeInt(0);
-    counter.writeInt(0);
-    counter.writeInt(0);
-    counter.writeInt(npacks);
+    std::vector<int> updateid_v;
+    int buf_size = 0;
     _master->lock();
     for (size_t i = 0; i < reader_v.size(); i++) {
+      updateid_v.push_back(reader_v[i].getUpdateId());
       if (monitored_v[i]) {
+        StreamSizeCounter counter;
         sendContents(reader_v[i], counter);
+        if (counter.count() > buf_size) buf_size = counter.count();
       }
     }
     _master->unlock();
-    //BufferedWriter buf(counter.count());
-    ZipDeflater buf(counter.count(), counter.count() * 1.01 + 12);
+    ZipDeflater buf(buf_size, buf_size * 1.01 + 12);
 
     try {
       while (true) {
         bool revised = false;
         _master->lock();
-        for (size_t i = 0; i < reader_v.size(); i++) {
-          LogFile::debug("debug package : %s", reader_v[i].getName().c_str());
-          if (reader_v[i].isReady() && reader_v[i].getUpdateId() == 0) {
-            LogFile::debug("Found revised package : %s", reader_v[i].getName().c_str());
-            revised = true;
-          }
-        }
-        if (revised) {
-          _master->unlock();
-
-          break;
-        }
         socket_writer.writeInt(FLAG_UPDATE);
-        socket_writer.writeInt(buf.getBufferSize());
-        buf.seekTo(0);
-        buf.writeInt(_master->getExpNumber());
-        buf.writeInt(_master->getRunNumber());
-        buf.writeInt(_master->getState().getId());
-        buf.writeInt(npacks);
+        socket_writer.writeInt(_master->getExpNumber());
+        socket_writer.writeInt(_master->getRunNumber());
+        socket_writer.writeInt(_master->getState().getId());
+        socket_writer.writeInt(npacks);
         for (size_t i = 0; i < reader_v.size(); i++) {
           if (monitored_v[i]) {
+            buf.seekTo(0);
             sendContents(reader_v[i], buf);
+            buf.deflate();
+            buf.writeObject(socket_writer);
           }
         }
+        _master->wait();
         _master->unlock();
-        buf.deflate();
-        buf.writeObject(socket_writer);
-        //socket_writer.write(buf.ptr(), buf.count());
-        sleep(10);
       }
     } catch (const IOException& e) {
       _master->unlock();

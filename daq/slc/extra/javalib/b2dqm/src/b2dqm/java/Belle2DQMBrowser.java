@@ -51,6 +51,7 @@ public class Belle2DQMBrowser extends JavaEntoryPoint {
 			SocketDataWriter socket_writer = new SocketDataWriter(_socket);
 			SocketDataReader socket_reader = new SocketDataReader(_socket);
 			ZlibInflater inflater = new ZlibInflater();
+			boolean configured = false;
 			while (true) {
 				int flag = socket_reader.readInt();
 				switch ( flag ) {
@@ -64,7 +65,7 @@ public class Belle2DQMBrowser extends JavaEntoryPoint {
 						HistoPackage pack = new HistoPackage(name);
 						_pack_v.add(pack);
 					}
-					ArrayList<Boolean> monitored_v = PackageSelectPanel.showPane(_pack_v);
+					ArrayList<Boolean> monitored_v = PackageSelectPanel.showPane(_pack_v, configured);
 					for ( int n = 0; n < monitored_v.size(); n++ ) {
 						socket_writer.writeByte(monitored_v.get(n)?(byte)1:0);
 					}
@@ -119,14 +120,14 @@ public class Belle2DQMBrowser extends JavaEntoryPoint {
 						throw new Exception("Wrong magic:" + magic);
 					}
 					_frame.init(_pack_v, _info_v);
+					configured = true;
 				}
 				break;
 				case FLAG_UPDATE : {
-					inflater.readBuffer(socket_reader);
-					int expno = inflater.readInt();
-					int runno = inflater.readInt();
-					int stateno = inflater.readInt();
-					int npacks = inflater.readInt();
+					int expno = socket_reader.readInt();
+					int runno = socket_reader.readInt();
+					int stateno = socket_reader.readInt();
+					int npacks = socket_reader.readInt();
 					_frame.getStatusPnale().update(expno, runno, stateno);
 					System.out.println("update : expno = " + expno + " runno = "+
 					runno+" state = "+stateno);
@@ -138,6 +139,7 @@ public class Belle2DQMBrowser extends JavaEntoryPoint {
 						}							
 					}
 					for (int n = 0; n < npacks; n++) {
+						inflater.readBuffer(socket_reader);
 						HistoPackage pack = _pack_v.get(n);
 						String name = inflater.readString();
 						if (!name.matches(pack.getName())) {

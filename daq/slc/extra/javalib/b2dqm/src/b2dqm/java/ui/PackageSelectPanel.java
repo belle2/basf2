@@ -15,7 +15,8 @@ import b2dqm.core.HistoPackage;
 
 public class PackageSelectPanel {
 
-	static public ArrayList<Boolean> showPane(ArrayList<HistoPackage> package_v) {
+	static public ArrayList<Boolean> showPane(ArrayList<HistoPackage> package_v,
+													boolean configured) {
 		ArrayList<JCheckBox> check_box_v = new ArrayList<JCheckBox>();
 		ArrayList<Boolean> monitored_v = new ArrayList<Boolean>();
 		JPanel panel = new JPanel();
@@ -23,6 +24,7 @@ public class PackageSelectPanel {
 		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 		JPanel title_panel = new JPanel();
 		JLabel title_label = new JLabel("DQM package selection");
+		if (configured) title_label.setText("New Packages are available");
 		title_label.setHorizontalAlignment(JLabel.CENTER);
 		title_panel.setLayout(new BoxLayout(title_panel, BoxLayout.X_AXIS));
 		title_panel.add(title_label);

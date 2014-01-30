@@ -21,7 +21,7 @@ namespace Belle2 {
     void* getCompBuffer() const throw() { return _comp_buf; }
     size_t getBufferSize() const throw() { return _comp_buf_size; }
     size_t getCompSize() const throw() { return _comp_size; }
-    void deflate(int level = 6) throw(IOException);
+    void deflate(int level = 1) throw(IOException);
     void writeObject(Writer&) throw(IOException);
 
     // member data

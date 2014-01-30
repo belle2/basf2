@@ -59,6 +59,7 @@ namespace Belle2 {
     addParam("randomize", m_randomize, "Randomize time within TDC bin",
              true);
     addParam("t0", m_t0, "common offset to be added to photon TDC times [ns]", 0.0);
+    addParam("multipleHits", m_multipleHits, "Allow multiple hits in a single channel within an event", false);
 
     // initialize other private data members
     m_file = NULL;
@@ -156,33 +157,45 @@ namespace Belle2 {
     m_top.eventNum = evtMetaData->getEvent();
     m_top.eventflag = 1;
 
-    int TDC[m_numChannels];
+    float TDC[m_numChannels];
     for (int i = 0; i < m_numChannels; i++) TDC[i] = m_tdcOverflow;
 
     StoreArray<TOPDigit> topDigits;
-    for (int i = 0; i < topDigits.getEntries(); i++) {
+    int nEntries(topDigits.getEntries());
+    for (int i = 0; i < nEntries; ++i) {
       TOPDigit* digi = topDigits[i];
       int ich = digi->getChannelID() - 1;
-      if (digi->getTDC() < TDC[ich]) TDC[ich] = digi->getTDC(); // single hit TDC
+      float tdc(digi->getTDC());
+      if (m_randomize) {tdc += gRandom->Rndm();}
+
+      if (m_multipleHits) {
+        m_top.pmtid_mcp[i] = ich / m_numPMTchannels + 1;
+        m_top.ch_mcp[i] = ich % m_numPMTchannels + 1;
+        m_top.tdc0_mcp[i] = tdc * m_tdcWidth + m_t0 * Unit::ns / Unit::ps;
+        m_top.tdc_mcp[i] = m_top.tdc0_mcp[i];
+        m_top.pmtflag_mcp[i] = 1;
+      }
+      if (int(tdc) < int(TDC[ich])) {TDC[ich] = tdc;} // for single hit TDC
     }
 
     for (int ich = 0; ich < m_numChannels; ich++) {
-      if (TDC[ich] == m_tdcOverflow) continue;
+      if (TDC[ich] == m_tdcOverflow) {continue;}
       int i = m_top.nhit;
       m_top.nhit++;
-      m_top.pmtid_mcp[i] = ich / m_numPMTchannels + 1;
-      m_top.ch_mcp[i] = ich % m_numPMTchannels + 1;
-      float tdc = TDC[ich];
-      if (m_randomize) tdc += gRandom->Rndm();
-      m_top.tdc0_mcp[i] = tdc * m_tdcWidth + m_t0 * Unit::ns / Unit::ps;
-      m_top.pmtflag_mcp[i] = 1;
-
-      m_top.tdc0_ch[ich] = m_top.tdc0_mcp[i];
+      float tdc = TDC[ich] * m_tdcWidth + m_t0 * Unit::ns / Unit::ps;
+      if (!m_multipleHits) {
+        m_top.pmtid_mcp[i] = ich / m_numPMTchannels + 1;
+        m_top.ch_mcp[i] = ich % m_numPMTchannels + 1;
+        m_top.tdc0_mcp[i] = tdc;
+        m_top.tdc_mcp[i] = tdc;
+        m_top.pmtflag_mcp[i] = 1;
+      }
+      m_top.tdc0_ch[ich] = tdc;
       m_top.pmtflag_ch[ich] = m_top.pmtflag_mcp[i];
-      m_top.tdc_mcp[i] = m_top.tdc0_mcp[i];
-      m_top.tdc_ch[ich] = m_top.tdc_mcp[i];
+      m_top.tdc_ch[ich] = tdc;
     }
 
+    if (m_multipleHits) {m_top.nhit = nEntries;}
     m_treeTop->Fill();
 
   }

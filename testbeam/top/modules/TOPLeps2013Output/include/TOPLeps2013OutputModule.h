@@ -76,6 +76,7 @@ namespace Belle2 {
     std::string m_outputFileName; /**< output file name */
     bool m_randomize;             /**< randomize within TDC bin */
     double m_t0;   /**< offset time to add for adjusting photon TDC times */
+    bool m_multipleHits; /**< Allow multiple hits in a single channel within an event */
 
     TFile* m_file;      /**< TFile */
     TTree* m_treeTop;   /**< TTree top */

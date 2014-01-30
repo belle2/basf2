@@ -107,6 +107,7 @@ TOPdigi.param('timeZeroJitter', 25e-3)
 # output = register_module('RootOutput')
 output = register_module('TOPLeps2013Output')
 output.param('outputFileName', outfile)
+output.param('multipleHits', False)
 
 # suppress messages and warnings during processing:
 set_log_level(LogLevel.ERROR)

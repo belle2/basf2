@@ -197,7 +197,7 @@ void TrackfitDQMModule::event()
   // Loop over TrackCands
   for (int i = 0; i < storeTrackCand.getEntries(); ++i) {
     const genfit::TrackCand* cand = storeTrackCand[i];
-    const genfit::Track* track = DataStore::getRelatedFromObj<genfit::Track>(cand);
+    const genfit::Track* track = DataStore::getRelatedFromObj<genfit::Track>(cand, m_storeTrackName);
     if (!track) {
       // No related Track
       m_hNTracks->Fill("TrackCand, but no Track", 1.0);
@@ -205,6 +205,12 @@ void TrackfitDQMModule::event()
     }
     if (!track->checkConsistency())
       return;
+
+    /* //Data integrity check:
+    const genfit::TrackCand* candBackwards = DataStore::getRelatedToObj<genfit::TrackCand>(track, m_storeTrackCandName);
+    if (!candBackwards)
+      B2ERROR("backwards lookup failed");
+    */
 
     const genfit::FitStatus* fs = track->getFitStatus();
     if (!fs || !fs->isFitConverged()) {

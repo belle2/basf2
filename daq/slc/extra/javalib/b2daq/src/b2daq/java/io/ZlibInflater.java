@@ -33,11 +33,13 @@ public class ZlibInflater extends DataReader {
 	}
 
 	public void readBuffer(DataReader reader) throws Exception {
-		int count = reader.readInt();
-		if (count > _comp_buf.length) {
-			_comp_buf = new byte[count];
+		int buf_size = reader.readInt();
+		setBufferSize(buf_size);
+		int comp_size = reader.readInt();
+		if (comp_size > _comp_buf.length) {
+			_comp_buf = new byte[comp_size];
 		}
-		_comp_size = count;
+		_comp_size = comp_size;
 		for (int i = 0; i < _comp_size; i++ ) {
 			_comp_buf[i] = reader.readByte();
 		}

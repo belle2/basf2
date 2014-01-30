@@ -17,6 +17,7 @@ def stdLooseFSParticles(path=main):
     stdLooseK(path)
     stdLoosePi(path)
     stdLooseMu(path)
+    stdVeryLooseMu(path)
 
 
 def stdVeryLoosePi(path=main):
@@ -43,8 +44,16 @@ def stdLooseK(path=main):
                    path)
 
 
+   # Add a loose PID here when Mu is available
+
+
 def stdLooseMu(path=main):
     selectParticle('StdLooseMu+', 13, ['chiProb 0.001:'], True, path)
     selectParticle('StdLooseMu-', -13, ['chiProb 0.001:'], True, path)
+
+
+def stdVeryLooseMu(path=main):
+    selectParticle('StdVeryLooseMu+', 13, ['chiProb 0.001:'], True, path)
+    selectParticle('StdVeryLooseMu-', -13, ['chiProb 0.001:'], True, path)
 
 

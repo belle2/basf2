@@ -97,7 +97,7 @@ tools4S += ['RecoilKinematics', '^Upsilon(4S) -> B- B+']
 tools4S += ['ExtraEnergy', '^Upsilon(4S) -> B- B+']
 
 # write flat ntuples
-ntupleFile('restOfEvent_genu.root', myMain)
+ntupleFile('restOfEvent_pi0enu.root', myMain)
 ntupleTree('btag', 'B-', toolsB, myMain)
 ntupleTree('btagbsig', 'Upsilon(4S)', tools4S, myMain)
 

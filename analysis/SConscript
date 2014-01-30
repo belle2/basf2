@@ -3,27 +3,9 @@ Import('env')
 env['LIBS'] = [
 	    'framework', 
 	    'analysis_dataobjects', 
-	    'arich_dataobjects', 
-       	    'bklm_dataobjects',
-	    'cdc_dataobjects',
-       	    'ecl_dataobjects',
-       	    'eklm_dataobjects',
-            'mdst_dataobjects',
-       	    'pxd_dataobjects',
-	    'reconstruction_dataobjects',
-      	    'svd_dataobjects',
-	    'top_dataobjects',
-	    'tracking_dataobjects', 
-      	    'vxd_dataobjects',
-            'RaveBase',
-            'RaveCore',
-            'RaveVertex',
-            'RaveFlavorTag',
-            'RaveVertexKinematics',
 	    '$ROOT_LIBS',
             'TMVA',
 	    'EG', 
-	    'CLHEP',
 	    'EvtGen'
             ]
 Return('env')

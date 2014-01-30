@@ -1,7 +1,6 @@
 Import('env')
 
-env['LIBS'] = ['framework', 'analysis_dataobjects', 'reconstruction_dataobjects',
-               '$ROOT_LIBS']
+env['LIBS'] = ['framework', 'analysis_dataobjects', '$ROOT_LIBS']
 
 env.Append(LIBPATH = ['/usr/users/phit/neurobayes/lib/'])
 env.Append(CPPPATH = ['/usr/users/phit/neurobayes/include/'])

@@ -1,9 +1,20 @@
 Import('env')
-
+env['SUBLIB'] = True
 env['LIBS'] = [
-       'analysis', 
-       'framework', 
-       'analysis_dataobjects', 
-       'tracking_dataobjects']
+       	      'framework', 
+	      'analysis_dataobjects', 
+	      'tracking_dataobjects',
+	      'arich_dataobjects',
+              'bklm_dataobjects',
+              'cdc_dataobjects',
+              'ecl_dataobjects',
+              'eklm_dataobjects',
+              'mdst_dataobjects',
+              'pxd_dataobjects',
+              'reconstruction_dataobjects',
+              'svd_dataobjects',
+              'top_dataobjects',
+              'vxd_dataobjects'
+	      ]
 Return('env')
 

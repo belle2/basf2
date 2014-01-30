@@ -111,7 +111,19 @@ public class Canvas extends GRect {
 			try {
 				Histo h = (Histo)obj;
 				getAxisX().get().copy(h.getAxisX());
+				double xmax =getAxisX().get().getMax();
+				double xmin =getAxisX().get().getMin();
+				if (xmax < 10 && xmax > 5 &&
+					xmin > -10 && xmin < -5) {
+					getAxisX().setNdivisions(5);
+				}
 				getAxisY().get().copy(h.getAxisY());
+				xmax =getAxisY().get().getMax();
+				xmin =getAxisY().get().getMin();
+				if (xmax < 10 && xmax > 5 &&
+					xmin > -10 && xmin < -5) {
+					getAxisY().setNdivisions(5);
+				}
 				if ( getTitle().length() == 0 ) {
 					setTitle(h.getTitle());
 				}

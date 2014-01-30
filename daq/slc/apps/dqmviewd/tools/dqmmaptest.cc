@@ -18,7 +18,7 @@ int main(int argc, char** argv)
   TH2F* h2_3 = new TH2F("h2_3", "2D-Histogram;X value;Y value", 900, -40, 40, 900, -30, 30);
   TH2F* h2_4 = new TH2F("h2_4", "2D-Histogram;X value;Y value", 900, -40, 40, 900, -30, 30);
   TH2F* h2_5 = new TH2F("h2_5", "2D-Histogram;X value;Y value", 900, -40, 40, 900, -30, 30);
-  TH2F* h2_6 = new TH2F("h2_6", "2D-Histogram;X value;Y value", 900, -40, 40, 900, -30, 30);
+  TH2F* h2_6 = new TH2F("h2_6", "2D-Histogram (Long Histogram title test for Java browser GUI);X value;Y value", 900, -40, 40, 900, -30, 30);
   file->Add(h1);
   file->Add(h1_2);
   file->Add(h2);

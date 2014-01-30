@@ -131,7 +131,7 @@ void HistSender::run()
     }
     _master->unlock();
     //BufferedWriter buf(counter.count());
-    ZipDeflater buf(counter.count(), counter.count() * 2.0);
+    ZipDeflater buf(counter.count(), counter.count() * 1.01 + 12);
 
     try {
       while (true) {

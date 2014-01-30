@@ -67,7 +67,7 @@ int DQMFileReader::update()
     TH1* h0 = (TH1*)_file->Get(name.c_str());
     h->Add(h0);
     delete h0;
-    if (_updateid % 1 == 0) {
+    if (_updateid % 10 == 0) {
       LogFile::debug("Entries of %s = %d", name.c_str(), (int)h->GetEntries());
     }
   }
@@ -81,19 +81,20 @@ bool DQMFileReader::dump(const std::string& dir,
                          unsigned int expno, unsigned int runno)
 {
   _mutex.lock();
+  _file->Update();
   std::string filepath = Form("%s/DQM_%s_%04d_%06d.root",
                               dir.c_str(), _name.c_str(), expno, runno);
   LogFile::debug("created DQM dump file: %s", filepath.c_str());
   TFile* file = new TFile(filepath.c_str(), "recreate");
   for (TH1Map::iterator it = _hist_m.getHists().begin();
        it != _hist_m.getHists().end(); it++) {
-    //TObject* obj = _file->Get(it->first.c_str());
-    //obj->Write();
-    it->second->Write();
+    std::string name = it->first;
+    TH1* h = (TH1*)_file->Get(name.c_str());
+    h->Write();
   }
   file->Close();
   delete file;
-  //_file->cd();
+  _file->cd();
   _mutex.unlock();
   return true;
 }

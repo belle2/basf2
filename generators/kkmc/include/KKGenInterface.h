@@ -73,13 +73,12 @@ namespace Belle2 {
     /**
      * Constructor.
      */
-    KKGenInterface() {}
+    KKGenInterface();
 
     /**
      * Destructor.
      */
-    ~KKGenInterface() {
-    }
+    ~KKGenInterface() {}
 
     int setup(const std::string& KKdefaultFileName, const std::string& tauinputFileName, const std::string& taudecaytableFileName, const std::string& EvtPDLFileName, TLorentzVector P4_LER, TLorentzVector P4_HER); /**< Setup for KKMC/TAUOLA  */
 

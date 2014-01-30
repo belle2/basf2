@@ -33,6 +33,12 @@
 using namespace std;
 using namespace Belle2;
 
+KKGenInterface::KKGenInterface()
+{
+  // initialize EvtPDL
+  myevtpdl = new EvtPDL();
+}
+
 int KKGenInterface::setup(const std::string& KKdefaultFileName, const std::string& tauinputFileName, const std::string& taudecaytableFileName, const std::string& EvtPDLFileName, TLorentzVector P4_LER, TLorentzVector P4_HER)
 {
   B2INFO("Begin initialisation of KKGen Interface.");
@@ -60,7 +66,6 @@ int KKGenInterface::setup(const std::string& KKdefaultFileName, const std::strin
   kk_init_seed_();
 
   // To use EvtPDL, setting file should be read
-  myevtpdl = new EvtPDL();
   myevtpdl->read(EvtPDLFileName.c_str());
 
   // If EvtPDL does not know pi0, initialization of EvtPDL fails

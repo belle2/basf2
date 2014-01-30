@@ -58,7 +58,7 @@ void PrintTauTauMCParticlesModule::event()
     if (q != NULL) {
       moID = q->getIndex();
     }
-    sprintf(buf, "PMC: %3d %4d %8d %4d %4d %4d %9.4f %9.4f %9.4f %9.4f",
+    sprintf(buf, "PMC: %3d %4u %8d %4d %4d %4d %9.4f %9.4f %9.4f %9.4f",
             p.getIndex(), p.getStatus(), p.getPDG(), moID,
             p.getFirstDaughter(), p.getLastDaughter(),
             p.get4Vector().Px(), p.get4Vector().Py(),

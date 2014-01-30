@@ -20,13 +20,13 @@ def stdLooseFSParticles(path=main):
 
 
 def stdVeryLoosePi(path=main):
-    selectParticle('VeryLoosePi+', 211, [''], True, path)
-    selectParticle('VeryLoosePi-', -211, [''], True, path)
+    selectParticle('StdVeryLoosePi+', 211, [''], True, path)
+    selectParticle('StdVeryLoosePi-', -211, [''], True, path)
 
 
 def stdVeryLooseK(path=main):
-    selectParticle('VeryLooseK+', 321, [''], True, path)
-    selectParticle('VeryLooseK-', -321, [''], True, path)
+    selectParticle('StdVeryLooseK+', 321, [''], True, path)
+    selectParticle('StdVeryLooseK-', -321, [''], True, path)
 
 
 def stdLoosePi(path=main):

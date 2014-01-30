@@ -49,27 +49,27 @@ namespace Belle2 {
 
     int getDHHID(int j) const {
       if (j < 0 || j >= (int)m_2timesNrROIs / 2) return -1;
-      return (m_rois[2 * j] & 0x3F0) >> 4;
+      return (m_rois[2 * j] >> 4) & 0x3F; // & 0x3F0
     }
     int getRow1(int j) const {
       if (j < 0 || j >= (int)m_2timesNrROIs / 2) return -1;
-      return ((m_rois[2 * j] & 0x00F) << 6) | ((m_rois[2 * j + 1] & 0xFC000000) >> 26) ;
+      return ((m_rois[2 * j] << 6) & 0x3C0) | ((m_rois[2 * j + 1] >> 26) & 0x3F) ;//  & 0x00F , & 0xFC000000
     }
     int getRow2(int j) const {
       if (j < 0 || j >= (int)m_2timesNrROIs / 2) return -1;
-      return (m_rois[2 * j + 1] & 0x0003FF00) >> 8;
+      return (m_rois[2 * j + 1] >> 8) & 0x3FF;  // & 0x0003FF00
     }
     int getCol1(int j) const {
       if (j < 0 || j >= (int)m_2timesNrROIs / 2) return -1;
-      return (m_rois[2 * j + 1] & 0x03FC0000) >> 18;
+      return (m_rois[2 * j + 1] >> 18) & 0xFF; // & 0x03FC0000
     }
     int getCol2(int j) const {
       if (j < 0 || j >= (int)m_2timesNrROIs / 2) return -1;
-      return (m_rois[2 * j + 1] & 0xFF);
+      return (m_rois[2 * j + 1]) & 0xFF;
     }
     int getType(int j) const {
       if (j < 0 || j >= (int)m_2timesNrROIs / 2) return -1;
-      return (m_rois[2 * j] & 0x400) >> 10;
+      return (m_rois[2 * j] >> 10) & 0x1; //  & 0x400
     }
 
   protected:

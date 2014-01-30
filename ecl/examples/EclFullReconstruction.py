@@ -64,7 +64,7 @@ cdcDigitizer.param(param_cdcdigi)
 ext = register_module('Ext')
 
 genfit = register_module('GenFitter')
-mctrackfinder = register_module('MCTrackFinder')
+mctrackfinder = register_module('TrackFinderMCTruth')
 param_mctrackfinder = {
     'UseCDCHits': 1,
     'UseSVDHits': 1,
@@ -75,7 +75,7 @@ mctrackfinder.param(param_mctrackfinder)
 
 trackfitter = register_module('GenFitter')
 trackfitter.logging.log_level = LogLevel.WARNING
-trackfitter.param('NIterations', 3)
+trackfitter.param('NMinIterations', 3)
 
 trackfitchecker = register_module('TrackFitChecker')
 trackfitchecker.logging.log_level = LogLevel.INFO

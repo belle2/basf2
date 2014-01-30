@@ -53,7 +53,7 @@ namespace Belle2 {
     }
     int getRow1(int j) const {
       if (j < 0 || j >= (int)m_2timesNrROIs / 2) return -1;
-      return ((m_rois[2 * j] & 0x00F) << 6) | ((m_rois[2 * j + 1] & 0x03FC0000) >> 26) ;
+      return ((m_rois[2 * j] & 0x00F) << 6) | ((m_rois[2 * j + 1] & 0xFC000000) >> 26) ;
     }
     int getRow2(int j) const {
       if (j < 0 || j >= (int)m_2timesNrROIs / 2) return -1;

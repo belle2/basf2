@@ -87,8 +87,8 @@ const int pid[] = {211,321,11,13,2212,22};
 const float pdgmasses[] = {0.13957,0.49367,0.000511,0.105658,0.93827,0.};
 const char *names[] = { "pi", "k", "e", "mu", "p","gamma"};
 
-void test2_Validation_Resolution_Tracks(TString,bool);
-void test2_Validation_Resolution_Photons(TString,bool);
+//void test2_Validation_Resolution_Tracks(TString,bool);
+//void test2_Validation_Resolution_Photons(TString,bool);
 
 void test2_Validation_Resolution(bool runOffline=false){
 
@@ -296,7 +296,7 @@ void test2_Validation_Resolution_Tracks(TString testfile, bool runOffline){
 }
 
 
-void test2_Validation_Resolution_Photons(TString testfile,runOffline){
+void test2_Validation_Resolution_Photons(TString testfile,bool runOffline){
   
   TChain * recoTree = new TChain("gammatuple");
   recoTree->AddFile(testfile);
@@ -311,9 +311,9 @@ void test2_Validation_Resolution_Photons(TString testfile,runOffline){
   float fgamma_P;  
   int igamma_mcID;  
   
-  recoTree->SetBranchAddress("pi_mcID", &igamma_mcID);  
-  recoTree->SetBranchAddress("pi_TruthP", &fgamma_TruthP);  
-  recoTree->SetBranchAddress("pi_P",      &fgamma_P);  
+  recoTree->SetBranchAddress("gamma_mcID", &igamma_mcID);  
+  recoTree->SetBranchAddress("gamma_TruthP", &fgamma_TruthP);  
+  recoTree->SetBranchAddress("gamma_P",      &fgamma_P);  
   
   for(Int_t iloop=0;iloop<recoTree->GetEntries();iloop++) {
     

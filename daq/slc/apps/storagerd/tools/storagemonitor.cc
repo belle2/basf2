@@ -44,9 +44,6 @@ int main(int argc, char** argv)
 
   while (true) {
     sleep(interval);
-    fputs("\033[2J\033[0;0H", stdout);
-    rewind(stdout);
-    ftruncate(1, 0);
     for (size_t i = 0; i < info_v.size(); i++) {
       storage_info* sinfo = (storage_info*)info_v[i].getReserved();
       storage_info* sinfo1 = &sinfo_v[i];
@@ -68,6 +65,9 @@ int main(int argc, char** argv)
       sinfo_out->nbyte[i] = sinfo1->nbyte;
     }
 
+    fputs("\033[2J\033[0;0H", stdout);
+    rewind(stdout);
+    ftruncate(1, 0);
     std::stringstream ss;
     ss << " Updated at " << Date().toString() << std::endl
        << "---------------------------------------------------------------------------------" << std::endl

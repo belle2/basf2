@@ -54,10 +54,10 @@ namespace Belle2 {
     unsigned int getNMaps() const { return m_maps.size(); }
 
   private:
-    // check if all entries in 'oldMap' prior to insertIndex are found in 'map'
+    /** check if all entries in 'oldMap' prior to insertIndex are found in 'map'. */
     static bool compatible(const IndexMap& oldMap, const IndexMap& map, unsigned int insertIndex);
 
-    std::vector<IndexMap> m_maps; /** List of string -> index maps. */
+    std::vector<IndexMap> m_maps; /**< List of string -> index maps. */
 
     ClassDef(ParticleExtraInfoMap, 1); /**< Internal class to store string -> index maps for user-defined variables in Particle. */
   };

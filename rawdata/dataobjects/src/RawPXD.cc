@@ -15,9 +15,9 @@ ClassImp(RawPXD);
 
 RawPXD::RawPXD()
 {
-  m_nwords = 1;
-  m_buffer = new int[1];
-  m_allocated = true;
+  m_nwords = 0;
+  m_buffer = NULL; // new int[1];
+  m_allocated = false;
 }
 
 RawPXD::RawPXD(int* buffer, int length_in_Bytes)

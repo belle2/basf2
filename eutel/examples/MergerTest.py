@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 from basf2 import *
 
 # Set the log level to show only warning, error and, fatal messages
@@ -14,7 +17,7 @@ geometry = register_module('Geometry')
 # No magnetic field for this test,
 geometry.param('components', ['TB'])
 
-#input
+# input
 input = register_module('SeqRootInput')
 input.param('inputFileName', '../vxdtb/data/e0000r000391.sroot')
 # data reader

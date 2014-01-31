@@ -7,6 +7,7 @@
 #include <string>
 #include <set>
 #include <map>
+#include <tuple>
 
 // Include BASF2 Base stuff
 #include <framework/core/Module.h>
@@ -21,6 +22,8 @@
 
 // load some parts of the eudaq
 #include <eutel/eudaq/FileReader.h>
+#include <eutel/merge/CircularTools.h>
+#include <eutel/merge/BoundedSpaceMap.h>
 
 namespace Belle2 {
   /** A module template.
@@ -29,6 +32,9 @@ namespace Belle2 {
    */
   class TelDataMergerModule : public Module {
   public:
+
+    typedef CIRC::tag_type tag_type;
+
     /** Constructor, for setting module description and parameters. */
     TelDataMergerModule();
 
@@ -63,17 +69,38 @@ namespace Belle2 {
      * @return true
      */
     virtual bool processEOREvent(const eudaq::Event& ev);
-    /** Get TLU tag from a telescope event
-     * @param ev eudaq::Event from which the TLU tag has to be extracted.
-     * @return TLU tag, or -1 if not found.
-     */
-    virtual int getTelTriggerID(const eudaq::Event& ev);
-    /** Process normal data event: extract and save useful data.
-     *
+
+    /** Process normal data event: extract and push useful data into the buffer.
+     * @param ev eudaq::Event to process
+     * @return bool if useful data were saved.
      */
     virtual bool processNormalEvent(const eudaq::Event& ev);
 
+    /** Extract TLU tag from a normal EUDAQ event. .
+     * @param ev eudaq::Event to process
+     * @return the extracted TLU tag, 0 if tag not present.
+     */
+    virtual short int getTLUTagFromEUDAQ(const eudaq::Event& ev);
+
+
+    /** get the next telescope event to buffer
+     * @return true, if a data event was retrieved successfully, otherwise false.
+     */
+    virtual bool addTelEventToBuffer();
+
+    /** Advance buffer by max(number of free positions, given advance)
+     * @param advance forced buffer advance - the buffer will advance by at least this
+     * @return actual number of advanced positions
+     */
+    virtual std::size_t advanceBuffer(std::size_t advance = 0);
+
+    /** Get data from the buffer and save them as digits in the DataStore.
+     * @param currentTag current TLU tag from ftsw.
+     */
+    virtual void saveDigits(tag_type currentTag);
+
   private:
+
 
     // Steering Variables
 
@@ -81,20 +108,26 @@ namespace Belle2 {
     std::string m_storeDigitsName;  /**< DataStore name of TelDigits */
     std::string m_storeRawFTSWsName;    /**< DataStore name of RawFTSWs */
 
-    // Internal Variables
+    unsigned short m_bufferSize;    /**< Size of the buffers */
 
-    unsigned long int m_telEventNo; /**< stores the number of processed Tel events. */
+    // Internal Variables
 
     eudaq::FileReader* m_reader; /**> EUDAQ data reader */
 
-    unsigned long int m_nDataEvents;
-    unsigned int m_nBOREvents;
-    unsigned int m_nEOREvents;
-    unsigned int m_nNoTrigEvents;
+    // Telescope event data cache
+    typedef std::tuple<unsigned short, short, short> short_digit_type;
+    BoundedSpaceMap<short_digit_type> m_buffer;
+    BoundedSpaceSet m_bufferVXD;
+
+    unsigned long int m_nVXDDataEvents; /**< Number of processed VXD data events */
+    unsigned long int m_nTelDataEvents; /**< Number of processed Tel data events */
+    unsigned long int m_nMapHits;       /**< Number of successful retrievals from buffer */
+    unsigned int m_nBOREvents;            /**< Number of BORE events */
+    unsigned int m_nEOREvents;            /**< Number of EORE events */
+    unsigned int m_nNoTrigEvents;         /**< Number of data events without trigger tag */
 
     // The current TLU ID (15 bits) from the FTSW:
-    int m_currentTLUTagFromFTSW; /**< TLU tag extracted from FTSW data in VXD DAQ */
-    int m_currentTLUTagFromEUDAQ; /**< TLU tag extracted from EUDAQ telescope event */
+    tag_type m_currentTLUTagFromFTSW; /**< TLU tag extracted from FTSW data in VXD DAQ */
 
     // conversion map between sensor numbers and their VxdIDs
     std::map< unsigned short, VxdID > m_sensorID;

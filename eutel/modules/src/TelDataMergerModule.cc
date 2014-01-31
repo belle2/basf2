@@ -2,6 +2,7 @@
 
 // include standard c++
 #include <memory>
+#include <algorithm>
 #include <set>
 
 // Load the eudaq part
@@ -38,8 +39,9 @@ namespace {
 }
 
 TelDataMergerModule::TelDataMergerModule() : Module(),
-  m_telEventNo(0), m_reader(NULL), m_nDataEvents(0), m_nBOREvents(0), m_nEOREvents(0),
-  m_nNoTrigEvents(0), m_currentTLUTagFromFTSW(0), m_currentTLUTagFromEUDAQ(0)
+  m_bufferSize(100), m_reader(NULL), m_buffer(m_bufferSize), m_bufferVXD(m_bufferSize),
+  m_nVXDDataEvents(0), m_nTelDataEvents(0), m_nMapHits(0),
+  m_nBOREvents(0), m_nEOREvents(0), m_nNoTrigEvents(0), m_currentTLUTagFromFTSW(0)
 {
 
   // Module Description
@@ -48,6 +50,7 @@ TelDataMergerModule::TelDataMergerModule() : Module(),
   //Parameter definition
   addParam("inputFileName", m_inputFileName, "Input file name. For multiple files, use inputFileNames instead. Can be overridden using the -i argument to basf2.", std::string(""));
   addParam("storeDigitsName", m_storeDigitsName, "DataStore name of TelDigits collection", std::string(""));
+  addParam("bufferSize", m_bufferSize, "Size of the telescope data buffer", m_bufferSize);
 }
 
 
@@ -84,90 +87,106 @@ bool TelDataMergerModule::processEOREvent(const eudaq::Event&)
   return true;
 }
 
-int TelDataMergerModule::getTelTriggerID(const eudaq::Event& ev)
+short int TelDataMergerModule::getTLUTagFromEUDAQ(const eudaq::Event& ev)
 {
-
+  int currentTLUTagFromEUDAQ = -1;
   if (const eudaq::DetectorEvent* detEv = dynamic_cast<const eudaq::DetectorEvent*>(& ev)) {
 
     bool bFoundTrigId = false;
-
     for (size_t i = 0; i < (*detEv).NumEvents(); ++i) {
       const eudaq::Event* subEv = (*detEv).GetEvent(i);
       // the first time we find a SubEvent which is of type EUDRB or NI,
       // we collect its Trigger ID and assume it is the trigger ID
-      // of the whole event
+      // of the whole event NOPE.
       if (std::string("EUDRB") == subEv->GetSubType() ||
           std::string("NI") == subEv->GetSubType()) {
-        m_currentTLUTagFromEUDAQ =
+        currentTLUTagFromEUDAQ =
           static_cast<int>((eudaq::PluginManager::GetTriggerID(* subEv) & IDMASK));
         bFoundTrigId = true;
         break;
       }
     }
 
-    for (size_t i = 0; i < (*detEv).NumEvents(); ++i) {
-      const eudaq::Event* subEv = (*detEv).GetEvent(i);
-      B2DEBUG(15, "  TrigID  " << (eudaq::PluginManager::GetTriggerID(* subEv) & IDMASK)
-              << "  (" << subEv->GetSubType() << ")");
-    }
-    return m_currentTLUTagFromEUDAQ;
-
     if (! bFoundTrigId) {
       ++m_nNoTrigEvents;
       B2WARNING("No event of \"EUDRB\" subtype found! \n Could not extract Trigger ID. \n Will skip this event.");
-      return -1;
     }
-
-  } else return -1;
-
+  }
+  return currentTLUTagFromEUDAQ;
 }
 
 bool TelDataMergerModule::processNormalEvent(const eudaq::Event& ev)
 {
-  // Setup Belle2 Datastore
-  StoreArray<TelDigit> storeTelDigits(m_storeDigitsName);
-  StoreObjPtr<TelEventInfo> storeTelEventInfo;
+  short int currentTLUTagFromEUDAQ = getTLUTagFromEUDAQ(ev);
+  if (currentTLUTagFromEUDAQ < 0) return false;
 
-  if (m_nBOREvents == 0) {
-    B2WARNING("No BORE found prior to data event!");
-  }
-
-  ++m_nDataEvents;
-
-  // This is just a cast, no conversion, so never mind that it is duplicated. Or?
   if (const eudaq::DetectorEvent* detEv = dynamic_cast<const eudaq::DetectorEvent*>(& ev)) {
 
     // it is really important to note here that we must manually set the trigger ID
     // after the conversion step has finished. This is due to the fact that a certain
     // TLU ID Mask was used, which in turn is not considered in the eudaq part.
     TBTelEvent tbEvt = eudaq::PluginManager::ConvertToTBTelEvent(* detEv);
-    tbEvt.setTriggerId(m_currentTLUTagFromEUDAQ);
+    tbEvt.setTriggerId(currentTLUTagFromEUDAQ);
 
     B2DEBUG(10, "TBEvent: Event: " << tbEvt.getEventNumber()
             << ", NumPlanes: " << tbEvt.getNumPlanes()
             << ", TrigID: " << tbEvt.getTriggerId());
 
-    for (size_t index = 0; index < tbEvt.getNumPlanes(); ++index) {
-      const std::shared_ptr<const std::vector<TelDigit> > digits = tbEvt.getDigits(index);
-      for (size_t iDigit = 0; iDigit < digits->size(); ++iDigit) {
-        const TelDigit& digit = digits->at(iDigit);
-        unsigned short planeNo = digit.getSensorID();
-        std::map<unsigned short, VxdID>::const_iterator it = m_sensorID.find(planeNo);
-        if (it == m_sensorID.end()) {
-          // There must be a serious reason for this.
-          B2ERROR("Incorrect plane number, unassociated with a VxdID " << planeNo);
-          continue;
-        } else {
-          storeTelDigits.appendNew(it->second, digit.getUCellID(), digit.getVCellID(), 1.0);
-        }
+    BoundedSpaceMap<short_digit_type>::collection_type digitTuples;
+    for (size_t plane = 0; plane < tbEvt.getNumPlanes(); ++plane) {
+      const std::shared_ptr<const std::vector<TelDigit> > digits = tbEvt.getDigits(plane);
+      if (digits->size() == 0) return false;
+      for (const TelDigit & digit : *digits) {
+        short_digit_type dtuple =
+          std::make_tuple(digit.getSensorID().getID(), digit.getUCellID(), digit.getVCellID());
+        digitTuples.push_back(dtuple);
       }
     }
-    storeTelEventInfo.assign(tbEvt.getTelEventInfo());
+    m_buffer.put(currentTLUTagFromEUDAQ, digitTuples);
+    ++m_nTelDataEvents;
+    // FIXME: Somehow also add this.
+    //storeTelEventInfo.assign(tbEvt.getTelEventInfo());
   } else {
     return false;
   }
   return true;
 }
+
+bool TelDataMergerModule::addTelEventToBuffer()
+{
+  const eudaq::Event& ev = m_reader->GetEvent();
+
+  bool result = false;
+  if (ev.IsBORE()) {
+    B2DEBUG(50, "Operating on BORE");
+    processBOREvent(ev);
+  } else if (ev.IsEORE()) {
+    B2DEBUG(50, "Operating on EORE");
+    processEOREvent(ev);
+  } else {
+    B2DEBUG(10, "Operating on normal event");
+    if (processNormalEvent(ev)) result = true;
+  }
+  return result;
+}
+
+std::size_t TelDataMergerModule::advanceBuffer(std::size_t advance)
+{
+  std::size_t advanceActual = std::max(advance, m_buffer.getFreeSize());
+  std::size_t acquired(0);
+
+  while (acquired < advanceActual) {
+    if (!m_reader->NextEvent()) {
+      B2INFO("No more usable telescope events to acquire.");
+      break;
+    } else if (addTelEventToBuffer()) {
+      acquired++;
+    }
+  }
+  B2INFO("Acquired " << acquired << " tel events out of " << advanceActual);
+  return acquired;
+}
+
 
 void TelDataMergerModule::initialize()
 {
@@ -203,6 +222,11 @@ void TelDataMergerModule::initialize()
       }
     }
   }
+
+  // Initialize buffer map
+  m_buffer.setMaxSize(m_bufferSize);
+  m_bufferVXD.setMaxSize(m_bufferSize);
+
   B2DEBUG(75, "TelDataMergerModule initialised!");
 }
 
@@ -212,6 +236,7 @@ void TelDataMergerModule::beginRun()
 
   // create data reader object
   m_reader = new eudaq::FileReader(m_inputFileName, "" , true);
+
 
   // if creation failed, fail with loud noise
   if (! m_reader) {
@@ -223,7 +248,9 @@ void TelDataMergerModule::beginRun()
   unsigned int runNo = m_reader->RunNumber();
   B2INFO("Operating on file \"" << m_reader->Filename() << "\", run Number is " << runNo);
 
-  m_nDataEvents = 0;
+  m_nVXDDataEvents = 0;
+  m_nTelDataEvents = 0;
+  m_nMapHits = 0;
   m_nBOREvents = 0;
   m_nEOREvents = 0;
   m_nNoTrigEvents = 0;
@@ -232,15 +259,35 @@ void TelDataMergerModule::beginRun()
   const eudaq::Event& ev = m_reader->GetEvent();
 
   // check whether the resulting event is a BORE
-  // if not, fail with loud noise
+  // if not, complain, but do not fail.
   if (! ev.IsBORE()) {
-    B2FATAL("First event of run was not BORE! Quitting.");
-    return;
+    B2ERROR("First event of run was not BORE!.");
   } else { // process BDRE
     processBOREvent(ev);
   }
 
   B2DEBUG(75, "Started eudaq::FileReader!");
+}
+
+void TelDataMergerModule::saveDigits(tag_type currentTag)
+{
+  StoreArray<TelDigit> storeDigits(m_storeDigitsName);
+
+  B2INFO("Found a match for event " << currentTag << ". Storing digits.")
+
+  auto digitTuples = m_buffer.get(currentTag);
+  for (auto dtuple : digitTuples) {
+    unsigned short planeNo = std::get<0>(dtuple);
+    auto it = m_sensorID.find(planeNo);
+    if (it == m_sensorID.end()) {
+      // There must be a serious reason for this.
+      B2ERROR("Incorrect plane number, unassociated with a VxdID " << planeNo);
+      continue;
+    } else {
+      storeDigits.appendNew(it->second, std::get<1>(dtuple), std::get<2>(dtuple), 1.0);
+    }
+  }
+  m_nMapHits++;
 }
 
 void TelDataMergerModule::event()
@@ -254,36 +301,36 @@ void TelDataMergerModule::event()
 
   m_currentTLUTagFromFTSW =
     static_cast<unsigned short>(storeFTSW[0]->Get15bitTLUTag(0));
-  timeval* currentTimeValFromFTSW(new timeval);
-  storeFTSW[0]->GetTTTimeVal(0, currentTimeValFromFTSW);
+  m_bufferVXD.put(m_currentTLUTagFromFTSW);
 
-  const eudaq::Event& ev = m_reader->GetEvent();
 
-  if (ev.IsBORE()) {
-    B2DEBUG(50, "Operating on BORE");
-    processBOREvent(ev);
-  } else if (ev.IsEORE()) {
-    B2DEBUG(50, "Operating on EORE");
-    processEOREvent(ev);
+  tag_type meanVXD = m_bufferVXD.getMedian();
+  tag_type meanEUDAQ = m_buffer.getMedian();
+  std::size_t advance = CIRC::distance(meanVXD, meanEUDAQ);
+  if (CIRC::compare(meanVXD, meanEUDAQ))
+    advance = 0;
+  advanceBuffer(advance);
+
+  B2INFO("Event: VXD TLU: " << m_currentTLUTagFromFTSW <<
+         " VXD mean:  " << meanVXD <<
+         " TEL mean: " << meanEUDAQ <<
+         " Advance:" << advance
+        );
+
+  if (m_buffer.hasKey(m_currentTLUTagFromFTSW)) {
+    // we have a hit, get the data and save digits.
+    saveDigits(m_currentTLUTagFromFTSW);
   } else {
-    B2DEBUG(10, "Operating on normal event");
-    if (getTelTriggerID(ev) >= 0) {
-      // Here goes the search....
-      // But now we only print out what's up and go on
-      B2INFO("TLU tags: FTSW: " << m_currentTLUTagFromFTSW
-             << " EUDAQ: " << m_currentTLUTagFromEUDAQ)
-      processNormalEvent(ev);
+    // synicng failed, report
+    B2INFO("No match for VXD event with FTSW TLU tag " << m_currentTLUTagFromFTSW);
+    if (!m_reader->NextEvent()) {
+      B2DEBUG(25, "No more events from EUDAQ Reader.");
+      stopPeacefully();
     }
   }
 
-  if (m_reader->NextEvent()) {
-    B2DEBUG(25, "EUDAQ Reader returned good event.");
-  } else {
-    B2DEBUG(25, "EUDAQ Reader returned bad event.");
-    stopPeacefully();
-  }
-
-  B2DEBUG(25, "Finished Event();");
+  m_nVXDDataEvents++;
+  B2DEBUG(25, "Finished VXD Event();");
   return;
 }
 
@@ -294,20 +341,21 @@ void TelDataMergerModule::endRun()
   // delete data reader object
   if (m_reader) { delete m_reader; m_reader = NULL; }
 
-  B2INFO("Processed " << m_nDataEvents << " data events!");
+  B2INFO("Processed " << m_nVXDDataEvents << " VXD data events!");
+  B2INFO("Matched " << m_nMapHits << "Tel Data events.")
   if (! m_nBOREvents) {
-    B2WARNING("No BORE found, possibly truncated file!");
+    B2INFO("No BORE found, possibly truncated file!");
   } else if (m_nBOREvents > 1) {
-    B2WARNING("Multiple BOREs found!");
+    B2INFO("Multiple BOREs found!");
   }
   if (! m_nEOREvents) {
-    B2WARNING("No EORE found, possibly truncated file!");
+    B2INFO("No EORE found, possibly truncated file!");
   } else if (m_nEOREvents > 1) {
-    B2WARNING("Multiple EOREs found!");
+    B2INFO("Multiple EOREs found!");
   }
 
   if (m_nNoTrigEvents) {
-    B2WARNING("Found " << m_nNoTrigEvents << " events without a valid trigger ID.");
+    B2INFO("Found " << m_nNoTrigEvents << " events without a valid trigger ID.");
   }
 
   B2DEBUG(75, "Finished run!");

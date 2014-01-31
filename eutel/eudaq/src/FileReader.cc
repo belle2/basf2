@@ -317,7 +317,10 @@ namespace eudaq {
             if (tid1 == triggerid) {
               EUDAQ_INFO("Discarded extra 'zero' in event " + to_string(eventnum));
               queue.discardevent(i);
-            } else if (tid1 == triggerid1) {
+            } else if (tid1 == triggerid1 || tid1 == 1) {
+              if (tid1 == 1 && tid != triggerid + 1)
+                EUDAQ_WARN("Performing wrap-around for event " + to_string(eventnum) +
+                           ", trigger id " + to_string(tid1) + ", expected " + to_string(triggerid1));
               EUDAQ_DEBUG("Detected 'zero' in event " + to_string(eventnum));
             } else if (tid1 == 0) {
               // Make sure there are at least three full events in the queue

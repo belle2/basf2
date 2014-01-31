@@ -34,15 +34,7 @@ namespace Belle2 {
     /** Constructor. needs the first parameter is outer hit, second is inner hit. Parameters in TVector3-format*/
     TwoHitFilters(TVector3& outerHit, TVector3& innerHit):
       m_hitA(outerHit),
-      m_hitB(innerHit),
-      m_dz(outerHit[2] - innerHit[2]) {
-      double dx = m_hitA[0] - m_hitB[0];
-      double dy = m_hitA[1] - m_hitB[1];
-
-      m_x2 = dx * dx;
-      m_y2 = dy * dy;
-      m_z2 = m_dz * m_dz;
-    }
+      m_hitB(innerHit) { initializeMe(outerHit, innerHit); }
 
 
     /** Destructor. */
@@ -52,14 +44,8 @@ namespace Belle2 {
     void resetValues(TVector3& outerHit, TVector3& innerHit) {
       m_hitA = outerHit;
       m_hitB = innerHit;
-      m_dz = m_hitA[2] - m_hitB[2];
 
-      double dx = m_hitA[0] - m_hitB[0];
-      double dy = m_hitA[1] - m_hitB[1];
-
-      m_x2 = dx * dx;
-      m_y2 = dy * dy;
-      m_z2 = m_dz * m_dz;
+      initializeMe(outerHit, innerHit);
     }
 
     /** calculates the distance between the hits (3D), returning unit: cm^2 for speed optimization */
@@ -73,7 +59,7 @@ namespace Belle2 {
 
     /** calculates the slope of the hits in RZ, return unit: cm (cm^2/cm = cm) */
     double calcSlopeRZ() {
-      double slope = (m_x2 + m_y2) / m_dz;
+      double slope = calcDistXY() / m_dz;
       return filterNan(slope);
     } // return unit: cm  (cm^2/cm = cm)
 
@@ -82,7 +68,7 @@ namespace Belle2 {
 
     /** calculates the normed distance between the hits (3D), return unit: none */
     double calcNormedDist3D() {
-      double normedVal = (m_x2 + m_y2) / (m_x2 + m_y2 + m_z2);
+      double normedVal = calcDistXY() / calcDist3D();
       return filterNan(normedVal);
     } // return unit: none
 
@@ -90,6 +76,17 @@ namespace Belle2 {
     double filterNan(double value);
 
   protected:
+
+    /** initializer function, sets values */
+    void initializeMe(TVector3& outerHit, TVector3& innerHit) {
+      m_x2 = outerHit[0] - innerHit[0]; // not x2 yet, reusing member
+      m_y2 = outerHit[1] - innerHit[1];
+      m_dz = outerHit[2] - innerHit[2];
+
+      m_x2 *= m_x2;
+      m_y2 *= m_y2;
+      m_z2 = m_dz * m_dz;
+    }
 
     TVector3 m_hitA; /**< outer hit (position relevant for useful filter calculation) used for the filter calculation */
     TVector3 m_hitB; /**< inner hit (position relevant for useful filter calculation) used for the filter calculation */

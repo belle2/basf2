@@ -25,7 +25,7 @@ void DQMPackageUpdater::run()
         LogFile::debug("Hist entries was found in %s", filename.c_str());
       }
       if (reader.isReady()) {
-        LogFile::debug("Updating %s", reader.getName().c_str());
+        //LogFile::debug("Updating %s", reader.getName().c_str());
         reader.update();
       }
     }

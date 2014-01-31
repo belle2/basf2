@@ -169,7 +169,7 @@ void HistSender::run()
 void HistSender::sendContents(DQMFileReader& reader, Writer& writer)
 throw(IOException)
 {
-  LogFile::debug("Sending package : %s", reader.getName().c_str());
+  //LogFile::debug("Sending package : %s", reader.getName().c_str());
   writer.writeString(reader.getName());
   writer.writeInt(reader.getHists().size());
   for (TH1Map::iterator it = reader.getHists().begin();

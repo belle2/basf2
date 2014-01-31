@@ -70,7 +70,7 @@ int DQMFileReader::update()
       updated = true;
     }
     delete h0;
-    if (_updateid % 10 == 0) {
+    if (_updateid % 1000 == 0) {
       LogFile::debug("Entries of %s = %d", name.c_str(), (int)h->GetEntries());
     }
   }

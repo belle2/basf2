@@ -379,6 +379,9 @@ namespace Belle2 {
       double zoffset = boxParams.getLength("beamcenter/z")  * mm  / Unit::mm - zBox / 2.;
       G4ThreeVector roffset(xoffset, yoffset, zoffset);
 
+      TVector3 sh(boxParams.getLength("beamcenter/x"), boxParams.getLength("beamcenter/y"), boxParams.getLength("beamcenter/z") - boxParams.getLength("zSize") / 2.);
+      m_arichbtgp->setOffset(sh);
+
       string boxMat = boxParams.getString("material");
       G4Material* boxMaterial = Materials::get(boxMat);
       G4Box* expBox = new G4Box("ExperimentalBox", xBox / 2., yBox / 2., zBox / 2.);
@@ -506,13 +509,13 @@ namespace Belle2 {
       GearDir moduleParam(hapdcontent, "Detector/Module");
       G4LogicalVolume* detModule = buildModule(moduleParam);
 
-      double detZpos = hapdcontent.getLength("Detector/Plane/zPosition") / Unit::mm;
-      double detThick = hapdcontent.getLength("Detector/Module/moduleZSize") / Unit::mm;
+      double detZpos = hapdcontent.getLength("Detector/Plane/zPosition") * mm / Unit::mm;
+      double detThick = hapdcontent.getLength("Detector/Module/moduleZSize") * mm / Unit::mm;
       int nModules = m_arichgp->getNMCopies();
 
       for (int i = 1; i <= nModules; i++) {
         G4ThreeVector origin = m_arichgp->getOriginG4(i);
-        origin.setZ(detZpos + detThick / 2. - zFrame / 2.);
+        origin.setZ(detZpos + detThick / 2.);
         double angle = m_arichgp->getModAngle(i);
         G4RotationMatrix Ra;
         Ra.rotateZ(angle);
@@ -569,7 +572,7 @@ namespace Belle2 {
         G4Material* tileMaterial = Materials::get(tileMat);
         if (!m_arichbtgp->getAverageAgel()) {
           m_arichgp->setAeroRefIndex(ilayer, m_agelrefind[ilayer]);
-          m_arichgp->setAerogelZPosition(ilayer, posZ * Unit::mm / mm);
+          m_arichgp->setAerogelZPosition(ilayer, (posZ - zFrame / 2.) * Unit::mm / mm);
           m_arichgp->setAerogelThickness(ilayer, sizeZ * Unit::mm / mm);
           m_arichgp->setAeroTransLength(ilayer, m_ageltrlen[ilayer]);
         }
@@ -577,7 +580,7 @@ namespace Belle2 {
         meantrlen  += sizeZ / m_ageltrlen[ilayer];
         meanrefind += m_agelrefind[ilayer];
         G4Box* tileBox = new G4Box("tileBox", sizeX / 2., sizeY / 2., sizeZ / 2.);
-        G4LogicalVolume* lTile = new G4LogicalVolume(tileBox, tileMaterial, "Tile", 0, m_sensitiveAero);
+        G4LogicalVolume* lTile = new G4LogicalVolume(tileBox, tileMaterial, "Tile", 0, ilayer == 0 ? m_sensitiveAero : 0);
         setColor(*lTile, "rgb(0.0, 1.0, 1.0,1.0)");
         G4Transform3D trans = G4Translate3D(posX, posY, posZ + sizeZ / 2.  - zFrame / 2.);
         new G4PVPlacement(trans, lTile, "ARICH.tile", lenvBox, false, ilayer + 1);
@@ -586,7 +589,7 @@ namespace Belle2 {
       if (m_arichbtgp->getAverageAgel() && m_agelthickness.size()) {
         B2INFO("Average aerogel will be used in the reconstruction ");
         m_arichgp->setAeroRefIndex(0, meanrefind / m_agelthickness.size());
-        m_arichgp->setAerogelZPosition(0, posZ0 * Unit::mm / mm);
+        m_arichgp->setAerogelZPosition(0, (posZ0 - zFrame)* Unit::mm / mm);
         m_arichgp->setAerogelThickness(0, posZ  * Unit::mm / mm);
         if (meantrlen > 0 && posZ > 0) meantrlen = 1 / meantrlen / posZ;
         m_arichgp->setAeroTransLength(0, meantrlen);

@@ -302,6 +302,11 @@ int arichBtestModule::readhapd(unsigned int len, unsigned int* data)
             pair<int, int> eposhapd(_arichbtgp->GetHapdElectronicMap(module * 144 + channelID));
             int channel = eposhapd.second;
 
+            if ((channel < 108 && channel > 71) || channel < 36) channel = 108 - (int(channel / 6) * 2 + 1) * 6 +
+                  channel;
+            else channel = 144 - (int((channel - 36) / 6) * 2 + 1) * 6 + channel - 36;
+            TVector2 loc = _arichgp->getChannelCenterLoc(channel);
+            if (abs(loc.X()) > 2.3 || abs(loc.Y()) > 2.3) continue;
 
             ARICHDigit* newHit = arichDigits.appendNew();
             newHit->setModuleID(module + 1);
@@ -440,6 +445,7 @@ int arichBtestModule::readdata(gzFile fp, int rec_id, int)
       TVector3 rrel  =  rc - rot * rc;
       r = rot * r + rrel;
       dir = rot * dir;
+      r.SetX(-r.X()); dir.SetX(-dir.X());
 
       //
       // end track rotation

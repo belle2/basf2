@@ -9,39 +9,40 @@
 <Detector>
       <xi:include href="ARICH-Hapd.xml"/>
       <Plane>
-      <zPosition unit="mm">200</zPosition>
+      <!--zPosition unit="mm">200</zPosition-->
+      <zPosition unit="mm">50</zPosition>
       <xPosition unit="mm">0</xPosition>
       <yPosition unit="mm">203</yPosition>
       <Modules>
         <Module>
-          <xPos unit="mm">97.7</xPos>
+          <xPos unit="mm">-97.7</xPos>
           <yPos unit="mm">48.89</yPos>
-          <angle unit="deg">3.75</angle>
-        </Module>
-        <Module>
-          <xPos unit="mm">97.7</xPos>
-          <yPos unit="mm">-42.89</yPos>
           <angle unit="deg">-3.75</angle>
         </Module>
+        <Module>
+          <xPos unit="mm">-97.7</xPos>
+          <yPos unit="mm">-42.89</yPos>
+          <angle unit="deg">3.75</angle>
+        </Module>
          <Module>
-          <xPos unit="mm">20.56</xPos>
+          <xPos unit="mm">-20.56</xPos>
           <yPos unit="mm">26.32</yPos>
-          <angle unit="deg">2.144</angle>
+          <angle unit="deg">-2.144</angle>
         </Module>
         <Module>
-          <xPos unit="mm">17.08</xPos>
+          <xPos unit="mm">-17.08</xPos>
           <yPos unit="mm">-66.8</yPos>
-          <angle unit="deg">-6.43</angle>
+          <angle unit="deg">6.43</angle>
         </Module>
         <Module>
-	  			<xPos unit="mm">-57.2</xPos>
+	  			<xPos unit="mm">57.2</xPos>
 	  			<yPos unit="mm">3.0</yPos>
 	  			<angle unit="deg">0.0</angle> 
 				</Module>	     
 				<Module>
-	  			<xPos unit="mm">-65.48</xPos>
+	  			<xPos unit="mm">65.48</xPos>
 	  			<yPos unit="mm">-91.69</yPos>
-	  			<angle unit="deg">-10.0</angle> 
+	  			<angle unit="deg">10.0</angle> 
 				</Module>              
       </Modules>
 	</Plane>
@@ -55,39 +56,39 @@
 <Detector>
       <xi:include href="ARICH-Hapd.xml"/>
       <Plane>
-      <zPosition unit="mm">200</zPosition>
+      <zPosition unit="mm">50</zPosition>
       <xPosition unit="mm">0</xPosition>
       <yPosition unit="mm">203</yPosition>
       <Modules>
         <Module>
-          <xPos unit="mm">97.7</xPos>
+          <xPos unit="mm">-97.7</xPos>
           <yPos unit="mm">48.89</yPos>
-          <angle unit="deg">3.75</angle>
-        </Module>
-        <Module>
-          <xPos unit="mm">97.7</xPos>
-          <yPos unit="mm">-42.89</yPos>
           <angle unit="deg">-3.75</angle>
         </Module>
+        <Module>
+          <xPos unit="mm">-97.7</xPos>
+          <yPos unit="mm">-42.89</yPos>
+          <angle unit="deg">3.75</angle>
+        </Module>
          <Module>
-          <xPos unit="mm">20.56</xPos>
+          <xPos unit="mm">-20.56</xPos>
           <yPos unit="mm">26.32</yPos>
-          <angle unit="deg">2.144</angle>
+          <angle unit="deg">-2.144</angle>
         </Module>
         <Module>
-          <xPos unit="mm">17.08</xPos>
+          <xPos unit="mm">-17.08</xPos>
           <yPos unit="mm">-66.8</yPos>
-          <angle unit="deg">-6.43</angle>
+          <angle unit="deg">6.43</angle>
         </Module>
         <Module>
-	  			<xPos unit="mm">-57.2</xPos>
+	  			<xPos unit="mm">57.2</xPos>
 	  			<yPos unit="mm">3.0</yPos>
 	  			<angle unit="deg">0.0</angle> 
 				</Module>	     
 				<Module>
-	  			<xPos unit="mm">-65.48</xPos>
+	  			<xPos unit="mm">65.48</xPos>
 	  			<yPos unit="mm">-91.69</yPos>
-	  			<angle unit="deg">-10.0</angle> 
+	  			<angle unit="deg">10.0</angle> 
 				</Module>              
       </Modules>
 	</Plane>
@@ -101,39 +102,39 @@
 <Detector>
       <xi:include href="ARICH-Hapd.xml"/>
       <Plane>
-      <zPosition unit="mm">200</zPosition>
+      <zPosition unit="mm">50</zPosition>
       <xPosition unit="mm">0</xPosition>
       <yPosition unit="mm">203</yPosition>
       <Modules>
         <Module>
-          <xPos unit="mm">97.7</xPos>
+          <xPos unit="mm">-97.7</xPos>
           <yPos unit="mm">48.89</yPos>
-          <angle unit="deg">3.75</angle>
-        </Module>
-        <Module>
-          <xPos unit="mm">97.7</xPos>
-          <yPos unit="mm">-42.89</yPos>
           <angle unit="deg">-3.75</angle>
         </Module>
+        <Module>
+          <xPos unit="mm">-97.7</xPos>
+          <yPos unit="mm">-42.89</yPos>
+          <angle unit="deg">3.75</angle>
+        </Module>
          <Module>
-          <xPos unit="mm">20.56</xPos>
+          <xPos unit="mm">-20.56</xPos>
           <yPos unit="mm">26.32</yPos>
-          <angle unit="deg">2.144</angle>
+          <angle unit="deg">-2.144</angle>
         </Module>
         <Module>
-          <xPos unit="mm">17.08</xPos>
+          <xPos unit="mm">-17.08</xPos>
           <yPos unit="mm">-66.8</yPos>
-          <angle unit="deg">-6.43</angle>
+          <angle unit="deg">6.43</angle>
         </Module>
         <Module>
-	  			<xPos unit="mm">-57.2</xPos>
+	  			<xPos unit="mm">57.2</xPos>
 	  			<yPos unit="mm">3.0</yPos>
 	  			<angle unit="deg">0.0</angle> 
 				</Module>	     
 				<Module>
-	  			<xPos unit="mm">-65.48</xPos>
+	  			<xPos unit="mm">65.48</xPos>
 	  			<yPos unit="mm">-91.69</yPos>
-	  			<angle unit="deg">-10.0</angle> 
+	  			<angle unit="deg">10.0</angle> 
 				</Module>              
       </Modules>
 	</Plane>
@@ -147,39 +148,39 @@
 <Detector>
       <xi:include href="ARICH-Hapd.xml"/>
       <Plane>
-      <zPosition unit="mm">200</zPosition>
+      <zPosition unit="mm">50</zPosition>
       <xPosition unit="mm">0</xPosition>
       <yPosition unit="mm">203</yPosition>
       <Modules>
         <Module>
-          <xPos unit="mm">97.7</xPos>
+          <xPos unit="mm">-97.7</xPos>
           <yPos unit="mm">48.89</yPos>
-          <angle unit="deg">3.75</angle>
-        </Module>
-        <Module>
-          <xPos unit="mm">97.7</xPos>
-          <yPos unit="mm">-42.89</yPos>
           <angle unit="deg">-3.75</angle>
         </Module>
+        <Module>
+          <xPos unit="mm">-97.7</xPos>
+          <yPos unit="mm">-42.89</yPos>
+          <angle unit="deg">3.75</angle>
+        </Module>
          <Module>
-          <xPos unit="mm">20.56</xPos>
+          <xPos unit="mm">-20.56</xPos>
           <yPos unit="mm">26.32</yPos>
-          <angle unit="deg">2.144</angle>
+          <angle unit="deg">-2.144</angle>
         </Module>
         <Module>
-          <xPos unit="mm">17.08</xPos>
+          <xPos unit="mm">-17.08</xPos>
           <yPos unit="mm">-66.8</yPos>
-          <angle unit="deg">-6.43</angle>
+          <angle unit="deg">6.43</angle>
         </Module>
         <Module>
-	  			<xPos unit="mm">-57.2</xPos>
+	  			<xPos unit="mm">57.2</xPos>
 	  			<yPos unit="mm">3.0</yPos>
 	  			<angle unit="deg">0.0</angle> 
 				</Module>	     
 				<Module>
-	  			<xPos unit="mm">-65.48</xPos>
+	  			<xPos unit="mm">65.48</xPos>
 	  			<yPos unit="mm">-91.69</yPos>
-	  			<angle unit="deg">-10.0</angle> 
+	  			<angle unit="deg">10.0</angle> 
 				</Module>              
       </Modules>
 	</Plane>
@@ -193,39 +194,39 @@
 <Detector>
       <xi:include href="ARICH-Hapd.xml"/>
       <Plane>
-      <zPosition unit="mm">200</zPosition>
+      <zPosition unit="mm">50</zPosition>
       <xPosition unit="mm">0</xPosition>
       <yPosition unit="mm">203</yPosition>
       <Modules>
         <Module>
-          <xPos unit="mm">97.7</xPos>
+          <xPos unit="mm">-97.7</xPos>
           <yPos unit="mm">48.89</yPos>
-          <angle unit="deg">3.75</angle>
-        </Module>
-        <Module>
-          <xPos unit="mm">97.7</xPos>
-          <yPos unit="mm">-42.89</yPos>
           <angle unit="deg">-3.75</angle>
         </Module>
+        <Module>
+          <xPos unit="mm">-97.7</xPos>
+          <yPos unit="mm">-42.89</yPos>
+          <angle unit="deg">3.75</angle>
+        </Module>
          <Module>
-          <xPos unit="mm">20.56</xPos>
+          <xPos unit="mm">-20.56</xPos>
           <yPos unit="mm">26.32</yPos>
-          <angle unit="deg">2.144</angle>
+          <angle unit="deg">-2.144</angle>
         </Module>
         <Module>
-          <xPos unit="mm">17.08</xPos>
+          <xPos unit="mm">-17.08</xPos>
           <yPos unit="mm">-66.8</yPos>
-          <angle unit="deg">-6.43</angle>
+          <angle unit="deg">6.43</angle>
         </Module>
         <Module>
-	  			<xPos unit="mm">-57.2</xPos>
+	  			<xPos unit="mm">57.2</xPos>
 	  			<yPos unit="mm">3.0</yPos>
 	  			<angle unit="deg">0.0</angle> 
 				</Module>	     
 				<Module>
-	  			<xPos unit="mm">-65.48</xPos>
+	  			<xPos unit="mm">65.48</xPos>
 	  			<yPos unit="mm">-91.69</yPos>
-	  			<angle unit="deg">-10.0</angle> 
+	  			<angle unit="deg">10.0</angle> 
 				</Module>              
       </Modules>
 	</Plane>
@@ -239,39 +240,39 @@
 <Detector>
       <xi:include href="ARICH-Hapd.xml"/>
       <Plane>
-      <zPosition unit="mm">200</zPosition>
+      <zPosition unit="mm">50</zPosition>
       <xPosition unit="mm">0</xPosition>
       <yPosition unit="mm">203</yPosition>
       <Modules>
         <Module>
-          <xPos unit="mm">97.7</xPos>
+          <xPos unit="mm">-97.7</xPos>
           <yPos unit="mm">48.89</yPos>
-          <angle unit="deg">3.75</angle>
-        </Module>
-        <Module>
-          <xPos unit="mm">97.7</xPos>
-          <yPos unit="mm">-42.89</yPos>
           <angle unit="deg">-3.75</angle>
         </Module>
+        <Module>
+          <xPos unit="mm">-97.7</xPos>
+          <yPos unit="mm">-42.89</yPos>
+          <angle unit="deg">3.75</angle>
+        </Module>
          <Module>
-          <xPos unit="mm">20.56</xPos>
+          <xPos unit="mm">-20.56</xPos>
           <yPos unit="mm">26.32</yPos>
-          <angle unit="deg">2.144</angle>
+          <angle unit="deg">-2.144</angle>
         </Module>
         <Module>
-          <xPos unit="mm">17.08</xPos>
+          <xPos unit="mm">-17.08</xPos>
           <yPos unit="mm">-66.8</yPos>
-          <angle unit="deg">-6.43</angle>
+          <angle unit="deg">6.43</angle>
         </Module>
         <Module>
-	  			<xPos unit="mm">-57.2</xPos>
+	  			<xPos unit="mm">57.2</xPos>
 	  			<yPos unit="mm">3.0</yPos>
 	  			<angle unit="deg">0.0</angle> 
 				</Module>	     
 				<Module>
-	  			<xPos unit="mm">-65.48</xPos>
+	  			<xPos unit="mm">65.48</xPos>
 	  			<yPos unit="mm">-91.69</yPos>
-	  			<angle unit="deg">-10.0</angle> 
+	  			<angle unit="deg">10.0</angle> 
 				</Module>              
       </Modules>
 	</Plane>
@@ -285,39 +286,39 @@
 <Detector>
       <xi:include href="ARICH-Hapd.xml"/>
       <Plane>
-      <zPosition unit="mm">200</zPosition>
+      <zPosition unit="mm">50</zPosition>
       <xPosition unit="mm">0</xPosition>
       <yPosition unit="mm">203</yPosition>
       <Modules>
         <Module>
-          <xPos unit="mm">97.7</xPos>
+          <xPos unit="mm">-97.7</xPos>
           <yPos unit="mm">48.89</yPos>
-          <angle unit="deg">3.75</angle>
-        </Module>
-        <Module>
-          <xPos unit="mm">97.7</xPos>
-          <yPos unit="mm">-42.89</yPos>
           <angle unit="deg">-3.75</angle>
         </Module>
+        <Module>
+          <xPos unit="mm">-97.7</xPos>
+          <yPos unit="mm">-42.89</yPos>
+          <angle unit="deg">3.75</angle>
+        </Module>
          <Module>
-          <xPos unit="mm">20.56</xPos>
+          <xPos unit="mm">-20.56</xPos>
           <yPos unit="mm">26.32</yPos>
-          <angle unit="deg">2.144</angle>
+          <angle unit="deg">-2.144</angle>
         </Module>
         <Module>
-          <xPos unit="mm">17.08</xPos>
+          <xPos unit="mm">-17.08</xPos>
           <yPos unit="mm">-66.8</yPos>
-          <angle unit="deg">-6.43</angle>
+          <angle unit="deg">6.43</angle>
         </Module>
         <Module>
-	  			<xPos unit="mm">-57.2</xPos>
+	  			<xPos unit="mm">57.2</xPos>
 	  			<yPos unit="mm">3.0</yPos>
 	  			<angle unit="deg">0.0</angle> 
 				</Module>	     
 				<Module>
-	  			<xPos unit="mm">-65.48</xPos>
+	  			<xPos unit="mm">65.48</xPos>
 	  			<yPos unit="mm">-91.69</yPos>
-	  			<angle unit="deg">-10.0</angle> 
+	  			<angle unit="deg">10.0</angle> 
 				</Module>              
       </Modules>
 	</Plane>
@@ -331,39 +332,39 @@
 <Detector>
       <xi:include href="ARICH-Hapd.xml"/>
       <Plane>
-      <zPosition unit="mm">200</zPosition>
+      <zPosition unit="mm">50</zPosition>
       <xPosition unit="mm">0</xPosition>
       <yPosition unit="mm">203</yPosition>
       <Modules>
         <Module>
-          <xPos unit="mm">97.7</xPos>
+          <xPos unit="mm">-97.7</xPos>
           <yPos unit="mm">48.89</yPos>
-          <angle unit="deg">3.75</angle>
-        </Module>
-        <Module>
-          <xPos unit="mm">97.7</xPos>
-          <yPos unit="mm">-42.89</yPos>
           <angle unit="deg">-3.75</angle>
         </Module>
+        <Module>
+          <xPos unit="mm">-97.7</xPos>
+          <yPos unit="mm">-42.89</yPos>
+          <angle unit="deg">3.75</angle>
+        </Module>
          <Module>
-          <xPos unit="mm">20.56</xPos>
+          <xPos unit="mm">-20.56</xPos>
           <yPos unit="mm">26.32</yPos>
-          <angle unit="deg">2.144</angle>
+          <angle unit="deg">-2.144</angle>
         </Module>
         <Module>
-          <xPos unit="mm">17.08</xPos>
+          <xPos unit="mm">-17.08</xPos>
           <yPos unit="mm">-66.8</yPos>
-          <angle unit="deg">-6.43</angle>
+          <angle unit="deg">6.43</angle>
         </Module>
         <Module>
-	  			<xPos unit="mm">-57.2</xPos>
+	  			<xPos unit="mm">57.2</xPos>
 	  			<yPos unit="mm">3.0</yPos>
 	  			<angle unit="deg">0.0</angle> 
 				</Module>	     
 				<Module>
-	  			<xPos unit="mm">-65.48</xPos>
+	  			<xPos unit="mm">65.48</xPos>
 	  			<yPos unit="mm">-91.69</yPos>
-	  			<angle unit="deg">-10.0</angle> 
+	  			<angle unit="deg">10.0</angle> 
 				</Module>              
       </Modules>
 	</Plane>
@@ -377,39 +378,39 @@
 <Detector>
       <xi:include href="ARICH-Hapd.xml"/>
       <Plane>
-      <zPosition unit="mm">200</zPosition>
+      <zPosition unit="mm">50</zPosition>
       <xPosition unit="mm">0</xPosition>
       <yPosition unit="mm">203</yPosition>
       <Modules>
         <Module>
-          <xPos unit="mm">97.7</xPos>
+          <xPos unit="mm">-97.7</xPos>
           <yPos unit="mm">48.89</yPos>
-          <angle unit="deg">3.75</angle>
-        </Module>
-        <Module>
-          <xPos unit="mm">97.7</xPos>
-          <yPos unit="mm">-42.89</yPos>
           <angle unit="deg">-3.75</angle>
         </Module>
+        <Module>
+          <xPos unit="mm">-97.7</xPos>
+          <yPos unit="mm">-42.89</yPos>
+          <angle unit="deg">3.75</angle>
+        </Module>
          <Module>
-          <xPos unit="mm">20.56</xPos>
+          <xPos unit="mm">-20.56</xPos>
           <yPos unit="mm">26.32</yPos>
-          <angle unit="deg">2.144</angle>
+          <angle unit="deg">-2.144</angle>
         </Module>
         <Module>
-          <xPos unit="mm">17.08</xPos>
+          <xPos unit="mm">-17.08</xPos>
           <yPos unit="mm">-66.8</yPos>
-          <angle unit="deg">-6.43</angle>
+          <angle unit="deg">6.43</angle>
         </Module>
         <Module>
-	  			<xPos unit="mm">-57.2</xPos>
+	  			<xPos unit="mm">57.2</xPos>
 	  			<yPos unit="mm">3.0</yPos>
 	  			<angle unit="deg">0.0</angle> 
 				</Module>	     
 				<Module>
-	  			<xPos unit="mm">-65.48</xPos>
+	  			<xPos unit="mm">65.48</xPos>
 	  			<yPos unit="mm">-91.69</yPos>
-	  			<angle unit="deg">-10.0</angle> 
+	  			<angle unit="deg">10.0</angle> 
 				</Module>              
       </Modules>
 	</Plane>

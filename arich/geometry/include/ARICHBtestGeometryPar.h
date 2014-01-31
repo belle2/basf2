@@ -156,10 +156,17 @@ namespace Belle2 {
       int AddHapdChannelPositionPair(double , double);
       //! Set the mapping of the electronic channel to the HAPD module nr and the channel number
       int AddHapdElectronicMapPair(int, int);
+      //! Set of the setup global offset
+      void setOffset(TVector3&);
+      //! Get the setup global offset
+      TVector3 getOffset();
+
 
     private:
       //! Pointer to the tracking chambers
       ARICHTracking* m_mwpc;
+      //! Global offset
+      TVector3       m_offset;
       //! Tracking shift
       TVector3       m_trackingShift;
       //! rotation center of the Aerogel RICH frame

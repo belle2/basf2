@@ -11,6 +11,7 @@
 #include "arich/modules/arichReconstruction/ARICHReconstruction.h"
 #include "arich/modules/arichReconstruction/Utility.h"
 #include "arich/geometry/ARICHGeometryPar.h"
+#include "arich/geometry/ARICHBtestGeometryPar.h"
 #include "arich/dataobjects/ARICHDigit.h"
 #include <arich/modules/arichReconstruction/ARICHTrack.h>
 
@@ -70,6 +71,15 @@ namespace Belle2 {
 
     int ARICHReconstruction::smearTracks(std::vector<ARICHTrack>& arichTracks)
     {
+      TRotation rot;  TVector3  rc; TVector3 rrel; TVector3 offset;
+      if (m_beamtest % 2 == 0 && m_beamtest != 0) {
+        static arich::ARICHBtestGeometryPar* _arichbtgp = arich::ARICHBtestGeometryPar::Instance();
+        rot  =  _arichbtgp->getFrameRotation();
+        rc   =  _arichbtgp->getRotationCenter();
+        offset = _arichbtgp->getOffset();
+        rrel  =  rc - rot * rc;
+      }
+
       unsigned int nTracks = arichTracks.size();
 
       for (unsigned  int i = 0; i < nTracks; i++) {
@@ -86,6 +96,10 @@ namespace Belle2 {
         TVector3 odir  = track->getOriginalDirection();
         double omomentum  = track->getOriginalMomentum();
         TVector3 rdir = TransformFromFixed(odir) * dirf;  // global system
+        if (m_beamtest % 2 == 0 && m_beamtest != 0) {
+          rdir = rot * rdir;
+          rpoint = rot * rpoint + rrel - (rc + offset);
+        }
         double rmomentum = omomentum;
         track->setReconstructedValues(rpoint, rdir, rmomentum);
       }
@@ -451,7 +465,7 @@ namespace Belle2 {
               if (th_cer > 0.5 || th_cer < 0.05) continue;
 
               if (m_beamtest) m_hitstuple->Fill(ncount, iAerogel, mirr, th_cer, fi_cer, hitpos.x(), hitpos.y(), hitpos.z(), epoint.x(), epoint.y(), epoint.z() , edir.x(), edir.y());
-              if (m_beamtest > 2) continue;
+              if (m_beamtest < 3 && m_beamtest) continue;
               if (fabs(th_cer - thetaCh[track->getIdentity()][0]) < 0.042 && iAerogel == 0 && nfoo == nDetPhotons && th_cer > 0.07) nDetPhotons++;
               if (fi_cer < 0) fi_cer += 2 * M_PI;
               double fii = fi_cer;

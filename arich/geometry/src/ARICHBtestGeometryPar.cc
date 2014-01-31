@@ -145,9 +145,20 @@ namespace Belle2 {
       m_trackingShift = TVector3();
       m_frameRotation   = TRotation();
       m_rotationCenter  = TVector3();
+    }
 
+    void ARICHBtestGeometryPar::setOffset(TVector3& v)
+    {
+      m_offset = v;
+      B2INFO("ARICHBtestGeometryPar::setOffset=" << m_offset.x() << ","  << m_offset.y() << ","  <<  m_offset.z());
 
     }
+
+    TVector3 ARICHBtestGeometryPar::getOffset()
+    {
+      return m_offset;
+    }
+
 
     void ARICHBtestGeometryPar::Print(void) const
     {

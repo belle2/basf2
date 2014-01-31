@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <setup  desc="Parameters of beamtest setup" xmlns:xi="http://www.w3.org/2001/XInclude">
 
-
 <ExperimentalBox>
       <xSize desc="xsize" unit="mm">1000</xSize>
       <ySize desc="ysize" unit="mm">500</ySize>
       <zSize desc="zsize" unit="mm">2000</zSize>
       <material desc="aRICH envelope material: should be air with specified refractive index">ARICH_Vacuum</material>
-      <beamcenter desc="Position of the beam center on the hapd experimental box = reference point " ><x  unit="mm">0</x><y  unit="mm">198</y><z  unit="mm">100</z></beamcenter>
+      <beamcenter desc="Position of the beam center on the hapd experimental box = reference point " ><x  unit="mm">0</x><y  unit="mm">198</y><z  unit="mm">200</z></beamcenter>
 </ExperimentalBox>
 
 <Frame>
@@ -15,7 +14,7 @@
       <ySize desc="Ending z position of aRICH envelope" unit="mm">300</ySize>
       <zSize desc="Ending z position of aRICH envelope" unit="mm">300</zSize>
       <material desc="aRICH envelope material: should be air with specified refractive index">ARICH_Vacuum</material>
-      <position desc="position of the rotation point"><x  unit="mm">53</x><y  unit="mm"   desc="-180+203">23</y><z  unit="mm">210</z></position>
+      <position desc="position of the rotation point"><x  unit="mm">-53</x><y  unit="mm"   desc="-180+203">23</y><z  unit="mm">210</z></position>
 </Frame>
   
 <aerogel>
@@ -76,11 +75,11 @@
 		<setup>3</setup>
 	</row>
 	<row id="3a"> <comment>Aerogel moved</comment>
-		<aerogeldx unit="mm">4.0</aerogeldx> 
+		<aerogeldx unit="mm">-4.0</aerogeldx> 
 		<setup>3</setup>
 	</row>
 	<row id="3b"> <comment>Aerogel moved</comment>
-		<aerogeldx unit="mm">6.0</aerogeldx> 
+		<aerogeldx unit="mm">-6.0</aerogeldx> 
 		<aerogeldy unit="mm">2.0</aerogeldy> 
 		<setup>3</setup> 
 	</row>
@@ -90,7 +89,7 @@
 		<setup>3</setup> 
 	</row>
 	<row id="3d"> <comment>Aerogel moved</comment>
-		<aerogeldx unit="mm">4.5</aerogeldx> 
+		<aerogeldx unit="mm">-4.5</aerogeldx> 
 		<aerogeldy unit="mm">0.0</aerogeldy> 
 		<setup>3</setup> 
 	</row>
@@ -122,54 +121,54 @@
 	<row id="9"> <comment>Mirror study, positions: as initial</comment>
 		<aerogeldx unit="mm">0</aerogeldx> 
 		<aerogeldy unit="mm">0</aerogeldy>
-		<rotation unit="degree">30</rotation> 		
+		<rotation unit="degree">-30</rotation> 		
 		<setup>9</setup> 
 	</row>
 	<row id="9a"> <comment>Mirror study, positions: as initial</comment>
-		<aerogeldx unit="mm">-20</aerogeldx> 
+		<aerogeldx unit="mm">20</aerogeldx> 
 		<aerogeldy unit="mm">0</aerogeldy>
 		<setup>9</setup>
-		<framedx unit="mm">20</framedx>
-		<rotation unit="degree">30</rotation>
+		<framedx unit="mm">-20</framedx>
+		<rotation unit="degree">-30</rotation>
 	</row>
 	<row id="9b"> <comment>Mirror study, positions: as initial</comment>
-		<aerogeldx unit="mm">-40</aerogeldx> 
+		<aerogeldx unit="mm">40</aerogeldx> 
 		<aerogeldy unit="mm">0</aerogeldy>
 		<setup>9</setup>
-		<framedx>40</framedx>
-		<rotation unit="degree">30</rotation>
+		<framedx>-40</framedx>
+		<rotation unit="degree">-30</rotation>
 		</row>
 	<row id="9c"> <comment>Mirror study, positions: as initial</comment>
-		<aerogeldx unit="mm">-58</aerogeldx> 
+		<aerogeldx unit="mm">58</aerogeldx> 
 		<aerogeldy unit="mm">0</aerogeldy>
 		<framedx>58</framedx>
-		<rotation unit="degree">30</rotation> 		
+		<rotation unit="degree">-30</rotation> 		
 		<setup>9</setup> 
 		</row>
 	<row id="9d"> <comment>Mirror study, positions: as initial</comment>
-		<aerogeldx unit="mm">-60</aerogeldx> 
+		<aerogeldx unit="mm">60</aerogeldx> 
 		<aerogeldy unit="mm">0</aerogeldy>
-		<framedx>60</framedx>
-		<rotation unit="degree">30</rotation>
+		<framedx>-60</framedx>
+		<rotation unit="degree">-30</rotation>
 		<setup>9</setup> 
 		</row>
 	<row id="9e"> <comment>Mirror study, positions: as initial</comment>
-		<aerogeldx unit="mm">-78</aerogeldx> 
+		<aerogeldx unit="mm">78</aerogeldx> 
 		<aerogeldy unit="mm">0</aerogeldy> 		
-		<framedx>78</framedx>
-		<rotation unit="degree">30</rotation>
+		<framedx>-78</framedx>
+		<rotation unit="degree">-30</rotation>
 		<setup>9</setup> </row>
 	<row id="9f"> <comment>Mirror study, positions: as initial</comment>
-		<aerogeldx unit="mm">-100</aerogeldx> 
+		<aerogeldx unit="mm">100</aerogeldx> 
 		<aerogeldy unit="mm">0</aerogeldy> 		
-		<framedx>100</framedx>
-		<rotation unit="degree">30</rotation>
+		<framedx>-100</framedx>
+		<rotation unit="degree">-30</rotation>
 		<setup>9</setup> </row>
 	<row id="9g"> <comment>Mirror study, positions: as initial</comment>
-		<aerogeldx unit="mm">-120</aerogeldx> 
+		<aerogeldx unit="mm">120</aerogeldx> 
 		<aerogeldy unit="mm">0</aerogeldy> 		
-		<framedx>120</framedx>
-		<rotation unit="degree">30</rotation>
+		<framedx>-120</framedx>
+		<rotation unit="degree">-30</rotation>
 		<setup>9</setup> </row>
 </hapd>
 
@@ -182,9 +181,9 @@
 <Aerogel desc="Parameter of aRICH aerogel layers">
       <tileXSize desc="Size of wedge aerogel tile (maximal size in r direction)" unit="mm">100</tileXSize>  
       <tileYSize desc="Size of wedge aerogel tile (maximal size in phi direction)" unit="mm">100</tileYSize>        
-      <tileXPos unit="mm">-53.0</tileXPos>
+      <tileXPos unit="mm">53.0</tileXPos>
       <tileYPos unit="mm">0.0</tileYPos>
-      <tileZPos desc="Z position of aerogel plane(beginning)" unit="mm">00</tileZPos>
+      <tileZPos desc="Z position of aerogel plane(beginning)" unit="mm">0.0</tileZPos>
     </Aerogel>
     
 

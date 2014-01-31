@@ -17,6 +17,7 @@
 #include <arich/modules/arichReconstruction/ARICHReconstruction.h>
 
 #include <string>
+#include <TFile.h>
 
 namespace Belle2 {
   namespace arich {
@@ -89,6 +90,7 @@ namespace Belle2 {
 
       // Output collection
       std::string m_outColName;        /**< Output likelihoods */
+      std::string m_outfileName;       /**< Mame of beamtest analysis output file */
 
       // Other members.
       ARICHReconstruction* m_ana;      /**< Class with reconstruction tools */
@@ -101,8 +103,8 @@ namespace Belle2 {
       double m_singleResolution;       /**< Resolution of single photon emission angle. */
       std::vector<double> m_aerogelMerit; /**< Vector of aerogel layer figures of merit. */
       int m_inputTrackType;            /**< Input tracks from the tracking (0) or from MCParticles>AeroHits (1). */
-      int    m_beamtest;                  /**< If >=1 ARICH beamtest, default 0 (off) */
-
+      int    m_beamtest;               /**< If >=1 ARICH beamtest, default 0 (off) */
+      TFile* m_file;                   /**< Beamtest analysis output file */
       //! Function fills the internal vector ARICHTracks from ext module
       /*!
         \param tracks Internal ARICH vector reference.

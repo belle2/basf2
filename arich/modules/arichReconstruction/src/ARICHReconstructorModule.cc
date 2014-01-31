@@ -72,6 +72,7 @@ namespace Belle2 {
       addParam("tracksColName", m_tracksColName, "Tracks collection name", string(""));
       addParam("extHitsColName", m_extHitsColName, "ExtHits collection name", string(""));
       addParam("outColName", m_outColName, "ARICHLikelihoods collection name",  string(""));
+      addParam("outfileName", m_outfileName, "File to store single photon information",  string("beamtest.root"));
       addParam("trackPositionResolution", m_trackPositionResolution, "Resolution of track position on aerogel plane", 1.0 * Unit::mm);
       addParam("trackAngleResolution", m_trackAngleResolution, "Resolution of track direction angle on aerogel plane", 1.0 * Unit::mrad);
       addParam("backgroundLevel", m_backgroundLevel, "Background level in photon hits per m^2", 50.0);
@@ -88,6 +89,7 @@ namespace Belle2 {
     void ARICHReconstructorModule::initialize()
     {
       // Initialize variables
+      if (m_beamtest) m_file = new TFile(m_outfileName.c_str(), "RECREATE");
       m_nRun    = 0 ;
       m_nEvent  = 0 ;
       m_ana = new ARICHReconstruction(m_beamtest);
@@ -220,6 +222,10 @@ namespace Belle2 {
     void ARICHReconstructorModule::endRun()
     {
       m_nRun++;
+      if (m_beamtest) {
+        m_file->Write();
+        m_file->Close();
+      }
     }
 
     void ARICHReconstructorModule::terminate()

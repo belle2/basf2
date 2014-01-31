@@ -72,7 +72,7 @@ namespace Belle2 {
       ARICHGeometryPar* m_arichGeoParameters; /**< holding the parameters of detector */
       TNtuple* m_hitstuple;  /**< beamtest/debug output hit-track pairs */
       TNtuple* m_tracktuple; /**< beamtest/debug output tracks */
-      double m_beamtest; /**< in the case of beamtest analysis >=1, default 0 */
+      int m_beamtest; /**< in the case of beamtest analysis >=1, default 0 */
       double m_bkgLevel; /**< detector photon background level */
       double m_trackPosRes; /**< track position resolution (from tracking) */
       double m_trackAngRes; /**< track direction resolution (from tracking) */

@@ -42,6 +42,9 @@ namespace Belle2 {
     /** Initializes the module. */
     virtual void initialize();
 
+    /** Method is called for each run. */
+    virtual void beginRun();
+
     /** Method is called for each event. */
     virtual void event();
 

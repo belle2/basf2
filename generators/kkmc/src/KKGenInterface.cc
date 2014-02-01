@@ -39,23 +39,10 @@ KKGenInterface::KKGenInterface()
   myevtpdl = new EvtPDL();
 }
 
-int KKGenInterface::setup(const std::string& KKdefaultFileName, const std::string& tauinputFileName, const std::string& taudecaytableFileName, const std::string& EvtPDLFileName, TLorentzVector P4_LER, TLorentzVector P4_HER)
+int KKGenInterface::setup(const std::string& KKdefaultFileName, const std::string& tauinputFileName, const std::string& taudecaytableFileName, const std::string& EvtPDLFileName)
 {
   B2INFO("Begin initialisation of KKGen Interface.");
 
-  // Beam 4 momenta settiongs
-  float pxh, pyh, pzh, eh, pxl, pyl, pzl, el;
-  pxh = (float)P4_HER.Px();
-  pyh = (float)P4_HER.Py();
-  pzh = (float)P4_HER.Pz();
-  eh = (float)P4_HER.E();
-
-  pxl = (float)P4_LER.Px();
-  pyl = (float)P4_LER.Py();
-  pzl = (float)P4_LER.Pz();
-  el = (float)P4_LER.E();
-
-  kk_putbeam_(&pxh, &pyh, &pzh, &eh, &pxl, &pyl, &pzl, &el);
 
   int irand = 0;
   kk_init_(KKdefaultFileName.c_str(), tauinputFileName.c_str(),
@@ -82,6 +69,51 @@ int KKGenInterface::setup(const std::string& KKdefaultFileName, const std::strin
   B2INFO("End initialisation of KKGen Interface.");
 
   return 0;
+}
+
+void KKGenInterface::set_beam_info(TLorentzVector P4_LER, double Espread_LER, TLorentzVector P4_HER, double Espread_HER)
+{
+
+  // Beam 4 momenta settiongs
+
+  double crossing_angle = 0.;
+  double ph = P4_HER.Vect().Mag();
+  double pl = P4_LER.Vect().Mag();
+  double eh = P4_HER.E();
+  double el = P4_LER.E();
+  if (ph > 0. && pl > 0. && eh > 0. && el > 0.) {
+
+    double pxh, pyh, pzh, pxl, pyl, pzl;
+    pxh = P4_HER.Px();
+    pyh = P4_HER.Py();
+    pzh = P4_HER.Pz();
+
+    pxl = P4_LER.Px();
+    pyl = P4_LER.Py();
+    pzl = P4_LER.Pz();
+
+    char buf[200];
+    sprintf(buf,
+            "Set Beam info: (%9.4f, %9.4f, %9.4f, %9.4f), (%9.4f, %9.4f, %9.4f, %9.4f)", pxh, pyh, pzh, eh, pxl, pyl, pzl, el);
+    B2DEBUG(100, buf);
+
+    kk_putbeam_(&pxh, &pyh, &pzh, &eh, &pxl, &pyl, &pzl, &el);
+
+    crossing_angle = P4_HER.Vect().Dot(P4_LER.Vect()) / ph / pl;
+    double Espread_CM = getBeamEnergySpreadCM(el, Espread_LER,
+                                              eh, Espread_HER, crossing_angle);
+    sprintf(buf,
+            "Set Beam Energy spread: %9.4f", Espread_CM);
+    B2DEBUG(100, buf);
+    kk_begin_run_(&Espread_CM);
+  } else {
+    char buf[200];
+    sprintf(buf,
+            "Wrongly Set Beam info: Eh=%9.4f, Ph=%9.4f, El=%9.4f, Pl=%9.4f",
+            eh, ph, el, pl);
+    B2DEBUG(100, buf);
+  }
+
 }
 
 

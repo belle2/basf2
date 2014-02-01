@@ -10,7 +10,6 @@
 
 #include <generators/kkmc/KKGenInterface.h>
 #include <generators/modules/kkgeninput/KKGenInputModule.h>
-
 #include <mdst/dataobjects/MCParticleGraph.h>
 #include <generators/utilities/cm2LabBoost.h>
 #include <framework/core/Environment.h>
@@ -21,7 +20,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
-
+#include <framework/gearbox/GearDir.h>
 
 #include <boost/format.hpp>
 #include <boost/foreach.hpp>
@@ -98,12 +97,6 @@ KKGenInputModule::KKGenInputModule() : Module()
   addParam("tauinputFile", m_tauinputFileName, "user-defined tau/mu-pairs generation setting", default_tauinputFileName);
   addParam("taudecaytableFile", m_taudecaytableFileName, "tau-decay-table file name", default_taudecaytableFileName);
   addParam("evtpdlfilename", m_EvtPDLFileName, "EvtPDL filename", default_evtpdlfilename);
-  addParam("HER_Energy", m_EHER, "Energy for HER[GeV]", 7 * Unit::GeV);
-  addParam("LER_Energy", m_ELER, "Energy for LER[GeV]", 4 * Unit::GeV);
-  addParam("HER_Spread", m_HER_Espread, "Energy spread for HER[GeV]", 0.00513 * Unit::GeV);
-  addParam("LER_Spread", m_LER_Espread, "Energy spread for LER[GeV]", 0.002375 * Unit::GeV);
-  addParam("CrossingAngle", m_crossing_angle, "Beam pipe crossing angle[mrad]", 83 * Unit::mrad);
-  addParam("RotationAngle", m_angle, "Rotation with respect to e- beampie[mrad]", 41.5 * Unit::mrad);
 }
 
 
@@ -111,31 +104,8 @@ void KKGenInputModule::initialize()
 {
   B2INFO("starting initialisation of KKGen Input Module. ");
 
-  // beam 4-momenta setting
-
-  double mEle = Const::electronMass;
-
-  double angleLerToB = M_PI - m_angle * Unit::mrad;
-  double Eler = m_ELER * Unit::GeV;
-  double pLerZ = Eler * cos(angleLerToB);
-  double pLerX = Eler * sin(angleLerToB);
-  double pLerY = 0.;
-
-
-  double angleHerToB = (m_crossing_angle * Unit::mrad) - (m_angle * Unit::mrad);
-  double Eher = m_EHER * Unit::GeV;
-  double pHerZ = Eher * cos(angleHerToB);
-  double pHerX = Eher * sin(angleHerToB);
-  double pHerY = 0.;
-
-  TLorentzVector vlLer;
-  vlLer.SetXYZM(pLerX, pLerY, pLerZ, mEle);
-
-  TLorentzVector vlHer;
-  vlHer.SetXYZM(pHerX, pHerY, pHerZ, mEle);
-
   m_Ikkgen.setup(m_KKdefaultFileName, m_tauinputFileName,
-                 m_taudecaytableFileName, m_EvtPDLFileName, vlLer, vlHer);
+                 m_taudecaytableFileName, m_EvtPDLFileName);
 
   //Initialize MCParticle collection
   StoreArray<MCParticle>::registerPersistent();
@@ -144,44 +114,55 @@ void KKGenInputModule::initialize()
 
 }
 
-
-void KKGenInputModule::event()
+void KKGenInputModule::beginRun()
 {
-  B2INFO("Starting event simulation.");
-  StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
-
-  /*
-
-  //Initialize the beam energy for each event separatly
+  //Initialize the beam energy for each run separatly
+  GearDir ler("/Detector/SuperKEKB/LER/");
+  GearDir her("/Detector/SuperKEKB/HER/");
+  m_ELER = ler.getDouble("energy");
+  m_EHER = her.getDouble("energy");
+  m_LER_Espread = ler.getDouble("energyError");
+  m_HER_Espread = her.getDouble("energyError");
+  m_crossing_angle = her.getDouble("angle") - ler.getDouble("angle");
+  m_angle = her.getDouble("angle");
+  B2INFO("KKGenInputModule::beginRun() called.");
+  char buf[100];
+  sprintf(buf, "ELER = %f, LER beam energy spread = %f", m_ELER, m_LER_Espread);
+  B2DEBUG(100, buf);
+  sprintf(buf, "EHER = %f, HER beam energy spread = %f", m_EHER, m_HER_Espread);
+  B2DEBUG(100, buf);
+  sprintf(buf, "Crossing angls = %f, Detector tilted angle = %f", m_crossing_angle, m_angle);
+  B2DEBUG(100, buf);
 
   double mEle = Const::electronMass;
 
-  double angleLerToB = M_PI - m_angle * Unit::mrad;
-  double Eler = gRandom->Gaus(m_ELER, m_LER_Espread) * Unit::GeV; //Beam energy spread
+  double angleLerToB = M_PI - m_angle;
+  double Eler = m_ELER;
   double pLerZ = Eler * cos(angleLerToB);
   double pLerX = Eler * sin(angleLerToB);
   double pLerY = 0.;
 
-
-  double angleHerToB = (m_crossing_angle * Unit::mrad) - (m_angle * Unit::mrad);
-  double Eher = gRandom->Gaus(m_EHER, m_HER_Espread) * Unit::GeV; //Beam energy spread
+  double angleHerToB = m_crossing_angle - m_angle;
+  double Eher = m_EHER;
   double pHerZ = Eher * cos(angleHerToB);
   double pHerX = Eher * sin(angleHerToB);
   double pHerY = 0.;
 
-  TLorentzVector vlLer;
+  TLorentzVector vlLer, vlHer;
   vlLer.SetXYZM(pLerX, pLerY, pLerZ, mEle);
-
-  TLorentzVector vlHer;
   vlHer.SetXYZM(pHerX, pHerY, pHerZ, mEle);
 
-  TLorentzVector pParentParticle;
+  sprintf(buf, "roots = %f", (vlLer + vlHer).Mag());
+  B2DEBUG(100, buf);
+  m_Ikkgen.set_beam_info(vlLer, m_LER_Espread, vlHer, m_HER_Espread);
+}
 
-  pParentParticle = (vlHer + vlLer);
 
-  //end initialization
+void KKGenInputModule::event()
+{
 
-  */
+  B2INFO("Starting event simulation.");
+  StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
 
   mpg.clear();
   int nPart =  m_Ikkgen.simulateEvent(mpg);

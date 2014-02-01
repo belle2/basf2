@@ -13,7 +13,7 @@ CCCCCC
       integer iflong, IRAND1
 
       double precision Pb1, Pb2, BoostV, cosA, sinA, ctau
-      common /KK_cntl/ Pb1(4), Pb2(4), BoostV(3), cosA, sinA, ctau
+      common /KK_cntl/ Pb1(4), Pb2(4), BoostV(3), cosA, sinA, ctau, xpar
       double precision dum(4)
 
 C   Input environment
@@ -54,10 +54,10 @@ C   Random seed init for init
 C   KK initialize
       CALL KK2f_ReaDataX(DatX_d, 1,imax,xpar)
       CALL KK2f_ReaDataX(DatX_u, 0,imax,xpar)
-      xpar(1)=sqrt((Pb1(4)+Pb2(4))**2-(Pb1(1)+Pb2(1))**2
-     &            -(Pb1(2)+Pb2(2))**2-(Pb1(3)+Pb2(3))**2)
-      Print *,'KK CMS energy changes to ',xpar(1),' (GeV)'
-      CALL KK2f_Initialize(xpar)                  ! initialize generator
+C      xpar(1)=sqrt((Pb1(4)+Pb2(4))**2-(Pb1(1)+Pb2(1))**2
+C     &            -(Pb1(2)+Pb2(2))**2-(Pb1(3)+Pb2(3))**2)
+C      Print *,'KK CMS energy changes to ',xpar(1),' (GeV)'
+C      CALL KK2f_Initialize(xpar)                  ! initialize generator
 
 C   Pythia initialize
 c      call KK_Pythia_output_table  ! output default table (for tempolary use)
@@ -78,6 +78,30 @@ C   TAUOLA fifo initialize
 C     call TAUFIF(-1)  ! open outcome.dat
 
 C      call NoFifo
+
+C      call KK_Boost_flush
+
+      end
+
+      subroutine KK_begin_run(Espread)
+      implicit         none
+      double precision Espread
+      integer imax
+      parameter (imax = 10000)
+      double precision xpar(imax)
+
+      integer iflong, IRAND1
+
+      double precision Pb1, Pb2, BoostV, cosA, sinA, ctau
+      common /KK_cntl/ Pb1(4), Pb2(4), BoostV(3), cosA, sinA, ctau, xpar
+      double precision dum(4)
+
+      xpar(1)=sqrt((Pb1(4)+Pb2(4))**2-(Pb1(1)+Pb2(1))**2
+     &            -(Pb1(2)+Pb2(2))**2-(Pb1(3)+Pb2(3))**2)
+      xpar(2)=Espread
+      Print *,'KK CMS energy changes to ',xpar(1),' (GeV)'
+      Print *,'KK CMS energy spread changes to ',xpar(2),' (GeV)'
+      CALL KK2f_Initialize(xpar)                  ! initialize generator
 
       call KK_Boost_flush
 
@@ -141,8 +165,12 @@ c
       double precision p(4)
       integer i
 
+      integer imax
+      parameter (imax = 10000)
+      double precision xpar(imax)
+
       double precision Pb1, Pb2, BoostV, cosA, sinA, ctau
-      common /KK_cntl/ Pb1(4), Pb2(4), BoostV(3), cosA, sinA, ctau
+      common /KK_cntl/ Pb1(4), Pb2(4), BoostV(3), cosA, sinA, ctau, xpar
 
 C   TAUOLA fifo clear
       call TAUFIF(0)
@@ -194,8 +222,12 @@ CCCCCC
 C  input: Pb1(4), Pb2(4)
 C  output: BoostV(3), cosA, sinA
 
+      integer imax
+      parameter (imax = 10000)
+      double precision xpar(imax)
+
       double precision Pb1, Pb2, BoostV, cosA, sinA, ctau
-      common /KK_cntl/ Pb1(4), Pb2(4), BoostV(3), cosA, sinA, ctau
+      common /KK_cntl/ Pb1(4), Pb2(4), BoostV(3), cosA, sinA, ctau, xpar
       double precision Pb4, PbKK(4), dtemp
 
 C   Make boost vector and rotation angle
@@ -248,8 +280,12 @@ CCCCCC
       implicit none
       double precision p(4)
 
+      integer imax
+      parameter (imax = 10000)
+      double precision xpar(imax)
+
       double precision Pb1, Pb2, BoostV, cosA, sinA, ctau
-      common /KK_cntl/ Pb1(4), Pb2(4), BoostV(3), cosA, sinA, ctau
+      common /KK_cntl/ Pb1(4), Pb2(4), BoostV(3), cosA, sinA, ctau, xpar
 
       double precision b2, gamma, gamma2, bp, tpz, dca, dsa
 
@@ -334,10 +370,15 @@ c      End
 CCCCCC
       subroutine KK_GetBeam ( PXH, PYH, PZH, EH, PXL, PYL, PZL, EL )
       implicit none
-      double precision Pb1, Pb2, BoostV, cosA, sinA, ctau
-      common /KK_cntl/ Pb1(4), Pb2(4), BoostV(3), cosA, sinA, ctau
 
-      REAL PXH, PYH, PZH, EH, PXL, PYL, PZL, EL
+      integer imax
+      parameter (imax = 10000)
+      double precision xpar(imax)
+
+      double precision Pb1, Pb2, BoostV, cosA, sinA, ctau
+      common /KK_cntl/ Pb1(4), Pb2(4), BoostV(3), cosA, sinA, ctau, xpar
+
+      double precision PXH, PYH, PZH, EH, PXL, PYL, PZL, EL
 
       PXH = Pb2(1)
       PYH = Pb2(2)
@@ -354,10 +395,15 @@ CCCCCC
 CCCCCC
       subroutine KK_PutBeam ( PXH, PYH, PZH, EH, PXL, PYL, PZL, EL )
       implicit none
-      double precision Pb1, Pb2, BoostV, cosA, sinA, ctau
-      common /KK_cntl/ Pb1(4), Pb2(4), BoostV(3), cosA, sinA, ctau
 
-      REAL PXH, PYH, PZH, EH, PXL, PYL, PZL, EL
+      integer imax
+      parameter (imax = 10000)
+      double precision xpar(imax)
+
+      double precision Pb1, Pb2, BoostV, cosA, sinA, ctau
+      common /KK_cntl/ Pb1(4), Pb2(4), BoostV(3), cosA, sinA, ctau, xpar
+
+      double precision PXH, PYH, PZH, EH, PXL, PYL, PZL, EL
 
       Pb2(1) = PXH
       Pb2(2) = PYH
@@ -375,11 +421,15 @@ CCCCCC
       subroutine KK_ShiftTauDecayVtx
       implicit none
 
+      integer imax
+      parameter (imax = 10000)
+      double precision xpar(imax)
+
       integer itau,i,j
       double precision p, betagamma, flen, rvec(1), vtx(4), vtx0(4)
 
       double precision Pb1, Pb2, BoostV, cosA, sinA, ctau
-      common /KK_cntl/ Pb1(4), Pb2(4), BoostV(3), cosA, sinA, ctau
+      common /KK_cntl/ Pb1(4), Pb2(4), BoostV(3), cosA, sinA, ctau, xpar
 c  HepEvt
       INCLUDE 'KK2f/HepEvt.fi'
       

@@ -68,7 +68,7 @@ void PrintTauTauMCParticlesModule::event()
   //Loop over the primary particles (no mother particle exists)
   for (int i = 0; i < MCParticles.getEntries(); i++) {
     MCParticle& mc = *MCParticles[i];
-    if (abs(mc.getPDG()) != 15) continue;
+    if (!(mc.getMother() != NULL && mc.getMother()->getIndex() <= 3)) continue;
     printTree(mc, 0);
   }
 }

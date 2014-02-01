@@ -16,6 +16,7 @@
 #include <mdst/dataobjects/MCParticleGraph.h>
 
 #include <evtgen/EvtGenBase/EvtPDL.hh>
+#include <generators/utilities/cm2LabBoost.h>
 
 
 #include <string>
@@ -47,14 +48,15 @@ extern pydat2_type pydat2_;
 extern "C" {
 
   void kk_init_(const char*, const char*, const char*, int*);
+  void kk_begin_run_(double*);
   void kk_init_seed_();
   void kk_term_(double*, double*);
   void kk_event_(int*);
 
-  void kk_getbeam_(float*, float*, float*, float*,
-                   float*, float*, float*, float*);
-  void kk_putbeam_(float*, float*, float*, float*,
-                   float*, float*, float*, float*);
+  void kk_getbeam_(double*, double*, double*, double*,
+                   double*, double*, double*, double*);
+  void kk_putbeam_(double*, double*, double*, double*,
+                   double*, double*, double*, double*);
 
   int pycomp_(int&);
 
@@ -80,7 +82,9 @@ namespace Belle2 {
      */
     ~KKGenInterface() {}
 
-    int setup(const std::string& KKdefaultFileName, const std::string& tauinputFileName, const std::string& taudecaytableFileName, const std::string& EvtPDLFileName, TLorentzVector P4_LER, TLorentzVector P4_HER); /**< Setup for KKMC/TAUOLA  */
+    int setup(const std::string& KKdefaultFileName, const std::string& tauinputFileName, const std::string& taudecaytableFileName, const std::string& EvtPDLFileName); /**< Setup for KKMC/TAUOLA  */
+
+    void set_beam_info(TLorentzVector P4_LER, double Espread_LER, TLorentzVector P4_HER, double Espread_HER); /**< Setup for beam inforamtion to KKMC */
 
     int simulateEvent(MCParticleGraph& graph); /**< MC simulation function */
 

@@ -25,8 +25,6 @@ chargedTrackVars = [
     'muid_ARICH',
     'p',
     'pt',
-    'p_CMS',
-    'pt_CMS',
     'chiProb',
     ]
 
@@ -47,8 +45,8 @@ methods = [('BDTGradient_100', 'BDT',
 fr = FullReconstruction()
 
 # Add FSP
-fr.addParticle(Particle('gamma', ['p', 'pt', 'p_CMS', 'pt_CMS'], methods))
-fr.addParticle(Particle('pi0', ['p', 'pt', 'p_CMS', 'pt_CMS'], methods))
+fr.addParticle(Particle('gamma', ['p', 'pt'], methods))
+fr.addParticle(Particle('pi0', ['p', 'pt'], methods))
 fr.addParticle(Particle('pi+', chargedTrackVars, methods))
 fr.addParticle(Particle('K+', chargedTrackVars, methods))
 
@@ -92,9 +90,10 @@ fr.addParticle(p)
 main = create_path()
 main.add_module(register_module('RootInput'))
 main.add_module(register_module('ParticleLoader'))
-main.add_module(register_module('ProgressBar'))
 
 fr.run(main)
+#after full reconstruction modules (to allow parallel processing)
+main.add_module(register_module('ProgressBar'))
 
 # ntupler = register_module('VariableNtuple')
 # ntupler.param('particleList', 'B+')

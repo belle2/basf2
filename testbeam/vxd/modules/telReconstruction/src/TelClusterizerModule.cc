@@ -181,10 +181,11 @@ void TelClusterizerModule::event()
       //Load the correct noise map for the new sensor
       m_noiseMap.setSensorID(sensorID);
     } else if (px <= lastPixel) {
-      //Check for sorting as precaution
-      B2FATAL("Pixels are not sorted correctly, please include the "
-              "TelDigitSorter module before running the Clusterizer or fix "
-              "the input to be ordered by v,u in ascending order");
+      //Check for sorting as precaution; but is sometimes happens to fail, so don't panic.
+      B2WARNING("Pixels are not sorted correctly, please include the "
+                "TelDigitSorter module before running the Clusterizer or fix "
+                "the input to be ordered by v,u in ascending order");
+      return;
     }
     //Remember last pixel to check sorting
     lastPixel = px;

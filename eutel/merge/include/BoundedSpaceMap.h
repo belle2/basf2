@@ -42,24 +42,24 @@ struct BoundedSpaceSet {
   /** Get number of free positions in the set.
    * @return number of free positions in the map, maxSize - actual size.
    */
-  inline std::size_t getFreeSize() { return m_maxSize - m_set.size(); }
+  inline std::size_t getFreeSize() const { return m_maxSize - m_set.size(); }
 
   /** Get the smallest label in the set in the sense of sorting
    * properties of CIRC::tag_type.
    * @return smallest set label
    */
-  inline CIRC::tag_type getBottom() { return *m_set.begin(); }
+  inline CIRC::tag_type getBottom() const { return *m_set.begin(); }
 
   /** Get the largest label in the set in the sense of sorting
    * properties of CIRC::tag_type.
    * @return largest set label
    */
-  inline CIRC::tag_type getTop() { return (m_set.empty()) ? 0 : *m_set.rbegin(); }
+  inline CIRC::tag_type getTop() const { return (m_set.empty()) ? 0 : *m_set.rbegin(); }
 
   /** Get the median (mid-range) value of the set.
    * @return median of set elements
    */
-  inline CIRC::tag_type getMedian() {
+  inline CIRC::tag_type getMedian() const {
     if (m_set.empty()) return 0;
     auto it = m_set.begin();
     for (unsigned i = 0; i < m_set.size() / 2; ++i) it++;
@@ -75,7 +75,7 @@ struct BoundedSpaceSet {
   /** Check if the buffer is empty.
    * @return true if there are no data in the deque.
    */
-  inline bool isEmpty() { return m_set.size() == 0; }
+  inline bool isEmpty() const { return m_set.size() == 0; }
 
   /** Insert a new element into the map. If thereby the maximum map size is exceeded,
    * the smallest element is dropped. Caution: the method will not add minimum element
@@ -95,6 +95,11 @@ struct BoundedSpaceSet {
    * @return true if key found, otherwise false.
    */
   inline bool hasKey(CIRC::tag_type k) const { return (m_set.count(k) > 0);  }
+
+  /** Delete element with key k from the set.
+   * @param k The key to delete from the set.
+   */
+  inline void pop(CIRC::tag_type k) { m_set.erase(k); }
 
 private:
 
@@ -140,24 +145,24 @@ struct BoundedSpaceMap {
   /** Get number of free positions in the map.
    * @return number of free positions in the map, maxSize - actual size.
    */
-  inline std::size_t getFreeSize() { return m_maxSize - m_map.size(); }
+  inline std::size_t getFreeSize() const { return m_maxSize - m_map.size(); }
 
   /** Get the smallest label in the map in the sense of sorting
    * properties of CIRC::tag_type.
    * @return smallest map label
    */
-  inline CIRC::tag_type getBottom() { return m_map.begin()->first; }
+  inline CIRC::tag_type getBottom() const { return m_map.begin()->first; }
 
   /** Get the largest label in the map in the sense of sorting
    * properties of CIRC::tag_type.
    * @return largest map label
    */
-  inline CIRC::tag_type getTop() { return (m_map.empty() ? 0 : m_map.rbegin()->first); }
+  inline CIRC::tag_type getTop() const { return (m_map.empty() ? 0 : m_map.rbegin()->first); }
 
   /** Get the median (mid-range) label of the map.
    * @return median of map labels
    */
-  inline CIRC::tag_type getMedian() {
+  inline CIRC::tag_type getMedian() const {
     if (m_map.empty()) return 0;
     auto it = m_map.begin();
     for (unsigned i = 0; i < m_map.size() / 2; ++i) it++;
@@ -174,7 +179,7 @@ struct BoundedSpaceMap {
   /** Check if the buffer is empty.
    * @return true if there are no data in the deque.
    */
-  inline bool isEmpty() { return m_map.size() == 0; }
+  inline bool isEmpty() const { return m_map.size() == 0; }
 
   /** Insert a new element into the map. If thereby the maximum map size is exceeded,
    * the smallest element is dropped. Caution: the method will not add minimum element

@@ -40,7 +40,7 @@ TelxVXDModule::TelxVXDModule() : HistoModule()
   setDescription("Tel x VXD DQM module adds some correlation plots between telescopes and nearest VXD sensors.");
   setPropertyFlags(c_ParallelProcessingCertified);  // specify this flag if you need parallel processing
   addParam("Clusters", m_storeTelClustersName, "Name of the telescopes cluster collection",
-           std::string("PXDClusters")); // always be explicit about this, can cause trouble
+           std::string("TelClusters")); // always be explicit about this, can cause trouble
   addParam("histgramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed", std::string("tel-vxd"));
 }
 

@@ -248,7 +248,11 @@ enum EKLM::FPGAFitStatus BKLMDigitizerModule::processEntry(std::vector<std::pair
   m_FPGAParams.bgAmplitude = (double)m_enableConstBkg;
   m_FPGAStat = m_fitter->fit(m_ADCAmplitude, m_ADCFit, &m_FPGAParams);
   if (m_FPGAStat != EKLM::c_FPGASuccessfulFit)
-    return m_FPGAStat;
+    m_FPGAParams.startTime = 0.0;
+  m_FPGAParams.peakTime = 0.0;
+  m_FPGAParams.attenuationFreq = 0.0;
+  m_FPGAParams.amplitude = 0.0;
+  return m_FPGAStat;
   /**
    * TODO: Change units.
    * FPGA fitter now uses units: time = ADC conversion time,

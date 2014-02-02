@@ -139,18 +139,15 @@ unsigned int SharedEventBuffer::write(const int* buf, unsigned int nword,
     if ((serial == 0 || serial - 1 == _header->count_in) &&
         _header->nword_in - _header->nword_out < _nword - (nword + 1)) {
       if (i_w >= i_r) {
-        if (nword + 1 < _nword - i_w) {
+        unsigned int count = _nword - i_w;
+        if (nword + 1 < count) {
           _buf[i_w] = nword;
           memcpy((_buf + i_w + 1), buf, sizeof(int) * nword);
         } else {
-          unsigned int count = _nword - i_w;
           _buf[i_w] = nword;
-          if (count > 1) {
-            memcpy((_buf + i_w + 1), buf, sizeof(int) * (count - 1));
-            memcpy(_buf, buf + count, sizeof(int) * (nword - count + 1));
-          } else {
-            memcpy(_buf, buf, sizeof(int) * nword);
-          }
+          memcpy((_buf + i_w + 1), buf, sizeof(int) * count);
+          if (nword >= count)
+            memcpy(_buf, buf + count, sizeof(int) * (nword - count));
         }
       } else {
         _buf[i_w] = nword;
@@ -189,12 +186,9 @@ unsigned int SharedEventBuffer::read(int* buf)
             break;
           } else {
             unsigned int count = _nword - i_r;
-            if (count > 1) {
-              memcpy(buf, (_buf + i_r + 1), sizeof(int) * (count - 1));
-              memcpy(buf + count, _buf, sizeof(int) * (nword - count + 1));
-            } else {
-              memcpy(buf, _buf, sizeof(int) * nword);
-            }
+            memcpy(buf, (_buf + i_r + 1), sizeof(int) * count);
+            if (nword > count)
+              memcpy(buf + count, _buf, sizeof(int) * (nword - count));
             break;
           }
         }

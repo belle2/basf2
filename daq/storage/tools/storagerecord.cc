@@ -40,7 +40,7 @@ int main(int argc, char** argv)
     sinfo->nodeid = atoi(argv[5]);
   }
   SharedEventBuffer ibuf;
-  ibuf.open(argv[1], 250000000, true);
+  ibuf.open(argv[1], 25000000, true);
   std::string dir = argv[2];
   SharedEventBuffer obuf;
   obuf.open(argv[3], 10000000, true);

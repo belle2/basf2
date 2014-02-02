@@ -38,7 +38,7 @@ int main(int argc, char** argv)
     sinfo->nodeid = atoi(argv[5]);
   }
   SharedEventBuffer ibuf;
-  ibuf.open(argv[1], 250000000, true);
+  ibuf.open(argv[1], 20000000, true);
   TCPSocket socket(argv[2], atoi(argv[3]));
   B2INFO("storagein: Connected to eb2.");
   info.reportRunning();

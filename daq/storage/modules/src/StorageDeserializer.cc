@@ -60,7 +60,7 @@ StorageDeserializerModule::~StorageDeserializerModule()
 void StorageDeserializerModule::initialize()
 {
   B2INFO("StorageDeserializer: initialize() started.");
-  m_ibuf.open(m_ibuf_name, 250000000);
+  m_ibuf.open(m_ibuf_name, 20000000);
   if (m_shmflag > 0) {
     if (m_nodename.size() == 0 || m_nodeid < 0) {
       m_shmflag = 0;

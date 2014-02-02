@@ -48,7 +48,7 @@ void StorageOutputModule::initialize()
   m_expno = m_runno = -1;
   m_count = m_count_0 = 0;
   if (m_obufname.size() > 0) {
-    m_obuf.open(m_obufname.c_str(), 250000000);
+    m_obuf.open(m_obufname.c_str(), 25000000);
   }
   B2INFO("StorageOutput: initialized.");
 }

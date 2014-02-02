@@ -125,24 +125,6 @@ namespace Belle2 {
     //! Flag to enable constant noise in MPPC
     bool m_enableConstBkg;
 
-    //! Stands for nDigitizations*ADCSamplingTime
-    double m_histRange;
-
-    //! Analog amplitude (direct)
-    float* m_amplitudeDirect;
-
-    //! Analog amplitude (reflected)
-    float* m_amplitudeReflected;
-
-    //! Analog amplitude
-    float* m_amplitude;
-
-    //! Digital amplitude
-    int* m_ADCAmplitude;
-
-    //! Digital fit result
-    float* m_ADCFit;
-
     //! FPGA fitter
     EKLM::FPGAFitter* m_fitter;
 
@@ -161,7 +143,7 @@ namespace Belle2 {
     //! Distance from the hitpoint to SiPM for the backward-moving photons
     double m_hitDistReflected;
 
-    //! Discriminator threshold (# of photoelectrons)
+    //! User parameter: Discriminator threshold (# of photoelectrons)
     double m_discriminatorThreshold;
 
   };

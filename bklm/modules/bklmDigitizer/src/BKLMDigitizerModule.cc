@@ -54,6 +54,10 @@ BKLMDigitizerModule::BKLMDigitizerModule() : Module()
   m_PEAttenuationFreq = 3.0;
   m_meanSiPMNoise = -1;
   m_enableConstBkg = false;
+  // These are calculated dynamically but initialize here to satisfy valgrind
+  m_npe = 0;
+  m_hitDistDirect = 0.0;
+  m_hitDistReflected = 0.0;
 
 }
 
@@ -195,6 +199,7 @@ enum EKLM::FPGAFitStatus BKLMDigitizerModule::processEntry(std::vector<std::pair
   float m_amplitude[m_nDigitizations];
   int   m_ADCAmplitude[m_nDigitizations];
   float m_ADCFit[m_nDigitizations];
+  // initialize variable-size arrays at run-time
   for (unsigned int i = 0; i < m_nDigitizations; ++i) {
     m_amplitudeDirect[i] = 0.0;
     m_amplitudeReflected[i] = 0.0;

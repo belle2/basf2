@@ -13,7 +13,7 @@ using namespace std;
 using namespace Belle2;
 
 #define DESY
-//#define NO_DATA_CHECK
+#define NO_DATA_CHECK
 //#define WO_FIRST_EVENUM_CHECK
 
 ClassImp(RawCOPPER);

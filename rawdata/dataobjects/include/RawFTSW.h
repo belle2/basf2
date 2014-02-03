@@ -65,6 +65,8 @@ namespace Belle2 {
     //! Get magic number for data corruption check
     unsigned int GetMagicTrailer(int n);
 
+
+
     //! check the data contents
     void CheckData(int n,
                    unsigned int prev_evenum, unsigned int* cur_evenum,
@@ -72,6 +74,9 @@ namespace Belle2 {
 
     //! Get run #
     int GetRunNo(int n);
+
+    //! Get exp and run+subrun word
+    unsigned int GetExpRunWord(int n);
 
     //! Get subrun #
     int GetSubRunNo(int n);
@@ -147,6 +152,11 @@ namespace Belle2 {
     ClassDef(RawFTSW, 2);
     // ver.2 Remove m_FTSW_header and introduce a new data format on Nov. 20, 2013
   };
+
+  inline unsigned int RawFTSW::GetExpRunWord(int n)
+  {
+    return (unsigned int)(m_buffer[ GetBufferPos(n) + POS_EXP_RUN_NO ]);
+  }
 
   inline int RawFTSW::GetRunNo(int n)
   {

@@ -391,6 +391,20 @@ namespace Belle2 {
       }
 
       /**
+       * Return mode for material definition.
+       * Return value = 0: define a mixture of gases and wires
+       * in the entire tracking volume;
+       * =1: define two different mixtures:
+       * one for the inner volume (small cell),
+       * and  the other for the outer volume (normal cell).
+       *
+       */
+
+      inline int getMaterialDefinitionMode() const {
+        return m_materialDefinitionMode;
+      }
+
+      /**
        * Set the nominal spacial resolution in the unit of um.
        * @param[in] resol spacial resolution (um)
        *
@@ -490,6 +504,7 @@ namespace Belle2 {
       bool m_Geometry4Recon; /*!< Switch for selecting geometry. */
       bool m_XTetc4Recon;    /*!< Switch for selecting xt etc. */
       std::string m_version; /*!< The version of geometry parameters. */
+      int m_materialDefinitionMode; /*!< Control switch for gas and wire material definition. */
       int m_nSLayer;         /*!< The number of sense wire layer. */
       int m_nFLayer;         /*!< The number of field wire layer. */
       double m_rWall[4];     /*!< The array to store radius of inner wall and outer wall. */

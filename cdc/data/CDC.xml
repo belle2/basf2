@@ -10,6 +10,9 @@
     </SensitiveDetector>
     <Rotation desc="Rotation of the whole cdc detector (should be the same as beampipe)" unit="mrad">0.0</Rotation>
 
+    <!-- Material definition mode -->
+    <MaterialDefinitionMode desc="=0: define a mixture of gases and wires in the entire tracking volume; =1: define two different mixtures: one for the inner vol.; the other for the outer vol.">0</MaterialDefinitionMode>
+
     <!-- Switch for printing for debug -->
     <Debug desc="true: print out; false: not print out.">false</Debug>
 

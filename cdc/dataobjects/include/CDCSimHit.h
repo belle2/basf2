@@ -186,7 +186,9 @@ namespace Belle2 {
               TVector3 posIn,
               TVector3 posOut,
               TVector3 posTrack,
-              int posFlag): SimHitBase() {
+              int posFlag,
+              double globalTime): SimHitBase() {
+
       m_wireID.setWireID(layerId, wireId);
       m_trackId = trackId;
       m_pdg = pdg;
@@ -200,6 +202,7 @@ namespace Belle2 {
       m_posOut = posOut;
       m_posTrack = posTrack;
       m_posFlag = posFlag;
+      m_globalTime = globalTime;
     }
 
     /** Shift the SimHit in time

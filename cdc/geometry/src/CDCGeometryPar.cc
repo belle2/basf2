@@ -118,24 +118,15 @@ void CDCGeometryPar::read()
   }
 
   GearDir coverParams(content, "Covers/");
-  double R1 = coverParams.getLength("Cover[2]/InnerR1");
-  double R2 = coverParams.getLength("Cover[2]/InnerR2");
-  double angle = coverParams.getLength("Cover[2]/Angle");
-  double thick = coverParams.getLength("Cover[2]/Thickness");
-  double zpos = coverParams.getLength("Cover[2]/PosZ");
-  //  Commented by M. U. June 2nd, 2013
-  //  double length1;
-  //  if (angle != 0) length1 = fabs(zpos - (R2 - R1) / tan(angle));
-  //  else length1 = fabs(zpos);
-  R1 = coverParams.getLength("Cover[4]/InnerR1");
-  R2 = coverParams.getLength("Cover[4]/InnerR2");
-  angle = coverParams.getLength("Cover[4]/Angle");
-  zpos = coverParams.getLength("Cover[4]/PosZ");
+  double R1 = coverParams.getLength("Cover[4]/InnerR1");
+  double R2 = coverParams.getLength("Cover[4]/InnerR2");
+  double angle = coverParams.getLength("Cover[4]/Angle");
+  double thick = coverParams.getLength("Cover[4]/Thickness");
+  double zpos = coverParams.getLength("Cover[4]/PosZ");
   double length2;
   if (angle != 0) length2 = fabs(zpos + (R2 - R1) / tan(angle));
   else length2 = fabs(zpos);
   m_motherLength = (length2 + thick) * 2.;
-  //m_motherLength = length1 + length2 + 2 * thick;
 
   // Get inner wall parameters
   m_rWall[0]    = innerWallParams.getLength("InnerWall[3]/InnerR");
@@ -160,6 +151,10 @@ void CDCGeometryPar::read()
   m_debug = gbxParams.getBool("Debug");
   int nSLayer = gbxParams.getNumberNodes("SLayers/SLayer");
   m_nSLayer = nSLayer;
+
+  // Get control switch for gas and wire material definition
+  m_materialDefinitionMode = gbxParams.getInt("MaterialDefinitionMode");
+  //  std::cout <<"m_materialDefinitionMode in CDCGeometryPar= " << m_materialDefinitionMode << std::endl;
 
   // Loop over all sense layers
   for (int iSLayer = 0; iSLayer < nSLayer; iSLayer++) {

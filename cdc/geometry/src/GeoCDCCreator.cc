@@ -201,6 +201,36 @@ namespace Belle2 {
       cdcMed->AddMaterial(medTungsten, denTungsten / density);
       cdcMed->AddMaterial(medAluminum, denAluminum / density);
 
+      // Define material for inner volume (for tentative use)
+      double rBound = 24.3; //boundary betw. inner and outer
+      int nSenseWiresInInner = 8 * 160;
+      int nFieldWiresInInner = 8 * (160 + 320) - 160;
+      totalCS = (rBound * rBound - rmax_innerWall * rmax_innerWall);
+      senseCS = (diameter_senseWire / 2) * (diameter_senseWire / 2) * nSenseWiresInInner;
+      fieldCS = (diameter_fieldWire / 2) * (diameter_fieldWire / 2) * nFieldWiresInInner;
+      denAluminum = medAluminum->GetDensity() * (fieldCS / totalCS);
+      denTungsten = medTungsten->GetDensity() * (senseCS / totalCS);
+      density = denHelium + denEthane + denAluminum + denTungsten;
+      G4Material* med4Inner = new G4Material("CDCGasWire4Inner", density, 4);
+      med4Inner->AddMaterial(medHelium, denHelium / density);
+      med4Inner->AddMaterial(medEthane, denEthane / density);
+      med4Inner->AddMaterial(medTungsten, denTungsten / density);
+      med4Inner->AddMaterial(medAluminum, denAluminum / density);
+
+      // Define material for outer volume(for tentative use)
+      totalCS = (rmin_outerWall * rmin_outerWall - rBound * rBound);
+      senseCS = (diameter_senseWire / 2) * (diameter_senseWire / 2) * (num_senseWire - nSenseWiresInInner);
+      fieldCS = (diameter_fieldWire / 2) * (diameter_fieldWire / 2) * (num_fieldWire - nFieldWiresInInner);
+      denAluminum = medAluminum->GetDensity() * (fieldCS / totalCS);
+      denTungsten = medTungsten->GetDensity() * (senseCS / totalCS);
+      density = denHelium + denEthane + denAluminum + denTungsten;
+      G4Material* med4Outer = new G4Material("CDCGasWire4Outer", density, 4);
+      med4Outer->AddMaterial(medHelium, denHelium / density);
+      med4Outer->AddMaterial(medEthane, denEthane / density);
+      med4Outer->AddMaterial(medTungsten, denTungsten / density);
+      med4Outer->AddMaterial(medAluminum, denAluminum / density);
+
+
       //------------------------------
       // Construct mother volume
       //------------------------------
@@ -416,6 +446,9 @@ namespace Belle2 {
       //------------------------------------------
 
       for (int iSLayer = 0; iSLayer < nSLayer; ++iSLayer) {
+        if (cdcgp.getMaterialDefinitionMode() == 1) {
+          cdcMed = (iSLayer <= 7) ? med4Inner : med4Outer;
+        }
         // Get the number of endplate layers
         int nEPLayer = nEndplateLayer[iSLayer];
 
@@ -865,6 +898,7 @@ namespace Belle2 {
       delete [] innerWallBZ;
       delete [] innerWallFZ;
 
+      //      G4cout << *(G4Material::GetMaterialTable());
     }
 
   }

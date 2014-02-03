@@ -15,7 +15,8 @@
 #define CHECKEVT 5000
 
 //#define DEBUG
-//#define NO_DATA_CHECK
+#define NO_DATA_CHECK
+#define DUMHSLB
 
 using namespace std;
 using namespace Belle2;
@@ -428,6 +429,10 @@ void DeSerializerPCModule::event()
     unsigned int utime_array[32];// # of noeds is less than 17
     unsigned int ctime_type_array[32];// # of noeds is less than 17
 
+#ifdef DUMHSLB
+    unsigned int exp_run_ftsw = 0, ctime_trgtype_ftsw = 0, utime_ftsw = 0;
+#endif
+
     for (int k = 0; k < num_events_in_sendblock; k++) {
       memset(eve_array, 0, sizeof(eve_array));
       memset(utime_array, 0, sizeof(utime_array));
@@ -441,13 +446,19 @@ void DeSerializerPCModule::event()
         //
         if (raw_datablk->CheckFTSWID(entry_id)) {
           RawFTSW* temp_rawftsw = new RawFTSW;
+          int block_id = 0;
           temp_rawftsw->SetBuffer((int*)temp_buf + raw_datablk->GetBufferPos(entry_id),
                                   raw_datablk->GetBlockNwords(entry_id), 0, 1, 1);
-          if (temp_rawftsw->GetEveNo(0) < 10
-             ) {
+          if (temp_rawftsw->GetEveNo(block_id) < 10) {
             printf("[DEBUG] ######FTSW#########\n");
             printData((int*)temp_buf + raw_datablk->GetBufferPos(entry_id), raw_datablk->GetBlockNwords(entry_id));
           }
+
+#ifdef DUMHSLB
+          exp_run_ftsw = temp_rawftsw->GetExpRunWord(block_id);
+          ctime_trgtype_ftsw = temp_rawftsw->GetTTCtimeTRGType(block_id);
+          utime_ftsw = temp_rawftsw->GetTTUtime(block_id);
+#endif
 
 
 #ifndef NO_DATA_CHECK
@@ -459,8 +470,8 @@ void DeSerializerPCModule::event()
             exit(1);
           }
 #endif
-          utime_array[ entry_id ] = temp_rawftsw->GetTTUtime(0);
-          ctime_type_array[ entry_id ] = temp_rawftsw->GetTTCtimeTRGType(0);
+          utime_array[ entry_id ] = temp_rawftsw->GetTTUtime(block_id);
+          ctime_type_array[ entry_id ] = temp_rawftsw->GetTTCtimeTRGType(block_id);
           delete temp_rawftsw;
 
           //
@@ -487,14 +498,19 @@ void DeSerializerPCModule::event()
           }
 #endif
           delete temp_rawtlu;
+        } else {
           //
           // RawCOPPER
           //
-        } else {
+          int block_id = 0;
           RawCOPPER* temp_rawcopper = new RawCOPPER;
           temp_rawcopper->SetBuffer((int*)temp_buf + raw_datablk->GetBufferPos(entry_id),
                                     raw_datablk->GetBlockNwords(entry_id), 0, 1, 1);
-
+#ifdef DUMHSLB
+          (temp_rawcopper->GetBuffer(block_id))[ RawHeader::POS_EXP_RUN_NO ] = exp_run_ftsw;
+          (temp_rawcopper->GetBuffer(block_id))[ RawHeader::POS_TTCTIME_TRGTYPE ] = ctime_trgtype_ftsw;
+          (temp_rawcopper->GetBuffer(block_id))[ RawHeader::POS_TTUTIME ] = utime_ftsw;
+#endif
 
 #ifndef NO_DATA_CHECK
           try {
@@ -520,7 +536,6 @@ void DeSerializerPCModule::event()
           delete temp_rawcopper;
         }
       }
-
 
 #ifndef NO_DATA_CHECK
       // event #, ctime, utime over nodes

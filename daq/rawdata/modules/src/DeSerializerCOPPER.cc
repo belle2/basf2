@@ -13,7 +13,7 @@
 //#define DUMMY
 //#define MAXEVTSIZE 400000000
 //#define TIME_MONITOR
-//#define NO_DATA_CHECK
+#define NO_DATA_CHECK
 //#define WO_FIRST_EVENUM_CHECK
 
 

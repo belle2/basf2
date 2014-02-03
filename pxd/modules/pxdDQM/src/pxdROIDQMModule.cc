@@ -35,7 +35,7 @@ pxdROIDQMModule::pxdROIDQMModule() : HistoModule() , m_storeROIs()
 void pxdROIDQMModule::defineHisto()
 {
   hrawROIcount = new TH1F("hrawROIcount", "ROI count;Nr per Event", 256, 0, 256);
-  hrawROItype = new TH1F("hrawROIytpe", "ROI type;Nr per Event", 3, -1, 1);
+  hrawROItype = new TH1F("hrawROIytpe", "ROI type;Nr per Event", 2, 0, 2);
 
   hrawROIHLTmap  = new TH2F("hrawROIHLTmap", "HLT ROI Middle Map ;column;row", 256, 0, 256, 786, 0, 786);
   hrawROIHLTsize  = new TH2F("hrawROIHLTsize", "HLT ROI Size Map ;column;row", 256, 0, 256, 786, 0, 786);

@@ -22,6 +22,9 @@ using namespace Belle2;
 MsgHandler::MsgHandler(int complevel)
 {
   //  printf("MsgHandler : constructor called.....\n");
+  if (complevel != 0) {
+    B2FATAL("Compression support disabled because of https://sft.its.cern.ch/jira/browse/ROOT-4550 . You can enable it manually by removing this check in MsgHandler, but be aware of huge memory leaks.");
+  }
   m_complevel = complevel;
 
   //Schema evolution is needed to stream genfit tracks

@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+import stat
 from SCons.Script import *
 
 
@@ -90,6 +91,15 @@ def process_dir(
     script_files = get_files(os.path.join(dir_name, 'scripts', '*.py'),
                              release_dir)
 
+    # get list of executable script files
+    executable_files = []
+    executable_mode = stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH
+    for tools_file in get_files(os.path.join(dir_name, 'tools', '*'),
+                                release_dir):
+        if os.stat(str(tools_file)).st_mode & executable_mode \
+            == executable_mode:
+            executable_files.append(tools_file)
+
     # get list of data files
     data_files = get_files(os.path.join(dir_name, 'data', '*'), release_dir)
 
@@ -101,6 +111,7 @@ def process_dir(
     env['TEST_FILES'] = test_files
     env['TEST_LIBS'] = []
     env['SCRIPT_FILES'] = script_files
+    env['EXECUTABLE_FILES'] = executable_files
     env['DATA_FILES'] = data_files
 
     # clean up some environment variables that should not be inherited from the parent environment
@@ -137,6 +148,10 @@ def process_dir(
     # install script files in the library directory
     scripts = env.Install(env['LIBDIR'], env['SCRIPT_FILES'])
     define_aliases(env, scripts, dir_name, 'scripts')
+
+    # install executable script files in the bin directory
+    executables = env.Install(env['BINDIR'], env['EXECUTABLE_FILES'])
+    define_aliases(env, executables, dir_name, 'tools')
 
     # install data files in the data directory
     data = env.Install(os.path.join(env['DATADIR'], dir_name), env['DATA_FILES'

@@ -210,6 +210,8 @@ void TelDataMergerModule::initialize()
   storeTelEventInfo.registerAsPersistent();
 
   // Initialize sensor number to sensor VxdID conversion map.
+  // sorry, this is dirty, I'll fix it once the stuff works.
+  const unsigned int eudetPlaneNrs[] = {4, 3, 2, 0, 1, 5};
 
   VXD::GeoCache& geo = VXD::GeoCache::getInstance();
   m_sensorID.clear();
@@ -217,7 +219,7 @@ void TelDataMergerModule::initialize()
   for (VxdID layer : geo.getLayers(TEL::SensorInfo::TEL)) {
     for (VxdID ladder : geo.getLadders(layer)) {
       for (VxdID sensor : geo.getSensors(ladder)) {
-        m_sensorID.insert(std::pair<unsigned short, VxdID>(iPlane, sensor));
+        m_sensorID.insert(std::pair<unsigned short, VxdID>(eudetPlaneNrs[iPlane], sensor));
         iPlane++;
       }
     }

@@ -139,7 +139,8 @@ void TelDataReaderModule::start_run()
 
   // Set sensor number to sensor VxdID conversion map. Must not be done in init,
   // because geometry must already be available.
-  // ASSUMPTION: Planes are numbered from 0 to n in beam direction.
+  // sorry, this is dirty, I'll fix it once stuff works.
+  const unsigned int eudetPlaneNrs[] = {4, 3, 2, 0, 1, 5};
 
   VXD::GeoCache& geo = VXD::GeoCache::getInstance();
   m_sensorID.clear();

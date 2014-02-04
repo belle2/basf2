@@ -13,8 +13,7 @@ histo.param('histoFileName', 'Tel-histo.root')  # File to save histograms
 
 # Load parameters from xml
 gearbox = register_module('Gearbox')
-# VXD (no Telescopes), and the real PCMAG magnetic field
-gearbox.param('fileName', 'testbeam/vxd/FullTelescopeVXDTB_v1.xml')
+gearbox.param('fileName', 'testbeam/vxd/FullTelescopeVXDTB_v2.xml')
 
 # Create geometry
 geometry = register_module('Geometry')
@@ -28,7 +27,7 @@ input.param('inputFileName', '../vxdtb/data/e0000r000391.sroot')
 dataMerger = register_module('TelDataMerger')
 # use corresponding telescope data file
 dataMerger.param('inputFileName', '../vxdtb/data/run000070.raw')
-dataMerger.param('bufferSize', 100)
+dataMerger.param('bufferSize', 200)
 dataMerger.set_log_level(LogLevel.INFO)
 
 # PXD unpacker
@@ -58,12 +57,11 @@ SVDSort.param('mergeDuplicates', False)
 # SVDSort.param('ignoredStripsListName', 'testbeam/vxd/data/SVD-IgnoredStripsList.xml')
 # SVD clusterizer
 SVDClust = register_module('SVDClusterizer')
-# SVDClust.param('digitsSorted', False)
 SVDClust.param('TanLorentz_holes', 0.)
 SVDClust.param('TanLorentz_electrons', 0.)
-SVDClust.param('applyTimeWindow', True)
-SVDClust.param('triggerTime', -20.0)
-SVDClust.param('acceptanceWindowSize', 20.0)
+# SVDClust.param('applyTimeWindow', True)
+# SVDClust.param('triggerTime', -20.0)
+# SVDClust.param('acceptanceWindowSize', 20.0)
 
 # SVD DQM module
 svd_dqm = register_module('SVDDQM')

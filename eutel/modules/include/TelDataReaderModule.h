@@ -20,10 +20,7 @@
 #include <eutel/eudaq/FileReader.h>
 
 namespace Belle2 {
-  /** A module template.
-   *
-   *  A detailed description of your module.
-   */
+
   class TelDataReaderModule : public Module {
   public:
     /** Constructor, for setting module description and parameters. */
@@ -112,8 +109,13 @@ namespace Belle2 {
 
     // mapping of eutel plane numbers: EUDAQ numbers ordered in beam direction
     std::vector<int> m_eutelPlaneNrs;
-    // conversion map between sensor numbers and their VxdIDs
+    // conversion map between telescope sensor numbers and their VxdIDs
     std::map< int, VxdID > m_sensorID;
+
+    // mapping of pxd plane numbers: PXD numbers ordered in beam direction
+    std::vector<int> m_pxdPlaneNrs;
+    // conversion map between pxd sensor numbers and their VxdIDs
+    std::map< int, VxdID > m_PxdSensorID;
   };
 }
 #endif

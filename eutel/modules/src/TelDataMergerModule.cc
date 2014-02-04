@@ -133,12 +133,12 @@ bool TelDataMergerModule::processNormalEvent(const eudaq::Event& ev)
     tbEvt.setTriggerId(currentTLUTagFromEUDAQ);
 
     B2DEBUG(10, "TBEvent: Event: " << tbEvt.getEventNumber()
-            << ", NumPlanes: " << tbEvt.getNumPlanes()
+            << ", NumPlanes: " << tbEvt.getNumTelPlanes()
             << ", TrigID: " << tbEvt.getTriggerId());
 
     BoundedSpaceMap<short_digit_type>::collection_type digitTuples;
-    for (size_t plane = 0; plane < tbEvt.getNumPlanes(); ++plane) {
-      const std::shared_ptr<const std::vector<TelDigit> > digits = tbEvt.getDigits(plane);
+    for (size_t plane = 0; plane < tbEvt.getNumTelPlanes(); ++plane) {
+      const std::shared_ptr<const std::vector<TelDigit> > digits = tbEvt.getTelDigits(plane);
       if (digits->size() == 0) return false;
       for (const TelDigit & digit : *digits) {
         short_digit_type dtuple =
@@ -239,7 +239,10 @@ void TelDataMergerModule::beginRun()
   B2DEBUG(75, "Starting eudaq::FileReader...");
 
   // create data reader object
-  m_reader = new eudaq::FileReader(m_inputFileName, "" , true);
+  //   first argument: Input File Name
+  //   second argument: <empty>
+  //   third argument: resync flag
+  m_reader = new eudaq::FileReader(m_inputFileName, "" , false);
 
 
   // if creation failed, fail with loud noise

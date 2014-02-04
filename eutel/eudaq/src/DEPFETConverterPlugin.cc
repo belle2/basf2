@@ -7,16 +7,6 @@
 #include <eutel/eudaq/DEPFETADCValues.h>
 #include <eutel/eudaq/DEPFETEvent.h>
 
-
-#if USE_LCIO
-#  include "IMPL/LCEventImpl.h"
-#  include "IMPL/TrackerRawDataImpl.h"
-#  include "IMPL/TrackerDataImpl.h"
-#  include "IMPL/LCCollectionVec.h"
-#  include "UTIL/CellIDEncoder.h"
-#  include "lcio.h"
-#endif
-
 #include <iostream>
 #include <string>
 #include <vector>
@@ -41,6 +31,7 @@ unsigned char DHPHybrid5Mapping[256] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
                                         226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240, 241,
                                         242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255
                                        };
+
 
 struct EvtHeader {
   unsigned int    EventSize: 20;
@@ -86,21 +77,23 @@ namespace eudaq {
   class DEPFETConverterBase {
   public:
 
-#if USE_LCIO
-    void ConvertLCIOHeader(lcio::LCRunHeader& header, eudaq::Event const& bore, eudaq::Configuration const& conf) const;
-    bool ConvertLCIO(lcio::LCEvent& lcioEvent, const Event& eudaqEvent) const;
-#endif
-
     depfet::DEPFETADCValues ConvertDEPFETEvent(const std::vector<unsigned char>& data, unsigned id) const {
 
 
       //---------------------------------------------------------------------------------------------
       depfet::DEPFETADCValues m_event;
 
-      bool debug = false;
+      bool debug = false; // false;
       long int rc = 0;
 
       if (debug) std::cout << "ConvertDEPFETEvent() of block id " << id << " of length " << data.size() << std::endl;
+      /*
+      // BENNI just print the event
+      for (int i = 0; i<(int) data.size(); ++i  ){
+      printf("next char 0x%02x\n",data[i]);
+      }
+      */
+
 
       //---------------------------------------------------------------------------------------------
       struct EvtHeader GROUP_Header = *(struct EvtHeader*) &data[rc];
@@ -138,120 +131,7 @@ namespace eudaq {
         if (debug)printf(" Data event from DevType=%d: this would be Hybrid 4 or 4.1 Geant, etc...\n", GROUP_Header.DeviceType);
       }
 
-      if (GROUP_Header.EventType == 2
-          && (GROUP_Header.DeviceType == 12) // This is the DHP EMULATOR system; Should be DeviceType==12
-          &&  ModID > 0) {
 
-
-        // 32 bit frame header
-        struct InfoWord frameInfoData = *(struct InfoWord*) &data[rc];
-        rc += sizeof(struct InfoWord);
-
-        uint16_t tempZSFrameData[MAX_FRAME_LENGTH];
-
-        if (debug)printf("=> Mod=%2d DHP Data, Zero suppressed =  %s\n" , GROUP_Header.ModuleNo, (frameInfoData.zerosupp == 1) ? "true" : "false");
-        // Npixel counts how many byte in payload
-        // EventSize is size of payload + header in 32bit integers
-        int Npixels = (GROUP_Header.EventSize - 3) * 4;
-        if (Npixels > 65544) {
-          printf("frame too big\n");
-          exit(-1);
-        }
-        if (debug)printf("=> Read evt, size=%d \n", Npixels);
-
-        if (true) {
-
-          if ((frameInfoData.zerosupp == 1)) {
-
-            for (int iword = 0; iword < Npixels / 2; iword++) {
-              tempZSFrameData[iword] = *(uint16_t*) &data[rc];
-              rc += sizeof(uint16_t);
-              if (debug) printf("ZSData arrived %04x\n", tempZSFrameData[iword]);
-            }
-
-            if (debug)printf("ZSData arrived\n");
-            uint16_t current_word, current_row_base, current_row_bit, current_val, current_col, current_CM, current_row;
-            uint16_t frame_type = ((tempZSFrameData[0]) >> 13);
-            unsigned char mappedCol, mappedRowOffset, DCDChannel, mappedDrain, rowOffset;
-            uint16_t mappedRow;
-
-
-            if (frame_type == 5) {
-
-              // Here: word means 16bit integer
-              // Here: any header can be skipped.
-              //
-              // In case last word is 0000, it means last
-              // three words are footer (header+padding)
-              // and should be skipped.
-              // Otherwise, last two words are header.
-              // Just skip it.
-              // First two words are always header (skip
-              // it). If a000 appears, new DHP reading
-              // frame starts. Skip this word and the next
-              // word.
-
-              // Check for padding
-              int lastword;
-              if (tempZSFrameData[Npixels / 2 - 1] == 0x0000)
-                lastword = (Npixels - 6) / 2; // skip last three words
-              else
-                lastword = (Npixels - 4) / 2; // skip last two words
-
-              if (debug) std::cout << "lastword is " << lastword << std::endl;
-
-              for (int ipix = 2; ipix < lastword; ipix++) {
-                if (debug) printf("ZSData arrived %04x\n", tempZSFrameData[ipix]);
-                current_word = tempZSFrameData[ipix];
-
-                // Detect start of new DHP reading frame
-                if (current_word == 0xa000) {
-                  // Skip this word and the next
-                  ipix++;
-                  continue;
-                }
-
-                if (((current_word) >> 15) == 0) { //row header
-                  current_row_base = 2 * ((current_word) >> 6);
-                  current_CM = (current_word) & 0x3f;
-                  if (debug) printf("New row Header 0x%4x:  row base %2d,with common mode of:%d\n", current_word, current_row_base, current_CM);
-                } else { //row content
-                  current_val = (current_word) & 0xFF;
-                  current_col = ((current_word) >> 8) & 0x3F;
-                  current_row_bit = (((current_word) >> 8) & 0x40) / 64;
-                  current_row = current_row_base + current_row_bit;
-                  if (debug) printf("New hit token 0x%4x: col: %3d val: %2d]\n", current_word, current_col, current_val);
-
-                  //mapping
-                  rowOffset = current_row % 4;
-                  DCDChannel = 4 * current_col + rowOffset;
-                  mappedDrain = DHPHybrid5Mapping[DCDChannel];
-                  mappedCol = mappedDrain >> 2;
-                  mappedRowOffset = 3 - mappedDrain % 4;
-                  mappedRow = (current_row >> 2) * 4 + mappedRowOffset;
-                  if (debug) printf("Translating coordinates DHPRow %4d%%4 = %d, DHPCol %3d -> DCDChannel %3d -> Drain %3d, Col %d, row %4d, Offset %d\n", current_row, rowOffset, current_col, DCDChannel, mappedDrain, mappedCol, mappedRow, mappedRowOffset);
-                  if ((mappedRow < 1024) && (mappedCol < 64)) {
-                    m_event.at(0).push_back(mappedRow);
-                    m_event.at(1).push_back(mappedCol);
-                    m_event.at(2).push_back(current_val);
-                    m_event.at(3).push_back(current_CM);
-                  } else printf("Warning: col/val: [%d|%d], in row  %d, out of range. Max Row=%d, max col=%d\n", mappedCol, current_val, mappedRow, 1024, 64);
-                }
-              }
-
-
-            } else printf("\n Error! Expected zero supressed frame_type=5, got type %d, header 0x%4x 0x%4x\n", frame_type, tempZSFrameData[0], tempZSFrameData[1]);
-
-          } else { // non zero supp
-
-            printf("NonZSData arrived. This is probably a bug\n");
-
-          }
-        } else {
-          printf("wrong Module \n");
-
-        }
-      } //-- end DHH EMULATOR DATA event
 
       if (GROUP_Header.EventType == 2
           && (GROUP_Header.DeviceType == 7) // This is the DHH/Onsen system; Should be DeviceType==7
@@ -268,6 +148,8 @@ namespace eudaq {
         // EventSize is size of payload + header in 32bit integers
         int Npixels = (GROUP_Header.EventSize - 3) * 4;
 
+        //std::cout << "BENNI NPIXEL " << Npixels << std::endl;
+
         // Start looping over DHH/Onsen frames in the event
 
         unsigned int nextHeaderIndex = rc;
@@ -278,25 +160,28 @@ namespace eudaq {
         while ((!finished) && (nextHeaderIndex < lastByte)) {
 
           char dhhType = (data[nextHeaderIndex + 17] & 0x70) >> 4;
-          if (!((dhhType == 3) || (dhhType == 4) || (dhhType == 2))) {
-            printf("dhhType = %d\n", dhhType);
-            uint16_t DHPheader = (data[nextHeaderIndex + 21] << 8) + (data[nextHeaderIndex + 20]);
-            if (DHPheader != 0xA000) {
-              //printf("Error header!!! = %04X\n", DHPheader);
-              if (DHPheader == lastWord) {
-                //printf("Header corrected\n");
-                DHPheader = 0xA000;
-                dhhType = 5;
-              }
+
+          //printf("dhhType = %d\n", dhhType);
+
+          /*
+          if( !((dhhType == 3) || (dhhType == 4) || (dhhType == 2))){
+
+          std::cout << "+++++++++++++++++++++++++++++++---------------" << std::endl;
+
+          printf("dhhType = %d\n", dhhType);
+            uint16_t DHPheader = (data[nextHeaderIndex+21] << 8) + (data[nextHeaderIndex+20]);
+          if( DHPheader != 0xA000){
+          //printf("Error header!!! = %04X\n", DHPheader);
+          if(DHPheader == lastWord){
+          //printf("Header corrected\n");
+          DHPheader = 0xA000;
+          dhhType = 5;
+          }
             }
           }
+          */
 
 
-          // Print DHH header (Dima)
-          //printf("Header 0x%02x 0x%02x 0x%02x 0x%02x\n",data[nextHeaderIndex+16],data[nextHeaderIndex+17],data[nextHeaderIndex+18],data[nextHeaderIndex+19]);
-          //printf("Header 0x%02x 0x%02x 0x%02x 0x%02x\n",data[nextHeaderIndex+20],data[nextHeaderIndex+21],data[nextHeaderIndex+22],data[nextHeaderIndex+23]);
-          //printf("Header 0x%02x 0x%02x 0x%02x 0x%02x\n",data[nextHeaderIndex+24],data[nextHeaderIndex+25],data[nextHeaderIndex+26],data[nextHeaderIndex+27]);
-          //printf("Header 0x%02x 0x%02x 0x%02x 0x%02x\n",data[nextHeaderIndex+28],data[nextHeaderIndex+29],data[nextHeaderIndex+30],data[nextHeaderIndex+31]);
 
           // Extract ONSEN and DHH Header (==Onsen_Header_t )
           // DHH header is last integer in Onsen_Header_t
@@ -322,7 +207,7 @@ namespace eudaq {
 
           DHH_Header_t  DHH_Header;
           DHH_Header.flag = (DHHHeaderNotCorrected & 0x8000) >> 15;
-          DHH_Header.DataType = (DHHHeaderNotCorrected & 0x7000) >> 12;
+          DHH_Header.DataType = (DHHHeaderNotCorrected & 0x7800) >> 11;
           DHH_Header.FrameNr = (DHHHeaderNotCorrected & 0x0f00) >> 8;
           DHH_Header.DHH_ID = (DHHHeaderNotCorrected & 0x00fc) >> 2;
           DHH_Header.Chip_ID = (DHHHeaderNotCorrected & 0x0003);
@@ -411,8 +296,13 @@ namespace eudaq {
 
             lastWord = tempZSFrameData[payloadLength / 2 - 3] ;
 
-            printf("Drittes wort vom ende %04x\n", tempZSFrameData[payloadLength / 2 - 3]);
+            //printf("Drittes wort vom ende %04x\n",tempZSFrameData[payloadLength/2-3]);
 
+            unsigned short mydhpid = tempZSFrameData[0];
+
+            if ((mydhpid & 0xFFFC) != 0xA000) std::cout << "EEEERRRRROOOOOOOOOOR" << std::endl;
+
+            mydhpid = mydhpid & 0x0003;
 
             for (int ipix = 2; ipix < lastword; ipix++) {
               if (debug) printf("ZSData arrived %04x\n", tempZSFrameData[ipix]);
@@ -437,19 +327,19 @@ namespace eudaq {
                 if (debug) printf("New hit token 0x%4x: col: %3d val: %2d]\n", current_word, current_col, current_val);
 
                 //mapping
-                rowOffset = current_row % 4;
-                DCDChannel = 4 * current_col + rowOffset;
-                mappedDrain = DHPHybrid5Mapping[DCDChannel];
-                mappedCol = mappedDrain >> 2;
-                mappedRowOffset = 3 - mappedDrain % 4;
-                mappedRow = (current_row >> 2) * 4 + mappedRowOffset;
+                //rowOffset=current_row%4;
+                //DCDChannel=4*current_col+rowOffset;
+                //mappedDrain=DHPHybrid5Mapping[DCDChannel];
+                mappedCol = (current_col ^ 0x3C) + 64 * mydhpid;  //mappedDrain>>2;
+                //mappedRowOffset=3-mappedDrain%4;
+                mappedRow = current_row; //(current_row>>2)*4+mappedRowOffset;
                 if (debug) printf("Translating coordinates DHPRow %4d%%4 = %d, DHPCol %3d -> DCDChannel %3d -> Drain %3d, Col %d, row %4d, Offset %d\n", current_row, rowOffset, current_col, DCDChannel, mappedDrain, mappedCol, mappedRow, mappedRowOffset);
-                if ((mappedRow < 1024) && (mappedCol < 64)) {
+                if ((mappedRow < 480) && (mappedCol < 128)) {
                   m_event.at(0).push_back(mappedRow);
                   m_event.at(1).push_back(mappedCol);
                   m_event.at(2).push_back(current_val);
                   m_event.at(3).push_back(current_CM);
-                } else printf("Warning: col/val: [%d|%d], in row  %d, out of range. Max Row=%d, max col=%d\n", mappedCol, current_val, mappedRow, 1024, 64);
+                } else printf("Warning: col/val: [%d|%d], in row  %d, out of range. Max Row=%d, max col=%d\n", mappedCol, current_val, mappedRow, 480, 128);
               }
 
             } //-- end dhp reading frame (hits)
@@ -502,15 +392,7 @@ namespace eudaq {
       return getlittleendian<unsigned>(&rawev.GetBlock(0)[4]);
     }
 
-#if USE_LCIO
-    virtual void GetLCIORunHeader(lcio::LCRunHeader& header, eudaq::Event const& bore, eudaq::Configuration const& conf) const {
-      return ConvertLCIOHeader(header, bore, conf);
-    }
-
-    virtual bool GetLCIOSubEvent(lcio::LCEvent& lcioEvent, const Event& eudaqEvent) const {
-      return ConvertLCIO(lcioEvent, eudaqEvent);
-    }
-#endif
+    virtual bool GetTBTelEventSubEvent(TBTelEvent& result, const Event& source) const;
 
   private:
     DEPFETConverterPlugin() : DataConverterPlugin("DEPFET") {}
@@ -580,10 +462,8 @@ namespace eudaq {
     return true;
   }
 
-#if USE_LCIO
-  void DEPFETConverterBase::ConvertLCIOHeader(lcio::LCRunHeader& header, eudaq::Event const& /*bore*/, eudaq::Configuration const& /*conf*/) const {}
 
-  bool DEPFETConverterBase::ConvertLCIO(lcio::LCEvent& result, const Event& source) const
+  bool DEPFETConverterPlugin::GetTBTelEventSubEvent(TBTelEvent& result, const Event& source) const
   {
 
     if (source.IsBORE()) {
@@ -611,27 +491,18 @@ namespace eudaq {
     }
 
     //-----------------------------------------------
-    // Decode event data to a LCIO format
-
-    LCCollectionVec* ZSDataCollection = new LCCollectionVec(LCIO::TRACKERDATA);
-    CellIDEncoder<TrackerDataImpl> ZSDataEncoder("sensorID:6,sparsePixelType:5" , ZSDataCollection);
+    // Decode event data to a TBTelEvent
 
     for (size_t iframe = 0; iframe < m_event.size(); iframe++) {
 
       // Get read fully decoded data
       const depfet::DEPFETADCValues& data = m_event[iframe];
 
-      // Prepare a TrackerData to store zs pixels
-      TrackerDataImpl* zspixels = new TrackerDataImpl;
+      int sensorID = data.getModuleNr();
 
-      // Set description for zspixels
-      ZSDataEncoder["sensorID"] = data.getModuleNr();
-      ZSDataEncoder["sparsePixelType"] = 0;
-      ZSDataEncoder.setCellID(zspixels);
+      size_t nPixel = (int) data.at(0).size();
 
-      int nPixel = (int) data.at(0).size();
-
-      for (int iPixel = 0; iPixel < nPixel; iPixel++) {
+      for (size_t iPixel = 0; iPixel < nPixel; iPixel++) {
         int val = data.at(2).at(iPixel);
         int col = data.at(1).at(iPixel);
         int row = data.at(0).at(iPixel);
@@ -643,22 +514,10 @@ namespace eudaq {
         //cout << " cm  " << cm << endl;
 
         // Store pixel data int EUTelescope format
-        zspixels->chargeValues().push_back(col);
-        zspixels->chargeValues().push_back(row);
-        zspixels->chargeValues().push_back(val);
+        result.addPXDPixel(sensorID, col, row, val);
       }
-
-      // Add event to LCIO collection
-      ZSDataCollection->push_back(zspixels);
     }
-
-    result.addCollection(ZSDataCollection, "zsdata_dep");
-
     return true;
   }
-
-#endif
-
-
 
 } //namespace eudaq

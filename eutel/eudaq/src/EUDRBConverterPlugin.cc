@@ -603,7 +603,7 @@ namespace eudaq {
           // FIXME
           // START-NEW: Replacement
           // FIXME
-          result.addPixel(sensorID, XCoord, YCoord, Signal);
+          result.addTelPixel(sensorID, XCoord, YCoord, Signal);
           // FIXME
           // End-NEW: Replacement
           // FIXME

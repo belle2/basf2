@@ -15,6 +15,8 @@
 #include <testbeam/vxd/dataobjects/TelDigit.h>
 #include <testbeam/vxd/dataobjects/TelEventInfo.h>
 
+#include <pxd/dataobjects/PXDDigit.h>
+
 #include <testbeam/vxd/geometry/SensorInfo.h>
 #include <vxd/geometry/GeoCache.h>
 
@@ -51,7 +53,6 @@ TelDataReaderModule::TelDataReaderModule() : Module(),
   setDescription("Data Reader Module for EUDET telescope data.");
   setPropertyFlags(c_Input);
 
-
   //Parameter definition
   std::vector<std::string> emptyStringVector;
   addParam("inputFileName", m_inputFileName, "Input file name. For multiple files, use inputFileNames instead. Can be overridden using the -i argument to basf2.", std::string(""));
@@ -62,6 +63,9 @@ TelDataReaderModule::TelDataReaderModule() : Module(),
   // This is dirty, but safe for all practical purposes - there may be less EuTels, but hardly more.
   m_eutelPlaneNrs = {0, 1, 2, 3, 4, 5};
   addParam("eutelPlaneNrs", m_eutelPlaneNrs, "EUDAQ plane numbers ordered in beam direction", m_eutelPlaneNrs);
+  // This is dirty, but safe for all practical purposes
+  m_pxdPlaneNrs = {11};
+  addParam("pxdPlaneNrs", m_pxdPlaneNrs, "PXD plane numbers ordered in beam direction", m_pxdPlaneNrs);
 }
 
 
@@ -97,6 +101,8 @@ void TelDataReaderModule::initialize()
   storeTelDigits.registerAsPersistent();
   StoreObjPtr<TelEventInfo> storeTelEventInfo("TelEventInfo");
   storeTelEventInfo.registerAsPersistent();
+  StoreArray<PXDDigit> storePXDDigits("ePXDDigits");
+  storePXDDigits.registerAsPersistent();
 
 
   B2DEBUG(75, "TelDataReaderModule initialised!");
@@ -114,7 +120,10 @@ void TelDataReaderModule::start_run()
   }
 
   // create data reader object
-  m_reader = new eudaq::FileReader(m_inputFileNames.at(m_fileID), "" , true);
+  //   first argument: Input File Name
+  //   second argument: <empty>
+  //   third argument: resync flag
+  m_reader = new eudaq::FileReader(m_inputFileNames.at(m_fileID), "" , false);
 
   // if creation failed -> goto terminate()
   if (! m_reader) {
@@ -143,14 +152,27 @@ void TelDataReaderModule::start_run()
 
   // Set sensor number to sensor VxdID conversion map. Must not be done in init,
   // because geometry must already be available.
+  // ASSUMPTION: Planes are numbered from 0 to n in beam direction.
 
   VXD::GeoCache& geo = VXD::GeoCache::getInstance();
+
   m_sensorID.clear();
   unsigned short iPlane(0);
   for (VxdID layer : geo.getLayers(TEL::SensorInfo::TEL)) {
     for (VxdID ladder : geo.getLadders(layer)) {
       for (VxdID sensor : geo.getSensors(ladder)) {
         m_sensorID.insert(std::make_pair(m_eutelPlaneNrs[iPlane], sensor));
+        iPlane++;
+      }
+    }
+  }
+
+  m_PxdSensorID.clear();
+  iPlane = 0;
+  for (VxdID layer : geo.getLayers(TEL::SensorInfo::PXD)) {
+    for (VxdID ladder : geo.getLadders(layer)) {
+      for (VxdID sensor : geo.getSensors(ladder)) {
+        m_PxdSensorID.insert(std::make_pair(m_pxdPlaneNrs[iPlane], sensor));
         iPlane++;
       }
     }
@@ -231,6 +253,7 @@ void TelDataReaderModule::event()
   // Setup Belle2 Datastore
   StoreArray<TelDigit> storeTelDigits("TelDigits");
   StoreObjPtr<TelEventInfo> storeTelEventInfo("TelEventInfo");
+  StoreArray<PXDDigit> storePXDDigits("ePXDDigits");
 
   const eudaq::Event& ev = m_reader->GetEvent();
 
@@ -316,7 +339,7 @@ void TelDataReaderModule::event()
 
         if (! bFoundTrigId) {
           ++m_nNoTrig;
-          B2WARNING("No event of \"EUDRB\" subtype found! \n Could not extract Trigger ID. \n Will skip this event.");
+          B2WARNING("No event of \"EUDRB\" or \"NI\" subtype found! \n Could not extract Trigger ID. \n Will skip this event.");
         }
 
         // it is really important to note here that we must
@@ -328,24 +351,50 @@ void TelDataReaderModule::event()
         tbEvt.setTriggerId(uiTrigID);
 
         B2DEBUG(10, "TBEvent: Event: " << tbEvt.getEventNumber()
-                << ", NumPlanes: " << tbEvt.getNumPlanes()
+                << ", NumPlanes (Tel): " << tbEvt.getNumTelPlanes()
+                << ", NumPlanes (PXD): " << tbEvt.getNumPXDPlanes()
                 << ", TrigID: " << tbEvt.getTriggerId());
 
-        for (size_t index = 0; index < tbEvt.getNumPlanes(); ++index) {
-          const std::shared_ptr<const std::vector<TelDigit> > digits = tbEvt.getDigits(index);
+        // Store TelDigits
+        for (size_t index = 0; index < tbEvt.getNumTelPlanes(); ++index) {
+          const std::shared_ptr<const std::vector<TelDigit> > digits = tbEvt.getTelDigits(index);
           for (size_t iDigit = 0; iDigit < digits->size(); ++iDigit) {
             const TelDigit& digit = digits->at(iDigit);
             int planeNo = digit.getSensorID();
             auto it = m_sensorID.find(planeNo);
             if (it == m_sensorID.end()) {
               // There must be a serious reason for this.
-              B2ERROR("Incorrect plane number, unassociated with a VxdID " << planeNo);
+              B2ERROR("Incorrect telescope plane number, unassociated with a VxdID " << planeNo);
               continue;
             } else {
               storeTelDigits.appendNew(it->second, digit.getUCellID(), digit.getVCellID(), 1.0);
             }
           }
         }
+
+        // Store PXDDigits
+        for (size_t index = 0; index < tbEvt.getNumPXDPlanes(); ++index) {
+          const std::shared_ptr<const std::vector<PXDDigit> > digits = tbEvt.getPXDDigits(index);
+          for (size_t iDigit = 0; iDigit < digits->size(); ++iDigit) {
+            const PXDDigit& digit = digits->at(iDigit);
+            int planeNo = digit.getSensorID();
+            auto it = m_PxdSensorID.find(planeNo);
+            if (it == m_PxdSensorID.end()) {
+              // There must be a serious reason for this.
+              B2ERROR("Incorrect PXD plane number, unassociated with a VxdID " << planeNo);
+              continue;
+            } else {
+              storePXDDigits.appendNew(it->second,
+                                       digit.getUCellID(),
+                                       digit.getVCellID(),
+                                       digit.getUCellPosition(),
+                                       digit.getVCellPosition(),
+                                       digit.getCharge());
+            }
+          }
+        }
+
+        // store telescope event info
         storeTelEventInfo.assign(tbEvt.getTelEventInfo());
       }
 

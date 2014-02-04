@@ -9,6 +9,7 @@
 // include the datastore objects
 #include <testbeam/vxd/dataobjects/TelDigit.h>
 #include <testbeam/vxd/dataobjects/TelEventInfo.h>
+#include <pxd/dataobjects/PXDDigit.h>
 
 class TBTelEvent {
 public:
@@ -17,9 +18,12 @@ public:
     m_runNo(0),
     m_triggerId(0),
     m_timeStamp(0),
-    m_Planes(new std::vector<unsigned short>()),
-    m_planeToId(),
-    m_Digits() {
+    m_TelPlanes(new std::vector<unsigned short>()),
+    m_telPlaneToId(),
+    m_TelDigits(),
+    m_PXDPlanes(new std::vector<unsigned short>()),
+    m_pxdPlaneToId(),
+    m_PXDDigits() {
 
   }
 
@@ -43,35 +47,73 @@ public:
   /**  Time Stamp. */
   inline void setTimeStamp(unsigned long long int timeStamp) { m_timeStamp = timeStamp; }
 
-  /** Get number of planes currently stored. */
-  inline size_t getNumPlanes() const { return m_Planes->size(); }
-  /** Get the plane number collection. */
-  inline std::shared_ptr<const std::vector<unsigned short> > getPlanes() const { return m_Planes; }
+  //==================================================
+  // Public Interface For Telescope Digits
+  //==================================================
 
-  /** Add data for a full plane. */
-  void addPlane(unsigned short planeNo,
-                const std::vector<unsigned short>& cols,
-                const std::vector<unsigned short>& rows,
-                const std::vector<unsigned short>& signals);
-  /** Add data for a single pixel. */
-  void addPixel(unsigned short planeNo,
-                unsigned short col,
-                unsigned short row,
-                unsigned short signal);
+  /** Get number of telescope planes currently stored. */
+  inline size_t getNumTelPlanes() const { return m_TelPlanes->size(); }
+  /** Get the telescope plane number collection. */
+  inline std::shared_ptr<const std::vector<unsigned short> > getTelPlanes() const { return m_TelPlanes; }
 
-  /** Obtain the data of a single plane from its plane number. */
-  std::shared_ptr<const std::vector<Belle2::TelDigit> > getPlaneDigits(unsigned short planeNo) const;
-  /** Obtain the data of a single plane from its vector id. */
-  std::shared_ptr<const std::vector<Belle2::TelDigit> > getDigits(size_t id) const { return m_Digits.at(id); }
+  /** Add data for a full telescope plane. */
+  void addTelPlane(unsigned short planeNo,
+                   const std::vector<unsigned short>& cols,
+                   const std::vector<unsigned short>& rows,
+                   const std::vector<unsigned short>& signals);
+  /** Add data for a single telescope pixel. */
+  void addTelPixel(unsigned short planeNo,
+                   unsigned short col,
+                   unsigned short row,
+                   unsigned short signal);
+
+  /** Obtain the data of a single telescope plane from its plane number. */
+  std::shared_ptr<const std::vector<Belle2::TelDigit> > getTelPlaneDigits(unsigned short planeNo) const;
+  /** Obtain the data of a single pxd plane from its vector id. */
+  std::shared_ptr<const std::vector<Belle2::TelDigit> > getTelDigits(size_t id) const { return m_TelDigits.at(id); }
 
   /** Obtain the plain number from its vector id. */
-  unsigned short getPlaneNumber(size_t id) const { return m_Planes->at(id); }
+  unsigned short getTelPlaneNumber(size_t id) const { return m_TelPlanes->at(id); }
+
+  //==================================================
+  // Public Interface For PXD Digits
+  //==================================================
+
+  /** Get number of PXD planes currently stored. */
+  inline size_t getNumPXDPlanes() const { return m_PXDPlanes->size(); }
+  /** Get the PXD plane number collection. */
+  inline std::shared_ptr<const std::vector<unsigned short> > getPXDPlanes() const { return m_PXDPlanes; }
+
+  /** Add data for a full pxd plane. */
+  void addPXDPlane(unsigned short planeNo,
+                   const std::vector<unsigned short>& cols,
+                   const std::vector<unsigned short>& rows,
+                   const std::vector<unsigned short>& signals);
+  /** Add data for a single pxd pixel. */
+  void addPXDPixel(unsigned short planeNo,
+                   unsigned short col,
+                   unsigned short row,
+                   unsigned short signal);
+
+  /** Obtain the data of a single pxd plane from its plane number. */
+  std::shared_ptr<const std::vector<Belle2::PXDDigit> > getPXDPlaneDigits(unsigned short planeNo) const;
+  /** Obtain the data of a single pxd plane from its vector id. */
+  std::shared_ptr<const std::vector<Belle2::PXDDigit> > getPXDDigits(size_t id) const { return m_PXDDigits.at(id); }
+
+  /** Obtain the plain number from its vector id. */
+  unsigned short getPXDPlaneNumber(size_t id) const { return m_PXDPlanes->at(id); }
+
 private:
+  /** Enum class */
+  enum class DigitType {
+    Telescope,
+    PXD
+  };
   /** Internal function for obtaining the index in the data vector for a
-  given plane number. If there is no data present yet for this plane
-  number, create the appropriate data structure and return resulting
-  index. */
-  size_t getIdFromPlane(unsigned short planeNo);
+      given plane number. If there is no data present yet for this plane
+      number, create the appropriate data structure and return resulting
+      index. */
+  size_t getIdFromPlane(unsigned short planeNo, DigitType type);
 
   /** The current event number. */
   unsigned long long int m_eventNo;
@@ -81,15 +123,26 @@ private:
   unsigned long long int m_triggerId;
   /** The timestamp of the current event. */
   unsigned long long int m_timeStamp;
-  /** Set storing the plane numbers kept for this event. */
-  std::shared_ptr<std::vector<unsigned short> > m_Planes;
-  /** Map storing a mapping of plane number to vector id. */
-  std::map<unsigned short int, size_t> m_planeToId;
 
-  /** Vector for storing the pixel values of each plane separately. The
-  outer vector loop over the different plane numbers, the inner vector
-  over the firing pixels. */
-  std::vector<std::shared_ptr<std::vector<Belle2::TelDigit> > > m_Digits;
+  /** Set storing the telescope plane numbers kept for this event. */
+  std::shared_ptr<std::vector<unsigned short> > m_TelPlanes;
+  /** Map storing a mapping of telescope plane number to vector id. */
+  std::map<unsigned short int, size_t> m_telPlaneToId;
+
+  /** Vector for storing the pixel values of each telescope plane separately. The
+      outer vector loop over the different plane numbers, the inner vector
+      over the firing pixels. */
+  std::vector<std::shared_ptr<std::vector<Belle2::TelDigit> > > m_TelDigits;
+
+  /** Set storing the PXD plane numbers kept for this event. */
+  std::shared_ptr<std::vector<unsigned short> > m_PXDPlanes;
+  /** Map storing a mapping of PXD plane number to vector id. */
+  std::map<unsigned short int, size_t> m_pxdPlaneToId;
+
+  /** Vector for storing the pixel values of each PXD plane separately. The
+      outer vector loop over the different plane numbers, the inner vector
+      over the firing pixels. */
+  std::vector<std::shared_ptr<std::vector<Belle2::PXDDigit> > > m_PXDDigits;
 };
 
 #endif

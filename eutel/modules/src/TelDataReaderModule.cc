@@ -148,7 +148,7 @@ void TelDataReaderModule::start_run()
   for (VxdID layer : geo.getLayers(TEL::SensorInfo::TEL)) {
     for (VxdID ladder : geo.getLadders(layer)) {
       for (VxdID sensor : geo.getSensors(ladder)) {
-        m_sensorID.insert(std::pair<unsigned short, VxdID>(iPlane, sensor));
+        m_sensorID.insert(std::pair<unsigned short, VxdID>(eudetPlaneNrs[iPlane], sensor));
         iPlane++;
       }
     }

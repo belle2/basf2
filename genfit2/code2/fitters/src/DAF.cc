@@ -128,9 +128,10 @@ void DAF::processTrackWithRep(Track* tr, const AbsTrackRep* rep, bool resortHits
     bool converged(false);
     try{
       converged = calcWeights(tr, rep, betas_.at(iBeta));
-      if (!converged && iBeta >= minIterations_-1 && abs(lastPval - status->getBackwardPVal()) < this->deltaPval_) {
+      if (!converged && iBeta >= minIterations_-1 &&
+          status->getBackwardPVal() != 0 && abs(lastPval - status->getBackwardPVal()) < this->deltaPval_) {
         if (debugLvl_ > 0) {
-          std::cout << "converged by Pval = " << lastPval << " even though weights changed at iBeta = " << iBeta << std::endl;
+          std::cout << "converged by Pval = " << status->getBackwardPVal() << " even though weights changed at iBeta = " << iBeta << std::endl;
         }
         converged = true;
       }
@@ -219,8 +220,9 @@ void DAF::setBetas(double b1,double b2,double b3,double b4,double b5,double b6,d
       }
     }
   }
+  minIterations_ = betas_.size();
   maxIterations_ = betas_.size() + 4;
-  betas_.resize(maxIterations_,betas_.back()); //make sure main loop has a maximum of 10 iterations and also make sure the last beta value is used for if more iterations are needed then the ones set by the user.
+  betas_.resize(maxIterations_,betas_.back()); //make sure main loop has a maximum of maxIterations_ and also make sure the last beta value is used for if more iterations are needed then the ones set by the user.
 }
 
 
@@ -231,6 +233,7 @@ void DAF::setAnnealingScheme(double bStart, double bFinal, unsigned int nSteps) 
   assert(bFinal > 1.E-10);
   assert(nSteps > 1);
 
+  minIterations_ = nSteps;
   maxIterations_ = nSteps + 4;
 
   betas_.clear();

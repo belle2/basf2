@@ -60,7 +60,7 @@ struct BoundedSpaceSet {
    * @return median of set elements
    */
   inline CIRC::tag_type getMedian() const {
-    if (m_set.empty()) return 0;
+    if (m_set.size() < 5) return 0;
     auto it = m_set.begin();
     for (unsigned i = 0; i < m_set.size() / 2; ++i) it++;
     if (m_set.size() % 2 == 1)
@@ -163,7 +163,7 @@ struct BoundedSpaceMap {
    * @return median of map labels
    */
   inline CIRC::tag_type getMedian() const {
-    if (m_map.empty()) return 0;
+    if (m_map.size() < 5) return 0;
     auto it = m_map.begin();
     for (unsigned i = 0; i < m_map.size() / 2; ++i) it++;
     if (m_map.size() % 2 == 1)

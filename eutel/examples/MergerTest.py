@@ -28,6 +28,14 @@ dataMerger = register_module('TelDataMerger')
 # use corresponding telescope data file
 dataMerger.param('inputFileName', '../vxdtb/data/run000070.raw')
 dataMerger.param('bufferSize', 200)
+dataMerger.param('eutelPlaneNrs', [
+    4,
+    3,
+    2,
+    0,
+    1,
+    5,
+    ])
 dataMerger.set_log_level(LogLevel.INFO)
 
 # PXD unpacker

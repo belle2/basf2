@@ -51,6 +51,7 @@ TelDataReaderModule::TelDataReaderModule() : Module(),
   setDescription("Data Reader Module for EUDET telescope data.");
   setPropertyFlags(c_Input);
 
+
   //Parameter definition
   std::vector<std::string> emptyStringVector;
   addParam("inputFileName", m_inputFileName, "Input file name. For multiple files, use inputFileNames instead. Can be overridden using the -i argument to basf2.", std::string(""));
@@ -58,6 +59,9 @@ TelDataReaderModule::TelDataReaderModule() : Module(),
   addParam("maxNumEntries", m_ullMaxNumEntries, "The Maximum number of enries to be processed.\nIf this is zero, no restrict will be placed.", static_cast<unsigned long long int>(0));
   addParam("numEntriesSkip", m_ullNumEntriesSkip, "The number of entries that shall be skipped at the beginning.", static_cast<unsigned long long int>(0));
   addParam("numEntriesPrint", m_numPrint, "How often to print the current entry number.\nIf this is zero, do not print any progress output.", static_cast<unsigned long long int>(0));
+  // This is dirty, but safe for all practical purposes - there may be less EuTels, but hardly more.
+  m_eutelPlaneNrs = {0, 1, 2, 3, 4, 5};
+  addParam("eutelPlaneNrs", m_eutelPlaneNrs, "EUDAQ plane numbers ordered in beam direction", m_eutelPlaneNrs);
 }
 
 
@@ -139,8 +143,6 @@ void TelDataReaderModule::start_run()
 
   // Set sensor number to sensor VxdID conversion map. Must not be done in init,
   // because geometry must already be available.
-  // sorry, this is dirty, I'll fix it once stuff works.
-  const unsigned int eudetPlaneNrs[] = {4, 3, 2, 0, 1, 5};
 
   VXD::GeoCache& geo = VXD::GeoCache::getInstance();
   m_sensorID.clear();
@@ -148,7 +150,7 @@ void TelDataReaderModule::start_run()
   for (VxdID layer : geo.getLayers(TEL::SensorInfo::TEL)) {
     for (VxdID ladder : geo.getLadders(layer)) {
       for (VxdID sensor : geo.getSensors(ladder)) {
-        m_sensorID.insert(std::pair<unsigned short, VxdID>(eudetPlaneNrs[iPlane], sensor));
+        m_sensorID.insert(std::make_pair(m_eutelPlaneNrs[iPlane], sensor));
         iPlane++;
       }
     }
@@ -333,8 +335,8 @@ void TelDataReaderModule::event()
           const std::shared_ptr<const std::vector<TelDigit> > digits = tbEvt.getDigits(index);
           for (size_t iDigit = 0; iDigit < digits->size(); ++iDigit) {
             const TelDigit& digit = digits->at(iDigit);
-            unsigned short planeNo = digit.getSensorID();
-            std::map<unsigned short, VxdID>::const_iterator it = m_sensorID.find(planeNo);
+            int planeNo = digit.getSensorID();
+            auto it = m_sensorID.find(planeNo);
             if (it == m_sensorID.end()) {
               // There must be a serious reason for this.
               B2ERROR("Incorrect plane number, unassociated with a VxdID " << planeNo);

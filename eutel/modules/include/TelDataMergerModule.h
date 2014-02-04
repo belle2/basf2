@@ -109,6 +109,7 @@ namespace Belle2 {
     std::string m_storeRawFTSWsName;    /**< DataStore name of RawFTSWs */
 
     unsigned short m_bufferSize;    /**< Size of the buffers */
+    std::vector<int> m_eutelPlaneNrs; /**< Numbering of telescope planes in eudaq */
 
     // Internal Variables
 
@@ -130,7 +131,7 @@ namespace Belle2 {
     tag_type m_currentTLUTagFromFTSW; /**< TLU tag extracted from FTSW data in VXD DAQ */
 
     // conversion map between sensor numbers and their VxdIDs
-    std::map< unsigned short, VxdID > m_sensorID;
+    std::map< int, VxdID > m_sensorID;
   };
 }
 #endif

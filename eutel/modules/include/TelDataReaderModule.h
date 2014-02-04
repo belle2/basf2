@@ -110,8 +110,10 @@ namespace Belle2 {
     unsigned int m_nEORE;
     unsigned int m_nNoTrig;
 
+    // mapping of eutel plane numbers: EUDAQ numbers ordered in beam direction
+    std::vector<int> m_eutelPlaneNrs;
     // conversion map between sensor numbers and their VxdIDs
-    std::map< unsigned short, VxdID > m_sensorID;
+    std::map< int, VxdID > m_sensorID;
   };
 }
 #endif

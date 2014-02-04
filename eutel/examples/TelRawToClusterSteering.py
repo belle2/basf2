@@ -7,7 +7,7 @@ set_log_level(LogLevel.WARNING)
 # Load parameters from xml
 gearbox = register_module('Gearbox')
 # VXD (no Telescopes), and the real PCMAG magnetic field
-gearbox.param('fileName', 'testbeam/vxd/FullTelescopeVXDTB_v1.xml')
+gearbox.param('fileName', 'testbeam/vxd/FullTelescopeVXDTB_v2.xml')
 
 # Create geometry
 geometry = register_module('Geometry')
@@ -18,7 +18,8 @@ geometry.param('components', ['TB'])
 dataReader = register_module('TelDataReader')
 # use 4394, 313 or, 3
 p_dataReader = {'inputFileName': 'put_your_path_here/run000005.raw',
-                'maxNumEntries': 10000}
+                'maxNumEntries': 10000,
+                'eutelPlaneNrs': [4, 3, 2, 0, 1, 5]}
 dataReader.param(p_dataReader)
 
 # Histogram manager immediately after master module

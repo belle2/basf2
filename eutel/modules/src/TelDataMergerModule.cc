@@ -51,6 +51,10 @@ TelDataMergerModule::TelDataMergerModule() : Module(),
   addParam("inputFileName", m_inputFileName, "Input file name. For multiple files, use inputFileNames instead. Can be overridden using the -i argument to basf2.", std::string(""));
   addParam("storeDigitsName", m_storeDigitsName, "DataStore name of TelDigits collection", std::string(""));
   addParam("bufferSize", m_bufferSize, "Size of the telescope data buffer", m_bufferSize);
+
+  // This is dirty, but safe for all practical purposes - there may be less EuTels, but hardly more.
+  m_eutelPlaneNrs = {0, 1, 2, 3, 4, 5};
+  addParam("eutelPlaneNrs", m_eutelPlaneNrs, "Numbering of eutel planes", m_eutelPlaneNrs);
 }
 
 
@@ -210,8 +214,6 @@ void TelDataMergerModule::initialize()
   storeTelEventInfo.registerAsPersistent();
 
   // Initialize sensor number to sensor VxdID conversion map.
-  // sorry, this is dirty, I'll fix it once the stuff works.
-  const unsigned int eudetPlaneNrs[] = {4, 3, 2, 0, 1, 5};
 
   VXD::GeoCache& geo = VXD::GeoCache::getInstance();
   m_sensorID.clear();
@@ -219,7 +221,7 @@ void TelDataMergerModule::initialize()
   for (VxdID layer : geo.getLayers(TEL::SensorInfo::TEL)) {
     for (VxdID ladder : geo.getLadders(layer)) {
       for (VxdID sensor : geo.getSensors(ladder)) {
-        m_sensorID.insert(std::pair<unsigned short, VxdID>(eudetPlaneNrs[iPlane], sensor));
+        m_sensorID.insert(std::make_pair(m_eutelPlaneNrs[iPlane], sensor));
         iPlane++;
       }
     }
@@ -279,7 +281,7 @@ void TelDataMergerModule::saveDigits(tag_type currentTag)
 
   auto digitTuples = m_buffer.get(currentTag);
   for (auto dtuple : digitTuples) {
-    unsigned short planeNo = std::get<0>(dtuple);
+    int planeNo = std::get<0>(dtuple);
     auto it = m_sensorID.find(planeNo);
     if (it == m_sensorID.end()) {
       // There must be a serious reason for this.

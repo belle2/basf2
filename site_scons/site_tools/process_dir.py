@@ -113,6 +113,8 @@ def process_dir(
     env['SCRIPT_FILES'] = script_files
     env['EXECUTABLE_FILES'] = executable_files
     env['DATA_FILES'] = data_files
+    env['DATAOBJECT_LIB'] = []
+    env['DATAOBJECT_LIBS'] = []
 
     # clean up some environment variables that should not be inherited from the parent environment
     if env.Dictionary().has_key('SUBLIB'):
@@ -261,6 +263,8 @@ def process_dir(
     # add dataobject libs to parent environment
     if env.Dictionary().has_key('DATAOBJECT_LIB'):
         parent_env.Append(DATAOBJECT_LIBS=env['DATAOBJECT_LIB'])
+    if env.Dictionary().has_key('DATAOBJECT_LIBS'):
+        parent_env.AppendUnique(DATAOBJECT_LIBS=env['DATAOBJECT_LIBS'])
 
     # process modules directory last so that it is known whether the main library exists
     if os.path.isdir(real_path(os.path.join(dir_name, 'modules'),

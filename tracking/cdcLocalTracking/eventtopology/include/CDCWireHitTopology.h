@@ -32,17 +32,26 @@ namespace Belle2 {
     class CDCWireHitTopology : public UsedTObject {
 
     public:
+      /// A Range of const CDCWireHits - usable with range based for
       typedef SortableVector<Belle2::CDCLocalTracking::CDCWireHit>::const_range CDCWireHitRange;
+
+      /// A Range of const CDCLRWireHits - usable with range based for
       typedef SortableVector<Belle2::CDCLocalTracking::CDCRLWireHit>::const_range CDCRLWireHitRange;
 
+
+      /// Getter of the singletone instance
+      static CDCWireHitTopology& getInstance();
+
+    public:
       /// Default constructor for ROOT compatibility.
       CDCWireHitTopology() {;}
 
       /// Empty deconstructor
       ~CDCWireHitTopology() {;}
 
+    public:
       /// Fill the topology from the raw cdc hits
-      void fill(const std::string& cdcHitsStoreArrayName = "");
+      size_t fill(const std::string& cdcHitsStoreArrayName = "");
 
       /// Clear content of the topology after the event is processed
       void clear();

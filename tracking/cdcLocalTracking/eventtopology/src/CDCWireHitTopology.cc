@@ -21,8 +21,17 @@ using namespace Belle2;
 using namespace CDCLocalTracking;
 
 
+namespace {
+  CDCWireHitTopology* g_wireHitTopology = nullptr;
+}
 
-void CDCWireHitTopology::fill(const std::string& cdcHitsStoreArrayName)
+CDCWireHitTopology& CDCWireHitTopology::getInstance()
+{
+  if (not g_wireHitTopology) g_wireHitTopology = new CDCWireHitTopology;
+  return *g_wireHitTopology;
+}
+
+size_t CDCWireHitTopology::fill(const std::string& cdcHitsStoreArrayName)
 {
   //clear all wire hits and oriented wire hits that might be left over from the last event
   clear();
@@ -53,6 +62,8 @@ void CDCWireHitTopology::fill(const std::string& cdcHitsStoreArrayName)
   if (not m_rlWireHits.checkSorted()) {
     B2ERROR("Oriented wire hits are not sorted after creation");
   }
+
+  return nHits;
 
 }
 

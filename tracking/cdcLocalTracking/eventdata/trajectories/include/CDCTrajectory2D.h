@@ -58,7 +58,7 @@ namespace Belle2 {
     public:
 
       /// Checks if the circle is already set to a valid value
-      bool isFitted() const { return getGenCircle().isNull(); }
+      bool isFitted() const { return not getGenCircle().isNull(); }
 
       /// Calculate the travel distance from the start position of the trajectory.
       /** Returns the travel distance on the trajectory from the start point to \n

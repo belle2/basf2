@@ -138,5 +138,5 @@ void CDCRecoHit2D::reverse()
 
 CDCRecoHit2D CDCRecoHit2D::reversed() const
 {
-  return CDCRecoHit2D(CDCWireHitTopology::getInstance().getReverseOf(getRLWireHit()), getRefDisp2D());
+  return CDCRecoHit2D(CDCWireHitTopology::getInstance().getReverseOf(getRLWireHit()), getRecoDisp2D());
 }

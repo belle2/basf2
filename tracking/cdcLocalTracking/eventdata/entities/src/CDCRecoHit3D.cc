@@ -10,6 +10,8 @@
 
 #include "../include/CDCRecoHit3D.h"
 
+#include <tracking/cdcLocalTracking/eventtopology/CDCWireHitTopology.h>
+
 using namespace std;
 using namespace Belle2;
 using namespace CDCLocalTracking;
@@ -17,31 +19,28 @@ using namespace CDCLocalTracking;
 ClassImpInCDCLocalTracking(CDCRecoHit3D)
 
 CDCRecoHit3D::CDCRecoHit3D():
-  m_wirehit(&(CDCWireHit::getLowest())),
-  m_position(Vector3D::getLowest()),
-  m_rlInfo(LEFT),
+  m_rlWireHit(nullptr),
+  m_recoPos3D(Vector3D::getLowest()),
   m_perpS(0.0)
 {;}
 
 
 CDCRecoHit3D::CDCRecoHit3D(
-  const CDCWireHit* wirehit,
-  const Vector3D& position,
-  RightLeftInfo rlInfo,
+  const CDCRLWireHit* rlWireHit,
+  const Vector3D& recoPos3D,
   FloatType perpS
 ) :
-  m_wirehit(wirehit),
-  m_position(position) ,
-  m_rlInfo(rlInfo),
+  m_rlWireHit(rlWireHit),
+  m_recoPos3D(recoPos3D),
   m_perpS(perpS)
 {
-  if (wirehit == nullptr) B2WARNING("Recohit with nullptr as wire hit");
+  if (rlWireHit == nullptr) B2ERROR("Initialization of three dimensional reconstructed hit with nullptr as oriented wire hit");
 }
 
 CDCRecoHit3D CDCRecoHit3D::fromSimHit(const CDCWireHit* wireHit, const CDCSimHit& simHit)
 {
 
-  //prepS can not be deduced from the flightTime in this context
+  //prepS cannot be deduced from the flightTime in this context
   FloatType perpS = std::numeric_limits<FloatType>::quiet_NaN();
 
   // find out if the wire is right or left of the track ( view in flight direction )
@@ -52,7 +51,9 @@ CDCRecoHit3D CDCRecoHit3D::fromSimHit(const CDCWireHit* wireHit, const CDCSimHit
 
   RightLeftInfo rlInfo = trackPosToWire.xy().isRightOrLeftOf(directionOfFlight.xy());
 
-  return CDCRecoHit3D(wireHit, simHit.getPosTrack(), rlInfo, perpS);
+  const CDCRLWireHit* rlWireHit = CDCWireHitTopology::getInstance().getRLWireHit(*wireHit, rlInfo);
+
+  return CDCRecoHit3D(rlWireHit, simHit.getPosTrack(), perpS);
 
 }
 
@@ -63,13 +64,13 @@ CDCRecoHit3D CDCRecoHit3D::reconstruct(
 )
 {
 
-  AxialType axialType = recoHit->getAxialType();
+  AxialType axialType = recoHit.getAxialType();
   if (axialType == STEREO_V or axialType == STEREO_U) {
 
     BoundSkewLine skewLine = recoHit.getSkewLine();
     Vector3D reconstructedPoint = trajectory2D.reconstruct3D(skewLine);
     FloatType perpS = trajectory2D.calcPerpS(reconstructedPoint.xy());
-    return CDCRecoHit3D(&(recoHit.getWireHit()), reconstructedPoint, recoHit.getRLInfo(), perpS);
+    return CDCRecoHit3D(&(recoHit.getRLWireHit()), reconstructedPoint, perpS);
 
   } else if (axialType == AXIAL) {
     Vector2D recoPos2D = trajectory2D.getClosest(recoHit.getRecoPos2D());
@@ -79,8 +80,9 @@ CDCRecoHit3D CDCRecoHit3D::reconstruct(
     //we set it to a not a number here
     FloatType z        = std::numeric_limits<FloatType>::quiet_NaN();
 
-    return CDCRecoHit3D(&(recoHit.getWireHit()), Vector3D(recoPos2D, z), recoHit.getRLInfo(), perpS);
+    return CDCRecoHit3D(&(recoHit.getRLWireHit()), Vector3D(recoPos2D, z), perpS);
   } else {
+    B2ERROR("Reconstruction on invalid wire");
     return CDCRecoHit3D();
   }
 }
@@ -92,14 +94,14 @@ CDCRecoHit3D CDCRecoHit3D::reconstruct(
 )
 {
 
-  AxialType axialType = recoHit->getAxialType();
+  AxialType axialType = recoHit.getAxialType();
   if (axialType == AXIAL) {
     Vector2D recoPos2D = trajectory2D.getClosest(recoHit.getRecoPos2D());
     FloatType perpS    = trajectory2D.calcPerpS(recoPos2D);
     FloatType z        = trajectorySZ.mapSToZ(perpS);
 
     Vector3D recoPos3D(recoPos2D, z);
-    return CDCRecoHit3D(&(recoHit.getWireHit()), recoPos3D, recoHit.getRLInfo(), perpS);
+    return CDCRecoHit3D(&(recoHit.getRLWireHit()), recoPos3D, perpS);
 
   } else if (axialType == STEREO_U or axialType == STEREO_V) {
     //the closest approach of a skew line to a helix
@@ -114,20 +116,24 @@ CDCRecoHit3D CDCRecoHit3D::reconstruct(
     FloatType perpS    = trajectory2D.calcPerpS(recoPos3D.xy());
     FloatType z        = trajectorySZ.mapSToZ(perpS);
     recoPos3D.setZ(z);
-    return CDCRecoHit3D(&(recoHit.getWireHit()), recoPos3D, recoHit.getRLInfo(), perpS);
+    return CDCRecoHit3D(&(recoHit.getRLWireHit()), recoPos3D, perpS);
 
   } else {
+    B2ERROR("Reconstruction on invalid wire");
     return CDCRecoHit3D();
   }
 }
 
 CDCRecoHit3D CDCRecoHit3D::average(const CDCRecoHit3D& first , const CDCRecoHit3D& second)
 {
-  return first.getWireHit() == second.getWireHit() ?
-         CDCRecoHit3D(first.getWireHit(), Vector3D::average(first.getPos3D(), second.getPos3D()),
-                      averageInfo(first.getRLInfo(), second.getRLInfo()),
-                      (first.getPerpS() + second.getPerpS()) / 2) :
-         first;
+  if (first.getRLWireHit() == second.getRLWireHit()) {
+    return CDCRecoHit3D(&(first.getRLWireHit()),
+                        Vector3D::average(first.getRecoPos3D(), second.getRecoPos3D()),
+                        (first.getPerpS() + second.getPerpS()) / 2);
+  } else {
+    B2ERROR("Averaging three dimensional hits which are passed on different oriented wire hits. Return first one unchanged");
+    return first;
+  }
 }
 
 
@@ -139,14 +145,25 @@ CDCRecoHit3D::~CDCRecoHit3D()
 bool CDCRecoHit3D::isInCDC() const
 {
 
-  const CDCWire* wire = getWire();
-  if (wire == nullptr) return false;
+  const CDCWire& wire = getWire();
 
-  const double forwardZ = wire->getSkewLine().forwardZ();
-  const double backwardZ = wire->getSkewLine().backwardZ();
+  const double forwardZ = wire.getSkewLine().forwardZ();
+  const double backwardZ = wire.getSkewLine().backwardZ();
 
-  return (backwardZ < getPos3D().z() and getPos3D().z() < forwardZ);
+  return (backwardZ < getRecoPos3D().z() and getRecoPos3D().z() < forwardZ);
 }
 
-// Implement all functions
 
+
+void CDCRecoHit3D::reverse()
+{
+  const CDCRLWireHit* reverseRLWireHit = CDCWireHitTopology::getInstance().getReverseOf(getRLWireHit());
+  setRLWireHit(reverseRLWireHit);
+}
+
+
+
+CDCRecoHit3D CDCRecoHit3D::reversed() const
+{
+  return CDCRecoHit3D(CDCWireHitTopology::getInstance().getReverseOf(getRLWireHit()), getRecoPos3D(), getPerpS());
+}

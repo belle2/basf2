@@ -143,7 +143,6 @@ namespace Belle2 {
       BoundSkewLine getSkewLine() const
       { return getWire().getSkewLine().movedBy(getRecoDisp2D()); }
 
-
       /// Getter for the axial type of the underlying wire.
       AxialType getAxialType() const
       { return getRLWireHit().getAxialType(); }
@@ -167,24 +166,21 @@ namespace Belle2 {
       const CDCWireHit& getWireHit() const
       { return getRLWireHit().getWireHit(); }
 
-      /// Getter for the right left passage information.
-      const RightLeftInfo& getRLInfo() const
-      { return getRLWireHit().getRLInfo(); }
-
-
       /// Checks if the reconstructed hit is assoziated with the give wire hit
       bool hasWireHit(const CDCWireHit& wireHit) const
       { return getRLWireHit().hasWireHit(wireHit); }
 
 
 
+      /// Getter for the right left passage information.
+      const RightLeftInfo& getRLInfo() const
+      { return getRLWireHit().getRLInfo(); }
+
+
+
       /// Getter for the position in the reference plane
       Vector2D getRecoPos2D() const
       { return getRecoDisp2D() + getWireHit().getRefPos2D(); }
-
-      /// Legacy getter for the displacement from the wire reference position
-      const Vector2D& getRefDisp2D() const
-      { return getRecoDisp2D(); }
 
       /// Getter for the displacement from the wire reference position
       const Vector2D& getRecoDisp2D() const

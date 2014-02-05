@@ -82,7 +82,7 @@ TrackCreator::create(
     CDCTrajectorySZ endTrajectorySZ = firstTriple->getTrajectorySZ();
 
     // Set the reference point on the trajectories to the last reconstructed hit
-    FloatType perpSShift = endTrajectory2D.setStartPos2D(track.getEndRecoHit3D().getPos2D());
+    FloatType perpSShift = endTrajectory2D.setStartPos2D(track.getEndRecoHit3D().getRecoPos2D());
     endTrajectorySZ.passiveMoveS(perpSShift);
     //Both fits now have the travel distance scale from the last hit as it should be
 
@@ -125,7 +125,7 @@ bool TrackCreator::create(
     track.setStartTrajectory2D(trajectory2D);
 
     //Shift fit to the last reco hit and assigne the end fit of the track as well
-    FloatType perpSShift = trajectory2D.setStartPos2D(track.getEndRecoHit3D().getPos2D());
+    FloatType perpSShift = trajectory2D.setStartPos2D(track.getEndRecoHit3D().getRecoPos2D());
     trajectorySZ.passiveMoveS(perpSShift); //this does not really do anythin for the line z = 0*s + 0
     // mentioned only for completeness
 

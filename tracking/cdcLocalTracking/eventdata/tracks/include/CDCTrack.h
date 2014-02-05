@@ -47,11 +47,11 @@ namespace Belle2 {
 
       /// Getter for the position of the first reconstructed hit. Does not account for the forward backward info.
       const Vector3D& getStartRecoPos3D() const
-      { return getStartRecoHit3D().getPos3D(); }
+      { return getStartRecoHit3D().getRecoPos3D(); }
 
       /// Getter for the position of the last reconstructed hit. Does not account for the forward backward info.
       const Vector3D& getEndRecoPos3D() const
-      { return getEndRecoHit3D().getPos3D(); }
+      { return getEndRecoHit3D().getRecoPos3D(); }
 
 
       /// Getter for the start fitted position of track. Does not account for the forward backward info.

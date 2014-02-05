@@ -106,8 +106,8 @@ namespace Belle2 {
         return getMCParticle(&wireHit);
       }
       const Belle2::MCParticle* getMCParticle(const CDCRecoHit3D& recoHit) const {
-        const CDCWireHit* wireHit = recoHit.getWireHit();
-        return getMCParticle(wireHit);
+        const CDCWireHit& wireHit = recoHit.getWireHit();
+        return getMCParticle(&wireHit);
       }
 
     private:
@@ -145,8 +145,10 @@ namespace Belle2 {
         const CDCWireHit& wireHit = recoHit.getWireHit();
         return getMCTrackId(&wireHit);
       }
-      ITrackType getMCTrackId(const CDCRecoHit3D& recoHit) const
-      { return getMCTrackId(recoHit.getWireHit()); }
+      ITrackType getMCTrackId(const CDCRecoHit3D& recoHit) const {
+        const CDCWireHit& wireHit = recoHit.getWireHit();
+        return getMCTrackId(&wireHit);
+      }
 
 
       ITrackType getMajorMCTrackId(const CDCWireHit* one,

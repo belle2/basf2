@@ -108,13 +108,13 @@ GFTrackCandCreator::appendHits(
 
       //the hit id correspondes to the index in the TClonesArray
       //this is stored in the wirehit the recohit is based on
-      unsigned int storeIHit = recohit.getWireHit()->getStoreIHit();
+      unsigned int storeIHit = recohit.getWireHit().getStoreIHit();
 
       //the plain id serves to mark competition between two or more hits
       //use the wire id here which is unique for all the hits in the track
       //but it may also serve the fact that a track can only be responsable for a single hit on each wire
       //double hits should correspond to multiple tracks
-      unsigned int planeId = recohit.getWire()->getEWire();
+      unsigned int planeId = recohit.getWire().getEWire();
 
 
       //the rho parameter is used to sort the cdchits accoring to the direction of flight
@@ -132,13 +132,13 @@ GFTrackCandCreator::appendHits(
 
       //the hit id correspondes to the index in the TClonesArray
       //this is stored in the wirehit the recohit is based on
-      unsigned int storeIHit = recohit.getWireHit()->getStoreIHit();
+      unsigned int storeIHit = recohit.getWireHit().getStoreIHit();
 
       //the plain id serves to mark competition between two or more hits
       //use the wire id here which is unique for all the hits in the track
       //but it may also serve the fact that a track can only be responsable for a single hit on each wire
       //double hits should correspond to multiple tracks
-      unsigned int planeId = recohit.getWire()->getEWire();
+      unsigned int planeId = recohit.getWire().getEWire();
 
 
       //the rho parameter is used to sort the cdchits accoring to the direction of flight

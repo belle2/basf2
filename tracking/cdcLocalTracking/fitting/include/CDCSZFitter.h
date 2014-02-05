@@ -45,7 +45,7 @@ namespace Belle2 {
 
       void fillObservation(const Belle2::CDCLocalTracking::CDCRecoHit3D& recohit, std::vector<FloatType>& observations) const {
         observations.push_back(recohit.getPerpS());
-        observations.push_back(recohit.getPos3D().z());
+        observations.push_back(recohit.getRecoPos3D().z());
       }
 
     private:

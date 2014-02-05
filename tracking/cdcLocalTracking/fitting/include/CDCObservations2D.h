@@ -48,25 +48,48 @@ namespace Belle2 {
       { m_observations.reserve(nObservations * 3); }
 
       /// Appends the observed position - drift radius is assumed to be zero
-      void append(const Belle2::CDCLocalTracking::Vector2D& pos2D);
+      void append(const Belle2::CDCLocalTracking::Vector2D& pos2D, const FloatType& signedRadius = 0.0) {
+        m_observations.push_back(pos2D.x());
+        m_observations.push_back(pos2D.y());
+        m_observations.push_back(signedRadius);
+      }
 
       /// Appends the observed position - drift radius is take a positiv number
-      void append(const Belle2::CDCLocalTracking::CDCWireHit& wireHit);
+      void append(const Belle2::CDCLocalTracking::CDCWireHit& wireHit)
+      { append(wireHit.getRefPos2D(), wireHit.getRefDriftLength()); }
 
       /// Appends the observed position - drift radius is signed number according to the orientation
-      void append(const Belle2::CDCLocalTracking::CDCRLWireHit& rlWireHit);
+      void append(const Belle2::CDCLocalTracking::CDCRLWireHit& rlWireHit)
+      { append(rlWireHit.getRefPos2D(), rlWireHit.getSignedRefDriftLength()); }
 
       /// Appends the two observed position - drift radius is signed number according to the orientation
-      void append(const Belle2::CDCLocalTracking::CDCRLWireHitPair& rlWireHitPair);
+      void append(const Belle2::CDCLocalTracking::CDCRLWireHitPair& rlWireHitPair) {
+        append(rlWireHitPair.getFromRLWireHit());
+        append(rlWireHitPair.getToRLWireHit());
+      }
 
       /// Appends the three observed position - drift radius is signed number according to the orientation
-      void append(const Belle2::CDCLocalTracking::CDCRLWireHitTriple& rlWireHitTriple);
+      void append(const Belle2::CDCLocalTracking::CDCRLWireHitTriple& rlWireHitTriple) {
+        append(rlWireHitTriple.getStartRLWireHit());
+        append(rlWireHitTriple.getMiddleRLWireHit());
+        append(rlWireHitTriple.getEndRLWireHit());
+      }
 
       /// Appends the observed position - drift radius is signed number according to the orientation
-      void append(const Belle2::CDCLocalTracking::CDCRecoHit2D& recoHit2D, bool usePosition = false);
+      void append(const Belle2::CDCLocalTracking::CDCRecoHit2D& recoHit2D, bool usePosition = false) {
+        if (usePosition) {
+          append(recoHit2D.getRecoPos2D());
+        } else {
+          append(recoHit2D.getRLWireHit());
+        }
+      }
 
       /// Appends all reconstructed hits from the two dimensional segment, usePosition indicates whether the absolute position shall be used instead of the oriented wire hit information
-      void append(const CDCRecoSegment2D& recoSegment2D, bool usePosition = false);
+      void append(const CDCRecoSegment2D& recoSegment2D, bool usePosition = false) {
+        for (const CDCRecoHit2D & recoHit2D :  recoSegment2D) {
+          append(recoHit2D, usePosition);
+        }
+      }
 
 
 

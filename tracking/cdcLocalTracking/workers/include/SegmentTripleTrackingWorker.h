@@ -77,7 +77,7 @@ namespace Belle2 {
           B2DEBUG(100, "Apply cellular automat for CDCSegmentTriples");
           const CDCSegmentTriple* highestCell
             =  m_segmentTripleAutomaton.applyTo(m_segmentTriples, m_segmentTripleNeighborhood);
-          B2DEBUG(100, "  MaximalState " << highestCell->getCellState());
+          B2DEBUG(100, "  MaximalState " << highestCell->getAutomatonCell().getCellState());
 
           //create the tracks by following the highest states in the segment triples
           B2DEBUG(100, "Follow the longest paths");
@@ -122,38 +122,15 @@ namespace Belle2 {
             //               segmentTripleTrack.size() << " segment triples");
 
             //Block the used segments
-            for (std::vector<const CDCSegmentTriple*>::const_iterator itTriple = segmentTripleTrack.begin();
-                 itTriple != segmentTripleTrack.end(); ++itTriple) {
-              const CDCSegmentTriple* triple = *itTriple;
-
-              triple->getAutomatonCell().setFlags(DO_NOT_USE);
-              triple->getStart()->getAutomatonCell().setFlags(DO_NOT_USE);
-              triple->getMiddle()->getAutomatonCell().setFlags(DO_NOT_USE);
-              triple->getEnd()->getAutomatonCell().setFlags(DO_NOT_USE);
-              //B2DEBUG(100,facet << " " <<
-              //            facet->hasAnyFlags(DO_NOT_USE) << " " <<
-              //            facet->getFlags() << " " <<
-              //            facet->getCellState());
+            for (const CDCSegmentTriple * triple : segmentTripleTrack) {
+              triple->setDoNotUse();
             }
 
-            //Block the facets that use already used segments as well
-            for (std::set<CDCSegmentTriple>::const_iterator itTriple = m_segmentTriples.begin();
-                 itTriple != m_segmentTriples.end(); ++itTriple) {
-
-              const CDCSegmentTriple& triple = *itTriple;
-
-              if (triple.getStart()->getAutomatonCell().hasAnyFlags(DO_NOT_USE) or
-                  triple.getMiddle()->getAutomatonCell().hasAnyFlags(DO_NOT_USE) or
-                  triple.getEnd()->getAutomatonCell().hasAnyFlags(DO_NOT_USE)) {
-
-                triple.setFlags(DO_NOT_USE);
-
-              }
-              //B2DEBUG(100,&facet << " " <<
-              //            facet.hasAnyFlags(DO_NOT_USE) << " " <<
-              //            facet.getCellState());
-
+            //Block the triples that use already used segments as well
+            for (const CDCSegmentTriple * triple : segmentTripleTrack) {
+              triple->receiveDoNotUse();
             }
+
           } while (created != 0);
 
           m_segmentTripleTracks.pop_back();

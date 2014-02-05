@@ -21,7 +21,7 @@ namespace Belle2 {
   namespace CDCLocalTracking {
 
     /// Class representing a triple of reconstructed segements in adjacent superlayer
-    class CDCSegmentTriple : public AutomatonCell {
+    class CDCSegmentTriple : public UsedTObject {
     public:
 
       /** Constructor. */
@@ -29,14 +29,12 @@ namespace Belle2 {
        */
 
       CDCSegmentTriple() :
-        AutomatonCell(),
         m_startSegment(nullptr),
         m_middleSegment(nullptr),
         m_endSegment(nullptr)
       {;}
 
       CDCSegmentTriple(const CDCAxialRecoSegment2D* startSegment , const CDCAxialRecoSegment2D* endSegment) :
-        AutomatonCell(),
         m_startSegment(startSegment),
         m_middleSegment(nullptr),
         m_endSegment(endSegment)
@@ -47,7 +45,6 @@ namespace Belle2 {
         const CDCStereoRecoSegment2D* middleSegment,
         const CDCAxialRecoSegment2D* endSegment
       ) :
-        AutomatonCell(),
         m_startSegment(startSegment),
         m_middleSegment(middleSegment),
         m_endSegment(endSegment)
@@ -61,7 +58,6 @@ namespace Belle2 {
         const CDCTrajectory2D& trajectory2D,
         const CDCTrajectorySZ& trajectorySZ
       ) :
-        AutomatonCell(),
         m_startSegment(startSegment),
         m_middleSegment(middleSegment),
         m_endSegment(endSegment),
@@ -130,6 +126,33 @@ namespace Belle2 {
       { m_trajectorySZ = trajectorySZ; }
 
 
+      /// Sets the do not use flag of the segment triple's automaton cell and of the three contained segments
+      void setDoNotUse() const {
+        getAutomatonCell().setFlags(DO_NOT_USE);
+        forwardDoNotUse();
+      }
+
+      /// Sets the do not use flag of the three contained segments
+      void forwardDoNotUse() const {
+        getStart()->getAutomatonCell().setFlags(DO_NOT_USE);
+        getMiddle()->getAutomatonCell().setFlags(DO_NOT_USE);
+        getEnd()->getAutomatonCell().setFlags(DO_NOT_USE);
+      }
+
+      /// If one of the contained segments is marked as do not use this segment triple is set be not usable as well
+      void receiveDoNotUse() const {
+
+        if (getStart()->getAutomatonCell().hasAnyFlags(DO_NOT_USE) or
+            getMiddle()->getAutomatonCell().hasAnyFlags(DO_NOT_USE) or
+            getEnd()->getAutomatonCell().hasAnyFlags(DO_NOT_USE)) {
+
+          getAutomatonCell().setFlags(DO_NOT_USE);
+        }
+      }
+
+      /// Getter for the automaton cell.
+      AutomatonCell& getAutomatonCell() const { return m_automatonCell; }
+
     private:
 
       const CDCAxialRecoSegment2D* m_startSegment;
@@ -138,7 +161,7 @@ namespace Belle2 {
 
       mutable CDCTrajectory2D m_trajectory2D;
       mutable CDCTrajectorySZ m_trajectorySZ;
-
+      mutable AutomatonCell m_automatonCell;
 
       /** ROOT Macro to make CDCSegmentTriple a ROOT class.*/
       ClassDefInCDCLocalTracking(CDCSegmentTriple, 1);

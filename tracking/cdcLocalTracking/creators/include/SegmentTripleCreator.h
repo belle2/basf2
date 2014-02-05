@@ -191,7 +191,7 @@ namespace Belle2 {
             // insert a copy in the set
             const CDCSegmentTriple& newTriple = *(segmentTriples.insert(triple).first);
 
-            newTriple.setCellWeight(cellWeight);
+            newTriple.getAutomatonCell().setCellWeight(cellWeight);
 
           }
         }

@@ -32,12 +32,7 @@ struct BoundedSpaceSet {
   /** Set max size of the set.
   * @param maxSize new maximum size to be set.
   */
-  inline void setMaxSize(size_t maxSize) {
-    m_maxSize = maxSize;
-    while (m_set.size() > m_maxSize) {
-      m_set.erase(m_set.begin());
-    }
-  }
+  inline void setMaxSize(size_t maxSize) { m_maxSize = maxSize; ensureSize(); }
 
   /** Get number of free positions in the set.
    * @return number of free positions in the map, maxSize - actual size.
@@ -103,7 +98,7 @@ struct BoundedSpaceSet {
 
 private:
 
-  inline void ensureSize() { if (m_set.size() > m_maxSize) m_set.erase(m_set.begin()); }
+  inline void ensureSize() { while (m_set.size() > m_maxSize) m_set.erase(m_set.begin()); }
 
   std::size_t m_maxSize;
   set_type m_set;
@@ -135,12 +130,7 @@ struct BoundedSpaceMap {
   /** Set max size of the map.
    * @param maxSize new maximum size to be set.
    */
-  inline void setMaxSize(size_t maxSize) {
-    m_maxSize = maxSize;
-    while (m_map.size() > m_maxSize) {
-      m_map.erase(m_map.begin());
-    }
-  }
+  inline void setMaxSize(size_t maxSize) { m_maxSize = maxSize; ensureSize(); }
 
   /** Get number of free positions in the map.
    * @return number of free positions in the map, maxSize - actual size.
@@ -220,7 +210,7 @@ struct BoundedSpaceMap {
 
 private:
 
-  inline void ensureSize() { if (m_map.size() > m_maxSize) m_map.erase(m_map.begin()); }
+  inline void ensureSize() { while (m_map.size() > m_maxSize) m_map.erase(m_map.begin()); }
 
   std::size_t m_maxSize;
   map_type m_map;

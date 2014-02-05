@@ -49,8 +49,8 @@ TEST(BoundedSpaceMap, input)
   // The bottom should be at 7, and the top at 9.
   EXPECT_EQ(buf.getBottom(), tag_type(7));
   EXPECT_EQ(buf.getTop(), tag_type(9));
-  // Median should be at 8
-  EXPECT_EQ(buf.getMedian(), tag_type(8));
+  // Median should be at 0, because size is less than 5
+  EXPECT_EQ(buf.getMedian(), tag_type(0));
   // No free position
   EXPECT_EQ(size_t(0), buf.getFreeSize());
   // One by one

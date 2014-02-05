@@ -56,7 +56,7 @@ CDCMCHitLookUp& CDCMCHitLookUp::getInstance()
 void CDCMCHitLookUp::fill()
 {
 
-  B2INFO("In CDCMCHitLookUp::fill()");
+  B2DEBUG(100, "In CDCMCHitLookUp::fill()");
 
   m_primarySimHits.clear();
   m_rightLeftInfos.clear();
@@ -189,18 +189,20 @@ void CDCMCHitLookUp::arrangeMCHitTracks(std::map<int, std::vector<const CDCHit*>
       const CDCSimHit* simHit = hit->getRelated<CDCSimHit>();
       const CDCSimHit* otherSimHit = otherHit->getRelated<CDCSimHit>();
 
-      const CDCSimHit* primarySimHit = getClosestPrimarySimHit(hit);
-      const CDCSimHit* otherPrimarySimHit = getClosestPrimarySimHit(otherHit);
+      //const CDCSimHit* primarySimHit = getClosestPrimarySimHit(hit);
+      //const CDCSimHit* otherPrimarySimHit = getClosestPrimarySimHit(otherHit);
 
-      double primaryFlightTime = primarySimHit ? primarySimHit->getFlightTime() : simHit->getFlightTime();
-      double otherPrimaryFlightTime = otherPrimarySimHit ? otherPrimarySimHit->getFlightTime() : otherSimHit->getFlightTime();
+      //double primaryFlightTime = primarySimHit ? primarySimHit->getFlightTime() : simHit->getFlightTime();
+      //double otherPrimaryFlightTime = otherPrimarySimHit ? otherPrimarySimHit->getFlightTime() : otherSimHit->getFlightTime();
 
       double secondaryFlightTime =  simHit->getFlightTime();
       double otherSecondaryFlightTime =  otherSimHit->getFlightTime();
 
-      return primaryFlightTime < otherPrimaryFlightTime or
-      (primaryFlightTime == otherPrimaryFlightTime and
-      secondaryFlightTime < otherSecondaryFlightTime);
+      return secondaryFlightTime < otherSecondaryFlightTime;
+
+      //return primaryFlightTime < otherPrimaryFlightTime or
+      //(primaryFlightTime == otherPrimaryFlightTime and
+      //secondaryFlightTime < otherSecondaryFlightTime);
 
     });
   }
@@ -343,7 +345,7 @@ const CDCSimHit* CDCMCHitLookUp::getClosestPrimarySimHit(const CDCSimHit* ptrSim
 
     if (itClosestPrimarySimHit != primarySimHitsOnSameOrNeighborWire.end()) {
 
-      B2INFO("Found primary hit for reassigned secondary");
+      //B2INFO("Found primary hit for reassigned secondary");
       return *itClosestPrimarySimHit;
 
     } else {
@@ -479,13 +481,10 @@ bool CDCMCHitLookUp::isCorrect(const CDCRLWireHitTriple& rlWireHitTriple, int in
 
 
 
-
-
   //Maybe be a bit more permissive for reassigned hits
   bool startIsReassigned = isReassignedSecondaryHit(startWireHit);
   bool middleIsReassigned = isReassignedSecondaryHit(middleWireHit);
   bool endIsReassigned = isReassignedSecondaryHit(endWireHit);
-
 
 
 
@@ -550,9 +549,9 @@ bool CDCMCHitLookUp::isCorrect(const CDCRLWireHitTriple& rlWireHitTriple, int in
 
 
   if (startRLInfo == mcStartRLInfo and middleRLInfo == mcMiddleRLInfo and endRLInfo == mcEndRLInfo) {
-    return true;
+    //return true;
   } else {
-    //return false;
+    return false;
   }
 
 

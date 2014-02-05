@@ -82,7 +82,7 @@ namespace Belle2 {
       /// Helper function. Sets all cell states to -1.
       inline void prepareCellStates(const Collection& items) const {
         BOOST_FOREACH(Item const & item , items) {
-          item.setCellState(-1);
+          item.getAutomatonCell().setCellState(-1);
         }
       }
 
@@ -93,7 +93,7 @@ namespace Belle2 {
                                const Item& seedItem) const {
 
         //Cluster uses pointers as items instead of objects
-        seedItem.setCellState(iCluster);
+        seedItem.getAutomatonCell().setCellState(iCluster);
         const Item* clusterSeedItem = &seedItem;
         newCluster.insert(newCluster.end(), clusterSeedItem);
 
@@ -122,11 +122,11 @@ namespace Belle2 {
 
               const Item* const& neighborItem = itNeighbor.getNeighbor();
 
-              CellState neighborICluster = neighborItem->getCellState();
+              CellState neighborICluster = neighborItem->getAutomatonCell().getCellState();
               if (neighborICluster == -1) {
                 // Element not yet in cluster
                 //Add the element
-                neighborItem->setCellState(iCluster);
+                neighborItem->getAutomatonCell().setCellState(iCluster);
                 newCluster.insert(newCluster.end(), neighborItem);
 
                 //register it for further expansion

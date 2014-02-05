@@ -73,9 +73,9 @@ namespace Belle2 {
 
           const Item& item = *itItem;
 
-          if (item.hasAnyFlags(IS_START) and
-              not item.hasAnyFlags(DO_NOT_USE + IS_CYCLE) and
-              minStateToFollow <= item.getCellState()) {
+          if (item.getAutomatonCell().hasAnyFlags(IS_START) and
+              not item.getAutomatonCell().hasAnyFlags(DO_NOT_USE + IS_CYCLE) and
+              minStateToFollow <= item.getAutomatonCell().getCellState()) {
 
             //item marks a start point of a path
 
@@ -106,9 +106,9 @@ namespace Belle2 {
       ) const {
 
         if (startItem != nullptr and
-            startItem->hasAnyFlags(IS_START) and
-            not startItem->hasAnyFlags(DO_NOT_USE + IS_CYCLE) and
-            minStateToFollow <= startItem->getCellState()) {
+            startItem->getAutomatonCell().hasAnyFlags(IS_START) and
+            not startItem-> getAutomatonCell().hasAnyFlags(DO_NOT_USE + IS_CYCLE) and
+            minStateToFollow <= startItem->getAutomatonCell().getCellState()) {
 
           //start new segment
           path.clear();
@@ -127,10 +127,10 @@ namespace Belle2 {
             const Item* neighborItem = currentNeighborRange.first.getNeighbor();
             Weight relationWeight = currentNeighborRange.first.getWeight();
 
-            if (not neighborItem->hasAnyFlags(DO_NOT_USE + IS_CYCLE) and
-                currentItem->getCellState() == currentItem->getCellWeight() +
+            if (not neighborItem->getAutomatonCell().hasAnyFlags(DO_NOT_USE + IS_CYCLE) and
+                currentItem->getAutomatonCell().getCellState() == currentItem->getAutomatonCell().getCellWeight() +
                 relationWeight +
-                neighborItem->getCellState()
+                neighborItem->getAutomatonCell().getCellState()
                 /* detected that this is the highest continuation */) {
 
               // Best continuation detected
@@ -179,10 +179,10 @@ namespace Belle2 {
           const Item* item = itNeighbor.getItem();
           const Item* neighborItem = itNeighbor.getNeighbor();
 
-          if (not neighborItem->hasAnyFlags(DO_NOT_USE + IS_CYCLE) and
-              lastItem->getCellState() == item->getCellWeight() +
+          if (not neighborItem-> getAutomatonCell().hasAnyFlags(DO_NOT_USE + IS_CYCLE) and
+              lastItem->getAutomatonCell().getCellState() == item->getAutomatonCell().getCellWeight() +
               itNeighbor.getWeight() +
-              neighborItem->getCellState()
+              neighborItem->getAutomatonCell().getCellState()
               /* detect if this is the highest continuation */) {
 
             path.push_back(neighborItem);

@@ -87,6 +87,12 @@ namespace Belle2 {
       /// Setter for the cell weight
       void setCellWeight(CellState weight) const { m_weight = weight; }
 
+      /// Transitional change to migrate AutomatonCell from a base class to a regular member
+      AutomatonCell& getAutomatonCell() { return *this; }
+
+      /// Transitional change to migrate AutomatonCell from a base class to a regular member
+      const AutomatonCell& getAutomatonCell() const { return *this; }
+
     private:
 
       mutable CellState m_weight; ///< Storage for the cell weight

@@ -78,7 +78,7 @@ namespace Belle2 {
 
         //Advance the iterator to a valid item in order to to have a valid highest item.
         while (itHighestItem != collection.end() and
-               (*itHighestItem).hasAnyFlags(DO_NOT_USE)) {
+               (*itHighestItem).getAutomatonCell().hasAnyFlags(DO_NOT_USE)) {
           ++itHighestItem;
         }
 
@@ -89,22 +89,22 @@ namespace Belle2 {
 
           const Item& item = *itItem;
 
-          if (not item.hasAnyFlags(IS_SET + IS_CYCLE + DO_NOT_USE)) {
+          if (not item.getAutomatonCell().hasAnyFlags(IS_SET + IS_CYCLE + DO_NOT_USE)) {
 
             const CellState& state = updateState(item, neighborhood);
 
             // Mark this cell as a start point of a long path since we encountered it in
             // a top level recursion
-            item.setFlags(IS_START);
-            itHighestItem = itHighestItem->getCellState() > state ?  itHighestItem : itItem;
+            item.getAutomatonCell().setFlags(IS_START);
+            itHighestItem = itHighestItem->getAutomatonCell().getCellState() > state ?  itHighestItem : itItem;
 
           }
         }
 
         // Return the element with the highst cell value as a good start point for a segment/track
         if (itHighestItem == collection.end() or
-            (*itHighestItem).hasAnyFlags(IS_CYCLE + DO_NOT_USE) or
-            not(*itHighestItem).hasAnyFlags(IS_START)) {
+            (*itHighestItem).getAutomatonCell().hasAnyFlags(IS_CYCLE + DO_NOT_USE) or
+            not(*itHighestItem).getAutomatonCell().hasAnyFlags(IS_START)) {
 
           return nullptr;
 
@@ -118,13 +118,13 @@ namespace Belle2 {
       inline const CellState& updateState(const Item& item, const Neighborhood& neighborhood) const {
 
         // since we encounter this cell in a recursion it is not the start point of track
-        item.clearFlags(IS_START);
+        item.getAutomatonCell().clearFlags(IS_START);
 
         // check if the cell is valid to continue on
-        if (item.hasAnyFlags(IS_CYCLE /* + DO_NOT_USE */)) {
+        if (item.getAutomatonCell().hasAnyFlags(IS_CYCLE /* + DO_NOT_USE */)) {
           // if not in validate this cell and return
-          item.setCellState(NO_CONTINUATION);
-          return item.getCellState();
+          item.getAutomatonCell().setCellState(NO_CONTINUATION);
+          return item.getAutomatonCell().getCellState();
         }
         // We check the do not use flag before going into the recursion
 
@@ -146,7 +146,7 @@ namespace Belle2 {
 
         //advance to a valid neighbor
         while (neighborRange.first != neighborRange.second and
-               neighborRange.first.getNeighbor()->hasAnyFlags(DO_NOT_USE)) {
+               neighborRange.first.getNeighbor()->getAutomatonCell().hasAnyFlags(DO_NOT_USE)) {
           ++(neighborRange.first);
         }
 
@@ -163,7 +163,7 @@ namespace Belle2 {
           maxStateWithContinuation = -std::numeric_limits<CellState>::infinity();
 
           //mark cell in order to detect if it was already traversed in this recursion cycle
-          item.setFlags(IS_CYCLE);
+          item.getAutomatonCell().setFlags(IS_CYCLE);
 
           // consider all neighbors as possible continuations and
           // ask each who many value they have to offer
@@ -172,19 +172,19 @@ namespace Belle2 {
 
             const Item* neighbor = itNeighbor.getNeighbor();
 
-            if (not neighbor->hasAnyFlags(DO_NOT_USE)) {
+            if (not neighbor->getAutomatonCell().hasAnyFlags(DO_NOT_USE)) {
 
               // Invalidate a possible start flag since the neighbor has an ancestors
-              neighbor->clearFlags(IS_START);
+              neighbor->getAutomatonCell().clearFlags(IS_START);
 
               // Check if the neighbor was already marked in this recursion cycle
               // Preventing an infinit loop
-              if (neighbor->hasAnyFlags(IS_CYCLE)) {
+              if (neighbor->getAutomatonCell().hasAnyFlags(IS_CYCLE)) {
                 // encountered cycle
                 // do not unset IS_CYCLE
-                item.setCellState(NO_CONTINUATION);
+                item.getAutomatonCell().setCellState(NO_CONTINUATION);
                 B2WARNING("Cycle detected");
-                return item.getCellState();
+                return item.getAutomatonCell().getCellState();
 
               }
 
@@ -192,8 +192,8 @@ namespace Belle2 {
               // If it was set just get it
               // If is was not set go into the recursion
               const CellState& stateWithoutContinuation =
-                neighbor->hasAnyFlags(IS_SET) ?
-                neighbor->getCellState() :
+                neighbor->getAutomatonCell().hasAnyFlags(IS_SET) ?
+                neighbor->getAutomatonCell().getCellState() :
                 updateState(*neighbor, neighborhood);
 
 
@@ -206,21 +206,21 @@ namespace Belle2 {
           }
 
           // no cycle encountered, unset flag
-          item.clearFlags(IS_CYCLE);
+          item.getAutomatonCell().clearFlags(IS_CYCLE);
 
         }
 
         // Add the value of this cell to the value of the best neighbor continuation
         // to get the total value since this cell shall also be part of the path
-        maxStateWithContinuation += item.getCellWeight();
+        maxStateWithContinuation += item.getAutomatonCell().getCellWeight();
 
         // Set this cell has a correct value
-        item.setFlags(IS_SET);
+        item.getAutomatonCell().setFlags(IS_SET);
         // Set the value
-        item.setCellState(maxStateWithContinuation);
+        item.getAutomatonCell().setCellState(maxStateWithContinuation);
 
         // Return the just determined value
-        return item.getCellState();
+        return item.getAutomatonCell().getCellState();
 
       }
 

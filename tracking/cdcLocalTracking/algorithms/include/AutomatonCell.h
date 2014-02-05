@@ -64,7 +64,7 @@ namespace Belle2 {
        *  const CellFlags DO_NOT_USE = 8; \n
        *  Use rather hasAnyFlags() to retrieve stats even for single state values.
        */
-      CellFlags getFlags() const { return m_flags; }
+      const CellFlags& getFlags() const { return m_flags; }
 
       /// Setter for the cell flags
       void setFlags(CellFlags flags) const { m_flags |= flags; }
@@ -75,7 +75,6 @@ namespace Belle2 {
       /// Checks if a cell has any of a sum of given flags.
       bool hasAnyFlags(CellFlags flags) const { return  m_flags bitand flags; }
 
-
       /// Getter for the cell weight. See details
       /** The cell might carry more than one unit of information to be added to the path. \n
        *  The weight discribes an additiv constant to be gained when picking up this cell. \n
@@ -85,20 +84,18 @@ namespace Belle2 {
       const CellState& getCellWeight() const { return m_weight; }
 
       /// Setter for the cell weight
-      void setCellWeight(CellState weight) const { m_weight = weight; }
+      void setCellWeight(CellState weight) { m_weight = weight; }
 
       /// Transitional change to migrate AutomatonCell from a base class to a regular member
-      AutomatonCell& getAutomatonCell() { return *this; }
+      //AutomatonCell& getAutomatonCell() { return *this; }
 
       /// Transitional change to migrate AutomatonCell from a base class to a regular member
-      const AutomatonCell& getAutomatonCell() const { return *this; }
+      //const AutomatonCell& getAutomatonCell() const { return *this; }
 
     private:
-
-      mutable CellState m_weight; ///< Storage for the cell weight
+      CellState m_weight; ///< Storage for the cell weight
       mutable CellFlags m_flags; ///< Storage for the cell status flags
       mutable CellState m_state; ///< Storage for the cell state set by the cellular automata
-
 
       /** ROOT Macro to make AutomatonCell a ROOT class.*/
       ClassDefInCDCLocalTracking(AutomatonCell, 1);

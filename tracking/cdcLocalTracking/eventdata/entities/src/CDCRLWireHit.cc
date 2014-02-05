@@ -19,7 +19,7 @@ using namespace CDCLocalTracking;
 ClassImpInCDCLocalTracking(CDCRLWireHit)
 
 CDCRLWireHit::CDCRLWireHit() :
-  m_wirehit(&(CDCWireHit::getLowest())),
+  m_wirehit(nullptr),
   m_rlInfo(LEFT)
 {;}
 

@@ -57,7 +57,6 @@ CDCLocalTrackingModule::~CDCLocalTrackingModule()
 
 void CDCLocalTrackingModule::initialize()
 {
-
   //output collection
   StoreArray < genfit::TrackCand >::registerPersistent(m_param_gfTrackCandColName);
 
@@ -74,11 +73,6 @@ void CDCLocalTrackingModule::initialize()
   //marked as unused intentionally to avoid a compile warning
   CDC::CDCGeometryPar& cdcGeo __attribute__((unused)) = CDC::CDCGeometryPar::Instance();
   CDCWireTopology& topo __attribute__((unused)) = CDCWireTopology::getInstance();
-
-  // initialize the lowest CDCWireHit, also after each geometry change!
-  CDCWireHit::initializeLowest();
-  const CDCWireHit& lowest = CDCWireHit::getLowest();
-  B2DEBUG(100, lowest);
 
 }
 
@@ -117,14 +111,12 @@ void CDCLocalTrackingModule::event()
   }
   CDCWireHitTopology::CDCWireHitRange allWireHitRange = wireHitTopology.getWireHits();
 
-
-
-
   //CALLGRIND_STOP_INSTRUMENTATION;
 
 #ifdef CDCLOCALTRACKING_USE_MC_FILTERS
   CDCMCHitLookUp& mcHitLookUp = CDCMCHitLookUp::getInstance();
   mcHitLookUp.fill();
+
 
   //check the relations between the particles simhit and hits before using them
   StoreArray <MCParticle> storedMCParticles;
@@ -132,22 +124,18 @@ void CDCLocalTrackingModule::event()
 
   //CDCMCLookUp::checkComposition(storedCDCHits,storedSimhits,storedMCParticles);
 
-  //create mc look up
+  //create mc look up - to be abolished soon
   CDCMCLookUp& mcLookUp = CDCMCLookUp::Instance();
   mcLookUp.clear();
   mcLookUp.addAllSimHits(allWireHitRange, storedCDCHits, storedSimhits);
   mcLookUp.addAllMCParticle(allWireHitRange, storedCDCHits, storedMCParticles);
 #endif
 
-
-
-
   //CALLGRIND_START_INSTRUMENTATION;
   //build the segments
   m_recoSegments.clear();
   m_segmentWorker.apply(allWireHitRange, m_recoSegments);
   B2DEBUG(100, "Received " << m_recoSegments.size() << " RecoSegments from worker");
-
 
 #ifdef CDCLOCALTRACKING_USE_MC_FILTERS
   //register the segments to the mclookup in order to enable descisions based on the alignement of them

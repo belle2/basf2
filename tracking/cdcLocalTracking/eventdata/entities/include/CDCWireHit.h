@@ -61,39 +61,13 @@ namespace Belle2 {
 
     public:
 
-      /** @name Equality comparision
-       *  Based on the equality of the wire and the hit id */
-      /**@{*/
+
       /// Equality comparision based the wire and the hit id.
-      /** Equality comparision based in wire ids and hit id. \n
-          Hit id is taken into account in case we want to distiguish double hits at some point.\n
-          Depending on the double hit implementation this might have to change though.*/
       bool operator==(const CDCWireHit& other) const
       { return getWire() == other.getWire() and getStoreIHit() == other.getStoreIHit(); }
 
-      /// Equality comparision based on the wire and the hit id usable with pointer.
-      /** Equality comparision of wire hits based on the wire and the hit id.
-       *  This is still usable if a nullptr is given. The nullptr is always different to an actual wire object.
-       *  Compatible for use with ROOT containers.
-       */
-      bool inline IsEqual(const CDCWireHit* const& other) const
-      {return other == nullptr ? false : operator==(*other); }
 
-      /// Equality comparision based on on the wire and the hit id usable with two pointer.
-      /** Equality comparision of wires based on their on the wire and their hit id.
-       *  This is still usable, if two nullptrs are given to the function.
-       *  The nullptr is always different to any actual wire object, but a nullptr is equal to itself.
-       *  Since there is no object in the case of two nullptrs we have to relie on a static method */
-      static inline bool ptrIsEqual(const CDCWireHit* lhs , const CDCWireHit* rhs)
-      { return lhs == nullptr ? (rhs == nullptr ? true : false) : lhs->IsEqual(rhs); }
-      /**@}*/
-
-      /** @name Total ordering
-       *  Comparing the wire first and the hit id second. Hence wire hits are coaligned with the wires.*/
-      /**@{*/
       /// Total ordering relation based on the wire and the hit id.
-      /** Defines a total ordering sheme for wire hit objects based on the wire first and the hit id second.
-       *  It needs be present for the wire to work with all kinds of stl algorithms and containers */
       bool operator<(const CDCWireHit& other) const {
         return (getWire() < other.getWire() or (
                   getWire() == other.getWire() and getStoreIHit() < other.getStoreIHit()));
@@ -104,40 +78,6 @@ namespace Belle2 {
 
       /// Defines wires and wire hits to be coaligned on the wire on which they are based.
       friend bool operator<(const CDCWire& wire, const CDCWireHit& wireHit) { return wire < wireHit.getWire(); }
-
-
-      /// Total ordering relation based on the wire and the hit id usable with pointers.
-      /** Retains the total ordering sheme for wire hit objects, but introduces the special nullptr case to the ordering.
-       *  The nullptr is always smallest. Therefore it forms a lower bound for the wire hit pointers.
-       *  This also enables compatibility with all sorts of ROOT containers*/
-      bool inline IsLessThan(const CDCWireHit* const& other) const
-      { return other == nullptr ? false : operator<(*other); }
-
-      /// Total ordering relation based on the wire and the hit id usable with two pointer
-      /** Retains the total ordering sheme for wire hit objects,
-       *  but introduces the special nullptr case to the ordering.
-       *  The nullptr is always smallest. Therefor it forms a lower bound for the wire hit objects.
-       *  This is for completeness if we want to take the nullptr as a valid member of the range.
-       *  Since there is no object in the case of two nullptrs we have to relie on a static method */
-      static inline bool ptrIsLessThan(const CDCWireHit* lhs , const CDCWireHit* rhs)
-      { return rhs == nullptr ? false : (lhs == nullptr ? true : *lhs < *rhs); }
-
-      /// Getter for the possible lowest wire hit. For lookup purpose only.
-      /** Get the lowest wire hit static instance. The lowest wire hit compares less than all other wire hit instances possible. \n
-       *  It serves as a sentinal in all kinds of look ups in ordered sequences of higher order tracking entities. \n
-       *  Since we need a certain storage place for the wire to go and we do not want to recreate it all the time \n
-       *  we keep it in a static variable.
-       *  However it has to be initialized before the first look up and after each switch of the geometry
-       *  This should happen on the initialize() or beginRun() of the tracking module!! */
-      static const CDCWireHit& getLowest()
-      { return *s_lowest; }
-
-      /// Getter for the possible lowest wire hit on a certain wire. It contains no CDCHit though. For lookup purpose only. See details.
-      /** Important : make sure that the CDCWire lives longer than the CDCWireHit \n
-       *  return by this function since its keeping the reference to it. */
-      static const CDCWireHit getLowerBound(const CDCWire* wire)
-      { return CDCWireHit(wire); }
-      /**@}*/
 
       /// Getter for the CDCHit pointer into the StoreArray
       const CDCHit* getHit() const { return m_hit; }
@@ -241,25 +181,6 @@ namespace Belle2 {
       int m_iHit; ///< Memory for the index into the storing StoreArray<CDCHit>
       FloatType m_refDriftLength; ///< Memory for the drift length at the wire reference point
       AutomatonCell m_automatonCell; ///< Memory for the automaton cell. Marked it as mutable since its content should be changeable when if the wire and drift length information are required to be constant.
-
-    private:
-      /// Static variable for lowest possible wire hit
-      /** For all kinds of look up involving high order tracking entitie we need a sentinal wire hit
-       *  which is lower than any kind of actual wire hit. Since we do not want to recreate it all the
-       *  time we create it as a static variable. The default parameterless constructor constructs the
-       *  lowest wire hit. So no specifc initialisation is needed.
-       *  However the lowest wire has to be updated for each switch of geometry.
-       */
-      static const CDCWireHit* s_lowest;
-    public:
-
-      /// Initializes the lowest wire hit possible
-      /** This creates the lowest wire hit possible stored as a static instance.
-       *  Call after each geometry switch */
-      static void initializeLowest() {
-        if (s_lowest) delete s_lowest;
-        s_lowest = new CDCWireHit(&(CDCWire::getLowest()));
-      }
 
       //setup instance for the tdc count translation
     public:

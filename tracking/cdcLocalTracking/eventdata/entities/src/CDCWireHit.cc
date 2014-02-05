@@ -57,10 +57,8 @@ CDCWireHit::CDCWireHit(const WireID& wireID, const FloatType& driftLength):
   m_automatonCell(1)
 {;}
 
-/** Destructor. */
-CDCWireHit::~CDCWireHit() {;}
 
-const CDCWireHit* CDCWireHit::s_lowest = nullptr;
+CDCWireHit::~CDCWireHit() {;}
 
 
 CDCWireHit::TDCCountTranslator* CDCWireHit::m_tdcCountTranslator = nullptr;

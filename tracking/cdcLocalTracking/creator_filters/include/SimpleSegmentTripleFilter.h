@@ -46,64 +46,30 @@ namespace Belle2 {
        *  Returns NOT_A_CELL if the connection shall not be made or a finit value be used as the cell weight of the cell to constructed. */
       CellWeight isGoodSegmentTriple(const CDCSegmentTriple& triple);
 
-    private:
-      CellWeight isGoodTriple(const CDCAxialRecoSegment2D& startSegment,
-                              const CDCStereoRecoSegment2D& middleSegment,
-                              const CDCAxialRecoSegment2D& endSegment);
-
-      /// Set the circle fit and the sz of the segment triple to be stored as a cell
-      void setTrajectoryOf(const CDCSegmentTriple& segmentTriple);
 
     private:
-      /// Type to store fits to segments
-      typedef std::map<const CDCAxialRecoSegment2D*, CDCTrajectory2D > SegmentXYFitMap;
+      /// Returns the trajectory of the axial segment. Also fits it if necessary.
+      const CDCTrajectory2D& getFittedTrajectory2D(const CDCAxialRecoSegment2D& segment) const;
 
-      /// A pair of the segments to store. Used in the in the map to store fits to pairs of axial segments
-      typedef std::pair<const CDCAxialRecoSegment2D*, const CDCAxialRecoSegment2D*> SegmentPair;
+      /// Returns the trajectory of the axial to axial segment piar. Also fits it if necessary.
+      const CDCTrajectory2D& getFittedTrajectory2D(const CDCAxialAxialSegmentPair& axialAxialSegmentPair) const;
 
-      /// Type to store fits to pairs of axial segments
-      typedef std::map<SegmentPair, CDCTrajectory2D > SegmentPairXYFitMap;
-
-      /// An axial, stereo, axial segment triple to be used in the map storing sz fits
-      typedef boost::tuple<const CDCAxialRecoSegment2D*, const CDCStereoRecoSegment2D*, const CDCAxialRecoSegment2D*>  ASATriple;
-
-      /// Map type to store sz fits to stereo segment supported by two surrounding axial segments
-      typedef std::map<ASATriple, CDCTrajectorySZ > SegmentTripleSZFitMap;
+      /// Returns the xy fitter instance that is used by this filter
+      const CDCRiemannFitter& getRiemannFitter() const
+      { return m_riemannFitter; }
 
 
-      SegmentXYFitMap m_segmentXYFits; ///< Memory of the map storing xy fits to the single axial segments
-      SegmentPairXYFitMap m_segmentPairXYFits; ///< Memory of the map storing xy fits to pairs of axial segments
-      SegmentTripleSZFitMap m_segmentTripleSZFits; ///< Memory of the map storing sz fits to stereo segments supported by two axial segments
+    private:
+      /// Returns the sz trajectory of the reconstructed stereo segment of the segment triple. Does a fit if necessary.
+      const CDCTrajectorySZ& getFittedTrajectorySZ(const CDCSegmentTriple& segmentTriple) const;
 
-      CDCRiemannFitter m_xyFitter; ///< Memory of the Riemann fitter for the circle fits.
+      /// Returns the sz fitter instance that is used by this filter
+      const CDCSZFitter& getSZFitter() const
+      { return m_szFitter; }
+
+    private:
+      CDCRiemannFitter m_riemannFitter; ///< Memory of the Riemann fitter for the circle fits.
       CDCSZFitter m_szFitter; ///< Memory of the SZ fitter fitting sz lines to the stereo segments
-
-
-      /// Getter for an circle fit to an axial segments
-      /** Returns the circle fit to an axial segment. The fit gets stored in the fit map and is returned without
-       *  recalculation if the fit to the same segment is requested again */
-      const CDCTrajectory2D& getXYFit(const CDCAxialRecoSegment2D& segment);
-
-
-      /** Returns the circle fit to a pair of axial segments. The fit gets stored in the fit map and is returned without
-       *  recalculation if the fit to the same two segments is requested again */
-      const CDCTrajectory2D& getXYFit(const CDCAxialRecoSegment2D& startSegment,
-                                      const CDCAxialRecoSegment2D& endSegment);
-
-      /** Returns the sz fit to a triple of segments. The fit gets stored in the fit map and is returned without
-       *  recalculation, if the fit to the same three segments is requested again */
-      const CDCTrajectorySZ& getSZFit(
-        const CDCAxialRecoSegment2D& startSegment,
-        const CDCStereoRecoSegment2D& middleSegment,
-        const CDCAxialRecoSegment2D& endSegment
-      );
-
-      /** Manually store a sz fit of the three segments. The fit can be obtained by the getSZFit function again. */
-      void storeSZFit(const CDCAxialRecoSegment2D& startSegment,
-                      const CDCStereoRecoSegment2D& middleSegment,
-                      const CDCAxialRecoSegment2D& endSegment,
-                      const CDCTrajectorySZ& szFit);
-
 
     }; // end class SimpleSegmentTripleFilter
 

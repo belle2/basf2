@@ -85,6 +85,12 @@ namespace Belle2 {
       void setTrajectorySZ(const CDCTrajectorySZ& trajectorySZ) const
       { m_trajectorySZ = trajectorySZ; }
 
+      void clearTrajectorySZ() const
+      { getTrajectorySZ().clear(); }
+
+      void clearTrajectories() const
+      { clearTrajectorySZ(); CDCAxialAxialSegmentPair::clearTrajectory2D(); }
+
       /// Sets the do not use flag of the segment triple's automaton cell and of the three contained segments
       void setDoNotUse() const {
         getAutomatonCell().setFlags(DO_NOT_USE);

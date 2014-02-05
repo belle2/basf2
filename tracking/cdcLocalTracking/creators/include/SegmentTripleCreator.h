@@ -168,8 +168,16 @@ namespace Belle2 {
             segmentTriple.setStart(startSegment);
             segmentTriple.setMiddle(nullptr);
             segmentTriple.setEnd(endSegment);
-            segmentTriple.getTrajectory2D().clear();
-            segmentTriple.getTrajectorySZ().clear();
+            segmentTriple.clearTrajectories();
+
+            if (segmentTriple.getTrajectory2D().isFitted()) {
+              B2ERROR("CDCAxialAxialSegmentPair still fitted after clearing.")
+              continue;
+            }
+            if (segmentTriple.getTrajectorySZ().isFitted()) {
+              B2ERROR("CDCAxialAxialSegmentPair still fitted after clearing.")
+              continue;
+            }
 
             const CDCAxialAxialSegmentPair& axialAxialSegmentPair = segmentTriple;
             if (not axialAxialSegmentPair.checkSegments()) {

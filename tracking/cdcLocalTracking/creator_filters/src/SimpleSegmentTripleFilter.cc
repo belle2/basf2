@@ -19,10 +19,9 @@ using namespace std;
 using namespace Belle2;
 using namespace CDCLocalTracking;
 
-SimpleSegmentTripleFilter::SimpleSegmentTripleFilter() :
-  m_segmentXYFits(), m_segmentPairXYFits(), m_segmentTripleSZFits(), m_xyFitter(), m_szFitter()
+SimpleSegmentTripleFilter::SimpleSegmentTripleFilter() : m_riemannFitter(), m_szFitter()
 {
-  m_xyFitter.useOnlyOrientation();
+  m_riemannFitter.useOnlyOrientation();
 }
 
 SimpleSegmentTripleFilter::~SimpleSegmentTripleFilter()
@@ -32,10 +31,6 @@ SimpleSegmentTripleFilter::~SimpleSegmentTripleFilter()
 
 void SimpleSegmentTripleFilter::clear()
 {
-
-  m_segmentXYFits.clear();
-  m_segmentPairXYFits.clear();
-  m_segmentTripleSZFits.clear();
 
 }
 
@@ -60,8 +55,8 @@ bool SimpleSegmentTripleFilter::isGoodAxialAxialSegmentPair(const CDCAxialAxialS
   const CDCAxialRecoSegment2D& endSegment = *ptrEndSegment;
 
   //do fits
-  const CDCTrajectory2D& startFit = getXYFit(startSegment);
-  const CDCTrajectory2D& endFit = getXYFit(endSegment);
+  const CDCTrajectory2D& startFit = getFittedTrajectory2D(startSegment);
+  const CDCTrajectory2D& endFit = getFittedTrajectory2D(endSegment);
 
   //B2DEBUG(100,"    startSegment.front() = " <<  startSegment.front() );
   //B2DEBUG(100,"    startSegment.back()  = " <<  startSegment.back() );
@@ -155,25 +150,12 @@ CellWeight SimpleSegmentTripleFilter::isGoodSegmentTriple(const CDCSegmentTriple
   const CDCAxialRecoSegment2D& middleSegment = *ptrMiddleSegment;
   const CDCAxialRecoSegment2D& endSegment = *ptrEndSegment;
 
-  CellWeight result = isGoodTriple(startSegment, middleSegment, endSegment);
-  if (not isNotACell(result)) {
-    setTrajectoryOf(segmentTriple);
-  }
-  return result;
-
-}
-
-
-CellWeight SimpleSegmentTripleFilter::isGoodTriple(const CDCAxialRecoSegment2D& startSegment,
-                                                   const CDCStereoRecoSegment2D& middleSegment,
-                                                   const CDCAxialRecoSegment2D& endSegment)
-{
 
   //check if the middle segment lies within the acceptable bounds in angular deviation
   {
     //get the remembered fits
-    const CDCTrajectory2D& startFit = getXYFit(startSegment);
-    const CDCTrajectory2D& endFit = getXYFit(endSegment);
+    const CDCTrajectory2D& startFit = getFittedTrajectory2D(startSegment);
+    const CDCTrajectory2D& endFit = getFittedTrajectory2D(endSegment);
 
     //use only the first and last hit for this check
     const CDCRecoHit2D& firstHit = middleSegment.front();
@@ -248,7 +230,7 @@ CellWeight SimpleSegmentTripleFilter::isGoodTriple(const CDCAxialRecoSegment2D& 
   // make more complex judgement on fitness
 
   // Get the combined fit of start and end axial segment
-  const CDCTrajectory2D& fit = getXYFit(startSegment, endSegment);
+  const CDCTrajectory2D& fit = getFittedTrajectory2D(segmentTriple);
 
   // Check if the middle segment is actually coaligned with the trajectory
   if (not middleSegment.isForwardTrajectory(fit)) return NOT_A_CELL;
@@ -266,148 +248,79 @@ CellWeight SimpleSegmentTripleFilter::isGoodTriple(const CDCAxialRecoSegment2D& 
     }
   }
 
-  //Fit the middle segment
-  CDCSZFitter szFitter;
-  CDCTrajectorySZ trajectorySZ;
-  szFitter.update(trajectorySZ, reconstructedMiddle);
+  const CDCTrajectorySZ& trajectorySZ = getFittedTrajectorySZ(segmentTriple);
 
   FloatType squaredDistance = reconstructedMiddle.getSquaredZDist(trajectorySZ);
+
   {
     B2DEBUG(100, "  ZDistance of the middleSegment = " << squaredDistance);
-    storeSZFit(startSegment, middleSegment, endSegment, trajectorySZ);
 
   }
 
-  CellState cellWeight = startSegment.size() + middleSegment.size() + endSegment.size();
-  return cellWeight;
+  CellState result = startSegment.size() + middleSegment.size() + endSegment.size();
 
-}
+  if (not isNotACell(result)) {
 
-void SimpleSegmentTripleFilter::setTrajectoryOf(const CDCSegmentTriple& segmentTriple)
-{
+    getFittedTrajectory2D(segmentTriple);
+    getFittedTrajectorySZ(segmentTriple);
 
-  segmentTriple.setTrajectory2D(
-    getXYFit(*(segmentTriple.getStart()), *(segmentTriple.getEnd()))
-  );
-
-  const CDCTrajectorySZ& szTrajectory =
-    getSZFit(*(segmentTriple.getStart())  ,
-             *(segmentTriple.getMiddle()) ,
-             *(segmentTriple.getEnd()));
-
-  segmentTriple.setTrajectorySZ(szTrajectory);
-
-}
-
-
-const CDCTrajectory2D& SimpleSegmentTripleFilter::getXYFit(const CDCAxialRecoSegment2D& segment)
-{
-
-  SegmentXYFitMap::iterator itFit = m_segmentXYFits.find(&segment);
-
-  if (itFit == m_segmentXYFits.end()) {
-
-    //create the fit
-    CDCTrajectory2D& fit = m_segmentXYFits[&segment];
-
-    m_xyFitter.update(fit, segment);
-
-    if (not segment.isForwardTrajectory(fit)) {
-      B2WARNING("Fit is not oriented correctly");
-    }
-    return fit;
-
-  } else {
-    return itFit->second;
   }
 
+  return result;
+
 }
 
 
-
-const CDCTrajectory2D&
-SimpleSegmentTripleFilter::getXYFit(
-  const CDCAxialRecoSegment2D& startSegment,
-  const CDCAxialRecoSegment2D& endSegment
-)
+const CDCTrajectory2D& SimpleSegmentTripleFilter::getFittedTrajectory2D(const CDCAxialRecoSegment2D& segment) const
 {
 
-  SegmentPair segmentPair(&startSegment, &endSegment);
-
-  SegmentPairXYFitMap::iterator itFit = m_segmentPairXYFits.find(segmentPair);
-
-  if (itFit == m_segmentPairXYFits.end()) {
-
-    //create the fit
-    CDCTrajectory2D& fit = m_segmentPairXYFits[segmentPair];
-
-    m_xyFitter.update(fit, startSegment, endSegment);
-
-    //B2DEBUG(100,"    startSegment.getStartPerpS(fit) = " <<  startSegment.getStartPerpS(fit) );
-    //B2DEBUG(100,"    startSegment.getEndPerpS(fit)   = " <<  startSegment.getEndPerpS(fit) );
-
-    //B2DEBUG(100,"    endSegment.getStartPerpS(fit)   = " <<  endSegment.getStartPerpS(fit) );
-    //B2DEBUG(100,"    endSegment.getEndPerpS(fit)     = " <<  endSegment.getEndPerpS(fit) );
-
-    //B2DEBUG(100,"    Check startSegment isForwardFit " << startSegment.isForwardFit(fit));
-    //B2DEBUG(100,"    Check endSegment isForwardFit " << endSegment.isForwardFit(fit));
-
-    return fit;
-
-  } else {
-    return itFit->second;
+  CDCTrajectory2D& trajectory2D = segment.getTrajectory2D();
+  if (not trajectory2D.isFitted()) {
+    getRiemannFitter().update(trajectory2D, segment);
   }
+  return trajectory2D;
+
 }
 
 
 
-const CDCTrajectorySZ&
-SimpleSegmentTripleFilter::getSZFit(
-  const CDCAxialRecoSegment2D& startSegment,
-  const CDCStereoRecoSegment2D& middleSegment,
-  const CDCAxialRecoSegment2D& endSegment
-)
+const CDCTrajectory2D& SimpleSegmentTripleFilter::getFittedTrajectory2D(const CDCAxialAxialSegmentPair& axialAxialSegmentPair) const
+{
+  CDCTrajectory2D& trajectory2D = axialAxialSegmentPair.getTrajectory2D();
+  if (not trajectory2D.isFitted()) {
+    getRiemannFitter().update(trajectory2D, axialAxialSegmentPair);
+  }
+  return trajectory2D;
+}
+
+
+
+const CDCTrajectorySZ& SimpleSegmentTripleFilter::getFittedTrajectorySZ(const CDCSegmentTriple& segmentTriple) const
 {
 
-  ASATriple triple(&startSegment, &middleSegment, &endSegment);
-  SegmentTripleSZFitMap::iterator itFit = m_segmentTripleSZFits.find(triple);
+  CDCTrajectorySZ& trajectorySZ = segmentTriple.getTrajectorySZ();
 
-  if (itFit == m_segmentTripleSZFits.end()) {
+  if (not trajectorySZ.isFitted()) {
 
-    const CDCTrajectory2D& fit = getXYFit(startSegment, endSegment);
+    const CDCTrajectory2D& trajectory2D = getFittedTrajectory2D(segmentTriple);
+
+    const CDCStereoRecoSegment2D* ptrMiddleSegment = segmentTriple.getMiddle();
+    const CDCStereoRecoSegment2D middleSegment = *ptrMiddleSegment;
 
     //recostruct the stereo segment with the hit
     CDCRecoSegment3D reconstructedMiddle;
     for (CDCStereoRecoSegment2D::const_iterator itRecoHits = middleSegment.begin();
          itRecoHits != middleSegment.end(); ++itRecoHits) {
-      reconstructedMiddle.push_back(CDCRecoHit3D::reconstruct(*itRecoHits, fit));
+      reconstructedMiddle.push_back(CDCRecoHit3D::reconstruct(*itRecoHits, trajectory2D));
     }
 
-    //create the fit
-    CDCTrajectorySZ& szFit = m_segmentTripleSZFits[triple];
+    getSZFitter().update(trajectorySZ, reconstructedMiddle);
 
-    m_szFitter.update(szFit, reconstructedMiddle);
-    return szFit;
-
-  } else {
-    return itFit->second;
   }
 
-}
-
-
-
-void
-SimpleSegmentTripleFilter::storeSZFit(
-  const CDCAxialRecoSegment2D& startSegment,
-  const CDCStereoRecoSegment2D& middleSegment,
-  const CDCAxialRecoSegment2D& endSegment,
-  const CDCTrajectorySZ& szFit
-)
-{
-
-  m_segmentTripleSZFits[ASATriple(&startSegment, &middleSegment, &endSegment)] = szFit;
-
+  return trajectorySZ;
 
 }
+
+
 

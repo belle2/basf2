@@ -83,6 +83,9 @@ namespace Belle2 {
       void setTrajectory2D(const CDCTrajectory2D& trajectory2D) const
       { m_trajectory2D =  trajectory2D; }
 
+      void clearTrajectory2D() const
+      { getTrajectory2D().clear(); }
+
       /// Sets the do not use flag of the segment triple's automaton cell and of the three contained segments
       void setDoNotUse() const {
         getAutomatonCell().setFlags(DO_NOT_USE);

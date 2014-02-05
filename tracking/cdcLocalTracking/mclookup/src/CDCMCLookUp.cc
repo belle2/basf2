@@ -363,10 +363,10 @@ void CDCMCLookUp::addSegments(const std::vector< Belle2::CDCLocalTracking::CDCRe
          itRecoHit2D != segment.end(); ++itRecoHit2D) {
 
       const CDCRecoHit2D& recohit = *itRecoHit2D;
-      const CDCWireHit* wirehit = recohit.getWireHit();
-      if (getMCTrackId(wirehit) == iTrack) {
+      const CDCWireHit& wirehit = recohit.getWireHit();
+      if (getMCTrackId(&wirehit) == iTrack) {
         //consider this hit for the alignement only if it has the same as the highest efficiency track id
-        const CDCSimHit* simhit = getSimHit(wirehit);
+        const CDCSimHit* simhit = getSimHit(&wirehit);
 
         cumulatedFlightTime += simhit->getFlightTime();
         ++nHits;
@@ -476,8 +476,8 @@ const Belle2::MCParticle* CDCMCLookUp::getMCParticle(const CDCRecoSegment2D& seg
   for (CDCRecoSegment2D::const_iterator itRecoHit = segment.begin();
        itRecoHit != segment.end(); ++itRecoHit) {
 
-    const CDCWireHit* wirehit = itRecoHit->getWireHit();
-    if (getMCTrackId(wirehit) == iTrack) return getMCParticle(wirehit);
+    const CDCWireHit& wirehit = itRecoHit->getWireHit();
+    if (getMCTrackId(&wirehit) == iTrack) return getMCParticle(&wirehit);
 
   }
   return nullptr;
@@ -827,9 +827,9 @@ void CDCMCLookUp::addMajorMCTrackIdCountGeneric(const HitIterator& begin, const 
 
   for (HitIterator itRecoHit = begin; itRecoHit != end; ++itRecoHit) {
 
-    const CDCWireHit* wirehit = (*itRecoHit)->getWireHit();
+    const auto& wireHit = (*itRecoHit)->getWireHit();
 
-    ITrackType trackIdOfHit = getMajorMCTrackId(wirehit);
+    ITrackType trackIdOfHit = getMajorMCTrackId(wireHit);
     if (trackIdCount.count(trackIdOfHit) == 0) {
       trackIdCount[trackIdOfHit] = 0;
     }
@@ -837,6 +837,7 @@ void CDCMCLookUp::addMajorMCTrackIdCountGeneric(const HitIterator& begin, const 
   }
 
 }
+
 
 
 void CDCMCLookUp::addMajorMCTrackIdCount(const CDCRecoSegment2D& segment, TrackIdCountMap& trackIdCount) const
@@ -928,10 +929,10 @@ const CDCSimHit* CDCMCLookUp::getFirstSimHit(const CDCRecoSegment2D& segment, IT
 
   // in case the given trackId is INVALID_ITRACK it ignores the trackId and gives the first simhit that is not nullptr
   while (itRecoHit != segment.end() and
-         (getSimHit(itRecoHit->getWireHit()) == nullptr or
-          (trackId != INVALID_ITRACK and getMCTrackId(itRecoHit->getWireHit()) != trackId))) ++itRecoHit;
+         (getSimHit(&(itRecoHit->getWireHit())) == nullptr or
+          (trackId != INVALID_ITRACK and getMCTrackId(&(itRecoHit->getWireHit())) != trackId))) ++itRecoHit;
 
-  return itRecoHit == segment.end() ? nullptr : getSimHit(itRecoHit->getWireHit()) ;
+  return itRecoHit == segment.end() ? nullptr : getSimHit(&(itRecoHit->getWireHit())) ;
 
 
 }
@@ -948,10 +949,10 @@ const CDCSimHit* CDCMCLookUp::getLastSimHit(const CDCRecoSegment2D& segment, ITr
 
   // in case the given trackId is INVALID_ITRACK it ignores the trackId and gives the first simhit that is not nullptr
   while (itRecoHit != segment.rend() and
-         (getSimHit(itRecoHit->getWireHit()) == nullptr or
-          (trackId != INVALID_ITRACK and getMCTrackId(itRecoHit->getWireHit()) != trackId))) ++itRecoHit;
+         (getSimHit(&(itRecoHit->getWireHit())) == nullptr or
+          (trackId != INVALID_ITRACK and getMCTrackId(&(itRecoHit->getWireHit())) != trackId))) ++itRecoHit;
 
-  return itRecoHit == segment.rend() ? nullptr : getSimHit(itRecoHit->getWireHit()) ;
+  return itRecoHit == segment.rend() ? nullptr : getSimHit(&(itRecoHit->getWireHit())) ;
 
 }
 

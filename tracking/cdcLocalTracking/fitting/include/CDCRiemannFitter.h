@@ -49,7 +49,7 @@ namespace Belle2 {
 
         //set transverse s reference
         //fit.setStartPos2D( recohits.getCenterOfMass2D() ) ;
-        fit.setStartPos2D(recohits.front().getRefPos2D()) ;
+        fit.setStartPos2D(recohits.front().getRecoPos2D()) ;
 
         //check if fit is forward
         if (not recohits.isForwardTrajectory(fit)) fit.reverse();
@@ -69,7 +69,7 @@ namespace Belle2 {
 
         //set transverse s reference
         //fit.setStartPos2D( recohits.getCenterOfMass2D() ) ;
-        fit.setStartPos2D(firstRecohits.front().getRefPos2D()) ;
+        fit.setStartPos2D(firstRecohits.front().getRecoPos2D()) ;
 
         //check if fit is forward
         if (not firstRecohits.isForwardTrajectory(fit)) fit.reverse();

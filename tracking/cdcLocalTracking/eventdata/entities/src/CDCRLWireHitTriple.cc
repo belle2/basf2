@@ -46,9 +46,9 @@ CDCRLWireHitTriple::CDCRLWireHitTriple(
 CDCRLWireHitTriple CDCRLWireHitTriple::reversed() const
 {
   return CDCRLWireHitTriple(
-           &(CDCWireHitTopology::getInstance().getReverseOf(getEndRLWireHit())),
-           &(CDCWireHitTopology::getInstance().getReverseOf(getMiddleRLWireHit())),
-           &(CDCWireHitTopology::getInstance().getReverseOf(getStartRLWireHit()))
+           CDCWireHitTopology::getInstance().getReverseOf(getEndRLWireHit()),
+           CDCWireHitTopology::getInstance().getReverseOf(getMiddleRLWireHit()),
+           CDCWireHitTopology::getInstance().getReverseOf(getStartRLWireHit())
          );
 }
 
@@ -57,13 +57,13 @@ CDCRLWireHitTriple CDCRLWireHitTriple::reversed() const
 void CDCRLWireHitTriple::reverse()
 {
 
-  const CDCRLWireHit& newStartRLWireHit = CDCWireHitTopology::getInstance().getReverseOf(getEndRLWireHit());
-  const CDCRLWireHit& newMiddleRLWireHit = CDCWireHitTopology::getInstance().getReverseOf(getMiddleRLWireHit());
-  const CDCRLWireHit& newEndRLWireHit = CDCWireHitTopology::getInstance().getReverseOf(getStartRLWireHit());
+  const CDCRLWireHit* newStartRLWireHit = CDCWireHitTopology::getInstance().getReverseOf(getEndRLWireHit());
+  const CDCRLWireHit* newMiddleRLWireHit = CDCWireHitTopology::getInstance().getReverseOf(getMiddleRLWireHit());
+  const CDCRLWireHit* newEndRLWireHit = CDCWireHitTopology::getInstance().getReverseOf(getStartRLWireHit());
 
-  setStartRLWireHit(&newStartRLWireHit);
-  setMiddleRLWireHit(&newMiddleRLWireHit);
-  setEndRLWireHit(&newEndRLWireHit);
+  setStartRLWireHit(newStartRLWireHit);
+  setMiddleRLWireHit(newMiddleRLWireHit);
+  setEndRLWireHit(newEndRLWireHit);
 
 }
 
@@ -73,8 +73,8 @@ void CDCRLWireHitTriple::setStartRLInfo(const RightLeftInfo& startRLInfo)
 {
 
   if (startRLInfo != getStartRLInfo()) {
-    const CDCRLWireHit& newStartRLWireHit = CDCWireHitTopology::getInstance().getReverseOf(getStartRLWireHit());
-    m_startRLWireHit = &newStartRLWireHit;
+    const CDCRLWireHit* newStartRLWireHit = CDCWireHitTopology::getInstance().getReverseOf(getStartRLWireHit());
+    setStartRLWireHit(newStartRLWireHit);
   }
 
 }

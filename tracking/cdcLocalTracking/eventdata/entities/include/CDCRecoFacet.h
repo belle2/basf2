@@ -92,13 +92,13 @@ namespace Belle2 {
 
 
       CDCRecoHit2D getStartRecoHit2D() const
-      { return CDCRecoHit2D::fromAbsPos2D(&(getStartWireHit()), getStartRLInfo(), getStartRefPos2D()); }
+      { return CDCRecoHit2D::fromAbsPos2D(&(getStartRLWireHit()), getStartRefPos2D()); }
 
       CDCRecoHit2D getMiddleRecoHit2D() const
-      { return CDCRecoHit2D::fromAbsPos2D(&(getMiddleWireHit()), getMiddleRLInfo(), getMiddleRefPos2D()); }
+      { return CDCRecoHit2D::fromAbsPos2D(&(getMiddleRLWireHit()), getMiddleRefPos2D()); }
 
       CDCRecoHit2D getEndRecoHit2D() const
-      { return CDCRecoHit2D::fromAbsPos2D(&(getEndWireHit()), getEndRLInfo(), getEndRefPos2D()); }
+      { return CDCRecoHit2D::fromAbsPos2D(&(getEndRLWireHit()), getEndRefPos2D()); }
 
       CDCRecoTangent getStartToMiddle() const
       { return CDCRecoTangent(&(getStartRLWireHit()), &(getMiddleRLWireHit()), getStartToMiddleLine()); }

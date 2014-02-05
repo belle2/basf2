@@ -55,10 +55,10 @@ CDCRLWireHitPair::~CDCRLWireHitPair()
 CDCRLWireHitPair CDCRLWireHitPair::reversed() const
 {
 
-  const CDCRLWireHit& newFromRLWireHit = CDCWireHitTopology::getInstance().getReverseOf(getToRLWireHit());
-  const CDCRLWireHit& newToRLWireHit = CDCWireHitTopology::getInstance().getReverseOf(getFromRLWireHit());
+  const CDCRLWireHit* newFromRLWireHit = CDCWireHitTopology::getInstance().getReverseOf(getToRLWireHit());
+  const CDCRLWireHit* newToRLWireHit = CDCWireHitTopology::getInstance().getReverseOf(getFromRLWireHit());
 
-  return CDCRLWireHitPair(&newFromRLWireHit, &newToRLWireHit);
+  return CDCRLWireHitPair(newFromRLWireHit, newToRLWireHit);
 
 }
 
@@ -67,11 +67,11 @@ CDCRLWireHitPair CDCRLWireHitPair::reversed() const
 void CDCRLWireHitPair::reverse()
 {
 
-  const CDCRLWireHit& newFromRLWireHit = CDCWireHitTopology::getInstance().getReverseOf(getToRLWireHit());
-  const CDCRLWireHit& newToRLWireHit = CDCWireHitTopology::getInstance().getReverseOf(getFromRLWireHit());
+  const CDCRLWireHit* newFromRLWireHit = CDCWireHitTopology::getInstance().getReverseOf(getToRLWireHit());
+  const CDCRLWireHit* newToRLWireHit = CDCWireHitTopology::getInstance().getReverseOf(getFromRLWireHit());
 
-  setFromRLWireHit(&newFromRLWireHit);
-  setToRLWireHit(&newToRLWireHit);
+  setFromRLWireHit(newFromRLWireHit);
+  setToRLWireHit(newToRLWireHit);
 
 }
 
@@ -91,8 +91,8 @@ void CDCRLWireHitPair::setFromRLInfo(const RightLeftInfo& fromRLInfo)
 {
 
   if (fromRLInfo != getFromRLInfo()) {
-    const CDCRLWireHit& newFromRLWireHit = CDCWireHitTopology::getInstance().getReverseOf(getFromRLWireHit());
-    m_fromRLWireHit = &newFromRLWireHit;
+    const CDCRLWireHit* newFromRLWireHit = CDCWireHitTopology::getInstance().getReverseOf(getFromRLWireHit());
+    setFromRLWireHit(newFromRLWireHit);
   }
 
 }
@@ -103,8 +103,8 @@ void CDCRLWireHitPair::setToRLInfo(const RightLeftInfo& toRLInfo)
 {
 
   if (toRLInfo != getToRLInfo()) {
-    const CDCRLWireHit& newToRLWireHit = CDCWireHitTopology::getInstance().getReverseOf(getToRLWireHit());
-    m_toRLWireHit = &newToRLWireHit;
+    const CDCRLWireHit* newToRLWireHit = CDCWireHitTopology::getInstance().getReverseOf(getToRLWireHit());
+    setToRLWireHit(newToRLWireHit);
   }
 
 }

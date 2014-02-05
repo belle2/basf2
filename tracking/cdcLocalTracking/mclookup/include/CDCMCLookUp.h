@@ -93,15 +93,22 @@ namespace Belle2 {
       void addSegments(const std::vector< Belle2::CDCLocalTracking::CDCRecoSegment2D >& segments);
 
 
-      const Belle2::CDCSimHit* getSimHit(const CDCWireHit* wirehit) const;
-      const Belle2::CDCSimHit* getSimHit(const CDCRecoHit2D& recohit) const { return getSimHit(recohit.getWireHit()); }
+      const Belle2::CDCSimHit* getSimHit(const CDCWireHit* wireHit) const;
+      const Belle2::CDCSimHit* getSimHit(const CDCRecoHit2D& recoHit) const {
+        const CDCWireHit& wireHit = recoHit.getWireHit();
+        return getSimHit(&wireHit);
+      }
 
 
-      const Belle2::MCParticle* getMCParticle(const CDCWireHit* wirehit) const;
-      const Belle2::MCParticle* getMCParticle(const CDCRecoHit2D& recohit) const
-      { return getMCParticle(recohit.getWireHit()); }
-      const Belle2::MCParticle* getMCParticle(const CDCRecoHit3D& recohit) const
-      { return getMCParticle(recohit.getWireHit()); }
+      const Belle2::MCParticle* getMCParticle(const CDCWireHit* wireHit) const;
+      const Belle2::MCParticle* getMCParticle(const CDCRecoHit2D& recoHit) const {
+        const CDCWireHit& wireHit = recoHit.getWireHit();
+        return getMCParticle(&wireHit);
+      }
+      const Belle2::MCParticle* getMCParticle(const CDCRecoHit3D& recoHit) const {
+        const CDCWireHit* wireHit = recoHit.getWireHit();
+        return getMCParticle(wireHit);
+      }
 
     private:
       const Belle2::MCParticle* getMajorMCParticle(const Belle2::MCParticle* mcpart) const {
@@ -121,6 +128,7 @@ namespace Belle2 {
 
       ITrackType getMCTrackId(const CDCWireHit* wirehit) const;
       ITrackType getMajorMCTrackId(const CDCWireHit* wirehit) const;
+      ITrackType getMajorMCTrackId(const CDCWireHit& wirehit) const { return getMajorMCTrackId(&wirehit);}
       ITrackType getSimTrackId(const CDCWireHit* wirehit) const;
 
       void checkSimToMCTrackIdEquivalence(const CDCWireHitCollection& wirehits) const;
@@ -133,10 +141,12 @@ namespace Belle2 {
                999 : itIndexInTrackPair->second;
       }
 
-      ITrackType getMCTrackId(const CDCRecoHit2D& recohit) const
-      { return getMCTrackId(recohit.getWireHit()); }
-      ITrackType getMCTrackId(const CDCRecoHit3D& recohit) const
-      { return getMCTrackId(recohit.getWireHit()); }
+      ITrackType getMCTrackId(const CDCRecoHit2D& recoHit) const {
+        const CDCWireHit& wireHit = recoHit.getWireHit();
+        return getMCTrackId(&wireHit);
+      }
+      ITrackType getMCTrackId(const CDCRecoHit3D& recoHit) const
+      { return getMCTrackId(recoHit.getWireHit()); }
 
 
       ITrackType getMajorMCTrackId(const CDCWireHit* one,

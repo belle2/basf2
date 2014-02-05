@@ -38,68 +38,68 @@ CDCRecoHit3D::CDCRecoHit3D(
   if (wirehit == nullptr) B2WARNING("Recohit with nullptr as wire hit");
 }
 
-CDCRecoHit3D CDCRecoHit3D::fromSimHit(const CDCWireHit* wirehit, const CDCSimHit& simhit)
+CDCRecoHit3D CDCRecoHit3D::fromSimHit(const CDCWireHit* wireHit, const CDCSimHit& simHit)
 {
 
   //prepS can not be deduced from the flightTime in this context
   FloatType perpS = std::numeric_limits<FloatType>::quiet_NaN();
 
   // find out if the wire is right or left of the track ( view in flight direction )
-  Vector3D trackPosToWire =  simhit.getPosWire();
-  trackPosToWire.subtract(simhit.getPosTrack());
+  Vector3D trackPosToWire =  simHit.getPosWire();
+  trackPosToWire.subtract(simHit.getPosTrack());
 
-  Vector3D directionOfFlight = simhit.getMomentum();
+  Vector3D directionOfFlight = simHit.getMomentum();
 
   RightLeftInfo rlInfo = trackPosToWire.xy().isRightOrLeftOf(directionOfFlight.xy());
 
-  return CDCRecoHit3D(wirehit, simhit.getPosTrack(), rlInfo, perpS);
+  return CDCRecoHit3D(wireHit, simHit.getPosTrack(), rlInfo, perpS);
 
 }
 
 
 CDCRecoHit3D CDCRecoHit3D::reconstruct(
-  const CDCRecoHit2D& recohit,
+  const CDCRecoHit2D& recoHit,
   const CDCTrajectory2D& trajectory2D
 )
 {
 
-  AxialType axialType = recohit->getAxialType();
+  AxialType axialType = recoHit->getAxialType();
   if (axialType == STEREO_V or axialType == STEREO_U) {
 
-    BoundSkewLine skewLine = recohit.getSkewLine();
+    BoundSkewLine skewLine = recoHit.getSkewLine();
     Vector3D reconstructedPoint = trajectory2D.reconstruct3D(skewLine);
     FloatType perpS = trajectory2D.calcPerpS(reconstructedPoint.xy());
-    return CDCRecoHit3D(recohit.getWireHit(), reconstructedPoint, recohit.getRLInfo(), perpS);
+    return CDCRecoHit3D(&(recoHit.getWireHit()), reconstructedPoint, recoHit.getRLInfo(), perpS);
 
   } else if (axialType == AXIAL) {
-    Vector2D recoPos2D = trajectory2D.getClosest(recohit->getRefPos2D());
+    Vector2D recoPos2D = trajectory2D.getClosest(recoHit.getRecoPos2D());
     FloatType perpS    = trajectory2D.calcPerpS(recoPos2D);
 
     //for axial wire we can not determine the z coordinate by looking at the xy projection only
     //we set it to a not a number here
     FloatType z        = std::numeric_limits<FloatType>::quiet_NaN();
 
-    return CDCRecoHit3D(recohit.getWireHit(), Vector3D(recoPos2D, z), recohit.getRLInfo(), perpS);
+    return CDCRecoHit3D(&(recoHit.getWireHit()), Vector3D(recoPos2D, z), recoHit.getRLInfo(), perpS);
   } else {
     return CDCRecoHit3D();
   }
 }
 
 CDCRecoHit3D CDCRecoHit3D::reconstruct(
-  const CDCRecoHit2D& recohit,
+  const CDCRecoHit2D& recoHit,
   const CDCTrajectory2D& trajectory2D,
   const CDCTrajectorySZ& trajectorySZ
 )
 {
 
-  AxialType axialType = recohit->getAxialType();
+  AxialType axialType = recoHit->getAxialType();
   if (axialType == AXIAL) {
-    Vector2D recoPos2D = trajectory2D.getClosest(recohit->getRefPos2D());
+    Vector2D recoPos2D = trajectory2D.getClosest(recoHit.getRecoPos2D());
     FloatType perpS    = trajectory2D.calcPerpS(recoPos2D);
     FloatType z        = trajectorySZ.mapSToZ(perpS);
 
     Vector3D recoPos3D(recoPos2D, z);
-    return CDCRecoHit3D(recohit.getWireHit(), recoPos3D, recohit.getRLInfo(), perpS);
+    return CDCRecoHit3D(&(recoHit.getWireHit()), recoPos3D, recoHit.getRLInfo(), perpS);
 
   } else if (axialType == STEREO_U or axialType == STEREO_V) {
     //the closest approach of a skew line to a helix
@@ -109,12 +109,12 @@ CDCRecoHit3D CDCRecoHit3D::reconstruct(
     //with the reconstruct methode above in the other reconstruct method.
     //sticking to that method but using the average z from the sz fit
 
-    const BoundSkewLine skewLine = recohit.getSkewLine();
+    const BoundSkewLine skewLine = recoHit.getSkewLine();
     Vector3D recoPos3D = trajectory2D.reconstruct3D(skewLine);
     FloatType perpS    = trajectory2D.calcPerpS(recoPos3D.xy());
     FloatType z        = trajectorySZ.mapSToZ(perpS);
     recoPos3D.setZ(z);
-    return CDCRecoHit3D(recohit.getWireHit(), recoPos3D, recohit.getRLInfo(), perpS);
+    return CDCRecoHit3D(&(recoHit.getWireHit()), recoPos3D, recoHit.getRLInfo(), perpS);
 
   } else {
     return CDCRecoHit3D();

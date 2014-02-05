@@ -74,13 +74,13 @@ void CDCWireHitTopology::clear()
 }
 
 
-const CDCRLWireHit& CDCWireHitTopology::getReverseOf(const CDCRLWireHit& rlWireHit) const
+const CDCRLWireHit* CDCWireHitTopology::getReverseOf(const CDCRLWireHit& rlWireHit) const
 {
 
   SortableVector<CDCRLWireHit>::const_iterator itFoundRLWireHit = m_rlWireHits.findFast(rlWireHit);
   if (itFoundRLWireHit == m_rlWireHits.end()) {
     B2ERROR("An oriented wire hit can not be found in the CDCWireHitTopology.");
-    return rlWireHit;
+    return nullptr;
   }
   if (rlWireHit.getRLInfo() == RIGHT) {
     // The oriented wire hit with left passage is stored in the vector just before this one -- see above in fill()
@@ -93,7 +93,7 @@ const CDCRLWireHit& CDCWireHitTopology::getReverseOf(const CDCRLWireHit& rlWireH
     B2ERROR("An oriented wire hit does not have the right left passage variable assigned correctly.");
   }
 
-  return *itFoundRLWireHit;
+  return &*itFoundRLWireHit;
 
 }
 

@@ -58,5 +58,5 @@ CDCRLWireHit CDCRLWireHit::fromSimHit(
 }
 
 
-const CDCRLWireHit& CDCRLWireHit::reversed() const
+const CDCRLWireHit* CDCRLWireHit::reversed() const
 { return CDCWireHitTopology::getInstance().getReverseOf(*this); }

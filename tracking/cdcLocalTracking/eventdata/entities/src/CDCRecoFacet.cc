@@ -73,9 +73,9 @@ CDCRecoFacet::CDCRecoFacet(
 CDCRecoFacet CDCRecoFacet::reversed() const
 {
   return CDCRecoFacet(
-           &(CDCWireHitTopology::getInstance().getReverseOf(getEndRLWireHit())),
-           &(CDCWireHitTopology::getInstance().getReverseOf(getMiddleRLWireHit())),
-           &(CDCWireHitTopology::getInstance().getReverseOf(getStartRLWireHit()))
+           CDCWireHitTopology::getInstance().getReverseOf(getEndRLWireHit()),
+           CDCWireHitTopology::getInstance().getReverseOf(getMiddleRLWireHit()),
+           CDCWireHitTopology::getInstance().getReverseOf(getStartRLWireHit())
          );
 
 }

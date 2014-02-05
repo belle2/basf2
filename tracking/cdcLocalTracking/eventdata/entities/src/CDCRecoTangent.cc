@@ -59,10 +59,9 @@ CDCRecoTangent::CDCRecoTangent(
   const CDCRecoHit2D& fromRecoHit,
   const CDCRecoHit2D& toRecoHit
 ):
-  CDCRLWireHitPair(CDCWireHitTopology::getInstance().getRLWireHit(*(fromRecoHit.getWireHit()), fromRecoHit.getRLInfo()),
-                   CDCWireHitTopology::getInstance().getRLWireHit(*(toRecoHit.getWireHit()), toRecoHit.getRLInfo())),
-  m_line(ParameterLine2D::throughPoints(fromRecoHit.getRefPos2D(),
-                                        toRecoHit.getRefPos2D()))
+  CDCRLWireHitPair(&(fromRecoHit.getRLWireHit()), &(toRecoHit.getRLWireHit())),
+  m_line(ParameterLine2D::throughPoints(fromRecoHit.getRecoPos2D(),
+                                        toRecoHit.getRecoPos2D()))
 {;}
 
 

@@ -10,6 +10,8 @@
 
 #include "../include/CDCRecoHit2D.h"
 
+#include <tracking/cdcLocalTracking/eventtopology/CDCWireHitTopology.h>
+
 using namespace std;
 using namespace Belle2;
 using namespace CDCLocalTracking;
@@ -17,80 +19,71 @@ using namespace CDCLocalTracking;
 ClassImpInCDCLocalTracking(CDCRecoHit2D)
 
 CDCRecoHit2D::CDCRecoHit2D() :
-  m_wirehit(&(CDCWireHit::getLowest())),
-  m_displacement(Vector2D::getLowest()),
-  m_rlInfo(LEFT)
+  m_rlWireHit(nullptr),
+  m_recoDisp2D(Vector2D::getLowest())
 {;}
 
 
 CDCRecoHit2D::CDCRecoHit2D(
-  const CDCWireHit* wirehit,
-  RightLeftInfo rlInfo
+  const CDCRLWireHit* rlWireHit
 ) :
-  m_wirehit(wirehit),
-  m_displacement(Vector2D::getLowest()),
-  m_rlInfo(rlInfo)
+  m_rlWireHit(rlWireHit),
+  m_recoDisp2D(Vector2D::getLowest())
 {
-  if (wirehit == nullptr) B2WARNING("Recohit with nullptr as wire hit");
+  if (rlWireHit == nullptr) B2ERROR("Initialization of two dimensional reconstructed hit with nullptr as oriented wire hit");
 }
 
 
 CDCRecoHit2D::CDCRecoHit2D(
-  const CDCWireHit* wirehit,
-  const Vector2D& displacement,
-  RightLeftInfo rlInfo
+  const CDCRLWireHit* rlWireHit,
+  const Vector2D& recoDisp2D
 ) :
-  m_wirehit(wirehit),
-  m_displacement(displacement),
-  m_rlInfo(rlInfo)
+  m_rlWireHit(rlWireHit),
+  m_recoDisp2D(recoDisp2D)
 {
-  if (wirehit == nullptr) B2WARNING("Recohit with nullptr as wire hit");
+  if (rlWireHit == nullptr) B2ERROR("Initialization of two dimensional reconstructed hit with nullptr as oriented wire hit");
 }
 
 CDCRecoHit2D::~CDCRecoHit2D() {;}
 
 CDCRecoHit2D CDCRecoHit2D::fromSimHit(
-  const CDCWireHit* wirehit,
-  const CDCSimHit& simhit
+  const CDCWireHit* wireHit,
+  const CDCSimHit& simHit
 )
 {
-  if (wirehit == nullptr) B2WARNING("Recohit with nullptr as wire hit");
+  if (wireHit == nullptr) B2WARNING("Recohit with nullptr as wire hit");
 
   // find out if the wire is right or left of the track ( view in flight direction )
-  Vector3D trackPosToWire =  simhit.getPosWire();
-  trackPosToWire.subtract(simhit.getPosTrack());
+  Vector3D trackPosToWire =  simHit.getPosWire();
+  trackPosToWire.subtract(simHit.getPosTrack());
 
-  Vector3D directionOfFlight = simhit.getMomentum();
+  Vector3D directionOfFlight = simHit.getMomentum();
 
   RightLeftInfo rlInfo = trackPosToWire.xy().isRightOrLeftOf(directionOfFlight.xy());
 
-  CDCRecoHit2D recohit2D(wirehit, Vector2D(-trackPosToWire.x(), -trackPosToWire.y()), rlInfo);
-  recohit2D.snapToDriftCircle();
+  const CDCRLWireHit* rlWireHit = CDCWireHitTopology::getInstance().getRLWireHit(*wireHit, rlInfo);
 
-  return recohit2D;
+  CDCRecoHit2D recoHit2D(rlWireHit, Vector2D(-trackPosToWire.x(), -trackPosToWire.y()));
+  recoHit2D.snapToDriftCircle();
 
+  return recoHit2D;
 }
 
 CDCRecoHit2D
 CDCRecoHit2D::average(
-  const CDCRecoHit2D& recohit1,
-  const CDCRecoHit2D& recohit2
+  const CDCRecoHit2D& recoHit1,
+  const CDCRecoHit2D& recoHit2
 )
 {
 
-  if (!(recohit1.getWireHit()->IsEqual(recohit2.getWireHit()))) {
-    B2ERROR("Average of two CDCRecoHit2Ds with different wirehits requested, returning first given RecoHit");
-    return recohit1;
+  if (not(recoHit1.getRLWireHit() == recoHit2.getRLWireHit())) {
+    B2ERROR("Average of two CDCRecoHit2Ds with different oriented wire hits requested, returning first given RecoHit");
+    return recoHit1;
   }
 
-  Vector2D displacement = Vector2D::average(recohit1.getRefDisp2D(), recohit2.getRefDisp2D());
+  Vector2D displacement = Vector2D::average(recoHit1.getRecoDisp2D(), recoHit2.getRecoDisp2D());
 
-  if (recohit1.getRLInfo() *  recohit2.getRLInfo() < 0)
-    B2WARNING("Averaged two CDCRecoHit2Ds with opposite left right information");
-
-  RightLeftInfo rlInfo = averageInfo(recohit1.getRLInfo(), recohit2.getRLInfo()) ;
-
-  CDCRecoHit2D result(recohit1.getWireHit(), displacement, rlInfo);
+  CDCRecoHit2D result(&(recoHit1.getRLWireHit()), displacement);
   result.snapToDriftCircle();
 
   return result;
@@ -100,36 +93,22 @@ CDCRecoHit2D::average(
 
 CDCRecoHit2D
 CDCRecoHit2D::average(
-  const CDCRecoHit2D& recohit1,
-  const CDCRecoHit2D& recohit2 ,
-  const CDCRecoHit2D& recohit3
+  const CDCRecoHit2D& recoHit1,
+  const CDCRecoHit2D& recoHit2,
+  const CDCRecoHit2D& recoHit3
 )
 {
-
-  if (!(recohit1.getWireHit()->IsEqual(recohit2.getWireHit()) &&
-        recohit2.getWireHit()->IsEqual(recohit3.getWireHit()))) {
+  if (not(recoHit1.getRLWireHit() == recoHit2.getRLWireHit() and
+          recoHit2.getRLWireHit() == recoHit3.getRLWireHit())) {
     B2ERROR("Average of three CDCRecoHit2Ds with different wirehits requested, returning first given RecoHit");
-    return recohit1;
+    return recoHit1;
   }
 
-  //check for opposite sign of the recohits
-  if (recohit1.getRLInfo() * recohit2.getRLInfo() < 0  or
-      recohit2.getRLInfo() * recohit3.getRLInfo() < 0  or
-      recohit3.getRLInfo() * recohit1.getRLInfo() < 0)
-    B2WARNING("Averaged three CDCRecoHit2Ds with incompatible left right information");
+  Vector2D displacement = Vector2D::average(recoHit1.getRecoDisp2D() ,
+                                            recoHit2.getRecoDisp2D() ,
+                                            recoHit3.getRecoDisp2D());
 
-
-  Vector2D displacement = Vector2D::average(recohit1.getRefDisp2D() ,
-                                            recohit2.getRefDisp2D() ,
-                                            recohit3.getRefDisp2D());
-
-  RightLeftInfo rlInfo = averageInfo(recohit1.getRLInfo() ,
-                                     recohit2.getRLInfo() ,
-                                     recohit3.getRLInfo()) ;
-
-
-
-  CDCRecoHit2D result(recohit1.getWireHit(), displacement, rlInfo);
+  CDCRecoHit2D result(&(recoHit1.getRLWireHit()), displacement);
   result.snapToDriftCircle();
 
   return result;
@@ -137,16 +116,27 @@ CDCRecoHit2D::average(
 }
 
 CDCRecoHit2D CDCRecoHit2D::fromAbsPos2D(
-  const CDCWireHit* wirehit,
-  RightLeftInfo rlinfo,
+  const CDCRLWireHit* rlWireHit,
   const Vector2D& pos2D,
   bool snap
 )
 {
-  CDCRecoHit2D result(wirehit, pos2D - wirehit->getRefPos2D(), rlinfo);
+  CDCRecoHit2D result(rlWireHit, pos2D - rlWireHit->getRefPos2D());
   if (snap) result.snapToDriftCircle();
   return result;
 }
 
 
 
+void CDCRecoHit2D::reverse()
+{
+  const CDCRLWireHit* reverseRLWireHit = CDCWireHitTopology::getInstance().getReverseOf(getRLWireHit());
+  setRLWireHit(reverseRLWireHit);
+}
+
+
+
+CDCRecoHit2D CDCRecoHit2D::reversed() const
+{
+  return CDCRecoHit2D(CDCWireHitTopology::getInstance().getReverseOf(getRLWireHit()), getRefDisp2D());
+}

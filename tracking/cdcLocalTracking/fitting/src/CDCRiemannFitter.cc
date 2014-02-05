@@ -70,7 +70,7 @@ size_t CDCRiemannFitter::fillObservation(const CDCRecoHit2D& recohit, vector<Flo
   size_t result = 0;
   if (m_usePosition) {
 
-    Vector2D position = recohit.getRefPos2D();
+    Vector2D position = recohit.getRecoPos2D();
 
     observations.push_back(position.x());
     observations.push_back(position.y());
@@ -79,8 +79,8 @@ size_t CDCRiemannFitter::fillObservation(const CDCRecoHit2D& recohit, vector<Flo
   }
   if (m_useOrientation) {
 
-    const CDCWireHit* wirehit = recohit.getWireHit();
-    Vector2D positionOfWire = wirehit->getRefPos2D();
+    const CDCWireHit& wirehit = recohit.getWireHit();
+    Vector2D positionOfWire = wirehit.getRefPos2D();
 
     observations.push_back(positionOfWire.x());
     observations.push_back(positionOfWire.y());

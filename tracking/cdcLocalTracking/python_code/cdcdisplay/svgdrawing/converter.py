@@ -206,7 +206,7 @@ class CDCDataobjectsConverter:
 
     def CDCRecoHit2DToSVG(self, recohit, **kwd):
 
-        position = recohit.getRefPos2D()
+        position = recohit.getRecoPos2D()
         point = (position.x(), position.y())
 
         if point[0] != point[0] or point[1] != point[1]:

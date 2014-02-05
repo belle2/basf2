@@ -91,8 +91,8 @@ void SegmentSelecter::selectSegments(vector<CDCRecoSegment2D>& in,
     for (CDCRecoSegment2D::iterator itRecoHit = segment.begin();
          itRecoHit != segment.end(); ++itRecoHit) {
 
-      const CDCWireHit* wirehit = itRecoHit->getWireHit();
-      hitAssignedTo[wirehit].push_back(&segment);
+      const CDCWireHit& wirehit = itRecoHit->getWireHit();
+      hitAssignedTo[&wirehit].push_back(&segment);
 
     }
   }
@@ -145,8 +145,8 @@ void SegmentSelecter::selectSegments(vector<CDCRecoSegment2D>& in,
          itRecoHit != segment.end(); ++itRecoHit) {
 
       CDCRecoHit2D& recohit = *itRecoHit;
-      const CDCWireHit* wirehit = recohit.getWireHit();
-      if (hitAssignedTo[wirehit][0] == &segment) {
+      const CDCWireHit& wirehit = recohit.getWireHit();
+      if (hitAssignedTo[&wirehit][0] == &segment) {
         newSegment.push_back(recohit);
       }
     }

@@ -129,11 +129,11 @@ namespace Belle2 {
 
       /// Getter for the reconstructed hit on the first oriented wire hit using reconstructed touch point as position
       CDCRecoHit2D getFromRecoHit2D() const
-      { return CDCRecoHit2D::fromAbsPos2D(&(getFromWireHit()), getFromRLInfo(), getFromRefTouch2D()); }
+      { return CDCRecoHit2D::fromAbsPos2D(&(getFromRLWireHit()), getFromRefTouch2D()); }
 
       /// Getter for the reconstructed hit on the second oriented wire hit using reconstructed touch point as position
       CDCRecoHit2D getToRecoHit2D() const
-      { return CDCRecoHit2D::fromAbsPos2D(&(getToWireHit()), getToRLInfo(), getToRefTouch2D()); }
+      { return CDCRecoHit2D::fromAbsPos2D(&(getToRLWireHit()), getToRefTouch2D()); }
 
 
 

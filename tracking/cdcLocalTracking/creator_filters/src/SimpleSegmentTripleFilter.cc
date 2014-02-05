@@ -152,8 +152,8 @@ CellState SimpleSegmentTripleFilter::isGoodTriple(const CDCAxialRecoSegment2D& s
     const CDCRecoHit2D& firstHit = middleSegment.front();
     const CDCRecoHit2D& lastHit = middleSegment.back();
 
-    Vector2D firstPosition = firstHit.getRefPos2D();
-    Vector2D lastPosition  = lastHit.getRefPos2D();
+    Vector2D firstPosition = firstHit.getRecoPos2D();
+    Vector2D lastPosition  = lastHit.getRecoPos2D();
 
     Vector2D firstReconstructed = startFit.getCloseSamePolarR(firstPosition);
     Vector2D lastReconstructed = endFit.getCloseSamePolarR(lastPosition);
@@ -161,14 +161,14 @@ CellState SimpleSegmentTripleFilter::isGoodTriple(const CDCAxialRecoSegment2D& s
     FloatType first_refToReconstructedAngle = firstPosition.angleWith(firstReconstructed);
     FloatType last_refToReconstructedAngle = lastPosition.angleWith(lastReconstructed);
 
-    const CDCWire* firstWire = firstHit->getWire();
-    const CDCWire* lastWire  = lastHit->getWire();
+    const CDCWire& firstWire = firstHit.getWire();
+    const CDCWire& lastWire  = lastHit.getWire();
 
     //Both wires are stereo wires by construction
     //So they have both non zero twist
     //check if the first and last are within the acceptable twist bounds
-    const std::pair<FloatType, FloatType>& first_phiRangeToRef = firstWire->getPhiRangeToRef();
-    const std::pair<FloatType, FloatType>& last_phiRangeToRef  = lastWire->getPhiRangeToRef();
+    const std::pair<FloatType, FloatType>& first_phiRangeToRef = firstWire.getPhiRangeToRef();
+    const std::pair<FloatType, FloatType>& last_phiRangeToRef  = lastWire.getPhiRangeToRef();
 
     const FloatType tolerance = 0.0;
 

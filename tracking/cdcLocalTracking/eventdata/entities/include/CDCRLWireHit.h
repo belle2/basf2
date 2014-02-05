@@ -44,7 +44,7 @@ namespace Belle2 {
       static CDCRLWireHit fromSimHit(const CDCWireHit* wirehit, const CDCSimHit& simhit);
 
       /// Returns the oriented wire hit with the opposite right left information.
-      const CDCRLWireHit& reversed() const;
+      const CDCRLWireHit* reversed() const;
 
 
 

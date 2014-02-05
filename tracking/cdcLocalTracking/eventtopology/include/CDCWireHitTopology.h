@@ -57,7 +57,7 @@ namespace Belle2 {
       void clear();
 
       /// Getter for the oriented wire hit with the opposite orientation.
-      const Belle2::CDCLocalTracking::CDCRLWireHit& getReverseOf(const Belle2::CDCLocalTracking::CDCRLWireHit& rlWireHit) const;
+      const Belle2::CDCLocalTracking::CDCRLWireHit* getReverseOf(const Belle2::CDCLocalTracking::CDCRLWireHit& rlWireHit) const;
 
       /// Getter for the two oriented wire hits that are based on the given wire hit
       std::pair<const Belle2::CDCLocalTracking::CDCRLWireHit*, const Belle2::CDCLocalTracking::CDCRLWireHit*> getRLWireHitPair(const Belle2::CDCLocalTracking::CDCWireHit& wireHit) const;

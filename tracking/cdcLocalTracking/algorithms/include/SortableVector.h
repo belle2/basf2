@@ -134,6 +134,12 @@ namespace Belle2 {
       /// Reserves space in std::vector as Container
       void reserve(size_t n) { m_items.reserve(n); }
 
+      /// Unchecked access to the elements of the vector
+      Item& operator[](size_t const& index) { return m_items[index]; }
+
+      /// Unchecked access to the elements of the constant vector
+      ConstItem& operator[](size_t const& index) const { return m_items[index]; }
+
       /// Gives the first item of the vector
       Item& back() { return m_items.back(); }
       /// Gives the first item of the constant vector
@@ -217,16 +223,39 @@ namespace Belle2 {
 
     public:
       /// Returns an iterator to the found element. end() if not found.
-      /** For in sorted vectors this is rather slow. But if the isSorted state is set the look up is \n
+      /** For unsorted vectors this is rather slow. But if the isSorted state is set the look up is \n
        *  as fast as for sets. */
       const_iterator find(const Item& item) const {
         if (isSorted()) {
           const_iterator found = lower_bound(item);
-          return found != m_items.end() and * found == item ? found : end();
+          return (found != m_items.end() and (*found) == item) ? found : end();
         } else {
           return std::find(begin(), end(), item);
         }
       }
+
+
+      /// Returns an iterator to the found element. end() if not found.
+      /** This method gains some speed up by considering the memory address of the given object first.
+       *  If the address lies within the memory range of the vector the iterator can be forwarded to this position.
+       *  without any comparision operation. Otherwise the normal find() is invoked.
+       *  This essentially casts a reference into the vector to an iterator.
+       *  Note: Although considering the memory address this operation is as fail save as the normal find operation.
+       *  If the address does not point to a proper object inside the vector this method will fail as would the normal find.
+       */
+      const_iterator findFast(const Item& item) const {
+        if (containsPointer(&item)) {
+          const_iterator itBegin = begin();
+          const Item* ptrItem = &item;
+          const Item* ptrBegin = &*itBegin;
+          size_t idxItem = ptrItem - ptrBegin;
+          std::advance(itBegin, idxItem);
+          return itBegin;
+        } else {
+          return find(item);
+        }
+      }
+
       /// Returns returns the lower bound iterator of the item in the vector.
       /** The lower bound is only available in sorted vectors. If the isSorted state is not set \n
        *  this method always returns end. In case of a sorted vector this is as fast as the set look up. */
@@ -300,6 +329,28 @@ namespace Belle2 {
           return true;
         }
       }
+
+
+      /// Evaluates if the pointer address of the given object points to a place inside the containers range
+      bool containsPointer(const T* item) const {
+        // Note size_t is required to be large enough to contain any of the platform's memory addresses
+        size_t instanceAddress = (size_t)item;
+
+        const_iterator itBegin = begin();
+        const_iterator itEnd = end();
+
+        size_t beginAddress = (size_t)(&*itBegin);
+        size_t endAddress = (size_t)(&*itEnd);
+
+        bool isInside = beginAddress <= instanceAddress and instanceAddress < endAddress;
+        bool paddingIsCorrect = ((instanceAddress - beginAddress) % sizeof(T)) == 0;
+
+        return isInside and paddingIsCorrect;
+      }
+
+
+    private:
+
 
 
     protected:

@@ -92,6 +92,69 @@ TEST_F(CDCLocalTrackingTest, SortableVector_range)
 }
 
 
+TEST_F(CDCLocalTrackingTest, SortableVector_findFast)
+{
+
+  const CDCGenHit lowestGenHit;
+  const CDCGenHit largerGenHit(WireID(0, 0, 0), Vector2D(0.0, 1.0));
+  SortableVector<CDCGenHit> collection;
+
+  collection.push_back(lowestGenHit);
+  collection.push_back(largerGenHit);
+  collection.push_back(lowestGenHit);
+
+  EXPECT_EQ(3u, collection.size());
+
+  // test the contains pointer mechanism
+
+  EXPECT_EQ(false, collection.containsPointer(&lowestGenHit));
+  EXPECT_EQ(false, collection.containsPointer(&largerGenHit));
+
+  const CDCGenHit& firstStoredGenHit = collection[0];
+  const CDCGenHit& secondStoredGenHit = collection[1];
+  const CDCGenHit& thirdStoredGenHit = collection[2];
+
+  EXPECT_EQ(true, collection.containsPointer(&firstStoredGenHit));
+  EXPECT_EQ(true, collection.containsPointer(&secondStoredGenHit));
+  EXPECT_EQ(true, collection.containsPointer(&thirdStoredGenHit));
+
+  // test the fast find
+  SortableVector<CDCGenHit>::const_iterator itFoundLowest = collection.findFast(lowestGenHit);
+  SortableVector<CDCGenHit>::const_iterator itFoundLarger = collection.findFast(largerGenHit);
+
+  // External lookup should yield different object
+  EXPECT_NE(&lowestGenHit, &*itFoundLowest);
+  EXPECT_NE(&largerGenHit, &*itFoundLarger);
+
+  // But objects should be equal
+  EXPECT_EQ(lowestGenHit, *itFoundLowest);
+  EXPECT_EQ(largerGenHit, *itFoundLarger);
+
+  // Also check the iterators to point to the correct place inside the vector
+  SortableVector<CDCGenHit>::const_iterator itBegin = collection.begin();
+
+  EXPECT_EQ(0, std::distance(itBegin, itFoundLowest));
+  EXPECT_EQ(1, std::distance(itBegin, itFoundLarger));
+
+  // Compare addresses since it must be exactly the same
+  SortableVector<CDCGenHit>::const_iterator itFoundFirst = collection.findFast(collection[0]);
+  SortableVector<CDCGenHit>::const_iterator itFoundSecond = collection.findFast(collection[1]);
+  SortableVector<CDCGenHit>::const_iterator itFoundThird = collection.findFast(collection[2]);
+
+  // External lookup should yield exactly the same object
+  EXPECT_EQ(&collection[0], &*itFoundFirst);
+  EXPECT_EQ(&collection[1], &*itFoundSecond);
+  EXPECT_EQ(&collection[2], &*itFoundThird);
+
+  // Also check the iterators to point to the correct place inside the vector
+  EXPECT_EQ(0, std::distance(itBegin, itFoundFirst));
+  EXPECT_EQ(1, std::distance(itBegin, itFoundSecond));
+  EXPECT_EQ(2, std::distance(itBegin, itFoundThird));
+
+}
+
+
+
 
 TEST_F(CDCLocalTrackingTest, SortableVector_sort)
 {

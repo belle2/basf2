@@ -20,8 +20,6 @@
 #include <tracking/cdcLocalTracking/algorithms/NeighborhoodBuilder.h>
 #include <tracking/cdcLocalTracking/neighbor_chooser/WireHitNeighborChooser.h>
 
-#include <tracking/cdcLocalTracking/algorithms/CellularAutomaton.h>
-#include <tracking/cdcLocalTracking/algorithms/CellularPathFollower.h>
 #include <tracking/cdcLocalTracking/algorithms/MultipassCellularPathFinder.h>
 #include <tracking/cdcLocalTracking/algorithms/Clusterizer.h>
 
@@ -42,9 +40,6 @@ namespace Belle2 {
     class FacetSegmentWorker {
 
     public:
-      //switches
-      static const bool growMany = false;
-
 
       /** Constructor. */
       FacetSegmentWorker(): m_cellularPathFinder(3.0) {;}
@@ -71,7 +66,6 @@ namespace Belle2 {
                         std::vector< CDCRecoSegment2D >& outputSegments) {
 
         //which recosegment should be show in the output
-
         std::vector< CDCRecoSegment2D >& recoSegments = m_recoSegments;
         std::vector< CDCRecoSegment2D >& selectedRecoSegments = outputSegments;  //output
 
@@ -116,11 +110,7 @@ namespace Belle2 {
         //double d;
         //std::cin >> d;
 
-        for (std::vector<CDCWireHitCluster>::iterator itCluster = m_clusters.begin();
-             itCluster != m_clusters.end(); ++itCluster) {
-          CDCWireHitCluster& cluster = *itCluster;
-
-
+        for (CDCWireHitCluster & cluster : m_clusters) {
           //size_t nSegmentsBefore = selectedRecoSegments.size();
 
           //create the facets
@@ -135,75 +125,26 @@ namespace Belle2 {
           m_facetNeighborhoodBuilder.create(m_facets, m_facetsNeighborhood);
           B2DEBUG(100, "  Created " << m_facetsNeighborhood.size()  << " FacetsNeighborhoods");
 
+          //Apply the cellular automaton in a multipass manner
+          m_facetSegments.clear();
+          m_cellularPathFinder.apply(m_facets, m_facetsNeighborhood, m_facetSegments);
 
-          if (growMany) {
-            // single pass of cellular automation
-            // all maximal segments are grown but
-            // they can be very much overlapping
-            // a best candidate analysis is needed
-            // to single out the good ones from the many segments
-
-            //apply the cellular automation
-            B2DEBUG(100, "Apply cellular automat");
-            const CDCRecoFacet* highestCell = m_cellularAutomaton.applyTo(m_facets, m_facetsNeighborhood);
-            if (highestCell != nullptr) {
-              B2DEBUG(100, "  MaximalState " << highestCell->getAutomatonCell().getCellState());
-            }
-
-            //create the segments by following the highest states in the reco facets
-            B2DEBUG(100, "Follow the longest paths");
-            m_facetSegments.clear();
-            m_cellularFollower.followAll(m_facets, m_facetsNeighborhood ,
-                                         m_facetSegments, 2.0);
-
-            B2DEBUG(100, "  Created " << m_facetSegments.size()  << " CDCRecoFacetPtrSegment");
-
-            //save the tangents for display only
+          //save the tangents for display only
 #ifdef CDCLOCALTRACKING_USE_ROOT
-            B2DEBUG(100, "Reduce the CDCRecoFacetPtrSegment to RecoSegment2D");
-            m_tangentSegmentCreator.create(m_facetSegments, m_recoTangentSegments);
+          B2DEBUG(100, "Reduce the CDCRecoFacetPtrSegment to RecoSegment2D");
+          m_tangentSegmentCreator.create(m_facetSegments, m_recoTangentSegments);
 #endif
 
-            //reduce for further usage in the best candidate analysis
-            B2DEBUG(100, "Reduce the CDCRecoFacetPtrSegment to RecoSegment2D");
-            // reduce the many segments
-            recoSegments.clear();
-            recoSegments.reserve(m_facetSegments.size());
-            m_recoSegmentCreator.create(m_facetSegments, recoSegments);
-            B2DEBUG(100, "  Created " << recoSegments.size()  << " CDCRecoSegment2Ds");
-
-
-            //make the die out analysis to single out the best ones
-            B2DEBUG(100, "Selecting CDCRecoSegment2Ds ");
-            m_segmentSelecter.selectSegments(recoSegments, selectedRecoSegments);
-
-          } else { /* not growMany */
-
-            m_facetSegments.clear();
-            m_cellularPathFinder.apply(m_facets, m_facetsNeighborhood, m_facetSegments);
-
-
-            //save the tangents for display only
-#ifdef CDCLOCALTRACKING_USE_ROOT
-            B2DEBUG(100, "Reduce the CDCRecoFacetPtrSegment to RecoSegment2D");
-            m_tangentSegmentCreator.create(m_facetSegments, m_recoTangentSegments);
-#endif
-
-            // reduce the CDCRecoFacetPtrSegment directly to the selected vector
-            B2DEBUG(100, "Reduce the CDCRecoFacetPtrSegment to RecoSegment2D");
-            selectedRecoSegments.reserve(selectedRecoSegments.size() + m_facetSegments.size());
-            m_recoSegmentCreator.create(m_facetSegments, selectedRecoSegments);
-
-
-          } //end if growMany
+          // reduce the CDCRecoFacetPtrSegment directly to the selected vector
+          B2DEBUG(100, "Reduce the CDCRecoFacetPtrSegment to RecoSegment2D");
+          selectedRecoSegments.reserve(selectedRecoSegments.size() + m_facetSegments.size());
+          m_recoSegmentCreator.create(m_facetSegments, selectedRecoSegments);
 
           //TODO: combine matching segments here
 
           //size_t nSegmentsAfter = selectedRecoSegments.size();
-
           B2DEBUG(100, "  Created " << selectedRecoSegments.size()  << " selected CDCRecoSegment2Ds");
-        } // end cluster batch loop
-
+        } // end for cluster
 
         //make both orientations available
         B2DEBUG(100, "Reversing CDCReco2DSegments");
@@ -247,7 +188,6 @@ namespace Belle2 {
         }
         B2DEBUG(100, "  Created " << storedRecoSegments.getEntries()  << " CDCRecoSegment2D");
 
-
         // IO selected segments without tangents
         B2DEBUG(100, "  Creating the StoreArray for the selected CDCRecoHit2DSegments");
         StoreArray < CDCRecoSegment2D > storedSelectedRecoSegments("CDCRecoHit2DSegmentsSelected");
@@ -283,7 +223,6 @@ namespace Belle2 {
       std::vector<CDCRecoSegment2D> m_recoSegments;
 
       Clusterizer<CDCWireHit, CDCWireHitCluster> m_wirehitClusterizer;
-
       std::vector<CDCWireHitCluster> m_clusters;
 
       //object creators
@@ -311,20 +250,12 @@ namespace Belle2 {
       NeighborhoodBuilder<CDCRecoFacet, FacetNeighborChooser>
       m_facetNeighborhoodBuilder;
 
-
       //cellular automat
-      CellularAutomaton<CDCRecoFacet>  m_cellularAutomaton;
-
-      //CellularPathFollower< CDCRecoFacetCollection > m_cellularFollower;
-      CellularPathFollower<CDCRecoFacet> m_cellularFollower;
-
       MultipassCellularPathFinder<CDCRecoFacet> m_cellularPathFinder;
-
 
       RecoSegmentCreator m_recoSegmentCreator;
       TangentSegmentCreator m_tangentSegmentCreator;
 
-      // die out analysis
       SegmentSelecter m_segmentSelecter;
       SegmentReverser m_segmentReverser;
 

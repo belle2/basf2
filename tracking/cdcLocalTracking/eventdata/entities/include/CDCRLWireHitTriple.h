@@ -122,7 +122,9 @@ namespace Belle2 {
       FloatType getSquaredDist2D(const CDCTrajectory2D& trajectory2D) const
       { return getStartRLWireHit().getSquaredDist2D(trajectory2D) + getRearRLWireHitPair().getSquaredDist2D(trajectory2D);}
 
-
+      /// Checks if the last oriented wire hit in the triple lies at greater travel distance than the first oriented wire hit
+      bool isForwardTrajectory(const CDCTrajectory2D& trajectory2D) const
+      { return getStartPerpS(trajectory2D) < getEndPerpS(trajectory2D); }
 
       /// Getter for the common superlayer id of the pair
       ILayerType getISuperLayer() const {

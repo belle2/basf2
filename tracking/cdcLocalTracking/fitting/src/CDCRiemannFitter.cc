@@ -24,192 +24,138 @@ ClassImpInCDCLocalTracking(CDCRiemannFitter)
 CDCRiemannFitter::CDCRiemannFitter() : m_usePosition(true), m_useOrientation(true),
   m_lineConstrained(false) , m_originConstrained(false) {;}
 
-/** Destructor. */
 CDCRiemannFitter::~CDCRiemannFitter()
 {
 }
 
 
-/*
-size_t CDCRiemannFitter::fillObservations(const CDCRecoHit2DSet& recohits, vector<FloatType>& observations) const
+CDCTrajectory2D CDCRiemannFitter::fit(const CDCRLWireHitTriple& rlWireHitTriple) const
 {
-  size_t result = 0;
-  for (CDCRecoHit2DSet::const_iterator itRecoHit = recohits.begin();  itRecoHit != recohits.end(); ++itRecoHit) {
-    result += fillObservation(*itRecoHit, observations);
-  }
+  CDCTrajectory2D result;
+  update(result, rlWireHitTriple);
   return result;
-  }*/
+}
 
-size_t CDCRiemannFitter::fillObservations(const CDCRecoHit2DVector& recohits, vector<FloatType>& observations) const
+
+CDCTrajectory2D CDCRiemannFitter::fit(const CDCRecoSegment2D& recoSegment2D) const
+{
+  CDCTrajectory2D result;
+  update(result, recoSegment2D);
+  return result;
+}
+
+
+CDCTrajectory2D CDCRiemannFitter::fit(const CDCSegmentTriple& segmentTriple) const
+{
+  CDCTrajectory2D result;
+  update(result, segmentTriple);
+  return result;
+}
+
+
+void CDCRiemannFitter::update(CDCTrajectory2D& fit, const CDCRLWireHitTriple& rlWireHitTriple) const
 {
 
-  size_t result = 0;
-  for (CDCRecoHit2DVector::const_iterator itRecoHit = recohits.begin();  itRecoHit != recohits.end(); ++itRecoHit) {
-    result += fillObservation(*itRecoHit, observations);
-  }
-  return result;
+  CDCObservations2D observations2D;
+  observations2D.append(rlWireHitTriple);
+
+  B2ERROR("CDCRiemannFitter ask to fit a oriented wire hit triple without line constraint.");
+  update(fit, observations2D);
+
+  //Set transverse s reference
+  fit.setStartPos2D(rlWireHitTriple.getStartWire().getRefPos2D());
+
+  //Check if fit is forward
+  if (not rlWireHitTriple.isForwardTrajectory(fit)) fit.reverse();
+  if (not rlWireHitTriple.isForwardTrajectory(fit)) B2WARNING("Fit cannot be oriented correctly");
 
 }
 
-/*
-size_t CDCRiemannFitter::fillObservations(const CDCSegmentTriple& segmentTriple, std::vector<FloatType>& observations) const
+void CDCRiemannFitter::update(CDCTrajectory2D& fit, const CDCRecoSegment2D& recoSegment2D) const
 {
 
-  const CDCAxialRecoSegment2D* startSegment = segmentTriple.getStart();
-  size_t result = startSegment == nullptr ? 0 : fillObservations(*startSegment, observations);
-
-  const CDCAxialRecoSegment2D* endSegment = segmentTriple.getEnd();
-  result += endSegment == nullptr ? 0 : fillObservations(*endSegment, observations);
-
-  return result;
-}
-*/
-
-size_t CDCRiemannFitter::fillObservation(const CDCRecoHit2D& recohit, vector<FloatType>& observations) const
-{
-  size_t result = 0;
+  CDCObservations2D observations2D;
   if (m_usePosition) {
-
-    Vector2D position = recohit.getRecoPos2D();
-
-    observations.push_back(position.x());
-    observations.push_back(position.y());
-    observations.push_back(0.0);
-
+    observations2D.append(recoSegment2D, true);
   }
   if (m_useOrientation) {
-
-    const CDCWireHit& wirehit = recohit.getWireHit();
-    Vector2D positionOfWire = wirehit.getRefPos2D();
-
-    observations.push_back(positionOfWire.x());
-    observations.push_back(positionOfWire.y());
-    observations.push_back(SignType(recohit.getRLInfo()) * wirehit->getRefDriftLength());
-
-    result = observations.back() == 0 ? 0 : 1;
-
+    observations2D.append(recoSegment2D, false);
   }
-  return result;
+
+  update(fit, observations2D);
+
+  //Set transverse s reference
+  fit.setStartPos2D(recoSegment2D.front().getRecoPos2D()) ;
+
+  //Check if fit is forward
+  if (not recoSegment2D.isForwardTrajectory(fit)) fit.reverse();
+  if (not recoSegment2D.isForwardTrajectory(fit)) B2WARNING("Fit cannot be oriented correctly");
+
 }
 
-
-/*
-void CDCRiemannFitter::update(CDCTrajectory2D & fit,const CDCRecoSegment & recosegments) const{
-  updateGeneric(fit,recosegments.begin(),recosegments.end(),recosegments.size());
-}
-
-void CDCRiemannFitter::update(CDCTrajectory2D & fit, const CDCRecoSegment & fromRecoSegment, const CDCRecoSegment & toRecoSegment )const{
-
-  CDCRecoSegment combinedSegment;
-  combinedSegment.expand(fromRecoSegment);
-  combinedSegment.expand(toRecoSegment);
-  updateGeneric(fit,combinedSegment.begin(),combinedSegment.end(),combinedSegment.size());
-
-}*/
-/*
-
-template<class RecoHitInputIterator>
-void CDCRiemannFitter::updateGeneric(CDCTrajectory2D & fit,
-                                     RecoHitInputIterator recohitsBegin , RecoHitInputIterator recohitsEnd,
-                                     size_t nRecoHits) const{
-
-
-  // first find out how many observations we have
-  size_t multi = 0;
-  if (m_usePosition) ++multi;
-  if (m_useOrientation) ++multi;
-
-  size_t nRows = multi*nRecoHits;
-
-  FloatType observations[nRows][3];
-  //observations has three columns
-  // first for the x coordinate
-  // second for the y coordinate
-  // third the signed desired distance from that point,
-  //   where the sign indicates whether the point lies to the right or left of the fitted trajectory
-
-  //fill the observations
-  size_t iArrayRow = 0;
-
-  if ( m_usePosition ){
-    TVector2 position;
-    for ( RecoHitInputIterator itRecoHit = recohitsBegin;
-          itRecoHit != recohitsEnd;
-          ++itRecoHit, ++iArrayRow){
-
-      const CDCRecoHitCand & recohit = *itRecoHit;
-      position = recohit.getPosition();
-
-      observations[iArrayRow][0] = position.X();
-      observations[iArrayRow][1] = position.Y();
-      observations[iArrayRow][2] = 0.0;
-    }
-  }
-
-  size_t nLeftRightInfo = 0;
-  if ( m_useOrientation ){
-    TVector2 positionOfWire;
-    for ( RecoHitInputIterator itRecoHit = recohitsBegin;
-          itRecoHit != recohitsEnd;
-          ++itRecoHit, ++iArrayRow){
-
-      const CDCRecoHitCand & recohit = *itRecoHit;
-      CDCWireHit * wirehit = recohit.getWireHit();
-
-      positionOfWire = wirehit->getPosition();
-
-      observations[iArrayRow][0] = positionOfWire.X();
-      observations[iArrayRow][1] = positionOfWire.Y();
-      observations[iArrayRow][2] = recohit.getRightLeftInfo() * wirehit->getDriftCircleRadius();
-      if( recohit.getRightLeftInfo() != 0) ++nLeftRightInfo;
-    }
-  }
-
-  const bool usesRightLeftInfo = nLeftRightInfo > 0;
-
-  update(fit,observations,nRows,usesRightLeftInfo);
-
-
-}  */
-
-
-void CDCRiemannFitter::update(CDCTrajectory2D& fit, std::vector<FloatType>& observations, bool usesRightLeftInfo) const
+void CDCRiemannFitter::update(CDCTrajectory2D& fit,
+                              const CDCRecoSegment2D& firstRecoSegment2D,
+                              const CDCRecoSegment2D& secondRecoSegment2D) const
 {
 
-  size_t nObservations = observations.size() / 3;
-  FloatType* rawObservations = &(observations.front());
+  CDCObservations2D observations2D;
+  if (m_usePosition) {
+    observations2D.append(firstRecoSegment2D, true);
+    observations2D.append(secondRecoSegment2D, true);
+  }
+  if (m_useOrientation) {
+    observations2D.append(firstRecoSegment2D, false);
+    observations2D.append(secondRecoSegment2D, false);
+  }
 
-  if (usesRightLeftInfo) {
-    updateWithRightLeft(fit, rawObservations, nObservations);
+  update(fit, observations2D);
 
+  //set transverse s reference
+  fit.setStartPos2D(firstRecoSegment2D.front().getRecoPos2D()) ;
+
+  //check if fit is forward
+  if (not firstRecoSegment2D.isForwardTrajectory(fit)) fit.reverse();
+
+  if (not(firstRecoSegment2D.isForwardTrajectory(fit) and secondRecoSegment2D.isForwardTrajectory(fit)))
+    B2WARNING("Fit cannot be oriented correctly");
+
+}
+
+void CDCRiemannFitter::update(CDCTrajectory2D& fit, const CDCSegmentTriple& segmentTriple) const
+{
+  update(fit, *(segmentTriple.getStart()), *(segmentTriple.getEnd()));
+}
+
+
+
+
+
+void CDCRiemannFitter::update(CDCTrajectory2D& fit, CDCObservations2D& observations2D) const
+{
+
+  if (observations2D.getNObservationsWithDriftRadius() > 0) {
+    updateWithRightLeft(fit, observations2D);
   } else {
-
-    updateWithOutRightLeft(fit, rawObservations, nObservations);
-
+    updateWithOutRightLeft(fit, observations2D);
   }
+
 }
 
 
-void CDCRiemannFitter::updateWithOutRightLeft(CDCTrajectory2D& fit,
-                                              FloatType* observations,
-                                              size_t nObservations) const
+
+
+
+void CDCRiemannFitter::updateWithOutRightLeft(CDCTrajectory2D& fit, CDCObservations2D& observations2D) const
 {
 
-  //observations always have the structure
-  /*
-  observables[0][0] == x of first point
-  observables[0][1] == y of first point
-  observables[0][2] == desired distance of first point
-  */
+  CDCObservations2D::EigenObservationMatrix&&  eigenObservation = observations2D.getObservationMatrix();
+  size_t nObservations = observations2D.size();
 
-  //c++ arrays are always row major
-  Map< Matrix< FloatType, Dynamic, Dynamic, RowMajor > > eigenObservation(observations, nObservations, 3);
 
   if (isLineConstrained()) {
 
     //do a normal line fit
     Matrix<FloatType, Dynamic, 2> points = eigenObservation.leftCols<2>();
-
 
     Matrix<FloatType, 1, 2> pointMean;
     //RowVector2d pointMean;
@@ -290,10 +236,14 @@ void CDCRiemannFitter::updateWithOutRightLeft(CDCTrajectory2D& fit,
 }
 
 
-void CDCRiemannFitter::updateWithRightLeft(CDCTrajectory2D& fit,
-                                           FloatType* observations,
-                                           size_t nObservations) const
+
+
+
+void CDCRiemannFitter::updateWithRightLeft(CDCTrajectory2D& fit, CDCObservations2D& observations2D) const
 {
+
+  CDCObservations2D::EigenObservationMatrix && eigenObservation = observations2D.getObservationMatrix();
+  size_t nObservations = observations2D.size();
 
   //cout << "updateWithRightLeft : " << endl;
   //observations always have the structure
@@ -302,10 +252,6 @@ void CDCRiemannFitter::updateWithRightLeft(CDCTrajectory2D& fit,
   observables[0][1] == y of first point
   observables[0][2] == desired distance of first point
   */
-
-
-  //c++ arrays are always row major
-  Map< Matrix<FloatType, Dynamic, Dynamic , RowMajor > > eigenObservation(observations, nObservations, 3);
 
   Matrix< FloatType, Dynamic, 1 > distances = eigenObservation.col(2);
 

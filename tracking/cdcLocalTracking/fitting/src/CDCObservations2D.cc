@@ -24,9 +24,11 @@ CDCObservations2D::CDCObservations2D()
 }
 
 
+
 CDCObservations2D::~CDCObservations2D()
 {
 }
+
 
 
 void CDCObservations2D::append(const Vector2D& pos2D)
@@ -37,6 +39,8 @@ void CDCObservations2D::append(const Vector2D& pos2D)
   m_observations.push_back(0.0);
 
 }
+
+
 
 void CDCObservations2D::append(const CDCWireHit& wireHit)
 {
@@ -49,16 +53,60 @@ void CDCObservations2D::append(const CDCWireHit& wireHit)
 
 }
 
+
+
 void CDCObservations2D::append(const CDCRLWireHit& rlWireHit)
 {
-
   const Vector2D& pos2D = rlWireHit.getRefPos2D();
 
   m_observations.push_back(pos2D.x());
   m_observations.push_back(pos2D.y());
   m_observations.push_back(rlWireHit.getSignedRefDriftLength());
+}
+
+
+
+void CDCObservations2D::append(const Belle2::CDCLocalTracking::CDCRLWireHitPair& rlWireHitPair)
+{
+  append(rlWireHitPair.getFromRLWireHit());
+  append(rlWireHitPair.getToRLWireHit());
+}
+
+
+
+void CDCObservations2D::append(const Belle2::CDCLocalTracking::CDCRLWireHitTriple& rlWireHitTriple)
+{
+  append(rlWireHitTriple.getStartRLWireHit());
+  append(rlWireHitTriple.getMiddleRLWireHit());
+  append(rlWireHitTriple.getEndRLWireHit());
+}
+
+
+
+void CDCObservations2D::append(const Belle2::CDCLocalTracking::CDCRecoHit2D& recoHit2D, bool usePosition)
+{
+  if (usePosition) {
+    Vector2D pos2D = recoHit2D.getRecoPos2D();
+    append(pos2D);
+
+  } else {
+    const CDCRLWireHit& rlWireHit = recoHit2D.getRLWireHit();
+    append(rlWireHit);
+
+  }
 
 }
+
+
+
+void CDCObservations2D::append(const CDCRecoSegment2D& recoSegment2D, bool usePosition)
+{
+
+  for (const CDCRecoHit2D & recoHit2D :  recoSegment2D) {
+    append(recoHit2D, usePosition);
+  }
+}
+
 
 
 size_t CDCObservations2D::getNObservationsWithDriftRadius() const
@@ -82,8 +130,7 @@ size_t CDCObservations2D::getNObservationsWithDriftRadius() const
 
 
 
-
-Map< Matrix< FloatType, Dynamic, Dynamic, RowMajor > > CDCObservations2D::getObservationMatrix()
+CDCObservations2D::EigenObservationMatrix CDCObservations2D::getObservationMatrix()
 {
 
   size_t nObservations = m_observations.size() / 3;

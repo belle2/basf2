@@ -25,6 +25,10 @@ namespace Belle2 {
     class CDCObservations2D : public UsedTObject {
 
     public:
+#ifndef __CINT__
+      typedef Eigen::Map< Eigen::Matrix< FloatType, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor > > EigenObservationMatrix;
+#endif
+
       /// Empty constructor.
       CDCObservations2D();
 
@@ -52,6 +56,20 @@ namespace Belle2 {
       /// Appends the observed position - drift radius is signed number according to the orientation
       void append(const Belle2::CDCLocalTracking::CDCRLWireHit& rlWireHit);
 
+      /// Appends the two observed position - drift radius is signed number according to the orientation
+      void append(const Belle2::CDCLocalTracking::CDCRLWireHitPair& rlWireHitPair);
+
+      /// Appends the three observed position - drift radius is signed number according to the orientation
+      void append(const Belle2::CDCLocalTracking::CDCRLWireHitTriple& rlWireHitTriple);
+
+      /// Appends the observed position - drift radius is signed number according to the orientation
+      void append(const Belle2::CDCLocalTracking::CDCRecoHit2D& recoHit2D, bool usePosition = false);
+
+      /// Appends all reconstructed hits from the two dimensional segment, usePosition indicates whether the absolute position shall be used instead of the oriented wire hit information
+      void append(const CDCRecoSegment2D& recoSegment2D, bool usePosition = false);
+
+
+
       /// Returns the number of observations having a drift radius radius
       size_t getNObservationsWithDriftRadius() const;
 
@@ -59,7 +77,7 @@ namespace Belle2 {
       //Hide this methode from CINT since it does not like the Eigen Library to much
       /// Returns the observations structured as an Eigen matrix
       /** This returns a reference to the stored observations. Note that operations may alter the content of the underlying memory and render it useless for subceeding calculations.*/
-      Eigen::Map< Eigen::Matrix< FloatType, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor > > getObservationMatrix();
+      EigenObservationMatrix getObservationMatrix();
 #endif
 
     private:

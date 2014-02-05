@@ -116,7 +116,7 @@ namespace Belle2 {
 
         } // end if( growMany )
 
-        m_singleSegmentTrackCreator.append(recoSegments, m_tracks);
+        //m_singleSegmentTrackCreator.append(recoSegments, m_tracks);
 
         m_trackOrientator.markOrientation(m_tracks);
 

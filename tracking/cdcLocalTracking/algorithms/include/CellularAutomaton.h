@@ -338,10 +338,10 @@ namespace Belle2 {
       /// Helper function to prepare the stats
       /** Clears all flags but DO_NOT_USE and sets the cell state to minus infinity. */
       void prepareCellFlags(const Collection& collection) const {
-        BOOST_FOREACH(const Item & item, collection) {
+        for (const Item & item : collection) {
 
-          item.clearFlags(IS_SET + IS_START + IS_CYCLE);
-          item.setCellState(-std::numeric_limits<CellState>::infinity());
+          item->getAutomatonCell().clearFlags(IS_SET + IS_START + IS_CYCLE);
+          item->getAutomatonCell().setCellState(-std::numeric_limits<CellState>::infinity());
 
         }
 

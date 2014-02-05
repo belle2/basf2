@@ -28,18 +28,10 @@ namespace Belle2 {
     ///Implemetation of the cellular automaton
     /** Implements the weighted cellular automaton algorithm respecting the DO_NOT_USE flags of the cells
      *  not to be traversed. */
-
-    template<class Collection>
+    template<class Item>
     class CellularAutomaton {
-      //Collection can be
-      //  vector<Item>
-      //  set<Item>
-      //  CDCGenericHitVector<Item>
-      //  CDCGenericHitSet<Item>
 
     private:
-      typedef typename Collection::value_type Item; // Type of the items in the collection
-
       typedef WeightedNeighborhood<const Item> Neighborhood; // Type of the neighborhood of elements
 
     public:
@@ -54,38 +46,44 @@ namespace Belle2 {
       /// Applies the cellular automaton to the collection and its neighborhood
       /** Applies the cellular automaton algorithm to the collection where the connections is given by
        *  the neighborhood.
-       *  @param collection the collection containing the items that should acquire the cell states
+       *  @param itemRange the range based iterable containing the items that should acquire the cell states
        *  @param neighborhood the weighted neighborhood of type WeightedNeighborhood<const Item> */
+      template<class ItemRange>
       const Item*
       applyTo(
-        const Collection& collection,
+        const ItemRange& itemRange,
         const Neighborhood& neighborhood
       ) const {
 
-        return applyWithRecursion(collection, neighborhood);
+        return applyWithRecursion(itemRange, neighborhood);
 
       }
 
+      template<class ItemRange>
       const Item*
       applyWithRecursion(
-        const Collection& collection,
+        const ItemRange& itemRange,
         const Neighborhood& neighborhood
       ) const {
         //set all cell states to -inf and the flags to unset
-        prepareCellFlags(collection);
+        prepareCellFlags(itemRange);
 
-        typename Collection::const_iterator itHighestItem = collection.begin();
 
-        //Advance the iterator to a valid item in order to to have a valid highest item.
-        while (itHighestItem != collection.end() and
-               (*itHighestItem).getAutomatonCell().hasAnyFlags(DO_NOT_USE)) {
+        typedef decltype(std::begin(itemRange)) ItemIterator;
+
+        ItemIterator itHighestItem = std::begin(itemRange);
+
+        // Advance the iterator to a valid item in order to to have a valid highest item.
+        while (itHighestItem != std::end(itemRange) and
+               itHighestItem->getAutomatonCell().hasAnyFlags(DO_NOT_USE)) {
+
           ++itHighestItem;
+
         }
 
         // apply cellular automation
         // uses recursion and a single pass through
-        for (typename Collection::const_iterator itItem = itHighestItem;
-             itItem != collection.end(); ++itItem) {
+        for (ItemIterator itItem = itHighestItem; itItem != std::end(itemRange); ++itItem) {
 
           const Item& item = *itItem;
 
@@ -102,9 +100,9 @@ namespace Belle2 {
         }
 
         // Return the element with the highst cell value as a good start point for a segment/track
-        if (itHighestItem == collection.end() or
-            (*itHighestItem).getAutomatonCell().hasAnyFlags(IS_CYCLE + DO_NOT_USE) or
-            not(*itHighestItem).getAutomatonCell().hasAnyFlags(IS_START)) {
+        if (itHighestItem == std::end(itemRange) or
+            itHighestItem->getAutomatonCell().hasAnyFlags(IS_CYCLE + DO_NOT_USE) or
+            not itHighestItem->getAutomatonCell().hasAnyFlags(IS_START)) {
 
           return nullptr;
 
@@ -122,7 +120,7 @@ namespace Belle2 {
 
         // check if the cell is valid to continue on
         if (item.getAutomatonCell().hasAnyFlags(IS_CYCLE /* + DO_NOT_USE */)) {
-          // if not in validate this cell and return
+          // if not invalidate this cell and return
           item.getAutomatonCell().setCellState(NO_CONTINUATION);
           return item.getAutomatonCell().getCellState();
         }
@@ -166,7 +164,7 @@ namespace Belle2 {
           item.getAutomatonCell().setFlags(IS_CYCLE);
 
           // consider all neighbors as possible continuations and
-          // ask each who many value they have to offer
+          // ask each who much value they have to offer
           for (typename Neighborhood::iterator itNeighbor = neighborRange.first;
                itNeighbor != neighborRange.second; ++itNeighbor) {
 
@@ -181,7 +179,7 @@ namespace Belle2 {
               // Preventing an infinit loop
               if (neighbor->getAutomatonCell().hasAnyFlags(IS_CYCLE)) {
                 // encountered cycle
-                // do not unset IS_CYCLE
+                // do not unset IS_CYCLE of this item
                 item.getAutomatonCell().setCellState(NO_CONTINUATION);
                 B2WARNING("Cycle detected");
                 return item.getAutomatonCell().getCellState();
@@ -337,11 +335,12 @@ namespace Belle2 {
     private:
       /// Helper function to prepare the stats
       /** Clears all flags but DO_NOT_USE and sets the cell state to minus infinity. */
-      void prepareCellFlags(const Collection& collection) const {
-        for (const Item & item : collection) {
+      template<class ItemRange>
+      void prepareCellFlags(const ItemRange& itemRange) const {
+        for (const Item & item : itemRange) {
 
-          item->getAutomatonCell().clearFlags(IS_SET + IS_START + IS_CYCLE);
-          item->getAutomatonCell().setCellState(-std::numeric_limits<CellState>::infinity());
+          item.getAutomatonCell().clearFlags(IS_SET + IS_START + IS_CYCLE);
+          item.getAutomatonCell().setCellState(-std::numeric_limits<CellState>::infinity());
 
         }
 

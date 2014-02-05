@@ -355,8 +355,7 @@ namespace Belle2 {
 
 
       //cellular automat
-      CellularAutomaton< CDCRecoFacetCollection >  m_cellularAutomaton;
-
+      CellularAutomaton<CDCRecoFacet>  m_cellularAutomaton;
 
       //CellularPathFollower< CDCRecoFacetCollection > m_cellularFollower;
       CellularPathFollower<CDCRecoFacet> m_cellularFollower;

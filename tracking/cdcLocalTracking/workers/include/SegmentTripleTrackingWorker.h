@@ -207,7 +207,7 @@ namespace Belle2 {
                           SegmentTripleNeighborChooser > m_segmentTriple_neighborhoodBuilder;
 
       //cellular automat
-      CellularAutomaton< std::set<CDCSegmentTriple> > m_segmentTripleAutomaton;
+      CellularAutomaton<CDCSegmentTriple> m_segmentTripleAutomaton;
 
       static const bool growMany = false;
 

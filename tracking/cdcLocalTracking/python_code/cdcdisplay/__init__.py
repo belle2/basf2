@@ -50,6 +50,40 @@ class CDCHitColorMap:
         return self.bkgHitColor
 
 
+class RLColorMap:
+
+    def __call__(self, iCDCHit, cdcHit):
+        simHit = cdcHit.getRelated('CDCSimHits')
+        posFlag = simHit.getPosFlag()
+        if posFlag == 0:
+            # Right
+            return 'green'
+        elif posFlag == 1:
+            # Left
+            return 'red'
+        else:
+            self.bkgHitColor
+
+
+class TOFTransperancyMap:
+
+    def __init__(self, cdcHits):
+        timesOfFlight = []
+        for cdcHit in cdcHits:
+            simHit = cdcHit.getRelated('CDCSimHits')
+            timesOfFlight.append(simHit.getFlightTime())
+
+        self.maxTimeOfFlight = max(timesOfFlight)
+        self.minTimeOfFlight = min(timesOfFlight)
+
+    def __call__(self, iCDCHit, cdcHit):
+        timeOfFlight = cdcHit.getRelated('CDCSimHits').getFlightTime()
+        opacity = math.exp(-(timeOfFlight - self.minTimeOfFlight)
+                           / (self.maxTimeOfFlight - self.minTimeOfFlight)
+                           * math.log(10))
+        return str(opacity)
+
+
 class MCParticleColorMap(CDCHitColorMap):
 
     def __init__(self):
@@ -364,81 +398,28 @@ class CDCSVGDisplayModule(Module):
     # Draw RL MC info
         if self.draw_rlinfo:
             print 'Drawing Monte Carlo right left information of the wirehits'
-            wirehit_collection_storeobj = \
-                Belle2.PyStoreObj('CDCAllWireHitCollection')
-            if wirehit_collection_storeobj:
-                wirehit_collection = wirehit_collection_storeobj.obj()
-                print '#WireHits', wirehit_collection.size(), \
+            cdchits_storearray = Belle2.PyStoreArray('CDCHits')
+            if cdchits_storearray:
+                print '#WireHits', cdchits_storearray.getEntries(), \
                     'colored mc right left information'
 
-                mcLookUp = Belle2.CDCLocalTracking.CDCMCLookUp.Instance()
+                styleDict = {'stroke-width': '0.2', 'stroke': RLColorMap()}
 
-                def color_map(iWireHit, wirehit):
-                    simhit = mcLookUp.getSimHit(wirehit)
-                    recohit = \
-                        Belle2.CDCLocalTracking.CDCRecoHit2D.fromSimHit(wirehit,
-                            simhit)
-                    if recohit.getRLInfo() == 1:
-                        return 'green'
-                    else:
-                        return 'red'
-
-                styleDict = {'stroke-width': '0.2', 'stroke': color_map}
-
-                plotter.append(wirehit_collection, **styleDict)
+                plotter.append(cdchits_storearray, **styleDict)
 
     # Draw tof info
         if self.draw_tof:
             print 'Drawing time of flight of the wirehits'
-            wirehit_collection_storeobj = \
-                Belle2.PyStoreObj('CDCAllWireHitCollection')
-            if wirehit_collection_storeobj:
-                wirehit_collection = wirehit_collection_storeobj.obj()
-                print '#WireHits', wirehit_collection.size(), \
-                    'colored mc right left information'
+            hit_collection = Belle2.PyStoreArray('CDCHits')
+            if hit_collection:
+                print '#CDCHits', hit_collection.getEntries(), \
+                    'colored time of flight information as opacity'
 
-                mcLookUp = Belle2.CDCLocalTracking.CDCMCLookUp.Instance()
+                styleDict = {'stroke-width': '1',
+                             'stroke': MCParticleColorMap(),
+                             'stroke-opacity': TOFTransperancyMap(hit_collection)}
 
-                timeOfFlights = set()
-                iterWireHits = (wirehit_collection.at(iWireHit)
-                    for iWireHit in xrange(wirehit_collection.size()))
-                for wirehit in iterWireHits:
-                    simhit = mcLookUp.getSimHit(wirehit)
-                    timeOfFlights.add(simhit.getFlightTime())
-
-                max_timeOfFlight = max(timeOfFlights)
-                min_timeOfFlight = min(timeOfFlights)
-                print 'Number of different tof', len(timeOfFlights)
-
-                color_by_trackId = {}
-
-                def color_map(iWireHit, wirehit):
-                    trackId = int(mcLookUp.getMajorMCTrackId(wirehit))
-          # trackId = int(mcLookUp.getSimTrackId(wirehit))
-          # trackId = int(mcLookUp.getMCTrackId(wirehit))
-
-                    if trackId not in color_by_trackId:
-                        iColor = len(color_by_trackId)
-                        iColor = iColor % len(listColors)
-                        color = listColors[iColor]
-                        color_by_trackId[trackId] = color
-                    else:
-                        color = color_by_trackId[trackId]
-
-                    return color
-
-                def opacity_map(iWireHit, wirehit):
-                    simhit = mcLookUp.getSimHit(wirehit)
-                    timeOfFlight = simhit.getFlightTime()
-                    opacity = math.exp(-(timeOfFlight - min_timeOfFlight)
-                                       / (max_timeOfFlight - min_timeOfFlight)
-                                       * math.log(10))
-                    return str(opacity)
-
-                styleDict = {'stroke-width': '1', 'stroke': color_map,
-                             'stroke-opacity': opacity_map}
-
-                plotter.append(wirehit_collection, **styleDict)
+                plotter.append(hit_collection, **styleDict)
 
     # Draw mc vertices
         if self.draw_mcvertices:

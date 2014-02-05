@@ -22,11 +22,10 @@
 #include <cdc/dataobjects/CDCHit.h>
 
 #include <tracking/cdcLocalTracking/eventtopology/CDCWireHitTopology.h>
+#include <tracking/cdcLocalTracking/mclookup/CDCMCHitLookUp.h>
 
 //typedefs
 #include <tracking/cdcLocalTracking/typedefs/UsedDataHolders.h>
-
-
 
 //out type
 #include "genfit/TrackCand.h"
@@ -118,9 +117,11 @@ void CDCLocalTrackingModule::event()
   size_t nHits = wireHitTopology.fill();
   if (nHits == 0) {
     B2WARNING("Event with no hits - skipping");
+    return;
   }
 
-
+  CDCMCHitLookUp& mcHitLookUp = CDCMCHitLookUp::getInstance();
+  mcHitLookUp.fill();
 
 #ifdef CDCLOCALTRACKING_USE_ROOT
   B2DEBUG(100, "  Getting storedCDCWireHits from DataStore");

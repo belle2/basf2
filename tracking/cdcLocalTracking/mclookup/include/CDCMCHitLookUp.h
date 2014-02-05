@@ -91,8 +91,7 @@ namespace Belle2 {
       RightLeftInfo getRLInfo(const CDCWireHit& wireHit) const;
 
 
-      /// Indicated if the oriented triple is a correct hypotheses
-      bool isCorrect(const CDCRLWireHitTriple& rlWireHit, int inTrackHitDistanceTolerance = 99999) const;
+
 
 
     public:

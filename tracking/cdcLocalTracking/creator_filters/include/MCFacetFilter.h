@@ -34,6 +34,9 @@ namespace Belle2 {
       /// Clears all remember information from the last event
       void clear() const;
 
+    private:
+      /// Indicated if the oriented triple is a correct hypotheses
+      bool isCorrect(const CDCRLWireHitTriple& rlWireHit, int inTrackHitDistanceTolerance = 99999) const;
 
     private:
       // const CDCMCLookUp& m_mcLookUp;

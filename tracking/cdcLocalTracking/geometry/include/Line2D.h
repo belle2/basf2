@@ -107,6 +107,10 @@ namespace Belle2 {
       void setN(const FloatType& n0, const FloatType& n1, const FloatType& n2)
       { setN0(n0) ; setN12(n1, n2); normalize();}
 
+      /// Sets all line parameters to zero.
+      void setNull()
+      { setN(0.0, 0.0, 0.0); }
+
       /// Setter for the intercept and slope.
       /** Sets the new intercept and slope of the line the direction is set to be forward with the increasing x axes. */
       void setSlopeIntercept(const FloatType& slope, const FloatType& intercept)
@@ -190,7 +194,15 @@ namespace Belle2 {
       FloatType lengthOnCurve(const Vector2D& from, const Vector2D& to) const
       { return to.fastOrthogonalComp(n12()) - from.fastOrthogonalComp(n12()); }
 
+
+      /// Indicates if all circle parameters are zero
+      inline bool isNull() const
+      { return n0() == 0.0 and n12().isNull(); }
+
+
       // Note : Maybe add the tangential ( Vector2D ) for homogenity to the circles
+
+
 
       /// Gives the tangential vector in the direction of positiv advance on the line
       Vector2D tangential() const { return normal().orthogonal(); }

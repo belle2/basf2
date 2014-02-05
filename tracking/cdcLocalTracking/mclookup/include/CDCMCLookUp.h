@@ -64,11 +64,13 @@ namespace Belle2 {
 
       void clear();
 
-      void addAllSimHits(const CDCWireHitCollection& wirehits,
+      template<class CDCWireHitRange>
+      void addAllSimHits(const CDCWireHitRange& wirehits,
                          const Belle2::StoreArray<Belle2::CDCHit>& storedHits,
                          const Belle2::StoreArray<Belle2::CDCSimHit>& storedSimhits);
 
-      void addAllMCParticle(const CDCWireHitCollection& wirehits,
+      template<class CDCWireHitRange>
+      void addAllMCParticle(const CDCWireHitRange& wirehits,
                             const Belle2::StoreArray<Belle2::CDCHit>& storedHits,
                             const Belle2::StoreArray<Belle2::MCParticle>& storedMCParticles);
 
@@ -131,7 +133,7 @@ namespace Belle2 {
       ITrackType getMajorMCTrackId(const CDCWireHit& wirehit) const { return getMajorMCTrackId(&wirehit);}
       ITrackType getSimTrackId(const CDCWireHit* wirehit) const;
 
-      void checkSimToMCTrackIdEquivalence(const CDCWireHitCollection& wirehits) const;
+      //void checkSimToMCTrackIdEquivalence(const CDCWireHitCollection& wirehits) const;
 
       Index getIndexInTrack(const CDCWireHit* wirehit) const {
         Index iStoredIHit = wirehit->getStoreIHit();
@@ -275,6 +277,190 @@ namespace Belle2 {
       //ClassDefInCDCLocalTracking(CDCMCLookUp, 1);
 
     }; //class
+
+
+
+
+
+
+
+
+
+    template<class CDCWireHitRange>
+    void CDCMCLookUp::addAllSimHits(
+      const CDCWireHitRange& wirehits,
+      const StoreArray<CDCHit>& storedHits,
+      const StoreArray<CDCSimHit>& storedSimhits
+    )
+    {
+
+      //size_t nStoredSimhits = storedSimhits->getEntries();
+      //size_t nStoredHits = storedHits->getEntries();
+
+      RelationArray simhitsToHitsRelation(storedSimhits, storedHits);
+      int nRelation = simhitsToHitsRelation.getEntries();
+
+
+      for (const CDCWireHit & wirehit : wirehits) {
+        size_t iStoredHit = wirehit.getStoreIHit();
+
+        bool found = false;
+        for (int iRelation = 0; iRelation < nRelation and not found; ++iRelation) {
+          const RelationElement& relationElement = simhitsToHitsRelation[iRelation];
+
+          if (relationElement.getSize() > 1)
+            B2WARNING("Rework CDCMCLookUp! CDCSimHits to CDCHit correspondence is not unique. ( Maybe double hit semantics have been introduced  ?)");
+
+          RelationElement::index_type iStoredHitInRelation = relationElement.getToIndex(0);
+          if (iStoredHitInRelation == iStoredHit) {
+            found = true;
+            RelationElement::index_type iStoredSimHit = relationElement.getFromIndex();
+            CDCSimHit* simHit = storedSimhits[iStoredSimHit];
+
+            addSimHit(&wirehit, simHit, iStoredSimHit);
+
+            // We use both time of flight and index of the stored simhit
+            // There used to be simhits that had the same time of flight to them
+            // So the only way to distinguish the order of their occurance was by the index
+            // in their StoreArray
+            FlightTimeAndIndex flightTimeAndIndex(simHit->getFlightTime(), iStoredSimHit);
+            m_timeSortedWireHits[flightTimeAndIndex] = &wirehit;
+
+          }
+        } // end for iRelation
+
+        if (found == false) {
+          B2WARNING("No CDCSimHit found for the give CDCHit");
+          std::cin >> found;
+        }
+
+      } // end for itWireHit
+
+    }
+
+    template<class CDCWireHitRange>
+    void CDCMCLookUp::addAllMCParticle(
+      const CDCWireHitRange& wirehits,
+      const StoreArray<CDCHit>& storedHits,
+      const StoreArray<MCParticle>& storedMCParticles
+    )
+    {
+
+      //size_t nStoredSimhits = storedMcParticles->getEntries();
+      //size_t nStoredHits = storedHits->getEntries();
+
+      RelationArray mcParticlesToHitsRelation(storedMCParticles, storedHits);
+      int nRelation = mcParticlesToHitsRelation.getEntries();
+
+      std::map<const MCParticle*, size_t> mcPartCount;
+
+      for (const CDCWireHit & wirehit : wirehits) {
+
+        size_t iStoredHit = wirehit.getStoreIHit();
+
+        bool found = false;
+        for (int iRelation = 0; iRelation < nRelation and not found; ++iRelation) {
+          const RelationElement& relationElement = mcParticlesToHitsRelation[iRelation];
+
+          const std::vector< RelationElement::index_type >& toIndices = relationElement.getToIndices();
+
+          for (std::vector< RelationElement::index_type >::const_iterator itIndex = toIndices.begin();
+               itIndex != toIndices.end() and not found; ++itIndex) {
+
+            RelationElement::index_type iStoredHitInRelation = *itIndex;
+            if (iStoredHitInRelation == iStoredHit) {
+              found = true;
+
+              RelationElement::index_type iStoredMCParticle = relationElement.getFromIndex();
+              MCParticle* mcParticle = storedMCParticles[iStoredMCParticle];
+              addMCParticle(&wirehit, mcParticle);
+
+              if (mcPartCount.count(mcParticle) == 0) {
+                mcPartCount[mcParticle] = 1;
+              } else {
+                ++mcPartCount[mcParticle];
+              }
+
+            }
+          } //end for itIndex
+        } // end for iRelation
+
+      } // end for itWireHit
+
+      //now check for mcParticles that only produced a small number of hits
+      //if the specific monte  carlo particle only contributed a small amount of hits
+      //it should rather be attributed to the mother of it
+      for (std::map<const MCParticle*, size_t>::const_iterator itPartCount = mcPartCount.begin();
+           itPartCount != mcPartCount.end(); ++itPartCount) {
+
+        const MCParticle* mcpart = itPartCount->first;
+        //B2DEBUG(100,"mcPartCount " << mcpart<< " " << itPartCount->second );
+        if (itPartCount->second <= 2) {
+          //MCParticle only created an insignificant number of hits
+          //search for a mother particle with a significant number of hits
+          const MCParticle* majorMCPart = mcpart->getMother();
+
+          while (majorMCPart != nullptr and
+                 (mcPartCount.count(majorMCPart) == 0 ? 0 : mcPartCount[majorMCPart]) <= 2) {
+
+            majorMCPart = majorMCPart->getMother();
+
+          }
+
+          if (majorMCPart != nullptr) {
+
+            registerMajorMCParticle(mcpart, majorMCPart);
+
+          }
+
+        } else { //itPartCount->second > 2
+
+          //MCParticle created a significant number of hits
+          //gets registered as its own major particle
+          registerMajorMCParticle(mcpart, mcpart);
+        }
+      }
+
+      //build the mctracks to have the alignement information correctly
+      for (TimeSortedWireHits::iterator itFlightTimeWireHitPair = m_timeSortedWireHits.begin();
+           itFlightTimeWireHitPair != m_timeSortedWireHits.end(); ++itFlightTimeWireHitPair) {
+
+        const CDCWireHit* wirehit = itFlightTimeWireHitPair->second;
+
+        ITrackType iTrack =  getMCTrackId(wirehit);
+
+        m_iTrackToMCTrackMap[iTrack].push_back(wirehit);
+
+        Index indexInTrack = m_iTrackToMCTrackMap[iTrack].size() - 1;
+
+        m_iWireHitToIndexInTrackMap[wirehit->getStoreIHit()] = indexInTrack;
+
+      }
+
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   } // end namespace CDCLocalTracking
 } // namespace Belle2
 #endif // CDCMCLOOKUP

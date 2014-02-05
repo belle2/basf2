@@ -83,26 +83,41 @@ namespace Belle2 {
 
     CDCLocalTracking::WireHitCreator m_wirehitCreator;
 
-    //typedef CDCLocalTracking::SimpleFacetFilter FacetFilter;
-    typedef CDCLocalTracking::MCFacetFilter FacetFilter;
-    //typedef CDCLocalTracking::OptimizingFacetFilter FacetFilter;
 
-    //typedef CDCLocalTracking::SimpleFacetNeighborChooser FacetNeighborChooser;
+#ifdef CDCLOCALTRACKING_USE_MC_FILTERS
+#ifdef CDCLOCALTRACKING_USE_OPTIMIZING_FILTERS
+    typedef CDCLocalTracking::OptimizingFacetFilter FacetFilter;
+    typedef CDCLocalTracking::OptimizingFacetNeighborChooser FacetNeighborChooser;
+#else
+    typedef CDCLocalTracking::MCFacetFilter FacetFilter;
     typedef CDCLocalTracking::MCFacetNeighborChooser FacetNeighborChooser;
-    //typedef CDCLocalTracking::OptimizingFacetNeighborChooser FacetNeighborChooser;
+#endif
+
+#else
+    typedef CDCLocalTracking::SimpleFacetFilter FacetFilter;
+    typedef CDCLocalTracking::SimpleFacetNeighborChooser FacetNeighborChooser;
+#endif
 
     CDCLocalTracking::FacetSegmentWorker<FacetFilter, FacetNeighborChooser> m_segmentWorker;
-
     //storing the recosegments for the whole event
     std::vector< Belle2::CDCLocalTracking::CDCRecoSegment2D > m_recoSegments;
 
-    //typedef CDCLocalTracking::SimpleSegmentTripleFilter SegmentTripleFilter;
+
+#ifdef CDCLOCALTRACKING_USE_MC_FILTERS
     typedef CDCLocalTracking::MCSegmentTripleFilter SegmentTripleFilter;
+    typedef CDCLocalTracking::MCSegmentTripleNeighborChooser SegmentTripleNeighborChooser;
+    //No optimizing filters and choosers for segment triples yet.
+#ifdef CDCLOCALTRACKING_USE_OPTIMIZING_FILTERS
+#else
+#endif
 
-    //typedef CDCLocalTracking::SimpleSegmentTripleNeighborChooser SegmentTripleChooser;
-    typedef CDCLocalTracking::MCSegmentTripleNeighborChooser SegmentTripleChooser;
+#else
+    typedef CDCLocalTracking::SimpleSegmentTripleFilter SegmentTripleFilter;
+    typedef CDCLocalTracking::SimpleSegmentTripleNeighborChooser SegmentTripleNeighborChooser;
+#endif
 
-    CDCLocalTracking::SegmentTripleTrackingWorker<SegmentTripleFilter, SegmentTripleChooser> m_trackingWorker;
+
+    CDCLocalTracking::SegmentTripleTrackingWorker<SegmentTripleFilter, SegmentTripleNeighborChooser> m_trackingWorker;
 
 
   }; // end class

@@ -120,9 +120,6 @@ void CDCLocalTrackingModule::event()
     return;
   }
 
-  CDCMCHitLookUp& mcHitLookUp = CDCMCHitLookUp::getInstance();
-  mcHitLookUp.fill();
-
 #ifdef CDCLOCALTRACKING_USE_ROOT
   B2DEBUG(100, "  Getting storedCDCWireHits from DataStore");
   StoreObjPtr< CDCWireHitCollection > storeCDCWireHits("CDCAllWireHitCollection");
@@ -134,6 +131,7 @@ void CDCLocalTrackingModule::event()
   B2DEBUG(100, "  Allocating CDCWireHitNeighborhood");
   CDCWireHitCollection nonConstAllWireHits;
 #endif
+
   //Fill the wireHits
   B2DEBUG(100, "  Creating the CDCWireHits");
   m_wirehitCreator.create(storedCDCHits, nonConstAllWireHits);
@@ -143,6 +141,10 @@ void CDCLocalTrackingModule::event()
   const CDCWireHitCollection& allWireHits = nonConstAllWireHits;
   B2DEBUG(100, "  Created " << allWireHits.size() << " CDCWireHits");
   //CALLGRIND_STOP_INSTRUMENTATION;
+
+#ifdef CDCLOCALTRACKING_USE_MC_FILTERS
+  CDCMCHitLookUp& mcHitLookUp = CDCMCHitLookUp::getInstance();
+  mcHitLookUp.fill();
 
   //check the relations between the particles simhit and hits before using them
   StoreArray <MCParticle> storedMCParticles;
@@ -155,6 +157,7 @@ void CDCLocalTrackingModule::event()
   mcLookUp.clear();
   mcLookUp.addAllSimHits(allWireHits, storedCDCHits, storedSimhits);
   mcLookUp.addAllMCParticle(allWireHits, storedCDCHits, storedMCParticles);
+#endif
 
   //mcLookUp.checkSimToMCTrackIdEquivalence(allWireHits);
 
@@ -165,14 +168,15 @@ void CDCLocalTrackingModule::event()
   B2DEBUG(100, "Received " << m_recoSegments.size() << " RecoSegments from worker");
 
 
+#ifdef CDCLOCALTRACKING_USE_MC_FILTERS
   //register the segments to the mclookup in order to enable descisions based on the alignement of them
   mcLookUp.addSegments(m_recoSegments);
+#endif
 
   //build the gfTracks
   StoreArray < genfit::TrackCand > storedGFTrackCands(m_param_gfTrackCandColName);
   storedGFTrackCands.create();
   m_trackingWorker.apply(m_recoSegments, storedGFTrackCands);
-
 
   //End callgrind recording
 #ifdef HAS_CALLGRIND

@@ -198,6 +198,20 @@ namespace Belle2 {
 
 
 
+      /// Setter for the first oriented wire hit
+      void setStartRLWireHit(const CDCRLWireHit* startRLWireHit)
+      { m_startRLWireHit = startRLWireHit; }
+
+      /// Setter for the second oriented wire hit
+      void setMiddleRLWireHit(const CDCRLWireHit* middleRLWireHit)
+      { m_rearRLWireHitPair.setFromRLWireHit(middleRLWireHit); }
+
+      /// Setter for the third oriented wire hit
+      void setEndRLWireHit(const CDCRLWireHit* endRLWireHit)
+      { m_rearRLWireHitPair.setToRLWireHit(endRLWireHit); }
+
+
+
     private:
       const CDCRLWireHit* m_startRLWireHit; ///< Memory for the reference to the start oriented wire hit
       CDCRLWireHitPair m_rearRLWireHitPair; ///< Memory for the reference to the remaining two oriented wire hits

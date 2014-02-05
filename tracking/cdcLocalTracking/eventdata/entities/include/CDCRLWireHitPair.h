@@ -122,6 +122,18 @@ namespace Belle2 {
       /// Getter for the  second oriented wire hit
       const CDCRLWireHit& getToRLWireHit() const { return *m_toRLWireHit; }
 
+
+
+      /// Setter for the first oriented wire hit
+      void setFromRLWireHit(const CDCRLWireHit* fromRLWireHit)
+      { m_fromRLWireHit = fromRLWireHit; }
+
+      /// Setter for the second oriented wire hit
+      void setToRLWireHit(const CDCRLWireHit* toRLWireHit)
+      { m_toRLWireHit = toRLWireHit; }
+
+
+
     private:
       const CDCRLWireHit* m_fromRLWireHit; ///< Memory for the reference to the first oriented wire hit
       const CDCRLWireHit* m_toRLWireHit;   ///< Memory for the reference to the second oriented wire hit

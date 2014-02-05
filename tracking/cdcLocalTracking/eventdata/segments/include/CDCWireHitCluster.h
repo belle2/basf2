@@ -17,13 +17,23 @@
 namespace Belle2 {
   namespace CDCLocalTracking {
 
-    //for now a typedef is enough
-    //may get additional methods if necessary
+    /// An aggregation of CDCWireHits.
+    class CDCWireHitCluster : public CDCGenHitVector<const Belle2::CDCLocalTracking::CDCWireHit*> {
+    public:
 
-    // An agregation of CDCWireHits
-    //typedef CDCWireHitPtrSet CDCWireHitCluster;
-    typedef CDCGenHitVector<const Belle2::CDCLocalTracking::CDCWireHit*> CDCWireHitCluster;
+      /// Default constructor for ROOT compatibility.
+      CDCWireHitCluster() {;}
 
+      /// Empty deconstructor
+      ~CDCWireHitCluster() {;}
+
+    private:
+      /// ROOT Macro to make CDCWireHitCluster a ROOT class.
+      ClassDefInCDCLocalTracking(CDCWireHitCluster, 1);
+
+
+
+    }; //end class CDCWireHitCluster
 
   }
 }

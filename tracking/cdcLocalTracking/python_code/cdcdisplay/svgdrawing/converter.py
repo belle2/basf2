@@ -44,6 +44,7 @@ class CDCDataobjectsConverter:
             Belle2.CDCLocalTracking.CDCRecoFacetVector: self.CDCGenericHitCollectionToSVG,
             Belle2.CDCLocalTracking.CDCRecoHit3D: self.CDCRecoHit3DToSVG,
             Belle2.CDCLocalTracking.CDCRecoHit3DVector: self.CDCGenericHitCollectionToSVG,
+            Belle2.CDCLocalTracking.CDCWireHitCluster: self.CDCGenericHitCollectionToSVG,
             Belle2.CDCLocalTracking.CDCRecoSegment2D: self.CDCGenericHitCollectionToSVG,
             Belle2.CDCLocalTracking.CDCSegmentTriple: self.CDCSegmentTripleToSVG,
             Belle2.CDCLocalTracking.CDCTrack: self.CDCGenericHitCollectionToSVG,

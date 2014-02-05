@@ -11,6 +11,9 @@
 #include <gtest/gtest.h>
 #include "cdcLocalTrackingTest.h"
 
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
+
 #include <tracking/cdcLocalTracking/eventdata/entities/CDCWireHit.h>
 #include <tracking/cdcLocalTracking/eventdata/collections/CDCWireHitVector.h>
 #include <tracking/cdcLocalTracking/topology/CDCWire.h>
@@ -42,3 +45,11 @@ TEST_F(CDCLocalTrackingTest, CDCGenHitVector_WithCDCWireHits)
   ASSERT_FALSE(collection.empty());
 
 }
+
+
+
+
+
+
+
+

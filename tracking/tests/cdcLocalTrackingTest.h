@@ -33,8 +33,8 @@ namespace Belle2 {
        test_tracking --help for more details
     */
     class CDCLocalTrackingTest : public ::testing::Test {
-    protected:
 
+    public:
       static void SetUpTestCase();
       static void TearDownTestCase();
 

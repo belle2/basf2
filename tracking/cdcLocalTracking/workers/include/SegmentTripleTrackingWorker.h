@@ -21,8 +21,6 @@
 #include <tracking/cdcLocalTracking/neighbor_chooser/SimpleSegmentTripleNeighborChooser.h>
 
 #include <tracking/cdcLocalTracking/algorithms/Clusterizer.h>
-#include <tracking/cdcLocalTracking/algorithms/CellularAutomaton.h>
-#include <tracking/cdcLocalTracking/algorithms/CellularPathFollower.h>
 #include <tracking/cdcLocalTracking/algorithms/MultipassCellularPathFinder.h>
 
 #include <tracking/cdcLocalTracking/creators/SegmentTripleCreator.h>
@@ -30,8 +28,6 @@
 #include <tracking/cdcLocalTracking/creators/SingleSegmentTrackCreator.h>
 #include <tracking/cdcLocalTracking/creators/TrackOrientator.h>
 #include <tracking/cdcLocalTracking/creators/GFTrackCandCreator.h>
-
-#include <tracking/cdcLocalTracking/mclookup/CDCMCLookUp.h>
 
 namespace Belle2 {
   namespace CDCLocalTracking {
@@ -72,49 +68,20 @@ namespace Belle2 {
         m_segmentTripleNeighborhood.clear();
         m_segmentTriple_neighborhoodBuilder.create(m_segmentTriples, m_segmentTripleNeighborhood);
         B2DEBUG(100, "  Created " << m_segmentTripleNeighborhood.size()  << " SegmentTripleNeighborhoods");
-        if (growMany) {
 
-          //apply the cellular automation
-          B2DEBUG(100, "Apply cellular automat for CDCSegmentTriples");
-          const CDCSegmentTriple* highestCell
-            =  m_segmentTripleAutomaton.applyTo(m_segmentTriples, m_segmentTripleNeighborhood);
-          B2DEBUG(100, "  MaximalState " << highestCell->getAutomatonCell().getCellState());
+        //multiple passes if growMany is active and one track is created at a time
+        //no best candidate analysis needed
 
-          //create the tracks by following the highest states in the segment triples
-          B2DEBUG(100, "Follow the longest paths");
-          m_segmentTripleTracks.clear();
-          m_tipleSegmentCellularFollower.followAll(m_segmentTriples,
-                                                   m_segmentTripleNeighborhood,
-                                                   m_segmentTripleTracks);
+        m_segmentTripleTracks.clear();
+        m_cellularPathFinder.apply(m_segmentTriples, m_segmentTripleNeighborhood, m_segmentTripleTracks);
 
-          B2DEBUG(100, "  Created " << m_segmentTripleTracks.size()  << " SegmentTripleTracks");
+        B2DEBUG(100, "  Created " << m_segmentTripleTracks.size()  << " SegmentTripleTracks");
 
-          //reduce to plain tracks
-          B2DEBUG(100, "Reducing the SegmentTripleTracks to CDCTracks");
-          m_tracks.clear();
-          m_trackCreator.create(m_segmentTripleTracks, m_tracks);
-          B2DEBUG(100, "  Created " << m_tracks.size()  << " CDCTracks");
-
-          //TODO: die out analysis
-
-        } else { // not growMany
-          //multiple passes if growMany is active and one track is created at a time
-          //no best candidate analysis needed
-
-          m_segmentTripleTracks.clear();
-          m_cellularPathFinder.apply(m_segmentTriples, m_segmentTripleNeighborhood, m_segmentTripleTracks);
-
-          B2DEBUG(100, "  Created " << m_segmentTripleTracks.size()  << " SegmentTripleTracks");
-
-          //reduce to plain tracks
-          B2DEBUG(100, "Reducing the SegmentTripleTracks to CDCTracks");
-          m_tracks.clear();
-          m_trackCreator.create(m_segmentTripleTracks, m_tracks);
-          B2DEBUG(100, "  Created " << m_tracks.size()  << " CDCTracks");
-
-
-
-        } // end if( growMany )
+        //reduce to plain tracks
+        B2DEBUG(100, "Reducing the SegmentTripleTracks to CDCTracks");
+        m_tracks.clear();
+        m_trackCreator.create(m_segmentTripleTracks, m_tracks);
+        B2DEBUG(100, "  Created " << m_tracks.size()  << " CDCTracks");
 
         //m_singleSegmentTrackCreator.append(recoSegments, m_tracks);
 
@@ -133,13 +100,8 @@ namespace Belle2 {
           StoreArray < CDCSegmentTriple > storedSegmentTriples("CDCSegmentTriples");
           storedSegmentTriples.create();
 
-          for (std::set< CDCSegmentTriple >::iterator itSegmentTriple = m_segmentTriples.begin();
-               itSegmentTriple != m_segmentTriples.end(); ++itSegmentTriple) {
-
-            storedSegmentTriples.appendNew(*itSegmentTriple);
-            //B2DEBUG(100,"  ##### Copying " << itSegmentTriple->getStartISuperLayer() <<
-            //                           " " << itSegmentTriple->getMiddleISuperLayer() <<
-            //                           " " << itSegmentTriple->getEndISuperLayer() );
+          for (const CDCSegmentTriple & segmentTriple :  m_segmentTriples) {
+            storedSegmentTriples.appendNew(segmentTriple);
           }
           B2DEBUG(100, "  Created " << storedSegmentTriples.getEntries()  << " CDCSegmentTriples");
         }
@@ -151,9 +113,8 @@ namespace Belle2 {
           StoreArray < CDCTrack > storedTracks("CDCTracks");
           storedTracks.create();
           B2DEBUG(100, "  Copying the CDCTracks to the StoreArray");
-          for (std::vector< CDCTrack >::iterator itTrack = m_tracks.begin();
-               itTrack != m_tracks.end(); ++itTrack) {
-            storedTracks.appendNew(*itTrack);
+          for (const CDCTrack & track : m_tracks) {
+            storedTracks.appendNew(track);
           }
 
         }
@@ -176,14 +137,7 @@ namespace Belle2 {
       NeighborhoodBuilder <CDCSegmentTriple, SegmentTripleNeighborChooser > m_segmentTriple_neighborhoodBuilder;
 
       //cellular automat
-      CellularAutomaton<CDCSegmentTriple> m_segmentTripleAutomaton;
-
-      static const bool growMany = false;
-
-      //CellularPathFollower< std::set<CDCSegmentTriple> > m_tipleSegmentCellularFollower;
-      CellularPathFollower<CDCSegmentTriple> m_tipleSegmentCellularFollower;
       MultipassCellularPathFinder<CDCSegmentTriple> m_cellularPathFinder;
-
 
       TrackCreator m_trackCreator;
 

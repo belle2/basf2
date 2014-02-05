@@ -389,11 +389,15 @@ class CDCSVGDisplayModule(Module):
         # Draw SimHits
         if self.draw_simhits:
             print 'Drawing simulated hits'
-            simhits_storearray = Belle2.PyStoreArray('CDCSimHits')
+            cdchits_storearray = Belle2.PyStoreArray('CDCHits')
+            simhits_storearray = Belle2.PyStoreArray('CDCHits')
             if simhits_storearray:
+                simhits_related_to_cdchit = [cdchit.getRelated('CDCSimHits')
+                        for cdchit in cdchits_storearray]
                 print '#CDCSimHits', simhits_storearray.getEntries()
                 styleDict = {'stroke': 'orange', 'stroke-width': '0.2'}
-                plotter.append(simhits_storearray, **styleDict)
+                # plotter.append(simhits_storearray, **styleDict)
+                plotter.append(simhits_related_to_cdchit, **styleDict)
 
     # Draw RL MC info
         if self.draw_rlinfo:

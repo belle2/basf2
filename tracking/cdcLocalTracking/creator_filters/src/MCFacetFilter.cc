@@ -16,20 +16,48 @@
 #include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
 #include <tracking/cdcLocalTracking/typedefs/BasicConstants.h>
 
+#include <tracking/cdcLocalTracking/mclookup/CDCMCHitLookUp.h>
+
 
 using namespace std;
 using namespace Belle2;
 using namespace CDCLocalTracking;
 
-MCFacetFilter::MCFacetFilter() : m_mcLookUp(CDCMCLookUp::Instance()) {;}
-MCFacetFilter::MCFacetFilter(const CDCMCLookUp& mcLookUp) : m_mcLookUp(mcLookUp) {;}
+MCFacetFilter::MCFacetFilter() {;}
 
 MCFacetFilter::~MCFacetFilter() {;}
 
 
 CellState MCFacetFilter::isGoodFacet(const CDCRecoFacet& facet) const
 {
+  const CDCMCHitLookUp& mcHitLookUp = CDCMCHitLookUp::getInstance();
+  bool isCorrectFacet = mcHitLookUp.isCorrect(facet, 3);
 
+  //CellState oldCellState = oldIsGoodFacet(facet);
+
+  //if ( (oldCellState == 3.0) xor isCorrectFacet){
+  //  B2WARNING("New defintion disagrees");
+  //}
+
+  if (isCorrectFacet) {
+    //if (oldCellState == 3.0) {
+    facet.adjustLines();
+    return 3;
+  } else {
+    return NOT_A_CELL;
+  }
+
+}
+
+
+
+
+
+
+
+/*
+CellState MCFacetFilter::oldIsGoodFacet(const CDCRecoFacet& facet) const
+{
   const CDCWireHit* startWireHit  = &(facet.getStartWireHit());
   const CDCWireHit* middleWireHit = &(facet.getMiddleWireHit());
   const CDCWireHit* endWireHit    = &(facet.getEndWireHit());
@@ -65,7 +93,6 @@ CellState MCFacetFilter::isGoodFacet(const CDCRecoFacet& facet) const
   CDCRecoHit2D startMCHit = m_mcLookUp.getMCHit2D(startWireHit);
   CDCRecoHit2D middleMCHit = m_mcLookUp.getMCHit2D(middleWireHit);
   CDCRecoHit2D endMCHit = m_mcLookUp.getMCHit2D(endWireHit);
-
 
   CDCRecoTangent startToMiddleMCTangent(startMCHit, middleMCHit);
   CDCRecoTangent startToEndMCTangent(startMCHit, endMCHit);
@@ -128,14 +155,8 @@ CellState MCFacetFilter::isGoodFacet(const CDCRecoFacet& facet) const
 
   }
 
-  //B2DEBUG(200,"Match");
-
-  facet.adjustLines();
-
-  //Good facet contains three points of the track
   return 3;
 
 }
-
-
+*/
 void MCFacetFilter::clear() const {;}

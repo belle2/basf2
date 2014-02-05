@@ -718,9 +718,9 @@ bool CDCMCLookUp::isTOFAligned(const CDCWireHit* one,
   }
 
   {
-    // if the simhits are not from the same particle the time of flight is not a got indicator
+    // if the simhits are not from the same particle the time of flight is not a good indicator
     // since secondary slow particles might overtake the electron avalanche in a though large time periode
-    // the still belongs to the same track but the timing will indicate that the hit accured much later
+    // it still belongs to the same track but the timing will indicate that the hit accured much later
     // so we hope that if the hit position of the second hit is in between the other two the hits are still
     // aligned corretly
 

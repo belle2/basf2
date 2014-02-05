@@ -13,8 +13,6 @@
 
 #include <tracking/cdcLocalTracking/typedefs/UsedDataHolders.h>
 
-#include <tracking/cdcLocalTracking/mclookup/CDCMCLookUp.h>
-
 namespace Belle2 {
   namespace CDCLocalTracking {
 
@@ -26,19 +24,19 @@ namespace Belle2 {
 
       /** Constructor. */
       MCFacetFilter();
-      MCFacetFilter(const CDCMCLookUp& mcLookUp);
 
       /** Destructor.*/
       ~MCFacetFilter();
 
       CellState isGoodFacet(const CDCRecoFacet& facet) const;
 
+    public:
       /// Clears all remember information from the last event
       void clear() const;
 
 
     private:
-      const CDCMCLookUp& m_mcLookUp;
+      // const CDCMCLookUp& m_mcLookUp;
 
 
 

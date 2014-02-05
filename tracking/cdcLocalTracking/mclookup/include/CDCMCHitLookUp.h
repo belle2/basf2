@@ -54,10 +54,17 @@ namespace Belle2 {
         return hit ? hit->getRelated<MCParticle>() : nullptr;
       }
 
-      ///Returns the track id for the hit
-      int getMCTrackId(const CDCWireHit& wireHit) const;
+    private:
+      bool isReassignedSecondaryHit(const CDCHit& hit) const;
 
-      ///Returns if this hit is considered background
+    public:
+      /// Indicates if the hit was reassigned to a different mc particle because it was caused by a secondary.
+      bool isReassignedSecondaryHit(const CDCWireHit& wireHit) const;
+
+      /// Returns the track id for the hit
+      ITrackType getMCTrackId(const CDCWireHit& wireHit) const;
+
+      /// Returns if this hit is considered background
       bool isBackground(const CDCWireHit& wireHit) const;
 
       /// Returns the position if the wire hit in the track along the travel direction
@@ -65,6 +72,11 @@ namespace Belle2 {
 
       /// Returns the true right left passage information
       RightLeftInfo getRLInfo(const CDCWireHit& wireHit) const;
+
+
+      /// Indicated if the oriented triple is a correct hypotheses
+      bool isCorrect(const CDCRLWireHitTriple& rlWireHit, int inTrackHitDistanceTolerance = 99999) const;
+
 
     public:
       std::map<const CDCHit*, RightLeftInfo> m_rightLeftInfos;

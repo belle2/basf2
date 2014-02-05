@@ -84,13 +84,14 @@ namespace Belle2 {
         return paths.size() - nPathsBefore;
       }
 
-      /// Follows a single maximal path starting with the given start item.
-      inline bool followSingle(
+      /// Follows a single maximal path starting with the given start item. If the start item is nullptr or has a state lower than the minimum state to follow na empty vecotr is returned.
+      inline Path followSingle(
         const Item* startItem,
         const WeightedNeighborhood<const Item>& neighborhood,
-        Path& path,
         CellState minStateToFollow = -std::numeric_limits<CellState>::infinity()
       ) const {
+
+        Path path;
 
         if (startItem != nullptr and
             startItem->getAutomatonCell().hasAnyFlags(IS_START) and
@@ -98,6 +99,7 @@ namespace Belle2 {
             minStateToFollow <= startItem->getAutomatonCell().getCellState()) {
 
           //start new segment
+          path.reserve(20); //Just a guess
           path.clear();
 
           //insert a pointer to the item into the segment
@@ -129,17 +131,11 @@ namespace Belle2 {
               ++(currentNeighborRange.first);
             }
           }
-          // return if a path has been grown
-          return true;
-
-        } else {
-
-          // return that no path has been grown
-          return false;
-
         }
-      }
 
+        return path;
+
+      }
 
     private:
       /// Helper function for recursively growing a path.

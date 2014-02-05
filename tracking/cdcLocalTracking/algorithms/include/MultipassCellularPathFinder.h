@@ -64,24 +64,28 @@ namespace Belle2 {
           const Item* highestCell
             = m_cellularAutomaton.applyTo(itemRange, neighborhood);
 
-          paths.push_back(Path());
-          Path& newPath = paths.back();
-          created = m_cellularPathFollower.followSingle(highestCell, neighborhood, newPath, m_minStateToFollow);
+          Path&& newPath = m_cellularPathFollower.followSingle(highestCell, neighborhood, m_minStateToFollow);
 
-          //Block the used items
-          for (const Item * item :  newPath) {
-            item->setDoNotUse();
-          }
+          if (newPath.empty()) {
+            created = false;
+          } else {
 
-          //Block the items that have already used components
-          for (const Item & item :  itemRange) {
-            item.receiveDoNotUse();
+            //Block the used items
+            for (const Item * item :  newPath) {
+              item->setDoNotUse();
+            }
+
+            //Block the items that have already used components
+            for (const Item & item :  itemRange) {
+              item.receiveDoNotUse();
+            }
+
+            paths.push_back(std::move(newPath));
+            created = true;
+
           }
 
         } while (created);
-
-        // drop last oath because it was not filled
-        paths.pop_back();
 
       }
 

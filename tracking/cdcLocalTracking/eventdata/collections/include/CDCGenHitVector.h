@@ -49,7 +49,16 @@ namespace Belle2 {
       /// Empty deconstructor
       ~CDCGenHitVector() {;}
 
+      ///Implements the standard swap idiom
+      friend void swap(CDCGenHitVector<T>& lhs, CDCGenHitVector<T>& rhs) {
+        SortableVector<T>& rawLHS = lhs;
+        SortableVector<T>& rawRHS = rhs;
+        rawLHS.swap(rawRHS);
+        B2DEBUG(200, "CDCGenHitVector::swap");
+      }
+
     private:
+
       /// Helper class for STL algorithms searching for specific wire
       class HasWirePredicate {
       public:

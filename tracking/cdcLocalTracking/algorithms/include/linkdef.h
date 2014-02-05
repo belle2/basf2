@@ -11,7 +11,12 @@
 
 #pragma link C++ class Belle2::CDCLocalTracking::AutomatonCell;
 
+//for testing
+#pragma link C++ class Belle2::CDCLocalTracking::SortableVector<int>;
+#pragma link C++ class Belle2::CDCLocalTracking::SortableVector<float>;
 #pragma link C++ class Belle2::CDCLocalTracking::SortableVector<CDCGenHit>;
+
+//to use
 #pragma link C++ class Belle2::CDCLocalTracking::SortableVector<CDCWireHit>;
 #pragma link C++ class Belle2::CDCLocalTracking::SortableVector<const CDCWireHit *>;
 #pragma link C++ class Belle2::CDCLocalTracking::SortableVector<CDCRLWireHit>;

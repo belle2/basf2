@@ -15,6 +15,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 
 #include <tracking/cdcLocalTracking/eventdata/entities/CDCGenHit.h>
+#include <tracking/cdcLocalTracking/eventdata/collections/CDCGenHitVector.h>
 #include <tracking/cdcLocalTracking/eventdata/entities/Compare.h>
 
 #include <tracking/cdcLocalTracking/algorithms/SortableVector.h>
@@ -232,4 +233,68 @@ TEST_F(CDCLocalTrackingTest, SortableVector_unique)
 
 
 
+TEST_F(CDCLocalTrackingTest, SortableVector_swap)
+{
 
+  SortableVector<CDCGenHit> collection;
+
+  CDCGenHit lowestGenHit;
+  CDCGenHit secondGenHit(WireID(0, 0, 1), Vector2D(0.0, 0.0));
+
+
+  collection.push_back(lowestGenHit);
+  collection.push_back(secondGenHit);
+  collection.push_back(lowestGenHit);
+
+
+  std::vector< SortableVector<CDCGenHit> > collectionVector;
+
+  collectionVector.emplace_back();
+  SortableVector<CDCGenHit>&  storedCollection = collectionVector[0];
+
+  //correct swapping idiom by associating the std::swap to the lookup in the local namespace
+  using std::swap;
+  swap(storedCollection, collection);
+
+  EXPECT_EQ(0u, collection.size());
+  EXPECT_EQ(3u, storedCollection.size());
+
+}
+
+
+TEST_F(CDCLocalTrackingTest, CDCGenHitVector_swap_sort)
+{
+
+
+
+  CDCGenHit lowestGenHit;
+  CDCGenHit secondGenHit(WireID(0, 0, 1), Vector2D(0.0, 0.0));
+
+
+  CDCGenHitVector<CDCGenHit> lowestCollection;
+  lowestCollection.push_back(lowestGenHit);
+
+  CDCGenHitVector<CDCGenHit> secondCollection;
+  secondCollection.push_back(secondGenHit);
+
+
+  std::vector< CDCGenHitVector<CDCGenHit> > collectionVector;
+
+  collectionVector.push_back(lowestCollection);
+  collectionVector.push_back(secondCollection);
+
+  collectionVector.push_back(lowestCollection);
+  collectionVector.push_back(secondCollection);
+
+  collectionVector.push_back(lowestCollection);
+  collectionVector.push_back(secondCollection);
+
+  collectionVector.push_back(lowestCollection);
+  collectionVector.push_back(secondCollection);
+
+  collectionVector.push_back(lowestCollection);
+  collectionVector.push_back(secondCollection);
+
+  std::sort(collectionVector.begin(), collectionVector.end());
+
+}

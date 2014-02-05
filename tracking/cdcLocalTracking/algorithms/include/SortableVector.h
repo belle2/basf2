@@ -91,6 +91,20 @@ namespace Belle2 {
       /// Empty deconstructor
       ~SortableVector() {;}
 
+      ///Defines an ordering of sortable vector instance by lexicographical comparison
+      bool operator<(SortableVector<T> const& rhs) const
+      { return  m_items < rhs.m_items; }
+
+      ///Swaps the items out of the other vector
+
+      void swap(SortableVector<T>& rhs)
+      { m_items.swap(rhs.m_items); std::swap(m_isSorted, rhs.m_isSorted); }
+
+      ///Implements the standard swap idiom
+      friend void swap(SortableVector<T>& lhs, SortableVector<T>& rhs)
+      { std::swap(lhs.m_items, rhs.m_items); std::swap(lhs.m_isSorted, rhs.m_isSorted); B2DEBUG(200, "SortableVector::swap");}
+
+
       /// The begin of the container
       iterator begin() { return m_items.begin(); }
       /// The begin of the constant container

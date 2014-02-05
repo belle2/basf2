@@ -28,6 +28,14 @@ namespace Belle2 {
       /// Empty deconstructor
       ~CDCRecoSegment2D() {;}
 
+      ///Implements the standard swap idiom
+      friend void swap(CDCRecoSegment2D& lhs, CDCRecoSegment2D& rhs) {
+        SortableVector<CDCRecoHit2D>& rawLHS = lhs;
+        SortableVector<CDCRecoHit2D>& rawRHS = rhs;
+        rawLHS.swap(rawRHS);
+        B2DEBUG(200, "CDCRecoSegment::swap");
+      }
+
       /// Getter for the automaton cell.
       AutomatonCell& getAutomatonCell() { return m_automatonCell; }
 

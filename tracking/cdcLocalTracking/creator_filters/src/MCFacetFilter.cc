@@ -30,9 +30,9 @@ MCFacetFilter::~MCFacetFilter() {;}
 CellState MCFacetFilter::isGoodFacet(const CDCRecoFacet& facet) const
 {
 
-  const CDCWireHit* startWireHit  = facet.getStartWireHit();
-  const CDCWireHit* middleWireHit = facet.getMiddleWireHit();
-  const CDCWireHit* endWireHit    = facet.getEndWireHit();
+  const CDCWireHit* startWireHit  = &(facet.getStartWireHit());
+  const CDCWireHit* middleWireHit = &(facet.getMiddleWireHit());
+  const CDCWireHit* endWireHit    = &(facet.getEndWireHit());
 
   //the three hits should be in the right order tofwise
   //const Belle2::CDCSimHit * simStart = m_mcLookUp.getSimHit(startWireHit);

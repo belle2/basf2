@@ -99,6 +99,13 @@ namespace Belle2 {
                   getWire() == other.getWire() and getStoreIHit() < other.getStoreIHit()));
       }
 
+      /// Defines wires and wire hits to be coaligned on the wire on which they are based.
+      friend bool operator<(const CDCWireHit& wireHit, const CDCWire& wire) { return wireHit.getWire() < wire; }
+
+      /// Defines wires and wire hits to be coaligned on the wire on which they are based.
+      friend bool operator<(const CDCWire& wire, const CDCWireHit& wireHit) { return wire < wireHit.getWire(); }
+
+
       /// Total ordering relation based on the wire and the hit id usable with pointers.
       /** Retains the total ordering sheme for wire hit objects, but introduces the special nullptr case to the ordering.
        *  The nullptr is always smallest. Therefore it forms a lower bound for the wire hit pointers.

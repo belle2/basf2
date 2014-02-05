@@ -124,6 +124,18 @@ namespace Belle2 {
                        getRefDisp2D() <  other.getRefDisp2D()))));
       }
 
+      /// Defines wires and the two dimensional reconstructed hits as coaligned
+      friend bool operator<(const CDCRecoHit2D& recoHit2D, const CDCWire& wire) { return *(recoHit2D.getWire()) < wire; }
+
+      /// Defines wires and the two dimensional reconstructed hits as coaligned
+      friend bool operator<(const CDCWire& wire, const CDCRecoHit2D& recoHit2D) { return wire < *(recoHit2D.getWire()); }
+
+      /// Defines wire hits and the two dimensional reconstructed hits as coaligned
+      friend bool operator<(const CDCRecoHit2D& recoHit2D, const CDCWireHit& wireHit) { return *(recoHit2D.getWireHit()) < wireHit; }
+
+      /// Defines wire hits and the two dimensional reconstructed hits as coaligned
+      friend bool operator<(const CDCWireHit& wireHit, const CDCRecoHit2D& recoHit2D) { return wireHit < *(recoHit2D.getWireHit()); }
+
       /// Total ordering relation based on wire hit, left right passage information and displacement usable with pointers
       /** Retains the total ordering sheme for reconstructed hit objects, \n
        *  but introduces the special nullptr case to the ordering.

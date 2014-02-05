@@ -11,8 +11,12 @@
 #ifndef BASEFACETNEIGHBORCHOOSER_H_
 #define BASEFACETNEIGHBORCHOOSER_H_
 
+#include <boost/range/iterator_range.hpp>
+
 #include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
 #include <tracking/cdcLocalTracking/typedefs/BasicConstants.h>
+
+#include <tracking/cdcLocalTracking/eventdata/entities/CDCRLWireHitPair.h>
 #include <tracking/cdcLocalTracking/typedefs/UsedDataHolders.h>
 
 
@@ -36,35 +40,24 @@ namespace Belle2 {
       /// Clears information from former events
       inline void clear() const {/*nothing to remember*/;}
 
-      inline const CDCRecoFacet
-      getLowestPossibleNeighbor(
-        const CDCRecoFacet& facet
-      ) const {
-        return CDCRecoFacet::getLowerBound(facet.getMiddleWireHit(),
-                                           facet.getMiddleRLInfo(),
-                                           facet.getEndWireHit(),
-                                           facet.getEndRLInfo());
-      }
 
-      inline bool
-      isStillPossibleNeighbor(
-        const CDCRecoFacet& facet,
-        const CDCRecoFacet& neighborFacet,
-        const CDCRecoFacet& lowestPossibleNeighbor __attribute__((unused))
-      ) const {
 
-        return *(facet.getMiddleWireHit()) == *(neighborFacet.getStartWireHit()) and
-               facet.getMiddleRLInfo() == neighborFacet.getStartRLInfo() and
-               * (facet.getEndWireHit()) == *(neighborFacet.getMiddleWireHit()) and
-               facet.getEndRLInfo() == neighborFacet.getMiddleRLInfo();
+      template<class CDCRecoFacetIterator>
+      boost::iterator_range<CDCRecoFacetIterator> getPossibleNeighbors(const CDCRecoFacet& recoFacet, const CDCRecoFacetIterator& itBegin, const CDCRecoFacetIterator& itEnd) const {
+
+        const CDCRLWireHitPair rearRLWireHitPair = recoFacet.getRearRLWireHitPair();
+
+        std::pair<CDCRecoFacetIterator, CDCRecoFacetIterator> itPairPossibleNeighbors = std::equal_range(itBegin, itEnd, rearRLWireHitPair);
+        return boost::iterator_range<CDCRecoFacetIterator>(itPairPossibleNeighbors.first, itPairPossibleNeighbors.second);
+        //return boost::iterator_range<CDCRecoFacetIterator>(itEnd,itEnd);
+
       }
 
       inline
       Weight
       isGoodNeighbor(
         const CDCRecoFacet& facet,
-        const CDCRecoFacet& neighborFacet,
-        const CDCRecoFacet& lowestPossibleNeighbor __attribute__((unused))
+        const CDCRecoFacet& neighborFacet
       ) const {
 
         //the last wire of the neighbor should not be the same as the start wire of the facet
@@ -83,10 +76,7 @@ namespace Belle2 {
         return -2;
 
       }
-
-
     }; // end class
-
 
   } //end namespace CDCLocalTracking
 } //end namespace Belle2

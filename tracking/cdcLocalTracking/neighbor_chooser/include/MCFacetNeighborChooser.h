@@ -36,8 +36,7 @@ namespace Belle2 {
       NeighborWeight
       isGoodNeighbor(
         const CDCRecoFacet& facet,
-        const CDCRecoFacet& neighborFacet,
-        const CDCRecoFacet& lowestPossibleNeighbor __attribute__((unused))
+        const CDCRecoFacet& neighborFacet
       ) const {
 
 

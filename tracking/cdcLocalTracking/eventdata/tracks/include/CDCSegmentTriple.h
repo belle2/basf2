@@ -84,6 +84,15 @@ namespace Belle2 {
                        getMiddle()   < rhs.getMiddle()))));
       }
 
+      /// Define reconstructed segments and segment triples as coaligned on the start segment
+      friend bool operator<(CDCSegmentTriple const& segmentTriple , const CDCAxialRecoSegment2D* axialSegment)
+      { return segmentTriple.getStart() < axialSegment; }
+
+      /// Define reconstructed segments and segment triples as coaligned on the start segment
+      friend bool operator<(const CDCAxialRecoSegment2D* axialSegment, CDCSegmentTriple const& segmentTriple)
+      { return axialSegment < segmentTriple.getStart(); }
+
+
       /** Equality comparision usable with points */
       bool IsEqual(const CDCSegmentTriple* const& other) const
       { return other == nullptr ? false : operator==(*other); }

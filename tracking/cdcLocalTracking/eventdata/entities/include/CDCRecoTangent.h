@@ -174,6 +174,13 @@ namespace Belle2 {
                            getToRLInfo() < rhs.getToRLInfo())))))) ;
       }
 
+
+      /// Defines wire hits and reconstructed tangents as coaligned on the first wire hit
+      friend bool operator<(const CDCRecoTangent& recoTangent, const CDCWireHit& wireHit) { return *(recoTangent.getFromWireHit()) < wireHit; }
+
+      /// Defines wire hits and reconstructed tangents as coaligned on the first wire hit
+      friend bool operator<(const CDCWireHit& wireHit, const CDCRecoTangent& recoTangent) { return  wireHit <  *(recoTangent.getFromWireHit()); }
+
       /// Total ordering for tangents usable with pointers.
       /** Establish a total ordering based wire hits first and left right passage info second,
        *  but introduces the special nullptr case to the ordering.

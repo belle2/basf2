@@ -8,12 +8,18 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef WIREHITNEIGHBORCHOOSER_H_
-#define WIREHITNEIGHBORCHOOSER_H_
+#ifndef WIREHITNEIGHBORCHOOSER_H
+#define WIREHITNEIGHBORCHOOSER_H
+
+#include <boost/range/iterator_range.hpp>
 
 #include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
 #include <tracking/cdcLocalTracking/typedefs/BasicConstants.h>
-#include <tracking/cdcLocalTracking/typedefs/UsedDataHolders.h>
+
+#include <tracking/cdcLocalTracking/topology/CDCWire.h>
+#include <tracking/cdcLocalTracking/eventdata/entities/CDCWireHit.h>
+#include <tracking/cdcLocalTracking/eventdata/entities/Compare.h>
+
 #include <cmath>
 
 
@@ -86,67 +92,42 @@ namespace Belle2 {
     public:
 
       /// Empty constructor
-      WireHitNeighborChooser()
-      {;}
+      WireHitNeighborChooser() {;}
 
       /// Empty destructor
       ~WireHitNeighborChooser() {;}
 
       /// Clear remembered informations. Nothing to do in this case
-      void clear() const {
-        m_lastLowestPossibleNeighborValid = false;
-      }
+      void clear() const {;}
 
-      /// Getter for the lowest possible neighbor of the wirehit.
-      /** Returns the wire hit of the based on the neighbor wire */
-      inline const CDCWireHit getLowestPossibleNeighbor(const CDCWireHit& wirehit) const {
-        const CDCWire& wire = wirehit.getWire();
-        const CDCWire* neighborWire = NeighborWireGetter<ConcreteNeighborType>::get(wire);
-        if (neighborWire == nullptr) {
+      template<class CDCWireHitIterator>
+      boost::iterator_range<CDCWireHitIterator> getPossibleNeighbors(const CDCWireHit& wireHit, const CDCWireHitIterator& itBegin, const CDCWireHitIterator& itEnd) const {
 
-          m_lastLowestPossibleNeighborValid = false;
-          neighborWire = &(CDCWire::getLowest());
+        const CDCWire& wire = wireHit.getWire();
+        const CDCWire* ptrNeighborWire = NeighborWireGetter<ConcreteNeighborType>::get(wire);
 
+        if (ptrNeighborWire == nullptr) {
+          return boost::iterator_range<CDCWireHitIterator>(itEnd, itEnd);
         } else {
-
-          m_lastLowestPossibleNeighborValid = true;
-
+          const CDCWire& neighborWire = *ptrNeighborWire;
+          std::pair<CDCWireHitIterator, CDCWireHitIterator> itPairPossibleNeighbors = std::equal_range(itBegin, itEnd, neighborWire);
+          return boost::iterator_range<CDCWireHitIterator>(itPairPossibleNeighbors.first, itPairPossibleNeighbors.second);
         }
-        return CDCWireHit::getLowerBound(neighborWire);
-
       }
-      /// Returns if the wire hit given is still in the possible neighbor range or not */
-      inline bool
-      isStillPossibleNeighbor(
-        const CDCWireHit& wirehit __attribute__((unused)),
-        const CDCWireHit& neighborWirehit,
-        const CDCWireHit& lowestPossibleNeighbor
-      ) const {
-
-        return  m_lastLowestPossibleNeighborValid and
-                neighborWirehit.getWire() == lowestPossibleNeighbor.getWire();
-
-      }
-
 
       /// Returns whether the wire hit is a good neighbor.
       /** Returns if the wire hit given in the range of possible neighbors is also a good neighbor.
        *  In the case of wire hits every neighbor is a good neighbor */
       inline Weight isGoodNeighbor(
         const CDCWireHit& wirehit __attribute__((unused)),
-        const CDCWireHit& neighborWirehit __attribute__((unused)),
-        const CDCWireHit& lowestPossibleNeighbor __attribute__((unused))
+        const CDCWireHit& neighborWirehit __attribute__((unused))
       ) const {
         return 0; // All possible neighbors are good ones but the relation does not contribute any specific gain in points
       }
 
-    private:
-      mutable bool m_lastLowestPossibleNeighborValid;
-
     }; // end class
-
 
   } //end namespace CDCLocalTracking
 } //end namespace Belle2
 
-#endif //WIREHITNEIGHBORCHOOSER_H_
+#endif //WIREHITNEIGHBORCHOOSER_H

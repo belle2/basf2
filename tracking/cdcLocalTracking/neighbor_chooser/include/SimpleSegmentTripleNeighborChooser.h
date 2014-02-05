@@ -33,8 +33,7 @@ namespace Belle2 {
 
       inline Weight isGoodNeighbor(
         const CDCSegmentTriple& triple __attribute__((unused)) ,
-        const CDCSegmentTriple& neighborTriple,
-        const CDCSegmentTriple& lowestPossibleNeighbor __attribute__((unused))
+        const CDCSegmentTriple& neighborTriple
       ) const {
 
         // Just let all found neighors pass since we have the same start -> end segment

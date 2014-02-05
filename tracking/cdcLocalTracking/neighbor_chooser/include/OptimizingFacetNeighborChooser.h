@@ -45,13 +45,12 @@ namespace Belle2 {
 
       inline NeighborWeight isGoodNeighbor(
         const CDCRecoFacet& facet,
-        const CDCRecoFacet& neighborFacet,
-        const CDCRecoFacet& lowestPossibleNeighbor
+        const CDCRecoFacet& neighborFacet
       ) const {
 
         if (facet.getStartWire() == neighborFacet.getEndWire()) return NOT_A_NEIGHBOR;
 
-        NeighborWeight mcWeight = m_mcNeighborChooser.isGoodNeighbor(facet, neighborFacet, lowestPossibleNeighbor);
+        NeighborWeight mcWeight = m_mcNeighborChooser.isGoodNeighbor(facet, neighborFacet);
 
         bool mcDecision = not isNotANeighbor(mcWeight);
 
@@ -72,7 +71,7 @@ namespace Belle2 {
                      << mcDecision
                      << std::endl;
 
-        NeighborWeight simpleWeight = m_simpleNeighborChooser.isGoodNeighbor(facet, neighborFacet, lowestPossibleNeighbor);
+        NeighborWeight simpleWeight = m_simpleNeighborChooser.isGoodNeighbor(facet, neighborFacet);
 
         return simpleWeight;
 

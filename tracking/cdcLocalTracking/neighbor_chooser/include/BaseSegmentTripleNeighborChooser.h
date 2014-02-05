@@ -11,6 +11,8 @@
 #ifndef BASESEGMENTTRIPLENEIGHBORCHOOSER_H_
 #define BASESEGMENTTRIPLENEIGHBORCHOOSER_H_
 
+#include <boost/range/iterator_range.hpp>
+
 #include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
 #include <tracking/cdcLocalTracking/typedefs/BasicConstants.h>
 #include <tracking/cdcLocalTracking/typedefs/UsedDataHolders.h>
@@ -38,25 +40,23 @@ namespace Belle2 {
       /// Clears stored information for a former event
       inline void clear() const {/*nothing to remember*/;}
 
-      inline const CDCSegmentTriple getLowestPossibleNeighbor(const CDCSegmentTriple& triple) const
-      { return CDCSegmentTriple::getLowerBound(triple.getEnd()); }
-
-      inline
-      bool
-      isStillPossibleNeighbor(
+      template<class CDCSegmentTripleIterator>
+      boost::iterator_range<CDCSegmentTripleIterator>
+      getPossibleNeighbors(
         const CDCSegmentTriple& triple,
-        const CDCSegmentTriple& neighborTriple,
-        const CDCSegmentTriple& lowestPossibleNeighbor __attribute__((unused))
+        const CDCSegmentTripleIterator& itBegin,
+        const CDCSegmentTripleIterator& itEnd
       ) const {
 
-        return triple.getEnd() == neighborTriple.getStart();
+        const CDCAxialRecoSegment2D* endSegment = triple.getEnd();
+        std::pair<CDCSegmentTripleIterator,  CDCSegmentTripleIterator> itPairPossibleNeighbors = std::equal_range(itBegin, itEnd, endSegment);
+        return boost::iterator_range<CDCSegmentTripleIterator>(itPairPossibleNeighbors.first, itPairPossibleNeighbors.second);
 
       }
 
       inline Weight isGoodNeighbor(
         const CDCSegmentTriple& triple __attribute__((unused)) ,
-        const CDCSegmentTriple& neighborTriple,
-        const CDCSegmentTriple& lowestPossibleNeighbor __attribute__((unused))
+        const CDCSegmentTriple& neighborTriple
       ) const {
 
         // Just let all found neighors pass for the base implementation

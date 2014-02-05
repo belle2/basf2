@@ -47,7 +47,10 @@ namespace Belle2 {
       /// Empty destructor
       ~CDCRLWireHitTriple() {;}
 
+    public:
 
+      /// Constructs the reverse tiple from this one
+      CDCRLWireHitTriple reversed() const;
 
     public:
       bool operator==(const CDCRLWireHitTriple& other) const
@@ -59,6 +62,22 @@ namespace Belle2 {
         return getStartRLWireHit() <  other.getStartRLWireHit() or
                (getStartRLWireHit() == other.getStartRLWireHit() and getRearRLWireHitPair() < other.getRearRLWireHitPair());
       }
+
+
+      /// Define oriented wire hit pairs to be coaligned with orient wire hit triples on the first two oriented wire hits
+      friend bool operator< (const CDCRLWireHitTriple& rlWireHitTriple, const CDCRLWireHitPair& rlWireHitPair) {
+        return rlWireHitTriple.getStartRLWireHit() <  rlWireHitPair.getFromRLWireHit() or
+               (rlWireHitTriple.getStartRLWireHit() == rlWireHitPair.getFromRLWireHit() and
+                rlWireHitTriple.getMiddleRLWireHit() <  rlWireHitPair.getToRLWireHit());
+      }
+
+      /// Define oriented wire hit pairs to be coaligned with orient wire hit triples on the first two oriented wire hits
+      friend bool operator< (const CDCRLWireHitPair& rlWireHitPair, const CDCRLWireHitTriple& rlWireHitTriple) {
+        return rlWireHitPair.getFromRLWireHit() < rlWireHitTriple.getStartRLWireHit() or
+               (rlWireHitPair.getFromRLWireHit() == rlWireHitTriple.getStartRLWireHit() and
+                rlWireHitPair.getToRLWireHit() < rlWireHitTriple.getMiddleRLWireHit());
+      }
+
 
       /// Standard output operator for debugging purposes
       friend std::ostream& operator<<(std::ostream& output, const CDCRLWireHitTriple& rlWireHitTriple) {

@@ -34,8 +34,7 @@ namespace Belle2 {
 
       inline NeighborWeight isGoodNeighbor(
         const CDCRecoFacet& facet,
-        const CDCRecoFacet& neighborFacet,
-        const CDCRecoFacet& lowestPossibleNeighbor __attribute__((unused))
+        const CDCRecoFacet& neighborFacet
       ) const {
 
         if (facet.getStartWire() == neighborFacet.getEndWire()) return NOT_A_NEIGHBOR;

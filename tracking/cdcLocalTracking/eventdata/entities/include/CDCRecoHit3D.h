@@ -139,6 +139,21 @@ namespace Belle2 {
       }
 
 
+
+      /// Defines wires and the three dimensional reconstructed hits as coaligned
+      friend bool operator<(const CDCRecoHit3D& recoHit3D, const CDCWire& wire) { return *(recoHit3D.getWire()) < wire; }
+
+      /// Defines wires and the three dimensional reconstructed hits as coaligned
+      friend bool operator<(const CDCWire& wire, const CDCRecoHit3D& recoHit3D) { return wire < *(recoHit3D.getWire()); }
+
+      /// Defines wire hits and the three dimensional reconstructed hits as coaligned
+      friend bool operator<(const CDCRecoHit3D& recoHit3D, const CDCWireHit& wireHit) { return *(recoHit3D.getWireHit()) < wireHit; }
+
+      /// Defines wire hits and the three dimensional reconstructed hits as coaligned
+      friend bool operator<(const CDCWireHit& wireHit, const CDCRecoHit3D& recoHit3D) { return wireHit < *(recoHit3D.getWireHit()); }
+
+
+
       ///Total ordering relation based on wire hit, right left passage information and position information usable with pointers.
       /** Retains the total ordering sheme for reconstructed hit objects, but introduces the \n
        *  special nullptr case to the ordering. The nullptr is always smallest. Therefore it \n

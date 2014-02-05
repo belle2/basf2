@@ -1,13 +1,15 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2012 - Belle II Collaboration                             *
+ * Copyright(C) 2014 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Oliver Frost                                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#pragma once
+
+#ifndef CDCENTITIESCOMPARE_H
+#define CDCENTITIESCOMPARE_H
 
 #include "CDCGenHit.h"
 
@@ -32,87 +34,43 @@ namespace Belle2 {
      *    - CDCRLWireHit
      */
     /**@{*/
-    template<class HitEntity>
-    bool operator<(const HitEntity& hitEntity, const CDCWire& wire) { return hitEntity.getWire() < wire; }
+    /* template<class HitEntity> */
+    /* bool operator<(const HitEntity& hitEntity, const CDCWire& wire) { return hitEntity.getWire() < wire; } */
 
-    template<class HitEntity>
-    bool operator<(const CDCWire& wire, const HitEntity& hitEntity) { return wire < hitEntity.getWire(); }
+    /* template<class HitEntity> */
+    /* bool operator<(const CDCWire& wire, const HitEntity& hitEntity) { return wire < hitEntity.getWire(); } */
+    /* /\**@}*\/ */
+
+    /* /\** @name Definition of coalignment with wire hits */
+    /*  *  The following methods define wires and several entities that support the getWireHit method as coaligned. */
+    /*  *  Which is true for */
+    /*  *    - CDCRLWireHit */
+    /*  *\/ */
+    /* /\**@{*\/ */
+    /* template<class HitEntity> */
+    /* bool operator<(const HitEntity& hitEntity, const CDCWireHit& wireHit) { return hitEntity.getWireHit() < wireHit; } */
+
+    /* template<class HitEntity> */
+    /* bool operator<(const CDCWireHit& wireHit, const HitEntity& hitEntity) { return wireHit < hitEntity.getWireHit(); } */
     /**@}*/
 
-    /** @name Definition of coalignment with wire hits
-     *  The following methods define wires and several entities that support the getWireHit method as coaligned.
-     *  Which is true for
-     *    - CDCRLWireHit
-     */
-    /**@{*/
-    template<class HitEntity>
-    bool operator<(const HitEntity& hitEntity, const CDCWireHit& wireHit) { return hitEntity.getWireHit() < wireHit; }
-
-    template<class HitEntity>
-    bool operator<(const CDCWireHit& wireHit, const HitEntity& hitEntity) { return wireHit < hitEntity.getWireHit(); }
-    /**@}*/
-
-
-
-
-
-
-    /// Defines wires and the two dimensional reconstructed hits as coaligned
-    bool operator<(const CDCRecoHit2D& recoHit2D, const CDCWire& wire) { return *(recoHit2D.getWire()) < wire; }
-
-    /// Defines wires and the two dimensional reconstructed hits as coaligned
-    bool operator<(const CDCWire& wire, const CDCRecoHit2D& recoHit2D) { return wire < *(recoHit2D.getWire()); }
-
-    /// Defines wire hits and the two dimensional reconstructed hits as coaligned
-    bool operator<(const CDCRecoHit2D& recoHit2D, const CDCWireHit& wireHit) { return *(recoHit2D.getWireHit()) < wireHit; }
-
-    /// Defines wire hits and the two dimensional reconstructed hits as coaligned
-    bool operator<(const CDCWireHit& wireHit, const CDCRecoHit2D& recoHit2D) { return wireHit < *(recoHit2D.getWireHit()); }
-
-
-
-
-
-    /// Defines wires and the three dimensional reconstructed hits as coaligned
-    bool operator<(const CDCRecoHit3D& recoHit3D, const CDCWire& wire) { return *(recoHit3D.getWire()) < wire; }
-
-    /// Defines wires and the three dimensional reconstructed hits as coaligned
-    bool operator<(const CDCWire& wire, const CDCRecoHit3D& recoHit3D) { return wire < *(recoHit3D.getWire()); }
-
-    /// Defines wire hits and the three dimensional reconstructed hits as coaligned
-    bool operator<(const CDCRecoHit3D& recoHit3D, const CDCWireHit& wireHit) { return *(recoHit3D.getWireHit()) < wireHit; }
-
-    /// Defines wire hits and the three dimensional reconstructed hits as coaligned
-    bool operator<(const CDCWireHit& wireHit, const CDCRecoHit3D& recoHit3D) { return wireHit < *(recoHit3D.getWireHit()); }
-
-
-
-
-
-    /// Defines wire hits and reconstructed tangents as coaligned on the first wire
-    bool operator<(const CDCRecoTangent& recoTangent, const CDCWireHit& wireHit) { return *(recoTangent.getFromWireHit()) < wireHit; }
-
-    /// Defines wire hits and reconstructed tangents as coaligned on the first wire
-    bool operator<(const CDCWireHit& wireHit, const CDCRecoTangent& recoTangent) { return  wireHit <  *(recoTangent.getFromWireHit()); }
-
-
-
-
-
-    /// Defines wire hits and facet as coaligned on the first wire hit
-    bool operator<(const CDCRecoFacet& recoFacet, const CDCWireHit& wireHit) { return *(recoFacet.getStartWireHit()) < wireHit; }
-
-    /// Defines wire hits and facet as coaligned on the first wire hit
-    bool operator<(const CDCWireHit& wireHit, const CDCRecoFacet& recoFacet) { return  wireHit <  *(recoFacet.getStartWireHit()); }
+    /// Defines reconstructed tangents and facet as coaligned on the start to middle tangent
+    /*bool operator<(const CDCRecoFacet& recoFacet, const CDCRecoTangent& recoTangent) {
+      return recoFacet.getStartRLWireHit() < recoTangent.getFromRLWireHit() or
+    ( recoFacet.getStartRLWireHit() == recoTangent.getFromRLWireHit() and
+    recoFacet.getMiddleRLWireHit() < recoTangent.getToRLWireHit() );
+    }
 
     /// Defines reconstructed tangents and facet as coaligned on the start to middle tangent
-    //bool operator<(const CDCRecoFacet& recoFacet, const CDCRecoTangent& recoTangent)
-    //{ return *(recoFacet.getStartWireHit()) < recoTangent; }
-
-    /// Defines reconstructed tangents and facet as coaligned on the start to middle tangent
-    //bool operator<(const CDCWireHit& recoTangent, const CDCRecoFacet& recoFacet) { return  recoTangent < *(recoFacet.getStartWireHit()); }
-
+    bool operator<(const CDCWireHit& recoTangent, const CDCRecoFacet& recoFacet){
+      return recoTangent.getFromRLWireHit() < recoFacet.getStartRLWireHit() or
+    ( recoTangent.getFromRLWireHit() == recoFacet.getStartRLWireHit() and
+    recoTangent.getToRLWireHit() < recoFacet.getMiddleRLWireHit() );
+    }
+    */
 
 
   } //end namespace CDCLocalTracking
 } //end namespace Belle2
+
+#endif //CDCENTITIESCOMPARE_H

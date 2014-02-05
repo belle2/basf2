@@ -69,6 +69,14 @@ namespace Belle2 {
       bool operator<(const CDCGenHit& other) const
       { return getWire() < other.getWire() or (getWire() == other.getWire() and getDummyPos2D() < other.getDummyPos2D()); }
 
+
+      /// Defines wires and dummy hits to be coaligned on the wire on which they are based.
+      friend bool operator<(const CDCGenHit& genHit, const CDCWire& wire) { return genHit.getWire() < wire; }
+
+      /// Defines wires and dummy hits to be coaligned on the wire on which they are based.
+      friend bool operator<(const CDCWire& wire, const CDCGenHit& genHit) { return wire < genHit.getWire(); }
+
+
       /// Total ordering relation based on the wire and the dummy position usable with pointers.
       bool inline IsLessThan(const CDCGenHit* const& other) const
       { return other == nullptr ? false : operator<(*other); }

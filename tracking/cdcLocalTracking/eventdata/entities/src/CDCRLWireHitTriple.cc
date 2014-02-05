@@ -10,6 +10,8 @@
 
 #include "../include/CDCRLWireHitTriple.h"
 
+#include <tracking/cdcLocalTracking/eventtopology/CDCWireHitTopology.h>
+
 using namespace std;
 using namespace Belle2;
 using namespace CDCLocalTracking;
@@ -41,6 +43,15 @@ CDCRLWireHitTriple::CDCRLWireHitTriple(
 }
 
 
+CDCRLWireHitTriple CDCRLWireHitTriple::reversed() const
+{
+  return CDCRLWireHitTriple(
+           &(CDCWireHitTopology::getInstance().getReverseOf(getEndRLWireHit())),
+           &(CDCWireHitTopology::getInstance().getReverseOf(getMiddleRLWireHit())),
+           &(CDCWireHitTopology::getInstance().getReverseOf(getStartRLWireHit()))
+         );
+}
+
 
 CDCRLWireHitTriple::Shape CDCRLWireHitTriple::getShape() const
 {
@@ -60,5 +71,7 @@ CDCRLWireHitTriple::Shape CDCRLWireHitTriple::getShape() const
   //else
   return Shape::ILLSHAPED;
 }
+
+
 
 

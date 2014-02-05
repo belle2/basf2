@@ -74,6 +74,19 @@ namespace Belle2 {
                    getRLInfo() < other.getRLInfo()));
       }
 
+      /// Defines wires and oriented wire hits to be coaligned on the wire on which they are based.
+      friend bool operator<(const CDCRLWireHit& rlWireHit, const CDCWire& wire) { return rlWireHit.getWire() < wire; }
+
+      /// Defines wires and oriented wire hits to be coaligned on the wire on which they are based.
+      friend bool operator<(const CDCWire& wire, const CDCRLWireHit& rlWireHit) { return wire < rlWireHit.getWire(); }
+
+      /// Defines wire hits and oriented wire hits to be coaligned on the wire hit on which they are based.
+      friend bool operator<(const CDCRLWireHit& rlWireHit, const CDCWireHit& wireHit) { return rlWireHit.getWireHit() < wireHit; }
+
+      /// Defines wire hits and oriented wire hits to be coaligned on the wire hit on which they are based.
+      friend bool operator<(const CDCWireHit& wireHit, const CDCRLWireHit& rlWireHit) { return wireHit < rlWireHit.getWireHit(); }
+
+
       /// Total ordering relation based on wire hit and left right passage information usable with pointers
       /** Retains the total ordering sheme for oriented hit objects, \n
        *  but introduces the special nullptr case to the ordering.

@@ -12,12 +12,12 @@
 #define FACETCREATOR_H_
 
 #include <vector>
-#include <boost/foreach.hpp>
-
-#include <tracking/cdcLocalTracking/typedefs/UsedDataHolders.h>
 
 #include<framework/datastore/StoreArray.h>
 
+#include <tracking/cdcLocalTracking/eventtopology/CDCWireHitTopology.h>
+
+#include <tracking/cdcLocalTracking/typedefs/UsedDataHolders.h>
 
 namespace Belle2 {
   namespace CDCLocalTracking {
@@ -184,37 +184,25 @@ namespace Belle2 {
                                     const CDCWireHit* middleWireHit,
                                     const CDCWireHit* endWireHit,
                                     GenericFacetCollection& facets) const {
+
         if (startWireHit == nullptr or middleWireHit == nullptr or endWireHit == nullptr) return;
 
+        const CDCWireHitTopology& cdcWireHitTopology = CDCWireHitTopology::getInstance();
 
-        // Now iterator over all possible right left passage information triples
-        // Not for zero drift radius we only take one passage information which is unknown
+        CDCWireHitTopology::CDCRLWireHitRange startRLWireHits = cdcWireHitTopology.getRLWireHits(*startWireHit);
+        CDCWireHitTopology::CDCRLWireHitRange middleRLWireHits = cdcWireHitTopology.getRLWireHits(*middleWireHit);
+        CDCWireHitTopology::CDCRLWireHitRange endRLWireHits = cdcWireHitTopology.getRLWireHits(*endWireHit);
 
-        for (RightLeftInfo startRLInfo = LEFT * sign(startWireHit->getRefDriftLength());
-             startRLInfo <= RIGHT * sign(startWireHit->getRefDriftLength());
-             startRLInfo += (RIGHT - LEFT)) {
+        for (const CDCRLWireHit & startRLWireHit : startRLWireHits) {
 
-          for (RightLeftInfo middleRLInfo = LEFT * sign(middleWireHit->getRefDriftLength());
-               middleRLInfo <= RIGHT * sign(middleWireHit->getRefDriftLength());
-               middleRLInfo += (RIGHT - LEFT)) {
+          for (const CDCRLWireHit & middleRLWireHit : middleRLWireHits) {
 
-            for (RightLeftInfo endRLInfo = LEFT * sign(endWireHit->getRefDriftLength());
-                 endRLInfo <= RIGHT * sign(endWireHit->getRefDriftLength());
-                 endRLInfo += (RIGHT - LEFT)) {
+            for (const CDCRLWireHit & endRLWireHit : endRLWireHits) {
 
-              CDCRecoFacet facet(
-                startWireHit,
-                startRLInfo,
 
-                middleWireHit,
-                middleRLInfo,
-
-                endWireHit,
-                endRLInfo,
-                ParameterLine2D()
-                // do not set the lines yet. The filter shall do that if he wants to.
-                // He should set them if he accepts the facet.
-              );
+              CDCRecoFacet facet(&startRLWireHit, &middleRLWireHit, &endRLWireHit, ParameterLine2D());
+              // do not set the lines yet. The filter shall do that if he wants to.
+              // He should set them if he accepts the facet.
 
               const CDCRecoFacet& constFacet = facet;
 
@@ -229,10 +217,11 @@ namespace Belle2 {
                 //itNewFacet->getAutomatonCell().setCellWeight(cellWeight);
 
               }
-            } //end for endRLInfo
-          } //end for middleRLInfo
-        } //end for endRLInfo
-        //B2DEBUG(200,"#CreatedForThisGroup " << nCreatedForThisGroup);
+
+            } //end for endRLWireHit
+
+          } //end for middleRLWireHit
+        } //end for startRLWireHit
       }
 
     private:

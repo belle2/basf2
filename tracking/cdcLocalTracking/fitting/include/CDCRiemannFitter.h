@@ -105,7 +105,7 @@ namespace Belle2 {
       size_t fillObservations(const CDCRecoHit2DVector& recohits, std::vector<FloatType>& observations) const;
       size_t fillObservations(const CDCSegmentTriple& segmentTriple, std::vector<FloatType>& observations) const __attribute__((deprecated));
 
-      size_t fillObservation(const CDCRecoHit2D& recohit, std::vector<FloatType>& observations) const;
+      size_t fillObservation(const Belle2::CDCLocalTracking::CDCRecoHit2D& recohit, std::vector<FloatType>& observations) const;
 
       //void update(CDCTrajectory2D & fit,const CDCWireHitCollection & wirehits) const;
       //void update(CDCTrajectory2D & fit,const CDCRecoHitCollection & recohits) const;

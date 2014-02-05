@@ -11,7 +11,7 @@
 
 #pragma link C++ class Belle2::CDCLocalTracking::CDCWireHitPtrSet;
 #pragma link C++ class Belle2::CDCLocalTracking::CDCWireHitSet;
-#pragma link C++ class Belle2::CDCLocalTracking::CDCWireHitVector;
+//#pragma link C++ class Belle2::CDCLocalTracking::CDCWireHitVector;
 
 #pragma link C++ class Belle2::CDCLocalTracking::CDCRecoFacetSet;
 #pragma link C++ class Belle2::CDCLocalTracking::CDCRecoFacetVector;

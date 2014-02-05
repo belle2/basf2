@@ -17,12 +17,16 @@
 #include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
 
 #include <tracking/cdcLocalTracking/eventdata/entities/CDCWireHit.h>
+#include <tracking/cdcLocalTracking/eventdata/entities/CDCGenHitVector.h>
 
 namespace Belle2 {
   namespace CDCLocalTracking {
 
+    typedef CDCGenHitVector<Belle2::CDCLocalTracking::CDCWireHit> CDCWireHitVector;
+
     /// A vector of wire hits. Template instance of CDCGenericHitVector<CDCWireHit>
     /** See CDCGenericHitVector for all methods and details */
+    /*
     class CDCWireHitVector : public CDCLocalTracking::UsedTObject {
     public:
 
@@ -32,7 +36,6 @@ namespace Belle2 {
       /// Empty deconstructor
       ~CDCWireHitVector() {;}
 
-      /* ###### poor mans collection template ###### */
     public:
       typedef CDCWireHitVector Collection; ///< The type of this class
     private:
@@ -43,12 +46,13 @@ namespace Belle2 {
 
     public:
       /// Include all method implementations
-#include <tracking/cdcLocalTracking/eventdata/collections/implementation/CDCGenericHitVector.part.h>
+      #include <tracking/cdcLocalTracking/eventdata/collections/implementation/CDCGenericHitVector.part.h>
     private:
       /// ROOT Macro to make CDCWireHitVector a ROOT class.
       ClassDefInCDCLocalTracking(CDCWireHitVector, 1);
 
     }; //class
+    */
 
   } // namespace CDCLocalTracking
 } // namespace Belle2

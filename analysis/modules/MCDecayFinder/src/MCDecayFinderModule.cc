@@ -50,15 +50,13 @@ void MCDecayFinderModule::initialize()
   if (m_persistent) {
     StoreObjPtr<ParticleList>::registerPersistent(m_strListName);
     StoreArray<Particle>::registerPersistent(m_particleStore);
-    StoreObjPtr<ParticleExtraInfoMap>::registerPersistent();
-    RelationArray::registerPersistent<Particle, MCParticle>(m_particleStore,
-                                                            string("MCParticles"));
+    StoreObjPtr<ParticleExtraInfoMap>::registerPersistent("", DataStore::c_Event, false); //allow reregistration
+    RelationArray::registerPersistent<Particle, MCParticle>(m_particleStore, "");
   } else {
     StoreObjPtr<ParticleList>::registerTransient(m_strListName);
     StoreArray<Particle>::registerTransient(m_particleStore);
-    StoreObjPtr<ParticleExtraInfoMap>::registerTransient();
-    RelationArray::registerTransient<Particle, MCParticle>(m_particleStore,
-                                                           string("MCParticles"));
+    StoreObjPtr<ParticleExtraInfoMap>::registerTransient("", DataStore::c_Event, false); //allow reregistration
+    RelationArray::registerTransient<Particle, MCParticle>(m_particleStore, "");
   }
 }
 

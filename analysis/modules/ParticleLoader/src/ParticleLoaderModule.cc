@@ -69,7 +69,7 @@ namespace Belle2 {
   void ParticleLoaderModule::initialize()
   {
     StoreArray<Particle>::registerPersistent();
-    StoreObjPtr<ParticleExtraInfoMap>::registerPersistent();
+    StoreObjPtr<ParticleExtraInfoMap>::registerPersistent("", DataStore::c_Event, false); //allow reregistration
     RelationArray::registerPersistent<Particle, PIDLikelihood>();
     RelationArray::registerPersistent<Particle, MCParticle>();
   }

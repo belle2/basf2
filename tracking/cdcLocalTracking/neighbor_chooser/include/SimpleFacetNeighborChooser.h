@@ -24,7 +24,7 @@ namespace Belle2 {
 
     public:
       /** Constructor. */
-      SimpleFacetNeighborChooser() : m_allowedDeviationCos(cos(PI / 180.0 * 5))
+      SimpleFacetNeighborChooser() : m_allowedDeviationCos(cos(PI / 180.0 * 180.0))
       {;}
       SimpleFacetNeighborChooser(FloatType allowedDeviationCos) : m_allowedDeviationCos(allowedDeviationCos)
       {;}

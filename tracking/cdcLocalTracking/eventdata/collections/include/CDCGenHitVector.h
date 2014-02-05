@@ -215,7 +215,18 @@ namespace Belle2 {
         return result;
       }
 
-      void ensureSorted() { if (not isSorted() or not checkSorted()) sort(); }
+      /// Establishes the vector to be sorted.
+      /** This sorts the elements, only if they are not sorted already */
+      void ensureSorted() { if (not isSorted()) sort(); }
+
+      /// Establishes a state where each element is only present once inside the vector. This may change the order of elements!
+      /** Removes all duplicated entries, but may has to sort the vector first, to detect them. */
+      void ensureUnique() {
+        ensureSorted();
+        iterator last = std::unique(m_items.begin(), m_items.end());
+        //erase remove idiom (here with unique)
+        erase(last, end());
+      }
 
     public:
       /// Returns an iterator to the found element. end() if not found.

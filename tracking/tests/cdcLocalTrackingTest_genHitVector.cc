@@ -47,7 +47,7 @@ TEST_F(CDCLocalTrackingTest, CDCGenHitVector_empty)
 }
 
 
-TEST_F(CDCLocalTrackingTest, CDCGenHitVector_Sorting)
+TEST_F(CDCLocalTrackingTest, CDCGenHitVector_sort)
 {
   CDCGenHitVector<CDCGenHit> collection;
   EXPECT_TRUE(collection.isSorted()) << "Empty collection is not sorted";
@@ -99,7 +99,27 @@ TEST_F(CDCLocalTrackingTest, CDCGenHitVector_Sorting)
 }
 
 
+TEST_F(CDCLocalTrackingTest, CDCGenHitVector_unique)
+{
 
+  CDCGenHitVector<CDCGenHit> collection;
+
+  CDCGenHit lowestGenHit;
+  CDCGenHit secondGenHit(WireID(0, 0, 1), Vector2D(0.0, 0.0));
+
+  collection.push_back(lowestGenHit);
+  collection.push_back(secondGenHit);
+  collection.push_back(lowestGenHit);
+  collection.push_back(secondGenHit);
+  collection.push_back(lowestGenHit);
+  collection.push_back(secondGenHit);
+  collection.push_back(lowestGenHit);
+
+  collection.ensureUnique();
+
+  EXPECT_EQ(2, collection.size());
+
+}
 
 
 

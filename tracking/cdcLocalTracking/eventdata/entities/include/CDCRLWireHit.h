@@ -84,6 +84,10 @@ namespace Belle2 {
       FloatType getRefDriftLength() const
       { return getWireHit().getRefDriftLength(); }
 
+      /// Getter for the  drift length at the reference position of the wire
+      FloatType getSignedRefDriftLength() const
+      { return ((SignType)(getRLInfo())) * getRefDriftLength(); }
+
       /// Getter for the wire hit assoziated with the oriented hit.
       const CDCWireHit& getWireHit() const { return *m_wirehit; }
 

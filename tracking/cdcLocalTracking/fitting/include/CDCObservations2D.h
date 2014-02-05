@@ -1,0 +1,75 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2014 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Oliver Frost                                             *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+#ifndef CDCOBSERVATIONS2D_H
+#define CDCOBSERVATIONS2D_H
+
+#ifndef __CINT__
+#include <Eigen/Dense>
+#endif
+
+#include <tracking/cdcLocalTracking/mockroot/MockRoot.h>
+#include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
+#include <tracking/cdcLocalTracking/eventdata/CDCEventData.h>
+
+namespace Belle2 {
+  namespace CDCLocalTracking {
+
+    /// Class serving as a storage of observed drift circles to present to the Riemann fitter
+    class CDCObservations2D : public UsedTObject {
+
+    public:
+      /// Empty constructor.
+      CDCObservations2D();
+
+      /// Empty destructor.
+      ~CDCObservations2D();
+
+      /// Returns the number of observations stored
+      size_t size() const
+      { return  m_observations.size() / 3; }
+
+      /// Removes all observations stored
+      void clear()
+      { m_observations.clear(); }
+
+      /// Reserves enough space for nObservations
+      void reserve(size_t nObservations)
+      { m_observations.reserve(nObservations * 3); }
+
+      /// Appends the observed position - drift radius is assumed to be zero
+      void append(const Belle2::CDCLocalTracking::Vector2D& pos2D);
+
+      /// Appends the observed position - drift radius is take a positiv number
+      void append(const Belle2::CDCLocalTracking::CDCWireHit& wireHit);
+
+      /// Appends the observed position - drift radius is signed number according to the orientation
+      void append(const Belle2::CDCLocalTracking::CDCRLWireHit& rlWireHit);
+
+      /// Returns the number of observations having a drift radius radius
+      size_t getNObservationsWithDriftRadius() const;
+
+#ifndef __CINT__
+      //Hide this methode from CINT since it does not like the Eigen Library to much
+      /// Returns the observations structured as an Eigen matrix
+      /** This returns a reference to the stored observations. Note that operations may alter the content of the underlying memory and render it useless for subceeding calculations.*/
+      Eigen::Map< Eigen::Matrix< FloatType, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor > > getObservationMatrix();
+#endif
+
+    private:
+      std::vector<FloatType> m_observations;
+
+      /** ROOT Macro to make CDCObservation2D a ROOT class.*/
+      ClassDefInCDCLocalTracking(CDCObservations2D, 1);
+
+    }; //class
+
+  } // end namespace CDCLocalTracking
+} // namespace Belle2
+#endif // CDCOBSERVATIONS2D_H

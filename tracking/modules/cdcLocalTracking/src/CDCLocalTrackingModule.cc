@@ -21,8 +21,12 @@
 #include <cdc/dataobjects/CDCSimHit.h>
 #include <cdc/dataobjects/CDCHit.h>
 
+#include <tracking/cdcLocalTracking/eventtopology/CDCWireHitTopology.h>
+
 //typedefs
 #include <tracking/cdcLocalTracking/typedefs/UsedDataHolders.h>
+
+
 
 //out type
 #include "genfit/TrackCand.h"
@@ -108,6 +112,15 @@ void CDCLocalTrackingModule::event()
 
   //create the wirehits
   B2DEBUG(100, "Creating all CDCWireHits");
+
+  CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
+
+  size_t nHits = wireHitTopology.fill();
+  if (nHits == 0) {
+    B2WARNING("Event with no hits - skipping");
+  }
+
+
 
 #ifdef CDCLOCALTRACKING_USE_ROOT
   B2DEBUG(100, "  Getting storedCDCWireHits from DataStore");

@@ -33,9 +33,9 @@ TEST_F(CDCLocalTrackingTest, CDCRiemannFitter_LineFit)
   CDCRiemannFitter lineFitter = CDCRiemannFitter::getLineFitter();
 
   CDCObservations2D observations2D;
-  observations2D.append(Vector2D(0, 2), 0.5);
-  observations2D.append(Vector2D(1, 0), -0.5);
-  observations2D.append(Vector2D(2, 2), 0.5);
+  observations2D.append(Vector2D(0, 1), 0.5);
+  observations2D.append(Vector2D(1, -1), -0.5);
+  observations2D.append(Vector2D(2, 1), 0.5);
 
   CDCTrajectory2D trajectory2D;
 
@@ -45,13 +45,13 @@ TEST_F(CDCLocalTrackingTest, CDCRiemannFitter_LineFit)
 
   Vector2D closestToOrigin = trajectory2D.getClosestToOrigin();
 
-  ASSERT_FLOAT_EQ(0.0, closestToOrigin.x());
-  ASSERT_FLOAT_EQ(1.0, closestToOrigin.y());
+  EXPECT_NEAR(0.0, closestToOrigin.x(), 10e-7);
+  EXPECT_NEAR(0.0, closestToOrigin.y(), 10e-7);
 
   Vector2D closestToPoint = trajectory2D.getClosest(Vector2D(2, 2));
 
   ASSERT_FLOAT_EQ(2.0, closestToPoint.x());
-  ASSERT_FLOAT_EQ(1.0, closestToPoint.y());
+  EXPECT_NEAR(0.0, closestToPoint.y(), 10e-7);
 
 }
 

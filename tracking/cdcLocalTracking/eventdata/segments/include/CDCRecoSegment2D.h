@@ -42,8 +42,17 @@ namespace Belle2 {
       /// Constant getter for the automaton cell.
       AutomatonCell& getAutomatonCell() const { return m_automatonCell; }
 
+      /// Getter for the two dimensional trajectory fitted to the segment
+      CDCTrajectory2D& getTrajectory2D() const
+      { return m_trajectory2D; }
+
+      /// Setter for the two dimensional trajectory fitted to the segment
+      void setTrajectory2D(const CDCTrajectory2D& trajectory2D) const
+      { m_trajectory2D =  trajectory2D; }
+
     private:
       mutable AutomatonCell m_automatonCell; ///< Memory for the automaton cell. It is declared mutable because it can vary rather freely despite of the hit content might be required fixed
+      mutable CDCTrajectory2D m_trajectory2D; ///< Memory for the two dimensional trajectory fitted to this segment
 
     private:
       /// ROOT Macro to make CDCRecoSegment2D a ROOT class.

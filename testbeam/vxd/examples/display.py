@@ -61,14 +61,14 @@ progress = register_module('Progress')
 gearbox = register_module('Gearbox')
 # This file contains the VXD (no Telescopes) beam test geometry including
 #the real PCMAG magnetic field
-gearbox.param('fileName', 'testbeam/vxd/FullTelescopeVXDTB.xml')
+gearbox.param('fileName', 'testbeam/vxd/FullTelescopeVXDTB_v2.xml')
 
 # Create geometry
 geometry = register_module('Geometry')
 # You can specify components to be created
-geometry.param('Components', ['MagneticField', 'TB'])
+geometry.param('components', ['MagneticField', 'TB'])
 # To turn off magnetic field:
-# geometry.param('Components', ['TB'])
+# geometry.param('components', ['TB'])
 
 # Full simulation module
 simulation = register_module('FullSim')
@@ -88,7 +88,7 @@ PXDDigi = register_module('PXDDigitizer')
 SVDDigi = register_module('SVDDigitizer')
 # PXD/SVD clusterizer
 PXDClust = register_module('PXDClusterizer')
-PXDClust.param('ClusterCacheSize', 576)
+#PXDClust.param('ClusterCacheSize', 576)
 SVDClust = register_module('SVDClusterizer')
 # Save output of simulation
 output = register_module('RootOutput')

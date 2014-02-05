@@ -163,7 +163,10 @@ namespace Belle2 {
       int getStoreIHit() const { return m_iHit; }
 
       /// Getter for the automaton cell.
-      AutomatonCell& getAutomatonCell() const { return m_automatonCell; }
+      AutomatonCell& getAutomatonCell() { return m_automatonCell; }
+
+      /// Constant getter for the automaton cell.
+      const AutomatonCell& getAutomatonCell() const { return m_automatonCell; }
 
       /** @name Mimic pointer
         */
@@ -230,7 +233,7 @@ namespace Belle2 {
       const CDCHit* m_hit;   ///< Memory for the CDCWire reference
       int m_iHit; ///< Memory for the index into the storing StoreArray<CDCHit>
       FloatType m_refDriftLength; ///< Memory for the drift length at the wire reference point
-      mutable AutomatonCell m_automatonCell; ///< Memory for the automaton cell. Marked it as mutable since its content should be changeable when if the wire and drift length information are required to be constant.
+      AutomatonCell m_automatonCell; ///< Memory for the automaton cell. Marked it as mutable since its content should be changeable when if the wire and drift length information are required to be constant.
 
     private:
       /// Static variable for lowest possible wire hit

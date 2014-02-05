@@ -21,12 +21,63 @@ using namespace CDCLocalTracking;
 
 ClassImpInCDCLocalTracking(CDCRiemannFitter)
 
+
+namespace {
+  CDCRiemannFitter* g_fitter = nullptr;
+  CDCRiemannFitter* g_lineFitter = nullptr;
+  CDCRiemannFitter* g_originCircleFitter = nullptr;
+}
+
+
+
+const CDCRiemannFitter& CDCRiemannFitter::getFitter()
+{
+  if (not g_fitter) {
+    g_fitter = new CDCRiemannFitter();
+  }
+  return *g_fitter;
+}
+
+
+
+const CDCRiemannFitter& CDCRiemannFitter::getLineFitter()
+{
+  if (not g_lineFitter) {
+    g_lineFitter = new CDCRiemannFitter();
+    g_lineFitter->setLineConstrained();
+  }
+  return *g_lineFitter;
+}
+
+
+
+const CDCRiemannFitter& CDCRiemannFitter::getOriginCircleFitter()
+{
+  if (not g_originCircleFitter) {
+    g_originCircleFitter = new CDCRiemannFitter();
+    g_originCircleFitter->setOriginConstrained();
+  }
+  return *g_originCircleFitter;
+}
+
+
+
+
 CDCRiemannFitter::CDCRiemannFitter() : m_usePosition(true), m_useOrientation(true),
   m_lineConstrained(false) , m_originConstrained(false) {;}
 
 CDCRiemannFitter::~CDCRiemannFitter()
 {
 }
+
+
+
+
+
+
+
+
+
 
 
 CDCTrajectory2D CDCRiemannFitter::fit(const CDCRLWireHitTriple& rlWireHitTriple) const

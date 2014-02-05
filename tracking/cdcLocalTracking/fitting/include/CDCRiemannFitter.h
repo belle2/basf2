@@ -21,10 +21,21 @@ namespace Belle2 {
 
     /// Class implementing the Riemann fit for two dimensional trajectory circle
     class CDCRiemannFitter : public CDCLocalTracking::UsedTObject {
+
+    public:
+
+      ///Static getter for a general riemann fitter
+      static const CDCRiemannFitter& getFitter();
+
+      ///Static getter for a line fitter
+      static const CDCRiemannFitter& getLineFitter();
+
+      ///Static getter for an origin cirlce fitter
+      static const CDCRiemannFitter& getOriginCircleFitter();
+
     public:
 
       ///Empty constructor
-
       CDCRiemannFitter();
 
       ///Empty destructor
@@ -62,8 +73,13 @@ namespace Belle2 {
       bool m_lineConstrained;
       bool m_originConstrained;
 
+    public:
+
       /** ROOT Macro to make CDCRiemannFitter a ROOT class.*/
       ClassDefInCDCLocalTracking(CDCRiemannFitter, 1);
+
+
+
 
     }; //class
 

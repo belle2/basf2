@@ -138,6 +138,10 @@ cdclocaltracking = register_module('CDCLocalTracking')
 
 # select which detectors you would like to use
 
+# CDCSVGDisplayModule - for reassignment
+svgdisplay_reassignment = cdcdisplay.CDCSVGDisplayModule('/tmp')
+svgdisplay_reassignment.draw_reassigned = True
+
 # ---------------------------------------------------------------
 # CDCSVGDisplayModule - for segments
 svgdisplay = cdcdisplay.CDCSVGDisplayModule('/tmp')
@@ -211,6 +215,7 @@ elif options.conformalTracking:
 elif options.legendreTracking:
     main.add_module(cdclegendretracking)
 
+main.add_module(svgdisplay_reassignment)
 main.add_module(svgdisplay)
 main.add_module(svgdisplay_tracks)
 

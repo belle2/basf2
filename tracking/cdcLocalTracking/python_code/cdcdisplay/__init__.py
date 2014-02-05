@@ -84,6 +84,20 @@ class TOFTransperancyMap:
         return str(opacity)
 
 
+class ReassignedSecondaryMap:
+
+    def __call__(self, iCDCHit, cdcHit):
+        relatedMCParticles = cdcHit.getRelationsWith('MCParticles')
+        if relatedMCParticles.size() == 0:
+            return self.bkgHitColor
+        else:
+            mcRelationWeight = relatedMCParticles.weight(0)
+            if mcRelationWeight > 0:
+                return 'green'
+            else:
+                return 'red'
+
+
 class MCParticleColorMap(CDCHitColorMap):
 
     def __init__(self):
@@ -243,6 +257,7 @@ class CDCSVGDisplayModule(Module):
         self.draw_simhits = True and False
         self.draw_rlinfo = True and False
         self.draw_tof = True and False
+        self.draw_reassigned = True and False
 
         self.draw_clusters = True and False
 
@@ -413,7 +428,7 @@ class CDCSVGDisplayModule(Module):
 
     # Draw tof info
         if self.draw_tof:
-            print 'Drawing time of flight of the wirehits'
+            print 'Drawing time of flight of the hits'
             hit_collection = Belle2.PyStoreArray('CDCHits')
             if hit_collection:
                 print '#CDCHits', hit_collection.getEntries(), \
@@ -422,6 +437,19 @@ class CDCSVGDisplayModule(Module):
                 styleDict = {'stroke-width': '1',
                              'stroke': MCParticleColorMap(),
                              'stroke-opacity': TOFTransperancyMap(hit_collection)}
+
+                plotter.append(hit_collection, **styleDict)
+
+     # Draw the reassignment information of hits
+        if self.draw_reassigned:
+            print 'Drawing reassignment information of the hits'
+            hit_collection = Belle2.PyStoreArray('CDCHits')
+            if hit_collection:
+                print '#CDCHits', hit_collection.getEntries(), \
+                    'colored with the reassignment information.'
+
+                styleDict = {'stroke-width': '1',
+                             'stroke': ReassignedSecondaryMap()}
 
                 plotter.append(hit_collection, **styleDict)
 

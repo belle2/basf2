@@ -68,6 +68,7 @@ CDCRiemannFitter::CDCRiemannFitter() : m_usePosition(true), m_useOrientation(tru
 
 CDCRiemannFitter::~CDCRiemannFitter()
 {
+
 }
 
 
@@ -109,8 +110,9 @@ void CDCRiemannFitter::update(CDCTrajectory2D& fit, const CDCRLWireHitTriple& rl
 
   CDCObservations2D observations2D;
   observations2D.append(rlWireHitTriple);
-
-  B2ERROR("CDCRiemannFitter ask to fit a oriented wire hit triple without line constraint.");
+  if (not isLineConstrained()) {
+    B2ERROR("CDCRiemannFitter ask to fit a oriented wire hit triple without line constraint.");
+  }
   update(fit, observations2D);
 
   //Set transverse s reference

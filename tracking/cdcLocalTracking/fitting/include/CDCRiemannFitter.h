@@ -30,7 +30,7 @@ namespace Belle2 {
       ///Static getter for a line fitter
       static const CDCRiemannFitter& getLineFitter();
 
-      ///Static getter for an origin cirlce fitter
+      ///Static getter for an origin circle fitter
       static const CDCRiemannFitter& getOriginCircleFitter();
 
     public:

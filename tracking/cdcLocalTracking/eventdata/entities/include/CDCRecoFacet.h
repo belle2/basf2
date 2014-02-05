@@ -75,6 +75,7 @@ namespace Belle2 {
       const ParameterLine2D& getMiddleToEndLine() const
       { return m_middleToEnd; }
 
+
       void adjustLines() const;
 
       Vector2D getStartRecoPos2D() const
@@ -100,15 +101,16 @@ namespace Belle2 {
       CDCRecoHit2D getEndRecoHit2D() const
       { return CDCRecoHit2D::fromAbsPos2D(&(getEndRLWireHit()), getEndRecoPos2D()); }
 
+
+
       CDCRecoTangent getStartToMiddle() const
-      { return CDCRecoTangent(&(getStartRLWireHit()), &(getMiddleRLWireHit()), getStartToMiddleLine()); }
+      { return CDCRecoTangent(&(getStartRLWireHit()), &(getEndRLWireHit()), getStartToMiddleLine()); }
 
       CDCRecoTangent getStartToEnd() const
       { return CDCRecoTangent(&(getStartRLWireHit()), &(getEndRLWireHit()), getStartToEndLine()); }
 
       CDCRecoTangent getMiddleToEnd() const
       { return CDCRecoTangent(&(getMiddleRLWireHit()), &(getEndRLWireHit()), getMiddleToEndLine()); }
-
 
 
       FloatType getStartPerpS(const CDCTrajectory2D& trajectory2D) const
@@ -118,8 +120,6 @@ namespace Belle2 {
       { return trajectory2D.calcPerpS(getEndRecoPos2D()); }
 
       FloatType getSquaredDist2D(const CDCTrajectory2D& trajectory2D) const;
-
-
 
       /// Sets the do not use flag of the facet's automaton cell and of the three contained wire hits
       void setDoNotUse() const {
@@ -158,6 +158,8 @@ namespace Belle2 {
       mutable ParameterLine2D m_middleToEnd;
 
       AutomatonCell m_automatonCell;
+
+
 
       /// ROOT Macro to make CDCRecoFacet a ROOT class.
       ClassDefInCDCLocalTracking(CDCRecoFacet, 1);

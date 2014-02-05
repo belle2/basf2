@@ -42,6 +42,144 @@ listColors = [  # 'magenta',
     ]
 
 
+class CDCHitColorMap:
+
+    bkgHitColor = 'orange'
+
+    def __call__(self, iCDCHit, cdcHit):
+        return self.bkgHitColor
+
+
+class MCParticleColorMap(CDCHitColorMap):
+
+    def __init__(self):
+        self.color_by_mcparticleId = {-1: self.bkgHitColor}
+
+    def __call__(self, iCDCHit, cdcHit):
+
+        mcParticle = cdcHit.getRelated('MCParticles')
+        if mcParticle:
+            mcParticleId = mcParticle.getArrayIndex()
+        else:
+            mcParticleId = -1
+
+        # cdcSimHit = cdcHit.getRelated("CDCSimHits")
+        # if cdcSimHit:
+        #    cdcSimHitTrackId = cdcSimHit.getTrackId()
+        # else:
+        #    cdcSimHitTrackId = -1
+
+        if mcParticleId in self.color_by_mcparticleId:
+            color = self.color_by_mcparticleId[mcParticleId]
+        else:
+            iColor = len(self.color_by_mcparticleId)
+            iColor = iColor % len(listColors)
+            color = listColors[iColor]
+            self.color_by_mcparticleId[mcParticleId] = color
+
+        return color
+
+
+class MCPDGCodeColorMap(CDCHitColorMap):
+
+    color_by_pdgcode = {
+        -999: CDCHitColorMap.bkgHitColor,
+        11: 'blue',
+        -11: 'blue',
+        13: 'turquoise',
+        -13: 'turquoise',
+        15: 'cyan',
+        -15: 'cyan',
+        211: 'green',
+        -211: 'green',
+        321: 'olive',
+        -321: 'olive',
+        2212: 'red',
+        -2212: 'red',
+        }
+
+    missing_pdg_color = 'lime'
+
+    def __init__(self):
+        pass
+
+    def __call__(self, iCDCHit, cdcHit):
+
+        mcParticle = cdcHit.getRelated('MCParticles')
+        if mcParticle:
+            pdgcode = mcParticle.getPDG()
+        else:
+
+            # getSecondaryPhysicsProcess()
+            pdgcode = -999
+
+        if pdgcode in self.color_by_pdgcode:
+            color = self.color_by_pdgcode[pdgcode]
+        else:
+            print 'Unknown PDG code', pdgcode
+            color = self.missing_pdg_color
+
+        return color
+
+    def __str__(self):
+        legend_head = 'Legend:\n'
+
+        pdg_code_by_color = {}
+
+        for (pdgcode, color) in self.color_by_pdgcode.items():
+            pdg_code_by_color.setdefault(color, [])
+            pdg_code_by_color[color].append(pdgcode)
+
+        legend_content = '\n'.join(str(color) + '->'
+                                   + str(pdg_code_by_color[color])
+                                   for color in pdg_code_by_color)
+
+        return legend_head + legend_content
+
+
+class MCPrimaryColorMap(CDCHitColorMap):
+
+    def __init__(self):
+        self.n_hits_by_secondary_type = {}
+
+    def __call__(self, iCDCHit, cdcHit):
+        mcParticle = cdcHit.getRelated('MCParticles')
+        if mcParticle:
+            primaryFlag = 1
+            isPrimary = mcParticle.hasStatus(primaryFlag)
+            secondaryProcess = mcParticle.getSecondaryPhysicsProcess()
+            if secondaryProcess > 0:
+                motherMCParticle = mcParticle.getMother()
+                secondary_type = (motherMCParticle.getPDG(),
+                                  mcParticle.getPDG())
+            else:
+                motherMCParticle = None
+                secondary_type = (-999, mcParticle.getPDG())
+
+            self.n_hits_by_secondary_type.setdefault(secondary_type, 0)
+            self.n_hits_by_secondary_type[secondary_type] = \
+                self.n_hits_by_secondary_type[secondary_type] + 1
+            if isPrimary:
+                return 'blue'
+            elif secondaryProcess > 200:
+                                          # decay in flight
+                return 'green'
+            else:
+                return 'red'
+        else:
+            return self.bkgHitColor
+
+    def __str__(self):
+        return """
+Legend:
+blue->primary
+green->secondary decay in flight
+red->secondary other process
+orange->beam background
+""" \
+            + str(self.n_hits_by_secondary_type)
+
+
 class CDCSVGDisplayModule(Module):
 
     def __init__(self, output_folder, interactive=True):
@@ -59,10 +197,12 @@ class CDCSVGDisplayModule(Module):
                 os.makedirs(output_folder)
 
         self.draw_wires = True  # and False
-        self.draw_wirehits = True  # and False
-        self.draw_hits = True and False
+        self.draw_wirehits = True and False
+        self.draw_hits = True  # and False
 
-        self.draw_mctracks = True and False
+        self.draw_mcparticles = True and False
+        self.draw_mcpdgcodes = True and False
+        self.draw_mcprimary = True and False
 
         self.draw_mcvertices = True and False
 
@@ -78,14 +218,19 @@ class CDCSVGDisplayModule(Module):
         self.draw_segmenttriples = True and False
         self.draw_tracks = True and False
 
-        self.draw_gftrackcands = True  # and False
+        self.draw_gftrackcands = True and False
 
         self.draw_segmenttriple_trajectories = True and False
         self.draw_segment_trajectories = True and False
-        self.draw_gftrackcand_trajectories = True  # and False
+        self.draw_gftrackcand_trajectories = True and False
 
         self.draw_superlayer_boundaries = True  # and False
         self.draw_interactionpoint = True  # and False
+
+    @property
+    def drawoptions(self):
+        return [option for option in self.__dict__ if option.startswith('draw_'
+                )]
 
     def initialize(self):
         print 'initialize()'
@@ -149,7 +294,7 @@ class CDCSVGDisplayModule(Module):
 
                 plotter.append(wirehit_collection, **styleDict)
 
-    # Draw the raw CDCHits
+        # Draw the raw CDCHits
         if self.draw_hits:
             print 'Drawing the CDCHits'
             cdchit_storearray = Belle2.PyStoreArray('CDCHits')
@@ -158,39 +303,56 @@ class CDCSVGDisplayModule(Module):
                 styleDict = {'stroke': 'orange', 'stroke-width': '0.2'}
                 plotter.append(cdchit_storearray, **styleDict)
 
-    # Draw  mctracks
-        if self.draw_mctracks:
-            print 'Drawing the Monte Carlo Tracks'
-            wirehit_storeobj = Belle2.PyStoreObj('CDCAllWireHitCollection')
-            if wirehit_storeobj:
-                wirehit_collection = wirehit_storeobj.obj()
-                print '#WireHits', wirehit_collection.size(), \
-                    'colored with the Track id'
+        # Draw  mcparticle id
+        if self.draw_mcparticles:
+            print 'Drawing the MC Particless'
+            cdchits_storearray = Belle2.PyStoreArray('CDCHits')
 
-                mcLookUp = Belle2.CDCLocalTracking.CDCMCLookUp.Instance()
-                color_by_trackId = {}
+            if cdchit_storearray:
+                print '#CDCHits', cdchit_storearray.getEntries(), \
+                    'colored with the mc particle id'
 
-                def color_map(iWireHit, wirehit):
-                    trackId = int(mcLookUp.getMajorMCTrackId(wirehit))
-          # trackId = int(mcLookUp.getSimTrackId(wirehit))
-          # trackId = int(mcLookUp.getMCTrackId(wirehit))
+                styleDict = {'stroke-width': '0.5',
+                             'stroke': MCParticleColorMap()}
+                    # 'stroke-opacity': '0.5',
 
-                    if trackId not in color_by_trackId:
-                        iColor = len(color_by_trackId)
-                        iColor = iColor % len(listColors)
-                        color = listColors[iColor]
-                        color_by_trackId[trackId] = color
-                    else:
-                        color = color_by_trackId[trackId]
+                plotter.append(cdchit_storearray, **styleDict)
 
-                    return color
+        # Draw monte carlo pdg codes
+        if self.draw_mcpdgcodes:
+            print 'Drawing the Monte Carlo pdg codes'
+            cdchits_storearray = Belle2.PyStoreArray('CDCHits')
 
-                styleDict = {'stroke-width': '1', 'stroke': color_map,
-                             'stroke-opacity': '0.5'}
+            if cdchit_storearray:
+                print '#CDCHits', cdchit_storearray.getEntries(), \
+                    'colored with the pdg codes'
+                color_map = MCPDGCodeColorMap()
 
-                plotter.append(wirehit_collection, **styleDict)
+                styleDict = {'stroke-width': '0.5', 'stroke': color_map}
+                    # 'stroke-opacity': '0.5',
 
-    # Draw SimHits
+                plotter.append(cdchit_storearray, **styleDict)
+
+                print str(color_map)
+
+        # Draw monte carlo pdg codes
+        if self.draw_mcprimary:
+            print 'Drawing the Monte Carlo pdg codes'
+            cdchits_storearray = Belle2.PyStoreArray('CDCHits')
+
+            if cdchit_storearray:
+                print '#CDCHits', cdchit_storearray.getEntries(), \
+                    'colored with the pdg codes'
+                color_map = MCPrimaryColorMap()
+
+                styleDict = {'stroke-width': '0.5', 'stroke': color_map}
+                    # 'stroke-opacity': '0.5',
+
+                plotter.append(cdchit_storearray, **styleDict)
+
+                print str(color_map)
+
+        # Draw SimHits
         if self.draw_simhits:
             print 'Drawing simulated hits'
             simhits_storearray = Belle2.PyStoreArray('CDCSimHits')
@@ -385,7 +547,7 @@ class CDCSVGDisplayModule(Module):
     # Draw the genfit track candidates
         if self.draw_gftrackcands:
             print 'Drawing exported Genfit tracks'
-            gftrackcand_storearray = Belle2.PyStoreArray('GFTrackCands')
+            gftrackcand_storearray = Belle2.PyStoreArray('TrackCands')
             if gftrackcand_storearray:
                 print '#Genfit tracks', gftrackcand_storearray.getEntries()
 
@@ -457,7 +619,7 @@ class CDCSVGDisplayModule(Module):
     # Draw the trajectories of the genfit track candidates
         if self.draw_gftrackcand_trajectories:
             print 'Drawing trajectories of the exported Genfit tracks'
-            gftrackcand_storearray = Belle2.PyStoreArray('GFTrackCands')
+            gftrackcand_storearray = Belle2.PyStoreArray('TrackCands')
             if gftrackcand_storearray:
                 print '#Genfit tracks', gftrackcand_storearray.getEntries()
 

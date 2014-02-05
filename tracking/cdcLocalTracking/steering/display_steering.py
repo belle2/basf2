@@ -146,8 +146,9 @@ svgdisplay.draw_wires = True  # and False
 svgdisplay.draw_hits = True and False
 
 # Objects only drawable with local tracking
-svgdisplay.draw_mctracks = True and False
+svgdisplay.draw_mcparticles = True and False
 svgdisplay.draw_mcvertices = True and False
+svgdisplay.draw_mcpdgcodes = True and False
 svgdisplay.draw_simhits = True and False
 svgdisplay.draw_rlinfo = True and False
 svgdisplay.draw_tof = True and False

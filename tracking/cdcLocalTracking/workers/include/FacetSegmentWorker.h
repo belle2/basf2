@@ -278,9 +278,9 @@ namespace Belle2 {
       std::vector< CDCRecoTangentCollection > m_recoTangentSegments;
 #endif
 
-      std::vector< CDCRecoSegment2D > m_recoSegments;
+      std::vector<CDCRecoSegment2D> m_recoSegments;
 
-      Clusterizer< CDCWireHitCollection, CDCWireHitCluster > m_wirehitClusterizer;
+      Clusterizer<CDCWireHit, CDCWireHitCluster> m_wirehitClusterizer;
 
       std::vector<CDCWireHitCluster> m_clusters;
 

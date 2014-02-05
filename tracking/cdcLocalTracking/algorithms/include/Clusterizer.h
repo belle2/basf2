@@ -36,7 +36,7 @@ namespace Belle2 {
      *  The collection container must support BOOST_FOREACH for iteration over its ::value_type.
      *  Cluster can be anything that is default constructable and supports .insert(end(),const value_type *item).
      * The neighborhood given to the clusterizer must be of type WeightedNeighborhood<const value_type>*/
-    template<class Collection, class Cluster>
+    template<class Item, class Cluster>
     class Clusterizer {
 
     public:
@@ -48,14 +48,14 @@ namespace Belle2 {
       ~Clusterizer() {;}
 
     private:
-      typedef typename Collection::value_type Item; /// Contained item type
       typedef WeightedNeighborhood<const Item> Neighborhood; /// Neighborhood type
 
     public:
 
       /// Creates the clusters.
       /** Take the collection and its assoziated neighborhood and appends the clusters to the cluster vector give by non const reference*/
-      void create(const Collection& items,
+      template<class ItemRange>
+      void create(const ItemRange& items,
                   const Neighborhood& neighborhood,
                   std::vector<Cluster>& clusters) const {
 
@@ -64,7 +64,7 @@ namespace Belle2 {
         clusters.reserve(30);
 
         int iCluster = -1;
-        BOOST_FOREACH(Item const & item , items) {
+        for (Item const & item : items) {
 
           if (item.getAutomatonCell().getCellState() == -1) {
 
@@ -80,8 +80,9 @@ namespace Belle2 {
 
     private:
       /// Helper function. Sets all cell states to -1.
-      inline void prepareCellStates(const Collection& items) const {
-        BOOST_FOREACH(Item const & item , items) {
+      template<class ItemRange>
+      inline void prepareCellStates(const ItemRange& items) const {
+        for (Item const & item : items) {
           item.getAutomatonCell().setCellState(-1);
         }
       }

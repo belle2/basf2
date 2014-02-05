@@ -75,8 +75,28 @@ namespace Belle2 {
       typedef typename Container::reverse_iterator reverse_iterator; ///< Reversed iterator type of this container
       typedef typename Container::const_reverse_iterator const_reverse_iterator;  ///< Constant reversed iterator type of this container
 
-      typedef std::pair<iterator, iterator> range; ///< Pair type of iterators indicating a range
-      typedef std::pair<const_iterator, const_iterator> const_range; ///< Pair type of constant iterators indication a range
+      //typedef std::pair<iterator, iterator> range; ///<
+      //typedef std::pair<const_iterator, const_iterator> const_range; ///< Pair type of constant iterators indication a range
+
+      /// Type for a pair of iterators which are iterable with range based for.
+      class range : public std::pair<iterator, iterator> {
+      public:
+        range(const std::pair<iterator, iterator>& iterator_pair) : std::pair<iterator, iterator>(iterator_pair) {;}
+        range(const iterator& begin, const iterator& end) : std::pair<iterator, iterator>(begin, end) {;}
+
+        const iterator& begin() const { return this->first;}
+        const iterator& end() const { return this->second;}
+      };
+
+      /// Type for a pair of constant iterators which are iterable with range based for.
+      class const_range : public std::pair<const_iterator, const_iterator> {
+      public:
+        const_range(const std::pair<const_iterator, const_iterator>& iterator_pair) : std::pair<const_iterator, const_iterator>(iterator_pair) {;}
+        const_range(const const_iterator& begin, const const_iterator& end) : std::pair<const_iterator, const_iterator>(begin, end) {;}
+
+        const const_iterator& begin() const { return this->first;}
+        const const_iterator& end() const { return this->second;}
+      };
 
       /// Input iterator type usable with stl algorithms
       class input_iterator : public std::iterator<std::output_iterator_tag, void, void, void, void> {

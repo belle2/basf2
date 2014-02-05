@@ -13,7 +13,7 @@
 #include <cstddef> //for size_t
 #include <limits>
 
-#include <Rtypes.h> //for nullptr remove for c++11  !!
+//#include <Rtypes.h> //for nullptr remove for c++11  !!
 
 namespace Belle2 {
 
@@ -108,7 +108,7 @@ namespace Belle2 {
 
 
 
-  }
+  } // namespace CDCLocalTracking
 
 } // namespace Belle2
 #endif // BASICTYPES

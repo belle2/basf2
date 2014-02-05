@@ -46,6 +46,35 @@ TEST_F(CDCLocalTrackingTest, CDCGenHitVector_empty)
 
 }
 
+TEST_F(CDCLocalTrackingTest, CDCGenHitVector_range)
+{
+
+  CDCGenHit lowestGenHit;
+  CDCGenHitVector<CDCGenHit> collection;
+
+  collection.push_back(lowestGenHit);
+  collection.push_back(lowestGenHit);
+  collection.push_back(lowestGenHit);
+  collection.push_back(lowestGenHit);
+
+  int counter = 0;
+  for (CDCGenHit & genHit : collection) {
+    ++counter;
+  }
+
+  EXPECT_EQ(4, counter);
+
+  counter = 0;
+  CDCGenHitVector<CDCGenHit>::range range_for_item = collection.equal_range(lowestGenHit);
+  for (CDCGenHit & genHit : range_for_item) {
+    ++counter;
+  }
+
+  EXPECT_EQ(4, counter);
+
+}
+
+
 
 TEST_F(CDCLocalTrackingTest, CDCGenHitVector_sort)
 {

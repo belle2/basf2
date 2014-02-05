@@ -77,28 +77,28 @@ namespace Belle2 {
 
       void adjustLines() const;
 
-      Vector2D getStartRefPos2D() const
+      Vector2D getStartRecoPos2D() const
       { return Vector2D::average(getStartToMiddleLine().at(0), getStartToEndLine().at(0)); }
 
-      Vector2D getMiddleRefPos2D() const
+      Vector2D getMiddleRecoPos2D() const
       { return Vector2D::average(getStartToMiddleLine().at(1), getMiddleToEndLine().at(0)); }
 
-      Vector2D getEndRefPos2D() const
+      Vector2D getEndRecoPos2D() const
       { return Vector2D::average(getStartToEndLine().at(1), getMiddleToEndLine().at(1)); }
 
       Vector2D getCenterOfMass2D() const
-      { return Vector2D::average(getStartRefPos2D(), getMiddleRefPos2D(), getEndRefPos2D()); }
+      { return Vector2D::average(getStartRecoPos2D(), getMiddleRecoPos2D(), getEndRecoPos2D()); }
 
 
 
       CDCRecoHit2D getStartRecoHit2D() const
-      { return CDCRecoHit2D::fromAbsPos2D(&(getStartRLWireHit()), getStartRefPos2D()); }
+      { return CDCRecoHit2D::fromAbsPos2D(&(getStartRLWireHit()), getStartRecoPos2D()); }
 
       CDCRecoHit2D getMiddleRecoHit2D() const
-      { return CDCRecoHit2D::fromAbsPos2D(&(getMiddleRLWireHit()), getMiddleRefPos2D()); }
+      { return CDCRecoHit2D::fromAbsPos2D(&(getMiddleRLWireHit()), getMiddleRecoPos2D()); }
 
       CDCRecoHit2D getEndRecoHit2D() const
-      { return CDCRecoHit2D::fromAbsPos2D(&(getEndRLWireHit()), getEndRefPos2D()); }
+      { return CDCRecoHit2D::fromAbsPos2D(&(getEndRLWireHit()), getEndRecoPos2D()); }
 
       CDCRecoTangent getStartToMiddle() const
       { return CDCRecoTangent(&(getStartRLWireHit()), &(getMiddleRLWireHit()), getStartToMiddleLine()); }
@@ -112,10 +112,10 @@ namespace Belle2 {
 
 
       FloatType getStartPerpS(const CDCTrajectory2D& trajectory2D) const
-      { return trajectory2D.calcPerpS(getStartRefPos2D()); }
+      { return trajectory2D.calcPerpS(getStartRecoPos2D()); }
 
       FloatType getEndPerpS(const CDCTrajectory2D& trajectory2D) const
-      { return trajectory2D.calcPerpS(getEndRefPos2D()); }
+      { return trajectory2D.calcPerpS(getEndRecoPos2D()); }
 
       FloatType getSquaredDist2D(const CDCTrajectory2D& trajectory2D) const;
 

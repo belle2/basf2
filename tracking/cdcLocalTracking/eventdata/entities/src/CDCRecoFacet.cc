@@ -111,13 +111,13 @@ void CDCRecoFacet::adjustLines() const
 FloatType CDCRecoFacet::getSquaredDist2D(const CDCTrajectory2D& trajectory2D) const
 {
 
-  FloatType distance = trajectory2D.getDist2D(getStartRefPos2D());
+  FloatType distance = trajectory2D.getDist2D(getStartRecoPos2D());
   FloatType result = distance * distance;
 
-  distance = trajectory2D.getDist2D(getMiddleRefPos2D());
+  distance = trajectory2D.getDist2D(getMiddleRecoPos2D());
   result += distance * distance;
 
-  distance = trajectory2D.getDist2D(getEndRefPos2D());
+  distance = trajectory2D.getDist2D(getEndRecoPos2D());
   result += distance * distance;
 
   return result;

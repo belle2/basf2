@@ -81,6 +81,7 @@ void ROIDQMModule::defineHisto()
 
   createHistosDictionaries();
 
+  oldDir->cd();
 
 }
 
@@ -101,9 +102,9 @@ void ROIDQMModule::initialize()
 
 void ROIDQMModule::event()
 {
+
   n_events++;
 
-  //  m_aGeometry = VXD::GeoCache::getInstance();
   StoreArray<ROIid> ROIs(m_ROIsName);
   StoreArray<PXDRawHit> PXDRawHits;
   StoreArray<PXDIntercept> Intercepts(m_InterceptsName);
@@ -774,6 +775,23 @@ void ROIDQMModule::createHistosDictionaries()
                                 )
                               )
                              );
+
+        // ROI center
+        name = "hROIcenter_" + sensorid;
+        title = "ROI center " + sensorid;
+        tmp2D = new TH2F(name.c_str(), title.c_str(), nPixelsU, 0, nPixelsU, nPixelsV, 0, nPixelsV);
+        tmp2D->GetXaxis()->SetTitle(" U (ID)");
+        tmp2D->GetYaxis()->SetTitle(" V (ID)");
+        hROIDictionary.insert(pair< Belle2::VxdID, ROIHistoAndFill >
+                              (
+                                (Belle2::VxdID)*itPxdSensors,
+                                ROIHistoAndFill(
+                                  tmp2D,
+        [](TH1 * hPtr, const ROIid * roi) { hPtr->Fill((roi->getMaxUid() + roi->getMinUid()) / 2, (roi->getMaxVid() + roi->getMinVid()) / 2); }
+                                )
+                              )
+                             );
+
         //--------------------------
 
         itPxdSensors++;

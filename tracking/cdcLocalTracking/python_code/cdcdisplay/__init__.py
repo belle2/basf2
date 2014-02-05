@@ -42,12 +42,38 @@ listColors = [  # 'magenta',
     ]
 
 
+class CDCHitStrokeWidthMap:
+
+    def __call__(self, iCDCHit, cdcHit):
+        return 0.2
+
+
+class ZeroDriftLengthStrokeWidthMap(CDCHitStrokeWidthMap):
+
+    def __call__(self, iCDCHit, cdcHit):
+        wirehit = Belle2.CDCLocalTracking.CDCWireHit(cdcHit, 0)
+        if wirehit.getRefDriftLength() == 0.0:
+            return 1
+        else:
+            return 0.2
+
+
 class CDCHitColorMap:
 
     bkgHitColor = 'orange'
 
     def __call__(self, iCDCHit, cdcHit):
         return self.bkgHitColor
+
+
+class ZeroDriftLengthColorMap(CDCHitColorMap):
+
+    def __call__(self, iCDCHit, cdcHit):
+        wirehit = Belle2.CDCLocalTracking.CDCWireHit(cdcHit, 0)
+        if wirehit.getRefDriftLength() == 0.0:
+            return 'red'
+        else:
+            return self.bkgHitColor
 
 
 class RLColorMap(CDCHitColorMap):
@@ -304,8 +330,8 @@ class CDCSVGDisplayModule(Module):
 
         plotter = svgdrawing.CDCSVGPlotter()
 
-    # Draw wires from cdcwire objects
-    # Now prefered way of ploting the wires
+        # Draw wires from cdcwire objects
+        # Now prefered way of ploting the wires
         if self.draw_wires:
             print 'Drawing wires'
             theCDCWireTopology = \
@@ -317,39 +343,15 @@ class CDCSVGDisplayModule(Module):
                     wire = wirelayer.getWireSave(iWire)
                     plotter.append(wire, stroke='gray')
 
-    # Draw wirehits
-        if self.draw_wirehits:
-            print 'Drawing the wirehits'
-            wirehit_storeobj = Belle2.PyStoreObj('CDCAllWireHitCollection')
-
-            if wirehit_storeobj:
-                wirehit_collection = wirehit_storeobj.obj()
-                print '#Wirehits', wirehit_collection.size()
-
-                def stroke_width_map(iWirehit, wirehit):
-                    if wirehit.getRefDriftLength() == 0.0:
-                        return '1'
-                    else:
-                        return '0.4'
-
-                def stroke_map(iWirehit, wirehit):
-                    if wirehit.getRefDriftLength() == 0.0:
-                        return 'yellow'
-                    else:
-                        return 'red'
-
-                styleDict = {'stroke-opacity': '0.5', 'stroke': stroke_map,
-                             'stroke-width': stroke_width_map}
-
-                plotter.append(wirehit_collection, **styleDict)
-
+        # Draw wirehits or
         # Draw the raw CDCHits
-        if self.draw_hits:
+        if self.draw_hits or self.draw_wirehits:
             print 'Drawing the CDCHits'
             cdchit_storearray = Belle2.PyStoreArray('CDCHits')
             if cdchit_storearray:
                 print '#CDCHits', cdchit_storearray.getEntries()
-                styleDict = {'stroke': 'orange', 'stroke-width': '0.2'}
+                styleDict = {'stroke': ZeroDriftLengthColorMap(),
+                             'stroke-width': ZeroDriftLengthStrokeWidthMap()}
                 plotter.append(cdchit_storearray, **styleDict)
 
         # Draw  mcparticle id

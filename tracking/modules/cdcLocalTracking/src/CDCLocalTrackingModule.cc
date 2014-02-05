@@ -58,10 +58,6 @@ CDCLocalTrackingModule::~CDCLocalTrackingModule()
 void CDCLocalTrackingModule::initialize()
 {
 
-#ifdef CDCLOCALTRACKING_USE_ROOT
-  StoreObjPtr< CDCWireHitCollection >::registerTransient("CDCAllWireHitCollection");
-#endif
-
   //output collection
   StoreArray < genfit::TrackCand >::registerPersistent(m_param_gfTrackCandColName);
 
@@ -119,27 +115,11 @@ void CDCLocalTrackingModule::event()
     B2WARNING("Event with no hits - skipping");
     return;
   }
+  CDCWireHitTopology::CDCWireHitRange allWireHitRange = wireHitTopology.getWireHits();
 
-#ifdef CDCLOCALTRACKING_USE_ROOT
-  B2DEBUG(100, "  Getting storedCDCWireHits from DataStore");
-  StoreObjPtr< CDCWireHitCollection > storeCDCWireHits("CDCAllWireHitCollection");
-  storeCDCWireHits.create();
-  B2DEBUG(100, "  storedCDCWireHits.isValid() == " <<  storeCDCWireHits.isValid())
-  B2DEBUG(100, "  storedCDCWireHits->size() == " <<  storeCDCWireHits->size());
-  CDCWireHitCollection& nonConstAllWireHits = *storeCDCWireHits;
-#else
-  B2DEBUG(100, "  Allocating CDCWireHitNeighborhood");
-  CDCWireHitCollection nonConstAllWireHits;
-#endif
 
-  //Fill the wireHits
-  B2DEBUG(100, "  Creating the CDCWireHits");
-  m_wirehitCreator.create(storedCDCHits, nonConstAllWireHits);
-  B2DEBUG(100, "  Created " << nonConstAllWireHits.size() << " CDCWireHits");
 
-  //use a constant reference to prevent any alteration of the wirehits from this point on
-  const CDCWireHitCollection& allWireHits = nonConstAllWireHits;
-  B2DEBUG(100, "  Created " << allWireHits.size() << " CDCWireHits");
+
   //CALLGRIND_STOP_INSTRUMENTATION;
 
 #ifdef CDCLOCALTRACKING_USE_MC_FILTERS
@@ -155,16 +135,17 @@ void CDCLocalTrackingModule::event()
   //create mc look up
   CDCMCLookUp& mcLookUp = CDCMCLookUp::Instance();
   mcLookUp.clear();
-  mcLookUp.addAllSimHits(allWireHits, storedCDCHits, storedSimhits);
-  mcLookUp.addAllMCParticle(allWireHits, storedCDCHits, storedMCParticles);
+  mcLookUp.addAllSimHits(allWireHitRange, storedCDCHits, storedSimhits);
+  mcLookUp.addAllMCParticle(allWireHitRange, storedCDCHits, storedMCParticles);
 #endif
 
-  //mcLookUp.checkSimToMCTrackIdEquivalence(allWireHits);
+
+
 
   //CALLGRIND_START_INSTRUMENTATION;
   //build the segments
   m_recoSegments.clear();
-  m_segmentWorker.apply(allWireHits, m_recoSegments);
+  m_segmentWorker.apply(allWireHitRange, m_recoSegments);
   B2DEBUG(100, "Received " << m_recoSegments.size() << " RecoSegments from worker");
 
 

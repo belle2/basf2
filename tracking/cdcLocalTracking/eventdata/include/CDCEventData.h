@@ -23,7 +23,6 @@ namespace Belle2 {
 
 
     //some additional transient types for exchange between creator objects
-    typedef CDCWireHitVector CDCWireHitCollection;
     typedef CDCRecoFacetVector CDCRecoFacetCollection;
 
   }

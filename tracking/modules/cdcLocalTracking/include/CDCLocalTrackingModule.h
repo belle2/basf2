@@ -15,8 +15,6 @@
 
 #include <tracking/cdcLocalTracking/typedefs/UsedDataHolders.h>
 
-#include <tracking/cdcLocalTracking/creators/WireHitCreator.h> //no decisions to optimize
-
 #include <tracking/cdcLocalTracking/workers/FacetSegmentWorker.h>
 
 #include <tracking/cdcLocalTracking/creator_filters/SimpleFacetFilter.h>
@@ -80,8 +78,6 @@ namespace Belle2 {
   private:
 
     std::string m_param_gfTrackCandColName; /**< Name of the output collection of genfit::TrackCands */
-
-    CDCLocalTracking::WireHitCreator m_wirehitCreator;
 
 
 #ifdef CDCLOCALTRACKING_USE_MC_FILTERS

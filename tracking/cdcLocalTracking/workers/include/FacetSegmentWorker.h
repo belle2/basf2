@@ -65,7 +65,9 @@ namespace Belle2 {
 
       }
 
-      inline void apply(const CDCWireHitCollection& wirehits,
+
+      template<class CDCWireHitRange>
+      inline void apply(const CDCWireHitRange& wirehits,
                         std::vector< CDCRecoSegment2D >& outputSegments) {
 
         //which recosegment should be show in the output

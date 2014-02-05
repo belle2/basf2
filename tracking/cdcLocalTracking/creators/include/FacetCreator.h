@@ -136,22 +136,15 @@ namespace Belle2 {
 
     private:
 
-      template<class GenericWireHitCollection, class GenericFacetCollection>
-      void createFacetsGeneric(const GenericWireHitCollection& wirehits,
+      template<class MayBePtrCDCWireHitRange, class GenericFacetCollection>
+      void createFacetsGeneric(const MayBePtrCDCWireHitRange& wirehits,
                                const Neighborhood& neighborhood,
                                GenericFacetCollection& facets) const {
-
         m_filter.clear();
+        for (const auto & middleWireHit : wirehits) {
+          //auto can be either CDCWireHit or CDCWireHit*
 
-        //size_t nGroupsOfThree = 0;
-
-        for (typename GenericWireHitCollection::const_iterator itMiddleWireHit = wirehits.begin();
-             itMiddleWireHit != wirehits.end() ;  ++itMiddleWireHit) {
-
-          const typename GenericWireHitCollection::Item& middleWireHit = *itMiddleWireHit;
-          const CDCWireHit* ptrMiddleWireHit = &(*middleWireHit);
-
-          Neighborhood::range nextNeighborRange = neighborhood.equal_range(ptrMiddleWireHit);
+          Neighborhood::range neighbors = neighborhood.equal_range(middleWireHit);
 
           for (Neighborhood::iterator itStartWireHit = nextNeighborRange.first;
                itStartWireHit != nextNeighborRange.second; ++itStartWireHit) {
@@ -165,10 +158,6 @@ namespace Belle2 {
 
               //skip combinations where the facet starts and ends on the same wire
               if (not(ptrStartWireHit->getWire() ==  ptrEndWireHit->getWire())) {
-                //B2DEBUG(200,"Building facets for");
-                //B2DEBUG(200,"Start hit " <<  startWireHit->getWire());
-                //B2DEBUG(200,"Middle hit " <<  middleWireHit->getWire());
-                //B2DEBUG(200,"End hit " <<  endWireHit->getWire());
 
                 createFacetsForHitTriple(ptrStartWireHit, ptrMiddleWireHit, ptrEndWireHit, facets);
                 //++nGroupsOfThree;
@@ -194,32 +183,23 @@ namespace Belle2 {
         CDCWireHitTopology::CDCRLWireHitRange endRLWireHits = cdcWireHitTopology.getRLWireHits(*endWireHit);
 
         for (const CDCRLWireHit & startRLWireHit : startRLWireHits) {
-
           for (const CDCRLWireHit & middleRLWireHit : middleRLWireHits) {
-
             for (const CDCRLWireHit & endRLWireHit : endRLWireHits) {
-
 
               CDCRecoFacet facet(&startRLWireHit, &middleRLWireHit, &endRLWireHit, ParameterLine2D());
               // do not set the lines yet. The filter shall do that if he wants to.
               // He should set them if he accepts the facet.
 
+              //Obtain a constant interface to pass to the filter method following
               const CDCRecoFacet& constFacet = facet;
 
               CellState cellWeight = m_filter.isGoodFacet(constFacet);
 
               if (not isNotACell(cellWeight)) {
                 facet.getAutomatonCell().setCellWeight(cellWeight);
-
-                //typename GenericFacetCollection::iterator itNewFacet =
                 facets.insert(facets.end(), facet);
-
-                //itNewFacet->getAutomatonCell().setCellWeight(cellWeight);
-
               }
-
             } //end for endRLWireHit
-
           } //end for middleRLWireHit
         } //end for startRLWireHit
       }

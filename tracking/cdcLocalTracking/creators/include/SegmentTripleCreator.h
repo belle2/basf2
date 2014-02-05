@@ -187,11 +187,10 @@ namespace Belle2 {
           CellWeight cellWeight = m_filter.isGoodTriple(triple);
 
           if (not isNotACell(cellWeight)) {
-
+            triple.getAutomatonCell().setCellWeight(cellWeight);
+            segmentTriples.insert(triple);
             // insert a copy in the set
-            const CDCSegmentTriple& newTriple = *(segmentTriples.insert(triple).first);
-
-            newTriple.getAutomatonCell().setCellWeight(cellWeight);
+            // const CDCSegmentTriple& newTriple = *(segmentTriples.insert(triple).first);
 
           }
         }

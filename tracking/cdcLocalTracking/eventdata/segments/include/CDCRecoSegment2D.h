@@ -29,6 +29,9 @@ namespace Belle2 {
       ~CDCRecoSegment2D() {;}
 
       /// Getter for the automaton cell.
+      AutomatonCell& getAutomatonCell() { return m_automatonCell; }
+
+      /// Constant getter for the automaton cell.
       AutomatonCell& getAutomatonCell() const { return m_automatonCell; }
 
     private:

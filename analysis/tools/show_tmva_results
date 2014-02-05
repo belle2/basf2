@@ -2,6 +2,12 @@
 # show_tma_results.sh TMVA.root
 # Shows Control Plots for a training stored in root file created by TMVATeacher
 
+if [ $# -ne 1 ]
+then
+  echo "Usage: show_tmva_results TMVA_TRAINING_OUTPUT"
+  exit 1
+fi
+
 #get full path
 FILE=`readlink -f "$1"`
 

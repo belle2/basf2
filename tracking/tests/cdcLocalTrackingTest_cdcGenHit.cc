@@ -8,27 +8,32 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../include/CDCGenHit.h"
+#include <gtest/gtest.h>
+#include "cdcLocalTrackingTest.h"
+
+#include <tracking/cdcLocalTracking/eventdata/entities/CDCGenHit.h>
+#include <tracking/cdcLocalTracking/topology/CDCWire.h>
+#include <tracking/cdcLocalTracking/topology/CDCWireTopology.h>
 
 using namespace std;
+
 using namespace Belle2;
 using namespace CDCLocalTracking;
 
-ClassImpInCDCLocalTracking(CDCGenHit)
-
-CDCGenHit::CDCGenHit():
-  m_wire(&(CDCWire::getLowest())),
-  m_dummyPos(0.0, 0.0)
-{;}
-
-CDCGenHit::CDCGenHit(const WireID& wireID, const Vector2D& dummyPos):
-  m_wire(CDCWire::getInstance(wireID)),
-  m_dummyPos(dummyPos)
-{;}
-
-
-CDCGenHit::~CDCGenHit()
+// Tests if CDCGenHitVector can handle CDCWireHits
+TEST_F(CDCLocalTrackingTest, CDCGenHit_totalOrdering)
 {
+  CDCGenHit lowestGenHit;
+  CDCGenHit secondLowestGenHit(WireID(0, 0, 1), Vector2D(0.0, 0.0));
+  CDCGenHit thirdLowestGenHit(WireID(0, 0, 1), Vector2D(0.0, 1.0));
+
+  ASSERT_LT(lowestGenHit, secondLowestGenHit);
+  ASSERT_LT(secondLowestGenHit, thirdLowestGenHit);
+  ASSERT_LT(lowestGenHit, thirdLowestGenHit);
 
 }
+
+
+
+
 

@@ -10,6 +10,8 @@
 #ifndef CDCCOLLECTIONS_H
 #define CDCCOLLECTIONS_H
 
+#include "CDCGenHitVector.h"
+
 #include "CDCWireHitPtrSet.h"
 #include "CDCWireHitSet.h"
 #include "CDCWireHitVector.h"

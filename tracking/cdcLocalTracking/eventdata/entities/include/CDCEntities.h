@@ -11,6 +11,7 @@
 #define CDCENTITIES_H
 
 //Convenience header
+#include "CDCGenHit.h"
 
 #include "CDCWireHit.h"
 #include "CDCRecoHit2D.h"

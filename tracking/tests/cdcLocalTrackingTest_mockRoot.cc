@@ -20,9 +20,7 @@
 //Types supporting mock root
 #include <tracking/cdcLocalTracking/geometry/Vector2D.h>
 #include <tracking/cdcLocalTracking/geometry/Vector3D.h>
-#include <tracking/cdcLocalTracking/eventdata/entities/CDCGenHit.h>
-#include <tracking/cdcLocalTracking/eventdata/collections/CDCGenHitVector.h>
-#include <tracking/cdcLocalTracking/eventdata/entities/CDCWireHit.h>
+#include <tracking/cdcLocalTracking/eventdata/CDCEventData.h>
 
 using namespace Belle2;
 using namespace CDCLocalTracking;
@@ -36,8 +34,15 @@ typedef ::testing::Types <
 Vector2D,
 Vector3D,
 CDCGenHit,
-CDCGenHitVector<CDCGenHit>
+CDCGenHitVector<CDCGenHit>,
+CDCGenHitVector<CDCWireHit>,
+CDCWireHitVector,
+CDCRecoHit2DVector,
+CDCRecoTangentVector,
+CDCRecoFacetVector,
+CDCRecoHit3DVector
 > MockRootTypes;
+
 
 TYPED_TEST_CASE(CDCLocalTrackingMockRootTest, MockRootTypes);
 

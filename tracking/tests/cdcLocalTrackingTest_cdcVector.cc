@@ -16,6 +16,7 @@
 
 //#include <tracking/cdcLocalTracking/eventdata/entities/CDCWireHit.h>
 #include <tracking/cdcLocalTracking/eventdata/entities/CDCGenHit.h>
+#include <tracking/cdcLocalTracking/eventdata/entities/Compare.h>
 #include <tracking/cdcLocalTracking/eventdata/collections/CDCVector.h>
 #include <tracking/cdcLocalTracking/eventdata/collections/CDCWireHitVector.h>
 #include <tracking/cdcLocalTracking/topology/CDCWire.h>
@@ -50,27 +51,44 @@ TEST_F(CDCLocalTrackingTest, CDCVector_range)
 {
 
   CDCGenHit lowestGenHit;
+  CDCGenHit largerGenHitOnFirstWire(WireID(0, 0, 0), Vector2D(0.0, 1.0));
   CDCVector<CDCGenHit> collection;
 
   collection.push_back(lowestGenHit);
   collection.push_back(lowestGenHit);
   collection.push_back(lowestGenHit);
   collection.push_back(lowestGenHit);
+  collection.push_back(largerGenHitOnFirstWire);
 
   int counter = 0;
   for (CDCGenHit & genHit : collection) {
     ++counter;
   }
+  EXPECT_EQ(5, counter);
 
-  EXPECT_EQ(4, counter);
+
 
   counter = 0;
+
   CDCVector<CDCGenHit>::range range_for_item = collection.equal_range(lowestGenHit);
+  EXPECT_EQ(4, std::distance(range_for_item.first, range_for_item.second));
+
   for (CDCGenHit & genHit : range_for_item) {
-    ++counter;
+    EXPECT_EQ(lowestGenHit, genHit);
   }
 
-  EXPECT_EQ(4, counter);
+
+
+  // Test the coalignment of wires and the generic dummy hits
+  const CDCWire& firstWire = CDCWire::getLowest();
+  range_for_item = collection.equal_range(firstWire);
+
+  EXPECT_EQ(5, std::distance(range_for_item.first, range_for_item.second));
+
+  for (CDCGenHit & genHit : range_for_item) {
+    EXPECT_EQ(firstWire, genHit.getWire());
+  }
+
 
 }
 

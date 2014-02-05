@@ -14,7 +14,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
-#include <tracking/cdcLocalTracking/eventdata/entities/CDCWireHit.h>
+//#include <tracking/cdcLocalTracking/eventdata/entities/CDCWireHit.h>
 #include <tracking/cdcLocalTracking/eventdata/entities/CDCGenHit.h>
 #include <tracking/cdcLocalTracking/eventdata/entities/CDCGenHitVector.h>
 #include <tracking/cdcLocalTracking/eventdata/collections/CDCWireHitVector.h>
@@ -27,22 +27,20 @@ using namespace Belle2;
 using namespace CDCLocalTracking;
 
 // Tests if CDCGenHitVector can handle CDCWireHits
-TEST_F(CDCLocalTrackingTest, CDCGenHitVector_WithCDCWireHits)
+TEST_F(CDCLocalTrackingTest, CDCGenHitVector_empty)
 {
 
-  const CDCWireTopology& theWireTopology  = CDCWireTopology::getInstance();
-  const CDCWire& firstWire = theWireTopology.first();
+  const CDCWireTopology& wireTopology  = CDCWireTopology::getInstance();
+  const CDCWire& firstWire = wireTopology.first();
 
-  WireID wireID = WireID(firstWire);
+  CDCGenHit genHit(firstWire, Vector2D(0.0, 0.0));
 
-  CDCWireHit wirehit(firstWire, 0.0);
-
-  CDCGenHitVector<CDCWireHit> collection;
+  CDCGenHitVector<CDCGenHit> collection;
   //CDCWireHitVector collection;
 
   ASSERT_TRUE(collection.empty());
 
-  collection.push_back(wirehit);
+  collection.push_back(genHit);
 
   ASSERT_FALSE(collection.empty());
 

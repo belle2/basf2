@@ -53,7 +53,7 @@ namespace Belle2 {
     /** details */
 
     template<class T>
-    class CDCGenHitVector : public TObject {
+    class CDCGenHitVector : public CDCLocalTracking::UsedTObject {
 
     private:
       typedef std::vector<T> Container; ///< std::vector to be wrapped
@@ -422,7 +422,7 @@ namespace Belle2 {
 
     private:
       /// ROOT Macro to make CDCGenHitVector a ROOT class.
-      ClassDef(CDCGenHitVector, 1);
+      ClassDefInCDCLocalTracking(CDCGenHitVector, 1);
 
     }; //class
 

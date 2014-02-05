@@ -96,7 +96,11 @@ def process_dir(
     executable_mode = stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH
     for tools_file in get_files(os.path.join(dir_name, 'tools', '*'),
                                 release_dir):
-        if os.stat(str(tools_file)).st_mode & executable_mode \
+        executable_file = str(tools_file)
+        if not os.path.exists(executable_file):
+            executable_file = os.path.join(os.environ['BELLE2_RELEASE_DIR'],
+                    executable_file)
+        if os.stat(executable_file).st_mode & executable_mode \
             == executable_mode:
             executable_files.append(tools_file)
 

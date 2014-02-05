@@ -252,10 +252,10 @@ class CDCDataobjectsConverter:
         styleDict = {'stroke': 'black', 'stroke-width': '0.02'}
         styleDict.update(kwd)
 
-        fromPoint = (recotangent.getFromRefTouch2D().x(),
-                     recotangent.getFromRefTouch2D().y())
-        toPoint = (recotangent.getToRefTouch2D().x(),
-                   recotangent.getToRefTouch2D().y())
+        fromPoint = (recotangent.getFromRecoPos2D().x(),
+                     recotangent.getFromRecoPos2D().y())
+        toPoint = (recotangent.getToRecoPos2D().x(),
+                   recotangent.getToRecoPos2D().y())
 
         lineElement = self.svgElementFactory.createLine(fromPoint, toPoint,
                 **styleDict)

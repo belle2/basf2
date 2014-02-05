@@ -83,8 +83,8 @@ namespace Belle2 {
       /// Print tangent for debugging
       friend ostream& operator<<(ostream& output, const CDCRecoTangent& tangent) {
         output << "RecoTangent" << std::endl;
-        output << "From : " << tangent.getFromWireHit()->getWire() << " " <<  tangent.getFromRefDisp2D() << std::endl;
-        output << "To : " << tangent.getToWireHit()->getWire() << " " <<  tangent.getToRefDisp2D()  << std::endl;
+        output << "From : " << tangent.getFromWireHit()->getWire() << " " <<  tangent.getFromRecoDisp2D() << std::endl;
+        output << "To : " << tangent.getToWireHit()->getWire() << " " <<  tangent.getToRecoDisp2D()  << std::endl;
         return output;
       }
 
@@ -98,28 +98,28 @@ namespace Belle2 {
 
 
       /// Getter for the touching point of the tangent to the first drift circle
-      const Vector2D& getFromRefTouch2D() const
+      const Vector2D& getFromRecoPos2D() const
       { return getLine().support(); }
 
       /// Getter for displacement of the touching point from the first wire in the reference plane
-      Vector2D getFromRefDisp2D() const
-      { return getFromRefTouch2D() - getFromWireHit()->getRefPos2D(); }
+      Vector2D getFromRecoDisp2D() const
+      { return getFromRecoPos2D() - getFromWireHit()->getRefPos2D(); }
 
       /// Getter for the touching point of the tangent to the second drift circle
-      Vector2D getToRefTouch2D() const
+      Vector2D getToRecoPos2D() const
       { return  getLine().at(1); }
 
       /// Getter for displacement of the touching point from the second wire in the reference plane
-      Vector2D getToRefDisp2D() const
-      { return getToRefTouch2D() - getToWireHit()->getRefPos2D(); }
+      Vector2D getToRecoDisp2D() const
+      { return getToRecoPos2D() - getToWireHit()->getRefPos2D(); }
 
       /// Getter for the vector from the first to the second touch point.*/
-      const Vector2D& getRefFlightVec2D() const
+      const Vector2D& getFlightVec2D() const
       { return getLine().tangential(); }
 
       /// Returns the cosine of the angle between the two flight directions of the tangents.
       double getCosFlightDifference(const CDCRecoTangent& tangent) const
-      { return getRefFlightVec2D().cosWith(tangent.getRefFlightVec2D()); }
+      { return getFlightVec2D().cosWith(tangent.getFlightVec2D()); }
 
       /// Gets the center of the tangent half way from one touch point to the other
       Vector2D getCenterOfMass2D() const
@@ -129,11 +129,11 @@ namespace Belle2 {
 
       /// Getter for the reconstructed hit on the first oriented wire hit using reconstructed touch point as position
       CDCRecoHit2D getFromRecoHit2D() const
-      { return CDCRecoHit2D::fromAbsPos2D(&(getFromRLWireHit()), getFromRefTouch2D()); }
+      { return CDCRecoHit2D::fromAbsPos2D(&(getFromRLWireHit()), getFromRecoPos2D()); }
 
       /// Getter for the reconstructed hit on the second oriented wire hit using reconstructed touch point as position
       CDCRecoHit2D getToRecoHit2D() const
-      { return CDCRecoHit2D::fromAbsPos2D(&(getToRLWireHit()), getToRefTouch2D()); }
+      { return CDCRecoHit2D::fromAbsPos2D(&(getToRLWireHit()), getToRecoPos2D()); }
 
 
 
@@ -143,7 +143,7 @@ namespace Belle2 {
        *  calculates the arc length from the reference point on the circle.
        *  @return The arc length on the circle from the reference */
       FloatType getStartPerpS(const CDCTrajectory2D& trajectory2D) const
-      { return trajectory2D.calcPerpS(getFromRefTouch2D()); }
+      { return trajectory2D.calcPerpS(getFromRecoPos2D()); }
 
       /// Estimate the transvers travel distance on the given circle of the second touch point
       /** Uses the point of closest approach on the circle
@@ -151,7 +151,7 @@ namespace Belle2 {
        *  calculates the arc length from the reference point on the circle.
        *  @return The arc length on the circle from the reference */
       FloatType getEndPerpS(const CDCTrajectory2D& trajectory2D) const
-      { return trajectory2D.calcPerpS(getToRefTouch2D()); }
+      { return trajectory2D.calcPerpS(getToRecoPos2D()); }
 
       /// Calculates the squared distance of the tangent to a circle as see from the transvers plane.
       FloatType getSquaredDist2D(const CDCTrajectory2D& trajectory2D) const;

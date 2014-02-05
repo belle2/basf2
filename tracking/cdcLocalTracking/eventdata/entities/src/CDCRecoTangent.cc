@@ -108,14 +108,14 @@ void CDCRecoTangent::reverse()
 CDCRecoTangent CDCRecoTangent::reversed() const
 {
   return CDCRecoTangent(CDCRLWireHitPair::reversed(),
-                        ParameterLine2D::throughPoints(getToRefTouch2D(), getFromRefTouch2D()));
+                        ParameterLine2D::throughPoints(getToRecoPos2D(), getFromRecoPos2D()));
 }
 
 /** This returns sum of the squared distances of the two touch points to the circle */
 FloatType CDCRecoTangent::getSquaredDist2D(const  CDCTrajectory2D& trajectory2D) const
 {
-  FloatType fromDistance =  trajectory2D.getDist2D(getFromRefTouch2D());
-  FloatType toDistance   =  trajectory2D.getDist2D(getToRefTouch2D());
+  FloatType fromDistance =  trajectory2D.getDist2D(getFromRecoPos2D());
+  FloatType toDistance   =  trajectory2D.getDist2D(getToRecoPos2D());
   return fromDistance * fromDistance + toDistance * toDistance;
 }
 

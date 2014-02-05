@@ -58,8 +58,12 @@ namespace Belle2 {
       friend bool operator<(const CDCAxialRecoSegment2D* axialSegment, CDCAxialAxialSegmentPair const& segmentTriple)
       { return axialSegment < segmentTriple.getStart(); }
 
-
       const CDCAxialAxialSegmentPair* operator->() const { return this; }
+
+      /// Checks the references to the contained three segment for nullptrs
+      bool checkSegments() const
+      { return not(m_startSegment == nullptr or m_endSegment == nullptr); }
+
 
       ILayerType getStartISuperLayer() const
       { return getStart() == nullptr ? INVALIDSUPERLAYER : getStart()->getISuperLayer(); }
@@ -73,7 +77,7 @@ namespace Belle2 {
       const CDCAxialRecoSegment2D*   getEnd()     const { return m_endSegment; }
       void setEnd(const CDCAxialRecoSegment2D* endSegment) { m_endSegment = endSegment; }
 
-      const CDCTrajectory2D& getTrajectory2D() const
+      CDCTrajectory2D& getTrajectory2D() const
       { return m_trajectory2D; }
 
       void setTrajectory2D(const CDCTrajectory2D& trajectory2D) const

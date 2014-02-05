@@ -39,15 +39,14 @@ namespace Belle2 {
 
       void clear() {;}
 
-      bool isGoodPair(const CDCAxialRecoSegment2D& startSegment,
-                      const CDCAxialRecoSegment2D& endSegment);
+      bool isGoodAxialAxialSegmentPair(const CDCAxialAxialSegmentPair& axialAxialSegmentPair);
 
+      CellWeight isGoodSegmentTriple(const CDCSegmentTriple& triple);
 
-      CellWeight isGoodTriple(const CDCSegmentTriple& triple);
-
-      CellState isGoodTriple(const CDCAxialRecoSegment2D& startSegment,
-                             const CDCStereoRecoSegment2D& middleSegment,
-                             const CDCAxialRecoSegment2D& endSegment);
+    private:
+      CellWeight isGoodTriple(const CDCAxialRecoSegment2D& startSegment,
+                              const CDCStereoRecoSegment2D& middleSegment,
+                              const CDCAxialRecoSegment2D& endSegment);
 
       void setTrajectoryOf(const CDCSegmentTriple& segmentTriple);
 

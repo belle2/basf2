@@ -39,21 +39,20 @@ namespace Belle2 {
       void clear();
 
       /// Checks if a pair of axial segments is a good combination
-      bool isGoodPair(const CDCAxialRecoSegment2D& startSegment,
-                      const CDCAxialRecoSegment2D& endSegment);
+      bool isGoodAxialAxialSegmentPair(const CDCAxialAxialSegmentPair& startToEndAxialAxialSegmentPair);
 
       /// Checks if a triple of axial, stereo and axial segments is a good combination to be stored as an automaton cell
       /** Checks the proper alignement and the quality of connection between all three segments.
        *  Returns NOT_A_CELL if the connection shall not be made or a finit value be used as the cell weight of the cell to constructed. */
-      CellWeight isGoodTriple(const CDCSegmentTriple& triple);
+      CellWeight isGoodSegmentTriple(const CDCSegmentTriple& triple);
 
-      CellState isGoodTriple(const CDCAxialRecoSegment2D& startSegment,
-                             const CDCStereoRecoSegment2D& middleSegment,
-                             const CDCAxialRecoSegment2D& endSegment);
+    private:
+      CellWeight isGoodTriple(const CDCAxialRecoSegment2D& startSegment,
+                              const CDCStereoRecoSegment2D& middleSegment,
+                              const CDCAxialRecoSegment2D& endSegment);
 
       /// Set the circle fit and the sz of the segment triple to be stored as a cell
       void setTrajectoryOf(const CDCSegmentTriple& segmentTriple);
-
 
     private:
       /// Type to store fits to segments

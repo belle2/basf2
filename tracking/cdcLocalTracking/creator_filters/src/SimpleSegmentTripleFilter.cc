@@ -40,8 +40,24 @@ void SimpleSegmentTripleFilter::clear()
 }
 
 
-bool SimpleSegmentTripleFilter::isGoodPair(const CDCAxialRecoSegment2D& startSegment, const CDCAxialRecoSegment2D& endSegment)
+bool SimpleSegmentTripleFilter::isGoodAxialAxialSegmentPair(const CDCAxialAxialSegmentPair& axialAxialSegmentPair)
 {
+
+  const CDCAxialRecoSegment2D* ptrStartSegment = axialAxialSegmentPair.getStart();
+  const CDCAxialRecoSegment2D* ptrEndSegment = axialAxialSegmentPair.getEnd();
+
+  if (ptrStartSegment == nullptr) {
+    B2ERROR("SimpleSegmentTripleFilter::isGoodAxialAxialSegmentPair invoked with nullptr as start segment");
+    return false;
+  }
+
+  if (ptrEndSegment == nullptr) {
+    B2ERROR("SimpleSegmentTripleFilter::isGoodAxialAxialSegmentPair invoked with nullptr as end segment");
+    return false;
+  }
+
+  const CDCAxialRecoSegment2D& startSegment = *ptrStartSegment;
+  const CDCAxialRecoSegment2D& endSegment = *ptrEndSegment;
 
   //do fits
   const CDCTrajectory2D& startFit = getXYFit(startSegment);
@@ -115,31 +131,42 @@ bool SimpleSegmentTripleFilter::isGoodPair(const CDCAxialRecoSegment2D& startSeg
 }
 
 
-CellState SimpleSegmentTripleFilter::isGoodTriple(const CDCSegmentTriple& triple)
+CellWeight SimpleSegmentTripleFilter::isGoodSegmentTriple(const CDCSegmentTriple& segmentTriple)
 {
 
-  const CDCAxialRecoSegment2D* start = triple.getStart();
-  const CDCStereoRecoSegment2D* middle = triple.getMiddle();
-  const CDCAxialRecoSegment2D* end = triple.getEnd();
+  const CDCAxialRecoSegment2D* ptrStartSegment = segmentTriple.getStart();
+  const CDCStereoRecoSegment2D* ptrMiddleSegment = segmentTriple.getMiddle();
+  const CDCAxialRecoSegment2D* ptrEndSegment = segmentTriple.getEnd();
 
-  if (start == nullptr or middle == nullptr or end == nullptr) {
+  if (ptrStartSegment == nullptr) {
+    B2ERROR("MCSegmentTripleFilter::isGoodSegmentTriple invoked with nullptr as start segment");
     return NOT_A_CELL;
-  } else {
-
-    CellWeight result = isGoodTriple(*start, *middle, *end);
-    if (not isNotACell(result)) {
-      setTrajectoryOf(triple);
-    }
-    return result;
-
   }
+  if (ptrMiddleSegment == nullptr) {
+    B2ERROR("MCSegmentTripleFilter::isGoodSegmentTriple invoked with nullptr as middle segment");
+    return NOT_A_CELL;
+  }
+  if (ptrEndSegment == nullptr) {
+    B2ERROR("MCSegmentTripleFilter::isGoodSegmentTriple invoked with nullptr as end segment");
+    return NOT_A_CELL;
+  }
+
+  const CDCAxialRecoSegment2D& startSegment = *ptrStartSegment;
+  const CDCAxialRecoSegment2D& middleSegment = *ptrMiddleSegment;
+  const CDCAxialRecoSegment2D& endSegment = *ptrEndSegment;
+
+  CellWeight result = isGoodTriple(startSegment, middleSegment, endSegment);
+  if (not isNotACell(result)) {
+    setTrajectoryOf(segmentTriple);
+  }
+  return result;
 
 }
 
 
-CellState SimpleSegmentTripleFilter::isGoodTriple(const CDCAxialRecoSegment2D& startSegment,
-                                                  const CDCStereoRecoSegment2D& middleSegment,
-                                                  const CDCAxialRecoSegment2D& endSegment)
+CellWeight SimpleSegmentTripleFilter::isGoodTriple(const CDCAxialRecoSegment2D& startSegment,
+                                                   const CDCStereoRecoSegment2D& middleSegment,
+                                                   const CDCAxialRecoSegment2D& endSegment)
 {
 
   //check if the middle segment lies within the acceptable bounds in angular deviation

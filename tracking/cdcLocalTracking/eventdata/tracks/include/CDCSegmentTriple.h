@@ -69,13 +69,17 @@ namespace Belle2 {
 
       const CDCSegmentTriple* operator->() const { return this; }
 
+      /// Checks the references to the contained three segment for nullptrs
+      bool checkSegments() const
+      { return CDCAxialAxialSegmentPair::checkSegments() and not(m_middleSegment == nullptr); }
+
       ILayerType getMiddleISuperLayer() const
       { return getMiddle() == nullptr ? INVALIDSUPERLAYER : getMiddle()->getISuperLayer(); }
 
       const CDCStereoRecoSegment2D* getMiddle()  const { return m_middleSegment; }
       void setMiddle(const CDCStereoRecoSegment2D* middleSegment) { m_middleSegment = middleSegment; }
 
-      const CDCTrajectorySZ& getTrajectorySZ() const
+      CDCTrajectorySZ& getTrajectorySZ() const
       { return m_trajectorySZ; }
 
       void setTrajectorySZ(const CDCTrajectorySZ& trajectorySZ) const

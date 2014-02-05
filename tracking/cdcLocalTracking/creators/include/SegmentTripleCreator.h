@@ -152,6 +152,7 @@ namespace Belle2 {
       }
 
 
+
       inline void createForAxialSuperLayerPair(
         const std::vector<const CDCAxialRecoSegment2D* >& startSegments,
         const std::vector<const CDCStereoRecoSegment2D* >& middleSegments,
@@ -159,39 +160,50 @@ namespace Belle2 {
         std::set< CDCSegmentTriple >& segmentTriples
       ) const {
 
-        BOOST_FOREACH(const CDCAxialRecoSegment2D * startSegment, startSegments) {
-          BOOST_FOREACH(const CDCAxialRecoSegment2D * endSegment, endSegments) {
+        CDCSegmentTriple segmentTriple;
 
-            if (startSegment != endSegment and m_filter.isGoodPair(*startSegment, *endSegment)) {
+        for (const CDCAxialRecoSegment2D * startSegment : startSegments) {
+          for (const CDCAxialRecoSegment2D * endSegment : endSegments) {
 
-              createForSegmentPair(startSegment, middleSegments, endSegment, segmentTriples);
+            segmentTriple.setStart(startSegment);
+            segmentTriple.setMiddle(nullptr);
+            segmentTriple.setEnd(endSegment);
+            segmentTriple.getTrajectory2D().clear();
+            segmentTriple.getTrajectorySZ().clear();
+
+            const CDCAxialAxialSegmentPair& axialAxialSegmentPair = segmentTriple;
+            if (not axialAxialSegmentPair.checkSegments()) {
+              B2ERROR("CDCAxialAxialSegmentPair containing nullptr encountered in SegmentTripleCreator");
+              continue;
+            }
+
+            if (startSegment != endSegment and m_filter.isGoodAxialAxialSegmentPair(axialAxialSegmentPair)) {
+
+              for (const CDCAxialRecoSegment2D * middleSegment : middleSegments) {
+
+                segmentTriple.setMiddle(middleSegment);
+                segmentTriple.getTrajectorySZ().clear();
+
+                if (not segmentTriple.checkSegments()) {
+                  B2ERROR("CDCSegmentTriple containing nullptr encountered in SegmentTripleCreator");
+                  continue;
+                }
+
+                // Ask the filter to asses this triple
+                CellWeight cellWeight = m_filter.isGoodSegmentTriple(segmentTriple);
+
+                if (not isNotACell(cellWeight)) {
+                  segmentTriple.getAutomatonCell().setCellWeight(cellWeight);
+                  segmentTriples.insert(segmentTriples.end(), segmentTriple);
+                  // insert a copy in the set
+                  // const CDCSegmentTriple& newTriple = *(segmentTriples.insert(triple).first);
+
+                }
+              }
 
             } else {
               //B2DEBUG(100,"    Check makesGoodPair false");
             }
-          }
-        }
-      }
-
-      inline void createForSegmentPair(const CDCAxialRecoSegment2D* startSegment,
-                                       const std::vector<const CDCStereoRecoSegment2D* >& middleSegments,
-                                       const CDCAxialRecoSegment2D* endSegment,
-                                       std::set<CDCSegmentTriple>& segmentTriples) const {
-
-        BOOST_FOREACH(const CDCAxialRecoSegment2D * middleSegment, middleSegments) {
-
-          // Create a segment to work on. The middle segment is not yet assigned and is initialized to nullptr
-          CDCSegmentTriple triple(startSegment, middleSegment, endSegment);
-
-          // Ask the filter to asses this triple
-          CellWeight cellWeight = m_filter.isGoodTriple(triple);
-
-          if (not isNotACell(cellWeight)) {
-            triple.getAutomatonCell().setCellWeight(cellWeight);
-            segmentTriples.insert(triple);
-            // insert a copy in the set
-            // const CDCSegmentTriple& newTriple = *(segmentTriples.insert(triple).first);
-
           }
         }
       }

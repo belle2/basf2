@@ -19,7 +19,7 @@ ClassImpInCDCLocalTracking(CDCSegmentTriple)
 
 
 CDCSegmentTriple::CDCSegmentTriple() :
-  CDCAxialAxialSegmentPair(nullptr, nullptr),
+  CDCAxialAxialSegmentPair(),
   m_middleSegment(nullptr)
 {;}
 

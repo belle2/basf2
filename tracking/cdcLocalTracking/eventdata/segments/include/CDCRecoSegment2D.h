@@ -18,13 +18,30 @@
 namespace Belle2 {
   namespace CDCLocalTracking {
 
+    /// A segment consisting of two dimensional reconsturcted hits
+    class CDCRecoSegment2D : public CDCRecoHit2DVector {
+    public:
 
-    //for now a typedef is enough
-    //may get additional methods if necessary
-    /// A segment consisting of three dimensional reconsturcted hits
-    typedef CDCRecoHit2DVector CDCRecoSegment2D;
+      /// Default constructor for ROOT compatibility.
+      CDCRecoSegment2D() {;}
+
+      /// Empty deconstructor
+      ~CDCRecoSegment2D() {;}
+
+      /// Getter for the automaton cell.
+      AutomatonCell& getAutomatonCell() const { return m_automatonCell; }
+
+    private:
+      mutable AutomatonCell m_automatonCell; ///< Memory for the automaton cell. It is declared mutable because it can vary rather freely despite of the hit content might be required fixed
+
+    private:
+      /// ROOT Macro to make CDCRecoSegment2D a ROOT class.
+      ClassDefInCDCLocalTracking(CDCRecoSegment2D, 1);
 
 
-  } // namespace CDCLocalTracking
-} // namespace Belle2
+
+    }; //end class CDCRecoSegment2D
+
+  } // end namespace CDCLocalTracking
+} // end namespace Belle2
 #endif // CDCRECOSEGMENT2D_H_

@@ -126,10 +126,10 @@ namespace Belle2 {
                  itTriple != segmentTripleTrack.end(); ++itTriple) {
               const CDCSegmentTriple* triple = *itTriple;
 
-              triple->setFlags(DO_NOT_USE);
-              triple->getStart()->setFlags(DO_NOT_USE);
-              triple->getMiddle()->setFlags(DO_NOT_USE);
-              triple->getEnd()->setFlags(DO_NOT_USE);
+              triple->getAutomatonCell().setFlags(DO_NOT_USE);
+              triple->getStart()->getAutomatonCell().setFlags(DO_NOT_USE);
+              triple->getMiddle()->getAutomatonCell().setFlags(DO_NOT_USE);
+              triple->getEnd()->getAutomatonCell().setFlags(DO_NOT_USE);
               //B2DEBUG(100,facet << " " <<
               //            facet->hasAnyFlags(DO_NOT_USE) << " " <<
               //            facet->getFlags() << " " <<
@@ -142,9 +142,9 @@ namespace Belle2 {
 
               const CDCSegmentTriple& triple = *itTriple;
 
-              if (triple.getStart()->hasAnyFlags(DO_NOT_USE) or
-                  triple.getMiddle()->hasAnyFlags(DO_NOT_USE) or
-                  triple.getEnd()->hasAnyFlags(DO_NOT_USE)) {
+              if (triple.getStart()->getAutomatonCell().hasAnyFlags(DO_NOT_USE) or
+                  triple.getMiddle()->getAutomatonCell().hasAnyFlags(DO_NOT_USE) or
+                  triple.getEnd()->getAutomatonCell().hasAnyFlags(DO_NOT_USE)) {
 
                 triple.setFlags(DO_NOT_USE);
 

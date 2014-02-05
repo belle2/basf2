@@ -49,7 +49,7 @@ namespace Belle2 {
     /** details */
 
     template<class T>
-    class CDCVector : public AutomatonCell {
+    class CDCVector : public UsedTObject {
 
     private:
       typedef std::vector<T> Container; ///< std::vector to be wrapped

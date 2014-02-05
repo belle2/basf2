@@ -20,26 +20,26 @@ using namespace CDCLocalTracking;
 ClassImpInCDCLocalTracking(CDCWireHit)
 
 CDCWireHit::CDCWireHit():
-  AutomatonCell(1),
   m_wire(&(CDCWire::getLowest())),
   m_hit(nullptr), m_iHit(-1),
-  m_refDriftLength(0)
+  m_refDriftLength(0),
+  m_automatonCell(1)
 {;}
 
 CDCWireHit::CDCWireHit(const CDCWire* wire):
-  AutomatonCell(1),
   m_wire(wire),
   m_hit(nullptr),
   m_iHit(-1),
-  m_refDriftLength(0.0)
+  m_refDriftLength(0.0),
+  m_automatonCell(1)
 {;}
 
 CDCWireHit::CDCWireHit(const CDCHit* hit, int iHit):
-  AutomatonCell(1),
   m_wire(CDCWire::getInstance(*hit)),
   m_hit(hit),
   m_iHit(iHit),
-  m_refDriftLength(0.0)
+  m_refDriftLength(0.0),
+  m_automatonCell(1)
 {
   m_refDriftLength = CDCWireHit::TDCCountTranslatorInstance().getDriftLength(hit->getTDCCount());
   //m_refDriftLength = CDCWireHit::TDCCountTranslatorInstance().getDriftLength(hit->getTDCCount(),
@@ -50,11 +50,11 @@ CDCWireHit::CDCWireHit(const CDCHit* hit, int iHit):
 }
 
 CDCWireHit::CDCWireHit(const WireID& wireID, const FloatType& driftLength):
-  AutomatonCell(1),
   m_wire(CDCWire::getInstance(wireID)),
   m_hit(nullptr),
   m_iHit(-1),
-  m_refDriftLength(driftLength)
+  m_refDriftLength(driftLength),
+  m_automatonCell(1)
 {;}
 
 /** Destructor. */

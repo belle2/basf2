@@ -34,7 +34,7 @@ namespace Belle2 {
      *  Also it keeps the index of the CDCHit in the StoreArray since we will need it for later output to genfit::TrackCands \n
      */
 
-    class CDCWireHit : public AutomatonCell {
+    class CDCWireHit : public UsedTObject {
 
     public:
 
@@ -162,6 +162,8 @@ namespace Belle2 {
       /// Getter for the index  of the hit in the StoreArray holding this hit.
       int getStoreIHit() const { return m_iHit; }
 
+      /// Getter for the automaton cell.
+      AutomatonCell& getAutomatonCell() const { return m_automatonCell; }
 
       /** @name Mimic pointer
         */
@@ -228,6 +230,7 @@ namespace Belle2 {
       const CDCHit* m_hit;   ///< Memory for the CDCWire reference
       int m_iHit; ///< Memory for the index into the storing StoreArray<CDCHit>
       FloatType m_refDriftLength; ///< Memory for the drift length at the wire reference point
+      mutable AutomatonCell m_automatonCell; ///< Memory for the automaton cell. Marked it as mutable since its content should be changeable when if the wire and drift length information are required to be constant.
 
     private:
       /// Static variable for lowest possible wire hit

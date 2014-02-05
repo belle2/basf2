@@ -11,9 +11,8 @@
 #include "../include/CDCRecoTangent.h"
 
 #include <cmath>
-#include <TObjArray.h>
 
-
+#include <tracking/cdcLocalTracking/eventtopology/CDCWireHitTopology.h>
 
 using namespace std;
 using namespace Belle2;
@@ -22,70 +21,64 @@ using namespace CDCLocalTracking;
 
 ClassImpInCDCLocalTracking(CDCRecoTangent)
 
-CDCRecoTangent::CDCRecoTangent():
-  m_wirehits(&(CDCWireHit::getLowest()) , &(CDCWireHit::getLowest())),
-  m_fromRLInfo(LEFT),
-  m_toRLInfo(LEFT)
-{;}
 
-CDCRecoTangent::CDCRecoTangent(
-  const CDCWireHit* fromWireHit,
-  const RightLeftInfo& fromRL,
 
-  const CDCWireHit* toWireHit,
-  const RightLeftInfo& toRL
-) :
-  m_wirehits(fromWireHit, toWireHit),
-  m_fromRLInfo(fromRL),
-  m_toRLInfo(toRL)
+CDCRecoTangent::CDCRecoTangent(): CDCRLWireHitPair(), m_line() {;}
+
+
+
+CDCRecoTangent::CDCRecoTangent(const CDCRLWireHitPair& rlWireHitPair):
+  CDCRLWireHitPair(rlWireHitPair), m_line()
 {
   adjustLine();
-  if (fromWireHit == nullptr) B2WARNING("Tangent with nullptr as wire hit");
-  if (toWireHit == nullptr) B2WARNING("Tangent with nullptr as wire hit");
 }
+
+
+
+CDCRecoTangent::CDCRecoTangent(const CDCRLWireHit* fromRLWireHit, const CDCRLWireHit* toRLWireHit):
+  CDCRLWireHitPair(fromRLWireHit, toRLWireHit), m_line()
+{
+  adjustLine();
+}
+
+
+
+CDCRecoTangent::CDCRecoTangent(const CDCRLWireHitPair& rlWireHitPair, const ParameterLine2D& line):
+  CDCRLWireHitPair(rlWireHitPair), m_line(line)
+{;}
+
+
+
+CDCRecoTangent::CDCRecoTangent(const CDCRLWireHit* fromRLWireHit, const CDCRLWireHit* toRLWireHit, const ParameterLine2D& line):
+  CDCRLWireHitPair(fromRLWireHit, toRLWireHit), m_line(line)
+{;}
+
+
 
 CDCRecoTangent::CDCRecoTangent(
   const CDCRecoHit2D& fromRecoHit,
   const CDCRecoHit2D& toRecoHit
-) :
-  m_wirehits(fromRecoHit.getWireHit(), toRecoHit.getWireHit()),
-  m_fromRLInfo(fromRecoHit.getRLInfo()),
-  m_toRLInfo(toRecoHit.getRLInfo()),
+):
+  CDCRLWireHitPair(CDCWireHitTopology::getInstance().getRLWireHit(*(fromRecoHit.getWireHit()), fromRecoHit.getRLInfo()),
+                   CDCWireHitTopology::getInstance().getRLWireHit(*(toRecoHit.getWireHit()), toRecoHit.getRLInfo())),
   m_line(ParameterLine2D::throughPoints(fromRecoHit.getRefPos2D(),
                                         toRecoHit.getRefPos2D()))
 {;}
 
 
-CDCRecoTangent::CDCRecoTangent(
-  const CDCWireHit* fromWireHit,
-  const RightLeftInfo& fromRL,
 
-  const CDCWireHit* toWireHit,
-  const RightLeftInfo& toRL,
-  const ParameterLine2D& line
-) :
-  m_wirehits(fromWireHit, toWireHit),
-  m_fromRLInfo(fromRL),
-  m_toRLInfo(toRL),
-  m_line(line)
-{
-  if (fromWireHit == nullptr) B2WARNING("Tangent with nullptr as wire hit");
-  if (toWireHit == nullptr) B2WARNING("Tangent with nullptr as wire hit");
-}
-
-
-
-/** Destructor. */
 CDCRecoTangent::~CDCRecoTangent() {;}
+
+
 
 void CDCRecoTangent::adjustLine()
 {
 
   m_line  = constructTouchingLine(
-              getFromWireHit()->getRefPos2D(),
-              getFromRLInfo() * getFromWireHit()->getRefDriftLength() ,
-              getToWireHit()->getRefPos2D(),
-              getToRLInfo() * getToWireHit()->getRefDriftLength()
+              getFromWireHit().getRefPos2D(),
+              getFromRLInfo() * getFromWireHit().getRefDriftLength() ,
+              getToWireHit().getRefPos2D(),
+              getToRLInfo() * getToWireHit().getRefDriftLength()
             );
 
 }
@@ -93,25 +86,18 @@ void CDCRecoTangent::adjustLine()
 void CDCRecoTangent::adjustRLInfo()
 {
 
-  if (getFromWireHit()->getRefDriftLength() == 0.0) {
-    m_fromRLInfo = 0;
-  } else {
-    m_fromRLInfo = getLine().isRightOrLeft(getFromWireHit()->getRefPos2D());
-  }
-  if (getToWireHit()->getRefDriftLength() == 0.0) {
-    m_toRLInfo = 0;
-  } else {
-    m_toRLInfo   = getLine().isRightOrLeft(getToWireHit()->getRefPos2D());
-  }
+  RightLeftInfo newFromRLInfo = getLine().isRightOrLeft(getFromWireHit()->getRefPos2D());
+  setFromRLInfo(newFromRLInfo);
+
+  RightLeftInfo newToRLInfo = getLine().isRightOrLeft(getToWireHit()->getRefPos2D());
+  setToRLInfo(newToRLInfo);
 
 }
 
 void CDCRecoTangent::reverse()
 {
-  std::swap(m_wirehits.first, m_wirehits.second);
-  std::swap(m_fromRLInfo, m_toRLInfo);
-  m_fromRLInfo = -m_fromRLInfo;
-  m_toRLInfo   = -m_toRLInfo;
+
+  CDCRLWireHitPair::reverse();
 
   //reverse the direction of flight
   m_line.reverse();
@@ -122,9 +108,7 @@ void CDCRecoTangent::reverse()
 
 CDCRecoTangent CDCRecoTangent::reversed() const
 {
-
-  return CDCRecoTangent(getToWireHit(),  -getToRLInfo(),
-                        getFromWireHit(), -getFromRLInfo(),
+  return CDCRecoTangent(CDCRLWireHitPair::reversed(),
                         ParameterLine2D::throughPoints(getToRefTouch2D(), getFromRefTouch2D()));
 }
 
@@ -136,25 +120,6 @@ FloatType CDCRecoTangent::getSquaredDist2D(const  CDCTrajectory2D& trajectory2D)
   return fromDistance * fromDistance + toDistance * toDistance;
 }
 
-
-
-
-/** Prints all wires contained in the collection mainly for debuging */
-/*ostream& operator<<(ostream& output, const CDCRecoTangent& tangent){
-  output << "RecoTangent" << endl;
-  output << "From : " << *(tangent.getFromRecoHit().getWire()) << endl;
-  output << "To : " << *(tangent.getToRecoHit().getWire()) << endl;
-  return output;
-}*/
-
-const CDCWireHit* CDCRecoTangent::commonWireHit(const CDCRecoTangent& recoTangent) const
-{
-
-  if (getFromWireHit() != nullptr and recoTangent.hasWireHit(*getFromWireHit())) return getFromWireHit();
-  else if (getFromWireHit() != nullptr and recoTangent.hasWireHit(*getToWireHit())) return getToWireHit();
-  else return nullptr;
-
-}
 
 
 ParameterLine2D CDCRecoTangent::constructTouchingLine(

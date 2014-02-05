@@ -141,10 +141,9 @@ namespace Belle2 {
                                const Neighborhood& neighborhood,
                                GenericFacetCollection& facets) const {
         m_filter.clear();
-        for (const auto & middleWireHit : wirehits) {
-          //auto can be either CDCWireHit or CDCWireHit*
+        for (const CDCWireHit * ptrMiddleWireHit : wirehits) {
 
-          Neighborhood::range neighbors = neighborhood.equal_range(middleWireHit);
+          Neighborhood::range nextNeighborRange = neighborhood.equal_range(ptrMiddleWireHit);
 
           for (Neighborhood::iterator itStartWireHit = nextNeighborRange.first;
                itStartWireHit != nextNeighborRange.second; ++itStartWireHit) {

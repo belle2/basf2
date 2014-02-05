@@ -52,7 +52,13 @@ namespace Belle2 {
       /// Constructs the reverse tiple from this one
       CDCRLWireHitTriple reversed() const;
 
+      /// Reverses the triple inplace.
+      void reverse();
+
+
     public:
+
+      /// Equality comparision considering all three oriented wire hits
       bool operator==(const CDCRLWireHitTriple& other) const
       { return getStartRLWireHit() == other.getStartRLWireHit() and getRearRLWireHitPair() == other.getRearRLWireHitPair(); }
 
@@ -192,8 +198,12 @@ namespace Belle2 {
       const CDCRLWireHit& getEndRLWireHit() const
       { return getRearRLWireHitPair().getToRLWireHit(); }
 
-      /// Getter for the pair of second and third oriented wire hit
+      /// Constant getter for the pair of second and third oriented wire hit
       const CDCRLWireHitPair& getRearRLWireHitPair() const
+      { return m_rearRLWireHitPair; }
+
+      /// Getter for the pair of second and third oriented wire hit
+      CDCRLWireHitPair& getRearRLWireHitPair()
       { return m_rearRLWireHitPair; }
 
 
@@ -212,7 +222,19 @@ namespace Belle2 {
 
 
 
-    private:
+    public:
+      /// Setter for the right left passage information of the first oriented wire hit
+      void setStartRLInfo(const RightLeftInfo& startRLInfo);
+
+      /// Setter for the right left passage information of the second oriented wire hit
+      void setMiddleRLInfo(const RightLeftInfo& middleRLInfo);
+
+      /// Setter for the right left passage information of the third oriented wire hit
+      void setEndRLInfo(const RightLeftInfo& endRLInfo);
+
+
+
+    protected:
       const CDCRLWireHit* m_startRLWireHit; ///< Memory for the reference to the start oriented wire hit
       CDCRLWireHitPair m_rearRLWireHitPair; ///< Memory for the reference to the remaining two oriented wire hits
 

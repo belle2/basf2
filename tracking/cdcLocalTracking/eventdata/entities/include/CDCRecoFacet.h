@@ -89,6 +89,8 @@ namespace Belle2 {
       Vector2D getCenterOfMass2D() const
       { return Vector2D::average(getStartRefPos2D(), getMiddleRefPos2D(), getEndRefPos2D()); }
 
+
+
       CDCRecoHit2D getStartRecoHit2D() const
       { return CDCRecoHit2D::fromAbsPos2D(&(getStartWireHit()), getStartRLInfo(), getStartRefPos2D()); }
 
@@ -99,13 +101,13 @@ namespace Belle2 {
       { return CDCRecoHit2D::fromAbsPos2D(&(getEndWireHit()), getEndRLInfo(), getEndRefPos2D()); }
 
       CDCRecoTangent getStartToMiddle() const
-      { return CDCRecoTangent(&(getStartWireHit()), getStartRLInfo(), &(getMiddleWireHit()), getMiddleRLInfo(), getStartToMiddleLine()); }
+      { return CDCRecoTangent(&(getStartRLWireHit()), &(getMiddleRLWireHit()), getStartToMiddleLine()); }
 
       CDCRecoTangent getStartToEnd() const
-      { return CDCRecoTangent(&(getStartWireHit()), getStartRLInfo(), &(getEndWireHit()), getEndRLInfo(), getStartToEndLine()); }
+      { return CDCRecoTangent(&(getStartRLWireHit()), &(getEndRLWireHit()), getStartToEndLine()); }
 
       CDCRecoTangent getMiddleToEnd() const
-      { return CDCRecoTangent(&(getMiddleWireHit()), getMiddleRLInfo(), &(getEndWireHit()), getEndRLInfo(), getMiddleToEndLine()); }
+      { return CDCRecoTangent(&(getMiddleRLWireHit()), &(getEndRLWireHit()), getMiddleToEndLine()); }
 
 
 

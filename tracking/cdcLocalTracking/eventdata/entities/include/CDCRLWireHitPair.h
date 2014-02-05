@@ -25,11 +25,24 @@ namespace Belle2 {
       /// Default constructor for ROOT compatibility.
       CDCRLWireHitPair();
 
+      /// Copy constructor applying checks
+      CDCRLWireHitPair(const CDCRLWireHitPair& rlWireHitPair);
+
       /// Constructor taking two oriented wire hits
       CDCRLWireHitPair(const CDCRLWireHit* fromRLWireHit, const CDCRLWireHit* toRLWireHit);
 
       /// Empty deconstructor
       ~CDCRLWireHitPair();
+
+
+
+      /// Constructs a oriented wire hit pair that is the reverse of this one
+      CDCRLWireHitPair reversed() const;
+
+      /// Reverses the oriented wire hit pair inplace.
+      void reverse();
+
+
 
       /// Equality comparision based the two oriented wire hits.
       bool operator==(const CDCRLWireHitPair& other) const
@@ -40,6 +53,14 @@ namespace Belle2 {
         return getFromRLWireHit() < other.getFromRLWireHit() or
                (getFromRLWireHit() == other.getFromRLWireHit() and getToRLWireHit() < other.getToRLWireHit());
       }
+
+
+
+      /// Defines wire hits and oriented wire hit pair as coaligned on the first wire hit
+      friend bool operator<(const  CDCRLWireHitPair& rlWireHitPair, const CDCWireHit& wireHit) { return rlWireHitPair.getFromWireHit() < wireHit; }
+
+      /// Defines wire hits and oriented wire hit pair as coaligned on the first wire hit
+      friend bool operator<(const CDCWireHit& wireHit, const CDCRLWireHitPair& rlWireHitPair) { return  wireHit <  rlWireHitPair.getFromWireHit(); }
 
 
 
@@ -106,6 +127,9 @@ namespace Belle2 {
       bool hasWireHit(const CDCWireHit& wirehit) const
       { return getFromRLWireHit()->hasWireHit(wirehit) or getToRLWireHit()->hasWireHit(wirehit); }
 
+      /// Returns the wirehit *this* oriented wire hit pair and the given oriented wire hit pair have in common. Nullptr for no common wire hit.
+      const CDCWireHit* commonWireHit(const CDCRLWireHitPair& rlWireHitPair) const;
+
 
 
       /// Getter for the right left passage information of the first oriented wire hit
@@ -133,8 +157,14 @@ namespace Belle2 {
       { m_toRLWireHit = toRLWireHit; }
 
 
+    public:
+      /// Setter for the right left passage information of the first oriented wire hit
+      void setFromRLInfo(const RightLeftInfo& fromRLInfo);
 
-    private:
+      /// Setter for the right left passage information of the second oriented wire hit
+      void setToRLInfo(const RightLeftInfo& toRLInfo);
+
+    protected:
       const CDCRLWireHit* m_fromRLWireHit; ///< Memory for the reference to the first oriented wire hit
       const CDCRLWireHit* m_toRLWireHit;   ///< Memory for the reference to the second oriented wire hit
 

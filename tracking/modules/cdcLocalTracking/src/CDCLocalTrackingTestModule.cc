@@ -793,6 +793,8 @@ void CDCLocalTrackingTestModule::test_recotangent() const
   const CDCWireHit wirehit0(wire0->getWireID(), connecting.norm() / 4.0);
   const CDCWireHit wirehit1(wire1->getWireID(), connecting.norm() / 4.0);
 
+
+  /*
   CDCRecoTangent t0(&wirehit0, RIGHT, &wirehit1, RIGHT);
   CDCRecoTangent t1(&wirehit0, RIGHT, &wirehit1, LEFT);
   CDCRecoTangent t2(&wirehit0, LEFT,  &wirehit1, RIGHT);
@@ -805,7 +807,7 @@ void CDCLocalTrackingTestModule::test_recotangent() const
   B2INFO("LL new " << t3);
 
   std::vector<CDCRecoTangent> oldTangents;
-
+  */
   //CDCRecoTangent::collectGroupOfTangents(oldTangents, &wirehit0, &wirehit1 );
   //for( std::vector<CDCRecoTangent>::iterator itOldTangents = oldTangents.begin();
   //     itOldTangents != oldTangents.end(); ++itOldTangents ){

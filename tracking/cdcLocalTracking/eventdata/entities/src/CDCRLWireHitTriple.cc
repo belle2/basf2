@@ -53,6 +53,48 @@ CDCRLWireHitTriple CDCRLWireHitTriple::reversed() const
 }
 
 
+
+void CDCRLWireHitTriple::reverse()
+{
+
+  const CDCRLWireHit& newStartRLWireHit = CDCWireHitTopology::getInstance().getReverseOf(getEndRLWireHit());
+  const CDCRLWireHit& newMiddleRLWireHit = CDCWireHitTopology::getInstance().getReverseOf(getMiddleRLWireHit());
+  const CDCRLWireHit& newEndRLWireHit = CDCWireHitTopology::getInstance().getReverseOf(getStartRLWireHit());
+
+  setStartRLWireHit(&newStartRLWireHit);
+  setMiddleRLWireHit(&newMiddleRLWireHit);
+  setEndRLWireHit(&newEndRLWireHit);
+
+}
+
+
+
+void CDCRLWireHitTriple::setStartRLInfo(const RightLeftInfo& startRLInfo)
+{
+
+  if (startRLInfo != getStartRLInfo()) {
+    const CDCRLWireHit& newStartRLWireHit = CDCWireHitTopology::getInstance().getReverseOf(getStartRLWireHit());
+    m_startRLWireHit = &newStartRLWireHit;
+  }
+
+}
+
+
+
+void CDCRLWireHitTriple::setMiddleRLInfo(const RightLeftInfo& middleRLInfo)
+{
+  getRearRLWireHitPair().setFromRLInfo(middleRLInfo);
+}
+
+
+
+void CDCRLWireHitTriple::setEndRLInfo(const RightLeftInfo& endRLInfo)
+{
+  getRearRLWireHitPair().setToRLInfo(endRLInfo);
+}
+
+
+
 CDCRLWireHitTriple::Shape CDCRLWireHitTriple::getShape() const
 {
 

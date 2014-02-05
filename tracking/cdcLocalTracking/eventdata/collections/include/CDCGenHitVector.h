@@ -16,6 +16,8 @@
 #include <tracking/cdcLocalTracking/mockroot/MockRoot.h>
 //#include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
 
+#include <tracking/cdcLocalTracking/algorithms/AutomatonCell.h>
+
 #include <tracking/cdcLocalTracking/topology/CDCWire.h>
 #include <tracking/cdcLocalTracking/eventdata/entities/CDCGenHit.h>
 #include <tracking/cdcLocalTracking/eventdata/entities/CDCWireHit.h>
@@ -53,7 +55,7 @@ namespace Belle2 {
     /** details */
 
     template<class T>
-    class CDCGenHitVector : public CDCLocalTracking::UsedTObject {
+    class CDCGenHitVector : public AutomatonCell {
 
     private:
       typedef std::vector<T> Container; ///< std::vector to be wrapped

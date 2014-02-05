@@ -32,10 +32,10 @@ namespace Belle2 {
       ~CDCTrack() {;}
 
       /// Getter for the first reconstructed hit in the track. Does not account for the forward backward info.
-      const CDCRecoHit3D& getStartRecoHit3D() const { return front(); }
+      const Belle2::CDCLocalTracking::CDCRecoHit3D& getStartRecoHit3D() const { return front(); }
 
       /// Getter for the last reconstructed hit in the track. Does not account for the forward backward info.
-      const CDCRecoHit3D& getEndRecoHit3D() const { return back(); }
+      const Belle2::CDCLocalTracking::CDCRecoHit3D& getEndRecoHit3D() const { return back(); }
 
       /// Getter for the superlayer id the track starts from. Does not account for the forward backward info.
       ILayerType getStartISuperLayer() const

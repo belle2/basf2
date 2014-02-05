@@ -127,8 +127,8 @@ namespace Belle2 {
             }
 
             //Block the triples that use already used segments as well
-            for (const CDCSegmentTriple * triple : segmentTripleTrack) {
-              triple->receiveDoNotUse();
+            for (const CDCSegmentTriple & triple : m_segmentTriples) {
+              triple.receiveDoNotUse();
             }
 
           } while (created != 0);

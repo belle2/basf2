@@ -4,8 +4,8 @@
 const int storage_info_all_revision = 1;
 
 struct storage_info_all {
-  uint32 nnodes;
   uint32 nodeid[20];
+  uint32 state[20];
   uint32 expno[20];
   uint32 runno[20];
   uint32 subno[20];
@@ -16,6 +16,9 @@ struct storage_info_all {
   double freq[20];
   double evtsize[20];
   double rate[20];
+  uint32 connection[2];
+  uint32 rcstate;
+  uint32 nnodes;
 };
 
 #endif

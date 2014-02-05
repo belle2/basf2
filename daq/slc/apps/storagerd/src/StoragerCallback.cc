@@ -37,7 +37,9 @@ void StoragerCallback::init() throw()
     _con[i].init(Belle2::form("basf2_%d", i - 3),
                  sizeof(storage_info) / sizeof(int));
   }
-  //PThread(new StoragerMonitor(this));
+  _data = new NSMData("STORAGE_DATA", "storage_info_all", 1);
+  _data->allocate(getCommunicator());
+  PThread(new StoragerMonitor(this));
 }
 
 void StoragerCallback::term() throw()
@@ -126,8 +128,8 @@ bool StoragerCallback::load() throw()
 
 bool StoragerCallback::start() throw()
 {
-  std::string name[3] = {"storagein", "basf2", "storageout"};
   for (size_t i = 0; i < _con.size(); i++) {
+    std::string name = _con[i].getName();
     if (!_con[i].start()) {
       if (i != 2) {
         std::string emsg = name[i] + " is not started";

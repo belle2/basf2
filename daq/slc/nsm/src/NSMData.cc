@@ -3,6 +3,9 @@
 #include "daq/slc/nsm/NSMCommunicator.h"
 
 #include "daq/slc/base/StringUtil.h"
+#include "daq/slc/base/Debugger.h"
+#include "daq/slc/base/Writer.h"
+#include "daq/slc/base/Reader.h"
 
 #include "nsm2/belle2nsm.h"
 extern "C" {
@@ -60,8 +63,7 @@ void* NSMData::parse(const char* incpath, bool maclloc_new) throw(NSMHandlerExce
     if (type == 'l') pro.type = INT64;
     else if (type == 'i') pro.type = INT32;
     else if (type == 's') pro.type = INT16;
-    else if (type == 'c' && length < 0) pro.type = CHAR;
-    else if (type == 'c' && length > 0) pro.type = TEXT;
+    else if (type == 'c') pro.type = CHAR;
     else if (type == 'L') pro.type = UINT64;
     else if (type == 'I') pro.type = UINT32;
     else if (type == 'S') pro.type = UINT16;
@@ -70,6 +72,7 @@ void* NSMData::parse(const char* incpath, bool maclloc_new) throw(NSMHandlerExce
     else if (type == 'f') pro.type = FLOAT;
     size += (length < 0) ? pro.type % 100 : (pro.type % 100) * length;
     pro.length = length;
+    Belle2::debug("%s %d %c %d", ptr->name, size, ptr->type, ptr->offset);
     _pro_m.insert(NSMDataPropertyMap::value_type(label, pro));
     _label_v.push_back(label);
     ptr = ptr->next;
@@ -285,15 +288,10 @@ const std::string NSMData::toSQLConfig()
       case BYTE8:  type_s = "tinyint unsigned"; break;
       case DOUBLE: type_s = "double"; break;
       case FLOAT:  type_s = "float"; break;
-      case TEXT:   type_s = "text"; break;
       default : break;
     }
-    if (pro.length == 0 && pro.type == TEXT) {
-      ss << ", " << label << " " << type_s;
-    } else {
-      for (size_t i = 0; i < pro.length; i++) {
-        ss << ", `" << label << ":" << i << "` " << type_s;
-      }
+    for (size_t i = 0; i < pro.length; i++) {
+      ss << ", `" << label << ":" << i << "` " << type_s;
     }
   }
   return ss.str();
@@ -307,7 +305,7 @@ const std::string NSMData::toSQLNames()
        it != _label_v.end(); it++) {
     std::string& label(*it);
     NSMDataProperty& pro(_pro_m[label]);
-    if (pro.length == 0 && pro.type == TEXT) {
+    if (pro.length == 0) {
       ss << ", " << label;
     } else {
       for (size_t i = 0; i < pro.length; i++) {
@@ -328,7 +326,7 @@ const std::string NSMData::toSQLValues()
     std::string& label(*it);
     NSMDataProperty& pro(_pro_m[label]);
     int length = pro.length;
-    if (length <= 0 && pro.type == TEXT) length = 1;
+    if (length < 0) length = 1;
     for (int i = 0; i < length; i++) {
       ss << ", ";
       switch (pro.type) {
@@ -342,9 +340,6 @@ const std::string NSMData::toSQLValues()
         case BYTE8:  ss << (uint32)((byte8*)(data + pro.offset))[i]; break;
         case DOUBLE: ss << ((double*)(data + pro.offset))[i]; break;
         case FLOAT:  ss << ((float*)(data + pro.offset))[i]; break;
-        case TEXT:
-          ss << "'" << (const char*)(data + pro.offset) << "'";
-          break;
         default : break;
       }
     }
@@ -376,7 +371,6 @@ void NSMData::setSQLValues(std::vector<std::string>& name_v,
       case BYTE8: ((byte8*)(data + pro.offset))[index] = (byte8)atoi(value_v[i].c_str()); break;
       case DOUBLE: ((double*)(data + pro.offset))[index] = atof(value_v[i].c_str()); break;
       case FLOAT: ((float*)(data + pro.offset))[index] = atof(value_v[i].c_str()); break;
-      case TEXT:   strncpy((char*)(data + pro.offset), value_v[i].c_str(), pro.length); break;
       default : break;
     }
   }
@@ -391,7 +385,7 @@ void NSMData::getSQLValues(std::vector<std::string>&,
     std::string& label(*it);
     NSMDataProperty& pro(_pro_m[label]);
     int length = pro.length;
-    if (length <= 0 && pro.type == TEXT) length = 1;
+    if (length < 0) length = 1;
     for (int i = 0; i < length; i++) {
       std::stringstream ss;
       switch (pro.type) {
@@ -405,43 +399,11 @@ void NSMData::getSQLValues(std::vector<std::string>&,
         case BYTE8:  ss << ((byte8*)(data + pro.offset))[i];  break;
         case DOUBLE: ss << ((double*)(data + pro.offset))[i]; break;
         case FLOAT:  ss << ((float*)(data + pro.offset))[i];  break;
-        case TEXT:   ss << (char*)(data + pro.offset);        break;
         default : break;
       }
       value_v.push_back(ss.str());
     }
   }
-}
-
-DataObject* NSMData::createDataObject()
-{
-  DataObject* obj = new DataObject();
-  char* data = (char*)get();
-  for (std::vector<std::string>::iterator it = _label_v.begin();
-       it != _label_v.end(); it++) {
-    std::string& label(*it);
-    NSMDataProperty& pro(_pro_m[label]);
-    std::stringstream ss;
-    DataObject::ParamInfo pinfo = { DataObject::INT, 0, NULL };
-    pinfo.buf = data + pro.offset;
-    pinfo.length = (pro.length <= 0) ? 0 : pro.length;
-    switch (pro.type) {
-      case INT64:  pinfo.type = DataObject::LONG;   break;
-      case INT32:  pinfo.type = DataObject::INT;    break;
-      case INT16:  pinfo.type = DataObject::SHORT;  break;
-      case CHAR:   pinfo.type = DataObject::CHAR;   break;
-      case UINT64: pinfo.type = DataObject::ULONG;  break;
-      case UINT32: pinfo.type = DataObject::UINT;   break;
-      case UINT16: pinfo.type = DataObject::USHORT; break;
-      case BYTE8:  pinfo.type = DataObject::UCHAR;  break;
-      case DOUBLE: pinfo.type = DataObject::DOUBLE; break;
-      case FLOAT:  pinfo.type = DataObject::FLOAT;  break;
-      case TEXT:   pinfo.type = DataObject::TEXT;   break;
-      default : break;
-    }
-    obj->add(label, pinfo.buf, pinfo.type, pinfo.length);
-  }
-  return obj;
 }
 
 const std::string NSMData::toXML()
@@ -486,12 +448,75 @@ const std::string NSMData::toXML()
       case FLOAT:  ss << "<float name=\"" << label
                         << "\" value=\"" << *(float*)(data + pro.offset)
                         << "\" />" << std::endl; break;
-      case TEXT:   ss << "<text name=\"" << label
-                        << "\" value=\"" << (char*)(data + pro.offset)
-                        << "\" />" << std::endl; break;
       default : break;
     }
   }
   return ss.str();
+}
+
+void NSMData::readObject(Reader& reader) throw(IOException)
+{
+  /*
+  DataObject* obj = new DataObject();
+  char* data = (char*)get();
+  for (std::vector<std::string>::iterator it = _label_v.begin();
+       it != _label_v.end(); it++) {
+    std::string& label(*it);
+    NSMDataProperty& pro(_pro_m[label]);
+    std::stringstream ss;
+    DataObject::ParamInfo pinfo = { DataObject::INT, 0, NULL };
+    pinfo.buf = data + pro.offset;
+    pinfo.length = (pro.length <= 0) ? 0 : pro.length;
+    switch (pro.type) {
+      case INT64:  pinfo.type = DataObject::LONG;   break;
+      case INT32:  pinfo.type = DataObject::INT;    break;
+      case INT16:  pinfo.type = DataObject::SHORT;  break;
+      case CHAR:   pinfo.type = DataObject::CHAR;   break;
+      case UINT64: pinfo.type = DataObject::ULONG;  break;
+      case UINT32: pinfo.type = DataObject::UINT;   break;
+      case UINT16: pinfo.type = DataObject::USHORT; break;
+      case BYTE8:  pinfo.type = DataObject::UCHAR;  break;
+      case DOUBLE: pinfo.type = DataObject::DOUBLE; break;
+      case FLOAT:  pinfo.type = DataObject::FLOAT;  break;
+      default : break;
+    }
+    obj->add(label, pinfo.buf, pinfo.type, pinfo.length);
+  }
+  return obj;
+  */
+}
+
+void NSMData::writeObject(Writer& writer) const throw(IOException)
+{
+  writer.writeString(_data_name);
+  writer.writeString(_format);
+  writer.writeInt(_revision);
+  writer.writeInt(_label_v.size());
+  char* data = (char*)get();
+  for (std::vector<std::string>::iterator it = _label_v.begin();
+       it != _label_v.end(); it++) {
+    std::string& label(*it);
+    NSMDataProperty& pro(_pro_m[label]);
+    writer.writeString(label);
+    writer.writeInt(pro.type);
+    writer.writeInt(pro.length);
+    int length = pro.length;
+    if (length < 0) length = 1;
+    for (int i = 0; i < length; i++) {
+      switch (pro.type) {
+        case INT64:  writer.writeLong(((int64*)(data + pro.offset))[i]); break;
+        case INT32:  writer.writeInt(((int32*)(data + pro.offset))[i]); break;
+        case INT16:  writer.writeShort(((int16*)(data + pro.offset))[i]); break;
+        case CHAR:   writer.writeChar(((char*)(data + pro.offset))[i]); break;
+        case UINT64: writer.writeLong(((uint64*)(data + pro.offset))[i]); break;
+        case UINT32: writer.writeInt(((uint32*)(data + pro.offset))[i]); break;
+        case UINT16: writer.writeShort(((uint16*)(data + pro.offset))[i]); break;
+        case BYTE8:  writer.writeChar(((byte8*)(data + pro.offset))[i]); break;
+        case DOUBLE: writer.writeDouble(((double*)(data + pro.offset))[i]); break;
+        case FLOAT:  writer.writeFloat(((float*)(data + pro.offset))[i]); break;
+        default : break;
+      }
+    }
+  }
 }
 

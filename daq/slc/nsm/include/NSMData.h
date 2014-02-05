@@ -4,6 +4,7 @@
 #include "daq/slc/nsm/NSMHandlerException.h"
 
 #include "daq/slc/base/DataObject.h"
+#include "daq/slc/base/Serializable.h"
 
 extern "C" {
 #include "nsm2/nsm2.h"
@@ -19,7 +20,7 @@ namespace Belle2 {
   enum NSMDataType {
     CHAR = 1, INT16 = 2, INT32 = 4, INT64 = 8,
     BYTE8 = 101, UINT16 = 102, UINT32 = 104, UINT64 = 108,
-    FLOAT = 204, DOUBLE = 208, TEXT = 300
+    FLOAT = 204, DOUBLE = 208
   };
 
   struct NSMDataProperty {
@@ -30,7 +31,7 @@ namespace Belle2 {
 
   typedef std::map<std::string, NSMDataProperty> NSMDataPropertyMap;
 
-  class NSMData {
+  class NSMData : public Serializable {
 
   public:
     NSMData(const std::string& data_name, const std::string& format,
@@ -95,8 +96,9 @@ namespace Belle2 {
                       std::vector<std::string>& value_v);
     void getSQLValues(std::vector<std::string>& name_v,
                       std::vector<std::string>& value_v);
-    DataObject* createDataObject();
     const std::string toXML();
+    void writeObject(Writer& writer) const throw(IOException);
+    void readObject(Reader& reader) throw(IOException);
 
   private:
     int initProperties() throw();
@@ -106,8 +108,8 @@ namespace Belle2 {
     std::string _data_name;
     std::string _format;
     int _revision;
-    NSMDataPropertyMap _pro_m;
-    std::vector<std::string> _label_v;
+    mutable NSMDataPropertyMap _pro_m;
+    mutable std::vector<std::string> _label_v;
 
   };
 

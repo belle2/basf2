@@ -14,6 +14,7 @@ namespace Belle2 {
 
   public:
     void run();
+    int checkConnection(const std::string& proc_name, int port);
 
   private:
     StoragerCallback* _callback;

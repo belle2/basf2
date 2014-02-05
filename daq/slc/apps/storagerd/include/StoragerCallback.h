@@ -4,6 +4,7 @@
 #include "daq/slc/readout/ProcessController.h"
 
 #include "daq/slc/nsm/RCCallback.h"
+#include "daq/slc/nsm/NSMData.h"
 
 #include <vector>
 
@@ -18,6 +19,8 @@ namespace Belle2 {
   public:
     size_t getNControllers() const { return _con.size(); }
     ProcessController& getController(int n) { return _con[n]; }
+    std::vector<ProcessController>& getControllers() { return _con; }
+    NSMData* getData() { return _data; }
 
   public:
     virtual void init() throw();
@@ -33,6 +36,7 @@ namespace Belle2 {
 
   private:
     std::vector<ProcessController> _con;
+    NSMData* _data;
 
   };
 

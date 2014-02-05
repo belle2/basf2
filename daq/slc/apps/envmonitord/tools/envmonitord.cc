@@ -1,7 +1,6 @@
 #include "daq/slc/apps/envmonitord/EnvMonitorMaster.h"
-#include "daq/slc/apps/envmonitord/EnvDBRecorder.h"
+#include "daq/slc/apps/envmonitord/DataSender.h"
 
-#include <daq/slc/apps/PackageSender.h>
 #include <daq/slc/apps/SocketAcceptor.h>
 
 #include <daq/slc/database/PostgreSQLInterface.h>
@@ -14,14 +13,14 @@
 #include <daq/slc/base/Debugger.h>
 #include <daq/slc/base/ConfigFile.h>
 
-#include <cstring>
-#include <cstdlib>
 #include <dirent.h>
+#include <unistd.h>
 #include <errno.h>
+#include <cstring>
 
 using namespace Belle2;
 
-typedef SocketAcceptor<PackageSender, EnvMonitorMaster> EnvUIAcceptor;
+typedef SocketAcceptor<DataSender, EnvMonitorMaster> EnvUIAcceptor;
 
 typedef void* MonitorFunc_t(const char*);
 
@@ -43,15 +42,11 @@ int main(int argc, char** argv)
                                             config.get("DATABASE_USER"),
                                             config.get("DATABASE_PASS"),
                                             config.getInt("DATABASE_PORT"));
-  EnvDBRecorder::setDB(db);
-  const std::string lib_path = config.get("ENV_LIB_PATH");
-  const std::string map_path = config.get("ENV_MAP_PATH");
   const std::string config_path = config.get("ENV_CONFIG_PATH");
   const std::string hostname = config.get("ENV_GUI_HOST");
   const int port = config.getInt("ENV_GUI_PORT");
 
-  std::vector<DynamicLoader*> dl_v;
-  EnvMonitorMaster* master = new EnvMonitorMaster(comm);
+  EnvMonitorMaster* master = new EnvMonitorMaster(db, comm);
   DIR* dir = opendir(config_path.c_str());
   int count = 0;
   if (dir != NULL) {
@@ -63,29 +58,12 @@ int main(int argc, char** argv)
             filename.find("~") == std::string::npos) {
           config.clear();
           config.read(config_path + "/" + filename);
-          std::string pack_name = config.get("ENV_PACKAGE_NAME");
-          if (pack_name.size() == 0) continue;
-          Belle2::debug("Env config (%d): %s", count++, filename.c_str());
-          std::string pack_lib   = config.get("ENV_PACKAGE_LIB");
-          std::string pack_class = config.get("ENV_PACKAGE_CLASS");
           std::string nsmdata_name   = config.get("ENV_NSMDATA_NAME");
-          std::string nsmdata_format  = config.get("ENV_NSMDATA_FORMAT");
-          const int nsmdata_revision  = config.getInt("ENV_NSMDATA_REVISION");
-          if (pack_class.size() > 0) {
-            if (pack_lib.size() > 0 && pack_lib.at(0) != '/') {
-              pack_lib = "lib" + pack_lib + ".so";
-            }
-            DynamicLoader* dl = new DynamicLoader();
-            dl->open(pack_lib);
-            std::string funcname = Belle2::form("create%s", pack_class.c_str());
-            MonitorFunc_t* createMonitor = (MonitorFunc_t*)dl->load(funcname);
-            EnvMonitorPackage* package = (EnvMonitorPackage*)createMonitor(pack_name.c_str());
-            if (nsmdata_name.size() > 0 && nsmdata_format.size() > 0 && nsmdata_revision > 0) {
-              package->setData(new NSMData(nsmdata_name, nsmdata_format, nsmdata_revision));
-            }
-            dl_v.push_back(dl);
-            master->add(package);
-          }
+          std::string nsmdata_format = config.get("ENV_NSMDATA_FORMAT");
+          const int nsmdata_revision = config.getInt("ENV_NSMDATA_REVSION");
+          LogFile::debug("Env config (%d): %s = (%s:%s:%d)", count++, filename.c_str(),
+                         nsmdata_name.c_str(), nsmdata_format.c_str(), nsmdata_revision);
+          master->add(new NSMData(nsmdata_name, nsmdata_format, nsmdata_revision));
         }
       }
     }

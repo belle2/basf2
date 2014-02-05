@@ -31,7 +31,7 @@ namespace Belle2 {
       /** Constructor. */
       OptimizingFacetNeighborChooser() {
 
-        m_output_csv.open("facet_neighbor.csv");
+        m_output_csv.open("facet_neighbor_chooser.csv");
 
         //Headline
         m_output_csv << "SMToNeighborSECosing,"
@@ -72,7 +72,6 @@ namespace Belle2 {
                      << std::endl;
 
         NeighborWeight simpleWeight = m_simpleNeighborChooser.isGoodNeighbor(facet, neighborFacet);
-
         return simpleWeight;
 
       }

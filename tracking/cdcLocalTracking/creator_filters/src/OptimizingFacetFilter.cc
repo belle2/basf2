@@ -24,7 +24,7 @@ using namespace CDCLocalTracking;
 OptimizingFacetFilter::OptimizingFacetFilter()
 {
 
-  m_output_csv.open("facet_creation.csv");
+  m_output_csv.open("facet_creator_filter.csv");
 
   m_output_csv << "SMToSECosine,"
                << "SEToMECosine,"
@@ -46,11 +46,10 @@ CellState OptimizingFacetFilter::isGoodFacet(const CDCRecoFacet& facet) const
   CellState mcCellWeight = m_mcFacetFilter.isGoodFacet(facet);
   //bool mcDecision = (not isNotACell(mcCellWeight));
 
-  CDCRecoFacet reversedFacet = facet.reversed();
-  CellState mcReversedCellWeight = m_mcFacetFilter.isGoodFacet(reversedFacet);
+  //CDCRecoFacet reversedFacet = facet.reversed();
+  //CellState mcReversedCellWeight = m_mcFacetFilter.isGoodFacet(reversedFacet);
 
-  bool mcDecision = (not isNotACell(mcCellWeight)) or (not isNotACell(mcReversedCellWeight));
-
+  bool mcDecision = not isNotACell(mcCellWeight);
 
   facet.adjustLines();
 
@@ -64,10 +63,9 @@ CellState OptimizingFacetFilter::isGoodFacet(const CDCRecoFacet& facet) const
                << mcDecision
                << endl;
 
+  //return mcCellWeight;
+
   CellState simpleCellWeight = m_simpleFacetFilter.isGoodFacet(facet);
-
-  return mcCellWeight;
-
   return simpleCellWeight;
 
 

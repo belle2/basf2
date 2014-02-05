@@ -7,40 +7,16 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#ifndef CDCVECTOR_H
-#define CDCVECTOR_H
+#ifndef SORTABLEVECTOR_H
+#define SORTABLEVECTOR_H
 
 #include <vector>
 #include <algorithm>
 
 #include <tracking/cdcLocalTracking/mockroot/MockRoot.h>
-//#include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
-#include <tracking/cdcLocalTracking/algorithms/AutomatonCell.h>
 
-#ifdef __CINT__
-//#ifdef CDCLOCALTRACKING_ROOTIFY_CDCVECTOR
-// Because ROOTCINT does not like namespaces inside template parameters
-// we have to make each object, which we want the instantiate the template
-// available outside any namespace. Therefore we also have to include each of
-// them as well.
-
-#include <tracking/cdcLocalTracking/eventdata/entities/CDCGenHit.h>
-#include <tracking/cdcLocalTracking/eventdata/entities/CDCWireHit.h>
-#include <tracking/cdcLocalTracking/eventdata/entities/CDCRecoHit2D.h>
-#include <tracking/cdcLocalTracking/eventdata/entities/CDCRecoTangent.h>
-#include <tracking/cdcLocalTracking/eventdata/entities/CDCRecoFacet.h>
-#include <tracking/cdcLocalTracking/eventdata/entities/CDCRecoHit3D.h>
-
-typedef Belle2::CDCLocalTracking::CDCGenHit CDCGenHit;
-typedef Belle2::CDCLocalTracking::CDCWireHit CDCWireHit;
-typedef Belle2::CDCLocalTracking::CDCRecoHit2D CDCRecoHit2D;
-typedef Belle2::CDCLocalTracking::CDCRecoTangent CDCRecoTangent;
-typedef Belle2::CDCLocalTracking::CDCRecoFacet CDCRecoFacet;
-typedef Belle2::CDCLocalTracking::CDCRecoHit3D CDCRecoHit3D;
-
-//#endif // CDCLOCALTRACKING_ROOTIFY_CDCVECTOR
-#endif // __CINT__
-
+//Unpacked version for ROOT dictionary generation
+#include <tracking/cdcLocalTracking/eventdata/entities/CDCEntitiesUnpackedFromNamespaces.h>
 
 namespace Belle2 {
   namespace CDCLocalTracking {
@@ -49,7 +25,7 @@ namespace Belle2 {
     /** details */
 
     template<class T>
-    class CDCVector : public UsedTObject {
+    class SortableVector : public UsedTObject {
 
     private:
       typedef std::vector<T> Container; ///< std::vector to be wrapped
@@ -92,9 +68,9 @@ namespace Belle2 {
       /// Input iterator type usable with stl algorithms
       class input_iterator : public std::iterator<std::output_iterator_tag, void, void, void, void> {
       protected:
-        CDCVector<T>& m_collection;
+        SortableVector<T>& m_collection;
       public:
-        explicit input_iterator(CDCVector<T>& collection) : m_collection(collection) {}
+        explicit input_iterator(SortableVector<T>& collection) : m_collection(collection) {}
 
         input_iterator& operator= (T const& item) {
           m_collection.push_back(item); return *this;
@@ -110,10 +86,10 @@ namespace Belle2 {
 
     public:
       /// Default constructor for ROOT compatibility.
-      CDCVector() : m_isSorted(true) {;}
+      SortableVector() : m_isSorted(true) {;}
 
       /// Empty deconstructor
-      ~CDCVector() {;}
+      ~SortableVector() {;}
 
       /// The begin of the container
       iterator begin() { return m_items.begin(); }
@@ -186,7 +162,7 @@ namespace Belle2 {
       void push_back(const_iterator first, const_iterator last) { for (; first != last; ++first) push_back(*first); }
 
       /// Appends a copy of a whole other vector to this vector.
-      void push_back(const CDCVector<T>& collection)
+      void push_back(const SortableVector<T>& collection)
       { reserve(size() + collection.size()); push_back(collection.begin(), collection.end()); }
 
       /// Stores an element into the set. Same method as in the set for easy storage.
@@ -314,7 +290,7 @@ namespace Belle2 {
 
       /// Evaluate if the given collection is completelly contained in *this*
       /** Inefficient only if both vectors are sorted. */
-      bool contains(const CDCVector<T>& items) const {
+      bool contains(const SortableVector<T>& items) const {
         if (isSorted() and items.isSorted()) {
           return std::includes(begin(), end(), items.begin(), items.end());
         } else {
@@ -331,12 +307,12 @@ namespace Belle2 {
       std::vector<T> m_items;
 
     private:
-      /// ROOT Macro to make CDCVector a ROOT class.
-      ClassDefInCDCLocalTracking(CDCVector, 1);
+      /// ROOT Macro to make SortableVector a ROOT class.
+      ClassDefInCDCLocalTracking(SortableVector, 1);
 
     }; //class
 
   } // namespace CDCLocalTracking
 } // namespace Belle2
 
-#endif // CDCVECTOR_H
+#endif // SORTABLEVECTOR_H

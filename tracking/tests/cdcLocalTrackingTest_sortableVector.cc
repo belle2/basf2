@@ -14,11 +14,11 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
-//#include <tracking/cdcLocalTracking/eventdata/entities/CDCWireHit.h>
 #include <tracking/cdcLocalTracking/eventdata/entities/CDCGenHit.h>
 #include <tracking/cdcLocalTracking/eventdata/entities/Compare.h>
-#include <tracking/cdcLocalTracking/eventdata/collections/CDCVector.h>
-#include <tracking/cdcLocalTracking/eventdata/collections/CDCWireHitVector.h>
+
+#include <tracking/cdcLocalTracking/algorithms/SortableVector.h>
+
 #include <tracking/cdcLocalTracking/topology/CDCWire.h>
 #include <tracking/cdcLocalTracking/topology/CDCWireTopology.h>
 
@@ -27,8 +27,8 @@ using namespace std;
 using namespace Belle2;
 using namespace CDCLocalTracking;
 
-// Tests if CDCVector can handle CDCGenHits
-TEST_F(CDCLocalTrackingTest, CDCVector_empty)
+// Tests if SortableVector can handle CDCGenHits
+TEST_F(CDCLocalTrackingTest, SortableVector_empty)
 {
 
   const CDCWireTopology& wireTopology  = CDCWireTopology::getInstance();
@@ -36,8 +36,7 @@ TEST_F(CDCLocalTrackingTest, CDCVector_empty)
 
   CDCGenHit genHit(firstWire, Vector2D(0.0, 0.0));
 
-  CDCVector<CDCGenHit> collection;
-  //CDCWireHitVector collection;
+  SortableVector<CDCGenHit> collection;
 
   ASSERT_TRUE(collection.empty());
 
@@ -47,12 +46,12 @@ TEST_F(CDCLocalTrackingTest, CDCVector_empty)
 
 }
 
-TEST_F(CDCLocalTrackingTest, CDCVector_range)
+TEST_F(CDCLocalTrackingTest, SortableVector_range)
 {
 
   CDCGenHit lowestGenHit;
   CDCGenHit largerGenHitOnFirstWire(WireID(0, 0, 0), Vector2D(0.0, 1.0));
-  CDCVector<CDCGenHit> collection;
+  SortableVector<CDCGenHit> collection;
 
   collection.push_back(lowestGenHit);
   collection.push_back(lowestGenHit);
@@ -70,7 +69,7 @@ TEST_F(CDCLocalTrackingTest, CDCVector_range)
 
   counter = 0;
 
-  CDCVector<CDCGenHit>::range range_for_item = collection.equal_range(lowestGenHit);
+  SortableVector<CDCGenHit>::range range_for_item = collection.equal_range(lowestGenHit);
   EXPECT_EQ(4, std::distance(range_for_item.first, range_for_item.second));
 
   for (CDCGenHit & genHit : range_for_item) {
@@ -94,9 +93,9 @@ TEST_F(CDCLocalTrackingTest, CDCVector_range)
 
 
 
-TEST_F(CDCLocalTrackingTest, CDCVector_sort)
+TEST_F(CDCLocalTrackingTest, SortableVector_sort)
 {
-  CDCVector<CDCGenHit> collection;
+  SortableVector<CDCGenHit> collection;
   EXPECT_TRUE(collection.isSorted()) << "Empty collection is not sorted";
   EXPECT_TRUE(collection.checkSorted()) << "Empty collection was checked to be not sorted";
   collection.sort(); //Just check if those run
@@ -146,10 +145,10 @@ TEST_F(CDCLocalTrackingTest, CDCVector_sort)
 }
 
 
-TEST_F(CDCLocalTrackingTest, CDCVector_unique)
+TEST_F(CDCLocalTrackingTest, SortableVector_unique)
 {
 
-  CDCVector<CDCGenHit> collection;
+  SortableVector<CDCGenHit> collection;
 
   CDCGenHit lowestGenHit;
   CDCGenHit secondGenHit(WireID(0, 0, 1), Vector2D(0.0, 0.0));

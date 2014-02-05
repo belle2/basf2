@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../include/CDCVector.h"
+#include "../include/SortableVector.h"
 
 using namespace std;
 using namespace Belle2;

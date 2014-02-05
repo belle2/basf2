@@ -9,15 +9,6 @@
 
 #ifdef CDCLOCALTRACKING_USE_ROOT
 
-#pragma link C++ class Belle2::CDCLocalTracking::CDCVector<CDCGenHit>;
-#pragma link C++ class Belle2::CDCLocalTracking::CDCVector<CDCWireHit>;
-#pragma link C++ class Belle2::CDCLocalTracking::CDCVector<const CDCWireHit *>;
-#pragma link C++ class Belle2::CDCLocalTracking::CDCVector<CDCRecoHit2D>;
-#pragma link C++ class Belle2::CDCLocalTracking::CDCVector<CDCRecoTangent>;
-#pragma link C++ class Belle2::CDCLocalTracking::CDCVector<CDCRecoFacet>;
-#pragma link C++ class Belle2::CDCLocalTracking::CDCVector<CDCRecoHit3D>;
-
-
 #pragma link C++ class Belle2::CDCLocalTracking::CDCGenHitVector<CDCGenHit>;
 #pragma link C++ class Belle2::CDCLocalTracking::CDCGenHitVector<CDCWireHit>;
 #pragma link C++ class Belle2::CDCLocalTracking::CDCGenHitVector<const CDCWireHit *>;

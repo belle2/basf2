@@ -14,15 +14,11 @@
 #include <algorithm>
 
 #include <tracking/cdcLocalTracking/mockroot/MockRoot.h>
-//#include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
-
-#include <tracking/cdcLocalTracking/algorithms/AutomatonCell.h>
-
-#include <tracking/cdcLocalTracking/eventdata/collections/CDCVector.h>
 
 #include <tracking/cdcLocalTracking/topology/CDCWire.h>
-#include <tracking/cdcLocalTracking/eventdata/entities/CDCGenHit.h>
 #include <tracking/cdcLocalTracking/eventdata/entities/CDCWireHit.h>
+
+#include <tracking/cdcLocalTracking/algorithms/SortableVector.h>
 
 namespace Belle2 {
   namespace CDCLocalTracking {
@@ -31,19 +27,19 @@ namespace Belle2 {
     /** details */
 
     template<class T>
-    class CDCGenHitVector : public CDCVector<T> {
+    class CDCGenHitVector : public SortableVector<T> {
     public:
-      typedef typename CDCVector<T>::iterator iterator; ///< Iterator type of this container
-      typedef typename CDCVector<T>::const_iterator const_iterator;    ///< Constant iterator type of this container
+      typedef typename SortableVector<T>::iterator iterator; ///< Iterator type of this container
+      typedef typename SortableVector<T>::const_iterator const_iterator;    ///< Constant iterator type of this container
 
-      typedef typename CDCVector<T>::reverse_iterator reverse_iterator; ///< Reversed iterator type of this container
-      typedef typename CDCVector<T>::const_reverse_iterator const_reverse_iterator;  ///< Constant reversed iterator type of this container
+      typedef typename SortableVector<T>::reverse_iterator reverse_iterator; ///< Reversed iterator type of this container
+      typedef typename SortableVector<T>::const_reverse_iterator const_reverse_iterator;  ///< Constant reversed iterator type of this container
 
 
-      typedef typename CDCVector<T>::range range; ///< Iterator type of this container
-      typedef typename CDCVector<T>::const_range const_range; ///< Iterator type of this container
+      typedef typename SortableVector<T>::range range; ///< Iterator type of this container
+      typedef typename SortableVector<T>::const_range const_range; ///< Iterator type of this container
 
-      typedef typename CDCVector<T>::input_iterator input_iterator;    ///< Constant iterator type of this container
+      typedef typename SortableVector<T>::input_iterator input_iterator;    ///< Constant iterator type of this container
 
 
     public:

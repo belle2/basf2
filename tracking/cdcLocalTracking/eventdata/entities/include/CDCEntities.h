@@ -14,6 +14,8 @@
 #include "CDCGenHit.h"
 
 #include "CDCWireHit.h"
+#include "CDCRLWireHit.h"
+
 #include "CDCRecoHit2D.h"
 #include "CDCRecoTangent.h"
 #include "CDCRecoFacet.h"

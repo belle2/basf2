@@ -30,18 +30,10 @@ namespace Belle2 {
      *  including this path. If there are many disjoint paths this is the way to get them. However you most
      *  certainly pick up a lot of elements twice if there are many start culminating into a common long
      *  path segment. This is carried out recursively by followAll over the start items marked with IS_START.*/
-    template<class Collection>
+    template<class Item>
     class CellularPathFollower {
-      //Collections can be
-      // const_iterables of const Item or of const Item *
-
-      //Segments can be
-      //  ordered collections of const Item * that has push_back(const Item *)
-      //  vector<const Item *>
-      //  CDCGenericHitVector<const Item *>
 
     private:
-      typedef typename Collection::value_type Item;
       typedef WeightedNeighborhood<const Item> Neighborhood;
       typedef std::vector<const Item*> Path;
 
@@ -54,10 +46,10 @@ namespace Belle2 {
     public:
 
       /// Follow paths from all start items marked with IS_START
-      inline
-      size_t
-      followAll(
-        const Collection& collection,
+
+      template<class ItemRange>
+      inline size_t followAll(
+        const ItemRange& itemRange,
         const WeightedNeighborhood<const Item>& neighborhood,
         std::vector<Path>& paths,
         CellState minStateToFollow = -std::numeric_limits<CellState>::infinity()
@@ -68,10 +60,7 @@ namespace Belle2 {
         //segment to work on
         Path path;
 
-        for (typename Collection::const_iterator itItem = collection.begin();
-             itItem != collection.end(); ++itItem) {
-
-          const Item& item = *itItem;
+        for (const Item & item : itemRange) {
 
           if (item.getAutomatonCell().hasAnyFlags(IS_START) and
               not item.getAutomatonCell().hasAnyFlags(DO_NOT_USE + IS_CYCLE) and
@@ -96,9 +85,7 @@ namespace Belle2 {
       }
 
       /// Follows a single maximal path starting with the given start item.
-      inline
-      bool
-      followSingle(
+      inline bool followSingle(
         const Item* startItem,
         const WeightedNeighborhood<const Item>& neighborhood,
         Path& path,
@@ -123,18 +110,13 @@ namespace Belle2 {
           typename Neighborhood::range currentNeighborRange = neighborhood.equal_range(currentItem);
 
           while (currentNeighborRange.first != currentNeighborRange.second) {
+
             //const Item * currentItem = itNeighbor.getItem();
             const Item* neighborItem = currentNeighborRange.first.getNeighbor();
             Weight relationWeight = currentNeighborRange.first.getWeight();
 
-            if (not neighborItem->getAutomatonCell().hasAnyFlags(DO_NOT_USE + IS_CYCLE) and
-                currentItem->getAutomatonCell().getCellState() == currentItem->getAutomatonCell().getCellWeight() +
-                relationWeight +
-                neighborItem->getAutomatonCell().getCellState()
-                /* detected that this is the highest continuation */) {
+            if (isHighestNeighbor(currentItem, relationWeight, neighborItem)) {
 
-              // Best continuation detected
-              // Append the neighbor item
               path.push_back(neighborItem);
 
               // Get the neighbors neighbors to be considered next. Changes iteration range.
@@ -177,15 +159,12 @@ namespace Belle2 {
              itNeighbor != neighborRange.second;  ++itNeighbor) {
 
           const Item* item = itNeighbor.getItem();
-          const Item* neighborItem = itNeighbor.getNeighbor();
+          const Weight& relationWeight = itNeighbor.getWeight();
+          const Item* neighbor = itNeighbor.getNeighbor();
 
-          if (not neighborItem-> getAutomatonCell().hasAnyFlags(DO_NOT_USE + IS_CYCLE) and
-              lastItem->getAutomatonCell().getCellState() == item->getAutomatonCell().getCellWeight() +
-              itNeighbor.getWeight() +
-              neighborItem->getAutomatonCell().getCellState()
-              /* detect if this is the highest continuation */) {
+          if (isHighestNeighbor(item, relationWeight, neighbor)) {
 
-            path.push_back(neighborItem);
+            path.push_back(neighbor);
             grew = true;
             growPath(path, neighborhood, paths);
             path.pop_back();
@@ -198,6 +177,16 @@ namespace Belle2 {
         }
 
       }
+
+      bool isHighestNeighbor(const Item* item, const Weight& relationWeight, const Item* neighbor) const {
+
+        return (not neighbor->getAutomatonCell().hasAnyFlags(DO_NOT_USE + IS_CYCLE) and
+                (item->getAutomatonCell().getCellState() ==
+                 item->getAutomatonCell().getCellWeight() + relationWeight + neighbor->getAutomatonCell().getCellState())
+               );
+      }
+
+
     }; // end class CellularPathFollower
 
   } //end namespace CDCLocalTracking

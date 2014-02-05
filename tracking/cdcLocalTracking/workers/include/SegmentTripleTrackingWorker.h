@@ -211,7 +211,8 @@ namespace Belle2 {
 
       static const bool growMany = false;
 
-      CellularPathFollower< std::set<CDCSegmentTriple> > m_tipleSegmentCellularFollower;
+      //CellularPathFollower< std::set<CDCSegmentTriple> > m_tipleSegmentCellularFollower;
+      CellularPathFollower<CDCSegmentTriple> m_tipleSegmentCellularFollower;
 
       TrackCreator m_trackCreator;
 

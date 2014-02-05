@@ -66,7 +66,7 @@ namespace Belle2 {
         int iCluster = -1;
         BOOST_FOREACH(Item const & item , items) {
 
-          if (item.getCellState() == -1) {
+          if (item.getAutomatonCell().getCellState() == -1) {
 
             clusters.push_back(Cluster());
             Cluster& newCluster = clusters.back();

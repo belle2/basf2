@@ -140,14 +140,14 @@ cdclocaltracking = register_module('CDCLocalTracking')
 
 # CDCSVGDisplayModule - for reassignment
 svgdisplay_reassignment = cdcdisplay.CDCSVGDisplayModule('/tmp')
-svgdisplay_reassignment.draw_reassigned = True
+# svgdisplay_reassignment.draw_reassigned = True
 
 # ---------------------------------------------------------------
 # CDCSVGDisplayModule - for segments
 svgdisplay = cdcdisplay.CDCSVGDisplayModule('/tmp')
 
 svgdisplay.draw_wires = True  # and False
-svgdisplay.draw_hits = True and False
+svgdisplay.draw_hits = True  # and False
 
 # Objects only drawable with local tracking
 svgdisplay.draw_mcparticles = True and False

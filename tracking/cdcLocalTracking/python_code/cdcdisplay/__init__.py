@@ -50,7 +50,7 @@ class CDCHitColorMap:
         return self.bkgHitColor
 
 
-class RLColorMap:
+class RLColorMap(CDCHitColorMap):
 
     def __call__(self, iCDCHit, cdcHit):
         simHit = cdcHit.getRelated('CDCSimHits')
@@ -65,7 +65,7 @@ class RLColorMap:
             self.bkgHitColor
 
 
-class TOFTransperancyMap:
+class TOFTransperancyMap(CDCHitColorMap):
 
     def __init__(self, cdcHits):
         timesOfFlight = []
@@ -84,7 +84,7 @@ class TOFTransperancyMap:
         return str(opacity)
 
 
-class ReassignedSecondaryMap:
+class ReassignedSecondaryMap(CDCHitColorMap):
 
     def __call__(self, iCDCHit, cdcHit):
         relatedMCParticles = cdcHit.getRelationsWith('MCParticles')

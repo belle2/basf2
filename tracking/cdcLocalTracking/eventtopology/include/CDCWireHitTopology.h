@@ -31,6 +31,10 @@ namespace Belle2 {
     /// Class representating the sense wire arrangement in the whole of the central drift chamber.
     class CDCWireHitTopology : public UsedTObject {
 
+    public:
+      typedef SortableVector<Belle2::CDCLocalTracking::CDCWireHit>::const_range CDCWireHitRange;
+      typedef SortableVector<Belle2::CDCLocalTracking::CDCRLWireHit>::const_range CDCRLWireHitRange;
+
       /// Default constructor for ROOT compatibility.
       CDCWireHitTopology() {;}
 
@@ -44,11 +48,24 @@ namespace Belle2 {
       void clear();
 
       /// Getter for the oriented wire hit with the opposite orientation.
-      const CDCRLWireHit& getReverseOf(const CDCRLWireHit& rlWireHit) const;
+      const Belle2::CDCLocalTracking::CDCRLWireHit& getReverseOf(const Belle2::CDCLocalTracking::CDCRLWireHit& rlWireHit) const;
 
       /// Getter for the two oriented wire hits that are passed on the given wire hit
-      std::pair<const CDCRLWireHit*, const CDCRLWireHit*> getRLWireHitPair(const CDCWireHit& wireHit) const;
+      std::pair<const Belle2::CDCLocalTracking::CDCRLWireHit*, const Belle2::CDCLocalTracking::CDCRLWireHit*> getRLWireHitPair(const Belle2::CDCLocalTracking::CDCWireHit& wireHit) const;
 
+      /// Getter for a coaligned subrange of wire hits
+      template<class Coaligned>
+      CDCWireHitRange getWireHits(const Coaligned& coaligned) const { return m_wireHits.equal_range(coaligned); }
+
+      /// Getter for a coaligned subrange of oriented wire hits
+      template<class Coaligned>
+      CDCRLWireHitRange getRLWireHits(const Coaligned& coaligned) const { return m_rlWireHits.equal_range(coaligned); }
+
+      /// Getter for the wire hits
+      CDCWireHitRange getWireHits() const { return CDCWireHitRange(m_wireHits.begin(), m_wireHits.end()); }
+
+      /// Getter for the wire hits
+      CDCRLWireHitRange getRLWireHits() const { return CDCRLWireHitRange(m_rlWireHits.begin(), m_rlWireHits.end()); }
 
     private:
       SortableVector<CDCWireHit> m_wireHits; ///< Memory for the wire hits to be stored

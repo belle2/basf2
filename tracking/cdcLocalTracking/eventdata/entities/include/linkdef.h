@@ -19,22 +19,6 @@
 
 #pragma link C++ class Belle2::CDCLocalTracking::CDCRecoHit3D;
 
-//#pragma link C++ class vector<Belle2::CDCLocalTracking::CDCWireHit>;
-//#pragma link C++ class vector<Belle2::CDCLocalTracking::CDCRecoHit2D>;
-//#pragma link C++ class vector<Belle2::CDCLocalTracking::CDCRecoTangent>;
-//#pragma link C++ class vector<Belle2::CDCLocalTracking::CDCRecoFacet>;
-//#pragma link C++ class vector<Belle2::CDCLocalTracking::CDCRecoHit3D>;
-
-#pragma link C++ class Belle2::CDCLocalTracking::CDCGenHitVector<CDCGenHit>;
-
-#pragma link C++ class Belle2::CDCLocalTracking::CDCGenHitVector<CDCWireHit>;
-#pragma link C++ class Belle2::CDCLocalTracking::CDCGenHitVector<CDCRecoHit2D>;
-#pragma link C++ class Belle2::CDCLocalTracking::CDCGenHitVector<CDCRecoTangent>;
-#pragma link C++ class Belle2::CDCLocalTracking::CDCGenHitVector<CDCRecoFacet>;
-
-#pragma link C++ class Belle2::CDCLocalTracking::CDCGenHitVector<CDCRecoHit3D>;
-
-
 #endif
 
 #endif

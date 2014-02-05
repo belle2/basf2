@@ -16,7 +16,7 @@
 
 //#include <tracking/cdcLocalTracking/eventdata/entities/CDCWireHit.h>
 #include <tracking/cdcLocalTracking/eventdata/entities/CDCGenHit.h>
-#include <tracking/cdcLocalTracking/eventdata/entities/CDCGenHitVector.h>
+#include <tracking/cdcLocalTracking/eventdata/collections/CDCGenHitVector.h>
 #include <tracking/cdcLocalTracking/eventdata/collections/CDCWireHitVector.h>
 #include <tracking/cdcLocalTracking/topology/CDCWire.h>
 #include <tracking/cdcLocalTracking/topology/CDCWireTopology.h>

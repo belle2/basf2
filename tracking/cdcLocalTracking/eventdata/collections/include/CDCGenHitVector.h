@@ -11,19 +11,18 @@
 #define CDCGENHITVECTOR_H
 
 #include <vector>
-#include <TObject.h>
+#include <algorithm>
 
-//#include <algorithm>
-
-//#include <tracking/cdcLocalTracking/mockroot/MockRoot.h>
+#include <tracking/cdcLocalTracking/mockroot/MockRoot.h>
 //#include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
 
-//#include <tracking/cdcLocalTracking/algorithms/AutomatonCell.h>
-
 #include <tracking/cdcLocalTracking/topology/CDCWire.h>
+#include <tracking/cdcLocalTracking/eventdata/entities/CDCGenHit.h>
 #include <tracking/cdcLocalTracking/eventdata/entities/CDCWireHit.h>
 
+
 #ifdef __CINT__
+//#ifdef CDCLOCALTRACKING_ROOTIFY_CDCGENHITVECTOR
 // Because ROOTCINT does not like namespaces inside template parameters
 // we have to make each object, which we want the instantiate the template
 // available outside any namespace. Therefore we also have to include each of
@@ -43,6 +42,7 @@ typedef Belle2::CDCLocalTracking::CDCRecoTangent CDCRecoTangent;
 typedef Belle2::CDCLocalTracking::CDCRecoFacet CDCRecoFacet;
 typedef Belle2::CDCLocalTracking::CDCRecoHit3D CDCRecoHit3D;
 
+//#endif // CDCLOCALTRACKING_ROOTIFY_CDCGENHITVECTOR
 #endif // __CINT__
 
 

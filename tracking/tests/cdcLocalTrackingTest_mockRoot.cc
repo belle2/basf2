@@ -21,7 +21,7 @@
 #include <tracking/cdcLocalTracking/geometry/Vector2D.h>
 #include <tracking/cdcLocalTracking/geometry/Vector3D.h>
 #include <tracking/cdcLocalTracking/eventdata/entities/CDCGenHit.h>
-#include <tracking/cdcLocalTracking/eventdata/entities/CDCGenHitVector.h>
+#include <tracking/cdcLocalTracking/eventdata/collections/CDCGenHitVector.h>
 #include <tracking/cdcLocalTracking/eventdata/entities/CDCWireHit.h>
 
 using namespace Belle2;

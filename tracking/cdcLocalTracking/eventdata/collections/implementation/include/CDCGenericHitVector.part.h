@@ -276,7 +276,7 @@ namespace Belle2 {
       /// Helper class for STL algorithms searching for specific wire hit
       class HasWireHitPredicate {
       public:
-        HasWireHitPredicate(const CDCWireHit& wirehit) : m_wirehit(wirehit) {;}
+        HasWireHitPredicate(const Belle2::CDCLocalTracking::CDCWireHit& wirehit) : m_wirehit(wirehit) {;}
         bool operator()(const Item& item) { return item->hasWireHit(m_wirehit); }
       private:
         const CDCWireHit& m_wirehit;
@@ -289,7 +289,7 @@ namespace Belle2 {
         //remove erase idiom
       }
       /// Erases all tracking entities assoziated with specific wire hit from the vector.
-      void eraseAll(const CDCWireHit& wirehit) {
+      void eraseAll(const Belle2::CDCLocalTracking::CDCWireHit& wirehit) {
         m_items.erase(remove_if(m_items.begin(), m_items.end(), HasWireHitPredicate(wirehit)), m_items.end());
         //remove erase idiom
       }
@@ -301,7 +301,7 @@ namespace Belle2 {
       }
 
       /// Checks if any stored tracking entity is assoziated with a specific wire hit.
-      bool hasWireHit(const CDCWireHit& wirehit) const {
+      bool hasWireHit(const Belle2::CDCLocalTracking::CDCWireHit& wirehit) const {
         const_iterator found = std::find_if(begin(), end(), HasWireHitPredicate(wirehit));
         return found != end();
       }
@@ -314,7 +314,7 @@ namespace Belle2 {
         }
       }
       /// Copy all entities in this collection assoziated with a specific wire hit to the given collection.
-      void collectForWireHit(const CDCWireHit& wirehit, Collection& collect) const {
+      void collectForWireHit(const Belle2::CDCLocalTracking::CDCWireHit& wirehit, Collection& collect) const {
         input_iterator inputTo = collect.input();
         for (const_iterator itItem = begin(); itItem != end(); ++itItem) {
           if ((*itItem)->hasWireHit(wirehit)) inputTo = *itItem;

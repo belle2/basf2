@@ -10,6 +10,8 @@
 
 #include "../include/CDCRLWireHit.h"
 
+#include <tracking/cdcLocalTracking/eventtopology/CDCWireHitTopology.h>
+
 using namespace std;
 using namespace Belle2;
 using namespace CDCLocalTracking;
@@ -56,5 +58,5 @@ CDCRLWireHit CDCRLWireHit::fromSimHit(
 }
 
 
-CDCRLWireHit CDCRLWireHit::reversed() const
-{ return CDCRLWireHit(&getWireHit(), -getRLInfo()); }
+const CDCRLWireHit& CDCRLWireHit::reversed() const
+{ return CDCWireHitTopology::getInstance().getReverseOf(*this); }

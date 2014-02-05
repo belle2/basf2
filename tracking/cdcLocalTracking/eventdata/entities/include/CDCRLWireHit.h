@@ -43,30 +43,16 @@ namespace Belle2 {
        *  It merely evalutates, if the true trajectory passes right or left of the wire. */
       static CDCRLWireHit fromSimHit(const CDCWireHit* wirehit, const CDCSimHit& simhit);
 
-      /** Returns the oriented wire hit with the opposite right left information */
-      CDCRLWireHit reversed() const;
+      /// Returns the oriented wire hit with the opposite right left information.
+      const CDCRLWireHit& reversed() const;
 
-      /** @name Equality comparision
-       *  Based on the equality of the wire hit, the left right passage information*/
-      /**@{*/
+
 
       /// Equality comparision based on wire hit, left right passage information.
       bool operator==(const CDCRLWireHit& other) const {
         return getWireHit() == other.getWireHit() and getRLInfo() == other.getRLInfo();
       }
 
-      /// Equality comparision based on wire hit, left right passage information and displacement.
-      /** Equality comparision of oriented hits based on  wire hit, left right passage information and displacement.
-       *  This is still usable if a nullptr is given. The nullptr is always different to an actual wire object.
-       *  Compatible for use with ROOT containers.
-       */
-      bool IsEqual(const CDCRLWireHit* const& other) const
-      { return other == nullptr ? false : operator==(*other); }
-      /**@}*/
-
-      /** @name Total ordering
-       *  Comparing the wire hit and the right left passage info in this order of importance. */
-      /**@{*/
       /// Total ordering relation based on wire hit and left right passage information in this order of importance.
       bool operator<(const CDCRLWireHit& other) const {
         return getWireHit() <  other.getWireHit() or (
@@ -87,46 +73,22 @@ namespace Belle2 {
       friend bool operator<(const CDCWireHit& wireHit, const CDCRLWireHit& rlWireHit) { return wireHit < rlWireHit.getWireHit(); }
 
 
-      /// Total ordering relation based on wire hit and left right passage information usable with pointers
-      /** Retains the total ordering sheme for oriented hit objects, \n
-       *  but introduces the special nullptr case to the ordering.
-       *  The nullptr is always smallest. Therefore it forms a lower bound \n
-       *  for the oriented hit pointers.
-       *  This also enables compatibility with all sorts of ROOT containers */
-      bool IsLessThan(const CDCRLWireHit* const& other) const
-      { return other == nullptr ? false : operator<(*other); }
 
-      /// Getter for the lowest possible oriented wire hit.
-      /** Returns oriented hit that compares less to all other possible instances. \n
-       *  Maybe used by higher order tracking entities as a sentinal component for look up \n
-       *  into sorted ranges. */
-      static const CDCRLWireHit getLowest()
-      { return CDCRLWireHit(&(CDCWireHit::getLowest()), LEFT); }
-
-      /// Getter for the lowest possible oriented hit on the given wire hit.
-      /** Returns oriented hit that compare less to all other possible instances on the given wire. \n
-       *  This enables us to find all oriented hits in a sorted range that are assoziated with the same wire, \n
-       */
-      static const CDCRLWireHit getLowerBound(const CDCWireHit* wirehit)
-      { return CDCRLWireHit(wirehit, LEFT); }
-      /**@}*/
+      /// The two dimensional reference position of the underlying wire
+      const Vector2D& getRefPos2D() const { return getWireHit().getRefPos2D(); }
 
       /// Getter for the wire the oriented hit assoziated to.
       const CDCWire& getWire() const { return getWireHit().getWire(); }
+
+      /// Getter for the  drift length at the reference position of the wire
+      FloatType getRefDriftLength() const
+      { return getWireHit().getRefDriftLength(); }
 
       /// Getter for the wire hit assoziated with the oriented hit.
       const CDCWireHit& getWireHit() const { return *m_wirehit; }
 
       /// Getter for the right left passage information.
       const RightLeftInfo& getRLInfo() const { return m_rlInfo; }
-
-      /// The two dimensional reference position of the underlying wire
-      const Vector2D& getRefPos2D() const { return getWireHit().getRefPos2D(); }
-
-      /// Getter for the  drift length at the reference position of the wire
-      FloatType getRefDriftLength() const
-      { return getWireHit().getRefDriftLength(); }
-
 
       /// Estimate the transvers travel distance on the given circle.
       /** Uses the point of closest approach to the wire hit position
@@ -135,16 +97,13 @@ namespace Belle2 {
       FloatType getPerpS(const CDCTrajectory2D& trajectory2D) const
       { return getWireHit().getPerpS(trajectory2D); }
 
-      /** @name Mimic pointer
-        */
+
       /// Access the object methods and methods from a pointer in the same way.
       /** In situations where the type is not known to be a pointer or a reference there is no way to tell \n
        *  if one should use the dot '.' or operator '->' for method look up. \n
        *  So this function defines the -> operator for the object. \n
        *  No matter you have a pointer or an object access is given with '->'*/
-      /**@{*/
       const CDCRLWireHit* operator->() const { return this; }
-      /**@}*/
 
       /** @name Methods common to all tracking entities
        *  All entities ( track parts contained in a single superlayer ) share this interface to help definition of collections of them.

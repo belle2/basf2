@@ -40,10 +40,16 @@ namespace Belle2 {
     public:
       static CDCMCHitLookUp& getInstance();
 
-
     public:
       void fill();
 
+    private:
+      void arrangeMCHitTracks(std::map<int, std::vector<const CDCHit*> >&  mcHitTracks_by_mcParticleIdx);
+      void fillInTrackId(std::map<int, std::vector<const CDCHit*> >&  mcHitTracks_by_mcParticleIdx);
+      void fillRLInfo(std::map<int, std::vector<const CDCHit*> >&  mcHitTracks_by_mcParticleIdx);
+
+
+    public:
       const Belle2::CDCSimHit* getSimHit(const CDCWireHit& wireHit) const {
         const CDCHit* hit = wireHit.getHit();
         return hit ? hit->getRelated<CDCSimHit>() : nullptr;
@@ -54,12 +60,23 @@ namespace Belle2 {
         return hit ? hit->getRelated<MCParticle>() : nullptr;
       }
 
+
     private:
       bool isReassignedSecondaryHit(const CDCHit& hit) const;
+      bool isReassignedSecondaryHit(const CDCSimHit& simHit) const;
+
+      const CDCSimHit* getClosestPrimarySimHit(const CDCHit* hit) const;
+      const CDCSimHit* getClosestPrimarySimHit(const CDCSimHit* simHit) const;
+
+      RightLeftInfo getRLInfo(const CDCSimHit& simHit) const;
+      RightLeftInfo getPrimaryRLInfo(const CDCSimHit& simHit) const;
 
     public:
       /// Indicates if the hit was reassigned to a different mc particle because it was caused by a secondary.
       bool isReassignedSecondaryHit(const CDCWireHit& wireHit) const;
+
+      /// Getter for the closest simulated hit of a primary particle to the given hit
+      const CDCSimHit* getClosestPrimarySimHit(const CDCWireHit& wireHit) const;
 
       /// Returns the track id for the hit
       ITrackType getMCTrackId(const CDCWireHit& wireHit) const;
@@ -79,6 +96,9 @@ namespace Belle2 {
 
 
     public:
+
+      std::map<const CDCHit*, const CDCSimHit*>  m_primarySimHits;
+
       std::map<const CDCHit*, RightLeftInfo> m_rightLeftInfos;
       std::map<const CDCHit*, int> m_inTrackIds;
 

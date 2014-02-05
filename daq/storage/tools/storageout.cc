@@ -46,8 +46,10 @@ int main(int argc, char** argv)
   unsigned int runno = 0;
   info.reportRunning();
   while (true) {
+    if (use_info) sinfo->connection = 0;
     REvtSocketSend* socket = new REvtSocketSend(atoi(argv[3]));
     B2INFO("Connected from expreco.");
+    if (use_info) sinfo->connection = 1;
     while (true) {
       ibuf.read(evtbuf);
       ibuf.lock();
@@ -71,6 +73,7 @@ int main(int argc, char** argv)
       delete msg;
       if (nbyte <= 0) {
         B2WARNING("Connection to expreco broken.");
+        if (use_info) sinfo->connection = 0;
         info.reportError();
         break;
       }

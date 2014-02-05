@@ -68,6 +68,7 @@ void StorageDeserializerModule::initialize()
       m_info.open(m_nodename, sizeof(storage_info) / sizeof(int), m_shmflag > 1);
       m_sinfo = (storage_info*)m_info.getReserved();
       memset(m_sinfo, 0, sizeof(storage_info));
+      m_sinfo->nodeid = m_nodeid;
     }
   }
   StoreArray<RawPXD>::registerPersistent();

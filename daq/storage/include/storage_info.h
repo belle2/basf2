@@ -11,6 +11,7 @@ struct storage_info {
   unsigned long long stime;
   unsigned int count;
   unsigned long long nbyte;
+  unsigned int connection;
 };
 
 #endif

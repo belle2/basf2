@@ -56,6 +56,7 @@ int main(int argc, char** argv)
       socket.connect();
       socket.setBufferSize(4 * 1024 * 1024);
       ntried = 0;
+      if (use_info) sinfo->connection = 1;
     } catch (const IOException& e) {
       socket.close();
       B2WARNING("storagein: failed to connect to eb2 (try=" << ntried++ << ")");
@@ -65,6 +66,7 @@ int main(int argc, char** argv)
     try {
       TCPSocketReader reader(socket);
       B2INFO("storagein: Cconnected to eb2.");
+      if (use_info) sinfo->connection = 1;
       while (true) {
         reader.read(evtbuf, sizeof(int));
         reader.read((evtbuf + 1), (evtbuf[0] - 1) * sizeof(int));
@@ -96,6 +98,7 @@ int main(int argc, char** argv)
       }
     } catch (const IOException& e) {
       socket.close();
+      if (use_info) sinfo->connection = 0;
       B2WARNING("storagein: Connection to eb2 broken.");
       sleep(5);
     }

@@ -62,9 +62,10 @@ namespace Belle2 {
 
     public:
       typedef T Item; ///< Value type of this container
+      typedef const T ConstItem; ///< Value type of this container
 
     public:
-      typedef T& StoredItemRef;  ///< Reference type to a stored item.
+      //typedef T& StoredItemRef;  ///< Reference type to a stored item.
 
       typedef T value_type; ///< Value type of this container
 
@@ -149,13 +150,12 @@ namespace Belle2 {
       /// Gives the first item of the vector
       Item& back() { return m_items.back(); }
       /// Gives the first item of the constant vector
-      const Item& back() const { return m_items.back(); }
+      ConstItem& back() const { return m_items.back(); }
 
       /// Gives the last item of the vector
       Item& front() { return m_items.front(); }
       /// Gives the last item of the constant vector
-      const Item& front() const { return m_items.front(); }
-
+      ConstItem& front() const { return m_items.front(); }
 
       /// Returns an input iterator to the vector
       input_iterator input() { return input_iterator(*this); }
@@ -182,8 +182,8 @@ namespace Belle2 {
       /** The STL unfortunatly does not define a common method to store elements in all kinds \n
        *  of container types. With this method we provide a common method name to just store instances \n
        *  no matter we are storing to a set or to vector */
-      inline StoredItemRef store(Item const& item)
-      { push_back(item); return back(); }
+      //inline StoredItemRef store(Item const& item)
+      //{ push_back(item); return back(); }
 
       /// Inserts an element before the given iterator position
       /** This can be used to just store items the same way as in sets by giving .end() to the pos iterator

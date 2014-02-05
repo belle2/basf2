@@ -12,20 +12,20 @@
 
 #include "CDCGenHitVector.h"
 
-#include "CDCWireHitPtrSet.h"
-#include "CDCWireHitSet.h"
+//#include "CDCWireHitPtrSet.h"
+//#include "CDCWireHitSet.h"
 #include "CDCWireHitVector.h"
 
-#include "CDCRecoHit2DSet.h"
+//#include "CDCRecoHit2DSet.h"
 #include "CDCRecoHit2DVector.h"
 
-#include "CDCRecoHit3DSet.h"
+//#include "CDCRecoHit3DSet.h"
 #include "CDCRecoHit3DVector.h"
 
-#include "CDCRecoTangentSet.h"
+//#include "CDCRecoTangentSet.h"
 #include "CDCRecoTangentVector.h"
 
-#include "CDCRecoFacetSet.h"
+//#include "CDCRecoFacetSet.h"
 #include "CDCRecoFacetVector.h"
 
 #endif //CDCCOLLECTIONS_H

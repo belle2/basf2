@@ -14,8 +14,6 @@
 #include <tracking/cdcLocalTracking/eventdata/entities/CDCWireHit.h>
 #include <tracking/cdcLocalTracking/eventdata/collections/CDCGenHitVector.h>
 
-#include <tracking/cdcLocalTracking/eventdata/collections/CDCWireHitPtrSet.h>
-
 namespace Belle2 {
   namespace CDCLocalTracking {
 
@@ -23,8 +21,8 @@ namespace Belle2 {
     //may get additional methods if necessary
 
     // An agregation of CDCWireHits
-    typedef CDCWireHitPtrSet CDCWireHitCluster;
-    //typedef CDCGenHitVector<Belle2::CDCLocalTracking::CDCWireHit*> CDCWireHitCluster;
+    //typedef CDCWireHitPtrSet CDCWireHitCluster;
+    typedef CDCGenHitVector<const Belle2::CDCLocalTracking::CDCWireHit*> CDCWireHitCluster;
 
 
   }

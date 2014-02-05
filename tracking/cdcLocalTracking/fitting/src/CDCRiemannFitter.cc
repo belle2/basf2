@@ -30,7 +30,7 @@ CDCRiemannFitter::~CDCRiemannFitter()
 }
 
 
-
+/*
 size_t CDCRiemannFitter::fillObservations(const CDCRecoHit2DSet& recohits, vector<FloatType>& observations) const
 {
   size_t result = 0;
@@ -38,7 +38,7 @@ size_t CDCRiemannFitter::fillObservations(const CDCRecoHit2DSet& recohits, vecto
     result += fillObservation(*itRecoHit, observations);
   }
   return result;
-}
+  }*/
 
 size_t CDCRiemannFitter::fillObservations(const CDCRecoHit2DVector& recohits, vector<FloatType>& observations) const
 {

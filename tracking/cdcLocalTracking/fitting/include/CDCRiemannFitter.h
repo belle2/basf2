@@ -31,12 +31,6 @@ namespace Belle2 {
       /** Destructor. */
       ~CDCRiemannFitter();
 
-      CDCTrajectory2D fit(const CDCRecoHit2DSet& recohits) const {
-        CDCTrajectory2D result;
-        update(result, recohits);
-        return result;
-      }
-
       CDCTrajectory2D fit(const CDCRecoHit2DVector& recohits) const {
         CDCTrajectory2D result;
         update(result, recohits);
@@ -46,14 +40,6 @@ namespace Belle2 {
         CDCTrajectory2D result;
         update(result, recohits);
         return result;
-      }
-
-
-      void update(CDCTrajectory2D& fit, const CDCRecoHit2DSet& recohits) const {
-        std::vector<FloatType> observations;
-        bool useRightLeftInfo = fillObservations(recohits, observations) != 0;
-        update(fit, observations, useRightLeftInfo);
-
       }
 
       void update(CDCTrajectory2D& fit, const CDCRecoHit2DVector& recohits) const {
@@ -101,7 +87,7 @@ namespace Belle2 {
         //update(fit,observations,useRightLeftInfo);
       }
 
-      size_t fillObservations(const CDCRecoHit2DSet& recohits, std::vector<FloatType>& observations) const;
+      //size_t fillObservations(const CDCRecoHit2DSet& recohits, std::vector<FloatType>& observations) const;
       size_t fillObservations(const CDCRecoHit2DVector& recohits, std::vector<FloatType>& observations) const;
       size_t fillObservations(const CDCSegmentTriple& segmentTriple, std::vector<FloatType>& observations) const __attribute__((deprecated));
 

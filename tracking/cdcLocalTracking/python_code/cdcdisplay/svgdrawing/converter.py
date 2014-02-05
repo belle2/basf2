@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+
 from ROOT import gSystem
 gSystem.Load('libframework')  # for PyStoreArray
 gSystem.Load('libcdc')  # for CDCSimHit
@@ -15,7 +16,7 @@ from ROOT import genfit
 print dir(genfit)
 print dir(genfit.TrackCand)
 print dir(Belle2)
-#from ROOT import GFTrackCand
+# from ROOT import GFTrackCand
 
 import primitives
 
@@ -26,48 +27,26 @@ class CDCDataobjectsConverter:
         self.svgElementFactory = \
             primitives.SVGPrimitivesFactory(elementFactory)
 
-        self.toSVGFunctions_by_type = {
-            # Belle2.CDCLocalTracking.CDCRecoSegment2D: \
-               # self.CDCGenericHitCollectionToSVG,
+        self.toSVGFunctions_by_type = {  # Belle2.CDCLocalTracking.CDCRecoSegment2D: \
+                                         # self.CDCGenericHitCollectionToSVG,
             Belle2.PyStoreObj: self.PyStoreObjToSVG,
             Belle2.PyStoreArray: self.PyStoreArrayToSVG,
             Belle2.CDCLocalTracking.Vector2D: self.Vector2DToSVG,
             Belle2.CDCLocalTracking.Vector3D: self.Vector3DToSVG,
             Belle2.CDCLocalTracking.CDCWire: self.CDCWireToSVG,
-            Belle2.CDCLocalTracking.CDCWireSuperLayer: \
-                self.CDCWireSuperLayerToSVG,
+            Belle2.CDCLocalTracking.CDCWireSuperLayer: self.CDCWireSuperLayerToSVG,
             Belle2.CDCLocalTracking.CDCWireHit: self.CDCWireHitToSVG,
-            Belle2.CDCLocalTracking.CDCWireHitSet: \
-                self.CDCGenericHitCollectionToSVG,
-            Belle2.CDCLocalTracking.CDCWireHitPtrSet: \
-                self.CDCGenericHitCollectionToSVG,
-            Belle2.CDCLocalTracking.CDCWireHitVector: \
-                self.CDCGenericHitCollectionToSVG,
+            Belle2.CDCLocalTracking.CDCWireHitVector: self.CDCGenericHitCollectionToSVG,
             Belle2.CDCLocalTracking.CDCRecoHit2D: self.CDCRecoHit2DToSVG,
-            Belle2.CDCLocalTracking.CDCRecoHit2DSet: \
-                self.CDCGenericHitCollectionToSVG,
-            Belle2.CDCLocalTracking.CDCRecoHit2DVector: \
-                self.CDCGenericHitCollectionToSVG,
+            Belle2.CDCLocalTracking.CDCRecoHit2DVector: self.CDCGenericHitCollectionToSVG,
             Belle2.CDCLocalTracking.CDCRecoTangent: self.CDCRecoTangentToSVG,
-            Belle2.CDCLocalTracking.CDCRecoTangentSet: \
-                self.CDCGenericHitCollectionToSVG,
-            Belle2.CDCLocalTracking.CDCRecoTangentVector: \
-                self.CDCGenericHitCollectionToSVG,
-            Belle2.CDCLocalTracking.CDCRecoFacetSet: \
-                self.CDCGenericHitCollectionToSVG,
-            Belle2.CDCLocalTracking.CDCRecoFacetVector: \
-                self.CDCGenericHitCollectionToSVG,
+            Belle2.CDCLocalTracking.CDCRecoTangentVector: self.CDCGenericHitCollectionToSVG,
+            Belle2.CDCLocalTracking.CDCRecoFacetVector: self.CDCGenericHitCollectionToSVG,
             Belle2.CDCLocalTracking.CDCRecoHit3D: self.CDCRecoHit3DToSVG,
-            Belle2.CDCLocalTracking.CDCRecoHit3DSet: \
-                self.CDCGenericHitCollectionToSVG,
-            Belle2.CDCLocalTracking.CDCRecoHit3DVector: \
-                self.CDCGenericHitCollectionToSVG,
-            Belle2.CDCLocalTracking.CDCSegmentTriple: \
-                self.CDCSegmentTripleToSVG,
-            Belle2.CDCLocalTracking.CDCTrack: \
-                self.CDCGenericHitCollectionToSVG,
-            Belle2.CDCLocalTracking.CDCTrajectory2D: \
-                self.CDCTrajectory2DToSVG,
+            Belle2.CDCLocalTracking.CDCRecoHit3DVector: self.CDCGenericHitCollectionToSVG,
+            Belle2.CDCLocalTracking.CDCSegmentTriple: self.CDCSegmentTripleToSVG,
+            Belle2.CDCLocalTracking.CDCTrack: self.CDCGenericHitCollectionToSVG,
+            Belle2.CDCLocalTracking.CDCTrajectory2D: self.CDCTrajectory2DToSVG,
             Belle2.CDCSimHit: self.CDCSimHitToSVG,
             Belle2.CDCHit: self.CDCHitToSVG,
             genfit.TrackCand: self.GFTrackCandToSVG,
@@ -107,8 +86,7 @@ class CDCDataobjectsConverter:
             iter(iterable)
         except TypeError, e:
             print type(iterable), \
-                ' is not iterable. Consider adding a specialised '\
-                    'converter function for this object type.'
+                ' is not iterable. Consider adding a specialised converter function for this object type.'
 
         childElements = []
         for (iObj, obj) in enumerate(iterable):
@@ -531,3 +509,5 @@ class CDCDataobjectsConverter:
                 self.IterableToSVG)
 
         return toSVGForType(obj, **kwd)
+
+

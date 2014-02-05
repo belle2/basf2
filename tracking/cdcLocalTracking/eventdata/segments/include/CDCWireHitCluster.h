@@ -11,6 +11,9 @@
 #define CDCWIREHITCLUSTER_H
 
 
+#include <tracking/cdcLocalTracking/eventdata/entities/CDCWireHit.h>
+#include <tracking/cdcLocalTracking/eventdata/collections/CDCGenHitVector.h>
+
 #include <tracking/cdcLocalTracking/eventdata/collections/CDCWireHitPtrSet.h>
 
 namespace Belle2 {
@@ -21,6 +24,8 @@ namespace Belle2 {
 
     // An agregation of CDCWireHits
     typedef CDCWireHitPtrSet CDCWireHitCluster;
+    //typedef CDCGenHitVector<Belle2::CDCLocalTracking::CDCWireHit*> CDCWireHitCluster;
+
 
   }
 }

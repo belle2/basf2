@@ -32,7 +32,7 @@ namespace Belle2 {
 
     //some additional transient types for exchange between objects
     typedef std::vector<const CDCRecoFacet*>  CDCRecoFacetPtrSegment;
-    typedef CDCRecoTangentSet CDCRecoTangentCollection; //for now just used for io to python
+    typedef CDCRecoTangentVector CDCRecoTangentCollection; //for now just used for io to python
 
   }
 } // namespace Belle2

@@ -40,6 +40,8 @@ TangentSegmentCreator::create(
 
     create(facetSegment, tangentSegment);
 
+    tangentSegment.ensureUnique();
+
   } // next facetsegment
 
 }

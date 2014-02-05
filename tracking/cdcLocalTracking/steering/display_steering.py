@@ -154,14 +154,14 @@ svgdisplay.draw_rlinfo = True and False
 svgdisplay.draw_tof = True and False
 svgdisplay.draw_clusters = True and False
 svgdisplay.draw_segments = True  # and False
-svgdisplay.draw_tangentsegments = True and False
+svgdisplay.draw_tangentsegments = True  # and False
 svgdisplay.draw_segmenttriples = True and False
 svgdisplay.draw_tracks = True and False
 svgdisplay.draw_segmenttriple_trajectories = True and False
 svgdisplay.draw_segment_trajectories = True and False
 
-svgdisplay.draw_gftrackcands = True  # and False
-svgdisplay.draw_gftrackcand_trajectories = True  # and False
+svgdisplay.draw_gftrackcands = True and False
+svgdisplay.draw_gftrackcand_trajectories = True and False
 
 svgdisplay.draw_superlayer_boundaries = True  # and False
 svgdisplay.draw_interactionpoint = True  # and False

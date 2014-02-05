@@ -22,6 +22,7 @@
 
 #include <tracking/cdcLocalTracking/algorithms/CellularAutomaton.h>
 #include <tracking/cdcLocalTracking/algorithms/CellularPathFollower.h>
+#include <tracking/cdcLocalTracking/algorithms/MultipassCellularPathFinder.h>
 #include <tracking/cdcLocalTracking/algorithms/Clusterizer.h>
 
 #include <tracking/cdcLocalTracking/creators/FacetCreator.h>
@@ -46,8 +47,7 @@ namespace Belle2 {
 
 
       /** Constructor. */
-      FacetSegmentWorker() {;}
-
+      FacetSegmentWorker(): m_cellularPathFinder(3.0) {;}
 
       /** Destructor.*/
       ~FacetSegmentWorker() {;}
@@ -60,7 +60,6 @@ namespace Belle2 {
         StoreArray < CDCRecoSegment2D >::registerTransient("CDCRecoHit2DSegmentsSelected");
         StoreArray < CDCWireHitCluster >::registerTransient("CDCWireHitClusters");
 #endif
-
 
         m_clusters.reserve(50);
 
@@ -177,54 +176,10 @@ namespace Belle2 {
             m_segmentSelecter.selectSegments(recoSegments, selectedRecoSegments);
 
           } else { /* not growMany */
-            // multiple passes of the cellular automat
-            // one segment is created at a time denying all the wire hits it picked up
-            // and apply the cellular automat again
-            // and so on
-            // no best candidate analysis needed
-            // (only makes sense with minimal clusters to avoid reweighting of uncommon paths )
-
 
             m_facetSegments.clear();
-            bool created = false;
-            B2DEBUG(100, "Apply multipass cellular automat");
-            do {
-              //apply the cellular automation
-              //B2DEBUG(100,"Apply cellular automat");
-              const CDCRecoFacet* highestCell
-                = m_cellularAutomaton.applyTo(m_facets, m_facetsNeighborhood);
-              if (highestCell != nullptr) {
-                //B2DEBUG(100,"  MaximalState " << highestCell->getCellState());
-              }
+            m_cellularPathFinder.apply(m_facets, m_facetsNeighborhood, m_facetSegments);
 
-              //create the segments by following the highest states in the reco facets
-              //B2DEBUG(100,"Follow the longest paths");
-              //B2DEBUG(100,m_facetsNeighborhood);
-              m_facetSegments.push_back(CDCRecoFacetPtrSegment());
-              CDCRecoFacetPtrSegment& ptrFacetSegment = m_facetSegments.back();
-              created = m_cellularFollower.followSingle(highestCell, m_facetsNeighborhood,
-                                                        ptrFacetSegment, 3.0);
-
-              //B2DEBUG(100,"  Created CDCRecoFacetPtrSegment with " <<
-              //               ptrFacetSegment.size() << " facets");
-              //B2DEBUG(100,"  Created " << nCreated  << " CDCRecoSegment2Ds");
-
-
-              //Block the used facets
-              for (const CDCRecoFacet * facet :  ptrFacetSegment) {
-                facet->setDoNotUse();
-              }
-
-              //Block the facets that use already used wirehits as well
-              for (const CDCRecoFacet & facet :  m_facets) {
-                facet.receiveDoNotUse();
-              }
-
-            } while (created);
-
-            // drop last facet segment because it was not filles
-            m_facetSegments.pop_back();
-            B2DEBUG(100, "  Created " << m_facetSegments.size()  << " CDCRecoFacetPtrSegment");
 
             //save the tangents for display only
 #ifdef CDCLOCALTRACKING_USE_ROOT
@@ -236,6 +191,7 @@ namespace Belle2 {
             B2DEBUG(100, "Reduce the CDCRecoFacetPtrSegment to RecoSegment2D");
             selectedRecoSegments.reserve(selectedRecoSegments.size() + m_facetSegments.size());
             m_recoSegmentCreator.create(m_facetSegments, selectedRecoSegments);
+
 
           } //end if growMany
 
@@ -359,6 +315,8 @@ namespace Belle2 {
 
       //CellularPathFollower< CDCRecoFacetCollection > m_cellularFollower;
       CellularPathFollower<CDCRecoFacet> m_cellularFollower;
+
+      MultipassCellularPathFinder<CDCRecoFacet> m_cellularPathFinder;
 
 
       RecoSegmentCreator m_recoSegmentCreator;

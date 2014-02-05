@@ -23,6 +23,7 @@
 #include <tracking/cdcLocalTracking/algorithms/Clusterizer.h>
 #include <tracking/cdcLocalTracking/algorithms/CellularAutomaton.h>
 #include <tracking/cdcLocalTracking/algorithms/CellularPathFollower.h>
+#include <tracking/cdcLocalTracking/algorithms/MultipassCellularPathFinder.h>
 
 #include <tracking/cdcLocalTracking/creators/SegmentTripleCreator.h>
 #include <tracking/cdcLocalTracking/creators/TrackCreator.h> //no decisions to optimize
@@ -42,7 +43,7 @@ namespace Belle2 {
     public:
 
       /** Constructor. */
-      SegmentTripleTrackingWorker() {;}
+      SegmentTripleTrackingWorker(): m_cellularPathFinder(0.0) {;}
 
 
       /** Destructor.*/
@@ -101,39 +102,8 @@ namespace Belle2 {
           //no best candidate analysis needed
 
           m_segmentTripleTracks.clear();
-          bool created = 0;
-          B2DEBUG(100, "Apply multipass cellular automat for CDCSegmentTriples");
-          do {
-            //apply the cellular automation
-            //B2DEBUG(100,"Apply cellular automat for CDCSegmentTriples");
-            const CDCSegmentTriple* highestCell
-              =  m_segmentTripleAutomaton.applyTo(m_segmentTriples, m_segmentTripleNeighborhood);
-            if (highestCell != nullptr) {
-              //B2DEBUG(100,"  MaximalState " << highestCell->getCellState());
-            }
+          m_cellularPathFinder.apply(m_segmentTriples, m_segmentTripleNeighborhood, m_segmentTripleTracks);
 
-            //create the segments by following the highest states in the segment triples
-            //B2DEBUG(100,"Follow the longest paths");
-            m_segmentTripleTracks.push_back(std::vector<const CDCSegmentTriple*>());
-            std::vector<const CDCSegmentTriple*>& segmentTripleTrack = m_segmentTripleTracks.back();
-            created = m_tipleSegmentCellularFollower.followSingle(highestCell, m_segmentTripleNeighborhood,
-                                                                  segmentTripleTrack, 0);
-            //B2DEBUG(100,"  Created SegmentTripleTracks with " <<
-            //               segmentTripleTrack.size() << " segment triples");
-
-            //Block the used segments
-            for (const CDCSegmentTriple * triple : segmentTripleTrack) {
-              triple->setDoNotUse();
-            }
-
-            //Block the triples that use already used segments as well
-            for (const CDCSegmentTriple & triple : m_segmentTriples) {
-              triple.receiveDoNotUse();
-            }
-
-          } while (created != 0);
-
-          m_segmentTripleTracks.pop_back();
           B2DEBUG(100, "  Created " << m_segmentTripleTracks.size()  << " SegmentTripleTracks");
 
           //reduce to plain tracks
@@ -213,6 +183,8 @@ namespace Belle2 {
 
       //CellularPathFollower< std::set<CDCSegmentTriple> > m_tipleSegmentCellularFollower;
       CellularPathFollower<CDCSegmentTriple> m_tipleSegmentCellularFollower;
+      MultipassCellularPathFinder<CDCSegmentTriple> m_cellularPathFinder;
+
 
       TrackCreator m_trackCreator;
 

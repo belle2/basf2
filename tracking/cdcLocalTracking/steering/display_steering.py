@@ -139,7 +139,7 @@ cdclocaltracking = register_module('CDCLocalTracking')
 # select which detectors you would like to use
 
 # ---------------------------------------------------------------
-# CDCSVGDisplayModule
+# CDCSVGDisplayModule - for segments
 svgdisplay = cdcdisplay.CDCSVGDisplayModule('/tmp')
 
 svgdisplay.draw_wires = True  # and False
@@ -165,6 +165,15 @@ svgdisplay.draw_gftrackcand_trajectories = True and False
 
 svgdisplay.draw_superlayer_boundaries = True  # and False
 svgdisplay.draw_interactionpoint = True  # and False
+
+# CDCSVGDisplayModule - for tracks
+svgdisplay_tracks = cdcdisplay.CDCSVGDisplayModule('/tmp')
+
+svgdisplay_tracks.draw_wires = True  # and False
+svgdisplay_tracks.draw_gftrackcands = True  # and False
+svgdisplay_tracks.draw_gftrackcand_trajectories = True  # and False
+svgdisplay_tracks.draw_superlayer_boundaries = True  # and False
+svgdisplay_tracks.draw_interactionpoint = True  # and False
 
 # ---------------------------------------------------------------
 # input
@@ -203,6 +212,7 @@ elif options.legendreTracking:
     main.add_module(cdclegendretracking)
 
 main.add_module(svgdisplay)
+main.add_module(svgdisplay_tracks)
 
 process(main)
 

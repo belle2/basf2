@@ -1306,7 +1306,7 @@ void VXDTFModule::the_real_event()
       hitInfo.sigmaU = m_errorContainer.at(aLayerID - 1).first;
       hitInfo.sigmaV = m_errorContainer.at(aLayerID - 1).second;
 
-      B2DEBUG(10, " pxdluster got global pos X/Y/Z: " << hitInfo.hitPosition.X() << "/" << hitInfo.hitPosition.Y() << "/" << hitInfo.hitPosition.Z() << ", global var X/Y/Z: " << hitInfo.hitSigma.X() << "/" << hitInfo.hitSigma.Y() << "/" << hitInfo.hitSigma.Z()) /// WARNING TODO: set to debug level 100
+      B2DEBUG(100, "svdClusterCombi got global pos X/Y/Z: " << hitInfo.hitPosition.X() << "/" << hitInfo.hitPosition.Y() << "/" << hitInfo.hitPosition.Z() << ", global var X/Y/Z: " << hitInfo.hitSigma.X() << "/" << hitInfo.hitSigma.Y() << "/" << hitInfo.hitSigma.Z())
 
       // local(0,0,0) is the center of the sensorplane
       vSize = 0.5 * aSensorInfo.getVSize();
@@ -1966,7 +1966,7 @@ void VXDTFModule::endRun()
     B2DEBUG(1, "manually calculated mean: " << meanTimeConsumption / numLoggedEvents << ", and median: " << m_TESTERlogEvents.at(median).totalTime.count() << " of time consumption per event");
   }
 
-  B2INFO(" VXDTF - endRun: within " << m_eventCounter + 1 << " events, there were a total number of " << m_TESTERcountTotalTCsFinal << " TCs and " << float(m_TESTERcountTotalTCsFinal) / (float(m_eventCounter + 1)) << " TCs per event. Mean track length: " << float(m_TESTERcountTotalUsedIndicesFinal) / float(m_TESTERcountTotalTCsFinal))
+  B2INFO(" VXDTF - endRun: within " << m_eventCounter + 1 << " events, there were a total number of " << m_TESTERcountTotalTCsFinal << " TCs and " << float(m_TESTERcountTotalTCsFinal) / (float(m_eventCounter + 1)) << " TCs per event(" << m_PARAMkillEventForHighOccupancyThreshold << " events killed for high occupancy). Mean track length: " << float(m_TESTERcountTotalUsedIndicesFinal) / float(m_TESTERcountTotalTCsFinal))
 
   B2DEBUG(1, " ############### " << m_PARAMnameOfInstance << " endRun - end ############### ")
 }
@@ -2671,7 +2671,7 @@ void VXDTFModule::tcDuel(TCsOfEvent& tcVector)
   if (tcVector.at(0)->getTrackQuality() > tcVector.at(1)->getTrackQuality()) {
     tcVector.at(1)->setCondition(false);
   } else { tcVector.at(0)->setCondition(false); }
-  B2DEBUG(10, "2 overlapping Track Candidates found, tcDuel chose the last TC standing on its own")
+  B2DEBUG(10, "2 overlapping Track Candidates found, tcDuel choses the last TC standing on its own")
 }
 
 
@@ -2740,6 +2740,7 @@ int VXDTFModule::segFinder(PassData* currentPass)
   oldFriendID = numeric_limits<unsigned int>::max();
   TVector3 currentVector, tempVector;
   TVector3* currentCoords, *friendCoords;
+  vector< pair < int, bool > > acceptedRejectedFilters; // collects for each filter whether it accepted or rejected the current segment. .first is filterID as int, .second is true if accepted, else false
   bool accepted = false; // recycled return value of the filters
   int simpleSegmentQI; // considers only min and max cutoff values, but could be weighed by order of relevance
   int discardedSegmentsCounter = 0;
@@ -2779,8 +2780,9 @@ int VXDTFModule::segFinder(PassData* currentPass)
       if (numOfFriendHits == 0 && ownHits[currentHit]->getNumberOfSegments() == 0) {
         B2DEBUG(10, "event " << m_eventCounter << ": current Hit has no friendHits although layer is " << FullSecID(mainSecIter->second->getSecID()).getLayerID() << " and secID: " << FullSecID(ownHits.at(currentHit)->getSectorName()).getFullSecString())
       }
-      B2DEBUG(50, "Sector " << FullSecID(mainSecIter->first).getFullSecString() << " has got " << numOfFriendHits << " hits lying among his friends! ");
+      B2DEBUG(20, "Sector " << FullSecID(mainSecIter->first).getFullSecString() << " has got " << numOfFriendHits << " hits lying among his friends! ");
       for (int friendHit = 0; friendHit < numOfFriendHits; ++friendHit) {
+        acceptedRejectedFilters.clear();
         simpleSegmentQI = 0;
 
         if (allFriendHits[friendHit]->isReserved() == true) { continue; }
@@ -2798,8 +2800,10 @@ int VXDTFModule::segFinder(PassData* currentPass)
           if (accepted == true) {
             simpleSegmentQI++;
             B2DEBUG(150, " dist3d: segment approved!")
+            acceptedRejectedFilters.push_back(make_pair(FilterID::distance3D, true));
           } else {
             B2DEBUG(150, " dist3d: segment discarded!")
+            acceptedRejectedFilters.push_back(make_pair(FilterID::distance3D, false));
             if (m_PARAMDebugMode == true) {
               pair <double, double> cutoffs = currentPass->twoHitFilterBox.getCutoffs(FilterID::distance3D);
               B2WARNING("dist3D - minCutoff: " << cutoffs.first << ", calcValue: " << currentPass->twoHitFilterBox.calcDist3D() << ", maxCutoff: " << cutoffs.second)
@@ -2812,8 +2816,10 @@ int VXDTFModule::segFinder(PassData* currentPass)
           if (accepted == true) {
             simpleSegmentQI++;
             B2DEBUG(150, " distxy: segment approved!")
+            acceptedRejectedFilters.push_back(make_pair(FilterID::distanceXY, true));
           } else {
             B2DEBUG(150, " distxy: segment discarded!")
+            acceptedRejectedFilters.push_back(make_pair(FilterID::distanceXY, false));
             if (m_PARAMDebugMode == true) {
               pair <double, double> cutoffs = currentPass->twoHitFilterBox.getCutoffs(FilterID::distanceXY);
               B2WARNING("distxy - minCutoff: " << cutoffs.first << ", calcValue: " << currentPass->twoHitFilterBox.calcDistXY() << ", maxCutoff: " << cutoffs.second)
@@ -2826,8 +2832,10 @@ int VXDTFModule::segFinder(PassData* currentPass)
           if (accepted == true) {
             simpleSegmentQI++;
             B2DEBUG(150, " distz: segment approved!")
+            acceptedRejectedFilters.push_back(make_pair(FilterID::distanceZ, true));
           } else {
             B2DEBUG(150, " distz: segment discarded!")
+            acceptedRejectedFilters.push_back(make_pair(FilterID::distanceZ, false));
             if (m_PARAMDebugMode == true) {
               pair <double, double> cutoffs = currentPass->twoHitFilterBox.getCutoffs(FilterID::distanceZ);
               B2WARNING("distz - minCutoff: " << cutoffs.first << ", calcValue: " << currentPass->twoHitFilterBox.calcDistZ() << ", maxCutoff: " << cutoffs.second)
@@ -2840,8 +2848,10 @@ int VXDTFModule::segFinder(PassData* currentPass)
           if (accepted == true) {
             simpleSegmentQI++;
             B2DEBUG(150, " normeddist3d: segment approved!")
+            acceptedRejectedFilters.push_back(make_pair(FilterID::normedDistance3D, true));
           } else {
             B2DEBUG(150, " normeddist3d: segment discarded!")
+            acceptedRejectedFilters.push_back(make_pair(FilterID::normedDistance3D, false));
             if (m_PARAMDebugMode == true) {
               pair <double, double> cutoffs = currentPass->twoHitFilterBox.getCutoffs(FilterID::normedDistance3D);
               B2WARNING("normeddist3d - minCutoff: " << cutoffs.first << ", calcValue: " << currentPass->twoHitFilterBox.calcNormedDist3D() << ", maxCutoff: " << cutoffs.second)
@@ -2854,8 +2864,10 @@ int VXDTFModule::segFinder(PassData* currentPass)
           if (accepted == true) {
             simpleSegmentQI++;
             B2DEBUG(150, " slopeRZ: segment approved!")
+            acceptedRejectedFilters.push_back(make_pair(FilterID::slopeRZ, true));
           } else {
             B2DEBUG(150, " slopeRZ: segment discarded!")
+            acceptedRejectedFilters.push_back(make_pair(FilterID::slopeRZ, false));
             if (m_PARAMDebugMode == true) {
               pair <double, double> cutoffs = currentPass->twoHitFilterBox.getCutoffs(FilterID::slopeRZ);
               B2WARNING("slopeRZ - minCutoff: " << cutoffs.first << ", calcValue: " << currentPass->twoHitFilterBox.calcSlopeRZ() << ", maxCutoff: " << cutoffs.second)
@@ -2865,23 +2877,42 @@ int VXDTFModule::segFinder(PassData* currentPass)
 
 
         if (simpleSegmentQI < currentPass->activatedSegFinderTests) {
-          B2DEBUG(150, "SegFINDER: segment discarded! simpleSegmentQI = " << simpleSegmentQI << ", threshold: " << currentPass->activatedSegFinderTests)
+          if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 50, PACKAGENAME()) == true) {
+            stringstream outputStream;
+            for (auto & entry : acceptedRejectedFilters) {
+              outputStream << FilterID().getFilterString(entry.first) << " " << entry.second << ", ";
+            }
+            B2DEBUG(50, "SegFINDER: segment discarded! simpleSegmentQI = " << simpleSegmentQI << ", threshold: " << currentPass->activatedSegFinderTests << " Outer/inner Segment: " << FullSecID(ownHits.at(currentHit)->getSectorName()).getFullSecString() << "/" << FullSecID(currentFriendID).getFullSecString() << endl << "FilterResults: " << outputStream.str() << ", needed threshold: " << currentPass->activatedSegFinderTests  << "\n")
+          }
+
           discardedSegmentsCounter++;
           oldFriendID = currentFriendID;
           continue;
         }
 
-        if (m_highOccupancyCase == true && currentHit < (numOfCurrentHits - 1)) {
+        if ((m_highOccupancyCase == true) && (currentHit < (numOfCurrentHits - 1)) && (currentPass->activatedHighOccupancySegFinderTests != 0)) {
           currentPass->threeHitFilterBox.resetValues(*currentCoords, *friendCoords, currentPass->origin, mainSecIter->second, currentFriendID);
           bool testPassed = SegFinderHighOccupancy(currentPass, currentPass->threeHitFilterBox);
           if (testPassed == false) {
-            B2DEBUG(150, "SegFINDERHighOccupancy: segment discarded! Outer/inner Segment: " << FullSecID(ownHits.at(currentHit)->getSectorName()).getFullSecString() << "/" << FullSecID(currentFriendID).getFullSecString())
+            if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 50, PACKAGENAME()) == true) {
+              stringstream outputStream;
+              for (auto & entry : acceptedRejectedFilters) {
+                outputStream << FilterID().getFilterString(entry.first) << " " << entry.second << ", ";
+              }
+              B2DEBUG(50, "SegFINDER: segment discarded! Outer/inner Segment: " << FullSecID(ownHits.at(currentHit)->getSectorName()).getFullSecString() << "/" << FullSecID(currentFriendID).getFullSecString() << endl << "FilterResults: " << outputStream.str() << ", needed threshold: " << currentPass->activatedSegFinderTests << "\n")
+            }
             discardedSegmentsCounter++;
             oldFriendID = currentFriendID;
             continue;
           }
         }
-        B2DEBUG(100, " segment approved!  Outer/inner Segment: " << FullSecID(ownHits.at(currentHit)->getSectorName()).getFullSecString() << "/" << FullSecID(currentFriendID).getFullSecString())
+        if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 50, PACKAGENAME()) == true) {
+          stringstream outputStream;
+          for (auto & entry : acceptedRejectedFilters) {
+            outputStream << FilterID().getFilterString(entry.first) << " " << entry.second << ", ";
+          }
+          B2DEBUG(50, "SegFINDER: segment approved!  Outer/inner Segment: " << FullSecID(ownHits.at(currentHit)->getSectorName()).getFullSecString() << "/" << FullSecID(currentFriendID).getFullSecString() << endl << "FilterResults: " << outputStream.str() << "\n")
+        }
         VXDSegmentCell* pCell = new VXDSegmentCell(ownHits[currentHit],
                                                    allFriendHits[friendHit],
                                                    mainSecIter,
@@ -2899,7 +2930,7 @@ int VXDTFModule::segFinder(PassData* currentPass)
         ++activatedSegmentsCounter;
 
         if (activatedSegmentsCounter > m_PARAMkillEventForHighOccupancyThreshold) {
-          B2DEBUG(1, "number of activated segments reached threshold " << activatedSegmentsCounter << ", stopping segFinder now") // TODO: set to B2DEBUG
+          B2DEBUG(1, "number of activated segments reached threshold " << activatedSegmentsCounter << ", stopping segFinder now")
           return discardedSegmentsCounter;
         } // security check
       } //iterating through all my friendHits
@@ -2914,6 +2945,7 @@ int VXDTFModule::segFinder(PassData* currentPass)
 bool VXDTFModule::SegFinderHighOccupancy(PassData* currentPass, NbFinderFilters& threeHitFilterBox)
 {
   int simpleSegmentQI = 0;
+  vector< pair < int, bool > > acceptedRejectedFilters; // collects for each filter whether it accepted or rejected the current segment. .first is filterID as int, .second is true if accepted, else false
   bool accepted;
 
   if (currentPass->anglesHighOccupancy3D.first == true) { // min & max!
@@ -2921,8 +2953,10 @@ bool VXDTFModule::SegFinderHighOccupancy(PassData* currentPass, NbFinderFilters&
     if (accepted == true) {
       simpleSegmentQI++;
       B2DEBUG(150, " anglesHighOccupancy3D: segment approved!")
+      acceptedRejectedFilters.push_back(make_pair(FilterID::anglesHighOccupancy3D, true));
     } else {
       B2DEBUG(150, " anglesHighOccupancy3D: segment discarded!")
+      acceptedRejectedFilters.push_back(make_pair(FilterID::anglesHighOccupancy3D, false));
       if (m_PARAMDebugMode == true) {
         pair <double, double> cutoffs = threeHitFilterBox.getCutoffs(FilterID::anglesHighOccupancy3D);
         B2WARNING("anglesHighOccupancy3D - minCutoff: " << cutoffs.first << ", calcValue: " << threeHitFilterBox.calcAngle3D() << ", maxCutoff: " << cutoffs.second)
@@ -2935,8 +2969,10 @@ bool VXDTFModule::SegFinderHighOccupancy(PassData* currentPass, NbFinderFilters&
     if (accepted == true) {
       simpleSegmentQI++;
       B2DEBUG(150, " anglesHighOccupancyxy: segment approved!")
+      acceptedRejectedFilters.push_back(make_pair(FilterID::anglesHighOccupancyXY, true));
     } else {
       B2DEBUG(150, " anglesHighOccupancyxy: segment discarded!")
+      acceptedRejectedFilters.push_back(make_pair(FilterID::anglesHighOccupancyXY, false));
       if (m_PARAMDebugMode == true) {
         pair <double, double> cutoffs = threeHitFilterBox.getCutoffs(FilterID::anglesHighOccupancyXY);
         B2WARNING("anglesHighOccupancyxy - minCutoff: " << cutoffs.first << ", calcValue: " << threeHitFilterBox.calcAngleXY() << ", maxCutoff: " << cutoffs.second)
@@ -2949,8 +2985,10 @@ bool VXDTFModule::SegFinderHighOccupancy(PassData* currentPass, NbFinderFilters&
     if (accepted == true) {
       simpleSegmentQI++;
       B2DEBUG(150, " anglesHighOccupancyRZ: segment approved!")
+      acceptedRejectedFilters.push_back(make_pair(FilterID::anglesHighOccupancyRZ, true));
     } else {
       B2DEBUG(150, " anglesHighOccupancyRZ: segment discarded!")
+      acceptedRejectedFilters.push_back(make_pair(FilterID::anglesHighOccupancyRZ, false));
       if (m_PARAMDebugMode == true) {
         pair <double, double> cutoffs = threeHitFilterBox.getCutoffs(FilterID::anglesHighOccupancyRZ);
         B2WARNING("anglesHighOccupancyRZ - minCutoff: " << cutoffs.first << ", calcValue: " << threeHitFilterBox.calcAngleRZ() << ", maxCutoff: " << cutoffs.second)
@@ -2963,8 +3001,10 @@ bool VXDTFModule::SegFinderHighOccupancy(PassData* currentPass, NbFinderFilters&
     if (accepted == true) {
       simpleSegmentQI++;
       B2DEBUG(150, " distanceHighOccupancy2IP: segment approved!")
+      acceptedRejectedFilters.push_back(make_pair(FilterID::distanceHighOccupancy2IP, true));
     } else {
       B2DEBUG(150, " distanceHighOccupancy2IP: segment discarded!")
+      acceptedRejectedFilters.push_back(make_pair(FilterID::distanceHighOccupancy2IP, false));
       if (m_PARAMDebugMode == true) {
         pair <double, double> cutoffs = threeHitFilterBox.getCutoffs(FilterID::distanceHighOccupancy2IP);
         B2WARNING("distanceHighOccupancy2IP - minCutoff: " << cutoffs.first << ", calcValue: " << threeHitFilterBox.calcCircleDist2IP() << ", maxCutoff: " << cutoffs.second)
@@ -2977,8 +3017,10 @@ bool VXDTFModule::SegFinderHighOccupancy(PassData* currentPass, NbFinderFilters&
     if (accepted == true) {
       simpleSegmentQI++;
       B2DEBUG(150, " deltaSlopeHighOccupancyRZ: segment approved!")
+      acceptedRejectedFilters.push_back(make_pair(FilterID::deltaSlopeHighOccupancyRZ, true));
     } else {
       B2DEBUG(150, " deltaSlopeHighOccupancyRZ: segment discarded!")
+      acceptedRejectedFilters.push_back(make_pair(FilterID::deltaSlopeHighOccupancyRZ, false));
       if (m_PARAMDebugMode == true) {
         pair <double, double> cutoffs = threeHitFilterBox.getCutoffs(FilterID::deltaSlopeHighOccupancyRZ);
         B2WARNING("deltaSlopeHighOccupancyRZ - minCutoff: " << cutoffs.first << ", calcValue: " << threeHitFilterBox.calcDeltaSlopeRZ() << ", maxCutoff: " << cutoffs.second)
@@ -2991,8 +3033,10 @@ bool VXDTFModule::SegFinderHighOccupancy(PassData* currentPass, NbFinderFilters&
     if (accepted == true) {
       simpleSegmentQI++;
       B2DEBUG(150, " pTHighOccupancy: segment approved!")
+      acceptedRejectedFilters.push_back(make_pair(FilterID::pTHighOccupancy, true));
     } else {
       B2DEBUG(150, " pTHighOccupancy: segment discarded!")
+      acceptedRejectedFilters.push_back(make_pair(FilterID::pTHighOccupancy, false));
       if (m_PARAMDebugMode == true) {
         pair <double, double> cutoffs = threeHitFilterBox.getCutoffs(FilterID::pTHighOccupancy);
         B2WARNING("pTHighOccupancy - minCutoff: " << cutoffs.first << ", calcValue: " << threeHitFilterBox.calcPt() << ", maxCutoff: " << cutoffs.second)
@@ -3005,8 +3049,10 @@ bool VXDTFModule::SegFinderHighOccupancy(PassData* currentPass, NbFinderFilters&
     if (accepted == true) {
       simpleSegmentQI++;
       B2DEBUG(150, " helixHighOccupancyFit: segment approved!")
+      acceptedRejectedFilters.push_back(make_pair(FilterID::helixHighOccupancyFit, true));
     } else {
       B2DEBUG(150, " helixHighOccupancyFit: segment discarded!")
+      acceptedRejectedFilters.push_back(make_pair(FilterID::helixHighOccupancyFit, false));
       if (m_PARAMDebugMode == true) {
         pair <double, double> cutoffs = threeHitFilterBox.getCutoffs(FilterID::helixHighOccupancyFit);
         B2WARNING("helixHighOccupancyFit - minCutoff: " << cutoffs.first << ", calcValue: " << threeHitFilterBox.calcHelixFit() << ", maxCutoff: " << cutoffs.second)
@@ -3015,8 +3061,24 @@ bool VXDTFModule::SegFinderHighOccupancy(PassData* currentPass, NbFinderFilters&
   } else { B2DEBUG(175, " slopeRZ is not activated for pass: " << currentPass->sectorSetup << "!") }
 
   if (simpleSegmentQI < currentPass->activatedHighOccupancySegFinderTests) {
+    if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 75, PACKAGENAME()) == true) {
+      stringstream outputStream;
+      for (auto & entry : acceptedRejectedFilters) {
+        outputStream << FilterID().getFilterString(entry.first) << " " << entry.second << ", ";
+      }
+      B2DEBUG(50, "SegFINDER HIOC: segment discarded! simpleSegmentQI = " << simpleSegmentQI << ", threshold: " << currentPass->activatedHighOccupancySegFinderTests << "FilterResults: " << outputStream.str() << ", needed threshold: " << currentPass->activatedHighOccupancySegFinderTests << "\n")
+    }
     return false;
-  } else { return true; }
+  } else {
+    if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 75, PACKAGENAME()) == true) {
+      stringstream outputStream;
+      for (auto & entry : acceptedRejectedFilters) {
+        outputStream << FilterID().getFilterString(entry.first) << " " << entry.second << ", ";
+      }
+      B2DEBUG(50, "SegFINDER HIOC: segment approved! simpleSegmentQI = " << simpleSegmentQI << ", threshold: " << currentPass->activatedHighOccupancySegFinderTests << "FilterResults: " << outputStream.str() << ", needed threshold: " << currentPass->activatedHighOccupancySegFinderTests << "\n")
+    }
+    return true;
+  }
 }
 
 
@@ -3025,7 +3087,9 @@ bool VXDTFModule::SegFinderHighOccupancy(PassData* currentPass, NbFinderFilters&
 /// filters neighbouring segments in given pass and returns number of discarded segments
 int VXDTFModule::neighbourFinder(PassData* currentPass)
 {
-  B2DEBUG(20, "nbFinder: for this pass: activatedNbFinderTests: " << currentPass->activatedNbFinderTests << ", a3D: " << currentPass->angles3D.first << ", aXY: " << currentPass->anglesXY.first << ", aRZ: " << currentPass->anglesRZ.first << ", d2IP: " << currentPass->distance2IP.first << ", dSlRZ: " << currentPass->deltaSlopeRZ.first << ", pT: " << currentPass->pT.first << ", hFit: " << currentPass->helixFit.first)
+  B2DEBUG(10, "nbFinder: for this pass: activatedNbFinderTests: " << currentPass->activatedNbFinderTests << ", a3D: " << currentPass->angles3D.first << ", aXY: " << currentPass->anglesXY.first << ", aRZ: " << currentPass->anglesRZ.first << ", d2IP: " << currentPass->distance2IP.first << ", dSlRZ: " << currentPass->deltaSlopeRZ.first << ", pT: " << currentPass->pT.first << ", hFit: " << currentPass->helixFit.first)
+
+  vector< pair < int, bool > > acceptedRejectedFilters; // collects for each filter whether it accepted or rejected the current segment. .first is filterID as int, .second is true if accepted, else false
   bool accepted = false; // recycled return value of the filters
   int NFdiscardedSegmentsCounter = 0, activatedSeedsCounter = 0;
   unsigned int currentFriendID; // not needed: outerLayerID, innerLayerID
@@ -3034,11 +3098,12 @@ int VXDTFModule::neighbourFinder(PassData* currentPass)
   TVector3 innerTempVector, cpA/*central point of innerSegment*/, cpB/*central point of mediumSegment*/, nA/*normal vector of segment a*/, nB/*normal vector of segment b*/, intersectionAB;
   int simpleSegmentQI; // better than segmentApproved, but still digital (only min and max cutoff values), but could be weighed by order of relevance
   int centerLayerIDNumber = 0;
+
   OperationSequenceOfActivatedSectors::const_iterator secSequenceIter;
   MapOfSectors::iterator mainSecIter;
   MapOfSectors::iterator friendSecIter;
   for (secSequenceIter = currentPass->sectorSequence.begin(); secSequenceIter != currentPass->sectorSequence.end(); ++secSequenceIter) {
-    B2DEBUG(50, "neighbourFinder: SectorSequence is named " << FullSecID((*secSequenceIter).first).getFullSecString());
+    B2DEBUG(75, "neighbourFinder: SectorSequence is named " << FullSecID((*secSequenceIter).first).getFullSecString());
     mainSecIter = (*secSequenceIter).second;
 
     vector<VXDSegmentCell*> outerSegments = mainSecIter->second->getInnerSegmentCells(); // loading segments of sector
@@ -3053,6 +3118,7 @@ int VXDTFModule::neighbourFinder(PassData* currentPass)
       int nInnerSegments = innerSegments.size();
 
       for (int thisInnerSegment = 0; thisInnerSegment < nInnerSegments; thisInnerSegment++) {
+        acceptedRejectedFilters.clear();
         VXDSegmentCell* currentInnerSeg = currentPass->totalCellVector[innerSegments[thisInnerSegment]];
         innerCoords = currentInnerSeg->getInnerHit()->getHitCoordinates();
 
@@ -3064,8 +3130,10 @@ int VXDTFModule::neighbourFinder(PassData* currentPass)
           if (accepted == true) {
             simpleSegmentQI++;
             B2DEBUG(150, " angles3D: segment approved!")
+            acceptedRejectedFilters.push_back(make_pair(FilterID::angles3D, true));
           } else {
             B2DEBUG(150, " angles3D: segment discarded!")
+            acceptedRejectedFilters.push_back(make_pair(FilterID::angles3D, false));
             if (m_PARAMDebugMode == true) {
               pair <double, double> cutoffs = currentPass->threeHitFilterBox.getCutoffs(FilterID::angles3D);
               B2WARNING("angles3D - minCutoff: " << cutoffs.first << ", calcValue: " << currentPass->threeHitFilterBox.calcAngle3D() << ", maxCutoff: " << cutoffs.second)
@@ -3078,8 +3146,10 @@ int VXDTFModule::neighbourFinder(PassData* currentPass)
           if (accepted == true) {
             simpleSegmentQI++;
             B2DEBUG(150, " anglesXY: segment approved!")
+            acceptedRejectedFilters.push_back(make_pair(FilterID::anglesXY, true));
           } else {
             B2DEBUG(150, " anglesXY: segment discarded!")
+            acceptedRejectedFilters.push_back(make_pair(FilterID::anglesXY, false));
             if (m_PARAMDebugMode == true) {
               pair <double, double> cutoffs = currentPass->threeHitFilterBox.getCutoffs(FilterID::anglesXY);
               B2WARNING("anglesXY - minCutoff: " << cutoffs.first << ", calcValue: " << currentPass->threeHitFilterBox.calcAngleXY() << ", maxCutoff: " << cutoffs.second)
@@ -3092,8 +3162,10 @@ int VXDTFModule::neighbourFinder(PassData* currentPass)
           if (accepted == true) {
             simpleSegmentQI++;
             B2DEBUG(150, " anglesRZ: segment approved!")
+            acceptedRejectedFilters.push_back(make_pair(FilterID::anglesRZ, true));
           } else {
             B2DEBUG(150, " anglesRZ: segment discarded!")
+            acceptedRejectedFilters.push_back(make_pair(FilterID::anglesRZ, false));
             if (m_PARAMDebugMode == true) {
               pair <double, double> cutoffs = currentPass->threeHitFilterBox.getCutoffs(FilterID::anglesRZ);
               B2WARNING("anglesRZ - minCutoff: " << cutoffs.first << ", calcValue: " << currentPass->threeHitFilterBox.calcAngleRZ() << ", maxCutoff: " << cutoffs.second)
@@ -3106,8 +3178,10 @@ int VXDTFModule::neighbourFinder(PassData* currentPass)
           if (accepted == true) {
             simpleSegmentQI++;
             B2DEBUG(150, " distance2IP: segment approved!")
+            acceptedRejectedFilters.push_back(make_pair(FilterID::distance2IP, true));
           } else {
             B2DEBUG(150, " distance2IP: segment discarded!")
+            acceptedRejectedFilters.push_back(make_pair(FilterID::distance2IP, false));
             if (m_PARAMDebugMode == true) {
               pair <double, double> cutoffs = currentPass->threeHitFilterBox.getCutoffs(FilterID::distance2IP);
               B2WARNING("distance2IP - minCutoff: " << cutoffs.first << ", calcValue: " << currentPass->threeHitFilterBox.calcCircleDist2IP() << ", maxCutoff: " << cutoffs.second)
@@ -3120,8 +3194,10 @@ int VXDTFModule::neighbourFinder(PassData* currentPass)
           if (accepted == true) {
             simpleSegmentQI++;
             B2DEBUG(150, " deltaSlopeRZ: segment approved!")
+            acceptedRejectedFilters.push_back(make_pair(FilterID::deltaSlopeRZ, true));
           } else {
             B2DEBUG(150, " deltaSlopeRZ: segment discarded!")
+            acceptedRejectedFilters.push_back(make_pair(FilterID::deltaSlopeRZ, false));
             if (m_PARAMDebugMode == true) {
               pair <double, double> cutoffs = currentPass->threeHitFilterBox.getCutoffs(FilterID::deltaSlopeRZ);
               B2WARNING("deltaSlopeRZ - minCutoff: " << cutoffs.first << ", calcValue: " << currentPass->threeHitFilterBox.calcDeltaSlopeRZ() << ", maxCutoff: " << cutoffs.second)
@@ -3134,8 +3210,10 @@ int VXDTFModule::neighbourFinder(PassData* currentPass)
           if (accepted == true) {
             simpleSegmentQI++;
             B2DEBUG(150, " pT: segment approved!")
+            acceptedRejectedFilters.push_back(make_pair(FilterID::pT, true));
           } else {
             B2DEBUG(150, " pT: segment discarded!")
+            acceptedRejectedFilters.push_back(make_pair(FilterID::pT, false));
             if (m_PARAMDebugMode == true) {
               pair <double, double> cutoffs = currentPass->threeHitFilterBox.getCutoffs(FilterID::pT);
               B2WARNING("pT - minCutoff: " << cutoffs.first << ", calcValue: " << currentPass->threeHitFilterBox.calcPt() << ", maxCutoff: " << cutoffs.second)
@@ -3148,8 +3226,10 @@ int VXDTFModule::neighbourFinder(PassData* currentPass)
           if (accepted == true) {
             simpleSegmentQI++;
             B2DEBUG(150, " helixFit: segment approved!")
+            acceptedRejectedFilters.push_back(make_pair(FilterID::helixFit, true));
           } else {
             B2DEBUG(150, " helixFit: segment discarded!")
+            acceptedRejectedFilters.push_back(make_pair(FilterID::helixFit, false));
             if (m_PARAMDebugMode == true) {
               pair <double, double> cutoffs = currentPass->threeHitFilterBox.getCutoffs(FilterID::helixFit);
               B2WARNING("helixFit - minCutoff: " << cutoffs.first << ", calcValue: " << currentPass->threeHitFilterBox.calcHelixFit() << ", maxCutoff: " << cutoffs.second)
@@ -3158,21 +3238,33 @@ int VXDTFModule::neighbourFinder(PassData* currentPass)
         } else { B2DEBUG(175, " helixFit is not activated for pass: " << currentPass->sectorSetup << "!") }
 
         if (simpleSegmentQI < currentPass->activatedNbFinderTests) {
-          B2DEBUG(50, "neighbourFINDER: segment discarded! simpleSegmentQI = " << simpleSegmentQI << " in " << FullSecID(outerSegments[thisOuterSegment]->getOuterHit()->getSectorName()).getFullSecString() << " got friend in " << FullSecID(currentFriendID).getFullSecString());
+          if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 50, PACKAGENAME()) == true) {
+            stringstream outputStream;
+            for (auto & entry : acceptedRejectedFilters) {
+              outputStream << FilterID().getFilterString(entry.first) << " " << entry.second << ", ";
+            }
+            B2DEBUG(50, "neighbourFINDER: segment discarded! simpleSegmentQI = " << simpleSegmentQI << ", threshold: " << currentPass->activatedNbFinderTests << " Outer/inner Segment: " << FullSecID(outerSegments[thisOuterSegment]->getOuterHit()->getSectorName()).getFullSecString() << "/" << FullSecID(currentFriendID).getFullSecString() << "/" << FullSecID(currentInnerSeg->getInnerHit()->getSectorName()).getFullSecString() << endl << "FilterResults: " << outputStream.str()  << endl)
+          }
           continue;
         }
-        if (m_highOccupancyCase == true) {
+        if ((m_highOccupancyCase == true) && (currentPass->activatedHighOccupancyNbFinderTests != 0)) {
           if (currentPass->origin != *innerCoords) {
             currentPass->fourHitFilterBox.resetValues(*outerCoords, *centerCoords, *innerCoords, currentPass->origin, mainSecIter->second, currentFriendID);
             bool testPassed = NbFinderHighOccupancy(currentPass, currentPass->fourHitFilterBox);
             if (testPassed == false) {
-              B2DEBUG(50, "NbFINDERHighOccupancy: segment discarded! ")
+              if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 50, PACKAGENAME()) == true) {
+                stringstream outputStream;
+                for (auto & entry : acceptedRejectedFilters) {
+                  outputStream << FilterID().getFilterString(entry.first) << " " << entry.second << ", ";
+                }
+                B2DEBUG(50, "NbFINDERHighOccupancy: segment discarded! Outer/inner Segment: " <<  FullSecID(outerSegments[thisOuterSegment]->getOuterHit()->getSectorName()).getFullSecString() << "/" << FullSecID(currentFriendID).getFullSecString() << "/" << FullSecID(currentInnerSeg->getInnerHit()->getSectorName()).getFullSecString() << endl << "FilterResults: " << outputStream.str() << ", needed threshold: " << currentPass->activatedHighOccupancyNbFinderTests << "\n")
+              }
               continue;
             }
           }
         }
 
-        B2DEBUG(50, "neighbourFINDER: segment in " << FullSecID(outerSegments[thisOuterSegment]->getOuterHit()->getSectorName()).getFullSecString() << " got friend in " << FullSecID(currentFriendID).getFullSecString() << " now (-> passed tests)");
+        B2DEBUG(50, "neighbourFINDER: segment in " << FullSecID(outerSegments[thisOuterSegment]->getOuterHit()->getSectorName()).getFullSecString() << " got friend in " << FullSecID(currentFriendID).getFullSecString() << " with innermost hit in " << FullSecID(currentInnerSeg->getInnerHit()->getSectorName()).getFullSecString() << " now (-> passed tests)" << "\n");
         outerSegments[thisOuterSegment]->addInnerNeighbour(currentInnerSeg);
         currentInnerSeg->addOuterNeighbour(outerSegments[thisOuterSegment]);
 
@@ -3203,7 +3295,7 @@ int VXDTFModule::neighbourFinder(PassData* currentPass)
   }
   currentPass->activeCellList = newActiveList;
 
-  B2DEBUG(50, "neighbourFINDER: " << currentPass->activeCellList.size() << " cells in activeList, " << NFdiscardedSegmentsCounter << " cells discarded, " << activatedSeedsCounter << " cells set as seeds")
+  B2DEBUG(10, "neighbourFINDER: " << currentPass->activeCellList.size() << " cells in activeList, " << NFdiscardedSegmentsCounter << " cells discarded, " << activatedSeedsCounter << " cells set as seeds")
 
   return NFdiscardedSegmentsCounter;
 }
@@ -3213,17 +3305,20 @@ int VXDTFModule::neighbourFinder(PassData* currentPass)
 bool VXDTFModule::NbFinderHighOccupancy(PassData* currentPass, TcFourHitFilters& fourHitFilterBox)
 {
   int simpleSegmentQI = 0;
+  vector< pair < int, bool > > acceptedRejectedFilters; // collects for each filter whether it accepted or rejected the current segment. .first is filterID as int, .second is true if accepted, else false
   bool accepted;
 
   if (currentPass->deltaDistanceHighOccupancy2IP.first == true) { // max only
-    accepted = fourHitFilterBox.checkDeltaDistCircleCenter(FilterID::distanceHighOccupancy2IP);
+    accepted = fourHitFilterBox.checkDeltaDistCircleCenter(FilterID::deltaDistanceHighOccupancy2IP);
     if (accepted == true) {
       simpleSegmentQI++;
       B2DEBUG(150, " deltaDistanceHighOccupancy2IP: segment approved!")
+      acceptedRejectedFilters.push_back(make_pair(FilterID::deltaDistanceHighOccupancy2IP, true));
     } else {
       B2DEBUG(150, " deltaDistanceHighOccupancy2IP: segment discarded!")
+      acceptedRejectedFilters.push_back(make_pair(FilterID::deltaDistanceHighOccupancy2IP, false));
       if (m_PARAMDebugMode == true) {
-        pair <double, double> cutoffs = fourHitFilterBox.getCutoffs(FilterID::distanceHighOccupancy2IP);
+        pair <double, double> cutoffs = fourHitFilterBox.getCutoffs(FilterID::deltaDistanceHighOccupancy2IP);
         B2WARNING("deltaDistanceHighOccupancy2IP - minCutoff: " << cutoffs.first << ", calcValue: " << fourHitFilterBox.deltaDistCircleCenter() << ", maxCutoff: " << cutoffs.second)
       }
     } // else segment not approved
@@ -3234,8 +3329,10 @@ bool VXDTFModule::NbFinderHighOccupancy(PassData* currentPass, TcFourHitFilters&
     if (accepted == true) {
       simpleSegmentQI++;
       B2DEBUG(150, " deltaPtHighOccupancy: segment approved!")
+      acceptedRejectedFilters.push_back(make_pair(FilterID::deltapTHighOccupancy, true));
     } else {
       B2DEBUG(150, " deltaPtHighOccupancy: segment discarded!")
+      acceptedRejectedFilters.push_back(make_pair(FilterID::deltapTHighOccupancy, false));
       if (m_PARAMDebugMode == true) {
         pair <double, double> cutoffs = fourHitFilterBox.getCutoffs(FilterID::deltapTHighOccupancy);
         B2WARNING("deltaPtHighOccupancy - minCutoff: " << cutoffs.first << ", calcValue: " << fourHitFilterBox.deltapT() << ", maxCutoff: " << cutoffs.second)
@@ -3244,8 +3341,18 @@ bool VXDTFModule::NbFinderHighOccupancy(PassData* currentPass, TcFourHitFilters&
   } else { B2DEBUG(175, " pTHighOccupancy is not activated for pass: " << currentPass->sectorSetup << "!") }
 
   if (simpleSegmentQI < currentPass->activatedHighOccupancyNbFinderTests) {
+    if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 50, PACKAGENAME()) == true) {
+      stringstream outputStream;
+      for (auto & entry : acceptedRejectedFilters) {
+        outputStream << FilterID().getFilterString(entry.first) << " " << entry.second << ", ";
+      }
+      B2DEBUG(50, "nbFinder- HIOC: segment discarded! simpleSegmentQI = " << simpleSegmentQI << ", threshold: " << currentPass->activatedHighOccupancyNbFinderTests << endl << "FilterResults: " << outputStream.str()  << endl)
+    }
     return false;
-  } else { return true; }
+  } else {
+    B2DEBUG(100, "nbFinder- HIOC: segment passed tests)");
+    return true;
+  }
 }
 
 
@@ -3254,7 +3361,8 @@ bool VXDTFModule::NbFinderHighOccupancy(PassData* currentPass, TcFourHitFilters&
 /// uses attribute "state" to find rows of compatible neighbours. State indicates length of row. This allows fast Track candidate collection
 int VXDTFModule::cellularAutomaton(PassData* currentPass)
 {
-  int activeCells = 1;
+  int activeCells = 1; // is set 1 because of following while loop.
+  int deadCells = 0;
   int caRound = 0;
   int highestCellState = 0;
   int goodNeighbours, countedSegments;
@@ -3277,15 +3385,18 @@ int VXDTFModule::cellularAutomaton(PassData* currentPass)
         if (currentSeg->getState() == (*currentNeighbour)->getState()) {
           goodNeighbours++;
           ++currentNeighbour;
+          B2DEBUG(100, "neighboring cell found!")
         } else {
           currentNeighbour = currentSeg->eraseInnerNeighbour(currentNeighbour); // includes currentNeighbour++;
         }
       }
       if (goodNeighbours != 0) {
-        currentSeg->allowStateUpgrade(true); activeCells++;
-        B2DEBUG(175, "good cell found!");
-      } else {currentSeg->setActivationState(false); }
+        currentSeg->allowStateUpgrade(true);
+        activeCells++;
+        B2DEBUG(50, "CAstep: accepted cell found!")
+      } else {currentSeg->setActivationState(false); deadCells++; }
     }//CAStep
+    B2DEBUG(10, "CA: before update-step: at round " << caRound << ", there are " << activeCells << " cells still alive, counted " << deadCells << " dead cells so far")
 
     /// Updatestep:
     for (VXDSegmentCell * currentSeg : currentPass->activeCellList) {
@@ -3317,7 +3428,7 @@ int VXDTFModule::cellularAutomaton(PassData* currentPass)
   if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 10, PACKAGENAME()) == true) {
     countedSegments = 0;
     for (VXDSegmentCell * currentSeg : currentPass->activeCellList) {
-      B2DEBUG(150, "Post CA - Current state of cell: " << currentSeg->getState() << " with outer/inner hit at sectors: " << currentSeg->getOuterHit()->getSectorString() << "/" << currentSeg->getInnerHit()->getSectorString());
+      B2DEBUG(100, "Post CA - Current state of cell: " << currentSeg->getState() << " with outer/inner hit at sectors: " << currentSeg->getOuterHit()->getSectorString() << "/" << currentSeg->getInnerHit()->getSectorString());
       if (currentSeg->getInnerNeighbours().size() == 0 and currentSeg->getOuterNeighbours().size() == 0) { continue; }
       countedSegments++;
     }
@@ -3361,18 +3472,6 @@ void VXDTFModule::tcCollector(PassData* currentPass)
       findTCs(currentPass->tcVector, pTC, currentPass->highestAllowedLayer);
       findTCsCounter++;
     }
-//     for (int thisSegmentInSector = 0; thisSegmentInSector < nSegmentsInSector; thisSegmentInSector++) {
-//       if (segmentsOfSector[thisSegmentInSector]->isSeed() == false) { B2DEBUG(100, "current segment is no seed!"); continue; }
-//       if (segmentsOfSector[thisSegmentInSector]->getState() < tccMinState) { B2DEBUG(100, "current segment has no sufficent cellstate..."); continue; }
-//
-//       VXDTFTrackCandidate* pTC = new VXDTFTrackCandidate();
-//       pTC->addSegments(segmentsOfSector[thisSegmentInSector]);
-//       pTC->addHits(segmentsOfSector[thisSegmentInSector]->getOuterHit());
-//       pTC->addHits(segmentsOfSector[thisSegmentInSector]->getInnerHit());
-//
-//       findTCs(currentPass->tcVector, pTC, currentPass->highestAllowedLayer);
-//       findTCsCounter++;
-//     }
   }
   int numTCsafterTCC = currentPass->tcVector.size(); // total number of tc's
 

@@ -492,12 +492,11 @@ std::pair<double, TVector3> TrackletFilters::helixFit(const std::vector<Position
   TMatrixD p = AtGAInv * AtG * zValues; // fitted z value in the first point, tan(lambda)
   if (lambdaCheckMatrix4NAN(p) == true) { B2DEBUG(10, "helixFit: p got 'nan'-entries!") }
 
-  double thetaVal = M_PI * 0.5 - atan(p(1, 0)); // WARNING: was M_PI*0.5 - atan(p(1,0)), but values were wrong! double-WARNING: but + atan was wrong too!
+  double thetaVal = (M_PI * 0.5 - atan(p(1, 0))); // WARNING: was M_PI*0.5 - atan(p(1,0)), but values were wrong! double-WARNING: but + atan was wrong too!
 
   if (std::isnan(thetaVal) == true) {
     didNanAppear = true;
-    thetaVal = (hits->at(nHits - 1)->hitPosition - hits->at(0)->hitPosition).Theta();
-//    B2DEBUG(1,
+    thetaVal = (hits->at(0)->hitPosition - hits->at(nHits - 1)->hitPosition).Theta(); /// INFO swapped! feb4th2014
     B2DEBUG(1, "helixFit: calculating theta for momentum produced 'nan' -> fallback-solution produces theta: " << thetaVal)
     if (std::isnan(thetaVal) == true) { B2ERROR("helixFit: no usable Theta value could be produced -> serious error telling us that helix fit does not work! bypass is setting the value to 0!"); thetaVal = 0; }
   }
@@ -532,8 +531,8 @@ std::pair<double, TVector3> TrackletFilters::helixFit(const std::vector<Position
   B2DEBUG(10, "helixFit: radius(rho): " << rho << ", theta: " << thetaVal << ", pT: " << pT << ", pZ: " << pZ << ", pVector.Perp: " << pVector.Perp() << ", pVector.Mag: " << pVector.Mag() << ", fitted zValue: " << p(1, 0))
   TVector3 vectorToSecondHit = secondHit - seedHit;
   vectorToSecondHit.SetZ(0);
-  if (((useBackwards == true) && (vectorToSecondHit.Angle(pVector) < M_PI * 0.5)) || ((useBackwards == false) && (vectorToSecondHit.Angle(pVector) > M_PI * 0.5))) { pVector *= -1.; }
-//  if ( vectorToSecondHit.Angle(pVector) > M_PI*0.5 ) { pVector *= -1.; }
+////////  if (((useBackwards == true) && (vectorToSecondHit.Angle(pVector) < M_PI * 0.5)) || ((useBackwards == false) && (vectorToSecondHit.Angle(pVector) > M_PI * 0.5))) { pVector *= -1.; }
+  if (((useBackwards == true) && (vectorToSecondHit.Angle(pVector) > M_PI * 0.5)) || ((useBackwards == false) && (vectorToSecondHit.Angle(pVector) < M_PI * 0.5))) { pVector *= -1.; } // edit: Feb4-2014: swapped values...
 
   pVector.SetZ(pZ); // now that track carries full momentum
   if (lambdaCheckVector4NAN(pVector) == true) { B2ERROR("helixFit: pVector got 'nan'-entries x/y/z: " << pVector.X() << "/" << pVector.Y() << "/" << pVector.Z()); didNanAppear = true; }

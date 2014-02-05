@@ -22,7 +22,7 @@
 
 #include <framework/gearbox/Const.h>
 
-#include <generators/dataobjects/MCParticle.h>
+#include <mdst/dataobjects/MCParticle.h>
 
 //#include <genfit/TrackCandHit.h>
 

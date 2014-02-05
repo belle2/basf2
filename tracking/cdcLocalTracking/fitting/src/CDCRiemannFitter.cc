@@ -51,6 +51,7 @@ size_t CDCRiemannFitter::fillObservations(const CDCRecoHit2DVector& recohits, ve
 
 }
 
+/*
 size_t CDCRiemannFitter::fillObservations(const CDCSegmentTriple& segmentTriple, std::vector<FloatType>& observations) const
 {
 
@@ -62,7 +63,7 @@ size_t CDCRiemannFitter::fillObservations(const CDCSegmentTriple& segmentTriple,
 
   return result;
 }
-
+*/
 
 size_t CDCRiemannFitter::fillObservation(const CDCRecoHit2D& recohit, vector<FloatType>& observations) const
 {

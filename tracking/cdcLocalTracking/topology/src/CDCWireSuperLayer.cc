@@ -48,7 +48,7 @@ void CDCWireSuperLayer::initialize()
   }
 
 
-
+  /*
   CDCGeometryPar& cdcgp = CDCGeometryPar::Instance();
 
   //declared but not defined function
@@ -60,15 +60,15 @@ void CDCWireSuperLayer::initialize()
     double momZ = cdcgp.momZ(iBound);
     double momRmin = cdcgp.momRmin(iBound);
 
-    /*
-      B2INFO("iBound : " << iBound );
-      B2INFO("momZ : " << momZ );
-      B2INFO("momRmin : " << momRmin);
-    */
+
+    B2INFO("iBound : " << iBound );
+    B2INFO("momZ : " << momZ );
+    B2INFO("momRmin : " << momRmin);
+
 
   }
-
   //cin >> momBound;
+  */
 
 }
 

@@ -120,7 +120,7 @@ namespace Belle2 {
           CDCWireHitCluster& cluster = *itCluster;
 
 
-          size_t nSegmentsBefore = selectedRecoSegments.size();
+          //size_t nSegmentsBefore = selectedRecoSegments.size();
 
           //create the facets
           B2DEBUG(100, "Creating the CDCRecoFacets");
@@ -258,7 +258,7 @@ namespace Belle2 {
 
           //TODO: combine matching segments here
 
-          size_t nSegmentsAfter = selectedRecoSegments.size();
+          //size_t nSegmentsAfter = selectedRecoSegments.size();
 
           B2DEBUG(100, "  Created " << selectedRecoSegments.size()  << " selected CDCRecoSegment2Ds");
         } // end cluster batch loop

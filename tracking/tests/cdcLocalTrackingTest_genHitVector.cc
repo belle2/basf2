@@ -117,7 +117,7 @@ TEST_F(CDCLocalTrackingTest, CDCGenHitVector_unique)
 
   collection.ensureUnique();
 
-  EXPECT_EQ(2, collection.size());
+  EXPECT_EQ(2u, collection.size());
 
 }
 

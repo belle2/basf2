@@ -101,7 +101,7 @@ void SegmentSelecter::selectSegments(vector<CDCRecoSegment2D>& in,
        itWireHitSegmentsPair != hitAssignedTo.end();  ++itWireHitSegmentsPair) {
 
 
-    const CDCWireHit* wirehit = itWireHitSegmentsPair->first;
+    //const CDCWireHit* wirehit = itWireHitSegmentsPair->first;
     vector< CDCRecoSegment2D* >& segments = itWireHitSegmentsPair->second;
 
 
@@ -111,13 +111,13 @@ void SegmentSelecter::selectSegments(vector<CDCRecoSegment2D>& in,
          itSegment != segments.end() ; ++itSegment) {
 
       CDCRecoSegment2D* winningSegment = *itWinningSegment;
-      PairFitChi2& winningFitAndChi2 = mapRecoSegmentsToFits[winningSegment];
+      //PairFitChi2& winningFitAndChi2 = mapRecoSegmentsToFits[winningSegment];
       //const double & winningChi2 = winningFitAndChi2.second;
       size_t winningSize = winningSegment->size();
 
       CDCRecoSegment2D* segment = *itSegment;
-      PairFitChi2& fitAndChi2 = mapRecoSegmentsToFits[segment];
-      const double& chi2 = fitAndChi2.second;
+      //PairFitChi2& fitAndChi2 = mapRecoSegmentsToFits[segment];
+      //const double& chi2 = fitAndChi2.second;
       size_t size = segment->size();
 
       //scoring rule

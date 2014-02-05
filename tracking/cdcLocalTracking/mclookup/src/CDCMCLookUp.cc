@@ -518,7 +518,7 @@ ITrackType CDCMCLookUp::getMCTrackId(const CDCWireHit* wirehit) const
 ITrackType CDCMCLookUp::getMajorMCTrackId(const CDCWireHit* wirehit) const
 {
   //decide whether this hit has the trackid of its major particle based on how far the simhit is from the production vertex of the last descendant before the major particle
-  const double deltaTCut =  4.0; //ns
+  //const double deltaTCut =  4.0; //ns
   const double distanceCut =  4.0; //<- this is the more important variable since the time is rather extended in the cdc and can very much for particles of different velocities
 
 
@@ -542,7 +542,7 @@ ITrackType CDCMCLookUp::getMajorMCTrackId(const CDCWireHit* wirehit) const
     if (daughterParticle == nullptr) return INVALID_ITRACK;
 
     TVector3 productionVertexFromMajor = daughterParticle->getVertex();
-    float productionTime = daughterParticle->getProductionTime();
+    //float productionTime = daughterParticle->getProductionTime();
     //compare the vertex with the hit position and the productionTime with the hit time
     const CDCSimHit* simhit  = getSimHit(wirehit);
     if (simhit == nullptr) {
@@ -551,11 +551,11 @@ ITrackType CDCMCLookUp::getMajorMCTrackId(const CDCWireHit* wirehit) const
     }
 
     TVector3 hitPosition = simhit->getPosTrack();
-    float hitTime = simhit->getFlightTime();
+    //float hitTime = simhit->getFlightTime();
 
     hitPosition -= productionVertexFromMajor;
     float distanceFromVertex = hitPosition.Mag();
-    float deltaT = hitTime - productionTime;
+    //float deltaT = hitTime - productionTime;
 
     // deltaT < deltaTCut or
     if (distanceFromVertex < distanceCut) {

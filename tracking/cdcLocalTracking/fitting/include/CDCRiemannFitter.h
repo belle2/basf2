@@ -43,12 +43,12 @@ namespace Belle2 {
 
       CDCTrajectory2D fit(const CDCRLWireHitTriple& rlWireHitTriple) const;
       CDCTrajectory2D fit(const CDCRecoSegment2D& recoSegment2D) const;
-      CDCTrajectory2D fit(const CDCSegmentTriple& segmentTriple) const;
+      CDCTrajectory2D fit(const CDCAxialAxialSegmentPair& axialAxialSegmentPair) const;
 
       void update(CDCTrajectory2D& fit, const CDCRLWireHitTriple& rlWireHitTriple) const;
       void update(CDCTrajectory2D& fit, const CDCRecoSegment2D& recoSegment2D) const;
       void update(CDCTrajectory2D& fit, const CDCRecoSegment2D& firstRecoSegment2D, const CDCRecoSegment2D& secondRecoSegment2D) const;
-      void update(CDCTrajectory2D& fit, const CDCSegmentTriple& segmentTriple) const;
+      void update(CDCTrajectory2D& fit, const CDCAxialAxialSegmentPair& axialAxialSegmentPair) const;
 
       void update(CDCTrajectory2D& fit, CDCObservations2D& observations2D) const;
       void updateWithOutRightLeft(CDCTrajectory2D& fit, CDCObservations2D& observations2D) const;

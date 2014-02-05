@@ -97,15 +97,15 @@ CDCTrajectory2D CDCRiemannFitter::fit(const CDCRecoSegment2D& recoSegment2D) con
 }
 
 
-CDCTrajectory2D CDCRiemannFitter::fit(const CDCSegmentTriple& segmentTriple) const
+CDCTrajectory2D CDCRiemannFitter::fit(const CDCAxialAxialSegmentPair& axialAxialSegmentPair) const
 {
   CDCTrajectory2D result;
-  update(result, segmentTriple);
+  update(result, axialAxialSegmentPair);
   return result;
 }
 
 
-void CDCRiemannFitter::update(CDCTrajectory2D& fit, const CDCRLWireHitTriple& rlWireHitTriple) const
+void CDCRiemannFitter::update(CDCTrajectory2D& trajectory2D, const CDCRLWireHitTriple& rlWireHitTriple) const
 {
 
   CDCObservations2D observations2D;
@@ -113,18 +113,18 @@ void CDCRiemannFitter::update(CDCTrajectory2D& fit, const CDCRLWireHitTriple& rl
   if (not isLineConstrained()) {
     B2ERROR("CDCRiemannFitter ask to fit a oriented wire hit triple without line constraint.");
   }
-  update(fit, observations2D);
+  update(trajectory2D, observations2D);
 
   //Set transverse s reference
-  fit.setStartPos2D(rlWireHitTriple.getStartWire().getRefPos2D());
+  trajectory2D.setStartPos2D(rlWireHitTriple.getStartWire().getRefPos2D());
 
   //Check if fit is forward
-  if (not rlWireHitTriple.isForwardTrajectory(fit)) fit.reverse();
-  if (not rlWireHitTriple.isForwardTrajectory(fit)) B2WARNING("Fit cannot be oriented correctly");
+  if (not rlWireHitTriple.isForwardTrajectory(trajectory2D)) trajectory2D.reverse();
+  if (not rlWireHitTriple.isForwardTrajectory(trajectory2D)) B2WARNING("Fit cannot be oriented correctly");
 
 }
 
-void CDCRiemannFitter::update(CDCTrajectory2D& fit, const CDCRecoSegment2D& recoSegment2D) const
+void CDCRiemannFitter::update(CDCTrajectory2D& trajectory2D, const CDCRecoSegment2D& recoSegment2D) const
 {
 
   CDCObservations2D observations2D;
@@ -135,18 +135,18 @@ void CDCRiemannFitter::update(CDCTrajectory2D& fit, const CDCRecoSegment2D& reco
     observations2D.append(recoSegment2D, false);
   }
 
-  update(fit, observations2D);
+  update(trajectory2D, observations2D);
 
   //Set transverse s reference
-  fit.setStartPos2D(recoSegment2D.front().getRecoPos2D()) ;
+  trajectory2D.setStartPos2D(recoSegment2D.front().getRecoPos2D()) ;
 
   //Check if fit is forward
-  if (not recoSegment2D.isForwardTrajectory(fit)) fit.reverse();
-  if (not recoSegment2D.isForwardTrajectory(fit)) B2WARNING("Fit cannot be oriented correctly");
+  if (not recoSegment2D.isForwardTrajectory(trajectory2D)) trajectory2D.reverse();
+  if (not recoSegment2D.isForwardTrajectory(trajectory2D)) B2WARNING("Fit cannot be oriented correctly");
 
 }
 
-void CDCRiemannFitter::update(CDCTrajectory2D& fit,
+void CDCRiemannFitter::update(CDCTrajectory2D& trajectory2D,
                               const CDCRecoSegment2D& firstRecoSegment2D,
                               const CDCRecoSegment2D& secondRecoSegment2D) const
 {
@@ -161,35 +161,35 @@ void CDCRiemannFitter::update(CDCTrajectory2D& fit,
     observations2D.append(secondRecoSegment2D, false);
   }
 
-  update(fit, observations2D);
+  update(trajectory2D, observations2D);
 
   //set transverse s reference
-  fit.setStartPos2D(firstRecoSegment2D.front().getRecoPos2D()) ;
+  trajectory2D.setStartPos2D(firstRecoSegment2D.front().getRecoPos2D()) ;
 
   //check if fit is forward
-  if (not firstRecoSegment2D.isForwardTrajectory(fit)) fit.reverse();
+  if (not firstRecoSegment2D.isForwardTrajectory(trajectory2D)) trajectory2D.reverse();
 
-  if (not(firstRecoSegment2D.isForwardTrajectory(fit) and secondRecoSegment2D.isForwardTrajectory(fit)))
+  if (not(firstRecoSegment2D.isForwardTrajectory(trajectory2D) and secondRecoSegment2D.isForwardTrajectory(trajectory2D)))
     B2WARNING("Fit cannot be oriented correctly");
 
 }
 
-void CDCRiemannFitter::update(CDCTrajectory2D& fit, const CDCSegmentTriple& segmentTriple) const
+
+
+void CDCRiemannFitter::update(CDCTrajectory2D& trajectory2D, const CDCAxialAxialSegmentPair& axialAxialSegmentPair) const
 {
-  update(fit, *(segmentTriple.getStart()), *(segmentTriple.getEnd()));
+  update(trajectory2D, *(axialAxialSegmentPair.getStart()), *(axialAxialSegmentPair.getEnd()));
 }
 
 
 
-
-
-void CDCRiemannFitter::update(CDCTrajectory2D& fit, CDCObservations2D& observations2D) const
+void CDCRiemannFitter::update(CDCTrajectory2D& trajectory2D, CDCObservations2D& observations2D) const
 {
 
   if (observations2D.getNObservationsWithDriftRadius() > 0) {
-    updateWithRightLeft(fit, observations2D);
+    updateWithRightLeft(trajectory2D, observations2D);
   } else {
-    updateWithOutRightLeft(fit, observations2D);
+    updateWithOutRightLeft(trajectory2D, observations2D);
   }
 
 }
@@ -198,7 +198,7 @@ void CDCRiemannFitter::update(CDCTrajectory2D& fit, CDCObservations2D& observati
 
 
 
-void CDCRiemannFitter::updateWithOutRightLeft(CDCTrajectory2D& fit, CDCObservations2D& observations2D) const
+void CDCRiemannFitter::updateWithOutRightLeft(CDCTrajectory2D& trajectory2D, CDCObservations2D& observations2D) const
 {
 
   CDCObservations2D::EigenObservationMatrix&&  eigenObservation = observations2D.getObservationMatrix();
@@ -234,7 +234,7 @@ void CDCRiemannFitter::updateWithOutRightLeft(CDCTrajectory2D& fit, CDCObservati
 
     // set the generalized circle parameters
     // last set to zero constrains to a line
-    fit.setGenCircle(GeneralizedCircle(offset, normalToLine(0), normalToLine(1), 0));
+    trajectory2D.setGenCircle(GeneralizedCircle(offset, normalToLine(0), normalToLine(1), 0));
 
   } else {
 
@@ -268,13 +268,13 @@ void CDCRiemannFitter::updateWithOutRightLeft(CDCTrajectory2D& fit, CDCObservati
 
     FloatType offset = -pointMean * normalToPlane;
 
-    fit.setGenCircle(GeneralizedCircle(offset, normalToPlane(0), normalToPlane(1), normalToPlane(2)));
+    trajectory2D.setGenCircle(GeneralizedCircle(offset, normalToPlane(0), normalToPlane(1), normalToPlane(2)));
     //fit.setParameters();
 
   }
 
   //check if the orientation is alright
-  Vector2D directionAtCenter = fit.getUnitMom2D(Vector2D(0.0, 0.0));
+  Vector2D directionAtCenter = trajectory2D.getUnitMom2D(Vector2D(0.0, 0.0));
 
 
   size_t voteForChangeSign = 0;
@@ -284,7 +284,7 @@ void CDCRiemannFitter::updateWithOutRightLeft(CDCTrajectory2D& fit, CDCObservati
     if (pointInSameDirection < 0) ++voteForChangeSign;
   }
 
-  if (voteForChangeSign > nObservations / 2.0) fit.reverse();
+  if (voteForChangeSign > nObservations / 2.0) trajectory2D.reverse();
 
 }
 
@@ -292,7 +292,7 @@ void CDCRiemannFitter::updateWithOutRightLeft(CDCTrajectory2D& fit, CDCObservati
 
 
 
-void CDCRiemannFitter::updateWithRightLeft(CDCTrajectory2D& fit, CDCObservations2D& observations2D) const
+void CDCRiemannFitter::updateWithRightLeft(CDCTrajectory2D& trajectory2D, CDCObservations2D& observations2D) const
 {
 
   CDCObservations2D::EigenObservationMatrix && eigenObservation = observations2D.getObservationMatrix();
@@ -323,7 +323,7 @@ void CDCRiemannFitter::updateWithRightLeft(CDCTrajectory2D& fit, CDCObservations
 
     Matrix< FloatType, 2, 1> parameters = projectedPoints.jacobiSvd(ComputeThinU | ComputeThinV).solve(distances);
 
-    fit.setGenCircle(GeneralizedCircle(0.0, parameters(0), parameters(1), 0.0));
+    trajectory2D.setGenCircle(GeneralizedCircle(0.0, parameters(0), parameters(1), 0.0));
   }
 
   else if ((! isLineConstrained()) && (isOriginConstrained())) {
@@ -338,7 +338,7 @@ void CDCRiemannFitter::updateWithRightLeft(CDCTrajectory2D& fit, CDCObservations
 
     Matrix< FloatType, 3, 1> parameters = projectedPoints.jacobiSvd(ComputeThinU | ComputeThinV).solve(distances);
 
-    fit.setGenCircle(GeneralizedCircle(0.0, parameters(0), parameters(1), parameters(2)));
+    trajectory2D.setGenCircle(GeneralizedCircle(0.0, parameters(0), parameters(1), parameters(2)));
   }
 
   else if ((isLineConstrained()) && (! isOriginConstrained())) {
@@ -353,7 +353,7 @@ void CDCRiemannFitter::updateWithRightLeft(CDCTrajectory2D& fit, CDCObservations
 
     Matrix< FloatType, 3, 1> parameters = projectedPoints.jacobiSvd(ComputeThinU | ComputeThinV).solve(distances);
 
-    fit.setGenCircle(GeneralizedCircle(parameters(0), parameters(1), parameters(2), 0.0));
+    trajectory2D.setGenCircle(GeneralizedCircle(parameters(0), parameters(1), parameters(2), 0.0));
     //fit.setParameters(parameters(0),parameters(1),parameters(2),0.0);
 
   }
@@ -372,7 +372,7 @@ void CDCRiemannFitter::updateWithRightLeft(CDCTrajectory2D& fit, CDCObservations
 
     Matrix< FloatType, 4, 1> parameters = projectedPoints.jacobiSvd(ComputeThinU | ComputeThinV).solve(distances);
 
-    fit.setGenCircle(GeneralizedCircle(parameters(0), parameters(1), parameters(2), parameters(3)));
+    trajectory2D.setGenCircle(GeneralizedCircle(parameters(0), parameters(1), parameters(2), parameters(3)));
 
   }
 

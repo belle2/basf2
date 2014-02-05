@@ -12,6 +12,7 @@
 #include "CDCGenHit.h"
 
 #include "CDCWireHit.h"
+#include "CDCRLWireHit.h"
 #include "CDCRecoHit2D.h"
 #include "CDCRecoTangent.h"
 #include "CDCRecoFacet.h"
@@ -23,21 +24,34 @@
 namespace Belle2 {
   namespace CDCLocalTracking {
 
-    /// Defines wires and the dummy generic hits as coaligned
-    bool operator<(const CDCGenHit& genHit, const CDCWire& wire) { return genHit.getWire() < wire; }
+    /** @name Definition of coalignment with wires
+     *  The following methods define wires and several entities that support the getWire method as coaligned.
+     *  Which is true for
+     *    - CDCGenHit
+     *    - CDCWireHit
+     *    - CDCRLWireHit
+     */
+    /**@{*/
+    template<class HitEntity>
+    bool operator<(const HitEntity& hitEntity, const CDCWire& wire) { return hitEntity.getWire() < wire; }
 
-    /// Defines wires and the dummy generic hits as coaligned
-    bool operator<(const CDCWire& wire, const CDCGenHit& genHit) { return wire < genHit.getWire(); }
+    template<class HitEntity>
+    bool operator<(const CDCWire& wire, const HitEntity& hitEntity) { return wire < hitEntity.getWire(); }
+    /**@}*/
 
+    /** @name Definition of coalignment with wire hits
+     *  The following methods define wires and several entities that support the getWireHit method as coaligned.
+     *  Which is true for
+     *    - CDCRLWireHit
+     */
+    /**@{*/
+    template<class HitEntity>
+    bool operator<(const HitEntity& hitEntity, const CDCWireHit& wireHit) { return hitEntity.getWireHit() < wireHit; }
 
+    template<class HitEntity>
+    bool operator<(const CDCWireHit& wireHit, const HitEntity& hitEntity) { return wireHit < hitEntity.getWireHit(); }
+    /**@}*/
 
-
-
-    /// Defines wires and the wire hits as coaligned
-    bool operator<(const CDCWireHit& wireHit, const CDCWire& wire) { return wireHit.getWire() < wire; }
-
-    /// Defines Wires and the wire hits as coaligned
-    bool operator<(const CDCWire& wire, const CDCWireHit& wireHit) { return wire < wireHit.getWire(); }
 
 
 

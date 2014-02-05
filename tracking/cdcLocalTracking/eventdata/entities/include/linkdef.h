@@ -13,6 +13,7 @@
 #pragma link C++ class Belle2::CDCLocalTracking::CDCGenHit;
 
 #pragma link C++ class Belle2::CDCLocalTracking::CDCWireHit;
+#pragma link C++ class Belle2::CDCLocalTracking::CDCRLWireHit;
 #pragma link C++ class Belle2::CDCLocalTracking::CDCRecoHit2D;
 #pragma link C++ class Belle2::CDCLocalTracking::CDCRecoTangent;
 #pragma link C++ class Belle2::CDCLocalTracking::CDCRecoFacet;

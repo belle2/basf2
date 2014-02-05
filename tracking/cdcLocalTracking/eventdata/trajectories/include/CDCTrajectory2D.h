@@ -221,6 +221,12 @@ namespace Belle2 {
       /// Setter for start point and momentum at the start point subjected to the charge sign.
       void setStartPosMom2D(const Vector2D& pos, const Vector2D& mom, FloatType charge);
 
+      /// Clears all information from this trajectoy
+      void clear() {
+        m_genCircle.setNull();
+        m_startPos2D.set(0.0, 0.0);
+      }
+
     public:
       /// Getter for the generalized circle that describes the trajectory.
       const GeneralizedCircle& getGenCircle() const
@@ -229,6 +235,7 @@ namespace Belle2 {
       /// Setter for the generalized circle that describes the trajectory.
       void setGenCircle(const GeneralizedCircle& genCircle)
       { m_genCircle = genCircle; }
+
 
     public:
       /// Output helper for debugging

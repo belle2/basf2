@@ -125,6 +125,12 @@ namespace Belle2 {
         if (not getSZLine().alignedWithFirst()) m_szLine.reverse();
       }
 
+      /// Clears all information from this trajectory line
+      void clear() {
+        m_szLine.setN(0.0, 0.0, 0.0);
+      }
+
+
     private:
       Line2D m_szLine; ///< Memory for the line representation
 

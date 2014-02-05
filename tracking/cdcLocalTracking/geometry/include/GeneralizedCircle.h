@@ -113,6 +113,10 @@ namespace Belle2 {
                               const FloatType& r,
                               const CCWInfo& orientation = CCW);
 
+      /// Sets all circle parameters to zero
+      void setNull()
+      { setN(0.0, 0.0, 0.0, 0.0); }
+
       /// Indicates if all circle parameters are zero
       inline bool isNull() const
       { return n0() == 0 and n12().isNull() and n3() == 0; }

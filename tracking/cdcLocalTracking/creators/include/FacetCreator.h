@@ -12,12 +12,11 @@
 #define FACETCREATOR_H_
 
 #include <vector>
-
-#include<framework/datastore/StoreArray.h>
+#include <set>
 
 #include <tracking/cdcLocalTracking/eventtopology/CDCWireHitTopology.h>
-
-#include <tracking/cdcLocalTracking/typedefs/UsedDataHolders.h>
+#include <tracking/cdcLocalTracking/algorithms/SortableVector.h>
+#include <tracking/cdcLocalTracking/algorithms/WeightedNeighborhood.h>
 
 namespace Belle2 {
   namespace CDCLocalTracking {
@@ -26,109 +25,34 @@ namespace Belle2 {
     class FacetCreator {
 
     public:
-      //typedef SimpleFacetFilter Filter;
-
-      /** Constructor. */
-
       FacetCreator() : m_filter() {;}
       FacetCreator(const Filter& filter) : m_filter(filter) {;}
-
-
       ~FacetCreator() {;}
 
       //in types
-      typedef CDCWireHitCollection   WireHitCollection;
-      typedef CDCWireHitCluster      WireHitCluster;
       typedef WeightedNeighborhood<const CDCWireHit> Neighborhood;
 
-      //out type
-      typedef CDCRecoFacetCollection FacetCollection;
-
-      //normal wirehit collections - usable with the AllWireHitCollection
-      void createFacets(const WireHitCollection& wirehits,
+      template<class CDCWireHitMayBePtrRange>
+      void createFacets(const CDCWireHitMayBePtrRange& wirehits,
                         const Neighborhood& neighborhood,
-                        FacetCollection& facets) const {
+                        SortableVector<CDCRecoFacet>& facets) const {
 
         createFacetsGeneric(wirehits, neighborhood, facets);
-
-        B2INFO("Before sort");
         facets.sort();
+
       }
 
-
-      void createFacets(const WireHitCollection& wirehits,
+      template<class CDCWireHitMayBePtrRange>
+      void createFacets(const CDCWireHitMayBePtrRange& wirehits,
                         const Neighborhood& neighborhood,
-                        std::vector< CDCRecoFacet >& facets) const {
-
-        createFacetsGeneric(wirehits, neighborhood, facets);
-        std::sort(facets.begin(), facets.end());
-      }
-
-      void createFacets(const WireHitCollection& wirehits,
-                        const Neighborhood& neighborhood,
-                        std::set< CDCRecoFacet >& facets) const {
+                        std::set<CDCRecoFacet>& facets) const {
         createFacetsGeneric(wirehits, neighborhood, facets);
       }
 
-      //cluster
-      void createFacets(const WireHitCluster& wirehits,
+      template<class CDCWireHitMayBePtrRange>
+      void createFacets(const CDCWireHitMayBePtrRange& wirehits,
                         const Neighborhood& neighborhood,
-                        FacetCollection& facets) const {
-
-
-        //B2INFO("Number of facets before " << facets.size());
-        createFacetsGeneric(wirehits, neighborhood, facets);
-        //B2INFO("Number of facets after " << facets.size());
-        facets.sort();
-        return;
-        /*
-        std::set<size_t> addressesInFacets;
-
-        BOOST_FOREACH(const CDCRecoFacet & recofacet,facets){
-          B2INFO( recofacet );
-          addressesInFacets.insert( (size_t)(recofacet.getStartWireHit()) );
-          addressesInFacets.insert( (size_t)(recofacet.getMiddleWireHit()) );
-          addressesInFacets.insert( (size_t)(recofacet.getEndWireHit()) );
-        }
-
-        std::cerr << "Address of sentinal " << size_t(&(CDCWireHit::getLowest())) << std::endl;
-
-        std::set<size_t> addressesOfWirehits;
-
-        BOOST_FOREACH(const CDCWireHit * wirehit,wirehits){
-          addressesOfWirehits.insert(size_t(wirehit));
-        }
-
-        std::cerr << "Addresses of wirehits" << std::endl;
-        BOOST_FOREACH(size_t address,addressesOfWirehits){
-          std::cerr << address << std::endl;
-        }
-
-        std::cerr << "Addresses in facets" << std::endl;
-        BOOST_FOREACH(size_t address,addressesInFacets){
-          std::cerr << address << std::endl;
-          if ( not addressesOfWirehits.count(address) ){
-            std::cerr << "Not in addressesOfWireHits" << std::endl;
-            double d;
-            std::cin >> d;
-          }
-        }
-
-        B2INFO("Before sort");
-        std::sort( facets.begin(),facets.end());
-        B2INFO("After sort");*/
-
-      }
-
-      void createFacets(const WireHitCluster& wirehits,
-                        const Neighborhood& neighborhood,
-                        std::set< CDCRecoFacet >& facets) const {
-        createFacetsGeneric(wirehits, neighborhood, facets);
-      }
-
-      void createFacets(const WireHitCluster& wirehits,
-                        const Neighborhood& neighborhood,
-                        std::vector< CDCRecoFacet >& facets) const {
+                        std::vector<CDCRecoFacet>& facets) const {
         createFacetsGeneric(wirehits, neighborhood, facets);
         std::sort(facets.begin(), facets.end());
       }
@@ -136,33 +60,39 @@ namespace Belle2 {
 
     private:
 
-      template<class MayBePtrCDCWireHitRange, class GenericFacetCollection>
-      void createFacetsGeneric(const MayBePtrCDCWireHitRange& wirehits,
+      template<class CDCWireHitMayBePtrRange, class GenericFacetCollection>
+      void createFacetsGeneric(const CDCWireHitMayBePtrRange& wirehits,
                                const Neighborhood& neighborhood,
                                GenericFacetCollection& facets) const {
         m_filter.clear();
-        for (const CDCWireHit * ptrMiddleWireHit : wirehits) {
+        for (const auto & mayBePtrMiddleWireHit : wirehits) {
 
-          Neighborhood::range nextNeighborRange = neighborhood.equal_range(ptrMiddleWireHit);
+          Neighborhood::range nextNeighborRange = neighborhood.equal_range(mayBePtrMiddleWireHit);
 
-          for (Neighborhood::iterator itStartWireHit = nextNeighborRange.first;
-               itStartWireHit != nextNeighborRange.second; ++itStartWireHit) {
+          if (nextNeighborRange.first != nextNeighborRange.second) {
 
-            const CDCWireHit* ptrStartWireHit = itStartWireHit.getNeighbor();
+            const CDCWireHit* ptrMiddleWireHit = nextNeighborRange.first.getItem();
 
-            for (Neighborhood::iterator itEndWireHit = nextNeighborRange.first;
-                 itEndWireHit != nextNeighborRange.second; ++itEndWireHit) {
+            for (Neighborhood::iterator itStartWireHit = nextNeighborRange.first;
+                 itStartWireHit != nextNeighborRange.second; ++itStartWireHit) {
 
-              const CDCWireHit* ptrEndWireHit = itEndWireHit.getNeighbor();
+              const CDCWireHit* ptrStartWireHit = itStartWireHit.getNeighbor();
 
-              //skip combinations where the facet starts and ends on the same wire
-              if (not(ptrStartWireHit->getWire() ==  ptrEndWireHit->getWire())) {
+              for (Neighborhood::iterator itEndWireHit = nextNeighborRange.first;
+                   itEndWireHit != nextNeighborRange.second; ++itEndWireHit) {
 
-                createFacetsForHitTriple(ptrStartWireHit, ptrMiddleWireHit, ptrEndWireHit, facets);
-                //++nGroupsOfThree;
-              }
-            } //end for itEndWireHit
-          } //end for itStartWireHit
+                const CDCWireHit* ptrEndWireHit = itEndWireHit.getNeighbor();
+
+                //skip combinations where the facet starts and ends on the same wire
+                if (not(ptrStartWireHit->getWire() ==  ptrEndWireHit->getWire())) {
+
+                  createFacetsForHitTriple(ptrStartWireHit, ptrMiddleWireHit, ptrEndWireHit, facets);
+                  //++nGroupsOfThree;
+                }
+
+              } //end for itEndWireHit
+            } //end for itStartWireHit
+          } //end if neighborRange.first != neighborRange.second
         } //end for itMiddleWireHit
         //B2DEBUG(200,"#GroupsOfThree " << nGroupsOfThree);
       }

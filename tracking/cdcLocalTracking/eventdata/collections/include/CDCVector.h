@@ -69,9 +69,6 @@ namespace Belle2 {
       typedef typename Container::reverse_iterator reverse_iterator; ///< Reversed iterator type of this container
       typedef typename Container::const_reverse_iterator const_reverse_iterator;  ///< Constant reversed iterator type of this container
 
-      //typedef std::pair<iterator, iterator> range; ///<
-      //typedef std::pair<const_iterator, const_iterator> const_range; ///< Pair type of constant iterators indication a range
-
       /// Type for a pair of iterators which are iterable with range based for.
       class range : public std::pair<iterator, iterator> {
       public:
@@ -260,17 +257,21 @@ namespace Belle2 {
       const_iterator lower_bound(const Item& item) const
       { return isSorted() ? std::lower_bound(begin(), end(), item) : end(); }
 
-      /// Returns returns the equal range iterator pair for the item in the vector.
+      /// Returns returns the equal range iterator pair for the entity that is coaligned with the items in this vector.
       /** The equal range is only available in sorted vectors. If the isSorted state is not set \n
-       *  this method always returns two end iterators. In case of a sorted vector this is as fast as the set look up. */
-      range equal_range(const Item& item)
-      { return isSorted() ? std::equal_range(begin(), end(), item) : range(end() , end()); }
+       *  this method always returns two end iterators.
+       *  The passed entity must support operator< as both arguments, meaning it is coaligned with items of this vector.*/
+      template<class Coaligned>
+      range equal_range(const Coaligned& coaligned)
+      { return isSorted() ? std::equal_range(begin(), end(), coaligned) : range(end() , end()); }
 
       /// Returns returns the equal range constant iterator pair for the item in the constant vector.
       /** The equal range is only available in sorted vectors. If the isSorted state is not set \n
-       *  this method always returns two end iterators. In case of a sorted vector this is as fast as the set look up. */
-      const_range equal_range(const Item& item) const
-      { return isSorted() ? std::equal_range(begin(), end(), item) : const_range(end() , end()); }
+       *  this method always returns two end iterators.
+       *  The passed entity must support operator< as both arguments, meaning it is coaligned with items of this vector.*/
+      template<class Coaligned>
+      const_range equal_range(const Coaligned& coaligned) const
+      { return isSorted() ? std::equal_range(begin(), end(), coaligned) : const_range(end() , end()); }
 
 
       // Note if you have to remove lots of items from the collection at random positions, better use sets.

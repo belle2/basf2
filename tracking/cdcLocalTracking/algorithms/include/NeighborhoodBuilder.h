@@ -36,11 +36,10 @@ namespace Belle2 {
      *  but vary the definition of what a neighborhood is supposed to be we factor the later about into \n
      *  a strategy object called the NeighborChooser. \n
      */
-    template<class Collection, class NeighborChooser>
+    template<class Item, class NeighborChooser>
     class NeighborhoodBuilder {
 
     private:
-      typedef typename Collection::value_type Item; /// type of the item
       typedef WeightedNeighborhood<const Item> Neighborhood; /// type of the neighborhood to be filled
 
     private:
@@ -59,17 +58,19 @@ namespace Belle2 {
       ~NeighborhoodBuilder() {;}
 
       /// Drop all relations in a neighborhood an create a new one.
-      void create(const Collection& collection, Neighborhood& neighborhood) const {
+      template<class ItemRange>
+      void create(const ItemRange& itemRange, Neighborhood& neighborhood) const {
         neighborhood.clear();
-        append(collection, neighborhood);
+        append(itemRange, neighborhood);
       }
       /// Append the neighborhood relations to an existing neighborhood.
-      void append(const Collection& collection, Neighborhood& neighborhood) const {
+      template<class ItemRange>
+      void append(const ItemRange& itemRange, Neighborhood& neighborhood) const {
         //forget everything from former creations
         m_chooser.clear();
-        for (const Item & item : collection) {
+        for (const Item & item : itemRange) {
 
-          for (const Item & possibleNeighbor : m_chooser.getPossibleNeighbors(item, collection.begin(), collection.end())) {
+          for (const Item & possibleNeighbor : m_chooser.getPossibleNeighbors(item, std::begin(itemRange), std::end(itemRange))) {
 
             Weight weight = m_chooser.isGoodNeighbor(item, possibleNeighbor);
             if (not isNotANeighbor(weight)) {

@@ -173,8 +173,7 @@ namespace Belle2 {
       SegmentTripleCreator<SegmentTripleFilter> m_segmentTripleCreator;
 
       //neighborhood builders
-      NeighborhoodBuilder < std::set<CDCSegmentTriple>,
-                          SegmentTripleNeighborChooser > m_segmentTriple_neighborhoodBuilder;
+      NeighborhoodBuilder <CDCSegmentTriple, SegmentTripleNeighborChooser > m_segmentTriple_neighborhoodBuilder;
 
       //cellular automat
       CellularAutomaton<CDCSegmentTriple> m_segmentTripleAutomaton;

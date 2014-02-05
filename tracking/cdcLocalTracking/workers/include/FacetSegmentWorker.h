@@ -288,25 +288,25 @@ namespace Belle2 {
       FacetCreator<FacetFilter> m_facetCreator;
 
       //neighborhood builders
-      NeighborhoodBuilder<CDCWireHitCollection, WireHitNeighborChooser<CW_OUT_NEIGHBOR> >
+      NeighborhoodBuilder<CDCWireHit, WireHitNeighborChooser<CW_OUT_NEIGHBOR> >
       m_clockwiseOut_neighborhoodBuilder;
 
-      NeighborhoodBuilder<CDCWireHitCollection, WireHitNeighborChooser<CW_NEIGHBOR> >
+      NeighborhoodBuilder<CDCWireHit, WireHitNeighborChooser<CW_NEIGHBOR> >
       m_clockwise_neighborhoodBuilder;
 
-      NeighborhoodBuilder<CDCWireHitCollection, WireHitNeighborChooser<CW_IN_NEIGHBOR> >
+      NeighborhoodBuilder<CDCWireHit, WireHitNeighborChooser<CW_IN_NEIGHBOR> >
       m_clockwiseIn_neighborhoodBuilder;
 
-      NeighborhoodBuilder<CDCWireHitCollection, WireHitNeighborChooser<CCW_OUT_NEIGHBOR> >
+      NeighborhoodBuilder<CDCWireHit, WireHitNeighborChooser<CCW_OUT_NEIGHBOR> >
       m_counterClockwiseOut_neighborhoodBuilder;
 
-      NeighborhoodBuilder<CDCWireHitCollection, WireHitNeighborChooser<CCW_NEIGHBOR> >
+      NeighborhoodBuilder<CDCWireHit, WireHitNeighborChooser<CCW_NEIGHBOR> >
       m_counterClockwise_neighborhoodBuilder;
 
-      NeighborhoodBuilder<CDCWireHitCollection, WireHitNeighborChooser<CCW_IN_NEIGHBOR> >
+      NeighborhoodBuilder<CDCWireHit, WireHitNeighborChooser<CCW_IN_NEIGHBOR> >
       m_counterClockwiseIn_neighborhoodBuilder;
 
-      NeighborhoodBuilder<CDCRecoFacetCollection, FacetNeighborChooser>
+      NeighborhoodBuilder<CDCRecoFacet, FacetNeighborChooser>
       m_facetNeighborhoodBuilder;
 
 

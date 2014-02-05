@@ -302,11 +302,10 @@ namespace Belle2 {
       }
 
       /// Getter for the automaton cell.
-      AutomatonCell& getAutomatonCell() const { return m_automatonCell; }
+      AutomatonCell& getAutomatonCell() { return m_automatonCell; }
 
-
-
-
+      /// Constant getter for the automaton cell.
+      const AutomatonCell& getAutomatonCell() const { return m_automatonCell; }
 
     private:
 
@@ -318,7 +317,7 @@ namespace Belle2 {
       mutable ParameterLine2D m_startToEnd;
       mutable ParameterLine2D m_middleToEnd;
 
-      mutable AutomatonCell m_automatonCell;
+      AutomatonCell m_automatonCell;
 
 
       /// ROOT Macro to make CDCRecoFacet a ROOT class.

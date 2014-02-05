@@ -202,7 +202,7 @@ namespace Belle2 {
                  endRLInfo <= RIGHT * sign(endWireHit->getRefDriftLength());
                  endRLInfo += (RIGHT - LEFT)) {
 
-              const CDCRecoFacet facet(
+              CDCRecoFacet facet(
                 startWireHit,
                 startRLInfo,
 
@@ -216,26 +216,29 @@ namespace Belle2 {
                 // He should set them if he accepts the facet.
               );
 
-              CellState cellWeight = m_filter.isGoodFacet(facet);
+              const CDCRecoFacet& constFacet = facet;
+
+              CellState cellWeight = m_filter.isGoodFacet(constFacet);
 
               if (not isNotACell(cellWeight)) {
+                facet.getAutomatonCell().setCellWeight(cellWeight);
 
-                typename GenericFacetCollection::iterator itNewFacet =
-                  facets.insert(facets.end(), facet);
+                //typename GenericFacetCollection::iterator itNewFacet =
+                facets.insert(facets.end(), facet);
 
-                itNewFacet->getAutomatonCell().setCellWeight(cellWeight);
+                //itNewFacet->getAutomatonCell().setCellWeight(cellWeight);
 
               }
-            } //end endRLInfo
-          } //end middleRLInfo
-        } //end endRLInfo
+            } //end for endRLInfo
+          } //end for middleRLInfo
+        } //end for endRLInfo
         //B2DEBUG(200,"#CreatedForThisGroup " << nCreatedForThisGroup);
       }
 
     private:
       Filter m_filter;
 
-    }; // end class FacetCreator
+    }; //end class FacetCreator
   } //end namespace CDCLocalTracking
 } //end namespace Belle2
 

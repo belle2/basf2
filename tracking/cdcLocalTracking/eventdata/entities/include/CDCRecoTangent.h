@@ -166,10 +166,11 @@ namespace Belle2 {
       bool operator<(CDCRecoTangent const& rhs) const {
         return getFromWireHit() <  rhs.getFromWireHit() or (
                  getFromWireHit() == rhs.getFromWireHit() and (
-                   getToWireHit() <  rhs.getToWireHit() or (
-                     getToWireHit() == rhs.getToWireHit()  and (
-                       getFromRLInfo() < rhs.getFromRLInfo()  or (
-                         getFromRLInfo() == rhs.getFromRLInfo() and (
+                   getFromRLInfo() < rhs.getFromRLInfo()  or (
+                     getFromRLInfo() == rhs.getFromRLInfo() and (
+
+                       getToWireHit() <  rhs.getToWireHit() or (
+                         getToWireHit() == rhs.getToWireHit()  and (
                            getToRLInfo() < rhs.getToRLInfo())))))) ;
       }
 
@@ -213,8 +214,8 @@ namespace Belle2 {
        *  Both passage information are set to left. \n
        *  The tangent line however is not set correctly! \n
        *  It is used to find actual tangents starting from a wire hit in a sorted range of wire hits. */
-      static const CDCRecoTangent getLowerBound(const CDCWireHit* fromWireHit, const CDCWireHit* toWireHit)
-      { return CDCRecoTangent(fromWireHit, LEFT, toWireHit, LEFT, ParameterLine2D()); }
+      //static const CDCRecoTangent getLowerBound(const CDCWireHit* fromWireHit, const CDCWireHit* toWireHit)
+      //{ return CDCRecoTangent(fromWireHit, LEFT, toWireHit, LEFT, ParameterLine2D()); }
       /**@}*/
 
       /** @name Mimic pointer

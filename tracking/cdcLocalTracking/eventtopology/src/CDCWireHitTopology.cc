@@ -117,3 +117,16 @@ std::pair<const CDCRLWireHit*, const CDCRLWireHit*> CDCWireHitTopology::getRLWir
     return std::pair<const CDCRLWireHit*, const CDCRLWireHit*>(&leftWireHit, &rightWireHit);
   }
 }
+
+const Belle2::CDCLocalTracking::CDCRLWireHit* CDCWireHitTopology::getRLWireHit(const Belle2::CDCLocalTracking::CDCWireHit& wireHit, const RightLeftInfo& rlInfo) const
+{
+
+  std::pair<const CDCRLWireHit*, const CDCRLWireHit*> rlWireHitPair = getRLWireHitPair(wireHit);
+  if (rlInfo == LEFT) {
+    return rlWireHitPair.first;
+  } else {
+    return rlWireHitPair.second;
+  }
+
+}
+

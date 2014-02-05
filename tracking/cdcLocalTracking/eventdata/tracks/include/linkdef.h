@@ -9,6 +9,7 @@
 
 #ifdef CDCLOCALTRACKING_USE_ROOT
 
+#pragma link C++ class Belle2::CDCLocalTracking::CDCAxialAxialSegmentPair;
 #pragma link C++ class Belle2::CDCLocalTracking::CDCSegmentTriple;
 #pragma link C++ class Belle2::CDCLocalTracking::CDCTrack;
 

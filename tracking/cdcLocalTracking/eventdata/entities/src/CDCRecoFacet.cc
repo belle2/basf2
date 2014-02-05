@@ -17,28 +17,27 @@ using namespace CDCLocalTracking;
 ClassImpInCDCLocalTracking(CDCRecoFacet)
 
 CDCRecoFacet::CDCRecoFacet() :
-  AutomatonCell(),
   m_start(&(CDCWireHit::getLowest()) , LEFT),
   m_middle(&(CDCWireHit::getLowest()) , LEFT),
   m_end(&(CDCWireHit::getLowest()) , LEFT),
   m_startToMiddle(),
   m_startToEnd(),
-  m_middleToEnd()
+  m_middleToEnd(),
+  m_automatonCell()
 {;}
-
 
 CDCRecoFacet::CDCRecoFacet(
   const CDCWireHit* startWireHit,  const RightLeftInfo& startRLInfo,
   const CDCWireHit* middleWireHit, const RightLeftInfo& middleRLInfo,
   const CDCWireHit* endWireHit,    const RightLeftInfo& endRLInfo
 ) :
-  AutomatonCell(),
   m_start(startWireHit, startRLInfo),
   m_middle(middleWireHit, middleRLInfo),
   m_end(endWireHit, endRLInfo),
   m_startToMiddle(),
   m_startToEnd(),
-  m_middleToEnd()
+  m_middleToEnd(),
+  m_automatonCell()
 {
   if (startWireHit == nullptr) B2WARNING("Recohit with nullptr as wire hit");
   if (middleWireHit == nullptr) B2WARNING("Recohit with nullptr as wire hit");
@@ -54,13 +53,13 @@ CDCRecoFacet::CDCRecoFacet(
   const ParameterLine2D& startToEnd,
   const ParameterLine2D& middleToEnd
 ) :
-  AutomatonCell(),
   m_start(startWireHit, startRLInfo),
   m_middle(middleWireHit, middleRLInfo),
   m_end(endWireHit, endRLInfo),
   m_startToMiddle(startToMiddle),
   m_startToEnd(startToEnd),
-  m_middleToEnd(middleToEnd)
+  m_middleToEnd(middleToEnd),
+  m_automatonCell()
 {
   if (startWireHit == nullptr) B2WARNING("Recohit with nullptr as wire hit");
   if (middleWireHit == nullptr) B2WARNING("Recohit with nullptr as wire hit");

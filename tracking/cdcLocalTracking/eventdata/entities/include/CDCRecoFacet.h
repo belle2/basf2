@@ -24,7 +24,7 @@ namespace Belle2 {
   namespace CDCLocalTracking {
 
     /// Class representing a triple of neighboring wire hits
-    class CDCRecoFacet : public AutomatonCell {
+    class CDCRecoFacet : public UsedTObject {
 
     public:
 
@@ -277,6 +277,37 @@ namespace Belle2 {
       }
 
 
+      /// Sets the do not use flag of the facet's automaton cell and of the three contained wire hits
+      void setDoNotUse() const {
+        getAutomatonCell().setFlags(DO_NOT_USE);
+        forwardDoNotUse();
+      }
+
+      /// Sets the do not use flag of the three contained wire hits
+      void forwardDoNotUse() const {
+        getStartWireHit()->getAutomatonCell().setFlags(DO_NOT_USE);
+        getMiddleWireHit()->getAutomatonCell().setFlags(DO_NOT_USE);
+        getEndWireHit()->getAutomatonCell().setFlags(DO_NOT_USE);
+      }
+
+      /// If one of the contained wire hits is marked as do not use this facet is set be not usable as well
+      void receiveDoNotUse() const {
+
+        if (getStartWireHit()->getAutomatonCell().hasAnyFlags(DO_NOT_USE) or
+            getMiddleWireHit()->getAutomatonCell().hasAnyFlags(DO_NOT_USE) or
+            getEndWireHit()->getAutomatonCell().hasAnyFlags(DO_NOT_USE)) {
+
+          getAutomatonCell().setFlags(DO_NOT_USE);
+        }
+      }
+
+      /// Getter for the automaton cell.
+      AutomatonCell& getAutomatonCell() const { return m_automatonCell; }
+
+
+
+
+
     private:
 
       OrientedWireHit m_start;
@@ -286,6 +317,9 @@ namespace Belle2 {
       mutable ParameterLine2D m_startToMiddle;
       mutable ParameterLine2D m_startToEnd;
       mutable ParameterLine2D m_middleToEnd;
+
+      mutable AutomatonCell m_automatonCell;
+
 
       /// ROOT Macro to make CDCRecoFacet a ROOT class.
       ClassDefInCDCLocalTracking(CDCRecoFacet, 1);

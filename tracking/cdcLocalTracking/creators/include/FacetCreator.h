@@ -223,7 +223,7 @@ namespace Belle2 {
                 typename GenericFacetCollection::iterator itNewFacet =
                   facets.insert(facets.end(), facet);
 
-                itNewFacet->setCellWeight(cellWeight);
+                itNewFacet->getAutomatonCell().setCellWeight(cellWeight);
 
               }
             } //end endRLInfo

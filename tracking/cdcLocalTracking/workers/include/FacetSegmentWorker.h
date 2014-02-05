@@ -146,7 +146,7 @@ namespace Belle2 {
             B2DEBUG(100, "Apply cellular automat");
             const CDCRecoFacet* highestCell = m_cellularAutomaton.applyTo(m_facets, m_facetsNeighborhood);
             if (highestCell != nullptr) {
-              B2DEBUG(100, "  MaximalState " << highestCell->getCellState());
+              B2DEBUG(100, "  MaximalState " << highestCell->getAutomatonCell().getCellState());
             }
 
             //create the segments by following the highest states in the reco facets
@@ -211,30 +211,13 @@ namespace Belle2 {
 
 
               //Block the used facets
-              for (CDCRecoFacetPtrSegment::const_iterator itFacet = ptrFacetSegment.begin();
-                   itFacet != ptrFacetSegment.end(); ++itFacet) {
-                const CDCRecoFacet* facet = *itFacet;
-
-                facet->setFlags(DO_NOT_USE);
-                facet->getStartWireHit()->setFlags(DO_NOT_USE);
-                facet->getMiddleWireHit()->setFlags(DO_NOT_USE);
-                facet->getEndWireHit()->setFlags(DO_NOT_USE);
-
+              for (const CDCRecoFacet * facet :  ptrFacetSegment) {
+                facet->setDoNotUse();
               }
 
               //Block the facets that use already used wirehits as well
-              for (CDCRecoFacetCollection::const_iterator itFacet = m_facets.begin();
-                   itFacet != m_facets.end(); ++itFacet) {
-
-                const CDCRecoFacet& facet = *itFacet;
-
-                if (facet.getStartWireHit()->hasAnyFlags(DO_NOT_USE) or
-                    facet.getMiddleWireHit()->hasAnyFlags(DO_NOT_USE) or
-                    facet.getEndWireHit()->hasAnyFlags(DO_NOT_USE)) {
-
-                  facet.setFlags(DO_NOT_USE);
-
-                }
+              for (const CDCRecoFacet & facet :  m_facets) {
+                facet.receiveDoNotUse();
               }
 
             } while (created);

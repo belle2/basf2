@@ -30,7 +30,10 @@ void ROIpayload::init(int length)
 {
   m_index = 0;
   m_length = length;
-  m_rootdata = new int[length];
+  if (length == 0)
+    m_rootdata = NULL;
+  else
+    m_rootdata = new int[length];
   m_data32 = (uint32_t*)m_rootdata;
   m_data64 = (ROIrawID::baseType*)(m_data32 + 3);
 }

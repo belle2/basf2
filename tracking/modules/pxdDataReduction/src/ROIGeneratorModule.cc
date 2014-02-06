@@ -81,7 +81,7 @@ void ROIGeneratorModule::event()
   if (iROI % m_divider != 0)
     return ;
 
-  ROIList.create(true);
+  //  ROIList.create(true);
 
   ROIid tmp_ROIid;
 
@@ -90,6 +90,7 @@ void ROIGeneratorModule::event()
   sensorID.setLadderNumber(m_ladder);
   sensorID.setSensorNumber(m_sensor);
 
+  /*
   int minU;
   int minV;
   int maxU;
@@ -103,7 +104,7 @@ void ROIGeneratorModule::event()
   //    minV =  (0 + iROI*32 ) % 768;
   //  minV = (iROI / 250) % 768;
   //  maxV = min(767 , minV + 10);
-
+  */
 
   tmp_ROIid.setMinUid(m_minU);
   tmp_ROIid.setMinVid(m_minV);

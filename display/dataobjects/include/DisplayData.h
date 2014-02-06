@@ -54,20 +54,30 @@ namespace Belle2 {
     /** Destructor. */
     ~DisplayData();
 
-    /** Add a point at the given position, as part of a collection specified by name.
+    /** Add an arrow in the display (for axes, to point out some specific location).
      *
-     * All points with the same name will be hilighted when clicked etc.
+     * @param name  Text to be shown beside arrow.
+     * @param start The arrow will start here.
+     * @param end   The pointy end ends up here.
      */
-    void addPoint(const std::string& name, const TVector3& pos);
-
-    /** Add a text label at the given position. */
-    void addLabel(const std::string& text, const TVector3& pos);
+    void addArrow(const std::string& name, const TVector3& start, const TVector3& end);
 
     /** Add histogram with the given name.
      *
      * The histogram will show up in the 'Histograms' tab and can be drawn on the active canvas by double-clicking it.
      */
     void addHistogram(const std::string& name, const TH1* hist);
+
+    /** Add a text label at the given position. */
+    void addLabel(const std::string& text, const TVector3& pos);
+
+
+    /** Add a point at the given position, as part of a collection specified by name.
+     *
+     * All points with the same name will be hilighted when clicked etc.
+     */
+    void addPoint(const std::string& name, const TVector3& pos);
+
 
     /** Select the given object in the display.
      *
@@ -85,8 +95,9 @@ namespace Belle2 {
     std::vector<TH1*> m_histograms; //->
 
     std::vector<std::pair<std::string, unsigned int> > m_selectedObjects; /**< List of selected objects (array name, index). */
+    std::vector<std::pair<std::string, std::pair<TVector3, TVector3> > > m_arrows; /**< arrows ( name, (start, end)) . */
 
-    ClassDef(DisplayData, 2); /**< Add custom information to the display. */
+    ClassDef(DisplayData, 3); /**< Add custom information to the display. */
 
     friend class DisplayUI;
     friend class EVEVisualization;

@@ -25,6 +25,11 @@ DisplayData::~DisplayData()
   m_histograms.clear();
 }
 
+void DisplayData::addArrow(const std::string& name, const TVector3& start, const TVector3& end)
+{
+  m_arrows.push_back(std::make_pair(name, std::make_pair(start, end)));
+}
+
 void DisplayData::addPoint(const std::string& name, const TVector3& pos)
 {
   m_pointSets[name].push_back(pos);
@@ -41,6 +46,7 @@ void DisplayData::addHistogram(const std::string& name, const TH1* hist)
   newhist->SetDirectory(0);
   m_histograms.push_back(newhist);
 }
+
 void DisplayData::select(const TObject* object)
 {
   //where is this thing stored?

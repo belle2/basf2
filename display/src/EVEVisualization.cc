@@ -49,6 +49,7 @@
 #include <genfit/KalmanFitterRefTrack.h>
 
 #include <TApplication.h>
+#include <TEveArrow.h>
 #include <TEveBox.h>
 #include <TEveCalo.h>
 #include <TEveManager.h>
@@ -1376,6 +1377,25 @@ void EVEVisualization::showUserData(const DisplayData& displayData)
       points->SetNextPoint(p.x(), p.y(), p.z());
     }
     gEve->AddElement(points);
+  }
+
+  for (const auto & arrowPair : displayData.m_arrows) {
+    const TVector3 pos = arrowPair.second.first;
+    const TVector3 dir = arrowPair.second.second - pos;
+    TEveArrow* arrow = new TEveArrow(dir.x(), dir.y(), dir.z(), pos.x(), pos.y(), pos.z());
+    arrow->SetName(arrowPair.first.c_str());
+    arrow->SetTitle(arrowPair.first.c_str());
+    arrow->SetMainColor(kOrange);
+
+    //add label
+    TEveText* text = new TEveText(arrowPair.first.c_str());
+    text->SetTitle(arrowPair.first.c_str());
+    text->SetMainColor(kOrange);
+    //in middle of arrow, with some slight offset
+    const TVector3& labelPos = pos + 0.5 * dir + 0.1 * dir.Orthogonal();
+    text->PtrMainTrans()->SetPos(labelPos.x(), labelPos.y(), labelPos.z());
+    arrow->AddElement(text);
+    gEve->AddElement(arrow);
   }
 
 }

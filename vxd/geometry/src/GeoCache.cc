@@ -42,6 +42,14 @@ namespace Belle2 {
       return (info != m_sensorInfo.end());
     }
 
+    const vector<VxdID> GeoCache::getListOfSensors() const
+    {
+      vector<VxdID> sensors;
+      for (auto entry : m_sensorInfo)
+        sensors.push_back(entry.first);
+      return sensors;
+    }
+
     const SensorInfoBase& GeoCache::getSensorInfo(VxdID id) const
     {
       id.setSegmentNumber(0);

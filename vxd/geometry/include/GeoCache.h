@@ -13,6 +13,7 @@
 
 #include <vxd/dataobjects/VxdID.h>
 #include <vxd/geometry/SensorInfoBase.h>
+#include <vector>
 #include <set>
 #include <map>
 
@@ -66,9 +67,15 @@ namespace Belle2 {
 
       /** Check that id is a valid sensor number.
        * @param id sensor id to be checked against current GeoCache information
-       * @true if there is a SensorInfo associated with id, otherwise false.
+       * @return true if there is a SensorInfo associated with id, otherwise false.
        */
       bool validSensorID(Belle2::VxdID id) const;
+
+      /** Get list of all sensors.
+       * Intended mostly for Python, where std::sets don't work.
+       * @return vector of VxdIDs of all sensors in GeoCache.
+       */
+      const std::vector<VxdID> getListOfSensors() const;
 
       /** Return a referecne to the SensorInfo of a given SensorID */
       const SensorInfoBase& getSensorInfo(Belle2::VxdID id) const;

@@ -7,4 +7,5 @@
 
 #pragma link C++ class Belle2::VXDTrueHit;
 #pragma link C++ class Belle2::VxdID;
+#pragma link C++ class std::vector<Belle2::VxdID>+;
 #endif

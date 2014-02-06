@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import math
+from sets import Set
 from basf2 import *
 import ROOT
 from ROOT import Belle2
@@ -109,7 +110,7 @@ particlegun.param({  # Generate 5 tracks on average
     'momentumParams': [5, 1],
     'phiGeneration': 'normal',
     'phiParams': [0, 360],
-    'thetaGeneration': 'uniformCosinus',
+    'thetaGeneration': 'uniformCos',
     'thetaParams': [17, 150],
     'vertexGeneration': 'normal',
     'xVertexParams': [0, 1],
@@ -119,7 +120,7 @@ particlegun.param({  # Generate 5 tracks on average
     })
 
 # Select subdetectors to be built
-geometry.param('Components', ['MagneticField', 'PXD'])
+geometry.param('components', ['MagneticField', 'PXD'])
 
 # create processing path
 main = create_path()

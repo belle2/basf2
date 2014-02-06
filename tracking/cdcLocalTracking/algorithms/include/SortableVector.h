@@ -51,8 +51,8 @@ namespace Belle2 {
         range(const std::pair<iterator, iterator>& iterator_pair) : std::pair<iterator, iterator>(iterator_pair) {;}
         range(const iterator& begin, const iterator& end) : std::pair<iterator, iterator>(begin, end) {;}
 
-        const iterator& begin() const { return this->first;}
-        const iterator& end() const { return this->second;}
+        iterator begin() const { return this->first;}
+        iterator end() const { return this->second;}
       };
 
       /// Type for a pair of constant iterators which are iterable with range based for.
@@ -61,8 +61,8 @@ namespace Belle2 {
         const_range(const std::pair<const_iterator, const_iterator>& iterator_pair) : std::pair<const_iterator, const_iterator>(iterator_pair) {;}
         const_range(const const_iterator& begin, const const_iterator& end) : std::pair<const_iterator, const_iterator>(begin, end) {;}
 
-        const const_iterator& begin() const { return this->first;}
-        const const_iterator& end() const { return this->second;}
+        const_iterator begin() const { return this->first;}
+        const_iterator end() const { return this->second;}
       };
 
       /// Input iterator type usable with stl algorithms

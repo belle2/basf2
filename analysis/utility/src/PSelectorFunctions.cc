@@ -653,8 +653,8 @@ namespace Belle2 {
     REGISTER_VARIABLE("chiProb", particlePvalue, "chi^2 probability of the fit");
     REGISTER_VARIABLE("nDaughters", particleNDaughters, "number of daughter particles");
     REGISTER_VARIABLE("flavor", particleFlavorType, "flavor type of decay (0=unflavored, 1=flavored)");
-    REGISTER_VARIABLE("sumChildProb", sumChildProb, "sum of signal probabilities of childs");
-    REGISTER_VARIABLE("prodChildProb", prodChildProb, "product of signal probabilities of childs");
+    REGISTER_VARIABLE("sumChildProb", sumChildProb, "sum of signal probabilities of daughters");
+    REGISTER_VARIABLE("prodChildProb", prodChildProb, "product of signal probabilities of daughters");
 
     REGISTER_VARIABLE("isSignal", isSignal, "1.0 if Particle is correctly reconstructed (SIGNAL), 0.0 otherwise");
 

@@ -270,15 +270,15 @@ namespace Belle2 {
     while (!stack.empty()) {
       Particle* p = stack.back();
       stack.pop_back();
-      vector<int> childs = p->getDaughterIndices();
-      if (childs.empty()) {
+      const vector<int>& daughters = p->getDaughterIndices();
+      if (daughters.empty()) {
         int source = p->getMdstSource();
         for (unsigned i = 0; i < sources.size(); i++) {
           if (source == sources[i]) return false;
         }
         sources.push_back(source);
       } else {
-        for (unsigned i = 0; i < childs.size(); i++) stack.push_back(Particles[childs[i]]);
+        for (unsigned i = 0; i < daughters.size(); i++) stack.push_back(Particles[daughters[i]]);
       }
     }
     return true;

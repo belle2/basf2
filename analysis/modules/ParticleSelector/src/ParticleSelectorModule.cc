@@ -51,7 +51,7 @@ namespace Belle2 {
   {
     // set module description (e.g. insert text)
     setDescription("Performs particle selection");
-    setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
+    setPropertyFlags(c_ParallelProcessingCertified);
 
     // Add parameters
     addParam("PDG", m_pdg,

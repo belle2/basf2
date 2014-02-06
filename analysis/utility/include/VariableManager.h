@@ -32,6 +32,9 @@ namespace Belle2 {
    *  Note that only alphanumeric characters (0-9, a-Z) plus '_' are permitted in variable names.
    *
    *  Variables can then be accessed using getVariable(name) and getVariables().
+   *
+   *  \note All functions should be listed on
+   *        https://belle2.cc.kek.jp/~twiki/bin/view/Physics/ParticleSelectorFunctions
    */
   class VariableManager {
   public:

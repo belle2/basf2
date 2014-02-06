@@ -351,14 +351,14 @@ namespace Belle2 {
     /**
      * function for PSelector
      * @param part const pointer to Particle
-     * @return sum of signal probabilities of childs
+     * @return sum of signal probabilities of daughters
      */
     double sumChildProb(const Particle* particle);
 
     /**
      * function for PSelector
      * @param part const pointer to Particle
-     * @return product of signal probabilities of childs
+     * @return product of signal probabilities of daughters
      */
     double prodChildProb(const Particle* particle);
 

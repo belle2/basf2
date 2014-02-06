@@ -39,11 +39,11 @@ TEST_F(CDCLocalTrackingTest, SortableVector_empty)
 
   SortableVector<CDCGenHit> collection;
 
-  ASSERT_TRUE(collection.empty());
+  EXPECT_TRUE(collection.empty());
 
   collection.push_back(genHit);
 
-  ASSERT_FALSE(collection.empty());
+  EXPECT_FALSE(collection.empty());
 
 }
 
@@ -62,6 +62,7 @@ TEST_F(CDCLocalTrackingTest, SortableVector_range)
 
   int counter = 0;
   for (CDCGenHit & genHit : collection) {
+    EXPECT_EQ(genHit, collection[counter]);
     ++counter;
   }
   EXPECT_EQ(5, counter);
@@ -108,8 +109,8 @@ TEST_F(CDCLocalTrackingTest, SortableVector_findFast)
 
   // test the contains pointer mechanism
 
-  EXPECT_EQ(false, collection.containsPointer(&lowestGenHit));
-  EXPECT_EQ(false, collection.containsPointer(&largerGenHit));
+  EXPECT_FALSE(collection.containsPointer(&lowestGenHit));
+  EXPECT_FALSE(collection.containsPointer(&largerGenHit));
 
   const CDCGenHit& firstStoredGenHit = collection[0];
   const CDCGenHit& secondStoredGenHit = collection[1];

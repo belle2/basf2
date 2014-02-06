@@ -12,7 +12,6 @@
 #define ROI_SENDER_H_
 
 #include <framework/core/Module.h>
-#include <tracking/pxdDataReductionClasses/ROIrawID.h>
 #include <string>
 
 #include <fcntl.h>           /* For O_* constants */

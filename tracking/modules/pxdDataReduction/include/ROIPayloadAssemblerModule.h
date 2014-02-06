@@ -12,7 +12,7 @@
 #define ROI_PAYLOAD_ASSEMBLER_H_
 
 #include <framework/core/Module.h>
-#include <tracking/pxdDataReductionClasses/ROIrawID.h>
+#include <tracking/dataobjects/ROIrawID.h>
 #include <string>
 
 namespace Belle2 {

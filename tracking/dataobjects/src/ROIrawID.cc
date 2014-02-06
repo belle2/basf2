@@ -9,7 +9,7 @@
  **************************************************************************/
 
 #include <arpa/inet.h>
-#include <tracking/pxdDataReductionClasses/ROIrawID.h>
+#include <tracking/dataobjects/ROIrawID.h>
 using namespace Belle2;
 
 ROIrawID::baseType ROIrawID::getBigEndian() const

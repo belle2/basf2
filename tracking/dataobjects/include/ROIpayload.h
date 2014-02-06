@@ -9,7 +9,8 @@
  **************************************************************************/
 
 #pragma once
-#include <tracking/pxdDataReductionClasses/ROIrawID.h>
+
+#include <tracking/dataobjects/ROIrawID.h>
 #include "TObject.h"
 #include <stdio.h>
 #include <stdint.h>

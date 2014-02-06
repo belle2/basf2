@@ -174,7 +174,7 @@ namespace Belle2 {
     double m_momYmc;
     double m_momZmc;
     double m_thetamc;
-    double m_theta;
+    //    double m_theta;
     double m_costhetamc;
     double m_costhetaMCPart;
     double m_phimc;
@@ -186,7 +186,7 @@ namespace Belle2 {
     unsigned int npxdDigitInROI[6];
     unsigned int n_pxdDigit;
     unsigned int n_pxdDigitInROI;
-    unsigned int n_noHit;
+    //    unsigned int n_noHit;
     unsigned int n_noHit2;
     unsigned int n_noHit3;
     unsigned int n_noROI4;

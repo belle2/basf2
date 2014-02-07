@@ -31,6 +31,8 @@ namespace Belle2 {
 
     //! Constructor using existing pointer to raw data buffer
     RawPXD(int* , int);
+    //! Constructor using existing data which needs to be copied to a new raw data buffer
+    RawPXD(std::vector <unsigned int>& header, std::vector <std::vector <unsigned char>>& payload);
 
     //! Destructor
     virtual ~RawPXD();
@@ -51,6 +53,9 @@ namespace Belle2 {
     int m_nwords;/**< Number of (32bit) Words stored in the buffer. There might be unsused bytes in the last word.*/
     int* m_buffer; //[m_nwords] /**< Buffer of size m_nwords  */
     bool m_allocated;/**< copied over flag*/
+
+    //! Endian swap a int32
+    unsigned int endian_swap(unsigned int x);
 
     ClassDef(RawPXD, 1)
   }; // class RawPXD

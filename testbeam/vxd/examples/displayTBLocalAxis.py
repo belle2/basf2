@@ -91,19 +91,23 @@ class DisplayAxis(Module):
         geo = Belle2.VXD.GeoCache.getInstance()
         Plane = 1
         for sensor in geo.getListOfSensors():
-            if int(ShowPlane) == -1 or int(ShowPlane) == Plane:
-                info = geo.get(sensor)
-                if info.getID().getLayerNumber() == 7:
-                    if info.getID().getSensorNumber() < 4:
-                        SensorID = 'Tel' + str(info.getID().getSensorNumber())
-                    else:
-                        SensorID = 'Tel' + str(info.getID().getSensorNumber()\
-                            + 6)
+            info = geo.get(sensor)
+            if info.getID().getLayerNumber() == 7:
+                if info.getID().getSensorNumber() < 4:
+                    SensorID = 'Tel' + str(info.getID().getSensorNumber())
+                    PlaneOK = info.getID().getSensorNumber()
                 else:
-                    if info.getID().getLayerNumber() < 3:
-                        SensorID = 'PXD' + str(info.getID().getLayerNumber())
-                    else:
-                        SensorID = 'SVD' + str(info.getID().getLayerNumber())
+                    SensorID = 'Tel' + str(info.getID().getSensorNumber()\
+                     + 6)
+                    PlaneOK = info.getID().getSensorNumber() + 6
+            else:
+                if info.getID().getLayerNumber() < 3:
+                    SensorID = 'PXD' + str(info.getID().getLayerNumber())
+                    PlaneOK = info.getID().getLayerNumber() + 3
+                else:
+                    SensorID = 'SVD' + str(info.getID().getLayerNumber())
+                    PlaneOK = info.getID().getLayerNumber() + 3
+            if int(ShowPlane) == -1 or int(ShowPlane) == PlaneOK:
                 if int(ShowLocal) != 0:
                     detPos = geo.get(sensor).\
                         pointToGlobal(TVector3(0., 0., 0.))
@@ -138,12 +142,12 @@ class DisplayAxis(Module):
                        pixelDir0, pixelDirU, ROOT.kCyan)
                     displayData.obj().addArrow(LableV, pixelDir0, \
                         pixelDirV, ROOT.kYellow)
-                    print SensorID + ', dir U, pitch ' + str(
-                        info.getUPitch() * 10000) + 'um, size ' + \
+                    print str(PlaneOK) + ':' + SensorID + ', dir U, pitch ' \
+                        + str(info.getUPitch() * 10000) + 'um, size ' + \
                         str(info.getUSize() * 20) + ' mm, pixels ' + \
                         str(info.getUCells())
-                    print SensorID + ', dir V, pitch ' + str(info.\
-                        getVPitch() * 10000) + 'um, size ' + \
+                    print str(PlaneOK) + ':' + SensorID + ', dir V, pitch ' + \
+                        str(info.getVPitch() * 10000) + 'um, size ' + \
                         str(info.getVSize() * 20) + ' mm, pixels ' + \
                         str(info.getVCells())
             Plane += 1

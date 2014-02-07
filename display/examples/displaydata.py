@@ -13,6 +13,7 @@ PyConfig.StartGuiThread = False
 
 from ROOT import Belle2
 from ROOT import TVector3
+import ROOT
 
 
 class DisplayDataTest(Module):
@@ -45,7 +46,7 @@ class DisplayDataTest(Module):
         displayData.obj().addArrow("z", pos, pos + TVector3(0, 0, 50))
 
         displayData.obj().addArrow("z=-2m", TVector3(100, 100, -200),
-                TVector3(0, 0, -200))
+                TVector3(0, 0, -200), ROOT.kGray)
 
         # highlight the first MCParticle
         mcparticles = Belle2.PyStoreArray('MCParticles')

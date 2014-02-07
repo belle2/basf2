@@ -59,8 +59,9 @@ namespace Belle2 {
      * @param name  Text to be shown beside arrow.
      * @param start The arrow will start here.
      * @param end   The pointy end ends up here.
+     * @param color Color_t to use for this object, default: random color.
      */
-    void addArrow(const std::string& name, const TVector3& start, const TVector3& end);
+    void addArrow(const std::string& name, const TVector3& start, const TVector3& end, int color = -1);
 
     /** Add histogram with the given name.
      *
@@ -88,6 +89,12 @@ namespace Belle2 {
      */
     void select(const TObject* object);
   private:
+    struct Arrow {
+      std::string name; /*< label. */
+      TVector3 start; /**< arrow starts here. */
+      TVector3 end; /**< and ends here. */
+      int color; /**< Color_t, e.g. kGreen. -1 for default */
+    };
 
     std::map<std::string, std::vector<TVector3> > m_pointSets; /**< name -> points map */
     std::vector<std::pair<std::string, TVector3> > m_labels; /**< text labels (to be shown at a given position). */
@@ -95,9 +102,9 @@ namespace Belle2 {
     std::vector<TH1*> m_histograms; //->
 
     std::vector<std::pair<std::string, unsigned int> > m_selectedObjects; /**< List of selected objects (array name, index). */
-    std::vector<std::pair<std::string, std::pair<TVector3, TVector3> > > m_arrows; /**< arrows ( name, (start, end)) . */
+    std::vector<Arrow> m_arrows; /**< List of arrows. */
 
-    ClassDef(DisplayData, 3); /**< Add custom information to the display. */
+    ClassDef(DisplayData, 4); /**< Add custom information to the display. */
 
     friend class DisplayUI;
     friend class EVEVisualization;

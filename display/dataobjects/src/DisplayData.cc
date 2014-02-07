@@ -25,9 +25,9 @@ DisplayData::~DisplayData()
   m_histograms.clear();
 }
 
-void DisplayData::addArrow(const std::string& name, const TVector3& start, const TVector3& end)
+void DisplayData::addArrow(const std::string& name, const TVector3& start, const TVector3& end, int color)
 {
-  m_arrows.push_back(std::make_pair(name, std::make_pair(start, end)));
+  m_arrows.push_back(Arrow {name, start, end, color});
 }
 
 void DisplayData::addPoint(const std::string& name, const TVector3& pos)

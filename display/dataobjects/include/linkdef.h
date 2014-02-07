@@ -11,8 +11,7 @@
 #pragma link C++ class pair<string, TVector3>+;
 #pragma link C++ class vector<pair<string, TVector3> >+;
 #pragma link C++ class vector<TH1*>+;
-#pragma link C++ class pair<TVector3, TVector3>+;
-#pragma link C++ class pair<string, pair<TVector3, TVector3> >+;
-#pragma link C++ class vector<pair<string, pair<TVector3, TVector3> > >+;
+#pragma link C++ class Belle2::DisplayData::Arrow+;
+#pragma link C++ class vector<Arrow>+;
 
 #endif

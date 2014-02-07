@@ -1380,25 +1380,28 @@ void EVEVisualization::showUserData(const DisplayData& displayData)
     gEve->AddElement(points);
   }
 
-  int color = 2; //primary colours, changing rapidly with index
-  for (const auto & arrowPair : displayData.m_arrows) {
-    const TVector3 pos = arrowPair.second.first;
-    const TVector3 dir = arrowPair.second.second - pos;
-    TEveArrow* arrow = new TEveArrow(dir.x(), dir.y(), dir.z(), pos.x(), pos.y(), pos.z());
-    arrow->SetName(arrowPair.first.c_str());
-    arrow->SetTitle(arrowPair.first.c_str());
-    arrow->SetMainColor(color);
+  int randomColor = 2; //primary colours, changing rapidly with index
+  for (const auto & arrow : displayData.m_arrows) {
+    const TVector3 pos = arrow.start;
+    const TVector3 dir = arrow.end - pos;
+    TEveArrow* eveArrow = new TEveArrow(dir.x(), dir.y(), dir.z(), pos.x(), pos.y(), pos.z());
+    eveArrow->SetName(arrow.name.c_str());
+    eveArrow->SetTitle(arrow.name.c_str());
+    int arrowColor = arrow.color;
+    if (arrowColor == -1) {
+      arrowColor = randomColor;
+      randomColor++;
+    }
+    eveArrow->SetMainColor(arrowColor);
 
     //add label
-    TEveText* text = new TEveText(arrowPair.first.c_str());
-    text->SetMainColor(color);
+    TEveText* text = new TEveText(arrow.name.c_str());
+    text->SetMainColor(arrowColor);
     //in middle of arrow, with some slight offset
     const TVector3& labelPos = pos + 0.5 * dir + 0.1 * dir.Orthogonal();
     text->PtrMainTrans()->SetPos(labelPos.x(), labelPos.y(), labelPos.z());
-    arrow->AddElement(text);
-    gEve->AddElement(arrow);
-
-    color++;
+    eveArrow->AddElement(text);
+    gEve->AddElement(eveArrow);
   }
 
 }

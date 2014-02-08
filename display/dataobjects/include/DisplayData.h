@@ -89,8 +89,9 @@ namespace Belle2 {
      */
     void select(const TObject* object);
   private:
+    /** Stores data associated with an arrow. */
     struct Arrow {
-      std::string name; /*< label. */
+      std::string name; /**< label. */
       TVector3 start; /**< arrow starts here. */
       TVector3 end; /**< and ends here. */
       int color; /**< Color_t, e.g. kGreen. -1 for default */

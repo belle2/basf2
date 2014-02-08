@@ -39,7 +39,7 @@ void NtupleVertexTool::setupTree()
     m_tree->Branch((strNames[iProduct] + "_Z").c_str(), &m_fDZ[iProduct], (strNames[iProduct] + "_Z/F").c_str());
     m_tree->Branch((strNames[iProduct] + "_ErrZ").c_str(), &m_fDEZ[iProduct], (strNames[iProduct] + "_ErrZ/F").c_str());
     m_tree->Branch((strNames[iProduct] + "_Rho").c_str(), &m_fDRho[iProduct], (strNames[iProduct] + "_Rho/F").c_str());
-    m_tree->Branch((strNames[iProduct] + "_Pval").c_str(), &m_fPvalue[iProduct], (strNames[iProduct] + "_Pval/F").c_str());
+    m_tree->Branch((strNames[iProduct] + "_VtxPvalue").c_str(), &m_fPvalue[iProduct], (strNames[iProduct] + "_VtxPvalue/F").c_str());
   }
 }
 

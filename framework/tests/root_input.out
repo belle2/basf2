@@ -11,90 +11,80 @@
 [INFO] ============================================================================
 [INFO] DataStore collections in event 0
 [INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDClustersToPXDDigits
+[INFO] RelationContainer    PXDClustersToPXDTrueHits
+[INFO] PXDDigit[]           PXDDigits                  177
+[INFO] PXDTrueHit[]         PXDTrueHits                40
 [INFO] 
-[INFO] (Type)    Name                             Number of entries         <Event>
 [INFO] ----------------------------------------------------------------------------
-[INFO] (Object)  EventMetaData
-[INFO] (Object)  PXDClustersToPXDDigits
-[INFO] (Object)  PXDClustersToPXDTrueHits
-[INFO] (Array)   PXDDigits                        177
-[INFO] (Array)   PXDTrueHits                      40
-[INFO] 
-[INFO] (Type)    Name                             Number of entries    <Persistent>
-[INFO] ----------------------------------------------------------------------------
-[INFO] (Object)  FileMetaData
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] FileMetaData         FileMetaData
 [INFO] 
 [INFO] ============================================================================
 [INFO] EXP:        0        RUN:        1        EVT:        1
 [INFO] ============================================================================
 [INFO] DataStore collections in event 1
 [INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDClustersToPXDDigits
+[INFO] RelationContainer    PXDClustersToPXDTrueHits
+[INFO] PXDDigit[]           PXDDigits                  165
+[INFO] PXDTrueHit[]         PXDTrueHits                37
 [INFO] 
-[INFO] (Type)    Name                             Number of entries         <Event>
 [INFO] ----------------------------------------------------------------------------
-[INFO] (Object)  EventMetaData
-[INFO] (Object)  PXDClustersToPXDDigits
-[INFO] (Object)  PXDClustersToPXDTrueHits
-[INFO] (Array)   PXDDigits                        165
-[INFO] (Array)   PXDTrueHits                      37
-[INFO] 
-[INFO] (Type)    Name                             Number of entries    <Persistent>
-[INFO] ----------------------------------------------------------------------------
-[INFO] (Object)  FileMetaData
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] FileMetaData         FileMetaData
 [INFO] 
 [INFO] ============================================================================
 [INFO] EXP:        0        RUN:        1        EVT:        2
 [INFO] ============================================================================
 [INFO] DataStore collections in event 2
 [INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDClustersToPXDDigits
+[INFO] RelationContainer    PXDClustersToPXDTrueHits
+[INFO] PXDDigit[]           PXDDigits                  150
+[INFO] PXDTrueHit[]         PXDTrueHits                59
 [INFO] 
-[INFO] (Type)    Name                             Number of entries         <Event>
 [INFO] ----------------------------------------------------------------------------
-[INFO] (Object)  EventMetaData
-[INFO] (Object)  PXDClustersToPXDDigits
-[INFO] (Object)  PXDClustersToPXDTrueHits
-[INFO] (Array)   PXDDigits                        150
-[INFO] (Array)   PXDTrueHits                      59
-[INFO] 
-[INFO] (Type)    Name                             Number of entries    <Persistent>
-[INFO] ----------------------------------------------------------------------------
-[INFO] (Object)  FileMetaData
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] FileMetaData         FileMetaData
 [INFO] 
 [INFO] ============================================================================
 [INFO] EXP:        0        RUN:        1        EVT:        3
 [INFO] ============================================================================
 [INFO] DataStore collections in event 3
 [INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDClustersToPXDDigits
+[INFO] RelationContainer    PXDClustersToPXDTrueHits
+[INFO] PXDDigit[]           PXDDigits                  103
+[INFO] PXDTrueHit[]         PXDTrueHits                18
 [INFO] 
-[INFO] (Type)    Name                             Number of entries         <Event>
 [INFO] ----------------------------------------------------------------------------
-[INFO] (Object)  EventMetaData
-[INFO] (Object)  PXDClustersToPXDDigits
-[INFO] (Object)  PXDClustersToPXDTrueHits
-[INFO] (Array)   PXDDigits                        103
-[INFO] (Array)   PXDTrueHits                      18
-[INFO] 
-[INFO] (Type)    Name                             Number of entries    <Persistent>
-[INFO] ----------------------------------------------------------------------------
-[INFO] (Object)  FileMetaData
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] FileMetaData         FileMetaData
 [INFO] 
 [INFO] ============================================================================
 [INFO] EXP:        0        RUN:        1        EVT:        4
 [INFO] ============================================================================
 [INFO] DataStore collections in event 4
 [INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDClustersToPXDDigits
+[INFO] RelationContainer    PXDClustersToPXDTrueHits
+[INFO] PXDDigit[]           PXDDigits                  165
+[INFO] PXDTrueHit[]         PXDTrueHits                48
 [INFO] 
-[INFO] (Type)    Name                             Number of entries         <Event>
 [INFO] ----------------------------------------------------------------------------
-[INFO] (Object)  EventMetaData
-[INFO] (Object)  PXDClustersToPXDDigits
-[INFO] (Object)  PXDClustersToPXDTrueHits
-[INFO] (Array)   PXDDigits                        165
-[INFO] (Array)   PXDTrueHits                      48
-[INFO] 
-[INFO] (Type)    Name                             Number of entries    <Persistent>
-[INFO] ----------------------------------------------------------------------------
-[INFO] (Object)  FileMetaData
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] FileMetaData         FileMetaData
 [INFO] 
 [INFO] ============================================================================
 [INFO] ------------------------------------------------------------------------

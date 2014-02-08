@@ -12,17 +12,15 @@
 [INFO] ============================================================================
 [INFO] DataStore collections in event 2
 [INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 34
+[INFO] PXDTrueHit[]         PXDTrueHits                2
 [INFO] 
-[INFO] (Type)    Name                             Number of entries         <Event>
 [INFO] ----------------------------------------------------------------------------
-[INFO] (Object)  EventMetaData
-[INFO] (Object)  PXDTrueHitsToPXDSimHits
-[INFO] (Array)   PXDSimHits                       34
-[INFO] (Array)   PXDTrueHits                      2
-[INFO] 
-[INFO] (Type)    Name                             Number of entries    <Persistent>
-[INFO] ----------------------------------------------------------------------------
-[INFO] (Object)  FileMetaData
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] FileMetaData         FileMetaData
 [INFO] 
 [INFO] ============================================================================
 truehit (edep: 2.51373e-05) => hit(edep: 1.14828e-06)
@@ -63,17 +61,15 @@ truehit (edep: 1.63073e-05) => hit(edep: 4.68044e-07)
 [INFO] ============================================================================
 [INFO] DataStore collections in event 6
 [INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 33
+[INFO] PXDTrueHit[]         PXDTrueHits                2
 [INFO] 
-[INFO] (Type)    Name                             Number of entries         <Event>
 [INFO] ----------------------------------------------------------------------------
-[INFO] (Object)  EventMetaData
-[INFO] (Object)  PXDTrueHitsToPXDSimHits
-[INFO] (Array)   PXDSimHits                       33
-[INFO] (Array)   PXDTrueHits                      2
-[INFO] 
-[INFO] (Type)    Name                             Number of entries    <Persistent>
-[INFO] ----------------------------------------------------------------------------
-[INFO] (Object)  FileMetaData
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] FileMetaData         FileMetaData
 [INFO] 
 [INFO] ============================================================================
 truehit (edep: 2.21165e-05) => hit(edep: 1.025e-06)
@@ -113,17 +109,15 @@ truehit (edep: 1.81704e-05) => hit(edep: 1.26953e-06)
 [INFO] ============================================================================
 [INFO] DataStore collections in event 5
 [INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 37
+[INFO] PXDTrueHit[]         PXDTrueHits                2
 [INFO] 
-[INFO] (Type)    Name                             Number of entries         <Event>
 [INFO] ----------------------------------------------------------------------------
-[INFO] (Object)  EventMetaData
-[INFO] (Object)  PXDTrueHitsToPXDSimHits
-[INFO] (Array)   PXDSimHits                       37
-[INFO] (Array)   PXDTrueHits                      2
-[INFO] 
-[INFO] (Type)    Name                             Number of entries    <Persistent>
-[INFO] ----------------------------------------------------------------------------
-[INFO] (Object)  FileMetaData
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] FileMetaData         FileMetaData
 [INFO] 
 [INFO] ============================================================================
 truehit (edep: 2.5554e-05) => hit(edep: 1.06187e-06)
@@ -167,17 +161,15 @@ truehit (edep: 2.049e-05) => hit(edep: 1.34384e-09)
 [INFO] ============================================================================
 [INFO] DataStore collections in event 9
 [INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 31
+[INFO] PXDTrueHit[]         PXDTrueHits                2
 [INFO] 
-[INFO] (Type)    Name                             Number of entries         <Event>
 [INFO] ----------------------------------------------------------------------------
-[INFO] (Object)  EventMetaData
-[INFO] (Object)  PXDTrueHitsToPXDSimHits
-[INFO] (Array)   PXDSimHits                       31
-[INFO] (Array)   PXDTrueHits                      2
-[INFO] 
-[INFO] (Type)    Name                             Number of entries    <Persistent>
-[INFO] ----------------------------------------------------------------------------
-[INFO] (Object)  FileMetaData
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] FileMetaData         FileMetaData
 [INFO] 
 [INFO] ============================================================================
 truehit (edep: 1.93205e-05) => hit(edep: 8.85788e-07)
@@ -215,17 +207,15 @@ truehit (edep: 2.49923e-05) => hit(edep: 1.10737e-06)
 [INFO] ============================================================================
 [INFO] DataStore collections in event 10
 [INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 56
+[INFO] PXDTrueHit[]         PXDTrueHits                3
 [INFO] 
-[INFO] (Type)    Name                             Number of entries         <Event>
 [INFO] ----------------------------------------------------------------------------
-[INFO] (Object)  EventMetaData
-[INFO] (Object)  PXDTrueHitsToPXDSimHits
-[INFO] (Array)   PXDSimHits                       56
-[INFO] (Array)   PXDTrueHits                      3
-[INFO] 
-[INFO] (Type)    Name                             Number of entries    <Persistent>
-[INFO] ----------------------------------------------------------------------------
-[INFO] (Object)  FileMetaData
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] FileMetaData         FileMetaData
 [INFO] 
 [INFO] ============================================================================
 truehit (edep: 2.04524e-05) => hit(edep: 1.34394e-06)
@@ -288,17 +278,15 @@ truehit (edep: 2.90512e-05) => hit(edep: 6.90497e-07)
 [INFO] ============================================================================
 [INFO] DataStore collections in event 11
 [INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 71
+[INFO] PXDTrueHit[]         PXDTrueHits                2
 [INFO] 
-[INFO] (Type)    Name                             Number of entries         <Event>
 [INFO] ----------------------------------------------------------------------------
-[INFO] (Object)  EventMetaData
-[INFO] (Object)  PXDTrueHitsToPXDSimHits
-[INFO] (Array)   PXDSimHits                       71
-[INFO] (Array)   PXDTrueHits                      2
-[INFO] 
-[INFO] (Type)    Name                             Number of entries    <Persistent>
-[INFO] ----------------------------------------------------------------------------
-[INFO] (Object)  FileMetaData
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] FileMetaData         FileMetaData
 [INFO] 
 [INFO] ============================================================================
 truehit (edep: 4.39481e-05) => hit(edep: 4.20905e-06)
@@ -376,17 +364,15 @@ truehit (edep: 4.89612e-05) => hit(edep: 4.53651e-08)
 [INFO] ============================================================================
 [INFO] DataStore collections in event 8
 [INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 34
+[INFO] PXDTrueHit[]         PXDTrueHits                2
 [INFO] 
-[INFO] (Type)    Name                             Number of entries         <Event>
 [INFO] ----------------------------------------------------------------------------
-[INFO] (Object)  EventMetaData
-[INFO] (Object)  PXDTrueHitsToPXDSimHits
-[INFO] (Array)   PXDSimHits                       34
-[INFO] (Array)   PXDTrueHits                      2
-[INFO] 
-[INFO] (Type)    Name                             Number of entries    <Persistent>
-[INFO] ----------------------------------------------------------------------------
-[INFO] (Object)  FileMetaData
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] FileMetaData         FileMetaData
 [INFO] 
 [INFO] ============================================================================
 truehit (edep: 2.20655e-05) => hit(edep: 1.08388e-06)
@@ -427,17 +413,15 @@ truehit (edep: 2.10364e-05) => hit(edep: 8.80884e-07)
 [INFO] ============================================================================
 [INFO] DataStore collections in event 12
 [INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 76
+[INFO] PXDTrueHit[]         PXDTrueHits                2
 [INFO] 
-[INFO] (Type)    Name                             Number of entries         <Event>
 [INFO] ----------------------------------------------------------------------------
-[INFO] (Object)  EventMetaData
-[INFO] (Object)  PXDTrueHitsToPXDSimHits
-[INFO] (Array)   PXDSimHits                       76
-[INFO] (Array)   PXDTrueHits                      2
-[INFO] 
-[INFO] (Type)    Name                             Number of entries    <Persistent>
-[INFO] ----------------------------------------------------------------------------
-[INFO] (Object)  FileMetaData
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] FileMetaData         FileMetaData
 [INFO] 
 [INFO] ============================================================================
 truehit (edep: 4.27464e-05) => hit(edep: 1.2089e-06)
@@ -520,17 +504,15 @@ truehit (edep: 5.10978e-05) => hit(edep: 3.9422e-07)
 [INFO] ============================================================================
 [INFO] DataStore collections in event 0
 [INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 31
+[INFO] PXDTrueHit[]         PXDTrueHits                2
 [INFO] 
-[INFO] (Type)    Name                             Number of entries         <Event>
 [INFO] ----------------------------------------------------------------------------
-[INFO] (Object)  EventMetaData
-[INFO] (Object)  PXDTrueHitsToPXDSimHits
-[INFO] (Array)   PXDSimHits                       31
-[INFO] (Array)   PXDTrueHits                      2
-[INFO] 
-[INFO] (Type)    Name                             Number of entries    <Persistent>
-[INFO] ----------------------------------------------------------------------------
-[INFO] (Object)  FileMetaData
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] FileMetaData         FileMetaData
 [INFO] 
 [INFO] ============================================================================
 truehit (edep: 2.32479e-05) => hit(edep: 1.15344e-06)
@@ -568,17 +550,15 @@ truehit (edep: 1.95442e-05) => hit(edep: 2.24071e-07)
 [INFO] ============================================================================
 [INFO] DataStore collections in event 13
 [INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 70
+[INFO] PXDTrueHit[]         PXDTrueHits                2
 [INFO] 
-[INFO] (Type)    Name                             Number of entries         <Event>
 [INFO] ----------------------------------------------------------------------------
-[INFO] (Object)  EventMetaData
-[INFO] (Object)  PXDTrueHitsToPXDSimHits
-[INFO] (Array)   PXDSimHits                       70
-[INFO] (Array)   PXDTrueHits                      2
-[INFO] 
-[INFO] (Type)    Name                             Number of entries    <Persistent>
-[INFO] ----------------------------------------------------------------------------
-[INFO] (Object)  FileMetaData
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] FileMetaData         FileMetaData
 [INFO] 
 [INFO] ============================================================================
 truehit (edep: 4.68743e-05) => hit(edep: 1.71942e-06)
@@ -655,17 +635,15 @@ truehit (edep: 5.77344e-05) => hit(edep: 6.95549e-07)
 [INFO] ============================================================================
 [INFO] DataStore collections in event 15
 [INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 34
+[INFO] PXDTrueHit[]         PXDTrueHits                2
 [INFO] 
-[INFO] (Type)    Name                             Number of entries         <Event>
 [INFO] ----------------------------------------------------------------------------
-[INFO] (Object)  EventMetaData
-[INFO] (Object)  PXDTrueHitsToPXDSimHits
-[INFO] (Array)   PXDSimHits                       34
-[INFO] (Array)   PXDTrueHits                      2
-[INFO] 
-[INFO] (Type)    Name                             Number of entries    <Persistent>
-[INFO] ----------------------------------------------------------------------------
-[INFO] (Object)  FileMetaData
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] FileMetaData         FileMetaData
 [INFO] 
 [INFO] ============================================================================
 truehit (edep: 2.5263e-05) => hit(edep: 1.17323e-06)
@@ -706,17 +684,15 @@ truehit (edep: 1.88081e-05) => hit(edep: 1.95376e-07)
 [INFO] ============================================================================
 [INFO] DataStore collections in event 16
 [INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 66
+[INFO] PXDTrueHit[]         PXDTrueHits                2
 [INFO] 
-[INFO] (Type)    Name                             Number of entries         <Event>
 [INFO] ----------------------------------------------------------------------------
-[INFO] (Object)  EventMetaData
-[INFO] (Object)  PXDTrueHitsToPXDSimHits
-[INFO] (Array)   PXDSimHits                       66
-[INFO] (Array)   PXDTrueHits                      2
-[INFO] 
-[INFO] (Type)    Name                             Number of entries    <Persistent>
-[INFO] ----------------------------------------------------------------------------
-[INFO] (Object)  FileMetaData
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] FileMetaData         FileMetaData
 [INFO] 
 [INFO] ============================================================================
 truehit (edep: 4.28605e-05) => hit(edep: 1.77285e-06)
@@ -789,17 +765,15 @@ truehit (edep: 7.27455e-05) => hit(edep: 1.45138e-07)
 [INFO] ============================================================================
 [INFO] DataStore collections in event 7
 [INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 54
+[INFO] PXDTrueHit[]         PXDTrueHits                2
 [INFO] 
-[INFO] (Type)    Name                             Number of entries         <Event>
 [INFO] ----------------------------------------------------------------------------
-[INFO] (Object)  EventMetaData
-[INFO] (Object)  PXDTrueHitsToPXDSimHits
-[INFO] (Array)   PXDSimHits                       54
-[INFO] (Array)   PXDTrueHits                      2
-[INFO] 
-[INFO] (Type)    Name                             Number of entries    <Persistent>
-[INFO] ----------------------------------------------------------------------------
-[INFO] (Object)  FileMetaData
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] FileMetaData         FileMetaData
 [INFO] 
 [INFO] ============================================================================
 truehit (edep: 3.54471e-05) => hit(edep: 7.37605e-07)
@@ -860,17 +834,15 @@ truehit (edep: 3.50122e-05) => hit(edep: 3.70311e-07)
 [INFO] ============================================================================
 [INFO] DataStore collections in event 6
 [INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 62
+[INFO] PXDTrueHit[]         PXDTrueHits                2
 [INFO] 
-[INFO] (Type)    Name                             Number of entries         <Event>
 [INFO] ----------------------------------------------------------------------------
-[INFO] (Object)  EventMetaData
-[INFO] (Object)  PXDTrueHitsToPXDSimHits
-[INFO] (Array)   PXDSimHits                       62
-[INFO] (Array)   PXDTrueHits                      2
-[INFO] 
-[INFO] (Type)    Name                             Number of entries    <Persistent>
-[INFO] ----------------------------------------------------------------------------
-[INFO] (Object)  FileMetaData
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] FileMetaData         FileMetaData
 [INFO] 
 [INFO] ============================================================================
 truehit (edep: 4.68895e-05) => hit(edep: 1.52771e-06)
@@ -939,17 +911,15 @@ truehit (edep: 4.47179e-05) => hit(edep: 7.52955e-07)
 [INFO] ============================================================================
 [INFO] DataStore collections in event 3
 [INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 80
+[INFO] PXDTrueHit[]         PXDTrueHits                2
 [INFO] 
-[INFO] (Type)    Name                             Number of entries         <Event>
 [INFO] ----------------------------------------------------------------------------
-[INFO] (Object)  EventMetaData
-[INFO] (Object)  PXDTrueHitsToPXDSimHits
-[INFO] (Array)   PXDSimHits                       80
-[INFO] (Array)   PXDTrueHits                      2
-[INFO] 
-[INFO] (Type)    Name                             Number of entries    <Persistent>
-[INFO] ----------------------------------------------------------------------------
-[INFO] (Object)  FileMetaData
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] FileMetaData         FileMetaData
 [INFO] 
 [INFO] ============================================================================
 truehit (edep: 5.35128e-05) => hit(edep: 1.51375e-06)
@@ -1036,17 +1006,15 @@ truehit (edep: 5.88216e-05) => hit(edep: 5.20555e-07)
 [INFO] ============================================================================
 [INFO] DataStore collections in event 8
 [INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 46
+[INFO] PXDTrueHit[]         PXDTrueHits                2
 [INFO] 
-[INFO] (Type)    Name                             Number of entries         <Event>
 [INFO] ----------------------------------------------------------------------------
-[INFO] (Object)  EventMetaData
-[INFO] (Object)  PXDTrueHitsToPXDSimHits
-[INFO] (Array)   PXDSimHits                       46
-[INFO] (Array)   PXDTrueHits                      2
-[INFO] 
-[INFO] (Type)    Name                             Number of entries    <Persistent>
-[INFO] ----------------------------------------------------------------------------
-[INFO] (Object)  FileMetaData
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] FileMetaData         FileMetaData
 [INFO] 
 [INFO] ============================================================================
 truehit (edep: 2.7502e-05) => hit(edep: 1.0004e-06)
@@ -1099,17 +1067,15 @@ truehit (edep: 3.54357e-05) => hit(edep: 1.51542e-07)
 [INFO] ============================================================================
 [INFO] DataStore collections in event 9
 [INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 35
+[INFO] PXDTrueHit[]         PXDTrueHits                2
 [INFO] 
-[INFO] (Type)    Name                             Number of entries         <Event>
 [INFO] ----------------------------------------------------------------------------
-[INFO] (Object)  EventMetaData
-[INFO] (Object)  PXDTrueHitsToPXDSimHits
-[INFO] (Array)   PXDSimHits                       35
-[INFO] (Array)   PXDTrueHits                      2
-[INFO] 
-[INFO] (Type)    Name                             Number of entries    <Persistent>
-[INFO] ----------------------------------------------------------------------------
-[INFO] (Object)  FileMetaData
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] FileMetaData         FileMetaData
 [INFO] 
 [INFO] ============================================================================
 truehit (edep: 2.17939e-05) => hit(edep: 1.19446e-06)
@@ -1151,17 +1117,15 @@ truehit (edep: 2.62731e-05) => hit(edep: 1.10342e-07)
 [INFO] ============================================================================
 [INFO] DataStore collections in event 12
 [INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 34
+[INFO] PXDTrueHit[]         PXDTrueHits                2
 [INFO] 
-[INFO] (Type)    Name                             Number of entries         <Event>
 [INFO] ----------------------------------------------------------------------------
-[INFO] (Object)  EventMetaData
-[INFO] (Object)  PXDTrueHitsToPXDSimHits
-[INFO] (Array)   PXDSimHits                       34
-[INFO] (Array)   PXDTrueHits                      2
-[INFO] 
-[INFO] (Type)    Name                             Number of entries    <Persistent>
-[INFO] ----------------------------------------------------------------------------
-[INFO] (Object)  FileMetaData
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] FileMetaData         FileMetaData
 [INFO] 
 [INFO] ============================================================================
 truehit (edep: 1.77814e-05) => hit(edep: 1.93269e-06)
@@ -1202,17 +1166,15 @@ truehit (edep: 2.33829e-05) => hit(edep: 1.37566e-07)
 [INFO] ============================================================================
 [INFO] DataStore collections in event 4
 [INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 32
+[INFO] PXDTrueHit[]         PXDTrueHits                2
 [INFO] 
-[INFO] (Type)    Name                             Number of entries         <Event>
 [INFO] ----------------------------------------------------------------------------
-[INFO] (Object)  EventMetaData
-[INFO] (Object)  PXDTrueHitsToPXDSimHits
-[INFO] (Array)   PXDSimHits                       32
-[INFO] (Array)   PXDTrueHits                      2
-[INFO] 
-[INFO] (Type)    Name                             Number of entries    <Persistent>
-[INFO] ----------------------------------------------------------------------------
-[INFO] (Object)  FileMetaData
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] FileMetaData         FileMetaData
 [INFO] 
 [INFO] ============================================================================
 truehit (edep: 2.5142e-05) => hit(edep: 1.08842e-06)
@@ -1251,17 +1213,15 @@ truehit (edep: 2.42652e-05) => hit(edep: 2.13189e-08)
 [INFO] ============================================================================
 [INFO] DataStore collections in event 11
 [INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 32
+[INFO] PXDTrueHit[]         PXDTrueHits                2
 [INFO] 
-[INFO] (Type)    Name                             Number of entries         <Event>
 [INFO] ----------------------------------------------------------------------------
-[INFO] (Object)  EventMetaData
-[INFO] (Object)  PXDTrueHitsToPXDSimHits
-[INFO] (Array)   PXDSimHits                       32
-[INFO] (Array)   PXDTrueHits                      2
-[INFO] 
-[INFO] (Type)    Name                             Number of entries    <Persistent>
-[INFO] ----------------------------------------------------------------------------
-[INFO] (Object)  FileMetaData
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] FileMetaData         FileMetaData
 [INFO] 
 [INFO] ============================================================================
 truehit (edep: 2.19325e-05) => hit(edep: 3.21812e-06)
@@ -1300,17 +1260,15 @@ truehit (edep: 2.67301e-05) => hit(edep: 9.73583e-07)
 [INFO] ============================================================================
 [INFO] DataStore collections in event 10
 [INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 39
+[INFO] PXDTrueHit[]         PXDTrueHits                2
 [INFO] 
-[INFO] (Type)    Name                             Number of entries         <Event>
 [INFO] ----------------------------------------------------------------------------
-[INFO] (Object)  EventMetaData
-[INFO] (Object)  PXDTrueHitsToPXDSimHits
-[INFO] (Array)   PXDSimHits                       39
-[INFO] (Array)   PXDTrueHits                      2
-[INFO] 
-[INFO] (Type)    Name                             Number of entries    <Persistent>
-[INFO] ----------------------------------------------------------------------------
-[INFO] (Object)  FileMetaData
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] FileMetaData         FileMetaData
 [INFO] 
 [INFO] ============================================================================
 truehit (edep: 3.43838e-05) => hit(edep: 1.61118e-06)
@@ -1356,17 +1314,15 @@ truehit (edep: 2.50433e-05) => hit(edep: 1.06874e-06)
 [INFO] ============================================================================
 [INFO] DataStore collections in event 16
 [INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 68
+[INFO] PXDTrueHit[]         PXDTrueHits                2
 [INFO] 
-[INFO] (Type)    Name                             Number of entries         <Event>
 [INFO] ----------------------------------------------------------------------------
-[INFO] (Object)  EventMetaData
-[INFO] (Object)  PXDTrueHitsToPXDSimHits
-[INFO] (Array)   PXDSimHits                       68
-[INFO] (Array)   PXDTrueHits                      2
-[INFO] 
-[INFO] (Type)    Name                             Number of entries    <Persistent>
-[INFO] ----------------------------------------------------------------------------
-[INFO] (Object)  FileMetaData
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] FileMetaData         FileMetaData
 [INFO] 
 [INFO] ============================================================================
 truehit (edep: 5.64053e-05) => hit(edep: 4.72084e-06)
@@ -1441,17 +1397,15 @@ truehit (edep: 5.12191e-05) => hit(edep: 5.39998e-07)
 [INFO] ============================================================================
 [INFO] DataStore collections in event 13
 [INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 64
+[INFO] PXDTrueHit[]         PXDTrueHits                3
 [INFO] 
-[INFO] (Type)    Name                             Number of entries         <Event>
 [INFO] ----------------------------------------------------------------------------
-[INFO] (Object)  EventMetaData
-[INFO] (Object)  PXDTrueHitsToPXDSimHits
-[INFO] (Array)   PXDSimHits                       64
-[INFO] (Array)   PXDTrueHits                      3
-[INFO] 
-[INFO] (Type)    Name                             Number of entries    <Persistent>
-[INFO] ----------------------------------------------------------------------------
-[INFO] (Object)  FileMetaData
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] FileMetaData         FileMetaData
 [INFO] 
 [INFO] ============================================================================
 truehit (edep: 2.47019e-05) => hit(edep: 1.09541e-06)
@@ -1522,17 +1476,15 @@ truehit (edep: 3.08008e-05) => hit(edep: 3.63986e-07)
 [INFO] ============================================================================
 [INFO] DataStore collections in event 17
 [INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 34
+[INFO] PXDTrueHit[]         PXDTrueHits                2
 [INFO] 
-[INFO] (Type)    Name                             Number of entries         <Event>
 [INFO] ----------------------------------------------------------------------------
-[INFO] (Object)  EventMetaData
-[INFO] (Object)  PXDTrueHitsToPXDSimHits
-[INFO] (Array)   PXDSimHits                       34
-[INFO] (Array)   PXDTrueHits                      2
-[INFO] 
-[INFO] (Type)    Name                             Number of entries    <Persistent>
-[INFO] ----------------------------------------------------------------------------
-[INFO] (Object)  FileMetaData
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] FileMetaData         FileMetaData
 [INFO] 
 [INFO] ============================================================================
 truehit (edep: 1.90953e-05) => hit(edep: 6.24901e-07)
@@ -1573,17 +1525,15 @@ truehit (edep: 1.65925e-05) => hit(edep: 1.10639e-06)
 [INFO] ============================================================================
 [INFO] DataStore collections in event 18
 [INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 33
+[INFO] PXDTrueHit[]         PXDTrueHits                2
 [INFO] 
-[INFO] (Type)    Name                             Number of entries         <Event>
 [INFO] ----------------------------------------------------------------------------
-[INFO] (Object)  EventMetaData
-[INFO] (Object)  PXDTrueHitsToPXDSimHits
-[INFO] (Array)   PXDSimHits                       33
-[INFO] (Array)   PXDTrueHits                      2
-[INFO] 
-[INFO] (Type)    Name                             Number of entries    <Persistent>
-[INFO] ----------------------------------------------------------------------------
-[INFO] (Object)  FileMetaData
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] FileMetaData         FileMetaData
 [INFO] 
 [INFO] ============================================================================
 truehit (edep: 1.90527e-05) => hit(edep: 1.89574e-06)
@@ -1623,17 +1573,15 @@ truehit (edep: 2.00138e-05) => hit(edep: 4.01977e-08)
 [INFO] ============================================================================
 [INFO] DataStore collections in event 14
 [INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 40
+[INFO] PXDTrueHit[]         PXDTrueHits                2
 [INFO] 
-[INFO] (Type)    Name                             Number of entries         <Event>
 [INFO] ----------------------------------------------------------------------------
-[INFO] (Object)  EventMetaData
-[INFO] (Object)  PXDTrueHitsToPXDSimHits
-[INFO] (Array)   PXDSimHits                       40
-[INFO] (Array)   PXDTrueHits                      2
-[INFO] 
-[INFO] (Type)    Name                             Number of entries    <Persistent>
-[INFO] ----------------------------------------------------------------------------
-[INFO] (Object)  FileMetaData
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] FileMetaData         FileMetaData
 [INFO] 
 [INFO] ============================================================================
 truehit (edep: 2.50621e-05) => hit(edep: 1.14317e-06)
@@ -1680,17 +1628,15 @@ truehit (edep: 3.22857e-05) => hit(edep: 1.89317e-07)
 [INFO] ============================================================================
 [INFO] DataStore collections in event 15
 [INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 40
+[INFO] PXDTrueHit[]         PXDTrueHits                2
 [INFO] 
-[INFO] (Type)    Name                             Number of entries         <Event>
 [INFO] ----------------------------------------------------------------------------
-[INFO] (Object)  EventMetaData
-[INFO] (Object)  PXDTrueHitsToPXDSimHits
-[INFO] (Array)   PXDSimHits                       40
-[INFO] (Array)   PXDTrueHits                      2
-[INFO] 
-[INFO] (Type)    Name                             Number of entries    <Persistent>
-[INFO] ----------------------------------------------------------------------------
-[INFO] (Object)  FileMetaData
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] FileMetaData         FileMetaData
 [INFO] 
 [INFO] ============================================================================
 truehit (edep: 3.79215e-05) => hit(edep: 3.80378e-06)

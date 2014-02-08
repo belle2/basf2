@@ -13,6 +13,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 
+#include <TClass.h>
 #include <TClonesArray.h>
 
 #include <boost/format.hpp>
@@ -31,10 +32,7 @@ REG_MODULE(PrintCollections)
 
 PrintCollectionsModule::PrintCollectionsModule()
 {
-  //Set module properties
-  setDescription("Prints the current data store collections.");
-
-  //Parameter definition
+  setDescription("Prints the contents of DataStore in each event, listing all objects and arrays (including size).");
 }
 
 
@@ -53,26 +51,32 @@ void PrintCollectionsModule::event()
   B2INFO("============================================================================");
   B2INFO("DataStore collections in event " << eventMetaDataPtr->getEvent());
   B2INFO("============================================================================");
-  B2INFO("")
-  B2INFO("(Type)    Name                             Number of entries         <Event>");
+  B2INFO(boost::format("Type %|20t| Name %|47t| #Entries           <Event>"));
   printCollections(DataStore::c_Event);
-  B2INFO("")
-  B2INFO("(Type)    Name                             Number of entries    <Persistent>");
+  B2INFO("----------------------------------------------------------------------------");
+  B2INFO(boost::format("Type %|20t| Name %|47t| #Entries      <Persistent>"));
   printCollections(DataStore::c_Persistent);
-  B2INFO("")
   B2INFO("============================================================================");
 }
 
 
+/** remove Belle2 namespace prefix from className, if present. */
+std::string shorten(std::string className)
+{
+  if (className.find("Belle2::") == 0) {
+    //we know the experiment name, thanks
+    return className.substr(8);
+  }
+  return className;
+}
 
 //===============================================================
 //                    Protected methods
 //===============================================================
 
+
 void PrintCollectionsModule::printCollections(DataStore::EDurability durability)
 {
-  B2INFO("----------------------------------------------------------------------------");
-
   //-----------------------------
   //Print the object information
   //-----------------------------
@@ -83,7 +87,7 @@ void PrintCollectionsModule::printCollections(DataStore::EDurability durability)
     const TObject* currCol = iter->second->ptr;
 
     if (currCol != NULL) {
-      B2INFO(boost::format("(Object)  %1%") % iter->first);
+      B2INFO(boost::format("%1% %|20t| %2%") % shorten(currCol->ClassName()) % iter->first);
     }
   }
 
@@ -100,6 +104,12 @@ void PrintCollectionsModule::printCollections(DataStore::EDurability durability)
     if (currCol != NULL)
       entries = currCol->GetEntriesFast();
 
-    B2INFO(boost::format("(Array)   %1% %|42t| %2%") % iter->first % entries);
+    const TClonesArray* obj = dynamic_cast<TClonesArray*>(iter->second->object);
+    std::string type;
+    if (obj)
+      type = shorten(obj->GetClass()->GetName());
+
+    B2INFO(boost::format("%1%[] %|20t| %2% %|47t| %3%") % type % iter->first % entries);
   }
+  B2INFO("");
 }

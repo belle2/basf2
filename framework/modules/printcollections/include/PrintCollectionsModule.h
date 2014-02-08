@@ -15,9 +15,7 @@
 #include <framework/datastore/DataStore.h>
 
 namespace Belle2 {
-  /** The module prints the collections of the DataStore to the log system.
-   *
-   */
+  /** Prints the contents of DataStore in each event, listing all objects and arrays (including size). */
   class PrintCollectionsModule : public Module {
 
   public:

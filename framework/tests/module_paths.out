@@ -12,13 +12,11 @@
 [INFO] ============================================================================
 [INFO] DataStore collections in event 0
 [INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
 [INFO] 
-[INFO] (Type)    Name                             Number of entries         <Event>
 [INFO] ----------------------------------------------------------------------------
-[INFO] (Object)  EventMetaData
-[INFO] 
-[INFO] (Type)    Name                             Number of entries    <Persistent>
-[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
 [INFO] 
 [INFO] ============================================================================
 [INFO] In module ReturnFalse1Condition
@@ -38,13 +36,11 @@
 [INFO] ============================================================================
 [INFO] DataStore collections in event 0
 [INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
 [INFO] 
-[INFO] (Type)    Name                             Number of entries         <Event>
 [INFO] ----------------------------------------------------------------------------
-[INFO] (Object)  EventMetaData
-[INFO] 
-[INFO] (Type)    Name                             Number of entries    <Persistent>
-[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
 [INFO] 
 [INFO] ============================================================================
 [INFO] In module ReturnFalse1Condition

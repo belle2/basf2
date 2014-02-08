@@ -5,90 +5,80 @@
 [INFO] ============================================================================
 [INFO] DataStore collections in event 0
 [INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    MCParticlesToARICHAeroHits
+[INFO] RelationContainer    MCParticlesToARICHSimHits
+[INFO] ARICHAeroHit[]       ARICHAeroHits              1
+[INFO] ARICHSimHit[]        ARICHSimHits               72
+[INFO] MCParticle[]         MCParticles                1
 [INFO] 
-[INFO] (Type)    Name                             Number of entries         <Event>
 [INFO] ----------------------------------------------------------------------------
-[INFO] (Object)  EventMetaData
-[INFO] (Object)  MCParticlesToARICHAeroHits
-[INFO] (Object)  MCParticlesToARICHSimHits
-[INFO] (Array)   ARICHAeroHits                    1
-[INFO] (Array)   ARICHSimHits                     72
-[INFO] (Array)   MCParticles                      1
-[INFO] 
-[INFO] (Type)    Name                             Number of entries    <Persistent>
-[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
 [INFO] 
 [INFO] ============================================================================
 [INFO] Processed:   1 runs,      1 events
 [INFO] ============================================================================
 [INFO] DataStore collections in event 1
 [INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    MCParticlesToARICHAeroHits
+[INFO] RelationContainer    MCParticlesToARICHSimHits
+[INFO] ARICHAeroHit[]       ARICHAeroHits              1
+[INFO] ARICHSimHit[]        ARICHSimHits               78
+[INFO] MCParticle[]         MCParticles                1
 [INFO] 
-[INFO] (Type)    Name                             Number of entries         <Event>
 [INFO] ----------------------------------------------------------------------------
-[INFO] (Object)  EventMetaData
-[INFO] (Object)  MCParticlesToARICHAeroHits
-[INFO] (Object)  MCParticlesToARICHSimHits
-[INFO] (Array)   ARICHAeroHits                    1
-[INFO] (Array)   ARICHSimHits                     78
-[INFO] (Array)   MCParticles                      1
-[INFO] 
-[INFO] (Type)    Name                             Number of entries    <Persistent>
-[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
 [INFO] 
 [INFO] ============================================================================
 [INFO] Processed:   1 runs,      2 events
 [INFO] ============================================================================
 [INFO] DataStore collections in event 2
 [INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    MCParticlesToARICHAeroHits
+[INFO] RelationContainer    MCParticlesToARICHSimHits
+[INFO] ARICHAeroHit[]       ARICHAeroHits              1
+[INFO] ARICHSimHit[]        ARICHSimHits               109
+[INFO] MCParticle[]         MCParticles                1
 [INFO] 
-[INFO] (Type)    Name                             Number of entries         <Event>
 [INFO] ----------------------------------------------------------------------------
-[INFO] (Object)  EventMetaData
-[INFO] (Object)  MCParticlesToARICHAeroHits
-[INFO] (Object)  MCParticlesToARICHSimHits
-[INFO] (Array)   ARICHAeroHits                    1
-[INFO] (Array)   ARICHSimHits                     109
-[INFO] (Array)   MCParticles                      1
-[INFO] 
-[INFO] (Type)    Name                             Number of entries    <Persistent>
-[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
 [INFO] 
 [INFO] ============================================================================
 [INFO] Processed:   1 runs,      3 events
 [INFO] ============================================================================
 [INFO] DataStore collections in event 3
 [INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    MCParticlesToARICHAeroHits
+[INFO] RelationContainer    MCParticlesToARICHSimHits
+[INFO] ARICHAeroHit[]       ARICHAeroHits              1
+[INFO] ARICHSimHit[]        ARICHSimHits               56
+[INFO] MCParticle[]         MCParticles                2
 [INFO] 
-[INFO] (Type)    Name                             Number of entries         <Event>
 [INFO] ----------------------------------------------------------------------------
-[INFO] (Object)  EventMetaData
-[INFO] (Object)  MCParticlesToARICHAeroHits
-[INFO] (Object)  MCParticlesToARICHSimHits
-[INFO] (Array)   ARICHAeroHits                    1
-[INFO] (Array)   ARICHSimHits                     56
-[INFO] (Array)   MCParticles                      2
-[INFO] 
-[INFO] (Type)    Name                             Number of entries    <Persistent>
-[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
 [INFO] 
 [INFO] ============================================================================
 [INFO] Processed:   1 runs,      4 events
 [INFO] ============================================================================
 [INFO] DataStore collections in event 4
 [INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    MCParticlesToARICHAeroHits
+[INFO] RelationContainer    MCParticlesToARICHSimHits
+[INFO] ARICHAeroHit[]       ARICHAeroHits              1
+[INFO] ARICHSimHit[]        ARICHSimHits               9
+[INFO] MCParticle[]         MCParticles                9
 [INFO] 
-[INFO] (Type)    Name                             Number of entries         <Event>
 [INFO] ----------------------------------------------------------------------------
-[INFO] (Object)  EventMetaData
-[INFO] (Object)  MCParticlesToARICHAeroHits
-[INFO] (Object)  MCParticlesToARICHSimHits
-[INFO] (Array)   ARICHAeroHits                    1
-[INFO] (Array)   ARICHSimHits                     9
-[INFO] (Array)   MCParticles                      9
-[INFO] 
-[INFO] (Type)    Name                             Number of entries    <Persistent>
-[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
 [INFO] 
 [INFO] ============================================================================
 [INFO] Processed:   1 runs,      5 events

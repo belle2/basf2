@@ -248,8 +248,8 @@ void SVDDQMModule::defineHisto()
         string name = str(format("h2VXDHitmapUV%1%") % iPlane2);
         string title = str(format("Hitmap VXD in U x V, plane %1%") % iPlane2);
         m_correlationsHitMaps[c_nVXDPlanes * j + i] = new TH2F(name.c_str(), title.c_str(), nStripsU2, 0, nStripsU2, nStripsV2, 0, nStripsV2);
-        m_correlationsHitMaps[c_nVXDPlanes * j + i]->GetXaxis()->SetTitle("u position [cm]");
-        m_correlationsHitMaps[c_nVXDPlanes * j + i]->GetYaxis()->SetTitle("v position [cm]");
+        m_correlationsHitMaps[c_nVXDPlanes * j + i]->GetXaxis()->SetTitle("u position [pitch units]");
+        m_correlationsHitMaps[c_nVXDPlanes * j + i]->GetYaxis()->SetTitle("v position [pitch units]");
         m_correlationsHitMaps[c_nVXDPlanes * j + i]->GetZaxis()->SetTitle("hits");
         string nameSP = str(format("h2VXDHitmapSP%1%") % iPlane2);
         string titleSP = str(format("Hitmap VXD in space points, plane %1%") % iPlane2);
@@ -261,8 +261,8 @@ void SVDDQMModule::defineHisto()
         string name = str(format("h2VXDCorrelationmapU%1%%2%") % iPlane1 % iPlane2);
         string title = str(format("Correlation map VXD in U, plane %1%, plane %2%") % iPlane1 % iPlane2);
         m_correlationsHitMaps[c_nVXDPlanes * j + i] = new TH2F(name.c_str(), title.c_str(), nStripsU1, 0, nStripsU1, nStripsU2, 0, nStripsU2);
-        string axisxtitle = str(format("u position, plane %1% [cm]") % iPlane1);
-        string axisytitle = str(format("u position, plane %1% [cm]") % iPlane2);
+        string axisxtitle = str(format("u position, plane %1% [pitch units]") % iPlane1);
+        string axisytitle = str(format("u position, plane %1% [pitch units]") % iPlane2);
         m_correlationsHitMaps[c_nVXDPlanes * j + i]->GetXaxis()->SetTitle(axisxtitle.c_str());
         m_correlationsHitMaps[c_nVXDPlanes * j + i]->GetYaxis()->SetTitle(axisytitle.c_str());
         m_correlationsHitMaps[c_nVXDPlanes * j + i]->GetZaxis()->SetTitle("hits");
@@ -278,8 +278,8 @@ void SVDDQMModule::defineHisto()
         string name = str(format("h2VXDCorrelationmapV%1%%2%") % iPlane2 % iPlane1);
         string title = str(format("Correlation map VXD in V, plane %1%, plane %2%") % iPlane2 % iPlane1);
         m_correlationsHitMaps[c_nVXDPlanes * j + i] = new TH2F(name.c_str(), title.c_str(), nStripsV2, 0, nStripsV2, nStripsV1, 0, nStripsV1);
-        string axisxtitle = str(format("v position, plane %1% [cm]") % iPlane2);
-        string axisytitle = str(format("v position, plane %1% [cm]") % iPlane1);
+        string axisxtitle = str(format("v position, plane %1% [pitch units]") % iPlane2);
+        string axisytitle = str(format("v position, plane %1% [pitch units]") % iPlane1);
         m_correlationsHitMaps[c_nVXDPlanes * j + i]->GetXaxis()->SetTitle(axisxtitle.c_str());
         m_correlationsHitMaps[c_nVXDPlanes * j + i]->GetYaxis()->SetTitle(axisytitle.c_str());
         m_correlationsHitMaps[c_nVXDPlanes * j + i]->GetZaxis()->SetTitle("hits");

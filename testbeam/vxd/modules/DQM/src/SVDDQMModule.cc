@@ -247,7 +247,7 @@ void SVDDQMModule::defineHisto()
       if (i == j) {  // hit maps
         string name = str(format("h2VXDHitmapUV%1%") % iPlane2);
         string title = str(format("Hitmap VXD in U x V, plane %1%") % iPlane2);
-        m_correlationsHitMaps[c_nVXDPlanes * j + i] = new TH2F(name.c_str(), title.c_str(), nStripsU2, -0.5 * uSize2, 0.5 * uSize2, nStripsV2, -0.5 * vSize2, 0.5 * vSize2);
+        m_correlationsHitMaps[c_nVXDPlanes * j + i] = new TH2F(name.c_str(), title.c_str(), nStripsU2, 0, nStripsU2, nStripsV2, 0, nStripsV2);
         m_correlationsHitMaps[c_nVXDPlanes * j + i]->GetXaxis()->SetTitle("u position [cm]");
         m_correlationsHitMaps[c_nVXDPlanes * j + i]->GetYaxis()->SetTitle("v position [cm]");
         m_correlationsHitMaps[c_nVXDPlanes * j + i]->GetZaxis()->SetTitle("hits");
@@ -260,7 +260,7 @@ void SVDDQMModule::defineHisto()
       } else if (i < j) { // correlations for u
         string name = str(format("h2VXDCorrelationmapU%1%%2%") % iPlane1 % iPlane2);
         string title = str(format("Correlation map VXD in U, plane %1%, plane %2%") % iPlane1 % iPlane2);
-        m_correlationsHitMaps[c_nVXDPlanes * j + i] = new TH2F(name.c_str(), title.c_str(), nStripsU1, -0.5 * uSize1, 0.5 * uSize1, nStripsU2, -0.5 * uSize2, 0.5 * uSize2);
+        m_correlationsHitMaps[c_nVXDPlanes * j + i] = new TH2F(name.c_str(), title.c_str(), nStripsU1, 0, nStripsU1, nStripsU2, 0, nStripsU2);
         string axisxtitle = str(format("u position, plane %1% [cm]") % iPlane1);
         string axisytitle = str(format("u position, plane %1% [cm]") % iPlane2);
         m_correlationsHitMaps[c_nVXDPlanes * j + i]->GetXaxis()->SetTitle(axisxtitle.c_str());
@@ -277,7 +277,7 @@ void SVDDQMModule::defineHisto()
       } else {       // correlations for v
         string name = str(format("h2VXDCorrelationmapV%1%%2%") % iPlane2 % iPlane1);
         string title = str(format("Correlation map VXD in V, plane %1%, plane %2%") % iPlane2 % iPlane1);
-        m_correlationsHitMaps[c_nVXDPlanes * j + i] = new TH2F(name.c_str(), title.c_str(), nStripsV2, -0.5 * vSize2, 0.5 * vSize2, nStripsV1, -0.5 * vSize1, 0.5 * vSize1);
+        m_correlationsHitMaps[c_nVXDPlanes * j + i] = new TH2F(name.c_str(), title.c_str(), nStripsV2, 0, nStripsV2, nStripsV1, 0, nStripsV1);
         string axisxtitle = str(format("v position, plane %1% [cm]") % iPlane2);
         string axisytitle = str(format("v position, plane %1% [cm]") % iPlane1);
         m_correlationsHitMaps[c_nVXDPlanes * j + i]->GetXaxis()->SetTitle(axisxtitle.c_str());
@@ -454,8 +454,8 @@ void SVDDQMModule::event()
       iIsPXD1 = 1;
       iIsU1 = 1;
       iIsV1 = 1;
-      fPosU1 = clusterPXD1.getU();
-      fPosV1 = clusterPXD1.getV();
+      fPosU1 = getInfoPXD(index1).getUCellID(clusterPXD1.getU());
+      fPosV1 = getInfoPXD(index1).getVCellID(clusterPXD1.getV());
     } else {                                  // SVD clusters:
       const SVDCluster& cluster1 = *storeClusters[i1 - storePXDClusters.getEntries()];
       iPlane1 = cluster1.getSensorID().getLayerNumber();
@@ -466,11 +466,11 @@ void SVDDQMModule::event()
       if (cluster1.isUCluster()) {
         if (fCharge1 < CutDQMCorrelSigU[index1]) continue;
         iIsU1 = 1;
-        fPosU1 = cluster1.getPosition();
+        fPosU1 = getInfo(index1 - c_nPXDPlanes).getUCellID(cluster1.getPosition());
       } else {
         if (fCharge1 < CutDQMCorrelSigV[index1]) continue;
         iIsV1 = 1;
-        fPosV1 = cluster1.getPosition();
+        fPosV1 = getInfo(index1 - c_nPXDPlanes).getVCellID(cluster1.getPosition());
       }
     }
     for (int i2 = 0; i2 < storeClusters.getEntries() + storePXDClusters.getEntries(); i2++) {
@@ -483,7 +483,7 @@ void SVDDQMModule::event()
       int iIsU2 = 0;
       int iIsV2 = 0;
       int iPlane2 = 0;
-      if (i2 < storePXDClusters.getEntries()) {  // PCD clusters:
+      if (i2 < storePXDClusters.getEntries()) {  // PXD clusters:
         const PXDCluster& clusterPXD2 = *storePXDClusters[i2];
         iPlane2 = clusterPXD2.getSensorID().getLayerNumber();
         if ((iPlane2 < c_firstPXDPlane) || (iPlane2 > c_lastPXDPlane)) continue;
@@ -493,8 +493,8 @@ void SVDDQMModule::event()
         iIsPXD2 = 1;
         iIsU2 = 1;
         iIsV2 = 1;
-        fPosU2 = clusterPXD2.getU();
-        fPosV2 = clusterPXD2.getV();
+        fPosU2 = getInfoPXD(index2).getUCellID(clusterPXD2.getU());
+        fPosV2 = getInfoPXD(index2).getVCellID(clusterPXD2.getV());
       } else {                                  // SVD clusters:
         const SVDCluster& cluster2 = *storeClusters[i2 - storePXDClusters.getEntries()];
         iPlane2 = cluster2.getSensorID().getLayerNumber();
@@ -505,11 +505,11 @@ void SVDDQMModule::event()
         if (cluster2.isUCluster()) {
           if (fCharge2 < CutDQMCorrelSigU[index2]) continue;
           iIsU2 = 1;
-          fPosU2 = cluster2.getPosition();
+          fPosU2 = getInfo(index2 - c_nPXDPlanes).getUCellID(cluster2.getPosition());
         } else {
           if (fCharge2 < CutDQMCorrelSigV[index2]) continue;
           iIsV2 = 1;
-          fPosV2 = cluster2.getPosition();
+          fPosV2 = getInfo(index2 - c_nPXDPlanes).getVCellID(cluster2.getPosition());
         }
       }
       if ((iIsPXD1 == 0) && (iIsPXD2 == 0))

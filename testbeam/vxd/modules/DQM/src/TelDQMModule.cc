@@ -140,38 +140,34 @@ void TelDQMModule::defineHisto()
   // Correlations in U + V, 2D Hitmaps
   for (int i = 0; i < c_nTELPlanes; i++) {
     int iPlane1 = indexToPlane(i);
-    float vSize1 = getInfo(i).getVSize();
     int nStripsU1 = getInfo(i).getUCells();
-    float uSize1 = getInfo(i).getUSize();
     int nStripsV1 = getInfo(i).getVCells();
     for (int j = 0; j < c_nTELPlanes; j++) {
       int iPlane2 = indexToPlane(j);
-      float vSize2 = getInfo(j).getVSize();
       int nStripsU2 = getInfo(j).getUCells();
-      float uSize2 = getInfo(j).getUSize();
       int nStripsV2 = getInfo(j).getVCells();
       if (i == j) {  // hit maps
         string name = str(format("h2TELHitmapUV%1%") % iPlane2);
         string title = str(format("Hitmap TEL in U x V, plane %1%") % iPlane2);
-        m_correlationsHitMaps[c_nTELPlanes * j + i] = new TH2F(name.c_str(), title.c_str(), nStripsU2, -0.5 * uSize2, 0.5 * uSize2, nStripsV2, -0.5 * vSize2, 0.5 * vSize2);
-        m_correlationsHitMaps[c_nTELPlanes * j + i]->GetXaxis()->SetTitle("u position [cm]");
-        m_correlationsHitMaps[c_nTELPlanes * j + i]->GetYaxis()->SetTitle("v position [cm]");
+        m_correlationsHitMaps[c_nTELPlanes * j + i] = new TH2F(name.c_str(), title.c_str(), nStripsU2, 0, nStripsU2, nStripsV2, 0, nStripsV2);
+        m_correlationsHitMaps[c_nTELPlanes * j + i]->GetXaxis()->SetTitle("u position [pitch units]");
+        m_correlationsHitMaps[c_nTELPlanes * j + i]->GetYaxis()->SetTitle("v position [pitch units]");
         m_correlationsHitMaps[c_nTELPlanes * j + i]->GetZaxis()->SetTitle("hits");
       } else if (i < j) { // correlations for u
         string name = str(format("h2TELCorrelationmapU%1%%2%") % iPlane1 % iPlane2);
         string title = str(format("Correlationmap TEL in U, plane %1%, plane %2%") % iPlane1 % iPlane2);
-        m_correlationsHitMaps[c_nTELPlanes * j + i] = new TH2F(name.c_str(), title.c_str(), nStripsU1, -0.5 * uSize1, 0.5 * uSize1, nStripsU2, -0.5 * uSize2, 0.5 * uSize2);
-        string axisxtitle = str(format("u position, plane %1% [cm]") % iPlane1);
-        string axisytitle = str(format("u position, plane %1% [cm]") % iPlane2);
+        m_correlationsHitMaps[c_nTELPlanes * j + i] = new TH2F(name.c_str(), title.c_str(), nStripsU1, 0, nStripsU1, nStripsU2, 0, nStripsU2);
+        string axisxtitle = str(format("u position, plane %1% [pitch units]") % iPlane1);
+        string axisytitle = str(format("u position, plane %1% [pitch units]") % iPlane2);
         m_correlationsHitMaps[c_nTELPlanes * j + i]->GetXaxis()->SetTitle(axisxtitle.c_str());
         m_correlationsHitMaps[c_nTELPlanes * j + i]->GetYaxis()->SetTitle(axisytitle.c_str());
         m_correlationsHitMaps[c_nTELPlanes * j + i]->GetZaxis()->SetTitle("hits");
       } else {            // correlations for v
         string name = str(format("h2TELCorrelationmapV%1%%2%") % iPlane2 % iPlane1);
         string title = str(format("Correlationmap TEL in V, plane %1%, plane %2%") % iPlane2 % iPlane1);
-        m_correlationsHitMaps[c_nTELPlanes * j + i] = new TH2F(name.c_str(), title.c_str(), nStripsV2, -0.5 * vSize2, 0.5 * vSize2, nStripsV1, -0.5 * vSize1, 0.5 * vSize1);
-        string axisxtitle = str(format("v position, plane %1% [cm]") % iPlane2);
-        string axisytitle = str(format("v position, plane %1% [cm]") % iPlane1);
+        m_correlationsHitMaps[c_nTELPlanes * j + i] = new TH2F(name.c_str(), title.c_str(), nStripsV2, 0, nStripsV2, nStripsV1, 0, nStripsV1);
+        string axisxtitle = str(format("v position, plane %1% [pitch units]") % iPlane2);
+        string axisytitle = str(format("v position, plane %1% [pitch units]") % iPlane1);
         m_correlationsHitMaps[c_nTELPlanes * j + i]->GetXaxis()->SetTitle(axisxtitle.c_str());
         m_correlationsHitMaps[c_nTELPlanes * j + i]->GetYaxis()->SetTitle(axisytitle.c_str());
         m_correlationsHitMaps[c_nTELPlanes * j + i]->GetZaxis()->SetTitle("hits");
@@ -280,13 +276,13 @@ void TelDQMModule::event()
       // ready to fill correlation histograms and hit maps:
       if (index1 == index2) {
         // hit maps:
-        m_correlationsHitMaps[c_nTELPlanes * index2 + index1]->Fill(cluster1.getU(), cluster2.getV());
+        m_correlationsHitMaps[c_nTELPlanes * index2 + index1]->Fill(getInfo(index1).getUCellID(cluster1.getU()), getInfo(index2).getVCellID(cluster2.getV()));
       } else if (index1 < index2) {
         // correlations for u
-        m_correlationsHitMaps[c_nTELPlanes * index2 + index1]->Fill(cluster1.getU(), cluster2.getU());
+        m_correlationsHitMaps[c_nTELPlanes * index2 + index1]->Fill(getInfo(index1).getUCellID(cluster1.getU()), getInfo(index2).getUCellID(cluster2.getU()));
       } else if (index1 > index2) {
         // correlations for v
-        m_correlationsHitMaps[c_nTELPlanes * index2 + index1]->Fill(cluster2.getV(), cluster1.getV());
+        m_correlationsHitMaps[c_nTELPlanes * index2 + index1]->Fill(getInfo(index2).getVCellID(cluster2.getV()), getInfo(index1).getVCellID(cluster1.getV()));
       }
     }
   }

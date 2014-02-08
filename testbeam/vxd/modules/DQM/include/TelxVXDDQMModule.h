@@ -100,6 +100,13 @@ namespace Belle2 {
     std::string m_relTelClusterDigitName; /**< TelClustersToTelDigits RelationArray name */
     std::string m_histogramDirectoryName; /**< Name of the ROOT file directory for these histograms */
 
+    int m_SwapAxis;     /**< 0: u<->u, 1: u<->v correlations */
+    int m_DUTPXD;       /**< PXD for correlations: 3,4 */
+    int m_DUTSVDFwd;    /**< forward SVD for correlations: 5..8 */
+    int m_DUTSVDBwd;    /**< backward SVD for correlations: 5..8 */
+    int m_DUTTelFwd;    /**< forward telescope for correlations: 0..2 */
+    int m_DUTTelBwd;    /**< backward telescope for correlations: 9..11 */
+
     // +1 in dimensions to protect against noisy VXDID values.
     TH1F* m_chargePXD2;                 /**< charge by plane */
     TH1F* m_chargeUSVD1;                /**< u charge by plane */

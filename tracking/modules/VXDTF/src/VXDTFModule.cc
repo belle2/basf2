@@ -975,7 +975,7 @@ void VXDTFModule::the_real_event()
 
   StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
 
-  m_eventCounter = eventMetaDataPtr->getEvent();
+  m_eventCounter++;
   thisInfoPackage.evtNumber = m_eventCounter;
   B2DEBUG(3, "################## entering vxd CA track finder - event " << m_eventCounter << " ######################");
   /** cleaning will be done at the end of the event **/
@@ -1966,7 +1966,7 @@ void VXDTFModule::endRun()
     B2DEBUG(1, "manually calculated mean: " << meanTimeConsumption / numLoggedEvents << ", and median: " << m_TESTERlogEvents.at(median).totalTime.count() << " of time consumption per event");
   }
 
-  B2INFO(" VXDTF - endRun: within " << m_eventCounter + 1 << " events, there were a total number of " << m_TESTERcountTotalTCsFinal << " TCs and " << float(m_TESTERcountTotalTCsFinal) / (float(m_eventCounter + 1)) << " TCs per event(" << m_PARAMkillEventForHighOccupancyThreshold << " events killed for high occupancy). Mean track length: " << float(m_TESTERcountTotalUsedIndicesFinal) / float(m_TESTERcountTotalTCsFinal))
+  B2INFO(" VXDTF - endRun: within " << m_eventCounter + 1 << " events, there were a total number of " << m_TESTERcountTotalTCsFinal << " TCs and " << float(m_TESTERcountTotalTCsFinal) / (float(m_eventCounter + 1)) << " TCs per event(" << m_TESTERbrokenEventsCtr << " events killed for high occupancy). Mean track length: " << float(m_TESTERcountTotalUsedIndicesFinal) / float(m_TESTERcountTotalTCsFinal))
 
   B2DEBUG(1, " ############### " << m_PARAMnameOfInstance << " endRun - end ############### ")
 }
@@ -3795,9 +3795,11 @@ void VXDTFModule::calcQIbyKalman(TCsOfEvent& tcVector, StoreArray<PXDCluster>& p
       } else if (tfHit->getDetectorType() == Const::SVD) {
 //         TVector3 pos = *(tfHit->getHitCoordinates()); // jan192014, old way, global coordinates
 //         SVDRecoHit2D* newRecoHit = new SVDRecoHit2D(tfHit->getVxdID(), pos[0], pos[1]);
-        SVDRecoHit2D* newRecoHit = new SVDRecoHit2D(tfHit->getVxdID(),
-                                                    tfHit->getClusterInfoU()->getSVDCluster()->getPosition(),
-                                                    tfHit->getClusterInfoV()->getSVDCluster()->getPosition()); /// WARNING test jan192014: local instead of global coordinates
+        //   SVDRecoHit2D* newRecoHit = new SVDRecoHit2D(tfHit->getVxdID(),
+        //                                              tfHit->getClusterInfoU()->getSVDCluster()->getPosition(),
+        //                                              tfHit->getClusterInfoV()->getSVDCluster()->getPosition()); /// WARNING test jan192014: local instead of global coordinates
+        SVDRecoHit2D* newRecoHit = new SVDRecoHit2D(*tfHit->getClusterInfoU()->getSVDCluster(),
+                                                    *tfHit->getClusterInfoV()->getSVDCluster()); /// WARNING test feb072014: direct references to clusters
         track.insertMeasurement(newRecoHit);
       } else {
         B2ERROR("VXDTFModule::calcQIbyKalman: event " << m_eventCounter << " a hit has unknown detector type ( " << tfHit->getDetectorType() << ") discarding hit")

@@ -20,31 +20,36 @@
 
 void NtupleRecoStatsTool::setupTree()
 {
+  m_iShowers = -1;
   m_iPhotons = -1;
   m_iPi0s = -1;
   m_iTracks = -1;
   m_iMCParticles = -1;
   m_iParticles = -1;
-  m_tree->Branch("nECLGammas",  &m_iPhotons,    "nECLGammas/I");
-  m_tree->Branch("nECLPi0s",  &m_iPi0s,     "nECLPi0s/I");
-  m_tree->Branch("nTracks" ,  &m_iTracks,     "nTracks/I");
-  m_tree->Branch("nMCParticles", &m_iMCParticles,    "nMCParticles/I");
-  m_tree->Branch("nParticles" , &m_iParticles,    "nParticles/I");
+  m_tree->Branch("nECLShowers",  &m_iShowers,     "nECLShowers/I");
+  m_tree->Branch("nECLGammas",   &m_iPhotons,     "nECLGammas/I");
+  m_tree->Branch("nECLPi0s",     &m_iPi0s,        "nECLPi0s/I");
+  m_tree->Branch("nTracks" ,     &m_iTracks,      "nTracks/I");
+  m_tree->Branch("nMCParticles", &m_iMCParticles, "nMCParticles/I");
+  m_tree->Branch("nParticles" ,  &m_iParticles,   "nParticles/I");
 
 }
 
 void NtupleRecoStatsTool::eval(const  Particle*)
 {
-  StoreArray<ECLGamma>    eclgammas("ECLGammas");
+  StoreArray<ECLShower>    eclshowers;
+  m_iShowers = (int) eclshowers.getEntries();
+
+  StoreArray<ECLGamma>    eclgammas;
   m_iPhotons = (int) eclgammas.getEntries();
 
   StoreArray<ECLPi0>   pi0s;
   m_iPi0s = (int) pi0s.getEntries();
 
-  StoreArray<Track>  tracks("Tracks");
+  StoreArray<Track>  tracks;
   m_iTracks = tracks.getEntries();
 
-  StoreArray<MCParticle> mcParticles("");
+  StoreArray<MCParticle> mcParticles;
   m_iMCParticles = (int) mcParticles.getEntries();
 
   StoreArray<Particle> particles;

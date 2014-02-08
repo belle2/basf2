@@ -23,6 +23,8 @@ namespace Belle2 {
   /** Tool for NtupleMaker to write out container summaries to flat ntuple. */
   class NtupleRecoStatsTool : public NtupleFlatTool {
   private:
+    /** N ECL showers */
+    int m_iShowers;
     /** N ECL gammas */
     int m_iPhotons;
     /** N ECL pi0s */

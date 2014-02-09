@@ -371,7 +371,7 @@ std::pair<int, int> ExportSectorMapModule::importXMLMap()
   newSecMap.setAdditionalInfo(m_PARAMadditionalInfo);
   string  tagName = "<" + chosenSetup + ">\n";
   string  endTagName = "\n</" + chosenSetup + ">\n";
-  file << tagName << Stream::escapeXML(Stream::serialize(&newSecMap)) << endTagName;
+  file << tagName << Stream::escapeXML(Stream::serializeXML(&newSecMap)) << endTagName;
 
   return (make_pair(countFriends, countFilters));
 }
@@ -484,7 +484,7 @@ std::pair<int, int> ExportSectorMapModule::importROOTMap()
     string  tagName = "<" + newMap.getMapName() + ">\n";
     string  endTagName = "\n</" + newMap.getMapName() + ">\n";
 
-    file << tagName << Stream::escapeXML(Stream::serialize(&newMap)) << endTagName;
+    file << tagName << Stream::escapeXML(Stream::serializeXML(&newMap)) << endTagName;
   }
 
   return (make_pair(countSectors, countTotalValues));

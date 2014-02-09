@@ -87,8 +87,7 @@ Particle::Particle(const TLorentzVector& momentum,
 
 
 Particle::Particle(const Track* track,
-                   const Const::ChargedStable& chargedStable,
-                   const int mdstIndex) :
+                   const Const::ChargedStable& chargedStable) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
   m_pValue(-1), m_flavorType(0), m_particleType(c_Undefined), m_mdstIndex(0),
   m_arrayPointer(0)
@@ -99,8 +98,8 @@ Particle::Particle(const Track* track,
 
   m_flavorType = 1;
   m_particleType = c_Track;
-  if (mdstIndex < 0) {m_mdstIndex = track->getArrayIndex();}
-  else {m_mdstIndex = mdstIndex;}
+
+  m_mdstIndex = track->getArrayIndex();
 
   // set PDG code TODO: ask Anze why this procedure is needed?
   int absPDGCode = chargedStable.getPDGCode();
@@ -176,7 +175,7 @@ Particle::Particle(const Track* track,
 }
 
 
-Particle::Particle(const ECLGamma* gamma, const int mdstIndex) :
+Particle::Particle(const ECLGamma* gamma) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
   m_pValue(-1), m_flavorType(0), m_particleType(c_Undefined), m_mdstIndex(0),
   m_arrayPointer(0)
@@ -190,9 +189,8 @@ Particle::Particle(const ECLGamma* gamma, const int mdstIndex) :
   //  setVertex(gamma->getPosition());
   setVertex(gamma->getPositon()); // TODO: report this typo to ECL
 
-  m_particleType = c_ECLGamma;
-  if (mdstIndex < 0) {m_mdstIndex = gamma->getArrayIndex();}
-  else {m_mdstIndex = mdstIndex;}
+  m_particleType = c_ECLShower;
+  m_mdstIndex = gamma->getShowerId();
 
   // set Chi^2 probability:
   m_pValue = 1; //TODO: gamma quality can be written here
@@ -204,7 +202,7 @@ Particle::Particle(const ECLGamma* gamma, const int mdstIndex) :
 }
 
 
-Particle::Particle(const ECLPi0* pi0, const int mdstIndex) :
+Particle::Particle(const ECLPi0* pi0) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
   m_pValue(-1), m_flavorType(0), m_particleType(c_Undefined), m_mdstIndex(0),
   m_arrayPointer(0)
@@ -218,9 +216,11 @@ Particle::Particle(const ECLPi0* pi0, const int mdstIndex) :
   m_pz = pi0->getPz();
   // position: TODO obtain the values that are used for gamma momentum construction
 
-  m_particleType = c_Pi0;
-  if (mdstIndex < 0) {m_mdstIndex = pi0->getArrayIndex();}
-  else {m_mdstIndex = mdstIndex;}
+  // The state is undefined only temporarly
+  // as soon as photon daughter Particles are
+  // appendet the state is changed to c_Composite
+  m_particleType = c_Undefined;
+  m_mdstIndex = pi0->getArrayIndex();
 
   // set Chi^2 probability:
   m_pValue = pi0->getPValue();
@@ -232,7 +232,7 @@ Particle::Particle(const ECLPi0* pi0, const int mdstIndex) :
 }
 
 
-Particle::Particle(const MCParticle* mcParticle, const int mdstIndex) :
+Particle::Particle(const MCParticle* mcParticle) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
   m_pValue(-1), m_flavorType(0), m_particleType(c_Undefined), m_mdstIndex(0),
   m_arrayPointer(0)
@@ -241,8 +241,9 @@ Particle::Particle(const MCParticle* mcParticle, const int mdstIndex) :
 
   m_pdgCode      = mcParticle->getPDG();
   m_particleType = c_MCParticle; // TODO: what about daughters if not FS particle?
-  if (mdstIndex < 0) {m_mdstIndex = mcParticle->getArrayIndex();}
-  else {m_mdstIndex = mdstIndex;}
+
+  m_mdstIndex = mcParticle->getArrayIndex();
+
   setFlavorType();
 
   // mass and momentum

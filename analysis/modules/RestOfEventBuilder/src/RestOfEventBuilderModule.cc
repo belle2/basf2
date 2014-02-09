@@ -70,6 +70,8 @@ void RestOfEventBuilderModule::event()
   StoreObjPtr<ParticleList> plist(m_particleList);
   StoreObjPtr<Particle>     particles;
 
+  //printEvent();
+
   // output
   StoreArray<RestOfEvent> roeArray;
 
@@ -118,8 +120,8 @@ void RestOfEventBuilderModule::addRemainingECLObjects(const Particle* particle, 
   StoreArray<ECLShower> eclShowers;
   StoreArray<Track>     tracks;
 
-  // vector of all final state particle daughters created from ECLGamma
-  std::vector<int> eclFSPs   = particle->getMdstArrayIndices(Particle::EParticleType::c_ECLGamma);
+  // vector of all final state particle daughters created from energy cluster or charged track
+  std::vector<int> eclFSPs   = particle->getMdstArrayIndices(Particle::EParticleType::c_ECLShower);
   std::vector<int> trackFSPs = particle->getMdstArrayIndices(Particle::EParticleType::c_Track);
 
   // Add remaining ECLGammas
@@ -128,7 +130,7 @@ void RestOfEventBuilderModule::addRemainingECLObjects(const Particle* particle, 
 
     bool remainingGamma = true;
     for (unsigned j = 0; j < eclFSPs.size(); j++) {
-      if (gamma->getArrayIndex() == eclFSPs[j]) {
+      if (gamma->getShowerId() == eclFSPs[j]) {
         remainingGamma = false;
         break;
       }
@@ -144,10 +146,8 @@ void RestOfEventBuilderModule::addRemainingECLObjects(const Particle* particle, 
 
     bool remainingPi0 = true;
     for (unsigned j = 0; j < eclFSPs.size(); j++) {
-      const ECLGamma* gamma = eclGammas[eclFSPs[j]];
-
-      if (pi0->getShowerId1() == gamma->getShowerId()
-          || pi0->getShowerId2() == gamma->getShowerId()) {
+      if (pi0->getShowerId1() == eclFSPs[j]
+          || pi0->getShowerId2() == eclFSPs[j]) {
         remainingPi0 = false;
         break;
       }
@@ -163,9 +163,7 @@ void RestOfEventBuilderModule::addRemainingECLObjects(const Particle* particle, 
 
     bool remainingShower = true;
     for (unsigned j = 0; j < eclFSPs.size(); j++) {
-      const ECLGamma* gamma = eclGammas[eclFSPs[j]];
-
-      if (shower->getShowerId() == gamma->getShowerId()) {
+      if (shower->getShowerId() == eclFSPs[j]) {
         remainingShower = false;
         break;
       }
@@ -234,7 +232,7 @@ void RestOfEventBuilderModule::printEvent()
 
 void RestOfEventBuilderModule::printParticle(const Particle* particle)
 {
-  std::vector<int> eclFSPs   = particle->getMdstArrayIndices(Particle::EParticleType::c_ECLGamma);
+  std::vector<int> eclFSPs   = particle->getMdstArrayIndices(Particle::EParticleType::c_ECLShower);
   std::vector<int> trackFSPs = particle->getMdstArrayIndices(Particle::EParticleType::c_Track);
 
   B2INFO("[RestOfEventBuilderModule] tracks  : ");

@@ -71,9 +71,7 @@ namespace Belle2 {
     /**
      * particle type enumerators (to be completed when all Mdst dataobjects are defined)
      */
-    enum EParticleType {c_Undefined, c_Track, c_ECLGamma, c_KLong, c_Pi0,
-                        c_MCParticle, c_Composite
-                       };
+    enum EParticleType {c_Undefined, c_Track, c_ECLShower, c_KLong , c_MCParticle, c_Composite};
 
     /**
      * error matrix dimensions and size of 1D representation
@@ -134,32 +132,27 @@ namespace Belle2 {
      * Constructor from a reconstructed track (mdst object Track);
      * @param track pointer to Track object
      * @param chargedStable Type of charged particle
-     * @param mdstIndex store array index of Track object (optional)
      */
     Particle(const Track* track,
-             const Const::ChargedStable& chargedStable,
-             const int mdstIndex = -1);
+             const Const::ChargedStable& chargedStable);
 
     /**
      * Constructor from a reconstructed gamma candidate (mdst object ECLGamma)
      * @param gamma pointer to ECLGamma object
-     * @param mdstIndex store array index of ECLGamma object (optional)
      */
-    Particle(const ECLGamma* gamma, const int mdstIndex = -1);
+    Particle(const ECLGamma* gamma);
 
     /**
      * Constructor from a reconstructed pi0 candidate (mdst object ECLPi0)
      * @param pi0 pointer to ECLPi0 object
-     * @param mdstIndex store array index of ECLPi0 object (optional)
      */
-    Particle(const ECLPi0* pi0, const int mdstIndex = -1);
+    Particle(const ECLPi0* pi0);
 
     /**
      * Constructor from MC particle (mdst object MCParticle)
      * @param MCparticle pointer to MCParticle object
-     * @param mdstIndex store array index of MCParticle object (optional)
      */
-    Particle(const MCParticle* MCparticle, const int mdstIndex = -1);
+    Particle(const MCParticle* MCparticle);
 
     /**
      * Destructor

@@ -153,7 +153,7 @@ namespace Belle2 {
       const PIDLikelihood* pid = DataStore::getRelated<PIDLikelihood>(track);
       const MCParticle* mcParticle = DataStore::getRelated<MCParticle>(track);
       for (int k = 0; k < 5; k++) {
-        Particle particle(track, charged[k], i);
+        Particle particle(track, charged[k]);
         if (particle.getParticleType() == Particle::c_Track) { // should always hold but...
           Particle* newPart = Particles.appendNew(particle);
           DataStore::addRelationFromTo(newPart, pid);
@@ -170,8 +170,8 @@ namespace Belle2 {
       const ECLGamma* gamma = Gammas[i];
       const ECLShower* eclshower   = DataStore::getRelated<ECLShower>(gamma);
       const MCParticle* mcParticle = DataStore::getRelated<MCParticle>(eclshower);
-      Particle particle(gamma, i);
-      if (particle.getParticleType() == Particle::c_ECLGamma) { // should always hold but...
+      Particle particle(gamma);
+      if (particle.getParticleType() == Particle::c_ECLShower) { // should always hold but...
         Particle* newPart = Particles.appendNew(particle);
         DataStore::addRelationFromTo(newPart, mcParticle);
         int lastIndex = Particles.getEntries() - 1;
@@ -184,25 +184,24 @@ namespace Belle2 {
 
     for (int i = 0; i < Pi0s.getEntries(); i++) {
       const ECLPi0* pi0 = Pi0s[i];
-      Particle particle(pi0, i);
-      if (particle.getParticleType() == Particle::c_Pi0) { // should always hold but...
-        int showerId1 = pi0->getShowerId1();
-        int showerId2 = pi0->getShowerId2();
-        //find corresponding gamma Particles from shower ID
-        for (unsigned k = 0; k < gammaShowerId.size(); k++) {
-          int showerId = gammaShowerId[k].second;
-          if (showerId == showerId1 || showerId == showerId2) {
-            particle.appendDaughter(gammaShowerId[k].first);
-          }
-        }
-        Particle* newPart = Particles.appendNew(particle);
+      Particle particle(pi0);
 
-        const MCParticle* gammaMc1 = ECLShowers[showerId1]->getRelated<MCParticle>();
-        const MCParticle* gammaMc2 = ECLShowers[showerId2]->getRelated<MCParticle>();
-        if (gammaMc1 and gammaMc2 and gammaMc1->getMother() == gammaMc2->getMother()) {
-          //both ECLShowers have same mother, save MC info
-          newPart->addRelationTo(gammaMc1->getMother());
+      int showerId1 = pi0->getShowerId1();
+      int showerId2 = pi0->getShowerId2();
+      //find corresponding gamma Particles from shower ID
+      for (unsigned k = 0; k < gammaShowerId.size(); k++) {
+        int showerId = gammaShowerId[k].second;
+        if (showerId == showerId1 || showerId == showerId2) {
+          particle.appendDaughter(gammaShowerId[k].first);
         }
+      }
+      Particle* newPart = Particles.appendNew(particle);
+
+      const MCParticle* gammaMc1 = ECLShowers[showerId1]->getRelated<MCParticle>();
+      const MCParticle* gammaMc2 = ECLShowers[showerId2]->getRelated<MCParticle>();
+      if (gammaMc1 and gammaMc2 and gammaMc1->getMother() == gammaMc2->getMother()) {
+        //both ECLShowers have same mother, save MC info
+        newPart->addRelationTo(gammaMc1->getMother());
       }
     }
 

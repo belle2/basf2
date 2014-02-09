@@ -42,6 +42,9 @@ TelDataMergerModule::TelDataMergerModule() : Module(),
   m_bufferSize(100), m_reader(NULL), m_buffer(m_bufferSize), m_bufferVXD(m_bufferSize),
   m_nVXDDataEvents(0), m_nTelDataEvents(0), m_nMapHits(0),
   m_nBOREvents(0), m_nEOREvents(0), m_nNoTrigEvents(0), m_currentTLUTagFromFTSW(0)
+#ifdef debug_log
+  , m_debugLog("TelMerger.log")
+#endif
 {
 
   // Module Description
@@ -121,8 +124,9 @@ short int TelDataMergerModule::getTLUTagFromEUDAQ(const eudaq::Event& ev)
 
 bool TelDataMergerModule::processNormalEvent(const eudaq::Event& ev)
 {
-  short int currentTLUTagFromEUDAQ = getTLUTagFromEUDAQ(ev);
-  if (currentTLUTagFromEUDAQ < 0) return false;
+  // Use Event number in place of telescope TLU tag!
+  //short int currentTLUTagFromEUDAQ = getTLUTagFromEUDAQ(ev);
+  ///if (currentTLUTagFromEUDAQ < 0) return false;
 
   if (const eudaq::DetectorEvent* detEv = dynamic_cast<const eudaq::DetectorEvent*>(& ev)) {
 
@@ -130,11 +134,18 @@ bool TelDataMergerModule::processNormalEvent(const eudaq::Event& ev)
     // after the conversion step has finished. This is due to the fact that a certain
     // TLU ID Mask was used, which in turn is not considered in the eudaq part.
     TBTelEvent tbEvt = eudaq::PluginManager::ConvertToTBTelEvent(* detEv);
-    tbEvt.setTriggerId(currentTLUTagFromEUDAQ);
+    //tbEvt.setTriggerId(currentTLUTagFromEUDAQ);
 
     B2DEBUG(10, "TBEvent: Event: " << tbEvt.getEventNumber()
             << ", NumPlanes: " << tbEvt.getNumTelPlanes()
             << ", TrigID: " << tbEvt.getTriggerId());
+
+    short int currentTLUTagFromEUDAQ = short(tbEvt.getEventNumber() % 32768);
+    tbEvt.setTriggerId(currentTLUTagFromEUDAQ);
+
+#ifdef debug_log
+    m_debugLog << "TEL\tTelEvent\t" << tbEvt.getEventNumber() % 32768 << "\tTLU_tag\t" << currentTLUTagFromEUDAQ << "\ttimestamp\t" << tbEvt.getTimeStamp() << std::endl;
+#endif
 
     BoundedSpaceMap<short_digit_type>::collection_type digitTuples;
     for (size_t plane = 0; plane < tbEvt.getNumTelPlanes(); ++plane) {
@@ -311,6 +322,13 @@ void TelDataMergerModule::event()
   m_bufferVXD.put(m_currentTLUTagFromFTSW);
 
 
+#ifdef debug_log
+  timeval* time = new timeval;
+  storeFTSW[0]->GetTTTimeVal(0, time);
+  unsigned long FTSWTime = time->tv_sec * 1000000 + time->tv_usec;
+  m_debugLog << "FTSW\tTLUtag\t" << m_currentTLUTagFromFTSW << "\ttimestamp\t" << FTSWTime << std::endl;
+#endif
+
   tag_type meanVXD = m_bufferVXD.getMedian();
   tag_type meanEUDAQ = m_buffer.getMedian();
   std::size_t advance = CIRC::distance(meanVXD, meanEUDAQ);
@@ -364,6 +382,10 @@ void TelDataMergerModule::endRun()
   if (m_nNoTrigEvents) {
     B2INFO("Found " << m_nNoTrigEvents << " events without a valid trigger ID.");
   }
+
+#ifdef debug_log
+  m_debugLog.close();
+#endif
 
   B2DEBUG(75, "Finished run!");
 

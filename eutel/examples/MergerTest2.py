@@ -21,13 +21,13 @@ geometry = register_module('Geometry')
 geometry.param('components', ['TB'])
 
 # input
-input = register_module('SeqRootInput')
-input.param('inputFileName', '../vxdtb/data/e0000r000391.sroot')
+input = register_module('RootInput')
+input.param('inputFileName', '../vxdtb/data/RawData_0000_000470.root')
 # data reader
 dataMerger = register_module('TelDataMerger')
 # use corresponding telescope data file
-dataMerger.param('inputFileName', '../vxdtb/data/run000070.raw')
-dataMerger.param('bufferSize', 200)
+dataMerger.param('inputFileName', '../vxdtb/data/run000131.raw')
+dataMerger.param('bufferSize', 2500)
 dataMerger.param('eutelPlaneNrs', [
     4,
     3,

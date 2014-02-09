@@ -1,6 +1,7 @@
 #ifndef TELDATAMERGERMODULE_H
 #define TELDATAMERGERMODULE_H
 
+#undef debug_log
 // include standard c++
 #include <sys/time.h>
 #include <memory>
@@ -24,6 +25,10 @@
 #include <eutel/eudaq/FileReader.h>
 #include <eutel/merge/CircularTools.h>
 #include <eutel/merge/BoundedSpaceMap.h>
+
+#ifdef debug_log
+#include <fstream>
+#endif
 
 namespace Belle2 {
   /** A module template.
@@ -132,6 +137,10 @@ namespace Belle2 {
 
     // conversion map between sensor numbers and their VxdIDs
     std::map< int, VxdID > m_sensorID;
+
+#ifdef debug_log
+    std::ofstream m_debugLog;         /**< Debug log text file */
+#endif
   };
 }
 #endif

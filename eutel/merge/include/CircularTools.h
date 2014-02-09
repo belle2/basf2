@@ -24,7 +24,7 @@ namespace CIRC {
 
   enum {
     c_tagLowerBound = 0,
-    c_tagUpperBound = 16384
+    c_tagUpperBound = 32768
   };
 
   /** Wrap value to interval <c_tagLowerBound, c_tagUpperBound)

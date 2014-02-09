@@ -63,7 +63,7 @@ void TelxVXDModule::defineHisto()
   // define setting options for correlations
   //----------------------------------------------------------------
 
-  m_SwapAxis = 0;  /**< [0] 0: u<->u, 1: u<->v correlations */
+  m_SwapAxis = 1;  /**< [0] 0: u<->u, 1: u<->v correlations */
   m_DUTPXD = 4;    /**< [4] PXD for correlations: 3,4 */
   m_DUTSVDFwd = 5; /**< [5] forward SVD for correlations: 5..8 */
   m_DUTSVDBwd = 8; /**< [8] backward SVD for correlations: 5..8 */

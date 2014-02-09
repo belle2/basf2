@@ -371,6 +371,20 @@ namespace Belle2 {
 
     /**
      * function for PSelector
+     * @param part const pointer to Particle
+     * @return PDG code of mathced MCParticle
+     */
+    double particleMCMatchPDGCode(const Particle* particle);
+
+    /**
+     * function for PSelector
+     * @param part const pointer to Particle
+     * @return PDG code of mathced MCParticle
+     */
+    double particleMCMatchPDGStatus(const Particle* particle);
+
+    /**
+     * function for PSelector
      * requires that RestOfEvent <-> Particle relation exists (returns -1 if it doesn't)
      *
      * @param part const pointer to Particle

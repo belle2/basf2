@@ -51,35 +51,6 @@ bool setMCTruth(const Particle* particle);
 int getMCTruthStatus(const Particle* particle, const MCParticle* mcParticle);
 
 /**
- * Returns the flag (quality indicator) of the match. Possible values and meaning are:
- * -11 : gen_hepevt link of one of children not found in list of daughters of matched gen_hepevt (something wrong)
- * -10 : one of children has not link to gen_hepevt (something wrong)
- *  -9 : as -10 but in addition size of reconstructed < size of generated
- *  -5 : more reconstructed than generated particle in final state (something wrong)
- *  -2 : gen_hepvt particle doesn't have any daughters (something wrong in maching)
- *  -1 : random combination (common mother is virtual gamma (ccbar, uds mc), or Upsilon(4S), Upsilon(5S))
- *   0 : no link to gen_hepevt particle
- *   1 : particle is correctly reconstructed; including correct particle id of final state particles (SIGNAL)
- *   2 : one or more FSP are misidentified, but have common mother
- *   3 : FSP have common mother, but at least one massive particle is missing
- *   4 : FSP have common mother, but at least one massless particle is missing (radiative photon)
- *   5 : final state includes pi0 without perfect match to gen_hepevt
- *   6 : ID = 2 and 5 are true
- *  10 : particle is correctly reconstructed; including correct particle id of final state particles, but FSR photon is missing (SIGNAL)
- *  11 : in addition to FSR photon missing one more radiative photon is missing
- *  20 : missing neutrino
- *  21 : missing neutrino and radiative photon
- *  23 : missing neutrino and massive particle
- *  24 : missing neutrino and another massles particle (FSR photon)
- *
- * @param pointer to the particle
- * @param pointer to the matched MCParticle
- *
- * @return flag of the mc match
- */
-int  getMCTruthFlag(const Particle* particle, const MCParticle* mcParticle);
-
-/**
  * Fills vector with array (1-based) indices of all generator ancestors of given MCParticle.
  *
  * @param pointer to the MCParticle
@@ -120,13 +91,6 @@ void appendFSP(const MCParticle* gen, vector<const MCParticle*>& children);
  * @return true if MCParticle is FSP and false otherwise
  */
 int isFSP(const MCParticle* P);
-
-/**
- * Determines the flag. See above.
- *
- * @return the mc match flag
- */
-int compareFinalStates(vector<const Particle*> reconstructed, vector<const MCParticle*> generated);
 
 /**
  * Finds final stat particles given in vector of generated particles that

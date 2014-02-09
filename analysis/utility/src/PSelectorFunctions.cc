@@ -492,6 +492,30 @@ namespace Belle2 {
       return result;
     }
 
+    double particleMCMatchPDGCode(const Particle* part)
+    {
+      double result = 0.0;
+
+      const MCParticle* mcparticle = DataStore::getRelated<MCParticle>(part);
+
+      if (mcparticle == nullptr)
+        return result;
+
+      return mcparticle->getPDG();
+    }
+
+    double particleMCMatchStatus(const Particle* part)
+    {
+      double result = 0.0;
+
+      const MCParticle* mcparticle = DataStore::getRelated<MCParticle>(part);
+
+      if (mcparticle == nullptr)
+        return result;
+
+      return getMCTruthStatus(part, mcparticle);
+    }
+
     double nROETracks(const Particle* particle)
     {
       double result = -1.0;
@@ -656,7 +680,9 @@ namespace Belle2 {
     REGISTER_VARIABLE("sumChildProb", sumChildProb, "sum of signal probabilities of daughters");
     REGISTER_VARIABLE("prodChildProb", prodChildProb, "product of signal probabilities of daughters");
 
-    REGISTER_VARIABLE("isSignal", isSignal, "1.0 if Particle is correctly reconstructed (SIGNAL), 0.0 otherwise");
+    REGISTER_VARIABLE("isSignal", isSignal,               "1.0 if Particle is correctly reconstructed (SIGNAL), 0.0 otherwise");
+    REGISTER_VARIABLE("mcPDG",    particleMCMatchPDGCode, "The PDG code of matched MCParticle");
+    REGISTER_VARIABLE("mcStatus", particleMCMatchStatus,  "The bit pattern indicating the quality of MC match");
 
     REGISTER_VARIABLE("nROETracks",  nROETracks,  "number of remaining tracks as given by the related RestOfEvent object");
     REGISTER_VARIABLE("nROEShowers", nROEShowers, "number of remaining ECL showers as given by the related RestOfEvent object");

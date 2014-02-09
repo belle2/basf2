@@ -191,7 +191,7 @@ class Particle:
             histMaker.param('file', self.getHistFilename())
             histMaker.param('histVariables', [('prodChildProb', 100, 0, 1),
                             ('M', 100, mass - mass * 1.0 / 10.0, mass + mass
-                            * 1.0 / 10.0), ('mcTruthFlag', 100, -10, 10)])
+                            * 1.0 / 10.0), ('mcStatus', 64, 0, 64)])
             histMaker.param('make2dHists', True)
             histMaker.param('truthVariable', 'isSignal')
             histMaker.param('listNames', [self.to_string(c) for c in

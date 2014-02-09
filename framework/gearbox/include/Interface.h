@@ -11,9 +11,10 @@
 #ifndef GEARBOX_INTERFACE_H
 #define GEARBOX_INTERFACE_H
 
-#include <string>
 #include <framework/core/FrameworkExceptions.h>
 #include <framework/gearbox/Unit.h>
+
+#include <string>
 
 class TObject;
 
@@ -27,7 +28,7 @@ namespace Belle2 {
     /** Exception to be thrown in case of an conversion error */
     BELLE2_DEFINE_EXCEPTION(ConversionError, "Path '%1%': Could not convert '%2%' to numerical value");
     /** getTObject() couldn't deserialize data. */
-    BELLE2_DEFINE_EXCEPTION(TObjectConversionError, "Path '%1%': Could not convert to TObject!");
+    BELLE2_DEFINE_EXCEPTION(TObjectConversionError, "Path '%1%': Could not convert to TObject! Malformed data?");
 
     /** common interface for Gearbox and GearDir. */
     class Interface {

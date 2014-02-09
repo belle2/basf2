@@ -226,8 +226,15 @@ namespace Belle2 {
     if (it != m_ownedObjects.end())
       return it->second;
 
-    string value = getString(path);
-    TObject* object = Stream::deserialize(value);
+    const string& value = getString(path);
+    TObject* object = NULL;
+    if (value.find("<Object") == 0) {
+      //most likely is XML-serialized object
+      object = Stream::deserializeXML(value);
+    } else {
+      //assume base64-encoded raw data.
+      object = Stream::deserializeEncodedRawData(value);
+    }
     if (!object)
       throw gearbox::TObjectConversionError() << path;
 

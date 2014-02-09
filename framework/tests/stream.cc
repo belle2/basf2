@@ -27,11 +27,11 @@ namespace Belle2 {
   TEST_F(StreamTest, XML)
   {
     TVector3 v(1.0, 2.0, 3.0);
-    std::string vStr = Stream::serialize(&v);
+    std::string vStr = Stream::serializeXML(&v);
     //B2INFO(vStr);
 
     //restore
-    TObject* obj = Stream::deserialize(vStr);
+    TObject* obj = Stream::deserializeXML(vStr);
     TVector3* v2 = dynamic_cast<TVector3*>(obj);
     EXPECT_TRUE(v2 != NULL);
 
@@ -44,39 +44,83 @@ namespace Belle2 {
     relCont->setFromDurability(DataStore::c_Event);
     relCont->setToDurability(DataStore::c_Event);
     TClonesArray& relations = relCont->elements();
-    new(relations.AddrAt(relations.GetLast() + 1)) RelationElement(0, 1, 42.0);
+    //let's make this a bit larger (very small objects are never compressed)
+    for (int i = 0; i < 100; i++)
+      new(relations.AddrAt(relations.GetLast() + 1)) RelationElement(0, i + 1, 42.0);
 
-    std::string relStr = Stream::serialize(relCont);
+    std::string relStr = Stream::serializeXML(relCont);
     //B2INFO(relStr);
-    obj = Stream::deserialize(relStr);
+    obj = Stream::deserializeXML(relStr);
     const RelationContainer* relCont2 = dynamic_cast<const RelationContainer*>(obj);
     EXPECT_TRUE(relCont2 != NULL);
-    EXPECT_EQ(relCont2->getEntries(), 1);
+    EXPECT_EQ(relCont2->getEntries(), 100);
     EXPECT_EQ(relCont2->elements(0).getToIndex(0), 1u);
     EXPECT_DOUBLE_EQ(relCont2->elements(0).getWeight(0), 42.0);
 
     //creating file for next test..
-    //std::ofstream file("serialized.xml");
-    //file << Stream::escapeXML(relStr);
+    /*
+    std::ofstream file("object.xml");
+    file << Stream::escapeXML(relStr);
+    */
 
 
     //try converting something broken
-    obj = Stream::deserialize("this is not actually XML!");
+    obj = Stream::deserializeXML("this is not actually XML!");
     EXPECT_FALSE(obj != NULL);
   }
 
-  /** Read things from gearbox. */
-  TEST_F(StreamTest, Gearbox)
+  /** Check raw conversion. */
+  TEST_F(StreamTest, raw)
+  {
+    TVector3 v(1.0, 2.0, 3.0);
+    std::string vStr = Stream::serializeAndEncode(&v);
+    //B2INFO(vStr);
+
+    //restore
+    TObject* obj = Stream::deserializeEncodedRawData(vStr);
+    TVector3* v2 = dynamic_cast<TVector3*>(obj);
+    EXPECT_TRUE(v2 != NULL);
+    EXPECT_TRUE(*v2 == v);
+
+    //something more complex
+    RelationContainer* relCont = new RelationContainer;
+    relCont->setFromName("a");
+    relCont->setToName("b");
+    relCont->setFromDurability(DataStore::c_Event);
+    relCont->setToDurability(DataStore::c_Event);
+    TClonesArray& relations = relCont->elements();
+    //let's make this a bit larger (very small objects are never compressed)
+    for (int i = 0; i < 100; i++)
+      new(relations.AddrAt(relations.GetLast() + 1)) RelationElement(0, i + 1, 42.0);
+
+    std::string relStr = Stream::serializeAndEncode(relCont);
+    //B2INFO(relStr);
+    obj = Stream::deserializeEncodedRawData(relStr);
+    const RelationContainer* relCont2 = dynamic_cast<const RelationContainer*>(obj);
+    EXPECT_TRUE(relCont2 != NULL);
+    EXPECT_EQ(relCont2->getEntries(), 100);
+    EXPECT_EQ(relCont2->elements(0).getToIndex(0), 1u);
+    EXPECT_DOUBLE_EQ(relCont2->elements(0).getWeight(0), 42.0);
+
+    //creating file for next test..
+    /*
+    std::ofstream file("object_base64.xml");
+    file << relStr; //no additional escaping necessary
+    */
+
+    // Given random input, TBase64 will most likely just crash, this specific truncation seems ok.
+    std::string truncated = vStr.substr(0, 10);
+    TObject* broken_obj = Stream::deserializeEncodedRawData(truncated);
+    EXPECT_TRUE(broken_obj == NULL);
+  }
+
+  void checkGbContents()
   {
     Gearbox& gb = Gearbox::getInstance();
-    vector<string> backends;
-    backends.push_back("file:/framework/tests/");
-    gb.setBackends(backends);
-    gb.open("object.xml");
 
     const RelationContainer* relCont2 = dynamic_cast<const RelationContainer*>(gb.getTObject("/A/RelationContainer"));
     EXPECT_TRUE(relCont2 != NULL);
-    EXPECT_EQ(relCont2->getEntries(), 1);
+    EXPECT_EQ(relCont2->getEntries(), 100);
     EXPECT_EQ(relCont2->elements(0).getToIndex(0), 1u);
     EXPECT_DOUBLE_EQ(relCont2->elements(0).getWeight(0), 42.0);
 
@@ -84,14 +128,34 @@ namespace Belle2 {
     GearDir detector("/A/");
     relCont2 = dynamic_cast<const RelationContainer*>(detector.getTObject("RelationContainer"));
     EXPECT_TRUE(relCont2 != NULL);
-    EXPECT_EQ(relCont2->getEntries(), 1);
+    EXPECT_EQ(relCont2->getEntries(), 100);
     EXPECT_EQ(relCont2->elements(0).getToIndex(0), 1u);
     EXPECT_DOUBLE_EQ(relCont2->elements(0).getWeight(0), 42.0);
+  }
 
-    //not an object, should throw error
-    EXPECT_THROW(gb.getTObject("/A/Description"), gearbox::TObjectConversionError);
-    //non-exstant path
-    EXPECT_THROW(gb.getTObject("/A/NothingHere"), gearbox::PathEmptyError);
+
+  /** Read things from gearbox. */
+  TEST_F(StreamTest, GearboxXML)
+  {
+    Gearbox& gb = Gearbox::getInstance();
+    vector<string> backends;
+    backends.push_back("file:/framework/tests/");
+    gb.setBackends(backends);
+    gb.open("object.xml");
+
+    checkGbContents();
+  }
+
+  /** Read things from gearbox. */
+  TEST_F(StreamTest, GearboxRaw)
+  {
+    Gearbox& gb = Gearbox::getInstance();
+    vector<string> backends;
+    backends.push_back("file:/framework/tests/");
+    gb.setBackends(backends);
+    gb.open("object_base64.xml");
+
+    checkGbContents();
   }
 
 }  // namespace

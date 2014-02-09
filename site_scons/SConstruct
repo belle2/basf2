@@ -216,6 +216,9 @@ if len(global_env['TEST_FILES']) > 0:
 
 global_env.RemoveNonTargets(global_env["INCDIR"])
 global_env.RemoveNonTargets(global_env["MODDIR"])
+global_env.RemoveNonTargets(global_env["LIBDIR"])
+global_env.RemoveNonTargets(global_env["BINDIR"])
+global_env.RemoveNonTargets(global_env["DATADIR"])
 
 
 from SCons.Script.Main import OptionsParser

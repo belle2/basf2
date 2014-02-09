@@ -357,11 +357,12 @@ namespace Belle2 {
       lr = 1;
       if ((posW.cross(posTrack)).z() < 0.) lr = 0;
 
-      //          int saveIndex = -999;
       if (nWires == 1) {
-        //            saveIndex = saveSimHit(layerId, wires[i], trackID, pid, distance, tofBefore, edep, s_in_layer * cm, momIn, posW, posIn, posOut, posTrack, lr, speed);
+
         saveSimHit(layerId, wires[i], trackID, pid, distance, tofBefore, edep, s_in_layer * cm, momIn, posW, posIn, posOut, posTrack, lr, speed);
+
       } else {
+
         G4int cel1 = wires[i] + 1;
         G4int cel2 = cel1;
         if (i + 1 <= nWires - 1) {

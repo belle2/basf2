@@ -326,6 +326,13 @@ namespace Belle2 {
       */
       int nShifts(int layerId) const;
 
+      /**
+       * Return wire offset in phi direction at endplate.
+       * @parm layerID layerID(0-55).
+       * @return offset value.
+       */
+      double offset(int layerID) const;
+
       //! Set radius of sense wire in each layer.
       /*!
           \param layerId The layer id of sense wires.
@@ -596,6 +603,12 @@ namespace Belle2 {
     inline int CDCGeometryPar::nShifts(int layerID) const
     {
       return m_nShifts[layerID];
+    }
+
+
+    inline double CDCGeometryPar::offset(int layerID) const
+    {
+      return m_offSet[layerID];
     }
 
     inline unsigned CDCGeometryPar::nWiresInLayer(int layerID) const

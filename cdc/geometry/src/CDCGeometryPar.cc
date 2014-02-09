@@ -157,8 +157,11 @@ void CDCGeometryPar::read()
   //  std::cout <<"m_materialDefinitionMode in CDCGeometryPar= " << m_materialDefinitionMode << std::endl;
 
   // Loop over all sense layers
-  for (int iSLayer = 0; iSLayer < nSLayer; iSLayer++) {
+  for (int iSLayer = 0; iSLayer < nSLayer; ++iSLayer) {
+
+
     int layerId = atoi((gbxParams.getString((format("SLayers/SLayer[%1%]/@id") % (iSLayer + 1)).str())).c_str());
+
     m_rSLayer[layerId] = gbxParams.getLength((format("SLayers/SLayer[%1%]/Radius") % (iSLayer + 1)).str());
     m_zSBackwardLayer[layerId] = gbxParams.getLength((format("SLayers/SLayer[%1%]/BackwardZ") % (iSLayer + 1)).str());
     m_zSForwardLayer[layerId] = gbxParams.getLength((format("SLayers/SLayer[%1%]/ForwardZ") % (iSLayer + 1)).str());

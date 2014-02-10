@@ -27,7 +27,8 @@ def autoclean_dir(env, dirname):
     for (dirname, dirs, files) in os.walk(str(directory)):
         for filename in files:
             fullname = os.path.join(dirname, filename)
-            if not fullname in targets:
+            if not fullname in targets and not (fullname.endswith('.pyc')
+                    and fullname[:-1] in targets):
                 print env['CLEANUPCOMSTR'] % fullname
                 os.remove(fullname)
 

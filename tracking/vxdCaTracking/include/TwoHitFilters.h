@@ -88,8 +88,8 @@ namespace Belle2 {
       m_z2 = m_dz * m_dz;
     }
 
-    TVector3 m_hitA; /**< outer hit (position relevant for useful filter calculation) used for the filter calculation */
-    TVector3 m_hitB; /**< inner hit (position relevant for useful filter calculation) used for the filter calculation */
+    TVector3 m_hitA; /**< outer hit (position relevant for useful filter calculation, e.g. calcDist3D) used for the filter calculation */
+    TVector3 m_hitB; /**< inner hit (position relevant for useful filter calculation, e.g. calcDist3D) used for the filter calculation */
     double m_x2; /**< internal intermediate value storing x^2, no enduser-relevance */
     double m_y2; /**< internal intermediate value storing y^2, no enduser-relevance */
     double m_z2; /**< internal intermediate value storing z^2, no enduser-relevance */

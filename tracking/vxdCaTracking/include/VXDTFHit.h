@@ -20,7 +20,8 @@
 
 namespace Belle2 {
 
-  class ClusterInfo;
+  class ClusterInfo; /**< predeclaration */
+
   /** The VXD Track Finder Hit class
    * This class stores all information needed for reconstructing track candidates within the VXDonlyTrackFinder.
    * VXDTFHits are generated individually for each pass.

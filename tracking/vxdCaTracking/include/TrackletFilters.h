@@ -15,6 +15,8 @@
 #include <tuple>
 #include <TVector3.h>
 #include <vector>
+#include <boost/assign/std/vector.hpp> // overloading + to fill many values at once in vector;
+#include <array>
 #include "ThreeHitFilters.h"
 #include "SharedFunctions.h" // e.g. PositionInfo
 
@@ -31,7 +33,11 @@ namespace Belle2 {
     TrackletFilters():
       m_radius(0),
       m_chi2(0),
-      m_numHits(0) { m_hits = NULL; }
+      m_numHits(0) {
+      m_hits = NULL;
+      using namespace boost::assign;
+      m_lineParameters += 0, 0, 0, 0;
+    }
 
     /** Constructor. expects a vector of TVector3 formatted hits ordered by magnitude in x-y (first entry should be the outermost hit. Atm not needed yet, but relevant for possible future changes where a dependency of related classes like the ThreeHitFilters expect a sorted input that way) */
     TrackletFilters(const std::vector<PositionInfo*>* hits, double magneticFieldStrength = 1.5):
@@ -40,6 +46,8 @@ namespace Belle2 {
       m_chi2(0) {
       m_numHits = m_hits->size();
       resetMagneticField(magneticFieldStrength);
+      using namespace boost::assign;
+      m_lineParameters += 0, 0, 0, 0;
     }
 
 
@@ -50,6 +58,8 @@ namespace Belle2 {
     void resetValues(const std::vector<PositionInfo*>* hits) {
       m_hits = hits;
       m_numHits = hits->size();
+      using namespace boost::assign;
+      m_lineParameters += 0, 0, 0, 0;
     }
 
     /** Overrides Constructor-Setup for magnetic field. if no value is given, magnetic field is assumed to be Belle2-Detector standard of 1.5T */
@@ -80,9 +90,14 @@ namespace Belle2 {
     std::pair<double, TVector3> simpleLineFit3D() { return simpleLineFit3D(m_hits); }
 
     /** straight line fits expecting the hits stored in a vector of PositionInfo */
-    std::pair<double, TVector3> simpleLineFit3D(const std::vector<PositionInfo*>* hits);
+    std::pair<double, TVector3> simpleLineFit3D(const std::vector<PositionInfo*>* hits, bool useBackwards = false, double setMomentumMagnitude = 0);
 
-    /** producing a reasonable guess for the pT of the tracklet */
+    /** if simpleLineFit3D has been executed before, this getter returns the estimated values using an array. At position0: slopeYest, 1: interceptYest, 2: slopeZest: 3: interceptZest. Else values are 0 */
+    std::vector<double> getStraightLineFitResults() { return m_lineParameters; }
+//    /** straight line fit (2D only) expecting the hits stored in a vector of PositionInfo. indexFixValue is the index of the value (x=1,y=2,z=3) where no errors are assumed, indexMeasuredValue is the index of the values which were 'measured' and therefore there are measurement errors in the hitSigma (same index). It is not allowed to use the same index for both entries -> B2FATAL. Return value: .first is chi2-value of fit, .second is slope for fit */
+//    std::pair<double, double> simpleLineFit2D(const std::vector<PositionInfo*>* hits, int indexFixValue, int indexMeasuredValue);
+
+    /** producing a reasonable guess for the pT of the tracklet, not compatible with setups of very small values for magnetic field */
     double calcPt() {
       if (m_radius < 0.001) { m_chi2 = circleFit(); }
       if (m_radius < 0.001) { return 0.; }
@@ -98,6 +113,7 @@ namespace Belle2 {
     double m_radius; /**< stores radius of tracklet-circle */
     double m_chi2; /**< stores chi2 of tracklet-circle */
     int m_numHits; /**< stores number of hits for some speed optimizations */
+    std::vector<double> m_lineParameters; /**< position0: slopeYest, 1: interceptYest, 2: slopeZest: 3: interceptZest */
     ThreeHitFilters m_3hitFilterBox; /**< instance of ThreeHitFilters-class used for some internal calculations */
 
   }; //end class TrackletFilters

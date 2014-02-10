@@ -534,8 +534,6 @@ std::pair<double, TVector3> TrackletFilters::helixFit(const std::vector<Position
   vectorToSecondHit.SetZ(0);
 
 
-
-//   pVector.SetZ(pZ); // now that track carries full momentum
   if (((useBackwards == true) && (vectorToSecondHit.Angle(pVector) < M_PI * 0.5)) || ((useBackwards == false) && (vectorToSecondHit.Angle(pVector) > M_PI * 0.5))) { pVector *= -1.; }
   pVector.SetZ(-pZ); // now that track carries full momentum
 
@@ -709,9 +707,9 @@ std::pair<double, TVector3> TrackletFilters::helixFit(const std::vector<Position
 
 
 
-pair<double, TVector3> TrackletFilters::simpleLineFit3D(const vector<PositionInfo*>* hits)
+pair<double, TVector3> TrackletFilters::simpleLineFit3D(const vector<PositionInfo*>* hits, bool useBackwards, double setMomentumMagnitude)
 {
-  /**
+  /** Testbeam:
    * Coords:   Sensors:
    * ^        ./| ./| ./|
    * |   ^    | | | | | |
@@ -720,57 +718,80 @@ pair<double, TVector3> TrackletFilters::simpleLineFit3D(const vector<PositionInf
    * -------> X
    *
    * beam parallel to x. Measurement errors in y & z (v&u)
-   * With these conditions, the following approach using 2 independent 2D line fits is acceptable (if rotation is the same for all sensors)
+   * With these conditions, the following approach using 2 independent 2D line fits is acceptable (if rotation is the same for all sensors):
+   * Modells:
+   * Y_i = a*X_i + b        Z_i = c*X_i + d
    * */
-  double chi2 = 0;
+
   TVector3 directionVector;
-  TVector3 meanVal; // xBar, yBar, zBar
-  double SSxy = 0, SSxz = 0, SSyy = 0, SSzz = 0; // sum of squares -> SSxy = Sum(x*y)^2 - n*xBar*yBar
-  double a = 0, b = 0, c = 0, d = 0; // parameters to be estimated (2 2D fits -> 4 parameters), x1 = a + b*y    x2 = d + c*z
-  double chi2xy = 0, chi2xz = 0; // two fits mean two chi2-values, later they can be added
-  int nHits = hits->size();
+  double Wyi = 0, // weight for Yi
+         Wzi = 0, // weight for Zi
+         sumWyi = 0, // sum of weights for Yi
+         sumWzi = 0, // sum of weights for Zi
+         sumWyiXi = 0, // sum of (y-weights times x-values)
+         sumWziXi = 0, // sum of (z-weights times x-values)
+         sumWyiYi = 0, // sum of (y-weights times y-values)
+         sumWziZi = 0, // sum of (z-weights times z-values)
+         sumWyiXiYi = 0, // sum of (y-weights times x-values times y-values)
+         sumWziXiZi = 0, // sum of (z-weights times x-values times z-values)
+         sumWyiXi2 = 0, // sum of (y-weights times x-values^2)
+         sumWziXi2 = 0, // sum of (z-weights times x-values^2)
+         detValY = 0, // determinant for norming values - y
+         detValZ = 0, // determinant for norming values - z
+         slopeY = 0, // = a of model
+         slopeZ = 0, // = c of model
+         chi2 = 0, // final chi2-value of fit
+         interceptY = 0, // b of model, needed only for chi2-calculation
+         interceptZ = 0; // d of model, needed only for chi2-calculation
 
+  // NOTE: this approach is not optimal. Maybe can be optimized for less redundancy
   for (const PositionInfo * aHit : *hits) {
-    meanVal += aHit->hitPosition;
-  }
-  meanVal *= (1. / double(nHits));
+    Wyi = (1. / (aHit->hitSigma.Y() * aHit->hitSigma.Y()));
+    Wzi = (1. / (aHit->hitSigma.Z() * aHit->hitSigma.Z()));
 
-  for (const PositionInfo * aHit : *hits) {
-    SSxy += aHit->hitPosition.X() * aHit->hitPosition.Y();
-  }
-  for (const PositionInfo * aHit : *hits) {
-    SSxz += aHit->hitPosition.X() * aHit->hitPosition.Z();
-  }
-  for (const PositionInfo * aHit : *hits) {
-    SSyy += aHit->hitPosition.Y() * aHit->hitPosition.Y();
-  }
-  for (const PositionInfo * aHit : *hits) {
-    SSzz += aHit->hitPosition.Z() * aHit->hitPosition.Z();
-  }
+    sumWyi += Wyi;
+    sumWzi += Wzi;
 
-  SSxy -= nHits * meanVal.X() * meanVal.Y();
-  SSxz -= nHits * meanVal.X() * meanVal.Z();
-  SSyy -= nHits * meanVal.Y() * meanVal.Y();
-  SSzz -= nHits * meanVal.Z() * meanVal.Z();
+    sumWyiXi += Wyi * aHit->hitPosition.X();
+    sumWziXi += Wzi * aHit->hitPosition.X();
 
-  // now we use the values from above to calculate parameters for the two 2D-fits:
-  b = SSxy / SSyy;
-  c = SSxz / SSzz;
-  a = meanVal.X() - b * meanVal.Y();
-  d = meanVal.X() - d * meanVal.Z();
+    sumWyiYi += Wyi * aHit->hitPosition.Y();
+    sumWziZi += Wzi * aHit->hitPosition.Z();
 
-  // now calculating the chi2s independently...
-  for (const PositionInfo * aHit : *hits) {
-    chi2xy += (aHit->hitPosition.X() - a - b * aHit->hitPosition.Y()) * (aHit->hitPosition.X() - a - b * aHit->hitPosition.Y()) / aHit->sigmaU;
+    sumWyiXiYi += Wyi * aHit->hitPosition.X() * aHit->hitPosition.Y();
+    sumWziXiZi += Wzi * aHit->hitPosition.X() * aHit->hitPosition.Z();
+
+    sumWyiXi2 += Wyi * aHit->hitPosition.X() * aHit->hitPosition.X();
+    sumWziXi2 += Wzi * aHit->hitPosition.X() * aHit->hitPosition.X();
   }
 
-  for (const PositionInfo * aHit : *hits) {
-    chi2xz += (aHit->hitPosition.Z() - d - c * aHit->hitPosition.Z()) * (aHit->hitPosition.Z() - d - c * aHit->hitPosition.Z()) / aHit->sigmaV;
+  detValY = sumWyiXi2 * sumWyi - sumWyiXi * sumWyiXi;
+  detValY = 1. / detValY; // invert
+
+  detValZ = sumWziXi2 * sumWzi - sumWziXi * sumWziXi;
+  detValZ = 1. / detValZ; // invert
+
+  slopeY = detValY * (sumWyi * sumWyiXiYi  -  sumWyiXi * sumWyiYi);
+  slopeZ = detValZ * (sumWzi * sumWziXiZi  -  sumWziXi * sumWziZi);
+
+  interceptY = detValY * (- sumWyiXi * sumWyiXiYi  +  sumWyiXi2 * sumWyiYi);
+  interceptZ = detValZ * (- sumWziXi * sumWziXiZi  +  sumWziXi2 * sumWziZi);
+
+  for (const PositionInfo * aHit : *hits) { // chi2 of xy-fit and of xz-fit can be combined by adding their values
+    chi2 += pow(((aHit->hitPosition.Y() - slopeY * aHit->hitPosition.X() - interceptY) / aHit->hitSigma.Y()) , 2)
+            + pow(((aHit->hitPosition.Z() - slopeZ * aHit->hitPosition.X() - interceptZ) / aHit->hitSigma.Z()) , 2);
   }
+
+  m_lineParameters = {slopeY, interceptY, slopeZ, interceptZ}; // storing values for validation
+
+  directionVector.SetXYZ(1, slopeY, slopeZ);
+
+  if (useBackwards == true) { directionVector *= -1.; } // TODO: check that...
+
+  if (setMomentumMagnitude != 0) { directionVector = setMomentumMagnitude * directionVector.Unit(); } // means we want to set the magnitude of the momentum artificially
 
   return make_pair(chi2, directionVector);
 }
-
 
 /*
  NOTE: old version for calculating momentum seed (maybe fallback?)

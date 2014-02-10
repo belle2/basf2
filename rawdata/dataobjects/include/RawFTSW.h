@@ -84,6 +84,9 @@ namespace Belle2 {
     //! get a word cotaining run # and subrun #
     int GetRunNoSubRunNo(int n);
 
+    //! Get Exp #
+    int GetExpNo(int n);
+
     //! DESY test only
     int Get15bitTLUTag(int n);
 
@@ -174,6 +177,13 @@ namespace Belle2 {
     return ((unsigned int)(m_buffer[ GetBufferPos(n) + POS_EXP_RUN_NO ]) &
             (RUNNO_MASK | SUBRUNNO_MASK));
   }
+
+  inline int RawFTSW::GetExpNo(int n)
+  {
+    return (((unsigned int)(m_buffer[ GetBufferPos(n) + POS_EXP_RUN_NO ]) & EXP_MASK)
+            >> EXP_SHIFT);
+  }
+
 }
 
 #endif

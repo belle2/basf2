@@ -77,6 +77,9 @@ namespace Belle2 {
     if (m_method == "NeuroBayes") {
       gPluginMgr->AddHandler("TMVA@@MethodBase", ".*_NeuroBayes.*", "TMVA::MethodNeuroBayes", "TMVANeuroBayes", "MethodNeuroBayes(DataSetInfo&,TString)");
       gPluginMgr->AddHandler("TMVA@@MethodBase", ".*NeuroBayes.*", "TMVA::MethodNeuroBayes", "TMVANeuroBayes",  "MethodNeuroBayes(TString&,TString&,DataSetInfo&,TString&)");
+    } else if (m_method == "Parallel") {
+      gPluginMgr->AddHandler("TMVA@@MethodBase", ".*_Parallel.*", "TMVA::MethodParallel", "TMVAParallel", "MethodParallel(DataSetInfo&,TString)");
+      gPluginMgr->AddHandler("TMVA@@MethodBase", ".*Parallel.*", "TMVA::MethodParallel", "TMVAParallel",  "MethodParallel(TString&,TString&,DataSetInfo&,TString&)");
     }
     if (!m_reader->BookMVA(m_method, weightfile)) {
       B2FATAL("Could not set up expert! Please see preceding error message from TMVA!");

@@ -34,6 +34,18 @@ namespace Belle2 {
       gPluginMgr->AddHandler("TMVA@@MethodBase", ".*_NeuroBayes.*", "TMVA::MethodNeuroBayes", "TMVANeuroBayes", "MethodNeuroBayes(DataSetInfo&,TString)");
       gPluginMgr->AddHandler("TMVA@@MethodBase", ".*NeuroBayes.*", "TMVA::MethodNeuroBayes", "TMVANeuroBayes",  "MethodNeuroBayes(TString&,TString&,DataSetInfo&,TString&)");
       m_type = TMVA::Types::kPlugins;
+    } else if (type == "MTBDT") {
+      gPluginMgr->AddHandler("TMVA@@MethodBase", ".*_MTBDT.*", "TMVA::MethodMTBDT", "TMVAMTBDT", "MethodMTBDT(DataSetInfo&,TString)");
+      gPluginMgr->AddHandler("TMVA@@MethodBase", ".*MTBDT.*", "TMVA::MethodMTBDT", "TMVAMTBDT",  "MethodMTBDT(TString&,TString&,DataSetInfo&,TString&)");
+      m_type = TMVA::Types::kPlugins;
+    } else if (type == "MPBDT") {
+      gPluginMgr->AddHandler("TMVA@@MethodBase", ".*_MPBDT.*", "TMVA::MethodMPBDT", "TMVAMPBDT", "MethodMPBDT(DataSetInfo&,TString)");
+      gPluginMgr->AddHandler("TMVA@@MethodBase", ".*MPBDT.*", "TMVA::MethodMPBDT", "TMVAMPBDT",  "MethodMPBDT(TString&,TString&,DataSetInfo&,TString&)");
+      m_type = TMVA::Types::kPlugins;
+    } else if (type == "OwnBDT") {
+      gPluginMgr->AddHandler("TMVA@@MethodBase", ".*_OwnBDT.*", "TMVA::MethodOwnBDT", "TMVAOwnBDT", "MethodOwnBDT(DataSetInfo&,TString)");
+      gPluginMgr->AddHandler("TMVA@@MethodBase", ".*OwnBDT.*", "TMVA::MethodOwnBDT", "TMVAOwnBDT",  "MethodOwnBDT(TString&,TString&,DataSetInfo&,TString&)");
+      m_type = TMVA::Types::kPlugins;
     } else {
       m_type = TMVA::Types::Instance().GetMethodType(type);
     }
@@ -57,7 +69,7 @@ namespace Belle2 {
     // Get Pointer to VariableManager::Var for the provided target name
     const VariableManager::Var* targetVar =  manager.getVariable(target);
     if (targetVar == nullptr) {
-      B2ERROR("Couldn't find variable " << targetVar << " via the VariableManager. Check the name!")
+      B2ERROR("Couldn't find target variable " << target << " via the VariableManager. Check the name!")
     }
     m_target = {targetVar, 0};
 

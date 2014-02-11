@@ -33,11 +33,10 @@ namespace Belle2 {
   REG_MODULE(HistMaker)
 
 
-  HistMakerModule::HistMakerModule() : Module(), m_truth(nullptr), m_outputFile(nullptr)
+  HistMakerModule::HistMakerModule() : m_truth(nullptr)
   {
     setDescription("Writes out signal and background distributions for given variables and given reconstructed ParticleLists.");
-    // We use root TFile, this is propably not usable for parallel processsing
-    //setPropertyFlags(c_ParallelProcessingCertified);
+    setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInMain);
 
     // Add parameters
     std::vector<std::string> defaultList;
@@ -56,6 +55,8 @@ namespace Belle2 {
 
   void HistMakerModule::initialize()
   {
+
+    setFilename(m_identifierName);
 
     VariableManager& manager = VariableManager::Instance();
 
@@ -110,8 +111,6 @@ namespace Belle2 {
       }
     }
 
-    m_outputFile = TFile::Open((m_identifierName).c_str() , "RECREATE");
-
   }
 
 
@@ -123,10 +122,8 @@ namespace Belle2 {
   {
   }
 
-  void HistMakerModule::terminate()
+  void HistMakerModule::writeHists()
   {
-
-    m_outputFile->cd();
 
     for (auto & pair : m_hists) {
       for (auto & hist : pair.second) {
@@ -142,7 +139,12 @@ namespace Belle2 {
       }
     }
 
-    m_outputFile->Close();
+  }
+
+  void HistMakerModule::terminate()
+  {
+
+    saveHists();
 
     for (auto & pair : m_hists) {
       for (auto & hist : pair.second) {

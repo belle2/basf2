@@ -10,7 +10,7 @@
 #pragma once
 
 #include <analysis/utility/VariableManager.h>
-#include <framework/core/Module.h>
+#include <framework/pcore/HistModule.h>
 
 #include <map>
 #include <string>
@@ -27,7 +27,7 @@ namespace Belle2 {
    * This module creates Histogramm for given variables registered in VariableManager
    */
 
-  class HistMakerModule : public Module {
+  class HistMakerModule : public HistModule {
   public:
 
     /**
@@ -70,6 +70,8 @@ namespace Belle2 {
      */
     void printModuleParams() const;
 
+    virtual void writeHists();
+
   private:
 
     typedef std::tuple<std::string, int, double, double> Range; /**< Tuple holding name, amount of bins, lower and upper boundary of a histogram */
@@ -86,7 +88,6 @@ namespace Belle2 {
     std::vector< const VariableManager::Var* > m_variables; /**< Pointers to the input variables */
     std::vector< float > m_values; /**< Vector for saving the current values of the input variables */
     const VariableManager::Var* m_truth; /**< Pointer to the truth variables: >0.5 is signal, <0.5 is background */
-    TFile* m_outputFile; /**< The output file stores all generated histograms */
 
   };
 

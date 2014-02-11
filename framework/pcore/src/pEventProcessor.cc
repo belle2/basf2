@@ -14,6 +14,7 @@
 #include <framework/pcore/RingBuffer.h>
 #include <framework/pcore/RxModule.h>
 #include <framework/pcore/TxModule.h>
+#include <framework/pcore/HistModule.h>
 
 #include <signal.h>
 #include <sys/wait.h>
@@ -170,6 +171,7 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
     exit(0);
   }
 
+
   // 6. Framework process
   if (m_procHandler->isFramework()) {
     //ignore some signals for framework (mother) process, so only child processes will handle them
@@ -216,6 +218,8 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
     }
     m_procHandler->wait_output_server();
     B2INFO("All processes completed");
+
+    HistModule::mergeFiles();
 
     // 6.5 Remove all ring buffers
     for (std::vector<RingBuffer*>::iterator it = m_rbinlist.begin();

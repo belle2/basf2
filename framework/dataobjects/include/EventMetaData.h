@@ -185,7 +185,7 @@ namespace Belle2 {
      */
     unsigned long m_experiment;
 
-    /** Time in ns.
+    /** Time in ns since epoch (1970-01-01).
      */
     unsigned long long int m_time;
 

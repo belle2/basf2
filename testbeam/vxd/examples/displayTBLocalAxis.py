@@ -144,11 +144,11 @@ class DisplayAxis(Module):
                         pixelDirV, ROOT.kYellow)
                     print str(PlaneOK) + ':' + SensorID + ', dir U, pitch ' \
                         + str(info.getUPitch() * 10000) + 'um, size ' + \
-                        str(info.getUSize() * 20) + ' mm, pixels ' + \
+                        str(info.getUSize() * 10) + ' mm, pixels ' + \
                         str(info.getUCells())
                     print str(PlaneOK) + ':' + SensorID + ', dir V, pitch ' + \
                         str(info.getVPitch() * 10000) + 'um, size ' + \
-                        str(info.getVSize() * 20) + ' mm, pixels ' + \
+                        str(info.getVSize() * 10) + ' mm, pixels ' + \
                         str(info.getVCells())
             Plane += 1
 

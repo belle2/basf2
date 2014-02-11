@@ -23,6 +23,48 @@ namespace Belle2 {
 
   };
 
+  /** create a more or less complex RelationContainer. */
+  RelationContainer* createObject()
+  {
+    RelationContainer* relCont = new RelationContainer;
+    relCont->setFromName("a");
+    relCont->setToName("b");
+    relCont->setFromDurability(DataStore::c_Event);
+    relCont->setToDurability(DataStore::c_Event);
+    TClonesArray& relations = relCont->elements();
+    //let's make this a bit larger (very small objects are never compressed)
+    for (int i = 0; i < 100; i++)
+      new(relations.AddrAt(relations.GetLast() + 1)) RelationElement(0, i + 1, 42.0);
+
+    return relCont;
+  }
+
+  /** common content checks for RelationContainer. */
+  void checkObject(const RelationContainer* rel)
+  {
+    EXPECT_TRUE(rel != NULL);
+    EXPECT_TRUE(rel->getFromName() == "a");
+    EXPECT_TRUE(rel->getToName() == "b");
+    EXPECT_EQ(rel->getEntries(), 100);
+    for (int i = 0; i < 100; i++) {
+      EXPECT_EQ(rel->elements(i).getToIndex(0), (unsigned int)(i + 1));
+      EXPECT_DOUBLE_EQ(rel->elements(i).getWeight(0), 42.0);
+    }
+  }
+
+  /** common content checks for data retrieved from Gearbox. */
+  void checkGbContents()
+  {
+    Gearbox& gb = Gearbox::getInstance();
+
+    checkObject(dynamic_cast<const RelationContainer*>(gb.getTObject("/A/RelationContainer")));
+
+    //Access from GearDir should work
+    GearDir detector("/A/");
+    checkObject(dynamic_cast<const RelationContainer*>(detector.getTObject("RelationContainer")));
+  }
+
+
   /** Check XML conversion. */
   TEST_F(StreamTest, XML)
   {
@@ -38,31 +80,18 @@ namespace Belle2 {
     EXPECT_TRUE(*v2 == v);
 
     //something more complex
-    RelationContainer* relCont = new RelationContainer;
-    relCont->setFromName("a");
-    relCont->setToName("b");
-    relCont->setFromDurability(DataStore::c_Event);
-    relCont->setToDurability(DataStore::c_Event);
-    TClonesArray& relations = relCont->elements();
-    //let's make this a bit larger (very small objects are never compressed)
-    for (int i = 0; i < 100; i++)
-      new(relations.AddrAt(relations.GetLast() + 1)) RelationElement(0, i + 1, 42.0);
+    RelationContainer* relCont = createObject();
 
     std::string relStr = Stream::serializeXML(relCont);
     //B2INFO(relStr);
     obj = Stream::deserializeXML(relStr);
-    const RelationContainer* relCont2 = dynamic_cast<const RelationContainer*>(obj);
-    EXPECT_TRUE(relCont2 != NULL);
-    EXPECT_EQ(relCont2->getEntries(), 100);
-    EXPECT_EQ(relCont2->elements(0).getToIndex(0), 1u);
-    EXPECT_DOUBLE_EQ(relCont2->elements(0).getWeight(0), 42.0);
+    checkObject(dynamic_cast<const RelationContainer*>(obj));
 
     //creating file for next test..
     /*
     std::ofstream file("object.xml");
     file << Stream::escapeXML(relStr);
     */
-
 
     //try converting something broken
     obj = Stream::deserializeXML("this is not actually XML!");
@@ -83,24 +112,12 @@ namespace Belle2 {
     EXPECT_TRUE(*v2 == v);
 
     //something more complex
-    RelationContainer* relCont = new RelationContainer;
-    relCont->setFromName("a");
-    relCont->setToName("b");
-    relCont->setFromDurability(DataStore::c_Event);
-    relCont->setToDurability(DataStore::c_Event);
-    TClonesArray& relations = relCont->elements();
-    //let's make this a bit larger (very small objects are never compressed)
-    for (int i = 0; i < 100; i++)
-      new(relations.AddrAt(relations.GetLast() + 1)) RelationElement(0, i + 1, 42.0);
+    RelationContainer* relCont = createObject();
 
     std::string relStr = Stream::serializeAndEncode(relCont);
     //B2INFO(relStr);
     obj = Stream::deserializeEncodedRawData(relStr);
-    const RelationContainer* relCont2 = dynamic_cast<const RelationContainer*>(obj);
-    EXPECT_TRUE(relCont2 != NULL);
-    EXPECT_EQ(relCont2->getEntries(), 100);
-    EXPECT_EQ(relCont2->elements(0).getToIndex(0), 1u);
-    EXPECT_DOUBLE_EQ(relCont2->elements(0).getWeight(0), 42.0);
+    checkObject(dynamic_cast<const RelationContainer*>(obj));
 
     //creating file for next test..
     /*
@@ -113,27 +130,6 @@ namespace Belle2 {
     TObject* broken_obj = Stream::deserializeEncodedRawData(truncated);
     EXPECT_TRUE(broken_obj == NULL);
   }
-
-  void checkGbContents()
-  {
-    Gearbox& gb = Gearbox::getInstance();
-
-    const RelationContainer* relCont2 = dynamic_cast<const RelationContainer*>(gb.getTObject("/A/RelationContainer"));
-    EXPECT_TRUE(relCont2 != NULL);
-    EXPECT_EQ(relCont2->getEntries(), 100);
-    EXPECT_EQ(relCont2->elements(0).getToIndex(0), 1u);
-    EXPECT_DOUBLE_EQ(relCont2->elements(0).getWeight(0), 42.0);
-
-    //Access from GearDir should work
-    GearDir detector("/A/");
-    relCont2 = dynamic_cast<const RelationContainer*>(detector.getTObject("RelationContainer"));
-    EXPECT_TRUE(relCont2 != NULL);
-    EXPECT_EQ(relCont2->getEntries(), 100);
-    EXPECT_EQ(relCont2->elements(0).getToIndex(0), 1u);
-    EXPECT_DOUBLE_EQ(relCont2->elements(0).getWeight(0), 42.0);
-  }
-
-
   /** Read things from gearbox. */
   TEST_F(StreamTest, GearboxXML)
   {

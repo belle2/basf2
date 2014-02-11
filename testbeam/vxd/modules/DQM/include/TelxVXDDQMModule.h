@@ -101,6 +101,8 @@ namespace Belle2 {
     std::string m_histogramDirectoryName; /**< Name of the ROOT file directory for these histograms */
 
     int m_SwapAxis;     /**< 0: u<->u, 1: u<->v correlations */
+    int m_UseSP;        /**< 1: use space points for hitmaps and correlations */
+    std::vector<int> m_ModulesForCheck; /**< List of modules for check in order as is below: */
     int m_DUTPXD;       /**< PXD for correlations: 3,4 */
     int m_DUTSVDFwd;    /**< forward SVD for correlations: 5..8 */
     int m_DUTSVDBwd;    /**< backward SVD for correlations: 5..8 */

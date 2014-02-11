@@ -42,6 +42,25 @@ TelxVXDModule::TelxVXDModule() : HistoModule()
   addParam("Clusters", m_storeTelClustersName, "Name of the telescopes cluster collection",
            std::string("TelClusters")); // always be explicit about this, can cause trouble
   addParam("histgramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed", std::string("tel-vxd"));
+
+  //----------------------------------------------------------------
+  // define setting options for correlations
+  //----------------------------------------------------------------
+
+  // Externally possible to set swapping of axes for correlations and change unit from local [pitch unit] to space points [cm]
+  m_SwapAxis = 0;  /**< [0] 0: u<->u, 1: u<->v correlations */
+  addParam("SwapAxesUV", m_SwapAxis, "Swap of axes between u and v", m_SwapAxis);
+  m_UseSP = 0;     /**< 1: use space points for hitmaps and correlations */
+  addParam("UseSpacePoints", m_UseSP, "Use space points for correlations", m_UseSP);
+  // Externally possible to set modules for correlations
+  m_ModulesForCheck = {4, 5, 8, 2, 9};
+  addParam("ModuleNrsForCheck", m_ModulesForCheck, "Numbering of modules for correlations", m_ModulesForCheck);
+  m_DUTPXD = m_ModulesForCheck[0];    /**< [4] PXD for correlations: 3,4 */
+  m_DUTSVDFwd = m_ModulesForCheck[1]; /**< [5] forward SVD for correlations: 5..8 */
+  m_DUTSVDBwd = m_ModulesForCheck[2]; /**< [8] backward SVD for correlations: 5..8 */
+  m_DUTTelFwd = m_ModulesForCheck[3]; /**< [2] forward telescope for correlations: 0..2 */
+  m_DUTTelBwd = m_ModulesForCheck[4]; /**< [9] backward telescope for correlations: 9..11 */
+
 }
 
 
@@ -58,17 +77,6 @@ void TelxVXDModule::defineHisto()
   // Create a separate histogram directory and cd into it.
   TDirectory* oldDir = gDirectory;
   oldDir->mkdir(m_histogramDirectoryName.c_str())->cd();
-
-  //----------------------------------------------------------------
-  // define setting options for correlations
-  //----------------------------------------------------------------
-
-  m_SwapAxis = 1;  /**< [0] 0: u<->u, 1: u<->v correlations */
-  m_DUTPXD = 4;    /**< [4] PXD for correlations: 3,4 */
-  m_DUTSVDFwd = 5; /**< [5] forward SVD for correlations: 5..8 */
-  m_DUTSVDBwd = 8; /**< [8] backward SVD for correlations: 5..8 */
-  m_DUTTelFwd = 2; /**< [2] forward telescope for correlations: 0..2 */
-  m_DUTTelBwd = 9; /**< [9] backward telescope for correlations: 9..11 */
 
   //----------------------------------------------------------------
   // Charge of clusters : hClusterCharge[U/V][PlaneNo]

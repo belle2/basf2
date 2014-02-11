@@ -19,7 +19,9 @@ ClassImp(EventMetaData)
 EventMetaData::EventMetaData(unsigned long event, unsigned long run, unsigned long experiment):
   m_event(event),
   m_run(run),
+  m_subrun(0),
   m_experiment(experiment),
+  m_time(0),
   m_parent_index(UINT_MAX),
   m_generated_weight(1.0)
 {}

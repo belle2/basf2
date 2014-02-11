@@ -53,6 +53,9 @@ namespace Belle2 {
      * was ended and which run number we were running on.
      */
     virtual void endRun();
+
+  private:
+    bool m_printTime;  /**< Print time in addition to exp/run/evt numbers. */
   };
 
 }

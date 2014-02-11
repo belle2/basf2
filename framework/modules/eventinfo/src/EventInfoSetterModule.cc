@@ -13,6 +13,7 @@
 #include <framework/core/Environment.h>
 
 #include <vector>
+#include <chrono>
 
 using namespace std;
 using namespace Belle2;
@@ -97,6 +98,8 @@ void EventInfoSetterModule::event()
   m_eventMetaDataPtr->setExperiment(m_expList[m_colIndex]);
   m_eventMetaDataPtr->setRun(m_runList[m_colIndex]);
   m_eventMetaDataPtr->setEvent(m_evtNumber);
+  auto time = std::chrono::high_resolution_clock::now().time_since_epoch();
+  m_eventMetaDataPtr->setTime(std::chrono::duration_cast<std::chrono::nanoseconds>(time).count());
 
   m_evtNumber++;
 }

@@ -45,12 +45,28 @@ namespace Belle2 {
       m_run = run;
     }
 
+    /** Sub run Setter.
+     *
+     *  @param run The number of the current sub run.
+     */
+    void setSubrun(unsigned long subrun) {
+      m_subrun = subrun;
+    }
+
     /** Experiment Setter.
      *
      *  @param experiment The number of the current experiment.
      */
     void setExperiment(unsigned long experiment) {
       m_experiment = experiment;
+    }
+
+    /** Time Setter.
+     *
+     *  @param time The time when the event was recorded.
+     */
+    void setTime(unsigned long long int time) {
+      m_time = time;
     }
 
     /** Marks the end of the data processing.
@@ -97,12 +113,28 @@ namespace Belle2 {
       return m_run;
     }
 
+    /** Sub run Getter.
+     *
+     *  @return The number of the current sub run.
+     */
+    unsigned long getSubrun() const {
+      return m_subrun;
+    }
+
     /** Experiment Getter.
      *
      *  @return The number of the current experiment.
      */
     unsigned long getExperiment() const {
       return m_experiment;
+    }
+
+    /** Time Getter.
+     *
+     *  @return The time when the event was recorded.
+     */
+    unsigned long long int getTime() const {
+      return m_time;
     }
 
     /** Parent Index Getter.
@@ -145,9 +177,17 @@ namespace Belle2 {
      */
     unsigned long m_run;
 
+    /** Sub-run number.
+     */
+    unsigned long m_subrun;
+
     /** Experiment number.
      */
     unsigned long m_experiment;
+
+    /** Time in ns.
+     */
+    unsigned long long int m_time;
 
     /** Index of parent file.
      */
@@ -157,7 +197,7 @@ namespace Belle2 {
      */
     double m_generated_weight;
 
-    ClassDef(EventMetaData, 1); /**< Store event number, run number, and experiment number. */
+    ClassDef(EventMetaData, 2); /**< Store event number, run number, and experiment number. */
   }; //class
 } // namespace Belle2
 #endif // EVENTMETADATA

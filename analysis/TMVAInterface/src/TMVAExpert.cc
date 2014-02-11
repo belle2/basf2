@@ -66,20 +66,23 @@ namespace Belle2 {
         continue;
       }
       m_input.insert(std::make_pair(x, 0));
+      m_reader->AddVariable(x->name, &m_input[x]);
     }
 
-    // Add variables to the reader, the readers expects that the variable values are stored in m_inputProxy
-    for (auto & pair : m_input) {
-      m_reader->AddVariable(pair.first->name, &pair.second);
-    }
 
     // For the NeuroBayes method we load the TMVA::NeuroBayes interface at runtime as via the TPluginManager of ROOT
     if (m_method == "NeuroBayes") {
       gPluginMgr->AddHandler("TMVA@@MethodBase", ".*_NeuroBayes.*", "TMVA::MethodNeuroBayes", "TMVANeuroBayes", "MethodNeuroBayes(DataSetInfo&,TString)");
       gPluginMgr->AddHandler("TMVA@@MethodBase", ".*NeuroBayes.*", "TMVA::MethodNeuroBayes", "TMVANeuroBayes",  "MethodNeuroBayes(TString&,TString&,DataSetInfo&,TString&)");
-    } else if (m_method == "Parallel") {
-      gPluginMgr->AddHandler("TMVA@@MethodBase", ".*_Parallel.*", "TMVA::MethodParallel", "TMVAParallel", "MethodParallel(DataSetInfo&,TString)");
-      gPluginMgr->AddHandler("TMVA@@MethodBase", ".*Parallel.*", "TMVA::MethodParallel", "TMVAParallel",  "MethodParallel(TString&,TString&,DataSetInfo&,TString&)");
+    } else if (m_method == "MTBDT") {
+      gPluginMgr->AddHandler("TMVA@@MethodBase", ".*_MTBDT.*", "TMVA::MethodMTBDT", "TMVAMTBDT", "MethodMTBDT(DataSetInfo&,TString)");
+      gPluginMgr->AddHandler("TMVA@@MethodBase", ".*MTBDT.*", "TMVA::MethodMTBDT", "TMVAMTBDT",  "MethodMTBDT(TString&,TString&,DataSetInfo&,TString&)");
+    } else if (m_method == "MPBDT") {
+      gPluginMgr->AddHandler("TMVA@@MethodBase", ".*_MPBDT.*", "TMVA::MethodMPBDT", "TMVAMPBDT", "MethodMPBDT(DataSetInfo&,TString)");
+      gPluginMgr->AddHandler("TMVA@@MethodBase", ".*MPBDT.*", "TMVA::MethodMPBDT", "TMVAMPBDT",  "MethodMPBDT(TString&,TString&,DataSetInfo&,TString&)");
+    } else if (m_method == "OwnBDT") {
+      gPluginMgr->AddHandler("TMVA@@MethodBase", ".*_OwnBDT.*", "TMVA::MethodOwnBDT", "TMVAOwnBDT", "MethodOwnBDT(DataSetInfo&,TString)");
+      gPluginMgr->AddHandler("TMVA@@MethodBase", ".*OwnBDT.*", "TMVA::MethodOwnBDT", "TMVAOwnBDT",  "MethodOwnBDT(TString&,TString&,DataSetInfo&,TString&)");
     }
     if (!m_reader->BookMVA(m_method, weightfile)) {
       B2FATAL("Could not set up expert! Please see preceding error message from TMVA!");

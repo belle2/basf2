@@ -152,13 +152,12 @@ void TrackingAction::PostUserTrackingAction(const G4Track* track)
     //If the track is just suspended we can return here: the rest should be filled once the track is done
     if (track->GetTrackStatus() == fSuspend) return;
 
-    //Check if particle left detector.
-    //fWorldBoundary seems to be broken, check if poststep is on boundary and next volume is 0
-    if (postStep->GetStepStatus() == fGeomBoundary && track->GetNextVolume() == NULL) {
+    //Check if particle left the detector/simulation volume.
+    if (postStep->GetStepStatus() == fWorldBoundary) {
       currParticle.addStatus(MCParticle::c_LeftDetector);
     }
 
-    //Check if particle was stopped in the detector
+    //Check if particle was stopped in the detector/simulation volume
     if (track->GetKineticEnergy() <= 0.0) {
       currParticle.addStatus(MCParticle::c_StoppedInDetector);
     }

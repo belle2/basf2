@@ -30,7 +30,6 @@
 #include <genfit/MaterialEffects.h>
 #include <genfit/TGeoMaterialInterface.h>
 #include <genfit/StateOnPlane.h>
-#include <genfit/KalmanFitStatus.h>
 
 #include <TFile.h>
 #include <TGeoManager.h>
@@ -417,7 +416,7 @@ void DedxPIDModule::event()
             dedxTrack->m_dedx_avg[c_CDC] += layer_dedx;
             dedxTrack->addDedx(current_layer, total_distance, layer_dedx);
             if (!m_pdfFile.empty() and m_useIndividualHits) {
-              saveLogLikelihood(dedxTrack->m_logl, dedxTrack->m_p, layer_dedx, m_pdfs[c_CDC]);
+              saveLogLikelihood(dedxTrack->m_cdcLogl, dedxTrack->m_p, layer_dedx, m_pdfs[c_CDC]);
             }
           }
 
@@ -465,7 +464,8 @@ void DedxPIDModule::event()
         if (!detectorEnabled(static_cast<Detector>(detector)))
           continue; //unwanted detector
 
-        saveLogLikelihood(dedxTrack->m_logl, dedxTrack->m_p, dedxTrack->m_dedx_avg_truncated[detector], m_pdfs[detector]);
+        saveLogLikelihood((detector == c_CDC) ? dedxTrack->m_cdcLogl : dedxTrack->m_svdLogl,
+                          dedxTrack->m_p, dedxTrack->m_dedx_avg_truncated[detector], m_pdfs[detector]);
       }
     }
 
@@ -480,7 +480,7 @@ void DedxPIDModule::event()
 
     //save DedxLikelihood
     if (!m_pdfFile.empty()) {
-      DedxLikelihood* likelihoodObj = likelihood_array.appendNew(dedxTrack->m_logl);
+      DedxLikelihood* likelihoodObj = likelihood_array.appendNew(dedxTrack->m_cdcLogl, dedxTrack->m_svdLogl);
       track->addRelationTo(likelihoodObj);
     }
   } //end loop over tracks
@@ -626,7 +626,7 @@ template <class HitClass> void DedxPIDModule::saveSiHits(DedxTrack* track, const
       track->m_dedx_avg[current_detector] += dedx;
       track->addDedx(layer, total_distance, dedx);
       if (!m_pdfFile.empty() and m_useIndividualHits) {
-        saveLogLikelihood(track->m_logl, track->m_p, dedx, m_pdfs[current_detector]);
+        saveLogLikelihood(track->m_svdLogl, track->m_p, dedx, m_pdfs[current_detector]);
       }
     } else {
       B2WARNING("dE/dx is zero in layer " << layer);

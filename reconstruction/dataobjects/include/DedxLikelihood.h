@@ -17,8 +17,6 @@
 #include <string>
 #include <cmath>
 
-class TH1F;
-
 namespace Belle2 {
   /** Container for likelihoods obtained by the dE/dx PID (DedxPIDModule).
    */
@@ -28,19 +26,21 @@ namespace Belle2 {
     DedxLikelihood(): RelationsObject() {
       //for all particles
       for (unsigned int i = 0; i < Const::ChargedStable::c_SetSize; i++) {
-        m_logl[i] = 0.0;
+        m_cdcLogl[i] = 0.0;
+        m_svdLogl[i] = 0.0;
       }
     }
 
     /** actually const float (&logl)[Const::ChargedStable::c_SetSize], but CINT complains. */
-    DedxLikelihood(const float* logl): RelationsObject() {
+    DedxLikelihood(const float* cdcLogl, const float* svdLogl): RelationsObject() {
       //for all particles
       for (unsigned int i = 0; i < Const::ChargedStable::c_SetSize; i++) {
-        m_logl[i] = logl[i];
+        m_cdcLogl[i] = cdcLogl[i];
+        m_svdLogl[i] = svdLogl[i];
       }
     }
 
-    /** returns unnormalised log-likelihood value for a particle hypothesis.
+    /** returns unnormalised log-likelihood value for a particle hypothesis using CDC information.
      *
      * This can be used for classifications using the ratio
      * \f$ \mathcal{L}_m / \mathcal{L}_n \f$ of the likelihoods for two
@@ -48,18 +48,25 @@ namespace Belle2 {
      *
      * @param type  The desired particle hypothesis.
      */
-    float getLogLikelihood(const Const::ChargedStable& type) const { return m_logl[type.getIndex()]; }
+    float getCDCLogLikelihood(const Const::ChargedStable& type) const { return m_cdcLogl[type.getIndex()]; }
 
-    /** returns exp(getLogLikelihood(type)) with sufficient precision. */
-    double getLikelihood(const Const::ChargedStable& type) const { return exp((double)m_logl[type.getIndex()]); }
+    /** returns exp(getCDCLikelihood(type)) with sufficient precision. */
+    double getCDCLikelihood(const Const::ChargedStable& type) const { return exp((double)m_cdcLogl[type.getIndex()]); }
 
-    /** corresponding setter for m_logl. */
-    void setLogLikelihood(const Const::ChargedStable& type, float logl) { m_logl[type.getIndex()] = logl; }
+    /** returns unnormalised log-likelihood value for a particle hypothesis using SVD (and/or PXD) information.
+     *
+     * @sa getCDCLogLikelihood()
+     */
+    float getSVDLogLikelihood(const Const::ChargedStable& type) const { return m_svdLogl[type.getIndex()]; }
+
+    /** returns exp(getSVDLikelihood(type)) with sufficient precision. */
+    double getSVDLikelihood(const Const::ChargedStable& type) const { return exp((double)m_svdLogl[type.getIndex()]); }
 
   private:
-    float m_logl[Const::ChargedStable::c_SetSize]; /**< log likelihood for each particle, not including momentum prior */
+    float m_cdcLogl[Const::ChargedStable::c_SetSize]; /**< CDC log likelihood for each particle, not including momentum prior */
+    float m_svdLogl[Const::ChargedStable::c_SetSize]; /**< SVD (and/or PXD) log likelihood for each particle, not including momentum prior */
 
-    ClassDef(DedxLikelihood, 3); /**< Container for likelihoods obtained by the dE/dx PID (DedxPIDModule). */
+    ClassDef(DedxLikelihood, 4); /**< Container for likelihoods obtained by the dE/dx PID (DedxPIDModule). */
   };
 }
 #endif

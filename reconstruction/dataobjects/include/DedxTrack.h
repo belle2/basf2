@@ -45,7 +45,8 @@ namespace Belle2 {
 
       //for all particles
       for (unsigned int i = 0; i < Const::ChargedStable::c_SetSize; i++) {
-        m_logl[i] = 0.0;
+        m_cdcLogl[i] = 0.0;
+        m_svdLogl[i] = 0.0;
       }
     }
 
@@ -107,10 +108,10 @@ namespace Belle2 {
     float m_dedx_avg_truncated[Dedx::c_num_detectors]; /**< dEdX averaged for one subdetector, truncated mean */
     float m_dedx_avg_truncated_err[Dedx::c_num_detectors]; /**< standard deviation of m_dedx_avg_truncated */
 
-    float m_logl[Const::ChargedStable::c_SetSize]; /**< log likelihood for each particle, not including momentum prior */
+    float m_cdcLogl[Const::ChargedStable::c_SetSize]; /**< CDC log likelihood for each particle, not including momentum prior */
+    float m_svdLogl[Const::ChargedStable::c_SetSize]; /**< SVD log likelihood for each particle, not including momentum prior */
 
-    /** Build ROOT dictionary. */
-    ClassDef(DedxTrack, 5);
+    ClassDef(DedxTrack, 6); /**< Debug output for DedxPID module. */
   };
 }
 #endif

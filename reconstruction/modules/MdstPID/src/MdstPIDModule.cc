@@ -11,7 +11,6 @@
 #include <reconstruction/modules/MdstPID/MdstPIDModule.h>
 
 // framework - DataStore
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 
@@ -88,7 +87,7 @@ namespace Belle2 {
 
       // append new and set relation
       m_pid = pidLikelihoods.appendNew();
-      DataStore::addRelationFromTo(track, m_pid);
+      track->addRelationTo(m_pid);
 
       // set top likelihoods
       const TOPLikelihood* top = DataStore::getRelated<TOPLikelihood>(track);
@@ -148,8 +147,10 @@ namespace Belle2 {
 
   void MdstPIDModule::setLikelihoods(const DedxLikelihood* logl)
   {
-    for (Const::ParticleType k = Const::chargedStableSet.begin(); k != Const::chargedStableSet.end(); ++k)
-      m_pid->setLogLikelihood(Const::CDC, k, logl->getLogLikelihood(k));
+    for (Const::ParticleType k = Const::chargedStableSet.begin(); k != Const::chargedStableSet.end(); ++k) {
+      m_pid->setLogLikelihood(Const::SVD, k, logl->getSVDLogLikelihood(k));
+      m_pid->setLogLikelihood(Const::CDC, k, logl->getCDCLogLikelihood(k));
+    }
   }
 
 

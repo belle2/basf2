@@ -3,7 +3,6 @@
 #include <TTree.h>
 #include <TF1.h>
 #include <TH2F.h>
-#include <TProfile.h>
 #include <TApplication.h>
 #include <TROOT.h>
 #include <TSystem.h>
@@ -40,13 +39,13 @@ void plot(const TString &input_filename)
   TString logl_strings[num_particles];
   for(int part = 0; part < show_particles; part++) {
     //for this particle, take its likelihood...
-    logl_strings[part] = TString::Format("exp(DedxTracks.m_logl[][%i]) / (", part);
+    logl_strings[part] = TString::Format("exp(DedxTracks.m_cdcLogl[][%i] + DedxTracks.m_svdLogl[][%i]) / (", part, part);
 
     //and divide by summed likelihood of all particles
     for(int i = 0; i < num_particles; i++) {
       if(i!=0)
         logl_strings[part] += " + ";
-      logl_strings[part] += TString::Format("exp(DedxTracks.m_logl[][%i])", i);
+      logl_strings[part] += TString::Format("exp(DedxTracks.m_cdcLogl[][%i] + DedxTracks.m_svdLogl[][%i])", i, i);
     }
     logl_strings[part] += ") ";
     std::cout << logl_strings[part] << "\n";

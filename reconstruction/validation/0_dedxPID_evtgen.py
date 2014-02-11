@@ -5,6 +5,9 @@ import os
 import random
 from basf2 import *
 
+
+print os.getcwd()
+
 # create geometry
 gearbox = register_module('Gearbox')
 geometry = register_module('Geometry')
@@ -36,7 +39,7 @@ main.add_module(dedx)
 
 output = register_module('RootOutput')
 output.param('outputFileName', 'EvtGenSimRec_dedx.root')
-# avoid some issues with missing dictionaries for rktrackrep etc.
+# let's keep this small
 output.param('branchNames', ['DedxLikelihoods', 'DedxTracks', 'EventMetaData'])
 main.add_module(output)
 

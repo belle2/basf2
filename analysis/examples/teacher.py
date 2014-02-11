@@ -63,7 +63,7 @@ teacher = register_module('TMVATeacher')
 teacher.param('identifier', 'TMVA')
 teacher.param('methods', methods)
 teacher.param('variables', variables)
-teacher.param('target', 'truth')
+teacher.param('target', 'isSignal')
 teacher.param('listNames', ['e-'])
 main.add_module(teacher)
 

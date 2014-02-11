@@ -39,7 +39,7 @@ for method in methods:
     histMaker.param('histVariables', [(method + '_Probability', 100, 0, 1),
                     ('p_CMS', 100, 0, 1), ('eid', 100, 0, 1), ('chiProb', 100,
                     0, 1)])
-    histMaker.param('truthVariable', 'truth')
+    histMaker.param('truthVariable', 'isSignal')
     histMaker.param('listNames', ['e-'])
     histMaker.param('make2dHists', True)
     main.add_module(histMaker)

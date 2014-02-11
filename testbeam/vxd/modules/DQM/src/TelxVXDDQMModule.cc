@@ -191,6 +191,12 @@ void TelxVXDModule::defineHisto()
   for (int i = 0; i < 2; i++) {
     string uAxis;
     string vAxis;
+    string Unit;
+    if (m_UseSP) {
+      Unit = str(format("cm"));
+    } else {
+      Unit = str(format("pitch units"));
+    }
     if (i) {
       uAxis = str(format("v"));
       vAxis = str(format("v"));
@@ -207,91 +213,241 @@ void TelxVXDModule::defineHisto()
     }
     int nPixelsU;
     int nPixelsV;
+    float nPixelsExtenzion = 20;
+    int nPixelsUExtend;
+    int nPixelsVExtend;
+    float PixelsUStart;
+    float PixelsUEnd;
+    float PixelsVStart;
+    float PixelsVEnd;
 
     string name = str(format("hCorrelationsTel%1%SVD%2%%3%%4%") % (m_DUTTelFwd + 1) % (m_DUTSVDFwd - 3 + 1) % uAxis.data() % vAxis.data());
     string title = str(format("Corelation Tel%1% SVD%2%, axis %3% %4%") % (m_DUTTelFwd + 1) % (m_DUTSVDFwd - 3 + 1) % uAxis.data() % vAxis.data());
-    string AxisU = str(format("%1% position Tel%2% [pitch units]") % uAxis.data() % (m_DUTTelFwd + 1));
-    string AxisV = str(format("%1% position SVD%2% [pitch units]") % vAxis.data() % (m_DUTSVDFwd - 3 + 1));
+    string AxisU = str(format("%1% position Tel%2% [%3%]") % uAxis.data() % (m_DUTTelFwd + 1) % Unit.data());
+    string AxisV = str(format("%1% position SVD%2% [%3%]") % vAxis.data() % (m_DUTSVDFwd - 3 + 1) % Unit.data());
     if (i) {
       nPixelsU = getInfoTel(m_DUTTelFwd).getVCells();
+      PixelsUEnd = nPixelsU;
+      if (m_UseSP)
+        PixelsUEnd = getInfoTel(m_DUTTelFwd).getVSize();
       nPixelsV = getInfoSVD(m_DUTSVDFwd).getVCells();
+      PixelsVEnd = nPixelsV;
+      if (m_UseSP)
+        PixelsVEnd = getInfoSVD(m_DUTSVDFwd).getVSize();
       if (m_SwapAxis) {
         nPixelsV = getInfoSVD(m_DUTSVDFwd).getUCells();
+        PixelsVEnd = nPixelsV;
+        if (m_UseSP)
+          PixelsVEnd = getInfoSVD(m_DUTSVDFwd).getUSize();
       }
     } else {
       nPixelsU = getInfoTel(m_DUTTelFwd).getUCells();
+      PixelsUEnd = nPixelsU;
+      if (m_UseSP)
+        PixelsUEnd = getInfoTel(m_DUTTelFwd).getUSize();
       nPixelsV = getInfoSVD(m_DUTSVDFwd).getUCells();
-      if (m_SwapAxis)
+      PixelsVEnd = nPixelsV;
+      if (m_UseSP)
+        PixelsVEnd = getInfoSVD(m_DUTSVDFwd).getUSize();
+      if (m_SwapAxis) {
         nPixelsV = getInfoSVD(m_DUTSVDFwd).getVCells();
+        PixelsVEnd = nPixelsV;
+        if (m_UseSP)
+          PixelsVEnd = getInfoSVD(m_DUTSVDFwd).getVSize();
+      }
     }
-    m_correlationsTel3SVD1[i] = new TH2F(name.c_str(), title.c_str(), nPixelsU, 0, nPixelsU, nPixelsV, 0, nPixelsV);
+    nPixelsUExtend = nPixelsU + 2 * nPixelsExtenzion;
+    if (m_UseSP) {
+      PixelsUStart = PixelsUEnd * (-0.5 - nPixelsExtenzion / nPixelsU);
+      PixelsUEnd = - PixelsUStart;
+    } else {
+      PixelsUStart = - nPixelsExtenzion * PixelsUEnd / nPixelsU;
+      PixelsUEnd = PixelsUEnd - PixelsUStart;
+    }
+    nPixelsVExtend = nPixelsV + 2 * nPixelsExtenzion;
+    if (m_UseSP) {
+      PixelsVStart = PixelsVEnd * (-0.5 - nPixelsExtenzion / nPixelsV);
+      PixelsVEnd = - PixelsVStart;
+    } else {
+      PixelsVStart = - nPixelsExtenzion * PixelsVEnd / nPixelsV;
+      PixelsVEnd = PixelsVEnd - PixelsVStart;
+    }
+
+    m_correlationsTel3SVD1[i] = new TH2F(name.c_str(), title.c_str(), nPixelsUExtend, PixelsUStart, PixelsUEnd, nPixelsVExtend, PixelsVStart, PixelsVEnd);
     m_correlationsTel3SVD1[i]->GetXaxis()->SetTitle(AxisU.data());
     m_correlationsTel3SVD1[i]->GetYaxis()->SetTitle(AxisV.data());
     m_correlationsTel3SVD1[i]->GetZaxis()->SetTitle("hits");
 
     name = str(format("hCorrelationsTel%1%SVD%2%%3%%4%") % (m_DUTTelBwd - 6 + 1) % (m_DUTSVDBwd - 3 + 1) % uAxis.data() % vAxis.data());
     title = str(format("Corelation Tel%1% SVD%2%, axis %3% %4%") % (m_DUTTelBwd - 6 + 1) % (m_DUTSVDBwd - 3 + 1) % uAxis.data() % vAxis.data());
-    AxisU = str(format("%1% position Tel%2% [pitch units]") % uAxis.data() % (m_DUTTelBwd - 6 + 1));
-    AxisV = str(format("%1% position SVD%2% [pitch units]") % vAxis.data() % (m_DUTSVDBwd - 3 + 1));
+    AxisU = str(format("%1% position Tel%2% [%3%]") % uAxis.data() % (m_DUTTelBwd - 6 + 1) % Unit.data());
+    AxisV = str(format("%1% position SVD%2% [%3%]") % vAxis.data() % (m_DUTSVDBwd - 3 + 1) % Unit.data());
     if (i) {
       nPixelsU = getInfoTel(m_DUTTelBwd).getVCells();
+      PixelsUEnd = nPixelsU;
+      if (m_UseSP)
+        PixelsUEnd = getInfoTel(m_DUTTelBwd).getVSize();
       nPixelsV = getInfoSVD(m_DUTSVDBwd).getVCells();
-      if (m_SwapAxis)
+      PixelsVEnd = nPixelsV;
+      if (m_UseSP)
+        PixelsVEnd = getInfoSVD(m_DUTSVDBwd).getVSize();
+      if (m_SwapAxis) {
         nPixelsV = getInfoSVD(m_DUTSVDBwd).getUCells();
+        PixelsVEnd = nPixelsV;
+        if (m_UseSP)
+          PixelsVEnd = getInfoSVD(m_DUTSVDBwd).getUSize();
+      }
     } else {
       nPixelsU = getInfoTel(m_DUTTelBwd).getUCells();
+      PixelsUEnd = nPixelsU;
+      if (m_UseSP)
+        PixelsUEnd = getInfoTel(m_DUTTelBwd).getUSize();
       nPixelsV = getInfoSVD(m_DUTSVDBwd).getUCells();
-      if (m_SwapAxis)
+      PixelsVEnd = nPixelsV;
+      if (m_UseSP)
+        PixelsVEnd = getInfoSVD(m_DUTSVDBwd).getUSize();
+      if (m_SwapAxis) {
         nPixelsV = getInfoSVD(m_DUTSVDBwd).getVCells();
+        PixelsVEnd = nPixelsV;
+        if (m_UseSP)
+          PixelsVEnd = getInfoSVD(m_DUTSVDBwd).getVSize();
+      }
     }
-    m_correlationsTel4SVD4[i] = new TH2F(name.c_str(), title.c_str(), nPixelsU, 0, nPixelsU, nPixelsV, 0, nPixelsV);
+    nPixelsUExtend = nPixelsU + 2 * nPixelsExtenzion;
+    if (m_UseSP) {
+      PixelsUStart = PixelsUEnd * (-0.5 - nPixelsExtenzion / nPixelsU);
+      PixelsUEnd = - PixelsUStart;
+    } else {
+      PixelsUStart = - nPixelsExtenzion * PixelsUEnd / nPixelsU;
+      PixelsUEnd = PixelsUEnd - PixelsUStart;
+    }
+    nPixelsVExtend = nPixelsV + 2 * nPixelsExtenzion;
+    if (m_UseSP) {
+      PixelsVStart = PixelsVEnd * (-0.5 - nPixelsExtenzion / nPixelsV);
+      PixelsVEnd = - PixelsVStart;
+    } else {
+      PixelsVStart = - nPixelsExtenzion * PixelsVEnd / nPixelsV;
+      PixelsVEnd = PixelsVEnd - PixelsVStart;
+    }
+
+    m_correlationsTel4SVD4[i] = new TH2F(name.c_str(), title.c_str(), nPixelsUExtend, PixelsUStart, PixelsUEnd, nPixelsVExtend, PixelsVStart, PixelsVEnd);
     m_correlationsTel4SVD4[i]->GetXaxis()->SetTitle(AxisU.data());
     m_correlationsTel4SVD4[i]->GetYaxis()->SetTitle(AxisV.data());
     m_correlationsTel4SVD4[i]->GetZaxis()->SetTitle("hits");
 
     name = str(format("hCorrelationsTel%1%PXD%2%%3%%4%") % (m_DUTTelFwd + 1) % (m_DUTPXD - 3 + 1) % uAxis.data() % vAxis.data());
     title = str(format("Corelation Tel%1% PXD%2%, axis %3% %4%") % (m_DUTTelFwd + 1) % (m_DUTPXD - 3 + 1) % uAxis.data() % vAxis.data());
-    AxisU = str(format("%1% position Tel%2% [pitch units]") % uAxis.data() % (m_DUTTelFwd + 1));
-    AxisV = str(format("%1% position PXD%2% [pitch units]") % vAxis.data() % (m_DUTPXD - 3 + 1));
+    AxisU = str(format("%1% position Tel%2% [%3%]") % uAxis.data() % (m_DUTTelFwd + 1) % Unit.data());
+    AxisV = str(format("%1% position PXD%2% [%3%]") % vAxis.data() % (m_DUTPXD - 3 + 1) % Unit.data());
     if (i) {
       nPixelsU = getInfoTel(m_DUTTelFwd).getVCells();
+      PixelsUEnd = nPixelsU;
+      if (m_UseSP)
+        PixelsUEnd = getInfoTel(m_DUTTelFwd).getVSize();
       nPixelsV = getInfoPXD(m_DUTPXD).getVCells();
-      if (m_SwapAxis)
+      PixelsVEnd = nPixelsV;
+      if (m_UseSP)
+        PixelsVEnd = getInfoPXD(m_DUTPXD).getVSize();
+      if (m_SwapAxis) {
         nPixelsV = getInfoPXD(m_DUTPXD).getUCells();
+        PixelsVEnd = nPixelsV;
+        if (m_UseSP)
+          PixelsVEnd = getInfoPXD(m_DUTPXD).getUSize();
+      }
     } else {
       nPixelsU = getInfoTel(m_DUTTelFwd).getUCells();
+      PixelsUEnd = nPixelsU;
+      if (m_UseSP)
+        PixelsUEnd = getInfoTel(m_DUTTelFwd).getUSize();
       nPixelsV = getInfoPXD(m_DUTPXD).getUCells();
-      if (m_SwapAxis)
+      PixelsVEnd = nPixelsV;
+      if (m_UseSP)
+        PixelsVEnd = getInfoPXD(m_DUTPXD).getUSize();
+      if (m_SwapAxis) {
         nPixelsV = getInfoPXD(m_DUTPXD).getVCells();
+        PixelsVEnd = nPixelsV;
+        if (m_UseSP)
+          PixelsVEnd = getInfoPXD(m_DUTPXD).getVSize();
+      }
     }
-    m_correlationsTel3PXD2[i] = new TH2F(name.c_str(), title.c_str(), nPixelsU, 0, nPixelsU, nPixelsV, 0, nPixelsV);
+    nPixelsUExtend = nPixelsU + 2 * nPixelsExtenzion;
+    if (m_UseSP) {
+      PixelsUStart = PixelsUEnd * (-0.5 - nPixelsExtenzion / nPixelsU);
+      PixelsUEnd = - PixelsUStart;
+    } else {
+      PixelsUStart = - nPixelsExtenzion * PixelsUEnd / nPixelsU;
+      PixelsUEnd = PixelsUEnd - PixelsUStart;
+    }
+    nPixelsVExtend = nPixelsV + 2 * nPixelsExtenzion;
+    if (m_UseSP) {
+      PixelsVStart = PixelsVEnd * (-0.5 - nPixelsExtenzion / nPixelsV);
+      PixelsVEnd = - PixelsVStart;
+    } else {
+      PixelsVStart = - nPixelsExtenzion * PixelsVEnd / nPixelsV;
+      PixelsVEnd = PixelsVEnd - PixelsVStart;
+    }
+
+    m_correlationsTel3PXD2[i] = new TH2F(name.c_str(), title.c_str(), nPixelsUExtend, PixelsUStart, PixelsUEnd, nPixelsVExtend, PixelsVStart, PixelsVEnd);
     m_correlationsTel3PXD2[i]->GetXaxis()->SetTitle(AxisU.data());
     m_correlationsTel3PXD2[i]->GetYaxis()->SetTitle(AxisV.data());
     m_correlationsTel3PXD2[i]->GetZaxis()->SetTitle("hits");
 
     name = str(format("hCorrelationsSVD%1%PXD%2%%3%%4%") % (m_DUTSVDFwd - 3 + 1) % (m_DUTPXD - 3 + 1) % uAxis.data() % vAxis.data());
     title = str(format("Corelation SVD%1% PXD%2%, axis %3% %4%") % (m_DUTSVDFwd - 3 + 1) % (m_DUTPXD - 3 + 1) % uAxis.data() % vAxis.data());
-    AxisU = str(format("%1% position SVD%2% [pitch units]") % uAxis.data() % (m_DUTSVDFwd - 3 + 1));
-    AxisV = str(format("%1% position PXD%2% [pitch units]") % vAxis.data() % (m_DUTPXD - 3 + 1));
+    AxisU = str(format("%1% position SVD%2% [%3%]") % uAxis.data() % (m_DUTSVDFwd - 3 + 1) % Unit.data());
+    AxisV = str(format("%1% position PXD%2% [%3%]") % vAxis.data() % (m_DUTPXD - 3 + 1) % Unit.data());
     if (i) {
       nPixelsU = getInfoSVD(m_DUTSVDFwd).getVCells();
+      PixelsUEnd = nPixelsU;
+      if (m_UseSP)
+        PixelsUEnd = getInfoSVD(m_DUTSVDFwd).getVSize();
       nPixelsV = getInfoPXD(m_DUTPXD).getVCells();
-      if (m_SwapAxis)
+      PixelsVEnd = nPixelsV;
+      if (m_UseSP)
+        PixelsVEnd = getInfoPXD(m_DUTPXD).getVSize();
+      if (m_SwapAxis) {
         nPixelsV = getInfoPXD(m_DUTPXD).getUCells();
+        PixelsVEnd = nPixelsV;
+        if (m_UseSP)
+          PixelsVEnd = getInfoPXD(m_DUTPXD).getUSize();
+      }
     } else {
       nPixelsU = getInfoSVD(m_DUTSVDFwd).getUCells();
+      PixelsUEnd = nPixelsU;
+      if (m_UseSP)
+        PixelsUEnd = getInfoSVD(m_DUTSVDFwd).getUSize();
       nPixelsV = getInfoPXD(m_DUTPXD).getUCells();
-      if (m_SwapAxis)
+      PixelsVEnd = nPixelsV;
+      if (m_UseSP)
+        PixelsVEnd = getInfoPXD(m_DUTPXD).getUSize();
+      if (m_SwapAxis) {
         nPixelsV = getInfoPXD(m_DUTPXD).getVCells();
+        PixelsVEnd = nPixelsV;
+        if (m_UseSP)
+          PixelsVEnd = getInfoPXD(m_DUTPXD).getVSize();
+      }
     }
-    m_correlationsSVD1PXD2[i] = new TH2F(name.c_str(), title.c_str(), nPixelsU, 0, nPixelsU, nPixelsV, 0, nPixelsV);
+    nPixelsUExtend = nPixelsU + 2 * nPixelsExtenzion;
+    if (m_UseSP) {
+      PixelsUStart = PixelsUEnd * (-0.5 - nPixelsExtenzion / nPixelsU);
+      PixelsUEnd = - PixelsUStart;
+    } else {
+      PixelsUStart = - nPixelsExtenzion * PixelsUEnd / nPixelsU;
+      PixelsUEnd = PixelsUEnd - PixelsUStart;
+    }
+    nPixelsVExtend = nPixelsV + 2 * nPixelsExtenzion;
+    if (m_UseSP) {
+      PixelsVStart = PixelsVEnd * (-0.5 - nPixelsExtenzion / nPixelsV);
+      PixelsVEnd = - PixelsVStart;
+    } else {
+      PixelsVStart = - PixelsVEnd * nPixelsExtenzion / nPixelsV;
+      PixelsVEnd = PixelsVEnd - PixelsVStart;
+    }
+
+    m_correlationsSVD1PXD2[i] = new TH2F(name.c_str(), title.c_str(), nPixelsUExtend, PixelsUStart, PixelsUEnd, nPixelsVExtend, PixelsVStart, PixelsVEnd);
     m_correlationsSVD1PXD2[i]->GetXaxis()->SetTitle(AxisU.data());
     m_correlationsSVD1PXD2[i]->GetYaxis()->SetTitle(AxisV.data());
     m_correlationsSVD1PXD2[i]->GetZaxis()->SetTitle("hits");
-//    m_correlationsTel3SVD1SP[i]->Reset();
-//    m_correlationsTel4SVD4SP[i]->Reset();
-//    m_correlationsTel3PXD2SP[i]->Reset();
-//    m_correlationsSVD1PXD2SP[i]->Reset();
   }
 
   oldDir->cd();
@@ -347,10 +503,6 @@ void TelxVXDModule::beginRun()
     m_correlationsTel4SVD4[i]->Reset();
     m_correlationsTel3PXD2[i]->Reset();
     m_correlationsSVD1PXD2[i]->Reset();
-    //m_correlationsTel3SVD1SP[i]->Reset();
-    //m_correlationsTel4SVD4SP[i]->Reset();
-    //m_correlationsTel3PXD2SP[i]->Reset();
-    //m_correlationsSVD1PXD2SP[i]->Reset();
   }
 
 }
@@ -398,11 +550,13 @@ void TelxVXDModule::event()
     if ((iPlane2 < 1) || (iPlane2 > 6)) continue;
     if (iPlane2 == m_DUTTelFwd + 1) {
       int index = m_DUTTelFwd;
+      if ((getInfoTel(index).getUCellID(cluster.getU()) < -1) || (getInfoTel(index).getVCellID(cluster.getV()) < -1)) continue;
       m_chargeTel3->Fill(cluster.getCharge());
       m_hitMapTel3->Fill(getInfoTel(index).getUCellID(cluster.getU()), getInfoTel(index).getVCellID(cluster.getV()));
     }
     if (iPlane2 == m_DUTTelBwd - 6 + 1) {
       int index = m_DUTTelBwd;
+      if ((getInfoTel(index).getUCellID(cluster.getU()) < -1) || (getInfoTel(index).getVCellID(cluster.getV()) < -1)) continue;
       m_chargeTel4->Fill(cluster.getCharge());
       m_hitMapTel4->Fill(getInfoTel(index).getUCellID(cluster.getU()), getInfoTel(index).getVCellID(cluster.getV()));
     }
@@ -469,9 +623,15 @@ void TelxVXDModule::event()
       iIsU1 = 1;
       iIsV1 = 1;
       fPosU1 = getInfoPXD(index1).getUCellID(clusterPXD1.getU());
+      if (m_UseSP)
+        fPosU1 = clusterPXD1.getU();
       fPosV1 = getInfoPXD(index1).getVCellID(clusterPXD1.getV());
+      if (m_UseSP)
+        fPosV1 = clusterPXD1.getV();
       if (m_SwapAxis) {
         fPosU1 = getInfoPXD(index1).getVCellID(clusterPXD1.getV());
+        if (m_UseSP)
+          fPosU1 = clusterPXD1.getV();
       }
     } else {                                  // SVD clusters:
       const SVDCluster& cluster1 = *storeSVDClusters[i1 - storePXDClusters.getEntries()];
@@ -482,16 +642,24 @@ void TelxVXDModule::event()
         if (!cluster1.isUCluster()) {
           iIsU1 = 1;
           fPosU1 = getInfoSVD(index1).getVCellID(cluster1.getPosition());
+          if (m_UseSP)
+            fPosU1 = cluster1.getPosition();
           iIsV1 = 1;
           fPosV1 = getInfoSVD(index1).getVCellID(cluster1.getPosition());
+          if (m_UseSP)
+            fPosV1 = cluster1.getPosition();
         }
       } else {
         if (cluster1.isUCluster()) {
           iIsU1 = 1;
           fPosU1 = getInfoSVD(index1).getUCellID(cluster1.getPosition());
+          if (m_UseSP)
+            fPosU1 = cluster1.getPosition();
         } else {
           iIsV1 = 1;
           fPosV1 = getInfoSVD(index1).getVCellID(cluster1.getPosition());
+          if (m_UseSP)
+            fPosV1 = cluster1.getPosition();
         }
       }
     }
@@ -512,9 +680,15 @@ void TelxVXDModule::event()
         iIsU2 = 1;
         iIsV2 = 1;
         fPosU2 = getInfoPXD(index2).getUCellID(clusterPXD2.getU());
+        if (m_UseSP)
+          fPosU2 = clusterPXD2.getU();
         fPosV2 = getInfoPXD(index2).getVCellID(clusterPXD2.getV());
+        if (m_UseSP)
+          fPosV2 = clusterPXD2.getV();
         if (m_SwapAxis) {
           fPosV2 = getInfoPXD(index2).getUCellID(clusterPXD2.getU());
+          if (m_UseSP)
+            fPosV2 = clusterPXD2.getU();
         }
       } else {                                  // SVD clusters:
         const SVDCluster& cluster2 = *storeSVDClusters[i2 - storePXDClusters.getEntries()];
@@ -525,16 +699,24 @@ void TelxVXDModule::event()
           if (cluster2.isUCluster()) {
             iIsU2 = 1;
             fPosU2 = getInfoSVD(index2).getUCellID(cluster2.getPosition());
+            if (m_UseSP)
+              fPosU2 = cluster2.getPosition();
             iIsV2 = 1;
             fPosV2 = getInfoSVD(index2).getUCellID(cluster2.getPosition());
+            if (m_UseSP)
+              fPosV2 = cluster2.getPosition();
           }
         } else {
           if (cluster2.isUCluster()) {
             iIsU2 = 1;
             fPosU2 = getInfoSVD(index2).getUCellID(cluster2.getPosition());
+            if (m_UseSP)
+              fPosU2 = cluster2.getPosition();
           } else {
             iIsV2 = 1;
             fPosV2 = getInfoSVD(index2).getVCellID(cluster2.getPosition());
+            if (m_UseSP)
+              fPosV2 = cluster2.getPosition();
           }
         }
       }
@@ -571,9 +753,15 @@ void TelxVXDModule::event()
       iIsU1 = 1;
       iIsV1 = 1;
       fPosV1 = getInfoPXD(index1).getVCellID(clusterPXD1.getV());
+      if (m_UseSP)
+        fPosV1 = clusterPXD1.getV();
       fPosU1 = getInfoPXD(index1).getUCellID(clusterPXD1.getU());
+      if (m_UseSP)
+        fPosU1 = clusterPXD1.getU();
       if (m_SwapAxis) {
         fPosV1 = getInfoPXD(index1).getUCellID(clusterPXD1.getU());
+        if (m_UseSP)
+          fPosV1 = clusterPXD1.getU();
       }
     } else {                                  // Tel clusters:
       const PXDCluster& clusterPXD1 = *storeTelClusters[i1 - storePXDClusters.getEntries()];
@@ -585,13 +773,19 @@ void TelxVXDModule::event()
         index1 = iPlane1s - 1;
       else
         index1 = iPlane1s - 1 + 6;
-      iPlane1 = indexToPlane(index1);
+      if ((getInfoTel(index1).getUCellID(clusterPXD1.getU()) < -1) || (getInfoTel(index1).getVCellID(clusterPXD1.getV()) < -1)) continue;
       iIsU1 = 1;
       iIsV1 = 1;
       fPosV1 = getInfoTel(index1).getVCellID(clusterPXD1.getV());
+      if (m_UseSP)
+        fPosV1 = clusterPXD1.getV();
       fPosU1 = getInfoTel(index1).getUCellID(clusterPXD1.getU());
+      if (m_UseSP)
+        fPosU1 = clusterPXD1.getU();
       if (m_SwapAxis) {
         fPosV1 = getInfoTel(index1).getUCellID(clusterPXD1.getU());
+        if (m_UseSP)
+          fPosV1 = clusterPXD1.getU();
       }
     }
     if (!((index1 == SelDet1) || (index1 == SelDet2))) continue;
@@ -611,9 +805,15 @@ void TelxVXDModule::event()
         iIsU2 = 1;
         iIsV2 = 1;
         fPosU2 = getInfoPXD(index2).getUCellID(clusterPXD2.getU());
+        if (m_UseSP)
+          fPosU2 = clusterPXD2.getU();
         fPosV2 = getInfoPXD(index2).getVCellID(clusterPXD2.getV());
+        if (m_UseSP)
+          fPosV2 = clusterPXD2.getV();
         if (m_SwapAxis) {
           fPosU2 = getInfoPXD(index2).getVCellID(clusterPXD2.getV());
+          if (m_UseSP)
+            fPosU2 = clusterPXD2.getV();
         }
       } else {                                  // Tel clusters:
         const PXDCluster& clusterPXD2 = *storeTelClusters[i2 - storePXDClusters.getEntries()];
@@ -625,13 +825,19 @@ void TelxVXDModule::event()
           index2 = iPlane2s - 1;
         else
           index2 = iPlane2s - 1 + 6;
-        iPlane2 = indexToPlane(index2);
+        if ((getInfoTel(index2).getUCellID(clusterPXD2.getU()) < -1) || (getInfoTel(index2).getVCellID(clusterPXD2.getV()) < -1)) continue;
         iIsU2 = 1;
         iIsV2 = 1;
         fPosU2 = getInfoTel(index2).getUCellID(clusterPXD2.getU());
+        if (m_UseSP)
+          fPosU2 = clusterPXD2.getU();
         fPosV2 = getInfoTel(index2).getVCellID(clusterPXD2.getV());
+        if (m_UseSP)
+          fPosV2 = clusterPXD2.getV();
         if (m_SwapAxis) {
           fPosU2 = getInfoTel(index2).getVCellID(clusterPXD2.getV());
+          if (m_UseSP)
+            fPosU2 = clusterPXD2.getV();
         }
       }
       if (!((index2 == SelDet1) || (index2 == SelDet2))) continue;
@@ -670,13 +876,19 @@ void TelxVXDModule::event()
         index1 = iPlane1s - 1;
       else
         index1 = iPlane1s - 1 + 6;
-      iPlane1 = indexToPlane(index1);
+      if ((getInfoTel(index1).getUCellID(clusterPXD1.getU()) < -1) || (getInfoTel(index1).getVCellID(clusterPXD1.getV()) < -1)) continue;
       iIsU1 = 1;
       iIsV1 = 1;
       fPosV1 = getInfoTel(index1).getVCellID(clusterPXD1.getV());
+      if (m_UseSP)
+        fPosV1 = clusterPXD1.getV();
       fPosU1 = getInfoTel(index1).getUCellID(clusterPXD1.getU());
+      if (m_UseSP)
+        fPosU1 = clusterPXD1.getU();
       if (m_SwapAxis) {
         fPosU1 = getInfoTel(index1).getVCellID(clusterPXD1.getV());
+        if (m_UseSP)
+          fPosU1 = clusterPXD1.getV();
       }
     } else {                                  // SVD clusters:
       const SVDCluster& cluster1 = *storeSVDClusters[i1 - storeTelClusters.getEntries()];
@@ -687,16 +899,24 @@ void TelxVXDModule::event()
         if (!cluster1.isUCluster()) {
           iIsU1 = 1;
           fPosU1 = getInfoSVD(index1).getVCellID(cluster1.getPosition());
+          if (m_UseSP)
+            fPosU1 = cluster1.getPosition();
           iIsV1 = 1;
           fPosV1 = getInfoSVD(index1).getVCellID(cluster1.getPosition());
+          if (m_UseSP)
+            fPosV1 = cluster1.getPosition();
         }
       } else {
         if (cluster1.isUCluster()) {
           iIsU1 = 1;
           fPosU1 = getInfoSVD(index1).getUCellID(cluster1.getPosition());
+          if (m_UseSP)
+            fPosU1 = cluster1.getPosition();
         } else {
           iIsV1 = 1;
           fPosV1 = getInfoSVD(index1).getVCellID(cluster1.getPosition());
+          if (m_UseSP)
+            fPosV1 = cluster1.getPosition();
         }
       }
     }
@@ -719,13 +939,19 @@ void TelxVXDModule::event()
           index2 = iPlane2s - 1;
         else
           index2 = iPlane2s - 1 + 6;
-        iPlane2 = indexToPlane(index2);
+        if ((getInfoTel(index2).getUCellID(clusterPXD2.getU()) < -1) || (getInfoTel(index2).getVCellID(clusterPXD2.getV()) < -1)) continue;
         iIsU2 = 1;
         iIsV2 = 1;
         fPosU2 = getInfoTel(index2).getUCellID(clusterPXD2.getU());
+        if (m_UseSP)
+          fPosU2 = clusterPXD2.getU();
         fPosV2 = getInfoTel(index2).getVCellID(clusterPXD2.getV());
+        if (m_UseSP)
+          fPosV2 = clusterPXD2.getV();
         if (m_SwapAxis) {
           fPosV2 = getInfoTel(index2).getUCellID(clusterPXD2.getU());
+          if (m_UseSP)
+            fPosV2 = clusterPXD2.getU();
         }
       } else {                                  // SVD clusters:
         const SVDCluster& cluster2 = *storeSVDClusters[i2 - storeTelClusters.getEntries()];
@@ -736,16 +962,24 @@ void TelxVXDModule::event()
           if (cluster2.isUCluster()) {
             iIsU2 = 1;
             fPosU2 = getInfoSVD(index2).getUCellID(cluster2.getPosition());
+            if (m_UseSP)
+              fPosU2 = cluster2.getPosition();
             iIsV2 = 1;
             fPosV2 = getInfoSVD(index2).getUCellID(cluster2.getPosition());
+            if (m_UseSP)
+              fPosV2 = cluster2.getPosition();
           }
         } else {
           if (cluster2.isUCluster()) {
             iIsU2 = 1;
             fPosU2 = getInfoSVD(index2).getUCellID(cluster2.getPosition());
+            if (m_UseSP)
+              fPosU2 = cluster2.getPosition();
           } else {
             iIsV2 = 1;
             fPosV2 = getInfoSVD(index2).getVCellID(cluster2.getPosition());
+            if (m_UseSP)
+              fPosV2 = cluster2.getPosition();
           }
         }
       }
@@ -784,13 +1018,19 @@ void TelxVXDModule::event()
         index1 = iPlane1s - 1;
       else
         index1 = iPlane1s - 1 + 6;
-      iPlane1 = indexToPlane(index1);
+      if ((getInfoTel(index1).getUCellID(clusterPXD1.getU()) < -1) || (getInfoTel(index1).getVCellID(clusterPXD1.getV()) < -1)) continue;
       iIsU1 = 1;
       iIsV1 = 1;
       fPosV1 = getInfoTel(index1).getVCellID(clusterPXD1.getV());
+      if (m_UseSP)
+        fPosV1 = clusterPXD1.getV();
       fPosU1 = getInfoTel(index1).getUCellID(clusterPXD1.getU());
+      if (m_UseSP)
+        fPosU1 = clusterPXD1.getU();
       if (m_SwapAxis) {
         fPosV1 = getInfoTel(index1).getUCellID(clusterPXD1.getU());
+        if (m_UseSP)
+          fPosV1 = clusterPXD1.getU();
       }
     } else {                                  // SVD clusters:
       const SVDCluster& cluster1 = *storeSVDClusters[i1 - storeTelClusters.getEntries()];
@@ -801,16 +1041,24 @@ void TelxVXDModule::event()
         if (cluster1.isUCluster()) {
           iIsU1 = 1;
           fPosU1 = getInfoSVD(index1).getUCellID(cluster1.getPosition());
+          if (m_UseSP)
+            fPosU1 = cluster1.getPosition();
           iIsV1 = 1;
           fPosV1 = getInfoSVD(index1).getUCellID(cluster1.getPosition());
+          if (m_UseSP)
+            fPosV1 = cluster1.getPosition();
         }
       } else {
         if (cluster1.isUCluster()) {
           iIsU1 = 1;
           fPosU1 = getInfoSVD(index1).getUCellID(cluster1.getPosition());
+          if (m_UseSP)
+            fPosU1 = cluster1.getPosition();
         } else {
           iIsV1 = 1;
           fPosV1 = getInfoSVD(index1).getVCellID(cluster1.getPosition());
+          if (m_UseSP)
+            fPosV1 = cluster1.getPosition();
         }
       }
     }
@@ -833,13 +1081,19 @@ void TelxVXDModule::event()
           index2 = iPlane2s - 1;
         else
           index2 = iPlane2s - 1 + 6;
-        iPlane2 = indexToPlane(index2);
+        if ((getInfoTel(index2).getUCellID(clusterPXD2.getU()) < -1) || (getInfoTel(index2).getVCellID(clusterPXD2.getV()) < -1)) continue;
         iIsU2 = 1;
         iIsV2 = 1;
         fPosU2 = getInfoTel(index2).getUCellID(clusterPXD2.getU());
+        if (m_UseSP)
+          fPosU2 = clusterPXD2.getU();
         fPosV2 = getInfoTel(index2).getVCellID(clusterPXD2.getV());
+        if (m_UseSP)
+          fPosV2 = clusterPXD2.getV();
         if (m_SwapAxis) {
           fPosU2 = getInfoTel(index2).getVCellID(clusterPXD2.getV());
+          if (m_UseSP)
+            fPosU2 = clusterPXD2.getV();
         }
       } else {                                  // SVD clusters:
         const SVDCluster& cluster2 = *storeSVDClusters[i2 - storeTelClusters.getEntries()];
@@ -850,16 +1104,24 @@ void TelxVXDModule::event()
           if (!cluster2.isUCluster()) {
             iIsU2 = 1;
             fPosU2 = getInfoSVD(index2).getVCellID(cluster2.getPosition());
+            if (m_UseSP)
+              fPosU2 = cluster2.getPosition();
             iIsV2 = 1;
             fPosV2 = getInfoSVD(index2).getVCellID(cluster2.getPosition());
+            if (m_UseSP)
+              fPosV2 = cluster2.getPosition();
           }
         } else {
           if (cluster2.isUCluster()) {
             iIsU2 = 1;
             fPosU2 = getInfoSVD(index2).getUCellID(cluster2.getPosition());
+            if (m_UseSP)
+              fPosU2 = cluster2.getPosition();
           } else {
             iIsV2 = 1;
             fPosV2 = getInfoSVD(index2).getVCellID(cluster2.getPosition());
+            if (m_UseSP)
+              fPosV2 = cluster2.getPosition();
           }
         }
       }

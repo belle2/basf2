@@ -29,8 +29,7 @@ SeqFile::SeqFile(const char* filename, const char* rwflag)
     m_fd = open(filename, O_RDONLY);
 
   if (m_fd < 0) {
-    fprintf(stderr, "file open error (%s): %s\n", strerror(errno), filename);
-    //    exit ( -1 );
+    B2ERROR("file open error (" << strerror(errno) << "): " << filename);
   }
   strcpy(m_filename, filename);
   B2INFO("SeqFile: " << m_filename << " opened (fd=" << m_fd << ")");
@@ -41,7 +40,7 @@ SeqFile::SeqFile(const char* filename, const char* rwflag)
 SeqFile::~SeqFile()
 {
   close(m_fd);
-  printf("Seq File %d closed\n", m_nfile);
+  B2INFO("Seq File " << m_nfile << " closed");
 }
 
 int SeqFile::status()
@@ -56,18 +55,16 @@ int SeqFile::write(char* buf)
   if (insize + m_nb >= BLOCKSIZE &&
       strcmp(m_filename, "/dev/null") != 0) {
     close(m_fd);
-    printf("SeqFile: previous file closed (size=%d bytes)\n", m_nb);
+    B2INFO("SeqFile: previous file closed (size=" << m_nb << " bytes)");
     m_nfile++;
     char filename[256];
     sprintf(filename, "%s-%d", m_filename, m_nfile);
     m_fd = open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0664);
     if (m_fd < 0) {
-      fprintf(stderr, "file open error (%s): %s\n",
-              strerror(errno), filename);
-      exit(-1);
+      B2FATAL("file open error (" << strerror(errno) << "): " << filename);
     }
     m_nb = 0;
-    printf("SeqFile: %s opened\n", filename);
+    B2INFO("SeqFile: " << m_filename << " opened");
     stat = ::write(m_fd, buf, insize);
     if (stat > 0)
       m_nb += stat;

@@ -1,6 +1,7 @@
 #ifndef FITTER3DUTILITY_H
 #define FITTER3DUTILITY_H
 
+#include "TVectorD.h"
 #include "TLorentzVector.h"
 #include "TVector3.h"
 #include "TVector2.h"
@@ -32,5 +33,10 @@ void rSFit(double *iezz2, double *arcS, double *zz, double &z0, double &cot,doub
 void rSFit2(double *iezz21, double *iezz22, double *arcS, double *zz,int *lutv,  double &z0, double &cot,double &zchi2);
 
 void findImpactPosition(TVector3 * mcPosition, TLorentzVector * mcMomentum, int charge, TVector2 & helixCenter, TVector3 & impactPosition);
+
+// HelixParameters: dR, phi0, keppa, dz, tanLambda
+void calHelixParameters(TVector3* position, TVector3* momentum, int charge, TVectorD* helixParameters); 
+
+void calPositionAtR(TVectorD& helixParameters, double radius, TVector3* position, TVector3* momentum);
 
 #endif

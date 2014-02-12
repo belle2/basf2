@@ -1,12 +1,15 @@
 #!/user/bin/env python
 #
 # 2012/10/11 : param_cdcdigi, Threshold added
+# 2013/11/05 : Updated for release-00-03-00
+# 2014/02/12 : Updated for build-2014-01-19 //JB
 
 from basf2 import *
 
 #...suppress messages and warnings during processing...
 set_log_level(LogLevel.ERROR)
 set_random_seed(0)
+basf2datadir = os.path.join(os.environ.get('BELLE2_LOCAL_DIR', None), 'data')
 
 #...Particle Gun...
 particlegun = register_module('ParticleGun')
@@ -32,7 +35,7 @@ particlegun.param('yVertexParams', [0, 0])
 particlegun.param('zVertexParams', [0, 0])
 
 #Register modules
-evtmetagen  = register_module('EvtMetaGen')
+evtmetagen  = register_module('EventInfoSetter')
 evtmetainfo = register_module('Progress')
 #evtmetainfo = fw.register_module("EvtMetaInfo")
 paramloader = register_module('Gearbox')
@@ -48,16 +51,18 @@ cdctrg      = fw.register_module("TRGCDC")
 # Turn off physics processes
 #    "physics.mac" is located at "trg/examples/".
 #g4sim.param('UICommands',['/control/execute physics.mac'])
+# or below line can be used when trgcdc.py is not in trg/examples directory //JB
+#g4sim.param('UICommands',['/control/execute ' + os.path.join(os.environ.get('BELLE2_LOCAL_DIR', None),"trg/cdc/examples/physics.mac")])
 
 #...EvtMetaGen...
-evtmetagen.param({'EvtNumList': [2], 'RunList': [1]})
+evtmetagen.param({'evtNumList': [2], 'runList': [1]})
 
 #...GeoBuilder... Exclude detectors other than CDC
 geobuilder.param('Components', ['MagneticField', 'CDC'])
 
 #...CDC Trigger...
 cdctrg.param('ConfigFile', os.path.join(basf2datadir,"trg/cdc/TRGCDCConfig_0_20101111_1051.dat"))
-cdctrg.param('InnerTSLUTDataFile', os.path.join(basf2datadir,"trg/cdc/LRLUT.coe"))
+cdctrg.param('InnerTSLUTDataFile', os.path.join(basf2datadir,"trg/cdc/LRLUTIN.coe"))
 cdctrg.param('OuterTSLUTDataFile', os.path.join(basf2datadir,"trg/cdc/LRLUT.coe"))
 cdctrg.param('TSFLUTSL0DataFile', os.path.join(basf2datadir,"trg/cdc/TSF.FPGA.SL0.coe"))
 cdctrg.param('TSFLUTSL1DataFile', os.path.join(basf2datadir,"trg/cdc/TSF.FPGA.SL1.coe"))
@@ -70,7 +75,7 @@ cdctrg.param('TSFLUTSL7DataFile', os.path.join(basf2datadir,"trg/cdc/TSF.FPGA.SL
 cdctrg.param('TSFLUTSL8DataFile', os.path.join(basf2datadir,"trg/cdc/TSF.FPGA.SL8.coe"))
 cdctrg.param('DebugLevel', 10)
 cdctrg.param('CurlBackStop', 1)
-cdctrg.param('SimulationMode', 3)
+cdctrg.param('SimulationMode', 1)
 cdctrg.param('FastSimulationMode', 2)
 cdctrg.param('2DFinderPerfect',1)
 #cdctrg.param('HoughFinderMeshX',180)

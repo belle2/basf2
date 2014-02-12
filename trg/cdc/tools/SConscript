@@ -6,4 +6,8 @@ env['TOOLS_LIBS']['TRGCDCFrontEndImplementation'] = ['trg', 'dataobjects']
 env['TOOLS_LIBS']['TRGCDCTRGPackerTB'] = ['trg', 'dataobjects']
 env['TOOLS_LIBS']['TRGCDCTSStreamReader'] = ['Core', 'trg', 'framework', 'dataobjects']
 env['TOOLS_LIBS']['TRGCDCDisplay'] = ['trg', 'framework', 'dataobjects']
+
+#env['TOOLS_LIBS']['TRGCDCTSStreamReader'].insert(0, ['gtkmm-2.4', 'gdkmm-2.4', 'glibmm-2.4', 'Core'])
+#env['TOOLS_LIBS']['TRGCDCDisplay'].insert(0, ['gtkmm-2.4', 'gdkmm-2.4', 'glibmm-2.4', 'Core'])
+
 Return('env')

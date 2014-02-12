@@ -63,10 +63,21 @@ class TRGCDCFitter3D {
     int doit(const std::vector<TRGCDCTrack *> & trackListIn,
              std::vector<TRGCDCTrack *> & trackListOut);
 
+    void calculatePhiUsingDrift(unsigned* nSuperLayers, TRGCDCTrack* aTrack, float* evtTime, double (&phi_w)[9], double (&phi)[9], int (&lutv)[9], double (&drift)[9], int (&mclutv)[9], int &ckt);
+
     /// initializes Look Up Table (LUT)
     void callLUT(void);
 
     void initialize(void);
+
+    /// initialize for saving in ROOT.
+    void initializeRoot(void);
+    /// save initialization values.
+    void saveInitializationValues(void);
+    /// initialize for saveing in ROOT for each event.
+    void initializeEventRoot(void);
+    /// save track values.
+    void saveTrackValues(double* phi, double* phi_w, double pt, double myphi0, double z0, double cot, int mysign, double zchi2, double* zz, int* lutv, double pt_w, double myphi0_w,  TRGCDCTrack* aTrack, int iFit, double* arcS, TVectorD* wStAxPhi, TVectorD* stAxPhi, double* drift, int* mclutv);
 
     void terminate(void);
    
@@ -81,29 +92,67 @@ class TRGCDCFitter3D {
     /// CDCTRG.
     const TRGCDC & _cdc;
 
-    /// LUTs
-    int lut00[4096];
+    /// Geometry of CDC
+    double m_rr[9];
+    double m_anglest[4];
+    double m_ztostraw[4];
+    int m_ni[9];
+
+    // Integer conversion parameters
+    //For signed bits for myphi0
+    int m_intnum2;
+    unsigned int m_numbit2;	
+    //For signed bits for rho
+    int m_intnum3;
+    unsigned m_numbit3;	
+    //For signed bits for zz
+    int m_intnum5;
+    unsigned m_numbit5;	
+    //For signed bits for rr
+    int m_intnum6;
+    unsigned m_numbit6;	
+    //For signed bits for iezz2
+    int m_intnum7;
+    unsigned m_numbit7;	
+    //For unsigned iz0den
+    int m_intnum8;
+    unsigned m_numbit8;	
+    //For unsigned z0den
+    int m_intnum9;
+    unsigned m_numbit9;	
+    //For unsinged z0num_p1
+    int m_intnum10;
+    unsigned m_numbit10;	
+    //For unsigned z0num_p2
+    int m_intnum11;
+    unsigned m_numbit11;	
 
     /// LUTs
-    int lut01[4096];
+    int m_lut00[4096];
 
     /// LUTs
-    int lut02[4096];
+    int m_lut01[4096];
 
     /// LUTs
-    int lut03[4096];
+    int m_lut02[4096];
 
     /// LUTs
-    int zz_0_lut[1024];
+    int m_lut03[4096];
 
     /// LUTs
-    int zz_1_lut[1024];
+    int m_zz_0_lut[1024];
 
     /// LUTs
-    int zz_2_lut[1024];
+    int m_zz_1_lut[1024];
 
     /// LUTs
-    int zz_3_lut[1024];
+    int m_zz_2_lut[1024];
+
+    /// LUTs
+    int m_zz_3_lut[1024];
+
+    /// LUTs
+    int m_iz0den_lut[8192];
 
     // Constants
     double m_Trg_PI;
@@ -132,20 +181,26 @@ class TRGCDCFitter3D {
       // Stores geometry
       // r1, r2, r3, r4, r5, r6, r7, r8, r9, anglest1, anglest2, anglest3, anglest4, ztostraw1, ztostraw2, ztostraw3, ztostraw4
       TVectorD* m_geometryFitter3D;
-      // # wires ax1, ax2, ax3, ax4, ax5, st1, st2, st3, st4, st5
+      // # wires ax1, st1, ...  ax5
       TVectorD* m_nWiresFitter3D;
 
       // Stores phi hit values
-      // axphi1, axphi2, axphi3, axphi4, axphi5, stphi1, stphi2, stphi3, stphi4
+      // axphi1, stphi1, ... axphi5 - with L/R LUT
       TClonesArray* m_tSTrackFitter3D;
-      // MC TS values
-      // 3*5 + 3*4 = 27
-      // ax1_x, ax1_y, ax1_z, ax2_x, ax2_y, ax2_z, ax3_x, ax3_y, ax3_z, ax4_x, ax4_y, ax4_z, ax5_x, ax5_y, ax5_z, 
-      // st1_x, st1_y, st1_z, st2_x, st2_y, st2_z, st3_x, st3_y, st3_z, st4_x, st4_y, st4_z
-      TClonesArray* m_mcTSTrackFitter3D;
-      // Stores s and z hit values
-      // s1, s2, s3, s4, z1, z2, z3, z4
+      // axphi1, stphi1, ... axphi5 - wire position
+      TClonesArray* m_tsPhiTrackFitter3D;
+      // ax1, st1, ... ax5 - drift length
+      TClonesArray* m_tsDriftTrackFitter3D;
+      // ax1, st1, ... ax5 - left right
+      TClonesArray* m_tsLRTrackFitter3D;
+      // s1, s2, s3, s4, z1, z2, z3, z4. Unit is m.
       TClonesArray* m_szTrackFitter3D;
+      // MC TS values. Position on wire. Unit is cm.
+      // 3*9 = 27
+      // ax1_x, ax1_y, ax1_z, st1_x, st1_y, st1_z, ... ax5_x, ax5_y, ax5_z
+      TClonesArray* m_mcTSTrackFitter3D;
+      // axphi1, stphi1, ... axphi5 - mc left right
+      TClonesArray* m_mcTSLRTrackFitter3D;
 
       // Stores MC values
       // MCpT, MCphi0, MCz0, MCtheta, MCcharge
@@ -158,7 +213,7 @@ class TRGCDCFitter3D {
       TClonesArray* m_mcImpactPositionTrackFitter3D;
 
       // Stores error values
-      // phierror1, phierror2, phierror3, phierror4, phierror5, zerror1, zerror2, zerror3, zerror4
+      // phierror1, zerror1, phierror2, zerror2, ... phierror5
       TVectorD* m_errorFitter3D;
       // Stores fit values
       // pT, phi0, z0, theta, charge, zhi2
@@ -173,12 +228,11 @@ class TRGCDCFitter3D {
       TClonesArray* m_stAxPhiTrackFitter3D;
 
 
-      // Stores Stereo phi candidates upto 25 * 4 layers.
-      TClonesArray* m_stTSsTrackFitter3D;
       // Stores event and track ID;
       TClonesArray* m_eventTrackIDTrackFitter3D;
 
     public:
+      bool m_boolMc;
       bool m_flagRealInt;
       bool m_flagWireLRLUT;
       bool m_flagNonTSStudy;

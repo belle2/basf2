@@ -273,6 +273,8 @@ namespace Belle2 {
 
     /** Add a relation from an object in a store array to another object in a store array.
      *
+     *  @note If possible, use RelationsObject members instead, as they allow more efficent caching.
+     *
      *  @sa RelationsInterface::addRelationTo
      *  @param fromObject     Pointer to the object from which the relation points.
      *  @param toObject       Pointer to the object to which the relation points.
@@ -286,6 +288,8 @@ namespace Belle2 {
     }
 
     /** Get the relations from an object to other objects in a store array.
+     *
+     *  @note If possible, use RelationsObject members instead, as they allow more efficent caching.
      *
      *  @sa RelationsInterface::getRelationsTo
      *  @param fromObject     Pointer to the object from which the relations point.
@@ -302,6 +306,8 @@ namespace Belle2 {
     }
 
     /** Get the relations to an object from other objects in a store array.
+     *
+     *  @note If possible, use RelationsObject members instead, as they allow more efficent caching.
      *
      *  @sa RelationsInterface::getRelationsFrom
      *  @param toObject       Pointer to the object to which the relations point.
@@ -321,6 +327,8 @@ namespace Belle2 {
      *
      *  Relations in both directions are returned.
      *
+     *  @note If possible, use RelationsObject members instead, as they allow more efficent caching.
+     *
      *  @sa RelationsInterface::getRelationsWith
      *  @param object         Pointer to the object from or to which the relations point.
      *  @tparam T             Class of the objects to or from which the relations point.
@@ -337,6 +345,8 @@ namespace Belle2 {
 
     /** Get the object to which another object has a relation.
      *
+     *  @note If possible, use RelationsObject members instead, as they allow more efficent caching.
+     *
      *  @param fromObject  Pointer to the object from which the relation points.
      *  @tparam TO     The class of objects to which the relation points.
      *  @param toName  The name of the store array to which the relation points.
@@ -352,6 +362,8 @@ namespace Belle2 {
     }
 
     /** Get the object from which another object has a relation.
+     *
+     *  @note If possible, use RelationsObject members instead, as they allow more efficent caching.
      *
      *  @param toObject Pointer to the object to which the relation points.
      *  @tparam FROM    The class of objects from which the relation points.

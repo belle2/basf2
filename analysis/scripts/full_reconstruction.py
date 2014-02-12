@@ -141,12 +141,15 @@ class Particle:
                     self.channels])
         return cuts
 
-    def reconstruct(self, path):
+    def reconstruct(self, path, mcrun=False):
         """
         Reconstruct the particle in all given decay channels. A particle
         without decay channels is considered as a final state particle.
-        If the histograms, from which the intermediate cuts are determined,
-        don't exists we create them first.
+        If the histograms from which the intermediate cuts are determined
+        don't exist we create them first.
+        @param path  modules are added to this path
+        @param mcrun if True, do not apply any cuts (or determine them)
+
         The function returns:
             False - if not all data is available at the moment to reconstruct
                 the particle -> the needed modules to generate this
@@ -160,7 +163,7 @@ class Particle:
 
         # If this is not a final state particle and no cut determination
         # histograms available we have to gennerate the histograms first
-        if not self.channels == [] \
+        if not mcrun and not self.channels == [] \
             and not os.path.isfile(self.getHistFilename()):
 
             # So first we combine the daughter particles to candidates
@@ -203,7 +206,7 @@ class Particle:
             # False
             return False
 
-        # If not a final state particle we determine the cuts and reconstruct
+        # If not a final state particle we fetch the cuts and reconstruct
         # the particle in all of its decay channels.
         if not self.channels == []:
             cuts = self.getCuts()
@@ -213,7 +216,8 @@ class Particle:
                 pmake.param('PDG', self.pdg)
                 pmake.param('ListName', self.to_string(channel))
                 pmake.param('InputListNames', pdg.to_names(channel))
-                pmake.param('MassCut', cuts['M'][self.to_string(channel)])
+                if not mcrun:
+                    pmake.param('MassCut', cuts['M'][self.to_string(channel)])
                 path.add_module(pmake)
 
         # Now select all the reconstructed (or loaded) particles with this pdg
@@ -353,7 +357,7 @@ class FullReconstruction:
 
         self.particles.append(particle)
 
-    def run(self, path):
+    def run(self, path, mcrun=False):
         """
         All the added Particle objects are arranged in stages according to
         their dependencies. Every stage is then reconstructed. The
@@ -362,6 +366,9 @@ class FullReconstruction:
         The needed modules to create this information are added to the path.
         So you need to run the FullReconstruction several times, to train
         all stages.
+        @param path  modules are added to this path
+        @param mcrun if True, only do reconstruction, with no cuts, trainings,
+                     or classifications.
         """
 
         # Create a map from abs(pdg code) to the Particle object
@@ -458,8 +465,8 @@ class FullReconstruction:
             # channels. If not all particles can be reconstructed, then we
             # missing information about the intermediate cuts we want to
             # apply. So some histograms have to be generated first.
-            if not all([pdg_to_particle[pdg].reconstruct(path) for pdg in
-                       stage]):
+            if not all([pdg_to_particle[pdg].reconstruct(path, mcrun) for pdg
+                    in stage]):
                 B2WARNING('Missing cuts for a particle at stage'
                           + ' {i} generating cut'.format(i=i)
                           + ' determination histograms.')
@@ -470,7 +477,9 @@ class FullReconstruction:
             # methods have to be trained first. So if not all training files
             # (experts) are present yet, we stop the evaluation at this stage
             # and generate these experts first.
-            if not all([pdg_to_particle[pdg].classify(path) for pdg in stage]):
-                B2WARNING('Missing experts for a particle at stage'
-                          + ' {i} generating experts.'.format(i=i))
-                break
+            if not mcrun:
+                if not all([pdg_to_particle[pdg].classify(path)
+                        for pdg in stage]):
+                    B2WARNING('Missing experts for a particle at stage'
+                              + ' {i} generating experts.'.format(i=i))
+                    break

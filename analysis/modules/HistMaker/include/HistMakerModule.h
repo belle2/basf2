@@ -9,8 +9,8 @@
 
 #pragma once
 
-#include <analysis/utility/VariableManager.h>
 #include <framework/pcore/HistModule.h>
+#include <analysis/utility/VariableManager.h>
 
 #include <map>
 #include <string>

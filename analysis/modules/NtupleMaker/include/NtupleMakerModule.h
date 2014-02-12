@@ -10,9 +10,9 @@
 
 #ifndef NTUPLEDUMPERMODULE_H
 #define NTUPLEDUMPERMODULE_H
+#include <framework/core/Module.h>
 #include <analysis/NtupleTools/NtupleFlatTool.h>
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
-#include <framework/core/Module.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <analysis/dataobjects/Particle.h>

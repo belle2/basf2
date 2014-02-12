@@ -13,17 +13,6 @@
 #include <sys/time.h>
 
 
-/* EvtMessage structure
-   word 0 : Number of words in this record
-   word 1 : Type RECORD_TYPE
-   word 2 : Decode time
-   word 3-15 : Reserved
-   word 16- : List of streamed objects
-    Streamed object :
-      word 1 : size of obj
-      word 2- : streamd object
-*/
-
 namespace Belle2 {
 
   /** What type of message is this? */
@@ -31,20 +20,27 @@ namespace Belle2 {
 
   /*! Header structure of streamed object list */
   struct EvtHeader {
-    int size; /**< Number of words in this record. */
+    UInt_t size; /**< Number of words in this record. */
     RECORD_TYPE rectype; /**< Type of message. */
-    struct timeval timestamp; /**< Decode time. */
-    int src; /**< source IP. */
-    int dest; /**< destination IP. */
-    int reserved[10]; /**< For future use. */
+    Long64_t time_sec; /**< seconds part of timeval. */
+    Long64_t time_usec; /**< seconds part of timeval. */
+    UInt_t src; /**< source IP. */
+    UInt_t dest; /**< destination IP. */
+    UInt_t reserved[10]; /**< Someone forgot to name these when introduced. first three are durability, #objects, #arrays. */
   };
 
-  /*! Class to manage streamed object */
+  /** Class to manage streamed object.
+   *
+   * Binary stream consists of:
+   *  Fields in EvtHeader (see definition)
+   *  List of streamed objects, each consisting of:
+   *    word 1 : size of object
+   *    word 2- : streamed object
+   */
   class EvtMessage {
 
   public:
-    /** maximal EvtMessage size, in bytes (50MB->200MB). */
-    //    const static unsigned int c_MaxEventSize = 50000000;
+    /** maximal EvtMessage size, in bytes (200MB). */
     const static unsigned int c_MaxEventSize = 200000000;
 
     /*! build EvtMessage from existing buffer (does not take ownership). */
@@ -72,12 +68,12 @@ namespace Belle2 {
     void  buffer(const char*);
 
     /*! Get size of message including headers*/
-    int   size();
+    int   size() const;
     /** Same as size(), but as size of an integer array.
      *
      * Use this for passing EvtMessage to RingBuffer::insq().
      */
-    int   paddedSize();
+    int   paddedSize() const;
     /*! Get size of message body */
     int   msg_size();
 
@@ -87,17 +83,17 @@ namespace Belle2 {
     void type(RECORD_TYPE);
 
     /*! Get time stamp */
-    struct timeval time();
+    struct timeval time() const;
     /*! Set time stamp */
     void time(struct timeval& time);
 
     /*! Get source IP of message */
-    int   src();
+    int   src() const;
     /*! Set source IP of message */
     void  src(int src);
 
     /*! Get destination IP of message */
-    int   dest();
+    int   dest() const;
     /*! Set destination IP of message */
     void  dest(int dest);
 

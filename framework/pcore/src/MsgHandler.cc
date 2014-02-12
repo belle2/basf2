@@ -98,7 +98,7 @@ EvtMessage* MsgHandler::encode_msg(RECORD_TYPE rectype)
     char* buf = msg->Buffer();
     // Get buffer length
     //    int len = msg->BufferSize();
-    int len = msg->Length();
+    UInt_t len = msg->Length();
     if (msg->CompBuffer()) {
       // Compression ON
       len = msg->CompLength();
@@ -106,19 +106,19 @@ EvtMessage* MsgHandler::encode_msg(RECORD_TYPE rectype)
     }
     // Put name of object in output buffer
     string& name = m_name[nameptr];
-    int lname = strlen(name.c_str()) + 1;
-    memcpy(msgptr, &lname, sizeof(int));
-    memcpy(msgptr + sizeof(int), name.c_str(), lname);
-    msgptr += (sizeof(int) + lname);
-    totlen += (sizeof(int) + lname);
+    UInt_t nameLength = strlen(name.c_str()) + 1;
+    memcpy(msgptr, &nameLength, sizeof(nameLength));
+    memcpy(msgptr + sizeof(nameLength), name.c_str(), nameLength);
+    msgptr += (sizeof(nameLength) + nameLength);
+    totlen += (sizeof(nameLength) + nameLength);
     // Copy object into buffer
     //    printf ( "encode: obj name = %s : size = %d, msgptr = %8.8x\n",
     //           name.c_str(), len, msgptr );
     //    fflush ( stdout );
-    memcpy(msgptr, &len, sizeof(int));
-    memcpy(msgptr + sizeof(int), buf, len);
-    msgptr += (sizeof(int) + len);
-    totlen += (sizeof(int) + len);
+    memcpy(msgptr, &len, sizeof(len));
+    memcpy(msgptr + sizeof(len), buf, len);
+    msgptr += (sizeof(len) + len);
+    totlen += (sizeof(len) + len);
     nameptr++;
     delete msg; // test
   }
@@ -148,19 +148,20 @@ int MsgHandler::decode_msg(EvtMessage* msg, vector<TObject*>& objlist,
 
   while (totlen < msg->msg_size()) {
     // Restore object name
-    int lname;
-    memcpy(&lname, msgptr, sizeof(int));
-    string name((char*)(msgptr + sizeof(int)));
+    UInt_t nameLength;
+    memcpy(&nameLength, msgptr, sizeof(nameLength));
+    string name((char*)(msgptr + sizeof(nameLength)));
     namelist.push_back(name);
-    msgptr += (sizeof(int) + lname);
-    totlen += (sizeof(int) + lname);
+    msgptr += (sizeof(nameLength) + nameLength);
+    totlen += (sizeof(nameLength) + nameLength);
+
     // Restore object
-    int objlen;
+    UInt_t objlen;
     //    printf ( "MsgHandler::decode obj=%s\n", name.c_str() );
-    memcpy(&objlen, msgptr, sizeof(int));
+    memcpy(&objlen, msgptr, sizeof(objlen));
     //    printf ( "decode : objlen = %d\n", objlen );
     // Old impl.
-    TMessage* tmsg = new InMessage(msgptr + sizeof(int), objlen);
+    TMessage* tmsg = new InMessage(msgptr + sizeof(objlen), objlen);
     //    char* tmpmsg = new char[objlen];
     //    TMessage* tmsg = new InMessage ( tmpmsg, objlen );
     //    TObject* obj = (TObject*)tmsg->ReadObjectAny(NULL);
@@ -178,8 +179,8 @@ int MsgHandler::decode_msg(EvtMessage* msg, vector<TObject*>& objlist,
     }
     */
 
-    msgptr += objlen + sizeof(int);
-    totlen += objlen + sizeof(int);
+    msgptr += objlen + sizeof(objlen);
+    totlen += objlen + sizeof(objlen);
 
     //TMessage doesn't honour the kIsOwner bit for the compression buffer and
     //tries to delete the passed message.

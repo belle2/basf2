@@ -194,6 +194,9 @@ int DataStoreStreamer::restoreDataStore(EvtMessage* msg)
     DataStore::EDurability durability = (DataStore::EDurability)(msg->header())->reserved[0];
     int nobjs = (msg->header())->reserved[1];
     int narrays = (msg->header())->reserved[2];
+    if (durability != DataStore::c_Event and durability != DataStore::c_Persistent) {
+      B2FATAL("Invalid durability when deserializing data: " << durability);
+    }
 
     //    if ( m_initStatus != 0 ) return 0;   // Debugging only
 

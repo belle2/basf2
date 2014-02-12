@@ -81,7 +81,7 @@ char* EvtMessage::buffer()
 
 void EvtMessage::buffer(const char* bufadr)
 {
-  int size = *(int*)bufadr;
+  UInt_t size = *(UInt_t*)bufadr;
   int bufsize = roundToNearestInt(size);
   m_data = new char[bufsize];
   memcpy(m_data, bufadr, size);
@@ -92,12 +92,12 @@ void EvtMessage::buffer(const char* bufadr)
 
 // @brief size
 // @return record size
-int EvtMessage::size()
+int EvtMessage::size() const
 {
   return (((EvtHeader*)m_data)->size);
 }
 
-int EvtMessage::paddedSize()
+int EvtMessage::paddedSize() const
 {
   const int sizeBytes = size();
   //round up to next int boundary
@@ -123,7 +123,7 @@ void EvtMessage::type(RECORD_TYPE type)
 }
 
 // Source of this record
-int EvtMessage::src()
+int EvtMessage::src() const
 {
   return (((EvtHeader*)m_data)->src);
 }
@@ -134,7 +134,7 @@ void EvtMessage::src(int src)
 }
 
 // Destination of this record
-int EvtMessage::dest()
+int EvtMessage::dest() const
 {
   return (((EvtHeader*)m_data)->dest);
 }
@@ -145,14 +145,17 @@ void EvtMessage::dest(int dest)
 }
 
 // Time stamp
-struct timeval EvtMessage::time()
-{
-  return (((EvtHeader*)m_data)->timestamp);
+struct timeval EvtMessage::time() const {
+  struct timeval tv;
+  tv.tv_sec = ((EvtHeader*)m_data)->time_sec;
+  tv.tv_usec = ((EvtHeader*)m_data)->time_usec;
+  return tv;
 }
 
 void EvtMessage::time(struct timeval& tbuf)
 {
-  ((EvtHeader*)m_data)->timestamp = tbuf;
+  ((EvtHeader*)m_data)->time_sec = tbuf.tv_sec;
+  ((EvtHeader*)m_data)->time_usec = tbuf.tv_usec;
 }
 
 // Event Header
@@ -176,9 +179,11 @@ void EvtMessage::msg(char const* msgin, int size, RECORD_TYPE type)
   hdr->rectype = type;
   struct timeval tv;
   gettimeofday(&tv, NULL);
-  hdr->timestamp = tv;
+  ((EvtHeader*)m_data)->time_sec = tv.tv_sec;
+  ((EvtHeader*)m_data)->time_usec = tv.tv_usec;
   hdr->src = -1;
   hdr->dest = -1;
+  //TODO: set durability, nobjs, narrays here?
   if (size > 0)
     memcpy(m_data + sizeof(EvtHeader), msgin, size);
 }

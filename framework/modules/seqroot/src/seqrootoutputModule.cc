@@ -149,6 +149,7 @@ void SeqRootOutputModule::terminate()
 
 EvtMessage* SeqRootOutputModule::buildMessage(RECORD_TYPE rectype)
 {
+  //TODO why doesn't this use DataStoreStreamer??
 
   m_msghandler->clear();
 

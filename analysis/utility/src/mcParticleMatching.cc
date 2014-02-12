@@ -52,7 +52,7 @@ bool setMCTruth(const Particle* particle)
 {
 
   // if Particle<->MCParticle relation already exists, there is nothing new to do
-  const MCParticle* mcParticle = DataStore::getRelated<MCParticle>(particle);
+  const MCParticle* mcParticle = particle->getRelatedTo<MCParticle>();
   if (mcParticle) {
     return true;
   }
@@ -66,7 +66,7 @@ bool setMCTruth(const Particle* particle)
   // check, if for all daughter particles Particle <-> MCParticle relation exists
   for (int i = 0; i < nChildren; ++i) {
     const Particle*    daugP   = particle->getDaughter(i);
-    const MCParticle*  daugMCP = DataStore::getRelated<MCParticle>(daugP);
+    const MCParticle*  daugMCP = daugP->getRelatedTo<MCParticle>();
 
     if (!daugMCP) {
       // Particle <-> MCParticle relation does not exist for this daughter; -> Set it!
@@ -85,7 +85,7 @@ bool setMCTruth(const Particle* particle)
 
   for (int i = 0; i < nChildren; ++i) {
     const Particle*    daugP   = particle->getDaughter(i);
-    const MCParticle*  daugMCP = DataStore::getRelated<MCParticle>(daugP);
+    const MCParticle*  daugMCP = daugP->getRelatedTo<MCParticle>();
 
     if (i == 0)
       fillGenMothers(daugMCP, firstDaugMothers);
@@ -110,7 +110,7 @@ bool setMCTruth(const Particle* particle)
 
   MCParticle* mcMatch = mcParticles[motherIndex - 1];
 
-  bool result = DataStore::addRelationFromTo(particle, mcMatch);
+  bool result = particle->addRelationTo(mcMatch);
 
   return result;
 }
@@ -269,7 +269,7 @@ void findMissingGeneratedParticles(vector<const Particle*>   reconstructed,
     int link = 0;
 
     for (int j = 0; j < (int)reconstructed.size(); ++j) {
-      const MCParticle* mcParticle = DataStore::getRelated<MCParticle>(reconstructed[j]);
+      const MCParticle* mcParticle = reconstructed[j]->getRelatedTo<MCParticle>();
 
       if (mcParticle)
         if (mcParticle->getIndex() == generated[i]->getIndex()) {
@@ -369,7 +369,7 @@ bool isMissidentified(vector<const Particle*> reconstructed, vector<const MCPart
   bool status = false;
 
   for (int i = 0; i < (int)reconstructed.size(); ++i) {
-    const MCParticle* mcParticle = DataStore::getRelated<MCParticle>(reconstructed[i]);
+    const MCParticle* mcParticle = reconstructed[i]->getRelatedTo<MCParticle>();
 
     for (int j = 0; j < (int)generated.size(); ++j) {
       if (mcParticle->getIndex() == generated[j]->getIndex()) {

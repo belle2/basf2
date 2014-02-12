@@ -551,11 +551,12 @@ void Particle::print() const
   std::cout << std::endl;
   std::cout << std::setprecision(prec);
 
-  StoreObjPtr<ParticleExtraInfoMap> extraInfoMap;
   std::cout << " extra info=( ";
-  if (!m_extraInfo.empty() and !extraInfoMap) {
-    B2FATAL("ParticleExtraInfoMap not available, but needed for storing extra info in Particle!");
-  } else {
+  if (!m_extraInfo.empty()) {
+    StoreObjPtr<ParticleExtraInfoMap> extraInfoMap;
+    if (!extraInfoMap) {
+      B2FATAL("ParticleExtraInfoMap not available, but needed for storing extra info in Particle!");
+    }
     const ParticleExtraInfoMap::IndexMap& map = extraInfoMap->getMap(m_extraInfo[0]);
     const unsigned int nVars = m_extraInfo.size();
     for (const auto & pair : map) {

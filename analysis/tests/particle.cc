@@ -56,6 +56,7 @@ namespace Belle2 {
     StoreObjPtr<ParticleExtraInfoMap> map;
 
     Particle p;
+    p.print();
     p.addExtraInfo("htns", 1.0);
     EXPECT_EQ(1u, map->getNMaps());
 

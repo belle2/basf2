@@ -191,6 +191,7 @@ def add_mdst_output(path, mc=True, filename='mdst.root'):
         'PIDLikelihoods',
         'TracksToPIDLikelihoods',
         'ECLShowers',
+        'TracksToECLShowers',
         'ECLGammas',
         'ECLGammasToECLShowers',
         'ECLPi0s',

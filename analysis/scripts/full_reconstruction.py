@@ -104,6 +104,10 @@ class Particle:
         return hashlib.sha1(self.hashseed + str(self.channels)).hexdigest()
 
     def getHistFilename(self):
+        """
+        Returns filename where histograms used for cut determination are
+        stored.
+        """
         return 'HistMaker_{pdg}_{hash}.root'.format(pdg=self.pdg,
                 hash=self.getHistHash())
 
@@ -119,6 +123,9 @@ class Particle:
                             + str(self.methods)).hexdigest()
 
     def getWeightFilename(self, channel, method):
+        """
+        Returns filename where weightfile of TMVA Method is stored.
+        """
         return 'weights/{channel}_{hash}_{name}.weights.xml'.format(
                 channel=self.to_string(channel),
                 name=method[0], hash=self.getWeightHash())
@@ -348,6 +355,9 @@ class FullReconstruction:
                             help="""
                             Retrain all networs and recreate all histograms
                             """)
+
+        ## Stores arguments passed via command line and parsed by argparse of
+        ## python
         self.args = parser.parse_args()
 
     def addParticle(self, particle):

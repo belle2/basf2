@@ -86,7 +86,7 @@ void TelxVXDModule::defineHisto()
   iPlane = iPlane - 3;
   string name = str(format("hPXDClusterChargeU%1%") % iPlane);
   string title = str(format("PXD cluster charge, plane %1%") % iPlane);
-  m_chargePXD2 = new TH1F(name.c_str(), title.c_str(), 50, 0, 200);
+  m_chargePXD2 = new TH1F(name.c_str(), title.c_str(), 200, 0, 200);
   m_chargePXD2->GetXaxis()->SetTitle("charge of clusters [ADU]");
   m_chargePXD2->GetYaxis()->SetTitle("count");
 
@@ -194,21 +194,35 @@ void TelxVXDModule::defineHisto()
     string Unit;
     if (m_UseSP) {
       Unit = str(format("cm"));
+      if (i) {
+        uAxis = str(format("z"));
+        vAxis = str(format("z"));
+      } else {
+        uAxis = str(format("y"));
+        vAxis = str(format("y"));
+      }
+      if (m_SwapAxis) {
+        if (i) {
+          vAxis = str(format("y"));
+        } else {
+          vAxis = str(format("z"));
+        }
+      }
     } else {
       Unit = str(format("pitch units"));
-    }
-    if (i) {
-      uAxis = str(format("v"));
-      vAxis = str(format("v"));
-    } else {
-      uAxis = str(format("u"));
-      vAxis = str(format("u"));
-    }
-    if (m_SwapAxis) {
       if (i) {
-        vAxis = str(format("u"));
-      } else {
+        uAxis = str(format("v"));
         vAxis = str(format("v"));
+      } else {
+        uAxis = str(format("u"));
+        vAxis = str(format("u"));
+      }
+      if (m_SwapAxis) {
+        if (i) {
+          vAxis = str(format("u"));
+        } else {
+          vAxis = str(format("v"));
+        }
       }
     }
     int nPixelsU;
@@ -534,13 +548,17 @@ void TelxVXDModule::event()
   }
 
 //  m_chargePXD2, m_hitMapPXD2
+  float PXDCutSeedL = 17;
+  float PXDCutSeedH = 27;
   for (const PXDCluster & cluster : storePXDClusters) {
     int iPlane = cluster.getSensorID().getLayerNumber();
     if ((iPlane + 3 < c_firstPXDPlane) || (iPlane + 3 > c_lastPXDPlane)) continue;
     int index = planeToIndex(iPlane + 3);
     if (index != m_DUTPXD) continue;
-    m_chargePXD2->Fill(cluster.getCharge());
-    m_hitMapPXD2->Fill(getInfoPXD(index).getUCellID(cluster.getU()), getInfoPXD(index).getVCellID(cluster.getV()));
+    if ((cluster.getSeedCharge() >= PXDCutSeedL) && (cluster.getSeedCharge() <= PXDCutSeedH)) {
+      m_chargePXD2->Fill(cluster.getCharge());
+      m_hitMapPXD2->Fill(getInfoPXD(index).getUCellID(cluster.getU()), getInfoPXD(index).getVCellID(cluster.getV()));
+    }
   }
 //  m_chargeTel3, m_chargeTel4, m_hitMapTel3, m_hitMapTel4
   for (const PXDCluster & cluster : storeTelClusters) {
@@ -602,7 +620,7 @@ void TelxVXDModule::event()
     }
   }
 
-  // Correlations for local u v coordinates
+  // Correlations for local u v or global y z or swap coordinates
 
 // m_correlationsSVD1PXD2[u/v]
   int SelDet1 = m_DUTSVDFwd;  // SVD1
@@ -619,47 +637,38 @@ void TelxVXDModule::event()
       const PXDCluster& clusterPXD1 = *storePXDClusters[i1];
       iPlane1 = clusterPXD1.getSensorID().getLayerNumber();
       if ((iPlane1 + 3 < c_firstPXDPlane) || (iPlane1 + 3 > c_lastPXDPlane)) continue;
+      if ((clusterPXD1.getSeedCharge() < PXDCutSeedL) || (clusterPXD1.getSeedCharge() > PXDCutSeedH)) continue;
       index1 = planeToIndex(iPlane1 + 3);
       iIsU1 = 1;
       iIsV1 = 1;
       fPosU1 = getInfoPXD(index1).getUCellID(clusterPXD1.getU());
-      if (m_UseSP)
-        fPosU1 = clusterPXD1.getU();
       fPosV1 = getInfoPXD(index1).getVCellID(clusterPXD1.getV());
-      if (m_UseSP)
-        fPosV1 = clusterPXD1.getV();
-      if (m_SwapAxis) {
-        fPosU1 = getInfoPXD(index1).getVCellID(clusterPXD1.getV());
-        if (m_UseSP)
-          fPosU1 = clusterPXD1.getV();
+      if (m_UseSP) {
+        TVector3 rLocal(clusterPXD1.getU(), clusterPXD1.getV(), 0);
+        TVector3 rGlobal = getInfoPXD(index1).pointToGlobal(rLocal);
+        fPosU1 = rGlobal.Y();
+        fPosV1 = rGlobal.Z();
       }
     } else {                                  // SVD clusters:
       const SVDCluster& cluster1 = *storeSVDClusters[i1 - storePXDClusters.getEntries()];
       iPlane1 = cluster1.getSensorID().getLayerNumber();
       if ((iPlane1 + 3 < c_firstSVDPlane) || (iPlane1 + 3 > c_lastSVDPlane)) continue;
       index1 = planeToIndex(iPlane1 + 3);
-      if (m_SwapAxis) {
-        if (!cluster1.isUCluster()) {
-          iIsU1 = 1;
-          fPosU1 = getInfoSVD(index1).getVCellID(cluster1.getPosition());
-          if (m_UseSP)
-            fPosU1 = cluster1.getPosition();
-          iIsV1 = 1;
-          fPosV1 = getInfoSVD(index1).getVCellID(cluster1.getPosition());
-          if (m_UseSP)
-            fPosV1 = cluster1.getPosition();
+      if (cluster1.isUCluster()) {
+        iIsU1 = 1;
+        fPosU1 = getInfoSVD(index1).getUCellID(cluster1.getPosition());
+        if (m_UseSP) {
+          TVector3 rLocal(cluster1.getPosition(), 0, 0);
+          TVector3 rGlobal = getInfoSVD(index1).pointToGlobal(rLocal);
+          fPosU1 = rGlobal.Y();
         }
       } else {
-        if (cluster1.isUCluster()) {
-          iIsU1 = 1;
-          fPosU1 = getInfoSVD(index1).getUCellID(cluster1.getPosition());
-          if (m_UseSP)
-            fPosU1 = cluster1.getPosition();
-        } else {
-          iIsV1 = 1;
-          fPosV1 = getInfoSVD(index1).getVCellID(cluster1.getPosition());
-          if (m_UseSP)
-            fPosV1 = cluster1.getPosition();
+        iIsV1 = 1;
+        fPosV1 = getInfoSVD(index1).getVCellID(cluster1.getPosition());
+        if (m_UseSP) {
+          TVector3 rLocal(0, cluster1.getPosition(), 0);
+          TVector3 rGlobal = getInfoSVD(index1).pointToGlobal(rLocal);
+          fPosV1 = rGlobal.Z();
         }
       }
     }
@@ -676,55 +685,48 @@ void TelxVXDModule::event()
         const PXDCluster& clusterPXD2 = *storePXDClusters[i2];
         iPlane2 = clusterPXD2.getSensorID().getLayerNumber();
         if ((iPlane2 + 3 < c_firstPXDPlane) || (iPlane2 + 3 > c_lastPXDPlane)) continue;
+        if ((clusterPXD2.getSeedCharge() < PXDCutSeedL) || (clusterPXD2.getSeedCharge() > PXDCutSeedH)) continue;
         index2 = planeToIndex(iPlane2 + 3);
         iIsU2 = 1;
         iIsV2 = 1;
         fPosU2 = getInfoPXD(index2).getUCellID(clusterPXD2.getU());
-        if (m_UseSP)
-          fPosU2 = clusterPXD2.getU();
         fPosV2 = getInfoPXD(index2).getVCellID(clusterPXD2.getV());
-        if (m_UseSP)
-          fPosV2 = clusterPXD2.getV();
-        if (m_SwapAxis) {
-          fPosV2 = getInfoPXD(index2).getUCellID(clusterPXD2.getU());
-          if (m_UseSP)
-            fPosV2 = clusterPXD2.getU();
+        if (m_UseSP) {
+          TVector3 rLocal(clusterPXD2.getU(), clusterPXD2.getV(), 0);
+          TVector3 rGlobal = getInfoPXD(index2).pointToGlobal(rLocal);
+          fPosU2 = rGlobal.Y();
+          fPosV2 = rGlobal.Z();
         }
       } else {                                  // SVD clusters:
         const SVDCluster& cluster2 = *storeSVDClusters[i2 - storePXDClusters.getEntries()];
         iPlane2 = cluster2.getSensorID().getLayerNumber();
         if ((iPlane2 + 3 < c_firstSVDPlane) || (iPlane2 + 3 > c_lastSVDPlane)) continue;
         index2 = planeToIndex(iPlane2 + 3);
-        if (m_SwapAxis) {
-          if (cluster2.isUCluster()) {
-            iIsU2 = 1;
-            fPosU2 = getInfoSVD(index2).getUCellID(cluster2.getPosition());
-            if (m_UseSP)
-              fPosU2 = cluster2.getPosition();
-            iIsV2 = 1;
-            fPosV2 = getInfoSVD(index2).getUCellID(cluster2.getPosition());
-            if (m_UseSP)
-              fPosV2 = cluster2.getPosition();
+        if (cluster2.isUCluster()) {
+          iIsU2 = 1;
+          fPosU2 = getInfoSVD(index2).getUCellID(cluster2.getPosition());
+          if (m_UseSP) {
+            TVector3 rLocal(cluster2.getPosition(), 0, 0);
+            TVector3 rGlobal = getInfoSVD(index2).pointToGlobal(rLocal);
+            fPosU2 = rGlobal.Y();
           }
         } else {
-          if (cluster2.isUCluster()) {
-            iIsU2 = 1;
-            fPosU2 = getInfoSVD(index2).getUCellID(cluster2.getPosition());
-            if (m_UseSP)
-              fPosU2 = cluster2.getPosition();
-          } else {
-            iIsV2 = 1;
-            fPosV2 = getInfoSVD(index2).getVCellID(cluster2.getPosition());
-            if (m_UseSP)
-              fPosV2 = cluster2.getPosition();
+          iIsV2 = 1;
+          fPosV2 = getInfoSVD(index2).getVCellID(cluster2.getPosition());
+          if (m_UseSP) {
+            TVector3 rLocal(0, cluster2.getPosition(), 0);
+            TVector3 rGlobal = getInfoSVD(index2).pointToGlobal(rLocal);
+            fPosV2 = rGlobal.Z();
           }
         }
       }
+      if (m_SwapAxis) {
+        swap(fPosU2, fPosV2);
+        swap(iIsU2, iIsV2);
+      }
       if (!((index2 == SelDet1) || (index2 == SelDet2))) continue;
       // ready to fill correlation histograms and hit maps:
-      if ((index1 == index2) && (iIsU1 == 1) && (iIsV2 == 1)) {
-        // hit maps:
-      } else if ((index1 < index2) && (iIsU1 == iIsU2) && (iIsU1 == 1)) {
+      if ((index1 < index2) && (iIsU1 == iIsU2) && (iIsU1 == 1)) {
         // correlations for u
         m_correlationsSVD1PXD2[0]->Fill(fPosU2, fPosU1);
       } else if ((index1 > index2) && (iIsV1 == iIsV2) && (iIsV1 == 1)) {
@@ -749,19 +751,17 @@ void TelxVXDModule::event()
       const PXDCluster& clusterPXD1 = *storePXDClusters[i1];
       iPlane1 = clusterPXD1.getSensorID().getLayerNumber();
       if ((iPlane1 + 3 < c_firstPXDPlane) || (iPlane1 + 3 > c_lastPXDPlane)) continue;
+      if ((clusterPXD1.getSeedCharge() < PXDCutSeedL) || (clusterPXD1.getSeedCharge() > PXDCutSeedH)) continue;
       index1 = planeToIndex(iPlane1 + 3);
       iIsU1 = 1;
       iIsV1 = 1;
-      fPosV1 = getInfoPXD(index1).getVCellID(clusterPXD1.getV());
-      if (m_UseSP)
-        fPosV1 = clusterPXD1.getV();
       fPosU1 = getInfoPXD(index1).getUCellID(clusterPXD1.getU());
-      if (m_UseSP)
-        fPosU1 = clusterPXD1.getU();
-      if (m_SwapAxis) {
-        fPosV1 = getInfoPXD(index1).getUCellID(clusterPXD1.getU());
-        if (m_UseSP)
-          fPosV1 = clusterPXD1.getU();
+      fPosV1 = getInfoPXD(index1).getVCellID(clusterPXD1.getV());
+      if (m_UseSP) {
+        TVector3 rLocal(clusterPXD1.getU(), clusterPXD1.getV(), 0);
+        TVector3 rGlobal = getInfoPXD(index1).pointToGlobal(rLocal);
+        fPosU1 = rGlobal.Y();
+        fPosV1 = rGlobal.Z();
       }
     } else {                                  // Tel clusters:
       const PXDCluster& clusterPXD1 = *storeTelClusters[i1 - storePXDClusters.getEntries()];
@@ -776,16 +776,13 @@ void TelxVXDModule::event()
       if ((getInfoTel(index1).getUCellID(clusterPXD1.getU()) < -1) || (getInfoTel(index1).getVCellID(clusterPXD1.getV()) < -1)) continue;
       iIsU1 = 1;
       iIsV1 = 1;
-      fPosV1 = getInfoTel(index1).getVCellID(clusterPXD1.getV());
-      if (m_UseSP)
-        fPosV1 = clusterPXD1.getV();
       fPosU1 = getInfoTel(index1).getUCellID(clusterPXD1.getU());
-      if (m_UseSP)
-        fPosU1 = clusterPXD1.getU();
-      if (m_SwapAxis) {
-        fPosV1 = getInfoTel(index1).getUCellID(clusterPXD1.getU());
-        if (m_UseSP)
-          fPosV1 = clusterPXD1.getU();
+      fPosV1 = getInfoTel(index1).getVCellID(clusterPXD1.getV());
+      if (m_UseSP) {
+        TVector3 rLocal(clusterPXD1.getU(), clusterPXD1.getV(), 0);
+        TVector3 rGlobal = getInfoTel(index1).pointToGlobal(rLocal);
+        fPosU1 = rGlobal.Y();
+        fPosV1 = rGlobal.Z();
       }
     }
     if (!((index1 == SelDet1) || (index1 == SelDet2))) continue;
@@ -801,19 +798,17 @@ void TelxVXDModule::event()
         const PXDCluster& clusterPXD2 = *storePXDClusters[i2];
         iPlane2 = clusterPXD2.getSensorID().getLayerNumber();
         if ((iPlane2 + 3 < c_firstPXDPlane) || (iPlane2 + 3 > c_lastPXDPlane)) continue;
+        if ((clusterPXD2.getSeedCharge() < PXDCutSeedL) || (clusterPXD2.getSeedCharge() > PXDCutSeedH)) continue;
         index2 = planeToIndex(iPlane2 + 3);
         iIsU2 = 1;
         iIsV2 = 1;
         fPosU2 = getInfoPXD(index2).getUCellID(clusterPXD2.getU());
-        if (m_UseSP)
-          fPosU2 = clusterPXD2.getU();
         fPosV2 = getInfoPXD(index2).getVCellID(clusterPXD2.getV());
-        if (m_UseSP)
-          fPosV2 = clusterPXD2.getV();
-        if (m_SwapAxis) {
-          fPosU2 = getInfoPXD(index2).getVCellID(clusterPXD2.getV());
-          if (m_UseSP)
-            fPosU2 = clusterPXD2.getV();
+        if (m_UseSP) {
+          TVector3 rLocal(clusterPXD2.getU(), clusterPXD2.getV(), 0);
+          TVector3 rGlobal = getInfoPXD(index2).pointToGlobal(rLocal);
+          fPosU2 = rGlobal.Y();
+          fPosV2 = rGlobal.Z();
         }
       } else {                                  // Tel clusters:
         const PXDCluster& clusterPXD2 = *storeTelClusters[i2 - storePXDClusters.getEntries()];
@@ -829,22 +824,20 @@ void TelxVXDModule::event()
         iIsU2 = 1;
         iIsV2 = 1;
         fPosU2 = getInfoTel(index2).getUCellID(clusterPXD2.getU());
-        if (m_UseSP)
-          fPosU2 = clusterPXD2.getU();
         fPosV2 = getInfoTel(index2).getVCellID(clusterPXD2.getV());
-        if (m_UseSP)
-          fPosV2 = clusterPXD2.getV();
-        if (m_SwapAxis) {
-          fPosU2 = getInfoTel(index2).getVCellID(clusterPXD2.getV());
-          if (m_UseSP)
-            fPosU2 = clusterPXD2.getV();
+        if (m_UseSP) {
+          TVector3 rLocal(clusterPXD2.getU(), clusterPXD2.getV(), 0);
+          TVector3 rGlobal = getInfoTel(index2).pointToGlobal(rLocal);
+          fPosU2 = rGlobal.Y();
+          fPosV2 = rGlobal.Z();
         }
+      }
+      if (m_SwapAxis) {
+        swap(fPosU2, fPosV2);
       }
       if (!((index2 == SelDet1) || (index2 == SelDet2))) continue;
       // ready to fill correlation histograms and hit maps:
-      if ((index1 == index2) && (iIsU1 == 1) && (iIsV2 == 1)) {
-        // hit maps:
-      } else if ((index1 < index2) && (iIsU1 == iIsU2) && (iIsU1 == 1)) {
+      if ((index1 < index2) && (iIsU1 == iIsU2) && (iIsU1 == 1)) {
         // correlations for u
         m_correlationsTel3PXD2[0]->Fill(fPosU1, fPosU2);
       } else if ((index1 > index2) && (iIsV1 == iIsV2) && (iIsV1 == 1)) {
@@ -879,44 +872,34 @@ void TelxVXDModule::event()
       if ((getInfoTel(index1).getUCellID(clusterPXD1.getU()) < -1) || (getInfoTel(index1).getVCellID(clusterPXD1.getV()) < -1)) continue;
       iIsU1 = 1;
       iIsV1 = 1;
-      fPosV1 = getInfoTel(index1).getVCellID(clusterPXD1.getV());
-      if (m_UseSP)
-        fPosV1 = clusterPXD1.getV();
       fPosU1 = getInfoTel(index1).getUCellID(clusterPXD1.getU());
-      if (m_UseSP)
-        fPosU1 = clusterPXD1.getU();
-      if (m_SwapAxis) {
-        fPosU1 = getInfoTel(index1).getVCellID(clusterPXD1.getV());
-        if (m_UseSP)
-          fPosU1 = clusterPXD1.getV();
+      fPosV1 = getInfoTel(index1).getVCellID(clusterPXD1.getV());
+      if (m_UseSP) {
+        TVector3 rLocal(clusterPXD1.getU(), clusterPXD1.getV(), 0);
+        TVector3 rGlobal = getInfoTel(index1).pointToGlobal(rLocal);
+        fPosU1 = rGlobal.Y();
+        fPosV1 = rGlobal.Z();
       }
     } else {                                  // SVD clusters:
       const SVDCluster& cluster1 = *storeSVDClusters[i1 - storeTelClusters.getEntries()];
       iPlane1 = cluster1.getSensorID().getLayerNumber();
       if ((iPlane1 + 3 < c_firstSVDPlane) || (iPlane1 + 3 > c_lastSVDPlane)) continue;
       index1 = planeToIndex(iPlane1 + 3);
-      if (m_SwapAxis) {
-        if (!cluster1.isUCluster()) {
-          iIsU1 = 1;
-          fPosU1 = getInfoSVD(index1).getVCellID(cluster1.getPosition());
-          if (m_UseSP)
-            fPosU1 = cluster1.getPosition();
-          iIsV1 = 1;
-          fPosV1 = getInfoSVD(index1).getVCellID(cluster1.getPosition());
-          if (m_UseSP)
-            fPosV1 = cluster1.getPosition();
+      if (cluster1.isUCluster()) {
+        iIsU1 = 1;
+        fPosU1 = getInfoSVD(index1).getUCellID(cluster1.getPosition());
+        if (m_UseSP) {
+          TVector3 rLocal(cluster1.getPosition(), 0, 0);
+          TVector3 rGlobal = getInfoSVD(index1).pointToGlobal(rLocal);
+          fPosU1 = rGlobal.Y();
         }
       } else {
-        if (cluster1.isUCluster()) {
-          iIsU1 = 1;
-          fPosU1 = getInfoSVD(index1).getUCellID(cluster1.getPosition());
-          if (m_UseSP)
-            fPosU1 = cluster1.getPosition();
-        } else {
-          iIsV1 = 1;
-          fPosV1 = getInfoSVD(index1).getVCellID(cluster1.getPosition());
-          if (m_UseSP)
-            fPosV1 = cluster1.getPosition();
+        iIsV1 = 1;
+        fPosV1 = getInfoSVD(index1).getVCellID(cluster1.getPosition());
+        if (m_UseSP) {
+          TVector3 rLocal(0, cluster1.getPosition(), 0);
+          TVector3 rGlobal = getInfoSVD(index1).pointToGlobal(rLocal);
+          fPosV1 = rGlobal.Z();
         }
       }
     }
@@ -943,51 +926,43 @@ void TelxVXDModule::event()
         iIsU2 = 1;
         iIsV2 = 1;
         fPosU2 = getInfoTel(index2).getUCellID(clusterPXD2.getU());
-        if (m_UseSP)
-          fPosU2 = clusterPXD2.getU();
         fPosV2 = getInfoTel(index2).getVCellID(clusterPXD2.getV());
-        if (m_UseSP)
-          fPosV2 = clusterPXD2.getV();
-        if (m_SwapAxis) {
-          fPosV2 = getInfoTel(index2).getUCellID(clusterPXD2.getU());
-          if (m_UseSP)
-            fPosV2 = clusterPXD2.getU();
+        if (m_UseSP) {
+          TVector3 rLocal(clusterPXD2.getU(), clusterPXD2.getV(), 0);
+          TVector3 rGlobal = getInfoTel(index2).pointToGlobal(rLocal);
+          fPosU2 = rGlobal.Y();
+          fPosV2 = rGlobal.Z();
         }
       } else {                                  // SVD clusters:
         const SVDCluster& cluster2 = *storeSVDClusters[i2 - storeTelClusters.getEntries()];
         iPlane2 = cluster2.getSensorID().getLayerNumber();
         if ((iPlane2 + 3 < c_firstSVDPlane) || (iPlane2 + 3 > c_lastSVDPlane)) continue;
         index2 = planeToIndex(iPlane2 + 3);
-        if (m_SwapAxis) {
-          if (cluster2.isUCluster()) {
-            iIsU2 = 1;
-            fPosU2 = getInfoSVD(index2).getUCellID(cluster2.getPosition());
-            if (m_UseSP)
-              fPosU2 = cluster2.getPosition();
-            iIsV2 = 1;
-            fPosV2 = getInfoSVD(index2).getUCellID(cluster2.getPosition());
-            if (m_UseSP)
-              fPosV2 = cluster2.getPosition();
+        if (cluster2.isUCluster()) {
+          iIsU2 = 1;
+          fPosU2 = getInfoSVD(index2).getUCellID(cluster2.getPosition());
+          if (m_UseSP) {
+            TVector3 rLocal(cluster2.getPosition(), 0, 0);
+            TVector3 rGlobal = getInfoSVD(index2).pointToGlobal(rLocal);
+            fPosU2 = rGlobal.Y();
           }
         } else {
-          if (cluster2.isUCluster()) {
-            iIsU2 = 1;
-            fPosU2 = getInfoSVD(index2).getUCellID(cluster2.getPosition());
-            if (m_UseSP)
-              fPosU2 = cluster2.getPosition();
-          } else {
-            iIsV2 = 1;
-            fPosV2 = getInfoSVD(index2).getVCellID(cluster2.getPosition());
-            if (m_UseSP)
-              fPosV2 = cluster2.getPosition();
+          iIsV2 = 1;
+          fPosV2 = getInfoSVD(index2).getVCellID(cluster2.getPosition());
+          if (m_UseSP) {
+            TVector3 rLocal(0, cluster2.getPosition(), 0);
+            TVector3 rGlobal = getInfoSVD(index2).pointToGlobal(rLocal);
+            fPosV2 = rGlobal.Z();
           }
         }
       }
+      if (m_SwapAxis) {
+        swap(fPosU2, fPosV2);
+        swap(iIsU2, iIsV2);
+      }
       if (!((index2 == SelDet1) || (index2 == SelDet2))) continue;
       // ready to fill correlation histograms and hit maps:
-      if ((index1 == index2) && (iIsU1 == 1) && (iIsV2 == 1)) {
-        // hit maps:
-      } else if ((index1 < index2) && (iIsU1 == iIsU2) && (iIsU1 == 1)) {
+      if ((index1 < index2) && (iIsU1 == iIsU2) && (iIsU1 == 1)) {
         // correlations for u
         m_correlationsTel4SVD4[0]->Fill(fPosU2, fPosU1);
       } else if ((index1 > index2) && (iIsV1 == iIsV2) && (iIsV1 == 1)) {
@@ -1021,44 +996,34 @@ void TelxVXDModule::event()
       if ((getInfoTel(index1).getUCellID(clusterPXD1.getU()) < -1) || (getInfoTel(index1).getVCellID(clusterPXD1.getV()) < -1)) continue;
       iIsU1 = 1;
       iIsV1 = 1;
-      fPosV1 = getInfoTel(index1).getVCellID(clusterPXD1.getV());
-      if (m_UseSP)
-        fPosV1 = clusterPXD1.getV();
       fPosU1 = getInfoTel(index1).getUCellID(clusterPXD1.getU());
-      if (m_UseSP)
-        fPosU1 = clusterPXD1.getU();
-      if (m_SwapAxis) {
-        fPosV1 = getInfoTel(index1).getUCellID(clusterPXD1.getU());
-        if (m_UseSP)
-          fPosV1 = clusterPXD1.getU();
+      fPosV1 = getInfoTel(index1).getVCellID(clusterPXD1.getV());
+      if (m_UseSP) {
+        TVector3 rLocal(clusterPXD1.getU(), clusterPXD1.getV(), 0);
+        TVector3 rGlobal = getInfoTel(index1).pointToGlobal(rLocal);
+        fPosU1 = rGlobal.Y();
+        fPosV1 = rGlobal.Z();
       }
     } else {                                  // SVD clusters:
       const SVDCluster& cluster1 = *storeSVDClusters[i1 - storeTelClusters.getEntries()];
       iPlane1 = cluster1.getSensorID().getLayerNumber();
       if ((iPlane1 + 3 < c_firstSVDPlane) || (iPlane1 + 3 > c_lastSVDPlane)) continue;
       index1 = planeToIndex(iPlane1 + 3);
-      if (m_SwapAxis) {
-        if (cluster1.isUCluster()) {
-          iIsU1 = 1;
-          fPosU1 = getInfoSVD(index1).getUCellID(cluster1.getPosition());
-          if (m_UseSP)
-            fPosU1 = cluster1.getPosition();
-          iIsV1 = 1;
-          fPosV1 = getInfoSVD(index1).getUCellID(cluster1.getPosition());
-          if (m_UseSP)
-            fPosV1 = cluster1.getPosition();
+      if (cluster1.isUCluster()) {
+        iIsU1 = 1;
+        fPosU1 = getInfoSVD(index1).getUCellID(cluster1.getPosition());
+        if (m_UseSP) {
+          TVector3 rLocal(cluster1.getPosition(), 0, 0);
+          TVector3 rGlobal = getInfoSVD(index1).pointToGlobal(rLocal);
+          fPosU1 = rGlobal.Y();
         }
       } else {
-        if (cluster1.isUCluster()) {
-          iIsU1 = 1;
-          fPosU1 = getInfoSVD(index1).getUCellID(cluster1.getPosition());
-          if (m_UseSP)
-            fPosU1 = cluster1.getPosition();
-        } else {
-          iIsV1 = 1;
-          fPosV1 = getInfoSVD(index1).getVCellID(cluster1.getPosition());
-          if (m_UseSP)
-            fPosV1 = cluster1.getPosition();
+        iIsV1 = 1;
+        fPosV1 = getInfoSVD(index1).getVCellID(cluster1.getPosition());
+        if (m_UseSP) {
+          TVector3 rLocal(0, cluster1.getPosition(), 0);
+          TVector3 rGlobal = getInfoSVD(index1).pointToGlobal(rLocal);
+          fPosV1 = rGlobal.Z();
         }
       }
     }
@@ -1085,51 +1050,43 @@ void TelxVXDModule::event()
         iIsU2 = 1;
         iIsV2 = 1;
         fPosU2 = getInfoTel(index2).getUCellID(clusterPXD2.getU());
-        if (m_UseSP)
-          fPosU2 = clusterPXD2.getU();
         fPosV2 = getInfoTel(index2).getVCellID(clusterPXD2.getV());
-        if (m_UseSP)
-          fPosV2 = clusterPXD2.getV();
-        if (m_SwapAxis) {
-          fPosU2 = getInfoTel(index2).getVCellID(clusterPXD2.getV());
-          if (m_UseSP)
-            fPosU2 = clusterPXD2.getV();
+        if (m_UseSP) {
+          TVector3 rLocal(clusterPXD2.getU(), clusterPXD2.getV(), 0);
+          TVector3 rGlobal = getInfoTel(index2).pointToGlobal(rLocal);
+          fPosU2 = rGlobal.Y();
+          fPosV2 = rGlobal.Z();
         }
       } else {                                  // SVD clusters:
         const SVDCluster& cluster2 = *storeSVDClusters[i2 - storeTelClusters.getEntries()];
         iPlane2 = cluster2.getSensorID().getLayerNumber();
         if ((iPlane2 + 3 < c_firstSVDPlane) || (iPlane2 + 3 > c_lastSVDPlane)) continue;
         index2 = planeToIndex(iPlane2 + 3);
-        if (m_SwapAxis) {
-          if (!cluster2.isUCluster()) {
-            iIsU2 = 1;
-            fPosU2 = getInfoSVD(index2).getVCellID(cluster2.getPosition());
-            if (m_UseSP)
-              fPosU2 = cluster2.getPosition();
-            iIsV2 = 1;
-            fPosV2 = getInfoSVD(index2).getVCellID(cluster2.getPosition());
-            if (m_UseSP)
-              fPosV2 = cluster2.getPosition();
+        if (cluster2.isUCluster()) {
+          iIsU2 = 1;
+          fPosU2 = getInfoSVD(index2).getUCellID(cluster2.getPosition());
+          if (m_UseSP) {
+            TVector3 rLocal(cluster2.getPosition(), 0, 0);
+            TVector3 rGlobal = getInfoSVD(index2).pointToGlobal(rLocal);
+            fPosU2 = rGlobal.Y();
           }
         } else {
-          if (cluster2.isUCluster()) {
-            iIsU2 = 1;
-            fPosU2 = getInfoSVD(index2).getUCellID(cluster2.getPosition());
-            if (m_UseSP)
-              fPosU2 = cluster2.getPosition();
-          } else {
-            iIsV2 = 1;
-            fPosV2 = getInfoSVD(index2).getVCellID(cluster2.getPosition());
-            if (m_UseSP)
-              fPosV2 = cluster2.getPosition();
+          iIsV2 = 1;
+          fPosV2 = getInfoSVD(index2).getVCellID(cluster2.getPosition());
+          if (m_UseSP) {
+            TVector3 rLocal(0, cluster2.getPosition(), 0);
+            TVector3 rGlobal = getInfoSVD(index2).pointToGlobal(rLocal);
+            fPosV2 = rGlobal.Z();
           }
         }
       }
+      if (m_SwapAxis) {
+        swap(fPosU2, fPosV2);
+        swap(iIsU2, iIsV2);
+      }
       if (!((index2 == SelDet1) || (index2 == SelDet2))) continue;
       // ready to fill correlation histograms and hit maps:
-      if ((index1 == index2) && (iIsU1 == 1) && (iIsV2 == 1)) {
-        // hit maps:
-      } else if ((index1 < index2) && (iIsU1 == iIsU2) && (iIsU1 == 1)) {
+      if ((index1 < index2) && (iIsU1 == iIsU2) && (iIsU1 == 1)) {
         // correlations for u
         m_correlationsTel3SVD1[0]->Fill(fPosU1, fPosU2);
       } else if ((index1 > index2) && (iIsV1 == iIsV2) && (iIsV1 == 1)) {

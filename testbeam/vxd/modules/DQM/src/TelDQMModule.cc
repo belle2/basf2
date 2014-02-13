@@ -253,6 +253,7 @@ void TelDQMModule::event()
     int iPlane = cluster.getSensorID().getSensorNumber();
     if ((iPlane < c_firstTELPlane) || (iPlane > c_lastTELPlane)) continue;
     int index = planeToIndex(iPlane);
+    if ((getInfo(index).getUCellID(cluster.getU()) < -1) || (getInfo(index).getVCellID(cluster.getV()) < -1)) continue;
     m_hitMapU[index]->Fill(getInfo(index).getUCellID(cluster.getU()));
     m_hitMapV[index]->Fill(getInfo(index).getVCellID(cluster.getV()));
     m_sizeU[index]->Fill(cluster.getUSize());
@@ -264,20 +265,25 @@ void TelDQMModule::event()
   for (int i1 = 0; i1 < storeClusters.getEntries(); i1++) {
     // preparing of first value for correlation plots with postfix "1":
     const PXDCluster& cluster1 = *storeClusters[i1];
+    int iPlaneL1 = cluster1.getSensorID().getLayerNumber();
+    if (iPlaneL1 != 7) continue;
     int iPlane1 = cluster1.getSensorID().getSensorNumber();
     if ((iPlane1 < c_firstTELPlane) || (iPlane1 > c_lastTELPlane)) continue;
     int index1 = planeToIndex(iPlane1);
+    if ((getInfo(index1).getUCellID(cluster1.getU()) < -1) || (getInfo(index1).getVCellID(cluster1.getV()) < -1)) continue;
+    // hit maps:
+    m_correlationsHitMaps[c_nTELPlanes * index1 + index1]->Fill(getInfo(index1).getUCellID(cluster1.getU()), getInfo(index1).getVCellID(cluster1.getV()));
     for (int i2 = 0; i2 < storeClusters.getEntries(); i2++) {
       // preparing of second value for correlation plots with postfix "2":
       const PXDCluster& cluster2 = *storeClusters[i2];
+      int iPlaneL2 = cluster2.getSensorID().getLayerNumber();
+      if (iPlaneL2 != 7) continue;
       int iPlane2 = cluster2.getSensorID().getSensorNumber();
       if ((iPlane2 < c_firstTELPlane) || (iPlane2 > c_lastTELPlane)) continue;
       int index2 = planeToIndex(iPlane2);
-      // ready to fill correlation histograms and hit maps:
-      if (index1 == index2) {
-        // hit maps:
-        m_correlationsHitMaps[c_nTELPlanes * index2 + index1]->Fill(getInfo(index1).getUCellID(cluster1.getU()), getInfo(index2).getVCellID(cluster2.getV()));
-      } else if (index1 < index2) {
+      if ((getInfo(index2).getUCellID(cluster2.getU()) < -1) || (getInfo(index2).getVCellID(cluster2.getV()) < -1)) continue;
+      // ready to fill correlation histograms:
+      if (index1 < index2) {
         // correlations for u
         m_correlationsHitMaps[c_nTELPlanes * index2 + index1]->Fill(getInfo(index1).getUCellID(cluster1.getU()), getInfo(index2).getUCellID(cluster2.getU()));
       } else if (index1 > index2) {

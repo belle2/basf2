@@ -254,8 +254,8 @@ void SVDDQMModule::defineHisto()
         string nameSP = str(format("h2VXDHitmapSP%1%") % iPlane2);
         string titleSP = str(format("Hitmap VXD in space points, plane %1%") % iPlane2);
         m_correlationsHitMapsSP[c_nVXDPlanes * j + i] = new TH2F(nameSP.c_str(), titleSP.c_str(), nStripsU2, -0.5 * uSize2, 0.5 * uSize2, nStripsV2, -0.5 * vSize2, 0.5 * vSize2);
-        m_correlationsHitMapsSP[c_nVXDPlanes * j + i]->GetXaxis()->SetTitle("horizontal position [cm]");
-        m_correlationsHitMapsSP[c_nVXDPlanes * j + i]->GetYaxis()->SetTitle("vertical position [cm]");
+        m_correlationsHitMapsSP[c_nVXDPlanes * j + i]->GetXaxis()->SetTitle("vertical y position [cm]");
+        m_correlationsHitMapsSP[c_nVXDPlanes * j + i]->GetYaxis()->SetTitle("horizontal z position [cm]");
         m_correlationsHitMapsSP[c_nVXDPlanes * j + i]->GetZaxis()->SetTitle("hits");
       } else if (i < j) { // correlations for u
         string name = str(format("h2VXDCorrelationmapU%1%%2%") % iPlane1 % iPlane2);
@@ -269,8 +269,8 @@ void SVDDQMModule::defineHisto()
         string nameSP = str(format("h2VXDCorrelationmapSPU%1%%2%") % iPlane1 % iPlane2);
         string titleSP = str(format("Correlation map VXD space points in U, plane %1%, plane %2%") % iPlane1 % iPlane2);
         m_correlationsHitMapsSP[c_nVXDPlanes * j + i] = new TH2F(nameSP.c_str(), titleSP.c_str(), nStripsU1, -0.5 * uSize1, 0.5 * uSize1, nStripsU2, -0.5 * uSize2, 0.5 * uSize2);
-        axisxtitle = str(format("horizontal position, plane %1% [cm]") % iPlane1);
-        axisytitle = str(format("horizontal position, plane %1% [cm]") % iPlane2);
+        axisxtitle = str(format("vertical y position, plane %1% [cm]") % iPlane1);
+        axisytitle = str(format("vertical y position, plane %1% [cm]") % iPlane2);
         m_correlationsHitMapsSP[c_nVXDPlanes * j + i]->GetXaxis()->SetTitle(axisxtitle.c_str());
         m_correlationsHitMapsSP[c_nVXDPlanes * j + i]->GetYaxis()->SetTitle(axisytitle.c_str());
         m_correlationsHitMapsSP[c_nVXDPlanes * j + i]->GetZaxis()->SetTitle("hits");
@@ -286,8 +286,8 @@ void SVDDQMModule::defineHisto()
         string nameSP = str(format("h2VXDCorrelationmapSPV%1%%2%") % iPlane2 % iPlane1);
         string titleSP = str(format("Correlation map VXD space points in V, plane %1%, plane %2%") % iPlane2 % iPlane1);
         m_correlationsHitMapsSP[c_nVXDPlanes * j + i] = new TH2F(nameSP.c_str(), titleSP.c_str(), nStripsV2, -0.5 * vSize2, 0.5 * vSize2, nStripsV1, -0.5 * vSize1, 0.5 * vSize1);
-        axisxtitle = str(format("vertical position, plane %1% [cm]") % iPlane1);
-        axisytitle = str(format("vertical position, plane %1% [cm]") % iPlane2);
+        axisxtitle = str(format("horizontal z position, plane %1% [cm]") % iPlane1);
+        axisytitle = str(format("horizontal z position, plane %1% [cm]") % iPlane2);
         m_correlationsHitMapsSP[c_nVXDPlanes * j + i]->GetXaxis()->SetTitle(axisxtitle.c_str());
         m_correlationsHitMapsSP[c_nVXDPlanes * j + i]->GetYaxis()->SetTitle(axisytitle.c_str());
         m_correlationsHitMapsSP[c_nVXDPlanes * j + i]->GetZaxis()->SetTitle("hits");
@@ -444,7 +444,7 @@ void SVDDQMModule::event()
     int iIsU1 = 0;
     int iIsV1 = 0;
     int iPlane1 = 0;
-    if (i1 < storePXDClusters.getEntries()) {  // PCD clusters:
+    if (i1 < storePXDClusters.getEntries()) {  // PXD clusters:
       const PXDCluster& clusterPXD1 = *storePXDClusters[i1];
       iPlane1 = clusterPXD1.getSensorID().getLayerNumber();
       if ((iPlane1 < c_firstPXDPlane) || (iPlane1 > c_lastPXDPlane)) continue;
@@ -473,6 +473,9 @@ void SVDDQMModule::event()
         fPosV1 = getInfo(index1 - c_nPXDPlanes).getVCellID(cluster1.getPosition());
       }
     }
+    // hit maps for PXD:
+    if ((iIsU1 == 1) && (iIsV1 == 1))
+      m_correlationsHitMaps[c_nVXDPlanes * index1 + index1]->Fill(fPosU1, fPosV1);
     for (int i2 = 0; i2 < storeClusters.getEntries() + storePXDClusters.getEntries(); i2++) {
       // preparing of second value for correlation plots with postfix "2":
       float fTime2 = 0.0;
@@ -514,9 +517,9 @@ void SVDDQMModule::event()
       }
       if ((iIsPXD1 == 0) && (iIsPXD2 == 0))
         if ((fabs(fTime1 - fTime2)) > CutDQMCorrelTime) continue;
-      // ready to fill correlation histograms and hit maps:
-      if ((index1 == index2) && (iIsU1 == 1) && (iIsV2 == 1)) {
-        // hit maps:
+      // ready to fill correlation histograms:
+      if ((index1 == index2) && (iIsU1 == 1) && (iIsV2 == 1) && (iIsPXD1 == 0) && (iIsPXD2 == 0)) {
+        // hit maps for SVD:
         m_correlationsHitMaps[c_nVXDPlanes * index2 + index1]->Fill(fPosU1, fPosV2);
       } else if ((index1 < index2) && (iIsU1 == iIsU2) && (iIsU1 == 1)) {
         // correlations for u
@@ -539,7 +542,7 @@ void SVDDQMModule::event()
     int iIsU1 = 0;
     int iIsV1 = 0;
     int iPlane1 = 0;
-    if (i1 < storePXDClusters.getEntries()) {  // PCD clusters:
+    if (i1 < storePXDClusters.getEntries()) {  // PXD clusters:
       const PXDCluster& clusterPXD1 = *storePXDClusters[i1];
       iPlane1 = clusterPXD1.getSensorID().getLayerNumber();
       if ((iPlane1 < c_firstPXDPlane) || (iPlane1 > c_lastPXDPlane)) continue;
@@ -553,8 +556,8 @@ void SVDDQMModule::event()
       iIsPXD1 = 1;
       iIsU1 = 1;
       iIsV1 = 1;
-      fPosSPU1 = rGlobal1.Z();
-      fPosSPV1 = rGlobal1.Y();
+      fPosSPU1 = rGlobal1.Y();
+      fPosSPV1 = rGlobal1.Z();
     } else {                                  // SVD clusters:
       const SVDCluster& cluster1 = *storeClusters[i1 - storePXDClusters.getEntries()];
       iPlane1 = cluster1.getSensorID().getLayerNumber();
@@ -569,15 +572,18 @@ void SVDDQMModule::event()
         TVector3 rLocal1(cluster1.getPosition(), 0 , 0);
         TVector3 rGlobal1 = info.pointToGlobal(rLocal1);
         iIsU1 = 1;
-        fPosSPU1 = rGlobal1.Z();
+        fPosSPU1 = rGlobal1.Y();
       } else {
         if (fCharge1 < CutDQMCorrelSigV[index1]) continue;
         TVector3 rLocal1(0, cluster1.getPosition(), 0);
         TVector3 rGlobal1 = info.pointToGlobal(rLocal1);
         iIsV1 = 1;
-        fPosSPV1 = rGlobal1.Y();
+        fPosSPV1 = rGlobal1.Z();
       }
     }
+    // hit maps for PXD:
+    if ((iIsU1 == 1) && (iIsV1 == 1))
+      m_correlationsHitMapsSP[c_nVXDPlanes * index1 + index1]->Fill(fPosSPU1, fPosSPV1);
     for (int i2 = 0; i2 < storeClusters.getEntries() + storePXDClusters.getEntries(); i2++) {
       // preparing of second value for correlation plots with postfix "2":
       float fTime2 = 0.0;
@@ -588,7 +594,7 @@ void SVDDQMModule::event()
       int iIsU2 = 0;
       int iIsV2 = 0;
       int iPlane2 = 0;
-      if (i2 < storePXDClusters.getEntries()) {  // PCD clusters:
+      if (i2 < storePXDClusters.getEntries()) {  // PXD clusters:
         const PXDCluster& clusterPXD2 = *storePXDClusters[i2];
         iPlane2 = clusterPXD2.getSensorID().getLayerNumber();
         if ((iPlane2 < c_firstPXDPlane) || (iPlane2 > c_lastPXDPlane)) continue;
@@ -602,8 +608,8 @@ void SVDDQMModule::event()
         iIsPXD2 = 1;
         iIsU2 = 1;
         iIsV2 = 1;
-        fPosSPU2 = rGlobal2.Z();
-        fPosSPV2 = rGlobal2.Y();
+        fPosSPU2 = rGlobal2.Y();
+        fPosSPV2 = rGlobal2.Z();
       } else {                                  // SVD clusters:
         const SVDCluster& cluster2 = *storeClusters[i2 - storePXDClusters.getEntries()];
         iPlane2 = cluster2.getSensorID().getLayerNumber();
@@ -618,20 +624,20 @@ void SVDDQMModule::event()
           TVector3 rLocal2(cluster2.getPosition(), 0 , 0);
           TVector3 rGlobal2 = info.pointToGlobal(rLocal2);
           iIsU2 = 1;
-          fPosSPU2 = rGlobal2.Z();
+          fPosSPU2 = rGlobal2.Y();
         } else {
           if (fCharge2 < CutDQMCorrelSigV[index2]) continue;
           TVector3 rLocal2(0, cluster2.getPosition(), 0);
           TVector3 rGlobal2 = info.pointToGlobal(rLocal2);
           iIsV2 = 1;
-          fPosSPV2 = rGlobal2.Y();
+          fPosSPV2 = rGlobal2.Z();
         }
       }
       if ((iIsPXD1 == 0) && (iIsPXD2 == 0))
         if ((fabs(fTime1 - fTime2)) > CutDQMCorrelTime) continue;
       // ready to fill correlation histograms and hit maps:
-      if ((index1 == index2) && (iIsU1 == 1) && (iIsV2 == 1)) {
-        // hit maps:
+      if ((index1 == index2) && (iIsU1 == 1) && (iIsV2 == 1) && (iIsPXD1 == 0) && (iIsPXD2 == 0)) {
+        // hit maps for SVD:
         m_correlationsHitMapsSP[c_nVXDPlanes * index2 + index1]->Fill(fPosSPU1, fPosSPV2);
       } else if ((index1 < index2) && (iIsU1 == iIsU2) && (iIsU1 == 1)) {
         // correlations for u

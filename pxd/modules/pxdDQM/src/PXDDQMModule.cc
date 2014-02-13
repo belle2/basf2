@@ -124,7 +124,7 @@ void PXDDQMModule::defineHisto()
     int iPlane = indexToPlane(i);
     string name = str(format("hPXDDigitCharge%1%") % iPlane);
     string title = str(format("PXD pixel charge, plane %1%") % iPlane);
-    m_digitCharge[i] = new TH1F(name.c_str(), title.c_str(), 50, 0, 500);
+    m_digitCharge[i] = new TH1F(name.c_str(), title.c_str(), 500, 0, 500);
     m_digitCharge[i]->GetXaxis()->SetTitle("pixel charge [ADU]");
     m_digitCharge[i]->GetYaxis()->SetTitle("count");
   }
@@ -136,7 +136,7 @@ void PXDDQMModule::defineHisto()
     int iPlane = indexToPlane(i);
     string name = str(format("hPXDClusterCharge%1%") % iPlane);
     string title = str(format("PXD cluster charge, plane %1%") % iPlane);
-    m_clusterCharge[i] = new TH1F(name.c_str(), title.c_str(), 50, 0, 500);
+    m_clusterCharge[i] = new TH1F(name.c_str(), title.c_str(), 500, 0, 500);
     m_clusterCharge[i]->GetXaxis()->SetTitle("cluster charge [ADU]");
     m_clusterCharge[i]->GetYaxis()->SetTitle("count");
   }
@@ -148,7 +148,7 @@ void PXDDQMModule::defineHisto()
     int iPlane = indexToPlane(i);
     string name = str(format("hPXDSeed%1%") % iPlane);
     string title = str(format("PXD seed charge, plane %1%") % iPlane);
-    m_seed[i] = new TH1F(name.c_str(), title.c_str(), 50, 0, 500);
+    m_seed[i] = new TH1F(name.c_str(), title.c_str(), 500, 0, 500);
     m_seed[i]->GetXaxis()->SetTitle("seed charge [ADU]");
     m_seed[i]->GetYaxis()->SetTitle("count");
   }
@@ -343,10 +343,11 @@ void PXDDQMModule::event()
     int index = planeToIndex(iPlane);
     m_hitMapU[index]->Fill(getInfo(index).getUCellID(cluster.getU()));
     m_hitMapV[index]->Fill(getInfo(index).getVCellID(cluster.getV()));
-    m_hitMapUV[index]->Fill(
-      getInfo(index).getUCellID(cluster.getU()),
-      getInfo(index).getVCellID(cluster.getV())
-    );
+    if ((cluster.getSeedCharge() > 16) && (cluster.getSeedCharge() < 28))
+      m_hitMapUV[index]->Fill(
+        getInfo(index).getUCellID(cluster.getU()),
+        getInfo(index).getVCellID(cluster.getV())
+      );
     m_clusterCharge[index]->Fill(cluster.getCharge());
     m_seed[index]->Fill(cluster.getSeedCharge());
     m_sizeU[index]->Fill(cluster.getUSize());

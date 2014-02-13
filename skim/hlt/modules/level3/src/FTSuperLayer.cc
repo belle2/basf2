@@ -32,7 +32,7 @@ void
 FTSuperLayer::clear(void)
 {
   if (m_wireHits.length()) {
-    register FTWire** hptr = m_wireHits.firstPtr();
+    FTWire** hptr = m_wireHits.firstPtr();
     FTWire** const last = m_wireHits.lastPtr();
     do {(**hptr).state(FTWireHitInvalid);} while ((hptr++) != last);
     m_wireHits.clear();
@@ -122,7 +122,7 @@ FTSuperLayer::clustering(void)
   //                  +---+---+
   //
   if (!m_wireHits.length()) return;
-  register FTWire** hptr = m_wireHits.firstPtr();
+  FTWire** hptr = m_wireHits.firstPtr();
   FTWire** const last = m_wireHits.lastPtr();
   // discard continuous hits
   do {(**hptr).chkLeftRight();} while ((hptr++) != last);

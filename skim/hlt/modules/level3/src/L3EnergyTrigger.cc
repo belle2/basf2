@@ -18,6 +18,12 @@
 
 using namespace Belle2;
 
+L3EnergyTrigger::L3EnergyTrigger()
+  : m_minEnergy(0.)
+{
+  SetName("EnergyTrigger");
+}
+
 bool
 L3EnergyTrigger::select(L3Tag* tag)
 {
@@ -27,7 +33,7 @@ L3EnergyTrigger::select(L3Tag* tag)
   //const int n = clusters.getEntries();
   const int n = clusters.length();
   for (int i = 0; i < n; i++) {
-    FCCluster& c = *clusters[i];
+    const FCCluster& c = *clusters[i];
     //L3Cluster& c = *clusters[i];
     energySum += c.getEnergy();
   }

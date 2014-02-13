@@ -19,21 +19,45 @@ namespace Belle2 {
   namespace L3 {
     class Zav {
     public:
+      //! Constructor
       Zav();
-      Zav(int) {} // dummy for one of the chain constructor
+
+      //! Destructor
+      ~Zav() {}
+
+      //! set
       void set(const Zav*);
+
+      //! returns chi square
       double chisq() const { return m_chisq; }
+
+      //! add point
       void add(double , double, double);
-      //void add(const zhit&);
+
+      //! calculate a and b
       double calculate();
+
+      //! returns a (tanL)
       double a() const { return m_a; }
+
+      //! returns b (dz)
       double b() const { return m_b; }
+
+      //! returns z at the path length s
       double z(double s) const { return m_a * s + m_b; }
+
+      //! z distance from the line
       double d(double s, double z) const { return z - m_a * s - m_b; }
+
+      //! returns number of points
       int nc() const { return m_nc; }
+
+      //! clear data members
       void clear(void);
+
+      //! returns covariance matrix
       TMatrixDSym cov() const;
-      //friend class chain;
+
     private:
       double m_a;
       double m_b;
@@ -51,16 +75,26 @@ namespace Belle2 {
       int m_nc;
     };
 
+    //----------------------------------------------
+#ifdef Zav_NO_INLINE
+#define inline
+#else
+#undef inline
+#define Zav_INLINE_DEFINE_HERE
+#endif
+
+#ifdef Zav_INLINE_DEFINE_HERE
+
     inline Zav::Zav()
+      : m_a(-9999.), m_b(-9999.), m_w(0.), m_sav(0.), m_ssav(0.), m_zav(0.),
+        m_szav(0.), m_zzav(0.), m_chisq(-1.), m_sig_inv(0.),
+        m_c11(0.), m_c21(0.), m_c22(0.), m_nc(0)
     {
-      m_a = m_b = m_w = m_sav = m_ssav = m_zav = m_szav = m_zzav = 0;
-      m_chisq = -1;
-      m_c22 = m_c21 = m_c11 = m_sig_inv = 0;
-      m_nc = 0;
     }
 
     inline void Zav::clear(void)
     {
+      m_a = m_b = -9999.;
       m_w = m_sav = m_ssav = m_zav = m_szav = m_zzav = 0;
       m_chisq = -1;
       m_c22 = m_c21 = m_c11 = m_sig_inv = 0;
@@ -83,7 +117,7 @@ namespace Belle2 {
         m_nc = c->m_nc;
       } else {
         m_w = m_sav = m_ssav = m_zav = m_szav = m_zzav =
-                                                  m_sig_inv = m_c11 = m_c21 = m_c22 = 0;
+                                                  m_sig_inv = m_c11 = m_c21 = m_c22 = 0.;
         m_nc = 0;
       }
       m_a = m_b = 0;
@@ -136,6 +170,11 @@ namespace Belle2 {
       vret(1, 1) = m_w;
       return vret;
     }
+
+#endif
+
+#undef inline
+
   }
 }
 

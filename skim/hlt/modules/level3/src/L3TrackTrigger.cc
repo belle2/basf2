@@ -18,6 +18,12 @@
 
 using namespace Belle2;
 
+L3TrackTrigger::L3TrackTrigger()
+  : m_drCut(0.), m_dzCut(0.), m_ptCut(0.), m_minNGoodTrks(0)
+{
+  SetName("TrackTrigger");
+}
+
 bool
 L3TrackTrigger::select(L3Tag* tag)
 {
@@ -27,7 +33,7 @@ L3TrackTrigger::select(L3Tag* tag)
   const int n = tracks.length();
   //const int n = tracks.getEntries();
   for (int i = 0; i < n; i++) {
-    FTTrack& t = *tracks[i];
+    const FTTrack& t = *tracks[i];
     //L3Track& t = *tracks[i];
     const double dr = t.getDr();
     const double dz = t.getDz();

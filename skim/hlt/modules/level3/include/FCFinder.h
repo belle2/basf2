@@ -56,7 +56,7 @@ namespace Belle2 {
     //! clear object
     void clear(void);
 
-    //! create wire hit from datecl-ehits(needs cal-ecl before fzisan)
+    //! create wire hit from ECLDigit
     void updateEcl3(void);
 
     //! cluster finding

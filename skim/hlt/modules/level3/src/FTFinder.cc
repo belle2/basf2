@@ -40,8 +40,6 @@ FTFinder::instance(void)
 FTFinder::FTFinder()
   : m_tOffSet(FLT_MAX),
     m_xtCoEff(FLT_MAX),
-    m_xtCoEff2(FLT_MAX),
-    m_xtCoEff3(FLT_MAX),
     m_tWindow(400.),
     m_wire(NULL),
     m_layer(NULL),
@@ -63,32 +61,7 @@ FTFinder::FTFinder()
 void
 FTFinder::init()
 {
-}
-
-void
-FTFinder::term()
-{
-  clear();
-  if (m_EvtByEvtBadWires) delete m_EvtByEvtBadWires;
-  delete &m_tracks;
-  delete m_linkedSegments;
   clearGeometry();
-  if (m_wire) free(m_wire);
-  if (m_layer) free(m_layer);
-  if (m_superLayer) free(m_superLayer);
-}
-
-void
-FTFinder::beginRun()
-{
-  clearGeometry();
-
-  // set default x-t parameters
-  m_tOffSet = -15.;
-  m_xtCoEff = 40. / 10000.;
-  m_tWindowLow = -m_tWindow;
-  m_tWindowHigh = m_tWindow + 300.;
-  FTTrack::s_additionalTdcCuts = true;
 
   // local arrays
   CDC::CDCGeometryPar& cdc2 =
@@ -121,10 +94,10 @@ FTFinder::beginRun()
   // allocate memory for geometry
   m_Nwire = iWir;
   m_NsuperLayer = iSup + 1;
-  m_wire = (FTWire*) realloc(m_wire, (m_Nwire + 1) * sizeof(FTWire));
-  m_layer = (FTLayer*) realloc(m_layer, m_Nlayer * sizeof(FTLayer));
-  m_superLayer = (FTSuperLayer*) realloc(m_superLayer,
-                                         m_NsuperLayer * sizeof(FTSuperLayer));
+  m_wire = (FTWire*) malloc((m_Nwire + 1) * sizeof(FTWire));
+  m_layer = (FTLayer*) malloc(m_Nlayer * sizeof(FTLayer));
+  m_superLayer = (FTSuperLayer*) malloc(m_NsuperLayer * sizeof(FTSuperLayer));
+
   if (!m_wire) B2FATAL("Realloc failed for wires");
   if (!m_layer) B2FATAL("Realloc failed for layers");
   if (!m_superLayer) B2FATAL("Realloc failed for super layers");
@@ -139,9 +112,9 @@ FTFinder::beginRun()
     if (nShifts != nShiftsBack) {
       // superlayer
       iSup++;
-      new(m_superLayer + iSup) FTSuperLayer(iWir, lLyr,
-                                            sup_Nlayer[iSup],
-                                            iSup, (nShifts == 0) ? 1 : 0, 0 == iSup, m_layer + lLyr);
+      new(m_superLayer + iSup) FTSuperLayer(sup_Nlayer[iSup], iSup,
+                                            (nShifts == 0) ? 1 : 0,
+                                            0 == iSup, m_layer + lLyr);
       lyr_localID = 0;
       nShiftsBack = nShifts;
     }
@@ -158,23 +131,22 @@ FTFinder::beginRun()
       //slant2 = nShifts/abs(nShifts) * std::atan2(fb.Perp(), fb.z());
     }
     //B2INFO("layer:" << lLyr << " nwires=" << nWiresInLayer << " nshifts=" << nShifts << " slant=" << slant << " slant2=" << slant2 << " nLocalLayer=" << sup_Nlayer[iSup] << " iSup=" << iSup << " lyr_localID=" << lyr_localID << " nWires" << cdc2.nWiresInLayer(lLyr) << " offset=" << cdc2.offset(lLyr));
-    new(m_layer + lLyr) FTLayer(cdc2.senseWireR(lLyr),
-                                slant,
-                                cdc2.senseWireFZ(lLyr),
-                                cdc2.senseWireBZ(lLyr),
-                                cdc2.offset(lLyr),
-                                lLyr, lyr_localID++, cdc2.nWiresInLayer(lLyr),
-                                m_superLayer[iSup], iSup ? 0 : 1, m_wire + iWir);
+    new(m_layer + lLyr) FTLayer(cdc2.senseWireR(lLyr), slant,
+                                cdc2.senseWireFZ(lLyr), cdc2.senseWireBZ(lLyr),
+                                cdc2.offset(lLyr), lLyr, lyr_localID++,
+                                cdc2.nWiresInLayer(lLyr), m_superLayer[iSup],
+                                iSup ? 0 : 1, m_wire + iWir);
     for (int j = 0; j < nWiresInLayer; j++) {
       // wire
       const TVector3 wf(cdc2.wireForwardPosition(lLyr, j));
       const TVector3 wb(cdc2.wireBackwardPosition(lLyr, j));
       if (0 == nShifts) { // axial wire
-        new(m_wire + iWir) FTWire(0.5 * (wb.x() + wf.x()), 0.5 * (wb.y() + wf.y()), 0., 0.,
-                                  m_layer[lLyr], j);
+        new(m_wire + iWir) FTWire(0.5 * (wb.x() + wf.x()),
+                                  0.5 * (wb.y() + wf.y()),
+                                  0., 0., m_layer[lLyr], j);
       } else {           // stereo wire
-        new(m_wire + iWir) FTWire(wb.x(), wb.y(), wf.x() - wb.x(), wf.y() - wb.y(),
-                                  m_layer[lLyr], j);
+        new(m_wire + iWir) FTWire(wb.x(), wb.y(), wf.x() - wb.x(),
+                                  wf.y() - wb.y(), m_layer[lLyr], j);
       }
       iWir++;
     }
@@ -200,6 +172,29 @@ FTFinder::beginRun()
     }
   }
   */
+}
+
+void
+FTFinder::term()
+{
+  clear();
+  if (m_EvtByEvtBadWires) delete m_EvtByEvtBadWires;
+  delete &m_tracks;
+  delete m_linkedSegments;
+  clearGeometry();
+}
+
+void
+FTFinder::beginRun()
+{
+
+  // set default x-t parameters
+  m_tOffSet = -15.;
+  m_xtCoEff = 40. / 10000.;
+  m_tWindowLow = -m_tWindow;
+  m_tWindowHigh = m_tWindow + 300.;
+  FTTrack::s_additionalTdcCuts = true;
+
   // read bad wires, T0 and pedestal
 
 }
@@ -376,14 +371,20 @@ FTFinder::clear(void)
 void
 FTFinder::clearGeometry(void)
 {
-  for (int i = 0; i < m_NsuperLayer; i++) {
-    m_superLayer[i].~FTSuperLayer();
+  if (m_superLayer) {
+    for (int i = 0; i < m_NsuperLayer; i++) m_superLayer[i].~FTSuperLayer();
+    free(m_superLayer);
+    m_superLayer = NULL;
   }
-  for (int i = 0; i < m_Nlayer; i++) {
-    m_layer[i].~FTLayer();
+  if (m_layer) {
+    for (int i = 0; i < m_Nlayer; i++) m_layer[i].~FTLayer();
+    free(m_layer);
+    m_layer = NULL;
   }
-  for (int i = 0; i < m_Nwire + 1; i++) {
-    m_wire[i].~FTWire();
+  if (m_wire) {
+    for (int i = 0; i < m_Nwire + 1; i++) m_wire[i].~FTWire();
+    free(m_wire);
+    m_wire = NULL;
   }
 }
 
@@ -511,7 +512,7 @@ FTFinder::linkAxialSegments(const FTSegment* initial)
   do {      // loop over linked segments
     FTSegment& s = * (*m_linkedSegments)[n - 1];
     FTSegment* innerSegment = NULL;
-    double SigmaKCache, SigmaRRCache, SigmaKRRCache, SigmaKKRRCache;
+    double SigmaKCache(0.), SigmaRRCache(0.), SigmaKRRCache(0.), SigmaKKRRCache(0.);
     double minChi2 = 4000.;
     double inX = s.incomingX();
     double inY = s.incomingY();
@@ -536,13 +537,16 @@ FTFinder::linkAxialSegments(const FTSegment* initial)
         const double out_r = NextOuterBoundHit.layer().r();
         // kappa = -2. * alpha * ((Vout X Vin)_z / |Vin|*|Vout|) / |Vin-Vout|
         double GapK = 2.*alpha * (inX * outY - inY * outX) /
-                      (in_r * out_r * sqrt((inX - outX) * (inX - outX) + (inY - outY) * (inY - outY)));
-        double GapRR = (currentLayer == j + 2) ? 0.5 * (in_r + out_r) : in_r + out_r;
+                      (in_r * out_r * sqrt((inX - outX) * (inX - outX) +
+                                           (inY - outY) * (inY - outY)));
+        double GapRR =
+          (currentLayer == j + 2) ? 0.5 * (in_r + out_r) : in_r + out_r;
         GapRR *= GapRR;
         double SigmaKTmp = (SigmaK + SegK + GapK);
         double SigmaRRTmp = SigmaRR + SegRR + GapRR;
         double SigmaKRRTmp = SigmaKRR + SegK * SegRR + GapK * GapRR;
-        double SigmaKKRRTmp = SigmaKKRR + SegK * SegK * SegRR + GapK * GapK * GapRR;
+        double SigmaKKRRTmp =
+          SigmaKKRR + SegK * SegK * SegRR + GapK * GapK * GapRR;
         double MuKTmp = SigmaKTmp / (2 * n + 1);
         double chi2 = (MuKTmp * MuKTmp * SigmaRRTmp
                        - 2.*MuKTmp * SigmaKRRTmp + SigmaKKRRTmp) / (2 * n + 1);
@@ -587,7 +591,7 @@ FTFinder::mkTrack3D(void)
     for (int j = 0; j ^ m; j++) {
       FTSegment* s = segments[j];
       int nTrack = 0;
-      FTTrack* t;
+      FTTrack* t(NULL);
       for (int k = 0; k ^ n; k++) {
         if (s->update3D(m_tracks[k])) { // calcurate s and z
           t = m_tracks[k];
@@ -630,22 +634,22 @@ FTFinder::VertexFit2D()
   FTList<double> py(10);
   FTList<double> dx(10);
   FTList<double> dy(10);
-  FTList<double> sigma2_r(10);
+  FTList<double> sigmaR2(10);
 
   for (int i = 0; i < n; i++) {
     const Lpav& la = m_tracks[i]->lpav();
     if (la.nc() <= 3) continue;
     TVectorD a = la.Hpar(FTTrack::pivot());
 
-    const double dr_i = a(0);
-    const double px_i = - std::sin(a(1));
-    const double py_i = std::cos(a(1));
+    const double dri = a(0);
+    const double pxi = - std::sin(a(1));
+    const double pyi = std::cos(a(1));
 
-    px.append(px_i);
-    py.append(py_i);
-    dx.append(dr_i * py_i);
-    dy.append(-dr_i * px_i);
-    sigma2_r.append(la.chisq() / (la.nc() - 3));
+    px.append(pxi);
+    py.append(pyi);
+    dx.append(dri * pyi);
+    dy.append(-dri * pxi);
+    sigmaR2.append(la.chisq() / (la.nc() - 3));
   }
 
   n = dx.length();
@@ -656,53 +660,53 @@ FTFinder::VertexFit2D()
     return 0;
   }
 
-  FTList<double> vtx_x(20);
-  FTList<double> vtx_y(20);
-  FTList<double> weight2(20);
+  FTList<double> vx(20);
+  FTList<double> vy(20);
+  FTList<double> w2(20);
   unsigned nVts(0);
   for (int i = dx.length() - 1; i; i--) {
     for (int j = 0; j < i; j++) {
 
-      const double pij_z = px[i] * py[j] - py[i] * px[j];
+      const double pijz = px[i] * py[j] - py[i] * px[j];
 
-      if (pij_z == 0.0f) continue;
+      if (pijz == 0.) continue;
 
-      const double sr = sigma2_r[i] + sigma2_r[j];
+      const double sr = sigmaR2[i] + sigmaR2[j];
 
       const double ddx = dx[i] - dx[j];
       const double ddy = dy[i] - dy[j];
 
-      const double d_i = (px[j] * ddy - py[j] * ddx) / pij_z;
+      const double di = (px[j] * ddy - py[j] * ddx) / pijz;
 
-      //const double d_j = (px[i]*ddy-py[i]*ddx)/pij_z;
+      //const double dj = (px[i]*ddy-py[i]*ddx)/pijz;
 
-      const double vtx_x_i = dx[i] + px[i] * d_i;
-      const double vtx_y_i = dy[i] + py[i] * d_i;
+      const double vxi = dx[i] + px[i] * di;
+      const double vyi = dy[i] + py[i] * di;
 
-      //const double vtx_x_j = dx[j] + px[j]*d_j;
-      //const double vtx_y_j = dy[j] + py[j]*d_j;
+      //const double vxj = dx[j] + px[j]*dj;
+      //const double vyj = dy[j] + py[j]*dj;
 
-      vtx_x.append(vtx_x_i);
-      vtx_y.append(vtx_y_i);
+      vx.append(vxi);
+      vy.append(vyi);
 
-      weight2.append(1.0f / sr);
+      w2.append(1. / sr);
       nVts++;
     }
   }
-  n = weight2.length();
-  double SigmaWeight(0.0f);
+  n = w2.length();
+  double wSum(0.);
   for (int i = 0; i != n; i++) {
-    m_vx += vtx_x[i] * weight2[i];
-    m_vy += vtx_y[i] * weight2[i];
-    SigmaWeight += weight2[i];
+    m_vx += vx[i] * w2[i];
+    m_vy += vy[i] * w2[i];
+    wSum += w2[i];
   }
   int rtn_flag = 0;
-  if (SigmaWeight <= 0.) {
+  if (wSum <= 0.) {
     m_vx = -99999.;
     m_vy = -99999.;
   } else {
-    m_vx /= SigmaWeight;
-    m_vy /= SigmaWeight;
+    m_vx /= wSum;
+    m_vy /= wSum;
     rtn_flag = 1;
   }
   return rtn_flag;
@@ -720,26 +724,26 @@ FTFinder::VertexFit2D()
   FTList<double> py(10);
   FTList<double> dx(10);
   FTList<double> dy(10);
-  FTList<double> weight(10);
+  FTList<double> w(10);
   for (int i = 0; i < nTrks; i++) {
     const Lpav& la = m_tracks[i]->lpav();
     TVectorD a = la.Hpar(FTTrack::pivot());
 
-    const double dr_i = a(0);
+    const double dri = a(0);
     if (fabs(a(1)) > 1.5) continue;
-    const double px_i = - sin(a(1));
-    const double py_i = cos(a(1));
+    const double pxi = - sin(a(1));
+    const double pyi = cos(a(1));
 
-    //const double dx_i = dr_i*py_i;
-    //const double dy_i = -dr_i*px_i;
+    //const double dxi = dri*pyi;
+    //const double dyi = -dri*pxi;
 
-    double weight_i = la.chisq() / (la.nc() * 0.02);
+    double wi = la.chisq() / (la.nc() * 0.02);
 
-    px.append(px_i);
-    py.append(py_i);
-    dx.append(dr_i * py_i);
-    dy.append(-dr_i * px_i);
-    weight.append(exp(-weight_i * weight_i));
+    px.append(pxi);
+    py.append(pyi);
+    dx.append(dri * pyi);
+    dy.append(-dri * pxi);
+    w.append(exp(-wi * wi));
   }
   if (dx.length() < 2) {
     m_vx = -99999.;
@@ -747,50 +751,50 @@ FTFinder::VertexFit2D()
     m_vz = -99999.;
     return 0;
   }
-  double SigmaWeight = 0.;
+  double wSum = 0.;
   for (int i = dx.length() - 1; i; i--) {
-    const double px_i = px[i];
-    const double py_i = py[i];
-    const double dx_i = dx[i];
-    const double dy_i = dy[i];
-    const double weight_i = weight[i];
+    const double pxi = px[i];
+    const double pyi = py[i];
+    const double dxi = dx[i];
+    const double dyi = dy[i];
+    const double wi = w[i];
     for (int j = 0; j < i; j++) {
-      const double px_j = px[j];
-      const double py_j = py[j];
-      //const double weight_j = weight[j];
+      const double pxj = px[j];
+      const double pyj = py[j];
+      //const double wj = w[j];
 
-      const double ddx = dx[j] - dx_i;
-      const double ddy = dx[j] - dy_i;
+      const double ddx = dx[j] - dxi;
+      const double ddy = dx[j] - dyi;
 
-      const double tmp_par = px_i * py_j - px_j * py_i;
-      //      const double par = (py_j*ddx-px_j*ddy)/tmp_par;
+      const double tmp_par = pxi * pyj - pxj * pyi;
+      //      const double par = (pyj*ddx-pxj*ddy)/tmp_par;
       double par(0.);
       if (tmp_par != 0.) {
-        par = (py_j * ddx - px_j * ddy) / tmp_par;
+        par = (pyj * ddx - pxj * ddy) / tmp_par;
       }
-      double weight_ij = weight_i * weight[j];
-      SigmaWeight += weight_i * weight[j];
+      double wij = wi * w[j];
+      wSum += wi * w[j];
       if (tmp_par == 0 ||
-          par < -0.5 || (py_i * ddx - px_i * ddy) / tmp_par < -0.5 ||
-          fabs((px_i * px_j + py_i * py_j) /
-               sqrt((px_i * px_i + py_i * py_i) * (px_j * px_j + py_j * py_j))) > 0.86) {
-        m_vx += (dx_i + 0.5 * ddx) * weight_ij;
-        m_vy += (dy_i + 0.5 * ddy) * weight_ij;
+          par < -0.5 || (pyi * ddx - pxi * ddy) / tmp_par < -0.5 ||
+          fabs((pxi * pxj + pyi * pyj) /
+               sqrt((pxi * pxi + pyi * pyi) * (pxj * pxj + pyj * pyj))) > 0.86) {
+        m_vx += (dxi + 0.5 * ddx) * wij;
+        m_vy += (dyi + 0.5 * ddy) * wij;
       } else {
-        m_vx += (dx_i + par * px_i) * weight_ij;
-        m_vy += (dy_i + par * py_i) * weight_ij;
+        m_vx += (dxi + par * pxi) * wij;
+        m_vy += (dyi + par * pyi) * wij;
       }
     }
   }
 
   int rtn_flag = 0;
-  if (SigmaWeight == 0.) {
+  if (wSum == 0.) {
     m_vx = -99999.;
     m_vy = -99999.;
     m_vz = -99999.;
   } else {
-    m_vx /= SigmaWeight;
-    m_vy /= SigmaWeight;
+    m_vx /= wSum;
+    m_vy /= wSum;
     m_vz = -99999.;
     rtn_flag = 1;
   }
@@ -821,38 +825,36 @@ FTFinder::VertexFit(int z_flag)
   FTList<double> dx(10);
   FTList<double> dy(10);
   FTList<double> dz(10);
-  FTList<double> pmag2(10);
-  FTList<double> weight(10);
-  FTList<double> weight_z(10);
-  FTList<double> sigma2_r(10);
-  FTList<double> sigma2_z(10);
+  FTList<double> w(10);
+  FTList<double> wz(10);
+  FTList<double> sigmaR2(10);
+  FTList<double> sigmaZ2(10);
 
   for (int i = 0; i < n; i++) {
     const Lpav& la = m_tracks[i]->lpav();
     if (la.nc() <= 3) continue;
     const Zav& za = m_tracks[i]->zav();
     if (za.nc() > 2 && za.b() > -900) {
-      pmag2.append(1 + za.b()*za.b());
       pz.append(za.a());
       dz.append(za.b());
-      sigma2_z.append(za.chisq() / (za.nc() - 2));
-      weight_z.append(exp(-(za.chisq() / (za.nc() - 2))));
+      sigmaZ2.append(za.chisq() / (za.nc() - 2));
+      wz.append(exp(-(za.chisq() / (za.nc() - 2))));
     } else {
       continue;
     }
 
-    TVectorD a = la.Hpar(FTTrack::pivot());
+    const TVectorD a = la.Hpar(FTTrack::pivot());
 
-    const double dr_i = a(0);
-    const double px_i = - std::sin(a(1));
-    const double py_i = std::cos(a(1));
+    const double dri = a(0);
+    const double pxi = - std::sin(a(1));
+    const double pyi = std::cos(a(1));
 
-    px.append(px_i);
-    py.append(py_i);
-    dx.append(dr_i * py_i);
-    dy.append(-dr_i * px_i);
-    sigma2_r.append(std::sqrt(la.chisq()) / (la.nc() - 3));
-    weight.append(exp(-(std::sqrt(la.chisq()) / (la.nc() - 3))));
+    px.append(pxi);
+    py.append(pyi);
+    dx.append(dri * pyi);
+    dy.append(-dri * pxi);
+    sigmaR2.append(std::sqrt(la.chisq()) / (la.nc() - 3));
+    w.append(exp(-(std::sqrt(la.chisq()) / (la.nc() - 3))));
   }
 
   n = dx.length();
@@ -863,85 +865,86 @@ FTFinder::VertexFit(int z_flag)
     return 0;
   }
 
-  FTList<double> vtx_x(20);
-  FTList<double> vtx_y(20);
-  FTList<double> vtx_z(20);
-  FTList<double> weight2(20);
-  FTList<double> weight2_z(20);
+  FTList<double> vx(20);
+  FTList<double> vy(20);
+  FTList<double> vz(20);
+  FTList<double> w2(20);
+  FTList<double> wz2(20);
   FTList<double> vtx_chi2(20);
   unsigned nVts(0);
   for (int i = n - 1; i; i--) {
     for (int j = 0; j < i; j++) {
       // min. chi2 fit w/ line approximation
-      const double pij_x = py[i] * pz[j] - pz[i] * py[j];
-      const double pij_y = pz[i] * px[j] - px[i] * pz[j];
-      const double pij_z = px[i] * py[j] - py[i] * px[j];
+      const double pijX = py[i] * pz[j] - pz[i] * py[j];
+      const double pijY = pz[i] * px[j] - px[i] * pz[j];
+      const double pijZ = px[i] * py[j] - py[i] * px[j];
 
-      if (pij_x == 0.0f && pij_y == 0.0f && pij_z == 0.0f) continue;
+      if (pijX == 0. && pijY == 0. && pijZ == 0.) continue;
 
-      const double sr = sigma2_r[i] + sigma2_r[j];
-      const double sz = sigma2_z[i] + sigma2_z[j];
+      const double sr = sigmaR2[i] + sigmaR2[j];
+      const double sz = sigmaZ2[i] + sigmaZ2[j];
 
       const double ddx = dx[i] - dx[j];
       const double ddy = dy[i] - dy[j];
       const double ddz = dz[i] - dz[j];
 
-      const double pij_mag2 = pij_x * pij_x / (sr * sz) + pij_y * pij_y / (sr * sz) + pij_z * pij_z / (sr * sr);
+      const double pij2 = pijX * pijX / (sr * sz) +
+                          pijY * pijY / (sr * sz) + pijZ * pijZ / (sr * sr);
 
-      const double d_i = (pij_x * (py[j] * ddz - pz[j] * ddy) / (sr * sz) +
-                          pij_y * (pz[j] * ddx - px[j] * ddz) / (sr * sz) +
-                          pij_z * (px[j] * ddy - py[j] * ddx) / (sr * sr)) / pij_mag2;
+      const double di = (pijX * (py[j] * ddz - pz[j] * ddy) / (sr * sz) +
+                         pijY * (pz[j] * ddx - px[j] * ddz) / (sr * sz) +
+                         pijZ * (px[j] * ddy - py[j] * ddx) / (sr * sr)) / pij2;
 
-      const double d_j = (pij_x * (py[i] * ddz - pz[i] * ddy) / (sr * sz) +
-                          pij_y * (pz[i] * ddx - px[i] * ddz) / (sr * sz) +
-                          pij_z * (px[i] * ddy - py[i] * ddx) / (sr * sr)) / pij_mag2;
+      const double dj = (pijX * (py[i] * ddz - pz[i] * ddy) / (sr * sz) +
+                         pijY * (pz[i] * ddx - px[i] * ddz) / (sr * sz) +
+                         pijZ * (px[i] * ddy - py[i] * ddx) / (sr * sr)) / pij2;
 
-      const double vtx_x_i = dx[i] + px[i] * d_i;
-      const double vtx_y_i = dy[i] + py[i] * d_i;
-      const double vtx_z_i = dz[i] + pz[i] * d_i;
+      const double vxi = dx[i] + px[i] * di;
+      const double vyi = dy[i] + py[i] * di;
+      const double vzi = dz[i] + pz[i] * di;
 
-      const double vtx_x_j = dx[j] + px[j] * d_j;
-      const double vtx_y_j = dy[j] + py[j] * d_j;
-      const double vtx_z_j = dz[j] + pz[j] * d_j;
+      const double vxj = dx[j] + px[j] * dj;
+      const double vyj = dy[j] + py[j] * dj;
+      const double vzj = dz[j] + pz[j] * dj;
 
-      const double weight_ij = weight[i] + weight[j];
-      vtx_x.append((weight[j]*vtx_x_i + weight[i]*vtx_x_j) / weight_ij);
-      vtx_y.append((weight[j]*vtx_y_i + weight[i]*vtx_y_j) / weight_ij);
-      vtx_z.append((weight_z[j]*vtx_z_i + weight_z[i]*vtx_z_j) / (weight_z[i] + weight_z[j]));
+      const double wij = w[i] + w[j];
+      vx.append((w[j]*vxi + w[i]*vxj) / wij);
+      vy.append((w[j]*vyi + w[i]*vyj) / wij);
+      vz.append((wz[j]*vzi + wz[i]*vzj) / (wz[i] + wz[j]));
 
-      weight2.append(exp(-sr));
-      weight2_z.append(exp(-sz));
-      vtx_chi2.append(((vtx_x_i - vtx_x_j) * (vtx_x_i - vtx_x_j) + (vtx_y_i - vtx_y_j) * (vtx_y_i - vtx_y_j)) / sr +
-                      (vtx_z_i - vtx_z_j) * (vtx_z_i - vtx_z_j) / sz);
+      w2.append(exp(-sr));
+      wz2.append(exp(-sz));
+      vtx_chi2.append(((vxi - vxj) * (vxi - vxj) + (vyi - vyj) * (vyi - vyj))
+                      / sr + (vzi - vzj) * (vzi - vzj) / sz);
       nVts++;
     }
   }
   n = vtx_chi2.length();
-  double SigmaWeight(0.0f);
-  double SigmaWeight_z(0.0f);
+  double wSum(0.);
+  double wzSum(0.);
   for (int i = 0; i != n; i++) {
     if (vtx_chi2[i] > 10.) continue;
     double w(std::exp(-vtx_chi2[i]));
-    m_vx += vtx_x[i] * weight2[i] * w;
-    m_vy += vtx_y[i] * weight2[i] * w;
-    m_vz += vtx_z[i] * weight2_z[i] * w;
-    SigmaWeight += weight2[i] * w;
-    SigmaWeight_z += weight2_z[i] * w;
+    m_vx += vx[i] * w2[i] * w;
+    m_vy += vy[i] * w2[i] * w;
+    m_vz += vz[i] * wz2[i] * w;
+    wSum += w2[i] * w;
+    wzSum += wz2[i] * w;
   }
   int rtn_flag = 0;
-  if (SigmaWeight <= 0.) {
+  if (wSum <= 0.) {
     m_vx = -9999.;
     m_vy = -9999.;
   } else {
-    m_vx /= SigmaWeight;
-    m_vy /= SigmaWeight;
+    m_vx /= wSum;
+    m_vy /= wSum;
     rtn_flag = 1;
   }
   if (!z_flag) return rtn_flag;
-  if (SigmaWeight_z <= 0.) {
+  if (wzSum <= 0.) {
     m_vz = -9999.;
   } else {
-    m_vz /= SigmaWeight_z;
+    m_vz /= wzSum;
     rtn_flag++;
   }
   return rtn_flag;
@@ -981,11 +984,11 @@ int
 FTFinder::CorrectEvtTiming(void)
 {
   int nTrks = m_tracks.length();
-  double weight_sum = 0.;
-  double dt_sum2 = 0.;
+  double wSum = 0.;
+  double dtSum2 = 0.;
   for (int i = 0; i ^ nTrks; i++) {
-    double dt_sum = 0.;
-    double dtt_sum = 0.;
+    double dtSum = 0.;
+    double dttSum = 0.;
     int nHits = 0;
     const Lpav& la = m_tracks[i]->lpav();
     FTList<FTSegment*>& axialSgmnts = m_tracks[i]->getAxialSegments();
@@ -997,20 +1000,18 @@ FTFinder::CorrectEvtTiming(void)
         FTWire& h = * hits[k];
         const double x = h.x();
         const double y = h.y();
-        double d0 = fabs(la.d((double)x, (double)y));
-        if (d0 >= 0.45f * h.layer().csize()) continue;
+        const double d0 = fabs(la.d(x, y));
+        if (d0 >= 0.45 * h.layer().csize()) continue;
         nHits++;
         double dt = x2t(d0) - h.time();
-        dt_sum += dt;
-        dtt_sum += (dt * dt);
+        dtSum += dt;
+        dttSum += (dt * dt);
       }
     }
     if (!nHits) continue;
-    double weight_t = exp(-(dtt_sum - (dt_sum * dt_sum / nHits)) / (nHits * 1600));
-    weight_sum += (nHits * weight_t);
-    dt_sum2 += (dt_sum * weight_t);
+    const double w = exp(-(dttSum - (dtSum * dtSum / nHits)) / (nHits * 1600.));
+    wSum += (nHits * w);
+    dtSum2 += (dtSum * w);
   }
-  return int(dt_sum2 / weight_sum);
+  return int(dtSum2 / wSum);
 }
-
-

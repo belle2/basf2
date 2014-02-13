@@ -16,7 +16,10 @@
 namespace Belle2 {
   class L3TrackTrigger : public L3TriggerBase {
   public:
-    L3TrackTrigger() {SetName("TrackTrigger");}
+    //! Constructor
+    L3TrackTrigger();
+
+    //! Destructor
     virtual ~L3TrackTrigger() {}
 
     //! selecct events

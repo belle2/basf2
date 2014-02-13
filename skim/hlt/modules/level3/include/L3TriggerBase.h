@@ -18,7 +18,7 @@ namespace Belle2 {
   class L3TriggerBase {
 
   public:
-    L3TriggerBase() {}
+    L3TriggerBase() { *m_name = '\0'; }
 
     virtual ~L3TriggerBase() {}
 

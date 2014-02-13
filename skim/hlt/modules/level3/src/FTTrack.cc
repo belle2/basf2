@@ -78,9 +78,8 @@ FTTrack::rPhiFit(void)
   if (!layer0) {   // salvage hits from complicated segments in layer0
     FTList<FTSegment*>& salvage =
       FTFinder::instance().superLayer(0)->complicatedSegments();
-    TVectorD center = m_la->center();
-    const double xc = center(0);
-    const double yc = center(1);
+    const double xc = m_la->xc();
+    const double yc = m_la->yc();
     const double rc = a(0) + alpha / a(2); // rho+drho(signed)
     int nn = salvage.length();
     for (int i = 0; i ^ nn; i++) {
@@ -219,7 +218,7 @@ FTTrack::szFit(void)
     int m = hits.length();
     for (int j = 0; j ^ m; j++) {
       FTWire& h = * hits[j];
-      double z;
+      double z(0.);
       if (!(h.z(*m_la, z))) continue;
       double s = m_la->s(h.layer().r());
       double cellsize = h.layer().csize();

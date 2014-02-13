@@ -37,11 +37,6 @@ static double err_dis_inv(double x, double y, double w, double a, double b)
 //
 // constructors and destructor
 //
-Lpav::Lpav()
-{
-  clear();
-}
-
 Lpav::~Lpav()
 {
 }
@@ -53,53 +48,45 @@ void Lpav::calculate_average(double xi, double yi, double wi)
 {
   if (m_wsum <= 0) return;
   m_wsum_temp = m_wsum + wi;
-  double rri(xi * xi + yi * yi);
-  double wrri(wi * rri);
-  double wsum_inv(1 / m_wsum_temp);
+  const double rri(xi * xi + yi * yi);
+  const double wrri(wi * rri);
+  const double wsum_inv(1 / m_wsum_temp);
   m_xav = (m_xsum + wi * xi) * wsum_inv;
   m_yav = (m_ysum + wi * yi) * wsum_inv;
 
-  double xxav((m_xxsum + wi * xi * xi) * wsum_inv);
-  double yyav((m_yysum + wi * yi * yi) * wsum_inv);
-  double xyav((m_xysum + wi * xi * yi) * wsum_inv);
-  double xrrav((m_xrrsum + xi * wrri) * wsum_inv);
-  double yrrav((m_yrrsum + yi * wrri) * wsum_inv);
-  double rrrrav((m_rrrrsum + wrri * rri) * wsum_inv);
-
-  calculate_average_n(xxav, yyav, xyav, xrrav, yrrav, rrrrav);
-
+  calculate_average_n((m_xxsum + wi * xi * xi) * wsum_inv,
+                      (m_yysum + wi * yi * yi) * wsum_inv,
+                      (m_xysum + wi * xi * yi) * wsum_inv,
+                      (m_xrrsum + xi * wrri) * wsum_inv,
+                      (m_yrrsum + yi * wrri) * wsum_inv,
+                      (m_rrrrsum + wrri * rri) * wsum_inv);
 }
 
 void Lpav::calculate_average(void)
 {
   if (m_wsum <= 0) return;
   m_wsum_temp = m_wsum;
-  double wsum_inv(1 / m_wsum_temp);
+  const double wsum_inv(1 / m_wsum_temp);
   m_xav = m_xsum * wsum_inv;
   m_yav = m_ysum * wsum_inv;
 
-  double xxav(m_xxsum * wsum_inv);
-  double yyav(m_yysum * wsum_inv);
-  double xyav(m_xysum * wsum_inv);
-  double xrrav(m_xrrsum * wsum_inv);
-  double yrrav(m_yrrsum * wsum_inv);
-  double rrrrav(m_rrrrsum * wsum_inv);
-
-  calculate_average_n(xxav, yyav, xyav, xrrav, yrrav, rrrrav);
+  calculate_average_n(m_xxsum * wsum_inv, m_yysum * wsum_inv,
+                      m_xysum * wsum_inv, m_xrrsum * wsum_inv,
+                      m_yrrsum * wsum_inv, m_rrrrsum * wsum_inv);
 }
 
 void Lpav::calculate_average_n(double xxav, double yyav, double xyav,
                                double xrrav, double yrrav, double rrrrav)
 {
-  double xxav_p = xxav - m_xav * m_xav;
-  double yyav_p = yyav - m_yav * m_yav;
-  double xyav_p = xyav - m_xav * m_yav;
-  double rrav_p = xxav_p + yyav_p;
+  const double xxav_p = xxav - m_xav * m_xav;
+  const double yyav_p = yyav - m_yav * m_yav;
+  const double xyav_p = xyav - m_xav * m_yav;
+  const double rrav_p = xxav_p + yyav_p;
 
-  double a = std::fabs(xxav_p - yyav_p);
-  double b = 4 * xyav_p * xyav_p;
-  double asqpb = a * a + b;
-  double rasqpb = std::sqrt(asqpb);
+  const double a = std::fabs(xxav_p - yyav_p);
+  const double b = 4 * xyav_p * xyav_p;
+  const double asqpb = a * a + b;
+  const double rasqpb = std::sqrt(asqpb);
   double splus = 1 + a / rasqpb;
   double sminus = b / (asqpb * splus);
   splus = std::sqrt(0.5 * splus);
@@ -132,28 +119,28 @@ void Lpav::calculate_average_n(double xxav, double yyav, double xyav,
     m_sinrot = - m_sinrot;
   }
   m_rscale = std::sqrt(rrav_p);
-  double cos2 = m_cosrot * m_cosrot;
-  double sin2 = m_sinrot * m_sinrot;
-  double cs2 = 2 * m_sinrot * m_cosrot;
-  double rrav_p_inv(1 / rrav_p);
+  const double cos2 = m_cosrot * m_cosrot;
+  const double sin2 = m_sinrot * m_sinrot;
+  const double cs2 = 2 * m_sinrot * m_cosrot;
+  const double rrav_p_inv(1 / rrav_p);
   m_xxavp = (cos2 * xxav_p + cs2 * xyav_p + sin2 * yyav_p) * rrav_p_inv;
   m_yyavp = (cos2 * yyav_p - cs2 * xyav_p + sin2 * xxav_p) * rrav_p_inv;
 
-  double xav2 = m_xav * m_xav;
-  double yav2 = m_yav * m_yav;
-  double xrrav_p = (xrrav - 2 * xxav * m_xav + xav2 * m_xav -
-                    2 * xyav * m_yav + m_xav * yav2) - m_xav * rrav_p;
-  double yrrav_p = (yrrav - 2 * yyav * m_yav + yav2 * m_yav -
-                    2 * xyav * m_xav + m_yav * xav2) - m_yav * rrav_p;
+  const double xav2 = m_xav * m_xav;
+  const double yav2 = m_yav * m_yav;
+  const double xrrav_p = (xrrav - 2 * xxav * m_xav + xav2 * m_xav -
+                          2 * xyav * m_yav + m_xav * yav2) - m_xav * rrav_p;
+  const double yrrav_p = (yrrav - 2 * yyav * m_yav + yav2 * m_yav -
+                          2 * xyav * m_xav + m_yav * xav2) - m_yav * rrav_p;
   m_xrravp = (m_cosrot * xrrav_p + m_sinrot * yrrav_p) * rrav_p_inv / m_rscale;
   m_yrravp = (- m_sinrot * xrrav_p + m_cosrot * yrrav_p) * rrav_p_inv / m_rscale;
 
-  double rrav = xxav + yyav;
-  double rrrrav_p = rrrrav
-                    - 2 * m_yav * yrrav - 2 * m_xav * xrrav
-                    + rrav * (xav2 + yav2)
-                    - 2 * m_xav * xrrav_p - xav2 * rrav_p
-                    - 2 * m_yav * yrrav_p - yav2 * rrav_p;
+  const double rrav = xxav + yyav;
+  const double rrrrav_p = rrrrav
+                          - 2 * m_yav * yrrav - 2 * m_xav * xrrav
+                          + rrav * (xav2 + yav2)
+                          - 2 * m_xav * xrrav_p - xav2 * rrav_p
+                          - 2 * m_yav * yrrav_p - yav2 * rrav_p;
   m_rrrravp = rrrrav_p * rrav_p_inv * rrav_p_inv;
   m_xyavp = 0;
 }
@@ -173,7 +160,7 @@ void Lpav::calculate_average3(double xi, double yi, double wi)
   m_xxavp = (m_xxsum + wi * xi * xi) * wsum_inv;
   m_xyavp = (m_xysum + wi * xi * yi) * wsum_inv;
   m_yyavp = (m_yysum + wi * yi * yi) * wsum_inv;
-  double wrri(wi * rri);
+  const double wrri(wi * rri);
   m_xrravp = (m_xrrsum + xi * wrri) * wsum_inv;
   m_yrravp = (m_yrrsum + yi * wrri) * wsum_inv;
   m_rrrravp = (m_rrrrsum + rri * wrri) * wsum_inv;
@@ -183,7 +170,7 @@ void Lpav::calculate_average3(void)
 {
   if (m_wsum <= 0) return;
   m_wsum_temp = m_wsum;
-  double wsum_inv(1 / m_wsum_temp);
+  const double wsum_inv(1 / m_wsum_temp);
   m_xav = m_xsum * wsum_inv;
   m_yav = m_ysum * wsum_inv;
 
@@ -201,32 +188,32 @@ void Lpav::calculate_average3(void)
 double Lpav::solve_lambda(void)
 {
   if (m_rscale <= 0) return -1;
-  double xrrxrr = m_xrravp * m_xrravp;
-  double yrryrr = m_yrravp * m_yrravp;
-  double rrrrm1 = m_rrrravp - 1;
-  double xxyy = m_xxavp * m_yyavp;
+  const double xrrxrr = m_xrravp * m_xrravp;
+  const double yrryrr = m_yrravp * m_yrravp;
+  const double rrrrm1 = m_rrrravp - 1;
+  const double xxyy = m_xxavp * m_yyavp;
 
-  double c0 =       rrrrm1 * xxyy - xrrxrr * m_yyavp - yrryrr * m_xxavp;
-  double c1 =     - rrrrm1        + xrrxrr        + yrryrr        - 4 * xxyy;
-  double c2 =   4 + rrrrm1                                        - 4 * xxyy;
-  double c4 = - 4;
+  const double c0 =  rrrrm1 * xxyy - xrrxrr * m_yyavp - yrryrr * m_xxavp;
+  const double c1 = -rrrrm1 + xrrxrr + yrryrr - 4 * xxyy;
+  const double c2 =  4 + rrrrm1 - 4 * xxyy;
+  const double c4 = -4;
   //
   //C     COEFFICIENTS OF THE DERIVATIVE - USED IN NEWTON-RAPHSON ITERATIONS
   //
-  double c2d = 2 * c2;
-  double c4d = 4 * c4;
+  const double c2d = 2 * c2;
+  const double c4d = 4 * c4;
   //
   double lambda = 0;
 
-  double chiscl = m_wsum_temp * m_rscale * m_rscale;
-  double dlamax = 0.001 / chiscl;
+  const double chiscl = m_wsum_temp * m_rscale * m_rscale;
+  const double dlamax = 0.001 / chiscl;
   const int ntry = 5;
   int itry = 0;
   double dlambda = dlamax;
   while (itry < ntry && std::fabs(dlambda) >= dlamax) {
-    double cpoly = c0 + lambda * (c1 + lambda *
-                                  (c2 + lambda * lambda * c4));
-    double dcpoly = c1 + lambda * (c2d + lambda * lambda * c4d);
+    const double cpoly = c0 + lambda * (c1 + lambda *
+                                        (c2 + lambda * lambda * c4));
+    const double dcpoly = c1 + lambda * (c2d + lambda * lambda * c4d);
     dlambda = - cpoly / dcpoly;
     lambda += dlambda;
     itry ++;
@@ -238,20 +225,20 @@ double Lpav::solve_lambda(void)
 double Lpav::solve_lambda3(void)
 {
   if (m_rscale <= 0) return -1;
-  double xrrxrr = m_xrravp * m_xrravp;
-  double yrryrr = m_yrravp * m_yrravp;
+  const double xrrxrr = m_xrravp * m_xrravp;
+  const double yrryrr = m_yrravp * m_yrravp;
   //double rrrrm1 = m_rrrravp - 1;
   //double xxyy = m_xxavp * m_yyavp;
 
-  double a = m_rrrravp;
-  double b = xrrxrr + yrryrr - m_rrrravp * (m_xxavp + m_yyavp);
-  double c = m_rrrravp * m_xxavp * m_yyavp
-             - m_yyavp * xrrxrr - m_xxavp * yrryrr
-             + 2 * m_xyavp * m_xrravp * m_yrravp - m_rrrravp * m_xyavp * m_xyavp;
+  const double a = m_rrrravp;
+  const double b = xrrxrr + yrryrr - m_rrrravp * (m_xxavp + m_yyavp);
+  const double c = m_rrrravp * m_xxavp * m_yyavp
+                   - m_yyavp * xrrxrr - m_xxavp * yrryrr
+                   + 2 * m_xyavp * m_xrravp * m_yrravp - m_rrrravp * m_xyavp * m_xyavp;
   if (c >= 0 && b <= 0) {
     return (-b - std::sqrt(b * b - 4 * a * c)) / 2 / a;
   } else if (c >= 0 && b > 0) {
-    B2ERROR(" returning -1");
+    B2ERROR("Lpav::solve_lambda3: returning -1");
     return -1;
   } else if (c < 0) {
     return (-b + std::sqrt(b * b - 4 * a * c)) / 2 / a;
@@ -261,16 +248,16 @@ double Lpav::solve_lambda3(void)
 
 double Lpav::calculate_lpar(void)
 {
-  double lambda = solve_lambda();
+  const double lambda = solve_lambda();
   // changed on Oct-13-93
   //  if (lambda<=0) return -1;
   if (lambda < 0) return -1;
-  double h11 = m_xxavp - lambda;
-  double h22 = m_yyavp - lambda;
+  const double h11 = m_xxavp - lambda;
+  const double h22 = m_yyavp - lambda;
   if (h11 == 0.0) return -1;
-  double h14 = m_xrravp;
-  double h24 = m_yrravp;
-  double h34 = 1 + 2 * lambda;
+  const double h14 = m_xrravp;
+  const double h24 = m_yrravp;
+  const double h34 = 1 + 2 * lambda;
   double rootsq = (h14 * h14 / h11 / h11) + 4 * h34;
   if (std::fabs(h22) > std::fabs(h24)) {
     if (h22 == 0.0) return -1;
@@ -288,25 +275,15 @@ double Lpav::calculate_lpar(void)
   }
   m_alpha = - (h14 / h11) * m_kappa;
   m_gamma = - h34 * m_kappa;
-  //    if (lambda<0.0001) {
-  //      dout(Debugout::INFO,"Lpav") << " lambda=" << lambda << " h34=" << h34
-  //  << " rootsq=" << rootsq << " h22=" << h22
-  //    << " h11=" << h11 << " h14=" << h14 << " h24=" << h24 <<
-  //      " " << *this << std::endl;
-  //    }
-  //
-  //C     TRANSFORM THESE INTO THE LAB COORDINATE SYSTEM
-  //
-  //C     FIRST GET KAPPA  AND GAMMA  BACK TO REAL DIMENSIONS
-  //
+
+  //---
+  // Transform These into the lab. coordinate system
+  //---
+  // first get kappa and gamma back to real dimensions
   scale(m_rscale);
-  //
-  //C     NEXT ROTATE ALPHA  AND BETA
-  //
+  // next rotate alpha and beta
   rotate(m_cosrot, -m_sinrot);
-  //
-  //C     THEN TRANSLATE BY (XAV,YAV)
-  //
+  // then translate by (m_xav, m_yav)
   move(-m_xav, -m_yav);
   if (m_yrravp < 0) neg();
   if (lambda >= 0) m_chisq = lambda * m_wsum_temp * m_rscale * m_rscale;
@@ -315,21 +292,21 @@ double Lpav::calculate_lpar(void)
 
 double Lpav::calculate_lpar3(void)
 {
-  double lambda = solve_lambda3();
+  const double lambda = solve_lambda3();
   // changed on Oct-13-93
   //  if (lambda<=0) return -1;
   if (lambda < 0) return -1;
-  double h11 = m_xxavp - lambda;
-  double h22 = m_yyavp - lambda;
-  double h14 = m_xrravp;
-  double h24 = m_yrravp;
+  const double h11 = m_xxavp - lambda;
+  const double h22 = m_yyavp - lambda;
+  const double h14 = m_xrravp;
+  const double h24 = m_yrravp;
   m_gamma = 0;
-  double h12 = m_xyavp;
-  double det = h11 * h22 - h12 * h12;
+  const double h12 = m_xyavp;
+  const double det = h11 * h22 - h12 * h12;
   if (det != 0) {
-    double r1 = (h14 * h22 - h24 * h12) / (det);
-    double r2 = (h24 * h11 - h14 * h12) / (det);
-    double kinvsq = r1 * r1 + r2 * r2;
+    const double r1 = (h14 * h22 - h24 * h12) / (det);
+    const double r2 = (h24 * h11 - h14 * h12) / (det);
+    const double kinvsq = r1 * r1 + r2 * r2;
     m_kappa = std::sqrt(1 / kinvsq);
     if (h11 != 0) m_alpha = -m_kappa * r1;
     else m_alpha = 1;
@@ -350,9 +327,6 @@ double Lpav::calculate_lpar3(void)
   }
   if ((m_alpha * m_xav + m_beta * m_yav) *
       (m_beta * m_xav - m_alpha * m_yav) < 0) neg();
-  //    if (std::fabs(m_alpha)<0.01 && std::fabs(m_beta)<0.01) {
-  //      dout(Debugout::INFO,"Lpav") << " lambda=" << lambda << " " << *this << std::endl;
-  //    }
   if (lambda >= 0) m_chisq = lambda * m_wsum_temp * m_rscale * m_rscale;
   return lambda;
 }
@@ -392,13 +366,8 @@ double Lpav::fit(void)
 }
 
 TMatrixDSym Lpav::cov(int inv) const
-#ifdef BELLE_OPTIMIZED_RETURN
-return vret(4);
-{
-#else
 {
   TMatrixDSym vret(4);
-#endif
   vret(0, 0) = m_xxsum;
   vret(1, 0) = m_xysum;
   vret(1, 1) = m_yysum;
@@ -415,9 +384,7 @@ return vret(4);
     vret.Invert(&d);
     if (d == 0.) {
       B2ERROR("Lpav::cov:could not invert nc=" << m_nc);
-#ifdef HAVE_EXCEPTION
-      throw new Singular();
-#endif
+      return TMatrixDSym(0);
     }
   }
   return vret;
@@ -425,24 +392,13 @@ return vret(4);
 
 TMatrixDSym Lpav::cov_c(int inv) const
 {
-  TMatrixDSym vret(3);
-#ifdef HAVE_EXCEPTION
-  try {
-#endif
-    vret = cov(1).Similarity(dldc());
-#ifdef HAVE_EXCEPTION
-  } catch (Lpav::Singular) {
-    throw new Singular_c();
-  }
-#endif
+  TMatrixDSym vret(cov(1).Similarity(dldc()));
   if (inv == 0) {
     double d;
     vret.Invert(&d);
     if (d == 0.) {
       B2ERROR("Lpav::cov_c:could not invert");
-#ifdef HAVE_EXCEPTION
-      throw new Singular_c();
-#endif
+      return TMatrixDSym(0);
     }
   }
   return vret;
@@ -460,19 +416,13 @@ int Lpav::extrapolate(double r, double& phi, double& dphi) const
   v(1) = y;
   v(2) = 1;
   v(3) = r * r;
-#ifdef HAVE_EXCEPTION
-  try {
-#endif
-    double l = cov().Similarity(v);
-    if (l > 0) {
-      double ls = std::sqrt(l);
-      dphi = ls / r;
-    }
-#ifdef HAVE_EXCEPTION
-  } catch (Lpav::Singular) {
+  double l = cov().Similarity(v);
+  if (l > 0) {
+    double ls = std::sqrt(l);
+    dphi = ls / r;
+  } else {
     return -1;
   }
-#endif
   return 0;
 }
 
@@ -484,27 +434,17 @@ double Lpav::similarity(double x, double y) const
   v(1) = y;
   v(2) = 1;
   v(3) = x * x + y * y;
-  double l;
-#ifdef HAVE_EXCEPTION
-  try {
-#endif
-    l = cov().Similarity(v);
-#ifdef HAVE_EXCEPTION
-  } catch (Lpav::Singular) {
-    return -1;
-  }
-#endif
-  return l;
+  double l = cov().Similarity(v);
+  return (l > 0) ? l : -1.;
 }
 
 void Lpav::add(double xi, double yi, double w, double a, double b)
 {
-  register double wi = err_dis_inv(xi, yi, w, a, b);
+  const double wi = err_dis_inv(xi, yi, w, a, b);
   add(xi, yi, wi);
 }
 
-void Lpav::add_point(register double xi, register double yi,
-                     register double wi)
+void Lpav::add_point(double xi, double yi, double wi)
 {
   m_wsum += wi;
   m_xsum += wi * xi;
@@ -512,8 +452,8 @@ void Lpav::add_point(register double xi, register double yi,
   m_xxsum += wi * xi * xi;
   m_yysum += wi * yi * yi;
   m_xysum += wi * xi * yi;
-  register double rri = (xi * xi + yi * yi);
-  register double wrri = wi * rri;
+  const double rri = (xi * xi + yi * yi);
+  const double wrri = wi * rri;
   m_xrrsum += wrri * xi;
   m_yrrsum += wrri * yi;
   m_rrrrsum += wrri * rri;
@@ -522,15 +462,15 @@ void Lpav::add_point(register double xi, register double yi,
 
 void Lpav::add_point_frac(double xi, double yi, double w, double a)
 {
-  register double wi = w * a;
+  const double wi = w * a;
   m_wsum += wi;
   m_xsum += wi * xi;
   m_ysum += wi * yi;
   m_xxsum += wi * xi * xi;
   m_yysum += wi * yi * yi;
   m_xysum += wi * xi * yi;
-  register double rri = (xi * xi + yi * yi);
-  register double wrri = wi * rri;
+  const double rri = (xi * xi + yi * yi);
+  const double wrri = wi * rri;
   m_xrrsum += wrri * xi;
   m_yrrsum += wrri * yi;
   m_rrrrsum += wrri * rri;
@@ -539,15 +479,15 @@ void Lpav::add_point_frac(double xi, double yi, double w, double a)
 
 void Lpav::sub(double xi, double yi, double w, double a, double b)
 {
-  register double wi = err_dis_inv(xi, yi, w, a, b);
+  const double wi = err_dis_inv(xi, yi, w, a, b);
   m_wsum -= wi;
   m_xsum -= wi * xi;
   m_ysum -= wi * yi;
   m_xxsum -= wi * xi * xi;
   m_yysum -= wi * yi * yi;
   m_xysum -= wi * xi * yi;
-  register double rri = (xi * xi + yi * yi);
-  register double wrri = wi * rri;
+  const double rri = (xi * xi + yi * yi);
+  const double wrri = wi * rri;
   m_xrrsum -= wrri * xi;
   m_yrrsum -= wrri * yi;
   m_rrrrsum -= wrri * rri;
@@ -568,28 +508,7 @@ const Lpav& Lpav::operator+=(const Lpav& la1)
   m_nc += la1.m_nc;
   return *this;
 }
-/*
-Lpav operator+(const Lpav &la1, const Lpav &la2)
-#ifdef BELLE_OPTIMIZED_RETURN
-return la;
-{
-#else
-{
-  Lpav la;
-#endif
-  la.m_wsum = la1.m_wsum + la2.m_wsum;
-  la.m_xsum = la1.m_xsum + la2.m_xsum;
-  la.m_ysum = la1.m_ysum + la2.m_ysum;
-  la.m_xxsum = la1.m_xxsum + la2.m_xxsum;
-  la.m_yysum = la1.m_yysum + la2.m_yysum;
-  la.m_xysum = la1.m_xysum + la2.m_xysum;
-  la.m_xrrsum = la1.m_xrrsum + la2.m_xrrsum;
-  la.m_yrrsum = la1.m_yrrsum + la2.m_yrrsum;
-  la.m_rrrrsum = la1.m_rrrrsum + la2.m_rrrrsum;
-  la.m_nc = la1.m_nc + la2.m_nc;
-  return la;
-}
-*/
+
 double Lpav::chi_deg() const
 {
   if (m_nc <= 3) return -1;

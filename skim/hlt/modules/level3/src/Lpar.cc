@@ -33,41 +33,19 @@ const double Lpar::BELLE_ALPHA(222.37606);
 // }
 Lpar::Cpar::Cpar(const Lpar& l)
 {
-  m_cu = l.kappa();
-  if (l.alpha() != 0 && l.beta() != 0)
-    m_fi = atan2(l.alpha(), -l.beta());
+  m_cu = l.m_kappa;
+  if (l.m_alpha != 0 && l.m_beta != 0)
+    m_fi = atan2(l.m_alpha, -l.m_beta);
   else m_fi = 0;
   if (m_fi < 0) m_fi += 2 * M_PI;
-  m_da = 2 * l.gamma() / (1 + sqrt(1 + 4 * l.kappa() * l.gamma()));
+  m_da = 2 * l.m_gamma / (1 + sqrt(1 + 4 * l.m_kappa * l.m_gamma));
   m_cfi = cos(m_fi);
   m_sfi = sin(m_fi);
 }
 
-// Lpar::Lpar( const Lpar& )
-// {
-// }
-
 Lpar::~Lpar()
 {
 }
-
-//
-// assignment operators
-//
-// const Lpar& Lpar::operator=( const Lpar& )
-// {
-// }
-
-//
-// comparison operators
-//
-// bool Lpar::operator==( const Lpar& ) const
-// {
-// }
-
-// bool Lpar::operator!=( const Lpar& ) const
-// {
-// }
 
 //
 // member functions
@@ -75,10 +53,7 @@ Lpar::~Lpar()
 void Lpar::circle(double x1, double y1, double x2, double y2,
                   double x3, double y3)
 {
-  double a;
-  double b;
-  double c;
-  double delta = (x1 - x2) * (y1 - y3) - (y1 - y2) * (x1 - x3);
+  const double delta = (x1 - x2) * (y1 - y3) - (y1 - y2) * (x1 - x3);
   if (delta == 0) {
     //
     // three points are on a line.
@@ -112,13 +87,15 @@ void Lpar::circle(double x1, double y1, double x2, double y2,
       }
     }
   } else {
-    double r1sq = x1 * x1 + y1 * y1;
-    double r2sq = x2 * x2 + y2 * y2;
-    double r3sq = x3 * x3 + y3 * y3;
-    a = 0.5 * ((y1 - y3) * (r1sq - r2sq) - (y1 - y2) * (r1sq - r3sq)) / delta;
-    b = 0.5 * (- (x1 - x3) * (r1sq - r2sq) + (x1 - x2) * (r1sq - r3sq)) / delta;
-    double csq = (x1 - a) * (x1 - a) + (y1 - b) * (y1 - b);
-    c = sqrt(csq);
+    const double r1sq = x1 * x1 + y1 * y1;
+    const double r2sq = x2 * x2 + y2 * y2;
+    const double r3sq = x3 * x3 + y3 * y3;
+    const double a
+      = 0.5 * ((y1 - y3) * (r1sq - r2sq) - (y1 - y2) * (r1sq - r3sq)) / delta;
+    const double b
+      = 0.5 * (- (x1 - x3) * (r1sq - r2sq) + (x1 - x2) * (r1sq - r3sq)) / delta;
+    const double csq = (x1 - a) * (x1 - a) + (y1 - b) * (y1 - b);
+    const double c = sqrt(csq);
     //double csq2 = (x2-a)*(x2-a) + (y2-b)*(y2-b);
     //double csq3 = (x3-a)*(x3-a) + (y3-b)*(y3-b);
     m_kappa = 1 / (2 * c);
@@ -129,17 +106,12 @@ void Lpar::circle(double x1, double y1, double x2, double y2,
 }
 
 TMatrixD Lpar::dldc() const
-#ifdef BELLE_OPTIMIZED_RETURN
-return vret(3, 4);
-{
-#else
 {
   TMatrixD vret(3, 4);
-#endif
   Cpar cp(*this);
-  double xi = cp.xi();
-  double s = cp.sfi();
-  double c = cp.cfi();
+  const double xi = cp.xi();
+  const double s = cp.sfi();
+  const double c = cp.cfi();
   vret(0, 0) = 2 * cp.da() * s;
   vret(0, 1) = -2 * cp.da() * c;
   vret(0, 2) = cp.da() * cp.da();
@@ -157,11 +129,11 @@ return vret(3, 4);
 
 bool Lpar::xy(double r, double& x, double& y, int dir) const
 {
-  double t_kr2g = kr2g(r);
-  double t_xi2 = xi2();
-  double ro = r * r * t_xi2 - t_kr2g * t_kr2g;
+  const double t_kr2g = kr2g(r);
+  const double t_xi2 = xi2();
+  const double ro = r * r * t_xi2 - t_kr2g * t_kr2g;
   if (ro < 0) return false;
-  double rs = sqrt(ro);
+  const double rs = sqrt(ro);
   if (dir == 0) {
     x = (- m_alpha * t_kr2g  -  m_beta * rs) / t_xi2;
     y = (- m_beta  * t_kr2g  + m_alpha * rs) / t_xi2;
@@ -197,25 +169,25 @@ double Lpar::phi(double r, int dir) const
 
 void Lpar::xhyh(double x, double y, double& xh, double& yh) const
 {
-  double ddm = dr(x, y);
+  const double ddm = dr(x, y);
   if (ddm == 0) {
     xh = x;
     yh = y;
     return;
   }
-  double kdp1 = 1 + 2 * kappa() * ddm;
-  xh = x - ddm * (2 * kappa() * x + alpha()) / kdp1;
-  yh = y - ddm * (2 * kappa() * y + beta()) / kdp1;
+  const double kdp1 = 1 + 2 * m_kappa * ddm;
+  xh = x - ddm * (2 * m_kappa * x + m_alpha) / kdp1;
+  yh = y - ddm * (2 * m_kappa * y + m_beta) / kdp1;
 }
 
 double Lpar::s(double x, double y) const
 {
   double xh, yh, xx, yy;
   xhyh(x, y, xh, yh);
-  double fk = fabs(kappa());
+  const double fk = fabs(m_kappa);
   if (fk == 0) return 0;
-  yy = 2 * fk * (alpha() * yh - beta() * xh);
-  xx = 2 * kappa() * (alpha() * xh + beta() * yh) + xi2();
+  yy = 2 * fk * (m_alpha * yh - m_beta * xh);
+  xx = 2 * m_kappa * (m_alpha * xh + m_beta * yh) + xi2();
   double sp = atan2(yy, xx);
   if (sp < 0) sp += (2 * M_PI);
   return sp / 2 / fk;
@@ -223,24 +195,11 @@ double Lpar::s(double x, double y) const
 
 double Lpar::s(double r, int dir) const
 {
-  double d0 = da();
+  const double d0 = da();
   if (fabs(r) < fabs(d0)) return -1;
-  double b = fabs(kappa()) * sqrt((r * r - d0 * d0) / (1 + 2 * kappa() * d0));
+  const double b
+    = fabs(m_kappa) * sqrt((r * r - d0 * d0) / (1 + 2 * m_kappa * d0));
   if (fabs(b) > 1) return -1;
-  if (dir == 0)return asin(b) / fabs(kappa());
-  return (M_PI - asin(b)) / fabs(kappa());
-}
-
-TVectorD Lpar::center() const
-#ifdef BELLE_OPTIMIZED_RETURN
-return v(3);
-{
-#else
-{
-  TVectorD v(3);
-#endif
-  v(0) = xc();
-  v(1) = yc();
-  v(2) = 0;
-  return (v);
+  if (dir == 0) return asin(b) / fabs(m_kappa);
+  return (M_PI - asin(b)) / fabs(m_kappa);
 }

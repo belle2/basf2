@@ -57,13 +57,15 @@ FCFinder::init()
 {
   ECL::ECLGeometryPar& geom = *ECL::ECLGeometryPar::Instance();
 
-  if (!m_Crystal) m_Crystal = new FCCrystal[8737];
+  static const int nCrystals(8736);
+
+  if (!m_Crystal) m_Crystal = new FCCrystal[nCrystals + 1];
 
   int nPhiRing[69];
   int n = 0;
   int thetaId_save = 0;
 
-  for (int cellId = 0; cellId < 8736; cellId++) {
+  for (int cellId = 0; cellId < nCrystals; cellId++) {
     geom.Mapping(cellId);
     const int thetaId = geom.GetThetaID();
     if (thetaId != thetaId_save) {
@@ -75,12 +77,12 @@ FCFinder::init()
   }
   nPhiRing[thetaId_save] = n;
 
-  for (int cellId = 0; cellId < 8736; cellId++) {
+  for (int cellId = 0; cellId < nCrystals; cellId++) {
     geom.Mapping(cellId);
     const int thetaId = geom.GetThetaID();
     const int phiId = geom.GetPhiID();
 
-    FCCrystal* minusPhi = m_Crystal + 8736;
+    FCCrystal* minusPhi = m_Crystal + nCrystals;
     n = nPhiRing[thetaId];
     if (thetaId && thetaId != 13 && thetaId != 59) {
       minusPhi = m_Crystal;
@@ -90,7 +92,7 @@ FCFinder::init()
       if ((remnant << 1) >= n) PhiRingMinusPhiId++;
       minusPhi += (cellId - phiId - (nPhiRingMinus - PhiRingMinusPhiId));
     }
-    FCCrystal* plusPhi = m_Crystal + 8736;
+    FCCrystal* plusPhi = m_Crystal + nCrystals;
     if (thetaId != 12 && thetaId != 58 && thetaId != 68) {
       plusPhi = m_Crystal;
       int nPhiRingPlus = nPhiRing[thetaId + 1];
@@ -103,7 +105,7 @@ FCFinder::init()
     //B2INFO("crystal " << getCellId(m_Crystal+cellId) << " plus:" << getCellId(plusPhi) << " minus:" << getCellId(minusPhi) << " theta:" << thetaId << " phi:" << phiId);
   }
   // make virtual cell object for the pointer of boundary's neighbor
-  new(m_Crystal + 8736) FCCrystal();
+  new(m_Crystal + nCrystals) FCCrystal();
 
 }
 
@@ -202,7 +204,7 @@ FCFinder::clustering(const double seedThreshold, const double clusterECut)
 
   FTList<FCCrystal*>* hits = new FTList<FCCrystal*>(25);
   FCCrystal** const last = m_ehits.lastPtr();
-  register FCCrystal** hptr = m_ehits.firstPtr();
+  FCCrystal** hptr = m_ehits.firstPtr();
   do {      // cluster loop
     if ((**hptr).state()) continue;
     FCCrystal* seed = *hptr;
@@ -210,7 +212,7 @@ FCFinder::clustering(const double seedThreshold, const double clusterECut)
     double clusterEnergy = 0;
     hits->append(seed);
     for (int i = 0; i ^ hits->length(); i++) { // loop over hits in a cluster
-      register FCCrystal* const ehit = (*hits)[i];
+      FCCrystal* const ehit = (*hits)[i];
       const unsigned int state = ehit->state();
       const double energy = ehit->energy();
       clusterEnergy += energy;

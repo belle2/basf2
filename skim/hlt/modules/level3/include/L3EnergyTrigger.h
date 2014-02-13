@@ -16,7 +16,10 @@
 namespace Belle2 {
   class L3EnergyTrigger : public L3TriggerBase {
   public:
-    L3EnergyTrigger() {SetName("EnergyTrigger");}
+    //! Constructor
+    L3EnergyTrigger();
+
+    //! Destructor
     virtual ~L3EnergyTrigger() {}
 
     //! selecct events

@@ -22,9 +22,7 @@ namespace Belle2 {
   class FTSuperLayer {
   public:
     //! Constructors and destructor
-    FTSuperLayer(const int firstWireID,
-                 const int firstLayerID, const int NLayer,
-                 const int superLayerID, const int isAxial,
+    FTSuperLayer(const int NLayer, const int superLayerID, const int isAxial,
                  const bool haveSmallCell, FTLayer* first);
     ~FTSuperLayer();
 
@@ -66,7 +64,8 @@ namespace Belle2 {
     //! returns complicated segments
     FTList<FTSegment*>& complicatedSegments(void);
 
-    FTLayer* firstLayer() const {return m_firstLayer;}
+    //! returns first layer in the super layer
+    FTLayer* firstLayer() const;
 
   private:
     //! clustering of wire-hits
@@ -88,8 +87,6 @@ namespace Belle2 {
 
   private: // private data members
     const int m_superLayerId;
-    const int m_firstLayerId;
-    const int m_firstWireId;
     const int m_Nlayer;
     const int m_isAxial;
     FTList<FTSegment*>* const m_complicatedSegments;
@@ -112,13 +109,10 @@ namespace Belle2 {
 #ifdef FTSuperLayer_INLINE_DEFINE_HERE
 
   inline
-  FTSuperLayer::FTSuperLayer(const int firstWireID,
-                             const int firstLayerID, const int NLayer,
-                             const int superLayerID, const int isAxial,
-                             const bool haveSmallCell, FTLayer* first)
+  FTSuperLayer::FTSuperLayer(const int NLayer, const int superLayerID,
+                             const int isAxial, const bool haveSmallCell,
+                             FTLayer* first)
     : m_superLayerId(superLayerID),
-      m_firstLayerId(firstLayerID),
-      m_firstWireId(firstWireID),
       m_Nlayer(NLayer),
       m_isAxial(isAxial),
       m_complicatedSegments((superLayerID) ? NULL : new FTList<FTSegment*>(20)),
@@ -201,6 +195,13 @@ namespace Belle2 {
   FTSuperLayer::haveSmallCell(void) const
   {
     return m_haveSmallCell;
+  }
+
+  inline
+  FTLayer*
+  FTSuperLayer::firstLayer() const
+  {
+    return m_firstLayer;
   }
 
 #endif

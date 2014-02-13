@@ -23,7 +23,7 @@ FTSegment::examine()
   int stat = -1;
   const int minLength = (m_superLayer.superLayerId() & 1) ? 0 : 2;
   FTList<FTWire*> wireHitsByLocalLayer[8] = {3, 3, 3, 3, 3, 3, 3, 3};
-  register FTWire** hptr = m_wireHits.firstPtr();
+  FTWire** hptr = m_wireHits.firstPtr();
   FTWire** const last = m_wireHits.lastPtr();
   do {
     wireHitsByLocalLayer[(**hptr).layer().localLayerId()].append(*hptr);

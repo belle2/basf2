@@ -72,7 +72,9 @@ namespace Belle2 {
     //! returns cell size
     double csize(void) const;
 
-    FTWire* firstWire() const { return m_firstWire; }
+    //! returns first wire in a layer
+    FTWire* firstWire() const;
+
   private: // private data members
     const double m_radius;
     const double m_tanSlant;
@@ -213,6 +215,13 @@ namespace Belle2 {
   FTLayer::csize(void) const
   {
     return 2 * M_PI * m_radius / m_Nwire;
+  }
+
+  inline
+  FTWire*
+  FTLayer::firstWire() const
+  {
+    return m_firstWire;
   }
 
 #endif

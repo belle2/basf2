@@ -58,24 +58,6 @@ namespace Belle2 {
     //! returns neighbor of - thetaId side
     FCCrystal* neighborMinusTheta(void) const;
 
-    //! returns pedestal of low range
-    double ped_low(void) const;
-
-    //! returns pedestal of middle range
-    double ped_mid(void) const;
-
-    //! returns pedestal of high range
-    double ped_high(void) const;
-
-    //! returns electronics gain of low range
-    double gain_low(void) const;
-
-    //! returns electronics gain of middle range
-    double gain_mid(void) const;
-
-    //! returns electronics gain of high range
-    double gain_high(void) const;
-
     //! returns cid_status
     double status(void) const;
 
@@ -92,24 +74,6 @@ namespace Belle2 {
 
     //! sets counter energy
     double energy(double src);
-
-    //! sets pedestal of low range
-    double ped_low(double src);
-
-    //! sets pedestal of middle range
-    double ped_mid(double src);
-
-    //! sets pedestal of high range
-    double ped_high(double src);
-
-    //! sets electronics gain of low range
-    double gain_low(double src);
-
-    //! sets electronics gain of middle range
-    double gain_mid(double src);
-
-    //! sets electronics gain of high range
-    double gain_high(double src);
 
     //! set state
     double status(double status);
@@ -135,12 +99,6 @@ namespace Belle2 {
     const int m_phiId;
     FCCrystal* const m_neighborPlus;
     FCCrystal* const m_neighborMinus;
-    double m_ped_low;
-    double m_ped_mid;
-    double m_ped_high;
-    double m_gain_low;
-    double m_gain_mid;
-    double m_gain_high;
     double m_energy;
     double m_status;
     unsigned int m_state;
@@ -163,12 +121,6 @@ namespace Belle2 {
       m_phiId(phiId),
       m_neighborPlus(plus),
       m_neighborMinus(minus),
-      m_ped_low(0.),
-      m_ped_mid(0.),
-      m_ped_high(0.),
-      m_gain_low(0.),
-      m_gain_mid(0.),
-      m_gain_high(0.),
       m_energy(0.),
       m_status(1.),
       m_state(FCCrystalCheckedOrNotHit)
@@ -181,12 +133,6 @@ namespace Belle2 {
       m_phiId(-999),
       m_neighborPlus(NULL),
       m_neighborMinus(NULL),
-      m_ped_low(0.),
-      m_ped_mid(0.),
-      m_ped_high(0.),
-      m_gain_low(0.),
-      m_gain_mid(0.),
-      m_gain_high(0.),
       m_energy(0.),
       m_status(1.),
       m_state(FCCrystalCheckedOrNotHit)
@@ -263,90 +209,6 @@ namespace Belle2 {
   FCCrystal::neighborMinusTheta(void) const
   {
     return m_neighborMinus;
-  }
-
-  inline
-  double
-  FCCrystal::ped_low(void) const
-  {
-    return m_ped_low;
-  }
-
-  inline
-  double
-  FCCrystal::ped_low(double src)
-  {
-    return m_ped_low = src;
-  }
-
-  inline
-  double
-  FCCrystal::ped_mid(void) const
-  {
-    return m_ped_mid;
-  }
-
-  inline
-  double
-  FCCrystal::ped_mid(double src)
-  {
-    return m_ped_mid = src;
-  }
-
-  inline
-  double
-  FCCrystal::ped_high(void) const
-  {
-    return m_ped_high;
-  }
-
-  inline
-  double
-  FCCrystal::ped_high(double src)
-  {
-    return m_ped_high = src;
-  }
-
-  inline
-  double
-  FCCrystal::gain_low(void) const
-  {
-    return m_gain_low;
-  }
-
-  inline
-  double
-  FCCrystal::gain_low(double src)
-  {
-    return m_gain_low = src;
-  }
-
-  inline
-  double
-  FCCrystal::gain_mid(void) const
-  {
-    return m_gain_mid;
-  }
-
-  inline
-  double
-  FCCrystal::gain_mid(double src)
-  {
-    return m_gain_mid = src;
-  }
-
-  inline
-  double
-  FCCrystal::gain_high(void) const
-  {
-    return m_gain_high;
-  }
-
-  inline
-  double
-  FCCrystal::gain_high(double src)
-  {
-    return m_gain_high = src;
   }
 
   inline

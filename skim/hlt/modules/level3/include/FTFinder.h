@@ -72,7 +72,7 @@ namespace Belle2 {
     //! unpack RAWCDC and create wire-hit
     //int updateCdc(void);
 
-    //! create wire hit from datcdc-wirhit(needs cal-cdc before fzisan)
+    //! create wire hit from CDCHit
     void updateCdc3(void);
 
     //! create track list
@@ -103,8 +103,6 @@ namespace Belle2 {
     static FTFinder* s_tFinder;
     double m_tOffSet;
     double m_xtCoEff;
-    double m_xtCoEff2;
-    double m_xtCoEff3;
     double m_tWindow;
     FTWire* m_wire;
     FTLayer* m_layer;

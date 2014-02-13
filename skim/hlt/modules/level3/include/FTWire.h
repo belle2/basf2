@@ -164,15 +164,15 @@ namespace Belle2 {
     const double m_dy;
     const FTLayer& m_layer;
     const int m_localId;
+#ifdef FZISAN_DEBUG
+    MCParticle* m_mcPart;
+#endif
     double m_distance;
     double m_t0;
     double m_time;
     double m_pedestal;
     unsigned int m_state;
     FTWire* m_neighbor[6];
-#ifdef FZISAN_DEBUG
-    MCParticle* m_mcPart;
-#endif
   };
 
   //----------------------------------------------
@@ -195,7 +195,9 @@ namespace Belle2 {
       m_dy(dy),
       m_layer(layer),
       m_localId(localID),
-      //_hep(NULL),
+#ifdef FZISAN_DEBUG
+      m_mcPart(NULL),
+#endif
       m_distance(0),
       m_t0(0),
       m_time(0),
@@ -218,6 +220,9 @@ namespace Belle2 {
       m_dy(0),
       m_layer(*(FTLayer*)NULL),
       m_localId(0),
+#ifdef FZISAN_DEBUG
+      m_mcPart(NULL),
+#endif
       m_distance(0),
       m_t0(0),
       m_time(0),
@@ -378,7 +383,7 @@ namespace Belle2 {
   MCParticle*
   FTWire::mcPart(void) const
   {
-    return m_hep;
+    return m_mcPart;
   }
 #endif
 
@@ -428,10 +433,9 @@ namespace Belle2 {
   int
   FTWire::z(const L3::Lpav& la, double&   z) const
   {
-    TVectorD center = la.center();
     double rho = la.radius();
-    double dx2 = center(0) - m_x;
-    double dy2 = center(1) - m_y;
+    double dx2 = la.xc() - m_x;
+    double dy2 = la.yc() - m_y;
     double par1 = m_dx * m_dx + m_dy * m_dy;
     double par2 = (m_dx * dx2 + m_dy * dy2) / par1;
     double par3 = m_dx * dy2 - m_dy * dx2;

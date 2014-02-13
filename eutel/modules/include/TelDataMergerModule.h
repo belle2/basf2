@@ -97,7 +97,7 @@ namespace Belle2 {
      * @param advance forced buffer advance - the buffer will advance by at least this
      * @return actual number of advanced positions
      */
-    virtual std::size_t advanceBuffer(std::size_t advance = 0);
+    virtual std::size_t advanceBuffer();
 
     /** Get data from the buffer and save them as digits in the DataStore.
      * @param currentTag current TLU tag from ftsw.
@@ -122,7 +122,8 @@ namespace Belle2 {
 
     // Telescope event data cache
     typedef std::tuple<unsigned short, short, short> short_digit_type;
-    BoundedSpaceMap<short_digit_type> m_buffer;
+    typedef unsigned long long int eudaq_timestamp_type;
+    BoundedSpaceMap<eudaq_timestamp_type, short_digit_type> m_buffer;
     BoundedSpaceSet m_bufferVXD;
 
     unsigned long int m_nVXDDataEvents; /**< Number of processed VXD data events */
@@ -134,6 +135,12 @@ namespace Belle2 {
 
     // The current TLU ID (15 bits) from the FTSW:
     tag_type m_currentTLUTagFromFTSW; /**< TLU tag extracted from FTSW data in VXD DAQ */
+    unsigned long m_currentTimeStampFromFTSW; /**> TLU timestamp extracted from FTSW */
+
+    // Data for sync sanity check
+    tag_type m_referenceTLUTag;                 /** TLU tag of a previous matched event. */
+    long long int m_referenceTimeFromFTSW;     /**< FTSW timestamp of a previous matched pair */
+    long long int m_referenceTimeFromEUDAQ; /**< EUDAQ timestamp of a previous matched pair */
 
     // conversion map between sensor numbers and their VxdIDs
     std::map< int, VxdID > m_sensorID;

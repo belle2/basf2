@@ -27,7 +27,7 @@ input.param('inputFileName', '../vxdtb/data/RawData_0000_000470.root')
 dataMerger = register_module('TelDataMerger')
 # use corresponding telescope data file
 dataMerger.param('inputFileName', '../vxdtb/data/run000131.raw')
-dataMerger.param('bufferSize', 2500)
+dataMerger.param('bufferSize', 2000)
 dataMerger.param('eutelPlaneNrs', [
     4,
     3,
@@ -39,7 +39,7 @@ dataMerger.param('eutelPlaneNrs', [
 # This produces a lot of console output. Once you're sure the merger works,
 # set log level WARNING to disable it. However, when starting with a new file,
 # look at the output to make sure that the merger works correctly.
-dataMerger.set_log_level(LogLevel.INFO)
+dataMerger.set_log_level(LogLevel.WARNING)
 
 # PXD unpacker
 PXDUnpack = register_module('PXDUnpacker')

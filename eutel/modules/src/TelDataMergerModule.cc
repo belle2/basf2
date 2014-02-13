@@ -41,7 +41,9 @@ namespace {
 TelDataMergerModule::TelDataMergerModule() : Module(),
   m_bufferSize(100), m_reader(NULL), m_buffer(m_bufferSize), m_bufferVXD(m_bufferSize),
   m_nVXDDataEvents(0), m_nTelDataEvents(0), m_nMapHits(0),
-  m_nBOREvents(0), m_nEOREvents(0), m_nNoTrigEvents(0), m_currentTLUTagFromFTSW(0)
+  m_nBOREvents(0), m_nEOREvents(0), m_nNoTrigEvents(0), m_currentTLUTagFromFTSW(0),
+  m_currentTimeStampFromFTSW(0), m_referenceTLUTag(-1),
+  m_referenceTimeFromFTSW(0), m_referenceTimeFromEUDAQ(0)
 #ifdef debug_log
   , m_debugLog("TelMerger.log")
 #endif
@@ -124,30 +126,25 @@ short int TelDataMergerModule::getTLUTagFromEUDAQ(const eudaq::Event& ev)
 
 bool TelDataMergerModule::processNormalEvent(const eudaq::Event& ev)
 {
-  // Use Event number in place of telescope TLU tag!
-  //short int currentTLUTagFromEUDAQ = getTLUTagFromEUDAQ(ev);
-  ///if (currentTLUTagFromEUDAQ < 0) return false;
-
   if (const eudaq::DetectorEvent* detEv = dynamic_cast<const eudaq::DetectorEvent*>(& ev)) {
 
-    // it is really important to note here that we must manually set the trigger ID
-    // after the conversion step has finished. This is due to the fact that a certain
-    // TLU ID Mask was used, which in turn is not considered in the eudaq part.
     TBTelEvent tbEvt = eudaq::PluginManager::ConvertToTBTelEvent(* detEv);
-    //tbEvt.setTriggerId(currentTLUTagFromEUDAQ);
 
     B2DEBUG(10, "TBEvent: Event: " << tbEvt.getEventNumber()
             << ", NumPlanes: " << tbEvt.getNumTelPlanes()
             << ", TrigID: " << tbEvt.getTriggerId());
 
     short int currentTLUTagFromEUDAQ = short(tbEvt.getEventNumber() % 32768);
+    // it is really important to note here that we must manually set the trigger ID
+    // after the conversion step has finished. This is due to the fact that a certain
+    // TLU ID Mask was used, which in turn is not considered in the eudaq part.
     tbEvt.setTriggerId(currentTLUTagFromEUDAQ);
 
 #ifdef debug_log
     m_debugLog << "TEL\tTelEvent\t" << tbEvt.getEventNumber() % 32768 << "\tTLU_tag\t" << currentTLUTagFromEUDAQ << "\ttimestamp\t" << tbEvt.getTimeStamp() << std::endl;
 #endif
 
-    BoundedSpaceMap<short_digit_type>::collection_type digitTuples;
+    BoundedSpaceMap<eudaq_timestamp_type, short_digit_type>::collection_type digitTuples;
     for (size_t plane = 0; plane < tbEvt.getNumTelPlanes(); ++plane) {
       const std::shared_ptr<const std::vector<TelDigit> > digits = tbEvt.getTelDigits(plane);
       if (digits->size() == 0) return false;
@@ -157,10 +154,8 @@ bool TelDataMergerModule::processNormalEvent(const eudaq::Event& ev)
         digitTuples.push_back(dtuple);
       }
     }
-    m_buffer.put(currentTLUTagFromEUDAQ, digitTuples);
+    m_buffer.put(currentTLUTagFromEUDAQ, tbEvt.getEventNumber(), digitTuples);
     ++m_nTelDataEvents;
-    // FIXME: Somehow also add this.
-    //storeTelEventInfo.assign(tbEvt.getTelEventInfo());
   } else {
     return false;
   }
@@ -185,12 +180,11 @@ bool TelDataMergerModule::addTelEventToBuffer()
   return result;
 }
 
-std::size_t TelDataMergerModule::advanceBuffer(std::size_t advance)
+std::size_t TelDataMergerModule::advanceBuffer()
 {
-  std::size_t advanceActual = std::max(advance, m_buffer.getFreeSize());
   std::size_t acquired(0);
 
-  while (acquired < advanceActual) {
+  while (m_buffer.getFreeSize() > 0 || CIRC::compare(m_buffer.getMedian(), m_bufferVXD.getMedian())) {
     if (!m_reader->NextEvent()) {
       B2INFO("No more usable telescope events to acquire.");
       break;
@@ -198,7 +192,6 @@ std::size_t TelDataMergerModule::advanceBuffer(std::size_t advance)
       acquired++;
     }
   }
-  B2INFO("Acquired " << acquired << " tel events out of " << advanceActual);
   return acquired;
 }
 
@@ -290,10 +283,12 @@ void TelDataMergerModule::beginRun()
 void TelDataMergerModule::saveDigits(tag_type currentTag)
 {
   StoreArray<TelDigit> storeDigits(m_storeDigitsName);
+  StoreObjPtr<TelEventInfo> storeTelEventInfo;
 
   B2INFO("Found a match for event " << currentTag << ". Storing digits.")
 
-  auto digitTuples = m_buffer.get(currentTag);
+  auto digitTuples = m_buffer.getData(currentTag);
+
   for (auto dtuple : digitTuples) {
     int planeNo = std::get<0>(dtuple);
     auto it = m_sensorID.find(planeNo);
@@ -305,6 +300,7 @@ void TelDataMergerModule::saveDigits(tag_type currentTag)
       storeDigits.appendNew(it->second, std::get<1>(dtuple), std::get<2>(dtuple), 1.0);
     }
   }
+  storeTelEventInfo.assign(new TelEventInfo(m_currentTLUTagFromFTSW, m_currentTLUTagFromFTSW, m_currentTimeStampFromFTSW));
   m_nMapHits++;
 }
 
@@ -320,34 +316,51 @@ void TelDataMergerModule::event()
   m_currentTLUTagFromFTSW =
     static_cast<unsigned short>(storeFTSW[0]->Get15bitTLUTag(0));
   m_bufferVXD.put(m_currentTLUTagFromFTSW);
-
-
-#ifdef debug_log
   timeval* time = new timeval;
   storeFTSW[0]->GetTTTimeVal(0, time);
-  unsigned long FTSWTime = time->tv_sec * 1000000 + time->tv_usec;
-  m_debugLog << "FTSW\tTLUtag\t" << m_currentTLUTagFromFTSW << "\ttimestamp\t" << FTSWTime << std::endl;
-#endif
+  m_currentTimeStampFromFTSW = time->tv_sec * 1000000 + time->tv_usec;
 
-  tag_type meanVXD = m_bufferVXD.getMedian();
-  tag_type meanEUDAQ = m_buffer.getMedian();
-  std::size_t advance = CIRC::distance(meanVXD, meanEUDAQ);
-  if (CIRC::compare(meanVXD, meanEUDAQ))
-    advance = 0;
-  advanceBuffer(advance);
+  // advance buffer
+  size_t advance = advanceBuffer();
 
   B2INFO("Event: VXD TLU: " << m_currentTLUTagFromFTSW <<
-         " VXD mean:  " << meanVXD <<
-         " TEL mean: " << meanEUDAQ <<
+         " VXD mean:  " << m_bufferVXD.getMedian() <<
+         " TEL mean: " << m_buffer.getMedian() <<
          " Advance:" << advance
         );
 
   if (m_buffer.hasKey(m_currentTLUTagFromFTSW)) {
-    // we have a hit, get the data and save digits.
-    saveDigits(m_currentTLUTagFromFTSW);
+    // we have a hit, do sanity check and then get the data and save digits.
+    // Do we have valid reference data?
+    size_t distance = CIRC::distance(m_referenceTLUTag, m_currentTLUTagFromFTSW);
+    long long int eventTimeFromEUDAQ = m_buffer.getTimeStamp(m_currentTLUTagFromFTSW);
+    long long int differenceEUTEL = eventTimeFromEUDAQ - m_referenceTimeFromEUDAQ;
+    long long int differenceFTSW = (m_currentTimeStampFromFTSW - m_referenceTimeFromFTSW) / 2048;
+    if (m_referenceTLUTag >= 0 && abs(differenceEUTEL - differenceFTSW) / distance > 32) {
+      B2WARNING("Possible sync problem (ignore if only few isolated warnings):\n" << "Event: "
+                << m_currentTLUTagFromFTSW << " "
+                << "distance from previous: " << distance << " "
+                << "difference: " << abs(differenceEUTEL - differenceFTSW)
+               )
+    } else {
+      // only rebase and save if difference within bounds
+      m_referenceTimeFromFTSW = m_currentTimeStampFromFTSW;
+      m_referenceTimeFromEUDAQ = eventTimeFromEUDAQ;
+      m_referenceTLUTag = m_currentTLUTagFromFTSW;
+      saveDigits(m_currentTLUTagFromFTSW);
+    }
+#ifdef debug_log
+    m_debugLog << "FTSW\tTLUtag\t" << m_currentTLUTagFromFTSW
+               << "\ttimestamp\t" << m_currentTimeStampFromFTSW
+               << "\tdifferenceEUTEL\t" << differenceEUTEL
+               << "\tdifferenceFTSW\t" << differenceFTSW
+               << "\tdifference\t" << differenceEUTEL - differenceFTSW
+               << "\tdistance\t" << distance << std::endl;
+#endif
   } else {
-    // synicng failed, report
-    B2INFO("No match for VXD event with FTSW TLU tag " << m_currentTLUTagFromFTSW);
+    // syncing failed, report
+    B2WARNING("No match for VXD event with FTSW TLU tag " << m_currentTLUTagFromFTSW << std::endl
+              << "If this appears frequently, try to increase buffer size.");
     if (!m_reader->NextEvent()) {
       B2DEBUG(25, "No more events from EUDAQ Reader.");
       stopPeacefully();

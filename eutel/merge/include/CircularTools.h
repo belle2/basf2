@@ -20,7 +20,7 @@ namespace CIRC {
    * but are expected to work with sets of small range compared to the tag range.
    */
 
-  typedef short int tag_type;
+  typedef int tag_type;
 
   enum {
     c_tagLowerBound = 0,

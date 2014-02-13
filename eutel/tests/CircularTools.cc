@@ -18,7 +18,7 @@ using namespace std;
 TEST(CircularTools, wrap)
 {
   EXPECT_EQ(CIRC::wrap(-3), CIRC::c_tagUpperBound - 3);
-  EXPECT_EQ(CIRC::wrap(17000), 17000 - CIRC::c_tagUpperBound);
+  EXPECT_EQ(CIRC::wrap(17000), 17000 % CIRC::c_tagUpperBound);
   // upper bound wraps to lower bound
   EXPECT_EQ(CIRC::wrap(CIRC::c_tagUpperBound), CIRC::c_tagLowerBound);
 }

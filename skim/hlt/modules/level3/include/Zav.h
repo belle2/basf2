@@ -94,7 +94,6 @@ namespace Belle2 {
 
     inline void Zav::clear(void)
     {
-      m_a = m_b = -9999.;
       m_w = m_sav = m_ssav = m_zav = m_szav = m_zzav = 0;
       m_chisq = -1;
       m_c22 = m_c21 = m_c11 = m_sig_inv = 0;

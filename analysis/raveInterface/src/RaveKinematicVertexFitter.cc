@@ -45,34 +45,10 @@ RaveKinematicVertexFitter::RaveKinematicVertexFitter(): m_useBeamSpot(false), m_
   m_useBeamSpot = RaveSetup::s_instance->m_useBeamSpot;
 }
 
-//RaveKinematicVertexFitter::RaveKinematicVertexFitter(/*string howToInterfaceRave*/)
-//{
-// if ( howToInterfaceRave == "GFRave" ) {
-//   m_gfRave = true;
-//   RaveKinematicVertexFitter();
-// } else if(howToInterfaceRave == "Rave" ) {
-//if (howToInterfaceRave == "Rave") {
-// m_gfRave = false;
-//RaveKinematicVertexFitter();
-//} else {
-//B2FATAL("RaveKinematicVertexFitter: \"GFRave\" and \"Rave\" are the only 2 valid options");
-//B2FATAL("RaveKinematicVertexFitter: \"Rave\" is the only valid option");
-//}
-//}
 
 
 RaveKinematicVertexFitter::~RaveKinematicVertexFitter()
 {
-  //destroy all the temporary trackreps created in this class but do not destroy the pointers coming from outside
-  // int n = m_ownGfTrackReps.size();
-  // for (int i = 0; i not_eq n; ++i) {
-  //   delete m_ownGfTrackReps[i];
-  // }
-
-  // n = m_GFRaveVertices.size();
-  // for (int i = 0; i not_eq n; ++i) {
-  //   delete m_GFRaveVertices[i];
-  // }
 }
 
 
@@ -86,107 +62,6 @@ void RaveKinematicVertexFitter::setVertFit(bool isVertFit)
   m_vertFit = isVertFit;
 }
 
-// void RaveKinematicVertexFitter::addTrack(GFTrack& aGFTrack)
-// {
-//  GFAbsTrackRep* const aGFTrackRepPtr = aGFTrack.getCardinalRep();
-//  if (m_gfRave == true) {
-//    m_gfTrackReps.push_back(aGFTrackRepPtr);
-//  } else {
-//    m_raveTracks.push_back(GFTrackRepToRaveTrack(aGFTrackRepPtr));
-//  }
-// }
-
-
-// void RaveKinematicVertexFitter::addTrack(GFTrack* const aGFTrackPtr)
-// {
-//  GFAbsTrackRep* const aGFTrackRepPtr = aGFTrackPtr->getCardinalRep();
-//  if (m_gfRave == true) {
-//    m_gfTrackReps.push_back(aGFTrackRepPtr);
-//  } else {
-//    m_raveTracks.push_back(GFTrackRepToRaveTrack(aGFTrackRepPtr));
-//  }
-// }
-
-// void RaveKinematicVertexFitter::addTrack(const TrackFitResult* aTrackPtr)
-// {
-//  if (m_gfRave == true) {
-//    //maybe there is a smarter way to convert TMatrixF to TMatrixDSym. If you know one feel free to change it.
-//    TMatrixF cov(aTrackPtr->getCovariance6());
-//    TMatrixDSym temp(6);
-//    for (int i = 0; i not_eq 6; ++i) {
-//      for (int j = 0; j not_eq 6; ++j) {
-//        temp(i, j) = cov(i, j);
-//      }
-//    }
-//    RKTrackRep* aTrackRepPtr = new RKTrackRep(aTrackPtr->getPosition(), aTrackPtr->getMomentum(), temp, aTrackPtr->getPDGCode());
-//    m_ownGfTrackReps.push_back(static_cast<GFAbsTrackRep*>(aTrackRepPtr));
-//    m_gfTrackReps.push_back(static_cast<GFAbsTrackRep*>(aTrackRepPtr));
-//  } else {
-//    m_raveTracks.push_back(TrackFitResultToRaveTrack(aTrackPtr));
-//  }
-// }
-
-// void RaveKinematicVertexFitter::addTrack(GFAbsTrackRep* const aTrackRepPtr)
-// {
-//  if (m_gfRave == true) {
-//    m_gfTrackReps.push_back(aTrackRepPtr);
-//  } else {
-//    m_raveTracks.push_back(GFTrackRepToRaveTrack(aTrackRepPtr));
-//  }
-
-// }
-
-// rave::Track RaveKinematicVertexFitter::GFTrackRepToRaveTrack(GFAbsTrackRep* const aGFTrackRepPtr) const
-// {
-//  const int id = m_raveTracks.size();
-
-//  const GFDetPlane& refPlane(aGFTrackRepPtr->getReferencePlane());
-//  TVector3 pos;
-//  TVector3 mom;
-//  TMatrixDSym cov;
-
-//  aGFTrackRepPtr->getPosMomCov(refPlane, pos, mom, cov);
-
-//  // state
-//  rave::Vector6D ravestate(pos.X(), pos.Y(), pos.Z(),
-//                           mom.X(), mom.Y(), mom.Z());
-
-//  rave::Covariance6D ravecov(cov(0, 0), cov(1, 0), cov(2, 0),
-//                             cov(1, 1), cov(2, 1), cov(2, 2),
-//                             cov(3, 0), cov(4, 0), cov(5, 0),
-//                             cov(3, 1), cov(4, 1), cov(5, 1),
-//                             cov(3, 2), cov(4, 2), cov(5, 2),
-//                             cov(3, 3), cov(4, 3), cov(5, 3),
-//                             cov(4, 4), cov(5, 4), cov(5, 5));
-
-//  return rave::Track(id, ravestate, ravecov, rave::Charge(aGFTrackRepPtr->getCharge() + 0.1), aGFTrackRepPtr->getChiSqu(), aGFTrackRepPtr->getNDF());
-
-// }
-
-// rave::Track RaveKinematicVertexFitter::TrackFitResultToRaveTrack(const TrackFitResult* aTrackPtr) const
-// {
-//  const int id = m_raveTracks.size();
-
-//  TVector3 pos = aTrackPtr->getPosition();
-//  TVector3 mom = aTrackPtr->getMomentum();
-//  TMatrixF cov(aTrackPtr->getCovariance6());
-
-
-//  // state
-//  rave::Vector6D ravestate(pos.X(), pos.Y(), pos.Z(),
-//                           mom.X(), mom.Y(), mom.Z());
-
-//  rave::Covariance6D ravecov(cov(0, 0), cov(1, 0), cov(2, 0),
-//                             cov(1, 1), cov(2, 1), cov(2, 2),
-//                             cov(3, 0), cov(4, 0), cov(5, 0),
-//                             cov(3, 1), cov(4, 1), cov(5, 1),
-//                             cov(3, 2), cov(4, 2), cov(5, 2),
-//                             cov(3, 3), cov(4, 3), cov(5, 3),
-//                             cov(4, 4), cov(5, 4), cov(5, 5));
-
-//  return rave::Track(id, ravestate, ravecov, rave::Charge(aTrackPtr->getCharge()), 1, 1); //the two 1s are just dummy values. They are not used by Rave anyway
-
-// }
 
 
 void RaveKinematicVertexFitter::addTrack(const Particle* aParticlePtr)
@@ -211,7 +86,6 @@ void RaveKinematicVertexFitter::addTrack(const Particle* aParticlePtr)
 
   m_inputParticles.push_back(aRaveParticle);
 
-  //cov.Print();
 
 }
 
@@ -260,7 +134,6 @@ int RaveKinematicVertexFitter::fit(string options)
   if (m_useBeamSpot == true) {
     ndf += 3;
   }
-  //if (ndf < 4) {
   if (ndf < 4 && m_vertFit) {
     return -1;
   }

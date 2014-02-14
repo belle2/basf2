@@ -83,29 +83,7 @@ namespace Belle2 {
       /** returns a pointer to the updated mother particle */
       Particle* getMother();
 
-      /* TLorentzVector get4Vector(std::vector<int>::size_type vertexId = 0){ */
-      /*   if (m_GFRaveVertices.empty()) { */
-      /*     B2ERROR("There is no fitted Vertex. Maybe you did not call fit() or maybe the fit was not successful"); */
-      /*     throw; */
-      /*   } else if (vertexId < m_GFRaveVertices.size()) { */
-      /*     //does not work this way hat to determin which track belong to which vertex */
-      /*     TLorentzVector result; */
 
-      /*     for ( int i = 0; i not_eq m_GFRaveVertices[vertexId]->getNTracks(); ++i){ */
-      /*       TParticlePDG* part = TDatabasePDG::Instance()->GetParticle(m_gfTrackReps[i]->getPDG()); */
-      /*       result += TLorentzVector(m_gfTrackReps[i]->getPos(), part->Mass()); */
-      /*     } */
-      /*     return result; */
-      /*   } else { */
-      /*     B2ERROR("The Vertex id " << vertexId << " does not correspond to any fitted vertex"); */
-      /*     throw; */
-      /*   } */
-      /* } */
-
-      //TMatrixDSym get4CovarianceMatrix(std::vector<int>::size_type vertexId = 0){
-      //}
-
-      //void setInvarantMass(int pdgCode);
 
       /** Delete all information of previously added tracks and fitted results*/
       void clearTracks() {

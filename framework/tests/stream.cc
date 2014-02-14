@@ -122,7 +122,7 @@ namespace Belle2 {
     //creating file for next test..
     /*
     std::ofstream file("object_base64.xml");
-    file << relStr; //no additional escaping necessary
+    file << Stream::escapeXML(relStr);
     */
 
     // Given random input, TBase64 will most likely just crash, this specific truncation seems ok.

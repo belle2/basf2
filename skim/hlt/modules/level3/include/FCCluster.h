@@ -16,6 +16,7 @@
 
 namespace Belle2 {
 
+  // ECL cluster class for the Level-3 Fast Cluster Finder
   class FCCluster {
   public:
     //! constructor
@@ -40,10 +41,10 @@ namespace Belle2 {
     const FTList<FCCrystal*>& getEHits(void) const;
 
   private: //private data members
-    const FTList<FCCrystal*>& m_hits;
-    const double m_energy;
-    const TVector3 m_position;
-    const FCCrystal& m_seed;
+    const FTList<FCCrystal*>& m_hits; // array of hits
+    const double m_energy; // energy deposit
+    const TVector3 m_position; // position of the seed
+    const FCCrystal& m_seed; // reference of the seed crystal
   };
 
   //----------------------------------------------

@@ -335,14 +335,13 @@ double Lpav::fit(double x, double y, double w)
 {
   if (m_nc <= 3) return -1;
   m_chisq = -1;
-  double q;
   if (m_nc < 4) {
     calculate_average3(x, y, w);
-    double q = calculate_lpar3();
+    const double q = calculate_lpar3();
     if (q > 0) m_chisq = q * m_wsum_temp * m_rscale * m_rscale;
   } else {
     calculate_average(x, y, w);
-    q = calculate_lpar();
+    const double q = calculate_lpar();
     if (q > 0) m_chisq = q * m_wsum_temp * m_rscale * m_rscale;
   }
   return m_chisq;
@@ -352,19 +351,18 @@ double Lpav::fit(void)
 {
   if (m_nc <= 3) return -1;
   m_chisq = -1;
-  double q;
   if (m_nc < 4) {
     calculate_average3();
-    q = calculate_lpar3();
+    const double q = calculate_lpar3();
     if (q > 0) m_chisq = q * m_wsum_temp * m_rscale * m_rscale;
   } else {
     calculate_average();
-    q = calculate_lpar();
+    const double q = calculate_lpar();
     if (q > 0) m_chisq = q * m_wsum_temp * m_rscale * m_rscale;
   }
   return m_chisq;
 }
-
+/*
 TMatrixDSym Lpav::cov(int inv) const
 {
   TMatrixDSym vret(4);
@@ -437,7 +435,7 @@ double Lpav::similarity(double x, double y) const
   double l = cov().Similarity(v);
   return (l > 0) ? l : -1.;
 }
-
+*/
 void Lpav::add(double xi, double yi, double w, double a, double b)
 {
   const double wi = err_dis_inv(xi, yi, w, a, b);
@@ -459,7 +457,7 @@ void Lpav::add_point(double xi, double yi, double wi)
   m_rrrrsum += wrri * rri;
   m_nc += 1;
 }
-
+/*
 void Lpav::add_point_frac(double xi, double yi, double w, double a)
 {
   const double wi = w * a;
@@ -476,7 +474,7 @@ void Lpav::add_point_frac(double xi, double yi, double w, double a)
   m_rrrrsum += wrri * rri;
   m_nc += a;
 }
-
+*/
 void Lpav::sub(double xi, double yi, double w, double a, double b)
 {
   const double wi = err_dis_inv(xi, yi, w, a, b);
@@ -494,7 +492,7 @@ void Lpav::sub(double xi, double yi, double w, double a, double b)
   m_nc -= 1;
 }
 
-const Lpav& Lpav::operator+=(const Lpav& la1)
+Lpav& Lpav::operator+=(const Lpav& la1)
 {
   m_wsum += la1.m_wsum;
   m_xsum += la1.m_xsum;
@@ -508,7 +506,7 @@ const Lpav& Lpav::operator+=(const Lpav& la1)
   m_nc += la1.m_nc;
   return *this;
 }
-
+/*
 double Lpav::chi_deg() const
 {
   if (m_nc <= 3) return -1;
@@ -523,4 +521,4 @@ double Lpav::delta_chisq(double x, double y, double w) const
   double delta = d * d * w / (1 + sim * w);
   return delta;
 }
-
+*/

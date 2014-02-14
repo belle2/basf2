@@ -136,6 +136,7 @@ void Level3Module::reconstruct()
   if (m_saveData >= 2) {
     // make an array of L3Cluster
     StoreArray<L3Cluster> clusters;
+    clusters.clear();
     FTList<FCCluster*>& clstrs = m_cFinder.getClusters();
     for (int i = 0; i < clstrs.length(); i++) {
       TVector3 pos = clstrs[i]->getPosition();
@@ -145,6 +146,7 @@ void Level3Module::reconstruct()
 
     // make an array of L3Track
     StoreArray<L3Track> tracks;
+    tracks.clear();
     FTList<FTTrack*>& trks = m_tFinder.getTracks();
     for (int i = 0; i < trks.length(); i++) {
       const TVectorD& h = trks[i]->getHelix();

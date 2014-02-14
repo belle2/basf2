@@ -17,10 +17,12 @@
 // user include files
 #include "TVector3.h"
 #include "TVectorD.h"
-#include "TMatrixD.h"
+//#include "TMatrixD.h"
 
 namespace Belle2 {
   namespace L3 {
+
+    // Parameter class for Lpav
     class Lpar {
 
     public:
@@ -31,7 +33,7 @@ namespace Belle2 {
       virtual ~Lpar();
 
       //! assignment operator(s)
-      const Lpar& operator=(const Lpar&);
+      Lpar& operator=(const Lpar&);
 
       //! invert parameter
       void neg();
@@ -73,23 +75,22 @@ namespace Belle2 {
 
     protected:
       // Constructors and destructor
-      inline Lpar(const Lpar&);
+      Lpar(const Lpar&);
 
       void scale(double s) { m_kappa /= s; m_gamma *= s; }
-      inline void rotate(double c, double s);
-      inline void move(double x, double y);
-
-      inline double d0(double x, double y) const;
-      TMatrixD dldc() const;
+      void rotate(double c, double s);
+      void move(double x, double y);
+      double d0(double x, double y) const;
       bool xy(double, double&, double&, int dir = 0) const;
+      //TMatrixD dldc() const;
 
-      // data members
-      double m_alpha;
-      double m_beta;
-      double m_gamma;
-      double m_kappa;
+      double m_alpha; // alpha
+      double m_beta;  // beta
+      double m_gamma; // gamma
+      double m_kappa; // kappa
 
     private:
+      /*
       // Private class cpar
       class Cpar {
       public:
@@ -107,6 +108,7 @@ namespace Belle2 {
         double m_sfi;
         double m_cfi;
       };
+      */
 
       // comparison operators
       bool operator==(const Lpar&) const;
@@ -126,7 +128,7 @@ namespace Belle2 {
 
       // data members
 
-      static const double BELLE_ALPHA;
+      static const double BELLE_ALPHA; // magnetic field parameter
 
       // static data members
 
@@ -157,7 +159,7 @@ namespace Belle2 {
     }
 
     inline
-    const Lpar&
+    Lpar&
     Lpar::operator=(const Lpar& l)
     {
       if (this != &l) {

@@ -53,6 +53,7 @@ bool L3TriggerManager::preselect()
   hltTag.SetAlgoInfo(HLTTag::Level3, summary);
   if (m_saveData) {
     StoreArray<L3Tag> l3Tags;
+    l3Tags.clear();
     l3Tags.appendNew(L3Tag(summary));
   }
   return summary & 0x1;

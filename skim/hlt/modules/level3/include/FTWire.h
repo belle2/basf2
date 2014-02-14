@@ -45,7 +45,9 @@
 
 namespace Belle2 {
 
+  // CDC wire class for the Level-3 Fast Track Finder
   class FTWire {
+
   public:
     //! constructors
     FTWire(const double x, const double y, const double dx, const double dy,
@@ -134,7 +136,9 @@ namespace Belle2 {
 
   public:
 #ifdef FZISAN_DEBUG
+    //! set pointer of the MC particle
     MCParticle* mcPart(MCParticle* src);
+    //! returns pointer to the MC particle
     MCParticle* mcPart(void) const;
 #endif
 
@@ -158,21 +162,21 @@ namespace Belle2 {
     const FTWire* outerRight(FTWire* const vtWire) const;
 
   private: //private data members
-    const double m_x;
-    const double m_y;
-    const double m_dx;
-    const double m_dy;
-    const FTLayer& m_layer;
-    const int m_localId;
+    const double m_x; // x position
+    const double m_y; // y position
+    const double m_dx; // delta x b/w forward and backward endplate
+    const double m_dy; // delta y b/w forward and backward endplate
+    const FTLayer& m_layer; // reference to the layer
+    const int m_localId; // ID in the layer
 #ifdef FZISAN_DEBUG
-    MCParticle* m_mcPart;
+    MCParticle* m_mcPart; // pointer to the MC particle
 #endif
-    double m_distance;
-    double m_t0;
-    double m_time;
-    double m_pedestal;
-    unsigned int m_state;
-    FTWire* m_neighbor[6];
+    double m_distance; // drift distance
+    double m_t0; // t0 of the wire
+    double m_time; // drift time
+    double m_pedestal; // pedestal of the ADC value
+    unsigned int m_state; // status bit
+    FTWire* m_neighbor[6]; // pointer of neighbor channels
   };
 
   //----------------------------------------------
@@ -247,12 +251,12 @@ namespace Belle2 {
   void
   FTWire::set_neighbors(FTWire* const vt)
   {
-    m_neighbor[0] = (FTWire*) innerLeft(vt);
-    m_neighbor[1] = (FTWire*) innerRight(vt);
-    m_neighbor[2] = (FTWire*) left();
-    m_neighbor[3] = (FTWire*) right();
-    m_neighbor[4] = (FTWire*) outerLeft(vt);
-    m_neighbor[5] = (FTWire*) outerRight(vt);
+    m_neighbor[0] = const_cast<FTWire*>(innerLeft(vt));
+    m_neighbor[1] = const_cast<FTWire*>(innerRight(vt));
+    m_neighbor[2] = const_cast<FTWire*>(left());
+    m_neighbor[3] = const_cast<FTWire*>(right());
+    m_neighbor[4] = const_cast<FTWire*>(outerLeft(vt));
+    m_neighbor[5] = const_cast<FTWire*>(outerRight(vt));
   }
 
   inline

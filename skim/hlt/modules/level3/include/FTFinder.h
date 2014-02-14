@@ -21,6 +21,8 @@
 namespace Belle2 {
 
   class FTSegment;
+
+  // The Level-3 Fast Track Finder
   class FTFinder {
 
   public:
@@ -88,7 +90,7 @@ namespace Belle2 {
     int VertexFit2D();
 
     //! find vertex closest to IP
-    int findBestVertex(void);
+    //int findBestVertex(void);
 
     //! corrects event timing after 2nd r-phi fit and returns event timing
     int CorrectEvtTiming(void);
@@ -100,24 +102,24 @@ namespace Belle2 {
     void setBadWires(const bool EvtByEvt, const bool inBeginRun);
 
   private: // private data members
-    static FTFinder* s_tFinder;
-    double m_tOffSet;
-    double m_xtCoEff;
-    double m_tWindow;
-    FTWire* m_wire;
-    FTLayer* m_layer;
-    FTSuperLayer* m_superLayer;
-    int m_Nwire;
-    int m_Nlayer;
-    int m_NsuperLayer;
-    FTList<FTTrack*>& m_tracks;
-    FTList<FTSegment*>* m_linkedSegments;
-    double m_tWindowLow;
-    double m_tWindowHigh;
-    double m_vx;
-    double m_vy;
-    double m_vz;
-    FTList<FTWire*>* m_EvtByEvtBadWires;
+    static FTFinder* s_tFinder; // pointer of the FTFinder
+    double m_tOffSet; // offset of the T0
+    double m_xtCoEff; // coefficient of the x-t relation
+    double m_tWindow; // time window of a hit
+    FTWire* m_wire; // pointer to the array of wires
+    FTLayer* m_layer; // pointer to the array of layers
+    FTSuperLayer* m_superLayer; // pointer to the array of super layers
+    int m_Nwire; // number of wires
+    int m_Nlayer; // number of layers
+    int m_NsuperLayer; // number of super layers
+    FTList<FTTrack*>& m_tracks; // list of tracks for the event
+    FTList<FTSegment*>* m_linkedSegments; // list of all the track segments
+    double m_tWindowLow; // lower bound of the time window
+    double m_tWindowHigh; // upper bound of the time window
+    double m_vx; // x of the reconstucted event vertex
+    double m_vy; // y of the reconstucted event vertex
+    double m_vz; // z of the reconstucted event vertex
+    FTList<FTWire*>* m_EvtByEvtBadWires; // list of bad wires
   };
 
   //----------------------------------------------

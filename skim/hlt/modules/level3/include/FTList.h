@@ -18,12 +18,13 @@
 
 namespace Belle2 {
 
+  // class template of list for the Level-3 Fast Track / Cluster Finder
   template <class T>
   class FTList {
   public:
 
     //! default constructor
-    FTList(int lengthToAlloc = 100);
+    FTList(const int lengthToAlloc = 100);
 
     //! copy constructor
     FTList(const FTList<T>&);
@@ -32,7 +33,7 @@ namespace Belle2 {
     ~FTList();
 
     //! append an object into the end of the list
-    int append(T x);
+    int append(const T x);
 
     //! append objects into the end of the list
     int append(const FTList<T>&);
@@ -41,10 +42,10 @@ namespace Belle2 {
     int remove(int&);
 
     //! remove objects by index
-    void remove2(int);
+    void remove2(const int);
 
     //! replace index-th object by the object src
-    void replace(int i, T src);
+    void replace(const int i, const T src);
 
     //! delete objects by index and returns decremented index and length
     int deleteObj(int&);
@@ -65,10 +66,10 @@ namespace Belle2 {
     void resize(void);
 
     //! returns a object by index
-    T operator[](int i) const;
+    T operator[](const int i) const;
 
     //! returns the reference of a object by index
-    T& operator()(int i) const;
+    T& operator()(const int i) const;
 
     //! returns the first object in the list
     T first(void) const;
@@ -83,10 +84,10 @@ namespace Belle2 {
     int length(void) const;
 
   private: // private data members
-    int m_length;
-    int m_remain;
-    int m_lengthToAlloc;
-    T* m_obj;
+    int m_length; // length of the list
+    int m_remain; // allocated length - m_length
+    int m_lengthToAlloc; // length to allocate
+    T* m_obj; // array of the object
   };
 
   //----------------------------------------------
@@ -101,11 +102,11 @@ namespace Belle2 {
 
   template <class T>
   inline
-  FTList<T>::FTList(int lengthToAlloc)
+  FTList<T>::FTList(const int lengthToAlloc)
     : m_length(0),
       m_remain(lengthToAlloc),
       m_lengthToAlloc(lengthToAlloc),
-      m_obj((T*) std::malloc(lengthToAlloc* sizeof(T)))
+      m_obj(static_cast<T*>(std::malloc(lengthToAlloc* sizeof(T))))
   {
     if (!m_obj) B2FATAL("FTList::m_obj malloc failed");
   }
@@ -116,7 +117,7 @@ namespace Belle2 {
       m_remain(src.m_remain),
       m_lengthToAlloc(src.m_lengthToAlloc)
   {
-    m_obj = (T*) std::malloc((m_length + m_remain) * sizeof(T));
+    m_obj = static_cast<T*>(std::malloc((m_length + m_remain) * sizeof(T)));
     if (!m_obj) B2FATAL("FTList::m_obj malloc failed");
     T* srcObj = src.m_obj;
     for (int i = 0; i < m_length; i++) {
@@ -134,10 +135,10 @@ namespace Belle2 {
   template <class T>
   inline
   int
-  FTList<T>::append(T src)
+  FTList<T>::append(const T src)
   {
     if (!m_remain) {
-      m_obj = (T*) std::realloc(m_obj, (m_length + m_lengthToAlloc) * sizeof(T));
+      m_obj = static_cast<T*>(std::realloc(m_obj, (m_length + m_lengthToAlloc) * sizeof(T)));
       if (!m_obj) B2FATAL("FTList::m_obj realloc failed");
       m_remain = m_lengthToAlloc;
     }
@@ -162,7 +163,7 @@ namespace Belle2 {
   template <class T>
   inline
   void
-  FTList<T>::remove2(int i)
+  FTList<T>::remove2(const int i)
   {
 #ifdef FTLIST_DEBUG
     if (i < 0 || i >= m_length) B2FATAL("FTList overrun!!");
@@ -174,7 +175,7 @@ namespace Belle2 {
   template <class T>
   inline
   void
-  FTList<T>::replace(int i, T src)
+  FTList<T>::replace(const int i, const T src)
   {
 #ifdef FTLIST_DEBUG
     if (i < 0 || i >= m_length) B2FATAL("FTList overrun!!");
@@ -233,7 +234,7 @@ namespace Belle2 {
   void
   FTList<T>::resize(void)
   {
-    m_obj = (T*)std::realloc(m_obj, m_length * sizeof(T));
+    m_obj = static_cast<T*>(std::realloc(m_obj, m_length * sizeof(T)));
     if (!m_obj) B2FATAL("FTList::m_obj realloc failed");
     m_remain = 0;
     m_lengthToAlloc = m_length;
@@ -242,7 +243,7 @@ namespace Belle2 {
   template <class T>
   inline
   T
-  FTList<T>::operator[](int i) const
+  FTList<T>::operator[](const int i) const
   {
 #ifdef FTLIST_DEBUG
     if (i < 0 || i >= m_length) B2FATAL("FTList overrun!!");
@@ -253,7 +254,7 @@ namespace Belle2 {
   template <class T>
   inline
   T&
-  FTList<T>::operator()(int i) const
+  FTList<T>::operator()(const int i) const
   {
 #ifdef FTLIST_DEBUG
     if (i < 0 || i >= m_length) B2FATAL("FTList overrun!!");
@@ -301,7 +302,7 @@ namespace Belle2 {
     T* srcObj = src.m_obj;
     int i = 0;
     if (m_remain < srcLength) {
-      m_obj = (T*)std::realloc(m_obj, (m_length + m_remain + srcLength) * sizeof(T));
+      m_obj = static_cast<T*>(std::realloc(m_obj, (m_length + m_remain + srcLength) * sizeof(T)));
       if (!m_obj) B2FATAL("FTList::m_obj realloc failed");
       while (i ^ srcLength) *(m_obj + (m_length++)) = *(srcObj + (i++));
     } else {

@@ -26,11 +26,13 @@ namespace Belle2 {
 #define FCCrystalAppendedNeighbor3 65
 #define FCCrystalAppendedNeighbor6 9
 
+  // CsI crystal class for the Level-3 Fast Cluster Finder
   class FCCrystal {
   public:
-    //! constructors
+    //! constructor
     FCCrystal(const int thetaId, const int phiId, FCCrystal* const, FCCrystal* const);
 
+    //! constructor
     FCCrystal();
 
     //! destructor
@@ -59,7 +61,7 @@ namespace Belle2 {
     FCCrystal* neighborMinusTheta(void) const;
 
     //! returns cid_status
-    double status(void) const;
+    //double status(void) const;
 
     //! returns state
     unsigned state(void) const;
@@ -75,8 +77,8 @@ namespace Belle2 {
     //! sets counter energy
     double energy(double src);
 
-    //! set state
-    double status(double status);
+    //! set status
+    //double status(double status);
 
     //! set state
     unsigned state(const unsigned state);
@@ -92,16 +94,16 @@ namespace Belle2 {
     int phiMax(void) const;
 
   private: //static data members
-    static const int m_phiMaxFE[13];
-    static const int m_phiMaxBE[10];
+    static const int m_phiMaxFE[13]; // maximum phi ID for FE
+    static const int m_phiMaxBE[10]; // maximum phi ID for BE
   private: //private data members
-    const int m_thetaId;
-    const int m_phiId;
-    FCCrystal* const m_neighborPlus;
-    FCCrystal* const m_neighborMinus;
-    double m_energy;
-    double m_status;
-    unsigned int m_state;
+    const int m_thetaId; // theta ID
+    const int m_phiId; // phi ID
+    FCCrystal* const m_neighborPlus; // pointer of neighbor channel
+    FCCrystal* const m_neighborMinus; // pointer of neighbor channel
+    double m_energy; // energy deposit
+    //double m_status;
+    unsigned int m_state; // status bits
   };
 
   //----------------------------------------------
@@ -122,7 +124,7 @@ namespace Belle2 {
       m_neighborPlus(plus),
       m_neighborMinus(minus),
       m_energy(0.),
-      m_status(1.),
+      //m_status(1.),
       m_state(FCCrystalCheckedOrNotHit)
   {
   }
@@ -134,7 +136,7 @@ namespace Belle2 {
       m_neighborPlus(NULL),
       m_neighborMinus(NULL),
       m_energy(0.),
-      m_status(1.),
+      //m_status(1.),
       m_state(FCCrystalCheckedOrNotHit)
   {
   }
@@ -187,14 +189,19 @@ namespace Belle2 {
   FCCrystal*
   FCCrystal::neighborPlusPhi(void) const
   {
-    return (m_phiId == phiMax()) ? (FCCrystal*)this - phiMax() : (FCCrystal*)this + 1;
+    const int max(phiMax());
+    return (m_phiId == max)
+           ? const_cast<FCCrystal*>(this) - max
+           : const_cast<FCCrystal*>(this) + 1;
   }
 
   inline
   FCCrystal*
   FCCrystal::neighborMinusPhi(void) const
   {
-    return (m_phiId) ? (FCCrystal*)this - 1 : (FCCrystal*)this + phiMax();
+    return (m_phiId)
+           ? const_cast<FCCrystal*>(this) - 1
+           : const_cast<FCCrystal*>(this) + phiMax();
   }
 
   inline
@@ -210,7 +217,7 @@ namespace Belle2 {
   {
     return m_neighborMinus;
   }
-
+  /*
   inline
   double
   FCCrystal::status(void) const
@@ -224,7 +231,7 @@ namespace Belle2 {
   {
     return m_status = status;
   }
-
+  */
   inline
   unsigned
   FCCrystal::state(void) const

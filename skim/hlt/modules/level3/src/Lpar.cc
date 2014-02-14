@@ -25,24 +25,6 @@ using namespace L3;
 
 const double Lpar::BELLE_ALPHA(222.37606);
 
-//
-// constructors and destructor
-//
-// Lpar::Lpar(double x1, double y1, double x2, double y2, double x3, double y3) {
-//   circle(x1, y1, x2, y2, x3, y3);
-// }
-Lpar::Cpar::Cpar(const Lpar& l)
-{
-  m_cu = l.m_kappa;
-  if (l.m_alpha != 0 && l.m_beta != 0)
-    m_fi = atan2(l.m_alpha, -l.m_beta);
-  else m_fi = 0;
-  if (m_fi < 0) m_fi += 2 * M_PI;
-  m_da = 2 * l.m_gamma / (1 + sqrt(1 + 4 * l.m_kappa * l.m_gamma));
-  m_cfi = cos(m_fi);
-  m_sfi = sin(m_fi);
-}
-
 Lpar::~Lpar()
 {
 }
@@ -105,6 +87,19 @@ void Lpar::circle(double x1, double y1, double x2, double y2,
   }
 }
 
+/*
+Lpar::Cpar::Cpar(const Lpar& l)
+{
+  m_cu = l.m_kappa;
+  if (l.m_alpha != 0 && l.m_beta != 0)
+    m_fi = atan2(l.m_alpha, -l.m_beta);
+  else m_fi = 0;
+  if (m_fi < 0) m_fi += 2 * M_PI;
+  m_da = 2 * l.m_gamma / (1 + sqrt(1 + 4 * l.m_kappa * l.m_gamma));
+  m_cfi = cos(m_fi);
+  m_sfi = sin(m_fi);
+}
+
 TMatrixD Lpar::dldc() const
 {
   TMatrixD vret(3, 4);
@@ -126,6 +121,7 @@ TMatrixD Lpar::dldc() const
   vret(2, 3) = 0;
   return vret;
 }
+*/
 
 bool Lpar::xy(double r, double& x, double& y, int dir) const
 {

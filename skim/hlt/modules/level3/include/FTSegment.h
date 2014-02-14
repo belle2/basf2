@@ -20,6 +20,8 @@ namespace Belle2 {
   class FTLayer;
   class FTSuperLayer;
   class FTTrack;
+
+  // Track segment class for the Level-3 Fast Track Finder
   class FTSegment {
   public:
 
@@ -102,27 +104,24 @@ namespace Belle2 {
     FTTrack* track(FTTrack*);
 
   private: // private data members
-    FTList<FTWire*>& m_wireHits;
-    FTSuperLayer& m_superLayer;
-    FTList<FTWire*>& m_innerBoundHits;
-    FTList<FTWire*>& m_outerBoundHits;
-    FTList<double>* m_sList;
+    FTList<FTWire*>& m_wireHits; // list of hits
+    FTSuperLayer& m_superLayer; // reference to the super layer
+    FTList<FTWire*>& m_innerBoundHits; // list of hits in the inner bound layer
+    FTList<FTWire*>& m_outerBoundHits; // list of hits in the outer bound layer
+    FTList<double>* m_sList; // list of s value for the hits
     union {
-      double m_kappa;
-      FTList<double>* m_zList;
+      double m_kappa; // kappa of the segment
+      FTList<double>* m_zList; // list of z value for the hits
     };
     union {
-      FTTrack* m_track;
-      FTList<FTTrack*>* m_trackList;
+      FTTrack* m_track; // pointer to the track
+      FTList<FTTrack*>* m_trackList; // pointer of associated tracks
     };
-    double m_r;
-    double m_outgoing_x;
-    double m_outgoing_y;
-    double m_incoming_x;
-    double m_incoming_y;
-#ifdef FZISAN_DEBUG
-    Gen_hepevt* m_hep;
-#endif
+    double m_r; // r of the segment
+    double m_outgoing_x; // x position at exit
+    double m_outgoing_y; // y position at exit
+    double m_incoming_x; // x position at entry
+    double m_incoming_y; // y position at entry
   };
 
 
@@ -166,27 +165,27 @@ namespace Belle2 {
   FTSegment::connectOuter(const FTList<FTWire*>& outerHits,
                           const FTList<FTWire*>& outerBound)
   {
-    m_wireHits.append((FTList<FTWire*>&)outerHits);
+    m_wireHits.append(outerHits);
     m_outerBoundHits.clear();
-    m_outerBoundHits.append((FTList<FTWire*>&)outerBound);
+    m_outerBoundHits.append(outerBound);
   }
 
   inline
   void
   FTSegment::connectOuter(const FTWire* h)
   {
-    m_wireHits.append((FTWire*)h);
+    m_wireHits.append(const_cast<FTWire*>(h));
     m_outerBoundHits.clear();
-    m_outerBoundHits.append((FTWire*)h);
+    m_outerBoundHits.append(const_cast<FTWire*>(h));
   }
 
   inline
   void
   FTSegment::connectInner(const FTWire* h)
   {
-    m_wireHits.append((FTWire*)h);
+    m_wireHits.append(const_cast<FTWire*>(h));
     m_innerBoundHits.clear();
-    m_innerBoundHits.append((FTWire*)h);
+    m_innerBoundHits.append(const_cast<FTWire*>(h));
   }
 
   inline

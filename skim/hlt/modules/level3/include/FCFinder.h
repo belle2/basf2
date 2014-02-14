@@ -19,6 +19,8 @@
 namespace Belle2 {
 
   class FCCluster;
+
+  // The Level-3 Fast Cluster Finder
   class FCFinder {
 
   public:
@@ -63,10 +65,10 @@ namespace Belle2 {
     void clustering(const double seedThreshold, const double clusterECut);
 
   private: // private data members
-    static FCFinder* s_cFinder;
-    FCCrystal* m_Crystal;
-    FTList<FCCrystal*>& m_ehits;
-    FTList<FCCluster*>& m_clusters;
+    static FCFinder* s_cFinder; // pointer for FCFinder
+    FCCrystal* m_Crystal; // pointer for the array of crystals
+    FTList<FCCrystal*>& m_ehits; // list of hits for the event
+    FTList<FCCluster*>& m_clusters; // list of clusters for the event
   };
 
   //----------------------------------------------

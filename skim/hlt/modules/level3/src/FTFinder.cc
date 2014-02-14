@@ -94,9 +94,10 @@ FTFinder::init()
   // allocate memory for geometry
   m_Nwire = iWir;
   m_NsuperLayer = iSup + 1;
-  m_wire = (FTWire*) malloc((m_Nwire + 1) * sizeof(FTWire));
-  m_layer = (FTLayer*) malloc(m_Nlayer * sizeof(FTLayer));
-  m_superLayer = (FTSuperLayer*) malloc(m_NsuperLayer * sizeof(FTSuperLayer));
+  m_wire = static_cast<FTWire*>(malloc((m_Nwire + 1) * sizeof(FTWire)));
+  m_layer = static_cast<FTLayer*>(malloc(m_Nlayer * sizeof(FTLayer)));
+  m_superLayer =
+    static_cast<FTSuperLayer*>(malloc(m_NsuperLayer * sizeof(FTSuperLayer)));
 
   if (!m_wire) B2FATAL("Realloc failed for wires");
   if (!m_layer) B2FATAL("Realloc failed for layers");
@@ -327,8 +328,8 @@ FTFinder::updateCdc3(void)
   for (int i = 0; i < nHits; i++) {
     const CDCHit& h = * CDCHits[i];
 
-    int layerId = h.getILayer();
-    int localId = h.getIWire();
+    const int layerId = h.getILayer();
+    //const int localId = h.getIWire();
 
     FTLayer& layer = m_layer[layerId];
     FTWire& wire = layer.wire(local);
@@ -503,7 +504,7 @@ FTFinder::linkAxialSegments(const FTSegment* initial)
   static const double alpha(222.37606);
   double chi2Kappa = 3000.;
   m_linkedSegments->clear();
-  int n = m_linkedSegments->append((FTSegment*)initial);
+  int n = m_linkedSegments->append(const_cast<FTSegment*>(initial));
   double SigmaK = initial->kappa();
   double SigmaRR = initial->r(); SigmaRR *= SigmaRR;
   double SigmaKRR = SigmaK * SigmaRR;
@@ -950,6 +951,7 @@ FTFinder::VertexFit(int z_flag)
   return rtn_flag;
 }
 
+/*
 int
 FTFinder::findBestVertex(void)
 {
@@ -973,6 +975,7 @@ FTFinder::findBestVertex(void)
   m_vy = minDr * sin(phi0);
   return 1;
 }
+*/
 
 TVector3
 FTFinder::getVertex(void) const

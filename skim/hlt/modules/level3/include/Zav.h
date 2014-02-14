@@ -13,10 +13,12 @@
 
 #include <iostream>
 
-#include <TMatrixDSym.h>
+//#include <TMatrixDSym.h>
 
 namespace Belle2 {
   namespace L3 {
+
+    // Line fitter in the s-z plane
     class Zav {
     public:
       //! Constructor
@@ -56,7 +58,7 @@ namespace Belle2 {
       void clear(void);
 
       //! returns covariance matrix
-      TMatrixDSym cov() const;
+      //TMatrixDSym cov() const;
 
     private:
       double m_a;
@@ -160,7 +162,7 @@ namespace Belle2 {
       }
       return m_chisq;
     }
-
+    /*
     inline TMatrixDSym Zav::cov() const
     {
       TMatrixDSym vret(2);
@@ -169,7 +171,7 @@ namespace Belle2 {
       vret(1, 1) = m_w;
       return vret;
     }
-
+    */
 #endif
 
 #undef inline

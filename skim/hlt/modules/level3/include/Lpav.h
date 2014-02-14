@@ -14,11 +14,13 @@
 // system include files
 
 // user include files
-#include "TMatrixDSym.h"
+//#include "TMatrixDSym.h"
 #include "skim/hlt/modules/level3/Lpar.h"
 
 namespace Belle2 {
   namespace L3 {
+
+    // Circle fitter in the r-phi plane
     class Lpav : public Lpar {
 
     public:
@@ -41,30 +43,27 @@ namespace Belle2 {
       //! add a point
       void add_point(double x, double y, double w = 1);
 
-      //! add a point
-      void add_point_frac(double x, double y, double w, double f);
-
       //! returns number of points
       double nc() const { return m_nc; }
 
       //! returns chi square
       double chisq() const { return m_chisq; }
 
-      //! returns covariance matrix (4x4)
+      /*
+      // unused functions
       TMatrixDSym cov(int = 0) const;
-
-      //! returns covariance matrix (3x3)
       TMatrixDSym cov_c(int = 0) const;
-
+      void add_point_frac(double x, double y, double w, double f);
       int extrapolate(double, double&, double&) const;
       double similarity(double, double) const;
       double delta_chisq(double x, double y, double w = 1) const;
       double chi_deg() const;
+      */
 
       // assignment operator(s)
-      const Lpav& operator=(const Lpav&);
-      const Lpav& operator=(const Lpar&);
-      const Lpav& operator+=(const Lpav&);
+      Lpav& operator=(const Lpav&);
+      //Lpav& operator=(const Lpar&);
+      Lpav& operator+=(const Lpav&);
 
     private:
       // Constructors and destructor
@@ -93,17 +92,17 @@ namespace Belle2 {
       // private const member functions
 
       // data members
-      double m_wsum;
-      double m_xsum;
-      double m_ysum;
-      double m_xxsum;
-      double m_yysum;
-      double m_xysum;
-      double m_xrrsum;
-      double m_yrrsum;
-      double m_rrrrsum;
+      double m_wsum; // sum of weight
+      double m_xsum; // sum of x
+      double m_ysum; // sum of y
+      double m_xxsum; // sum of x*x
+      double m_yysum; // sum of y*y
+      double m_xysum; // sum of x*y
+      double m_xrrsum; // sum of x*r*r
+      double m_yrrsum; // sum of y*r*r
+      double m_rrrrsum; // sum of r*r*r*r
 
-      double m_wsum_temp;
+      double m_wsum_temp; // sum of weight
       double m_xav;
       double m_yav;
       double m_xyavp;
@@ -117,8 +116,8 @@ namespace Belle2 {
       double m_sinrot;
       double m_cosrot;
 
-      double m_nc;
-      double m_chisq;
+      double m_nc; // number of points
+      double m_chisq; // chi square
 
       // static data members
 
@@ -193,7 +192,7 @@ namespace Belle2 {
     }
 
     inline
-    const Lpav&
+    Lpav&
     Lpav::operator=(const Lpav& lp)
     {
       Lpar::operator=(lp);

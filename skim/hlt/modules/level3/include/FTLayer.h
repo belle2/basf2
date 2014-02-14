@@ -18,6 +18,8 @@
 namespace Belle2 {
 
   class FTWire;
+
+  // CDC layer class for the Level-3 Fast Track Finder
   class FTLayer {
   public:
     //! constructor
@@ -76,17 +78,17 @@ namespace Belle2 {
     FTWire* firstWire() const;
 
   private: // private data members
-    const double m_radius;
-    const double m_tanSlant;
-    const double m_zf;        // z of forward endplate
-    const double m_zb;        // z of backward endplate
-    const double m_offset;
-    const int m_layerId;
-    const int m_localLayerId;
-    const int m_Nwire;
-    const FTSuperLayer& m_superLayer;
-    const int m_smallCell;
-    FTWire* const m_firstWire;
+    const double m_radius; // radius
+    const double m_tanSlant; // tangent of the slant angle
+    const double m_zf; // z of forward endplate
+    const double m_zb; // z of backward endplate
+    const double m_offset; // offset of phi
+    const int m_layerId; // global ID
+    const int m_localLayerId; // ID in the super layer
+    const int m_Nwire; // number of wires
+    const FTSuperLayer& m_superLayer; // reference to the super layer
+    const int m_smallCell; // =1 small cell, =0 otherwise
+    FTWire* const m_firstWire; // pointer to the first wire in the layer
   };
 
   //----------------------------------------------

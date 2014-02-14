@@ -149,7 +149,7 @@ FTSegment::update3D(const FTTrack* track)
   double outZ = bound->z(d);
   m_sList->append(inS + outS);
   m_zList->append(inZ + outZ);
-  m_trackList->append((FTTrack*)track);
+  m_trackList->append(const_cast<FTTrack*>(track));
   return 1;
 }
 

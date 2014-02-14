@@ -649,6 +649,10 @@ void TelxVXDModule::event()
         fPosU1 = rGlobal.Y();
         fPosV1 = rGlobal.Z();
       }
+      if (m_SwapAxis) {
+        swap(fPosU1, fPosV1);
+        swap(iIsU1, iIsV1);
+      }
     } else {                                  // SVD clusters:
       const SVDCluster& cluster1 = *storeSVDClusters[i1 - storePXDClusters.getEntries()];
       iPlane1 = cluster1.getSensorID().getLayerNumber();
@@ -697,6 +701,10 @@ void TelxVXDModule::event()
           fPosU2 = rGlobal.Y();
           fPosV2 = rGlobal.Z();
         }
+        if (m_SwapAxis) {
+          swap(fPosU2, fPosV2);
+          swap(iIsU2, iIsV2);
+        }
       } else {                                  // SVD clusters:
         const SVDCluster& cluster2 = *storeSVDClusters[i2 - storePXDClusters.getEntries()];
         iPlane2 = cluster2.getSensorID().getLayerNumber();
@@ -719,10 +727,6 @@ void TelxVXDModule::event()
             fPosV2 = rGlobal.Z();
           }
         }
-      }
-      if (m_SwapAxis) {
-        swap(fPosU2, fPosV2);
-        swap(iIsU2, iIsV2);
       }
       if (!((index2 == SelDet1) || (index2 == SelDet2))) continue;
       // ready to fill correlation histograms and hit maps:
@@ -762,6 +766,10 @@ void TelxVXDModule::event()
         TVector3 rGlobal = getInfoPXD(index1).pointToGlobal(rLocal);
         fPosU1 = rGlobal.Y();
         fPosV1 = rGlobal.Z();
+      }
+      if (m_SwapAxis) {
+        swap(fPosU1, fPosV1);
+        swap(iIsU1, iIsV1);
       }
     } else {                                  // Tel clusters:
       const PXDCluster& clusterPXD1 = *storeTelClusters[i1 - storePXDClusters.getEntries()];
@@ -810,6 +818,10 @@ void TelxVXDModule::event()
           fPosU2 = rGlobal.Y();
           fPosV2 = rGlobal.Z();
         }
+        if (m_SwapAxis) {
+          swap(fPosU2, fPosV2);
+          swap(iIsU2, iIsV2);
+        }
       } else {                                  // Tel clusters:
         const PXDCluster& clusterPXD2 = *storeTelClusters[i2 - storePXDClusters.getEntries()];
         iPlane2 = clusterPXD2.getSensorID().getLayerNumber();
@@ -831,9 +843,6 @@ void TelxVXDModule::event()
           fPosU2 = rGlobal.Y();
           fPosV2 = rGlobal.Z();
         }
-      }
-      if (m_SwapAxis) {
-        swap(fPosU2, fPosV2);
       }
       if (!((index2 == SelDet1) || (index2 == SelDet2))) continue;
       // ready to fill correlation histograms and hit maps:
@@ -902,6 +911,10 @@ void TelxVXDModule::event()
           fPosV1 = rGlobal.Z();
         }
       }
+      if (m_SwapAxis) {
+        swap(fPosU1, fPosV1);
+        swap(iIsU1, iIsV1);
+      }
     }
     if (!((index1 == SelDet1) || (index1 == SelDet2))) continue;
     for (int i2 = 0; i2 < storeSVDClusters.getEntries() + storeTelClusters.getEntries(); i2++) {
@@ -955,10 +968,10 @@ void TelxVXDModule::event()
             fPosV2 = rGlobal.Z();
           }
         }
-      }
-      if (m_SwapAxis) {
-        swap(fPosU2, fPosV2);
-        swap(iIsU2, iIsV2);
+        if (m_SwapAxis) {
+          swap(fPosU2, fPosV2);
+          swap(iIsU2, iIsV2);
+        }
       }
       if (!((index2 == SelDet1) || (index2 == SelDet2))) continue;
       // ready to fill correlation histograms and hit maps:
@@ -1026,6 +1039,10 @@ void TelxVXDModule::event()
           fPosV1 = rGlobal.Z();
         }
       }
+      if (m_SwapAxis) {
+        swap(fPosU1, fPosV1);
+        swap(iIsU1, iIsV1);
+      }
     }
     if (!((index1 == SelDet1) || (index1 == SelDet2))) continue;
     for (int i2 = 0; i2 < storeSVDClusters.getEntries() + storeTelClusters.getEntries(); i2++) {
@@ -1079,10 +1096,10 @@ void TelxVXDModule::event()
             fPosV2 = rGlobal.Z();
           }
         }
-      }
-      if (m_SwapAxis) {
-        swap(fPosU2, fPosV2);
-        swap(iIsU2, iIsV2);
+        if (m_SwapAxis) {
+          swap(fPosU2, fPosV2);
+          swap(iIsU2, iIsV2);
+        }
       }
       if (!((index2 == SelDet1) || (index2 == SelDet2))) continue;
       // ready to fill correlation histograms and hit maps:

@@ -14,9 +14,11 @@ class ChannelCut:
     def __init__(self, file, channel):
         """
         Determines the cut on a specific channel
-        file - the ROOT TFile where the histograms are stored
-        channel - the channel name as string
+        @param file - the ROOT TFile where the histograms are stored
+        @param channel - the channel name as string
         """
+        ## Channel nae
+        self.channel = channel
         ## Distribution of invariant mass for signal events
         self.signal = file.Get(channel + '_M_signal_histogram')
         ## Distribution of invariant mass for background events
@@ -37,6 +39,7 @@ class ChannelCut:
     def getCut(self, d):
         """
         Returns cut positions at x-axis for a cut d on y-axis
+        @param d cut on y-axis
         """
         return (self.func.GetX(d, 0, self.maxpos), self.func.GetX(d,
                 self.maxpos, 100))
@@ -51,6 +54,7 @@ class ChannelCut:
     def getNEventCut(self, d):
         """
         Returns total number of events which surviving the cut d
+        @param d cut on y axis
         """
         (a, b) = self.getCut(d)
         return self.signal.Integral(self.signal.FindBin(a),
@@ -67,6 +71,8 @@ class GlobalCut:
     def __init__(self, file, channels):
         """
         channels is a list of channel names
+        @param file ROOT file with histograms
+        @param channels names of channels
         """
 
         ## List of ChannelCut objects for each channel
@@ -76,6 +82,7 @@ class GlobalCut:
         """
         Returns dictionary of cut positions on the x-axis for a cut d on the
         y-axis
+        @param d cut on y-axis
         """
         return dict([(c.channel, c.getCut(d)) for c in self.channel_cuts])
 
@@ -89,6 +96,7 @@ class GlobalCut:
         """
         Function which is used by TF1, to implement mass_cut function.
         Returns the total number of events which survive a cut d
+        @param d cut on y axis
         """
         return sum([c.getNEventCut(d[0]) for c in self.channel_cuts])
 
@@ -97,6 +105,9 @@ def getCutOnMass(percentage, filename, channels):
     """
     Calculates a cut on all channels from the histograms in filename so only
     percentage of the events survive the cut.
+    @param percentage percentage of events which sould survive the cut
+    @param filename of the file which contains the histograms
+    @param channels names of the channels for which the cuts are determiend
     """
     file = ROOT.TFile(filename, 'UPDATE')
     global_cuts = GlobalCut(file, channels)

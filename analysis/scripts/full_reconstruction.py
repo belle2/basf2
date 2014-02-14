@@ -143,7 +143,7 @@ class Particle:
         # If this is not a final state particle and cut determination histogram
         # is available we calculate the correct cuts
         if not self.channels == [] and os.path.isfile(self.getHistFilename()):
-            cuts['M'] = cut_determination.getCutOnMass(0.0001,
+            cuts['M'] = cut_determination.getCutOnMass(0.01,
                     self.getHistFilename(), [self.to_string(c) for c in
                     self.channels])
         return cuts
@@ -289,6 +289,8 @@ class Particle:
                 teacher.param('identifier', self.to_string(channel) + '_'
                               + self.getWeightHash())
                 teacher.param('methods', self.methods)
+                teacher.param('factoryOption',
+                '!V:!Silent:Color:DrawProgressBar:AnalysisType=Classification')
                 teacher.param('variables', self.variables)
                 teacher.param('target', 'isSignal')
                 teacher.param('listNames', [self.to_string(channel)])

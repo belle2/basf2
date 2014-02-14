@@ -1,5 +1,5 @@
 Import('env')
 
-env['LIBS'] = ['generators_bhwide', 'generators_dataobjects', 'generators', 'framework']
+env['LIBS'] = ['generators_bhwide', 'mdst_dataobjects', 'generators', 'framework']
 
 Return('env')

@@ -26,7 +26,7 @@ namespace Belle2 {
    *  This is an empty baseclass to allow storage of all template
    *  specializations to be stored in the same map
    *
-   *  This class is only used internally, users should use RelationIndex/RelationArray to access/modify relations.
+   *  This class is only used internally, users should use RelationsObject/RelationsInterface to access/add relations.
    */
   class RelationIndexBase {
   public:
@@ -171,8 +171,8 @@ namespace Belle2 {
     //Get related StoreArrays
     m_storeFrom = storeRel.getFromAccessorParams();
     m_storeTo = storeRel.getToAccessorParams();
-    StoreArray<FROM> storeFrom(m_storeFrom.first, m_storeFrom.second);
-    StoreArray<TO>   storeTo(m_storeTo.first, m_storeTo.second);
+    const StoreArray<FROM> storeFrom(m_storeFrom.first, m_storeFrom.second);
+    const StoreArray<TO>   storeTo(m_storeTo.first, m_storeTo.second);
 
     //Get number of entries in relation and stores
     unsigned int nRel = storeRel.getEntries();

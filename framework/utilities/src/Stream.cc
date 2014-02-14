@@ -62,6 +62,9 @@ TObject* Stream::deserializeXML(const std::string& data)
 
 TObject* Stream::deserializeEncodedRawData(const std::string& base64Data)
 {
+  if (base64Data.empty())
+    return nullptr;
+
   //convert data back into raw byte stream
   const TString& data(TBase64::Decode(base64Data.c_str()));
 

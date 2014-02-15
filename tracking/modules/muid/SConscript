@@ -7,7 +7,6 @@ env['LIBS'] = [
     'framework',
     'simulation',
     'geometry',
-    'generators_dataobjects',
     'genfit2',
     'tracking_dataobjects',
     'bklm', 'bklm_dataobjects',

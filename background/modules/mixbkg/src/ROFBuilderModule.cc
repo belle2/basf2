@@ -12,7 +12,7 @@
 
 #include <framework/core/InputController.h>
 #include <framework/gearbox/Unit.h>
-#include <generators/dataobjects/SimHitBase.h>
+#include <simulation/dataobjects/SimHitBase.h>
 #include <pxd/dataobjects/PXDSimHit.h>
 #include <svd/dataobjects/SVDSimHit.h>
 #include <cdc/dataobjects/CDCSimHit.h>

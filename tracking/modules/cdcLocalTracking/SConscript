@@ -3,7 +3,6 @@ Import('env')
 env['LIBS'] = [
     'framework',
     'mdst_dataobjects',
-    'generators_dataobjects',
     'cdc', 'cdc_dataobjects',
     'genfit2',
     'tracking', #'tracking_dataobjects',

@@ -4,7 +4,6 @@ env['LIBS'] = [
     '$ROOT_LIBS',
     'framework',
     'geometry',
-    'generators_dataobjects',
     'mdst_dataobjects',
     'vxd', 'vxd_dataobjects', 
     'pxd_dataobjects',

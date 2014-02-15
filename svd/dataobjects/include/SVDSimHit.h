@@ -11,7 +11,7 @@
 #ifndef SVDSIMHIT_H
 #define SVDSIMHIT_H
 
-#include <generators/dataobjects/SimHitBase.h>
+#include <simulation/dataobjects/SimHitBase.h>
 // ROOT
 #include <TObject.h>
 #include <TVector3.h>

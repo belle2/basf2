@@ -1,6 +1,6 @@
 Import('env')
 
-env['LIBS'] = ['eklm', 'eklm_dataobjects', 'generators_dataobjects',
+env['LIBS'] = ['eklm', 'eklm_dataobjects',
                'framework', '$ROOT_LIBS']
 
 Return('env')

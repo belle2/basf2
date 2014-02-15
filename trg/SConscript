@@ -5,7 +5,6 @@ env['CONTINUE'] = False
 env['LIBS'] = ['framework',
 	       'cdc',
 	       'ecl',
-	       'generators_dataobjects',
 	       'rawdata_dataobjects',
 	       'cdc_dataobjects',
 	       'ecl_dataobjects',

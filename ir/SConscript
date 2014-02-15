@@ -1,7 +1,7 @@
 Import('env')
 
 env['LIBS'] = ['framework', 'geometry', 'simulation',
-               '$ROOT_LIBS', 'Geom', 'generators_dataobjects',
+               '$ROOT_LIBS', 'Geom',
                'simulation_dataobjects', 'ir_dataobjects']
 
 Return('env')

@@ -1,5 +1,5 @@
 Import('env')
 
-env['LIBS'] = ['generators_dataobjects', 'framework', 'CLHEP']
+env['LIBS'] = ['framework', 'CLHEP']
 
 Return('env')

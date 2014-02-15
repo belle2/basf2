@@ -11,7 +11,7 @@
 #ifndef ECLHIT_H
 #define ECLHIT_H
 
-#include <generators/dataobjects/SimHitBase.h>
+#include <simulation/dataobjects/SimHitBase.h>
 
 namespace Belle2 {
   /** \addtogroup dataobjects

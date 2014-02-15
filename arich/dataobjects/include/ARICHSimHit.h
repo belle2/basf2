@@ -12,7 +12,7 @@
 #define ARICHSIMHIT_H
 
 #include <TVector3.h>
-#include <generators/dataobjects/SimHitBase.h>
+#include <simulation/dataobjects/SimHitBase.h>
 
 namespace Belle2 {
 

@@ -12,7 +12,7 @@
 #define CDCSIMHIT_H
 
 #include <cdc/dataobjects/WireID.h>
-#include <generators/dataobjects/SimHitBase.h>
+#include <simulation/dataobjects/SimHitBase.h>
 #include <framework/datastore/RelationsObject.h>
 
 #include <TVector3.h>

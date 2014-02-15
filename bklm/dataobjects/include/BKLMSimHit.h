@@ -11,7 +11,7 @@
 #ifndef BKLMSIMHIT_H
 #define BKLMSIMHIT_H
 
-#include <generators/dataobjects/SimHitBase.h>
+#include <simulation/dataobjects/SimHitBase.h>
 #include <TVector3.h>
 #include <TLorentzVector.h>
 #include <framework/datastore/RelationsObject.h>

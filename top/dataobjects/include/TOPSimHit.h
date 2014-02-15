@@ -11,7 +11,7 @@
 #ifndef TOPSIMHIT_H
 #define TOPSIMHIT_H
 
-#include <generators/dataobjects/SimHitBase.h>
+#include <simulation/dataobjects/SimHitBase.h>
 #include <TObject.h>
 #include <TVector3.h>
 

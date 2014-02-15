@@ -12,7 +12,7 @@
 #define EKLMSIMHIT_H
 
 /* Belle2 headers. */
-#include <generators/dataobjects/SimHitBase.h>
+#include <simulation/dataobjects/SimHitBase.h>
 #include <eklm/dataobjects/EKLMHitBase.h>
 #include <eklm/dataobjects/EKLMHitCoord.h>
 #include <eklm/dataobjects/EKLMHitMomentum.h>

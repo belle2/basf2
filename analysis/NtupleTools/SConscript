@@ -5,7 +5,6 @@ env['LIBS'] = [
 	      'analysis',
 	      'analysis_dataobjects', 
 	      'tracking_dataobjects',
-	      'generators_dataobjects',
 	      'arich_dataobjects',
               'bklm_dataobjects',
               'cdc_dataobjects',

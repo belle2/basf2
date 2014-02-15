@@ -22,7 +22,7 @@
 #include <framework/dataobjects/RelationElement.h>
 
 #include <mdst/dataobjects/MCParticle.h>
-#include <generators/dataobjects/BackgroundInfo.h>
+#include <background/dataobjects/BackgroundInfo.h>
 
 #include <TChain.h>
 #include <TClonesArray.h>

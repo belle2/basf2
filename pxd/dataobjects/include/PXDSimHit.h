@@ -11,7 +11,7 @@
 #ifndef PXDSIMHIT_H
 #define PXDSIMHIT_H
 
-#include <generators/dataobjects/SimHitBase.h>
+#include <simulation/dataobjects/SimHitBase.h>
 
 // ROOT
 #include <TVector3.h>

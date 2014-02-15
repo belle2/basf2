@@ -16,6 +16,5 @@
 #pragma link C++ nestedclasses;
 
 #pragma link C++ class Belle2::BackgroundInfo;
-#pragma link C++ class Belle2::SimHitBase;
 
 #endif

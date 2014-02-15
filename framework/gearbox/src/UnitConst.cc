@@ -168,6 +168,10 @@ Const::EDetector Const::DetectorSet::getDetector(unsigned short bit) const
     case 0x0020: return ARICH;
     case 0x0040: return ECL;
     case 0x0080: return KLM;
+    case 0x0100: return TRG;
+    case 0x0200: return DAQ;
+    case 0x0400: return BEAST;
+    case 0x0800: return TEST;
     default: return invalidDetector;
   }
 }
@@ -186,7 +190,7 @@ int Const::DetectorSet::getIndex(EDetector det) const
 Const::EDetector Const::DetectorSet::operator [](int index) const
 {
   if (index < 0) return Const::invalidDetector;
-  for (unsigned short setBit = 1; setBit < 0x100; setBit *= 2) {
+  for (unsigned short setBit = 1; setBit < 0x1000; setBit *= 2) {
     if ((m_bits & setBit) != 0) --index;
     if (index < 0) return getDetector(setBit);
   }
@@ -196,7 +200,7 @@ Const::EDetector Const::DetectorSet::operator [](int index) const
 size_t Const::DetectorSet::size() const
 {
   int size = 0;
-  for (unsigned short setBit = 1; setBit < 0x100; setBit *= 2) {
+  for (unsigned short setBit = 1; setBit < 0x1000; setBit *= 2) {
     if ((m_bits & setBit) != 0) ++size;
   }
   return size;
@@ -216,7 +220,8 @@ public:
 
 
 const Const::DetectorSet Const::allDetectors = Const::IR + Const::PXD + Const::SVD + Const::CDC +
-                                               Const::TOP + Const::ARICH + Const::ECL + Const::KLM;
+                                               Const::TOP + Const::ARICH + Const::ECL + Const::KLM +
+                                               Const::TRG + Const::DAQ + Const::BEAST + Const::TEST;
 
 
 bool Const::ParticleType::operator < (const Const::ParticleType& other) const

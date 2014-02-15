@@ -148,4 +148,30 @@ namespace Belle2 {
     EXPECT_TRUE(Const::invalidParticle.getParticlePDG() == NULL);
   }
 
+  /** Check DetectorSet. */
+  TEST_F(ConstTest, DetectorSet)
+  {
+    Const::DetectorSet set(Const::IR);
+    EXPECT_EQ(set, Const::IR);
+    set += Const::PXD;
+    EXPECT_EQ(set, Const::IR + Const::PXD);
+    set += Const::PXD;
+    EXPECT_EQ(set, Const::IR + Const::PXD);
+    EXPECT_TRUE(set == Const::IR + Const::PXD);
+    EXPECT_FALSE(set == Const::IR);
+    set -= Const::IR;
+    EXPECT_EQ(set, Const::PXD);
+    EXPECT_TRUE(set.contains(Const::PXD));
+    EXPECT_FALSE(set.contains(Const::IR));
+    set += Const::SVD + Const::TEST;
+    EXPECT_EQ(set.getIndex(Const::IR), -1);
+    EXPECT_EQ(set.getIndex(Const::PXD), 0);
+    EXPECT_EQ(set.getIndex(Const::TEST), 2);
+    EXPECT_EQ(set[0], Const::PXD);
+    EXPECT_EQ(set[2], Const::TEST);
+    EXPECT_EQ(set[3], Const::invalidDetector);
+    EXPECT_EQ(set.size(), (size_t)3);
+    EXPECT_EQ(Const::allDetectors.size(), (size_t)12);
+  }
+
 }  // namespace

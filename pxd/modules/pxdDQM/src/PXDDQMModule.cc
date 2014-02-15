@@ -112,8 +112,8 @@ void PXDDQMModule::defineHisto()
     int nPixelsU = getInfo(i).getUCells();
     int nPixelsV = getInfo(i).getVCells();
     m_hitMapUV[i] = new TH2F(name.c_str(), title.c_str(), nPixelsU, 0, nPixelsU, nPixelsV, 0, nPixelsV);
-    m_hitMapUV[i]->GetXaxis()->SetTitle("u position [cm]");
-    m_hitMapUV[i]->GetYaxis()->SetTitle("v position [cm]");
+    m_hitMapUV[i]->GetXaxis()->SetTitle("u position [pitch units]");
+    m_hitMapUV[i]->GetYaxis()->SetTitle("v position [pitch units]");
     m_hitMapUV[i]->GetZaxis()->SetTitle("hits");
   }
   //----------------------------------------------------------------

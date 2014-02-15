@@ -83,8 +83,20 @@ class DisplayAxis(Module):
         displayData.obj().addLabel("Global axes", pos + TVector3(1, 1, 1))
 
         posBeam = TVector3(30, -5, -5)
-        displayData.obj().addArrow("Beam direction, -x=20cm", posBeam,
-                posBeam + TVector3(-20, 0, 0))
+        displayData.obj().addArrow(
+            "Beam direction, -x=20cm",
+            posBeam,
+            posBeam + TVector3(-20, 0, 0))
+
+        posBField = TVector3(30, 5, -5)
+        displayData.obj().addArrow(
+            "Magnetic field direction; -z", posBField,
+            posBField + TVector3(0, 0, -20))
+
+        posElectronTurns = TVector3(30, 5, -5)
+        displayData.obj().addArrow(
+            "Turn of electrons in magnetic field: +y",
+            posElectronTurns, posElectronTurns + TVector3(0, +20, 0))
 
         displayData.obj().addLabel(GeometryFileName, TVector3(-20, 20, 0))
 
@@ -97,8 +109,8 @@ class DisplayAxis(Module):
                     SensorID = 'Tel' + str(info.getID().getSensorNumber())
                     PlaneOK = info.getID().getSensorNumber()
                 else:
-                    SensorID = 'Tel' + str(info.getID().getSensorNumber()\
-                     + 6)
+                    SensorID = 'Tel' + str(
+                        info.getID().getSensorNumber() + 6)
                     PlaneOK = info.getID().getSensorNumber() + 6
             else:
                 if info.getID().getLayerNumber() < 3:
@@ -115,33 +127,40 @@ class DisplayAxis(Module):
                     v = geo.get(sensor).vectorToGlobal(TVector3(0., 2., 0.))
                     w = geo.get(sensor).vectorToGlobal(TVector3(0., 0., 0.5))
                     LableU = SensorID + ', dir U, 2cm'
-                    displayData.obj().addArrow(LableU, detPos, detPos + u, \
-                        ROOT.kBlue)
+                    displayData.obj().addArrow(
+                        LableU, detPos, detPos + u, ROOT.kBlue)
                     LableV = SensorID + ', dir V, 2cm'
-                    displayData.obj().addArrow(LableV, detPos, detPos + v, \
-                        ROOT.kGreen)
+                    displayData.obj().addArrow(
+                        LableV, detPos, detPos + v, ROOT.kGreen)
                     LableW = SensorID + ', dir W, 0.5cm'
-                    displayData.obj().addArrow(LableW, detPos, detPos + w), \
-                        ROOT.kGray
+                    displayData.obj().addArrow(
+                        LableW, detPos, detPos + w, ROOT.kGray)
 
                 if int(ShowCounting) != 0:
-                    pixelDir0 = geo.get(sensor).pointToGlobal(TVector3(\
-                        info.getUCellPosition(0), \
-                        info.getVCellPosition(0), 0.))
-                    pixelDirU = geo.get(sensor).pointToGlobal(TVector3(\
-                        info.getUCellPosition(200), \
-                        info.getVCellPosition(0), 0.))
-                    pixelDirV = geo.get(sensor).pointToGlobal(TVector3(\
-                        info.getUCellPosition(0), \
-                        info.getVCellPosition(200), 0.))
+                    pixelDir0 = geo.get(sensor).pointToGlobal(
+                        TVector3(
+                            info.getUCellPosition(0),
+                            info.getVCellPosition(0),
+                            0.))
+                    pixelDirU = geo.get(sensor).pointToGlobal(
+                        TVector3(
+                            info.getUCellPosition(200),
+                            info.getVCellPosition(0),
+                            0.))
+                    pixelDirV = geo.get(sensor).pointToGlobal(
+                        TVector3(
+                            info.getUCellPosition(0),
+                            info.getVCellPosition(200),
+                            0.))
                     LableU = SensorID + ', dir U, 200 pixels, pitch ' \
                         + str(int(info.getUPitch() * 10000)) + 'um'
                     LableV = SensorID + ', dir V, 200 pixels, pitch ' \
                         + str(int(info.getVPitch() * 10000)) + 'um'
-                    displayData.obj().addArrow(LableU,
-                       pixelDir0, pixelDirU, ROOT.kCyan)
-                    displayData.obj().addArrow(LableV, pixelDir0, \
-                        pixelDirV, ROOT.kYellow)
+                    displayData.obj().addArrow(
+                        LableU, pixelDir0, pixelDirU, ROOT.kCyan)
+                    displayData.obj().addArrow(
+                        LableV, pixelDir0, pixelDirV, ROOT.kYellow)
+
                     print str(PlaneOK) + ':' + SensorID + ', dir U, pitch ' \
                         + str(info.getUPitch() * 10000) + 'um, size ' + \
                         str(info.getUSize() * 10) + ' mm, pixels ' + \
@@ -239,8 +258,7 @@ param_mctrackfinder = {
     'UseSVDHits': 1,
     'UsePXDHits': 1,
     'Smearing': 0,
-    'UseClusters': True,
-    }
+    'UseClusters': True}
 mctrackfinder.param(param_mctrackfinder)
 # mctrackfinder.logging.log_level = LogLevel.DEBUG
 

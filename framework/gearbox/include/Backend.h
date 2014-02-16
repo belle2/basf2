@@ -119,7 +119,7 @@ namespace Belle2 {
 
       private:
 
-        Backend* owner;
+        //Backend* owner;
         multiOp_opType_t opType;
         IData_t idata;
         unsigned int autoCommit;

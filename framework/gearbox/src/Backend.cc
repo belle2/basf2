@@ -45,7 +45,7 @@ namespace Belle2 {
     }
 
 
-    Backend::MultiOp::MultiOp(Backend* owner, multiOp_opType_t type, IData_t idata, int autoCommit) : owner(owner), opType(type), idata(idata), autoCommit(autoCommit)
+    Backend::MultiOp::MultiOp(Backend* /*owner*/, multiOp_opType_t type, IData_t idata, int autoCommit) : /*owner(owner),*/ opType(type), idata(idata), autoCommit(autoCommit)
     {
 
 

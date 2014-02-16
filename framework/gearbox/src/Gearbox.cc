@@ -357,7 +357,7 @@ namespace Belle2 {
   }
 
 
-  void Gearbox::printBackendUseCount(gearbox::BackendPtr p)
+  void Gearbox::printBackendUseCount(gearbox::BackendPtr /*p*/)
   {
     // subtract by 1 in order to hide the increased use count due to this function itself
     // makes only sense if BackendPtr is a shared_ptr

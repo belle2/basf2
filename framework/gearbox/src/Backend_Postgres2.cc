@@ -73,7 +73,7 @@ namespace Belle2 {
     }
 
 
-    std::string Backend_Postgres2::generateQueryRead1(std::string nodename, std::string conditions, queryParams_t queryParameters)
+    std::string Backend_Postgres2::generateQueryRead1(std::string nodename, std::string conditions, queryParams_t /*queryParameters*/)
     {
 
       std::string tablename;
@@ -100,7 +100,7 @@ namespace Belle2 {
 
     }
 
-    void Backend_Postgres2::query(const std::string& xPath, QryResultSet& connectNode, std::string internalUpToPath, GBResult& theGBResult)
+    void Backend_Postgres2::query(const std::string& xPath, QryResultSet& /*connectNode*/, std::string /*internalUpToPath*/, GBResult& /*theGBResult*/)
     {
 
       // all previous xpath labels are removed by the mount code -> remaining label corresponds to
@@ -170,7 +170,7 @@ namespace Belle2 {
 
     }
 
-    void Backend_Postgres2::buildAndAddNode1(pqxx::tuple row, GBResult& theGBResult)
+    void Backend_Postgres2::buildAndAddNode1(pqxx::tuple /*row*/, GBResult& /*theGBResult*/)
     {
 
       std::string valuecolumn;
@@ -197,7 +197,7 @@ namespace Belle2 {
 
     }
 
-    bool Backend_Postgres2::checkPathExists(std::string path)
+    bool Backend_Postgres2::checkPathExists(std::string /*path*/)
     {
 
       return true;

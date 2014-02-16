@@ -74,10 +74,7 @@ namespace Belle2 {
 
     bool Backend::MultiOp::hasData()
     {
-
-      if (this->data.size() > 0) return true;
-      else return false;
-
+      return !(data.empty());
     }
 
     Backend::multiOp_opType_t Backend::MultiOp::getType()

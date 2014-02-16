@@ -290,7 +290,7 @@ void pEventProcessor::analyze_path(const PathPtr& path, Module* inmod, int cstat
         }
       } else {
         state = 1;
-        if (inlist.size() > 0) {
+        if (!(inlist.empty())) {
           // Create RingBuffer
           char* inrbname = getenv("BASF2_RBIN");
           RingBuffer* rbuf;
@@ -334,7 +334,7 @@ void pEventProcessor::analyze_path(const PathPtr& path, Module* inmod, int cstat
         }
       } else {
         state = 2;
-        if (mainlist.size() > 0 || (cstate == 1 && mainlist.size() == 0)) {
+        if (!(mainlist.empty()) || (cstate == 1 && mainlist.empty())) {
           // Create RingBuffer
           //          RingBuffer* rbuf = new RingBuffer();
           char* inrbname = getenv("BASF2_RBOUT");

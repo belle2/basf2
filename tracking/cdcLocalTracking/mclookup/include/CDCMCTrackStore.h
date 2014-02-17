@@ -56,28 +56,50 @@ namespace Belle2 {
       { return  m_mcSegmentsByMCParticleIdx;}
 
     private:
+
+      /// Construct the tracks by grouping the hits by the mc particle id and sorted them for the FlightTime of the related CDCSimHits.
       void fillMCTracks();
+
+      /// Construct the segments by dividing the mc tracks in to disconnected parts and sorted them for the FlightTime of the related CDCSimHits.
       void fillMCSegments();
 
+      /// Sorts the given track for the FlightTime of the assoziated CDCSimHits
       void arrangeMCTrack(CDCHitVector& mcTrack) const;
 
+      /// Fill the look up table for the in track index of each hit
       void fillInTrackId();
+
+      /// Fill the look up table for the in track segment index of each hit
       void fillInTrackSegmentId();
+
+      /// Fill the look up table of the number of traversed super layers until each hit
       void fillNPassedSuperLayers();
 
     public:
+      /// Getter for the index of the hit within its track.
       int getInTrackId(const CDCHit* hit) const;
+
+      /// Getter for the index of the segment of the hit within its track.
       int getInTrackSegmentId(const CDCHit* hit) const;
+
+      /// Getter for the number of super layers traversed until this hit.
       int getNPassedSuperLayers(const CDCHit* hit) const;
 
     private:
+      /// The memory for the tracks made of CDCHits sorted for the time of flight and assoziated to the Monte Carlo particle id
       std::map<int, CDCHitVector> m_mcTracksByMCParticleIdx;
+
+      /// The memory for the segments made of CDCHits sorted for the time of flight and assoziated to the Monte Carlo particle id
       std::map<int, std::vector<CDCHitVector>> m_mcSegmentsByMCParticleIdx;
 
+      /// Look up table for index of the hit within its track
       std::map<const CDCHit*, int> m_inTrackIds;
-      std::map<const CDCHit*, int> m_inTrackSegmentIds;
-      std::map<const CDCHit*, int> m_nPassedSuperLayers;
 
+      /// Look up table for index of the segment of the hits within their respective tracks
+      std::map<const CDCHit*, int> m_inTrackSegmentIds;
+
+      /// Look up table for the number of super layers the particle traversed before making the individual hit
+      std::map<const CDCHit*, int> m_nPassedSuperLayers;
 
       /** ROOT Macro to make CDCMCTrackStore a ROOT class.*/
       ClassDefInCDCLocalTracking(CDCMCTrackStore, 1);

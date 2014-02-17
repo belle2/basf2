@@ -27,20 +27,22 @@ MCSegmentTripleFilter::~MCSegmentTripleFilter()
 {
 }
 
-bool MCSegmentTripleFilter::isGoodAxialAxialSegmentPair(const CDCAxialAxialSegmentPair& axialAxialSegmentPair)
+CellWeight MCSegmentTripleFilter::isGoodAxialAxialSegmentPair(const CDCAxialAxialSegmentPair& axialAxialSegmentPair)
 {
+
+  return m_mcAxialAxialSegmentPairFilter.isGoodAxialAxialSegmentPair(axialAxialSegmentPair);
 
   const CDCAxialRecoSegment2D* ptrStartSegment = axialAxialSegmentPair.getStart();
   const CDCAxialRecoSegment2D* ptrEndSegment = axialAxialSegmentPair.getEnd();
 
   if (ptrStartSegment == nullptr) {
     B2ERROR("MCSegmentTripleFilter::isGoodAxialAxialSegmentPair invoked with nullptr as start segment");
-    return false;
+    return NOT_A_CELL;
   }
 
   if (ptrEndSegment == nullptr) {
     B2ERROR("MCSegmentTripleFilter::isGoodAxialAxialSegmentPair invoked with nullptr as end segment");
-    return false;
+    return NOT_A_CELL;
   }
 
   const CDCAxialRecoSegment2D& startSegment = *ptrStartSegment;
@@ -48,7 +50,7 @@ bool MCSegmentTripleFilter::isGoodAxialAxialSegmentPair(const CDCAxialAxialSegme
 
 
 
-  if (startSegment.empty() or endSegment.empty()) return false;
+  if (startSegment.empty() or endSegment.empty()) return NOT_A_CELL;
 
   //check if the segments have the same trackid
   std::pair<float, ITrackType> efficiencyOfStart = m_mcLookUp.getHighestEfficieny(startSegment);
@@ -56,7 +58,7 @@ bool MCSegmentTripleFilter::isGoodAxialAxialSegmentPair(const CDCAxialAxialSegme
 
   if (efficiencyOfStart.first < 0.5 or efficiencyOfEnd.first < 0.5 or
       efficiencyOfStart.second != efficiencyOfEnd.second or
-      efficiencyOfStart.second == INVALID_ITRACK) return false;
+      efficiencyOfStart.second == INVALID_ITRACK) return NOT_A_CELL;
 
   ITrackType iTrack = efficiencyOfStart.second;
 
@@ -68,15 +70,15 @@ bool MCSegmentTripleFilter::isGoodAxialAxialSegmentPair(const CDCAxialAxialSegme
   const CDCSimHit* lastSimHitOfEnd  = m_mcLookUp.getLastSimHit(endSegment, iTrack);
 
   if (firstSimHitOfStart == nullptr or lastSimHitOfStart == nullptr or
-      firstSimHitOfEnd   == nullptr or lastSimHitOfEnd   == nullptr) return false;
+      firstSimHitOfEnd   == nullptr or lastSimHitOfEnd   == nullptr) return NOT_A_CELL;
 
   if (not(firstSimHitOfStart->getFlightTime() < lastSimHitOfStart->getFlightTime() and
           lastSimHitOfStart->getFlightTime()  < firstSimHitOfEnd->getFlightTime()  and
-          firstSimHitOfEnd->getFlightTime()   < lastSimHitOfEnd->getFlightTime())) return false;
+          firstSimHitOfEnd->getFlightTime()   < lastSimHitOfEnd->getFlightTime())) return NOT_A_CELL;
 
   //check if there are two many superlayers to be traversed
   int nSuperlayers = m_mcLookUp.getNSuperLayersTraversed(startSegment, endSegment);
-  if (abs(nSuperlayers) > 2) return false;
+  if (abs(nSuperlayers) > 2) return NOT_A_CELL;
 
   return true;
 

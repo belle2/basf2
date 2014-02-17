@@ -17,6 +17,7 @@
 #include <tracking/cdcLocalTracking/fitting/CDCRiemannFitter.h>
 #include <tracking/cdcLocalTracking/fitting/CDCSZFitter.h>
 
+#include <tracking/cdcLocalTracking/creator_filters/axial_axial/MCAxialAxialSegmentPairFilter.h>
 #include <tracking/cdcLocalTracking/mclookup/CDCMCLookUp.h>
 
 
@@ -39,7 +40,7 @@ namespace Belle2 {
 
       void clear() {;}
 
-      bool isGoodAxialAxialSegmentPair(const CDCAxialAxialSegmentPair& axialAxialSegmentPair);
+      CellWeight isGoodAxialAxialSegmentPair(const CDCAxialAxialSegmentPair& axialAxialSegmentPair);
 
       CellWeight isGoodSegmentTriple(const CDCSegmentTriple& triple);
 
@@ -53,6 +54,7 @@ namespace Belle2 {
 
     private:
       const CDCMCLookUp& m_mcLookUp;
+      MCAxialAxialSegmentPairFilter m_mcAxialAxialSegmentPairFilter;
 
     }; // end class MCSegmentTripleFilter
 

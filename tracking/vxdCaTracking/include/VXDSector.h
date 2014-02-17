@@ -39,7 +39,7 @@ namespace Belle2 {
     VXDSector(): m_sectorID(0), m_distance2Origin(0) { m_friends.clear(); }
 
     /** useful constructor */
-    VXDSector(unsigned int secID): m_sectorID(secID) { m_friends.clear(); } // default values
+    VXDSector(unsigned int secID): m_sectorID(secID), m_distance2Origin(0) { m_friends.clear(); } // default values
 
     bool operator<(const VXDSector& b)  const { return getSecID() < b.getSecID(); } /**< overloaded '<'-operator for sorting algorithms */
     bool operator==(const VXDSector& b) const { return getSecID() == b.getSecID(); } /**< overloaded '=='-operator for sorting algorithms */

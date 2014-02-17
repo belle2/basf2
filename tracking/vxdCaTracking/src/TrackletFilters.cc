@@ -121,7 +121,7 @@ double TrackletFilters::circleFit(double& clapPhi, double& clapR, double& radius
   double meanX = 0, meanY = 0, meanX2 = 0, meanY2 = 0, meanR2 = 0, meanR4 = 0, meanXR2 = 0, meanYR2 = 0, meanXY = 0; //mean values
   double r2 = 0, x = 0, y = 0, x2 = 0, y2 = 0; // coords
   double weight;// weight of each hit, so far no difference in hit quality
-  double sumWeights = 0, divisor, weightNormalizer = 0; // sumWeights is sum of weights, divisor is 1/sumWeights;
+  double sumWeights = 0, divisor/*, weightNormalizer = 0*/; // sumWeights is sum of weights, divisor is 1/sumWeights;
   double tuningParameter = 1.; //0.02; // this parameter is for internal tuning of the weights, since at the moment, the error seams highly overestimated at the moment. 1 means no influence of parameter.
 
   // looping over all hits and do the division afterwards

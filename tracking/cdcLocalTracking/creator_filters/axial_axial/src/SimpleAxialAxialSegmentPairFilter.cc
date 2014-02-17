@@ -36,7 +36,7 @@ void SimpleAxialAxialSegmentPairFilter::clear()
 }
 
 
-bool SimpleAxialAxialSegmentPairFilter::isGoodAxialAxialSegmentPair(const CDCAxialAxialSegmentPair& axialAxialSegmentPair)
+CellWeight SimpleAxialAxialSegmentPairFilter::isGoodAxialAxialSegmentPair(const CDCAxialAxialSegmentPair& axialAxialSegmentPair)
 {
 
   const CDCAxialRecoSegment2D* ptrStartSegment = axialAxialSegmentPair.getStart();
@@ -44,12 +44,12 @@ bool SimpleAxialAxialSegmentPairFilter::isGoodAxialAxialSegmentPair(const CDCAxi
 
   if (ptrStartSegment == nullptr) {
     B2ERROR("SimpleAxialAxialSegmentPairFilter::isGoodAxialAxialSegmentPair invoked with nullptr as start segment");
-    return false;
+    return NOT_A_CELL;
   }
 
   if (ptrEndSegment == nullptr) {
     B2ERROR("SimpleAxialAxialSegmentPairFilter::isGoodAxialAxialSegmentPair invoked with nullptr as end segment");
-    return false;
+    return NOT_A_CELL;
   }
 
   const CDCAxialRecoSegment2D& startSegment = *ptrStartSegment;
@@ -75,7 +75,7 @@ bool SimpleAxialAxialSegmentPairFilter::isGoodAxialAxialSegmentPair(const CDCAxi
   //B2DEBUG(100,"    Check endSegment isForwardFit " << endSegment.isForwardFit(startFit));
 
   //alignment cut - nonnegotiable
-  if (not endSegment.isForwardTrajectory(startFit)) return false;
+  if (not endSegment.isForwardTrajectory(startFit)) return NOT_A_CELL;
 
   //FloatType distanceAverage = ( endSegment.getStartPerpS(startFit) +
   //                              endSegment.getEndPerpS(startFit)    ) / 2;
@@ -85,7 +85,7 @@ bool SimpleAxialAxialSegmentPairFilter::isGoodAxialAxialSegmentPair(const CDCAxi
   //reference point was already set in the fit to the first hit of the startSegment
   //alignment cut - nonnegotiable
   if (endSegment.getEndPerpS(startFit)   < startSegment.getEndPerpS(startFit) or
-      endSegment.getStartPerpS(startFit) < startSegment.getStartPerpS(startFit)) return false;
+      endSegment.getStartPerpS(startFit) < startSegment.getStartPerpS(startFit)) return NOT_A_CELL;
 
 
   //check if the last hit of the reco hit lies further in travel direction than the first
@@ -119,10 +119,13 @@ bool SimpleAxialAxialSegmentPairFilter::isGoodAxialAxialSegmentPair(const CDCAxi
   double cosDeviation = endCenter.cosWith(pointOnFromTrack);
   double tolerance = cos(PI / 180);
 
-  return true;
+  return startSegment.size() + endSegment.size();
 
-  return cosDeviation > tolerance;
-
+  if (cosDeviation > tolerance) {
+    return startSegment.size() + endSegment.size();
+  } else {
+    return NOT_A_CELL;
+  }
 
 }
 

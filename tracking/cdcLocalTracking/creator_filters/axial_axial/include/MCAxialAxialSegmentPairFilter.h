@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef SIMPLEAXIALAXIALSEGMENTPAIRFILTER_H_
-#define SIMPLEAXIALAXIALSEGMENTPAIRFILTER_H_
+#ifndef MCAXIALAXIALSEGMENTPAIRFILTER_H_
+#define MCAXIALAXIALSEGMENTPAIRFILTER_H_
 
 #include <tracking/cdcLocalTracking/typedefs/UsedDataHolders.h>
 
@@ -23,15 +23,15 @@ namespace Belle2 {
   namespace CDCLocalTracking {
 
     /// Filter for the constuction of axial to axial segment pairs based on simple criterions
-    class SimpleAxialAxialSegmentPairFilter {
+    class MCAxialAxialSegmentPairFilter {
 
     public:
 
       /// Constructor
-      SimpleAxialAxialSegmentPairFilter();
+      MCAxialAxialSegmentPairFilter();
 
       /// Empty destructor
-      ~SimpleAxialAxialSegmentPairFilter();
+      ~MCAxialAxialSegmentPairFilter();
 
     public:
 
@@ -41,24 +41,13 @@ namespace Belle2 {
       /// Checks if a pair of axial segments is a good combination
       CellWeight isGoodAxialAxialSegmentPair(const CDCAxialAxialSegmentPair& axialAxialSegmentPair);
 
-    protected:
-      /// Returns the trajectory of the axial segment. Also fits it if necessary.
-      const CDCTrajectory2D& getFittedTrajectory2D(const CDCAxialRecoSegment2D& segment) const;
-
-      /// Returns the trajectory of the axial to axial segment pair. Also fits it if necessary.
-      const CDCTrajectory2D& getFittedTrajectory2D(const CDCAxialAxialSegmentPair& axialAxialSegmentPair) const;
-
-      /// Returns the xy fitter instance that is used by this filter
-      const CDCRiemannFitter& getRiemannFitter() const
-      { return m_riemannFitter; }
-
     private:
-      CDCRiemannFitter m_riemannFitter; ///< Memory of the Riemann fitter for the circle fits.
 
-    }; // end class SimpleAxialAxialSegmentPairFilter
+
+    }; // end class MCAxialAxialSegmentPairFilter
 
 
   } //end namespace CDCLocalTracking
 } //end namespace Belle2
 
-#endif //SIMPLEAXIALAXIALSEGMENTPAIRFILTER_H_
+#endif // MCAXIALAXIALSEGMENTPAIRFILTER_H_

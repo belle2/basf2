@@ -185,7 +185,10 @@ namespace Belle2 {
               continue;
             }
 
-            if (startSegment != endSegment and m_filter.isGoodAxialAxialSegmentPair(axialAxialSegmentPair)) {
+            CellWeight pairWeight = m_filter.isGoodAxialAxialSegmentPair(axialAxialSegmentPair);
+            bool pairIsGood = not isNotACell(pairWeight);
+
+            if (startSegment != endSegment and pairIsGood) {
 
               for (const CDCAxialRecoSegment2D * middleSegment : middleSegments) {
 

@@ -15,6 +15,8 @@
 #include <tracking/cdcLocalTracking/typedefs/BasicConstants.h>
 #include <tracking/cdcLocalTracking/typedefs/UsedDataHolders.h>
 
+#include <tracking/cdcLocalTracking/creator_filters/MCSegmentTripleFilter.h>
+
 #include "BaseSegmentTripleNeighborChooser.h"
 
 namespace Belle2 {
@@ -32,25 +34,21 @@ namespace Belle2 {
 
 
       inline Weight isGoodNeighbor(
-        const CDCSegmentTriple& triple __attribute__((unused)) ,
+        const CDCSegmentTriple& triple,
         const CDCSegmentTriple& neighborTriple
       ) const {
 
-        // Just let all found neighors pass since we have the same start -> end triple
-        // and let the cellular automaton figure auto which is the best
+        CellState mcTripleWeight = m_mcSegmentTripleFilter.isGoodSegmentTriple(triple);
+        CellState mcNeighborTripleWeight = m_mcSegmentTripleFilter.isGoodSegmentTriple(neighborTriple);
 
-        // can of course be adjusted by comparing the z components between
-        // triple and neighbor triple
+        bool mcDecision = (not isNotACell(mcTripleWeight)) and (not isNotACell(mcNeighborTripleWeight));
 
-        // neighbor weight is a penalty for the overlap of the segments since we would
-        // count it to times
-        // could also be a better measure of fit quality
-
-        return - neighborTriple.getStart()->size();
+        return mcDecision ? - neighborTriple.getStart()->size() : NOT_A_NEIGHBOR;
 
       }
 
     private:
+      MCSegmentTripleFilter m_mcSegmentTripleFilter;
 
     }; // end class
 

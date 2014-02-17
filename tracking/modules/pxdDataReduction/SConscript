@@ -4,6 +4,8 @@ env['LIBS'] = [
     'framework',
     'geometry',
     'mdst_dataobjects',
+    'simulation_dataobjects',
+    'rawdata_dataobjects',
     'pxd_dataobjects',
     'vxd', 'vxd_dataobjects',
     'genfit2',

@@ -5,6 +5,7 @@ env['LIBS'] = [
     'framework',
     'geometry',
     'mdst_dataobjects',
+    'simulation_dataobjects',
     'vxd', 'vxd_dataobjects', 
     'pxd_dataobjects',
     'svd', 'svd_dataobjects',

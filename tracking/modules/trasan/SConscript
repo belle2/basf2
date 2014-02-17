@@ -6,9 +6,10 @@ env['LIBS'] = [
     'CLHEP',
     'framework',
     'mdst_dataobjects',
+    'simulation_dataobjects',
     'cdc', 'cdc_dataobjects', 
     'genfit2',
-    'tracking_dataobjects',
+    #'tracking_dataobjects',
     ]
 
 #env.Append(CPPDEFINES = {'TRASAN_WINDOW_GTK':None,

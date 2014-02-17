@@ -518,13 +518,13 @@ void ExtModule::getStartPoint(const genfit::Track* gfTrack, int pdgCode,
   TMatrixDSym lastCov;
   gfTrackRep->getPosMomCov(lastState, lastPosition, lastMomentum, lastCov);
   TVector3 lastDirection(lastMomentum.Unit());
-  double lastPperp = lastMomentum.Perp();
+//  double lastPperp = lastMomentum.Perp();
   double lastMomMag = lastMomentum.Mag();
-  double sinLambda = lastPperp / lastMomMag;
-  double cosLambda = sqrt(1.0 - sinLambda * sinLambda);
-  double phi = atan2(lastMomentum.Y(), lastMomentum.X());
-  double sinPhi = sin(phi);
-  double cosPhi = cos(phi);
+//  double sinLambda = lastPperp / lastMomMag;
+//  double cosLambda = sqrt(1.0 - sinLambda * sinLambda);
+//  double phi = atan2(lastMomentum.Y(), lastMomentum.X());
+//  double sinPhi = sin(phi);
+//  double cosPhi = cos(phi);
 
   // The path length should really be taken from the fit result ...
   // ... but leave this as is for exact comparison.

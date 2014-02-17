@@ -16,6 +16,8 @@
 #include <tracking/cdcLocalTracking/fitting/CDCRiemannFitter.h>
 #include <tracking/cdcLocalTracking/fitting/CDCSZFitter.h>
 
+#include "SimpleAxialAxialSegmentPairFilter.h"
+
 #include "boost/tuple/tuple.hpp"
 #include "boost/tuple/tuple_comparison.hpp"
 
@@ -23,7 +25,7 @@ namespace Belle2 {
   namespace CDCLocalTracking {
 
     /// Filter for the constuction of segment triples based on simple criterions
-    class SimpleSegmentTripleFilter {
+    class SimpleSegmentTripleFilter : public SimpleAxialAxialSegmentPairFilter {
 
     public:
 
@@ -34,30 +36,13 @@ namespace Belle2 {
       ~SimpleSegmentTripleFilter();
 
     public:
-
       /// Clears all remember information from the last event
       void clear();
-
-      /// Checks if a pair of axial segments is a good combination
-      bool isGoodAxialAxialSegmentPair(const CDCAxialAxialSegmentPair& startToEndAxialAxialSegmentPair);
 
       /// Checks if a triple of axial, stereo and axial segments is a good combination to be stored as an automaton cell
       /** Checks the proper alignement and the quality of connection between all three segments.
        *  Returns NOT_A_CELL if the connection shall not be made or a finit value be used as the cell weight of the cell to constructed. */
       CellWeight isGoodSegmentTriple(const CDCSegmentTriple& triple);
-
-
-    private:
-      /// Returns the trajectory of the axial segment. Also fits it if necessary.
-      const CDCTrajectory2D& getFittedTrajectory2D(const CDCAxialRecoSegment2D& segment) const;
-
-      /// Returns the trajectory of the axial to axial segment piar. Also fits it if necessary.
-      const CDCTrajectory2D& getFittedTrajectory2D(const CDCAxialAxialSegmentPair& axialAxialSegmentPair) const;
-
-      /// Returns the xy fitter instance that is used by this filter
-      const CDCRiemannFitter& getRiemannFitter() const
-      { return m_riemannFitter; }
-
 
     private:
       /// Returns the sz trajectory of the reconstructed stereo segment of the segment triple. Does a fit if necessary.
@@ -68,7 +53,6 @@ namespace Belle2 {
       { return m_szFitter; }
 
     private:
-      CDCRiemannFitter m_riemannFitter; ///< Memory of the Riemann fitter for the circle fits.
       CDCSZFitter m_szFitter; ///< Memory of the SZ fitter fitting sz lines to the stereo segments
 
     }; // end class SimpleSegmentTripleFilter

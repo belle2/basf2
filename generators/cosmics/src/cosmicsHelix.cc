@@ -413,6 +413,7 @@ namespace Belle2 {
     m_a = i.m_a;
     m_Ea = i.m_Ea;
     m_matrixValid = i.m_matrixValid;
+    m_helixValid = i.m_helixValid;
 
     m_center = i.m_center;
     m_cp = i.m_cp;

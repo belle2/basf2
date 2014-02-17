@@ -42,9 +42,6 @@ namespace Belle2 {
     private:
       typedef WeightedNeighborhood<const Item> Neighborhood; /// type of the neighborhood to be filled
 
-    private:
-      NeighborChooser m_chooser; ///< Memory for the neighborhood chooser
-
     public:
       ///Empty constructor initialzing the default chooser
       NeighborhoodBuilder() : m_chooser()
@@ -83,6 +80,7 @@ namespace Belle2 {
       }
 
     private:
+      NeighborChooser m_chooser; ///< Memory for the neighborhood chooser
 
     }; // end class
 

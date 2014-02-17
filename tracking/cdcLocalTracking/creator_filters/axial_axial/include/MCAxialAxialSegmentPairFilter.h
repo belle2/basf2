@@ -36,7 +36,7 @@ namespace Belle2 {
       void clear();
 
       /// Checks if a pair of axial segments is a good combination
-      CellWeight isGoodAxialAxialSegmentPair(const Belle2::CDCLocalTracking::CDCAxialAxialSegmentPair& axialAxialSegmentPair, bool allowBackward = false);
+      CellWeight isGoodAxialAxialSegmentPair(const Belle2::CDCLocalTracking::CDCAxialAxialSegmentPair& axialAxialSegmentPair, bool allowBackward = false) const;
 
     private:
       /// ROOT Macro to make MCAxialAxialSegmentPairFilter a ROOT class.

@@ -31,14 +31,14 @@ namespace Belle2 {
       void clear() {;}
 
       /// Check if the axial to axial segment pair is aligned in the Monte Carlo track. Signals NOT_A_CELL if not.
-      CellWeight isGoodAxialAxialSegmentPair(const CDCAxialAxialSegmentPair& axialAxialSegmentPair);
+      CellWeight isGoodAxialAxialSegmentPair(const CDCAxialAxialSegmentPair& axialAxialSegmentPair) const;
 
       /// Check if the segment triple is aligned in the Monte Carlo track. Signals NOT_A_CELL if not.
-      CellWeight isGoodSegmentTriple(const CDCSegmentTriple& triple, bool allowBackward = false);
+      CellWeight isGoodSegmentTriple(const CDCSegmentTriple& triple, bool allowBackward = false) const;
 
     private:
       /// Sets the trajectories of the segment triple from Monte Carlo information. IS executed for good segment triples.
-      void setTrajectoryOf(const CDCSegmentTriple& segmentTriple);
+      void setTrajectoryOf(const CDCSegmentTriple& segmentTriple) const;
 
     private:
       /// Instance of the Monte Carlo filter for axial to axial segment pairs to factor some of the judgment.

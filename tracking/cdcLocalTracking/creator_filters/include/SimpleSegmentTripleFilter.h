@@ -42,7 +42,7 @@ namespace Belle2 {
       /// Checks if a triple of axial, stereo and axial segments is a good combination to be stored as an automaton cell
       /** Checks the proper alignement and the quality of connection between all three segments.
        *  Returns NOT_A_CELL if the connection shall not be made or a finit value be used as the cell weight of the cell to constructed. */
-      CellWeight isGoodSegmentTriple(const CDCSegmentTriple& triple);
+      CellWeight isGoodSegmentTriple(const CDCSegmentTriple& triple) const;
 
     private:
       /// Returns the sz trajectory of the reconstructed stereo segment of the segment triple. Does a fit if necessary.

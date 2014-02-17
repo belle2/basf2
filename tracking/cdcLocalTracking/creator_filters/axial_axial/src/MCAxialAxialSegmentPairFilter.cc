@@ -46,7 +46,7 @@ void MCAxialAxialSegmentPairFilter::clear()
 
 
 
-CellWeight MCAxialAxialSegmentPairFilter::isGoodAxialAxialSegmentPair(const CDCAxialAxialSegmentPair& axialAxialSegmentPair, bool allowBackward)
+CellWeight MCAxialAxialSegmentPairFilter::isGoodAxialAxialSegmentPair(const CDCAxialAxialSegmentPair& axialAxialSegmentPair, bool allowBackward) const
 {
   const CDCAxialRecoSegment2D* ptrStartSegment = axialAxialSegmentPair.getStart();
   const CDCAxialRecoSegment2D* ptrEndSegment = axialAxialSegmentPair.getEnd();

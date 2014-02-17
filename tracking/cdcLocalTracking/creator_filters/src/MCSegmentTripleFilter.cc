@@ -31,7 +31,7 @@ MCSegmentTripleFilter::~MCSegmentTripleFilter()
 {
 }
 
-CellWeight MCSegmentTripleFilter::isGoodAxialAxialSegmentPair(const CDCAxialAxialSegmentPair& axialAxialSegmentPair)
+CellWeight MCSegmentTripleFilter::isGoodAxialAxialSegmentPair(const CDCAxialAxialSegmentPair& axialAxialSegmentPair) const
 {
   return m_mcAxialAxialSegmentPairFilter.isGoodAxialAxialSegmentPair(axialAxialSegmentPair);
 }
@@ -39,7 +39,7 @@ CellWeight MCSegmentTripleFilter::isGoodAxialAxialSegmentPair(const CDCAxialAxia
 
 
 
-CellWeight MCSegmentTripleFilter::isGoodSegmentTriple(const CDCSegmentTriple& segmentTriple, bool allowBackward)
+CellWeight MCSegmentTripleFilter::isGoodSegmentTriple(const CDCSegmentTriple& segmentTriple, bool allowBackward) const
 {
 
   const CDCAxialRecoSegment2D* ptrStartSegment = segmentTriple.getStart();
@@ -97,7 +97,7 @@ CellWeight MCSegmentTripleFilter::isGoodSegmentTriple(const CDCSegmentTriple& se
 
 
 
-void MCSegmentTripleFilter::setTrajectoryOf(const CDCSegmentTriple& segmentTriple)
+void MCSegmentTripleFilter::setTrajectoryOf(const CDCSegmentTriple& segmentTriple) const
 {
   if (segmentTriple.getTrajectorySZ().isFitted()) {
     // SZ trajectory has been fitted before. Skipping

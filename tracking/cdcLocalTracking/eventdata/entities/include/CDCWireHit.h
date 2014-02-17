@@ -115,6 +115,10 @@ namespace Belle2 {
       /// Constant getter for the automaton cell.
       const AutomatonCell& getAutomatonCell() const { return m_automatonCell; }
 
+      /// Cast operator to the reference of the automaton cell - making AutomatonCell a constant pseudo base class of CDCWireHit
+      operator const Belle2::CDCLocalTracking::AutomatonCell& () const { return m_automatonCell; }
+
+
       /** @name Mimic pointer
         */
       /// Access the object methods and methods from a pointer in the same way.

@@ -12,7 +12,11 @@
 #define CLUSTERIZER_H_
 
 #include <boost/foreach.hpp>
+#include <boost/utility/enable_if.hpp>
+#include <boost/type_traits.hpp>
 
+
+#include <tracking/cdcLocalTracking/algorithms/AutomatonCell.h>
 #include <tracking/cdcLocalTracking/algorithms/WeightedNeighborhood.h>
 
 #include <framework/logging/Logger.h>
@@ -59,14 +63,18 @@ namespace Belle2 {
                   const Neighborhood& neighborhood,
                   std::vector<Cluster>& clusters) const {
 
-        prepareCellStates(items);
-
         clusters.reserve(30);
+
+        //Prepare states
+        m_cellStates.clear();
+        for (Item const & item : items) {
+          setCellState(item, -1);
+        }
 
         int iCluster = -1;
         for (Item const & item : items) {
 
-          if (item.getAutomatonCell().getCellState() == -1) {
+          if (getCellState(item) == -1) {
 
             clusters.push_back(Cluster());
             Cluster& newCluster = clusters.back();
@@ -78,14 +86,86 @@ namespace Belle2 {
         }
       }
 
-    private:
-      /// Helper function. Sets all cell states to -1.
-      template<class ItemRange>
-      inline void prepareCellStates(const ItemRange& items) const {
-        for (Item const & item : items) {
-          item.getAutomatonCell().setCellState(-1);
+      template<class PtrItemRange>
+      void createFromPointers(const PtrItemRange& ptrItems,
+                              const Neighborhood& neighborhood,
+                              std::vector<Cluster>& clusters) const {
+
+
+        clusters.reserve(30);
+
+        //Prepare states
+        m_cellStates.clear();
+        for (Item const * ptrItem : ptrItems) {
+
+          if (ptrItem == nullptr) {
+            B2WARNING("Nullptr given as item in Clusterizer");
+            continue;
+          }
+          const Item& item = *ptrItem;
+          setCellState(item, -1);
+        }
+
+        int iCluster = -1;
+        for (const Item * ptrItem : ptrItems) {
+
+          if (ptrItem == nullptr) {
+            B2WARNING("Nullptr given as item in Clusterizer");
+            continue;
+          }
+          const Item& item = *ptrItem;
+
+          if (getCellState(item) == -1) {
+
+            clusters.push_back(Cluster());
+            Cluster& newCluster = clusters.back();
+            ++iCluster;
+
+            startCluster(neighborhood, newCluster, iCluster, item);
+
+          }
         }
       }
+
+
+      // Setter for the cell state if the Item inherits from AutomatonCell - use the cell state internal to the AutomtonCell
+      template<class ConvertableToAutomaton>
+      typename boost::enable_if <
+      boost::is_convertible<ConvertableToAutomaton, const AutomatonCell& >,
+            void >::type
+      setCellState(const ConvertableToAutomaton& item, const CellState& cellState) const {
+        const AutomatonCell& automatonCell = item;
+        automatonCell.setCellState(cellState);
+      }
+
+      // Getter for the cell state if the Item inherits from Automaton cell - use the cell state internal to the AutomtonCell
+      template<class ConvertableToAutomaton>
+      typename boost::enable_if <
+      boost::is_convertible<ConvertableToAutomaton, const AutomatonCell& >,
+            CellState >::type
+      getCellState(const ConvertableToAutomaton& item) const {
+        const AutomatonCell& automatonCell = item;
+        return automatonCell.getCellState();
+      }
+
+      // Setter for the cell state if the Item does not inherit from Automaton cell
+      template<class NotConvertableToAutomaton>
+      typename boost::disable_if <
+      boost::is_convertible<NotConvertableToAutomaton, const AutomatonCell& >,
+            void >::type
+            setCellState(const NotConvertableToAutomaton& item, const CellState& cellState) const
+      { m_cellStates[&item] = cellState; }
+
+      // Getter for the cell state if the Item does not inherit from AutomatonCell
+      template<class NotConvertableToAutomaton>
+      typename boost::disable_if <
+      boost::is_convertible<NotConvertableToAutomaton, const AutomatonCell& >,
+            CellState >::type
+            getCellState(const NotConvertableToAutomaton& item) const
+      { return m_cellStates[&item]; }
+
+
+    private:
 
       /// Helper function. Starting a new cluster and iterativelly (not recursively) expands it.
       inline void startCluster(const Neighborhood& neighborhood,
@@ -94,9 +174,10 @@ namespace Belle2 {
                                const Item& seedItem) const {
 
         //Cluster uses pointers as items instead of objects
-        seedItem.getAutomatonCell().setCellState(iCluster);
-        const Item* clusterSeedItem = &seedItem;
-        newCluster.insert(newCluster.end(), clusterSeedItem);
+        const Item* ptrSeedItem = &seedItem;
+
+        setCellState(*ptrSeedItem, iCluster);
+        newCluster.insert(newCluster.end(), ptrSeedItem);
 
         //grow the cluster
         std::vector<const Item*> itemsToCheckNow;
@@ -105,8 +186,7 @@ namespace Belle2 {
         itemsToCheckNow.reserve(10);
         itemsToCheckNext.reserve(10);
 
-        itemsToCheckNext.push_back(clusterSeedItem);
-
+        itemsToCheckNext.push_back(ptrSeedItem);
 
         while (! itemsToCheckNext.empty()) {
 
@@ -123,11 +203,11 @@ namespace Belle2 {
 
               const Item* const& neighborItem = itNeighbor.getNeighbor();
 
-              CellState neighborICluster = neighborItem->getAutomatonCell().getCellState();
+              CellState neighborICluster = getCellState(*neighborItem);
               if (neighborICluster == -1) {
                 // Element not yet in cluster
                 //Add the element
-                neighborItem->getAutomatonCell().setCellState(iCluster);
+                setCellState(*neighborItem, iCluster);
                 newCluster.insert(newCluster.end(), neighborItem);
 
                 //register it for further expansion
@@ -145,6 +225,9 @@ namespace Belle2 {
         } // end while  !itemsToCheckNext.empty()
 
       } // end  startCluster(...)
+
+    private:
+      mutable std::map<const Item*, CellState> m_cellStates;
 
     }; // end class Clusterizer
 

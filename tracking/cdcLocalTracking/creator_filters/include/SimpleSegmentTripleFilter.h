@@ -16,7 +16,7 @@
 #include <tracking/cdcLocalTracking/fitting/CDCRiemannFitter.h>
 #include <tracking/cdcLocalTracking/fitting/CDCSZFitter.h>
 
-#include "SimpleAxialAxialSegmentPairFilter.h"
+#include <tracking/cdcLocalTracking/creator_filters/axial_axial/SimpleAxialAxialSegmentPairFilter.h>
 
 #include "boost/tuple/tuple.hpp"
 #include "boost/tuple/tuple_comparison.hpp"

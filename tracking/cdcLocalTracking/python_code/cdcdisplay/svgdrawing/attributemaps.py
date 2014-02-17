@@ -35,6 +35,31 @@ listColors = [  # 'magenta',
     ]
 
 
+def timeOfFlightToColor(timeOfFlight):
+    # values are all fractions of their respective scale
+
+    # Full color circle in 3 nanoseconds
+    hue = 360 / 3.0 * timeOfFlight % 360.0 / 360.0
+    saturation = 0.75
+    lightness = 0.5
+
+    (red, green, blue) = colorsys.hls_to_rgb(hue, lightness, saturation)
+
+    color = 'rgb({0:.2%}, {1:.2%}, {2:.2%})'.format(red, green, blue)
+    return color
+
+
+def inTrackIdToColor(inTrackId):
+    hue = 50 * inTrackId % 360 / 360.0
+    saturation = 0.75
+    lightness = 0.5
+
+    (red, green, blue) = colorsys.hls_to_rgb(hue, lightness, saturation)
+
+    color = 'rgb({0:.2%}, {1:.2%}, {2:.2%})'.format(red, green, blue)
+    return color
+
+
 class CDCHitStrokeWidthMap:
 
     def __call__(self, iCDCHit, cdcHit):
@@ -124,17 +149,9 @@ class TOFColorMap(CDCHitColorMap):
 
     def __call__(self, iCDCHit, cdcHit):
         simHit = cdcHit.getRelated('CDCSimHits')
-        timeOfFlight = simhit.getFlightTime()
+        timeOfFlight = simHit.getFlightTime()
 
-        # values are all fractions of their respective scale
-        hue = 36 * timeOfFlight % 360.0 / 360.0
-        saturation = 0.75
-        lightness = 0.5
-
-        (red, green, blue) = colorsys.hls_to_rgb(hue, lightness, saturation)
-
-        color = 'rgb({0:.2%}, {1:.2%}, {2:.2%})'.format(red, green, blue)
-        return color
+        return timeOfFlightToColor(timeOfFlight)
 
 
 class ReassignedSecondaryMap(CDCHitColorMap):
@@ -303,5 +320,115 @@ class SegmentMCTrackIdColorMap(CDCSegmentColorMap):
             iColor = mcTrackId % len(listColors)
             color = listColors[iColor]
             return color
+
+
+class SegmentFBInfoColorMap(CDCSegmentColorMap):
+
+    def __call__(self, iSegment, segment):
+
+        mcSegmentLookUp = \
+            Belle2.CDCLocalTracking.CDCMCSegmentLookUp.getInstance()
+
+        # Just to look at matched segments
+        mcTrackId = mcSegmentLookUp.getMCTrackId(segment)
+        if mcTrackId < 0:
+            return self.bkgSegmentColor
+
+        fbInfo = mcSegmentLookUp.isForwardOrBackwardToMCTrack(segment)
+        if fbInfo == 1:
+            return 'green'
+        elif fbInfo == -1:
+            return 'red'
+        else:
+            print 'Segment not orientable to match track'
+            return self.bkgSegmentColor
+
+
+class SegmentFBInfoColorMap(CDCSegmentColorMap):
+
+    def __call__(self, iSegment, segment):
+
+        mcSegmentLookUp = \
+            Belle2.CDCLocalTracking.CDCMCSegmentLookUp.getInstance()
+
+        # Just to look at matched segments
+        mcTrackId = mcSegmentLookUp.getMCTrackId(segment)
+        if mcTrackId < 0:
+            return self.bkgSegmentColor
+
+        fbInfo = mcSegmentLookUp.isForwardOrBackwardToMCTrack(segment)
+        if fbInfo == 1:
+            return 'green'
+        elif fbInfo == -1:
+            return 'red'
+        else:
+            print 'Segment not orientable to match track'
+            return self.bkgSegmentColor
+
+
+class SegmentFirstInTrackIdColorMap(CDCSegmentColorMap):
+
+    def __call__(self, iSegment, segment):
+
+        mcSegmentLookUp = \
+            Belle2.CDCLocalTracking.CDCMCSegmentLookUp.getInstance()
+
+        # Just to look at matched segments
+        firstInTrackId = mcSegmentLookUp.getFirstInTrackId(segment)
+
+        if firstInTrackId < 0:
+            return self.bkgSegmentColor
+
+        return inTrackIdToColor(firstInTrackId)
+
+
+class SegmentLastInTrackIdColorMap(CDCSegmentColorMap):
+
+    def __call__(self, iSegment, segment):
+
+        mcSegmentLookUp = \
+            Belle2.CDCLocalTracking.CDCMCSegmentLookUp.getInstance()
+
+        # Just to look at matched segments
+        lastInTrackId = mcSegmentLookUp.getLastInTrackId(segment)
+
+        if lastInTrackId < 0:
+            return self.bkgSegmentColor
+
+        return inTrackIdToColor(lastInTrackId)
+
+
+class SegmentFirstNPassedSuperLayersColorMap(CDCSegmentColorMap):
+
+    def __call__(self, iSegment, segment):
+
+        mcSegmentLookUp = \
+            Belle2.CDCLocalTracking.CDCMCSegmentLookUp.getInstance()
+
+        # Just to look at matched segments
+        firstNPassedSuperLayers = \
+            mcSegmentLookUp.getFirstNPassedSuperLayers(segment)
+
+        if firstNPassedSuperLayers < 0:
+            return self.bkgSegmentColor
+
+        return inTrackIdToColor(firstNPassedSuperLayers)
+
+
+class SegmentLastNPassedSuperLayersColorMap(CDCSegmentColorMap):
+
+    def __call__(self, iSegment, segment):
+
+        mcSegmentLookUp = \
+            Belle2.CDCLocalTracking.CDCMCSegmentLookUp.getInstance()
+
+        # Just to look at matched segments
+        lastNPassedSuperLayers = \
+            mcSegmentLookUp.getLastNPassedSuperLayers(segment)
+
+        if lastNPassedSuperLayers < 0:
+            return self.bkgSegmentColor
+
+        return inTrackIdToColor(lastNPassedSuperLayers)
 
 

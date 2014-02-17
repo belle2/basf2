@@ -141,7 +141,17 @@ cdclocaltracking = register_module('CDCLocalTracking')
 # CDCSVGDisplayModule - for reassignment
 svgdisplay_reassignment = cdcdisplay.CDCSVGDisplayModule('/tmp')
 # svgdisplay_reassignment.draw_mcsegments = True
-svgdisplay_reassignment.draw_segments_mctrackid = True
+# svgdisplay_reassignment.draw_segments_mctrackid = True
+# svgdisplay_reassignment.draw_segments_fbinfo = True
+# svgdisplay_reassignment.draw_tof = True
+
+# svgdisplay_reassignment.draw_segments_firstNPassedSuperLayers = True
+# svgdisplay_reassignment.draw_segments_lastNPassedSuperLayers = True
+# svgdisplay_reassignment.draw_segments_firstInTrackId = True
+# svgdisplay_reassignment.draw_segments_lastInTrackId = True
+
+# svgdisplay_reassignment.draw_segments = True  # and False
+# svgdisplay_reassignment.draw_mcaxialaxialpairs = True
 
 # ---------------------------------------------------------------
 # CDCSVGDisplayModule - for segments

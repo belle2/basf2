@@ -64,6 +64,13 @@ class CDCSVGDisplayModule(Module):
         self.draw_tangentsegments = True and False
 
         self.draw_segments_mctrackid = True and False
+        self.draw_segments_fbinfo = True and False
+        self.draw_segments_firstInTrackId = True and False
+        self.draw_segments_lastInTrackId = True and False
+        self.draw_segments_firstNPassedSuperLayers = True and False
+        self.draw_segments_lastNPassedSuperLayers = True and False
+
+        self.draw_mcaxialaxialpairs = True and False
 
         self.draw_segmenttriples = True and False
         self.draw_tracks = True and False
@@ -192,7 +199,7 @@ class CDCSVGDisplayModule(Module):
         # Draw tof info
         if self.draw_tof:
             styleDict = {'stroke-width': '1',
-                         'stroke': attributesmaps.TOFColorMap()}
+                         'stroke': attributemaps.TOFColorMap()}
             self.draw_storearray('CDCHits', styleDict)
 
         # Draw the reassignment information of hits
@@ -220,6 +227,68 @@ class CDCSVGDisplayModule(Module):
             styleDict = {'stroke': attributemaps.SegmentMCTrackIdColorMap(),
                          'stroke-width': '0.5'}
             self.draw_storearray('CDCRecoHit2DSegmentsSelected', styleDict)
+
+        if self.draw_segments_fbinfo:
+            styleDict = {'stroke': attributemaps.SegmentFBInfoColorMap(),
+                         'stroke-width': '0.5'}
+            self.draw_storearray('CDCRecoHit2DSegmentsSelected', styleDict)
+
+        if self.draw_segments_firstInTrackId:
+            styleDict = \
+                {'stroke': attributemaps.SegmentFirstInTrackIdColorMap(),
+                 'stroke-width': '0.5'}
+            self.draw_storearray('CDCRecoHit2DSegmentsSelected', styleDict)
+
+        if self.draw_segments_lastInTrackId:
+            styleDict = \
+                {'stroke': attributemaps.SegmentLastInTrackIdColorMap(),
+                 'stroke-width': '0.5'}
+            self.draw_storearray('CDCRecoHit2DSegmentsSelected', styleDict)
+
+        if self.draw_segments_firstNPassedSuperLayers:
+            styleDict = \
+                {'stroke': attributemaps.SegmentFirstNPassedSuperLayersColorMap(),
+                 'stroke-width': '0.5'}
+            self.draw_storearray('CDCRecoHit2DSegmentsSelected', styleDict)
+
+        if self.draw_segments_lastNPassedSuperLayers:
+            styleDict = \
+                {'stroke': attributemaps.SegmentLastNPassedSuperLayersColorMap(),
+                 'stroke-width': '0.5'}
+            self.draw_storearray('CDCRecoHit2DSegmentsSelected', styleDict)
+
+        # Mimic axial to axial pair selection
+        if self.draw_mcaxialaxialpairs:
+            print 'Draw axial to axial segment pairs'
+            segment_storearray = \
+                Belle2.PyStoreArray('CDCRecoHit2DSegmentsSelected')
+            if segment_storearray:
+                print '#Segment', segment_storearray.getEntries()
+                axial_segments = [segment for segment in segment_storearray
+                                  if segment.getAxialType() == 0]
+
+                mc_axial_axial_segment_filter = \
+                    Belle2.CDCLocalTracking.MCAxialAxialSegmentPairFilter()
+                axial_axial_segment_pairs = \
+                    (Belle2.CDCLocalTracking.CDCAxialAxialSegmentPair(startSegment,
+                        endSegment) for startSegment in axial_segments
+                    for endSegment in axial_segments)
+
+                def is_good_pair(pair):
+                    weight = \
+                        mc_axial_axial_segment_filter.isGoodAxialAxialSegmentPair(pair,
+                            True)
+                    print weight
+                    print weight == weight
+                    return weight == weight
+
+                good_axial_axial_segment_pairs = [pair for pair in
+                        axial_axial_segment_pairs if is_good_pair(pair)]
+
+                print '#NPairs', len(good_axial_axial_segment_pairs)
+                styleDict = {'stroke': 'black', 'stroke-width': '0.2'}
+
+                plotter.append(good_axial_axial_segment_pairs, **styleDict)
 
         # Draw mc vertices
         if self.draw_mcvertices:

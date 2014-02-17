@@ -12,16 +12,20 @@
 
 #include <framework/logging/Logger.h>
 
+#include <TDatabasePDG.h>
+
 #include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
 #include <tracking/cdcLocalTracking/typedefs/BasicConstants.h>
 
+#include <tracking/cdcLocalTracking/mclookup/CDCMCSegmentLookUp.h>
 
 using namespace std;
 using namespace Belle2;
 using namespace CDCLocalTracking;
 
-MCSegmentTripleFilter::MCSegmentTripleFilter() : m_mcLookUp(CDCMCLookUp::Instance()) {;}
-MCSegmentTripleFilter::MCSegmentTripleFilter(const CDCMCLookUp& mcLookUp) : m_mcLookUp(mcLookUp) {;}
+MCSegmentTripleFilter::MCSegmentTripleFilter()
+{
+}
 
 MCSegmentTripleFilter::~MCSegmentTripleFilter()
 {
@@ -29,64 +33,13 @@ MCSegmentTripleFilter::~MCSegmentTripleFilter()
 
 CellWeight MCSegmentTripleFilter::isGoodAxialAxialSegmentPair(const CDCAxialAxialSegmentPair& axialAxialSegmentPair)
 {
-
   return m_mcAxialAxialSegmentPairFilter.isGoodAxialAxialSegmentPair(axialAxialSegmentPair);
-
-  const CDCAxialRecoSegment2D* ptrStartSegment = axialAxialSegmentPair.getStart();
-  const CDCAxialRecoSegment2D* ptrEndSegment = axialAxialSegmentPair.getEnd();
-
-  if (ptrStartSegment == nullptr) {
-    B2ERROR("MCSegmentTripleFilter::isGoodAxialAxialSegmentPair invoked with nullptr as start segment");
-    return NOT_A_CELL;
-  }
-
-  if (ptrEndSegment == nullptr) {
-    B2ERROR("MCSegmentTripleFilter::isGoodAxialAxialSegmentPair invoked with nullptr as end segment");
-    return NOT_A_CELL;
-  }
-
-  const CDCAxialRecoSegment2D& startSegment = *ptrStartSegment;
-  const CDCAxialRecoSegment2D& endSegment = *ptrEndSegment;
-
-
-
-  if (startSegment.empty() or endSegment.empty()) return NOT_A_CELL;
-
-  //check if the segments have the same trackid
-  std::pair<float, ITrackType> efficiencyOfStart = m_mcLookUp.getHighestEfficieny(startSegment);
-  std::pair<float, ITrackType> efficiencyOfEnd   = m_mcLookUp.getHighestEfficieny(endSegment);
-
-  if (efficiencyOfStart.first < 0.5 or efficiencyOfEnd.first < 0.5 or
-      efficiencyOfStart.second != efficiencyOfEnd.second or
-      efficiencyOfStart.second == INVALID_ITRACK) return NOT_A_CELL;
-
-  ITrackType iTrack = efficiencyOfStart.second;
-
-  //check if the alignement is correct
-  const CDCSimHit* firstSimHitOfStart = m_mcLookUp.getFirstSimHit(startSegment, iTrack);
-  const CDCSimHit* lastSimHitOfStart = m_mcLookUp.getLastSimHit(startSegment, iTrack);
-
-  const CDCSimHit* firstSimHitOfEnd = m_mcLookUp.getFirstSimHit(endSegment, iTrack);
-  const CDCSimHit* lastSimHitOfEnd  = m_mcLookUp.getLastSimHit(endSegment, iTrack);
-
-  if (firstSimHitOfStart == nullptr or lastSimHitOfStart == nullptr or
-      firstSimHitOfEnd   == nullptr or lastSimHitOfEnd   == nullptr) return NOT_A_CELL;
-
-  if (not(firstSimHitOfStart->getFlightTime() < lastSimHitOfStart->getFlightTime() and
-          lastSimHitOfStart->getFlightTime()  < firstSimHitOfEnd->getFlightTime()  and
-          firstSimHitOfEnd->getFlightTime()   < lastSimHitOfEnd->getFlightTime())) return NOT_A_CELL;
-
-  //check if there are two many superlayers to be traversed
-  int nSuperlayers = m_mcLookUp.getNSuperLayersTraversed(startSegment, endSegment);
-  if (abs(nSuperlayers) > 2) return NOT_A_CELL;
-
-  return true;
-
 }
 
 
 
-CellWeight MCSegmentTripleFilter::isGoodSegmentTriple(const CDCSegmentTriple& segmentTriple)
+
+CellWeight MCSegmentTripleFilter::isGoodSegmentTriple(const CDCSegmentTriple& segmentTriple, bool allowBackward)
 {
 
   const CDCAxialRecoSegment2D* ptrStartSegment = segmentTriple.getStart();
@@ -110,113 +63,105 @@ CellWeight MCSegmentTripleFilter::isGoodSegmentTriple(const CDCSegmentTriple& se
   const CDCAxialRecoSegment2D& middleSegment = *ptrMiddleSegment;
   const CDCAxialRecoSegment2D& endSegment = *ptrEndSegment;
 
-  CellWeight result = isGoodTriple(startSegment, middleSegment, endSegment);
-  if (not isNotACell(result)) {
+  /// Recheck the axial axial compatability
+  CellWeight pairWeight = m_mcAxialAxialSegmentPairFilter.isGoodAxialAxialSegmentPair(segmentTriple, allowBackward);
+  if (isNotACell(pairWeight)) return NOT_A_CELL;
+
+  const CDCMCSegmentLookUp& mcSegmentLookUp = CDCMCSegmentLookUp::getInstance();
+
+  // Check if the segments are aligned correctly along the Monte Carlo track
+  ForwardBackwardInfo startToMiddleFBInfo = mcSegmentLookUp.areAlignedInMCTrack(ptrStartSegment, ptrMiddleSegment);
+  if (startToMiddleFBInfo == INVALID_INFO) return NOT_A_CELL;
+
+  ForwardBackwardInfo middleToEndFBInfo = mcSegmentLookUp.areAlignedInMCTrack(ptrMiddleSegment, ptrEndSegment);
+  if (middleToEndFBInfo == INVALID_INFO) return NOT_A_CELL;
+
+
+  if (startToMiddleFBInfo != middleToEndFBInfo) return NOT_A_CELL;
+
+
+  if ((startToMiddleFBInfo == FORWARD and middleToEndFBInfo == FORWARD) or
+      (allowBackward and startToMiddleFBInfo == BACKWARD and middleToEndFBInfo == BACKWARD)) {
+
+    // Do fits
     setTrajectoryOf(segmentTriple);
+
+    CellState cellWeight = startSegment.size() + middleSegment.size() + endSegment.size();
+    return cellWeight;
+
   }
-  return result;
+
+  return NOT_A_CELL;
 
 }
 
-
-CellState MCSegmentTripleFilter::isGoodTriple(const CDCAxialRecoSegment2D& startSegment,
-                                              const CDCStereoRecoSegment2D& middleSegment,
-                                              const CDCAxialRecoSegment2D& endSegment)
-{
-
-
-  if (startSegment.empty() or middleSegment.empty() or endSegment.empty()) return NOT_A_CELL;
-
-  //check if the segments have the same trackid
-  std::pair<float, ITrackType> efficiencyOfStart  = m_mcLookUp.getHighestEfficieny(startSegment);
-  std::pair<float, ITrackType> efficiencyOfMiddle = m_mcLookUp.getHighestEfficieny(middleSegment);
-
-  //end has been checked in the isGoodPair call
-  std::pair<float, ITrackType> efficiencyOfEnd    = m_mcLookUp.getHighestEfficieny(endSegment);
-
-  if (efficiencyOfMiddle.first < 0.5 or
-      efficiencyOfStart.second != efficiencyOfMiddle.second or
-      efficiencyOfEnd.second != efficiencyOfMiddle.second or
-      efficiencyOfMiddle.second == INVALID_ITRACK
-     ) {
-
-    return NOT_A_CELL;
-
-  }
-
-  ITrackType iTrack = efficiencyOfStart.second;
-
-  //check if the alignement is correct
-  const CDCSimHit* lastSimHitOfStart = m_mcLookUp.getLastSimHit(startSegment, iTrack);
-
-  const CDCSimHit* firstSimHitOfMiddle = m_mcLookUp.getFirstSimHit(middleSegment, iTrack);
-  const CDCSimHit* lastSimHitOfMiddle = m_mcLookUp.getLastSimHit(middleSegment, iTrack);
-
-  const CDCSimHit* firstSimHitOfEnd = m_mcLookUp.getFirstSimHit(endSegment, iTrack);
-
-  if (lastSimHitOfStart  == nullptr or firstSimHitOfMiddle == nullptr or
-      lastSimHitOfMiddle == nullptr or firstSimHitOfEnd    == nullptr) return NOT_A_CELL;
-
-  if (not(lastSimHitOfStart->getFlightTime()   < firstSimHitOfMiddle->getFlightTime() and
-          firstSimHitOfMiddle->getFlightTime() < lastSimHitOfMiddle->getFlightTime()  and
-          lastSimHitOfMiddle->getFlightTime()  < firstSimHitOfEnd->getFlightTime())) {
-
-    return NOT_A_CELL;
-
-  }
-
-  CellState cellWeight = startSegment.size() + middleSegment.size() + endSegment.size();
-  return cellWeight;
-
-}
 
 
 void MCSegmentTripleFilter::setTrajectoryOf(const CDCSegmentTriple& segmentTriple)
 {
+  if (segmentTriple.getTrajectorySZ().isFitted()) {
+    // SZ trajectory has been fitted before. Skipping
+    // A fit sz trajectory implies a 2d trajectory to be fitted, but not the other way around
+    return;
+  }
 
-  const CDCAxialRecoSegment2D* startSegmentPtr = segmentTriple.getStart();
-  if (startSegmentPtr == nullptr) {
+  const CDCAxialRecoSegment2D* ptrStartSegment = segmentTriple.getStart();
+  if (not ptrStartSegment) {
     B2WARNING("Start segment of segmentTriple is nullptr. Could not set fits.");
     return;
   }
 
-  const CDCAxialRecoSegment2D& startSegment = *startSegmentPtr;
+  //const CDCAxialRecoSegment2D& startSegment = *ptrStartSegment;
 
-  std::pair<float, ITrackType> efficiencyOfStart = m_mcLookUp.getHighestEfficieny(startSegment);
-  ITrackType iTrack = efficiencyOfStart.second;
+  const CDCMCSegmentLookUp& mcSegmentLookUp = CDCMCSegmentLookUp::getInstance();
+  const CDCMCHitLookUp& mcHitLookUp = CDCMCHitLookUp::getInstance();
 
-  const CDCSimHit* firstSimHitOfStart = m_mcLookUp.getFirstSimHit(startSegment, iTrack);
-  const Belle2::MCParticle* mcPartOfStart =  m_mcLookUp.getMCParticle(startSegment);
+  const CDCHit* ptrFirstHit = mcSegmentLookUp.getFirstHit(ptrStartSegment);
+
+  const CDCSimHit* ptrPrimarySimHit = mcHitLookUp.getClosestPrimarySimHit(ptrFirstHit);
 
 
-  if (firstSimHitOfStart == nullptr) {
-    B2WARNING("First simhit of CDCRecoSegment is nullptr. Could not set fits.");
-    return;
+  if (not ptrPrimarySimHit) {
+    // If there is no primary SimHit simply use the secondary simhit as reference
+    ptrPrimarySimHit = mcHitLookUp.getSimHit(ptrFirstHit);
+    if (not ptrPrimarySimHit) {
+      B2WARNING("First simhit of CDCRecoSegment is nullptr. Could not set fits.");
+      return;
+    }
   }
-  if (mcPartOfStart == nullptr) {
-    B2WARNING("Major mc particle of CDCRecoSegment is nullptr. Could not set fits.");
-    return;
+
+  const CDCSimHit& primarySimHit = *ptrPrimarySimHit;
+
+  Vector3D mom3D = primarySimHit.getMomentum();
+  Vector3D pos3D = primarySimHit.getPosTrack();
+
+
+
+  int pdgCode = primarySimHit.getPDGCode();
+  const TParticlePDG* ptrTPDGParticle = TDatabasePDG::Instance()->GetParticle(pdgCode);
+
+  if (not ptrTPDGParticle) {
+    B2WARNING("No particle for PDG code " << pdgCode << ". Could not set fits");
   }
 
-  Vector3D mom3D = firstSimHitOfStart->getMomentum();
-  Vector3D pos3D = firstSimHitOfStart->getPosTrack();
+  const TParticlePDG& tPDGParticle = *ptrTPDGParticle;
 
-  SignType chargeSign = sign(mcPartOfStart->getCharge());
+  double charge = tPDGParticle.Charge() / 3.0;
+
+  SignType chargeSign = sign(charge);
+
+
 
   CDCTrajectory2D trajectory2D;
   trajectory2D.setStartPosMom2D(pos3D.xy(), mom3D.xy(), chargeSign);
 
   SignType settedChargeSign = trajectory2D.getChargeSign();
 
-  //B2WARNING("settedChargeSign " << settedChargeSign);
-  //B2WARNING("chargeSign " << chargeSign);
-
   if (chargeSign != settedChargeSign) {
-
     B2WARNING("Charge sign of mc particle is not the same as the one of the fit");
-
   }
-  //cin >> settedChargeSign;
+
+
 
   CDCTrajectorySZ trajectorySZ(mom3D.z() / mom3D.polarR(), pos3D.z());
 

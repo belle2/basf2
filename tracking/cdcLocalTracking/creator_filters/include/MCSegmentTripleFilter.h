@@ -11,15 +11,8 @@
 #ifndef MCSEGMENTTRIPLEFILTER_H_
 #define MCSEGMENTTRIPLEFILTER_H_
 
-
-#include <tracking/cdcLocalTracking/typedefs/UsedDataHolders.h>
-
-#include <tracking/cdcLocalTracking/fitting/CDCRiemannFitter.h>
-#include <tracking/cdcLocalTracking/fitting/CDCSZFitter.h>
-
 #include <tracking/cdcLocalTracking/creator_filters/axial_axial/MCAxialAxialSegmentPairFilter.h>
-#include <tracking/cdcLocalTracking/mclookup/CDCMCLookUp.h>
-
+#include <tracking/cdcLocalTracking/eventdata/tracks/CDCSegmentTriple.h>
 
 namespace Belle2 {
   namespace CDCLocalTracking {
@@ -27,38 +20,31 @@ namespace Belle2 {
     class MCSegmentTripleFilter {
 
     public:
-
-
-      /** Constructor. */
+      /// Empty constructor
       MCSegmentTripleFilter();
-      MCSegmentTripleFilter(const CDCMCLookUp& mcLookUp);
 
-      /** Destructor.*/
+      /// Empty destructor
       ~MCSegmentTripleFilter();
 
     public:
-
+      /// May be used to clear information from former events. Currently unused.
       void clear() {;}
 
+      /// Check if the axial to axial segment pair is aligned in the Monte Carlo track. Signals NOT_A_CELL if not.
       CellWeight isGoodAxialAxialSegmentPair(const CDCAxialAxialSegmentPair& axialAxialSegmentPair);
 
-      CellWeight isGoodSegmentTriple(const CDCSegmentTriple& triple);
+      /// Check if the segment triple is aligned in the Monte Carlo track. Signals NOT_A_CELL if not.
+      CellWeight isGoodSegmentTriple(const CDCSegmentTriple& triple, bool allowBackward = false);
 
     private:
-      CellWeight isGoodTriple(const CDCAxialRecoSegment2D& startSegment,
-                              const CDCStereoRecoSegment2D& middleSegment,
-                              const CDCAxialRecoSegment2D& endSegment);
-
+      /// Sets the trajectories of the segment triple from Monte Carlo information. IS executed for good segment triples.
       void setTrajectoryOf(const CDCSegmentTriple& segmentTriple);
 
-
     private:
-      const CDCMCLookUp& m_mcLookUp;
+      /// Instance of the Monte Carlo filter for axial to axial segment pairs to factor some of the judgment.
       MCAxialAxialSegmentPairFilter m_mcAxialAxialSegmentPairFilter;
 
     }; // end class MCSegmentTripleFilter
-
-
   } //end namespace CDCLocalTracking
 } //end namespace Belle2
 

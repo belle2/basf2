@@ -165,6 +165,8 @@ namespace Belle2 {
         for (const CDCAxialRecoSegment2D * startSegment : startSegments) {
           for (const CDCAxialRecoSegment2D * endSegment : endSegments) {
 
+            if (startSegment == endSegment) continue; //Just for safety
+
             segmentTriple.setStart(startSegment);
             segmentTriple.setMiddle(nullptr);
             segmentTriple.setEnd(endSegment);
@@ -188,7 +190,7 @@ namespace Belle2 {
             CellWeight pairWeight = m_filter.isGoodAxialAxialSegmentPair(axialAxialSegmentPair);
             bool pairIsGood = not isNotACell(pairWeight);
 
-            if (startSegment != endSegment and pairIsGood) {
+            if (pairIsGood) {
 
               for (const CDCAxialRecoSegment2D * middleSegment : middleSegments) {
 

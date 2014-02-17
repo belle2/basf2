@@ -30,8 +30,6 @@
 #include <tracking/cdcLocalTracking/creators/SegmentSelecter.h>
 #include <tracking/cdcLocalTracking/creators/SegmentReverser.h>
 
-#include <tracking/cdcLocalTracking/mclookup/CDCMCLookUp.h>
-
 namespace Belle2 {
   namespace CDCLocalTracking {
 

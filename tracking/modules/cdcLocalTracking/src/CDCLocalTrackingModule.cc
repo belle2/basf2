@@ -86,6 +86,12 @@ void CDCLocalTrackingModule::beginRun()
 void CDCLocalTrackingModule::event()
 {
   B2DEBUG(100, "########## CDCLocalTracking begin ##########");
+
+#ifdef CDCLOCALTRACKING_USE_MC_FILTERS
+  CDCMCManager::getInstance().clear();
+  CDCMCManager::getInstance().fill();
+#endif
+
 #ifdef HAS_CALLGRIND
   CALLGRIND_START_INSTRUMENTATION;
 #endif
@@ -103,9 +109,7 @@ void CDCLocalTrackingModule::event()
 
   //create the wirehits
   B2DEBUG(100, "Creating all CDCWireHits");
-
   CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
-
   size_t nHits = wireHitTopology.fill();
   if (nHits == 0) {
     B2WARNING("Event with no hits - skipping");
@@ -113,36 +117,10 @@ void CDCLocalTrackingModule::event()
   }
   CDCWireHitTopology::CDCWireHitRange allWireHitRange = wireHitTopology.getWireHits();
 
-  //CALLGRIND_STOP_INSTRUMENTATION;
-
-#ifdef CDCLOCALTRACKING_USE_MC_FILTERS
-  CDCMCManager::getInstance().clear();
-  CDCMCManager::getInstance().fill();
-
-
-  //check the relations between the particles simhit and hits before using them
-  StoreArray <MCParticle> storedMCParticles;
-  StoreArray <CDCSimHit> storedSimhits;
-
-  //CDCMCLookUp::checkComposition(storedCDCHits,storedSimhits,storedMCParticles);
-
-  //create mc look up - to be abolished soon
-  CDCMCLookUp& mcLookUp = CDCMCLookUp::Instance();
-  mcLookUp.clear();
-  mcLookUp.addAllSimHits(allWireHitRange, storedCDCHits, storedSimhits);
-  mcLookUp.addAllMCParticle(allWireHitRange, storedCDCHits, storedMCParticles);
-#endif
-
-  //CALLGRIND_START_INSTRUMENTATION;
   //build the segments
   m_recoSegments.clear();
   m_segmentWorker.apply(allWireHitRange, m_recoSegments);
   B2DEBUG(100, "Received " << m_recoSegments.size() << " RecoSegments from worker");
-
-#ifdef CDCLOCALTRACKING_USE_MC_FILTERS
-  //register the segments to the mclookup in order to enable descisions based on the alignement of them
-  mcLookUp.addSegments(m_recoSegments);
-#endif
 
   //build the gfTracks
   StoreArray < genfit::TrackCand > storedGFTrackCands(m_param_gfTrackCandColName);

@@ -281,3 +281,27 @@ orange->beam background
             + str(self.n_hits_by_secondary_type)
 
 
+class CDCSegmentColorMap:
+
+    bkgSegmentColor = 'orange'
+
+    def __call__(self, iSegment, segment):
+        return self.bkgSegmentColor
+
+
+class SegmentMCTrackIdColorMap(CDCSegmentColorMap):
+
+    def __call__(self, iSegment, segment):
+
+        mcSegmentLookUp = \
+            Belle2.CDCLocalTracking.CDCMCSegmentLookUp.getInstance()
+
+        mcTrackId = mcSegmentLookUp.getMCTrackId(segment)
+        if mcTrackId < 0:
+            return self.bkgSegmentColor
+        else:
+            iColor = mcTrackId % len(listColors)
+            color = listColors[iColor]
+            return color
+
+

@@ -22,7 +22,7 @@ import os
 import os.path
 import math
 
-from svgdrawing.attributemaps import *
+# from svgdrawing.attributemaps import *
 import svgdrawing.attributemaps as attributemaps
 
 
@@ -62,6 +62,8 @@ class CDCSVGDisplayModule(Module):
 
         self.draw_segments = True and False
         self.draw_tangentsegments = True and False
+
+        self.draw_segments_mctrackid = True and False
 
         self.draw_segmenttriples = True and False
         self.draw_tracks = True and False
@@ -119,6 +121,7 @@ class CDCSVGDisplayModule(Module):
         plotter = svgdrawing.CDCSVGPlotter()
         self.plotter = plotter
 
+        # ######### CDCWires ##########
         # Draw wires from cdcwire objects
         # Now prefered way of ploting the wires
         if self.draw_wires:
@@ -132,6 +135,7 @@ class CDCSVGDisplayModule(Module):
                     wire = wirelayer.getWireSave(iWire)
                     plotter.append(wire, stroke='gray')
 
+        # ######### CDCHits ##########
         # Draw wirehits or
         # Draw the raw CDCHits
         if self.draw_hits or self.draw_wirehits:
@@ -197,6 +201,26 @@ class CDCSVGDisplayModule(Module):
                          'stroke': attributemaps.ReassignedSecondaryMap()}
             self.draw_storearray('CDCHits', styleDict)
 
+        # ######### CDCClusters
+        # Draw clusters
+        if self.draw_clusters:
+            styleDict = {'stroke': attributemaps.listColors,
+                         'stroke-width': '0.5'}
+            self.draw_storearray('CDCWireHitClusters', styleDict)
+
+        # ######### CDCRecoSegments2D ##########
+        # Draw Segments
+
+        if self.draw_segments:
+            styleDict = {'stroke': attributemaps.listColors,
+                         'stroke-width': '0.5'}
+            self.draw_storearray('CDCRecoHit2DSegmentsSelected', styleDict)
+
+        if self.draw_segments_mctrackid:
+            styleDict = {'stroke': attributemaps.SegmentMCTrackIdColorMap(),
+                         'stroke-width': '0.5'}
+            self.draw_storearray('CDCRecoHit2DSegmentsSelected', styleDict)
+
         # Draw mc vertices
         if self.draw_mcvertices:
             print 'Drawing Monte Carlo vertices of the cdc hits'
@@ -213,8 +237,8 @@ class CDCSVGDisplayModule(Module):
                 for wirehit in iterWireHits:
 
                     trackId = int(mcLookUp.getMCTrackId(wirehit))
-                    colorId = trackId % len(listColors)
-                    color = listColors[colorId]
+                    colorId = trackId % len(attributemaps.listColors)
+                    color = attributemaps.listColors[colorId]
 
                     simhit = mcLookUp.getSimHit(wirehit)
                     toTPos = simhit.getPosTrack()
@@ -227,18 +251,6 @@ class CDCSVGDisplayModule(Module):
                         mcPos = Belle2.CDCLocalTracking.Vector3D(mcTPos)
                         plotter.append(mcPos, stroke=color)
                         mcPart = mcPart.getMother()
-
-        # Draw clusters
-        if self.draw_clusters:
-            styleDict = {'stroke': attributemaps.listColors,
-                         'stroke-width': '0.5'}
-            self.draw_storearray('CDCWireHitClusters', styleDict)
-
-        # Draw Segments
-        if self.draw_segments:
-            styleDict = {'stroke': attributemaps.listColors,
-                         'stroke-width': '0.5'}
-            self.draw_storearray('CDCRecoHit2DSegmentsSelected', styleDict)
 
         # Draw Tangent segments
         if self.draw_tangentsegments:
@@ -330,7 +342,8 @@ class CDCSVGDisplayModule(Module):
 
                 def color_map(iTrajectory, trajectory):
                     # return "black"
-                    return listColors[iTrajectory % len(listColors)]
+                    return attributemaps.listColors[iTrajectory
+                            % len(attributemaps.listColors)]
 
                 styleDict = {'stroke-width': '0.5', 'stroke': color_map}
 

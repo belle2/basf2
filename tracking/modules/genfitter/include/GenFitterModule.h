@@ -84,6 +84,7 @@ namespace Belle2 {
     std::string m_filterId;                          /**< Select the filter: 'Kalman' for Kalman, 'DAF for DAF, 'simpleKalman' for the simple Kalman. */
     int m_nMinIter;                                  /**< Minimum number of iterations for the Kalman filter. */
     int m_nMaxIter;                                  /**< Maximum number of iterations for the Kalman filter. */
+    int m_nMaxFailed;                                /**< Maximum number of failed hits before aborting the fit. */
     double m_probCut;                                /**< Probability cut for the DAF filter (0.001, 0.005, 0.01). */
 
     bool m_storeFailed;                              /**< Boolean to mark if failed track fits should also be stored as Tracks. */

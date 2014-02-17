@@ -96,8 +96,9 @@ GenFitterModule::GenFitterModule() :
            "Name of collection holding the MCParticles (need to create relations between found tracks and MCParticles)", string(""));
   //select the filter and set some parameters
   addParam("FilterId", m_filterId, "Set to 'Kalman' use Kalman Filter, 'DAF' to use the DAF and 'simpleKalman' for the Kalman without reference track", string("DAF"));
-  addParam("NMinIterations", m_nMinIter, "Minimum umber of iterations for the Kalman filter", int(3));
-  addParam("NMaxIterations", m_nMaxIter, "Maximum umber of iterations for the Kalman filter", int(10));
+  addParam("NMinIterations", m_nMinIter, "Minimum number of iterations for the Kalman filter", int(3));
+  addParam("NMaxIterations", m_nMaxIter, "Maximum number of iterations for the Kalman filter", int(10));
+  addParam("NMaxFailedHits", m_nMaxFailed, "Maximum number of of failed hits before aborting the fit", int(5));
   addParam("ProbCut", m_probCut, "Probability cut for the DAF. Any value between 0 and 1 possible. Common values are between 0.01 and 0.001", double(0.001));
   addParam("StoreFailedTracks", m_storeFailed, "Set true if the tracks where the fit failed should also be stored in the output", bool(false));
   addParam("UseClusters", m_useClusters, "if set to true cluster hits (PXD/SVD clusters) will be used for fitting. If false Gaussian smeared trueHits will be used", true);
@@ -432,6 +433,7 @@ void GenFitterModule::event()
       }
       fitter->setMinIterations(m_nMinIter);
       fitter->setMaxIterations(m_nMaxIter);
+      fitter->setMaxFailedHits(m_nMaxFailed);
       if (m_resolveWireHitAmbi != "default") {
         if (m_resolveWireHitAmbi == "weightedAverage") {
           fitter->setMultipleMeasurementHandling(genfit::weightedAverage);
@@ -602,8 +604,8 @@ void GenFitterModule::event()
             if (fitSuccess) {
               genfit::KalmanFitStatus* fs = gfTrack.getKalmanFitStatus();
               newTrackFitResult->setCharge(fs->getCharge());
-              newTrackFitResult->setPValue(fs->getBackwardPVal());
               double Pval = fs->getBackwardPVal();
+              newTrackFitResult->setPValue(Pval);
               /*hPval->Fill(Pval);
               if (nPXD == 0 && nSVD == 0)
                  hPvalCDC->Fill(Pval);
@@ -704,7 +706,6 @@ void GenFitterModule::event()
 
   }//end loop over all track candidates
   B2DEBUG(99, "GenFitter event summary: " << trackCounter + 1 << " tracks were processed");
-
 }
 
 void GenFitterModule::endRun()

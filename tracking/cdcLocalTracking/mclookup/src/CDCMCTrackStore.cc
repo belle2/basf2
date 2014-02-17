@@ -103,7 +103,7 @@ void CDCMCTrackStore::fillMCTracks()
 
     if (not mcMap.isBackground(ptrHit) and ptrMCParticle) {
 
-      int mcParticleIdx = ptrMCParticle->getArrayIndex();
+      ITrackType mcParticleIdx = ptrMCParticle->getArrayIndex();
       //Append hit to its own track
       m_mcTracksByMCParticleIdx[mcParticleIdx].push_back(ptrHit);
     }
@@ -111,7 +111,7 @@ void CDCMCTrackStore::fillMCTracks()
 
 
   //Sort the tracks along the time of flight
-  for (std::pair<const int, CDCHitVector>& mcTrackAndMCParticleIdx : m_mcTracksByMCParticleIdx) {
+  for (std::pair<const ITrackType, CDCHitVector>& mcTrackAndMCParticleIdx : m_mcTracksByMCParticleIdx) {
 
     //int mcParticleIdx = mcTrackAndMCParticleIdx.first;
     CDCHitVector& mcTrack = mcTrackAndMCParticleIdx.second;
@@ -124,9 +124,9 @@ void CDCMCTrackStore::fillMCTracks()
 void CDCMCTrackStore::fillMCSegments()
 {
 
-  for (std::pair<const int, CDCHitVector>& mcTrackAndMCParticleIdx : m_mcTracksByMCParticleIdx) {
+  for (std::pair<const ITrackType, CDCHitVector>& mcTrackAndMCParticleIdx : m_mcTracksByMCParticleIdx) {
 
-    int mcParticleIdx = mcTrackAndMCParticleIdx.first;
+    ITrackType mcParticleIdx = mcTrackAndMCParticleIdx.first;
     CDCHitVector& mcTrack = mcTrackAndMCParticleIdx.second;
 
     std::vector<CDCHitVector>& mcSegments = m_mcSegmentsByMCParticleIdx[mcParticleIdx];
@@ -209,12 +209,12 @@ void CDCMCTrackStore::arrangeMCTrack(CDCHitVector& mcTrack) const
 void CDCMCTrackStore::fillInTrackId()
 {
 
-  for (const std::pair<int, CDCHitVector>& mcTrackAndMCParticleIdx : getMCTracksByMCParticleIdx()) {
+  for (const std::pair<ITrackType, CDCHitVector>& mcTrackAndMCParticleIdx : getMCTracksByMCParticleIdx()) {
 
     const CDCHitVector& mcTrack = mcTrackAndMCParticleIdx.second;
 
     //Fill the in track ids
-    int iHit = -1;
+    Index iHit = -1;
     for (const CDCHit * ptrHit : mcTrack) {
       ++iHit;
       m_inTrackIds[ptrHit] = iHit;
@@ -225,10 +225,10 @@ void CDCMCTrackStore::fillInTrackId()
 
 void CDCMCTrackStore::fillInTrackSegmentId()
 {
-  for (const std::pair<int, std::vector<CDCHitVector> >& mcSegmentsAndMCParticleIdx : getMCSegmentsByMCParticleIdx()) {
+  for (const std::pair<ITrackType, std::vector<CDCHitVector> >& mcSegmentsAndMCParticleIdx : getMCSegmentsByMCParticleIdx()) {
     const std::vector<CDCHitVector>& mcSegments = mcSegmentsAndMCParticleIdx.second;
 
-    int iSegment = -1;
+    Index iSegment = -1;
     for (const CDCHitVector &  mcSegment : mcSegments) {
       ++iSegment;
       for (const CDCHit * ptrHit : mcSegment) {
@@ -243,15 +243,13 @@ void CDCMCTrackStore::fillInTrackSegmentId()
 void CDCMCTrackStore::fillNPassedSuperLayers()
 {
 
-  for (const std::pair<int, std::vector<CDCHitVector> >& mcSegmentsAndMCParticleIdx : getMCSegmentsByMCParticleIdx()) {
+  for (const std::pair<ITrackType, std::vector<CDCHitVector> >& mcSegmentsAndMCParticleIdx : getMCSegmentsByMCParticleIdx()) {
     const std::vector<CDCHitVector>& mcSegments = mcSegmentsAndMCParticleIdx.second;
 
     ILayerType lastISuperLayer = INVALID_ISUPERLAYER;
-    int nPassedSuperLayers = 0;
+    Index nPassedSuperLayers = 0;
 
-    int iSegment = -1;
     for (const CDCHitVector & mcSegment : mcSegments) {
-      ++iSegment;
 
       for (const CDCHit * ptrHit : mcSegment) {
 
@@ -269,29 +267,29 @@ void CDCMCTrackStore::fillNPassedSuperLayers()
 
 
 
-int CDCMCTrackStore::getInTrackId(const CDCHit* ptrHit) const
+Index CDCMCTrackStore::getInTrackId(const CDCHit* ptrHit) const
 {
 
   auto itFoundHit = m_inTrackIds.find(ptrHit);
-  return itFoundHit == m_inTrackIds.end() ? -999 : itFoundHit->second;
+  return itFoundHit == m_inTrackIds.end() ? INVALID_INDEX : itFoundHit->second;
 
 }
 
 
 
-int CDCMCTrackStore::getInTrackSegmentId(const CDCHit* ptrHit) const
+Index CDCMCTrackStore::getInTrackSegmentId(const CDCHit* ptrHit) const
 {
 
   auto itFoundHit = m_inTrackSegmentIds.find(ptrHit);
-  return itFoundHit == m_inTrackSegmentIds.end() ? -999 : itFoundHit->second;
+  return itFoundHit == m_inTrackSegmentIds.end() ? INVALID_INDEX : itFoundHit->second;
 
 }
 
 
-int CDCMCTrackStore::getNPassedSuperLayers(const CDCHit* ptrHit) const
+Index CDCMCTrackStore::getNPassedSuperLayers(const CDCHit* ptrHit) const
 {
 
   auto itFoundHit = m_nPassedSuperLayers.find(ptrHit);
-  return itFoundHit == m_nPassedSuperLayers.end() ? -999 : itFoundHit->second;
+  return itFoundHit == m_nPassedSuperLayers.end() ? INVALID_INDEX : itFoundHit->second;
 
 }

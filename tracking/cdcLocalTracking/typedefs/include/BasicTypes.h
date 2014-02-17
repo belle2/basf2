@@ -23,6 +23,8 @@ namespace Belle2 {
     /**@{*/
 
     typedef int Index;
+    const Index INVALID_INDEX = -999;
+
 
     /// Track id type
     typedef int ITrackType;

@@ -10,6 +10,8 @@
 #ifndef CDCMCTRACKSTORE_H
 #define CDCMCTRACKSTORE_H
 
+#include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
+
 #include <tracking/cdcLocalTracking/mockroot/MockRoot.h>
 
 #include <tracking/cdcLocalTracking/mclookup/CDCMCMap.h>
@@ -51,11 +53,11 @@ namespace Belle2 {
 
     public:
       /// Getter for the stored Monte Carlo tracks ordered by their Monte Carlo Id
-      const std::map<int, Belle2::CDCLocalTracking::CDCMCTrackStore::CDCHitVector>& getMCTracksByMCParticleIdx() const
+      const std::map<ITrackType, Belle2::CDCLocalTracking::CDCMCTrackStore::CDCHitVector>& getMCTracksByMCParticleIdx() const
       { return  m_mcTracksByMCParticleIdx;}
 
       /// Getter for the stored Monte Carlo segments ordered by their Monte Carlo Id
-      const std::map<int, std::vector<Belle2::CDCLocalTracking::CDCMCTrackStore::CDCHitVector> >& getMCSegmentsByMCParticleIdx() const
+      const std::map<ITrackType, std::vector<Belle2::CDCLocalTracking::CDCMCTrackStore::CDCHitVector> >& getMCSegmentsByMCParticleIdx() const
       { return  m_mcSegmentsByMCParticleIdx;}
 
     private:
@@ -80,32 +82,32 @@ namespace Belle2 {
 
     public:
       /// Getter for the index of the hit within its track.
-      int getInTrackId(const CDCHit* hit) const;
+      Index getInTrackId(const CDCHit* hit) const;
 
       /// Getter for the index of the segment of the hit within its track.
-      int getInTrackSegmentId(const CDCHit* hit) const;
+      Index getInTrackSegmentId(const CDCHit* hit) const;
 
       /// Getter for the number of super layers traversed until this hit.
-      int getNPassedSuperLayers(const CDCHit* hit) const;
+      Index getNPassedSuperLayers(const CDCHit* hit) const;
 
     private:
       /// Reference to the MC map of the current event
       const CDCMCMap* m_ptrMCMap;
 
       /// The memory for the tracks made of CDCHits sorted for the time of flight and assoziated to the Monte Carlo particle id
-      std::map<int, CDCHitVector> m_mcTracksByMCParticleIdx;
+      std::map<ITrackType, CDCHitVector> m_mcTracksByMCParticleIdx;
 
       /// The memory for the segments made of CDCHits sorted for the time of flight and assoziated to the Monte Carlo particle id
-      std::map<int, std::vector<CDCHitVector>> m_mcSegmentsByMCParticleIdx;
+      std::map<ITrackType, std::vector<CDCHitVector>> m_mcSegmentsByMCParticleIdx;
 
       /// Look up table for index of the hit within its track
-      std::map<const CDCHit*, int> m_inTrackIds;
+      std::map<const CDCHit*, Index> m_inTrackIds;
 
       /// Look up table for index of the segment of the hits within their respective tracks
-      std::map<const CDCHit*, int> m_inTrackSegmentIds;
+      std::map<const CDCHit*, Index> m_inTrackSegmentIds;
 
       /// Look up table for the number of super layers the particle traversed before making the individual hit
-      std::map<const CDCHit*, int> m_nPassedSuperLayers;
+      std::map<const CDCHit*, Index> m_nPassedSuperLayers;
 
     }; //class CDCMCTrackStore
   } // end namespace CDCLocalTracking

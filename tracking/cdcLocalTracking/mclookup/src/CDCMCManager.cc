@@ -25,7 +25,7 @@ namespace {
   CDCMCManager* g_mcManager = nullptr;
 }
 
-CDCMCManager::CDCMCManager() : m_mcMap(), m_mcTrackStore(), m_simHitLookUp()
+CDCMCManager::CDCMCManager()
 {
 }
 
@@ -49,6 +49,8 @@ void CDCMCManager::clear()
   m_mcTrackStore.clear();
   m_simHitLookUp.clear();
 
+  //m_mcHitLookUp.clear();
+  m_mcSegmentLookUp.clear();
 }
 
 void CDCMCManager::fill()

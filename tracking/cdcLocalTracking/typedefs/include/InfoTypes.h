@@ -23,7 +23,8 @@ namespace Belle2 {
     typedef signed short OrientationInfo;
 
     const OrientationInfo INVALID_INFO = -32768; ///< Constant for invalid orientation for all InfoTypes
-    const OrientationInfo UNKNOWN = 0; ///<Constant for unknown orientation for all InfoTypes
+    const OrientationInfo UNKNOWN_INFO = 0; ///<Constant for unknown orientation for all InfoTypes
+    const OrientationInfo UNKNOWN = UNKNOWN_INFO; ///< Legacy constant for unknown orientation for all InfoTypes
 
     typedef OrientationInfo RightLeftInfo ; ///< Indicator for right or left orientation
     const RightLeftInfo RIGHT = 1;  ///< Constant for right orientation

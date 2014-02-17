@@ -90,6 +90,10 @@ namespace Belle2 {
       static CDCRecoHit2D fromSimHit(const CDCWireHit* wireHit, const CDCSimHit& simHit);
 
 
+      /// Make the wire hit automatically castable to its underlying cdcHit
+      operator const Belle2::CDCHit* () const
+      { return (const CDCHit*)getRLWireHit(); }
+
 
       /// Equality comparision based on the oriented wire hit and displacement.
       bool operator==(const CDCRecoHit2D& other) const {

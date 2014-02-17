@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include "../include/CDCMCHitLookUp.h"
+#include "../include/CDCMCManager.h"
 
 #include <tracking/cdcLocalTracking/mclookup/CDCMCManager.h>
 
@@ -17,10 +18,6 @@ using namespace Belle2;
 using namespace CDCLocalTracking;
 
 ClassImpInCDCLocalTracking(CDCMCHitLookUp)
-
-namespace {
-  CDCMCHitLookUp* g_mcHitLookUp = nullptr;
-}
 
 
 
@@ -36,10 +33,9 @@ CDCMCHitLookUp::~CDCMCHitLookUp()
 
 
 
-CDCMCHitLookUp& CDCMCHitLookUp::getInstance()
+const CDCMCHitLookUp& CDCMCHitLookUp::getInstance()
 {
-  if (not g_mcHitLookUp) g_mcHitLookUp = new CDCMCHitLookUp;
-  return *g_mcHitLookUp;
+  return CDCMCManager::getMCHitLookUp();
 }
 
 
@@ -95,21 +91,21 @@ ITrackType CDCMCHitLookUp::getMCTrackId(const CDCHit* ptrHit) const
 
 
 
-int CDCMCHitLookUp::getInTrackId(const CDCHit* ptrHit) const
+Index CDCMCHitLookUp::getInTrackId(const CDCHit* ptrHit) const
 {
   return CDCMCManager::getMCTrackStore().getInTrackId(ptrHit);
 }
 
 
 
-int CDCMCHitLookUp::getInTrackSegmentId(const CDCHit* ptrHit) const
+Index CDCMCHitLookUp::getInTrackSegmentId(const CDCHit* ptrHit) const
 {
   return CDCMCManager::getMCTrackStore().getInTrackSegmentId(ptrHit);
 }
 
 
 
-int CDCMCHitLookUp::getNPassedSuperLayers(const CDCHit* ptrHit) const
+Index CDCMCHitLookUp::getNPassedSuperLayers(const CDCHit* ptrHit) const
 {
   return CDCMCManager::getMCTrackStore().getNPassedSuperLayers(ptrHit);
 }

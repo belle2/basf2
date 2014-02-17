@@ -65,6 +65,19 @@ namespace Belle2 {
         const_iterator end() const { return this->second;}
       };
 
+
+      class const_reverse_range : public std::pair<const_reverse_iterator, const_reverse_iterator> {
+      public:
+        const_reverse_range(const std::pair<const_reverse_iterator, const_reverse_iterator>& iterator_reverse_pair) :
+          std::pair<const_reverse_iterator, const_reverse_iterator>(iterator_reverse_pair) {;}
+        const_reverse_range(const const_reverse_iterator& begin, const const_reverse_iterator& end) :
+          std::pair<const_reverse_iterator, const_reverse_iterator>(begin, end) {;}
+
+        const_reverse_iterator begin() const { return this->first;}
+        const_reverse_iterator end() const { return this->second;}
+      };
+
+
       /// Input iterator type usable with stl algorithms
       class input_iterator : public std::iterator<std::output_iterator_tag, void, void, void, void> {
       protected:
@@ -122,6 +135,10 @@ namespace Belle2 {
       reverse_iterator rend() { return m_items.rend(); }
       /// The reverse end of the constant container
       const_reverse_iterator rend() const { return m_items.rend(); }
+
+      /// Getter for a reverse range usable with range based for
+      const_reverse_range reverseRange() const { return const_reverse_range(rbegin(), rend()); }
+
 
       /// Getter for the element by its position for easy read access from python.
       /** This gets the an element by its position in the vector. Returns a default \n

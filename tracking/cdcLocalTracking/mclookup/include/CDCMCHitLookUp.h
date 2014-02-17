@@ -35,7 +35,7 @@ namespace Belle2 {
 
     public:
       /// Getter for the singletone instance
-      static CDCMCHitLookUp& getInstance();
+      static const CDCMCHitLookUp& getInstance();
 
     public:
       /// Getter for the CDCSimHit which is related to the CDCHit contained in the given wire hit
@@ -58,13 +58,13 @@ namespace Belle2 {
       bool isBackground(const CDCHit* ptrHit) const;
 
       /// Returns the position if the wire hit in the track along the travel direction
-      int getInTrackId(const CDCHit* ptrHit) const;
+      Index getInTrackId(const CDCHit* ptrHit) const;
 
       /// Returns the id of the segment in the track.
-      int getInTrackSegmentId(const CDCHit* ptrHit) const;
+      Index getInTrackSegmentId(const CDCHit* ptrHit) const;
 
       /// Returns the number of superlayers the track traversed until this hit.
-      int getNPassedSuperLayers(const CDCHit* ptrHit) const;
+      Index getNPassedSuperLayers(const CDCHit* ptrHit) const;
 
       /// Returns the true right left passage information
       RightLeftInfo getRLInfo(const CDCHit* ptrHit) const;

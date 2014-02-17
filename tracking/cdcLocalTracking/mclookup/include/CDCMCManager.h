@@ -14,6 +14,9 @@
 #include "CDCMCTrackStore.h"
 #include "CDCSimHitLookUp.h"
 
+#include "CDCMCHitLookUp.h"
+#include "CDCMCSegmentLookUp.h"
+
 namespace Belle2 {
   namespace CDCLocalTracking {
 
@@ -44,6 +47,15 @@ namespace Belle2 {
       static const CDCSimHitLookUp& getSimHitLookUp()
       { return getInstance().m_simHitLookUp; }
 
+      /// Getter for the singletone instance of the CDCMCHitLookUp
+      static const CDCMCHitLookUp& getMCHitLookUp()
+      { return getInstance().m_mcHitLookUp; }
+
+      /// Getter for the singletone instance of the CDCMCSegmentLookUp
+      static const CDCMCSegmentLookUp& getMCSegmentLookUp()
+      { return getInstance().m_mcSegmentLookUp; }
+
+
     public:
       /// Clears all Monte Carlo information present in the last event
       void clear();
@@ -60,6 +72,12 @@ namespace Belle2 {
 
       /// Memory for the singletone CDCSimHitLookUp
       CDCSimHitLookUp m_simHitLookUp;
+
+      /// Memory for the singletone CDCMCHitLookUp
+      CDCMCHitLookUp m_mcHitLookUp;
+
+      /// Memory for the singletone CDCMCSegmentLookUp
+      CDCMCSegmentLookUp m_mcSegmentLookUp;
 
     }; //class
   } // end namespace CDCLocalTracking

@@ -46,6 +46,9 @@ namespace Belle2 {
       /// Returns the oriented wire hit with the opposite right left information.
       const CDCRLWireHit* reversed() const;
 
+      /// Make the wire hit automatically castable to its underlying cdcHit
+      operator const Belle2::CDCHit* () const
+      { return (const CDCHit*) getWireHit(); }
 
 
       /// Equality comparision based on wire hit, left right passage information.

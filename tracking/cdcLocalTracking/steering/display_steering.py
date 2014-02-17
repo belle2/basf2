@@ -55,7 +55,7 @@ evtgeninput.param('userDECFile', os.environ['BELLE2_LOCAL_DIR']
 
 # specify number of events to be generated in job
 eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param('evtNumList', [10])  # we want to process nOfEvents events
+eventinfosetter.param('evtNumList', [2])  # we want to process nOfEvents events
 eventinfosetter.param('runList', [1])  # from run number 1
 eventinfosetter.param('expList', [1])  # and experiment number 1
 
@@ -141,7 +141,7 @@ cdclocaltracking = register_module('CDCLocalTracking')
 # CDCSVGDisplayModule - for reassignment
 svgdisplay_reassignment = cdcdisplay.CDCSVGDisplayModule('/tmp')
 # svgdisplay_reassignment.draw_mcsegments = True
-# svgdisplay_reassignment.draw_segments_mctrackid = True
+svgdisplay_reassignment.draw_segments_mctrackid = True
 # svgdisplay_reassignment.draw_segments_fbinfo = True
 # svgdisplay_reassignment.draw_tof = True
 
@@ -151,7 +151,10 @@ svgdisplay_reassignment = cdcdisplay.CDCSVGDisplayModule('/tmp')
 # svgdisplay_reassignment.draw_segments_lastInTrackId = True
 
 # svgdisplay_reassignment.draw_segments = True  # and False
+# svgdisplay_reassignment.draw_mcaxialstereopairs = True
 # svgdisplay_reassignment.draw_mcaxialaxialpairs = True
+# svgdisplay_reassignment.draw_mcsegmenttriples = True
+svgdisplay_reassignment.draw_segmenttriples = True
 
 # ---------------------------------------------------------------
 # CDCSVGDisplayModule - for segments
@@ -226,8 +229,8 @@ elif options.conformalTracking:
 elif options.legendreTracking:
     main.add_module(cdclegendretracking)
 
-main.add_module(svgdisplay_reassignment)
-main.add_module(svgdisplay)
+# main.add_module(svgdisplay_reassignment)
+# main.add_module(svgdisplay)
 main.add_module(svgdisplay_tracks)
 
 process(main)

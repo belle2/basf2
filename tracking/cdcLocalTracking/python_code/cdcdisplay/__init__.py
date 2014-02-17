@@ -71,6 +71,8 @@ class CDCSVGDisplayModule(Module):
         self.draw_segments_lastNPassedSuperLayers = True and False
 
         self.draw_mcaxialaxialpairs = True and False
+        self.draw_mcaxialstereopairs = True and False
+        self.draw_mcsegmenttriples = True and False
 
         self.draw_segmenttriples = True and False
         self.draw_tracks = True and False
@@ -112,6 +114,10 @@ class CDCSVGDisplayModule(Module):
 
     def event(self):
         print '##################### DISPLAY EVENT ###########################'
+        eventMetaData = Belle2.PyStoreObj('EventMetaData')
+     #   if (eventMetaData.obj().getEvent()):
+     #       print 'Skip event', eventMetaData.obj().getEvent()
+     #      return
 
         if not hasattr(Belle2, 'CDCLocalTracking'):
             print 'CDCLocalTracking namespace not available from Python'
@@ -276,19 +282,148 @@ class CDCSVGDisplayModule(Module):
 
                 def is_good_pair(pair):
                     weight = \
-                        mc_axial_axial_segment_filter.isGoodAxialAxialSegmentPair(pair,
-                            True)
-                    print weight
-                    print weight == weight
-                    return weight == weight
+                        mc_axial_axial_segment_filter.isGoodAxialAxialSegmentPair(pair)
+                    return weight == weight  # not nan
 
                 good_axial_axial_segment_pairs = [pair for pair in
                         axial_axial_segment_pairs if is_good_pair(pair)]
 
-                print '#NPairs', len(good_axial_axial_segment_pairs)
+                print '#Pairs', len(good_axial_axial_segment_pairs)
                 styleDict = {'stroke': 'black', 'stroke-width': '0.2'}
 
                 plotter.append(good_axial_axial_segment_pairs, **styleDict)
+
+        # Mimic axial to stereo pair selection
+        if self.draw_mcaxialstereopairs:
+            print 'Draw axial to axial segment pairs'
+            segment_storearray = \
+                Belle2.PyStoreArray('CDCRecoHit2DSegmentsSelected')
+            if segment_storearray:
+                print '#Segment', segment_storearray.getEntries()
+                axial_segments = [segment for segment in segment_storearray
+                                  if segment.getAxialType() == 0]
+
+                stereo_segments = [segment for segment in segment_storearray
+                                   if segment.getAxialType() != 0]
+
+                # # Misuse this a bit but still does what we want
+                mc_axial_axial_segment_filter = \
+                    Belle2.CDCLocalTracking.MCAxialAxialSegmentPairFilter()
+
+                axial_stereo_segment_pairs = \
+                    (Belle2.CDCLocalTracking.CDCAxialAxialSegmentPair(startSegment,
+                        endSegment) for startSegment in axial_segments
+                    for endSegment in stereo_segments)
+
+                stereo_axial_segment_pairs = \
+                    (Belle2.CDCLocalTracking.CDCAxialAxialSegmentPair(startSegment,
+                        endSegment) for startSegment in stereo_segments
+                    for endSegment in axial_segments)
+
+                def is_good_pair(pair):
+                    weight = \
+                        mc_axial_axial_segment_filter.isGoodAxialAxialSegmentPair(pair)
+                    return weight == weight  # not nan
+
+                good_axial_stereo_segment_pairs = [pair for pair in
+                        axial_stereo_segment_pairs if is_good_pair(pair)]
+
+                good_stereo_axial_segment_pairs = [pair for pair in
+                        stereo_axial_segment_pairs if is_good_pair(pair)]
+
+                print '#Pairs', len(good_axial_stereo_segment_pairs) \
+                    + len(good_stereo_axial_segment_pairs)
+                styleDict = {'stroke': 'black', 'stroke-width': '0.2'}
+
+                plotter.append(good_axial_stereo_segment_pairs, **styleDict)
+                plotter.append(good_stereo_axial_segment_pairs, **styleDict)
+
+        if self.draw_mcsegmenttriples:
+            print 'Draw axial to axial segment pairs'
+            segment_storearray = \
+                Belle2.PyStoreArray('CDCRecoHit2DSegmentsSelected')
+            if segment_storearray:
+                print '#Segment', segment_storearray.getEntries()
+                axial_segments = [segment for segment in segment_storearray
+                                  if segment.getAxialType() == 0]
+
+                stereo_segments = [segment for segment in segment_storearray
+                                   if segment.getAxialType() != 0]
+
+                # # Misuse this a bit but still does what we want
+                mc_axial_axial_segment_filter = \
+                    Belle2.CDCLocalTracking.MCAxialAxialSegmentPairFilter()
+                mc_segment_lookup = \
+                    Belle2.CDCLocalTracking.CDCMCSegmentLookUp.getInstance()
+
+                segment_triples = \
+                    (Belle2.CDCLocalTracking.CDCSegmentTriple(startSegment,
+                        middleSegment, endSegment) for startSegment in
+                    axial_segments for middleSegment in stereo_segments
+                    for endSegment in axial_segments)
+
+                def is_good_triple(triple):
+                    start = triple.getStart()
+                    middle = triple.getMiddle()
+                    end = triple.getEnd()
+
+                    pairWeight = \
+                        mc_axial_axial_segment_filter.isGoodAxialAxialSegmentPair(triple)
+
+                    # startToMiddlePair = Belle2.CDCLocalTracking.CDCAxialAxialSegmentPair(start,middle)
+
+                    # startToMiddleWeight = \
+                    #     mc_axial_axial_segment_filter.isGoodAxialAxialSegmentPair(startToMiddlePair)
+
+                    # middleToEndPair = Belle2.CDCLocalTracking.CDCAxialAxialSegmentPair(middle,end)
+
+                    # middleToEndWeight = \
+                    #     mc_axial_axial_segment_filter.isGoodAxialAxialSegmentPair(middleToEndPair)
+
+                    # return (pairWeight == pairWeight) and (startToMiddleWeight == startToMiddleWeight) and (middleToEndWeight == middleToEndWeight)
+
+                    if not pairWeight == pairWeight:
+                        return False
+
+                    startToMiddleFBInfo = \
+                        mc_segment_lookup.areAlignedInMCTrack(start, middle)
+                    if abs(startToMiddleFBInfo) > 1:
+                        return False
+
+                    middleToEndFBInfo = \
+                        mc_segment_lookup.areAlignedInMCTrack(middle, end)
+                    if abs(middleToEndFBInfo) > 1:
+                        return False
+
+                    if startToMiddleFBInfo == middleToEndFBInfo:
+                        return True
+                    else:
+                        return False
+
+  # CellWeight pairWeight = m_mcAxialAxialSegmentPairFilter.isGoodAxialAxialSegmentPair(segmentTriple,allowBackward);
+  # if (isNotACell(pairWeight)) return NOT_A_CELL;
+
+  # const CDCMCSegmentLookUp& mcSegmentLookUp = CDCMCSegmentLookUp::getInstance();
+
+  # // Check if the segments are aligned correctly along the Monte Carlo track
+  # ForwardBackwardInfo startToMiddleFBInfo = mcSegmentLookUp.areAlignedInMCTrack(ptrStartSegment, ptrMiddleSegment);
+  # if (startToMiddleFBInfo == INVALID_INFO) return NOT_A_CELL;
+
+  # ForwardBackwardInfo middleToEndFBInfo = mcSegmentLookUp.areAlignedInMCTrack(ptrMiddleSegment, ptrEndSegment);
+  # if (middleToEndFBInfo == INVALID_INFO) return NOT_A_CELL;
+
+  # if ( startToMiddleFBInfo != middleToEndFBInfo) return NOT_A_CELL;
+
+  # if( (startToMiddleFBInfo == FORWARD and middleToEndFBInfo == FORWARD) or
+  #     (allowBackward and startToMiddleFBInfo == BACKWARD and middleToEndFBInfo == BACKWARD)) {
+
+                good_segment_triples = [triple for triple in segment_triples
+                        if is_good_triple(triple)]
+
+                print '#Triple', len(good_segment_triples)
+                styleDict = {'stroke': 'black', 'stroke-width': '0.2'}
+
+                plotter.append(good_segment_triples, **styleDict)
 
         # Draw mc vertices
         if self.draw_mcvertices:

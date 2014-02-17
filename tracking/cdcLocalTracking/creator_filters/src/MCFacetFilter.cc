@@ -75,9 +75,9 @@ bool MCFacetFilter::isCorrect(const CDCRLWireHitTriple& rlWireHitTriple, int inT
 
 
   //Maybe be a bit more permissive for reassigned hits
-  bool startIsReassigned = mcHitLookUp.isReassignedSecondaryHit(startWireHit);
-  bool middleIsReassigned = mcHitLookUp.isReassignedSecondaryHit(middleWireHit);
-  bool endIsReassigned = mcHitLookUp.isReassignedSecondaryHit(endWireHit);
+  bool startIsReassigned = mcHitLookUp.isReassignedSecondary(startWireHit);
+  bool middleIsReassigned = mcHitLookUp.isReassignedSecondary(middleWireHit);
+  bool endIsReassigned = mcHitLookUp.isReassignedSecondary(endWireHit);
 
 
 

@@ -168,7 +168,7 @@ void CDCMCHitLookUp::fill()
 
 
 
-bool CDCMCHitLookUp::isReassignedSecondaryHit(const CDCWireHit& wireHit) const
+bool CDCMCHitLookUp::isReassignedSecondary(const CDCWireHit& wireHit) const
 {
   const CDCHit* ptrHit = wireHit.getHit();
   return CDCMCMap::getInstance().isReassignedSecondary(ptrHit);

@@ -66,7 +66,7 @@ namespace Belle2 {
 
     public:
       /// Indicates if the hit was reassigned to a different mc particle because it was caused by a secondary.
-      bool isReassignedSecondaryHit(const CDCWireHit& wireHit) const;
+      bool isReassignedSecondary(const CDCWireHit& wireHit) const;
 
       /// Getter for the closest simulated hit of a primary particle to the given hit - may return nullptr of no closest is found
       const CDCSimHit* getClosestPrimarySimHit(const CDCWireHit& wireHit) const;

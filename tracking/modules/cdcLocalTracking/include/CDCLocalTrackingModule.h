@@ -13,6 +13,8 @@
 //#define LOG_NO_B2DEBUG
 #include <framework/core/Module.h>
 
+#include <tracking/cdcLocalTracking/config/CDCLocalTrackingConfig.h>
+
 #include <tracking/cdcLocalTracking/typedefs/UsedDataHolders.h>
 
 #include <tracking/cdcLocalTracking/workers/FacetSegmentWorker.h>

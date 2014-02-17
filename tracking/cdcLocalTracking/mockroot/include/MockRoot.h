@@ -11,8 +11,8 @@
 #ifndef MOCKROOT_H_
 #define MOCKROOT_H_
 
-
 #include "ToggleMockRoot.h"
+#include <tracking/cdcLocalTracking/config/CDCLocalTrackingConfig.h>
 #include <TObject.h>
 
 namespace Belle2 {

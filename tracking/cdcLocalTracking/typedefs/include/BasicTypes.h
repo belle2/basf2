@@ -78,10 +78,16 @@ namespace Belle2 {
 
     ///The type of the layer and superlayer ids
     typedef signed short ILayerType;
+
+
     //typedef signed char ILayerType;    // This can be used for performance maximization but makes lousy output
-    const ILayerType INVALIDSUPERLAYER = 128; ///< Constant making an invalid superlayer id
-    const ILayerType INVALIDLAYER = 128; ///< Constant making an invalid layer id
-    const IWireType INVALIDWIRE = 32767; ///< Constant making an invalid wire id
+    const ILayerType INVALID_ISUPERLAYER = 15; ///< Constant making an invalid superlayer id
+    const ILayerType INVALID_ILAYER = 127; ///< Constant making an invalid layer id
+    const IWireType INVALID_IWIRE = 32767; ///< Constant making an invalid wire id
+
+    const ILayerType INVALIDSUPERLAYER = INVALID_ISUPERLAYER; ///Legacy constant
+    const ILayerType INVALIDLAYER = INVALID_ILAYER; ///Legacy constant
+    const IWireType INVALIDWIRE = INVALID_IWIRE; ///Legacy constant
     /**@}*/
 
     /** @name Wire neighborhood relation */

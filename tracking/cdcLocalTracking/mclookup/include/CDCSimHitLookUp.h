@@ -7,8 +7,8 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#ifndef CDCMCHITLOOKUP_H
-#define CDCMCHITLOOKUP_H
+#ifndef CDCSIMHITLOOKUP_H
+#define CDCSIMHITLOOKUP_H
 
 #include <tracking/cdcLocalTracking/eventdata/CDCEventData.h>
 #include <tracking/cdcLocalTracking/eventtopology/CDCWireHitTopology.h>
@@ -23,7 +23,6 @@
 #include <framework/gearbox/Unit.h>
 
 #include "CDCMCTrackStore.h"
-#include "CDCSimHitLookUp.h"
 
 #include <map>
 #include <list>
@@ -34,24 +33,33 @@ namespace Belle2 {
 
     ///Class to organize and present the monte carlo hit information
 
-    class CDCMCHitLookUp : public UsedTObject {
+    class CDCSimHitLookUp : public UsedTObject {
 
     public:
       /// Type for an ordered sequence of pointers to the CDCHit
       typedef CDCMCTrackStore::CDCHitVector CDCHitVector;
 
     public:
-      CDCMCHitLookUp();
+      CDCSimHitLookUp();
 
-      ~CDCMCHitLookUp();
+      ~CDCSimHitLookUp();
 
     public:
-      static CDCMCHitLookUp& getInstance();
+      static CDCSimHitLookUp& getInstance();
 
     public:
       void clear();
       void fill();
 
+    private:
+      void fillPrimarySimHits();
+      bool isReassignedSecondaryHit(const CDCSimHit& simHit) const;
+      const CDCSimHit* getClosestPrimarySimHit(const CDCSimHit* simHit) const;
+
+
+      void fillRLInfo();
+      RightLeftInfo getPrimaryRLInfo(const CDCSimHit& simHit) const;
+      //RightLeftInfo getRLInfo(const CDCSimHit& simHit) const;
 
     public:
       const Belle2::CDCSimHit* getSimHit(const CDCWireHit& wireHit) const {
@@ -59,37 +67,16 @@ namespace Belle2 {
         return hit ? hit->getRelated<CDCSimHit>() : nullptr;
       }
 
-      const Belle2::MCParticle* getMCParticle(const CDCWireHit& wireHit) const {
-        const CDCHit* hit = wireHit.getHit();
-        return hit ? hit->getRelated<MCParticle>() : nullptr;
-      }
-
     public:
-      /// Indicates if the hit was reassigned to a different mc particle because it was caused by a secondary.
-      bool isReassignedSecondaryHit(const CDCWireHit& wireHit) const;
+      bool isReassignedSecondaryHit(const CDCHit* hit) const;
+      const CDCSimHit* getClosestPrimarySimHit(const CDCHit* hit) const;
+      RightLeftInfo getRLInfo(const CDCHit* wireHit) const;
 
-      /// Getter for the closest simulated hit of a primary particle to the given hit - may return nullptr of no closest is found
-      const CDCSimHit* getClosestPrimarySimHit(const CDCWireHit& wireHit) const;
-
-      /// Returns the track id for the hit
-      ITrackType getMCTrackId(const CDCWireHit& wireHit) const;
-
-      /// Returns if this hit is considered background
-      bool isBackground(const CDCWireHit& wireHit) const;
-
-      /// Returns the position if the wire hit in the track along the travel direction
-      int getInTrackId(const CDCWireHit& wireHit) const;
-
-      /// Returns the id of the segment in the track.
-      int getInTrackSegmentId(const CDCWireHit& wireHit) const;
-
-      /// Returns the number of superlayers the track traversed until this hit.
-      int getNPassedSuperLayers(const CDCWireHit& wireHit) const;
-
-      /// Returns the true right left passage information
-      RightLeftInfo getRLInfo(const CDCWireHit& wireHit) const;
+    private:
+      std::map<const CDCHit*, const CDCSimHit*>  m_primarySimHits;
+      std::map<const CDCHit*, RightLeftInfo> m_rightLeftInfos;
 
     }; //class
   } // end namespace CDCLocalTracking
 } // namespace Belle2
-#endif // CDCMCHITLOOKUP
+#endif // CDCSIMHITLOOKUP

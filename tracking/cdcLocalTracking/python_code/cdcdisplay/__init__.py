@@ -21,6 +21,7 @@ import svgdrawing
 import os
 import os.path
 import math
+import colorsys
 
 listColors = [  # 'magenta',
                 # 'gold',
@@ -76,6 +77,21 @@ class ZeroDriftLengthColorMap(CDCHitColorMap):
             return self.bkgHitColor
 
 
+class PosFlagColorMap(CDCHitColorMap):
+
+    def __call__(self, iCDCHit, cdcHit):
+        simHit = cdcHit.getRelated('CDCSimHits')
+        posFlag = simHit.getPosFlag()
+        if posFlag == 0:
+            # Right
+            return 'green'
+        elif posFlag == 1:
+            # Left
+            return 'red'
+        else:
+            self.bkgHitColor
+
+
 class RLColorMap(CDCHitColorMap):
 
     def __call__(self, iCDCHit, cdcHit):
@@ -89,6 +105,28 @@ class RLColorMap(CDCHitColorMap):
             return 'red'
         else:
             self.bkgHitColor
+
+
+class MCSegmentIdColorMap(CDCHitColorMap):
+
+    def __call__(self, iCDCHit, cdcHit):
+        mcTrackStore = Belle2.CDCLocalTracking.CDCMCTrackStore.getInstance()
+        inTrackSegmentId = mcTrackStore.getInTrackSegmentId(cdcHit)
+
+        if inTrackSegmentId < 0:
+            return self.bkgHitColor
+        else:
+            # values are all fractions of their respective scale
+            hue = 50 * inTrackSegmentId % 360 / 360.0
+            saturation = 1.0
+            lightness = 0.5
+
+            (red, green, blue) = colorsys.hls_to_rgb(hue, lightness,
+                    saturation)
+
+            color = 'rgb({0:.2%}, {1:.2%}, {2:.2%})'.format(red, green, blue)
+            print color
+            return color
 
 
 class TOFTransperancyMap(CDCHitColorMap):
@@ -277,6 +315,7 @@ class CDCSVGDisplayModule(Module):
         self.draw_mcparticles = True and False
         self.draw_mcpdgcodes = True and False
         self.draw_mcprimary = True and False
+        self.draw_mcsegments = True and False
 
         self.draw_mcvertices = True and False
 
@@ -356,7 +395,7 @@ class CDCSVGDisplayModule(Module):
 
         # Draw  mcparticle id
         if self.draw_mcparticles:
-            print 'Drawing the MC Particless'
+            print 'Drawing the MC Particles'
             cdchits_storearray = Belle2.PyStoreArray('CDCHits')
 
             if cdchit_storearray:
@@ -366,6 +405,20 @@ class CDCSVGDisplayModule(Module):
                 styleDict = {'stroke-width': '0.5',
                              'stroke': MCParticleColorMap()}
                     # 'stroke-opacity': '0.5',
+
+                plotter.append(cdchit_storearray, **styleDict)
+
+        # Draw the in track segment id
+        if self.draw_mcsegments:
+            print 'Drawing the MC Segments'
+            cdchits_storearray = Belle2.PyStoreArray('CDCHits')
+
+            if cdchit_storearray:
+                print '#CDCHits', cdchit_storearray.getEntries(), \
+                    'colored with the mc in track segment id'
+
+                styleDict = {'stroke-width': '0.5',
+                             'stroke': MCSegmentIdColorMap()}
 
                 plotter.append(cdchit_storearray, **styleDict)
 
@@ -416,7 +469,7 @@ class CDCSVGDisplayModule(Module):
                 # plotter.append(simhits_storearray, **styleDict)
                 plotter.append(simhits_related_to_cdchit, **styleDict)
 
-    # Draw RL MC info
+        # Draw RL MC info
         if self.draw_rlinfo:
             print 'Drawing Monte Carlo right left information of the wirehits'
             cdchits_storearray = Belle2.PyStoreArray('CDCHits')
@@ -428,7 +481,7 @@ class CDCSVGDisplayModule(Module):
 
                 plotter.append(cdchits_storearray, **styleDict)
 
-    # Draw tof info
+        # Draw tof info
         if self.draw_tof:
             print 'Drawing time of flight of the hits'
             hit_collection = Belle2.PyStoreArray('CDCHits')
@@ -442,7 +495,7 @@ class CDCSVGDisplayModule(Module):
 
                 plotter.append(hit_collection, **styleDict)
 
-     # Draw the reassignment information of hits
+        # Draw the reassignment information of hits
         if self.draw_reassigned:
             print 'Drawing reassignment information of the hits'
             hit_collection = Belle2.PyStoreArray('CDCHits')
@@ -455,7 +508,7 @@ class CDCSVGDisplayModule(Module):
 
                 plotter.append(hit_collection, **styleDict)
 
-    # Draw mc vertices
+        # Draw mc vertices
         if self.draw_mcvertices:
             print 'Drawing Monte Carlo vertices of the cdc hits'
             wirehit_collection_storeobj = \

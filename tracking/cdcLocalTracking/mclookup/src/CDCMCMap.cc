@@ -53,8 +53,8 @@ void CDCMCMap::clear()
 
   m_simHitByHit.clear();
 
-  //m_mcParticlesByHit.clear();
-  //m_mcParticlesBySimHit.clear();
+  m_mcParticlesByHit.clear();
+  m_mcParticlesBySimHit.clear();
 
   m_reassignedSecondaryHits.clear();
   m_reassignedSecondaryHits.clear();
@@ -66,118 +66,30 @@ void CDCMCMap::clear()
 void CDCMCMap::fill()
 {
 
-  fillHitToSimHitMap();
+  B2DEBUG(100, "In CDCMCMap::fill()");
+  clear();
+
+  fillSimHitByHitMap();
+  fillMCParticleByHitMap();
+  fillMCParticleBySimHitMap();
+
+  validateRelations();
+  validateReassignedSecondaries();
 
 
-  /* B2DEBUG(100, "In CDCMCMap::fill()"); */
-  /* clear(); */
+  B2INFO("m_simHitByHit.size(): " << m_simHitByHit.size());
 
-  /* const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance(); */
+  B2INFO("m_mcParticlesByHit.size(): " << m_mcParticlesByHit.size());
+  B2INFO("m_mcParticlesBySimHit.size(): " << m_mcParticlesBySimHit.size());
 
-  /* std::vector< std::pair<int, int> > mcParticleIdx_simHitTrackId_pairs; */
-
-  /* for (const CDCWireHit & wireHit : wireHitTopology.getWireHits()) { */
-
-  /*   const CDCHit* ptrHit = wireHit.getHit(); */
-  /*   if (not ptrHit) { */
-  /*     B2ERROR("CDCWireHit has no containing CDCHit in CDCMCMap::fill()"); */
-  /*     continue; */
-  /*   } */
-  /*   const CDCHit& hit = *ptrHit; */
-
-
-
-  /*   const CDCSimHit* ptrSimHit = hit.getRelated<CDCSimHit>(); */
-  /*   if (not ptrSimHit) { */
-  /*     B2ERROR("CDCHit has no related CDCSimHit in CDCMCMap::fill()"); */
-  /*     continue; */
-  /*   } */
-  /*   const CDCSimHit& simHit = *ptrSimHit; */
-
-
-
-  /*   const RelationVector<MCParticle> mcParticles = hit.getRelationsWith<MCParticle>(); */
-
-  /*   if (mcParticles.size() > 1) { */
-  /*     B2ERROR("CDCHit has more than one related MCParticle in CDCMCMap::fill()"); */
-  /*     continue; */
-  /*   } else if (mcParticles.size() == 0) { */
-  /*     //CDCHit is background */
-  /*     //Check if background flag is set */
-  /*     if (simHit.getBackgroundTag() == CDCSimHit::bg_none) { */
-  /*       B2ERROR("CDCHit has no MCParticle but the related CDCSimHit is not marked as background."); */
-  /*     } */
-  /*     continue; //for CDCWireHit */
-  /*   } */
-  /*   const MCParticle* ptrMCParticle = mcParticles.object(0); */
-  /*   const MCParticle& mcParticle = *ptrMCParticle; */
-  /*   double mcRelationWeight = mcParticles.weight(0); */
-
-
-
-  /*   const RelationVector<MCParticle> mcParticlesFromSimHit = simHit.getRelationsWith<MCParticle>(); */
-
-  /*   if (mcParticlesFromSimHit.size() > 1) { */
-  /*     B2ERROR("CDCSimHit has more than one related MCParticle in CDCMCMap::fill()"); */
-  /*     continue; */
-
-  /*   } else if (mcParticlesFromSimHit.size() == 0) { */
-  /*     B2ERROR("CDCSimHit has no related MCParticle but the CDCHit as a related MCParticle in CDCMCMap::fill()"); */
-  /*     continue; */
-
-  /*   } */
-  /*   const MCParticle* ptrMCParticleFromSimHit = mcParticlesFromSimHit.object(0); */
-  /*   double mcRelationWeightFromSimHit =  mcParticlesFromSimHit.weight(0); */
-
-  /*   if (ptrMCParticle != ptrMCParticleFromSimHit) { */
-  /*     B2ERROR("MCParticle from CDCSimHit and CDCHit mismatch in CDCMCMap::fill()"); */
-  /*     continue; */
-  /*   } */
-
-  /*   if (mcRelationWeight != mcRelationWeightFromSimHit) { */
-  /*     B2WARNING("The relation weights from SimHit and CDCHit to MCParticle mismatch in CDCMCMap::fill()"); */
-  /*     B2WARNING("mcRelationWeight: " << mcRelationWeight); */
-  /*     B2WARNING("mcRelationWeightFromSimHit: " << mcRelationWeightFromSimHit); */
-  /*     if (mcRelationWeight * mcRelationWeightFromSimHit < 0) { */
-  /*       B2ERROR("The relation weights from SimHit and CDCHit to MCParticle have mismatching signs in CDCMCMap::fill()"); */
-  /*       continue; */
-  /*     } */
-  /*   } */
-
-
-
-  /*   int mcParticleIdx = mcParticle.getArrayIndex(); */
-
-  /*   int simHitTrackId = simHit.getTrackId(); */
-  /*   mcParticleIdx_simHitTrackId_pairs.emplace_back(simHitTrackId, mcParticleIdx); */
-
-  /*   //Also consider */
-  /*   //getStatus, getSecondaryPhysicsProcess */
-  /*   //for additional information */
-
-  /* } //end for wire hits */
-
-
-
-  /* // Look at the relation of the MCParticle::getArrayIndex() and CDCSimHit::getTrackId() */
-  /* std::sort(mcParticleIdx_simHitTrackId_pairs.begin(), mcParticleIdx_simHitTrackId_pairs.end()); */
-
-  /* mcParticleIdx_simHitTrackId_pairs.erase( */
-  /*   std::unique(mcParticleIdx_simHitTrackId_pairs.begin(), */
-  /*               mcParticleIdx_simHitTrackId_pairs.end()), */
-  /*   mcParticleIdx_simHitTrackId_pairs.end()); */
-
-  /* for (const pair<int, int> mcParticleIdx_simHitTrackId_pair : mcParticleIdx_simHitTrackId_pairs) { */
-
-  /*   B2DEBUG(100, "mcParticleIdx <-> simHitTrackId: " <<  mcParticleIdx_simHitTrackId_pair.first << " <-> " << mcParticleIdx_simHitTrackId_pair.second); */
-
-  /* } */
+  B2INFO("m_reassignedSecondaryHits.size(): " << m_reassignedSecondaryHits.size());
+  B2INFO("m_reassignedSecondarySimHits.size(): " << m_reassignedSecondarySimHits.size());
 
 }
 
 
 
-void CDCMCMap::fillHitToSimHitMap()
+void CDCMCMap::fillSimHitByHitMap()
 {
 
   StoreArray<CDCSimHit> simHits;
@@ -219,7 +131,7 @@ void CDCMCMap::fillHitToSimHitMap()
     const CDCHit* ptrHit = &hit;
 
     if (m_simHitByHit.by<CDCHit>().count(ptrHit) == 0) {
-      B2ERROR("CDCHit has no related CDCSimHit in CDCMCMap::fill()");
+      B2WARNING("CDCHit has no related CDCSimHit in CDCMCMap::fill()");
     };
 
   }
@@ -228,40 +140,149 @@ void CDCMCMap::fillHitToSimHitMap()
 
 
 
-/*
-for (const CDCWireHit & wirehit : wirehits) {
-size_t iStoredHit = wirehit.getStoreIHit();
 
-bool found = false;
-for (int iRelation = 0; iRelation < nRelation and not found; ++iRelation) {
-  const RelationElement& relationElement = simhitsToHitsRelation[iRelation];
 
-      if (relationElement.getSize() > 1)
-        B2WARNING("Rework CDCMCLookUp! CDCSimHits to CDCHit correspondence is not unique. ( Maybe double hit semantics have been introduced  ?)");
 
-      RelationElement::index_type iStoredHitInRelation = relationElement.getToIndex(0);
-      if (iStoredHitInRelation == iStoredHit) {
-        found = true;
-        RelationElement::index_type iStoredSimHit = relationElement.getFromIndex();
-        CDCSimHit* simHit = storedSimhits[iStoredSimHit];
+void CDCMCMap::fillMCParticleByHitMap()
+{
 
-        addSimHit(&wirehit, simHit, iStoredSimHit);
+  StoreArray<MCParticle> mcParticles;
+  StoreArray<CDCHit> hits;
 
-        // We use both time of flight and index of the stored simhit
-        // There used to be simhits that had the same time of flight to them
-        // So the only way to distinguish the order of their occurance was by the index
-        // in their StoreArray
-        FlightTimeAndIndex flightTimeAndIndex(simHit->getFlightTime(), iStoredSimHit);
-        m_timeSortedWireHits[flightTimeAndIndex] = &wirehit;
+  RelationArray mcParticleToHitsRelations(mcParticles, hits);
 
+  //Pickup an iterator for hinted insertion
+  MCParticleByCDCHitMap::iterator itInsertHint = m_mcParticlesByHit.end();
+
+  for (const RelationElement & mcParticleToHitsRelation : mcParticleToHitsRelations) {
+
+    RelationElement::index_type iMCParticle = mcParticleToHitsRelation.getFromIndex();
+    const MCParticle* ptrMCParticle = mcParticles[iMCParticle];
+
+    size_t nRelatedHits = mcParticleToHitsRelation.getSize();
+    for (size_t iRelation = 0; iRelation < nRelatedHits; ++iRelation) {
+
+      RelationElement::index_type iHit = mcParticleToHitsRelation.getToIndex(iRelation);
+      RelationElement::weight_type weight = mcParticleToHitsRelation.getWeight(iRelation);
+
+      const CDCHit* ptrHit = hits[iHit];
+
+      if (m_mcParticlesByHit.by<CDCHit>().count(ptrHit) != 0) {
+        B2WARNING("CDCHit as more than one related MCParticle - reorganize the mapping");
       }
-    } // end for iRelation
 
-    if (found == false) {
-      B2WARNING("No CDCSimHit found for the give CDCHit");
-      std::cin >> found;
+      if (indicatesReassignedSecondary(weight)) {
+        m_reassignedSecondaryHits.insert(ptrHit);
+      }
+
+      itInsertHint = m_mcParticlesByHit.insert(itInsertHint, MCParticleByCDCHitMap::value_type(ptrHit, ptrMCParticle));
+
     }
 
-  } // end for itWireHit
+  }
 
-  }*/
+  //Check if every hit has a corresponding MCParticle
+  //Only exception is, if the hit is background.
+  for (const CDCHit & hit : hits) {
+    const CDCHit* ptrHit = &hit;
+
+    if (m_mcParticlesByHit.by<CDCHit>().count(ptrHit) == 0 and not isBackground(ptrHit)) {
+      B2WARNING("CDCHit has no related MCParticle but CDCSimHit indicates that it is no background in CDCMCMap::fill()");
+    };
+
+  }
+
+}
+
+
+
+void CDCMCMap::fillMCParticleBySimHitMap()
+{
+
+  StoreArray<MCParticle> mcParticles;
+  StoreArray<CDCSimHit> simHits;
+
+  RelationArray mcParticleToSimHitsRelations(mcParticles, simHits);
+
+  //Pickup an iterator for hinted insertion
+  MCParticleByCDCSimHitMap::iterator itInsertHint = m_mcParticlesBySimHit.end();
+
+  for (const RelationElement & mcParticleToSimHitsRelation : mcParticleToSimHitsRelations) {
+
+    RelationElement::index_type iMCParticle = mcParticleToSimHitsRelation.getFromIndex();
+    const MCParticle* ptrMCParticle = mcParticles[iMCParticle];
+
+    size_t nRelatedHits = mcParticleToSimHitsRelation.getSize();
+    for (size_t iRelation = 0; iRelation < nRelatedHits; ++iRelation) {
+
+      RelationElement::index_type iSimHit = mcParticleToSimHitsRelation.getToIndex(iRelation);
+      RelationElement::weight_type weight = mcParticleToSimHitsRelation.getWeight(iRelation);
+
+      const CDCSimHit* ptrSimHit = simHits[iSimHit];
+
+      if (m_mcParticlesBySimHit.by<CDCSimHit>().count(ptrSimHit) != 0) {
+        B2WARNING("CDCSimHit as more than one related MCParticle - reorganize the mapping");
+      }
+
+      if (indicatesReassignedSecondary(weight)) {
+        m_reassignedSecondarySimHits.insert(ptrSimHit);
+      }
+
+      itInsertHint = m_mcParticlesBySimHit.insert(itInsertHint, MCParticleByCDCSimHitMap::value_type(ptrSimHit, ptrMCParticle));
+
+    }
+
+  }
+
+  //Check if every hit has a corresponding MCParticle
+  //Only exception is, if the hit is background.
+  for (const CDCSimHit & simHit : simHits) {
+    const CDCSimHit* ptrSimHit = &simHit;
+
+    if (m_mcParticlesBySimHit.by<CDCSimHit>().count(ptrSimHit) == 0 and not isBackground(ptrSimHit)) {
+      B2WARNING("CDCSimHit has no related MCParticle but CDCSimHit indicates that it is no background in CDCMCMap::fill()");
+    };
+
+  }
+
+}
+
+
+
+void CDCMCMap::validateRelations() const
+{
+
+  StoreArray<CDCHit> hits;
+
+  for (const CDCHit & hit : hits) {
+    const CDCHit* ptrHit = &hit;
+
+
+    const CDCSimHit* ptrSimHit = getSimHit(ptrHit);
+    const MCParticle* ptrMCParticle = getMCParticle(ptrHit);
+
+    const MCParticle* ptrMCParticleFromSimHit = getMCParticle(ptrSimHit);
+
+    if (ptrMCParticle != ptrMCParticleFromSimHit) {
+      B2WARNING("MCParticle from CDCHit and MCParticle from related CDCSimHit mismatch in CDCMCMap::validateRelations()");
+    }
+
+
+  }
+}
+
+
+
+void CDCMCMap::validateReassignedSecondaries() const
+{
+
+  for (const CDCHit * ptrHit : m_reassignedSecondaryHits) {
+
+    const CDCSimHit* ptrSimHit = getSimHit(ptrHit);
+    if (not isReassignedSecondary(ptrSimHit)) {
+      B2WARNING("CDCHit is reassigned secondary but related CDCSimHit is not.");
+    }
+
+  }
+
+}

@@ -11,19 +11,16 @@
 #ifndef MCAXIALAXIALSEGMENTPAIRFILTER_H_
 #define MCAXIALAXIALSEGMENTPAIRFILTER_H_
 
-#include <tracking/cdcLocalTracking/typedefs/UsedDataHolders.h>
+#include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
 
-#include <tracking/cdcLocalTracking/fitting/CDCRiemannFitter.h>
-#include <tracking/cdcLocalTracking/fitting/CDCSZFitter.h>
-
-#include "boost/tuple/tuple.hpp"
-#include "boost/tuple/tuple_comparison.hpp"
+#include <tracking/cdcLocalTracking/mockroot/MockRoot.h>
+#include <tracking/cdcLocalTracking/eventdata/tracks/CDCAxialAxialSegmentPair.h>
 
 namespace Belle2 {
   namespace CDCLocalTracking {
 
     /// Filter for the constuction of axial to axial segment pairs based on simple criterions
-    class MCAxialAxialSegmentPairFilter {
+    class MCAxialAxialSegmentPairFilter : public UsedTObject {
 
     public:
 
@@ -39,10 +36,11 @@ namespace Belle2 {
       void clear();
 
       /// Checks if a pair of axial segments is a good combination
-      CellWeight isGoodAxialAxialSegmentPair(const CDCAxialAxialSegmentPair& axialAxialSegmentPair, bool allowBackward = false);
+      CellWeight isGoodAxialAxialSegmentPair(const Belle2::CDCLocalTracking::CDCAxialAxialSegmentPair& axialAxialSegmentPair, bool allowBackward = false);
 
     private:
-
+      /// ROOT Macro to make MCAxialAxialSegmentPairFilter a ROOT class.
+      ClassDefInCDCLocalTracking(MCAxialAxialSegmentPairFilter, 1);
 
     }; // end class MCAxialAxialSegmentPairFilter
 

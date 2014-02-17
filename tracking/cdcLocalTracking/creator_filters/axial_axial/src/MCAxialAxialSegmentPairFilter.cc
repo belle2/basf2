@@ -12,10 +12,11 @@
 
 #include <framework/logging/Logger.h>
 
-#include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
 #include <tracking/cdcLocalTracking/typedefs/BasicConstants.h>
 
 #include <tracking/cdcLocalTracking/mclookup/CDCMCSegmentLookUp.h>
+
+#include <tracking/cdcLocalTracking/fitting/CDCRiemannFitter.h>
 
 using namespace std;
 using namespace Belle2;

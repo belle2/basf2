@@ -11,15 +11,16 @@
 #define CDCSIMHITLOOKUP_H
 
 #include <tracking/cdcLocalTracking/mockroot/MockRoot.h>
-#include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
+#include <tracking/cdcLocalTracking/typedefs/InfoTypes.h>
 
-#include <tracking/cdcLocalTracking/eventdata/entities/CDCWireHit.h>
+#include <tracking/cdcLocalTracking/geometry/Vector3D.h>
+
+#include <tracking/cdcLocalTracking/mclookup/CDCMCMap.h>
 
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/dataobjects/CDCSimHit.h>
 
 #include <map>
-
 
 namespace Belle2 {
   namespace CDCLocalTracking {
@@ -31,7 +32,7 @@ namespace Belle2 {
      *  to collect an manage localised information about each hit such as the local direction of travel and said
      *  left right passage information.
      */
-    class CDCSimHitLookUp : public UsedTObject {
+    class CDCSimHitLookUp {
 
     public:
       /// Default constructor
@@ -41,15 +42,11 @@ namespace Belle2 {
       ~CDCSimHitLookUp();
 
     public:
-      /// Getter for the singletone instance
-      static CDCSimHitLookUp& getInstance();
-
-    public:
       /// Clear all information from the last event
       void clear();
 
       /// Gather the information about the right left passage using the CDCMCMap
-      void fill();
+      void fill(const CDCMCMap* ptrMCMap);
 
     private:
       /// Constructs the relation from reassigned secondary to a close by primary hit from the same MCParticle
@@ -74,6 +71,9 @@ namespace Belle2 {
       RightLeftInfo getRLInfo(const CDCHit* ptrHit) const;
 
     private:
+      /// Reference to the CDCMCMap to be used in this event
+      const CDCMCMap* m_ptrMCMap;
+
       /// Memory for the look up relation of close primary CDCSimHits
       std::map<const CDCHit*, const CDCSimHit*>  m_primarySimHits;
 

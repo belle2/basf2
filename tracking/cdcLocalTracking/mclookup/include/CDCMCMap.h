@@ -24,7 +24,7 @@ namespace Belle2 {
     ///Class to organize and present the monte carlo hit information
     class CDCMCMap {
 
-    private:
+    public:
 
       /// Type for a one to one relation form CDCHits to CDCSimHits
       typedef
@@ -33,8 +33,12 @@ namespace Belle2 {
             boost::bimaps::set_of< boost::bimaps::tagged<const CDCSimHit*, CDCSimHit> >
             > CDCSimHitByCDCHitMap;
 
+    public:
+      /// Type which is returned by MCParticleByCDCHitMap the in a range based for loop
+      typedef CDCSimHitByCDCHitMap::value_type CDCSimHitByCDCHitRelation;
 
 
+    public:
       /// Type for a one to n relation form CDCHits to MCParticles
       typedef
       boost::bimaps::bimap <
@@ -56,6 +60,12 @@ namespace Belle2 {
 
 
 
+      /// Type which is returned by MCParticleByCDCHitMap the in a range based for loop
+      typedef MCParticleByCDCHitMap::value_type MCParticleByCDCHitRelation;
+
+
+
+
       /// Type for a one to n relation form CDCSimHits to MCParticles
       typedef
       boost::bimaps::bimap <
@@ -63,7 +73,7 @@ namespace Belle2 {
             boost::bimaps::multiset_of< boost::bimaps::tagged<const MCParticle*, MCParticle> >
             > MCParticleByCDCSimHitMap;
 
-    private:
+    public:
       /// Iterator type for an iteration over several CDCSimHit <-> MCParticle relations as view from the MCParticle side.
       typedef MCParticleByCDCSimHitMap::map_by<MCParticle>::const_iterator CDCSimHitByMCParticleRelationIterator;
 
@@ -76,6 +86,11 @@ namespace Belle2 {
 
 
 
+      /// Type which is returned by MCParticleByCDCSimHitMap the in a range based for loop
+      typedef MCParticleByCDCSimHitMap::value_type MCParticleByCDCSimHitRelation;
+
+
+
     public:
       /// Empty constructor
       CDCMCMap();
@@ -85,11 +100,6 @@ namespace Belle2 {
 
       /// Delete the assignement operator in order to avoid accidental copies.
       CDCMCMap& operator=(const CDCMCMap&) = delete;
-
-    public:
-
-      /// Getter for the singletone instance of the CDCMCMap
-      static CDCMCMap& getInstance();
 
     public:
 
@@ -162,8 +172,6 @@ namespace Belle2 {
       //{ return simHit ? simHit->getRelated<MCParticle>() : nullptr; }
 
 
-
-
       /// Getter for the range MCParticle to CDCSimHits relations which come from the given MCParticle
       CDCSimHitByMCParticleRelationRange getSimHits(const MCParticle* mcParticle) const
       { return CDCSimHitByMCParticleRelationRange(m_mcParticlesBySimHit.by<MCParticle>().equal_range(mcParticle)); }
@@ -193,6 +201,20 @@ namespace Belle2 {
       /// Getter for all reassigned secondary CDCSimHits.
       const std::set<const CDCSimHit*>& getReassignedSecondarySimHits() const
       { return m_reassignedSecondarySimHits; }
+
+
+
+      /// Getter for the CDCHit <-> MCParticle relations.
+      const CDCSimHitByCDCHitMap& getSimHitByHitRelations() const
+      { return m_simHitByHit; }
+
+      /// Getter for the CDCHit <-> MCParticle relations.
+      const MCParticleByCDCHitMap& getMCParticleByHitRelations() const
+      { return m_mcParticlesByHit; }
+
+      /// Getter for the CDCSimHit <-> MCParticle relations.
+      const MCParticleByCDCSimHitMap& getMCParticleBySimHitRelations() const
+      { return m_mcParticlesBySimHit; }
 
     private:
 

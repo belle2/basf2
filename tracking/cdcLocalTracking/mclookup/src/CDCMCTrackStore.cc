@@ -10,15 +10,12 @@
 
 #include "../include/CDCMCTrackStore.h"
 
-#include <tracking/cdcLocalTracking/mclookup/CDCMCMap.h>
-
-#include <framework/datastore/StoreArray.h>
-
 #include <tracking/cdcLocalTracking/algorithms/WeightedNeighborhood.h>
 #include <tracking/cdcLocalTracking/algorithms/Clusterizer.h>
 
 #include <tracking/cdcLocalTracking/topology/CDCWireTopology.h>
 
+#include <cdc/dataobjects/CDCHit.h>
 #include <cdc/dataobjects/CDCSimHit.h>
 #include <mdst/dataobjects/MCParticle.h>
 
@@ -26,14 +23,6 @@
 using namespace std;
 using namespace Belle2;
 using namespace CDCLocalTracking;
-
-ClassImpInCDCLocalTracking(CDCMCTrackStore)
-
-namespace {
-  CDCMCTrackStore* g_mcTrackStore = nullptr;
-}
-
-
 
 CDCMCTrackStore::CDCMCTrackStore()
 {
@@ -47,16 +36,10 @@ CDCMCTrackStore::~CDCMCTrackStore()
 
 
 
-CDCMCTrackStore& CDCMCTrackStore::getInstance()
-{
-  if (not g_mcTrackStore) g_mcTrackStore = new CDCMCTrackStore;
-  return *g_mcTrackStore;
-}
-
-
-
 void CDCMCTrackStore::clear()
 {
+
+  m_ptrMCMap = nullptr;
 
   m_mcTracksByMCParticleIdx.clear();
   m_mcSegmentsByMCParticleIdx.clear();
@@ -69,11 +52,13 @@ void CDCMCTrackStore::clear()
 
 
 
-void CDCMCTrackStore::fill()
+void CDCMCTrackStore::fill(const CDCMCMap* ptrMCMap)
 {
 
   B2DEBUG(200, "In CDCMCTrackStore::fill()");
   clear();
+
+  m_ptrMCMap = ptrMCMap;
 
   // Put the right hits into the rigth track
   fillMCTracks();
@@ -103,15 +88,18 @@ void CDCMCTrackStore::fill()
 void CDCMCTrackStore::fillMCTracks()
 {
 
-  StoreArray<CDCHit> hits;
+  //StoreArray<CDCHit> hits;
+  if (not m_ptrMCMap) {
+    B2WARNING("CDCMCMap not set. Cannot create tracks");
+    return;
+  }
 
-  CDCMCMap& mcMap = CDCMCMap::getInstance();
+  const CDCMCMap& mcMap = *m_ptrMCMap;
 
-  for (const CDCHit & hit : hits) {
+  for (const CDCMCMap::MCParticleByCDCHitRelation & relation : mcMap.getMCParticleByHitRelations()) {
 
-    const CDCHit* ptrHit = &hit;
-
-    const MCParticle* ptrMCParticle = mcMap.getMCParticle(ptrHit);
+    const CDCHit* ptrHit = relation.get<CDCHit>();
+    const MCParticle* ptrMCParticle = relation.get<MCParticle>();
 
     if (not mcMap.isBackground(ptrHit) and ptrMCParticle) {
 
@@ -184,9 +172,13 @@ void CDCMCTrackStore::fillMCSegments()
 
 void CDCMCTrackStore::arrangeMCTrack(CDCHitVector& mcTrack) const
 {
+  if (not m_ptrMCMap) {
+    B2WARNING("CDCMCMap not set. Cannot sort track");
+    return;
+  }
+  const CDCMCMap& mcMap = *m_ptrMCMap;
 
-  std::sort(mcTrack.begin(), mcTrack.end(), [this](const CDCHit * ptrHit, const CDCHit * ptrOtherHit) -> bool {
-    const  CDCMCMap& mcMap = CDCMCMap::getInstance();
+  std::sort(mcTrack.begin(), mcTrack.end(), [&mcMap](const CDCHit * ptrHit, const CDCHit * ptrOtherHit) -> bool {
 
     const CDCSimHit* ptrSimHit = mcMap.getSimHit(ptrHit);
     const CDCSimHit* ptrOtherSimHit = mcMap.getSimHit(ptrOtherHit);
@@ -206,6 +198,7 @@ void CDCMCTrackStore::arrangeMCTrack(CDCHitVector& mcTrack) const
     //(primaryFlightTime == otherPrimaryFlightTime and
     //secondaryFlightTime < otherSecondaryFlightTime);
   });
+
 }
 
 

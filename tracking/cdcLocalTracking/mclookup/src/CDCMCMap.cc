@@ -10,7 +10,6 @@
 
 #include "../include/CDCMCMap.h"
 
-#include <framework/datastore/RelationVector.h>
 #include <tracking/cdcLocalTracking/topology/CDCWireTopology.h>
 
 #include <framework/datastore/StoreArray.h>
@@ -20,14 +19,6 @@ using namespace std;
 using namespace Belle2;
 using namespace CDCLocalTracking;
 
-//ClassImpInCDCLocalTracking(CDCMCMap)
-
-namespace {
-  CDCMCMap* g_mcMap = nullptr;
-}
-
-
-
 CDCMCMap::CDCMCMap()
 {
 }
@@ -36,14 +27,6 @@ CDCMCMap::CDCMCMap()
 
 CDCMCMap::~CDCMCMap()
 {
-}
-
-
-
-CDCMCMap& CDCMCMap::getInstance()
-{
-  if (not g_mcMap) g_mcMap = new CDCMCMap;
-  return *g_mcMap;
 }
 
 

@@ -60,7 +60,9 @@ namespace Belle2 {
       ~CDCWireHit();
 
     public:
-
+      /// Make the wire hit automatically castable to its underlying cdcHit
+      operator const Belle2::CDCHit* () const
+      { return m_hit; }
 
       /// Equality comparision based the wire and the hit id.
       bool operator==(const CDCWireHit& other) const

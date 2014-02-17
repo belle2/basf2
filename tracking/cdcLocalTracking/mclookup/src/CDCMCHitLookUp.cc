@@ -10,18 +10,13 @@
 
 #include "../include/CDCMCHitLookUp.h"
 
-#include <framework/datastore/RelationVector.h>
-#include <tracking/cdcLocalTracking/topology/CDCWireTopology.h>
-
-#include <framework/datastore/StoreArray.h>
-
-#include <tracking/cdcLocalTracking/mclookup/CDCMCMap.h>
+#include <tracking/cdcLocalTracking/mclookup/CDCMCManager.h>
 
 using namespace std;
 using namespace Belle2;
 using namespace CDCLocalTracking;
 
-//ClassImpInCDCLocalTracking(CDCMCHitLookUp)
+ClassImpInCDCLocalTracking(CDCMCHitLookUp)
 
 namespace {
   CDCMCHitLookUp* g_mcHitLookUp = nullptr;
@@ -49,193 +44,72 @@ CDCMCHitLookUp& CDCMCHitLookUp::getInstance()
 
 
 
-void CDCMCHitLookUp::clear()
+const Belle2::CDCSimHit* CDCMCHitLookUp::getSimHit(const CDCHit* ptrHit) const
 {
-
+  return CDCMCManager::getMCMap().getSimHit(ptrHit);
 }
 
 
 
-void CDCMCHitLookUp::fill()
+const Belle2::MCParticle* CDCMCHitLookUp::getMCParticle(const CDCHit* ptrHit) const
 {
-
-  B2DEBUG(100, "In CDCMCHitLookUp::fill()");
-  clear();
-
-  const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
-
-  std::vector< std::pair<int, int> > mcParticleIdx_simHitTrackId_pairs;
-
-  for (const CDCWireHit & wireHit : wireHitTopology.getWireHits()) {
-
-    const CDCHit* ptrHit = wireHit.getHit();
-    if (not ptrHit) {
-      B2ERROR("CDCWireHit has no containing CDCHit in CDCMCHitLookUp::fill()");
-      continue;
-    }
-    const CDCHit& hit = *ptrHit;
-
-
-
-    const CDCSimHit* ptrSimHit = hit.getRelated<CDCSimHit>();
-    if (not ptrSimHit) {
-      B2ERROR("CDCHit has no related CDCSimHit in CDCMCHitLookUp::fill()");
-      continue;
-    }
-    const CDCSimHit& simHit = *ptrSimHit;
-
-
-
-    const RelationVector<MCParticle> mcParticles = hit.getRelationsWith<MCParticle>();
-
-    if (mcParticles.size() > 1) {
-      B2ERROR("CDCHit has more than one related MCParticle in CDCMCHitLookUp::fill()");
-      continue;
-    } else if (mcParticles.size() == 0) {
-      //CDCHit is background
-      //Check if background flag is set
-      if (simHit.getBackgroundTag() == CDCSimHit::bg_none) {
-        B2ERROR("CDCHit has no MCParticle but the related CDCSimHit is not marked as background.");
-      }
-      continue; //for CDCWireHit
-    }
-    const MCParticle* ptrMCParticle = mcParticles.object(0);
-    const MCParticle& mcParticle = *ptrMCParticle;
-    double mcRelationWeight = mcParticles.weight(0);
-
-
-
-    const RelationVector<MCParticle> mcParticlesFromSimHit = simHit.getRelationsWith<MCParticle>();
-
-    if (mcParticlesFromSimHit.size() > 1) {
-      B2ERROR("CDCSimHit has more than one related MCParticle in CDCMCHitLookUp::fill()");
-      continue;
-
-    } else if (mcParticlesFromSimHit.size() == 0) {
-      B2ERROR("CDCSimHit has no related MCParticle but the CDCHit as a related MCParticle in CDCMCHitLookUp::fill()");
-      continue;
-
-    }
-    const MCParticle* ptrMCParticleFromSimHit = mcParticlesFromSimHit.object(0);
-    double mcRelationWeightFromSimHit =  mcParticlesFromSimHit.weight(0);
-
-    if (ptrMCParticle != ptrMCParticleFromSimHit) {
-      B2ERROR("MCParticle from CDCSimHit and CDCHit mismatch in CDCMCHitLookUp::fill()");
-      continue;
-    }
-
-    if (mcRelationWeight != mcRelationWeightFromSimHit) {
-      B2WARNING("The relation weights from SimHit and CDCHit to MCParticle mismatch in CDCMCHitLookUp::fill()");
-      B2WARNING("mcRelationWeight: " << mcRelationWeight);
-      B2WARNING("mcRelationWeightFromSimHit: " << mcRelationWeightFromSimHit);
-      if (mcRelationWeight * mcRelationWeightFromSimHit < 0) {
-        B2ERROR("The relation weights from SimHit and CDCHit to MCParticle have mismatching signs in CDCMCHitLookUp::fill()");
-        continue;
-      }
-    }
-
-
-
-    int mcParticleIdx = mcParticle.getArrayIndex();
-
-    int simHitTrackId = simHit.getTrackId();
-    mcParticleIdx_simHitTrackId_pairs.emplace_back(simHitTrackId, mcParticleIdx);
-
-    //Also consider
-    //getStatus, getSecondaryPhysicsProcess
-    //for additional information
-
-  } //end for wire hits
-
-
-
-  // Look at the relation of the MCParticle::getArrayIndex() and CDCSimHit::getTrackId()
-  std::sort(mcParticleIdx_simHitTrackId_pairs.begin(), mcParticleIdx_simHitTrackId_pairs.end());
-
-  mcParticleIdx_simHitTrackId_pairs.erase(
-    std::unique(mcParticleIdx_simHitTrackId_pairs.begin(),
-                mcParticleIdx_simHitTrackId_pairs.end()),
-    mcParticleIdx_simHitTrackId_pairs.end());
-
-  for (const pair<int, int> mcParticleIdx_simHitTrackId_pair : mcParticleIdx_simHitTrackId_pairs) {
-
-    B2DEBUG(100, "mcParticleIdx <-> simHitTrackId: " <<  mcParticleIdx_simHitTrackId_pair.first << " <-> " << mcParticleIdx_simHitTrackId_pair.second);
-
-  }
-
+  return CDCMCManager::getMCMap().getMCParticle(ptrHit);
 }
 
 
 
-
-bool CDCMCHitLookUp::isReassignedSecondary(const CDCWireHit& wireHit) const
+bool CDCMCHitLookUp::isReassignedSecondary(const CDCHit* ptrHit) const
 {
-  const CDCHit* ptrHit = wireHit.getHit();
-  return CDCMCMap::getInstance().isReassignedSecondary(ptrHit);
+  return CDCMCManager::getMCMap().isReassignedSecondary(ptrHit);
 }
 
 
 
-const CDCSimHit* CDCMCHitLookUp::getClosestPrimarySimHit(const CDCWireHit& wireHit) const
+const CDCSimHit* CDCMCHitLookUp::getClosestPrimarySimHit(const CDCHit* ptrHit) const
 {
-  const CDCHit* hit = wireHit.getHit();
-  return CDCSimHitLookUp::getInstance().getClosestPrimarySimHit(hit);
+  return CDCMCManager::getSimHitLookUp().getClosestPrimarySimHit(ptrHit);
 }
 
 
 
-RightLeftInfo CDCMCHitLookUp::getRLInfo(const CDCWireHit& wireHit) const
+RightLeftInfo CDCMCHitLookUp::getRLInfo(const CDCHit* ptrHit) const
 {
-
-  const CDCHit* hit = wireHit.getHit();
-  return CDCSimHitLookUp::getInstance().getRLInfo(hit);
-
+  return CDCMCManager::getSimHitLookUp().getRLInfo(ptrHit);
 }
 
 
 
-bool CDCMCHitLookUp::isBackground(const CDCWireHit& wireHit) const
+bool CDCMCHitLookUp::isBackground(const CDCHit* ptrHit) const
 {
-  const CDCHit* hit = wireHit.getHit();
-  const CDCSimHit* simHit = hit->getRelated<CDCSimHit>();
-  return simHit->getBackgroundTag() != CDCSimHit::bg_none;
+  const CDCSimHit* ptrSimHit = getSimHit(ptrHit);
+  return ptrSimHit ? ptrSimHit->getBackgroundTag() != CDCSimHit::bg_none : false;
 }
 
 
 
-ITrackType CDCMCHitLookUp::getMCTrackId(const CDCWireHit& wireHit) const
+ITrackType CDCMCHitLookUp::getMCTrackId(const CDCHit* ptrHit) const
 {
-  const CDCHit* hit = wireHit.getHit();
-  const MCParticle* mcParticle = hit->getRelated<MCParticle>();
-  return mcParticle ? mcParticle->getArrayIndex() : INVALID_ITRACK;
+  const MCParticle* ptrMCParticle = getMCParticle(ptrHit);
+  return ptrMCParticle ? ptrMCParticle->getArrayIndex() : INVALID_ITRACK;
 }
 
 
 
-int CDCMCHitLookUp::getInTrackId(const CDCWireHit& wireHit) const
+int CDCMCHitLookUp::getInTrackId(const CDCHit* ptrHit) const
 {
-
-  const CDCHit* hit = wireHit.getHit();
-  return CDCMCTrackStore::getInstance().getInTrackId(hit);
-
+  return CDCMCManager::getMCTrackStore().getInTrackId(ptrHit);
 }
 
 
 
-int CDCMCHitLookUp::getInTrackSegmentId(const CDCWireHit& wireHit) const
+int CDCMCHitLookUp::getInTrackSegmentId(const CDCHit* ptrHit) const
 {
-
-  const CDCHit* hit = wireHit.getHit();
-  return CDCMCTrackStore::getInstance().getInTrackSegmentId(hit);
-
+  return CDCMCManager::getMCTrackStore().getInTrackSegmentId(ptrHit);
 }
 
 
 
-int CDCMCHitLookUp::getNPassedSuperLayers(const CDCWireHit& wireHit) const
+int CDCMCHitLookUp::getNPassedSuperLayers(const CDCHit* ptrHit) const
 {
-
-  const CDCHit* hit = wireHit.getHit();
-  return CDCMCTrackStore::getInstance().getNPassedSuperLayers(hit);
-
+  return CDCMCManager::getMCTrackStore().getNPassedSuperLayers(ptrHit);
 }

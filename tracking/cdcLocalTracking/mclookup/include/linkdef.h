@@ -9,8 +9,7 @@
 
 #ifdef CDCLOCALTRACKING_USE_ROOT
 
-//#pragma link C++ class Belle2::CDCLocalTracking::CDCMCLookUp;
-#pragma link C++ class Belle2::CDCLocalTracking::CDCMCTrackStore;
+#pragma link C++ class Belle2::CDCLocalTracking::CDCMCHitLookUp;
 
 #endif
 

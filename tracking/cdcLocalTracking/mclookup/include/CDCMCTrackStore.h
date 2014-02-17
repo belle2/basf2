@@ -12,6 +12,8 @@
 
 #include <tracking/cdcLocalTracking/mockroot/MockRoot.h>
 
+#include <tracking/cdcLocalTracking/mclookup/CDCMCMap.h>
+
 #include <cdc/dataobjects/CDCHit.h>
 #include <map>
 #include <vector>
@@ -20,7 +22,7 @@ namespace Belle2 {
   namespace CDCLocalTracking {
 
     ///Class to organize and present the monte carlo hit information
-    class CDCMCTrackStore : public UsedTObject {
+    class CDCMCTrackStore {
 
     public:
       /// Type for an ordered sequence of pointers to the CDCHit
@@ -44,7 +46,8 @@ namespace Belle2 {
       /** Fill the store with the tracks from Monte Carlo information.
        *  It uses the CDCMCMap to construct the Monte Carlo tracks.
        */
-      void fill();
+      void fill(const CDCMCMap* ptrMCMap);
+
 
     public:
       /// Getter for the stored Monte Carlo tracks ordered by their Monte Carlo Id
@@ -86,6 +89,9 @@ namespace Belle2 {
       int getNPassedSuperLayers(const CDCHit* hit) const;
 
     private:
+      /// Reference to the MC map of the current event
+      const CDCMCMap* m_ptrMCMap;
+
       /// The memory for the tracks made of CDCHits sorted for the time of flight and assoziated to the Monte Carlo particle id
       std::map<int, CDCHitVector> m_mcTracksByMCParticleIdx;
 
@@ -100,9 +106,6 @@ namespace Belle2 {
 
       /// Look up table for the number of super layers the particle traversed before making the individual hit
       std::map<const CDCHit*, int> m_nPassedSuperLayers;
-
-      /** ROOT Macro to make CDCMCTrackStore a ROOT class.*/
-      ClassDefInCDCLocalTracking(CDCMCTrackStore, 1);
 
     }; //class CDCMCTrackStore
   } // end namespace CDCLocalTracking

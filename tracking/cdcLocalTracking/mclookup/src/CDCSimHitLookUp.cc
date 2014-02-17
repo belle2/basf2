@@ -12,22 +12,11 @@
 
 #include <tracking/cdcLocalTracking/topology/CDCWireTopology.h>
 
-#include <tracking/cdcLocalTracking/mclookup/CDCMCMap.h>
-
-#include <framework/datastore/StoreArray.h>
-
 #include <vector>
 
 using namespace std;
 using namespace Belle2;
 using namespace CDCLocalTracking;
-
-//ClassImpInCDCLocalTracking(CDCSimHitLookUp)
-
-namespace {
-  CDCSimHitLookUp* g_simHitLookUp = nullptr;
-}
-
 
 
 CDCSimHitLookUp::CDCSimHitLookUp()
@@ -41,19 +30,9 @@ CDCSimHitLookUp::~CDCSimHitLookUp()
 }
 
 
-
-CDCSimHitLookUp& CDCSimHitLookUp::getInstance()
-{
-
-  if (not g_simHitLookUp) g_simHitLookUp = new CDCSimHitLookUp;
-  return *g_simHitLookUp;
-
-}
-
-
-
 void CDCSimHitLookUp::clear()
 {
+  m_ptrMCMap = nullptr;
 
   m_primarySimHits.clear();
   m_rightLeftInfos.clear();
@@ -62,11 +41,12 @@ void CDCSimHitLookUp::clear()
 
 
 
-void CDCSimHitLookUp::fill()
+void CDCSimHitLookUp::fill(const CDCMCMap* ptrMCMap)
 {
 
   B2DEBUG(100, "In CDCSimHitLookUp::fill()");
   clear();
+  m_ptrMCMap = ptrMCMap;
 
   fillPrimarySimHits();
   fillRLInfo();
@@ -79,14 +59,18 @@ void CDCSimHitLookUp::fill()
 
 void CDCSimHitLookUp::fillPrimarySimHits()
 {
-  StoreArray<CDCHit> hits;
 
-  const CDCMCMap& mcMap = CDCMCMap::getInstance();
+  if (not m_ptrMCMap) {
+    B2WARNING("CDCMCMap not set. Cannot setup primary sim hit map");
+    return;
+  }
 
-  for (const CDCHit & hit : hits) {
+  const CDCMCMap& mcMap = *m_ptrMCMap;
 
-    const CDCHit* ptrHit = &hit;
-    const CDCSimHit* ptrSimHit = mcMap.getSimHit(ptrHit);
+  for (const CDCMCMap::CDCSimHitByCDCHitRelation & relation : mcMap.getSimHitByHitRelations()) {
+
+    const CDCHit* ptrHit = relation.get<CDCHit>();
+    const CDCSimHit* ptrSimHit = relation.get<CDCSimHit>();
 
     if (not ptrSimHit) {
       B2ERROR("CDCHit has no related CDCSimHit in CDCSimHitLookUp::fill()");
@@ -110,7 +94,12 @@ const CDCSimHit* CDCSimHitLookUp::getClosestPrimarySimHit(const CDCSimHit* ptrSi
   }
   const CDCSimHit& simHit = *ptrSimHit;
 
-  const CDCMCMap& mcMap = CDCMCMap::getInstance();
+  if (not m_ptrMCMap) {
+    B2WARNING("CDCMCMap not set. Cannot find primary sim hit");
+    return nullptr;
+  }
+
+  const CDCMCMap& mcMap = *m_ptrMCMap;
 
   //Check if the CDCSimHit was reassigned from a secondary particle to its primary particle
   if (not mcMap.isReassignedSecondary(ptrSimHit)) {
@@ -174,7 +163,12 @@ const CDCSimHit* CDCSimHitLookUp::getClosestPrimarySimHit(const CDCSimHit* ptrSi
 
 const CDCSimHit* CDCSimHitLookUp::getClosestPrimarySimHit(const CDCHit* ptrHit) const
 {
-  const CDCMCMap& mcMap = CDCMCMap::getInstance();
+  if (not m_ptrMCMap) {
+    B2WARNING("CDCMCMap not set. Look up closest primary sim hit.")
+    return nullptr;
+  }
+  const CDCMCMap& mcMap = *m_ptrMCMap;
+
   if (mcMap.isReassignedSecondary(ptrHit)) {
 
     auto itFoundPrimarySimHit = m_primarySimHits.find(ptrHit);
@@ -192,7 +186,12 @@ Vector3D CDCSimHitLookUp::getDirectionOfFlight(const CDCHit* ptrHit)
 {
   if (not ptrHit) return Vector3D();
 
-  const CDCMCMap& mcMap = CDCMCMap::getInstance();
+  if (not m_ptrMCMap) {
+    B2WARNING("CDCMCMap not set. Cannot find direction of flight");
+    return Vector3D();
+  }
+
+  const CDCMCMap& mcMap = *m_ptrMCMap;
 
   const CDCSimHit* ptrSimHit = mcMap.getSimHit(ptrHit);
 
@@ -219,14 +218,18 @@ Vector3D CDCSimHitLookUp::getDirectionOfFlight(const CDCHit* ptrHit)
 
 void CDCSimHitLookUp::fillRLInfo()
 {
-  StoreArray<CDCHit> hits;
-  const CDCMCMap& mcMap = CDCMCMap::getInstance();
 
-  for (const CDCHit & hit : hits) {
+  if (not m_ptrMCMap) {
+    B2WARNING("CDCMCMap not set. Cannot setup right left passage information map");
+    return;
+  }
+  const CDCMCMap& mcMap = *m_ptrMCMap;
 
-    const CDCHit* ptrHit = &hit;
+  for (const CDCMCMap::CDCSimHitByCDCHitRelation & relation : mcMap.getSimHitByHitRelations()) {
 
-    const CDCSimHit* ptrSimHit = mcMap.getSimHit(ptrHit);
+    const CDCHit* ptrHit = relation.get<CDCHit>();
+    const CDCSimHit* ptrSimHit = relation.get<CDCSimHit>();
+
     if (not ptrSimHit) continue;
     const CDCSimHit& simHit = *ptrSimHit;
 

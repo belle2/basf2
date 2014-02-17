@@ -10,84 +10,67 @@
 #ifndef CDCMCHITLOOKUP_H
 #define CDCMCHITLOOKUP_H
 
-#include <tracking/cdcLocalTracking/eventdata/CDCEventData.h>
-#include <tracking/cdcLocalTracking/eventtopology/CDCWireHitTopology.h>
-#include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
-
+#include <tracking/cdcLocalTracking/typedefs/InfoTypes.h>
 #include <tracking/cdcLocalTracking/mockroot/MockRoot.h>
 
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/dataobjects/CDCSimHit.h>
 #include <mdst/dataobjects/MCParticle.h>
 
-#include <framework/gearbox/Unit.h>
-
-#include "CDCMCTrackStore.h"
-#include "CDCSimHitLookUp.h"
-
-#include <map>
-#include <list>
-#include <vector>
 
 namespace Belle2 {
   namespace CDCLocalTracking {
 
-    ///Class to organize and present the monte carlo hit information
-
+    /// Interface class to the Monte Carlo information for individual hits
+    /** This class provides a stable interface for the underlying implementation for look ups
+     *  into the Monte Carlo informations for the first stage of the algorithm.*/
     class CDCMCHitLookUp : public UsedTObject {
 
     public:
-      /// Type for an ordered sequence of pointers to the CDCHit
-      typedef CDCMCTrackStore::CDCHitVector CDCHitVector;
-
-    public:
+      /// Empty constructor
       CDCMCHitLookUp();
 
+      /// Empty deconstructor
       ~CDCMCHitLookUp();
 
     public:
+      /// Getter for the singletone instance
       static CDCMCHitLookUp& getInstance();
 
     public:
-      void clear();
-      void fill();
+      /// Getter for the CDCSimHit which is related to the CDCHit contained in the given wire hit
+      const Belle2::CDCSimHit* getSimHit(const CDCHit* ptrHit) const;
 
-
-    public:
-      const Belle2::CDCSimHit* getSimHit(const CDCWireHit& wireHit) const {
-        const CDCHit* hit = wireHit.getHit();
-        return hit ? hit->getRelated<CDCSimHit>() : nullptr;
-      }
-
-      const Belle2::MCParticle* getMCParticle(const CDCWireHit& wireHit) const {
-        const CDCHit* hit = wireHit.getHit();
-        return hit ? hit->getRelated<MCParticle>() : nullptr;
-      }
+      /// Getter for the MCParticle which is related to the CDCHit contained in the given wire hit
+      const Belle2::MCParticle* getMCParticle(const CDCHit* ptrHit) const;
 
     public:
       /// Indicates if the hit was reassigned to a different mc particle because it was caused by a secondary.
-      bool isReassignedSecondary(const CDCWireHit& wireHit) const;
+      bool isReassignedSecondary(const CDCHit* ptrHit) const;
 
       /// Getter for the closest simulated hit of a primary particle to the given hit - may return nullptr of no closest is found
-      const CDCSimHit* getClosestPrimarySimHit(const CDCWireHit& wireHit) const;
+      const CDCSimHit* getClosestPrimarySimHit(const CDCHit* ptrHit) const;
 
       /// Returns the track id for the hit
-      ITrackType getMCTrackId(const CDCWireHit& wireHit) const;
+      ITrackType getMCTrackId(const CDCHit* ptrHit) const;
 
       /// Returns if this hit is considered background
-      bool isBackground(const CDCWireHit& wireHit) const;
+      bool isBackground(const CDCHit* ptrHit) const;
 
       /// Returns the position if the wire hit in the track along the travel direction
-      int getInTrackId(const CDCWireHit& wireHit) const;
+      int getInTrackId(const CDCHit* ptrHit) const;
 
       /// Returns the id of the segment in the track.
-      int getInTrackSegmentId(const CDCWireHit& wireHit) const;
+      int getInTrackSegmentId(const CDCHit* ptrHit) const;
 
       /// Returns the number of superlayers the track traversed until this hit.
-      int getNPassedSuperLayers(const CDCWireHit& wireHit) const;
+      int getNPassedSuperLayers(const CDCHit* ptrHit) const;
 
       /// Returns the true right left passage information
-      RightLeftInfo getRLInfo(const CDCWireHit& wireHit) const;
+      RightLeftInfo getRLInfo(const CDCHit* ptrHit) const;
+
+      /// ROOT Macro to make CDCMCHitLookUp a ROOT class.
+      ClassDefInCDCLocalTracking(CDCMCHitLookUp, 1);
 
     }; //class
   } // end namespace CDCLocalTracking

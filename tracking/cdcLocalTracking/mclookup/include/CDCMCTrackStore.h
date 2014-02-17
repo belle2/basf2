@@ -42,7 +42,7 @@ namespace Belle2 {
       void clear();
 
       /** Fill the store with the tracks from Monte Carlo information.
-       *  It uses the data store store to construct the Monte Carlo tracks.
+       *  It uses the CDCMCMap to construct the Monte Carlo tracks.
        */
       void fill();
 
@@ -81,7 +81,6 @@ namespace Belle2 {
 
       /** ROOT Macro to make CDCMCTrackStore a ROOT class.*/
       ClassDefInCDCLocalTracking(CDCMCTrackStore, 1);
-
 
     }; //class CDCMCTrackStore
   } // end namespace CDCLocalTracking

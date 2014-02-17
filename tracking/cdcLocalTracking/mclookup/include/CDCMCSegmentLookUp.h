@@ -59,6 +59,8 @@ namespace Belle2 {
       /// Clears all Monte Carlo information left from the last event
       void clear();
 
+      static const float MinimalMatchEfficiency;
+
     private:
       /// Fill a map with the number of hits for each track id contained in the given hit range.
       template<class CDCHitPtrRange>

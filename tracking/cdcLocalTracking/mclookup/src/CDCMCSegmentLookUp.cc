@@ -39,17 +39,20 @@ void CDCMCSegmentLookUp::clear()
   m_mcTrackIds.clear();
 }
 
+const float CDCMCSegmentLookUp::MinimalMatchEfficiency = 0.5;
 
 
 ITrackType CDCMCSegmentLookUp::getMCTrackId(const CDCRecoSegment2D* ptrSegment2D) const
 {
+
   if (not ptrSegment2D) return INVALID_ITRACK;
+
   const CDCRecoSegment2D& segment2D = *ptrSegment2D;
   auto itFound = m_mcTrackIds.find(ptrSegment2D);
 
   if (itFound == m_mcTrackIds.end()) {
     MCTrackIdEfficiencyPair mcTrackIdAndEfficiency = getHighestEfficieny(segment2D);
-    if (mcTrackIdAndEfficiency.getEfficiency() < 0.5) {
+    if (mcTrackIdAndEfficiency.getEfficiency() >= MinimalMatchEfficiency) {
       m_mcTrackIds[ptrSegment2D] = mcTrackIdAndEfficiency.getMCTrackId();
       return mcTrackIdAndEfficiency.getMCTrackId();
     } else {

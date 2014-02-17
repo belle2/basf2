@@ -49,13 +49,39 @@ namespace Belle2 {
                                      float, float);
 
     private:
+
+      /**
+       * Flag to activate the propagation delay of the sense wire.
+       * true : activated, false : the propagation delay is not used.
+       *
+       */
       bool m_useInWirePropagationDelay;
+
+      /**
+       * Wire position at the cdc backward endplate.
+       */
       TVector3 m_backWirePos;
 
+      /**
+       * Event timing.
+       * If this is not simulated, m_eventTime is set to be 0.
+       */
       float m_eventTime;
 
+      /**
+       * CDC Geometry parameters.
+       */
       CDCGeometryPar& m_cdcp;
+
+      /**
+       * Hit timing offset value.
+       */
       unsigned short m_tdcOffset;
+
+      /**
+       * TDC bin width (1nsec).
+       */
+
       float m_tdcBinWidth;
     };
   }

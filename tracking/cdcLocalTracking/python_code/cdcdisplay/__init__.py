@@ -21,275 +21,9 @@ import svgdrawing
 import os
 import os.path
 import math
-import colorsys
 
-listColors = [  # 'magenta',
-                # 'gold',
-                # 'yellow',
-                # 'aquamarine',
-    'red',
-    'blue',
-    'green',
-    'orange',
-    'cyan',
-    'olive',
-    'lime',
-    'maroon',
-    'tomato',
-    'turquoise',
-    'mediumspringgreen',
-    'darkgreen',
-    'indigo',
-    ]
-
-
-class CDCHitStrokeWidthMap:
-
-    def __call__(self, iCDCHit, cdcHit):
-        return 0.2
-
-
-class ZeroDriftLengthStrokeWidthMap(CDCHitStrokeWidthMap):
-
-    def __call__(self, iCDCHit, cdcHit):
-        wirehit = Belle2.CDCLocalTracking.CDCWireHit(cdcHit, 0)
-        if wirehit.getRefDriftLength() == 0.0:
-            return 1
-        else:
-            return 0.2
-
-
-class CDCHitColorMap:
-
-    bkgHitColor = 'orange'
-
-    def __call__(self, iCDCHit, cdcHit):
-        return self.bkgHitColor
-
-
-class ZeroDriftLengthColorMap(CDCHitColorMap):
-
-    def __call__(self, iCDCHit, cdcHit):
-        wirehit = Belle2.CDCLocalTracking.CDCWireHit(cdcHit, 0)
-        if wirehit.getRefDriftLength() == 0.0:
-            return 'red'
-        else:
-            return self.bkgHitColor
-
-
-class PosFlagColorMap(CDCHitColorMap):
-
-    def __call__(self, iCDCHit, cdcHit):
-        simHit = cdcHit.getRelated('CDCSimHits')
-        posFlag = simHit.getPosFlag()
-        if posFlag == 0:
-            # Right
-            return 'green'
-        elif posFlag == 1:
-            # Left
-            return 'red'
-        else:
-            self.bkgHitColor
-
-
-class RLColorMap(CDCHitColorMap):
-
-    def __call__(self, iCDCHit, cdcHit):
-        simHit = cdcHit.getRelated('CDCSimHits')
-        posFlag = simHit.getPosFlag()
-        if posFlag == 0:
-            # Right
-            return 'green'
-        elif posFlag == 1:
-            # Left
-            return 'red'
-        else:
-            self.bkgHitColor
-
-
-class MCSegmentIdColorMap(CDCHitColorMap):
-
-    def __call__(self, iCDCHit, cdcHit):
-        mcTrackStore = Belle2.CDCLocalTracking.CDCMCTrackStore.getInstance()
-        inTrackSegmentId = mcTrackStore.getInTrackSegmentId(cdcHit)
-
-        if inTrackSegmentId < 0:
-            return self.bkgHitColor
-        else:
-            # values are all fractions of their respective scale
-            hue = 50 * inTrackSegmentId % 360 / 360.0
-            saturation = 1.0
-            lightness = 0.5
-
-            (red, green, blue) = colorsys.hls_to_rgb(hue, lightness,
-                    saturation)
-
-            color = 'rgb({0:.2%}, {1:.2%}, {2:.2%})'.format(red, green, blue)
-            print color
-            return color
-
-
-class TOFTransperancyMap(CDCHitColorMap):
-
-    def __init__(self, cdcHits):
-        timesOfFlight = []
-        for cdcHit in cdcHits:
-            simHit = cdcHit.getRelated('CDCSimHits')
-            timesOfFlight.append(simHit.getFlightTime())
-
-        self.maxTimeOfFlight = max(timesOfFlight)
-        self.minTimeOfFlight = min(timesOfFlight)
-
-    def __call__(self, iCDCHit, cdcHit):
-        timeOfFlight = cdcHit.getRelated('CDCSimHits').getFlightTime()
-        opacity = math.exp(-(timeOfFlight - self.minTimeOfFlight)
-                           / (self.maxTimeOfFlight - self.minTimeOfFlight)
-                           * math.log(10))
-        return str(opacity)
-
-
-class ReassignedSecondaryMap(CDCHitColorMap):
-
-    def __call__(self, iCDCHit, cdcHit):
-        relatedMCParticles = cdcHit.getRelationsWith('MCParticles')
-        if relatedMCParticles.size() == 0:
-            return self.bkgHitColor
-        else:
-            mcRelationWeight = relatedMCParticles.weight(0)
-            if mcRelationWeight > 0:
-                return 'green'
-            else:
-                return 'red'
-
-
-class MCParticleColorMap(CDCHitColorMap):
-
-    def __init__(self):
-        self.color_by_mcparticleId = {-1: self.bkgHitColor}
-
-    def __call__(self, iCDCHit, cdcHit):
-
-        mcParticle = cdcHit.getRelated('MCParticles')
-        if mcParticle:
-            mcParticleId = mcParticle.getArrayIndex()
-        else:
-            mcParticleId = -1
-
-        # cdcSimHit = cdcHit.getRelated("CDCSimHits")
-        # if cdcSimHit:
-        #    cdcSimHitTrackId = cdcSimHit.getTrackId()
-        # else:
-        #    cdcSimHitTrackId = -1
-
-        if mcParticleId in self.color_by_mcparticleId:
-            color = self.color_by_mcparticleId[mcParticleId]
-        else:
-            iColor = len(self.color_by_mcparticleId)
-            iColor = iColor % len(listColors)
-            color = listColors[iColor]
-            self.color_by_mcparticleId[mcParticleId] = color
-
-        return color
-
-
-class MCPDGCodeColorMap(CDCHitColorMap):
-
-    color_by_pdgcode = {
-        -999: CDCHitColorMap.bkgHitColor,
-        11: 'blue',
-        -11: 'blue',
-        13: 'turquoise',
-        -13: 'turquoise',
-        15: 'cyan',
-        -15: 'cyan',
-        211: 'green',
-        -211: 'green',
-        321: 'olive',
-        -321: 'olive',
-        2212: 'red',
-        -2212: 'red',
-        }
-
-    missing_pdg_color = 'lime'
-
-    def __init__(self):
-        pass
-
-    def __call__(self, iCDCHit, cdcHit):
-
-        mcParticle = cdcHit.getRelated('MCParticles')
-        if mcParticle:
-            pdgcode = mcParticle.getPDG()
-        else:
-
-            # getSecondaryPhysicsProcess()
-            pdgcode = -999
-
-        if pdgcode in self.color_by_pdgcode:
-            color = self.color_by_pdgcode[pdgcode]
-        else:
-            print 'Unknown PDG code', pdgcode
-            color = self.missing_pdg_color
-
-        return color
-
-    def __str__(self):
-        legend_head = 'Legend:\n'
-
-        pdg_code_by_color = {}
-
-        for (pdgcode, color) in self.color_by_pdgcode.items():
-            pdg_code_by_color.setdefault(color, [])
-            pdg_code_by_color[color].append(pdgcode)
-
-        legend_content = '\n'.join(str(color) + '->'
-                                   + str(pdg_code_by_color[color])
-                                   for color in pdg_code_by_color)
-
-        return legend_head + legend_content
-
-
-class MCPrimaryColorMap(CDCHitColorMap):
-
-    def __init__(self):
-        self.n_hits_by_secondary_type = {}
-
-    def __call__(self, iCDCHit, cdcHit):
-        mcParticle = cdcHit.getRelated('MCParticles')
-        if mcParticle:
-            primaryFlag = 1
-            isPrimary = mcParticle.hasStatus(primaryFlag)
-            secondaryProcess = mcParticle.getSecondaryPhysicsProcess()
-            if secondaryProcess > 0:
-                motherMCParticle = mcParticle.getMother()
-                secondary_type = (motherMCParticle.getPDG(),
-                                  mcParticle.getPDG())
-            else:
-                motherMCParticle = None
-                secondary_type = (-999, mcParticle.getPDG())
-
-            self.n_hits_by_secondary_type.setdefault(secondary_type, 0)
-            self.n_hits_by_secondary_type[secondary_type] = \
-                self.n_hits_by_secondary_type[secondary_type] + 1
-            if isPrimary:
-                return 'blue'
-            elif secondaryProcess > 200:
-                                          # decay in flight
-                return 'green'
-            else:
-                return 'red'
-        else:
-            return self.bkgHitColor
-
-    def __str__(self):
-        return """
-Legend:
-blue->primary
-green->secondary decay in flight
-red->secondary other process
-orange->beam background
-""" \
-            + str(self.n_hits_by_secondary_type)
+from svgdrawing.attributemaps import *
+import svgdrawing.attributemaps as attributemaps
 
 
 class CDCSVGDisplayModule(Module):
@@ -352,6 +86,21 @@ class CDCSVGDisplayModule(Module):
     def beginRun(self):
         print 'beginRun()'
 
+    def draw_storearray(self, storearray_name, styleDict):
+        print 'Drawing', storearray_name,
+        print
+        storearray = Belle2.PyStoreArray(storearray_name)
+        if storearray:
+            print 'with', storearray.getEntries(), 'entries'
+            print 'Attributes are'
+            for (key, value) in styleDict.items():
+                print str(key), ':', str(value)
+
+            self.plotter.append(storearray, **styleDict)
+        else:
+
+            print ' which is not present in the DataStore'
+
     def event(self):
         print '##################### DISPLAY EVENT ###########################'
 
@@ -368,6 +117,7 @@ class CDCSVGDisplayModule(Module):
             print 'dir(genfit)', dir(genfit)
 
         plotter = svgdrawing.CDCSVGPlotter()
+        self.plotter = plotter
 
         # Draw wires from cdcwire objects
         # Now prefered way of ploting the wires
@@ -385,76 +135,36 @@ class CDCSVGDisplayModule(Module):
         # Draw wirehits or
         # Draw the raw CDCHits
         if self.draw_hits or self.draw_wirehits:
-            print 'Drawing the CDCHits'
-            cdchit_storearray = Belle2.PyStoreArray('CDCHits')
-            if cdchit_storearray:
-                print '#CDCHits', cdchit_storearray.getEntries()
-                styleDict = {'stroke': ZeroDriftLengthColorMap(),
-                             'stroke-width': ZeroDriftLengthStrokeWidthMap()}
-                plotter.append(cdchit_storearray, **styleDict)
+            styleDict = {'stroke': attributemaps.ZeroDriftLengthColorMap(),
+                         'stroke-width': attributemaps.ZeroDriftLengthStrokeWidthMap()}
+            self.draw_storearray('CDCHits', styleDict)
 
         # Draw  mcparticle id
         if self.draw_mcparticles:
-            print 'Drawing the MC Particles'
-            cdchits_storearray = Belle2.PyStoreArray('CDCHits')
-
-            if cdchit_storearray:
-                print '#CDCHits', cdchit_storearray.getEntries(), \
-                    'colored with the mc particle id'
-
-                styleDict = {'stroke-width': '0.5',
-                             'stroke': MCParticleColorMap()}
-                    # 'stroke-opacity': '0.5',
-
-                plotter.append(cdchit_storearray, **styleDict)
+            styleDict = {'stroke-width': '0.5',
+                         'stroke': attributemaps.MCParticleColorMap()}
+                # 'stroke-opacity': '0.5',
+            self.draw_storearray('CDCHits', styleDict)
 
         # Draw the in track segment id
         if self.draw_mcsegments:
-            print 'Drawing the MC Segments'
-            cdchits_storearray = Belle2.PyStoreArray('CDCHits')
-
-            if cdchit_storearray:
-                print '#CDCHits', cdchit_storearray.getEntries(), \
-                    'colored with the mc in track segment id'
-
-                styleDict = {'stroke-width': '0.5',
-                             'stroke': MCSegmentIdColorMap()}
-
-                plotter.append(cdchit_storearray, **styleDict)
+            styleDict = {'stroke-width': '0.5',
+                         'stroke': attributemaps.MCSegmentIdColorMap()}
+            self.draw_storearray('CDCHits', styleDict)
 
         # Draw monte carlo pdg codes
         if self.draw_mcpdgcodes:
-            print 'Drawing the Monte Carlo pdg codes'
-            cdchits_storearray = Belle2.PyStoreArray('CDCHits')
-
-            if cdchit_storearray:
-                print '#CDCHits', cdchit_storearray.getEntries(), \
-                    'colored with the pdg codes'
-                color_map = MCPDGCodeColorMap()
-
-                styleDict = {'stroke-width': '0.5', 'stroke': color_map}
-                    # 'stroke-opacity': '0.5',
-
-                plotter.append(cdchit_storearray, **styleDict)
-
-                print str(color_map)
+            styleDict = {'stroke-width': '0.5',
+                         'stroke': attributemaps.MCPDGCodeColorMap()}
+                # 'stroke-opacity': '0.5',
+            self.draw_storearray('CDCHits', styleDict)
 
         # Draw monte carlo pdg codes
         if self.draw_mcprimary:
-            print 'Drawing the Monte Carlo pdg codes'
-            cdchits_storearray = Belle2.PyStoreArray('CDCHits')
-
-            if cdchit_storearray:
-                print '#CDCHits', cdchit_storearray.getEntries(), \
-                    'colored with the pdg codes'
-                color_map = MCPrimaryColorMap()
-
-                styleDict = {'stroke-width': '0.5', 'stroke': color_map}
-                    # 'stroke-opacity': '0.5',
-
-                plotter.append(cdchit_storearray, **styleDict)
-
-                print str(color_map)
+            styleDict = {'stroke-width': '0.5',
+                         'stroke': attributemaps.MCPrimaryColorMap}
+                # 'stroke-opacity': '0.5',
+            self.draw_storearray('CDCHits', styleDict)
 
         # Draw SimHits
         if self.draw_simhits:
@@ -471,42 +181,21 @@ class CDCSVGDisplayModule(Module):
 
         # Draw RL MC info
         if self.draw_rlinfo:
-            print 'Drawing Monte Carlo right left information of the wirehits'
-            cdchits_storearray = Belle2.PyStoreArray('CDCHits')
-            if cdchits_storearray:
-                print '#WireHits', cdchits_storearray.getEntries(), \
-                    'colored mc right left information'
-
-                styleDict = {'stroke-width': '0.2', 'stroke': RLColorMap()}
-
-                plotter.append(cdchits_storearray, **styleDict)
+            styleDict = {'stroke-width': '0.2',
+                         'stroke': attributemaps.RLColorMap()}
+            self.draw_storearray('CDCHits', styleDict)
 
         # Draw tof info
         if self.draw_tof:
-            print 'Drawing time of flight of the hits'
-            hit_collection = Belle2.PyStoreArray('CDCHits')
-            if hit_collection:
-                print '#CDCHits', hit_collection.getEntries(), \
-                    'colored time of flight information as opacity'
-
-                styleDict = {'stroke-width': '1',
-                             'stroke': MCParticleColorMap(),
-                             'stroke-opacity': TOFTransperancyMap(hit_collection)}
-
-                plotter.append(hit_collection, **styleDict)
+            styleDict = {'stroke-width': '1',
+                         'stroke': attributesmaps.TOFColorMap()}
+            self.draw_storearray('CDCHits', styleDict)
 
         # Draw the reassignment information of hits
         if self.draw_reassigned:
-            print 'Drawing reassignment information of the hits'
-            hit_collection = Belle2.PyStoreArray('CDCHits')
-            if hit_collection:
-                print '#CDCHits', hit_collection.getEntries(), \
-                    'colored with the reassignment information.'
-
-                styleDict = {'stroke-width': '1',
-                             'stroke': ReassignedSecondaryMap()}
-
-                plotter.append(hit_collection, **styleDict)
+            styleDict = {'stroke-width': '0.5',
+                         'stroke': attributemaps.ReassignedSecondaryMap()}
+            self.draw_storearray('CDCHits', styleDict)
 
         # Draw mc vertices
         if self.draw_mcvertices:
@@ -530,7 +219,7 @@ class CDCSVGDisplayModule(Module):
                     simhit = mcLookUp.getSimHit(wirehit)
                     toTPos = simhit.getPosTrack()
                     toPos = Belle2.CDCLocalTracking.Vector3D(toTPos)
-          # plotter.append(toPos,stroke=color)
+                    # plotter.append(toPos,stroke=color)
 
                     mcPart = mcLookUp.getMCParticle(wirehit)
                     while mcPart != None:
@@ -539,94 +228,42 @@ class CDCSVGDisplayModule(Module):
                         plotter.append(mcPos, stroke=color)
                         mcPart = mcPart.getMother()
 
-    # Draw clusters
+        # Draw clusters
         if self.draw_clusters:
-            print 'Drawing the clusters'
-            cluster_storearray = Belle2.PyStoreArray('CDCWireHitClusters')
-            if cluster_storearray:
-                print '#Clusters', cluster_storearray.getEntries()
+            styleDict = {'stroke': attributemaps.listColors,
+                         'stroke-width': '0.5'}
+            self.draw_storearray('CDCWireHitClusters', styleDict)
 
-                styleDict = {'stroke': listColors, 'stroke-width': '1'}
-
-                plotter.append(cluster_storearray, **styleDict)
-
-    # Draw Segments
+        # Draw Segments
         if self.draw_segments:
-            print 'Drawing the selected RecoHit2DSegments'
-            segment_storearray = \
-                Belle2.PyStoreArray('CDCRecoHit2DSegmentsSelected')
-            if segment_storearray:
-                print '#RecoHit2DSegments', segment_storearray.getEntries()
+            styleDict = {'stroke': attributemaps.listColors,
+                         'stroke-width': '0.5'}
+            self.draw_storearray('CDCRecoHit2DSegmentsSelected', styleDict)
 
-                def color_map(iSegment, segment):
-                    return listColors[iSegment % len(listColors)]
-
-                styleDict = {'stroke-width': '0.5', 'stroke': color_map}
-
-                plotter.append(segment_storearray, **styleDict)
-
-    # Draw Tangent segments
+        # Draw Tangent segments
         if self.draw_tangentsegments:
-            print 'Drawing the selected CDCRecoTangentSegments'
+            styleDict = {'stroke': 'black', 'stroke-width': '0.2'}
+            self.draw_storearray('CDCRecoTangentSegments', styleDict)
 
-            tangentsegment_storearray = \
-                Belle2.PyStoreArray('CDCRecoTangentSegments')
-            if tangentsegment_storearray:
-                print '#CDCRecoTangentSegments', \
-                    tangentsegment_storearray.getEntries()
-
-                def color_map(iTangentSegment, tangentsegment):
-                    return listColors[iTangentSegment % len(listColors)]
-
-                styleDict = {'stroke-width': '0.2', 'stroke': 'black'}
-
-                plotter.append(tangentsegment_storearray, **styleDict)
-
-    # Draw segment triples
+        # Draw segment triples
         if self.draw_segmenttriples:
-            print 'Drawing the segment triples'
-            segmentTriple_storearray = Belle2.PyStoreArray('CDCSegmentTriples')
-            if segmentTriple_storearray:
-                print '#SegmentTriples', segmentTriple_storearray.getEntries()
+            styleDict = {'stroke': attributemaps.listColors,
+                         'stroke-width': '0.5'}
+            self.draw_storearray('CDCSegmentTriples', styleDict)
 
-                def color_map(iSegmentTriples, segmenttriples):
-          # return "black"
-                    return listColors[iSegmentTriples % len(listColors)]
-
-                styleDict = {'stroke-width': '0.5', 'stroke': color_map}
-
-                plotter.append(segmentTriple_storearray, **styleDict)
-
-    # Draw Tracks
+        # Draw Tracks
         if self.draw_tracks:
-            print 'Drawing reconstructed tracks'
-            track_storearray = Belle2.PyStoreArray('CDCTracks')
-            if track_storearray:
-                print '#Tracks', track_storearray.getEntries()
+            styleDict = {'stroke': attributemaps.listColors,
+                         'stroke-width': '0.5'}
+            self.draw_storearray('CDCTracks', styleDict)
 
-                def color_map(iTrack, track):
-          # return "black"
-                    return listColors[iTrack % len(listColors)]
-
-                styleDict = {'stroke-width': '0.5', 'stroke': color_map}
-
-                plotter.append(track_storearray, **styleDict)
-
-    # Draw the genfit track candidates
+        # Draw the genfit track candidates
         if self.draw_gftrackcands:
-            print 'Drawing exported Genfit tracks'
-            gftrackcand_storearray = Belle2.PyStoreArray('TrackCands')
-            if gftrackcand_storearray:
-                print '#Genfit tracks', gftrackcand_storearray.getEntries()
+            styleDict = {'stroke': attributemaps.listColors,
+                         'stroke-width': '0.5'}
+            self.draw_storearray('TrackCands', styleDict)
 
-                def color_map(iTrack, track):
-          # return "black"
-                    return listColors[iTrack % len(listColors)]
-
-                styleDict = {'stroke-width': '0.5', 'stroke': color_map}
-                plotter.append(gftrackcand_storearray, **styleDict)
-
-    # Draw the superlayer boundaries
+        # Draw the superlayer boundaries
         if self.draw_superlayer_boundaries:
             print 'Drawing superlayer boundaries'
             theCDCWireTopology = \
@@ -634,11 +271,11 @@ class CDCSVGDisplayModule(Module):
 
             for iSuperLayer in range(theCDCWireTopology.getNSuperLayers()):
                 superlayer = theCDCWireTopology.getWireSuperLayer(iSuperLayer)
-        # superlayers get converted to two circles marking their
-        # inner and outer radius
+                # superlayers get converted to two circles marking their
+                # inner and outer radius
                 plotter.append(superlayer)
 
-    # Draw interaction point
+        # Draw interaction point
         if self.draw_interactionpoint:
             print 'Drawing interaction point'
             interactionPoint = Belle2.CDCLocalTracking.Vector2D(0.0, 0.0)
@@ -647,7 +284,7 @@ class CDCSVGDisplayModule(Module):
 
             plotter.append(interactionPoint, **styleDict)
 
-    # Draw segment triples fits
+        # Draw segment triples fits
         if self.draw_segmenttriple_trajectories:
             print 'Drawing segment triple fits'
             segmentTriple_storearray = Belle2.PyStoreArray('CDCSegmentTriples')
@@ -660,7 +297,7 @@ class CDCSVGDisplayModule(Module):
                     for segmentTriple in iterSegmentTriples)
                 plotter.append(iterTrajectories)
 
-    # Draw the fits to the segments
+        # Draw the fits to the segments
         if self.draw_segment_trajectories:
             print 'Drawing the fits to the selected RecoHit2DSegments'
             segment_storearray = \
@@ -671,9 +308,9 @@ class CDCSVGDisplayModule(Module):
                     if segment.getAxialType() == 0:
 
                         fitter = Belle2.CDCLocalTracking.CDCRiemannFitter()
-            # fitter.useOnlyPosition()
+                        # fitter.useOnlyPosition()
                         fitter.useOnlyOrientation()
-            # fitter.usePositionAndOrientation()
+                        # fitter.usePositionAndOrientation()
                         trajectory2D = fitter.fit(segment)
                         plotter.append(trajectory2D, **{'stroke': 'black',
                                        'stroke-width': '0.2'})
@@ -684,7 +321,7 @@ class CDCSVGDisplayModule(Module):
                         centralPoint = trajectory2D.getClosest(com)
                         plotter.append(centralPoint)
 
-    # Draw the trajectories of the genfit track candidates
+        # Draw the trajectories of the genfit track candidates
         if self.draw_gftrackcand_trajectories:
             print 'Drawing trajectories of the exported Genfit tracks'
             gftrackcand_storearray = Belle2.PyStoreArray('TrackCands')
@@ -692,7 +329,7 @@ class CDCSVGDisplayModule(Module):
                 print '#Genfit tracks', gftrackcand_storearray.getEntries()
 
                 def color_map(iTrajectory, trajectory):
-          # return "black"
+                    # return "black"
                     return listColors[iTrajectory % len(listColors)]
 
                 styleDict = {'stroke-width': '0.5', 'stroke': color_map}
@@ -723,10 +360,10 @@ class CDCSVGDisplayModule(Module):
         if self.interactive:
             print " Use the 'display' command to show the svg file", fileName, \
                 'generated for the last event'
-      # 'display' is part of the ImageMagic package commonly installed in linux
+            # 'display' is part of the ImageMagic package commonly installed in linux
             procDisplay = subprocess.Popen(['display', fileName])
-      # procDisplay = subprocess.Popen(['display','-background','white',
-      # '-flatten',fileName])
+            # procDisplay = subprocess.Popen(['display','-background','white',
+            # '-flatten',fileName])
 
             raw_input('Hit enter for next event')
 

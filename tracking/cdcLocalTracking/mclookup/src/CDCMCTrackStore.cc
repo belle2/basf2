@@ -39,6 +39,8 @@ CDCMCTrackStore::~CDCMCTrackStore()
 void CDCMCTrackStore::clear()
 {
 
+  B2DEBUG(200, "In CDCMCTrackStore::clear()");
+
   m_ptrMCMap = nullptr;
 
   m_mcTracksByMCParticleIdx.clear();
@@ -47,6 +49,16 @@ void CDCMCTrackStore::clear()
   m_inTrackIds.clear();
   m_inTrackSegmentIds.clear();
   m_nPassedSuperLayers.clear();
+
+
+  B2INFO("m_mcTracksByMCParticleIdx.size(): " << m_mcTracksByMCParticleIdx.size());
+  B2INFO("m_mcSegmentsByMCParticleIdx.size(): " << m_mcSegmentsByMCParticleIdx.size());
+
+  B2INFO("m_inTrackIds.size(): " << m_inTrackIds.size());
+  B2INFO("m_inTrackSegmentIds.size() " << m_inTrackSegmentIds.size());
+  B2INFO("m_nPassedSuperLayers.size(): " << m_nPassedSuperLayers.size());
+
+
 
 }
 
@@ -78,8 +90,8 @@ void CDCMCTrackStore::fill(const CDCMCMap* ptrMCMap)
   B2INFO("m_mcTracksByMCParticleIdx.size(): " << m_mcTracksByMCParticleIdx.size());
   B2INFO("m_mcSegmentsByMCParticleIdx.size(): " << m_mcSegmentsByMCParticleIdx.size());
 
-  B2INFO("m_inTrackSegmentIds.size() " << m_inTrackSegmentIds.size());
   B2INFO("m_inTrackIds.size(): " << m_inTrackIds.size());
+  B2INFO("m_inTrackSegmentIds.size() " << m_inTrackSegmentIds.size());
   B2INFO("m_nPassedSuperLayers.size(): " << m_nPassedSuperLayers.size());
 
 }

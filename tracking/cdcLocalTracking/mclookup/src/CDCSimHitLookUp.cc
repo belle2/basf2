@@ -37,6 +37,9 @@ void CDCSimHitLookUp::clear()
   m_primarySimHits.clear();
   m_rightLeftInfos.clear();
 
+  B2INFO("m_primarySimHits.size(): " << m_primarySimHits.size());
+  B2INFO("m_rightLeftInfos.size(): " << m_rightLeftInfos.size());
+
 }
 
 

@@ -34,13 +34,23 @@ CDCMCMap::~CDCMCMap()
 void CDCMCMap::clear()
 {
 
+  B2DEBUG(100, "In CDCMCMap::clear()");
   m_simHitByHit.clear();
 
   m_mcParticlesByHit.clear();
   m_mcParticlesBySimHit.clear();
 
   m_reassignedSecondaryHits.clear();
-  m_reassignedSecondaryHits.clear();
+  m_reassignedSecondarySimHits.clear();
+
+  B2INFO("m_simHitByHit.size(): " << m_simHitByHit.size());
+
+  B2INFO("m_mcParticlesByHit.size(): " << m_mcParticlesByHit.size());
+  B2INFO("m_mcParticlesBySimHit.size(): " << m_mcParticlesBySimHit.size());
+
+  B2INFO("m_reassignedSecondaryHits.size(): " << m_reassignedSecondaryHits.size());
+  B2INFO("m_reassignedSecondarySimHits.size(): " << m_reassignedSecondarySimHits.size());
+
 
 }
 

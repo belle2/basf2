@@ -36,7 +36,9 @@ const CDCMCSegmentLookUp& CDCMCSegmentLookUp::getInstance()
 
 void CDCMCSegmentLookUp::clear()
 {
+  B2INFO("Clearing CDCMCSegmentLookUp");
   m_mcTrackIds.clear();
+  B2INFO("m_mcTrackIds.size(): " <<  m_mcTrackIds.size());
 }
 
 const float CDCMCSegmentLookUp::MinimalMatchEfficiency = 0.5;
@@ -142,6 +144,24 @@ ForwardBackwardInfo CDCMCSegmentLookUp::areAlignedInMCTrack(const CDCRecoSegment
 
 
   // Now check are aligned with their common track
+  // Examine if they are in the same super layer
+
+  Index lastNPassedSuperLayersOfStartSegment = getLastNPassedSuperLayers(ptrStartSegment2D);
+  if (lastNPassedSuperLayersOfStartSegment == INVALID_INDEX) return INVALID_INFO;
+
+  Index firstNPassedSuperLayersOfEndSegment = getFirstNPassedSuperLayers(ptrEndSegment2D);
+  if (firstNPassedSuperLayersOfEndSegment == INVALID_INDEX) return INVALID_INFO;
+
+  if (lastNPassedSuperLayersOfStartSegment < firstNPassedSuperLayersOfEndSegment) {
+    if (startFBInfo == FORWARD and  endFBInfo == FORWARD) return FORWARD;
+    else return INVALID_INFO;
+  } else if (lastNPassedSuperLayersOfStartSegment > firstNPassedSuperLayersOfEndSegment) {
+    if (startFBInfo == BACKWARD and endFBInfo == BACKWARD) return BACKWARD;
+    else return INVALID_INFO;
+  }
+
+  // Now we are in the same passed super layer with both segments
+  //TODO check this definition....
   Index lastInTrackIdOfStartSegment = getLastInTrackId(ptrStartSegment2D);
   if (lastInTrackIdOfStartSegment == INVALID_INDEX) return INVALID_INFO;
 
@@ -149,22 +169,14 @@ ForwardBackwardInfo CDCMCSegmentLookUp::areAlignedInMCTrack(const CDCRecoSegment
   if (firstInTrackIdOfEndSegment == INVALID_INDEX) return INVALID_INFO;
 
   if (startFBInfo == FORWARD and  endFBInfo == FORWARD) {
-
     if (lastInTrackIdOfStartSegment < firstInTrackIdOfEndSegment) return FORWARD;
     else return INVALID_INFO;
-
-
-
   } else if (startFBInfo == BACKWARD and endFBInfo == BACKWARD) {
-
     // Test if end segment lies before in the mc track
     // Hence the whole pair of segments is reverse to the track direction of flight
-
     if (lastInTrackIdOfStartSegment > firstInTrackIdOfEndSegment) return BACKWARD;
     else return INVALID_INFO;
-
   }
-
   return INVALID_INFO;
 
 }

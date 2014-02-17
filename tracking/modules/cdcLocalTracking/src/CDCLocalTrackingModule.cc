@@ -116,6 +116,7 @@ void CDCLocalTrackingModule::event()
   //CALLGRIND_STOP_INSTRUMENTATION;
 
 #ifdef CDCLOCALTRACKING_USE_MC_FILTERS
+  CDCMCManager::getInstance().clear();
   CDCMCManager::getInstance().fill();
 
 

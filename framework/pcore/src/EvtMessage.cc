@@ -94,7 +94,7 @@ void EvtMessage::buffer(const char* bufadr)
 // @return record size
 int EvtMessage::size() const
 {
-  return (((EvtHeader*)m_data)->size);
+  return ((reinterpret_cast<EvtHeader*>(m_data))->size);
 }
 
 int EvtMessage::paddedSize() const
@@ -108,60 +108,60 @@ int EvtMessage::paddedSize() const
 // @return message size
 int EvtMessage::msg_size()
 {
-  return (((EvtHeader*)m_data)->size - sizeof(EvtHeader));
+  return ((reinterpret_cast<EvtHeader*>(m_data))->size - sizeof(EvtHeader));
 }
 
 // Record type
 RECORD_TYPE EvtMessage::type()
 {
-  return (((EvtHeader*)m_data)->rectype);
+  return ((reinterpret_cast<EvtHeader*>(m_data))->rectype);
 }
 
 void EvtMessage::type(RECORD_TYPE type)
 {
-  ((EvtHeader*)m_data)->rectype = type;
+  (reinterpret_cast<EvtHeader*>(m_data))->rectype = type;
 }
 
 // Source of this record
 int EvtMessage::src() const
 {
-  return (((EvtHeader*)m_data)->src);
+  return ((reinterpret_cast<EvtHeader*>(m_data))->src);
 }
 
 void EvtMessage::src(int src)
 {
-  ((EvtHeader*)m_data)->src = src;
+  (reinterpret_cast<EvtHeader*>(m_data))->src = src;
 }
 
 // Destination of this record
 int EvtMessage::dest() const
 {
-  return (((EvtHeader*)m_data)->dest);
+  return ((reinterpret_cast<EvtHeader*>(m_data))->dest);
 }
 
 void EvtMessage::dest(int dest)
 {
-  ((EvtHeader*)m_data)->dest = dest;
+  (reinterpret_cast<EvtHeader*>(m_data))->dest = dest;
 }
 
 // Time stamp
 struct timeval EvtMessage::time() const {
   struct timeval tv;
-  tv.tv_sec = ((EvtHeader*)m_data)->time_sec;
-  tv.tv_usec = ((EvtHeader*)m_data)->time_usec;
+  tv.tv_sec = (reinterpret_cast<EvtHeader*>(m_data))->time_sec;
+  tv.tv_usec = (reinterpret_cast<EvtHeader*>(m_data))->time_usec;
   return tv;
 }
 
 void EvtMessage::time(struct timeval& tbuf)
 {
-  ((EvtHeader*)m_data)->time_sec = tbuf.tv_sec;
-  ((EvtHeader*)m_data)->time_usec = tbuf.tv_usec;
+  (reinterpret_cast<EvtHeader*>(m_data))->time_sec = tbuf.tv_sec;
+  (reinterpret_cast<EvtHeader*>(m_data))->time_usec = tbuf.tv_usec;
 }
 
 // Event Header
 EvtHeader* EvtMessage::header()
 {
-  return ((EvtHeader*)m_data);
+  return (reinterpret_cast<EvtHeader*>(m_data));
 }
 
 // Message body
@@ -174,13 +174,13 @@ char* EvtMessage::msg()
 
 void EvtMessage::msg(char const* msgin, int size, RECORD_TYPE type)
 {
-  EvtHeader* hdr = (EvtHeader*)m_data;
+  EvtHeader* hdr = reinterpret_cast<EvtHeader*>(m_data);
   hdr->size = size + sizeof(EvtHeader);
   hdr->rectype = type;
   struct timeval tv;
   gettimeofday(&tv, NULL);
-  ((EvtHeader*)m_data)->time_sec = tv.tv_sec;
-  ((EvtHeader*)m_data)->time_usec = tv.tv_usec;
+  (reinterpret_cast<EvtHeader*>(m_data))->time_sec = tv.tv_sec;
+  (reinterpret_cast<EvtHeader*>(m_data))->time_usec = tv.tv_usec;
   hdr->src = -1;
   hdr->dest = -1;
   //TODO: set durability, nobjs, narrays here?

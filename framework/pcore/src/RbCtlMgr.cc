@@ -26,7 +26,7 @@ RbCtlMgr::RbCtlMgr()
     perror("RbCtlMgr::shmget");
     return;
   }
-  m_ctlshm = (RbCtlShm*) shmat(m_shmid, 0, 0);
+  m_ctlshm = static_cast<RbCtlShm*>(shmat(m_shmid, 0, 0));
   m_ctlshm->n_sync = 0;
 
   m_semid = semget(IPC_PRIVATE, 1, IPC_CREAT | 0600);
@@ -40,7 +40,7 @@ RbCtlMgr::RbCtlMgr()
 RbCtlMgr::RbCtlMgr(int shmid):
   m_shmid(shmid)
 {
-  m_ctlshm = (RbCtlShm*) shmat(m_shmid, 0, 0);
+  m_ctlshm = static_cast<RbCtlShm*>(shmat(m_shmid, 0, 0));
 }
 
 RbCtlMgr::~RbCtlMgr()
@@ -86,10 +86,9 @@ void RbCtlMgr::sync_done()
 void RbCtlMgr::sync_wait()
 {
   int count = 0;
-  int nsync;
   for (;;) {
     //    sem_lock();
-    nsync = m_ctlshm->n_sync;
+    int nsync = m_ctlshm->n_sync;
     //    sem_unlock();
     if (nsync == 0) break;
     usleep(1000);

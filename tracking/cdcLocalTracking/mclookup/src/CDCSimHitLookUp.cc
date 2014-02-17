@@ -10,10 +10,13 @@
 
 #include "../include/CDCSimHitLookUp.h"
 
-#include <framework/datastore/RelationVector.h>
 #include <tracking/cdcLocalTracking/topology/CDCWireTopology.h>
 
+#include <tracking/cdcLocalTracking/mclookup/CDCMCMap.h>
+
 #include <framework/datastore/StoreArray.h>
+
+#include <vector>
 
 using namespace std;
 using namespace Belle2;
@@ -78,33 +81,23 @@ void CDCSimHitLookUp::fillPrimarySimHits()
 {
   StoreArray<CDCHit> hits;
 
+  const CDCMCMap& mcMap = CDCMCMap::getInstance();
+
   for (const CDCHit & hit : hits) {
 
-    const CDCSimHit* ptrSimHit = hit.getRelated<CDCSimHit>();
+    const CDCHit* ptrHit = &hit;
+    const CDCSimHit* ptrSimHit = mcMap.getSimHit(ptrHit);
+
     if (not ptrSimHit) {
       B2ERROR("CDCHit has no related CDCSimHit in CDCSimHitLookUp::fill()");
       continue;
     }
-    //const CDCSimHit& simHit = *ptrSimHit;
 
-    const CDCHit* ptrHit = &hit;
-
-    m_primarySimHits[ptrHit] = getClosestPrimarySimHit(ptrSimHit);
-
+    if (mcMap.isReassignedSecondary(ptrSimHit)) {
+      m_primarySimHits[ptrHit] = getClosestPrimarySimHit(ptrSimHit);
+    }
   }
 
-}
-
-
-
-bool CDCSimHitLookUp::isReassignedSecondaryHit(const CDCSimHit& simHit) const
-{
-  const RelationVector<MCParticle> mcParticles = simHit.getRelationsWith<MCParticle>();
-  if (mcParticles.size() == 1) {
-    return  mcParticles.weight(0) <= 0.0;
-  } else {
-    return false;
-  }
 }
 
 
@@ -117,36 +110,39 @@ const CDCSimHit* CDCSimHitLookUp::getClosestPrimarySimHit(const CDCSimHit* ptrSi
   }
   const CDCSimHit& simHit = *ptrSimHit;
 
+  const CDCMCMap& mcMap = CDCMCMap::getInstance();
+
   //Check if the CDCSimHit was reassigned from a secondary particle to its primary particle
-  if (not isReassignedSecondaryHit(simHit)) {
+  if (not mcMap.isReassignedSecondary(ptrSimHit)) {
     return ptrSimHit;
   } else {
 
     //Try to find the hit on the same wire from the primary particle
-    const MCParticle* ptrMCParticle = simHit.getRelated<MCParticle>();
+    const MCParticle* ptrMCParticle = mcMap.getMCParticle(ptrSimHit);
     if (not ptrMCParticle) {
       return nullptr;
     }
 
-    const MCParticle& mcParticle = *ptrMCParticle;
-
-    //Get all CDCSimHits that are related with the MCParticle
-    const RelationVector<CDCSimHit> simHitsOfMCParticle = mcParticle.getRelationsWith<CDCSimHit>();
-
-    size_t nSimHitsOfMCParticle = simHitsOfMCParticle.size();
-
     WireID wireID = simHit.getWireID();
     std::vector<const CDCSimHit*> primarySimHitsOnSameOrNeighborWire;
+    const CDCWireTopology& wireTopology = CDCWireTopology::getInstance();
 
-    for (size_t iSimHit = 0; iSimHit < nSimHitsOfMCParticle; ++iSimHit) {
-      if ((CDCWireTopology::getInstance().areNeighbors(simHitsOfMCParticle.object(iSimHit)->getWireID(), wireID) or
-           simHitsOfMCParticle.object(iSimHit)->getWireID() == wireID) and
-          simHitsOfMCParticle.weight(iSimHit) > 0) {
+    for (const CDCMCMap::CDCSimHitByMCParticleRelation & simHitByMCParticleRelation : mcMap.getSimHits(ptrMCParticle)) {
+
+      const CDCSimHit* ptrPrimarySimHit = simHitByMCParticleRelation.get<CDCSimHit>();
+      if (mcMap.isReassignedSecondary(ptrPrimarySimHit) or not ptrPrimarySimHit) continue;
+
+      const CDCSimHit& primarySimHit = *ptrPrimarySimHit;
+
+      if (wireTopology.areNeighbors(primarySimHit.getWireID(), wireID) or primarySimHit.getWireID() == wireID) {
+
         // Found a hit on the same wire from the primary particle
-        primarySimHitsOnSameOrNeighborWire.push_back(simHitsOfMCParticle.object(iSimHit));
+        primarySimHitsOnSameOrNeighborWire.push_back(ptrPrimarySimHit);
       }
     }
 
+
+    //Now from the neighboring primary CDCSimHits pick to one with the smallest distance to the secondary CDCSimHit
     auto itClosestPrimarySimHit = std::min_element(primarySimHitsOnSameOrNeighborWire.begin(),
                                                    primarySimHitsOnSameOrNeighborWire.end(),
     [&simHit](const CDCSimHit * primarySimHit, const CDCSimHit * otherPrimarySimHit) -> bool {
@@ -176,102 +172,92 @@ const CDCSimHit* CDCSimHitLookUp::getClosestPrimarySimHit(const CDCSimHit* ptrSi
 
 
 
-void CDCSimHitLookUp::fillRLInfo()
+const CDCSimHit* CDCSimHitLookUp::getClosestPrimarySimHit(const CDCHit* ptrHit) const
 {
-  StoreArray<CDCHit> hits;
-  for (const CDCHit & hit : hits) {
+  const CDCMCMap& mcMap = CDCMCMap::getInstance();
+  if (mcMap.isReassignedSecondary(ptrHit)) {
 
-    const CDCSimHit* ptrSimHit = hit.getRelated<CDCSimHit>();
-    const CDCHit* ptrHit = &hit;
+    auto itFoundPrimarySimHit = m_primarySimHits.find(ptrHit);
+    return itFoundPrimarySimHit == m_primarySimHits.end() ? nullptr : itFoundPrimarySimHit->second;
 
-    if (not ptrSimHit) {
-      m_rightLeftInfos[ptrHit] = INVALID_INFO;
-    } else {
-
-      const CDCSimHit& simHit = *ptrSimHit;
-      m_rightLeftInfos[ptrHit] = getPrimaryRLInfo(simHit);
-    }
-
+  } else {
+    return mcMap.getSimHit(ptrHit);
   }
 
 }
 
 
 
-RightLeftInfo CDCSimHitLookUp::getPrimaryRLInfo(const CDCSimHit& simHit) const
+Vector3D CDCSimHitLookUp::getDirectionOfFlight(const CDCHit* ptrHit)
 {
+  if (not ptrHit) return Vector3D();
 
-  const CDCSimHit* ptrClosestPrimarySimHit = getClosestPrimarySimHit(&simHit);
-  if (ptrClosestPrimarySimHit) {
-    const CDCSimHit& closestPrimarySimHit = *ptrClosestPrimarySimHit;
+  const CDCMCMap& mcMap = CDCMCMap::getInstance();
 
-    //Take the momentum of the primary hit in this case
-    Vector3D directionOfFlight = closestPrimarySimHit.getMomentum();
+  const CDCSimHit* ptrSimHit = mcMap.getSimHit(ptrHit);
+
+  if (not ptrSimHit) return Vector3D();
+
+  const CDCSimHit* ptrPrimarySimHit =  mcMap.isReassignedSecondary(ptrHit) ? getClosestPrimarySimHit(ptrHit) : ptrSimHit;
+
+  if (not ptrPrimarySimHit) {
+    // if no primary simhit is close to the secondary hit we can only take the secondary
+    ptrPrimarySimHit = ptrSimHit;
+
+    //or invent something better at some point...
+  }
+
+  const CDCSimHit& primarySimHit = *ptrPrimarySimHit;
+
+  //Take the momentum of the primary hit
+  Vector3D directionOfFlight = primarySimHit.getMomentum();
+  return directionOfFlight;
+
+}
+
+
+
+void CDCSimHitLookUp::fillRLInfo()
+{
+  StoreArray<CDCHit> hits;
+  const CDCMCMap& mcMap = CDCMCMap::getInstance();
+
+  for (const CDCHit & hit : hits) {
+
+    const CDCHit* ptrHit = &hit;
+
+    const CDCSimHit* ptrSimHit = mcMap.getSimHit(ptrHit);
+    if (not ptrSimHit) continue;
+    const CDCSimHit& simHit = *ptrSimHit;
+
+    Vector3D directionOfFlight = getDirectionOfFlight(ptrHit);
+    if (directionOfFlight.isNull()) continue;
 
     // find out if the wire is right or left of the track ( view in flight direction )
     Vector3D trackPosToWire =  simHit.getPosWire();
     trackPosToWire.subtract(simHit.getPosTrack());
 
     RightLeftInfo rlInfo = trackPosToWire.xy().isRightOrLeftOf(directionOfFlight.xy());
-    return rlInfo;
+    m_rightLeftInfos[ptrHit] = rlInfo;
 
-  } else {
-    return INVALID_INFO;
-  }
-
-}
-
-
-/*
-RightLeftInfo CDCSimHitLookUp::getRLInfo(const CDCSimHit& simHit) const
-{
-
-  // find out if the wire is right or left of the track ( view in flight direction )
-  Vector3D trackPosToWire =  simHit.getPosWire();
-  trackPosToWire.subtract(simHit.getPosTrack());
-
-  Vector3D directionOfFlight = simHit.getMomentum();
-  RightLeftInfo rlInfo = trackPosToWire.xy().isRightOrLeftOf(directionOfFlight.xy());
-
-  return rlInfo;
-
-  }*/
-
-
-
-bool CDCSimHitLookUp::isReassignedSecondaryHit(const CDCHit* ptrHit) const
-{
-
-  if (not ptrHit) return false;
-
-  const CDCHit& hit = *ptrHit;
-
-  const RelationVector<MCParticle> mcParticles = hit.getRelationsWith<MCParticle>();
-
-  if (mcParticles.size() == 1) {
-    return  mcParticles.weight(0) <= 0.0;
-  } else {
-    return false;
   }
 
 }
 
 
 
-const CDCSimHit* CDCSimHitLookUp::getClosestPrimarySimHit(const CDCHit* hit) const
-{
-  auto itFoundPrimarySimHit = m_primarySimHits.find(hit);
-  return itFoundPrimarySimHit == m_primarySimHits.end() ? nullptr : itFoundPrimarySimHit->second;
-}
-
-
-
-RightLeftInfo CDCSimHitLookUp::getRLInfo(const CDCHit* hit) const
+RightLeftInfo CDCSimHitLookUp::getRLInfo(const CDCHit* ptrHit) const
 {
 
-  auto itFoundHit = m_rightLeftInfos.find(hit);
+  auto itFoundHit = m_rightLeftInfos.find(ptrHit);
   return itFoundHit == m_rightLeftInfos.end() ?  INVALID_INFO : itFoundHit->second;
 
 }
+
+
+
+
+
+
 
 

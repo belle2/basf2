@@ -15,6 +15,8 @@
 
 #include <framework/datastore/StoreArray.h>
 
+#include <tracking/cdcLocalTracking/mclookup/CDCMCMap.h>
+
 using namespace std;
 using namespace Belle2;
 using namespace CDCLocalTracking;
@@ -168,8 +170,8 @@ void CDCMCHitLookUp::fill()
 
 bool CDCMCHitLookUp::isReassignedSecondaryHit(const CDCWireHit& wireHit) const
 {
-  const CDCHit* hit = wireHit.getHit();
-  return CDCSimHitLookUp::getInstance().isReassignedSecondaryHit(hit);
+  const CDCHit* ptrHit = wireHit.getHit();
+  return CDCMCMap::getInstance().isReassignedSecondary(ptrHit);
 }
 
 

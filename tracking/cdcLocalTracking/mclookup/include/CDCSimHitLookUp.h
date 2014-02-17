@@ -10,73 +10,77 @@
 #ifndef CDCSIMHITLOOKUP_H
 #define CDCSIMHITLOOKUP_H
 
-#include <tracking/cdcLocalTracking/eventdata/CDCEventData.h>
-#include <tracking/cdcLocalTracking/eventtopology/CDCWireHitTopology.h>
+#include <tracking/cdcLocalTracking/mockroot/MockRoot.h>
 #include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
 
-#include <tracking/cdcLocalTracking/mockroot/MockRoot.h>
+#include <tracking/cdcLocalTracking/eventdata/entities/CDCWireHit.h>
 
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/dataobjects/CDCSimHit.h>
-#include <mdst/dataobjects/MCParticle.h>
-
-#include <framework/gearbox/Unit.h>
-
-#include "CDCMCTrackStore.h"
 
 #include <map>
-#include <list>
-#include <vector>
+
 
 namespace Belle2 {
   namespace CDCLocalTracking {
 
-    ///Class to organize and present the monte carlo hit information
 
+    /// Singletone class to gather local information about the hits.
+    /** Because of the reassignment of secondary hits and the different definition of the right
+     *  left passage in the CDCSimHit compared to the definition used in tracking finding, we provide this class
+     *  to collect an manage localised information about each hit such as the local direction of travel and said
+     *  left right passage information.
+     */
     class CDCSimHitLookUp : public UsedTObject {
 
     public:
-      /// Type for an ordered sequence of pointers to the CDCHit
-      typedef CDCMCTrackStore::CDCHitVector CDCHitVector;
-
-    public:
+      /// Default constructor
       CDCSimHitLookUp();
 
+      /// Empty destructor
       ~CDCSimHitLookUp();
 
     public:
+      /// Getter for the singletone instance
       static CDCSimHitLookUp& getInstance();
 
     public:
+      /// Clear all information from the last event
       void clear();
+
+      /// Gather the information about the right left passage using the CDCMCMap
       void fill();
 
     private:
+      /// Constructs the relation from reassigned secondary to a close by primary hit from the same MCParticle
       void fillPrimarySimHits();
-      bool isReassignedSecondaryHit(const CDCSimHit& simHit) const;
-      const CDCSimHit* getClosestPrimarySimHit(const CDCSimHit* simHit) const;
 
-
-      void fillRLInfo();
-      RightLeftInfo getPrimaryRLInfo(const CDCSimHit& simHit) const;
-      //RightLeftInfo getRLInfo(const CDCSimHit& simHit) const;
+      /// Helper function to find the closest primary hit for the given CDCSimHit from the same MCParticle - nullptr if no suitable hit can be found
+      const CDCSimHit* getClosestPrimarySimHit(const CDCSimHit*  ptrSimHit) const;
 
     public:
-      const Belle2::CDCSimHit* getSimHit(const CDCWireHit& wireHit) const {
-        const CDCHit* hit = wireHit.getHit();
-        return hit ? hit->getRelated<CDCSimHit>() : nullptr;
-      }
-
-    public:
-      bool isReassignedSecondaryHit(const CDCHit* hit) const;
+      /// Look up and return the closest primary simulated hit for the given CDCHit - nullptr if no suitable hit can be found
       const CDCSimHit* getClosestPrimarySimHit(const CDCHit* hit) const;
-      RightLeftInfo getRLInfo(const CDCHit* wireHit) const;
+
+      /// Calculate the local direction of flight. If the hit is secondary take the direction of flight from a close by primary - null vector if it cannot be assumed this way
+      Vector3D getDirectionOfFlight(const CDCHit* hit);
 
     private:
+      /// Construct the look up relation for the right left passage information as used in track finding
+      void fillRLInfo();
+
+    public:
+      /// Look up the Monte Carlo right left passage information for the given hit.
+      RightLeftInfo getRLInfo(const CDCHit* ptrHit) const;
+
+    private:
+      /// Memory for the look up relation of close primary CDCSimHits
       std::map<const CDCHit*, const CDCSimHit*>  m_primarySimHits;
+
+      /// Memory for the look up relation of the right left passage information as defined in tracking.
       std::map<const CDCHit*, RightLeftInfo> m_rightLeftInfos;
 
     }; //class
   } // end namespace CDCLocalTracking
 } // namespace Belle2
-#endif // CDCSIMHITLOOKUP
+#endif // CDCSIMHITLOOKUP_H

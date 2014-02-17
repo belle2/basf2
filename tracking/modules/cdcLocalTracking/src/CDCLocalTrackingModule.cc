@@ -23,9 +23,11 @@
 
 #include <tracking/cdcLocalTracking/eventtopology/CDCWireHitTopology.h>
 
+#include <tracking/cdcLocalTracking/mclookup/CDCMCMap.h>
 #include <tracking/cdcLocalTracking/mclookup/CDCMCTrackStore.h>
 #include <tracking/cdcLocalTracking/mclookup/CDCSimHitLookUp.h>
 #include <tracking/cdcLocalTracking/mclookup/CDCMCHitLookUp.h>
+
 
 //typedefs
 #include <tracking/cdcLocalTracking/typedefs/UsedDataHolders.h>
@@ -117,6 +119,8 @@ void CDCLocalTrackingModule::event()
   //CALLGRIND_STOP_INSTRUMENTATION;
 
 #ifdef CDCLOCALTRACKING_USE_MC_FILTERS
+  CDCMCMap::getInstance().fill();
+
   CDCMCTrackStore& mcTrackStore = CDCMCTrackStore::getInstance();
   mcTrackStore.fill();
 

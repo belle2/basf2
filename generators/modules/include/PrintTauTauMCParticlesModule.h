@@ -3,13 +3,13 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Kiyoshi Hayasaka                                        *
+ * Contributors: Kiyoshi Hayasaka                                         *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PRINTMCPARTICLESMODULE_H
-#define PRINTMCPARTICLESMODULE_H
+#ifndef PRINTTAUTAUMCPARTICLESMODULE_H
+#define PRINTTAUTAUMCPARTICLESMODULE_H
 
 #include <framework/core/Module.h>
 
@@ -61,4 +61,4 @@ namespace Belle2 {
 
 } // end namespace Belle2
 
-#endif // PRINTMCPARTICLESMODULE_H
+#endif // PRINTTAUTAUMCPARTICLESMODULE_H

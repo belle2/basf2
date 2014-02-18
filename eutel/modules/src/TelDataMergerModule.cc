@@ -320,8 +320,8 @@ void TelDataMergerModule::event()
 
   StoreObjPtr<EventMetaData> storeEventMetaData;
 
-  //if (storeEventMetaData->getEvent() > m_nEventsProcess) storeEventMetaData->setEndOfData();
-  if (storeEventMetaData->getEvent() > m_nEventsProcess) stopPeacefully();
+
+  if (abs(storeEventMetaData->getEvent()) > m_nEventsProcess) stopPeacefully();
 
   m_currentTLUTagFromFTSW =
     static_cast<unsigned short>(storeFTSW[0]->Get15bitTLUTag(0));

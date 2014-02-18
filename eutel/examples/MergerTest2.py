@@ -23,6 +23,7 @@ geometry.param('components', ['TB'])
 # input
 input = register_module('RootInput')
 input.param('inputFileName', '../vxdtb/data/RawData_0000_000470.root')
+input.param('excludeBranchNames', ['SVDDigits'])
 # data reader
 dataMerger = register_module('TelDataMerger')
 # use corresponding telescope data file
@@ -86,6 +87,7 @@ tel_dqm.param('Clusters', 'TelClusters')
 
 # TB DQM module adds correlations between telescopes and nearest VXD sensors.
 telvxd_dqm = register_module('TelxVXD')
+telvxd_dqm.param('UseSpacePoints', 1)
 
 progress = register_module('Progress')
 dataWriter = register_module('RootOutput')
@@ -102,6 +104,7 @@ main.add_module(PXDUnpack)
 main.add_module(PXDSort)
 main.add_module(PXDClust)
 main.add_module(PXD_DQM)
+main.add_module(svdUnpacker)
 main.add_module(SVDSort)
 main.add_module(SVDClust)
 main.add_module(svd_dqm)

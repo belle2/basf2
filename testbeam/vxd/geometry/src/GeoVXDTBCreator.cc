@@ -220,10 +220,10 @@ namespace Belle2 {
                                    aWidth,
                                    aLength,
                                    aHeight,
-                                   content.getInt("pixelsZ[1]"),//!!!exchanged
                                    content.getInt("pixelsR"),//!!!exchanged
-                                   0., //content.getLength("splitLength", 0),
-                                   0 //content.getInt("pixelsZ[2]", 0)
+                                   content.getInt("pixelsZ[1]"),//!!!exchanged
+                                   content.getLength("splitLength", 0),
+                                   content.getInt("pixelsZ[2]", 0)
                                   );
         sensorInfo.setDEPFETParams(
           content.getDouble("BulkDoping") / (Unit::um * Unit::um * Unit::um),
@@ -252,8 +252,8 @@ namespace Belle2 {
                                    aWidth,
                                    aLength,
                                    aHeight,
-                                   content.getInt("stripsV"),//!!! exchanged
                                    content.getInt("stripsU"),//!!! exchanged
+                                   content.getInt("stripsV"),//!!! exchanged
                                    content.getLength("width2", 0));
         const double unit_pF = 1000 * Unit::fC / Unit::V; // picofarad
         sensorInfo.setSensorParams(
@@ -276,10 +276,10 @@ namespace Belle2 {
                                    aWidth,
                                    aLength,
                                    aHeight,
-                                   content.getInt("pixelsZ[1]"),
                                    content.getInt("pixelsR"),
-                                   0.,//content.getLength("splitLength", 0),
-                                   0 //content.getInt("pixelsZ[2]", 0)
+                                   content.getInt("pixelsZ[1]"),
+                                   content.getLength("splitLength", 0),
+                                   content.getInt("pixelsZ[2]", 0)
                                   );
 
         TEL::SensorInfo* newInfo = new TEL::SensorInfo(sensorInfo);
@@ -360,3 +360,7 @@ namespace Belle2 {
   } // namespace TB
 
 } // namespace Belle2
+
+
+
+

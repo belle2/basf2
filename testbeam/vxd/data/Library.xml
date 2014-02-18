@@ -24,8 +24,8 @@
      <Material>Air</Material>
      <Shape>Box</Shape>
      
-     <HalfX unit="mm">65.00</HalfX>
-     <HalfY unit="mm">20.00</HalfY>
+     <HalfX unit="mm">20.00</HalfX>
+     <HalfY unit="mm">65.00</HalfY>
      <HalfZ unit="mm">1</HalfZ>
    </Snippet>
    <Snippet name="SVD_module">
@@ -33,8 +33,8 @@
       <Material>Air</Material>
       <Shape>Box</Shape>
 
-      <HalfX unit="mm">65.00</HalfX>
-      <HalfY unit="mm">30.00</HalfY>
+      <HalfX unit="mm">30.00</HalfX>
+      <HalfY unit="mm">65.00</HalfY>
       <HalfZ unit="mm">1</HalfZ>
    </Snippet>
    <Snippet name="SVD_sensor">
@@ -47,8 +47,8 @@
       <Theta unit="deg">0</Theta>
       <Phi unit="deg">0</Phi>
       <Psi unit="deg">0</Psi>
-      <HalfX unit="mm">61.440</HalfX>
-      <HalfY unit="mm">28.8</HalfY>
+      <HalfY unit="mm">61.440</HalfY>
+      <HalfX unit="mm">28.8</HalfX>
       <HalfZ unit="um">160</HalfZ>
    </Snippet>
    <Snippet name="SVD_sensor_layer3">
@@ -61,15 +61,15 @@
      <Theta unit="deg">0</Theta>
      <Phi unit="deg">0</Phi>
      <Psi unit="deg">0</Psi>
-     <HalfX unit="mm">61.44</HalfX>
-     <HalfY unit="mm">19.2</HalfY>
+     <HalfY unit="mm">61.44</HalfY>
+     <HalfX unit="mm">19.2</HalfX>
      <HalfZ unit="um">160</HalfZ>
    </Snippet>   
    <Snippet name="SVD_active">
       <DetectorType>SVD</DetectorType>
       <stepSize unit="um">5</stepSize>
-      <stripsU>768</stripsU><!-- This is long side -->
-      <stripsV>512</stripsV><!-- This is short side -->
+      <stripsU>768</stripsU>
+      <stripsV>512</stripsV>
       <!-- Sensor operation parameters. -->
       <DepletionVoltage unit="V">60.0</DepletionVoltage>
       <BiasVoltage unit="V">150</BiasVoltage>
@@ -283,17 +283,20 @@
    <Snippet name="EUDET-SensitiveArea">
       <Material>Si</Material>
       <Shape>Box</Shape>
-      <HalfX unit="mm">5.2992</HalfX>
-      <HalfY unit="mm">10.5984</HalfY>
+      <HalfX unit="mm">10.5984</HalfX>
+      <HalfY unit="mm">5.2992</HalfY>
+      <Phi unit="deg">90</Phi>
+      <Theta unit="deg">180</Theta>
+      <Psi unit="deg">180</Psi>
       <HalfZ unit="um">25</HalfZ>
    </Snippet>
    <Snippet name="EUDET-Active">
       <DetectorType>TEL</DetectorType>
       <stepSize unit="um">5</stepSize>
       <!-- define the number of pixels in rphi direction -->
-      <pixelsR>576</pixelsR>
+      <pixelsR>1152</pixelsR>
       <!-- define the number of pixels in z direction. There are two values since we have two different pixel sizes inside of one module: Larger pixels in the outer area, smaller pixels in the middle -->
-      <pixelsZ>1152</pixelsZ>
+      <pixelsZ>576</pixelsZ>
       <pixelsZ>0</pixelsZ>
       <!-- splitLength defines the position inside the active area (starting at the outside) where the pixel size changes. Pixel size is calculated automatically from the size of the active area and the number of pixels -->
       <splitLength unit="mm">0.0</splitLength>
@@ -355,19 +358,19 @@
          <Subtract>
             <Name>EUDET-FrameCutTroley</Name>
             <Shape>Box</Shape>
-            <DX unit="mm">60</DX>
-            <DY unit="mm">-76</DY>
-            <HalfX unit="mm">5</HalfX>
-            <HalfY unit="mm">6</HalfY>
+            <DX unit="mm">76</DX>
+            <DY unit="mm">60</DY>
+            <HalfX unit="mm">6</HalfX>
+            <HalfY unit="mm">5</HalfY>
             <HalfZ unit="mm">8.5</HalfZ>
          </Subtract>
          <Subtract>
             <Name>EUDET-FrameCutTroley</Name>
             <Shape>Box</Shape>
-            <DX unit="mm">-60</DX>
-            <DY unit="mm">-76</DY>
+            <DX unit="mm">76</DX>
+            <DY unit="mm">-60</DY>
             <HalfX unit="mm">5</HalfX>
-            <HalfY unit="mm">6</HalfY>
+            <HalfY unit="mm">5</HalfY>
             <HalfZ unit="mm">8.5</HalfZ>
          </Subtract>
          <Subtract>
@@ -452,20 +455,24 @@
       <Shape>Box</Shape>
       <DX unit="mm">7.0</DX>
       <DY unit="mm">1.2</DY>
+      <Phi unit="deg">90</Phi>
       <DZ unit="mm">-0.1725</DZ>
-      <HalfX unit="mm">24</HalfX>
-      <HalfY unit="mm">4.8</HalfY>
+      <HalfX unit="mm">4.8</HalfX>
+      <HalfY unit="mm">24</HalfY>
       <HalfZ unit="um">25</HalfZ>
    </Snippet>
    <Snippet name="PXD6-S-SensitiveArea_short">
       <Color>#00ff00</Color>
       <Material>Si</Material>
       <Shape>Box</Shape>
+      <!-- Following update changes LOCAL correlations to +1 (is it right?) -->
+      <Phi unit="deg">90</Phi>
       <DX unit="mm">7.0</DX>
       <DY unit="mm">1.0</DY>
+      
       <DZ unit="mm">-0.1725</DZ>
-      <HalfX unit="mm">18.4</HalfX>
-      <HalfY unit="mm">4.8</HalfY>
+      <HalfX unit="mm">4.8</HalfX>
+      <HalfY unit="mm">18</HalfY>
       <HalfZ unit="um">25</HalfZ>
    </Snippet>
    <Snippet name="airPXD-SensitiveArea">
@@ -474,21 +481,25 @@
      <Shape>Box</Shape>
      <DX unit="mm">7.0</DX>
      <DY unit="mm">1.2</DY>
+     <Phi unit="deg">90</Phi>
      <DZ unit="mm">-0.1725</DZ>
-     <HalfX unit="mm">24</HalfX>
-     <HalfY unit="mm">4.8</HalfY>
+     <HalfX unit="mm">4.8</HalfX>
+     <HalfY unit="mm">24</HalfY>
      <HalfZ unit="um">25</HalfZ>
    </Snippet>
    <Snippet name="airPXD6-S-SensitiveArea_short">
      <Color>#00ff00</Color>
      <Material>Air</Material>
-     <Shape>Box</Shape>
-     <DX unit="mm">7.0</DX>
-     <DY unit="mm">1.0</DY>
-     <DZ unit="mm">-0.1725</DZ>
-     <HalfX unit="mm">18.4</HalfX>
-     <HalfY unit="mm">4.8</HalfY>
-     <HalfZ unit="um">25</HalfZ>
+      <Shape>Box</Shape>
+      <!-- Following update changes LOCAL correlations to +1 (is it right?) -->
+      <Phi unit="deg">90</Phi>
+      <DX unit="mm">7.0</DX>
+      <DY unit="mm">1.0</DY>
+      
+      <DZ unit="mm">-0.1725</DZ>
+      <HalfX unit="mm">4.8</HalfX>
+      <HalfY unit="mm">18</HalfY>
+      <HalfZ unit="um">25</HalfZ>
    </Snippet>
    <Snippet name="PXD6-sensor_L2">
       <Color>#006699</Color>

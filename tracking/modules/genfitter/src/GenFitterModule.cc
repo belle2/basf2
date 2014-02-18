@@ -574,14 +574,6 @@ void GenFitterModule::event()
             B2DEBUG(149, "Point of closest approach: " << poca.x() << "  " << poca.y() << "  " << poca.z());
             B2DEBUG(149, "Track direction in POCA: " << dirInPoca.x() << "  " << dirInPoca.y() << "  " << dirInPoca.z());
 
-            //get momentum, position and covariance matrix
-            TMatrixF newResultCovariance(6, 6);
-            for (int ii = 0; ii < 6; ii++) {
-              for (int jj = 0; jj < 6; jj++) {
-                newResultCovariance(ii, jj) = cov(ii, jj);
-              }
-            }
-
             //MH: this is new stuff...
             tracks[trackCounter]->setTrackFitResultIndex(chargedStable, trackFitResultCounter);
             //Create relations
@@ -589,31 +581,16 @@ void GenFitterModule::event()
               mcParticlesToTracks.add(aTrackCandPointer->getMcTrackId(), trackCounter);
             }
 
-            TrackFitResult* newTrackFitResult = trackFitResults.appendNew();
-            newTrackFitResult->setCharge(0);
-            newTrackFitResult->setParticleType(chargedStable);
-            newTrackFitResult->setMomentum(dirInPoca);
-            newTrackFitResult->setPosition(poca);
-            newTrackFitResult->setCovariance6(newResultCovariance);
-            newTrackFitResult->setPValue(1);
+            genfit::KalmanFitStatus* fs = gfTrack.getKalmanFitStatus();
+            int charge = fs->getCharge();
+            double pVal = fs->getBackwardPVal();
+            float bField = 1.5; //TODO: get magnetic field from genfit
+
+            TrackFitResult* newTrackFitResult = trackFitResults.appendNew(TrackFitResult(poca, dirInPoca, cov, charge, chargedStable, pVal, bField));
             gfTracksToTrackFitResults.add(trackCounter, trackFitResultCounter);
             gfTrackCandidatesToTrackFitResults.add(iCand, trackFitResultCounter);
             gfTrackCandidatesTogfTracks.add(iCand, trackCounter);
             trackFitResultCounter++;
-
-            if (fitSuccess) {
-              genfit::KalmanFitStatus* fs = gfTrack.getKalmanFitStatus();
-              newTrackFitResult->setCharge(fs->getCharge());
-              double Pval = fs->getBackwardPVal();
-              newTrackFitResult->setPValue(Pval);
-              /*hPval->Fill(Pval);
-              if (nPXD == 0 && nSVD == 0)
-                 hPvalCDC->Fill(Pval);
-               else if (nCDC == 0)
-                 hPvalVXD->Fill(Pval);
-              else
-                hPvalFull->Fill(Pval);*/
-            }
 
 
             // store position

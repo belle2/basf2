@@ -37,9 +37,9 @@ namespace Belle2 {
 
     BBBrem() :
       m_eventCount(0),
-      m_weightCount(0),
       m_applyBoost(false),
       m_unweighted(true),
+      m_weightCount(0),
       m_maxWeight(0.0),
       m_maxWeightDelivered(0.0),
       m_sumWeightDelivered(0.0),

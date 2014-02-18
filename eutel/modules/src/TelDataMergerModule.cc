@@ -4,6 +4,7 @@
 #include <memory>
 #include <algorithm>
 #include <set>
+#include <limits>
 
 // Load the eudaq part
 #include <eutel/eudaq/DetectorEvent.h>
@@ -56,6 +57,8 @@ TelDataMergerModule::TelDataMergerModule() : Module(),
   addParam("inputFileName", m_inputFileName, "Input file name. For multiple files, use inputFileNames instead. Can be overridden using the -i argument to basf2.", std::string(""));
   addParam("storeDigitsName", m_storeDigitsName, "DataStore name of TelDigits collection", std::string(""));
   addParam("bufferSize", m_bufferSize, "Size of the telescope data buffer", m_bufferSize);
+  m_nEventsProcess = -1;
+  addParam("nEventsProcess", m_nEventsProcess, "Number of events to process", m_nEventsProcess);
 
   // This is dirty, but safe for all practical purposes - there may be less EuTels, but hardly more.
   m_eutelPlaneNrs = {0, 1, 2, 3, 4, 5};
@@ -217,6 +220,8 @@ void TelDataMergerModule::initialize()
   StoreObjPtr<TelEventInfo> storeTelEventInfo;
   storeTelEventInfo.registerAsPersistent();
 
+  if (m_nEventsProcess < 0) m_nEventsProcess = std::numeric_limits<long>::max();
+
   // Initialize sensor number to sensor VxdID conversion map.
 
   VXD::GeoCache& geo = VXD::GeoCache::getInstance();
@@ -312,6 +317,11 @@ void TelDataMergerModule::event()
   B2DEBUG(25, "Started Event();");
 
   StoreArray<RawFTSW> storeFTSW(m_storeRawFTSWsName);
+
+  StoreObjPtr<EventMetaData> storeEventMetaData;
+
+  //if (storeEventMetaData->getEvent() > m_nEventsProcess) storeEventMetaData->setEndOfData();
+  if (storeEventMetaData->getEvent() > m_nEventsProcess) stopPeacefully();
 
   m_currentTLUTagFromFTSW =
     static_cast<unsigned short>(storeFTSW[0]->Get15bitTLUTag(0));

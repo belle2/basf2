@@ -115,6 +115,7 @@ namespace Belle2 {
 
     unsigned short m_bufferSize;    /**< Size of the buffers */
     std::vector<int> m_eutelPlaneNrs; /**< Numbering of telescope planes in eudaq */
+    long m_nEventsProcess;          /**< Number of events to process */
 
     // Internal Variables
 

@@ -2,10 +2,13 @@
 #include <framework/logging/Logger.h>
 #include <tracking/dataobjects/Track.h>
 #include <tracking/dataobjects/TrackFitResult.h>
-#include <genfit/Track.h>
-#include <TMatrixF.h>
-#include <genfit/RKTrackRep.h>
+//#include <genfit/Track.h>
 
+#include <TMatrixF.h>
+#include <TMatrixDSym.h>
+#include <TVector3.h>
+#include <TRandom3.h>
+#include <TMath.h>
 
 #include <gtest/gtest.h>
 
@@ -20,60 +23,52 @@ namespace Belle2 {
   };
 
   /** Test simple Setters and Getters. */
-  TEST_F(TrackFitResultTest, settersNGetters)
+  TEST_F(TrackFitResultTest, Getters)
   {
-    TrackFitResult myResult;
-    float pValue = 0.45;
-    myResult.setPValue(pValue);
-    EXPECT_FLOAT_EQ(pValue, myResult.getPValue());
+    TRandom3 generator;
+    unsigned int nCases = 1;
+    double absError = 1e-6;
+    double bField = 1.5;
 
-    myResult.setCharge(1);
-    EXPECT_EQ(1, myResult.getCharge());
+    for (unsigned int i = 0; i < nCases; ++i) {
 
-    myResult.setCharge(-10);
-    EXPECT_EQ(-1, myResult.getCharge());
+      short int charge = generator.Uniform(-1, 1) > 0 ? 1 : -1;
+      Const::ParticleType pType = Const::electron;
+      float pValue = 0.45;
 
-    myResult.setParticleType(Const::electron);
-    EXPECT_EQ(Const::electron, myResult.getParticleType());
-  }
+      // Generate a random put orthogonal pair of vectors in the r-phi plane
+      TVector2 d(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
+      TVector2 pt(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
+      d.Set(d.X(), -(d.X()*pt.Px()) / pt.Py());
+      // Add a random z component
+      TVector3 position(d.X(), d.Y(), generator.Uniform(-1, 1));
+      TVector3 momentum(pt.Px(), pt.Py(), generator.Uniform(-1, 1));
 
-  /** Test Position/Momentum Vectors and respective error matrix input and retrieval.*/
-  TEST_F(TrackFitResultTest, posMomErrorIO)
-  {
-    TVector3 pos(0.1, 0.1, 0.1);
-    TVector3 mom(1.0, 1.0, -1.0);
-    TMatrixF errorMatrix(6, 6);
-    for (int ii = 0; ii < 6; ii++) {
-      for (int jj = ii; jj < 6; jj++) {
-        errorMatrix(ii, jj) = 0.01;
-      }
+      TMatrixDSym cov6(6);
+
+      // Set up class for testing
+      TrackFitResult myResult(position, momentum, cov6, charge, pType, pValue, bField);
+
+      // Test all vector elements
+      EXPECT_NEAR(position.X(), myResult.getPosition().X(), absError);
+      EXPECT_NEAR(position.Y(), myResult.getPosition().Y(), absError);
+      EXPECT_NEAR(position.Z(), myResult.getPosition().Z(), absError);
+      EXPECT_NEAR(momentum.Px(), myResult.getMomentum(bField).Px(), absError);
+      EXPECT_NEAR(momentum.Py(), myResult.getMomentum(bField).Py(), absError);
+      EXPECT_NEAR(momentum.Pz(), myResult.getMomentum(bField).Pz(), absError);
+
+      // Test other variables
+      EXPECT_EQ(charge, myResult.getCharge());
+      EXPECT_EQ(pValue, myResult.getPValue());
+      EXPECT_EQ(pType, myResult.getParticleType());
+
     }
-    TrackFitResult myResult;
-    myResult.setPosition(pos);
-    myResult.setMomentum(mom);
-    myResult.setCovariance6(errorMatrix);
+  } // Testcases for getters
 
-    //The following should be replaced with proper inspection,
-    // if the TVector3 are compatible within the tolerance.
-    //Position
-    EXPECT_FLOAT_EQ(pos.Mag(), myResult.getPosition().Mag());
-
-    EXPECT_FLOAT_EQ(pos.Phi(), myResult.getPosition().Phi());
-
-    EXPECT_FLOAT_EQ(pos.Eta(), myResult.getPosition().Eta());
-
-    //Momentum
-    EXPECT_FLOAT_EQ(mom.Mag(), myResult.getMomentum().Mag());
-
-    EXPECT_FLOAT_EQ(mom.Phi(), myResult.getMomentum().Phi());
-
-    EXPECT_FLOAT_EQ(mom.Eta(), myResult.getMomentum().Eta());
-
-    //Covariance
-    //Dangerous, because expectation of bite-wise equality is unreasonable if there are internal
-    // conversions.
-    EXPECT_EQ(errorMatrix, myResult.getCovariance6());
-
+  TEST_F(TrackFitResultTest, ErrorPropagation)
+  {
+    // TODO:
   }
+
 
 }  // namespace

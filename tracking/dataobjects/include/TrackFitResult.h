@@ -3,7 +3,7 @@
  * Copyright(C) 2013 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Martin Heck                                              *
+ * Contributors: Martin Heck, Markus Prim                                 *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -11,11 +11,16 @@
 
 #include <framework/gearbox/Const.h>
 #include <framework/datastore/RelationsObject.h>
+#include <framework/logging/Logger.h>
+
 #include <tracking/dataobjects/HitPatternCDC.h>
 #include <tracking/dataobjects/HitPatternVXD.h>
 #include <TVector3.h>
 #include <TMatrixF.h>
+#include <TMatrixDSym.h>
 #include <cstdlib>
+
+#include <vector>
 
 namespace Belle2 {
 
@@ -26,20 +31,36 @@ namespace Belle2 {
     /** Constructor initializing everything to zero. */
     TrackFitResult();
 
-    // This class should be able to give back Helix information either in Perigee Parametrisation
-    // or as starting position + momentum.
+    /** Constructor initializing class with fit result. */
+    TrackFitResult(const TVector3& position, const TVector3& momentum, const TMatrixDSym& covariance,
+                   const short int charge, const Const::ParticleType& pType, const float pValue,
+                   const float bField);
+
+    /** Constructor initializing class with perigee parameters. Just for test cases*/
+    TrackFitResult(const std::vector<float>& tau, const std::vector<float>& cov5,
+                   const Const::ParticleType& pType, const float pValue);
 
     /** Getter for vector of position at closest approach of track in r/phi projection.*/
     TVector3 getPosition() const;
 
-    /** Setter for position vector.*/
-    void setPosition(const TVector3& position);
+    /** Setter for position vector.
+     * TODO delete, out of Business
+     * */
+    void setPosition(const TVector3& position) {
+      B2WARNING("Deprecated, member variables are set with constructor call.");
+    }
 
-    /** Getter for vector of momentum at closest approach of track in r/phi projection.*/
-    TVector3 getMomentum() const;
+    /** Getter for vector of momentum at closest approach of track in r/phi projection.
+     * This has a default value so that the basf2 compiles
+     * */
+    TVector3 getMomentum(const float bField = 1.5) const;
 
-    /** Setter for momentum vector.*/
-    void setMomentum(const TVector3& momentum);
+    /** Setter for momentum vector.
+      * TODO delete, out of Business
+      * */
+    void setMomentum(const TVector3& momentum) {
+      B2WARNING("Deprecated, member variables are set with constructor call.");
+    }
 
     /** Position and Momentum Covariance Matrix.
      *
@@ -48,34 +69,38 @@ namespace Belle2 {
      *  As well currently no TMatrixSym is used (which might change, but doesn't matter much due to the misconstruction of TMatrixSym).
      *  @TODO Study if double precision matrix is needed and if TMatrixSym helps somewhere.
      */
-    TMatrixF getCovariance6() const;
+    TMatrixF getCovariance6(const float bField = 1.5) const;
 
-    /** Setter for Covariance matrix of position and momentum.*/
-    void setCovariance6(const TMatrixF& covariance);
+    /** Setter for Covariance matrix of position and momentum.
+     * TODO delete, out of Business
+     * */
+    void setCovariance6(const TMatrixF& covariance) {
+      B2WARNING("Deprecated, member variables are set with constructor call.");
+    }
 
     /** Get back a ParticleCode of the hypothesis of the track fit.*/
     Const::ParticleType getParticleType() const {
       return Const::ParticleType(m_pdg);
     }
 
-    /* Setter for the PDGCode. */
+    /** Setter for the PDGCode.
+     * TODO delete, out of Business
+     * */
     void setParticleType(const Const::ParticleType& pType) {
-      m_pdg = std::abs(pType.getPDGCode());
+      B2WARNING("Deprecated, member variables are set with constructor call.");
     }
 
     /** Return track charge (1 or -1). */
     short getCharge() const {
-      return m_charge; // this is a temporary solution.
-      /*      if (getOmega() >= 0)
-              return 1;
-            else
-              return -1;
-              */
+      // getOmega needs an argument, so one is given
+      return getOmega(1.5) >= 0 ? 1 : -1;
     }
 
-    /** Setter for Charge */
+    /** Setter for Charge
+     * TODO delete, out of Business
+     * */
     void setCharge(int charge) {
-      m_charge = (charge < 0) ? -1 : 1;
+      B2WARNING("Deprecated, member variables are set with constructor call.");
     }
 
     /** Getter for Chi2 Probability of the track fit. */
@@ -83,10 +108,65 @@ namespace Belle2 {
       return m_pValue;
     }
 
-    /** Setter for Chi2 Probability of the track fit. */
+    /** Setter for Chi2 Probability of the track fit.
+     * TODO delete, out of Business
+     * */
     void setPValue(float pValue) {
-      m_pValue = pValue;
+      B2WARNING("Deprecated, member variables are set with constructor call.");
     }
+
+    //---------------------------------------------------------------------------------------------------------------------------
+    // --- Getters for perigee helix parameters
+    //---------------------------------------------------------------------------------------------------------------------------
+    /**
+     * Getter for d0. This is the signed distance to the POCA in the r-phi plane.
+     * @return
+     */
+    float getD0() const { return m_tau.at(0); }
+
+    /**
+     * Getter for phi. This is the angle of the transverse momentum in the r-phi plane.
+     * @return
+     */
+    float getPhi() const { return m_tau.at(1); }
+
+    /**
+     * Getter for omega. This is the curvature of the track. It's sign is defined by the charge of the particle.
+     * @return
+     */
+    float getOmega(const float bField) const { return m_tau.at(2); }
+
+    /**
+     * Getter for z0. This is the z coordinate of the POCA.
+     * @return
+     */
+    float getZ0() const { return m_tau.at(3); }
+
+    /**
+     * Getter for cotTheta. This is the slope of the track in the r-z plane.
+     * @return
+     */
+    float getCotTheta() const { return m_tau.at(4); }
+
+    /**
+     * Getter for all perigee parameters
+     * @return vector with 5 elements
+     */
+    std::vector<float> getTau(const float bField) const { return m_tau; }
+
+    /**
+     * Getter for all covariance matrix elements of perigee parameters
+     * TODO: Implement bField
+     * @return vector with 15 elements
+     */
+    std::vector<float> getCov(const float bField) const { return m_cov5; }
+
+    /**
+     * Getter for covariance matrix of perigee parameters in matrix form.
+     * TODO: Implement bField
+     * @return
+     */
+    TMatrixF getCovariance5(const float bField) const;
 
     //---------------------------------------------------------------------------------------------------------------------------
     //--- Hit Pattern Arithmetics
@@ -135,37 +215,49 @@ namespace Belle2 {
 
     ///--------------------------------------------------------------------------------------------------------------------------
   private:
-    /** PDG Code for hypothesis with which the corresponding fir was performed. */
-    unsigned int m_pdg;
+    /** Calculates the alpha value for a given magnetic field in Tesla */
+    double getAlpha(const float bField) const;
+
+    //---------------------------------------------------------------------------------------------------------------------------
+    //--- Functions for internal conversions between cartesian and perigee helix parameters
+    //--- This can be placed in a seperate header which handles all the conversion stuff
+    //---------------------------------------------------------------------------------------------------------------------------
+    float calcD0FromCartesian(const TVector3& position, const TVector3& momentum) const ;
+    float calcPhiFromCartesian(const TVector3& momentum) const;
+    float calcOmegaFromCartesian(const TVector3& momentum, const short int charge, const float bField) const;
+    float calcZ0FromCartesian(const TVector3& position) const;
+    float calcCotThetaFromCartesian(const TVector3& momentum) const;
+    //TMatrixF transformCov6ToCov5(TMatrixF& cov6) const; //handled inside cartesianToPerigee
+
+    float calcXFromPerigee() const;
+    float calcYFromPerigee() const;
+    float calcZFromPerigee() const;
+    float calcPxFromPerigee(const float bField) const;
+    float calcPyFromPerigee(const float bField) const;
+    float calcPzFromPerigee(const float bField) const;
+    TMatrixF transformCov5ToCov6(const TMatrixF& cov5, const float bField) const;
+
+    /** Cartesian to Perigee conversion
+     * everything happens internally, m_tau and m_cov5 will be set and cartesian values dropped
+     */
+    void cartesianToPerigee(const TVector3& position, const TVector3& momentum, const TMatrixDSym& covariance,
+                            const short int charge, const float bField);
+
+    /** PDG Code for hypothesis with which the corresponding fit was performed. */
+    const unsigned int m_pdg;
 
     /** Chi2 Probability of the fit. */
-    float m_pValue;
+    const float m_pValue;
 
-    ///--------------------------------------------------------------------------------------------------------------------------
-    /** Charge;
-     *
-     *  this is probably a temporary variable, that will be removed later,
-     *  and the charge will be saved within the helix parametrization.
+    /** perigee helix parameters
+     * tau = d0, phi, omega, z0, cotTheta
      */
-    short m_charge;
+    std::vector<float> m_tau;
 
-    /** Momentum Vector.
-     *
-     *  Another temporary solution. This should be transformed to the helix parametrization later.
+    /** covariance matrix elements
+     * (0,0), (0,1) ... (1,1), (1,2) ... (2,2) ...
      */
-    TVector3 m_momentum;
-
-    /** Position Vector.
-     *
-     *  Yet another temporary solution.
-     */
-    TVector3 m_position;
-
-    /** Covariance Matrix.
-     *
-     *  Temp ...
-     */
-    TMatrixF m_cov;
+    std::vector<float> m_cov5;
 
     ///--------------------------------------------------------------------------------------------------------------------------
     /** Hit Pattern of the corresponding Hit.
@@ -177,13 +269,7 @@ namespace Belle2 {
      */
 //    std::bitset<64> m_hitPattern;
 
-    //---------------------------------------------------------------------------------------------------------------------------
-    //--- Internal Variables to store track parameters with uncertainties in perigee description of helix.
-    //---------------------------------------------------------------------------------------------------------------------------
-//    float m_perigeeParams [5] ;
-//    float m_perigeeUncertainties [15];
-
-
-    ClassDef(TrackFitResult, 1);
+    ClassDef(TrackFitResult, 2);
   };
 }
+

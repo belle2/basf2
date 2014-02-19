@@ -60,6 +60,10 @@ TelxVXDModule::TelxVXDModule() : HistoModule()
   m_DUTSVDBwd = m_ModulesForCheck[2]; /**< [8] backward SVD for correlations: 5..8 */
   m_DUTTelFwd = m_ModulesForCheck[3]; /**< [2] forward telescope for correlations: 0..2 */
   m_DUTTelBwd = m_ModulesForCheck[4]; /**< [9] backward telescope for correlations: 9..11 */
+  m_PXDCutSeedL = 0;
+  m_PXDCutSeedH = 100000;
+  addParam("PXDCutSeedL", m_PXDCutSeedL, "PXD: seed cut lower border", m_PXDCutSeedL);
+  addParam("PXDCutSeedL", m_PXDCutSeedH, "PXD: seed cut higher border", m_PXDCutSeedH);
 
 }
 
@@ -548,14 +552,12 @@ void TelxVXDModule::event()
   }
 
 //  m_chargePXD2, m_hitMapPXD2
-  float PXDCutSeedL = 17;
-  float PXDCutSeedH = 27;
   for (const PXDCluster & cluster : storePXDClusters) {
     int iPlane = cluster.getSensorID().getLayerNumber();
     if ((iPlane + 3 < c_firstPXDPlane) || (iPlane + 3 > c_lastPXDPlane)) continue;
     int index = planeToIndex(iPlane + 3);
     if (index != m_DUTPXD) continue;
-    if ((cluster.getSeedCharge() >= PXDCutSeedL) && (cluster.getSeedCharge() <= PXDCutSeedH)) {
+    if ((cluster.getSeedCharge() >= m_PXDCutSeedL) && (cluster.getSeedCharge() <= m_PXDCutSeedH)) {
       m_chargePXD2->Fill(cluster.getCharge());
       m_hitMapPXD2->Fill(getInfoPXD(index).getUCellID(cluster.getU()), getInfoPXD(index).getVCellID(cluster.getV()));
     }
@@ -637,7 +639,7 @@ void TelxVXDModule::event()
       const PXDCluster& clusterPXD1 = *storePXDClusters[i1];
       iPlane1 = clusterPXD1.getSensorID().getLayerNumber();
       if ((iPlane1 + 3 < c_firstPXDPlane) || (iPlane1 + 3 > c_lastPXDPlane)) continue;
-      if ((clusterPXD1.getSeedCharge() < PXDCutSeedL) || (clusterPXD1.getSeedCharge() > PXDCutSeedH)) continue;
+      if ((clusterPXD1.getSeedCharge() < m_PXDCutSeedL) || (clusterPXD1.getSeedCharge() > m_PXDCutSeedH)) continue;
       index1 = planeToIndex(iPlane1 + 3);
       iIsU1 = 1;
       iIsV1 = 1;
@@ -689,7 +691,7 @@ void TelxVXDModule::event()
         const PXDCluster& clusterPXD2 = *storePXDClusters[i2];
         iPlane2 = clusterPXD2.getSensorID().getLayerNumber();
         if ((iPlane2 + 3 < c_firstPXDPlane) || (iPlane2 + 3 > c_lastPXDPlane)) continue;
-        if ((clusterPXD2.getSeedCharge() < PXDCutSeedL) || (clusterPXD2.getSeedCharge() > PXDCutSeedH)) continue;
+        if ((clusterPXD2.getSeedCharge() < m_PXDCutSeedL) || (clusterPXD2.getSeedCharge() > m_PXDCutSeedH)) continue;
         index2 = planeToIndex(iPlane2 + 3);
         iIsU2 = 1;
         iIsV2 = 1;
@@ -755,7 +757,7 @@ void TelxVXDModule::event()
       const PXDCluster& clusterPXD1 = *storePXDClusters[i1];
       iPlane1 = clusterPXD1.getSensorID().getLayerNumber();
       if ((iPlane1 + 3 < c_firstPXDPlane) || (iPlane1 + 3 > c_lastPXDPlane)) continue;
-      if ((clusterPXD1.getSeedCharge() < PXDCutSeedL) || (clusterPXD1.getSeedCharge() > PXDCutSeedH)) continue;
+      if ((clusterPXD1.getSeedCharge() < m_PXDCutSeedL) || (clusterPXD1.getSeedCharge() > m_PXDCutSeedH)) continue;
       index1 = planeToIndex(iPlane1 + 3);
       iIsU1 = 1;
       iIsV1 = 1;
@@ -806,7 +808,7 @@ void TelxVXDModule::event()
         const PXDCluster& clusterPXD2 = *storePXDClusters[i2];
         iPlane2 = clusterPXD2.getSensorID().getLayerNumber();
         if ((iPlane2 + 3 < c_firstPXDPlane) || (iPlane2 + 3 > c_lastPXDPlane)) continue;
-        if ((clusterPXD2.getSeedCharge() < PXDCutSeedL) || (clusterPXD2.getSeedCharge() > PXDCutSeedH)) continue;
+        if ((clusterPXD2.getSeedCharge() < m_PXDCutSeedL) || (clusterPXD2.getSeedCharge() > m_PXDCutSeedH)) continue;
         index2 = planeToIndex(iPlane2 + 3);
         iIsU2 = 1;
         iIsV2 = 1;

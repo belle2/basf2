@@ -67,8 +67,66 @@ namespace Belle2 {
 
   TEST_F(TrackFitResultTest, ErrorPropagation)
   {
-    // TODO:
-  }
+    TRandom3 generator;
+    unsigned int nCases = 1;
+    double absError = 1e-6;
+
+    for (unsigned int i = 0; i < nCases; ++i) {
+
+      auto bField = 1.5;
+      auto pType = Belle2::Const::electron;
+      auto pValue = 0.45;
+      std::vector<float> tau;
+      for (int i = 0; i < 5; ++i) {
+        // does not matter what is appended here, we only test the cov matrix
+        tau.push_back(1);
+      }
+      std::vector<float> cov(15);
+      for (auto & element : cov) {
+        element = generator.Gaus(1e-4);
+      }
+      Belle2::TrackFitResult myResult(tau, cov, pType, pValue);
+      TMatrix covariance(myResult.getCovariance6());
+      TMatrixDSym cov6(6);
+      for (unsigned int row = 0; row < 6; ++row) {
+        for (unsigned int col = 0; col < 6; ++col) {
+          cov6(row, col) = covariance(row, col);
+        }
+      }
+      Belle2::TrackFitResult myResult2(myResult.getPosition(), myResult.getMomentum(), cov6,
+                                       myResult.getCharge(), pType, pValue, bField);
+
+      TMatrixF myResultCov5 = myResult.getCovariance5(bField);
+      TMatrixF myResult2Cov5 = myResult2.getCovariance5(bField);
+
+      EXPECT_NEAR(myResultCov5(0, 0), myResult2Cov5(0, 0), absError);
+      EXPECT_NEAR(myResultCov5(0, 1), myResult2Cov5(0, 1), absError);
+      EXPECT_NEAR(myResultCov5(0, 2), myResult2Cov5(0, 2), absError);
+      EXPECT_NEAR(myResultCov5(0, 3), myResult2Cov5(0, 3), absError);
+      EXPECT_NEAR(myResultCov5(0, 4), myResult2Cov5(0, 4), absError);
+      EXPECT_NEAR(myResultCov5(1, 0), myResult2Cov5(1, 0), absError);
+      EXPECT_NEAR(myResultCov5(1, 1), myResult2Cov5(1, 1), absError);
+      EXPECT_NEAR(myResultCov5(1, 2), myResult2Cov5(1, 2), absError);
+      EXPECT_NEAR(myResultCov5(1, 3), myResult2Cov5(1, 3), absError);
+      EXPECT_NEAR(myResultCov5(1, 4), myResult2Cov5(1, 4), absError);
+      EXPECT_NEAR(myResultCov5(2, 0), myResult2Cov5(2, 0), absError);
+      EXPECT_NEAR(myResultCov5(2, 1), myResult2Cov5(2, 1), absError);
+      EXPECT_NEAR(myResultCov5(2, 2), myResult2Cov5(2, 2), absError);
+      EXPECT_NEAR(myResultCov5(2, 3), myResult2Cov5(2, 3), absError);
+      EXPECT_NEAR(myResultCov5(2, 4), myResult2Cov5(2, 4), absError);
+      EXPECT_NEAR(myResultCov5(3, 0), myResult2Cov5(3, 0), absError);
+      EXPECT_NEAR(myResultCov5(3, 1), myResult2Cov5(3, 1), absError);
+      EXPECT_NEAR(myResultCov5(3, 2), myResult2Cov5(3, 2), absError);
+      EXPECT_NEAR(myResultCov5(3, 3), myResult2Cov5(3, 3), absError);
+      EXPECT_NEAR(myResultCov5(3, 4), myResult2Cov5(3, 4), absError);
+      EXPECT_NEAR(myResultCov5(4, 0), myResult2Cov5(4, 0), absError);
+      EXPECT_NEAR(myResultCov5(4, 1), myResult2Cov5(4, 1), absError);
+      EXPECT_NEAR(myResultCov5(4, 2), myResult2Cov5(4, 2), absError);
+      EXPECT_NEAR(myResultCov5(4, 3), myResult2Cov5(4, 3), absError);
+      EXPECT_NEAR(myResultCov5(4, 4), myResult2Cov5(4, 4), absError);
+
+    }
+  } // Testcases error propagation
 
 
 }  // namespace

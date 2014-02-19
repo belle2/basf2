@@ -141,9 +141,9 @@ void test2_Validation_Resolution_Tracks(TString testfile, bool runOffline){
   float fpi_PIDmu;  
   float fpi_PIDp;  
   float fpi_dz;  
-  int ipi_mcID;  
+  int ipi_mcPDG;  
   recoTree->SetBranchAddress("pi_TruthP",  &fpi_TruthP);  
-  recoTree->SetBranchAddress("pi_mcID", &ipi_mcID);  
+  recoTree->SetBranchAddress("pi_mcPDG", &ipi_mcPDG);  
   recoTree->SetBranchAddress("pi_TruthP4",      &fpi_TruthP4);  
   recoTree->SetBranchAddress("pi_P4",      &fpi_P4);  
   recoTree->SetBranchAddress("pi_PIDpi",   &fpi_PIDpi);  
@@ -157,7 +157,7 @@ void test2_Validation_Resolution_Tracks(TString testfile, bool runOffline){
     recoTree->GetEntry(iloop);
     TLorentzVector lv_pi(fpi_P4);  
     TLorentzVector lv_pi_truth(fpi_TruthP4);  
-    int pdgid=abs(ipi_mcID);
+    int pdgid=abs(ipi_mcPDG);
     
     if(pdgid==pid[pion]){
       h_PpiResolution->Fill((lv_pi.Pt()-lv_pi_truth.Pt())/lv_pi_truth.Pt());
@@ -309,16 +309,16 @@ void test2_Validation_Resolution_Photons(TString testfile,bool runOffline){
   
   float fgamma_TruthP;  
   float fgamma_P;  
-  int igamma_mcID;  
+  int igamma_mcPDG;  
   
-  recoTree->SetBranchAddress("gamma_mcID", &igamma_mcID);  
+  recoTree->SetBranchAddress("gamma_mcPDG", &igamma_mcPDG);  
   recoTree->SetBranchAddress("gamma_TruthP", &fgamma_TruthP);  
   recoTree->SetBranchAddress("gamma_P",      &fgamma_P);  
   
   for(Int_t iloop=0;iloop<recoTree->GetEntries();iloop++) {
     
     recoTree->GetEntry(iloop);
-    int pdgid=abs(igamma_mcID);
+    int pdgid=abs(igamma_mcPDG);
     if(pdgid==22){
       for(int i=0;i<NRESBINS;i++)if(fgamma_TruthP>=i*reswidth && fgamma_TruthP<(i+1)*reswidth)h_Resolution[i]->Fill((fgamma_P-fgamma_TruthP));
       h_Resolution_2D->Fill(fgamma_P,fgamma_TruthP);

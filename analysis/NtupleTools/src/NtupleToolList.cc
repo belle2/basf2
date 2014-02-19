@@ -8,6 +8,8 @@
 #include <analysis/NtupleTools/NtupleMCKinematicsTool.h>
 #include <analysis/NtupleTools/NtuplePIDTool.h>
 #include <analysis/NtupleTools/NtupleTrackTool.h>
+#include <analysis/NtupleTools/NtupleShowerTool.h>
+#include <analysis/NtupleTools/NtupleECLPi0Tool.h>
 #include <analysis/NtupleTools/NtupleRecoStatsTool.h>
 #include <analysis/NtupleTools/NtupleDetectorStatsRecTool.h>
 #include <analysis/NtupleTools/NtupleDetectorStatsSimTool.h>
@@ -60,6 +62,8 @@ NtupleFlatTool* NtupleToolList::create(string strName, TTree* tree, DecayDescrip
   else if (strToolName.compare("DetectorStatsSim") == 0) return new NtupleDetectorStatsSimTool(tree, d);
   else if (strToolName.compare("MCReconstructible") == 0) return new NtupleMCReconstructibleTool(tree, d);
   else if (strToolName.compare("Track") == 0) return new NtupleTrackTool(tree, d);
+  else if (strToolName.compare("Shower") == 0) return new NtupleShowerTool(tree, d);
+  else if (strToolName.compare("ECLPi0") == 0) return new NtupleECLPi0Tool(tree, d);
   else if (strToolName.compare("Vertex") == 0) return new NtupleVertexTool(tree, d);
   else if (strToolName.compare("MCVertex") == 0) return new NtupleMCVertexTool(tree, d);
   else if (strToolName.compare("CustomFloats") == 0) return new NtupleCustomFloatsTool(tree, d, strOption);

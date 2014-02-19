@@ -45,8 +45,6 @@ void NtupleMCHierarchyTool::eval(const Particle* particle)
       m_iMotherID[iProduct] = 0;
       m_iGDMotherID[iProduct] = 0;
       m_iGDGDMotherID[iProduct] = 0;
-
-      printf("NtupleMCHierarchyTool::eval - WARNING no truth match found for this reco particle!\n");
     } else {
       const MCParticle* mcparticleMother = mcparticle->getMother();
 

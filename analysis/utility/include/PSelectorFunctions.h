@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Staric                                             *
+ * Contributors: Marko Staric, Anze Zupanc                                *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -24,6 +24,13 @@ namespace Belle2 {
      * @return momentum magnitude
      */
     double particleP(const Particle* part);
+
+    /**
+     * function for PSelector
+     * @param part const pointer to Particle
+     * @return energy
+     */
+    double particleE(const Particle* part);
 
     /**
      * function for PSelector
@@ -73,6 +80,13 @@ namespace Belle2 {
      * @return momentum magnitude in CMS
      */
     double particleP_CMS(const Particle* part);
+
+    /**
+     * function for PSelector
+     * @param part const pointer to Particle
+     * @return energy in CMS
+     */
+    double particleE_CMS(const Particle* part);
 
     /**
      * function for PSelector
@@ -147,7 +161,7 @@ namespace Belle2 {
     /**
      * function for PSelector
      * @param part const pointer to Particle
-     * @return mass
+     * @return mass (determined from particle's 4-momentum vector)
      */
     double particleMass(const Particle* part);
 
@@ -157,6 +171,13 @@ namespace Belle2 {
      * @return mass minus nominal mass
      */
     double particleDMass(const Particle* part);
+
+    /**
+     * function for PSelector
+     * @param part const pointer to Particle
+     * @return mass (determined from particle's daughter 4-momentum vectors)
+     */
+    double particleInvariantMass(const Particle* part);
 
     /**
      * function for PSelector
@@ -457,6 +478,46 @@ namespace Belle2 {
      * @return extra energy in the calorimeter that is not associated to the given Particle
      */
     double extraEnergy(const Particle* particle);
+
+    /**
+     * function for PSelector
+     *
+     * @param part const pointer to Particle
+     * @return 1/2/3 if the ECL Shower is detected in the forward/barrel/backward region
+     */
+    double eclShowerDetectionRegion(const Particle* particle);
+
+    /**
+     * function for PSelector
+     *
+     * @param part const pointer to Particle
+     * @return ratio of energies in inner 3x3 and 5x5 cells
+     */
+    double eclShowerE9E25(const Particle* particle);
+
+    /**
+     * function for PSelector
+     *
+     * @param part const pointer to Particle
+     * @return number of hits associated to this shower
+     */
+    double eclShowerNHits(const Particle* particle);
+
+    /**
+     * function for PSelector
+     *
+     * @param part const pointer to Particle
+     * @return 1/0 if charged track is/is not Matched to this shower
+     */
+    double eclShowerTrackMatched(const Particle* particle);
+
+    /**
+     * function for PSelector
+     *
+     * @param part const pointer to Particle
+     * @return cosine of the angle between the mother momentum vector and the direction of the first daughter in the mother's rest frame
+     */
+    double particleDecayAngle(const Particle* particle);
 
   }
 } // Belle2 namespace

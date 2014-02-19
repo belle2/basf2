@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Staric                                             *
+ * Contributors: Marko Staric, Anze Zupanc                                *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -26,6 +26,8 @@
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
 
+#include <tracking/dataobjects/Track.h>
+#include <ecl/dataobjects/ECLShower.h>
 #include <ecl/dataobjects/ECLGamma.h>
 
 // framework aux
@@ -46,6 +48,11 @@ namespace Belle2 {
     double particleP(const Particle* part)
     {
       return part->getP();
+    }
+
+    double particleE(const Particle* part)
+    {
+      return part->getEnergy();
     }
 
     double particlePx(const Particle* part)
@@ -87,6 +94,13 @@ namespace Belle2 {
       PCmsLabTransform T;
       TLorentzVector vec = T.rotateLabToCms() * part->get4Vector();
       return vec.P();
+    }
+
+    double particleE_CMS(const Particle* part)
+    {
+      PCmsLabTransform T;
+      TLorentzVector vec = T.rotateLabToCms() * part->get4Vector();
+      return vec.E();
     }
 
     double particlePx_CMS(const Particle* part)
@@ -165,6 +179,24 @@ namespace Belle2 {
     double particleDMass(const Particle* part)
     {
       return part->getMass() - part->getPDGMass();
+    }
+
+    double particleInvariantMass(const Particle* part)
+    {
+      double result = 0.0;
+
+      const std::vector<Particle*> daughters = part->getDaughters();
+      if (daughters.size() > 0) {
+        TLorentzVector sum;
+        for (unsigned i = 0; i < daughters.size(); i++)
+          sum += daughters[i]->get4Vector();
+
+        result = sum.M();
+      } else {
+        result = part->getMass();
+      }
+
+      return result;
     }
 
     // released energy --------------------------------------------------
@@ -438,6 +470,8 @@ namespace Belle2 {
       return signalProbabilityProduct;
     }
 
+    // MC related ------------------------------------------------------------
+
     double isSignal(const Particle* part)
     {
       double result = 0.0;
@@ -484,6 +518,8 @@ namespace Belle2 {
 
       return getMCTruthStatus(part, mcparticle);
     }
+
+    // RestOfEvent related --------------------------------------------------
 
     double nROETracks(const Particle* particle)
     {
@@ -533,6 +569,8 @@ namespace Belle2 {
       return result;
     }
 
+    // Recoil Kinematics related ---------------------------------------------
+
     double recoilMomentum(const Particle* particle)
     {
       PCmsLabTransform T;
@@ -573,6 +611,8 @@ namespace Belle2 {
       return (pIN - particle->get4Vector()).M2();
     }
 
+    // Extra energy --------------------------------------------------------
+
     double extraEnergy(const Particle* particle)
     {
       double result = -1.0;
@@ -589,7 +629,92 @@ namespace Belle2 {
       return result;
     }
 
+    // ECLShower related variables -----------------------------------------
+
+    double eclShowerDetectionRegion(const Particle* particle)
+    {
+      double result = 0.0;
+
+      if (particle->getParticleType() == Particle::c_ECLShower) {
+        StoreArray<ECLShower> ECLShowers;
+        const ECLShower* shower = ECLShowers[particle->getMdstArrayIndex()];
+
+        float theta = shower->getTheta();
+        if (theta < 0.555) {
+          result = 1.0;
+        } else if (theta < 2.26) {
+          result = 2.0;
+        } else {
+          result = 3.0;
+        }
+      }
+
+      return result;
+    }
+
+    double eclShowerE9E25(const Particle* particle)
+    {
+      double result = 0.0;
+
+      if (particle->getParticleType() == Particle::c_ECLShower) {
+        StoreArray<ECLShower> ECLShowers;
+        const ECLShower* shower = ECLShowers[particle->getMdstArrayIndex()];
+
+        result = shower->getE9oE25();
+      }
+      return result;
+    }
+
+    double eclShowerNHits(const Particle* particle)
+    {
+      double result = 0.0;
+
+      if (particle->getParticleType() == Particle::c_ECLShower) {
+        StoreArray<ECLShower> ECLShowers;
+        const ECLShower* shower = ECLShowers[particle->getMdstArrayIndex()];
+
+        result = shower->getNHits();
+      }
+      return result;
+    }
+
+    double eclShowerTrackMatched(const Particle* particle)
+    {
+      double result = 0.0;
+
+      if (particle->getParticleType() == Particle::c_ECLShower) {
+        StoreArray<ECLShower> ECLShowers;
+        const ECLShower* shower = ECLShowers[particle->getMdstArrayIndex()];
+        const Track* track = DataStore::getRelated<Track>(shower);
+
+        if (track)
+          result = 1.0;
+      }
+      return result;
+
+    }
+
+    // Decay Kinematics -------------------------------------------------------
+    double particleDecayAngle(const Particle* particle)
+    {
+      double result = 0.0;
+
+      if (particle->getNDaughters() != 2)
+        return result;
+
+      TLorentzVector motherMomentum = particle->get4Vector();
+      TVector3       motherBoost    = -(motherMomentum.BoostVector());
+
+      TLorentzVector daugMomentum = particle->getDaughter(0)->get4Vector();
+      daugMomentum.Boost(motherBoost);
+
+      result = cos(daugMomentum.Angle(motherMomentum.Vect()));
+
+      return result;
+    }
+
     REGISTER_VARIABLE("p", particleP, "momentum magnitude");
+    REGISTER_VARIABLE("E", particleE, "energy");
     REGISTER_VARIABLE("px", particlePx, "momentum component x");
     REGISTER_VARIABLE("py", particlePy, "momentum component y");
     REGISTER_VARIABLE("pz", particlePz, "momentum component z");
@@ -599,6 +724,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("phi", particlePhi, "momentum azimuthal angle in degrees");
 
     REGISTER_VARIABLE("p_CMS", particleP_CMS, "CMS momentum magnitude");
+    REGISTER_VARIABLE("E_CMS", particleE_CMS, "CMS energy");
     REGISTER_VARIABLE("px_CMS", particlePx_CMS, "CMS momentum component x");
     REGISTER_VARIABLE("py_CMS", particlePy_CMS, "CMS momentum component y");
     REGISTER_VARIABLE("pz_CMS", particlePz_CMS, "CMS momentum component z");
@@ -612,12 +738,14 @@ namespace Belle2 {
     REGISTER_VARIABLE("dz", particleDZ, "z in respect to IP");
     REGISTER_VARIABLE("dr", particleDRho, "transverse distance in respect to IP");
 
-    REGISTER_VARIABLE("M", particleMass, "mass");
+    REGISTER_VARIABLE("M", particleMass, "invariant mass (determined from particle's 4-momentum vector)");
     REGISTER_VARIABLE("dM", particleDMass, "mass minus nominal mass");
     REGISTER_VARIABLE("Q", particleQ, "released energy in decay");
     REGISTER_VARIABLE("dQ", particleDQ, "released energy in decay minus nominal one");
     REGISTER_VARIABLE("Mbc", particleMbc, "beam constrained mass");
     REGISTER_VARIABLE("deltaE", particleDeltaE, "energy difference");
+
+    REGISTER_VARIABLE("invM", particleInvariantMass, "invariant mass (determined from particle's daughter 4-momentum vectors)");
 
     REGISTER_VARIABLE("eid", particleElectronId, "electron identification probability");
     REGISTER_VARIABLE("muid", particleMuonId, "muon identification probability");
@@ -664,6 +792,13 @@ namespace Belle2 {
     REGISTER_VARIABLE("m2Recoil", recoilMassSquared, "invariant mass squared of the system recoiling against given Particle");
 
     REGISTER_VARIABLE("eextra", extraEnergy, "extra energy in the calorimeter that is not associated to the given Particle");
+
+    REGISTER_VARIABLE("showerReg",        eclShowerDetectionRegion, "detection region in the ECL [1 - forward, 2 - barrel, 3 - backward]");
+    REGISTER_VARIABLE("showerE9E25",      eclShowerE9E25,           "ratio of energies in inner 3x3 and 5x5 cells");
+    REGISTER_VARIABLE("showerNHits",      eclShowerNHits,           "number of hits associated to this shower");
+    REGISTER_VARIABLE("showerTrackMatch", eclShowerTrackMatched,    "1/0 if charged track is/is not Matched to this shower");
+
+    REGISTER_VARIABLE("decayAngle", particleDecayAngle, "cosine of the angle between the mother momentum vector and the direction of the first daughter in the mother's rest frame");
   }
 }
 

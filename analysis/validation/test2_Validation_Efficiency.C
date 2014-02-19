@@ -432,9 +432,9 @@ void test2_Validation_Efficiency_Reco(TString filename){
   float fpi_TruthP4[4];  
   float fpi_P4[4];  
   float fpi_dz;  
-  int ipi_mcID;  
+  int ipi_mcPDG;  
   int iCand;  
-  recoTree->SetBranchAddress("pi_mcID", &ipi_mcID);  
+  recoTree->SetBranchAddress("pi_mcPDG", &ipi_mcPDG);  
   recoTree->SetBranchAddress("pi_TruthP4", &fpi_TruthP4);  
   recoTree->SetBranchAddress("pi_P4",      &fpi_P4);  
   recoTree->SetBranchAddress("pi_dz",      &fpi_dz);  
@@ -455,7 +455,7 @@ void test2_Validation_Efficiency_Reco(TString filename){
     }
     if(lv_pi_truth.Theta()>2.62 || lv_pi_truth.Theta()<0.3) continue;
 
-    int pdgid=abs(ipi_mcID);
+    int pdgid=abs(ipi_mcPDG);
     if(pdgid==pid[pion]){
       cache_p[count_pi]=lv_pi_truth.Pt();
       h_Ppi->Fill(lv_pi_truth.Pt());
@@ -529,9 +529,9 @@ void test2_Validation_Efficiency_Photon_Reco(TString filename, int region){
   float fgamma_TruthP;  
   float fgamma_P;  
   float fgamma_dz;  
-  int igamma_mcID;  
+  int igamma_mcPDG;  
   int iCand;  
-  recoTree->SetBranchAddress("gamma_mcID", &igamma_mcID);  
+  recoTree->SetBranchAddress("gamma_mcPDG", &igamma_mcPDG);  
   recoTree->SetBranchAddress("gamma_TruthP4", &fgamma_TruthP4);  
   recoTree->SetBranchAddress("gamma_P4",      &fgamma_P4);  
   recoTree->SetBranchAddress("gamma_TruthP",  &fgamma_TruthP);  
@@ -558,7 +558,7 @@ void test2_Validation_Efficiency_Photon_Reco(TString filename, int region){
     if((lv_gamma_truth.Theta()>0.58 || lv_gamma_truth.Theta()<0.21) && region==2) continue; //forward
     if((lv_gamma_truth.Theta()>2.71 || lv_gamma_truth.Theta()<2.23) && region==3) continue; //backward
 
-    int pdgid=abs(igamma_mcID);
+    int pdgid=abs(igamma_mcPDG);
     if(pdgid==22){
       if(iCand>0 && fabs(cache_p-lv_gamma_truth.Rho())<epsilon_p) continue;
       cache_p=lv_gamma_truth.Rho();

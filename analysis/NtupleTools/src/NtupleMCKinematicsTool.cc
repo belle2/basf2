@@ -38,9 +38,7 @@ void NtupleMCKinematicsTool::eval(const Particle* particle)
   for (int iProduct = 0; iProduct < nDecayProducts; iProduct++) {
     const MCParticle* mcparticle = DataStore::getRelated<MCParticle>(selparticles[iProduct]);
 
-    if (!mcparticle) {
-      printf("NtupleMCKinematicsTool::eval - WARNING no truth match found for this reco particle!\n");
-    } else {
+    if (mcparticle) {
       const TLorentzVector mcparticle_4vec = mcparticle->get4Vector();
       m_fTruthP[iProduct]  = mcparticle_4vec.P();
       m_fTruthP4[iProduct][0] = mcparticle_4vec.Px();

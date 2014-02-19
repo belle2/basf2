@@ -15,6 +15,7 @@
 #include <pxd/dataobjects/PXDRawHit.h>
 #include <pxd/dataobjects/PXDDigit.h>
 #include <pxd/dataobjects/PXDFrame.h>
+#include <pxd/online/PXDIgnoredPixelsMap.h>
 #include <string>
 
 namespace Belle2 {
@@ -57,6 +58,10 @@ namespace Belle2 {
       double m_0cut;
       /** Assign VXDID to data that don't have it. */
       bool m_assignID;
+      /** Name of the ignored pixels list xml */
+      std::string m_ignoredPixelsListName;
+      /** Ignored pixels list manager class */
+      std::unique_ptr<PXDIgnoredPixelsMap> m_ignoredPixelsList;
     };//end class declaration
 
     /** @}*/

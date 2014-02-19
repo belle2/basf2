@@ -13,6 +13,7 @@
 
 #include <framework/core/Module.h>
 #include <pxd/dataobjects/PXDDigit.h>
+#include <pxd/online/PXDIgnoredPixelsMap.h>
 #include <string>
 
 namespace Belle2 {
@@ -55,6 +56,10 @@ namespace Belle2 {
       std::vector<PXDDigit> m_digitcopy;
       /** Mode: if true, merge duplicate pixels, otherwise delete all but the first occurence */
       bool m_mergeDuplicates;
+      /** Name of the ignored pixels list xml */
+      std::string m_ignoredPixelsListName;
+      /** Ignored pixels list manager class */
+      std::unique_ptr<PXDIgnoredPixelsMap> m_ignoredPixelsList;
     };//end class declaration
 
     /** @}*/

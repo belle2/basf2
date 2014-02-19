@@ -9,7 +9,7 @@
  **************************************************************************/
 
 #include <pxd/modules/pxdReconstruction/PXDDigitSorterModule.h>
-
+#include <pxd/online/PXDIgnoredPixelsMap.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
@@ -19,9 +19,11 @@
 #include <pxd/dataobjects/PXDTrueHit.h>
 #include <pxd/reconstruction/Pixel.h>
 
+
 using namespace std;
 using namespace Belle2;
 using namespace Belle2::PXD;
+using namespace boost::python;
 
 //-----------------------------------------------------------------
 //                 Register the Module
@@ -41,6 +43,7 @@ PXDDigitSorterModule::PXDDigitSorterModule() : Module()
   setPropertyFlags(c_ParallelProcessingCertified);
   addParam("merge", m_mergeDuplicates, "If true, merge Pixel information if more than one digit exists for the same address", true);
   addParam("digits", m_storeDigitsName, "PXDDigit collection name", string(""));
+  addParam("ignoredPixelsListName", m_ignoredPixelsListName, "Name of the xml with ignored pixels list", string(""));
   addParam("truehits", m_storeTrueHitsName, "PXDTrueHit collection name", string(""));
   addParam("particles", m_storeMCParticlesName, "MCParticle collection name", string(""));
   addParam("digitsToTrueHits", m_relDigitTrueHitName, "Digits to TrueHit relation name",
@@ -70,6 +73,8 @@ void PXDDigitSorterModule::initialize()
 
   m_relDigitTrueHitName = relDigitTrueHits.getName();
   m_relDigitMCParticleName = relDigitMCParticles.getName();
+
+  m_ignoredPixelsList = unique_ptr<PXDIgnoredPixelsMap>(new PXDIgnoredPixelsMap(m_ignoredPixelsListName));
 }
 
 void PXDDigitSorterModule::event()
@@ -92,7 +97,9 @@ void PXDDigitSorterModule::event()
     const PXDDigit* const digit = storeDigits[i];
     Pixel px(digit, i);
     VxdID sensorID = digit->getSensorID();
-    sensors[sensorID].insert(px);
+    if (m_ignoredPixelsListName == "" || m_ignoredPixelsList->pixelOK(digit->getSensorID(), PXDIgnoredPixelsMap::map_pixel(digit->getUCellID(), digit->getVCellID()))) {
+      sensors[sensorID].insert(px);
+    }
   }
 
   // Now we loop over sensors and reorder the digits list

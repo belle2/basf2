@@ -40,8 +40,8 @@ namespace {
 }
 
 TelDataMergerModule::TelDataMergerModule() : Module(),
-  m_bufferSize(100), m_reader(NULL), m_buffer(m_bufferSize), m_bufferVXD(m_bufferSize),
-  m_nVXDDataEvents(0), m_nTelDataEvents(0), m_nMapHits(0),
+  m_bufferSize(100), m_nEventsProcess(-1), m_reader(NULL), m_buffer(m_bufferSize),
+  m_bufferVXD(m_bufferSize),  m_nVXDDataEvents(0), m_nTelDataEvents(0), m_nMapHits(0),
   m_nBOREvents(0), m_nEOREvents(0), m_nNoTrigEvents(0), m_currentTLUTagFromFTSW(0),
   m_currentTimeStampFromFTSW(0), m_referenceTLUTag(-1),
   m_referenceTimeFromFTSW(0), m_referenceTimeFromEUDAQ(0)
@@ -57,7 +57,6 @@ TelDataMergerModule::TelDataMergerModule() : Module(),
   addParam("inputFileName", m_inputFileName, "Input file name. For multiple files, use inputFileNames instead. Can be overridden using the -i argument to basf2.", std::string(""));
   addParam("storeDigitsName", m_storeDigitsName, "DataStore name of TelDigits collection", std::string(""));
   addParam("bufferSize", m_bufferSize, "Size of the telescope data buffer", m_bufferSize);
-  m_nEventsProcess = -1;
   addParam("nEventsProcess", m_nEventsProcess, "Number of events to process", m_nEventsProcess);
 
   // This is dirty, but safe for all practical purposes - there may be less EuTels, but hardly more.
@@ -247,6 +246,11 @@ void TelDataMergerModule::beginRun()
 {
   B2DEBUG(75, "Starting eudaq::FileReader...");
 
+  if (m_inputFileName == "") {
+    B2WARNING("No telescope data on input. Continuing silently.");
+    m_reader = 0;
+    return;
+  }
   // create data reader object
   //   first argument: Input File Name
   //   second argument: <empty>
@@ -254,7 +258,7 @@ void TelDataMergerModule::beginRun()
   m_reader = new eudaq::FileReader(m_inputFileName, "" , false);
 
 
-  // if creation failed, fail with loud noise
+  // if creation failed, make some noise but don't interfere
   if (! m_reader) {
     B2FATAL("Creation of eudaq::FileReader object failed!");
     return;
@@ -313,6 +317,7 @@ void TelDataMergerModule::event()
 {
   // if we've got here, we must have a valid reader and a data file starting with
   // BDRE.
+  if (!m_reader) return;
 
   B2DEBUG(25, "Started Event();");
 
@@ -320,8 +325,7 @@ void TelDataMergerModule::event()
 
   StoreObjPtr<EventMetaData> storeEventMetaData;
 
-
-  if (abs(storeEventMetaData->getEvent()) > m_nEventsProcess) stopPeacefully();
+  if (long(storeEventMetaData->getEvent()) > m_nEventsProcess) stopPeacefully();
 
   m_currentTLUTagFromFTSW =
     static_cast<unsigned short>(storeFTSW[0]->Get15bitTLUTag(0));

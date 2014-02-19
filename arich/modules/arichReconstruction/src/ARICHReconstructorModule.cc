@@ -57,7 +57,8 @@ namespace Belle2 {
       m_timeCPU(0),
       m_nRun(0),
       m_nEvent(0),
-      m_beamtest(0)
+      m_beamtest(0),
+      m_file(NULL)
     {
       // Set description()
       setDescription("ARICHReconstructor");
@@ -222,7 +223,7 @@ namespace Belle2 {
     void ARICHReconstructorModule::endRun()
     {
       m_nRun++;
-      if (m_beamtest) {
+      if (m_file) {
         m_file->Write();
         m_file->Close();
       }

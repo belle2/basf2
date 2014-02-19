@@ -2,6 +2,8 @@ Library.xml
 -----------
 ... file with individuall components the geometry is created of.
 
+19. Feb 2014 12:00 Big geometry update: Swap of U/V coordinates. Corrected all sensor's local coordinate axes.
+
 27. Jan 2014 21:00 The number of SVD strips in U/V is changed back to the convention of Belle2. But it goes to "our conventional" TB directions.
                    Nothing should be affected by this change.
 
@@ -18,6 +20,8 @@ FullVXDTB.xml
 -------------
 ... Complete geometry with deactivated telescopes. All sensors centered (except SVD3 moved by 4.8mm down)
 
+19. Feb 2014 12:00 Big geometry update: Swap of U/V coordinates. Corrected all sensor's local coordinate axes. Corrected to comply with v2 geometry but with both PXDs, with inactive telescopes
+
 8. Jan 2014 23:55 first version
 
 
@@ -25,6 +29,8 @@ FullVXDTB.xml
 FullTelescopeVXDTB.xml 
 ----------------------
 ... Complete geometry with active telescopes. All sensors centered (except SVD3 moved by 4.8mm down)
+
+19. Feb 2014 12:00 Big geometry update: Swap of U/V coordinates. Corrected all sensor's local coordinate axes. Corrected to comply with v2 geometry but with both PXDs
 
 8. Jan 2014 23:55 first version
 
@@ -35,6 +41,11 @@ FullTelescopeVXDTB_v1.xml
 ... from PXD only active areas are present, but made from air (they are active volumes) ... for ROI testing purposes
 This file should be used for testbeam analysis from Jan 6 to PXD installation (expected Jan 13)
 WARNING: The position of the telescopes is approximate (with tolerance up to 1cm)
+
+19. Feb 2014 12:00 Big geometry update: Swap of U/V coordinates. Corrected all sensor's local coordinate axes.
+
+20. Jan 2014 12:00 Initial alignment params (good at least for run 104)
+  Added initial alignment parameters (which make good-looking residuals at least on run 500, 507, 508, 510).
 
 12. Jan 2014 16:00 Telescopes moved to more realistic positions
 
@@ -53,6 +64,9 @@ WARNING: The position of the telescopes is approximate (with tolerance up to 1cm
 FullTelescopeVXDTB_v2.xml
 -------------------------
 ... this is the setup with PXD6-S (4 switchers) facing SVD layer 3. PCBoard and sensor from layer 2 (facing front telescopes) is removed.
+18. Feb 2014 12:00 Big geometry update: Swap of U/V coordinates. Corrected all sensor's local coordinate axes.
+  Added initial alignment parameters (which make good-looking residuals at least on run 500, 507, 508, 510).
+  Fixed position of 1st telescope.
 
 28. Jan 2014 12:00 Re-centering PXD layer to after the rotation from previous commit
 

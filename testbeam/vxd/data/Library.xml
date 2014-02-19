@@ -288,6 +288,7 @@
       <Phi unit="deg">90</Phi>
       <Theta unit="deg">180</Theta>
       <Psi unit="deg">180</Psi>
+      <!--Phi unit="deg">90</Phi-->
       <HalfZ unit="um">25</HalfZ>
    </Snippet>
    <Snippet name="EUDET-Active">

@@ -93,10 +93,13 @@
             </Volume>
             <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='VXDBox']/*))" />
             <Volume name="PXD-Envelope">
+               <Phi unit="deg">180</Phi>
+               <Psi unit="deg">0</Psi>
+               <Theta unit="deg">180</Theta>
+            
                <DX unit="mm">57.0</DX>
-               <!-- Shift down for better PXD acceptance at 6GeV -->
                <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='PXD-Envelope']/*)" />
-               <!--Volume name="CoolingBlock">
+               <Volume name="CoolingBlock">
                   <DY unit="mm">0.0</DY>
                   <DZ unit="mm">-47.0</DZ>
                   <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='CoolingBlock']/*)" />
@@ -113,25 +116,28 @@
                   <DZ unit="mm">-22</DZ>
                   <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='PCB-Board_L2_withCu']/*)" />
                </Volume>
-               <Volume name="PCB-Board_L1_withCu">
+               <!--Volume name="PCB-Board_L1_withCu">
                   <DX unit="mm">-2.75</DX>
                   <DY unit="mm">30</DY>
                   <DZ unit="mm">-22</DZ>
                   <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='PCB-Board_L1_withCu']/*)" />
                </Volume-->
                <Volume name="PXD6-S-sensor_L1">
+                  <Color>#006699</Color>
+                  <Material>Air</Material>
+                  <Shape>Box</Shape>
+                  <HalfX unit="mm">27.3</HalfX>
+                  <HalfY unit="mm">7.8</HalfY>
+                  <HalfZ unit="mm">0.61</HalfZ>
+                  
                   <DX unit="mm">3.71</DX>
                   <DY unit="mm">1.0</DY>
                   <DZ unit="mm">-7.0</DZ>
                   <Theta unit="deg">90</Theta>
                   <Phi unit="deg">90</Phi>
+                  <!-- The sensitive area is rotated in the Library -->
                   <Psi unit="deg">90</Psi>
                   
-                  
-                  
-                  <HalfX unit="mm">27.3</HalfX>
-                  <HalfY unit="mm">7.8</HalfY>
-                  <HalfZ unit="mm">0.61</HalfZ>
                   <Subtract>
                     <Name>removing_overlap_from_air_volume</Name>
                     <Shape>Box</Shape>
@@ -140,17 +146,15 @@
                     <HalfZ unit="mm">0.4</HalfZ>
                     <DZ unit="mm">-0.61</DZ>
                   </Subtract>
-                  <!--xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='PXD6-S-sensor_L1']/*)" /-->
                   
-                  
-                  
+                  <!--xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='PXD6-S-sensor_L1']/*)" /-->                                   
                   <Volume name="PXD-SensitiveArea">
-                     <AlignComponent>1.1.1</AlignComponent>
+                     <AlignComponent>2.1.2</AlignComponent>
                      <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='airPXD6-S-SensitiveArea_short']/*)" />
                      <Active>
-                        <SensorID>1</SensorID>
+                        <SensorID>2</SensorID>
                         <Ladder>1</Ladder>
-                        <Layer>1</Layer>
+                        <Layer>2</Layer>
                         <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='PXD6-S_active_L1']/*)" />
                      </Active>
                   </Volume>
@@ -162,9 +166,9 @@
                   <Theta unit="deg">-90</Theta>
                   <Phi unit="deg">270</Phi>
                   <Psi unit="deg">90</Psi>
-                  
-                  
-                  
+                  <Color>#006699</Color>
+                  <Material>Air</Material>
+                  <Shape>Box</Shape>
                   <HalfX unit="mm">32.9</HalfX>
                   <HalfY unit="mm">7.8</HalfY>
                   <HalfZ unit="mm">0.61</HalfZ>
@@ -176,17 +180,15 @@
                     <HalfZ unit="mm">0.4</HalfZ>
                     <DZ unit="mm">-0.61</DZ>
                   </Subtract>
+
                   <!--xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='PXD6-sensor_L2']/*)" /-->
-                  
-                  
-                  
                   <Volume name="PXD-SensitiveArea">
-                     <AlignComponent>2.1.2</AlignComponent>
+                     <AlignComponent>1.1.1</AlignComponent>
                      <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='airPXD-SensitiveArea']/*)" />
                      <Active>
-                        <SensorID>2</SensorID>
+                        <SensorID>1</SensorID>
                         <Ladder>1</Ladder>
-                        <Layer>2</Layer>
+                        <Layer>1</Layer>
                         <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='PXD_active_L2']/*)" />
                      </Active>
                   </Volume>
@@ -197,7 +199,7 @@
                <DX unit="mm">-25.0</DX>
                <Volume name="SVD_module_1">
                  <Theta unit="deg">90</Theta>
-                 <Phi unit="deg">270</Phi>
+                 <Phi unit="deg">180</Phi>
                  <Psi unit="deg">-90</Psi>
                   <DX unit="mm">61.84</DX>
                   <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='SVD_module_layer3']/*)" />
@@ -214,7 +216,7 @@
                </Volume>
                <Volume name="SVD_module_2">
                   <Theta unit="deg">90</Theta>
-                  <Phi unit="deg">270</Phi>
+                  <Phi unit="deg">180</Phi>
                   <Psi unit="deg">-90</Psi>
                   
                   <DX unit="mm">19.84</DX>
@@ -232,7 +234,7 @@
                </Volume>
                <Volume name="SVD_module_3">
                   <Theta unit="deg">90</Theta>
-                  <Phi unit="deg">270</Phi>
+                  <Phi unit="deg">180</Phi>
                   <Psi unit="deg">-90</Psi>
                   
                   <DX unit="mm">-4.16</DX>
@@ -252,7 +254,7 @@
                </Volume>
                <Volume name="SVD_module_4">
                   <Theta unit="deg">90</Theta>
-                  <Phi unit="deg">270</Phi>
+                  <Phi unit="deg">180</Phi>
                   <Psi unit="deg">-90</Psi>
                   
                   <DX unit="mm">-35.160</DX>
@@ -306,7 +308,7 @@
                </Volume>
             </Volume>
             <Volume name="EUDET-Module6">
-               <DX unit="mm">-359.5</DX>
+              <DX unit="mm">-359.5</DX>
                <DZ unit="mm">0.0</DZ>
                <Theta unit="deg">90</Theta>
                <Phi unit="deg">-90</Phi>

@@ -63,7 +63,7 @@ TelxVXDModule::TelxVXDModule() : HistoModule()
   m_PXDCutSeedL = 0;
   m_PXDCutSeedH = 100000;
   addParam("PXDCutSeedL", m_PXDCutSeedL, "PXD: seed cut lower border", m_PXDCutSeedL);
-  addParam("PXDCutSeedL", m_PXDCutSeedH, "PXD: seed cut higher border", m_PXDCutSeedH);
+  addParam("PXDCutSeedH", m_PXDCutSeedH, "PXD: seed cut higher border", m_PXDCutSeedH);
 
 }
 

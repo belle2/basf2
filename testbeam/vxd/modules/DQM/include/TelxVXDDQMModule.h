@@ -108,8 +108,8 @@ namespace Belle2 {
     int m_DUTSVDBwd;    /**< backward SVD for correlations: 5..8 */
     int m_DUTTelFwd;    /**< forward telescope for correlations: 0..2 */
     int m_DUTTelBwd;    /**< backward telescope for correlations: 9..11 */
-    int m_PXDCutSeedL;  /**< PXD - lower seed cut for acceptans of cluster */
-    int m_PXDCutSeedH;  /**< PXD - Higher seed cut for acceptans of cluster */
+    float m_PXDCutSeedL; /**< PXD - lower seed cut for acceptans of cluster */
+    float m_PXDCutSeedH; /**< PXD - Higher seed cut for acceptans of cluster */
 
     // +1 in dimensions to protect against noisy VXDID values.
     TH1F* m_chargePXD2;                 /**< charge by plane */

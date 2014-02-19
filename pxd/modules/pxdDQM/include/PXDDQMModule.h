@@ -69,6 +69,8 @@ namespace Belle2 {
     std::string m_relClusterDigitName;    /**< PXDClustersToPXDDigits RelationArray name */
     std::string m_storeFramesName;        /**< PXDFrames StoreArray name */
     std::string m_histogramDirectoryName; /**< Name of the histogram directory in ROOT file */
+    float m_PXDCutSeedL;                  /**< PXD - lower seed cut for acceptans of cluster */
+    float m_PXDCutSeedH;                  /**< PXD - Higher seed cut for acceptans of cluster */
 
     // +1 in dimensions to protect against noisy VXDID values.
     TH1F* m_fired[c_nPXDPlanes];          /**< Fired in u pixels per event by plane */

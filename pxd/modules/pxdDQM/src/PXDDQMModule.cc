@@ -39,6 +39,10 @@ PXDDQMModule::PXDDQMModule() : HistoModule()
   setDescription("PXD DQM module");
   setPropertyFlags(c_ParallelProcessingCertified);  // specify this flag if you need parallel processing
   addParam("histgramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed", std::string("pxd"));
+  m_PXDCutSeedL = 0;
+  m_PXDCutSeedH = 100000;
+  addParam("PXDCutSeedL", m_PXDCutSeedL, "PXD: seed cut lower border", m_PXDCutSeedL);
+  addParam("PXDCutSeedH", m_PXDCutSeedH, "PXD: seed cut higher border", m_PXDCutSeedH);
 
 }
 
@@ -343,11 +347,12 @@ void PXDDQMModule::event()
     int index = planeToIndex(iPlane);
     m_hitMapU[index]->Fill(getInfo(index).getUCellID(cluster.getU()));
     m_hitMapV[index]->Fill(getInfo(index).getVCellID(cluster.getV()));
-    if ((cluster.getSeedCharge() > 16) && (cluster.getSeedCharge() < 28))
+    if ((cluster.getSeedCharge() >= m_PXDCutSeedL) && (cluster.getSeedCharge() <= m_PXDCutSeedH)) {
       m_hitMapUV[index]->Fill(
         getInfo(index).getUCellID(cluster.getU()),
         getInfo(index).getVCellID(cluster.getV())
       );
+    }
     m_clusterCharge[index]->Fill(cluster.getCharge());
     m_seed[index]->Fill(cluster.getSeedCharge());
     m_sizeU[index]->Fill(cluster.getUSize());

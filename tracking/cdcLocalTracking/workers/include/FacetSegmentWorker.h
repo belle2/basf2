@@ -16,7 +16,9 @@
 #include <tracking/cdcLocalTracking/typedefs/UsedDataHolders.h>
 #include <framework/datastore/StoreArray.h>
 
-#include <tracking/cdcLocalTracking/algorithms/WeightedNeighborhood.h>
+#include <tracking/cdcLocalTracking/topology/CDCWireTopology.h>
+#include <tracking/cdcLocalTracking/eventtopology/CDCWireHitTopology.h>
+
 #include <tracking/cdcLocalTracking/algorithms/NeighborhoodBuilder.h>
 #include <tracking/cdcLocalTracking/neighbor_chooser/WireHitNeighborChooser.h>
 
@@ -69,80 +71,89 @@ namespace Belle2 {
         m_recoTangentSegments.clear();
 #endif
 
-        //create the neighborhood
-        B2DEBUG(100, "Creating the CDCWireHit neighborhood");
-        m_wirehitNeighborhood.clear();
-        B2DEBUG(100, "  Append clockwise neighborhood");
-        m_clockwise_neighborhoodBuilder.append(wirehits, m_wirehitNeighborhood);
-        B2DEBUG(100, "  Append clockwise out neighborhood");
-        m_clockwiseOut_neighborhoodBuilder.append(wirehits, m_wirehitNeighborhood);
-        B2DEBUG(100, "  Append clockwise in neighborhood");
-        m_clockwiseIn_neighborhoodBuilder.append(wirehits, m_wirehitNeighborhood);
-        B2DEBUG(100, "  Append counter clockwise neighborhood");
-        m_counterClockwise_neighborhoodBuilder.append(wirehits, m_wirehitNeighborhood);
-        B2DEBUG(100, "  Append counter clockwise out neighborhood");
-        m_counterClockwiseOut_neighborhoodBuilder.append(wirehits, m_wirehitNeighborhood);
-        B2DEBUG(100, "  Append counter clockwise in neighborhood");
-        m_counterClockwiseIn_neighborhoodBuilder.append(wirehits, m_wirehitNeighborhood);
+        const CDCWireTopology& wireTopology = CDCWireTopology::getInstance();
+        const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
 
-        bool isSymmetric = m_wirehitNeighborhood.isSymmetric();
-        B2DEBUG(100, "  Check symmetry " << isSymmetric);
-        B2DEBUG(100, "  allWirehitNeighbors.size() = " << m_wirehitNeighborhood.size());
-        if (not isSymmetric) { B2WARNING("  The wire neighborhood is not symmetric"); }
+        for (const CDCWireSuperLayer & wireSuperLayer : wireTopology.getWireSuperLayers()) {
 
-        //create the clusters
-        B2DEBUG(100, "Creating the CDCWireHit clusters");
-        m_clusters.clear();
-        m_wirehitClusterizer.create(wirehits, m_wirehitNeighborhood, m_clusters);
+          const CDCWireHitTopology::CDCWireHitRange wireHitsInSuperlayer = wireHitTopology.getWireHits(wireSuperLayer);
 
-        B2DEBUG(100, "Created " << m_clusters.size() << " CDCWireHit clusters");
+          //create the neighborhood
+          B2DEBUG(100, "Creating the CDCWireHit neighborhood");
+          m_wirehitNeighborhood.clear();
+          B2DEBUG(100, "  Append clockwise neighborhood");
+          m_clockwise_neighborhoodBuilder.append(wireHitsInSuperlayer, m_wirehitNeighborhood);
+          B2DEBUG(100, "  Append clockwise out neighborhood");
+          m_clockwiseOut_neighborhoodBuilder.append(wireHitsInSuperlayer, m_wirehitNeighborhood);
+          B2DEBUG(100, "  Append clockwise in neighborhood");
+          m_clockwiseIn_neighborhoodBuilder.append(wireHitsInSuperlayer, m_wirehitNeighborhood);
+          B2DEBUG(100, "  Append counter clockwise neighborhood");
+          m_counterClockwise_neighborhoodBuilder.append(wireHitsInSuperlayer, m_wirehitNeighborhood);
+          B2DEBUG(100, "  Append counter clockwise out neighborhood");
+          m_counterClockwiseOut_neighborhoodBuilder.append(wireHitsInSuperlayer, m_wirehitNeighborhood);
+          B2DEBUG(100, "  Append counter clockwise in neighborhood");
+          m_counterClockwiseIn_neighborhoodBuilder.append(wireHitsInSuperlayer, m_wirehitNeighborhood);
 
-        //double d;
-        //std::cin >> d;
+          bool isSymmetric = m_wirehitNeighborhood.isSymmetric();
+          B2DEBUG(100, "  Check symmetry " << isSymmetric);
+          B2DEBUG(100, "  allWirehitNeighbors.size() = " << m_wirehitNeighborhood.size());
+          if (not isSymmetric) { B2WARNING("  The wire neighborhood is not symmetric"); }
 
-        for (CDCWireHitCluster & cluster : m_clusters) {
-          //size_t nSegmentsBefore = m_segments2D.size();
+          //create the clusters
+          B2DEBUG(100, "Creating the CDCWireHit clusters");
+          m_clusters.clear();
+          m_wirehitClusterizer.create(wireHitsInSuperlayer, m_wirehitNeighborhood, m_clusters);
 
-          //create the facets
-          B2DEBUG(100, "Creating the CDCRecoFacets");
-          m_facets.clear();
-          m_facetCreator.createFacets(cluster, m_wirehitNeighborhood , m_facets);
-          B2DEBUG(100, "  Created " << m_facets.size()  << " CDCRecoFacets");
+          B2DEBUG(100, "Created " << m_clusters.size() << " CDCWireHit clusters");
 
-          //create the facet neighborhood
-          B2DEBUG(100, "Creating the CDCRecoFacet neighborhood");
-          m_facetsNeighborhood.clear();
-          m_facetNeighborhoodBuilder.create(m_facets, m_facetsNeighborhood);
-          B2DEBUG(100, "  Created " << m_facetsNeighborhood.size()  << " FacetsNeighborhoods");
+          //double d;
+          //std::cin >> d;
 
-          //Apply the cellular automaton in a multipass manner
-          m_facetSegments.clear();
-          m_cellularPathFinder.apply(m_facets, m_facetsNeighborhood, m_facetSegments);
+          for (CDCWireHitCluster & cluster : m_clusters) {
+            //size_t nSegmentsBefore = m_segments2D.size();
 
-          //save the tangents for display only
+            //create the facets
+            B2DEBUG(100, "Creating the CDCRecoFacets");
+            m_facets.clear();
+            m_facetCreator.createFacets(cluster, m_wirehitNeighborhood , m_facets);
+            B2DEBUG(100, "  Created " << m_facets.size()  << " CDCRecoFacets");
+
+            //create the facet neighborhood
+            B2DEBUG(100, "Creating the CDCRecoFacet neighborhood");
+            m_facetsNeighborhood.clear();
+            m_facetNeighborhoodBuilder.create(m_facets, m_facetsNeighborhood);
+            B2DEBUG(100, "  Created " << m_facetsNeighborhood.size()  << " FacetsNeighborhoods");
+
+            //Apply the cellular automaton in a multipass manner
+            m_facetSegments.clear();
+            m_cellularPathFinder.apply(m_facets, m_facetsNeighborhood, m_facetSegments);
+
+            //save the tangents for display only
 #ifdef CDCLOCALTRACKING_USE_ROOT
-          B2DEBUG(100, "Reduce the CDCRecoFacetPtrSegment to RecoSegment2D");
-          m_tangentSegmentCreator.create(m_facetSegments, m_recoTangentSegments);
+            B2DEBUG(100, "Reduce the CDCRecoFacetPtrSegment to RecoSegment2D");
+            m_tangentSegmentCreator.create(m_facetSegments, m_recoTangentSegments);
 #endif
 
-          // reduce the CDCRecoFacetPtrSegment directly to the selected vector
-          B2DEBUG(100, "Reduce the CDCRecoFacetPtrSegment to RecoSegment2D");
-          m_segments2D.reserve(m_segments2D.size() + m_facetSegments.size());
-          m_recoSegmentCreator.create(m_facetSegments, m_segments2D);
+            // reduce the CDCRecoFacetPtrSegment directly to the selected vector
+            B2DEBUG(100, "Reduce the CDCRecoFacetPtrSegment to RecoSegment2D");
+            m_segments2D.reserve(m_segments2D.size() + m_facetSegments.size());
+            m_recoSegmentCreator.create(m_facetSegments, m_segments2D);
 
-          //TODO: combine matching segments here
+            //TODO: combine matching segments here
 
-          //size_t nSegmentsAfter = m_segments2D.size();
-          B2DEBUG(100, "  Created " << m_segments2D.size()  << " selected CDCRecoSegment2Ds");
-        } // end for cluster
+            //size_t nSegmentsAfter = m_segments2D.size();
+            B2DEBUG(100, "  Created " << m_segments2D.size()  << " selected CDCRecoSegment2Ds");
+          } // end for cluster
+
+
+          //TODO: combine matching segments or here
+
+        } // end for superlayer
 
         //make both orientations available
         B2DEBUG(100, "Reversing CDCReco2DSegments");
         m_segmentReverser.appendReversed(m_segments2D);
         B2DEBUG(100, "  Created " << m_segments2D.size()  << " selected CDCRecoSegment2Ds after reversion");
-
-        //TODO: combine matching segments or here
-
 
         copyToDataStoreForDebug();
 

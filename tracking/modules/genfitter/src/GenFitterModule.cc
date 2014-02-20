@@ -586,7 +586,8 @@ void GenFitterModule::event()
             double pVal = fs->getBackwardPVal();
             float bField = 1.5; //TODO: get magnetic field from genfit
 
-            TrackFitResult* newTrackFitResult = trackFitResults.appendNew(TrackFitResult(poca, dirInPoca, cov, charge, chargedStable, pVal, bField));
+            trackFitResults.appendNew(TrackFitResult(poca, dirInPoca, cov, charge, chargedStable, pVal, bField));
+
             gfTracksToTrackFitResults.add(trackCounter, trackFitResultCounter);
             gfTrackCandidatesToTrackFitResults.add(iCand, trackFitResultCounter);
             gfTrackCandidatesTogfTracks.add(iCand, trackCounter);

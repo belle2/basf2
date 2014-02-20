@@ -90,35 +90,45 @@ namespace Belle2 {
         m_gfTrackCandCreator.create(m_tracks, storedGFTrackCands);
         B2DEBUG(100, "  Created " << storedGFTrackCands.getEntries()  << " genfit::TrackCands");
 
-        // IO for monitoring in python
-#ifdef CDCLOCALTRACKING_USE_ROOT
-        // IO segment triples
-        {
-          B2DEBUG(100, "  Creating the StoreArray for the CDCSegmentTriple");
-          StoreArray < CDCSegmentTriple > storedSegmentTriples("CDCSegmentTriples");
-          storedSegmentTriples.create();
+        copyToDataStoreForDebug();
 
-          for (const CDCSegmentTriple & segmentTriple :  m_segmentTriples) {
-            storedSegmentTriples.appendNew(segmentTriple);
-          }
-          B2DEBUG(100, "  Created " << storedSegmentTriples.getEntries()  << " CDCSegmentTriples");
+
+      }
+
+
+
+
+
+    private:
+      void copyToDataStoreForDebug() const {
+
+#ifdef CDCLOCALTRACKING_USE_ROOT
+
+        // IO for monitoring in python
+        // IO segment triples
+        B2DEBUG(100, "  Creating the StoreArray for the CDCSegmentTriple");
+        StoreArray < CDCSegmentTriple > storedSegmentTriples("CDCSegmentTriples");
+        storedSegmentTriples.create();
+        for (const CDCSegmentTriple & segmentTriple :  m_segmentTriples) {
+          storedSegmentTriples.appendNew(segmentTriple);
         }
+        B2DEBUG(100, "  Created " << storedSegmentTriples.getEntries()  << " CDCSegmentTriples");
 
         // IO tracks
-        {
-
-          B2DEBUG(100, "  Creating the StoreArray for the CDCTracks");
-          StoreArray < CDCTrack > storedTracks("CDCTracks");
-          storedTracks.create();
-          B2DEBUG(100, "  Copying the CDCTracks to the StoreArray");
-          for (const CDCTrack & track : m_tracks) {
-            storedTracks.appendNew(track);
-          }
-
+        B2DEBUG(100, "  Creating the StoreArray for the CDCTracks");
+        StoreArray < CDCTrack > storedTracks("CDCTracks");
+        storedTracks.create();
+        B2DEBUG(100, "  Copying the CDCTracks to the StoreArray");
+        for (const CDCTrack & track : m_tracks) {
+          storedTracks.appendNew(track);
         }
+
 #endif
 
       }
+
+
+
 
 
     private:

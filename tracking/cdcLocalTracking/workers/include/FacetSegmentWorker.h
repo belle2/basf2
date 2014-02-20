@@ -49,7 +49,6 @@ namespace Belle2 {
 
 #ifdef CDCLOCALTRACKING_USE_ROOT
         StoreArray < CDCRecoTangentCollection >::registerTransient("CDCRecoTangentSegments");
-        StoreArray < CDCRecoSegment2D >::registerTransient("CDCRecoHit2DSegments");
         StoreArray < CDCRecoSegment2D >::registerTransient("CDCRecoHit2DSegmentsSelected");
         StoreArray < CDCWireHitCluster >::registerTransient("CDCWireHitClusters");
 #endif
@@ -63,15 +62,8 @@ namespace Belle2 {
       inline void apply(const CDCWireHitRange& wirehits,
                         std::vector< CDCRecoSegment2D >& outputSegments) {
 
-        //which recosegment should be show in the output
-        std::vector< CDCRecoSegment2D >& recoSegments = m_recoSegments;
-        std::vector< CDCRecoSegment2D >& selectedRecoSegments = outputSegments;  //output
-
-        //std::vector< CDCRecoSegment2D > & recoSegments = recoSegments; //output
-        //std::vector< CDCRecoSegment2D > & selectedRecoSegments = m_recoSegments;
-
-        recoSegments.clear();
-        selectedRecoSegments.clear();
+        m_segments2D.clear();
+        outputSegments.clear();
 
 #ifdef CDCLOCALTRACKING_USE_ROOT
         m_recoTangentSegments.clear();
@@ -109,7 +101,7 @@ namespace Belle2 {
         //std::cin >> d;
 
         for (CDCWireHitCluster & cluster : m_clusters) {
-          //size_t nSegmentsBefore = selectedRecoSegments.size();
+          //size_t nSegmentsBefore = m_segments2D.size();
 
           //create the facets
           B2DEBUG(100, "Creating the CDCRecoFacets");
@@ -135,21 +127,31 @@ namespace Belle2 {
 
           // reduce the CDCRecoFacetPtrSegment directly to the selected vector
           B2DEBUG(100, "Reduce the CDCRecoFacetPtrSegment to RecoSegment2D");
-          selectedRecoSegments.reserve(selectedRecoSegments.size() + m_facetSegments.size());
-          m_recoSegmentCreator.create(m_facetSegments, selectedRecoSegments);
+          m_segments2D.reserve(m_segments2D.size() + m_facetSegments.size());
+          m_recoSegmentCreator.create(m_facetSegments, m_segments2D);
 
           //TODO: combine matching segments here
 
-          //size_t nSegmentsAfter = selectedRecoSegments.size();
-          B2DEBUG(100, "  Created " << selectedRecoSegments.size()  << " selected CDCRecoSegment2Ds");
+          //size_t nSegmentsAfter = m_segments2D.size();
+          B2DEBUG(100, "  Created " << m_segments2D.size()  << " selected CDCRecoSegment2Ds");
         } // end for cluster
 
         //make both orientations available
         B2DEBUG(100, "Reversing CDCReco2DSegments");
-        m_segmentReverser.appendReversed(selectedRecoSegments);
-        B2DEBUG(100, "  Created " << selectedRecoSegments.size()  << " selected CDCRecoSegment2Ds after reversion");
+        m_segmentReverser.appendReversed(m_segments2D);
+        B2DEBUG(100, "  Created " << m_segments2D.size()  << " selected CDCRecoSegment2Ds after reversion");
 
         //TODO: combine matching segments or here
+
+
+        copyToDataStoreForDebug();
+
+        outputSegments.swap(m_segments2D);
+      }
+
+    private:
+      void copyToDataStoreForDebug() const {
+
 
         // IO for monitoring in python
 #ifdef CDCLOCALTRACKING_USE_ROOT
@@ -159,7 +161,7 @@ namespace Belle2 {
         StoreArray < CDCWireHitCluster > storedClusters("CDCWireHitClusters");
         storedClusters.create();
         B2DEBUG(100, "  Do creating the CDCWireHitCluster in the StoreArray");
-        BOOST_FOREACH(const CDCWireHitCluster & cluster, m_clusters) {
+        for (const CDCWireHitCluster & cluster : m_clusters) {
           storedClusters.appendNew(cluster);
         }
         B2DEBUG(100, "  Created " << storedClusters.getEntries()  << " CDCWireHitClusters");
@@ -169,35 +171,25 @@ namespace Belle2 {
         StoreArray < CDCRecoTangentCollection > storedTangentSegments("CDCRecoTangentSegments");
         storedTangentSegments.create();
         B2DEBUG(100, "  Do creating the CDCRecoTangentSegment in the StoreArray");
-        BOOST_FOREACH(const CDCRecoTangentCollection & tangentSegment, m_recoTangentSegments) {
+        for (const CDCRecoTangentCollection & tangentSegment : m_recoTangentSegments) {
           storedTangentSegments.appendNew(tangentSegment);
         }
         B2DEBUG(100, "  Created " << storedTangentSegments.getEntries()  << " CDCRecoTangentSegment");
 
-
-        // IO segments without tangents
-
-        B2DEBUG(100, "  Creating the StoreArray for the CDCRecoHit2DSegments");
-        StoreArray < CDCRecoSegment2D > storedRecoSegments("CDCRecoHit2DSegments");
-        storedRecoSegments.create();
-        B2DEBUG(100, "  Do creating the CDCRecoSegment2D in the StoreArray");
-        BOOST_FOREACH(const CDCRecoSegment2D & segment, recoSegments) {
-          storedRecoSegments.appendNew(segment);
-        }
-        B2DEBUG(100, "  Created " << storedRecoSegments.getEntries()  << " CDCRecoSegment2D");
-
         // IO selected segments without tangents
         B2DEBUG(100, "  Creating the StoreArray for the selected CDCRecoHit2DSegments");
-        StoreArray < CDCRecoSegment2D > storedSelectedRecoSegments("CDCRecoHit2DSegmentsSelected");
-        storedSelectedRecoSegments.create();
+        StoreArray < CDCRecoSegment2D > storedSegments2D("CDCRecoHit2DSegmentsSelected");
+        storedSegments2D.create();
         B2DEBUG(100, "  Copying the selected CDCRecoHit2DSegments to the StoreArray");
-        BOOST_FOREACH(const CDCRecoSegment2D & segment, selectedRecoSegments) {
-          storedSelectedRecoSegments.appendNew(segment);
+        for (const CDCRecoSegment2D & segment2D : m_segments2D) {
+          storedSegments2D.appendNew(segment2D);
         }
-        B2DEBUG(100, "  Created " << storedSelectedRecoSegments.getEntries()  <<
+        B2DEBUG(100, "  Created " << storedSegments2D.getEntries()  <<
                 " selected CDCRecoSegment2D");
 #endif
+
       }
+
 
     private:
       //typedefs
@@ -218,7 +210,7 @@ namespace Belle2 {
       std::vector< CDCRecoTangentCollection > m_recoTangentSegments;
 #endif
 
-      std::vector<CDCRecoSegment2D> m_recoSegments;
+      std::vector<CDCRecoSegment2D> m_segments2D;
 
       Clusterizer<CDCWireHit, CDCWireHitCluster> m_wirehitClusterizer;
       std::vector<CDCWireHitCluster> m_clusters;

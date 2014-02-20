@@ -56,6 +56,9 @@ class CDCSVGDisplayModule(Module):
         self.draw_simhits = True and False
         self.draw_rlinfo = True and False
         self.draw_tof = True and False
+        self.draw_connect_tof = True and False
+        self.draw_simpdgcode = True and False
+
         self.draw_reassigned = True and False
 
         self.draw_clusters = True and False
@@ -206,6 +209,52 @@ class CDCSVGDisplayModule(Module):
         if self.draw_tof:
             styleDict = {'stroke-width': '1',
                          'stroke': attributemaps.TOFColorMap()}
+            self.draw_storearray('CDCHits', styleDict)
+
+        if self.draw_connect_tof:
+            print 'Drawing simulated hits connected by tof'
+            cdchits_storearray = Belle2.PyStoreArray('CDCHits')
+            if not cdchits_storearray:
+                print 'Store array not present'
+            if cdchits_storearray:
+                simhits_related_to_cdchit = [cdchit.getRelated('CDCSimHits')
+                        for cdchit in cdchits_storearray]
+
+                # group them by their mcparticle id
+                print 'Grouping simhits', simhits_related_to_cdchit
+                simhits_by_mcparticle = {}
+                for simhit in simhits_related_to_cdchit:
+                    mcparticle = simhit.getRelated('MCParticles')
+                    print mcparticle
+                    if not mcparticle == None:
+                        mcTrackId = mcparticle.getArrayIndex()
+                        simhits_by_mcparticle.setdefault(mcTrackId, [])
+                        simhits_by_mcparticle[mcTrackId].append(simhit)
+
+                for simhits_for_mcparticle in simhits_by_mcparticle.values():
+                    simhits_for_mcparticle.sort(key=lambda simhit: \
+                            simhit.getFlightTime())
+
+                    nSimHits = len(simhits_for_mcparticle)
+                    for iSimHit in range(nSimHits - 1):
+                        fromSimHit = simhits_for_mcparticle[iSimHit]
+                        toSimHit = simhits_for_mcparticle[iSimHit + 1]
+
+                        styleDict = {'stroke': 'black', 'stroke-width': '0.2'}
+                        # plotter.append(simhits_storearray, **styleDict)
+                        plotter.append((fromSimHit, toSimHit), **styleDict)
+
+        if self.draw_simpdgcode:
+
+            def color_map(iHit, hit):
+                simHit = hit.getRelated('CDCSimHits')
+                pdgCode = simHit.getPDGCode()
+                color = \
+                    attributemaps.MCPDGCodeColorMap.color_by_pdgcode.get(pdgCode,
+                        'orange')
+                return color
+
+            styleDict = {'stroke': color_map, 'stroke-width': '0.5'}
             self.draw_storearray('CDCHits', styleDict)
 
         # Draw the reassignment information of hits

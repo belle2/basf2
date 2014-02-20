@@ -29,6 +29,8 @@ class CDCDataobjectsConverter:
 
         self.toSVGFunctions_by_type = {  # Belle2.CDCLocalTracking.CDCRecoSegment2D: \
                                          # self.CDCGenericHitCollectionToSVG,
+                                         # for adhoc tangents
+            tuple: self.TupleToSVG,
             Belle2.PyStoreObj: self.PyStoreObjToSVG,
             Belle2.PyStoreArray: self.PyStoreArrayToSVG,
             Belle2.CDCLocalTracking.Vector2D: self.Vector2DToSVG,
@@ -102,6 +104,32 @@ class CDCDataobjectsConverter:
             self.svgElementFactory.createGroupFromIterable(iterChildElements)
 
         return groupElement
+
+    def TupleToSVG(self, tup, **kwd):
+
+        if len(tup) != 2:
+            return IterableToSVG(tup, **kwd)
+        else:
+            fromSimHit = tup[0]
+            toSimHit = tup[1]
+
+            if not isinstance(fromSimHit, Belle2.CDCSimHit) \
+                or not isinstance(toSimHit, Belle2.CDCSimHit):
+                raise ValueError('No conversion for pairs of '
+                                 + str(type(fromSimHit)) + ', '
+                                 + str(type(toSimHit)))
+
+            styleDict = {'stroke': 'black', 'stroke-width': '0.2'}
+            styleDict.update(kwd)
+
+            fromPoint = (fromSimHit.getPosTrack().X(),
+                         fromSimHit.getPosTrack().Y())
+            toPoint = (toSimHit.getPosTrack().X(), toSimHit.getPosTrack().Y())
+
+            lineElement = self.svgElementFactory.createLine(fromPoint,
+                    toPoint, **styleDict)
+
+            return lineElement
 
     def PyStoreObjToSVG(self, pystoreobj, **kwd):
         if pystoreobj:

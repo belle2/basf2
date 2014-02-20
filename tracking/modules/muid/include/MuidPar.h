@@ -13,12 +13,28 @@
 
 namespace Belle2 {
 
+//! Index for muon PDF
 #define MUID_MUON 0
+
+//! Index for pion PDF
 #define MUID_PION 1
+
+//! Index for kaon PDF
 #define MUID_KAON 2
 
+//! Index for proton PDF
+#define MUID_PROTON 3
+
+//! Index for electron PDF
+#define MUID_ELECTRON 4
+
+//! Maximum layer-difference index for array size
 #define MUID_MaxRange 16
+
+//! Maximum reduced-chi-squared index for array size
 #define MUID_MaxReducedChiSquared 50
+
+//! Maximum reduced-chi-squared value for transverse scattering
 #define MUID_ReducedChiSquaredLimit 10.0
 
   //! Provides muid parameters (from Gearbox)

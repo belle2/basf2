@@ -23,7 +23,7 @@ ExtHit::ExtHit() : RelationsObject()
 
 //! Constructor with initial values
 ExtHit::ExtHit(int pdgCode, ExtDetectorID detectorID, int copyID, ExtHitStatus status, double tof,
-               const TVector3& position, const TVector3& momentum, const TMatrixD& covariance) :
+               const TVector3& position, const TVector3& momentum, const TMatrixDSym& covariance) :
   RelationsObject(),
   m_PdgCode(pdgCode),
   m_DetectorID(detectorID),

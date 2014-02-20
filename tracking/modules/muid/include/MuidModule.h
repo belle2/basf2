@@ -19,13 +19,11 @@
 #include <simulation/kernel/ExtManager.h>
 #include <simulation/kernel/ExtCylSurfaceTarget.h>
 #include <bklm/geometry/GeometryPar.h>
-#include <CLHEP/Vector/ThreeVector.h>
-#include <CLHEP/Matrix/SymMatrix.h>
-#include <TVector3.h>
-
-#include <G4TouchableHandle.hh>
+#include <G4Point3D.hh>
+#include <G4Vector3D.hh>
 #include <G4ErrorTrajErr.hh>
-#include <TMatrixD.h>
+#include <TVector3.h>
+#include <TMatrixDSym.h>
 
 class G4RunManager;
 class G4VUserPhysicsList;
@@ -36,16 +34,6 @@ class G4ErrorFreeTrajState;
 class G4String;
 namespace genfit { class Track; }
 
-#define BARREL 1
-#define ENDCAP 2
-
-#define FORWARD 1
-#define BACKWARD 2
-
-#define MISSED 1
-#define CROSSED 2
-#define SIDE 3
-
 namespace Belle2 {
 
   class Muid;
@@ -54,42 +42,26 @@ namespace Belle2 {
   class EKLMHit2d;
   class MuidPar;
 
-  //! detector-element identifier
-  struct Address {
-    //! flag to indicate if this element is in an RPC (true) or scintillator (false)
-    bool isRPC;
-    //! flag to indicate if this element is in the barrel (true) or endcap (false)
-    bool inBarrel;
-    //! flag to indicate if this element is in the forward (true) or backward (false) end
-    bool isForward;
-    //! flag to indicate if this element is in the inner (true) or outer (false) detection plane
-    bool isInnerPlane;
-    //! sector number (0..7 for barrel, 0..3 for endcap) of this element
-    int  sector;
-    //! layer number (0..14 for barrel, 0..13 for endcap) of this element
-    int  layer;
-  };
-
   //! possible intersection of extrapolated track with a KLM layer
   struct Point {
-    //! flag to indicate if this intersection is in a sensitive volume
-    bool                enteredSensitiveVolume;
-    //!  state of the intersection
-    int                 intersected;
-    //! flag to indicate if the intersection has a matching 2D detector hit
-    bool                hasMatchingHit;
-    //! detector-element identifier of this intersection
-    Address             address;
+    //! flag to indicate if this point is in the barrel (true) or endcap (false)
+    bool        inBarrel;
+    //! flag to indicate if this point is in the forward (true) or backward (false) end
+    bool        isForward;
+    //! sector number (0..7 for barrel, 0..3 for endcap) of this point
+    int         sector;
+    //! layer number (0..14 for barrel, 0..13 for endcap) of this point
+    int         layer;
     //! extrapolated-track global position (cm) of this intersection
-    TVector3            position;
+    TVector3    position;
     //! extrapolated-track momentum (GeV/c) at this intersection
-    TVector3            momentum;
+    TVector3    momentum;
     //! extrapolated-track phase-space covariance matrix at this intersection
-    CLHEP::HepSymMatrix covariance;
-    //! extrapolated-track position (cm) projected to the hit plane
-    TVector3            positionAtHitPlane;
+    TMatrixDSym covariance;
+    //! extrapolated-track position (cm) projected to the 2D hit's midplane
+    TVector3    positionAtHitPlane;
     //! chi-squared value of transverse deviation between extrapolated and measured hit positions
-    double              chi2;
+    double      chi2;
   };
 
   /** The geant4e-based muon identification module.
@@ -166,64 +138,38 @@ namespace Belle2 {
     //! points will be saved during extrapolation
     void registerVolumes();
 
-    //! Get the physical volume information for a geant4 physical volume
-    void getVolumeID(const G4TouchableHandle&, ExtDetectorID&, int&);
-
-    //! Convert the geant4e covariance to phasespacePoint 6x6 covariance
-    TMatrixD getCov(const G4ErrorFreeTrajState*);
-
     //! Get the starting phase-space point and covariance for one reconstructed track and PDG hypothesis
-    void getStartPoint(const genfit::Track*, int, G4ThreeVector&, G4ThreeVector&, G4ErrorTrajErr&);
+    void getStartPoint(const genfit::Track*, int, G4Point3D&, G4Vector3D&, G4ErrorTrajErr&);
 
     //! Add an extrapolation point for the track
     bool createHit(G4ErrorFreeTrajState*, int, int, StoreArray<MuidHit>&, RelationArray&, const StoreArray<BKLMHit2d>&, const StoreArray<EKLMHit2d>&);
 
     //! Find the intersection point of the track with the crossed BKLM plane
-    void findBarrelIntersection(Point&, const TVector3&, const TVector3&);
+    bool findBarrelIntersection(Point&, const TVector3&, const TVector3&);
 
     //! Find the intersection point of the track with the crossed EKLM plane
-    void findEndcapIntersection(Point&, const TVector3&, const TVector3&);
+    bool findEndcapIntersection(Point&, const TVector3&, const TVector3&);
 
-    //! Find the matching BKLM 2D hit nearest the intersection point
-    //! of the track with the crossed BKLM plane
-    void findMatchingBarrelHit(Point&, const StoreArray<BKLMHit2d>&);
+    //! Find the matching BKLM 2D hit nearest the intersection point of the track with the crossed BKLM plane
+    bool findMatchingBarrelHit(Point&, const StoreArray<BKLMHit2d>&);
 
-    //! Find the matching EKLM 2D hit nearest the intersection point
-    //! of the track with the crossed EKLM plane
-    void findMatchingEndcapHit(Point&, const StoreArray<EKLMHit2d>&);
+    //! Find the matching EKLM 2D hit nearest the intersection point of the track with the crossed EKLM plane
+    bool findMatchingEndcapHit(Point&, const StoreArray<EKLMHit2d>&);
 
     //! Nudge the track using the matching hit
     void adjustIntersection(Point&, const double*, const TVector3&);
 
     //! Get the in-plane covariance
-    double getPlaneVariance(const CLHEP::HepSymMatrix&, const TVector3&, const TVector3&);
+    double getPlaneVariance(const Point&);
 
     //! Complete muon identification after end of track extrapolation
     void finishTrack(Muid*);
 
-    //! Convert GEANT4 physical volume in BKLM/EKLM to an Address
-    void getAddress(int, int, Address&);
-
     //! Convert GEANT4e covariance to phase-space covariance
-    void fromG4eToPhasespace(const G4ErrorFreeTrajState*, CLHEP::HepSymMatrix&);
+    TMatrixDSym fromG4eToPhasespace(const G4ErrorFreeTrajState*);
 
     //! Convert phase-space covariance to GEANT4e covariance
-    void fromPhasespaceToG4e(const Point&, G4ErrorTrajErr&);
-
-    //! Fill PDF tables
-    void fillPDF(int);
-
-    //! Calculate spline-interpolation coefficients
-    void spline(int, double, double*, double*, double*, double*);
-
-    //! Extract PDF value
-    double getPDF(int, int, int, int, double) const;
-
-    //! Extract PDF value for range difference
-    double getPDFRange(int, int, int, int) const;
-
-    //! Extract PDF value for transverse reduced chi-squared
-    double getPDFRchisq(int, int, int, double) const;
+    G4ErrorTrajErr fromPhasespaceToG4e(const TVector3&, const TMatrixDSym&);
 
     //! Pointer to the ExtManager singleton
     Simulation::ExtManager* m_extMgr;
@@ -243,11 +189,11 @@ namespace Belle2 {
     //!  ChargedStable hypotheses
     std::vector<Const::ChargedStable> m_chargedStable;
 
-    //! Pointers to geant4 physical volumes whose entry points will be saved
-    std::vector<G4VPhysicalVolume*>* m_enter;
+    //! Pointers to BKLM geant4 sensitive (physical) volumes
+    std::vector<G4VPhysicalVolume*>* m_bklm_enter;
 
-    //! Pointers to geant4 physical volumes whose exit points will be saved
-    std::vector<G4VPhysicalVolume*>* m_exit;
+    //! Pointers to EKLM geant4 sensitive (physical) volumes
+    std::vector<G4VPhysicalVolume*>* m_eklm_enter;
 
     //! Time of flight (ns) along the track from the interaction point
     double m_tof;
@@ -273,23 +219,14 @@ namespace Belle2 {
     //! half-length (cm) of the barrel
     double m_BarrelHalfLength;
 
-    //! number of endcap layers
-    int m_EndcapLayers;
+    //! outermost endcap layer that is active for muon identification (user-defined)
+    int m_LastActiveEndcapLayer;
 
-    //! number of barrel layers
-    int m_BarrelLayers;
-
-    //! outermost active endcap layer
-    int m_EndcapMaxLayer;
+    //! outermost barrel layer that is active for muon identification (user-defined)
+    int m_LastActiveBarrelLayer;
 
     //! midpoint along z (cm) of the forward endcap from the KLM midpoint
     double m_EndcapMiddleZ;
-
-    //! uncertainty in measured strip position (cm)
-    double m_StripPositionError;
-
-    //! default measurement uncertainty (cm)
-    double m_DefaultError;
 
     //! user-defined maximum distance (cm) for matching hit to extrapolation
     double m_maxDistCM;
@@ -297,23 +234,23 @@ namespace Belle2 {
     //! user-defined maximum distance (sigmas) for matching hit to extrapolation
     double m_maxDistSIGMA;
 
-    //! RPC strip width (cm)
-    double m_StripWidth;
-
     //! RPC strip position variance (cm^2)
     double m_StripPositionVariance;
 
     //! scintillator strip width (cm)
     double m_ScintWidth;
 
-    //! scintillator strip position variance (cm^2)
-    double m_ScintPositionVariance;
+    //! BKLM RPC phi-measuring strip position variance (cm^2) by layer
+    double m_BarrelPhiStripVariance[NLAYER + 1];
 
-    //! minimum z (cm) of the active portion of the forward-BKLM RPCs relative to KLM midpoint
-    double m_BarrelActiveMinZ;
+    //! BKLM RPC z-measuring strip position variance (cm^2) by layer
+    double m_BarrelZStripVariance[NLAYER + 1];
 
-    //! maximum z (cm) of the active portion of the forward-BKLM RPCs relative to KLM midpoint
-    double m_BarrelActiveMaxZ;
+    //! BKLM scintillator strip position variance (cm^2)
+    double m_BarrelScintVariance;
+
+    //! EKLM scintillator strip position variance (cm^2)
+    double m_EndcapScintVariance;
 
     //! hit-plane radius (cm) at closest distance to IP of each barrel layer
     double m_BarrelModuleMiddleRadius[NLAYER + 1];
@@ -321,29 +258,14 @@ namespace Belle2 {
     //! hit-plane z (cm) of each IP layer relative to KLM midpoint
     double m_EndcapModuleMiddleZ[NLAYER + 1];
 
-    //! minimum radius (r) of the active portion of the endcaps
-    double m_EndcapActiveMinR;
-
-    //! maximum radius (r) of the active portion of the endcaps
-    double m_EndcapActiveMaxR;
-
     //! normal unit vector of each barrel sector
     TVector3 m_BarrelSectorPerp[NSECTOR + 1];
 
-    //! rotation (radians) of each barrel sector relative to sector #0 (centred on the +x axis)
+    //! azimuthal unit vector of each barrel sector
     TVector3 m_BarrelSectorPhi[NSECTOR + 1];
-
-    //! flag to indicate that the extrapolation is outside the KLM
-    bool m_leftKLM;
 
     //! flag to indicate that the extrapolation left the barrel and entered the endcap
     bool m_fromBarrelToEndcap;
-
-    //! flag to indicate that the extrapolation left the barrel at +/-zmax and escaped
-    int m_sideGapEscape;
-
-    //! flag to indicate that the extrapolated track entered the barrel iron structure
-    bool m_wasInBarrelIron;
 
     //! flag to indicate that the extrapolated track had been in the barrel in the prior step
     bool m_wasInBarrel;
@@ -351,20 +273,23 @@ namespace Belle2 {
     //! flag to indicate that the extrapolated track had been in the endcap in the prior step
     bool m_wasInEndcap;
 
-    //! barrel layer number of the extrapolated track
-    int m_geantBarrelLayer;
-
-    //! endcap layer number of the extrapolated track
-    int m_geantEndcapLayer;
-
     //! outermost barrel layer encountered by the extrapolated track in the prior steps
     int m_firstBarrelLayer;
 
     //! outermost barrel layer encountered by the extrapolated track in the prior steps
     int m_firstEndcapLayer;
 
-    //! detector-element identifier at the current extrapolation step
-    Address m_address;
+    //! detector-element in-barrel flag at the current extrapolation step
+    bool m_inBarrel;
+
+    //! detector-element forward-end flag at the current extrapolation step
+    bool m_isForward;
+
+    //! detector-element sector at the current extrapolation step (zero-based)
+    int m_sector;
+
+    //! detector-element layer at the current extrapolation step (zero-based)
+    int m_layer;
 
     //! global position (cm) at the current extrapolation step
     TVector3 m_position;
@@ -380,9 +305,6 @@ namespace Belle2 {
 
     //! accumulated number of points with matching 2D hits
     int m_nPoint;
-
-    //! accumulated number of matching 1D strips (twice m_nPoint)
-    int m_nStrips;
 
     //! outermost barrel layer crossed by the extrapolated track
     int m_lastBarrelLayerExt;
@@ -416,6 +338,12 @@ namespace Belle2 {
 
     //! probability density function for kaon hypothesis
     MuidPar* m_kaonPar;
+
+    //! probability density function for proton hypothesis
+    MuidPar* m_protonPar;
+
+    //! probability density function for electron hypothesis
+    MuidPar* m_electronPar;
 
   };
 

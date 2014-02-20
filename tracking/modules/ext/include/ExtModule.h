@@ -21,7 +21,7 @@
 
 #include <G4TouchableHandle.hh>
 #include <G4ErrorTrajErr.hh>
-#include <TMatrixD.h>
+#include <TMatrixDSym.h>
 
 #include <string>
 #include <vector>
@@ -101,8 +101,11 @@ namespace Belle2 {
     //! Get the physical volume information for a geant4 physical volume
     void getVolumeID(const G4TouchableHandle&, ExtDetectorID&, int&);
 
-    //! Convert the geant4e covariance to phasespacePoint 6x6 covariance
-    TMatrixD getCov(const G4ErrorFreeTrajState*);
+    //! Convert the geant4e 5x5 covariance to phasespace 6x6 covariance
+    TMatrixDSym fromG4eToPhasespace(const G4ErrorFreeTrajState*);
+
+    //! Convert the phasespace covariance to geant4e covariance
+    G4ErrorTrajErr fromPhasespaceToG4e(const TVector3&, const TMatrixDSym&);
 
     //! Define a new track candidate for one reconstructed track and PDG hypothesis
     void getStartPoint(const genfit::Track*, int, G4ThreeVector&, G4ThreeVector&, G4ErrorTrajErr&);

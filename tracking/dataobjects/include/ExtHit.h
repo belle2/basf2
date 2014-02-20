@@ -12,7 +12,7 @@
 
 #include <framework/datastore/RelationsObject.h>
 #include <TVector3.h>
-#include <TMatrixD.h>
+#include <TMatrixDSym.h>
 
 namespace Belle2 {
 
@@ -28,7 +28,7 @@ namespace Belle2 {
     ExtHit();
 
     //! Constructor with initial values
-    ExtHit(int, ExtDetectorID, int, ExtHitStatus, double, const TVector3&, const TVector3&, const TMatrixD&);
+    ExtHit(int, ExtDetectorID, int, ExtHitStatus, double, const TVector3&, const TVector3&, const TMatrixDSym&);
 
     //! Copy constructor
     ExtHit(const ExtHit&);
@@ -58,7 +58,7 @@ namespace Belle2 {
     TVector3 getMomentum() const { return m_Momentum; }
 
     //! returns phase-space covariance (6x6, position--momentum) at this extrapolation hit
-    TMatrixD getCovariance() const { return m_Covariance; }
+    TMatrixDSym getCovariance() const { return m_Covariance; }
 
   private:
 
@@ -84,10 +84,10 @@ namespace Belle2 {
     TVector3 m_Momentum;
 
     //! phase-space covariance (6x6, position--momentum)
-    TMatrixD m_Covariance;
+    TMatrixDSym m_Covariance;
 
     //! Needed to make the ROOT object storable
-    ClassDef(ExtHit, 1)
+    ClassDef(ExtHit, 2)
 
   };
 }

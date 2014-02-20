@@ -139,7 +139,7 @@ namespace Belle2 {
   {
 
     // outcome:  0=Not in KLM, 1=Barrel Stop, 2=Endcap Stop, 3=Barrel Exit, 4=Endcap Exit
-    // lastExtLayer:  last layer that Ext track touched
+    // lastExtLayer:  last layer that Ext track touched (zero-based)
     // layerDifference:  difference between last Ext layer and last hit layer
     // reducedChiSquared: reduced chi**2 of the transverse deviations of all associated
     //           hits from the corresponding Ext track crossings
@@ -150,7 +150,7 @@ namespace Belle2 {
     }
 
     if ((outcome <= 0) || (outcome > 4)) { return 0.0; }
-    if ((lastExtLayer < 1) || (lastExtLayer  > 15)) { return 0.0; }
+    if ((lastExtLayer < 0) || (lastExtLayer  >= 15)) { return 0.0; }
     if (reducedChiSquared < 0.0) { return 0.0; }
 
     return getPDFRange(outcome, lastExtLayer, layerDifference) *
@@ -164,7 +164,7 @@ namespace Belle2 {
     // Evaluate the longitudinal-coordinate PDF for this particleID hypothesis
 
     if (layerDifference >= MUID_MaxRange) { layerDifference = MUID_MaxRange - 1; }
-    return m_RangePDF[outcome - 1][lastExtLayer - 1][layerDifference];
+    return m_RangePDF[outcome - 1][lastExtLayer][layerDifference];
 
   }
 
@@ -175,7 +175,7 @@ namespace Belle2 {
     // Use spline interpolation of the PDF to avoid binning artifacts.
 
     double pdf = 0.0;
-    double area = m_ReducedChiSquaredNorm[outcome - 1][lastExtLayer - 1];
+    double area = m_ReducedChiSquaredNorm[outcome - 1][lastExtLayer];
     if (reducedChiSquared >= MUID_ReducedChiSquaredLimit) {
       pdf = area * m_ReducedChiSquaredPDF[outcome - 1][MUID_MaxReducedChiSquared - 1] + (1.0 - area);
     } else {

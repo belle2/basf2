@@ -29,20 +29,41 @@ namespace Belle2 {
     //! Destructor
     virtual ~Muid() {}
 
-    //! returns muon PDF value for this extrapolation
+    //! returns the PDG code of the hypothesis used for this extrapolation
+    int getPDGCode() const { return m_pdgCode; }
+
+    //! returns muon PDF value for this extrapolation (normalized with Pion & Kaon)
     double getMuonPDFValue() const { return m_MuonPDFValue; }
 
-    //! returns pion PDF value for this extrapolation
+    //! returns pion PDF value for this extrapolation (normalized with Muon & Kaon)
     double getPionPDFValue() const { return m_PionPDFValue; }
 
-    //! returns kaon PDF value for this extrapolation
+    //! returns kaon PDF value for this extrapolation (normalized with Muon & Pion)
     double getKaonPDFValue() const { return m_KaonPDFValue; }
 
-    //! returns miss PDF value for this extrapolation
-    double getMissPDFValue() const { return m_MissPDFValue; }
+    //! returns proton PDF value for this extrapolation (normalized with Muon, Pion, Kaon)
+    double getProtonPDFValue() const { return m_ProtonPDFValue; }
 
-    //! returns junk PDF value for this extrapolation
+    //! returns electron PDF value for this extrapolation (normalized with Muon, Pion, Kaon)
+    double getElectronPDFValue() const { return m_ElectronPDFValue; }
+
+    //! returns junk PDF value for this extrapolation (1 if Muon+Pion+Kaon ~ 0)
     double getJunkPDFValue() const { return m_JunkPDFValue; }
+
+    //! returns muon log-likelihood for this extrapolation (not normalized)
+    double getLogL_mu() const {return m_LogL_mu;}
+
+    //! returns pion log-likelihood for this extrapolation (not normalized)
+    double getLogL_pi() const {return m_LogL_pi;}
+
+    //! returns kaon log-likelihood for this extrapolation (not normalized)
+    double getLogL_K() const {return m_LogL_K;}
+
+    //! returns proton log-likelihood for this extrapolation (not normalized)
+    double getLogL_p() const {return m_LogL_p;}
+
+    //! returns electron log-likelihood for this extrapolation (not normalized)
+    double getLogL_e() const {return m_LogL_e;}
 
     //! returns status word (bit pattern) for this extrapolation
     unsigned int getStatus() const { return m_Status; }
@@ -80,6 +101,9 @@ namespace Belle2 {
     //! returns Matching-hit bit pattern
     unsigned int getHitLayerPattern() const { return m_HitLayerPattern; }
 
+    //! assigns PDG code of the hypothesis used for this extrapolation
+    void setPDGCode(int pdgCode) { m_pdgCode = pdgCode; }
+
     //! assigns muon PDF value for this extrapolation
     void setMuonPDFValue(double pdfValue) { m_MuonPDFValue = pdfValue; }
 
@@ -89,11 +113,29 @@ namespace Belle2 {
     //! assigns kaon PDF value for this extrapolation
     void setKaonPDFValue(double pdfValue) { m_KaonPDFValue = pdfValue; }
 
-    //! assigns miss PDF value for this extrapolation
-    void setMissPDFValue(double pdfValue) { m_MissPDFValue = pdfValue; }
+    //! assigns proton PDF value for this extrapolation
+    void setProtonPDFValue(double pdfValue) { m_ProtonPDFValue = pdfValue; }
+
+    //! assigns electron PDF value for this extrapolation
+    void setElectronPDFValue(double pdfValue) { m_ElectronPDFValue = pdfValue; }
 
     //! assigns junk PDF value for this extrapolation
     void setJunkPDFValue(double pdfValue) { m_JunkPDFValue = pdfValue; }
+
+    //! assigns muon log-likelihood for this extrapolation
+    void setLogL_mu(double value) { m_LogL_mu = value; }
+
+    //! assigns pion log-likelihood for this extrapolation
+    void setLogL_pi(double value) { m_LogL_pi = value; }
+
+    //! assigns kaon log-likelihood for this extrapolation
+    void setLogL_K(double value) { m_LogL_K = value; }
+
+    //! assigns proton log-likelihood for this extrapolation
+    void setLogL_p(double value) { m_LogL_p = value; }
+
+    //! assigns electron log-likelihood for this extrapolation
+    void setLogL_e(double value) { m_LogL_e = value; }
 
     //! assigns status word (bit pattern) for this extrapolation
     void setStatus(unsigned int status) { m_Status = status; }
@@ -136,20 +178,38 @@ namespace Belle2 {
     //! PDG particleID hypothesis used for this extrapolation (typically muon)
     int m_pdgCode;
 
-    //! Muon PDF value for this extrapolation
+    //! Muon PDF value for this extrapolation (normalized with Pion & Kaon)
     double m_MuonPDFValue;
 
-    //! Pion PDF value for this extrapolation
+    //! Pion PDF value for this extrapolation (normalized with Muon & Kaon)
     double m_PionPDFValue;
 
-    //! Kaon PDF value for this extrapolation
+    //! Kaon PDF value for this extrapolation (normalized with Muon & Pion)
     double m_KaonPDFValue;
 
-    //! Miss PDF value for this extrapolation
-    double m_MissPDFValue;
+    //! Proton PDF value for this extrapolation (normalized with Muon, Pion, Kaon)
+    double m_ProtonPDFValue;
 
-    //! Junk PDF value for this extrapolation
+    //! Electron PDF value for this extrapolation (normalized with Muon, Pion, Kaon)
+    double m_ElectronPDFValue;
+
+    //! Junk PDF value for this extrapolation (1 if Muon+Pion+Kaon ~ 0)
     double m_JunkPDFValue;
+
+    //! Muon log-likelihood for this extrapolation (not normalized)
+    double m_LogL_mu;
+
+    //! Pion log-likelihood for this extrapolation (not normalized)
+    double m_LogL_pi;
+
+    //! Kaon log-likelihood for this extrapolation (not normalized)
+    double m_LogL_K;
+
+    //! Proton log-likelihood for this extrapolation (not normalized)
+    double m_LogL_p;
+
+    //! Electron log-likelihood for this extrapolation (not normalized)
+    double m_LogL_e;
 
     //! status word (bit pattern) for this extrapolation
     unsigned int m_Status;
@@ -197,7 +257,7 @@ namespace Belle2 {
     unsigned int m_HitLayerPattern;
 
     //! Needed to make the ROOT object storable
-    ClassDef(Muid, 1)
+    ClassDef(Muid, 2)
 
   };
 }

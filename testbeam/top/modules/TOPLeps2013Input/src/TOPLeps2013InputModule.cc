@@ -263,7 +263,7 @@ namespace Belle2 {
     double mass = Const::pion.getMass();
     double beta = m_p / sqrt(m_p * m_p + mass * mass);
     double tof = path / (beta * Const::speedOfLight);
-    TMatrixD covariance(6, 6);
+    TMatrixDSym covariance(6);
     ExtHit* extHit = extHits.appendNew(ExtHit(pdgCode, EXT_TOP, barID, EXT_ENTER, tof, hit,
                                               momentum, covariance));
     track->addRelationTo(extHit);

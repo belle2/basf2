@@ -20,6 +20,7 @@
 #include <tracking/cdcLocalTracking/algorithms/AutomatonCell.h>
 
 #include <tracking/cdcLocalTracking/topology/CDCWire.h>
+#include <tracking/cdcLocalTracking/topology/CDCWireSuperLayer.h>
 
 #include <tracking/cdcLocalTracking/eventdata/trajectories/CDCTrajectory2D.h>
 
@@ -80,6 +81,14 @@ namespace Belle2 {
 
       /// Defines wires and wire hits to be coaligned on the wire on which they are based.
       friend bool operator<(const CDCWire& wire, const CDCWireHit& wireHit) { return wire < wireHit.getWire(); }
+
+      /// Defines wires and wire hits to be coaligned on the wire on which they are based.
+      friend bool operator<(const CDCWireHit& wireHit, const CDCWireSuperLayer& wireSuperLayer)
+      { return wireHit.getISuperLayer() < wireSuperLayer.getISuperLayer(); }
+
+      /// Defines wires and wire hits to be coaligned on the wire on which they are based.
+      friend bool operator<(const CDCWireSuperLayer& wireSuperLayer, const CDCWireHit& wireHit)
+      { return wireSuperLayer.getISuperLayer() < wireHit.getISuperLayer(); }
 
       /// Getter for the CDCHit pointer into the StoreArray
       const CDCHit* getHit() const { return m_hit; }

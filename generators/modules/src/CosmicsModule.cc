@@ -41,15 +41,15 @@ CosmicsModule::CosmicsModule() : Module()
   m_parameters.ptmin = 0.7;
   // Parameter definition
   addParam("level", m_parameters.level,
-           "level of the cosmic generator (1 or 2), default is 1", m_parameters.level);
+           "level of the generator (1 or 2 with slightly different kinematic distributions and mu+/mu- ratio), default is 1", m_parameters.level);
   addParam("ipRequirement", m_parameters.ipRequirement,
-           "ipRequirement, default is 0", m_parameters.ipRequirement);
+           "Radial and longitudinal constraints near the Interaction Point can be required (ipRequirement == 1), default is 0 (no additional IP requirements)", m_parameters.ipRequirement);
   addParam("ipdr", m_parameters.ipdr,
-           "ipdr, default is 3.", m_parameters.ipdr);
+           "Constraint on the radial distance from the IP in cm, default is 3.", m_parameters.ipdr);
   addParam("ipdz", m_parameters.ipdz,
-           "ipdz, default is 3.", m_parameters.ipdz);
+           "Constraint on the longitudinal distance from the IP in cm, default is 3, default is 3.", m_parameters.ipdz);
   addParam("ptmin", m_parameters.ptmin,
-           "ptmin, default is 0.7", m_parameters.ptmin);
+           "Minimal value of the transverse momentum in GeV, default is 0.7", m_parameters.ptmin);
 }
 
 void CosmicsModule::initialize()

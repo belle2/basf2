@@ -234,12 +234,6 @@ namespace Belle2 {
     //! user-defined maximum distance (sigmas) for matching hit to extrapolation
     double m_maxDistSIGMA;
 
-    //! RPC strip position variance (cm^2)
-    double m_StripPositionVariance;
-
-    //! scintillator strip width (cm)
-    double m_ScintWidth;
-
     //! BKLM RPC phi-measuring strip position variance (cm^2) by layer
     double m_BarrelPhiStripVariance[NLAYER + 1];
 

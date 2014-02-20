@@ -1140,13 +1140,11 @@ void MuidModule::finishTrack(Muid* muid)
     } else {
       chiSquaredReduced2 = 0.0;
     }
-    muon = m_muonPar->getPDF(outcome, layerExt, layerDiff, chiSquaredReduced2);
-    pion = m_pionPar->getPDF(outcome, layerExt, layerDiff, chiSquaredReduced2);
-    kaon = m_kaonPar->getPDF(outcome, layerExt, layerDiff, chiSquaredReduced2);
-    // muon = m_muonPar->getPDF(outcome, layerExt, layerDiff, chiSquaredReduced);
-    // pion = m_pionPar->getPDF(outcome, layerExt, layerDiff, chiSquaredReduced);
-    // kaon = m_kaonPar->getPDF(outcome, layerExt, layerDiff, chiSquaredReduced);
+    chiSquaredReduced = chiSquaredReduced2;
     // END DIVOT
+    muon = m_muonPar->getPDF(outcome, layerExt, layerDiff, chiSquaredReduced);
+    pion = m_pionPar->getPDF(outcome, layerExt, layerDiff, chiSquaredReduced);
+    kaon = m_kaonPar->getPDF(outcome, layerExt, layerDiff, chiSquaredReduced);
     proton = 0.0; // DIVOT m_protonPar->getPDF(outcome, layerExt, layerDiff, chiSquaredReduced);
     electron = 0.0; // DIVOT m_electronPar->getPDF(outcome, layerExt, layerDiff, chiSquaredReduced);
     logL_mu   = (muon > 0.0 ? log(muon) : -1.0E200);

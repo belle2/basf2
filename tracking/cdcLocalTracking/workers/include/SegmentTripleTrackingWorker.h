@@ -33,14 +33,12 @@ namespace Belle2 {
   namespace CDCLocalTracking {
 
     /// Worker for building reconstructed tracks form reconstructed segments using segment triples
-    template<class SegmentTripleFilter, class SegmentTripleNeighborChooser>
+    template<class AxialAxialSegmentPairFilter, class SegmentTripleFilter, class SegmentTripleNeighborChooser>
     class SegmentTripleTrackingWorker {
 
     public:
-
       /** Constructor. */
       SegmentTripleTrackingWorker(): m_cellularPathFinder(0.0) {;}
-
 
       /** Destructor.*/
       ~SegmentTripleTrackingWorker() {;}
@@ -131,7 +129,7 @@ namespace Belle2 {
       std::vector<CDCTrack> m_tracks;
 
       //object creators
-      SegmentTripleCreator<SegmentTripleFilter> m_segmentTripleCreator;
+      SegmentTripleCreator<AxialAxialSegmentPairFilter, SegmentTripleFilter> m_segmentTripleCreator;
 
       //neighborhood builders
       NeighborhoodBuilder <CDCSegmentTriple, SegmentTripleNeighborChooser > m_segmentTriple_neighborhoodBuilder;

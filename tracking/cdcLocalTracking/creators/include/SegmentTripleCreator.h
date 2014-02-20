@@ -22,14 +22,13 @@
 namespace Belle2 {
   namespace CDCLocalTracking {
     /// Class providing construction combinatorics for the segment triples.
-    template<class Filter>
+    template<class AxialAxialSegmentPairFilter, class SegmentTripleFilter>
     class SegmentTripleCreator {
 
     public:
 
       /** Constructor. */
       SegmentTripleCreator() {;}
-      SegmentTripleCreator(const Filter& filter)  : m_filter(filter) {;}
 
       /** Destructor.*/
       ~SegmentTripleCreator() {;}
@@ -75,7 +74,8 @@ namespace Belle2 {
       ) const {
 
         //clear the remembered fits
-        m_filter.clear();
+        m_axialAxialSegmentPairFilter.clear();
+        m_segmentTripleFilter.clear();
 
         //Make pairs of closeby axial superlayers
         for (ILayerType iAxialSuperLayer = 0; iAxialSuperLayer < CDCWireTopology::N_SUPERLAYERS ;
@@ -187,7 +187,7 @@ namespace Belle2 {
               continue;
             }
 
-            CellWeight pairWeight = m_filter.isGoodAxialAxialSegmentPair(axialAxialSegmentPair);
+            CellWeight pairWeight = m_axialAxialSegmentPairFilter.isGoodAxialAxialSegmentPair(axialAxialSegmentPair);
             bool pairIsGood = not isNotACell(pairWeight);
 
             if (pairIsGood) {
@@ -203,7 +203,7 @@ namespace Belle2 {
                 }
 
                 // Ask the filter to asses this triple
-                CellWeight cellWeight = m_filter.isGoodSegmentTriple(segmentTriple);
+                CellWeight cellWeight = m_segmentTripleFilter.isGoodSegmentTriple(segmentTriple);
 
                 if (not isNotACell(cellWeight)) {
                   segmentTriple.getAutomatonCell().setCellWeight(cellWeight);
@@ -222,8 +222,8 @@ namespace Belle2 {
       }
 
     private:
-      mutable Filter m_filter;
-
+      mutable AxialAxialSegmentPairFilter m_axialAxialSegmentPairFilter;
+      mutable SegmentTripleFilter m_segmentTripleFilter;
     };
   } //end namespace CDCLocalTracking
 } //end namespace Belle2

@@ -102,11 +102,15 @@ namespace Belle2 {
 
 
 #ifdef CDCLOCALTRACKING_USE_MC_FILTERS
+#ifdef CDCLOCALTRACKING_USE_OPTIMIZING_FILTERS
+    typedef CDCLocalTracking::MCAxialAxialSegmentPairFilter AxialAxialSegmentPairFilter;
     typedef CDCLocalTracking::MCSegmentTripleFilter SegmentTripleFilter;
     typedef CDCLocalTracking::MCSegmentTripleNeighborChooser SegmentTripleNeighborChooser;
-    //No optimizing filters and choosers for segment triples yet.
-#ifdef CDCLOCALTRACKING_USE_OPTIMIZING_FILTERS
 #else
+    //No optimizing filters and choosers for segment triples yet.
+    typedef CDCLocalTracking::MCAxialAxialSegmentPairFilter AxialAxialSegmentPairFilter;
+    typedef CDCLocalTracking::MCSegmentTripleFilter SegmentTripleFilter;
+    typedef CDCLocalTracking::MCSegmentTripleNeighborChooser SegmentTripleNeighborChooser;
 #endif
 
 #else
@@ -115,7 +119,7 @@ namespace Belle2 {
 #endif
 
 
-    CDCLocalTracking::SegmentTripleTrackingWorker<SegmentTripleFilter, SegmentTripleNeighborChooser> m_trackingWorker;
+    CDCLocalTracking::SegmentTripleTrackingWorker< AxialAxialSegmentPairFilter, SegmentTripleFilter, SegmentTripleNeighborChooser> m_trackingWorker;
 
 
   }; // end class

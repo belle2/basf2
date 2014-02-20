@@ -233,103 +233,109 @@ namespace Belle2 {
                         getLocalCoordinate(zStripAve, false)) + m_Shift;
     }
 
-    const HepMatrix Module::getLocalError(int phiStripMultiplicity, int zStripMultiplicity) const
-    {
-      HepMatrix error(3, 3, 0);
+    /* unused function
+        const HepMatrix Module::getLocalError(int phiStripMultiplicity, int zStripMultiplicity) const
+        {
+          HepMatrix error(3, 3, 0);
 
-      // Original calculation... has been replaced below with measured values
-      // double phiStripFactor = m_phiStripWidth * phiStripMultiplicity;
-      // double   zStripFactor = m_zStripWidth   *   zStripMultiplicity;
-      // error[1][1] = (1 / 12) * phiStripFactor * phiStripFactor;
-      // error[2][2] = (1 / 12) *   zStripFactor *   zStripFactor;
-      // Corrected to give better approximation of error at Leo's advice.
-      // error[1][1] = (1 / 12) * m_phiStripWidth * m_phiStripWidth * phiStripMultiplicity;
-      // error[2][2] = (1 / 12) * m_zStripWidth   * m_zStripWidth   *   zStripMultiplicity;
-      // Measured values for multiplicities up to 4: S. Schrenk 28 May 1999 (Belle local run 1174)
+          // Original calculation... has been replaced below with measured values
+          // double phiStripFactor = m_phiStripWidth * phiStripMultiplicity;
+          // double   zStripFactor = m_zStripWidth   *   zStripMultiplicity;
+          // error[1][1] = (1 / 12) * phiStripFactor * phiStripFactor;
+          // error[2][2] = (1 / 12) *   zStripFactor *   zStripFactor;
+          // Corrected to give better approximation of error at Leo's advice.
+          // error[1][1] = (1 / 12) * m_phiStripWidth * m_phiStripWidth * phiStripMultiplicity;
+          // error[2][2] = (1 / 12) * m_zStripWidth   * m_zStripWidth   *   zStripMultiplicity;
+          // Measured values for multiplicities up to 4: S. Schrenk 28 May 1999 (Belle local run 1174)
 
-      switch (phiStripMultiplicity) {
-        case 1:  error[1][1] = 1.3 * 1.3; break;
-        case 2:  error[1][1] = 1.3 * 1.3; break;
-        case 3:  error[1][1] = 2.0 * 2.0; break;
-        case 4:  error[1][1] = 3.3 * 3.3; break;
-        default: error[1][1] = phiStripMultiplicity * m_PhiStripWidth * m_PhiStripWidth / 12.0; break;
-      }
+          switch (phiStripMultiplicity) {
+            case 1:  error[1][1] = 1.3 * 1.3; break;
+            case 2:  error[1][1] = 1.3 * 1.3; break;
+            case 3:  error[1][1] = 2.0 * 2.0; break;
+            case 4:  error[1][1] = 3.3 * 3.3; break;
+            default: error[1][1] = phiStripMultiplicity * m_PhiStripWidth * m_PhiStripWidth / 12.0; break;
+          }
 
-      switch (zStripMultiplicity) {
-        case 1:  error[2][2] = 1.1 * 1.1; break;
-        case 2:  error[2][2] = 1.1 * 1.1; break;
-        case 3:  error[2][2] = 1.7 * 1.7; break;
-        case 4:  error[2][2] = 2.9 * 2.9; break;
-        default: error[2][2] = zStripMultiplicity * m_ZStripWidth * m_ZStripWidth / 12.0; break;
-      }
+          switch (zStripMultiplicity) {
+            case 1:  error[2][2] = 1.1 * 1.1; break;
+            case 2:  error[2][2] = 1.1 * 1.1; break;
+            case 3:  error[2][2] = 1.7 * 1.7; break;
+            case 4:  error[2][2] = 2.9 * 2.9; break;
+            default: error[2][2] = zStripMultiplicity * m_ZStripWidth * m_ZStripWidth / 12.0; break;
+          }
 
-      return error;
+          return error;
 
-    }
+        }
+    */
 
-    const Rect Module::getStripRectLocal(double stripAve, bool isPhiReadout) const
-    {
-      Rect rect;
+    /* unused function
+        const Rect Module::getStripRectLocal(double stripAve, bool isPhiReadout) const
+        {
+          Rect rect;
 
-      rect.corner[0].setX(m_LocalX);
-      rect.corner[1].setX(m_LocalX);
-      rect.corner[2].setX(m_LocalX);
-      rect.corner[3].setX(m_LocalX);
+          rect.corner[0].setX(m_LocalX);
+          rect.corner[1].setX(m_LocalX);
+          rect.corner[2].setX(m_LocalX);
+          rect.corner[3].setX(m_LocalX);
 
-      if (isPhiReadout) {
-        rect.corner[0].setY(getLocalCoordinate(stripAve + 0.5, true));
-        rect.corner[1].setY(getLocalCoordinate(stripAve + 0.5, true));
-        rect.corner[2].setY(getLocalCoordinate(stripAve - 0.5, true));
-        rect.corner[3].setY(getLocalCoordinate(stripAve - 0.5, true));
-        rect.corner[0].setZ(0.0);
-        rect.corner[1].setZ(m_PhiStripLength);
-        rect.corner[2].setZ(m_PhiStripLength);
-        rect.corner[3].setZ(0.0);
-      } else {
-        rect.corner[0].setY(m_ZStripLength * 0.5);
-        rect.corner[1].setY(-m_ZStripLength * 0.5);
-        rect.corner[2].setY(-m_ZStripLength * 0.5);
-        rect.corner[3].setY(m_ZStripLength * 0.5);
-        rect.corner[0].setZ(getLocalCoordinate(stripAve + 0.5, false));
-        rect.corner[1].setZ(getLocalCoordinate(stripAve + 0.5, false));
-        rect.corner[2].setZ(getLocalCoordinate(stripAve - 0.5, false));
-        rect.corner[3].setZ(getLocalCoordinate(stripAve - 0.5, false));
-      }
+          if (isPhiReadout) {
+            rect.corner[0].setY(getLocalCoordinate(stripAve + 0.5, true));
+            rect.corner[1].setY(getLocalCoordinate(stripAve + 0.5, true));
+            rect.corner[2].setY(getLocalCoordinate(stripAve - 0.5, true));
+            rect.corner[3].setY(getLocalCoordinate(stripAve - 0.5, true));
+            rect.corner[0].setZ(0.0);
+            rect.corner[1].setZ(m_PhiStripLength);
+            rect.corner[2].setZ(m_PhiStripLength);
+            rect.corner[3].setZ(0.0);
+          } else {
+            rect.corner[0].setY(m_ZStripLength * 0.5);
+            rect.corner[1].setY(-m_ZStripLength * 0.5);
+            rect.corner[2].setY(-m_ZStripLength * 0.5);
+            rect.corner[3].setY(m_ZStripLength * 0.5);
+            rect.corner[0].setZ(getLocalCoordinate(stripAve + 0.5, false));
+            rect.corner[1].setZ(getLocalCoordinate(stripAve + 0.5, false));
+            rect.corner[2].setZ(getLocalCoordinate(stripAve - 0.5, false));
+            rect.corner[3].setZ(getLocalCoordinate(stripAve - 0.5, false));
+          }
 
-      rect.corner[0] += m_Shift;
-      rect.corner[1] += m_Shift;
-      rect.corner[2] += m_Shift;
-      rect.corner[3] += m_Shift;
+          rect.corner[0] += m_Shift;
+          rect.corner[1] += m_Shift;
+          rect.corner[2] += m_Shift;
+          rect.corner[3] += m_Shift;
 
-      return rect;
-    }
+          return rect;
+        }
+    */
 
-    const Rect Module::getModuleRectLocal(void) const
-    {
-      Rect rect;
+    /* unused function
+        const Rect Module::getModuleRectLocal(void) const
+        {
+          Rect rect;
 
-      rect.corner[0].setX(m_LocalX);
-      rect.corner[1].setX(m_LocalX);
-      rect.corner[2].setX(m_LocalX);
-      rect.corner[3].setX(m_LocalX);
+          rect.corner[0].setX(m_LocalX);
+          rect.corner[1].setX(m_LocalX);
+          rect.corner[2].setX(m_LocalX);
+          rect.corner[3].setX(m_LocalX);
 
-      rect.corner[0].setY(m_ZStripLength * 0.5);
-      rect.corner[1].setY(-m_ZStripLength * 0.5);
-      rect.corner[2].setY(-m_ZStripLength * 0.5);
-      rect.corner[3].setY(m_ZStripLength * 0.5);
+          rect.corner[0].setY(m_ZStripLength * 0.5);
+          rect.corner[1].setY(-m_ZStripLength * 0.5);
+          rect.corner[2].setY(-m_ZStripLength * 0.5);
+          rect.corner[3].setY(m_ZStripLength * 0.5);
 
-      rect.corner[0].setZ(0.0);
-      rect.corner[1].setZ(0.0);
-      rect.corner[2].setZ(m_PhiStripLength);
-      rect.corner[3].setZ(m_PhiStripLength);
+          rect.corner[0].setZ(0.0);
+          rect.corner[1].setZ(0.0);
+          rect.corner[2].setZ(m_PhiStripLength);
+          rect.corner[3].setZ(m_PhiStripLength);
 
-      rect.corner[0] += m_Shift;
-      rect.corner[1] += m_Shift;
-      rect.corner[2] += m_Shift;
-      rect.corner[3] += m_Shift;
+          rect.corner[0] += m_Shift;
+          rect.corner[1] += m_Shift;
+          rect.corner[2] += m_Shift;
+          rect.corner[3] += m_Shift;
 
-      return rect;
-    }
+          return rect;
+        }
+    */
 
     bool Module::isInActiveArea(const Hep3Vector& pos, int& phiStrip, int& zStrip) const
     {

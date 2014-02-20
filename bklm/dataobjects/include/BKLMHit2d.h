@@ -119,7 +119,7 @@ namespace Belle2 {
     void setLocalPosition(double, double, double);
 
     //! set local-position covariance matrix
-    void setLocalVariance(double, double, double, double);
+    //! unused function    void setLocalVariance(double, double, double, double);
 
   private:
 

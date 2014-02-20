@@ -191,11 +191,6 @@ namespace Belle2 {
                                            rotation
                                           );
               m_Modules.insert(std::pair<int, Module*>(moduleID, pModule));
-              //DIVOT to call these 3 functions
-              const HepMatrix lE = pModule->getLocalError(1, 1);
-              const Rect mR = pModule->getModuleRectLocal();
-              const Rect sR = pModule->getStripRectLocal(0.0, true);
-              phiStripNumber = (int)(lE.trace() + mR.corner[0].x() + sR.corner[0].x());
             } else {
               Hep3Vector translation(0.0, 0.0, m_OffsetZ);
               int    nPhiScints = layerContent.getInt("PhiScintillators/NScints");

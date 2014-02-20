@@ -280,13 +280,9 @@ double  BKLMDigitizerModule::distanceAttenuation(double dist)
 void BKLMDigitizerModule::fillAmplitude(int nPE, double timeShift,
                                         bool isReflected, float* hist)
 {
-  double hitTime;
-  double deExcitationTime;
-  double cosTheta;
-  double hitDist;
   for (int j = 0; j < nPE; ++j) {
-    cosTheta = gRandom->Uniform(m_minCosTheta, 1);
-    hitDist = (isReflected ? m_hitDistReflected : m_hitDistDirect) / cosTheta;
+    double cosTheta = gRandom->Uniform(m_minCosTheta, 1);
+    double hitDist = (isReflected ? m_hitDistReflected : m_hitDistDirect) / cosTheta;
     /* Drop lightflashes which were captured by fiber */
     if (gRandom->Uniform() > distanceAttenuation(hitDist))
       continue;
@@ -295,9 +291,9 @@ void BKLMDigitizerModule::fillAmplitude(int nPE, double timeShift,
       if (gRandom->Uniform() > m_mirrorReflectiveIndex)
         continue;
     m_npe++;
-    deExcitationTime = gRandom->Exp(m_scintillatorDeExcitationTime) +
-                       gRandom->Exp(m_fiberDeExcitationTime);
-    hitTime = hitDist / m_firstPhotonlightSpeed + deExcitationTime + timeShift;
+    double deExcitationTime = gRandom->Exp(m_scintillatorDeExcitationTime) +
+                              gRandom->Exp(m_fiberDeExcitationTime);
+    double hitTime = hitDist / m_firstPhotonlightSpeed + deExcitationTime + timeShift;
     for (unsigned int i = 0; i < m_nDigitizations; ++i)
       hist[i] = hist[i] + signalShape(i * m_ADCSamplingTime - hitTime);
   }

@@ -110,6 +110,7 @@ void BKLMHit2d::setLocalPosition(double x, double y, double z)
   m_LocalPosition.SetZ(z);
 }
 
+/* unused function
 void BKLMHit2d::setLocalVariance(double yy, double yz, double zy, double zz)
 {
   m_LocalVariance[0][0] = yy;
@@ -117,6 +118,7 @@ void BKLMHit2d::setLocalVariance(double yy, double yz, double zy, double zz)
   m_LocalVariance[1][0] = zy;
   m_LocalVariance[1][1] = zz;
 }
+*/
 
 void BKLMHit2d::setGlobalPosition(double x, double y, double z)
 {

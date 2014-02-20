@@ -128,10 +128,10 @@ void BKLMReconstructorModule::event()
       hit2dToHit1d.add(hit2ds.getEntries() - 1, j);
       const bklm::Module* m = m_GeoPar->findModule(hit2d->isForward(), hit2d->getSector(), hit2d->getLayer());
       CLHEP::Hep3Vector local = m->getLocalPosition(hit2d->getPhiStripAve(), hit2d->getZStripAve());
-      CLHEP::HepMatrix var = m->getLocalError(hit2d->getPhiStripCount(), hit2d->getZStripCount());
       CLHEP::Hep3Vector global = m->localToGlobal(local);
       hit2d->setLocalPosition(local.x(), local.y(), local.z());
       hit2d->setGlobalPosition(global.x(), global.y(), global.z());
+      // DIVOT CLHEP::HepMatrix var = m->getLocalError(hit2d->getPhiStripCount(), hit2d->getZStripCount());
       // DIVOT hit2d->setLocalVariance(var[0][0], var[0][1], var[1][0], var[1][1]);
     }
   }

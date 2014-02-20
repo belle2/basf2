@@ -176,13 +176,13 @@ namespace Belle2 {
       const CLHEP::Hep3Vector getLocalPosition(double phiStripAve, double zStripAve) const;
 
       //! Get 2D position covariance matrix in local coordinates, given strip multiplicities
-      const CLHEP::HepMatrix getLocalError(int phiStripMult, int zStripMult) const;
+      //! unused function      const CLHEP::HepMatrix getLocalError(int phiStripMult, int zStripMult) const;
 
       //! Get bounding rectangle of this strip's surface in local coordinates
-      const Rect getStripRectLocal(double stripAve, bool isPhiReadout) const;
+      //! unused function      const Rect getStripRectLocal(double stripAve, bool isPhiReadout) const;
 
       //! Get bounding rectangle of this module's surface in local coordinates
-      const Rect getModuleRectLocal(void) const;
+      //! unused function      const Rect getModuleRectLocal(void) const;
 
       //! Determine if space-point (in local coordinates) is in active area of RPC module, and fills phiStrip and zStrip
       bool isInActiveArea(const CLHEP::Hep3Vector& p, int& phiStrip, int& zStrip) const;

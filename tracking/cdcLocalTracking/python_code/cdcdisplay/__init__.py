@@ -13,16 +13,14 @@ from ROOT import Belle2  # make Belle2 namespace available
 from ROOT import std
 from ROOT import genfit
 
-import subprocess
-from datetime import datetime
-
-import svgdrawing
-
 import os
 import os.path
 import math
 
-# from svgdrawing.attributemaps import *
+import subprocess
+from datetime import datetime
+
+import svgdrawing
 import svgdrawing.attributemaps as attributemaps
 
 
@@ -42,25 +40,37 @@ class CDCSVGDisplayModule(Module):
             if answer == 'y':
                 os.makedirs(output_folder)
 
+        # # List of drawing options
+        # The following options can be used independent of the track finder to view Monte Carlo information after the simulation is done
         self.draw_wires = True  # and False
-        self.draw_wirehits = True and False
         self.draw_hits = True  # and False
 
-        self.draw_mcparticles = True and False
-        self.draw_mcpdgcodes = True and False
-        self.draw_mcprimary = True and False
+        self.draw_superlayer_boundaries = True  # and False
+        self.draw_interactionpoint = True  # and False
+
+        self.draw_mcparticle_id = True and False
+        self.draw_mcparticle_pdgcodes = True and False
+        self.draw_mcparticle_primary = True and False
+
         self.draw_mcsegments = True and False
 
-        self.draw_mcvertices = True and False
-
         self.draw_simhits = True and False
-        self.draw_rlinfo = True and False
-        self.draw_tof = True and False
-        self.draw_connect_tof = True and False
-        self.draw_simpdgcode = True and False
+        self.draw_simhit_tof = True and False
+        self.draw_simhit_posflag = True and False
+        self.draw_simhit_pdgcode = True and False
 
+        self.draw_connect_tof = True and False
+
+        self.draw_rlinfo = True and False
         self.draw_reassigned = True and False
 
+        self.draw_mcaxialaxialpairs = True and False
+        self.draw_mcaxialstereopairs = True and False
+
+        self.draw_mcsegmenttriples = True and False
+
+        # Those are only available if the local track finder is in the module chain
+        # and specific compile time flags enable to transportation of this data
         self.draw_clusters = True and False
 
         self.draw_segments = True and False
@@ -73,21 +83,15 @@ class CDCSVGDisplayModule(Module):
         self.draw_segments_firstNPassedSuperLayers = True and False
         self.draw_segments_lastNPassedSuperLayers = True and False
 
-        self.draw_mcaxialaxialpairs = True and False
-        self.draw_mcaxialstereopairs = True and False
-        self.draw_mcsegmenttriples = True and False
-
         self.draw_segmenttriples = True and False
         self.draw_tracks = True and False
 
-        self.draw_gftrackcands = True and False
-
         self.draw_segmenttriple_trajectories = True and False
         self.draw_segment_trajectories = True and False
-        self.draw_gftrackcand_trajectories = True and False
 
-        self.draw_superlayer_boundaries = True  # and False
-        self.draw_interactionpoint = True  # and False
+        # Those are only available, if any track finder is in the module chain (not tested for others than the local track finder)
+        self.draw_gftrackcands = True and False
+        self.draw_gftrackcand_trajectories = True and False
 
     @property
     def drawoptions(self):
@@ -95,10 +99,10 @@ class CDCSVGDisplayModule(Module):
                 )]
 
     def initialize(self):
-        print 'initialize()'
+        pass
 
     def beginRun(self):
-        print 'beginRun()'
+        pass
 
     def draw_storearray(self, storearray_name, styleDict):
         print 'Drawing', storearray_name,
@@ -112,20 +116,18 @@ class CDCSVGDisplayModule(Module):
 
             self.plotter.append(storearray, **styleDict)
         else:
-
-            print ' which is not present in the DataStore'
+            print '### not present in the DataStore'
 
     def event(self):
         print '##################### DISPLAY EVENT ###########################'
-        eventMetaData = Belle2.PyStoreObj('EventMetaData')
-     #   if (eventMetaData.obj().getEvent()):
-     #       print 'Skip event', eventMetaData.obj().getEvent()
-     #      return
+        # eventMetaData = Belle2.PyStoreObj('EventMetaData')
+        #   if (eventMetaData.obj().getEvent()):
+        #       print 'Skip event', eventMetaData.obj().getEvent()
+        #      return
 
         if not hasattr(Belle2, 'CDCLocalTracking'):
             print 'CDCLocalTracking namespace not available from Python'
-            print 'Did you compile with LOCALTRACKING_USE_ROOT?'
-            print 'Activate in cdcLocalTracking/mockroot/include/ToggleMockRoot.h and recompile.'
+            print 'Did you compile with -DCDCLOCALTRACKING_USE_ROOT?'
             r = raw_input('')
             return
         else:
@@ -136,6 +138,9 @@ class CDCSVGDisplayModule(Module):
 
         plotter = svgdrawing.CDCSVGPlotter()
         self.plotter = plotter
+
+        # Construct additional information from basic Monte Carlo data, if it is available from the DataStore
+        Belle2.CDCLocalTracking.CDCMCHitLookUp.getInstance().fill()
 
         # ######### CDCWires ##########
         # Draw wires from cdcwire objects
@@ -148,19 +153,19 @@ class CDCSVGDisplayModule(Module):
             for iLayer in range(theCDCWireTopology.getNLayers()):
                 wirelayer = theCDCWireTopology.getWireLayer(iLayer)
                 for iWire in range(wirelayer.size()):
-                    wire = wirelayer.getWireSave(iWire)
+                    wire = wirelayer.getWireSafe(iWire)
                     plotter.append(wire, stroke='gray')
 
         # ######### CDCHits ##########
         # Draw wirehits or
         # Draw the raw CDCHits
-        if self.draw_hits or self.draw_wirehits:
+        if self.draw_hits:
             styleDict = {'stroke': attributemaps.ZeroDriftLengthColorMap(),
                          'stroke-width': attributemaps.ZeroDriftLengthStrokeWidthMap()}
             self.draw_storearray('CDCHits', styleDict)
 
         # Draw  mcparticle id
-        if self.draw_mcparticles:
+        if self.draw_mcparticle_id:
             styleDict = {'stroke-width': '0.5',
                          'stroke': attributemaps.MCParticleColorMap()}
                 # 'stroke-opacity': '0.5',
@@ -173,40 +178,44 @@ class CDCSVGDisplayModule(Module):
             self.draw_storearray('CDCHits', styleDict)
 
         # Draw monte carlo pdg codes
-        if self.draw_mcpdgcodes:
+        if self.draw_mcparticle_pdgcodes:
             styleDict = {'stroke-width': '0.5',
                          'stroke': attributemaps.MCPDGCodeColorMap()}
                 # 'stroke-opacity': '0.5',
+
             self.draw_storearray('CDCHits', styleDict)
 
         # Draw monte carlo pdg codes
-        if self.draw_mcprimary:
+        if self.draw_mcparticle_primary:
             styleDict = {'stroke-width': '0.5',
-                         'stroke': attributemaps.MCPrimaryColorMap}
-                # 'stroke-opacity': '0.5',
+                         'stroke': attributemaps.MCPrimaryColorMap()}
             self.draw_storearray('CDCHits', styleDict)
 
         # Draw SimHits
         if self.draw_simhits:
             print 'Drawing simulated hits'
-            cdchits_storearray = Belle2.PyStoreArray('CDCHits')
-            simhits_storearray = Belle2.PyStoreArray('CDCHits')
-            if simhits_storearray:
-                simhits_related_to_cdchit = [cdchit.getRelated('CDCSimHits')
-                        for cdchit in cdchits_storearray]
-                print '#CDCSimHits', simhits_storearray.getEntries()
+            hit_storearray = Belle2.PyStoreArray('CDCHits')
+            if hit_storearray:
+                simHits_related_to_hits = [hit.getRelated('CDCSimHits')
+                        for hit in hit_storearray]
+                print '#CDCSimHits', hit_storearray.getEntries()
                 styleDict = {'stroke': 'orange', 'stroke-width': '0.2'}
-                # plotter.append(simhits_storearray, **styleDict)
-                plotter.append(simhits_related_to_cdchit, **styleDict)
+                plotter.append(simHits_related_to_hits, **styleDict)
 
         # Draw RL MC info
+        if self.draw_simhit_posflag:
+            styleDict = {'stroke-width': '0.2',
+                         'stroke': attributemaps.PosFlagColorMap()}
+            self.draw_storearray('CDCHits', styleDict)
+
+        # Draw local RL info
         if self.draw_rlinfo:
             styleDict = {'stroke-width': '0.2',
                          'stroke': attributemaps.RLColorMap()}
             self.draw_storearray('CDCHits', styleDict)
 
         # Draw tof info
-        if self.draw_tof:
+        if self.draw_simhit_tof:
             styleDict = {'stroke-width': '1',
                          'stroke': attributemaps.TOFColorMap()}
             self.draw_storearray('CDCHits', styleDict)
@@ -221,11 +230,9 @@ class CDCSVGDisplayModule(Module):
                         for cdchit in cdchits_storearray]
 
                 # group them by their mcparticle id
-                print 'Grouping simhits', simhits_related_to_cdchit
                 simhits_by_mcparticle = {}
                 for simhit in simhits_related_to_cdchit:
                     mcparticle = simhit.getRelated('MCParticles')
-                    print mcparticle
                     if not mcparticle == None:
                         mcTrackId = mcparticle.getArrayIndex()
                         simhits_by_mcparticle.setdefault(mcTrackId, [])
@@ -241,10 +248,9 @@ class CDCSVGDisplayModule(Module):
                         toSimHit = simhits_for_mcparticle[iSimHit + 1]
 
                         styleDict = {'stroke': 'black', 'stroke-width': '0.2'}
-                        # plotter.append(simhits_storearray, **styleDict)
                         plotter.append((fromSimHit, toSimHit), **styleDict)
 
-        if self.draw_simpdgcode:
+        if self.draw_simhit_pdgcode:
 
             def color_map(iHit, hit):
                 simHit = hit.getRelated('CDCSimHits')
@@ -419,18 +425,6 @@ class CDCSVGDisplayModule(Module):
                     pairWeight = \
                         mc_axial_axial_segment_filter.isGoodAxialAxialSegmentPair(triple)
 
-                    # startToMiddlePair = Belle2.CDCLocalTracking.CDCAxialAxialSegmentPair(start,middle)
-
-                    # startToMiddleWeight = \
-                    #     mc_axial_axial_segment_filter.isGoodAxialAxialSegmentPair(startToMiddlePair)
-
-                    # middleToEndPair = Belle2.CDCLocalTracking.CDCAxialAxialSegmentPair(middle,end)
-
-                    # middleToEndWeight = \
-                    #     mc_axial_axial_segment_filter.isGoodAxialAxialSegmentPair(middleToEndPair)
-
-                    # return (pairWeight == pairWeight) and (startToMiddleWeight == startToMiddleWeight) and (middleToEndWeight == middleToEndWeight)
-
                     if not pairWeight == pairWeight:
                         return False
 
@@ -449,23 +443,6 @@ class CDCSVGDisplayModule(Module):
                     else:
                         return False
 
-  # CellWeight pairWeight = m_mcAxialAxialSegmentPairFilter.isGoodAxialAxialSegmentPair(segmentTriple,allowBackward);
-  # if (isNotACell(pairWeight)) return NOT_A_CELL;
-
-  # const CDCMCSegmentLookUp& mcSegmentLookUp = CDCMCSegmentLookUp::getInstance();
-
-  # // Check if the segments are aligned correctly along the Monte Carlo track
-  # ForwardBackwardInfo startToMiddleFBInfo = mcSegmentLookUp.areAlignedInMCTrack(ptrStartSegment, ptrMiddleSegment);
-  # if (startToMiddleFBInfo == INVALID_INFO) return NOT_A_CELL;
-
-  # ForwardBackwardInfo middleToEndFBInfo = mcSegmentLookUp.areAlignedInMCTrack(ptrMiddleSegment, ptrEndSegment);
-  # if (middleToEndFBInfo == INVALID_INFO) return NOT_A_CELL;
-
-  # if ( startToMiddleFBInfo != middleToEndFBInfo) return NOT_A_CELL;
-
-  # if( (startToMiddleFBInfo == FORWARD and middleToEndFBInfo == FORWARD) or
-  #     (allowBackward and startToMiddleFBInfo == BACKWARD and middleToEndFBInfo == BACKWARD)) {
-
                 good_segment_triples = [triple for triple in segment_triples
                         if is_good_triple(triple)]
 
@@ -473,37 +450,6 @@ class CDCSVGDisplayModule(Module):
                 styleDict = {'stroke': 'black', 'stroke-width': '0.2'}
 
                 plotter.append(good_segment_triples, **styleDict)
-
-        # Draw mc vertices
-        if self.draw_mcvertices:
-            print 'Drawing Monte Carlo vertices of the cdc hits'
-            wirehit_collection_storeobj = \
-                Belle2.PyStoreObj('CDCAllWireHitCollection')
-
-            if wirehit_collection_storeobj:
-                wirehit_collection = wirehit_collection_storeobj.obj()
-                print '#WireHits', wirehit_collection.size()
-
-                mcLookUp = Belle2.CDCLocalTracking.CDCMCLookUp.Instance()
-                iterWireHits = (wirehit_collection.at(iWireHit)
-                    for iWireHit in xrange(wirehit_collection.size()))
-                for wirehit in iterWireHits:
-
-                    trackId = int(mcLookUp.getMCTrackId(wirehit))
-                    colorId = trackId % len(attributemaps.listColors)
-                    color = attributemaps.listColors[colorId]
-
-                    simhit = mcLookUp.getSimHit(wirehit)
-                    toTPos = simhit.getPosTrack()
-                    toPos = Belle2.CDCLocalTracking.Vector3D(toTPos)
-                    # plotter.append(toPos,stroke=color)
-
-                    mcPart = mcLookUp.getMCParticle(wirehit)
-                    while mcPart != None:
-                        mcTPos = mcPart.getVertex()
-                        mcPos = Belle2.CDCLocalTracking.Vector3D(mcTPos)
-                        plotter.append(mcPos, stroke=color)
-                        mcPart = mcPart.getMother()
 
         # Draw Tangent segments
         if self.draw_tangentsegments:
@@ -626,6 +572,7 @@ class CDCSVGDisplayModule(Module):
         if self.interactive:
             print " Use the 'display' command to show the svg file", fileName, \
                 'generated for the last event'
+
             # 'display' is part of the ImageMagic package commonly installed in linux
             procDisplay = subprocess.Popen(['display', fileName])
             # procDisplay = subprocess.Popen(['display','-background','white',
@@ -634,10 +581,10 @@ class CDCSVGDisplayModule(Module):
             raw_input('Hit enter for next event')
 
     def endRun(self):
-        print 'endRun()'
+        pass
 
     def terminate(self):
-        print 'terminate()'
+        pass
 
     def new_output_basename(self):
         output_basename = datetime.now().isoformat() + '.svg'

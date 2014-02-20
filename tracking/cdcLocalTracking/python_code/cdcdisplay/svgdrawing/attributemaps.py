@@ -94,6 +94,24 @@ class ZeroDriftLengthColorMap(CDCHitColorMap):
             return self.bkgHitColor
 
 
+class RLColorMap(CDCHitColorMap):
+
+    def __call__(self, iCDCHit, cdcHit):
+        mcHitLookUp = Belle2.CDCLocalTracking.CDCMCHitLookUp.getInstance()
+        rlInfo = mcHitLookUp.getRLInfo(cdcHit)
+        if rlInfo == 1:
+            # Right
+            return 'green'
+        elif rlInfo == -1:
+            # Left
+            return 'red'
+        else:
+            self.bkgHitColor
+
+    def __str__(self):
+        return 'Local right left passage variable: green <-> right, red <-> left, orange <-> not determinable.'
+
+
 class PosFlagColorMap(CDCHitColorMap):
 
     def __call__(self, iCDCHit, cdcHit):
@@ -108,20 +126,8 @@ class PosFlagColorMap(CDCHitColorMap):
         else:
             self.bkgHitColor
 
-
-class RLColorMap(CDCHitColorMap):
-
-    def __call__(self, iCDCHit, cdcHit):
-        simHit = cdcHit.getRelated('CDCSimHits')
-        posFlag = simHit.getPosFlag()
-        if posFlag == 0:
-            # Right
-            return 'green'
-        elif posFlag == 1:
-            # Left
-            return 'red'
-        else:
-            self.bkgHitColor
+    def __str__(self):
+        return 'PosFlag variable of the related CDCSimHit: green <-> 0 (Right), red <-> 1 (Left), orange <-> determinable.'
 
 
 class MCSegmentIdColorMap(CDCHitColorMap):

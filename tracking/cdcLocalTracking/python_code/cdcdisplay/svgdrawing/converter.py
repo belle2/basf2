@@ -27,41 +27,45 @@ class CDCDataobjectsConverter:
         self.svgElementFactory = \
             primitives.SVGPrimitivesFactory(elementFactory)
 
-        self.toSVGFunctions_by_type = {  # Belle2.CDCLocalTracking.CDCRecoSegment2D: \
-                                         # self.CDCGenericHitCollectionToSVG,
-                                         # for adhoc tangents
+        self.toSVGFunctions_by_type = {  # for adhoc tangents
             tuple: self.TupleToSVG,
             Belle2.PyStoreObj: self.PyStoreObjToSVG,
             Belle2.PyStoreArray: self.PyStoreArrayToSVG,
-            Belle2.CDCLocalTracking.Vector2D: self.Vector2DToSVG,
-            Belle2.CDCLocalTracking.Vector3D: self.Vector3DToSVG,
-            Belle2.CDCLocalTracking.CDCWire: self.CDCWireToSVG,
-            Belle2.CDCLocalTracking.CDCWireSuperLayer: self.CDCWireSuperLayerToSVG,
-            Belle2.CDCLocalTracking.CDCWireHit: self.CDCWireHitToSVG,
-            Belle2.CDCLocalTracking.CDCWireHitVector: self.CDCGenericHitCollectionToSVG,
-            Belle2.CDCLocalTracking.CDCRecoHit2D: self.CDCRecoHit2DToSVG,
-            Belle2.CDCLocalTracking.CDCRecoHit2DVector: self.CDCGenericHitCollectionToSVG,
-            Belle2.CDCLocalTracking.CDCRecoTangent: self.CDCRecoTangentToSVG,
-            Belle2.CDCLocalTracking.CDCRecoTangentVector: self.CDCGenericHitCollectionToSVG,
-            Belle2.CDCLocalTracking.CDCRecoFacetVector: self.CDCGenericHitCollectionToSVG,
-            Belle2.CDCLocalTracking.CDCRecoHit3D: self.CDCRecoHit3DToSVG,
-            Belle2.CDCLocalTracking.CDCRecoHit3DVector: self.CDCGenericHitCollectionToSVG,
-            Belle2.CDCLocalTracking.CDCWireHitCluster: self.CDCGenericHitCollectionToSVG,
-            Belle2.CDCLocalTracking.CDCRecoSegment2D: self.CDCGenericHitCollectionToSVG,
-            Belle2.CDCLocalTracking.CDCAxialAxialSegmentPair: self.CDCAxialAxialSegmentPairToSVG,
-            Belle2.CDCLocalTracking.CDCSegmentTriple: self.CDCSegmentTripleToSVG,
-            Belle2.CDCLocalTracking.CDCTrack: self.CDCGenericHitCollectionToSVG,
-            Belle2.CDCLocalTracking.CDCTrajectory2D: self.CDCTrajectory2DToSVG,
             Belle2.CDCSimHit: self.CDCSimHitToSVG,
             Belle2.CDCHit: self.CDCHitToSVG,
             genfit.TrackCand: self.GFTrackCandToSVG,
             }
 
-    # Generics
-        for name in Belle2.__dict__:
-            if 'CDCGenericHitCollection' in name:
-                self.toSVGFunctions_by_type[Belle2.__dict__[name]] = \
-                    self.CDCGenericHitCollectionToSVG
+        if hasattr(Belle2.CDCLocalTracking, 'CDCWireHit'):
+            # CDCLOCALTRACKING_USE_ROOT is active
+            # use pyROOT interface to draw various specialised objects from the local finder.
+            self.toSVGFunctions_by_type.update({
+                Belle2.CDCLocalTracking.Vector2D: self.Vector2DToSVG,
+                Belle2.CDCLocalTracking.Vector3D: self.Vector3DToSVG,
+                Belle2.CDCLocalTracking.CDCWire: self.CDCWireToSVG,
+                Belle2.CDCLocalTracking.CDCWireSuperLayer: self.CDCWireSuperLayerToSVG,
+                Belle2.CDCLocalTracking.CDCWireHit: self.CDCWireHitToSVG,
+                Belle2.CDCLocalTracking.CDCWireHitVector: self.CDCGenericHitCollectionToSVG,
+                Belle2.CDCLocalTracking.CDCRecoHit2D: self.CDCRecoHit2DToSVG,
+                Belle2.CDCLocalTracking.CDCRecoHit2DVector: self.CDCGenericHitCollectionToSVG,
+                Belle2.CDCLocalTracking.CDCRecoTangent: self.CDCRecoTangentToSVG,
+                Belle2.CDCLocalTracking.CDCRecoTangentVector: self.CDCGenericHitCollectionToSVG,
+                Belle2.CDCLocalTracking.CDCRecoFacetVector: self.CDCGenericHitCollectionToSVG,
+                Belle2.CDCLocalTracking.CDCRecoHit3D: self.CDCRecoHit3DToSVG,
+                Belle2.CDCLocalTracking.CDCRecoHit3DVector: self.CDCGenericHitCollectionToSVG,
+                Belle2.CDCLocalTracking.CDCWireHitCluster: self.CDCGenericHitCollectionToSVG,
+                Belle2.CDCLocalTracking.CDCRecoSegment2D: self.CDCGenericHitCollectionToSVG,
+                Belle2.CDCLocalTracking.CDCAxialAxialSegmentPair: self.CDCAxialAxialSegmentPairToSVG,
+                Belle2.CDCLocalTracking.CDCSegmentTriple: self.CDCSegmentTripleToSVG,
+                Belle2.CDCLocalTracking.CDCTrack: self.CDCGenericHitCollectionToSVG,
+                Belle2.CDCLocalTracking.CDCTrajectory2D: self.CDCTrajectory2DToSVG,
+                })
+
+            # Generics
+            for name in Belle2.__dict__:
+                if 'CDCGenericHitCollection' in name:
+                    self.toSVGFunctions_by_type[Belle2.__dict__[name]] = \
+                        self.CDCGenericHitCollectionToSVG
 
     def styleFillUpdate(self, attributes):
         if 'fill' not in attributes or not attributes['fill']:
@@ -453,7 +457,7 @@ class CDCDataobjectsConverter:
 
         flightLineElement = self.svgElementFactory.createLine(fromPoint,
                 toPoint, **styleDict)
-    # childElements.append(flightLineElement)
+        # childElements.append(flightLineElement)
 
         groupElement = self.svgElementFactory.createGroup(*childElements)
 

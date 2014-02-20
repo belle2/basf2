@@ -17,6 +17,8 @@
 #pragma link C++ class Belle2::CDCLocalTracking::Line2D;
 #pragma link C++ class Belle2::CDCLocalTracking::ParameterLine2D;
 
+#pragma link C++ class Belle2::CDCLocalTracking::StandardOriginCircle2D;
+
 #pragma link C++ class Belle2::CDCLocalTracking::GeneralizedCircle;
 #pragma link C++ class Belle2::CDCLocalTracking::BoundSkewLine;
 

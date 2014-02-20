@@ -228,7 +228,7 @@ namespace Belle2 {
 
       ///Getter for secondary neighbor at the one o'clock position
       const CDCWire* getSecondNeighorOneOClock(const ILayerType& iLayer, const IWireType& iWire) const
-      { return isValidILayer(iLayer + 2) ? &(getWireLayer(iLayer + 2).getWireSave(iWire - 1)) : nullptr;  }
+      { return isValidILayer(iLayer + 2) ? &(getWireLayer(iLayer + 2).getWireSafe(iWire - 1)) : nullptr;  }
 
 
       ///Getter for secondary neighbor at the two o'clock position
@@ -246,15 +246,15 @@ namespace Belle2 {
 
       ///Getter for secondary neighbor at the five o'clock position
       const CDCWire* getSecondNeighorFiveOClock(const ILayerType& iLayer, const IWireType& iWire) const
-      { return isValidILayer(iLayer - 2) ? &(getWireLayer(iLayer - 2).getWireSave(iWire - 1)) : nullptr;  }
+      { return isValidILayer(iLayer - 2) ? &(getWireLayer(iLayer - 2).getWireSafe(iWire - 1)) : nullptr;  }
 
       ///Getter for secondary neighbor at the six o'clock position
       const CDCWire* getSecondNeighorSixOClock(const ILayerType& iLayer, const IWireType& iWire) const
-      { return isValidILayer(iLayer - 2) ? &(getWireLayer(iLayer - 2).getWireSave(iWire)) : nullptr;  }
+      { return isValidILayer(iLayer - 2) ? &(getWireLayer(iLayer - 2).getWireSafe(iWire)) : nullptr;  }
 
       ///Getter for secondary neighbor at the seven o'clock position
       const CDCWire* getSecondNeighorSevenOClock(const ILayerType& iLayer, const IWireType& iWire) const
-      { return isValidILayer(iLayer - 2) ? &(getWireLayer(iLayer - 2).getWireSave(iWire + 1)) : nullptr;  }
+      { return isValidILayer(iLayer - 2) ? &(getWireLayer(iLayer - 2).getWireSafe(iWire + 1)) : nullptr;  }
 
 
       ///Getter for secondary neighbor at the eight o'clock position
@@ -272,11 +272,11 @@ namespace Belle2 {
 
       ///Getter for secondary neighbor at the elven o'clock position
       const CDCWire* getSecondNeighorElevenOClock(const ILayerType& iLayer, const IWireType& iWire) const
-      { return isValidILayer(iLayer + 2) ? &(getWireLayer(iLayer + 2).getWireSave(iWire + 1)) : nullptr;  }
+      { return isValidILayer(iLayer + 2) ? &(getWireLayer(iLayer + 2).getWireSafe(iWire + 1)) : nullptr;  }
 
       ///Getter for secondary neighbor at the twelve o'clock position
       const CDCWire* getSecondNeighorTwelveOClock(const ILayerType& iLayer, const IWireType& iWire) const
-      { return isValidILayer(iLayer + 2) ? &(getWireLayer(iLayer + 2).getWireSave(iWire)) : nullptr;  }
+      { return isValidILayer(iLayer + 2) ? &(getWireLayer(iLayer + 2).getWireSafe(iWire)) : nullptr;  }
       /**@}*/
 
 

@@ -161,7 +161,7 @@ namespace Belle2 {
        *  This makes the retrival of neighbors much easier if the neighborhood \n
        *  is around the discontinuity near the zero wires.
        */
-      const CDCWire& getWireSave(const IWireType& iWire) const
+      const CDCWire& getWireSafe(const IWireType& iWire) const
       { return *(begin() + (iWire % size() + size())  % size()); }
 
       /// Getter for the first counterclockwise neighbor by wire id in the layer.

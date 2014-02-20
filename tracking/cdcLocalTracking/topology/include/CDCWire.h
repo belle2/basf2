@@ -78,33 +78,9 @@ namespace Belle2 {
 
 
     public:
-
-      /** @name Equality comparision
-       *  Based on the equality of the wireID only */
-      /**@{*/
       /// Equality comparision based on wireID.
       bool operator==(const CDCWire& other) const { return getWireID() == other.getWireID(); }
 
-      /// Equality comparision based on wire id usable with pointer.
-      /** Equality comparision of wires based on their wire ID.
-       *  This is still usable if a nullptr is given. The nullptr is always different to an actual wire object.
-       *  Compatible for use with ROOT containers.
-       */
-      bool IsEqual(const CDCWire* const& other) const { return other == nullptr ? false : operator==(*other); }
-
-      /// Equality comparision based on wire id usable with two pointer.
-      /** Equality comparision of wires based on their wire ID.
-       *  This is still usable if two nullptrs are given to the function.
-       *  The nullptr is always different to any actual wire object, but a nullptr is equal to itself.
-       *  Since there is no object in the case of two nullptrs we have to relie on a static method */
-      static inline bool ptrIsEqual(const CDCWire* const& lhs , const CDCWire* const& rhs)
-      { return lhs == nullptr ? (rhs == nullptr ? true : false) : lhs->IsEqual(rhs) ; }
-      /**@}*/
-
-      /** @name Total ordering
-       *  Based on the wireID only */
-      /**@{*/
-      /** Constructs a total ordering of the wires */
       /// Total ordering relation based on wire id
       /** Defines a total ordering sheme for wire objects based on the encoded wireID only.
        *  Therefor the wires can get sorted for the super layer, than for the layers and finally for the in layer wire id.
@@ -112,24 +88,8 @@ namespace Belle2 {
        *  It needs be present for the wire to work with all kinds of stl algorithms and containers */
       bool operator<(const CDCWire& other) const { return getWireID() < other.getWireID(); }
 
-      /// Total ordering relation based on wire id usable with pointer
-      /** Retains the total ordering sheme for wire objects, but introduces the special nullptr case to the ordering.
-       *  The nullptr is always smallest. Therefor it forms a lower bound for the wire pointers.
-       *  This also enables compatibility with all sorts of ROOT containers*/
-      bool IsLessThan(const CDCWire* const& other) const { return other == nullptr ? false : operator<(*other); }
-
-      /// Total ordering relation based on wire id usable with two pointer
-      /** Retains the total ordering sheme for wire objects,
-       *  but introduces the special nullptr case to the ordering.
-       *  The nullptr is always smallest. Therefor it forms a lower bound for the wire objects.
-       *  This is for completeness if we want to take the nullptr as a valid member of the range.
-       *  Since there is no object in the case of two nullptrs we have to relie on a static method */
-      static inline bool ptrIsLessThan(const CDCWire* const& lhs , const CDCWire* const& rhs)
-      { return rhs == nullptr ? false : (lhs == nullptr ? true : *lhs < *rhs); }
-
       /// Getter for the wire with superlayer id 0, layer id 0 and wire id 0. Is always less in comparision to other wires.
       static const CDCWire& getLowest() { return  *(getInstance(0, 0, 0)); }
-      /**@}*/
 
     public:
       /// Updates the line definition of this wire from the CDCGeometry
@@ -139,7 +99,7 @@ namespace Belle2 {
        */
       /**@{*/
       /// Implicit downcast to WireID forgetting the line information as needed
-      operator WireID() const
+      operator const Belle2::WireID& () const
       { return getWireID(); }
 
       /// Getter for the wireID
@@ -363,8 +323,8 @@ namespace Belle2 {
       }
 
       /// Sting output operator for wire pointers to help debugging
-      friend std::ostream& operator<<(std::ostream& output, const CDCWire* wire)
-      { if (wire == nullptr) output << "nullptr"; else output << *wire;  return output; }
+      //friend std::ostream& operator<<(std::ostream& output, const CDCWire* wire)
+      //{ if (wire == nullptr) output << "nullptr"; else output << *wire;  return output; }
 
     private:
 

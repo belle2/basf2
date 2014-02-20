@@ -271,7 +271,7 @@ namespace Belle2 {
        *  If the address lies within the memory range of the vector the iterator can be forwarded to this position.
        *  without any comparision operation. Otherwise the normal find() is invoked.
        *  This essentially casts a reference into the vector to an iterator.
-       *  Note: Although considering the memory address this operation is as fail save as the normal find operation.
+       *  Note: Although considering the memory address this operation is as fail safe as the normal find operation.
        *  If the address does not point to a proper object inside the vector this method will fail as would the normal find.
        */
       const_iterator findFast(const Item& item) const {

@@ -146,7 +146,7 @@ void CDCMCTrackStore::fillMCSegments()
 
     if (mcTrack.empty()) continue;
 
-    //Savest way is to cluster the elements in the track for their nearest neighbors
+    //Safest way is to cluster the elements in the track for their nearest neighbors
     WeightedNeighborhood<const CDCHit> hitNeighborhood;
     const CDCWireTopology& wireTopology = CDCWireTopology::getInstance();
 

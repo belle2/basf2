@@ -172,9 +172,9 @@ CDCWireSuperLayer::NeighborPair CDCWireSuperLayer::getNeighborsInwards(const ILa
   const CCWInfo deltaShift = neighborLayer.getShift() - layer.getShift();
 
   if (deltaShift == CCW) {
-    return NeighborPair(&(neighborLayer.getWireSave(iWire)) , &(neighborLayer.getWireSave(iWire - 1)));
+    return NeighborPair(&(neighborLayer.getWireSafe(iWire)) , &(neighborLayer.getWireSafe(iWire - 1)));
   } else if (deltaShift == CW) {
-    return NeighborPair(&(neighborLayer.getWireSave(iWire + 1)) , &(neighborLayer.getWireSave(iWire)));
+    return NeighborPair(&(neighborLayer.getWireSafe(iWire + 1)) , &(neighborLayer.getWireSafe(iWire)));
   } else {
     B2WARNING("Wire numbering shift bigger than one in magnitude. Adjust getNeighbor functions " << deltaShift);
     B2WARNING("From iLayer " << iLayer << " and wire " << iWire << " to iLayer " << iLayer - 1);
@@ -193,9 +193,9 @@ CDCWireSuperLayer::NeighborPair CDCWireSuperLayer::getNeighborsOutwards(const IL
   const CCWInfo deltaShift = neighborLayer.getShift() - layer.getShift();
 
   if (deltaShift == CCW) {
-    return NeighborPair(&(neighborLayer.getWireSave(iWire)) , &(neighborLayer.getWireSave(iWire - 1)));
+    return NeighborPair(&(neighborLayer.getWireSafe(iWire)) , &(neighborLayer.getWireSafe(iWire - 1)));
   } else if (deltaShift == CW) {
-    return NeighborPair(&(neighborLayer.getWireSave(iWire + 1)) , &(neighborLayer.getWireSave(iWire)));
+    return NeighborPair(&(neighborLayer.getWireSafe(iWire + 1)) , &(neighborLayer.getWireSafe(iWire)));
   } else {
     B2WARNING("Wire numbering shift bigger than one in magnitude. Adjust getNeighbor functions " << deltaShift);
     B2WARNING("From iLayer " << iLayer << " and wire " << iWire << " to iLayer " << iLayer + 1);

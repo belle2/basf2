@@ -64,7 +64,6 @@ TMatrixF TrackFitResult::transformCov5ToCov6(const TMatrixF& cov5, const float b
   const double d0 = getD0();
   const double phi = getPhi();
   const double omega = getOmega(bField);
-  const double z0 = getZ0();
   const double cotTheta = getCotTheta();
   const double alpha = getAlpha(bField);
 

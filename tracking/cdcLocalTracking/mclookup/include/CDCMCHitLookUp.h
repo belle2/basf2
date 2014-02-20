@@ -37,6 +37,9 @@ namespace Belle2 {
       /// Getter for the singletone instance
       static const CDCMCHitLookUp& getInstance();
 
+      /// Method for forwarding a request to fill the Monte Carlo lookup tables from Python
+      void fill() const;
+
     public:
       /// Getter for the CDCSimHit which is related to the CDCHit contained in the given wire hit
       const Belle2::CDCSimHit* getSimHit(const CDCHit* ptrHit) const;

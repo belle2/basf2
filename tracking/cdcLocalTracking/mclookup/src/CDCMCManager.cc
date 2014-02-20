@@ -14,6 +14,7 @@
 #include <tracking/cdcLocalTracking/topology/CDCWireTopology.h>
 
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 
 #include <tracking/cdcLocalTracking/mclookup/CDCMCMap.h>
 
@@ -25,7 +26,7 @@ namespace {
   CDCMCManager* g_mcManager = nullptr;
 }
 
-CDCMCManager::CDCMCManager()
+CDCMCManager::CDCMCManager() : m_eventMetaData(-999, -999, -999)
 {
 }
 
@@ -56,11 +57,26 @@ void CDCMCManager::clear()
 void CDCMCManager::fill()
 {
 
+  StoreObjPtr<EventMetaData> storedEventMetaData;
+
+  if (storedEventMetaData.isValid()) {
+    if (m_eventMetaData == *storedEventMetaData) {
+      //Event has already been filled with the current event
+      return;
+    }
+  }
+
+  clear();
+
   m_mcMap.fill();
   const CDCMCMap* ptrMCMap = &m_mcMap;
   m_mcTrackStore.fill(ptrMCMap);
   m_simHitLookUp.fill(ptrMCMap);
 
+  if (storedEventMetaData.isValid()) {
+    //after filling store the event numbers
+    m_eventMetaData = *storedEventMetaData;
+  }
 }
 
 

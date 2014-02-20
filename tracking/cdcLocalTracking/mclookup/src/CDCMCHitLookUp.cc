@@ -40,6 +40,13 @@ const CDCMCHitLookUp& CDCMCHitLookUp::getInstance()
 
 
 
+void CDCMCHitLookUp::fill() const
+{
+  return CDCMCManager::getInstance().fill();
+}
+
+
+
 const Belle2::CDCSimHit* CDCMCHitLookUp::getSimHit(const CDCHit* ptrHit) const
 {
   return CDCMCManager::getMCMap().getSimHit(ptrHit);

@@ -10,6 +10,8 @@
 #ifndef CDCMCMANAGER_H
 #define CDCMCMANAGER_H
 
+#include <framework/dataobjects/EventMetaData.h>
+
 #include "CDCMCMap.h"
 #include "CDCMCTrackStore.h"
 #include "CDCSimHitLookUp.h"
@@ -64,6 +66,9 @@ namespace Belle2 {
       void fill();
 
     private:
+      /// Memory for the event, run and experminent number corresponding to the currently stored data.
+      EventMetaData m_eventMetaData;
+
       /// Memory for the singletone CDCMCMap
       CDCMCMap m_mcMap;
 

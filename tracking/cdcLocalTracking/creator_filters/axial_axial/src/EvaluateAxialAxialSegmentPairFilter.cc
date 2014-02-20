@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../include/EvaluatingAxialAxialSegmentPairFilter.h"
+#include "../include/EvaluateAxialAxialSegmentPairFilter.h"
 
 using namespace std;
 using namespace Belle2;

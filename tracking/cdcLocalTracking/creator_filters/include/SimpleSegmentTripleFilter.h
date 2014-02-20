@@ -25,7 +25,7 @@ namespace Belle2 {
   namespace CDCLocalTracking {
 
     /// Filter for the constuction of segment triples based on simple criterions
-    class SimpleSegmentTripleFilter : public SimpleAxialAxialSegmentPairFilter {
+    class SimpleSegmentTripleFilter {
 
     public:
 
@@ -38,6 +38,13 @@ namespace Belle2 {
     public:
       /// Clears all remember information from the last event
       void clear();
+
+      /// Forwards the modules initialize to the filter
+      void initialize();
+
+      /// Forwards the modules initialize to the filter
+      void terminate();
+
 
       /// Checks if a triple of axial, stereo and axial segments is a good combination to be stored as an automaton cell
       /** Checks the proper alignement and the quality of connection between all three segments.
@@ -54,6 +61,10 @@ namespace Belle2 {
 
     private:
       CDCSZFitter m_szFitter; ///< Memory of the SZ fitter fitting sz lines to the stereo segments
+
+      /// Subsidiary filter to use the fitter from it.
+      SimpleAxialAxialSegmentPairFilter m_simpleAxialAxialSegmentPairFilter;
+
 
     }; // end class SimpleSegmentTripleFilter
 

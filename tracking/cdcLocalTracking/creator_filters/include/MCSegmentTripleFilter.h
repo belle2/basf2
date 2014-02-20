@@ -28,10 +28,13 @@ namespace Belle2 {
 
     public:
       /// May be used to clear information from former events. Currently unused.
-      void clear() {;}
+      void clear();
 
-      /// Check if the axial to axial segment pair is aligned in the Monte Carlo track. Signals NOT_A_CELL if not.
-      CellWeight isGoodAxialAxialSegmentPair(const CDCAxialAxialSegmentPair& axialAxialSegmentPair) const;
+      /// Forwards the modules initialize to the filter
+      void initialize();
+
+      /// Forwards the modules initialize to the filter
+      void terminate();
 
       /// Check if the segment triple is aligned in the Monte Carlo track. Signals NOT_A_CELL if not.
       CellWeight isGoodSegmentTriple(const CDCSegmentTriple& triple, bool allowBackward = false) const;
@@ -41,9 +44,7 @@ namespace Belle2 {
       void setTrajectoryOf(const CDCSegmentTriple& segmentTriple) const;
 
     private:
-      /// Instance of the Monte Carlo filter for axial to axial segment pairs to factor some of the judgment.
       MCAxialAxialSegmentPairFilter m_mcAxialAxialSegmentPairFilter;
-
     }; // end class MCSegmentTripleFilter
   } //end namespace CDCLocalTracking
 } //end namespace Belle2

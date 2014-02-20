@@ -100,6 +100,14 @@ namespace Belle2 {
       /// Clear remembered informations. Nothing to do in this case
       void clear() const {;}
 
+      /// Forwards the initialize method from the module
+      void initialize() {;}
+
+      /// Forwards the terminate method from the module
+      void terminate() {;}
+
+
+
       template<class CDCWireHitIterator>
       boost::iterator_range<CDCWireHitIterator> getPossibleNeighbors(const CDCWireHit& wireHit, const CDCWireHitIterator& itBegin, const CDCWireHitIterator& itEnd) const {
 

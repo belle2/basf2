@@ -54,6 +54,12 @@ namespace Belle2 {
       ///Empty destructor
       ~NeighborhoodBuilder() {;}
 
+      /// Forwards the initialize method from the module to the chooser
+      void initialize() { m_chooser.initialize(); }
+
+      /// Forwards the terminate method from the module to the chooser
+      void terminate() { m_chooser.terminate(); }
+
       /// Drop all relations in a neighborhood an create a new one.
       template<class ItemRange>
       void create(const ItemRange& itemRange, Neighborhood& neighborhood) const {

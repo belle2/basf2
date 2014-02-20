@@ -33,6 +33,20 @@ namespace Belle2 {
       /** Destructor.*/
       ~SegmentTripleCreator() {;}
 
+      void initialize() {
+        m_axialAxialSegmentPairFilter.initialize();
+        m_segmentTripleFilter.initialize();
+      }
+
+
+
+      void terminate() {
+        m_axialAxialSegmentPairFilter.terminate();
+        m_segmentTripleFilter.terminate();
+      }
+
+
+
       inline void create(const std::vector<CDCRecoSegment2D>& segments,
                          std::set<CDCSegmentTriple>& segmentTriples) const {
 

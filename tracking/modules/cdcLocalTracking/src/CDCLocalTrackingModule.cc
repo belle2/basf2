@@ -62,14 +62,16 @@ void CDCLocalTrackingModule::initialize()
   //output collection
   StoreArray < genfit::TrackCand >::registerPersistent(m_param_gfTrackCandColName);
 
-  m_segmentWorker.init();
-  m_trackingWorker.init();
+  m_segmentWorker.initialize();
+  m_trackingWorker.initialize();
 
   //StoreArray with digitized CDCHits
   StoreArray <CDCHit>::required();
 
+#ifdef CDCLOCALTRACKING_USE_MC_FILTERS
   StoreArray <CDCSimHit>::required();
   StoreArray <MCParticle>::required();
+#endif
 
   //preload geometry during initialization
   //marked as unused intentionally to avoid a compile warning
@@ -142,6 +144,9 @@ void CDCLocalTrackingModule::endRun()
 
 void CDCLocalTrackingModule::terminate()
 {
+  m_segmentWorker.terminate();
+  m_trackingWorker.terminate();
+
 #ifdef HAS_CALLGRIND
   CALLGRIND_DUMP_STATS;
 #endif

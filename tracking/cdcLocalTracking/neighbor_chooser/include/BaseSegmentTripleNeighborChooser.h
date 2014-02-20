@@ -40,6 +40,14 @@ namespace Belle2 {
       /// Clears stored information for a former event
       inline void clear() const {/*nothing to remember*/;}
 
+      /// Forwards the initialize method from the module
+      void initialize() {;}
+
+      /// Forwards the terminate method from the module
+      void terminate() {;}
+
+
+
       template<class CDCSegmentTripleIterator>
       boost::iterator_range<CDCSegmentTripleIterator>
       getPossibleNeighbors(

@@ -43,14 +43,25 @@ namespace Belle2 {
       /** Destructor.*/
       ~SegmentTripleTrackingWorker() {;}
 
-      void init() {
+      /// Forwards the initialize methods of the module to the segment creator and the neighborhood builder
+      void initialize() {
 
 #ifdef CDCLOCALTRACKING_USE_ROOT
         StoreArray < CDCSegmentTriple >::registerTransient("CDCSegmentTriples");
         StoreArray < CDCTrack >::registerTransient("CDCTracks");
 #endif
+        m_segmentTripleCreator.initialize();
+        m_segmentTriple_neighborhoodBuilder.initialize();
 
       }
+
+      /// Forwards the terminate method of the module to the segment creator and the neighborhood builder
+      void terminate() {
+        m_segmentTripleCreator.terminate();
+        m_segmentTriple_neighborhoodBuilder.terminate();
+      }
+
+
 
       inline void apply(const std::vector< CDCRecoSegment2D >& recoSegments,
                         StoreArray < genfit::TrackCand >& storedGFTrackCands) {

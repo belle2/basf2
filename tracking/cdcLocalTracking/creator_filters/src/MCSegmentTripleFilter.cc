@@ -27,15 +27,32 @@ MCSegmentTripleFilter::MCSegmentTripleFilter()
 {
 }
 
+
+
 MCSegmentTripleFilter::~MCSegmentTripleFilter()
 {
 }
 
-CellWeight MCSegmentTripleFilter::isGoodAxialAxialSegmentPair(const CDCAxialAxialSegmentPair& axialAxialSegmentPair) const
+
+
+void MCSegmentTripleFilter::clear()
 {
-  return m_mcAxialAxialSegmentPairFilter.isGoodAxialAxialSegmentPair(axialAxialSegmentPair);
+  m_mcAxialAxialSegmentPairFilter.clear();
 }
 
+
+
+void MCSegmentTripleFilter::initialize()
+{
+  m_mcAxialAxialSegmentPairFilter.initialize();
+}
+
+
+
+void MCSegmentTripleFilter::terminate()
+{
+  m_mcAxialAxialSegmentPairFilter.terminate();
+}
 
 
 
@@ -64,7 +81,7 @@ CellWeight MCSegmentTripleFilter::isGoodSegmentTriple(const CDCSegmentTriple& se
   const CDCAxialRecoSegment2D& endSegment = *ptrEndSegment;
 
   /// Recheck the axial axial compatability
-  CellWeight pairWeight = m_mcAxialAxialSegmentPairFilter.isGoodAxialAxialSegmentPair(segmentTriple, allowBackward);
+  CellWeight pairWeight =  m_mcAxialAxialSegmentPairFilter.isGoodAxialAxialSegmentPair(segmentTriple, allowBackward);
   if (isNotACell(pairWeight)) return NOT_A_CELL;
 
   const CDCMCSegmentLookUp& mcSegmentLookUp = CDCMCSegmentLookUp::getInstance();

@@ -47,7 +47,8 @@ namespace Belle2 {
       /** Destructor.*/
       ~FacetSegmentWorker() {;}
 
-      void init() {
+      /// Forwards the initialize method of the module to the facet creator and the neighborhood builder
+      void initialize() {
 
 #ifdef CDCLOCALTRACKING_USE_ROOT
         StoreArray < CDCRecoTangentCollection >::registerTransient("CDCRecoTangentSegments");
@@ -57,11 +58,23 @@ namespace Belle2 {
 
         m_clusters.reserve(50);
 
+        m_facetCreator.initialize();
+        m_facetNeighborhoodBuilder.initialize();
+
       }
 
 
+
+      /// Forwards the terminate method of the module to the facet creator and the neighborhood builder
+      void terminate() {
+        m_facetCreator.terminate();
+        m_facetNeighborhoodBuilder.terminate();
+      }
+
+
+
       template<class CDCWireHitRange>
-      inline void apply(const CDCWireHitRange& wirehits,
+      inline void apply(const CDCWireHitRange&,
                         std::vector< CDCRecoSegment2D >& outputSegments) {
 
         m_segments2D.clear();

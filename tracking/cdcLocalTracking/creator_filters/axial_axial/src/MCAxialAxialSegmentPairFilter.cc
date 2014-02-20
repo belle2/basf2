@@ -39,9 +39,18 @@ MCAxialAxialSegmentPairFilter::~MCAxialAxialSegmentPairFilter()
 
 void MCAxialAxialSegmentPairFilter::clear()
 {
+}
 
 
 
+void MCAxialAxialSegmentPairFilter::initialize()
+{
+}
+
+
+
+void MCAxialAxialSegmentPairFilter::terminate()
+{
 }
 
 

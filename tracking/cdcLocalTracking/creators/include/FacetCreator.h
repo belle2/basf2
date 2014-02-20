@@ -21,12 +21,12 @@
 namespace Belle2 {
   namespace CDCLocalTracking {
     /// Class providing construction combinatorics for the facets.
-    template<class Filter>
+    template<class FacetFilter>
     class FacetCreator {
 
     public:
-      FacetCreator() : m_filter() {;}
-      FacetCreator(const Filter& filter) : m_filter(filter) {;}
+      FacetCreator() : m_facetFilter() {;}
+      FacetCreator(const FacetFilter& facetFilter) : m_facetFilter(facetFilter) {;}
       ~FacetCreator() {;}
 
       //in types
@@ -58,13 +58,25 @@ namespace Belle2 {
       }
 
 
+
+      void initialize() {
+        m_facetFilter.initialize();
+      }
+
+
+
+      void terminate() {
+        m_facetFilter.terminate();
+      }
+
+
     private:
 
       template<class CDCWireHitMayBePtrRange, class GenericFacetCollection>
       void createFacetsGeneric(const CDCWireHitMayBePtrRange& wirehits,
                                const Neighborhood& neighborhood,
                                GenericFacetCollection& facets) const {
-        m_filter.clear();
+        m_facetFilter.clear();
         for (const auto & mayBePtrMiddleWireHit : wirehits) {
 
           Neighborhood::range nextNeighborRange = neighborhood.equal_range(mayBePtrMiddleWireHit);
@@ -122,7 +134,7 @@ namespace Belle2 {
               //Obtain a constant interface to pass to the filter method following
               const CDCRecoFacet& constFacet = facet;
 
-              CellState cellWeight = m_filter.isGoodFacet(constFacet);
+              CellState cellWeight = m_facetFilter.isGoodFacet(constFacet);
 
               if (not isNotACell(cellWeight)) {
                 facet.getAutomatonCell().setCellWeight(cellWeight);
@@ -134,7 +146,7 @@ namespace Belle2 {
       }
 
     private:
-      Filter m_filter;
+      FacetFilter m_facetFilter;
 
     }; //end class FacetCreator
   } //end namespace CDCLocalTracking

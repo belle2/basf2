@@ -34,6 +34,13 @@ namespace Belle2 {
       /// Clears all remember information from the last event
       void clear() const;
 
+      /// Forwards the modules initialize to the filter
+      void initialize();
+
+      /// Forwards the modules initialize to the filter
+      void terminate();
+
+
     private:
       /// Indicated if the oriented triple is a correct hypotheses
       bool isCorrect(const CDCRLWireHitTriple& rlWireHit, int inTrackHitDistanceTolerance = 99999) const;

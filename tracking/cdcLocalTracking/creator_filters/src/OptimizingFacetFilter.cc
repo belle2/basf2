@@ -73,3 +73,11 @@ CellState OptimizingFacetFilter::isGoodFacet(const CDCRecoFacet& facet) const
 
 void OptimizingFacetFilter::clear() const {;}
 
+void OptimizingFacetFilter::initialize()
+{
+}
+
+
+void OptimizingFacetFilter::terminate()
+{
+}

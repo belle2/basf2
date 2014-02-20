@@ -219,13 +219,6 @@ bool MCFacetFilter::isCorrect(const CDCRLWireHitTriple& rlWireHitTriple, int inT
 }
 
 
-
-
-
-
-
-
-
 /*
 CellState MCFacetFilter::oldIsGoodFacet(const CDCRecoFacet& facet) const
 {
@@ -331,3 +324,14 @@ CellState MCFacetFilter::oldIsGoodFacet(const CDCRecoFacet& facet) const
 }
 */
 void MCFacetFilter::clear() const {;}
+
+
+
+void MCFacetFilter::initialize()
+{
+}
+
+
+void MCFacetFilter::terminate()
+{
+}

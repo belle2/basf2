@@ -7,10 +7,7 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
-#ifdef CDCLOCALTRACKING_USE_ROOT
-
 #pragma link C++ class Belle2::CDCLocalTracking::MCAxialAxialSegmentPairFilter;
-
-#endif
+#pragma link C++ class Belle2::CDCLocalTracking::AxialAxialSegmentPairFilterVars;
 
 #endif

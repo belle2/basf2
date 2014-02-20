@@ -30,6 +30,10 @@
 
 #include <tracking/cdcLocalTracking/workers/SegmentTripleTrackingWorker.h>
 
+#include <tracking/cdcLocalTracking/creator_filters/axial_axial/SimpleAxialAxialSegmentPairFilter.h>
+#include <tracking/cdcLocalTracking/creator_filters/axial_axial/MCAxialAxialSegmentPairFilter.h>
+#include <tracking/cdcLocalTracking/creator_filters/axial_axial/EvaluateAxialAxialSegmentPairFilter.h>
+
 #include <tracking/cdcLocalTracking/creator_filters/SimpleSegmentTripleFilter.h>
 #include <tracking/cdcLocalTracking/neighbor_chooser/SimpleSegmentTripleNeighborChooser.h>
 
@@ -103,17 +107,25 @@ namespace Belle2 {
 
 #ifdef CDCLOCALTRACKING_USE_MC_FILTERS
 #ifdef CDCLOCALTRACKING_USE_OPTIMIZING_FILTERS
-    typedef CDCLocalTracking::MCAxialAxialSegmentPairFilter AxialAxialSegmentPairFilter;
+    //No optimizing filters and choosers for segment triples yet.
+    typedef CDCLocalTracking::EvaluateAxialAxialSegmentPairFilter <
+    CDCLocalTracking::SimpleAxialAxialSegmentPairFilter
+    > AxialAxialSegmentPairFilter;
+
     typedef CDCLocalTracking::MCSegmentTripleFilter SegmentTripleFilter;
     typedef CDCLocalTracking::MCSegmentTripleNeighborChooser SegmentTripleNeighborChooser;
 #else
-    //No optimizing filters and choosers for segment triples yet.
-    typedef CDCLocalTracking::MCAxialAxialSegmentPairFilter AxialAxialSegmentPairFilter;
+    typedef CDCLocalTracking::EvaluateAxialAxialSegmentPairFilter <
+    CDCLocalTracking::SimpleAxialAxialSegmentPairFilter
+    > AxialAxialSegmentPairFilter;
+    //typedef CDCLocalTracking::MCAxialAxialSegmentPairFilter AxialAxialSegmentPairFilter;
+
     typedef CDCLocalTracking::MCSegmentTripleFilter SegmentTripleFilter;
     typedef CDCLocalTracking::MCSegmentTripleNeighborChooser SegmentTripleNeighborChooser;
 #endif
 
 #else
+    typedef CDCLocalTracking::SimpleAxialAxialSegmentPairFilter AxialAxialSegmentPairFilter;
     typedef CDCLocalTracking::SimpleSegmentTripleFilter SegmentTripleFilter;
     typedef CDCLocalTracking::SimpleSegmentTripleNeighborChooser SegmentTripleNeighborChooser;
 #endif

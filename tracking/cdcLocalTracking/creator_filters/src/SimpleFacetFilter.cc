@@ -58,3 +58,16 @@ CellState SimpleFacetFilter::isGoodFacet(const CDCRecoFacet& facet) const
 
 
 void SimpleFacetFilter::clear() const {;}
+
+
+void SimpleFacetFilter::initialize()
+{
+}
+
+
+void SimpleFacetFilter::terminate()
+{
+}
+
+
+

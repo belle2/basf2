@@ -38,10 +38,15 @@ namespace Belle2 {
       /// Clears all remember information from the last event
       void clear();
 
+      /// Forwards the modules initialize to the filter
+      void initialize();
+
+      /// Forwards the modules initialize to the filter
+      void terminate();
+
       /// Checks if a pair of axial segments is a good combination
       CellWeight isGoodAxialAxialSegmentPair(const CDCAxialAxialSegmentPair& axialAxialSegmentPair);
 
-    protected:
       /// Returns the trajectory of the axial segment. Also fits it if necessary.
       const CDCTrajectory2D& getFittedTrajectory2D(const CDCAxialRecoSegment2D& segment) const;
 

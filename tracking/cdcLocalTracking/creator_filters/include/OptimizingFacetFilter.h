@@ -36,6 +36,12 @@ namespace Belle2 {
       /// Clears all remember information from the last event
       void clear() const;
 
+      /// Forwards the modules initialize to the filter
+      void initialize();
+
+      /// Forwards the modules initialize to the filter
+      void terminate();
+
     private:
       mutable ofstream m_output_csv;  ///< Output stream for the csv file
 

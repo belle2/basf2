@@ -28,8 +28,8 @@ TrackFitResult::TrackFitResult(const TVector3& position, const TVector3& momentu
 
 TrackFitResult::TrackFitResult(const std::vector<float>& tau, const std::vector<float>& cov5,
                                const Const::ParticleType& pType, const float pValue) :
-  m_tau(tau), m_cov5(cov5),
-  m_pdg(std::abs(pType.getPDGCode())), m_pValue(pValue)
+  m_pdg(std::abs(pType.getPDGCode())), m_pValue(pValue),
+  m_tau(tau), m_cov5(cov5)
 {
 
 }

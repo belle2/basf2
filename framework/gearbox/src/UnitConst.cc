@@ -160,14 +160,14 @@ unsigned short Const::DetectorSet::getBit(Const::EDetector det) const
 Const::EDetector Const::DetectorSet::getDetector(unsigned short bit) const
 {
   switch (bit) {
-    case 0x0001: return IR;
-    case 0x0002: return PXD;
-    case 0x0004: return SVD;
-    case 0x0008: return CDC;
-    case 0x0010: return TOP;
-    case 0x0020: return ARICH;
-    case 0x0040: return ECL;
-    case 0x0080: return KLM;
+    case 0x0001: return PXD;
+    case 0x0002: return SVD;
+    case 0x0004: return CDC;
+    case 0x0008: return TOP;
+    case 0x0010: return ARICH;
+    case 0x0020: return ECL;
+    case 0x0040: return KLM;
+    case 0x0080: return IR;
     case 0x0100: return TRG;
     case 0x0200: return DAQ;
     case 0x0400: return BEAST;

@@ -1,18 +1,21 @@
+# -*- coding: utf-8 -*-
+# vim: syntax=python
+
 Import('env')
 
 env['LIBS'] = [
-    '$ROOT_LIBS',
-    'framework',
-    'geometry',
-    'mdst_dataobjects',
-    'simulation_dataobjects',
-    'vxd', 'vxd_dataobjects', 
+    'tracking_dataobjects', 
     'pxd_dataobjects',
     'svd', 'svd_dataobjects',
+    'vxd', 'vxd_dataobjects', 
     'cdc', 'cdc_dataobjects',
+    'simulation_dataobjects',
+    'geometry',
+    'mdst_dataobjects',
+    'framework',
     'genfit2',
     'EG',
-    'tracking_dataobjects', 
+    '$ROOT_LIBS',
     ]
 
 Return('env')

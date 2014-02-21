@@ -125,8 +125,7 @@ namespace Belle2 {
        *  As well for very small values, we might be unsure and return zero
      */
     short getCharge() const {
-      // getOmega needs an argument, so one is given
-      return getOmega(1.5) >= 0 ? 1 : -1;
+      return getOmega() >= 0 ? 1 : -1;
     }
 
     /** Setter for Charge
@@ -167,7 +166,7 @@ namespace Belle2 {
      * Getter for omega. This is the curvature of the track. It's sign is defined by the charge of the particle.
      * @return
      */
-    float getOmega(const float /*bField*/) const { return m_tau.at(2); }
+    float getOmega() const { return m_tau.at(2); }
 
     /**
      * Getter for z0. This is the z coordinate of the POCA.
@@ -185,21 +184,21 @@ namespace Belle2 {
      * Getter for all perigee parameters
      * @return vector with 5 elements
      */
-    std::vector<float> getTau(const float /*bField*/) const { return m_tau; }
+    std::vector<float> getTau() const { return m_tau; }
 
     /**
      * Getter for all covariance matrix elements of perigee parameters
      * TODO: Implement bField
      * @return vector with 15 elements
      */
-    std::vector<float> getCov(const float /*bField*/) const { return m_cov5; }
+    std::vector<float> getCov() const { return m_cov5; }
 
     /**
      * Getter for covariance matrix of perigee parameters in matrix form.
      * TODO: Implement bField
      * @return
      */
-    TMatrixF getCovariance5(const float bField) const;
+    TMatrixF getCovariance5() const;
 
     //---------------------------------------------------------------------------------------------------------------------------
     //--- Hit Pattern Arithmetics

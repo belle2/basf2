@@ -99,8 +99,8 @@ namespace Belle2 {
       Belle2::TrackFitResult myResult2(myResult.getPosition(), myResult.getMomentum(), cov6,
                                        myResult.getCharge(), pType, pValue, bField);
 
-      TMatrixF myResultCov5 = myResult.getCovariance5(bField);
-      TMatrixF myResult2Cov5 = myResult2.getCovariance5(bField);
+      TMatrixF myResultCov5 = myResult.getCovariance5();
+      TMatrixF myResult2Cov5 = myResult2.getCovariance5();
 
       EXPECT_NEAR(myResultCov5(0, 0), myResult2Cov5(0, 0), absError);
       EXPECT_NEAR(myResultCov5(0, 1), myResult2Cov5(0, 1), absError);

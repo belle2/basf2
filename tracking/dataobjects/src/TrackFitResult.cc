@@ -53,7 +53,7 @@ float TrackFitResult::getTransverseMomentum(const float bField) const
   return std::sqrt(px * px + py * py);
 }
 
-TMatrixF TrackFitResult::getCovariance5(const float bField) const
+TMatrixF TrackFitResult::getCovariance5() const
 {
   TMatrixF cov5(5, 5);
   unsigned int counter = 0;
@@ -99,7 +99,7 @@ TMatrixF TrackFitResult::transformCov5ToCov6(const TMatrixF& cov5, const float b
 
 TMatrixF TrackFitResult::getCovariance6(const float bField) const
 {
-  TMatrixF cov5(getCovariance5(bField));
+  TMatrixF cov5(getCovariance5());
   return transformCov5ToCov6(cov5, bField);
 }
 

@@ -1,7 +1,7 @@
-#include <framework/gearbox/Const.h>
-#include <framework/logging/Logger.h>
 #include <tracking/dataobjects/Track.h>
 #include <tracking/dataobjects/TrackFitResult.h>
+#include <framework/gearbox/Const.h>
+#include <framework/logging/Logger.h>
 #include <framework/datastore/StoreArray.h>
 #include <gtest/gtest.h>
 
@@ -26,21 +26,19 @@ namespace Belle2 {
     StoreArray<TrackFitResult>::registerPersistent();
     StoreArray<TrackFitResult> myResults;
 
-    TrackFitResult result1;
-    result1.setParticleType(Const::pion);
-    new(myResults.nextFreeAddress()) TrackFitResult(result1);
+    const TVector3 dummyVector3;
+    const TMatrixDSym dummyMatrix(6);
+    const int charge = 1;
+    const float pValue = 1.;
+    const float bField = 1.5;
 
-    TrackFitResult result2;
-    result2.setParticleType(Const::kaon);
-    new(myResults.nextFreeAddress()) TrackFitResult(result2);
+    new(myResults.nextFreeAddress()) TrackFitResult(dummyVector3, dummyVector3, dummyMatrix, charge, Const::pion,     pValue, bField);
 
-    TrackFitResult result3;
-    result3.setParticleType(Const::electron);
-    new(myResults.nextFreeAddress()) TrackFitResult(result3);
+    new(myResults.nextFreeAddress()) TrackFitResult(dummyVector3, dummyVector3, dummyMatrix, charge, Const::kaon,     pValue, bField);
 
-    TrackFitResult result4;
-    result4.setParticleType(Const::muon);
-    new(myResults.nextFreeAddress()) TrackFitResult(result4);
+    new(myResults.nextFreeAddress()) TrackFitResult(dummyVector3, dummyVector3, dummyMatrix, charge, Const::electron, pValue, bField);
+
+    new(myResults.nextFreeAddress()) TrackFitResult(dummyVector3, dummyVector3, dummyMatrix, charge, Const::muon,     pValue, bField);
 
     Track mytrack1;
     mytrack1.setTrackFitResultIndex(Const::pion, 0);

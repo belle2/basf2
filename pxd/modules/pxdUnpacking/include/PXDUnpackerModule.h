@@ -57,6 +57,8 @@ namespace Belle2 {
       bool m_ignore_headernrframes;
       /**  ignore missing DHPs from DHP mask in DHH Start*/
       bool m_ignore_dhpmask;
+      /**  ignore wrong DHP size for empty dhp frames (bug in Davids core) and checksum */
+      bool m_ignore_empty_dhp_wrong_size;
       /**  ignore wrong DHP ports in DHH header vs DHP header */
       bool m_ignore_dhpportdiffer;
       /** Only unpack, but Do Not Store anything to file */

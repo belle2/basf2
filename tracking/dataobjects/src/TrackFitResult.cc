@@ -46,6 +46,13 @@ TVector3 TrackFitResult::getMomentum(const float bField) const
   return TVector3(calcPxFromPerigee(bField), calcPyFromPerigee(bField), calcPzFromPerigee(bField));
 }
 
+float TrackFitResult::getTransverseMomentum(const float bField) const
+{
+  float px = calcPxFromPerigee(bField);
+  float py = calcPyFromPerigee(bField);
+  return std::sqrt(px * px + py * py);
+}
+
 TMatrixF TrackFitResult::getCovariance5(const float bField) const
 {
   TMatrixF cov5(5, 5);

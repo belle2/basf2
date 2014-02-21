@@ -57,6 +57,9 @@ namespace Belle2 {
       EXPECT_NEAR(momentum.Py(), myResult.getMomentum(bField).Py(), absError);
       EXPECT_NEAR(momentum.Pz(), myResult.getMomentum(bField).Pz(), absError);
 
+      // Test getter for transverse momentum
+      EXPECT_NEAR(momentum.Perp(), myResult.getTransverseMomentum(bField), absError);
+
       // Test other variables
       EXPECT_EQ(charge, myResult.getCharge());
       EXPECT_EQ(pValue, myResult.getPValue());

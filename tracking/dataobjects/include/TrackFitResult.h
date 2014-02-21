@@ -82,6 +82,12 @@ namespace Belle2 {
      */
     TVector3 getMomentum(const float bField = 1.5) const;
 
+    /** Getter for the absolute value of the transverse momentum at the perigee.
+     *
+     * @param bField Magnetic field at the perigee
+     */
+    float getTransverseMomentum(const float bField = 1.5) const;
+
     /** Setter for momentum vector.
       * @TODO delete, out of Business
       * */

@@ -16,9 +16,9 @@
     <!-- Switch for printing for debug -->
     <Debug desc="true: print out; false: not print out.">false</Debug>
 
-    <!-- Switch for reading x-t etc. (from disk) to be used in simulation -->
-    <XTetc desc="true: read x-t etc. params. from disk; false: not read.">false</XTetc>
-    <xtFileName desc="file which contains x-t relation">xt_v0.dat</xtFileName>
+    <!-- Switch for loadding x-t etc. (from disk) to be used in simulation -->
+    <XTetc desc="true: load x-t etc. params. from disk; false: not load.">false</XTetc>
+    <xtFileName desc="file which contains x-t relation">xt_v1.dat</xtFileName>
     <sigmaFileName desc="file which contains space resol.">sigma_v0.dat</sigmaFileName>
     <propSpeedFileName desc="file which contains propagation speed">propspeed_v0.dat</propSpeedFileName>
 
@@ -28,7 +28,7 @@
 
     <!-- Switch for selecting x-t etc. to be used in reconstruction -->
     <XTetc4Recon desc="true: use calibrated x-t etc.; false: use the same ones as used in simulation">false</XTetc4Recon>
-    <xt4ReconFileName desc="file which contains x-t relation for reconstruction">xt_v0.dat</xt4ReconFileName>
+    <xt4ReconFileName desc="file which contains x-t relation for reconstruction">xt_v1.dat</xt4ReconFileName>
     <sigma4ReconFileName desc="file which contains space resol. for reconstruction">sigma_v0.dat</sigma4ReconFileName>
     <propSpeed4ReconFileName desc="file which contains propagation speed for reconstruction">propspeed_v0.dat</propSpeed4ReconFileName>
 

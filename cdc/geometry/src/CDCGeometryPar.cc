@@ -332,9 +332,10 @@ void CDCGeometryPar::readXT(const GearDir gbxParams, const int mode)
     if (!ifs) B2FATAL("CDCGeometryPar: cannot open " << fileName0 << " !");
   }
 
-  int iL, lr;
+  int iL, lrp;
   const int np = 9;
-  double alpha, dummy0, dummy1, xt[np];
+  double alpha, theta, dummy1, xt[np];
+  unsigned ntheta = 7;
   unsigned nRead = 0;
 
   while (true) {
@@ -343,7 +344,7 @@ void CDCGeometryPar::readXT(const GearDir gbxParams, const int mode)
     // Read a line of xt-parameter from Garfield calculations.
     //
 
-    ifs >> iL >> alpha >> dummy0 >> dummy1 >> lr;
+    ifs >> iL >> theta >> alpha >> dummy1 >> lrp;
     for (int i = 0; i < np - 1; ++i) {
       ifs >> xt[i];
     }
@@ -352,52 +353,98 @@ void CDCGeometryPar::readXT(const GearDir gbxParams, const int mode)
 
     ++nRead;
 
-    const int ialpha = 0;  //tentative
+    const int ialpha = alpha / 10. + 9;
 
-    for (int i = 0; i < np - 1; ++i) {
-      m_XT[iL][lr][ialpha][i] = xt[i];
+    int itheta = 0;
+    if (theta ==  40.) {
+      itheta = 1;
+    } else if (theta ==  60.) {
+      itheta = 2;
+    } else if (theta ==  90.) {
+      itheta = 3;
+    } else if (theta == 120.) {
+      itheta = 4;
+    } else if (theta == 130.) {
+      itheta = 5;
+    } else if (theta == 149.) {
+      itheta = 6;
     }
 
-    double bound = m_XT[iL][lr][ialpha][6];
-    int i = np - 1;
-    xt[i] = m_XT[iL][lr][ialpha][0] + bound
-            * (m_XT[iL][lr][ialpha][1] + bound
-               * (m_XT[iL][lr][ialpha][2] + bound
-                  * (m_XT[iL][lr][ialpha][3] + bound
-                     * (m_XT[iL][lr][ialpha][4] + bound
-                        * (m_XT[iL][lr][ialpha][5])))));
+    //tentative
+    int lr = 0;
+    if (lrp == 0) lr = 1;
 
-    m_XT[iL][lr][ialpha][i] = xt[i];
+    for (int i = 0; i < np - 1; ++i) {
+      m_XT[iL][lr][ialpha][itheta][i] = xt[i];
+    }
+
+    double bound = m_XT[iL][lr][ialpha][itheta][6];
+    int i = np - 1;
+    xt[i] = m_XT[iL][lr][ialpha][itheta][0] + bound
+            * (m_XT[iL][lr][ialpha][itheta][1] + bound
+               * (m_XT[iL][lr][ialpha][itheta][2] + bound
+                  * (m_XT[iL][lr][ialpha][itheta][3] + bound
+                     * (m_XT[iL][lr][ialpha][itheta][4] + bound
+                        * (m_XT[iL][lr][ialpha][itheta][5])))));
+
+    m_XT[iL][lr][ialpha][itheta][i] = xt[i];
 
     if (m_debug) {
-      cout << iL << " " << alpha << " " << dummy0 << " " << dummy1 << " " << lr;
+      cout << iL << " " << alpha << " " << theta << " " << dummy1 << " " << lr;
       for (int i = 0; i < np; ++i) {
         cout << " " << xt[i];
       }
       cout << endl;
     }
 
-    /*    //convert unit, microsec -> nsec
+    //convert unit, microsec -> nsec  <- tentative
     i = 1;
-    m_XT[iL][lr][ialpha][i] *= 1.e-3;
+    m_XT[iL][lr][ialpha][itheta][i] *= 1.e-3;
     i = 2;
-    m_XT[iL][lr][ialpha][i] *= 1.e-6;
+    m_XT[iL][lr][ialpha][itheta][i] *= 1.e-6;
     i = 3;
-    m_XT[iL][lr][ialpha][i] *= 1.e-9;
+    m_XT[iL][lr][ialpha][itheta][i] *= 1.e-9;
     i = 4;
-    m_XT[iL][lr][ialpha][i] *= 1.e-12;
+    m_XT[iL][lr][ialpha][itheta][i] *= 1.e-12;
     i = 5;
-    m_XT[iL][lr][ialpha][i] *= 1.e-15;
+    m_XT[iL][lr][ialpha][itheta][i] *= 1.e-15;
     i = 6;
-    m_XT[iL][lr][ialpha][i] *= 1.e3;
+    m_XT[iL][lr][ialpha][itheta][i] *= 1.e3;
     i = 7;
-    m_XT[iL][lr][ialpha][i] *= 1.e-3;
-    */
+    m_XT[iL][lr][ialpha][itheta][i] *= 1.e-3;
+
   }
 
-  if (nRead != 2 * MAX_N_SLAYERS) B2FATAL("CDCGeometryPar::readXT: #lines read-in (=" << nRead << ") is inconsistent with 2 x total #layers (=" << 2 * MAX_N_SLAYERS << ") !");
+  if (nRead != 2 * 18 * 7 * MAX_N_SLAYERS) B2FATAL("CDCGeometryPar::readXT: #lines read-in (=" << nRead << ") is inconsistent with 2*18*7 x total #layers (=" << 2 * 18 * 7 * MAX_N_SLAYERS << ") !");
 
   ifs.close();
+
+  //set xt(L/R,alpha=-90deg) = xt(R/L,alpha=90deg)
+  for (unsigned iL = 0; iL < MAX_N_SLAYERS; ++iL) {
+    for (int lr = 0; lr < 2; ++lr) {
+      int lrp = 0;
+      if (lr == 0) lrp = 1;
+      for (unsigned itheta = 0; itheta < ntheta; ++itheta) {
+        for (int i = 0; i < np; ++i) {
+          m_XT[iL][lr][0][itheta][i] = m_XT[iL][lrp][18][itheta][i];
+        }
+      }
+    }
+  }
+
+  /*
+  iL = 55;
+  int lr = 0;
+  int ialpha = 8;
+  int itheta = 3;
+  for(int i=0; i<9; ++i) {
+    std::cout << "xt,iL,lr,ialpha,itheta= " << iL <<" "<< lr <<" "<< ialpha <<" "<< itheta <<" "<< m_XT[iL][lr][ialpha][itheta][i] << std::endl;
+  }
+  lr = 1;
+  for(int i=0; i<9; ++i) {
+    std::cout << "xt,iL,lr,ialpha,itheta= " << iL <<" "<< lr <<" "<< ialpha <<" "<< itheta <<" "<< m_XT[iL][lr][ialpha][itheta][i] << std::endl;
+  }
+  */
 }
 
 // Read space reso. params.
@@ -731,26 +778,32 @@ void CDCGeometryPar::outputDesignWirParam(const unsigned layerID, const unsigned
   ofs << endl;
 }
 
-double CDCGeometryPar::getDriftV(const double time, const unsigned short iCLayer, const unsigned short lr, const double alpha) const
+double CDCGeometryPar::getDriftV(const double time, const unsigned short iCLayer, const unsigned short lr, const double alpha, const double theta) const
 {
 
   double dDdt;
 
-  if (false) {
-    std::cout << "alpha " << alpha << std::endl;
-  }
+  //tentative
+  int ialpha = (alpha >= 0.) ? (alpha * 180. / M_PI + 5.) / 10. : (alpha * 180. / M_PI - 5.) / 10.;
+  ialpha += 9;
+  ialpha = std::max(0, ialpha);
+  ialpha = std::min(18, ialpha);
 
-  const unsigned ialpha = 0; //tentative
-  const double boundary = m_XT[iCLayer][lr][ialpha][6];
+  int itheta = theta * 180. / M_PI;
+  //  itheta = std::max( 0, itheta);
+  //  itheta = std::min( 7, itheta);
+  itheta = 3; //tentative
+
+  const double boundary = m_XT[iCLayer][lr][ialpha][itheta][6];
 
   if (time < boundary) {
-    dDdt =    m_XT[iCLayer][lr][ialpha][1] + time
-              * (2.*m_XT[iCLayer][lr][ialpha][2] + time
-                 * (3.*m_XT[iCLayer][lr][ialpha][3] + time
-                    * (4.*m_XT[iCLayer][lr][ialpha][4] + time
-                       * (5.*m_XT[iCLayer][lr][ialpha][5]))));
+    dDdt =    m_XT[iCLayer][lr][ialpha][itheta][1] + time
+              * (2.*m_XT[iCLayer][lr][ialpha][itheta][2] + time
+                 * (3.*m_XT[iCLayer][lr][ialpha][itheta][3] + time
+                    * (4.*m_XT[iCLayer][lr][ialpha][itheta][4] + time
+                       * (5.*m_XT[iCLayer][lr][ialpha][itheta][5]))));
   } else {
-    dDdt = m_XT[iCLayer][lr][ialpha][7];
+    dDdt = m_XT[iCLayer][lr][ialpha][itheta][7];
   }
 
   if (lr == 1) dDdt *= -1.;
@@ -758,35 +811,46 @@ double CDCGeometryPar::getDriftV(const double time, const unsigned short iCLayer
 
 }
 
-double CDCGeometryPar::getDriftLength(const double time, const unsigned short iCLayer, const unsigned short lr, const double alpha) const
+double CDCGeometryPar::getDriftLength(const double time, const unsigned short iCLayer, const unsigned short lr, const double alpha, const double theta) const
 {
 
   double dist = 0.;
 
-  if (false) {
-    std::cout << "alpha " << alpha << std::endl;
-  }
+  //tentative
+  int ialpha = (alpha >= 0.) ? (alpha * 180. / M_PI + 5.) / 10. : (alpha * 180. / M_PI - 5.) / 10.;
+  ialpha += 9;
+  ialpha = std::max(0, ialpha);
+  ialpha = std::min(18, ialpha);
 
-  const unsigned ialpha = 0;
-  const double boundary = m_XT[iCLayer][lr][ialpha][6];
+  int itheta = theta * 180. / M_PI;
+  //  itheta = std::max( 0, itheta);
+  //  itheta = std::min( 7, itheta);
+  itheta = 3; //tentative
+
+  //  std::cout <<"iCLayer= " << iCLayer << std::endl;
+  //  std::cout <<"lr= " << lr << std::endl;
+  //  std::cout <<"alpha,ialpha= " << alpha <<" "<< ialpha << std::endl;
+  const double boundary = m_XT[iCLayer][lr][ialpha][itheta][6];
+  //  std::cout <<"boundary= " << boundary << std::endl;
 
   if (time < boundary) {
-    dist = m_XT[iCLayer][lr][ialpha][0] + time
-           * (m_XT[iCLayer][lr][ialpha][1] + time
-              * (m_XT[iCLayer][lr][ialpha][2] + time
-                 * (m_XT[iCLayer][lr][ialpha][3] + time
-                    * (m_XT[iCLayer][lr][ialpha][4] + time
-                       * (m_XT[iCLayer][lr][ialpha][5])))));
+    dist = m_XT[iCLayer][lr][ialpha][itheta][0] + time
+           * (m_XT[iCLayer][lr][ialpha][itheta][1] + time
+              * (m_XT[iCLayer][lr][ialpha][itheta][2] + time
+                 * (m_XT[iCLayer][lr][ialpha][itheta][3] + time
+                    * (m_XT[iCLayer][lr][ialpha][itheta][4] + time
+                       * (m_XT[iCLayer][lr][ialpha][itheta][5])))));
   } else {
-    dist = m_XT[iCLayer][lr][ialpha][7] * (time - boundary) + m_XT[iCLayer][lr][ialpha][8];
+    dist = m_XT[iCLayer][lr][ialpha][itheta][7] * (time - boundary) + m_XT[iCLayer][lr][ialpha][itheta][8];
   }
 
   if (lr == 1) dist *= -1.;
+  //  std::cout <<"dist= " << dist << std::endl;
   return std::max(0., dist);
 
 }
 
-double CDCGeometryPar::getDriftTime(const double dist, const unsigned short iCLayer, const unsigned short lr, const double alpha) const
+double CDCGeometryPar::getDriftTime(const double dist, const unsigned short iCLayer, const unsigned short lr, const double alpha, const double theta) const
 {
   //to be replaced with a smarter algorithm...
 
@@ -795,14 +859,14 @@ double CDCGeometryPar::getDriftTime(const double dist, const unsigned short iCLa
   const double maxTrials = 100;
 
   double t0 = 0.;
-  double d0 = getDriftLength(t0, iCLayer, lr, alpha) - dist;
+  double d0 = getDriftLength(t0, iCLayer, lr, alpha, theta) - dist;
 
   unsigned i = 0;
   double t1 = maxTime;
   double time = dist * m_nominalDriftVInv;
   while (((t1 - t0) > eps) && (i < maxTrials)) {
     time = 0.5 * (t0 + t1);
-    double d1 = getDriftLength(time, iCLayer, lr, alpha) - dist;
+    double d1 = getDriftLength(time, iCLayer, lr, alpha, theta) - dist;
     if (d0 * d1 > 0.) {
       t0 = time;
     } else {
@@ -848,4 +912,58 @@ double CDCGeometryPar::getSigma(const double driftL, const unsigned short iCLaye
 #endif
 
   return sigma;
+}
+
+unsigned short CDCGeometryPar::getOldLeftRight(const TVector3& posOnWire, const TVector3& posOnTrack, const TVector3& momentum) const
+{
+  unsigned short lr = 1;
+  double wCrossT = (posOnWire.Cross(posOnTrack)).z();
+
+  if (wCrossT < 0.) {
+    lr = 0;
+  } else if (wCrossT > 0.) {
+    lr = 1;
+  } else {
+    if ((posOnTrack - posOnWire).Perp() != 0.) {
+      double wCrossP = (posOnWire.Cross(momentum)).z();
+      if (wCrossP > 0.) {
+        if (posOnTrack.Perp() > posOnWire.Perp()) {
+          lr = 0;
+        } else {
+          lr = 1;
+        }
+      } else if (wCrossP < 0.) {
+        if (posOnTrack.Perp() < posOnWire.Perp()) {
+          lr = 0;
+        } else {
+          lr = 1;
+        }
+      } else {
+        lr = 1;
+      }
+    } else {
+      lr = 1;
+    }
+  }
+  return lr;
+}
+
+double CDCGeometryPar::getAlpha(const TVector3& posOnWire, const TVector3& momentum) const
+{
+  double wx = posOnWire.x();
+  double wy = posOnWire.y();
+  double px = momentum.x();
+  double py = momentum.y();
+
+  double sinalpha = (wx * py - wy * px) / sqrt((wx * wx + wy * wy) * (px * px + py * py));
+
+  double dot = wx * px + wy * py;
+  if (dot < 0.) sinalpha *= -1.;
+
+  return asin(sinalpha);
+}
+
+double CDCGeometryPar::getTheta(const TVector3& momentum) const
+{
+  return atan2(momentum.Perp(), momentum.z());
 }

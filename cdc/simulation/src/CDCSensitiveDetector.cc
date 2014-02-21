@@ -208,6 +208,7 @@ namespace Belle2 {
       G4ThreeVector posW(0, 0, 0);
       G4int lr(1);
       HepPoint3D onTrack;
+      HepPoint3D pOnTrack;
 
       // Calculate forward/backward position of current wire
       const TVector3 tfw3v = cdcg.wireForwardPosition(layerId, wires[i]);
@@ -257,7 +258,7 @@ namespace Belle2 {
 
         //  HepPoint3D onTrack = tmp.x(0.);
         onTrack = tmp.x(0.);
-        Hep3Vector pOnTrack = tmp.momentum(0.);
+        pOnTrack = tmp.momentum(0.);
 
         for_Rotat(B_kG);
         const G4double xwb(bck.x()), ywb(bck.y()), zwb(bck.z());
@@ -355,7 +356,39 @@ namespace Belle2 {
       G4ThreeVector posTrack(onTrack.x(), onTrack.y(), onTrack.z());
 
       lr = 1;
-      if ((posW.cross(posTrack)).z() < 0.) lr = 0;
+      //      if ((posW.cross(posTrack)).z() < 0.) lr = 0;
+      double wCrossT = (posW.cross(posTrack)).z();
+      if (wCrossT < 0.) {
+        lr = 0;
+      } else if (wCrossT > 0.) {
+        lr = 1;
+      } else {
+        if ((posTrack - posW).perp() != 0.) {
+          G4ThreeVector mom(pOnTrack.x(), pOnTrack.y(), pOnTrack.z());
+          double wCrossP = (posW.cross(mom)).z();
+          if (wCrossP > 0.) {
+            if (posTrack.perp() > posW.perp()) {
+              lr = 0;
+            } else {
+              lr = 1;
+            }
+          } else if (wCrossP < 0.) {
+            if (posTrack.perp() < posW.perp()) {
+              lr = 0;
+            } else {
+              lr = 1;
+            }
+          } else {
+            lr = 1;
+          }
+        } else {
+          lr = 1;
+        }
+      }
+      //      if(lr != lrp) {
+      //        std::cout <<"lr,lrp=" << lr <<" " << lrp << std::endl;
+      //        exit(1);
+      //      }
 
       if (nWires == 1) {
 

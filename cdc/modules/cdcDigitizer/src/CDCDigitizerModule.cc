@@ -317,8 +317,11 @@ float CDCDigitizerModule::getdDdt(const float driftL)
   if (!m_useSimpleDigitization) {
     const unsigned short layer = m_wireID.getICLayer();
     const unsigned short leftRight = m_aCDCSimHit->getPosFlag();
-    double t = m_cdcp->getDriftTime(driftL, layer, leftRight);
-    dDdt = m_cdcp->getDriftV(t, layer, leftRight);
+    double alpha = m_cdcp->getAlpha(m_aCDCSimHit->getPosWire(),
+                                    m_aCDCSimHit->getMomentum());
+    double theta = m_cdcp->getTheta(m_aCDCSimHit->getMomentum());
+    double t = m_cdcp->getDriftTime(driftL, layer, leftRight, alpha, theta);
+    dDdt = m_cdcp->getDriftV(t, layer, leftRight, alpha, theta);
 
 #if defined(CDC_DEBUG)
     cout << " " << endl;
@@ -328,7 +331,7 @@ float CDCDigitizerModule::getdDdt(const float driftL)
       int lr = 0;
       for (int i = 0; i < 100; ++i) {
         t = 5 * i;
-        double d = m_cdcp->getDriftLength(t, layer, lr);
+        double d = m_cdcp->getDriftLength(t, layer, lr, alpha, theta);
         cout << t << " " << d << endl;
       }
 
@@ -337,7 +340,7 @@ float CDCDigitizerModule::getdDdt(const float driftL)
       lr = 1;
       for (int i = 0; i < 100; ++i) {
         t = 5 * i;
-        double d = m_cdcp->getDriftLength(t, layer, lr);
+        double d = m_cdcp->getDriftLength(t, layer, lr, alpha, theta);
         cout << t << " " << d << endl;
       }
       //      exit(-1);
@@ -371,7 +374,11 @@ float CDCDigitizerModule::getDriftTime(const float driftLength, const bool addTo
   } else {
     const unsigned short layer = m_wireID.getICLayer();
     const unsigned short leftRight = m_aCDCSimHit->getPosFlag();
-    driftT = m_cdcp->getDriftTime(driftLength, layer, leftRight);
+    double alpha = m_cdcp->getAlpha(m_aCDCSimHit->getPosWire(),
+                                    m_aCDCSimHit->getMomentum());
+    double theta = m_cdcp->getTheta(m_aCDCSimHit->getMomentum());
+    driftT = m_cdcp->getDriftTime(driftLength, layer, leftRight, alpha, theta);
+    //    std::cout <<"alpha,theta,driftT= " << alpha <<" "<< theta <<" "<< driftT << std::endl;
   }
 
   if (addTof) {

@@ -450,31 +450,34 @@ namespace Belle2 {
        * @param[in] dt Drift time.
        * @param[in] layer Layer ID.
        * @param[in] lr Left/Right
-       * @param[in] alpha incident angle w.r.t. the cell.
+       * @param[in] alpha incident angle (in rphi plane) w.r.t. the cell.
+       * @param[in] theta incident angle (polar angle).
        *
        */
 
-      double getDriftV(double dt, unsigned short layer, unsigned short lr, double alpha = 0.) const;
+      double getDriftV(double dt, unsigned short layer, unsigned short lr, double alpha = 0., double theta = 0.5 * M_PI) const;
 
       /**
        * Return the drift dength to the sense wire.
        * @param[in] dt Drift time.
        * @param[in] layer Layer ID.
        * @param[in] lr Left/Right
-       * @param[in] alpha incident angle w.r.t. the cell.
+       * @param[in] alpha incident angle (in rphi plane) w.r.t. the cell.
+       * @param[in] theta incident angle (polar angle).
        */
 
-      double getDriftLength(double dt, unsigned short layer, unsigned short lr, double alpha = 0.) const;
+      double getDriftLength(double dt, unsigned short layer, unsigned short lr, double alpha = 0., double theta = 0.5 * M_PI) const;
 
       /**
        * Return the drift time to the sense wire.
        * @param dist Drift length.
        * @param layer Layer ID.
        * @param lr Left/Right
-       * @param alpha incident angle w.r.t. the cell.
+       * @param alpha incident angle (in rphi plane) w.r.t. the cell.
+       * @param theta incident angle (polar angle).
        */
 
-      double getDriftTime(double dist, unsigned short layer, unsigned short lr, double alpha = 0.) const;
+      double getDriftTime(double dist, unsigned short layer, unsigned short lr, double alpha, double theta) const;
 
 
       /**
@@ -484,6 +487,30 @@ namespace Belle2 {
        */
 
       double getSigma(double dist, unsigned short layer) const;
+
+      /**
+       * Returns old left/right.
+       * @param posOnWire  Position on the wire  at the closest point.
+       * @param posOnTrack Position on the track at the closest point.
+       * @param momentum   Track 3-momentum.
+       */
+
+      unsigned short getOldLeftRight(const TVector3& posOnWire, const TVector3& posOnTrack, const TVector3& momentum) const;
+
+      /**
+       * Returns track incident angle in rphi plane (alpha in rad.).
+       * @param posOnWire Position on the wire  at the closest point.
+       * @param momentum  Track momentum at the closest point.
+       */
+
+      double getAlpha(const TVector3& posOnWire, const TVector3& momentum) const;
+
+      /**
+       * Returns track incident angle (theta in rad.).
+       * @param momentum Track momentum at the closest point.
+       */
+
+      double getTheta(const TVector3& momentum) const;
 
 
       /**
@@ -546,7 +573,7 @@ namespace Belle2 {
 
       double m_WirSagCoef[MAX_N_SLAYERS][MAX_N_SCELLS]; /*!< Wire sag coeffients for each layer and cell. */
 
-      double m_XT[MAX_N_SLAYERS][2][18][9];  /*! XT-relation coefficients for each layer, Left and Right etc. */
+      double m_XT[MAX_N_SLAYERS][2][19][7][9];  /*! XT-relation coefficients for each layer, Left and Right etc. */
       double m_Sigma[MAX_N_SLAYERS][7];      /*! position resulution for each layer */
       double m_PropSpeedInv[MAX_N_SLAYERS];  /*! Inverse of propagation speed of the sense wire. */
 
@@ -555,7 +582,7 @@ namespace Belle2 {
       double m_nominalDriftV;      /*! Nominal drift velocity (4.0x10^-3 cm/nsec). */
       double m_nominalDriftVInv;   /*! Inverse of the nominal drift velocity. */
       double m_nominalPropSpeed;   /*! Nominal propagation speed of the sense wire (27.25 cm/nsec). */
-      double m_nominalSpaceResol;  /*! Nominal spacial resolution (0.01301 cm). */
+      double m_nominalSpaceResol;  /*! Nominal spacial resolution (0.0130 cm). */
       double m_maxSpaceResol;      /*! 10 times Nominal spacial resolution. */
 
       static CDCGeometryPar* m_B4CDCGeometryParDB; /*!< Pointer that saves the instance of this class. */

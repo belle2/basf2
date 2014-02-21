@@ -39,6 +39,15 @@ namespace Belle2 {
                            bool leftRight = false,
                            float z = 0, float = static_cast<float>(TMath::Pi() / 2.));
 
+      /** */
+      float getDriftLength(unsigned short tdcCount,
+                           const TVector3& posOnWire,
+                           const TVector3& posOnTrack,
+                           const TVector3& momentum,
+                           const WireID& wireID        = WireID(),
+                           float timeOfFlightEstimator = 0);
+
+
       /** Uncertainty corresponding to drift length from getDriftLength of this class.
        *
        *  @return Uncertainty on the drift length.

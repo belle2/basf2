@@ -9,17 +9,19 @@
  **************************************************************************/
 #pragma once
 
+//These two classes need to be moved to the MDST package as well on monday.
+#include <tracking/dataobjects/HitPatternCDC.h>
+#include <tracking/dataobjects/HitPatternVXD.h>
+
 #include <framework/gearbox/Const.h>
 #include <framework/datastore/RelationsObject.h>
 #include <framework/logging/Logger.h>
 
-#include <tracking/dataobjects/HitPatternCDC.h>
-#include <tracking/dataobjects/HitPatternVXD.h>
 #include <TVector3.h>
 #include <TMatrixF.h>
 #include <TMatrixDSym.h>
-#include <cstdlib>
 
+#include <cstdlib>
 #include <vector>
 
 namespace Belle2 {
@@ -31,66 +33,97 @@ namespace Belle2 {
     /** Constructor initializing everything to zero. */
     TrackFitResult();
 
-    /** Constructor initializing class with fit result. */
+    /** Constructor initializing class with fit result.
+     *
+     *  This is the only way to set the values of the TrackFitResult.
+     *  We don't have any setters, as we assume, that once we create the MDST object, we don't want
+     *  to change the values of the tracks any more.
+     *  Scaling can be applied during readout, by setting the value for the magnetic field.
+     *  @param position      Position of the track at the perigee.
+     *  @param momentum      Momentum of the track at the perigee.
+     *  @param covariance    Covariance matrix for position and momentum of the track at the perigee.
+     *  @param charge        Charge of the particle.
+     *  @param particelType  Particle Type used for mass hypothesis of the fit.
+     *  @param pValue        p-value of the fit.
+     *  @param bField        Magnetic field to be used for the calculation of the curvature;
+                             It is assumed, that the B-field is parallel to the z-Axis.
+     */
     TrackFitResult(const TVector3& position, const TVector3& momentum, const TMatrixDSym& covariance,
-                   const short int charge, const Const::ParticleType& pType, const float pValue,
+                   const short int charge, const Const::ParticleType& particleType, const float pValue,
                    const float bField);
 
-    /** Constructor initializing class with perigee parameters. Just for test cases*/
+    /** Constructor initializing class with perigee parameters.
+     *
+     *  This constructor is needed for testing the class.
+     *  @param tau           Helix parameters of the track; @sa m_tau .
+     *  @param cov5          Covariance matrix of the helix paramters of the track; @sa m_cov5
+     *  @param particleType  Particle Type used for the mass hypothesis of the fit.
+     *  @param pValue        p-value of the fit.
+     */
     TrackFitResult(const std::vector<float>& tau, const std::vector<float>& cov5,
-                   const Const::ParticleType& pType, const float pValue);
+                   const Const::ParticleType& particleType, const float pValue);
 
-    /** Getter for vector of position at closest approach of track in r/phi projection.*/
+    /** Getter for vector of position at closest approach of track in r/phi projection. */
     TVector3 getPosition() const;
 
     /** Setter for position vector.
-     * TODO delete, out of Business
+     * @TODO delete, out of Business
      * */
-    void setPosition(const TVector3& position) {
-      B2WARNING("Deprecated, member variables are set with constructor call.");
+    void setPosition(const TVector3& /*position*/) {
+      B2ERROR("Deprecated, member variables are set with constructor call.");
     }
 
     /** Getter for vector of momentum at closest approach of track in r/phi projection.
-     * This has a default value so that the basf2 compiles
-     * */
+     *
+     *  As we calculate recalculate the momentum from a geometric helix, we need an estimate
+     *  of the magnetic field along the z-axis to give back the momentum.
+     *  @TODO This has a default value so that the basf2 compiles; default should be removed.
+     *  @param bField  Magnetic field at the perigee.
+     */
     TVector3 getMomentum(const float bField = 1.5) const;
 
     /** Setter for momentum vector.
-      * TODO delete, out of Business
+      * @TODO delete, out of Business
       * */
-    void setMomentum(const TVector3& momentum) {
-      B2WARNING("Deprecated, member variables are set with constructor call.");
+    void setMomentum(const TVector3& /*momentum*/) {
+      B2ERROR("Deprecated, member variables are set with constructor call.");
     }
 
     /** Position and Momentum Covariance Matrix.
      *
-     *  This is a copy from the genfit::Track getPosMomCov matrix (implicating the order of the matrix),
-     *  however, it uses just floating point precision rather than double.
+     *  This is a copy from the genfit::Track getPosMomCov matrix (implicating the order of the matrix).
+     *  However, it uses just floating point precision rather than double.
      *  As well currently no TMatrixSym is used (which might change, but doesn't matter much due to the misconstruction of TMatrixSym).
      *  @TODO Study if double precision matrix is needed and if TMatrixSym helps somewhere.
      */
     TMatrixF getCovariance6(const float bField = 1.5) const;
 
     /** Setter for Covariance matrix of position and momentum.
-     * TODO delete, out of Business
+     * @TODO delete, out of Business
      * */
-    void setCovariance6(const TMatrixF& covariance) {
-      B2WARNING("Deprecated, member variables are set with constructor call.");
+    void setCovariance6(const TMatrixF& /*covariance*/) {
+      B2ERROR("Deprecated, member variables are set with constructor call.");
     }
 
-    /** Get back a ParticleCode of the hypothesis of the track fit.*/
+    /** Getter for ParticleCode of the mass hypothesis of the track fit. */
     Const::ParticleType getParticleType() const {
       return Const::ParticleType(m_pdg);
     }
 
     /** Setter for the PDGCode.
-     * TODO delete, out of Business
+     * @TODO delete, out of Business
      * */
-    void setParticleType(const Const::ParticleType& pType) {
-      B2WARNING("Deprecated, member variables are set with constructor call.");
+    void setParticleType(const Const::ParticleType& /*pType*/) {
+      B2ERROR("Deprecated, member variables are set with constructor call.");
     }
 
-    /** Return track charge (1 or -1). */
+    /** Return track charge (1 or -1).
+     *
+     *  @TODO This needs to be reworked.
+     *  It should probably be named getChargeSign, as we
+     *  return only the sign, but might have alpha particles in theory in this class.
+       *  As well for very small values, we might be unsure and return zero
+     */
     short getCharge() const {
       // getOmega needs an argument, so one is given
       return getOmega(1.5) >= 0 ? 1 : -1;
@@ -99,8 +132,8 @@ namespace Belle2 {
     /** Setter for Charge
      * TODO delete, out of Business
      * */
-    void setCharge(int charge) {
-      B2WARNING("Deprecated, member variables are set with constructor call.");
+    void setCharge(int /*charge*/) {
+      B2ERROR("Deprecated, member variables are set with constructor call.");
     }
 
     /** Getter for Chi2 Probability of the track fit. */
@@ -111,8 +144,8 @@ namespace Belle2 {
     /** Setter for Chi2 Probability of the track fit.
      * TODO delete, out of Business
      * */
-    void setPValue(float pValue) {
-      B2WARNING("Deprecated, member variables are set with constructor call.");
+    void setPValue(float /*pValue*/) {
+      B2ERROR("Deprecated, member variables are set with constructor call.");
     }
 
     //---------------------------------------------------------------------------------------------------------------------------
@@ -134,7 +167,7 @@ namespace Belle2 {
      * Getter for omega. This is the curvature of the track. It's sign is defined by the charge of the particle.
      * @return
      */
-    float getOmega(const float bField) const { return m_tau.at(2); }
+    float getOmega(const float /*bField*/) const { return m_tau.at(2); }
 
     /**
      * Getter for z0. This is the z coordinate of the POCA.
@@ -152,14 +185,14 @@ namespace Belle2 {
      * Getter for all perigee parameters
      * @return vector with 5 elements
      */
-    std::vector<float> getTau(const float bField) const { return m_tau; }
+    std::vector<float> getTau(const float /*bField*/) const { return m_tau; }
 
     /**
      * Getter for all covariance matrix elements of perigee parameters
      * TODO: Implement bField
      * @return vector with 15 elements
      */
-    std::vector<float> getCov(const float bField) const { return m_cov5; }
+    std::vector<float> getCov(const float /*bField*/) const { return m_cov5; }
 
     /**
      * Getter for covariance matrix of perigee parameters in matrix form.

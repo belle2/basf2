@@ -19,16 +19,16 @@ TrackFitResult::TrackFitResult() : m_pdg(0), m_pValue(0)
 }
 
 TrackFitResult::TrackFitResult(const TVector3& position, const TVector3& momentum, const TMatrixDSym& covariance,
-                               const short int charge, const Const::ParticleType& pType, const float pValue,
+                               const short int charge, const Const::ParticleType& particleType, const float pValue,
                                const float bField) :
-  m_pdg(std::abs(pType.getPDGCode())), m_pValue(pValue)
+  m_pdg(std::abs(particleType.getPDGCode())), m_pValue(pValue)
 {
   cartesianToPerigee(position, momentum, covariance, charge, bField);
 }
 
 TrackFitResult::TrackFitResult(const std::vector<float>& tau, const std::vector<float>& cov5,
-                               const Const::ParticleType& pType, const float pValue) :
-  m_pdg(std::abs(pType.getPDGCode())), m_pValue(pValue),
+                               const Const::ParticleType& particleType, const float pValue) :
+  m_pdg(std::abs(particleType.getPDGCode())), m_pValue(pValue),
   m_tau(tau), m_cov5(cov5)
 {
 

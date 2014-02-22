@@ -154,7 +154,7 @@ Const::DetectorSet operator + (Const::EDetector firstDet, Const::EDetector secon
 
 unsigned short Const::DetectorSet::getBit(Const::EDetector det) const
 {
-  return (1 << det);
+  return (1 << (det - 1));
 }
 
 Const::EDetector Const::DetectorSet::getDetector(unsigned short bit) const

@@ -5,7 +5,14 @@ import sys
 import os
 from optparse import OptionParser
 
-parser = OptionParser()
+# Setup the options parser
+usage = \
+    """Usage:
+basf2 %prog -- [options] input_tracked_events_filename
+%prog [options] input_tracked_events_filename
+"""
+
+parser = OptionParser(usage=usage)
 
 (options, args) = parser.parse_args()
 

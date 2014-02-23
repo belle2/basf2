@@ -24,7 +24,7 @@ namespace Belle2 {
     /// Interface class to the Monte Carlo information for individual hits
     /** This class provides a stable interface for the underlying implementation for look ups
      *  into the Monte Carlo informations for the first stage of the algorithm.*/
-    class CDCMCHitLookUp : public UsedTObject {
+    class CDCMCHitLookUp : public TObject {
 
     public:
       /// Empty constructor
@@ -46,6 +46,13 @@ namespace Belle2 {
 
       /// Getter for the MCParticle which is related to the CDCHit contained in the given wire hit
       const Belle2::MCParticle* getMCParticle(const CDCHit* ptrHit) const;
+
+
+      /// Getter for the two dimensional reference position of the wire the given hit is located on - mainly for the python event display
+      const TVector2 getRefPos2D(const CDCHit* ptrHit) const;
+
+      /// Getter for the reference drift length in the two dimensional projection
+      float getRefDriftLength(const CDCHit* ptrHit) const;
 
     public:
       /// Indicates if the hit was reassigned to a different mc particle because it was caused by a secondary.
@@ -73,7 +80,7 @@ namespace Belle2 {
       RightLeftInfo getRLInfo(const CDCHit* ptrHit) const;
 
       /// ROOT Macro to make CDCMCHitLookUp a ROOT class.
-      ClassDefInCDCLocalTracking(CDCMCHitLookUp, 1);
+      ClassDef(CDCMCHitLookUp, 1);
 
     }; //class
   } // end namespace CDCLocalTracking

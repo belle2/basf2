@@ -17,7 +17,7 @@ using namespace std;
 using namespace Belle2;
 using namespace CDCLocalTracking;
 
-ClassImpInCDCLocalTracking(CDCMCHitLookUp)
+ClassImp(CDCMCHitLookUp)
 
 
 
@@ -58,6 +58,37 @@ const Belle2::MCParticle* CDCMCHitLookUp::getMCParticle(const CDCHit* ptrHit) co
 {
   return CDCMCManager::getMCMap().getMCParticle(ptrHit);
 }
+
+
+const TVector2 CDCMCHitLookUp::getRefPos2D(const CDCHit* ptrHit) const
+{
+  if (not ptrHit) return TVector2();
+  const CDCHit& hit = *ptrHit;
+
+  const CDCWire* ptrWire = CDCWire::getInstance(hit);
+
+  if (not ptrWire) {
+    B2WARNING("Encountered CDCHit with wire ids that do not correspond to a valid wire in the CDC)");
+    return TVector2();
+  }
+
+  const CDCWire& wire = *ptrWire;
+  Vector2D refPos2D =  wire.getRefPos2D();
+  return TVector2(refPos2D);
+
+}
+
+
+float CDCMCHitLookUp::getRefDriftLength(const CDCHit* ptrHit) const
+{
+
+  if (not ptrHit) return NAN;
+  CDCWireHit wireHit(ptrHit, 0);
+  return wireHit.getRefDriftLength();
+
+}
+
+
 
 
 

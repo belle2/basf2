@@ -93,7 +93,7 @@ namespace Belle2 {
       ~Vector3D() {;}
 
       /// Casting the back to TVector3 seamlessly
-      inline operator TVector3() { return TVector3(x(), y(), z()); }
+      inline operator const TVector3() { return TVector3(x(), y(), z()); }
 
       /// Equality comparison with all three coordinates
       inline bool operator==(const Vector3D& rhs) const

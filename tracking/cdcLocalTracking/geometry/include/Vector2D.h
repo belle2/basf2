@@ -100,7 +100,7 @@ namespace Belle2 {
       ~Vector2D() {;}
 
       /// Casting the back to TVector2 seamlessly
-      inline operator TVector2() { return TVector2(x(), y()); }
+      inline operator const TVector2() { return TVector2(x(), y()); }
 
       /// Equality comparison with both coordinates
       inline bool operator==(const Vector2D& rhs) const
@@ -174,7 +174,8 @@ namespace Belle2 {
       inline Vector2D scaled(const FloatType& factor) const { return Vector2D(x() * factor, y() * factor); }
 
       /// Same as scaled()
-      inline Vector2D operator*(const FloatType& factor) const { return scaled(factor); }
+      inline friend Vector2D operator*(const Vector2D& vec2D, const FloatType& factor)
+      { return vec2D.scaled(factor); }
 
       /// Divides all coordinates by a common denominator in place
       inline Vector2D& divide(const FloatType& denominator) {  m_x /= denominator; m_y /= denominator; return *this; }

@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef OPTIMIZINGFACETNEIGHBORCHOOSER_H_
-#define OPTIMIZINGFACETNEIGHBORCHOOSER_H_
+#ifndef EVALUATEFACETNEIGHBORCHOOSER_H_
+#define EVALUATEFACETNEIGHBORCHOOSER_H_
 
 #include <iostream>
 #include <fstream>
@@ -25,12 +25,20 @@ namespace Belle2 {
   namespace CDCLocalTracking {
 
     ///Class filtering the neighborhood of facets based on simple criterions.
-    class OptimizingFacetNeighborChooser : public BaseFacetNeighborChooser {
+    template<class RealFacetNeighborChooser>
+    class EvaluateFacetNeighborChooser : public BaseFacetNeighborChooser {
 
     public:
-      /** Constructor. */
-      OptimizingFacetNeighborChooser() {
+      /// Empty constructor
+      EvaluateFacetNeighborChooser() {
+      }
 
+      /// Empty deconstructor
+      ~EvaluateFacetNeighborChooser() {
+      }
+
+      /// Forwards the modules initialize to the filter
+      void initialize() {
         m_output_csv.open("facet_neighbor_chooser.csv");
 
         //Headline
@@ -40,8 +48,11 @@ namespace Belle2 {
                      << std::endl;
       }
 
-      /** Destructor.*/
-      ~OptimizingFacetNeighborChooser() {;}
+
+      /// Forwards the modules initialize to the filter
+      void terminate() {
+        m_output_csv.close();
+      }
 
       inline NeighborWeight isGoodNeighbor(
         const CDCRecoFacet& facet,
@@ -71,8 +82,8 @@ namespace Belle2 {
                      << mcDecision
                      << std::endl;
 
-        NeighborWeight simpleWeight = m_simpleNeighborChooser.isGoodNeighbor(facet, neighborFacet);
-        return simpleWeight;
+        NeighborWeight realWeight = m_realNeighborChooser.isGoodNeighbor(facet, neighborFacet);
+        return realWeight;
 
       }
 
@@ -82,7 +93,7 @@ namespace Belle2 {
       mutable ofstream m_output_csv;  ///< Output stream for the csv file
 
       MCFacetNeighborChooser m_mcNeighborChooser;
-      SimpleFacetNeighborChooser m_simpleNeighborChooser;
+      RealFacetNeighborChooser m_realNeighborChooser;
 
 
     }; // end class
@@ -91,4 +102,4 @@ namespace Belle2 {
   } //end namespace CDCLocalTracking
 } //end namespace Belle2
 
-#endif //OPTIMIZINGFACETNEIGHBORCHOOSER_H_
+#endif //EVALUATEFACETNEIGHBORCHOOSER_H_

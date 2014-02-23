@@ -41,8 +41,13 @@ class CDCSVGDisplayModule(Module):
                 os.makedirs(output_folder)
 
         # # List of drawing options
+        # Animate the display by uncovering the drawn objects in order of their time of flight
+        # This can be seen in most standard browsers. Note however that you should switch of
+        # the wires in this case to reduce the rendering load.
+        self.animate = False
+
         # The following options can be used independent of the track finder to view Monte Carlo information after the simulation is done
-        self.draw_wires = True  # and False
+        self._draw_wires = True  # and False
         self.draw_hits = True  # and False
 
         self.draw_superlayer_boundaries = True  # and False
@@ -95,10 +100,38 @@ class CDCSVGDisplayModule(Module):
 
     @property
     def drawoptions(self):
-        return [option for option in self.__dict__ if option.startswith('draw_'
-                )]
+        draw_options = [option for option in self.__dict__
+                        if option.startswith('draw_')]
+        _draw_options = [option[1:] for option in self.__dict__
+                         if option.startswith('_draw_')]
+
+        result = draw_options + _draw_options
+
+        # animate as a special case
+        result.append('animate')
+        return result
+
+    @property
+    def draw_wires(self):
+        return self._draw_wires and not self.animate
+
+    @draw_wires.setter
+    def draw_wires(self, draw_wires):
+        self._draw_wires
 
     def initialize(self):
+        # Check if the CDCLocalTracking namespace is available for object look up should always be true now
+        if not hasattr(Belle2, 'CDCLocalTracking'):
+            print 'CDCLocalTracking namespace not available from Python'
+            print 'Did you compile with -DCDCLOCALTRACKING_USE_ROOT?'
+            r = raw_input('')
+            return
+        else:
+            print 'CDCLocalTracking namespace available from Python'
+            print 'dir(Belle2)', dir(Belle2)
+            print 'dir(Belle2.CDCLocalTracking)', dir(Belle2.CDCLocalTracking)
+            print 'dir(genfit)', dir(genfit)
+
         pass
 
     def beginRun(self):
@@ -125,18 +158,7 @@ class CDCSVGDisplayModule(Module):
         #       print 'Skip event', eventMetaData.obj().getEvent()
         #      return
 
-        if not hasattr(Belle2, 'CDCLocalTracking'):
-            print 'CDCLocalTracking namespace not available from Python'
-            print 'Did you compile with -DCDCLOCALTRACKING_USE_ROOT?'
-            r = raw_input('')
-            return
-        else:
-            print 'CDCLocalTracking namespace available from Python'
-            print 'dir(Belle2)', dir(Belle2)
-            print 'dir(Belle2.CDCLocalTracking)', dir(Belle2.CDCLocalTracking)
-            print 'dir(genfit)', dir(genfit)
-
-        plotter = svgdrawing.CDCSVGPlotter()
+        plotter = svgdrawing.CDCSVGPlotter(animate=self.animate)
         self.plotter = plotter
 
         # Construct additional information from basic Monte Carlo data, if it is available from the DataStore
@@ -157,7 +179,6 @@ class CDCSVGDisplayModule(Module):
                     plotter.append(wire, stroke='gray')
 
         # ######### CDCHits ##########
-        # Draw wirehits or
         # Draw the raw CDCHits
         if self.draw_hits:
             styleDict = {'stroke': attributemaps.ZeroDriftLengthColorMap(),

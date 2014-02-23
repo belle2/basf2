@@ -23,7 +23,9 @@ import primitives
 
 class CDCDataobjectsConverter:
 
-    def __init__(self, elementFactory):
+    def __init__(self, elementFactory, animate=False):
+        self.animate = animate
+
         self.svgElementFactory = \
             primitives.SVGPrimitivesFactory(elementFactory)
 
@@ -66,6 +68,9 @@ class CDCDataobjectsConverter:
                 if 'CDCGenericHitCollection' in name:
                     self.toSVGFunctions_by_type[Belle2.__dict__[name]] = \
                         self.CDCGenericHitCollectionToSVG
+
+    def nanoSecondsToAnimationTime(self, nanoSeconds):
+        return str(nanoSeconds) + 's'
 
     def styleFillUpdate(self, attributes):
         if 'fill' not in attributes or not attributes['fill']:
@@ -110,7 +115,6 @@ class CDCDataobjectsConverter:
         return groupElement
 
     def TupleToSVG(self, tup, **kwd):
-
         if len(tup) != 2:
             return IterableToSVG(tup, **kwd)
         else:
@@ -150,8 +154,115 @@ class CDCDataobjectsConverter:
             print 'PyStoreArray does not reference a legal StoreArray'
             return self.svgElementFactory.createGroup()
 
-    def Vector2DToSVG(self, vec, **kwd):
+    def CDCSimHitToSVG(self, cdcsimhit, **kwd):
+        childElements = []
 
+        styleDict = {'stroke': 'yellow', 'stroke-width': '0.02'}
+        styleDict.update(kwd)
+
+    # mark trackPoint where hit occured
+        simhitVector = cdcsimhit.getPosTrack()
+        simhitPoint = (simhitVector.X(), simhitVector.Y())
+
+        supportPointRadius = 0.015
+        circleElement = self.svgElementFactory.createCircle(simhitPoint,
+                supportPointRadius, **styleDict)
+        childElements.append(circleElement)
+
+        simhitMomentumVec = cdcsimhit.getMomentum()
+        scale = 1.5
+        simhitMom = (simhitVector.X() + simhitMomentumVec.X() * scale,
+                     simhitVector.Y() + simhitMomentumVec.Y() * scale)
+
+        fromPointMom = simhitPoint
+        toPointMom = simhitMom
+
+        momStyleDict = dict(styleDict)
+        momStyleDict['marker-end'] = 'url(#markerEndArrow)'
+        momLineElement = self.svgElementFactory.createLine(fromPointMom,
+                toPointMom, **momStyleDict)
+        childElements.append(momLineElement)
+
+        fromVector = cdcsimhit.getPosIn()
+        fromPoint = (fromVector.X(), fromVector.Y())
+
+        toVector = cdcsimhit.getPosOut()
+        toPoint = (toVector.X(), toVector.Y())
+
+        flightLineElement = self.svgElementFactory.createLine(fromPoint,
+                toPoint, **styleDict)
+        # childElements.append(flightLineElement)
+
+        if self.animate:
+            tof = cdcsimhit.getFlightTime()
+
+            # stretch time by a common factor
+            end = self.nanoSecondsToAnimationTime(tof)
+
+            # make elements hidden in the beginning an uncover at their time of flight
+            setElement = self.svgElementFactory.createSet('visibility',
+                    'hidden', begin='0s', end=end)
+
+            childElements.append(setElement)
+
+        groupElement = self.svgElementFactory.createGroup(*childElements)
+
+        return groupElement
+
+    def CDCHitToSVG(self, cdchit, **kwd):
+        childElements = []
+
+        mcHitLookUp = Belle2.CDCLocalTracking.CDCMCHitLookUp.getInstance()
+        tCenterPostion = mcHitLookUp.getRefPos2D(cdchit)
+
+        center = (tCenterPostion.X(), tCenterPostion.Y())
+        driftRadius = mcHitLookUp.getRefDriftLength(cdchit)
+
+        # Draw the wire
+        wireRadius = 0.1
+
+        wireStyleDict = {'stroke': 'black', 'stroke-width': repr(wireRadius)}
+        wireStyleDict.update(kwd)
+        self.styleFillUpdate(wireStyleDict)
+
+        wireCircleElement = self.svgElementFactory.createCircle(center,
+                wireRadius, **wireStyleDict)
+        childElements.append(wireCircleElement)
+
+        driftCircleStyleDict = {'stroke': 'black', 'stroke-width': '0.02',
+                                'fill': 'none'}
+
+        driftCircleStyleDict.update(kwd)
+
+        driftCircleElement = self.svgElementFactory.createCircle(center,
+                driftRadius, **driftCircleStyleDict)
+        childElements.append(driftCircleElement)
+
+        if self.animate:
+            simhit = cdchit.getRelated('CDCSimHits')
+            tof = simhit.getFlightTime()
+
+            # stretch time by a common factor
+            end = self.nanoSecondsToAnimationTime(tof)
+
+            # make elements hidden in the beginning an uncover at their time of flight
+            setElement = self.svgElementFactory.createSet('visibility',
+                    'hidden', begin='0s', end=end)
+
+            childElements.append(setElement)
+
+        groupElement = self.svgElementFactory.createGroup(*childElements)
+
+        return groupElement
+
+    def GFTrackCandToSVG(self, gftrackcand, **kwd):
+        storeHits = Belle2.PyStoreArray('CDCHits')
+        hitIDs = gftrackcand.getHitIDs(3)
+        iterHitIDs = (hitIDs[iHit] for iHit in xrange(hitIDs.size()))
+        cdcHits = [storeHits[hitID] for hitID in iterHitIDs]
+        return self.toSVG(cdcHits, **kwd)
+
+    def Vector2DToSVG(self, vec, **kwd):
         defaultStyleDict = {'stroke': 'black', 'stroke-width': '0.02'}
         defaultStyleDict.update(kwd)
         self.styleFillUpdate(defaultStyleDict)
@@ -164,7 +275,6 @@ class CDCDataobjectsConverter:
         return circleElement
 
     def Vector3DToSVG(self, vec, **kwd):
-
         defaultStyleDict = {'stroke': 'black', 'stroke-width': '0.02'}
         defaultStyleDict.update(kwd)
         self.styleFillUpdate(defaultStyleDict)
@@ -194,7 +304,6 @@ class CDCDataobjectsConverter:
         return circleElement
 
     def CDCWireSuperLayerToSVG(self, cdcWireSuperLayer, **kwd):
-
         styleDict = {'stroke': 'black', 'stroke-width': '0.2', 'fill': 'none'}
         styleDict.update(kwd)
         self.styleFillUpdate(styleDict)
@@ -214,7 +323,6 @@ class CDCDataobjectsConverter:
         return groupElement
 
     def CDCWireHitToSVG(self, wirehit, **kwd):
-
         wire = wirehit.getWire()
         wireSVGElement = self.toSVG(wire, **kwd)
 
@@ -336,7 +444,6 @@ class CDCDataobjectsConverter:
         return groupElement
 
     def CDCSegmentTripleToSVG(self, segmentTriple, **kwd):
-
         childElements = []
         defaultStyleDict = {'stroke': 'black', 'stroke-width': '0.02'}
         defaultStyleDict.update(kwd)
@@ -418,61 +525,6 @@ class CDCDataobjectsConverter:
         iterItems = (genericHitCollection.at(iItem) for iItem in
             xrange(nItems))
         return self.IterableToSVG(iterItems, **kwd)
-
-    def CDCSimHitToSVG(self, cdcsimhit, **kwd):
-
-        childElements = []
-
-        styleDict = {'stroke': 'yellow', 'stroke-width': '0.02'}
-        styleDict.update(kwd)
-
-    # mark trackPoint where hit occured
-        simhitVector = cdcsimhit.getPosTrack()
-        simhitPoint = (simhitVector.X(), simhitVector.Y())
-
-        supportPointRadius = 0.015
-        circleElement = self.svgElementFactory.createCircle(simhitPoint,
-                supportPointRadius, **styleDict)
-        childElements.append(circleElement)
-
-        simhitMomentumVec = cdcsimhit.getMomentum()
-        scale = 1.5
-        simhitMom = (simhitVector.X() + simhitMomentumVec.X() * scale,
-                     simhitVector.Y() + simhitMomentumVec.Y() * scale)
-
-        fromPointMom = simhitPoint
-        toPointMom = simhitMom
-
-        momStyleDict = dict(styleDict)
-        momStyleDict['marker-end'] = 'url(#markerEndArrow)'
-        momLineElement = self.svgElementFactory.createLine(fromPointMom,
-                toPointMom, **momStyleDict)
-        childElements.append(momLineElement)
-
-        fromVector = cdcsimhit.getPosIn()
-        fromPoint = (fromVector.X(), fromVector.Y())
-
-        toVector = cdcsimhit.getPosOut()
-        toPoint = (toVector.X(), toVector.Y())
-
-        flightLineElement = self.svgElementFactory.createLine(fromPoint,
-                toPoint, **styleDict)
-        # childElements.append(flightLineElement)
-
-        groupElement = self.svgElementFactory.createGroup(*childElements)
-
-        return groupElement
-
-    def CDCHitToSVG(self, cdchit, **kwd):
-        wirehit = Belle2.CDCLocalTracking.CDCWireHit(cdchit, 0)
-        return self.CDCWireHitToSVG(wirehit, **kwd)
-
-    def GFTrackCandToSVG(self, gftrackcand, **kwd):
-        storeHits = Belle2.PyStoreArray('CDCHits')
-        hitIDs = gftrackcand.getHitIDs(3)
-        iterHitIDs = (hitIDs[iHit] for iHit in xrange(hitIDs.size()))
-        cdcHits = [storeHits[hitID] for hitID in iterHitIDs]
-        return self.toSVG(cdcHits, **kwd)
 
     def CDCTrajectory2DToSVG(self, fit, **kwd):
         svgElements = []

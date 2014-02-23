@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+
 import xml.dom.minidom
 
 
@@ -48,7 +49,7 @@ class Bound:
     """Class representing the rectangular boundary of an svg
             element in its local coordinates"""
 
-    ignoreList = ['defs']
+    ignoreList = ['defs', 'set']
 
     @classmethod
     def fromViewBox(cls, viewbox=''):
@@ -195,8 +196,8 @@ class Bound:
 
     @property
     def viewbox(self):
-        return repr(self.left) + ' ' + repr(self.top) \
-            + ' ' + repr(self.width) + ' ' + repr(self.height)
+        return repr(self.left) + ' ' + repr(self.top) + ' ' + repr(self.width) \
+            + ' ' + repr(self.height)
 
 
 class SVGDefsFactory:
@@ -329,6 +330,23 @@ class SVGPrimitivesFactory:
 
         return pathElement
 
+    def createSet(
+        self,
+        attr,
+        value,
+        **kwd
+        ):
+
+        setElement = self.elementFactory.createElement('set')
+
+        setElement.setAttribute('attributeName', attr)
+        setElement.setAttribute('to', value)
+
+        for (attrName, attrValue) in kwd.iteritems():
+            setElement.setAttribute(attrName, str(attrValue))
+
+        return setElement
+
     def createGroup(self, *pos, **kwd):
         return self.createGroupFromIterable(pos, **kwd)
 
@@ -343,3 +361,5 @@ class SVGPrimitivesFactory:
             groupElement.setAttribute(attrName, str(attrValue))
 
         return groupElement
+
+

@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+
 import math
 import xml.dom.minidom
 
@@ -9,12 +10,14 @@ import primitives
 
 class CDCSVGPlotter:
 
-    def __init__(self):
+    def __init__(self, animate=False):
         default_bound = primitives.Bound(top=-112, left=-112, right=112,
                 bottom=112)
         default_width = 1120
         default_height = 1120
         default_viewbox = default_bound.viewbox
+
+        self.animate = animate
 
     # Create the xml.dom.minidom document object set up with the right headers
     # The viewbox is set to a default value and is to be updated later
@@ -25,7 +28,8 @@ class CDCSVGPlotter:
     # Create helper object to convert the various dataobjects to svg
     # primitive element objects
     # The document serves as a factory for the xml.dom.minidom elements
-        self.converter = converter.CDCDataobjectsConverter(document)
+        self.converter = converter.CDCDataobjectsConverter(document,
+                animate=animate)
 
         defsFactory = primitives.SVGDefsFactory(document)
         defs = [defsFactory.createEndArrow('markerEndArrow')]
@@ -78,3 +82,5 @@ class CDCSVGPlotter:
         output = open(svgFileName, 'w')
         output.write(self.toxml())
         output.close()
+
+

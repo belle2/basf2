@@ -19,25 +19,25 @@
 
 #include <tracking/cdcLocalTracking/workers/FacetSegmentWorker.h>
 
-#include <tracking/cdcLocalTracking/creator_filters/SimpleFacetFilter.h>
+#include <tracking/cdcLocalTracking/filters/facet/SimpleFacetFilter.h>
 #include <tracking/cdcLocalTracking/neighbor_chooser/SimpleFacetNeighborChooser.h>
 
-#include <tracking/cdcLocalTracking/creator_filters/MCFacetFilter.h>
+#include <tracking/cdcLocalTracking/filters/facet/MCFacetFilter.h>
 #include <tracking/cdcLocalTracking/neighbor_chooser/MCFacetNeighborChooser.h>
 
-#include <tracking/cdcLocalTracking/creator_filters/OptimizingFacetFilter.h>
+#include <tracking/cdcLocalTracking/filters/facet/OptimizingFacetFilter.h>
 #include <tracking/cdcLocalTracking/neighbor_chooser/OptimizingFacetNeighborChooser.h>
 
 #include <tracking/cdcLocalTracking/workers/SegmentTripleTrackingWorker.h>
 
-#include <tracking/cdcLocalTracking/creator_filters/axial_axial/SimpleAxialAxialSegmentPairFilter.h>
-#include <tracking/cdcLocalTracking/creator_filters/axial_axial/MCAxialAxialSegmentPairFilter.h>
-#include <tracking/cdcLocalTracking/creator_filters/axial_axial/EvaluateAxialAxialSegmentPairFilter.h>
+#include <tracking/cdcLocalTracking/filters/axial_axial/SimpleAxialAxialSegmentPairFilter.h>
+#include <tracking/cdcLocalTracking/filters/axial_axial/MCAxialAxialSegmentPairFilter.h>
+#include <tracking/cdcLocalTracking/filters/axial_axial/EvaluateAxialAxialSegmentPairFilter.h>
 
-#include <tracking/cdcLocalTracking/creator_filters/SimpleSegmentTripleFilter.h>
+#include <tracking/cdcLocalTracking/filters/segment_triple/SimpleSegmentTripleFilter.h>
 #include <tracking/cdcLocalTracking/neighbor_chooser/SimpleSegmentTripleNeighborChooser.h>
 
-#include <tracking/cdcLocalTracking/creator_filters/MCSegmentTripleFilter.h>
+#include <tracking/cdcLocalTracking/filters/segment_triple/MCSegmentTripleFilter.h>
 #include <tracking/cdcLocalTracking/neighbor_chooser/MCSegmentTripleNeighborChooser.h>
 
 namespace Belle2 {

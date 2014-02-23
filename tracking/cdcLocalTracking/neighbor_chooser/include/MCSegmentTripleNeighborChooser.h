@@ -15,7 +15,7 @@
 #include <tracking/cdcLocalTracking/typedefs/BasicConstants.h>
 #include <tracking/cdcLocalTracking/typedefs/UsedDataHolders.h>
 
-#include <tracking/cdcLocalTracking/creator_filters/MCSegmentTripleFilter.h>
+#include <tracking/cdcLocalTracking/filters/segment_triple/MCSegmentTripleFilter.h>
 
 #include "BaseSegmentTripleNeighborChooser.h"
 

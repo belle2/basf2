@@ -11,7 +11,7 @@
 #ifndef MCSEGMENTTRIPLEFILTER_H_
 #define MCSEGMENTTRIPLEFILTER_H_
 
-#include <tracking/cdcLocalTracking/creator_filters/axial_axial/MCAxialAxialSegmentPairFilter.h>
+#include <tracking/cdcLocalTracking/filters/axial_axial/MCAxialAxialSegmentPairFilter.h>
 #include <tracking/cdcLocalTracking/eventdata/tracks/CDCSegmentTriple.h>
 
 namespace Belle2 {

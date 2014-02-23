@@ -15,7 +15,7 @@
 #include <tracking/cdcLocalTracking/typedefs/BasicConstants.h>
 #include <tracking/cdcLocalTracking/eventdata/entities/CDCRecoFacet.h>
 
-#include <tracking/cdcLocalTracking/creator_filters/MCFacetFilter.h>
+#include <tracking/cdcLocalTracking/filters/facet/MCFacetFilter.h>
 #include "BaseFacetNeighborChooser.h"
 
 namespace Belle2 {

@@ -1,4 +1,4 @@
-#include <tracking/dataobjects/HitPatternVXD.h>
+#include <mdst/dataobjects/HitPatternVXD.h>
 #include <gtest/gtest.h>
 
 

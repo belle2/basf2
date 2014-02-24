@@ -15,7 +15,7 @@
 #include <framework/datastore/RelationArray.h>
 
 //#include <GFTrack.h>
-#include <tracking/dataobjects/Track.h>
+#include <mdst/dataobjects/Track.h>
 
 #include <tracking/dataobjects/ExtHit.h>
 #include <framework/datastore/RelationIndex.h>

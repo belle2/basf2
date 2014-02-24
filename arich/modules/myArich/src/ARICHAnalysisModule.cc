@@ -17,7 +17,7 @@
 #include <framework/core/ModuleManager.h>
 
 // Hit classes
-#include <tracking/dataobjects/Track.h>
+#include <mdst/dataobjects/Track.h>
 #include <tracking/dataobjects/ExtHit.h>
 #include <arich/dataobjects/ARICHLikelihood.h>
 #include <arich/dataobjects/ARICHAeroHit.h>

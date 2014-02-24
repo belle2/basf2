@@ -38,7 +38,7 @@
 #include <cdc/translators/SimpleTDCCountTranslator.h>
 #include <cdc/translators/IdealCDCGeometryTranslator.h>
 
-#include <tracking/dataobjects/Track.h>
+#include <mdst/dataobjects/Track.h>
 
 #include <boost/scoped_ptr.hpp>
 

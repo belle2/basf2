@@ -19,7 +19,7 @@
 #include <top/reconstruction/TOPconfigure.h>
 
 // Hit classes
-#include <tracking/dataobjects/Track.h>
+#include <mdst/dataobjects/Track.h>
 #include <tracking/dataobjects/ExtHit.h>
 #include <top/dataobjects/TOPDigit.h>
 #include <top/dataobjects/TOPLikelihood.h>

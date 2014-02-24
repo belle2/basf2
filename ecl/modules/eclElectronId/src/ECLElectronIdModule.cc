@@ -13,7 +13,7 @@
 #include <ecl/dataobjects/ECLShower.h>
 #include <ecl/dataobjects/ECLPidLikelihood.h>
 #include <framework/datastore/RelationArray.h>
-#include <tracking/dataobjects/Track.h>
+#include <mdst/dataobjects/Track.h>
 #include <framework/datastore/RelationIndex.h>
 #include <G4ParticleTable.hh>
 #include <framework/datastore/StoreArray.h>

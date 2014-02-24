@@ -9,8 +9,8 @@
 #include <framework/gearbox/Const.h>
 #include <framework/utilities/FileSystem.h>
 
-#include <tracking/dataobjects/Track.h>
-#include <tracking/dataobjects/TrackFitResult.h>
+#include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/TrackFitResult.h>
 #include <mdst/dataobjects/MCParticle.h>
 
 #include <cdc/dataobjects/CDCHit.h>

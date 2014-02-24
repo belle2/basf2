@@ -14,8 +14,8 @@
 #include <tracking/dataobjects/MuidHit.h>
 #include <bklm/dataobjects/BKLMHit2d.h>
 #include <eklm/dataobjects/EKLMHit2d.h>
-#include <tracking/dataobjects/Track.h>
-#include <tracking/dataobjects/TrackFitResult.h>
+#include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/TrackFitResult.h>
 #include <genfit/Exception.h>
 #include <simulation/kernel/DetectorConstruction.h>
 #include <simulation/kernel/MagneticField.h>

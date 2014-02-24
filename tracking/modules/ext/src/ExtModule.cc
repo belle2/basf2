@@ -10,8 +10,8 @@
 
 #include <tracking/modules/ext/ExtModule.h>
 #include <tracking/dataobjects/ExtHit.h>
-#include <tracking/dataobjects/Track.h>
-#include <tracking/dataobjects/TrackFitResult.h>
+#include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/TrackFitResult.h>
 #include <genfit/Exception.h>
 #include <simulation/kernel/DetectorConstruction.h>
 #include <simulation/kernel/MagneticField.h>

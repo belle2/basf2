@@ -13,7 +13,7 @@
 #include <time.h>
 
 // Hit classes
-#include <tracking/dataobjects/Track.h>
+#include <mdst/dataobjects/Track.h>
 #include <tracking/dataobjects/ExtHit.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <arich/dataobjects/ARICHAeroHit.h>

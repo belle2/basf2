@@ -13,7 +13,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
-#include <tracking/dataobjects/Track.h>
+#include <mdst/dataobjects/Track.h>
 #include <tracking/dataobjects/ExtHit.h>
 #include <G4ParticleTable.hh>
 

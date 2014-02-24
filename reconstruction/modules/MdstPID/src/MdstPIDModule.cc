@@ -20,7 +20,7 @@
 #include <arich/dataobjects/ARICHLikelihood.h>
 #include <reconstruction/dataobjects/DedxLikelihood.h>
 #include <ecl/dataobjects/ECLPidLikelihood.h>
-#include <tracking/dataobjects/Track.h>
+#include <mdst/dataobjects/Track.h>
 #include <tracking/dataobjects/Muid.h>
 
 // framework aux

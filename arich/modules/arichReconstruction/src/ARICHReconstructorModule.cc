@@ -259,7 +259,7 @@ namespace Belle2 {
           B2ERROR("No TrackFitResult for " << hypothesis.getPDGCode());
           continue;
         }
-        int charge = fitResult->getCharge();
+        int charge = fitResult->getChargeSign();
         B2DEBUG(50, "Track.Charge " << charge);
         const MCParticle* particle = DataStore::getRelated<MCParticle>(track);
         const ARICHAeroHit* aeroHit = DataStore::getRelated<ARICHAeroHit>(particle);

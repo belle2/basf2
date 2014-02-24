@@ -274,7 +274,7 @@ namespace Belle2 {
           B2ERROR("No TrackFitResult for " << chargedStable.getPDGCode());
           continue;
         }
-        int charge = fitResult->getCharge();
+        int charge = fitResult->getChargeSign();
         const MCParticle* particle = DataStore::getRelated<MCParticle>(track);
         const TOPBarHit* barHit = DataStore::getRelated<TOPBarHit>(particle);
         int iBarHit = -1;

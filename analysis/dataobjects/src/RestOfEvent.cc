@@ -15,7 +15,7 @@
 #include <ecl/dataobjects/ECLShower.h>
 #include <ecl/dataobjects/ECLGamma.h>
 #include <ecl/dataobjects/ECLPi0.h>
-#include <tracking/dataobjects/Track.h>
+#include <mdst/dataobjects/Track.h>
 
 #include <framework/logging/Logger.h>
 #include <iostream>

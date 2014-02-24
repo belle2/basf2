@@ -18,8 +18,8 @@
 #include <ecl/dataobjects/ECLGamma.h>
 #include <ecl/dataobjects/ECLPi0.h>
 #include <mdst/dataobjects/MCParticle.h>
-#include <tracking/dataobjects/Track.h>
-#include <tracking/dataobjects/TrackFitResult.h>
+#include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/TrackFitResult.h>
 
 #include <TClonesArray.h>
 #include <TDatabasePDG.h>

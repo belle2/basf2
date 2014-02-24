@@ -24,8 +24,8 @@
 #include <eklm/dataobjects/EKLMHit2d.h>
 #include <eklm/dataobjects/EKLMK0L.h>
 
-#include <tracking/dataobjects/TrackFitResult.h>
-#include <tracking/dataobjects/Track.h>
+#include <mdst/dataobjects/TrackFitResult.h>
+#include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
 #include <pxd/dataobjects/PXDCluster.h>
 #include <svd/dataobjects/SVDCluster.h>

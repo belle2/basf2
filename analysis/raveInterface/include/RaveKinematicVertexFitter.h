@@ -15,7 +15,7 @@
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/raveInterface/RaveSetup.h>
 
-#include <tracking/dataobjects/TrackFitResult.h>
+#include <mdst/dataobjects/TrackFitResult.h>
 //std
 #include <string>
 

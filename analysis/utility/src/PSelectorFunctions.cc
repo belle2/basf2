@@ -26,7 +26,7 @@
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
 
-#include <tracking/dataobjects/Track.h>
+#include <mdst/dataobjects/Track.h>
 #include <ecl/dataobjects/ECLShower.h>
 #include <ecl/dataobjects/ECLGamma.h>
 

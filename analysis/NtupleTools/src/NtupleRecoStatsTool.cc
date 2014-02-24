@@ -11,11 +11,11 @@
 #include <analysis/NtupleTools/NtupleRecoStatsTool.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <TBranch.h>
-#include <tracking/dataobjects/Track.h>
+#include <mdst/dataobjects/Track.h>
 #include <ecl/dataobjects/ECLGamma.h>
 #include <ecl/dataobjects/ECLShower.h>
 #include <ecl/dataobjects/ECLPi0.h>
-#include <tracking/dataobjects/TrackFitResult.h>
+#include <mdst/dataobjects/TrackFitResult.h>
 #include <mdst/dataobjects/MCParticle.h>
 
 void NtupleRecoStatsTool::setupTree()

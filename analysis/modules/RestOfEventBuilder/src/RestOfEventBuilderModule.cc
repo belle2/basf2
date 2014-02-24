@@ -12,7 +12,7 @@
 
 #include <analysis/dataobjects/ParticleList.h>
 
-#include <tracking/dataobjects/Track.h>
+#include <mdst/dataobjects/Track.h>
 #include <ecl/dataobjects/ECLGamma.h>
 #include <ecl/dataobjects/ECLPi0.h>
 #include <ecl/dataobjects/ECLShower.h>

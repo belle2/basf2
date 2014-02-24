@@ -245,7 +245,9 @@ namespace Belle2 {
                                        -1,                         //charge
                                        Const::pion,                //The new constructor requires a ParticleType.
                                        0.5,                        //The new constructor requires a p-value.
-                                       1.5                         //The new constructor requires a b-field.
+                                       1.5,                        //The new constructor requires a b-field.
+                                       0,                          //HitPatternCDC
+                                       0                           //HitPatternVXD
                                      );
 
 

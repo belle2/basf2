@@ -190,7 +190,7 @@ namespace Belle2 {
         B2ERROR("No TrackFitResult for " << chargedStable.getPDGCode());
         continue;
       }
-      int charge = fitResult->getCharge();
+      int charge = fitResult->getChargeSign();
 
       RelationVector<ExtHit> extHits = DataStore::getRelationsWithObj<ExtHit>(track);
       for (unsigned i = 0; i < extHits.size(); i++) {

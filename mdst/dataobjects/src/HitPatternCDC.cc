@@ -7,7 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/dataobjects/HitPatternCDC.h>
+#include <mdst/dataobjects/HitPatternCDC.h>
 #include<framework/logging/Logger.h>
 #include <string>
 using namespace Belle2;

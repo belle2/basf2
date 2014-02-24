@@ -12,7 +12,7 @@
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 #include <framework/datastore/RelationsObject.h>
-#include <tracking/dataobjects/TrackFitResult.h>
+#include <mdst/dataobjects/TrackFitResult.h>
 #include <algorithm>
 
 namespace genfit { class Track; }

@@ -10,8 +10,8 @@
 #pragma once
 
 //These two classes need to be moved to the MDST package as well on monday.
-#include <tracking/dataobjects/HitPatternCDC.h>
-#include <tracking/dataobjects/HitPatternVXD.h>
+#include <mdst/dataobjects/HitPatternCDC.h>
+#include <mdst/dataobjects/HitPatternVXD.h>
 
 #include <framework/gearbox/Const.h>
 #include <framework/datastore/RelationsObject.h>

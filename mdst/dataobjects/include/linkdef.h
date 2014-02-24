@@ -21,4 +21,7 @@
 
 #pragma link C++ class Belle2::K0L;
 
+#pragma link C++ class Belle2::Track;
+#pragma link C++ class Belle2::TrackFitResult;
+
 #endif

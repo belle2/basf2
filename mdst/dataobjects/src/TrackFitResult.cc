@@ -7,7 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/dataobjects/TrackFitResult.h>
+#include <mdst/dataobjects/TrackFitResult.h>
 #include <TMath.h>
 
 using namespace Belle2;

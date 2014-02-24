@@ -175,7 +175,7 @@ rave::Track RaveVertexFitter::TrackFitResultToRaveTrack(const TrackFitResult* co
                              cov(3, 3), cov(4, 3), cov(5, 3),
                              cov(4, 4), cov(5, 4), cov(5, 5));
 
-  return rave::Track(id, ravestate, ravecov, rave::Charge(aTrackPtr->getCharge()), 1, 1); //the two 1s are just dummy values. They are not used by Rave anyway
+  return rave::Track(id, ravestate, ravecov, rave::Charge(aTrackPtr->getChargeSign()), 1, 1); //the two 1s are just dummy values. They are not used by Rave anyway
 
 }
 

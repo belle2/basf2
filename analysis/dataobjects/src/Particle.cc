@@ -105,7 +105,7 @@ Particle::Particle(const Track* track,
   int absPDGCode = chargedStable.getPDGCode();
   int signFlip = 1;
   if (absPDGCode < Const::muon.getPDGCode() + 1) signFlip = -1;
-  m_pdgCode = chargedStable.getPDGCode() * signFlip * trackFit->getCharge();
+  m_pdgCode = chargedStable.getPDGCode() * signFlip * trackFit->getChargeSign();
 
   // set mass
   if (TDatabasePDG::Instance()->GetParticle(m_pdgCode) == NULL)

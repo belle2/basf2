@@ -46,7 +46,7 @@ namespace Belle2 {
       TMatrixDSym cov6(6);
 
       // Set up class for testing
-      TrackFitResult myResult(position, momentum, cov6, charge, pType, pValue, bField);
+      TrackFitResult myResult(position, momentum, cov6, charge, pType, pValue, bField, 0, 0);
 
       // Test all vector elements
       EXPECT_NEAR(position.X(), myResult.getPosition().X(), absError);
@@ -60,7 +60,7 @@ namespace Belle2 {
       EXPECT_NEAR(momentum.Perp(), myResult.getTransverseMomentum(bField), absError);
 
       // Test other variables
-      EXPECT_EQ(charge, myResult.getCharge());
+      EXPECT_EQ(charge, myResult.getChargeSign());
       EXPECT_EQ(pValue, myResult.getPValue());
       EXPECT_EQ(pType, myResult.getParticleType());
 
@@ -87,7 +87,7 @@ namespace Belle2 {
       for (auto & element : cov) {
         element = generator.Gaus(1e-4);
       }
-      Belle2::TrackFitResult myResult(tau, cov, pType, pValue);
+      Belle2::TrackFitResult myResult(tau, cov, pType, pValue, 0, 0);
       TMatrix covariance(myResult.getCovariance6());
       TMatrixDSym cov6(6);
       for (unsigned int row = 0; row < 6; ++row) {
@@ -96,7 +96,7 @@ namespace Belle2 {
         }
       }
       Belle2::TrackFitResult myResult2(myResult.getPosition(), myResult.getMomentum(), cov6,
-                                       myResult.getCharge(), pType, pValue, bField);
+                                       myResult.getChargeSign(), pType, pValue, bField, 0, 0);
 
       TMatrixF myResultCov5 = myResult.getCovariance5();
       TMatrixF myResult2Cov5 = myResult2.getCovariance5();

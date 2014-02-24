@@ -32,13 +32,13 @@ namespace Belle2 {
     const float pValue = 1.;
     const float bField = 1.5;
 
-    new(myResults.nextFreeAddress()) TrackFitResult(dummyVector3, dummyVector3, dummyMatrix, charge, Const::pion,     pValue, bField);
+    new(myResults.nextFreeAddress()) TrackFitResult(dummyVector3, dummyVector3, dummyMatrix, charge, Const::pion,     pValue, bField, 0, 0);
 
-    new(myResults.nextFreeAddress()) TrackFitResult(dummyVector3, dummyVector3, dummyMatrix, charge, Const::kaon,     pValue, bField);
+    new(myResults.nextFreeAddress()) TrackFitResult(dummyVector3, dummyVector3, dummyMatrix, charge, Const::kaon,     pValue, bField, 0, 0);
 
-    new(myResults.nextFreeAddress()) TrackFitResult(dummyVector3, dummyVector3, dummyMatrix, charge, Const::electron, pValue, bField);
+    new(myResults.nextFreeAddress()) TrackFitResult(dummyVector3, dummyVector3, dummyMatrix, charge, Const::electron, pValue, bField, 0, 0);
 
-    new(myResults.nextFreeAddress()) TrackFitResult(dummyVector3, dummyVector3, dummyMatrix, charge, Const::muon,     pValue, bField);
+    new(myResults.nextFreeAddress()) TrackFitResult(dummyVector3, dummyVector3, dummyMatrix, charge, Const::muon,     pValue, bField, 0, 0);
 
     Track mytrack1;
     mytrack1.setTrackFitResultIndex(Const::pion, 0);

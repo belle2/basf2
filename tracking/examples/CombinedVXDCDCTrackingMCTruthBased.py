@@ -1,4 +1,6 @@
-#! /usr/bin/env python
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 """
 Create VXD and CDC track candidates using VXDTF and Trasan, respectively.
 Merge both kinds of track candidates using the MCTrackCandCombiner.
@@ -11,23 +13,26 @@ import os
 
 parser = OptionParser()
 
-parser.add_option('-t', '--decaytable',
-                  dest='decaytable',
-                  default=None,
+parser.add_option('-t', '--decaytable', dest='decaytable', default=None,
                   help='User decay table for EvtGenInput.')
-parser.add_option('-p', '--pdlfile',
-                  default=None,
+parser.add_option('-p', '--pdlfile', default=None,
                   help='User PDL file for EvtGenInput.')
-parser.add_option('-f', '--fitting',
-                  dest='fitting',
-                  action='store_true',
-                  default=False,
-                  help='Switch on fitting.')
-parser.add_option('-d', '--display',
-                  dest='display',
-                  action='store_true',
-                  default=False,
-                  help='Show events in the event display.')
+parser.add_option(
+    '-f',
+    '--fitting',
+    dest='fitting',
+    action='store_true',
+    default=False,
+    help='Switch on fitting.',
+    )
+parser.add_option(
+    '-d',
+    '--display',
+    dest='display',
+    action='store_true',
+    default=False,
+    help='Show events in the event display.',
+    )
 
 options = parser.parse_args()[0]
 
@@ -35,10 +40,7 @@ print options
 
 # number of events etc.
 eventinfosetter = register_module('EventInfoSetter')
-param_eventinfosetter = {'evtNumList': [1],
-                    'runList': [1],
-                    'expList': [1],
-                    }
+param_eventinfosetter = {'evtNumList': [1], 'runList': [1], 'expList': [1]}
 
 # evtgen
 # use user specified decaytable
@@ -48,15 +50,14 @@ if options.decaytable != None:
 if options.pdlfile != None:
     evtgeninput.param('pdlFile', options.pdlfile)
 
-
 # show progress of processing
 progress = register_module('Progress')
 
 # create geometry
 gearbox = register_module('Gearbox')
 geometry = register_module('Geometry')
-geometry.param('Components', ['MagneticField', 'BeamPipe',
-                              'PXD', 'SVD', 'CDC'])
+geometry.param('Components', ['MagneticField', 'BeamPipe', 'PXD', 'SVD', 'CDC'
+               ])
 
 # simulation
 g4sim = register_module('FullSim')
@@ -108,11 +109,9 @@ trasan.param('GFTrackCandidatesColName', cdcgftrackcands)
 # using the MC truth. Output is a GFTrackCand collection
 mctrackcandcombiner = register_module('MCTrackCandCombiner')
 mctrackcandcombiner.logging.log_level = LogLevel.DEBUG
-param_mctrackcandcombiner = {
-                        'CDCTrackCandidatesColName': cdcgftrackcands,
-                        'VXDTrackCandidatesColName': vxdgftrackcands,
-                        'OutputTrackCandidatesColName': combinedgftrackcands
-                        }
+param_mctrackcandcombiner = {'CDCTrackCandidatesColName': cdcgftrackcands,
+                             'VXDTrackCandidatesColName': vxdgftrackcands,
+                             'OutputTrackCandidatesColName': combinedgftrackcands}
 mctrackcandcombiner.param(param_mctrackcandcombiner)
 
 # genfitter, uses combined GFTrackCandidates for fitting

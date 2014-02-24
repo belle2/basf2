@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+
 from basf2 import Module
 
 from ROOT import gSystem
@@ -94,15 +95,13 @@ class CDCEvaluationModule(Module):
             if track_collection and wirehit_collection:
                 allTrackIds = set()
                 for wirehit in \
-                            basf2tools.CDCGenericHitCollectionIterator(
-                            wirehit_collection.obj()):
+                    basf2tools.CDCGenericHitCollectionIterator(wirehit_collection.obj()):
                     trackId = int(mcLookUp.getMajorMCTrackId(wirehit))
                     allTrackIds.add(trackId)
 
                 all_row = dict((trackId, 0) for trackId in allTrackIds)
                 for wirehit in \
-                            basf2tools.CDCGenericHitCollectionIterator(
-                            wirehit_collection.obj()):
+                    basf2tools.CDCGenericHitCollectionIterator(wirehit_collection.obj()):
                     trackId = int(mcLookUp.getMajorMCTrackId(wirehit))
 
                     hitCountForTrackId = all_row[trackId]
@@ -149,3 +148,5 @@ class CDCEvaluationModule(Module):
 
     def terminate(self):
         print 'terminate()'
+
+

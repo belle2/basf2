@@ -30,6 +30,8 @@
 #include <tracking/dataobjects/Track.h>
 #include <tracking/dataobjects/ExtHit.h>
 
+#include <TMatrixDSym.h>
+
 using namespace std;
 
 namespace Belle2 {
@@ -235,13 +237,17 @@ namespace Belle2 {
     }
 
     // write track info to data store
-    TrackFitResult* trackFitResult = trackFitResults.appendNew();
+    TVector3 momentum; momentum.SetMagThetaPhi(m_p, m_theta * Unit::deg, m_phi * Unit::deg);
     TVector3 position(m_x0, m_y0, m_z0);
-    trackFitResult->setPosition(position);
-    TVector3 momentum;
-    momentum.SetMagThetaPhi(m_p, m_theta * Unit::deg, m_phi * Unit::deg);
-    trackFitResult->setMomentum(momentum);
-    trackFitResult->setCharge(-1);
+    TMatrixDSym dummyMatrix;
+    TrackFitResult* trackFitResult = trackFitResults.appendNew(
+                                       position, momentum, dummyMatrix,
+                                       -1,                         //charge
+                                       Const::pion,                //The new constructor requires a ParticleType.
+                                       0.5,                        //The new constructor requires a p-value.
+                                       1.5                         //The new constructor requires a b-field.
+                                     );
+
 
     Track* track = tracks.appendNew();
     short index = trackFitResult->getArrayIndex();

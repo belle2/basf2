@@ -69,9 +69,9 @@ namespace Belle2 {
     /** Setter for position vector.
      * @TODO delete, out of Business
      * */
-    void setPosition(const TVector3& /*position*/) {
-      B2ERROR("Deprecated, member variables are set with constructor call.");
-    }
+//    void setPosition(const TVector3& /*position*/) {
+//      B2ERROR("Deprecated, member variables are set with constructor call.");
+//    }
 
     /** Getter for vector of momentum at closest approach of track in r/phi projection.
      *
@@ -107,9 +107,9 @@ namespace Belle2 {
     /** Setter for Covariance matrix of position and momentum.
      * @TODO delete, out of Business
      * */
-    void setCovariance6(const TMatrixF& /*covariance*/) {
-      B2ERROR("Deprecated, member variables are set with constructor call.");
-    }
+//    void setCovariance6(const TMatrixF& /*covariance*/) {
+//      B2ERROR("Deprecated, member variables are set with constructor call.");
+//    }
 
     /** Getter for ParticleCode of the mass hypothesis of the track fit. */
     Const::ParticleType getParticleType() const {
@@ -119,9 +119,9 @@ namespace Belle2 {
     /** Setter for the PDGCode.
      * @TODO delete, out of Business
      * */
-    void setParticleType(const Const::ParticleType& /*pType*/) {
-      B2ERROR("Deprecated, member variables are set with constructor call.");
-    }
+//    void setParticleType(const Const::ParticleType& /*pType*/) {
+//      B2ERROR("Deprecated, member variables are set with constructor call.");
+//    }
 
     /** Return track charge (1 or -1).
      *
@@ -137,9 +137,9 @@ namespace Belle2 {
     /** Setter for Charge
      * TODO delete, out of Business
      * */
-    void setCharge(int /*charge*/) {
-      B2ERROR("Deprecated, member variables are set with constructor call.");
-    }
+//    void setCharge(int /*charge*/) {
+//      B2ERROR("Deprecated, member variables are set with constructor call.");
+//    }
 
     /** Getter for Chi2 Probability of the track fit. */
     float getPValue() const {
@@ -149,9 +149,9 @@ namespace Belle2 {
     /** Setter for Chi2 Probability of the track fit.
      * TODO delete, out of Business
      * */
-    void setPValue(float /*pValue*/) {
-      B2ERROR("Deprecated, member variables are set with constructor call.");
-    }
+//    void setPValue(float /*pValue*/) {
+//      B2ERROR("Deprecated, member variables are set with constructor call.");
+//    }
 
     //---------------------------------------------------------------------------------------------------------------------------
     // --- Getters for perigee helix parameters

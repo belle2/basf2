@@ -1,14 +1,15 @@
-#include <gtest/gtest.h>
 #include <tracking/dataobjects/HitPatternVXD.h>
+#include <gtest/gtest.h>
+
 
 namespace Belle2 {
   /** */
-  class BitPatternCDCTest : public ::testing::Test {
+  class BitPatternVXDTest : public ::testing::Test {
   protected:
   };
 
   /** Test simple Setters and Getters. */
-  TEST_F(BitPatternCDCTest, settersNGetters)
+  TEST_F(BitPatternVXDTest, settersNGetters)
   {
   }
 }

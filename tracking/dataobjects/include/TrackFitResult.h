@@ -50,7 +50,8 @@ namespace Belle2 {
      */
     TrackFitResult(const TVector3& position, const TVector3& momentum, const TMatrixDSym& covariance,
                    const short int charge, const Const::ParticleType& particleType, const float pValue,
-                   const float bField);
+                   const float bField,
+                   const unsigned long hitPatternCDCInitializer, const unsigned short hitPatternVXDInitializer);
 
     /** Constructor initializing class with perigee parameters.
      *
@@ -61,17 +62,11 @@ namespace Belle2 {
      *  @param pValue        p-value of the fit.
      */
     TrackFitResult(const std::vector<float>& tau, const std::vector<float>& cov5,
-                   const Const::ParticleType& particleType, const float pValue);
+                   const Const::ParticleType& particleType, const float pValue,
+                   const unsigned long hitPatternCDCInitializer, const unsigned short hitPatternVXDInitializer);
 
     /** Getter for vector of position at closest approach of track in r/phi projection. */
     TVector3 getPosition() const;
-
-    /** Setter for position vector.
-     * @TODO delete, out of Business
-     * */
-//    void setPosition(const TVector3& /*position*/) {
-//      B2ERROR("Deprecated, member variables are set with constructor call.");
-//    }
 
     /** Getter for vector of momentum at closest approach of track in r/phi projection.
      *
@@ -88,13 +83,6 @@ namespace Belle2 {
      */
     float getTransverseMomentum(const float bField = 1.5) const;
 
-    /** Setter for momentum vector.
-      * @TODO delete, out of Business
-      * */
-    void setMomentum(const TVector3& /*momentum*/) {
-      B2ERROR("Deprecated, member variables are set with constructor call.");
-    }
-
     /** Position and Momentum Covariance Matrix.
      *
      *  This is a copy from the genfit::Track getPosMomCov matrix (implicating the order of the matrix).
@@ -104,152 +92,84 @@ namespace Belle2 {
      */
     TMatrixF getCovariance6(const float bField = 1.5) const;
 
-    /** Setter for Covariance matrix of position and momentum.
-     * @TODO delete, out of Business
-     * */
-//    void setCovariance6(const TMatrixF& /*covariance*/) {
-//      B2ERROR("Deprecated, member variables are set with constructor call.");
-//    }
-
     /** Getter for ParticleCode of the mass hypothesis of the track fit. */
     Const::ParticleType getParticleType() const {
       return Const::ParticleType(m_pdg);
     }
 
-    /** Setter for the PDGCode.
-     * @TODO delete, out of Business
-     * */
-//    void setParticleType(const Const::ParticleType& /*pType*/) {
-//      B2ERROR("Deprecated, member variables are set with constructor call.");
-//    }
-
     /** Return track charge (1 or -1).
      *
-     *  @TODO This needs to be reworked.
-     *  It should probably be named getChargeSign, as we
-     *  return only the sign, but might have alpha particles in theory in this class.
-       *  As well for very small values, we might be unsure and return zero
+     *  @TODO For very small values, we might be unsure and return zero.
      */
-    short getCharge() const {
+    short getChargeSign() const {
       return getOmega() >= 0 ? 1 : -1;
     }
-
-    /** Setter for Charge
-     * TODO delete, out of Business
-     * */
-//    void setCharge(int /*charge*/) {
-//      B2ERROR("Deprecated, member variables are set with constructor call.");
-//    }
 
     /** Getter for Chi2 Probability of the track fit. */
     float getPValue() const {
       return m_pValue;
     }
 
-    /** Setter for Chi2 Probability of the track fit.
-     * TODO delete, out of Business
-     * */
-//    void setPValue(float /*pValue*/) {
-//      B2ERROR("Deprecated, member variables are set with constructor call.");
-//    }
-
     //---------------------------------------------------------------------------------------------------------------------------
     // --- Getters for perigee helix parameters
     //---------------------------------------------------------------------------------------------------------------------------
-    /**
-     * Getter for d0. This is the signed distance to the POCA in the r-phi plane.
-     * @return
+    /** Getter for d0. This is the signed distance to the POCA in the r-phi plane.
+     *
+     *  @return
      */
     float getD0() const { return m_tau.at(0); }
 
-    /**
-     * Getter for phi. This is the angle of the transverse momentum in the r-phi plane.
-     * @return
+    /** Getter for phi. This is the angle of the transverse momentum in the r-phi plane.
+     *
+     *  @return
      */
     float getPhi() const { return m_tau.at(1); }
 
-    /**
-     * Getter for omega. This is the curvature of the track. It's sign is defined by the charge of the particle.
-     * @return
+    /** Getter for omega. This is the curvature of the track. It's sign is defined by the charge of the particle.
+     *
+     *  @return
      */
     float getOmega() const { return m_tau.at(2); }
 
-    /**
-     * Getter for z0. This is the z coordinate of the POCA.
-     * @return
+    /** Getter for z0. This is the z coordinate of the POCA.
+     *
+     *  @return
      */
     float getZ0() const { return m_tau.at(3); }
 
-    /**
-     * Getter for cotTheta. This is the slope of the track in the r-z plane.
-     * @return
+    /** Getter for cotTheta. This is the slope of the track in the r-z plane.
+     *
+     *  @return
      */
     float getCotTheta() const { return m_tau.at(4); }
 
-    /**
-     * Getter for all perigee parameters
-     * @return vector with 5 elements
+    /** Getter for all perigee parameters
+     *
+     *  @return vector with 5 elements
      */
     std::vector<float> getTau() const { return m_tau; }
 
-    /**
-     * Getter for all covariance matrix elements of perigee parameters
-     * TODO: Implement bField
-     * @return vector with 15 elements
+    /** Getter for all covariance matrix elements of perigee parameters
+     *
+     *  @return vector with 15 elements
      */
     std::vector<float> getCov() const { return m_cov5; }
 
-    /**
-     * Getter for covariance matrix of perigee parameters in matrix form.
-     * TODO: Implement bField
-     * @return
+    /** Getter for covariance matrix of perigee parameters in matrix form.
+     *
+     *  @return
      */
     TMatrixF getCovariance5() const;
 
-    //---------------------------------------------------------------------------------------------------------------------------
-    //--- Hit Pattern Arithmetics
-    //---------------------------------------------------------------------------------------------------------------------------
-    /** Number of PXD hits used in the TrackFitResult. */
-    /*    unsigned short getNPXDHits() const {
-          return (m_hitPattern[0] + m_hitPattern[1]);
-        }
-    */
-    /** Number of SVD hits used in the TrackFitResult. */
-    /*    unsigned short getNSVDHits() const {
-          return (m_hitPattern[2] + m_hitPattern[3] + m_hitPattern[4] + m_hitPattern[5]);
-        }
-    */
-    /** Number of CDC hits used in the TrackFitResult. */
-    /*    unsigned short getNCDCHits() const {
-          return (m_hitPattern.count() - getNPXDHits() - getNSVDHits());
-        }
-    */
-    /** Was there a hit in the specified layer?
-     *
-     *  @param  iVXDLayer  layer for which the information is requested.
-     */
-    /*    bool hitInVXDLayer(unsigned short iVXDLayer) const {
-          return m_hitPattern[iVXDLayer];
-        }
-    */
-    /** Was there a hit in the specified layer?
-     *
-     *  @param  iCDCLayer  layer for which the information is requested.
-     */
-    /*    bool hitInCDCLayer(unsigned short iCDCLayer) const {
-          return m_hitPattern[iCDCLayer + 6];
-        }
-    */
-    /** Similar as above, but asking for any hit in the corresponding SuperLayer.*/
-//    bool hitInSuperLayer(unsigned int iSuperLayer) const;
+    /** Getter for the hit pattern in the CDC; @sa HitPatternCDC */
+    HitPatternCDC getHitPatternCDC()const {
+      return HitPatternCDC(m_hitPatternCDCInitializer);
+    }
 
-    /** Were any Stereo hits in the CDC. */
-    /*    bool hitInStereoLayer() const {
-          return (hitInSuperLayer(2) || hitInSuperLayer(4) || hitInSuperLayer(6) || hitInSuperLayer(8));
-        }
-    */
-    /** Returns the count of the innermost Layer. */
-//    unsigned short getIInnermostLayer() const;
+    /** Getter for the hit pattern in the CDC; @sa HitPatternCDC */
+    HitPatternVXD getHitPatternVXD()const {
+      return HitPatternVXD(m_hitPatternVXDInitializer);
+    }
 
     ///--------------------------------------------------------------------------------------------------------------------------
   private:
@@ -275,39 +195,42 @@ namespace Belle2 {
     float calcPzFromPerigee(const float bField) const;
     TMatrixF transformCov5ToCov6(const TMatrixF& cov5, const float bField) const;
 
-    /** Cartesian to Perigee conversion
-     * everything happens internally, m_tau and m_cov5 will be set and cartesian values dropped
+    /** Cartesian to Perigee conversion.
+     *
+     *  Everything happens internally, m_tau and m_cov5 will be set and cartesian values dropped
      */
     void cartesianToPerigee(const TVector3& position, const TVector3& momentum, const TMatrixDSym& covariance,
                             const short int charge, const float bField);
 
+    //---------------------------------------------------------------------------------------------------------------------------
     /** PDG Code for hypothesis with which the corresponding fit was performed. */
     const unsigned int m_pdg;
 
     /** Chi2 Probability of the fit. */
     const float m_pValue;
 
-    /** perigee helix parameters
-     * tau = d0, phi, omega, z0, cotTheta
-     */
+    /** perigee helix parameters; tau = d0, phi, omega, z0, cotTheta. */
     std::vector<float> m_tau;
 
-    /** covariance matrix elements
-     * (0,0), (0,1) ... (1,1), (1,2) ... (2,2) ...
+    /** covariance matrix elements.
+     *
+     *  (0,0), (0,1) ... (1,1), (1,2) ... (2,2) ...
      */
     std::vector<float> m_cov5;
 
-    ///--------------------------------------------------------------------------------------------------------------------------
-    /** Hit Pattern of the corresponding Hit.
+    /** Member for initializing the information about hits in the CDC.
      *
-     *  Bits 0-1:   PXD <br>
-     *  Bits 2-5:   SVD <br>
-     *  Bits 6-61:  CDC <br>
-     *  Bits 62-63: unused.
+     *  @sa HitPatternCDC
      */
-//    std::bitset<64> m_hitPattern;
+    const unsigned long m_hitPatternCDCInitializer;
 
-    ClassDef(TrackFitResult, 2);
+    /** Member for initializing the information about hits in the VXD.
+     *
+     *  @sa HitPatternVXD
+     */
+    const unsigned short m_hitPatternVXDInitializer;
+
+    ClassDef(TrackFitResult, 3);
   };
 }
 

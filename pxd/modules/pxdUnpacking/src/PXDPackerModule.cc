@@ -12,7 +12,6 @@
 #include <framework/datastore/DataStore.h>
 #include <framework/logging/Logger.h>
 #include <rawdata/dataobjects/RawFTSW.h>
-#include <pxd/dataobjects/PXDDigit.h>
 
 // // for htonl
 #include <arpa/inet.h>
@@ -86,7 +85,6 @@ void PXDPackerModule::terminate()
 
 void PXDPackerModule::event()
 {
-  StoreArray<PXDDigit> storeDigits;// pixels
   StoreArray<RawFTSW> storeFTSW;/// needed for event number
 
   B2INFO("PXD Packer --> Event");
@@ -102,6 +100,19 @@ void PXDPackerModule::event()
       break;
     }
   */
+
+  VxdID lastVxdId = -1; /// invalid ... force to set first itertor/index
+  /// We assume the Digits are sorted by VxdID (P.K. says they are)
+  /// Thie saves some iterating lateron
+  for (auto it = storeDigits.begin() ; it != storeDigits.end(); it++) {
+    VxdID currentVxdId;
+    currentVxdId = it->getSensorID();
+    if (currentVxdId != lastVxdId) {
+      // do something...
+      lastVxdId = currentVxdId;
+      startOfVxdID[currentVxdId] = std::distance(storeDigits.begin(), it);
+    }
+  }
 
   m_trigger_nr = m_packed_events;
   pack_event();
@@ -229,8 +240,6 @@ void PXDPackerModule::pack_dhh(int dhh_id, int dhp_active)
   add_int16(0x00000000);  // Last DHP Frame Nr, Trigger Offset (nur 16 bit?)
   add_frame_to_payload();
 
-
-
 // now prepare the data from one halfladder
 // do the ROI selection???
 // then loop for each DHP in system
@@ -238,11 +247,24 @@ void PXDPackerModule::pack_dhh(int dhh_id, int dhp_active)
 // and pack dat per halfladder.
 // we fake the framenr and startframenr until we find ome better solution
 
-  for (int i = 0; i < 4; i++) {
-    if (dhp_active & 0x1) pack_dhp(i, dhh_id);
-    dhp_active >>= 1;
-  }
+  if (dhp_active != 0) { /// is there any hardware switched on?
+    /// clear pixelmap
+    VxdID currentVxdId = 0; /// TODO get from somewhere
+    auto map_it = startOfVxdID.find(currentVxdId);
+    if (map_it != startOfVxdID.end()) {
+      auto it = storeDigits.begin();
+      advance(it, map_it->second);
+      for (; it != storeDigits.end(); it++) {
+        if (currentVxdId != it->getSensorID()) break; /// another sensor starts
+        /// Fill pixel to pixelmap
+      }
+    }
 
+    for (int i = 0; i < 4; i++) {
+      if (dhp_active & 0x1) pack_dhp(i, dhh_id);
+      dhp_active >>= 1;
+    }
+  }
 
   /// DHH End
   start_frame();

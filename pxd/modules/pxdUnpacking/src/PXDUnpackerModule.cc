@@ -380,6 +380,11 @@ public:
 //  };
 
   unsigned int calc_crc(unsigned int length) {
+    if (length < 8) {
+      B2ERROR("DHHC ONSEN HLT/ROI Frame too small!!!");
+      error_mask |= ONSEN_ERR_FLAG_MERGER_CRC;
+      return 0;
+    }
     unsigned char* d;
     dhh_crc_32_type bocrc;
     char crcbuffer[65536 * 2]; /// 128kB
@@ -423,6 +428,10 @@ public:
     return c;
   };
   void save(StoreArray<PXDRawROIs>& sa, unsigned int length, unsigned int* data) {
+    if (length < 4 + 4 + 4 * 4) {
+      B2ERROR("DHHC ONSEN HLT/ROI Frame too small to hold any ROIs, did not save anything!");
+      return;
+    }
     unsigned int l;
     l = (length - 4 - 4 - 4 * 4) / 8;
     // for(unsigned int i=0; i<l*2; i++) data[5+i]=((data[5+i]>>16)&0xFFFF)| ((data[5+i]&0xFFFF)<<16);// dont do it here ... CRC will fail
@@ -734,6 +743,7 @@ PXDUnpackerModule::PXDUnpackerModule() :
   addParam("IgnoreDHHCFrameNr", m_ignore_headernrframes, "Ignore Wrong Nr Frames in DHHC Start", true);
   addParam("IgnoreDHPMask", m_ignore_dhpmask, "Ignore missing DHP from DHH Start mask", true);
   addParam("IgnoreDHPPortDiffer", m_ignore_dhpportdiffer, "Ignore if DHP port differ in DHH and DHP header", true);
+  addParam("IgnoreEmptyDHPWrongSize", m_ignore_empty_dhp_wrong_size, "Ignore empty. wrong sized DHP packets", true);
   addParam("DoNotStore", m_doNotStore, "only unpack and check, but do not store", false);
 
 }
@@ -924,7 +934,7 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int len2, unsigned int d
   bool rowflag = false;
 
   if (anzahl < 4) {
-    B2ERROR("DHP frame size error (too small) " << anzahl);
+    if (!m_ignore_empty_dhp_wrong_size) B2ERROR("DHP frame size error (too small) " << anzahl);
     error_mask |= ONSEN_ERR_FLAG_DHP_SIZE;
     dhp_size_error++;
     return;
@@ -1052,11 +1062,6 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& la
   dhhc_frame_header_word0* hw = (dhhc_frame_header_word0*)data;
   error_flag = false;
 
-  if (Frame_Number == 0) { /// We reset the counters on the first event
-    nr_of_dhh_start_frame = 0;
-    nr_of_dhh_end_frame = 0;
-  }
-
   dhhc_frames dhhc;
   dhhc.set(data, hw->get_type(), len, pad);
   int s;
@@ -1069,10 +1074,20 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& la
   unsigned int evtnr = dhhc.get_evtnr_lo();
   int type = dhhc.get_type();
 
+  if (Frame_Number == 0) { /// We reset the counters on the first event
+    nr_of_dhh_start_frame = 0;
+    nr_of_dhh_end_frame = 0;
+    if (type == DHHC_FRAME_HEADER_DATA_TYPE_DHHC_START) {
+      is_fake_event = ((dhhc_start_frame*)data)->is_fake();
+    } else {
+      is_fake_event = false;
+    }
+  }
+
+
   if ((evtnr & ftsw_evt_mask) != (ftsw_evt_nr & ftsw_evt_mask)) {
-    if ((type == DHHC_FRAME_HEADER_DATA_TYPE_DHHC_START && ((dhhc_start_frame*)data)->is_fake()) ||
-        (type != DHHC_FRAME_HEADER_DATA_TYPE_DHHC_START && is_fake_event)) {
-      /// If ist a start, check if its a fake event, if its not a start, the fake flag is already (re)set. As logn as the data structure is not messed up completly.
+    if (is_fake_event) {
+      /// If ist a start, check if its a fake event, if its not a start, the fake flag is already (re)set. As long as the data structure is not messed up completly.
       /// no need to explicitly check the DHHC_END or HLT/ROI
       /// We have afake and shoudl set the trigger nr by hand to prevent further errors
       evtnr = ftsw_evt_nr & ftsw_evt_mask; // masking might be a problem as we cannore recover all bits
@@ -1115,7 +1130,12 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& la
         B2ERROR("DHH ID from DHH Start and this frame do not match $" << hex << current_dhh_id << " != $" << ((dhhc_direct_readout_frame_raw*)data)->get_dhh_id());
         error_mask |= ONSEN_ERR_FLAG_DHH_START_ID;
       }
-      dhhc.calc_crc();
+      if (m_ignore_empty_dhp_wrong_size && type == DHHC_FRAME_HEADER_DATA_TYPE_DHP_ONS && len == 10) {
+        // Bug from Davids code ... ignore but count as error -> in unpack... ignore crc error
+        // error_mask |= ONSEN_ERR_FLAG_DHH_CRC;
+      } else {
+        dhhc.calc_crc();
+      }
       found_mask_active_dhp |= 1 << ((dhhc_direct_readout_frame*)data)->get_dhp_port();
       stat_zsd++;
 
@@ -1150,8 +1170,10 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& la
       break;
     };
     case DHHC_FRAME_HEADER_DATA_TYPE_DHHC_START: {
-      is_fake_event = ((dhhc_start_frame*)data)->is_fake();
-      if (is_fake_event) {
+      if (is_fake_event != ((dhhc_start_frame*)data)->is_fake()) {
+        B2ERROR("DHHC START is but no Fake event OR Fake Event but DHH END is not.");
+      }
+      if (((dhhc_start_frame*)data)->is_fake()) {
         B2WARNING("Faked DHHC START Data -> trigger without Data!");
         error_mask |= ONSEN_ERR_FLAG_FAKE_NO_DATA_TRIG;
       } else {

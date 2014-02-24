@@ -12,10 +12,10 @@
 #define PXDPackerModule_H
 
 #include <framework/core/Module.h>
-//#include <pxd/dataobjects/PXDRawHit.h>
 #include <vxd/dataobjects/VxdID.h>
-#include <rawdata/dataobjects/RawPXD.h>
 #include <framework/datastore/StoreArray.h>
+#include <rawdata/dataobjects/RawPXD.h>
+#include <pxd/dataobjects/PXDDigit.h>
 
 namespace Belle2 {
 
@@ -58,10 +58,11 @@ namespace Belle2 {
       /** For current processed frames */
       std::vector <unsigned char> m_current_frame;
 
-      /** Input array for Raw Hits. */
-      //StoreArray<PXDRawHit> m_storeRawHits;
+      /** Input array for Digits. */
+      StoreArray<PXDDigit> storeDigits;
       /** Output array for RawPxds */
       StoreArray<RawPXD> m_storeRaws;
+
       /** Pack one event (several DHHC) stored in seperate RawPXD object.
        */
       void pack_event(void);
@@ -88,6 +89,10 @@ namespace Belle2 {
       void add_int16(unsigned short w);
       void add_int32(unsigned int w);
       void add_frame_to_payload(void);
+
+      /** Store start of Vxd Detetcor related digits */
+      std::map <VxdID , int> startOfVxdID;
+
 
     };//end class declaration
 

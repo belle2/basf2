@@ -21,6 +21,9 @@ namespace Belle2 {
 
   namespace PXD {
 
+#define PACKER_NUM_ROWS 768
+#define PACKER_NUM_COLS 250
+
     /** \addtogroup modules
      * @{
      */
@@ -93,6 +96,8 @@ namespace Belle2 {
       /** Store start of Vxd Detetcor related digits */
       std::map <VxdID , int> startOfVxdID;
 
+      unsigned char halfladder_pixmap[PACKER_NUM_ROWS][PACKER_NUM_COLS];
+      // ignore common mode for now...
 
     };//end class declaration
 

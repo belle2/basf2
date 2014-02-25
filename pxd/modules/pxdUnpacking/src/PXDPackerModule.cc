@@ -244,11 +244,18 @@ void PXDPackerModule::pack_dhh(int dhh_id, int dhp_active)
 // do the ROI selection???
 // then loop for each DHP in system
 // get active DHPs from a database?
-// and pack dat per halfladder.
-// we fake the framenr and startframenr until we find ome better solution
+// and pack data per halfladder.
+// we fake the framenr and startframenr until we find some better solution
 
   if (dhp_active != 0) { /// is there any hardware switched on?
+    unsigned int ladder_min_row = 0; /// get them from database
+    unsigned int ladder_max_row = 785;
+    unsigned int ladder_min_col = 0;
+    unsigned int ladder_max_col = 250;
+
     /// clear pixelmap
+    bzero(halfladder_pixmap, sizeof(halfladder_pixmap));
+
     VxdID currentVxdId = 0; /// TODO get from somewhere
     auto map_it = startOfVxdID.find(currentVxdId);
     if (map_it != startOfVxdID.end()) {
@@ -257,6 +264,16 @@ void PXDPackerModule::pack_dhh(int dhh_id, int dhp_active)
       for (; it != storeDigits.end(); it++) {
         if (currentVxdId != it->getSensorID()) break; /// another sensor starts
         /// Fill pixel to pixelmap
+        {
+          unsigned int row, col;
+          row = it->getVCellID(); // getRow();
+          col = it->getUCellID(); // getColumn();
+          if (col < ladder_min_row || row > ladder_max_row || col < ladder_min_col || col > ladder_max_col) {
+            B2ERROR("ROW/COL out of range");
+          } else
+            // fill ADC ... convert float to unsigned char ... and how about common mode?
+            halfladder_pixmap[row][col] = (unsigned char) it->getCharge(); // scaling??
+        }
       }
     }
 
@@ -277,58 +294,48 @@ void PXDPackerModule::pack_dhh(int dhh_id, int dhp_active)
 void PXDPackerModule::pack_dhp(int chip_id, int dhh_id)
 {
   // remark: chip_id != port most of the time ...
-
+  bool empty = true;
 
   start_frame();
-  /// Ghost Frame
-  add_int32(0x90000000 | ((dhh_id & 0x3F) << 20) | ((chip_id & 0x03) << 16) | (m_trigger_nr & 0xFFFF));
+  /// DHP data Frame
+  add_int32(0xA8000000 | ((dhh_id & 0x3F) << 20) | ((chip_id & 0x03) << 16) | (m_trigger_nr & 0xFFFF));
+  for (int row = 0; row < PACKER_NUM_ROWS; row++) { // should be variable
+    bool rowstart;
+    rowstart = true;
+    int c1, c2;
+    c1 = 64 * chip_id;
+    c2 = c1 + 64;
+    if (c2 >= PACKER_NUM_COLS) c2 = PACKER_NUM_COLS;
+    for (int col = c1; c2; col++) {
+      if (rowstart) {
+        add_int16(((row & 0x3FE) << (6 - 1)) | 0); // plus common mode 6 bits ... set to 0
+        rowstart = false;
+      }
+      add_int16(0x8000 | ((row & 0x1) << 14) | ((col & 0x3F) << 8) | (halfladder_pixmap[row][col] & 0xFF));
+      empty = false;
+    }
+  }
+
+  if (empty) {
+    start_frame();
+    /// Ghost Frame
+    add_int32(0x90000000 | ((dhh_id & 0x3F) << 20) | ((chip_id & 0x03) << 16) | (m_trigger_nr & 0xFFFF));
+  }
   add_frame_to_payload();
 
 }
 
 #if 0
 
-#define NR_PIXELS_RAND  10
-#define NR_PIXELS_RAND_OFF  -5
-
 #define NR_LAYER_ONE  1 // 8
 #define NR_LAYER_TWO  1 // 12
 #define NR_CHIPS  1  // 4
-#define NR_ROW   768
-#define NR_COL_CHIP   64
 
 #define BUFFERSIZE  65536
-
-bool run_thread = true;
 
 unsigned char bufferin[65536];
 unsigned char bufferout[65536];
 int bufferin_size = 0, bufferout_size;
-
-struct onsen_header {
-  unsigned int magic;
-  unsigned int frames;
-  unsigned int frame_length[256 - 2]; // oder so
-} myonsen;
-
-int rec_bytes = 0, rec_frames = 0, rec_trig = 0;
-int send_bytes = 0, send_frames = 0, send_trig = 0;
-
-void endian_swap(unsigned int* x)
-{
-  *x = (*x >> 24) |
-       ((*x << 8) & 0x00FF0000) |
-       ((*x >> 8) & 0x0000FF00) |
-       (*x << 24);
-};
-
-void endian_swap(unsigned int& x)
-{
-  x = (x >> 24) |
-      ((x << 8) & 0x00FF0000) |
-      ((x >> 8) & 0x0000FF00) |
-      (x << 24);
-};
 
 unsigned char pixelmap[NR_ROW][NR_COL_CHIP];
 int dhp_pix[200000];

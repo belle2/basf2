@@ -23,7 +23,7 @@ geometry.param('components', ['TB'])
 # input
 input = register_module('RootInput')
 input.param('inputFileName', '../vxdtb/data/RawData_0000_000470.root')
-input.param('excludeBranchNames', ['SVDDigits'])
+input.param('excludeBranchNames', ['SVDDigits', 'TrackFitResults'])
 # data reader
 dataMerger = register_module('TelDataMerger')
 # use corresponding telescope data file
@@ -65,8 +65,7 @@ svdUnpacker.param('xmlMapFileName',
 # SVD Digit sorter
 SVDSort = register_module('SVDDigitSorter')
 SVDSort.param('mergeDuplicates', False)
-# No gearbox conventions, VERBATIM path!
-# SVDSort.param('ignoredStripsListName', 'testbeam/vxd/data/SVD-IgnoredStripsList.xml')
+
 # SVD clusterizer
 SVDClust = register_module('SVDClusterizer')
 SVDClust.param('TanLorentz_holes', 0.)

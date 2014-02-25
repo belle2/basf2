@@ -356,10 +356,10 @@ namespace Belle2 {
     int getEntries() const { return isValid() ? ((*m_relations)->getEntries()) : 0; }
 
     /** Return the AccessorParams the attached relation points from. */
-    const AccessorParams getFromAccessorParams() const { assertValid(); return AccessorParams((*m_relations)->getFromName(), (DataStore::EDurability)(*m_relations)->getFromDurability()); }
+    const AccessorParams getFromAccessorParams() const { ensureAttached(); return m_accessorFrom; }
 
     /** Return the AccessorParams the attached relation points to. */
-    const AccessorParams getToAccessorParams()   const { assertValid(); return AccessorParams((*m_relations)->getToName(), (DataStore::EDurability)(*m_relations)->getToDurability()); }
+    const AccessorParams getToAccessorParams() const { ensureAttached(); return m_accessorTo; }
 
     /** Get modified flag of underlying container. */
     bool getModified() const { assertValid(); return (*m_relations)->getModified(); }
@@ -499,8 +499,15 @@ namespace Belle2 {
           const_cast<RelationArray*>(this)->m_relations = 0;
           return;
         }
-        checkRelation("from", m_accessorFrom, getFromAccessorParams());
-        checkRelation("to", m_accessorTo, getToAccessorParams());
+        AccessorParams fromAccessorRel((*m_relations)->getFromName(), (DataStore::EDurability)(*m_relations)->getFromDurability());
+        AccessorParams toAccessorRel((*m_relations)->getToName(), (DataStore::EDurability)(*m_relations)->getToDurability());
+        //set if unset
+        if (m_accessorFrom.first.empty())
+          const_cast<RelationArray*>(this)->m_accessorFrom = fromAccessorRel;
+        if (m_accessorTo.first.empty())
+          const_cast<RelationArray*>(this)->m_accessorTo = toAccessorRel;
+        checkRelation("from", m_accessorFrom, fromAccessorRel);
+        checkRelation("to", m_accessorTo, toAccessorRel);
       }
     }
 

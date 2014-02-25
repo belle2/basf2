@@ -50,8 +50,14 @@ namespace Belle2 {
     DataStore::Instance().setInitializeActive(false);
 
     EXPECT_FALSE(relation); //creation only happens on write access or explicitly
+    //since we provided arguments to constructor, these should be available even before create()
+    EXPECT_TRUE(relation.getFromAccessorParams() == evtData.getAccessorParams());
+    EXPECT_TRUE(relation.getToAccessorParams() == profileData.getAccessorParams());
+
     relation.create();
     EXPECT_TRUE(relation);
+    EXPECT_TRUE(relation.getFromAccessorParams() == evtData.getAccessorParams());
+    EXPECT_TRUE(relation.getToAccessorParams() == profileData.getAccessorParams());
   }
 
   /** Check finding of relations. */
@@ -70,7 +76,12 @@ namespace Belle2 {
     relation.create();
     EXPECT_TRUE(RelationArray(evtData, profileData, "", DataStore::c_Event));
     string name = relation.getName();
-    EXPECT_TRUE(RelationArray(name));
+
+    RelationArray relationAttachedUsingName(name);
+    //trying to get the accessor params should cause the array to attach (and thus get the appropriate data)
+    EXPECT_TRUE(relationAttachedUsingName.getFromAccessorParams() == evtData.getAccessorParams());
+    EXPECT_TRUE(relationAttachedUsingName.getToAccessorParams() == profileData.getAccessorParams());
+    EXPECT_TRUE(relationAttachedUsingName);
 
     StoreArray<EventMetaData> evtData2("OwnName");
     //check for OwnNameToProfileInfos
@@ -94,8 +105,6 @@ namespace Belle2 {
     EXPECT_FATAL(RelationArray(profileData, evtData, "test").isValid());
     EXPECT_FATAL(RelationArray(profileData, evtData, "test").add(0, 0, 1.0));
     EXPECT_FATAL(RelationArray(profileData, evtData, "test")[0]);
-    EXPECT_FATAL(RelationArray(profileData, evtData, "test").getFromAccessorParams());
-    EXPECT_FATAL(RelationArray(profileData, evtData, "test").getToAccessorParams());
     EXPECT_FATAL(RelationArray(profileData, evtData, "test").getModified());
   }
 

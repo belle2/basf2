@@ -38,7 +38,7 @@ REG_MODULE(TelClusterizer);
 //-----------------------------------------------------------------
 
 TelClusterizerModule::TelClusterizerModule() :
-  Module(), m_clusterCacheSize(0)
+  Module(), m_clusterCacheSize(0), m_sizeHeadTail(3)
 {
   //Set module properties
   setDescription("Cluster TelHits");

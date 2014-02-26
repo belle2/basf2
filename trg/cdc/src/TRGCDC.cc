@@ -14,49 +14,14 @@
 #define TRG_SHORT_NAMES
 #define TRGCDC_SHORT_NAMES
 
-// #include <cstdlib>                                // unnecessary on kekcc
-// #include <sys/types.h>                            // unnecessary on kekcc
-// #include <sys/socket.h>                           // unnecessary on kekcc
-// #include <netinet/in.h>                           // unnecessary on kekcc
-// #include <netinet/tcp.h>                          // unnecessary on kekcc
-// #include <arpa/inet.h>                            // unnecessary on kekcc
-// #include <sys/resource.h>                         // unnecessary on kekcc
-// #include <sys/uio.h>                              // unnecessary on kekcc
-// #include <string>                                 // unnecessary on kekcc
-// #include <vector>                                 // unnecessary on kekcc
-// #include <iostream>                               // unnecessary on kekcc
-// #include <iomanip>                                // unnecessary on kekcc
-// #include "TFile.h"                                // unnecessary on kekcc
-// #include "TTree.h"                                // unnecessary on kekcc
-// #include "TVectorD.h"                             // unnecessary on kekcc
-// #include "TH1.h"                                  // unnecessary on kekcc
 #include "framework/datastore/StoreArray.h"
 #include "framework/datastore/RelationArray.h"
-// #include "framework/core/Module.h"                // unnecessary on kekcc
-// #include "framework/pcore/EvtMessage.h"           // unnecessary on kekcc
-// #include "framework/pcore/MsgHandler.h"           // unnecessary on kekcc
-// #include "framework/datastore/DataStore.h"        // unnecessary on kekcc
-// #include "framework/datastore/StoreObjPtr.h"      // unnecessary on kekcc
-// #include "framework/datastore/StoreArray.h"       // unnecessary on kekcc
-// #include "framework/dataobjects/EventMetaData.h"  // unnecessary on kekcc
-// #include "framework/core/InputController.h"
 #include "mdst/dataobjects/MCParticle.h"
 #include "cdc/geometry/CDCGeometryPar.h"
 #include "cdc/dataobjects/CDCHit.h"
 #include "cdc/dataobjects/CDCSimHit.h"
-// #include "daq/dataflow/EvtSocket.h"               // unnecessary on kekcc
-// #include "daq/rawdata/modules/DAQConsts.h"        // unnecessary on kekcc
-// #include "daq/rawdata/modules/DAQConsts.h"        // unnecessary on kekcc
-// #include "daq/rawdata/modules/PrintData.h"        // unnecessary on kekcc
 #include "rawdata/dataobjects/RawDataBlock.h"
 #include "rawdata/dataobjects/RawCOPPER.h"   
-// #include "rawdata/dataobjects/RawFTSW.h"          // unnecessary on kekcc
-// #include "rawdata/dataobjects/RawSVD.h"           // unnecessary on kekcc
-// #include "rawdata/dataobjects/RawCDC.h"           // unnecessary on kekcc
-// #include "rawdata/dataobjects/RawBPID.h"          // unnecessary on kekcc
-// #include "rawdata/dataobjects/RawEPID.h"          // unnecessary on kekcc
-// #include "rawdata/dataobjects/RawECL.h"           // unnecessary on kekcc
-// #include "rawdata/dataobjects/RawKLM.h"           // unnecessary on kekcc
 #include "trg/trg/Debug.h"
 #include "trg/trg/Time.h"
 #include "trg/trg/State.h"
@@ -449,15 +414,6 @@ TRGCDC::initialize(unsigned houghFinderMeshX,
     _luts.back()->initialize(_tsfLUTSL6DataFilename);
     _luts.back()->initialize(_tsfLUTSL7DataFilename);
     _luts.back()->initialize(_tsfLUTSL8DataFilename);
-    //_luts.back()->initialize("/gpfs/home/belle/kimjb/basf2/release-00-02-00-trigger-8/data/trg/cdc/TSF.FPGA.SL0.coe");
-    //_luts.back()->initialize("/gpfs/home/belle/kimjb/basf2/release-00-02-00-trigger-8/data/trg/cdc/TSF.FPGA.SL1.coe");
-    //_luts.back()->initialize("/gpfs/home/belle/kimjb/basf2/release-00-02-00-trigger-8/data/trg/cdc/TSF.FPGA.SL2.coe");
-    //_luts.back()->initialize("/gpfs/home/belle/kimjb/basf2/release-00-02-00-trigger-8/data/trg/cdc/TSF.FPGA.SL3.coe");
-    //_luts.back()->initialize("/gpfs/home/belle/kimjb/basf2/release-00-02-00-trigger-8/data/trg/cdc/TSF.FPGA.SL4.coe");
-    //_luts.back()->initialize("/gpfs/home/belle/kimjb/basf2/release-00-02-00-trigger-8/data/trg/cdc/TSF.FPGA.SL5.coe");
-    //_luts.back()->initialize("/gpfs/home/belle/kimjb/basf2/release-00-02-00-trigger-8/data/trg/cdc/TSF.FPGA.SL6.coe");
-    //_luts.back()->initialize("/gpfs/home/belle/kimjb/basf2/release-00-02-00-trigger-8/data/trg/cdc/TSF.FPGA.SL7.coe");
-    //_luts.back()->initialize("/gpfs/home/belle/kimjb/basf2/release-00-02-00-trigger-8/data/trg/cdc/TSF.FPGA.SL8.coe");
 
     //...event Time...
     _eventTime.push_back(new TCEventTime(*this));
@@ -631,15 +587,12 @@ TRGCDC::initialize(unsigned houghFinderMeshX,
     _h3DFinder = new TCH3DFinder(*this, _fileHough3D, _finder3DMode);
 
     //...3D fitter...
+    map<string, bool> flags = {{"fLRLUT",_fLRLUT},{"fEvtTime",_fevtTime},{"fzierror",_fzierror},
+                               {"fmcLR",_fmclr},{"fRootFile",_fileFitter3D}};
     _fitter3D = new TCFitter3D("Fitter3D",
                                _rootFitter3DFilename,
                                * this,
-                               _eventTime.back(),
-                               _fLRLUT,
-                               _fevtTime,
-                               _fzierror,
-                               _fmclr,
-                               _fileFitter3D);
+                               flags);
     _fitter3D->initialize();
 
     //...For module simulation (Front-end)...
@@ -986,6 +939,7 @@ TRGCDC::update(bool) {
                              << "] has multiple CDCHit(" << k << " hits)" << endl;
             }
 
+
             //...Get MCParticle... This is expensive, again.
             //   (Getting the first MCParticle only)
             unsigned iMCPart = 0;
@@ -1004,6 +958,7 @@ TRGCDC::update(bool) {
                              << "] has multiple CDCHit(" << k << " hits)" << endl;
             }
 
+
             //...Wire...
             int t_layerId;
             if (h.getISuperLayer() == 0) t_layerId = h.getILayer();
@@ -1011,6 +966,7 @@ TRGCDC::update(bool) {
             const unsigned layerId = t_layerId;
             const unsigned wireId = h.getIWire();
             TCWire & w = * (TCWire*) wire(layerId, wireId);
+
 
             //...TDC count...
             const int tdcCount = h.getTDCCount();
@@ -2064,7 +2020,7 @@ TRGCDC::fastSimulation(void) {
 
     //...3D tracker...
     vector<TCTrack*> trackList3D;
-    _fitter3D->doit(trackList, trackList3D, m_eventNum);
+    _fitter3D->doit(trackList, trackList3D);
 
     //...End of simulation...
 
@@ -2759,6 +2715,14 @@ TRGCDC::segment(unsigned lid, unsigned id) const {
 //jb 
 //jb   TRGDebug::leaveStage("Perfect 3D Finder");
 //jb }
+
+double TRGCDC::getEventTime(void) const {
+    return _eventTime.back()->getT0();
+}
+
+unsigned TRGCDC::getEventNumber(void) const {
+    return m_eventNum;
+}
 
 void TRGCDC::saveCDCHitInformation(vector<vector<unsigned> >& hitWiresFromCDC) {
 

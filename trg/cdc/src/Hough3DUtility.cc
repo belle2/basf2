@@ -113,11 +113,11 @@ void Hough3DFinder::runFinder(std::vector<double> &trackVariables, vector<vector
   vector<double > tsArcS;
   vector<vector<double> > tsZ;
   for(unsigned i=0; i<4; i++){
-    tsArcS.push_back(calS(rho,m_rr[i]));
+    tsArcS.push_back(Fitter3DUtility::calS(rho,m_rr[i]));
     tsZ.push_back(vector<double>());
     for(unsigned j=0; j<stTSs[i].size(); j++){
       //fitPhi0 = mcPhi0;
-      tsZ[i].push_back(calZ(charge, m_anglest[i], m_ztostraw[i], m_rr[i], stTSs[i][j], rho, fitPhi0));
+      tsZ[i].push_back(Fitter3DUtility::calZ(charge, m_anglest[i], m_ztostraw[i], m_rr[i], stTSs[i][j], rho, fitPhi0));
     }
   }
 
@@ -232,7 +232,7 @@ void Hough3DFinder::initVersion3(vector<float > & initVariables){
   // Set LUT information
   if(m_LUT) {
     // Make arccos LUT
-    int rho_bitSize = bitSize(m_rhoBit,0);
+    int rho_bitSize = Fitter3DUtility::bitSize(m_rhoBit,0);
     string first,second;
     ifstream inFileLUT;
     int iLUT;
@@ -263,7 +263,7 @@ void Hough3DFinder::initVersion3(vector<float > & initVariables){
       //}
     }
     // Make wireSpaceConversion LUT
-    int PI2_INT = int(m_Trg_PI * 2 * bitSize(m_phi0Bit,0)/(m_phi0Max - m_phi0Min));
+    int PI2_INT = int(m_Trg_PI * 2 * Fitter3DUtility::bitSize(m_phi0Bit,0)/(m_phi0Max - m_phi0Min));
     m_wireConvertLUT = new int*[4];
     for(int iLayer=0; iLayer<4; iLayer++) {
       // Include PI2_INT. PI2_INT is smaller than PI2.
@@ -576,7 +576,7 @@ void Hough3DFinder::runFinderVersion2(vector<double> &trackVariables, vector<vec
   double tsDiffSt;
 
   for( int iLayer=0; iLayer<4; iLayer++){
-    m_stAxPhi[iLayer] = calStAxPhi(charge, m_anglest[iLayer], m_ztostraw[iLayer],  m_rr[iLayer], rho, fitPhi0);
+    m_stAxPhi[iLayer] = Fitter3DUtility::calStAxPhi(charge, m_anglest[iLayer], m_ztostraw[iLayer],  m_rr[iLayer], rho, fitPhi0);
     if(stTSs[iLayer].size()==0) cout<<"stTSs["<<iLayer<<"] is zero"<<endl;
     for(unsigned iTS=0; iTS<stTSs[iLayer].size(); iTS++){
       // Find number of wire difference
@@ -697,23 +697,23 @@ void Hough3DFinder::runFinderVersion3(vector<double> &trackVariables, vector<vec
   int rho_int, rho_bitSize;
   int fitPhi0_int, fitPhi0_bitSize;
   int arcCos_int, myphiz_int;
-  rho_bitSize = bitSize(m_rhoBit,0);
-  fitPhi0_bitSize = bitSize(m_phi0Bit,0);
+  rho_bitSize = Fitter3DUtility::bitSize(m_rhoBit,0);
+  fitPhi0_bitSize = Fitter3DUtility::bitSize(m_phi0Bit,0);
   // Find 2*PI in integer space using phi0. phi0 min must be 0.
   // PI2_INT is the slightly smaller than 2*PI
   int PI2_INT = int(m_Trg_PI * 2 / m_phi0Max * fitPhi0_bitSize);
 
   // For integer space
-  findExtreme(m_findRhoMax, m_findRhoMin, rho);
-  findExtreme(m_findPhi0Max, m_findPhi0Min, fitPhi0);
-  changeInteger(rho_int, rho, m_rhoMin, m_rhoMax, rho_bitSize);
-  changeInteger(fitPhi0_int, fitPhi0, m_phi0Min, m_phi0Max, fitPhi0_bitSize);
-  findExtreme(m_findRhoIntMax, m_findRhoIntMin, rho_int);
-  findExtreme(m_findPhi0IntMax, m_findPhi0IntMin, fitPhi0_int);
+  Fitter3DUtility::findExtreme(m_findRhoMax, m_findRhoMin, rho);
+  Fitter3DUtility::findExtreme(m_findPhi0Max, m_findPhi0Min, fitPhi0);
+  Fitter3DUtility::changeInteger(rho_int, rho, m_rhoMin, m_rhoMax, rho_bitSize);
+  Fitter3DUtility::changeInteger(fitPhi0_int, fitPhi0, m_phi0Min, m_phi0Max, fitPhi0_bitSize);
+  Fitter3DUtility::findExtreme(m_findRhoIntMax, m_findRhoIntMin, rho_int);
+  Fitter3DUtility::findExtreme(m_findPhi0IntMax, m_findPhi0IntMin, fitPhi0_int);
   m_FPGAInput.push_back(rho_int);
   m_FPGAInput.push_back(fitPhi0_int);
-  changeReal(fitPhi0, fitPhi0_int, m_phi0Min, m_phi0Max, fitPhi0_bitSize);
-  changeReal(rho, rho_int, m_rhoMin, m_rhoMax, rho_bitSize);
+  Fitter3DUtility::changeReal(fitPhi0, fitPhi0_int, m_phi0Min, m_phi0Max, fitPhi0_bitSize);
+  Fitter3DUtility::changeReal(rho, rho_int, m_rhoMin, m_rhoMax, rho_bitSize);
   m_FPGAInput.push_back(charge);
 
   // Select TS candidate range variables
@@ -749,9 +749,9 @@ void Hough3DFinder::runFinderVersion3(vector<double> &trackVariables, vector<vec
     acos_real = acos(m_rr[iLayer]/(2*rho));
 
     // For integer space
-    findExtreme(m_findArcCosMax, m_findArcCosMin, acos_real);
-    changeInteger(arcCos_int, acos_real, m_phi0Min, m_phi0Max, fitPhi0_bitSize);
-    findExtreme(m_findArcCosIntMax, m_findArcCosIntMin, arcCos_int);
+    Fitter3DUtility::findExtreme(m_findArcCosMax, m_findArcCosMin, acos_real);
+    Fitter3DUtility::changeInteger(arcCos_int, acos_real, m_phi0Min, m_phi0Max, fitPhi0_bitSize);
+    Fitter3DUtility::findExtreme(m_findArcCosIntMax, m_findArcCosIntMin, arcCos_int);
     m_FPGAOutput.push_back(arcCos_int);
     if(arcCos_int != m_arcCosLUT[iLayer][rho_int]) {
       cout<<"Error with arcCos LUT: "<<rho_int<<" "<<arcCos_int<<" "<<m_arcCosLUT[iLayer][rho_int]<<endl;
@@ -768,10 +768,10 @@ void Hough3DFinder::runFinderVersion3(vector<double> &trackVariables, vector<vec
       myphiz_int = -arcCos_int+fitPhi0_int;
     }
 
-    changeReal(myphiz, myphiz_int, m_phi0Min, m_phi0Max, fitPhi0_bitSize);
+    Fitter3DUtility::changeReal(myphiz, myphiz_int, m_phi0Min, m_phi0Max, fitPhi0_bitSize);
     // Find extreme value
-    findExtreme(m_findPhiZMax, m_findPhiZMin, myphiz);
-    findExtreme(m_findPhiZIntMax, m_findPhiZIntMin, myphiz_int);
+    Fitter3DUtility::findExtreme(m_findPhiZMax, m_findPhiZMin, myphiz);
+    Fitter3DUtility::findExtreme(m_findPhiZIntMax, m_findPhiZIntMin, myphiz_int);
     m_FPGAOutput.push_back(myphiz_int);
 
     // Actual function
@@ -785,7 +785,7 @@ void Hough3DFinder::runFinderVersion3(vector<double> &trackVariables, vector<vec
     if(myphiz_int < 0 ) myphiz_int += PI2_INT + 1;
 
     // For real space
-    changeReal(myphiz, myphiz_int, m_phi0Min, m_phi0Max, fitPhi0_bitSize);
+    Fitter3DUtility::changeReal(myphiz, myphiz_int, m_phi0Min, m_phi0Max, fitPhi0_bitSize);
 
     stAxPhi[iLayer] = myphiz;
 

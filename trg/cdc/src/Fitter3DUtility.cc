@@ -1,6 +1,8 @@
 #ifndef __CINT__
 #include "trg/cdc/Fitter3DUtility.h"
 #include <cmath>
+#else
+#include "Fitter3DUtility.h"
 #endif
 
 #include <iostream>
@@ -10,8 +12,11 @@
 
 using std::cout;
 using std::endl;
+using std::vector;
+using std::map;
+using std::string;
 
-int bitSize(int numberBits, int mode) {
+int Fitter3DUtility::bitSize(int numberBits, int mode) {
   int bitsize = 1;
   if( mode == 1 ) {
     for(int i=0; i<numberBits-1; i++) {
@@ -27,26 +32,26 @@ int bitSize(int numberBits, int mode) {
 }
 
 
-void changeInteger(int &integer, double real, double minValue, double maxValue, int bitSize) {
+void Fitter3DUtility::changeInteger(int &integer, double real, double minValue, double maxValue, int bitSize) {
   double range = maxValue - minValue; 
   double convert = bitSize/range;
   //cout<<"maxValue: "<<bitSize<<" realValue: "<<(real-minValue)*convert<<endl;
   integer = int( (real - minValue) * convert +0.5);
 }
 
-void changeReal(double &real, int integer, double minValue, double maxValue, int bitSize) {
+void Fitter3DUtility::changeReal(double &real, int integer, double minValue, double maxValue, int bitSize) {
   double range = maxValue - minValue;
   double convert = bitSize/range;
   real = (integer/convert) + minValue;
 }
 
 
-void findExtreme(double &m_max, double &m_min, double value) {
+void Fitter3DUtility::findExtreme(double &m_max, double &m_min, double value) {
   if(value > m_max) m_max = value;
   if(value < m_min) m_min = value;
 }
 
-int findSign(double *phi2){
+int Fitter3DUtility::findSign(double *phi2){
   double Trg_PI=3.141592653589793; 
   int mysign;
   double sign_phi[2];
@@ -67,7 +72,7 @@ int findSign(double *phi2){
   return mysign;
 }
 
-void rPhiFit(double *rr, double *phi2, double *phierror, double &rho, double &myphi0){
+void Fitter3DUtility::rPhiFit(double *rr, double *phi2, double *phierror, double &rho, double &myphi0){
 
   // Print input values
   //for(unsigned iSL=0; iSL<5; iSL++){
@@ -116,7 +121,7 @@ void rPhiFit(double *rr, double *phi2, double *phierror, double &rho, double &my
   
 }
 
-void rPhiFit2(double *rr, double *phi2, double *phierror, double &rho, double &myphi0, int nTS){
+void Fitter3DUtility::rPhiFit2(double *rr, double *phi2, double *phierror, double &rho, double &myphi0, int nTS){
 
   double Trg_PI=3.141592653589793; 
   double A,B,C,D,E,G,hcx,hcy;
@@ -161,7 +166,18 @@ void rPhiFit2(double *rr, double *phi2, double *phierror, double &rho, double &m
   
 }
 
-double calStAxPhi(int &mysign, double &anglest, double &ztostraw, double &rr, double &rho, double &myphi0){
+double Fitter3DUtility::calPhi(double wirePhi, double driftLength, double eventTime, double rr, int lr){
+  double result = wirePhi;
+  double t_dPhi=driftLength*10 - eventTime;
+  // Change to radian
+  t_dPhi=atan(t_dPhi/rr/10);
+  // Use LR to add dPhi
+  if(lr == 0) result -= t_dPhi;
+  else if(lr == 1) result += t_dPhi;
+  return result;
+}
+
+double Fitter3DUtility::calStAxPhi(int mysign, double anglest, double ztostraw, double rr, double rho, double myphi0){
   if(1==2) cout<<anglest<<ztostraw<<endl; // Removes warnings when compileing
 
   double myphiz, acos_real;
@@ -182,7 +198,7 @@ double calStAxPhi(int &mysign, double &anglest, double &ztostraw, double &rr, do
   return myphiz;
 }
 
-double calDeltaPhi(int &mysign, double &anglest, double &ztostraw, double &rr, double &phi2, double &rho, double &myphi0){
+double Fitter3DUtility::calDeltaPhi(int mysign, double anglest, double ztostraw, double rr, double phi2, double rho, double myphi0){
   if(1==2) cout<<anglest<<ztostraw<<endl; // Removes warnings when compileing
 
   double myphiz, acos_real;
@@ -203,7 +219,7 @@ double calDeltaPhi(int &mysign, double &anglest, double &ztostraw, double &rr, d
   return myphiz;
 }
 
-double calZ(int &mysign, double &anglest, double &ztostraw, double &rr, double &phi2, double &rho, double &myphi0){
+double Fitter3DUtility::calZ(int mysign, double anglest, double ztostraw, double rr, double phi2, double rho, double myphi0){
   double myphiz, acos_real;
   double Trg_PI=3.141592653589793; 
   //Find phifit-phist
@@ -222,13 +238,13 @@ double calZ(int &mysign, double &anglest, double &ztostraw, double &rr, double &
   return (ztostraw - rr*2*sin(myphiz/2)/anglest);
 }
 
-double calS(double &rho, double &rr){
+double Fitter3DUtility::calS(double rho, double rr){
   double result;
   result = rho*2*asin(rr/2/rho);
   return result;
 }
 
-void rSFit(double *iezz2, double *arcS, double *zz, double &z0, double &cot, double &zchi2){
+void Fitter3DUtility::rSFit(double *iezz2, double *arcS, double *zz, double &z0, double &cot, double &zchi2){
 
   double ss=0, sx=0, sxx=0, cotnum=0, z0num=0;
   double z0nump1[4], z0nump2[4];
@@ -262,7 +278,7 @@ void rSFit(double *iezz2, double *arcS, double *zz, double &z0, double &cot, dou
 
 }
 
-void rSFit2(double *iezz21,double *iezz22, double *arcS, double *zz, int *lutv, double &z0, double &cot,double &zchi2){
+void Fitter3DUtility::rSFit2(double *iezz21,double *iezz22, double *arcS, double *zz, int *lutv, double &z0, double &cot,double &zchi2){
 //      cout << "rs2" << endl;
 
   double ss=0, sx=0, sxx=0, cotnum=0, z0num=0;
@@ -317,7 +333,7 @@ void rSFit2(double *iezz21,double *iezz22, double *arcS, double *zz, int *lutv, 
 }
 
 
-void findImpactPosition(TVector3 * mcPosition, TLorentzVector * mcMomentum, int charge, TVector2 & helixCenter, TVector3 & impactPosition){
+void Fitter3DUtility::findImpactPosition(TVector3 * mcPosition, TLorentzVector * mcMomentum, int charge, TVector2 & helixCenter, TVector3 & impactPosition){
 
   // Finds the impact position. Everything is in cm, and GeV.
   // Input:   production vertex (mcx, mcy, mcz),
@@ -341,32 +357,103 @@ void findImpactPosition(TVector3 * mcPosition, TLorentzVector * mcMomentum, int 
 
 }
 
-void calHelixParameters(TVector3* position, TVector3* momentum, int charge, TVectorD& helixParameters){
+void Fitter3DUtility::calHelixParameters(TVector3 position, TVector3 momentum, int charge, TVectorD& helixParameters){
+  double Trg_PI=3.141592653589793; 
   // HelixParameters: dR, phi0, keppa, dz, tanLambda
-  double t_alpha = 1/0.3/1.5;
-  double t_pT = momentum->Perp();
-  double t_R = charge * t_pT * t_alpha;
+  double t_alpha = 1/0.3/1.5*100;
+  double t_pT = momentum.Perp();
+  double t_R = t_pT * t_alpha;
   helixParameters.Clear();
   helixParameters.ResizeTo(5);
   helixParameters[2] = t_alpha/t_R;
-  helixParameters[1] = atan2(position->Y() - t_R * momentum->X() / t_pT, position->X() + t_R * momentum->Y() / t_pT);
-  helixParameters[0] = (position->X() + t_R * momentum->Y() / t_pT ) / cos(helixParameters[1]) - t_R;
-  double t_phi = asin(-momentum->X() / t_pT) - helixParameters[1];
-  helixParameters[4] = momentum->Z() / t_pT;
-  helixParameters[3] = position->Z() + helixParameters[4] * t_R * t_phi;
+  helixParameters[1] = atan2(position.Y() - t_R * momentum.X() / t_pT * charge, position.X() + t_R * momentum.Y() / t_pT * charge);
+  helixParameters[0] = (position.X() + t_R * momentum.Y() / t_pT * charge ) / cos(helixParameters[1]) - t_R;
+  double t_phi = atan2(-momentum.X()*charge, momentum.Y()*charge) - helixParameters[1];
+  if(t_phi > Trg_PI) t_phi -= 2*Trg_PI;
+  if(t_phi < -Trg_PI) t_phi += 2*Trg_PI;
+  helixParameters[4] = momentum.Z() / t_pT * charge;
+  helixParameters[3] = position.Z() + helixParameters[4] * t_R * t_phi;
 }
-void calVectorsAtR(TVectorD& helixParameters, double radius, TVector3* position, TVector3* momentum){
+void Fitter3DUtility::calVectorsAtR(TVectorD& helixParameters, int charge, double cdcRadius, TVector3& position, TVector3& momentum){
   // HelixParameters: dR, phi0, keppa, dz, tanLambda
-  double t_alpha = 1/0.3/1.5;
+  double t_alpha = 1/0.3/1.5*100;
   double t_R = t_alpha / helixParameters[2];
   double t_pT = t_R / t_alpha;
-  double t_phi = acos(-pow(radius,2) + pow(t_R+helixParameters[0],2) + pow(t_R,2) / (2*t_R*(t_R+helixParameters[0])));
+  double t_phi = -1*charge*acos((-pow(cdcRadius,2) + pow(t_R+helixParameters[0],2) + pow(t_R,2)) / (2*t_R*(t_R+helixParameters[0])));
   double t_X = (helixParameters[0]+t_R)*cos(helixParameters[1])-t_R*cos(helixParameters[1]+t_phi);
   double t_Y = (helixParameters[0]+t_R)*sin(helixParameters[1])-t_R*sin(helixParameters[1]+t_phi);
   double t_Z = helixParameters[3] - helixParameters[4]*t_R*t_phi;
-  double t_Px = -t_pT * sin(helixParameters[1]+t_phi);
-  double t_Py = t_pT * cos(helixParameters[1]+t_phi);
-  double t_Pz = t_pT * helixParameters[4];
-  position->SetXYZ(t_X, t_Y, t_Z);
-  momentum->SetXYZ(t_Px, t_Py, t_Pz);
+  double t_Px = -t_pT * sin(helixParameters[1]+t_phi)*charge;
+  double t_Py = t_pT * cos(helixParameters[1]+t_phi)*charge;
+  double t_Pz = t_pT * helixParameters[4]*charge;
+  position.SetXYZ(t_X, t_Y, t_Z);
+  momentum.SetXYZ(t_Px, t_Py, t_Pz);
+}
+
+
+// Convert method: abs(min)=abs(max): signed. min=0: unsigned. else: const+unsigned.
+// [TODO] Make function that calculates "const" in else case.
+int Fitter3DUtility::convertToInt(double value, std::vector<double> convertInformation){
+  // convertInformation: (min, max, #bits): 
+  double min = convertInformation[0];
+  double max = convertInformation[1];
+  int nBits = convertInformation[2];
+  double result;
+  // signed case
+  if(abs(min)==abs(max)){
+    double t_bitRange = pow(2,nBits)/2 - 0.5;
+    double t_realRange = max;
+    double t_min = 0;
+    result = (value-t_min)*float(t_bitRange)/t_realRange;
+    if(result > 0){
+      result = result + 0.5;
+      result = (result == int(result) ? result - 1 : int(result) );
+    } else {
+      result = result - 0.5;
+      result = (result == int(result) ? result + 1 : int(result) );
+    }
+  // unsigned case
+  } else if (min == 0){
+    int t_bitRange = pow(2,nBits);
+    double t_min = max / (t_bitRange-0.5) * (-0.5);
+    double t_realRange = max - t_min;
+    result = (value-t_min)*float(t_bitRange)/t_realRange;
+    result = (result == int(result) ? result - 1 : int(result) );
+  // unsigned + const case
+  } else {
+    int t_bitRange = pow(2,nBits);
+    double t_realRange = max - min;
+    result = (value-min)*float(t_bitRange)/t_realRange;
+    result = (result == int(result) ? result - 1 : int(result) );
+    if(value == min ) result = 0;
+  }
+  return int(result);
+}
+
+// Convert method: abs(min)=abs(max): signed. min=0: unsigned. else: const+unsigned.
+double Fitter3DUtility::convertToDouble(int value, std::vector<double> convertInformation){
+  // convertInformation: (min, max, #bits): 
+  double min = convertInformation[0];
+  double max = convertInformation[1];
+  int nBits = convertInformation[2];
+  double result;
+  // signed case
+  if(abs(min)==abs(max)){
+    double t_bitRange = pow(2,nBits)/2 - 0.5;
+    double t_realRange = max;
+    double t_min = 0;
+    result = (value-t_min)*t_realRange/float(t_bitRange);
+  // unsigned case
+  } else if (min == 0){
+    int t_bitRange = pow(2,nBits);
+    double t_min = max / (t_bitRange-0.5) * (-0.5);
+    double t_realRange = max - t_min;
+    result = value*t_realRange/float(t_bitRange);
+  } else {
+  // unsigned + const case
+    int t_bitRange = pow(2,nBits);
+    double t_realRange = max - min;
+    result = (value+0.5)*t_realRange/float(t_bitRange) + min;
+  }
+  return result;
 }

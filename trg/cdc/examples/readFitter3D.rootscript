@@ -1,12 +1,14 @@
 #include <algorithm>
 
+using namespace RooFit;
+
 readFitter3D(){
 
   // Control readFitter3D
   // graphFlag=-1: don't plot, 0: plot all, 1: plot fit, 2: plot pdg and mcParticle Status
-  int graphFlag = 1;
+  int graphFlag = 0;
   // Choose if there is a condition in plotting fit results
-  int conditionFlag = 1;
+  int conditionFlag = 0;
 
   gROOT->Reset();
   gROOT->SetStyle("Plain");
@@ -18,24 +20,36 @@ readFitter3D(){
   TFile* inFile = new TFile("Fitter3D.root");
   TTree* inTree = (TTree*)inFile->Get("m_treeTrackFitter3D");
   //Set branches
-  TClonesArray* tSTrackFitter3D = new TClonesArray("TVectorD"); 
-  TClonesArray* fitTrackFitter3D = new TClonesArray("TVectorD"); 
-  TClonesArray* mcTrackFitter3D = new TClonesArray("TVectorD"); 
-  TClonesArray* mcStatusTrackFitter3D = new TClonesArray("TVectorD"); 
-  inTree->SetBranchAddress("tSTrackFitter3D", &tSTrackFitter3D);
-  inTree->SetBranchAddress("fitTrackFitter3D", &fitTrackFitter3D);
-  inTree->SetBranchAddress("mcTrackFitter3D", &mcTrackFitter3D);
-  inTree->SetBranchAddress("mcStatusTrackFitter3D", &mcStatusTrackFitter3D);
+  TClonesArray* chargeTrackFitter3D = new TClonesArray("TVectorD"); 
+  TClonesArray* ptTrackFitter3D = new TClonesArray("TVectorD"); 
+  TClonesArray* phi0TrackFitter3D = new TClonesArray("TVectorD"); 
+  TClonesArray* mcPtTrackFitter3D = new TClonesArray("TVectorD"); 
+  TClonesArray* mcPhi0TrackFitter3D = new TClonesArray("TVectorD"); 
+  TClonesArray* z0TrackFitter3D = new TClonesArray("TVectorD"); 
+  TClonesArray* cotTrackFitter3D = new TClonesArray("TVectorD"); 
+  TClonesArray* mcZ0TrackFitter3D = new TClonesArray("TVectorD"); 
+  TClonesArray* mcCotTrackFitter3D = new TClonesArray("TVectorD"); 
+  TClonesArray* pdgIdTrackFitter3D = new TClonesArray("TVectorD"); 
+  inTree->SetBranchAddress("chargeTrackFitter3D", &chargeTrackFitter3D);
+  inTree->SetBranchAddress("ptTrackFitter3D", &ptTrackFitter3D);
+  inTree->SetBranchAddress("phi0TrackFitter3D", &phi0TrackFitter3D);
+  inTree->SetBranchAddress("mcPtTrackFitter3D", &mcPtTrackFitter3D);
+  inTree->SetBranchAddress("mcPhi0TrackFitter3D", &mcPhi0TrackFitter3D);
+  inTree->SetBranchAddress("z0TrackFitter3D", &z0TrackFitter3D);
+  inTree->SetBranchAddress("cotTrackFitter3D", &cotTrackFitter3D);
+  inTree->SetBranchAddress("mcZ0TrackFitter3D", &mcZ0TrackFitter3D);
+  inTree->SetBranchAddress("mcCotTrackFitter3D", &mcCotTrackFitter3D);
+  inTree->SetBranchAddress("pdgIdTrackFitter3D", &pdgIdTrackFitter3D);
 
   //Make Histogram
-  TH1F* hpT    = new TH1F("histpT","Plot of pT",93,0.9,1.1);
+  TH1F* hpT    = new TH1F("histpT","Plot of pT",93,0,5);
   TH1F* hphi0   = new TH1F("hphi00","",87,0,360);
   TH1F* hz0     = new TH1F("histz0","Plot of z0",98,-25,25);
   TH1F* htheta = new TH1F("htheta","",130,20,150);
   hphi0->SetMinimum(0);
   hpT->SetMinimum(0);
   // MC Histograms
-  TH1F* hMCpT    = new TH1F("histMCpT","Plot of pT",93,0.9,1.1);
+  TH1F* hMCpT    = new TH1F("histMCpT","Plot of pT",93,0,5);
   TH1F* hMCphi0   = new TH1F("hMCphi00","Plot of phi0",87,0,360);
   TH1F* hMCz0     = new TH1F("histMCz0","Plot of z0",98,-25,25);
   TH1F* hMCtheta = new TH1F("hMCtheta","Plot of theta",130,20,150);
@@ -56,141 +70,129 @@ readFitter3D(){
   TH1F* hRestheta = new TH1F("hRestheta","Resolution plot of theta",130,-50,50);
   hResphi0->SetMinimum(0);
   hRespT->SetMinimum(0);
-  
-  // For MC-Fit combined graph
-  double mcPt[10000];
-  double myPt[10000];
-  double mcPhi0[10000];
-  double myPhi0[10000];
-  double mcZ0[10000];
-  double myZ0[10000];
-  double mcTheta[10000];
-  double myTheta[10000];
 
   // For pdg id plot
   TH1F* hPDG = new TH1F("histPDG","Plot of pdg id",10001,-5000.5,5000.5);
 
   // For statusbit plot
   TH1F* hStatus = new TH1F("histStatus", "Plot of MCParticle status", 11, -0.5, 10.5);
-  
+
+
+  // Relation plots
+  TGraph* gPtRelation = new TGraph();
+  gPtRelation->SetTitle("pt,mcPt");
+  TGraph* gPhi0Relation = new TGraph();
+  gPhi0Relation->SetTitle("phi0,mcPhi0");
+  TGraph* gZ0Relation = new TGraph();
+  gZ0Relation->SetTitle("z0,mcZ0");
+  TGraph* gThetaRelation = new TGraph();
+  gThetaRelation->SetTitle("theta,mcTheta");
+
 
   double Trg_PI = 3.141592653589793;
 
-  //[0]=pt, [1]=phi0, [2]=z0(cm), [3]=cot [4]=charge
-  TVectorD tempPar(5);
-  TVectorD tempMCPar(5);
-  // statusbit, pdg, charge
-  TVectorD mcStatus(3);
-  // 0: primary, 1: stable in generator, 2: left detector, 3: stopped in detector
-  // 4: seen in PXD, 5: seen in SVD, 6: seen in CDC, 7: seen in TOP,
-  // 8: seen in ECL, 9: seen in KLM, 10: Virtual and not go to Geant4
-  bool mcStatusBit[11];
-  int tempStatus;
-  int countStrangeZ0=0;
-  int countTracks=0;
+  int totalNumberTracks=0;
 
-  Double_t theta;
-  Double_t MCtheta;
   cout<<"Number of events: "<<inTree->GetEntriesFast()<<endl;
+
   for(int event=0; event<inTree->GetEntriesFast();event++){
+    //cout<<"Event["<<event<<"]"<<endl;
     //Get event
     inTree->GetEntry(event);
     //Number of tracks
     //cout<<"Number of tracks: "<<fitTrackFitter3D->GetEntriesFast()<<endl;
-    countTracks += fitTrackFitter3D->GetEntriesFast();
-    for(int track=0; track<tSTrackFitter3D->GetEntriesFast(); track++){
-      tempPar = *(TVectorD*)fitTrackFitter3D->At(track);
-      tempMCPar = *(TVectorD*)mcTrackFitter3D->At(track);
-      mcStatus = *(TVectorD*)mcStatusTrackFitter3D->At(track);
+    for(int track=0; track<z0TrackFitter3D->GetEntriesFast(); track++){
+      totalNumberTracks++;
+      //cout<<"Track["<<track<<"]"<<endl;
+      double pdgId = (*(TVectorD*)pdgIdTrackFitter3D->At(track))[0];
+      double charge = (*(TVectorD*)chargeTrackFitter3D->At(track))[0];
+      double pt = (*(TVectorD*)ptTrackFitter3D->At(track))[0];
+      double mcPt = (*(TVectorD*)mcPtTrackFitter3D->At(track))[0];
+      double phi0 = (*(TVectorD*)phi0TrackFitter3D->At(track))[0];
+      double mcPhi0 = (*(TVectorD*)mcPhi0TrackFitter3D->At(track))[0];
+      double z0 = (*(TVectorD*)z0TrackFitter3D->At(track))[0];
+      double mcZ0 = (*(TVectorD*)mcZ0TrackFitter3D->At(track))[0];
+      double cot = (*(TVectorD*)cotTrackFitter3D->At(track))[0];
+      double mcCot = (*(TVectorD*)mcCotTrackFitter3D->At(track))[0];
 
-      // Transform parameters
-      if(tempPar[1]<0) tempPar[1] += 2*Trg_PI;
-      tempPar[1] = tempPar[1]*180/Trg_PI;
-      if(tempMCPar[1]<0) tempMCPar[1] += 2*Trg_PI;
-      tempMCPar[1] = tempMCPar[1]*180/Trg_PI;
-
-      theta = Trg_PI/2.-atan(tempPar[3]);
+      phi0 = phi0*180/Trg_PI;
+      mcPhi0 = mcPhi0*180/Trg_PI;
+      double theta = Trg_PI/2.-atan(cot);
       theta*=180./Trg_PI;
-      MCtheta=Trg_PI/2.-atan(tempMCPar[3]);
-      MCtheta*=180./Trg_PI;
+      double mcTheta = Trg_PI/2.-atan(mcCot);
+      mcTheta*=180./Trg_PI;
 
-      // Pick condition
-      //if((tempMCPar[2]*100>1 || tempMCPar[2]*100<-1) && conditionFlag == 1) continue;
-      //if(!(tempMCPar[1]>100 && tempMCPar[1]<250) && conditionFlag == 1) continue;
-      if(!(tempPar[0]>1.004) && conditionFlag == 1) continue;
 
-      hpT->Fill(tempPar[0]);
-      //myPt[event] = (tempPar[0]-tempMCPar[0])/tempMCPar[0];
-      myPt[event] = tempPar[0];
-      hMCpT->Fill(tempMCPar[0]);
-      mcPt[event] = tempMCPar[0];
-      hRespT->Fill(tempPar[0]-tempMCPar[0]);
+      hpT->Fill(pt);
+      hMCpT->Fill(mcPt);
+      hRespT->Fill(pt-mcPt);
+
+      gPtRelation->SetPoint(totalNumberTracks, pt, mcPt);
 
       // Divide by MC pT
-      if(tempMCPar[0]<1.5) {
-        hpT1->Fill((tempPar[0]-tempMCPar[0])/tempMCPar[0]);
+      if(mcPt<1.5) {
+        hpT1->Fill((pt-mcPt)/mcPt);
       }
-      if(tempMCPar[0]>1.5 && tempMCPar[0]<2.5) {
-        hpT2->Fill((tempPar[0]-tempMCPar[0])/tempMCPar[0]);
+      if(mcPt>1.5 && mcPt<2.5) {
+        hpT2->Fill((pt-mcPt)/mcPt);
       }
-      if(tempMCPar[0]>2.5 && tempMCPar[0]<3.5) {
-        hpT3->Fill((tempPar[0]-tempMCPar[0])/tempMCPar[0]);
+      if(mcPt>2.5 && mcPt<3.5) {
+        hpT3->Fill((pt-mcPt)/mcPt);
       }
-      if(tempMCPar[0]>3.5) {
-        hpT4->Fill((tempPar[0]-tempMCPar[0])/tempMCPar[0]);
+      if(mcPt>3.5) {
+        hpT4->Fill((pt-mcPt)/mcPt);
       }
 
+      hphi0->Fill(phi0);
+      hMCphi0->Fill(mcPhi0);
+      hResphi0->Fill(phi0-mcPhi0);
+      gPhi0Relation->SetPoint(totalNumberTracks, phi0, mcPhi0);
 
-      hphi0->Fill(tempPar[1]);
-      myPhi0[event] = tempPar[1];
-      hMCphi0->Fill(tempMCPar[1]);
-      mcPhi0[event] = tempMCPar[1];
-      hResphi0->Fill(tempPar[1]-tempMCPar[1]);
-
-      hz0->Fill(tempPar[2]*100);
-      myZ0[event] = tempPar[2]*100;
-      hMCz0->Fill(tempMCPar[2]*100);
-      mcZ0[event] = tempMCPar[2]*100;
-      hResz0->Fill(tempPar[2]*100-tempMCPar[2]);
+      hz0->Fill(z0);
+      hMCz0->Fill(mcZ0);
+      hResz0->Fill(z0-mcZ0);
+      gZ0Relation->SetPoint(totalNumberTracks, z0, mcZ0);
 
       htheta->Fill(theta);
-      myTheta[event]=theta;
-      hMCtheta->Fill(MCtheta);
-      mcTheta[event]=MCtheta;
-      hRestheta->Fill(theta-MCtheta);
+      hMCtheta->Fill(mcTheta);
+      hRestheta->Fill(theta-mcTheta);
+      gThetaRelation->SetPoint(totalNumberTracks, theta, mcTheta);
 
-
-      // Calculate the status bit.
-      tempStatus = mcStatus[0];
-      for(int n=10; n>=0; n--) mcStatusBit[n]=0;
-      for(int n=10; n>=0; n--){
-        if(tempStatus >= pow(2,n)){
-          tempStatus -= pow(2,n);
-          mcStatusBit[n] = 1;
-        }
-      }
-      // print status bit
-      //for(int n=10; n>=0; n--) cout<<mcStatusBit[n];
-      //cout<<endl;
-
-      // statusbit, pdg, charge
-      hPDG->Fill(mcStatus[1]);
-      for(int n=0; n<10; n++){
-        if(mcStatusBit[n] == 1){
-          hStatus->Fill(n);
-        }
-      }
-
-      float range = 1;
-      if(tempMCPar[2]*100>range || tempMCPar[2]<-range) countStrangeZ0 +=1;
+      hPDG->Fill(pdgId);
 
     } // track loop
   } // event loop
 
-  cout<<"Strange Z0: "<<countStrangeZ0<<" ratio: "<<(double) countStrangeZ0/countTracks*100<<endl;
-  cout<<"Tracks: "<<countTracks<<endl;
+  cout<<"Tracks: "<<totalNumberTracks<<endl;
 
   if(graphFlag==0 || graphFlag==1){
+
+    // Fit the histogram
+    RooRealVar x("z0","fitZ0 (cm)",-50,50);
+    RooRealVar gaus1_mean("gaus1_mean","gaus1_mean",0.1,-5,5);
+    RooRealVar gaus1_width("gaus1_withd","guas1_width",1,0,10);
+    RooRealVar gaus2_mean("gaus2_mean","gaus2_mean",-0.1,-5,5);
+    RooRealVar gaus2_width("gaus2_withd","guas2_width",6,4,60);
+    RooGaussian f_gaus1("f_gaus1","f_gaus1",x,gaus1_mean,gaus1_width);
+    RooGaussian f_gaus2("f_gaus2","f_gaus2",x,gaus2_mean,gaus2_width);
+    RooRealVar fracG("fracG","fraction gaussian",0.5,0,1);
+    RooAddPdf model("model","model",RooArgList(f_gaus1,f_gaus2),fracG);
+
+    RooDataHist dHfitZ0("dHfitZ0","Fitted z0",RooArgList(x), hz0);
+    RooFitResult* r_model = model.fitTo(dHfitZ0);
+
+    RooRealVar resZ0("resZ0","resZ0 (cm)",-50,50);
+    RooRealVar resZ0_gaus1_mean("resZ0_gaus1_mean","resZ0_gaus1_mean",0.1,-5,5);
+    RooRealVar resZ0_gaus1_width("resZ0_gaus1_withd","resZ0_guas1_width",1,0,10);
+    RooRealVar resZ0_gaus2_mean("resZ0_gaus2_mean","resZ0_gaus2_mean",-0.1,-5,5);
+    RooRealVar resZ0_gaus2_width("resZ0_gaus2_withd","resZ0_guas2_width",6,4,60);
+    RooGaussian resZ0_f_gaus1("resZ0_f_gaus1","resZ0_f_gaus1",resZ0,resZ0_gaus1_mean,resZ0_gaus1_width);
+    RooGaussian resZ0_f_gaus2("resZ0_f_gaus2","resZ0_f_gaus2",resZ0,resZ0_gaus2_mean,resZ0_gaus2_width);
+    RooRealVar resZ0_fracG("resZ0_fracG","resZ0_fraction gaussian",0.5,0,1);
+    RooAddPdf resZ0_model("resZ0_model","resZ0_model",RooArgList(resZ0_f_gaus1,resZ0_f_gaus2),resZ0_fracG);
+    RooDataHist dHresZ0("dHresZ0","Resolution z0",RooArgList(resZ0), hResz0);
+    RooFitResult* resZ0_r_model = resZ0_model.fitTo(dHresZ0);
+
     TCanvas *c1 = new TCanvas("c1", "", 1000, 500);
     c1->Divide(2,2);
     c1->cd(1);
@@ -202,35 +204,81 @@ readFitter3D(){
     hMCphi0->SetLineColor(2);
     hMCphi0->Draw("same");
     c1->cd(3);
-    hz0->SetMaximum(max(hz0->GetMaximum(),hMCz0->GetMaximum())*1.1);
-    hz0->Draw();
+    //hz0->SetMaximum(max(hz0->GetMaximum(),hMCz0->GetMaximum())*1.1);
+    RooPlot* frame = x.frame();
+    frame->SetTitle("fitZ0 (cm)");
+    dHfitZ0.plotOn(frame,MarkerSize(0.0),Name("d_z0"), DataError(RooAbsData::None), XErrorSize(0));
+    model.plotOn(frame,Components(RooArgSet(f_gaus1)),LineColor(kBlue),Name("gauss1"));
+    model.plotOn(frame,Components(RooArgSet(f_gaus2)),LineColor(kGreen),Name("gauss2"));
+    model.plotOn(frame,LineColor(kRed),Name("gauss1gauss2"));
+    frame->Draw();
+    hz0->Draw("same");
     hMCz0->SetLineColor(2);
     hMCz0->Draw("same");
+    double histEntries = hz0->GetEntries();
+    double fit1Mean = gaus1_mean.getVal();
+    double fit1Width = gaus1_width.getVal();
+    double fit2Mean = gaus2_mean.getVal();
+    double fit2Width = gaus2_width.getVal();
+    TPaveText* jbStats = new TPaveText(0.6,0.4,0.895,0.89,"NDC");
+    //jbStats->SetTextSize(0.03);
+    //Set white background
+    jbStats->SetFillColor(0);
+    jbStats->SetTextAlign(12);
+    //Entries
+    char jbEntries[30];
+    sprintf(jbEntries,"Entries %i", histEntries);
+    jbStatsEntry = jbStats->AddText(jbEntries);
+    //Gaus1 mean
+    char jbGauss1Mean[30];
+    sprintf(jbGauss1Mean,"Gauss1 Mean %4.2f", fit1Mean);
+    jbStatsEntry = jbStats->AddText(jbGauss1Mean);
+    //Gaus1 sigma
+    char jbGauss1Sigma[30];
+    sprintf(jbGauss1Sigma,"Gauss1 Sigma %4.2f", fit1Width);
+    jbStatsEntry = jbStats->AddText(jbGauss1Sigma);
+    //Gaus2 mean
+    char jbGauss2Mean[30];
+    sprintf(jbGauss2Mean,"Gauss2 Mean %4.2f", fit2Mean);
+    jbStatsEntry = jbStats->AddText(jbGauss2Mean);
+    //Gaus2 sigma
+    char jbGauss2Sigma[30];
+    sprintf(jbGauss2Sigma,"Gauss2 Sigma %4.2f", fit2Width);
+    jbStatsEntry = jbStats->AddText(jbGauss2Sigma);
+    jbStats->Draw();
+
+    TLegend* legend1 = new TLegend(0.1,0.7,0.4,0.9);
+    legend1->SetFillColor(0);
+    legend1->AddEntry(hResz0,"z0","l");
+    legend1->AddEntry(gauss1,"Gauss 1","l");
+    legend1->AddEntry(gauss2,"Gauss 2","l");
+    legend1->AddEntry(gauss1gauss2,"Model","l");
+    legend1->Draw();
+
+
     c1->cd(4);
+    htheta->SetMaximum(max(htheta->GetMaximum(),hMCtheta->GetMaximum())*1.1);
     htheta->Draw();
     hMCtheta->SetLineColor(2);
     hMCtheta->Draw("same");
 
+
     //c1->SaveAs("histFitter3D.pdf");
     TCanvas *c2 = new TCanvas("c2", "", 600, 600);
 
-    gPtMCFit = new TGraph(10000,mcPt,myPt);
-    gPhi0MCFit = new TGraph(10000,mcPhi0,myPhi0);
-    gZ0MCFit = new TGraph(10000,mcZ0,myZ0);
-    gThetaMCFit = new TGraph(10000,mcTheta,myTheta);
 
     c2->Divide(2,2);
     c2->cd(1);
-    gPtMCFit->Draw("AP");
+    gPtRelation->Draw("AP");
     c2->cd(2);
-    gPhi0MCFit->Draw("AP");
+    gPhi0Relation->Draw("AP");
     c2->cd(3);
-    gZ0MCFit->SetMaximum(20);
-    gZ0MCFit->SetMinimum(-20);
-    gZ0MCFit->GetXaxis()->SetLimits(-20,20);
-    gZ0MCFit->Draw("AP");
+    gZ0Relation->SetMaximum(20);
+    gZ0Relation->SetMinimum(-20);
+    gZ0Relation->GetXaxis()->SetLimits(-20,20);
+    gZ0Relation->Draw("AP");
     c2->cd(4);
-    gThetaMCFit->Draw("AP");
+    gThetaRelation->Draw("AP");
 
     TCanvas* c3 = new TCanvas("c3","",1000,500);
     c3->Divide(2,2);
@@ -256,12 +304,8 @@ readFitter3D(){
   }
 
   if(graphFlag==0 || graphFlag==2){
-    TCanvas* c4 = new TCanvas("c4","",500,500);
-    c4->Divide(1,2);
-    c4->cd(1);
+    TCanvas* c4 = new TCanvas("c4","",250,250);
     hPDG->Draw();
-    c4->cd(2);
-    hStatus->Draw();
   }
 
 }

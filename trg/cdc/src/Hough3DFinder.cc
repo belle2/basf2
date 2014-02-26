@@ -490,7 +490,7 @@ void TRGCDCHough3DFinder::doitFind(vector<TCTrack *> & trackList){
             tempR[iLayer+5] = 0;
             tempPhi[iLayer+5] = 0;
         }
-        rPhiFit(tempR,tempPhi,phiError,rho,fitPhi0);
+        Fitter3DUtility::rPhiFit(tempR,tempPhi,phiError,rho,fitPhi0);
         fitPt = rho*0.3*1.5;
 
         int charge = int(aTrack.charge());
@@ -786,8 +786,8 @@ void TRGCDCHough3DFinder::doitFind(vector<TCTrack *> & trackList){
                 fitZ[iLayer] = 999;
             }
             else {
-                deltaWireDiff[iLayer] = calDeltaPhi (charge, m_anglest[iLayer], m_ztostraw[iLayer],  m_rr[iLayer], tempMcTSs[iLayer], rho, fitPhi0) / 4 / m_Trg_PI * m_nWires[iLayer];
-                fitZ[iLayer] = calZ (charge, m_anglest[iLayer], m_ztostraw[iLayer],  m_rr[iLayer], tempMcTSs[iLayer], rho, fitPhi0);
+                deltaWireDiff[iLayer] = Fitter3DUtility::calDeltaPhi (charge, m_anglest[iLayer], m_ztostraw[iLayer],  m_rr[iLayer], tempMcTSs[iLayer], rho, fitPhi0) / 4 / m_Trg_PI * m_nWires[iLayer];
+                fitZ[iLayer] = Fitter3DUtility::calZ (charge, m_anglest[iLayer], m_ztostraw[iLayer],  m_rr[iLayer], tempMcTSs[iLayer], rho, fitPhi0);
             }
         }
         new(deltaWireDiffTrackHough3D[iTrack]) TVectorD(deltaWireDiff);

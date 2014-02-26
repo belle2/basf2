@@ -323,6 +323,12 @@ class TRGCDC {
     /// returns bad hits(finding invalid hits).
 //  std::vector<const TRGCDCWireHit *> badHits(void) const;
 
+    /// returns event time 
+    double getEventTime(void) const;
+
+    /// returns event number
+    unsigned getEventNumber(void) const;
+
   public:// Utility functions
 
     /// returns wire name.

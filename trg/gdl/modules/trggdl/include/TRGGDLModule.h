@@ -20,7 +20,10 @@
 
 namespace Belle2 {
 
-/// A module to process GDL trigger data
+/// A module to simulate the Global Decision Logic. This module
+/// requires sub-trigger simulation data (CDC, ECL, TOP, and KLM). The
+/// output is GDL response.
+
 class TRGGDLModule : public Module {
 
   public:

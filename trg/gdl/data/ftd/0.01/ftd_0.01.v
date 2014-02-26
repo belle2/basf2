@@ -21,51 +21,55 @@ input gclk2;
 
 //...CDC...
 
-reg      [2:0] n_t3_full; // 0, 1, 2
-reg     [2:0] n_t3_short; // 3, 4, 5
-reg      [2:0] n_t2_full; // 6, 7, 8
-reg     [2:0] n_t2_short; // 9, 10, 11,
-reg               cdc_bb; // 12
-reg           cdc_open45; // 13
-reg           cdc_timing; // 14
+reg      [2:0] n_t3_full;
+reg     [2:0] n_t3_short;
+reg      [2:0] n_t2_full;
+reg     [2:0] n_t2_short;
+reg               cdc_bb;
+reg           cdc_open45;
+reg 	      cdc_active;
+reg     [2:0] cdc_timing;
 
 
 //...ECL...
 
-reg               e_high; // 15
-reg                e_low; // 16
-reg                e_lum; // 17
-reg              ecl_bha; // 18
-reg      [10:0] bha_type; // 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29
-reg         [3:0] n_clus; // 30, 31, 32, 33
-reg          bg_ecl_veto; // 34
-reg       ecl_timing_fwd; // 35
-reg       ecl_timing_bwd; // 36
-reg       ecl_timing_brl; // 37
-reg           ecl_timing; // 38
+reg               e_high;
+reg                e_low;
+reg                e_lum;
+reg              ecl_bha;
+reg      [10:0] bha_type;
+reg         [3:0] n_clus;
+reg          bg_ecl_veto;
+reg       ecl_timing_fwd;
+reg       ecl_timing_bwd;
+reg       ecl_timing_brl;
+reg 	      ecl_active;
+reg     [2:0] ecl_timing;
 
 //...TOP...
 
-reg          [2:0] n_top; // 39, 40, 41
-reg               top_bb; // 42
+reg          [2:0] n_top;
+reg               top_bb;
+reg 	      top_active;
+reg     [3:0] top_timing;
 
 //...KLM...
 
-reg          [2:0] n_klm; // 43, 44, 45
+reg          [2:0] n_klm;
 
 //..KEKB...
 
-reg                 revo; // 46
-reg             her_kick; // 47
-reg             ler_kick; // 48
+reg                 revo;
+reg             her_kick;
+reg             ler_kick;
 
 //...GDL Internal...
 
-reg            bha_delay; // 49
-reg          pseude_rand; // 50
-reg                 veto; // 51
-reg           [2:0] n_t3; // 52  // := # of track count of full and short
-reg           [2:0] n_t2; // 52  // := # of track count of full and short
+reg            bha_delay;
+reg          pseude_rand;
+reg                 veto;
+reg           [2:0] n_t3;
+reg           [2:0] n_t2;
 
 //.............
 //   Outputs

@@ -210,15 +210,17 @@ TRGCDCMerger::simulate(void) {
   const string no = name() + "OutputSignalBundle";
   if (type() == innerType) {
     _mosb = new TRGSignalBundle(no,
-			       dClock,
-			       * _misb,
+                                dClock,
+                                * _misb,
+                                256,
 			       TCMerger::packerInner);
   }
   else if (type() == outerType) {
     _mosb = new TRGSignalBundle(no,
-			       dClock,
-			       * _misb,
-			       TCMerger::packerOuter);    
+                                dClock,
+                                * _misb,
+                                256,
+                                TCMerger::packerOuter);    
   }
   mosb = _mosb;
 

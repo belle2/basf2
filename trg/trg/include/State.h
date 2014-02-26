@@ -87,6 +87,11 @@ class TRGState {
 			 const bool * const array);
 
     /// sets state.
+    const TRGState & set(unsigned position,
+			 unsigned size,
+			 unsigned value);
+
+    /// sets state.
     const TRGState & set(unsigned position, const TRGState &);
 
   public:// Operators
@@ -250,6 +255,20 @@ TRGState::set(unsigned p, unsigned n, const bool * const a) {
 	const unsigned wp = (p + i) / _bsu;
 	const unsigned bp = (p + i) % _bsu;
 	if (a[i])
+	    _state[wp] |= (1 << bp);
+	else
+	    _state[wp] &= ~(1 << bp);
+    }
+    return * this;
+}
+
+inline
+const TRGState &
+TRGState::set(unsigned p, unsigned n, unsigned a) {
+    for (unsigned i = 0; i < n; i++) {
+	const unsigned wp = (p + i) / _bsu;
+	const unsigned bp = (p + i) % _bsu;
+	if (a & (1 << i))
 	    _state[wp] |= (1 << bp);
 	else
 	    _state[wp] &= ~(1 << bp);

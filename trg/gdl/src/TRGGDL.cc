@@ -23,6 +23,8 @@
 #include "trg/trg/Utilities.h"
 #include "trg/gdl/TRGGDL.h"
 
+#define N_TIMING_REGISTERS 4
+
 using namespace std;
 
 namespace Belle2 {
@@ -42,7 +44,7 @@ TRGGDL::name(void) const {
 
 string
 TRGGDL::version(void) const {
-    return string("TRGGDL 0.00");
+    return string("TRGGDL 0.01");
 }
 
 TRGGDL*
@@ -186,12 +188,26 @@ TRGGDL::firmwareSimulation(void) {
             delete (* _osb)[i];
         delete _osb;
     }
+    if (_tsb) {
+        for (unsigned i = 0; i < _tsb->size(); i++)
+            delete (* _tsb)[i];
+        delete _tsb;
+    }
+    if (_tosb) {
+        for (unsigned i = 0; i < _tosb->size(); i++)
+            delete (* _tosb)[i];
+        delete _tosb;
+    }
 
     //...Input bits...
     const unsigned nInput = _input.size();
     TRGSignalVector & input = * new TRGSignalVector(name() + "InputSignals",
                                                     _clock);
+    TRGSignalVector & timing = * new TRGSignalVector(name() + "TimingSignals",
+                                                     _clock);
     for (unsigned i = 0; i < nInput; i++) {
+
+        TRGSignal s;
 
         //...Create dummy timing signal for even number input bits...
         if ((i % 2) == 0) {
@@ -199,11 +215,8 @@ TRGGDL::firmwareSimulation(void) {
             TRGTime rise = TRGTime(tdcCount, true, _clock, _input[i]);
             TRGTime fall = rise;
             fall.shift(1).reverse();
-            TRGSignal s = TRGSignal(rise & fall);
+            s = TRGSignal(rise & fall);
             s.name(_input[i]);
-
-            //...Add to a signal vector...
-            input += s;
         }
 
         //...Create dummy timing signal for odd number input bits...
@@ -212,12 +225,20 @@ TRGGDL::firmwareSimulation(void) {
             TRGTime rise = TRGTime(tdcCount, true, _clock, _input[i]);
             TRGTime fall = rise;
             fall.shift(1).reverse();
-            TRGSignal s = TRGSignal(rise & fall);
+            s = TRGSignal(rise & fall);
             s.name(_input[i]);
-
-            //...Add to a signal vector...
-            input += s;
         }
+
+        //...Add to a signal vector...
+        input += s;
+
+        //...Timing signal...
+        bool t =
+            (i == 14) || (i == 15) || (i == 16) || (i == 17) ||
+            (i == 41) || (i == 42) || (i == 43) || (i == 44) ||
+            (i == 49) || (i == 50) || (i == 51) || (i == 52) || (i == 53);
+        if (t)
+            timing += s;
     }
 
     //...Make input signal bundle...
@@ -230,12 +251,35 @@ TRGGDL::firmwareSimulation(void) {
     _osb = new TRGSignalBundle(no,
                                _clock,
                                * _isb,
+                               14,
                                TRGGDL::decision);
+
+    //...Timing signal bundle...
+    TRGSignalVector & ftd = * new TRGSignalVector(name() + "FTD", _clock);
+//  ftd += (* ((* _osb)[0])[13]);
+//  ftd += * (* _osb)[0][13];
+    TRGSignal ddddd = (* (* _osb)[0])[13];
+    ftd += ddddd;
+
+    const string nt = name() + "TimingSignalBundle";
+    _tsb = new TRGSignalBundle(nt, _clock);
+    _tsb->push_back(& timing);
+    _tsb->push_back(& ftd);
+
+    //...Timing out signal bundle...
+    const string nto = name() + "TimingOutSignalBundle";
+    _tosb = new TRGSignalBundle(nto,
+                                _clock,
+                                * _tsb,
+                                3,
+                                TRGGDL::timingDecision);
 
     if (TRGDebug::level()) {
         if (input.active()) {
             _isb->dump("detail", TRGDebug::tab());
             _osb->dump("detail", TRGDebug::tab());
+            _tsb->dump("detail", TRGDebug::tab());
+            _tosb->dump("detail", TRGDebug::tab());
         }
     }
 
@@ -400,11 +444,11 @@ TRGState
 TRGGDL::decision(const TRGState & input) {
 
     //...Prepare states for output...
-    TRGState s(13);
+    TRGState s(14);
 
     //...Set up bool array...
     bool * in = new bool[input.size()];
-    bool * ou = new bool[13];
+    bool * ou = new bool[14];
     input.copy2bool(in);
 
     // //...Simulate output bit 4...
@@ -415,18 +459,128 @@ TRGGDL::decision(const TRGState & input) {
 
     //...FTD logic...
     _ftd(ou, in);
-    for (unsigned i = 0; i < 13; i++)
+    bool active = false;
+    for (unsigned i = 0; i < 13; i++) {
+        if (ou[i])
+            active = true;
         s.set(i, ou[i]);
+    }
+    if (active)
+        s.set(13, true);
 
     if (TRGDebug::level()) {
-        input.dump("detail", TRGDebug::tab() + "GDL in ");
-        s.dump("detail", TRGDebug::tab() + "GDL out ");
+        input.dump("detail", TRGDebug::tab(4) + "GDL in ");
+        s.dump("detail", TRGDebug::tab(4) + "GDL out ");
     }
 
     //...Termination...
     delete[] in;
     delete[] ou;
     return s;
+}
+
+TRGState
+TRGGDL::timingDecision(const TRGState & input,
+                       TRGState & reg,
+                       bool & active) {
+
+    //...Prepare registers...
+    //   reg[0] := timing logic active, NOT USED
+    //   reg[3:1] := state (0 to 7)
+    //   reg[6:4] := counter after timing logic active
+
+    //   reg[1] := waiting for timing of TOP, ECL, and CDC
+    //   reg[2] := TOP timing active
+    //   reg[3] := ECL timing active
+    //   reg[4] := CDC timing active
+    //   reg[7:5] := remaining count to issue timing signal
+
+    
+
+    //...Input preparations...
+    //   Assuming ftl_0.01
+    //   Last bit is additional FTD signal
+    bool in[14];
+
+    //...CDC...
+    in[0] = input[0];
+    in[1] = input[1];
+    in[2] = input[2];
+    in[3] = input[3];
+    bool cdc = in[0];
+    bool * cdct = & in[1];
+
+    //...ECL...
+    in[4] = input[4];
+    in[5] = input[5];
+    in[6] = input[6];
+    in[7] = input[7];
+    bool ecl = in[4];
+    bool * eclt = & in[5];
+
+    //...TOP...
+    in[8] = input[8];
+    in[9] = input[9];
+    in[10] = input[10];
+    in[11] = input[11];
+    in[12] = input[12];
+    bool top = in[8];
+    bool * topt = & in[9];
+
+    //...FTD...
+    in[13] = input[13];
+    bool ftd = in[13];
+
+    //...Get state info...
+    unsigned state = unsigned(reg.subset(1, 3));
+    unsigned count = unsigned(reg.subset(4, 3));
+
+    //...State machine...
+    bool timing = false;
+    unsigned source = 0;
+    if (state == 0) {
+        if (ftd) {
+            active = 1;
+            state = 1;
+            count = 1;
+        }
+        else {
+            active = 0;
+        }
+    }
+    else if (state == 1) {
+        if (count == 7) {
+            active = 0;
+            state = 0;
+            timing = true;
+        }
+        else {
+            active = 1;
+            ++count;
+        }
+    }
+
+    //...Set registers...
+    reg.set(1, 3, state);
+    reg.set(4, 3, count);
+
+    //...Output...
+    TRGState out(3);
+    out.set(0, 1, timing);
+    out.set(1, 2, source);
+
+    if (TRGDebug::level()) {
+        input.dump("detail", TRGDebug::tab(4) + "Timing in,");
+        reg.dump("detail", TRGDebug::tab(4) + "Registers,");
+        cout << TRGDebug::tab(4) << "ftd,active,state,count=" << ftd << ","
+             << active << "," << state
+             << "," << count << endl;
+
+        out.dump("detail", TRGDebug::tab(4) + "Timing out,");
+    }
+
+    //...Termination...
+    return out;
 }
 
 } // namespace Belle2

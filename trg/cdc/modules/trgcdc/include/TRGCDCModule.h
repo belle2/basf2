@@ -21,7 +21,10 @@
 
 namespace Belle2 {
 
-/// A module to process CDC trigger data
+/// A module to simulate the CDC trigger. This module requires CDC
+/// simulation data or trigger data taken by real hardwares. The
+/// output is the reconstructed track parameters.
+
 class TRGCDCModule : public Module {
 
   public:

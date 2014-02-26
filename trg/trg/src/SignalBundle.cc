@@ -20,6 +20,7 @@
 #include <iostream>
 #include "trg/trg/Constants.h"
 #include "trg/trg/Utilities.h"
+#include "trg/trg/Debug.h"
 #include "trg/trg/Clock.h"
 #include "trg/trg/Signal.h"
 #include "trg/trg/SignalVector.h"
@@ -43,6 +44,7 @@ TRGSignalBundle::TRGSignalBundle(const string & name, const TRGClock & c)
 TRGSignalBundle::TRGSignalBundle(const string & name,
 				 const TRGClock & c,
 				 const TRGSignalBundle & input,
+                                 const unsigned outputBitSize,
 				 TRGState (* packer)(const TRGState &))
     : _name(name),
       _clock(& c) {
@@ -53,32 +55,105 @@ TRGSignalBundle::TRGSignalBundle(const string & name,
 
     //...Loop over all states...
     vector<TRGState *> outputStates;
-    TRGState s0 = input.state(0);
-    outputStates.push_back(new TRGState((* packer)(s0)));
-
-    unsigned outputSize = 0;
     for (unsigned i = 0; i < nStates; i++) {
 	TRGState s = input.state(states[i]);
-#ifdef TRG_DEBUG
-	cout << "Clock=" << states[i] << endl;
-#endif	
-	outputStates.push_back(new TRGState((* packer)(s)));
 
+        if (TRGDebug::level()) {
+            cout << TRGDebug::tab() << "Clock=" << states[i] << endl;
+        }
+
+	outputStates.push_back(new TRGState((* packer)(s)));
     }
-    if (outputStates.size())
-	outputSize = outputStates.back()->size();
+
+    //...Bit size of output...
+    // unsigned outputSize = 0;
+    // if (outputStates.size())
+    //     outputSize = outputStates.back()->size();
    
     //...Creat a SignalVector...
-    TRGSignalVector * sb = new TRGSignalVector(_name, c, outputSize);
+    TRGSignalVector * sb = new TRGSignalVector(_name, c, outputBitSize);
  
     //...Make a SignalVector...
-    const TRGState &os0 = * outputStates[0];
-          sb->set(os0, 0); delete &os0;
-    const unsigned n = outputStates.size();   // same as nStates
+    // const TRGState &os0 = * outputStates[0];
+    //       sb->set(os0, 0); delete &os0;
+    // const unsigned n = outputStates.size();   // same as nStates
     
-    for (unsigned i = 1; i <n; i++) {
+    for (unsigned i = 0; i < nStates; i++) {
       	const TRGState & s = * outputStates[i];
-	sb->set(s, states[i-1]);
+	sb->set(s, states[i]);
+	delete & s;
+    }
+
+    push_back(sb);
+}
+
+TRGSignalBundle::TRGSignalBundle(const string & name,
+				 const TRGClock & c,
+				 const TRGSignalBundle & input,
+                                 const unsigned outputBitSize,
+				 TRGState (* packer)(const TRGState &,
+                                                     TRGState &,
+                                                     bool &))
+    : _name(name),
+      _clock(& c) {
+ 
+    //...Get state information...
+    const vector<int> states = input.stateChanges();
+    const unsigned nStates = states.size();
+
+    //...Loop over all states...
+    vector<TRGState *> outputStates;
+    vector<int> newStates;
+    int lastClock = states[0] - 1;
+    for (unsigned i = 0; i < nStates; i++) {
+
+        //...Check clock position...
+        if (states[i] <= lastClock)
+            continue;
+
+        TRGState r(7);
+        bool active = true;
+        int nLoops = 0;
+        while (active) {
+            int clk = states[i] + nLoops;
+            lastClock = clk;
+
+            if (TRGDebug::level()) {
+                cout << TRGDebug::tab() << "0:Clock=" << clk << ",active="
+                     << active << endl;
+                r.dump("", TRGDebug::tab() + "reg=");
+            }
+
+            TRGState s = input.state(clk);
+            outputStates.push_back(new TRGState((* packer)(s, r, active)));
+            newStates.push_back(clk);
+            ++nLoops;
+
+            if (TRGDebug::level()) {
+                cout << TRGDebug::tab() << "1:Clock=" << clk << ",active="
+                     << active << endl;
+                r.dump("", TRGDebug::tab() + "reg=");
+            }
+        }
+    }
+
+    //...Size of output...
+    // unsigned outputSize = 0;
+    // if (outputStates.size())
+    //     outputSize = outputStates.back()->size();
+   
+    //...Creat a SignalVector...
+    TRGSignalVector * sb = new TRGSignalVector(_name, c, outputBitSize);
+ 
+    //...Make a SignalVector...
+    // const TRGState &os0 = * outputStates[0];
+    //       sb->set(os0, 0); delete &os0;
+    // const unsigned n = outputStates.size();   // same as nStates
+    
+    const unsigned n = outputStates.size();
+    for (unsigned i = 0; i < n; i++) {
+      	const TRGState & s = * outputStates[i];
+	sb->set(s, newStates[i]);
 	delete & s;
     }
 
@@ -106,7 +181,14 @@ TRGSignalBundle::active(void) const {
 
 std::vector<int>
 TRGSignalBundle::stateChanges(void) const {
+
+    //...List for clock positions...
     std::vector<int> list;
+
+    //...Append the first clock point...
+    list.push_back(_clock->min());
+
+    //...Pick up all clock points with state changes...
     const unsigned n = size();
     for (unsigned i = 0; i < n; i++) {
 	vector<int> a =(* this)[i]->stateChanges();
@@ -151,6 +233,37 @@ TRGSignalBundle::clock(const TRGClock & c) {
     }
 
     return * _clock;
+}
+
+TRGSignal
+TRGSignalBundle::ored(void) const {
+
+    //...Get state information...
+    const vector<int> states = stateChanges();
+    const unsigned nStates = states.size();
+
+    //...Output...
+    TRGSignal ored;
+
+    //...Loop over all states...
+    vector<TRGState *> outputStates;
+    for (unsigned i = 0; i < nStates; i++) {
+        if (TRGDebug::level())
+            cout << TRGDebug::tab() << "Clock=" << states[i] << endl;
+
+        // if (active(states[i])) {
+        //     TRGSignal p(* _clock, 
+
+        // }
+
+
+        cout << "TRGSginalBundle::ored !!! not completed yet" << endl;
+    }
+
+
+    
+
+    return TRGSignal();
 }
 
 } // namespace Belle2

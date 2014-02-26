@@ -133,6 +133,11 @@ class TRGGDL {
     /// Function to simulate final trigger decision.
     static void (* _ftd)(bool * out, bool * in);
 
+    /// Makes timing decision.
+    static TRGState timingDecision(const TRGState & input,
+                                   TRGState & registers,
+                                   bool & logicStillActive);
+
   private:
 
     /// updates TRGGDL information for MC.
@@ -196,6 +201,12 @@ class TRGGDL {
 
     /// Output signal bundle.
     TRGSignalBundle * _osb;
+
+    /// Timing input signal bundle.
+    TRGSignalBundle * _tsb;
+
+    /// Timing output signal bundle.
+    TRGSignalBundle * _tosb;
 
     friend class TRGGDLModule;
 };

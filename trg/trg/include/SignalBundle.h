@@ -39,7 +39,17 @@ class TRGSignalBundle : public std::vector<TRGSignalVector *> {
     TRGSignalBundle(const std::string & name,
 		    const TRGClock & clock,
 		    const TRGSignalBundle & input,
+                    const unsigned outputBitSize,
 		    TRGState (* packer)(const TRGState &));
+
+    /// Constructor with a packer which can handle multiple clock states.
+    TRGSignalBundle(const std::string & name,
+		    const TRGClock & clock,
+		    const TRGSignalBundle & input,
+                    const unsigned outputBitSize,
+		    TRGState (* packer)(const TRGState & in,
+                                        TRGState & registers,
+                                        bool & logicStillActive));
 
     /// Destructor
     virtual ~TRGSignalBundle();
@@ -63,6 +73,9 @@ class TRGSignalBundle : public std::vector<TRGSignalVector *> {
 
     /// returns state at given clock position.
     TRGState state(int clockPosition) const;
+
+    /// returns signal of all ORed.
+    TRGSignal ored(void) const;
 
     /// dumps contents. "message" is to select information to
     /// dump. "pre" will be printed in head of each line.

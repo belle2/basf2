@@ -169,6 +169,18 @@ TRGClock::frequency(void) const {
     return _frequency;
 }
 
+inline
+int
+TRGClock::min(void) const {
+    return _min;
+}
+
+inline
+int
+TRGClock::max(void) const {
+    return _max;
+}
+
 } // namespace Belle2
 
 #endif /* TRGClock_FLAG_ */

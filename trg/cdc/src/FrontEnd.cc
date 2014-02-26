@@ -262,21 +262,25 @@ TRGCDCFrontEnd::simulate(void) {
         _osb = new TRGSignalBundle(no,
                                    dClock,
                                    * _isb,
+                                   256,
                                    TCFrontEnd::packerInnerInside);
     else if (type() == innerOutside)
         _osb = new TRGSignalBundle(no,
                                    dClock,
                                    * _isb,
+                                   256,
                                    TCFrontEnd::packerInnerOutside);
     else if (type() == outerInside)
         _osb = new TRGSignalBundle(no,
                                    dClock,
                                    * _isb,
+                                   256,
                                    TCFrontEnd::packerOuterInside);
     else if (type() == outerOutside)
         _osb = new TRGSignalBundle(no,
                                    dClock,
                                    * _isb,
+                                   256,
                                    TCFrontEnd::packerOuterOutside);
 
     //cout<<"Output signal vector Start"<<endl;

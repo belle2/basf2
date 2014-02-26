@@ -226,8 +226,8 @@ int RaveKinematicVertexFitter::fit(string options)
     m_fittedPValue = ROOT::Math::chisquared_cdf_c(m_fittedChi2, m_fittedNdf);
     m_fittedPos.SetXYZ(fittedVertex.position().x(), fittedVertex.position().y(), fittedVertex.position().z());
 
-    m_raveVertices = RaveSetup::s_instance->m_raveVertexFactory->create(m_raveTracks, m_useBeamSpot);
-    nOfVertices = m_raveVertices.size();
+    //m_raveVertices = RaveSetup::s_instance->m_raveVertexFactory->create(m_raveTracks, m_useBeamSpot);
+    //nOfVertices = m_raveVertices.size();
 
   } else {
     m_fittedNdf = m_fittedParticle.ndof();

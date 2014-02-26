@@ -98,6 +98,15 @@ namespace Belle2 {
       void setVertFit(bool isVertFit = true);
 
 
+      /** Print all attributes of this object to terminal*/
+      void Print() const {
+        std::cout << "useBeamSpot: " << m_useBeamSpot << std::endl;
+        std::cout << "number of rave::Tracks: " << m_inputParticles.size() << std::endl;
+      }
+
+
+
+
     protected:
 
       /** flag determines if the beam spot will be used or not. Overwrites the global flag in RaveSetup */

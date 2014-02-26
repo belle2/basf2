@@ -3,7 +3,7 @@
  * Copyright(C) 2012 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Moritz Nadler                                            *
+ * Contributors: Moritz Nadler,  Luigi Li Gioi                            *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -21,7 +21,6 @@
 
 //Genfit
 #include <genfit/Track.h>
-//#include <GFRaveVertex.h>
 #include <genfit/GFRaveConverters.h> // has some converter functions between root and rave
 //rave
 #include <rave/Track.h>
@@ -102,47 +101,20 @@ namespace Belle2 {
 
       /** Delete all information of previously added tracks and fitted results*/
       void clearTracks() {
-//    m_gfTrackReps.clear();
-//    int n = m_ownGfTrackReps.size();
-//    for (int i = 0; i not_eq n; ++i) {
-//      delete m_ownGfTrackReps[i];
-//    }
-//    m_ownGfTrackReps.clear();
-//    n = m_GFRaveVertices.size();
-//    for (int i = 0; i not_eq n; ++i) {
-//      delete m_GFRaveVertices[i];
-//    }
-        //and clear the fitting results
-//    m_GFRaveVertices.clear();
         m_raveTracks.clear();
       }
 
-//  /** Return the GFRaveVertex object. Holds all info on the fitted vertex. This is temporary and will be replaced with the Bell2 vertex object when ready */
-//  GFRaveVertex* getGFRaveVertex(VecSize vertexId = 0) {
-//    if (m_GFRaveVertices.empty()) {
-//      B2ERROR("There is no fitted Vertex. Maybe you did not call fit() or maybe the fit was not successful");
-//      throw;
-//    } else if (vertexId < m_GFRaveVertices.size()) {
-//      return m_GFRaveVertices[vertexId];
-//    } else {
-//      B2ERROR("The Vertex id " << vertexId << " does not correspond to any fitted vertex");
-//      throw;
-//    }
-//  }
+
       /** Print all attributes of this object to terminal*/
       void Print() const {
         std::cout << "useBeamSpot: " << m_useBeamSpot << std::endl;
-//    std::cout << "use gfRave: " << m_gfRave <<std::endl;
-//    std::cout << "number of GFAbsTrackRep pointers owned by other classes: " << m_gfTrackReps.size() << std::endl;
-//    std::cout << "number of GFAbsTrackRep pointers owned by this class: " << m_ownGfTrackReps.size() << std::endl;
         std::cout << "number of rave::Tracks: " << m_raveTracks.size() << std::endl;
-//    std::cout << "number of fitted GFRaveVertex pointers: " << m_GFRaveVertices.size() << std::endl;
         std::cout << "number of fitted  rave::Vertices: " << m_raveVertices.size() << std::endl;
 
       }
       /** return the number of tracks that where added via addTrack or addMother*/
       int getNTracks() const {
-        return /*m_gfTrackReps.size()*/ + m_raveTracks.size();
+        return m_raveTracks.size();
       }
 
 
@@ -161,14 +133,9 @@ namespace Belle2 {
       rave::Track TrackFitResultToRaveTrack(const TrackFitResult* const aTrackPtr) const;
       bool m_useBeamSpot; /**< flag determines if the beam spot will be used or not. Overwrites the global flag in RaveSetup */
 
-//  bool m_gfRave; /**< flag determines if Rave will be used through GFRave or if Rave will be used directly */
 
       //std::string m_raveAlgorithm;
 
-//  std::vector< GFAbsTrackRep* > m_gfTrackReps;
-//  std::vector< GFAbsTrackRep* > m_ownGfTrackReps;
-
-//  std::vector < GFRaveVertex* > m_GFRaveVertices;
       /** holds the tracks that were added to a RaveVertexFitter object in the format used by Rave*/
       std::vector<rave::Track> m_raveTracks;
 

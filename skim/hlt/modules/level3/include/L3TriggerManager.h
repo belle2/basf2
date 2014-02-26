@@ -40,6 +40,7 @@ namespace Belle2 {
     // data members
     int m_saveData;
   private:
+
     // data members
     FTList<L3TriggerBase*> m_triggers;
   };

@@ -21,13 +21,12 @@ namespace Belle2 {
   public:
     //! constructor
     FCCluster(const FTList<FCCrystal*>* hits, const double energy,
-              const FCCrystal* seed, const TVector3& Position);
+              const FCCrystal* seed, const TVector3& position);
 
     //! destructor
     ~FCCluster();
 
-  public: //Selectors
-
+  public:
     //! returns position of most energetic counter
     const TVector3& getPosition(void) const;
 
@@ -40,22 +39,19 @@ namespace Belle2 {
     //! returns list of ehits
     const FTList<FCCrystal*>& getEHits(void) const;
 
-  private: //private data members
-    const FTList<FCCrystal*>& m_hits; // array of hits
-    const double m_energy; // energy deposit
-    const TVector3 m_position; // position of the seed
-    const FCCrystal& m_seed; // reference of the seed crystal
+  private:
+    //! array of hits
+    const FTList<FCCrystal*>& m_hits;
+
+    //! energy deposit
+    const double m_energy;
+
+    //! position of the seed
+    const TVector3 m_position;
+
+    //! reference of the seed crystal
+    const FCCrystal& m_seed;
   };
-
-  //----------------------------------------------
-#ifdef FCCluster_NO_INLINE
-#define inline
-#else
-#undef inline
-#define FCCluster_INLINE_DEFINE_HERE
-#endif
-
-#ifdef FCCluster_INLINE_DEFINE_HERE
 
   inline
   FCCluster::FCCluster(const FTList<FCCrystal*>* hits, const double energy,
@@ -100,10 +96,6 @@ namespace Belle2 {
   {
     return m_hits;
   }
-
-#endif
-
-#undef inline
 
 }
 

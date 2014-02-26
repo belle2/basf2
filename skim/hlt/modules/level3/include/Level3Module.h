@@ -29,34 +29,39 @@ namespace Belle2 {
     /** Use to clean up anything you created in the constructor. */
     virtual ~Level3Module();
 
+    /** initialize routine **/
     virtual void initialize();
 
+    /** begin run routine **/
     virtual void beginRun();
 
+    /** initialize routine **/
     virtual void event();
 
+    /** end run routine **/
     virtual void endRun() {}
 
+    /** terminate routine **/
     virtual void terminate();
 
   private:
-    //bool preselect();
+    /** L3 reconstruction routine **/
     void reconstruct();
-    //bool select();
-    //void append(L3TriggerBase* t){ m_triggers.append(t); }
 
-    //define your own data members here
+    //! pointer to the fast track finder
     FTFinder& m_tFinder;
+
+    //! pointer to the fast cluster finder
     FCFinder& m_cFinder;
-    //double m_drCut;
-    //double m_dzCut;
-    //double m_ptCut;
+
+    //! cut parameter of seed energy for FCFinder
     double m_EsCut;
+
+    //! cut parameter of cluster energy for FCFinder
     double m_EcCut;
-    //int m_minNGoodTrks;
-    //double m_minEnergy;
+
+    //! =1: perform vertex finding at FTFinder
     int m_findEvtVtx;
-    //FTList<L3TriggerBase*> m_triggers;
   };
 }
 

@@ -23,9 +23,11 @@ namespace Belle2 {
   // CDC superlayer class for the Level-3 Fast Track Finder
   class FTSuperLayer {
   public:
-    //! Constructors and destructor
+    //! constructor
     FTSuperLayer(const int NLayer, const int superLayerID, const int isAxial,
                  const bool haveSmallCell, FTLayer* first);
+
+    //! destructor
     ~FTSuperLayer();
 
   public:
@@ -44,7 +46,7 @@ namespace Belle2 {
     //! returns if this superlayer have small cell layer
     bool haveSmallCell(void) const;
 
-  public: // Selectors
+  public:
     //! returns wirehit list
     FTList<FTWire*>& wireHits(void) const;
 
@@ -84,31 +86,38 @@ namespace Belle2 {
     //! returns 2*localId diffrerence between two hits
     int i2phiDiff(const FTWire& h1, const FTWire& h2) const;
 
-  private: //static data members
+  private:
+    //! state mask for six neighbors
     static const unsigned int m_neighborsMask[6];
 
-  private: // private data members
+  private:
+    //! ID of the superlayer
     const int m_superLayerId;
+
+    //! number of layers
     const int m_Nlayer;
+
+    //! =0: stereo =1: axial
     const int m_isAxial;
+
+    //! list of segments having complicated shape
     FTList<FTSegment*>* const m_complicatedSegments;
+
+    //! list of wire hits
     FTList<FTWire*>& m_wireHits;
+
+    //! list of single hits
     FTList<FTWire*>& m_singleHits;
+
+    //! list of segments
     FTList<FTSegment*>& m_segments;
+
+    //! true for small cell
     const bool m_haveSmallCell;
+
+    //! pointer to the first layer
     FTLayer* const m_firstLayer;
   };
-
-
-  //----------------------------------------------
-#ifdef FTSuperLayer_NO_INLINE
-#define inline
-#else
-#undef inline
-#define FTSuperLayer_INLINE_DEFINE_HERE
-#endif
-
-#ifdef FTSuperLayer_INLINE_DEFINE_HERE
 
   inline
   FTSuperLayer::FTSuperLayer(const int NLayer, const int superLayerID,
@@ -205,10 +214,6 @@ namespace Belle2 {
   {
     return m_firstLayer;
   }
-
-#endif
-
-#undef inline
 
 }
 

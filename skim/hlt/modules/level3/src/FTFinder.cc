@@ -20,12 +20,6 @@ using namespace L3;
 
 #include <TVector3.h>
 
-//...Defs...
-#define MAX_DATA_LENGTH  0x00080000
-#define MAX_SUBSYS_LENGTH 0x00040000
-#define MAX_CRATE_LENGTH 0x00020000
-#define MAX_TDC_LENGTH 0x00010000
-
 //...Globals...
 FTFinder*
 FTFinder::s_tFinder = NULL;
@@ -305,7 +299,7 @@ FTFinder::updateCdc3(void)
     //B2INFO("sup=" << sup.superLayerId() << " layerId=" << layer.layerId() << " localId=" << h.getIWire() << " wid=" << getWireId(&wire) << " time=" << time);
 
     //... Remove bad wire
-    if (wire.stateAND(FTWireInvalid)) continue;
+    if (wire.stateAND(FTWire::Dead)) continue;
 
     if (time < -m_tWindow || time > m_tWindow + 300) continue;
 
@@ -313,7 +307,7 @@ FTFinder::updateCdc3(void)
     //if (!adc_cut_(&m_ExpNo,&m_RunNo,&adc,&layer,&local)) continue;
 
     wire.distance(t2x(time));
-    wire.state(FTWireHit);
+    wire.state(FTWire::Hit);
     sup.appendHit(&wire);
 
     wire.time(time);
@@ -396,7 +390,7 @@ FTFinder::setBadWires(const bool EvtByEvt, const bool inBeginRun)
     // reset EvtByEvt bad wires
     const int n = m_EvtByEvtBadWires->length();
     for (int i = 0; i != n; i++) {
-      (*m_EvtByEvtBadWires)[i]->stateORXOR(FTWireStateMask);
+      (*m_EvtByEvtBadWires)[i]->stateORXOR(FTWire::StateMask);
     }
     m_EvtByEvtBadWires->clear();
     if (inBeginRun) {

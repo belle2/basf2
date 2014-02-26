@@ -25,17 +25,23 @@ namespace Belle2 {
     //! selecct events
     virtual bool select(L3Tag* tag);
 
-    //! returns reference of cut parameters
+    //! returns cut parameter (drho)
     double& drCut() { return m_drCut; }
+    //! returns cut parameter (dz)
     double& dzCut() { return m_dzCut; }
+    //! returns cut parameter (pt)
     double& ptCut() { return m_ptCut; }
+    //! returns cut parameter (minimum number of good tracks)
     int& minNGoodTrks() { return m_minNGoodTrks; }
 
   private:
-    //! cut parameters
+    //! cut parameter (drho)
     double m_drCut;
+    //! cut parameter (dz)
     double m_dzCut;
+    //! cut parameter (pt)
     double m_ptCut;
+    //! cut parameter (minimum number of good tracks)
     int m_minNGoodTrks;
   };
 }

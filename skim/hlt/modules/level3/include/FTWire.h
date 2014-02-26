@@ -11,26 +11,6 @@
 #ifndef FTWire_H
 #define FTWire_H
 
-//...Defs...
-#define FTWireHit 1
-#define FTWireHitInvalid 2
-#define FTWireHitAppended 4
-#define FTWireHitAppendedOrInvalid 6
-#define FTWireNeighbor0 8
-#define FTWireNeighbor1 16
-#define FTWireNeighbor2 32
-#define FTWireNeighbor3 64
-#define FTWireNeighbor4 128
-#define FTWireNeighbor5 256
-#define FTWireHitSegment 16384
-#define FTWireHitLinked 131072
-#define FTWireHitRight 32768
-#define FTWireHitLeft 65536
-
-#define FTWireFittingInvalid 0x10000000
-#define FTWireInvalid 0x20000000
-#define FTWireStateMask 0xf0000000
-
 #ifndef M_PI
 #define M_PI  3.14159265358979323846
 #endif
@@ -49,15 +29,39 @@ namespace Belle2 {
   class FTWire {
 
   public:
-    //! constructors
+    //! definition of state bits and masks
+    enum FTWireState {
+      Hit = 0x1,
+      Invalid = 0x2,
+      Appended = 0x4,
+      AppendedOrInvalid = 0x6,
+      Neighbor0 = 0x8,
+      Neighbor1 = 0x10,
+      Neighbor2 = 0x20,
+      Neighbor3 = 0x40,
+      Neighbor4 = 0x80,
+      Neighbor5 = 0x100,
+      NeighborEnd = 0x200,
+      Segment = 0x4000,
+      RightHit = 0x8000,
+      LeftHit = 0x10000,
+      Linked = 0x20000,
+      FitInvalid = 0x10000000,
+      Dead = 0x20000000,
+      StateMask = 0xf0000000
+    };
+
+    //! constructor
     FTWire(const double x, const double y, const double dx, const double dy,
            const FTLayer& layer, const int localID);
 
+    //! constructor
     FTWire();
+
     //! destructor
     ~FTWire();
 
-  public: //Selectors
+  public:
     //! returns position x
     double x(void) const;
 
@@ -100,7 +104,7 @@ namespace Belle2 {
     //! rerurns TDC time(after t0 subtraction)
     double time(void) const;
 
-  public: // Modifires
+  public:
     //! clear
     void clear(void);
 
@@ -142,7 +146,7 @@ namespace Belle2 {
     MCParticle* mcPart(void) const;
 #endif
 
-  private: //private member functions
+  private:
     //! returns left wire;
     const FTWire* left(void) const;
 
@@ -161,33 +165,48 @@ namespace Belle2 {
     //! returns outer-right wire;
     const FTWire* outerRight(FTWire* const vtWire) const;
 
-  private: //private data members
-    const double m_x; // x position
-    const double m_y; // y position
-    const double m_dx; // delta x b/w forward and backward endplate
-    const double m_dy; // delta y b/w forward and backward endplate
-    const FTLayer& m_layer; // reference to the layer
-    const int m_localId; // ID in the layer
+  private:
+    //! x position
+    const double m_x;
+
+    //! y position
+    const double m_y;
+
+    //! delta x b/w forward and backward endplate
+    const double m_dx;
+
+    //! delta y b/w forward and backward endplate
+    const double m_dy;
+
+    //! reference to the layer
+    const FTLayer& m_layer;
+
+    //! ID in the layer
+    const int m_localId;
+
 #ifdef FZISAN_DEBUG
-    MCParticle* m_mcPart; // pointer to the MC particle
+    //! pointer to the MC particle
+    MCParticle* m_mcPart;
 #endif
-    double m_distance; // drift distance
-    double m_t0; // t0 of the wire
-    double m_time; // drift time
-    double m_pedestal; // pedestal of the ADC value
-    unsigned int m_state; // status bit
-    FTWire* m_neighbor[6]; // pointer of neighbor channels
+
+    //! drift distance
+    double m_distance;
+
+    //! t0 of the wire
+    double m_t0;
+
+    //! drift time
+    double m_time;
+
+    //! pedestal of the ADC value
+    double m_pedestal;
+
+    //! status bit
+    unsigned m_state;
+
+    //! pointer of neighbors
+    FTWire* m_neighbor[6];
   };
-
-  //----------------------------------------------
-#ifdef FTWire_NO_INLINE
-#define inline
-#else
-#undef inline
-#define FTWire_INLINE_DEFINE_HERE
-#endif
-
-#ifdef FTWire_INLINE_DEFINE_HERE
 
   inline
   FTWire::FTWire(const double x, const double y,
@@ -206,7 +225,7 @@ namespace Belle2 {
       m_t0(0),
       m_time(0),
       m_pedestal(0),
-      m_state(FTWireHitInvalid)
+      m_state(Invalid)
   {
     m_neighbor[0] = NULL;
     m_neighbor[1] = NULL;
@@ -231,7 +250,7 @@ namespace Belle2 {
       m_t0(0),
       m_time(0),
       m_pedestal(0),
-      m_state(FTWireHitInvalid)
+      m_state(Invalid)
   {
     m_neighbor[0] = NULL;
     m_neighbor[1] = NULL;
@@ -267,7 +286,7 @@ namespace Belle2 {
     m_time = 0.;
     m_t0 = 0.;
     m_pedestal = 0.;
-    m_state = FTWireHitInvalid;
+    m_state = Invalid;
   }
 
   inline
@@ -402,7 +421,7 @@ namespace Belle2 {
   unsigned
   FTWire::state(const unsigned state)
   {
-    return m_state = (m_state & FTWireStateMask) | state;
+    return m_state = (m_state & StateMask) | state;
   }
 
   inline
@@ -464,11 +483,11 @@ namespace Belle2 {
   void
   FTWire::chkLeftRight(void)
   {
-    if (((**(m_neighbor + 2)).m_state & FTWireHit) &&
-        ((**(m_neighbor + 3)).m_state & FTWireHit)) {
-      m_state |= FTWireHitInvalid;
-      (**(m_neighbor + 2)).m_state |= FTWireHitInvalid;
-      (**(m_neighbor + 3)).m_state |= FTWireHitInvalid;
+    if (((**(m_neighbor + 2)).m_state & Hit) &&
+        ((**(m_neighbor + 3)).m_state & Hit)) {
+      m_state |= Invalid;
+      (**(m_neighbor + 2)).m_state |= Invalid;
+      (**(m_neighbor + 3)).m_state |= Invalid;
     }
   }
 
@@ -543,11 +562,6 @@ namespace Belle2 {
     if (m_localId + diff >= 2.*(double)m_layer.nWire()) i_diff -= m_layer.nWire();
     return this + i_diff;
   }
-
-
-#endif
-
-#undef inline
 
 }
 

@@ -77,17 +77,30 @@ namespace Belle2 {
       // Constructors and destructor
       Lpar(const Lpar&);
 
+      //! scale the parameters
       void scale(double s) { m_kappa /= s; m_gamma *= s; }
+
+      //! rotate the parameters
       void rotate(double c, double s);
+
+      //! move the parameters
       void move(double x, double y);
+
+      //! d0
       double d0(double x, double y) const;
+
+      //! returns x y
       bool xy(double, double&, double&, int dir = 0) const;
       //TMatrixD dldc() const;
 
-      double m_alpha; // alpha
-      double m_beta;  // beta
-      double m_gamma; // gamma
-      double m_kappa; // kappa
+      //! alpha
+      double m_alpha;
+      //! beta
+      double m_beta;
+      //! gamma
+      double m_gamma;
+      //! kappa
+      double m_kappa;
 
     private:
       /*
@@ -128,21 +141,9 @@ namespace Belle2 {
 
       // data members
 
-      static const double BELLE_ALPHA; // magnetic field parameter
-
-      // static data members
-
+      //! magnetic field parameter
+      static const double BELLE_ALPHA;
     };
-
-    //----------------------------------------------
-#ifdef Lpar_NO_INLINE
-#define inline
-#else
-#undef inline
-#define Lpar_INLINE_DEFINE_HERE
-#endif
-
-#ifdef Lpar_INLINE_DEFINE_HERE
 
     inline
     Lpar::Lpar() : m_alpha(0), m_beta(1), m_gamma(0), m_kappa(0)
@@ -283,10 +284,6 @@ namespace Belle2 {
       a(4) = 0;
       return a;
     }
-
-#endif
-
-#undef inline
 
   }
 }

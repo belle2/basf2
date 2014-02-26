@@ -53,7 +53,7 @@ namespace Belle2 {
     //! connect single hit
     void connectInner(const FTWire*);
 
-  public: // Selectors
+  public:
     //! returns wire-hit list
     FTList<FTWire*>& getWireHits(void) const;
 
@@ -99,41 +99,55 @@ namespace Belle2 {
     //! returns z for matched 2D track
     double z(void) const;
 
-  public: // Modifiers
+  public:
     //! set track
     FTTrack* track(FTTrack*);
 
-  private: // private data members
-    FTList<FTWire*>& m_wireHits; // list of hits
-    FTSuperLayer& m_superLayer; // reference to the super layer
-    FTList<FTWire*>& m_innerBoundHits; // list of hits in the inner bound layer
-    FTList<FTWire*>& m_outerBoundHits; // list of hits in the outer bound layer
-    FTList<double>* m_sList; // list of s value for the hits
+  private:
+    //! list of hits
+    FTList<FTWire*>& m_wireHits;
+
+    //! reference to the super layer
+    FTSuperLayer& m_superLayer;
+
+    //! list of hits in the inner bound layer
+    FTList<FTWire*>& m_innerBoundHits;
+
+    //! list of hits in the outer bound layer
+    FTList<FTWire*>& m_outerBoundHits;
+
+    //! list of s value for the hits
+    FTList<double>* m_sList;
+
     union {
-      double m_kappa; // kappa of the segment
-      FTList<double>* m_zList; // list of z value for the hits
+      //! kappa of the segment
+      double m_kappa;
+      //! list of z value for the hits
+      FTList<double>* m_zList;
     };
+
     union {
-      FTTrack* m_track; // pointer to the track
-      FTList<FTTrack*>* m_trackList; // pointer of associated tracks
+      //! pointer to the track
+      FTTrack* m_track;
+      //! pointer of associated tracks
+      FTList<FTTrack*>* m_trackList;
     };
-    double m_r; // r of the segment
-    double m_outgoing_x; // x position at exit
-    double m_outgoing_y; // y position at exit
-    double m_incoming_x; // x position at entry
-    double m_incoming_y; // y position at entry
+
+    //! r of the segment
+    double m_r;
+
+    //! x position at exit
+    double m_outgoing_x;
+
+    //! y position at exit
+    double m_outgoing_y;
+
+    //! x position at entry
+    double m_incoming_x;
+
+    //! y position at entry
+    double m_incoming_y;
   };
-
-
-  //----------------------------------------------
-#ifdef FTSegment_NO_INLINE
-#define inline
-#else
-#undef inline
-#define FTSegment_INLINE_DEFINE_HERE
-#endif
-
-#ifdef FTSegment_INLINE_DEFINE_HERE
 
   inline
   FTSegment::FTSegment(FTSuperLayer* super, FTList<FTWire*>& hits)
@@ -285,10 +299,6 @@ namespace Belle2 {
   {
     return m_track = src;
   }
-
-#endif
-
-#undef inline
 
 }
 

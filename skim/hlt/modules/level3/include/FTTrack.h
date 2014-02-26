@@ -26,6 +26,7 @@ namespace Belle2 {
 
   // Track class for the Level-3 Fast Track Finder
   class FTTrack {
+
   public:
     //! constructor
     FTTrack(FTList<FTSegment*>& axial_segments, double kappa, double chi2Kappa);
@@ -120,45 +121,70 @@ namespace Belle2 {
 
     static void setEvtTiming(double t) { s_evtTiming = t; }
 
-  public: // static data members
-    static double s_minPt; // cut value of pt at the track finding
-    static double s_minDr; // cut value of drho at the track finding
-    static bool s_additionalTdcCuts; // flag for additional TDC cuts
+  public:
+    //! cut value of pt at the track finding
+    static double s_minPt;
 
-  private: // private data members
-    static const TVector3 c_pivot; // pivot (=origin)
-    static int s_evtTiming; // reconstructed event timing
-    L3::Lpav* m_la; // pointer to the r-phi circle fitter
-    L3::Zav* m_za; // pointer to the s-z line fitter
-    TVectorD* m_helix; // pointer to the fitted helix parameter
-    FTList<FTSegment*>& m_axialSegments; // list of axial segments
-    FTList<FTSegment*>* m_stereoSegments; // list of stereo segments
-    FTList<FTSegment*>* m_stereoSegmentsCache; // list of stereo segments
-    FTList<FTList<FTSegment*> *>* m_stereoSegmentsBySuperLayer; // stereo segments by syper later
+    //! cut value of drho at the track finding
+    static double s_minDr;
+
+    //! flag for additional TDC cuts
+    static bool s_additionalTdcCuts;
+
+  private:
+    //! pivot (=origin)
+    static const TVector3 c_pivot;
+
+    //! reconstructed event timing
+    static int s_evtTiming;
+
+    //! pointer to the r-phi circle fitter
+    L3::Lpav* m_la;
+
+    //! pointer to the s-z line fitter
+    L3::Zav* m_za;
+
+    //! pointer to the fitted helix parameter
+    TVectorD* m_helix;
+
+    //! list of axial segments
+    FTList<FTSegment*>& m_axialSegments;
+
+    //! list of stereo segments
+    FTList<FTSegment*>* m_stereoSegments;
+
+    //! list of stereo segments
+    FTList<FTSegment*>* m_stereoSegmentsCache;
+
+    //! list of stereo segments for each syper laters
+    FTList<FTList<FTSegment*> *>* m_stereoSegmentsBySuperLayer;
+
     union {
-      double m_kappa; // kappa at track finding
-      double m_SigmaS; // sum of s
+      //! kappa at track finding
+      double m_kappa;
+      //! sum of s
+      double m_SigmaS;
     };
+
     union {
-      double m_chi2Kappa; // chi square of kappa at track finding
-      double m_SigmaSS; // sum of s*s
+      //! chi square of kappa at track finding
+      double m_chi2Kappa;
+      //! sum of s*s
+      double m_SigmaSS;
     };
-    double m_SigmaZ; // sum of z
-    double m_SigmaSZ; // sum of s*z
-    double m_rPhiFitChi2; // chi square of r-phi fit
-    double m_szFitChi2;  // chi square of s-z fit
+
+    //! sum of z
+    double m_SigmaZ;
+
+    //! sum of s*z
+    double m_SigmaSZ;
+
+    //! chi square of r-phi fit
+    double m_rPhiFitChi2;
+
+    //! chi square of s-z fit
+    double m_szFitChi2;
   };
-
-
-//----------------------------------------------
-#ifdef FTTrack_NO_INLINE
-#define inline
-#else
-#undef inline
-#define FTTrack_INLINE_DEFINE_HERE
-#endif
-
-#ifdef FTTrack_INLINE_DEFINE_HERE
 
   inline
   FTTrack::FTTrack(FTList<FTSegment*>& axialSegments,
@@ -367,10 +393,6 @@ namespace Belle2 {
       m_stereoSegmentsCache = new FTList<FTSegment*>(3);
     }
   }
-
-#endif
-
-#undef inline
 
 }
 

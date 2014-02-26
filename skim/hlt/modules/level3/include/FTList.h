@@ -83,22 +83,19 @@ namespace Belle2 {
     //! returns the length of the list
     int length(void) const;
 
-  private: // private data members
-    int m_length; // length of the list
-    int m_remain; // allocated length - m_length
-    int m_lengthToAlloc; // length to allocate
-    T* m_obj; // array of the object
+  private:
+    //! length of the list
+    int m_length;
+
+    //! allocated length - m_length
+    int m_remain;
+
+    //! length to allocate
+    int m_lengthToAlloc;
+
+    //! array of the object
+    T* m_obj;
   };
-
-  //----------------------------------------------
-#ifdef FTList_NO_INLINE
-#define inline
-#else
-#undef inline
-#define FTList_INLINE_DEFINE_HERE
-#endif
-
-#ifdef FTList_INLINE_DEFINE_HERE
 
   template <class T>
   inline
@@ -320,11 +317,6 @@ namespace Belle2 {
     clear();
   }
 
-#endif
-
-#undef inline
-
 }
 
 #endif /* FTList_FLAG_ */
-

@@ -13,21 +13,25 @@
 
 namespace Belle2 {
 
-  //...Defs...
-#define FCCrystalEHit 0
-#define FCCrystalCheckedOrNotHit 1
-#define FCCrystalNeighbor 79
-#define FCCrystalNeighbor1 2
-#define FCCrystalNeighbor2 4
-#define FCCrystalNeighbor3 8
-#define FCCrystalNeighbor6 64
-#define FCCrystalAppendedNeighbor1 5
-#define FCCrystalAppendedNeighbor2 3
-#define FCCrystalAppendedNeighbor3 65
-#define FCCrystalAppendedNeighbor6 9
-
   // CsI crystal class for the Level-3 Fast Cluster Finder
   class FCCrystal {
+
+  public:
+    //! definition of state bits and masks
+    enum FCCrystalState {
+      EHit = 0x0,
+      CheckedOrNotHit = 0x1,
+      Neighbor = 0x4F,
+      Neighbor1 = 0x2,
+      Neighbor2 = 0x4,
+      Neighbor3 = 0x8,
+      Neighbor6 = 0x40,
+      AppendedNeighbor1 = 0x5,
+      AppendedNeighbor2 = 0x3,
+      AppendedNeighbor3 = 0x41,
+      AppendedNeighbor6 = 0x9
+    };
+
   public:
     //! constructor
     FCCrystal(const int thetaId, const int phiId, FCCrystal* const, FCCrystal* const);
@@ -38,7 +42,7 @@ namespace Belle2 {
     //! destructor
     ~FCCrystal() {}
 
-  public: //Selectors
+  public:
     //! returns energy
     double energy(void) const;
 
@@ -69,8 +73,7 @@ namespace Belle2 {
     //! returns state bit
     unsigned stateAND(const unsigned mask) const;
 
-  public: // Modifires
-
+  public:
     //! clear information
     void clear(void);
 
@@ -93,28 +96,32 @@ namespace Belle2 {
     //! returns max phi id of this phi-ring
     int phiMax(void) const;
 
-  private: //static data members
-    static const int m_phiMaxFE[13]; // maximum phi ID for FE
-    static const int m_phiMaxBE[10]; // maximum phi ID for BE
-  private: //private data members
-    const int m_thetaId; // theta ID
-    const int m_phiId; // phi ID
-    FCCrystal* const m_neighborPlus; // pointer of neighbor channel
-    FCCrystal* const m_neighborMinus; // pointer of neighbor channel
-    double m_energy; // energy deposit
-    //double m_status;
-    unsigned int m_state; // status bits
+  private:
+    //! maximum phi ID for FE
+    static const int m_phiMaxFE[13];
+
+    //! maximum phi ID for BE
+    static const int m_phiMaxBE[10];
+
+  private:
+    //! theta ID
+    const int m_thetaId;
+
+    //! phi ID
+    const int m_phiId;
+
+    //! pointer of neighbor channel
+    FCCrystal* const m_neighborPlus;
+
+    //! pointer of neighbor channel
+    FCCrystal* const m_neighborMinus;
+
+    //! energy deposit
+    double m_energy;
+
+    //! state bits
+    unsigned int m_state;
   };
-
-  //----------------------------------------------
-#ifdef FCCrystal_NO_INLINE
-#define inline
-#else
-#undef inline
-#define FCCrystal_INLINE_DEFINE_HERE
-#endif
-
-#ifdef FCCrystal_INLINE_DEFINE_HERE
 
   inline
   FCCrystal::FCCrystal(const int thetaId, const int phiId,
@@ -125,7 +132,7 @@ namespace Belle2 {
       m_neighborMinus(minus),
       m_energy(0.),
       //m_status(1.),
-      m_state(FCCrystalCheckedOrNotHit)
+      m_state(CheckedOrNotHit)
   {
   }
 
@@ -137,7 +144,7 @@ namespace Belle2 {
       m_neighborMinus(NULL),
       m_energy(0.),
       //m_status(1.),
-      m_state(FCCrystalCheckedOrNotHit)
+      m_state(CheckedOrNotHit)
   {
   }
 
@@ -146,7 +153,7 @@ namespace Belle2 {
   FCCrystal::clear(void)
   {
     m_energy = 0.;
-    m_state = 1;
+    m_state = CheckedOrNotHit;
   }
 
   inline
@@ -264,16 +271,11 @@ namespace Belle2 {
   void
   FCCrystal::checkAndAppend(FTList<FCCrystal*>& hits, const unsigned& mask)
   {
-    if (m_state ^ FCCrystalCheckedOrNotHit) {
+    if (m_state ^ CheckedOrNotHit) {
       if (!m_state) hits.append(this);
       m_state |= mask;
     }
   }
-
-#endif
-
-#undef inline
-
 }
 
 #endif /* FCCrystal_FLAG_ */

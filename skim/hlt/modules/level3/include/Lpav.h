@@ -69,69 +69,91 @@ namespace Belle2 {
       // Constructors and destructor
       Lpav(const Lpav&);
 
-      // comparison operators
+      // comparison operator
       bool operator==(const Lpav&) const;
+
+      // comparison operator
       bool operator!=(const Lpav&) const;
 
-      // private member functions
+      //! add point
       void add(double x, double y, double w = 1, double a = 0, double b = 0);
+      //! subtract point
       void sub(double x, double y, double w = 1, double a = 0, double b = 0);
+      //! calculate average
       void calculate_average(void);
+      //! calculate average
       void calculate_average3(void);
+      //! calculate average
       void calculate_average(double x, double y, double w = 1);
+      //! calculate average
       void calculate_average3(double x, double y, double w = 1);
+      //! calculate average
       void calculate_average_n(double xxav, double yyav, double xyav,
                                double xrrav, double yrrav, double rrrrav);
+      //! set chi square
       double chisq(double chisq) { m_chisq = chisq; return m_chisq; }
+      //! set number of points
       double nc(double nc) { m_nc = nc; return m_nc; }
+      //! solve lambda
       double solve_lambda(void);
+      //! solve lambda
       double solve_lambda3(void);
+      //! calculate Lpar
       double calculate_lpar(void);
+      //! calculate Lpar
       double calculate_lpar3(void);
 
-      // private const member functions
+      //! sum of weight
+      double m_wsum;
+      //! sum of x
+      double m_xsum;
+      //! sum of y
+      double m_ysum;
+      //! sum of x*x
+      double m_xxsum;
+      //! sum of y*y
+      double m_yysum;
+      //! sum of x*y
+      double m_xysum;
+      //! sum of x*r*r
+      double m_xrrsum;
+      //! sum of y*r*r
+      double m_yrrsum;
+      //! sum of r*r*r*r
+      double m_rrrrsum;
 
-      // data members
-      double m_wsum; // sum of weight
-      double m_xsum; // sum of x
-      double m_ysum; // sum of y
-      double m_xxsum; // sum of x*x
-      double m_yysum; // sum of y*y
-      double m_xysum; // sum of x*y
-      double m_xrrsum; // sum of x*r*r
-      double m_yrrsum; // sum of y*r*r
-      double m_rrrrsum; // sum of r*r*r*r
-
-      double m_wsum_temp; // sum of weight
+      //! sum of weight?
+      double m_wsum_temp;
+      //! average of x?
       double m_xav;
+      //! average of y?
       double m_yav;
+      //! average of xy?
       double m_xyavp;
 
       double m_rscale;
+      //! average of xx?
       double m_xxavp;
+      //! average of yy?
       double m_yyavp;
+      //! average of xrr?
       double m_xrravp;
+      //! average of yrr?
       double m_yrravp;
+      //! average of rrrr?
       double m_rrrravp;
+      //! sin(rot)?
       double m_sinrot;
+      //! cos(rot)?
       double m_cosrot;
 
-      double m_nc; // number of points
-      double m_chisq; // chi square
+      //! number of points
+      double m_nc;
 
-      // static data members
+      //! chi square
+      double m_chisq;
 
     };
-
-    //----------------------------------------------
-#ifdef Lpav_NO_INLINE
-#define inline
-#else
-#undef inline
-#define Lpav_INLINE_DEFINE_HERE
-#endif
-
-#ifdef Lpav_INLINE_DEFINE_HERE
 
     inline
     Lpav::Lpav()
@@ -233,9 +255,6 @@ namespace Belle2 {
                                                      = m_xrrsum = m_yrrsum = m_rrrrsum = m_rscale = m_nc = 0;
       m_chisq = -1;
     }
-#endif
-
-#undef inline
   }
 }
 

@@ -21,13 +21,6 @@
 
 using namespace Belle2;
 
-//...Defs...
-
-#define MAX_DATA_LENGTH  0x00080000
-#define MAX_SUBSYS_LENGTH 0x00040000
-#define MAX_CRATE_LENGTH 0x00020000
-#define MAX_TDC_LENGTH 0x00010000
-
 //...Globals...
 FCFinder*
 FCFinder::s_cFinder = NULL;
@@ -46,7 +39,7 @@ FCFinder::instance(void)
 }
 
 FCFinder::FCFinder()
-  : m_Crystal(NULL),
+  : m_crystal(NULL),
     m_ehits(*(new FTList<FCCrystal*>(500))),
     m_clusters(*(new FTList<FCCluster*>(20)))
 {
@@ -59,7 +52,7 @@ FCFinder::init()
 
   static const int nCrystals(8736);
 
-  if (!m_Crystal) m_Crystal = new FCCrystal[nCrystals + 1];
+  if (!m_crystal) m_crystal = new FCCrystal[nCrystals + 1];
 
   int nPhiRing[69];
   int n = 0;
@@ -82,30 +75,30 @@ FCFinder::init()
     const int thetaId = geom.GetThetaID();
     const int phiId = geom.GetPhiID();
 
-    FCCrystal* minusPhi = m_Crystal + nCrystals;
+    FCCrystal* minusPhi = m_crystal + nCrystals;
     n = nPhiRing[thetaId];
     if (thetaId && thetaId != 13 && thetaId != 59) {
-      minusPhi = m_Crystal;
+      minusPhi = m_crystal;
       int nPhiRingMinus = nPhiRing[thetaId - 1];
       int PhiRingMinusPhiId  = (phiId * nPhiRingMinus) / n;
       int remnant = (phiId * nPhiRingMinus) % n;
       if ((remnant << 1) >= n) PhiRingMinusPhiId++;
       minusPhi += (cellId - phiId - (nPhiRingMinus - PhiRingMinusPhiId));
     }
-    FCCrystal* plusPhi = m_Crystal + nCrystals;
+    FCCrystal* plusPhi = m_crystal + nCrystals;
     if (thetaId != 12 && thetaId != 58 && thetaId != 68) {
-      plusPhi = m_Crystal;
+      plusPhi = m_crystal;
       int nPhiRingPlus = nPhiRing[thetaId + 1];
       int PhiRingPlusPhiId  = (phiId * nPhiRingPlus) / n;
       int remnant = (phiId * nPhiRingPlus) % n;
       if ((remnant << 1) >= n) PhiRingPlusPhiId++;
       plusPhi += (cellId + (n - phiId) + PhiRingPlusPhiId);
     }
-    new(m_Crystal + cellId) FCCrystal(thetaId, phiId, plusPhi, minusPhi);
-    //B2INFO("crystal " << getCellId(m_Crystal+cellId) << " plus:" << getCellId(plusPhi) << " minus:" << getCellId(minusPhi) << " theta:" << thetaId << " phi:" << phiId);
+    new(m_crystal + cellId) FCCrystal(thetaId, phiId, plusPhi, minusPhi);
+    //B2INFO("crystal " << getCellId(m_crystal+cellId) << " plus:" << getCellId(plusPhi) << " minus:" << getCellId(minusPhi) << " theta:" << thetaId << " phi:" << phiId);
   }
   // make virtual cell object for the pointer of boundary's neighbor
-  new(m_Crystal + nCrystals) FCCrystal();
+  new(m_crystal + nCrystals) FCCrystal();
 
 }
 
@@ -115,7 +108,7 @@ FCFinder::term()
   clear();
   delete &m_ehits;
   delete &m_clusters;
-  if (m_Crystal) delete[] m_Crystal;
+  if (m_crystal) delete[] m_crystal;
 }
 
 void
@@ -171,10 +164,10 @@ FCFinder::updateEcl3(void)
     }
     if (energy > 0.1) B2INFO("Id = " << cellId << ", E=" << energy << " , simE=" << simE);
     */
-    FCCrystal& c = *(m_Crystal + cellId);
+    FCCrystal& c = *(m_crystal + cellId);
     c.energy(energy);
     m_ehits.append(&c);
-    c.state(FCCrystalEHit);
+    c.state(FCCrystal::EHit);
   }
   //B2INFO("simESum = " << simESum);
 }
@@ -220,25 +213,25 @@ FCFinder::clustering(const double seedThreshold, const double clusterECut)
         seed = ehit;
         seed_energy = energy;
       }
-      if ((state & FCCrystalNeighbor) == FCCrystalNeighbor) continue;
+      if ((state & FCCrystal::Neighbor) == FCCrystal::Neighbor) continue;
 
-      if (!(state & FCCrystalNeighbor1)) {  // check neighbor1
+      if (!(state & FCCrystal::Neighbor1)) {  // check neighbor1
         ehit->neighborPlusPhi()->checkAndAppend(*hits,
-                                                FCCrystalAppendedNeighbor1);
+                                                FCCrystal::AppendedNeighbor1);
       }
-      if (!(state & FCCrystalNeighbor2)) {  // check neighbor2
+      if (!(state & FCCrystal::Neighbor2)) {  // check neighbor2
         ehit->neighborMinusPhi()->checkAndAppend(*hits,
-                                                 FCCrystalAppendedNeighbor2);
+                                                 FCCrystal::AppendedNeighbor2);
       }
-      if (!(state & FCCrystalNeighbor3)) {  // check neighbor3
+      if (!(state & FCCrystal::Neighbor3)) {  // check neighbor3
         ehit->neighborMinusTheta()->checkAndAppend(*hits,
-                                                   FCCrystalAppendedNeighbor3);
+                                                   FCCrystal::AppendedNeighbor3);
       }
-      if (!(state & FCCrystalNeighbor6)) {  // check neighbor6
+      if (!(state & FCCrystal::Neighbor6)) {  // check neighbor6
         ehit->neighborPlusTheta()->checkAndAppend(*hits,
-                                                  FCCrystalAppendedNeighbor6);
+                                                  FCCrystal::AppendedNeighbor6);
       }
-      ehit->state(FCCrystalCheckedOrNotHit);
+      ehit->state(FCCrystal::CheckedOrNotHit);
     }
     // discard bad clusters
     if (seed_energy < seedThreshold || clusterEnergy < clusterECut) {

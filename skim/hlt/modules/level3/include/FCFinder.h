@@ -24,7 +24,7 @@ namespace Belle2 {
   class FCFinder {
 
   public:
-    //! returns fzisan
+    //! returns FCFinder
     static FCFinder& instance(void);
 
   public:
@@ -43,8 +43,7 @@ namespace Belle2 {
     //! energy reconstructor core
     void event(const double seedThreshold, const double clusterECut);
 
-  public: // Selectors
-
+  public:
     //! returns list of eHits
     FTList<FCCrystal*>& getEHits(void) const;
 
@@ -64,22 +63,19 @@ namespace Belle2 {
     //! cluster finding
     void clustering(const double seedThreshold, const double clusterECut);
 
-  private: // private data members
-    static FCFinder* s_cFinder; // pointer for FCFinder
-    FCCrystal* m_Crystal; // pointer for the array of crystals
-    FTList<FCCrystal*>& m_ehits; // list of hits for the event
-    FTList<FCCluster*>& m_clusters; // list of clusters for the event
+  private:
+    //! pointer for FCFinder
+    static FCFinder* s_cFinder;
+
+    //! pointer for the array of crystals
+    FCCrystal* m_crystal;
+
+    //! list of hits for the event
+    FTList<FCCrystal*>& m_ehits;
+
+    //! list of clusters for the event
+    FTList<FCCluster*>& m_clusters;
   };
-
-  //----------------------------------------------
-#ifdef FCFinder_NO_INLINE
-#define inline
-#else
-#undef inline
-#define FCFinder_INLINE_DEFINE_HERE
-#endif
-
-#ifdef FCFinder_INLINE_DEFINE_HERE
 
   inline
   FTList<FCCrystal*>&
@@ -99,12 +95,8 @@ namespace Belle2 {
   int
   FCFinder::getCellId(FCCrystal* c) const
   {
-    return (int)(c - m_Crystal);
+    return (int)(c - m_crystal);
   }
-
-#endif
-
-#undef inline
 
 }
 

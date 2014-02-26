@@ -19,14 +19,24 @@
 using namespace Belle2;
 
 //...Globals...
+//const unsigned int
 const unsigned int
-FTSuperLayer::m_neighborsMask[6] = {452, 420, 340, 172, 92, 60};
-//                          [0] = 452 = FTWireHitAppended + FTWireNeighbor345
-//                          [1] = 420 = FTWireHitAppended + FTWireNeighbor245
-//     definitions of       [2] = 340 = FTWireHitAppended + FTWireNeighbor135
-//    m_neighborsMask[]     [3] = 172 = FTWireHitAppended + FTWireNeighbor024
-//                          [4] = 92  = FTWireHitAppended + FTWireNeighbor013
-//                          [5] = 60  = FTWireHitAppended + FTWireNeighbor012
+FTSuperLayer::m_neighborsMask[6] = {
+  FTWire::Appended | FTWire::Neighbor3 | FTWire::Neighbor4 | FTWire::Neighbor5,
+  FTWire::Appended | FTWire::Neighbor2 | FTWire::Neighbor4 | FTWire::Neighbor5,
+  FTWire::Appended | FTWire::Neighbor1 | FTWire::Neighbor3 | FTWire::Neighbor5,
+  FTWire::Appended | FTWire::Neighbor0 | FTWire::Neighbor2 | FTWire::Neighbor4,
+  FTWire::Appended | FTWire::Neighbor0 | FTWire::Neighbor1 | FTWire::Neighbor3,
+  FTWire::Appended | FTWire::Neighbor0 | FTWire::Neighbor1 | FTWire::Neighbor2
+};
+
+//FTSuperLayer::m_neighborsMask[6] = {452, 420, 340, 172, 92, 60};
+//                          [0] = 452 = FTWireHitAppended | FTWireNeighbor345
+//                          [1] = 420 = FTWireHitAppended | FTWireNeighbor245
+//     definitions of       [2] = 340 = FTWireHitAppended | FTWireNeighbor135
+//    m_neighborsMask[]     [3] = 172 = FTWireHitAppended | FTWireNeighbor024
+//                          [4] = 92  = FTWireHitAppended | FTWireNeighbor013
+//                          [5] = 60  = FTWireHitAppended | FTWireNeighbor012
 
 void
 FTSuperLayer::clear(void)
@@ -34,7 +44,7 @@ FTSuperLayer::clear(void)
   if (m_wireHits.length()) {
     FTWire** hptr = m_wireHits.firstPtr();
     FTWire** const last = m_wireHits.lastPtr();
-    do {(**hptr).state(FTWireHitInvalid);} while ((hptr++) != last);
+    do {(**hptr).state(FTWire::Invalid);} while ((hptr++) != last);
     m_wireHits.clear();
   }
   m_singleHits.clear();
@@ -130,7 +140,7 @@ FTSuperLayer::clustering(void)
   // clustering
   hptr = m_wireHits.firstPtr();
   do {      // loop over clusters
-    if ((**hptr).stateAND(FTWireHitAppendedOrInvalid)) continue;
+    if ((**hptr).stateAND(FTWire::AppendedOrInvalid)) continue;
     //(**hptr).stateOR(FTWireHitAppended);
     FTList<FTWire*>* hits = new FTList<FTWire*>(10);
     int n = hits->append(*hptr);
@@ -139,12 +149,13 @@ FTSuperLayer::clustering(void)
       const unsigned int* mptr = m_neighborsMask;
       FTWire** nptr = (*hits)[j]->neighborPtr();
       // check 6 neighbors
-      for (unsigned Mask = FTWireNeighbor0; Mask ^ 512; Mask <<= 1, mptr++, nptr++) {
+      for (unsigned Mask = FTWire::Neighbor0; Mask ^ FTWire::NeighborEnd;
+           Mask <<= 1, mptr++, nptr++) {
         if (!(checked & Mask)) {
-          switch ((**nptr).stateAND(FTWireHitAppendedOrInvalid)) {
+          switch ((**nptr).stateAND(FTWire::AppendedOrInvalid)) {
             case 0:
               n = hits->append(*nptr);
-            case FTWireHitAppended:
+            case FTWire::Appended:
               (**nptr).stateOR(*mptr);
           }
         }

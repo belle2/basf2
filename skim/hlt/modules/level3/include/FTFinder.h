@@ -45,7 +45,7 @@ namespace Belle2 {
     //! track finder core
     void event(const int findEventVertex);
 
-  public: // Selectors
+  public:
     //! returns superlayer
     FTSuperLayer* superLayer(int id) const;
 
@@ -64,7 +64,7 @@ namespace Belle2 {
     //! convert x to t
     double x2t(const double x) const;
 
-  private: // private member functions
+  private:
     //! clear object
     void clear(void);
 
@@ -101,36 +101,61 @@ namespace Belle2 {
     //! set badwires
     void setBadWires(const bool EvtByEvt, const bool inBeginRun);
 
-  private: // private data members
-    static FTFinder* s_tFinder; // pointer of the FTFinder
-    double m_tOffSet; // offset of the T0
-    double m_xtCoEff; // coefficient of the x-t relation
-    double m_tWindow; // time window of a hit
-    FTWire* m_wire; // pointer to the array of wires
-    FTLayer* m_layer; // pointer to the array of layers
-    FTSuperLayer* m_superLayer; // pointer to the array of super layers
-    int m_Nwire; // number of wires
-    int m_Nlayer; // number of layers
-    int m_NsuperLayer; // number of super layers
-    FTList<FTTrack*>& m_tracks; // list of tracks for the event
-    FTList<FTSegment*>* m_linkedSegments; // list of all the track segments
-    double m_tWindowLow; // lower bound of the time window
-    double m_tWindowHigh; // upper bound of the time window
-    double m_vx; // x of the reconstucted event vertex
-    double m_vy; // y of the reconstucted event vertex
-    double m_vz; // z of the reconstucted event vertex
-    FTList<FTWire*>* m_EvtByEvtBadWires; // list of bad wires
+  private:
+    //! pointer of the FTFinder
+    static FTFinder* s_tFinder;
+
+    //! offset of the T0
+    double m_tOffSet;
+
+    //! coefficient of the x-t relation
+    double m_xtCoEff;
+
+    //! time window of a hit
+    double m_tWindow;
+
+    //! pointer to the array of wires
+    FTWire* m_wire;
+
+    //! pointer to the array of layers
+    FTLayer* m_layer;
+
+    //! pointer to the array of super layers
+    FTSuperLayer* m_superLayer;
+
+    //! number of wires
+    int m_Nwire;
+
+    //! number of layers
+    int m_Nlayer;
+
+    //! number of super layers
+    int m_NsuperLayer;
+
+    //! list of tracks for the event
+    FTList<FTTrack*>& m_tracks;
+
+    //! list of all the track segments
+    FTList<FTSegment*>* m_linkedSegments;
+
+    //! lower bound of the time window
+    double m_tWindowLow;
+
+    //! upper bound of the time window
+    double m_tWindowHigh;
+
+    //! x of the reconstucted event vertex
+    double m_vx;
+
+    //! y of the reconstucted event vertex
+    double m_vy;
+
+    //! z of the reconstucted event vertex
+    double m_vz;
+
+    //! list of bad wires
+    FTList<FTWire*>* m_EvtByEvtBadWires;
   };
-
-  //----------------------------------------------
-#ifdef FTFinder_NO_INLINE
-#define inline
-#else
-#undef inline
-#define FTFinder_INLINE_DEFINE_HERE
-#endif
-
-#ifdef FTFinder_INLINE_DEFINE_HERE
 
   inline
   FTSuperLayer*
@@ -166,10 +191,6 @@ namespace Belle2 {
   {
     return t * m_xtCoEff;
   }
-
-#endif
-
-#undef inline
 
 }
 

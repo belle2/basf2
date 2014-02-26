@@ -41,7 +41,7 @@ FTTrack::rPhiFit(void)
     FTList<FTWire*>& hits = m_axialSegments[i]->getWireHits();
     for (int j = 0; j ^ (hits.length()); j++) {
       FTWire& h = * hits[j];
-      if (h.stateAND(FTWireFittingInvalid)) {
+      if (h.stateAND(FTWire::FitInvalid)) {
         hits.remove(j);
         continue;
       }
@@ -96,10 +96,10 @@ FTTrack::rPhiFit(void)
         double delta = h.distance() / r;
         if (fabs(d0) - delta > 0.7 * h.layer().csize()) continue; // remove bad hits
         if (d0 > 0) {   // left or right
-          h.stateOR(FTWireHitRight);
+          h.stateOR(FTWire::RightHit);
           d0 = -d0;
         } else {
-          h.stateOR(FTWireHitLeft);
+          h.stateOR(FTWire::LeftHit);
           delta = -delta;
         }
         m_la->add_point(x - delta * y, y + delta * x, 1);
@@ -149,10 +149,10 @@ FTTrack::rPhiReFit(double vx, double vy, int vtx_flag)
       double delta = h.distance() / h.layer().r();
       if (fabs(d0) - delta > 0.5 * cellsize) continue; // remove bad hits
       if (d0 > 0) {   // left or right
-        h.stateOR(FTWireHitRight);
+        h.stateOR(FTWire::RightHit);
         d0 = -d0;
       } else {
-        h.stateOR(FTWireHitLeft);
+        h.stateOR(FTWire::LeftHit);
         delta = -delta;
       }
       m_la->add_point(x - delta * y, y + delta * x, 1);

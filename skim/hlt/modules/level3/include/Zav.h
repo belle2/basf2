@@ -61,31 +61,35 @@ namespace Belle2 {
       //TMatrixDSym cov() const;
 
     private:
+      //! parameter a
       double m_a;
+      //! parameter b
       double m_b;
+      //! weight
       double m_w;
+      //! sum of s
       double m_sav;
+      //! sum of ss
       double m_ssav;
+      //! sum of z
       double m_zav;
+      //! sum of sz
       double m_szav;
+      //! sum of zz
       double m_zzav;
+      //! chi square
       double m_chisq;
+      //! 1/sigma
       double m_sig_inv;
+      //! covariance matrix element
       double m_c11;
+      //! covariance matrix element
       double m_c21;
+      //! covariance matrix element
       double m_c22;
+      //! number of points
       int m_nc;
     };
-
-    //----------------------------------------------
-#ifdef Zav_NO_INLINE
-#define inline
-#else
-#undef inline
-#define Zav_INLINE_DEFINE_HERE
-#endif
-
-#ifdef Zav_INLINE_DEFINE_HERE
 
     inline Zav::Zav()
       : m_a(-9999.), m_b(-9999.), m_w(0.), m_sav(0.), m_ssav(0.), m_zav(0.),
@@ -172,11 +176,8 @@ namespace Belle2 {
       return vret;
     }
     */
-#endif
-
-#undef inline
-
   }
+
 }
 
 #endif /* ZAV */

@@ -77,29 +77,40 @@ namespace Belle2 {
     //! returns first wire in a layer
     FTWire* firstWire() const;
 
-  private: // private data members
-    const double m_radius; // radius
-    const double m_tanSlant; // tangent of the slant angle
-    const double m_zf; // z of forward endplate
-    const double m_zb; // z of backward endplate
-    const double m_offset; // offset of phi
-    const int m_layerId; // global ID
-    const int m_localLayerId; // ID in the super layer
-    const int m_Nwire; // number of wires
-    const FTSuperLayer& m_superLayer; // reference to the super layer
-    const int m_smallCell; // =1 small cell, =0 otherwise
-    FTWire* const m_firstWire; // pointer to the first wire in the layer
+  private:
+    //! radius
+    const double m_radius;
+
+    //! tangent of the slant angle
+
+    const double m_tanSlant;
+    //! z of forward endplate
+    const double m_zf;
+
+    //! z of backward endplate
+    const double m_zb;
+
+    //! offset of phi
+    const double m_offset;
+
+    //! global ID
+    const int m_layerId;
+
+    //! ID in the super layer
+    const int m_localLayerId;
+
+    //! number of wires
+    const int m_Nwire;
+
+    //! reference to the super layer
+    const FTSuperLayer& m_superLayer;
+
+    //! =1 small cell, =0 otherwise
+    const int m_smallCell;
+
+    //! pointer to the first wire in the layer
+    FTWire* const m_firstWire;
   };
-
-  //----------------------------------------------
-#ifdef FTLayer_NO_INLINE
-#define inline
-#else
-#undef inline
-#define FTLayer_INLINE_DEFINE_HERE
-#endif
-
-#ifdef FTLayer_INLINE_DEFINE_HERE
 
   inline
   FTLayer::FTLayer(const double radius, const double stereoAngle,
@@ -226,11 +237,6 @@ namespace Belle2 {
     return m_firstWire;
   }
 
-#endif
-
-#undef inline
-
 }
 
 #endif /* FTLayer_FLAG_ */
-

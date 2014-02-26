@@ -32,12 +32,18 @@ namespace Belle2 {
     public:
       enum { size = 2 + sizeof ...(Chars) };
       static const char chars[2 + sizeof ...(Chars)];
-      static constexpr const char first = Char;
-      static const char* c_str() { return &(chars[0]); }
+      static const char first;
+      static const char* c_str();
     };
 
     template<char Char, char... Chars>
     const char StaticString<Char, Chars...>::chars[2 + sizeof ...(Chars)] = {Char, Chars... , '\0' };
+
+    template<char Char, char... Chars>
+    const char StaticString<Char, Chars...>::first = Char;
+
+    template<char Char, char... Chars>
+    const char* StaticString<Char, Chars...>::c_str() { return &(chars[0]); }
 
     /// Class for compile time string handeling - specialisation taking no characters as end point of recursion steps.
     template<>
@@ -45,12 +51,9 @@ namespace Belle2 {
     public:
       enum { size = 1 };
       static const char chars[1];
-      static constexpr const char first = '\0';
-      static const char* c_str() { return &(chars[0]); }
-      //static constexpr const char* c_str() { return &first; }
+      static const char first;
+      static const char* c_str();
     };
-
-
 
 
     template<class P>

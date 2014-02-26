@@ -14,3 +14,5 @@ using namespace Belle2;
 using namespace CDCLocalTracking;
 
 const char StaticString<>::chars[1] = {'\0' };
+const char StaticString<>::first = '\0';
+const char* StaticString<>::c_str() { return &(chars[0]); }

@@ -1,9 +1,0 @@
---- ../../cdc/SConscript	2012-02-13 14:34:25.000000000 +0900
-+++ ../../cdc/SConscript_new	2012-02-13 14:34:19.000000000 +0900
-@@ -4,5 +4,6 @@
-                '$ROOT_LIBS', 'Geom', 'EG', 'g4root',
-                '$GEANT4_LIBS', 'CLHEP', 'generators','generators_dataobjects',
- 	       'simulation_dataobjects']
-+#env.Append(CPPDEFINES={'CDC_ELOSS':None})
- 
- Return('env')

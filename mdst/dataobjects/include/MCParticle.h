@@ -86,7 +86,7 @@ namespace Belle2 {
       m_mother(0),
       m_firstDaughter(0), m_lastDaughter(0), m_spinType(c_NOTSET),
       m_secondaryPhysicsProcess(0),
-      m_seenIn(0) {}
+      m_seenIn() {}
 
     /**
      * Construct MCParticle from a another MCParticle and the TClonesArray it is stored in.
@@ -302,14 +302,14 @@ namespace Belle2 {
      * Return the seen-in flags of the entire Belle II subdetectors for an MC particle.
      * @return Returns the entire seen-in flags
      */
-    unsigned int getSeenInDetectors() const { return m_seenIn; }
+    Const::DetectorSet getSeenInDetector() const { return m_seenIn; }
 
     /**
      * Return if the seen-in flag for a specific subdetector is set or not.
      * @param detectorID The numerical subdetector ID.
      * @return Returns true if the corresponding bit is set.
      */
-    bool hasSeenInDetector(Const::EDetector detectorID) const { return (m_seenIn & (1 << detectorID)); }
+    bool hasSeenInDetector(Const::DetectorSet set) const { return m_seenIn.contains(set); }
 
     /**
      * Check if particle is virtual
@@ -474,19 +474,19 @@ namespace Belle2 {
      * Set the seen-in flags for the entire Belle II subdetectors for an Monte Carlo particle.
      * @param seenInFlags The entire seen-in flags of the MC particle.
      */
-    void setSeenInDetectors(unsigned short int seenInFlags) { m_seenIn = seenInFlags; }
+    void setSeenInDetector(Const::DetectorSet set) { m_seenIn = set; }
 
     /**
      * Flag/Add a bit if the MC particle is seen in a specific subdetector.
      * @param detectorID The numerical ID of a subdetector
      */
-    void addSeenInDetector(Const::EDetector detectorID) { m_seenIn |= 1 << detectorID; }
+    void addSeenInDetector(Const::DetectorSet set) { m_seenIn += set; }
 
     /**
      * Unflag/Remove the bit if the MC particle is not seen in a specific subdetector.
      * @param detectorID The numerical ID of a subdetector
      */
-    void removeSeenInDetector(Const::EDetector detectorID) { m_seenIn &= ~(1 << detectorID); }
+    void removeSeenInDetector(Const::DetectorSet set) { m_seenIn -= set; }
 
     /**
      * Search the DataStore for the corresponding MCParticle array.
@@ -550,10 +550,10 @@ namespace Belle2 {
 
     int m_secondaryPhysicsProcess;  /**< physics process type of a secondary particle */
 
-    unsigned short int m_seenIn;  /**< Each bit is a seen-in flag for the corresoponding subdetector of Belle II */
+    Const::DetectorSet m_seenIn;  /**< Each bit is a seen-in flag for the corresoponding subdetector of Belle II */
 
     /** Class definition required for the creation of the ROOT dictionary. */
-    ClassDef(MCParticle, 3);
+    ClassDef(MCParticle, 4);
   };
 
 

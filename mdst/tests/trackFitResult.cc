@@ -14,6 +14,7 @@
 using namespace std;
 
 namespace Belle2 {
+  /** Command x should exit using B2FATAL */
 #define EXPECT_FATAL(x) EXPECT_EXIT(x,::testing::KilledBySignal(SIGABRT),"");
 
   /** Set up a few arrays and objects in the datastore */
@@ -67,6 +68,7 @@ namespace Belle2 {
     }
   } // Testcases for getters
 
+  /** Test if the error propagation of the covariance matrix works properly. */
   TEST_F(TrackFitResultTest, ErrorPropagation)
   {
     TRandom3 generator;

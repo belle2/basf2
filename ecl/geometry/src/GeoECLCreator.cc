@@ -339,7 +339,7 @@ namespace Belle2 {
       G4Box* SensorDiode = new G4Box("diode", DiodeWidth / 2, DiodeLength / 2, DiodeHeight / 2);
 
 
-
+      /*
       double k_BLL;
       double k_Ba;
       double k_Bb;
@@ -352,6 +352,7 @@ namespace Belle2 {
       double k_phiC;
       double k_zC;
       double k_phi_init; // add correction
+      */
       double zsign = 1.;
 
       // add barrel fin parameters and previous crystal parameters/////////
@@ -401,18 +402,18 @@ namespace Belle2 {
           layerContent.append((format("/BarrelCrystals/BarrelCrystal[%1%]/") % (iBrCry)).str());
 
 
-          k_BLL = layerContent.getLength("K_BLL") * cm;
-          k_Ba = layerContent.getLength("K_Ba")   * cm;
-          k_Bb = layerContent.getLength("K_Bb")   * cm;
-          k_Bh = layerContent.getLength("K_Bh")   * cm;
-          k_BA = layerContent.getLength("K_BA")   * cm;
-          k_BH = layerContent.getLength("K_BH")   * cm;
-          k_z_TILTED = layerContent.getAngle("K_z_TILTED") ;
-          k_phi_TILTED = layerContent.getAngle("K_phi_TILTED") ;
-          k_perpC = layerContent.getLength("K_perpC") * cm ;
-          k_phiC = layerContent.getAngle("K_phiC") ;
-          k_zC = layerContent.getLength("K_zC") * cm;
-          k_phi_init = layerContent.getAngle("K_phi_init") ; // add correction
+          double k_BLL = layerContent.getLength("K_BLL") * cm;
+          double k_Ba = layerContent.getLength("K_Ba")   * cm;
+          double k_Bb = layerContent.getLength("K_Bb")   * cm;
+          double k_Bh = layerContent.getLength("K_Bh")   * cm;
+          double k_BA = layerContent.getLength("K_BA")   * cm;
+          double k_BH = layerContent.getLength("K_BH")   * cm;
+          double k_z_TILTED = layerContent.getAngle("K_z_TILTED") ;
+          double k_phi_TILTED = layerContent.getAngle("K_phi_TILTED") ;
+          double k_perpC = layerContent.getLength("K_perpC") * cm ;
+          double k_phiC = layerContent.getAngle("K_phiC") ;
+          double k_zC = layerContent.getLength("K_zC") * cm;
+          double k_phi_init = layerContent.getAngle("K_phi_init") ; // add correction
 
 
           double cDx1 = k_Ba / 2;

@@ -294,7 +294,12 @@ double ECLReconstructorModule::correctionFactor(double Energy, double Theta)
   //Used to break free of loop and also to check for any mistake in logic
   int  eCorrId = -10;
   //Corrections
-  double energyCorrectPolynomial[4];
+  double energyCorrectPolynomial[4] = {1.0, 0.0, 0.0, 0.0};
+  //... The above initialiation (1,0,0,0) will provide calibration factor of 1
+  //... i.e. is no correction : Vishal
+
+
+
 
   /*Register the ECL.xml file, which further register the
     ECL-FirstCorrection.xml file and use GearDir to access the elements*/

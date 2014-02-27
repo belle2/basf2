@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Poyuan Chen                                              *
+ * Contributors: Poyuan Chen,Vishal                                       *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -22,15 +22,27 @@
 #include <ecl/rec_lib/TRecEclCF.h>
 
 
+#include <mdst/dataobjects/Mdst_ECL.h>
+#include <mdst/dataobjects/Track.h>
+#include <tracking/dataobjects/ExtHit.h>
+
+
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
+#include <framework/gearbox/GearDir.h>
+#include <framework/datastore/RelationArray.h>
+#include <framework/datastore/RelationIndex.h>
+
+#include <boost/foreach.hpp>
+#include <G4ParticleTable.hh>
 
 #include<ctime>
 #include <iomanip>
 
 // ROOT
 #include <TVector3.h>
+#include <TMatrixFSym.h>
 
 #define PI 3.14159265358979323846
 
@@ -71,6 +83,9 @@ void ECLReconstructorModule::initialize()
   StoreArray<ECLHitAssignment>::registerPersistent();
   StoreArray<ECLShower>::registerPersistent();
 
+  StoreArray<Mdst_ECL>::registerPersistent();
+  RelationArray::registerPersistent<Mdst_ECL, ECLShower>("", "");
+
 
 }
 
@@ -88,6 +103,12 @@ void ECLReconstructorModule::event()
     B2DEBUG(100, "ECLDigit in empty in event " << m_nEvent);
     return;
   }
+
+
+  //Fill information with extrapolate..
+  //.. Vishal
+  readExtrapolate();
+
 
   cout.unsetf(ios::scientific);
   cout.precision(6);
@@ -119,6 +140,15 @@ void ECLReconstructorModule::event()
 
     for (EclCFShowerMap::const_iterator iShower = iCR->Showers().begin(); iShower != iCR->Showers().end(); ++iShower) {
       TEclCFShower iSh = (*iShower).second;
+
+      //.. To fill Highest Energy in single crystal in a shower
+      //.. and fit time for that particular cyrstal in Timing for now
+      //.. Also no. of tracks -- Vishal
+      double v_HiEnergy = -9999999;
+      double v_TIME = -10;
+      // bool  i_extMatch = false;
+      int m_NofTracks = 0;
+
       std::vector<MEclCFShowerHA> HAs = iSh.HitAssignment();
       for (std::vector<MEclCFShowerHA>::iterator iHA = HAs.begin();
            iHA != HAs.end(); ++iHA) {
@@ -130,11 +160,43 @@ void ECLReconstructorModule::event()
 
         eclHaArray[m_HANum]->setShowerId(nShower);
         eclHaArray[m_HANum]->setCellId(iHA->Id() + 1);
-      }
+
+        //... Below simply check for the TrackCellid for particular id
+        //... Based on tracks, it count the number of tracks
+        //... Vishal
+        if (m_TrackCellId[iHA->Id() + 1] >= 0) { ++m_NofTracks; }
+
+        //... To get ECLDigit information for particular shower
+        //... in order to get FitEnergy and FitTime for each crystal
+        //... in particular shower. To speed up Mapping to be used.
+        //... Vishal
+        for (int i_DigiLoop = 0; i_DigiLoop < eclDigiArray.getEntries();
+             i_DigiLoop++) {
+          ECLDigit* aECLDigi = eclDigiArray[i_DigiLoop];
+          if (aECLDigi->getCellId() != (iHA->Id() + 1))continue;
+          float v_FitEnergy    = (aECLDigi->getAmp()) / 20000.;
+          float v_FitTime      =  aECLDigi->getTimeFit();
+          if (v_HiEnergy < v_FitEnergy) {
+            v_HiEnergy = v_FitEnergy;
+            v_TIME = v_FitTime;
+          }
+        } // i_DigiLoop
+
+      } // MEclCFShowerHA LOOP
 
       double energyBfCorrect = (*iShower).second.Energy();
       double preliminaryCalibration = correctionFactor(energyBfCorrect, (*iShower).second.Theta()) ;
       double sEnergy = (*iShower).second.Energy() / preliminaryCalibration;
+
+
+      //... Calibration for Highest Energy in Shower
+      //... Assuming that scaling will be constant
+      //... TODO more careful study in future.
+      //... Vishal
+      double HighCalibrationFactor = v_HiEnergy / energyBfCorrect;
+      double HiEnergyinShower = sEnergy * HighCalibrationFactor;
+
+
 
 
       StoreArray<ECLShower> eclRecShowerArray;
@@ -155,13 +217,50 @@ void ECLReconstructorModule::event()
       eclRecShowerArray[m_hitNum]->setGrade((*iShower).second.Grade());
       eclRecShowerArray[m_hitNum]->setUncEnergy((float)(*iShower).second.UncEnergy());
       double sTheta = (*iShower).second.Theta();
-
+      double sPhi   = (*iShower).second.Phi(); //...Vishal
       float ErrorMatrix[3] = {
         errorE(sEnergy),
         errorTheta(sEnergy, sTheta),
         errorPhi(sEnergy, sTheta)
       };
       eclRecShowerArray[m_hitNum]->setError(ErrorMatrix);
+
+
+      //... This is where the Mdst_ECL dataobject is filled
+      //... i_Mdst is simply the number and used to relate with ECLShower
+      //... Vishal
+      StoreArray<Mdst_ECL> eclMdstArray;
+      if (!eclMdstArray) eclMdstArray.create();
+      new(eclMdstArray.nextFreeAddress()) Mdst_ECL();
+      int i_Mdst = eclMdstArray.getEntries() - 1;
+
+      //.. Fill Mdst_ECL here
+      RelationArray Mdst_ECLtoShower(eclMdstArray, eclRecShowerArray);
+      eclMdstArray[i_Mdst]->setTiming((float) v_TIME);
+      eclMdstArray[i_Mdst]->setEnergy((float) sEnergy);
+      eclMdstArray[i_Mdst]->setE9oE25((float)(*iShower).second.E9oE25());
+      eclMdstArray[i_Mdst]->setEnedepSum((float)(*iShower).second.UncEnergy());
+      eclMdstArray[i_Mdst]->setPx((float) Px(sEnergy, sTheta, sPhi));
+      eclMdstArray[i_Mdst]->setPy((float) Py(sEnergy, sTheta, sPhi));
+      eclMdstArray[i_Mdst]->setPz((float) Pz(sEnergy, sTheta));
+      eclMdstArray[i_Mdst]->setNofTracks((int)m_NofTracks);
+      eclMdstArray[i_Mdst]->setTiming((float) v_TIME);
+      eclMdstArray[i_Mdst]->setHighestE((float)  HiEnergyinShower);
+
+      TMatrixFSym GammaMomentumErrorMatrix(7);
+
+      readErrorMatrix7x7(sEnergy, sTheta, sPhi, GammaMomentumErrorMatrix);
+
+      eclMdstArray[i_Mdst]->setErrorMatrix(GammaMomentumErrorMatrix);
+
+      //... Relation of Mdst_ECL to ECLShower
+      Mdst_ECLtoShower.add(i_Mdst, m_hitNum);
+
+      //..... Mdst_ECL is completed here......
+
+
+
+
 
       nShower++;
 
@@ -184,68 +283,76 @@ void ECLReconstructorModule::terminate()
 
 }
 
-float ECLReconstructorModule::errorE(double E)
-{
-
-  double sigmaE = 0.01 * (0.047 / E + 1.105 / sqrt(sqrt(E)) + 0.8563) * E;
-//double sigmaE = 0.01 * E * sqrt(squ(0.066 / E) + squ(0.81) / sqrt(E) + squ(1.34)) ;
-//sigmaE / E = 0.066% / E +- 0.81% / (E)^(1/4)  +- 1.34%//NIM A441, 401(2000)
-  return (float)sigmaE;
-
-}
-float ECLReconstructorModule::errorTheta(double Energy, double Theta)
-{
-
-  double sigmaX = 0.1 * (0.27 + 3.4 / sqrt(Energy) + 1.8 / sqrt(sqrt(Energy))) ;
-//sigmaX (mm)=  0.27 + 3.4/ (E)^(1/2) + 1.8 / (E)^(1/4) ;E (GeV)
-
-  double zForward  =  196.2;
-  double zBackward = -102.2;
-  double Rbarrel   =  125.0;
-
-  double theta_f = atan2(Rbarrel, zForward);
-  double theta_b = atan2(Rbarrel, zBackward);
-
-  if (Theta < theta_f) {
-    return (float)(sigmaX * squ(cos(Theta)) / zForward);
-  } else if (Theta > theta_b) {
-    return (float)(sigmaX * squ(cos(Theta)) / (-1 * zBackward));
-  } else {
-    return (float)(sigmaX * sin(Theta) / Rbarrel)   ;
-  }
 
 
-}
-
-float ECLReconstructorModule::errorPhi(double Energy, double Theta)
-{
-
-  double sigmaX = 0.1 * (0.27 + 3.4 / sqrt(Energy) + 1.8 / sqrt(sqrt(Energy))) ;
-//sigmaX (mm)=  0.27 + 3.4/ (E)^(1/2) + 1.8 / (E)^(1/4) ;E (GeV)
-
-  double zForward  =  196.2;
-  double zBackward = -102.2;
-  double Rbarrel   =  125.0;
-
-  double theta_f = atan2(Rbarrel, zForward);
-  double theta_b = atan2(Rbarrel, zBackward);
-
-  if (Theta < theta_f) {
-    return (float)(sigmaX / (zForward * tan(Theta)))  ;
-  } else if (Theta > theta_b) {
-    return (float)(sigmaX / (zBackward * tan(Theta)))   ;
-  } else {
-    return (float)(sigmaX / Rbarrel);
-  }
-
-
-
-}
-
-
+//... Correction are now in ECL-FirstCorrection.xml
+//...  Read using GearDir : Vishal
 
 double ECLReconstructorModule::correctionFactor(double Energy, double Theta)
 {
+
+  //Used to break free of loop and also to check for any mistake in logic
+  int  eCorrId = -10;
+  //Corrections
+  double energyCorrectPolynomial[4];
+
+  /*Register the ECL.xml file, which further register the
+    ECL-FirstCorrection.xml file and use GearDir to access the elements*/
+  GearDir ThetaBins("Detector/DetectorComponent[@name=\"ECL\"]/Content/ECLFirstCorrection/ThetaBins/");
+  GearDir ThetaBinsContent(ThetaBins);
+
+
+  /* Below section help in reducing the looping time
+     checks which bin theta  should be, above or below
+     the middle of detector. This may help in speed up
+     of code. LoopStart is the first from where loop
+     will start and LoopStop is the last. */
+
+  // This is kept 1 as first entry is 1 in xml file
+  int LoopStart = 1;
+  // The number of bins the detector is divided into
+  int LoopStop  = ThetaBinsContent.getNumberNodes("ThetaBins");
+  int MiddleBin = int((LoopStop) / 2); // Take in between the bins
+
+  ThetaBinsContent.append((boost::format("ThetaBins[%1%]/") % (MiddleBin)).str());
+  if (Theta <  ThetaBinsContent.getAngle("ThetaEnd"))
+  {LoopStop = MiddleBin;}
+  else {LoopStart = MiddleBin + 1;}
+
+
+
+  for (int iThetaBins = LoopStart; iThetaBins <= LoopStop; ++iThetaBins) {
+    GearDir ThetaBinsContent(ThetaBins);
+
+    ThetaBinsContent.append((boost::format("ThetaBins[%1%]/") % (iThetaBins)).str());
+
+    if (Theta >= ThetaBinsContent.getAngle("ThetaStart")
+        && Theta < ThetaBinsContent.getAngle("ThetaEnd")) {
+      eCorrId = iThetaBins;
+      energyCorrectPolynomial[0] = ThetaBinsContent.getDouble("Polynomial1");
+      energyCorrectPolynomial[1] = ThetaBinsContent.getDouble("Polynomial2");
+      energyCorrectPolynomial[2] = ThetaBinsContent.getDouble("Polynomial3");
+      energyCorrectPolynomial[3] = ThetaBinsContent.getDouble("Polynomial4");
+    }
+
+    if (eCorrId > 0) break;
+    //break loop Here as now we have got correction,
+    //Save Time No need of looping more.
+  }
+
+
+  //Check, if there is some problem to get proper Theta !!!
+  if (eCorrId < 1 || eCorrId > 15) {
+    B2ERROR("ECLShower theta out of range " << (Theta / PI * 180))
+  }
+
+  double  preliminaryCalibration = energyCorrectPolynomial[0]
+                                   + energyCorrectPolynomial[1] * pow(log(Energy), 1)
+                                   + energyCorrectPolynomial[2] * pow(log(Energy), 2)
+                                   + energyCorrectPolynomial[3] * pow(log(Energy), 3);
+
+
+  /* OLD CODE to get correction with hard coded numbers.. To be removed in future -- Vishal
 
   int  eCorrId = -1;
   if (Theta > 0 && (Theta / PI * 180) < 32.2) {
@@ -312,9 +419,235 @@ double ECLReconstructorModule::correctionFactor(double Energy, double Theta)
                                    + energyCorrectPolynomial[eCorrId][1] * pow(log(Energy), 1)
                                    + energyCorrectPolynomial[eCorrId][2] * pow(log(Energy), 2)
                                    + energyCorrectPolynomial[eCorrId][3] * pow(log(Energy), 3);
-
+  */
 
   return preliminaryCalibration;
 
 }
+
+
+
+
+//.................
+// For track matching
+// Copied from ECLGammaReconstructorModule to avoid dependency
+// Vishal, One way is to use ECLTrackShowerMatchModule but I simply use
+// funciton here
+void ECLReconstructorModule::readExtrapolate()
+{
+  for (int i = 0; i < 8736; i++) {
+    m_TrackCellId[i] = -10 ;
+  }
+
+  StoreArray<Track> Tracks;
+  StoreArray<ExtHit> extHits;
+  RelationIndex<Track, ExtHit> TracksToExtHits(Tracks, extHits);
+
+  if (extHits) {
+    ExtDetectorID myDetID = EXT_ECL; // ECL in this example
+    int pdgCodePiP = G4ParticleTable::GetParticleTable()->FindParticle("pi+")->GetPDGEncoding();
+    int pdgCodePiM = G4ParticleTable::GetParticleTable()->FindParticle("pi-")->GetPDGEncoding();
+
+    typedef RelationIndex<Track, ExtHit>::Element relElement_t;
+    for (int i_trkLoop = 0; i_trkLoop < Tracks.getEntries(); ++i_trkLoop) {
+      BOOST_FOREACH(const relElement_t & rel, TracksToExtHits.getElementsFrom(Tracks[i_trkLoop])) {
+        const ExtHit* extHit = rel.to;
+        if (extHit->getPdgCode() != pdgCodePiP && extHit->getPdgCode() != pdgCodePiM) continue;
+        if ((extHit->getDetectorID() != myDetID) || (extHit->getCopyID() == 0)) continue;
+        // Fill here the id of the Tracks to
+        // m_TrackCellId to put relation to Shower
+        m_TrackCellId[extHit->getCopyID()] = i_trkLoop;
+      }//for cands
+    }//Tracks.getEntries()
+  }//if extTrackCands
+
+}
+//.................................................
+
+
+
+//................
+// Fill here Px, Py and Pz : Vishal
+float ECLReconstructorModule::Px(double Energy, double Theta, double Phi)
+{
+  return float(Energy * sin(Theta) * cos(Phi));
+}
+
+float ECLReconstructorModule::Py(double Energy, double Theta, double Phi)
+{
+  return float(Energy * sin(Theta) * sin(Phi));
+}
+
+float ECLReconstructorModule::Pz(double Energy, double Theta)
+{
+  return float(Energy * cos(Theta));
+}
+//_______________
+
+
+//...............
+// Fill here Error on Energy
+float ECLReconstructorModule::errorE(double E)
+{
+  double sigmaE = 0.01 * (0.047 / E + 1.105 / sqrt(sqrt(E)) + 0.8563) * E;
+  //double sigmaE = 0.01 * E * sqrt(squ(0.066 / E) + squ(0.81) / sqrt(E) + squ(1.34)) ;
+  //sigmaE / E = 0.066% / E +- 0.81% / (E)^(1/4)  +- 1.34%//NIM A441, 401(2000)
+  return (float)sigmaE;
+}
+//_______________
+
+
+//...............
+// Fill here Error on Theta
+float ECLReconstructorModule::errorTheta(double Energy, double Theta)
+{
+  double sigmaX = 0.1 * (0.27 + 3.4 / sqrt(Energy) + 1.8 / sqrt(sqrt(Energy))) ;
+  //sigmaX (mm)=  0.27 + 3.4/ (E)^(1/2) + 1.8 / (E)^(1/4) ;E (GeV)
+
+  double zForward  =  196.2;
+  double zBackward = -102.2;
+  double Rbarrel   =  125.0;
+
+  double theta_f = atan2(Rbarrel, zForward);
+  double theta_b = atan2(Rbarrel, zBackward);
+
+  if (Theta < theta_f) {
+    return (float)(sigmaX * squ(cos(Theta)) / zForward);
+  } else if (Theta > theta_b) {
+    return (float)(sigmaX * squ(cos(Theta)) / (-1 * zBackward));
+  } else {
+    return (float)(sigmaX * sin(Theta) / Rbarrel)   ;
+  }
+}
+//_______________
+
+
+//...............
+// Fill here Error on Phi
+float ECLReconstructorModule::errorPhi(double Energy, double Theta)
+{
+  double sigmaX = 0.1 * (0.27 + 3.4 / sqrt(Energy) + 1.8 / sqrt(sqrt(Energy))) ;
+//sigmaX (mm)=  0.27 + 3.4/ (E)^(1/2) + 1.8 / (E)^(1/4) ;E (GeV)
+
+  double zForward  =  196.2;
+  double zBackward = -102.2;
+  double Rbarrel   =  125.0;
+
+  double theta_f = atan2(Rbarrel, zForward);
+  double theta_b = atan2(Rbarrel, zBackward);
+
+  if (Theta < theta_f) {
+    return (float)(sigmaX / (zForward * tan(Theta)))  ;
+  } else if (Theta > theta_b) {
+    return (float)(sigmaX / (zBackward * tan(Theta)))   ;
+  } else {
+    return (float)(sigmaX / Rbarrel);
+  }
+}
+//_______________
+
+
+
+//.................
+// For filling error matrix on Px,Py and Pz here : Vishal
+void ECLReconstructorModule::readErrorMatrix(double Energy, double Theta,
+                                             double Phi, TMatrixFSym& ErrorMatrix)
+{
+  float EnergyError = float(ECLReconstructorModule::errorE(Energy));
+  float ThetaError =  float(ECLReconstructorModule::errorTheta(Energy, Theta));
+  float PhiError  =   float(ECLReconstructorModule::errorPhi(Energy, Theta));
+
+  TMatrixFSym  errEcl(3);   // 3x3 initialize to zero
+  errEcl[ 0 ][ 0 ] = EnergyError * EnergyError; // Energy
+  errEcl[ 1 ][ 0 ] = 0;
+  errEcl[ 1 ][ 1 ] = PhiError * PhiError; // Phi
+  errEcl[ 2 ][ 0 ] = 0;
+  errEcl[ 2 ][ 0 ] = 0;
+  errEcl[ 2 ][ 1 ] = 0;
+  errEcl[ 2 ][ 2 ] = ThetaError * ThetaError; // Theta
+
+  TMatrixF  jacobian(4, 3);
+  float  cosPhi = cos(Phi);
+  float  sinPhi = sin(Phi);
+  float  cosTheta = cos(Theta);
+  float  sinTheta = sin(Theta);
+  float   E = float(Energy);
+
+
+  jacobian[ 0 ][ 0 ] =            cosPhi * sinTheta;
+  jacobian[ 0 ][ 1 ] =  -1.0 * E * sinPhi * sinTheta;
+  jacobian[ 0 ][ 2 ] =        E * cosPhi * cosTheta;
+  jacobian[ 1 ][ 0 ] =            sinPhi * sinTheta;
+  jacobian[ 1 ][ 1 ] =        E * cosPhi * sinTheta;
+  jacobian[ 1 ][ 2 ] =        E * sinPhi * cosTheta;
+  jacobian[ 2 ][ 0 ] =                     cosTheta;
+  jacobian[ 2 ][ 1 ] =           0.0;
+  jacobian[ 2 ][ 2 ] =  -1.0 * E          * sinTheta;
+  jacobian[ 3 ][ 0 ] =           1.0;
+  jacobian[ 3 ][ 1 ] =           0.0;
+  jacobian[ 3 ][ 2 ] =           0.0;
+  TMatrixFSym errCart(4);
+  errCart = errEcl.Similarity(jacobian);
+
+  for (int i = 0; i < 4; i++) {
+    for (int j = 0; j <= i ; j++) {
+      ErrorMatrix[i][j] = errCart[i][j];
+    }
+  }
+}
+//__________________________
+
+
+//.................
+// For filling error matrix on Px,Py and Pz here 7x 7
+void ECLReconstructorModule::readErrorMatrix7x7(double Energy, double Theta,
+                                                double Phi, TMatrixFSym& ErrorMatrix)
+{
+  float EnergyError = float(ECLReconstructorModule::errorE(Energy));
+  float ThetaError =  float(ECLReconstructorModule::errorTheta(Energy, Theta));
+  float PhiError  =   float(ECLReconstructorModule::errorPhi(Energy, Theta));
+
+  TMatrixFSym  errEcl(3);   // 3x3 initialize to zero
+  errEcl[ 0 ][ 0 ] = EnergyError * EnergyError; // Energy
+  errEcl[ 1 ][ 0 ] = 0;
+  errEcl[ 1 ][ 1 ] = PhiError * PhiError; // Phi
+  errEcl[ 2 ][ 0 ] = 0;
+  errEcl[ 2 ][ 0 ] = 0;
+  errEcl[ 2 ][ 1 ] = 0;
+  errEcl[ 2 ][ 2 ] = ThetaError * ThetaError; // Theta
+
+  TMatrixF  jacobian(4, 3);
+  float  cosPhi = cos(Phi);
+  float  sinPhi = sin(Phi);
+  float  cosTheta = cos(Theta);
+  float  sinTheta = sin(Theta);
+  float   E = float(Energy);
+
+
+  jacobian[ 0 ][ 0 ] =            cosPhi * sinTheta;
+  jacobian[ 0 ][ 1 ] =  -1.0 * E * sinPhi * sinTheta;
+  jacobian[ 0 ][ 2 ] =        E * cosPhi * cosTheta;
+  jacobian[ 1 ][ 0 ] =            sinPhi * sinTheta;
+  jacobian[ 1 ][ 1 ] =        E * cosPhi * sinTheta;
+  jacobian[ 1 ][ 2 ] =        E * sinPhi * cosTheta;
+  jacobian[ 2 ][ 0 ] =                     cosTheta;
+  jacobian[ 2 ][ 1 ] =           0.0;
+  jacobian[ 2 ][ 2 ] =  -1.0 * E          * sinTheta;
+  jacobian[ 3 ][ 0 ] =           1.0;
+  jacobian[ 3 ][ 1 ] =           0.0;
+  jacobian[ 3 ][ 2 ] =           0.0;
+  TMatrixFSym errCart(4);
+  errCart = errEcl.Similarity(jacobian);
+
+  for (int i = 0; i < 4; i++) {
+    for (int j = 0; j <= i ; j++) {
+      ErrorMatrix[i][j] = errCart[i][j];
+    }
+  }
+  for (int i = 4; i <= 6; ++i) {
+    ErrorMatrix[i][i] = 1.0;
+  }
+
+}
+
 

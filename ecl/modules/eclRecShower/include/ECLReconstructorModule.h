@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Poyuan Chen                                              *
+ * Contributors: Poyuan Chen,Vishal                                       *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -14,6 +14,7 @@
 #include <framework/core/Module.h>
 #include <vector>
 #include <TRandom3.h>
+#include <TMatrixFSym.h>
 
 namespace Belle2 {
   namespace ECL {
@@ -80,7 +81,28 @@ namespace Belle2 {
       /**calculate correction factor of energy depending on Energy and Theta  */
       double correctionFactor(double Energy, double Theta);
 
+      /** Fill error matrix for Px, Py Pz and E */
+      void readErrorMatrix(double Energy, double Theta,
+                           double Phi, TMatrixFSym& ErrorMatrix);
 
+      /** Fill error matrix for Px, Py Pz and E */
+      void readErrorMatrix7x7(double Energy, double Theta,
+                              double Phi, TMatrixFSym& ErrorMatrix);
+
+      /** read Extrapolate CellID */
+      void readExtrapolate();
+
+      /**calculate Px using Energy, Theta and Phi */
+      float Px(double Energy, double Theta, double Phi);
+
+      /** Calculate Py using Energy, Theta and Phi */
+      float Py(double Energy, double Theta, double Phi);
+
+      /** Calculate Pz using Energy, Theta  */
+      float Pz(double Energy, double Theta);
+
+      /** extrapolated cell */
+      int   m_TrackCellId[8736];
 
 
     };

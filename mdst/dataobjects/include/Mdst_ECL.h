@@ -46,23 +46,23 @@ namespace Belle2 {
 
 
       // TODO
-      m_Timing = 0;   /**< Timing information */
-      m_ErrorTiming = 0;  /**< Timing Error */
+      m_Timing = 0;   /**< Timing information (at present study going on)*/
+      m_ErrorTiming = 0;  /**< Timing Error (at present study going on)*/
       m_HighestE = 0; /**< Highest Energy stored in a Crystal in a shower (GeV) */
-      m_LAT = 0; /**< Lateral distribution parameter */
+      m_LAT = 0; /**< Lateral distribution parameter (NA) */
 
-      m_NofCrystals = 0; /**< Number of Crystals in a shower */
-      m_Pi0Likelihood = 0; /**< Pi0 Likelihood (greater than 200 MeV) */
-      m_EtaLikelihood = 0; /**< Eta Likelihood (greater than 200 MeV) */
+      m_NofCrystals = 0; /**< Number of Crystals in a shower (NA) */
+      m_Pi0Likelihood = 0; /**< Pi0 Likelihood (greater than 200 MeV) (NA)*/
+      m_EtaLikelihood = 0; /**< Eta Likelihood (greater than 200 MeV) (NA) */
       m_NofTracks = 0; /**< Number of Tracks related to this shower */
-      m_deltaL = 0; /**< arXiv:0711.1593 */
-      m_beta = 0; /**< arXiv:0711.1593 */
-      m_CrystHealth = 0; /**< Crystal Health
+      m_deltaL = 0; /**< arXiv:0711.1593 (NA)*/
+      m_beta = 0; /**< arXiv:0711.1593 (NA)*/
+      m_CrystHealth = 0; /**< Crystal Health (NA)
         -100 : healthy
         10 : Bad
         20 : Broken
         30 : Dead  */
-      m_HimomentumPi0 = 0; /**< Likelihood of being High momentum Pi0
+      m_HimomentumPi0 = 0; /**< Likelihood of being High momentum Pi0 (NA)
           0 to 1 : Can be high momentum pi0
        */
 
@@ -238,8 +238,8 @@ namespace Belle2 {
     float  m_Py;         /**< Py Momentum of Gamma (GeV) */
     float  m_Pz;         /**< Pz Momentum of Gamma (GeV) */
     float  m_EnedepSum;  /**< Uncorrected  Energy Deposited (GeV) */
-    float  m_Timing;     /**< Timing information */
-    float  m_ErrorTiming;    /**< Timing Error */
+    float  m_Timing;     /**< Timing information (study going on) */
+    float  m_ErrorTiming;    /**< Timing Error (NA) */
     float  m_E9oE25;     /**< E9/E25: photon-like & isolation cut */
     float  m_HighestE;  /**< Highest energy stored in a crystal in Shower */
 

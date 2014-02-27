@@ -5,7 +5,6 @@ env['LIBS'] = [
 	    'analysis_dataobjects', 
 	    'ecl_dataobjects',
 	    'mdst_dataobjects',
-	    'tracking_dataobjects',
 	    '$ROOT_LIBS',
             'TMVA',
 	    'EG', 

@@ -22,7 +22,7 @@ namespace Belle2 {
 
   class FTSegment;
 
-  // The Level-3 Fast Track Finder
+  //! The Level-3 Fast Track Finder
   class FTFinder {
 
   public:

@@ -14,6 +14,8 @@
 #include "skim/hlt/modules/level3/L3TriggerBase.h"
 
 namespace Belle2 {
+
+  //! The Level3 energy trigger
   class L3EnergyTrigger : public L3TriggerBase {
   public:
     //! Constructor

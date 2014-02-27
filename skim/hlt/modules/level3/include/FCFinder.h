@@ -20,7 +20,7 @@ namespace Belle2 {
 
   class FCCluster;
 
-  // The Level-3 Fast Cluster Finder
+  //! The Level-3 Fast Cluster Finder
   class FCFinder {
 
   public:

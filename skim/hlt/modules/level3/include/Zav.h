@@ -18,7 +18,7 @@
 namespace Belle2 {
   namespace L3 {
 
-    // Line fitter in the s-z plane
+    //! Line fitter in the s-z plane
     class Zav {
     public:
       //! Constructor

@@ -53,7 +53,7 @@ namespace Belle2 {
 
   private:
 
-    // Level 3 Trigger information
+    //! Level 3 Trigger information
     // Same information is also stored in HLTTag::m_HLTAlgoInfo[HLTTag::Level3]
     // Bit 0:  Summary bit   : taken = 1 , discarded = 0
     // Bit 1:  TrackTrigger  : taken = 1 , discarded = 0
@@ -61,7 +61,11 @@ namespace Belle2 {
     // Bit 3:  algorithm 3   : taken = 1 , discarded = 0
     // Bit 4:  algorithm 4   : taken = 1 , discarded = 0
     int m_SummaryWord;
+
+    //! ECL cluster energy sum
     double m_EnergySum;
+
+    //! number of good CDC tracks
     int m_nTracks;
 
     //

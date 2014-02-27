@@ -23,7 +23,7 @@ using namespace L3;
 // static data member definitions
 //
 
-const double Lpar::BELLE_ALPHA(222.37606);
+const double Lpar::c_Belle2ALPHA(222.37606);
 
 Lpar::~Lpar()
 {

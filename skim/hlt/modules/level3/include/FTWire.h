@@ -25,7 +25,7 @@
 
 namespace Belle2 {
 
-  // CDC wire class for the Level-3 Fast Track Finder
+  //! CDC wire class for the Level-3 Fast Track Finder
   class FTWire {
 
   public:

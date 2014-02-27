@@ -20,7 +20,7 @@ namespace Belle2 {
   class FTFinder;
   class FTLayer;
 
-  // CDC superlayer class for the Level-3 Fast Track Finder
+  //! CDC superlayer class for the Level-3 Fast Track Finder
   class FTSuperLayer {
   public:
     //! constructor

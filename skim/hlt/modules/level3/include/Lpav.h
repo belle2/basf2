@@ -20,7 +20,7 @@
 namespace Belle2 {
   namespace L3 {
 
-    // Circle fitter in the r-phi plane
+    //! Circle fitter in the r-phi plane
     class Lpav : public Lpar {
 
     public:
@@ -60,19 +60,20 @@ namespace Belle2 {
       double chi_deg() const;
       */
 
-      // assignment operator(s)
+      //! assignment operator
       Lpav& operator=(const Lpav&);
-      //Lpav& operator=(const Lpar&);
+
+      //! assignment operator
       Lpav& operator+=(const Lpav&);
 
     private:
-      // Constructors and destructor
+      //! constructor
       Lpav(const Lpav&);
 
-      // comparison operator
+      //! comparison operator
       bool operator==(const Lpav&) const;
 
-      // comparison operator
+      //! comparison operator
       bool operator!=(const Lpav&) const;
 
       //! add point
@@ -130,7 +131,7 @@ namespace Belle2 {
       double m_yav;
       //! average of xy?
       double m_xyavp;
-
+      //! rscale?
       double m_rscale;
       //! average of xx?
       double m_xxavp;

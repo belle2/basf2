@@ -16,7 +16,7 @@
 
 namespace Belle2 {
 
-  // ECL cluster class for the Level-3 Fast Cluster Finder
+  //! ECL cluster class for the Level-3 Fast Cluster Finder
   class FCCluster {
   public:
     //! constructor

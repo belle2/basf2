@@ -15,6 +15,8 @@
 
 namespace Belle2 {
   class L3TriggerBase;
+
+  //! Manage Level3 trigger algorithms
   class L3TriggerManager {
 
   public:
@@ -37,11 +39,11 @@ namespace Belle2 {
     //! print information
     void printInformation();
 
-    // data members
+    //! data members
     int m_saveData;
   private:
 
-    // data members
+    //! data members
     FTList<L3TriggerBase*> m_triggers;
   };
 }

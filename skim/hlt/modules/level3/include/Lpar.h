@@ -22,7 +22,7 @@
 namespace Belle2 {
   namespace L3 {
 
-    // Parameter class for Lpav
+    //! Parameter class for Lpav
     class Lpar {
 
     public:
@@ -74,7 +74,7 @@ namespace Belle2 {
       TVectorD Hpar(const TVector3& pivot) const;
 
     protected:
-      // Constructors and destructor
+      //! Constructors and destructor
       Lpar(const Lpar&);
 
       //! scale the parameters
@@ -123,26 +123,31 @@ namespace Belle2 {
       };
       */
 
-      // comparison operators
+      //! comparison operator
       bool operator==(const Lpar&) const;
+
+      //! comparison operator
       bool operator!=(const Lpar&) const;
 
-      // private member functions
-
-      // private const member functions
-      inline double check() const;
+      //! check
+      double check() const;
+      //! kr2g
       double kr2g(double r) const { return m_kappa * r * r + m_gamma; }
+      //! returns x
       double x(double r) const;
+      //! returns y
       double y(double r) const;
+      //! returns xh and yh
       void xhyh(double x, double y, double& xh, double& yh) const;
+      //! returns xi2
       double xi2() const { return 1 + 4 * m_kappa * m_gamma; }
-      inline double r_max() const;
+      //! returns r_max
+      double r_max() const;
+      //! returns da
       double da() const {  return 2 * m_gamma / (std::sqrt(xi2()) + 1); }
 
-      // data members
-
-      //! magnetic field parameter
-      static const double BELLE_ALPHA;
+      //! magnetic field constant
+      static const double c_Belle2ALPHA;
     };
 
     inline
@@ -279,7 +284,7 @@ namespace Belle2 {
       a(1) = (m_kappa > 0)
              ? std::atan2(yc() - pivot.y(), xc() - pivot.x()) + M_PI
              : std::atan2(pivot.y() - yc(), pivot.x() - xc()) - M_PI;
-      a(2) = -2.0 * BELLE_ALPHA * m_kappa;
+      a(2) = -2.0 * c_Belle2ALPHA * m_kappa;
       a(3) = 0;
       a(4) = 0;
       return a;

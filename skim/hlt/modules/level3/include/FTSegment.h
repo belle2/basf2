@@ -21,7 +21,7 @@ namespace Belle2 {
   class FTSuperLayer;
   class FTTrack;
 
-  // Track segment class for the Level-3 Fast Track Finder
+  //! Track segment class for the Level-3 Fast Track Finder
   class FTSegment {
   public:
 

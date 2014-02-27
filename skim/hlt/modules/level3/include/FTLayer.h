@@ -19,8 +19,9 @@ namespace Belle2 {
 
   class FTWire;
 
-  // CDC layer class for the Level-3 Fast Track Finder
+  //! CDC layer class for the Level-3 Fast Track Finder
   class FTLayer {
+
   public:
     //! constructor
     FTLayer(const double radius, const double stereoAngle,

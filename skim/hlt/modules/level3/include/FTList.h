@@ -18,7 +18,7 @@
 
 namespace Belle2 {
 
-  // class template of list for the Level-3 Fast Track / Cluster Finder
+  //! class template of list for the Level-3 Fast Track / Cluster Finder
   template <class T>
   class FTList {
   public:

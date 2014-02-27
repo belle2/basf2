@@ -24,7 +24,7 @@ namespace Belle2 {
 
   class FTWire;
 
-  // Track class for the Level-3 Fast Track Finder
+  //! Track class for the Level-3 Fast Track Finder
   class FTTrack {
 
   public:
@@ -98,6 +98,7 @@ namespace Belle2 {
     //! returns chi2 of the s-z fit
     double szFitChi2() const;
 
+    //! pivot of the helix parameter =(0,0,0)
     static const TVector3& pivot() { return c_pivot; };
 
   public: // Modifiers
@@ -119,6 +120,7 @@ namespace Belle2 {
     //! append stereo segment to the cache
     void appendStereoCache(FTSegment*);
 
+    //! set event timing for the event
     static void setEvtTiming(double t) { s_evtTiming = t; }
 
   public:

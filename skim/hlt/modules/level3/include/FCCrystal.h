@@ -13,7 +13,7 @@
 
 namespace Belle2 {
 
-  // CsI crystal class for the Level-3 Fast Cluster Finder
+  //! CsI crystal class for the Level-3 Fast Cluster Finder
   class FCCrystal {
 
   public:
@@ -198,7 +198,7 @@ namespace Belle2 {
   {
     const int max(phiMax());
     return (m_phiId == max)
-           ? const_cast<FCCrystal*>(this) - max
+           ? const_cast<FCCrystal*>(this) + (-max)
            : const_cast<FCCrystal*>(this) + 1;
   }
 

@@ -15,11 +15,15 @@
 #include "skim/hlt/dataobjects/L3Tag.h"
 
 namespace Belle2 {
+
+  //! Base class for a Level3 trigger algorithm
   class L3TriggerBase {
 
   public:
+    //! constructor
     L3TriggerBase() { *m_name = '\0'; }
 
+    //! destructor
     virtual ~L3TriggerBase() {}
 
     //! preselect events before the fast track and cluster finder

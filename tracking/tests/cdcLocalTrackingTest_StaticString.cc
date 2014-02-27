@@ -19,7 +19,7 @@ using namespace std;
 using namespace Belle2;
 using namespace CDCLocalTracking;
 
-TEST(CDCLocalTrackingTest, StaticString)
+TEST(CDCLocalTrackingTestWithoutGearBox, StaticString)
 {
 
   EXPECT_EQ(1, StaticString<>::size); //Always count the terminating null character.
@@ -50,7 +50,7 @@ TEST(CDCLocalTrackingTest, StaticString)
 
 
 
-TEST(CDCLocalTrackingTest, StaticString_StaticStrip)
+TEST(CDCLocalTrackingTestWithoutGearBox, StaticString_StaticStrip)
 {
 
   typedef StaticString < 't', 'e', 's', 't' > StaticString_test;

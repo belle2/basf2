@@ -20,7 +20,7 @@ using namespace CDCLocalTracking;
 
 // This file contains only compile time test.
 
-TEST(CDCLocalTrackingTest, NAMED)
+TEST(CDCLocalTrackingTestWithoutGearBox, NAMED)
 {
 
   typedef StaticString < 't', 'e', 's', 't' > StaticString_test;
@@ -48,14 +48,14 @@ TEST(CDCLocalTrackingTest, NAMED)
 }
 
 
-TEST(CDCLocalTrackingTest, NAMED_Misaligned)
+TEST(CDCLocalTrackingTestWithoutGearBox, NAMED_Misaligned)
 {
   typedef StaticString < 't', 'e', 's', 't', 's' > StaticString_tests;
   typedef NAMED("tests") StaticString_tests2;
   ::testing::StaticAssertTypeEq< StaticString_tests, StaticString_tests2>();
 }
 
-TEST(CDCLocalTrackingTest, NAMED_ToLong)
+TEST(CDCLocalTrackingTestWithoutGearBox, NAMED_ToLong)
 {
 
   static_assert(NAMED_MAXLENGTH == 32, "");

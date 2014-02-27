@@ -51,24 +51,6 @@ namespace Belle2 {
       c_IsVirtual         = 16   /**< bit 4:  Particle is virtual and not going to Geant4 */
     };
 
-    /** This enum is more a less a copy from EvtSpinType. Except we explicitly set the
-      numbers of the standard spin states such, that they represent 2 x S */
-    enum EspinType {
-      c_SCALAR          = 0,
-      c_STRING          = 0,
-      c_DIRAC           = 1,
-      c_NEUTRINO        = 1,
-      c_VECTOR          = 2,
-      c_PHOTON          = 2,
-      c_RARITASCHWINGER = 3,
-      c_TENSOR          = 4,
-      c_SPIN5HALF       = 5,
-      c_SPIN3           = 6,
-      c_SPIN7HALF       = 7,
-      c_SPIN4           = 8,
-      c_NOTSET          = -1
-    };
-
 
     /**
      * Default constructor for ROOT.
@@ -76,7 +58,7 @@ namespace Belle2 {
     MCParticle():
 
       m_plist(0), m_index(0), m_status(0),
-      m_pdg(0), m_mass(0), m_charge(-10), m_energy(0),
+      m_pdg(0), m_mass(0), m_energy(0),
       m_momentum_x(0), m_momentum_y(0), m_momentum_z(0),
       m_validVertex(false), m_productionTime(0),
       m_productionVertex_x(0), m_productionVertex_y(0),
@@ -84,7 +66,7 @@ namespace Belle2 {
       m_decayTime(0), m_decayVertex_x(0),
       m_decayVertex_y(0), m_decayVertex_z(0),
       m_mother(0),
-      m_firstDaughter(0), m_lastDaughter(0), m_spinType(c_NOTSET),
+      m_firstDaughter(0), m_lastDaughter(0),
       m_secondaryPhysicsProcess(0),
       m_seenIn() {}
 
@@ -98,7 +80,7 @@ namespace Belle2 {
      */
     MCParticle(TClonesArray* plist, const MCParticle& p):
       m_plist(plist), m_index(p.m_index), m_status(p.m_status),
-      m_pdg(p.m_pdg), m_mass(p.m_mass), m_charge(p.m_charge), m_energy(p.m_energy),
+      m_pdg(p.m_pdg), m_mass(p.m_mass), m_energy(p.m_energy),
       m_momentum_x(p.m_momentum_x), m_momentum_y(p.m_momentum_y), m_momentum_z(p.m_momentum_z),
       m_validVertex(p.m_validVertex), m_productionTime(p.m_productionTime),
       m_productionVertex_x(p.m_productionVertex_x), m_productionVertex_y(p.m_productionVertex_y),
@@ -106,7 +88,7 @@ namespace Belle2 {
       m_decayTime(p.m_decayTime), m_decayVertex_x(p.m_decayVertex_x),
       m_decayVertex_y(p.m_decayVertex_y), m_decayVertex_z(p.m_decayVertex_z),
       m_mother(p.m_mother),
-      m_firstDaughter(p.m_firstDaughter), m_lastDaughter(p.m_lastDaughter), m_spinType(p.m_spinType),
+      m_firstDaughter(p.m_firstDaughter), m_lastDaughter(p.m_lastDaughter),
       m_secondaryPhysicsProcess(p.m_secondaryPhysicsProcess),
       m_seenIn(p.m_seenIn) {}
 
@@ -143,7 +125,7 @@ namespace Belle2 {
      * Return the particle charge.
      * @return The charge of the particle in units of q(positron).
      */
-    float getCharge() const { return m_charge; }
+    float getCharge() const;
 
     /**
      * Return particle energy in GeV.
@@ -272,19 +254,6 @@ namespace Belle2 {
      */
     MCParticle* getMother() const;
 
-
-    /**
-     * Returns the SpinType of the particle.
-     * @return The spinType of the particle.
-     */
-    EspinType getSpinType() const {return m_spinType;}
-
-    /**
-     * Returns the SpinType of the particle as integer number.
-     * @return The spinType of the particle as integer number.
-     */
-    int getSpinTypeInteger() const {return (int)m_spinType;}
-
     /**
      * Returns the physics process type of a secondary particle.
      * @return Returns an integer indicating the physics process type of a secondary particle.
@@ -329,11 +298,6 @@ namespace Belle2 {
     void setMassFromPDG();
 
     /**
-     * Sets the charge for the particle from the particle's PDG code.
-     */
-    void setChargeFromPDG();
-
-    /**
      * Set Status code for the particle.
      * @param status The status code of the MonteCarlo particle.
      */
@@ -358,12 +322,6 @@ namespace Belle2 {
      * @param mass The MonteCarlo particle mass.
      */
     void setMass(float mass) { m_mass = mass; }
-
-    /**
-     * Set particle charge.
-     * @param charge The MonteCarlo particle charge.
-     */
-    void setCharge(float charge) { m_charge = charge; }
 
     /**
      * Set energy.
@@ -432,18 +390,6 @@ namespace Belle2 {
      * @param 4Vector
      */
     void set4Vector(const TLorentzVector& p4) { setMomentum(p4.Vect()); m_energy = p4.Energy(); }
-
-    /**
-     * Sets the spin type of the particle.
-     * @param spin type (integer)
-     */
-    void setSpinType(int IspinType) { m_spinType = (EspinType)IspinType; }
-
-    /**
-     * Sets the spin type of the particle.
-     * @param spin type (EspinType)
-     */
-    void setSpinType(EspinType NewSpinType) { m_spinType = NewSpinType; }
 
     /**
      * Set decay vertex.
@@ -523,7 +469,6 @@ namespace Belle2 {
     unsigned short int m_status;      /**< status code */
     int m_pdg;                  /**< PDG-Code of the particle */
     float m_mass;               /**< mass of the particle */
-    float m_charge;             /**< charge of the particle */
     float m_energy;             /**< energy of the particle */
     float m_momentum_x;         /**< momentum of particle, x component */
     float m_momentum_y;         /**< momentum of particle, y component */
@@ -545,8 +490,6 @@ namespace Belle2 {
     int m_firstDaughter;        /**< 1-based index of first daughter particle in collection, 0 if no daughters */
     int m_lastDaughter;         /**< 1-based index of last daughter particle in collection, 0 if no daughters */
     static const double c_epsilon;  /**< limit of precision for two doubles to be the same. */
-
-    EspinType m_spinType;        /**< Spin type of the particle as provided by the generator. */
 
     int m_secondaryPhysicsProcess;  /**< physics process type of a secondary particle */
 

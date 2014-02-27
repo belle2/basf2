@@ -98,7 +98,6 @@ bool SGCosmic::generateEvent(MCParticleGraph& graph)
       continue;
     }
     p.setMassFromPDG();
-    p.setChargeFromPDG();
     p.setFirstDaughter(0);
     p.setLastDaughter(0);
 

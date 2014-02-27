@@ -235,7 +235,6 @@ namespace Belle2 {
           newParticle.setStatus(currParticle.getStatus());
           newParticle.setPDG(currParticle.getPDG());
           newParticle.setMass(currParticle.getMass());
-          newParticle.setCharge(currParticle.getCharge());
           newParticle.setEnergy(currParticle.getEnergy());
           newParticle.setMomentum(currParticle.getMomentum());
           newParticle.setValidVertex(currParticle.hasValidVertex());

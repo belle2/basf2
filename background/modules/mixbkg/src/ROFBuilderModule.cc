@@ -299,7 +299,6 @@ MCParticleGraph::GraphParticle& ROFBuilderModule::createGraphParticle(MCParticle
   graphParticle.setPDG(mcParticle.getPDG());
   graphParticle.setStatus(mcParticle.getStatus());
   graphParticle.setMass(mcParticle.getMass());
-  graphParticle.setCharge(mcParticle.getCharge());
   graphParticle.setEnergy(mcParticle.getEnergy());
   graphParticle.setValidVertex(mcParticle.hasValidVertex());
   graphParticle.setProductionTime(mcParticle.getProductionTime());

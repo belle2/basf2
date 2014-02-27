@@ -142,7 +142,6 @@ bool ParticleGun::generateEvent(MCParticleGraph& graph)
       p.setPDG(m_params.pdgCodes[index]);
     }
     p.setMassFromPDG();
-    p.setChargeFromPDG();
     p.setFirstDaughter(0);
     p.setLastDaughter(0);
 

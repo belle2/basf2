@@ -27,20 +27,28 @@ using namespace Belle2;
 
 const double MCParticle::c_epsilon = 10e-7;
 
+
 void MCParticle::setMassFromPDG()
 {
   if (TDatabasePDG::Instance()->GetParticle(m_pdg) == NULL) throw(ParticlePDGNotKnownError() << m_pdg);
   m_mass = TDatabasePDG::Instance()->GetParticle(m_pdg)->Mass();
 }
 
-void MCParticle::setChargeFromPDG()
+
+float MCParticle::getCharge() const
 {
-  if (TDatabasePDG::Instance()->GetParticle(m_pdg) == NULL) throw(ParticlePDGNotKnownError() << m_pdg);
-  m_charge = TDatabasePDG::Instance()->GetParticle(m_pdg)->Charge() / 3.0;
-  //  B2INFO("inside setting charge function: return value  "<<m_pdg<<"   "<<TDatabasePDG::Instance()->GetParticle(m_pdg)->Charge()<<"  "<<m_charge);
+  // Geant4 "optical photon" (m_pdg == 0) is not known to TDatabasePDG::Instance().
+  if (m_pdg == 0) {
+    return 0.0;
+  }
 
+  if (TDatabasePDG::Instance()->GetParticle(m_pdg) == NULL) {
+    B2ERROR("PDG=" << m_pdg << " ***code unknown to TDatabasePDG");
+    return 0.0;
+  }
+
+  return TDatabasePDG::Instance()->GetParticle(m_pdg)->Charge() / 3.0;
 }
-
 
 
 const vector<MCParticle*> MCParticle::getDaughters() const
@@ -57,7 +65,6 @@ const vector<MCParticle*> MCParticle::getDaughters() const
   }
   return result;
 }
-
 
 
 void MCParticle::fixParticleList() const

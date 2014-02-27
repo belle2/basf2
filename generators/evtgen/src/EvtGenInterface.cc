@@ -209,7 +209,6 @@ void EvtGenInterface::updateGraphParticle(EvtParticle* eParticle, MCParticleGrap
   gParticle->setStatus(MCParticle::c_PrimaryParticle);
   gParticle->setMass(eParticle->mass());
   gParticle->setPDG(EvtPDL::getStdHep(eParticle->getId()));
-  gParticle->setChargeFromPDG();
 
   EvtVector4R EvtP4 = eParticle->getP4Lab();
   TLorentzVector p4(EvtP4.get(1), EvtP4.get(2), EvtP4.get(3), EvtP4.get(0));
@@ -220,6 +219,4 @@ void EvtGenInterface::updateGraphParticle(EvtParticle* eParticle, MCParticleGrap
   gParticle->setProductionVertex(Evtpos.get(1)*Unit::mm, Evtpos.get(2)*Unit::mm, Evtpos.get(3)*Unit::mm);
   gParticle->setProductionTime(Evtpos.get(0)*Unit::mm / Const::speedOfLight);
   gParticle->setValidVertex(true);
-
-  gParticle->setSpinType((int)eParticle->getSpinType());
 }

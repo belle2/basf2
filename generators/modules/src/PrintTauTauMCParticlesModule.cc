@@ -92,13 +92,12 @@ void PrintTauTauMCParticlesModule::printTree(const MCParticle& mc, int level)
   }
   const TVector3& p = mc.getMomentum();
   const TVector3& v = mc.getVertex();
-  int spintype = (int)mc.getSpinTypeInteger();
-  B2INFO(boost::format("%3d %s%5d%s%20tp:(%10.3e, %10.3e, %10.3e) v:(%10.3e, %10.3e, %10.3e), t:%10.3e,%10.3e, s:%d, c:%d, st:%d")
+  B2INFO(boost::format("%3d %s%5d%s%20tp:(%10.3e, %10.3e, %10.3e) v:(%10.3e, %10.3e, %10.3e), t:%10.3e,%10.3e, s:%d, c:%d")
          % mc.getIndex() % indent % mc.getPDG() % name
          % p.X() % p.Y() % p.Z()
          % v.X() % v.Y() % v.Z()
          % mc.getProductionTime() % mc.getDecayTime()
-         % mc.getStatus() % mc.getCharge() % spintype
+         % mc.getStatus() % mc.getCharge()
         );
 
   const vector<MCParticle*> daughters = mc.getDaughters();

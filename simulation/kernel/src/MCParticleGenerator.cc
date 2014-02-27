@@ -101,7 +101,6 @@ void MCParticleGenerator::addParticle(MCParticle& mcParticle,
   graphParticle.setPDG(mcParticle.getPDG());
   graphParticle.setStatus(mcParticle.getStatus());
   graphParticle.setMass(mcParticle.getMass());
-  graphParticle.setCharge(mcParticle.getCharge());
   graphParticle.setEnergy(mcParticle.getEnergy());
   graphParticle.setValidVertex(mcParticle.hasValidVertex());
   graphParticle.setProductionTime(mcParticle.getProductionTime());
@@ -126,7 +125,6 @@ void MCParticleGenerator::addParticle(MCParticle& mcParticle,
                                     mcPartMom4.Z() / Unit::MeV,
                                     mcPartMom4.E() / Unit::MeV);
     newPart->SetMass(mcParticle.getMass() / Unit::MeV);
-    newPart->SetCharge(mcParticle.getCharge());
     if (opticalPhoton) {
       TVector3 polarization = mcParticle.getDecayVertex(); // temporary stored here
       newPart->SetPolarization(polarization.X(), polarization.Y(), polarization.Z());

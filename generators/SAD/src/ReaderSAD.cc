@@ -205,7 +205,6 @@ void ReaderSAD::addParticleToMCParticles(MCParticleGraph& graph, bool gaussSmear
   }
 
   particle.setMassFromPDG();
-  particle.setChargeFromPDG();
 
   //Convert the position of the particle from local SAD space to global geant4 space.
   //Flip the sign for the y and z component to go from the accelerator to the detector coordinate system.

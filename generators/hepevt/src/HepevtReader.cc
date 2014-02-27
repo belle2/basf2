@@ -76,9 +76,6 @@ int HepevtReader::getEvent(MCParticleGraph& graph, double& eventWeight) throw(He
     //check if particle should be made virtual according to steering options:
     if (i < m_nVirtual)
       p.setVirtual();
-
-    //set the particle charge:
-    p.setChargeFromPDG();
   }
   return eventID;
 }

@@ -108,10 +108,8 @@ namespace Belle2 {
     MCParticle* part = MCParticles.appendNew();
     part->setPDG(13);
     part->setMassFromPDG();
-    part->setChargeFromPDG();
     part->setStatus(MCParticle::c_PrimaryParticle);
     part->addStatus(MCParticle::c_StableInGenerator);
-    part->setSpinType(MCParticle::c_DIRAC);
     part->setProductionVertex(r1);
     part->setProductionTime(m_startTime);
     part->setMomentum(momentum);

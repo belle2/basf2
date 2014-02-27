@@ -77,7 +77,6 @@ void TrackingAction::PreUserTrackingAction(const G4Track* track)
     currParticle.setTrackID(track->GetTrackID());
     currParticle.setPDG(dynamicParticle->GetPDGcode());
     currParticle.setMass(dynamicParticle->GetMass() * Unit::MeV);
-    currParticle.setCharge(dynamicParticle->GetCharge());
     currParticle.setEnergy(dynamicParticle->GetTotalEnergy() * Unit::MeV);
     currParticle.setMomentum(dpMom.x(), dpMom.y(), dpMom.z());
     currParticle.setProductionTime(track->GetGlobalTime() * Unit::ns);

@@ -191,10 +191,8 @@ namespace Belle2 {
       MCParticle* part = MCParticles.appendNew();
       part->setPDG(0); // optical photon
       part->setMass(0);
-      part->setCharge(0);
       part->setStatus(MCParticle::c_PrimaryParticle);
       part->addStatus(MCParticle::c_StableInGenerator);
-      part->setSpinType(MCParticle::c_PHOTON);
       part->setProductionVertex(point);
       part->setProductionTime(startTime);
       part->setMomentum(momentum);

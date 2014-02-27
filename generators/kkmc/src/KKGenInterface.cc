@@ -222,14 +222,8 @@ void KKGenInterface::updateGraphParticle(int index, MCParticleGraph::GraphPartic
   if (evtid == EvtId(-1, -1)) {
     // set this PYTHIA number directly
     gParticle->setPDG(hepevt_.idhep[index - 1]);
-    // PYTHIA may know charge of this particle
-    double charge = 0.;
-    if (getPythiaCharge(hepevt_.idhep[index - 1], charge)) {
-      gParticle->setCharge(charge);
-    }
   } else {
     gParticle->setPDG(myevtpdl->getStdHep(evtid));
-    gParticle->setChargeFromPDG();
   }
 
   TLorentzVector p4(hepevt_.phep[index - 1][0],
@@ -244,8 +238,6 @@ void KKGenInterface::updateGraphParticle(int index, MCParticleGraph::GraphPartic
                                  hepevt_.vhep[index - 1][2]*Unit::mm);
   gParticle->setProductionTime(hepevt_.vhep[index - 1][3]*Unit::mm / Const::speedOfLight);
   gParticle->setValidVertex(true);
-
-  gParticle->setSpinType(getPythiaSpinType(hepevt_.idhep[index - 1]));
 
   gParticle->setStatus(MCParticleGraph::GraphParticle::c_PrimaryParticle);
 

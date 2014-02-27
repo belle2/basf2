@@ -54,7 +54,7 @@ namespace Belle2 {
       m_NofCrystals = 0; /**< Number of Crystals in a shower (NA) */
       m_Pi0Likelihood = 0; /**< Pi0 Likelihood (greater than 200 MeV) (NA)*/
       m_EtaLikelihood = 0; /**< Eta Likelihood (greater than 200 MeV) (NA) */
-      m_NofTracks = 0; /**< Number of Tracks related to this shower */
+      m_NofTracks = 0; /**< Number of Tracks related to this shower (being studied)*/
       m_deltaL = 0; /**< arXiv:0711.1593 (NA)*/
       m_beta = 0; /**< arXiv:0711.1593 (NA)*/
       m_CrystHealth = 0; /**< Crystal Health (NA)

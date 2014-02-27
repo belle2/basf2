@@ -316,7 +316,7 @@ void TelClusterizerModule::writeClusters(VxdID sensorID)
   m_cache->clear();
 }
 
-void TelClusterizerModule::calculatePositionError(const ClusterCandidate& cls, ClusterProjection& primary, const ClusterProjection& secondary, double minPitch, double centerPitch, double maxPitch)
+void TelClusterizerModule::calculatePositionError(const ClusterCandidate&, ClusterProjection& primary, const ClusterProjection& secondary, double minPitch, double centerPitch, double maxPitch)
 {
   if (primary.getSize() >= static_cast<unsigned int>(m_sizeHeadTail)) { //Analog head tail
     //Average charge in the central area

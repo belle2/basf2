@@ -25,4 +25,7 @@
 #pragma link C++ class Belle2::Track;
 #pragma link C++ class Belle2::TrackFitResult;
 
+#pragma link C++ class Belle2::TRGMdst;
+#pragma link C++ class Belle2::TRGTiming;
+
 #endif

@@ -26,18 +26,20 @@ chargedTrackVars = [
     'p',
     'pt',
     'chiProb',
-    ]
+]
 
 DVars = ['prodChildProb', 'p', 'pt', 'p_CMS', 'pt_CMS']
 BVars = ['prodChildProb', 'p', 'pt', 'p_CMS', 'pt_CMS']
 
-methods = [('BDTGradient_100', 'BDT',
-           '!H:CreateMVAPdfs:!V:NTrees=100:BoostType=Grad:Shrinkage=0.10:'
-           'UseBaggedGrad:GradBaggingFraction=0.5:nCuts=10:MaxDepth=2'
-           ),
-           #('NeuroBayes', 'NeuroBayes',
-           #'!H:CreateMVAPdfs:V:NTrainingIter=50:TrainingMethod=BFGS')
-           ]
+methods = [
+    (
+        'BDTGradient_100', 'BDT',
+        '!H:CreateMVAPdfs:!V:NTrees=100:BoostType=Grad:Shrinkage=0.10:'
+        'UseBaggedGrad:GradBaggingFraction=0.5:nCuts=10:MaxDepth=2'
+    ),
+    #('NeuroBayes', 'NeuroBayes',
+    #'!H:CreateMVAPdfs:V:NTrainingIter=50:TrainingMethod=BFGS')
+]
 # old syntax, needs to be updated
 # 'BDTGradient_1000_20_5': '!H:CreateMVAPdfs:!V:NTrees=1000:BoostType=Grad:
 # Shrinkage=0.10:UseBaggedGrad:GradBaggingFraction=0.5:nCuts=20:MaxDepth=5',
@@ -89,11 +91,11 @@ fr.addParticle(p)
 
 main = create_path()
 main.add_module(register_module('RootInput'))
+main.add_module(register_module('ProgressBar'))
+
 main.add_module(register_module('ParticleLoader'))
 
 fr.run(main)
-#after full reconstruction modules (to allow parallel processing)
-main.add_module(register_module('ProgressBar'))
 
 # ntupler = register_module('VariableNtuple')
 # ntupler.param('particleList', 'B+')

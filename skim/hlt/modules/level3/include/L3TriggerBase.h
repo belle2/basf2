@@ -41,7 +41,7 @@ namespace Belle2 {
 
 
   private:
-    // data member
+    //! name of the trigger algorithm
     char m_name[32];
   };
 }

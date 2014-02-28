@@ -75,7 +75,7 @@ FullSimModule::FullSimModule() : Module(), m_visManager(NULL)
   addParam("RegisterOptics", m_optics, "If true, G4OpticalPhysics is registered in Geant4 PhysicsList.", true);
   addParam("ProductionCut", m_productionCut, "[cm] Apply continuous energy loss to primary particle which has no longer enough energy to produce secondaries which travel at least the specified productionCut distance.", 0.07);
   addParam("MaxNumberSteps", m_maxNumberSteps, "The maximum number of steps before the track transportation is stopped and the track is killed.", 100000);
-  addParam("PhotonFraction", m_photonFraction, "The fraction of Cerenkov photons which will be kept and propagated.", 0.3);
+  addParam("PhotonFraction", m_photonFraction, "The fraction of Cerenkov photons which will be kept and propagated.", 0.35);
   addParam("EnableVisualization", m_EnableVisualization, "If set to True the Geant4 visualization support is enabled.", false);
   addParam("StoreOpticalPhotons", m_storeOpticalPhotons, "If set to True optical photons are stored in MCParticles", false);
   addParam("StoreAllSecondaries", m_storeSecondaries, "If set to True all secondaries produced by Geant over a kinetic energy cut are stored in MCParticles, otherwise do not store them", false);

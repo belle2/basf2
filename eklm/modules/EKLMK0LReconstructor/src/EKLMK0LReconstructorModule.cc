@@ -20,6 +20,9 @@
 #include <eklm/geometry/EKLMObjectNumbers.h>
 #include <eklm/modules/EKLMK0LReconstructor/EKLMK0LReconstructorModule.h>
 
+
+#include <mdst/dataobjects/K0L.h>
+
 using namespace Belle2;
 
 REG_MODULE(EKLMK0LReconstructor)
@@ -190,15 +193,18 @@ static void findAssociatedHits(std::vector<struct HitData>::iterator hit,
       mt = t;
     }
   }
-  /* Get number of layers. */
+  /* Get number of layers  and number of the innermost layer with hits */
   for (i = 0; i < 14; i++)
     layerHits[i] = 0;
   for (itClust = cluster.begin(); itClust != cluster.end(); itClust++)
     layerHits[(*itClust)->getLayer() - 1]++;
   nLayers = 0;
-  for (i = 0; i < 14; i++)
-    if (layerHits[i] > 0)
+  int   nInnermostLayer = 0;
+  for (i = 14; i >= 0; i--)
+    if (layerHits[i] > 0) {
+      nInnermostLayer = i;
       nLayers++;
+    }
   /* Get hit position as weighed average of cluster hit positions. */
   e = 0;
   hitPos = HepGeom::Point3D<double>(0., 0., 0.);
@@ -232,7 +238,13 @@ static void findAssociatedHits(std::vector<struct HitData>::iterator hit,
   k0l->setGlobalPosition(hitPos);
   k0l->setTime(mt);
   k0l->setLayers(nLayers);
-  k0l->setMomentum(CLHEP::HepLorentzVector(p, sqrt(p.mag2() + m * m)));
+  CLHEP::HepLorentzVector momentum4 = CLHEP::HepLorentzVector(p, sqrt(p.mag2() + m * m));
+  k0l->setMomentum(momentum4);
+
+  /* Fill MDST dataobject */
+  StoreArray<K0L> k0lMdstArray;
+  new(k0lMdstArray.nextFreeAddress()) K0L(hitPos.x(), hitPos.y(), hitPos.z(), mt, nLayers, nInnermostLayer, momentum4.x(), momentum4.y(), momentum4.z());
+
 }
 
 EKLMK0LReconstructorModule::EKLMK0LReconstructorModule() : Module()
@@ -248,6 +260,7 @@ EKLMK0LReconstructorModule::~EKLMK0LReconstructorModule()
 void EKLMK0LReconstructorModule::initialize()
 {
   StoreArray<EKLMK0L>::registerPersistent();
+  StoreArray<K0L>::registerPersistent();
 }
 
 void EKLMK0LReconstructorModule::beginRun()

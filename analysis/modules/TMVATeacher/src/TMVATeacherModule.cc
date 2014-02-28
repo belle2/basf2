@@ -13,10 +13,8 @@
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/TMVAInterface/TMVATeacher.h>
 
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/logging/Logger.h>
-#include <framework/core/ModuleManager.h>
 
 namespace Belle2 {
 
@@ -39,7 +37,7 @@ namespace Belle2 {
     addParam("factoryOption", m_factoryOption, "Option passed to TMVA::Factory", std::string("!V:!Silent:Color:DrawProgressBar:Transformations=I;D;P;G,D:AnalysisType=Classification"));
     addParam("prepareOption", m_prepareOption, "Option passed to TMVA::Factory::PrepareTrainingAndTestTree", std::string("SplitMode=random:!V"));
 
-    m_method = nullptr;
+    m_teacher = nullptr;
   }
 
   TMVATeacherModule::~TMVATeacherModule()
@@ -60,16 +58,14 @@ namespace Belle2 {
     for (auto & x : m_methods) {
       methods.push_back(TMVAMethod(std::get<0>(x), std::get<1>(x), std::get<2>(x)));
     }
-    m_method = new TMVATeacher(m_identifier, m_variables, m_target, methods);
+    m_teacher = new TMVATeacher(m_identifier, m_variables, m_target, methods);
   }
 
   void TMVATeacherModule::endRun()
   {
-    m_method->train(m_factoryOption, m_prepareOption);
-    if (m_method !=  nullptr) {
-      delete m_method;
-      m_method = nullptr;
-    }
+    m_teacher->train(m_factoryOption, m_prepareOption);
+    delete m_teacher;
+    m_teacher = nullptr;
   }
 
   void TMVATeacherModule::terminate()
@@ -84,13 +80,9 @@ namespace Belle2 {
       // Calculate Signal Probability for Particles [0, N_PARTICLE] and AntiParticles [N_PARTICLE, N_PARTICLE + N_ANTIPARTICLE]
       for (unsigned i = 0; i < list->getNumofParticles() + list->getNumofAntiParticles(); ++i) {
         const Particle* particle = list->getParticle(i);
-        m_method->addSample(particle);
+        m_teacher->addSample(particle);
       }
     }
-  }
-
-  void TMVATeacherModule::printModuleParams() const
-  {
   }
 
 } // Belle2 namespace

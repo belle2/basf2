@@ -59,11 +59,6 @@ namespace Belle2 {
      */
     virtual void terminate();
 
-    /**
-     * Prints module parameters.
-     */
-    void printModuleParams() const;
-
   private:
 
     std::vector<std::string> m_listNames; /**< input particle list names */
@@ -74,7 +69,7 @@ namespace Belle2 {
     std::string m_factoryOption; /**< Options which are passed to the TMVA Factory */
     std::string m_prepareOption; /**< Options which are passed to the TMVA Factory::PrepareTrainingAndTestTree */
 
-    TMVATeacher* m_method; /**< Used TMVA method */
+    TMVATeacher* m_teacher; /**< Used TMVA method */
 
   };
 

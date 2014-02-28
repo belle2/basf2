@@ -63,13 +63,32 @@ namespace Belle2 {
      */
     int getLayers();
 
+    /**
+     * Get number of the innermost level with hits
+     * @return Innermost hitted layer
+     */
+    inline int getInnermostLayer()
+    {return m_innermostLayer;};
+
+
+    /**
+     * Get number of the innermost level with hits
+     * @param[in] l Innermost hitted layer
+     */
+    inline void setInnermostLayer(int l)
+    {m_innermostLayer = l;};
+
   private:
+
 
     /** Decay time. */
     float m_time;
 
     /** Number of layers with hits. */
     int m_layers;
+
+    /** Innermost hitted layer. */
+    int m_innermostLayer;
 
     /** Needed to make objects storable. */
     ClassDef(Belle2::EKLMK0L, 1);

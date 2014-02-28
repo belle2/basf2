@@ -200,7 +200,7 @@ static void findAssociatedHits(std::vector<struct HitData>::iterator hit,
     layerHits[(*itClust)->getLayer() - 1]++;
   nLayers = 0;
   int   nInnermostLayer = 0;
-  for (i = 14; i >= 0; i--)
+  for (i = 13; i >= 0; i--)
     if (layerHits[i] > 0) {
       nInnermostLayer = i;
       nLayers++;
@@ -240,12 +240,44 @@ static void findAssociatedHits(std::vector<struct HitData>::iterator hit,
   k0l->setLayers(nLayers);
   CLHEP::HepLorentzVector momentum4 = CLHEP::HepLorentzVector(p, sqrt(p.mag2() + m * m));
   k0l->setMomentum(momentum4);
+  k0l->setInnermostLayer(nInnermostLayer);
+}
 
+void EKLMK0LReconstructorModule::fillMdstDataobjects()
+{
   /* Fill MDST dataobject */
+  StoreArray<EKLMK0L> k0lArray;
   StoreArray<K0L> k0lMdstArray;
-  new(k0lMdstArray.nextFreeAddress()) K0L(hitPos.x(), hitPos.y(), hitPos.z(), mt, nLayers, nInnermostLayer, momentum4.x(), momentum4.y(), momentum4.z());
+
+  for (int i = 0; i < k0lArray.getEntries(); i++) {
+    HepGeom::Point3D<double> pos = k0lArray[i]->getGlobalPosition();
+    CLHEP::HepLorentzVector momentum = k0lArray[i]->getMomentum();
+    new(k0lMdstArray.nextFreeAddress()) K0L(
+      pos.x(), pos.y(), pos.z(),
+      k0lArray[i]->getTime(),
+      k0lArray[i]->getLayers(),
+      k0lArray[i]->getInnermostLayer(),
+      momentum.x(), momentum.y(), momentum.z()
+    );
+  }
 
 }
+/*
+  bool EKLMK0LReconstructorModule::hasAssociatedTrack(genfit::Track &gfTrack)
+  {
+
+  genfit::AbsTrackRep* gfTrackRep = gfTrack->getCardinalRep();
+  const genfit::TrackPoint* firstPoint = gfTrack->getPointWithMeasurementAndFitterInfo(0, gfTrackRep);
+  const genfit::AbsFitterInfo* firstFitterInfo = firstPoint->getFitterInfo(gfTrackRep);
+  const genfit::MeasuredStateOnPlane& firstState = firstFitterInfo->getFittedState(true);
+  TVector3 firstPosition, firstMomentum;
+  TMatrixDSym firstCov(6);
+  gfTrackRep->getPosMomCov(firstState, firstPosition, firstMomentum, firstCov);
+  int charge = gfTrackRep->getCharge(firstState);
+  TVector3 firstDirection(firstMomentum.Unit());
+
+}
+*/
 
 EKLMK0LReconstructorModule::EKLMK0LReconstructorModule() : Module()
 {
@@ -302,11 +334,15 @@ void EKLMK0LReconstructorModule::event()
         continue;
       findAssociatedHits(it, endcap[i]);
     }
+
     /* Free memory. */
     for (itClust = new2dHits.begin(); itClust != new2dHits.end(); itClust++)
       delete *itClust;
     new2dHits.clear();
   }
+  /* create MDST objects */
+  fillMdstDataobjects();
+
 }
 
 void EKLMK0LReconstructorModule::endRun()

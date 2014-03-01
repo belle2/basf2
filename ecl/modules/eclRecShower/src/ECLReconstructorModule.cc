@@ -22,7 +22,7 @@
 #include <ecl/rec_lib/TRecEclCF.h>
 
 
-#include <mdst/dataobjects/Mdst_ECL.h>
+#include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/Track.h>
 #include <tracking/dataobjects/ExtHit.h>
 
@@ -83,8 +83,8 @@ void ECLReconstructorModule::initialize()
   StoreArray<ECLHitAssignment>::registerPersistent();
   StoreArray<ECLShower>::registerPersistent();
 
-  StoreArray<Mdst_ECL>::registerPersistent();
-  RelationArray::registerPersistent<Mdst_ECL, ECLShower>("", "");
+  StoreArray<ECLCluster>::registerPersistent();
+  RelationArray::registerPersistent<ECLCluster, ECLShower>("", "");
 
 
 }
@@ -226,16 +226,16 @@ void ECLReconstructorModule::event()
       eclRecShowerArray[m_hitNum]->setError(ErrorMatrix);
 
 
-      //... This is where the Mdst_ECL dataobject is filled
+      //... This is where the ECLCluster dataobject is filled
       //... i_Mdst is simply the number and used to relate with ECLShower
       //... Vishal
-      StoreArray<Mdst_ECL> eclMdstArray;
+      StoreArray<ECLCluster> eclMdstArray;
       if (!eclMdstArray) eclMdstArray.create();
-      new(eclMdstArray.nextFreeAddress()) Mdst_ECL();
+      new(eclMdstArray.nextFreeAddress()) ECLCluster();
       int i_Mdst = eclMdstArray.getEntries() - 1;
 
-      //.. Fill Mdst_ECL here
-      RelationArray Mdst_ECLtoShower(eclMdstArray, eclRecShowerArray);
+      //.. Fill ECLCluster here
+      RelationArray ECLClustertoShower(eclMdstArray, eclRecShowerArray);
       eclMdstArray[i_Mdst]->setTiming((float) v_TIME);
       eclMdstArray[i_Mdst]->setEnergy((float) sEnergy);
       eclMdstArray[i_Mdst]->setE9oE25((float)(*iShower).second.E9oE25());
@@ -253,10 +253,10 @@ void ECLReconstructorModule::event()
 
       eclMdstArray[i_Mdst]->setErrorMatrix(GammaMomentumErrorMatrix);
 
-      //... Relation of Mdst_ECL to ECLShower
-      Mdst_ECLtoShower.add(i_Mdst, m_hitNum);
+      //... Relation of ECLCluster to ECLShower
+      ECLClustertoShower.add(i_Mdst, m_hitNum);
 
-      //..... Mdst_ECL is completed here......
+      //..... ECLCluster is completed here......
 
 
 

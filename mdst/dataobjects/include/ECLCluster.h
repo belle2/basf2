@@ -38,9 +38,9 @@ namespace Belle2 {
 
       m_Energy = 0;   /**< Corrected energy (GeV) */
       m_EnedepSum = 0; /**< Uncorrected Energy Deposited in a shower (GeV) */
-      m_Px = 0;       /**< Px Momentum of Gamma (GeV) */
-      m_Py = 0;       /**< Py Momentum of Gamma (GeV) */
-      m_Pz = 0;       /**< Pz Momentum of Gamma (GeV) */
+      m_Px = 0;       /**< Px Momentum of Gamma (GeV/c) */
+      m_Py = 0;       /**< Py Momentum of Gamma (GeV/c) */
+      m_Pz = 0;       /**< Pz Momentum of Gamma (GeV/c) */
 
       m_E9oE25 = 0;   /**< E9/E25: photon-like & isolation cut */
 
@@ -77,15 +77,15 @@ namespace Belle2 {
      */
     void setEnergy(float Energy) {m_Energy = Energy;}
 
-    /*! Set X component of Momentum (GeV/c^{2})
+    /*! Set X component of Momentum (GeV/c)
      */
     void setPx(float Px) { m_Px = Px;}
 
-    /*! Set Y component of Momentum (GeV/c^{2})
+    /*! Set Y component of Momentum (GeV/c)
      */
     void setPy(float Py) { m_Py = Py;}
 
-    /*! Set Z component of Momentum (GeV/c^{2})
+    /*! Set Z component of Momentum (GeV/c)
      */
     void setPz(float Pz) { m_Pz = Pz;}
 
@@ -185,19 +185,19 @@ namespace Belle2 {
      */
     float getEnergy() const {return m_Energy;}
 
-    /*! Return X component of Momentum (GeV/c^{2})
+    /*! Return X component of Momentum (GeV/c)
      */
     float getPx() const {return m_Px;}
 
-    /*! Return Y component of Momentum (GeV/c^{2})
+    /*! Return Y component of Momentum (GeV/c)
      */
     float getPy() const { return m_Py;}
 
-    /*! Return Z component of Momentum (GeV/c^{2})
+    /*! Return Z component of Momentum (GeV/c)
      */
     float getPz() const { return m_Pz;}
 
-    /*! Return Uncorrect Energy deposited (GeV/ )
+    /*! Return Uncorrect Energy deposited (GeV)
      */
     float getEnedepSum() const {return m_EnedepSum;}
 
@@ -275,9 +275,9 @@ namespace Belle2 {
 
 
     float  m_Energy;     /**< Corrected energy (GeV) */
-    float  m_Px;         /**< Px Momentum of Gamma (GeV) */
-    float  m_Py;         /**< Py Momentum of Gamma (GeV) */
-    float  m_Pz;         /**< Pz Momentum of Gamma (GeV) */
+    float  m_Px;         /**< Px Momentum of Gamma (GeV/c) */
+    float  m_Py;         /**< Py Momentum of Gamma (GeV/c) */
+    float  m_Pz;         /**< Pz Momentum of Gamma (GeV/c) */
     float  m_EnedepSum;  /**< Uncorrected  Energy Deposited (GeV) */
     float  m_Timing;     /**< Timing information (study going on) */
     float  m_ErrorTiming;    /**< Timing Error (NA) */

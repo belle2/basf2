@@ -7,9 +7,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "mdst/dataobjects/Mdst_ECL.h"
+#include "mdst/dataobjects/ECLCluster.h"
 
 using namespace std;
 using namespace Belle2;
 
-ClassImp(Mdst_ECL)
+ClassImp(ECLCluster)

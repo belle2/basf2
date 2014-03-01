@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef MDST_ECL_H
-#define MDST_ECL_H
+#ifndef ECLCLUSTER_H
+#define ECLCLUSTER_H
 
 #include <framework/datastore/RelationsObject.h>
 #include <framework/logging/Logger.h>
@@ -24,17 +24,17 @@ namespace Belle2 {
    * @{
    */
 
-  /*! Class to store Mdst_ECL reconstructed from ECLDigit as Belle method
+  /*! Class to store ECLCluster reconstructed from ECLDigit as Belle method
    * relation to ECLShower
    * filled in ecl/modules/eclRecShower/src/ECLReconstructorModule.cc
    */
 
-  class Mdst_ECL : public RelationsObject {
+  class ECLCluster : public RelationsObject {
   public:
     /**
      *default constructor : all values are set to 0
      */
-    Mdst_ECL() {
+    ECLCluster() {
 
       m_Energy = 0;   /**< Corrected energy (GeV) */
       m_EnedepSum = 0; /**< Uncorrected Energy Deposited in a shower (GeV) */
@@ -49,45 +49,43 @@ namespace Belle2 {
       m_Timing = 0;   /**< Timing information (at present study going on)*/
       m_ErrorTiming = 0;  /**< Timing Error (at present study going on)*/
       m_HighestE = 0; /**< Highest Energy stored in a Crystal in a shower (GeV) */
-      m_LAT = 0; /**< Lateral distribution parameter (NA) */
+      m_LAT = 0; /**< Lateral distribution parameter (Not available now) */
 
-      m_NofCrystals = 0; /**< Number of Crystals in a shower (NA) */
-      m_Pi0Likelihood = 0; /**< Pi0 Likelihood (greater than 200 MeV) (NA)*/
-      m_EtaLikelihood = 0; /**< Eta Likelihood (greater than 200 MeV) (NA) */
+      m_NofCrystals = 0; /**< Number of Crystals in a shower (Not available now) */
+      m_Pi0Likelihood = 0; /**< Pi0 Likelihood (greater than 200 MeV) (Not available now)*/
+      m_EtaLikelihood = 0; /**< Eta Likelihood (greater than 200 MeV) (Not available now) */
       m_NofTracks = 0; /**< Number of Tracks related to this shower (being studied)*/
-      m_deltaL = 0; /**< arXiv:0711.1593 (NA)*/
-      m_beta = 0; /**< arXiv:0711.1593 (NA)*/
-      m_CrystHealth = 0; /**< Crystal Health (NA)
-        -100 : healthy
-        10 : Bad
-        20 : Broken
-        30 : Dead  */
-      m_HimomentumPi0 = 0; /**< Likelihood of being High momentum Pi0 (NA)
-          0 to 1 : Can be high momentum pi0
-       */
+      m_deltaL = 0; /**< arXiv:0711.1593 (Not available now)*/
+      m_beta = 0; /**< arXiv:0711.1593 (Not available now)*/
+      m_CrystHealth = 0; /**< Crystal Health (Not available now)
+          -100 : healthy
+          10 : Bad
+          20 : Broken
+          30 : Dead  */
+      m_HimomentumPi0 = 0; /**< Likelihood of being High momentum Pi0 (Not available now)
+            0 to 1 : Can be high momentum pi0
+         */
 
 
     }
 
-    // Function to return Good Gamma
-    /*! Return  */
 
 
     // Set the variables down here
 
-    /*! Set Correct Energy (GeV)
+    /*! Set Corrected Energy (GeV)
      */
     void setEnergy(float Energy) {m_Energy = Energy;}
 
-    /*! Set X component of Momentum (GeV)
+    /*! Set X component of Momentum (GeV/c^{2})
      */
     void setPx(float Px) { m_Px = Px;}
 
-    /*! Set Y component of Momentum (GeV)
+    /*! Set Y component of Momentum (GeV/c^{2})
      */
     void setPy(float Py) { m_Py = Py;}
 
-    /*! Set Z component of Momentum (GeV)
+    /*! Set Z component of Momentum (GeV/c^{2})
      */
     void setPz(float Pz) { m_Pz = Pz;}
 
@@ -107,7 +105,7 @@ namespace Belle2 {
      */
     void setE9oE25(float E9oE25) { m_E9oE25 = E9oE25; }
 
-    /*! Set  Error Matrix  for momentum TMatrixFSym class
+    /*! Set  Error Matrix (7x7)  for momentum TMatrixFSym class
      */
     void setErrorMatrix(TMatrixFSym& errorMatrix) {
       m_errorMatrix.ResizeTo(7, 7);
@@ -121,37 +119,57 @@ namespace Belle2 {
 
 
 
-    /*! Set HighestE
+    /*! Set Highest Energy stored in a Crystal in a shower (GeV)
      */
     void setHighestE(float HighestE) { m_HighestE = HighestE; }
 
 
-
+    /*! Set Lateral distribution parameter
+     */
     void setLAT(float LAT) {m_LAT = LAT;}
+
+    /*! Set Number of Crystals in a shower
+     */
     void setNofCrystals(int NofCrystals) {m_NofCrystals = NofCrystals;}
+
+    /*! Set Pi0 Likelihood
+     */
     void setPi0Likelihood(float Pi0Likelihood) {
       m_Pi0Likelihood = Pi0Likelihood;
     }
+
+    /*! Set Eta Likelihood
+     */
     void setEtaLikelihood(float EtaLikelihood) {
       m_EtaLikelihood = EtaLikelihood;
     }
 
+    /*! Set Number of charged tracks identified with corresponsing shower
+     */
     void setNofTracks(int NofTracks) {
       m_NofTracks = NofTracks;
     }
 
+    /*! Set Delta L for charged track
+     */
     void setdeltaL(float deltaL) {
       m_deltaL = deltaL;
     }
 
+    /*! Set beta  for charged tracks
+     */
     void setbeta(float beta) {
       m_beta = beta;
     }
 
+    /*! Set Crystal health (Not now)
+     */
     void setCrystHealth(int CrystHealth) {
       m_CrystHealth = CrystHealth;
     }
 
+    /*! Set high momentum pi0 likelihood
+     */
     void setHimomentumPi0(float HimomentumPi0) {
       m_HimomentumPi0 = HimomentumPi0;
     }
@@ -167,19 +185,19 @@ namespace Belle2 {
      */
     float getEnergy() const {return m_Energy;}
 
-    /*! Return X component of Momentum (GeV)
+    /*! Return X component of Momentum (GeV/c^{2})
      */
     float getPx() const {return m_Px;}
 
-    /*! Return Y component of Momentum (GeV)
+    /*! Return Y component of Momentum (GeV/c^{2})
      */
     float getPy() const { return m_Py;}
 
-    /*! Return Z component of Momentum (GeV)
+    /*! Return Z component of Momentum (GeV/c^{2})
      */
     float getPz() const { return m_Pz;}
 
-    /*! Return Uncorrect Energy deposited (GeV)
+    /*! Return Uncorrect Energy deposited (GeV/ )
      */
     float getEnedepSum() const {return m_EnedepSum;}
 
@@ -195,28 +213,51 @@ namespace Belle2 {
      */
     float getE9oE25() const { return m_E9oE25; }
 
-    /*! Return HighestE
+    /*! Return HighestEnergy in a crystal in a shower
      */
     float getHighestE() const {return m_HighestE; }
 
 
+    /*! Return LAT (shower variable)
+     */
     float getLAT() const {return m_LAT;}
+
+    /*! Return Number of a Crystals in a shower
+     */
     int getNofCrystals() const {return m_NofCrystals;}
+
+    /*! Return Pi0 Likelihood  of a shower
+     */
     float getPi0Likelihood() const { return m_Pi0Likelihood; }
+
+    /*! Return Eta Likelihood  of a shower
+     */
     float getEtaLikelihood() const { return m_EtaLikelihood;}
 
+
+    /*! Return Number of charged tracks identified with corresponsing shower
+     */
     int getNofTracks() const { return m_NofTracks;}
 
+    /*! Return Delta L for charged track
+     */
     float getdeltaL() const { return m_deltaL;}
 
+    /*! Set Return  for charged tracks
+     */
     float getbeta() const { return m_beta;}
 
+    /*! Return Crystal health (Not now)
+     */
     int getCrystHealth() const { return m_CrystHealth;}
 
+
+    /*! Return high momentum pi0 likelihood
+     */
     float getHimomentumPi0() const { return m_HimomentumPi0;}
 
-    //! The method to get return TMatrixFSym  7 Momentum Error Matrix
-    /*! Get  TMatrixFSym  7 Momentum Error Matrix
+    // The method to get return TMatrixFSym  7 Momentum Error Matrix
+    /*!   TMatrixFSym  7 Momentum Error Matrix
      * @return Error Matrix from E, theta, phi and their errors
      */
     TMatrixFSym getErrorMatrix() const { return m_errorMatrix;}
@@ -242,21 +283,25 @@ namespace Belle2 {
     float  m_ErrorTiming;    /**< Timing Error (NA) */
     float  m_E9oE25;     /**< E9/E25: photon-like & isolation cut */
     float  m_HighestE;  /**< Highest energy stored in a crystal in Shower */
-
-    float m_LAT;
-    int   m_NofCrystals;
-    float m_Pi0Likelihood;
-    float m_EtaLikelihood;
-    int   m_NofTracks;
-    float m_deltaL;
-    float m_beta;
-    int   m_CrystHealth;
-    float m_HimomentumPi0;
+    //TODO
+    float m_LAT;  /**< Lateral distribution parameter (Not available now) */
+    int   m_NofCrystals; /**< Number of Crystals in a shower (Not available now) */
+    float m_Pi0Likelihood; /**< Pi0 Likelihood (greater than 200 MeV) (Not available now)*/
+    float m_EtaLikelihood; /**< Eta Likelihood (greater than 200 MeV) (Not available now) */
+    int   m_NofTracks; /**< Number of Tracks related to this shower (being studied)*/
+    float m_deltaL; /**< DeltaL charged track arXiv:0711.1593 (Not available now)*/
+    float m_beta; /**< Beta charged track arXiv:0711.1593 (Not available now)*/
+    int   m_CrystHealth;/**< Crystal Health (Not available now)
+          -100 : healthy
+          10 : Bad
+          20 : Broken
+          30 : Dead  */
+    float m_HimomentumPi0; /**< Likelihood of being High momentum Pi0 (Not available now)
 
 
 
     /**< Class definition */
-    ClassDef(Mdst_ECL, 1);
+    ClassDef(ECLCluster, 1);
 
 
   };

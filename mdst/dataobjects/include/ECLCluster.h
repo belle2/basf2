@@ -296,7 +296,7 @@ namespace Belle2 {
           10 : Bad
           20 : Broken
           30 : Dead  */
-    float m_HimomentumPi0; /**< Likelihood of being High momentum Pi0 (Not available now)
+    float m_HimomentumPi0; /**< Likelihood of being High momentum Pi0 (Not available now) */
 
 
 

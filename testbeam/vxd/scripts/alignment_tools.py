@@ -1,6 +1,26 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+# ---------------------------------------------------------------------------------
+#                 ALIGNMENT TOOLS (mainly) for VXD TESTBEAM
+# ---------------------------------------------------------------------------------
+#
+#  The aim of these tools is to provide an easy way for the user
+#  to manipulate alignment and perform alignment iterations with Millepede II, e.g.
+#  incrementaly improve alignment parameters
+#
+#
+#  SetAlignment Module:
+#    - Allows setting own alignment during reconstruction
+#
+#  helper functions:
+#    - get_alignment_from_txt ... reading Millepede result text file int dictionary
+#    - *sum_xml_alignment ........ sum alignment in two xmls
+#    - sum_xmltxt_alignment ..... sum alignment in xml and Millepde txt
+#    - write_alignment .......... write alignment xml tree into file
+#
+#   *Needs to have xmls in cm/rad
+
 import sys
 import math
 from basf2 import *
@@ -22,12 +42,20 @@ paramnames = [
 
 
 def write_alignment(aligntree, file_path):
+    """Writes an xml tree to a file
+    """
+
     file = open(file_path, 'w')
     aligntree.write(file, encoding='UTF-8', xml_declaration=True)
     file.close()
 
 
 def get_alignment_from_txt(txt_path):
+    """Load alignment from millepede.res text file into dictionary
+    
+    Returns dictionary with structure dict[sensor vxd id][alignment parameter]=value
+    """
+
     alignment = dict()
     file = open(txt_path, 'r')
     line = file.readline()
@@ -54,6 +82,11 @@ def get_alignment_from_txt(txt_path):
 
 
 def sum_xmltxt_alignment(alignment_xml_path, alignment_txt_path):
+    """Sum alignment parameters from xml and millepede.res text file.
+    
+    Returns updated xml tree.
+    """
+
     aligntree = xml.parse(alignment_xml_path)
     txtdata = get_alignment_from_txt(alignment_txt_path)
     for comp in aligntree.iter('Align'):
@@ -63,15 +96,21 @@ def sum_xmltxt_alignment(alignment_xml_path, alignment_txt_path):
             if not paramname in txtdata[comp.attrib['component']]:
                 continue
             param = comp.find(paramname)
-            # Text file is always in cm (until Geant4 changes units)
+            # Text file is always in cm/rad (until Geant4 changes units)
+            # We try to do unit conversion here
             factor = 1.
-            if param.attrib['unit'] == 'cm':
+            unit = param.attrib['unit']
+            if unit == 'm':
+                factor = 100.
+            elif unit == 'cm':
                 factor = 1.
-            elif param.attrib['unit'] == 'mm':
+            elif unit == 'mm':
                 factor = 1. / 10.
-            elif param.attrib['unit'] == 'rad':
+            elif unit == 'um':
+                factor = 1. / 10000.
+            elif unit == 'rad':
                 factor = 1.
-            elif param.attrib['unit'] == 'deg':
+            elif unit == 'deg':
                 factor = 2. * 3.1415926 / 360.
             else:
                 raise Exception('Unsupported unit in xml file '
@@ -82,11 +121,18 @@ def sum_xmltxt_alignment(alignment_xml_path, alignment_txt_path):
     return aligntree
 
 
-# Limited use due to typically different units (deg, mm)
-# in default alignment xmls than in alignment (rad, cm)
-
-
 def sum_xml_alignment(alignment_xml_path1, alignment_xml_path2):
+    """Sum alignment parameters in two xml files (with same units).
+    
+    Returns updated xml tree
+    Limited use due to typically different units (deg, mm)
+    in default alignment xmls than in alignment (rad, cm).
+    
+    Use sum_xmltxt_alignment instead if you sum with millepede result.
+    
+    It is recommended to use (cm, rad) everywhere in alignment files.
+    """
+
     aligntree1 = xml.parse(alignment_xml_path1)
     aligntree2 = xml.parse(alignment_xml_path2)
     for comp1 in aligntree1.iter('Align'):
@@ -98,7 +144,8 @@ def sum_xml_alignment(alignment_xml_path1, alignment_xml_path2):
             param1 = comp1.find(paramname)
             param2 = comp2.find(paramname)
             if param1.attrib['unit'] != param2.attrib['unit']:
-                raise Exception('Incompatible units in alignment parameters')
+                raise Exception('Different units of alignment parameters in xml files not supported (yet).'
+                                )
 
             if param2 is not None:
                 param1.text = str(float(param1.text) + float(param2.text))
@@ -107,7 +154,13 @@ def sum_xml_alignment(alignment_xml_path1, alignment_xml_path2):
 
 class SetAlignment(Module):
 
-    """A utility module to manipulate alignment in VXD testbeam
+    """A utility module to manipulate alignment in VXD testbeam.
+    
+    Create the module as x=SetAlignment( path to main geometry xml, path to xml with alignment )
+    and add it to the path before GearBox.
+    It will replace alignment in the man xml by the other one.
+    At end of run, the change is reverted.
+    
      """
 
     def __init__(self, main_xml_path, alignment_xml_path):

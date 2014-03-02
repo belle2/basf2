@@ -5,25 +5,29 @@ import sys
 import math
 from basf2 import *
 
-# Import xml parser
-import xml.etree.ElementTree as xml
-
-# Load the required libraries
 import ROOT
 from ROOT import Belle2
 
-logging.log_level = LogLevel.WARNING
+# Import xml parser
+import xml.etree.ElementTree as xml
+
+paramnames = [
+    'du',
+    'dv',
+    'dw',
+    'alpha',
+    'beta',
+    'gamma',
+    ]
+
+
+def write_alignment(aligntree, file_path):
+    file = open(file_path, 'w')
+    aligntree.write(file, encoding='UTF-8', xml_declaration=True)
+    file.close()
 
 
 def get_alignment_from_txt(txt_path):
-    paramnames = [
-        'du',
-        'dv',
-        'dw',
-        'alpha',
-        'beta',
-        'gamma',
-        ]
     alignment = dict()
     file = open(txt_path, 'r')
     line = file.readline()
@@ -39,7 +43,9 @@ def get_alignment_from_txt(txt_path):
         param = int(paramid) - sensor * 10
         value = data[1]
     # presigma = data[2]
-        vxdid = str(Belle2.VxdID(sensor))
+        vxdid = str(Belle2.VxdID(sensor).getLayerNumber()) + '.' \
+            + str(Belle2.VxdID(sensor).getLadderNumber()) + '.' \
+            + str(Belle2.VxdID(sensor).getSensorNumber())
         if not vxdid in alignment.keys():
             alignment[vxdid] = dict()
         alignment[vxdid][paramnames[int(param) - 1]] = value
@@ -47,15 +53,37 @@ def get_alignment_from_txt(txt_path):
     return alignment
 
 
-def sum_xmltxt_alignment(self, alignment_xml_path, alignment_txt_path):
+def sum_xmltxt_alignment(alignment_xml_path, alignment_txt_path):
     aligntree = xml.parse(alignment_xml_path)
-    txtdata = self.get_alignment_from_txt(alignment_txt_path)
+    txtdata = get_alignment_from_txt(alignment_txt_path)
     for comp in aligntree.iter('Align'):
+        if not str(comp.attrib['component']) in txtdata:
+            continue
         for paramname in paramnames:
+            if not paramname in txtdata[comp.attrib['component']]:
+                continue
             param = comp.find(paramname)
-            param.text = str(float(param1.text)
-                             + txtdata[comp.attrib['component']][paramname])
+            # Text file is always in cm (until Geant4 changes units)
+            factor = 1.
+            if param.attrib['unit'] == 'cm':
+                factor = 1.
+            elif param.attrib['unit'] == 'mm':
+                factor = 1. / 10.
+            elif param.attrib['unit'] == 'rad':
+                factor = 1.
+            elif param.attrib['unit'] == 'deg':
+                factor = 2. * 3.1415926 / 360.
+            else:
+                raise Exception('Unsupported unit in xml file '
+                                + alignment_xml_path)
+            param.text = str(1. / factor * (float(param.text) * factor
+                             + float(txtdata[str(comp.attrib['component'
+                             ])][paramname])))
     return aligntree
+
+
+# Limited use due to typically different units (deg, mm)
+# in default alignment xmls than in alignment (rad, cm)
 
 
 def sum_xml_alignment(alignment_xml_path1, alignment_xml_path2):
@@ -64,10 +92,16 @@ def sum_xml_alignment(alignment_xml_path1, alignment_xml_path2):
     for comp1 in aligntree1.iter('Align'):
         comp2 = aligntree2.find(str('Align[@component="{vxdid}"]'
                                 ).format(vxdid=comp1.attrib['component']))
+        if comp2 is None:
+            continue
         for paramname in paramnames:
             param1 = comp1.find(paramname)
             param2 = comp2.find(paramname)
-            param1.text = str(float(param1.text) + float(param2.text))
+            if param1.attrib['unit'] != param2.attrib['unit']:
+                raise Exception('Incompatible units in alignment parameters')
+
+            if param2 is not None:
+                param1.text = str(float(param1.text) + float(param2.text))
     return aligntree1
 
 
@@ -81,7 +115,7 @@ class SetAlignment(Module):
 
         super(SetAlignment, self).__init__()
       # # The main geometry xml
-        self.main_xml_path = 'data/' + main_xml_path
+        self.main_xml_path = main_xml_path
       # # The alignment xml ... <Alignment>...</Alignment>
         self.alignment_xml_path = alignment_xml_path
       # # Original content of main xml file

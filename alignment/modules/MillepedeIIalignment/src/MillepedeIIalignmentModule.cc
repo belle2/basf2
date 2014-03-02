@@ -69,7 +69,7 @@ bool MillepedeIIalignmentModule::MillepedeIIalignmentExecutePede()
             R(i, j) = trans[i + j];
           }
         }
-        R.Print();
+        //R.Print();
         double xDet = detPos[0];
         double yDet = detPos[1];
         double zDet = detPos[2];

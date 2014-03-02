@@ -1,0 +1,174 @@
+Cfiles
+millefile_stage_2.dat ! file with binary data (one per line)
+
+Parameter ! fix some parameters
+1 0. -1. ! fix parameter 1
+2 0. -1. ! fix parameter 2
+3 0. -1. ! fix parameter 3
+4 0. -1. ! fix parameter 4
+5 0. -1. ! fix parameter 5
+6 0. -1. ! fix parameter 6
+
+! Fix badly defined params and coordinate system
+! We do not have telescopes in tracking so far...
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!          WARNING           !!        
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! In magnetic field, you must fix
+! at least 3 coordinates in beding
+! plane (param 1=u=1st coord).
+! Following list fixes
+! only two of them. Alignment will
+! fail or produce large (cm) corrections
+! to parameter "1" (=u)
+! You must choose one more xxxxx1 param
+! to fix, that is, remove "!" in front of it
+! in magnetic field
+
+! This is stage 2 : You can fix (remove "!") everything except what you
+! are interested in., e.g. just relative movement of PXD w.r.t. whole SVD
+! I have allowed same as before here ... you can just check that computed corrections are small
+
+! PXD 2
+!167041 0. -1.     ! Fix e.g. this with PXD in magnetic field by removing "!"
+!167042 0. -1.
+167043 0. -1.
+167044 0. -1.
+167045 0. -1.
+!167046 0. -1.
+! SVD3
+249281 0. -1.
+249282 0. -1.
+249283 0. -1.
+249284 0. -1.
+249285 0. -1.
+249286 0. -1.
+! SVD4
+331521 0. -1.     ! Fix e.g. this in magnetic field by removing "!"
+!331522 0. -1.
+331523 0. -1.
+331524 0. -1.
+331525 0. -1.
+!331526 0. -1.
+! SVD5
+!413761 0. -1.     ! Fix e.g. this in magnetic field by removing "!"
+!413762 0. -1.
+413763 0. -1.
+413764 0. -1.
+413765 0. -1.
+!413766 0. -1.
+! SVD6
+496001 0. -1.
+496002 0. -1.
+496003 0. -1.
+496004 0. -1.
+496005 0. -1.
+!496006 0. -1.
+
+!Currently there no good constraints for TB prepared
+!Fortranfiles
+!constraints.txt ! automatically generated file from MP2alignment module with geometry constraints
+
+printrecord 150 -1
+!maxrecords 5000 ! Number of records to be processed
+!memorydebug
+entries 25 ! Minimum entries to compute alignment parameter
+chiscut 30. 6. ! Outlier removal. Comment this in heavily misaligned geometry
+outlierdownweighting 3 ! Down-weighting of outliers - number of iterations
+dwfractioncut 0.1
+!method inversion  5  0.01   ! solution by inversion
+method diagonalization  5  0.01 ! solution with diagonalization -> computes eigenvectors
+!histprint
+
+end ! Nothing after this command will be processed
+
+! List of all available TB parameters:
+Parameter
+! VXD detectors:
+! PXD1
+84801 0. -1.
+84802 0. -1.
+84803 0. -1.
+84804 0. -1.
+84805 0. -1.
+84806 0. -1.
+! PXD 2
+167041 0. -1.
+167042 0. -1.
+167043 0. -1.
+167044 0. -1.
+167045 0. -1.
+167046 0. -1.
+! SVD3
+249281 0. -1.
+249282 0. -1.
+249283 0. -1.
+249284 0. -1.
+249285 0. -1.
+249286 0. -1.
+! SVD4
+331521 0. -1.
+331522 0. -1.
+331523 0. -1.
+331524 0. -1.
+331525 0. -1.
+331526 0. -1.
+! SVD5
+413761 0. -1.
+413762 0. -1.
+413763 0. -1.
+413764 0. -1.
+413765 0. -1.
+413766 0. -1.
+! SVD6
+496001 0. -1.
+496002 0. -1.
+496003 0. -1.
+496004 0. -1.
+496005 0. -1.
+496006 0. -1.
+! Telescopes:
+! TEL1
+578881 0. -1.
+578882 0. -1.
+578883 0. -1.
+578884 0. -1.
+578885 0. -1.
+578886 0. -1.
+! TEL2
+579201 0. -1.
+579202 0. -1.
+579203 0. -1.
+579204 0. -1.
+579205 0. -1.
+579206 0. -1.
+! TEL3
+579521 0. -1.
+579522 0. -1.
+579523 0. -1.
+579524 0. -1.
+579525 0. -1.
+579526 0. -1.
+! TEL4 (back)
+582401 0. -1.
+582402 0. -1.
+582403 0. -1.
+582404 0. -1.
+582405 0. -1.
+582406 0. -1.
+! TEL5 (back)
+582721 0. -1.
+582722 0. -1.
+582723 0. -1.
+582724 0. -1.
+582725 0. -1.
+582726 0. -1.
+! TEL6 (back)
+583041 0. -1.
+583042 0. -1.
+583043 0. -1.
+583044 0. -1.
+583045 0. -1.
+583046 0. -1.
+

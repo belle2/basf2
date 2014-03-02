@@ -33,6 +33,7 @@ MillepedeIIalignmentModule::MillepedeIIalignmentModule() :
   Module()
 {
   addParam("steeringFileName", m_steeringFileName, "Name of the steering file to run Millepede II alignment", string("steer.txt"));
+  addParam("resultXmlFileName", m_resultXmlFileName, "Name of the xml with results of Millepede II alignment", string("displacements.txt"));
 
 }
 
@@ -41,14 +42,14 @@ void MillepedeIIalignmentModule::endRun()
 
   MillepedeIIalignmentExecutePede();
 
-  MillepedeIIalignmentWriteXML("alignment.xml");
+  MillepedeIIalignmentWriteXML(m_resultXmlFileName);
 
 }
 
 bool MillepedeIIalignmentModule::MillepedeIIalignmentExecutePede()
 {
   bool ok(true);
-  ofstream positions("sensor_positions.txt");
+  //ofstream positions("sensor_positions.txt");
   // Write constraints file based on current geometry
   VXD::GeoCache& geo = VXD::GeoCache::getInstance();
   // Find all sensors and create a matrix of tranformation from local to global
@@ -59,7 +60,7 @@ bool MillepedeIIalignmentModule::MillepedeIIalignmentExecutePede()
         TMatrixD rotationT(3, 3);
         TMatrixD offset(3, 3);
         TVector3 detPos = geo.get(id).pointToGlobal(TVector3(0., 0., 0.));
-        positions << (unsigned int) id << ": x = " << detPos[0] << " y = " << detPos[1] << " z = " << detPos[2] << endl;
+        //positions << (unsigned int) id << ": x = " << detPos[0] << " y = " << detPos[1] << " z = " << detPos[2] << endl;
 
         const double* trans = geo.get(id).getTransformation().GetRotationMatrix();
         TMatrixD R(3, 3);
@@ -179,7 +180,9 @@ bool MillepedeIIalignmentModule::MillepedeIIalignmentExecutePede()
   // store start time of processing
   // time(&MP2startTime);
   // execute pede;
-  std::system("pede steer.txt");
+  std::string cmd("pede");
+  cmd = cmd + " " + m_steeringFileName;
+  std::system(cmd.c_str());
   // now open millepede.end file to see what happened (we need hiher pede version)
   return ok;
 }
@@ -201,11 +204,7 @@ bool MillepedeIIalignmentModule::MillepedeIIalignmentReadXML(const string& xml_f
 
 void MillepedeIIalignmentModule::readResWriteXml(const string& xml_filename, int type)
 {
-  int label = -1;
-  double param = 0.;
-  double presigma = 0.;
-  double differ = 0.;
-  double error = 0.;
+
   double ranSigmaShift = 0.05;
   double ranSigmaAngle = 0.005;
 
@@ -225,7 +224,7 @@ void MillepedeIIalignmentModule::readResWriteXml(const string& xml_filename, int
 
   xml << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" << endl;
   xml << "<Alignment xmlns:xi=\"http://www.w3.org/2001/XInclude\">" << endl;
-  xml << "  <Millepede>" << endl;
+  // xml << "  <Millepede>" << endl;
   // xml << "    <StartTime>" << endl << "      " << ctime(&MP2startTime) << "    </StartTime>" << endl;
   //
   // time_t now;
@@ -240,11 +239,18 @@ void MillepedeIIalignmentModule::readResWriteXml(const string& xml_filename, int
   unsigned int lastSensor = 0;
   bool startComp = false;
   while (getline(res, line)) {
+    int label = -1;
+    double param = 0.;
+    double presigma = 0.;
+    double differ = 0.;
+    double error = 0.;
     stringstream lineSTream;
     lineSTream << line;
     lineSTream >> label >> param >> presigma >> differ >> error;
 
     // Now decode vxd id
+    if (label < 10) continue;
+
     unsigned int id(floor(label / 10));
     unsigned int vxdId = id;
     unsigned int paramId = label - 10 * id;
@@ -295,8 +301,8 @@ bool MillepedeIIalignmentModule::MillepedeIIalignmentWriteXML(const string& xml_
 {
   bool ok(true);
   readResWriteXml(xml_filename, 0);
-  readResWriteXml("misalignment.xml", 1);
-  readResWriteXml("ideal.xml", 2);
+  //readResWriteXml("misalignment.xml", 1);
+  //readResWriteXml("ideal.xml", 2);
   return ok;
 }
 

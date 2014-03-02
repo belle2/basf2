@@ -81,6 +81,8 @@ namespace Belle2 {
 
 
     std::string m_steeringFileName;  /**< Name of the steering file for running Millepede II alignment */
+    std::string m_resultXmlFileName;  /**< Name of xml with results of Millepede II alignment */
+
   };
 
 

@@ -124,7 +124,7 @@ GBLfitModule::GBLfitModule() :
   // keep GFExceptions quiet or not
   genfit::Exception::quiet(m_suppressGFExceptionOutput);
 
-  addParam("internalIterations", m_gblInternalIterations, "GBL internal downweighting setting", std::string("THC"));
+  addParam("internalIterations", m_gblInternalIterations, "GBL internal downweighting setting", std::string(""));
   addParam("pValueCut", m_gblPvalueCut, "GBL p-value cut to output track to millepede file", 0.0);
   addParam("minNdf", m_gblMinNdf, "GBL minimum NDF to output track to millepede file", 1);
   addParam("milleFileName", m_gblMilleFileName, "GBL: Name of the mille binary file to be produced for alignments", std::string("millefile.dat"));

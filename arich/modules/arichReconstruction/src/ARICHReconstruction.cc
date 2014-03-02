@@ -434,6 +434,7 @@ namespace Belle2 {
           }
         }
         // loop over all detected photon hits
+
         for (unsigned int iPhoton = 0; iPhoton < nPhotonHits; iPhoton++) {
 
           ARICHDigit* h = arichDigits[iPhoton];
@@ -441,6 +442,7 @@ namespace Belle2 {
           int modID = h->getModuleID();
 
           TVector3 hitpos = m_arichGeoParameters->getChannelCenterGlob(modID, chID);
+
           for (int iHyp = 0; iHyp < c_noOfHypotheses; iHyp++) esigi[iHyp] = 0;
           int nfoo = nDetPhotons;
           // loop over all arogel layers
@@ -462,6 +464,7 @@ namespace Belle2 {
               TVector3 dirch = TransformToFixed(edir) * photonDirection;
               double fi_cer = dirch.Phi();
               double th_cer = dirch.Theta();
+
               if (th_cer > 0.5 || th_cer < 0.05) continue;
 
               if (m_beamtest) m_hitstuple->Fill(ncount, iAerogel, mirr, th_cer, fi_cer, hitpos.x(), hitpos.y(), hitpos.z(), epoint.x(), epoint.y(), epoint.z() , edir.x(), edir.y());

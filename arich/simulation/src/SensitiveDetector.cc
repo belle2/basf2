@@ -12,6 +12,7 @@
 #include <framework/logging/Logger.h>
 #include <arich/dataobjects/ARICHSimHit.h>
 
+#include <simulation/kernel/UserInfo.h>
 #include <G4Track.hh>
 #include <G4Step.hh>
 
@@ -20,6 +21,7 @@
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationIndex.h>
 #include <TVector3.h>
+#include <TRandom3.h>
 
 using namespace std;
 
@@ -27,7 +29,8 @@ namespace Belle2 {
   namespace arich {
 
     SensitiveDetector::SensitiveDetector():
-      Simulation::SensitiveDetectorBase("ARICH", Const::ARICH)
+      Simulation::SensitiveDetectorBase("ARICH", Const::ARICH),
+      m_arichgp(ARICHGeometryPar::Instance())
     {
 
       StoreArray<ARICHSimHit>::registerPersistent();
@@ -52,6 +55,21 @@ namespace Belle2 {
       if (std::isnan(globalTime)) {
         B2ERROR("ARICH Sensitive Detector: global time is nan !");
         return false;
+      }
+
+      // apply quantum efficiency if not yet done
+      bool applyQE = true;
+      Simulation::TrackInfo* info =
+        dynamic_cast<Simulation::TrackInfo*>(track.GetUserInformation());
+      if (info) applyQE = info->getStatus() < 2;
+      if (applyQE) {
+        double energy = track.GetKineticEnergy() * Unit::MeV / Unit::eV;
+        double qeffi  = m_arichgp->QE(energy) * m_arichgp->getColEffi();
+        double fraction = info->getFraction();
+        if (gRandom->Uniform() * fraction > qeffi) {
+          track.SetTrackStatus(fStopAndKill);
+          return false;
+        }
       }
 
       //Get step information

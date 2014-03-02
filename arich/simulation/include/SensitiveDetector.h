@@ -13,6 +13,8 @@
 
 #include <simulation/kernel/SensitiveDetectorBase.h>
 #include <arich/dataobjects/ARICHSimHit.h>
+#include <arich/geometry/ARICHGeometryPar.h>
+
 
 namespace Belle2 {
   namespace arich {
@@ -40,6 +42,7 @@ namespace Belle2 {
 
     private:
 
+      ARICHGeometryPar* m_arichgp; /**< geometry parameters from xml */
 
     }; // SensitiveDetector class
   } // end of namespace arich

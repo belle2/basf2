@@ -73,7 +73,7 @@ namespace Belle2 {
       /**
        *Prints module parameters.
        */
-      void printModuleParams() const;
+      void printModuleParams() const {};
 
     private:
 
@@ -84,20 +84,9 @@ namespace Belle2 {
       double m_timeCPU;                /**< CPU time.     */
       int    m_nRun;                   /**< Run number.   */
       int    m_nEvent;                 /**< Event number. */
+      double m_maxQE;                  /**< QE at 400nm (from QE curve applied in SensitveDetector) */
 
       ARICHGeometryPar* m_arichgp;    /**< Geometry parameters of ARICH. */
-
-      //! Returns q.e. of detector at given photon energy
-      /*!
-      \param energy energy at which q.e. is returned
-      */
-      double QESuperBialkali(double energy);
-
-      //! Apply q.e., returns 1 if photon is detected and 0 if not.
-      /*!
-      \param energy energy of photon
-      */
-      int DetectorQE(double energy);
 
     };
 

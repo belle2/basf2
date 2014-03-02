@@ -79,7 +79,7 @@ namespace Belle2 {
       addParam("backgroundLevel", m_backgroundLevel, "Background level in photon hits per m^2", 50.0);
       addParam("singleResolution", m_singleResolution, "Single photon resolution without pad", 0.010 * Unit::rad);
       addParam("aerogelMerit", m_aerogelMerit, "Aerogel figure of merit", defMerit);
-      addParam("inputTrackType", m_inputTrackType, "Input tracks switch: tracking (0) or AeroHit (1)", 0);
+      addParam("inputTrackType", m_inputTrackType, "Input tracks switch: tracking (0), tracks from AeroHits (1), AeroHits (2)", 0);
     }
 
     ARICHReconstructorModule::~ARICHReconstructorModule()
@@ -108,7 +108,7 @@ namespace Belle2 {
       StoreArray<ARICHLikelihood>::registerPersistent(m_outColName);
       RelationArray::registerPersistent<ARICHAeroHit, ARICHLikelihood>(m_mcColName, m_outColName);
       RelationArray::registerPersistent<Track, ARICHLikelihood>(m_tracksColName, m_outColName);
-      RelationArray::registerPersistent<ExtHit, ARICHLikelihood>(m_extHitsColName, m_outColName);
+      RelationArray::registerPersistent<ARICHAeroHit, ExtHit>(m_mcColName, m_extHitsColName);
     }
 
     void ARICHReconstructorModule::beginRun()
@@ -135,8 +135,8 @@ namespace Belle2 {
         // Output - relations
         RelationArray trackToArich(mdstTracks, arichLikelihoods);
         trackToArich.clear();
-        RelationArray extToArich(extHits, arichLikelihoods);
-        extToArich.clear();
+        RelationArray aeroHitToExt(arichAeroHits, extHits);
+        aeroHitToExt.clear();
         RelationArray aeroHitToArich(arichAeroHits, arichLikelihoods);
         aeroHitToArich.clear();
 
@@ -163,25 +163,28 @@ namespace Belle2 {
           // Add relations
           int last = arichLikelihoods.getEntries() - 1;
           trackToArich.add(track->getTrackID(), last);
-          extToArich.add(track->getHitID(), last);
           int aeroIndex = track->getAeroIndex();
           if (aeroIndex >= 0) {
             aeroHitToArich.add(aeroIndex, last);
+            aeroHitToExt.add(aeroIndex, track->getHitID());
           } else {
             B2DEBUG(50, "No AeroHit for Track " << track->getTrackID());
           }
         }
 
         trackToArich.consolidate();
-        extToArich.consolidate();
+        aeroHitToExt.consolidate();
         aeroHitToArich.consolidate();
 
-      } else if (m_inputTrackType == 1) {
+      } else {
         //------------------------------------------------------
         // Get the collection of ARICHSimHits from the DataStore.
+        // For inputTrackType=2 this assumes existence of
+        // ExtHit-ARICHAeroHit relation
         //------------------------------------------------------
 
         StoreArray<ARICHAeroHit> arichAeroHits(m_mcColName);
+        StoreArray<ExtHit> extHits(m_extHitsColName);
 
         // Output: ARICH likelihoods
         StoreArray<ARICHLikelihood> arichLikelihoods(m_outColName);
@@ -196,14 +199,25 @@ namespace Belle2 {
         // Get number of hits in this event
         int nTracks = arichAeroHits.getEntries();
 
-        // Loop over all tracks
+        // Loop over all ARICHAeroHits
         for (int iTrack = 0; iTrack < nTracks; ++iTrack) {
           ARICHAeroHit* aeroHit = arichAeroHits[iTrack];
-          arichTracks.push_back(ARICHTrack(*aeroHit));
+          if (m_inputTrackType == 2) { arichTracks.push_back(ARICHTrack(*aeroHit)); continue;}
+
+          ExtHit* extHit = DataStore::getRelated<ExtHit>(aeroHit);
+          if (extHit) {
+            ARICHTrack trk(extHit,  aeroHit->getPDG() > 0 ? 1 : -1, aeroHit->getPDG(), (int)iTrack, aeroHit->getArrayIndex());
+            arichTracks.push_back(trk);
+          }
         } // for iTrack
 
-        m_ana->smearTracks(arichTracks);
-        m_ana->likelihood2(arichTracks);
+        // if tracks from ARICHAeroHits apply smearing of track parameters
+        if (m_inputTrackType == 2) m_ana->smearTracks(arichTracks);
+
+        nTracks = arichTracks.size();
+        if (nTracks > 0) m_ana->likelihood2(arichTracks);
+
+        // build the relations (ARICHAeroHit-ARICHLikelihood))
 
         for (int iTrack = 0; iTrack < nTracks; ++iTrack) {
           ARICHTrack* track = &arichTracks[iTrack];
@@ -213,10 +227,15 @@ namespace Belle2 {
           track->getLikelihood(likelihoods);
           int detectedPhotons = track->getDetectedPhotons();
           new(arichLikelihoods.nextFreeAddress()) ARICHLikelihood(1, likelihoods, detectedPhotons, expectedPhotons);
-          aeroHitToArich.add(iTrack, iTrack);
-        } // for iTrack
+          int last = arichLikelihoods.getEntries() - 1;
+          int aeroIndex = track->getAeroIndex();
+          if (aeroIndex >= 0) {
+            aeroHitToArich.add(aeroIndex, last);
+          } else {
+            B2DEBUG(50, "No AeroHit for Track " << track->getTrackID());
+          }
+        }
       }
-
       m_nEvent++;
     }
 

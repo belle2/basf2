@@ -29,7 +29,7 @@ ARICHTrack::ARICHTrack(const ARICHAeroHit& aeroHit)
   m_trackID = aeroHit.getTrackID();
   m_extHitID = -1;
   m_identity = Lund2Type(m_PDGEncoding);
-  m_aeroIndex = -1;
+  m_aeroIndex = aeroHit.getArrayIndex();
   m_detectedPhotons = -1;
   for (int i = 0; i < c_noOfHypotheses; i++) {
     m_lkh[i] = 0;

@@ -132,7 +132,6 @@ arichEfficiency = register_module('ARICHAnalysis')
 arichEfficiency.logging.log_level = LogLevel.DEBUG
 arichEfficiency.logging.debug_level = debugLevel
 arichEfficiency.param('outputFile', filename)
-arichEfficiency.param('inputTrackType', 0)
 main.add_module(arichEfficiency)
 
 # Show progress of processing

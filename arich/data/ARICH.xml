@@ -6,6 +6,9 @@
     <xi:include href="ARICH-Aerogel.xml"/>
     <xi:include href="ARICH-Detectors.xml"/>
     <xi:include href="ARICH-Mirrors.xml"/>
+    <xi:include href="ARICH-QEsuperbialkali.xml"/>
+    <xi:include href="ARICH-ModuleInfo.xml"/>
+    
     <Envelope>
       <zFront desc="Starting z position of aRICH envelope" unit="mm">1668</zFront>
       <zBack desc="Ending z position of aRICH envelope" unit="mm">1900</zBack>

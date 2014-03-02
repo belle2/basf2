@@ -104,19 +104,15 @@ namespace Belle2 {
 
     std::string m_outputFile; /**< output root file */
 
-    /** Input particles from Track(GenFit+ext) or AeroHit(GEANT4 simulation) */
-    int m_inputTrackType;
-
     TFile* file; /**< pointer to output root file */
     TTree* tree; /**< pointer to output tree */
 
     Float_t m_chi2; /**< Chi2 p-value from MCTrackFit */
     Int_t m_pdg; /**< PDG from the MC-generator */
-    Int_t m_charge; /**< Charge of the particle from MC-generator */
+    Int_t m_mpdg; /**< PDG of the mother particle */
+    Int_t m_status; /**< m_status=1 if MC info was filled, m_status+=10 if likelihood info was filled, m_status+=100 for extHit info */
     Int_t m_flag; /**< MC flag, as defined in MCParticle.h */
-    Int_t m_daughter; /**< PDG of the first daughter */
-    Float_t m_lifetime; /**< Lifetime in ns. */
-    Float_t m_decayVertex[3]; /**< Decay vertex. */
+    Float_t m_prodVertex[3]; /**< production vertex. */
 
     Float_t m_truePosition[3]; /**< Position of aeroHit (GEANT4) */
     Float_t m_position[3]; /**< Position of extrapolated particle */

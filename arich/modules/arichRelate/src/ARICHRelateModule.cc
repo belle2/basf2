@@ -96,7 +96,6 @@ namespace Belle2 {
       }
 
       int pdg = particle->getPDG();
-      int charge = particle->getCharge();
 
       // Find the track produced by MCParticle
       const Track* track = DataStore::getRelated<Track>(particle);

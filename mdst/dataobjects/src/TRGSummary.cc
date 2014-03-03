@@ -7,8 +7,8 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <mdst/dataobjects/TRGMdst.h>
+#include <mdst/dataobjects/TRGSummary.h>
 
 using namespace Belle2;
 
-ClassImp(TRGMdst)
+ClassImp(TRGSummary)

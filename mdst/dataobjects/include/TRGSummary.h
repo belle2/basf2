@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef TRGMDST_H
-#define TRGMDST_H
+#ifndef TRGSUMMARY_H
+#define TRGSUMMARY_H
 
 #include <framework/datastore/RelationsObject.h>
 #include <framework/datastore/StoreArray.h>
@@ -23,7 +23,7 @@ namespace Belle2 {
    * @{
    */
 
-  class TRGMdst : public RelationsObject {
+  class TRGSummary : public RelationsObject {
 
   private:
 
@@ -32,10 +32,10 @@ namespace Belle2 {
   public:
 
     /*! constructor: xxx */
-    TRGMdst(unsigned int inputBits[10],
-            unsigned int ftdlBits[10],
-            unsigned int psnmBits[10],
-            unsigned int timTypeBits) {
+    TRGSummary(unsigned int inputBits[10],
+               unsigned int ftdlBits[10],
+               unsigned int psnmBits[10],
+               unsigned int timTypeBits) {
       for (int i = 0; i < 10; i++) {
         m_inputBits[i] = inputBits[i];
         m_ftdlBits[i] = ftdlBits[i];
@@ -45,16 +45,16 @@ namespace Belle2 {
     }
 
     /*! default constructor: xxx */
-    TRGMdst() {;}
+    TRGSummary() {;}
 
     /** Destructor.
      */
-    ~TRGMdst() {}
+    ~TRGSummary() {}
 
     /*! setter
      * @param xxx explanation
      */
-    void setTRGMdst() {;}
+    void setTRGSummary() {;}
 
     /*! get input bits
      * @param i index: 0, 1, 2 for bit 0-31, 32-63, 64-95, respectively.
@@ -100,7 +100,7 @@ namespace Belle2 {
     unsigned int m_psnmBits[10]; /**< psnm bits */
     unsigned int m_timTypeBits; /**< timing source bits */
 
-    ClassDef(TRGMdst, 1); /**< ClassDef */
+    ClassDef(TRGSummary, 1); /**< ClassDef */
 
   };
 

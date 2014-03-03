@@ -8,6 +8,9 @@
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 #pragma once
+
+#include <TObject.h>
+
 #include <bitset>
 #include <algorithm>
 
@@ -26,7 +29,7 @@ namespace Belle2 {
    *  GENERAL COMMENT: I think the non-static members and the interface are largely OK,
    *                   but the backend implementation maybe not so great.
    */
-  class HitPatternCDC {
+  class HitPatternCDC : public TObject {
   public:
     /** Create empty pattern.*/
     HitPatternCDC() {}
@@ -125,5 +128,12 @@ namespace Belle2 {
     std::bitset<64> m_pattern;                     /**<  Saves the actual pattern.*/
     static const std::bitset<64> s_sLayerMasks[9]; /**<  Masks to zero out all bits from other layers.*/
 
+    //-----------------------------------------------------------------------------------
+    /** Make it a ROOT object.
+     *
+     *  ClassVersionID is set to 0, as there is no need for streamer,
+     *  as this the integer equivalent of the bitset is used as object member.
+     */
+    ClassDef(HitPatternCDC, 0);
   };
 }

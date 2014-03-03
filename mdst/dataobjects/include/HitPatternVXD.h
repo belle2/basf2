@@ -7,7 +7,11 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+
 #pragma once
+
+#include <TObject.h>
+
 #include <bitset>
 #include <algorithm>
 
@@ -20,7 +24,7 @@ namespace Belle2 {
    *  @sa HitPatternCDC
    *  We only save hits from the outgoing arm.
    */
-  class HitPatternVXD {
+  class HitPatternVXD : public TObject {
   public:
     /** Create empty pattern.*/
     HitPatternVXD();
@@ -48,6 +52,10 @@ namespace Belle2 {
      *  1-4 = normal hit, 5-8 = rescue hit, 9-12 = normal gated mode, 13-16 = rescue during gated mode;
      */
     std::bitset<16> m_pattern;
+
+    //-----------------------------------------------------------------------------------
+    /** ROOTification for python access, but without I/O. */
+    ClassDef(HitPatternVXD, 0);
   };
 
 }

@@ -7,7 +7,14 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+
 #include <mdst/dataobjects/HitPatternVXD.h>
 
-namespace Belle2 {
+using namespace Belle2;
+
+ClassImp(HitPatternVXD);
+
+HitPatternVXD::HitPatternVXD(): m_pattern(0)
+{
+
 }

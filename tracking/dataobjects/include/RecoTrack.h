@@ -188,9 +188,7 @@ namespace Belle2 {
     /** CDC indices and right/left ambiguity resolution for the negative arm of the track.
      *
      *  @sa m_cdcHitIndicesPositive
-    /** Name of array of PXDHits (true hits or clusters) to be accessed. */
-    std::string m_pxdHitsName;
-    * /
+     */
     std::set< std::pair < unsigned short, short> > m_cdcHitIndicesNegative;
 
     /** Name of array of SVDHits (true hits, or clusters) to be accessed. */

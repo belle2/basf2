@@ -29,7 +29,11 @@ namespace Belle2 {
     HitPatternVXD(const unsigned short& initValue) : m_pattern(initValue)
     {}
 
-    /** */
+    /** Getter for single Layer.
+     *
+     *  FIXME This is not yet implemented.
+     *  @return  True, if at lease one hit is in the layer specified in the argument.
+     */
     bool hasLayer(const unsigned short&) {
       return 1;
     }

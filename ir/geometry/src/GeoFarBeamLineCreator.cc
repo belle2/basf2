@@ -225,7 +225,7 @@ namespace Belle2 {
         string logi_polycone_name = "logi_" + name + "_name";
         G4LogicalVolume* logi_polycone = new G4LogicalVolume(polycone.geo, mat_polycone, logi_polycone_name);
         setColor(*logi_polycone, cPolycone.getString("Color", "#CC0000"));
-        setVisibility(*logi_polycone, cPolycone.getBool("Visibility", true));
+        setVisibility(*logi_polycone, cPolycone.getBool("Visibility", false));
 
         //put volume
         string phys_polycone_name = "phys_" + name + "_name";
@@ -260,7 +260,7 @@ namespace Belle2 {
           G4LogicalVolume* logi_vacuum = new G4LogicalVolume(vacuum.geo, mat_vacuum, logi_vacuum_name);
           if (flag_limitStep) logi_vacuum->SetUserLimits(new G4UserLimits(stepMax));
           setColor(*logi_vacuum, "#000000");
-          setVisibility(*logi_vacuum, true);
+          setVisibility(*logi_vacuum, false);
 
           //put volume
           string phys_vacuum_name = "phys_" + nameVac + "_name";
@@ -329,7 +329,7 @@ namespace Belle2 {
         string logi_torus_name = "logi_" + name + "_name";
         G4LogicalVolume* logi_torus = new G4LogicalVolume(torus.geo, mat_torus, logi_torus_name);
         setColor(*logi_torus, cTorus.getString("Color", "#CC0000"));
-        setVisibility(*logi_torus, cTorus.getBool("Visibility", true));
+        setVisibility(*logi_torus, cTorus.getBool("Visibility", false));
 
         //put volume
         string phys_torus_name = "phys_" + name + "_name";
@@ -360,7 +360,7 @@ namespace Belle2 {
           string logi_vacuum_name = "logi_" + nameVac + "_name";
           G4LogicalVolume* logi_vacuum = new G4LogicalVolume(vacuum.geo, mat_vacuum, logi_vacuum_name);
           setColor(*logi_vacuum, "#000000");
-          setVisibility(*logi_vacuum, true);
+          setVisibility(*logi_vacuum, false);
 
           //put volume
           string phys_vacuum_name = "phys_" + nameVac + "_name";

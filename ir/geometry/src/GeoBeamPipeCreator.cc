@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Hiroshi Nakano, Hiroyuki Nakayama                        *
+ * Contributors: Hiroshi Nakano, Hiroyuki Nakayama,Yuri Soloviev                        *
  *                                                                        *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
@@ -18,6 +18,7 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 #include <ir/simulation/SensitiveDetector.h>
+#include <simulation/background/BkgSensitiveDetector.h>
 
 #include <cmath>
 #include <boost/format.hpp>
@@ -71,7 +72,7 @@ namespace Belle2 {
       m_sensitive.clear();
     }
 
-    void GeoBeamPipeCreator::create(const GearDir& content, G4LogicalVolume& topVolume, GeometryTypes)
+    void GeoBeamPipeCreator::create(const GearDir& content, G4LogicalVolume& topVolume, GeometryTypes type)
     {
 
       //########## Index ##########
@@ -105,9 +106,11 @@ namespace Belle2 {
       GearDir cSafety(content, "Safety/");
       double SafetyLength = cSafety.getLength("L1") / Unit::mm;
 
-      double stepMax = 5.0 * Unit::mm;
-      bool flag_limitStep = false;
-      //bool flag_limitStep = true;
+//      double stepMax = 5.0 * Unit::mm;
+//      double stepMax = 50.0 * Unit::mm;
+      double stepMax = 500.0 * Unit::mm;
+      bool flag_limitStep = true;
+      double A11 = 0.03918;
 
       ////==========
       ////= IP pipe
@@ -320,8 +323,10 @@ namespace Belle2 {
       // Part 3
       G4Polycone* geo_Lv2VacuumPart3 = new G4Polycone("geo_Lv2VacuumPart3_name", 0, 2 * M_PI, Lv2Vacuum3_num, Lv2Vacuum3_Z, Lv2Vacuum3_rI, Lv2Vacuum3_rO);
       // Part1+2+3
-      G4Transform3D transform_Lv2VacuumPart3 = G4Translate3D(0., 0., 0.);
-      transform_Lv2VacuumPart3 = transform_Lv2VacuumPart3 * G4RotateY3D(-Lv2Vacuum_A1);
+//      G4Transform3D transform_Lv2VacuumPart3 = G4Translate3D(0., 0., 0.);
+      G4Transform3D transform_Lv2VacuumPart3 = G4Translate3D(-0.5, 0., 0.);
+      // A11 instead of A1
+      transform_Lv2VacuumPart3 = transform_Lv2VacuumPart3 * G4RotateY3D(-A11);
       G4UnionSolid* geo_Lv2Vacuumxx = new G4UnionSolid("geo_Lv2Vacuumxx_name", geo_Lv2VacuumPart1, geo_Lv2VacuumPart3, transform_Lv2VacuumPart3);
       G4Transform3D transform_Lv2VacuumPart2 = G4Translate3D(Lv2Vacuum_L3 * sin(Lv2Vacuum_A2), 0., Lv2Vacuum_L2 + Lv2Vacuum_L3 * cos(Lv2Vacuum_A2));
       transform_Lv2VacuumPart2 = transform_Lv2VacuumPart2 * G4RotateY3D(Lv2Vacuum_A2);
@@ -510,7 +515,7 @@ namespace Belle2 {
       G4Trd* geo_Lv1TaFwd = new G4Trd("geo_Lv1TaFwd_name", Lv1TaFwd_L2, Lv1TaFwd_L3, Lv1TaFwd_T1, Lv1TaFwd_T1, Lv1TaFwd_L1 / 2.0);
       G4LogicalVolume* logi_Lv1TaFwd = new G4LogicalVolume(geo_Lv1TaFwd, mat_Lv1TaFwd, "logi_Lv1TaFwd_name");
 
-      //-   put volume
+      //-   put volume at (0.,0.,D1 + L1/2)
       setColor(*logi_Lv1TaFwd, cLv1TaFwd.getString("Color", "#333333"));
       new G4PVPlacement(0, G4ThreeVector(0, 0, Lv1TaFwd_D1 + Lv1TaFwd_L1 / 2.0), logi_Lv1TaFwd, "phys_Lv1TaFwd_name", &topVolume, false, 0);
 
@@ -556,38 +561,57 @@ namespace Belle2 {
       double Lv2VacFwd2_rI2 = 0.0;
       double Lv2VacFwd2_rO2 = 2 * Lv2VacFwd_R2;
       // Part 3
-      const int Lv2VacFwd3_num = 4;
+      const int Lv2VacFwd3_num1 = 2;  // Cylindrical part
+      const int Lv2VacFwd3_num2 = 3;  // Policone part
+      //-----------> Cylindrical part
+      double Lv2VacFwd_Z1[Lv2VacFwd3_num1];
+      Lv2VacFwd_Z1[0] = 0.0;
+//      Lv2VacFwd_Z1[1] = Lv2VacFwd_D3 - Lv2VacFwd_L2;
+      Lv2VacFwd_Z1[1] = Lv2VacFwd_D3 - Lv2VacFwd_L2 + 0.03 * SafetyLength;
+      double Lv2VacFwd_rI1[Lv2VacFwd3_num1];
+      for (int tmpn = 0; tmpn < Lv2VacFwd3_num1; tmpn++)
+      { Lv2VacFwd_rI1[tmpn] = 0.0; }
+      double Lv2VacFwd_rO1[Lv2VacFwd3_num1];
+      Lv2VacFwd_rO1[0] = Lv2VacFwd_R3;
+      Lv2VacFwd_rO1[1] = Lv2VacFwd_R3;
+      //<---------------
+      //----------->Policone part
+      double Lv2VacFwd_Z2[Lv2VacFwd3_num2];
+      Lv2VacFwd_Z2[0] = Lv2VacFwd_D3 - Lv2VacFwd_L2;
+      Lv2VacFwd_Z2[1] = Lv2VacFwd_D3;
+      Lv2VacFwd_Z2[2] = Lv2VacFwd_D3 + Lv2VacFwd_L3;
+      double Lv2VacFwd_rI2[Lv2VacFwd3_num2];
+      for (int tmpn = 0; tmpn < Lv2VacFwd3_num2; tmpn++)
+      { Lv2VacFwd_rI2[tmpn] = 0.0; }
+      double Lv2VacFwd_rO2[Lv2VacFwd3_num2];
+      Lv2VacFwd_rO2[0] = Lv2VacFwd_R3;
+      Lv2VacFwd_rO2[1] = Lv2VacFwd_R4;
+      Lv2VacFwd_rO2[2] = Lv2VacFwd_R4;
+      //<-------------------
       //
-      double Lv2VacFwd_Z[Lv2VacFwd3_num];
-      Lv2VacFwd_Z[0] = 0.0;
-      Lv2VacFwd_Z[1] = Lv2VacFwd_D3 - Lv2VacFwd_L2;
-      Lv2VacFwd_Z[2] = Lv2VacFwd_D3;
-      Lv2VacFwd_Z[3] = Lv2VacFwd_D3 + Lv2VacFwd_L3;
-      double Lv2VacFwd_rI[Lv2VacFwd3_num];
-      for (int tmpn = 0; tmpn < Lv2VacFwd3_num; tmpn++)
-      { Lv2VacFwd_rI[tmpn] = 0.0; }
-      double Lv2VacFwd_rO[Lv2VacFwd3_num];
-      Lv2VacFwd_rO[0] = Lv2VacFwd_R3;
-      Lv2VacFwd_rO[1] = Lv2VacFwd_R3;
-      Lv2VacFwd_rO[2] = Lv2VacFwd_R4;
-      Lv2VacFwd_rO[3] = Lv2VacFwd_R4;
 
       //define geometry
       // Part 1
       G4Tubs* geo_Lv2VacFwdPart1_1 = new G4Tubs("geo_Lv2VacFwdPart1_1_name", Lv2VacFwd1_rI1, Lv2VacFwd1_rO1, Lv2VacFwd1_Z1, 0, 2 * M_PI);
       G4Tubs* geo_Lv2VacFwdPart1_2 = new G4Tubs("geo_Lv2VacFwdPart1_2_name", Lv2VacFwd1_rI2, Lv2VacFwd1_rO2, Lv2VacFwd1_Z2, 0, 2 * M_PI);
+      //Slanted tube of Part 1
       G4Transform3D transform_Lv2VacFwdPart1_2 = G4Translate3D(0., 0., 0.);
       transform_Lv2VacFwdPart1_2 = transform_Lv2VacFwdPart1_2 * G4RotateY3D(-Lv2VacFwd_A2 / 2.);
       G4IntersectionSolid* geo_Lv2VacFwdPart1 = new G4IntersectionSolid("geo_Lv2VacFwdPart1_name", geo_Lv2VacFwdPart1_1, geo_Lv2VacFwdPart1_2, transform_Lv2VacFwdPart1_2);
       // Part 2
       G4Tubs* geo_Lv2VacFwdPart2_1 = new G4Tubs("geo_Lv2VacFwdPart2_1_name", Lv2VacFwd2_rI1, Lv2VacFwd2_rO1, Lv2VacFwd2_Z1, 0, 2 * M_PI);
       G4Tubs* geo_Lv2VacFwdPart2_2 = new G4Tubs("geo_Lv2VacFwdPart2_2_name", Lv2VacFwd2_rI2, Lv2VacFwd2_rO2, Lv2VacFwd2_Z2, 0, 2 * M_PI);
+      //Slanted tube of Part 2
       G4Transform3D transform_Lv2VacFwdPart2_2 = G4Translate3D(0., 0., 0.);
       transform_Lv2VacFwdPart2_2 = transform_Lv2VacFwdPart2_2 * G4RotateY3D(Lv2VacFwd_A2 / 2.);
       G4IntersectionSolid* geo_Lv2VacFwdPart2 = new G4IntersectionSolid("geo_Lv2VacFwdPart2_name", geo_Lv2VacFwdPart2_1, geo_Lv2VacFwdPart2_2, transform_Lv2VacFwdPart2_2);
       // Part 3
-      G4Polycone* geo_Lv2VacFwdPart3 = new G4Polycone("geo_Lv2VacFwdPart3", 0, 2 * M_PI, Lv2VacFwd3_num, Lv2VacFwd_Z, Lv2VacFwd_rI, Lv2VacFwd_rO);
-
+//      G4Polycone* geo_Lv2VacFwdPart3 = new G4Polycone("geo_Lv2VacFwdPart3", 0, 2 * M_PI, Lv2VacFwd3_num, Lv2VacFwd_Z, Lv2VacFwd_rI, Lv2VacFwd_rO);
+      G4Polycone* geo_Lv2VacFwdPart3_1 = new G4Polycone("geo_Lv2VacFwdPart3_1", 0, 2 * M_PI, Lv2VacFwd3_num1, Lv2VacFwd_Z1, Lv2VacFwd_rI1, Lv2VacFwd_rO1);
+      G4Polycone* geo_Lv2VacFwdPart3_2 = new G4Polycone("geo_Lv2VacFwdPart3_2", 0, 2 * M_PI, Lv2VacFwd3_num2, Lv2VacFwd_Z2, Lv2VacFwd_rI2, Lv2VacFwd_rO2);
+      G4Transform3D transform_Lv2VacFwdPart3_1 = G4Translate3D(-0.5, 0., 0.);
+      transform_Lv2VacFwdPart3_1 = transform_Lv2VacFwdPart3_1  * G4RotateY3D(Lv2VacFwd_A1 - A11);
+      G4UnionSolid* geo_Lv2VacFwdPart3 = new G4UnionSolid("geo_Lv2VacFwdPart3_name", geo_Lv2VacFwdPart3_2, geo_Lv2VacFwdPart3_1, transform_Lv2VacFwdPart3_1);
       // Part1+2+3
       //tmp begin
       G4Transform3D transform_Lv2VacFwdPart1 = G4Translate3D((Lv2VacFwd_D1 * sin(Lv2VacFwd_A1) + Lv2VacFwd_D2 * sin(2.*Lv2VacFwd_A1)) / 2. ,
@@ -698,21 +722,33 @@ namespace Belle2 {
       double Lv2VacBwd2_rI2 = 0.0;
       double Lv2VacBwd2_rO2 = 2 * Lv2VacBwd_R2;
       // Part 3
-      const int Lv2VacBwd3_num = 4;
+      const int Lv2VacBwd3_num1 = 2;  // cylindrical part
+      const int Lv2VacBwd3_num2 = 3;  // policone part
+      // ----------->Cylindrical part
+      double Lv2VacBwd_Z1[Lv2VacBwd3_num1];
+      Lv2VacBwd_Z1[0] = 0.0;
+      Lv2VacBwd_Z1[1] = -Lv2VacBwd_D3 + Lv2VacBwd_L2 - 0.03 * SafetyLength;
+      double Lv2VacBwd_rI1[Lv2VacBwd3_num1];
+      for (int tmpn = 0; tmpn < Lv2VacBwd3_num1; tmpn++)
+      { Lv2VacBwd_rI1[tmpn] = 0.0; }
+      double Lv2VacBwd_rO1[Lv2VacBwd3_num1];
+      Lv2VacBwd_rO1[0] = Lv2VacBwd_R3;
+      Lv2VacBwd_rO1[1] = Lv2VacBwd_R3;
+      //<----------------
+      //------------> Policone part
+      double Lv2VacBwd_Z2[Lv2VacBwd3_num2];
+      Lv2VacBwd_Z2[0] = -Lv2VacBwd_D3 + Lv2VacBwd_L2;
+      Lv2VacBwd_Z2[1] = -Lv2VacBwd_D3;
+      Lv2VacBwd_Z2[2] = -Lv2VacBwd_D3 - Lv2VacBwd_L3;
+      double Lv2VacBwd_rI2[Lv2VacBwd3_num2];
+      for (int tmpn = 0; tmpn < Lv2VacBwd3_num2; tmpn++)
+      { Lv2VacBwd_rI2[tmpn] = 0.0; }
+      double Lv2VacBwd_rO2[Lv2VacBwd3_num2];
+      Lv2VacBwd_rO2[0] = Lv2VacBwd_R3;
+      Lv2VacBwd_rO2[1] = Lv2VacBwd_R4;
+      Lv2VacBwd_rO2[2] = Lv2VacBwd_R4;
+      //<--------------
       //
-      double Lv2VacBwd_Z[Lv2VacBwd3_num];
-      Lv2VacBwd_Z[0] = 0.0;
-      Lv2VacBwd_Z[1] = -Lv2VacBwd_D3 + Lv2VacBwd_L2;
-      Lv2VacBwd_Z[2] = -Lv2VacBwd_D3;
-      Lv2VacBwd_Z[3] = -Lv2VacBwd_D3 - Lv2VacBwd_L3;
-      double Lv2VacBwd_rI[Lv2VacBwd3_num];
-      for (int tmpn = 0; tmpn < Lv2VacBwd3_num; tmpn++)
-      { Lv2VacBwd_rI[tmpn] = 0.0; }
-      double Lv2VacBwd_rO[Lv2VacBwd3_num];
-      Lv2VacBwd_rO[0] = Lv2VacBwd_R3;
-      Lv2VacBwd_rO[1] = Lv2VacBwd_R3;
-      Lv2VacBwd_rO[2] = Lv2VacBwd_R4;
-      Lv2VacBwd_rO[3] = Lv2VacBwd_R4;
 
       //define geometry
       // Part 1
@@ -728,8 +764,12 @@ namespace Belle2 {
       transform_Lv2VacBwdPart2_2 = transform_Lv2VacBwdPart2_2 * G4RotateY3D(-Lv2VacBwd_A2 / 2.);
       G4IntersectionSolid* geo_Lv2VacBwdPart2 = new G4IntersectionSolid("geo_Lv2VacBwdPart2_name", geo_Lv2VacBwdPart2_1, geo_Lv2VacBwdPart2_2, transform_Lv2VacBwdPart2_2);
       // Part 3
-      G4Polycone* geo_Lv2VacBwdPart3 = new G4Polycone("geo_Lv2VacBwdPart3", 0, 2 * M_PI, Lv2VacBwd3_num, Lv2VacBwd_Z, Lv2VacBwd_rI, Lv2VacBwd_rO);
-
+//      G4Polycone* geo_Lv2VacBwdPart3 = new G4Polycone("geo_Lv2VacBwdPart3", 0, 2 * M_PI, Lv2VacBwd3_num, Lv2VacBwd_Z, Lv2VacBwd_rI, Lv2VacBwd_rO);
+      G4Polycone* geo_Lv2VacBwdPart3_1 = new G4Polycone("geo_Lv2VacBwdPart3_1", 0, 2 * M_PI, Lv2VacBwd3_num1, Lv2VacBwd_Z1, Lv2VacBwd_rI1, Lv2VacBwd_rO1);
+      G4Polycone* geo_Lv2VacBwdPart3_2 = new G4Polycone("geo_Lv2VacBwdPart3_2", 0, 2 * M_PI, Lv2VacBwd3_num2, Lv2VacBwd_Z2, Lv2VacBwd_rI2, Lv2VacBwd_rO2);
+      G4Transform3D transform_Lv2VacBwdPart3_1 = G4Translate3D(-0.5, 0., 0.);
+      transform_Lv2VacBwdPart3_1 = transform_Lv2VacBwdPart3_1  * G4RotateY3D(-Lv2VacBwd_A1 + A11);
+      G4UnionSolid* geo_Lv2VacBwdPart3 = new G4UnionSolid("geo_Lv2VacBwdPart3_name", geo_Lv2VacBwdPart3_2, geo_Lv2VacBwdPart3_1, transform_Lv2VacBwdPart3_1);
       // Part1+2+3
       //tmp begin
       G4Transform3D transform_Lv2VacBwdPart1 = G4Translate3D((Lv2VacBwd_D1 * sin(Lv2VacBwd_A1) + Lv2VacBwd_D2 * sin(2.*Lv2VacBwd_A1)) / 2. ,
@@ -1082,6 +1122,14 @@ namespace Belle2 {
       //-   put volume
       setColor(*logi_Lv2VacLERDwn, cLv2VacLERDwn.getString("Color", "#CCCCCC"));
       new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_Lv2VacLERDwn, "phys_Lv2VacLERDwn_name", logi_Lv1TaLERDwn, false, 0);
+
+      logi_Lv3AuCoat->SetSensitiveDetector(new BkgSensitiveDetector("IR", 11));
+      logi_Lv1TaFwd->SetSensitiveDetector(new BkgSensitiveDetector("IR", 12));
+      logi_Lv1TaBwd->SetSensitiveDetector(new BkgSensitiveDetector("IR", 13));
+      logi_Lv1TaLERUp->SetSensitiveDetector(new BkgSensitiveDetector("IR", 14));
+      logi_Lv1TaHERDwn->SetSensitiveDetector(new BkgSensitiveDetector("IR", 15));
+      logi_Lv1TaHERUp->SetSensitiveDetector(new BkgSensitiveDetector("IR", 16));
+      logi_Lv1TaLERDwn->SetSensitiveDetector(new BkgSensitiveDetector("IR", 17));
 
       //-
       //----------

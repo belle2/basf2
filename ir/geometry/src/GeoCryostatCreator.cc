@@ -656,7 +656,7 @@ namespace Belle2 {
         string logi_polycone_name = "logi_" + name + "_name";
         polycone.logi =  new G4LogicalVolume(polycone.geo, mat_polycone, logi_polycone_name);
         setColor(*polycone.logi, cPolycone.getString("Color", "#CC0000"));
-        setVisibility(*polycone.logi, cPolycone.getBool("Visibility", true));
+        setVisibility(*polycone.logi, cPolycone.getBool("Visibility", false));
 
         //put volume
         string phys_polycone_name = "phys_" + name + "_name";

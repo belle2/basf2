@@ -26,7 +26,7 @@
 #pragma link C++ class vector < pair < unsigned int, vector < pair <unsigned int, pair < double, double > > > > >+;
 #pragma link C++ class pair < unsigned int, vector < pair < unsigned int, vector < pair <unsigned int, pair < double, double > > > > > >+;
 #pragma link C++ class vector < pair < unsigned int, vector < pair < unsigned int, vector < pair <unsigned int, pair < double, double > > > > > > >+;
-#pragma link C++ class list < double >+;
+//#pragma link C++ class list < double >+;
 #pragma link C++ class pair <unsigned int, list < double > >+;
 #pragma link C++ class vector < pair <unsigned int, list < double > > >+;
 #pragma link C++ class pair < unsigned int, vector < pair <unsigned int, list < double > > > >+;
@@ -42,5 +42,10 @@
 #pragma link C++ class Belle2::ROIid;
 #pragma link C++ class Belle2::ROIpayload;
 #pragma link C++ class Belle2::PXDIntercept;
+#pragma link C++ class Belle2::RelationsInterface<genfit::Track>+;
+#pragma link C++ class set < unsigned short >+;
+#pragma link C++ class Belle2::RecoTrack+;
+
+
 
 #endif

@@ -19,14 +19,16 @@
 
 namespace Belle2 {
 
-  /** \addtogroup dataobjects
-   * @{
+  /**
+   * Trigger Timing Information for a fired bit.
    */
-
   class TRGTiming : public RelationsObject {
 
   private:
 
+    /**
+     * version of this code
+     */
     static const int c_Version = 0;
 
   public:

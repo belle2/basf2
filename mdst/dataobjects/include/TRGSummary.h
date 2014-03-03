@@ -19,17 +19,22 @@
 
 namespace Belle2 {
 
-  /** \addtogroup dataobjects
-   * @{
+  /**
+   * Trigger Summary Information
    */
-
   class TRGSummary : public RelationsObject {
 
   private:
 
+    /**
+     * version of this code
+     */
     static const int c_Version = 0;
 
   public:
+
+    /*! default constructor: xxx */
+    TRGSummary() {;}
 
     /*! constructor: xxx */
     TRGSummary(unsigned int inputBits[10],
@@ -43,9 +48,6 @@ namespace Belle2 {
       }
       m_timTypeBits = timTypeBits;
     }
-
-    /*! default constructor: xxx */
-    TRGSummary() {;}
 
     /** Destructor.
      */

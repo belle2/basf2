@@ -301,7 +301,7 @@ namespace Belle2 {
 
 
     /**< Class definition */
-    ClassDef(ECLCluster, 1);
+    ClassDef(ECLCluster, 1); /**< Needed to make objects storable */
 
 
   };

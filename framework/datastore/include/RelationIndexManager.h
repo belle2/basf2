@@ -79,6 +79,20 @@ namespace Belle2 {
     /** Same for copy-constructor. */
     RelationIndexManager(const RelationIndexManager&) { }
 
+    /** if the index exists in the cache, it is returned; otherwise NULL.
+     *
+     * The index is not rebuilt, which makes this mostly useful to do minor changes to the index in DataStore::addRelation().
+     */
+    template<class FROM, class TO> RelationIndexContainer<FROM, TO>* getIndexIfExists(const std::string& name, DataStore::EDurability durability) const {
+      const RelationMap& relations =  m_cache[durability];
+      RelationMap::const_iterator it = relations.find(name);
+      if (it != relations.end()) {
+        return dynamic_cast< RelationIndexContainer<FROM, TO>* >(it->second);
+      } else {
+        return nullptr;
+      }
+    }
+
     /** Clean cache on exit. */
     ~RelationIndexManager() {
       for (int i = 0; i < DataStore::c_NDurabilityTypes; i++)
@@ -91,6 +105,9 @@ namespace Belle2 {
     typedef boost::array<RelationMap, DataStore::c_NDurabilityTypes> RelationCache;
     /** Cache for all Containers */
     RelationCache m_cache;
+
+    /** only DataStore should be able to get non-const indices. */
+    friend class DataStore;
   };
 
 } // end namespace Belle2

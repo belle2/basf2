@@ -13,6 +13,7 @@
 #include <framework/logging/Logger.h>
 #include <framework/dataobjects/RelationContainer.h>
 #include <framework/datastore/RelationIndex.h>
+#include <framework/datastore/RelationIndexManager.h>
 #include <framework/datastore/RelationsObject.h>
 #include <framework/datastore/StoreAccessorBase.h>
 
@@ -287,7 +288,16 @@ bool DataStore::addRelation(const TObject* fromObject, DataStore::StoreEntry*& f
   RelationContainer* relContainer = static_cast<RelationContainer*>(entry->ptr);
   TClonesArray& relations = relContainer->elements();
   new(relations.AddrAt(relations.GetLast() + 1)) RelationElement(fromIndex, toIndex, weight);
-  relContainer->setModified(true);
+
+  RelationIndexContainer<TObject, TObject>* relIndex = RelationIndexManager::Instance().getIndexIfExists<TObject, TObject>(relationsName, c_Event);
+  if (relIndex) {
+    // add it to index (so we avoid expensive rebuilding later)
+    relIndex->index().insert(RelationIndex<TObject, TObject>::Element(fromIndex, toIndex, fromObject, toObject, weight));
+  } else {
+    //mark for rebuilding later on
+    relContainer->setModified(true);
+  }
+
   return true;
 }
 

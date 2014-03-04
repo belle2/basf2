@@ -91,7 +91,9 @@ namespace Belle2 {
     operator bool() const { return m_valid; }
 
     /** Get the index. */
-    const ElementIndex&  index()                 const { return m_index; }
+    const ElementIndex&  index() const { return m_index; }
+    /** Get the index. */
+    ElementIndex&  index() { return m_index; }
 
     /** Get the AccessorParams of the underlying relation. */
     const AccessorParams& getAccessorParams()     const { return m_storeRel; }

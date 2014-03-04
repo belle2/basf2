@@ -9,8 +9,6 @@
  **************************************************************************/
 
 #pragma once
-#ifndef WireID_H
-#define WireID_H
 
 #include <framework/logging/Logger.h>
 
@@ -155,7 +153,7 @@ namespace Belle2 {
     unsigned short m_eWire;
 
     /** ROOT Macro.*/
-    ClassDef(WireID, 1);
+    ClassDef(WireID, 0);
   };
 }
-#endif /* WireID_H */
+

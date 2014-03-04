@@ -11,11 +11,12 @@
 using namespace std;
 using namespace Belle2;
 
-#define NOT_USE_SOCKETLIB
+
 //#define NOT_SEND
 //#define DUMMY_DATA
 #define TIME_MONITOR
 
+#define NONSTOP
 
 //#define DEBUG
 
@@ -71,15 +72,7 @@ void SerializerModule::initialize()
 
 
 #ifndef NOT_SEND
-#ifdef NOT_USE_SOCKETLIB
-
   Accept();
-#else
-
-  // Open Socket
-  m_sock = new EvtSocketSend(m_dest, m_port_to);
-  m_socket =  m_sock->socket()->sock();
-#endif
 #endif
 
   // Create Message Handler
@@ -325,7 +318,6 @@ int SerializerModule::Send(int socket, char* buf, int size_bytes)
 void SerializerModule::Accept()
 {
 
-#ifdef NOT_USE_SOCKETLIB
   //
   // Connect to cprtb01
   //
@@ -399,25 +391,20 @@ void SerializerModule::Accept()
     B2INFO("Done.");
 
     // set timepout option
-//     struct timeval timeout;
-//     timeout.tv_sec = 100;
-//     timeout.tv_usec = 0;
-//     ret = setsockopt(fd_accept, SOL_SOCKET, SO_SNDTIMEO, &timeout, (socklen_t)sizeof(timeout));
-//     if (ret < 0) {
-//       char temp_char[100] = "Failed to set TIMEOUT. Exiting..."; print_err.PrintError(temp_char, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-//       exit(-1);
-//     }
+    //     struct timeval timeout;
+    //     timeout.tv_sec = 100;
+    //     timeout.tv_usec = 0;
+    //     ret = setsockopt(fd_accept, SOL_SOCKET, SO_SNDTIMEO, &timeout, (socklen_t)sizeof(timeout));
+    //     if (ret < 0) {
+    //       char temp_char[100] = "Failed to set TIMEOUT. Exiting..."; print_err.PrintError(temp_char, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+    //       exit(-1);
+    //     }
   }
 
-//   int flag = 1;
-//   ret = setsockopt(fd_accept, IPPROTO_TCP, TCP_NODELAY, (char*)&flag, sizeof(flag) );
+  //   int flag = 1;
+  //   ret = setsockopt(fd_accept, IPPROTO_TCP, TCP_NODELAY, (char*)&flag, sizeof(flag) );
   m_socket = fd_accept;
 
-#else
-  // Open receiver sockets
-  m_recv.push_back(new EvtSocketRecv(m_base_port + i));
-  m_socket.push_back(m_recv[ i ]->socket()->sender());
-#endif
   return;
 
 }
@@ -501,12 +488,9 @@ void SerializerModule::event()
     if (m_start_flag == 0) {
       B2INFO("SerializerPC: Sending the 1st packet...");
     }
-#ifdef NOT_USE_SOCKETLIB
+
     m_totbytes += sendByWriteV(raw_dblkarray[ j ]);
-#else //NOT_USE_SOCKETLIB
-    // Use basf2 send library
-    m_sock->send_buffer(m_size_byte, (char*)buf);
-#endif //NOT_USE_SOCKETLIB
+
     if (m_start_flag == 0) {
       B2INFO("Done. ");
       m_start_flag = 1;
@@ -526,23 +510,23 @@ void SerializerModule::event()
   //
   if (n_basf2evt % 1000 == 0) {
 
-//     double cur_time = getTimeSec();
-//     double total_time = cur_time - m_start_time;
-//     double interval = cur_time - m_prev_time;
-//     if (n_basf2evt != 0) {
-//       double multieve = (1. / interval);
-//       if (multieve > 2.) multieve = 2.;
-//     }
-//     time_t timer;
-//     struct tm* t_st;
-//     time(&timer);
-//     t_st = localtime(&timer);
-//     printf( "[DEBUG] Event %d TotSent  %.1lf [MB] ElapsedTime %.1lf [s] RcvdRate %.2lf [MB/s] %s",
-//            n_basf2evt, m_totbytes / 1.e6, total_time, (m_totbytes - m_prev_totbytes) / interval / 1.e6, asctime(t_st));
-//     fflush(stderr);
-//     m_prev_time = cur_time;
-//     m_prev_totbytes = m_totbytes;
-//     m_prev_nevt = n_basf2evt;
+    //     double cur_time = getTimeSec();
+    //     double total_time = cur_time - m_start_time;
+    //     double interval = cur_time - m_prev_time;
+    //     if (n_basf2evt != 0) {
+    //       double multieve = (1. / interval);
+    //       if (multieve > 2.) multieve = 2.;
+    //     }
+    //     time_t timer;
+    //     struct tm* t_st;
+    //     time(&timer);
+    //     t_st = localtime(&timer);
+    //     printf( "[DEBUG] Event %d TotSent  %.1lf [MB] ElapsedTime %.1lf [s] RcvdRate %.2lf [MB/s] %s",
+    //            n_basf2evt, m_totbytes / 1.e6, total_time, (m_totbytes - m_prev_totbytes) / interval / 1.e6, asctime(t_st));
+    //     fflush(stderr);
+    //     m_prev_time = cur_time;
+    //     m_prev_totbytes = m_totbytes;
+    //     m_prev_nevt = n_basf2evt;
   }
   n_basf2evt++;
 }

@@ -51,6 +51,7 @@ namespace Belle2 {
       m_timeCPU(0),
       m_nRun(0),
       m_nEvent(0),
+      m_maxQE(0),
       m_arichgp(ARICHGeometryPar::Instance())
     {
       // Set description()

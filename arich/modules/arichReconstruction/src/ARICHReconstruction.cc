@@ -35,8 +35,9 @@ using namespace boost;
 namespace Belle2 {
   namespace arich {
 
-    ARICHReconstruction::ARICHReconstruction(int beamtest):
+    ARICHReconstruction::ARICHReconstruction(int storeHist, int beamtest):
       m_arichGeoParameters(ARICHGeometryPar::Instance()),
+      m_storeHist(storeHist),
       m_beamtest(beamtest),
       m_bkgLevel(0),
       m_trackPosRes(0),
@@ -45,8 +46,8 @@ namespace Belle2 {
       m_aeroMerit(0)
     {
       B2INFO("ARICHReconstruction::ARICHReconstruction()");
-      if (m_beamtest) {
-        m_hitstuple = new TNtuple("hits", "Btest Cherenkov angle", "n:agel:mir:thc:fic:x:y:z:tx:ty:tz:sx:sy");
+      if (m_storeHist) {
+        m_hitstuple = new TNtuple("hits", "Btest Cherenkov angle", "n:agel:mir:thc:fic:x:y:tx:ty:p");
         m_tracktuple = new TNtuple("tracks", "Btest tracks", "id:p:nexp:acc:ndet:le:lmu:lpi:lk:lp");
       }
     }
@@ -336,7 +337,7 @@ namespace Belle2 {
 
         ARICHTrack* track =  &arichTracks[i];
         // Reconstructed photons within expected cone
-        int nDetPhotons = 0;
+        int nDetPhotons[5] = {0, 0, 0, 0, 0};
         double padArea = padSize / Unit::m * padSize / Unit::m;
         int padNum = m_arichGeoParameters->getDetectorXPadNumber() * m_arichGeoParameters->getDetectorXPadNumber();
 
@@ -442,9 +443,9 @@ namespace Belle2 {
           int modID = h->getModuleID();
 
           TVector3 hitpos = m_arichGeoParameters->getChannelCenterGlob(modID, chID);
+          int nfoo[c_noOfHypotheses];
+          for (int iHyp = 0; iHyp < c_noOfHypotheses; iHyp++) { esigi[iHyp] = 0; nfoo[iHyp] = nDetPhotons[iHyp];}
 
-          for (int iHyp = 0; iHyp < c_noOfHypotheses; iHyp++) esigi[iHyp] = 0;
-          int nfoo = nDetPhotons;
           // loop over all arogel layers
           for (unsigned int iAerogel = 0; iAerogel < nAerogelLayers; iAerogel++) {
 
@@ -467,9 +468,8 @@ namespace Belle2 {
 
               if (th_cer > 0.5 || th_cer < 0.05) continue;
 
-              if (m_beamtest) m_hitstuple->Fill(ncount, iAerogel, mirr, th_cer, fi_cer, hitpos.x(), hitpos.y(), hitpos.z(), epoint.x(), epoint.y(), epoint.z() , edir.x(), edir.y());
-              if (m_beamtest < 3 && m_beamtest) continue;
-              if (fabs(th_cer - thetaCh[track->getIdentity()][0]) < 0.042 && iAerogel == 0 && nfoo == nDetPhotons && th_cer > 0.07) nDetPhotons++;
+              if (m_storeHist) m_hitstuple->Fill(ncount, iAerogel, mirr, th_cer, fi_cer, hitpos.x(), hitpos.y(), epoint.x(), epoint.y(), track->getReconstructedMomentum());
+              if (m_beamtest) continue;
               if (fi_cer < 0) fi_cer += 2 * M_PI;
               double fii = fi_cer;
               if (mirr > 0) {
@@ -479,6 +479,8 @@ namespace Belle2 {
 
               // loop over all particle hypotheses
               for (int iHyp = 0; iHyp < c_noOfHypotheses; iHyp++) {
+
+                if (fabs(th_cer - thetaCh[iHyp][iAerogel]) < 0.042 && nfoo[iHyp] == nDetPhotons[iHyp] && th_cer > 0.07) nDetPhotons[iHyp]++;
 
                 // track a photon from the mean emission point to the detector surface
                 TVector3  photonDirection1 = setThetaPhi(thetaCh[iHyp][iAerogel], fi_cer);  // particle system
@@ -550,15 +552,15 @@ namespace Belle2 {
         //******************************************
         for (int iHyp = 0; iHyp < c_noOfHypotheses; iHyp++) {
           track->setExpectedPhotons(iHyp, nSig[iHyp][nAerogelLayers]); // sum for all agels
+          track->setDetectedPhotons(iHyp, nDetPhotons[iHyp]);
         }
-        track->setDetectedPhotons(nDetPhotons);
         track->setLikelihood(logL);
         //**************************************
 
-        if (m_beamtest) {
+        if (m_storeHist) {
           int id = track->getIdentity();
           if (id < 0) id = 0;
-          m_tracktuple->Fill(id, track->getReconstructedMomentum(), nSig[2][nAerogelLayers], acceptance[2][0], nDetPhotons, logL[0], logL[1], logL[2], logL[3], logL[4]);
+          m_tracktuple->Fill(id, track->getReconstructedMomentum(), nSig[id][nAerogelLayers], acceptance[id][0], nDetPhotons[id], logL[0], logL[1], logL[2], logL[3], logL[4]);
         }
 
       } // for (unsigned  int i=0; i< nTracks; i++){

@@ -57,6 +57,7 @@ namespace Belle2 {
       m_timeCPU(0),
       m_nRun(0),
       m_nEvent(0),
+      m_storeHist(0),
       m_beamtest(0),
       m_file(NULL)
     {
@@ -64,16 +65,17 @@ namespace Belle2 {
       setDescription("ARICHReconstructor");
       setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
       std::vector<double> defMerit;
-      defMerit.push_back(30.0);
-      defMerit.push_back(30.0);
-      defMerit.push_back(30.0);
+      defMerit.push_back(24.0);
+      defMerit.push_back(24.0);
+      defMerit.push_back(24.0);
       // Add parameters
-      addParam("beamtest", m_beamtest, "ARICH beamtest switch (beamtest>=1)", 0);
+      addParam("beamtest", m_beamtest, "ARICH beamtest switch (beamtest data=1, beamtest MC=2)", 0);
+      addParam("storeHist", m_storeHist, "Store histograms with individual photon information (cherenkov angle distribution)", 0);
       addParam("MCColName", m_mcColName, "MCParticles collection name", string(""));
       addParam("tracksColName", m_tracksColName, "Tracks collection name", string(""));
       addParam("extHitsColName", m_extHitsColName, "ExtHits collection name", string(""));
       addParam("outColName", m_outColName, "ARICHLikelihoods collection name",  string(""));
-      addParam("outfileName", m_outfileName, "File to store single photon information",  string("beamtest.root"));
+      addParam("outfileName", m_outfileName, "File to store individual photon information",  string("thc.root"));
       addParam("trackPositionResolution", m_trackPositionResolution, "Resolution of track position on aerogel plane", 1.0 * Unit::mm);
       addParam("trackAngleResolution", m_trackAngleResolution, "Resolution of track direction angle on aerogel plane", 1.0 * Unit::mrad);
       addParam("backgroundLevel", m_backgroundLevel, "Background level in photon hits per m^2", 50.0);
@@ -90,10 +92,10 @@ namespace Belle2 {
     void ARICHReconstructorModule::initialize()
     {
       // Initialize variables
-      if (m_beamtest) m_file = new TFile(m_outfileName.c_str(), "RECREATE");
+      if (m_storeHist) m_file = new TFile(m_outfileName.c_str(), "RECREATE");
       m_nRun    = 0 ;
       m_nEvent  = 0 ;
-      m_ana = new ARICHReconstruction(m_beamtest);
+      m_ana = new ARICHReconstruction(m_storeHist, m_beamtest);
       m_ana->setBackgroundLevel(m_backgroundLevel);
       m_ana->setTrackPositionResolution(m_trackPositionResolution);
       m_ana->setTrackAngleResolution(m_trackAngleResolution);
@@ -152,13 +154,14 @@ namespace Belle2 {
           ARICHTrack* track = &arichTracks[iTrack];
           double likelihoods[5];
           double expectedPhotons[5];
+          int detectedPhotons[5];
           track->getLikelihood(likelihoods);
           track->getExpectedPhotons(expectedPhotons);
-          double detectedPhotons = track->getDetectedPhotons();
+          track->getDetectedPhotons(detectedPhotons);
           B2DEBUG(50, "Number of expected photons " << expectedPhotons[0]);
           B2DEBUG(50, "Number of detected photons " << detectedPhotons);
 
-          new(arichLikelihoods.nextFreeAddress()) ARICHLikelihood(1, likelihoods, detectedPhotons, expectedPhotons);
+          new(arichLikelihoods.nextFreeAddress()) ARICHLikelihood(1, likelihoods, detectedPhotons[2], expectedPhotons);
 
           // Add relations
           int last = arichLikelihoods.getEntries() - 1;
@@ -223,10 +226,11 @@ namespace Belle2 {
           ARICHTrack* track = &arichTracks[iTrack];
           double expectedPhotons[5];
           double likelihoods[5];
+          int detectedPhotons[5];
           track->getExpectedPhotons(expectedPhotons);
           track->getLikelihood(likelihoods);
-          int detectedPhotons = track->getDetectedPhotons();
-          new(arichLikelihoods.nextFreeAddress()) ARICHLikelihood(1, likelihoods, detectedPhotons, expectedPhotons);
+          track->getDetectedPhotons(detectedPhotons);
+          new(arichLikelihoods.nextFreeAddress()) ARICHLikelihood(1, likelihoods, detectedPhotons[2], expectedPhotons);
           int last = arichLikelihoods.getEntries() - 1;
           int aeroIndex = track->getAeroIndex();
           if (aeroIndex >= 0) {

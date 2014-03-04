@@ -99,6 +99,11 @@ namespace Belle2 {
         m_aeroZPosition[i] = 0; m_aeroThickness[i] = 0;
       }
       m_nPads = 0;
+      m_ColEffi = 0.;
+      m_LambdaFirst = 0.;
+      m_LambdaStep = 0.;
+      m_NpointsQE = 0;
+      for (int i = 0; i < MAXPTS_QE; i++) {m_QE[i] = 0.;}
     }
 
     void ARICHGeometryPar::read(const GearDir& content)

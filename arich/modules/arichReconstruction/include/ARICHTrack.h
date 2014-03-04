@@ -47,12 +47,12 @@ namespace Belle2 {
       m_trackID(-1),
       m_extHitID(-1),
       m_identity(-1),
-      m_aeroIndex(-1),
-      m_detectedPhotons(-1) {
+      m_aeroIndex(-1) {
       /*! does nothing */
       for (int i = 0; i < c_noOfHypotheses; i++) {
         m_lkh[i] = 0;
         m_expectedPhotons[i] = 0;
+        m_detectedPhotons[i] = 0;
         m_acc[i] = 0;
       }
     }
@@ -83,11 +83,11 @@ namespace Belle2 {
       m_trackID(trackID),
       m_extHitID(-1),
       m_identity(-1),
-      m_aeroIndex(-1),
-      m_detectedPhotons(-1) {
+      m_aeroIndex(-1) {
       for (int i = 0; i < c_noOfHypotheses; i++) {
         m_lkh[i]  = 0;
         m_expectedPhotons[i] = 0;
+        m_detectedPhotons[i] = 0;
         m_acc[i]  = 0;
       }
     };
@@ -152,13 +152,17 @@ namespace Belle2 {
     //! returns expected number of detected photons for "i" particle hypothesis (here i is particle index: 0 electron, 1 muon, 2 pion, 3 kaon, 4 proton)
     double getExpectedPhotons(int i) const {return m_expectedPhotons[i]; };
 
-    //! calculates the expected no. of photons. at the moment, impelemnted for true particle (MC->getPDGCode)
+    //! returns expected number of detected photons for all particle hypotheses
     void getExpectedPhotons(double nphot[]) {nphot[0] = m_expectedPhotons[0]; nphot[1] = m_expectedPhotons[1]; nphot[2] = m_expectedPhotons[2]; nphot[3] = m_expectedPhotons[3]; nphot[4] = m_expectedPhotons[4]; };
 
-    //! returns detected no. of photons
-    int getDetectedPhotons(void) {return m_detectedPhotons;};
+    //! returns no. of detected photons in +/- 3 sigma band around the expected cherenkov angle for "i"-th particle hypothesis (here i is particle index: 0 electron, 1 muon, 2 pion, 3 kaon, 4 proton)
+    int getDetectedPhotons(int i) const {return m_detectedPhotons[i];};
 
-    //! returns geometrical acceptance of emitted Cherenkov photos by particle "i"(here i is particle index: 0 electron, 1 muon, 2 pion, 3 kaon, 4 proton)
+    //! returns expected number of detected photons for all particle hypotheses
+    void getDetectedPhotons(int nphot[]) {nphot[0] = m_detectedPhotons[0]; nphot[1] = m_detectedPhotons[1]; nphot[2] = m_detectedPhotons[2]; nphot[3] = m_detectedPhotons[3]; nphot[4] = m_detectedPhotons[4]; };
+
+
+    //! returns geometrical acceptance of emitted Cherenkov photons by particle "i" (here i is particle index: 0 electron, 1 muon, 2 pion, 3 kaon, 4 proton)
     double getGeometricalAcceptance(int i) const {return m_acc[i]; };
 
     //! sets value of likelihood function for particle hypothesis "i" to "val" (here i is particle index: 0 electron, 1 muon, 2 pion, 3 kaon, 4 proton)
@@ -170,11 +174,11 @@ namespace Belle2 {
     //! sets theoretically expected number of photons for i-th particle hypothesis (here i is particle index: 0 electron, 1 muon, 2 pion, 3 kaon, 4 proton)
     void setExpectedPhotons(int i, double val) {m_expectedPhotons[i] = val; };
 
-    //! sets detected number of photons for certain hypothesis
+    //! sets detected number of photons for i-th particle hypothesis
     /* Photons are detected if they are found to be in the theoretically expected Cherenkov cone
-     * within +-50mrad (for now, fixed).
+     * within +/- 42mrad (~3sigma, for now fixed).
      */
-    void setDetectedPhotons(double val) {m_detectedPhotons = val;};
+    void setDetectedPhotons(int i, double val) {m_detectedPhotons[i] = val;};
 
     //! sets the reconstructed value of track parameters.
     // "r" is position of track, "dir" direction and "p" momentum of track on aerogel plane.
@@ -245,7 +249,7 @@ namespace Belle2 {
 
     double  m_lkh[c_noOfHypotheses];  /**< Value of likelihood function for different particle hypotheses. */
     double  m_expectedPhotons[c_noOfHypotheses]; /**< Number of theoretically expected photons for different particle hypotheses.  */
-    int     m_detectedPhotons;        /**< Number of detected photons in expected cone. */
+    int     m_detectedPhotons[c_noOfHypotheses]; /**< Number of detected photons in expected cone. */
     double  m_acc[c_noOfHypotheses];  /**< Geometrical acceptance of expected cherenkov ring for different particle hypotheses. */
 
 

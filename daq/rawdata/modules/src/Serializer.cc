@@ -11,8 +11,6 @@
 using namespace std;
 using namespace Belle2;
 
-
-//#define NOT_SEND
 //#define DUMMY_DATA
 #define TIME_MONITOR
 
@@ -70,10 +68,7 @@ void SerializerModule::initialize()
     m_cfg_sta[ 0 ] = 1; // Status bit is 1 : ready before accept()
   }
 
-
-#ifndef NOT_SEND
   Accept();
-#endif
 
   // Create Message Handler
   m_msghandler = new MsgHandler(m_compressionLevel);
@@ -484,7 +479,7 @@ void SerializerModule::event()
     //
     // Send data
     //
-#ifndef NOT_SEND
+
     if (m_start_flag == 0) {
       B2INFO("SerializerPC: Sending the 1st packet...");
     }
@@ -496,8 +491,6 @@ void SerializerModule::event()
       m_start_flag = 1;
     }
 
-    // Not send data
-#endif //NOT_SEND
   }
 
 #ifdef TIME_MONITOR

@@ -34,6 +34,7 @@ class FitConfiguration;
  *  Totally missing:
  *   - Fitting functionality
  *   - Storing of which Trackfinders have contributed hits to the RecoTrack
+ *     and the exact relation with the HitInfoManager.
  *   - Sorting magic.
  */
 namespace Belle2 {

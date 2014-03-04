@@ -44,6 +44,16 @@ namespace Belle2 {
     TMVAExpert(std::string identifier, std::string method);
 
     /**
+     * Disallow copy
+     */
+    TMVAExpert(const TMVAExpert&) = delete;
+
+    /**
+     * Disallow assign
+     */
+    TMVAExpert& operator=(const TMVAExpert&) = delete;
+
+    /**
      * Destructor, closes outputFile, deletes TMVA::Reader
      */
     ~TMVAExpert();

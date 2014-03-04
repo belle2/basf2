@@ -81,6 +81,16 @@ namespace Belle2 {
     TMVATeacher(std::string identifier, std::vector<std::string> variables, std::string target, std::vector<TMVAMethod> methods);
 
     /**
+     * Disallow copy
+     */
+    TMVATeacher(const TMVATeacher&) = delete;
+
+    /**
+     * Disallow assign
+     */
+    TMVATeacher& operator=(const TMVATeacher&) = delete;
+
+    /**
      * Destructor, closes outputFile, deletes TMVA::Factory
      */
     ~TMVATeacher();

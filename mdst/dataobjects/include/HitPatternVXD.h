@@ -30,7 +30,7 @@ namespace Belle2 {
     HitPatternVXD();
 
     /** Initialize the pattern with some short.*/
-    HitPatternVXD(const unsigned short& initValue) : m_pattern(initValue)
+    HitPatternVXD(const unsigned int initValue) : m_pattern(initValue)
     {}
 
     /** Getter for single Layer.
@@ -51,7 +51,7 @@ namespace Belle2 {
      *  and if it was taken during gated mode running.
      *  1-4 = normal hit, 5-8 = rescue hit, 9-12 = normal gated mode, 13-16 = rescue during gated mode;
      */
-    std::bitset<16> m_pattern;
+    std::bitset<32> m_pattern;
 
     //-----------------------------------------------------------------------------------
     /** ROOTification for python access, but without I/O. */

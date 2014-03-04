@@ -10,6 +10,9 @@
 
 #pragma once
 
+#include <mdst/dataobjects/HitPatternCDC.h>
+#include <mdst/dataobjects/HitPatternVXD.h>
+
 #include <framework/datastore/RelationsObject.h>
 #include <framework/gearbox/Const.h>
 
@@ -31,7 +34,7 @@ namespace Belle2 {
       m_cdcHitsName(cdcHitsName), m_svdHitsName(svdHitsName), m_pxdHitsName(pxdHitsName)
     {}
 
-    //-------------------------------------- CDC Part -----------------------------------
+    //-------------------------------------- CDC Hit Handling ---------------------------
     //-----------------------------------------------------------------------------------
     /** Replacing the existing CDC indices with new indices.
      *
@@ -73,7 +76,20 @@ namespace Belle2 {
       m_cdcHitIndicesNegative.insert(cdcHitIndices.begin(), cdcHitIndices.end());
     }
 
-    //-------------------------------------- SVD Part -----------------------------------
+    /** Has the track any CDC Hits? */
+    bool hasCDCHits() {
+      return !(m_cdcHitIndicesPositive.empty() and m_cdcHitIndicesNegative.empty());
+    }
+
+    /** Fill HitPatternCDC with hits from track arm indicated by pseudoCharge. */
+    void fillHitPatternCDC(const short pseudoCharge);
+
+    /** Getter for the hit pattern of the CDC. */
+    HitPatternCDC getHitPatternCDC() {
+      return HitPatternCDC(m_hitPatternCDCInitializer);
+    }
+
+    //-------------------------------------- VXD Hit Handling ---------------------------
     //-----------------------------------------------------------------------------------
     /** Replacing the existing SVD indices with new indices.
      *
@@ -84,6 +100,17 @@ namespace Belle2 {
                           const short pseudocharge) {
       pseudocharge > 0 ?
       (m_svdHitIndicesPositive = svdHitIndices) : (m_svdHitIndicesNegative = svdHitIndices);
+    }
+
+    /** Replacing the existing PXD indices with new indices.
+     *
+     *  @param pseudocharge  Shall those indices be used for the positive (or negative)
+     *                       arm of the track.
+     */
+    void setPXDHitIndices(const std::set< unsigned short >& pxdHitIndices,
+                          const short pseudocharge) {
+      pseudocharge > 0 ?
+      (m_pxdHitIndicesPositive = pxdHitIndices) : (m_pxdHitIndicesNegative = pxdHitIndices);
     }
 
     /** Adding a single index to the set of SVD Indices.
@@ -100,33 +127,6 @@ namespace Belle2 {
               (m_svdHitIndicesNegative.insert(svdHitIndex))).second;
     }
 
-    /** Adding several SVD indices at the same time.
-     *
-     *  In this case a vector is chosen as input, as this might be the favorable type at
-     *  creation of the hit indices.
-     *  @param  pseudoCharge  Shall those indices be used for the positive (or negative)
-     *                        arm of the track.
-     */
-    void addSVDHitIndices(const std::vector< unsigned short >& svdHitIndices,
-                          const short pseudoCharge) {
-      pseudoCharge > 0 ?
-      m_svdHitIndicesPositive.insert(svdHitIndices.begin(), svdHitIndices.end()) :
-      m_svdHitIndicesNegative.insert(svdHitIndices.begin(), svdHitIndices.end());
-    }
-
-    //-------------------------------------- PXD Part -----------------------------------
-    //-----------------------------------------------------------------------------------
-    /** Replacing the existing PXD indices with new indices.
-     *
-     *  @param pseudocharge  Shall those indices be used for the positive (or negative)
-     *                       arm of the track.
-     */
-    void setPXDHitIndices(const std::set< unsigned short >& pxdHitIndices,
-                          const short pseudocharge) {
-      pseudocharge > 0 ?
-      (m_svdHitIndicesPositive = pxdHitIndices) : (m_svdHitIndicesNegative = pxdHitIndices);
-    }
-
     /** Adding a single index to the set of SVD Indices.
      *
      *  @param   pseudoCharge  Shall this index be used for the positive (or negative)
@@ -139,6 +139,20 @@ namespace Belle2 {
       return (pseudoCharge > 0 ?
               (m_pxdHitIndicesPositive.insert(pxdHitIndex)) :
               (m_pxdHitIndicesNegative.insert(pxdHitIndex))).second;
+    }
+
+    /** Adding several SVD indices at the same time.
+     *
+     *  In this case a vector is chosen as input, as this might be the favorable type at
+     *  creation of the hit indices.
+     *  @param  pseudoCharge  Shall those indices be used for the positive (or negative)
+     *                        arm of the track.
+     */
+    void addSVDHitIndices(const std::vector< unsigned short >& svdHitIndices,
+                          const short pseudoCharge) {
+      pseudoCharge > 0 ?
+      m_svdHitIndicesPositive.insert(svdHitIndices.begin(), svdHitIndices.end()) :
+      m_svdHitIndicesNegative.insert(svdHitIndices.begin(), svdHitIndices.end());
     }
 
     /** Adding several PXD indices at the same time.
@@ -155,6 +169,29 @@ namespace Belle2 {
       m_svdHitIndicesNegative.insert(pxdHitIndices.begin(), pxdHitIndices.end());
     }
 
+    /** Has the track SVD hits? */
+    bool hasSVDHits() {
+      return !(m_svdHitIndicesPositive.empty() and m_svdHitIndicesNegative.empty());
+    }
+
+    /** Has the track PXD hits? */
+    bool hasPXDHits() {
+      return !(m_pxdHitIndicesPositive.empty() and m_pxdHitIndicesNegative.empty());
+    }
+
+    /** Has the track VXD hits? */
+    bool hasVXDHits() {
+      return (hasSVDHits() or hasPXDHits());
+    }
+
+    /** Fill HitPatternVXD with hits from track arm indicated by pseudoCharge. */
+    void fillHitPatternVXD(const short pseudoCharge);
+
+    /** Getter for the hit pattern of the VXD. */
+    HitPatternVXD getHitPatternVXD() {
+      return HitPatternVXD(m_hitPatternVXDInitializer);
+    }
+
     //-------------------------------------- General hit handling -----------------------
     //-----------------------------------------------------------------------------------
     /** Eliminating indices from this RecoTrack.
@@ -168,7 +205,20 @@ namespace Belle2 {
     void resetHitIndices(const short pseudoCharge,
                          const Const::EDetector detector = Const::EDetector::invalidDetector);
 
+
   private:
+    //-------------------------------------- Hit Pattern Handling -----------------------
+    /** Member for initializing the information about hits in the CDC.
+     *
+     *  @sa HitPatternCDC
+     */
+    unsigned long m_hitPatternCDCInitializer;
+
+    /** Member for initializing the information about hits in the VXD.
+     *
+     *  @sa HitPatternVXD
+     */
+    unsigned int m_hitPatternVXDInitializer;
 
     //needs some Comparator class, that makes sure, positively charged
 

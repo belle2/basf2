@@ -10,6 +10,12 @@
 
 #include <tracking/dataobjects/RecoTrack.h>
 
+#include <cdc/dataobjects/CDCHit.h>
+#include <cdc/dataobjects/WireID.h>
+
+#include <framework/datastore/StoreArray.h>
+
+
 using namespace Belle2;
 
 ClassImp(RecoTrack);
@@ -46,4 +52,28 @@ void RecoTrack::resetHitIndices(const short pseudoCharge,
        detector == Const::EDetector::invalidDetector) and
       pseudoCharge <= 0)
     m_pxdHitIndicesNegative.clear();
+}
+
+void RecoTrack::fillHitPatternCDC(const short pseudoCharge)
+{
+  StoreArray<CDCHit> cdcHits(m_cdcHitsName);
+  HitPatternCDC      hitPatternCDC(m_hitPatternCDCInitializer);
+  auto& cdcHitIndices =
+    pseudoCharge > 0 ? m_cdcHitIndicesPositive : m_cdcHitIndicesNegative;
+
+  for (auto hitPair : cdcHitIndices) {
+    // I need to initialize a WireID with the ID from the CDCHit to get the continuous layer ID.
+    WireID wireID(cdcHits[hitPair.first]->getID());
+    // Then I set the corresponding layer in the hit pattern.
+    if (hitPatternCDC.setLayer(wireID.getICLayer())) {
+      // Finally, if the layer was already set, I set the double layer marker.
+      // This total number of layers(56) + Super Layer Number
+      hitPatternCDC.setLayerFast(56 + wireID.getISuperLayer());
+    }
+  }
+}
+
+void RecoTrack::fillHitPatternVXD(const short pseudoCharge)
+{
+  //Do something similar as for the CDC
 }

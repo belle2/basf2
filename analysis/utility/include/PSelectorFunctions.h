@@ -11,10 +11,9 @@
 #ifndef PSELECTORFUNCTIONS_H
 #define PSELECTORFUNCTIONS_H
 
+#include <analysis/dataobjects/Particle.h>
 
 namespace Belle2 {
-
-  class Particle;
 
   namespace analysis {
 
@@ -382,6 +381,18 @@ namespace Belle2 {
      * @return product of signal probabilities of daughters
      */
     double prodChildProb(const Particle* particle);
+
+    /**
+     * function for PSelector
+     * @param part const pointer to Particle
+     * @return signal probability of daughter particle
+     */
+    template<unsigned int N>
+    double childProb(const Particle* particle)
+    {
+      return particle->getDaughter(N)->getExtraInfo("SignalProbability");
+    }
+
 
     /**
      * function for PSelector

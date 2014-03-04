@@ -19,6 +19,7 @@ def get(name):
     'name' can be either the name of the particle, or a pdg code.
     Will throw an LookupError of no such particle exists.
     """
+
     p = database.GetParticle(name)
     if not p:
         raise LookupError("No particle with name '%s'" % name)
@@ -44,6 +45,7 @@ def from_names(names):
     >>> pdg.from_names(["e+","e-","gamma"])
     [-11, 11, 22]
     """
+
     assert not isinstance(names, str), 'Argument is not a list!'
 
     return [from_name(n) for n in names]
@@ -67,6 +69,20 @@ def to_names(pdg_codes):
     >>> pdg.to_names([11,-11,-211,3212])
     ['e-', 'e+', 'pi-', 'Sigma0']
     """
+
     assert not isinstance(pdg_codes, int), 'Argument is not a list!'
 
     return [to_name(pdg) for pdg in pdg_codes]
+
+
+def conjugate(name):
+    """
+    Function to return name of conjugated particle
+    """
+
+    try:
+        return to_name(-from_name(name))
+    except LookupError, e:
+        return name
+
+

@@ -24,6 +24,7 @@
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
+#include <boost/algorithm/string.hpp>
 
 #include <algorithm>
 #include <string>
@@ -44,15 +45,31 @@ namespace Belle2 {
     TString methodName = TString(m_method) + TString(" method");
     TString weightfile = dir + prefix + TString("_") + TString(m_method) + TString(".weights.xml");
 
-    // Read out variables
+    // Read out variables and method type and name
     std::vector<std::string> variables;
     try {
       boost::property_tree::ptree pt;
       boost::property_tree::xml_parser::read_xml(std::string(weightfile), pt);
+
       for (const auto & f : pt.get_child("MethodSetup.Variables")) {
         if (f.first.data() != std::string("Variable")) continue;
         variables.push_back(f.second.get<std::string>("<xmlattr>.Expression"));
       }
+
+      // For plugin methods we load the TMVA::PluginName interface at runtime as via the TPluginManager of ROOT
+      std::string methodString = pt.get<std::string>("MethodSetup.<xmlattr>.Method");
+      size_t pos = methodString.find(':');
+      if (pos < std::string::npos) {
+        std::string type = methodString.substr(0, pos);
+        std::string name = methodString.substr(pos + 2, std::string::npos);
+        if (type == "Plugins") {
+          gPluginMgr->AddHandler("TMVA@@MethodBase", (std::string(".*_") + name + std::string(".*")).c_str(), (std::string("TMVA::Method") + name).c_str(),
+                                 (std::string("TMVA") + name).c_str(), (std::string("Method") + name + std::string("(DataSetInfo&,TString)")).c_str());
+          gPluginMgr->AddHandler("TMVA@@MethodBase", (std::string(".*") + name + std::string(".*")).c_str(), (std::string("TMVA::Method") + name).c_str(),
+                                 (std::string("TMVA") + name).c_str(), (std::string("Method") + name + std::string("(TString&,TString&,DataSetInfo&,TString&)")).c_str());
+        }
+      }
+
     } catch (const std::exception& ex) {
       B2ERROR("There was an error during the readout of the file " <<  weightfile << " : " << ex.what())
     }
@@ -69,21 +86,6 @@ namespace Belle2 {
       m_reader->AddVariable(x->name, &m_input[x]);
     }
 
-
-    // For the NeuroBayes method we load the TMVA::NeuroBayes interface at runtime as via the TPluginManager of ROOT
-    if (m_method == "NeuroBayes") {
-      gPluginMgr->AddHandler("TMVA@@MethodBase", ".*_NeuroBayes.*", "TMVA::MethodNeuroBayes", "TMVANeuroBayes", "MethodNeuroBayes(DataSetInfo&,TString)");
-      gPluginMgr->AddHandler("TMVA@@MethodBase", ".*NeuroBayes.*", "TMVA::MethodNeuroBayes", "TMVANeuroBayes",  "MethodNeuroBayes(TString&,TString&,DataSetInfo&,TString&)");
-    } else if (m_method == "MTBDT") {
-      gPluginMgr->AddHandler("TMVA@@MethodBase", ".*_MTBDT.*", "TMVA::MethodMTBDT", "TMVAMTBDT", "MethodMTBDT(DataSetInfo&,TString)");
-      gPluginMgr->AddHandler("TMVA@@MethodBase", ".*MTBDT.*", "TMVA::MethodMTBDT", "TMVAMTBDT",  "MethodMTBDT(TString&,TString&,DataSetInfo&,TString&)");
-    } else if (m_method == "MPBDT") {
-      gPluginMgr->AddHandler("TMVA@@MethodBase", ".*_MPBDT.*", "TMVA::MethodMPBDT", "TMVAMPBDT", "MethodMPBDT(DataSetInfo&,TString)");
-      gPluginMgr->AddHandler("TMVA@@MethodBase", ".*MPBDT.*", "TMVA::MethodMPBDT", "TMVAMPBDT",  "MethodMPBDT(TString&,TString&,DataSetInfo&,TString&)");
-    } else if (m_method == "OwnBDT") {
-      gPluginMgr->AddHandler("TMVA@@MethodBase", ".*_OwnBDT.*", "TMVA::MethodOwnBDT", "TMVAOwnBDT", "MethodOwnBDT(DataSetInfo&,TString)");
-      gPluginMgr->AddHandler("TMVA@@MethodBase", ".*OwnBDT.*", "TMVA::MethodOwnBDT", "TMVAOwnBDT",  "MethodOwnBDT(TString&,TString&,DataSetInfo&,TString&)");
-    }
     if (!m_reader->BookMVA(m_method, weightfile)) {
       B2FATAL("Could not set up expert! Please see preceding error message from TMVA!");
     }

@@ -30,26 +30,22 @@ namespace Belle2 {
   TMVAMethod::TMVAMethod(std::string name, std::string type, std::string config) : m_name(name), m_config(config)
   {
 
-    if (type == "NeuroBayes") {
-      gPluginMgr->AddHandler("TMVA@@MethodBase", ".*_NeuroBayes.*", "TMVA::MethodNeuroBayes", "TMVANeuroBayes", "MethodNeuroBayes(DataSetInfo&,TString)");
-      gPluginMgr->AddHandler("TMVA@@MethodBase", ".*NeuroBayes.*", "TMVA::MethodNeuroBayes", "TMVANeuroBayes",  "MethodNeuroBayes(TString&,TString&,DataSetInfo&,TString&)");
-      m_type = TMVA::Types::kPlugins;
-    } else if (type == "MTBDT") {
-      gPluginMgr->AddHandler("TMVA@@MethodBase", ".*_MTBDT.*", "TMVA::MethodMTBDT", "TMVAMTBDT", "MethodMTBDT(DataSetInfo&,TString)");
-      gPluginMgr->AddHandler("TMVA@@MethodBase", ".*MTBDT.*", "TMVA::MethodMTBDT", "TMVAMTBDT",  "MethodMTBDT(TString&,TString&,DataSetInfo&,TString&)");
-      m_type = TMVA::Types::kPlugins;
-    } else if (type == "MPBDT") {
-      gPluginMgr->AddHandler("TMVA@@MethodBase", ".*_MPBDT.*", "TMVA::MethodMPBDT", "TMVAMPBDT", "MethodMPBDT(DataSetInfo&,TString)");
-      gPluginMgr->AddHandler("TMVA@@MethodBase", ".*MPBDT.*", "TMVA::MethodMPBDT", "TMVAMPBDT",  "MethodMPBDT(TString&,TString&,DataSetInfo&,TString&)");
-      m_type = TMVA::Types::kPlugins;
-    } else if (type == "OwnBDT") {
-      gPluginMgr->AddHandler("TMVA@@MethodBase", ".*_OwnBDT.*", "TMVA::MethodOwnBDT", "TMVAOwnBDT", "MethodOwnBDT(DataSetInfo&,TString)");
-      gPluginMgr->AddHandler("TMVA@@MethodBase", ".*OwnBDT.*", "TMVA::MethodOwnBDT", "TMVAOwnBDT",  "MethodOwnBDT(TString&,TString&,DataSetInfo&,TString&)");
+    // For plugin methods we load the TMVA::PluginName interface at runtime as via the TPluginManager of ROOT
+    size_t pos = type.find(':');
+    if (pos < std::string::npos) {
+      std::string plg_type = type.substr(0, pos);
+      std::string name = type.substr(pos + 2, std::string::npos);
+      if (plg_type == "Plugins") {
+        gPluginMgr->AddHandler("TMVA@@MethodBase", (std::string(".*_") + name + std::string(".*")).c_str(), (std::string("TMVA::Method") + name).c_str(),
+                               (std::string("TMVA") + name).c_str(), (std::string("Method") + name + std::string("(DataSetInfo&,TString)")).c_str());
+        gPluginMgr->AddHandler("TMVA@@MethodBase", (std::string(".*") + name + std::string(".*")).c_str(), (std::string("TMVA::Method") + name).c_str(),
+                               (std::string("TMVA") + name).c_str(), (std::string("Method") + name + std::string("(TString&,TString&,DataSetInfo&,TString&)")).c_str());
+      }
+      B2INFO("Loaded plugin " << name)
       m_type = TMVA::Types::kPlugins;
     } else {
       m_type = TMVA::Types::Instance().GetMethodType(type);
     }
-
   }
 
   TMVATeacher::TMVATeacher(std::string identifier, std::vector<std::string> variables, std::string target, std::vector<TMVAMethod> methods) : m_identifier(identifier), m_methods(methods)

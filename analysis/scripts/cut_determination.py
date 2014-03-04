@@ -7,6 +7,7 @@ import ROOT
 
 
 class ChannelCut:
+
     """
     Represents a cut on a specific channel
     """
@@ -17,6 +18,7 @@ class ChannelCut:
         @param file - the ROOT TFile where the histograms are stored
         @param channel - the channel name as string
         """
+
         ## Channel nae
         self.channel = channel
         ## Distribution of invariant mass for signal events
@@ -33,37 +35,47 @@ class ChannelCut:
         ## This should coincidence with the nominal mass of the particle
         self.maxpos = self.signal.GetBinCenter(self.signal.GetMaximumBin())
         ## ROOT TF1 function wrapping the spline fit
-        self.func = ROOT.TF1(str(id(channel)) + '_M_func', lambda x: \
-                             self.spline.Eval(x[0]), 0, 100, 0)
+        self.func = ROOT.TF1(str(id(channel)) + '_M_func', lambda x: self.spline.Eval(x[0]), 0, 100, 0)
 
     def getCut(self, d):
         """
         Returns cut positions at x-axis for a cut d on y-axis
         @param d cut on y-axis
         """
-        return (self.func.GetX(d, 0, self.maxpos), self.func.GetX(d,
-                self.maxpos, 100))
+
+        return (self.func.GetX(d, 0, self.maxpos), self.func.GetX(d, self.maxpos, 100))
 
     def getNEvent(self):
         """
         Returns total number of recorded events in this channel.
         """
-        return self.signal.Integral(0, self.signal.GetNbinsX()) \
-            + self.bckgrd.Integral(0, self.bckgrd.GetNbinsX())
+
+        return self.signal.Integral(0, self.signal.GetNbinsX()) + self.bckgrd.Integral(0, self.bckgrd.GetNbinsX())
 
     def getNEventCut(self, d):
         """
         Returns total number of events which surviving the cut d
         @param d cut on y axis
         """
+
         (a, b) = self.getCut(d)
-        return self.signal.Integral(self.signal.FindBin(a),
-                                    self.signal.FindBin(b)) \
-            + self.bckgrd.Integral(self.bckgrd.FindBin(a),
-                                   self.bckgrd.FindBin(b))
+        return self.signal.Integral(self.signal.FindBin(a), self.signal.FindBin(b)) \
+            + self.bckgrd.Integral(self.bckgrd.FindBin(a), self.bckgrd.FindBin(b))
+
+    def isIgnored(self, d):
+        """
+        Checks if the channel should be ignored
+        @param d cut on y-axis
+        """
+
+        (a, b) = self.getCut(d)
+        if abs(b - a) < self.ratio.GetBinWidth(self.signal.GetMaximumBin()) or self.signal.Integral(self.signal.FindBin(a), self.signal.FindBin(b)) < 100:
+            return True
+        return False
 
 
 class GlobalCut:
+
     """
     Represent a cut on a specific particle.
     """
@@ -84,12 +96,14 @@ class GlobalCut:
         y-axis
         @param d cut on y-axis
         """
+
         return dict([(c.channel, c.getCut(d)) for c in self.channel_cuts])
 
     def getNEvent(self):
         """
         Returns total number of recorded events in all channels
         """
+
         return sum([c.getNEvent() for c in self.channel_cuts])
 
     def __call__(self, d):
@@ -98,7 +112,16 @@ class GlobalCut:
         Returns the total number of events which survive a cut d
         @param d cut on y axis
         """
+
         return sum([c.getNEventCut(d[0]) for c in self.channel_cuts])
+
+    def getIgnoredChannels(self, d):
+        """
+        Returns ignored channels for cut on d
+        @param d cut on y axis
+        """
+
+        return [c.channel for c in self.channel_cuts if c.isIgnored(d)]
 
 
 def getCutOnMass(percentage, filename, channels):
@@ -109,9 +132,10 @@ def getCutOnMass(percentage, filename, channels):
     @param filename of the file which contains the histograms
     @param channels names of the channels for which the cuts are determiend
     """
+
     file = ROOT.TFile(filename, 'UPDATE')
     global_cuts = GlobalCut(file, channels)
     func = ROOT.TF1(filename + '_mass_cut_func', global_cuts, 0, 1, 0)
     nevent = percentage * global_cuts.getNEvent()
     d = func.GetX(nevent, 0.0, 1.0)
-    return global_cuts.getCuts(d)
+    return (global_cuts.getCuts(d), global_cuts.getIgnoredChannels(d))

@@ -116,6 +116,6 @@ namespace Belle2 {
    * \sa VariableManager
    */
 #define REGISTER_VARIABLE(name, function, description) \
-  VariableProxy VARMANAGER_MAKE_UNIQUE(_variableproxy##function)(name, &function, description);
+  VariableProxy VARMANAGER_MAKE_UNIQUE(_variableproxy)(name, &function, description);
 
 }

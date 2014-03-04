@@ -21,7 +21,6 @@
 #include <framework/datastore/StoreArray.h>
 
 // dataobjects
-#include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/RestOfEvent.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
@@ -776,6 +775,15 @@ namespace Belle2 {
     REGISTER_VARIABLE("flavor", particleFlavorType, "flavor type of decay (0=unflavored, 1=flavored)");
     REGISTER_VARIABLE("sumChildProb", sumChildProb, "sum of signal probabilities of daughters");
     REGISTER_VARIABLE("prodChildProb", prodChildProb, "product of signal probabilities of daughters");
+    REGISTER_VARIABLE("childProb0", childProb<0>, "probability of daughters 0");
+    REGISTER_VARIABLE("childProb1", childProb<1>, "probability of daughters 1");
+    REGISTER_VARIABLE("childProb2", childProb<2>, "probability of daughters 2");
+    REGISTER_VARIABLE("childProb3", childProb<3>, "probability of daughters 3");
+    REGISTER_VARIABLE("childProb4", childProb<4>, "probability of daughters 4");
+    REGISTER_VARIABLE("childProb5", childProb<5>, "probability of daughters 5");
+    REGISTER_VARIABLE("childProb6", childProb<6>, "probability of daughters 6");
+    REGISTER_VARIABLE("childProb7", childProb<7>, "probability of daughters 7");
+    REGISTER_VARIABLE("childProb8", childProb<8>, "probability of daughters 8");
 
     REGISTER_VARIABLE("isSignal", isSignal,               "1.0 if Particle is correctly reconstructed (SIGNAL), 0.0 otherwise");
     REGISTER_VARIABLE("mcPDG",    particleMCMatchPDGCode, "The PDG code of matched MCParticle");

@@ -21,18 +21,14 @@ class Particle:
     reconstruct it.
     """
 
-    def __init__(
-        self,
-        name,
-        variables=None,
-        methods=None,
-        ):
+    def __init__(self, name, variables=None, methods=None):
         """
         Creates a Particle without any decay channels. To add
         decay channels use addChannel method.
         name is the correct pdg name as a string of the particle
         variables is a list of variables which are used to classify the
-            particle
+            particle signal probability variables of childs are automatically
+            added later.
         methods is a list of tuples (name, type, config) of the
             methods used to classify the particle.
         """
@@ -64,6 +60,10 @@ class Particle:
         ## the dependency of the particle to the previous stages.
         self.hashseed = ''
 
+        ## Ignored channels aren't trained and used, because there isn't enough
+        ## statistics for a training
+        self.ignored_channels = []
+
     def addChannel(self, channel):
         """
         Appends a new decay channel to the Particle object. A decay channel is
@@ -79,8 +79,7 @@ class Particle:
 
         # Create list of pdg names in all the channels, use set to make the
         # names unique and transform them to abs(pdg codes).
-        return map(abs, pdg.from_names(list(set(sum([c for c in
-                   self.channels], [])))))
+        return map(abs, pdg.from_names(list(set(sum([c for c in self.channels], [])))))
 
     def to_string(self, channel):
         """
@@ -108,8 +107,8 @@ class Particle:
         Returns filename where histograms used for cut determination are
         stored.
         """
-        return 'HistMaker_{pdg}_{hash}.root'.format(pdg=self.pdg,
-                hash=self.getHistHash())
+
+        return 'HistMaker_{pdg}_{hash}.root'.format(pdg=self.pdg, hash=self.getHistHash())
 
     def getWeightHash(self):
         """
@@ -118,17 +117,14 @@ class Particle:
         used classifiers.
         """
 
-        return hashlib.sha1(self.hashseed + str(self.channels)
-                            + str(self.variables)
-                            + str(self.methods)).hexdigest()
+        return hashlib.sha1(self.hashseed + str(self.channels) + str(self.variables) + str(self.methods)).hexdigest()
 
     def getWeightFilename(self, channel, method):
         """
         Returns filename where weightfile of TMVA Method is stored.
         """
-        return 'weights/{channel}_{hash}_{name}.weights.xml'.format(
-                channel=self.to_string(channel),
-                name=method[0], hash=self.getWeightHash())
+
+        return 'weights/{channel}_{hash}_{name}.weights.xml'.format(channel=self.to_string(channel), name=method[0], hash=self.getWeightHash())
 
     def getCuts(self):
         """
@@ -143,10 +139,9 @@ class Particle:
         # If this is not a final state particle and cut determination histogram
         # is available we calculate the correct cuts
         if not self.channels == [] and os.path.isfile(self.getHistFilename()):
-            cuts['M'] = cut_determination.getCutOnMass(0.01,
-                    self.getHistFilename(), [self.to_string(c) for c in
-                    self.channels])
-        return cuts
+            (cuts_m, ignored_channels) = cut_determination.getCutOnMass(0.01, self.getHistFilename(), [self.to_string(c) for c in self.channels])
+            cuts['M'] = cuts_m
+        return (cuts, ignored_channels)
 
     def reconstruct(self, path, mcrun=False):
         """
@@ -170,19 +165,18 @@ class Particle:
 
         # If this is not a final state particle and no cut determination
         # histograms available we have to gennerate the histograms first
-        if not mcrun and not self.channels == [] \
-            and not os.path.isfile(self.getHistFilename()):
+        if not mcrun and not self.channels == [] and not os.path.isfile(self.getHistFilename()):
 
             # So first we combine the daughter particles to candidates
             # and apply very loose cuts
             for channel in self.channels:
+                print self.to_string(channel)
                 pmake = register_module('ParticleCombiner')
                 pmake.set_name('ParticleCombiner_' + self.to_string(channel))
                 pmake.param('PDG', self.pdg)
                 pmake.param('ListName', self.to_string(channel))
                 pmake.param('InputListNames', pdg.to_names(channel))
-                pmake.param('MassCut', (mass - mass * 1.0 / 10.0, mass + mass
-                            * 1.0 / 10.0))
+                pmake.param('MassCut', (mass - mass * 1.0 / 10.0, mass + mass * 1.0 / 10.0))
                 # pmake.param('cutsOnProduct', {'SignalProbability': (0.01,
                 #            1.0)})
                 path.add_module(pmake)
@@ -199,13 +193,10 @@ class Particle:
             histMaker = register_module('HistMaker')
             histMaker.set_name(self.getHistFilename())
             histMaker.param('file', self.getHistFilename())
-            histMaker.param('histVariables', [('prodChildProb', 100, 0, 1),
-                            ('M', 100, mass - mass * 1.0 / 10.0, mass + mass
-                            * 1.0 / 10.0), ('mcStatus', 64, 0, 64)])
+            histMaker.param('histVariables', [('M', 100, mass - mass * 1.0 / 10.0, mass + mass * 1.0 / 10.0)])
             histMaker.param('make2dHists', True)
             histMaker.param('truthVariable', 'isSignal')
-            histMaker.param('listNames', [self.to_string(c) for c in
-                            self.channels])
+            histMaker.param('listNames', [self.to_string(c) for c in self.channels])
             path.add_module(histMaker)
 
             # Obviously we can't proceed until these histograms are generated,
@@ -216,8 +207,14 @@ class Particle:
         # If not a final state particle we fetch the cuts and reconstruct
         # the particle in all of its decay channels.
         if not self.channels == []:
-            cuts = self.getCuts()
+            (cuts, ignored_channels) = self.getCuts()
+            self.ignored_channels = self.ignored_channels + ignored_channels
+            print cuts
+            print ignored_channels
             for channel in self.channels:
+                if self.to_string(channel) in self.ignored_channels:
+                    continue
+                print channel
                 pmake = register_module('ParticleCombiner')
                 pmake.set_name('ParticleCombiner_' + self.to_string(channel))
                 pmake.param('PDG', self.pdg)
@@ -274,11 +271,12 @@ class Particle:
 
         # So for every channel we train all the classifiers seperatly.
         for channel in channels:
+            # Check if channels is ignored
+            if self.to_string(channel) in self.ignored_channels:
+                continue
             # Check first if all methods are available, by checking if the
             # weight files are present
-            if any([not os.path.isfile(self.getWeightFilename(channel,
-                   method)) for method in self.methods]):
-
+            if any([not os.path.isfile(self.getWeightFilename(channel, method)) for method in self.methods]):
                 # If one or more files are missing we retrain all methods
                 # (this has the advantage that we can easily compare the
                 # methods in the test phase of the full reconstruction,
@@ -286,12 +284,11 @@ class Particle:
                 # anyway, so this won't make a difference)
                 teacher = register_module('TMVATeacher')
                 teacher.set_name('TMVATeacher_' + self.to_string(channel))
-                teacher.param('identifier', self.to_string(channel) + '_'
-                              + self.getWeightHash())
+                teacher.param('identifier', self.to_string(channel) + '_' + self.getWeightHash())
                 teacher.param('methods', self.methods)
-                teacher.param('factoryOption',
-                '!V:!Silent:Color:DrawProgressBar:AnalysisType=Classification')
-                teacher.param('variables', self.variables)
+                teacher.param('factoryOption', '!V:!Silent:Color:DrawProgressBar:AnalysisType=Classification')
+                # Add child probability variables!
+                teacher.param('variables', self.variables + ['childProb{i}'.format(i=i) for i in range(0, len(channel))])
                 teacher.param('target', 'isSignal')
                 teacher.param('listNames', [self.to_string(channel)])
                 path.add_module(teacher)
@@ -306,14 +303,14 @@ class Particle:
         # If all the needed experts are present, we classify alle the particle
         # candidates.
         for channel in channels:
+            if self.to_string(channel) in self.ignored_channels:
+                continue
             # For every method we add a TMVAExpert module to the path, the
             # target variable has the same name as the method.
             for method in self.methods:
                 expert = register_module('TMVAExpert')
-                expert.set_name('TMVAEXPERT_' + self.to_string(channel) + '_'
-                                + method[0])
-                expert.param('identifier', self.to_string(channel) + '_'
-                             + self.getWeightHash())
+                expert.set_name('TMVAEXPERT_' + self.to_string(channel) + '_' + method[0])
+                expert.param('identifier', self.to_string(channel) + '_' + self.getWeightHash())
                 expert.param('method', method[0])
                 # TODO All methods use the same target variable at the moment
                 # we want to use different targets for different methods later
@@ -344,16 +341,12 @@ class FullReconstruction:
         self.particles = []
 
         parser = argparse.ArgumentParser()
-        parser.add_argument('-n', '--retrain-stage', dest='retrain_stage',
-                            type=int, help='Retrain networks in given stage')
-        parser.add_argument('-m', '--recreate-stage', dest='recreate_stage',
-                            type=int, help='Recreate histograms in given stage'
+        parser.add_argument('-t', '--train', dest='train', action='store_true', help='Train stages')
+        parser.add_argument('-n', '--retrain-stage', dest='retrain_stage', type=int, help='Retrain networks in given stage')
+        parser.add_argument('-m', '--recreate-stage', dest='recreate_stage', type=int, help='Recreate histograms in given stage')
+        parser.add_argument('-c', '--print-cuts', dest='print_cuts', action='store_true', help='Output cuts for given stage only'
                             )
-        parser.add_argument('-c', '--print-cuts', dest='print_cuts',
-                            action='store_true',
-                            help='Output cuts for given stage only')
-        parser.add_argument('-a', '--recreate-all', dest='recreate_all',
-                            action='store_true',
+        parser.add_argument('-a', '--recreate-all', dest='recreate_all', action='store_true',
                             help="""
                             Retrain all networs and recreate all histograms
                             """)
@@ -395,22 +388,19 @@ class FullReconstruction:
         # codes) for all the particles
         # We use the old dict comprehension syntax because fixstyle crashs
         # with the new one :-(
-        dependencies = dict((abs(p.pdg), p.dependencies()) for p in
-                            self.particles)
+        dependencies = dict((abs(p.pdg), p.dependencies()) for p in self.particles)
         stages = []
         # Loop over the dependencies as long as their are still particles
         # which aren't added into a stage.
         while len(dependencies) > 0:
             # Add  pdg codes to the next stage which don't have any
             # dependencies left
-            stages.append([pdg for (pdg, d) in dependencies.iteritems()
-                          if len(d) == 0])
+            stages.append([pdg for (pdg, d) in dependencies.iteritems() if len(d) == 0])
             # Keep only dependencies to pdg codes which weren't added to the
             # stage in the previous line.
             # We use the old dict comprehension syntax because fixstyle crashs
             # with the new one :-(
-            dependencies = dict((pdg, filter(lambda x: x not in stages[-1],
-                                d)) for (pdg, d) in dependencies.iteritems()
+            dependencies = dict((pdg, filter(lambda x: x not in stages[-1], d)) for (pdg, d) in dependencies.iteritems()
                                 if len(d) > 0)
             # If no pdg codes were added to the current stagem but the
             # dependencies are still not empty, something is wring with the
@@ -443,20 +433,15 @@ class FullReconstruction:
 
         # Process options
         for (i, stage) in enumerate(stages):
-            if self.args.retrain_stage and self.args.retrain_stage == i \
-                or self.args.recreate_stage and self.args.recreate_stage == i \
-                or self.args.recreate_all:
+            if self.args.retrain_stage and self.args.retrain_stage == i or self.args.recreate_stage and self.args.recreate_stage == i or self.args.recreate_all:
                 for pdg in stage:
                     p = pdg_to_particle[pdg]
                     for method in p.methods:
                         for channel in p.channels:
-                            if os.path.isfile(p.getWeightFilename(channel,
-                                    method)):
-                                print 'Remove ' + p.getWeightFilename(channel,
-                                        method)
+                            if os.path.isfile(p.getWeightFilename(channel, method)):
+                                print 'Remove ' + p.getWeightFilename(channel, method)
                                 os.remove(p.getWeightFilename(channel, method))
-            if self.args.recreate_stage and self.args.recreate_stage == i \
-                or self.args.recreate_all:
+            if self.args.recreate_stage and self.args.recreate_stage == i or self.args.recreate_all:
                 for pdg in stage:
                     p = pdg_to_particle[pdg]
                     if os.path.isfile(p.getHistFilename()):
@@ -477,10 +462,11 @@ class FullReconstruction:
             # channels. If not all particles can be reconstructed, then we
             # missing information about the intermediate cuts we want to
             # apply. So some histograms have to be generated first.
-            if not all([pdg_to_particle[pdg].reconstruct(path, mcrun) for pdg
-                    in stage]):
-                B2WARNING('Missing cuts for a particle at stage'
-                          + ' {i} generating cut'.format(i=i)
+            if not all([pdg_to_particle[pdg].reconstruct(path, mcrun) for pdg in stage]):
+                if not self.args.train:
+                    B2ERROR('Missing cuts for a particle at stage' + ' {i} abort process.'.format(i=i)
+                            + 'iPleas use --train to train the fullrecon.')
+                B2WARNING('Missing cuts for a particle at stage' + ' {i} generating cut'.format(i=i)
                           + ' determination histograms.')
                 break
 
@@ -490,8 +476,9 @@ class FullReconstruction:
             # (experts) are present yet, we stop the evaluation at this stage
             # and generate these experts first.
             if not mcrun:
-                if not all([pdg_to_particle[pdg].classify(path)
-                        for pdg in stage]):
-                    B2WARNING('Missing experts for a particle at stage'
-                              + ' {i} generating experts.'.format(i=i))
+                if not all([pdg_to_particle[pdg].classify(path) for pdg in stage]):
+                    if not self.args.train:
+                        B2ERROR('Missing experts for a particle at stage' + ' {i} abort process.'.format(i=i)
+                                + 'iPleas use --train to train the fullrecon.')
+                    B2WARNING('Missing experts for a particle at stage' + ' {i} generating experts.'.format(i=i))
                     break

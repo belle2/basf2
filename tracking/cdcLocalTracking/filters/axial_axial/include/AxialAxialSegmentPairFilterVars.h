@@ -13,8 +13,8 @@
 
 #include <tracking/cdcLocalTracking/eventdata/tracks/CDCAxialAxialSegmentPair.h>
 
-#include <root/TVector2.h>
-#include <root/TObject.h>
+#include <TVector2.h>
+#include <TObject.h>
 
 namespace Belle2 {
   namespace CDCLocalTracking {

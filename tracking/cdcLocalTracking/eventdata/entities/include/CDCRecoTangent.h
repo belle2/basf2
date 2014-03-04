@@ -81,7 +81,7 @@ namespace Belle2 {
 
 
       /// Print tangent for debugging
-      friend ostream& operator<<(ostream& output, const CDCRecoTangent& tangent) {
+      friend std::ostream& operator<<(std::ostream& output, const CDCRecoTangent& tangent) {
         output << "RecoTangent" << std::endl;
         output << "From : " << tangent.getFromWireHit()->getWire() << " " <<  tangent.getFromRecoDisp2D() << std::endl;
         output << "To : " << tangent.getToWireHit()->getWire() << " " <<  tangent.getToRecoDisp2D()  << std::endl;

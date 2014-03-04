@@ -13,9 +13,9 @@
 
 #include <tracking/cdcLocalTracking/typedefs/UsedDataHolders.h>
 
-#include <root/TFile.h>
-#include <root/TTree.h>
-#include <root/TVector2.h>
+#include <TFile.h>
+#include <TTree.h>
+#include <TVector2.h>
 
 #include "MCAxialAxialSegmentPairFilter.h"
 #include "AxialAxialSegmentPairFilterVars.h"

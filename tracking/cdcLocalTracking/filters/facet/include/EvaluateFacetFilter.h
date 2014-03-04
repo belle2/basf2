@@ -47,7 +47,7 @@ namespace Belle2 {
       void terminate();
 
     private:
-      mutable ofstream m_output_csv;  ///< Output stream for the csv file
+      mutable std::ofstream m_output_csv;  ///< Output stream for the csv file
 
 
       MCFacetFilter m_mcFacetFilter;

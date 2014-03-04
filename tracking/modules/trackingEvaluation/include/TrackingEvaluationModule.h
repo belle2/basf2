@@ -13,8 +13,8 @@
 #include <framework/core/Module.h>
 #include <framework/gearbox/Const.h>
 
-#include <root/TFile.h>
-#include <root/TTree.h>
+#include <TFile.h>
+#include <TTree.h>
 
 #include <genfit/TrackCand.h>
 

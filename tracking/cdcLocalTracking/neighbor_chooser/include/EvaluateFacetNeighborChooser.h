@@ -90,7 +90,7 @@ namespace Belle2 {
 
     private:
 
-      mutable ofstream m_output_csv;  ///< Output stream for the csv file
+      mutable std::ofstream m_output_csv;  ///< Output stream for the csv file
 
       MCFacetNeighborChooser m_mcNeighborChooser;
       RealFacetNeighborChooser m_realNeighborChooser;

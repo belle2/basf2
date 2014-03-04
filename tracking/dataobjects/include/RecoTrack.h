@@ -25,10 +25,16 @@
 #include <vector>
 #include <string>
 
+class FitConfiguration;
+
 /** This is the Reconstruction Event-Data Model Track.
  *
  *  This class collects hits, performs fits and saves the Track parameters.
  *  Note: This class is still experimental.
+ *  Totally missing:
+ *   - Fitting functionality
+ *   - Storing of which Trackfinders have contributed hits to the RecoTrack
+ *   - Sorting magic.
  */
 namespace Belle2 {
   class RecoTrack : public Belle2::RelationsInterface <genfit::Track> {
@@ -212,6 +218,20 @@ namespace Belle2 {
     void resetHitIndices(const short pseudoCharge,
                          const Const::EDetector detector = Const::EDetector::invalidDetector);
 
+    //-------------------------------------- Fitting ------------------------------------
+    /** Fit the track with a fitConfiguration object. */
+    void fitTrack(const FitConfiguration& fitConfiguration) {
+      /* This function has to move to the source file of course, but will consist of
+       * - recreating RecoHits
+       * - configure the fitter
+       * - hand "this" over to the fitter
+       *
+       *  We want to do it this way, so we can save fit configurations belonging to
+       *  certain genfit::TrackReps.
+       *  As we want to have potentially information from the fit in this class, I'm afraid
+       *  this little overloading of the RecoTrack class can't be avoided entirely.
+       */
+    }
 
   private:
     //-------------------------------------- Hit Pattern Handling -----------------------

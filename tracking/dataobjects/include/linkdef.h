@@ -45,6 +45,8 @@
 #pragma link C++ class Belle2::RelationsInterface<genfit::Track>+;
 #pragma link C++ class set < unsigned short >+;
 #pragma link C++ class Belle2::RecoTrack+;
+#pragma link C++ class Belle2::HitSorterBaseCDC;
+#pragma link C++ class Belle2::HitSorterBaseVXD;
 
 
 

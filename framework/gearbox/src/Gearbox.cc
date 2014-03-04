@@ -4,10 +4,10 @@
 #include <boost/python/dict.hpp>
 #include <boost/python/manage_new_object.hpp>
 
-#include "framework/gearbox/Gearbox.h"
-#include "framework/gearbox/GearDir.h"
-#include "framework/logging/Logger.h"
-#include "framework/utilities/Stream.h"
+#include <framework/gearbox/Gearbox.h>
+#include <framework/gearbox/GearDir.h>
+#include <framework/logging/Logger.h>
+#include <framework/utilities/Stream.h>
 
 #include <libxml/parser.h>
 #include <libxml/xinclude.h>
@@ -19,11 +19,11 @@
 #include <boost/regex.hpp>
 #include <list>
 
-#include "framework/gearbox/Backend_Postgres1.h"
-#include "framework/gearbox/Backend_Postgres2.h"
-#include "framework/gearbox/Backend_Xml.h"
+#include <framework/gearbox/Backend_Postgres1.h>
+#include <framework/gearbox/Backend_Postgres2.h>
+#include <framework/gearbox/Backend_Xml.h>
 
-#include <root/TObject.h>
+#include <TObject.h>
 
 using namespace std;
 

@@ -7,18 +7,6 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <root/TUrl.h>
-#include <root/TString.h>
-#include <root/TMessage.h>
-#include <root/TSQLServer.h>
-#include <root/TSQLResult.h>
-#include <root/TSQLRow.h>
-#include <root/TSQLStatement.h>
-
-#ifdef HAS_ROOTPGSQL
-#include <root/TPgSQLStatement.h>
-#endif
-
 #include <framework/logging/Logger.h>
 
 #include <framework/gearbox/SqlHandler.h>
@@ -26,6 +14,18 @@
 
 #include <TObjString.h>
 #include <TObjArray.h>
+#include <TUrl.h>
+#include <TString.h>
+#include <TMessage.h>
+#include <TSQLServer.h>
+#include <TSQLResult.h>
+#include <TSQLRow.h>
+#include <TSQLStatement.h>
+
+#ifdef HAS_ROOTPGSQL
+#include <TPgSQLStatement.h>
+#endif
+
 
 #include <boost/iostreams/device/file.hpp>
 #include <boost/iostreams/filter/gzip.hpp>

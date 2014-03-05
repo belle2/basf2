@@ -177,5 +177,14 @@ tree = file.Get('tree')
 if tree.GetEntries() != 5:
     B2FATAL('Created output file contains wrong number of events!')
 
+nummcparticles = tree.Project("", "MCParticles.m_pdg")
+if nummcparticles < 5:
+    B2FATAL('Output file should contain at least five MCParticles!')
+
+numhits = tree.Project("", "PXDSimHits.getEnergyDep()")
+if numhits < 5:  # usually much more, existence is most important thing here
+    B2FATAL('Output file should contain at least 5 hits!')
+
+
 import os
 os.remove('parallel_processing_test.root')

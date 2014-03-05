@@ -8,7 +8,6 @@
 
 #include <stdio.h>
 #include <sys/types.h>
-#include <sys/ipc.h>
 #include <sys/wait.h>
 #include <sys/prctl.h>
 #include <iostream>
@@ -22,300 +21,124 @@ using namespace std;
 using namespace Belle2;
 
 /// Set static process ID number
-int ProcHandler::s_fEvtProcID = -1;
+int ProcHandler::s_processID = -1;
 
-ProcHandler::ProcHandler()
-  : m_nEvtSrv(0), m_nEvtProc(0), m_nOutputSrv(0),
-    m_fEvtServer(0), m_fEvtProc(0), m_fOutputSrv(0)
-{
+ProcHandler::ProcHandler() { }
 
-  m_kSrcShm = ftok(".", 'S');
-  m_kOutShm = ftok(".", 'O');
-}
+ProcHandler::~ProcHandler() { }
 
-/// @brief Destructor of ProcHandler class
-
-ProcHandler::~ProcHandler()
-{
-}
-
-/// @brief Initialize an event server
-
-int ProcHandler::init_EvtServer()
+void ProcHandler::startInputProcess()
 {
   fflush(stdout);
   fflush(stderr);
   pid_t pid = fork();
   if (pid > 0) {   // Mother process
-    m_lEvtSrv.push_back(pid);
-    m_fEvtServer = 0;
-    m_nEvtSrv++;
-    B2INFO("ProcHandler: event server forked. pid = " << pid);
+    m_inputProcessList.push_back(pid);
+    B2INFO("ProcHandler: input process forked. pid = " << pid);
   } else if (pid < 0) {
-    B2ERROR("init_EvtServer");
-    exit(-99);
+    B2FATAL("fork() failed: " << strerror(errno));
   } else {
-    m_fEvtServer = 1; // I'm event server
-    s_fEvtProcID = 10000;
+    s_processID = 10000;
     //die when parent dies
     prctl(PR_SET_PDEATHSIG, SIGHUP);
   }
-  return 0;
 }
 
-int ProcHandler::init_EvtProc(int nproc)
+void ProcHandler::startEventProcesses(int nproc)
 {
-  m_nEvtProc = nproc;
   for (int i = 0; i < nproc; i++) {
-    if (m_fEvtProc == 0) {
+    fflush(stdout);
+    fflush(stderr);
+    pid_t pid = fork();
+    if (pid > 0) {   // Mother process
+      m_eventProcessList.push_back(pid);
+      B2INFO("ProcHandler: event process " << i << " forked. pid = " << pid);
       fflush(stdout);
-      fflush(stderr);
-      pid_t pid = fork();
-      if (pid > 0) {   // Mother process
-        m_lEvtProc.push_back(pid);
-        m_fEvtProc = 0;
-        m_nEvtProc++;
-        B2INFO("ProcHandler: event process " << i << " forked. pid = " << pid);
-        fflush(stdout);
-      } else if (pid < 0) {
-        B2ERROR("init_EvtProc");
-        exit(-99);
-      } else { // Event Process
-        m_fEvtProc = 1;    // I'm event process
-        s_fEvtProcID = i;
-        //die when parent dies
-        prctl(PR_SET_PDEATHSIG, SIGHUP);
-      }
+    } else if (pid < 0) {
+      B2FATAL("fork() failed: " << strerror(errno));
+    } else { // Event Process
+      s_processID = i;
+      //die when parent dies
+      prctl(PR_SET_PDEATHSIG, SIGHUP);
+      break;
     }
   }
-  return 0;
 }
 
-int ProcHandler::init_OutServer(int id)
+void ProcHandler::startOutputProcess(int id)
 {
   fflush(stdout);
   fflush(stderr);
   pid_t pid = fork();
   if (pid > 0) {   // Mother process
-    m_lOutputSrv.push_back(pid);
-    m_fOutputSrv = 0;
-    m_nOutputSrv++;
-    B2INFO("ProcHandler: output server forked. pid = " << pid);
+    m_outputProcessList.push_back(pid);
+    B2INFO("ProcHandler: output process forked. pid = " << pid);
   } else if (pid < 0) {
-    B2ERROR("init_OutServer");
-    exit(-99);
+    B2FATAL("fork() failed: " << strerror(errno));
   } else {
-    m_fOutputSrv = 1; // I'm output server
-    m_fOutputSrvID = id;
-    s_fEvtProcID = 20000 + id;
+    s_processID = 20000 + id;
     //die when parent dies
     prctl(PR_SET_PDEATHSIG, SIGHUP);
   }
-  return 0;
 }
 
 
-/// @brief Check whether this process is framework or not
-/// @return 0 for non-framework
-/// @return 1 for framework
-int ProcHandler::isFramework()
+bool ProcHandler::isFramework()
 {
-  return !(m_fEvtServer || m_fEvtProc || m_fOutputSrv);
+  return s_processID == -1;
 }
 
-/// @brief Check whether this process is event server or not
-/// @return 0 for non-event server
-/// @return 1 for event server
-int ProcHandler::isEvtServer()
+bool ProcHandler::isInputProcess()
 {
-  return m_fEvtServer;
+  return (s_processID >= 10000 and s_processID < 20000);
 }
 
-/// @brief Check whether this process is event process or not
-/// @return 0 for non-event process
-/// @return 1 for event process
-int ProcHandler::isEvtProc()
+bool ProcHandler::isEventProcess()
 {
-  return m_fEvtProc;
+  return (!isFramework() and s_processID < 10000);
 }
 
-/// @brief Check whether this process is output server or not
-/// @return 0 for non-output server
-/// @return 1 for output server
-int ProcHandler::isOutputSrv()
+bool ProcHandler::isOutputProcess()
 {
-  return m_fOutputSrv;
+  return s_processID >= 20000;
 }
 
 int ProcHandler::EvtProcID()
 {
-  return s_fEvtProcID;
+  return s_processID;
 }
 
-/// @brief Get the key of the source shared memory
-/// @return Key value of the source shared memory
-key_t ProcHandler::get_srcShmKey()
-{
-  return m_kSrcShm;
-}
 
-/// @brief Get the key of the output shared memory
-/// @return Key value of the output shared memory
-key_t ProcHandler::get_outShmKey()
+void ProcHandler::waitForProcesses(std::vector<pid_t>& pids)
 {
-  return m_kOutShm;
-}
-
-// @brief Wait for all the forked processes completed
-int ProcHandler::wait_processes()
-{
-  // wait for any process exit
-  //  printf ( "... wait processes called from %d\n", getpid() );
-  //  printf ( "sizes = EVS %d; EVP %d; OPS %d\n",
-  //     m_lEvtSrv.size(), m_lEvtProc.size(), m_lOutputSrv.size() );
-  //
-  // Output server can be common for multiple sessions..
-  //  while ( m_lEvtSrv.size() > 0 || m_lEvtProc.size() > 0  ||
-  //    m_lOutputSrv.size() > 0 ) {
-
-  while (!m_lEvtSrv.empty() || !m_lEvtProc.empty()) {
+  for (pid_t pid : pids) {
     while (1) {
       int status;
-      int pid = waitpid(-1, &status, 0);
-      if (pid == -1) {
-        if (errno == EINTR)
-          continue;
-        else if (errno == ECHILD)
-          break;
-        else {
-          B2ERROR("wait_processes : waitpid");
-          perror("Error");
-          return -1;
+      int ret = waitpid(pid, &status, 0);
+      if (ret == -1) {
+        if (errno == EINTR) {
+          continue; //interrupted, try again
+        } else if (errno == ECHILD) {
+          break; //doesn't exist anymore, so nothing to do
+        } else {
+          B2FATAL("waitpid(" << pid << ") failed: " << strerror(errno));
         }
       } else {
-        //  printf ( "wait_processes : completion of %d detected\n", pid );
-        remove_pid(pid);
-        //  printf ( "sizes = EVS %d; EVP %d; OPS %d\n",
-        //     m_lEvtSrv.size(), m_lEvtProc.size(), m_lOutputSrv.size() );
+        //success
         break;
       }
     }
   }
-  return 0;
+  pids.clear();
 }
 
-// @brief scan pid list and remove the pid if found
-
-int ProcHandler::remove_pid(pid_t pid)
+void ProcHandler::waitForAllProcesses()
 {
-  // Search for event_server list
-  for (std::vector<pid_t>::iterator it = m_lEvtSrv.begin(); it != m_lEvtSrv.end(); ++it) {
-    if (pid == *it) {
-      m_lEvtSrv.erase(it);
-      B2INFO("ProcHandler : event server " << pid << " completed and removed");
-      return 0;
-    }
-  }
-  // Search for output_server list
-  for (std::vector<pid_t>::iterator it = m_lOutputSrv.begin(); it != m_lOutputSrv.end(); ++it) {
-    if (pid == *it) {
-      m_lOutputSrv.erase(it);
-      B2INFO("ProcHandler : output server " << pid << " completed and removed");
-      return 0;
-    }
-  }
-  // Search for event process list
-  for (std::vector<pid_t>::iterator it = m_lEvtProc.begin(); it != m_lEvtProc.end(); ++it) {
-    if (pid == *it) {
-      m_lEvtProc.erase(it);
-      B2INFO("ProcHandler : event process " << pid << " completed and removed");
-      return 0;
-    }
-  }
-  return -1;
+  waitForInputProcesses();
+  waitForEventProcesses();
+  waitForOutputProcesses();
 }
 
-int ProcHandler::wait_event_server()
-{
-  unsigned int id = 0;
-  while (id  < m_lEvtSrv.size()) {
-    while (1) {
-      int status;
-      int pid = waitpid(m_lEvtSrv[id], &status, 0);
-      if (pid == -1) {
-        if (errno == EINTR)
-          continue;
-        else if (errno == ECHILD)
-          break;
-        else {
-          B2ERROR("wait_event_server : waitpid");
-          perror("Error");
-          return -1;
-        }
-      } else {
-        break;
-      }
-    }
-    id++;
-  }
-  m_lEvtSrv.erase(m_lEvtSrv.begin(), m_lEvtSrv.end());
-  return 0;
-}
-
-int ProcHandler::wait_event_processes()
-{
-  unsigned int id = 0;
-  while (id  < m_lEvtProc.size()) {
-    while (1) {
-      int status;
-      int pid = waitpid(m_lEvtProc[id], &status, 0);
-      if (pid == -1) {
-        if (errno == EINTR)
-          continue;
-        else if (errno == ECHILD)
-          break;
-        else {
-          B2ERROR("wait_event_processes : waitpid");
-          perror("Error");
-          return -1;
-        }
-      } else {
-        break;
-      }
-    }
-    id++;
-  }
-  m_lEvtProc.erase(m_lEvtProc.begin(), m_lEvtProc.end());
-  return 0;
-}
-
-int ProcHandler::wait_output_server()
-{
-  unsigned int id = 0;
-  while (id < m_lOutputSrv.size()) {
-    while (1) {
-      int status;
-      int pid = waitpid(m_lOutputSrv[id], &status, 0);
-      if (pid == -1) {
-        if (errno == EINTR)
-          continue;
-        else if (errno == ECHILD)
-          break;
-        else {
-          B2ERROR("wait_output_server : waitpid");
-          perror("Error");
-          return -1;
-        }
-      } else {
-        //  printf ( "wait_processes : completion of %d detected\n", pid );
-        //        remove_pid(pid);
-        //  printf ( "sizes = EVS %d; EVP %d; OPS %d\n",
-        //     m_lEvtSrv.size(), m_lEvtProc.size(), m_lOutputSrv.size() );
-        break;
-      }
-    }
-    id++;
-  }
-  m_lOutputSrv.erase(m_lOutputSrv.begin(), m_lOutputSrv.end());
-  return 0;
-}
+void ProcHandler::waitForInputProcesses() { waitForProcesses(m_inputProcessList); }
+void ProcHandler::waitForEventProcesses() { waitForProcesses(m_eventProcessList); }
+void ProcHandler::waitForOutputProcesses() { waitForProcesses(m_outputProcessList); }

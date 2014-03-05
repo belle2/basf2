@@ -144,9 +144,9 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
     dump_path("Output Path ", m_outpathlist[i]);
   }
 
-  // 3. Fork  input path
-  m_procHandler->init_EvtServer();
-  if (m_procHandler->isEvtServer()) {   // In event server process
+  // 3. Fork input path
+  m_procHandler->startInputProcess();
+  if (m_procHandler->isInputProcess()) {   // In input process
     PathPtr& inpath = m_inpathlist[0];
     ModulePtrList inpath_modules = m_pathManager.buildModulePathList(inpath);
     ModulePtrList procinitmodules = init_modules_in_process(inpath_modules);
@@ -155,17 +155,17 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
       processInitialize(procinitmodules);
     processCore(inpath, inpath_modules, maxEvent);
     processTerminate(inpath_modules);
-    B2INFO("Event Server Terminated");
+    B2INFO("Input process finished.");
     exit(0);
   }
 
-  // 4. Fork out output path
+  // 4. Fork output path
   int nout = 0;
   for (std::vector<PathPtr>::iterator it = m_outpathlist.begin(); it != m_outpathlist.end(); ++it) {
     PathPtr& outpath = *it;
     if ((outpath->getModules()).size() > 0) {
-      m_procHandler->init_OutServer(nout);
-      if (m_procHandler->isOutputSrv()) {   // In output server process
+      m_procHandler->startOutputProcess(nout);
+      if (m_procHandler->isOutputProcess()) {   // In output process
         m_master = outpath->getModules().begin()->get(); //set Rx as master
         ModulePtrList outpath_modules = m_pathManager.buildModulePathList(outpath);
         ModulePtrList procinitmodules = init_modules_in_process(outpath_modules);
@@ -174,7 +174,7 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
           processInitialize(procinitmodules);
         processCore(outpath, outpath_modules, maxEvent);
         processTerminate(outpath_modules);
-        B2INFO("Output Server Terminated");
+        B2INFO("Output process finished.");
         exit(0);
       }
       nout++;
@@ -183,8 +183,8 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
 
   // 5. Fork out main path (parallel part)
   fflush(stdout);
-  m_procHandler->init_EvtProc(numProcesses);
-  if (m_procHandler->isEvtProc()) {
+  m_procHandler->startEventProcesses(numProcesses);
+  if (m_procHandler->isEventProcess()) {
     PathPtr& mainpath = m_bodypathlist[m_bodypathlist.size() - 1];
     m_master = mainpath->getModules().begin()->get(); //set Rx as master
     ModulePtrList main_modules = m_pathManager.buildModulePathList(mainpath);
@@ -194,7 +194,7 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
       processInitialize(procinitmodules);
     processCore(mainpath, main_modules, maxEvent);
     processTerminate(main_modules);
-    B2INFO("Event Process Terminated");
+    B2INFO("Event process finished.");
     exit(0);
   }
 
@@ -220,7 +220,7 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
     // 6.0 Build End of data message
     EvtMessage term(NULL, 0, MSG_TERMINATE);
     // 6.1 Wait for input path to terminate
-    m_procHandler->wait_event_server();
+    m_procHandler->waitForInputProcesses();
     // 6.2 Send termination to event processes
     for (int i = 0; i < numProcesses; i++) {
       for (std::vector<RingBuffer*>::iterator it = m_rbinlist.begin();
@@ -233,8 +233,8 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
       }
     }
     // 6.3 Wait for event processes to terminate
-    m_procHandler->wait_event_processes();
-    // 6.4 Send termination to output servers
+    m_procHandler->waitForEventProcesses();
+    // 6.4 Send termination to output processes
     for (std::vector<RingBuffer*>::iterator it = m_rboutlist.begin();
          it != m_rboutlist.end(); ++it) {
       RingBuffer* rbuf = *it;
@@ -243,7 +243,7 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
         usleep(20);
       }
     }
-    m_procHandler->wait_output_server();
+    m_procHandler->waitForOutputProcesses();
     B2INFO("All processes completed");
 
     HistModule::mergeFiles();
@@ -256,7 +256,7 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
          it != m_rboutlist.end(); ++it)
       delete *it;
 
-    B2INFO("process: completed");
+    B2INFO("Global process: completed");
 
     //did anything bad happen?
     if (s_PIDofKilledChild != 0) {

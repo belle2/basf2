@@ -79,8 +79,8 @@ namespace Belle2 {
       c_Output                      = 2,  /**< This module is an output module (writes data). */
       c_ParallelProcessingCertified = 4,  /**< This module can be run in parallel processing mode safely (All I/O must be done through the data store, in particular, the module must not write any files.) */
       c_HistogramManager            = 8, /**< This module is used to manage histograms accumulated by other modules */
-      c_InitializeInProcess         = 16, /**< initialize() function is called in same forked process event() is called in (this is the default.)*/
-      c_InitializeInMain            = 32,  /**< initialize() function is called in the main process, i.e. only once. Resources allocated there will be available to all forked processes, using copy-on-write pages (see 'man 2 fork').*/
+      c_InitializeInProcess         = 16, /**< Obsolete, has no effect. */
+      c_InitializeInMain            = 32,  /**< Obsolete, has no effect. */
       c_InternalSerializer          = 64  /**< This module is an internal serializer/deserializer for parallel processing */
     };
 

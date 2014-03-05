@@ -16,6 +16,8 @@
 #include <framework/pcore/TxModule.h>
 #include <framework/pcore/HistModule.h>
 
+#include <TROOT.h>
+
 #include <signal.h>
 #include <sys/wait.h>
 #include <stdlib.h>
@@ -74,6 +76,13 @@ pEventProcessor::~pEventProcessor()
   delete m_procHandler;
 }
 
+void pEventProcessor::clearFileList()
+{
+  //B2WARNING("list of files: " << gROOT->GetListOfFiles()->GetEntries());
+  //clear list, but don't actually delete the objects
+  gROOT->GetListOfFiles()->Clear("nodelete");
+}
+
 
 void pEventProcessor::process(PathPtr spath, long maxEvent)
 {
@@ -94,11 +103,13 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
 
   // 1. Initialization
   ModulePtrList modulelist = m_pathManager.buildModulePathList(spath);
-  //  processInitialize(modulelist);
   //  dump_modules ( "full : ", modulelist );
   ModulePtrList initmodules = init_modules_in_main(modulelist);
+  dump_modules("processInitialize : ", initmodules);
   processInitialize(initmodules);
-  //  dump_modules ( "extracted : ", initmodules );
+
+  //disable ROOT's management of TFiles
+  clearFileList();
 
   //If we crash after forking, ROOTs SIGSEGV handler could potentially use huge amounts of memory (scales with numProcesses)
   if (signal(SIGSEGV, signalHandler) == SIG_ERR) {
@@ -126,6 +137,7 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
     PathPtr& inpath = m_inpathlist[0];
     ModulePtrList inpath_modules = m_pathManager.buildModulePathList(inpath);
     ModulePtrList procinitmodules = init_modules_in_process(inpath_modules);
+    dump_modules("processInitialize for ", procinitmodules);
     if (!procinitmodules.empty())
       processInitialize(procinitmodules);
     processCore(inpath, inpath_modules, maxEvent);
@@ -141,9 +153,10 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
     if ((outpath->getModules()).size() > 0) {
       m_procHandler->init_OutServer(nout);
       if (m_procHandler->isOutputSrv()) {   // In output server process
-        m_master = 0; //allow resetting master module
+        m_master = outpath->getModules().begin()->get(); //set Rx as master
         ModulePtrList outpath_modules = m_pathManager.buildModulePathList(outpath);
         ModulePtrList procinitmodules = init_modules_in_process(outpath_modules);
+        dump_modules("processInitialize for ", procinitmodules);
         if (!procinitmodules.empty())
           processInitialize(procinitmodules);
         processCore(outpath, outpath_modules, maxEvent);
@@ -155,14 +168,15 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
     }
   }
 
-  // 5. Fork out main path
+  // 5. Fork out main path (parallel part)
   fflush(stdout);
   m_procHandler->init_EvtProc(numProcesses);
   if (m_procHandler->isEvtProc()) {
-    m_master = 0; //allow resetting master module
     PathPtr& mainpath = m_bodypathlist[m_bodypathlist.size() - 1];
+    m_master = mainpath->getModules().begin()->get(); //set Rx as master
     ModulePtrList main_modules = m_pathManager.buildModulePathList(mainpath);
     ModulePtrList procinitmodules = init_modules_in_process(main_modules);
+    //dump_modules("processInitialize for ", procinitmodules);
     if (!procinitmodules.empty())
       processInitialize(procinitmodules);
     processCore(mainpath, main_modules, maxEvent);
@@ -444,16 +458,19 @@ void pEventProcessor::dump_modules(const std::string title, const ModulePtrList 
   B2INFO(strbuf.str());
 }
 
+bool pEventProcessor::initializeGlobally(ModulePtr module)
+{
+  return (!module->hasProperties(Module::c_InternalSerializer));
+}
+
 ModulePtrList pEventProcessor::init_modules_in_main(const ModulePtrList& modlist)
 {
   ModulePtrList tmpModuleList;
   ModulePtrList::const_iterator listIter;
 
   for (listIter = modlist.begin(); listIter != modlist.end(); ++listIter) {
-    Module* module = listIter->get();
-    ModulePtr ptr = *listIter;
-    if (module->hasProperties(Module::c_InitializeInMain))
-      tmpModuleList.push_back(ptr);
+    if (initializeGlobally(*listIter))
+      tmpModuleList.push_back(*listIter);
   }
 
   return tmpModuleList;
@@ -465,8 +482,7 @@ ModulePtrList pEventProcessor::init_modules_in_process(const ModulePtrList& modl
   ModulePtrList::const_iterator listIter;
 
   for (listIter = modlist.begin(); listIter != modlist.end(); ++listIter) {
-    Module* module = listIter->get();
-    if (!module->hasProperties(Module::c_InitializeInMain))
+    if (!initializeGlobally(*listIter))
       tmpModuleList.push_back(*listIter);
   }
 

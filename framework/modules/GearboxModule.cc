@@ -29,7 +29,6 @@ GearboxModule::GearboxModule() : Module()
 {
   //Set module properties
   setDescription("Loads the Belle II detector parameters from an XML document.");
-  setPropertyFlags(c_InitializeInMain);
 
   m_backends.push_back("file:");
 

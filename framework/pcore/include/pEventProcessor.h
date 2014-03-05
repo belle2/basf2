@@ -13,7 +13,6 @@
 
 #include <framework/core/Module.h>
 #include <framework/core/EventProcessor.h>
-
 #include <framework/core/Path.h>
 
 
@@ -23,7 +22,6 @@ namespace Belle2 {
   class ProcHandler;
   class RingBuffer;
 
-  /*! The pEventProcessor Class */
   /*!
     This class provides the core event processing loop for parallel processing.
   */
@@ -54,6 +52,18 @@ namespace Belle2 {
 
     /*! Dump module names in the ModulePtrList */
     void dump_modules(const std::string, const ModulePtrList);
+
+    /** Should this module be initialized in the global process?
+     *
+     *  Returns false if initialize() should be called inside forked process.
+     */
+    bool initializeGlobally(ModulePtr module);
+    /* TFiles are stored in a global list and cleaned up by root
+     * since this will happen in all forked processes, these will be corrupted if we don't clean the list!
+     *
+     * needs to be called at the end of every process.
+     */
+    void clearFileList();
 
     /*! Extract modules to be initialized in main process */
     ModulePtrList init_modules_in_main(const ModulePtrList& modlist);

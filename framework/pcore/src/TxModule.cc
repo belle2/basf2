@@ -29,7 +29,7 @@ TxModule::TxModule(RingBuffer* rbuf) : Module(), m_streamer(0), m_blockingInsert
 {
   //Set module properties
   setDescription("Encode DataStore into RingBuffer");
-  setPropertyFlags(c_Input | c_InitializeInProcess | c_InternalSerializer);
+  setPropertyFlags(c_Input | c_InternalSerializer);
 
   m_rbuf = rbuf;
   m_nsent = 0;

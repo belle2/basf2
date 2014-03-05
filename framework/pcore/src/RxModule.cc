@@ -28,7 +28,7 @@ RxModule::RxModule(RingBuffer* rbuf) : Module(), m_streamer(0), m_nrecv(-1)
 {
   //Set module properties
   setDescription("Decode data from RingBuffer into DataStore");
-  setPropertyFlags(c_Input | c_InitializeInProcess | c_InternalSerializer);
+  setPropertyFlags(c_Input | c_InternalSerializer);
 
   m_rbuf = rbuf;
   m_compressionLevel = 0;

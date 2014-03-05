@@ -45,6 +45,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
+//#define NONSTOP
 
 namespace Belle2 {
 
@@ -175,11 +176,29 @@ namespace Belle2 {
     //! start flag
     int m_start_flag;
 
+#ifdef NONSTOP
     //! for nonstop DAQ
-    int checkRunStop();
+    int* m_ptr;
 
     //! for nonstop DAQ
-    int checkRunRecovery();
+    virtual void openRunStopNshm();
+
+    //! for nonstop DAQ
+    virtual int checkRunStop();
+
+    //! for nonstop DAQ
+    virtual int checkRunRecovery();
+
+    //! for nonstop DAQ
+    virtual void restartRun();
+
+    //! for nonstop DAQ
+    virtual void pauseRun();
+
+    //! for nonstop DAQ
+    virtual void waitRestart();
+
+#endif
 
   };
 

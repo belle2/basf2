@@ -13,7 +13,7 @@ using namespace Belle2;
 
 //#define DUMMY_DATA
 #define TIME_MONITOR
-//#define NONSTOP
+#define NONSTOP_DEBUG
 //#define DEBUG
 
 //-----------------------------------------------------------------
@@ -73,6 +73,14 @@ void SerializerModule::initialize()
   Accept();
 
   initializeNode();
+
+#ifdef NONSTOP
+  openRunStopNshm();
+#ifdef NONSTOP_DEBUG
+  printf("###########(DesCpr) prepare shm  ###############\n");
+  fflush(stdout);
+#endif
+#endif
 
   B2INFO("Tx initialized.");
 }
@@ -235,6 +243,22 @@ int SerializerModule::sendByWriteV(RawDataBlock* rawdblk)
     if ((n = writev(m_socket, iov, NUM_BUFFER)) < 0) {
       if (errno == EINTR) {
         continue;
+      } else if (errno == EAGAIN || errno == EWOULDBLOCK) {
+#ifdef NONSTOP
+#ifdef NONSTOP_DEBUG
+        printf("###########(Ser) TIMEOUT durin writev  ############### sent %d bytes\n", n);
+        fflush(stdout);
+#endif
+        if (checkRunStop()) {
+#ifdef NONSTOP_DEBUG
+          printf("###########(Ser) Stop is detected after return from writev ###############\n");
+          fflush(stdout);
+#endif
+          pauseRun();
+          waitRestart();
+        }
+#endif
+        continue;
       } else {
         char err_buf[500];
         sprintf(err_buf, "WRITEV error.(%s) Exiting... : sent %d bytes, header %d bytes body %d tailer %d\n" ,
@@ -261,7 +285,7 @@ int SerializerModule::sendByWriteV(RawDataBlock* rawdblk)
   // Retry sending
   //
   if (n != total_send_bytes) {
-    B2WARNING("Serializer: Sent byte(" << n << "bytes) is not same as the event size (" << total_send_bytes << "bytes). Retyring...");
+    B2WARNING("Serializer: Sent byte(" << n << "bytes) is not same as the event size (" << total_send_bytes << "bytes). Retryring...");
     double retry_start = getTimeSec();
     // Send Header
     if (n < (int)(iov[ 0 ].iov_len)) {
@@ -295,6 +319,22 @@ int SerializerModule::Send(int socket, char* buf, int size_bytes)
     if ((ret = send(socket,
                     buf + sent_bytes, size_bytes - sent_bytes,  MSG_NOSIGNAL)) < 0) {
       if (errno == EINTR) {
+        continue;
+      } else if (errno == EAGAIN || errno == EWOULDBLOCK) {
+#ifdef NONSTOP
+#ifdef NONSTOP_DEBUG
+        printf("###########(Ser) TIMEOUT during send()  ###############\n");
+        fflush(stdout);
+#endif
+        if (checkRunStop()) {
+#ifdef NONSTOP_DEBUG
+          printf("###########(Ser) Stop is detected after return from send ###############\n");
+          fflush(stdout);
+#endif
+          pauseRun();
+          waitRestart();
+        }
+#endif
         continue;
       } else {
         char err_buf[500];
@@ -385,15 +425,15 @@ void SerializerModule::Accept()
     //    B2INFO("Connection is established: port " << htons(sock_accept.sin_port) << " address " <<  sock_accept.sin_addr.s_addr );
     B2INFO("Done.");
 
-    // set timepout option
-    //     struct timeval timeout;
-    //     timeout.tv_sec = 100;
-    //     timeout.tv_usec = 0;
-    //     ret = setsockopt(fd_accept, SOL_SOCKET, SO_SNDTIMEO, &timeout, (socklen_t)sizeof(timeout));
-    //     if (ret < 0) {
-    //       char temp_char[100] = "Failed to set TIMEOUT. Exiting..."; print_err.PrintError(temp_char, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-    //       exit(-1);
-    //     }
+    //    set timepout option
+    struct timeval timeout;
+    timeout.tv_sec = 1;
+    timeout.tv_usec = 0;
+    ret = setsockopt(fd_accept, SOL_SOCKET, SO_SNDTIMEO, &timeout, (socklen_t)sizeof(timeout));
+    if (ret < 0) {
+      char temp_char[100] = "Failed to set TIMEOUT. Exiting..."; print_err.PrintError(temp_char, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      exit(-1);
+    }
   }
 
   //   int flag = 1;
@@ -444,10 +484,8 @@ void SerializerModule::printData(int* buf, int nwords)
 }
 
 
-
-
-
-int SerializerModule::checkRunStop()
+#ifdef NONSTOP
+void SerializerModule::openRunStopNshm()
 {
   char path_shm[100] = "/cpr_startstop";
   int fd = shm_open(path_shm, O_RDONLY, 0666);
@@ -456,31 +494,60 @@ int SerializerModule::checkRunStop()
     perror("[ERROR] shm_open2");
     exit(1);
   }
-  int* ptr;
-  ptr = (int*)mmap(NULL, sizeof(int), PROT_READ, MAP_SHARED, fd, 0);
-  close(fd);
-  // stop = 1, recover = 0
-  if (*ptr) { return 1; } else { return 0;}
+  m_ptr = (int*)mmap(NULL, sizeof(int), PROT_READ, MAP_SHARED, fd, 0);
+  return;
+}
 
+int SerializerModule::checkRunStop()
+{
+  if (*m_ptr) { return 1; } else { return 0;}
 }
 
 int SerializerModule::checkRunRecovery()
 {
-  char path_shm[100] = "/cpr_startstop";
-  int fd = shm_open(path_shm, O_RDONLY, 0666);
-  if (fd < 0) {
-    printf("[DEBUG] %s\n", path_shm);
-    perror("[ERROR] shm_open2");
-    exit(1);
-  }
-  int* ptr;
-  ptr = (int*)mmap(NULL, sizeof(int), PROT_READ, MAP_SHARED, fd, 0);
-  // stop = 1, recover = 0
-  close(fd);
-  if (*ptr) { return 0; } else { return 1;}
-
+  if (*m_ptr) { return 0; } else { return 1;}
 }
 
+void SerializerModule::restartRun()
+{
+#ifdef NONSTOP_DEBUG
+  printf("###########(Ser) the 1st event sicne the restart  ###############\n");
+  fflush(stdout);
+#endif
+  g_run_restarting = 0;
+  initializeNode();
+  return;
+}
+
+
+void SerializerModule::pauseRun()
+{
+  g_run_stop = 1;
+#ifdef NONSTOP_DEBUG
+  printf("###########(Ser) Pause the run ###############\n");
+  fflush(stdout);
+#endif
+  return;
+}
+
+
+void SerializerModule::waitRestart()
+{
+  while (true) {
+#ifdef NONSTOP_DEBUG
+    printf("###########(Ser) Waiting for Restart ###############\n");
+    fflush(stdout);
+#endif
+    if (checkRunRecovery()) {
+      g_run_stop = 0;
+      g_run_recovery = 1;
+      break;
+    }
+    sleep(1);
+  }
+  return;
+}
+#endif
 
 
 void SerializerModule::event()
@@ -488,9 +555,12 @@ void SerializerModule::event()
 
 #ifdef NONSTOP
   if (g_run_restarting == 1) {
-    g_run_restarting = 0;
-    initializeNode();
+    restartRun();
   } else if (g_run_recovery == 1) {
+#ifdef NONSTOP_DEBUG
+    printf("###########(Ser) Go back to Deseializer()  ###############\n");
+    fflush(stdout);
+#endif
     return; // Nothing to do here
   }
 #endif
@@ -536,11 +606,9 @@ void SerializerModule::event()
       m_totbytes += sendByWriteV(raw_dblkarray[ j ]);
     } catch (string err_str) {
 #ifdef NONSTOP
-      if (err_str == "TIMEOUT") {
-        if (checkRunStop()) {
-          g_run_stop = 1;
-          break;
-        }
+      if (err_str == "EAGAIN") {
+        pauseRun();
+        break;
       }
 #endif
       //      print_err.PrintError(m_shmflag, &m_status, err_str);
@@ -559,14 +627,7 @@ void SerializerModule::event()
 
 #ifdef NONSTOP
   if (g_run_stop == 1) {
-    while (true) {
-      if (checkRunRecovery()) {
-        g_run_stop = 0;
-        g_run_recovery = 1;
-        break;
-      }
-      sleep(1);
-    }
+    waitRestart();
   }
 #endif
 

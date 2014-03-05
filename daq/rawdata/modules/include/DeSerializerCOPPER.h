@@ -58,6 +58,14 @@ namespace Belle2 {
     //! Fill RawHeader
     virtual void fillNewRawCOPPERHeader(RawCOPPER* raw_copper);
 
+#ifdef NONSTOP
+    //! for nonstop DAQ
+    virtual void restartRun();
+
+    //! for nonstop DAQ
+    virtual void waitRestart();
+#endif
+
   private:
     //! data
     StoreObjPtr<RawCOPPER> m_rawcopper;
@@ -76,13 +84,13 @@ namespace Belle2 {
     // Parallel processing parameters
 
     //! COPPER file descripter
-    int cpr_fd;
+    int m_cpr_fd;
 
     //! bit flag for available FINESSE slot
-    int use_slot;
+    int m_use_slot;
 
     //! bit flag for available FINESSE slot
-    int finesse_bit_flag;
+    int m_finesse_bit_flag;
 
 
 

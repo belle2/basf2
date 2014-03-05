@@ -316,6 +316,52 @@ int DeSerializerModule::checkRunRecovery()
   if (*m_ptr) { return 0; } else { return 1;}
 }
 
+void DeSerializerModule::restartRun()
+{
+
+#ifdef NONSTOP_DEBUG
+  printf("###########(DesCpr) Restart from PAUSE  ###############\n");
+  fflush(stdout);
+#endif
+  //    initializeCOPPER();
+  g_run_recovery = 0;
+  g_run_restarting = 1;
+  m_start_flag = 0;
+  return;
+}
+
+
+void DeSerializerModule::pauseRun()
+{
+  g_run_stop = 1;
+#ifdef NONSTOP_DEBUG
+  printf("###########(Ser) Pause the run ###############\n");
+  fflush(stdout);
+#endif
+  return;
+}
+
+
+void DeSerializerModule::waitRestart()
+{
+
+  while (true) {
+    if (checkRunRecovery()) {
+      g_run_stop = 0;
+      g_run_recovery = 1;
+      break;
+    }
+#ifdef NONSTOP_DEBUG
+    printf("###########(DesCpr) Waiting for RESTART  ###############\n");
+    fflush(stdout);
+#endif
+    sleep(1);
+  }
+  return;
+}
+
+
+
 #endif
 
 void DeSerializerModule::event()

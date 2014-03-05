@@ -41,12 +41,13 @@ DeSerializerCOPPERModule::DeSerializerCOPPERModule() : DeSerializerModule()
   setDescription("Encode DataStore into RingBuffer");
 
   //  setPropertyFlags(c_Input | c_ParallelProcessingCertified);
-  addParam("FinesseBitFlag", finesse_bit_flag, "finnese (A,B,C,D) -> bit (0,1,2,3)", 15);
+  addParam("FinesseBitFlag", m_finesse_bit_flag, "finesse (A,B,C,D) -> bit (0,1,2,3)", 15);
 
   //Parameter definition
   B2INFO("DeSerializerCOPPER: Constructor done.");
   m_prev_ftsweve32 = 0xFFFFFFFF;
 
+  m_cpr_fd = -1;
 }
 
 
@@ -106,6 +107,10 @@ void DeSerializerCOPPERModule::initialize()
 
 #ifdef NONSTOP
   openRunStopNshm();
+#ifdef NONSTOP_DEBUG
+  printf("###########(DesCpr) prepare shm  ###############\n");
+  fflush(stdout);
+#endif
 #endif
 
   B2INFO("DeSerializerCOPPER: initialize() done.");
@@ -116,32 +121,32 @@ void DeSerializerCOPPERModule::initializeCOPPER()
 {
 
 #ifndef DUMMY
-  use_slot = 0; /* bit mask */
+  m_use_slot = 0; /* bit mask */
   int slot_shift;
 
-  if ((finesse_bit_flag & 0x1) == 1) {
+  if ((m_finesse_bit_flag & 0x1) == 1) {
     slot_shift = 0; // a:0, b:1, c:2, d:3
-    use_slot |= 1 << slot_shift;  //
+    m_use_slot |= 1 << slot_shift;  //
   }
 
-  if (((finesse_bit_flag >> 1) & 0x1) == 1) {
+  if (((m_finesse_bit_flag >> 1) & 0x1) == 1) {
     slot_shift = 1; // a:0, b:1, c:2, d:3
-    use_slot |= 1 << slot_shift;  //
+    m_use_slot |= 1 << slot_shift;  //
   }
 
-  if (((finesse_bit_flag >> 2) & 0x1) == 1) {
+  if (((m_finesse_bit_flag >> 2) & 0x1) == 1) {
     slot_shift = 2; // a:0, b:1, c:2, d:3
-    use_slot |= 1 << slot_shift;  //
+    m_use_slot |= 1 << slot_shift;  //
   }
 
-  if (((finesse_bit_flag >> 3) & 0x1) == 1) {
+  if (((m_finesse_bit_flag >> 3) & 0x1) == 1) {
     slot_shift = 3; // a:0, b:1, c:2, d:3
-    use_slot |= 1 << slot_shift;  //
+    m_use_slot |= 1 << slot_shift;  //
   }
   //
   // Present slots to use
   //
-  if (! use_slot) {
+  if (! m_use_slot) {
     char err_buf[100] = "Slot is not specified. Exiting...";
     print_err.PrintError(m_shmflag, &m_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     exit(1);
@@ -149,7 +154,7 @@ void DeSerializerCOPPERModule::initializeCOPPER()
     int slot;
     printf("[DEBUG] ");
     for (slot = 0; slot < 4; slot++) {
-      if (use_slot & (1 << slot)) printf(" %c", 'A' + slot);
+      if (m_use_slot & (1 << slot)) printf(" %c", 'A' + slot);
     }
     printf("\n");
   }
@@ -294,9 +299,32 @@ int* DeSerializerCOPPERModule::readOneEventFromCOPPERFIFO(const int entry, int* 
   int recvd_byte = RawHeader::RAWHEADER_NWORDS * sizeof(int);
   while (1) {
     int read_size = 0;
-    if ((read_size = read(cpr_fd, (char*)m_bufary[entry] + recvd_byte, sizeof(int) *  BUF_SIZE_WORD  - recvd_byte)) < 0) {
+    if ((read_size = read(m_cpr_fd, (char*)m_bufary[entry] + recvd_byte, sizeof(int) *  BUF_SIZE_WORD  - recvd_byte)) < 0) {
       if (errno == EINTR) {
         continue;
+      } else if (errno == EAGAIN || errno == EWOULDBLOCK) {
+        if (recvd_byte > RawHeader::RAWHEADER_NWORDS * sizeof(int)) {
+          char err_buf[500];
+          sprintf("EAGAIN return in the middle of an event( COPPER driver should't do this.). Exting...", strerror(errno));
+          print_err.PrintError(m_shmflag, &m_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+          exit(-1);
+        }
+#ifdef NONSTOP
+#ifdef NONSTOP_DEBUG
+        printf("###########(DesCpr) Return from read with EAGAIN  ###############\n");
+        fflush(stdout);
+#endif
+        if (checkRunStop()) {
+#ifdef NONSTOP_DEBUG
+          printf("###########(DesCpr) Stop is detected after return with EAGAIN  ###############\n");
+          fflush(stdout);
+#endif
+          string err_str = "EAGAIN";
+          throw (err_str);
+        }
+#endif
+        continue;
+
       } else {
         char err_buf[500];
         sprintf("Failed to read data from COPPER(%s). Exiting...", strerror(errno));
@@ -327,10 +355,10 @@ int* DeSerializerCOPPERModule::readOneEventFromCOPPERFIFO(const int entry, int* 
 
 
       memcpy(temp_buf, m_bufary[ entry ], recvd_byte);
-      recvd_byte += readFD(cpr_fd, (char*)temp_buf + recvd_byte,
+      recvd_byte += readFD(m_cpr_fd, (char*)temp_buf + recvd_byte,
                            (*m_size_word - RawTrailer::RAWTRAILER_NWORDS) * sizeof(int) - recvd_byte);
     } else {
-      recvd_byte += readFD(cpr_fd, (char*)(m_bufary[ entry ]) + recvd_byte,
+      recvd_byte += readFD(m_cpr_fd, (char*)(m_bufary[ entry ]) + recvd_byte,
                            (*m_size_word - RawTrailer::RAWTRAILER_NWORDS) * sizeof(int) - recvd_byte);
     }
 
@@ -392,10 +420,15 @@ int* DeSerializerCOPPERModule::readOneEventFromCOPPERFIFO(const int entry, int* 
 
 void DeSerializerCOPPERModule::openCOPPER()
 {
+
+  if (m_cpr_fd != -1) {
+    close(m_cpr_fd);
+    m_cpr_fd = -1;
+  }
   //
   // Open a finesse device
   //
-  if ((cpr_fd = open("/dev/copper/copper", O_RDONLY)) == -1) {
+  if ((m_cpr_fd = open("/dev/copper/copper", O_RDONLY)) == -1) {
     char err_buf[500];
     sprintf("Failed to open Finesse(%s). Exiting... ", strerror(errno));
     print_err.PrintError(m_shmflag, &m_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
@@ -404,18 +437,18 @@ void DeSerializerCOPPERModule::openCOPPER()
 
   int set_regval = 15; // How many events to be stored in COPPER FIFO before request for DMA
   //    int set_regval=1;
-  ioctl(cpr_fd, CPRIOSET_LEF_WA_FF, &set_regval);
-  ioctl(cpr_fd, CPRIOSET_LEF_WB_FF, &set_regval);
-  ioctl(cpr_fd, CPRIOSET_LEF_WC_FF, &set_regval);
-  ioctl(cpr_fd, CPRIOSET_LEF_WD_FF, &set_regval);
-  ioctl(cpr_fd, CPRIOSET_FINESSE_STA, &use_slot, sizeof(use_slot));
+  ioctl(m_cpr_fd, CPRIOSET_LEF_WA_FF, &set_regval);
+  ioctl(m_cpr_fd, CPRIOSET_LEF_WB_FF, &set_regval);
+  ioctl(m_cpr_fd, CPRIOSET_LEF_WC_FF, &set_regval);
+  ioctl(m_cpr_fd, CPRIOSET_LEF_WD_FF, &set_regval);
+  ioctl(m_cpr_fd, CPRIOSET_FINESSE_STA, &m_use_slot, sizeof(m_use_slot));
 
   int v = 511 - 32;
 
-  ioctl(cpr_fd, CPRIOSET_LEF_WA_AF, &v, sizeof(v));
-  ioctl(cpr_fd, CPRIOSET_LEF_WB_AF, &v, sizeof(v));
-  ioctl(cpr_fd, CPRIOSET_LEF_WC_AF, &v, sizeof(v));
-  ioctl(cpr_fd, CPRIOSET_LEF_WD_AF, &v, sizeof(v));
+  ioctl(m_cpr_fd, CPRIOSET_LEF_WA_AF, &v, sizeof(v));
+  ioctl(m_cpr_fd, CPRIOSET_LEF_WB_AF, &v, sizeof(v));
+  ioctl(m_cpr_fd, CPRIOSET_LEF_WC_AF, &v, sizeof(v));
+  ioctl(m_cpr_fd, CPRIOSET_LEF_WD_AF, &v, sizeof(v));
 
 
   B2INFO("DeSerializerCOPPER: openCOPPER() done.");
@@ -433,6 +466,28 @@ int DeSerializerCOPPERModule::readFD(int fd, char* buf, int data_size_byte)
     if ((read_size = read(fd, (char*)buf + n, data_size_byte - n)) < 0) {
       if (errno == EINTR) {
         continue;
+      } else if (errno == EAGAIN || errno == EWOULDBLOCK) {
+        if (n > 0) {
+          char err_buf[500];
+          sprintf("EAGAIN return in the middle of an event( COPPER driver should't do this.). Exting...", strerror(errno));
+          print_err.PrintError(m_shmflag, &m_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+          exit(-1);
+        }
+#ifdef NONSTOP
+#ifdef NONSTOP_DEBUG
+        printf("###########(DesCpr) Return from readFD with EAGAIN  ###############\n");
+        fflush(stdout);
+#endif
+        if (checkRunStop()) {
+#ifdef NONSTOP_DEBUG
+          printf("###########(DesCpr) Stop is detected after return from readFD with EAGAIN ##\n");
+          fflush(stdout);
+#endif
+          string err_str = "EAGAIN";
+          throw (err_str);
+        }
+#endif
+        continue;
       } else {
         char err_buf[500];
         sprintf("Failed to read data from COPPER(%s). Exting...", strerror(errno));
@@ -448,17 +503,49 @@ int DeSerializerCOPPERModule::readFD(int fd, char* buf, int data_size_byte)
 
 }
 
+#ifdef NONSTOP
+void DeSerializerCOPPERModule::restartRun()
+{
 
+#ifdef NONSTOP_DEBUG
+  printf("###########(DesCpr) Restart from PAUSE  ###############\n");
+  fflush(stdout);
+#endif
+  initializeCOPPER();
+  g_run_recovery = 0;
+  g_run_restarting = 1;
+  m_start_flag = 0;
+  return;
+}
+
+void DeSerializerCOPPERModule::waitRestart()
+{
+  // close COPPER FIFO
+  if (m_cpr_fd != -1) close(m_cpr_fd);
+  m_cpr_fd = -1;
+  while (true) {
+    if (checkRunRecovery()) {
+      g_run_stop = 0;
+      g_run_recovery = 1;
+      break;
+    }
+#ifdef NONSTOP_DEBUG
+    printf("###########(DesCpr) Waiting for RESTART  ###############\n");
+    fflush(stdout);
+#endif
+    sleep(1);
+  }
+  return;
+}
+
+#endif
 
 void DeSerializerCOPPERModule::event()
 {
 
 #ifdef NONSTOP
   if (g_run_recovery == 1) {
-    initializeCOPPER();
-    g_run_recovery = 0;
-    g_run_restarting = 1;
-    m_start_flag = 0;
+    restartRun();
   }
 #endif
 
@@ -499,11 +586,13 @@ void DeSerializerCOPPERModule::event()
       temp_buf = readOneEventFromCOPPERFIFO(j, &malloc_flag, &m_size_word);
     } catch (string err_str) {
 #ifdef NONSTOP
-      if (err_str == "TIMEOUT") {
-        if (checkRunStop()) {
-          g_run_stop = 1;
-          break;
-        }
+      if (err_str == "EAGAIN") {
+#ifdef NONSTOP_DEBUG
+        printf("###########(DesCpr) caught Exception ###############\n");
+        fflush(stdout);
+#endif
+        pauseRun();
+        break;
       }
 #endif
       print_err.PrintError(m_shmflag, &m_status, err_str);
@@ -545,16 +634,7 @@ void DeSerializerCOPPERModule::event()
 
 #ifdef NONSTOP
   if (g_run_stop == 1 || checkRunStop()) {
-    // close COPPER FIFO
-    close(cpr_fd);
-    while (true) {
-      if (checkRunRecovery()) {
-        g_run_stop = 0;
-        g_run_recovery = 1;
-        break;
-      }
-      sleep(1);
-    }
+    waitRestart();
   }
 #endif
 

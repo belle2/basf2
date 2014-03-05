@@ -41,6 +41,7 @@
 #include <fcntl.h>
 
 //#define NONSTOP
+#define NONSTOP_DEBUG
 
 namespace Belle2 {
 
@@ -231,17 +232,25 @@ namespace Belle2 {
 
 #ifdef NONSTOP
     //! for nonstop DAQ
-    int checkRunStop();
-
-    //! for nonstop DAQ
-    int checkRunRecovery();
-
-    //! for nonstop DAQ
-    void openRunStopNshm();
-
-    //! for nonstop DAQ
     int* m_ptr;
 
+    //! for nonstop DAQ
+    virtual int checkRunStop();
+
+    //! for nonstop DAQ
+    virtual int checkRunRecovery();
+
+    //! for nonstop DAQ
+    virtual void openRunStopNshm();
+
+    //! for nonstop DAQ
+    virtual void restartRun();
+
+    //! for nonstop DAQ
+    virtual void pauseRun();
+
+    //! for nonstop DAQ
+    virtual void waitRestart();
 #endif
 
   private:

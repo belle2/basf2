@@ -62,6 +62,9 @@ namespace Belle2 {
     //! Module functions to be called from main process
     virtual void initialize();
 
+    //! Module functions to be called from main process
+    virtual void initializeNode();
+
     //! Module functions to be called from event process
     virtual void beginRun();
     virtual void event();
@@ -171,6 +174,12 @@ namespace Belle2 {
 
     //! start flag
     int m_start_flag;
+
+    //! for nonstop DAQ
+    int checkRunStop();
+
+    //! for nonstop DAQ
+    int checkRunRecovery();
 
   };
 

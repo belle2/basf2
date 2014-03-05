@@ -40,10 +40,12 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
+//#define NONSTOP
 
 namespace Belle2 {
 
   /*! A class definition of an input module for Sequential ROOT I/O */
+
 
   class DeSerializerModule : public Module {
 
@@ -225,6 +227,22 @@ namespace Belle2 {
 
     //! wrapper for B2LOG system
     CprErrorMessage print_err;
+
+
+#ifdef NONSTOP
+    //! for nonstop DAQ
+    int checkRunStop();
+
+    //! for nonstop DAQ
+    int checkRunRecovery();
+
+    //! for nonstop DAQ
+    void openRunStopNshm();
+
+    //! for nonstop DAQ
+    int* m_ptr;
+
+#endif
 
   private:
 

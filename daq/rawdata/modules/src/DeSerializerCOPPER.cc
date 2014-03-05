@@ -14,13 +14,17 @@
 //#define MAXEVTSIZE 400000000
 //#define TIME_MONITOR
 #define NO_DATA_CHECK
-//#define WO_FIRST_EVENUM_CHECK
-
+#define WO_FIRST_EVENUM_CHECK
+#define YAMADA_DUMMY
 
 using namespace std;
 using namespace Belle2;
 
-
+#ifdef NONSTOP
+int g_run_recovery = 0;
+int g_run_restarting = 0;
+int g_run_stop = 0;
+#endif
 
 //-----------------------------------------------------------------
 //                 Register the Module
@@ -53,6 +57,64 @@ DeSerializerCOPPERModule::~DeSerializerCOPPERModule()
 void DeSerializerCOPPERModule::initialize()
 {
   B2INFO("DeSerializerCOPPER: initialize() started.");
+  // allocate buffer
+  for (int i = 0 ; i < NUM_PREALLOC_BUF; i++) {
+    m_bufary[i] = new int[ BUF_SIZE_WORD ];
+  }
+  m_buffer = new int[ BUF_SIZE_WORD ];
+
+  //
+  // Initialize basf2 related
+  //
+  for (int i = 0 ; i < NUM_PREALLOC_BUF; i++) {
+    memset(m_bufary[i], 0,  BUF_SIZE_WORD * sizeof(int));
+  }
+
+  // Open message handler
+  m_msghandler = new MsgHandler(m_compressionLevel);
+
+  // Initialize EvtMetaData
+  m_eventMetaDataPtr.registerAsPersistent();
+
+  // Initialize Array of RawCOPPER
+  //  rawcprarray.registerPersistent();
+  raw_dblkarray.registerPersistent();
+
+  if (m_dump_fname.size() > 0) {
+    openOutputFile();
+  }
+  memset(time_array0, 0, sizeof(time_array0));
+  memset(time_array1, 0, sizeof(time_array1));
+  memset(time_array2, 0, sizeof(time_array2));
+  memset(time_array3, 0, sizeof(time_array3));
+  memset(time_array4, 0, sizeof(time_array4));
+  memset(time_array5, 0, sizeof(time_array5));
+
+  // initialize COPPER
+  initializeCOPPER();
+
+  //
+  // report ready to SLC
+  //
+  if (m_shmflag > 0) {
+    if (m_nodename.size() == 0 || m_nodeid < 0) {
+      m_shmflag = 0;
+    } else {
+      m_status.open(m_nodename, m_nodeid);
+    }
+  }
+
+#ifdef NONSTOP
+  openRunStopNshm();
+#endif
+
+  B2INFO("DeSerializerCOPPER: initialize() done.");
+}
+
+
+void DeSerializerCOPPERModule::initializeCOPPER()
+{
+
 #ifndef DUMMY
   use_slot = 0; /* bit mask */
   int slot_shift;
@@ -95,60 +157,15 @@ void DeSerializerCOPPERModule::initialize()
 
 #endif
 
-  // allocate buffer
-  for (int i = 0 ; i < NUM_PREALLOC_BUF; i++) {
-    m_bufary[i] = new int[ BUF_SIZE_WORD ];
-  }
-  m_buffer = new int[ BUF_SIZE_WORD ];
-
-  //
-  // Initialize basf2 related
-  //
-  for (int i = 0 ; i < NUM_PREALLOC_BUF; i++) {
-    memset(m_bufary[i], 0,  BUF_SIZE_WORD * sizeof(int));
-  }
-
-  // Open message handler
-  m_msghandler = new MsgHandler(m_compressionLevel);
-
-  // Initialize EvtMetaData
-  m_eventMetaDataPtr.registerAsPersistent();
-
-  // Initialize Array of RawCOPPER
-  //  rawcprarray.registerPersistent();
-  raw_dblkarray.registerPersistent();
-
-  if (m_dump_fname.size() > 0) {
-    openOutputFile();
-  }
-
-
-  memset(time_array0, 0, sizeof(time_array0));
-  memset(time_array1, 0, sizeof(time_array1));
-  memset(time_array2, 0, sizeof(time_array2));
-  memset(time_array3, 0, sizeof(time_array3));
-  memset(time_array4, 0, sizeof(time_array4));
-  memset(time_array5, 0, sizeof(time_array5));
-
+#ifndef YAMADA_DUMMY
   B2INFO("Opening COPPER...");      fflush(stderr);
   openCOPPER();
   B2INFO("Done.\n");    fflush(stderr);
+#endif
 
-  B2INFO("DeSerializerCOPPER: initialize() done.");
-  //
-  // report ready to SLC
-  //
-  if (m_shmflag > 0) {
-    if (m_nodename.size() == 0 || m_nodeid < 0) {
-      m_shmflag = 0;
-    } else {
-      m_status.open(m_nodename, m_nodeid);
-    }
-  }
+
+
 }
-
-
-
 
 void DeSerializerCOPPERModule::fillNewRawCOPPERHeader(RawCOPPER* raw_copper)
 {
@@ -435,9 +452,25 @@ int DeSerializerCOPPERModule::readFD(int fd, char* buf, int data_size_byte)
 
 void DeSerializerCOPPERModule::event()
 {
+
+#ifdef NONSTOP
+  if (g_run_recovery == 1) {
+    initializeCOPPER();
+    g_run_recovery = 0;
+    g_run_restarting = 1;
+    m_start_flag = 0;
+  }
+#endif
+
   if (m_start_flag == 0) {
     // Use shared memory to start(for HSLB dummy data)
+#ifdef YAMADA_DUMMY
+    B2INFO("Opening COPPER...");      fflush(stderr);
+    openCOPPER();
+    B2INFO("Done.\n");    fflush(stderr);
+#endif
     if (m_shmflag > 0) {
+
       B2INFO("DeSerializerCOPPER: Waiting for Start...\n");
       m_status.reportRunning();
     }
@@ -459,7 +492,24 @@ void DeSerializerCOPPERModule::event()
     if (m_start_flag == 0) {
       B2INFO("DeSerializerCOPPER: Reading the 1st event from COPPER FIFO...");
     }
-    int* temp_buf = readOneEventFromCOPPERFIFO(j, &malloc_flag, &m_size_word);
+
+
+    int* temp_buf;
+    try {
+      temp_buf = readOneEventFromCOPPERFIFO(j, &malloc_flag, &m_size_word);
+    } catch (string err_str) {
+#ifdef NONSTOP
+      if (err_str == "TIMEOUT") {
+        if (checkRunStop()) {
+          g_run_stop = 1;
+          break;
+        }
+      }
+#endif
+      print_err.PrintError(m_shmflag, &m_status, err_str);
+      exit(1);
+    }
+
     if (m_start_flag == 0) {
       B2INFO("DeSerializerCOPPER: Done. the size of the 1st event is " << m_size_word << "words");
       m_start_flag = 1;
@@ -492,6 +542,21 @@ void DeSerializerCOPPERModule::event()
     }
     m_totbytes += m_size_word * sizeof(int);
   }
+
+#ifdef NONSTOP
+  if (g_run_stop == 1 || checkRunStop()) {
+    // close COPPER FIFO
+    close(cpr_fd);
+    while (true) {
+      if (checkRunRecovery()) {
+        g_run_stop = 0;
+        g_run_recovery = 1;
+        break;
+      }
+      sleep(1);
+    }
+  }
+#endif
 
 
   //

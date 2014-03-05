@@ -152,10 +152,6 @@ int* DeSerializerModule::shmGet(int fd, int size_words)
 }
 
 
-void DeSerializerModule::event()
-{
-}
-
 
 
 unsigned int  DeSerializerModule::calcXORChecksum(int* buf, int nwords)
@@ -293,4 +289,36 @@ void DeSerializerModule::RateMonitor(unsigned int nevt)
   m_prev_nevt = nevt;
 
 
+
 }
+
+#ifdef NONSTOP
+void DeSerializerModule::openRunStopNshm()
+{
+  char path_shm[100] = "/cpr_startstop";
+  int fd = shm_open(path_shm, O_RDONLY, 0666);
+  if (fd < 0) {
+    printf("[DEBUG] %s\n", path_shm);
+    perror("[ERROR] shm_open2");
+    exit(1);
+  }
+  m_ptr = (int*)mmap(NULL, sizeof(int), PROT_READ, MAP_SHARED, fd, 0);
+  return;
+}
+
+int DeSerializerModule::checkRunStop()
+{
+  if (*m_ptr) { return 1; } else { return 0;}
+}
+
+int DeSerializerModule::checkRunRecovery()
+{
+  if (*m_ptr) { return 0; } else { return 1;}
+}
+
+#endif
+
+void DeSerializerModule::event()
+{
+}
+

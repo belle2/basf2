@@ -13,9 +13,7 @@ using namespace Belle2;
 
 //#define DUMMY_DATA
 #define TIME_MONITOR
-
-#define NONSTOP
-
+//#define NONSTOP
 //#define DEBUG
 
 //-----------------------------------------------------------------
@@ -54,10 +52,8 @@ void SerializerModule::initialize()
 {
 
 
-
 #ifdef DUMMY
   m_buffer = new int[ BUF_SIZE_WORD ];
-
 #endif
 
   if (m_shmflag != 0) {
@@ -68,19 +64,19 @@ void SerializerModule::initialize()
     m_cfg_sta[ 0 ] = 1; // Status bit is 1 : ready before accept()
   }
 
-  Accept();
-
   // Create Message Handler
   m_msghandler = new MsgHandler(m_compressionLevel);
-
-  B2INFO("Tx initialized.");
   memset(time_array0, 0, sizeof(time_array0));
   memset(time_array1, 0, sizeof(time_array1));
   memset(time_array2, 0, sizeof(time_array2));
 
+  Accept();
 
+  initializeNode();
 
+  B2INFO("Tx initialized.");
 }
+
 
 
 void SerializerModule::beginRun()
@@ -110,6 +106,10 @@ void SerializerModule::terminate()
 // User defined functions
 //
 
+void SerializerModule::initializeNode()
+{
+
+}
 
 
 int* SerializerModule::shmGet(int fd, int size_words)
@@ -444,8 +444,57 @@ void SerializerModule::printData(int* buf, int nwords)
 }
 
 
+
+
+
+int SerializerModule::checkRunStop()
+{
+  char path_shm[100] = "/cpr_startstop";
+  int fd = shm_open(path_shm, O_RDONLY, 0666);
+  if (fd < 0) {
+    printf("[DEBUG] %s\n", path_shm);
+    perror("[ERROR] shm_open2");
+    exit(1);
+  }
+  int* ptr;
+  ptr = (int*)mmap(NULL, sizeof(int), PROT_READ, MAP_SHARED, fd, 0);
+  close(fd);
+  // stop = 1, recover = 0
+  if (*ptr) { return 1; } else { return 0;}
+
+}
+
+int SerializerModule::checkRunRecovery()
+{
+  char path_shm[100] = "/cpr_startstop";
+  int fd = shm_open(path_shm, O_RDONLY, 0666);
+  if (fd < 0) {
+    printf("[DEBUG] %s\n", path_shm);
+    perror("[ERROR] shm_open2");
+    exit(1);
+  }
+  int* ptr;
+  ptr = (int*)mmap(NULL, sizeof(int), PROT_READ, MAP_SHARED, fd, 0);
+  // stop = 1, recover = 0
+  close(fd);
+  if (*ptr) { return 0; } else { return 1;}
+
+}
+
+
+
 void SerializerModule::event()
 {
+
+#ifdef NONSTOP
+  if (g_run_restarting == 1) {
+    g_run_restarting = 0;
+    initializeNode();
+  } else if (g_run_recovery == 1) {
+    return; // Nothing to do here
+  }
+#endif
+
   if (m_start_flag == 0) {
     m_start_time = getTimeSec();
     n_basf2evt = 0;
@@ -455,9 +504,9 @@ void SerializerModule::event()
 #ifdef TIME_MONITOR
   recordTime(n_basf2evt, time_array0);
 #endif
+
   //  StoreArray<RawCOPPER> rawcprarray;
   StoreArray<RawDataBlock> raw_dblkarray;
-
   for (int j = 0; j < raw_dblkarray.getEntries(); j++) {
     //    int* buf;
     //    int m_size_byte = 0;
@@ -479,22 +528,46 @@ void SerializerModule::event()
     //
     // Send data
     //
-
     if (m_start_flag == 0) {
       B2INFO("SerializerPC: Sending the 1st packet...");
     }
 
-    m_totbytes += sendByWriteV(raw_dblkarray[ j ]);
-
+    try {
+      m_totbytes += sendByWriteV(raw_dblkarray[ j ]);
+    } catch (string err_str) {
+#ifdef NONSTOP
+      if (err_str == "TIMEOUT") {
+        if (checkRunStop()) {
+          g_run_stop = 1;
+          break;
+        }
+      }
+#endif
+      //      print_err.PrintError(m_shmflag, &m_status, err_str);
+      exit(1);
+    }
     if (m_start_flag == 0) {
       B2INFO("Done. ");
       m_start_flag = 1;
     }
-
   }
 
 #ifdef TIME_MONITOR
   recordTime(n_basf2evt, time_array2);
+#endif
+
+
+#ifdef NONSTOP
+  if (g_run_stop == 1) {
+    while (true) {
+      if (checkRunRecovery()) {
+        g_run_stop = 0;
+        g_run_recovery = 1;
+        break;
+      }
+      sleep(1);
+    }
+  }
 #endif
 
 
@@ -522,4 +595,5 @@ void SerializerModule::event()
     //     m_prev_nevt = n_basf2evt;
   }
   n_basf2evt++;
+
 }

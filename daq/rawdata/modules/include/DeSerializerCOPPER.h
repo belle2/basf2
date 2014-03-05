@@ -32,9 +32,12 @@
 #include <daq/rawdata/modules/DeSerializer.h>
 
 
+
 namespace Belle2 {
 
   /*! A class definition of an input module for Sequential ROOT I/O */
+
+
 
   class DeSerializerCOPPERModule : public  DeSerializerModule {
 
@@ -66,6 +69,9 @@ namespace Belle2 {
     virtual void openCOPPER();
     //! receive data
     virtual int readFD(int fd, char* buf, int data_size_byte);
+
+    //! Module functions to be called from main process
+    virtual void initializeCOPPER();
 
     // Parallel processing parameters
 

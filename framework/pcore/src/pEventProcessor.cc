@@ -7,14 +7,16 @@
  */
 
 #include <framework/pcore/pEventProcessor.h>
-#include <framework/core/Environment.h>
-#include <framework/core/PathManager.h>
 #include <framework/pcore/EvtMessage.h>
 #include <framework/pcore/ProcHandler.h>
 #include <framework/pcore/RingBuffer.h>
 #include <framework/pcore/RxModule.h>
 #include <framework/pcore/TxModule.h>
 #include <framework/pcore/HistModule.h>
+
+#include <framework/core/Environment.h>
+#include <framework/core/PathManager.h>
+#include <framework/logging/LogSystem.h>
 
 #include <TROOT.h>
 
@@ -107,6 +109,17 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
   ModulePtrList initmodules = init_modules_in_main(modulelist);
   dump_modules("processInitialize : ", initmodules);
   processInitialize(initmodules);
+
+  //Don't start processing in case of no master module
+  if (!m_master) {
+    B2ERROR("There is no module that provides event and run numbers. You must either add the EventInfoSetter module to your path, or, if using an input module, read EventMetaData objects from file.");
+  }
+
+  //Check if errors appeared. If yes, don't start the event processing.
+  int numLogError = LogSystem::Instance().getMessageCounter(LogConfig::c_Error);
+  if (numLogError != 0) {
+    B2FATAL(numLogError << " ERROR(S) occurred! The processing of events will not be started.");
+  }
 
   //disable ROOT's management of TFiles
   clearFileList();

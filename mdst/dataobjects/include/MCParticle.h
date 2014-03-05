@@ -46,8 +46,8 @@ namespace Belle2 {
     enum StatusBit {
       c_PrimaryParticle   = 1,   /**< bit 0:  Particle is primary particle. */
       c_StableInGenerator = 2,   /**< bit 1:  Particle is stable in the generator. */
-      c_LeftDetector      = 4,   /**< bit 2:  Particle left the detector. */
-      c_StoppedInDetector = 8,   /**< bit 3:  Particle was stopped in detector. */
+      c_LeftDetector      = 4,   /**< bit 2:  Particle left the detector (the simulation volume). */
+      c_StoppedInDetector = 8,   /**< bit 3:  Particle was stopped in the detector (the simulation volume). */
       c_IsVirtual         = 16   /**< bit 4:  Particle is virtual and not going to Geant4 */
     };
 
@@ -122,7 +122,7 @@ namespace Belle2 {
     float getMass() const { return m_mass; }
 
     /**
-     * Return the particle charge.
+     * Return the particle charge defined in TDatabasePDG.
      * @return The charge of the particle in units of q(positron).
      */
     float getCharge() const;
@@ -149,6 +149,8 @@ namespace Belle2 {
      * Return the decay time in ns.
      * @return The timestamp of the decay of the MonteCarlo particle in ns.
      *         If the particle is stable the time is set to infinity.
+     *         If the particle crosses the simulation volume boundary,
+     *         it is set to the crossing time.
      */
     float getDecayTime() const { return m_decayTime; }
 
@@ -156,6 +158,8 @@ namespace Belle2 {
      * Return the lifetime in ns.
      * A convenient method to get the lifetime of the MonteCarlo particle.
      * @return The lifetime of the MonteCarlo particle in ns.
+     *         If the particle crosses the simulation volume boundary,
+     *         it is set to the time spent inside the volume.
      */
     float getLifetime() const { return m_decayTime - m_productionTime; }
 
@@ -193,6 +197,8 @@ namespace Belle2 {
     /**
      * Return decay vertex.
      * @return The decay vertex of the MonteCarlo particle in cm.
+     *         If the particle crosses the simulation volume boundary,
+     *         it is set to the crossing position.
      */
     const TVector3 getDecayVertex() const {
       return TVector3(m_decayVertex_x, m_decayVertex_y, m_decayVertex_z);

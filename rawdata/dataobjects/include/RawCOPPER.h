@@ -293,8 +293,9 @@ namespace Belle2 {
     enum {
       POS_MAGIC_COPPER_3 = 0,
       POS_CHKSUM_COPPER = 1,
-      POS_MAGIC_COPPER_4 = 2
+      POS_MAGIC_COPPER_4 = 2,
 
+      SIZE_COPPER_TRAILER = 3
     };
 
     //
@@ -345,13 +346,11 @@ namespace Belle2 {
       COPPER_MAGIC_DRIVER_TRAILER = 0x7FFF0009
     };
 
-
-  protected :
-
     RawHeader tmp_header;  //! Not record
 
     RawTrailer tmp_trailer; //! Not record
 
+  protected :
     ClassDef(RawCOPPER, 2);
     //ver.2 Change FEE format as presented at B2GM in Nov.2013 ( Nov.20, 2013)
   };

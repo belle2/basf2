@@ -12,9 +12,9 @@
 using namespace std;
 using namespace Belle2;
 
-#define DESY
+//#define DESY
 #define NO_DATA_CHECK
-//#define WO_FIRST_EVENUM_CHECK
+#define WO_FIRST_EVENUM_CHECK
 
 ClassImp(RawCOPPER);
 
@@ -811,6 +811,8 @@ unsigned int RawCOPPER::FillTopBlockRawHeader(unsigned int m_node_id, unsigned i
 #else
     if (prev_eve32 + 1 != cur_ftsw_eve32) {
 #endif
+
+#ifndef NO_DATA_CHECK
       char err_buf[500];
       sprintf(err_buf, "CORRUPTED DATA: Invalid event_number. Exiting...: cur 32bit eve %u preveve %u prun %d crun %d\n %s %s %d\n",  cur_ftsw_eve32, prev_eve32,
               prev_runsubrun_no, *cur_runsubrun_no,
@@ -822,6 +824,7 @@ unsigned int RawCOPPER::FillTopBlockRawHeader(unsigned int m_node_id, unsigned i
       PrintData(GetBuffer(cpr_id), TotalBufNwords());
       throw (err_str);
       exit(-1);
+#endif
 
     }
   }

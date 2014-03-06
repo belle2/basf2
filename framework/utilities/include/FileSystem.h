@@ -15,7 +15,10 @@ namespace Belle2 {
     bool isDir(const std::string& filename);
 
     /**
-     * Load a shared library
+     * Load a shared library.
+     *
+     * Symbols are resolved only when used, slightly reducing loading time (RTLD_LAZY, see dlopen(3))
+     *
      * @param library  Name of the library
      * @param fullname If false, the Library name is interpreted as short name
      *                 like given to the compiler with -l. It will be expanded

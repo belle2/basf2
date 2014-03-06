@@ -4,6 +4,7 @@ env['LIBS'] = [
     'framework',
     'pxd_dataobjects',
     'vxd_dataobjects',
+    'cdc_dataobjects',
     'genfit2',
     ]
 Return('env')

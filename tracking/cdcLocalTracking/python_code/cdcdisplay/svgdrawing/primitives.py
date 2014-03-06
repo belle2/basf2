@@ -53,6 +53,8 @@ class Bound:
 
     @classmethod
     def fromViewBox(cls, viewbox=''):
+        """Constucts a bound object from a viewbox sting"""
+
         if viewbox:
 
             (left_str, top_str, width_str, height_str) = viewbox.split(' ')
@@ -72,6 +74,8 @@ class Bound:
 
     @classmethod
     def fromSVG(cls, svgElement):
+        """Generates a Bound object by traversing a svg DOM tree combining the individual bounds"""
+
         tagName = svgElement.tagName
 
         if tagName in cls.ignoreList:
@@ -158,21 +162,40 @@ class Bound:
         bottom=0,
         right=0,
         ):
+        """
+        Construction method taking the boundaries
+        @param top Top boundary
+        @param left Left boundary
+        @param bottom Bottom boundary
+        @param right Right boundary
+        """
 
+        # # The top boundary
         self.top = top
+        # # The bottom boundary
         self.bottom = bottom
+        # # The left boundary
         self.left = left
+        # # The right boundary
         self.right = right
 
     @property
     def width(self):
+        """Getter property for the width of the bound area"""
+
         return self.right - self.left
 
     @property
     def height(self):
+        """Getter property for the height of the bound area"""
+
         return self.bottom - self.top
 
     def __iadd__(self, other):
+        """
+        Function to update the current boundary object extending it such that includes the area of the given other boundary object. (Invoked by expressions like this += other)
+        """
+
         if other is None:
             return self
 
@@ -191,21 +214,32 @@ class Bound:
         return self
 
     def __str__(self):
+        """Informal string representation of the boundaries"""
+
         return 'top = ' + repr(self.top) + ' bottom = ' + repr(self.bottom) \
             + ' left = ' + repr(self.left) + ' right = ' + repr(self.right)
 
     @property
     def viewbox(self):
+        """Property combining the boundaries to a view box string usable in the view box attribute of the svg toplevel element."""
+
         return repr(self.left) + ' ' + repr(self.top) + ' ' + repr(self.width) \
             + ' ' + repr(self.height)
 
 
 class SVGDefsFactory:
 
+    """Factory to compose definition elements to be attached to an SVG document"""
+
     def __init__(self, elementFactory):
+        """Constuction method receiving to fundamental element factory to be used to create the XML DOM elements"""
+
+        # # The fundamental factory to generate the DOM elements
         self.elementFactory = elementFactory
 
     def createDefs(self, *defs):
+        """Creates a defs group from a variadic number of XML DOM elements"""
+
         defsElement = self.elementFactory.createElement('defs')
 
         for defElement in defs:
@@ -214,9 +248,13 @@ class SVGDefsFactory:
         return defsElement
 
     def createEndArrow(self, markerName='endArrow', color='darkblue'):
+        """Creates a defintion of an end arrow to be referenced by other svg elements"""
+
         return self.createSimpleEndArrow(markerName, color)
 
     def createSimpleEndArrow(self, markerName='endArrow', color='darkblue'):
+        """Creates a simple defintion of an end arrow to be referenced by other svg elements"""
+
         arrowMarkerString = \
             """
     <marker id="%(markerName)s" viewBox="0 0 10 10" refX="1" refY="5"
@@ -236,7 +274,12 @@ class SVGDefsFactory:
 
 class SVGPrimitivesFactory:
 
+    """Factory to compose geometric primitiv XML DOM elements"""
+
     def __init__(self, elementFactory):
+        """Constuction method receiving to fundamental element factory to be used to create the XML DOM elements"""
+
+        # # The fundamental factory to generate the DOM elements
         self.elementFactory = elementFactory
 
     def createCircle(
@@ -245,6 +288,7 @@ class SVGPrimitivesFactory:
         radius=1.0,
         **kwd
         ):
+        """Construct a SVG circle from center and radius. Additional keyword arguments are added a attributes to the element."""
 
         cx = center[0]
         cy = center[1]
@@ -268,6 +312,7 @@ class SVGPrimitivesFactory:
         toPoint=(1.0, 1.0),
         **kwd
         ):
+        """Construct a SVG line between two points. Additional keyword arguments are added a attributes to the element."""
 
         lineElement = self.elementFactory.createElement('line')
 
@@ -291,6 +336,11 @@ class SVGPrimitivesFactory:
         sweep_flag=False,
         **kwd
         ):
+        """
+        Construct a SVG circle arc between two points and radius. 
+        To select one of four remaining posibilities the flags long_arc and sweep_flag have to be given.
+        Additional keyword arguments are added a attributes to the element.
+        """
 
         if long_arc:
             long_arc = 1
@@ -336,6 +386,7 @@ class SVGPrimitivesFactory:
         value,
         **kwd
         ):
+        """Construct a SVG animation set element, which sets a specific attribut of the surrounding svg element at a specified."""
 
         setElement = self.elementFactory.createElement('set')
 
@@ -348,9 +399,13 @@ class SVGPrimitivesFactory:
         return setElement
 
     def createGroup(self, *pos, **kwd):
+        """Constructs a SVG group element from a variadic list of other primitive svg elements"""
+
         return self.createGroupFromIterable(pos, **kwd)
 
     def createGroupFromIterable(self, iterChildElements, **kwd):
+        """Constructs a SVG group element from an iterable of other primitive svg elements"""
+
         groupElement = self.elementFactory.createElement('g')
 
         for childElement in iterChildElements:

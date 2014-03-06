@@ -24,9 +24,9 @@
 
 #else
 /// Exponent (taken for a power of two) of the maximal string length given to the NAMED macro
-#   define NAMED_MAXLENGTH_EXPONENT 5
+#   define NAMED_MAXLENGTH_EXPONENT 6
 
-/// The maximal string length that can be used in the NAMED macro - currently 32
+/// The maximal string length that can be used in the NAMED macro - currently 64
 #   define NAMED_MAXLENGTH BELLE2_PP_POW(2, NAMED_MAXLENGTH_EXPONENT) //Including the terminating '\0' character
 
 /// Helper macro for the repeatition of the string unpacking in the NAMED macro

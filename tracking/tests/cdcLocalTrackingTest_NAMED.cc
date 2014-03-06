@@ -58,7 +58,7 @@ TEST(CDCLocalTrackingTestWithoutGearBox, NAMED_Misaligned)
 TEST(CDCLocalTrackingTestWithoutGearBox, NAMED_ToLong)
 {
 
-  static_assert(NAMED_MAXLENGTH == 32, "");
+  static_assert(NAMED_MAXLENGTH == 64, "");
   /*
   typedef NAMED("0123456789" \
     "0123456789" \

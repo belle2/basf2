@@ -2,19 +2,13 @@
 #include <analysis/dataobjects/ParticleExtraInfoMap.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-
 #include <framework/logging/Logger.h>
-
-#include <TVector3.h>
 
 #include <gtest/gtest.h>
 
 using namespace std;
 
 namespace Belle2 {
-  /** command x should exit using B2FATAL. */
-#define EXPECT_FATAL(x) EXPECT_EXIT(x,::testing::KilledBySignal(SIGABRT),"");
-
   /** Test fixture. */
   class ParticleTest : public ::testing::Test {
   protected:

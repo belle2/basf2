@@ -1,20 +1,14 @@
 #include <analysis/utility/VariableManager.h>
 #include <analysis/dataobjects/Particle.h>
 #include <framework/datastore/StoreArray.h>
-
+#include <framework/utilities/TestHelpers.h>
 #include <framework/logging/Logger.h>
 
-#include <TVector3.h>
-
-#include <fstream>
 #include <gtest/gtest.h>
 
 using namespace std;
 
 namespace Belle2 {
-  /** command x should exit using B2FATAL. */
-#define EXPECT_FATAL(x) EXPECT_EXIT(x,::testing::KilledBySignal(SIGABRT),"");
-
   /** Test Variable class. */
   class VariableTest : public ::testing::Test {
   protected:
@@ -36,9 +30,9 @@ namespace Belle2 {
     EXPECT_TRUE(pvar != nullptr);
 
     //re-registration not allowed
-    EXPECT_FATAL(VariableManager::Instance().registerVariable("p", &dummyVar, "description"));
+    EXPECT_B2FATAL(VariableManager::Instance().registerVariable("p", &dummyVar, "description"));
 
-    EXPECT_FATAL(VariableManager::Instance().registerVariable("something", nullptr, "blah"));
+    EXPECT_B2FATAL(VariableManager::Instance().registerVariable("something", nullptr, "blah"));
 
 
     VariableManager::Instance().registerVariable("testingthedummyvar", &dummyVar, "blah");
@@ -63,9 +57,9 @@ namespace Belle2 {
     EXPECT_TRUE(VariableManager::Instance().getVariables().size() > 0);
 
     //special characters are not allowed!
-    EXPECT_FATAL(VariableManager::Instance().registerVariable(" space", dummyVar, "blah"));
-    EXPECT_FATAL(VariableManager::Instance().registerVariable("star*", dummyVar, "blah"));
-    EXPECT_FATAL(VariableManager::Instance().registerVariable("*", dummyVar, "blah"));
+    EXPECT_B2FATAL(VariableManager::Instance().registerVariable(" space", dummyVar, "blah"));
+    EXPECT_B2FATAL(VariableManager::Instance().registerVariable("star*", dummyVar, "blah"));
+    EXPECT_B2FATAL(VariableManager::Instance().registerVariable("*", dummyVar, "blah"));
 
     //this is ok, though
     VariableManager::Instance().registerVariable("abcdef0123945859432689_ZEFUEONHSUTNSXA", dummyVar, "blah");

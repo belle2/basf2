@@ -38,14 +38,10 @@ namespace Belle2 {
         m_segmentTripleFilter.initialize();
       }
 
-
-
       void terminate() {
         m_axialAxialSegmentPairFilter.terminate();
         m_segmentTripleFilter.terminate();
       }
-
-
 
       inline void create(const std::vector<CDCRecoSegment2D>& segments,
                          std::set<CDCSegmentTriple>& segmentTriples) const {
@@ -54,7 +50,7 @@ namespace Belle2 {
         StereoSegmentsBySuperLayer stereoSegmentsBySL;
 
         /// Divide segments by superlayer
-        BOOST_FOREACH(const CDCRecoSegment2D & segment, segments) {
+        for (const CDCRecoSegment2D & segment : segments) {
 
           ILayerType iSuperLayer =  segment.getISuperLayer();
           AxialType axialType = segment.getAxialType();
@@ -70,6 +66,15 @@ namespace Belle2 {
             const CDCStereoRecoSegment2D* stereoSegment = &segment;
             stereoSegmentsBySL[iSuperLayer].push_back(stereoSegment);
 
+            // Also store the stereo layers in the neighboring axial layer index
+            // Hence we can ask for all stereo segments, which are next to a specific axial layer
+            // by taking the stereo layers for the array at the index of the axial layer !
+            int iNeighboringAxialLayerInwards = iSuperLayer - 1;
+            int iNeighboringAxialLayerOutwards = iSuperLayer + 1;
+
+            stereoSegmentsBySL[iNeighboringAxialLayerInwards].push_back(stereoSegment);
+            stereoSegmentsBySL[iNeighboringAxialLayerOutwards].push_back(stereoSegment);
+
           }
         }
 
@@ -82,7 +87,7 @@ namespace Belle2 {
       typedef std::vector<const CDCStereoRecoSegment2D*> StereoSegmentsBySuperLayer[CDCWireTopology::N_SUPERLAYERS];
 
       inline void create(
-        const AxialSegmentsBySuperLayer&   axialSegmentsBySL,
+        const AxialSegmentsBySuperLayer& axialSegmentsBySL,
         const StereoSegmentsBySuperLayer& stereoSegmentsBySL,
         std::set<CDCSegmentTriple>& segmentTriples
       ) const {
@@ -92,7 +97,7 @@ namespace Belle2 {
         m_segmentTripleFilter.clear();
 
         //Make pairs of closeby axial superlayers
-        for (ILayerType iAxialSuperLayer = 0; iAxialSuperLayer < CDCWireTopology::N_SUPERLAYERS ;
+        for (ILayerType iAxialSuperLayer = 0; iAxialSuperLayer < CDCWireTopology::N_SUPERLAYERS;
              ++(++iAxialSuperLayer) /*only even slots are filled */) {
 
           //consider only axial superlayers
@@ -108,7 +113,7 @@ namespace Belle2 {
               const std::vector<const CDCStereoRecoSegment2D*>& middleSegments =
                 stereoSegmentsBySL[iStereoSuperLayerIn];
 
-              const std::vector<const CDCAxialRecoSegment2D*>& endSegments    =
+              const std::vector<const CDCAxialRecoSegment2D*>& endSegments =
                 axialSegmentsBySL[iAxialSuperLayerIn];
 
 
@@ -132,37 +137,51 @@ namespace Belle2 {
 
             }
           }
-          //continue;
 
           //make pairs from and to the same superlayer
           {
-            // via the stereo superlayer outside
-            ILayerType iStereoSuperLayerOut = iAxialSuperLayer + 1;
+            // Note: By asking the stereo layer for an axial indexwe get all neighboring stereo segments to this axial superlayer
+            const std::vector<const CDCStereoRecoSegment2D*>& middleSegments = stereoSegmentsBySL[iAxialSuperLayer];
+            const std::vector<const CDCAxialRecoSegment2D*>& endSegments  = axialSegmentsBySL[iAxialSuperLayer];
 
-            if (CDCWireTopology::getInstance().isValidISuperLayer(iStereoSuperLayerOut)) {
+            createForAxialSuperLayerPair(startSegments, middleSegments, endSegments, segmentTriples);
 
-              const std::vector<const CDCStereoRecoSegment2D*>& middleSegments = stereoSegmentsBySL[iStereoSuperLayerOut];
-              const std::vector<const CDCAxialRecoSegment2D*>& endSegments  = axialSegmentsBySL[iAxialSuperLayer];
-
-              createForAxialSuperLayerPair(startSegments, middleSegments, endSegments, segmentTriples);
-
-            }
           }
 
-          {
-            // via the stereo superlayer outside
-            ILayerType iStereoSuperLayerIn = iAxialSuperLayer - 1;
+          continue;
 
-            if (CDCWireTopology::getInstance().isValidISuperLayer(iStereoSuperLayerIn)) {
+          /*
+                //make pairs from and to the same superlayer
+                {
+                  // via the stereo superlayer outside
+                  ILayerType iStereoSuperLayerOut = iAxialSuperLayer + 1;
 
-              const std::vector<const CDCStereoRecoSegment2D*>& middleSegments = stereoSegmentsBySL[iStereoSuperLayerIn];
-              const std::vector<const CDCAxialRecoSegment2D*>& endSegments  = axialSegmentsBySL[iAxialSuperLayer];
+                  if (CDCWireTopology::getInstance().isValidISuperLayer(iStereoSuperLayerOut)) {
 
-              createForAxialSuperLayerPair(startSegments, middleSegments, endSegments, segmentTriples);
+                    const std::vector<const CDCStereoRecoSegment2D*>& middleSegments = stereoSegmentsBySL[iStereoSuperLayerOut];
+                    const std::vector<const CDCAxialRecoSegment2D*>& endSegments  = axialSegmentsBySL[iAxialSuperLayer];
 
-            }
-          }
-        }
+                    createForAxialSuperLayerPair(startSegments, middleSegments, endSegments, segmentTriples);
+
+                  }
+                }
+
+                {
+                  // via the stereo superlayer inside
+                  ILayerType iStereoSuperLayerIn = iAxialSuperLayer - 1;
+
+                  if (CDCWireTopology::getInstance().isValidISuperLayer(iStereoSuperLayerIn)) {
+
+                    const std::vector<const CDCStereoRecoSegment2D*>& middleSegments = stereoSegmentsBySL[iStereoSuperLayerIn];
+                    const std::vector<const CDCAxialRecoSegment2D*>& endSegments  = axialSegmentsBySL[iAxialSuperLayer];
+
+                    createForAxialSuperLayerPair(startSegments, middleSegments, endSegments, segmentTriples);
+
+                  }
+                }
+
+          */
+        } // end for iAxialSuperLayer
       }
 
 

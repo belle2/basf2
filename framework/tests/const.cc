@@ -9,17 +9,9 @@
 using namespace std;
 
 namespace Belle2 {
-  /** command x should exit using B2FATAL. */
-#define EXPECT_FATAL(x) EXPECT_EXIT(x,::testing::KilledBySignal(SIGABRT),"");
-
-  /** test fixture. */
-  class ConstTest : public ::testing::Test {
-  protected:
-
-  };
 
   /** Check basics. */
-  TEST_F(ConstTest, ParticleBasics)
+  TEST(ConstTest, ParticleBasics)
   {
     //construction
     Const::ChargedStable(Const::ParticleType(211));
@@ -56,7 +48,7 @@ namespace Belle2 {
   }
 
   /** Check iteration over ParticleSets. */
-  TEST_F(ConstTest, ParticleIteration)
+  TEST(ConstTest, ParticleIteration)
   {
     const Const::ParticleSet emptyset;
     EXPECT_FALSE(emptyset.contains(Const::Klong));
@@ -107,7 +99,7 @@ namespace Belle2 {
   }
 
   /** Check combination of ParticleSets. */
-  TEST_F(ConstTest, ParticleCombination)
+  TEST(ConstTest, ParticleCombination)
   {
     //no-op
     const Const::ParticleSet set = Const::chargedStableSet + Const::chargedStableSet;
@@ -133,7 +125,7 @@ namespace Belle2 {
   }
 
   /** Check TDatabasePDG lookups. */
-  TEST_F(ConstTest, TDatabasePDG)
+  TEST(ConstTest, TDatabasePDG)
   {
     EXPECT_DOUBLE_EQ(Const::Klong.getParticlePDG()->Charge(), 0);
     EXPECT_EQ(Const::Klong.getParticlePDG()->PdgCode(), 130);
@@ -149,7 +141,7 @@ namespace Belle2 {
   }
 
   /** Check DetectorSet. */
-  TEST_F(ConstTest, DetectorSet)
+  TEST(ConstTest, DetectorSet)
   {
     Const::DetectorSet set(Const::IR);
     EXPECT_EQ(set, Const::IR);
@@ -175,7 +167,7 @@ namespace Belle2 {
   }
 
   /** Check RestrictedDetectorSet. */
-  TEST_F(ConstTest, RestrictedDetectorSet)
+  TEST(ConstTest, RestrictedDetectorSet)
   {
     //note: cannot use EXPECT_EQ() here because c_size is only declared in header, but EXPECT_EQ wants a const&, leading to an undefined reference
     EXPECT_TRUE(Const::PIDDetectors::c_set.size() == Const::PIDDetectors::c_size);

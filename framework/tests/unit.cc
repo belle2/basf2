@@ -1,21 +1,16 @@
 #include <framework/gearbox/Unit.h>
 
+#include <framework/logging/Logger.h>
+#include <framework/utilities/TestHelpers.h>
+
 #include <gtest/gtest.h>
-#include <math.h>
+#include <cmath>
 
 using namespace std;
 
 namespace Belle2 {
-  /** command x should exit using B2FATAL. */
-#define EXPECT_FATAL(x) EXPECT_EXIT(x,::testing::KilledBySignal(SIGABRT),"");
-
-  /** test fixture. */
-  class UnitTest : public ::testing::Test {
-  protected:
-
-  };
   /** check manual conversion. */
-  TEST_F(UnitTest, MultiplyDivide)
+  TEST(UnitTest, MultiplyDivide)
   {
     //set to 10mm in standard units
     double length = 10.0 * Unit::mm;
@@ -29,7 +24,7 @@ namespace Belle2 {
   }
 
   /** check conversions between different units. */
-  TEST_F(UnitTest, ConvertValue)
+  TEST(UnitTest, ConvertValue)
   {
     //check standard units
     EXPECT_DOUBLE_EQ(1.0, Unit::convertValue(1.0, "cm"));
@@ -53,8 +48,8 @@ namespace Belle2 {
     EXPECT_DOUBLE_EQ(5e-3 * 1e2, Unit::convertValue(5e-3, "m"));
     EXPECT_DOUBLE_EQ(M_PI, Unit::convertValue(180.0, "deg"));
 
-    //test fall-back behaviour
-    EXPECT_DOUBLE_EQ(5e3, Unit::convertValue(5e3, "nonexistingunit"));
+    //test fall-back behaviour (return value unchanged, throw B2ERROR)
+    EXPECT_B2ERROR(EXPECT_DOUBLE_EQ(5e3, Unit::convertValue(5e3, "nonexistingunit")));
   }
 
 }  // namespace

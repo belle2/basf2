@@ -2,6 +2,7 @@
 #include <framework/dataobjects/ProfileInfo.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/utilities/TestHelpers.h>
 
 #include <gtest/gtest.h>
 #include <boost/foreach.hpp>
@@ -11,9 +12,6 @@
 using namespace std;
 
 namespace Belle2 {
-  /** command x should exit using B2FATAL. */
-#define EXPECT_FATAL(x) EXPECT_EXIT(x,::testing::KilledBySignal(SIGABRT),"");
-
   /** Set up a few arrays and objects in the datastore */
   class DataStoreTest : public ::testing::Test {
   protected:
@@ -87,14 +85,14 @@ namespace Belle2 {
   TEST_F(DataStoreTest, TypeTest)
   {
     //attach with incompatible type
-    EXPECT_FATAL(StoreArray<ProfileInfo>("EventMetaDatas").isValid());
-    EXPECT_FATAL(StoreObjPtr<ProfileInfo>("EventMetaData").isValid());
+    EXPECT_B2FATAL(StoreArray<ProfileInfo>("EventMetaDatas").isValid());
+    EXPECT_B2FATAL(StoreObjPtr<ProfileInfo>("EventMetaData").isValid());
 
     //attaching objects to array and vice versa shouldn't work
     //neither should the store allow objects with same name/durability
     //as existing arrays
-    EXPECT_FATAL(StoreArray<EventMetaData>("EventMetaData").isValid());
-    EXPECT_FATAL(StoreObjPtr<EventMetaData>("EventMetaDatas").isValid());
+    EXPECT_B2FATAL(StoreArray<EventMetaData>("EventMetaData").isValid());
+    EXPECT_B2FATAL(StoreObjPtr<EventMetaData>("EventMetaDatas").isValid());
 
     //getting a base class is OK
     EXPECT_TRUE(StoreArray<TObject>("EventMetaDatas").isValid());
@@ -388,17 +386,20 @@ namespace Belle2 {
     EXPECT_FALSE(StoreObjPtr<EventMetaData>::required(evtPtr.getName()));
     EXPECT_FALSE(StoreArray<EventMetaData>::required(evtArray.getName()));
 
+    //emulate Module::initialize()
     DataStore::Instance().setInitializeActive(true);
-    EXPECT_TRUE(evtPtr.registerAsPersistent());
-    EXPECT_TRUE(evtArray.registerAsTransient());
+    {
+      EXPECT_TRUE(evtPtr.registerAsPersistent());
+      EXPECT_TRUE(evtArray.registerAsTransient());
 
-    //already registered, ok by default
-    EXPECT_TRUE(evtPtr.registerAsPersistent());
-    EXPECT_TRUE(evtArray.registerAsTransient());
+      //already registered, ok by default
+      EXPECT_TRUE(evtPtr.registerAsPersistent());
+      EXPECT_TRUE(evtArray.registerAsTransient());
 
-    //test errorIfExisting
-    EXPECT_FALSE(evtPtr.registerAsPersistent(true));
-    EXPECT_FALSE(evtArray.registerAsTransient(true));
+      //test errorIfExisting (return code=false + B2ERROR)
+      EXPECT_B2ERROR(EXPECT_FALSE(evtPtr.registerAsPersistent(true)));
+      EXPECT_B2ERROR(EXPECT_FALSE(evtArray.registerAsTransient(true)));
+    }
     DataStore::Instance().setInitializeActive(false);
 
     //now they should be available:
@@ -410,6 +411,12 @@ namespace Belle2 {
     EXPECT_TRUE(StoreArray<EventMetaData>::optional(evtArray.getName()));
     EXPECT_TRUE(StoreObjPtr<EventMetaData>::required(evtPtr.getName()));
     EXPECT_TRUE(StoreArray<EventMetaData>::required(evtArray.getName()));
+
+
+    //outside initialize(), registration results in an error
+    EXPECT_B2ERROR(StoreArray<EventMetaData>::registerPersistent("someothernewname"));
+    EXPECT_B2ERROR(StoreArray<EventMetaData>::registerTransient("someothernewname"));
+    EXPECT_FALSE(StoreArray<EventMetaData>::optional("someothernewname"));
   }
 
 }  // namespace

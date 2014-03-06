@@ -14,15 +14,6 @@
 using namespace std;
 
 namespace Belle2 {
-  /** command x should exit using B2FATAL. */
-#define EXPECT_FATAL(x) EXPECT_EXIT(x,::testing::KilledBySignal(SIGABRT),"");
-
-  /** Test (de)serialization routines. */
-  class StreamTest : public ::testing::Test {
-  protected:
-
-  };
-
   /** create a more or less complex RelationContainer. */
   RelationContainer* createObject()
   {
@@ -66,7 +57,7 @@ namespace Belle2 {
 
 
   /** Check XML conversion. */
-  TEST_F(StreamTest, XML)
+  TEST(StreamTest, XML)
   {
     TVector3 v(1.0, 2.0, 3.0);
     std::string vStr = Stream::serializeXML(&v);
@@ -99,7 +90,7 @@ namespace Belle2 {
   }
 
   /** Check raw conversion. */
-  TEST_F(StreamTest, raw)
+  TEST(StreamTest, raw)
   {
     TVector3 v(1.0, 2.0, 3.0);
     std::string vStr = Stream::serializeAndEncode(&v);
@@ -131,7 +122,7 @@ namespace Belle2 {
     EXPECT_TRUE(broken_obj == NULL);
   }
   /** Read things from gearbox. */
-  TEST_F(StreamTest, GearboxXML)
+  TEST(StreamTest, GearboxXML)
   {
     Gearbox& gb = Gearbox::getInstance();
     vector<string> backends;
@@ -143,7 +134,7 @@ namespace Belle2 {
   }
 
   /** Read things from gearbox. */
-  TEST_F(StreamTest, GearboxRaw)
+  TEST(StreamTest, GearboxRaw)
   {
     Gearbox& gb = Gearbox::getInstance();
     vector<string> backends;

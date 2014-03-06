@@ -2,16 +2,17 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/dataobjects/ProfileInfo.h>
 #include <framework/datastore/RelationsObject.h>
+#include <framework/utilities/TestHelpers.h>
+
 #include <gtest/gtest.h>
+
 #include <boost/foreach.hpp>
+
 #include <iostream>
 using namespace std;
 
 namespace Belle2 {
-  /** command x should exit using B2FATAL. */
-#define EXPECT_FATAL(x) EXPECT_EXIT(x,::testing::KilledBySignal(SIGABRT),"");
-
-  /** The fixture for testing class Foo. */
+  /** test relations. */
   class RelationTest : public ::testing::Test {
   protected:
     /** fill StoreArrays with entries from 0..9 */
@@ -102,10 +103,10 @@ namespace Belle2 {
     DataStore::Instance().setInitializeActive(false);
 
     relation1.create();
-    EXPECT_FATAL(RelationArray(profileData, evtData, "test").isValid());
-    EXPECT_FATAL(RelationArray(profileData, evtData, "test").add(0, 0, 1.0));
-    EXPECT_FATAL(RelationArray(profileData, evtData, "test")[0]);
-    EXPECT_FATAL(RelationArray(profileData, evtData, "test").getModified());
+    EXPECT_B2FATAL(RelationArray(profileData, evtData, "test").isValid());
+    EXPECT_B2FATAL(RelationArray(profileData, evtData, "test").add(0, 0, 1.0));
+    EXPECT_B2FATAL(RelationArray(profileData, evtData, "test")[0]);
+    EXPECT_B2FATAL(RelationArray(profileData, evtData, "test").getModified());
   }
 
   /** Some events may have default constructed relations (i.e. nothing
@@ -216,10 +217,10 @@ namespace Belle2 {
 
     relation.add(0, 10, 1.0);
     typedef RelationIndex<EventMetaData, ProfileInfo> rel_t;
-    EXPECT_FATAL(rel_t relIndex);
+    EXPECT_B2FATAL(rel_t relIndex);
     relation.clear();
     relation.add(10, 0, 1.0);
-    EXPECT_FATAL(rel_t relIndex);
+    EXPECT_B2FATAL(rel_t relIndex);
   }
 
 
@@ -252,12 +253,12 @@ namespace Belle2 {
 
     relation.create();
     typedef RelationIndex<EventMetaData, ProfileInfo> rel_t;
-    EXPECT_FATAL(rel_t(evtData, profileData, "test"));
-    EXPECT_FATAL(rel_t("test"));
+    EXPECT_B2FATAL(rel_t(evtData, profileData, "test"));
+    EXPECT_B2FATAL(rel_t("test"));
 
     StoreArray<EventMetaData> eventData("evts");
     relation2.create();
-    EXPECT_FATAL(rel_t(eventData, profileData, "test2"));
+    EXPECT_B2FATAL(rel_t(eventData, profileData, "test2"));
 
     //This relation works and points to evtData, not eventData.
     //no check is performed, user is responsible to check

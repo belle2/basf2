@@ -27,17 +27,17 @@
 
 class FitConfiguration;
 
-/** This is the Reconstruction Event-Data Model Track.
- *
- *  This class collects hits, performs fits and saves the Track parameters.
- *  Note: This class is still experimental.
- *  Totally missing:
- *   - Fitting functionality
- *   - Storing of which Trackfinders have contributed hits to the RecoTrack
- *     and the exact relation with the HitInfoManager.
- *   - Sorting magic.
- */
 namespace Belle2 {
+  /** This is the Reconstruction Event-Data Model Track.
+   *
+   *  This class collects hits, performs fits and saves the Track parameters.
+   *  Note: This class is still experimental.
+   *  Totally missing:
+   *   - Fitting functionality
+   *   - Storing of which Trackfinders have contributed hits to the RecoTrack
+   *     and the exact relation with the HitInfoManager.
+   *   - Sorting magic.
+   */
   class RecoTrack : public Belle2::RelationsInterface <genfit::Track> {
   public:
     RecoTrack(HitSorterBaseCDC& hitSorterCDC, HitSorterBaseVXD& hitSorterVXD,

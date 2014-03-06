@@ -13,7 +13,7 @@
 #include <TObject.h>
 
 #include <vector>
-#include <climits>
+#include <utility>
 
 namespace Belle2 {
   /** Class to store a single element of a relation.
@@ -30,8 +30,8 @@ namespace Belle2 {
     typedef float weight_type;
 
     /** Empty constructor for ROOT */
-    RelationElement():
-      TObject(), m_from(UINT_MAX), m_to(), m_weights() {}
+    RelationElement();
+
 
     /** Constructor for a 1:1 relation.
      *

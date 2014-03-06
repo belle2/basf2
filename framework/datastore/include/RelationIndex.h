@@ -17,12 +17,15 @@
 namespace Belle2 {
   template <class T> class StoreArray;
 
-  /** Class to ease use of relations.
+  /** Provides access to fast ( O(log n) ) bi-directional lookups on a specified relation.
+   *
+   *  \note This class is used internally by RelationsObject/RelationsInterface. In most cases, you should avoid using RelationIndex directly and use these more friendly interfaces.
    *
    *  Relations connect objects stored in two StoreArrays with each other,
    *  with the possibility of n:n connections and individual weights.
    *
-   *  This class provides bidirectional access to a given Relation to ease use
+   *
+   *  This class provides bidirectional access to a given relation to ease use
    *  of Relations for the normal user. There is no support for changing or adding
    *  Elements of the relation, this should be done directly using RelationArray.
    *

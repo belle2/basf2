@@ -42,7 +42,7 @@ namespace Belle2 {
    *  or adding Relations. All instances of this class will be managed and
    *  created by the RelationIndexManager.
    *
-   *  This class is only used internally, users should use RelationIndex/RelationArray to access/modify relations.
+   *  This class is only used internally, users should use RelationsObject/RelationsInterface to access/add relations.
    */
   template<class FROM, class TO> class RelationIndexContainer: public RelationIndexBase {
   public:

@@ -23,7 +23,7 @@ namespace Belle2 {
    *  This singleton keeps track of all RelationIndexContainers that where created
    *  to make sure indices are not created more often than needed.
    *
-   *  This class is only used internally, users should use RelationIndex/RelationArray to access/modify relations.
+   *  This class is only used internally, users should use RelationsObject/RelationsInterface to access/add relations.
    */
   class RelationIndexManager {
   public:

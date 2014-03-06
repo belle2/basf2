@@ -12,10 +12,13 @@
 
 #include <framework/logging/Logger.h>
 
+#include <climits>
+
 using namespace std;
 using namespace Belle2;
 
 ClassImp(RelationElement)
+
 RelationElement::RelationElement(index_type from, const std::vector<index_type>& to, const std::vector<weight_type>& weights):
   TObject(),
   m_from(from),
@@ -25,4 +28,9 @@ RelationElement::RelationElement(index_type from, const std::vector<index_type>&
   if (to.size() != weights.size()) {
     B2FATAL("Index and weight vector sizes differ!");
   }
+}
+RelationElement::RelationElement():
+  TObject(), m_from(UINT_MAX), m_to(), m_weights()
+{
+
 }

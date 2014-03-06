@@ -12,7 +12,6 @@
 
 #include <TClonesArray.h>
 
-#include <vector>
 #include <string>
 
 namespace Belle2 {
@@ -20,7 +19,7 @@ namespace Belle2 {
 
   /** Class to store relations between StoreArrays in the DataStore.
    *
-   *  This class is only used internally, users should use RelationIndex/RelationArray to access/modify relations.
+   *  This class is only used internally, users should use RelationsObject/RelationsInterface to access/add relations.
    *
    *  \sa RelationElement
    */

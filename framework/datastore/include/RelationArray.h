@@ -21,16 +21,12 @@
 namespace Belle2 {
   template <class T> class StoreArray;
 
-  /** Class to create/modify relations between StoreArrays.
+  /** Low-level class to create/modify relations between StoreArrays.
    *
    *  Relations connect objects stored in two StoreArrays with each other,
    *  with the possibility of n:n connections and individual weights.
    *
    *  \note In almost all cases, you'll want to create/find relations using RelationsObject instead.
-   *
-   *  RelationArray is suitable for adding and modifying relations, see the
-   *  documentation of RelationIndex for a more convenient way of finding and
-   *  accessing relations.
    *
    *  <h1>Creating new relations</h1>
    *  Assuming you have two StoreArrays called 'particles' and 'cdcsimhits',
@@ -66,7 +62,8 @@ namespace Belle2 {
       RelationArray::registerPersistent<MCParticle, SVDSimHit>("", "MySVDSimHits");
       \endcode
    *
-   *  \sa RelationIndex provides a convenient interface to finding objects
+   *  \sa RelationObject for the main user interface to relations.
+   *  \sa RelationIndex provides an interface to quickly find objects
    *      related to a given FROM/TO side object.
    *  \sa The on-disk data structure is provided by RelationElement objects
    *      in a RelationContainer.

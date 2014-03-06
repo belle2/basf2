@@ -24,20 +24,33 @@ from itertools import cycle
 
 class CDCEvaluationModule(Module):
 
+    """Personal module to make some checkout of data to files to debug the local finder."""
+
     def __init__(self, output_folder):
+        """Construction method of the module receiving to output folder, where the evaluation should be written."""
+
         super(CDCEvaluationModule, self).__init__()
                  # call constructor of base class, required!
 
+        # # Output folder for the various output file
         self.output_folder = output_folder
+
+        # # Switch if also the sz information of tracks shall be written
         self.write_sz_tracks = True and False
 
     def initialize(self):
+        """Initialize method of the module"""
+
         print 'initialize()'
 
     def beginRun(self):
+        """BeginRun method of the module"""
+
         print 'beginRun()'
 
     def event(self):
+        """Event method of the module"""
+
         print '#################### EVALUATE EVENT ###########################'
 
     # ##### Short evaluation of the tracking performance
@@ -144,9 +157,13 @@ class CDCEvaluationModule(Module):
                     print outputRow(confusion_row)
 
     def endRun(self):
+        """EndRun method of the module"""
+
         print 'endRun()'
 
     def terminate(self):
+        """Terminate method of the module"""
+
         print 'terminate()'
 
 

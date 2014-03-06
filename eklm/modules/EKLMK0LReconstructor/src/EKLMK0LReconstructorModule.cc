@@ -13,8 +13,10 @@
 
 /* Belle2 headers. */
 #include <framework/core/ModuleManager.h>
+#include <framework/datastore/RelationArray.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Const.h>
+
 #include <eklm/dataobjects/EKLMHit2d.h>
 #include <eklm/dataobjects/EKLMK0L.h>
 #include <eklm/geometry/EKLMObjectNumbers.h>
@@ -170,7 +172,6 @@ static void findAssociatedHits(std::vector<struct HitData>::iterator hit,
   float mt, t, m;
   double v;
   EKLMK0L* k0l;
-  StoreArray<EKLMK0L> k0lArray;
   /* Initially fill the cluster with the hit in question. */
   cluster.push_back(hit->hit);
   hitPos = hit->hit->getGlobalPosition();
@@ -233,7 +234,9 @@ static void findAssociatedHits(std::vector<struct HitData>::iterator hit,
     return;
   }
   hit->stat = c_Cluster;
+
   /* Fill EKLMK0L. */
+  StoreArray<EKLMK0L> k0lArray;
   k0l = new(k0lArray.nextFreeAddress()) EKLMK0L();
   k0l->setGlobalPosition(hitPos);
   k0l->setTime(mt);
@@ -241,10 +244,33 @@ static void findAssociatedHits(std::vector<struct HitData>::iterator hit,
   CLHEP::HepLorentzVector momentum4 = CLHEP::HepLorentzVector(p, sqrt(p.mag2() + m * m));
   k0l->setMomentum(momentum4);
   k0l->setInnermostLayer(nInnermostLayer);
+
+  /* Fill cluster-hit relation array */
+  StoreArray<EKLMHit2d> hits2d;
+  RelationArray EKLMClustersToHits2d(k0lArray, hits2d);
+  for (std::vector<EKLMHit2d*>::iterator clusterPtr_it = cluster.begin(); clusterPtr_it != cluster.end(); ++clusterPtr_it) { //clusterPtr_it iterates over std::vector<EKLMHit2d*>
+    EKLMHit2d tmp = **clusterPtr_it;
+    for (int  hits2d_it = 0; hits2d_it != hits2d.getEntries(); hits2d_it++) // hits2d_it iterates over StoreArray<EKLMHit2d>
+      if (tmp == *(hits2d[hits2d_it]))
+
+      {
+        EKLMClustersToHits2d.add(k0lArray.getEntries() - 1, hits2d_it);
+        break;
+      }
+  }
 }
+
+
+
+
+
+
+
 
 void EKLMK0LReconstructorModule::fillMdstDataobjects()
 {
+
+
   /* Fill MDST dataobject */
   StoreArray<EKLMK0L> k0lArray;
   StoreArray<K0L> k0lMdstArray;
@@ -282,7 +308,7 @@ void EKLMK0LReconstructorModule::fillMdstDataobjects()
 EKLMK0LReconstructorModule::EKLMK0LReconstructorModule() : Module()
 {
   setDescription("EKLM K0L reconstruction module.");
-  setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
+  setPropertyFlags(c_ParallelProcessingCertified);
 }
 
 EKLMK0LReconstructorModule::~EKLMK0LReconstructorModule()
@@ -291,6 +317,7 @@ EKLMK0LReconstructorModule::~EKLMK0LReconstructorModule()
 
 void EKLMK0LReconstructorModule::initialize()
 {
+  RelationArray::registerPersistent<EKLMK0L, EKLMHit2d>();
   StoreArray<EKLMK0L>::registerPersistent();
   StoreArray<K0L>::registerPersistent();
 }

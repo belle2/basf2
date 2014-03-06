@@ -22,7 +22,7 @@ REG_MODULE(EKLMDigitizer)
 EKLMDigitizerModule::EKLMDigitizerModule() : Module()
 {
   setDescription("EKLM digitization module");
-  setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
+  setPropertyFlags(c_ParallelProcessingCertified);
   addParam("DiscriminatorThreshold", m_discriminatorThreshold,
            "Strip hits with npe lower this value will be marked as bad",
            double(7.));

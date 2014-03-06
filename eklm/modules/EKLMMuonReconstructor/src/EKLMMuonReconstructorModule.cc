@@ -19,7 +19,7 @@ REG_MODULE(EKLMMuonReconstructor)
 EKLMMuonReconstructorModule::EKLMMuonReconstructorModule() : Module()
 {
   setDescription("EKLM muon reconstruction module.");
-  setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
+  setPropertyFlags(c_ParallelProcessingCertified);
 }
 
 EKLMMuonReconstructorModule::~EKLMMuonReconstructorModule()

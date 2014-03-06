@@ -25,7 +25,7 @@ EKLMAlignmentModule::EKLMAlignmentModule() : Module()
 {
   setDescription("Module for generation of EKLM transformation and "
                  "alignment data.");
-  setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
+  setPropertyFlags(c_ParallelProcessingCertified);
   addParam("OutputFile", m_out, "Output file.",
            std::string("eklm_alignment.dat"));
 }

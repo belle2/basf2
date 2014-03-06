@@ -96,3 +96,17 @@ void EKLMHitBase::increaseEDep(float deltaEDep)
   m_EDep += deltaEDep;
 }
 
+
+bool EKLMHitBase::operator==(const EKLMHitBase& right)  const // to be justified later
+{
+  if (m_Endcap != right.getEndcap())
+    return false;
+  if (m_Layer != right.getLayer())
+    return false;
+  if (m_Sector != right.getSector())
+    return false;
+  if (abs(m_Time - right.getTime()) > 1)
+    return false;
+  return true;
+}
+

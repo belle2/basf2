@@ -22,7 +22,7 @@ static const char MemErr[] = "Memory allocation error.";
 EKLMReconstructorModule::EKLMReconstructorModule() : Module()
 {
   setDescription("EKLM reconstruction module.");
-  setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
+  setPropertyFlags(c_ParallelProcessingCertified);
 }
 
 EKLMReconstructorModule::~EKLMReconstructorModule()

@@ -24,7 +24,7 @@ static const char MemErr[] = "Memory allocation error.";
 EKLMADCModule::EKLMADCModule() : Module()
 {
   setDescription("Standalone generation and studies of ADC output.");
-  setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
+  setPropertyFlags(c_ParallelProcessingCertified);
   addParam("OutputFile", m_out, "Output file.", std::string("EKLMADC.root"));
   addParam("Mode", m_mode, "Mode (\"Shape\" or \"Strips\").",
            std::string("Strips"));

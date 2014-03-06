@@ -18,7 +18,7 @@
 #include <TVector2.h>
 
 #include "MCAxialAxialSegmentPairFilter.h"
-#include "AxialAxialSegmentPairFilterVars.h"
+#include "AxialAxialSegmentPairFilterTree.h"
 
 namespace Belle2 {
   namespace CDCLocalTracking {
@@ -66,35 +66,12 @@ namespace Belle2 {
 
 
     private:
-      void setupTree();
-
       std::string m_outputFileName = "EvaluateAxialAxialSegmentFilter.root";
 
-      TFile* m_outputFile;
-      TTree* m_tree;
-
-      Bool_t m_truth;
-      Float_t m_weight;
-
-      AxialAxialSegmentPairFilterVars m_axialAxialSegmentFilterVars;
+      TFile* m_ptrTFileForOutput;
+      AxialAxialSegmentPairFilterTree m_axialAxialSegmentFilterTree;
 
     }; // end class EvaluateAxialAxialSegmentPairFilter
-
-    template<class RealAxialAxialSegmentPairFilter>
-    void EvaluateAxialAxialSegmentPairFilter<RealAxialAxialSegmentPairFilter>::setupTree()
-    {
-
-      m_tree->Branch("truth", &m_truth, "truth/O");
-      m_tree->Branch("weight", &m_weight, "weight/F");
-
-      Int_t bufferSize = 32000;
-      Int_t split = 1; //Split the object in branches such that we do not need the class to read it.
-
-      m_tree->Branch("vars", &m_axialAxialSegmentFilterVars, bufferSize, split);
-
-    }
-
-
 
     template<class RealAxialAxialSegmentPairFilter>
     EvaluateAxialAxialSegmentPairFilter<RealAxialAxialSegmentPairFilter>::EvaluateAxialAxialSegmentPairFilter()
@@ -102,24 +79,18 @@ namespace Belle2 {
     }
 
 
-
     template<class RealAxialAxialSegmentPairFilter>
     EvaluateAxialAxialSegmentPairFilter<RealAxialAxialSegmentPairFilter>::~EvaluateAxialAxialSegmentPairFilter()
     {
     }
 
-
-
     template<class RealAxialAxialSegmentPairFilter>
     void EvaluateAxialAxialSegmentPairFilter<RealAxialAxialSegmentPairFilter>::clear()
     {
-
       m_realAxialAxialSegmentPairFilter.clear();
       m_mcAxialAxialSegmentPairFilter.clear();
       //Nothing to do...
     }
-
-
 
     template<class RealAxialAxialSegmentPairFilter>
     void EvaluateAxialAxialSegmentPairFilter<RealAxialAxialSegmentPairFilter>::initialize()
@@ -127,26 +98,22 @@ namespace Belle2 {
       m_mcAxialAxialSegmentPairFilter.initialize();
       m_realAxialAxialSegmentPairFilter.initialize();
 
-      m_outputFile = new TFile(m_outputFileName.c_str(), "RECREATE");
-      m_tree = new TTree("axial_axial", "Variables to select correct axial to axial segment combinations and the mc truth.");
-      setupTree();
+      m_ptrTFileForOutput = new TFile(m_outputFileName.c_str(), "RECREATE");
+      if (m_ptrTFileForOutput) {
+        m_axialAxialSegmentFilterTree.create(*m_ptrTFileForOutput);
+      }
 
     }
-
-
 
     template<class RealAxialAxialSegmentPairFilter>
     void EvaluateAxialAxialSegmentPairFilter<RealAxialAxialSegmentPairFilter>::terminate()
     {
-      if (m_tree != nullptr) {
-        m_tree->Write();
-        delete m_tree;
-        m_tree = nullptr;
-      }
-      if (m_outputFile != nullptr) {
-        m_outputFile->Close();
-        delete m_outputFile;
-        m_outputFile = nullptr;
+      m_axialAxialSegmentFilterTree.save();
+
+      if (m_ptrTFileForOutput != nullptr) {
+        m_ptrTFileForOutput->Close();
+        delete m_ptrTFileForOutput;
+        m_ptrTFileForOutput = nullptr;
       }
 
       m_realAxialAxialSegmentPairFilter.terminate();
@@ -175,20 +142,13 @@ namespace Belle2 {
 
 
       CellWeight mcWeight = getMCAxialAxialSegmentPairFilter().isGoodAxialAxialSegmentPair(axialAxialSegmentPair);
-      bool mcDecision = not isNotACell(mcWeight);
 
       // Forget about the Monte Carlo fit
       axialAxialSegmentPair.clearTrajectory2D();
 
       CellWeight realWeight = getRealAxialAxialSegmentPairFilter().isGoodAxialAxialSegmentPair(axialAxialSegmentPair);
-      //bool realDecision = not isNotACell(realWeight);
-
-      m_axialAxialSegmentFilterVars.fill(axialAxialSegmentPair);
-
-      m_truth = mcDecision;
-      m_weight = mcWeight;
-
-      m_tree->Fill();
+      m_axialAxialSegmentFilterTree.setValues(mcWeight, axialAxialSegmentPair);
+      m_axialAxialSegmentFilterTree.fill();
 
       return realWeight;
 

@@ -12,13 +12,9 @@
 // Own include
 #include <analysis/modules/ParticleVertexFitter/ParticleVertexFitterModule.h>
 
-#include <framework/core/ModuleManager.h>
-
 // framework - DataStore
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/RelationArray.h>
 
 // framework aux
 #include <framework/gearbox/Unit.h>
@@ -52,7 +48,7 @@ namespace Belle2 {
   {
     // set module description (e.g. insert text)
     setDescription("Vertex fitter for modular analysis");
-    setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
+    setPropertyFlags(c_ParallelProcessingCertified);
 
     // Add parameters
     addParam("ListName", m_listName, "name of particle list", string(""));

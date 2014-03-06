@@ -7,8 +7,8 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-/// NOTE:These Classes are needed by dataobjects, but shall not be compatible to the datastore for performance reasons,
-/// therefore not inheriting from T-object (compare to VXDID)
+// NOTE:These Classes are needed by dataobjects, but shall not be compatible to the datastore for performance reasons,
+// therefore not inheriting from T-object (compare to VXDID)
 #ifndef SECTORFRIENDS_H
 #define SECTORFRIENDS_H
 

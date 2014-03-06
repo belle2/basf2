@@ -7,7 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-/// NOTE:These Classes are needed by dataobjects, but shall not be compatible to the datastore for performance reasons, therefore only implemented as .h-file (compare to VXDID)
+// NOTE:These Classes are needed by dataobjects, but shall not be compatible to the datastore for performance reasons, therefore only implemented as .h-file (compare to VXDID)
 #ifndef VXDSECTOR_H
 #define VXDSECTOR_H
 

@@ -64,7 +64,7 @@ namespace Belle2 {
      */
     int restoreDataStore(EvtMessage* msg);
 
-    // Set names of objects to be streamed/destreamed
+    /** Set names of objects to be streamed/destreamed. */
     void registerStreamObjs(std::vector<std::string>& list);
 
     // Pipelined destreaming of EvtMessage using thread

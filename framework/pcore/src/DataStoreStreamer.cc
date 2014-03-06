@@ -118,11 +118,11 @@ EvtMessage* DataStoreStreamer::streamDataStore(DataStore::EDurability durability
 
     //skip empty arrays
     if (removeEmptyArrays and entry->isArray) {
-      if (((TClonesArray*)entry->object)->GetEntries() == 0) continue;
+      if (((TClonesArray*)entry->object)->GetEntriesFast() == 0) continue;
     }
 
     //skip objects not in the list
-    if (m_streamobjnames.size() != 0) {
+    if (!m_streamobjnames.empty()) {
       //      printf ( "selecting %s : ", (it->first).c_str() );
       //      std::basic_string<char> objname = it->first;
       vector<string>::iterator pos = std::find(m_streamobjnames.begin(), m_streamobjnames.end(), it->first);

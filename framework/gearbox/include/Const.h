@@ -11,11 +11,12 @@
 #ifndef CONST_H
 #define CONST_H
 
-#include <cstddef>
-#include <stdexcept>
 #include <framework/core/FrameworkExceptions.h>
 
 #include <TObject.h>
+
+#include <cstddef>
+#include <stdexcept>
 
 class TDatabasePDG;
 class TParticlePDG;
@@ -38,7 +39,7 @@ namespace Belle2 {
     enum EDetector {invalidDetector, PXD, SVD, CDC, TOP, ARICH, ECL, KLM, IR, TRG, DAQ, BEAST, TEST};
 
     /**
-     * The DetectorSet class for sets of detector IDs.
+     * The DetectorSet class for sets of detector IDs in the form of EDetector values.
      */
     class DetectorSet {
     public:

@@ -15,6 +15,7 @@ from ROOT import genfit
 
 import colorsys
 
+## Standard color map for id types
 listColors = [  # 'magenta',
                 # 'gold',
                 # 'yellow',
@@ -36,6 +37,10 @@ listColors = [  # 'magenta',
 
 
 def timeOfFlightToColor(timeOfFlight):
+    """
+    Translates the given floating point time of flight to a color.
+    """
+
     # values are all fractions of their respective scale
 
     # Full color circle in 3 nanoseconds
@@ -50,6 +55,10 @@ def timeOfFlightToColor(timeOfFlight):
 
 
 def inTrackIdToColor(inTrackId):
+    """
+    Translates the given integer in track id to a color.
+    """
+
     hue = 50 * inTrackId % 360 / 360.0
     saturation = 0.75
     lightness = 0.5
@@ -62,13 +71,29 @@ def inTrackIdToColor(inTrackId):
 
 class CDCHitStrokeWidthMap:
 
+    """
+    Base class for CDCHit to the stroke width map functional objects.
+    """
+
     def __call__(self, iCDCHit, cdcHit):
+        """
+        Function call to map the CDCHit id and object to a stroke width.
+        """
+
         return 0.2
 
 
 class ZeroDriftLengthStrokeWidthMap(CDCHitStrokeWidthMap):
 
+    """
+    CDCHit to stroke width map highlighting the CDCHits with 0 drift length.
+    """
+
     def __call__(self, iCDCHit, cdcHit):
+        """
+        Function call to map the CDCHit id and object to a stroke width.
+        """
+
         wirehit = Belle2.CDCLocalTracking.CDCWireHit(cdcHit, 0)
         if wirehit.getRefDriftLength() == 0.0:
             return 1
@@ -78,15 +103,32 @@ class ZeroDriftLengthStrokeWidthMap(CDCHitStrokeWidthMap):
 
 class CDCHitColorMap:
 
+    """
+    Base class for CDCHit to color map functional objects.
+    """
+
+    # # Default color to be used
     bkgHitColor = 'orange'
 
     def __call__(self, iCDCHit, cdcHit):
+        """
+        Function call to map the CDCHit id and object to a color.
+        """
+
         return self.bkgHitColor
 
 
 class ZeroDriftLengthColorMap(CDCHitColorMap):
 
+    """
+    CDCHit to color map highlighting the CDCHits with 0 drift length.
+    """
+
     def __call__(self, iCDCHit, cdcHit):
+        """
+        Function call to map the CDCHit id and object to a color.
+        """
+
         wirehit = Belle2.CDCLocalTracking.CDCWireHit(cdcHit, 0)
         if wirehit.getRefDriftLength() == 0.0:
             return 'red'
@@ -96,7 +138,15 @@ class ZeroDriftLengthColorMap(CDCHitColorMap):
 
 class RLColorMap(CDCHitColorMap):
 
+    """
+    CDCHit to color map by their local right left passage information from Monte Carlo truth
+    """
+
     def __call__(self, iCDCHit, cdcHit):
+        """
+        Function call to map the CDCHit id and object to a color.
+        """
+
         mcHitLookUp = Belle2.CDCLocalTracking.CDCMCHitLookUp.getInstance()
         rlInfo = mcHitLookUp.getRLInfo(cdcHit)
         if rlInfo == 1:
@@ -114,7 +164,15 @@ class RLColorMap(CDCHitColorMap):
 
 class PosFlagColorMap(CDCHitColorMap):
 
+    """
+    CDCHit to color map by their assoziated CDCSimHit::getPosFlag property.
+    """
+
     def __call__(self, iCDCHit, cdcHit):
+        """
+        Function call to map the CDCHit id and object to a color.
+        """
+
         simHit = cdcHit.getRelated('CDCSimHits')
         posFlag = simHit.getPosFlag()
         if posFlag == 0:
@@ -132,7 +190,15 @@ class PosFlagColorMap(CDCHitColorMap):
 
 class MCSegmentIdColorMap(CDCHitColorMap):
 
+    """
+    CDCHit to color map by their Monte Carlo segment id
+    """
+
     def __call__(self, iCDCHit, cdcHit):
+        """
+        Function call to map the CDCHit id and object to a color.
+        """
+
         mcHitLookUp = Belle2.CDCLocalTracking.CDCMCHitLookUp.getInstance()
         inTrackSegmentId = mcHitLookUp.getInTrackSegmentId(cdcHit)
 
@@ -153,7 +219,15 @@ class MCSegmentIdColorMap(CDCHitColorMap):
 
 class TOFColorMap(CDCHitColorMap):
 
+    """
+    CDCHit to color map by their assoziated CDCSimHit::getFlightTime.
+    """
+
     def __call__(self, iCDCHit, cdcHit):
+        """
+        Function call to map the CDCHit id and object to a color.
+        """
+
         simHit = cdcHit.getRelated('CDCSimHits')
         timeOfFlight = simHit.getFlightTime()
 
@@ -162,7 +236,15 @@ class TOFColorMap(CDCHitColorMap):
 
 class ReassignedSecondaryMap(CDCHitColorMap):
 
+    """
+    CDCHit to color map indicating the reassignment to a different MCParticle.
+    """
+
     def __call__(self, iCDCHit, cdcHit):
+        """
+        Function call to map the CDCHit id and object to a color.
+        """
+
         relatedMCParticles = cdcHit.getRelationsWith('MCParticles')
         if relatedMCParticles.size() == 0:
             return self.bkgHitColor
@@ -176,10 +258,23 @@ class ReassignedSecondaryMap(CDCHitColorMap):
 
 class MCParticleColorMap(CDCHitColorMap):
 
+    """
+    CDCHit to color map coloring by the assoziated MCParticle::getArrayIndex()
+    """
+
     def __init__(self):
+        """
+        Construction method setting up a Monte Carlo id to color dictionary which is continously filled
+        as new during the event.
+        """
+
+        # # Dictionary mapping the MCParticle ids to colors for consistent and contious use of the available colors
         self.color_by_mcparticleId = {-1: self.bkgHitColor}
 
     def __call__(self, iCDCHit, cdcHit):
+        """
+        Function call to map the CDCHit id and object to a color.
+        """
 
         mcParticle = cdcHit.getRelated('MCParticles')
         if mcParticle:
@@ -206,6 +301,11 @@ class MCParticleColorMap(CDCHitColorMap):
 
 class MCPDGCodeColorMap(CDCHitColorMap):
 
+    """
+    CDCHit to color map by the assoziated MCParticle::getPDG()
+    """
+
+    # # Dictionary to define the color for the most relevant
     color_by_pdgcode = {
         -999: CDCHitColorMap.bkgHitColor,
         11: 'blue',
@@ -222,12 +322,13 @@ class MCPDGCodeColorMap(CDCHitColorMap):
         -2212: 'red',
         }
 
+    # # Color for the case a particle a pdg code not mentioned in the color_by_pdgcode map
     missing_pdg_color = 'lime'
 
-    def __init__(self):
-        pass
-
     def __call__(self, iCDCHit, cdcHit):
+        """
+        Function call to map the CDCHit id and object to a color.
+        """
 
         mcParticle = cdcHit.getRelated('MCParticles')
         if mcParticle:
@@ -246,6 +347,10 @@ class MCPDGCodeColorMap(CDCHitColorMap):
         return color
 
     def __str__(self):
+        """
+        Informal string summarizing the translation from pdg codes to colors.
+        """
+
         legend_head = 'Legend:\n'
 
         pdg_code_by_color = {}
@@ -263,10 +368,23 @@ class MCPDGCodeColorMap(CDCHitColorMap):
 
 class MCPrimaryColorMap(CDCHitColorMap):
 
+    """
+    CDCHit to color map by the isPrimary information as well as the secondary process type in case the particle is not primary.
+    """
+
     def __init__(self):
+        """
+        Constuction method setting up a dictionary to count the hits for each secondary type.
+        """
+
+        # # Dictionary keeping track of the number of hits with a specific secondary process type.
         self.n_hits_by_secondary_type = {}
 
     def __call__(self, iCDCHit, cdcHit):
+        """
+        Function call to map the CDCHit id and object to a color.
+        """
+
         mcParticle = cdcHit.getRelated('MCParticles')
         if mcParticle:
             primaryFlag = 1
@@ -294,6 +412,10 @@ class MCPrimaryColorMap(CDCHitColorMap):
             return self.bkgHitColor
 
     def __str__(self):
+        """
+        Informal string summarizing the translation from seconday process codes to colors.
+        """
+
         return """
 Legend:
 blue->primary
@@ -306,15 +428,27 @@ orange->beam background
 
 class CDCSegmentColorMap:
 
+    """
+    Base class for Segments to color  map functional objects.
+    """
+
+    # # Default color to be used
     bkgSegmentColor = 'orange'
 
     def __call__(self, iSegment, segment):
+        """
+        Function call to map a segments object from the local finder to a color.
+        """
+
         return self.bkgSegmentColor
 
 
 class SegmentMCTrackIdColorMap(CDCSegmentColorMap):
 
     def __call__(self, iSegment, segment):
+        """
+        Function call to map a segments object from the local finder to a color.
+        """
 
         mcSegmentLookUp = \
             Belle2.CDCLocalTracking.CDCMCSegmentLookUp.getInstance()
@@ -331,6 +465,9 @@ class SegmentMCTrackIdColorMap(CDCSegmentColorMap):
 class SegmentFBInfoColorMap(CDCSegmentColorMap):
 
     def __call__(self, iSegment, segment):
+        """
+        Function call to map a segments object from the local finder to a color.
+        """
 
         mcSegmentLookUp = \
             Belle2.CDCLocalTracking.CDCMCSegmentLookUp.getInstance()
@@ -353,6 +490,9 @@ class SegmentFBInfoColorMap(CDCSegmentColorMap):
 class SegmentFBInfoColorMap(CDCSegmentColorMap):
 
     def __call__(self, iSegment, segment):
+        """
+        Function call to map a segments object from the local finder to a color.
+        """
 
         mcSegmentLookUp = \
             Belle2.CDCLocalTracking.CDCMCSegmentLookUp.getInstance()
@@ -374,7 +514,14 @@ class SegmentFBInfoColorMap(CDCSegmentColorMap):
 
 class SegmentFirstInTrackIdColorMap(CDCSegmentColorMap):
 
+    """
+    Segment to color map by the in track id of the first hit.
+    """
+
     def __call__(self, iSegment, segment):
+        """
+        Function call to map a segments object from the local finder to a color.
+        """
 
         mcSegmentLookUp = \
             Belle2.CDCLocalTracking.CDCMCSegmentLookUp.getInstance()
@@ -390,7 +537,14 @@ class SegmentFirstInTrackIdColorMap(CDCSegmentColorMap):
 
 class SegmentLastInTrackIdColorMap(CDCSegmentColorMap):
 
+    """
+    Segment to color map by the in track id of the last hit.
+    """
+
     def __call__(self, iSegment, segment):
+        """
+        Function call to map a segments object from the local finder to a color.
+        """
 
         mcSegmentLookUp = \
             Belle2.CDCLocalTracking.CDCMCSegmentLookUp.getInstance()
@@ -406,7 +560,14 @@ class SegmentLastInTrackIdColorMap(CDCSegmentColorMap):
 
 class SegmentFirstNPassedSuperLayersColorMap(CDCSegmentColorMap):
 
+    """
+    Segment to color map by the number of passed superlayers of the first hit.
+    """
+
     def __call__(self, iSegment, segment):
+        """
+        Function call to map a segments object from the local finder to a color.
+        """
 
         mcSegmentLookUp = \
             Belle2.CDCLocalTracking.CDCMCSegmentLookUp.getInstance()
@@ -423,7 +584,14 @@ class SegmentFirstNPassedSuperLayersColorMap(CDCSegmentColorMap):
 
 class SegmentLastNPassedSuperLayersColorMap(CDCSegmentColorMap):
 
+    """
+    Segment to color map by the number of passed superlayers of the last hit.
+    """
+
     def __call__(self, iSegment, segment):
+        """
+        Function call to map a segments object from the local finder to a color.
+        """
 
         mcSegmentLookUp = \
             Belle2.CDCLocalTracking.CDCMCSegmentLookUp.getInstance()

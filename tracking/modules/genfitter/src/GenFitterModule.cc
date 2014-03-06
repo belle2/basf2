@@ -497,7 +497,8 @@ void GenFitterModule::event()
               gfTracksToMCPart.add(trackCounter, aTrackCandPointer->getMcTrackId());
             }
 
-            else B2WARNING("No MCParticle contributed to this track! No genfit::Track<->MCParticle relation will be created!");
+            //else B2WARNING("No MCParticle contributed to this track! No genfit::Track<->MCParticle relation will be created!");
+            //FIXME: disabled, makes no sense with real data.
 
             //Set non-helix parameters
             tracks[trackCounter]->setTrackFitResultIndex(chargedStable, -999);

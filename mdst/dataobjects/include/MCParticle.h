@@ -281,7 +281,7 @@ namespace Belle2 {
 
     /**
      * Return if the seen-in flag for a specific subdetector is set or not.
-     * @param detectorID The numerical subdetector ID.
+     * @param set The ID for Belle II subdetector(s), in either Const::DetectorSet or Const::EDetector format.
      * @return Returns true if the corresponding bit is set.
      */
     bool hasSeenInDetector(Const::DetectorSet set) const { return m_seenIn.contains(set); }
@@ -430,13 +430,13 @@ namespace Belle2 {
 
     /**
      * Flag/Add a bit if the MC particle is seen in a specific subdetector.
-     * @param detectorID The numerical ID of a subdetector
+     * @param set The ID for Belle II subdetector(s), in either Const::DetectorSet or Const::EDetector format
      */
     void addSeenInDetector(Const::DetectorSet set) { m_seenIn += set; }
 
     /**
      * Unflag/Remove the bit if the MC particle is not seen in a specific subdetector.
-     * @param detectorID The numerical ID of a subdetector
+     * @param set The ID for Belle II subdetector(s), in either Const::DetectorSet or Const::EDetector format
      */
     void removeSeenInDetector(Const::DetectorSet set) { m_seenIn -= set; }
 

@@ -38,6 +38,16 @@ namespace Belle2 {
       event = evtmetadata.obj().getEvent()
     \endcode
   *
+  * <h1>Creating objects</h1>
+  * You can also create new objects in your Python basf2 module, using
+  * registerAsPersistent()/registerAsTransient() and create(). Since you
+  * cannot specify the type directly, as with template arguments to StoreObjPtr,
+  * the class name is assumed to be identical to the 'name' argument given to the
+  * constructor, and to reside in the Belle2 namespace.
+  * Consequently, you can only create objects with their default names.
+  *
+  * See display/examples/displaydata.py for a concrete example.
+  *
   * \sa PyStoreArray
   */
   class PyStoreObj {

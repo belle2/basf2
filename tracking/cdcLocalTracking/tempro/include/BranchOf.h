@@ -12,6 +12,7 @@
 
 #include <stddef.h>
 #include <typeinfo>
+#include <assert.h>
 
 #include "StaticString.h"
 #include <TTree.h>

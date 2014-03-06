@@ -147,6 +147,11 @@ namespace Belle2 {
       axialAxialSegmentPair.clearTrajectory2D();
 
       CellWeight realWeight = getRealAxialAxialSegmentPairFilter().isGoodAxialAxialSegmentPair(axialAxialSegmentPair);
+      //do fits
+      getRealAxialAxialSegmentPairFilter().getFittedTrajectory2D(*ptrStartSegment);
+      getRealAxialAxialSegmentPairFilter().getFittedTrajectory2D(*ptrEndSegment);
+      getRealAxialAxialSegmentPairFilter().getFittedTrajectory2D(axialAxialSegmentPair);
+
       m_axialAxialSegmentFilterTree.setValues(mcWeight, axialAxialSegmentPair);
       m_axialAxialSegmentFilterTree.fill();
 

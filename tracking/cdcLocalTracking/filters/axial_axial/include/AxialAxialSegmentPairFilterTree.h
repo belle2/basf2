@@ -30,31 +30,43 @@ namespace Belle2 {
     BranchOf < float, NAMED("mcWeight") > ,
              BranchOf < bool, NAMED("mcDecision") > ,
 
-             BranchOf < bool, NAMED("startIsForwardTrajectoryOfEnd") > ,
-             BranchOf < bool, NAMED("endIsForwardTrajectoryOfStart") > ,
+             BranchOf < bool, NAMED("startSegment_isForwardTrajectory_startFit") > ,
+             BranchOf < bool, NAMED("startSegment_isForwardTrajectory_endFit") > ,
+             BranchOf < bool, NAMED("startSegment_isForwardTrajectory_commonFit") > ,
 
-             BranchOf < float, NAMED("totalPerpS_startSegment_startFit") > ,
+             BranchOf < bool, NAMED("endSegment_isForwardTrajectory_startFit") > ,
+             BranchOf < bool, NAMED("endSegment_isForwardTrajectory_endFit") > ,
+             BranchOf < bool, NAMED("endSegment_isForwardTrajectory_commonFit") > ,
 
-             BranchOf < float, NAMED("totalPerpS_startSegment_startFit") > ,
-             BranchOf < float, NAMED("totalPerpS_endSegment_startFit") > ,
+             BranchOf < float, NAMED("startSegment_totalPerpS_startFit") > ,
+             BranchOf < float, NAMED("startSegment_totalPerpS_endFit") > ,
+             BranchOf < float, NAMED("startSegment_totalPerpS_commonFit") > ,
 
-             BranchOf < float, NAMED("totalPerpS_startSegment_endFit") > ,
-             BranchOf < float, NAMED("totalPerpS_endSegment_endFit") > ,
+             BranchOf < float, NAMED("endSegment_totalPerpS_startFit") > ,
+             BranchOf < float, NAMED("endSegment_totalPerpS_endFit") > ,
+             BranchOf < float, NAMED("endSegment_totalPerpS_commonFit") > ,
 
              BranchOf < float, NAMED("perpS_gap_startFit") > ,
              BranchOf < float, NAMED("perpS_gap_endFit") > ,
+             BranchOf < float, NAMED("perpS_gap_commonFit") > ,
+
+             BranchOf < float, NAMED("perpS_offset_startHits_startFit") > ,
+             BranchOf < float, NAMED("perpS_offset_startHits_endFit") > ,
+             BranchOf < float, NAMED("perpS_offset_startHits_commonFit") > ,
+
+             BranchOf < float, NAMED("perpS_offset_endHits_startFit") > ,
+             BranchOf < float, NAMED("perpS_offset_endHits_endFit") > ,
+             BranchOf < float, NAMED("perpS_offset_endHits_commonFit") > ,
+
+             BranchOf < float, NAMED("startSegment_absmom") > ,
+             BranchOf < float, NAMED("endSegment_absmom") > ,
 
 
-             BranchOf < float, NAMED("perpS_offset_endHits") > ,
-             BranchOf < float, NAMED("perpS_offset_startHits") > ,
 
              BranchOf < float, NAMED("startSegment_com_x") > ,
              BranchOf < float, NAMED("startSegment_com_y") > ,
              BranchOf < float, NAMED("endSegment_com_x") > ,
              BranchOf < float, NAMED("endSegment_com_y") > ,
-
-             BranchOf < float, NAMED("startSegment_absmom") > ,
-             BranchOf < float, NAMED("endSegment_absmom") > ,
 
              BranchOf < float, NAMED("startSegment_center_x") > ,
              BranchOf < float, NAMED("startSegment_center_y") > ,

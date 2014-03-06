@@ -42,6 +42,7 @@ bool AxialAxialSegmentPairFilterTree::setValues(const CellWeight& mcWeight, cons
 
   const CDCTrajectory2D& startFit =  startSegment.getTrajectory2D();
   const CDCTrajectory2D& endFit = endSegment.getTrajectory2D();
+  const CDCTrajectory2D& commonFit = axialAxialSegmentPair.getTrajectory2D();
 
 
   bool mcDecision = not isNotACell(mcWeight);
@@ -49,27 +50,34 @@ bool AxialAxialSegmentPairFilterTree::setValues(const CellWeight& mcWeight, cons
   setValue < NAMED("mcDecision") > (mcDecision);
 
 
-  setValue < NAMED("endIsForwardTrajectoryOfStart") > (endSegment.isForwardTrajectory(startFit));
-  setValue < NAMED("startIsForwardTrajectoryOfEnd") > (startSegment.isForwardTrajectory(endFit));
+  setValue < NAMED("startSegment_isForwardTrajectory_startFit") > (startSegment.isForwardTrajectory(startFit));
+  setValue < NAMED("startSegment_isForwardTrajectory_endFit") > (startSegment.isForwardTrajectory(endFit));
+  setValue < NAMED("startSegment_isForwardTrajectory_commonFit") > (startSegment.isForwardTrajectory(commonFit));
 
+  setValue < NAMED("endSegment_isForwardTrajectory_startFit") > (endSegment.isForwardTrajectory(startFit));
+  setValue < NAMED("endSegment_isForwardTrajectory_endFit") > (endSegment.isForwardTrajectory(endFit));
+  setValue < NAMED("endSegment_isForwardTrajectory_commonFit") > (endSegment.isForwardTrajectory(commonFit));
 
+  setValue < NAMED("startSegment_totalPerpS_startFit") > (startSegment.getEndPerpS(startFit) - startSegment.getStartPerpS(startFit));
+  setValue < NAMED("startSegment_totalPerpS_endFit") > (startSegment.getEndPerpS(endFit) - startSegment.getStartPerpS(endFit));
+  setValue < NAMED("startSegment_totalPerpS_commonFit") > (startSegment.getEndPerpS(commonFit) - startSegment.getStartPerpS(commonFit));
 
-
-
-  setValue < NAMED("totalPerpS_startSegment_startFit") > (startSegment.getEndPerpS(startFit) - startSegment.getStartPerpS(startFit));
-  setValue < NAMED("totalPerpS_endSegment_startFit") > (endSegment.getEndPerpS(startFit) - endSegment.getStartPerpS(startFit));
-
-
-  setValue < NAMED("totalPerpS_startSegment_endFit") > (startSegment.getEndPerpS(endFit) - startSegment.getStartPerpS(endFit));
-  setValue < NAMED("totalPerpS_endSegment_endFit") > (endSegment.getEndPerpS(endFit) - endSegment.getStartPerpS(endFit));
+  setValue < NAMED("endSegment_totalPerpS_startFit") > (endSegment.getEndPerpS(startFit) - endSegment.getStartPerpS(startFit));
+  setValue < NAMED("endSegment_totalPerpS_endFit") > (endSegment.getEndPerpS(endFit) - endSegment.getStartPerpS(endFit));
+  setValue < NAMED("endSegment_totalPerpS_commonFit") > (endSegment.getEndPerpS(commonFit) - endSegment.getStartPerpS(commonFit));
 
 
   setValue < NAMED("perpS_gap_startFit") > (endSegment.getStartPerpS(startFit) - startSegment.getEndPerpS(startFit));
   setValue < NAMED("perpS_gap_endFit") > (endSegment.getStartPerpS(endFit) - startSegment.getEndPerpS(endFit));
+  setValue < NAMED("perpS_gap_commonFit") > (endSegment.getStartPerpS(commonFit) - startSegment.getEndPerpS(commonFit));
 
+  setValue < NAMED("perpS_offset_startHits_startFit") > (endSegment.getStartPerpS(startFit) - startSegment.getStartPerpS(startFit));
+  setValue < NAMED("perpS_offset_startHits_endFit") > (endSegment.getStartPerpS(endFit) - startSegment.getStartPerpS(endFit));
+  setValue < NAMED("perpS_offset_startHits_commonFit") > (endSegment.getStartPerpS(commonFit) - startSegment.getStartPerpS(commonFit));
 
-  setValue < NAMED("perpS_offset_endHits") > (endSegment.getEndPerpS(startFit) - startSegment.getEndPerpS(startFit));
-  setValue < NAMED("perpS_offset_startHits") > (endSegment.getStartPerpS(startFit) - startSegment.getStartPerpS(startFit));
+  setValue < NAMED("perpS_offset_endHits_startFit") > (endSegment.getEndPerpS(startFit) - startSegment.getEndPerpS(startFit));
+  setValue < NAMED("perpS_offset_endHits_endFit") > (endSegment.getEndPerpS(endFit) - startSegment.getEndPerpS(endFit));
+  setValue < NAMED("perpS_offset_endHits_commonFit") > (endSegment.getEndPerpS(commonFit) - startSegment.getEndPerpS(commonFit));
 
   Vector2D startCOM = startSegment.getCenterOfMass2D();
   Vector2D endCOM = endSegment.getCenterOfMass2D();
@@ -111,7 +119,9 @@ bool AxialAxialSegmentPairFilterTree::setValues(const CellWeight& mcWeight, cons
   setValue < NAMED("startSegment_extrapolation_to_center_distance") > (startExtrapolatedToEndCenter.distance(endCenter));
   setValue < NAMED("endSegment_extrapolation_to_center_distance") > (endExtrapolatedToStartCenter.distance(startCenter));
 
+
   /*
+
   Vector2D startMomAtCenter = startFit.getUnitMom2D(startCenter);
   Vector2D endMomAtCenter = endFit.getUnitMom2D(endCenter);
 

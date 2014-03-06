@@ -10,26 +10,14 @@ from pybasf2 import *
 # -----------------------------------------------
 basf2label = 'BASF2 (Belle Analysis Framework 2)'
 basf2version = os.environ.get('BELLE2_RELEASE', 'unknown')
-basf2copyright = 'Copyright(C) 2010-2013  Belle II Collaboration'
-basf2authors = [
-    'Andreas Moll',
-    'Martin Heck',
-    'Thomas Kuhr',
-    'Ryosuke Itoh',
-    'Martin Ritter',
-    'Susanne Koblitz',
-    'Nobu Katayama',
-    'Kolja Prothmann',
-    'Zbynek Drasal',
-    'Christian Pulvermacher'
-    ]
+basf2copyright = 'Copyright(C) 2010-2014  Belle II Collaboration'
 
 # -----------------------------------------------
 #               Prepare basf2
 # -----------------------------------------------
 
 # Reset the signal handler to allow the framework execution
-# to be stopped with Ctrl-c
+# to be stopped with Ctrl-c (Python installs own handler)
 signal.signal(signal.SIGINT, signal.SIG_DFL)
 
 

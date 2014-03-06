@@ -12,7 +12,7 @@
  * This file implements the main executable "basf2".                      *
  *                                                                        *
  *                                                                        *
- * Copyright(C) 2010-2013  Belle II Collaboration                         *
+ * Copyright(C) 2010-2014  Belle II Collaboration                         *
  *                                                                        *
  * Contributing authors :                                                 *
  * (main framework)                                                       *
@@ -25,6 +25,7 @@
  *                        Martin Ritter                                   *
  *                        Zbynek Drasal                                   *
  *                        Christian Pulvermacher                          *
+ *                        Thomas Keck                                     *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/

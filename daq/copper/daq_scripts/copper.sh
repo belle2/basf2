@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# setup basf2 environment (See "Setup of Software Tools" at https://belle2.cc.kek.jp/~twiki/bin/view/Computing/SoftwareInstallation
+# setup basf2 environment (See "Setup of Software Tools" at https://belle2.cc.kek.jp/~twiki/bin/view/Software/SoftwareInstallation
 #
 source  ~/.bash_profile
 #

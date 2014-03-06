@@ -58,17 +58,17 @@ namespace Belle2 {
      *  Returns false if initialize() should be called inside forked process.
      */
     bool initializeGlobally(ModulePtr module);
-    /* TFiles are stored in a global list and cleaned up by root
+    /** TFiles are stored in a global list and cleaned up by root
      * since this will happen in all forked processes, these will be corrupted if we don't clean the list!
      *
      * needs to be called at the end of every process.
      */
     void clearFileList();
 
-    /*! Extract modules to be initialized in main process */
+    /** Extract modules to be initialized in main process */
     ModulePtrList init_modules_in_main(const ModulePtrList& modlist);
 
-    /*! Extract modules to be initialized in forked process */
+    /** Extract modules to be initialized in forked process */
     ModulePtrList init_modules_in_process(const ModulePtrList& modlist);
 
   protected:

@@ -61,9 +61,9 @@ namespace Belle2 {
     /** wait for all processes in the given list to terminate. */
     void waitForProcesses(std::vector<pid_t>& pids);
 
-    std::vector<pid_t> m_inputProcessList;  //< PIDs of input processes
-    std::vector<pid_t> m_eventProcessList;  //< PIDs of event processes
-    std::vector<pid_t> m_outputProcessList; //< PIDs of output processes
+    std::vector<pid_t> m_inputProcessList;  /**< PIDs of input processes. */
+    std::vector<pid_t> m_eventProcessList;  /**< PIDs of event processes. */
+    std::vector<pid_t> m_outputProcessList; /**< PIDs of output processes. */
 
     static int s_processID;       ///< ID of current process
 

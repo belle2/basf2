@@ -29,8 +29,7 @@ namespace Belle2 {
 
     /// Looks up at, which index the given Type can be found in a tuple. Amounts to a type inheriting from std::integral_constant
     template<class Type, class Tuple>
-    struct GetIndexInTuple :
-        std::integral_constant < int, -1 > {
+    struct GetIndexInTuple {
     };
 
     /// Specialisation for the case that the first type in the tuple is not the Type asked for. Recursion case.
@@ -47,7 +46,7 @@ namespace Belle2 {
 
     /// Looks up at, which index the given Type can be found in any container type.
     template <class Type, class TypeContainer>
-    class GetIndex;
+    struct GetIndex;
 
     /// Specialisation for variadic type container.
     template <template<class ...> class TypeContainerTemplate, class Type, class ... Types>

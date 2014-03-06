@@ -23,12 +23,23 @@ import primitives
 
 class CDCDataobjectsConverter:
 
+    """
+    Helper object to translate the various tracking objects from BASF2 to a XML-DOM representation
+    """
+
     def __init__(self, elementFactory, animate=False):
+        """
+        Construction method
+        """
+
+        # # Switch if an animated version of the elements shall be generated
         self.animate = animate
 
+        # # SVG primitive elements factory
         self.svgElementFactory = \
             primitives.SVGPrimitivesFactory(elementFactory)
 
+        # # Dispatch map from tracking object types to specialised translator functions
         self.toSVGFunctions_by_type = {  # for adhoc tangents
             tuple: self.TupleToSVG,
             Belle2.PyStoreObj: self.PyStoreObjToSVG,
@@ -70,15 +81,21 @@ class CDCDataobjectsConverter:
                         self.CDCGenericHitCollectionToSVG
 
     def nanoSecondsToAnimationTime(self, nanoSeconds):
+        """Translator function from nano seconds to animation time units in seconds"""
+
         return str(nanoSeconds) + 's'
 
     def styleFillUpdate(self, attributes):
+        """Helper function to set the fill property to the stroke property if not already set otherwise."""
+
         if 'fill' not in attributes or not attributes['fill']:
             if 'stroke' in attributes:
                 attributes['fill'] = attributes['stroke']
 
     @staticmethod
     def unpackKwd(kwd, iObj=0, obj=None):
+        """Mapping function to unpack the attributes from the attribute maps. Mechanism and interface inspired by d3.js"""
+
         result = {}
         for (key, value) in kwd.items():
             if callable(value):
@@ -91,7 +108,19 @@ class CDCDataobjectsConverter:
                 result[key] = value
         return result
 
+    def toSVG(self, obj, **kwd):
+        """Common entry point for the object translation managing the dispatch to specialised functions"""
+
+        # implements dispatch on object type
+        objtype = type(obj)
+
+        toSVGForType = self.toSVGFunctions_by_type.get(objtype,
+                self.IterableToSVG)
+
+        return toSVGForType(obj, **kwd)
+
     def IterableToSVG(self, iterable, **kwd):
+        """Mapping an iterable object to a group of svg objects"""
 
         toSVG = self.toSVG
         unpackKwd = self.unpackKwd
@@ -115,6 +144,8 @@ class CDCDataobjectsConverter:
         return groupElement
 
     def TupleToSVG(self, tup, **kwd):
+        """Mapping a tuple to a group of svg objects. Contains a special case for pairs of simhits to mimic a tangent."""
+
         if len(tup) != 2:
             return IterableToSVG(tup, **kwd)
         else:
@@ -140,6 +171,8 @@ class CDCDataobjectsConverter:
             return lineElement
 
     def PyStoreObjToSVG(self, pystoreobj, **kwd):
+        """Unpacks a PyStoreObj and translates the content to svg."""
+
         if pystoreobj:
             unpackedObject = pystoreobj.obj()
             return self.toSVG(unpackedObject, **kwd)
@@ -147,6 +180,8 @@ class CDCDataobjectsConverter:
             return self.svgElementFactory.createGroup()
 
     def PyStoreArrayToSVG(self, pystorearray, **kwd):
+        """Mapping a PyStoreArray to a group of svg objects."""
+
         if pystorearray:
             iterItems = iter(pystorearray)
             return self.IterableToSVG(iterItems, **kwd)
@@ -155,6 +190,8 @@ class CDCDataobjectsConverter:
             return self.svgElementFactory.createGroup()
 
     def CDCSimHitToSVG(self, cdcsimhit, **kwd):
+        """Maps a CDCSimHit to a momentum arrow starting at the current position with a length proportional to its momentum."""
+
         childElements = []
 
         styleDict = {'stroke': 'yellow', 'stroke-width': '0.02'}
@@ -210,6 +247,8 @@ class CDCDataobjectsConverter:
         return groupElement
 
     def CDCHitToSVG(self, cdchit, **kwd):
+        """Maps a CDCHit to a drift circle at the two dimensional reference wire position"""
+
         childElements = []
 
         mcHitLookUp = Belle2.CDCLocalTracking.CDCMCHitLookUp.getInstance()
@@ -256,6 +295,8 @@ class CDCDataobjectsConverter:
         return groupElement
 
     def GFTrackCandToSVG(self, gftrackcand, **kwd):
+        """Maps a Genfit track candiadte to a group of hits"""
+
         storeHits = Belle2.PyStoreArray('CDCHits')
         hitIDs = gftrackcand.getHitIDs(3)
         iterHitIDs = (hitIDs[iHit] for iHit in xrange(hitIDs.size()))
@@ -263,6 +304,8 @@ class CDCDataobjectsConverter:
         return self.toSVG(cdcHits, **kwd)
 
     def Vector2DToSVG(self, vec, **kwd):
+        """Maps a Vector2D to a point at the position pointed to"""
+
         defaultStyleDict = {'stroke': 'black', 'stroke-width': '0.02'}
         defaultStyleDict.update(kwd)
         self.styleFillUpdate(defaultStyleDict)
@@ -275,6 +318,8 @@ class CDCDataobjectsConverter:
         return circleElement
 
     def Vector3DToSVG(self, vec, **kwd):
+        """Maps a Vector2D to a two dimensional point at the position pointed to"""
+
         defaultStyleDict = {'stroke': 'black', 'stroke-width': '0.02'}
         defaultStyleDict.update(kwd)
         self.styleFillUpdate(defaultStyleDict)
@@ -287,6 +332,8 @@ class CDCDataobjectsConverter:
         return circleElement
 
     def CDCWireToSVG(self, cdcwire, **kwd):
+        """Maps a CDCWire to the two dimensional wire reference position."""
+
         wireRadius = 0.1
 
         styleDict = {'stroke': 'black', 'stroke-width': repr(wireRadius)}
@@ -304,6 +351,8 @@ class CDCDataobjectsConverter:
         return circleElement
 
     def CDCWireSuperLayerToSVG(self, cdcWireSuperLayer, **kwd):
+        """Maps a CDCWireSuperLayer to two circles representing the inner and outer radius of the superlayer"""
+
         styleDict = {'stroke': 'black', 'stroke-width': '0.2', 'fill': 'none'}
         styleDict.update(kwd)
         self.styleFillUpdate(styleDict)
@@ -323,6 +372,8 @@ class CDCDataobjectsConverter:
         return groupElement
 
     def CDCWireHitToSVG(self, wirehit, **kwd):
+        """Maps a CDCWireHit to a drift circle at the two dimensional reference wire position"""
+
         wire = wirehit.getWire()
         wireSVGElement = self.toSVG(wire, **kwd)
 
@@ -346,6 +397,7 @@ class CDCDataobjectsConverter:
         return groupElement
 
     def CDCRecoHit2DToSVG(self, recohit, **kwd):
+        """Maps a CDCRecoHit2D to a drift circle at the two dimensional reference wire position and a point at the reconstructed position"""
 
         position = recohit.getRecoPos2D()
         point = (position.x(), position.y())
@@ -370,6 +422,8 @@ class CDCDataobjectsConverter:
                 circleElement)
 
     def CDCRecoHit3DToSVG(self, recohit, **kwd):
+        """Maps a CDCRecoHit2D to a drift circle at the two dimensional reference wire position and a point at the reconstructed position"""
+
         wirehit = recohit.getWireHit()
         wirehitElement = self.toSVG(wirehit, **kwd)
 
@@ -390,6 +444,8 @@ class CDCDataobjectsConverter:
                 circleElement)
 
     def CDCRecoTangentToSVG(self, recotangent, **kwd):
+        """Maps a CDCRecoTangent to line connecting the from and the to reconstructed position"""
+
         styleDict = {'stroke': 'black', 'stroke-width': '0.02'}
         styleDict.update(kwd)
 
@@ -416,6 +472,8 @@ class CDCDataobjectsConverter:
         return groupElement
 
     def CDCAxialAxialSegmentPairToSVG(self, segmentTriple, **kwd):
+        """Maps a CDCAxialAxialSegmentPair to a line connecting the center of masses of the two segments."""
+
         childElements = []
         defaultStyleDict = {'stroke': 'black', 'stroke-width': '0.02'}
         defaultStyleDict.update(kwd)
@@ -444,6 +502,8 @@ class CDCDataobjectsConverter:
         return groupElement
 
     def CDCSegmentTripleToSVG(self, segmentTriple, **kwd):
+        """Maps a CDCAxialAxialSegmentPair to two lines connecting the center of masses of the three segments."""
+
         childElements = []
         defaultStyleDict = {'stroke': 'black', 'stroke-width': '0.02'}
         defaultStyleDict.update(kwd)
@@ -521,12 +581,16 @@ class CDCDataobjectsConverter:
         return groupElement
 
     def CDCGenericHitCollectionToSVG(self, genericHitCollection, **kwd):
+        """Maps a collection of tracking entities to a group of svg elements"""
+
         nItems = genericHitCollection.size()
         iterItems = (genericHitCollection.at(iItem) for iItem in
             xrange(nItems))
         return self.IterableToSVG(iterItems, **kwd)
 
     def CDCTrajectory2DToSVG(self, fit, **kwd):
+        """Maps a CDCTrajectory to a circle section arc at the reference start position on the trajectory until it exits the CDC."""
+
         svgElements = []
 
         styleDict = {'stroke': 'black', 'stroke-width': '0.02'}
@@ -615,14 +679,5 @@ class CDCDataobjectsConverter:
         groupElement = \
             self.svgElementFactory.createGroupFromIterable(svgElements)
         return groupElement
-
-    def toSVG(self, obj, **kwd):
-    # implements dispatch on object type
-        objtype = type(obj)
-
-        toSVGForType = self.toSVGFunctions_by_type.get(objtype,
-                self.IterableToSVG)
-
-        return toSVGForType(obj, **kwd)
 
 

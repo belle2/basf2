@@ -213,11 +213,6 @@ const Const::DetectorSet Const::TrackingDetectors::c_set = Const::PXD + Const::S
 
 const Const::DetectorSet Const::PIDDetectors::c_set = Const::SVD + Const::CDC + Const::TOP + Const::ARICH + Const::ECL + Const::KLM;
 
-static class CheckPIDDetectorsSize {
-public:
-  CheckPIDDetectorsSize() {assert(Const::PIDDetectors::c_set.size() == Const::PIDDetectors::c_size);}
-} checkPIDDetectorsSize;
-
 
 const Const::DetectorSet Const::allDetectors = Const::IR + Const::PXD + Const::SVD + Const::CDC +
                                                Const::TOP + Const::ARICH + Const::ECL + Const::KLM +

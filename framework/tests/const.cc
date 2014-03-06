@@ -174,4 +174,11 @@ namespace Belle2 {
     EXPECT_EQ(Const::allDetectors.size(), (size_t)12);
   }
 
+  /** Check RestrictedDetectorSet. */
+  TEST_F(ConstTest, RestrictedDetectorSet)
+  {
+    //note: cannot use EXPECT_EQ() here because c_size is only declared in header, but EXPECT_EQ wants a const&, leading to an undefined reference
+    EXPECT_TRUE(Const::PIDDetectors::c_set.size() == Const::PIDDetectors::c_size);
+  }
+
 }  // namespace

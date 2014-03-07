@@ -15,7 +15,6 @@
 #include <analysis/TMVAInterface/TMVAExpert.h>
 #include <analysis/utility/VariableManager.h>
 
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/logging/Logger.h>
@@ -29,7 +28,7 @@ namespace Belle2 {
 
   TMVAExpertModule::TMVAExpertModule() : Module()
   {
-    setDescription("Fills ExtraInfo of Particl object with calculated TMVAExpert output.");
+    setDescription("Fills ExtraInfo of Particle object with calculated TMVAExpert output. Requires existing training from running TMVATeacher.");
     setPropertyFlags(c_ParallelProcessingCertified);
 
     // Add parameters

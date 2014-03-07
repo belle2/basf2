@@ -23,7 +23,7 @@ namespace Belle2 {
 
   TMVATeacherModule::TMVATeacherModule() : Module()
   {
-    setDescription("Trains multivariate analysis method with given particle lists as training samples.");
+    setDescription("Trains multivariate analysis method with given particle lists as training samples. See https://belle2.cc.kek.jp/~twiki/bin/view/Software/TMVA for detailed instructions.");
     // This module isn't cabable of parallel processing due to the use of TMVA
     //setPropertyFlags(c_ParallelProcessingCertified);
 

@@ -30,10 +30,7 @@ namespace Belle2 {
     EXPECT_TRUE(nmessages_after > nmessages_before) << "Message of level " << #loglevel << " expected, but not found."; \
   }
 
-    /** \def EXPECT_B2FATAL(x)
-     *
-     *  command x should exit using B2FATAL.
-     */
+    /**  command x should exit using B2FATAL.  */
 #define EXPECT_B2FATAL(x) EXPECT_EXIT(x, ::testing::KilledBySignal(SIGABRT),"");
 
     /** \def EXPECT_B2ERROR(x)

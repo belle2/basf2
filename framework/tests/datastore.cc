@@ -417,6 +417,14 @@ namespace Belle2 {
     EXPECT_B2ERROR(StoreArray<EventMetaData>::registerPersistent("someothernewname"));
     EXPECT_B2ERROR(StoreArray<EventMetaData>::registerTransient("someothernewname"));
     EXPECT_FALSE(StoreArray<EventMetaData>::optional("someothernewname"));
+
+    //accessing unregistered things doesn't work.
+    StoreArray<EventMetaData> someothernewname("someothernewname");
+    EXPECT_FALSE(someothernewname.isValid());
+    //usually one shouldn't call StoreArray::create(), but everything like appendNew() would crash
+    EXPECT_B2ERROR(EXPECT_FALSE(someothernewname.create()));
+    EXPECT_FALSE(someothernewname.isValid()); //still invalid (as create() failed)
+
   }
 
 }  // namespace

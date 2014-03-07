@@ -2,6 +2,7 @@
 #include "daq/slc/apps/runcontrold/RunConfig.h"
 #include "daq/slc/apps/runcontrold/RCMaster.h"
 
+#include <daq/slc/nsm/NSMNode.h>
 #include <daq/slc/nsm/NSMMessage.h>
 
 #include <daq/slc/system/PThread.h>
@@ -14,7 +15,6 @@
 #include <daq/slc/base/StringUtil.h>
 #include <daq/slc/base/Command.h>
 #include <daq/slc/base/DataObject.h>
-#include <daq/slc/base/NSMNode.h>
 #include <daq/slc/base/Date.h>
 
 #include <cstdio>

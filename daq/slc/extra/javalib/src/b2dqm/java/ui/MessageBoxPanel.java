@@ -14,6 +14,11 @@ public class MessageBoxPanel extends MessageViewPanel implements Updatable {
 	private String _footer = "";
 	
 	public MessageBoxPanel() {
+		super(13);
+	}
+	
+	public MessageBoxPanel(int font_size) {
+		super(font_size);
 	}
 	
 	public void add(UpdatableMessage text) {

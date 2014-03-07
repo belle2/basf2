@@ -3,19 +3,19 @@ package b2rc.core;
 public class RCState extends RCEnum {
 
 	final static public RCState UNKNOWN = new RCState(0, "UNKNOWN", "UNKNOWN");
-	final static public RCState INITIAL_S = new RCState(101, "INITIAL_S", "INITIAL");
-	final static public RCState CONFIGURED_S = new RCState(102, "CONFIGURED_S", "CONFIGURED");
-	final static public RCState READY_S = new RCState(103, "READY_S", "READY");
-	final static public RCState RUNNING_S = new RCState(104, "RUNNING_S", "RUNNING");
-	final static public RCState PAUSED_S = new RCState(105, "PAUSED_S", "PAUSED");
-	final static public RCState BOOTING_TS = new RCState(201, "BOOTING_TS", "BOOTING");
-	final static public RCState LOADING_TS = new RCState(202, "LOADING_TS", "LOADING");
-	final static public RCState STARTING_TS = new RCState(203, "STARTING_TS", "STARTING");
-	final static public RCState STOPPING_TS = new RCState(204, "STOPPING_TS", "STOPPING");
-	final static public RCState ERROR_ES = new RCState(301, "ERROR_ES", "ERROR");
-	final static public RCState FATAL_ES = new RCState(302, "FATAL_ES", "FATAL");
-	final static public RCState RECOVERING_RS = new RCState(402, "RECOVERING_RS", "RECOVERING");
-	final static public RCState ABORTING_RS = new RCState(403, "ABORTING_RS", "ABORTING");
+	final static public RCState INITIAL_S = new RCState(1, "INITIAL_S", "INITIAL");
+	final static public RCState CONFIGURED_S = new RCState(2, "CONFIGURED_S", "CONFIGURED");
+	final static public RCState READY_S = new RCState(3, "READY_S", "READY");
+	final static public RCState RUNNING_S = new RCState(4, "RUNNING_S", "RUNNING");
+	final static public RCState PAUSED_S = new RCState(5, "PAUSED_S", "PAUSED");
+	final static public RCState BOOTING_TS = new RCState(21, "BOOTING_TS", "BOOTING");
+	final static public RCState LOADING_TS = new RCState(22, "LOADING_TS", "LOADING");
+	final static public RCState STARTING_TS = new RCState(23, "STARTING_TS", "STARTING");
+	final static public RCState STOPPING_TS = new RCState(24, "STOPPING_TS", "STOPPING");
+	final static public RCState ERROR_ES = new RCState(41, "ERROR_ES", "ERROR");
+	final static public RCState FATAL_ES = new RCState(42, "FATAL_ES", "FATAL");
+	final static public RCState RECOVERING_RS = new RCState(61, "RECOVERING_RS", "RECOVERING");
+	final static public RCState ABORTING_RS = new RCState(62, "ABORTING_RS", "ABORTING");
 	
 	private boolean _active = true;
 	private boolean _masked = false;

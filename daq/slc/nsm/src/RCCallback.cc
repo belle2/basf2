@@ -53,9 +53,10 @@ void RCCallback::download()
   }
 }
 
-bool RCCallback::perform(const Command& cmd, NSMMessage& msg)
+bool RCCallback::perform(NSMMessage& msg)
 throw(NSMHandlerException)
 {
+  const Command cmd = msg.getRequestName();
   setReply("");
   if (cmd == Command::OK) {
     return ok();

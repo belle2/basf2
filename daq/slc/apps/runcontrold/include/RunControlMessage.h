@@ -2,8 +2,8 @@
 #define _Belle2_RunControlMessage_hh
 
 #include <daq/slc/base/Command.h>
-#include <daq/slc/base/NSMNode.h>
 
+#include <daq/slc/nsm/NSMNode.h>
 #include <daq/slc/nsm/NSMMessage.h>
 
 namespace Belle2 {

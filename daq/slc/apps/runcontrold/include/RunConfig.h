@@ -1,8 +1,9 @@
 #ifndef _Belle2_RunConfig_hh
 #define _Belle2_RunConfig_hh
 
+#include <daq/slc/nsm/NSMNode.h>
+
 #include <daq/slc/base/DataObject.h>
-#include <daq/slc/base/NSMNode.h>
 
 namespace Belle2 {
 

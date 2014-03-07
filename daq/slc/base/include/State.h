@@ -37,16 +37,22 @@ namespace Belle2 {
     throw() : Enum(id, label, alias) {}
 
   public:
-    bool isStable() const throw() { return _id > 100 && _id < 200; }
-    bool isTransaction() const throw() { return _id > 200 && _id < 300; }
-    bool isError() const throw() { return _id > 300 && _id < 400; }
-    bool isRecovering() const throw() { return _id > 400 && _id < 500; }
+    bool isStable() const throw() { return _id > 0 && _id < 20; }
+    bool isTransaction() const throw() { return _id > 20 && _id < 40; }
+    bool isError() const throw() { return _id > 40 && _id < 60; }
+    bool isRecovering() const throw() { return _id > 60 && _id < 80; }
     State next() const throw();
 
   public:
     const State& operator=(const std::string& msg) throw();
     const State& operator=(const char* msg) throw();
     const State& operator=(int id) throw();
+    inline const State& operator=(const State& e) throw() {
+      _id = e._id;
+      _label = e._label;
+      _alias = e._alias;
+      return *this;
+    }
 
   };
 

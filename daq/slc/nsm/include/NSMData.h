@@ -3,7 +3,8 @@
 
 #include "daq/slc/nsm/NSMHandlerException.h"
 
-#include "daq/slc/base/DataObject.h"
+#include "daq/slc/database/DBInterface.h"
+
 #include "daq/slc/base/Serializable.h"
 
 extern "C" {
@@ -25,7 +26,7 @@ namespace Belle2 {
 
   struct NSMDataProperty {
     NSMDataType type;
-    size_t length;
+    int length;
     size_t offset;
   };
 
@@ -36,14 +37,15 @@ namespace Belle2 {
   public:
     NSMData(const std::string& data_name, const std::string& format,
             int revision) throw() : _pdata(NULL), _data_name(data_name),
-      _format(format), _revision(revision) {}
-    NSMData() throw() : _pdata(NULL) {}
+      _format(format), _revision(revision), _size(0) {}
+    NSMData() throw() : _pdata(NULL), _size(0) {}
     virtual ~NSMData() throw() {}
 
   public:
     const std::string& getName() const { return _data_name; }
     const std::string& getFormat() const { return  _format; }
     int getRevision() const { return _revision; }
+    int getSize() const { return _size; }
     bool isAvailable() throw() { return (_pdata != NULL); }
     void* open(NSMCommunicator* comm) throw(NSMHandlerException);
     void* allocate(NSMCommunicator* comm, int interval = 3) throw(NSMHandlerException);
@@ -89,14 +91,12 @@ namespace Belle2 {
     double* getDoubleArray(const std::string& label, size_t& length) throw(NSMHandlerException);
     float* getFloatArray(const std::string& label, size_t& length) throw(NSMHandlerException);
 
-    const std::string toSQLConfig();
+    const std::string getDBTableName();
     const std::string toSQLNames();
-    const std::string toSQLValues();
-    void setSQLValues(std::vector<std::string>& name_v,
-                      std::vector<std::string>& value_v);
-    void getSQLValues(std::vector<std::string>& name_v,
-                      std::vector<std::string>& value_v);
-    const std::string toXML();
+    int openDB(DBInterface* db) throw(DBHandlerException);
+    int writeDB(DBInterface* db) throw(DBHandlerException);
+    int readDB(DBInterface* db, int id = -1) throw(DBHandlerException);
+
     void writeObject(Writer& writer) const throw(IOException);
     void readObject(Reader& reader) throw(IOException);
 
@@ -108,6 +108,7 @@ namespace Belle2 {
     std::string _data_name;
     std::string _format;
     int _revision;
+    int _size;
     mutable NSMDataPropertyMap _pro_m;
     mutable std::vector<std::string> _label_v;
 

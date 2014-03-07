@@ -8,9 +8,10 @@ import javax.swing.JPanel;
 public class MessageViewPanel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
-	private MessagePanel _message = new MessagePanel();
+	private MessagePanel _message;
 
-	public MessageViewPanel() {
+	public MessageViewPanel(int fontsize) {
+		_message = new MessagePanel(fontsize);
 		setLayout(null);
 		addComponentListener(new ComponentAdapter() {
 			public void componentResized(ComponentEvent e) {
@@ -21,6 +22,10 @@ public class MessageViewPanel extends JPanel {
 			}
     	});
 		add(_message);
+	}
+	
+	public void setFontSize(int fontsize) {
+		_message.setFontSize(fontsize);
 	}
 	
 	synchronized public void add(String message) {

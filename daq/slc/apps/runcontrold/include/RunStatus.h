@@ -2,7 +2,7 @@
 #define _Belle2_RunStatus_hh
 
 #include <daq/slc/base/DataObject.h>
-#include <daq/slc/base/NSMNode.h>
+#include <daq/slc/nsm/NSMNode.h>
 #include <daq/slc/system/LogFile.h>
 
 namespace Belle2 {

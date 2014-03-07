@@ -185,6 +185,7 @@ public class SystemConfigurationPanel extends JPanel implements Updatable {
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
+				/*
 				RunTypeSelectPanel panel = new RunTypeSelectPanel(tree.createBranch(_run_type_v_m.keySet()));
 				Object[] message = { panel };
 				String[] options = { "Set", "Cancel" };
@@ -221,6 +222,7 @@ public class SystemConfigurationPanel extends JPanel implements Updatable {
 				default:
 					break;
 				}
+				*/
 			}
 		});
 

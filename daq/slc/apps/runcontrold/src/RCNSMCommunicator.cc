@@ -91,7 +91,7 @@ bool RCNSMCommunicator::isOnline(NSMNode* node) throw()
 
 void RCNSMCommunicator::sendLog(const SystemLog& log) throw()
 {
-  if (_rc_node == NULL) return;
-  _comm->setRCNode(_rc_node);
+  //if (_rc_node == NULL) return;
+  //_comm->setRCNode(_rc_node);
   _comm->sendLog(log);
 }

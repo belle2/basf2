@@ -146,10 +146,11 @@ void RCGUICommunicator::run()
         master->unlock();
       } else {
         _reader.readObject(msg);
-        LogFile::debug(msg.getData());
-        _callback->setForce(msg.getData().find("ALL") == std::string::npos);
+        std::string text = msg.getData();
+        LogFile::debug(text);
+        _callback->setForce(text.find("ALL") == std::string::npos);
         _callback->setMessage(msg);
-        if (_callback->perform(cmd, msg)) {
+        if (_callback->perform(msg)) {
 
         }
       }

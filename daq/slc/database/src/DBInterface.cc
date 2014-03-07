@@ -1,5 +1,6 @@
 #include "daq/slc/database/DBInterface.h"
 
+#include <cstdarg>
 using namespace Belle2;
 
 DBInterface::DBInterface(const std::string& host,
@@ -17,4 +18,14 @@ DBInterface::DBInterface(const std::string& host,
 DBInterface::~DBInterface() throw()
 {
 
+}
+
+void DBInterface::execute(const std::string& text, ...) throw(DBHandlerException)
+{
+  va_list ap;
+  static char ss[1024];
+  va_start(ap, text);
+  vsprintf(ss, text.c_str(), ap);
+  va_end(ap);
+  execute_imp(ss);
 }

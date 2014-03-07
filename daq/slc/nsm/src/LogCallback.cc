@@ -3,9 +3,10 @@
 
 using namespace Belle2;
 
-bool LogCallback::perform(const Command& cmd, NSMMessage&)
+bool LogCallback::perform(NSMMessage& msg)
 throw(NSMHandlerException)
 {
+  const Command cmd = msg.getRequestName();
   setReply("");
   if (cmd == Command::OK) {
     return ok();

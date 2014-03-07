@@ -5,34 +5,50 @@
 using namespace Belle2;
 
 BufferedWriter::BufferedWriter()
-throw() : _memory(NULL), _size(0), _pos(0)  {}
+throw() : _memory(NULL), _size(0), _pos(0), _allocated(false) {}
 
-BufferedWriter::BufferedWriter(size_t size) throw()
-  : _memory(new unsigned char[size]), _size(size), _pos(0) {}
+BufferedWriter::BufferedWriter(size_t size, unsigned char* memory) throw()
+  : _memory(memory), _size(size), _pos(0), _allocated(false)
+{
+  if (memory == NULL) {
+    _memory = new unsigned char[size];
+    _allocated = true;
+  }
+}
 
 BufferedWriter::BufferedWriter(const BufferedWriter& writer) throw()
-  : _memory(NULL), _size(writer._size), _pos(writer._pos)
+  : _memory(NULL), _size(writer._size),
+    _pos(writer._pos), _allocated(writer._allocated)
 {
-  _memory = new unsigned char [writer._size];
+  if (_allocated) {
+    _memory = new unsigned char [writer._size];
+    ::memcpy(_memory, writer._memory, writer._size);
+  } else {
+    _memory = writer._memory;
+  }
   _size = writer._size;
   _pos = writer._pos;
-  ::memcpy(_memory, writer._memory, _size);
 }
 
 BufferedWriter::~BufferedWriter() throw()
 {
-  if (_memory != NULL) delete [] _memory;
+  if (_allocated && _memory != NULL) delete [] _memory;
 }
 
 const BufferedWriter& BufferedWriter::operator=(const BufferedWriter& writer) throw()
 {
-  if (_memory != NULL) {
+  if (_allocated) {
     delete [] _memory;
   }
-  _memory = new unsigned char [writer._size];
+  _allocated = writer._allocated;
+  if (_allocated) {
+    _memory = new unsigned char [writer._size];
+    ::memcpy(_memory, writer._memory, writer._size);
+  } else {
+    _memory = writer._memory;
+  }
   _size = writer._size;
   _pos = writer._pos;
-  ::memcpy(_memory, writer._memory, _size);
   return *this;
 }
 

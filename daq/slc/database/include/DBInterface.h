@@ -5,6 +5,7 @@
 #include "daq/slc/database/DBRecord.h"
 
 #include <vector>
+#include <map>
 
 namespace Belle2 {
 
@@ -22,10 +23,14 @@ namespace Belle2 {
 
   public:
     virtual void connect() throw(DBHandlerException) = 0;
-    virtual void execute(const std::string& command) throw(DBHandlerException) = 0;
+    virtual void execute_imp(const std::string& command) throw(DBHandlerException) = 0;
+    void execute(const std::string& command, ...) throw(DBHandlerException);
     virtual void close() throw(DBHandlerException) = 0;
     virtual void clear() throw() = 0;
     virtual DBRecordList& loadRecords() throw(DBHandlerException) = 0;
+    virtual bool checkTable(const std::string& tablename) throw(DBHandlerException) = 0;
+    virtual std::map<std::string, std::string> getTableContents(const std::string& tablename)
+    throw(DBHandlerException) = 0;
     void clearRecords() throw(DBHandlerException) { _record_v.resize(0); }
     DBRecordList& getRecords() throw(DBHandlerException) { return _record_v; }
     const std::string& getHostName() const throw() { return _host; }

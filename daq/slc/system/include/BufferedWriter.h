@@ -12,11 +12,12 @@ namespace Belle2 {
     unsigned char* _memory;
     size_t _size;
     size_t _pos;
+    bool _allocated;
 
     // constructors & destructors
   public:
     BufferedWriter() throw();
-    BufferedWriter(size_t size) throw();
+    BufferedWriter(size_t size, unsigned char* memory = NULL) throw();
     BufferedWriter(const BufferedWriter& w) throw();
     virtual ~BufferedWriter() throw();
 

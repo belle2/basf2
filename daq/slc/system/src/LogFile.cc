@@ -26,7 +26,7 @@ void LogFile::open(const std::string& filename, SystemLog::Priority threshold)
 {
   if (!__opened) {
     ConfigFile config("slowcontrol");
-    __filepath = config.get("LOGFILE_DIR") + "/" + filename + "." +  Date().toString("%Y.%m.%d") + ".log";
+    __filepath = config.get("logfile.dir") + "/" + filename + "." +  Date().toString("%Y.%m.%d") + ".log";
     __threshold = threshold;
     __opened = true;
     open();

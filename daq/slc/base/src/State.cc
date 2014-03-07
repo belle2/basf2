@@ -3,19 +3,19 @@
 using namespace Belle2;
 
 const State State::UNKNOWN(Enum::UNKNOWN);
-const State State::INITIAL_S(101, "INITIAL", "INITIAL");
-const State State::CONFIGURED_S(102, "CONFIGURED", "CONFIGURED");
-const State State::READY_S(103, "READY", "READY");
-const State State::RUNNING_S(104, "RUNNING", "RUNNING");
-const State State::PAUSED_S(105, "PAUSED", "PAUSED");
-const State State::BOOTING_TS(201, "BOOTING", "BOOTING");
-const State State::LOADING_TS(202, "LOADING", "LOADING");
-const State State::STARTING_TS(203, "STARTING", "STARTING");
-const State State::STOPPING_TS(204, "STOPPING", "STOPPING");
-const State State::ERROR_ES(301, "ERROR", "ERROR");
-const State State::FATAL_ES(302, "FATAL", "FATAL");
-const State State::RECOVERING_RS(402, "RECOVERING", "RECOVERING");
-const State State::ABORTING_RS(403, "ABORTING", "ABORTING");
+const State State::INITIAL_S(1, "INITIAL", "INITIAL");
+const State State::CONFIGURED_S(2, "CONFIGURED", "CONFIGURED");
+const State State::READY_S(3, "READY", "READY");
+const State State::RUNNING_S(4, "RUNNING", "RUNNING");
+const State State::PAUSED_S(5, "PAUSED", "PAUSED");
+const State State::BOOTING_TS(21, "BOOTING", "BOOTING");
+const State State::LOADING_TS(22, "LOADING", "LOADING");
+const State State::STARTING_TS(23, "STARTING", "STARTING");
+const State State::STOPPING_TS(24, "STOPPING", "STOPPING");
+const State State::ERROR_ES(41, "ERROR", "ERROR");
+const State State::FATAL_ES(42, "FATAL", "FATAL");
+const State State::RECOVERING_RS(61, "RECOVERING", "RECOVERING");
+const State State::ABORTING_RS(62, "ABORTING", "ABORTING");
 
 const State& State::operator=(const std::string& label) throw()
 {

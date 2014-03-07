@@ -45,6 +45,10 @@ public class TextBoxPanel extends JPanel {
 		return _text_field.getText();
 	}
 
+	public String getLabel() {
+		return _label.getText();
+	}
+
 	public void setFieldSize(int width, int height) {
 		_text_field.setMaximumSize(new Dimension(width, height));
 		_text_field.setPreferredSize(new Dimension(width, height));

@@ -5,36 +5,52 @@
 using namespace Belle2;
 
 BufferedReader::BufferedReader() throw()
-  : _memory(NULL), _size(0), _pos(0) {}
+  : _memory(NULL), _size(0), _pos(0), _allocated(false) {}
 
 BufferedReader::BufferedReader(const BufferedReader& reader) throw()
-  : _memory(NULL), _size(reader._size), _pos(reader._pos)
+  : _memory(NULL), _size(reader._size),
+    _pos(reader._pos), _allocated(reader._allocated)
 {
-  _memory = new unsigned char [reader._size];
+  if (_allocated) {
+    _memory = new unsigned char [reader._size];
+    ::memcpy(_memory, reader._memory, reader._size);
+  } else {
+    _memory = reader._memory;
+  }
   _size = reader._size;
   _pos = reader._pos;
-  memcpy(_memory, reader._memory, _size);
 }
 
-BufferedReader::BufferedReader(size_t size) throw()
-  : _memory(new unsigned char[size]), _size(size), _pos(0) {}
+BufferedReader::BufferedReader(size_t size, unsigned char* memory) throw()
+  : _memory(memory), _size(size), _pos(0), _allocated(false)
+{
+  if (memory == NULL) {
+    _memory = new unsigned char[size];
+    _allocated = true;
+  }
+}
 
 BufferedReader::~BufferedReader() throw()
 {
-  if (_memory != NULL) {
+  if (_allocated && _memory != NULL) {
     delete [] _memory;
   }
 }
 
 const BufferedReader& BufferedReader::operator=(const BufferedReader& reader) throw()
 {
-  if (_memory != NULL) {
+  if (_allocated) {
     delete [] _memory;
   }
-  _memory = new unsigned char [reader._size];
+  _allocated = reader._allocated;
+  if (_allocated) {
+    _memory = new unsigned char [reader._size];
+    ::memcpy(_memory, reader._memory, reader._size);
+  } else {
+    _memory = reader._memory;
+  }
   _size = reader._size;
   _pos = reader._pos;
-  memcpy(_memory, reader._memory, _size);
   return *this;
 }
 

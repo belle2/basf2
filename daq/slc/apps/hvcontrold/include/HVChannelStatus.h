@@ -1,37 +1,47 @@
-#ifndef Belle2_HVChannelStatus_h
-#define Belle2_HVChannelStatus_h
+#ifndef _Belle2_HVChannelStatus_h
+#define _Belle2_HVChannelStatus_h
 
-#include "daq/slc/base/DataObject.h"
+#include "daq/slc/apps/hvcontrold/hv_channel_status.h"
+#include "daq/slc/apps/hvcontrold/HVState.h"
+
+#include <daq/slc/base/Serializable.h>
+
+#include <string>
+#include <vector>
 
 namespace Belle2 {
 
-  class HVChannelStatus : public DataObject {
+  class HVChannelStatus : public Serializable {
 
   public:
-    HVChannelStatus(unsigned int crate = 0, unsigned int slot = 0, unsigned int ch = 0);
-    virtual ~HVChannelStatus() throw();
+    static const int MAX_CHANNELS = 20;
 
   public:
-    std::string print_names();
-    std::string print_values();
+    HVChannelStatus();
+    virtual ~HVChannelStatus() throw() {}
 
   public:
-    unsigned int getCrate() const { return getUInt("crate"); }
-    unsigned int getSlot() const { return getUInt("slot"); }
-    unsigned int getChannel() const { return getUInt("channel"); }
-    unsigned int getStatus() const { return getUInt("status"); }
-    unsigned int getVoltageMonitored() const { return getUInt("voltage_monitored"); }
-    unsigned int getCurrentMonitored() const { return getUInt("current_monitored"); }
+    const hv_channel_status& getStatus() const { return _status; }
+    hv_channel_status& getStatus() { return _status; }
+    void setStatus(const hv_channel_status& status);
+    void setStatus(const hv_channel_status* status);
 
-    void setCrate(unsigned int v) { setUInt("crate", v); }
-    void setSlot(unsigned int v) { setUInt("slot", v); }
-    void setChannel(unsigned int v) { setUInt("channel", v); }
-    void setStatus(unsigned int v) { setUInt("status", v); }
-    void setVoltageMonitored(unsigned int v) { setUInt("voltage_monitored", v); }
-    void setCurrentMonitored(unsigned int v) { setUInt("current_monitored", v); }
+    HVState getState() const { return HVState(_status.state); }
+    float getVoltageMon() const { return _status.voltage_mon; }
+    float getCurrentMon() const { return _status.current_mon; }
+
+    void setState(HVState state) { _status.state = state.getId(); }
+    void setVoltageMon(float voltage) { _status.voltage_mon = voltage; }
+    void setCurrentMon(float current) { _status.current_mon = current; }
+
+  public:
+    void writeObject(Writer& writer) const throw(IOException);
+    void readObject(Reader& reader) throw(IOException);
+
+  private:
+    hv_channel_status _status;
 
   };
-
-};
+}
 
 #endif

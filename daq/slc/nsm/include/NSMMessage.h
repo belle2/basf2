@@ -3,6 +3,7 @@
 
 extern "C" {
 #include "nsm2/nsm2.h"
+#include "nsm2/nsmsys2.h"
 }
 
 #include "daq/slc/nsm/NSMHandlerException.h"
@@ -16,6 +17,9 @@ namespace Belle2 {
   class NSMMessage : public Serializable {
 
     friend class NSMCommunicator;
+
+  public:
+    static const unsigned int DATA_SIZE;
 
   public:
     NSMMessage() throw();
@@ -41,7 +45,7 @@ namespace Belle2 {
     const unsigned int* getParams() const throw();
 #endif
     unsigned int getLength() const throw();
-    const std::string& getData() const throw();
+    const char* getData() const throw();
     void setRequestId(unsigned short id) throw();
     void setSequenceId(unsigned short id) throw();
     void setNodeId(unsigned short id) throw();
@@ -49,6 +53,7 @@ namespace Belle2 {
     void setParam(int i, unsigned int v) throw();
     void setData(int len, const char* data)  throw();
     void setData(const std::string& text)  throw();
+    void setData(const Serializable& obj) throw(IOException);
     virtual void readObject(Reader&) throw(IOException);
     virtual void writeObject(Writer&) const throw(IOException);
 
@@ -62,7 +67,7 @@ namespace Belle2 {
   private:
     mutable NSMcontext* _nsmc;
     NSMmsg _nsm_msg;
-    std::string _text;
+    int _data[NSM_TCPDATSIZ];
 
   };
 

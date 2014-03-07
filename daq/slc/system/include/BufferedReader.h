@@ -12,11 +12,12 @@ namespace Belle2 {
     unsigned char* _memory;
     size_t _size;
     size_t _pos;
+    bool _allocated;
 
     // constructors & destructors
   public:
     BufferedReader() throw();
-    BufferedReader(size_t size) throw();
+    BufferedReader(size_t size, unsigned char* memory = NULL) throw();
     BufferedReader(const BufferedReader& r) throw();
     virtual ~BufferedReader() throw();
 

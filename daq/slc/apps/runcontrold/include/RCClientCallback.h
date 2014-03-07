@@ -17,7 +17,7 @@ namespace Belle2 {
     virtual void init() throw();
     virtual bool ok() throw();
     virtual bool error() throw();
-    virtual void selfCheck() throw(NSMHandlerException);
+    virtual void selfCheck() throw();
 
   private:
     RCMaster* _master;

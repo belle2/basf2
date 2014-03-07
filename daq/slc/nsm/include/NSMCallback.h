@@ -3,8 +3,8 @@
 
 #include "daq/slc/nsm/NSMHandlerException.h"
 #include "daq/slc/nsm/NSMMessage.h"
+#include "daq/slc/nsm/NSMNode.h"
 
-#include "daq/slc/base/NSMNode.h"
 #include "daq/slc/base/Command.h"
 
 #include <string>
@@ -33,7 +33,7 @@ namespace Belle2 {
     static std::vector<NSMCallback*> __callback_v;
 
   public:
-    NSMCallback(NSMNode* node) throw();
+    NSMCallback(NSMNode* node, int interval = 2) throw();
     virtual ~NSMCallback() throw() {}
 
   public:
@@ -42,7 +42,7 @@ namespace Belle2 {
     virtual bool ok() { return true; }
     virtual bool error() { return true; }
     virtual bool fatal() { return true; }
-    virtual void selfCheck() throw(NSMHandlerException) {}
+    virtual void selfCheck() throw() {}
     bool isReady() const throw();
 
   public:
@@ -52,8 +52,9 @@ namespace Belle2 {
     NSMNode* getNode() { return _node; }
     void setCommunicator(NSMCommunicator* comm) { _comm = comm; }
     int getExpNumber();
-    int getColdNumber();
-    int getHotNumber();
+    int getRunNumber();
+    int getSubNumber();
+    int getInterval() const { return _interval; }
 
   public:
     void setReply(const std::string& reply) { _reply = reply; }
@@ -61,7 +62,7 @@ namespace Belle2 {
       NSMRequestId req = { -1, cmd};
       _req_v.push_back(req);
     }
-    virtual bool perform(const Command& command, NSMMessage& msg)
+    virtual bool perform(NSMMessage& msg)
     throw(NSMHandlerException);
 
   protected:
@@ -75,6 +76,7 @@ namespace Belle2 {
     NSMCommunicator* _comm;
     NSMRequestList _req_v;
     NSMMessage _msg;
+    int _interval;
 
   };
 

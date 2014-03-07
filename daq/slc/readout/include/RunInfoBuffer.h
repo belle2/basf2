@@ -44,14 +44,14 @@ namespace Belle2 {
     unsigned int* getParams() throw() { return _buf; }
     unsigned int getState() const throw() { return _buf[0]; }
     unsigned int getExpNumber() const throw() { return _buf[1]; }
-    unsigned int getColdNumber() const throw() { return _buf[2]; }
-    unsigned int getHotNumber() const throw() { return _buf[3]; }
+    unsigned int getRunNumber() const throw() { return _buf[2]; }
+    unsigned int getSubNumber() const throw() { return _buf[3]; }
     unsigned int getNodeId() const throw() { return _buf[4]; }
     unsigned int* getReserved() throw() { return _buf + 5; }
     void setState(unsigned int state) { _buf[0] = state; }
     void setExpNumber(unsigned int number) { _buf[1] = number; }
-    void setColdNumber(unsigned int number) { _buf[2] = number; }
-    void setHotNumber(unsigned int number) { _buf[3] = number; }
+    void setRunNumber(unsigned int number) { _buf[2] = number; }
+    void setSubNumber(unsigned int number) { _buf[3] = number; }
     void setNodeId(unsigned int id) { _buf[4] = id; }
     bool waitRunning(int timeout);
     bool reportRunning();

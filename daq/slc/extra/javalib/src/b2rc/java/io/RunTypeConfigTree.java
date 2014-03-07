@@ -1,10 +1,10 @@
 package b2rc.java.io;
 
-import java.util.Set;
+import java.util.ArrayList;
 
 public class RunTypeConfigTree extends ConfigTree {
 
-	public Branch createBranch(Set<String> set) {
+	public Branch createBranch(ArrayList<String> set) {
 		Branch branch = new Branch("Run type");
 		for (String type : set) {
 			String [] str_v = type.split(":");

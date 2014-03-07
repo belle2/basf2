@@ -1,7 +1,8 @@
 Import('env')
 
+env['TOOLS_LIBS']['createHVtable'] = ['pthread', '$PGSQL_LIBS', 'daq', 'framework', 'nsm2_b2lib', 'nsm2_corelib']
 env['TOOLS_LIBS']['hvcontrold'] = ['pthread', '$PGSQL_LIBS', 'daq', 'framework', 'nsm2_b2lib', 'nsm2_corelib']
-env['TOOLS_LIBS']['hvmasterd'] = ['pthread', 'ncurses','readline', '$PGSQL_LIBS', 'daq', 'framework', 'nsm2_b2lib', 'nsm2_corelib']
-env['TOOLS_LIBS']['hvfake'] = ['pthread', '$PGSQL_LIBS', 'daq', 'framework', 'nsm2_b2lib', 'nsm2_corelib']
+env['TOOLS_LIBS']['hvcui'] = ['pthread', 'ncurses','readline', '$PGSQL_LIBS', 'daq', 'framework', 'nsm2_b2lib', 'nsm2_corelib']
+
 
 Return('env')

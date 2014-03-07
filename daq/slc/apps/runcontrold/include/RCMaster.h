@@ -7,11 +7,12 @@
 
 #include <daq/slc/xml/XMLElement.h>
 
+#include <daq/slc/nsm/NSMNode.h>
+
 #include <daq/slc/system/TCPSocket.h>
 #include <daq/slc/system/Mutex.h>
 #include <daq/slc/system/Cond.h>
 
-#include <daq/slc/base/NSMNode.h>
 #include <daq/slc/base/DataObject.h>
 #include <daq/slc/base/SystemLog.h>
 

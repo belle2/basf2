@@ -19,10 +19,13 @@ namespace Belle2 {
 
   public:
     virtual void connect() throw(DBHandlerException);
-    virtual void execute(const std::string& command) throw(DBHandlerException);
+    virtual void execute_imp(const std::string& command) throw(DBHandlerException);
     virtual void close() throw(DBHandlerException);
     virtual void clear() throw();
     virtual DBRecordList& loadRecords() throw(DBHandlerException);
+    virtual bool checkTable(const std::string& tablename) throw(DBHandlerException);
+    virtual std::map<std::string, std::string> getTableContents(const std::string& tablename)
+    throw(DBHandlerException);
 
   private:
     PGconn* _sq_conn;

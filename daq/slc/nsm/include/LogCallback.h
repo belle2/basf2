@@ -3,8 +3,6 @@
 
 #include "daq/slc/nsm/NSMCallback.h"
 
-#include "daq/slc/base/NSMNode.h"
-
 namespace Belle2 {
 
   class LogCallback : public NSMCallback {
@@ -17,7 +15,7 @@ namespace Belle2 {
     virtual bool log()   throw() { return true; }
 
   public:
-    virtual bool perform(const Command& command, NSMMessage& msg)
+    virtual bool perform(NSMMessage& msg)
     throw(NSMHandlerException);
 
   };

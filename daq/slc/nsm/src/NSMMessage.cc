@@ -14,6 +14,8 @@ extern "C" {
 
 using namespace Belle2;
 
+const unsigned int NSMMessage::DATA_SIZE = NSM_TCPDATSIZ;
+
 NSMMessage::NSMMessage() throw()
 {
   _nsmc = NULL;
@@ -22,7 +24,7 @@ NSMMessage::NSMMessage() throw()
   _nsm_msg.node = 0;
   _nsm_msg.npar = 0;
   _nsm_msg.len = 0;
-  _text = "";
+  memset(_data, 0, sizeof(_data));
 }
 
 NSMMessage::NSMMessage(const NSMMessage& msg) throw()
@@ -34,7 +36,7 @@ NSMMessage::NSMMessage(const NSMMessage& msg) throw()
   _nsm_msg.npar = msg._nsm_msg.npar;
   memcpy(_nsm_msg.pars, msg._nsm_msg.pars, sizeof(_nsm_msg.pars));
   _nsm_msg.len = msg._nsm_msg.len;
-  _text = msg._text;
+  memcpy(_data, msg._data, sizeof(_data));
 }
 
 const NSMMessage& NSMMessage::operator=(const NSMMessage& msg) throw()
@@ -46,7 +48,7 @@ const NSMMessage& NSMMessage::operator=(const NSMMessage& msg) throw()
   _nsm_msg.npar = msg._nsm_msg.npar;
   memcpy(_nsm_msg.pars, msg._nsm_msg.pars, sizeof(_nsm_msg.pars));
   _nsm_msg.len = msg._nsm_msg.len;
-  _text = msg._text;
+  memcpy(_data, msg._data, sizeof(_data));
   return *this;
 }
 
@@ -119,9 +121,9 @@ unsigned int NSMMessage::getLength() const throw()
   return _nsm_msg.len;
 }
 
-const std::string& NSMMessage::getData() const throw()
+const char* NSMMessage::getData() const throw()
 {
-  return _text;
+  return (const char*)_data;
 }
 
 void NSMMessage::setRequestId(unsigned short id) throw()
@@ -151,14 +153,16 @@ void NSMMessage::setParam(int i, unsigned int v) throw()
 
 void NSMMessage::setData(int len, const char* data)  throw()
 {
-  _nsm_msg.len = len;
-  _text = data;
+  memset(_data, 0, sizeof(_data));
+  if (len > 0 && data != NULL) {
+    _nsm_msg.len = len;
+    memcpy(_data, data, len);
+  }
 }
 
 void NSMMessage::setData(const std::string& text)  throw()
 {
-  _nsm_msg.len = text.size();
-  _text = text;
+  setData(text.size(), text.c_str());
 }
 
 int NSMMessage::try_read(int sock, char* buf, int datalen)
@@ -209,12 +213,10 @@ size_t NSMMessage::read(NSMcontext* nsmc) throw(NSMHandlerException)
 
   datalen = _nsm_msg.len;
   if (datalen > 0) {
-    char buf[512];
-    memset(buf, 0, sizeof(buf));
-    if ((ret = try_read(sock, buf, datalen)) < 0) {
+    memset(_data, 0, sizeof(_data));
+    if ((ret = try_read(sock, (char*)_data, datalen)) < 0) {
       throw (NSMHandlerException(__FILE__, __LINE__, "Failed to read data"));
     }
-    _text = buf;
     count += ret;
   }
   return count;

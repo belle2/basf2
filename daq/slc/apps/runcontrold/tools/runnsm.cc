@@ -18,7 +18,6 @@
 #include <daq/slc/base/StringUtil.h>
 #include <daq/slc/base/Command.h>
 #include <daq/slc/base/DataObject.h>
-#include <daq/slc/base/NSMNode.h>
 
 #include <cstdlib>
 #include <cstring>

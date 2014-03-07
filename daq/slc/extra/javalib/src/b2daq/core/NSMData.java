@@ -19,7 +19,7 @@ public class NSMData implements SerializableObject {
 	final static public int UINT64 = 108;
 	final static public int FLOAT = 204;
 	final static public int DOUBLE = 208;
-
+	
 	public class ParamInfo {
 		public int type;
 		public int length;
@@ -29,6 +29,7 @@ public class NSMData implements SerializableObject {
 	private int _revision;
 	private String _format = "";
 	private String _dataname = "";
+	private int _size = 0;
 	private HashMap<String, ParamInfo> _param_m = new HashMap<String, ParamInfo>();
 	private ArrayList<String> _name_v = new ArrayList<String>();
 
@@ -56,6 +57,7 @@ public class NSMData implements SerializableObject {
 		_dataname = reader.readString();
 		_format = reader.readString();
 		_revision = reader.readInt();
+		_size = reader.readInt();
 		int npars = reader.readInt();
 		for (int n = 0; n < npars; n++) {
 			String name = reader.readString();
@@ -91,6 +93,7 @@ public class NSMData implements SerializableObject {
 		writer.writeString(_dataname);
 		writer.writeString(_format);
 		writer.writeInt(_revision);
+		writer.writeInt(_size);
 		writer.writeInt(_name_v.size());
 		for (String name : _name_v) {
 			ParamInfo info = _param_m.get(name);
@@ -203,6 +206,14 @@ public class NSMData implements SerializableObject {
 
 	public char getChar(String name, int i) {
 		return (char) get(name, i);
+	}
+
+	public String getText(String name) {
+		if (getParam(name).type == CHAR && getParam(name).length > 0) {
+			return getParam(name).buf.toArray().toString();
+		} else {
+			return "";
+		}
 	}
 
 	public short getShort(String name, int i) {

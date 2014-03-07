@@ -1,43 +1,38 @@
 #ifndef Belle2_HVChannelInfo_h
 #define Belle2_HVChannelInfo_h
 
-#include "daq/slc/base/DataObject.h"
+#include "daq/slc/apps/hvcontrold/hv_channel_info.h"
+#include "daq/slc/apps/hvcontrold/HVChannelConfig.h"
+#include "daq/slc/apps/hvcontrold/HVChannelStatus.h"
+
+#include <daq/slc/database/DBInterface.h>
 
 namespace Belle2 {
 
-  class HVChannelInfo : public DataObject {
+  class HVChannelInfo {
 
   public:
-    HVChannelInfo(unsigned int crate = 0, unsigned int slot = 0, unsigned int ch = 0);
-    virtual ~HVChannelInfo() throw();
+    HVChannelInfo(uint32 master = 0, uint32 crate = 0,
+                  uint32 slot = 0, uint32 channel = 0)
+      : _config(master, crate, slot, channel) {}
+    HVChannelInfo(const HVChannelInfo& info) {
+      setConfig(info._config);
+      setStatus(info._status);
+    }
+    virtual ~HVChannelInfo() throw() {}
 
   public:
-    std::string print_names();
-    std::string print_values();
+    HVChannelConfig& getConfig() { return _config; }
+    HVChannelStatus& getStatus() { return _status; }
+    void setConfig(const HVChannelConfig& config);
+    void setStatus(const HVChannelStatus& status);
 
-  public:
-    unsigned int getCrate() const { return getUInt("crate"); }
-    unsigned int getSlot() const { return getUInt("slot"); }
-    unsigned int getChannel() const { return getUInt("channel"); }
-    bool isSwitchOn() const { return getBool("switch_on"); }
-    unsigned int getRampUpSpeed() const { return getUInt("rampup_speed"); }
-    unsigned int getRampDownSpeed() const { return getUInt("rampdown_speed"); }
-    unsigned int getVoltageDemand() const { return getUInt("voltage_demand"); }
-    unsigned int getVoltageLimit() const { return getUInt("voltage_limit"); }
-    unsigned int getCurrentLimit() const { return getUInt("current_limit"); }
-
-    void setCrate(unsigned int v) { setUInt("crate", v); }
-    void setSlot(unsigned int v) { setUInt("slot", v); }
-    void setChannel(unsigned int v) { setUInt("channel", v); }
-    void setSwitchOn(bool v) { setBool("switch_on", v); }
-    void setRampUpSpeed(unsigned int v) { setUInt("rampup_speed", v); }
-    void setRampDownSpeed(unsigned int v) { setUInt("rampdown_speed", v); }
-    void setVoltageDemand(unsigned int v) { setUInt("voltage_demand", v); }
-    void setVoltageLimit(unsigned int v) { setUInt("voltage_limit", v); }
-    void setCurrentLimit(unsigned int v) { setUInt("current_limit", v); }
+  private:
+    HVChannelConfig _config;
+    HVChannelStatus _status;
 
   };
 
-};
+}
 
 #endif

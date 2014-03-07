@@ -99,7 +99,14 @@ public class PanelGenerator {
 				_panel_v.add(canvas);
 				return canvas;
 			} else if (type.matches("ListPanel")) {
-				MessageBoxPanel panel = new MessageBoxPanel();
+				int font_size = 12;
+				try {
+					String str = str_v[1].replace(")", "");
+					font_size = Integer.parseInt(str);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				MessageBoxPanel panel = new MessageBoxPanel(font_size);
 				if (_config.hasKey(label+".title")) {
 					panel.add(new UpdatableMessage(_config.getString(label+".title")));
 				}
@@ -145,7 +152,7 @@ public class PanelGenerator {
 			str = str.replace("TimedGraph(", "").replace(")", "");
 			String [] s_v = str.split(",");
 			if (s_v.length > 1) {
-				int npoints = Integer.parseInt(s_v[0]);
+				int npoints = Integer.parseInt(s_v[0]) * 2;
 				int time_max = Integer.parseInt(s_v[1]);
 				String title = _config.getString(name+".title");
 				MonObject obj = new TimedGraph1F(name, title, npoints, 0, time_max);
@@ -191,6 +198,7 @@ public class PanelGenerator {
 		} else if (str.startsWith("Label")) {
 			str = str.replace("Label(", "").replace(")", "");
 			String [] s_v = str.split(",");
+			System.out.println(str);
 			GText label;
 			if (s_v.length > 2) {
 				String text = s_v[0];

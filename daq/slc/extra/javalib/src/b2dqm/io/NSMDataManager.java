@@ -56,7 +56,7 @@ public class NSMDataManager {
 				if (s_v.length > 4) {
 					int i = Integer.parseInt(s_v[0]);
 					ColorInfo color = new ColorInfo();
-					color.text = s_v[1];
+					color.text = s_v[1].replace("\"", "");
 					color.linecolor = new HtmlColor(s_v[2]);
 					color.fillcolor = new HtmlColor(s_v[3]);
 					color.fontcolor = new HtmlColor(s_v[4]);
@@ -138,6 +138,7 @@ public class NSMDataManager {
 		public String _format = "";
 		public ArrayList<UpdateInfo> _info_v = new ArrayList<UpdateInfo>();
 		public HashMap<Integer,ColorInfo> _color_v = null;
+		private long _time = 0;
 		
 		public void update(HashMap<String, NSMData> data_m) {
 			for (UpdateInfo info : _info_v) {
@@ -147,11 +148,13 @@ public class NSMDataManager {
 			}
 			try {
 				if (_histo != null) {
+					long time = new Date().getTime();
 					for (UpdateInfo info : _info_v) {
 						NSMData data = data_m.get(info._dataname);
 						if (_histo.get().getDataType().contains("TG")) {
 							TimedGraph1 gr = (TimedGraph1)(_histo.get());
-							long time = new Date().getTime();
+							if (_time > 0)
+								gr.addPoint(_time, data.getValue(info._paraname, info.index));
 							gr.addPoint(time, data.getValue(info._paraname, info.index));
 							gr.setUpdateTime(time);
 						} else if (_histo.get().getDataType().contains("H1")) {
@@ -159,6 +162,7 @@ public class NSMDataManager {
 							h.fill(data.getValue(info._paraname, info.index));
 						}
 					}
+					_time = time;
 				} else if (_shape != null) {
 					if (_shape instanceof GText) {
 						GText label = (GText)_shape;

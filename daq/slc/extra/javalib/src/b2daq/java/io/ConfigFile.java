@@ -18,7 +18,8 @@ import java.util.jar.JarFile;
 public class ConfigFile {
 
 	private Map<String, String> _map = new LinkedHashMap<String, String>();
-	private ArrayList<String> _dir = new ArrayList<String>();
+	private String _dir = "";
+	private ArrayList<String> _dir_v = new ArrayList<String>();
 	private JarFile _jarfile;
 	
 	public ConfigFile() {
@@ -54,8 +55,11 @@ public class ConfigFile {
 		BufferedReader br = new BufferedReader(new InputStreamReader(is));
 		String s = "";
 		String s_tmp = "";
+		String dir = "";
 		while ((s = br.readLine()) != null) {
-			if (s.endsWith("\\")) {
+			if (s.length() == 0 || s.startsWith("#"))
+				continue;
+			if (s.replace(" ", "").endsWith("\\")) {
 				s_tmp += s.substring(0, s.lastIndexOf('\\'));
 				continue;
 			} else {
@@ -67,8 +71,13 @@ public class ConfigFile {
 					s_tmp = "";
 				}
 			}
-			if (s.length() == 0 || s.startsWith("#"))
+			if (s.startsWith("!cd")) {
+				dir = s.replace("!cd", "").replace(" ", "").replace("\t", "");
+				if (dir.length() > 0) {
+					_dir_v.add(dir);
+				}
 				continue;
+			}
 			String[] str_v = s.split(":");
 			if (str_v.length >= 2) {
 				String label = str_v[0].replace(" ", "").replace("\t", "");
@@ -78,18 +87,27 @@ public class ConfigFile {
 					str += ":" + str_v[i];
 				}
 				int i = 0;
+				boolean is_comment = false;
 				for (; i < str.length(); i++) {
 					if (str.charAt(i) == '#' || str.charAt(i) == '\n')
 						break;
-					if (str.charAt(i) == ' ' || str.charAt(i) == '\t')
+					if ((str.charAt(i) == ' ' || str.charAt(i) == '\t'))
 						continue;
-					if (value.length() == 0 && str.charAt(i) == '"') {
+					if (str.charAt(i) == '"') {
+						is_comment = is_comment || (value.length() == 0);
+						if (!is_comment) value += '"';
 						for (i++; i < str.length(); i++) {
-							if (str.charAt(i) == '"')
+							if (str.charAt(i) == '"') {
+								if (!is_comment) value += '"';
+								i++;
 								break;
+							}
 							value += str.charAt(i);
 						}
-						break;
+						if (i >= str.length()) break;
+					}
+					if (str.charAt(i) == '"') {
+						if (is_comment) break;
 					}
 					if (str.charAt(i) == '$') {
 						i++;
@@ -110,6 +128,9 @@ public class ConfigFile {
 					}
 					value += str.charAt(i);
 				}
+				if (dir.length() > 0) {
+					label = dir + "." + label;
+				}
 				if (_map.containsKey(label)) {
 					_map.put(label, value);
 				} else {
@@ -125,11 +146,8 @@ public class ConfigFile {
 	}
 	
 	public boolean hasKey(String key) {
-		String path = "";
-		for (String d : _dir) {
-			path += d + ".";
-		}
-		return _map.containsKey(path + key);
+		String path = (_dir.length() > 0)?_dir + "." + key:key;
+		return _map.containsKey(path);
 	}
 
 	public int getInt(String key) {
@@ -153,26 +171,17 @@ public class ConfigFile {
 		if (!hasKey(key)) {
 			return "";
 		} else {
-			String path = "";
-			for (String d : _dir) {
-				path += d + ".";
-			}
-			return _map.get(path + key);
+			String path = (_dir.length() > 0)?_dir + "." + key:key;
+			return _map.get(path);
 		}
 	}
 
 	public void cd() {
-		_dir.clear();
+		_dir = "";
 	}
 
-	public void cd(String base) {
-		if (base.matches("\\.\\.")) {
-			if (_dir.size() > 0) {
-				_dir.remove(_dir.size());
-			}
-		} else {
-			_dir.add(base);
-		}
+	public void cd(String dir) {
+		_dir = (_dir.length() > 0)?_dir+"."+dir: dir;
 	}
 
 	public Set<String> getKeyList() {
@@ -194,11 +203,14 @@ public class ConfigFile {
 	}
 
 	static public void main(String[] argv) throws IOException {
-		ConfigFile config = new ConfigFile("/home/tkonno/test.conf");
-		config.cd("h1");
-		System.out.println(config.getString("fill.color"));
-		System.out.println(config.getString("line.color"));
+		ConfigFile config = new ConfigFile("/home/tkonno/runcontrol.conf");
+		config.cd("physics.regular.full");
+		System.out.println("'"+config.getString("PXD.runtype")+"'");
 		config.cd();
+	}
+
+	public ArrayList<String> getDirectories() {
+		return _dir_v;
 	}
 
 }

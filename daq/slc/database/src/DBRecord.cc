@@ -30,6 +30,16 @@ int DBRecord::getFieldValueInt(int i) const throw()
   return atoi(getFieldValue(i).c_str());
 }
 
+float DBRecord::getFieldValueFloat(std::string name) const throw()
+{
+  return atof(getFieldValue(name).c_str());
+}
+
+float DBRecord::getFieldValueFloat(int i) const throw()
+{
+  return atof(getFieldValue(i).c_str());
+}
+
 std::vector<std::string> DBRecord::getFieldValueArray(std::string name) const throw()
 {
   std::string value = Belle2::replace(Belle2::replace(getFieldValue(name), "}", ""), "{", "");
@@ -58,6 +68,26 @@ std::vector<int> DBRecord::getFieldValueIntArray(int i) const throw()
   std::vector<std::string> value_v = getFieldValueArray(i);
   for (size_t i = 0; i < value_v.size(); i++) {
     value_i_v.push_back(atoi(value_v[i].c_str()));
+  }
+  return value_i_v;
+}
+
+std::vector<float> DBRecord::getFieldValueFloatArray(std::string name) const throw()
+{
+  std::vector<float> value_i_v;
+  std::vector<std::string> value_v = getFieldValueArray(name);
+  for (size_t i = 0; i < value_v.size(); i++) {
+    value_i_v.push_back(atof(value_v[i].c_str()));
+  }
+  return value_i_v;
+}
+
+std::vector<float> DBRecord::getFieldValueFloatArray(int i) const throw()
+{
+  std::vector<float> value_i_v;
+  std::vector<std::string> value_v = getFieldValueArray(i);
+  for (size_t i = 0; i < value_v.size(); i++) {
+    value_i_v.push_back(atof(value_v[i].c_str()));
   }
   return value_i_v;
 }

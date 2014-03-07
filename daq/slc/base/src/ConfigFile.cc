@@ -21,7 +21,11 @@ void ConfigFile::read(const std::string& filename, bool overload)
       exit(1);
     }
     file_path = path;
-    file_path += "/daq/slc/data/config/" + filename + ".conf";
+    if (filename.find("/") == std::string::npos) {
+      file_path += "/daq/slc/data/config/" + filename + ".conf";
+    } else {
+      file_path += "/daq/slc/data/" + filename + ".conf";
+    }
   } else {
     file_path = filename;
   }

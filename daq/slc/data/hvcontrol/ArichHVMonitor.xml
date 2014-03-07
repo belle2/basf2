@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<system name="" >
-  <monitor name="ArichHVTest" class="ArichHV" lib_name="daq" >
-    <data name="HV01_STATUS" format="ArichHVStatus" revision="1" />
-    <data name="HV02_STATUS" format="ArichHVStatus" revision="1" />
-  </monitor>
-</system>

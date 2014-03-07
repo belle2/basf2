@@ -2,8 +2,8 @@ package b2rc.core;
 
 public class RCConnection extends RCEnum {
 
-	final static public RCConnection ONLINE = new RCConnection(10000, "ONLINE", "ONLINE"); 
-	final static public RCConnection OFFLINE = new RCConnection(20000, "OFFLINE", "OFFLINE"); 
+	final static public RCConnection ONLINE = new RCConnection(1, "ONLINE", "ONLINE"); 
+	final static public RCConnection OFFLINE = new RCConnection(2, "OFFLINE", "OFFLINE"); 
 	
 	public RCConnection() {
 		

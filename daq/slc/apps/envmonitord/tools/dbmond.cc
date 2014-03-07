@@ -53,6 +53,7 @@ int main(int argc, char** argv)
   for (size_t i = 0; i < data_v.size(); i++) {
     NSMData* data = data_v[i];
     data->parse();
+    /*
     try {
       db->execute(Belle2::form("select unix_timestamp(record_time) %sfrom %s_rev%d;",
                                data->toSQLNames().c_str(),
@@ -67,6 +68,7 @@ int main(int argc, char** argv)
                   << data->getInt32("current_mon") << std::endl;
       }
     } catch (const DBHandlerException& e) {}
+    */
   }
 
   return 0;

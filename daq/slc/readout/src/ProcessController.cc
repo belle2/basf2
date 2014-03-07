@@ -56,8 +56,8 @@ bool ProcessController::start()
 {
   _info.lock();
   _info.setExpNumber(_callback->getExpNumber());
-  _info.setColdNumber(_callback->getColdNumber());
-  _info.setHotNumber(_callback->getHotNumber());
+  _info.setRunNumber(_callback->getRunNumber());
+  _info.setSubNumber(_callback->getSubNumber());
   _info.setNodeId(_callback->getNode()->getData()->getId());
   if (_info.getState() != RunInfoBuffer::RUNNING) {
     _callback->setReply(_name + " is not running");

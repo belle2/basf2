@@ -18,6 +18,7 @@ import javax.swing.JEditorPane;
 import javax.swing.JFileChooser;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
@@ -36,13 +37,18 @@ public class MessagePanel extends JScrollPane {
 	private ArrayList<String> _message_v = new ArrayList<String>();
 	private int _max_length = 200;
 	
-	public MessagePanel(String name) {
-		this();
+	public MessagePanel(String name, int fontsize) {
+		this(fontsize);
 		setName(name);
 	}
+
+	public void setFontSize(int fontsize) {
+		_text_panel.setFont(new Font("Sans", Font.PLAIN, fontsize));
+	}
 	
-	public MessagePanel() {
+	public MessagePanel(int fontsize) {
 		setName("log_panel");
+		_text_panel.setFont(new Font("Sans", Font.PLAIN, fontsize));
 		_text_panel.setBackground(Color.WHITE);
 		_text_panel.setEditable(false);
 		_text_panel.addMouseListener(new MouseAdapter(){
@@ -50,11 +56,16 @@ public class MessagePanel extends JScrollPane {
 			public void mouseClicked(MouseEvent arg0) {
 				if (!SwingUtilities.isRightMouseButton(arg0)) return;
 				JPopupMenu pop_menu = new JPopupMenu();
-				JMenu menu = new JMenu("Message history");
-				JMenuItem item = new JMenuItem("Clear");
+				JMenu menu = new JMenu("Option");
+				JMenuItem item = new JMenuItem("Font size");
 				item.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent arg0) {
-						reset();
+						String text = JOptionPane.showInputDialog("Input new font size", ""+_text_panel.getFont().getSize());
+						try {
+							setFontSize(Integer.parseInt(text));
+						} catch (Exception e) {
+							
+						}
 					}
 				});
 				menu.add(item);
@@ -130,7 +141,6 @@ public class MessagePanel extends JScrollPane {
 		setBorder(new BevelBorder(BevelBorder.LOWERED));
 		setViewportView(_text_panel);
 		setCursor(Cursor.getPredefinedCursor(Cursor.TEXT_CURSOR));
-		_text_panel.setFont(new Font("Sans", Font.PLAIN, 13));
 		_text_panel.setText("");
 	}
 	

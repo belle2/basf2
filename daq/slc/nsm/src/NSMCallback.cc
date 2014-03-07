@@ -21,7 +21,7 @@ void NSMCallback::terminate(int sig)
 
 std::vector<NSMCallback*>  NSMCallback::__callback_v;
 
-NSMCallback::NSMCallback(NSMNode* node) throw()
+NSMCallback::NSMCallback(NSMNode* node, int interval) throw()
   : _node(node), _comm(NULL)
 {
   add(Command::OK);
@@ -30,6 +30,7 @@ NSMCallback::NSMCallback(NSMNode* node) throw()
   //signal(SIGINT, terminate);
   //signal(SIGQUIT, terminate);
   //signal(SIGTERM, terminate);
+  _interval = interval;
 }
 
 bool NSMCallback::isReady() const throw()
@@ -37,9 +38,10 @@ bool NSMCallback::isReady() const throw()
   return _comm != NULL && _comm->isOnline();
 }
 
-bool NSMCallback::perform(const Command& cmd, NSMMessage&)
+bool NSMCallback::perform(NSMMessage& msg)
 throw(NSMHandlerException)
 {
+  const Command cmd = msg.getRequestName();
   if (cmd == Command::OK) {
     return ok();
   } else if (cmd == Command::ERROR) {
@@ -68,7 +70,7 @@ int NSMCallback::getExpNumber()
   }
 }
 
-int NSMCallback::getColdNumber()
+int NSMCallback::getRunNumber()
 {
   if (getMessage().getNParams() > 1) {
     return (int)getMessage().getParam(1);
@@ -77,7 +79,7 @@ int NSMCallback::getColdNumber()
   }
 }
 
-int NSMCallback::getHotNumber()
+int NSMCallback::getSubNumber()
 {
   if (getMessage().getNParams() > 2) {
     return (int)getMessage().getParam(2);

@@ -24,37 +24,14 @@ extern "C" {
 
 using namespace Belle2;
 
-std::vector<NSMCommunicator*> NSMCommunicator::__com_v;
-
-NSMCommunicator* NSMCommunicator::select(int timeout) throw(NSMHandlerException)
-{
-  NSMcontext* nsmc = nsmlib_selectc(0, timeout);
-  for (size_t i = 0; i < __com_v.size(); i++) {
-    NSMCommunicator* com = __com_v[i];
-    if (com == NULL) continue;
-    if (nsmc == (NSMcontext*) - 1) {
-      throw (NSMHandlerException(__FILE__, __LINE__, "Error during select"));
-    } else if (nsmc == com->_nsmc) {
-      com->_message.read(nsmc);
-      b2nsm_context(nsmc);
-      return com;
-    }
-  }
-  return NULL;
-}
-
-
-NSMCommunicator::NSMCommunicator(NSMNode* node, const std::string& host,
-                                 int port, const std::string& config_name) throw()
-  : _node(node), _callback(NULL)
+NSMCommunicator::NSMCommunicator(NSMNode* node, const std::string& host, int port)
+throw() : _node(node), _callback(NULL)
 {
   _id = -1;
   _nsmc = NULL;
   _host = host;
   _port = port;
-  _logger_node = NULL;
   _rc_node = NULL;
-  _config_name = config_name;
 }
 
 void NSMCommunicator::init(const std::string& host, int port) throw(NSMHandlerException)
@@ -97,13 +74,6 @@ void NSMCommunicator::init(const std::string& host, int port) throw(NSMHandlerEx
       }
     }
   }
-  ConfigFile config(_config_name, false);
-  std::string rc_name = config.get("RC_NSM_NAME");
-  if (rc_name.size() > 0) {
-    _rc_node = new NSMNode(rc_name);
-  }
-  __com_v.push_back(this);
-  LogFile::debug("%s:%d", __FILE__, __LINE__);
 #else
 #warning "Wrong version of nsm2. try source daq/slc/extra/nsm2/export.sh"
 #endif
@@ -124,8 +94,16 @@ void NSMCommunicator::sendRequest(const NSMNode* node, const Command& command,
 }
 
 void NSMCommunicator::sendRequest(const NSMNode* node, const Command& cmd,
-                                  int npar, int* pars,
-                                  const std::string& message)
+                                  int npar, int* pars, const Serializable& obj)
+throw(NSMHandlerException)
+{
+  _writer.seekTo(0);
+  _writer.writeObject(obj);
+  sendRequest(node, cmd, npar, pars, (int)_writer.count(), (const char*)_writer.ptr());
+}
+
+void NSMCommunicator::sendRequest(const NSMNode* node, const Command& cmd,
+                                  int npar, int* pars, const std::string& message)
 throw(NSMHandlerException)
 {
   sendRequest(node, cmd, npar, pars, message.size(),
@@ -138,8 +116,8 @@ throw(NSMHandlerException)
 {
 #if NSM_PACKAGE_VERSION >= 1914
   sendRequest(node, cmd, message.getNParams(), message.getParams(),
-              message.getData().size(),
-              (message.getData().size() == 0) ? NULL : message.getData().c_str());
+              message.getLength(),
+              (message.getLength() == 0) ? NULL : message.getData());
 #else
 #warning "Wrong version of nsm2. try source daq/slc/extra/nsm2/export.sh"
 #endif
@@ -178,19 +156,12 @@ bool NSMCommunicator::sendLog(const SystemLog& log)
 {
 #if NSM_PACKAGE_VERSION >= 1914
   try {
-    if (_logger_node == NULL) {
-      ConfigFile config("slowcontrol", false);
-      std::string logger_name = config.get("LOG_NSM_NAME");
-      if (logger_name.size() > 0) {
-        _logger_node = new NSMNode(logger_name);
-      }
-    }
-    if (_logger_node != NULL &&
-        b2nsm_nodeid(_logger_node->getName().c_str()) >= 0) {
+    if (_rc_node != NULL &&
+        b2nsm_nodeid(_rc_node->getName().c_str()) >= 0) {
       std::string str;
       int pars[3];
       int npar = log.pack(pars, str);
-      sendRequest(_logger_node, Command::LOG, npar, pars, str);
+      sendRequest(_rc_node, Command::LOG, npar, pars, str);
     }
   } catch (const NSMHandlerException& e) {
     return false;
@@ -260,6 +231,10 @@ bool NSMCommunicator::wait(int sec) throw(NSMHandlerException)
   }
   if (FD_ISSET(_nsmc->sock, &fds)) {
     _message.read(_nsmc);
+    const char* rcname = _message.getNodeName();
+    if (rcname != NULL && _rc_node == NULL) {
+      _rc_node = new NSMNode(rcname);
+    }
     b2nsm_context(_nsmc);
     return true;
   } else {
@@ -281,8 +256,7 @@ void NSMCommunicator::setContext(NSMcontext* nsmc) throw(NSMHandlerException)
 bool NSMCommunicator::performCallback() throw(NSMHandlerException)
 {
   if (_callback) {
-    Command command = _message.getRequestName();
-    return _callback->perform(command, _message);
+    return _callback->perform(_message);
   }
   return false;
 }
@@ -307,4 +281,11 @@ throw(NSMHandlerException)
 #else
   return -1;
 #endif
+}
+
+bool NSMCommunicator::isConnected(NSMNode* node) throw()
+{
+  bool is_online = getNodeIdByName(node->getName()) >= 0 &&
+                   getNodePidByName(node->getName()) > 0;
+  return is_online;
 }

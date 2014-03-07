@@ -107,7 +107,7 @@ bool RCClientCallback::error() throw()
   _master->getStatus()->update();
   _master->getNode()->setState(State::ERROR_ES);
   std::string emsg = Belle2::form("%s got error (message = %s)",
-                                  node->getName().c_str(), nsm.getData().c_str());
+                                  node->getName().c_str(), nsm.getData());
   nsm.setData(emsg);
   RunControlMessage msg(_master->getNode(), Command::ERROR, nsm);
   _master->sendMessageToMaster(msg);
@@ -119,7 +119,7 @@ bool RCClientCallback::error() throw()
   return true;
 }
 
-void RCClientCallback::selfCheck() throw(NSMHandlerException)
+void RCClientCallback::selfCheck() throw()
 {
   _master->lock();
   RCCommunicator* comm = _master->getClientCommunicator();

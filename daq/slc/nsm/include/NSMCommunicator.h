@@ -3,13 +3,16 @@
 
 #include "daq/slc/nsm/NSMHandlerException.h"
 #include "daq/slc/nsm/NSMMessage.h"
+#include "daq/slc/nsm/NSMNode.h"
 
-#include "daq/slc/base/NSMNode.h"
-#include "daq/slc/base/Command.h"
-#include "daq/slc/base/SystemLog.h"
+#include <daq/slc/system/BufferedWriter.h>
+
+#include <daq/slc/base/Command.h>
+#include <daq/slc/base/SystemLog.h>
+#include <daq/slc/base/Serializable.h>
 
 extern "C" {
-#include "nsm2/nsm2.h"
+#include <nsm2/nsm2.h>
 }
 
 #include <vector>
@@ -30,7 +33,7 @@ namespace Belle2 {
 
   public:
     NSMCommunicator(NSMNode* node = NULL, const std::string& host = "",
-                    int port = -1, const std::string& config_name = "slowcontrol") throw();
+                    int port = -1) throw();
     ~NSMCommunicator() throw() {}
 
   public:
@@ -39,6 +42,8 @@ namespace Belle2 {
     void sendRequest(const NSMNode* node, const Command& cmd,
                      int npar = 0, int* pars = NULL,
                      int len = 0, const char* datap = NULL) throw(NSMHandlerException);
+    void sendRequest(const NSMNode* node, const Command& cmd,
+                     int npar, int* pars, const Serializable& obj) throw(NSMHandlerException);
     void sendRequest(const NSMNode* node, const Command& cmd,
                      int npar, int* pars,
                      const std::string& message) throw(NSMHandlerException);
@@ -64,15 +69,15 @@ namespace Belle2 {
     void setMessage(NSMMessage& msg) throw() { _message = msg; }
     void setId(int id) throw() { _id = id; }
     void setNode(NSMNode* node) throw() { _node = node; }
-    void setRCNode(NSMNode* node) throw() { _rc_node = node; }
+    //void setRCNode(NSMNode* node) throw() { _rc_node = node; }
     void setCallback(NSMCallback* callback) throw() { _callback = callback; }
     bool performCallback() throw(NSMHandlerException);
     int getNodeIdByName(const std::string& name) throw(NSMHandlerException);
     int getNodePidByName(const std::string& name) throw(NSMHandlerException);
     void setContext(NSMcontext* nsmc) throw(NSMHandlerException);
+    bool isConnected(NSMNode* node) throw();
 
   private:
-    std::string _config_name;
     NSMNode* _node;
     NSMCallback* _callback;
     int _id;
@@ -80,8 +85,8 @@ namespace Belle2 {
     NSMcontext* _nsmc;
     std::string _host;
     int _port;
-    NSMNode* _logger_node;
     NSMNode* _rc_node;
+    BufferedWriter _writer;
 
   };
 

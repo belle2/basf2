@@ -1,43 +1,40 @@
 #include "daq/slc/apps/hvcontrold/HVChannelStatus.h"
 
-#include "daq/slc/apps/hvcontrold/HVState.h"
+#include <daq/slc/base/Writer.h>
+#include <daq/slc/base/Reader.h>
 
-#include "daq/slc/base/StringUtil.h"
-
-#include <sstream>
+#include <cstring>
 
 using namespace Belle2;
 
-HVChannelStatus::HVChannelStatus(unsigned int crate, unsigned int slot, unsigned int ch)
-  : DataObject("HVChannelStatus", "")
+HVChannelStatus::HVChannelStatus()
 {
-  addUInt("crate", crate);
-  addUInt("slot", slot);
-  addUInt("channel", ch);
-  addUInt("status", HVState::OFF_STABLE_S.getId());
-  addUInt("voltage_monitored", 0);
-  addUInt("current_monitored", 0);
+  memset(&_status, 0, sizeof(hv_channel_status));
+  setState(HVState::OFF_S);
 }
 
-HVChannelStatus::~HVChannelStatus() throw()
+void HVChannelStatus::setStatus(const hv_channel_status& status)
 {
-
+  memcpy(&_status, &status, sizeof(hv_channel_status));
 }
 
-std::string HVChannelStatus::print_names()
+void HVChannelStatus::setStatus(const hv_channel_status* status)
 {
-  std::stringstream ss;
-  ss << " crate | slot | channel | status | voltage_monitored | current_monitored ";
-  return ss.str();
+  memcpy(&_status, status, sizeof(hv_channel_status));
 }
 
-std::string HVChannelStatus::print_values()
+void HVChannelStatus::writeObject(Writer& writer) const throw(IOException)
 {
-  std::stringstream ss;
-  ss << Belle2::form(" %5d |  %3d | %7d |", getUInt("crate"),
-                     getUInt("slot"), getUInt("channel"));
-  ss << Belle2::form(" %6d | %17d | %16d ", getUInt("status"),
-                     getUInt("voltage_monitored"),
-                     getUInt("current_monitored"));
-  return ss.str();
+  writer.writeInt(_status.configid);
+  writer.writeInt(_status.state);
+  writer.writeFloat(_status.voltage_mon);
+  writer.writeFloat(_status.current_mon);
+}
+
+void HVChannelStatus::readObject(Reader& reader) throw(IOException)
+{
+  _status.configid = reader.readInt();
+  _status.state = reader.readInt();
+  _status.voltage_mon = reader.readFloat();
+  _status.current_mon = reader.readFloat();
 }

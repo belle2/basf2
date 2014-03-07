@@ -1,68 +1,52 @@
 #ifndef _Belle2_HVControlMaster_h
 #define _Belle2_HVControlMaster_h
 
-#include "daq/slc/apps/hvcontrold/HVCrateInfo.h"
-#include "daq/slc/apps/hvcontrold/HVCommand.h"
+#include <daq/slc/database/DBInterface.h>
 
-#include "daq/slc/database/DBInterface.h"
+#include <daq/slc/system/Cond.h>
 
-#include "daq/slc/nsm/NSMCommunicator.h"
+#include <daq/slc/nsm/NSMCallback.h>
+#include <daq/slc/nsm/NSMData.h>
 
-#include "daq/slc/system/Mutex.h"
-
-#include "daq/slc/base/NSMNode.h"
+#include "daq/slc/apps/hvcontrold/HVNodeInfo.h"
 
 #include <map>
 
 namespace Belle2 {
 
-  class DBInterface;
-  class TCPSocket;
+  typedef std::map<std::string, NSMData*> HVNSMDataList;
+  typedef std::map<std::string, HVNodeInfo> HVNodeInfoList;
+  typedef std::vector<std::string> HVNodeNameList;
 
   class HVControlMaster {
 
   public:
-    typedef  std::map<std::string, HVCrateInfo*> HVCrateInfoMap;
-    typedef  std::map<std::string, NSMNode*> NSMNodeMap;
+    HVControlMaster() {}
+    virtual ~HVControlMaster() throw() {}
 
   public:
-    HVControlMaster(DBInterface& db) : _db(db) {}
-    ~HVControlMaster() {}
-
-  public:
-    void add(const std::string& name, HVCrateInfo* crate);
-    void perform(const std::string& command, const std::string& str);
-    void accept(const TCPSocket& socket);
-    void setCommunicator(NSMCommunicator* comm) { _comm = comm; }
-
-  public:
-    bool help(const std::string& str);
-    bool show(const std::string& str);
-    bool set(const std::string& str);
-    bool get(const std::string& str);
-    bool save(const std::string& str);
-    bool recall(const std::string& str);
-    bool list(const std::string& str);
-    bool remove(const std::string& str);
-    bool execute(const std::string& str, HVCommand command);
-    bool quit(const std::string& str);
+    void lock() { _mutex.lock(); }
+    void unlock() { _mutex.unlock(); }
+    void wait() { _cond.wait(_mutex); }
+    void notify() { _cond.signal(); }
+    void addNode(NSMNode* node, const std::string& filename);
+    bool hasNode(const std::string& id) throw() { return _node_m.find(id) != _node_m.end(); }
+    HVNodeInfo& getNodeInfo(const std::string& id) { return _node_m[id]; }
+    NSMData* getData(const std::string& id) { return _nsmdata_m[id]; }
+    HVNodeNameList& getNodeNameList() { return _name_v; }
+    HVNodeInfoList& getNodeInfoList() { return _node_m; }
+    HVNSMDataList& getDataList() { return _nsmdata_m; }
+    void setDB(DBInterface* db) { _db = db; }
+    DBInterface* getDB() { return _db; }
+    void createTables();
 
   private:
-    DBInterface& _db;
-    HVCrateInfoMap _crate_m;
-    NSMNodeMap _node_m;
-    NSMCommunicator* _comm;
     Mutex _mutex;
-
-  private:
-    typedef bool (*HVControlFunc_t)(HVChannelInfo*, HVChannelStatus*,
-                                    const std::string&, const std::string&);
-    bool handle(HVControlFunc_t func, HVCrateInfo* crate, size_t slot, size_t channel,
-                const std::string& pname, const std::string& value);
-    static bool show_local(HVChannelInfo*, HVChannelStatus*, const std::string& pname, const std::string& value);
-    static bool set_local(HVChannelInfo*, HVChannelStatus*, const std::string& pname, const std::string& value);
-    static bool get_local(HVChannelInfo*, HVChannelStatus*, const std::string& pname, const std::string& value);
-    bool save_local(const std::string& nodename);
+    Cond _cond;
+    HVNodeNameList _name_v;
+    HVNodeInfoList _node_m;
+    HVNSMDataList _nsmdata_m;
+    DBInterface* _db;
 
   };
 

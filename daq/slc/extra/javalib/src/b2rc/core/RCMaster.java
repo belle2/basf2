@@ -7,6 +7,7 @@ import b2daq.core.DataObject;
 import b2daq.core.RCConnection;
 import b2daq.core.RCNode;
 import b2daq.core.RCState;
+import b2daq.java.io.ConfigFile;
 
 public class RCMaster {
 
@@ -17,6 +18,8 @@ public class RCMaster {
 	private ArrayList<RCNode> _node_v = new ArrayList<RCNode>();
 	private HashMap<Integer, RCNode> _node_id_m = new HashMap<Integer, RCNode>();
 	private HashMap<String, RCNode> _node_name_m = new HashMap<String, RCNode>();
+	private ConfigFile _config_file = new ConfigFile();
+	private ArrayList<ConfigFile> _config_file_v = new ArrayList<ConfigFile>();
 	// private RCDatabaseManager _dbmanager;
 
 	public RCMaster(RCNode node, RunConfig config, RunStatus status) {
@@ -96,6 +99,22 @@ public class RCMaster {
 
 	public RunConfig getConfig() {
 		return _config;
+	}
+
+	public ConfigFile getConfigFile() {
+		return _config_file;
+	}
+
+	public void setConfigFile(ConfigFile config_file) {
+		_config_file = config_file;
+	}
+
+	public ArrayList<ConfigFile> getConfigFiles() {
+		return _config_file_v;
+	}
+
+	public void setConfigFiles(ArrayList<ConfigFile> config_file_v) {
+		_config_file_v = config_file_v;
 	}
 
 }

@@ -41,7 +41,7 @@ public class DnDTabbedPane extends JTabbedPane {
 
 	public DnDTabbedPane() {
 		super();
-		setFont(new Font("Sans", Font.PLAIN, 14));
+		setFont(new Font("Sans", Font.PLAIN, 12));
 		setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 		final DragSourceListener dsl = new DragSourceListener() {
 			public void dragEnter(DragSourceDragEvent e) {

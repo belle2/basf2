@@ -12,7 +12,7 @@ public abstract class JavaEntoryPoint extends Thread implements EntoryPoint {
 	public JavaEntoryPoint() {
 		 try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-			final Font font = new Font("Sans",Font.PLAIN,14);
+			final Font font = new Font("Arial",Font.PLAIN,14);
 			Enumeration<Object> enumeration = UIManager.getDefaults().keys();
 			while(enumeration.hasMoreElements()){
 			    Object key = enumeration.nextElement();

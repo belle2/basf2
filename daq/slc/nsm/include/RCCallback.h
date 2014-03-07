@@ -27,7 +27,7 @@ namespace Belle2 {
     virtual bool stateCheck()  throw() { return true; }
 
   public:
-    virtual bool perform(const Command& cmd, NSMMessage& msg)
+    virtual bool perform(NSMMessage& msg)
     throw(NSMHandlerException);
     void setForce(bool force) { _force = force; }
 

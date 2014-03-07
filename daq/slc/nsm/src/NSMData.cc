@@ -30,7 +30,7 @@ void* NSMData::open(NSMCommunicator* comm) throw(NSMHandlerException)
       == NULL) {
     throw (NSMHandlerException(__FILE__, __LINE__, "Failed to open data memory"));
   }
-  parse(NULL, false);
+  //parse(NULL, false);
   return _pdata;
 }
 
@@ -41,11 +41,11 @@ void* NSMData::allocate(NSMCommunicator* comm, int interval) throw(NSMHandlerExc
       == NULL) {
     throw (NSMHandlerException(__FILE__, __LINE__, "Failed to allocate data memory"));
   }
-  parse(NULL, false);
+  //parse(NULL, false);
   return _pdata;
 }
 
-void* NSMData::parse(const char* incpath, bool maclloc_new) throw(NSMHandlerException)
+void* NSMData::parse(const char* incpath, bool malloc_new) throw(NSMHandlerException)
 {
 #if NSM_PACKAGE_VERSION >= 1914
   NSMparse* ptr = NULL;
@@ -77,7 +77,8 @@ void* NSMData::parse(const char* incpath, bool maclloc_new) throw(NSMHandlerExce
     _label_v.push_back(label);
     ptr = ptr->next;
   }
-  if (size > 0) return malloc(size);
+  _size = size;
+  if (size > 0 && malloc_new) return malloc(size);
 #endif
   return NULL;
 }
@@ -268,33 +269,9 @@ void NSMData::setFloat(const std::string& label, float value) throw(NSMHandlerEx
   setValue(label, &value, sizeof(float));
 }
 
-const std::string NSMData::toSQLConfig()
+const std::string NSMData::getDBTableName()
 {
-  std::stringstream ss;
-  ss << "record_time timestamp";
-  for (std::vector<std::string>::iterator it = _label_v.begin();
-       it != _label_v.end(); it++) {
-    std::string& label(*it);
-    NSMDataProperty& pro(_pro_m[label]);
-    std::string type_s;
-    switch (pro.type) {
-      case INT64:  type_s = "bigint"; break;
-      case INT32:  type_s = "int"; break;
-      case INT16:  type_s = "smallint"; break;
-      case CHAR:   type_s = "tinyint"; break;
-      case UINT64: type_s = "bigint unsigned"; break;
-      case UINT32: type_s = "int unsigned"; break;
-      case UINT16: type_s = "smallint unsigned"; break;
-      case BYTE8:  type_s = "tinyint unsigned"; break;
-      case DOUBLE: type_s = "double"; break;
-      case FLOAT:  type_s = "float"; break;
-      default : break;
-    }
-    for (size_t i = 0; i < pro.length; i++) {
-      ss << ", `" << label << ":" << i << "` " << type_s;
-    }
-  }
-  return ss.str();
+  return Belle2::form("%s_rev%d", _data_name.c_str(), _revision);
 }
 
 const std::string NSMData::toSQLNames()
@@ -304,157 +281,151 @@ const std::string NSMData::toSQLNames()
   for (std::vector<std::string>::iterator it = _label_v.begin();
        it != _label_v.end(); it++) {
     std::string& label(*it);
-    NSMDataProperty& pro(_pro_m[label]);
-    if (pro.length == 0) {
-      ss << ", " << label;
-    } else {
-      for (size_t i = 0; i < pro.length; i++) {
-        ss << ", `" << label << ":" << i << "`";
-      }
-    }
+    ss << ", " << label << "";
   }
   return ss.str();
 }
 
-const std::string NSMData::toSQLValues()
+int NSMData::openDB(DBInterface* db) throw(DBHandlerException)
 {
-  char* data = (char*)get();
-  std::stringstream ss;
-  ss << "current_timestamp";
-  for (std::vector<std::string>::iterator it = _label_v.begin();
-       it != _label_v.end(); it++) {
-    std::string& label(*it);
-    NSMDataProperty& pro(_pro_m[label]);
-    int length = pro.length;
-    if (length < 0) length = 1;
-    for (int i = 0; i < length; i++) {
+  std::string tablename = getDBTableName();
+  if (db != NULL && !db->checkTable(tablename)) {
+    std::stringstream ss;
+    ss << "serial_id serial, record_time timestamp";
+    for (size_t i = 0; i < _label_v.size(); i++) {
+      std::string& label(_label_v[i]);
+      NSMDataProperty& pro(_pro_m[label]);
+      if (pro.type == CHAR && pro.length > 0) {
+        ss << ", " << label << " text";
+      } else {
+        std::string type_s;
+        switch (pro.type) {
+          case INT64:  type_s = "int8"; break;
+          case INT32:  type_s = "int4"; break;
+          case INT16:  type_s = "int2"; break;
+          case CHAR:   type_s = "int2"; break;
+          case UINT64: type_s = "int8"; break;
+          case UINT32: type_s = "int4"; break;
+          case UINT16: type_s = "int2"; break;
+          case BYTE8:  type_s = "int2"; break;
+          case DOUBLE: type_s = "float8"; break;
+          case FLOAT:  type_s = "float"; break;
+          default : break;
+        }
+        if (pro.length > 0) {
+          ss << ", " << label << " " << type_s << "[" << pro.length << "]";
+        } else {
+          ss << ", " << label << " " << type_s;
+        }
+      }
+    }
+    db->execute(Belle2::form("create table \"%s\" (%s);",
+                             tablename.c_str(), ss.str().c_str()));
+  }
+  return 1;
+}
+
+int NSMData::writeDB(DBInterface* db) throw(DBHandlerException)
+{
+  char* data;
+  try {
+    data = (char*)get();
+  } catch (const NSMHandlerException& e) {
+    return -1;
+  }
+  const std::string tablename = getDBTableName();
+  if (db != NULL && db->checkTable(tablename)) {
+    std::stringstream ss;
+    ss << "current_timestamp";
+    for (std::vector<std::string>::iterator it = _label_v.begin();
+         it != _label_v.end(); it++) {
+      std::string& label(*it);
+      NSMDataProperty& pro(_pro_m[label]);
+      int length = pro.length;
+      if (length <= 0) length = 1;
       ss << ", ";
-      switch (pro.type) {
-        case INT64:  ss << ((int64*)(data + pro.offset))[i]; break;
-        case INT32:  ss << ((int32*)(data + pro.offset))[i]; break;
-        case INT16:  ss << ((int16*)(data + pro.offset))[i]; break;
-        case CHAR:   ss << (int)((char*)(data + pro.offset))[i]; break;
-        case UINT64: ss << ((uint64*)(data + pro.offset))[i]; break;
-        case UINT32: ss << ((uint32*)(data + pro.offset))[i]; break;
-        case UINT16: ss << ((uint16*)(data + pro.offset))[i]; break;
-        case BYTE8:  ss << (uint32)((byte8*)(data + pro.offset))[i]; break;
-        case DOUBLE: ss << ((double*)(data + pro.offset))[i]; break;
-        case FLOAT:  ss << ((float*)(data + pro.offset))[i]; break;
-        default : break;
+      if (pro.type == CHAR && pro.length > 0) {
+        ss << (char*)(data + pro.offset);
+      } else {
+        if (pro.length > 0) ss << "'{";
+        for (int i = 0; i < length; i++) {
+          if (i > 0) ss << ", ";
+          switch (pro.type) {
+            case INT64:  ss << ((int64*)(data + pro.offset))[i]; break;
+            case INT32:  ss << ((int32*)(data + pro.offset))[i]; break;
+            case INT16:  ss << ((int16*)(data + pro.offset))[i]; break;
+            case CHAR:   ss << (int)((char*)(data + pro.offset))[i]; break;
+            case UINT64: ss << ((uint64*)(data + pro.offset))[i]; break;
+            case UINT32: ss << ((uint32*)(data + pro.offset))[i]; break;
+            case UINT16: ss << ((uint16*)(data + pro.offset))[i]; break;
+            case BYTE8:  ss << (uint32)((byte8*)(data + pro.offset))[i]; break;
+            case DOUBLE: ss << ((double*)(data + pro.offset))[i]; break;
+            case FLOAT:  ss << ((float*)(data + pro.offset))[i]; break;
+            default : break;
+          }
+        }
+        if (pro.length > 0) ss << "}'";
       }
     }
+    std::string parvalues = ss.str();
+    db->execute(Belle2::form("insert into \"%s\" (%s)  values (%s);",
+                             tablename.c_str(), toSQLNames().c_str(),
+                             parvalues.c_str()));
   }
-  return ss.str();
+  return 1;
 }
 
-void NSMData::setSQLValues(std::vector<std::string>& name_v,
-                           std::vector<std::string>& value_v)
+int NSMData::readDB(DBInterface* db, int id) throw(DBHandlerException)
 {
-  char* data = (char*)get();
-  for (size_t i = 0; i < name_v.size(); i++) {
-    std::string name = name_v[i];
-    std::vector<std::string> str_v = Belle2::split(name, ':');
-    int index = 0;
-    if (str_v.size() > 1) {
-      name = str_v[0];
-      index = atoi(str_v[1].c_str());
-    }
+  char* data;
+  try {
+    data = (char*)get();
+  } catch (const NSMHandlerException& e) {
+    return -1;
+  }
+  const std::string tablename = getDBTableName();
+  if (id < 0) {
+    db->execute(Belle2::form("select * from \"%s\" order by desc record_time limit 1;",
+                             tablename.c_str()));
+  } else {
+    db->execute(Belle2::form("select * from \"%s\" where serial_id = %d order by desc record_time limit 1;",
+                             tablename.c_str(), id));
+  }
+  DBRecordList& record_v(db->loadRecords());
+  if (record_v.size() == 0) return -1;
+  for (size_t i = 0; i < _label_v.size(); i++) {
+    std::string name = _label_v[i];
+    std::string value = record_v[0].getFieldValue(name);
     NSMDataProperty& pro(_pro_m[name]);
-    switch (pro.type) {
-      case INT64: ((int64*)(data + pro.offset))[index] = atoll(value_v[i].c_str()); break;
-      case INT32: ((int32*)(data + pro.offset))[index] = atoi(value_v[i].c_str()); break;
-      case INT16: ((int16*)(data + pro.offset))[index] = atoi(value_v[i].c_str()); break;
-      case CHAR: ((char*)(data + pro.offset))[index] = (char)atoi(value_v[i].c_str()); break;
-      case UINT64: ((uint64*)(data + pro.offset))[index] = strtoll(value_v[i].c_str(), NULL, 0); break;
-      case UINT32: ((uint32*)(data + pro.offset))[index] = strtol(value_v[i].c_str(), NULL, 0); break;
-      case UINT16: ((uint16*)(data + pro.offset))[index] = strtol(value_v[i].c_str(), NULL, 0); break;
-      case BYTE8: ((byte8*)(data + pro.offset))[index] = (byte8)atoi(value_v[i].c_str()); break;
-      case DOUBLE: ((double*)(data + pro.offset))[index] = atof(value_v[i].c_str()); break;
-      case FLOAT: ((float*)(data + pro.offset))[index] = atof(value_v[i].c_str()); break;
-      default : break;
-    }
-  }
-}
-
-void NSMData::getSQLValues(std::vector<std::string>&,
-                           std::vector<std::string>& value_v)
-{
-  char* data = (char*)get();
-  for (std::vector<std::string>::iterator it = _label_v.begin();
-       it != _label_v.end(); it++) {
-    std::string& label(*it);
-    NSMDataProperty& pro(_pro_m[label]);
     int length = pro.length;
-    if (length < 0) length = 1;
-    for (int i = 0; i < length; i++) {
-      std::stringstream ss;
-      switch (pro.type) {
-        case INT64:  ss << ((int64*)(data + pro.offset))[i];  break;
-        case INT32:  ss << ((int32*)(data + pro.offset))[i];  break;
-        case INT16:  ss << ((int16*)(data + pro.offset))[i];  break;
-        case CHAR:   ss << ((char*)(data + pro.offset))[i];   break;
-        case UINT64: ss << ((uint64*)(data + pro.offset))[i]; break;
-        case UINT32: ss << ((uint32*)(data + pro.offset))[i]; break;
-        case UINT16: ss << ((uint16*)(data + pro.offset))[i]; break;
-        case BYTE8:  ss << ((byte8*)(data + pro.offset))[i];  break;
-        case DOUBLE: ss << ((double*)(data + pro.offset))[i]; break;
-        case FLOAT:  ss << ((float*)(data + pro.offset))[i];  break;
-        default : break;
+    if (length <= 0) length = 1;
+    if (pro.type == CHAR && pro.length > 0) {
+      memset((char*)(data + pro.offset), 0, pro.length);
+      memcpy((char*)(data + pro.offset), name.c_str(), name.size());
+    } else {
+      std::string value = Belle2::replace(Belle2::replace(value, "{", ""), "}", "");
+      std::vector<std::string> v_v = Belle2::split(value, ',');
+      for (int ii = 0; ii < length && ii < (int)v_v.size(); ii++) {
+        switch (pro.type) {
+          case INT64: ((int64*)(data + pro.offset))[ii] = atoll(v_v[i].c_str()); break;
+          case INT32: ((int32*)(data + pro.offset))[ii] = atoi(v_v[i].c_str()); break;
+          case INT16: ((int16*)(data + pro.offset))[ii] = atoi(v_v[i].c_str()); break;
+          case CHAR: ((char*)(data + pro.offset))[ii] = (char)atoi(v_v[i].c_str()); break;
+          case UINT64: ((uint64*)(data + pro.offset))[ii] = strtoll(v_v[i].c_str(), NULL, 0); break;
+          case UINT32: ((uint32*)(data + pro.offset))[ii] = strtol(v_v[i].c_str(), NULL, 0); break;
+          case UINT16: ((uint16*)(data + pro.offset))[ii] = strtol(v_v[i].c_str(), NULL, 0); break;
+          case BYTE8: ((byte8*)(data + pro.offset))[ii] = (byte8)atoi(v_v[i].c_str()); break;
+          case DOUBLE: ((double*)(data + pro.offset))[ii] = atof(v_v[i].c_str()); break;
+          case FLOAT: ((float*)(data + pro.offset))[ii] = atof(v_v[i].c_str()); break;
+          default : break;
+        }
       }
-      value_v.push_back(ss.str());
     }
   }
+  return record_v[0].getFieldValueInt("serial_id");
 }
 
-const std::string NSMData::toXML()
-{
-  std::stringstream ss;
-  ss << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" << std::endl
-     << "<object class=\"" << _data_name
-     << "\" revision=\"" << _revision << "\" >" << std::endl;
-  char* data = (char*)get();
-  for (std::vector<std::string>::iterator it = _label_v.begin();
-       it != _label_v.end(); it++) {
-    std::string& label(*it);
-    NSMDataProperty& pro(_pro_m[label]);
-    switch (pro.type) {
-      case INT64:  ss << "<int name=\"" << label
-                        << "\" value=\"" << *(int64*)(data + pro.offset)
-                        << "\" />" << std::endl; break;
-      case INT32:  ss << "<int name=\"" << label
-                        << "\" value=\"" << *(int32*)(data + pro.offset)
-                        << "\" />" << std::endl; break;
-      case INT16:  ss << "<short name=\"" << label
-                        << "\" value=\"" << *(int16*)(data + pro.offset)
-                        << "\" />" << std::endl; break;
-      case CHAR:   ss << "<int name=\"" << label
-                        << "\" value=\"" << *(char*)(data + pro.offset)
-                        << "\" />" << std::endl; break;
-      case UINT64: ss << "<int name=\"" << label
-                        << "\" value=\"" << *(int64*)(data + pro.offset)
-                        << "\" />" << std::endl; break;
-      case UINT32: ss << "<int name=\"" << label
-                        << "\" value=\"" << *(int32*)(data + pro.offset)
-                        << "\" />" << std::endl; break;
-      case UINT16: ss << "<short name=\"" << label
-                        << "\" value=\"" << *(int16*)(data + pro.offset)
-                        << "\" />" << std::endl; break;
-      case BYTE8:  ss << "<byte name=\"" << label
-                        << "\" value=\"" << *(byte8*)(data + pro.offset)
-                        << "\" />" << std::endl; break;
-      case DOUBLE: ss << "<double name=\"" << label
-                        << "\" value=\"" << *(double*)(data + pro.offset)
-                        << "\" />" << std::endl; break;
-      case FLOAT:  ss << "<float name=\"" << label
-                        << "\" value=\"" << *(float*)(data + pro.offset)
-                        << "\" />" << std::endl; break;
-      default : break;
-    }
-  }
-  return ss.str();
-}
-
-void NSMData::readObject(Reader& reader) throw(IOException)
+void NSMData::readObject(Reader& /*reader*/) throw(IOException)
 {
   /*
   DataObject* obj = new DataObject();
@@ -491,6 +462,7 @@ void NSMData::writeObject(Writer& writer) const throw(IOException)
   writer.writeString(_data_name);
   writer.writeString(_format);
   writer.writeInt(_revision);
+  writer.writeInt(_size);
   writer.writeInt(_label_v.size());
   char* data = (char*)get();
   for (std::vector<std::string>::iterator it = _label_v.begin();

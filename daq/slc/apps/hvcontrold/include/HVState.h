@@ -8,14 +8,19 @@ namespace Belle2 {
   class HVState : public State {
 
   public:
-    static const HVState OFF_STABLE_S;
-    static const HVState OFF_ERROR_ES;
-    static const HVState ON_STABLE_S;
-    static const HVState ON_RAMPINGUP_TS;
-    static const HVState ON_RAMPINGDOWN_TS;
-    static const HVState ON_TRIP_ES;
-    static const HVState ON_OCP_ES;
-    static const HVState ON_OVP_ES;
+    static const HVState OFF_S;
+    static const HVState STABLE_S;
+    static const HVState STANDBY_S;
+    static const HVState STANDBY2_S;
+    static const HVState STANDBY3_S;
+    static const HVState PEAK_S;
+    static const HVState TRANSITION_TS;
+    static const HVState RAMPINGUP_TS;
+    static const HVState RAMPINGDOWN_TS;
+    static const HVState TRIP_ES;
+    static const HVState OVER_CURRENT_ES;
+    static const HVState OVER_VOLTAGE_ES;
+    static const HVState ERROR_ES;
 
   public:
     HVState() throw() : State(Enum::UNKNOWN) {}
@@ -32,8 +37,10 @@ namespace Belle2 {
     throw() : State(id, label, alias) {}
 
   public:
+    bool isOff() const;
     bool isOn() const;
-    bool isStable() const;
+    bool isStable() const { return isOn() || isOff(); }
+    bool isTransition() const;
     bool isError() const;
 
   public:

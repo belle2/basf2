@@ -2,6 +2,8 @@
 
 #include <daq/slc/base/StringUtil.h>
 
+#include <iostream>
+
 using namespace Belle2;
 
 PostgreSQLInterface::PostgreSQLInterface(const std::string& host,
@@ -10,7 +12,9 @@ PostgreSQLInterface::PostgreSQLInterface(const std::string& host,
                                          const std::string& password,
                                          int port) throw()
   : DBInterface(host, database, user, password, port),
-    _sq_conn(NULL), _sq_result(NULL) {}
+    _sq_conn(NULL), _sq_result(NULL)
+{
+}
 
 void PostgreSQLInterface::connect() throw(DBHandlerException)
 {
@@ -19,12 +23,12 @@ void PostgreSQLInterface::connect() throw(DBHandlerException)
                                       _user.c_str(), _password.c_str()).c_str());
   if (PQstatus(_sq_conn) == CONNECTION_BAD) {
     throw (DBHandlerException(__FILE__, __LINE__,
-                              Belle2::form("Failed to connect to the database : (%s)",
-                                           PQerrorMessage(_sq_conn))));
+                              Belle2::replace(Belle2::form("Failed to connect to the database : (%s)",
+                                                           PQerrorMessage(_sq_conn)), "\n", "")));
   }
 }
 
-void PostgreSQLInterface::execute(const std::string& command)
+void PostgreSQLInterface::execute_imp(const std::string& command)
 throw(DBHandlerException)
 {
   clear();
@@ -32,15 +36,15 @@ throw(DBHandlerException)
   ExecStatusType status = PQresultStatus(_sq_result);
   if (status == PGRES_FATAL_ERROR) {
     throw (DBHandlerException(__FILE__, __LINE__,
-                              Belle2::form("Failed to execute command : %s (%s)",
-                                           command.c_str(), PQerrorMessage(_sq_conn))));
+                              Belle2::replace(Belle2::form("Failed to execute command : %s (%s)",
+                                                           command.c_str(), PQerrorMessage(_sq_conn)), "\n", "")));
   }
 }
 
 DBRecordList& PostgreSQLInterface::loadRecords() throw(DBHandlerException)
 {
   if (PQresultStatus(_sq_result) != PGRES_TUPLES_OK) {
-    throw (DBHandlerException(__FILE__, __LINE__, "Failed to get records"));
+    throw (DBHandlerException(__FILE__, __LINE__, "DB records are not ready for reading"));
   }
   const size_t nrecords = PQntuples(_sq_result);
   const size_t nfields = PQnfields(_sq_result);
@@ -77,3 +81,23 @@ void PostgreSQLInterface::close() throw(DBHandlerException)
   PQfinish(_sq_conn);
 }
 
+bool PostgreSQLInterface::checkTable(const std::string& tablename) throw(DBHandlerException)
+{
+  execute(Belle2::form("select relname from pg_stat_user_tables where relname='%s'", tablename.c_str()));
+  DBRecordList& ret(loadRecords());
+  return ret.size() > 0;
+}
+
+std::map<std::string, std::string> PostgreSQLInterface::getTableContents(const std::string& tablename)
+throw(DBHandlerException)
+{
+  std::map<std::string, std::string> name_m;
+  execute(Belle2::form("select attname, typname from pg_class, pg_attribute, pg_type where relkind ='r'and relname = '%s' and attrelid = relfilenode and attnum > 0 and pg_type.oid = atttypid;", tablename.c_str()));
+  DBRecordList& ret(loadRecords());
+  for (size_t i = 0; i < ret.size(); i++) {
+    name_m.insert(std::map<std::string, std::string>::value_type(ret[i].getFieldValue("attname"),
+                  ret[i].getFieldValue("typname")));
+  }
+  return name_m;
+
+}

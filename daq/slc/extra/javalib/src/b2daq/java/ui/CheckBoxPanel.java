@@ -45,6 +45,14 @@ public class CheckBoxPanel extends JPanel {
 		return _checkbox.getText();
 	}
 
+	public boolean isSelected() {
+		return _checkbox.isSelected();
+	}
+
+	public String getLabel() {
+		return _label.getText();
+	}
+
 	public void setFieldSize(int width, int height) {
 		_checkbox.setMaximumSize(new Dimension(width, height));
 		_checkbox.setPreferredSize(new Dimension(width, height));

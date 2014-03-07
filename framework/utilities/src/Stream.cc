@@ -69,14 +69,12 @@ TObject* Stream::deserializeEncodedRawData(const std::string& base64Data)
   const TString& data(TBase64::Decode(base64Data.c_str()));
 
   //const-cast ok since TMessage doesn't own the buffer
-  TMessage* tmsg = new InMessage(const_cast<char*>(data.Data()), data.Length());
+  InMessage msg(const_cast<char*>(data.Data()), data.Length());
   //some checking
-  if (tmsg->What() != kMESS_OBJECT or tmsg->GetClass() == nullptr) {
-    delete tmsg;
+  if (msg.What() != kMESS_OBJECT or msg.GetClass() == nullptr) {
     return nullptr;
   }
-  TObject* obj = (TObject*)tmsg->ReadObjectAny(tmsg->GetClass());
-  delete tmsg;
+  TObject* obj = static_cast<TObject*>(msg.ReadObjectAny(msg.GetClass()));
 
   return obj;
 }

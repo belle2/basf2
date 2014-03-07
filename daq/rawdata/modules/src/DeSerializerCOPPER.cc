@@ -13,9 +13,11 @@
 //#define DUMMY
 //#define MAXEVTSIZE 400000000
 //#define TIME_MONITOR
-#define NO_DATA_CHECK
-#define WO_FIRST_EVENUM_CHECK
+//#define NO_DATA_CHECK
+//#define WO_FIRST_EVENUM_CHECK
 #define YAMADA_DUMMY
+
+
 
 using namespace std;
 using namespace Belle2;
@@ -172,6 +174,7 @@ void DeSerializerCOPPERModule::initializeCOPPER()
 
 }
 
+#ifndef REDUCED_RAWCOPPER
 void DeSerializerCOPPERModule::fillNewRawCOPPERHeader(RawCOPPER* raw_copper)
 {
 
@@ -280,6 +283,7 @@ void DeSerializerCOPPERModule::fillNewRawCOPPERHeader(RawCOPPER* raw_copper)
   return;
 }
 
+#endif
 
 
 int* DeSerializerCOPPERModule::readOneEventFromCOPPERFIFO(const int entry, int* malloc_flag, int* m_size_word)
@@ -295,15 +299,27 @@ int* DeSerializerCOPPERModule::readOneEventFromCOPPERFIFO(const int entry, int* 
   //
   // Read data from HSLB
   //
-
+#ifndef REDUCED_RAWCOPPER
   int recvd_byte = RawHeader::RAWHEADER_NWORDS * sizeof(int);
+#else
+
+  int recvd_byte = ReducedRawHeader::RAWHEADER_NWORDS * sizeof(int);
+#endif
+
   while (1) {
     int read_size = 0;
     if ((read_size = read(m_cpr_fd, (char*)m_bufary[entry] + recvd_byte, sizeof(int) *  BUF_SIZE_WORD  - recvd_byte)) < 0) {
       if (errno == EINTR) {
         continue;
       } else if (errno == EAGAIN || errno == EWOULDBLOCK) {
-        if (recvd_byte > RawHeader::RAWHEADER_NWORDS * sizeof(int)) {
+
+        if (
+#ifndef REDUCED_RAWCOPPER
+          recvd_byte > RawHeader::RAWHEADER_NWORDS * sizeof(int)
+#else
+          recvd_byte > ReducedRawHeader::RAWHEADER_NWORDS * sizeof(int)
+#endif
+        ) {
           char err_buf[500];
           sprintf("EAGAIN return in the middle of an event( COPPER driver should't do this.). Exting...", strerror(errno));
           print_err.PrintError(m_shmflag, &m_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
@@ -333,21 +349,39 @@ int* DeSerializerCOPPERModule::readOneEventFromCOPPERFIFO(const int entry, int* 
       }
     } else {
       recvd_byte += read_size;
+
+#ifndef REDUCED_RAWCOPPER
       if (recvd_byte - RawHeader::RAWHEADER_NWORDS * sizeof(int) > (int)(sizeof(int) * (RawCOPPER::POS_DATA_LENGTH + 1)))break;
+#else
+      if (recvd_byte - ReducedRawHeader::RAWHEADER_NWORDS * sizeof(int) > (int)(sizeof(int) * (PreRawCOPPER::POS_DATA_LENGTH + 1)))break;
+#endif
+
     }
   }
 
   //
   // Calcurate data size
   //
+#ifndef REDUCED_RAWCOPPER
   *m_size_word = m_bufary[ entry ][ RawCOPPER::POS_DATA_LENGTH + RawHeader::RAWHEADER_NWORDS ]
                  + RawCOPPER::SIZE_COPPER_DRIVER_HEADER + RawCOPPER::SIZE_COPPER_DRIVER_TRAILER
                  + RawHeader::RAWHEADER_NWORDS + RawTrailer::RAWTRAILER_NWORDS; // 9 words are COPPER haeder and trailer size.
+#else
+  *m_size_word = m_bufary[ entry ][ PreRawCOPPER::POS_DATA_LENGTH + ReducedRawHeader::RAWHEADER_NWORDS ]
+                 + PreRawCOPPER::SIZE_COPPER_DRIVER_HEADER + PreRawCOPPER::SIZE_COPPER_DRIVER_TRAILER
+                 + ReducedRawHeader::RAWHEADER_NWORDS + ReducedRawTrailer::RAWTRAILER_NWORDS; // 9 words are COPPER haeder and trailer size.
+#endif
 
   //
   // Allocate buffer if needed
   //
-  if ((int)((*m_size_word - RawTrailer::RAWTRAILER_NWORDS) * sizeof(int)) > recvd_byte) {
+  if (
+#ifndef REDUCED_RAWCOPPER
+    (int)((*m_size_word - RawTrailer::RAWTRAILER_NWORDS) * sizeof(int)) > recvd_byte
+#else
+    (int)((*m_size_word - ReducedRawTrailer::RAWTRAILER_NWORDS) * sizeof(int)) > recvd_byte
+#endif
+  ) {
     // Check buffer size
     if (*m_size_word >  BUF_SIZE_WORD) {
       *malloc_flag = 1;
@@ -355,27 +389,65 @@ int* DeSerializerCOPPERModule::readOneEventFromCOPPERFIFO(const int entry, int* 
 
 
       memcpy(temp_buf, m_bufary[ entry ], recvd_byte);
+#ifndef REDUCED_RAWCOPPER
       recvd_byte += readFD(m_cpr_fd, (char*)temp_buf + recvd_byte,
                            (*m_size_word - RawTrailer::RAWTRAILER_NWORDS) * sizeof(int) - recvd_byte);
+#else
+      recvd_byte += readFD(m_cpr_fd, (char*)temp_buf + recvd_byte,
+                           (*m_size_word - ReducedRawTrailer::RAWTRAILER_NWORDS) * sizeof(int) - recvd_byte);
+#endif
     } else {
+#ifndef REDUCED_RAWCOPPER
       recvd_byte += readFD(m_cpr_fd, (char*)(m_bufary[ entry ]) + recvd_byte,
                            (*m_size_word - RawTrailer::RAWTRAILER_NWORDS) * sizeof(int) - recvd_byte);
+#else
+      recvd_byte += readFD(m_cpr_fd, (char*)(m_bufary[ entry ]) + recvd_byte,
+                           (*m_size_word - ReducedRawTrailer::RAWTRAILER_NWORDS) * sizeof(int) - recvd_byte);
+#endif
     }
 
-    if ((int)((*m_size_word - RawTrailer::RAWTRAILER_NWORDS) * sizeof(int)) != recvd_byte) {
+    if (
+#ifndef REDUCED_RAWCOPPER
+      (int)((*m_size_word - RawTrailer::RAWTRAILER_NWORDS) * sizeof(int)) != recvd_byte
+#else
+      (int)((*m_size_word - ReducedRawTrailer::RAWTRAILER_NWORDS) * sizeof(int)) != recvd_byte
+#endif
+    ) {
       char    err_buf[500];
+
+#ifndef REDUCED_RAWCOPPER
       sprintf(err_buf, "CORRUPTED DATA: Read less bytes(%d) than expected(%d:%d). Exiting...\n",
               recvd_byte,
               *m_size_word * sizeof(int) - RawTrailer::RAWTRAILER_NWORDS * sizeof(int),
               m_bufary[ entry ][ RawCOPPER::POS_DATA_LENGTH ]);
+#else
+      sprintf(err_buf, "CORRUPTED DATA: Read less bytes(%d) than expected(%d:%d). Exiting...\n",
+              recvd_byte,
+              *m_size_word * sizeof(int) - ReducedRawTrailer::RAWTRAILER_NWORDS * sizeof(int),
+              m_bufary[ entry ][ PreRawCOPPER::POS_DATA_LENGTH ]);
+#endif
       print_err.PrintError(m_shmflag, &m_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
       exit(-1);
     }
-
-  } else if ((int)((*m_size_word - RawTrailer::RAWTRAILER_NWORDS) * sizeof(int)) < recvd_byte) {
+  } else if (
+#ifndef REDUCED_RAWCOPPER
+    (int)((*m_size_word - RawTrailer::RAWTRAILER_NWORDS) * sizeof(int)) < recvd_byte
+#else
+    (int)((*m_size_word - ReducedRawTrailer::RAWTRAILER_NWORDS) * sizeof(int)) < recvd_byte
+#endif
+  ) {
     char    err_buf[500];
-    sprintf(err_buf, "CORRUPTED DATA: Read more than data size. Exiting...: %d %d %d %d %d\n", recvd_byte, *m_size_word * sizeof(int) , RawTrailer::RAWTRAILER_NWORDS * sizeof(int), m_bufary[ entry ][ RawCOPPER::POS_DATA_LENGTH ],  RawCOPPER::POS_DATA_LENGTH);
+#ifndef REDUCED_RAWCOPPER
+    sprintf(err_buf, "CORRUPTED DATA: Read more than data size. Exiting...: %d %d %d %d %d\n",
+            recvd_byte, *m_size_word * sizeof(int) , RawTrailer::RAWTRAILER_NWORDS * sizeof(int),
+            m_bufary[ entry ][ RawCOPPER::POS_DATA_LENGTH ],  RawCOPPER::POS_DATA_LENGTH);
     print_err.PrintError(m_shmflag, &m_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+#else
+    sprintf(err_buf, "CORRUPTED DATA: Read more than data size. Exiting...: %d %d %d %d %d\n",
+            recvd_byte, *m_size_word * sizeof(int) , ReducedRawTrailer::RAWTRAILER_NWORDS * sizeof(int),
+            m_bufary[ entry ][ PreRawCOPPER::POS_DATA_LENGTH ],  PreRawCOPPER::POS_DATA_LENGTH);
+    print_err.PrintError(m_shmflag, &m_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+#endif
 
     exit(-1);
   }
@@ -564,6 +636,7 @@ void DeSerializerCOPPERModule::event()
     //
     // for DESY test
     //
+    printf("Bef DeSerCOPPER ################## NODEID %d\n", m_nodeid);
     m_nodeid = SVD_ID | m_nodeid  ;
     m_start_time = getTimeSec();
     n_basf2evt = 0;
@@ -609,14 +682,19 @@ void DeSerializerCOPPERModule::event()
     temp_rawdblk =  raw_dblkarray.appendNew();
     temp_rawdblk->SetBuffer(temp_buf, m_size_word, malloc_flag, num_events, num_nodes);
     // Fill Header and Trailer
+
+#ifndef REDUCED_RAWCOPPER
     RawCOPPER temp_rawcopper;
+#else
+    PreRawCOPPER temp_rawcopper;
+#endif
     temp_rawcopper.SetBuffer(temp_buf, m_size_word, 0, num_events, num_nodes);
 
 
 
     // Fill header and trailer
     try {
-
+      printf("DeSerCOPPER ################## NODEID %d\n", m_nodeid);
       m_prev_ftsweve32 = temp_rawcopper.FillTopBlockRawHeader(m_nodeid, m_data_type, m_trunc_mask,
                                                               m_prev_ftsweve32, m_prev_runsubrun_no, &m_runsubrun_no);
       m_prev_runsubrun_no = m_runsubrun_no;

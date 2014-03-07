@@ -366,11 +366,20 @@ void DeSerializerFILEModule::event()
       }
 
       if (data_type == COPPER_DATABLOCK) {
+
         RawCOPPER temp_rawcopper;
+
         int num_nodes = 1;
         int num_events = 1;
         temp_rawcopper.SetBuffer(temp_buf, size_word, 0, num_events, num_nodes);
-        fillNewRawCOPPERHeader(&temp_rawcopper);
+
+        {
+          printf("Sorry. This version does not support fillNewCOPPERheader()");
+          exit(1);
+          //        fillNewRawCOPPERHeader(&temp_rawcopper);
+        }
+
+
         unsigned int temp_cur_evenum = 0, temp_cur_copper_ctr = 0;
         unsigned temp_utime, temp_ctime_trgtype;
         try {

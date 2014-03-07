@@ -28,7 +28,15 @@
 #include <daq/rawdata/modules/DAQConsts.h>
 #include <daq/dataobjects/SendHeader.h>
 #include <daq/dataobjects/SendTrailer.h>
-#include <rawdata/dataobjects/RawCOPPER.h>
+#include <rawdata/dataobjects/RawDataBlock.h>
+
+//#define REDUCED_COPPER
+#ifndef REDUCED_COPPER
+#include <rawdata/dataobjects/RawHeader.h>
+#else
+#include <daq/dataobjects/ReducedRawHeader.h>
+#endif
+//#include <rawdata/dataobjects/RawCOPPER.h>
 
 
 

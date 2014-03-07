@@ -190,7 +190,11 @@ void SerializerModule::fillSendHeaderTrailer(SendHeader* hdr, SendTrailer* trl,
 
     //copy event # from a tonp COPPER block
     if (!(rawdblk->CheckFTSWID(i)) && !(rawdblk->CheckTLUID(i))) {
+#ifndef REDUCED_COPPER
       RawHeader rawhdr;
+#else
+      ReducedRawHeader rawhdr;
+#endif
       rawhdr.SetBuffer(rawdblk->GetBuffer(i));
       hdr->SetEventNumber(rawhdr.GetEveNo());
       hdr->SetNodeID(rawhdr.GetSubsysId());

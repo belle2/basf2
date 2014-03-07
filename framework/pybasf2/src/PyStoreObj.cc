@@ -46,7 +46,7 @@ bool PyStoreObj::registerAsPersistent(bool errorIfExisting)
   if (!cl)
     return false;
 
-  return DataStore::Instance().createEntry(m_name, DataStore::EDurability(m_durability), cl, false, false, errorIfExisting);
+  return DataStore::Instance().registerEntry(m_name, DataStore::EDurability(m_durability), cl, false, false, errorIfExisting);
 }
 
 bool PyStoreObj::registerAsTransient(bool errorIfExisting)
@@ -55,7 +55,7 @@ bool PyStoreObj::registerAsTransient(bool errorIfExisting)
   if (!cl)
     return false;
 
-  return DataStore::Instance().createEntry(m_name, DataStore::EDurability(m_durability), cl, false, true, errorIfExisting);
+  return DataStore::Instance().registerEntry(m_name, DataStore::EDurability(m_durability), cl, false, true, errorIfExisting);
 }
 
 void PyStoreObj::list(int durability)

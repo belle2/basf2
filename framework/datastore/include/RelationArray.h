@@ -165,7 +165,7 @@ namespace Belle2 {
     template<class FROM, class TO> static bool registerPersistent(const std::string& fromName, const std::string& toName, DataStore::EDurability durability = DataStore::c_Event,
         bool errorIfExisting = false) {
       const std::string& relName = DataStore::relationName(DataStore::arrayName<FROM>(fromName), DataStore::arrayName<TO>(toName));
-      return DataStore::Instance().createEntry(relName, durability, RelationContainer::Class(), false, false, errorIfExisting);
+      return DataStore::Instance().registerEntry(relName, durability, RelationContainer::Class(), false, false, errorIfExisting);
 
     }
     /** Register a relation array, that should be written to the output by default, in the data store.
@@ -191,7 +191,7 @@ namespace Belle2 {
     static bool registerPersistent(const std::string& fromName, const std::string& toName,
                                    DataStore::EDurability durability = DataStore::c_Event, bool errorIfExisting = false) {
       const std::string& relName = DataStore::relationName(fromName, toName);
-      return DataStore::Instance().createEntry(relName, durability, RelationContainer::Class(), false, false, errorIfExisting);
+      return DataStore::Instance().registerEntry(relName, durability, RelationContainer::Class(), false, false, errorIfExisting);
     }
 
     /** Register a relation array, that should NOT be written to the output by default, in the data store.
@@ -206,7 +206,7 @@ namespace Belle2 {
     template<class FROM, class TO> static bool registerTransient(const std::string& fromName, const std::string& toName, DataStore::EDurability durability = DataStore::c_Event,
         bool errorIfExisting = false) {
       const std::string& relName = DataStore::relationName(DataStore::arrayName<FROM>(fromName), DataStore::arrayName<TO>(toName));
-      return DataStore::Instance().createEntry(relName, durability, RelationContainer::Class(), false, true, errorIfExisting);
+      return DataStore::Instance().registerEntry(relName, durability, RelationContainer::Class(), false, true, errorIfExisting);
     }
     /** Register a relation array, that should NOT be written to the output by default, in the data store.
      *  This must be called in the initialization phase.
@@ -231,7 +231,7 @@ namespace Belle2 {
     static bool registerTransient(const std::string& fromName, const std::string& toName,
                                   DataStore::EDurability durability = DataStore::c_Event, bool errorIfExisting = false) {
       const std::string& relName = DataStore::relationName(fromName, toName);
-      return DataStore::Instance().createEntry(relName, durability, RelationContainer::Class(), false, true, errorIfExisting);
+      return DataStore::Instance().registerEntry(relName, durability, RelationContainer::Class(), false, true, errorIfExisting);
     }
 
     /** Check whether a relation array was registered before.

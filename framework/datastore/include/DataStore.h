@@ -76,7 +76,7 @@ namespace Belle2 {
       std::string name;        /**< Name of the entry. Equal to the key in the map. **/
     };
 
-    /** Stores information on inputs/outputs of a module, as obtained by require()/optionalInput()/createEntry(); */
+    /** Stores information on inputs/outputs of a module, as obtained by require()/optionalInput()/registerEntry(); */
     struct ModuleInfo {
       /** Possible types of entries/relations for a module. */
       enum EEntryType {
@@ -164,10 +164,10 @@ namespace Belle2 {
     }
 
     //------------------------------ Accessing objects and arrays ----------------------------------------------
-    /** Create an entry in the DataStore map.
+    /** Register an entry in the DataStore map.
      *
      *  If the map of requested durability already contains an object under the key name with a DIFFERENT type
-     *  than the given type one, an error will be reported. <br>
+     *  than the given type, an error will be reported. <br>
      *  Otherwise a new map slot is created.
      *  This must be called in the initialization phase. Otherwise an error is returned.
      *  @param name       Name under which you want to save the object in the DataStore.
@@ -178,8 +178,8 @@ namespace Belle2 {
      *  @param errorIfExisting  Whether to complain if the entry alreay exists.
      *  @return           True if the registration succeeded.
      */
-    bool createEntry(const std::string& name, EDurability durability,
-                     const TClass* objClass, bool array, bool transient, bool errorIfExisting);
+    bool registerEntry(const std::string& name, EDurability durability,
+                       const TClass* objClass, bool array, bool transient, bool errorIfExisting);
 
     /** Check whether an entry with the correct type is registered in the DataStore map and return it.
      *
@@ -216,7 +216,7 @@ namespace Belle2 {
      */
     TObject** getObject(const StoreAccessorBase& accessor) const;
 
-    /** Create a new object in the DataStore or add an existing one.
+    /** Create a new object/array in the DataStore or add an existing one.
      *
      *  A matching map entry must already exist. Otherwise an error will be generated.
      *  @param object     Pointer to the object that should be stored. If 0, a new default object is created.
@@ -447,7 +447,7 @@ namespace Belle2 {
      */
     void setModule(const std::string& name) { m_currentModule = name; }
 
-    /** return information on inputs/outputs of each module, as obtained by require()/optionalInput()/createEntry(); */
+    /** return information on inputs/outputs of each module, as obtained by require()/optionalInput()/registerEntry(); */
     const std::map<std::string, ModuleInfo>& getModuleInfoMap() const { return m_moduleInfo; }
 
 
@@ -492,7 +492,7 @@ namespace Belle2 {
     /** Stores the current module, used to fill m_moduleInfo. */
     std::string m_currentModule;
 
-    /** Stores information on inputs/outputs of each module, as obtained by require()/optionalInput()/createEntry(); */
+    /** Stores information on inputs/outputs of each module, as obtained by require()/optionalInput()/registerEntry(); */
     std::map<std::string, ModuleInfo> m_moduleInfo;
   };
 } // namespace Belle2

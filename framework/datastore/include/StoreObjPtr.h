@@ -82,7 +82,7 @@ namespace Belle2 {
      */
     static bool registerPersistent(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event,
                                    bool errorIfExisting = true) {
-      return DataStore::Instance().createEntry(DataStore::objectName<T>(name), durability, T::Class(), false, false, errorIfExisting);
+      return DataStore::Instance().registerEntry(DataStore::objectName<T>(name), durability, T::Class(), false, false, errorIfExisting);
     }
 
     /** Register an object, that should not be written to the output by default, in the data store.
@@ -96,7 +96,7 @@ namespace Belle2 {
      */
     static bool registerTransient(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event,
                                   bool errorIfExisting = true) {
-      return DataStore::Instance().createEntry(DataStore::objectName<T>(name), durability, T::Class(), false, true, errorIfExisting);
+      return DataStore::Instance().registerEntry(DataStore::objectName<T>(name), durability, T::Class(), false, true, errorIfExisting);
     }
 
     /** Check whether an object was registered before.

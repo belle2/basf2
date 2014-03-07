@@ -90,7 +90,7 @@ void DataStorePackage::restore(bool init)
         cl = static_cast<TClonesArray*>(obj)->GetClass();
       if (!init) {
         bool is_transient = obj->TestBit(c_IsTransient);
-        DataStore::Instance().createEntry(m_namelist.at(i), m_durability, cl, is_array, is_transient, false);
+        DataStore::Instance().registerEntry(m_namelist.at(i), m_durability, cl, is_array, is_transient, false);
       }
       bool is_null = !obj->TestBit(c_IsNull);
       if (is_null) {

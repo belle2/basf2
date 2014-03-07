@@ -48,8 +48,8 @@ namespace Belle2 {
      *  @return            True if the registration succeeded.
      */
     bool registerAsPersistent(bool errorIfExisting = false) {
-      return DataStore::Instance().createEntry(m_name, m_durability, getClass(), isArray(),
-                                               false, errorIfExisting);
+      return DataStore::Instance().registerEntry(m_name, m_durability, getClass(), isArray(),
+                                                 false, errorIfExisting);
     }
 
     /** Register the object/array in the data store, but do not include it in the output by default.
@@ -59,8 +59,8 @@ namespace Belle2 {
      *  @return            True if the registration succeeded.
      */
     bool registerAsTransient(bool errorIfExisting = false) {
-      return DataStore::Instance().createEntry(m_name, m_durability, getClass(), isArray(),
-                                               true, errorIfExisting);
+      return DataStore::Instance().registerEntry(m_name, m_durability, getClass(), isArray(),
+                                                 true, errorIfExisting);
     }
 
     /** Ensure this array/object has been registered previously.

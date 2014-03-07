@@ -255,7 +255,7 @@ bool RootInputModule::connectBranches(TTree* tree, DataStore::EDurability durabi
     delete objectPtr;
 
     //Create a DataStore entry and connect the branch address to it
-    if (!DataStore::Instance().createEntry(branchName, durability, objClass, array, false, false)) {
+    if (!DataStore::Instance().registerEntry(branchName, durability, objClass, array, false, false)) {
       tree->SetBranchStatus(branch->GetName(), 0);
       continue;
     }

@@ -38,7 +38,7 @@ int main(int argc, char** argv)
   RFRunControlCallback* rccallback = new RFRunControlCallback(new NSMNode("HLT"),
                                                               master, callback);
   PThread(new NSMNodeDaemon(rccallback, global_host, global_port));
-  NSMNodeDaemon* daemon = new NSMNodeDaemon(callback, local_host, local_port, NULL, data);
+  NSMNodeDaemon* daemon = new NSMNodeDaemon(callback, local_host, local_port/*, NULL, data*/);
   daemon->run();
 
   return 0;

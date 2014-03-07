@@ -16,7 +16,6 @@ using namespace Belle2;
 RFMasterCallback::RFMasterCallback(NSMNode* node, NSMData* data, RFMaster* master)
   : NSMCallback(node), _data(data), _master(master)
 {
-  node->setData(new DataObject());
 }
 
 RFMasterCallback::~RFMasterCallback() throw()

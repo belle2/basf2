@@ -16,8 +16,6 @@ RFRunControlCallback::RFRunControlCallback(NSMNode* node, RFMaster* master,
                                            RFMasterCallback* callback)
   : RCCallback(node), _master(master), _callback(callback)
 {
-  node->setData(new DataObject());
-  node->setState(State::INITIAL_S);
 }
 
 RFRunControlCallback::~RFRunControlCallback() throw()

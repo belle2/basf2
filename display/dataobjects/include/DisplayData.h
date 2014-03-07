@@ -38,11 +38,16 @@ namespace Belle2 {
       for (int i = 0; i < 20; i++) {
         displayData.addPoint("pointset", TVector3(i*10.0, 0, 0));
       }
+
+      //add an arrow to point to (0, 0, -2m)
+      displayData.addArrow("z=-2m", TVector3(100, 100, -200),
+              TVector3(0, 0, -200), kGray);
       \endcode
    *
    * You can then save the output of your module to a file and view it with 'b2display', or look at it directly
    * after execution by adding the Display module in your steering file.
    *
+   * See display/examples/displaydata.py to see how to use most features from a python steering file.
    * See display/examples/histogram_monitor.py for an example that generates and adds histograms in Python.
    */
   class DisplayData : public TObject {
@@ -88,7 +93,7 @@ namespace Belle2 {
      * @param object object to select, must be inside a StoreArray
      */
     void select(const TObject* object);
-  private:
+  protected:
     /** Stores data associated with an arrow. */
     struct Arrow {
       std::string name; /**< label. */
@@ -96,6 +101,7 @@ namespace Belle2 {
       TVector3 end; /**< and ends here. */
       int color; /**< Color_t, e.g. kGreen. -1 for default */
     };
+  private:
 
     std::map<std::string, std::vector<TVector3> > m_pointSets; /**< name -> points map */
     std::vector<std::pair<std::string, TVector3> > m_labels; /**< text labels (to be shown at a given position). */

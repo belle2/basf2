@@ -1,7 +1,4 @@
 //+
-// File : seqrootoutput.h
-// Description : Sequential ROOT I/O input module
-//
 // Author : Ryosuke Itoh, IPNS, KEK
 // Date : 13 - Aug - 2010
 //-

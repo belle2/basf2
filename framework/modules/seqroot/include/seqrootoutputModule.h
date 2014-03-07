@@ -1,5 +1,4 @@
 //+
-// File : seqrootoutput.h
 // Description : Sequential ROOT I/O output module
 //
 // Author : Ryosuke Itoh, IPNS, KEK
@@ -22,6 +21,10 @@
 namespace Belle2 {
   /*! Class definition for the output module of Sequential ROOT I/O */
 
+  /** Module for sequential ROOT I/O.
+   *
+   * As an alternative to the TTree format, this format stores data as a sequential stream of objects plus a small meta-data header, which doesn't impose the overhead of the TTree and may result in higher read rates from hard disks. It is also the storage format used by DAQ and HLT. SeqRoot files however tend be a factor 2-3 larger than their .root equivalents.
+   */
   class SeqRootOutputModule : public Module {
 
     // Public functions

@@ -1,7 +1,4 @@
 //+
-// File : seqrootinput.cc
-// Description : Sequential ROOT input module for pbasf2
-//
 // Author : Ryosuke Itoh, IPNS, KEK
 // Date : 13 - Aug - 2010
 //         6 - Sep - 2012     modified to use DataStoreStreamer, clean up
@@ -45,7 +42,7 @@ SeqRootInputModule::SeqRootInputModule() : Module()
   m_nevt = -1;
 
   //Parameter definition
-  addParam("inputFileName"  , m_inputFileName, "SeqRoot file name.", string("SeqRootInput.root"));
+  addParam("inputFileName"  , m_inputFileName, "SeqRoot file name.", string("SeqRootInput.sroot"));
 
   B2DEBUG(1, "SeqRootInput: Constructor done.");
 }

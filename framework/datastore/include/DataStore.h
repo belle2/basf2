@@ -7,9 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
-#ifndef DATASTORE_H
-#define DATASTORE_H
+#pragma once
 
 #include <framework/datastore/RelationEntry.h>
 
@@ -498,5 +496,3 @@ namespace Belle2 {
     std::map<std::string, ModuleInfo> m_moduleInfo;
   };
 } // namespace Belle2
-
-#endif // DATASTORE_H

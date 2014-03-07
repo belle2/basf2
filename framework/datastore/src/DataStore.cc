@@ -67,7 +67,7 @@ bool DataStore::checkType(const StoreEntry& entry, const StoreAccessorBase& acce
     entryClass = static_cast<TClonesArray*>(entry.object)->GetClass();
   }
   if (!entryClass->InheritsFrom(accessor.getClass())) {
-    B2FATAL("Existing " << entryType << " '" << entry.name << "' of type " << entryClass->GetName() << " doesn't match requested type " << accessor.getClass()->GetName());
+    B2FATAL("Existing " << accessor.readableName() << " of type " << entryClass->GetName() << " doesn't match requested type " << accessor.getClass()->GetName());
     return false;
   }
 
@@ -78,9 +78,10 @@ bool DataStore::checkType(const StoreEntry& entry, const StoreAccessorBase& acce
 bool DataStore::createEntry(const std::string& name, EDurability durability,
                             const TClass* objClass, bool array, bool transient, bool errorIfExisting)
 {
+  const StoreAccessorBase accessor(name, durability, objClass, array);
   // Check whether this method is called in the initialization phase
   if (!m_initializeActive) {
-    B2ERROR("Attempt to register object '" << name << "' outside the initialization phase.");
+    B2ERROR("Attempt to register " << accessor.readableName() << " outside of the initialization phase. Please move calls to registerPersistent() etc. into your Module's initialize() function.");
     return false;
   }
 
@@ -95,20 +96,20 @@ bool DataStore::createEntry(const std::string& name, EDurability durability,
 
     // Complain about existing entry
     if (errorIfExisting) {
-      B2ERROR("The object '" << name << "' of type " << entry->object->ClassName() << " was already registered before.");
+      B2ERROR("An " << accessor.readableName() << " of type " << entry->object->ClassName() << " was already registered before. (Multiple calls to registerPersistent() etc. are fine if the errorIfExisting parameter is set to false. For objects you will want to make sure that you don't discard existing data from other modules in that case.");
       return false;
     }
 
     // Check whether the types match
-    if (!checkType(*entry, StoreAccessorBase(name, durability, objClass, array))) return false;
+    if (!checkType(*entry, accessor)) return false;
 
     // Check whether the persistency type matches
     if (entry->isTransient != transient) {
-      B2WARNING("Existing object '" << name << "' has different persistency type than the requested one. Using " << (transient ? "transient" : "persistent") << ".");
+      B2WARNING("Existing " << accessor.readableName() << " has different persistency type than requested. Changing persistency to " << (transient ? "transient" : "persistent") << ".");
       entry->isTransient = transient;
     }
 
-    B2DEBUG(100, "An entry with name " << name << " and durability " << durability << " already exists.");
+    B2DEBUG(100, "An " << accessor.readableName() << " was registered once more (with errorIfExisting=false).");
     return true;
   }
 
@@ -130,7 +131,7 @@ bool DataStore::createEntry(const std::string& name, EDurability durability,
   }
   entry->name = name;
 
-  B2DEBUG(100, "Entry with name " << name << " and durability " << durability << " was registered.");
+  B2DEBUG(100, "Successfully registered " << accessor.readableName());
   return true;
 }
 
@@ -161,12 +162,12 @@ bool DataStore::createObject(TObject* object, bool replace, const StoreAccessorB
 {
   StoreEntry* entry = getEntry(accessor);
   if (!entry) {
-    B2ERROR("No entry with name " << accessor.getName() << " and durability " << accessor.getDurability() << " exists in the DataStore.");
+    B2ERROR("No " << accessor.readableName() << " exists in the DataStore, did you forget to register it in your Module's initialize() function? Note: direct accesses to it will crash!");
     return false;
   }
 
   if (entry->ptr && !replace) {
-    B2ERROR("An object with name " << accessor.getName() << " and durability " << accessor.getDurability() << " was already created in the DataStore.");
+    B2ERROR("An " << accessor.readableName() << " was already created in the DataStore.");
     return false;
   }
 
@@ -421,7 +422,7 @@ bool DataStore::require(const StoreAccessorBase& accessor)
   }
 
   if (!getEntry(accessor)) {
-    B2ERROR("The required DataStore entry with name " << accessor.getName() << " and durability " << accessor.getDurability() << " does not exist. Maybe you forgot the module that creates it?");
+    B2ERROR("The required " << accessor.readableName() << " does not exist. Maybe you forgot the module that registers it?");
     return false;
   }
   return true;

@@ -83,7 +83,7 @@ namespace Belle2 {
     double m_maxTime;  /**< maximal time shift of background event */
 
     /**
-     * An input event buffer definition for background data (SimHits)
+     * An input event buffer definition for background SimHits
      */
     struct BkgHits {
       TClonesArray* PXD; /**< PXD SimHits from collision file */
@@ -104,7 +104,7 @@ namespace Belle2 {
     };
 
     std::vector<TFile*> m_files;  /**< vector of file pointers */
-    std::vector<TTree*> m_trees;  /**< vector of trees */
+    std::vector<TTree*> m_trees;  /**< vector of tree pointers */
     std::vector<unsigned> m_numEvents;  /**< number of events in each file */
     std::vector<unsigned> m_eventCount; /**< current event number in each file */
     std::vector<double> m_bkgRates;  /**< background rate of each file */
@@ -115,7 +115,7 @@ namespace Belle2 {
      * functions that add background SimHits to those in the DataStore
      * @param simHits a reference to DataStore SimHits
      * @param cloneArray a pointer to background SimHits read from a file
-     * @param timeShift time shift of background SimHits
+     * @param timeShift time shift to be applied to background SimHits
      */
     template<class SIMHIT>
     void addSimHits(StoreArray<SIMHIT>& simHits,

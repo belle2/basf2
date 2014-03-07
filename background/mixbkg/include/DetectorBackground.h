@@ -205,7 +205,7 @@ namespace Belle2 {
     template<class SIMHITS>
     inline Component<SIMHITS>& DetectorBackground<SIMHITS>::addComponent(const std::string& name)
     {
-      Component<SIMHITS> *newComponent = new Component<SIMHITS>();
+      Component<SIMHITS>* newComponent = new Component<SIMHITS>();
       m_components.insert(make_pair(name, newComponent));
       return *newComponent;
     }

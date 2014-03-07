@@ -136,7 +136,7 @@ namespace Belle2 {
     template<class SIMHITS>
     inline Generator<SIMHITS>& Component<SIMHITS>::addGenerator(const std::string& name)
     {
-      Generator<SIMHITS> *newGenerator = new Generator<SIMHITS>();
+      Generator<SIMHITS>* newGenerator = new Generator<SIMHITS>();
       m_generators.insert(make_pair(name, newGenerator));
       return *newGenerator;
     }

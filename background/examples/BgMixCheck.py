@@ -212,8 +212,7 @@ for i_record in range(n_entries):
             tag = simhit.getBackgroundTag()
             if tag == bg_codes['bg_none'] or tag == bg_codes['bg_other'] \
                 or tag == bg_codes['bg_twoPhoton']:
-                print 'ERROR: background tag {tag} should not appear here.'\
-                    .format(tag=tag)
+                print 'ERROR: background tag {tag} should not appear here.'.format(tag=tag)
             else:
                 (component, generator) = decodeBg(tag)
 
@@ -235,5 +234,5 @@ for (detector, components) in backgrounds.iteritems():
                     diffs += 1
                     print '                {i} {mix} {rof}'.format(i=i,
                             mix=arrays['MIX'][i], rof=arrays['ROF'][i])
-            print '            {d} differences in {sum} simhits.'\
-                .format(d=diffs, sum=sum)
+            print '            {d} differences in {sum} simhits.'.format(d=diffs,
+                    sum=sum)

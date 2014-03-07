@@ -55,15 +55,18 @@ namespace Belle2 {
 
   {
     // set module description (e.g. insert text)
-    setDescription("Beam background mixer (alternative)");
+    setDescription("Beam background mixer at SimHit level that uses beam background simulation output directly (collision files) and not ROF files. Each background event is shifted in time randomly within a time window given by minTime and maxTime.");
     setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
 
     // Add parameters
-    addParam("backgroundFiles", m_backgroundFiles, "list of background (collision) files",
-             m_backgroundFiles);
-    addParam("realTime", m_realTime, "real time in nano seconds", 0.0);
-    addParam("minTime", m_minTime, "minimal start time in nano seconds", 0.0);
-    addParam("maxTime", m_maxTime, "maximal stop time in nano seconds", 0.0);
+    addParam("backgroundFiles", m_backgroundFiles,
+             "list of background (collision) files: one file per background type");
+    addParam("realTime", m_realTime,
+             "real time in nano seconds that corresponds to background samle");
+    addParam("minTime", m_minTime,
+             "time window lower edge in nano seconds", -1000.0);
+    addParam("maxTime", m_maxTime,
+             "time window upper edge in nano seconds", 800.0);
     addParam("scaleFactors", m_scaleFactors, "factors to scale rates of backgrounds",
              m_scaleFactors);
   }
@@ -75,7 +78,7 @@ namespace Belle2 {
   void BeamBkgMixerModule::initialize()
   {
 
-    if (m_realTime <= 0) B2ERROR("invalid realTime (not given?): " << m_realTime);
+    if (m_realTime <= 0) B2ERROR("invalid realTime: " << m_realTime);
 
     for (unsigned i = m_scaleFactors.size(); i < m_backgroundFiles.size(); ++i) {
       m_scaleFactors.push_back(1.0);
@@ -84,8 +87,12 @@ namespace Belle2 {
     for (unsigned bkg = 0; bkg < m_backgroundFiles.size(); ++bkg) {
       B2INFO("opening file: " << m_backgroundFiles[bkg]);
       TFile* file = TFile::Open(m_backgroundFiles[bkg].c_str(), "READ");
-      if (!file || !file->IsOpen()) {
-        B2ERROR("Input file " << m_backgroundFiles[bkg] << "can't open or not found");
+      if (!file) {
+        B2ERROR("Input file " << m_backgroundFiles[bkg] << " not found");
+        continue;
+      }
+      if (!file->IsOpen()) {
+        B2ERROR("Input file " << m_backgroundFiles[bkg] << " can't be open");
         continue;
       }
       m_files.push_back(file);
@@ -103,15 +110,7 @@ namespace Belle2 {
 
       B2INFO(" rate = " << rate * 1000 << " MHz");
 
-      BkgHits hits;
-      hits.PXD = new TClonesArray("Belle2::PXDSimHit", 5000);
-      hits.SVD = new TClonesArray("Belle2::SVDSimHit", 5000);
-      hits.CDC = new TClonesArray("Belle2::CDCSimHit", 5000);
-      hits.TOP = new TClonesArray("Belle2::TOPSimHit", 5000);
-      hits.ARICH = new TClonesArray("Belle2::ARICHSimHit", 5000);
-      hits.ECL = new TClonesArray("Belle2::ECLSimHit", 5000);
-      hits.BKLM = new TClonesArray("Belle2::BKLMSimHit", 5000);
-      hits.EKLM = new TClonesArray("Belle2::EKLMSimHit", 5000);
+      BkgHits hits; // Note: allocation of TClonesArray's left to root
       m_bkgSimHits.push_back(hits);
 
       unsigned i = m_bkgSimHits.size() - 1;
@@ -155,6 +154,7 @@ namespace Belle2 {
     for (unsigned bkg = 0; bkg < numBkg; ++bkg) {
       double mean = m_bkgRates[bkg] * (m_maxTime - m_minTime);
       int nev = gRandom->Poisson(mean);
+
       for (int iev = 0; iev < nev; iev++) {
         double timeShift = gRandom->Rndm() * (m_maxTime - m_minTime) + m_minTime;
         m_trees[bkg]->GetEntry(m_eventCount[bkg]);
@@ -171,7 +171,7 @@ namespace Belle2 {
         m_eventCount[bkg]++;
         if (m_eventCount[bkg] >= m_numEvents[bkg]) {
           m_eventCount[bkg] = 0;
-          B2INFO("events re-used, bkg=" << bkg);
+          B2INFO("BeamBkgMixer: events re-used, bkg=" << bkg);
         }
       }
     }
@@ -185,6 +185,11 @@ namespace Belle2 {
 
   void BeamBkgMixerModule::terminate()
   {
+
+    for (unsigned i = 0; i < m_files.size(); ++i) {
+      if (m_files[i]) m_files[i]->Close();
+    }
+
   }
 
   void BeamBkgMixerModule::printModuleParams() const

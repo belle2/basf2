@@ -11,14 +11,23 @@ from basf2 import *
 import ROOT
 from ROOT import Belle2
 
-subdetectorCodes = {1: 'PXD', 2: 'SVD', 3: 'CDC', 4: 'TOP', 5: 'ARICH',\
-                    6: 'ECL', 7: 'EKLM', 8: 'BKLM', 9: 'ECLsim'}
+subdetectorCodes = {
+    1: 'PXD',
+    2: 'SVD',
+    3: 'CDC',
+    4: 'TOP',
+    5: 'ARICH',
+    6: 'ECL',
+    7: 'EKLM',
+    8: 'BKLM',
+    9: 'ECLsim',
+    }
 
 n_files = len(sys.argv)
 ids = set([])
 n_conflicts = 0
 for file_name in sys.argv[1:n_files]:
-    f = ROOT.TFile(file_name, "READ")
+    f = ROOT.TFile(file_name, 'READ')
     tree = f.Get('ContentTree')
     tree.Draw('Subdetector', '', 'goff')
     h = ROOT.gDirectory.Get('htemp')
@@ -27,11 +36,11 @@ for file_name in sys.argv[1:n_files]:
     h = ROOT.gDirectory.Get('htemp')
     component = h.GetYaxis().GetLabels().First().GetName()
     generator = h.GetXaxis().GetLabels().First().GetName()
-    print file_name + ':' + '\tDetector: ' + detector + \
-        '\tComponent: ' + component + '\tGenerator: ' + generator
+    print file_name + ':' + '\tDetector: ' + detector + '\tComponent: ' \
+        + component + '\tGenerator: ' + generator
     if (detector, component, generator) in ids:
-        print 'The combination ' + detector + ' + ' + component + \
-        ' + ' + generator + ' is duplicated!'
+        print 'The combination ' + detector + ' + ' + component + ' + ' \
+            + generator + ' is duplicated!'
         n_conflicts += 1
     else:
         ids.add((detector, component, generator))

@@ -7,9 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
-#ifndef STOREACCESSORBASE_H
-#define STOREACCESSORBASE_H
+#pragma once
 
 #include <framework/datastore/DataStore.h>
 
@@ -22,7 +20,7 @@ namespace Belle2 {
 
   typedef std::pair<std::string, DataStore::EDurability> AccessorParams; /**< Pair of parameters needed to find an object in the DataStore. */
 
-  /** Base class for the StoreObjPtr and the StoreArray for easier common treatment.
+  /** Base class for StoreObjPtr and StoreArray for easier common treatment.
    *
    *  @author <a href="mailto:belle2_software@bpost.kek.jp?subject=StoreAccessorBase">The basf2 developers</a>
    */
@@ -131,6 +129,12 @@ namespace Belle2 {
     /** Is this an accessor for an array? */
     bool isArray() const { return m_isArray; }
 
+    /** Convert this acessor into a readable string (for messages).
+     *
+     * e.g. "object EventMetaData (durability: event)"
+     */
+    std::string readableName() const;
+
 
   protected:
     /** Store name under which this object/array is saved. */
@@ -147,5 +151,3 @@ namespace Belle2 {
 
   };
 }
-
-#endif // STOREACCESSORBASE_H

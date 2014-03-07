@@ -10,3 +10,19 @@
 
 #include <framework/datastore/StoreAccessorBase.h>
 
+using namespace Belle2;
+
+std::string StoreAccessorBase::readableName() const
+{
+  std::string str(isArray() ? "array" : "object");
+  str += " '" + getName() + "' (durability: ";
+  switch (getDurability()) {
+    case DataStore::c_Event:
+      str += "event";
+      break;
+    case DataStore::c_Persistent:
+      str += "persistent";
+      break;
+  }
+  return str + ")";
+}

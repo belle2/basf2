@@ -72,9 +72,6 @@ void SeqRootOutputModule::initialize()
 
 void SeqRootOutputModule::beginRun()
 {
-  //  EvtMessage* msg = buildMessage(MSG_BEGIN_RUN);
-
-  //  m_file->write(msg->buffer());
 
   // Statistics
   gettimeofday(&m_t0, 0);
@@ -88,11 +85,7 @@ void SeqRootOutputModule::beginRun()
 void SeqRootOutputModule::event()
 {
   // Stream DataStore in EvtMessage
-  // - Choice of two methods
-  //    Default is to use DataStoreStreamer class
-  //    buildMessage function is still kept for further testing purpose
   EvtMessage* msg = m_streamer->streamDataStore(DataStore::c_Event);
-  //  EvtMessage* msg = buildMessage(MSG_EVENT);
 
   // Store EvtMessage
   int stat = m_file->write(msg->buffer());
@@ -143,45 +136,4 @@ void SeqRootOutputModule::terminate()
   delete m_file;
 
   B2INFO("terminate called")
-}
-
-// Fill Datastore
-
-EvtMessage* SeqRootOutputModule::buildMessage(RECORD_TYPE rectype)
-{
-  //TODO why doesn't this use DataStoreStreamer??
-
-  m_msghandler->clear();
-
-  DataStore::EDurability durability = DataStore::c_Event;
-  /*
-  if (rectype == MSG_BEGIN_RUN)
-    durability = DataStore::c_Run;
-    */
-
-  // Collect objects and place them in msghandler
-
-  const DataStore::StoreObjMap& map = DataStore::Instance().getStoreObjectMap(durability);
-  int narrays = 0;
-  int nobjs = 0;
-  for (DataStore::StoreObjConstIter it = map.begin(); it != map.end(); ++it) {
-    if (m_msghandler->add(it->second->ptr, it->first)) {
-      B2INFO("Tx: adding item " << it->first);
-
-      if (it->second->isArray)
-        narrays++;
-      else
-        nobjs++;
-    }
-  }
-
-  // Encode EvtMessage
-  EvtMessage* msg = m_msghandler->encode_msg(rectype);
-  (msg->header())->reserved[0] = (int)durability;
-  (msg->header())->reserved[1] = nobjs;       // No. of objects
-  (msg->header())->reserved[2] = narrays;    // No. of arrays
-
-  //  printf ( "RecType = %d MsgSize = %d\n", rectype, msg->size() );
-  return msg;
-
 }

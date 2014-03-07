@@ -41,11 +41,6 @@ namespace Belle2 {
     virtual void terminate();
 
   private:
-    //! Build EvtMessage from DataStore
-    EvtMessage* buildMessage(RECORD_TYPE);
-
-    // Data members
-  private:
     //! File name
     std::string m_outputFileName;
 

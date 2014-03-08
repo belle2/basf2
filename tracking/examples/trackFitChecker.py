@@ -54,7 +54,6 @@ track_finder_mc_truth.param(param_track_finder_mc_truth)
 
 trackfitter = register_module('GenFitter')
 trackfitter.logging.log_level = LogLevel.WARNING
-trackfitter.param('NIterations', 2)
 trackfitter.param('UseClusters', False)
 
 trackfitchecker = register_module('TrackFitChecker')
@@ -63,7 +62,7 @@ trackfitchecker.logging.log_level = LogLevel.INFO  # the reults of the statistic
 trackfitchecker.param('robustTests', True)
 trackfitchecker.param('testCdc', False)
 trackfitchecker.param('writeToTextFile', True)  # especially when CDC hits are anlyzed the the info on the termianl becomes unreadable. look into the file statisticaltests.txt instead (at the moment the file name is hard coded
-
+# trackfitchecker.param('writeToRootFile', True) #write the extracted data from the tracks into a root file for further examination
 # Create paths
 main = create_path()
 # Add modules to paths

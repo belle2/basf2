@@ -95,13 +95,8 @@ track_finder_mc_truth.param(param_track_finder_mc_truth)
 cdcfitting = register_module('GenFitter')
 
 # fit the tracks with one iteration of Kalman filter
-param_cdcfitting = {
-    'StoreFailedTracks': 0,
-    'FilterId': 0,
-    'NIterations': 1,
-    'ProbCut': 0.001,
-    'UseClusters': False,
-    }
+param_cdcfitting = {'StoreFailedTracks': 0, 'FilterId': 'Kalman',
+                    'UseClusters': False}
 cdcfitting.param(param_cdcfitting)
 
 # output
@@ -121,7 +116,7 @@ main.add_module(g4sim)
 main.add_module(cdcDigitizer)
 main.add_module(track_finder_mc_truth)
 main.add_module(cdcfitting)
-main.add_module(output)
+# main.add_module(output)
 
 # Process events
 process(main)

@@ -62,7 +62,7 @@ cdcDigitizer = register_module('CDCDigitizer')
 
 # find MCTracks
 track_finder_mc_truth = register_module('TrackFinderMCTruth')
-
+track_finder_mc_truth.logging.log_level = LogLevel.DEBUG
 # select which detectors you would like to use
 param_track_finder_mc_truth = {
     'UseCDCHits': 1,
@@ -82,20 +82,19 @@ trackfitting = register_module('GenFitter')
 # fit the tracks with one iteration of Kalman filter
 # 'PDGCodes': [] means use the pdgCodes from
 # the TrackFinderMCTruth wich are the correct ones
-param_trackfitting = {
+param_trackfitting = {  # 'PDGCodes': [],
     'StoreFailedTracks': 0,
-    'FilterId': 0,
-    'PDGCodes': [],
-    'NIterations': 1,
+    'FilterId': 'DAF',
     'ProbCut': 0.001,
     'UseClusters': False,
     }
 trackfitting.param(param_trackfitting)
+trackfitting.logging.log_level = LogLevel.DEBUG
 
 # output
 output = register_module('RootOutput')
 output.param('outputFileName', 'MCFittingEvtGenOutput.root')
-
+output.logging.log_level = LogLevel.DEBUG
 # create paths
 main = create_path()
 
@@ -109,7 +108,7 @@ main.add_module(g4sim)
 main.add_module(cdcDigitizer)
 main.add_module(track_finder_mc_truth)
 main.add_module(trackfitting)
-main.add_module(output)
+# main.add_module(output)
 
 # Process events
 process(main)

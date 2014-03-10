@@ -7,16 +7,14 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef TMVAEXPERT_MODULE_H
-#define TMVAEXPERT_MODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
-
+#include <analysis/TMVAInterface/Expert.h>
 
 namespace Belle2 {
 
   class Particle;
-  class TMVAExpert;
 
   /**
    * This module fills the ExtraInfo of the Particle object with the value calculated by a TMVA method for every Particle in the given ParticleLists
@@ -70,15 +68,11 @@ namespace Belle2 {
     std::vector<std::string> m_listNames; /**< input particle list names */
     std::string m_methodName; /**< used multivariate analysis method */
     std::string m_identifier; /**< identifier name for the files created by the TMVA method */
+    std::string m_weightfile; /**< weightfile created by the TMVATeacher */
     std::string m_targetName /**< the name of the target variable which is stored in the ExtraInfo of the Particle object */;
-    TMVAExpert* m_method; /**< Method used to calculate the target variable */
+    TMVAInterface::Expert* m_method; /**< Method used to calculate the target variable */
 
   };
 
 } // Belle2 namespace
-
-#endif
-
-
-
 

@@ -12,7 +12,6 @@
 #include <analysis/modules/TMVAExpert/TMVAExpertModule.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
-#include <analysis/TMVAInterface/TMVAExpert.h>
 #include <analysis/utility/VariableManager.h>
 
 #include <framework/datastore/StoreObjPtr.h>
@@ -36,6 +35,7 @@ namespace Belle2 {
     addParam("listNames", m_listNames, "Input particle list names as list", defaultList);
     addParam("method", m_methodName, "Method which is used to calculate the target variable. The name has to start with a valid method. Valid methods are: BDT, KNN, NeuroBayes, Fisher. Valid names are therefore BDT, BDTWithGradientBoost, BDT_MySecondBDTWhichDoesntOverwriteMyFirstOne,...");
     addParam("identifier", m_identifier, "Identifier which is used by the TMVA method to read the files weights/$identifier_$method.class.C and weights/$identifier_$method.weights.xml with additional information");
+    addParam("weightfile", m_weightfile, "Path to weightfile. If you don't specify method and identifier, you have to specify the weightfile instead.", std::string(""));
     addParam("target", m_targetName, "Name of the target variable, which is stored in the ExtraInfo of the Particle object");
 
     m_method = nullptr;
@@ -51,7 +51,9 @@ namespace Belle2 {
       StoreObjPtr<ParticleList>::required(name);
     }
 
-    m_method = new TMVAExpert(m_identifier, m_methodName);
+    if (m_weightfile.empty())
+      m_weightfile = std::string("weights/") + m_identifier + std::string("_") + m_methodName + std::string(".weights.xml");
+    m_method = new TMVAInterface::Expert(m_weightfile);
     VariableManager::Instance().registerParticleExtraInfoVariable(m_targetName, "TMVA Expert TargetVariable");
   }
 

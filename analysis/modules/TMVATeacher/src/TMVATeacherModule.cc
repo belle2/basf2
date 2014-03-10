@@ -11,7 +11,6 @@
 #include <analysis/modules/TMVATeacher/TMVATeacherModule.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
-#include <analysis/TMVAInterface/TMVATeacher.h>
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/logging/Logger.h>
@@ -54,11 +53,11 @@ namespace Belle2 {
 
   void TMVATeacherModule::beginRun()
   {
-    std::vector<TMVAMethod> methods;
+    std::vector<TMVAInterface::Method> methods;
     for (auto & x : m_methods) {
-      methods.push_back(TMVAMethod(std::get<0>(x), std::get<1>(x), std::get<2>(x)));
+      methods.push_back(TMVAInterface::Method(std::get<0>(x), std::get<1>(x), std::get<2>(x), m_variables));
     }
-    m_teacher = new TMVATeacher(m_identifier, m_variables, m_target, methods);
+    m_teacher = new TMVAInterface::Teacher(m_identifier, m_target, methods);
   }
 
   void TMVATeacherModule::endRun()

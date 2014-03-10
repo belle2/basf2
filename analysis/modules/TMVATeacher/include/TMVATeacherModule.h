@@ -10,7 +10,7 @@
 #pragma once
 
 #include <framework/core/Module.h>
-#include <analysis/TMVAInterface/TMVATeacher.h>
+#include <analysis/TMVAInterface/Teacher.h>
 
 namespace Belle2 {
 
@@ -69,7 +69,7 @@ namespace Belle2 {
     std::string m_factoryOption; /**< Options which are passed to the TMVA Factory */
     std::string m_prepareOption; /**< Options which are passed to the TMVA Factory::PrepareTrainingAndTestTree */
 
-    TMVATeacher* m_teacher; /**< Used TMVA method */
+    TMVAInterface::Teacher* m_teacher; /**< Used TMVA method */
 
   };
 

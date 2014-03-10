@@ -81,5 +81,5 @@ ntupleTree('ntupDst', 'D*+', toolsDst)
 # uncomment to write microDst
 # outputMdst('recDstarFull.root')
 
-process(main)
+process(analysis_main)
 print statistics

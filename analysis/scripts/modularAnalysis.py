@@ -3,10 +3,10 @@
 
 from basf2 import *
 
-main = create_path()
+analysis_main = create_path()
 
 
-def inputMdst(filename, path=main):
+def inputMdst(filename, path=analysis_main):
     roinput = register_module('RootInput')
     roinput.param('inputFileName', filename)
     path.add_module(roinput)
@@ -16,7 +16,7 @@ def inputMdst(filename, path=main):
     path.add_module(progress)
 
 
-def inputMdstList(filelist, path=main):
+def inputMdstList(filelist, path=analysis_main):
     roinput = register_module('RootInput')
     roinput.param('inputFileNames', filelist)
     path.add_module(roinput)
@@ -26,14 +26,14 @@ def inputMdstList(filelist, path=main):
     path.add_module(progress)
 
 
-def outputMdst(filename, path=main):
+def outputMdst(filename, path=analysis_main):
     rooutput = register_module('RootOutput')
     rooutput.param('outputFileName', filename)
     rooutput.set_name('RootOutput_' + filename)
     path.add_module(rooutput)
 
 
-def generateEvents(noEvents, filename, path=main):
+def generateEvents(noEvents, filename, path=analysis_main):
     evtnumbers = register_module('EventInfoSetter')
     evtnumbers.param('evtNumList', [noEvents])
     evtnumbers.param('runList', [1])
@@ -45,18 +45,18 @@ def generateEvents(noEvents, filename, path=main):
     path.add_module(evtgeninput)
 
 
-def loadGearbox(path=main):
+def loadGearbox(path=analysis_main):
     paramloader = register_module('Gearbox')
     path.add_module(paramloader)
 
 
-def loadMCParticles(path=main):
+def loadMCParticles(path=analysis_main):
     ploader = register_module('ParticleLoader')
     ploader.param('UseMCParticles', True)
     path.add_module(ploader)
 
 
-def loadReconstructedParticles(path=main):
+def loadReconstructedParticles(path=analysis_main):
     ploader = register_module('ParticleLoader')
     ploader.param('UseMCParticles', False)
     path.add_module(ploader)
@@ -67,7 +67,7 @@ def selectParticle(
     PDGcode,
     criteria,
     persistent=False,
-    path=main,
+    path=analysis_main,
     ):
 
     pselect = register_module('ParticleSelector')
@@ -79,7 +79,7 @@ def selectParticle(
     path.add_module(pselect)
 
 
-def applyCuts(list_name, criteria, path=main):
+def applyCuts(list_name, criteria, path=analysis_main):
     pselect = register_module('ParticleSelector')
     pselect.set_name('ParticleSelector_applyCuts_' + list_name)
     pselect.param('ListName', list_name)
@@ -94,7 +94,7 @@ def makeParticle(
     mL,
     mH,
     persistent=False,
-    path=main,
+    path=analysis_main,
     ):
 
     pmake = register_module('ParticleCombiner')
@@ -114,7 +114,7 @@ def fitVertex(
     fitter='rave',
     fit_type='vertex',
     with_constraint='',
-    path=main,
+    path=analysis_main,
     ):
 
     pvfit = register_module('ParticleVertexFitter')
@@ -128,7 +128,7 @@ def fitVertex(
     path.add_module(pvfit)
 
 
-def printList(list_name, full, path=main):
+def printList(list_name, full, path=analysis_main):
     prlist = register_module('ParticlePrinter')
     prlist.set_name('ParticlePrinter_' + list_name)
     prlist.param('ListName', list_name)
@@ -136,7 +136,7 @@ def printList(list_name, full, path=main):
     path.add_module(prlist)
 
 
-def ntupleFile(file_name, path=main):
+def ntupleFile(file_name, path=analysis_main):
     ntmaker = register_module('NtupleMaker')
     ntmaker.set_name('NtupleMaker_ntupleFile_' + file_name)
     ntmaker.param('strFileName', file_name)
@@ -147,7 +147,7 @@ def ntupleTree(
     tree_name,
     list_name,
     tools,
-    path=main,
+    path=analysis_main,
     ):
 
     ntmaker = register_module('NtupleMaker')
@@ -162,7 +162,7 @@ def findMCDecay(
     list_name,
     decay,
     persistent=False,
-    path=main,
+    path=analysis_main,
     ):
 
     decayfinder = register_module('MCDecayFinder')
@@ -173,20 +173,20 @@ def findMCDecay(
     path.add_module(decayfinder)
 
 
-def summaryOfLists(particleLists, path=main):
+def summaryOfLists(particleLists, path=analysis_main):
     particleStats = register_module('ParticleStats')
     particleStats.param('strParticleLists', particleLists)
     path.add_module(particleStats)
 
 
-def matchMCTruth(list_name, path=main):
+def matchMCTruth(list_name, path=analysis_main):
     mcMatch = register_module('MCMatching')
     mcMatch.set_name('MCMatching_' + list_name)
     mcMatch.param('ListName', list_name)
     path.add_module(mcMatch)
 
 
-def buildRestOfEvent(list_name, path=main):
+def buildRestOfEvent(list_name, path=analysis_main):
     roeBuilder = register_module('RestOfEventBuilder')
     roeBuilder.set_name('ROEBuilder_' + list_name)
     roeBuilder.param('particleList', list_name)

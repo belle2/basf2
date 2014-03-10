@@ -5,12 +5,12 @@ from basf2 import *
 from modularAnalysis import *
 
 
-def stdDiLeptons(path=main):
+def stdDiLeptons(path=analysis_main):
 
     stdLooseJpsi2mumu(path)
 
 
-def stdLooseJpsi2mumu(path=main):
+def stdLooseJpsi2mumu(path=analysis_main):
     makeParticle(
         'LooseJpsi2mumu',
         443,

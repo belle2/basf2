@@ -5,14 +5,14 @@ from basf2 import *
 from modularAnalysis import *
 
 
-def stdLightMesons(path=main):
+def stdLightMesons(path=analysis_main):
 
     stdLooseKS0(path)
     stdRho(path)
     stdKstar(path)
 
 
-def stdLooseKS0(path=main):
+def stdLooseKS0(path=analysis_main):
     makeParticle(
         'StdLooseKS0',
         310,
@@ -24,7 +24,7 @@ def stdLooseKS0(path=main):
         )
 
 
-def stdRho(path=main):
+def stdRho(path=analysis_main):
     makeParticle(
         'StdRho',
         113,
@@ -36,7 +36,7 @@ def stdRho(path=main):
         )
 
 
-def stdKstar(path=main):
+def stdKstar(path=analysis_main):
     makeParticle(
         'StdKstar',
         323,

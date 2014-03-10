@@ -74,6 +74,6 @@ toolsDst += ['MCVertex', '^D*+ -> ^D0 pi+']
 ntupleFile('ntupleDstar.root')
 ntupleTree('ntupDst', 'D*+', toolsDst)
 
-process(main)
+process(analysis_main)
 print statistics
 

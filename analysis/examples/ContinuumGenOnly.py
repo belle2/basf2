@@ -18,4 +18,4 @@ loadGearbox()
 outputMdst('evtgen-Dstar.root')
 
 # Process the events
-process(main)
+process(analysis_main)

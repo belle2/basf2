@@ -12,11 +12,11 @@
 //-
 
 #include <framework/pcore/RingBuffer.h>
+#include <framework/pcore/SemaphoreLocker.h>
 #include <framework/logging/Logger.h>
 
 #include <sys/ipc.h>
 #include <sys/shm.h>
-#include <sys/sem.h>
 #include <sys/stat.h>
 
 #include <errno.h>
@@ -190,7 +190,7 @@ void RingBuffer::cleanup()
   B2INFO("RingBuffer: Cleaning up IPC");
   if (m_new) {
     shmctl(m_shmid, IPC_RMID, (struct shmid_ds*) 0);
-    semctl(m_semid, 1, IPC_RMID);
+    SemaphoreLocker::destroy(m_semid);
     if (m_file) {
       //      close(m_pathfd);
       unlink(m_pathname.c_str());
@@ -441,54 +441,5 @@ void RingBuffer::DumpInfo()
   printf("mode = %d\n", m_bufinfo->mode);
   printf("ninsq = %d\n", m_bufinfo->ninsq);
   printf("nremq = %d\n", m_bufinfo->ninsq);
-}
-
-int RingBuffer::SemaphoreLocker::create(key_t semkey)
-{
-  int semid = semget(semkey, 1, IPC_CREAT | 0600);
-  if (semid < 0) {
-    B2FATAL("Couldn't create semaphore with semget()!");
-  }
-  //  cout << "Semaphore created" << endl;
-
-  // POSIX doesn't guarantee any particular state of our fresh semaphore
-  int semval = 1; //unlocked state
-  if (semctl(semid, 0, SETVAL, semval) == -1) { //set 0th semaphore to semval
-    B2FATAL("Initializing semaphore with semctl() failed.");
-  }
-
-  return semid;
-}
-
-void RingBuffer::SemaphoreLocker::lock()
-{
-  struct sembuf sb;
-  sb.sem_num = 0;
-  sb.sem_op = -1;
-  sb.sem_flg = 0;
-  while (semop(m_id, &sb, 1) == -1) {
-    if (errno == EINTR) {
-      //interrupted by signal (e.g. window size changed), try again
-      continue;
-    } else {
-      B2FATAL("Ringbuffer: error in SemaphoreLocker::lock(semop), semaphore " << m_id << ", error: " << strerror(errno));
-    }
-  }
-}
-
-void RingBuffer::SemaphoreLocker::unlock()
-{
-  struct sembuf sb;
-  sb.sem_num = 0;
-  sb.sem_op = 1;
-  sb.sem_flg = 0;
-  while (semop(m_id, &sb, 1) == -1) {
-    if (errno == EINTR) {
-      //interrupted by signal (e.g. window size changed), try again
-      continue;
-    } else {
-      B2FATAL("Ringbuffer: error in SemaphoreLocker::unlock(semop), semaphore " << m_id << ", error: " << strerror(errno));
-    }
-  }
 }
 

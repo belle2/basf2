@@ -82,27 +82,6 @@ namespace Belle2 {
     void DumpInfo();
 
   private:
-    /** Convenience class to lock a semaphore on construction, and unlock on destruction. */
-    class SemaphoreLocker {
-    public:
-      /** Lock the given semaphore. */
-      SemaphoreLocker(int semId): m_id(semId) { lock(); }
-      /** Unlock. */
-      ~SemaphoreLocker() { unlock(); }
-
-      /** Create a new semaphore and initialize it. Returns the semaphore id or dies with an error. */
-      static int create(key_t semkey);
-
-      /** Lock the semaphore. */
-      void lock();
-      /** Unlock the semaphore. */
-      void unlock();
-
-    private:
-      int m_id; /**< semaphore id, see semget(2). */
-    };
-
-  private:
     bool m_new; /**< True if we created the ring buffer ourselves (and need to clean it). */
     bool m_file; /**< True if m_pathfd needs to be closed. */
     std::string m_pathname; /**< Path for identifying shared memory if named ring buffer is created. */

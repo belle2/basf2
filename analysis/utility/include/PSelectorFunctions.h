@@ -393,6 +393,28 @@ namespace Belle2 {
       return particle->getDaughter(N)->getExtraInfo("SignalProbability");
     }
 
+    /**
+     * NeuroBayesifys this function
+     * @param part cconst pointer to Particle
+     * @return function value, except for value numerator/denominator which is set to -999
+     */
+    template<double(*T)(const Particle*), int numerator, int denominator>
+    double NeuroBayesify(const Particle* particle)
+    {
+      double result = T(particle);
+      return (std::abs(result - static_cast<double>(numerator) / denominator) < 1e-12) ? -999 : result;
+    }
+
+    /**
+     * Caclulate NeuroBayes Flag for function
+     * @param part cconst pointer to Particle
+     * @return function value, except for value numerator/denominator which is set to -999
+     */
+    template<double(*T)(const Particle*), int numerator, int denominator>
+    double NeuroBayesFlagify(const Particle* particle)
+    {
+      return (std::abs(T(particle) - static_cast<double>(numerator) / denominator) < 1e-12) ? 1 : 0;
+    }
 
     /**
      * function for PSelector

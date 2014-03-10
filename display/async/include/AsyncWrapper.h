@@ -22,6 +22,15 @@ namespace Belle2 {
 
   /** Wraps a given Module to execute it asynchronously.
    *
+   * The module will be executed in its own process and will receive all
+   * event data that would normally be available to it, once available.
+   * Anything written to the DataStore by the wrapped module will be lost.
+   *
+   * To use it, inherit from AsyncWrapper and use the base class constructor
+   * in your own constructor, passing it an instance of the wrapped module class.
+   *
+   * \sa See AsyncDisplayModule for an example that wraps DisplayModule.
+   *
    */
   class AsyncWrapper : public Module {
   public:

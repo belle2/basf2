@@ -32,7 +32,7 @@ namespace Belle2 {
    *
    * The viewers, projections and interactive elements are controlled by DisplayUI.
    *
-   * Please send suggestions and patches to <cpulvermacher@ekp.uni-karlsruhe.de>
+   * Full documentation is available at https://belle2.cc.kek.jp/~twiki/bin/view/Software/EventDisplay
    */
   class DisplayModule : public Module {
   public:

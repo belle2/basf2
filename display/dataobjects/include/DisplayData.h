@@ -47,8 +47,8 @@ namespace Belle2 {
    * You can then save the output of your module to a file and view it with 'b2display', or look at it directly
    * after execution by adding the Display module in your steering file.
    *
-   * See display/examples/displaydata.py to see how to use most features from a python steering file.
-   * See display/examples/histogram_monitor.py for an example that generates and adds histograms in Python.
+   * \sa Check display/examples/displaydata.py to see how to use most features from a python steering file.
+   * \sa See display/examples/histogram_monitor.py for an example that generates and adds histograms in Python.
    */
   class DisplayData : public TObject {
   public:

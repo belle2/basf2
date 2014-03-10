@@ -11,6 +11,7 @@
 #include <framework/datastore/DataStore.h>
 
 #include <framework/logging/Logger.h>
+#include <framework/datastore/RelationEntry.h>
 #include <framework/dataobjects/RelationContainer.h>
 #include <framework/datastore/RelationIndex.h>
 #include <framework/datastore/RelationIndexManager.h>

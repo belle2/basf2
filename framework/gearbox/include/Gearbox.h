@@ -19,7 +19,6 @@
 
 #include "framework/gearbox/types.h"
 #include "framework/gearbox/Backend.h"
-#include "framework/gearbox/GBResult.h"
 
 #include <map>
 #include <list>
@@ -37,6 +36,7 @@ namespace boost {
 namespace Belle2 {
   namespace gearbox {
     void* openXmlUri(const char*);
+    class GBResult;
   }
 
   /** Singleton class responsible for loading detector parameters from an XML file.

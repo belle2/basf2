@@ -6,6 +6,7 @@
 
 #include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/GearDir.h>
+#include "framework/gearbox/GBResult.h"
 #include <framework/logging/Logger.h>
 #include <framework/utilities/Stream.h>
 

@@ -12,9 +12,8 @@
 #define BOOSTS_H
 
 #include <framework/gearbox/Unit.h>
-#include "TLorentzRotation.h"
 
-
+class TLorentzRotation;
 
 namespace Belle2 {
 

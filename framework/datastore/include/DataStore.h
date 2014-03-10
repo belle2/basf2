@@ -9,8 +9,6 @@
  **************************************************************************/
 #pragma once
 
-#include <framework/datastore/RelationEntry.h>
-
 #include <vector>
 #include <string>
 #include <set>
@@ -22,6 +20,7 @@ class TClass;
 namespace Belle2 {
   class StoreAccessorBase;
   template <class T> class RelationVector;
+  struct RelationEntry;
 
   /** In the store you can park objects that have to be accessed by various modules.
    *

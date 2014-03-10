@@ -411,8 +411,10 @@ namespace Belle2 {
     EXPECT_TRUE(StoreArray<EventMetaData>::optional(evtArray.getName()));
     EXPECT_TRUE(StoreObjPtr<EventMetaData>::required(evtPtr.getName()));
     EXPECT_TRUE(StoreArray<EventMetaData>::required(evtArray.getName()));
+  }
 
-
+  TEST_F(DataStoreTest, RegistrationOutsideOfInitializeShouldFail)
+  {
     //outside initialize(), registration results in an error
     EXPECT_B2ERROR(StoreArray<EventMetaData>::registerPersistent("someothernewname"));
     EXPECT_B2ERROR(StoreArray<EventMetaData>::registerTransient("someothernewname"));
@@ -424,7 +426,6 @@ namespace Belle2 {
     //usually one shouldn't call StoreArray::create(), but everything like appendNew() would crash
     EXPECT_B2ERROR(EXPECT_FALSE(someothernewname.create()));
     EXPECT_FALSE(someothernewname.isValid()); //still invalid (as create() failed)
-
   }
 
 }  // namespace

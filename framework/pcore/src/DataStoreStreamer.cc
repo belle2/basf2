@@ -16,6 +16,8 @@
 #include <TClonesArray.h>
 #include <TClass.h>
 
+#include <algorithm>
+
 using namespace std;
 using namespace Belle2;
 
@@ -23,11 +25,11 @@ using namespace Belle2;
 static DataStoreStreamer* s_streamer = NULL;
 
 static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
-static pthread_mutex_t mutex_thread[MAXTHREADS];
-//static char* evtbuf_thread[MAXTHREADS];
-static int msg_compLevel[MAXTHREADS];
+static pthread_mutex_t mutex_thread[DataStoreStreamer::c_maxThreads];
+//static char* evtbuf_thread[DataStoreStreamer::c_maxThreads];
+static int msg_compLevel[DataStoreStreamer::c_maxThreads];
 
-static std::queue<char*> my_evtbuf[MAXTHREADS];
+static std::queue<char*> my_evtbuf[DataStoreStreamer::c_maxThreads];
 
 static std::queue<int> my_nobjs;
 static std::queue<int> my_narrays;
@@ -35,7 +37,7 @@ static std::queue<DataStore::EDurability> my_durability;
 static std::queue<std::vector<TObject*>> my_objlist;
 static std::queue<std::vector<std::string>> my_namelist;
 
-static int my_decstat[MAXTHREADS];
+static int my_decstat[DataStoreStreamer::c_maxThreads];
 
 void* RunDecodeEvtMessage(void* targ)
 {
@@ -58,9 +60,9 @@ DataStoreStreamer::DataStoreStreamer(int complevel, int maxthread) : m_compressi
   m_threadin(0)
   //, m_threadout(0)
 {
-  if (m_maxthread > MAXTHREADS) {
+  if (m_maxthread > c_maxThreads) {
     B2FATAL("DataStoreStreamer : Too many threads " << m_maxthread);
-    m_maxthread = MAXTHREADS;
+    m_maxthread = c_maxThreads;
   }
   m_msghandler = new MsgHandler(m_compressionLevel);
 
@@ -93,7 +95,7 @@ DataStoreStreamer::~DataStoreStreamer()
   delete m_msghandler;
 }
 
-void DataStoreStreamer::registerStreamObjs(vector<string>& objlist)
+void DataStoreStreamer::registerStreamObjs(const vector<string>& objlist)
 {
   m_streamobjnames = objlist;
 }
@@ -248,7 +250,7 @@ int DataStoreStreamer::queueEvtMessage(char* evtbuf)
   if (evtbuf == NULL) {
     printf("queueEvtMessage : NULL evtbuf detected. \n");
     for (int i = 0; i < m_maxthread; i++) {
-      while (my_evtbuf[i].size() >= MAXQUEUEDEPTH) usleep(10);
+      while (my_evtbuf[i].size() >= c_maxQueueDepth) usleep(10);
       my_evtbuf[m_threadin].push(evtbuf);
     }
     return 0;
@@ -256,7 +258,7 @@ int DataStoreStreamer::queueEvtMessage(char* evtbuf)
 
   // Put the event buffer in the queue of current thread
   for (;;) {
-    if (my_evtbuf[m_threadin].size() < MAXQUEUEDEPTH) {
+    if (my_evtbuf[m_threadin].size() < c_maxQueueDepth) {
       pthread_mutex_lock(&mutex_thread[m_threadin]);
       my_evtbuf[m_threadin].push(evtbuf);
       pthread_mutex_unlock(&mutex_thread[m_threadin]);
@@ -322,7 +324,7 @@ void* DataStoreStreamer::decodeEvtMessage(int id)
 
 
     // Queue them for the registration in DataStore
-    while (my_nobjs.size() >= MAXQUEUEDEPTH) usleep(10);
+    while (my_nobjs.size() >= c_maxQueueDepth) usleep(10);
     pthread_mutex_lock(&mutex);     // Lock queueing
     my_objlist.push(objlist);
     my_namelist.push(namelist);

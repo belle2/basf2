@@ -413,6 +413,7 @@ namespace Belle2 {
     EXPECT_TRUE(StoreArray<EventMetaData>::required(evtArray.getName()));
   }
 
+  /** nomen est omen. */
   TEST_F(DataStoreTest, RegistrationOutsideOfInitializeShouldFail)
   {
     //outside initialize(), registration results in an error

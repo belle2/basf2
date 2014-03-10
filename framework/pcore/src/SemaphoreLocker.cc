@@ -27,7 +27,9 @@ int SemaphoreLocker::create(key_t semkey)
 
 void SemaphoreLocker::destroy(int semId)
 {
-  semctl(semId, 1, IPC_RMID); //semnum=1 has no meaning, ignored
+  if (semctl(semId, 1, IPC_RMID) == -1) { //semnum=1 has no meaning, ignored
+    B2ERROR("Error in SemaphoreLocker::destroy(), semaphore " << semId << ", error: " << strerror(errno));
+  }
 }
 
 void SemaphoreLocker::lock()
@@ -41,7 +43,7 @@ void SemaphoreLocker::lock()
       //interrupted by signal (e.g. window size changed), try again
       continue;
     } else {
-      B2FATAL("Ringbuffer: error in SemaphoreLocker::lock(semop), semaphore " << m_id << ", error: " << strerror(errno));
+      B2FATAL("Error in SemaphoreLocker::lock(), semaphore " << m_id << ", error: " << strerror(errno));
     }
   }
 }
@@ -57,7 +59,7 @@ void SemaphoreLocker::unlock()
       //interrupted by signal (e.g. window size changed), try again
       continue;
     } else {
-      B2FATAL("Ringbuffer: error in SemaphoreLocker::unlock(semop), semaphore " << m_id << ", error: " << strerror(errno));
+      B2FATAL("Error in SemaphoreLocker::unlock(), semaphore " << m_id << ", error: " << strerror(errno));
     }
   }
 }

@@ -33,19 +33,43 @@ def outputMdst(filename, path=analysis_main):
     path.add_module(rooutput)
 
 
-def generateEvents(noEvents, filename, path=analysis_main):
+def generateEvents(noEvents, decayTable, path=analysis_main):
+    """                                                                                                                                   
+    Generated events with EvtGen event generator according to the user 
+    specifed decay table. 
+
+    The experiment and run numbers are set to 1. 
+
+    If the simulation and reconstruction is not performed in the sam job,
+    then the Gearbox needs to be loaded. Use loadGearbox(path) function
+    for this purpose.
+
+    @param noEvents   number of events to be generated
+    @param decayTable file name of the decay table to be used
+    @param path       modules are added to this path
+    """
+
     evtnumbers = register_module('EventInfoSetter')
     evtnumbers.param('evtNumList', [noEvents])
     evtnumbers.param('runList', [1])
     evtnumbers.param('expList', [1])
     evtgeninput = register_module('EvtGenInput')
-    evtgeninput.param('userDECFile', filename)
+    evtgeninput.param('userDECFile', decayTable)
     evtgeninput.param('boost2LAB', True)
     path.add_module(evtnumbers)
     path.add_module(evtgeninput)
 
 
 def loadGearbox(path=analysis_main):
+    """
+    Loads Gearbox module to the path. 
+
+    This is neccessary in a job with event generation only 
+    (without reconstruction and reconstruction).
+    
+    @param path modules are added to this path
+    """
+
     paramloader = register_module('Gearbox')
     path.add_module(paramloader)
 
@@ -180,6 +204,15 @@ def summaryOfLists(particleLists, path=analysis_main):
 
 
 def matchMCTruth(list_name, path=analysis_main):
+    """
+    Performs MC matching (sets relation Particle<->MCParticle) for 
+    all particles (and its (grand)^N-daughter particles) in the specified
+    ParticleList.
+
+    @param list_name name of the input ParticleList 
+    @param path      modules are added to this path
+    """
+
     mcMatch = register_module('MCMatching')
     mcMatch.set_name('MCMatching_' + list_name)
     mcMatch.param('ListName', list_name)
@@ -187,6 +220,14 @@ def matchMCTruth(list_name, path=analysis_main):
 
 
 def buildRestOfEvent(list_name, path=analysis_main):
+    """
+    Creates for each Particle in the given ParticleList a RestOfEvent 
+    dataobject and makes BASF2 relation between them.
+
+    @param list_name name of the input ParticleList
+    @param path      modules are added to this path
+    """
+
     roeBuilder = register_module('RestOfEventBuilder')
     roeBuilder.set_name('ROEBuilder_' + list_name)
     roeBuilder.param('particleList', list_name)

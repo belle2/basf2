@@ -8,10 +8,10 @@
 //         9 - Dec - 2013, Modification for DAQ use
 //-
 
-#include <rawdata/dataobjects/RawPXD.h>
 
 #include <daq/storage/modules/StorageOutput.h>
 #include <daq/storage/modules/StorageDeserializer.h>
+#include <rawdata/dataobjects/RawPXD.h>
 
 #include <stdio.h>
 

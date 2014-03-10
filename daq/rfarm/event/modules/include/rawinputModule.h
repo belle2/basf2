@@ -9,6 +9,13 @@
 #ifndef RAW_INPUT_H
 #define RAW_INPUT_H
 
+#include <framework/core/Module.h>
+
+#include <framework/datastore/DataStore.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/datastore/StoreArray.h>
+
+
 #include <string>
 #include <vector>
 #include <cmath>
@@ -19,13 +26,6 @@
 #include <stdio.h>
 #include <sys/time.h>
 #include <fcntl.h>
-
-
-#include <framework/core/Module.h>
-
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
 
 
 #include <daq/rawdata/modules/DAQConsts.h>
@@ -47,14 +47,6 @@
 #define MAXEVTSIZE  10000000
 
 namespace Belle2 {
-  /**
-   * \addtogroup modules
-   * @{
-   * \addtogroup framework_modules
-   * \ingroup modules
-   * @{ RawInputModule @} @}
-   */
-
   /*! A class definition of an input module for Sequential ROOT I/O. */
 
   class RawInputModule : public Module {

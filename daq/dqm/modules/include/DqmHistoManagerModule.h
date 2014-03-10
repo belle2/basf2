@@ -8,7 +8,6 @@
 // Date : 27 - Jul - 2010
 //-
 
-#include <string>
 
 #include <framework/core/Module.h>
 #include <daq/dataflow/EvtSocket.h>
@@ -27,17 +26,12 @@
 #include "TIterator.h"
 #include "TDirectory.h"
 
+#include <string>
+
 
 #define DQM_SOCKET 9899
 
 namespace Belle2 {
-  /**
-   * \addtogroup modules
-   * @{
-   * \addtogroup framework_modules
-   * \ingroup modules
-   * @{ HistoManagerModule @} @}
-   */
 
   /*! Class definition of DqmHistoManager module */
   class DqmHistoManagerModule : public Module {

@@ -31,9 +31,9 @@ namespace Belle2 {
   class DataStoreStreamer {
   public:
     /** global maximum number of threads (cannot set higher number). */
-    static const int c_maxThreads = 16;
+    static const unsigned int c_maxThreads = 16;
     /** Ask Itoh-san. */
-    static const int c_maxQueueDepth = 64;
+    static const unsigned int c_maxQueueDepth = 64;
 
     /** Constructor
      *  @param complevel  Compression level of streaming

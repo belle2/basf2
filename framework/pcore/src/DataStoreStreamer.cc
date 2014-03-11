@@ -60,7 +60,7 @@ DataStoreStreamer::DataStoreStreamer(int complevel, int maxthread) : m_compressi
   m_threadin(0)
   //, m_threadout(0)
 {
-  if (m_maxthread > c_maxThreads) {
+  if ((unsigned int)m_maxthread > c_maxThreads) {
     B2FATAL("DataStoreStreamer : Too many threads " << m_maxthread);
     m_maxthread = c_maxThreads;
   }

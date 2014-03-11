@@ -1,4 +1,4 @@
-/* Copyright 2008-2009, Technische Universitaet Muenchen,
+/* Copyright 2008-2014, Technische Universitaet Muenchen,
    Authors: Christian Hoeppner & Sebastian Neubert & Johannes Rauch
 
    This file is part of GENFIT.
@@ -26,8 +26,8 @@
 #include <assert.h>
 #include <math.h>
 
-//#define DEBUG
-
+static const bool debug = false;
+//static const bool debug = true;
 
 namespace genfit {
 
@@ -35,11 +35,7 @@ double MeanExcEnergy_get(int Z);
 double MeanExcEnergy_get(TGeoMaterial*);
 
 
-TGeoMaterialInterface::TGeoMaterialInterface() : whichNavig_(0) {
-  gGeoManager->AddNavigator();
-}
-
-void
+bool
 TGeoMaterialInterface::initTrack(double posX, double posY, double posZ,
                                    double dirX, double dirY, double dirZ){
   #ifdef DEBUG
@@ -48,42 +44,11 @@ TGeoMaterialInterface::initTrack(double posX, double posY, double posZ,
   std::cout << "Dir    "; TVector3(dirX, dirY, dirZ).Print();
   #endif
 
-  const Double_t * pt = gGeoManager->GetCurrentPoint();
-
-  if (posX == pt[0] &&
-      posY == pt[1] &&
-      posZ == pt[2]) {
-    // position does not change
-    gGeoManager->SetCurrentDirection(dirX, dirY, dirZ);
-    #ifdef DEBUG
-    std::cout << "just init dir (default navigator)! \n";
-    #endif
-  }
-  else {
-
-    whichNavig_ = (whichNavig_ + 1) % 2;
-    gGeoManager->SetCurrentNavigator(whichNavig_);
-    pt = gGeoManager->GetCurrentPoint();
-
-    if (posX == pt[0] &&
-        posY == pt[1] &&
-        posZ == pt[2]) {
-      // position does not change
-      gGeoManager->SetCurrentDirection(dirX, dirY, dirZ);
-      #ifdef DEBUG
-      std::cout << "just init dir (second navigator)! \n";
-      #endif
-    }
-    else {
-      gGeoManager->InitTrack(posX, posY, posZ,
-                             dirX, dirY, dirZ);
-    }
-  }
-
-  #ifdef DEBUG
-  std::cout << "\n";
-  #endif
-
+  // Move to the new point.
+  bool result = !gGeoManager->IsSameLocation(posX, posY, posZ, kTRUE);
+  // Set the intended direction.
+  gGeoManager->SetCurrentDirection(dirX, dirY, dirZ);
+  return result;
 }
 
 
@@ -123,97 +88,112 @@ double
 TGeoMaterialInterface::findNextBoundary(const RKTrackRep* rep,
                                           const M1x7& stateOrig,
                                           double sMax, // signed
-                                          bool varField){
+                                          bool varField)
+{
+  const double delta(1.E-2); // cm, distance limit beneath which straight-line steps are taken.
+  const double epsilon(1.E-1); // cm, allowed upper bound on arch
+			       // deviation from straight line
 
-  const double delta(1.E-2); // cm
-  double s(0), safety(0), slDist(0);
   M1x3 SA;
-  M1x7 state7;
-  memcpy(state7, stateOrig, sizeof(stateOrig));
+  M1x7 state7, oldState7;
+  memcpy(oldState7, stateOrig, sizeof(state7));
 
-  int stepSign(1);
-  if (sMax < 0) stepSign = -1;
+  int stepSign(sMax < 0 ? -1 : 1);
 
-  unsigned int maxIt(300), it(0);
+  double s = 0;  // trajectory length to boundary
 
+  const unsigned maxIt = 300;
+  unsigned it = 0;
 
-  while (true) {
+  // Initialize the geometry to the current location (set by caller).
+  gGeoManager->FindNextBoundary(fabs(sMax) - s);
+  double safety = gGeoManager->GetSafeDistance();
+  double slDist = gGeoManager->GetStep();
+  double step = slDist;
 
+  while (1) {
     if (++it > maxIt){
       Exception exc("TGeoMaterialInterface::findNextBoundary ==> maximum number of iterations exceeded",__LINE__,__FILE__);
       exc.setFatal();
       throw exc;
     }
 
-    safety = gGeoManager->Safety(); // unsigned; distance to closest boundary
-
-#ifdef DEBUG
-    std::cout << "   TGeoMaterialInterface::findNextBoundary: Iteration " << it << ". Safety = " << safety << ". slDist = " << slDist << ". Step so far = " << s << "\n";
-    std::cout << "   Material before step: " << gGeoManager->GetCurrentVolume()->GetMedium()->GetName() << "\n";
-#endif
-
-    if (fabs(s + stepSign*safety) > fabs(sMax)) { // next boundary is further away than sMax
-#ifdef DEBUG
-      std::cout << "   next boundary is further away than sMax \n";
-#endif
-      return s + stepSign*safety;
+    // No boundary in sight?
+    if (s + safety > fabs(sMax)) {
+      if (debug)
+	std::cout << "   next boundary is further away than sMax \n";
+      return stepSign*(s + safety); //sMax;
     }
 
-    gGeoManager->FindNextBoundary();
-    slDist = gGeoManager->GetStep(); // unsigned; straight line distance to next boundary along step direction
-
-    if (slDist < delta) { // very near the boundary
-#ifdef DEBUG
-      std::cout << "   very near the boundary -> return s + stepSign*slDist; = " << s + stepSign*slDist << "\n";
-#endif
-      return s + stepSign*slDist;
-    }
-    else {
-#ifdef DEBUG
-      std::cout << "   make RKutta step \n";
-#endif
-      // check if we would cross a boundary when making slDist step
-      double tryStep = 0.9 * stepSign*slDist;
-
-      bool safe = false;
-      if (fabs(tryStep) < fabs(safety))
-        safe = true;
-
-      if (!safe) {
-        memcpy(state7, stateOrig, sizeof(state7)); // propagate complete way from original start
-        rep->RKPropagate(state7, NULL, SA, s+tryStep, varField);
-        // init for checking
-        initTrack(stateOrig[0], stateOrig[1], stateOrig[2],
-                  state7[0]-stateOrig[0], state7[1]-stateOrig[1], state7[2]-stateOrig[2]);
-      }
-      // check: gGeoManager->GetStep() gives us the max sl step size from stateOrig to state7
-      if (!safe && gGeoManager->GetStep() > fabs(tryStep)) {
-        s += tryStep;
-        // init for next iteration
-        initTrack(state7[0], state7[1], state7[2],  stepSign*state7[3], stepSign*state7[4], stepSign*state7[5]);
-        #ifdef DEBUG
-          std::cout << "   tried and its safe to make a step of  " << stepSign*tryStep << "\n";
-        #endif
-      }
-      else { // step along safety
-        s += stepSign*safety;
-        memcpy(state7, stateOrig, sizeof(state7)); // propagate complete way from original start
-        rep->RKPropagate(state7, NULL, SA, s, varField);
-        // init for next iteration
-        initTrack(state7[0], state7[1], state7[2],  stepSign*state7[3], stepSign*state7[4], stepSign*state7[5]);
-#ifdef DEBUG
-    std::cout << "   step along safety  " << stepSign*safety << "\n";
-#endif
-      }
-
+    // Are we at the boundary?
+    if (slDist < delta) {
+      if (debug)
+	std::cout << "   very close to the boundary -> return"
+		  << " stepSign*(s + slDist) = "
+		  << stepSign << "*(" << s + slDist << ")\n";
+      return stepSign*(s + slDist);
     }
 
-#ifdef DEBUG
-    std::cout << "   Material after step: " << gGeoManager->GetCurrentVolume()->GetMedium()->GetName() << "\n";
-#endif
+    // We have to find whether there's any boundary on our path.
 
+    // Follow curved arch, then see if we may have missed a boundary.
+    // Always propagate complete way from original start to avoid
+    // inconsistent extrapolations.
+    memcpy(state7, stateOrig, sizeof(state7));
+    rep->RKPropagate(state7, NULL, SA, stepSign*(s + step), varField);
+
+    // Straight line distance² between extrapolation finish and
+    // the end of the previously determined safe segment.
+    double dist2 = (pow(state7[0] - oldState7[0], 2)
+		    + pow(state7[1] - oldState7[1], 2)
+		    + pow(state7[2] - oldState7[2], 2));
+    // Maximal lateral deviation².
+    double maxDeviation2 = 0.25*(step*step - dist2);
+
+    if (step > safety
+	&& maxDeviation2 > epsilon*epsilon) {
+      // Need to take a shorter step to reliably estimate material,
+      // but only if we didn't move by safety.  In order to avoid
+      // issues with roundoff we check 'step > safety' instead of
+      // 'step != safety'.  If we moved by safety, there couldn't have
+      // been a boundary that we missed along the path, but we could
+      // be on the boundary.
+
+      // Take a shorter step, but never shorter than safety.
+      step = std::max(step / 2, safety);
+    } else {
+      gGeoManager->PushPoint();
+      bool volChanged = initTrack(state7[0], state7[1], state7[2],
+				  stepSign*state7[3], stepSign*state7[4],
+				  stepSign*state7[5]);
+
+      if (volChanged) {
+	// Move back to start.
+	gGeoManager->PopPoint();
+
+	// Extrapolation may not take the exact step length we asked
+	// for, so it can happen that a requested step < safety takes
+	// us across the boundary.  This is then the best estimate we
+	// can get of the distance to the boundary with the stepper.
+	if (step <= safety)
+	  return stepSign*(s + step);
+
+	// Volume changed during the extrapolation.  Take a shorter
+	// step, but never shorter than safety.
+	step = std::max(step / 2, safety);
+      } else {
+	// we're in the new place, the step was safe, advance
+	s += step;
+
+	memcpy(oldState7, state7, sizeof(state7));
+	gGeoManager->PopDummy();  // Pop stack, but stay in place.
+
+	gGeoManager->FindNextBoundary(fabs(sMax) - s);
+	safety = gGeoManager->GetSafeDistance();
+	step = slDist = gGeoManager->GetStep();
+      }
+    }
   }
-
 }
 
 

@@ -40,7 +40,7 @@ if len(Flatten(source_files)) == 0:
   Exit(1)
 
 # builder for root dictionaries
-rootcint = Builder(action='rootcint -f $TARGET -c -p $CINTFLAGS $_CPPDEFFLAGS $_CPPINCFLAGS $SOURCES', source_scanner=CScanner())
+rootcint = Builder(action='rootcling -f $TARGET -c -p $CINTFLAGS $_CPPDEFFLAGS $_CPPINCFLAGS $SOURCES', source_scanner=CScanner())
 env['BUILDERS']['RootCint'] = rootcint
 rootcint.action.cmdstr = '${ROOTCINTCOMSTR}'
 

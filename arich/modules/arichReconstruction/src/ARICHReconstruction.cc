@@ -47,7 +47,7 @@ namespace Belle2 {
     {
       B2INFO("ARICHReconstruction::ARICHReconstruction()");
       if (m_storeHist) {
-        m_hitstuple = new TNtuple("hits", "Btest Cherenkov angle", "n:agel:mir:thc:fic:x:y:tx:ty:p");
+        m_hitstuple = new TNtuple("hits", "Btest Cherenkov angle", "n:id:agel:mir:thc:fic:x:y:tx:ty:p");
         m_tracktuple = new TNtuple("tracks", "Btest tracks", "id:p:nexp:acc:ndet:le:lmu:lpi:lk:lp");
       }
     }
@@ -85,13 +85,11 @@ namespace Belle2 {
 
       for (unsigned  int i = 0; i < nTracks; i++) {
         ARICHTrack* track = &arichTracks[i];
-        double thc = gRandom->Gaus(0, m_trackAngRes);
-        double fic = gRandom->Uniform(2 * M_PI);
-        TVector3 dirf = setThetaPhi(thc, fic);  // particle system
-        double dr = gRandom->Gaus(0, m_trackPosRes);
-        double dfi = gRandom->Uniform(2 * M_PI);
-        double dx = dr * cos(dfi);
-        double dy = dr * sin(dfi);
+        double a = gRandom->Gaus(0, m_trackAngRes);
+        double b = gRandom->Gaus(0, m_trackAngRes);
+        TVector3 dirf(a, b, sqrt(1 - a * a - b * b));
+        double dx = gRandom->Gaus(0, m_trackPosRes);
+        double dy = gRandom->Gaus(0, m_trackPosRes);
         TVector3 mod = TVector3(dx, dy, 0);
         TVector3 rpoint = track->getOriginalPosition() + mod;
         TVector3 odir  = track->getOriginalDirection();
@@ -277,8 +275,6 @@ namespace Belle2 {
 
     int ARICHReconstruction::likelihood2(std::vector<ARICHTrack>& arichTracks)
     {
-      static int ncount = 0;
-      ncount++;
       //const double p_mass[5] = { 0.000511, 0.10566, 0.13957, 0.49368, 0.93827};// mass of particles in GeV
       const double p_mass[5] = {Const::electron.getMass(), Const::muon.getMass(), Const::pion.getMass(), Const::kaon.getMass(), Const::proton.getMass()};
 
@@ -332,8 +328,11 @@ namespace Belle2 {
         first = 0;
       }
 
+      static int ncount = 0;
+
       // loop over all tracks
       for (unsigned  int i = 0; i < nTracks; i++) {
+        ncount++;
 
         ARICHTrack* track =  &arichTracks[i];
         // Reconstructed photons within expected cone
@@ -468,7 +467,7 @@ namespace Belle2 {
 
               if (th_cer > 0.5 || th_cer < 0.05) continue;
 
-              if (m_storeHist) m_hitstuple->Fill(ncount, iAerogel, mirr, th_cer, fi_cer, hitpos.x(), hitpos.y(), epoint.x(), epoint.y(), track->getReconstructedMomentum());
+              if (ncount < m_storeHist) m_hitstuple->Fill(ncount, track->getIdentity(), iAerogel, mirr, th_cer, fi_cer, hitpos.x(), hitpos.y(), epoint.x(), epoint.y(), track->getReconstructedMomentum());
               if (m_beamtest) continue;
               if (fi_cer < 0) fi_cer += 2 * M_PI;
               double fii = fi_cer;
@@ -553,11 +552,12 @@ namespace Belle2 {
         for (int iHyp = 0; iHyp < c_noOfHypotheses; iHyp++) {
           track->setExpectedPhotons(iHyp, nSig[iHyp][nAerogelLayers]); // sum for all agels
           track->setDetectedPhotons(iHyp, nDetPhotons[iHyp]);
+          track->setGeometricalAcceptance(iHyp, acceptance[iHyp][0]);
         }
         track->setLikelihood(logL);
         //**************************************
 
-        if (m_storeHist) {
+        if (ncount < m_storeHist) {
           int id = track->getIdentity();
           if (id < 0) id = 0;
           m_tracktuple->Fill(id, track->getReconstructedMomentum(), nSig[id][nAerogelLayers], acceptance[id][0], nDetPhotons[id], logL[0], logL[1], logL[2], logL[3], logL[4]);

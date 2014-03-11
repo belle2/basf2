@@ -180,6 +180,8 @@ namespace Belle2 {
      */
     void setDetectedPhotons(int i, double val) {m_detectedPhotons[i] = val;};
 
+    void setGeometricalAcceptance(int i, double val) {m_acc[i] = val;};
+
     //! sets the reconstructed value of track parameters.
     // "r" is position of track, "dir" direction and "p" momentum of track on aerogel plane.
     void   setReconstructedValues(TVector3 r, TVector3 dir, double p) {

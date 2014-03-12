@@ -110,7 +110,7 @@ void BKLMReconstructorModule::event()
   new(hit1ds.nextFreeAddress()) BKLMHit1d(cluster);
   hit1dToDigits.add(hit1ds.getEntries() - 1, indices);
 
-  // Construct StoreArray<BKLMHit2D> from StoreArray<BKLMHit1D>
+  // Construct StoreArray<BKLMHit2D> from orthogonal same-module hits in StoreArray<BKLMHit1D>
 
   StoreArray<BKLMHit2d> hit2ds;
   RelationArray hit2dToHit1d(hit2ds, hit1ds);
@@ -131,8 +131,6 @@ void BKLMReconstructorModule::event()
       CLHEP::Hep3Vector global = m->localToGlobal(local);
       hit2d->setLocalPosition(local.x(), local.y(), local.z());
       hit2d->setGlobalPosition(global.x(), global.y(), global.z());
-      // DIVOT CLHEP::HepMatrix var = m->getLocalError(hit2d->getPhiStripCount(), hit2d->getZStripCount());
-      // DIVOT hit2d->setLocalVariance(var[0][0], var[0][1], var[1][0], var[1][1]);
     }
   }
 

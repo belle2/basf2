@@ -90,10 +90,14 @@ BKLMHit2d::BKLMHit2d(const BKLMHit2d& h) :
 
 void BKLMHit2d::getLocalPosition(double position[2], double error[2]) const
 {
-  position[0] = m_LocalPosition.Y();
-  position[1] = m_LocalPosition.Z();
-  error[0] = sqrt(m_LocalVariance[0][0]);
-  error[1] = sqrt(m_LocalVariance[1][1]);
+//*  position[0] = m_LocalPosition.Y();
+//*  position[1] = m_LocalPosition.Z();
+//*  error[0] = sqrt(m_LocalVariance[0][0]);
+//*  error[1] = sqrt(m_LocalVariance[1][1]);
+  position[0] = m_PhiStripAve;
+  position[1] = m_ZStripAve;
+  error[0] = m_PhiStripErr;
+  error[1] = m_ZStripErr;
 }
 
 // DIVOT this function is not used

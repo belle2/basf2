@@ -111,14 +111,14 @@ namespace Belle2 {
         int layer = hist->GetCopyNumber(baseDepth + 4);
         int sector = hist->GetCopyNumber(baseDepth + 6);
         bool isForward = (hist->GetCopyNumber(baseDepth + 7) == BKLM_FORWARD);
-        const CLHEP::Hep3Vector mom = 0.5 * (preStep->GetMomentum() + postStep->GetMomentum()) / MeV;  // GEANT4: in MeV/c
+        const CLHEP::Hep3Vector mom = 0.5 * (preStep->GetMomentum() + postStep->GetMomentum());  // GEANT4: in MeV/c
         const TVector3 momentum(mom.x(), mom.y(), mom.z());
-        double energy = 0.5 * (preStep->GetTotalEnergy() + postStep->GetTotalEnergy()) / MeV;  // GEANT4: in MeV
-        double kineticEnergy = 0.5 * (preStep->GetKineticEnergy() + postStep->GetKineticEnergy()) / MeV;  // GEANT4: in MeV
-        double time = 0.5 * (preStep->GetGlobalTime() + postStep->GetGlobalTime()) / ns;  // GEANT4: in ns
-        const CLHEP::Hep3Vector gHitPos = 0.5 * (preStep->GetPosition() + postStep->GetPosition()) / cm; // GEANT4: in mm
-        const Module* pModule = m_GeoPar->findModule(isForward, sector, layer);
-        const CLHEP::Hep3Vector lHitPos = pModule->globalToLocal(gHitPos.x(), gHitPos.y(), gHitPos.z());
+        double energy = 0.5 * (preStep->GetTotalEnergy() + postStep->GetTotalEnergy());  // GEANT4: in MeV
+        double kineticEnergy = 0.5 * (preStep->GetKineticEnergy() + postStep->GetKineticEnergy());  // GEANT4: in MeV
+        double time = 0.5 * (preStep->GetGlobalTime() + postStep->GetGlobalTime());  // GEANT4: in ns
+        const CLHEP::Hep3Vector gHitPos = 0.5 * (preStep->GetPosition() + postStep->GetPosition()) / cm; // in cm
+        const Module* m = m_GeoPar->findModule(isForward, sector, layer);
+        const CLHEP::Hep3Vector lHitPos = m->globalToLocal(gHitPos);
         const TVector3 globalPos(gHitPos.x(), gHitPos.y(), gHitPos.z());
         const TVector3 localPos(lHitPos.x(), lHitPos.y(), lHitPos.z());
         unsigned int status = STATUS_MC;
@@ -129,20 +129,20 @@ namespace Belle2 {
         int parentID = track->GetParentID();
         if (baseDepth == 0) {
           status |= STATUS_INRPC;
-          int phiStripMin = -1;
-          int phiStripMax = -1;
-          int zStripMin = -1;
-          int zStripMax = -1;
-          convertHitToRPCStrips(lHitPos, pModule, phiStripMin, phiStripMax, zStripMin, zStripMax);
-          if (phiStripMin >= 0) {
+          int phiStripLower = -1;
+          int phiStripUpper = -1;
+          int zStripLower = -1;
+          int zStripUpper = -1;
+          convertHitToRPCStrips(lHitPos, m, phiStripLower, phiStripUpper, zStripLower, zStripUpper);
+          if (phiStripLower >= 0) {
             new(simHits.nextFreeAddress())
-            BKLMSimHit(status, pdg, trackID, parentID, isForward, sector, layer, true, phiStripMin, phiStripMax,
+            BKLMSimHit(status, pdg, trackID, parentID, isForward, sector, layer, true, phiStripLower, phiStripUpper,
                        globalPos, localPos, time, eDep, momentum, energy, kineticEnergy);
             particleToSimHits.add(trackID, simHits.getEntries() - 1);
           }
-          if (zStripMin >= 0) {
+          if (zStripLower >= 0) {
             new(simHits.nextFreeAddress())
-            BKLMSimHit(status, pdg, trackID, parentID, isForward, sector, layer, false, zStripMin, zStripMax,
+            BKLMSimHit(status, pdg, trackID, parentID, isForward, sector, layer, false, zStripLower, zStripUpper,
                        globalPos, localPos, time, eDep, momentum, energy, kineticEnergy);
             particleToSimHits.add(trackID, simHits.getEntries() - 1);
           }
@@ -158,46 +158,55 @@ namespace Belle2 {
       return false;
     }
 
-    void SensitiveDetector::convertHitToRPCStrips(const CLHEP::Hep3Vector& lHitPos, const Module* pModule,
-                                                  int& phiStripMin, int& phiStripMax, int& zStripMin, int& zStripMax)
+    void SensitiveDetector::convertHitToRPCStrips(const CLHEP::Hep3Vector& lHitPos, const Module* m,
+                                                  int& phiStripLower, int& phiStripUpper, int& zStripLower, int& zStripUpper)
     {
-      int phiStrip = 0;
-      int zStrip = 0;
-      if (pModule->isInActiveArea(lHitPos, phiStrip, zStrip)) {
-        phiStripMin = phiStrip;
-        phiStripMax = phiStrip;
-        zStripMin = zStrip;
-        zStripMax = zStrip;
-        double phiStripDiv = 0.0; // between -0.5 and +0.5 within central phiStrip
-        double zStripDiv = 0.0;   // between -0.5 and +0.5 within central zStrip
-        pModule->getStripDivisions(lHitPos, phiStripDiv, zStripDiv);
-        int n = 0;
-        double rand = gRandom->Uniform();
-        for (n = 1; n < m_SimPar->getMaxMultiplicity(); ++n) {
-          if (m_SimPar->getPhiMultiplicityCDF(phiStripDiv, n) > rand) break;
+      double phiStripD = m->getPhiStrip(lHitPos);
+      int phiStrip = int(phiStripD);
+      int pMin = m->getPhiStripMin();
+      if (phiStrip < pMin) return;
+      int pMax = m->getPhiStripMax();
+      if (phiStrip > pMax) return;
+
+      double zStripD = m->getZStrip(lHitPos);
+      int zStrip = int(zStripD);
+      int zMin = m->getZStripMin();
+      if (zStrip < zMin) return;
+      int zMax = m->getZStripMax();
+      if (zStrip > zMax) return;
+
+      phiStripLower = phiStrip;
+      phiStripUpper = phiStrip;
+      zStripLower = zStrip;
+      zStripUpper = zStrip;
+      double phiStripDiv = fmod(phiStripD, 1.0) - 0.5; // between -0.5 and +0.5 within central phiStrip
+      double zStripDiv = fmod(zStripD, 1.0) - 0.5;   // between -0.5 and +0.5 within central zStrip
+      int n = 0;
+      double rand = gRandom->Uniform();
+      for (n = 1; n < m_SimPar->getMaxMultiplicity(); ++n) {
+        if (m_SimPar->getPhiMultiplicityCDF(phiStripDiv, n) > rand) break;
+      }
+      int nextStrip = (phiStripDiv > 0.0 ? 1 : -1);
+      while (--n > 0) {
+        phiStrip += nextStrip;
+        if ((phiStrip >= pMin) && (phiStrip <= pMax)) {
+          phiStripLower = min(phiStrip, phiStripLower);
+          phiStripUpper = max(phiStrip, phiStripUpper);
         }
-        int nextStrip = (phiStripDiv > 0.0 ? 1 : -1);
-        while (--n > 0) {
-          phiStrip += nextStrip;
-          if ((phiStrip >= pModule->getPhiStripMin()) && (phiStrip <= pModule->getPhiStripMax())) {
-            phiStripMin = min(phiStrip, phiStripMin);
-            phiStripMax = max(phiStrip, phiStripMax);
-          }
-          nextStrip = (nextStrip > 0 ? -(1 + nextStrip) : 1 - nextStrip);
+        nextStrip = (nextStrip > 0 ? -(1 + nextStrip) : 1 - nextStrip);
+      }
+      rand = gRandom->Uniform();
+      for (n = 1; n < m_SimPar->getMaxMultiplicity(); ++n) {
+        if (m_SimPar->getZMultiplicityCDF(zStripDiv, n) > rand) break;
+      }
+      nextStrip = (zStripDiv > 0.0 ? 1 : -1);
+      while (--n > 0) {
+        zStrip += nextStrip;
+        if ((zStrip >= zMin) && (zStrip <= zMax)) {
+          zStripLower = min(zStrip, zStripLower);
+          zStripUpper = max(zStrip, zStripUpper);
         }
-        rand = gRandom->Uniform();
-        for (n = 1; n < m_SimPar->getMaxMultiplicity(); ++n) {
-          if (m_SimPar->getZMultiplicityCDF(zStripDiv, n) > rand) break;
-        }
-        nextStrip = (zStripDiv > 0.0 ? 1 : -1);
-        while (--n > 0) {
-          zStrip += nextStrip;
-          if ((zStrip >= pModule->getZStripMin()) && (zStrip <= pModule->getZStripMax())) {
-            zStripMin = min(zStrip, zStripMin);
-            zStripMax = max(zStrip, zStripMax);
-          }
-          nextStrip = (nextStrip > 0 ? -(1 + nextStrip) : 1 - nextStrip);
-        }
+        nextStrip = (nextStrip > 0 ? -(1 + nextStrip) : 1 - nextStrip);
       }
       return;
     }

@@ -45,11 +45,9 @@
         <PhiStrips>
           <NStrips>36</NStrips>
           <Width unit="cm">4.45</Width>
-          <Length unit="cm">216.9</Length>
         </PhiStrips>
         <ZStrips>
           <Width unit="cm">4.52</Width>
-          <Length unit="cm">151.4</Length>
         </ZStrips>
         <PhiScintillators>
           <NScints>37</NScints>
@@ -64,11 +62,9 @@
         <PhiStrips>
           <NStrips>36</NStrips>
           <Width unit="cm">4.69</Width>
-          <Length unit="cm">216.9</Length>
         </PhiStrips>
         <ZStrips>
           <Width unit="cm">4.52</Width>
-          <Length unit="cm">168.8</Length>
         </ZStrips>
         <PhiScintillators>
           <NScints>42</NScints>
@@ -143,11 +139,9 @@
         <PhiStrips>
           <NStrips>36</NStrips>
           <Width unit="cm">4.90</Width>
-          <Length unit="cm">216.9</Length>
         </PhiStrips>
         <ZStrips>
           <Width unit="cm">4.52</Width>
-          <Length unit="cm">176.4</Length>
         </ZStrips>
       </Layer>
       <Layer layer="4">
@@ -155,11 +149,9 @@
         <PhiStrips>
           <NStrips>36</NStrips>
           <Width unit="cm">5.11</Width>
-          <Length unit="cm">216.9</Length>
         </PhiStrips>
         <ZStrips>
           <Width unit="cm">4.52</Width>
-          <Length unit="cm">183.9</Length>
         </ZStrips>
       </Layer>
       <Layer layer="5">
@@ -167,11 +159,9 @@
         <PhiStrips>
           <NStrips>36</NStrips>
           <Width unit="cm">5.32</Width>
-          <Length unit="cm">216.9</Length>
         </PhiStrips>
         <ZStrips>
           <Width unit="cm">4.52</Width>
-          <Length unit="cm">191.4</Length>
         </ZStrips>
       </Layer>
       <Layer layer="6">
@@ -179,11 +169,9 @@
         <PhiStrips>
           <NStrips>36</NStrips>
           <Width unit="cm">5.53</Width>
-          <Length unit="cm">216.9</Length>
         </PhiStrips>
         <ZStrips>
           <Width unit="cm">4.52</Width>
-          <Length unit="cm">199.0</Length>
         </ZStrips>
       </Layer>
       <Layer layer="7">
@@ -191,11 +179,9 @@
         <PhiStrips>
           <NStrips>48</NStrips>
           <Width unit="cm">4.30</Width>
-          <Length unit="cm">216.9</Length>
         </PhiStrips>
         <ZStrips>
           <Width unit="cm">4.52</Width>
-          <Length unit="cm">206.5</Length>
         </ZStrips>
       </Layer>
       <Layer layer="8">
@@ -203,11 +189,9 @@
         <PhiStrips>
           <NStrips>48</NStrips>
           <Width unit="cm">4.46</Width>
-          <Length unit="cm">216.9</Length>
         </PhiStrips>
         <ZStrips>
           <Width unit="cm">4.52</Width>
-          <Length unit="cm">214.1</Length>
         </ZStrips>
       </Layer>
       <Layer layer="9">
@@ -215,11 +199,9 @@
         <PhiStrips>
           <NStrips>48</NStrips>
           <Width unit="cm">4.62</Width>
-          <Length unit="cm">216.9</Length>
         </PhiStrips>
         <ZStrips>
           <Width unit="cm">4.52</Width>
-          <Length unit="cm">221.6</Length>
         </ZStrips>
       </Layer>
       <Layer layer="10">
@@ -227,11 +209,9 @@
         <PhiStrips>
           <NStrips>48</NStrips>
           <Width unit="cm">4.77</Width>
-          <Length unit="cm">216.9</Length>
         </PhiStrips>
         <ZStrips>
           <Width unit="cm">4.52</Width>
-          <Length unit="cm">229.1</Length>
         </ZStrips>
       </Layer>
       <Layer layer="11">
@@ -239,11 +219,9 @@
         <PhiStrips>
           <NStrips>48</NStrips>
           <Width unit="cm">4.93</Width>
-          <Length unit="cm">216.9</Length>
         </PhiStrips>
         <ZStrips>
           <Width unit="cm">4.52</Width>
-          <Length unit="cm">236.7</Length>
         </ZStrips>
       </Layer>
       <Layer layer="12">
@@ -251,11 +229,9 @@
         <PhiStrips>
           <NStrips>48</NStrips>
           <Width unit="cm">5.09</Width>
-          <Length unit="cm">216.9</Length>
         </PhiStrips>
         <ZStrips>
           <Width unit="cm">4.52</Width>
-          <Length unit="cm">244.2</Length>
         </ZStrips>
       </Layer>
       <Layer layer="13">
@@ -263,11 +239,9 @@
         <PhiStrips>
           <NStrips>48</NStrips>
           <Width unit="cm">5.25</Width>
-          <Length unit="cm">216.9</Length>
         </PhiStrips>
         <ZStrips>
           <Width unit="cm">4.52</Width>
-          <Length unit="cm">251.8</Length>
         </ZStrips>
       </Layer>
       <Layer layer="14">
@@ -275,11 +249,9 @@
         <PhiStrips>
           <NStrips>48</NStrips>
           <Width unit="cm">5.40</Width>
-          <Length unit="cm">216.9</Length>
         </PhiStrips>
         <ZStrips>
           <Width unit="cm">4.52</Width>
-          <Length unit="cm">259.3</Length>
         </ZStrips>
       </Layer>
       <Layer layer="15">
@@ -287,11 +259,9 @@
         <PhiStrips>
           <NStrips>48</NStrips>
           <Width unit="cm">5.56</Width>
-          <Length unit="cm">216.9</Length>
         </PhiStrips>
         <ZStrips>
           <Width unit="cm">4.52</Width>
-          <Length unit="cm">266.9</Length>
         </ZStrips>
       </Layer>
     </Layers>
@@ -2081,7 +2051,6 @@
       <FrameWidth unit="cm">1.25</FrameWidth>
       <FrameThickness unit="cm">0.3</FrameThickness>
       <SpacerWidth unit="cm">0.6</SpacerWidth>
-      <ElectrodeBorder unit="cm">1.0</ElectrodeBorder>
       <PolystyreneInnerHeight unit="cm">0.635</PolystyreneInnerHeight>
       <PolystyreneOuterHeight unit="cm">0.47625</PolystyreneOuterHeight>
       <Scintillator>

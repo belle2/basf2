@@ -674,11 +674,40 @@ namespace Belle2 {
                             logicalName(moduleBox)
                            );
       moduleLogical->SetVisAttributes(G4VisAttributes(false));
+      sprintf(name, "BKLM.Layer%02d%sModuleInteriorSolid1", layer, (hasChimney ? "Chimney" : ""));
+      const Hep3Vector interiorHalfSize1 = m_GeoPar->getModuleInteriorHalfSize1(layer, hasChimney) * cm;
+      G4Box* interiorBox1 =
+        new G4Box(name,
+                  interiorHalfSize1.x(), interiorHalfSize1.y(), interiorHalfSize1.z()
+                 );
+      sprintf(name, "BKLM.Layer%02d%sModuleInteriorSolid2", layer, (hasChimney ? "Chimney" : ""));
+      const Hep3Vector interiorHalfSize2 = m_GeoPar->getModuleInteriorHalfSize2(layer, hasChimney) * cm;
+      G4Box* interiorBox2 =
+        new G4Box(name,
+                  interiorHalfSize2.x(), interiorHalfSize2.y(), interiorHalfSize2.z()
+                 );
+      sprintf(name, "BKLM.Layer%02d%sModuleInteriorSolid", layer, (hasChimney ? "Chimney" : ""));
+      G4UnionSolid* interiorUnion =
+        new G4UnionSolid(name, interiorBox1, interiorBox2);
+      G4LogicalVolume* interiorLogical =
+        new G4LogicalVolume(interiorUnion,
+                            Materials::get((m_GeoPar->hasRPCs(layer) ? "RPCReadout" : "G4_POLYSTYRENE")),
+                            logicalName(interiorUnion)
+                           );
+      interiorLogical->SetVisAttributes(G4VisAttributes(false));
       if (m_GeoPar->hasRPCs(layer)) {
-        putRPCsInModule(moduleLogical, layer, hasChimney);
+        putRPCsInInterior(interiorLogical, layer, hasChimney);
       } else {
-        putScintsInModule(moduleLogical, module, layer, hasChimney);
+        putScintsInInterior(interiorLogical, module, layer, hasChimney);
       }
+      new G4PVPlacement(G4TranslateZ3D(0.0),
+                        interiorLogical,
+                        physicalName(interiorLogical),
+                        moduleLogical,
+                        false,
+                        0,
+                        m_GeoPar->doOverlapCheck()
+                       );
       double dx = (m_GeoPar->getModuleMiddleRadius(layer) - m_GeoPar->getGapMiddleRadius(layer)) * cm;
       double dz = moduleHalfSize.z() - gapHalfSize.z();
       new G4PVPlacement(G4Translate3D(dx, 0.0, dz),
@@ -700,23 +729,10 @@ namespace Belle2 {
                        );
     }
 
-    void GeoBKLMCreator::putRPCsInModule(G4LogicalVolume* moduleLogical, int layer, bool hasChimney)
+    void GeoBKLMCreator::putRPCsInInterior(G4LogicalVolume* interiorLogical, int layer, bool hasChimney)
     {
       char name[80] = "";
-      // Place readout inside aluminum frame
-      sprintf(name, "BKLM.Layer%02d%sReadoutSolid", layer, (hasChimney ? "Chimney" : ""));
-      const Hep3Vector readoutHalfSize = m_GeoPar->getReadoutHalfSize(layer, hasChimney) * cm;
-      G4Box* readoutBox =
-        new G4Box(name,
-                  readoutHalfSize.x(), readoutHalfSize.y(), readoutHalfSize.z()
-                 );
-      G4LogicalVolume* readoutLogical =
-        new G4LogicalVolume(readoutBox,
-                            Materials::get("RPCReadout"),
-                            logicalName(readoutBox)
-                           );
-      readoutLogical->SetVisAttributes(G4VisAttributes(false));
-      // Place electrode inside readout
+      // Place electrode inside the module's interior
       sprintf(name, "BKLM.Layer%02d%sElectrodeSolid", layer, (hasChimney ? "Chimney" : ""));
       const Hep3Vector electrodeHalfSize = m_GeoPar->getElectrodeHalfSize(layer, hasChimney) * cm;
       G4Box* electrodeBox =
@@ -766,45 +782,16 @@ namespace Belle2 {
       new G4PVPlacement(G4TranslateZ3D(0.0),
                         electrodeLogical,
                         physicalName(electrodeLogical),
-                        readoutLogical,
-                        false,
-                        1,
-                        m_GeoPar->doOverlapCheck()
-                       );
-      new G4PVPlacement(G4TranslateZ3D(0.0),
-                        readoutLogical,
-                        physicalName(readoutLogical),
-                        moduleLogical,
+                        interiorLogical,
                         false,
                         1,
                         m_GeoPar->doOverlapCheck()
                        );
     }
 
-    void GeoBKLMCreator::putScintsInModule(G4LogicalVolume* moduleLogical, const Module* module, int layer, bool hasChimney)
+    void GeoBKLMCreator::putScintsInInterior(G4LogicalVolume* interiorLogical, const Module* module, int layer, bool hasChimney)
     {
       char name[80] = "";
-      sprintf(name, "BKLM.Layer%02d%sPolystyreneSolid1", layer, (hasChimney ? "Chimney" : ""));
-      const Hep3Vector polystyreneHalfSize1 = m_GeoPar->getPolystyreneHalfSize1(layer, hasChimney) * cm;
-      G4Box* polystyreneBox1 =
-        new G4Box(name,
-                  polystyreneHalfSize1.x(), polystyreneHalfSize1.y(), polystyreneHalfSize1.z()
-                 );
-      sprintf(name, "BKLM.Layer%02d%sPolystyreneSolid2", layer, (hasChimney ? "Chimney" : ""));
-      const Hep3Vector polystyreneHalfSize2 = m_GeoPar->getPolystyreneHalfSize2(layer, hasChimney) * cm;
-      G4Box* polystyreneBox2 =
-        new G4Box(name,
-                  polystyreneHalfSize2.x(), polystyreneHalfSize2.y(), polystyreneHalfSize2.z()
-                 );
-      sprintf(name, "BKLM.Layer%02d%sPolystyreneSolid", layer, (hasChimney ? "Chimney" : ""));
-      G4UnionSolid* polystyreneUnion =
-        new G4UnionSolid(name, polystyreneBox1, polystyreneBox2);
-      G4LogicalVolume* polystyreneLogical =
-        new G4LogicalVolume(polystyreneUnion,
-                            Materials::get("G4_POLYSTYRENE"),
-                            logicalName(polystyreneUnion)
-                           );
-      polystyreneLogical->SetVisAttributes(G4VisAttributes(false));
       sprintf(name, "BKLM.Layer%02d%sAirSolid", layer, (hasChimney ? "Chimney" : ""));
       const Hep3Vector airHalfSize = m_GeoPar->getAirHalfSize(layer, hasChimney) * cm;
       G4Box* airBox =
@@ -866,8 +853,8 @@ namespace Belle2 {
                           m_GeoPar->doOverlapCheck()
                          );
       }
-      Hep3Vector scintEnvelopeOffset = m_GeoPar->getScintEnvelopeOffset(layer, hasChimney) * cm;
-      new G4PVPlacement(G4Translate3D(-scintEnvelopeHalfSize.x(), scintEnvelopeOffset.y(), scintEnvelopeOffset.z()),
+      Hep3Vector envelopeOffset = m_GeoPar->getScintEnvelopeOffset(layer, hasChimney) * cm;
+      new G4PVPlacement(G4Translate3D(-scintEnvelopeHalfSize.x(), envelopeOffset.y(), envelopeOffset.z()),
                         innerEnvelopeLogical,
                         physicalName(innerEnvelopeLogical),
                         airLogical,
@@ -875,7 +862,7 @@ namespace Belle2 {
                         BKLM_INNER,
                         m_GeoPar->doOverlapCheck()
                        );
-      new G4PVPlacement(G4Translate3D(+scintEnvelopeHalfSize.x(), scintEnvelopeOffset.y(), scintEnvelopeOffset.z()),
+      new G4PVPlacement(G4Translate3D(+scintEnvelopeHalfSize.x(), envelopeOffset.y(), envelopeOffset.z()),
                         outerEnvelopeLogical,
                         physicalName(outerEnvelopeLogical),
                         airLogical,
@@ -883,20 +870,12 @@ namespace Belle2 {
                         BKLM_OUTER,
                         m_GeoPar->doOverlapCheck()
                        );
-      new G4PVPlacement(G4TranslateX3D(m_GeoPar->getAirOffsetX() * cm),
+      new G4PVPlacement(G4TranslateX3D(m_GeoPar->getPolystyreneOffsetX() * cm),
                         airLogical,
                         physicalName(airLogical),
-                        polystyreneLogical,
+                        interiorLogical,
                         false,
                         1,
-                        m_GeoPar->doOverlapCheck()
-                       );
-      new G4PVPlacement(G4TranslateZ3D(0.0),
-                        polystyreneLogical,
-                        physicalName(polystyreneLogical),
-                        moduleLogical,
-                        false,
-                        0,
                         m_GeoPar->doOverlapCheck()
                        );
     }

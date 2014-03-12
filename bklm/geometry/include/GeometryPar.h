@@ -65,8 +65,11 @@ namespace Belle2 {
       //! Get the size (dx,dy,dz) of the detector module of specified layer
       const CLHEP::Hep3Vector getModuleHalfSize(int layer, bool hasChimney) const;
 
-      //! Get the size (dx,dy,dz) of the detector module's readout of specified layer
-      const CLHEP::Hep3Vector getReadoutHalfSize(int layer, bool hasChimney) const;
+      //! Get the size (dx,dy,dz) of the detector module's interior volume 1
+      const CLHEP::Hep3Vector getModuleInteriorHalfSize1(int layer, bool hasChimney) const;
+
+      //! Get the size (dx,dy,dz) of the scintillator detector module's polystyrene filler
+      const CLHEP::Hep3Vector getModuleInteriorHalfSize2(int layer, bool hasChimney) const;
 
       //! Get the size (dx,dy,dz) of the detector module's electrode of specified layer
       const CLHEP::Hep3Vector getElectrodeHalfSize(int layer, bool hasChimney) const;
@@ -74,23 +77,17 @@ namespace Belle2 {
       //! Get the size (dx,dy,dz) of the detector module's gas gaps of specified layer
       const CLHEP::Hep3Vector getGasHalfSize(int layer, bool hasChimney) const;
 
-      //! Get the size (dx,dy,dz) of the scintillator detector module's polystyrene filler
-      const CLHEP::Hep3Vector getPolystyreneHalfSize1(int layer, bool hasChimney) const;
-
-      //! Get the size (dx,dy,dz) of the scintillator detector module's polystyrene filler
-      const CLHEP::Hep3Vector getPolystyreneHalfSize2(int layer, bool hasChimney) const;
-
       //! Get the size (dx,dy,dz) of the scintillator detector module's air filler
       const CLHEP::Hep3Vector getAirHalfSize(int layer, bool hasChimney) const;
 
       //! Get the size (dx,dy,dz) of the scintillator detector module's scintillator envelope
       const CLHEP::Hep3Vector getScintEnvelopeHalfSize(int layer, bool hasChimney) const;
 
-      //! Get the offset of the scintillator detector module's scintillator envelope
+      //! Get the shift (dx,dy,dz) of the scintillator detector module's scintillator envelope within its enclosure
       const CLHEP::Hep3Vector getScintEnvelopeOffset(int layer, bool hasChimney) const;
 
-      //! Get the radial offset of the scintillator detector module's air envelope
-      double getAirOffsetX(void) const;
+      //! Get the radial offset of the scintillator detector module's active envelope due to difference in polystyrene-sheet thicknesses
+      double getPolystyreneOffsetX(void) const;
 
       //! Get the height of the active volume of a scintillator strip
       double getScintHalfHeight(void) const { return 0.5 * m_ScintHeight - m_ScintTiO2ThicknessTop; }
@@ -109,6 +106,9 @@ namespace Belle2 {
 
       //! Get the radial midpoint of the detector module of specified layer
       double getModuleMiddleRadius(int layer) const;
+
+      //! Get the radial midpoint of the detector module's active volume of specified layer
+      double getActiveMiddleRadius(int layer) const;
 
       //! Get the global rotation angle about z of the entire BKLM
       double getRotation(void) const { return m_Rotation; }
@@ -167,20 +167,17 @@ namespace Belle2 {
       //! Get the radius of the inner tangent circle of gap 1 (next-to-innermost)
       double getGapInnerRadius(void) const { return m_GapInnerRadius; }
 
-      //! Get the number of z-measuring cathode strips or scintillators
+      //! Get the number of z-measuring cathode strips in an RPC module
       int getNZStrips(bool isChimney) const { return (isChimney ? m_NZStripsChimney : m_NZStrips); }
 
-      //! Get the number of phi-measuring cathode strips or scintillators
+      //! Get the number of phi-measuring cathode strips in an RPC module
       int getNPhiStrips(int layer) const;
 
       //! Get the number of z-measuring scintillators in a scintillator module
       int getNZScints(bool isChimney) const { return (isChimney ? m_NZScintsChimney : m_NZScints); }
 
       //! Get the number of phi-measuring scintillators in a scintillator module
-      int getNPhiScints(int layer) const { return getNPhiStrips(layer); }
-
-      //! Get the offset of the scintillator envelope within a scintillator module
-      const CLHEP::Hep3Vector getScintOffset(int layer, bool isChimney) const;
+      int getNPhiScints(int layer) const;
 
       //! Get the length along z of the module
       double getModuleLength(void) const { return m_ModuleLength; }
@@ -290,11 +287,8 @@ namespace Belle2 {
       //! Get the pointer to the definition of a module
       const Module* findModule(bool isForward, int sector, int layer) const;
 
-      //! Get the pointer to the definition of a module in forward sector #1
-      const Module* findModule(int layer) const;
-
-      //! Print all sector and module definitions
-      void printTree(void) const;
+      //! Get the pointer to the definition of a module
+      const Module* findModule(int layer, bool hasChimney) const;
 
     private:
 
@@ -382,6 +376,12 @@ namespace Belle2 {
       //! radius of the inner tangent circle of virtual gap 0 (assuming equal-height layers)
       double m_GapInnerRadius;
 
+      //! Number of phi-readout RPC strips in each layer
+      int m_NPhiStrips[NLAYER + 1];
+
+      //! Number of phi-readout scintillators in each layer
+      int m_NPhiScints[NLAYER + 1];
+
       //! number of z-measuring cathode strips in a standard RPC module
       int m_NZStrips;
 
@@ -393,6 +393,12 @@ namespace Belle2 {
 
       //! number of z-measuring scintillators in a chimney-sector scintillator module
       int m_NZScintsChimney;
+
+      //! Sign (+/-1) of scintillator envelope's shift along phi axis within its enclosing module
+      double m_PhiScintsOffsetSign[NLAYER + 1];
+
+      //! Sign (+/-1) of scintillator envelope's shift along z axis within its enclosing module
+      double m_ZScintsOffsetSign[NLAYER + 1];
 
       //! length along z of the module
       double m_ModuleLength;
@@ -534,6 +540,9 @@ namespace Belle2 {
 
       //! angular width of the innermost-module support plate's bracket's cutout
       double m_BracketCutoutDphi;
+
+      //! Flag to indicate whether layer contains RPCs (true) or scintillators (false)
+      bool m_HasRPCs[NLAYER + 1];
 
       //! map of <volumeIDs, pointers to defined modules>
       std::map<int, Module*> m_Modules;

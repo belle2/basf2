@@ -22,32 +22,6 @@ BKLMDigit::BKLMDigit() : RelationsObject()
 {
 }
 
-//! Constructor with initial values for an RPC or scint hit
-//BKLMDigit::BKLMDigit(unsigned int status, int pdg, bool isForward, int sector,
-//                     int layer, bool isPhiReadout, int strip, int moduleID,
-//                     const TVector3& globalPosition, const TVector3& localPosition,
-//                     double time, double eDep) :
-//  RelationsObject(),
-//  m_Status(status),
-//  m_PDG(pdg),
-//  m_IsForward(isForward),
-//  m_Sector(sector),
-//  m_Layer(layer),
-//  m_IsPhiReadout(isPhiReadout),
-//  m_Strip(strip),
-//  m_ModuleID(moduleID),
-//  m_SimGlobalPosition(globalPosition),
-//  m_SimLocalPosition(localPosition),
-//  m_SimTime(time),
-//  m_Time(0.0),
-//  m_SimEDep(eDep),
-//  m_EDep(0.0),
-//  m_SimNPixel(0),
-//  m_NPixel(0.0),
-//  m_FitStatus(0)
-//{
-//}
-
 //! Constructor with initial values for an RPC hit
 BKLMDigit::BKLMDigit(const BKLMSimHit* simHit, int strip) :
   RelationsObject(),
@@ -62,9 +36,9 @@ BKLMDigit::BKLMDigit(const BKLMSimHit* simHit, int strip) :
   m_SimGlobalPosition(simHit->getGlobalPosition()),
   m_SimLocalPosition(simHit->getLocalPosition()),
   m_SimTime(simHit->getTime()),
-  m_Time(0.0),
+  m_Time(m_SimTime),
   m_SimEDep(simHit->getEDep()),
-  m_EDep(0.0),
+  m_EDep(m_SimEDep),
   m_SimNPixel(0),
   m_NPixel(0.0),
   m_FitStatus(0)
@@ -85,9 +59,9 @@ BKLMDigit::BKLMDigit(const BKLMSimHit* simHit) :
   m_SimGlobalPosition(simHit->getGlobalPosition()),
   m_SimLocalPosition(simHit->getLocalPosition()),
   m_SimTime(simHit->getTime()),
-  m_Time(0.0),
+  m_Time(m_SimTime),
   m_SimEDep(simHit->getEDep()),
-  m_EDep(0.0),
+  m_EDep(m_SimEDep),
   m_SimNPixel(0),
   m_NPixel(0.0),
   m_FitStatus(0)

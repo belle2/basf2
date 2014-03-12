@@ -79,11 +79,11 @@ namespace Belle2 {
       //! Put the module (and enclosing air gap) into each layer
       void putModuleInLayer(G4LogicalVolume*, const Module*, int, bool);
 
-      //! Put the RPCs into each detector module (which is in an air gap)
-      void putRPCsInModule(G4LogicalVolume*, int, bool);
+      //! Put the RPCs into each detector module's interior (module is itself in an air gap)
+      void putRPCsInInterior(G4LogicalVolume*, int, bool);
 
-      //! Put the scintillators into each detector module (which is in an air gap)
-      void putScintsInModule(G4LogicalVolume*, const Module*, int, bool);
+      //! Put the scintillators into each detector module's interior (module is itself in an air gap)
+      void putScintsInInterior(G4LogicalVolume*, const Module*, int, bool);
 
       //! get pointer to sector logical volume
       G4LogicalVolume* getSectorLogical(int, bool, bool);

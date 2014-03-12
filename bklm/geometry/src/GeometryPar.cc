@@ -106,7 +106,6 @@ namespace Belle2 {
       m_ModuleFrameWidth = content.getLength("Module/FrameWidth");
       m_ModuleFrameThickness = content.getLength("Module/FrameThickness");
       m_ModuleGasSpacerWidth = content.getLength("Module/SpacerWidth");
-      m_ModuleElectrodeBorder = content.getLength("Module/ElectrodeBorder");
       m_ModulePolystyreneInnerHeight = content.getLength("Module/PolystyreneInnerHeight");
       m_ModulePolystyreneOuterHeight = content.getLength("Module/PolystyreneOuterHeight");
       m_ScintWidth = content.getLength("Module/Scintillator/Width");
@@ -145,14 +144,13 @@ namespace Belle2 {
       m_BracketInset = content.getLength("BracketInset");
       m_BracketCutoutDphi = content.getAngle("BracketCutoutDphi");
 
-      Hep3Vector rSector(m_GapInnerRadius + 0.5 * m_GapNominalHeight, 0.0, 0.0);
       char name[40] = { '\0' };
       for (int fb = 1; fb <= 2; ++fb) {
         bool isForward = (fb == 1);
-        double dzRPC = (isForward ? m_ModuleElectrodeBorder : -m_ModuleElectrodeBorder);
         for (int sector = 1; sector <= m_NSector; ++sector) {
-          int nZStrips = ((!isForward) && (sector == 3) ? m_NZStripsChimney : m_NZStrips);
-          int nZScints = ((!isForward) && (sector == 3) ? m_NZScintsChimney : m_NZScints);
+          bool hasChimney = (!isForward) && (sector == 3);
+          int nZStrips = (hasChimney ? m_NZStripsChimney : m_NZStrips);
+          int nZScints = (hasChimney ? m_NZScintsChimney : m_NZScints);
           sprintf(name, "/Sectors/%s/Sector[@sector=\"%d\"]", (isForward ? "Forward" : "Backward"), sector);
           GearDir sectorContent(content);
           sectorContent.append(name);
@@ -163,59 +161,51 @@ namespace Belle2 {
             GearDir layerContent(sectorContent);
             sprintf(name, "/Layer[@layer=\"%d\"]", layer);
             layerContent.append(name);
-            Hep3Vector shift(layerContent.getLength("ReconstructionShift/X"),
-                             layerContent.getLength("ReconstructionShift/Y"),
-                             layerContent.getLength("ReconstructionShift/Z"));
-            double dr = (layer == 1 ? (m_GapNominalHeight - m_Gap1NominalHeight) * 0.5 : (layer - 1) * m_LayerHeight);
-            int moduleID = (isForward ? 0 : MODULE_END_MASK)
-                           + ((sector - 1) << MODULE_SECTOR_BIT)
-                           + ((layer - 1) << MODULE_LAYER_BIT);
+            Hep3Vector localReconstructionShift(layerContent.getLength("ReconstructionShift/X"),
+                                                layerContent.getLength("ReconstructionShift/Y"),
+                                                layerContent.getLength("ReconstructionShift/Z"));
             sprintf(name, "/Layers/Layer[@layer=\"%d\"]", layer);
             layerContent = content;
             layerContent.append(name);
-            if (layerContent.getBool("HasRPCs")) {
-              Hep3Vector translation(0.0, 0.0, m_OffsetZ + dzRPC);
+            m_HasRPCs[layer] = layerContent.getBool("HasRPCs");
+            m_NPhiScints[layer] = layerContent.getInt("PhiScintillators/NScints", 0);
+            m_PhiScintsOffsetSign[layer] = layerContent.getInt("PhiScintillators/OffsetSign", 1.0);
+            m_ZScintsOffsetSign[layer] = layerContent.getInt("ZScintillators/OffsetSign", 1.0);
+            Hep3Vector localOrigin(getActiveMiddleRadius(layer), 0.0, m_ModuleFrameThickness);
+            int moduleID = (isForward ? 0 : MODULE_END_MASK)
+                           + ((sector - 1) << MODULE_SECTOR_BIT)
+                           + ((layer - 1) << MODULE_LAYER_BIT);
+            if (m_HasRPCs[layer]) {
               int phiStripNumber = layerContent.getInt("PhiStrips/NStrips");
-              Module* pModule = new Module(isForward, sector, layer, shift, dr,
-                                           layerContent.getLength("PhiStrips/Width"),
-                                           layerContent.getLength("PhiStrips/Length"),
-                                           phiStripNumber,
+              localOrigin.setZ(localOrigin.z() + m_ModuleGasSpacerWidth);
+              Module* pModule = new Module(layerContent.getLength("PhiStrips/Width"),
                                            (layer == 1 ? 2 : 1),
                                            (layer == 1 ? phiStripNumber - 1 : phiStripNumber),
                                            layerContent.getLength("ZStrips/Width"),
-                                           layerContent.getLength("ZStrips/Length"),
                                            nZStrips,
-                                           1,
-                                           nZStrips,
-                                           translation + rotation(rSector),
+                                           Hep3Vector(0.0, 0.0, m_OffsetZ) + rotation(localOrigin),
+                                           localReconstructionShift,
                                            rotation
                                           );
               m_Modules.insert(std::pair<int, Module*>(moduleID, pModule));
             } else {
-              Hep3Vector translation(0.0, 0.0, m_OffsetZ);
-              int    nPhiScints = layerContent.getInt("PhiScintillators/NScints");
-              double phiScintLength = nZScints * m_ScintWidth;
-              double zScintLength = nPhiScints * m_ScintWidth;
-              Module* pModule = new Module(isForward, sector, layer, shift, dr,
-                                           m_ScintWidth,
-                                           phiScintLength,
-                                           nPhiScints,
-                                           layerContent.getInt("PhiScintillators/OffsetSign"),
-                                           zScintLength,
+              localOrigin.setY(localOrigin.y() + getScintEnvelopeOffset(layer, hasChimney).y());
+              Module* pModule = new Module(m_ScintWidth,
+                                           m_NPhiScints[layer],
                                            nZScints,
-                                           layerContent.getInt("ZScintillators/OffsetSign"),
-                                           translation + rotation(rSector),
+                                           Hep3Vector(0.0, 0.0, m_OffsetZ) + rotation(localOrigin),
+                                           localReconstructionShift,
                                            rotation
                                           );
               m_Modules.insert(std::pair<int, Module*>(moduleID, pModule));
-              double base = -0.5 * (nPhiScints + 1) * m_ScintWidth;
-              for (int scint = 1; scint <= nPhiScints; ++scint) {
+              double base = -0.5 * (m_NPhiScints[layer] + 1) * m_ScintWidth;
+              for (int scint = 1; scint <= m_NPhiScints[layer]; ++scint) {
                 sprintf(name, "/PhiScintillators/Scint[@scint=\"%d\"]", scint);
                 GearDir scintContent(layerContent);
                 scintContent.append(name);
                 double dLength = scintContent.getLength("DLength", 0.0);
                 pModule->addPhiScint(scint,
-                                     phiScintLength + dLength,
+                                     nZScints * m_ScintWidth + dLength,
                                      0.5 * fabs(dLength) * scintContent.getInt("OffsetSign", 0),
                                      base + scint * m_ScintWidth
                                     );
@@ -227,7 +217,7 @@ namespace Belle2 {
                 scintContent.append(name);
                 double dLength = scintContent.getLength("DLength", 0.0);
                 pModule->addZScint(scint,
-                                   zScintLength + dLength,
+                                   m_NPhiScints[layer] * m_ScintWidth + dLength,
                                    0.5 * fabs(dLength) * scintContent.getInt("OffsetSign", 0),
                                    base + scint * m_ScintWidth
                                   );
@@ -255,7 +245,7 @@ namespace Belle2 {
       return getLayerInnerRadius(layer + 1);
     }
 
-    const Hep3Vector GeometryPar::getGapHalfSize(int layer, bool flag) const
+    const Hep3Vector GeometryPar::getGapHalfSize(int layer, bool hasChimney) const
     {
       double r, ds, dx;
       if (layer == 1) {
@@ -267,91 +257,75 @@ namespace Belle2 {
         ds = m_GapIronWidth;
         dx = 0.5 * m_GapActualHeight;
       }
-      double dz = 0.5 * (flag ? m_GapLength - m_ChimneyLength : m_GapLength);
+      double dz = 0.5 * (hasChimney ? m_GapLength - m_ChimneyLength : m_GapLength);
       return Hep3Vector(dx, r * tan(M_PI / m_NSector) - ds, dz);
 
     }
 
-    const Hep3Vector GeometryPar::getModuleHalfSize(int layer, bool flag) const
+    const Hep3Vector GeometryPar::getModuleHalfSize(int layer, bool hasChimney) const
     {
-      Hep3Vector size = getGapHalfSize(layer, flag);
+      Hep3Vector size = getGapHalfSize(layer, hasChimney);
       size.setX(0.5 * m_ModuleHeight);
-      size.setZ(0.5 * (flag ? m_ModuleLengthChimney : m_ModuleLength));
+      size.setZ(0.5 * (hasChimney ? m_ModuleLengthChimney : m_ModuleLength));
       return size;
     }
 
-    const Hep3Vector GeometryPar::getReadoutHalfSize(int layer, bool flag) const
+    const Hep3Vector GeometryPar::getModuleInteriorHalfSize1(int layer, bool hasChimney) const
     {
-      Hep3Vector size = getModuleHalfSize(layer, flag);
+      Hep3Vector size = getModuleHalfSize(layer, hasChimney);
       size.setX(m_ModuleReadoutHeight + 2.0 * m_ModuleGlassHeight + m_ModuleGasHeight);
       size.setY(size.y() - m_ModuleFrameWidth);
       size.setZ(size.z() - m_ModuleFrameWidth);
       return size;
     }
 
-    const Hep3Vector GeometryPar::getElectrodeHalfSize(int layer, bool flag) const
+    const Hep3Vector GeometryPar::getModuleInteriorHalfSize2(int layer, bool hasChimney) const
     {
-      Hep3Vector size = getReadoutHalfSize(layer, flag);
-      size.setX(2.0 * m_ModuleGlassHeight + m_ModuleGasHeight);
-      return size;
-    }
-
-    const Hep3Vector GeometryPar::getGasHalfSize(int layer, bool flag) const
-    {
-      Hep3Vector size = getElectrodeHalfSize(layer, flag);
-      size.setX(0.5 * m_ModuleGasHeight);
-      size.setY(size.y() - m_ModuleGasSpacerWidth);
-      size.setZ(size.z() - m_ModuleGasSpacerWidth);
-      return size;
-    }
-
-    const Hep3Vector GeometryPar::getPolystyreneHalfSize1(int layer, bool flag) const
-    {
-      return getReadoutHalfSize(layer, flag);
-    }
-
-    const Hep3Vector GeometryPar::getPolystyreneHalfSize2(int layer, bool flag) const
-    {
-      Hep3Vector size = getModuleHalfSize(layer, flag);
+      Hep3Vector size = getModuleHalfSize(layer, hasChimney);
       size.setX(size.x() - m_ModuleFrameThickness - m_ModuleCoverHeight);
       size.setY(size.y() - m_ModuleFrameThickness);
       size.setZ(size.z() - m_ModuleFrameThickness);
       return size;
     }
 
-    const Hep3Vector GeometryPar::getAirHalfSize(int layer, bool flag) const
+    const Hep3Vector GeometryPar::getElectrodeHalfSize(int layer, bool hasChimney) const
     {
-      Hep3Vector size = getPolystyreneHalfSize2(layer, flag);
+      Hep3Vector size = getModuleInteriorHalfSize1(layer, hasChimney);
+      size.setX(2.0 * m_ModuleGlassHeight + m_ModuleGasHeight);
+      return size;
+    }
+
+    const Hep3Vector GeometryPar::getGasHalfSize(int layer, bool hasChimney) const
+    {
+      Hep3Vector size = getElectrodeHalfSize(layer, hasChimney);
+      size.setX(0.5 * m_ModuleGasHeight);
+      size.setY(size.y() - m_ModuleGasSpacerWidth);
+      size.setZ(size.z() - m_ModuleGasSpacerWidth);
+      return size;
+    }
+
+    const Hep3Vector GeometryPar::getAirHalfSize(int layer, bool hasChimney) const
+    {
+      Hep3Vector size = getModuleInteriorHalfSize2(layer, hasChimney);
       size.setX(m_ScintHeight);
       return size;
     }
 
-    const Hep3Vector GeometryPar::getScintEnvelopeHalfSize(int layer, bool flag) const
+    const Hep3Vector GeometryPar::getScintEnvelopeHalfSize(int layer, bool hasChimney) const
     {
       return Hep3Vector(0.5 * m_ScintHeight,
                         0.5 * m_ScintWidth * getNPhiScints(layer),
-                        0.5 * m_ScintWidth * getNZScints(flag)
+                        0.5 * m_ScintWidth * getNZScints(hasChimney)
                        );
     }
 
-    int GeometryPar::getNPhiStrips(int layer) const
+    int GeometryPar::getNPhiScints(int layer) const
     {
-      const Module* module = findModule(layer);
-      if (module == NULL) return 0;
-      return module->getNStrips(true);
+      if ((layer <= 0) || (layer > m_NLayer)) return 0;
+      return m_NPhiScints[layer];
     }
 
-    const Hep3Vector GeometryPar::getScintEnvelopeOffset(int layer, bool flag) const
-    {
-      Hep3Vector airSize = getAirHalfSize(layer, flag);
-      Hep3Vector scintEnvelopeSize = getScintEnvelopeHalfSize(layer, flag);
-      Hep3Vector offset = airSize - scintEnvelopeSize;
-      offset.setY(offset.y() * findModule(layer)->getPhiOffsetSign());
-      offset.setZ(offset.z() * findModule(layer)->getZOffsetSign());
-      return offset;
-    }
-
-    double GeometryPar::getAirOffsetX(void) const
+    double GeometryPar::getPolystyreneOffsetX(void) const
     {
       return 0.5 * (m_ModulePolystyreneInnerHeight - m_ModulePolystyreneOuterHeight);
     }
@@ -372,6 +346,23 @@ namespace Belle2 {
       return m_GapInnerRadius + 0.5 * m_GapNominalHeight + m_LayerHeight * (layer - 1);
     }
 
+    double GeometryPar::getActiveMiddleRadius(int layer) const
+    {
+      double r = getModuleMiddleRadius(layer);
+      if (hasRPCs(layer)) r += getPolystyreneOffsetX();
+      return r;
+    }
+
+    const Hep3Vector GeometryPar::getScintEnvelopeOffset(int layer, bool hasChimney) const
+    {
+      Hep3Vector airHalfSize = getAirHalfSize(layer, hasChimney);
+      Hep3Vector envelopeHalfSize = getScintEnvelopeHalfSize(layer, hasChimney);
+      Hep3Vector offset((airHalfSize.x() - envelopeHalfSize.x()),
+                        (airHalfSize.y() - envelopeHalfSize.y()) * m_PhiScintsOffsetSign[layer],
+                        (airHalfSize.z() - envelopeHalfSize.z()) * m_ZScintsOffsetSign[layer]);
+      return offset;
+    }
+
     const Hep3Vector GeometryPar::getChimneyHalfSize(int layer) const
     {
       return Hep3Vector(0.5 * (getLayerOuterRadius(layer) - getLayerInnerRadius(layer)),
@@ -386,12 +377,12 @@ namespace Belle2 {
                         0.5 * (m_GapLength - m_ChimneyLength - m_ChimneyCoverThickness));
     }
 
-    const Hep3Vector GeometryPar::getSupportPlateHalfSize(bool flag) const
+    const Hep3Vector GeometryPar::getSupportPlateHalfSize(bool hasChimney) const
     {
       Hep3Vector size;
       size.setX(0.5 * m_SupportPlateHeight);
       size.setY(0.5 * m_SupportPlateWidth);
-      if (flag) {
+      if (hasChimney) {
         size.setZ(0.5 * m_SupportPlateLengthChimney);
       } else {
         size.setZ(0.5 * m_SupportPlateLength);
@@ -399,11 +390,11 @@ namespace Belle2 {
       return size;
     }
 
-    double GeometryPar::getBracketZPosition(int bracket, bool flag) const
+    double GeometryPar::getBracketZPosition(int bracket, bool hasChimney) const
     {
       double z = m_BracketInset - 0.5 * m_GapLength;
       if (bracket == 0) return z;
-      if (flag) {
+      if (hasChimney) {
         return m_SupportPlateLengthChimney - m_GapLength - z;
       } else {
         return (bracket == 1 ? 0.0 : -z);
@@ -412,9 +403,8 @@ namespace Belle2 {
 
     bool GeometryPar::hasRPCs(int layer) const
     {
-      const Module* module = findModule(layer);
-      if (module == NULL) return false;
-      return module->hasRPCs();
+      if ((layer <= 0) || (layer > m_NLayer)) return false;
+      return m_HasRPCs[layer];
     }
 
     const Module* GeometryPar::findModule(bool isForward, int sector, int layer) const
@@ -423,16 +413,18 @@ namespace Belle2 {
                      + ((sector - 1) << MODULE_SECTOR_BIT)
                      + ((layer - 1) << MODULE_LAYER_BIT);
       map<int, Module*>::const_iterator iM = m_Modules.find(moduleID);
-      if (iM == m_Modules.end()) return NULL;
-      return iM->second;
+      return (iM == m_Modules.end() ? NULL : iM->second);
     }
 
-    const Module* GeometryPar::findModule(int layer) const
+    const Module* GeometryPar::findModule(int layer, bool hasChimney) const
     {
       int moduleID = ((layer - 1) << MODULE_LAYER_BIT);
+      if (hasChimney) {
+        // Chimney module is in backward sector 3
+        moduleID += MODULE_END_MASK + ((3 - 1) << MODULE_SECTOR_BIT);
+      }
       map<int, Module*>::const_iterator iM = m_Modules.find(moduleID);
-      if (iM == m_Modules.end()) return NULL;
-      return iM->second;
+      return (iM == m_Modules.end() ? NULL : iM->second);
     }
 
 

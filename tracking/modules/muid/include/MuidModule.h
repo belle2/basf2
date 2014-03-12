@@ -38,8 +38,6 @@ namespace Belle2 {
 
   class Muid;
   class MuidHit;
-  class BKLMHit2d;
-  class EKLMHit2d;
   class MuidPar;
 
   //! possible intersection of extrapolated track with a KLM layer
@@ -60,6 +58,8 @@ namespace Belle2 {
     TMatrixDSym covariance;
     //! extrapolated-track position (cm) projected to the 2D hit's midplane
     TVector3    positionAtHitPlane;
+    //! time (ns) of matching BKLMHit2d
+    double      time;
     //! chi-squared value of transverse deviation between extrapolated and measured hit positions
     double      chi2;
   };
@@ -142,7 +142,7 @@ namespace Belle2 {
     void getStartPoint(const genfit::Track*, int, G4Point3D&, G4Vector3D&, G4ErrorTrajErr&);
 
     //! Add an extrapolation point for the track
-    bool createHit(G4ErrorFreeTrajState*, int, int, StoreArray<MuidHit>&, RelationArray&, const StoreArray<BKLMHit2d>&, const StoreArray<EKLMHit2d>&);
+    bool createHit(G4ErrorFreeTrajState*, int, int, StoreArray<MuidHit>&, RelationArray&);
 
     //! Find the intersection point of the track with the crossed BKLM plane
     bool findBarrelIntersection(Point&, const TVector3&, const TVector3&);
@@ -151,10 +151,10 @@ namespace Belle2 {
     bool findEndcapIntersection(Point&, const TVector3&, const TVector3&);
 
     //! Find the matching BKLM 2D hit nearest the intersection point of the track with the crossed BKLM plane
-    bool findMatchingBarrelHit(Point&, const StoreArray<BKLMHit2d>&);
+    bool findMatchingBarrelHit(Point&);
 
     //! Find the matching EKLM 2D hit nearest the intersection point of the track with the crossed EKLM plane
-    bool findMatchingEndcapHit(Point&, const StoreArray<EKLMHit2d>&);
+    bool findMatchingEndcapHit(Point&);
 
     //! Nudge the track using the matching hit
     void adjustIntersection(Point&, const double*, const TVector3&);
@@ -220,10 +220,10 @@ namespace Belle2 {
     double m_BarrelHalfLength;
 
     //! outermost endcap layer that is active for muon identification (user-defined)
-    int m_LastActiveEndcapLayer;
+    int m_OutermostActiveEndcapLayer;
 
     //! outermost barrel layer that is active for muon identification (user-defined)
-    int m_LastActiveBarrelLayer;
+    int m_OutermostActiveBarrelLayer;
 
     //! midpoint along z (cm) of the forward endcap from the KLM midpoint
     double m_EndcapMiddleZ;
@@ -258,9 +258,6 @@ namespace Belle2 {
     //! azimuthal unit vector of each barrel sector
     TVector3 m_BarrelSectorPhi[NSECTOR + 1];
 
-    //! flag to indicate that the extrapolation left the barrel and entered the endcap
-    bool m_fromBarrelToEndcap;
-
     //! flag to indicate that the extrapolated track had been in the barrel in the prior step
     bool m_wasInBarrel;
 
@@ -289,10 +286,10 @@ namespace Belle2 {
     TVector3 m_position;
 
     //! accumulated bit pattern of layers crossed by the extrapolated track
-    int m_enteredPattern;
+    int m_extLayerPattern;
 
     //! accumulated bit pattern of layers with matching hits
-    int m_matchedPattern;
+    int m_hitLayerPattern;
 
     //! accumulated chi-squared of all in-plane transverse deviations between extrapolation and matching hit
     double m_chi2;
@@ -301,28 +298,16 @@ namespace Belle2 {
     int m_nPoint;
 
     //! outermost barrel layer crossed by the extrapolated track
-    int m_lastBarrelLayerExt;
+    int m_lastBarrelExtLayer;
 
     //! outermost barrel layer with a matching hit
-    int m_lastBarrelLayerHit;
+    int m_lastBarrelHitLayer;
 
     //! outermost endcap layer crossed by the extrapolated track
-    int m_lastEndcapLayerExt;
+    int m_lastEndcapExtLayer;
 
     //! outermost endcap layer with a matching hit
-    int m_lastEndcapLayerHit;
-
-    //! number of barrel layers crossed by the extrapolated track
-    int m_numBarrelLayerExt;
-
-    //! number of barrel layers with matching hits
-    int m_numBarrelLayerHit;
-
-    //! number of endcap layers crossed by the extrapolated track
-    int m_numEndcapLayerExt;
-
-    //! number of endcap layers with matching hits
-    int m_numEndcapLayerHit;
+    int m_lastEndcapHitLayer;
 
     //! probability density function for muon hypothesis
     MuidPar* m_muonPar;

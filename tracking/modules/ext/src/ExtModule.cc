@@ -12,6 +12,17 @@
 #include <tracking/dataobjects/ExtHit.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/RelationArray.h>
+#include <framework/gearbox/GearDir.h>
+#include <framework/logging/Logger.h>
+#include <framework/dataobjects/EventMetaData.h>
+#include <genfit/Track.h>
+#include <genfit/DetPlane.h>
+#include <genfit/FieldManager.h>
+#include <genfit/TrackPoint.h>
+#include <genfit/AbsFitterInfo.h>
 #include <genfit/Exception.h>
 #include <simulation/kernel/DetectorConstruction.h>
 #include <simulation/kernel/MagneticField.h>
@@ -35,17 +46,6 @@
 #include <CLHEP/Matrix/Vector.h>
 #include <CLHEP/Vector/ThreeVector.h>
 #include <CLHEP/Matrix/Matrix.h>
-
-#include <genfit/Track.h>
-#include <genfit/DetPlane.h>
-#include <genfit/FieldManager.h>
-#include <genfit/TrackPoint.h>
-#include <genfit/AbsFitterInfo.h>
-
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationArray.h>
-#include <framework/gearbox/GearDir.h>
-#include <framework/logging/Logger.h>
 
 #include <globals.hh>
 #include <G4PhysicalVolumeStore.hh>
@@ -193,6 +193,8 @@ void ExtModule::initialize()
 
 void ExtModule::beginRun()
 {
+  StoreObjPtr<EventMetaData> evtMetaData;
+  B2INFO("Ext::beginRun(): experiment " << evtMetaData->getExperiment() << "  run " << evtMetaData->getRun())
 }
 
 void ExtModule::event()
@@ -282,13 +284,6 @@ void ExtModule::event()
           createHit(state, EXT_ESCAPE, t, pdgCode, extHits, TrackToExtHits);
           break;
         }
-        /* DIVOT */
-        if ((track->GetPosition().perp2() > 2890000.0) || (track->GetPosition().z() < -1735.0) || (track->GetPosition().z() > 2675.0)) {
-          B2WARNING("Ext::event(): position is outside target:  (" << track->GetPosition().x() << ", " << track->GetPosition().y() << ", " << track->GetPosition().z() << ")  r = " << track->GetPosition().perp())
-          break;
-        }
-        /* END DIVOT */
-
       } // track-extrapolation "infinite" loop
 
       m_extMgr->EventTermination();

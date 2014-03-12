@@ -43,6 +43,8 @@ namespace Belle2 {
 
   void MuidPar::fillPDFs(int expNo, const char hypothesisName[])
   {
+    expNo = 0; // DIVOT ignore supplied value for now
+
     char line[128];
     sprintf(line, "/Detector/Tracking/MuidParameters/Experiment[@exp=\"%d\"]/%s/", expNo, hypothesisName);
     GearDir content(line);

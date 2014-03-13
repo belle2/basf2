@@ -25,7 +25,6 @@ Ds2SampleModule::Ds2SampleModule() : Module()
 {
   //Set module properties
   setDescription("Encode DataStore into RingBuffer");
-  setPropertyFlags(c_InitializeInProcess);
 
   addParam("RingBufferName", m_rbufname, "Name of RingBuffer",
            string("OutputRbuf"));

@@ -25,7 +25,6 @@ ElapsedTimeModule::ElapsedTimeModule() : Module()
 {
   //Set module properties
   setDescription("Encode DataStore into RingBuffer");
-  setPropertyFlags(c_InitializeInProcess);
 
   addParam("EventInterval", m_interval, "Event interval to measure time",
            100);

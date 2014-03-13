@@ -25,7 +25,6 @@ Ds2RbufModule::Ds2RbufModule() : Module()
 {
   //Set module properties
   setDescription("Encode DataStore into RingBuffer");
-  setPropertyFlags(c_InitializeInProcess);
 
   vector<string> emptyvector;
   addParam("RingBufferName", m_rbufname, "Name of RingBuffer",

@@ -25,8 +25,6 @@ DqmHistoManagerModule::DqmHistoManagerModule() : Module(), m_initmain(false), m_
 {
   // Module description
   setDescription("Module to manage histograms/Ntuples/TTrees");
-  // Flag "initialization in main process"
-  //  setPropertyFlags(c_InitializeInMain);
   setPropertyFlags(Module::c_HistogramManager);
 
   // Parameters

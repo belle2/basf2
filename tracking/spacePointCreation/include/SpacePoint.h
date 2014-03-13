@@ -35,9 +35,17 @@ namespace Belle2 {
     SpacePoint()
     {}
 
-    /** Constructor for the case of PXD or TELHits (both are PXDClusters), first parameter is reference to cluster, second is the index number of the cluster in its storeArray */
-    SpacePoint(const PXDCluster& pxdCluster, unsigned int indexNumber);
+    /** Constructor for the case of PXD or TELHits (both are PXDClusters).
+     *
+     * first parameter is reference to cluster
+     * second is the index number of the cluster in its storeArray.
+     * If there is a sensorInfo at hand, it can be passed as a third parameter
+     *  (if no sensorInfo is passed, it will be created within the constructor)
+     */
+    SpacePoint(const PXDCluster& pxdCluster, unsigned int indexNumber, const VXD::SensorInfoBase* aSensorInfo = NULL);
 
+
+// getter:
 
     /** return the position vector in global coordinates */
     const TVector3& getPosition() const { return m_position; }

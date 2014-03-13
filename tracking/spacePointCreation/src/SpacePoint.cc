@@ -16,19 +16,20 @@ using namespace Belle2;
 
 ClassImp(SpacePoint)
 
-SpacePoint::SpacePoint(const PXDCluster& pxdCluster, unsigned int indexNumber) :
+SpacePoint::SpacePoint(const PXDCluster& pxdCluster, unsigned int indexNumber, const VXD::SensorInfoBase* aSensorInfo) :
   m_vxdID(pxdCluster.getSensorID())
 {
   m_indexNumbers.push_back(indexNumber);
 
-  VxdID myID = VxdID(m_vxdID); // missing, detector type import...
+  // missing, detector type import... (distinguishing between TELescope and PXD Hits)
 
   //We need some handle to translate IDs to local and global
   // coordinates.
-  const VXD::SensorInfoBase& sensorInfoBase =
-    VXD::GeoCache::getInstance().getSensorInfo(m_vxdID);
+  if (aSensorInfo == NULL) {
+    aSensorInfo = &VXD::GeoCache::getInstance().getSensorInfo(m_vxdID);
+  }
 
-  m_position = sensorInfoBase.pointToGlobal(
+  m_position = aSensorInfo->pointToGlobal(
                  TVector3(
                    pxdCluster.getU(),
                    pxdCluster.getV(),
@@ -36,9 +37,10 @@ SpacePoint::SpacePoint(const PXDCluster& pxdCluster, unsigned int indexNumber) :
                  )
                );
 
-  //As only variances, but not the sigmas transform linearly
-  // we need to use some acrobatics.
-  TVector3 globalizedVariances = sensorInfoBase.vectorToGlobal(
+  //As only variances, but not the sigmas transform linearly,
+  // we need to use some acrobatics
+  // (and some more (abs) since we do not really transform a vector).
+  TVector3 globalizedVariances = aSensorInfo->vectorToGlobal(
                                    TVector3(
                                      pxdCluster.getUSigma() * pxdCluster.getUSigma(),
                                      pxdCluster.getVSigma() * pxdCluster.getVSigma(),
@@ -46,16 +48,17 @@ SpacePoint::SpacePoint(const PXDCluster& pxdCluster, unsigned int indexNumber) :
                                    )
                                  );
   for (int i = 0; i < 3; i++) {
-    m_positionError[i] = sqrt(globalizedVariances[i]);
+    m_positionError[i] = sqrt(abs(globalizedVariances[i]));
   }
 
   //As the 0 is in the middle of sensor in the geometry, and we want
   // to normalize all positions to numbers between [0,1],
+  // where the middle will be 0.5,
   // we need to do some calculation.
-  float halfSensorSizeU = 0.5 *  sensorInfoBase.getUSize();
-  float halfSensorSizeV = 0.5 *  sensorInfoBase.getVSize();
+  float halfSensorSizeU = 0.5 *  aSensorInfo->getUSize();
+  float halfSensorSizeV = 0.5 *  aSensorInfo->getVSize();
   float localUPosition = pxdCluster.getU() + halfSensorSizeU;
   float localVPosition = pxdCluster.getV() + halfSensorSizeV;
-  m_normalizedLocal[0] = localUPosition / sensorInfoBase.getUSize();
-  m_normalizedLocal[1] = localVPosition / sensorInfoBase.getVSize();
+  m_normalizedLocal[0] = localUPosition / aSensorInfo->getUSize();
+  m_normalizedLocal[1] = localVPosition / aSensorInfo->getVSize();
 }

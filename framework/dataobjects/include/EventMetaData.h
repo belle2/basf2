@@ -15,7 +15,7 @@
 namespace Belle2 {
   /** Store event number, run number, and experiment number.
    *
-   *  Master modules have to create an object of this type!
+   *  Master modules (which control event flow) have to create an object of this type!
    *
    *  @sa EventInfoSetterModule, EventInfoPrinterModule
    *  @author <a href="mailto:martin.heck@kit.edu?subject=EventMetaData">Martin Heck</a>
@@ -47,7 +47,7 @@ namespace Belle2 {
 
     /** Sub run Setter.
      *
-     *  @param run The number of the current sub run.
+     *  @param subrun The number of the current sub run.
      */
     void setSubrun(unsigned long subrun) {
       m_subrun = subrun;
@@ -72,8 +72,8 @@ namespace Belle2 {
     /** Marks the end of the data processing.
      *
      * Can be used by any module to safely halt event processing.
-     * After this is set on StoreObjPtr<EventMetaData> and  your event() function returns,
-     * no further modules in the path will * be called and normal cleanup will
+     * After this is set on StoreObjPtr<EventMetaData> and your event() function returns,
+     * no further modules in the path will be called and normal cleanup will
      * be done (i.e. endRun(), terminate()).
      *
      * Using this will produce a warning that your module stopped execution early,

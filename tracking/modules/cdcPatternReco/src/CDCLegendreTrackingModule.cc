@@ -18,6 +18,7 @@
 
 #include <tracking/cdcLegendreTracking/CDCLegendreTrackHit.h>
 #include <tracking/cdcLegendreTracking/CDCLegendreTrackCandidate.h>
+#include <tracking/cdcLegendreTracking/CDCLegendreTrackFitter.h>
 
 #include "genfit/TrackCand.h"
 
@@ -84,6 +85,8 @@ void CDCLegendreTrackingModule::initialize()
 
   //Initialize look-up table
   m_nbinsTheta = static_cast<int>(std::pow(2.0, m_maxLevel));
+
+  cdcLegendreTrackFitter = new CDCLegendreTrackFitter(m_nbinsTheta, m_rMax, m_rMin);
 
   m_AxialHitList.reserve(1024);
   m_StereoHitList.reserve(1024);
@@ -168,6 +171,7 @@ void CDCLegendreTrackingModule::DoSteppedTrackFinding()
 
     // if track is found and has enough hits
     else if (n_hits >= m_threshold) {
+      cdcLegendreTrackFitter->fitTrackCandidate(&candidate);
       createLegendreTrackCandidate(candidate, &hits_set);
 
       limit = n_hits * m_stepScale;
@@ -497,7 +501,7 @@ void CDCLegendreTrackingModule::MaxFastHough(
   for (int t_index = 0; t_index < 2; ++t_index) {
     for (int r_index = 0; r_index < 2; ++r_index) {
 
-      //"trick" which allows to use wider bins for higer r values (lower pt tracks)
+      //"trick" which allows to use wider bins for higher r values (lower pt tracks)
       int level_diff = 0;
       if (fabs(r[r_index] + (r[r_index + 1] - r[r_index]) / 2.) > (m_rMax / 4.)) level_diff = 3;
       else if ((fabs(r[r_index] + (r[r_index + 1] - r[r_index]) / 2.) < (m_rMax / 4.)) && (fabs(r[r_index] + (r[r_index + 1] - r[r_index]) / 2.) > (2.*m_rMax / 3.)))

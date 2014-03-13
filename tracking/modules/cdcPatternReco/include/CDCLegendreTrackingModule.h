@@ -29,6 +29,7 @@ namespace Belle2 {
   /** Forward declaration to avoid including the corresponding header file*/
   class CDCLegendreTrackHit;
   class CDCLegendreTrackCandidate;
+  class CDCLegendreTrackFitter;
 
   /** CDC tracking module, using Legendre transformation of the drift time circles.
    * This is a module, performing tracking in the CDC. It is based on the paper "Implementation of the Legendre Transform for track segment reconstruction in drift tube chambers" by T. Alexopoulus, et al. NIM A592 456-462 (2008)
@@ -84,6 +85,7 @@ namespace Belle2 {
     std::vector<CDCLegendreTrackHit*> m_AxialHitList; /**< List of the axial hits used for track finding. This is the vector, which is used for memory management! */
     std::vector<CDCLegendreTrackHit*> m_StereoHitList; /**< List of the stereo hits used for track finding. This is the vector, which is used for memory management! */
     std::list<CDCLegendreTrackCandidate*> m_trackList; /**< List of track candidates. Mainly used for memory management! */
+    CDCLegendreTrackFitter* cdcLegendreTrackFitter;
 
     int m_threshold; /**< Threshold for votes in the legendre plane, parameter of the module*/
     double m_thresholdUnique; /**< Threshold of unique TrackHits for track building*/

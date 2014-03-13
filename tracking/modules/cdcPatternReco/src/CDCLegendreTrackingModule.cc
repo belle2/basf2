@@ -424,9 +424,9 @@ void CDCLegendreTrackingModule::MaxFastHough(
   }
 
   //calculate bin borders of 2x2 bin "histogram"
-  int thetaBin[3];
+  double thetaBin[3];
   thetaBin[0] = theta_min;
-  thetaBin[1] = theta_min + (theta_max - theta_min) / 2;
+  thetaBin[1] = theta_min + (theta_max - theta_min) / 2.;
   thetaBin[2] = theta_max;
 
   double r[3];
@@ -472,6 +472,8 @@ void CDCLegendreTrackingModule::MaxFastHough(
 
   }
 
+
+
 //Processing, which bins are further investigated
   for (int t_index = 0; t_index < 2; ++t_index) {
     for (int r_index = 0; r_index < 2; ++r_index) {
@@ -483,7 +485,7 @@ void CDCLegendreTrackingModule::MaxFastHough(
         //if max level of fast Hough is reached, mark candidate and return
         if (level == m_maxLevel) {
           double theta = static_cast<double>(thetaBin[t_index]
-                                             + thetaBin[t_index + 1]) / 2 * m_PI / m_nbinsTheta;
+                                             + thetaBin[t_index + 1]) / 2. ;
 
           if (not m_reconstructCurler
               && fabs((r[r_index] + r[r_index + 1]) / 2) > m_rc)

@@ -36,7 +36,7 @@ namespace Belle2 {
   HistMakerModule::HistMakerModule() : m_truth(nullptr)
   {
     setDescription("Writes out signal and background distributions for given variables and given reconstructed ParticleLists.");
-    setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInMain);
+    setPropertyFlags(c_ParallelProcessingCertified);
 
     // Add parameters
     std::vector<std::string> defaultList;

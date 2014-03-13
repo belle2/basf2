@@ -87,7 +87,7 @@ MuidModule::MuidModule() : Module(), m_extMgr(NULL)    // no ExtManager yet
 {
   m_pdgCode.clear();
   setDescription("Identifies muons by extrapolating tracks from CDC to KLM using geant4e");
-  setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
+  setPropertyFlags(c_ParallelProcessingCertified);
   addParam("pdgCodes", m_pdgCode, "Positive-charge PDG codes for extrapolation hypotheses", m_pdgCode);
   addParam("BKLMHitsColName", m_bklmHitsColName, "Name of collection holding the reconstructed 2D hits in barrel KLM", string(""));
   addParam("EKLMHitsColName", m_eklmHitsColName, "Name of collection holding the reconstructed 2D hits in endcap KLM", string(""));

@@ -37,7 +37,7 @@ TestMapModule::TestMapModule() : Module()
 {
   //Set module properties
   setDescription("tests std::map for sectorMaps");
-  setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
+  setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("numLayers", m_PARAMnumLayers, "sets how many layers are assumed (useful value: 4-6)", int(6));
   addParam("numSensors", m_PARAMnumSensors, "sets how many sensors per layer are assumed (useful value: ~227/numLayers)", int(38));

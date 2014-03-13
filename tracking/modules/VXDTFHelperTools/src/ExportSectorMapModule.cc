@@ -48,7 +48,7 @@ ExportSectorMapModule::ExportSectorMapModule() : Module()
 {
   //Set module properties
   setDescription("imports xml-files of sectorMaps and exports RAM-friendly versions of it");
-  setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
+  setPropertyFlags(c_ParallelProcessingCertified);
 
   /// setting standard values for steering parameters
   std::vector<double> defaultConfigU; // sector sizes

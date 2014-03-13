@@ -31,7 +31,6 @@ ROISenderModule::ROISenderModule() :
 {
   //Set module properties
   setDescription("Send the ROI payload to the external ring buffer");
-  setPropertyFlags(c_InitializeInProcess);
 
   addParam("MessageQueueName", m_messageQueueName, "name of the output message queue", std::string("/roi"));
   addParam("ROIpayloadName", m_ROIpayloadName, "name of the payload of ROIs", std::string(""));

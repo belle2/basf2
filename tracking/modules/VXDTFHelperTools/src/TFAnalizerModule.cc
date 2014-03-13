@@ -71,7 +71,7 @@ TFAnalizerModule::TFAnalizerModule() : Module()
 
   //Set module properties
   setDescription("analyzes quality of cell-o-mat versus mcTrackFinder");
-  setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
+  setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("fileExportMcTracks", m_PARAMFileExportMcTracks, "export mc Trackfinder tracks into file", bool(false));
   addParam("fileExportTfTracks", m_PARAMFileExportTfTracks, "export vxd Trackfinder tracks into file", bool(false));

@@ -38,7 +38,7 @@ REG_MODULE(Vertexer)
 VertexerModule::VertexerModule() : Module()
 {
   setDescription("Wrapper module for GFRave. Will get genfit::Tracks from the dataStore and put fitted GFRaveVertices onto the dataStore.");
-  setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
+  setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("GFRaveVerbosityLevel", m_verbosity, "Integer will control the verbosity of the GFRaveFactory class", 0);
   addParam("vertexingMethod", m_method, "Select vertexing method", string("kalman-smoothing:1"));

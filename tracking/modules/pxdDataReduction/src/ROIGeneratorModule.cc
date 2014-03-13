@@ -32,7 +32,7 @@ ROIGeneratorModule::ROIGeneratorModule() : Module()
 {
   //Set module properties
   setDescription("This module is used to generate a certain number of ROIs");
-  setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
+  setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("ROIListName", m_ROIListName, "name of the list of ROIs", std::string(""));
   addParam("nROIs", m_nROIs, "number of generated ROIs", 1);

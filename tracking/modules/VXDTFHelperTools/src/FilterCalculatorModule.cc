@@ -50,7 +50,7 @@ FilterCalculatorModule::FilterCalculatorModule() : Module()
 
   //Set module properties
   setDescription("This module calculates the relations of sectors and exports sector dependent filtervalues. Size of sectors and type of filters can be set by steering file. Only one track per event, needs many events for usefull outcome.");
-  setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
+  setPropertyFlags(c_ParallelProcessingCertified);
 
   std::vector<double> defaultConfigU;
   std::vector<double> defaultConfigV;

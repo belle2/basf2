@@ -83,7 +83,7 @@ GenFitterModule::GenFitterModule() :
 
   setDescription(
     "Uses GenFit2 to fit tracks. Needs genfit::TrackCands as input and provides genfit::Tracks and Tracks as output.");
-  setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
+  setPropertyFlags(c_ParallelProcessingCertified);
 
   //input
   addParam("GFTrackCandidatesColName", m_gfTrackCandsColName,

@@ -38,7 +38,7 @@ ROIPayloadAssemblerModule::ROIPayloadAssemblerModule() : Module()
 {
   //Set module properties
   setDescription("This module assembles payload for the ROI in the correct format to be sent to the ONSEN");
-  setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
+  setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("ROIListName", m_ROIListName, "name of the list of ROIs", std::string(""));
   addParam("ROIpayloadName", m_ROIpayloadName, "name of the payload of ROIs", std::string(""));

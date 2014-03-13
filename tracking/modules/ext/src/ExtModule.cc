@@ -71,7 +71,7 @@ ExtModule::ExtModule() : Module(), m_extMgr(NULL)  // no ExtManager yet
 {
   m_pdgCode.clear();
   setDescription("Extrapolates tracks from CDC to outer detectors using geant4e");
-  setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
+  setPropertyFlags(c_ParallelProcessingCertified);
   addParam("pdgCodes", m_pdgCode, "Positive-charge PDG codes for extrapolation hypotheses", m_pdgCode);
   addParam("TracksColName", m_TracksColName, "Name of collection holding the reconstructed tracks", string("Tracks"));
   addParam("ExtHitsColName", m_extHitsColName, "Name of collection holding the ExtHits from the extrapolation", string("ExtHits"));

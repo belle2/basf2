@@ -56,7 +56,7 @@ TrackFinderMCTruthModule::TrackFinderMCTruthModule() : Module()
 {
   //Set module properties
   setDescription("Uses the MC information to create genfit::TrackCandidates for primary MCParticles and Relations between them.  Fills the created genfit::TrackCandidates with all information (start values, hit indices) needed for the fitting.");
-  setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
+  setPropertyFlags(c_ParallelProcessingCertified);
 
   //Parameter definition
   addParam("UseClusters", m_useClusters, "Set true if you want to use PXD/SVD clusters instead of PXD/SVD trueHits", bool(true));

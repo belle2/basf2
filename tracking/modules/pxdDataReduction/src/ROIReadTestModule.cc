@@ -29,8 +29,7 @@ ROIReadTestModule::ROIReadTestModule() : Module()
 {
   //Set module properties
   setDescription("check the payload produced by the ROIPayloadAssembler Module");
-  //  setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
-  setPropertyFlags(c_InitializeInProcess);
+  //  setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("outfileName", m_outfileName, "name of the output file", std::string("ROipayload.txt"));
   addParam("ROIpayloadName", m_ROIpayloadName, "name of the payload of ROIs", std::string(""));

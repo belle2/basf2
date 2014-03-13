@@ -193,8 +193,8 @@ VXDTFModule::VXDTFModule() : Module()
 
 
   //Set module properties
-  setDescription(" trackfinder for the SVD using cellular automaton techniques, kalman filter (genfit) and a hopfield network as well.");
-  setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
+  setDescription("Trackfinder for the SVD using cellular automaton techniques, kalman filter (genfit) and a hopfield network as well.");
+  setPropertyFlags(c_ParallelProcessingCertified);
 
   ///Steering parameter import
 

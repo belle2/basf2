@@ -40,7 +40,7 @@ PXDDataReductionModule::PXDDataReductionModule() : Module()
 {
   //Set module properties
   setDescription("This module performs the reduction of the PXD data output");
-  setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
+  setPropertyFlags(c_ParallelProcessingCertified);
 
 
   addParam("trackCandCollName", m_gfTrackCandsColName, " name of the input collection of track candidates", std::string(""));

@@ -16,10 +16,12 @@
 #include <vxd/geometry/SensorInfoBase.h>
 // pxd
 #include <pxd/dataobjects/PXDCluster.h>
+//svd
+#include <svd/dataobjects/SVDCluster.h>
 
-//stl
+// stl:
 #include <vector>
-
+#include <math.h>
 
 namespace Belle2 {
   /** The SpacePoint class.
@@ -30,55 +32,55 @@ namespace Belle2 {
   public:
 
     /** Default constructor for the ROOT IO. */
-    SpacePoint() //:
-//      m_normalizedLocal[0](0),
-//      m_normalizedLocal[1](0)
+    SpacePoint()
     {}
 
-    /** Default constructor for the ROOT IO. */
-    SpacePoint(const PXDCluster& pxdCluster) :
-//      m_normalizedLocal[0](0),
-//      m_normalizedLocal[1](0)
-      m_vxdID(pxdCluster.getSensorID()) {
-      const VXD::SensorInfoBase& sensorInfoBase =
-        VXD::GeoCache::getInstance().getSensorInfo(m_vxdID);
+    /** Constructor for the case of PXD or TELHits (both are PXDClusters), first parameter is reference to cluster, second is the index number of the cluster in its storeArray */
+    SpacePoint(const PXDCluster& pxdCluster, unsigned int indexNumber);
 
-      m_position = sensorInfoBase.pointToGlobal(
-                     TVector3(pxdCluster.getU(), pxdCluster.getV(), 0));
 
-      float halfSensorSizeU = 0.5 *  sensorInfoBase.getUSize();
-      float halfSensorSizeV = 0.5 *  sensorInfoBase.getVSize();
-      float localUPosition = pxdCluster.getU() + halfSensorSizeU;
-      float localVPosition = pxdCluster.getV() + halfSensorSizeV;
+    /** return the position vector in global coordinates */
+    const TVector3& getPosition() const { return m_position; }
 
-      m_normalizedLocal[0] = localUPosition / sensorInfoBase.getUSize();
-      m_normalizedLocal[1] = localVPosition / sensorInfoBase.getVSize();
+    /** return the hitErrors in sigma of the global position */
+    const TVector3& getPositionError() const { return m_positionError; }
 
-      m_positionError = sensorInfoBase.vectorToGlobal(
-                          TVector3(pxdCluster.getUSigma(), pxdCluster.getVSigma(), 0));
-    }
+    /** return the VxdID of the sensor inhabiting the Cluster of the SpacePoint */
+    VxdID::baseType getVxdID() const { return m_vxdID; }
+
+    /** return the normalized local coordinates of the cluster in u (0 <= posU <= 1) */
+    float getNormalizedLocalU() const { return m_normalizedLocal[0]; }
+
+    /** return the normalized local coordinates of the cluster in v (0 <= posV <= 1) */
+    float getNormalizedLocalV() const { return m_normalizedLocal[1]; }
 
 
   protected:
-//  {
-//    float halfSensorSizeU = 0.5 *  aSensorInfo.getUSize();
-//        float halfSensorSizeV = 0.5 *  aSensorInfo.getVSize(pxdCluster.getU());
-//        float localUPosition = pxdCluster.getU() + halfSensorSizeU;
-//        float localVPosition = pxdCluster.getV() + halfSensorSizeV;
-//  }
-
-    /** position vector [0]: x , [1] : y, [2] : z */
+    /** Global position vector.
+     *
+     *  [0]: x , [1] : y, [2] : z
+     */
     TVector3 m_position;
 
-    /** error vector [0]: x , [1] : y, [2] : z */
+    /** Error "Vector" of global position in sigma.
+     *
+     *  [0]: x-uncertainty , [1] : y-uncertainty, [2] : z-uncertainty
+     */
     TVector3 m_positionError;
 
-    /** the position in local coordinates defined between 0 and 1, first entry is u, second is v*/
+    /** Position in local coordinates normalized to the sensor size between 0 and 1.
+     *
+     *  First entry is u, second is v
+     */
     float m_normalizedLocal[2];
 
     /** stores the vxdID */
     VxdID::baseType m_vxdID;
 
+    /** carries the index numbers of the linked clusters.
+     *
+     * These index numbers are for the storeArray of svdClusters, if the detector type is Const::SVD, If it is Const::PXD, its for the pxdCluster container, and for Const::Test it is for a pxdCluster-container carrying all the telescope hits */
+    std::vector<unsigned int> m_indexNumbers;
     ClassDef(SpacePoint, 1)
   };
 }

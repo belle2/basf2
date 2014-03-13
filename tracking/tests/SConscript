@@ -4,15 +4,22 @@
 Import('env')
 
 env['LIBS'] = [
-    'tracking', 'tracking_dataobjects', 
-    'vxd_dataobjects', 
-    'cdc', 'cdc_dataobjects',
+    'tracking', 'tracking_dataobjects',
+    'vxd',
+    'vxd_dataobjects',
+    #'pxd',
+    'pxd_dataobjects',
+    'cdc',
+    'cdc_dataobjects',
     'simulation_dataobjects',
-    'framework', 
+    'framework',
+    'Geom',
+    'geometry',
 #   'genfit2',
-    '$ROOT_LIBS', 
-    'boost_chrono', 
-    '$PYTHON_LIBS', 
+    '$ROOT_LIBS',
+    'boost_chrono',
+    '$PYTHON_LIBS',
+    #'generators',
     ]
 
 Return('env')

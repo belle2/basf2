@@ -63,7 +63,7 @@ ntupleTree('eventtuple', '', eventtools)
 summaryOfLists(['D0', 'B-toD0pi'])
 
 # ----> start processing of modules
-process(main)
+process(analysis_main)
 
 # ----> Print call statistics
 print statistics

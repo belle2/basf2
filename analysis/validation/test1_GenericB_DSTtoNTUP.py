@@ -159,7 +159,7 @@ ntupleTree('eventtuple', '', eventtools)
 summaryOfLists(['StdPhi', 'StdLooseKS0'])
 
 # ----> start processing of modules
-process(main)
+process(analysis_main)
 
 # ----> Print call statistics
 print statistics

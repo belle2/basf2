@@ -58,7 +58,7 @@ ntupleTree('eventtuple', '', eventtools)
 summaryOfLists(['K*0', 'B0toK*0gamma'])
 
 # ----> start processing of modules
-process(main)
+process(analysis_main)
 
 # ----> Print call statistics
 print statistics

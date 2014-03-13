@@ -38,6 +38,7 @@
 #include <G4Polyhedra.hh>
 #include <G4SubtractionSolid.hh>
 #include <G4Material.hh>
+#include <G4NistManager.hh>
 
 using namespace std;
 using namespace boost;
@@ -112,6 +113,26 @@ namespace Belle2 {
         envOrigin.setZ((zEnvFront + zEnvBack) / 2.);
         G4Transform3D transform = G4Translate3D(envOrigin);
         new G4PVPlacement(transform, envelope, "ARICH.Envelope", &topVolume, false, 1);
+
+        G4NistManager* man = G4NistManager::Instance();
+        G4Material* medPoly = man->FindOrBuildMaterial("G4_POLYETHYLENE");
+        G4Material* boron   = man->FindOrBuildMaterial("G4_B");
+        // 30% borated polyethylene = SWX210
+        G4Material* boratedpoly30 = new G4Material("BoratedPoly30", 1.19 * g / cm3, 2);
+        boratedpoly30->AddMaterial(boron, 0.30);
+        boratedpoly30->AddMaterial(medPoly, 0.70);
+
+        double zfrr = 1670;
+        double zbkk = 1900;
+        double radij1 = 380;
+        double radij2 = 440;
+        G4ThreeVector nshieldOrigin(0, 0, (zbkk + zfrr) / 2.);
+        G4Transform3D transform_nshield = G4Translate3D(nshieldOrigin);
+        G4Tubs* nshield_shape = new G4Tubs("nshield_shape", radij1, radij2, (zbkk - zfrr) / 2., 0, 2 * M_PI);
+        // please change here boratedpoly30 to boratedpoly05
+        G4LogicalVolume* nshield = new G4LogicalVolume(nshield_shape, boratedpoly30, "nShield");
+        new G4PVPlacement(transform_nshield , nshield, "ARICH.nShield", &topVolume, false, 1);
+
       }
 
       isBeamBkgStudy = content.getInt("BeamBackgroundStudy");

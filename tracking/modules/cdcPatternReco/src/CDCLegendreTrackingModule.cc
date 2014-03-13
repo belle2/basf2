@@ -66,7 +66,7 @@ CDCLegendreTrackingModule::CDCLegendreTrackingModule() :
            2.);
 
   addParam("MaxLevel", m_maxLevel,
-           "Maximal level of recursive calling of FastHough algorithm", 10);
+           "Maximal level of recursive calling of FastHough algorithm", 12);
 
   addParam("Reconstruct Curler", m_reconstructCurler,
            "Flag, whether curlers should be reconstructed", true);
@@ -123,8 +123,8 @@ void CDCLegendreTrackingModule::event()
 
   //perform track finding
   DoSteppedTrackFinding();
-  MergeCurler();
-  AsignStereoHits();
+//  MergeCurler();
+//  AsignStereoHits();
 
   //create GenFit Track candidates
   createGFTrackCandidates();
@@ -341,11 +341,11 @@ void CDCLegendreTrackingModule::processTrack(
 
 bool CDCLegendreTrackingModule::fullfillsQualityCriteria(CDCLegendreTrackCandidate* trackCandidate)
 {
-  if (trackCandidate->getNAxialHits() < m_threshold)
-    return false;
+//  if (trackCandidate->getNAxialHits() < m_threshold)
+//    return false;
 
-  if (trackCandidate->getLayerWaight() < 1)
-    return false;
+//  if (trackCandidate->getLayerWaight() < 1)
+//    return false;
 
   return true;
 }
@@ -472,18 +472,49 @@ void CDCLegendreTrackingModule::MaxFastHough(
 
   }
 
+  int max_value = 0;
+  std::pair<int, int> max_value_bin = std::make_pair(0, 0);
 
+  for (int t_index = 0; t_index < 2; ++t_index) {
+    for (int r_index = 0; r_index < 2; ++r_index) {
+      if (max_value  < voted_hits[t_index][r_index].size()) {
+        max_value = voted_hits[t_index][r_index].size();
+        max_value_bin = std::make_pair(t_index, r_index);
+      }
+    }
+  }
+
+  bool allow_overlap = false;
+  for (int t_index = 0; t_index < 2; ++t_index) {
+    for (int r_index = 0; r_index < 2; ++r_index) {
+      if (max_value - (sqrt(max_value)) < voted_hits[t_index][r_index].size())
+        allow_overlap = true;
+    }
+  }
+//  allow_overlap = false;
 
 //Processing, which bins are further investigated
   for (int t_index = 0; t_index < 2; ++t_index) {
     for (int r_index = 0; r_index < 2; ++r_index) {
+
+      //"trick" which allows to use wider bins for higer r values (lower pt tracks)
+      int level_diff = 0;
+      if (fabs(r[r_index] + (r[r_index + 1] - r[r_index]) / 2.) > (m_rMax / 4.)) level_diff = 3;
+      else if ((fabs(r[r_index] + (r[r_index + 1] - r[r_index]) / 2.) < (m_rMax / 4.)) && (fabs(r[r_index] + (r[r_index + 1] - r[r_index]) / 2.) > (2.*m_rMax / 3.)))
+        level_diff = 2;
+      else if ((fabs(r[r_index] + (r[r_index + 1] - r[r_index]) / 2.) < (2.*m_rMax / 3.)) && (fabs(r[r_index] + (r[r_index + 1] - r[r_index]) / 2.) > (m_rMax / 2.)))
+        level_diff = 1;
+//      level_diff = 0;
+
+//      if(max_value_bin != std::make_pair(t_index, r_index))allow_overlap = false;
 
       //bin must contain more hits than the limit and maximal found track candidate
       if (voted_hits[t_index][r_index].size() >= limit
           && voted_hits[t_index][r_index].size() > candidate->first.size()) {
 
         //if max level of fast Hough is reached, mark candidate and return
-        if (level == m_maxLevel) {
+//        if (((!allow_overlap)&&(level == (m_maxLevel - level_diff))) || ((allow_overlap)&&(level == (m_maxLevel - level_diff) + 2))) {
+        if (level >= (m_maxLevel - level_diff)) {
           double theta = static_cast<double>(thetaBin[t_index]
                                              + thetaBin[t_index + 1]) / 2. ;
 
@@ -493,12 +524,23 @@ void CDCLegendreTrackingModule::MaxFastHough(
 
           candidate->first = voted_hits[t_index][r_index];
           candidate->second = std::make_pair(theta,
-                                             (r[r_index] + r[r_index + 1]) / 2);
+                                             (r[r_index] + r[r_index + 1]) / 2.);
         } else {
           //Recursive calling of the function with higher level and smaller box
-          MaxFastHough(candidate, voted_hits[t_index][r_index], level + 1,
-                       thetaBin[t_index], thetaBin[t_index + 1], r[r_index],
-                       r[r_index + 1], limit);
+//          if (allow_overlap) { //if overlapping allowed make bin borders wider
+          if (allow_overlap  && (level >= (m_maxLevel - level_diff - 2)) && max_value_bin == std::make_pair(t_index, r_index)) { //if overlapping allowed make bin borders wider
+            double r_1_overlap, r_2_overlap, theta_1_overlap, theta_2_overlap; // here we involve new variables which allows to change bin borders for positive and negative r independently
+            r_1_overlap = r[r_index] - fabs(r[r_index + 1] - r[r_index]) / 2.;
+            r_2_overlap = r[r_index + 1] + fabs(r[r_index + 1] - r[r_index]) / 2.;
+            theta_1_overlap = thetaBin[t_index] - fabs(thetaBin[t_index + 1] - thetaBin[t_index]) / 2.;
+            theta_2_overlap = thetaBin[t_index + 1] + fabs(thetaBin[t_index + 1] - thetaBin[t_index]) / 2.;
+            MaxFastHough(candidate, voted_hits[t_index][r_index], level + 1,
+                         theta_1_overlap, theta_2_overlap, r_1_overlap,
+                         r_2_overlap, limit);
+          } else
+            MaxFastHough(candidate, voted_hits[t_index][r_index], level + 1,
+                         thetaBin[t_index], thetaBin[t_index + 1], r[r_index],
+                         r[r_index + 1], limit);
         }
       }
     }

@@ -449,7 +449,7 @@ namespace Belle2 {
     EXPECT_DOUBLE_EQ(rels.weight(0), -42.0);
 
     //should be safe
-    EXPECT_FALSE((relObjData)[0]->addRelationTo(NULL));
+    EXPECT_FALSE((relObjData)[0]->addRelationTo(static_cast<TObject*>(nullptr)));
     ProfileInfo notInArray;
     EXPECT_FALSE((relObjData)[0]->addRelationTo(&notInArray));
   }

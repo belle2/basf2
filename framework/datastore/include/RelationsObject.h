@@ -73,7 +73,7 @@ namespace Belle2 {
 
     /** Default constructor.
      */
-    RelationsInterface(): m_cacheDataStoreEntry(0), m_cacheArrayIndex(-1) {}
+    RelationsInterface(): m_cacheDataStoreEntry(NULL), m_cacheArrayIndex(-1) {}
 
     /** Copy constructor.
      *
@@ -89,6 +89,16 @@ namespace Belle2 {
      */
     RelationsInterface& operator=(const RelationsInterface& relationsInterface);
 
+
+    /** Add a relation from this object to another object (with caching).
+     *
+     *  @param object  The object to which the relation should point.
+     *  @param weight  The weight of the relation.
+     *  @return        Flag whether the creation of the relation succeeded.
+     */
+    bool addRelationTo(const RelationsInterface<BASE>* object, double weight = 1.0) const {
+      return DataStore::Instance().addRelation(this, m_cacheDataStoreEntry, m_cacheArrayIndex, object, object->m_cacheDataStoreEntry, object->m_cacheArrayIndex, weight);
+    }
 
     /** Add a relation from this object to another object.
      *
@@ -226,7 +236,7 @@ namespace Belle2 {
   {
     if (this != &relationsInterface) {
       this->BASE::operator=(relationsInterface);
-      m_cacheDataStoreEntry = 0;
+      m_cacheDataStoreEntry = NULL;
       m_cacheArrayIndex = -1;
     }
     return *this;

@@ -144,7 +144,7 @@ DataStore::StoreEntry* DataStore::getEntry(const StoreAccessorBase& accessor) co
   if (it != m_storeObjMap[accessor.getDurability()].end() and checkType(*(it->second), accessor)) {
     return it->second;
   } else {
-    return NULL;
+    return nullptr;
   }
 }
 
@@ -153,7 +153,7 @@ TObject** DataStore::getObject(const StoreAccessorBase& accessor) const
 {
   StoreEntry* entry = getEntry(accessor);
   if (!entry) {
-    return NULL;
+    return nullptr;
   }
   return &(entry->ptr);
 }
@@ -197,10 +197,10 @@ bool DataStore::findStoreEntry(const TObject* object, DataStore::StoreEntry*& en
     index = static_cast<TClonesArray*>(entry->ptr)->IndexOf(object);
     if (index >= 0) return true;
   }
-  entry = 0;
+  entry = nullptr;
   index = -1;
 
-  //searching for NULL should be safe
+  //searching for nullptr should be safe
   if (!object)
     return false;
 
@@ -255,14 +255,12 @@ void DataStore::getArrayNames(std::vector<std::string>& names, const std::string
   }
 }
 
-bool DataStore::addRelation(const TObject* fromObject, DataStore::StoreEntry*& fromEntry, int& fromIndex, const TObject* toObject, double weight)
+bool DataStore::addRelation(const TObject* fromObject, StoreEntry*& fromEntry, int& fromIndex, const TObject* toObject, StoreEntry*& toEntry, int& toIndex, double weight)
 {
   // get entry from which the relation points
   if (!findStoreEntry(fromObject, fromEntry, fromIndex)) return false;
 
   // get entry to which the relation points
-  StoreEntry* toEntry = 0;
-  int toIndex = -1;
   if (!findStoreEntry(toObject, toEntry, toIndex)) return false;
 
   // get the relations from -> to
@@ -324,7 +322,7 @@ std::vector<RelationEntry> DataStore::getRelationsWith(ESearchSide searchSide, c
   // loop over found store arrays
   for (const std::string & name : names) {
     const StoreObjConstIter& arrayIter = m_storeObjMap[c_Event].find(name);
-    if (arrayIter == m_storeObjMap[c_Event].end() or arrayIter->second->ptr == NULL) continue;
+    if (arrayIter == m_storeObjMap[c_Event].end() or arrayIter->second->ptr == nullptr) continue;
 
     // get the relations from -> to
     const string& relationsName = (searchSide == c_ToSide) ? relationName(entry->name, name) : relationName(name, entry->name);
@@ -362,7 +360,7 @@ RelationEntry DataStore::getRelationWith(ESearchSide searchSide, const TObject* 
   }
 
   // get StoreEntry for 'object'
-  if (!findStoreEntry(object, entry, index)) return RelationEntry(0);
+  if (!findStoreEntry(object, entry, index)) return RelationEntry(nullptr);
 
   // get names of store arrays to search
   std::vector<string> names;
@@ -371,7 +369,7 @@ RelationEntry DataStore::getRelationWith(ESearchSide searchSide, const TObject* 
   // loop over found store arrays
   for (const std::string & name : names) {
     const StoreObjConstIter& arrayIter = m_storeObjMap[c_Event].find(name);
-    if (arrayIter == m_storeObjMap[c_Event].end() or arrayIter->second->ptr == NULL) continue;
+    if (arrayIter == m_storeObjMap[c_Event].end() or arrayIter->second->ptr == nullptr) continue;
 
     // get the relations from -> to
     const string& relationsName = (searchSide == c_ToSide) ? relationName(entry->name, name) : relationName(name, entry->name);
@@ -393,14 +391,14 @@ RelationEntry DataStore::getRelationWith(ESearchSide searchSide, const TObject* 
     }
   }
 
-  return RelationEntry(0);
+  return RelationEntry(nullptr);
 }
 
 
 void DataStore::clearMaps(EDurability durability)
 {
   for (auto & mapEntry : m_storeObjMap[durability]) {
-    mapEntry.second->ptr = 0;
+    mapEntry.second->ptr = nullptr;
   }
 }
 
@@ -436,5 +434,5 @@ bool DataStore::optionalInput(const StoreAccessorBase& accessor)
     info.addEntry(accessor.getName(), ModuleInfo::c_OptionalInput, (accessor.getClass() == RelationContainer::Class()));
   }
 
-  return (getEntry(accessor) != NULL);
+  return (getEntry(accessor) != nullptr);
 }

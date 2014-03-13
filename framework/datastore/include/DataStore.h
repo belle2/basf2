@@ -228,16 +228,35 @@ namespace Belle2 {
     /** Get a reference to the object/array map. */
     const StoreObjMap& getStoreObjectMap(EDurability durability) const { return m_storeObjMap[durability]; }
 
+
     /** Add a relation from an object in a store array to another object in a store array.
      *
      *  @param fromObject     Pointer to the object from which the relation points.
-     *  @param fromEntry      Data store entry that contains the fromObject. Used for caching. Will be set if 0.
+     *  @param fromEntry      Data store entry that contains the fromObject. Used for caching. Will be set if NULL.
+     *  @param fromIndex      Index in TClonesArray that contains the fromObject. Used for caching. Will be set if < 0.
+     *  @param toObject       Pointer to the object to which the relation points.
+     *  @param toEntry        Data store entry that contains the toObject. Used for caching. Will be set if NULL.
+     *  @param toIndex        Index in TClonesArray that contains the toObject. Used for caching. Will be set if < 0.
+     *  @param weight         Weight of the relation.
+     *  @return               True if the relation was created, false otherwise.
+     */
+    bool addRelation(const TObject* fromObject, StoreEntry*& fromEntry, int& fromIndex, const TObject* toObject, StoreEntry*& toEntry, int& toIndex, double weight);
+
+    /** Add a relation from an object in a store array to another object in a store array.
+     *
+     *  @param fromObject     Pointer to the object from which the relation points.
+     *  @param fromEntry      Data store entry that contains the fromObject. Used for caching. Will be set if NULL.
      *  @param fromIndex      Index in TClonesArray that contains the fromObject. Used for caching. Will be set if < 0.
      *  @param toObject       Pointer to the object to which the relation points.
      *  @param weight         Weight of the relation.
      *  @return               True if the relation was created, false otherwise.
      */
-    bool addRelation(const TObject* fromObject, StoreEntry*& fromEntry, int& fromIndex, const TObject* toObject, double weight);
+    inline bool addRelation(const TObject* fromObject, StoreEntry*& fromEntry, int& fromIndex, const TObject* toObject, double weight) {
+      StoreEntry* toEntry = nullptr;
+      int toIndex = -1;
+      return addRelation(fromObject, fromEntry, fromIndex, toObject, toEntry, toIndex, weight);
+    }
+
 
     /** Get the relations between an object and other objects in a store array.
      *
@@ -279,7 +298,7 @@ namespace Belle2 {
      *  @return               True if the relation was created, false otherwise.
      */
     static bool addRelationFromTo(const TObject* fromObject, const TObject* toObject, double weight = 1) {
-      DataStore::StoreEntry* storeEntry = 0;
+      DataStore::StoreEntry* storeEntry = NULL;
       int index = -1;
       return Instance().addRelation(fromObject, storeEntry, index, toObject, weight);
     }

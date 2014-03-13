@@ -62,7 +62,7 @@ FullSimModule::FullSimModule() : Module(), m_visManager(NULL)
 {
   //Set module properties and the description
   setDescription("Performs the full Geant4 detector simulation. Requires a valid geometry in memory.");
-  setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
+  setPropertyFlags(c_ParallelProcessingCertified);
 
   //Parameter definition
   addParam("InputMCParticleCollection", m_mcParticleInputColName, "The name of the input MCParticle collection.", string(""));

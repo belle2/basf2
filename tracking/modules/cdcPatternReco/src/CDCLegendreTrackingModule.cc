@@ -52,7 +52,7 @@ CDCLegendreTrackingModule::CDCLegendreTrackingModule() :
 
   addParam("GFTrackCandidatesColName", m_gfTrackCandsColName,
            "Output GFTrackCandidates collection",
-           string("GFTrackCandidates_LegendreFinder"));
+           string("TrackCands"));
 
   addParam("Threshold", m_threshold, "Threshold for peak finder", 10);
 
@@ -84,15 +84,6 @@ void CDCLegendreTrackingModule::initialize()
 
   //Initialize look-up table
   m_nbinsTheta = static_cast<int>(std::pow(2.0, m_maxLevel));
-
-  double bin_width = m_PI / m_nbinsTheta;
-  m_sin_theta = new double[m_nbinsTheta + 1];
-  m_cos_theta = new double[m_nbinsTheta + 1];
-
-  for (int i = 0; i <= m_nbinsTheta; ++i) {
-    m_sin_theta[i] = sin(i * bin_width);
-    m_cos_theta[i] = cos(i * bin_width);
-  }
 
   m_AxialHitList.reserve(1024);
   m_StereoHitList.reserve(1024);
@@ -164,7 +155,7 @@ void CDCLegendreTrackingModule::DoSteppedTrackFinding()
     std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> > candidate =
       std::make_pair(c_list, std::make_pair(-999, -999));
 
-    MaxFastHough(&candidate, hits_vector, 1, 0, m_nbinsTheta, m_rMin, m_rMax,
+    MaxFastHough(&candidate, hits_vector, 1, 0, m_PI, m_rMin, m_rMax,
                  static_cast<unsigned>(limit));
 
     n_hits = candidate.first.size();
@@ -419,14 +410,12 @@ void CDCLegendreTrackingModule::endRun()
 
 void CDCLegendreTrackingModule::terminate()
 {
-  delete[] m_cos_theta;
-  delete[] m_sin_theta;
 }
 
 void CDCLegendreTrackingModule::MaxFastHough(
   std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> >* candidate,
   const std::vector<CDCLegendreTrackHit*>& hits, const int level,
-  const int theta_min, const int theta_max, const double r_min,
+  const double theta_min, const double theta_max, const double r_min,
   const double r_max, const unsigned limit)
 {
   if (not m_reconstructCurler
@@ -458,8 +447,8 @@ void CDCLegendreTrackingModule::MaxFastHough(
   //Voting within the four bins
   BOOST_FOREACH(CDCLegendreTrackHit * hit, hits) {
     for (int t_index = 0; t_index < 3; ++t_index) {
-      r_temp = hit->getConformalX() * m_cos_theta[thetaBin[t_index]]
-               + hit->getConformalY() * m_sin_theta[thetaBin[t_index]];
+      r_temp = hit->getConformalX() * cos(thetaBin[t_index])
+               + hit->getConformalY() * sin(thetaBin[t_index]);
       r_1 = r_temp + hit->getConformalDriftTime();
       r_2 = r_temp - hit->getConformalDriftTime();
 

@@ -101,9 +101,6 @@ namespace Belle2 {
     static constexpr double m_PI = 3.1415926535897932384626433832795; /**< pi is exactly three*/
     static constexpr double m_rc = 0.0176991150442477874; /**< threshold of r, which defines curlers*/
 
-    double* m_sin_theta; /**< Lookup array for calculation of sin*/
-    double* m_cos_theta; /**< Lookup array for calculation of cos*/
-
     bool m_reconstructCurler; /**< Stores, curlers shall be reconstructed*/
 
     /**
@@ -167,8 +164,8 @@ namespace Belle2 {
      * Only bins with more bins than the current maximum are further investigated where the current maximum is determined of the configured threshold or the number of hits of an already found track candidate.
      */
     void MaxFastHough(std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> >* candidate,
-                      const std::vector<CDCLegendreTrackHit*>& hits, const int level, const int theta_min,
-                      const int theta_max, const double r_min, const double r_max, const unsigned limit);
+                      const std::vector<CDCLegendreTrackHit*>& hits, const int level, const double theta_min,
+                      const double theta_max, const double r_min, const double r_max, const unsigned limit);
 
     /**
      * @brief Function to merge two track candidates

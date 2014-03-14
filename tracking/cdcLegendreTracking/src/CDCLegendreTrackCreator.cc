@@ -114,7 +114,7 @@ void CDCLegendreTrackCreator::appendNewHits(CDCLegendreTrackCandidate* track)
 
 void CDCLegendreTrackCreator::processTrack(
   CDCLegendreTrackCandidate* trackCandidate,
-  std::set<CDCLegendreTrackHit*>* trackHitList)
+  std::set<CDCLegendreTrackHit*>* /*trackHitList*/)
 {
   //check if the number has enough axial hits (might be less due to the curvature check).
   if (fullfillsQualityCriteria(trackCandidate)) {
@@ -140,7 +140,7 @@ void CDCLegendreTrackCreator::processTrack(
 }
 
 
-bool CDCLegendreTrackCreator::fullfillsQualityCriteria(CDCLegendreTrackCandidate* trackCandidate)
+bool CDCLegendreTrackCreator::fullfillsQualityCriteria(CDCLegendreTrackCandidate* /*trackCandidate*/)
 {
 //  if (trackCandidate->getNAxialHits() < m_threshold)
 //    return false;

@@ -159,10 +159,10 @@ void CDCLegendrePatternChecker::clearBadHits(std::pair<std::vector<CDCLegendreTr
 }
 
 
-void CDCLegendrePatternChecker::checkPattern(HitPatternCDC* pattern, double radius)
+void CDCLegendrePatternChecker::checkPattern(HitPatternCDC* /*pattern*/)
 {
-  double minSLayer, maxSLayer;
-  minSLayer = getMinSLayer(pattern);
-  maxSLayer = getMaxSLayer(pattern);
+//  double minSLayer, maxSLayer;
+//  minSLayer = getMinSLayer(pattern);
+//  maxSLayer = getMaxSLayer(pattern);
 }
 

@@ -32,7 +32,7 @@ namespace Belle2 {
 
     CDCLegendreNiceDrawing(std::string& TrackCandColName, std::string& trackColName,
                            std::string& HitColName, std::string& StoreDirectory, bool drawMCSignal,
-                           bool m_drawCands, std::string& m_mcParticlesColName);
+                           bool drawCands, std::string& mcParticlesColName);
 
     void initialize();
 
@@ -80,17 +80,19 @@ namespace Belle2 {
 
   protected:
 
-    std::string m_StoreDirectory;
-
     std::string m_TrackCandColName;
-
-    std::string m_HitColName;
-
-    std::string m_mcParticlesColName;
 
     std::string m_trackColName;
 
+    std::string m_HitColName;
+
+    std::string m_StoreDirectory;
+
     bool m_drawMCSignal;
+
+    bool m_drawCands;
+
+    std::string m_mcParticlesColName;
 
     double m_zReference;
 
@@ -103,8 +105,6 @@ namespace Belle2 {
     double m_rCDC;
 
     double m_scale;
-
-    bool m_drawCands;
 
     std::stringstream m_wireString;
 

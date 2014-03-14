@@ -50,7 +50,7 @@ void CDCLegendreTrackMerger::mergeTracks(CDCLegendreTrackCandidate* cand1, CDCLe
 
 void CDCLegendreTrackMerger::mergeTracks(CDCLegendreTrackCandidate* cand1,
                                          const std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> >& track,
-                                         std::set<CDCLegendreTrackHit*>& hits_set)
+                                         std::set<CDCLegendreTrackHit*>& /*hits_set*/)
 {
   /*
     cand1->setR(
@@ -205,13 +205,13 @@ void CDCLegendreTrackMerger::MergeCurler()
     }
     */
 
-  bool merged = false;
+//  bool merged = false;
   bool make_merge = false;
   std::pair<double, double> ref_point = std::make_pair(0., 0.);
 
   double chi2_track1, chi2_track2;
-  double x0_track1, y0_track1;
-  double x0_track2, y0_track2;
+//  double x0_track1, y0_track1;
+//  double x0_track2, y0_track2;
   //loop over all candidates
   for (std::list<CDCLegendreTrackCandidate*>::iterator it1 =
          m_trackList.begin(); it1 != m_trackList.end(); ++it1) {
@@ -260,7 +260,7 @@ void CDCLegendreTrackMerger::MergeCurler()
         }
       }
 
-      if (true/*make_merge*/) {
+      if (/*true*/make_merge) {
         std::vector<CDCLegendreTrackHit*> c_list_temp;
         std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> > candidate_temp =
           std::make_pair(c_list_temp, std::make_pair(-999, -999));
@@ -308,7 +308,7 @@ bool CDCLegendreTrackMerger::earlyCandidateMerge(std::pair < std::vector<CDCLege
   //      cdcLegendrePatternChecker->checkCandidate(&candidate);
 
   if (candidate.first.size() > 0) {
-    //        cdcLegendreTrackFitter->fitTrackCandidateFast(&candidate, ref_point, chi2_cand);
+    m_cdcLegendreTrackFitter->fitTrackCandidateFast(&candidate, ref_point, chi2_cand);
     //      cdcLegendrePatternChecker->clearBadHits(&candidate, ref_point);
 
     /*

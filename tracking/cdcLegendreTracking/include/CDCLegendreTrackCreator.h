@@ -70,11 +70,12 @@ namespace Belle2 {
 
 
   private:
-    CDCLegendreTrackDrawer* m_cdcLegendreTrackDrawer; /**< Class which performs in-module drawing */
-    CDCLegendreTrackFitter* m_cdcLegendreTrackFitter; /**< Class which performs track candidate fitting */
-    std::list<CDCLegendreTrackCandidate*>& m_trackList; /**< List of track candidates. Mainly used for memory management! */
     std::vector<CDCLegendreTrackHit*>& m_AxialHitList; /**< Vector which hold axial hits */
+    std::list<CDCLegendreTrackCandidate*>& m_trackList; /**< List of track candidates. Mainly used for memory management! */
     bool m_appendHits; /**< Trying to append new hits to track candidate*/
+
+    CDCLegendreTrackFitter* m_cdcLegendreTrackFitter; /**< Class which performs track candidate fitting */
+    CDCLegendreTrackDrawer* m_cdcLegendreTrackDrawer; /**< Class which performs in-module drawing */
 
 
   };

@@ -316,9 +316,9 @@ void CDCLegendreNiceDrawing::drawMCTrack(std::stringstream& drawString, MCPartic
 
   int charge = int(mcPart->getCharge());
 
-  double radius = sqrt(momentum.X() * momentum.X() + momentum.Y() * momentum.Y()) / (1.5 * 0.00299792458);
+//  double radius = sqrt(momentum.X() * momentum.X() + momentum.Y() * momentum.Y()) / (1.5 * 0.00299792458);
 
-  double alpha = atan2(momentum.Y(), momentum.X());
+//  double alpha = atan2(momentum.Y(), momentum.X());
 
   double yc = mcPart->getVertex().Y();
   double xc = mcPart->getVertex().X();

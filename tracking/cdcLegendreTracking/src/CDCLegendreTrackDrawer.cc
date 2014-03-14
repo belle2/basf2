@@ -13,7 +13,6 @@
 #include <tracking/cdcLegendreTracking/CDCLegendreTrackCandidate.h>
 #include <tracking/cdcLegendreTracking/CDCLegendreTrackHit.h>
 
-#include <framework/core/Module.h>
 #include "framework/datastore/StoreArray.h"
 #include "cdc/dataobjects/CDCHit.h"
 
@@ -234,7 +233,7 @@ void CDCLegendreTrackDrawer::drawConformalHits(std::vector<CDCLegendreTrackHit*>
     Color_t trackColor;
     if (ntrack >= 0)trackColor = getRootColor(ntrack);
     else trackColor = kBlue;
-    BOOST_FOREACH(CDCLegendreTrackHit * hit, trackHitList) {
+    for (CDCLegendreTrackHit * hit : trackHitList) {
       x0 = hit->getConformalX();
       y0 = hit->getConformalY();
       R = hit->getConformalDriftTime();
@@ -269,12 +268,12 @@ void CDCLegendreTrackDrawer::drawLegendreHits(std::vector<CDCLegendreTrackHit*> 
 
   if (!do_print) {
 
-    int nhits = 0;
+//    int nhits = 0;
     double x0, y0, R;
     Color_t trackColor;
     if (ntrack >= 0)trackColor = getRootColor(ntrack);
     else trackColor = kBlue;
-    BOOST_FOREACH(CDCLegendreTrackHit * hit, trackHitList) {
+    for (CDCLegendreTrackHit * hit : trackHitList) {
       TF1* funct1 = new TF1("funct", "[0]*cos(x)+[1]*sin(x)+[2]", 0, m_PI);
       TF1* funct2 = new TF1("funct", "[0]*cos(x)+[1]*sin(x)-[2]", 0, m_PI);
       funct1->SetLineWidth(0.25);

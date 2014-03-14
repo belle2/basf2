@@ -254,7 +254,7 @@ int CDCLegendreTrackCandidate::getInnermostAxialSLayer(bool forced, int minNHits
 {
 
   if ((m_innermostAxialSLayer == -1) || (forced)) {
-    int nHits = m_TrackHits.size();
+    unsigned nHits = m_TrackHits.size();
     int minSLayer = 0;
     do {
       if (m_hitPatternAxial.hasSLayer(minSLayer)) {
@@ -278,7 +278,7 @@ int CDCLegendreTrackCandidate::getInnermostAxialSLayer(bool forced, int minNHits
 int CDCLegendreTrackCandidate::getOutermostAxialSLayer(bool forced, int minNHits)
 {
   if ((m_outermostAxialSLayer == -1) || (forced)) {
-    int nHits = m_TrackHits.size();
+    unsigned nHits = m_TrackHits.size();
     int maxSLayer = 8;
     do {
       if (m_hitPatternAxial.hasSLayer(maxSLayer)) {
@@ -325,7 +325,7 @@ int CDCLegendreTrackCandidate::getCandidateType()
   return type;
 }
 
-bool CDCLegendreTrackCandidate::checkHitPattern(int minNHitsSLayer)
+bool CDCLegendreTrackCandidate::checkHitPattern(int /*minNHitsSLayer*/)
 {
 //TODO: implement this method
 

@@ -35,7 +35,7 @@ void CDCLegendreTrackFitter::fitTrackCandidateFast(
   std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> >* track,
   std::pair<double, double>& ref_point,
   double& chi2,
-  bool with_drift_time)
+  bool /*with_drift_time*/)
 {
 
   if (!m_fitTracks) return;
@@ -43,8 +43,8 @@ void CDCLegendreTrackFitter::fitTrackCandidateFast(
   double meanX = 0, meanY = 0, meanX2 = 0, meanY2 = 0, meanR2 = 0, meanR4 = 0, meanXR2 = 0, meanYR2 = 0, meanXY = 0; //mean values
   double r2 = 0, x = 0, y = 0, x2 = 0, y2 = 0; // coords
   double weight;// weight of each hit, so far no difference in hit quality
-  double sumWeights = 0, divisor, weightNormalizer = 0; // sumWeights is sum of weights, divisor is 1/sumWeights;
-  double tuningParameter = 1.; //0.02; // this parameter is for internal tuning of the weights, since at the moment, the error seams highly overestimated at the moment. 1 means no influence of parameter.
+  double sumWeights = 0, divisor /*, weightNormalizer*/ = 0; // sumWeights is sum of weights, divisor is 1/sumWeights;
+//  double tuningParameter = 1.; //0.02; // this parameter is for internal tuning of the weights, since at the moment, the error seams highly overestimated at the moment. 1 means no influence of parameter.
 
   // looping over all hits and do the division afterwards
   for (CDCLegendreTrackHit * hit : track->first) {
@@ -126,12 +126,10 @@ void CDCLegendreTrackFitter::fitTrackCandidateFast(
 
   if (!m_fitTracks) return;
 
-  double stopper = 0.000000001; /// WARNING hardcoded values!
   double meanX = 0, meanY = 0, meanX2 = 0, meanY2 = 0, meanR2 = 0, meanR4 = 0, meanXR2 = 0, meanYR2 = 0, meanXY = 0; //mean values
   double r2 = 0, x = 0, y = 0, x2 = 0, y2 = 0; // coords
   double weight;// weight of each hit, so far no difference in hit quality
-  double sumWeights = 0, divisor, weightNormalizer = 0; // sumWeights is sum of weights, divisor is 1/sumWeights;
-  double tuningParameter = 1.; //0.02; // this parameter is for internal tuning of the weights, since at the moment, the error seams highly overestimated at the moment. 1 means no influence of parameter.
+  double sumWeights = 0, divisor; // sumWeights is sum of weights, divisor is 1/sumWeights;
   double radius_track, xc_track, yc_track;
 
   // if with_drift_time if true, uses drift time information in fitting procedure
@@ -452,14 +450,10 @@ void CDCLegendreTrackFitter::fitTrackCandidateNormalSpace(
   double track_theta = track->second.first;
   double track_r = track->second.second;
   double summ;
-  double alpha, beta; //line parameters
-  double x0, y0, drift_time;
   double summ_prev, summ_min;
-  double delta_track_theta, delta_track_r;
-  double prev_track_theta, prev_track_r;
   double increment_x0, increment_y0, increment_R;
   bool is_finished;
-  int direction, direction_min; //direction of increment: 1 - (1,1); 2 - (1,-1); 3 - (-1,-1); 4 - (-1,1), where (theta,r)
+  int direction; //direction of increment: 1 - (1,1); 2 - (1,-1); 3 - (-1,-1); 4 - (-1,1), where (theta,r)
   double R, R_prev, x0_track, y0_track, x0_track_prev, y0_track_prev, x0_hit, y0_hit;
   double R_min, x0_track_min, y0_track_min;
   double x0_initial, y0_initial, track_theta_initial, track_r_initial, R_initial;
@@ -486,7 +480,6 @@ void CDCLegendreTrackFitter::fitTrackCandidateNormalSpace(
   increment_y0 = 1.;
   increment_R = 1.;
   direction = 1;
-  direction_min = 0;
   summ_min = 999.;
   x0_track_prev = x0_track;
   y0_track_prev = y0_track;
@@ -500,7 +493,7 @@ void CDCLegendreTrackFitter::fitTrackCandidateNormalSpace(
     R = R_prev + increment_R * R_prev * 0.01;
 //    R = R_prev;
 
-    BOOST_FOREACH(CDCLegendreTrackHit * hit, track->first) {
+    for (CDCLegendreTrackHit * hit : track->first) {
       x0_hit = hit->getOriginalWirePosition().X();
       y0_hit = hit->getOriginalWirePosition().Y();
       summ += SQR(fabs(R - sqrt(SQR(x0_track - x0_hit) + SQR(y0_track - y0_hit))) - hit->getDriftTime());
@@ -508,13 +501,11 @@ void CDCLegendreTrackFitter::fitTrackCandidateNormalSpace(
 
     if (direction == 1) {
       summ_min = summ;
-      direction_min = direction;
       R_min = R;
       x0_track_min = x0_track;
       y0_track_min = y0_track;
     } else if (summ_min > summ) {
       summ_min = summ;
-      direction_min = direction;
       R_min = R;
       x0_track_min = x0_track;
       y0_track_min = y0_track;

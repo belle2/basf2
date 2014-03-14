@@ -20,7 +20,7 @@ namespace Belle2 {
     /** Check pattern of track candidate. TODO: make checks for high-pt tracks, implement more robust criteria of pattern checks*/
     void checkCandidate(std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> >* track);
 
-    void checkPattern(HitPatternCDC* pattern, double radius);
+    void checkPattern(HitPatternCDC* pattern);
 
     /** Gets number of innermost superlayer*/
     int getMinSLayer(HitPatternCDC* pattern);

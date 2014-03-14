@@ -60,8 +60,8 @@ namespace Belle2 {
 
   private:
 
-    CDCLegendreTrackFitter* m_cdcLegendreTrackFitter;
     std::list<CDCLegendreTrackCandidate*>& m_trackList; /**< List of track candidates. Mainly used for memory management! */
+    CDCLegendreTrackFitter* m_cdcLegendreTrackFitter;
   };
 
 }

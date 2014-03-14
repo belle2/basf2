@@ -11,7 +11,6 @@
 #pragma once
 
 #include "tracking/cdcLegendreTracking/CDCLegendreNiceDrawing.h"
-#include <framework/core/Module.h>
 
 #include "cdc/geometry/CDCGeometryPar.h"
 #include "cdc/translators/SimpleTDCCountTranslator.h"
@@ -62,8 +61,8 @@ namespace Belle2 {
     void finalizeROOTFile(std::vector<CDCLegendreTrackHit*>& hits_vector);
   protected:
 
-    bool m_drawCandidates;
     bool m_drawCandInfo;
+    bool m_drawCandidates;
     int m_iTrack;
     FILE* pipeout_fp;
     int m_trackCounter;

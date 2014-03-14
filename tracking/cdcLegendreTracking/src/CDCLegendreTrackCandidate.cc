@@ -61,11 +61,19 @@ CDCLegendreTrackCandidate::CDCLegendreTrackCandidate(double theta, double r, int
       hitPatternStereo.setLayer(hit->getLayerId());
   }
 
-  DetermineHitNumbers();
+  makeHitPattern();
+
+  innermostAxialSLayer = -1;
+  outermostAxialSLayer = -1;
+//  getInnermostAxialSLayer();
+//  getOutermostAxialSLayer();
+  checkHitPattern();
 }
 
 void CDCLegendreTrackCandidate::DetermineHitNumbers()
 {
+  m_axialHits = 0;
+  m_stereoHits = 0;
   BOOST_FOREACH(CDCLegendreTrackHit * hit, m_TrackHits) {
     if (hit->getIsAxial())
       ++m_axialHits;
@@ -245,9 +253,9 @@ void CDCLegendreTrackCandidate::addHit(CDCLegendreTrackHit* hit)
     ++m_stereoHits;
 }
 
-int CDCLegendreTrackCandidate::getInnermostAxialSLayer()
+int CDCLegendreTrackCandidate::getInnermostAxialSLayer(bool forced, int minNHits)
 {
-  int minSLayer = 0;
+
 
   /*  BOOST_FOREACH(CDCLegendreTrackHit * hit, m_TrackHits) {
       if (hit->getIsAxial()) {
@@ -264,14 +272,31 @@ int CDCLegendreTrackCandidate::getInnermostAxialSLayer()
       }
     }
   */
-  while (!hitPatternAxial.getSLayer(minSLayer++));
+  if ((innermostAxialSLayer == -1) || (forced)) {
+    int nHits = m_TrackHits.size();
+    int minSLayer = 0;
+    do {
+      if (hitPatternAxial.getSLayer(minSLayer)) {
+        if (hitPatternAxial.getNSLayer(minSLayer) < minNHits) {
+          //using lambda functions for erase-remove idiom
+          m_TrackHits.erase(std::remove_if(m_TrackHits.begin(), m_TrackHits.end(), [&minSLayer](CDCLegendreTrackHit * hit) {return hit->getSuperlayerId() == minSLayer;}), m_TrackHits.end());
+        } else {
+          innermostAxialSLayer = minSLayer;
+          break;
+        }
+      }
+      ++minSLayer;
+    } while (minSLayer <= 8);
+//    while (!hitPatternAxial.getSLayer(minSLayer++));
+    innermostAxialSLayer = minSLayer - 1;
+    if (m_TrackHits.size() != nHits) makeHitPattern();
+  }
 
-  return minSLayer - 1;
+  return innermostAxialSLayer;
 }
 
-int CDCLegendreTrackCandidate::getOutermostAxialSLayer()
+int CDCLegendreTrackCandidate::getOutermostAxialSLayer(bool forced, int minNHits)
 {
-  int maxSLayer = 8;
 
   /*  for(int ii=8; ii>=0; ii--)
     {
@@ -281,9 +306,27 @@ int CDCLegendreTrackCandidate::getOutermostAxialSLayer()
       }
     }
   */
-  while (!hitPatternAxial.getSLayer(maxSLayer--));
+  if ((outermostAxialSLayer == -1) || (forced)) {
+    int nHits = m_TrackHits.size();
+    int maxSLayer = 8;
+    do {
+      if (hitPatternAxial.getSLayer(maxSLayer)) {
+        if (hitPatternAxial.getNSLayer(maxSLayer) < minNHits) {
+          //using lambda functions for erase-remove idiom
+          m_TrackHits.erase(std::remove_if(m_TrackHits.begin(), m_TrackHits.end(), [&maxSLayer](CDCLegendreTrackHit * hit) {return hit->getSuperlayerId() == maxSLayer;}), m_TrackHits.end());
+        } else {
+          innermostAxialSLayer = maxSLayer;
+          break;
+        }
+      }
+      --maxSLayer;
+    } while (maxSLayer >= 0);
+//    while (!hitPatternAxial.getSLayer(maxSLayer--));
+    innermostAxialSLayer = maxSLayer + 1;
+    if (m_TrackHits.size() != nHits) makeHitPattern();
+  }
 
-  return maxSLayer + 1;
+  return outermostAxialSLayer;
 }
 
 
@@ -311,6 +354,44 @@ int CDCLegendreTrackCandidate::getCandidateType()
 
   return type;
 }
+
+bool CDCLegendreTrackCandidate::checkHitPattern(int minNHitsSLayer)
+{
+  int innermostAxialSLayer = getInnermostAxialSLayer();
+  int outermostAxialSLayer = getOutermostAxialSLayer();
+//  bool prevSLayerIsGood = true; //variable which helps to find end of track
+  for (int iSLayer = innermostAxialSLayer; iSLayer <= outermostAxialSLayer; iSLayer += 2) {
+    if ((!hitPatternAxial.getSLayer(iSLayer)) || ((hitPatternAxial.getSLayer(iSLayer)) && (hitPatternAxial.getNSLayer(iSLayer)) < minNHitsSLayer)) {
+      //using lambda functions for erase-remove idiom; erase all hits starting from bad SLayer and above
+//      m_TrackHits.erase(std::remove_if(m_TrackHits.begin(), m_TrackHits.end(), [&iSLayer](CDCLegendreTrackHit * hit){return hit->getSuperlayerId() > iSLayer;}), m_TrackHits.end());
+//      getOutermostAxialSLayer(true);
+      return true;
+    }
+  }
+
+  return true;
+}
+
+void CDCLegendreTrackCandidate::makeHitPattern()
+{
+  hitPattern.clearPattern();
+  hitPatternAxial.clearPattern();
+  hitPatternStereo.clearPattern();
+  for (CDCLegendreTrackHit * hit : m_TrackHits) {
+
+    hitPattern.setLayer(hit->getLayerId());
+    if (hit->getIsAxial())
+      hitPatternAxial.setLayer(hit->getLayerId());
+    else
+      hitPatternStereo.setLayer(hit->getLayerId());
+  }
+
+  DetermineHitNumbers();
+
+  cout << "pattern:" << hitPatternAxial.getHitPattern() << endl;
+
+}
+
 
 
 double CDCLegendreTrackCandidate::getLayerWaight()
@@ -366,4 +447,10 @@ void CDCLegendreTrackCandidate::CheckStereoHits()
   }
 
   m_TrackHits = replace_vector;
+}
+
+void CDCLegendreTrackCandidate::setReferencePoint(double x0, double y0)
+{
+  ref_x = x0;
+  ref_y = y0;
 }

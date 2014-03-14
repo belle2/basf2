@@ -173,10 +173,41 @@ void CDCLegendreTrackingModule::DoSteppedTrackFinding()
       n_hits = 999;
     }
 
+
     // if track is found and has enough hits
     else if (n_hits >= m_threshold) {
-      cdcLegendreTrackFitter->fitTrackCandidate(&candidate);
-      createLegendreTrackCandidate(candidate, &hits_set);
+//      cdcLegendreTrackFitter->fitTrackCandidateStepped(&candidate);
+      std::pair<double, double> ref_point = std::make_pair(0., 0.);
+      cdcLegendreTrackFitter->fitTrackCandidateFast(&candidate, ref_point);
+
+      bool merged = false;
+      //loop over all candidates
+      for (std::list<CDCLegendreTrackCandidate*>::iterator it1 =
+             m_trackList.begin(); it1 != m_trackList.end(); ++it1) {
+        CDCLegendreTrackCandidate* cand1 = *it1;
+
+        //check only curler
+        if (fabs(cand1->getR()) > m_rc) {
+
+          if (fabs(candidate.second.second) > m_rc) {
+
+            //check if the two tracks lie next to each other
+            if (fabs(cand1->getR() - candidate.second.second) < 0.03
+                && fabs(cand1->getTheta() - candidate.second.first) < 0.15) {
+              mergeTracks(cand1, candidate);
+              BOOST_FOREACH(CDCLegendreTrackHit * hit, candidate.first) {
+                hits_set.erase(hit);
+              }
+              cdcLegendreTrackFitter->fitTrackCandidateFast(cand1, ref_point);
+              cand1->setReferencePoint(ref_point.first, ref_point.second);
+              merged = true;
+              break;
+            }
+          }
+        }
+      }
+
+      if (!merged) createLegendreTrackCandidate(candidate, &hits_set, ref_point);
 
       limit = n_hits * m_stepScale;
     }
@@ -209,7 +240,8 @@ void CDCLegendreTrackingModule::MergeCurler()
           //check if the two tracks lie next to each other
           if (fabs(cand1->getR() - cand2->getR()) < 0.03
               && fabs(cand1->getTheta() - cand2->getTheta()) < 0.15)
-            mergeTracks(cand1, cand2);
+            return;
+          //mergeTracks(cand1, cand2);
         }
       }
     }
@@ -349,24 +381,24 @@ void CDCLegendreTrackingModule::AsignStereoHits()
 }
 
 void CDCLegendreTrackingModule::mergeTracks(CDCLegendreTrackCandidate* cand1,
-                                            CDCLegendreTrackCandidate* cand2)
+                                            const std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> >& track)
 {
 
   cand1->setR(
-    (cand1->getR() * cand1->getNHits() + cand2->getR() * cand2->getNHits())
-    / (cand1->getNHits() + cand2->getNHits()));
+    (cand1->getR() * cand1->getNHits() + track.second.second * track.first.size())
+    / (cand1->getNHits() + track.second.second * track.first.size()));
   cand1->setTheta(
     (cand1->getTheta() * cand1->getNHits()
-     + cand2->getTheta() * cand2->getNHits())
-    / (cand1->getNHits() + cand2->getNHits()));
+     + track.second.first * track.second.second * track.first.size())
+    / (cand1->getNHits() + track.second.second * track.first.size()));
 
-  BOOST_FOREACH(CDCLegendreTrackHit * hit, cand2->getTrackHits()) {
+  BOOST_FOREACH(CDCLegendreTrackHit * hit, track.first) {
     cand1->addHit(hit);
   }
 
-  m_trackList.remove(cand2);
-  delete cand2;
-  cand2 = NULL;
+//  m_trackList.remove(cand2);
+//  delete cand2;
+//  cand2 = NULL;
 }
 
 void CDCLegendreTrackingModule::checkHitPattern()
@@ -383,7 +415,7 @@ void CDCLegendreTrackingModule::checkHitPattern()
 
 void CDCLegendreTrackingModule::createLegendreTrackCandidate(
   const std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> >& track,
-  std::set<CDCLegendreTrackHit*>* trackHitList)
+  std::set<CDCLegendreTrackHit*>* trackHitList, std::pair<double, double>& ref_point)
 {
 
   //get theta and r values for each track candidate
@@ -400,6 +432,7 @@ void CDCLegendreTrackingModule::createLegendreTrackCandidate(
       || charge == CDCLegendreTrackCandidate::charge_curler) {
     CDCLegendreTrackCandidate* trackCandidate = new CDCLegendreTrackCandidate(
       track_theta, track_r, charge, track.first);
+    trackCandidate->setReferencePoint(ref_point.first, ref_point.second);
 
     processTrack(trackCandidate, trackHitList);
   }
@@ -409,10 +442,12 @@ void CDCLegendreTrackingModule::createLegendreTrackCandidate(
     CDCLegendreTrackCandidate* trackCandidate_pos =
       new CDCLegendreTrackCandidate(track_theta, track_r,
                                     CDCLegendreTrackCandidate::charge_positive, track.first);
+    trackCandidate_pos->setReferencePoint(ref_point.first, ref_point.second);
 
     CDCLegendreTrackCandidate* trackCandidate_neg =
       new CDCLegendreTrackCandidate(track_theta, track_r,
                                     CDCLegendreTrackCandidate::charge_negative, track.first);
+    trackCandidate_neg->setReferencePoint(ref_point.first, ref_point.second);
 
     processTrack(trackCandidate_pos, trackHitList);
 
@@ -494,8 +529,9 @@ void CDCLegendreTrackingModule::createGFTrackCandidates()
     //set the values needed as start values for the fit in the genfit::TrackCandidate from the CDCTrackCandidate information
     //variables stored in the genfit::TrackCandidates are: vertex position + error, momentum + error, pdg value, indices for the Hits
     TVector3 position;
-    position.SetXYZ(0.0, 0.0, 0.0);//at the moment there is no vertex determination in the ConformalFinder, but maybe the origin or the innermost hit are good enough as start values...
+//    position.SetXYZ(0.0, 0.0, 0.0);//at the moment there is no vertex determination in the ConformalFinder, but maybe the origin or the innermost hit are good enough as start values...
     //position = cdcTrackCandidates[i]->getInnerMostHit().getWirePosition();
+    position = trackCand->getReferencePoint();
 
     TVector3 momentum =
       trackCand->getMomentumEstimation(true);

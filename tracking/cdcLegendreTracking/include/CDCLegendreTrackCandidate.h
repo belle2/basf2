@@ -61,17 +61,27 @@ namespace Belle2 {
       return m_TrackHits;
     }
 
+    /**Return pattern of assigned axial hits.*/
     inline HitPatternCDC getHitPatternAxial() {
       return hitPatternAxial;
     }
 
+    /**Return pattern of assigned stereo hits.*/
     inline HitPatternCDC getHitPatternStereo() {
       return hitPatternStereo;
     }
 
+    /**Return pattern of assigned axial and stereo hits.*/
     inline HitPatternCDC getHitPattern() {
       return hitPattern;
     }
+
+    /**
+     * Check pattern of hits:
+     * in between of innermost and outermost SLayers should be no empty SLayers;
+     * argument of function allows define minimal number of axial hits in each SLayer
+     * */
+    bool checkHitPattern(int minNHitsSLayer = 2);
 
     /** Return theta value of track.*/
     inline double getTheta() const {
@@ -162,13 +172,27 @@ namespace Belle2 {
 
     /**
      * @brief return SLayer ID of the contributing axial hit with the small layer ID.
+     * @param forced allows to redefine innermost SLayer ID (especially after changes in hit pattern)
+     * @param minNhits allows to change minimal number of hits required in innermost SLayer
      */
-    int getInnermostAxialSLayer();
+    int getInnermostAxialSLayer(bool forced = false, int minNHits = 2);
 
     /**
      * @brief return SLayer ID of the contributing axial hit with the largest layer ID.
+     * @param forced allows to redefine outermost SLayer ID (especially after changes in hit pattern)
+     * @param minNhits allows to change minimal number of hits required in outermost SLayer
+      */
+    int getOutermostAxialSLayer(bool forced = false, int minNHits = 2);
+
+    /**
+     * set reference point, with respect to which track was found
      */
-    int getOutermostAxialSLayer();
+    void setReferencePoint(double x0, double y0);
+
+    /**
+     * set reference point, with respect to which track was found
+     */
+    TVector3 getReferencePoint() const {return TVector3(ref_x, ref_y, 0);}
 
     /**
      *  Returns a weight, calculated from the contributing hits.
@@ -198,6 +222,8 @@ namespace Belle2 {
     double m_r; /**< r_value of the track candidate, given by Legendre track finding*/
     double m_xc; /**< xc value in conformal plane*/
     double m_yc; /**< yc value in conformal plane*/
+    double ref_x; /**< xc value in conformal plane*/
+    double ref_y; /**< yc value in conformal plane*/
     const int m_charge; /**< charge assumption of track*/
 
     int m_axialHits; /**< Number of axial hits, belonging to the track*/
@@ -210,6 +236,10 @@ namespace Belle2 {
     HitPatternCDC hitPatternStereo; /**< Efficient hit pattern builder; see HitPatternCDC description  */
     HitPatternCDC hitPattern; /**< Efficient hit pattern builder; see HitPatternCDC description  */
 
+    int innermostAxialSLayer; //Innermost axial superlayer;
+    int outermostAxialSLayer; //Outermost axial superlayer;
+    int innermostAxialLayer; //Innermost axial layer;
+    int outermostAxialLayer; //Outermost axial layer;
     /**
      * Calculates the momentum estimation from parameters of the track (for x and y)
      * and from contributing hits (for z)
@@ -227,6 +257,9 @@ namespace Belle2 {
      * Updates m_axialHits, m_stereoHits, and m_allHits
      */
     void DetermineHitNumbers();
+
+    /**Return pattern of assigned axial and stereo hits.*/
+    void makeHitPattern();
 
   };
 //end class CDCLegendreTrackCandidate

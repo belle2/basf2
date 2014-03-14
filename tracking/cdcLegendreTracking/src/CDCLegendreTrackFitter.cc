@@ -32,7 +32,7 @@ using namespace Belle2;
 //using namespace CDC;
 
 
-void CDCLegendreTrackFitter::fitTrackCandidate(
+void CDCLegendreTrackFitter::fitTrackCandidateStepped(
   std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> >* track)
 {
   //get theta and r values for each track candidate
@@ -395,3 +395,223 @@ void CDCLegendreTrackFitter::fitTrackCandidateNormalSpace(
   printf("initial: th: %f	r  %f\n", track_theta_initial, track_r_initial);
   printf("final:   th: %f	r  %f\n", track->second.first, track->second.second);
 }
+
+void CDCLegendreTrackFitter::fitTrackCandidateFast(
+  std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> >* track,
+  std::pair<double, double>& ref_point)
+{
+  /*
+    double x, y, w;
+    double x_tot=0., y_tot=0., xy_tot=0., x2_tot=0., y2_tot=0., r2_tot=0., r4_tot=0., xr2_tot=0., yr2_tot=0.;
+    double w_tot=0.;
+    double Crr, Cxy, Cxr, Cyr, Cxx, Cyy;
+    double q1, q2;
+    double phi, k, delta, rho, d;
+    double chi2 ;
+
+    for(CDCLegendreTrackHit* hit : track->first)
+    {
+  //    w = hit->getDriftTime();
+      w = 1.;
+      w_tot += w;
+      x += hit->getWirePosition().X();
+      y += hit->getWirePosition().Y();
+      x_tot += x;
+      y_tot += y;
+      xy_tot += x*y * w;
+      x2_tot += x*x * w;
+      y2_tot += y*y * w;
+      r2_tot += (x*x + y*y) * w;
+      xr2_tot += x*(x*x + y*y) * w;
+      yr2_tot += y*(x*x + y*y) * w;
+      r4_tot += (x*x + y*y)*(x*x + y*y) * w;
+    }
+
+    Cxx = x2_tot/w_tot - (x_tot/w_tot)*(x_tot/w_tot);
+    Cyy = y2_tot/w_tot - (y_tot/w_tot)*(y_tot/w_tot);
+    Cxy = xy_tot/w_tot - (x_tot/w_tot)*(y_tot/w_tot);
+    Cxr = xr2_tot/w_tot - (x_tot/w_tot)*(r2_tot/w_tot);
+    Cyr = yr2_tot/w_tot - (y_tot/w_tot)*(r2_tot/w_tot);
+    Crr = r4_tot/w_tot - (r2_tot/w_tot)*(r2_tot/w_tot);
+
+    q1 = Crr*Cxy - Cxr*Cyr;
+    q2 = Crr*(Cxx-Cyy) - Cxr*Cxr + Cyr*Cyr;
+
+    phi = 0.5*atan(2.*q1/q2);
+    k = (sin(phi)*Cxr - cos(phi)*Cyr)/Crr;
+    delta = -1.*k*(r2_tot/w_tot) + sin(phi)*(x_tot/w_tot) - cos(phi)*(y_tot/w_tot);
+
+    rho = 2.*k/sqrt(1-4.*delta*k);
+    d = 2.*delta/(1 + sqrt(1-4.*delta*k));
+
+    cout << "Before: " << track->second.first << "  " << track->second.second << endl;
+    track->second.first = phi;
+    track->second.second = rho;
+    cout << "k=" << k << " delta=" << delta << endl;
+    cout << "After: " << track->second.first << " " << track->second.second << endl;
+
+    chi2 = w_tot*(1+rho*d)*(1+rho*d)*(sin(phi)*sin(phi)*Cxx - 2.*sin(phi)*cos(phi)*Cxy + cos(phi)*cos(phi)*Cyy - k*k*Crr);
+    cout << "chi2=" << chi2 << ";" << (1+rho*d) << "^2 * " << (sin(phi)*sin(phi)*Cxx - 2.*sin(phi)*cos(phi)*Cxy + cos(phi)*cos(phi)*Cyy - k*k*Crr) << endl;
+
+  */
+  double stopper = 0.000000001; /// WARNING hardcoded values!
+  double meanX = 0, meanY = 0, meanX2 = 0, meanY2 = 0, meanR2 = 0, meanR4 = 0, meanXR2 = 0, meanYR2 = 0, meanXY = 0; //mean values
+  double r2 = 0, x = 0, y = 0, x2 = 0, y2 = 0; // coords
+  double weight;// weight of each hit, so far no difference in hit quality
+  double sumWeights = 0, divisor, weightNormalizer = 0; // sumWeights is sum of weights, divisor is 1/sumWeights;
+  double tuningParameter = 1.; //0.02; // this parameter is for internal tuning of the weights, since at the moment, the error seams highly overestimated at the moment. 1 means no influence of parameter.
+
+  // looping over all hits and do the division afterwards
+  for (CDCLegendreTrackHit * hit : track->first) {
+    if (hit->getDriftTime() != 0.)weight =  1. / hit->getDriftTime();
+    else continue;
+    sumWeights += weight;
+    x = hit->getWirePosition().X();
+    y = hit->getWirePosition().Y();
+    x2 = x * x;
+    y2 = y * y;
+    r2 = x2 + y2;
+    meanX += x * weight;
+    meanY += y * weight;
+    meanXY += x * y * weight;
+    meanX2 += x2 * weight;
+    meanY2 += y2 * weight;
+    meanXR2 += x * r2 * weight;
+    meanYR2 += y * r2 * weight;
+    meanR2 += r2 * weight;
+    meanR4 += r2 * r2 * weight;
+  }
+  divisor = 1. / sumWeights;
+  meanX *= divisor;
+  meanY *= divisor;
+  meanXY *= divisor;
+  meanY2 *= divisor;
+  meanX2 *= divisor;
+  meanXR2 *= divisor;
+  meanYR2 *= divisor;
+  meanR2 *= divisor;
+  meanR4 *= divisor;
+
+  // covariances:
+  double covXX = meanX2 - meanX * meanX;
+  double covXY = meanXY - meanX * meanY;
+  double covYY = meanY2 - meanY * meanY;
+  double covXR2 = meanXR2 - meanX * meanR2;
+  double covYR2 = meanYR2 - meanY * meanR2;
+  double covR2R2 = meanR4 - meanR2 * meanR2;
+
+  // q1, q2: helping variables, to make the code more readable
+  double q1 = covR2R2 * covXY - covXR2 * covYR2;
+  double q2 = covR2R2 * (covXX - covYY) - covXR2 * covXR2 + covYR2 * covYR2;
+
+  double clapPhi = 0.5 * atan2(2. * q1 , q2); // physical meaning: phi value of the point of closest approach of the fitted circle to the origin
+
+  double sinPhi = sin(clapPhi);
+  double cosPhi = cos(clapPhi);
+  double kappa = (sinPhi * covXR2 - cosPhi * covYR2) / covR2R2;
+  double delta = -kappa * meanR2 + sinPhi * meanX - cosPhi * meanY;
+  double rootTerm = sqrt(1. - 4.*delta * kappa);
+  double rho = 2.*kappa / (rootTerm); // rho = curvature in X-Y-plane = 1/radius of fitting circle, used for pT-calculation
+  double clapR = 2.*delta / (1. + rootTerm);
+  double radius = -1. / rho;
+//  if (radius < 0.) { radius *= -1.; }
+
+  double ref_x = cos(clapPhi - m_PI / 2.) * clapR;
+  double ref_y = sin(clapPhi - m_PI / 2.) * clapR;
+
+  ref_point.first = ref_x;
+  ref_point.second = ref_y;
+
+  cout << "Before: " << track->second.first << "	" << track->second.second << endl;
+  track->second.first = clapPhi + m_PI / 2.;
+  track->second.second = 1. / radius;
+  cout << "k=" << sumWeights << " delta=" << divisor << endl;
+  cout << "After: " << track->second.first << "	" << track->second.second << endl;
+
+  double chi2 = sumWeights * (1. + rho * clapR) * (1. + rho * clapR) * (sinPhi * sinPhi * covXX - 2.*sinPhi * cosPhi * covXY + cosPhi * cosPhi * covYY - kappa * kappa * covR2R2); /// returns chi2
+  cout << chi2 << endl;
+}
+
+void CDCLegendreTrackFitter::fitTrackCandidateFast(
+  CDCLegendreTrackCandidate* track,
+  std::pair<double, double>& ref_point)
+{
+
+  double stopper = 0.000000001; /// WARNING hardcoded values!
+  double meanX = 0, meanY = 0, meanX2 = 0, meanY2 = 0, meanR2 = 0, meanR4 = 0, meanXR2 = 0, meanYR2 = 0, meanXY = 0; //mean values
+  double r2 = 0, x = 0, y = 0, x2 = 0, y2 = 0; // coords
+  double weight;// weight of each hit, so far no difference in hit quality
+  double sumWeights = 0, divisor, weightNormalizer = 0; // sumWeights is sum of weights, divisor is 1/sumWeights;
+  double tuningParameter = 1.; //0.02; // this parameter is for internal tuning of the weights, since at the moment, the error seams highly overestimated at the moment. 1 means no influence of parameter.
+
+  // looping over all hits and do the division afterwards
+  for (CDCLegendreTrackHit * hit : track->getTrackHits()) {
+    if (hit->getDriftTime() != 0.)weight =  1. / hit->getDriftTime();
+    else continue;
+    sumWeights += weight;
+    x = hit->getWirePosition().X();
+    y = hit->getWirePosition().Y();
+    x2 = x * x;
+    y2 = y * y;
+    r2 = x2 + y2;
+    meanX += x * weight;
+    meanY += y * weight;
+    meanXY += x * y * weight;
+    meanX2 += x2 * weight;
+    meanY2 += y2 * weight;
+    meanXR2 += x * r2 * weight;
+    meanYR2 += y * r2 * weight;
+    meanR2 += r2 * weight;
+    meanR4 += r2 * r2 * weight;
+  }
+  divisor = 1. / sumWeights;
+  meanX *= divisor;
+  meanY *= divisor;
+  meanXY *= divisor;
+  meanY2 *= divisor;
+  meanX2 *= divisor;
+  meanXR2 *= divisor;
+  meanYR2 *= divisor;
+  meanR2 *= divisor;
+  meanR4 *= divisor;
+
+  // covariances:
+  double covXX = meanX2 - meanX * meanX;
+  double covXY = meanXY - meanX * meanY;
+  double covYY = meanY2 - meanY * meanY;
+  double covXR2 = meanXR2 - meanX * meanR2;
+  double covYR2 = meanYR2 - meanY * meanR2;
+  double covR2R2 = meanR4 - meanR2 * meanR2;
+
+  // q1, q2: helping variables, to make the code more readable
+  double q1 = covR2R2 * covXY - covXR2 * covYR2;
+  double q2 = covR2R2 * (covXX - covYY) - covXR2 * covXR2 + covYR2 * covYR2;
+
+  double clapPhi = 0.5 * atan2(2. * q1 , q2); // physical meaning: phi value of the point of closest approach of the fitted circle to the origin
+
+  double sinPhi = sin(clapPhi);
+  double cosPhi = cos(clapPhi);
+  double kappa = (sinPhi * covXR2 - cosPhi * covYR2) / covR2R2;
+  double delta = -kappa * meanR2 + sinPhi * meanX - cosPhi * meanY;
+  double rootTerm = sqrt(1. - 4.*delta * kappa);
+  double rho = 2.*kappa / (rootTerm); // rho = curvature in X-Y-plane = 1/radius of fitting circle, used for pT-calculation
+  double clapR = 2.*delta / (1. + rootTerm);
+  double radius = -1. / rho;
+//  if (radius < 0.) { radius *= -1.; }
+
+  double ref_x = cos(clapPhi - m_PI / 2.) * clapR;
+  double ref_y = sin(clapPhi - m_PI / 2.) * clapR;
+
+  ref_point.first = ref_x;
+  ref_point.second = ref_y;
+
+//  cout << "Before: " << track->second.first << "  " << track->second.second << endl;
+  track->setTheta(clapPhi + m_PI / 2.);
+  track->setR(1. / radius);
+//  cout << "k=" << sumWeights << " delta=" << divisor << endl;
+//  cout << "After: " << track->second.first << " " << track->second.second << endl;
+
+  double chi2 = sumWeights * (1. + rho * clapR) * (1. + rho * clapR) * (sinPhi * sinPhi * covXX - 2.*sinPhi * cosPhi * covXY + cosPhi * cosPhi * covYY - kappa * kappa * covR2R2); /// returns chi2
+  cout << chi2 << endl;
+}
+

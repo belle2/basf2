@@ -433,6 +433,32 @@ namespace Belle2 {
 
     }
 
+    double particleMissingARICHId(const Particle* part)
+    {
+      const PIDLikelihood* pid = DataStore::getRelated<PIDLikelihood>(part);
+      if (!pid)
+        return 1.0;
+
+      Const::PIDDetectorSet set = Const::ARICH;
+      if (not pid->isAvailable(set))
+        return 1.0;
+
+      return 0;
+    }
+
+    double particleMissingTOPId(const Particle* part)
+    {
+      const PIDLikelihood* pid = DataStore::getRelated<PIDLikelihood>(part);
+      if (!pid)
+        return 1.0;
+
+      Const::PIDDetectorSet set = Const::TOP;
+      if (not pid->isAvailable(set))
+        return 1.0;
+
+      return 0;
+    }
+
     // other ------------------------------------------------------------
 
     double particlePvalue(const Particle* part)
@@ -763,36 +789,26 @@ namespace Belle2 {
     REGISTER_VARIABLE("piid_TOP", particlePionTOPId, "pion identification probability from TOP");
     REGISTER_VARIABLE("Kid_TOP", particleKaonTOPId, "kaon identification probability from TOP");
     REGISTER_VARIABLE("prid_TOP", particleProtonTOPId, "proton identification probability from TOP");
+    REGISTER_VARIABLE("missing_TOP", particleMissingTOPId, "1.0 if identification probability from TOP is missing");
 
     REGISTER_VARIABLE("eid_ARICH", particleElectronARICHId, "electron identification probability from ARICH");
     REGISTER_VARIABLE("muid_ARICH", particleMuonARICHId, "muon identification probability from ARICH");
     REGISTER_VARIABLE("piid_ARICH", particlePionARICHId, "pion identification probability from ARICH");
     REGISTER_VARIABLE("Kid_ARICH", particleKaonARICHId, "kaon identification probability from ARICH");
     REGISTER_VARIABLE("prid_ARICH", particleProtonARICHId, "proton identification probability from ARICH");
+    REGISTER_VARIABLE("missing_ARICH", particleMissingARICHId, "1.0 if identification probability from ARICH is missing");
 
-    VariableProxy VariableProxy_NB_eid_TOP("NB_eid_TOP", NeuroBayesify<particleElectronTOPId, 1, 2>, "electron identification probability from TOP");
-    VariableProxy VariableProxy_NB_muid_TOP("NB_muid_TOP", NeuroBayesify<particleMuonTOPId, 1, 2>, "muon identification probability from TOP");
-    VariableProxy VariableProxy_NB_piid_TOP("NB_piid_TOP", NeuroBayesify<particlePionTOPId, 1, 2>, "pion identification probability from TOP");
-    VariableProxy VariableProxy_NB_Kid_TOP("NB_Kid_TOP", NeuroBayesify<particleKaonTOPId, 1, 2>, "kaon identification probability from TOP");
-    VariableProxy VariableProxy_NB_prid_TOP("NB_prid_TOP", NeuroBayesify<particleProtonTOPId, 1, 2>, "proton identification probability from TOP");
+    VariableProxy VariableProxy_NB_eid_TOP("NB_eid_TOP", NeuroBayesifyTOP<particleElectronTOPId>, "electron identification probability from TOP");
+    VariableProxy VariableProxy_NB_muid_TOP("NB_muid_TOP", NeuroBayesifyTOP<particleMuonTOPId>, "muon identification probability from TOP");
+    VariableProxy VariableProxy_NB_piid_TOP("NB_piid_TOP", NeuroBayesifyTOP<particlePionTOPId>, "pion identification probability from TOP");
+    VariableProxy VariableProxy_NB_Kid_TOP("NB_Kid_TOP", NeuroBayesifyTOP<particleKaonTOPId>, "kaon identification probability from TOP");
+    VariableProxy VariableProxy_NB_prid_TOP("NB_prid_TOP", NeuroBayesifyTOP<particleProtonTOPId>, "proton identification probability from TOP");
 
-    VariableProxy VariableProxy_NB_eid_ARICH("NB_eid_ARICH", NeuroBayesify<particleElectronARICHId, 1, 2>, "electron identification probability from ARICH");
-    VariableProxy VariableProxy_NB_muid_ARICH("NB_muid_ARICH", NeuroBayesify<particleMuonARICHId, 1, 2>, "muon identification probability from ARICH");
-    VariableProxy VariableProxy_NB_piid_ARICH("NB_piid_ARICH", NeuroBayesify<particlePionARICHId, 1, 2>, "pion identification probability from ARICH");
-    VariableProxy VariableProxy_NB_Kid_ARICH("NB_Kid_ARICH", NeuroBayesify<particleKaonARICHId, 1, 2>, "kaon identification probability from ARICH");
-    VariableProxy VariableProxy_NB_prid_ARICH("NB_prid_ARICH", NeuroBayesify<particleProtonARICHId, 1, 2>, "proton identification probability from ARICH");
-
-    VariableProxy VariableProxy_NB_flag_eid_TOP("NB_flag_eid_TOP", NeuroBayesFlagify<particleElectronTOPId, 1, 2>, "electron identification probability from TOP");
-    VariableProxy VariableProxy_NB_flag_muid_TOP("NB_flag_muid_TOP", NeuroBayesFlagify<particleMuonTOPId, 1, 2>, "muon identification probability from TOP");
-    VariableProxy VariableProxy_NB_flag_piid_TOP("NB_flag_piid_TOP", NeuroBayesFlagify<particlePionTOPId, 1, 2>, "pion identification probability from TOP");
-    VariableProxy VariableProxy_NB_flag_Kid_TOP("NB_flag_Kid_TOP", NeuroBayesFlagify<particleKaonTOPId, 1, 2>, "kaon identification probability from TOP");
-    VariableProxy VariableProxy_NB_flag_prid_TOP("NB_flag_prid_TOP", NeuroBayesFlagify<particleProtonTOPId, 1, 2>, "proton identification probability from TOP");
-
-    VariableProxy VariableProxy_NB_flag_eid_ARICH("NB_flag_eid_ARICH", NeuroBayesFlagify<particleElectronARICHId, 1, 2>, "electron identification probability from ARICH");
-    VariableProxy VariableProxy_NB_flag_muid_ARICH("NB_flag_muid_ARICH", NeuroBayesFlagify<particleMuonARICHId, 1, 2>, "muon identification probability from ARICH");
-    VariableProxy VariableProxy_NB_flag_piid_ARICH("NB_flag_piid_ARICH", NeuroBayesFlagify<particlePionARICHId, 1, 2>, "pion identification probability from ARICH");
-    VariableProxy VariableProxy_NB_flag_Kid_ARICH("NB_flag_Kid_ARICH", NeuroBayesFlagify<particleKaonARICHId, 1, 2>, "kaon identification probability from ARICH");
-    VariableProxy VariableProxy_NB_flag_prid_ARICH("NB_flag_prid_ARICH", NeuroBayesFlagify<particleProtonARICHId, 1, 2>, "proton identification probability from ARICH");
+    VariableProxy VariableProxy_NB_eid_ARICH("NB_eid_ARICH", NeuroBayesifyARICH<particleElectronARICHId>, "electron identification probability from ARICH");
+    VariableProxy VariableProxy_NB_muid_ARICH("NB_muid_ARICH", NeuroBayesifyARICH<particleMuonARICHId>, "muon identification probability from ARICH");
+    VariableProxy VariableProxy_NB_piid_ARICH("NB_piid_ARICH", NeuroBayesifyARICH<particlePionARICHId>, "pion identification probability from ARICH");
+    VariableProxy VariableProxy_NB_Kid_ARICH("NB_Kid_ARICH", NeuroBayesifyARICH<particleKaonARICHId>, "kaon identification probability from ARICH");
+    VariableProxy VariableProxy_NB_prid_ARICH("NB_prid_ARICH", NeuroBayesifyARICH<particleProtonARICHId>, "proton identification probability from ARICH");
 
     REGISTER_VARIABLE("chiProb", particlePvalue, "chi^2 probability of the fit");
     REGISTER_VARIABLE("nDaughters", particleNDaughters, "number of daughter particles");

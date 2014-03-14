@@ -12,6 +12,7 @@
 #define PSELECTORFUNCTIONS_H
 
 #include <analysis/dataobjects/Particle.h>
+#include <mdst/dataobjects/PIDLikelihood.h>
 
 namespace Belle2 {
 
@@ -396,25 +397,54 @@ namespace Belle2 {
     /**
      * NeuroBayesifys this function
      * @param part cconst pointer to Particle
-     * @return function value, except for value numerator/denominator which is set to -999
+     * @return function value, except if information from ARICH is not available which is set to -999
      */
-    template<double(*T)(const Particle*), int numerator, int denominator>
-    double NeuroBayesify(const Particle* particle)
+    template<double(*T)(const Particle*)>
+    double NeuroBayesifyARICH(const Particle* particle)
     {
-      double result = T(particle);
-      return (std::abs(result - static_cast<double>(numerator) / denominator) < 1e-12) ? -999 : result;
+
+      const PIDLikelihood* pid = DataStore::getRelated<PIDLikelihood>(particle);
+      if (!pid)
+        return -999;
+
+      Const::PIDDetectorSet set = Const::ARICH;
+      if (not pid->isAvailable(set))
+        return -999;
+      return T(particle);
     }
 
     /**
-     * Caclulate NeuroBayes Flag for function
+     * NeuroBayesifys this function
      * @param part cconst pointer to Particle
-     * @return function value, except for value numerator/denominator which is set to -999
+     * @return function value, except if information from TOP is not available which is set to -999
      */
-    template<double(*T)(const Particle*), int numerator, int denominator>
-    double NeuroBayesFlagify(const Particle* particle)
+    template<double(*T)(const Particle*)>
+    double NeuroBayesifyTOP(const Particle* particle)
     {
-      return (std::abs(T(particle) - static_cast<double>(numerator) / denominator) < 1e-12) ? 1 : 0;
+
+      const PIDLikelihood* pid = DataStore::getRelated<PIDLikelihood>(particle);
+      if (!pid)
+        return -999;
+
+      Const::PIDDetectorSet set = Const::TOP;
+      if (not pid->isAvailable(set))
+        return -999;
+      return T(particle);
     }
+
+    /**
+     * function for PSelector
+     * @param part const pointer to Particle
+     * @return 1 if ARICH Id is missing
+     */
+    double particleMissingARICHId(const Particle*);
+
+    /**
+     * function for PSelector
+     * @param part const pointer to Particle
+     * @return 1 if TOPId is missing
+     */
+    double particleMissingTOPId(const Particle*);
 
     /**
      * function for PSelector

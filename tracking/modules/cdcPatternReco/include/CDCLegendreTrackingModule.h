@@ -33,6 +33,7 @@ namespace Belle2 {
   class CDCLegendrePatternChecker;
   class CDCLegendreFastHough;
   class CDCLegendreTrackMerger;
+  class CDCLegendreTrackCreator;
 
   /** CDC tracking module, using Legendre transformation of the drift time circles.
    * This is a module, performing tracking in the CDC. It is based on the paper "Implementation of the Legendre Transform for track segment reconstruction in drift tube chambers" by T. Alexopoulus, et al. NIM A592 456-462 (2008)
@@ -95,6 +96,7 @@ namespace Belle2 {
     CDCLegendrePatternChecker* m_cdcLegendrePatternChecker;
     CDCLegendreFastHough* m_cdcLegendreFastHough;
     CDCLegendreTrackMerger* m_cdcLegendreTrackMerger;
+    CDCLegendreTrackCreator* m_cdcLegendreTrackCreator;
 
     int m_threshold; /**< Threshold for votes in the legendre plane, parameter of the module*/
     double m_thresholdUnique; /**< Threshold of unique TrackHits for track building*/
@@ -134,21 +136,6 @@ namespace Belle2 {
      */
     void AsignStereoHits();
 
-    /**
-     * @brief Function to create a track candidate
-     * @param track construction of std::pairs, describing the track candidate by the axial hits, belonging to it and the parameter r and theta
-     * @param trackHitList list of all track hits, which are used for track finding. Hits belonging to the track candidate will be deleted from it.
-     */
-    void createLegendreTrackCandidate(const std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> >& track, std::set<CDCLegendreTrackHit*>* trackHitList, std::pair<double, double>& ref_point);
-
-
-    /**
-     * @brief Perform the necessary operations after the track candidate has been constructed
-     * @param track The constructed track candidate
-     * @param trackHitList list of al track hits, which are used for track finding. Hits belonging to the track candidate will be deleted from it.
-     * This function leaves room for other operations like further quality checks or even the actual fitting of the track candidate.
-     */
-    void processTrack(CDCLegendreTrackCandidate* track, std::set<CDCLegendreTrackHit*>* trackHitList);
 
     /** Creates GeantFit Track Candidates from CDCLegendreTrackCandidates */
     void createGFTrackCandidates();
@@ -159,11 +146,6 @@ namespace Belle2 {
      */
     void checkHitPattern();
 
-
-    /**
-     * @brief Implementation of check for quality criteria after the track candidate was produced.
-     */
-    bool fullfillsQualityCriteria(CDCLegendreTrackCandidate* cand);
 
     /**
      * All objects in m_hitList and m_trackList are deleted and the two lists are cleared.

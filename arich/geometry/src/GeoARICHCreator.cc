@@ -123,15 +123,24 @@ namespace Belle2 {
         boratedpoly30->AddMaterial(medPoly, 0.70);
 
         double zfrr = 1670;
-        double zbkk = 1900;
-        double radij1 = 380;
-        double radij2 = 440;
-        G4ThreeVector nshieldOrigin(0, 0, (zbkk + zfrr) / 2.);
+        double zbkk = 1902;
+        double zfrr1 = 1906;
+        double zbkk1 = 1950;
+        double radij1 = 440;
+        double radij2 = 500;
+
+
+        G4ThreeVector nshieldOrigin(0, 0, (zbkk + zfrr) / 2. - envOrigin.z());
+        G4ThreeVector nshieldOrigin1(0, 0, (zbkk1 + zfrr1) / 2. - envOrigin.z());
         G4Transform3D transform_nshield = G4Translate3D(nshieldOrigin);
+        G4Transform3D transform_nshield1 = G4Translate3D(nshieldOrigin1);
         G4Tubs* nshield_shape = new G4Tubs("nshield_shape", radij1, radij2, (zbkk - zfrr) / 2., 0, 2 * M_PI);
+        G4Tubs* nshield_shape1 = new G4Tubs("nshield_shape1", radij1, radij2, (zbkk1 - zfrr1) / 2., 0, 2 * M_PI);
         // please change here boratedpoly30 to boratedpoly05
         G4LogicalVolume* nshield = new G4LogicalVolume(nshield_shape, boratedpoly30, "nShield");
-        new G4PVPlacement(transform_nshield , nshield, "ARICH.nShield", &topVolume, false, 1);
+        G4LogicalVolume* nshield1 = new G4LogicalVolume(nshield_shape1, boratedpoly30, "nShield1");
+        new G4PVPlacement(transform_nshield , nshield, "ARICH.nShield", envelope, false, 1);
+        new G4PVPlacement(transform_nshield1 , nshield1, "ARICH.nShield1", envelope, false, 1);
 
       }
 

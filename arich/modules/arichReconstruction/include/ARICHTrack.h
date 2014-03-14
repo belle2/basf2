@@ -180,6 +180,7 @@ namespace Belle2 {
      */
     void setDetectedPhotons(int i, double val) {m_detectedPhotons[i] = val;};
 
+    //! sets the geometrical acceptance of Cherenkov ring for i-th particle hypothesis (here i is particle index: 0 electron, 1 muon, 2 pion, 3 kaon, 4 proton)
     void setGeometricalAcceptance(int i, double val) {m_acc[i] = val;};
 
     //! sets the reconstructed value of track parameters.

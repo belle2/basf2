@@ -2,14 +2,14 @@
 <Detector desc="Parameters of detector plane and detector module" xmlns:xi="http://www.w3.org/2001/XInclude">
   <xi:include href="ARICH-Hapd.xml"/>
   <Plane> 
-    <zPosition desc="Z position of detector plane (beginning)" unit="mm">1860</zPosition>
+    <zPosition desc="Z position of detector plane (beginning)" unit="mm">1870</zPosition>
     <tubeOuterRadius desc="Outer radius of detector tube" unit="mm">1135</tubeOuterRadius>
-    <tubeInnerRadius desc="Inner radius of detector tube" unit="mm">440</tubeInnerRadius>    
+    <tubeInnerRadius desc="Inner radius of detector tube" unit="mm">500</tubeInnerRadius>    
     <Rings>
       <Ring id="1">
 	<nSegments desc="number of detector segments">6</nSegments>
 	<dFi desc="minimal distance between modules in fi direction" unit="mm">5</dFi>
-	<dR desc="minimal distance between modules in r direction" unit="mm">96</dR>
+	<dR desc="minimal distance between modules in r direction" unit="mm">36</dR>
       </Ring>
       <Ring id="2">
 	<nSegments desc="number of detector segments">6</nSegments>

@@ -2,7 +2,7 @@
 <Aerogel desc="Parameter of aRICH aerogel layers">
   <tileXSize desc="Size of wedge aerogel tile (maximal size in r direction)" unit="mm">180</tileXSize> 	
   <tileYSize desc="Size of wedge aerogel tile (maximal size in phi direction)" unit="mm">180</tileYSize> 	
-  <tubeInnerRadius desc="Inner radius of aerogel tube" unit="mm">440</tubeInnerRadius>
+  <tubeInnerRadius desc="Inner radius of aerogel tube" unit="mm">500</tubeInnerRadius>
   <tubeOuterRadius desc="Outer radius of aerogel tube" unit="mm">1137</tubeOuterRadius>
   <tileGap desc="Gap between the edges of aerogel tiles" unit="mm">1</tileGap>
   <tubeMaterial desc="Material that fills the gaps between aerogel tiles">ARICH_TileGapsFill</tubeMaterial>

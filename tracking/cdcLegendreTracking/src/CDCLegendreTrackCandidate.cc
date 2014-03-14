@@ -320,14 +320,14 @@ int CDCLegendreTrackCandidate::getOutermostAxialSLayer(bool forced, int minNHits
           //using lambda functions for erase-remove idiom
           m_TrackHits.erase(std::remove_if(m_TrackHits.begin(), m_TrackHits.end(), [&maxSLayer](CDCLegendreTrackHit * hit) {return hit->getSuperlayerId() == maxSLayer;}), m_TrackHits.end());
         } else {
-          m_innermostAxialSLayer = maxSLayer;
+          m_outermostAxialSLayer = maxSLayer;
           break;
         }
       }
       --maxSLayer;
     } while (maxSLayer >= 0);
 //    while (!hitPatternAxial.getSLayer(maxSLayer--));
-    m_innermostAxialSLayer = maxSLayer + 1;
+    m_outermostAxialSLayer = maxSLayer + 1;
     if (m_TrackHits.size() != nHits) makeHitPattern();
   }
 
@@ -469,8 +469,13 @@ void CDCLegendreTrackCandidate::clearBadHits(std::pair<double, double> ref_point
     double y0_track = sin(this->m_theta) / this->m_r + ref_point.second;
     double x0_hit = hit->getOriginalWirePosition().X();
     double y0_hit = hit->getOriginalWirePosition().Y();
-    double dist = SQR(fabs(R - sqrt(SQR(x0_track - x0_hit) + SQR(y0_track - y0_hit))) - hit->getDriftTime());
-    return hit->getDriftTime() / 2. < dist;
+    double dist = fabs(R - sqrt(SQR(x0_track - x0_hit) + SQR(y0_track - y0_hit))) - hit->getDriftTime();
+    if (dist > hit->getDriftTime() / 2.) {
+      hit->setUsed(CDCLegendreTrackHit::used_bad);
+      return true;
+    } else {
+      return false;
+    }
   }), m_TrackHits.end());
 
 

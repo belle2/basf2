@@ -50,6 +50,8 @@ CDCLegendreTrackHit::CDCLegendreTrackHit(CDCHit* hit, int ID) : m_storeID(ID), m
   setWirePosition();
   ConformalTransformation();
   m_wirePositionOrig = m_wirePosition;
+
+  m_is_used = CDCLegendreTrackHit::not_used;
 }
 
 CDCLegendreTrackHit::CDCLegendreTrackHit(const CDCLegendreTrackHit& rhs)
@@ -62,6 +64,7 @@ CDCLegendreTrackHit::CDCLegendreTrackHit(const CDCLegendreTrackHit& rhs)
   m_layerId = rhs.getLayerId();
   m_isAxial = rhs.m_isAxial;
   m_wirePositionOrig = rhs.m_wirePositionOrig;
+  m_is_used = rhs.isUsed();
 
   //set hit coordinates in normal space and conformal plane
   setWirePosition();

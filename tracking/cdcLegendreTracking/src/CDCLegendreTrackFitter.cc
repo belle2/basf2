@@ -399,7 +399,8 @@ void CDCLegendreTrackFitter::fitTrackCandidateNormalSpace(
 void CDCLegendreTrackFitter::fitTrackCandidateFast(
   std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> >* track,
   std::pair<double, double>& ref_point,
-  double& chi2)
+  double& chi2,
+  bool with_drift_time)
 {
   /*
     double x, y, w;
@@ -492,6 +493,7 @@ void CDCLegendreTrackFitter::fitTrackCandidateFast(
   meanYR2 *= divisor;
   meanR2 *= divisor;
   meanR4 *= divisor;
+  if (sumWeights == 0)cout << "clist_temp.size = " << track->first.size() << endl;
 
   // covariances:
   double covXX = meanX2 - meanX * meanX;
@@ -520,22 +522,23 @@ void CDCLegendreTrackFitter::fitTrackCandidateFast(
   double ref_x = cos(clapPhi - m_PI / 2.) * clapR;
   double ref_y = sin(clapPhi - m_PI / 2.) * clapR;
 
-//  ref_point.first = ref_x;
-//  ref_point.second = ref_y;
+  ref_point.first = ref_x;
+  ref_point.second = ref_y;
 
   cout << "Before: " << track->second.first << "	" << track->second.second << endl;
-//  track->second.first = clapPhi + m_PI / 2.;
-//  track->second.second = 1. / radius;
+  track->second.first = clapPhi + m_PI / 2.;
+  track->second.second = 1. / radius;
   cout << "k=" << sumWeights << " delta=" << divisor << endl;
   cout << "After: " << track->second.first << "	" << track->second.second << endl;
 
-  chi2 = sumWeights * (1. + rho * clapR) * (1. + rho * clapR) * (sinPhi * sinPhi * covXX - 2.*sinPhi * cosPhi * covXY + cosPhi * cosPhi * covYY - kappa * kappa * covR2R2); /// returns chi2
+  chi2 = sumWeights * (1. + rho * clapR) * (1. + rho * clapR) * (sinPhi * sinPhi * covXX - 2.*sinPhi * cosPhi * covXY + cosPhi * cosPhi * covYY - kappa * kappa * covR2R2)/*track->first.size()*/; /// returns chi2
   cout << chi2 << endl;
 }
 
 void CDCLegendreTrackFitter::fitTrackCandidateFast(
   CDCLegendreTrackCandidate* track,
-  std::pair<double, double>& ref_point)
+  std::pair<double, double>& ref_point,
+  bool with_drift_time)
 {
 
   double stopper = 0.000000001; /// WARNING hardcoded values!
@@ -544,26 +547,67 @@ void CDCLegendreTrackFitter::fitTrackCandidateFast(
   double weight;// weight of each hit, so far no difference in hit quality
   double sumWeights = 0, divisor, weightNormalizer = 0; // sumWeights is sum of weights, divisor is 1/sumWeights;
   double tuningParameter = 1.; //0.02; // this parameter is for internal tuning of the weights, since at the moment, the error seams highly overestimated at the moment. 1 means no influence of parameter.
+  double radius_track, xc_track, yc_track;
 
-  // looping over all hits and do the division afterwards
-  for (CDCLegendreTrackHit * hit : track->getTrackHits()) {
-    if (hit->getDriftTime() != 0.)weight =  1. / hit->getDriftTime();
-    else continue;
-    sumWeights += weight;
-    x = hit->getWirePosition().X();
-    y = hit->getWirePosition().Y();
-    x2 = x * x;
-    y2 = y * y;
-    r2 = x2 + y2;
-    meanX += x * weight;
-    meanY += y * weight;
-    meanXY += x * y * weight;
-    meanX2 += x2 * weight;
-    meanY2 += y2 * weight;
-    meanXR2 += x * r2 * weight;
-    meanYR2 += y * r2 * weight;
-    meanR2 += r2 * weight;
-    meanR4 += r2 * r2 * weight;
+  if (!with_drift_time) {
+    // looping over all hits and do the division afterwards
+    for (CDCLegendreTrackHit * hit : track->getTrackHits()) {
+      if (hit->getDriftTime() != 0.)weight =  1. / hit->getDriftTime();
+      else continue;
+      sumWeights += weight;
+      x = hit->getWirePosition().X();
+      y = hit->getWirePosition().Y();
+      x2 = x * x;
+      y2 = y * y;
+      r2 = x2 + y2;
+      meanX += x * weight;
+      meanY += y * weight;
+      meanXY += x * y * weight;
+      meanX2 += x2 * weight;
+      meanY2 += y2 * weight;
+      meanXR2 += x * r2 * weight;
+      meanYR2 += y * r2 * weight;
+      meanR2 += r2 * weight;
+      meanR4 += r2 * r2 * weight;
+    }
+  } else {
+    radius_track = fabs(1. / track->getR());
+//    xc_track = track->getXc();
+//    yc_track = track->getYc();
+    xc_track = cos(track->getTheta()) / track->getR() + track->getReferencePoint().X();
+    yc_track = sin(track->getTheta()) / track->getR() + track->getReferencePoint().Y();
+    for (CDCLegendreTrackHit * hit : track->getTrackHits()) {
+//      if (hit->getDriftTime() != 0.)weight =  1. / hit->getDriftTime();
+//      else continue;
+      weight = 1.;
+      sumWeights += weight;
+
+      x = hit->getWirePosition().X();
+      y = hit->getWirePosition().Y();
+      double R_dist = sqrt(SQR(xc_track - x) + SQR(yc_track - y));
+      double dist = radius_track - R_dist;
+
+      if (dist > 0) {
+        x = x + hit->getDriftTime() * (R_dist / (x - xc_track));
+        y = y + hit->getDriftTime() * (R_dist / (y - yc_track));
+      } else {
+        x = x - hit->getDriftTime() * (R_dist / (x - xc_track));
+        y = y - hit->getDriftTime() * (R_dist / (y - yc_track));
+      }
+
+      x2 = x * x;
+      y2 = y * y;
+      r2 = x2 + y2;
+      meanX += x * weight;
+      meanY += y * weight;
+      meanXY += x * y * weight;
+      meanX2 += x2 * weight;
+      meanY2 += y2 * weight;
+      meanXR2 += x * r2 * weight;
+      meanYR2 += y * r2 * weight;
+      meanR2 += r2 * weight;
+      meanR4 += r2 * r2 * weight;
+    }
   }
   divisor = 1. / sumWeights;
   meanX *= divisor;
@@ -616,6 +660,6 @@ void CDCLegendreTrackFitter::fitTrackCandidateFast(
 
   double chi2 = sumWeights * (1. + rho * clapR) * (1. + rho * clapR) * (sinPhi * sinPhi * covXX - 2.*sinPhi * cosPhi * covXY + cosPhi * cosPhi * covYY - kappa * kappa * covR2R2); /// returns chi2
   cout << chi2 << endl;
-  track->setChi2(chi2);
+  track->setChi2(chi2/*track->getNAxialHits()*/);
 }
 

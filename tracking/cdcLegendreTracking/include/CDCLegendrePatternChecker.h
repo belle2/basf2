@@ -1,6 +1,6 @@
 #pragma once
 
-#include <tracking/dataobjects/HitPatternCDC.h>
+#include <mdst/dataobjects/HitPatternCDC.h>
 
 namespace Belle2 {
 

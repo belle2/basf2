@@ -14,6 +14,7 @@
 #include <tracking/cdcLegendreTracking/CDCLegendreTrackCandidate.h>
 #include <tracking/cdcLegendreTracking/CDCLegendreTrackFitter.h>
 #include <tracking/cdcLegendreTracking/CDCLegendreTrackingSortHit.h>
+#include <tracking/cdcLegendreTracking/CDCLegendreTrackDrawer.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Const.h>
@@ -29,8 +30,8 @@ using namespace Belle2;
 using namespace std;
 
 CDCLegendreTrackCreator::CDCLegendreTrackCreator(
-  std::list<CDCLegendreTrackCandidate*>& trackList, CDCLegendreTrackFitter* cdcLegendreTrackFitter):
-  m_trackList(trackList), m_cdcLegendreTrackFitter(cdcLegendreTrackFitter)
+  std::list<CDCLegendreTrackCandidate*>& trackList, CDCLegendreTrackFitter* cdcLegendreTrackFitter, CDCLegendreTrackDrawer* cdcLegendreTrackDrawer):
+  m_trackList(trackList), m_cdcLegendreTrackFitter(cdcLegendreTrackFitter), m_cdcLegendreTrackDrawer(cdcLegendreTrackDrawer)
 {
 
 }
@@ -112,6 +113,8 @@ void CDCLegendreTrackCreator::processTrack(
         }
     */
     m_trackList.push_back(trackCandidate);
+
+    m_cdcLegendreTrackDrawer->drawTrackCand(trackCandidate);
 
     for (CDCLegendreTrackHit * hit : trackCandidate->getTrackHits()) {
 //      trackHitList->erase(hit);

@@ -23,6 +23,7 @@
 #include <tracking/cdcLegendreTracking/CDCLegendreTrackFitter.h>
 #include <tracking/cdcLegendreTracking/CDCLegendrePatternChecker.h>
 #include <tracking/cdcLegendreTracking/CDCLegendreFastHough.h>
+#include <tracking/cdcLegendreTracking/CDCLegendreTrackDrawer.h>
 
 #include "genfit/TrackCand.h"
 
@@ -79,14 +80,20 @@ CDCLegendreTrackingModule::CDCLegendreTrackingModule() :
   addParam("Reconstruct Curler", m_reconstructCurler,
            "Flag, whether curlers should be reconstructed", false);
 
-  addParam("Fit tracks", m_fitTracks,
+  addParam("FitTracks", m_fitTracks,
            "Flag, whether candidates should be fitted with circle", false);
 
-  addParam("Early track fitting", m_fitTracksEarly,
+  addParam("EarlyTrackFitting", m_fitTracksEarly,
            "Flag, whether candidates should be fitted with circle at early stage", false);
 
-  addParam("Early track merge", m_mergeTracksEarly,
+  addParam("EarlyTrackMerge", m_mergeTracksEarly,
            "Try to merge hit pattern after FastHough with any found track candidate", false);
+
+  addParam("DrawCandidates", m_drawCandidates,
+           "Draw candidate after finding", false);
+
+  addParam("EnableDrawing", m_drawCandInfo,
+           "Enable in-module drawing", false);
 
 }
 
@@ -112,7 +119,15 @@ void CDCLegendreTrackingModule::initialize()
 
   m_cdcLegendreTrackMerger = new CDCLegendreTrackMerger(m_trackList, m_cdcLegendreTrackFitter);
 
-  m_cdcLegendreTrackCreator = new CDCLegendreTrackCreator(m_trackList, m_cdcLegendreTrackFitter);
+  m_cdcLegendreTrackDrawer = new CDCLegendreTrackDrawer(m_drawCandInfo, m_drawCandidates);
+  m_cdcLegendreTrackDrawer->initialize();
+
+  m_cdcLegendreTrackCreator = new CDCLegendreTrackCreator(m_trackList, m_cdcLegendreTrackFitter, m_cdcLegendreTrackDrawer);
+  /*  ModuleParamList moduleParamList;
+    moduleParamList.setParameter("StoreDirectory","tmp/ModuleOutput");
+    moduleParamList.setParameter("DrawCands","True");
+    moduleParamList.setParameter("DrawMCSignal","True");
+    m_cdcLegendreTrackDrawer->setParamList(moduleParamList);*/
 }
 
 void CDCLegendreTrackingModule::beginRun()
@@ -122,6 +137,9 @@ void CDCLegendreTrackingModule::beginRun()
 
 void CDCLegendreTrackingModule::event()
 {
+
+  m_cdcLegendreTrackDrawer->event();
+
   B2INFO("**********   CDCTrackingModule  ************");
 
   //StoreArray with digitized CDCHits, should already be created by CDCDigitizer module
@@ -159,6 +177,9 @@ void CDCLegendreTrackingModule::event()
 
   //memory management
   clear_pointer_vectors();
+
+
+  m_cdcLegendreTrackDrawer->finalizeFile();
 }
 
 void CDCLegendreTrackingModule::DoSteppedTrackFinding()
@@ -205,6 +226,8 @@ void CDCLegendreTrackingModule::DoSteppedTrackFinding()
 
       if (!merged) m_cdcLegendreTrackCreator->createLegendreTrackCandidate(candidate, &hits_set, ref_point);
 
+      if (m_drawCandidates) m_cdcLegendreTrackDrawer->showPicture();
+
       limit = n_hits * m_stepScale;
     }
 
@@ -212,6 +235,10 @@ void CDCLegendreTrackingModule::DoSteppedTrackFinding()
   } while (n_hits >= m_threshold
            && (limit / m_stepScale >= m_threshold || n_hits != 999)
            && hits_set.size() >= (unsigned) m_threshold);
+
+
+  std::vector<CDCLegendreTrackHit*> hits_vector;
+  m_cdcLegendreTrackDrawer->finalizeROOTFile(hits_vector);
 
 }
 

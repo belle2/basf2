@@ -24,10 +24,11 @@ namespace Belle2 {
   class CDCLegendreTrackHit;
   class CDCLegendreTrackCandidate;
   class CDCLegendreTrackFitter;
+  class CDCLegendreTrackDrawer;
 
   class CDCLegendreTrackCreator {
   public:
-    CDCLegendreTrackCreator(std::list<CDCLegendreTrackCandidate*>& trackList, CDCLegendreTrackFitter* cdcLegendreTrackFitter);
+    CDCLegendreTrackCreator(std::list<CDCLegendreTrackCandidate*>& trackList, CDCLegendreTrackFitter* cdcLegendreTrackFitter, CDCLegendreTrackDrawer* cdcLegendreTrackDrawer);
 
     /**
      * @brief Function to create a track candidate
@@ -64,6 +65,7 @@ namespace Belle2 {
 
 
   private:
+    CDCLegendreTrackDrawer* m_cdcLegendreTrackDrawer;
     CDCLegendreTrackFitter* m_cdcLegendreTrackFitter;
     std::list<CDCLegendreTrackCandidate*>& m_trackList; /**< List of track candidates. Mainly used for memory management! */
 

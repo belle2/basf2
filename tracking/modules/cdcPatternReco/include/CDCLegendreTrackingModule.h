@@ -34,6 +34,9 @@ namespace Belle2 {
   class CDCLegendreFastHough;
   class CDCLegendreTrackMerger;
   class CDCLegendreTrackCreator;
+  class CDCLegendreTrackDrawer;
+
+  class CDCNiceDrawingModule;
 
   /** CDC tracking module, using Legendre transformation of the drift time circles.
    * This is a module, performing tracking in the CDC. It is based on the paper "Implementation of the Legendre Transform for track segment reconstruction in drift tube chambers" by T. Alexopoulus, et al. NIM A592 456-462 (2008)
@@ -119,6 +122,10 @@ namespace Belle2 {
     bool m_fitTracksEarly; /**< Apply fitting for candidates on early stage or not*/
     bool m_mergeTracksEarly; /**< Apply fitting for candidates on early stage or not*/
     bool m_earlyMerge; /**< Apply fitting for candidates or not*/
+    bool m_drawCandidates; /**< Draw each candidate in interactive mode*/
+    bool m_drawCandInfo; /**< Set whether CDCLegendreTrackDrawer class will bw used at all*/
+
+    CDCLegendreTrackDrawer* m_cdcLegendreTrackDrawer;
 
     /**
      * Function used in the event function, which contains the search for tracks, calling multiply the Fast Hough algorithm, always just searching for one track and afterwards removin the according hits from the hit list.

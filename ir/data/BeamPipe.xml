@@ -105,8 +105,8 @@
     </Lv2Vacuum>
 
     <Lv3AuCoat>
-        <L1 unit="cm">9.25</L1>
-        <L2 unit="cm">11.0</L2>
+        <L1 unit="cm">6.55</L1>
+        <L2 unit="cm">10.5</L2>
         <R1 unit="cm">0.999</R1>
         <R2 unit="cm">1.000</R2>
         <Material>Au</Material>
@@ -114,8 +114,8 @@
 
     <!-- ########## Ta pipe Forward ########## -->
     <Lv1TaFwd>
-        <D1 unit="cm">11.22</D1>
-        <L1 unit="cm">38.98</L1>
+        <D1 unit="cm">13.75</D1>
+        <L1 unit="cm">36.45</L1>
         <L2 unit="cm">1.45</L2>
         <L3 unit="cm">4.023</L3>
         <T1 unit="cm">1.45</T1>

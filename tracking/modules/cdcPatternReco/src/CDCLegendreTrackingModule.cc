@@ -88,7 +88,16 @@ void CDCLegendreTrackingModule::initialize()
   StoreArray<genfit::TrackCand>::registerPersistent(m_gfTrackCandsColName);
 
   //Initialize look-up table
-  m_nbinsTheta = static_cast<int>(std::pow(2.0, m_maxLevel));
+  m_nbinsTheta = static_cast<int>(std::pow(2.0, m_maxLevel + 3)); //+3 needed for make bin overlapping;
+
+  double bin_width = m_PI / m_nbinsTheta;
+  m_sin_theta = new double[m_nbinsTheta + 1];
+  m_cos_theta = new double[m_nbinsTheta + 1];
+
+  for (int i = 0; i <= m_nbinsTheta; ++i) {
+    m_sin_theta[i] = sin(i * bin_width);
+    m_cos_theta[i] = cos(i * bin_width);
+  }
 
   cdcLegendreTrackFitter = new CDCLegendreTrackFitter(m_nbinsTheta, m_rMax, m_rMin);
   cdcLegendrePatternChecker = new CDCLegendrePatternChecker();
@@ -963,8 +972,8 @@ void CDCLegendreTrackingModule::MaxFastHough(
             r_2_overlap = r[r_index + 1] + fabs(r[r_index + 1] - r[r_index]) / 2.;
 //            theta_1_overlap = thetaBin[t_index]/* - fabs(thetaBin[t_index + 1] - thetaBin[t_index]) / 2.*/;
 //            theta_2_overlap = thetaBin[t_index + 1]/* + fabs(thetaBin[t_index + 1] - thetaBin[t_index]) / 2.*/;
-            theta_1_overlap = thetaBin[t_index]/* - fabs(thetaBin[t_index + 1] - thetaBin[t_index]) / 2.*/;
-            theta_2_overlap = thetaBin[t_index + 1]/* + fabs(thetaBin[t_index + 1] - thetaBin[t_index]) / 2.*/;
+            theta_1_overlap = thetaBin[t_index] - fabs(thetaBin[t_index + 1] - thetaBin[t_index]) / 2.;
+            theta_2_overlap = thetaBin[t_index + 1] + fabs(thetaBin[t_index + 1] - thetaBin[t_index]) / 2.;
             MaxFastHough(candidate, voted_hits[t_index][r_index], level + 1,
                          theta_1_overlap, theta_2_overlap, r_1_overlap,
                          r_2_overlap, limit);

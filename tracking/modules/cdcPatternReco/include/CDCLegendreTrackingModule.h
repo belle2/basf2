@@ -108,6 +108,9 @@ namespace Belle2 {
     static constexpr double m_PI = 3.1415926535897932384626433832795; /**< pi is exactly three*/
     static constexpr double m_rc = 0.0176991150442477874; /**< threshold of r, which defines curlers*/
 
+    double* m_sin_theta; /**< Lookup array for calculation of sin*/
+    double* m_cos_theta; /**< Lookup array for calculation of cos*/
+
     bool m_reconstructCurler; /**< Stores, curlers shall be reconstructed*/
 
     /**

@@ -150,7 +150,12 @@ class Function(object):
                 kwargs[key] = requirement_argument_mapping[value]
             else:
                 kwargs[key] = [requirement_argument_mapping[v] for v in value]
-        return self.func(**kwargs)
+        print 'Called ' + self.name + ' with following arguments'
+        print kwargs
+        result = self.func(**kwargs)
+        print 'Result is:'
+        print result
+        return result
 
 
 def createHash(*args):
@@ -178,39 +183,48 @@ def ParticleList(path, name, pdgcode, particleLists, criteria=[]):
     return {'ParticleList_' + name: list_name}
 
 
-def ParticleListFromChannel(path, pdgcode, outputList, preCut, inputLists):
+def ParticleListFromChannel(path, pdgcode, name, preCut, inputLists, isIgnored):
     """
     Creates a ParticleList by combining other particleLists via the ParticleCombiner module.
         @param path the basf2 path
         @param pdgcode pdgcode of the particle which is reconstructed
-        @param outputList name of the list which holds the combined particles
+        @param name name of the channel or particle which shall be combined
         @param preCut cuts which are applied before the combining of the particles
         @param inputLists the inputs lists which are combined
+        @param true if the channel is ignored due to low statistics
     """
-    list_name = outputList + createHash(pdgcode, outputList, preCut, inputLists)
+    list_name = name + createHash(pdgcode, name, preCut, inputLists, isIgnored)
     pmake = register_module('ParticleCombiner')
-    pmake.set_name('ParticleCombiner_' + outputList)
+    pmake.set_name('ParticleCombiner_' + name)
     pmake.param('PDG', pdgcode)
     pmake.param('ListName', list_name)
     pmake.param('InputListNames', inputLists)
-    pmake.param(preCut['variable'], preCut['range'])
+    if isIgnored:
+        pmake.param('MassCut', (1000, 1000))
+    else:
+        pmake.param(preCut['variable'], preCut['range'])
+
     path.add_module(pmake)
-    modularAnalysis.matchMCTruth(outputList, path=path)
-    return {'ParticleList_' + outputList: list_name}
+    modularAnalysis.matchMCTruth(list_name, path=path)
+    return {'ParticleList_' + name: list_name}
 
 
-def SignalProbability(path, method, variables, particleList, target='SignalProbability'):
+def SignalProbability(path, method, variables, name, particleList, target='SignalProbability', isIgnored=False):
     """
     Calculates the SignalProbability of a ParticleList. If the needed experts aren't available they're created.
         @param path the basf2 path
         @param method method given to the TMVAInterface (see TMVAExpert and TMVATeacher)
         @param variables used for classification (see VariableManager)
+        @param name of the particle or channel which is classified
         @param particleList the particleList which is used for training and classification
         @param target name under which the expert stores the result in the extra info of the particle
+        @param true if the channel is ignored due to low statistics
     """
     # Create hash with all parameters on which this training depends
-    hash = createHash(method, variables, particleList)
+    hash = createHash(method, variables, particleList, isIgnored)
     filename = 'weights/{particleList}_{hash}_{method}.weights.xml'.format(particleList=particleList, hash=hash, method=method[0])
+    if isIgnored:
+        return {target + '_' + name: hash}
     if os.path.isfile(filename):
         expert = register_module('TMVAExpert')
         expert.set_name('TMVAExpert_' + particleList)
@@ -219,7 +233,8 @@ def SignalProbability(path, method, variables, particleList, target='SignalProba
         expert.param('target', target)
         expert.param('listNames', [particleList])
         path.add_module(expert)
-        return {target + '_' + particleList: hash}
+        print target + '_' + name
+        return {target + '_' + name: hash}
     else:
         teacher = register_module('TMVATeacher')
         teacher.set_name('TMVATeacher_' + particleList)
@@ -244,8 +259,9 @@ def CombineSignalProbabilities(path, name, targets, fsp_histogram):
     # TODO Read out fsp_histograms and calculate the correct signal probability
     # p = 1/( f_S + sum( f_Bi * ( 1 - Y_i) ) )
     calculator = register_module('VariableCalculator')
-    calculator.param('operation', ' * '.join(targets))
-    calculator.param('target', 'SignalProbability')
+    calculator.param('fractions', [0.01, 0.89, 0.01, 0.01, 0.08])
+    calculator.param('extraInfoVars', targets)  # TODO Use correct targets, targets contain hashes!
+    calculator.param('newExtraInfoVar', 'SignalProbability')
     return {'SignalProbability_' + name: hash}
 
 
@@ -276,7 +292,52 @@ def CreateFSPHistogram(path, name, particleList):
     return {}
 
 
-def CreatePreCutHistogram(path, particle, daughterLists, daughterSignalProbabilities):
+def CreatePreCutMassHistogram(path, particle, daughterLists):
+    """
+    Creates ROOT file with invariant mass and signal probability product histogram of every channel (signal/background)
+    for a given particle, before any intermediate cuts are applied. For now this class uses the ParticleCombiner and HistMaker
+    modules to generate these distributions, later we should join these modules together into one fast PreCutHistogram module.
+        @param path the basf2 path
+        @param particle object for which this histogram is created
+        @param daughterLists all particleLists of all the daughter particles in all channels
+    """
+    # Check if the file is available. If the file isn't available yet, create it with
+    # the HistMaker Module and return Nothing. If a function is called which depends on
+    # the PreCutHistogram, the process will stop, because the PreCutHistogram isn't provided.
+    hash = createHash(particle.name, daughterLists)
+    filename = 'Reconstruction_{name}_{hash}.root'.format(name=particle.name, hash=hash)
+    if os.path.isfile(filename):
+        return {'PreCutHistogram_' + particle.name: filename}
+    else:
+        # Combine all the particles according to the decay channels
+        mass = pdg.get(pdg.from_name(particle.name)).Mass()
+        for channel in particle.channels:
+            pmake = register_module('ParticleCombiner')
+            pmake.set_name('ParticleCombiner_' + channel.name)
+            pmake.param('PDG', pdg.from_name(particle.name))
+            pmake.param('ListName', channel.name)
+            inputListNames = []
+            for daughter in channel.daughters:
+                listName = filter(lambda x: daughter == x[0:len(daughter)], daughterLists)
+                #TODO Raise exception
+                if len(listName) > 1:
+                    print 'WARNING'
+                inputListNames += listName
+            pmake.param('InputListNames', inputListNames)
+            pmake.param('MassCut', (mass - mass * 1.0 / 10.0, mass + mass * 1.0 / 10.0))
+            path.add_module(pmake)
+            modularAnalysis.matchMCTruth(channel.name, path=path)
+        histMaker = register_module('HistMaker')
+        histMaker.set_name(filename)
+        histMaker.param('file', filename)
+        histMaker.param('histVariables', [('M', 100, mass - mass * 1.0 / 20.0, mass + mass * 1.0 / 20.0)])
+        histMaker.param('truthVariable', 'isSignal')
+        histMaker.param('listNames', [channel.name for channel in particle.channels])
+        path.add_module(histMaker)
+    return {}
+
+
+def CreatePreCutProbHistogram(path, particle, daughterLists, daughterSignalProbabilities):
     """
     Creates ROOT file with invariant mass and signal probability product histogram of every channel (signal/background)
     for a given particle, before any intermediate cuts are applied. For now this class uses the ParticleCombiner and HistMaker
@@ -301,7 +362,14 @@ def CreatePreCutHistogram(path, particle, daughterLists, daughterSignalProbabili
             pmake.set_name('ParticleCombiner_' + channel.name)
             pmake.param('PDG', pdg.from_name(particle.name))
             pmake.param('ListName', channel.name)
-            pmake.param('InputListNames', [daughter for daughter in channel.daughters])
+            inputListNames = []
+            for daughter in channel.daughters:
+                listName = filter(lambda x: daughter == x[0:len(daughter)], daughterLists)
+                #TODO Raise exception
+                if len(listName) > 1:
+                    print 'WARNING'
+                inputListNames += listName
+            pmake.param('InputListNames', inputListNames)
             pmake.param('MassCut', (mass - mass * 1.0 / 10.0, mass + mass * 1.0 / 10.0))
             pmake.param('cutsOnProduct', {'SignalProbability': (0.0, 1.0)})
             path.add_module(pmake)
@@ -317,7 +385,7 @@ def CreatePreCutHistogram(path, particle, daughterLists, daughterSignalProbabili
     return {}
 
 
-def PreCutDetermination(name, pdgcode, channels, preCut_Histogram, efficiency):
+def PreCutMassDetermination(name, pdgcode, channels, preCut_Histogram, efficiency):
     """
     Determines the PreCuts for all the channels of a particle. The cuts are chosen as follows:
         1. The maximum of every signal invariant mass preCut_Histogram is isolated
@@ -335,7 +403,7 @@ def PreCutDetermination(name, pdgcode, channels, preCut_Histogram, efficiency):
     # search the position of the peak of the signal histogram (this peak is used as the starting point for the cut search)
     # and calculate the S/B ratio by cloning signal and dividing it by bckgrd.
     hash = createHash(name, pdgcode, channels, preCut_Histogram, efficiency)
-    file = ROOT.TFile(preCut_histogram, 'UPDATE')
+    file = ROOT.TFile(preCut_Histogram, 'UPDATE')
     signal = dict([(channel, file.Get(channel + '_M_signal_histogram')) for channel in channels])
     bckgrd = dict([(channel, file.Get(channel + '_M_background_histogram')) for channel in channels])
     maxpos = dict([(channel, value.GetBinCenter(value.GetMaximumBin())) for (channel, value) in signal.iteritems()])
@@ -365,11 +433,15 @@ def PreCutDetermination(name, pdgcode, channels, preCut_Histogram, efficiency):
 
     nsignals_after_cut_ROOT = ROOT.TF1(hashlib.sha1(preCut_Histogram).hexdigest() + '_mass_cut_func', nsignals_after_cut, 0, 1, 0)
     ycut = nsignals_after_cut_ROOT.GetX(nsignals * efficiency, 0.0, 1.0)
-    print {'PreCut_' + channel: {'variable': 'MassCut', 'range': ycut_to_xcuts(channel, ycut)} for channel in channels}
 
     # Return the calculates ChannelCuts
     result = {'PreCut_' + channel: {'variable': 'MassCut', 'range': ycut_to_xcuts(channel, ycut)} for channel in channels}
     result.update({'Hash': hash})
+    # TODO Add IsIgnored_{channel} = True, so SignalProbability and ParticleCombiner can test this flag
+    for channel in channels:
+        (a, b) = ycut_to_xcuts(channel, ycut)
+        if abs(b - a) < ratio[channel].GetBinWidth(signal[channel].GetMaximumBin()) or signal[channel].Integral(signal[channel].FindBin(a), signal[channel].FindBin(b)) < 100 or bckgrd[channel].Integral(bckgrd[channel].FindBin(a), bckgrd[channel].FindBin(b)) < 100:
+            result.update({'IsIgnored_' + channel: True})
     return result
 
 
@@ -390,75 +462,102 @@ def FullReconstruction(path, particles):
         # Now loop over all given particles, foreach particle we add some Resources and Actors.
         for particle in particles:
             ########## RESOURCES #############
-            # First we add the resources of the particle
-            # We add the Name, PDG, Method, Efficiency and the Variables associated with this particle,
-            # in addition the same stuff is added for the conjugated particle
+            # Add all information the user has provided as resources to the sequence, so our function can require them
             seq.append(Resource('Name_' + particle.name, particle.name))
             seq.append(Resource('PDG_' + particle.name, pdg.from_name(particle.name)))
             seq.append(Resource('Method_' + particle.name, particle.method))
             seq.append(Resource('Efficiency_' + particle.name, particle.efficiency))
             seq.append(Resource('Particle_' + particle.name, particle))
+            # If the particle isn't self conjugated we add the name and the pdg also for the antiparticle
             name_conj = pdg.conjugate(particle.name)
             if particle.name != name_conj:
                 seq.append(Resource('Name_' + name_conj, name_conj))
                 seq.append(Resource('PDG_' + name_conj, pdg.from_name(name_conj)))
-            # Add some resources if FSP
+            # Add Variables:
+            # If the particle is a FSP, we add the variables for the particle
+            # If the particle has decay channels, we add the name and the variables for these decay channels.
+            # In addition childProb variables are added for each channel automatically here.
+            # The IsIgnored flag is used to deactivate a channel if there's not enough statistics.
             if particle.channels == []:
                 seq.append(Resource('Variables_' + particle.name, particle.variables))
-            # Add some resources for every channel
             for channel in particle.channels:
                 seq.append(Resource('Name_' + channel.name, channel.name))
-                # Here we add the additional childProb variables to each channel!
                 seq.append(Resource('Variables_' + channel.name, particle.variables + ['childProb{i}'.format(i=i) for i in range(0, len(channel.daughters))]))
+                seq.append(Resource('IsIgnored_' + channel.name, False))
 
             ########### RECONSTRUCTION ACTORS ##########
-            # ParticleList Actor provides the ParticleList for every particle
-            # Because anti-particles aren't handled properly yet we have to select the charge conjugate particles by hand.
+            # The Reconstruction part of the FullReconstruction:
+            # 1. Load the FSP (via ParticleList),
+            # 2. Create a particle list for each channel of the non-FSP (via ParticleListFromChannel), depending an all daughter ParticleLists of this channel
+            # 3. Gather up the different ParticleLists for each channel, into a single ParticleList for the particle itself, depending on all channel ParticleLists
+            # 4. If the particle isn't self conjugated we gather up the anti-particles as well, because anti-particles aren't handlet properly yet.  FIXME
             channelParticleLists = ['ParticleList_' + channel.name for channel in particle.channels]
             seq.append(Function(ParticleList, path='Path', name='Name_' + particle.name, pdgcode='PDG_' + particle.name, particleLists=channelParticleLists))
+            for channel in particle.channels:
+                seq.append(Function(ParticleListFromChannel, path='Path', pdgcode='PDG_' + particle.name, name='Name_' + channel.name, preCut='PreCut_' + channel.name,
+                                    inputLists=['ParticleList_' + daughter for daughter in channel.daughters], isIgnored='IsIgnored_' + channel.name))
             if particle.name != name_conj:
                 seq.append(Function(ParticleList, path='Path', name='Name_' + name_conj, pdgcode='PDG_' + name_conj, particleLists=channelParticleLists))
-            # ParticleListFromChannel Actor provides ParticleLists for every channel
-            for channel in particle.channels:
-                seq.append(Function(ParticleListFromChannel, path='Path', pdgcode='PDG_' + particle.name, outputList='Name_' + channel.name, preCut='PreCut_' + channel.name,
-                                    inputLists=['ParticleList_' + daughter for daughter in channel.daughters]))
-
-            ########### SIGNAL PROBABILITY ACTORS #######
-            # For FSP we add SignalProbability Actor for the particle itself, and a Resource which provides the conjugated SignalProbability
-            if particle.channels == []:
-                # Implement special treatment for electrons
-                seq.append(Function(CreateFSPHistogram, path='Path', name='Name_' + particle.name, particleList='ParticleList_' + particle.name))
-                # TODO Disabled at the moment
-                opponents = []  # ['e+','mu+','pi+','K+']
-                if particle.name in opponents:
-                    for opponent in opponents:
-                        if particle.name == opponent:
-                            continue
-                        tmp = particle.name + '_against_' + opponent
-                        seq.append(Resource('Name_' + tmp, tmp))
-                        seq.append(Function(ParticleList, path='Path', name='Name_' + tmp, pdgcode='PDG_' + particle.name, particleLists=['Name_' + particle.name]))
-                        seq.append(Function(SignalProbability, path='Path', method='Method_' + particle.name, variables='Variables_' + particle.name, particleList='ParticleList_' + tmp, target='Name_' + tmp))
-                    seq.append(Function(CombineSignalProbabilities, path='Path', name='Name_' + particle.name, targets=[particle.name + '_against_' + opponent + '_' + particle.name for opponent in opponents if particle.name != opponent], fsp_histogram='FSPHistogram_' + name))
-                else:
-                    seq.append(Function(SignalProbability, path='Path', method='Method_' + particle.name, variables='Variables_' + particle.name, particleList='ParticleList_' + particle.name))
-                    seq.append(Resource('SignalProbability_' + pdg.conjugate(particle.name), 'Dummy', requires=['SignalProbability_' + particle.name]))
-            else:
-            # For non FSP we add SignalProbability Actor for every channel and resources to provide SignalProbability for the whole particle and its conjugated particle as soon as all channels have SignalProbability
-                seq.append(Resource('SignalProbability_' + particle.name, 'Dummy', requires=['SignalProbability_' + channel.name for channel in particle.channels]))
-                seq.append(Resource('SignalProbability_' + pdg.conjugate(particle.name), 'Dummy', requires=['SignalProbability_' + channel.name for channel in particle.channels]))
-                for channel in particle.channels:
-                    seq.append(Function(SignalProbability, path='Path', method='Method_' + particle.name, variables='Variables_' + channel.name, particleList='ParticleList_' + channel.name))
 
             ############# PRECUT DETERMINATION ############
-            # For non FSP Particles we determine the PreCuts usgin the CreatePreCutHistogram and PreCutDetermination Actor
+            # Intermediate PreCut part of FullReconstruction algorithm.
+            # To surpress the computational cost due to the combinatoric, we apply efficient PreCuts before combining the daughter particles of each channel in the reconstruction part.
+            # The PreCuts are chosen, so that a user-defined total signal efficiency for this particle is met.
+            # 1. Create Histograms with the invariant mass or signal probability distribution for each channel, as soon as all daughter ParticleLists and daughter SignalProbabilities are available.
+            # 2. If the Histogram is available calculate the PreCuts with the PreCutDetermination function. As soon as the PreCuts are available the particle can be reconstructed.
+            # TODO Implement user choice -> Cut on invariant mass or cut on product of signal Probability
             if particle.channels != []:
-                seq.append(Function(PreCutDetermination, name='Name_' + particle.name, pdgcode='PDG_' + particle.name,
-                                    channels=['Name_' + channel.name for channel in particle.channels], preCut_histogram='PreCutHistogram_' + particle.name, efficiency='Efficiency_' + particle.name))
-
                 daughters = set([daughter for channel in particle.channels for daughter in channel.daughters])
-                seq.append(Function(CreatePreCutHistogram, path='Path', particle='Particle_' + particle.name,
-                                    daughterLists=['ParticleList_' + daughter for daughter in daughters],
-                                    daughterSignalProbabilities=['SignalProbability_' + daughter for daughter in daughters]))
+                seq.append(Function(CreatePreCutMassHistogram, path='Path', particle='Particle_' + particle.name,
+                                    daughterLists=['ParticleList_' + daughter for daughter in daughters]))
+                #seq.append(Function(CreatePreCutProbHistogram, path='Path', particle='Particle_' + particle.name,
+                #                    daughterLists=['ParticleList_' + daughter for daughter in daughters],
+                #                    daughterSignalProbabilities=['SignalProbability_' + daughter for daughter in daughters]))
+                seq.append(Function(PreCutMassDetermination, name='Name_' + particle.name, pdgcode='PDG_' + particle.name,
+                                    channels=['Name_' + channel.name for channel in particle.channels], preCut_Histogram='PreCutHistogram_' + particle.name, efficiency='Efficiency_' + particle.name))
+
+            ########### SIGNAL PROBABILITY ACTORS #######
+            # The classifier part of the FullReconstruction. Here one has to distinguish between [e+, mu+, pi+, K+, p], other FSPs and non-FSPs.
+            # All the classifiers depend on the method, variables and the ParticleList (either for the particle or for the channel).
+            # [e+,mu+,pi+,K+,p]: All the tracks seen in the detector are generated by one of these particles.
+            #                    To get a better spearation we train these particles against each other and combine the result later (via CombinSignalProbabilities)
+            # To accomplish this:
+            #   1. Create FSP Histogram with the real distribution of signal and background particles in the ParticleList
+            #   2. Create new ParticleList which contains only the the signal component and one background component e.g. e+ vs. mu+
+            #   3. Train a classifier for this ParticleList and calculate the SignalProbability with this classifier
+            #   4. Combine the different SignalProbabilities to one, using the signal and background fractions of the FSP Histogram.
+            # TODO Disabled at the moment
+            opponents = []  # ['e+','mu+','pi+','K+']
+            if particle.channels == [] and particle.name in opponents:
+                seq.append(Function(CreateFSPHistogram, path='Path', name='Name_' + particle.name, particleList='ParticleList_' + particle.name))
+                for opponent in opponents:
+                    if particle.name == opponent:
+                        continue
+                    tmp = particle.name + '_against_' + opponent
+                    seq.append(Resource('Name_' + tmp, tmp))
+                    seq.append(Function(ParticleList, path='Path', name='Name_' + tmp, pdgcode='PDG_' + particle.name, particleLists=['Name_' + particle.name], criteria=""))  # TODO Add criterium
+                    seq.append(Function(SignalProbability, path='Path', method='Method_' + particle.name, variables='Variables_' + particle.name,
+                                        name='Name_' + particle.name, particleList='ParticleList_' + tmp, target='Name_' + tmp))
+                seq.append(Function(CombineSignalProbabilities, path='Path', name='Name_' + particle.name,
+                                    targets=[particle.name + '_against_' + opponent + '_' + particle.name for opponent in opponents if particle.name != opponent], fsp_histogram='FSPHistogram_' + name))
+
+            # Other FSP: Other FSP like gammas and pi0, are trained with a single classifier.
+            if particle.channels == [] and not particle.name in opponents:
+                seq.append(Function(SignalProbability, path='Path', method='Method_' + particle.name, variables='Variables_' + particle.name,
+                                    name='Name_' + particle.name, particleList='ParticleList_' + particle.name))
+
+            # Non FSP:
+            #   1. Train classifier for every decay channel of the particle.
+            #   2. As soon as all SignalProbabilities for all channels are available the resoure SignalProbability_{particleName} is unlocked.
+            if particle.channels != []:
+                for channel in particle.channels:
+                    seq.append(Function(SignalProbability, path='Path', method='Method_' + particle.name, variables='Variables_' + channel.name,
+                                        name='Name_' + channel.name, particleList='ParticleList_' + channel.name, isIgnored='IsIgnored_' + channel.name))
+                seq.append(Resource('SignalProbability_' + particle.name, 'Dummy', requires=['SignalProbability_' + channel.name for channel in particle.channels]))
+
+            # If the classifiers provide the signal probability, they also provide the signal probability for the anti particles, so we add
+            # a dummy resource which depends only on the SignalProbability of the particle and provides the SignalProbability for the anti-particle.
+            seq.append(Resource('SignalProbability_' + pdg.conjugate(particle.name), 'Dummy', requires=['SignalProbability_' + particle.name]))
 
         # We've arrived at the climax of our algorithm. The great finale!
         # Resolve dependencies of the Actors, by extracting step by step the Actors for which

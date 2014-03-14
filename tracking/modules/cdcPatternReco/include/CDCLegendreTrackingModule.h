@@ -179,8 +179,8 @@ namespace Belle2 {
      * Only bins with more bins than the current maximum are further investigated where the current maximum is determined of the configured threshold or the number of hits of an already found track candidate.
      */
     void MaxFastHough(std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> >* candidate,
-                      const std::vector<CDCLegendreTrackHit*>& hits, const int level, const double theta_min,
-                      const double theta_max, const double r_min, const double r_max, const unsigned limit);
+                      const std::vector<CDCLegendreTrackHit*>& hits, const int level, const int theta_min,
+                      const int theta_max, const double r_min, const double r_max, const unsigned limit);
 
     /**
      * @brief Function to merge two track candidates

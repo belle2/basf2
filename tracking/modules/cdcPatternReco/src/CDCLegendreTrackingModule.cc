@@ -175,7 +175,7 @@ void CDCLegendreTrackingModule::DoSteppedTrackFinding()
     std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> > candidate =
       std::make_pair(c_list, std::make_pair(-999, -999));
 
-    MaxFastHough(&candidate, hits_vector, 1, 0, m_PI, m_rMin, m_rMax,
+    MaxFastHough(&candidate, hits_vector, 1, 0, m_nbinsTheta, m_rMin, m_rMax,
                  static_cast<unsigned>(limit));
 
     n_hits = candidate.first.size();
@@ -853,7 +853,7 @@ void CDCLegendreTrackingModule::terminate()
 void CDCLegendreTrackingModule::MaxFastHough(
   std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> >* candidate,
   const std::vector<CDCLegendreTrackHit*>& hits, const int level,
-  const double theta_min, const double theta_max, const double r_min,
+  const int theta_min, const int theta_max, const double r_min,
   const double r_max, const unsigned limit)
 {
   if (not m_reconstructCurler
@@ -862,9 +862,9 @@ void CDCLegendreTrackingModule::MaxFastHough(
   }
 
   //calculate bin borders of 2x2 bin "histogram"
-  double thetaBin[3];
+  int thetaBin[3];
   thetaBin[0] = theta_min;
-  thetaBin[1] = theta_min + (theta_max - theta_min) / 2.;
+  thetaBin[1] = theta_min + (theta_max - theta_min) / 2;
   thetaBin[2] = theta_max;
 
   double r[3];
@@ -885,8 +885,8 @@ void CDCLegendreTrackingModule::MaxFastHough(
   //Voting within the four bins
   BOOST_FOREACH(CDCLegendreTrackHit * hit, hits) {
     for (int t_index = 0; t_index < 3; ++t_index) {
-      r_temp = hit->getConformalX() * cos(thetaBin[t_index])
-               + hit->getConformalY() * sin(thetaBin[t_index]);
+      r_temp = hit->getConformalX() * m_cos_theta[thetaBin[t_index]]
+               + hit->getConformalY() * m_sin_theta[thetaBin[t_index]];
       r_1 = r_temp + hit->getConformalDriftTime();
       r_2 = r_temp - hit->getConformalDriftTime();
 
@@ -954,7 +954,7 @@ void CDCLegendreTrackingModule::MaxFastHough(
 //        if (((!allow_overlap)&&(level == (m_maxLevel - level_diff))) || ((allow_overlap)&&(level == (m_maxLevel - level_diff) + 2))) {
         if (level >= (m_maxLevel - level_diff)) {
           double theta = static_cast<double>(thetaBin[t_index]
-                                             + thetaBin[t_index + 1]) / 2. ;
+                                             + thetaBin[t_index + 1]) / 2. * m_PI / m_nbinsTheta;
 
           if (not m_reconstructCurler
               && fabs((r[r_index] + r[r_index + 1]) / 2) > m_rc)
@@ -967,13 +967,16 @@ void CDCLegendreTrackingModule::MaxFastHough(
           //Recursive calling of the function with higher level and smaller box
 //          if (allow_overlap) { //if overlapping allowed make bin borders wider
           if (allow_overlap  && (level >= (m_maxLevel - level_diff - 2)) && max_value_bin == std::make_pair(t_index, r_index)) { //if overlapping allowed make bin borders wider
-            double r_1_overlap, r_2_overlap, theta_1_overlap, theta_2_overlap; // here we involve new variables which allows to change bin borders for positive and negative r independently
+            double r_1_overlap, r_2_overlap;
+            int theta_1_overlap, theta_2_overlap; // here we involve new variables which allows to change bin borders for positive and negative r independently
             r_1_overlap = r[r_index] - fabs(r[r_index + 1] - r[r_index]) / 2.;
             r_2_overlap = r[r_index + 1] + fabs(r[r_index + 1] - r[r_index]) / 2.;
 //            theta_1_overlap = thetaBin[t_index]/* - fabs(thetaBin[t_index + 1] - thetaBin[t_index]) / 2.*/;
 //            theta_2_overlap = thetaBin[t_index + 1]/* + fabs(thetaBin[t_index + 1] - thetaBin[t_index]) / 2.*/;
-            theta_1_overlap = thetaBin[t_index] - fabs(thetaBin[t_index + 1] - thetaBin[t_index]) / 2.;
-            theta_2_overlap = thetaBin[t_index + 1] + fabs(thetaBin[t_index + 1] - thetaBin[t_index]) / 2.;
+//            theta_1_overlap = thetaBin[t_index] - fabs(thetaBin[t_index + 1] - thetaBin[t_index]) / 2.;
+//            theta_2_overlap = thetaBin[t_index + 1] + fabs(thetaBin[t_index + 1] - thetaBin[t_index]) / 2.;
+            theta_1_overlap = thetaBin[t_index] - pow(2, m_maxLevel - level_diff - 2 - level);
+            theta_2_overlap = thetaBin[t_index + 1] + pow(2, m_maxLevel - level_diff - 2 - level);
             MaxFastHough(candidate, voted_hits[t_index][r_index], level + 1,
                          theta_1_overlap, theta_2_overlap, r_1_overlap,
                          r_2_overlap, limit);

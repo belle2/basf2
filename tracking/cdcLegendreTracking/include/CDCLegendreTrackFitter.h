@@ -25,8 +25,8 @@ namespace Belle2 {
   class CDCLegendreTrackFitter {
   public:
 
-    CDCLegendreTrackFitter(int nbinsTheta, double rMax, double rMin) :
-      m_nbinsTheta(nbinsTheta), m_rMin(rMin), m_rMax(rMax)
+    CDCLegendreTrackFitter(int nbinsTheta, double rMax, double rMin, bool fitTracks) :
+      m_nbinsTheta(nbinsTheta), m_rMin(rMin), m_rMax(rMax), m_fitTracks(fitTracks)
     {};
 
 
@@ -53,6 +53,7 @@ namespace Belle2 {
     static constexpr double m_PI = 3.1415926535897932384626433832795; /**< pi is exactly three*/
     static constexpr double m_rc = 0.0176991150442477874; /**< threshold of r, which defines curlers*/
     int m_nbinsTheta; /**< Number of bins in theta, derived from m_maxLevel*/
+    bool m_fitTracks; /**< Decides whether fitting will be applied*/
 
   };
 }

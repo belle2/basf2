@@ -298,7 +298,8 @@ void CDCLegendreTrackMerger::MergeCurler()
 }
 
 bool CDCLegendreTrackMerger::earlyCandidateMerge(std::pair < std::vector<CDCLegendreTrackHit*>,
-                                                 std::pair<double, double> > & candidate, std::set<CDCLegendreTrackHit*>& hits_set)
+                                                 std::pair<double, double> > & candidate, std::set<CDCLegendreTrackHit*>& hits_set,
+                                                 bool fitTracksEarly)
 {
   bool merged = false;
   //      cdcLegendreTrackFitter->fitTrackCandidateStepped(&candidate);
@@ -405,7 +406,7 @@ bool CDCLegendreTrackMerger::earlyCandidateMerge(std::pair < std::vector<CDCLege
           //            cand1->setReferencePoint(ref_point_temp.first, ref_point_temp.second);
           mergeTracks(cand1, candidate, hits_set);
 
-          m_cdcLegendreTrackFitter->fitTrackCandidateFast(cand1, ref_point);
+          if (fitTracksEarly) m_cdcLegendreTrackFitter->fitTrackCandidateFast(cand1, ref_point);
           cand1->setReferencePoint(ref_point.first, ref_point.second);
 
           merged = true;

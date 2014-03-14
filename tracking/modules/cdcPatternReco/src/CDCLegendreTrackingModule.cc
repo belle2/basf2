@@ -77,13 +77,17 @@ CDCLegendreTrackingModule::CDCLegendreTrackingModule() :
            "Maximal level of recursive calling of FastHough algorithm", 12);
 
   addParam("Reconstruct Curler", m_reconstructCurler,
-           "Flag, whether curlers should be reconstructed", true);
+           "Flag, whether curlers should be reconstructed", false);
 
   addParam("Fit tracks", m_fitTracks,
            "Flag, whether candidates should be fitted with circle", false);
 
-  addParam("Early track merging", m_earlyMerge,
+  addParam("Early track fitting", m_fitTracksEarly,
+           "Flag, whether candidates should be fitted with circle at early stage", false);
+
+  addParam("Early track merge", m_mergeTracksEarly,
            "Try to merge hit pattern after FastHough with any found track candidate", false);
+
 }
 
 CDCLegendreTrackingModule::~CDCLegendreTrackingModule()
@@ -98,7 +102,7 @@ void CDCLegendreTrackingModule::initialize()
 
   m_nbinsTheta = static_cast<int>(std::pow(2.0, m_maxLevel + 3)); //+3 needed for make bin overlapping;
 
-  m_cdcLegendreTrackFitter = new CDCLegendreTrackFitter(m_nbinsTheta, m_rMax, m_rMin);
+  m_cdcLegendreTrackFitter = new CDCLegendreTrackFitter(m_nbinsTheta, m_rMax, m_rMin, m_fitTracks);
   m_cdcLegendrePatternChecker = new CDCLegendrePatternChecker();
 
   m_AxialHitList.reserve(1024);
@@ -151,7 +155,7 @@ void CDCLegendreTrackingModule::event()
 //  checkHitPattern();
 
   //create GenFit Track candidates
-  createGFTrackCandidates();
+  m_cdcLegendreTrackCreator->createGFTrackCandidates(m_gfTrackCandsColName);
 
   //memory management
   clear_pointer_vectors();
@@ -197,7 +201,7 @@ void CDCLegendreTrackingModule::DoSteppedTrackFinding()
       std::pair<double, double> ref_point = std::make_pair(0., 0.);
 
       bool merged = false;
-      //merged = m_cdcLegendreTrackMerger->earlyCandidateMerge(candidate, hits_set);
+      if (m_mergeTracksEarly) merged = m_cdcLegendreTrackMerger->earlyCandidateMerge(candidate, hits_set, m_fitTracksEarly);
 
       if (!merged) m_cdcLegendreTrackCreator->createLegendreTrackCandidate(candidate, &hits_set, ref_point);
 
@@ -265,65 +269,6 @@ void CDCLegendreTrackingModule::checkHitPattern()
 }
 
 
-void CDCLegendreTrackingModule::createGFTrackCandidates()
-{
-  //StoreArray for genfit::TrackCandidates: interface class to Genfit
-  StoreArray<genfit::TrackCand> gfTrackCandidates(m_gfTrackCandsColName);
-  gfTrackCandidates.create();
-
-  int i = 0;
-
-  for (CDCLegendreTrackCandidate * trackCand : m_trackList) {
-    gfTrackCandidates.appendNew();
-    std::pair<double, double> ref_point_temp = std::make_pair(0., 0.);
-    m_cdcLegendreTrackFitter->fitTrackCandidateFast(trackCand, ref_point_temp);
-
-//  testing of track's hit pattern
-//    cout << "pattern:" << trackCand->getHitPattern().getHitPattern() << endl;
-
-    //set the values needed as start values for the fit in the genfit::TrackCandidate from the CDCTrackCandidate information
-    //variables stored in the genfit::TrackCandidates are: vertex position + error, momentum + error, pdg value, indices for the Hits
-    TVector3 position;
-//    position.SetXYZ(0.0, 0.0, 0.0);//at the moment there is no vertex determination in the ConformalFinder, but maybe the origin or the innermost hit are good enough as start values...
-    //position = cdcTrackCandidates[i]->getInnerMostHit().getWirePosition();
-    position = trackCand->getReferencePoint();
-
-    TVector3 momentum =
-      trackCand->getMomentumEstimation(true);
-
-    //Pattern recognition can determine only the charge, so here some dummy pdg value is set (with the correct charge), the pdg hypothesis can be then overwritten in the GenFitterModule
-    int pdg = trackCand->getChargeSign() * (211);
-
-    //The initial covariance matrix is calculated from these errors and it is important (!!) that it is not completely wrong
-    /*TMatrixDSym covSeed(6);
-    covSeed(0, 0) = 4; covSeed(1, 1) = 4; covSeed(2, 2) = 4;
-    covSeed(3, 3) = 0.1 * 0.1; covSeed(4, 4) = 0.1 * 0.1; covSeed(5, 5) = 0.5 * 0.5;*/
-
-    //set the start parameters
-    gfTrackCandidates[i]->setPosMomSeedAndPdgCode(position, momentum, pdg);
-
-
-    B2DEBUG(100, "Create genfit::TrackCandidate " << i << "  with pdg " << pdg);
-    B2DEBUG(100,
-            "position seed:  (" << position.x() << ", " << position.y() << ", " << position.z() << ")");//   position variance: (" << covSeed(0, 0) << ", " << covSeed(1, 1) << ", " << covSeed(2, 2) << ") ");
-    B2DEBUG(100,
-            "momentum seed:  (" << momentum.x() << ", " << momentum.y() << ", " << momentum.z() << ")");//   position variance: (" << covSeed(3, 3) << ", " << covSeed(4, 4) << ", " << covSeed(5, 5) << ") ");
-
-    //find indices of the Hits
-    std::vector<CDCLegendreTrackHit*> trackHitVector = trackCand->getTrackHits();
-
-    sortHits(trackHitVector, trackCand->getChargeSign());
-
-    B2DEBUG(100, " Add Hits: hitId rho planeId")
-
-    for (CDCLegendreTrackHit * trackHit : trackHitVector) {
-      int hitID = trackHit->getStoreIndex();
-      gfTrackCandidates[i]->addHit(Const::CDC, hitID);
-    }
-    ++i;
-  }
-}
-
 void CDCLegendreTrackingModule::endRun()
 {
 
@@ -333,80 +278,6 @@ void CDCLegendreTrackingModule::terminate()
 {
 }
 
-void CDCLegendreTrackingModule::sortHits(
-  std::vector<CDCLegendreTrackHit*>& hits, int charge)
-{
-  CDCTracking_SortHit sorter(charge);
-  stable_sort(hits.begin(), hits.end(), sorter);
-}
-
-bool CDCTracking_SortHit::operator()(CDCLegendreTrackHit* hit1,
-                                     CDCLegendreTrackHit* hit2)
-{
-  bool result = true;
-  boost::tuple<int, double, int, double> tuple1(hit1->getStoreIndex(),
-                                                hit1->getWirePosition().Mag(), hit1->getWireId());
-  boost::tuple<int, double, int, double> tuple2(hit2->getStoreIndex(),
-                                                hit2->getWirePosition().Mag(), hit2->getWireId());
-
-  //the comparison function for the tuples created by the sort function
-
-  if ((int) tuple1.get<1>() == (int) tuple2.get<1>()) {
-    //special case: several hits in the same layer
-    //now we have to proceed differently for positive and negative tracks
-    //in a common case we just have to check the wireIds and decide the order according to the charge
-    //if however the track is crossing the wireId 0, we have again to treat it specially
-    //the number 100 is just a more or less arbitrary number, assuming that no track will be 'crossing' 100 different wireIds
-
-    //in general this solution does not look very elegant, so if you have some suggestions how to improve it, do not hesitate to tell me
-
-    if (m_charge < 0) {
-      //negative charge
-
-      //check for special case with wireId 0
-      if (tuple1.get<2>() == 0 && tuple2.get<2>() > 100) {
-        result = false;
-      }
-      if (tuple1.get<2>() > 100 && tuple2.get<2>() == 0) {
-        result = true;
-      }
-      //'common' case
-      if (tuple1.get<2>() < tuple2.get<2>()) {
-        result = true;
-      }
-      if (tuple1.get<2>() > tuple2.get<2>()) {
-        result = false;
-      }
-    } //end negative charge
-
-    else {
-      //positive charge
-
-      //check for special case with wireId 0
-      if (tuple1.get<2>() == 0 && tuple2.get<2>() > 100) {
-        result = true;
-      }
-      if (tuple1.get<2>() > 100 && tuple2.get<2>() == 0) {
-        result = false;
-      }
-      //'common' case
-      if (tuple1.get<2>() < tuple2.get<2>()) {
-        result = false;
-      }
-      if (tuple1.get<2>() > tuple2.get<2>()) {
-        result = true;
-      }
-    } //end positive charge
-
-  }
-
-  //usual case: hits sorted by the rho value
-  else
-    result = (tuple1.get<1>() < tuple2.get<1>());
-
-  return result;
-
-}
 
 void CDCLegendreTrackingModule::clear_pointer_vectors()
 {

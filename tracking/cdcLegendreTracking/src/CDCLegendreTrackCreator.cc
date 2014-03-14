@@ -13,7 +13,17 @@
 #include <tracking/cdcLegendreTracking/CDCLegendreTrackHit.h>
 #include <tracking/cdcLegendreTracking/CDCLegendreTrackCandidate.h>
 #include <tracking/cdcLegendreTracking/CDCLegendreTrackFitter.h>
+#include <tracking/cdcLegendreTracking/CDCLegendreTrackingSortHit.h>
+
+#include <framework/datastore/StoreArray.h>
+#include <framework/gearbox/Const.h>
+#include <cdc/dataobjects/CDCHit.h>
+#include "genfit/TrackCand.h"
+
 #include <cmath>
+#include <cstdlib>
+#include <iomanip>
+#include <string>
 
 using namespace Belle2;
 using namespace std;
@@ -135,3 +145,69 @@ bool CDCLegendreTrackCreator::fullfillsQualityCriteria(CDCLegendreTrackCandidate
 }
 
 
+void CDCLegendreTrackCreator::createGFTrackCandidates(string& m_gfTrackCandsColName)
+{
+  //StoreArray for genfit::TrackCandidates: interface class to Genfit
+  StoreArray<genfit::TrackCand> gfTrackCandidates(m_gfTrackCandsColName);
+  gfTrackCandidates.create();
+
+  int i = 0;
+
+  for (CDCLegendreTrackCandidate * trackCand : m_trackList) {
+    gfTrackCandidates.appendNew();
+    std::pair<double, double> ref_point_temp = std::make_pair(0., 0.);
+    m_cdcLegendreTrackFitter->fitTrackCandidateFast(trackCand, ref_point_temp);
+
+//  testing of track's hit pattern
+//    cout << "pattern:" << trackCand->getHitPattern().getHitPattern() << endl;
+
+    //set the values needed as start values for the fit in the genfit::TrackCandidate from the CDCTrackCandidate information
+    //variables stored in the genfit::TrackCandidates are: vertex position + error, momentum + error, pdg value, indices for the Hits
+    TVector3 position;
+//    position.SetXYZ(0.0, 0.0, 0.0);//at the moment there is no vertex determination in the ConformalFinder, but maybe the origin or the innermost hit are good enough as start values...
+    //position = cdcTrackCandidates[i]->getInnerMostHit().getWirePosition();
+    position = trackCand->getReferencePoint();
+
+    TVector3 momentum =
+      trackCand->getMomentumEstimation(true);
+
+    //Pattern recognition can determine only the charge, so here some dummy pdg value is set (with the correct charge), the pdg hypothesis can be then overwritten in the GenFitterModule
+    int pdg = trackCand->getChargeSign() * (211);
+
+    //The initial covariance matrix is calculated from these errors and it is important (!!) that it is not completely wrong
+    /*TMatrixDSym covSeed(6);
+    covSeed(0, 0) = 4; covSeed(1, 1) = 4; covSeed(2, 2) = 4;
+    covSeed(3, 3) = 0.1 * 0.1; covSeed(4, 4) = 0.1 * 0.1; covSeed(5, 5) = 0.5 * 0.5;*/
+
+    //set the start parameters
+    gfTrackCandidates[i]->setPosMomSeedAndPdgCode(position, momentum, pdg);
+
+
+    B2DEBUG(100, "Create genfit::TrackCandidate " << i << "  with pdg " << pdg);
+    B2DEBUG(100,
+            "position seed:  (" << position.x() << ", " << position.y() << ", " << position.z() << ")");//   position variance: (" << covSeed(0, 0) << ", " << covSeed(1, 1) << ", " << covSeed(2, 2) << ") ");
+    B2DEBUG(100,
+            "momentum seed:  (" << momentum.x() << ", " << momentum.y() << ", " << momentum.z() << ")");//   position variance: (" << covSeed(3, 3) << ", " << covSeed(4, 4) << ", " << covSeed(5, 5) << ") ");
+
+    //find indices of the Hits
+    std::vector<CDCLegendreTrackHit*> trackHitVector = trackCand->getTrackHits();
+
+    sortHits(trackHitVector, trackCand->getChargeSign());
+
+    B2DEBUG(100, " Add Hits: hitId rho planeId")
+
+    for (CDCLegendreTrackHit * trackHit : trackHitVector) {
+      int hitID = trackHit->getStoreIndex();
+      gfTrackCandidates[i]->addHit(Const::CDC, hitID);
+    }
+    ++i;
+  }
+}
+
+
+void CDCLegendreTrackCreator::sortHits(
+  std::vector<CDCLegendreTrackHit*>& hits, int charge)
+{
+  CDCLegendreTrackingSortHit sorter(charge);
+  stable_sort(hits.begin(), hits.end(), sorter);
+}

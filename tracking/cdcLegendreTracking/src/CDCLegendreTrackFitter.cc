@@ -35,6 +35,9 @@ using namespace Belle2;
 void CDCLegendreTrackFitter::fitTrackCandidateStepped(
   std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> >* track)
 {
+
+  if (!m_fitTracks) return;
+
   //get theta and r values for each track candidate
   double track_theta = track->second.first;
   double track_r = track->second.second;
@@ -221,6 +224,9 @@ void CDCLegendreTrackFitter::fitTrackCandidateNormalSpace(
   std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> >* track,
   std::pair<double, double>* ref_point)
 {
+
+  if (!m_fitTracks) return;
+
   //get theta and r values for each track candidate
   double track_theta = track->second.first;
   double track_r = track->second.second;
@@ -402,6 +408,9 @@ void CDCLegendreTrackFitter::fitTrackCandidateFast(
   double& chi2,
   bool with_drift_time)
 {
+
+  if (!m_fitTracks) return;
+
   /*
     double x, y, w;
     double x_tot=0., y_tot=0., xy_tot=0., x2_tot=0., y2_tot=0., r2_tot=0., r4_tot=0., xr2_tot=0., yr2_tot=0.;
@@ -540,6 +549,8 @@ void CDCLegendreTrackFitter::fitTrackCandidateFast(
   std::pair<double, double>& ref_point,
   bool with_drift_time)
 {
+
+  if (!m_fitTracks) return;
 
   double stopper = 0.000000001; /// WARNING hardcoded values!
   double meanX = 0, meanY = 0, meanX2 = 0, meanY2 = 0, meanR2 = 0, meanR4 = 0, meanXR2 = 0, meanYR2 = 0, meanXY = 0; //mean values

@@ -42,7 +42,7 @@ namespace Belle2 {
      * All hits of track 2 are assigned to track 1 and the mean of the r and theta values of the two tracks are assigned to track 1
      * Track 2 is deleted.
      */
-    bool earlyCandidateMerge(std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> >& track, std::set<CDCLegendreTrackHit*>& hits_set);
+    bool earlyCandidateMerge(std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> >& track, std::set<CDCLegendreTrackHit*>& hits_set, bool fitTracksEarly);
 
     /**
      * @brief Function to merge two track candidates

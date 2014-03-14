@@ -116,15 +116,9 @@ namespace Belle2 {
 
     bool m_reconstructCurler; /**< Stores, curlers shall be reconstructed*/
     bool m_fitTracks; /**< Apply fitting for candidates or not*/
+    bool m_fitTracksEarly; /**< Apply fitting for candidates on early stage or not*/
+    bool m_mergeTracksEarly; /**< Apply fitting for candidates on early stage or not*/
     bool m_earlyMerge; /**< Apply fitting for candidates or not*/
-
-    /** Sort hits for fitting.
-     * This method sorts hit indices to bring them in a correct order, which is needed for the fitting
-     * @param hitIndices vector with the hit indices, this vector is charged within the function.
-     * @param CDCLegendreTrackHits name of the CDCTrackHits array. In this way the sort funtion can get all necessary information about the hits.
-     * @param charge estimated charge of the track, which is needed for hits from the same layer to be ordered correctly.
-     */
-    void sortHits(std::vector<CDCLegendreTrackHit*>& hitIndices, int charge);
 
     /**
      * Function used in the event function, which contains the search for tracks, calling multiply the Fast Hough algorithm, always just searching for one track and afterwards removin the according hits from the hit list.
@@ -136,9 +130,6 @@ namespace Belle2 {
      */
     void AsignStereoHits();
 
-
-    /** Creates GeantFit Track Candidates from CDCLegendreTrackCandidates */
-    void createGFTrackCandidates();
 
     /**
      * @brief Function to split track candidates into 3 groups: long tracks, curlers, and tracklets
@@ -155,15 +146,6 @@ namespace Belle2 {
 
   };
 
-  /**
-   * Small helper class to perform sorting of hits in the CDC pattern reco
-   */
-  struct CDCTracking_SortHit {
-
-    CDCTracking_SortHit(int charge) : m_charge(charge) {}
-    bool operator()(CDCLegendreTrackHit* hit1, CDCLegendreTrackHit* hit2);
-    int m_charge;
-  };
 
 } // end namespace Belle2
 #endif

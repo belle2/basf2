@@ -398,7 +398,8 @@ void CDCLegendreTrackFitter::fitTrackCandidateNormalSpace(
 
 void CDCLegendreTrackFitter::fitTrackCandidateFast(
   std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> >* track,
-  std::pair<double, double>& ref_point)
+  std::pair<double, double>& ref_point,
+  double& chi2)
 {
   /*
     double x, y, w;
@@ -519,16 +520,16 @@ void CDCLegendreTrackFitter::fitTrackCandidateFast(
   double ref_x = cos(clapPhi - m_PI / 2.) * clapR;
   double ref_y = sin(clapPhi - m_PI / 2.) * clapR;
 
-  ref_point.first = ref_x;
-  ref_point.second = ref_y;
+//  ref_point.first = ref_x;
+//  ref_point.second = ref_y;
 
   cout << "Before: " << track->second.first << "	" << track->second.second << endl;
-  track->second.first = clapPhi + m_PI / 2.;
-  track->second.second = 1. / radius;
+//  track->second.first = clapPhi + m_PI / 2.;
+//  track->second.second = 1. / radius;
   cout << "k=" << sumWeights << " delta=" << divisor << endl;
   cout << "After: " << track->second.first << "	" << track->second.second << endl;
 
-  double chi2 = sumWeights * (1. + rho * clapR) * (1. + rho * clapR) * (sinPhi * sinPhi * covXX - 2.*sinPhi * cosPhi * covXY + cosPhi * cosPhi * covYY - kappa * kappa * covR2R2); /// returns chi2
+  chi2 = sumWeights * (1. + rho * clapR) * (1. + rho * clapR) * (sinPhi * sinPhi * covXX - 2.*sinPhi * cosPhi * covXY + cosPhi * cosPhi * covYY - kappa * kappa * covR2R2); /// returns chi2
   cout << chi2 << endl;
 }
 
@@ -604,6 +605,8 @@ void CDCLegendreTrackFitter::fitTrackCandidateFast(
 
   ref_point.first = ref_x;
   ref_point.second = ref_y;
+  track->setReferencePoint(ref_x, ref_y);
+
 
 //  cout << "Before: " << track->second.first << "  " << track->second.second << endl;
   track->setTheta(clapPhi + m_PI / 2.);
@@ -613,5 +616,6 @@ void CDCLegendreTrackFitter::fitTrackCandidateFast(
 
   double chi2 = sumWeights * (1. + rho * clapR) * (1. + rho * clapR) * (sinPhi * sinPhi * covXX - 2.*sinPhi * cosPhi * covXY + cosPhi * cosPhi * covYY - kappa * kappa * covR2R2); /// returns chi2
   cout << chi2 << endl;
+  track->setChi2(chi2);
 }
 

@@ -33,7 +33,7 @@ namespace Belle2 {
 
     void fitTrackCandidateStepped(std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> >* track);
 
-    void fitTrackCandidateFast(std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> >* track, std::pair<double, double>& ref_point);
+    void fitTrackCandidateFast(std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> >* track, std::pair<double, double>& ref_point, double& chi2);
 
     void fitTrackCandidateFast(CDCLegendreTrackCandidate* track, std::pair<double, double>& ref_point);
 

@@ -63,17 +63,17 @@ namespace Belle2 {
 
     /**Return pattern of assigned axial hits.*/
     inline HitPatternCDC getHitPatternAxial() {
-      return hitPatternAxial;
+      return m_hitPatternAxial;
     }
 
     /**Return pattern of assigned stereo hits.*/
     inline HitPatternCDC getHitPatternStereo() {
-      return hitPatternStereo;
+      return m_hitPatternStereo;
     }
 
     /**Return pattern of assigned axial and stereo hits.*/
     inline HitPatternCDC getHitPattern() {
-      return hitPattern;
+      return m_hitPattern;
     }
 
     /**
@@ -192,7 +192,7 @@ namespace Belle2 {
     /**
      * set reference point, with respect to which track was found
      */
-    TVector3 getReferencePoint() const {return TVector3(ref_x, ref_y, 0);}
+    TVector3 getReferencePoint() const {return TVector3(m_ref_x, m_ref_y, 0);}
 
     /**
      *  Returns a weight, calculated from the contributing hits.
@@ -210,6 +210,21 @@ namespace Belle2 {
      */
     int getCandidateType();
 
+    /**
+     * Remove "bad" hits
+     */
+    void clearBadHits(std::pair<double, double> ref_point);
+
+    /**
+     * set chi2 after fitting
+     */
+    void setChi2(double chi2) {
+      m_chi2 = chi2;
+    }
+
+    double getChi2() {
+      return m_chi2;
+    }
 
   private:
 
@@ -222,8 +237,8 @@ namespace Belle2 {
     double m_r; /**< r_value of the track candidate, given by Legendre track finding*/
     double m_xc; /**< xc value in conformal plane*/
     double m_yc; /**< yc value in conformal plane*/
-    double ref_x; /**< xc value in conformal plane*/
-    double ref_y; /**< yc value in conformal plane*/
+    double m_ref_x; /**< xc value in conformal plane*/
+    double m_ref_y; /**< yc value in conformal plane*/
     const int m_charge; /**< charge assumption of track*/
 
     int m_axialHits; /**< Number of axial hits, belonging to the track*/
@@ -232,14 +247,16 @@ namespace Belle2 {
     bool m_calcedMomentum; /**< Is the momentum estimation already calculated?*/
     TVector3 m_momEstimation; /**< Momentum estimation*/
 
-    HitPatternCDC hitPatternAxial; /**< Efficient hit pattern builder; see HitPatternCDC description  */
-    HitPatternCDC hitPatternStereo; /**< Efficient hit pattern builder; see HitPatternCDC description  */
-    HitPatternCDC hitPattern; /**< Efficient hit pattern builder; see HitPatternCDC description  */
+    HitPatternCDC m_hitPatternAxial; /**< Efficient hit pattern builder; see HitPatternCDC description  */
+    HitPatternCDC m_hitPatternStereo; /**< Efficient hit pattern builder; see HitPatternCDC description  */
+    HitPatternCDC m_hitPattern; /**< Efficient hit pattern builder; see HitPatternCDC description  */
 
-    int innermostAxialSLayer; //Innermost axial superlayer;
-    int outermostAxialSLayer; //Outermost axial superlayer;
-    int innermostAxialLayer; //Innermost axial layer;
-    int outermostAxialLayer; //Outermost axial layer;
+    int m_innermostAxialSLayer; //Innermost axial superlayer;
+    int m_outermostAxialSLayer; //Outermost axial superlayer;
+    int m_innermostAxialLayer; //Innermost axial layer;
+    int m_outermostAxialLayer; //Outermost axial layer;
+
+    double m_chi2;
     /**
      * Calculates the momentum estimation from parameters of the track (for x and y)
      * and from contributing hits (for z)

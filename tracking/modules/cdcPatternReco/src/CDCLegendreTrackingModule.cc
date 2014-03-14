@@ -187,13 +187,16 @@ void CDCLegendreTrackingModule::DoSteppedTrackFinding()
         CDCLegendreTrackCandidate* cand1 = *it1;
 
         //check only curler
-        if (fabs(cand1->getR()) > m_rc) {
+        if (true/*fabs(cand1->getR()) > m_rc*/) {
 
-          if (fabs(candidate.second.second) > m_rc) {
+          if (true/*fabs(candidate.second.second) > m_rc*/) {
+
+            cout << "R: " << cand1->getR() << "  " << candidate.second.second << endl;
+            cout << "theta: " << cand1->getTheta() << "  " << candidate.second.first << endl;
 
             //check if the two tracks lie next to each other
-            if (fabs(cand1->getR() - candidate.second.second) < 0.03
-                && fabs(cand1->getTheta() - candidate.second.first) < 0.15) {
+            if (fabs(cand1->getR() - candidate.second.second) < 0.3
+                && fabs(cand1->getTheta() - candidate.second.first) < 0.3) {
               mergeTracks(cand1, candidate);
               BOOST_FOREACH(CDCLegendreTrackHit * hit, candidate.first) {
                 hits_set.erase(hit);
@@ -201,11 +204,13 @@ void CDCLegendreTrackingModule::DoSteppedTrackFinding()
               cdcLegendreTrackFitter->fitTrackCandidateFast(cand1, ref_point);
               cand1->setReferencePoint(ref_point.first, ref_point.second);
               merged = true;
+              cout << "MERGED!" << endl;
               break;
             }
           }
         }
       }
+
 
       if (!merged) createLegendreTrackCandidate(candidate, &hits_set, ref_point);
 

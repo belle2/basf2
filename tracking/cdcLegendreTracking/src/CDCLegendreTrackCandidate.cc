@@ -276,8 +276,8 @@ int CDCLegendreTrackCandidate::getInnermostAxialSLayer(bool forced, int minNHits
     int nHits = m_TrackHits.size();
     int minSLayer = 0;
     do {
-      if (hitPatternAxial.getSLayer(minSLayer)) {
-        if (hitPatternAxial.getNSLayer(minSLayer) < minNHits) {
+      if (hitPatternAxial.hasSLayer(minSLayer)) {
+        if (hitPatternAxial.getSLayerNHits(minSLayer) < minNHits) {
           //using lambda functions for erase-remove idiom
           m_TrackHits.erase(std::remove_if(m_TrackHits.begin(), m_TrackHits.end(), [&minSLayer](CDCLegendreTrackHit * hit) {return hit->getSuperlayerId() == minSLayer;}), m_TrackHits.end());
         } else {
@@ -310,8 +310,8 @@ int CDCLegendreTrackCandidate::getOutermostAxialSLayer(bool forced, int minNHits
     int nHits = m_TrackHits.size();
     int maxSLayer = 8;
     do {
-      if (hitPatternAxial.getSLayer(maxSLayer)) {
-        if (hitPatternAxial.getNSLayer(maxSLayer) < minNHits) {
+      if (hitPatternAxial.hasSLayer(maxSLayer)) {
+        if (hitPatternAxial.getSLayerNHits(maxSLayer) < minNHits) {
           //using lambda functions for erase-remove idiom
           m_TrackHits.erase(std::remove_if(m_TrackHits.begin(), m_TrackHits.end(), [&maxSLayer](CDCLegendreTrackHit * hit) {return hit->getSuperlayerId() == maxSLayer;}), m_TrackHits.end());
         } else {
@@ -342,13 +342,13 @@ int CDCLegendreTrackCandidate::getCandidateType()
     type = fullTrack;
   } else
     //check whether track is "curler"
-    if ((innermostAxialLayer == 0) && (hitPatternAxial.getNSLayer(0) > 2)) {
+    if ((innermostAxialLayer == 0) && (hitPatternAxial.getSLayerNHits(0) > 2)) {
 //    for(int layer = 2; layer < 8; layer+=2)
 //      if(hitPatternAxial.getNSLayer(layer) > 3)
       type = curlerTrack;
     } else
       //check whether track is "tracklet"
-      if ((innermostAxialLayer != 0) || (hitPatternAxial.getNSLayer(0) < 2)) {
+      if ((innermostAxialLayer != 0) || (hitPatternAxial.getSLayerNHits(0) < 2)) {
         type = tracklet;
       }
 
@@ -361,7 +361,7 @@ bool CDCLegendreTrackCandidate::checkHitPattern(int minNHitsSLayer)
   int outermostAxialSLayer = getOutermostAxialSLayer();
 //  bool prevSLayerIsGood = true; //variable which helps to find end of track
   for (int iSLayer = innermostAxialSLayer; iSLayer <= outermostAxialSLayer; iSLayer += 2) {
-    if ((!hitPatternAxial.getSLayer(iSLayer)) || ((hitPatternAxial.getSLayer(iSLayer)) && (hitPatternAxial.getNSLayer(iSLayer)) < minNHitsSLayer)) {
+    if ((!hitPatternAxial.hasSLayer(iSLayer)) || ((hitPatternAxial.hasSLayer(iSLayer)) && (hitPatternAxial.getSLayerNHits(iSLayer)) < minNHitsSLayer)) {
       //using lambda functions for erase-remove idiom; erase all hits starting from bad SLayer and above
 //      m_TrackHits.erase(std::remove_if(m_TrackHits.begin(), m_TrackHits.end(), [&iSLayer](CDCLegendreTrackHit * hit){return hit->getSuperlayerId() > iSLayer;}), m_TrackHits.end());
 //      getOutermostAxialSLayer(true);

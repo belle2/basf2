@@ -23,7 +23,7 @@ using namespace std;
 using namespace Belle2;
 using namespace CDC;
 
-CDCLegendreTrackHit::CDCLegendreTrackHit(CDCHit* hit, int ID) : m_storeID(ID), m_wireId(hit->getIWire())
+CDCLegendreTrackHit::CDCLegendreTrackHit(CDCHit* hit, int ID, int nbinsTheta) : m_storeID(ID), m_wireId(hit->getIWire()), m_nbinsTheta(nbinsTheta)
 {
   CDC::SimpleTDCCountTranslator sDriftTimeTranslator;
   m_driftTime = sDriftTimeTranslator.getDriftLength(hit->getTDCCount(), WireID(hit->getID()));
@@ -52,6 +52,21 @@ CDCLegendreTrackHit::CDCLegendreTrackHit(CDCHit* hit, int ID) : m_storeID(ID), m
   m_wirePositionOrig = m_wirePosition;
 
   m_is_used = CDCLegendreTrackHit::not_used;
+
+  m_rValues = new double[m_nbinsTheta + 2];
+  std::fill_n(m_rValues, m_nbinsTheta + 2, -999.);
+  /*  double bin_width = 3.1415 / m_nbinsTheta;
+
+    for(int ii=0; ii<m_nbinsTheta + 1; ii++){
+      m_rValues[ii] = getConformalX() * cos(ii * bin_width)
+             + getConformalY() * sin(ii * bin_width);
+    }
+  */
+  m_rValuesBool = new bool[m_nbinsTheta + 2];
+  for (int ii = 0; ii < m_nbinsTheta + 2; ii++) {
+    m_rValuesBool[ii] = false;
+  }
+//  std::fill_n(m_rValuesBool, m_nbinsTheta+2, false);
 }
 
 CDCLegendreTrackHit::CDCLegendreTrackHit(const CDCLegendreTrackHit& rhs)
@@ -69,11 +84,47 @@ CDCLegendreTrackHit::CDCLegendreTrackHit(const CDCLegendreTrackHit& rhs)
   //set hit coordinates in normal space and conformal plane
   setWirePosition();
   ConformalTransformation();
+  m_rValues = new double[m_nbinsTheta + 2];
+//  std::fill_n(m_rValues, m_nbinsTheta, -999.);
+  /*  double bin_width = 3.1415 / m_nbinsTheta;
+    for(int ii=0; ii<m_nbinsTheta + 1; ii++){
+      m_rValues[ii] = getConformalX() * cos(ii * bin_width)
+             + getConformalY() * sin(ii * bin_width);
+    }
+  */
+  m_rValuesBool = new bool[m_nbinsTheta + 2];
+  for (int ii = 0; ii < m_nbinsTheta + 2; ii++) {
+    m_rValuesBool[ii] = false;
+  }
+
+//  std::fill_n(m_rValuesBool, m_nbinsTheta, false);
 }
 
 CDCLegendreTrackHit::~CDCLegendreTrackHit()
 {
 }
+
+void CDCLegendreTrackHit::clearPointers()
+{
+  delete[] m_rValues;
+  delete[] m_rValuesBool;
+}
+
+void CDCLegendreTrackHit::setRValue(int bin, double rValue)
+{
+  if (bin > m_nbinsTheta) {
+    printf("WTF!!!! OUT OF RANGE! bin = %i; m_nbinsTheta = %i \n", bin, m_nbinsTheta);
+    bin = m_nbinsTheta - 1;
+  }
+//  if(bin<0)
+//  {
+//    printf("WTF!!!! OUT OF RANGE! bin = %i; m_nbinsTheta = %i \n",bin, m_nbinsTheta);
+//    bin = 0;
+//  }
+  m_rValues[bin] = rValue;
+  m_rValuesBool[bin] = true;
+}
+
 
 void CDCLegendreTrackHit::setWirePosition()
 {

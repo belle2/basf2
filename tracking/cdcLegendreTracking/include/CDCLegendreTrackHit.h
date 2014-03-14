@@ -34,7 +34,7 @@ namespace Belle2 {
     /** Constructor to create a CDCTrackHit from a CDCHit object.
      * Some member variables of CDCHit are copied and other to CDCTrackHit specific variables are initialized (e.g. the position of the hit wire in normal space and in the conformal plane).
      */
-    CDCLegendreTrackHit(CDCHit* hit, int iHit);
+    CDCLegendreTrackHit(CDCHit* hit, int iHit, int nbinsTheta);
 
     /** Copy constructor.
      *
@@ -111,6 +111,14 @@ namespace Belle2 {
 
     void setUsed(int is_used) {m_is_used = is_used;};
 
+    double getRValue(int bin) {return m_rValues[bin];};
+
+    void setRValue(int bin, double rValue);
+
+    bool checkRValue(int bin) {return m_rValuesBool[bin];};
+
+    void clearPointers();
+
   private:
 
     int m_storeID;                     /**< ID of the original CDCHit in the store array*/
@@ -131,6 +139,10 @@ namespace Belle2 {
     TVector3 m_wirePositionOrig;           /**< Original Coordinates of the center (!) of the hit wire. */
 
     static constexpr double m_zReference = 25.852;  /**< Reference z position for wire position determination*/
+
+    double* m_rValues;
+    bool* m_rValuesBool;
+    int m_nbinsTheta;
 
     int m_is_used;
 

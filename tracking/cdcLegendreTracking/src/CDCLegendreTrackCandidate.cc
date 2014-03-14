@@ -69,7 +69,7 @@ CDCLegendreTrackCandidate::CDCLegendreTrackCandidate(double theta, double r, int
   m_outermostAxialSLayer = -1;
 //  getInnermostAxialSLayer();
 //  getOutermostAxialSLayer();
-  checkHitPattern();
+//  checkHitPattern();
 
 // CDCLegendreTrackFitter::fitTrackCandidateFast(this, std::make_pair(m_ref_x, m_ref_y));
 

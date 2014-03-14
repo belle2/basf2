@@ -21,6 +21,10 @@ namespace Belle2 {
 
     CDCLegendreFastHough(bool reconstructCurler, int maxLevel, int nbinsTheta, double rMin, double rMax);
 
+    /**
+     * @brief small helper function, to check if four values have the same sign
+     */
+    inline bool sameSign(double, double, double, double);
 
     /**
      * @brief Recursively called function to perform the Fast Hough algorithm, modified to only deliver the candidate with the most contributing hits
@@ -35,14 +39,19 @@ namespace Belle2 {
      * At each step, the remaining voting plane is divided in 2x2 squares and the voting procedure is performed in each of them, following NIM A 592 (456 - 462).
      * Only bins with more bins than the current maximum are further investigated where the current maximum is determined of the configured threshold or the number of hits of an already found track candidate.
      */
-    void MaxFastHough(std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> >* candidate,
-                      const std::vector<CDCLegendreTrackHit*>& hits, const int level, const int theta_min,
-                      const int theta_max, const double r_min, const double r_max, const unsigned limit);
+    void FastHoughNormal(std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> >* candidate,
+                         const std::vector<CDCLegendreTrackHit*>& hits, const int level, const int theta_min,
+                         const int theta_max, const double r_min, const double r_max, const unsigned limit);
 
-    /**
-     * @brief small helper function, to check if four values have the same sign
-     */
-    inline bool sameSign(double, double, double, double);
+    void MaxFastHough(const int level, const int theta_min, const int theta_max,
+                      const double r_min, const double r_max);
+
+
+    void setLimit(int limit) {m_limit = limit;};
+
+    void setAxialHits(std::vector<CDCLegendreTrackHit*>& hits) {m_hits = hits;};
+
+    void initializeCandidatesVector(std::vector< std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> > >* candidates) {m_candidates = candidates;};
 
   private:
     bool m_reconstructCurler;
@@ -55,6 +64,10 @@ namespace Belle2 {
     double m_rMax; /**< Maximum in r direction, initialized in initializer list of the module*/
     double* m_sin_theta; /**< Lookup array for calculation of sin*/
     double* m_cos_theta; /**< Lookup array for calculation of cos*/
+    int m_limit;
+    std::vector<CDCLegendreTrackHit*> m_hits;
+
+    std::vector< std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> > >* m_candidates;
 
 
   };

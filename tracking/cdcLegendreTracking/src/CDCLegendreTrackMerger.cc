@@ -376,7 +376,7 @@ bool CDCLegendreTrackMerger::earlyCandidateMerge(std::pair < std::vector<CDCLege
         }
       }
 
-      if (/*true*/make_merge/*false*/) {
+      if (true/*make_merge*//*false*/) {
         std::vector<CDCLegendreTrackHit*> c_list_temp;
         std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> > candidate_temp =
           std::make_pair(c_list_temp, std::make_pair(-999, -999));
@@ -395,11 +395,12 @@ bool CDCLegendreTrackMerger::earlyCandidateMerge(std::pair < std::vector<CDCLege
         //      cout << "clist_temp.size = " << candidate_temp.first.size() << endl;
         //      cout << "chi_cand=" << chi2_cand << " chi2_track=" << chi2_track << " chi2_temp=" << chi2_temp << endl;
         if (candidate_temp.first.size() == 0) {
+          printf("BAD MERGERD CANDIDATE SIZE!\n");
           merged = true;
           break;
         }
 
-        if (chi2_temp < SQR(sqrt(chi2_track) + sqrt(chi2_cand)) * 3.) {
+        if (chi2_temp < SQR(sqrt(chi2_track) + sqrt(chi2_cand)) * 5.) {
 
           cand1->setR(candidate_temp.second.second);
           cand1->setTheta(candidate_temp.second.first);
@@ -412,7 +413,7 @@ bool CDCLegendreTrackMerger::earlyCandidateMerge(std::pair < std::vector<CDCLege
           merged = true;
           //            cand1->clearBadHits(ref_point);
           //        cout << "MERGED!" << endl;
-          break;
+//          break;
         } else make_merge = false;
       }
     }

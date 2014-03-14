@@ -71,6 +71,7 @@ namespace Belle2 {
     bool m_drawCandInfo;
     int m_iTrack;
     FILE* pipeout_fp;
+    int m_trackCounter;
 
     //for ROOT drawing:
     std::vector<TF1*> m_hitsLegendre;

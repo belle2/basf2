@@ -122,7 +122,7 @@ void CDCLegendreTrackingModule::initialize()
   m_cdcLegendreTrackDrawer = new CDCLegendreTrackDrawer(m_drawCandInfo, m_drawCandidates);
   m_cdcLegendreTrackDrawer->initialize();
 
-  m_cdcLegendreTrackCreator = new CDCLegendreTrackCreator(m_trackList, m_cdcLegendreTrackFitter, m_cdcLegendreTrackDrawer);
+  m_cdcLegendreTrackCreator = new CDCLegendreTrackCreator(m_AxialHitList, m_trackList, m_cdcLegendreTrackFitter, m_cdcLegendreTrackDrawer);
   /*  ModuleParamList moduleParamList;
     moduleParamList.setParameter("StoreDirectory","tmp/ModuleOutput");
     moduleParamList.setParameter("DrawCands","True");

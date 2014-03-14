@@ -29,9 +29,9 @@
 using namespace Belle2;
 using namespace std;
 
-CDCLegendreTrackCreator::CDCLegendreTrackCreator(
-  std::list<CDCLegendreTrackCandidate*>& trackList, CDCLegendreTrackFitter* cdcLegendreTrackFitter, CDCLegendreTrackDrawer* cdcLegendreTrackDrawer):
-  m_trackList(trackList), m_cdcLegendreTrackFitter(cdcLegendreTrackFitter), m_cdcLegendreTrackDrawer(cdcLegendreTrackDrawer)
+CDCLegendreTrackCreator::CDCLegendreTrackCreator(std::vector<CDCLegendreTrackHit*>& AxialHitList,
+                                                 std::list<CDCLegendreTrackCandidate*>& trackList, CDCLegendreTrackFitter* cdcLegendreTrackFitter, CDCLegendreTrackDrawer* cdcLegendreTrackDrawer):
+  m_AxialHitList(AxialHitList), m_trackList(trackList), m_cdcLegendreTrackFitter(cdcLegendreTrackFitter), m_cdcLegendreTrackDrawer(cdcLegendreTrackDrawer)
 {
 
 }
@@ -55,8 +55,9 @@ void CDCLegendreTrackCreator::createLegendreTrackCandidate(
       || charge == CDCLegendreTrackCandidate::charge_curler) {
     CDCLegendreTrackCandidate* trackCandidate = new CDCLegendreTrackCandidate(
       track_theta, track_r, charge, track.first);
-    trackCandidate->setReferencePoint(ref_point.first, ref_point.second);
     m_cdcLegendreTrackFitter->fitTrackCandidateFast(trackCandidate, ref_point);
+    trackCandidate->setReferencePoint(ref_point.first, ref_point.second);
+    appendNewHits(trackCandidate);
 //    trackCandidate->clearBadHits(ref_point);
 
     processTrack(trackCandidate, trackHitList);
@@ -68,14 +69,16 @@ void CDCLegendreTrackCreator::createLegendreTrackCandidate(
     CDCLegendreTrackCandidate* trackCandidate_pos =
       new CDCLegendreTrackCandidate(track_theta, track_r,
                                     CDCLegendreTrackCandidate::charge_positive, track.first);
-    trackCandidate_pos->setReferencePoint(ref_point.first, ref_point.second);
 
     CDCLegendreTrackCandidate* trackCandidate_neg =
       new CDCLegendreTrackCandidate(track_theta, track_r,
                                     CDCLegendreTrackCandidate::charge_negative, track.first);
-    trackCandidate_neg->setReferencePoint(ref_point.first, ref_point.second);
     m_cdcLegendreTrackFitter->fitTrackCandidateFast(trackCandidate_pos, ref_point);
     m_cdcLegendreTrackFitter->fitTrackCandidateFast(trackCandidate_neg, ref_point);
+    trackCandidate_neg->setReferencePoint(ref_point.first, ref_point.second);
+    trackCandidate_pos->setReferencePoint(ref_point.first, ref_point.second);
+    appendNewHits(trackCandidate_pos);
+    appendNewHits(trackCandidate_neg);
 //    trackCandidate_pos->clearBadHits(ref_point);
 //    trackCandidate_neg->clearBadHits(ref_point);
 
@@ -88,6 +91,22 @@ void CDCLegendreTrackCreator::createLegendreTrackCandidate(
     B2ERROR(
       "Strange behavior of CDCLegendreTrackCandidate::getChargeAssumption");
     exit(EXIT_FAILURE);
+  }
+}
+
+void CDCLegendreTrackCreator::appendNewHits(CDCLegendreTrackCandidate* track)
+{
+  double x0_track = cos(track->getTheta()) / track->getR() + track->getReferencePoint().X();
+  double y0_track = sin(track->getTheta()) / track->getR() + track->getReferencePoint().Y();
+  double R = fabs(1. / track->getR());
+
+  for (CDCLegendreTrackHit * hit : m_AxialHitList) {
+    if (hit->isUsed() != CDCLegendreTrackHit::used_in_track) {
+      double x0_hit = hit->getOriginalWirePosition().X();
+      double y0_hit = hit->getOriginalWirePosition().Y();
+      double dist = fabs(R - sqrt((x0_track - x0_hit) * (x0_track - x0_hit) + (y0_track - y0_hit) * (y0_track - y0_hit))) - hit->getDriftTime();
+      if (dist < hit->getDriftTime() * 2.) track->addHit(hit);
+    }
   }
 }
 

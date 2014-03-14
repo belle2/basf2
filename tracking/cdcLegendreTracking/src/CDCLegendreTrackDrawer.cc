@@ -69,6 +69,8 @@ void CDCLegendreTrackDrawer::event()
 
   m_eventCounter += 1;
 
+  m_trackCounter = 1;
+
   initFig();
 
   drawWires();
@@ -170,10 +172,18 @@ void CDCLegendreTrackDrawer::showPicture()
   std::stringstream ss;
   ss << m_StoreDirectory << std::setfill('0') << std::setw(4) << m_eventCounter << "_cdc.svg";
 
-  if (m_drawCandidates) system(Form("display %s", ss.str().c_str()));
+  std::stringstream ss_out;
+  ss_out << m_StoreDirectory << std::setfill('0') << std::setw(4) << m_eventCounter << "_cdc_" << m_trackCounter << ".svg";
+
+
+
+
+//  if (m_drawCandidates) system(Form("display %s", ss.str().c_str()));
+  if (m_drawCandidates) system(Form("cp %s %s", ss.str().c_str(),  ss_out.str().c_str()));
 
   openFileAgain();
 
+  m_trackCounter++;
   //        std::cin.ignore();
 
 }

@@ -19,6 +19,7 @@
 #include <tracking/cdcLegendreTracking/CDCLegendreTrackHit.h>
 #include <tracking/cdcLegendreTracking/CDCLegendreTrackCandidate.h>
 #include <tracking/cdcLegendreTracking/CDCLegendreTrackFitter.h>
+#include <tracking/cdcLegendreTracking/CDCLegendreTrackMerger.h>
 #include <tracking/cdcLegendreTracking/CDCLegendrePatternChecker.h>
 #include <tracking/cdcLegendreTracking/CDCLegendreFastHough.h>
 
@@ -96,13 +97,15 @@ void CDCLegendreTrackingModule::initialize()
 
   m_nbinsTheta = static_cast<int>(std::pow(2.0, m_maxLevel + 3)); //+3 needed for make bin overlapping;
 
-  cdcLegendreTrackFitter = new CDCLegendreTrackFitter(m_nbinsTheta, m_rMax, m_rMin);
-  cdcLegendrePatternChecker = new CDCLegendrePatternChecker();
+  m_cdcLegendreTrackFitter = new CDCLegendreTrackFitter(m_nbinsTheta, m_rMax, m_rMin);
+  m_cdcLegendrePatternChecker = new CDCLegendrePatternChecker();
 
   m_AxialHitList.reserve(1024);
   m_StereoHitList.reserve(1024);
 
-  cdcLegendreFastHough = new CDCLegendreFastHough(m_reconstructCurler, m_maxLevel, m_nbinsTheta, m_rMin, m_rMax);
+  m_cdcLegendreFastHough = new CDCLegendreFastHough(m_reconstructCurler, m_maxLevel, m_nbinsTheta, m_rMin, m_rMax);
+
+  m_cdcLegendreTrackMerger = new CDCLegendreTrackMerger(m_trackList, m_cdcLegendreTrackFitter);
 }
 
 void CDCLegendreTrackingModule::beginRun()
@@ -157,7 +160,7 @@ void CDCLegendreTrackingModule::DoSteppedTrackFinding()
 
   std::set<CDCLegendreTrackHit*> hits_set;
   std::set<CDCLegendreTrackHit*>::iterator it = hits_set.begin();
-  BOOST_FOREACH(CDCLegendreTrackHit * trackHit, m_AxialHitList) {
+  for (CDCLegendreTrackHit * trackHit : m_AxialHitList) {
     it = hits_set.insert(it, trackHit);
   }
 
@@ -173,8 +176,8 @@ void CDCLegendreTrackingModule::DoSteppedTrackFinding()
     std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> > candidate =
       std::make_pair(c_list, std::make_pair(-999, -999));
 
-    cdcLegendreFastHough->MaxFastHough(&candidate, hits_vector, 1, 0, m_nbinsTheta, m_rMin, m_rMax,
-                                       static_cast<unsigned>(limit));
+    m_cdcLegendreFastHough->MaxFastHough(&candidate, hits_vector, 1, 0, m_nbinsTheta, m_rMin, m_rMax,
+                                         static_cast<unsigned>(limit));
 
     n_hits = candidate.first.size();
 
@@ -187,161 +190,15 @@ void CDCLegendreTrackingModule::DoSteppedTrackFinding()
 
     // if track is found and has enough hits
     else if (n_hits >= m_threshold) {
-//      cdcLegendreTrackFitter->fitTrackCandidateStepped(&candidate);
+
       std::pair<double, double> ref_point = std::make_pair(0., 0.);
-      double chi2_cand;
-//      cdcLegendrePatternChecker->checkCandidate(&candidate);
 
-      if (candidate.first.size() > 0) {
-//        cdcLegendreTrackFitter->fitTrackCandidateFast(&candidate, ref_point, chi2_cand);
-//      cdcLegendrePatternChecker->clearBadHits(&candidate, ref_point);
+      bool merged = false;
+      merged = m_cdcLegendreTrackMerger->earlyCandidateMerge(candidate, hits_set);
 
-        cout << "for hit removing: R:" << 1. / candidate.second.second <<
-             "theta:" << candidate.second.first <<
-             "ref_x:" << ref_point.first <<
-             "ref_y" << ref_point.second << endl;
-        /*
-              for (CDCLegendreTrackHit* hit: candidate.first){
-                double R = fabs(1. / candidate.second.second);
-                double x0_track = cos(candidate.second.first) / candidate.second.second + ref_point.first;
-                double y0_track = sin(candidate.second.first) / candidate.second.second + ref_point.second;
-                double x0_hit = hit->getOriginalWirePosition().X();
-                double y0_hit = hit->getOriginalWirePosition().Y();
-                double dist = SQR(fabs(R - sqrt(SQR(x0_track - x0_hit) + SQR(y0_track - y0_hit))) - hit->getDriftTime());
-                cout << "dist=" << dist << "||" << hit->getDriftTime() <<endl;
-              }
-              candidate.first.erase(std::remove_if(candidate.first.begin(), candidate.first.end(),
-                  [&candidate,&ref_point](CDCLegendreTrackHit * hit) {
-                        double R = fabs(1. / candidate.second.second);
-                        double x0_track = cos(candidate.second.first) / candidate.second.second + ref_point.first;
-                        double y0_track = sin(candidate.second.first) / candidate.second.second + ref_point.second;
-                        double x0_hit = hit->getOriginalWirePosition().X();
-                        double y0_hit = hit->getOriginalWirePosition().Y();
-                        double dist = SQR(fabs(R - sqrt(SQR(x0_track - x0_hit) + SQR(y0_track - y0_hit))) - hit->getDriftTime());
-                        return hit->getDriftTime()/2. < dist;
-                    }), candidate.first.end());
-              */
+      if (!merged) createLegendreTrackCandidate(candidate, &hits_set, ref_point);
 
-        double x0_cand = cos(candidate.second.first) / candidate.second.second + ref_point.first;
-        double y0_cand = sin(candidate.second.first) / candidate.second.second + ref_point.second;
-
-        bool merged = false;
-        bool make_merge = false;
-
-        double chi2_track;
-        //loop over all candidates
-        for (std::list<CDCLegendreTrackCandidate*>::iterator it1 =
-               m_trackList.begin(); it1 != m_trackList.end(); ++it1) {
-          CDCLegendreTrackCandidate* cand1 = *it1;
-
-          chi2_track = cand1->getChi2();
-
-          double x0_track = cos(cand1->getTheta()) / cand1->getR() + cand1->getReferencePoint().X();
-          double y0_track = sin(cand1->getTheta()) / cand1->getR() + cand1->getReferencePoint().Y();
-
-//        if((fabs(x0_track-x0_cand)/x0_track < 0.1)&&(fabs(y0_track-y0_cand)/y0_track < 0.1))make_merge = true;
-//        else
-
-          {
-            int n_overlapp = 0;
-            double R = fabs(1. / cand1->getR());
-            for (CDCLegendreTrackHit * hit : candidate.first) {
-              double x0_hit = hit->getOriginalWirePosition().X();
-              double y0_hit = hit->getOriginalWirePosition().Y();
-              double dist = fabs(R - sqrt(SQR(x0_track - x0_hit) + SQR(y0_track - y0_hit))) - hit->getDriftTime();
-              if (dist < hit->getDriftTime() * 3.)n_overlapp++;
-            }
-            if (n_overlapp > 3)make_merge = true;
-            else {
-              n_overlapp = 0;
-              R = fabs(1. / candidate.second.second);
-              for (CDCLegendreTrackHit * hit : cand1->getTrackHits()) {
-                double x0_hit = hit->getOriginalWirePosition().X();
-                double y0_hit = hit->getOriginalWirePosition().Y();
-                double dist = fabs(R - sqrt(SQR(x0_cand - x0_hit) + SQR(y0_cand - y0_hit))) - hit->getDriftTime();
-                if (dist < hit->getDriftTime() * 3.)n_overlapp++;
-              }
-              if (n_overlapp > 3)make_merge = true;
-
-            }
-          }
-
-          if (/*true*/make_merge/*false*/) {
-            std::vector<CDCLegendreTrackHit*> c_list_temp;
-            std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> > candidate_temp =
-              std::make_pair(c_list_temp, std::make_pair(-999, -999));
-            for (CDCLegendreTrackHit * hit : candidate.first) {
-              candidate_temp.first.push_back(hit);
-            }
-            for (CDCLegendreTrackHit * hit : cand1->getTrackHits()) {
-              candidate_temp.first.push_back(hit);
-            }
-
-            double chi2_temp;
-            std::pair<double, double> ref_point_temp = std::make_pair(0., 0.);
-            cdcLegendreTrackFitter->fitTrackCandidateFast(&candidate_temp, ref_point_temp, chi2_temp);
-//          cdcLegendrePatternChecker->clearBadHits(&candidate_temp, ref_point_temp);
-//          cdcLegendreTrackFitter->fitTrackCandidateFast(&candidate_temp, ref_point_temp, chi2_temp);
-            cout << "clist_temp.size = " << candidate_temp.first.size() << endl;
-            cout << "chi_cand=" << chi2_cand << " chi2_track=" << chi2_track << " chi2_temp=" << chi2_temp << endl;
-            if (candidate_temp.first.size() == 0) {
-              merged = true;
-              break;
-            }
-
-            if (chi2_temp < SQR(sqrt(chi2_track) + sqrt(chi2_cand)) * 3.) {
-
-              cand1->setR(candidate_temp.second.second);
-              cand1->setTheta(candidate_temp.second.first);
-//            cand1->setReferencePoint(ref_point_temp.first, ref_point_temp.second);
-              mergeTracks(cand1, candidate, hits_set);
-
-              cdcLegendreTrackFitter->fitTrackCandidateFast(cand1, ref_point);
-              cand1->setReferencePoint(ref_point.first, ref_point.second);
-
-              merged = true;
-//            cand1->clearBadHits(ref_point);
-              cout << "MERGED!" << endl;
-              break;
-            } else make_merge = false;
-          }
-
-
-          /*
-          //check only curler
-          if (fabs(cand1->getR()) > m_rc) {
-
-            if (fabs(candidate.second.second) > m_rc) {
-
-              cout << "R: " << cand1->getR() << "  " << candidate.second.second << endl;
-              cout << "theta: " << cand1->getTheta() << "  " << candidate.second.first << endl;
-
-              //check if the two tracks lie next to each other
-              if (fabs(cand1->getR() - candidate.second.second) < 0.03
-                  && fabs(cand1->getTheta() - candidate.second.first) < 0.03) {
-                mergeTracks(cand1, candidate);
-                BOOST_FOREACH(CDCLegendreTrackHit * hit, candidate.first) {
-                  hits_set.erase(hit);
-                }
-                cdcLegendreTrackFitter->fitTrackCandidateFast(cand1, ref_point);
-                cand1->setReferencePoint(ref_point.first, ref_point.second);
-                merged = true;
-                cand1->clearBadHits(ref_point);
-                cout << "MERGED!" << endl;
-                break;
-              }
-            }
-          }
-
-          */
-        }
-
-
-        if (!merged) createLegendreTrackCandidate(candidate, &hits_set, ref_point);
-
-        limit = n_hits * m_stepScale;
-
-      }
+      limit = n_hits * m_stepScale;
     }
 
     //perform search until found track has too few hits or threshold is too small and no tracks are found
@@ -351,228 +208,14 @@ void CDCLegendreTrackingModule::DoSteppedTrackFinding()
 
 }
 
-void CDCLegendreTrackingModule::MergeCurler()
-{
-  /*
-    //loop over all candidates
-    for (std::list<CDCLegendreTrackCandidate*>::iterator it1 =
-           m_trackList.begin(); it1 != m_trackList.end(); ++it1) {
-      CDCLegendreTrackCandidate* cand1 = *it1;
-
-      //check only curler
-      if (fabs(cand1->getR()) > m_rc) {
-
-        //loop over remaining candidates
-        std::list<CDCLegendreTrackCandidate*>::iterator it2 = boost::next(it1);
-        while (it2 != m_trackList.end()) {
-          CDCLegendreTrackCandidate* cand2 = *it2;
-          ++it2;
-
-          if (fabs(cand2->getR()) > m_rc) {
-
-            //check if the two tracks lie next to each other
-            if (fabs(cand1->getR() - cand2->getR()) < 0.03
-                && fabs(cand1->getTheta() - cand2->getTheta()) < 0.15)
-              return;
-            //mergeTracks(cand1, cand2);
-          }
-        }
-      }
-    }
-    */
-
-  bool merged = false;
-  bool make_merge = false;
-  std::pair<double, double> ref_point = std::make_pair(0., 0.);
-
-  double chi2_track1, chi2_track2;
-  double x0_track1, y0_track1;
-  double x0_track2, y0_track2;
-  //loop over all candidates
-  for (std::list<CDCLegendreTrackCandidate*>::iterator it1 =
-         m_trackList.begin(); it1 != m_trackList.end(); ++it1) {
-    CDCLegendreTrackCandidate* cand1 = *it1;
-
-    chi2_track1 = cand1->getChi2();
-
-    double x0_track1 = cos(cand1->getTheta()) / cand1->getR() + cand1->getReferencePoint().X();
-    double y0_track1 = sin(cand1->getTheta()) / cand1->getR() + cand1->getReferencePoint().Y();
-
-    //loop over remaining candidates
-    std::list<CDCLegendreTrackCandidate*>::iterator it2 = boost::next(it1);
-    while (it2 != m_trackList.end()) {
-      CDCLegendreTrackCandidate* cand2 = *it2;
-      ++it2;
-
-      chi2_track2 = cand2->getChi2();
-
-      double x0_track2 = cos(cand2->getTheta()) / cand2->getR() + cand2->getReferencePoint().X();
-      double y0_track2 = sin(cand2->getTheta()) / cand2->getR() + cand2->getReferencePoint().Y();
-
-
-//    if((fabs(x0_track1-x0_track2)/x0_track1 < 0.1)&&(fabs(y0_track1-y0_track2)/y0_track1 < 0.1))make_merge = true;
-//    else
-      {
-        int n_overlapp = 0;
-        double R = fabs(1. / cand1->getR());
-        for (CDCLegendreTrackHit * hit : cand2->getTrackHits()) {
-          double x0_hit = hit->getOriginalWirePosition().X();
-          double y0_hit = hit->getOriginalWirePosition().Y();
-          double dist = fabs(R - sqrt(SQR(x0_track1 - x0_hit) + SQR(y0_track1 - y0_hit))) - hit->getDriftTime();
-          if (dist < hit->getDriftTime() * 3.)n_overlapp++;
-        }
-        if (n_overlapp > 3)make_merge = true;
-        else {
-          n_overlapp = 0;
-          R = fabs(1. / cand2->getR());
-          for (CDCLegendreTrackHit * hit : cand1->getTrackHits()) {
-            double x0_hit = hit->getOriginalWirePosition().X();
-            double y0_hit = hit->getOriginalWirePosition().Y();
-            double dist = fabs(R - sqrt(SQR(x0_track2 - x0_hit) + SQR(y0_track2 - y0_hit))) - hit->getDriftTime();
-            if (dist < hit->getDriftTime() * 3.)n_overlapp++;
-          }
-          if (n_overlapp > 3)make_merge = true;
-
-        }
-      }
-
-      if (true/*make_merge*/) {
-        std::vector<CDCLegendreTrackHit*> c_list_temp;
-        std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> > candidate_temp =
-          std::make_pair(c_list_temp, std::make_pair(-999, -999));
-        for (CDCLegendreTrackHit * hit : cand2->getTrackHits()) {
-          candidate_temp.first.push_back(hit);
-        }
-        for (CDCLegendreTrackHit * hit : cand1->getTrackHits()) {
-          candidate_temp.first.push_back(hit);
-        }
-
-        double chi2_temp;
-        std::pair<double, double> ref_point_temp = std::make_pair(0., 0.);
-        cdcLegendreTrackFitter->fitTrackCandidateFast(&candidate_temp, ref_point_temp, chi2_temp);
-        if (chi2_temp < SQR(sqrt(chi2_track1) + sqrt(chi2_track2)) * 2.) {
-
-          mergeTracks(cand1, cand2);
-          cdcLegendreTrackFitter->fitTrackCandidateFast(cand1, ref_point, true);
-          cand1->setReferencePoint(ref_point.first, ref_point.second);
-          it2 = boost::next(it1);
-          /*        merged = true;
-                  cand1->clearBadHits(ref_point);
-                  cout << "MERGED!" << endl;
-                  break;
-          */
-
-        } else make_merge = false;
-      }
-
-    }
-    cdcLegendreTrackFitter->fitTrackCandidateFast(cand1, ref_point);
-    cdcLegendreTrackFitter->fitTrackCandidateFast(cand1, ref_point, true);
-
-  }
-
-}
-
-void CDCLegendreTrackingModule::MergeTracks()
-{
-  //loop over all full candidates
-  /*  for (std::list<CDCLegendreTrackCandidate*>::iterator it1 =
-        m_fullTrackList.begin(); it1 != m_fullTrackList.end(); ++it1) {
-      CDCLegendreTrackCandidate* cand1 = *it1;
-
-      //loop over remaining candidates
-
-      std::list<CDCLegendreTrackCandidate*>::iterator it2 = boost::next(it1);
-      while (it2 != m_fullTrackList.end()) {
-        CDCLegendreTrackCandidate* cand2 = *it2;
-        ++it2;
-
-        //check if the two tracks lie next to each other
-        if (fabs(cand1->getR() - cand2->getR()) < 0.03
-            && fabs(cand1->getTheta() - cand2->getTheta()) < 0.15)
-
-          mergeTracks(cand1, cand2);
-      }
-
-      for (std::list<CDCLegendreTrackCandidate*>::iterator it_short =
-          m_shortTrackList.begin(); it_short != m_shortTrackList.end(); ++it_short) {
-        CDCLegendreTrackCandidate* cand_short = *it_short;
-
-        //check if the two tracks lie next to each other
-        if (fabs(cand1->getR() - cand_short->getR()) < 0.03
-            && fabs(cand1->getTheta() - cand_short->getTheta()) < 0.15)
-
-          mergeTracks(cand1, cand_short);
-      }
-
-      for (std::list<CDCLegendreTrackCandidate*>::iterator it_short =
-          m_trackletTrackList.begin(); it_short != m_trackletTrackList.end(); ++it_short) {
-        CDCLegendreTrackCandidate* cand_short = *it_short;
-
-        //check if the two tracks lie next to each other
-        if (fabs(cand1->getR() - cand_short->getR()) < 0.03
-            && fabs(cand1->getTheta() - cand_short->getTheta()) < 0.15)
-
-          mergeTracks(cand1, cand_short);
-      }
-
-    }
-
-    //loop over all short candidates
-    for (std::list<CDCLegendreTrackCandidate*>::iterator it1 =
-        m_shortTrackList.begin(); it1 != m_shortTrackList.end(); ++it1) {
-      CDCLegendreTrackCandidate* cand1 = *it1;
-
-      //loop over remaining candidates
-
-      std::list<CDCLegendreTrackCandidate*>::iterator it2 = boost::next(it1);
-      while (it2 != m_shortTrackList.end()) {
-        CDCLegendreTrackCandidate* cand2 = *it2;
-        ++it2;
-
-        //check if the two tracks lie next to each other
-        if (fabs(cand1->getR() - cand2->getR()) < 0.03
-            && fabs(cand1->getTheta() - cand2->getTheta()) < 0.15)
-
-          mergeTracks(cand1, cand2);
-      }
-
-      for (std::list<CDCLegendreTrackCandidate*>::iterator it_short =
-          m_trackletTrackList.begin(); it_short != m_trackletTrackList.end(); ++it_short) {
-        CDCLegendreTrackCandidate* cand_short = *it_short;
-
-        //check if the two tracks lie next to each other
-        if (fabs(cand1->getR() - cand_short->getR()) < 0.03
-            && fabs(cand1->getTheta() - cand_short->getTheta()) < 0.15)
-
-          mergeTracks(cand1, cand_short);
-      }
-
-    }*/
-
-  for (CDCLegendreTrackCandidate * trackCand : m_fullTrackList) {
-    m_trackList.push_back(new CDCLegendreTrackCandidate(*trackCand));
-  }
-  for (CDCLegendreTrackCandidate * trackCand : m_shortTrackList) {
-    m_trackList.push_back(new CDCLegendreTrackCandidate(*trackCand));
-  }
-
-//  std::copy(m_fullTrackList.begin(), m_fullTrackList.end(), std::back_inserter(m_trackList));
-//  std::copy(m_shortTrackList.begin(), m_shortTrackList.end(), std::back_inserter(m_trackList));
-
-//  m_trackList.insert( m_trackList.end(), m_fullTrackList.begin(), m_fullTrackList.end() );
-//  m_trackList.insert( m_trackList.end(), m_shortTrackList.begin(), m_shortTrackList.end() );
-
-}
-
 
 void CDCLegendreTrackingModule::AsignStereoHits()
 {
-  BOOST_FOREACH(CDCLegendreTrackHit * hit, m_StereoHitList) {
+  for (CDCLegendreTrackHit * hit : m_StereoHitList) {
     CDCLegendreTrackCandidate* best = NULL;
     double best_chi2 = 999;
 
-    BOOST_FOREACH(CDCLegendreTrackCandidate * candidate, m_trackList) {
+    for (CDCLegendreTrackCandidate * candidate : m_trackList) {
       //precut on distance between track and stereo hit
       if (candidate->DistanceTo(*hit) <= 5.) {
         //Hit needs to have the correct curvature
@@ -599,67 +242,13 @@ void CDCLegendreTrackingModule::AsignStereoHits()
     }
   }
 
-  BOOST_FOREACH(CDCLegendreTrackCandidate * cand, m_trackList) {
+  for (CDCLegendreTrackCandidate * cand : m_trackList) {
     cand->CheckStereoHits();
   }
 
 }
 
-void CDCLegendreTrackingModule::mergeTracks(CDCLegendreTrackCandidate* cand1,
-                                            const std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> >& track,
-                                            std::set<CDCLegendreTrackHit*>& hits_set)
-{
-  /*
-    cand1->setR(
-      (cand1->getR() * cand1->getNHits() + track.second.second * track.first.size())
-      / (cand1->getNHits() + track.second.second * track.first.size()));
-    cand1->setTheta(
-      (cand1->getTheta() * cand1->getNHits()
-       + track.second.first * track.second.second * track.first.size())
-      / (cand1->getNHits() + track.second.second * track.first.size()));
-  */
-  BOOST_FOREACH(CDCLegendreTrackHit * hit, track.first) {
-    /*    cand1->addHit(hit);
-        hit->setUsed(CDCLegendreTrackHit::used_in_track);
-    */
-    double R = fabs(1. / cand1->getR());
-    double x0_track = cos(cand1->getTheta()) / cand1->getR() + cand1->getReferencePoint().X() ;
-    double y0_track = sin(cand1->getTheta()) / cand1->getR() + cand1->getReferencePoint().Y();
-    double x0_hit = hit->getOriginalWirePosition().X();
-    double y0_hit = hit->getOriginalWirePosition().Y();
-    double dist = SQR(fabs(R - sqrt(SQR(x0_track - x0_hit) + SQR(y0_track - y0_hit))) - hit->getDriftTime());
-    if (hit->getDriftTime() / 2. < dist) {
-      cand1->addHit(hit);
-      hit->setUsed(CDCLegendreTrackHit::used_in_track);
-//        hits_set.erase(hit);
-    }
-  }
 
-//  m_trackList.remove(cand2);
-//  delete cand2;
-//  cand2 = NULL;
-}
-
-void CDCLegendreTrackingModule::mergeTracks(CDCLegendreTrackCandidate* cand1, CDCLegendreTrackCandidate* cand2)
-{
-
-  cand1->setR(
-    (cand1->getR() * cand1->getNHits() + cand2->getR() * cand2->getNHits())
-    / (cand1->getNHits() + cand2->getNHits()));
-  cand1->setTheta(
-    (cand1->getTheta() * cand1->getNHits()
-     + cand2->getTheta() * cand2->getNHits())
-    / (cand1->getNHits() + cand2->getNHits()));
-
-  BOOST_FOREACH(CDCLegendreTrackHit * hit, cand2->getTrackHits()) {
-    cand1->addHit(hit);
-    hit->setUsed(true);
-  }
-
-  m_trackList.remove(cand2);
-  delete cand2;
-  cand2 = NULL;
-}
 void CDCLegendreTrackingModule::checkHitPattern()
 {
   int candType;
@@ -692,7 +281,7 @@ void CDCLegendreTrackingModule::createLegendreTrackCandidate(
     CDCLegendreTrackCandidate* trackCandidate = new CDCLegendreTrackCandidate(
       track_theta, track_r, charge, track.first);
     trackCandidate->setReferencePoint(ref_point.first, ref_point.second);
-    cdcLegendreTrackFitter->fitTrackCandidateFast(trackCandidate, ref_point);
+    m_cdcLegendreTrackFitter->fitTrackCandidateFast(trackCandidate, ref_point);
 //    trackCandidate->clearBadHits(ref_point);
 
     processTrack(trackCandidate, trackHitList);
@@ -710,8 +299,8 @@ void CDCLegendreTrackingModule::createLegendreTrackCandidate(
       new CDCLegendreTrackCandidate(track_theta, track_r,
                                     CDCLegendreTrackCandidate::charge_negative, track.first);
     trackCandidate_neg->setReferencePoint(ref_point.first, ref_point.second);
-    cdcLegendreTrackFitter->fitTrackCandidateFast(trackCandidate_pos, ref_point);
-    cdcLegendreTrackFitter->fitTrackCandidateFast(trackCandidate_neg, ref_point);
+    m_cdcLegendreTrackFitter->fitTrackCandidateFast(trackCandidate_pos, ref_point);
+    m_cdcLegendreTrackFitter->fitTrackCandidateFast(trackCandidate_neg, ref_point);
 //    trackCandidate_pos->clearBadHits(ref_point);
 //    trackCandidate_neg->clearBadHits(ref_point);
 
@@ -738,7 +327,7 @@ void CDCLegendreTrackingModule::processTrack(
         else if(candType == CDCLegendreTrackCandidate::curlerTrack)m_shortTrackList.push_back(trackCandidate);
         else if(candType == CDCLegendreTrackCandidate::tracklet)m_trackletTrackList.push_back(trackCandidate);
         else {
-          BOOST_FOREACH(CDCLegendreTrackHit * hit, trackCandidate->getTrackHits()) {
+          for(CDCLegendreTrackHit * hit: trackCandidate->getTrackHits()) {
             trackHitList->erase(hit);
           }
 
@@ -750,14 +339,14 @@ void CDCLegendreTrackingModule::processTrack(
     */
     m_trackList.push_back(trackCandidate);
 
-    BOOST_FOREACH(CDCLegendreTrackHit * hit, trackCandidate->getTrackHits()) {
+    for (CDCLegendreTrackHit * hit : trackCandidate->getTrackHits()) {
 //      trackHitList->erase(hit);
       hit->setUsed(CDCLegendreTrackHit::used_in_track);
     }
   }
 
   else {
-    BOOST_FOREACH(CDCLegendreTrackHit * hit, trackCandidate->getTrackHits()) {
+    for (CDCLegendreTrackHit * hit : trackCandidate->getTrackHits()) {
 //      trackHitList->erase(hit);
       hit->setUsed(CDCLegendreTrackHit::used_bad);
     }
@@ -788,10 +377,10 @@ void CDCLegendreTrackingModule::createGFTrackCandidates()
 
   int i = 0;
 
-  BOOST_FOREACH(CDCLegendreTrackCandidate * trackCand, m_trackList) {
+  for (CDCLegendreTrackCandidate * trackCand : m_trackList) {
     gfTrackCandidates.appendNew();
     std::pair<double, double> ref_point_temp = std::make_pair(0., 0.);
-    cdcLegendreTrackFitter->fitTrackCandidateFast(trackCand, ref_point_temp);
+    m_cdcLegendreTrackFitter->fitTrackCandidateFast(trackCand, ref_point_temp);
 
 //  testing of track's hit pattern
 //    cout << "pattern:" << trackCand->getHitPattern().getHitPattern() << endl;
@@ -831,7 +420,7 @@ void CDCLegendreTrackingModule::createGFTrackCandidates()
 
     B2DEBUG(100, " Add Hits: hitId rho planeId")
 
-    BOOST_FOREACH(CDCLegendreTrackHit * trackHit, trackHitVector) {
+    for (CDCLegendreTrackHit * trackHit : trackHitVector) {
       int hitID = trackHit->getStoreIndex();
       gfTrackCandidates[i]->addHit(Const::CDC, hitID);
     }
@@ -926,32 +515,32 @@ bool CDCTracking_SortHit::operator()(CDCLegendreTrackHit* hit1,
 void CDCLegendreTrackingModule::clear_pointer_vectors()
 {
 
-  BOOST_FOREACH(CDCLegendreTrackHit * hit, m_AxialHitList) {
+  for (CDCLegendreTrackHit * hit : m_AxialHitList) {
     delete hit;
   }
   m_AxialHitList.clear();
 
-  BOOST_FOREACH(CDCLegendreTrackHit * hit, m_StereoHitList) {
+  for (CDCLegendreTrackHit * hit : m_StereoHitList) {
     delete hit;
   }
   m_StereoHitList.clear();
 
-  BOOST_FOREACH(CDCLegendreTrackCandidate * track, m_trackList) {
+  for (CDCLegendreTrackCandidate * track : m_trackList) {
     delete track;
   }
   m_trackList.clear();
 
-  BOOST_FOREACH(CDCLegendreTrackCandidate * track, m_fullTrackList) {
+  for (CDCLegendreTrackCandidate * track : m_fullTrackList) {
     delete track;
   }
   m_fullTrackList.clear();
 
-  BOOST_FOREACH(CDCLegendreTrackCandidate * track, m_shortTrackList) {
+  for (CDCLegendreTrackCandidate * track : m_shortTrackList) {
     delete track;
   }
   m_shortTrackList.clear();
 
-  BOOST_FOREACH(CDCLegendreTrackCandidate * track, m_trackletTrackList) {
+  for (CDCLegendreTrackCandidate * track : m_trackletTrackList) {
     delete track;
   }
   m_trackletTrackList.clear();

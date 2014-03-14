@@ -32,6 +32,7 @@ namespace Belle2 {
   class CDCLegendreTrackFitter;
   class CDCLegendrePatternChecker;
   class CDCLegendreFastHough;
+  class CDCLegendreTrackMerger;
 
   /** CDC tracking module, using Legendre transformation of the drift time circles.
    * This is a module, performing tracking in the CDC. It is based on the paper "Implementation of the Legendre Transform for track segment reconstruction in drift tube chambers" by T. Alexopoulus, et al. NIM A592 456-462 (2008)
@@ -90,9 +91,10 @@ namespace Belle2 {
     std::list<CDCLegendreTrackCandidate*> m_fullTrackList; /**< List of track candidates, which consists of 1-9 SLayers */
     std::list<CDCLegendreTrackCandidate*> m_shortTrackList; /**< List of track candidates, which consists of 1-* SLayers, pass through one or more SLayers*/
     std::list<CDCLegendreTrackCandidate*> m_trackletTrackList; /**< List of track candidates, which starts from 3rd or 5th SLayer and pass through one or more SLayers*/
-    CDCLegendreTrackFitter* cdcLegendreTrackFitter;
-    CDCLegendrePatternChecker* cdcLegendrePatternChecker;
-    CDCLegendreFastHough* cdcLegendreFastHough;
+    CDCLegendreTrackFitter* m_cdcLegendreTrackFitter;
+    CDCLegendrePatternChecker* m_cdcLegendrePatternChecker;
+    CDCLegendreFastHough* m_cdcLegendreFastHough;
+    CDCLegendreTrackMerger* m_cdcLegendreTrackMerger;
 
     int m_threshold; /**< Threshold for votes in the legendre plane, parameter of the module*/
     double m_thresholdUnique; /**< Threshold of unique TrackHits for track building*/
@@ -114,11 +116,6 @@ namespace Belle2 {
     bool m_fitTracks; /**< Apply fitting for candidates or not*/
     bool m_earlyMerge; /**< Apply fitting for candidates or not*/
 
-    /**
-     * @brief small helper function, to check if four values have the same sign
-     */
-    inline bool sameSign(double, double, double, double);
-
     /** Sort hits for fitting.
      * This method sorts hit indices to bring them in a correct order, which is needed for the fitting
      * @param hitIndices vector with the hit indices, this vector is charged within the function.
@@ -131,16 +128,6 @@ namespace Belle2 {
      * Function used in the event function, which contains the search for tracks, calling multiply the Fast Hough algorithm, always just searching for one track and afterwards removin the according hits from the hit list.
      */
     void DoSteppedTrackFinding();
-
-    /**
-     * The track finding often finds two curling tracks, originating from the same particle. This function merges them.
-     */
-    void MergeCurler();
-
-    /**
-     * Trying to merge tracks
-     */
-    void MergeTracks();
 
     /**
      * In this function, the stereo hits are assigned to the track candidates.
@@ -165,20 +152,6 @@ namespace Belle2 {
 
     /** Creates GeantFit Track Candidates from CDCLegendreTrackCandidates */
     void createGFTrackCandidates();
-
-    /**
-     * @brief Function to merge two track candidates
-     * All hits of track 2 are assigned to track 1 and the mean of the r and theta values of the two tracks are assigned to track 1
-     * Track 2 is deleted.
-     */
-    void mergeTracks(CDCLegendreTrackCandidate* cand1, const std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> >& track, std::set<CDCLegendreTrackHit*>& hits_set);
-
-    /**
-     * @brief Function to merge two track candidates
-     * All hits of track 2 are assigned to track 1 and the mean of the r and theta values of the two tracks are assigned to track 1
-     * Track 2 is deleted.
-     */
-    void mergeTracks(CDCLegendreTrackCandidate* cand1, CDCLegendreTrackCandidate* cand2);
 
     /**
      * @brief Function to split track candidates into 3 groups: long tracks, curlers, and tracklets

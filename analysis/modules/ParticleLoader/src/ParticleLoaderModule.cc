@@ -11,8 +11,6 @@
 // Own include
 #include <analysis/modules/ParticleLoader/ParticleLoaderModule.h>
 
-#include <framework/core/ModuleManager.h>
-
 // framework - DataStore
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
@@ -32,7 +30,6 @@
 #include <ecl/dataobjects/ECLPi0.h>
 #include <ecl/dataobjects/ECLShower.h>
 #include <analysis/dataobjects/Particle.h>
-#include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/ParticleExtraInfoMap.h>
 
 #include <utility>
@@ -54,8 +51,7 @@ namespace Belle2 {
   ParticleLoaderModule::ParticleLoaderModule() : Module()
 
   {
-    // set module description (e.g. insert text)
-    setDescription("Loads mdst particles to StoreArray<Particle>");
+    setDescription("Fills StoreArray<Particle> from MDST data");
     setPropertyFlags(c_ParallelProcessingCertified);
 
     // Add parameters
@@ -123,7 +119,7 @@ namespace Belle2 {
         if (abs(mc->getPDG()) == pdgCode[k]) {
           Particle particle(mc);
           Particle* newPart = Particles.appendNew(particle);
-          DataStore::addRelationFromTo(newPart, mc);
+          newPart->addRelationTo(mc);
           break;
         }
       }
@@ -150,14 +146,14 @@ namespace Belle2 {
 
     for (int i = 0; i < Tracks.getEntries(); i++) {
       const Track* track = Tracks[i];
-      const PIDLikelihood* pid = DataStore::getRelated<PIDLikelihood>(track);
-      const MCParticle* mcParticle = DataStore::getRelated<MCParticle>(track);
+      const PIDLikelihood* pid = track->getRelated<PIDLikelihood>();
+      const MCParticle* mcParticle = track->getRelated<MCParticle>();
       for (int k = 0; k < 5; k++) {
         Particle particle(track, charged[k]);
         if (particle.getParticleType() == Particle::c_Track) { // should always hold but...
           Particle* newPart = Particles.appendNew(particle);
-          DataStore::addRelationFromTo(newPart, pid);
-          DataStore::addRelationFromTo(newPart, mcParticle);
+          newPart->addRelationTo(pid);
+          newPart->addRelationTo(mcParticle);
         }
       }
     }
@@ -168,12 +164,12 @@ namespace Belle2 {
 
     for (int i = 0; i < Gammas.getEntries(); i++) {
       const ECLGamma* gamma = Gammas[i];
-      const ECLShower* eclshower   = DataStore::getRelated<ECLShower>(gamma);
-      const MCParticle* mcParticle = DataStore::getRelated<MCParticle>(eclshower);
+      const ECLShower* eclshower   = gamma->getRelated<ECLShower>();
+      const MCParticle* mcParticle = eclshower->getRelated<MCParticle>();
       Particle particle(gamma);
       if (particle.getParticleType() == Particle::c_ECLShower) { // should always hold but...
         Particle* newPart = Particles.appendNew(particle);
-        DataStore::addRelationFromTo(newPart, mcParticle);
+        newPart->addRelationTo(mcParticle);
         int lastIndex = Particles.getEntries() - 1;
         int showerId = gamma->getShowerId();
         gammaShowerId.push_back(make_pair(lastIndex, showerId));

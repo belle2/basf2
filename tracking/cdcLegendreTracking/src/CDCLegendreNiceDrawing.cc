@@ -29,29 +29,6 @@ CDCLegendreNiceDrawing::CDCLegendreNiceDrawing(std::string& TrackCandColName, st
   m_TrackCandColName(TrackCandColName), m_trackColName(trackColName), m_HitColName(HitColName), m_StoreDirectory(StoreDirectory),
   m_drawMCSignal(drawMCSignal), m_drawCands(drawCands), m_mcParticlesColName(mcParticlesColName)
 {
-  /*
-    setDescription("Nice Tracking Drawing Module");
-
-    addParam("TrackCandColName", m_TrackCandColName, "Genfit Track candidate collection",
-             std::string("TrackCands"));
-
-    addParam("trackColName", m_trackColName, "Track collection",
-             std::string("Tracks"));
-
-    addParam("HitColName", m_HitColName, "CDCHit collection", std::string("CDCHits"));
-
-    addParam("StoreDirectory", m_StoreDirectory,
-             std::string("Directory where pictures are stored"));
-
-    addParam("DrawMCSignal", m_drawMCSignal,
-             "Controls, whether MC signal is draw", false);
-
-    addParam("DrawCands", m_drawCands,
-             "Controls, whether Track Candidates or Tracks are drawn", false);
-
-    addParam("MCParticlesColName", m_mcParticlesColName,
-             "MCParticles collection name", std::string("MCParticles"));
-  */
 
 }
 

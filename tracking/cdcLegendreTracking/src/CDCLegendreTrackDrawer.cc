@@ -37,7 +37,9 @@ CDCLegendreTrackDrawer::CDCLegendreTrackDrawer(bool drawCandInfo, bool drawCandi
 
 void CDCLegendreTrackDrawer::initialize()
 {
-  m_StoreDirectory = std::string("tmp/visualization");
+  system("mkdir tmp");
+
+  m_StoreDirectory = std::string("tmp/visualization"); // Where to store step-by-step drawings.
 
   if (not m_drawCandInfo) return;
 

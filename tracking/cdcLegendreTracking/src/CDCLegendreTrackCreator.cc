@@ -29,9 +29,10 @@
 using namespace Belle2;
 using namespace std;
 
-CDCLegendreTrackCreator::CDCLegendreTrackCreator(std::vector<CDCLegendreTrackHit*>& AxialHitList,
-                                                 std::list<CDCLegendreTrackCandidate*>& trackList, CDCLegendreTrackFitter* cdcLegendreTrackFitter, CDCLegendreTrackDrawer* cdcLegendreTrackDrawer):
-  m_AxialHitList(AxialHitList), m_trackList(trackList), m_cdcLegendreTrackFitter(cdcLegendreTrackFitter), m_cdcLegendreTrackDrawer(cdcLegendreTrackDrawer)
+CDCLegendreTrackCreator::CDCLegendreTrackCreator(std::vector<CDCLegendreTrackHit*>& AxialHitList, std::list<CDCLegendreTrackCandidate*>& trackList,
+                                                 bool appendHits, CDCLegendreTrackFitter* cdcLegendreTrackFitter, CDCLegendreTrackDrawer* cdcLegendreTrackDrawer):
+  m_AxialHitList(AxialHitList), m_trackList(trackList), m_appendHits(appendHits),
+  m_cdcLegendreTrackFitter(cdcLegendreTrackFitter), m_cdcLegendreTrackDrawer(cdcLegendreTrackDrawer)
 {
 
 }
@@ -96,6 +97,7 @@ void CDCLegendreTrackCreator::createLegendreTrackCandidate(
 
 void CDCLegendreTrackCreator::appendNewHits(CDCLegendreTrackCandidate* track)
 {
+  if (not m_appendHits) return;
   double x0_track = cos(track->getTheta()) / track->getR() + track->getReferencePoint().X();
   double y0_track = sin(track->getTheta()) / track->getR() + track->getReferencePoint().Y();
   double R = fabs(1. / track->getR());
@@ -105,7 +107,7 @@ void CDCLegendreTrackCreator::appendNewHits(CDCLegendreTrackCandidate* track)
       double x0_hit = hit->getOriginalWirePosition().X();
       double y0_hit = hit->getOriginalWirePosition().Y();
       double dist = fabs(R - sqrt((x0_track - x0_hit) * (x0_track - x0_hit) + (y0_track - y0_hit) * (y0_track - y0_hit))) - hit->getDriftTime();
-      if (dist < hit->getDriftTime() * 2.) track->addHit(hit);
+      if (dist < hit->getDriftTime() * 0.75) track->addHit(hit);
     }
   }
 }
@@ -116,34 +118,17 @@ void CDCLegendreTrackCreator::processTrack(
 {
   //check if the number has enough axial hits (might be less due to the curvature check).
   if (fullfillsQualityCriteria(trackCandidate)) {
-    /*    int candType = trackCandidate->getCandidateType();
-        if(candType == CDCLegendreTrackCandidate::fullTrack)m_fullTrackList.push_back(trackCandidate);
-        else if(candType == CDCLegendreTrackCandidate::curlerTrack)m_shortTrackList.push_back(trackCandidate);
-        else if(candType == CDCLegendreTrackCandidate::tracklet)m_trackletTrackList.push_back(trackCandidate);
-        else {
-          for(CDCLegendreTrackHit * hit: trackCandidate->getTrackHits()) {
-            trackHitList->erase(hit);
-          }
-
-
-          //memory management, since we cannot use smart pointers in function interfaces
-          delete trackCandidate;
-          trackCandidate = NULL;
-        }
-    */
     m_trackList.push_back(trackCandidate);
 
     m_cdcLegendreTrackDrawer->drawTrackCand(trackCandidate);
 
     for (CDCLegendreTrackHit * hit : trackCandidate->getTrackHits()) {
-//      trackHitList->erase(hit);
       hit->setUsed(CDCLegendreTrackHit::used_in_track);
     }
   }
 
   else {
     for (CDCLegendreTrackHit * hit : trackCandidate->getTrackHits()) {
-//      trackHitList->erase(hit);
       hit->setUsed(CDCLegendreTrackHit::used_bad);
     }
 
@@ -180,14 +165,11 @@ void CDCLegendreTrackCreator::createGFTrackCandidates(string& m_gfTrackCandsColN
     std::pair<double, double> ref_point_temp = std::make_pair(0., 0.);
     m_cdcLegendreTrackFitter->fitTrackCandidateFast(trackCand, ref_point_temp);
 
-//  testing of track's hit pattern
-//    cout << "pattern:" << trackCand->getHitPattern().getHitPattern() << endl;
 
     //set the values needed as start values for the fit in the genfit::TrackCandidate from the CDCTrackCandidate information
     //variables stored in the genfit::TrackCandidates are: vertex position + error, momentum + error, pdg value, indices for the Hits
     TVector3 position;
 //    position.SetXYZ(0.0, 0.0, 0.0);//at the moment there is no vertex determination in the ConformalFinder, but maybe the origin or the innermost hit are good enough as start values...
-    //position = cdcTrackCandidates[i]->getInnerMostHit().getWirePosition();
     position = trackCand->getReferencePoint();
 
     TVector3 momentum =

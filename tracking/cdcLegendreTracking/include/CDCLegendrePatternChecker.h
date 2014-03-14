@@ -14,27 +14,27 @@ namespace Belle2 {
 
     ~CDCLegendrePatternChecker() {};
 
+    /** Check pattern of curlers*/
     void checkCurler(std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> >* track);
 
+    /** Check pattern of track candidate. TODO: make checks for high-pt tracks, implement more robust criteria of pattern checks*/
     void checkCandidate(std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> >* track);
 
     void checkPattern(HitPatternCDC* pattern, double radius);
 
+    /** Gets number of innermost superlayer*/
     int getMinSLayer(HitPatternCDC* pattern);
 
+    /** Gets number of outermost superlayer*/
     int getMaxSLayer(HitPatternCDC* pattern);
 
+    /** Makes hits cleanup in candidate*/
     void clearBadHits(std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> >* track, std::pair<double, double>& ref_point);
 
   private:
 
-//    double m_rMin; /**< Minimum in r direction, initialized in initializer list of the module*/
-//    double m_rMax; /**< Maximum in r direction, initialized in initializer list of the module*/
-
     static constexpr double m_PI = 3.1415926535897932384626433832795; /**< pi is exactly three*/
     static constexpr double m_rc = 0.0176991150442477874; /**< threshold of r, which defines curlers*/
-//    int m_nbinsTheta; /**< Number of bins in theta, derived from m_maxLevel*/
-//    int m_initialAxialHits; /**< Initial number of axial hits in the stepped hough algorithm*/
 
 
   };

@@ -222,6 +222,9 @@ namespace Belle2 {
       m_chi2 = chi2;
     }
 
+    /**
+     * Get chi2 square of circular fit
+     */
     double getChi2() {
       return m_chi2;
     }
@@ -273,7 +276,7 @@ namespace Belle2 {
     /**
      * Updates m_axialHits, m_stereoHits, and m_allHits
      */
-    void DetermineHitNumbers();
+    void determineHitNumbers();
 
     /**Return pattern of assigned axial and stereo hits.*/
     void makeHitPattern();

@@ -21,9 +21,8 @@ void CDCLegendrePatternChecker::checkCurler(
   double theta = 1. / track->second.first;
   std::pair<double, double> center = std::make_pair(cos(theta) / radius, sin(theta) / radius);
 
-//  pattern_P = new HitPatternCDC();
-//  pattern_N = new HitPatternCDC();
 
+  // Make two patterns: for "positive" and "negative" parts of track (curler)
   for (CDCLegendreTrackHit * hit : track->first) {
     if (hit->getCurvatureSignWrt(center.first, center.second) == CDCLegendreTrackCandidate::charge_positive) {
       pattern_P.setLayer(hit->getLayerId());
@@ -33,30 +32,9 @@ void CDCLegendrePatternChecker::checkCurler(
       nhits_N++;
     }
   }
-  /*
-    if(pattern_P.getNHits() > pattern_N.getNHits())
-    {
-      pattern_lead = pattern_P;
-      pattern_sublead = pattern_N;
-      charge = CDCLegendreTrackCandidate::charge_positive;
-    }
-    else
-    {
-      pattern_lead = pattern_N;
-      pattern_sublead = pattern_P;
-      charge = CDCLegendreTrackCandidate::charge_negative;
-    }
 
-    if(getMaxSLayer(&pattern_sublead)<getMaxSLayer(&pattern_lead))
-    {
+  // Clear hits: if superlayer has 1 or 2 hits, those hits should be deleted
 
-      track->first.erase(std::remove_if(track->first.begin(), track->first.end(),
-          [&center,&charge](CDCLegendreTrackHit * hit)
-          {
-            return hit->getCurvatureSignWrt(center.first, center.second) != charge;
-          }), track->first.end());
-    }
-    */
   for (int ii = 0; ii < getMaxSLayer(&pattern_P); ii++) {
     if (pattern_P.getSLayerNHits(ii) <= 2)
       track->first.erase(std::remove_if(track->first.begin(), track->first.end(),
@@ -69,6 +47,8 @@ void CDCLegendrePatternChecker::checkCurler(
       }
     }), track->first.end());
   }
+
+  // Clear hits: if superlayer has 1 or 2 hits, those hits should be deleted
 
   for (int ii = 0; ii < getMaxSLayer(&pattern_N); ii++) {
     if (pattern_P.getSLayerNHits(ii) <= 2)
@@ -83,6 +63,7 @@ void CDCLegendrePatternChecker::checkCurler(
     }), track->first.end());
   }
 
+  // After cleanup leaving only those pattern which has most of hits
 
   if (pattern_P.getNHits() > pattern_N.getNHits()) {
     track->first.erase(std::remove_if(track->first.begin(), track->first.end(),
@@ -120,25 +101,15 @@ void CDCLegendrePatternChecker::checkCandidate(std::pair<std::vector<CDCLegendre
 int CDCLegendrePatternChecker::getMaxSLayer(HitPatternCDC* pattern)
 {
   double outermostAxialSLayer;
-//  if ((outermostAxialSLayer == -1) || (forced)) {
-//    int nHits = m_TrackHits.size();
   int maxSLayer = 8;
   do {
     if (pattern->hasSLayer(maxSLayer)) {
-//        if (m_hitPatternAxial.getSLayerNHits(maxSLayer) < minNHits) {
-      //using lambda functions for erase-remove idiom
-//          m_TrackHits.erase(std::remove_if(m_TrackHits.begin(), m_TrackHits.end(), [&maxSLayer](CDCLegendreTrackHit * hit) {return hit->getSuperlayerId() == maxSLayer;}), m_TrackHits.end());
-//        } else {
       outermostAxialSLayer = maxSLayer;
       break;
-//        }
     }
     --maxSLayer;
   } while (maxSLayer >= 0);
-//    while (!hitPatternAxial.getSLayer(maxSLayer--));
   outermostAxialSLayer = maxSLayer + 1;
-//    if (m_TrackHits.size() != nHits) makeHitPattern();
-//  }
 
   return outermostAxialSLayer;
 

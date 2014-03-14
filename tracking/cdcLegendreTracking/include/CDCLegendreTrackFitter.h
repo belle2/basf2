@@ -32,27 +32,39 @@ namespace Belle2 {
 
     ~CDCLegendreTrackFitter();
 
-    void fitTrackCandidateStepped(std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> >* track);
-
+    /*
+     * Perform fast circular fitting
+     */
     void fitTrackCandidateFast(std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> >* track, std::pair<double, double>& ref_point, double& chi2, bool with_drift_time = false);
 
+    /*
+     * Perform fast circular fitting
+     */
     void fitTrackCandidateFast(CDCLegendreTrackCandidate* track, std::pair<double, double>& ref_point, bool with_drift_time = false);
 
-    void checkHits(std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> >* track, std::pair<double, double>& ref_point);
-
+    /**
+     * Simple fitter which perform stepped fitting in normal space, not the best choice in sense of performance
+     */
     void fitTrackCandidateNormalSpace(
       std::pair < std::vector<CDCLegendreTrackHit*>,
       std::pair<double, double> > * track,
       std::pair<double, double>* ref_point);
 
+    /**
+     * Simple fitter which perform stepped fitting in conformal space, not the best choice in sense of performance
+     */
+    void fitTrackCandidateStepped(std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> >* track);
+
+
   private:
 
-    double m_rMin; /**< Minimum in r direction, initialized in initializer list of the module*/
-    double m_rMax; /**< Maximum in r direction, initialized in initializer list of the module*/
 
     static constexpr double m_PI = 3.1415926535897932384626433832795; /**< pi is exactly three*/
     static constexpr double m_rc = 0.0176991150442477874; /**< threshold of r, which defines curlers*/
+
     int m_nbinsTheta; /**< Number of bins in theta, derived from m_maxLevel*/
+    double m_rMin; /**< Minimum in r direction, initialized in initializer list of the module*/
+    double m_rMax; /**< Maximum in r direction, initialized in initializer list of the module*/
     bool m_fitTracks; /**< Decides whether fitting will be applied*/
 
   };

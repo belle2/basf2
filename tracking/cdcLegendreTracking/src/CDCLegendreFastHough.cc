@@ -12,16 +12,17 @@
 #include <tracking/cdcLegendreTracking/CDCLegendreTrackHit.h>
 
 #include <cmath>
+#include <algorithm>
 
 using namespace std;
 using namespace Belle2;
 
 
 
-CDCLegendreFastHough::CDCLegendreFastHough(bool reconstructCurler,
+CDCLegendreFastHough::CDCLegendreFastHough(bool reconstructCurler, bool useHitPrecalculatedR,
                                            int maxLevel, int nbinsTheta, double rMin, double rMax):
-  m_reconstructCurler(reconstructCurler), m_maxLevel(maxLevel), m_nbinsTheta(nbinsTheta),
-  m_rMin(rMin), m_rMax(rMax)
+  m_useHitPrecalculatedR(useHitPrecalculatedR), m_reconstructCurler(reconstructCurler), m_maxLevel(maxLevel),
+  m_nbinsTheta(nbinsTheta), m_rMin(rMin), m_rMax(rMax)
 {
 
   //Initialize look-up table
@@ -59,8 +60,6 @@ void CDCLegendreFastHough::FastHoughNormal(
     return;
   }
 
-//  if(candidate->first.size() > 0) return;
-
   //calculate bin borders of 2x2 bin "histogram"
   int thetaBin[3];
   thetaBin[0] = theta_min;
@@ -85,16 +84,19 @@ void CDCLegendreFastHough::FastHoughNormal(
   //Voting within the four bins
   for (CDCLegendreTrackHit * hit : hits) {
     for (int t_index = 0; t_index < 3; ++t_index) {
-      /*      r_temp = hit->getConformalX() * m_cos_theta[thetaBin[t_index]]
-                     + hit->getConformalY() * m_sin_theta[thetaBin[t_index]];
-            hit->setRValue(theta_max, 1.);
-      */    if (hit->checkRValue(thetaBin[t_index]))
-        r_temp = hit->getRValue(thetaBin[t_index]);
-      else {
-        r_temp = hit->getConformalX() * m_cos_theta[thetaBin[t_index]] +
-                 hit->getConformalY() * m_sin_theta[thetaBin[t_index]];
-        hit->setRValue(thetaBin[t_index], r_temp);
+
+      if (m_useHitPrecalculatedR) {
+        if (hit->checkRValue(thetaBin[t_index])) r_temp = hit->getRValue(thetaBin[t_index]);
+        else {
+          r_temp = hit->getConformalX() * m_cos_theta[thetaBin[t_index]] +
+                   hit->getConformalY() * m_sin_theta[thetaBin[t_index]];
+          hit->setRValue(thetaBin[t_index], r_temp);
+        }
+      } else {
+        r_temp = hit->getConformalX() * m_cos_theta[thetaBin[t_index]]
+                 + hit->getConformalY() * m_sin_theta[thetaBin[t_index]];
       }
+
 
       r_1 = r_temp + hit->getConformalDriftTime();
       r_2 = r_temp - hit->getConformalDriftTime();
@@ -121,7 +123,7 @@ void CDCLegendreFastHough::FastHoughNormal(
 
   }
 
-  int max_value = 0;
+  unsigned int max_value = 0;
   std::pair<int, int> max_value_bin = std::make_pair(0, 0);
 
   bool binUsed[2][2];
@@ -179,36 +181,36 @@ void CDCLegendreFastHough::FastHoughNormal(
     //      if(max_value_bin != std::make_pair(t_index, r_index))allow_overlap = false;
 
     //bin must contain more hits than the limit and maximal found track candidate
-    if (voted_hits[t_index][r_index].size() >= limit) {
+    /*    if (voted_hits[t_index][r_index].size() >= limit) {
 
-      //if max level of fast Hough is reached, mark candidate and return
-      //        if (((!allow_overlap)&&(level == (m_maxLevel - level_diff))) || ((allow_overlap)&&(level == (m_maxLevel - level_diff) + 2))) {
-      if (level >= (m_maxLevel - level_diff)) {
+          //if max level of fast Hough is reached, mark candidate and return
+          //        if (((!allow_overlap)&&(level == (m_maxLevel - level_diff))) || ((allow_overlap)&&(level == (m_maxLevel - level_diff) + 2))) {
+          if (level >= (m_maxLevel - level_diff)) {
 
-        std::vector<CDCLegendreTrackHit*> c_list;
-        std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> > candidate_temp =
-          std::make_pair(c_list, std::make_pair(-999, -999));
+            std::vector<CDCLegendreTrackHit*> c_list;
+            std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> > candidate_temp =
+              std::make_pair(c_list, std::make_pair(-999, -999));
 
 
 
-        double theta = static_cast<double>(thetaBin[t_index]
-                                           + thetaBin[t_index + 1]) / 2. * m_PI / m_nbinsTheta;
+            double theta = static_cast<double>(thetaBin[t_index]
+                                               + thetaBin[t_index + 1]) / 2. * m_PI / m_nbinsTheta;
 
-        if (not m_reconstructCurler
-            && fabs((r[r_index] + r[r_index + 1]) / 2) > m_rc)
-          return;
+            if (not m_reconstructCurler
+                && fabs((r[r_index] + r[r_index + 1]) / 2) > m_rc)
+              return;
 
-        for (CDCLegendreTrackHit * hit : voted_hits[t_index][r_index]) {
-          hit->setUsed(CDCLegendreTrackHit::used_in_cand);
-        }
-        candidate_temp.first = voted_hits[t_index][r_index];
-        candidate_temp.second = std::make_pair(theta,
-                                               (r[r_index] + r[r_index + 1]) / 2.);
+            for (CDCLegendreTrackHit * hit : voted_hits[t_index][r_index]) {
+              hit->setUsed(CDCLegendreTrackHit::used_in_cand);
+            }
+            candidate_temp.first = voted_hits[t_index][r_index];
+            candidate_temp.second = std::make_pair(theta,
+                                                   (r[r_index] + r[r_index + 1]) / 2.);
 
-        if (candidate_temp.first.size() > 0) m_candidates->push_back(candidate_temp);
+            if (candidate_temp.first.size() > 0) m_candidates->push_back(candidate_temp);
 
-      }
-    }
+          }
+        }*/
     if (voted_hits[t_index][r_index].size() >= limit
         && voted_hits[t_index][r_index].size() > candidate->first.size()) {
 
@@ -257,9 +259,10 @@ void CDCLegendreFastHough::FastHoughNormal(
 }
 
 
-void CDCLegendreFastHough::MaxFastHough(const int level, const int theta_min, const int theta_max,
+void CDCLegendreFastHough::MaxFastHough(const std::vector<CDCLegendreTrackHit*>& hits, const int level, const int theta_min, const int theta_max,
                                         const double r_min, const double r_max)
 {
+
   if (not m_reconstructCurler
       && (r_min * r_max >= 0 && fabs(r_min) > m_rc && fabs(r_max) > m_rc)) {
     return;
@@ -287,13 +290,21 @@ void CDCLegendreFastHough::MaxFastHough(const int level, const int theta_min, co
   double dist_2[3][3];
 
   //Voting within the four bins
-  for (CDCLegendreTrackHit * hit : m_hits) {
+  for (CDCLegendreTrackHit * hit : hits) {
+    if (hit->isUsed() != CDCLegendreTrackHit::not_used) continue;
     for (int t_index = 0; t_index < 3; ++t_index) {
-      if (hit->checkRValue(thetaBin[t_index]))
-        r_temp = hit->getRValue(thetaBin[t_index]);
-      else
-        hit->setRValue(thetaBin[t_index], hit->getConformalX() * m_cos_theta[thetaBin[t_index]] +
-                       hit->getConformalY() * m_sin_theta[thetaBin[t_index]]);
+
+      if (m_useHitPrecalculatedR) {
+        if (hit->checkRValue(thetaBin[t_index])) r_temp = hit->getRValue(thetaBin[t_index]);
+        else {
+          r_temp = hit->getConformalX() * m_cos_theta[thetaBin[t_index]] +
+                   hit->getConformalY() * m_sin_theta[thetaBin[t_index]];
+          hit->setRValue(thetaBin[t_index], r_temp);
+        }
+      } else {
+        r_temp = hit->getConformalX() * m_cos_theta[thetaBin[t_index]]
+                 + hit->getConformalY() * m_sin_theta[thetaBin[t_index]];
+      }
 
       r_1 = r_temp + hit->getConformalDriftTime();
       r_2 = r_temp - hit->getConformalDriftTime();
@@ -316,6 +327,82 @@ void CDCLegendreFastHough::MaxFastHough(const int level, const int theta_min, co
       }
     }
 
+  }
+
+  bool binUsed[2][2];
+  for (int ii = 0; ii < 2; ii++)
+    for (int jj = 0; jj < 2; jj++)
+      binUsed[ii][jj] = false;
+
+//Processing, which bins are further investigated
+  for (int bin_loop = 0; bin_loop < 4; bin_loop++) {
+    int t_index = 0;
+    int r_index = 0;
+    double max_value_temp = 0;
+    for (int t_index_temp = 0; t_index_temp < 2; ++t_index_temp) {
+      for (int r_index_temp = 0; r_index_temp < 2; ++r_index_temp) {
+        if ((max_value_temp  < voted_hits[t_index_temp][r_index_temp].size()) && (!binUsed[t_index_temp][r_index_temp])) {
+          max_value_temp = voted_hits[t_index_temp][r_index_temp].size();
+          t_index = t_index_temp;
+          r_index = r_index_temp;
+        }
+      }
+    }
+
+    binUsed[t_index][r_index] = true;
+
+    //bin must contain more hits than the limit and maximal found track candidate
+
+
+    //"trick" which allows to use wider bins for higher r values (lower pt tracks)
+    int level_diff = 0;
+    if (fabs(r[r_index] + (r[r_index + 1] - r[r_index]) / 2.) > (m_rMax / 4.)) level_diff = 3;
+    else if ((fabs(r[r_index] + (r[r_index + 1] - r[r_index]) / 2.) < (m_rMax / 4.)) && (fabs(r[r_index] + (r[r_index + 1] - r[r_index]) / 2.) > (2.*m_rMax / 3.)))
+      level_diff = 2;
+    else if ((fabs(r[r_index] + (r[r_index + 1] - r[r_index]) / 2.) < (2.*m_rMax / 3.)) && (fabs(r[r_index] + (r[r_index + 1] - r[r_index]) / 2.) > (m_rMax / 2.)))
+      level_diff = 1;
+
+//      level_diff = 0;
+
+    //bin must contain more hits than the limit and maximal found track candidate
+    if (voted_hits[t_index][r_index].size() >= m_limit) {
+
+      //if max level of fast Hough is reached, mark candidate and return
+      //        if (((!allow_overlap)&&(level == (m_maxLevel - level_diff))) || ((allow_overlap)&&(level == (m_maxLevel - level_diff) + 2))) {
+      if (level >= (m_maxLevel - level_diff)) {
+
+        std::vector<CDCLegendreTrackHit*> c_list;
+        std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> > candidate_temp =
+          std::make_pair(c_list, std::make_pair(-999, -999));
+
+
+
+        double theta = static_cast<double>(thetaBin[t_index]
+                                           + thetaBin[t_index + 1]) / 2. * m_PI / m_nbinsTheta;
+
+        if (not m_reconstructCurler
+            && fabs((r[r_index] + r[r_index + 1]) / 2) > m_rc)
+          return;
+
+        voted_hits[t_index][r_index].erase(std::remove_if(voted_hits[t_index][r_index].begin(), voted_hits[t_index][r_index].end(), [](CDCLegendreTrackHit * hit) {return hit->isUsed() != CDCLegendreTrackHit::not_used;}), voted_hits[t_index][r_index].end());
+
+        for (CDCLegendreTrackHit * hit : voted_hits[t_index][r_index]) {
+          hit->setUsed(CDCLegendreTrackHit::used_in_cand);
+        }
+
+        candidate_temp.first = voted_hits[t_index][r_index];
+        candidate_temp.second = std::make_pair(theta,
+                                               (r[r_index] + r[r_index + 1]) / 2.);
+
+        if (candidate_temp.first.size() > m_limit) m_candidates->push_back(candidate_temp);
+
+      } else {
+        //Recursive calling of the function with higher level and smaller box
+        MaxFastHough(voted_hits[t_index][r_index], level + 1, thetaBin[t_index], thetaBin[t_index + 1],
+                     r[r_index], r[r_index + 1]);
+
+      }
+    }
   }
 
 }

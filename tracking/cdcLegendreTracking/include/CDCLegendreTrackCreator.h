@@ -28,7 +28,7 @@ namespace Belle2 {
 
   class CDCLegendreTrackCreator {
   public:
-    CDCLegendreTrackCreator(std::vector<CDCLegendreTrackHit*>& AxialHitList, std::list<CDCLegendreTrackCandidate*>& trackList, CDCLegendreTrackFitter* cdcLegendreTrackFitter, CDCLegendreTrackDrawer* cdcLegendreTrackDrawer);
+    CDCLegendreTrackCreator(std::vector<CDCLegendreTrackHit*>& AxialHitList, std::list<CDCLegendreTrackCandidate*>& trackList, bool appendHits, CDCLegendreTrackFitter* cdcLegendreTrackFitter, CDCLegendreTrackDrawer* cdcLegendreTrackDrawer);
 
     /**
      * @brief Function to create a track candidate
@@ -63,14 +63,18 @@ namespace Belle2 {
      */
     void sortHits(std::vector<CDCLegendreTrackHit*>& hitIndices, int charge);
 
+    /*
+     * Appends new unused hits from set of hits which might belong to current track
+     */
     void appendNewHits(CDCLegendreTrackCandidate* track);
 
 
   private:
-    CDCLegendreTrackDrawer* m_cdcLegendreTrackDrawer;
-    CDCLegendreTrackFitter* m_cdcLegendreTrackFitter;
+    CDCLegendreTrackDrawer* m_cdcLegendreTrackDrawer; /**< Class which performs in-module drawing */
+    CDCLegendreTrackFitter* m_cdcLegendreTrackFitter; /**< Class which performs track candidate fitting */
     std::list<CDCLegendreTrackCandidate*>& m_trackList; /**< List of track candidates. Mainly used for memory management! */
-    std::vector<CDCLegendreTrackHit*>& m_AxialHitList; /**< List of track candidates. Mainly used for memory management! */
+    std::vector<CDCLegendreTrackHit*>& m_AxialHitList; /**< Vector which hold axial hits */
+    bool m_appendHits; /**< Trying to append new hits to track candidate*/
 
 
   };

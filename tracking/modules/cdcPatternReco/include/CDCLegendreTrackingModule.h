@@ -92,9 +92,7 @@ namespace Belle2 {
     std::vector<CDCLegendreTrackHit*> m_AxialHitList; /**< List of the axial hits used for track finding. This is the vector, which is used for memory management! */
     std::vector<CDCLegendreTrackHit*> m_StereoHitList; /**< List of the stereo hits used for track finding. This is the vector, which is used for memory management! */
     std::list<CDCLegendreTrackCandidate*> m_trackList; /**< List of track candidates. Mainly used for memory management! */
-    std::list<CDCLegendreTrackCandidate*> m_fullTrackList; /**< List of track candidates, which consists of 1-9 SLayers */
-    std::list<CDCLegendreTrackCandidate*> m_shortTrackList; /**< List of track candidates, which consists of 1-* SLayers, pass through one or more SLayers*/
-    std::list<CDCLegendreTrackCandidate*> m_trackletTrackList; /**< List of track candidates, which starts from 3rd or 5th SLayer and pass through one or more SLayers*/
+
     CDCLegendreTrackFitter* m_cdcLegendreTrackFitter;
     CDCLegendrePatternChecker* m_cdcLegendrePatternChecker;
     CDCLegendreFastHough* m_cdcLegendreFastHough;
@@ -124,8 +122,11 @@ namespace Belle2 {
     bool m_earlyMerge; /**< Apply fitting for candidates or not*/
     bool m_drawCandidates; /**< Draw each candidate in interactive mode*/
     bool m_drawCandInfo; /**< Set whether CDCLegendreTrackDrawer class will bw used at all*/
+    bool m_appendHits; /**< Try to append new hits to track candidate*/
+    bool m_multipleCandidateSearch; /**< Search multiple track candidates per run of FastHough algorithm*/
+    bool m_useHitPrecalculatedR; /**< To store r values inside hit objects or recalculate it each step */
 
-    CDCLegendreTrackDrawer* m_cdcLegendreTrackDrawer;
+    CDCLegendreTrackDrawer* m_cdcLegendreTrackDrawer; /**< Class which allows in-module drawing*/
 
     /**
      * Function used in the event function, which contains the search for tracks, calling multiply the Fast Hough algorithm, always just searching for one track and afterwards removin the according hits from the hit list.

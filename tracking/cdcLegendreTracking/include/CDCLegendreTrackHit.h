@@ -23,7 +23,7 @@ namespace Belle2 {
   public:
 
 
-    enum ChargeHypotheses {
+    enum HitUsage {
       not_used = 0,
       used_in_track = 1,
       used_in_cand = 2,
@@ -106,17 +106,34 @@ namespace Belle2 {
       ConformalTransformation();
     }
 
-
+    /**
+     * Shows where hit was used
+     */
     inline int isUsed() const {return m_is_used;};
 
+    /**
+     * Sets where hit was used
+     */
     void setUsed(int is_used) {m_is_used = is_used;};
 
-    double getRValue(int bin) {return m_rValues[bin];};
+    /**
+     * Return information about "r" in Legendre space
+     */
+    inline double getRValue(int bin) {return m_rValues[bin];};
 
+    /**
+     * Write information about "r" in Legendre space
+     */
     void setRValue(int bin, double rValue);
 
-    bool checkRValue(int bin) {return m_rValuesBool[bin];};
+    /**
+     * Check if information about "r" in Legendre space stored in current object
+     */
+    inline bool checkRValue(int bin) {return m_rValuesBool[bin];};
 
+    /**
+     * Memory clean-up
+     */
     void clearPointers();
 
   private:
@@ -140,11 +157,11 @@ namespace Belle2 {
 
     static constexpr double m_zReference = 25.852;  /**< Reference z position for wire position determination*/
 
-    double* m_rValues;
-    bool* m_rValuesBool;
-    int m_nbinsTheta;
+    double* m_rValues; /**< Holds information about "r" in Legendre space */
+    bool* m_rValuesBool; /**< Sets True when "r" value is stored */
+    int m_nbinsTheta; /**< Number of theta bins in Legendre space */
 
-    int m_is_used;
+    int m_is_used; /**< Indicates whether hit was used */
 
   }; //end class CDCTrackHit
 } //end namespace Belle2

@@ -66,7 +66,7 @@ CDCLegendreTrackingModule::CDCLegendreTrackingModule() :
   addParam("Threshold", m_threshold, "Threshold for peak finder", 10);
 
   addParam("InitialAxialHits", m_initialAxialHits,
-           "Starting value of axial hits for the stepped Hough", 48);
+           "Starting value of axial hits for the stepped Hough", 30);
 
   addParam("StepScale", m_stepScale, "Scale size for Stepped Hough", 0.75);
 
@@ -84,16 +84,25 @@ CDCLegendreTrackingModule::CDCLegendreTrackingModule() :
            "Flag, whether candidates should be fitted with circle", true);
 
   addParam("EarlyTrackFitting", m_fitTracksEarly,
-           "Flag, whether candidates should be fitted with circle at early stage", true);
+           "Flag, whether candidates should be fitted with circle at early stage", false);
 
   addParam("EarlyTrackMerge", m_mergeTracksEarly,
-           "Try to merge hit pattern after FastHough with any found track candidate", true);
+           "Try to merge hit pattern after FastHough with any found track candidate", false);
+
+  addParam("AppendHits", m_appendHits,
+           "Try to append new hits to track candidate", false);
 
   addParam("DrawCandidates", m_drawCandidates,
-           "Draw candidate after finding", true);
+           "Draw candidate after finding", false);
 
   addParam("EnableDrawing", m_drawCandInfo,
-           "Enable in-module drawing", true);
+           "Enable in-module drawing", false);
+
+  addParam("MultipleCandidateSearch", m_multipleCandidateSearch,
+           "Search multiple track candidates per run of FastHough algorithm", true);
+
+  addParam("UseHitPrecalculatedR", m_useHitPrecalculatedR,
+           "To store r values inside hit objects or recalculate it each step", true);
 
 }
 
@@ -115,19 +124,14 @@ void CDCLegendreTrackingModule::initialize()
   m_AxialHitList.reserve(1024);
   m_StereoHitList.reserve(1024);
 
-  m_cdcLegendreFastHough = new CDCLegendreFastHough(m_reconstructCurler, m_maxLevel, m_nbinsTheta, m_rMin, m_rMax);
+  m_cdcLegendreFastHough = new CDCLegendreFastHough(m_useHitPrecalculatedR, m_reconstructCurler, m_maxLevel, m_nbinsTheta, m_rMin, m_rMax);
 
   m_cdcLegendreTrackMerger = new CDCLegendreTrackMerger(m_trackList, m_cdcLegendreTrackFitter);
 
   m_cdcLegendreTrackDrawer = new CDCLegendreTrackDrawer(m_drawCandInfo, m_drawCandidates);
   m_cdcLegendreTrackDrawer->initialize();
 
-  m_cdcLegendreTrackCreator = new CDCLegendreTrackCreator(m_AxialHitList, m_trackList, m_cdcLegendreTrackFitter, m_cdcLegendreTrackDrawer);
-  /*  ModuleParamList moduleParamList;
-    moduleParamList.setParameter("StoreDirectory","tmp/ModuleOutput");
-    moduleParamList.setParameter("DrawCands","True");
-    moduleParamList.setParameter("DrawMCSignal","True");
-    m_cdcLegendreTrackDrawer->setParamList(moduleParamList);*/
+  m_cdcLegendreTrackCreator = new CDCLegendreTrackCreator(m_AxialHitList, m_trackList, m_appendHits, m_cdcLegendreTrackFitter, m_cdcLegendreTrackDrawer);
 }
 
 void CDCLegendreTrackingModule::beginRun()
@@ -199,64 +203,61 @@ void CDCLegendreTrackingModule::DoSteppedTrackFinding()
   do {
     std::vector<CDCLegendreTrackHit*> hits_vector;
     std::copy_if(hits_set.begin(), hits_set.end(), std::back_inserter(hits_vector), [](CDCLegendreTrackHit * hit) {return (hit->isUsed() == CDCLegendreTrackHit::not_used);});
+    if (not m_multipleCandidateSearch) {
+      std::vector<CDCLegendreTrackHit*> c_list;
+      std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> > candidate = std::make_pair(c_list, std::make_pair(-999, -999));
 
-    std::vector<CDCLegendreTrackHit*> c_list;
-    std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> > candidate =
-      std::make_pair(c_list, std::make_pair(-999, -999));
+      m_cdcLegendreFastHough->FastHoughNormal(&candidate, hits_vector, 1, 0, m_nbinsTheta, m_rMin, m_rMax, static_cast<unsigned>(limit));
 
-    std::vector< std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> > > candidates;
+      n_hits = candidate.first.size();
 
-    m_cdcLegendreFastHough->initializeCandidatesVector(&candidates);
-
-    m_cdcLegendreFastHough->FastHoughNormal(&candidate, hits_vector, 1, 0, m_nbinsTheta, m_rMin, m_rMax,
-                                            static_cast<unsigned>(limit));
-
-    /*    n_hits = candidate.first.size();
-
-        //if no track is found
-        if (n_hits == 0) {
-          limit *= m_stepScale;
-          n_hits = 999;
-        }
-
-
-        // if track is found and has enough hits
-        else if (n_hits >= m_threshold) {
-
-          std::pair<double, double> ref_point = std::make_pair(0., 0.);
-
-          bool merged = false;
-          if (m_mergeTracksEarly) merged = m_cdcLegendreTrackMerger->earlyCandidateMerge(candidate, hits_set, m_fitTracksEarly);
-
-          if (!merged) m_cdcLegendreTrackCreator->createLegendreTrackCandidate(candidate, &hits_set, ref_point);
-
-          if (m_drawCandidates) m_cdcLegendreTrackDrawer->showPicture();
-
-          limit = n_hits * m_stepScale;
-        }
-    */
-    //if no track is found
-
-    if (candidates.size() == 0) {
-      limit *= m_stepScale;
-      n_hits = 999;
-    }
-
-    // if track is found and has enough hits
-    else {
-      for (std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> > candidate_temp : candidates) {
-        if (candidate_temp.first.size() >= m_threshold) {
-          std::pair<double, double> ref_point = std::make_pair(0., 0.);
-
-          bool merged = false;
-          if (m_mergeTracksEarly) merged = m_cdcLegendreTrackMerger->earlyCandidateMerge(candidate_temp, hits_set, m_fitTracksEarly);
-
-          if (!merged) m_cdcLegendreTrackCreator->createLegendreTrackCandidate(candidate_temp, &hits_set, ref_point);
-
-          if (m_drawCandidates) m_cdcLegendreTrackDrawer->showPicture();
-        }
+      //if no track is found
+      if (n_hits == 0) {
+        limit *= m_stepScale;
+        n_hits = 999;
       }
-//      limit = limit * m_stepScale;
+      // if track is found and has enough hits
+      else if (n_hits >= m_threshold) {
+
+        std::pair<double, double> ref_point = std::make_pair(0., 0.);
+
+        bool merged = false;
+        if (m_mergeTracksEarly) merged = m_cdcLegendreTrackMerger->earlyCandidateMerge(candidate, hits_set, m_fitTracksEarly);
+
+        if (!merged) m_cdcLegendreTrackCreator->createLegendreTrackCandidate(candidate, &hits_set, ref_point);
+
+        if (m_drawCandidates) m_cdcLegendreTrackDrawer->showPicture();
+
+//        limit = n_hits * m_stepScale;
+      }
+    } else {
+      std::vector< std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> > > candidates;
+
+      m_cdcLegendreFastHough->initializeCandidatesVector(&candidates);
+      m_cdcLegendreFastHough->setLimit(limit);
+      m_cdcLegendreFastHough->setAxialHits(hits_vector);
+      m_cdcLegendreFastHough->MaxFastHough(hits_vector, 0, 0, m_nbinsTheta, m_rMin, m_rMax);
+
+      printf("candidates.size()=%i\n", candidates.size());
+
+      if (candidates.size() == 0) {
+        limit *= m_stepScale;
+        n_hits = 999;
+      } else {
+        for (std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> > candidate_temp : candidates) {
+          if (candidate_temp.first.size() >= m_threshold) {
+            std::pair<double, double> ref_point = std::make_pair(0., 0.);
+
+            bool merged = false;
+            if (m_mergeTracksEarly) merged = m_cdcLegendreTrackMerger->earlyCandidateMerge(candidate_temp, hits_set, m_fitTracksEarly);
+
+            if (!merged) m_cdcLegendreTrackCreator->createLegendreTrackCandidate(candidate_temp, &hits_set, ref_point);
+
+            if (m_drawCandidates) m_cdcLegendreTrackDrawer->showPicture();
+          }
+        }
+        limit = limit * m_stepScale;
+      }
     }
 
     //perform search until found track has too few hits or threshold is too small and no tracks are found
@@ -265,7 +266,7 @@ void CDCLegendreTrackingModule::DoSteppedTrackFinding()
            && hits_set.size() >= (unsigned) m_threshold);
 
 
-  std::vector<CDCLegendreTrackHit*> hits_vector;
+  std::vector<CDCLegendreTrackHit*> hits_vector; //temporary array;
   m_cdcLegendreTrackDrawer->finalizeROOTFile(hits_vector);
 
 }
@@ -310,20 +311,6 @@ void CDCLegendreTrackingModule::AsignStereoHits()
 
 }
 
-
-void CDCLegendreTrackingModule::checkHitPattern()
-{
-  int candType;
-  for (CDCLegendreTrackCandidate * trackCand : m_trackList) {
-    cout << "pattern:" << trackCand->getHitPatternAxial().getHitPattern() << endl;
-    candType = trackCand->getCandidateType();
-    cout << "candType = " << candType << endl;
-//    if(candType == 1)
-
-  }
-}
-
-
 void CDCLegendreTrackingModule::endRun()
 {
 
@@ -353,21 +340,6 @@ void CDCLegendreTrackingModule::clear_pointer_vectors()
     delete track;
   }
   m_trackList.clear();
-
-  for (CDCLegendreTrackCandidate * track : m_fullTrackList) {
-    delete track;
-  }
-  m_fullTrackList.clear();
-
-  for (CDCLegendreTrackCandidate * track : m_shortTrackList) {
-    delete track;
-  }
-  m_shortTrackList.clear();
-
-  for (CDCLegendreTrackCandidate * track : m_trackletTrackList) {
-    delete track;
-  }
-  m_trackletTrackList.clear();
 
 }
 

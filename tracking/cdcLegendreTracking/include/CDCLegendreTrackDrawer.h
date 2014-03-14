@@ -32,6 +32,7 @@ namespace Belle2 {
   class CDCLegendreTrackCandidate;
   class CDCLegendreTrackHit;
 
+  /** Class for in-module drawing (step-by-step drawing). For testing purposes only; contains hardcoded values and pathes*/
   class CDCLegendreTrackDrawer : public CDCLegendreNiceDrawing {
 
   public:
@@ -40,15 +41,9 @@ namespace Belle2 {
 
     virtual ~CDCLegendreTrackDrawer() {};
 
-    virtual void initialize();
+    void initialize();
 
-    virtual void beginRun() {};
-
-    virtual void event();
-
-    virtual void endRun() {};
-
-    virtual void terminate() {};
+    void event();
 
     void drawTrackCand(CDCLegendreTrackCandidate* TrackCand);
 

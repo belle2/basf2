@@ -23,7 +23,7 @@ namespace Belle2 {
   class CDCHit;
   class MCParticle;
 
-
+  /** Class for perform svg drawing of track candidates */
   class CDCLegendreNiceDrawing {
 
   public:

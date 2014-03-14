@@ -20,6 +20,7 @@
 #include <tracking/cdcLegendreTracking/CDCLegendreTrackCandidate.h>
 #include <tracking/cdcLegendreTracking/CDCLegendreTrackFitter.h>
 #include <tracking/cdcLegendreTracking/CDCLegendrePatternChecker.h>
+#include <tracking/cdcLegendreTracking/CDCLegendreFastHough.h>
 
 #include "genfit/TrackCand.h"
 
@@ -75,6 +76,12 @@ CDCLegendreTrackingModule::CDCLegendreTrackingModule() :
 
   addParam("Reconstruct Curler", m_reconstructCurler,
            "Flag, whether curlers should be reconstructed", true);
+
+  addParam("Fit tracks", m_fitTracks,
+           "Flag, whether candidates should be fitted with circle", false);
+
+  addParam("Early track merging", m_earlyMerge,
+           "Try to merge hit pattern after FastHough with any found track candidate", false);
 }
 
 CDCLegendreTrackingModule::~CDCLegendreTrackingModule()
@@ -87,17 +94,7 @@ void CDCLegendreTrackingModule::initialize()
   //StoreArray for genfit::TrackCandidates
   StoreArray<genfit::TrackCand>::registerPersistent(m_gfTrackCandsColName);
 
-  //Initialize look-up table
   m_nbinsTheta = static_cast<int>(std::pow(2.0, m_maxLevel + 3)); //+3 needed for make bin overlapping;
-
-  double bin_width = m_PI / m_nbinsTheta;
-  m_sin_theta = new double[m_nbinsTheta + 1];
-  m_cos_theta = new double[m_nbinsTheta + 1];
-
-  for (int i = 0; i <= m_nbinsTheta; ++i) {
-    m_sin_theta[i] = sin(i * bin_width);
-    m_cos_theta[i] = cos(i * bin_width);
-  }
 
   cdcLegendreTrackFitter = new CDCLegendreTrackFitter(m_nbinsTheta, m_rMax, m_rMin);
   cdcLegendrePatternChecker = new CDCLegendrePatternChecker();
@@ -105,6 +102,7 @@ void CDCLegendreTrackingModule::initialize()
   m_AxialHitList.reserve(1024);
   m_StereoHitList.reserve(1024);
 
+  cdcLegendreFastHough = new CDCLegendreFastHough(m_reconstructCurler, m_maxLevel, m_nbinsTheta, m_rMin, m_rMax);
 }
 
 void CDCLegendreTrackingModule::beginRun()
@@ -175,8 +173,8 @@ void CDCLegendreTrackingModule::DoSteppedTrackFinding()
     std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> > candidate =
       std::make_pair(c_list, std::make_pair(-999, -999));
 
-    MaxFastHough(&candidate, hits_vector, 1, 0, m_nbinsTheta, m_rMin, m_rMax,
-                 static_cast<unsigned>(limit));
+    cdcLegendreFastHough->MaxFastHough(&candidate, hits_vector, 1, 0, m_nbinsTheta, m_rMin, m_rMax,
+                                       static_cast<unsigned>(limit));
 
     n_hits = candidate.first.size();
 
@@ -195,7 +193,7 @@ void CDCLegendreTrackingModule::DoSteppedTrackFinding()
 //      cdcLegendrePatternChecker->checkCandidate(&candidate);
 
       if (candidate.first.size() > 0) {
-        cdcLegendreTrackFitter->fitTrackCandidateFast(&candidate, ref_point, chi2_cand);
+//        cdcLegendreTrackFitter->fitTrackCandidateFast(&candidate, ref_point, chi2_cand);
 //      cdcLegendrePatternChecker->clearBadHits(&candidate, ref_point);
 
         cout << "for hit removing: R:" << 1. / candidate.second.second <<
@@ -253,7 +251,7 @@ void CDCLegendreTrackingModule::DoSteppedTrackFinding()
               double dist = fabs(R - sqrt(SQR(x0_track - x0_hit) + SQR(y0_track - y0_hit))) - hit->getDriftTime();
               if (dist < hit->getDriftTime() * 3.)n_overlapp++;
             }
-            if (n_overlapp > 5)make_merge = true;
+            if (n_overlapp > 3)make_merge = true;
             else {
               n_overlapp = 0;
               R = fabs(1. / candidate.second.second);
@@ -263,12 +261,12 @@ void CDCLegendreTrackingModule::DoSteppedTrackFinding()
                 double dist = fabs(R - sqrt(SQR(x0_cand - x0_hit) + SQR(y0_cand - y0_hit))) - hit->getDriftTime();
                 if (dist < hit->getDriftTime() * 3.)n_overlapp++;
               }
-              if (n_overlapp > 5)make_merge = true;
+              if (n_overlapp > 3)make_merge = true;
 
             }
           }
 
-          if (true/*make_merge*//*false*/) {
+          if (/*true*/make_merge/*false*/) {
             std::vector<CDCLegendreTrackHit*> c_list_temp;
             std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> > candidate_temp =
               std::make_pair(c_list_temp, std::make_pair(-999, -999));
@@ -848,157 +846,6 @@ void CDCLegendreTrackingModule::endRun()
 
 void CDCLegendreTrackingModule::terminate()
 {
-}
-
-void CDCLegendreTrackingModule::MaxFastHough(
-  std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> >* candidate,
-  const std::vector<CDCLegendreTrackHit*>& hits, const int level,
-  const int theta_min, const int theta_max, const double r_min,
-  const double r_max, const unsigned limit)
-{
-  if (not m_reconstructCurler
-      && (r_min * r_max >= 0 && fabs(r_min) > m_rc && fabs(r_max) > m_rc)) {
-    return;
-  }
-
-  //calculate bin borders of 2x2 bin "histogram"
-  int thetaBin[3];
-  thetaBin[0] = theta_min;
-  thetaBin[1] = theta_min + (theta_max - theta_min) / 2;
-  thetaBin[2] = theta_max;
-
-  double r[3];
-  r[0] = r_min;
-  r[1] = r_min + 0.5 * (r_max - r_min);
-  r[2] = r_max;
-
-  //2 x 2 voting plane
-  std::vector<CDCLegendreTrackHit*> voted_hits[2][2];
-  for (unsigned int i = 0; i < 2; ++i)
-    for (unsigned int j = 0; j < 2; ++j)
-      voted_hits[i][j].reserve(1024);
-
-  double r_temp, r_1, r_2;
-  double dist_1[3][3];
-  double dist_2[3][3];
-
-  //Voting within the four bins
-  BOOST_FOREACH(CDCLegendreTrackHit * hit, hits) {
-    for (int t_index = 0; t_index < 3; ++t_index) {
-      r_temp = hit->getConformalX() * m_cos_theta[thetaBin[t_index]]
-               + hit->getConformalY() * m_sin_theta[thetaBin[t_index]];
-      r_1 = r_temp + hit->getConformalDriftTime();
-      r_2 = r_temp - hit->getConformalDriftTime();
-
-      //calculate distances of lines to horizontal bin border
-      for (int r_index = 0; r_index < 3; ++r_index) {
-        dist_1[t_index][r_index] = r[r_index] - r_1;
-        dist_2[t_index][r_index] = r[r_index] - r_2;
-      }
-    }
-
-    //actual voting, based on the distances (test, if line is passing though the bin)
-    for (int t_index = 0; t_index < 2; ++t_index) {
-      for (int r_index = 0; r_index < 2; ++r_index) {
-        //curves are assumed to be straight lines, might be a reasonable assumption locally
-        if (!sameSign(dist_1[t_index][r_index], dist_1[t_index][r_index + 1], dist_1[t_index + 1][r_index], dist_1[t_index + 1][r_index + 1]))
-          voted_hits[t_index][r_index].push_back(hit);
-        else if (!sameSign(dist_2[t_index][r_index], dist_2[t_index][r_index + 1], dist_2[t_index + 1][r_index], dist_2[t_index + 1][r_index + 1]))
-          voted_hits[t_index][r_index].push_back(hit);
-      }
-    }
-
-  }
-
-  int max_value = 0;
-  std::pair<int, int> max_value_bin = std::make_pair(0, 0);
-
-  for (int t_index = 0; t_index < 2; ++t_index) {
-    for (int r_index = 0; r_index < 2; ++r_index) {
-      if (max_value  < voted_hits[t_index][r_index].size()) {
-        max_value = voted_hits[t_index][r_index].size();
-        max_value_bin = std::make_pair(t_index, r_index);
-      }
-    }
-  }
-
-  bool allow_overlap = false;
-  for (int t_index = 0; t_index < 2; ++t_index) {
-    for (int r_index = 0; r_index < 2; ++r_index) {
-      if (max_value - (sqrt(max_value)) < voted_hits[t_index][r_index].size())
-        allow_overlap = true;
-    }
-  }
-//  allow_overlap = false;
-
-//Processing, which bins are further investigated
-  for (int t_index = 0; t_index < 2; ++t_index) {
-    for (int r_index = 0; r_index < 2; ++r_index) {
-
-      //"trick" which allows to use wider bins for higher r values (lower pt tracks)
-      int level_diff = 0;
-      if (fabs(r[r_index] + (r[r_index + 1] - r[r_index]) / 2.) > (m_rMax / 4.)) level_diff = 3;
-      else if ((fabs(r[r_index] + (r[r_index + 1] - r[r_index]) / 2.) < (m_rMax / 4.)) && (fabs(r[r_index] + (r[r_index + 1] - r[r_index]) / 2.) > (2.*m_rMax / 3.)))
-        level_diff = 2;
-      else if ((fabs(r[r_index] + (r[r_index + 1] - r[r_index]) / 2.) < (2.*m_rMax / 3.)) && (fabs(r[r_index] + (r[r_index + 1] - r[r_index]) / 2.) > (m_rMax / 2.)))
-        level_diff = 1;
-//      level_diff = 0;
-
-//      if(max_value_bin != std::make_pair(t_index, r_index))allow_overlap = false;
-
-      //bin must contain more hits than the limit and maximal found track candidate
-      if (voted_hits[t_index][r_index].size() >= limit
-          && voted_hits[t_index][r_index].size() > candidate->first.size()) {
-
-        //if max level of fast Hough is reached, mark candidate and return
-//        if (((!allow_overlap)&&(level == (m_maxLevel - level_diff))) || ((allow_overlap)&&(level == (m_maxLevel - level_diff) + 2))) {
-        if (level >= (m_maxLevel - level_diff)) {
-          double theta = static_cast<double>(thetaBin[t_index]
-                                             + thetaBin[t_index + 1]) / 2. * m_PI / m_nbinsTheta;
-
-          if (not m_reconstructCurler
-              && fabs((r[r_index] + r[r_index + 1]) / 2) > m_rc)
-            return;
-
-          candidate->first = voted_hits[t_index][r_index];
-          candidate->second = std::make_pair(theta,
-                                             (r[r_index] + r[r_index + 1]) / 2.);
-        } else {
-          //Recursive calling of the function with higher level and smaller box
-//          if (allow_overlap) { //if overlapping allowed make bin borders wider
-          if (allow_overlap  && (level >= (m_maxLevel - level_diff - 2)) && max_value_bin == std::make_pair(t_index, r_index)) { //if overlapping allowed make bin borders wider
-            double r_1_overlap, r_2_overlap;
-            int theta_1_overlap, theta_2_overlap; // here we involve new variables which allows to change bin borders for positive and negative r independently
-            r_1_overlap = r[r_index] - fabs(r[r_index + 1] - r[r_index]) / 2.;
-            r_2_overlap = r[r_index + 1] + fabs(r[r_index + 1] - r[r_index]) / 2.;
-//            theta_1_overlap = thetaBin[t_index]/* - fabs(thetaBin[t_index + 1] - thetaBin[t_index]) / 2.*/;
-//            theta_2_overlap = thetaBin[t_index + 1]/* + fabs(thetaBin[t_index + 1] - thetaBin[t_index]) / 2.*/;
-//            theta_1_overlap = thetaBin[t_index] - fabs(thetaBin[t_index + 1] - thetaBin[t_index]) / 2.;
-//            theta_2_overlap = thetaBin[t_index + 1] + fabs(thetaBin[t_index + 1] - thetaBin[t_index]) / 2.;
-            theta_1_overlap = thetaBin[t_index] - pow(2, m_maxLevel - level_diff - 2 - level);
-            theta_2_overlap = thetaBin[t_index + 1] + pow(2, m_maxLevel - level_diff - 2 - level);
-            MaxFastHough(candidate, voted_hits[t_index][r_index], level + 1,
-                         theta_1_overlap, theta_2_overlap, r_1_overlap,
-                         r_2_overlap, limit);
-          } else
-            MaxFastHough(candidate, voted_hits[t_index][r_index], level + 1,
-                         thetaBin[t_index], thetaBin[t_index + 1], r[r_index],
-                         r[r_index + 1], limit);
-        }
-      }
-    }
-  }
-}
-
-inline bool CDCLegendreTrackingModule::sameSign(double n1, double n2,
-                                                double n3, double n4)
-{
-  if (n1 > 0 && n2 > 0 && n3 > 0 && n4 > 0)
-    return true;
-  else if (n1 < 0 && n2 < 0 && n3 < 0 && n4 < 0)
-    return true;
-  else
-    return false;
 }
 
 void CDCLegendreTrackingModule::sortHits(

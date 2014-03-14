@@ -334,9 +334,12 @@ bool CDCLegendreTrackCandidate::checkHitPattern(int minNHitsSLayer)
 
 void CDCLegendreTrackCandidate::makeHitPattern()
 {
-  m_hitPattern.clearPattern();
-  m_hitPatternAxial.clearPattern();
-  m_hitPatternStereo.clearPattern();
+  for (int ii = 0; ii <= 8; ii++) {
+    m_hitPattern.resetSLayer(ii);
+    m_hitPatternAxial.resetSLayer(ii);
+    m_hitPatternStereo.resetSLayer(ii);
+  }
+
   for (CDCLegendreTrackHit * hit : m_TrackHits) {
 
     m_hitPattern.setLayer(hit->getLayerId());
@@ -348,7 +351,7 @@ void CDCLegendreTrackCandidate::makeHitPattern()
 
   determineHitNumbers();
 
-  cout << "pattern:" << m_hitPatternAxial.getHitPattern() << endl;
+//  cout << "pattern:" << m_hitPatternAxial.getHitPattern() << endl;
 
 }
 

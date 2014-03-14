@@ -85,6 +85,9 @@ namespace Belle2 {
     std::vector<CDCLegendreTrackHit*> m_AxialHitList; /**< List of the axial hits used for track finding. This is the vector, which is used for memory management! */
     std::vector<CDCLegendreTrackHit*> m_StereoHitList; /**< List of the stereo hits used for track finding. This is the vector, which is used for memory management! */
     std::list<CDCLegendreTrackCandidate*> m_trackList; /**< List of track candidates. Mainly used for memory management! */
+    std::list<CDCLegendreTrackCandidate*> m_fullTrackList; /**< List of track candidates, which consists of 1-9 SLayers */
+    std::list<CDCLegendreTrackCandidate*> m_shortTrackList; /**< List of track candidates, which consists of 1-* SLayers, pass through one or more SLayers*/
+    std::list<CDCLegendreTrackCandidate*> m_trackletTrackList; /**< List of track candidates, which starts from 3rd or 5th SLayer and pass through one or more SLayers*/
     CDCLegendreTrackFitter* cdcLegendreTrackFitter;
 
     int m_threshold; /**< Threshold for votes in the legendre plane, parameter of the module*/
@@ -127,6 +130,11 @@ namespace Belle2 {
      * The track finding often finds two curling tracks, originating from the same particle. This function merges them.
      */
     void MergeCurler();
+
+    /**
+     * Trying to merge tracks
+     */
+    void MergeTracks();
 
     /**
      * In this function, the stereo hits are assigned to the track candidates.
@@ -175,6 +183,13 @@ namespace Belle2 {
      * Track 2 is deleted.
      */
     void mergeTracks(CDCLegendreTrackCandidate* cand1, CDCLegendreTrackCandidate* cand2);
+
+    /**
+     * @brief Function to split track candidates into 3 groups: long tracks, curlers, and tracklets
+     * Long tracks - passed through all superlayers; curlers - starts at 1st superlayer, but not reach 9th; tracklets - some kind of cluster somewhere in CDC, should be merged with other tracklets or tracks
+     */
+    void checkHitPattern();
+
 
     /**
      * @brief Implementation of check for quality criteria after the track candidate was produced.

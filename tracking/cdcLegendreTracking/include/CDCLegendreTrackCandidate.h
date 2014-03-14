@@ -14,6 +14,7 @@
 #include "TVector3.h"
 #include "TVector2.h"
 #include <list>
+#include <tracking/dataobjects/HitPatternCDC.h>
 
 namespace Belle2 {
 
@@ -29,6 +30,13 @@ namespace Belle2 {
       charge_negative = -1, /**< Enum value negative charge. */
       charge_two_tracks = 2, /**< Enum value two tracks with the same values of r and theta charge. */
       charge_curler = 4 /**< Enum value curler (d < r(CDC). */
+    };
+
+    /** Enum for track candidate type */
+    enum CandidateType {
+      fullTrack = 1, /**< passed through all superlayers */
+      curlerTrack = 2, /**< starts at 1st superlayer, but not reach 9th */
+      tracklet = 3, /**< some kind of cluster somewhere in CDC, should be merged with other tracklets or tracks */
     };
 
     /** Copy Constructor.
@@ -51,6 +59,18 @@ namespace Belle2 {
     /**Return vector of assigned hits.*/
     inline std::vector<Belle2::CDCLegendreTrackHit*> getTrackHits() {
       return m_TrackHits;
+    }
+
+    inline HitPatternCDC getHitPatternAxial() {
+      return hitPatternAxial;
+    }
+
+    inline HitPatternCDC getHitPatternStereo() {
+      return hitPatternStereo;
+    }
+
+    inline HitPatternCDC getHitPattern() {
+      return hitPattern;
     }
 
     /** Return theta value of track.*/
@@ -141,9 +161,14 @@ namespace Belle2 {
       double theta, double r, const std::vector<CDCLegendreTrackHit*>& trackHits);
 
     /**
-     * @brief return Layer ID of the contributing axial hit with the small layer ID.
+     * @brief return SLayer ID of the contributing axial hit with the small layer ID.
      */
-    int getInnermostAxialLayer();
+    int getInnermostAxialSLayer();
+
+    /**
+     * @brief return SLayer ID of the contributing axial hit with the largest layer ID.
+     */
+    int getOutermostAxialSLayer();
 
     /**
      *  Returns a weight, calculated from the contributing hits.
@@ -155,6 +180,12 @@ namespace Belle2 {
      * Checks the contributing hits and removes stereo hits, that do not fit to the rest of the track
      */
     void CheckStereoHits();
+
+    /**
+     * Returns type of candidate (see enum CandidateType)
+     */
+    int getCandidateType();
+
 
   private:
 
@@ -174,6 +205,10 @@ namespace Belle2 {
 
     bool m_calcedMomentum; /**< Is the momentum estimation already calculated?*/
     TVector3 m_momEstimation; /**< Momentum estimation*/
+
+    HitPatternCDC hitPatternAxial; /**< Efficient hit pattern builder; see HitPatternCDC description  */
+    HitPatternCDC hitPatternStereo; /**< Efficient hit pattern builder; see HitPatternCDC description  */
+    HitPatternCDC hitPattern; /**< Efficient hit pattern builder; see HitPatternCDC description  */
 
     /**
      * Calculates the momentum estimation from parameters of the track (for x and y)

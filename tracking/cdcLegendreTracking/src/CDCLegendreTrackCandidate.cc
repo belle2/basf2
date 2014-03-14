@@ -7,16 +7,19 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#include <tracking/cdcLegendreTracking/CDCLegendreTrackHit.h>
 
 #include <tracking/cdcLegendreTracking/CDCLegendreTrackCandidate.h>
 
-#include <tracking/cdcLegendreTracking/CDCLegendreTrackHit.h>
+
 
 #include <framework/datastore/StoreArray.h>
 #include <cmath>
 #include <cstdlib>
 #include "TMath.h"
 #include "boost/foreach.hpp"
+#include <iostream>
+
 
 using namespace std;
 using namespace Belle2;
@@ -27,6 +30,9 @@ CDCLegendreTrackCandidate::CDCLegendreTrackCandidate(
     candidate.m_yc), m_charge(
       candidate.m_charge), m_calcedMomentum(candidate.m_calcedMomentum), m_momEstimation(candidate.m_momEstimation)
 {
+  hitPatternAxial = candidate.getHitPatternAxial();
+  hitPatternStereo = candidate.getHitPatternStereo();
+  hitPattern = candidate.getHitPattern();
   m_TrackHits = candidate.getTrackHits();
 }
 
@@ -47,6 +53,12 @@ CDCLegendreTrackCandidate::CDCLegendreTrackCandidate(double theta, double r, int
       continue;
 
     m_TrackHits.push_back(hit);
+
+    hitPattern.setLayer(hit->getLayerId());
+    if (hit->getIsAxial())
+      hitPatternAxial.setLayer(hit->getLayerId());
+    else
+      hitPatternStereo.setLayer(hit->getLayerId());
   }
 
   DetermineHitNumbers();
@@ -233,19 +245,73 @@ void CDCLegendreTrackCandidate::addHit(CDCLegendreTrackHit* hit)
     ++m_stereoHits;
 }
 
-int CDCLegendreTrackCandidate::getInnermostAxialLayer()
+int CDCLegendreTrackCandidate::getInnermostAxialSLayer()
 {
-  int minLayer = 999;
+  int minSLayer = 0;
 
-  BOOST_FOREACH(CDCLegendreTrackHit * hit, m_TrackHits) {
-    if (hit->getIsAxial()) {
-      if (hit->getLayerId() < minLayer)
-        minLayer = hit->getLayerId();
+  /*  BOOST_FOREACH(CDCLegendreTrackHit * hit, m_TrackHits) {
+      if (hit->getIsAxial()) {
+        if (hit->getLayerId() < minLayer)
+          minLayer = hit->getLayerId();
+      }
     }
-  }
+  */
+  /*  for(int ii=0; ii<9; ii++)
+    {
+      if((hitPatternAxial.getSLayer(ii))&&(ii<minSLayer)){
+        minSLayer = ii;
+        break;
+      }
+    }
+  */
+  while (!hitPatternAxial.getSLayer(minSLayer++));
 
-  return minLayer;
+  return minSLayer - 1;
 }
+
+int CDCLegendreTrackCandidate::getOutermostAxialSLayer()
+{
+  int maxSLayer = 8;
+
+  /*  for(int ii=8; ii>=0; ii--)
+    {
+      if((hitPatternAxial.getSLayer(ii))&&(ii>maxSLayer)){
+        maxSLayer = ii;
+        break;
+      }
+    }
+  */
+  while (!hitPatternAxial.getSLayer(maxSLayer--));
+
+  return maxSLayer + 1;
+}
+
+
+int CDCLegendreTrackCandidate::getCandidateType()
+{
+  int type = 0;
+  int innermostAxialLayer = getInnermostAxialSLayer();
+  int outermostAxialLayer = getOutermostAxialSLayer();
+
+  cout << "innermost: " <<  innermostAxialLayer << "; outermost:" << outermostAxialLayer << endl;
+  //check whether track is "fullTrack"
+  if ((innermostAxialLayer == 0) && (outermostAxialLayer == 8)) { //hardcoded since CDC will not change
+    type = fullTrack;
+  } else
+    //check whether track is "curler"
+    if ((innermostAxialLayer == 0) && (hitPatternAxial.getNSLayer(0) > 2)) {
+//    for(int layer = 2; layer < 8; layer+=2)
+//      if(hitPatternAxial.getNSLayer(layer) > 3)
+      type = curlerTrack;
+    } else
+      //check whether track is "tracklet"
+      if ((innermostAxialLayer != 0) || (hitPatternAxial.getNSLayer(0) < 2)) {
+        type = tracklet;
+      }
+
+  return type;
+}
+
 
 double CDCLegendreTrackCandidate::getLayerWaight()
 {

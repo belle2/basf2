@@ -31,6 +31,7 @@
 #include <boost/utility.hpp>
 
 #include <iostream>
+#include <sstream>
 #include <algorithm>
 #include <memory>
 #include <cmath>
@@ -126,8 +127,11 @@ void CDCLegendreTrackingModule::event()
 
   //perform track finding
   DoSteppedTrackFinding();
+//  MergeTracks();
 //  MergeCurler();
 //  AsignStereoHits();
+
+//  checkHitPattern();
 
   //create GenFit Track candidates
   createGFTrackCandidates();
@@ -205,13 +209,105 @@ void CDCLegendreTrackingModule::MergeCurler()
           //check if the two tracks lie next to each other
           if (fabs(cand1->getR() - cand2->getR()) < 0.03
               && fabs(cand1->getTheta() - cand2->getTheta()) < 0.15)
-
             mergeTracks(cand1, cand2);
         }
       }
     }
   }
 }
+
+void CDCLegendreTrackingModule::MergeTracks()
+{
+  //loop over all full candidates
+  /*  for (std::list<CDCLegendreTrackCandidate*>::iterator it1 =
+        m_fullTrackList.begin(); it1 != m_fullTrackList.end(); ++it1) {
+      CDCLegendreTrackCandidate* cand1 = *it1;
+
+      //loop over remaining candidates
+
+      std::list<CDCLegendreTrackCandidate*>::iterator it2 = boost::next(it1);
+      while (it2 != m_fullTrackList.end()) {
+        CDCLegendreTrackCandidate* cand2 = *it2;
+        ++it2;
+
+        //check if the two tracks lie next to each other
+        if (fabs(cand1->getR() - cand2->getR()) < 0.03
+            && fabs(cand1->getTheta() - cand2->getTheta()) < 0.15)
+
+          mergeTracks(cand1, cand2);
+      }
+
+      for (std::list<CDCLegendreTrackCandidate*>::iterator it_short =
+          m_shortTrackList.begin(); it_short != m_shortTrackList.end(); ++it_short) {
+        CDCLegendreTrackCandidate* cand_short = *it_short;
+
+        //check if the two tracks lie next to each other
+        if (fabs(cand1->getR() - cand_short->getR()) < 0.03
+            && fabs(cand1->getTheta() - cand_short->getTheta()) < 0.15)
+
+          mergeTracks(cand1, cand_short);
+      }
+
+      for (std::list<CDCLegendreTrackCandidate*>::iterator it_short =
+          m_trackletTrackList.begin(); it_short != m_trackletTrackList.end(); ++it_short) {
+        CDCLegendreTrackCandidate* cand_short = *it_short;
+
+        //check if the two tracks lie next to each other
+        if (fabs(cand1->getR() - cand_short->getR()) < 0.03
+            && fabs(cand1->getTheta() - cand_short->getTheta()) < 0.15)
+
+          mergeTracks(cand1, cand_short);
+      }
+
+    }
+
+    //loop over all short candidates
+    for (std::list<CDCLegendreTrackCandidate*>::iterator it1 =
+        m_shortTrackList.begin(); it1 != m_shortTrackList.end(); ++it1) {
+      CDCLegendreTrackCandidate* cand1 = *it1;
+
+      //loop over remaining candidates
+
+      std::list<CDCLegendreTrackCandidate*>::iterator it2 = boost::next(it1);
+      while (it2 != m_shortTrackList.end()) {
+        CDCLegendreTrackCandidate* cand2 = *it2;
+        ++it2;
+
+        //check if the two tracks lie next to each other
+        if (fabs(cand1->getR() - cand2->getR()) < 0.03
+            && fabs(cand1->getTheta() - cand2->getTheta()) < 0.15)
+
+          mergeTracks(cand1, cand2);
+      }
+
+      for (std::list<CDCLegendreTrackCandidate*>::iterator it_short =
+          m_trackletTrackList.begin(); it_short != m_trackletTrackList.end(); ++it_short) {
+        CDCLegendreTrackCandidate* cand_short = *it_short;
+
+        //check if the two tracks lie next to each other
+        if (fabs(cand1->getR() - cand_short->getR()) < 0.03
+            && fabs(cand1->getTheta() - cand_short->getTheta()) < 0.15)
+
+          mergeTracks(cand1, cand_short);
+      }
+
+    }*/
+
+  for (CDCLegendreTrackCandidate * trackCand : m_fullTrackList) {
+    m_trackList.push_back(new CDCLegendreTrackCandidate(*trackCand));
+  }
+  for (CDCLegendreTrackCandidate * trackCand : m_shortTrackList) {
+    m_trackList.push_back(new CDCLegendreTrackCandidate(*trackCand));
+  }
+
+//  std::copy(m_fullTrackList.begin(), m_fullTrackList.end(), std::back_inserter(m_trackList));
+//  std::copy(m_shortTrackList.begin(), m_shortTrackList.end(), std::back_inserter(m_trackList));
+
+//  m_trackList.insert( m_trackList.end(), m_fullTrackList.begin(), m_fullTrackList.end() );
+//  m_trackList.insert( m_trackList.end(), m_shortTrackList.begin(), m_shortTrackList.end() );
+
+}
+
 
 void CDCLegendreTrackingModule::AsignStereoHits()
 {
@@ -273,6 +369,18 @@ void CDCLegendreTrackingModule::mergeTracks(CDCLegendreTrackCandidate* cand1,
   cand2 = NULL;
 }
 
+void CDCLegendreTrackingModule::checkHitPattern()
+{
+  int candType;
+  for (CDCLegendreTrackCandidate * trackCand : m_trackList) {
+    cout << "pattern:" << trackCand->getHitPatternAxial().getHitPattern() << endl;
+    candType = trackCand->getCandidateType();
+    cout << "candType = " << candType << endl;
+//    if(candType == 1)
+
+  }
+}
+
 void CDCLegendreTrackingModule::createLegendreTrackCandidate(
   const std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> >& track,
   std::set<CDCLegendreTrackHit*>* trackHitList)
@@ -324,6 +432,21 @@ void CDCLegendreTrackingModule::processTrack(
 {
   //check if the number has enough axial hits (might be less due to the curvature check).
   if (fullfillsQualityCriteria(trackCandidate)) {
+    /*    int candType = trackCandidate->getCandidateType();
+        if(candType == CDCLegendreTrackCandidate::fullTrack)m_fullTrackList.push_back(trackCandidate);
+        else if(candType == CDCLegendreTrackCandidate::curlerTrack)m_shortTrackList.push_back(trackCandidate);
+        else if(candType == CDCLegendreTrackCandidate::tracklet)m_trackletTrackList.push_back(trackCandidate);
+        else {
+          BOOST_FOREACH(CDCLegendreTrackHit * hit, trackCandidate->getTrackHits()) {
+            trackHitList->erase(hit);
+          }
+
+
+          //memory management, since we cannot use smart pointers in function interfaces
+          delete trackCandidate;
+          trackCandidate = NULL;
+        }
+    */
     m_trackList.push_back(trackCandidate);
 
     BOOST_FOREACH(CDCLegendreTrackHit * hit, trackCandidate->getTrackHits()) {
@@ -364,6 +487,9 @@ void CDCLegendreTrackingModule::createGFTrackCandidates()
 
   BOOST_FOREACH(CDCLegendreTrackCandidate * trackCand, m_trackList) {
     gfTrackCandidates.appendNew();
+
+//  testing of track's hit pattern
+//    cout << "pattern:" << trackCand->getHitPattern().getHitPattern() << endl;
 
     //set the values needed as start values for the fit in the genfit::TrackCandidate from the CDCTrackCandidate information
     //variables stored in the genfit::TrackCandidates are: vertex position + error, momentum + error, pdg value, indices for the Hits
@@ -654,5 +780,21 @@ void CDCLegendreTrackingModule::clear_pointer_vectors()
     delete track;
   }
   m_trackList.clear();
+
+  BOOST_FOREACH(CDCLegendreTrackCandidate * track, m_fullTrackList) {
+    delete track;
+  }
+  m_fullTrackList.clear();
+
+  BOOST_FOREACH(CDCLegendreTrackCandidate * track, m_shortTrackList) {
+    delete track;
+  }
+  m_shortTrackList.clear();
+
+  BOOST_FOREACH(CDCLegendreTrackCandidate * track, m_trackletTrackList) {
+    delete track;
+  }
+  m_trackletTrackList.clear();
+
 }
 

@@ -154,21 +154,17 @@ class Function(object):
 
 ############### Now here are the Actors, every Actor implements a part of the FullReconstruction algorithm ################
 
-def ParticleList(path, pdgcode, particleLists):
+def ParticleList(path, name, pdgcode, particleLists, criteria=[]):
     """
     Creates a ParticleList gathering up all particles with the given pdgcode.
         @param path the basf2 path
+        @param name name of outputList
         @param pdgcode the pdgcode of the particle
         @param particleLists additional requirements before the Particles can be gathered. E.g. All ParticleList of created by the ParticleListFromChannel exist for this particle
+        @param criteria filter criteria
     """
     # Select all the reconstructed (or loaded) particles with this pdg into one list.
-    name = pdg.to_name(pdgcode)
-    name_conj = pdg.conjugate(name)
-    modularAnalysis.selectParticle(name, pdgcode, [], path=path)
-    # Because anti-particles aren't handled properly yet we have to select the charge conjugate particles by hand.
-    if name != name_conj:
-        modularAnalysis.selectParticle(name_conj, -pdgcode, [], path=path)
-        return {'ParticleList_' + name: name, 'ParticleList_' + name_conj: name_conj}
+    modularAnalysis.selectParticle(name, pdgcode, criteria, path=path)
     return {'ParticleList_' + name: name}
 
 
@@ -192,13 +188,14 @@ def ParticleListFromChannel(path, pdgcode, outputList, preCut, inputLists):
     return {'ParticleList_' + outputList: outputList}
 
 
-def SignalProbability(path, method, variables, particleList):
+def SignalProbability(path, method, variables, particleList, target='SignalProbability'):
     """
     Calculates the SignalProbability of a ParticleList. If the needed experts aren't available they're created.
         @param path the basf2 path
         @param method method given to the TMVAInterface (see TMVAExpert and TMVATeacher)
         @param variables used for classification (see VariableManager)
         @param particleList the particleList which is used for training and classification
+        @param target name under which the expert stores the result in the extra info of the particle
     """
     # Create hash with all parameters on which this training depends
     hash = hashlib.sha1(str(method) + str(variables) + particleList).hexdigest()
@@ -208,10 +205,10 @@ def SignalProbability(path, method, variables, particleList):
         expert.set_name('TMVAExpert_' + particleList)
         expert.param('identifier', particleList + '_' + hash)
         expert.param('method', method[0])
-        expert.param('target', 'SignalProbability')
+        expert.param('target', target)
         expert.param('listNames', [particleList])
         path.add_module(expert)
-        return {'SignalProbability_' + particleList: hash}
+        return {target + '_' + particleList: hash}
     else:
         teacher = register_module('TMVATeacher')
         teacher.set_name('TMVATeacher_' + particleList)
@@ -223,6 +220,18 @@ def SignalProbability(path, method, variables, particleList):
         teacher.param('listNames', [particleList])
         path.add_module(teacher)
         return {}
+
+
+def CombineSignalProbabilities(path, name, targets):
+    """
+    Combines the SignalProbability of multiple trainings
+        @param name of the particle
+        @param targets the targets which are combined
+    """
+    calculator = register_module('VariableCalculator')
+    calculator.param('operation', ' * '.join(targets))
+    calculator.param('target', 'SignalProbability')
+    return {'SignalProbability_' + name: ""}
 
 
 def PreCutDistribution(path, particle, daughterLists, daughterSignalProbabilities):
@@ -341,6 +350,10 @@ def FullReconstruction(path, particles):
             seq.append(Resource('Method_' + particle.name, particle.method))
             seq.append(Resource('Efficiency_' + particle.name, particle.efficiency))
             seq.append(Resource('Particle_' + particle.name, particle))
+            name_conj = pdg.conjugate(particle.name)
+            if particle.name != name_conj:
+                seq.append(Resource('Name_' + name_conj, name_conj))
+                seq.append(Resource('PDG_' + name_conj, pdg.from_name(name_conj)))
             # Add some resources if FSP
             if particle.channels == []:
                 seq.append(Resource('Variables_' + particle.name, particle.variables))
@@ -352,7 +365,10 @@ def FullReconstruction(path, particles):
 
             ########### RECONSTRUCTION ACTORS ##########
             # ParticleList Actor provides the ParticleList for every particle
-            seq.append(Function(ParticleList, path='Path', pdgcode='PDG_' + particle.name, particleLists=['ParticleList_' + channel.name for channel in particle.channels]))
+            seq.append(Function(ParticleList, path='Path', name='Name_' + particle.name, pdgcode='PDG_' + particle.name, particleLists=['ParticleList_' + channel.name for channel in particle.channels]))
+            # Because anti-particles aren't handled properly yet we have to select the charge conjugate particles by hand.
+            if particle.name != name_conj:
+                seq.append(Function(ParticleList, path='Path', name='Name_' + name_conj, pdgcode='PDG_' + name_conj, particleLists=['ParticleList_' + channel.name for channel in particle.channels]))
             # ParticleListFromChannel Actor provides ParticleLists for every channel
             for channel in particle.channels:
                 seq.append(Function(ParticleListFromChannel, path='Path', pdgcode='PDG_' + particle.name, outputList='Name_' + channel.name, preCut='PreCut_' + channel.name,
@@ -361,8 +377,20 @@ def FullReconstruction(path, particles):
             ########### SIGNAL PROBABILITY ACTORS #######
             # For FSP we add SignalProbability Actor for the particle itself, and a Resource which provides the conjugated SignalProbability
             if particle.channels == []:
-                seq.append(Function(SignalProbability, path='Path', method='Method_' + particle.name, variables='Variables_' + particle.name, particleList='ParticleList_' + particle.name))
-                seq.append(Resource('SignalProbability_' + pdg.conjugate(particle.name), 'Dummy', requires=['SignalProbability_' + particle.name]))
+                # Implement special treatment for electrons
+                opponents = []  # ['e+','mu+','pi+','K+']
+                if particle.name in opponents:
+                    for opponent in opponents:
+                        if particle.name == opponent:
+                            continue
+                        tmp = particle.name + '_against_' + opponent
+                        seq.append(Resource('Name_' + tmp, tmp))
+                        seq.append(Function(ParticleList, path='Path', name='Name_' + tmp, pdgcode='PDG_' + particle.name, particleLists=['Name_' + particle.name]))
+                        seq.append(Function(SignalProbability, path='Path', method='Method_' + particle.name, variables='Variables_' + particle.name, particleList='ParticleList_' + tmp, target='Name_' + tmp))
+                    seq.append(Function(CombineSignalProbabilities, path='Path', name='Name_' + particle.name, targets=[particle.name + '_against_' + opponent + '_' + particle.name for opponent in opponents if particle.name != opponent]))
+                else:
+                    seq.append(Function(SignalProbability, path='Path', method='Method_' + particle.name, variables='Variables_' + particle.name, particleList='ParticleList_' + particle.name))
+                    seq.append(Resource('SignalProbability_' + pdg.conjugate(particle.name), 'Dummy', requires=['SignalProbability_' + particle.name]))
             # For non FSP we add SignalProbability Actor for every channel and resources to provide SignalProbability for the whole particle and its conjugated particle as soon as all channels have SignalProbability
             else:
                 seq.append(Resource('SignalProbability_' + particle.name, 'Dummy', requires=['SignalProbability_' + channel.name for channel in particle.channels]))

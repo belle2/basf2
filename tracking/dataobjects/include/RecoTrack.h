@@ -10,8 +10,8 @@
 
 #pragma once
 
-#include <tracking/dataobjects/HitSorterBaseCDC.h>
-#include <tracking/dataobjects/HitSorterBaseVXD.h>
+#include <tracking/dataobjects/SorterCDCHit.h>
+#include <tracking/dataobjects/SorterVXDHit.h>
 
 #include <mdst/dataobjects/HitPatternCDC.h>
 #include <mdst/dataobjects/HitPatternVXD.h>
@@ -40,13 +40,24 @@ namespace Belle2 {
    */
   class RecoTrack : public Belle2::RelationsInterface <genfit::Track> {
   public:
-    RecoTrack(HitSorterBaseCDC& hitSorterCDC, HitSorterBaseVXD& hitSorterVXD,
-              std::string cdcHitsName = "", std::string svdHitsName = "", std::string pxdHitsName = "") :
-      m_hitPatternCDCInitializer(0), m_hitPatternVXDInitializer(0),
-      m_cdcHitsName(cdcHitsName), m_hitSorterCDC(hitSorterCDC),
-      m_svdHitsName(svdHitsName), m_hitSorterVXD(hitSorterVXD),
-      m_pxdHitsName(pxdHitsName)
+    /** Constructor defining the used hit types.
+     *
+     *  @param cdcHitsName     Name of StoreArray with CDCHits to be used.
+     *  @param svdHitsName     Name of StoreArray with either SVDClusters or SVDTrueHits.
+     *  @param pxdHitsName     Name of StoreArray with either PXDClusters or PXDTrueHits.
+     */
+    RecoTrack(const std::string& cdcHitsName = "CDCHits",
+              const std::string& svdHitsName = "SVDClusters",
+              const std::string& pxdHitsName = "PXDClusters") :
+      m_cdcHitsName(cdcHitsName), m_svdHitsName(svdHitsName), m_pxdHitsName(pxdHitsName),
+      m_hitPatternCDCInitializer(0), m_hitPatternVXDInitializer(0)
     {}
+
+    /** Defining the Sorter used for CDC hits. */
+    typedef SorterCDCHit SorterCDCHits;
+
+    /** Defining the Sorter used for SVD hits. */
+    typedef SorterVXDHit SorterVXDHits;
 
     //-------------------------------------- CDC Hit Handling ---------------------------
     //-----------------------------------------------------------------------------------
@@ -253,13 +264,8 @@ namespace Belle2 {
     /** Name of array of CDCHits to be accessed. */
     std::string m_cdcHitsName;
 
-    /** Pointer to the hitSorterCDC.
-     *
-     *  This is potentially not good for streaming, as we can in principle point
-     *  to a non-ROOTified object.
-     *  FIXME Use this for the sorting of the CDCHit indices.
-     */
-    HitSorterBaseCDC& m_hitSorterCDC; //! Don't stream this pointer to file.
+    /** Defining the order of the CDCHits within one arm for fitting. */
+    SorterCDCHits m_sorterCDCHits; //! Don't stream this pointer to file.
 
     /** CDC indices and right/left ambiguity resolution for the positive arm of the track.
      *
@@ -284,7 +290,7 @@ namespace Belle2 {
      *  to a non-ROOTified object.
      *  FIXME Use this for the sorting of the VXDHit indices.
      */
-    HitSorterBaseVXD& m_hitSorterVXD; //! Don't stream this pointer to file.
+    SorterVXDHits m_hitSorterVXD; //! Don't stream this pointer to file.
 
     /** SVD indices of the positive arm of the track. */
     std::set<unsigned short> m_svdHitIndicesPositive;

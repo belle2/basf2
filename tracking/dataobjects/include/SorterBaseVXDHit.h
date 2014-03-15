@@ -8,8 +8,21 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/dataobjects/HitSorterBaseCDC.h>
+#pragma once
 
-using namespace Belle2;
+namespace Belle2 {
+  /** This class is meant to be used as functor object for the sorting of the VXD Clusters in the RecoTrack.
+   *
+   *  To change the Sorter, please make a different typedef in the RecoTrack.
+   *  As the sorting depends on the geometry, alternative geometries, e.g. like a test-beam
+   *  may require a different Sorter.
+   */
+  class SorterVXDHit {
 
-ClassImp(HitSorterBaseCDC);
+    /** Constructor. */
+    SorterVXDHit() {}
+
+    /** Functor performing the actual sorting. */
+    bool operator()() {return true;}
+  };
+}

@@ -15,8 +15,8 @@
 namespace Belle2 {
   /** This class should know, which hits are taken by a track.
    *
-   *  And possibly as well by which finder the hit was assigned.
-   *  However, the details are not yet fully decided.
+   *  Probably the best is to inherit from RelationsArray and just relate
+   *  hits -> RecoTracks
    */
   class HitInfoManager : public RelationsObject {
   public:

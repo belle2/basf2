@@ -14,11 +14,35 @@
 #include <cdc/dataobjects/WireID.h>
 
 #include <framework/datastore/StoreArray.h>
+#include <framework/logging/Logger.h>
 
 
 using namespace Belle2;
 
 ClassImp(RecoTrack);
+
+RecoTrack::RecoTrack(const std::string& cdcHitsName,
+                     const std::string& svdHitsName,
+                     const std::string& pxdHitsName,
+                     const SorterBaseCDCHit sorterBaseCDCHit,
+                     const SorterBaseVXDHit sorterBaseVXDHit) :
+  m_hitPatternCDCInitializer(0), m_hitPatternVXDInitializer(0),
+  m_cdcHitsName(cdcHitsName), m_assumeSortedCDC(false),
+  m_sorterBaseCDC(sorterBaseCDCHit), m_sortingCacheCDC(true),
+  m_svdHitsName(svdHitsName), m_pxdHitsName(pxdHitsName),
+  m_assumeSortedVXD(false),
+  m_sorterBaseVXD(sorterBaseVXDHit),
+  m_sortingCacheVXD(true)
+
+{
+  m_cdcHitIndicesPositive.reserve(1000);
+  m_cdcHitIndicesNegative.reserve(1000);
+  m_svdHitIndicesPositive.reserve(32);
+  m_svdHitIndicesNegative.reserve(32);
+  m_pxdHitIndicesPositive.reserve(8);
+  m_pxdHitIndicesNegative.reserve(8);
+}
+
 
 void RecoTrack::resetHitIndices(const short pseudoCharge,
                                 const Const::EDetector detector)
@@ -57,13 +81,14 @@ void RecoTrack::resetHitIndices(const short pseudoCharge,
 void RecoTrack::fillHitPatternCDC(const short pseudoCharge)
 {
   StoreArray<CDCHit> cdcHits(m_cdcHitsName);
-  HitPatternCDC      hitPatternCDC(m_hitPatternCDCInitializer);
+  HitPatternCDC      hitPatternCDC;
   auto& cdcHitIndices =
     pseudoCharge > 0 ? m_cdcHitIndicesPositive : m_cdcHitIndicesNegative;
 
   for (auto hitPair : cdcHitIndices) {
     // I need to initialize a WireID with the ID from the CDCHit to get the continuous layer ID.
     WireID wireID(cdcHits[hitPair.first]->getID());
+    B2INFO("WireID " << wireID.getISuperLayer());
     // Then I set the corresponding layer in the hit pattern.
     if (hitPatternCDC.setLayer(wireID.getICLayer())) {
       // Finally, if the layer was already set, I set the double layer marker.
@@ -71,6 +96,7 @@ void RecoTrack::fillHitPatternCDC(const short pseudoCharge)
       hitPatternCDC.setLayerFast(56 + wireID.getISuperLayer());
     }
   }
+  m_hitPatternCDCInitializer = hitPatternCDC.getInteger();
 }
 
 void RecoTrack::fillHitPatternVXD(const short pseudoCharge)

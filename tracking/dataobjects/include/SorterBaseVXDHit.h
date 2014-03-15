@@ -17,12 +17,14 @@ namespace Belle2 {
    *  As the sorting depends on the geometry, alternative geometries, e.g. like a test-beam
    *  may require a different Sorter.
    */
-  class SorterVXDHit {
-
+  class SorterBaseVXDHit {
+  public:
     /** Constructor. */
-    SorterVXDHit() {}
+    SorterBaseVXDHit() {}
+
+    virtual ~SorterBaseVXDHit() {}
 
     /** Functor performing the actual sorting. */
-    bool operator()() {return true;}
+    virtual bool operator()() {return true;}
   };
 }

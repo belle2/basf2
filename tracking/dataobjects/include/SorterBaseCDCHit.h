@@ -12,13 +12,14 @@
 
 namespace Belle2 {
   /** This class is meant to be used as functor object for the sorting of the CDC Hits in the RecoTrack. */
-  class SorterCDCHit {
-
+  class SorterBaseCDCHit {
+  public:
     /* Constructor. */
-    SorterCDCHit() {}
+    SorterBaseCDCHit() {}
 
+    virtual ~SorterBaseCDCHit() {}
 
     /** Functor performing the actual sorting. */
-    bool operator()() {return true;}
+    virtual bool operator()() {return true;}
   };
 }

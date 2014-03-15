@@ -18,6 +18,10 @@ env['LIBS'] = [
     'boost_chrono',
     '$PYTHON_LIBS',
     #'generators',
+    'mdst_dataobjects',
+    'genfit2',
+    '$ROOT_LIBS', 
+    'boost_chrono', 
     ]
 
 Return('env')

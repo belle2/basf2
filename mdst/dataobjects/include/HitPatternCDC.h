@@ -27,7 +27,7 @@ namespace Belle2 {
    *  better description of the outermost super-layer...
    *  Note, that super Layer counting goes from 0 to 8.
    *  GENERAL COMMENT: I think the non-static members and the interface are largely OK,
-   *                   but the backend implementation maybe not so great.
+   *                   but the back-end implementation maybe not so great.
    */
   class HitPatternCDC : public TObject {
   public:
@@ -37,6 +37,16 @@ namespace Belle2 {
     /** Initialize the pattern with some long int.*/
     HitPatternCDC(const unsigned long& initValue) : m_pattern(initValue)
     {}
+
+    /** Getter for underlying integer type. */
+    unsigned long getInteger() {
+      return m_pattern.to_ulong();
+    }
+
+    /** Getter for underlying bit set. */
+    std::bitset<64> getBitSet() {
+      return m_pattern;
+    }
 
     /** Get the approximate total Number of CDC hits in the fit.
      *
@@ -87,11 +97,16 @@ namespace Belle2 {
       return ((m_pattern & s_sLayerMasks[sLayer]).any());
     }
 
-    /** Unset complete superLayer, e.g. because segment shouldn't belong to that track.*/
+    /** Reset complete superLayer, e.g. because segment shouldn't belong to that track.*/
     void resetSLayer(const unsigned short sLayer) {
       for (unsigned short int ii = 0; ii < m_pattern.size(); ++ii) {
         if ((s_sLayerMasks[sLayer])[ii]) {resetLayer(ii);}
       }
+    }
+
+    /** Reset the complete hit pattern. */
+    void resetPattern() {
+      m_pattern.reset();
     }
 
     /** Getter for the approximate number of hits in one super-layer.

@@ -10,8 +10,8 @@
 
 #pragma once
 
-#include <tracking/dataobjects/SorterCDCHit.h>
-#include <tracking/dataobjects/SorterVXDHit.h>
+#include <tracking/dataobjects/SorterBaseCDCHit.h>
+#include <tracking/dataobjects/SorterBaseVXDHit.h>
 
 #include <mdst/dataobjects/HitPatternCDC.h>
 #include <mdst/dataobjects/HitPatternVXD.h>
@@ -21,7 +21,6 @@
 
 #include <genfit/Track.h>
 
-#include <set>
 #include <vector>
 #include <string>
 
@@ -30,6 +29,7 @@ class FitConfiguration;
 namespace Belle2 {
   /** This is the Reconstruction Event-Data Model Track.
    *
+   *  ///FIXME clean this comment!
    *  This class collects hits, performs fits and saves the Track parameters.
    *  Note: This class is still experimental.
    *  Totally missing:
@@ -48,16 +48,9 @@ namespace Belle2 {
      */
     RecoTrack(const std::string& cdcHitsName = "CDCHits",
               const std::string& svdHitsName = "SVDClusters",
-              const std::string& pxdHitsName = "PXDClusters") :
-      m_cdcHitsName(cdcHitsName), m_svdHitsName(svdHitsName), m_pxdHitsName(pxdHitsName),
-      m_hitPatternCDCInitializer(0), m_hitPatternVXDInitializer(0)
-    {}
-
-    /** Defining the Sorter used for CDC hits. */
-    typedef SorterCDCHit SorterCDCHits;
-
-    /** Defining the Sorter used for SVD hits. */
-    typedef SorterVXDHit SorterVXDHits;
+              const std::string& pxdHitsName = "PXDClusters",
+              const SorterBaseCDCHit sorterBaseCDCHit = SorterBaseCDCHit(),
+              const SorterBaseVXDHit sorterBaseVXDHit = SorterBaseVXDHit());
 
     //-------------------------------------- CDC Hit Handling ---------------------------
     //-----------------------------------------------------------------------------------
@@ -67,7 +60,7 @@ namespace Belle2 {
      *                       arm of the track.
      *  @sa m_cdcHitIndicesPositive
      */
-    void setCDCHitIndices(const std::set< std::pair < unsigned short, short> >& cdcHitIndices,
+    void setCDCHitIndices(const std::vector< std::pair < unsigned short, short> >& cdcHitIndices,
                           const short pseudocharge) {
       pseudocharge > 0 ?
       (m_cdcHitIndicesPositive = cdcHitIndices) : (m_cdcHitIndicesNegative = cdcHitIndices);
@@ -80,11 +73,11 @@ namespace Belle2 {
      *  @return  True, if the index was inserted,
      *           false, if the index already existed before.
      */
-    bool addCDCHitIndex(const std::pair< unsigned short, short> cdcHitIndex,
+    void addCDCHitIndex(const std::pair< unsigned short, short> cdcHitIndex,
                         const short pseudoCharge) {
-      return (pseudoCharge > 0 ?
-              (m_cdcHitIndicesPositive.insert(cdcHitIndex)) :
-              (m_cdcHitIndicesNegative.insert(cdcHitIndex))).second;
+      pseudoCharge > 0 ?
+      (m_cdcHitIndicesPositive.push_back(cdcHitIndex)) :
+      (m_cdcHitIndicesNegative.push_back(cdcHitIndex));
     }
 
     /** Adding several CDC indices at the same time.
@@ -97,8 +90,8 @@ namespace Belle2 {
     void addCDCHitIndices(const std::vector< std::pair < unsigned short, short> >& cdcHitIndices,
                           const short pseudoCharge) {
       pseudoCharge > 0 ?
-      m_cdcHitIndicesPositive.insert(cdcHitIndices.begin(), cdcHitIndices.end()) :
-      m_cdcHitIndicesNegative.insert(cdcHitIndices.begin(), cdcHitIndices.end());
+      m_cdcHitIndicesPositive.insert(m_cdcHitIndicesPositive.end(), cdcHitIndices.begin(), cdcHitIndices.end()) :
+      m_cdcHitIndicesNegative.insert(m_cdcHitIndicesNegative.end(), cdcHitIndices.begin(), cdcHitIndices.end());
     }
 
     /** Has the track any CDC Hits? */
@@ -121,7 +114,7 @@ namespace Belle2 {
      *  @param pseudocharge  Shall those indices be used for the positive (or negative)
      *                       arm of the track.
      */
-    void setSVDHitIndices(const std::set< unsigned short >& svdHitIndices,
+    void setSVDHitIndices(const std::vector< unsigned short >& svdHitIndices,
                           const short pseudocharge) {
       pseudocharge > 0 ?
       (m_svdHitIndicesPositive = svdHitIndices) : (m_svdHitIndicesNegative = svdHitIndices);
@@ -132,7 +125,7 @@ namespace Belle2 {
      *  @param pseudocharge  Shall those indices be used for the positive (or negative)
      *                       arm of the track.
      */
-    void setPXDHitIndices(const std::set< unsigned short >& pxdHitIndices,
+    void setPXDHitIndices(const std::vector< unsigned short >& pxdHitIndices,
                           const short pseudocharge) {
       pseudocharge > 0 ?
       (m_pxdHitIndicesPositive = pxdHitIndices) : (m_pxdHitIndicesNegative = pxdHitIndices);
@@ -145,11 +138,11 @@ namespace Belle2 {
      *  @return  True, if the index was inserted,
      *           false, if the index already existed before.
      */
-    bool addSVDHitIndex(const unsigned short svdHitIndex,
+    void addSVDHitIndex(const unsigned short svdHitIndex,
                         const short pseudoCharge) {
-      return (pseudoCharge > 0 ?
-              (m_svdHitIndicesPositive.insert(svdHitIndex)) :
-              (m_svdHitIndicesNegative.insert(svdHitIndex))).second;
+      pseudoCharge > 0 ?
+      (m_svdHitIndicesPositive.push_back(svdHitIndex)) :
+      (m_svdHitIndicesNegative.push_back(svdHitIndex));
     }
 
     /** Adding a single index to the set of SVD Indices.
@@ -159,11 +152,11 @@ namespace Belle2 {
      *  @return  True, if the index was inserted,
      *           false, if the index already existed before.
      */
-    bool addPXDHitIndex(const unsigned short pxdHitIndex,
+    void addPXDHitIndex(const unsigned short pxdHitIndex,
                         const short pseudoCharge) {
-      return (pseudoCharge > 0 ?
-              (m_pxdHitIndicesPositive.insert(pxdHitIndex)) :
-              (m_pxdHitIndicesNegative.insert(pxdHitIndex))).second;
+      pseudoCharge > 0 ?
+      (m_pxdHitIndicesPositive.push_back(pxdHitIndex)) :
+      (m_pxdHitIndicesNegative.push_back(pxdHitIndex));
     }
 
     /** Adding several SVD indices at the same time.
@@ -176,8 +169,8 @@ namespace Belle2 {
     void addSVDHitIndices(const std::vector< unsigned short >& svdHitIndices,
                           const short pseudoCharge) {
       pseudoCharge > 0 ?
-      m_svdHitIndicesPositive.insert(svdHitIndices.begin(), svdHitIndices.end()) :
-      m_svdHitIndicesNegative.insert(svdHitIndices.begin(), svdHitIndices.end());
+      m_svdHitIndicesPositive.insert(m_svdHitIndicesPositive.end(), svdHitIndices.begin(), svdHitIndices.end()) :
+      m_svdHitIndicesNegative.insert(m_svdHitIndicesNegative.end(), svdHitIndices.begin(), svdHitIndices.end());
     }
 
     /** Adding several PXD indices at the same time.
@@ -190,8 +183,8 @@ namespace Belle2 {
     void addPXDHitIndices(const std::vector< unsigned short >& pxdHitIndices,
                           const short pseudoCharge) {
       pseudoCharge > 0 ?
-      m_svdHitIndicesPositive.insert(pxdHitIndices.begin(), pxdHitIndices.end()) :
-      m_svdHitIndicesNegative.insert(pxdHitIndices.begin(), pxdHitIndices.end());
+      m_pxdHitIndicesPositive.insert(m_pxdHitIndicesPositive.end(), pxdHitIndices.begin(), pxdHitIndices.end()) :
+      m_pxdHitIndicesNegative.insert(m_pxdHitIndicesNegative.end(), pxdHitIndices.begin(), pxdHitIndices.end());
     }
 
     /** Has the track SVD hits? */
@@ -264,8 +257,18 @@ namespace Belle2 {
     /** Name of array of CDCHits to be accessed. */
     std::string m_cdcHitsName;
 
-    /** Defining the order of the CDCHits within one arm for fitting. */
-    SorterCDCHits m_sorterCDCHits; //! Don't stream this pointer to file.
+    /** Assume, that TrackFinders take care of sorting already, e.g. by replacing the vector. */
+    bool m_assumeSortedCDC;
+
+    /** Functor for sorting the CDC hits. */
+    const SorterBaseCDCHit m_sorterBaseCDC;
+
+    /** Sorting cache for CDC.
+     *
+     *  To avoid sorting whenever a hit is added, sorting is done only before doing something,
+     *  that needs sorted vectors.
+     */
+    bool m_sortingCacheCDC;
 
     /** CDC indices and right/left ambiguity resolution for the positive arm of the track.
      *
@@ -273,39 +276,41 @@ namespace Belle2 {
      *  for the left right/left disambiguation.
      *  FIXME What stands for left, what stands for right?
      */
-    std::set< std::pair < unsigned short, short> > m_cdcHitIndicesPositive;
+    std::vector< std::pair < unsigned short, short> > m_cdcHitIndicesPositive;
 
     /** CDC indices and right/left ambiguity resolution for the negative arm of the track.
      *
      *  @sa m_cdcHitIndicesPositive
      */
-    std::set< std::pair < unsigned short, short> > m_cdcHitIndicesNegative;
+    std::vector< std::pair < unsigned short, short> > m_cdcHitIndicesNegative;
 
+    //-----------------------------------------------------------------------------------
     /** Name of array of SVDHits (true hits, or clusters) to be accessed. */
     std::string m_svdHitsName;
-
-    /** Pointer to the hitSorterVXD.
-     *
-     *  This is potentially not good for streaming, as we can in principle point
-     *  to a non-ROOTified object.
-     *  FIXME Use this for the sorting of the VXDHit indices.
-     */
-    SorterVXDHits m_hitSorterVXD; //! Don't stream this pointer to file.
-
-    /** SVD indices of the positive arm of the track. */
-    std::set<unsigned short> m_svdHitIndicesPositive;
-
-    /** SVD indices of the negative arm of the track. */
-    std::set<unsigned short> m_svdHitIndicesNegative;
 
     /** Name of array of PXDHits (true hits or clusters) to be accessed. */
     std::string m_pxdHitsName;
 
+    /** */
+    bool m_assumeSortedVXD;
+
+    /** Functor for sorting the VXD hits. */
+    const SorterBaseVXDHit m_sorterBaseVXD;
+
+    /** */
+    bool m_sortingCacheVXD;
+
+    /** SVD indices of the positive arm of the track. */
+    std::vector<unsigned short> m_svdHitIndicesPositive;
+
+    /** SVD indices of the negative arm of the track. */
+    std::vector<unsigned short> m_svdHitIndicesNegative;
+
     /** PXD indices of the positive arm of the track. */
-    std::set<unsigned short> m_pxdHitIndicesPositive;
+    std::vector<unsigned short> m_pxdHitIndicesPositive;
 
     /** PXD indices of the negative arm of the track. */
-    std::set<unsigned short> m_pxdHitIndicesNegative;
+    std::vector<unsigned short> m_pxdHitIndicesNegative;
 
     //-----------------------------------------------------------------------------------
     /** Making this class a ROOT class.*/

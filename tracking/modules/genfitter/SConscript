@@ -9,7 +9,7 @@ env['LIBS'] = [
     'vxd_dataobjects',
     'cdc', 'cdc_dataobjects',
     'genfit2',
-    'tracking', 'tracking_dataobjects',
+   # 'tracking', 'tracking_dataobjects',
     ]
 
 Return('env')

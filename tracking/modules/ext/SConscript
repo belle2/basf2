@@ -10,6 +10,7 @@ env['LIBS'] = [
     'simulation', 
     'ecl',
     'tracking_dataobjects',
+    'mdst_dataobjects',
     'genfit2',
     'mdst_dataobjects',
     ]

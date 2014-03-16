@@ -16,8 +16,12 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/logging/Logger.h>
 
+#include <algorithm>
+#include <utility>
+
 
 using namespace Belle2;
+using namespace std;
 
 ClassImp(RecoTrack);
 
@@ -41,6 +45,64 @@ RecoTrack::RecoTrack(const std::string& cdcHitsName,
   m_svdHitIndicesNegative.reserve(32);
   m_pxdHitIndicesPositive.reserve(8);
   m_pxdHitIndicesNegative.reserve(8);
+}
+
+void RecoTrack::setCDCHitIndices(const std::vector< std::pair < unsigned short, short> >& cdcHitIndices,
+                                 const short pseudocharge)
+{
+  pseudocharge > 0 ?
+  (m_cdcHitIndicesPositive = cdcHitIndices) :
+  (m_cdcHitIndicesNegative = cdcHitIndices);
+  m_sortingCacheCDC = false;
+}
+
+void RecoTrack::addCDCHitIndex(const std::pair< unsigned short, short> cdcHitIndex,
+                               const short pseudoCharge)
+{
+  pseudoCharge > 0 ?
+  (m_cdcHitIndicesPositive.push_back(cdcHitIndex)) :
+  (m_cdcHitIndicesNegative.push_back(cdcHitIndex));
+  m_sortingCacheCDC = false;
+}
+
+void RecoTrack::addCDCHitIndices(const std::vector< std::pair < unsigned short, short> >& cdcHitIndices,
+                                 const short pseudoCharge)
+{
+  pseudoCharge > 0 ?
+  m_cdcHitIndicesPositive.insert(m_cdcHitIndicesPositive.end(), cdcHitIndices.begin(), cdcHitIndices.end()) :
+  m_cdcHitIndicesNegative.insert(m_cdcHitIndicesNegative.end(), cdcHitIndices.begin(), cdcHitIndices.end());
+  m_sortingCacheCDC = false;
+}
+
+bool RecoTrack::hasCDCHit(const unsigned short hitIndex, const short rightLeft)
+{
+  return ((m_cdcHitIndicesNegative.end() !=
+           std::find(m_cdcHitIndicesNegative.begin(), m_cdcHitIndicesNegative.end(), make_pair(hitIndex, rightLeft)))
+          or
+          (m_cdcHitIndicesPositive.end() !=
+           std::find(m_cdcHitIndicesPositive.begin(), m_cdcHitIndicesPositive.end(), make_pair(hitIndex, rightLeft)))
+         );
+}
+
+void RecoTrack::fillHitPatternCDC(const short pseudoCharge)
+{
+  StoreArray<CDCHit> cdcHits(m_cdcHitsName);
+  HitPatternCDC      hitPatternCDC;
+  auto& cdcHitIndices =
+    pseudoCharge > 0 ? m_cdcHitIndicesPositive : m_cdcHitIndicesNegative;
+
+  for (auto hitPair : cdcHitIndices) {
+    // I need to initialize a WireID with the ID from the CDCHit to get the continuous layer ID.
+    WireID wireID(cdcHits[hitPair.first]->getID());
+    // Then I set the corresponding layer in the hit pattern.
+    hitPatternCDC.setLayer(wireID.getICLayer());
+  }
+  m_hitPatternCDCInitializer = hitPatternCDC.getInteger();
+}
+
+void RecoTrack::fillHitPatternVXD(const short pseudoCharge)
+{
+  //Do something similar as for the CDC
 }
 
 
@@ -76,30 +138,4 @@ void RecoTrack::resetHitIndices(const short pseudoCharge,
        detector == Const::EDetector::invalidDetector) and
       pseudoCharge <= 0)
     m_pxdHitIndicesNegative.clear();
-}
-
-void RecoTrack::fillHitPatternCDC(const short pseudoCharge)
-{
-  StoreArray<CDCHit> cdcHits(m_cdcHitsName);
-  HitPatternCDC      hitPatternCDC;
-  auto& cdcHitIndices =
-    pseudoCharge > 0 ? m_cdcHitIndicesPositive : m_cdcHitIndicesNegative;
-
-  for (auto hitPair : cdcHitIndices) {
-    // I need to initialize a WireID with the ID from the CDCHit to get the continuous layer ID.
-    WireID wireID(cdcHits[hitPair.first]->getID());
-    B2INFO("WireID " << wireID.getISuperLayer());
-    // Then I set the corresponding layer in the hit pattern.
-    if (hitPatternCDC.setLayer(wireID.getICLayer())) {
-      // Finally, if the layer was already set, I set the double layer marker.
-      // This total number of layers(56) + Super Layer Number
-      hitPatternCDC.setLayerFast(56 + wireID.getISuperLayer());
-    }
-  }
-  m_hitPatternCDCInitializer = hitPatternCDC.getInteger();
-}
-
-void RecoTrack::fillHitPatternVXD(const short pseudoCharge)
-{
-  //Do something similar as for the CDC
 }

@@ -13,6 +13,10 @@
 #include <tracking/dataobjects/SorterBaseCDCHit.h>
 #include <tracking/dataobjects/SorterBaseVXDHit.h>
 
+#include <pxd/dataobjects/PXDCluster.h>
+
+#include <svd/dataobjects/SVDCluster.h>
+
 #include <mdst/dataobjects/HitPatternCDC.h>
 #include <mdst/dataobjects/HitPatternVXD.h>
 
@@ -23,6 +27,7 @@
 
 #include <vector>
 #include <string>
+
 
 class FitConfiguration;
 
@@ -42,15 +47,28 @@ namespace Belle2 {
   public:
     /** Constructor defining the used hit types.
      *
+     *  You have to use names matching the types defined below.
      *  @param cdcHitsName     Name of StoreArray with CDCHits to be used.
      *  @param svdHitsName     Name of StoreArray with either SVDClusters or SVDTrueHits.
      *  @param pxdHitsName     Name of StoreArray with either PXDClusters or PXDTrueHits.
+     *  \sa SVDHit
      */
     RecoTrack(const std::string& cdcHitsName = "CDCHits",
               const std::string& svdHitsName = "SVDClusters",
               const std::string& pxdHitsName = "PXDClusters",
               const SorterBaseCDCHit sorterBaseCDCHit = SorterBaseCDCHit(),
               const SorterBaseVXDHit sorterBaseVXDHit = SorterBaseVXDHit());
+
+    /** Define, use of clusters or true hits for SVD.
+     *
+     *  You have to decide, if you want to use Clusters or true hits at compile-time.
+     *  In the real experiment, we want to use clusters without overhead from checking everytime,
+     *  if we should use true hits instead.
+     */
+    typedef SVDCluster SVDHit;
+
+    /** Define, use of clusters or true hits for PXD. */
+    typedef PXDCluster PXDHit;
 
     //-------------------------------------- CDC Hit Handling ---------------------------
     //-----------------------------------------------------------------------------------
@@ -61,43 +79,34 @@ namespace Belle2 {
      *  @sa m_cdcHitIndicesPositive
      */
     void setCDCHitIndices(const std::vector< std::pair < unsigned short, short> >& cdcHitIndices,
-                          const short pseudocharge) {
-      pseudocharge > 0 ?
-      (m_cdcHitIndicesPositive = cdcHitIndices) : (m_cdcHitIndicesNegative = cdcHitIndices);
-    }
+                          const short pseudocharge);
 
     /** Adding a single index to the set of CDC Indices.
      *
      *  @param   pseudoCharge  Shall this index be used for the positive (or negative)
      *                         arm of the track.
-     *  @return  True, if the index was inserted,
-     *           false, if the index already existed before.
      */
     void addCDCHitIndex(const std::pair< unsigned short, short> cdcHitIndex,
-                        const short pseudoCharge) {
-      pseudoCharge > 0 ?
-      (m_cdcHitIndicesPositive.push_back(cdcHitIndex)) :
-      (m_cdcHitIndicesNegative.push_back(cdcHitIndex));
-    }
+                        const short pseudoCharge);
 
     /** Adding several CDC indices at the same time.
      *
-     *  In this case a vector is chosen as input, as this might be the favorable type at
-     *  creation of the hit indices.
      *  @param  pseudoCharge  Shall those indices be used for the positive (or negative)
      *                        arm of the track.
      */
     void addCDCHitIndices(const std::vector< std::pair < unsigned short, short> >& cdcHitIndices,
-                          const short pseudoCharge) {
-      pseudoCharge > 0 ?
-      m_cdcHitIndicesPositive.insert(m_cdcHitIndicesPositive.end(), cdcHitIndices.begin(), cdcHitIndices.end()) :
-      m_cdcHitIndicesNegative.insert(m_cdcHitIndicesNegative.end(), cdcHitIndices.begin(), cdcHitIndices.end());
-    }
+                          const short pseudoCharge);
 
     /** Has the track any CDC Hits? */
     bool hasCDCHits() {
       return !(m_cdcHitIndicesPositive.empty() and m_cdcHitIndicesNegative.empty());
     }
+
+    /** Has the track this specific hit?
+     *
+     *  FIXME Again there is the question, what is right, what is left here.
+     */
+    bool hasCDCHit(const unsigned short hitIndex, const short rightLeft);
 
     /** Fill HitPatternCDC with hits from track arm indicated by pseudoCharge. */
     void fillHitPatternCDC(const short pseudoCharge);
@@ -225,7 +234,7 @@ namespace Belle2 {
 
     //-------------------------------------- Fitting ------------------------------------
     /** Fit the track with a fitConfiguration object. */
-    void fitTrack(const FitConfiguration& fitConfiguration) {
+    void fitTrack(const FitConfiguration& /*fitConfiguration*/) {
       /* This function has to move to the source file of course, but will consist of
        * - recreating RecoHits
        * - configure the fitter

@@ -75,6 +75,12 @@ namespace Belle2 {
     EXPECT_EQ(recoTrack.getHitPatternCDC().hasAxialLayer(),  false);
     EXPECT_EQ(recoTrack.getHitPatternCDC().hasStereoLayer(), false);
 
+    recoTrack.resetHitIndices(0, Const::CDC);
+    EXPECT_FALSE(recoTrack.hasCDCHits());
+    recoTrack.addCDCHitIndex(make_pair(static_cast<unsigned short>(0), static_cast<short>(-1)), -1);
+    EXPECT_TRUE(recoTrack.hasCDCHit(0, -1));
+    EXPECT_FALSE(recoTrack.hasCDCHit(0, +1));
+
     //--- Now we set up some SVD and PXD Clusters and test the same stuff ---------------
   }
 }

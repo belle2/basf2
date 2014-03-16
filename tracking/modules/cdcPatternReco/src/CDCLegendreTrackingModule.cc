@@ -238,8 +238,6 @@ void CDCLegendreTrackingModule::DoSteppedTrackFinding()
       m_cdcLegendreFastHough->setAxialHits(hits_vector);
       m_cdcLegendreFastHough->MaxFastHough(hits_vector, 0, 0, m_nbinsTheta, m_rMin, m_rMax);
 
-      printf("candidates.size()=%i\n", candidates.size());
-
       if (candidates.size() == 0) {
         limit *= m_stepScale;
         n_hits = 999;

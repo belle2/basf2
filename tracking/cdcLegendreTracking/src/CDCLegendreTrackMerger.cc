@@ -280,11 +280,6 @@ void CDCLegendreTrackMerger::MergeCurler()
           m_cdcLegendreTrackFitter->fitTrackCandidateFast(cand1, ref_point, true);
           cand1->setReferencePoint(ref_point.first, ref_point.second);
           it2 = std::next(it1);
-          /*        merged = true;
-                  cand1->clearBadHits(ref_point);
-                  cout << "MERGED!" << endl;
-                  break;
-          */
 
         } else make_merge = false;
       }
@@ -310,28 +305,6 @@ bool CDCLegendreTrackMerger::earlyCandidateMerge(std::pair < std::vector<CDCLege
   if (candidate.first.size() > 0) {
     m_cdcLegendreTrackFitter->fitTrackCandidateFast(&candidate, ref_point, chi2_cand);
     //      cdcLegendrePatternChecker->clearBadHits(&candidate, ref_point);
-
-    /*
-          for (CDCLegendreTrackHit* hit: candidate.first){
-            double R = fabs(1. / candidate.second.second);
-            double x0_track = cos(candidate.second.first) / candidate.second.second + ref_point.first;
-            double y0_track = sin(candidate.second.first) / candidate.second.second + ref_point.second;
-            double x0_hit = hit->getOriginalWirePosition().X();
-            double y0_hit = hit->getOriginalWirePosition().Y();
-            double dist = SQR(fabs(R - sqrt(SQR(x0_track - x0_hit) + SQR(y0_track - y0_hit))) - hit->getDriftTime());
-            cout << "dist=" << dist << "||" << hit->getDriftTime() <<endl;
-          }
-          candidate.first.erase(std::remove_if(candidate.first.begin(), candidate.first.end(),
-              [&candidate,&ref_point](CDCLegendreTrackHit * hit) {
-                    double R = fabs(1. / candidate.second.second);
-                    double x0_track = cos(candidate.second.first) / candidate.second.second + ref_point.first;
-                    double y0_track = sin(candidate.second.first) / candidate.second.second + ref_point.second;
-                    double x0_hit = hit->getOriginalWirePosition().X();
-                    double y0_hit = hit->getOriginalWirePosition().Y();
-                    double dist = SQR(fabs(R - sqrt(SQR(x0_track - x0_hit) + SQR(y0_track - y0_hit))) - hit->getDriftTime());
-                    return hit->getDriftTime()/2. < dist;
-                }), candidate.first.end());
-          */
 
     double x0_cand = cos(candidate.second.first) / candidate.second.second + ref_point.first;
     double y0_cand = sin(candidate.second.first) / candidate.second.second + ref_point.second;
@@ -390,12 +363,8 @@ bool CDCLegendreTrackMerger::earlyCandidateMerge(std::pair < std::vector<CDCLege
         double chi2_temp;
         std::pair<double, double> ref_point_temp = std::make_pair(0., 0.);
         m_cdcLegendreTrackFitter->fitTrackCandidateFast(&candidate_temp, ref_point_temp, chi2_temp);
-        //          cdcLegendrePatternChecker->clearBadHits(&candidate_temp, ref_point_temp);
-        //          cdcLegendreTrackFitter->fitTrackCandidateFast(&candidate_temp, ref_point_temp, chi2_temp);
-        //      cout << "clist_temp.size = " << candidate_temp.first.size() << endl;
-        //      cout << "chi_cand=" << chi2_cand << " chi2_track=" << chi2_track << " chi2_temp=" << chi2_temp << endl;
         if (candidate_temp.first.size() == 0) {
-          printf("BAD MERGERD CANDIDATE SIZE!\n");
+          B2ERROR("BAD MERGERD CANDIDATE SIZE!");
           merged = true;
           break;
         }
@@ -411,9 +380,6 @@ bool CDCLegendreTrackMerger::earlyCandidateMerge(std::pair < std::vector<CDCLege
           cand1->setReferencePoint(ref_point.first, ref_point.second);
 
           merged = true;
-          //            cand1->clearBadHits(ref_point);
-          //        cout << "MERGED!" << endl;
-//          break;
         } else make_merge = false;
       }
     }

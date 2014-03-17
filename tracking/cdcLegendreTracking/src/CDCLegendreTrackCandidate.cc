@@ -306,7 +306,7 @@ int CDCLegendreTrackCandidate::getCandidateType()
   int innermostAxialLayer = getInnermostAxialSLayer();
   int outermostAxialLayer = getOutermostAxialSLayer();
 
-  cout << "innermost: " <<  innermostAxialLayer << "; outermost:" << outermostAxialLayer << endl;
+  B2DEBUG(100, "innermost: " <<  innermostAxialLayer << "; outermost:" << outermostAxialLayer);
   //check whether track is "fullTrack"
   if ((innermostAxialLayer == 0) && (outermostAxialLayer == 8)) { //hardcoded since CDC will not change
     type = fullTrack;
@@ -351,7 +351,7 @@ void CDCLegendreTrackCandidate::makeHitPattern()
 
   determineHitNumbers();
 
-//  cout << "pattern:" << m_hitPatternAxial.getHitPattern() << endl;
+//  B2DEBUG(100, "pattern:" << m_hitPatternAxial.getHitPattern());
 
 }
 

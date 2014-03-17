@@ -76,7 +76,6 @@ void CDCLegendreTrackFitter::fitTrackCandidateFast(
   meanYR2 *= divisor;
   meanR2 *= divisor;
   meanR4 *= divisor;
-  if (sumWeights == 0)cout << "clist_temp.size = " << track->first.size() << endl;
 
   // covariances:
   double covXX = meanX2 - meanX * meanX;
@@ -108,14 +107,14 @@ void CDCLegendreTrackFitter::fitTrackCandidateFast(
   ref_point.first = ref_x;
   ref_point.second = ref_y;
 
-  cout << "Before: " << track->second.first << "	" << track->second.second << endl;
+  B2DEBUG(100, "============== Fitting info (track candidate after fast Hough) ===============");
+  B2DEBUG(100, "Before: theta: " << track->second.first << "; r: " << track->second.second);
   track->second.first = clapPhi + m_PI / 2.;
   track->second.second = 1. / radius;
-  cout << "k=" << sumWeights << " delta=" << divisor << endl;
-  cout << "After: " << track->second.first << "	" << track->second.second << endl;
+  B2DEBUG(100, "After:  theta: " << track->second.first << "; r: " << track->second.second);
 
-  chi2 = sumWeights * (1. + rho * clapR) * (1. + rho * clapR) * (sinPhi * sinPhi * covXX - 2.*sinPhi * cosPhi * covXY + cosPhi * cosPhi * covYY - kappa * kappa * covR2R2)/*track->first.size()*/; /// returns chi2
-  cout << chi2 << endl;
+  chi2 = sumWeights * (1. + rho * clapR) * (1. + rho * clapR) * (sinPhi * sinPhi * covXX - 2.*sinPhi * cosPhi * covXY + cosPhi * cosPhi * covYY - kappa * kappa * covR2R2); /// returns chi2
+  B2DEBUG(100, "chi2: " << chi2);
 }
 
 void CDCLegendreTrackFitter::fitTrackCandidateFast(
@@ -236,15 +235,16 @@ void CDCLegendreTrackFitter::fitTrackCandidateFast(
   track->setReferencePoint(ref_x, ref_y);
 
 
-//  cout << "Before: " << track->second.first << "  " << track->second.second << endl;
+  B2DEBUG(100, "============== Fitting info (track candidate as CDCLegendreTrackCandidate object) ===============");
+  B2DEBUG(100, "Before: theta: " << track->getTheta() << "; r: " << track->getR());
   track->setTheta(clapPhi + m_PI / 2.);
   track->setR(1. / radius);
-//  cout << "k=" << sumWeights << " delta=" << divisor << endl;
-//  cout << "After: " << track->second.first << " " << track->second.second << endl;
+  B2DEBUG(100, "After:  theta: " << track->getTheta() << "; r: " << track->getR());
 
   double chi2 = sumWeights * (1. + rho * clapR) * (1. + rho * clapR) * (sinPhi * sinPhi * covXX - 2.*sinPhi * cosPhi * covXY + cosPhi * cosPhi * covYY - kappa * kappa * covR2R2); /// returns chi2
-  cout << chi2 << endl;
-  track->setChi2(chi2/*track->getNAxialHits()*/);
+  track->setChi2(chi2);
+  B2DEBUG(100, "chi2: " << chi2);
+
 }
 
 
@@ -365,7 +365,6 @@ void CDCLegendreTrackFitter::fitTrackCandidateStepped(
       } else is_finished = true;
     }
 
-//    printf("%i,   %f\n",direction,summ);
   } while (!is_finished);
 
 //now applying least square fitting with drift time
@@ -433,7 +432,6 @@ void CDCLegendreTrackFitter::fitTrackCandidateStepped(
       track->second.second = track_r;
     }
 
-//    printf("%i,   %f\n",direction,summ);
   } while (!is_finished);
 
 }
@@ -579,9 +577,9 @@ void CDCLegendreTrackFitter::fitTrackCandidateNormalSpace(
       }
     } else {
       if (summ_prev > summ_min) {
-//        printf("r:  %f; R:  %f\n",track->second.second,R_min);
-//        printf("x0: %f; y0: %f\n",x0_track_min,y0_track_min);
-//        printf("summ: %f\n",summ_min);
+        B2DEBUG(100, "r: " << track->second.second << "R: " << R_min);
+        B2DEBUG(100, "x0: " << x0_track_min << "y0: " << y0_track_min);
+        B2DEBUG(100, "summ: " << summ_min);
         direction = 1;
         increment_x0 = 1.;
         increment_y0 = 1.;
@@ -600,17 +598,13 @@ void CDCLegendreTrackFitter::fitTrackCandidateNormalSpace(
                             ? atan2((y0_track_min - ref_point->second), (x0_track_min - ref_point->first))
                             : m_PI + atan2((y0_track_min - ref_point->second), (x0_track_min - ref_point->first));
       track->second.second = (1. / R_min) * (fabs(track->second.second) / track->second.second); // some playaround with sign of R
-//      ref_point->first = 0.;
-//      ref_point->second = 0.;
     }
-//    printf("%i,   %f\n",direction,summ);
   } while (!is_finished);
 
-
-  printf("initial: x0: %f	y0 %f	R:	%f\n", x0_initial, y0_initial, R_initial);
-  printf("final:   x0: %f	y0 %f	R:	%f\n", x0_track_min, y0_track_min, R_min);
-  printf("ref.p.:  x0: %f	y0 %f\n", ref_point->first, ref_point->second);
-  printf("initial: th: %f	r  %f\n", track_theta_initial, track_r_initial);
-  printf("final:   th: %f	r  %f\n", track->second.first, track->second.second);
+  B2DEBUG(100, "initial: x0: " << x0_initial << "	y0 " << y0_initial << "	R:	" << R_initial);
+  B2DEBUG(100, "final:   x0: " << x0_track_min << "	y0 " << y0_track_min << "	R:	" << R_min);
+  B2DEBUG(100, "ref.p.:  x0: " << ref_point->first << "	y0 " << ref_point->second);
+  B2DEBUG(100, "initial: th: " << track_theta_initial << "	r  " << track_r_initial);
+  B2DEBUG(100, "final:   th: " << track->second.first << "	r  " << track->second.second);
 }
 

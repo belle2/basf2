@@ -302,6 +302,24 @@ namespace Belle2 {
       }
     }
 
+    /** Constructor with AccessorParams for from- and to-side
+     *
+     *  @param fromAccessor (name, durability) of from side array
+     *  @param toAccessor (name, durability) of to side array
+     *  @param durability Durability of the relation. If the durability is larger than the
+     *                   durability of the related StoreArrays, an error is raised.
+     */
+    RelationArray(const AccessorParams& fromAccessor, const AccessorParams& toAccessor,
+                  DataStore::EDurability durability = DataStore::c_Event):
+      StoreAccessorBase(DataStore::relationName(fromAccessor.first, toAccessor.first), durability, RelationContainer::Class(), false),
+      m_accessorFrom(fromAccessor),
+      m_accessorTo(toAccessor),
+      m_relations(nullptr) {
+      if (m_accessorFrom.second > m_durability || m_accessorTo.second > m_durability) {
+        B2FATAL("Tried to create RelationArray '" << m_name << "' with a durability larger than the StoreArrays it relates");
+      }
+    }
+
     /** Constructor which only accepts name and durability of the relation.
      *
      *  This constructor will only assign existing relations and will not create

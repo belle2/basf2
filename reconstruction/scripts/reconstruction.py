@@ -89,8 +89,8 @@ def add_reconstruction(path, components=None):
 
     # tracking
     if components == None or 'SVD' in components or 'CDC' in components:
-        use_vxd = (components == None or 'SVD' in components)
-        use_cdc = (components == None or 'CDC' in components)
+        use_vxd = components == None or 'SVD' in components
+        use_cdc = components == None or 'CDC' in components
 
         # CDC track finder: trasan
         if use_cdc:
@@ -196,10 +196,15 @@ def add_mdst_output(path, mc=True, filename='mdst.root'):
         'ECLGammasToECLShowers',
         'ECLPi0s',
         'ECLPi0sToECLGammas',
-        'EKLMK0Ls',
+        'ECLClusters',
+        'TracksToECLClusters',
+        'K0Ls',
+        'TRGSummary',
         ]
     if mc:
         branches += ['MCParticles', 'MCParticlesToTracks',
-                     'ECLShowersToMCParticles']
+                     'ECLShowersToMCParticles', 'ECLClustersToMCParticles']
     output.param('branchNames', branches)
     path.add_module(output)
+
+

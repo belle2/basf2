@@ -71,7 +71,6 @@ unsigned int RawCOPPER::CalcDriverChkSum(int n)
   for (int i = min; i < max; i++) {
     chksum ^= m_buffer[ i ];
   }
-  GetDriverChkSum(n);
   return chksum;
 }
 
@@ -213,7 +212,6 @@ int* RawCOPPER::GetFINESSEBuffer(int n, int finesse_num)
 }
 
 
-
 int* RawCOPPER::GetDetectorBuffer(int n, int finesse_num)
 {
   switch (finesse_num) {
@@ -308,7 +306,6 @@ unsigned int  RawCOPPER::CalcXORChecksum(int* buf, int nwords)
 {
   unsigned int checksum = 0;
   for (int i = 0; i < nwords; i++) {
-
     checksum = checksum ^ buf[ i ];
   }
   return checksum;
@@ -415,11 +412,10 @@ void RawCOPPER::CheckData(int n,
   //
   RawTrailer rawtrl;
   rawtrl.SetBuffer(GetRawTrlBufPtr(n));
-  if (rawtrl.GetChksum() !=
-      CalcXORChecksum(GetBuffer(n), GetBlockNwords(n) - rawtrl.GetTrlNwords())) {
+  unsigned int xor_chksum = CalcXORChecksum(GetBuffer(n), GetBlockNwords(n) - rawtrl.GetTrlNwords());
+  if (rawtrl.GetChksum() != xor_chksum) {
     sprintf(err_buf, "CORRUPTED DATA: RawCOPPER checksum error : block %d : length %d eve 0x%x : Trailer chksum 0x%.8x : calcd. now 0x%.8x\n %s %s %d\n",
-            n, GetBlockNwords(n), *cur_evenum_rawcprhdr, rawtrl.GetChksum(),
-            CalcXORChecksum(GetBuffer(n), GetBlockNwords(n) - rawtrl.GetTrlNwords()),
+            n, GetBlockNwords(n), *cur_evenum_rawcprhdr, rawtrl.GetChksum(), xor_chksum,
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     err_flag = 1;
   }
@@ -726,6 +722,7 @@ unsigned int RawCOPPER::FillTopBlockRawHeader(unsigned int m_node_id, unsigned i
   // Calculate XOR checksum
   //
   unsigned int chksum_top = 0, chksum_body = 0, chksum_bottom = 0;
+
   int top_end = RawHeader::RAWHEADER_NWORDS;
   for (int i = 0; i < top_end; i++) {
     chksum_top ^= m_buffer[ i ];

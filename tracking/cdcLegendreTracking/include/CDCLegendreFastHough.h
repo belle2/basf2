@@ -58,6 +58,14 @@ namespace Belle2 {
     void MaxFastHough(const std::vector<CDCLegendreTrackHit*>& hits, const int level, const int theta_min, const int theta_max,
                       const double r_min, const double r_max);
 
+    /**
+     * Same logic as in MaxFastHough, but looks only for HighPt tracks;
+     * starts with 2x2 binning, but when reached desired dr resolution (which defined as 2*Rcell) makes 1xN binning and finish algorithm in one iteration
+     */
+    void MaxFastHoughHighPt(const std::vector<CDCLegendreTrackHit*>& hits, const int theta_min, const int theta_max,
+                            double r_min, double r_max);
+
+
     /** Set limitation on number of hits in candidate */
     void setLimit(int limit) {m_limit = limit;};
 
@@ -82,6 +90,7 @@ namespace Belle2 {
     double* m_cos_theta; /**< Lookup array for calculation of cos */
     unsigned m_limit;  /**< Limitation on number of hits in candidate */
     std::vector<CDCLegendreTrackHit*> m_hits;
+    double Rcell;
 
     std::vector< std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> > >* m_candidates; /**< Holds list of track candidates */
 

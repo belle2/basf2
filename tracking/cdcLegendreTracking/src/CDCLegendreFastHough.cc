@@ -35,6 +35,7 @@ CDCLegendreFastHough::CDCLegendreFastHough(bool reconstructCurler, bool useHitPr
     m_cos_theta[i] = cos(i * bin_width);
   }
 
+  Rcell = 2. * m_PI * 60. / 384.;
 }
 
 inline bool CDCLegendreFastHough::sameSign(double n1, double n2,
@@ -407,4 +408,247 @@ void CDCLegendreFastHough::MaxFastHough(const std::vector<CDCLegendreTrackHit*>&
 
 }
 
+
+void CDCLegendreFastHough::MaxFastHoughHighPt(const std::vector<CDCLegendreTrackHit*>& hits, const int theta_min, const int theta_max,
+                                              double r_min, double r_max)
+{
+
+  B2DEBUG(100, "MaxFastHoughHighPt: " << theta_min << " " << theta_max << " " << r_min << " " << r_max);
+
+  if (not m_reconstructCurler
+      && (r_min * r_max >= 0 && fabs(r_min) > m_rc && fabs(r_max) > m_rc)) {
+//    return;
+    r_min = -1. * m_rc;
+    r_max = m_rc;
+  }
+
+  B2DEBUG(100, "CREATING arrays r and theta");
+
+  int nbins_theta;
+  int nbins_r;
+
+  double delta_r;
+
+  double* r;
+  int* thetaBin;
+
+  delta_r = 4. * Rcell / (4. / ((r_max + r_min) * (r_max + r_min)) - 4.*Rcell * Rcell);
+
+  B2DEBUG(100, "DELTA r: " << delta_r << "; r_max-r_min: " << fabs(r_max - r_min));
+
+  //calculate bin borders of 2x2 bin "histogram"
+  if (fabs(r_max - r_min) > delta_r) {
+    B2DEBUG(100, "NORMAL binning");
+    nbins_r = 2;
+    nbins_theta = 2;
+
+    r = new double[3];
+    r[0] = r_min;
+    r[1] = r_min + 0.5 * (r_max - r_min);
+    r[2] = r_max;
+
+    thetaBin = new int[3];
+    thetaBin[0] = theta_min;
+    thetaBin[1] = theta_min + (theta_max - theta_min) / 2;
+    thetaBin[2] = theta_max;
+  } else if (fabs(r_max - r_min) < delta_r) {
+    B2DEBUG(100, "1xN binning");
+    nbins_r = 1;
+
+    r = new double[2];
+    r[0] = r_min;
+    r[1] = r_max;
+
+    nbins_theta = (theta_max - theta_min) / 8;
+    thetaBin = new int[nbins_theta + 1];
+    for (int t_index = 0; t_index < nbins_theta + 1; t_index++) {
+      thetaBin[t_index] = theta_min + t_index;
+    }
+  }
+
+  B2DEBUG(100, "Number of bins: " << nbins_r << "x" << nbins_theta);
+  B2DEBUG(100, "CREATING voting plane");
+
+  int nhitsToReserve;
+  nhitsToReserve = 2 * hits.size();
+  //voting plane
+  std::vector<CDCLegendreTrackHit*>** voted_hits;
+  voted_hits = new std::vector<CDCLegendreTrackHit*>* [nbins_theta];
+  for (unsigned int i = 0; i < nbins_theta; ++i) {
+    voted_hits[i] = new std::vector<CDCLegendreTrackHit*>[nbins_r];
+    for (unsigned int j = 0; j < nbins_r; ++j) {
+      voted_hits[i][j].reserve(nhitsToReserve);
+    }
+  }
+
+  B2DEBUG(100, "CREATING distance arrays");
+
+  double r_temp, r_1, r_2;
+
+  double** dist_1;
+  dist_1 = new double*[nbins_theta + 1];
+  for (int i = 0; i < nbins_theta + 1; ++i)
+    dist_1[i] = new double[nbins_r + 1];
+
+  double** dist_2;
+  dist_2 = new double*[nbins_theta + 1];
+  for (int i = 0; i < nbins_theta + 1; ++i)
+    dist_2[i] = new double[nbins_r + 1];
+
+  B2DEBUG(100, "VOTING");
+
+  int hit_counter = 0;
+  //Voting within the four bins
+  for (CDCLegendreTrackHit * hit : hits) {
+    hit_counter++;
+    B2DEBUG(100, "PROCCESSING hit " << hit_counter << " of " << nhitsToReserve);
+    if (hit->isUsed() != CDCLegendreTrackHit::not_used) continue;
+    for (int t_index = 0; t_index < nbins_theta + 1; ++t_index) {
+
+      if (m_useHitPrecalculatedR) {
+        if (hit->checkRValue(thetaBin[t_index])) r_temp = hit->getRValue(thetaBin[t_index]);
+        else {
+          r_temp = hit->getConformalX() * m_cos_theta[thetaBin[t_index]] +
+                   hit->getConformalY() * m_sin_theta[thetaBin[t_index]];
+          hit->setRValue(thetaBin[t_index], r_temp);
+        }
+      } else {
+        r_temp = hit->getConformalX() * m_cos_theta[thetaBin[t_index]]
+                 + hit->getConformalY() * m_sin_theta[thetaBin[t_index]];
+      }
+
+      r_1 = r_temp + hit->getConformalDriftTime();
+      r_2 = r_temp - hit->getConformalDriftTime();
+
+      //calculate distances of lines to horizontal bin border
+      for (int r_index = 0; r_index < nbins_r + 1; ++r_index) {
+        dist_1[t_index][r_index] = r[r_index] - r_1;
+        dist_2[t_index][r_index] = r[r_index] - r_2;
+      }
+    }
+
+    B2DEBUG(100, "VOTING for hit " << hit_counter << " of " << nhitsToReserve);
+    //actual voting, based on the distances (test, if line is passing though the bin)
+    for (int t_index = 0; t_index < nbins_theta; ++t_index) {
+      for (int r_index = 0; r_index < nbins_r; ++r_index) {
+        //curves are assumed to be straight lines, might be a reasonable assumption locally
+        if (!sameSign(dist_1[t_index][r_index], dist_1[t_index][r_index + 1], dist_1[t_index + 1][r_index], dist_1[t_index + 1][r_index + 1])) {
+          B2DEBUG(100, "INSERT hit in " << t_index << ";" << r_index << " bin");
+          voted_hits[t_index][r_index].push_back(hit);
+        } else if (!sameSign(dist_2[t_index][r_index], dist_2[t_index][r_index + 1], dist_2[t_index + 1][r_index], dist_2[t_index + 1][r_index + 1])) {
+          B2DEBUG(100, "INSERT hit in " << t_index << ";" << r_index << " bin");
+          voted_hits[t_index][r_index].push_back(hit);
+        }
+      }
+    }
+    B2DEBUG(100, "MOVING to next hit");
+  }
+
+  B2DEBUG(100, "END of voting");
+
+  bool** binUsed;
+  binUsed = new bool*[nbins_theta];
+  for (int ii = 0; ii < nbins_theta; ++ii) {
+    binUsed[ii] = new bool[nbins_r];
+    for (int jj = 0; jj < nbins_r; jj++)
+      binUsed[ii][jj] = false;
+  }
+
+  B2DEBUG(100, "PROCESSING bins");
+
+//Processing, which bins are further investigated
+  for (int bin_loop = 0; bin_loop < nbins_r * nbins_theta; bin_loop++) {
+    int t_index = 0;
+    int r_index = 0;
+    double max_value_temp = 0;
+    for (int t_index_temp = 0; t_index_temp < nbins_theta; ++t_index_temp) {
+      for (int r_index_temp = 0; r_index_temp < nbins_r; ++r_index_temp) {
+        if ((max_value_temp  < voted_hits[t_index_temp][r_index_temp].size()) && (!binUsed[t_index_temp][r_index_temp])) {
+          max_value_temp = voted_hits[t_index_temp][r_index_temp].size();
+          t_index = t_index_temp;
+          r_index = r_index_temp;
+        }
+      }
+    }
+
+    binUsed[t_index][r_index] = true;
+
+    //bin must contain more hits than the limit and maximal found track candidate
+
+
+    //"trick" which allows to use wider bins for higher r values (lower pt tracks)
+    int level_diff = 0;
+    if (fabs(r[r_index] + (r[r_index + 1] - r[r_index]) / 2.) > (m_rMax / 4.)) level_diff = 3;
+    else if ((fabs(r[r_index] + (r[r_index + 1] - r[r_index]) / 2.) < (m_rMax / 4.)) && (fabs(r[r_index] + (r[r_index + 1] - r[r_index]) / 2.) > (2.*m_rMax / 3.)))
+      level_diff = 2;
+    else if ((fabs(r[r_index] + (r[r_index + 1] - r[r_index]) / 2.) < (2.*m_rMax / 3.)) && (fabs(r[r_index] + (r[r_index + 1] - r[r_index]) / 2.) > (m_rMax / 2.)))
+      level_diff = 1;
+
+//      level_diff = 0;
+
+    //bin must contain more hits than the limit and maximal found track candidate
+    if (voted_hits[t_index][r_index].size() >= m_limit) {
+
+      B2DEBUG(100, "GOOD bin " << r_index << "  " << t_index << " " << voted_hits[t_index][r_index].size());
+
+
+      //if max level of fast Hough is reached, mark candidate and return
+      //        if (((!allow_overlap)&&(level == (m_maxLevel - level_diff))) || ((allow_overlap)&&(level == (m_maxLevel - level_diff) + 2))) {
+      if (nbins_r == 1) {
+
+        B2DEBUG(100, "CREATING candidate");
+
+        std::vector<CDCLegendreTrackHit*> c_list;
+        std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> > candidate_temp =
+          std::make_pair(c_list, std::make_pair(-999, -999));
+
+
+
+        double theta = static_cast<double>(thetaBin[t_index]
+                                           + thetaBin[t_index + 1]) / 2. * m_PI / m_nbinsTheta;
+
+        if (not m_reconstructCurler
+            && fabs((r[r_index] + r[r_index + 1]) / 2) > m_rc)
+          return;
+
+        voted_hits[t_index][r_index].erase(std::remove_if(voted_hits[t_index][r_index].begin(), voted_hits[t_index][r_index].end(), [](CDCLegendreTrackHit * hit) {return hit->isUsed() != CDCLegendreTrackHit::not_used;}), voted_hits[t_index][r_index].end());
+
+        for (CDCLegendreTrackHit * hit : voted_hits[t_index][r_index]) {
+          hit->setUsed(CDCLegendreTrackHit::used_in_cand);
+        }
+
+        candidate_temp.first = voted_hits[t_index][r_index];
+        candidate_temp.second = std::make_pair(theta,
+                                               (r[r_index] + r[r_index + 1]) / 2.);
+
+        if (candidate_temp.first.size() > m_limit) m_candidates->push_back(candidate_temp);
+
+      } else {
+        B2DEBUG(100, "RECURSIVE call");
+
+        //Recursive calling of the function with higher level and smaller box
+        MaxFastHoughHighPt(voted_hits[t_index][r_index], thetaBin[t_index], thetaBin[t_index + 1],
+                           r[r_index], r[r_index + 1]);
+
+      }
+    }
+  }
+
+  for (int i = 0; i < nbins_theta; ++i) {
+    delete[] binUsed[i];
+    delete[] voted_hits[i];
+  }
+  delete[] binUsed;
+  delete[] voted_hits;
+
+  for (int i = 0; i < nbins_theta + 1; ++i) {
+    delete[] dist_1[i];
+    delete[] dist_2[i];
+  }
+  delete[] dist_1;
+  delete[] dist_2;
+
+  delete[] r;
+  delete[] thetaBin;
+}
 

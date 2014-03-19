@@ -34,6 +34,10 @@
 #include <bklm/dataobjects/BKLMSimHit.h>
 #include <eklm/dataobjects/EKLMSimHit.h>
 
+// MetaData
+#include <framework/dataobjects/EventMetaData.h>
+#include <background/dataobjects/BackgroundMetaData.h>
+
 // Root
 #include <TRandom3.h>
 
@@ -60,15 +64,16 @@ namespace Belle2 {
 
     // Add parameters
     addParam("backgroundFiles", m_backgroundFiles,
-             "list of background (collision) files: one file per background type");
-    addParam("realTime", m_realTime,
-             "real time in nano seconds that corresponds to background samle");
+             "List of background (collision) files: one file per background type, wildcards possible (as in TChain)");
     addParam("minTime", m_minTime,
-             "time window lower edge in nano seconds", -1000.0);
+             "Time window lower edge in nano seconds", -1000.0);
     addParam("maxTime", m_maxTime,
-             "time window upper edge in nano seconds", 800.0);
-    addParam("scaleFactors", m_scaleFactors, "factors to scale rates of backgrounds",
+             "Time window upper edge in nano seconds", 800.0);
+    addParam("scaleFactors", m_scaleFactors, "Factors to scale rates of backgrounds",
              m_scaleFactors);
+    addParam("components", m_components,
+             "Detector components to be included, empty list means all components",
+             m_components);
   }
 
   BeamBkgMixerModule::~BeamBkgMixerModule()
@@ -78,52 +83,119 @@ namespace Belle2 {
   void BeamBkgMixerModule::initialize()
   {
 
-    if (m_realTime <= 0) B2ERROR("invalid realTime: " << m_realTime);
-
+    // complete the list of scale factors with the default value
     for (unsigned i = m_scaleFactors.size(); i < m_backgroundFiles.size(); ++i) {
       m_scaleFactors.push_back(1.0);
     }
 
+    // included components
+    std::vector<std::string> components = m_components;
+    bool PXD = isComponentIncluded(components, "PXD");
+    bool SVD = isComponentIncluded(components, "SVD");
+    bool CDC = isComponentIncluded(components, "CDC");
+    bool TOP = isComponentIncluded(components, "TOP");
+    bool ARICH = isComponentIncluded(components, "ARICH");
+    bool ECL = isComponentIncluded(components, "ECL");
+    bool BKLM = isComponentIncluded(components, "BKLM");
+    bool EKLM = isComponentIncluded(components, "EKLM");
+    if (!components.empty()) {
+      std::string str;
+      for (unsigned i = 0; i < components.size(); ++i) str = str + " " + components[i];
+      B2ERROR("Unknown components:" << str);
+    }
+
+    // open files
     for (unsigned bkg = 0; bkg < m_backgroundFiles.size(); ++bkg) {
+
       B2INFO("opening file: " << m_backgroundFiles[bkg]);
-      TFile* file = TFile::Open(m_backgroundFiles[bkg].c_str(), "READ");
-      if (!file) {
-        B2ERROR("Input file " << m_backgroundFiles[bkg] << " not found");
+
+      // check the file if wildcarding is not used in the name
+      if (!TString(m_backgroundFiles[bkg].c_str()).Contains("*")) {
+        TFile* file = TFile::Open(m_backgroundFiles[bkg].c_str(), "READ");
+        if (!file) {
+          B2ERROR(m_backgroundFiles[bkg] << ": file not found");
+          continue;
+        }
+        if (!file->IsOpen()) {
+          B2ERROR(m_backgroundFiles[bkg] << ": can't open file");
+          continue;
+        }
+        file->Close();
+      }
+
+      // get realTime from a persistent tree
+      TChain persistent("persistent");
+      int nFiles = persistent.Add(m_backgroundFiles[bkg].c_str());
+      if (nFiles == 0) {
+        B2ERROR(m_backgroundFiles[bkg] << ": no such files");
         continue;
       }
-      if (!file->IsOpen()) {
-        B2ERROR("Input file " << m_backgroundFiles[bkg] << " can't be open");
+      persistent.GetEntries();
+      TObject* bkgMetaData = 0; // Note: allocation left to root
+      persistent.SetBranchAddress("BackgroundMetaData", &bkgMetaData);
+      if (bkgMetaData == 0) {
+        B2ERROR(m_backgroundFiles[bkg] << ": branch 'BackgroundMetaData' not found");
         continue;
       }
-      m_files.push_back(file);
-      TTree* tree = (TTree*)file->Get("tree");
-      if (!tree) {
-        B2WARNING(m_backgroundFiles[bkg] << " TTree 'tree' not found - skip this file");
+      float realTime = 0;
+      std::vector<unsigned> tags;
+      for (unsigned k = 0; k < persistent.GetEntries(); k++) {
+        persistent.GetEntry(k);
+        realTime += ((BackgroundMetaData*)bkgMetaData)->getRealTime();
+        tags.push_back(((BackgroundMetaData*)bkgMetaData)->getBackgroundTag());
+      }
+      if (realTime <= 0) {
+        B2ERROR(m_backgroundFiles[bkg] << ": invalid realTime: " << realTime);
         continue;
       }
+      for (unsigned i = 1; i < tags.size(); ++i) {
+        if (tags[i] != tags[0]) {
+          B2ERROR(m_backgroundFiles[bkg] <<
+                  ": files with mixed background types not supported");
+          continue;
+        }
+      }
+      std::string bkgType = ((BackgroundMetaData*)bkgMetaData)->getBackgroundType();
+
+      // define TChain for reading SimHits
+      TChain* tree = new TChain("tree");
+      tree->Add(m_backgroundFiles[bkg].c_str());
       unsigned numEvents = tree->GetEntries();
-      double rate =  numEvents / m_realTime * m_scaleFactors[bkg];
+      double rate =  numEvents / realTime * m_scaleFactors[bkg];
+
       m_trees.push_back(tree);
       m_numEvents.push_back(numEvents);
       m_eventCount.push_back(0);
       m_bkgRates.push_back(rate);
-
-      B2INFO(" rate = " << rate * 1000 << " MHz");
+      m_bkgTypes.push_back(bkgType);
 
       BkgHits hits; // Note: allocation of TClonesArray's left to root
       m_bkgSimHits.push_back(hits);
 
       unsigned i = m_bkgSimHits.size() - 1;
-      tree->SetBranchAddress("PXDSimHits", &m_bkgSimHits[i].PXD);
-      tree->SetBranchAddress("SVDSimHits", &m_bkgSimHits[i].SVD);
-      tree->SetBranchAddress("CDCSimHits", &m_bkgSimHits[i].CDC);
-      tree->SetBranchAddress("TOPSimHits", &m_bkgSimHits[i].TOP);
-      tree->SetBranchAddress("ARICHSimHits", &m_bkgSimHits[i].ARICH);
-      tree->SetBranchAddress("ECLSimHits", &m_bkgSimHits[i].ECL);
-      tree->SetBranchAddress("BKLMSimHits", &m_bkgSimHits[i].BKLM);
-      tree->SetBranchAddress("EKLMSimHits", &m_bkgSimHits[i].EKLM);
+      if (PXD) tree->SetBranchAddress("PXDSimHits", &m_bkgSimHits[i].PXD);
+      if (SVD) tree->SetBranchAddress("SVDSimHits", &m_bkgSimHits[i].SVD);
+      if (CDC) tree->SetBranchAddress("CDCSimHits", &m_bkgSimHits[i].CDC);
+      if (TOP) tree->SetBranchAddress("TOPSimHits", &m_bkgSimHits[i].TOP);
+      if (ARICH) tree->SetBranchAddress("ARICHSimHits", &m_bkgSimHits[i].ARICH);
+      if (ECL) tree->SetBranchAddress("ECLSimHits", &m_bkgSimHits[i].ECL);
+      if (BKLM) tree->SetBranchAddress("BKLMSimHits", &m_bkgSimHits[i].BKLM);
+      if (EKLM) tree->SetBranchAddress("EKLMSimHits", &m_bkgSimHits[i].EKLM);
+
+      // print INFO
+      std::string unit(" ns");
+      if (realTime >= 1000.0) {realTime /= 1000.0; unit = " us";}
+      if (realTime >= 1000.0) {realTime /= 1000.0; unit = " ms";}
+      if (realTime >= 1000.0) {realTime /= 1000.0; unit = " s";}
+
+      B2INFO("--> type: " << bkgType <<
+             " (tag=" << tags[0] <<
+             ") events: " << numEvents <<
+             " realTime: " << realTime << unit <<
+             " rate = " << rate * 1000 << " MHz");
     }
 
+    // SimHits
     StoreArray<PXDSimHit>::optional();
     StoreArray<SVDSimHit>::optional();
     StoreArray<CDCSimHit>::optional();
@@ -171,7 +243,8 @@ namespace Belle2 {
         m_eventCount[bkg]++;
         if (m_eventCount[bkg] >= m_numEvents[bkg]) {
           m_eventCount[bkg] = 0;
-          B2INFO("BeamBkgMixer: events re-used, bkg=" << bkg);
+          B2INFO("BeamBkgMixer: events of " << m_bkgTypes[bkg] <<
+                 " re-used (file#" << bkg << ")");
         }
       }
     }
@@ -186,15 +259,33 @@ namespace Belle2 {
   void BeamBkgMixerModule::terminate()
   {
 
-    for (unsigned i = 0; i < m_files.size(); ++i) {
-      if (m_files[i]) m_files[i]->Close();
+    for (unsigned i = 0; i < m_trees.size(); ++i) {
+      delete m_trees[i];
     }
+
 
   }
 
   void BeamBkgMixerModule::printModuleParams() const
   {
   }
+
+
+  bool BeamBkgMixerModule::isComponentIncluded(std::vector<std::string>& components,
+                                               const std::string component)
+  {
+    if (m_components.empty()) return true;
+
+    for (unsigned i = 0; i < components.size(); ++i) {
+      if (components[i] == component) {
+        components.erase(components.begin() + i);
+        --i;
+        return true;
+      }
+    }
+    return false;
+  }
+
 
 
 } // end Belle2 namespace

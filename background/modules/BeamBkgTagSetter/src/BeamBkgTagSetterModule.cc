@@ -34,8 +34,9 @@
 #include <bklm/dataobjects/BKLMSimHit.h>
 #include <eklm/dataobjects/EKLMSimHit.h>
 
-// EventMetaData
+// MetaData
 #include <framework/dataobjects/EventMetaData.h>
+#include <background/dataobjects/BackgroundMetaData.h>
 
 #include <unordered_map>
 using namespace std;
@@ -61,7 +62,9 @@ namespace Belle2 {
     setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
 
     // Add parameters
-    addParam("backgroundType", m_backgroundType, "one of: Coulomb_LER, Coulomb_HER, RBB_LER, RBB_HER, Touschek_LER, Touschek_HER, twoPhoton", string(""));
+    addParam("backgroundType", m_backgroundType, "one of: Coulomb_LER, Coulomb_HER, RBB_LER, RBB_HER, Touschek_LER, Touschek_HER, twoPhoton, other");
+    addParam("realTime", m_realTime,
+             "real time in nano seconds that corresponds to background samle");
 
   }
 
@@ -71,6 +74,8 @@ namespace Belle2 {
 
   void BeamBkgTagSetterModule::initialize()
   {
+    if (m_realTime <= 0) B2FATAL("invalid realTime: " << m_realTime);
+
     std::unordered_map<std::string, SimHitBase::BG_TAG> tag;
     tag["Coulomb_LER"] = SimHitBase::bg_Coulomb_LER;
     tag["Coulomb_HER"] = SimHitBase::bg_Coulomb_HER;
@@ -79,6 +84,7 @@ namespace Belle2 {
     tag["Touschek_LER"] = SimHitBase::bg_Touschek_LER;
     tag["Touschek_HER"] = SimHitBase::bg_Touschek_HER;
     tag["twoPhoton"] = SimHitBase::bg_twoPhoton;
+    tag["other"] = SimHitBase::bg_other;
 
     m_backgroundTag = tag[m_backgroundType];
 
@@ -87,6 +93,13 @@ namespace Belle2 {
                 ", will be tagged as SimHitBase::bg_other");
       m_backgroundTag = SimHitBase::bg_other;
     }
+
+    StoreObjPtr<BackgroundMetaData> bkgMetaData("", DataStore::c_Persistent);
+    bkgMetaData.registerAsPersistent();
+    bkgMetaData.create();
+    bkgMetaData->setBackgroundType(m_backgroundType);
+    bkgMetaData->setBackgroundTag(m_backgroundTag);
+    bkgMetaData->setRealTime(m_realTime);
 
     StoreArray<PXDSimHit>::optional();
     StoreArray<SVDSimHit>::optional();

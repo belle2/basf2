@@ -73,6 +73,8 @@ namespace Belle2 {
   private:
 
     std::string m_backgroundType; /**< beam background type */
+    double m_realTime; /**< real time that corresponds to beam background sample */
+
     SimHitBase::BG_TAG m_backgroundTag; /**< background tag to set */
 
     /**

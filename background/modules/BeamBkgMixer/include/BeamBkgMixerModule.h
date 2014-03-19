@@ -17,7 +17,7 @@
 #include <string>
 
 #include "TFile.h"
-#include "TTree.h"
+#include "TChain.h"
 #include "TClonesArray.h"
 
 
@@ -78,9 +78,9 @@ namespace Belle2 {
 
     std::vector<std::string> m_backgroundFiles; /**< names of beam background files */
     std::vector<double> m_scaleFactors; /**< rate scale factors */
-    double m_realTime; /**< real time that corresponds to beam background simulation */
     double m_minTime;  /**< minimal time shift of background event */
     double m_maxTime;  /**< maximal time shift of background event */
+    std::vector<std::string> m_components; /**< detector components */
 
     /**
      * An input event buffer definition for background SimHits
@@ -103,13 +103,12 @@ namespace Belle2 {
       {}
     };
 
-    std::vector<TFile*> m_files;  /**< vector of file pointers */
-    std::vector<TTree*> m_trees;  /**< vector of tree pointers */
+    std::vector<TChain*> m_trees;  /**< vector of tree pointers */
     std::vector<unsigned> m_numEvents;  /**< number of events in each file */
     std::vector<unsigned> m_eventCount; /**< current event number in each file */
     std::vector<double> m_bkgRates;  /**< background rate of each file */
+    std::vector<std::string> m_bkgTypes; /**< background type of each file */
     std::vector<BkgHits> m_bkgSimHits;  /**< input event buffer */
-
 
     /**
      * functions that add background SimHits to those in the DataStore
@@ -135,6 +134,16 @@ namespace Belle2 {
       }
 
     }
+
+    /**
+     * Returns true if a component is found in components or the list is empty.
+     * If found a component is erased from components.
+     * @param components list of components to be included
+     * @param component the name of detector component to check
+     * @return true if component found in components
+     */
+    bool isComponentIncluded(std::vector<std::string>& components,
+                             const std::string component);
 
 
   };

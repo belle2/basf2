@@ -333,9 +333,10 @@ void CDCGeometryPar::readXT(const GearDir gbxParams, const int mode)
   }
 
   int iL, lrp;
-  const int np = 9;
+  const int np = 9; //to be moved to appropriate place...
   double alpha, theta, dummy1, xt[np];
-  unsigned ntheta = 7;
+  unsigned nalpha = 19; //to be moved to appropriate place...
+  unsigned ntheta = 7;  //to be moved to appropriate place...
   unsigned nRead = 0;
 
   while (true) {
@@ -427,6 +428,28 @@ void CDCGeometryPar::readXT(const GearDir gbxParams, const int mode)
       for (unsigned itheta = 0; itheta < ntheta; ++itheta) {
         for (int i = 0; i < np; ++i) {
           m_XT[iL][lr][0][itheta][i] = m_XT[iL][lrp][18][itheta][i];
+        }
+      }
+    }
+  }
+
+  //set xt(theta= 18) = xt(theta= 40) for the layers >= 20, since xt(theta=18) for these layers are unavailable
+  for (unsigned iL = 20; iL < MAX_N_SLAYERS; ++iL) {
+    for (int lr = 0; lr < 2; ++lr) {
+      for (unsigned ialpha = 0; ialpha < nalpha; ++ialpha) {
+        for (int i = 0; i < np; ++i) {
+          m_XT[iL][lr][ialpha][0][i] = m_XT[iL][lr][ialpha][1][i];
+        }
+      }
+    }
+  }
+
+  //set xt(theta=149) = xt(theta=130) for the layers >= 13, since xt(theta=149) for these layers are unavailable
+  for (unsigned iL = 13; iL < MAX_N_SLAYERS; ++iL) {
+    for (int lr = 0; lr < 2; ++lr) {
+      for (unsigned ialpha = 0; ialpha < nalpha; ++ialpha) {
+        for (int i = 0; i < np; ++i) {
+          m_XT[iL][lr][ialpha][6][i] = m_XT[iL][lr][ialpha][5][i];
         }
       }
     }
@@ -789,10 +812,36 @@ double CDCGeometryPar::getDriftV(const double time, const unsigned short iCLayer
   ialpha = std::max(0, ialpha);
   ialpha = std::min(18, ialpha);
 
-  int itheta = theta * 180. / M_PI;
-  //  itheta = std::max( 0, itheta);
-  //  itheta = std::min( 7, itheta);
-  itheta = 3; //tentative
+  /*  for(int i=-90; i<=90; ++i) {
+      double alpha = i*M_PI/180.;
+      int ialpha = (alpha >= 0.) ? (alpha * 180. / M_PI + 5.) / 10. : (alpha * 180. / M_PI - 5.) / 10.;
+      ialpha += 9;
+      ialpha = std::max(0, ialpha);
+      ialpha = std::min(18, ialpha);
+      std::cout <<"alpha,ialpha=" << alpha*180./M_PI <<" "<< ialpha << std::endl;
+      }
+      exit(-1);
+  */
+
+  double th = 180. * theta / M_PI;
+  //hard-coded tentatively
+  int itheta = 0;
+  if (th < 29.0) {
+  } else if (th <  50.0) {
+    itheta = 1;
+  } else if (th <  75.0) {
+    itheta = 2;
+  } else if (th < 105.0) {
+    itheta = 3;
+  } else if (th < 125.0) {
+    itheta = 4;
+  } else if (th < 139.5) {
+    itheta = 5;
+  } else {
+    itheta = 6;
+  }
+  //  ialpha = 9;
+  //  itheta = 3;
 
   const double boundary = m_XT[iCLayer][lr][ialpha][itheta][6];
 
@@ -806,8 +855,10 @@ double CDCGeometryPar::getDriftV(const double time, const unsigned short iCLayer
     dDdt = m_XT[iCLayer][lr][ialpha][itheta][7];
   }
 
-  if (lr == 1) dDdt *= -1.;
-  return dDdt;
+  //replaced with return fabs, since dDdt < 0 rarely; why happens ???
+  //  if (lr == 1) dDdt *= -1.;
+  //  return dDdt;
+  return fabs(dDdt);
 
 }
 
@@ -822,10 +873,25 @@ double CDCGeometryPar::getDriftLength(const double time, const unsigned short iC
   ialpha = std::max(0, ialpha);
   ialpha = std::min(18, ialpha);
 
-  int itheta = theta * 180. / M_PI;
-  //  itheta = std::max( 0, itheta);
-  //  itheta = std::min( 7, itheta);
-  itheta = 3; //tentative
+  double th = 180. * theta / M_PI;
+  //hard-coded tentatively
+  int itheta = 0;
+  if (th < 29.0) {
+  } else if (th <  50.0) {
+    itheta = 1;
+  } else if (th <  75.0) {
+    itheta = 2;
+  } else if (th < 105.0) {
+    itheta = 3;
+  } else if (th < 125.0) {
+    itheta = 4;
+  } else if (th < 139.5) {
+    itheta = 5;
+  } else {
+    itheta = 6;
+  }
+  //  ialpha = 9;
+  //  itheta = 3;
 
   //  std::cout <<"iCLayer= " << iCLayer << std::endl;
   //  std::cout <<"lr= " << lr << std::endl;
@@ -950,14 +1016,14 @@ unsigned short CDCGeometryPar::getOldLeftRight(const TVector3& posOnWire, const 
 
 double CDCGeometryPar::getAlpha(const TVector3& posOnWire, const TVector3& momentum) const
 {
-  double wx = posOnWire.x();
-  double wy = posOnWire.y();
-  double px = momentum.x();
-  double py = momentum.y();
+  const double wx = posOnWire.x();
+  const double wy = posOnWire.y();
+  const double px = momentum.x();
+  const double py = momentum.y();
 
   double sinalpha = (wx * py - wy * px) / sqrt((wx * wx + wy * wy) * (px * px + py * py));
 
-  double dot = wx * px + wy * py;
+  const double dot = wx * px + wy * py;
   if (dot < 0.) sinalpha *= -1.;
 
   return asin(sinalpha);

@@ -17,7 +17,6 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreEntry.h>
 
 #include <framework/gearbox/Const.h>
 

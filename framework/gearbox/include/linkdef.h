@@ -9,5 +9,6 @@
 #pragma link C++ class Belle2::Const::DetectorSet;
 #pragma link C++ class Belle2::Const::ChargedStable;
 #pragma link C++ class Belle2::Const::ParticleType;
+#pragma link C++ class Belle2::Const::ParticleSet;
 
 #endif

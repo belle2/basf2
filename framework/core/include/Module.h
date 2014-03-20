@@ -79,10 +79,10 @@ namespace Belle2 {
       c_Output                      = 2,  /**< This module is an output module (writes data). */
       c_ParallelProcessingCertified = 4,  /**< This module can be run in parallel processing mode safely (All I/O must be done through the data store, in particular, the module must not write any files.) */
       c_HistogramManager            = 8, /**< This module is used to manage histograms accumulated by other modules */
-      c_InitializeInProcess         = 16, /**< Obsolete, has no effect. */
-      c_InitializeInMain            = 32,  /**< Obsolete, has no effect. */
-      c_InternalSerializer          = 64  /**< This module is an internal serializer/deserializer for parallel processing */
+      c_InternalSerializer          = 16,  /**< This module is an internal serializer/deserializer for parallel processing */
     };
+    const static int c_InitializeInProcess __attribute__((deprecated))  = 0;  /**< Obsolete, has no effect. */
+    const static int c_InitializeInMain      __attribute__((deprecated))       = 0;  /**< Obsolete, has no effect. */
 
     /** Different options for behaviour _after_ a conditional path was executed. */
     enum class EAfterConditionPath {

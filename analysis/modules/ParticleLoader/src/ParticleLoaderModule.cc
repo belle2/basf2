@@ -169,7 +169,9 @@ namespace Belle2 {
       Particle particle(gamma);
       if (particle.getParticleType() == Particle::c_ECLShower) { // should always hold but...
         Particle* newPart = Particles.appendNew(particle);
-        newPart->addRelationTo(mcParticle);
+        if (mcParticle) {
+          newPart->addRelationTo(mcParticle);
+        }
         int lastIndex = Particles.getEntries() - 1;
         int showerId = gamma->getShowerId();
         gammaShowerId.push_back(make_pair(lastIndex, showerId));

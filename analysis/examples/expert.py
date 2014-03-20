@@ -1,18 +1,22 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+# Meant to be run after analysis/examples/teacher.py, attaches expert
+# output to each Particle (as extra info), produces some plots in files
+# $Method_hist.root
+
 import sys
 import os
 from basf2 import *
 
-if not os.path.isfile('/storage/6/cpulvermacher/mdst_large.root'):
-    sys.exit('output.root file does not exist.')
+if not os.path.isfile('YourMDSTFile.root'):
+    B2WARNING('This example requires an MDST file as input. You might need to change the \'inputFileName\' parameter in the steering file, or run basf2 with arguments -i MyFile.root')
 
 # Create main path
 main = create_path()
 
 input = register_module('RootInput')
-input.param('inputFileName', '/storage/6/cpulvermacher/mdst_large.root')
+input.param('inputFileName', 'YourMDSTFile.root')
 main.add_module(input)
 
 particleloader = register_module('ParticleLoader')
@@ -37,8 +41,7 @@ for method in methods:
     histMaker.param('file', method + '_hist.root')
     mass = 511e-6
     histMaker.param('histVariables', [(method + '_Probability', 100, 0, 1),
-                    ('p_CMS', 100, 0, 1), ('eid', 100, 0, 1), ('chiProb', 100,
-                    0, 1)])
+                    ('p_CMS', 100, 0, 1), ('eid', 100, 0, 1), ('chiProb', 100, 0, 1)])
     histMaker.param('truthVariable', 'isSignal')
     histMaker.param('listNames', ['e-'])
     histMaker.param('make2dHists', True)

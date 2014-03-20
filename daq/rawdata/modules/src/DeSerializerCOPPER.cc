@@ -262,7 +262,8 @@ void DeSerializerCOPPERModule::fillNewRawCOPPERHeader(RawCOPPER* raw_copper)
   if ((m_prev_ftsweve32 + 1 != cur_ftsw_eve32) && (m_prev_ftsweve32 != 0xFFFFFFFF)) {
 #else
   if (m_prev_ftsweve32 + 1 != cur_ftsw_eve32) {
-#endif
+#endif // WO_FIRST_EVENUM_CHECK
+
     char err_buf[500];
     sprintf(err_buf, "CORRUPTED DATA: Invalid event_number. Exiting...: cur 32bit eve %x preveve %x\n",  cur_ftsw_eve32, m_prev_ftsweve32);
     print_err.PrintError(m_shmflag, &m_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
@@ -270,11 +271,13 @@ void DeSerializerCOPPERModule::fillNewRawCOPPERHeader(RawCOPPER* raw_copper)
     printf("[DEBUG] i= %d : num entries %d : Tot words %d\n", 0 , raw_copper->GetNumEntries(), raw_copper->TotalBufNwords());
     printData(raw_copper->GetBuffer(0), raw_copper->TotalBufNwords());
     exit(-1);
-  }
-#endif
-  m_prev_ftsweve32 = cur_ftsw_eve32;
 
+  }
+#endif // NO_DATA_CHECK
+
+  m_prev_ftsweve32 = cur_ftsw_eve32;
   // Check magic words are set at proper positions
+
 #ifdef debug
   printf("[DEBUG] 3: i= %d : num entries %d : Tot words %d\n", 0 , raw_copper->GetNumEntries(), raw_copper->TotalBufNwords());
   printData(raw_copper->GetBuffer(0), raw_copper->TotalBufNwords());
@@ -283,7 +286,7 @@ void DeSerializerCOPPERModule::fillNewRawCOPPERHeader(RawCOPPER* raw_copper)
   return;
 }
 
-#endif
+#endif // REDUCED_RAWCOPPER
 
 
 int* DeSerializerCOPPERModule::readOneEventFromCOPPERFIFO(const int entry, int* malloc_flag, int* m_size_word)
@@ -302,7 +305,6 @@ int* DeSerializerCOPPERModule::readOneEventFromCOPPERFIFO(const int entry, int* 
 #ifndef REDUCED_RAWCOPPER
   int recvd_byte = RawHeader::RAWHEADER_NWORDS * sizeof(int);
 #else
-
   int recvd_byte = ReducedRawHeader::RAWHEADER_NWORDS * sizeof(int);
 #endif
 
@@ -327,12 +329,16 @@ int* DeSerializerCOPPERModule::readOneEventFromCOPPERFIFO(const int entry, int* 
         }
 #ifdef NONSTOP
 #ifdef NONSTOP_DEBUG
+        printf("\033[34m");
         printf("###########(DesCpr) Return from read with EAGAIN  ###############\n");
         fflush(stdout);
+        printf("\033[0m");
 #endif
         if (checkRunStop()) {
 #ifdef NONSTOP_DEBUG
+          printf("\033[31m");
           printf("###########(DesCpr) Stop is detected after return with EAGAIN  ###############\n");
+          printf("\033[0m");
           fflush(stdout);
 #endif
           string err_str = "EAGAIN";
@@ -580,7 +586,9 @@ void DeSerializerCOPPERModule::restartRun()
 {
 
 #ifdef NONSTOP_DEBUG
+  printf("\033[31m");
   printf("###########(DesCpr) Restart from PAUSE  ###############\n");
+  printf("\033[0m");
   fflush(stdout);
 #endif
   initializeCOPPER();
@@ -602,7 +610,9 @@ void DeSerializerCOPPERModule::waitRestart()
       break;
     }
 #ifdef NONSTOP_DEBUG
+    printf("\033[31m");
     printf("###########(DesCpr) Waiting for RESTART  ###############\n");
+    printf("\033[0m");
     fflush(stdout);
 #endif
     sleep(1);
@@ -636,7 +646,6 @@ void DeSerializerCOPPERModule::event()
     //
     // for DESY test
     //
-    printf("Bef DeSerCOPPER ################## NODEID %d\n", m_nodeid);
     m_nodeid = SVD_ID | m_nodeid  ;
     m_start_time = getTimeSec();
     n_basf2evt = 0;
@@ -694,7 +703,6 @@ void DeSerializerCOPPERModule::event()
 
     // Fill header and trailer
     try {
-      printf("DeSerCOPPER ################## NODEID %d\n", m_nodeid);
       m_prev_ftsweve32 = temp_rawcopper.FillTopBlockRawHeader(m_nodeid, m_data_type, m_trunc_mask,
                                                               m_prev_ftsweve32, m_prev_runsubrun_no, &m_runsubrun_no);
       m_prev_runsubrun_no = m_runsubrun_no;
@@ -731,7 +739,8 @@ void DeSerializerCOPPERModule::event()
   //
   // Print current status
   //
-  if (n_basf2evt % 100 == 0 || n_basf2evt < 10) {
+  //  if (n_basf2evt % 100 == 0 || n_basf2evt < 10) {
+  if (n_basf2evt % 100 == 0) {
     RateMonitor(m_prev_ftsweve32);
   }
 

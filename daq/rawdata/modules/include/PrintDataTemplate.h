@@ -26,6 +26,7 @@
 
 #include <daq/rawdata/modules/DAQConsts.h>
 
+
 #include <rawdata/dataobjects/RawDataBlock.h>
 #include <rawdata/dataobjects/RawFTSW.h>
 #include <rawdata/dataobjects/RawCOPPER.h>
@@ -36,6 +37,11 @@
 #include <rawdata/dataobjects/RawECL.h>
 #include <rawdata/dataobjects/RawKLM.h>
 #include <rawdata/dataobjects/RawPXD.h>
+
+#ifndef REDUCED_COPPER
+#else
+#include <daq/dataobjects/ReducedRawCOPPER.h>
+#endif
 
 #include <daq/dataobjects/SendHeader.h>
 #include <daq/dataobjects/SendTrailer.h>
@@ -74,6 +80,11 @@ namespace Belle2 {
     virtual void printFTSWEvent(RawDataBlock* raw_array, int i);
     virtual void printBuffer(int* buf, int nwords);
     virtual void printPXDEvent(RawPXD* raw_pxd);
+
+#ifndef REDUCED_COPPER
+#else
+    void printReducedCOPPEREvent(ReducedRawCOPPER* reduced_raw_copper, int i);
+#endif
 
   protected :
     //!Compression parameter

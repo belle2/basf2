@@ -23,7 +23,7 @@
 
 #include <daq/dataflow/EvtSocket.h>
 
-//#define REDUCED_RAWCOPPER
+#define REDUCED_RAWCOPPER
 #ifndef REDUCED_RAWCOPPER
 #include <rawdata/dataobjects/RawCOPPER.h>
 #include <rawdata/dataobjects/RawCDC.h>
@@ -41,7 +41,6 @@
 #include <rawdata/dataobjects/RawTLU.h>
 
 //#include <rawdata/RawROPC.h>
-#include <daq/rawdata/modules/DAQConsts.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <daq/rawdata/modules/DeSerializer.h>
 
@@ -88,6 +87,12 @@ namespace Belle2 {
 
     //! check data contents
     virtual int* checkData(RawDataBlock* raw_datablk, unsigned int* eve_copper_0);
+
+#ifdef REDUCED_COPPER
+    //! check data contents
+    virtual void reduceData(RawDataBlock* raw_datablk, const int malloc_flag_from,
+                            int* malloc_flag_to);
+#endif
 
     //! # of connections
     int m_num_connections;

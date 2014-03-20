@@ -30,7 +30,6 @@
 #include <daq/dataobjects/SendTrailer.h>
 #include <rawdata/dataobjects/RawDataBlock.h>
 
-//#define REDUCED_COPPER
 #ifndef REDUCED_COPPER
 #include <rawdata/dataobjects/RawHeader.h>
 #else
@@ -53,7 +52,6 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
-//#define NONSTOP
 
 namespace Belle2 {
 

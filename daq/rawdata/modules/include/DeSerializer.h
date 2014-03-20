@@ -26,6 +26,7 @@
 #include <daq/dataflow/EvtSocket.h>
 #include <daq/slc/readout/RunInfoBuffer.h>
 #include <daq/rawdata/CprErrorMessage.h>
+#include <daq/rawdata/modules/DAQConsts.h>
 
 #include <rawdata/dataobjects/RawDataBlock.h>
 //#include <rawdata/dataobjects/RawCOPPER.h>
@@ -40,8 +41,6 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
-//#define NONSTOP
-#define NONSTOP_DEBUG
 
 namespace Belle2 {
 

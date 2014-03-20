@@ -15,7 +15,7 @@
 #define CHECKEVT 5000
 
 //#define DEBUG
-//#define NO_DATA_CHECK
+#define NO_DATA_CHECK
 //#define DUMHSLB
 
 using namespace std;
@@ -337,10 +337,10 @@ int* DeSerializerPCModule::recvData(int* malloc_flag, int* total_buf_nwords, int
 }
 
 
-void DeSerializerPCModule::setRecvdBuffer(RawDataBlock* raw_datablk, int* malloc_flag)
+void DeSerializerPCModule::setRecvdBuffer(RawDataBlock* temp_raw_datablk, int* malloc_flag)
 {
   //
-  // Get a record from socket
+  // Get data from socket
   //
   int total_buf_nwords = 0 ;
   int num_events_in_sendblock = 0;
@@ -356,13 +356,13 @@ void DeSerializerPCModule::setRecvdBuffer(RawDataBlock* raw_datablk, int* malloc
   m_totbytes += total_buf_nwords * sizeof(int);
 
   int temp_malloc_flag = 0;
-  raw_datablk->SetBuffer((int*)temp_buf, total_buf_nwords, temp_malloc_flag,
-                         num_events_in_sendblock, num_nodes_in_sendblock);
+  temp_raw_datablk->SetBuffer((int*)temp_buf, total_buf_nwords, temp_malloc_flag,
+                              num_events_in_sendblock, num_nodes_in_sendblock);
 
   //
   // check even # and node # in one Sendblock
   //
-  int num_entries = raw_datablk->GetNumEntries();
+  int num_entries = temp_raw_datablk->GetNumEntries();
   if (num_entries != num_events_in_sendblock * num_nodes_in_sendblock) {
     char err_buf[500];
     sprintf(err_buf, "CORRUPTED DATA: Inconsistent SendHeader value. # of nodes(%d) times # of events(%d) differs from # of entries(%d). Exiting...",
@@ -375,6 +375,70 @@ void DeSerializerPCModule::setRecvdBuffer(RawDataBlock* raw_datablk, int* malloc
 
 }
 
+#ifdef REDUCED_RAWCOPPER
+void DeSerializerPCModule::reduceData(RawDataBlock* raw_datablk,
+                                      int malloc_flag_from, int* malloc_flag_to)
+{
+  int* buf_from = raw_datablk->GetWholeBuffer();
+
+  //
+  // Calculate reduced length
+  //
+  int reduced_nwords = 0;
+  for (int k = 0; k < raw_datablk->GetNumEvents(); k++) {
+    int num_nodes_in_sendblock = raw_datablk->GetNumNodes();
+    for (int l = 0; l < num_nodes_in_sendblock; l++) {
+      int entry_id = l + k * num_nodes_in_sendblock;
+      if (raw_datablk->CheckFTSWID(entry_id) ||
+          raw_datablk->CheckTLUID(entry_id)) {
+        reduced_nwords += raw_datablk->GetBlockNwords(entry_id);
+      } else {
+        PreRawCOPPER temp_prerawcpr;
+        ReducedRawCOPPER temp_redrawcpr;
+        int temp_malloc_flag = 0, temp_num_eve = 1, temp_num_nodes = 1;
+        temp_prerawcpr.SetBuffer(raw_datablk->GetBuffer(entry_id),
+                                 raw_datablk->GetBlockNwords(entry_id),
+                                 temp_malloc_flag, temp_num_eve,
+                                 temp_num_nodes);
+        reduced_nwords += temp_prerawcpr.CalcReducedNwords(0);
+      }
+    }
+  }
+
+  //
+  // allocate buffer
+  //
+  int* buf_to = getBuffer(reduced_nwords, malloc_flag_to);
+
+
+  //
+  // Reduce the buffer length
+  //
+  int pos_nwords_from = 0, pos_nwords_to = 0;
+  for (int k = 0; k < raw_datablk->GetNumEvents(); k++) {
+    int num_nodes_in_sendblock = raw_datablk->GetNumNodes();
+    for (int l = 0; l < num_nodes_in_sendblock; l++) {
+      int entry_id = l + k * num_nodes_in_sendblock;
+      if (raw_datablk->CheckFTSWID(entry_id) ||
+          raw_datablk->CheckTLUID(entry_id)) {
+        raw_datablk->CopyBlock(entry_id, buf_to + pos_nwords_to);
+        pos_nwords_to += raw_datablk->GetBlockNwords(entry_id);
+
+      } else {
+        PreRawCOPPER temp_prerawcpr;
+        temp_prerawcpr.SetBuffer(raw_datablk->GetWholeBuffer(),
+                                 raw_datablk->TotalBufNwords(), 0, 1, 1);
+        pos_nwords_to += temp_prerawcpr.CopyReducedBuffer(0, buf_to + pos_nwords_to);
+      }
+    }
+  }
+  if (malloc_flag_from == 1) { delete buf_from;}
+
+
+  return ;
+
+}
+#endif // REDUCED_RAWCOPPER
 
 int* DeSerializerPCModule::checkData(RawDataBlock* raw_datablk, unsigned int* eve_copper_0)
 {
@@ -592,19 +656,24 @@ void DeSerializerPCModule::event()
   //
   for (int j = 0; j < NUM_EVT_PER_BASF2LOOP_PC; j++) {
     eve_copper_0 = 0;
-
     //
     // Set buffer to the RawData class stored in DataStore
     //
-    int malloc_flag = 0;
+    int malloc_flag_from = 0, malloc_flag_to = 0;
     RawDataBlock temp_rawdatablk;
-    setRecvdBuffer(&temp_rawdatablk, &malloc_flag);
+    setRecvdBuffer(&temp_rawdatablk, &malloc_flag_from);
     int* store_buf = checkData(&temp_rawdatablk, &eve_copper_0);
+#ifdef REDUCED_COPPER
+    reduceData(&temp_rawdatablk, malloc_flag_from, &malloc_flag_to);
+#else
+    malloc_flag_to = malloc_flag_from;
+#endif
 
     RawDataBlock* raw_datablk = raw_datablkarray.appendNew();
-    raw_datablk->SetBuffer((int*)store_buf, temp_rawdatablk.TotalBufNwords(),
-                           malloc_flag, temp_rawdatablk.GetNumEvents(),
+    raw_datablk->SetBuffer((int*)temp_rawdatablk.GetWholeBuffer(), temp_rawdatablk.TotalBufNwords(),
+                           malloc_flag_to, temp_rawdatablk.GetNumEvents(),
                            temp_rawdatablk.GetNumNodes());
+
   }
 
 

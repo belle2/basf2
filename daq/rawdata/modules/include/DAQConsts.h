@@ -9,11 +9,16 @@
 #ifndef DAQCONSTS_H
 #define DAQCONSTS_H
 
+#define REDUCED_COPPER
+//#define NONSTOP
+//#define NONSTOP_DEBUG
+
 
 //#define RAWDATASIZE 1
 /* #define WORD_SENDHEADER 1 */
 /* #define WORD_SENDTRAILER 1 */
 /* #define WORD_RAWCPRHEADER 16 */
+
 
 #define BASE_PORT_ROPC_COPPER 33000
 #define NUM_EVT_PER_BASF2LOOP_COPPER 50

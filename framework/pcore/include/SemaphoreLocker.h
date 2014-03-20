@@ -22,7 +22,10 @@ namespace Belle2 {
     /** Destroy the given semaphore. */
     static void destroy(int semId);
 
-    /** Lock the semaphore. */
+    /** Lock the semaphore.
+     *
+     * If the semaphore is locked, this function will block until it can acquire a lock.
+     */
     void lock();
     /** Unlock the semaphore. */
     void unlock();

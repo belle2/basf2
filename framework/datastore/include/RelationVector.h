@@ -23,6 +23,16 @@ namespace Belle2 {
    *  This class is supposed to be used by the RelationsInterface to provide
    *  type safe access to the objects in a vector of relations returned by
    *  the data store.
+   *
+   * Besides accessing objects/weights directly using operator[](int) and weight(int),
+   * you can also iterate over the objects directly:
+      \code
+      const MCParticle* particle = particles[i];
+      for (const CDCSimHit& simhit :  particle->getRelationsTo<CDCSimHit>()) {
+        //do things with simhit
+      }
+      \endcode
+   * If you want to modify the related objects, you can use a non-const reference instead.
    */
   template <class T> class RelationVector {
   public:

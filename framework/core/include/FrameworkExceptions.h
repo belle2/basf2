@@ -1,3 +1,4 @@
+#pragma once
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2010 - Belle II Collaboration                             *
@@ -8,8 +9,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef FRAMEWORKEXCEPTIONS_H_
-#define FRAMEWORKEXCEPTIONS_H_
 
 //(ifndef required for the rootcint dictionary building)
 #ifndef __CINT__
@@ -18,7 +17,24 @@
 
 namespace Belle2 {
 
-  /** Macro that defines an exception with the given message template. */
+  /** Macro that defines an exception with the given message template.
+   *
+   *  Use the macro inside your class (header file) and specify a class name for your
+   *  exception, plus a format string that contains a description of what went wrong:
+      \code
+      BELLE2_DEFINE_EXCEPTION(ModuleNotCreatedError, "Could not create module: %1%")
+      \endcode
+   *
+   * When throwing, simply create an instance of this class, use operator<< to fill
+   * any placeholders (%n%) specified, and pass this to the throw keyword:
+      \code
+      throw (ModuleNotCreatedError() << moduleName);
+      \endcode
+   *
+   * Exceptions defined using this macro inherit from std::runtime_error, and can be queried
+   * using their what() member.
+   */
+
 #define BELLE2_DEFINE_EXCEPTION(ClassName, Message) \
   class ClassName : public std::runtime_error { \
   public: \
@@ -40,6 +56,3 @@ namespace Belle2 {
 /** Macro that defines an exception with the given message template. */
 #define BELLE2_DEFINE_EXCEPTION(ClassName, Message)
 #endif
-
-
-#endif /* FRAMEWORKEXCEPTIONS_H_ */

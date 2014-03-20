@@ -30,7 +30,7 @@ namespace Belle2 {
   public:
 
     //! Default constructor
-    ARICHSimHit():
+    ARICHSimHit(): SimHitBase(),
       m_moduleID(0),
       m_position(0, 0, 0),
       m_globalTime(0),
@@ -53,13 +53,12 @@ namespace Belle2 {
       TVector3 position,
       double globalTime,
       double energy,
-      int parentID):
-      m_moduleID(moduleID),
-      m_position(position),
-      m_globalTime(globalTime),
-      m_energy(energy),
-      m_parentID(parentID) {
-      /* Does nothing */
+      int parentID): SimHitBase() {
+      m_moduleID = moduleID;
+      m_position = position;
+      m_globalTime = globalTime;
+      m_energy = energy;
+      m_parentID = parentID;
     }
 
     //! Get ID number of module that registered hit
@@ -91,6 +90,12 @@ namespace Belle2 {
 
     //! Get G4 ID number of photons parent particle
     void setParentID(int parentID) { m_parentID = parentID; }
+
+    /** Shift the SimHit in time (needed for beam background mixing)
+     *  @param delta The value of the time shift.
+     */
+    void shiftInTime(float delta) { m_globalTime += delta;}
+
 
   private:
     int m_moduleID;           /**< ID number of module that registered hit*/

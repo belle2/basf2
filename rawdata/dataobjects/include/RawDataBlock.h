@@ -64,6 +64,9 @@ namespace Belle2 {
     //! get FTSW ID to check whether this data block is FTSW data or not
     virtual int CheckTLUID(int n);
 
+    //! Copy one datablock to buffer
+    virtual void CopyBlock(int n, int* buf_to);
+
     //! print data
     virtual void PrintData(int* buf, int nwords);
 

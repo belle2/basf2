@@ -167,3 +167,8 @@ void RawDataBlock::PrintData(int* buf, int nwords)
   return;
 }
 
+void RawDataBlock::CopyBlock(int n, int* buf_to)
+{
+  memcpy(buf_to, GetBuffer(n), GetBlockNwords(n) * sizeof(int));
+  return;
+}

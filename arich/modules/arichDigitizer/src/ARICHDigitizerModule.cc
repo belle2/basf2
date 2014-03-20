@@ -60,6 +60,8 @@ namespace Belle2 {
       // Add parameters
       addParam("InputColName", m_inColName, "ARICHSimHits collection name", string("ARICHSimHitArray"));
       addParam("OutputColName", m_outColName, "ARICHDigit collection name", string("ARICHDigitArray"));
+      addParam("TimeWindow", m_timeWindow, "Readout time window width in ns", 250.0);
+
     }
 
     ARICHDigitizerModule::~ARICHDigitizerModule()
@@ -105,16 +107,22 @@ namespace Belle2 {
       //-----------------------------------------------------
       StoreArray<ARICHDigit> arichDigits;
       if (!arichDigits.isValid()) arichDigits.create();
+
       //---------------------------------------------------------------------
       // Convert SimHits one by one to digitizer hits.
       //---------------------------------------------------------------------
-
 
       // Get number of hits in this event
       int nHits = arichSimHits.getEntries();
       // Loop over all hits
       for (int iHit = 0; iHit < nHits; ++iHit) {
+
         ARICHSimHit* aSimHit = arichSimHits[iHit];
+
+        // check for time window
+        double globaltime = aSimHit->getGlobalTime();
+
+        if (globaltime < 0 || globaltime > m_timeWindow) continue;
 
         TVector2 locpos(aSimHit->getLocalPosition().X(), aSimHit->getLocalPosition().Y());
 
@@ -129,7 +137,6 @@ namespace Belle2 {
         if (qe_scale > 1) B2ERROR("Channel QE is higher than QE  applied in SensitiveDetector");
         if (gRandom->Uniform(1) > qe_scale) continue;
 
-        double globaltime = aSimHit->getGlobalTime();
 
         // Check if channel already registered hit in this event (no multiple hits)
         bool newhit = true;

@@ -85,6 +85,7 @@ namespace Belle2 {
       int    m_nRun;                   /**< Run number.   */
       int    m_nEvent;                 /**< Event number. */
       double m_maxQE;                  /**< QE at 400nm (from QE curve applied in SensitveDetector) */
+      double m_timeWindow;             /**< Readout time window width */
 
       ARICHGeometryPar* m_arichgp;    /**< Geometry parameters of ARICH. */
 

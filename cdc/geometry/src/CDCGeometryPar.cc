@@ -444,6 +444,17 @@ void CDCGeometryPar::readXT(const GearDir gbxParams, const int mode)
     }
   }
 
+  //set xt(theta=130) = xt(theta=120) for the layers >= 37, since xt(theta=130) for these layers are unavailable
+  for (unsigned iL = 37; iL < MAX_N_SLAYERS; ++iL) {
+    for (int lr = 0; lr < 2; ++lr) {
+      for (unsigned ialpha = 0; ialpha < nalpha; ++ialpha) {
+        for (int i = 0; i < np; ++i) {
+          m_XT[iL][lr][ialpha][5][i] = m_XT[iL][lr][ialpha][4][i];
+        }
+      }
+    }
+  }
+
   //set xt(theta=149) = xt(theta=130) for the layers >= 13, since xt(theta=149) for these layers are unavailable
   for (unsigned iL = 13; iL < MAX_N_SLAYERS; ++iL) {
     for (int lr = 0; lr < 2; ++lr) {
@@ -912,7 +923,8 @@ double CDCGeometryPar::getDriftLength(const double time, const unsigned short iC
 
   if (lr == 1) dist *= -1.;
   //  std::cout <<"dist= " << dist << std::endl;
-  return std::max(0., dist);
+  //tentative  return std::max(0., dist);
+  return fabs(dist);
 
 }
 

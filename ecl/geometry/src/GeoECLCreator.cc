@@ -1005,7 +1005,7 @@ namespace Belle2 {
 
       makeEndcap(0);
       makeEndcap(1);
-      makeSupport();
+      // makeSupport(); // for 2014 Mar. MC production. K. Miya.
 
 
     }//create

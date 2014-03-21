@@ -101,7 +101,7 @@ namespace Belle2 {
     if (!components.empty()) {
       std::string str;
       for (unsigned i = 0; i < components.size(); ++i) str = str + " " + components[i];
-      B2ERROR("Unknown components:" << str);
+      B2WARNING("Unknown components:" << str);
     }
 
     // open files

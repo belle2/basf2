@@ -98,6 +98,21 @@ namespace Belle2 {
     bool ECL = isComponentIncluded(components, "ECL");
     bool BKLM = isComponentIncluded(components, "BKLM");
     bool EKLM = isComponentIncluded(components, "EKLM");
+
+    // ignore these ones
+    isComponentIncluded(components, "MagneticField2d");
+    isComponentIncluded(components, "MagneticField3d");
+    isComponentIncluded(components, "MagneticField");
+    isComponentIncluded(components, "MagneticFieldConstant4LimitedRCDC");
+    isComponentIncluded(components, "MagneticFieldConstant4LimitedRSVD");
+    isComponentIncluded(components, "BeamPipe");
+    isComponentIncluded(components, "Cryostat");
+    isComponentIncluded(components, "FarBeamLine");
+    isComponentIncluded(components, "HeavyMetalShield");
+    isComponentIncluded(components, "COIL");
+    isComponentIncluded(components, "STR");
+    isComponentIncluded(components, "VXDService");
+
     if (!components.empty()) {
       std::string str;
       for (unsigned i = 0; i < components.size(); ++i) str = str + " " + components[i];

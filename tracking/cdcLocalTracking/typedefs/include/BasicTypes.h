@@ -81,9 +81,28 @@ namespace Belle2 {
     ///The type of the layer and superlayer ids
     typedef signed short ILayerType;
 
+    ///The type of the layer and superlayer ids
+    typedef ILayerType ISuperLayerType;
 
-    //typedef signed char ILayerType;    // This can be used for performance maximization but makes lousy output
-    const ILayerType INVALID_ISUPERLAYER = 15; ///< Constant making an invalid superlayer id
+    const ISuperLayerType NSUPERLAYERS = 9; ///< Constant representing the total number of cdc superlayers
+    const ISuperLayerType INNER_ISUPERLAYER = -1; ///< Constant marking the subdetectors closer to the IP than the CDC.
+    const ISuperLayerType OUTER_ISUPERLAYER = NSUPERLAYERS; ///< Constant marking the subdetectors further away from the IP than the CDC.
+    const ISuperLayerType INVALID_ISUPERLAYER = 15; ///< Constant making an invalid superlayer id
+
+    /// Indicates if the given number corresponds to a true cdc superlayer - excludes the logic ids for inner and outer volumn
+    bool isValidISuperLayer(const ISuperLayerType& iSuperLayer);
+
+    /// Indicates if the given number corresponds to a logical superlayer - includes the logic ids for inner and outer volumn
+    bool isLogicISuperLayer(const ISuperLayerType& iSuperLayer);
+
+    /// Returns the logical superlayer number at the given radius
+    ISuperLayerType getISuperLayerAtPolarR(const FloatType& polarR);
+
+    /// Returns the logical superlayer number at the given radius
+    ISuperLayerType isAxialISuperLayer(const ISuperLayerType& iSuperLayer);
+
+
+
     const ILayerType INVALID_ILAYER = 127; ///< Constant making an invalid layer id
     const IWireType INVALID_IWIRE = 32767; ///< Constant making an invalid wire id
 

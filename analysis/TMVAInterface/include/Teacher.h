@@ -35,10 +35,11 @@ namespace Belle2 {
     public:
       /**
        * @param identifier which used to identify the outputted training files weights/$identifier_$method.class.C and weights/$identifier_$method.weights.xml
+       * @param workingDirectory where the config file and weight file directory is stored
        * @param target the name of the target variable (registered in VariableManager), which is used as expected output for the chosen TMVA method
        * @param methods vector of Method
        */
-      Teacher(std::string identifier, std::string target, std::vector<Method> methods);
+      Teacher(std::string identifier, std::string workingDirectory, std::string target, std::vector<Method> methods);
 
       /**
        * Disallow copy
@@ -68,16 +69,17 @@ namespace Belle2 {
        */
       void train(std::string factoryOption = "!V:!Silent:Color:DrawProgressBar:AnalysisType=Classification", std::string prepareOption = "SplitMode=random:!V");
 
+
     private:
       std::string m_identifier; /**< used to identify the outputted training files weights/$identifier_$method.class.C and weights/$identifier_$method.weights.xml */
+      std::string m_workingDirectory; /**< workingDirectory where the config file and weight file directory is stored */
       std::vector<Method> m_methods; /**< Name, Type and Config of methods */
 
-      TTree* m_signal_tree; /**< holds training and test signal samples */
-      TTree* m_bckgrd_tree; /**< holds training and test background samples */
-
-      std::vector<float> m_input; /**< Storage for input variables */
+      TTree* m_tree; /**< holds training and test signal samples */
       const VariableManager::Var* m_target_var; /** Variable Pointer to target variable */
-      float m_target; /**< Storage for the target variable */
+      int m_target; /**< Storage for the target variable */
+      std::vector<float> m_input; /**< Storage for input variables */
+      std::map<int, unsigned int> m_cluster_count; /**< Number of events foreach identified cluster */
     };
 
   }

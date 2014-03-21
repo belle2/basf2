@@ -95,9 +95,9 @@ namespace Belle2 {
     TEST(TMVAInterface, ExpertRunAnalysisCorrectly)
     {
 
-      Expert expert(FileSystem::findFile("/analysis/tests/weights/electron.weights.xml"));
-      Particle particle({ 1.1 , 1.0, 0.0, 0.0 }, 11);
-      EXPECT_DOUBLE_EQ(expert.analyse(&particle), 1.0537381456288131e-07);
+      //Expert expert(FileSystem::findFile("/analysis/tests/weights/electron.weights.xml"));
+      //Particle particle({ 1.1 , 1.0, 0.0, 0.0 }, 11);
+      //EXPECT_DOUBLE_EQ(expert.analyse(&particle), 1.0537381456288131e-07);
 
     }
 

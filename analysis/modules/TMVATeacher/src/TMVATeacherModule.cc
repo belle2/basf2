@@ -23,17 +23,15 @@ namespace Belle2 {
   TMVATeacherModule::TMVATeacherModule() : Module()
   {
     setDescription("Trains multivariate analysis method with given particle lists as training samples. See https://belle2.cc.kek.jp/~twiki/bin/view/Software/TMVA for detailed instructions.");
-    // This module isn't cabable of parallel processing due to the use of TMVA
     //setPropertyFlags(c_ParallelProcessingCertified);
 
-    // Add parameters
-    std::vector<std::string> defaultList;
-    addParam("listNames", m_listNames, "Input particle list names as list", defaultList);
+    addParam("listNames", m_listNames, "Input particle list names as list");
     addParam("methods", m_methods, "Vector of Tuples with (Name, Type, Config) of the methods. Valid types are: BDT, KNN, NeuroBayes, Fisher. The Config is passed to the TMVA Method and is documented in the TMVA UserGuide.");
-    addParam("identifier", m_identifier, "Identifier which is used by the TMVA method to write the files weights/$identifier_$method.class.C and weights/$identifier_$method.weights.xml with additional information");
-    addParam("variables", m_variables, "Input variables used by the TMVA method", defaultList);
+    addParam("identifier", m_identifier, "Identifier which is used by the TMVAInterface to store its configfile $identifier.config and by TMVA itself to write the files weights/$identifier_$method.class.C and weights/$identifier_$method.weights.xml with additional information", std::string("TMVA"));
+    addParam("workingDirectory", m_workingDirectory, "Working directory in which the config file and the weight file directory is created", std::string("."));
+    addParam("variables", m_variables, "Input variables used by the TMVA method");
     addParam("target", m_target, "Target used by the method");
-    addParam("factoryOption", m_factoryOption, "Option passed to TMVA::Factory", std::string("!V:!Silent:Color:DrawProgressBar:Transformations=I;D;P;G,D:AnalysisType=Classification"));
+    addParam("factoryOption", m_factoryOption, "Option passed to TMVA::Factory", std::string("!V:!Silent:Color:DrawProgressBar:AnalysisType=Classification"));
     addParam("prepareOption", m_prepareOption, "Option passed to TMVA::Factory::PrepareTrainingAndTestTree", std::string("SplitMode=random:!V"));
 
     m_teacher = nullptr;
@@ -57,7 +55,7 @@ namespace Belle2 {
     for (auto & x : m_methods) {
       methods.push_back(TMVAInterface::Method(std::get<0>(x), std::get<1>(x), std::get<2>(x), m_variables));
     }
-    m_teacher = new TMVAInterface::Teacher(m_identifier, m_target, methods);
+    m_teacher = new TMVAInterface::Teacher(m_identifier, m_workingDirectory, m_target, methods);
   }
 
   void TMVATeacherModule::endRun()

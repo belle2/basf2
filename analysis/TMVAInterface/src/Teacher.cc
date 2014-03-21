@@ -18,12 +18,18 @@
 #include <TTree.h>
 #include <TString.h>
 #include <TROOT.h>
+#include <TSystem.h>
+
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/xml_parser.hpp>
+
+#include <sstream>
 
 namespace Belle2 {
 
   namespace TMVAInterface {
 
-    Teacher::Teacher(std::string identifier, std::string target, std::vector<Method> methods) : m_identifier(identifier), m_methods(methods)
+    Teacher::Teacher(std::string identifier, std::string workingDirectory, std::string target, std::vector<Method> methods) : m_identifier(identifier), m_workingDirectory(workingDirectory), m_methods(methods)
     {
 
       const auto& variables = m_methods[0].getVariables();
@@ -37,68 +43,119 @@ namespace Belle2 {
       }
       m_target = 0;
 
-      m_signal_tree = new TTree((m_identifier + "_signal_tree").c_str(), (m_identifier + "_signal_tree").c_str());
-      m_bckgrd_tree = new TTree((m_identifier + "_bckgrd_tree").c_str(), (m_identifier + "_bckgrd_tree").c_str());
-
-      for (unsigned int i = 0; i < variables.size(); ++i) {
-        m_signal_tree->Branch(variables[i]->name.c_str(), &m_input[i], "F");
-        m_bckgrd_tree->Branch(variables[i]->name.c_str(), &m_input[i], "F");
-      }
-      m_signal_tree->Branch(m_target_var->name.c_str(), &m_target, "F");
-      m_bckgrd_tree->Branch(m_target_var->name.c_str(), &m_target, "F");
+      // Create new tree which stores the niput and target variable
+      m_tree = new TTree((m_identifier + "_tree").c_str(), (m_identifier + "_tree").c_str());
+      for (unsigned int i = 0; i < variables.size(); ++i)
+        m_tree->Branch(variables[i]->name.c_str(), &m_input[i]);
+      m_tree->Branch(m_target_var->name.c_str(), &m_target);
 
     }
 
     Teacher::~Teacher()
     {
-      delete m_signal_tree;
-      delete m_bckgrd_tree;
+      delete m_tree;
     }
 
     void Teacher::addSample(const Particle* particle)
     {
-
+      // Fill the tree with the input variables
       const auto& variables = m_methods[0].getVariables();
       for (unsigned int i = 0; i < variables.size(); ++i) {
         m_input[i] = variables[i]->function(particle);
       }
-      m_target = m_target_var->function(particle);
 
-      if (m_target > 0.5) {
-        m_signal_tree->Fill();
-      } else {
-        m_bckgrd_tree->Fill();
-      }
+      // The target variable is converted to an integer
+      m_target = int(m_target_var->function(particle) + 0.5);
+      m_tree->Fill();
+
+      // Now check if the target id was encountered before,
+      // and update the cluster count accordingly
+      auto it = m_cluster_count.find(m_target);
+      if (it == m_cluster_count.end())
+        m_cluster_count[m_target] = 1;
+      else
+        it->second++;
     }
 
     void Teacher::train(std::string factoryOption, std::string prepareOption)
     {
 
-      TFile* file = TFile::Open((m_identifier + ".root").c_str(), "RECREATE");
-      {
-        // Intitialize TMVA and ROOT stuff
-        TMVA::Tools::Instance();
-        TMVA::Factory factory(m_identifier, file, factoryOption);
+      // Change the workling directory to the user defined working directory
+      std::string oldDirectory = gSystem->WorkingDirectory();
+      gSystem->ChangeDirectory(m_workingDirectory.c_str());
 
-        // Add variables to the factory
-        for (auto & var : m_methods[0].getVariables()) {
-          factory.AddVariable(var->name);
-        }
-
-        factory.AddSignalTree(m_signal_tree);
-        factory.AddBackgroundTree(m_bckgrd_tree);
-        factory.PrepareTrainingAndTestTree(TCut(""), prepareOption);
-
-        for (auto & method : m_methods) {
-          factory.BookMethod(method.getType(), method.getName(), method.getConfig());
-        }
-
-        factory.TrainAllMethods();
-        factory.TestAllMethods();
-        factory.EvaluateAllMethods();
+      // Calculate the total number of events
+      unsigned int total = 0;
+      for (auto & x : m_cluster_count) {
+        total += x.second;
       }
 
-      file->Close();
+      // Add to the output config xml file the different clusters and their fractions
+      boost::property_tree::ptree pt;
+      for (auto & x : m_cluster_count) {
+        boost::property_tree::ptree node;
+        node.put("ID", x.first);
+        node.put("Count", x.second);
+        node.put("Fraction", static_cast<double>(x.second) / total);
+        pt.add_child("Setup.Clusters.Cluster", node);
+      }
+
+      // Train the found clusters against each other
+      for (auto & x : m_cluster_count) {
+        for (auto & y : m_cluster_count) {
+
+          if (x.first == y.first)
+            break;
+
+          std::stringstream signal;
+          std::stringstream bckgrd;
+          signal << x.first;
+          bckgrd << y.first;
+          std::string identifier = m_identifier + "_" + signal.str() + "_vs_" + bckgrd.str();
+
+          TFile* file = TFile::Open((identifier + ".root").c_str(), "RECREATE");
+          {
+
+            boost::property_tree::ptree node;
+            // Intitialize TMVA and ROOT stuff
+            TMVA::Tools::Instance();
+            TMVA::Factory factory(identifier, file, factoryOption);
+
+            // Add variables to the factory
+            for (auto & var : m_methods[0].getVariables()) {
+              factory.AddVariable(var->name);
+            }
+
+            factory.AddSignalTree(m_tree);
+            factory.AddBackgroundTree(m_tree);
+            factory.PrepareTrainingAndTestTree(TCut((m_target_var->name + " == " + signal.str()).c_str()), TCut((m_target_var->name + " == " + bckgrd.str()).c_str()), prepareOption);
+
+            // Append the trained methods to the config xml file
+            for (auto & method : m_methods) {
+              boost::property_tree::ptree method_node;
+              method_node.put("SignalID", x.first);
+              method_node.put("BackgroundID", y.first);
+              method_node.put("MethodName", method.getName());
+              method_node.put("Weightfile", std::string("weights/") + identifier + std::string("_") + method.getName() + std::string(".weights.xml"));
+              factory.BookMethod(method.getType(), method.getName(), method.getConfig());
+              node.add_child("Methods.Method", method_node);
+            }
+
+            factory.TrainAllMethods();
+            factory.TestAllMethods();
+            factory.EvaluateAllMethods();
+
+            pt.add_child("Setup.Trainings.Training", node);
+          }
+
+          file->Close();
+
+        }
+      }
+
+      boost::property_tree::xml_writer_settings<char> settings('\t', 1);
+      boost::property_tree::xml_parser::write_xml(m_identifier + ".config", pt, std::locale(), settings);
+      gSystem->ChangeDirectory(oldDirectory.c_str());
     }
   }
 }

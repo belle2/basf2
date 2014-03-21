@@ -203,13 +203,14 @@ def ParticleListFromChannel(path, pdgcode, name, preCut, inputLists, isIgnored):
         pmake.param('MassCut', (1000, 1000))
     else:
         pmake.param(preCut['variable'], preCut['range'])
+        pmake.param('cutsOnProduct', {'SignalProbability': (0.0001, 1.0)})
 
     path.add_module(pmake)
     modularAnalysis.matchMCTruth(list_name, path=path)
     return {'ParticleList_' + name: list_name}
 
 
-def SignalProbability(path, method, variables, name, particleList, target='SignalProbability', isIgnored=False):
+def SignalProbability(path, method, variables, name, particleList, isIgnored=False):
     """
     Calculates the SignalProbability of a ParticleList. If the needed experts aren't available they're created.
         @param path the basf2 path
@@ -217,24 +218,22 @@ def SignalProbability(path, method, variables, name, particleList, target='Signa
         @param variables used for classification (see VariableManager)
         @param name of the particle or channel which is classified
         @param particleList the particleList which is used for training and classification
-        @param target name under which the expert stores the result in the extra info of the particle
         @param true if the channel is ignored due to low statistics
     """
     # Create hash with all parameters on which this training depends
     hash = createHash(method, variables, particleList, isIgnored)
-    filename = 'weights/{particleList}_{hash}_{method}.weights.xml'.format(particleList=particleList, hash=hash, method=method[0])
+    filename = '{particleList}_{hash}.config'.format(particleList=particleList, hash=hash)
     if isIgnored:
-        return {target + '_' + name: hash}
+        return {'SignalProbability_' + name: hash}
     if os.path.isfile(filename):
         expert = register_module('TMVAExpert')
         expert.set_name('TMVAExpert_' + particleList)
         expert.param('identifier', particleList + '_' + hash)
         expert.param('method', method[0])
-        expert.param('target', target)
+        expert.param('signalProbabilityName', 'SignalProbability')
         expert.param('listNames', [particleList])
         path.add_module(expert)
-        print target + '_' + name
-        return {target + '_' + name: hash}
+        return {'SignalProbability_' + name: hash}
     else:
         teacher = register_module('TMVATeacher')
         teacher.set_name('TMVATeacher_' + particleList)
@@ -248,48 +247,40 @@ def SignalProbability(path, method, variables, name, particleList, target='Signa
         return {}
 
 
-def CombineSignalProbabilities(path, name, targets, fsp_histogram):
+def SignalProbabilityFSP(path, method, variables, name, pdg, particleList):
     """
-    Combines the SignalProbability of multiple trainings
-        @param name of the particle
-        @param targets the targets which are combined
-        @param filename of the fsp histogram with the MC-pdg distributions
-    """
-    hash = createHash(name, targets, fsp_histogram)
-    # TODO Read out fsp_histograms and calculate the correct signal probability
-    # p = 1/( f_S + sum( f_Bi * ( 1 - Y_i) ) )
-    calculator = register_module('VariableCalculator')
-    calculator.param('fractions', [0.01, 0.89, 0.01, 0.01, 0.08])
-    calculator.param('extraInfoVars', targets)  # TODO Use correct targets, targets contain hashes!
-    calculator.param('newExtraInfoVar', 'SignalProbability')
-    return {'SignalProbability_' + name: hash}
-
-
-def CreateFSPHistogram(path, name, particleList):
-    """
-    Creates ROOT File with MC-pdgcode distributionof the given particleList and returns the filename
-    This is used by the CombineSignalProbabilities to calculate the correct SignalProbability
+    Calculates the SignalProbability of a ParticleList. If the needed experts aren't available they're created.
         @param path the basf2 path
-        @param name of the particle
-        @param particleList for which this histogram is created
-        @param daughterSignalProbabilities all daughter particles need a SignalProbability
+        @param method method given to the TMVAInterface (see TMVAExpert and TMVATeacher)
+        @param variables used for classification (see VariableManager)
+        @param name of the particle which is classified
+        @param pdg of the particle which is classified
+        @param particleList the particleList which is used for training and classification
     """
-    # Check if the file is available. If the file isn't available yet, create it with
-    # the HistMaker Module and return Nothing. If a function is called which depends on
-    # the PreCutHistogram, the process will stop, because the PreCutHistogram isn't provided.
-    hash = createHash(name, particleList)
-    filename = 'Reconstruction_{name}_{hash}.root'.format(name=name, hash=hash)
+    # Create hash with all parameters on which this training depends
+    hash = createHash(method, variables, name, particleList, pdg)
+    filename = '{particleList}_{hash}.config'.format(particleList=particleList, hash=hash)
     if os.path.isfile(filename):
-        return {'FSPHistogram_' + name: filename}
+        expert = register_module('TMVAExpert')
+        expert.set_name('TMVAExpert_' + particleList)
+        expert.param('identifier', particleList + '_' + hash)
+        expert.param('method', method[0])
+        expert.param('signalProbabilityName', 'SignalProbability')
+        expert.param('signalCluster', pdg)
+        expert.param('listNames', [particleList])
+        path.add_module(expert)
+        return {'SignalProbability_' + name: hash}
     else:
-        histMaker = register_module('HistMaker')
-        histMaker.set_name(filename)
-        histMaker.param('file', filename)
-        histMaker.param('histVariables', [('mcPDG', 1000, 0, 1000)])
-        histMaker.param('truthVariable', 'isSignal')
-        histMaker.param('listNames', [particleList])
-        path.add_module(histMaker)
-    return {}
+        teacher = register_module('TMVATeacher')
+        teacher.set_name('TMVATeacher_' + particleList)
+        teacher.param('identifier', particleList + '_' + hash)
+        teacher.param('methods', [method])
+        teacher.param('factoryOption', '!V:!Silent:Color:DrawProgressBar:AnalysisType=Classification')
+        teacher.param('variables', variables)
+        teacher.param('target', 'abs_mcPDG')
+        teacher.param('listNames', [particleList])
+        path.add_module(teacher)
+        return {}
 
 
 def CreatePreCutMassHistogram(path, particle, daughterLists):
@@ -371,7 +362,7 @@ def CreatePreCutProbHistogram(path, particle, daughterLists, daughterSignalProba
                 inputListNames += listName
             pmake.param('InputListNames', inputListNames)
             pmake.param('MassCut', (mass - mass * 1.0 / 10.0, mass + mass * 1.0 / 10.0))
-            pmake.param('cutsOnProduct', {'SignalProbability': (0.0, 1.0)})
+            pmake.param('cutsOnProduct', {'SignalProbability': (0.0001, 1.0)})
             path.add_module(pmake)
             modularAnalysis.matchMCTruth(channel.name, path=path)
         histMaker = register_module('HistMaker')
@@ -508,11 +499,11 @@ def FullReconstruction(path, particles):
             # TODO Implement user choice -> Cut on invariant mass or cut on product of signal Probability
             if particle.channels != []:
                 daughters = set([daughter for channel in particle.channels for daughter in channel.daughters])
-                seq.append(Function(CreatePreCutMassHistogram, path='Path', particle='Particle_' + particle.name,
-                                    daughterLists=['ParticleList_' + daughter for daughter in daughters]))
-                #seq.append(Function(CreatePreCutProbHistogram, path='Path', particle='Particle_' + particle.name,
-                #                    daughterLists=['ParticleList_' + daughter for daughter in daughters],
-                #                    daughterSignalProbabilities=['SignalProbability_' + daughter for daughter in daughters]))
+                #seq.append(Function(CreatePreCutMassHistogram, path='Path', particle='Particle_' + particle.name,
+                #                    daughterLists=['ParticleList_' + daughter for daughter in daughters]))
+                seq.append(Function(CreatePreCutProbHistogram, path='Path', particle='Particle_' + particle.name,
+                                    daughterLists=['ParticleList_' + daughter for daughter in daughters],
+                                    daughterSignalProbabilities=['SignalProbability_' + daughter for daughter in daughters]))
                 seq.append(Function(PreCutMassDetermination, name='Name_' + particle.name, pdgcode='PDG_' + particle.name,
                                     channels=['Name_' + channel.name for channel in particle.channels], preCut_Histogram='PreCutHistogram_' + particle.name, efficiency='Efficiency_' + particle.name))
 
@@ -520,36 +511,21 @@ def FullReconstruction(path, particles):
             # The classifier part of the FullReconstruction. Here one has to distinguish between [e+, mu+, pi+, K+, p], other FSPs and non-FSPs.
             # All the classifiers depend on the method, variables and the ParticleList (either for the particle or for the channel).
             # [e+,mu+,pi+,K+,p]: All the tracks seen in the detector are generated by one of these particles.
-            #                    To get a better spearation we train these particles against each other and combine the result later (via CombinSignalProbabilities)
-            # To accomplish this:
-            #   1. Create FSP Histogram with the real distribution of signal and background particles in the ParticleList
-            #   2. Create new ParticleList which contains only the the signal component and one background component e.g. e+ vs. mu+
-            #   3. Train a classifier for this ParticleList and calculate the SignalProbability with this classifier
-            #   4. Combine the different SignalProbabilities to one, using the signal and background fractions of the FSP Histogram.
-            # TODO Disabled at the moment
-            opponents = []  # ['e+','mu+','pi+','K+']
-            if particle.channels == [] and particle.name in opponents:
-                seq.append(Function(CreateFSPHistogram, path='Path', name='Name_' + particle.name, particleList='ParticleList_' + particle.name))
-                for opponent in opponents:
-                    if particle.name == opponent:
-                        continue
-                    tmp = particle.name + '_against_' + opponent
-                    seq.append(Resource('Name_' + tmp, tmp))
-                    seq.append(Function(ParticleList, path='Path', name='Name_' + tmp, pdgcode='PDG_' + particle.name, particleLists=['Name_' + particle.name], criteria=""))  # TODO Add criterium
-                    seq.append(Function(SignalProbability, path='Path', method='Method_' + particle.name, variables='Variables_' + particle.name,
-                                        name='Name_' + particle.name, particleList='ParticleList_' + tmp, target='Name_' + tmp))
-                seq.append(Function(CombineSignalProbabilities, path='Path', name='Name_' + particle.name,
-                                    targets=[particle.name + '_against_' + opponent + '_' + particle.name for opponent in opponents if particle.name != opponent], fsp_histogram='FSPHistogram_' + name))
+            #                    To get a better spearation we train these particles against each other and combine the result later
+            if particle.channels == [] and particle.name in ['e+', 'e-', 'mu+', 'mu-', 'pi+', 'pi-', 'K+', 'K-', 'p']:
+                # Add charged FSP SignalProbability classifier
+                seq.append(Function(SignalProbabilityFSP, path='Path', method='Method_' + particle.name, variables='Variables_' + particle.name,
+                                    name='Name_' + particle.name, pdg='PDG_' + particle.name, particleList='ParticleList_' + particle.name))
 
             # Other FSP: Other FSP like gammas and pi0, are trained with a single classifier.
-            if particle.channels == [] and not particle.name in opponents:
+            elif particle.channels == []:
                 seq.append(Function(SignalProbability, path='Path', method='Method_' + particle.name, variables='Variables_' + particle.name,
                                     name='Name_' + particle.name, particleList='ParticleList_' + particle.name))
 
             # Non FSP:
             #   1. Train classifier for every decay channel of the particle.
             #   2. As soon as all SignalProbabilities for all channels are available the resoure SignalProbability_{particleName} is unlocked.
-            if particle.channels != []:
+            elif particle.channels != []:
                 for channel in particle.channels:
                     seq.append(Function(SignalProbability, path='Path', method='Method_' + particle.name, variables='Variables_' + channel.name,
                                         name='Name_' + channel.name, particleList='ParticleList_' + channel.name, isIgnored='IsIgnored_' + channel.name))

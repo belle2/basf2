@@ -68,9 +68,10 @@ namespace Belle2 {
     std::vector<std::string> m_listNames; /**< input particle list names */
     std::string m_methodName; /**< used multivariate analysis method */
     std::string m_identifier; /**< identifier name for the files created by the TMVA method */
-    std::string m_weightfile; /**< weightfile created by the TMVATeacher */
-    std::string m_targetName /**< the name of the target variable which is stored in the ExtraInfo of the Particle object */;
+    std::string m_workingDirectory; /**< Working directory in which the expert finds the config file and the weight file directory */
+    std::string m_signalProbabilityName /**< Name under which the signal probability is stored in the ExtraInfo of the Particle object. */;
     TMVAInterface::Expert* m_method; /**< Method used to calculate the target variable */
+    int m_signalCluster; /**< Number of the cluster which is considered signal */
 
   };
 

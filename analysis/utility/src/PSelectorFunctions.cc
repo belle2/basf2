@@ -532,6 +532,11 @@ namespace Belle2 {
       return mcparticle->getPDG();
     }
 
+    double particleAbsMCMatchPDGCode(const Particle* part)
+    {
+      return std::abs(particleMCMatchPDGCode(part));
+    }
+
     double particleMCMatchStatus(const Particle* part)
     {
       double result = 0.0;
@@ -827,6 +832,7 @@ namespace Belle2 {
 
     REGISTER_VARIABLE("isSignal", isSignal,               "1.0 if Particle is correctly reconstructed (SIGNAL), 0.0 otherwise");
     REGISTER_VARIABLE("mcPDG",    particleMCMatchPDGCode, "The PDG code of matched MCParticle");
+    REGISTER_VARIABLE("abs_mcPDG",    particleAbsMCMatchPDGCode, "The absolute PDG code of matched MCParticle");
     REGISTER_VARIABLE("mcStatus", particleMCMatchStatus,  "The bit pattern indicating the quality of MC match");
 
     REGISTER_VARIABLE("nROETracks",  nROETracks,  "number of remaining tracks as given by the related RestOfEvent object");

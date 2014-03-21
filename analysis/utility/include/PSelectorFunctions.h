@@ -456,14 +456,21 @@ namespace Belle2 {
     /**
      * function for PSelector
      * @param part const pointer to Particle
-     * @return PDG code of mathced MCParticle
+     * @return absolute PDG code of matched MCParticle
+     */
+    double particleAbsMCMatchPDGCode(const Particle* particle);
+
+    /**
+     * function for PSelector
+     * @param part const pointer to Particle
+     * @return PDG code of matched MCParticle
      */
     double particleMCMatchPDGCode(const Particle* particle);
 
     /**
      * function for PSelector
      * @param part const pointer to Particle
-     * @return PDG code of mathced MCParticle
+     * @return PDG code of matched MCParticle
      */
     double particleMCMatchPDGStatus(const Particle* particle);
 

@@ -36,9 +36,12 @@ namespace Belle2 {
     public:
 
       /**
-       * @param weightfile path to weightfile which is used to load the correct TMVA method
+       * @param identifier which used to identify the outputted training files weights/$identifier_$method.class.C and weights/$identifier_$method.weights.xml
+       * @param workingDirectory where the config file and weight file directory is stored
+       * @param methodName name of the method which is used by this expert
+       * @param signalCluster Number of the cluster which is considered as signal
        */
-      Expert(std::string weightfile);
+      Expert(std::string identifier, std::string workingDirectory, std::string methodName, int signalCluster);
 
       /**
        * Disallow copy
@@ -63,9 +66,13 @@ namespace Belle2 {
       float analyse(const Particle*);
 
     private:
-      TMVA::Reader* m_reader; /**< TMVA::Reader steers the booked TMVA method */
-      Method* m_method; /**< Method parameters */
+      std::vector<TMVA::Reader*> m_readers; /**< Vector of TMVA::Reader, which steers the booked TMVA method, foreach cluster */
       std::vector<float> m_input; /**< Pointers to the input variables */
+      int m_signalCluster; /**< Number of the cluster which is considered as signal */
+      std::vector<Method*> m_methods; /** methods used by the expert to classify */
+      std::map<int, float> m_clusters; /** map of cluster id and cluster fraction */
+      std::vector<bool> m_reverse; /** true if signalCluster was considered background in the training */
+      std::vector<int> m_against; /** cluster ID against signalCluster was trained */
     };
   }
 }

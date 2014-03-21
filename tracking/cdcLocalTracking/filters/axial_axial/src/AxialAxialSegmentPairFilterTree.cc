@@ -52,6 +52,20 @@ bool AxialAxialSegmentPairFilterTree::setValues(const CellWeight& mcWeight, cons
   setValue < NAMED("startSegment_size") > (startSegment.size());
   setValue < NAMED("endSegment_size") > (endSegment.size());
 
+  setValue < NAMED("startSegment_iSuperLayer") > (startSegment.getISuperLayer());
+  setValue < NAMED("endSegment_iSuperLayer") > (endSegment.getISuperLayer());
+
+  setValue < NAMED("startFit_startISuperLayer") > (startFit.getStartISuperLayer());
+  setValue < NAMED("endFit_startISuperLayer") > (endFit.getStartISuperLayer());
+
+  setValue < NAMED("startFit_nextISuperLayer") > (startFit.getNextISuperLayer());
+  //setValue< NAMED("endFit_nextISuperLayer") >(endFit.getNextISuperLayer());
+
+  setValue < NAMED("startFit_nextAxialISuperLayer") > (startFit.getNextAxialISuperLayer());
+  //setValue< NAMED("endFit_nextAxialISuperLayer") >(endFit.getNextAxialISuperLayer());
+
+
+
   setValue < NAMED("startSegment_isForwardTrajectory_startFit") > (startSegment.isForwardTrajectory(startFit));
   setValue < NAMED("startSegment_isForwardTrajectory_endFit") > (startSegment.isForwardTrajectory(endFit));
   setValue < NAMED("startSegment_isForwardTrajectory_commonFit") > (startSegment.isForwardTrajectory(commonFit));

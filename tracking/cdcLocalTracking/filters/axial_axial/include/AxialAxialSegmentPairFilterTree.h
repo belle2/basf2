@@ -33,6 +33,19 @@ namespace Belle2 {
              BranchOf < UInt_t, NAMED("startSegment_size") > ,
              BranchOf < UInt_t, NAMED("endSegment_size") > ,
 
+             BranchOf < Int_t, NAMED("startSegment_iSuperLayer") > ,
+             BranchOf < Int_t, NAMED("endSegment_iSuperLayer") > ,
+
+             BranchOf < Int_t, NAMED("startFit_startISuperLayer") > ,
+             BranchOf < Int_t, NAMED("endFit_startISuperLayer") > ,
+
+             BranchOf < Int_t, NAMED("startFit_nextISuperLayer") > ,
+             //BranchOf < Int_t, NAMED("endFit_nextISuperLayer") > ,
+
+             BranchOf < Int_t, NAMED("startFit_nextAxialISuperLayer") > ,
+             //BranchOf < Int_t, NAMED("endFit_nextAxialISuperLayer") > ,
+
+
              BranchOf < bool, NAMED("startSegment_isForwardTrajectory_startFit") > ,
              BranchOf < bool, NAMED("startSegment_isForwardTrajectory_endFit") > ,
              BranchOf < bool, NAMED("startSegment_isForwardTrajectory_commonFit") > ,
@@ -63,7 +76,6 @@ namespace Belle2 {
 
              BranchOf < float, NAMED("startSegment_absmom") > ,
              BranchOf < float, NAMED("endSegment_absmom") > ,
-
 
 
              BranchOf < float, NAMED("startSegment_com_x") > ,

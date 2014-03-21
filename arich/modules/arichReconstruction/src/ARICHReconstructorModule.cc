@@ -40,272 +40,270 @@ using namespace std;
 using namespace boost;
 
 namespace Belle2 {
-  namespace arich {
 
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-    REG_MODULE(ARICHReconstructor)
+  REG_MODULE(ARICHReconstructor)
 
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-    ARICHReconstructorModule::ARICHReconstructorModule() :
-      m_ana(0),
-      m_timeCPU(0),
-      m_nRun(0),
-      m_nEvent(0),
-      m_storeHist(0),
-      m_beamtest(0),
-      m_file(NULL)
-    {
-      // Set description()
-      setDescription("ARICHReconstructor");
-      setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
-      std::vector<double> defMerit;
-      defMerit.push_back(24.0);
-      defMerit.push_back(24.0);
-      defMerit.push_back(24.0);
-      // Add parameters
-      addParam("beamtest", m_beamtest, "ARICH beamtest switch (beamtest data=1, beamtest MC=2)", 0);
-      addParam("storeHist", m_storeHist, "Store histograms with individual photon information (cherenkov angle distribution)", 0);
-      addParam("MCColName", m_mcColName, "MCParticles collection name", string(""));
-      addParam("tracksColName", m_tracksColName, "Tracks collection name", string(""));
-      addParam("extHitsColName", m_extHitsColName, "ExtHits collection name", string(""));
-      addParam("outColName", m_outColName, "ARICHLikelihoods collection name",  string(""));
-      addParam("outfileName", m_outfileName, "File to store individual photon information",  string("thc.root"));
-      addParam("trackPositionResolution", m_trackPositionResolution, "Resolution of track position on aerogel plane", 1.0 * Unit::mm);
-      addParam("trackAngleResolution", m_trackAngleResolution, "Resolution of track direction angle on aerogel plane", 2.0 * Unit::mrad);
-      addParam("backgroundLevel", m_backgroundLevel, "Background level in photon hits per m^2", 50.0);
-      addParam("singleResolution", m_singleResolution, "Single photon resolution without pad", 0.010 * Unit::rad);
-      addParam("aerogelMerit", m_aerogelMerit, "Aerogel figure of merit", defMerit);
-      addParam("inputTrackType", m_inputTrackType, "Input tracks switch: tracking (0), tracks from AeroHits (1), AeroHits (2)", 0);
-    }
+  ARICHReconstructorModule::ARICHReconstructorModule() :
+    m_ana(0),
+    m_timeCPU(0),
+    m_nRun(0),
+    m_nEvent(0),
+    m_storeHist(0),
+    m_beamtest(0),
+    m_file(NULL)
+  {
+    // Set description()
+    setDescription("This module calculates the ARICHLikelihood values for all particle id. hypotheses, for all tracks that enter ARICH in the event.");
 
-    ARICHReconstructorModule::~ARICHReconstructorModule()
-    {
-      if (m_ana) delete m_ana;
-    }
+    std::vector<double> defMerit;
+    defMerit.push_back(24.0);
+    defMerit.push_back(24.0);
+    defMerit.push_back(24.0);
+    // Add parameters
+    addParam("beamtest", m_beamtest, "ARICH beamtest switch (beamtest data=1, beamtest MC=2)", 0);
+    addParam("storeHist", m_storeHist, "Store histograms with individual photon information (cherenkov angle distribution)", 0);
+    addParam("MCColName", m_mcColName, "MCParticles collection name", string(""));
+    addParam("tracksColName", m_tracksColName, "Tracks collection name", string(""));
+    addParam("extHitsColName", m_extHitsColName, "ExtHits collection name", string(""));
+    addParam("outColName", m_outColName, "ARICHLikelihoods collection name",  string(""));
+    addParam("outfileName", m_outfileName, "File to store individual photon information",  string("thc.root"));
+    addParam("trackPositionResolution", m_trackPositionResolution, "Resolution of track position on aerogel plane", 1.0 * Unit::mm);
+    addParam("trackAngleResolution", m_trackAngleResolution, "Resolution of track direction angle on aerogel plane", 2.0 * Unit::mrad);
+    addParam("backgroundLevel", m_backgroundLevel, "Background level in photon hits per m^2", 50.0);
+    addParam("singleResolution", m_singleResolution, "Single photon resolution without pad", 0.010 * Unit::rad);
+    addParam("aerogelMerit", m_aerogelMerit, "Aerogel figure of merit", defMerit);
+    addParam("inputTrackType", m_inputTrackType, "Input tracks switch: tracking (0), tracks from AeroHits (1), AeroHits (2)", 0);
+  }
 
-    void ARICHReconstructorModule::initialize()
-    {
-      // Initialize variables
-      if (m_storeHist) m_file = new TFile(m_outfileName.c_str(), "RECREATE");
-      m_nRun    = 0 ;
-      m_nEvent  = 0 ;
-      m_ana = new ARICHReconstruction(m_storeHist, m_beamtest);
-      m_ana->setBackgroundLevel(m_backgroundLevel);
-      m_ana->setTrackPositionResolution(m_trackPositionResolution);
-      m_ana->setTrackAngleResolution(m_trackAngleResolution);
-      m_ana->setSinglePhotonResolution(m_singleResolution);
-      m_ana->setAerogelFigureOfMerit(m_aerogelMerit);
-      // Print set parameters
-      printModuleParams();
+  ARICHReconstructorModule::~ARICHReconstructorModule()
+  {
+    if (m_ana) delete m_ana;
+  }
 
-      // CPU time start
-      m_timeCPU = clock() * Unit::us;
+  void ARICHReconstructorModule::initialize()
+  {
+    // Initialize variables
+    if (m_storeHist) m_file = new TFile(m_outfileName.c_str(), "RECREATE");
+    m_nRun    = 0 ;
+    m_nEvent  = 0 ;
+    m_ana = new ARICHReconstruction(m_storeHist, m_beamtest);
+    m_ana->setBackgroundLevel(m_backgroundLevel);
+    m_ana->setTrackPositionResolution(m_trackPositionResolution);
+    m_ana->setTrackAngleResolution(m_trackAngleResolution);
+    m_ana->setSinglePhotonResolution(m_singleResolution);
+    m_ana->setAerogelFigureOfMerit(m_aerogelMerit);
+    // Print set parameters
+    printModuleParams();
 
-      StoreArray<ARICHLikelihood>::registerPersistent(m_outColName);
-      RelationArray::registerPersistent<ARICHAeroHit, ARICHLikelihood>(m_mcColName, m_outColName);
-      RelationArray::registerPersistent<Track, ARICHLikelihood>(m_tracksColName, m_outColName);
-      RelationArray::registerPersistent<ARICHAeroHit, ExtHit>(m_mcColName, m_extHitsColName);
-    }
+    // CPU time start
+    m_timeCPU = clock() * Unit::us;
 
-    void ARICHReconstructorModule::beginRun()
-    {
-      // Print run number
-      B2INFO("ARICHReconstruction: Processing run: " << m_nRun);
-    }
+    StoreArray<ARICHLikelihood>::registerPersistent(m_outColName);
+    RelationArray::registerPersistent<ARICHAeroHit, ARICHLikelihood>(m_mcColName, m_outColName);
+    RelationArray::registerPersistent<Track, ARICHLikelihood>(m_tracksColName, m_outColName);
+    RelationArray::registerPersistent<ARICHAeroHit, ExtHit>(m_mcColName, m_extHitsColName);
+  }
 
-    void ARICHReconstructorModule::event()
-    {
-      if (m_inputTrackType == 0) {
+  void ARICHReconstructorModule::beginRun()
+  {
+    // Print run number
+    B2INFO("ARICHReconstruction: Processing run: " << m_nRun);
+  }
 
-        B2DEBUG(100, "New part of ARICHReconstructorModule::event");
+  void ARICHReconstructorModule::event()
+  {
+    if (m_inputTrackType == 0) {
 
-        // Input: reconstructed tracks
-        StoreArray<Track> mdstTracks(m_tracksColName);
-        StoreArray<ExtHit> extHits(m_extHitsColName);
-        StoreArray<ARICHAeroHit> arichAeroHits(m_mcColName);
+      B2DEBUG(100, "New part of ARICHReconstructorModule::event");
 
-        // Output - likelihoods
-        StoreArray<ARICHLikelihood> arichLikelihoods(m_outColName);
-        if (!arichLikelihoods.isValid()) arichLikelihoods.create();
+      // Input: reconstructed tracks
+      StoreArray<Track> mdstTracks(m_tracksColName);
+      StoreArray<ExtHit> extHits(m_extHitsColName);
+      StoreArray<ARICHAeroHit> arichAeroHits(m_mcColName);
 
-        // Output - relations
-        RelationArray trackToArich(mdstTracks, arichLikelihoods);
-        trackToArich.clear();
-        RelationArray aeroHitToExt(arichAeroHits, extHits);
-        aeroHitToExt.clear();
-        RelationArray aeroHitToArich(arichAeroHits, arichLikelihoods);
-        aeroHitToArich.clear();
+      // Output - likelihoods
+      StoreArray<ARICHLikelihood> arichLikelihoods(m_outColName);
+      if (!arichLikelihoods.isValid()) arichLikelihoods.create();
 
-        std::vector<ARICHTrack> arichTracks;
-        getTracks(arichTracks, Const::pion);
-        B2DEBUG(100, "Number of tracks from ext" << arichTracks.size());
-        if (arichTracks.empty()) return;
+      // Output - relations
+      RelationArray trackToArich(mdstTracks, arichLikelihoods);
+      trackToArich.clear();
+      RelationArray aeroHitToExt(arichAeroHits, extHits);
+      aeroHitToExt.clear();
+      RelationArray aeroHitToArich(arichAeroHits, arichLikelihoods);
+      aeroHitToArich.clear();
 
-        m_ana->likelihood2(arichTracks);
+      std::vector<ARICHTrack> arichTracks;
+      getTracks(arichTracks, Const::pion);
+      B2DEBUG(100, "Number of tracks from ext" << arichTracks.size());
+      if (arichTracks.empty()) return;
 
-        int nTracks = arichTracks.size();
-        for (int iTrack = 0; iTrack < nTracks; ++iTrack) {
-          ARICHTrack* track = &arichTracks[iTrack];
-          double likelihoods[5];
-          double expectedPhotons[5];
-          int detectedPhotons[5];
-          track->getLikelihood(likelihoods);
-          track->getExpectedPhotons(expectedPhotons);
-          track->getDetectedPhotons(detectedPhotons);
+      m_ana->likelihood2(arichTracks);
 
-          B2DEBUG(50, "Number of expected photons " << expectedPhotons[0]);
-          B2DEBUG(50, "Number of detected photons " << detectedPhotons);
+      int nTracks = arichTracks.size();
+      for (int iTrack = 0; iTrack < nTracks; ++iTrack) {
+        ARICHTrack* track = &arichTracks[iTrack];
+        double likelihoods[5];
+        double expectedPhotons[5];
+        int detectedPhotons[5];
+        track->getLikelihood(likelihoods);
+        track->getExpectedPhotons(expectedPhotons);
+        track->getDetectedPhotons(detectedPhotons);
 
-          new(arichLikelihoods.nextFreeAddress()) ARICHLikelihood(1, likelihoods, detectedPhotons[2], expectedPhotons);
+        B2DEBUG(50, "Number of expected photons " << expectedPhotons[0]);
+        B2DEBUG(50, "Number of detected photons " << detectedPhotons);
 
-          // Add relations
-          int last = arichLikelihoods.getEntries() - 1;
-          trackToArich.add(track->getTrackID(), last);
-          int aeroIndex = track->getAeroIndex();
-          if (aeroIndex >= 0) {
-            aeroHitToArich.add(aeroIndex, last);
-            aeroHitToExt.add(aeroIndex, track->getHitID());
-          } else {
-            B2DEBUG(50, "No AeroHit for Track " << track->getTrackID());
-          }
-        }
+        new(arichLikelihoods.nextFreeAddress()) ARICHLikelihood(1, likelihoods, detectedPhotons[2], expectedPhotons);
 
-        trackToArich.consolidate();
-        aeroHitToExt.consolidate();
-        aeroHitToArich.consolidate();
-
-      } else {
-        //------------------------------------------------------
-        // Get the collection of ARICHSimHits from the DataStore.
-        // For inputTrackType=2 this assumes existence of
-        // ExtHit-ARICHAeroHit relation
-        //------------------------------------------------------
-
-        StoreArray<ARICHAeroHit> arichAeroHits(m_mcColName);
-        StoreArray<ExtHit> extHits(m_extHitsColName);
-
-        // Output: ARICH likelihoods
-        StoreArray<ARICHLikelihood> arichLikelihoods(m_outColName);
-        arichLikelihoods.create();
-
-        // Output: AeroHits to ARICH likelihoods relations
-        RelationArray  aeroHitToArich(arichAeroHits, arichLikelihoods);
-        aeroHitToArich.clear();
-
-        std::vector<ARICHTrack> arichTracks;
-
-        // Get number of hits in this event
-        int nTracks = arichAeroHits.getEntries();
-
-        // Loop over all ARICHAeroHits
-        for (int iTrack = 0; iTrack < nTracks; ++iTrack) {
-          ARICHAeroHit* aeroHit = arichAeroHits[iTrack];
-          if (m_inputTrackType == 2) { arichTracks.push_back(ARICHTrack(*aeroHit)); continue;}
-
-          ExtHit* extHit = DataStore::getRelated<ExtHit>(aeroHit);
-          if (extHit) {
-            ARICHTrack trk(extHit,  aeroHit->getPDG() > 0 ? 1 : -1, aeroHit->getPDG(), (int)iTrack, aeroHit->getArrayIndex());
-            arichTracks.push_back(trk);
-          }
-        } // for iTrack
-
-        // if tracks from ARICHAeroHits apply smearing of track parameters
-        if (m_inputTrackType == 2) m_ana->smearTracks(arichTracks);
-
-        nTracks = arichTracks.size();
-        if (nTracks > 0) m_ana->likelihood2(arichTracks);
-
-        // build the relations (ARICHAeroHit-ARICHLikelihood))
-
-        for (int iTrack = 0; iTrack < nTracks; ++iTrack) {
-          ARICHTrack* track = &arichTracks[iTrack];
-          double expectedPhotons[5];
-          double likelihoods[5];
-          int detectedPhotons[5];
-          track->getExpectedPhotons(expectedPhotons);
-          track->getLikelihood(likelihoods);
-          track->getDetectedPhotons(detectedPhotons);
-          new(arichLikelihoods.nextFreeAddress()) ARICHLikelihood(1, likelihoods, detectedPhotons[2], expectedPhotons);
-          int last = arichLikelihoods.getEntries() - 1;
-          int aeroIndex = track->getAeroIndex();
-          if (aeroIndex >= 0) {
-            aeroHitToArich.add(aeroIndex, last);
-          } else {
-            B2DEBUG(50, "No AeroHit for Track " << track->getTrackID());
-          }
+        // Add relations
+        int last = arichLikelihoods.getEntries() - 1;
+        trackToArich.add(track->getTrackID(), last);
+        int aeroIndex = track->getAeroIndex();
+        if (aeroIndex >= 0) {
+          aeroHitToArich.add(aeroIndex, last);
+          aeroHitToExt.add(aeroIndex, track->getHitID());
+        } else {
+          B2DEBUG(50, "No AeroHit for Track " << track->getTrackID());
         }
       }
-      m_nEvent++;
-    }
 
-    void ARICHReconstructorModule::endRun()
-    {
-      m_nRun++;
-      if (m_file) {
-        m_file->Write();
-        m_file->Close();
-      }
-    }
+      trackToArich.consolidate();
+      aeroHitToExt.consolidate();
+      aeroHitToArich.consolidate();
 
-    void ARICHReconstructorModule::terminate()
-    {
-      // CPU time end
-      m_timeCPU = clock() * Unit::us - m_timeCPU;
-      // Announce
-      B2INFO("ARICHReconstructorModule finished. Time per event: " << m_timeCPU / m_nEvent / Unit::ms << " ms.");
+    } else {
+      //------------------------------------------------------
+      // Get the collection of ARICHSimHits from the DataStore.
+      // For inputTrackType=2 this assumes existence of
+      // ExtHit-ARICHAeroHit relation
+      //------------------------------------------------------
 
-    }
+      StoreArray<ARICHAeroHit> arichAeroHits(m_mcColName);
+      StoreArray<ExtHit> extHits(m_extHitsColName);
 
-    void ARICHReconstructorModule::printModuleParams() const
-    {
-      B2INFO("ARICHReconstructorModule parameters:")
-      B2INFO("Input tracks switch: " << m_inputTrackType);
-    }
+      // Output: ARICH likelihoods
+      StoreArray<ARICHLikelihood> arichLikelihoods(m_outColName);
+      arichLikelihoods.create();
 
-    void ARICHReconstructorModule::getTracks(std::vector<ARICHTrack>& tracks,
-                                             Const::ChargedStable hypothesis)
-    {
-      ExtDetectorID myDetID = EXT_ARICH; // arich
-      int pdgCode = abs(hypothesis.getPDGCode());
+      // Output: AeroHits to ARICH likelihoods relations
+      RelationArray  aeroHitToArich(arichAeroHits, arichLikelihoods);
+      aeroHitToArich.clear();
 
-      StoreArray<Track> Tracks(m_tracksColName);
+      std::vector<ARICHTrack> arichTracks;
 
-      for (int itra = 0; itra < Tracks.getEntries(); ++itra) {
-        const Track* track = Tracks[itra];
-        const TrackFitResult* fitResult = track->getTrackFitResult(hypothesis);
-        if (!fitResult) {
-          B2ERROR("No TrackFitResult for " << hypothesis.getPDGCode());
-          continue;
+      // Get number of hits in this event
+      int nTracks = arichAeroHits.getEntries();
+
+      // Loop over all ARICHAeroHits
+      for (int iTrack = 0; iTrack < nTracks; ++iTrack) {
+        ARICHAeroHit* aeroHit = arichAeroHits[iTrack];
+        if (m_inputTrackType == 2) { arichTracks.push_back(ARICHTrack(*aeroHit)); continue;}
+
+        ExtHit* extHit = DataStore::getRelated<ExtHit>(aeroHit);
+        if (extHit) {
+          ARICHTrack trk(extHit,  aeroHit->getPDG() > 0 ? 1 : -1, aeroHit->getPDG(), (int)iTrack, aeroHit->getArrayIndex());
+          arichTracks.push_back(trk);
         }
-        int charge = fitResult->getChargeSign();
-        B2DEBUG(50, "Track.Charge " << charge);
-        const MCParticle* particle = DataStore::getRelated<MCParticle>(track);
-        const ARICHAeroHit* aeroHit = DataStore::getRelated<ARICHAeroHit>(particle);
-        int aeroHitIndex = -1;
-        if (aeroHit) aeroHitIndex = aeroHit->getArrayIndex();
-        int truePDGCode = 0;
-        if (particle) truePDGCode = particle->getPDG();
+      } // for iTrack
 
-        RelationVector<ExtHit> extHits = DataStore::getRelationsWithObj<ExtHit>(track);
+      // if tracks from ARICHAeroHits apply smearing of track parameters
+      if (m_inputTrackType == 2) m_ana->smearTracks(arichTracks);
 
-        for (unsigned i = 0; i < extHits.size(); i++) {
-          const ExtHit* extHit = extHits[i];
-          if (abs(extHit->getPdgCode()) != pdgCode) continue;
-          if (extHit->getDetectorID() != myDetID) continue;
-          if (extHit->getCopyID() != 12345) continue; // aerogel Al support plate
-          if (extHit->getStatus() != EXT_EXIT) continue; // particles registered at the EXIT of the Al plate
-          B2DEBUG(100, "getTracks: z = " << extHit->getPosition().Z());
-          ARICHTrack trk(extHit, charge, truePDGCode, (int)itra, aeroHitIndex);
-          tracks.push_back(trk);
+      nTracks = arichTracks.size();
+      if (nTracks > 0) m_ana->likelihood2(arichTracks);
+
+      // build the relations (ARICHAeroHit-ARICHLikelihood))
+
+      for (int iTrack = 0; iTrack < nTracks; ++iTrack) {
+        ARICHTrack* track = &arichTracks[iTrack];
+        double expectedPhotons[5];
+        double likelihoods[5];
+        int detectedPhotons[5];
+        track->getExpectedPhotons(expectedPhotons);
+        track->getLikelihood(likelihoods);
+        track->getDetectedPhotons(detectedPhotons);
+        new(arichLikelihoods.nextFreeAddress()) ARICHLikelihood(1, likelihoods, detectedPhotons[2], expectedPhotons);
+        int last = arichLikelihoods.getEntries() - 1;
+        int aeroIndex = track->getAeroIndex();
+        if (aeroIndex >= 0) {
+          aeroHitToArich.add(aeroIndex, last);
+        } else {
+          B2DEBUG(50, "No AeroHit for Track " << track->getTrackID());
         }
       }
     }
+    m_nEvent++;
+  }
 
-  } // namespace arich
+  void ARICHReconstructorModule::endRun()
+  {
+    m_nRun++;
+    if (m_file) {
+      m_file->Write();
+      m_file->Close();
+    }
+  }
+
+  void ARICHReconstructorModule::terminate()
+  {
+    // CPU time end
+    m_timeCPU = clock() * Unit::us - m_timeCPU;
+    // Announce
+    B2INFO("ARICHReconstructorModule finished. Time per event: " << m_timeCPU / m_nEvent / Unit::ms << " ms.");
+
+  }
+
+  void ARICHReconstructorModule::printModuleParams() const
+  {
+    B2INFO("ARICHReconstructorModule parameters:")
+    B2INFO("Input tracks switch: " << m_inputTrackType);
+  }
+
+  void ARICHReconstructorModule::getTracks(std::vector<ARICHTrack>& tracks,
+                                           Const::ChargedStable hypothesis)
+  {
+    ExtDetectorID myDetID = EXT_ARICH; // arich
+    int pdgCode = abs(hypothesis.getPDGCode());
+
+    StoreArray<Track> Tracks(m_tracksColName);
+
+    for (int itra = 0; itra < Tracks.getEntries(); ++itra) {
+      const Track* track = Tracks[itra];
+      const TrackFitResult* fitResult = track->getTrackFitResult(hypothesis);
+      if (!fitResult) {
+        B2ERROR("No TrackFitResult for " << hypothesis.getPDGCode());
+        continue;
+      }
+      int charge = fitResult->getChargeSign();
+      B2DEBUG(50, "Track.Charge " << charge);
+      const MCParticle* particle = DataStore::getRelated<MCParticle>(track);
+      const ARICHAeroHit* aeroHit = DataStore::getRelated<ARICHAeroHit>(particle);
+      int aeroHitIndex = -1;
+      if (aeroHit) aeroHitIndex = aeroHit->getArrayIndex();
+      int truePDGCode = 0;
+      if (particle) truePDGCode = particle->getPDG();
+
+      RelationVector<ExtHit> extHits = DataStore::getRelationsWithObj<ExtHit>(track);
+
+      for (unsigned i = 0; i < extHits.size(); i++) {
+        const ExtHit* extHit = extHits[i];
+        if (abs(extHit->getPdgCode()) != pdgCode) continue;
+        if (extHit->getDetectorID() != myDetID) continue;
+        if (extHit->getCopyID() != 12345) continue; // aerogel Al support plate
+        if (extHit->getStatus() != EXT_EXIT) continue; // particles registered at the EXIT of the Al plate
+        B2DEBUG(100, "getTracks: z = " << extHit->getPosition().Z());
+        ARICHTrack trk(extHit, charge, truePDGCode, (int)itra, aeroHitIndex);
+        tracks.push_back(trk);
+      }
+    }
+  }
+
 } // namespace Belle2

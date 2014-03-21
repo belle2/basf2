@@ -89,119 +89,112 @@ namespace Belle2 {
     };
   };
 
-  namespace arich {
-    //! The Class for ARICH Beamtest Geometry Parameters
-    /*! This class provides ARICH gemetry paramters for simulation, reconstruction and so on.
-      These parameters are gotten from gearbox.
+  //! The Class for ARICH Beamtest Geometry Parameters
+  /*! This class provides ARICH gemetry paramters for simulation, reconstruction and so on.
+    These parameters are gotten from gearbox.
+  */
+
+
+  class ARICHBtestGeometryPar {
+
+  public:
+
+    //! Constructor
+    ARICHBtestGeometryPar();
+
+    //! Destructor
+    virtual ~ARICHBtestGeometryPar();
+
+    //! Static method to get a reference to the ARICHBtestGeometryPar instance.
+    /*!
+    \return A reference to an instance of this class.
     */
+    static ARICHBtestGeometryPar* Instance();
+    //! calculates detector parameters needed for geometry build and reconstruction.
+    void Initialize(const GearDir& content);
+    //! calculates detector parameters needed for geometry build and reconstruction.
+    void Initialize(const GearDir& modulecontent, const GearDir& mirrorcontent);
 
 
-    class ARICHBtestGeometryPar {
+    //! Clears
+    void clear(void);
 
-    public:
+    //! Print some debug information
+    void Print(void) const;
 
-      //! Constructor
-      ARICHBtestGeometryPar();
-
-      //! Destructor
-      virtual ~ARICHBtestGeometryPar();
-
-      //! Static method to get a reference to the ARICHBtestGeometryPar instance.
-      /*!
-      \return A reference to an instance of this class.
-      */
-      static ARICHBtestGeometryPar* Instance();
-      //! calculates detector parameters needed for geometry build and reconstruction.
-      void Initialize(const GearDir& content);
-      //! calculates detector parameters needed for geometry build and reconstruction.
-      void Initialize(const GearDir& modulecontent, const GearDir& mirrorcontent);
+    //! gets geometry parameters from gearbox.
+    void read(const GearDir& content);
 
 
-      //! Clears
-      void clear(void);
+    //! Set the tracking shift
+    void setTrackingShift(TVector3&);
+    //! Get the tracking shift
+    TVector3 getTrackingShift();
+    //! Set the rotation center of the Aerogel RICH frame
+    void setRotationCenter(TVector3&);
+    //! Get the rotation center of the Aerogel RICH frame
+    TVector3 getRotationCenter();
 
-      //! Print some debug information
-      void Print(void) const;
-
-      //! gets geometry parameters from gearbox.
-      void read(const GearDir& content);
-
-
-      //! Set the tracking shift
-      void setTrackingShift(TVector3&);
-      //! Get the tracking shift
-      TVector3 getTrackingShift();
-      //! Set the rotation center of the Aerogel RICH frame
-      void setRotationCenter(TVector3&);
-      //! Get the rotation center of the Aerogel RICH frame
-      TVector3 getRotationCenter();
-
-      //! Set the rotation angle of the Aerogel RICH frame
-      void setFrameRotation(double);
-      //! Get the rotation matrix of the Aerogel RICH frame
-      TRotation getFrameRotation();
-      //! Set the flag for the reconstruction by using the average aerogel refractive index
-      void setAverageAgel(bool);
-      //! Get the flag for the reconstruction by using the average aerogel refractive index
-      bool getAverageAgel();
-      //! Set the pointer of the tracking MWPCs
-      void setMwpc(ARICHTracking* m_mwpc);
-      //! Get the pointer of the tracking MWPCs
-      ARICHTracking* getMwpc();
-      //! Get the position of the HAPD channel
-      std::pair<double, double> GetHapdChannelPosition(int);
-      //! Get the mapping of the electronic channel to the HAPD module nr and the channel number
-      std::pair<int, int> GetHapdElectronicMap(int);
-      //! Set the position of the HAPD channel
-      int AddHapdChannelPositionPair(double , double);
-      //! Set the mapping of the electronic channel to the HAPD module nr and the channel number
-      int AddHapdElectronicMapPair(int, int);
-      //! Set of the setup global offset
-      void setOffset(TVector3&);
-      //! Get the setup global offset
-      TVector3 getOffset();
+    //! Set the rotation angle of the Aerogel RICH frame
+    void setFrameRotation(double);
+    //! Get the rotation matrix of the Aerogel RICH frame
+    TRotation getFrameRotation();
+    //! Set the flag for the reconstruction by using the average aerogel refractive index
+    void setAverageAgel(bool);
+    //! Get the flag for the reconstruction by using the average aerogel refractive index
+    bool getAverageAgel();
+    //! Set the pointer of the tracking MWPCs
+    void setMwpc(ARICHTracking* m_mwpc);
+    //! Get the pointer of the tracking MWPCs
+    ARICHTracking* getMwpc();
+    //! Get the position of the HAPD channel
+    std::pair<double, double> GetHapdChannelPosition(int);
+    //! Get the mapping of the electronic channel to the HAPD module nr and the channel number
+    std::pair<int, int> GetHapdElectronicMap(int);
+    //! Set the position of the HAPD channel
+    int AddHapdChannelPositionPair(double , double);
+    //! Set the mapping of the electronic channel to the HAPD module nr and the channel number
+    int AddHapdElectronicMapPair(int, int);
+    //! Set of the setup global offset
+    void setOffset(TVector3&);
+    //! Get the setup global offset
+    TVector3 getOffset();
 
 
-    private:
-      //! Pointer to the tracking chambers
-      ARICHTracking* m_mwpc;
-      //! Global offset
-      TVector3       m_offset;
-      //! Tracking shift
-      TVector3       m_trackingShift;
-      //! rotation center of the Aerogel RICH frame
-      TVector3       m_rotationCenter;
-      //! rotation matrix of the Aerogel RICH frame
-      TRotation      m_frameRotation;
-      //! flag for the reconstruction by using the average aerogel refractive index
-      bool           m_averageAgel;
-      //! the position of the HAPD channels
-      std::vector < std::pair<double, double> > m_hapdmap;
-      //! mapping of the electronic channel to the HAPD module nr and the channel number
-      std::vector < std::pair<int, int> > m_hapdeid;
+  private:
+    //! Pointer to the tracking chambers
+    ARICHTracking* m_mwpc;
+    //! Global offset
+    TVector3       m_offset;
+    //! Tracking shift
+    TVector3       m_trackingShift;
+    //! rotation center of the Aerogel RICH frame
+    TVector3       m_rotationCenter;
+    //! rotation matrix of the Aerogel RICH frame
+    TRotation      m_frameRotation;
+    //! flag for the reconstruction by using the average aerogel refractive index
+    bool           m_averageAgel;
+    //! the position of the HAPD channels
+    std::vector < std::pair<double, double> > m_hapdmap;
+    //! mapping of the electronic channel to the HAPD module nr and the channel number
+    std::vector < std::pair<int, int> > m_hapdeid;
 
-      int m_nPads;                           /*!< Number of detector module pads */
+    int m_nPads;                           /*!< Number of detector module pads */
 
-      bool m_init;                          /*!< True if parametrization is already initialized */
-      bool m_simple;                        /*!< True if parametrization initialized with simple geometry (beamtest) */
+    bool m_init;                          /*!< True if parametrization is already initialized */
+    bool m_simple;                        /*!< True if parametrization initialized with simple geometry (beamtest) */
 
 
 
-      static ARICHBtestGeometryPar* p_B4ARICHBtestGeometryParDB; /*!< Pointer that saves the instance of this class. */
+    static ARICHBtestGeometryPar* p_B4ARICHBtestGeometryParDB; /*!< Pointer that saves the instance of this class. */
 
-      // vectors holding information on HAPDs and chips and pads positions.
-
-
-    };
-
-    //-----------------------------------------------------------------------------
+    // vectors holding information on HAPDs and chips and pads positions.
 
 
+  };
 
+  //-----------------------------------------------------------------------------
 
-
-
-  } // end of namespace arich
 } // end of namespace Belle2
 
 #endif

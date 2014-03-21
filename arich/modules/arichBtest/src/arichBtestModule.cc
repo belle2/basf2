@@ -162,7 +162,7 @@ void arichBtestModule::beginRun()
   B2INFO("arichBtestModule::eventMetaDataPtr run:" << eventMetaDataPtr->getRun());
   B2INFO("arichBtestModule::eventMetaDataPtr exp:" << eventMetaDataPtr->getExperiment());
 
-  arich::ARICHBtestGeometryPar* _arichbtgp = arich::ARICHBtestGeometryPar::Instance();
+  ARICHBtestGeometryPar* _arichbtgp = ARICHBtestGeometryPar::Instance();
   m_mwpc = _arichbtgp->getMwpc();
 
   static int first = 1;
@@ -276,8 +276,8 @@ void arichBtestModule::readmwpc(unsigned int* dbuf, unsigned int len)
 int arichBtestModule::readhapd(unsigned int len, unsigned int* data)
 {
 
-  arich::ARICHGeometryPar* _arichgp = arich::ARICHGeometryPar::Instance();
-  arich::ARICHBtestGeometryPar* _arichbtgp = arich::ARICHBtestGeometryPar::Instance();
+  ARICHGeometryPar* _arichgp = ARICHGeometryPar::Instance();
+  ARICHBtestGeometryPar* _arichbtgp = ARICHBtestGeometryPar::Instance();
   //-----------------------------------------------------
 
   int bmask = 0xF;
@@ -431,7 +431,7 @@ int arichBtestModule::readdata(gzFile fp, int rec_id, int)
       int particleId = 0;// geant4
       dir *= m_beamMomentum * Unit::GeV;
       r *= Unit::mm / mm;
-      static arich::ARICHBtestGeometryPar* _arichbtgp = arich::ARICHBtestGeometryPar::Instance();
+      static ARICHBtestGeometryPar* _arichbtgp = ARICHBtestGeometryPar::Instance();
       static TVector3 dr =  _arichbtgp->getTrackingShift();
 
       r += dr;

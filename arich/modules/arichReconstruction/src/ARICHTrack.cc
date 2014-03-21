@@ -83,7 +83,7 @@ int ARICHTrack::Lund2Type(int ipart)
 double ARICHTrack::getMeanEmissionLength(int i) const
 {
   // Emission length measured from aerogel exit
-  static arich::ARICHGeometryPar* arichgp = arich::ARICHGeometryPar::Instance();
+  static ARICHGeometryPar* arichgp = ARICHGeometryPar::Instance();
 
   TVector3 dir = getMeanEmissionDirection(i);
   if (dir.Z() == 0) return 0;
@@ -105,7 +105,7 @@ TVector3 ARICHTrack::getMeanEmissionPosition(int i) const
 const TVector3 ARICHTrack::getAerogelExit(int i) const
 {
 
-  static arich::ARICHGeometryPar* arichgp = arich::ARICHGeometryPar::Instance();
+  static ARICHGeometryPar* arichgp = ARICHGeometryPar::Instance();
   double z = arichgp->getAerogelZPosition(i) + arichgp->getAerogelThickness(i);
   return  getPositionAtZ(z);
 }
@@ -113,7 +113,7 @@ const TVector3 ARICHTrack::getAerogelExit(int i) const
 const TVector3 ARICHTrack::getAerogelInput(int i) const
 {
 
-  static arich::ARICHGeometryPar* arichgp = arich::ARICHGeometryPar::Instance();
+  static ARICHGeometryPar* arichgp = ARICHGeometryPar::Instance();
   double z = arichgp->getAerogelZPosition(i);
   return  getPositionAtZ(z);
 }

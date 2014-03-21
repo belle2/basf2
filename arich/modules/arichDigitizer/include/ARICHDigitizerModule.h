@@ -17,81 +17,79 @@
 #include <string>
 
 namespace Belle2 {
-  namespace arich {
-    /** ARICH digitizer module.
-      *
-      * This module takes the hits form GEANT4 simulation (ARICHSimHit),
-      * applies q.e. of HAPDs, calculates and saves hit channel numbers (ARICHDigit).
-      * If the channel has multiple hits, only one is saved.
-      */
-    class ARICHDigitizerModule : public Module {
+  /** ARICH digitizer module.
+    *
+    * This module takes the hits form GEANT4 simulation (ARICHSimHit),
+    * applies q.e. of HAPDs, calculates and saves hit channel numbers (ARICHDigit).
+    * If the channel has multiple hits, only one is saved.
+    */
+  class ARICHDigitizerModule : public Module {
 
-    public:
+  public:
 
 
-      //! Constructor.
-      ARICHDigitizerModule();
+    //! Constructor.
+    ARICHDigitizerModule();
 
-      //! Destructor.
-      virtual ~ARICHDigitizerModule();
+    //! Destructor.
+    virtual ~ARICHDigitizerModule();
 
-      /**
-       * Initialize the Module.
-       *
-       * This method is called at the beginning of data processing.
-       */
-      virtual void initialize();
+    /**
+     * Initialize the Module.
+     *
+     * This method is called at the beginning of data processing.
+     */
+    virtual void initialize();
 
-      /**
-       * Called when entering a new run.
-       *
-       * Set run dependent things like run header parameters, alignment, etc.
-       */
-      virtual void beginRun();
+    /**
+     * Called when entering a new run.
+     *
+     * Set run dependent things like run header parameters, alignment, etc.
+     */
+    virtual void beginRun();
 
-      /**
-       * Event processor.
-       *
-       * Convert ARICHSimHits of the event to arichDigits.
-       */
-      virtual void event();
+    /**
+     * Event processor.
+     *
+     * Convert ARICHSimHits of the event to arichDigits.
+     */
+    virtual void event();
 
-      /**
-       * End-of-run action.
-       *
-       * Save run-related stuff, such as statistics.
-       */
-      virtual void endRun();
+    /**
+     * End-of-run action.
+     *
+     * Save run-related stuff, such as statistics.
+     */
+    virtual void endRun();
 
-      /**
-       * Termination action.
-       *
-       * Clean-up, close files, summarize statistics, etc.
-       */
-      virtual void terminate();
+    /**
+     * Termination action.
+     *
+     * Clean-up, close files, summarize statistics, etc.
+     */
+    virtual void terminate();
 
-      /**
-       *Prints module parameters.
-       */
-      void printModuleParams() const {};
+    /**
+     *Prints module parameters.
+     */
+    void printModuleParams() const {};
 
-    private:
+  private:
 
-      std::string m_inColName;         /**< Input collection name from simulation */
-      std::string m_outColName;        /**< Output collection name: digitized photons hits */
+    std::string m_inColName;         /**< Input collection name from simulation */
+    std::string m_outColName;        /**< Output collection name: digitized photons hits */
 
-      /* Other members.*/
-      double m_timeCPU;                /**< CPU time.     */
-      int    m_nRun;                   /**< Run number.   */
-      int    m_nEvent;                 /**< Event number. */
-      double m_maxQE;                  /**< QE at 400nm (from QE curve applied in SensitveDetector) */
-      double m_timeWindow;             /**< Readout time window width */
+    /* Other members.*/
+    double m_timeCPU;                /**< CPU time.     */
+    int    m_nRun;                   /**< Run number.   */
+    int    m_nEvent;                 /**< Event number. */
+    double m_maxQE;                  /**< QE at 400nm (from QE curve applied in SensitveDetector) */
+    double m_timeWindow;             /**< Readout time window width */
 
-      ARICHGeometryPar* m_arichgp;    /**< Geometry parameters of ARICH. */
+    ARICHGeometryPar* m_arichgp;    /**< Geometry parameters of ARICH. */
 
-    };
+  };
 
-  } // arich namespace
 } // Belle2 namespace
 
 #endif // ARICHDIGITIZERMODULE_H

@@ -40,10 +40,10 @@ namespace Belle2 {
              BranchOf < Int_t, NAMED("endFit_startISuperLayer") > ,
 
              BranchOf < Int_t, NAMED("startFit_nextISuperLayer") > ,
-             //BranchOf < Int_t, NAMED("endFit_nextISuperLayer") > ,
+             BranchOf < Int_t, NAMED("endFit_previousISuperLayer") > ,
 
              BranchOf < Int_t, NAMED("startFit_nextAxialISuperLayer") > ,
-             //BranchOf < Int_t, NAMED("endFit_nextAxialISuperLayer") > ,
+             BranchOf < Int_t, NAMED("endFit_previousAxialISuperLayer") > ,
 
 
              BranchOf < bool, NAMED("startSegment_isForwardTrajectory_startFit") > ,

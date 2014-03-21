@@ -34,17 +34,14 @@ for method in methods:
     expert.param('identifier', 'TMVA')
     expert.param('method', method)
     expert.param('listNames', ['e-'])
-    expert.param('target', method + '_Probability')
+    expert.param('signalProbabilityName', method + '_Probability')
     main.add_module(expert)
 
     histMaker = register_module('HistMaker')
     histMaker.param('file', method + '_hist.root')
-    mass = 511e-6
-    histMaker.param('histVariables', [(method + '_Probability', 100, 0, 1),
-                    ('p_CMS', 100, 0, 1), ('eid', 100, 0, 1), ('chiProb', 100, 0, 1)])
+    histMaker.param('histVariables', [(method + '_Probability', 100, 0, 1)])
     histMaker.param('truthVariable', 'isSignal')
     histMaker.param('listNames', ['e-'])
-    histMaker.param('make2dHists', True)
     main.add_module(histMaker)
 
 # ----> start processing of modules

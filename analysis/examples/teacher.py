@@ -58,11 +58,11 @@ methods = [
     ('Fisher', 'Fisher',
      'H:!V:Fisher:VarTransform=None:CreateMVAPdfs:PDFInterpolMVAPdf=Spline2:NbinsMVAPdf=50:NsmoothMVAPdf=10'),
     ('BDTGradient', 'BDT',
-     '!H:!V:CreateMVAPdfs:NTrees=1000:BoostType=Grad:Shrinkage=0.10:UseBaggedGrad:GradBaggingFraction=0.5:nCuts=20:MaxDepth=2'),
+     '!H:!V:CreateMVAPdfs:NTrees=100:BoostType=Grad:Shrinkage=0.10:UseBaggedGrad:GradBaggingFraction=0.5:nCuts=200:MaxDepth=2'),
     ('PDEFoamBoost', 'PDEFoam',
-     '!H:!V:CreateMVAPdfs:Boost_Num=30:Boost_Transform=linear:SigBgSeparate=F:MaxDepth=4:UseYesNoCell=T:DTLogic=MisClassificationError:FillFoamWithOrigWeights=F:TailCut=0:nActiveCells=500:nBin=20:Nmin=400:Kernel=None:Compress=T'),
+     '!H:!V:CreateMVAPdfs:Boost_Num=10:Boost_Transform=linear:SigBgSeparate=F:MaxDepth=4:UseYesNoCell=T:DTLogic=MisClassificationError:FillFoamWithOrigWeights=F:TailCut=0:nActiveCells=500:nBin=20:Nmin=400:Kernel=None:Compress=T'),
     ('NeuroBayes', 'Plugin',
-     '!H:V:CreateMVAPdfs:NTrainingIter=50:TrainingMethod=BFGS:NBIndiPreproFlagByVarname='
+        '!H:V:CreateMVAPdfs:NtrainingIter=20:Preprocessing=122:ShapeTreat=DIAG:TrainingMethod=BFGS:NBIndiPreproFlagByVarname='
      + '=34,'.join([s.replace('*', 'C') for s in variables]) + '=34')
 ]
 

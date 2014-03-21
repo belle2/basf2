@@ -94,7 +94,24 @@ namespace Belle2 {
              BranchOf < float, NAMED("endSegment_extrapolation_y") > ,
 
              BranchOf < float, NAMED("startSegment_extrapolation_to_center_distance") > ,
-             BranchOf < float, NAMED("endSegment_extrapolation_to_center_distance") >
+             BranchOf < float, NAMED("endSegment_extrapolation_to_center_distance") > ,
+
+
+             BranchOf < float, NAMED("startFit_center_unitMom_x") > ,
+             BranchOf < float, NAMED("startFit_center_unitMom_y") > ,
+
+             BranchOf < float, NAMED("startFit_extrapolation_unitMom_x") > ,
+             BranchOf < float, NAMED("startFit_extrapolation_unitMom_y") > ,
+
+
+             BranchOf < float, NAMED("endFit_center_unitMom_x") > ,
+             BranchOf < float, NAMED("endFit_center_unitMom_y") > ,
+
+             BranchOf < float, NAMED("endFit_extrapolation_unitMom_x") > ,
+             BranchOf < float, NAMED("endFit_extrapolation_unitMom_y") > ,
+
+             BranchOf < float, NAMED("start_to_end_mom_angle") > ,
+             BranchOf < float, NAMED("end_to_start_mom_angle") >
 
              > AxialAxialSegmentPairFilterTreeBase;
 
@@ -109,32 +126,6 @@ namespace Belle2 {
     public:
       /// Fills the object with the information gather from the given segment to segment pair instance.
       bool setValues(const CellWeight& mcWeight, const CDCAxialAxialSegmentPair& axialAxialSegmentPair);
-
-      /*
-      TVector2 m_startSegment_com;
-      TVector2 m_endSegment_com;
-
-      Float_t m_startSegment_mom;
-      Float_t m_endSegment_mom;
-
-      TVector2 m_startSegment_center;
-      TVector2 m_endSegment_center;
-
-      TVector2 m_startSegment_extrapolation;
-      TVector2 m_endSegment_extrapolation;
-
-      TVector2 m_startSegment_centerMom;
-      TVector2 m_endSegment_centerMom;
-
-      TVector2 m_startSegment_extarpolationMom;
-      TVector2 m_endSegment_extrapolationMom;
-
-      Float_t m_distanceAtStart;
-      Float_t m_distanceAtEnd;
-
-      Float_t m_momAngleDeviationAtStart;
-      Float_t m_momAngleDeviationAtEnd;
-      */
 
     private:
 

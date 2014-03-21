@@ -134,26 +134,31 @@ bool AxialAxialSegmentPairFilterTree::setValues(const CellWeight& mcWeight, cons
   setValue < NAMED("startSegment_extrapolation_to_center_distance") > (startExtrapolatedToEndCenter.distance(endCenter));
   setValue < NAMED("endSegment_extrapolation_to_center_distance") > (endExtrapolatedToStartCenter.distance(startCenter));
 
-
-  /*
-
   Vector2D startMomAtCenter = startFit.getUnitMom2D(startCenter);
   Vector2D endMomAtCenter = endFit.getUnitMom2D(endCenter);
-
-  m_startSegment_centerMom = startMomAtCenter;
-  m_endSegment_centerMom = endMomAtCenter;
 
   Vector2D startMomAtExtrapolation = startFit.getUnitMom2D(startExtrapolatedToEndCenter);
   Vector2D endMomAtExtrapolation = endFit.getUnitMom2D(endExtrapolatedToStartCenter);
 
-  m_startSegment_extarpolationMom = startMomAtExtrapolation;
-  m_endSegment_extrapolationMom = endMomAtExtrapolation;
+  setValue < NAMED("startFit_center_unitMom_x") > (startMomAtCenter.x());
+  setValue < NAMED("startFit_center_unitMom_y") > (startMomAtCenter.y());
 
+  setValue < NAMED("startFit_extrapolation_unitMom_x") > (startMomAtExtrapolation.x());
+  setValue < NAMED("startFit_extrapolation_unitMom_y") > (startMomAtExtrapolation.y());
+
+
+  setValue < NAMED("endFit_center_unitMom_x") > (endMomAtCenter.x());
+  setValue < NAMED("endFit_center_unitMom_y") > (endMomAtCenter.y());
+
+  setValue < NAMED("endFit_extrapolation_unitMom_x") > (endMomAtExtrapolation.x());
+  setValue < NAMED("endFit_extrapolation_unitMom_y") > (endMomAtExtrapolation.y());
+
+  setValue < NAMED("start_to_end_mom_angle") > (startMomAtCenter.angleWith(endMomAtExtrapolation));
+  setValue < NAMED("end_to_start_mom_angle") > (endMomAtCenter.angleWith(startMomAtExtrapolation));
+
+  /*
   m_distanceAtStart = startCenter.distance(endExtrapolatedToStartCenter);
   m_distanceAtEnd = endCenter.distance(startExtrapolatedToEndCenter);
-
-  m_momAngleDeviationAtStart = startMomAtCenter.angleWith(endMomAtExtrapolation);
-  m_momAngleDeviationAtEnd = endMomAtCenter.angleWith(startMomAtExtrapolation);
 
   //make a cut - make this more sophisticated at some point
   //double cosDeviation = endCenter.cosWith(pointOnFromTrack);

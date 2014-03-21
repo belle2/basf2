@@ -30,6 +30,9 @@ namespace Belle2 {
     BranchOf < float, NAMED("mcWeight") > ,
              BranchOf < bool, NAMED("mcDecision") > ,
 
+             BranchOf < UInt_t, NAMED("startSegment_size") > ,
+             BranchOf < UInt_t, NAMED("endSegment_size") > ,
+
              BranchOf < bool, NAMED("startSegment_isForwardTrajectory_startFit") > ,
              BranchOf < bool, NAMED("startSegment_isForwardTrajectory_endFit") > ,
              BranchOf < bool, NAMED("startSegment_isForwardTrajectory_commonFit") > ,

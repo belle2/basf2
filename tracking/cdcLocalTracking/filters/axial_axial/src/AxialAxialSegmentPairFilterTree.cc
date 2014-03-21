@@ -49,6 +49,8 @@ bool AxialAxialSegmentPairFilterTree::setValues(const CellWeight& mcWeight, cons
   setValue < NAMED("mcWeight") > (mcWeight);
   setValue < NAMED("mcDecision") > (mcDecision);
 
+  setValue < NAMED("startSegment_size") > (startSegment.size());
+  setValue < NAMED("endSegment_size") > (endSegment.size());
 
   setValue < NAMED("startSegment_isForwardTrajectory_startFit") > (startSegment.isForwardTrajectory(startFit));
   setValue < NAMED("startSegment_isForwardTrajectory_endFit") > (startSegment.isForwardTrajectory(endFit));

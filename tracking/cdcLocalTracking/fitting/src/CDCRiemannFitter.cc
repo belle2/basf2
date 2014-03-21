@@ -105,7 +105,8 @@ void CDCRiemannFitter::update(CDCTrajectory2D& trajectory2D, const CDCRecoSegmen
   update(trajectory2D, observations2D);
 
   //Set transverse s reference
-  trajectory2D.setStartPos2D(recoSegment2D.front().getRecoPos2D()) ;
+  // trajectory2D.setStartPos2D(recoSegment2D.front().getRecoPos2D()) ;
+  trajectory2D.setStartPos2D(recoSegment2D.getCenterOfMass2D()) ;
 
   //Check if fit is forward
   if (not recoSegment2D.isForwardTrajectory(trajectory2D)) trajectory2D.reverse();
@@ -131,7 +132,8 @@ void CDCRiemannFitter::update(CDCTrajectory2D& trajectory2D,
   update(trajectory2D, observations2D);
 
   //set transverse s reference
-  trajectory2D.setStartPos2D(firstRecoSegment2D.front().getRecoPos2D()) ;
+  //trajectory2D.setStartPos2D(firstRecoSegment2D.front().getRecoPos2D()) ;
+  trajectory2D.setStartPos2D(firstRecoSegment2D.getCenterOfMass2D()) ;
 
   //check if fit is forward
   if (not firstRecoSegment2D.isForwardTrajectory(trajectory2D)) trajectory2D.reverse();

@@ -31,20 +31,33 @@ TEST(CDCLocalTrackingTestWithoutGearBox, StaticString)
 
 
   typedef StaticString < 'a' > StaticString_a;
+  typedef StaticStringTail<StaticString_a> StaticString_a_tail;
+
   EXPECT_EQ(2, StaticString_a::size);
   EXPECT_EQ('a', StaticString_a::first);
   EXPECT_STREQ("a", StaticString_a::chars);
   EXPECT_STREQ("a", StaticString_a::c_str());
-  ::testing::StaticAssertTypeEq< EmptyStaticString, StaticStringTail<StaticString_a>::type >();
+
+  EXPECT_EQ(1, StaticString_a_tail::size);
+  EXPECT_EQ('\0', StaticString_a_tail::first);
+  EXPECT_STREQ("", StaticString_a_tail::chars);
+  EXPECT_STREQ("", StaticString_a_tail::c_str());
+
+
+
+  ::testing::StaticAssertTypeEq< EmptyStaticString, StaticString_a_tail>();
 
 
   typedef StaticString < 't', 'e', 's', 't' > StaticString_test;
   typedef StaticString < 'e', 's', 't' > StaticString_est;
+
+  typedef StaticStringTail<StaticString_test> StaticString_test_tail;
+
   EXPECT_EQ(5, StaticString_test::size);
   EXPECT_EQ('t', StaticString_test::first);
   EXPECT_STREQ("test", StaticString_test::chars);
   EXPECT_STREQ("test", StaticString_test::c_str());
-  ::testing::StaticAssertTypeEq< StaticStringTail<StaticString_test>::type, StaticString_est>();
+  ::testing::StaticAssertTypeEq<StaticString_est, StaticString_test_tail>();
 
 }
 
@@ -55,10 +68,10 @@ TEST(CDCLocalTrackingTestWithoutGearBox, StaticString_StaticStrip)
 
   typedef StaticString < 't', 'e', 's', 't' > StaticString_test;
 
-  typedef StaticStripFront < '\0', '\0', '\0', 't', 'e', 's', 't' >::type StaticString_test2;
+  typedef StaticStripFront < '\0', '\0', '\0', 't', 'e', 's', 't' > StaticString_test2;
   ::testing::StaticAssertTypeEq< StaticString_test, StaticString_test2>();
 
-  typedef StaticStripBack < 't', 'e', 's', 't', '\0', '\0', '\0' >::type StaticString_test3;
+  typedef StaticStripBack < 't', 'e', 's', 't', '\0', '\0', '\0' > StaticString_test3;
   ::testing::StaticAssertTypeEq< StaticString_test, StaticString_test3>();
 
 }

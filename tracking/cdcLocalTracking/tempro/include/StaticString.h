@@ -11,13 +11,7 @@
 #define STATICSTRING_H
 
 #include <stddef.h>
-
-#include "pp_pow.h"
-
-#include <boost/preprocessor/repetition/enum_params.hpp>
-#include <boost/preprocessor/facilities/intercept.hpp>
-#include <boost/preprocessor/repetition/enum.hpp>
-
+#include <type_traits>
 
 namespace Belle2 {
   namespace CDCLocalTracking {
@@ -30,9 +24,16 @@ namespace Belle2 {
     template<char Char, char... Chars>
     class StaticString <Char, Chars...> {
     public:
+      /// Class variable stating the length of the string including the trailing null character
       enum { size = 2 + sizeof ...(Chars) };
+
+      /// Class variable of all the characters in the string including a trailing null character
       static const char chars[2 + sizeof ...(Chars)];
+
+      /// Class variable containing the first character of the string
       static const char first;
+
+      /// Static function returning the run time c string represented by this static string
       static const char* c_str();
     };
 
@@ -49,98 +50,112 @@ namespace Belle2 {
     template<>
     class StaticString<> {
     public:
+      /// Class variable stating the length of the string including the trailing null character - amounts to 1 in this specialisation
       enum { size = 1 };
+
+      /// Class variable of all the characters in the string including a trailing null character - amounts to {'\0'} in this specialisation
       static const char chars[1];
+
+      /// Class variable containing the first character of the string - amounts to '\0' for this specialisation
       static const char first;
+
+      /// Static function returning the run time c string represented by this static string - amounts to "\0" for this specialisation
       static const char* c_str();
-    };
 
-
-    template<class P>
-    class StaticStringTail;
-
-    template<char Char, char... Chars>
-    class StaticStringTail<StaticString<Char, Chars...> > {
-    public:
-      typedef StaticString<Chars...> type;
-    };
-
-
-    template<class P>
-    class StaticStringHead;
-
-    template<char Char, char... Chars>
-    class StaticStringHead<StaticString<Char, Chars...> > {
-    public:
-      enum { value = Char};
-    };
-
-
-    template<>
-    class StaticStringTail<StaticString<> > {
-    public:
-      enum { value = '\0' };
     };
 
     /// Type alias for the string with no characters.
     typedef StaticString<> EmptyStaticString;
 
 
+
+    /// Implementation of the metafunction, which retieves a StaticString without the first character.
+    template<class P>
+    struct StaticStringTailImpl;
+
+    /// Implementation of the metafunction which retieves a StaticString without the first character - specialisation for non null strings.
+    template<char Char, char... Chars>
+    struct StaticStringTailImpl<StaticString<Char, Chars...> > {
+      /// Result of the metafunction containing the StaticString without the first character.
+      typedef StaticString<Chars...> type;
+    };
+
+    /// Implementation of the metafunction which retieves a StaticString without the first character - specialisation null strings.
+    template<>
+    struct StaticStringTailImpl< StaticString<> > {
+      /// Result of the metafunction containing the StaticString without the first character.
+      typedef StaticString<> type;
+    };
+
+
+
+    /// Metafunction returning the StaticString without the first character.
+    template<class StaticString_>
+    using StaticStringTail = typename StaticStringTailImpl<StaticString_ >::type;
+
+    /// Implementation of the metafunction, which retieves the first character of a StaticString. Specialisations always inherit from std::integral_constant, which contains the result.
+    template<class P>
+    struct StaticStringHead;
+
+    /// Implementation of the metafunction, which retieves the first character of a StaticString - specialisation for non empty strings.
+    template<char Char, char... Chars>
+    struct StaticStringHead<StaticString<Char, Chars...> > :
+        std::integral_constant<char, Char> {
+    };
+
+    /// Implementation of the metafunction, which retieves the first character of a StaticString - specialisation for empty strings.
+    template<>
+    struct StaticStringHead<StaticString<> > :
+        std::integral_constant < char, '\0' > {
+    };
+
+    /* As soon c++14 and templated variables are available this can be activated for direct usage of the metafunction with the need of ::value as in the current StaticStringHeadImpl version */
+    /*
     template<char... Chars>
-    class StaticStripFront {
-    public:
+    constexpr char staticStringHead = StaticStringHead<StaticString<Chars...>::value;
+    */
+
+    /// Implementation of the metafunction stripping leading null characters from a variadic character sequence.
+    template<char... Chars>
+    struct StaticStripFrontImpl {
+      /// Result of the metafunction - a StaticString made from the variadic character sequence stripped from leading null characters
       typedef StaticString<Chars ...> type;
     };
 
+    /// Implementation of the metafunction stripping leading null characters from a variadic character sequence - specialisation that strips one leading null character.
     template<char... Chars>
-    class StaticStripFront < '\0', Chars... > {
-    public:
-      typedef typename StaticStripFront<Chars ...>::type type;
+    struct StaticStripFrontImpl < '\0', Chars... > {
+      /// Result of the metafunction - a StaticString made from the variadic character sequence stripped from leading null characters.
+      typedef typename StaticStripFrontImpl<Chars ...>::type type;
     };
 
+    /// Metafunction striping null characters from the start StaticString
+    template<char ... Chars>
+    using StaticStripFront = typename StaticStripFrontImpl<Chars...>::type;
 
+
+
+    /// Implementation of the metafunction, which strips trailing characters from a variadic character sequence after the first null character.
     template< typename S, char... Chars>
-    class StaticStripBackImpl;
+    struct StaticStripBackImpl;
 
-    /*
-    template<char... ConsumedChars, char Char1,char Char2, char... Chars>
-    class StaticStripBackImpl< StaticString<ConsumedChars...>, Char1, Char2, Chars...> {
-    public:
-      typedef typename StaticStripBackImpl<StaticString<ConsumedChars..., Char1, Char2>, Chars...>::type type;
-      };*/
+    /// Implementation of the metafunction which strips of superflicious null characters from a StaticString - specialisation to capture the a null character and aborting the recursion
+    template<char... ConsumedChars, char... Chars>
+    struct StaticStripBackImpl < StaticString<ConsumedChars...>, '\0', Chars... > {
+      /// Result of the metafunction - a StaticString containing only the characters before the first null character.
+      typedef StaticString<ConsumedChars...> type;
+    };
 
-    /*
-    template<char... ConsumedChars, BOOST_PP_ENUM_PARAMS(2, char Char), char... Chars>
-    class StaticStripBackImpl< StaticString<ConsumedChars...>, BOOST_PP_ENUM_PARAMS(2, Char), Chars...> {
-    public:
-      typedef typename StaticStripBackImpl<StaticString<ConsumedChars..., BOOST_PP_ENUM_PARAMS(2, Char)>, Chars...>::type type;
-    };*/
-
+    /// Implementation of the metafunction which strips of superflicious null characters from a StaticString - specialisation to capture a non null character and recursively move it to the resulting StaticString.
     template<char... ConsumedChars, char Char, char... Chars>
-    class StaticStripBackImpl< StaticString<ConsumedChars...>, Char, Chars...> {
-    public:
+    struct StaticStripBackImpl< StaticString<ConsumedChars...>, Char, Chars...> {
+      /// Result of the metafunction - a StaticString containing only the characters before the first null character.
       typedef typename StaticStripBackImpl<StaticString<ConsumedChars..., Char>, Chars...>::type type;
     };
 
-    /*
-    template<char... ConsumedChars, char... Chars>
-    class StaticStripBackImpl< StaticString<ConsumedChars...>, BOOST_PP_ENUM_PARAMS(2, '\0' BOOST_PP_INTERCEPT), Chars...> {
-    public:
-      typedef StaticString<ConsumedChars...> type;
-      };*/
-
-
-    template<char... ConsumedChars, char... Chars>
-    class StaticStripBackImpl < StaticString<ConsumedChars...>, '\0', Chars... > {
-    public:
-      typedef StaticString<ConsumedChars...> type;
-    };
-
+    /// Metafunction returning a StaticString with characters before the first null character.
     template<char... Chars>
-    class StaticStripBack {
-    public:
-      typedef typename StaticStripBackImpl<StaticString<>, Chars... >::type type;
-    };
+    using StaticStripBack =  typename StaticStripBackImpl<StaticString<>, Chars... >::type;
 
 
   } // end namespace CDCLocalTracking

@@ -35,7 +35,7 @@
 //#   define NAMED(name) StaticStripBack<at(name,0), at(name,1), at(name,2), at(name,3), at(name,4), at(name,5), at(name,6)>::type
 
 /// Macro turning a string literal to a StaticString class representing that string as a type.
-#   define NAMED(name) StaticStripBack<BOOST_PP_ENUM(NAMED_MAXLENGTH, __NAMED_AT, name)>::type
+#   define NAMED(name) StaticStripBack<BOOST_PP_ENUM(NAMED_MAXLENGTH, __NAMED_AT, name)>
 
 #endif
 

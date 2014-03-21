@@ -4,7 +4,12 @@
 from basf2 import *
 
 
-def add_simulation(path, components=None, bkgfiles=None):
+def add_simulation(
+    path,
+    components=None,
+    bkgfiles=None,
+    bkgcomponents=None,
+    ):
     """
     This function adds the standard simulation modules to a path.
     """
@@ -27,8 +32,11 @@ def add_simulation(path, components=None, bkgfiles=None):
     if bkgfiles:
         bkgmixer = register_module('BeamBkgMixer')
         bkgmixer.param('backgroundFiles', bkgfiles)
-        if components:
-            bkgmixer.param('components', components)
+        if bkgcomponents:
+            bkgmixer.param('components', bkgcomponents)
+        else:
+            if components:
+                bkgmixer.param('components', components)
         path.add_module(bkgmixer)
 
     # PXD digitization

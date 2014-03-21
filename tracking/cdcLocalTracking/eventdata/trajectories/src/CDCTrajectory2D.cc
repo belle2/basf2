@@ -220,7 +220,7 @@ ISuperLayerType CDCTrajectory2D::getAxialISuperLayerAfterStart(const ForwardBack
     return INVALID_ISUPERLAYER;
   } else {
     // the next layer is a true stereo layer go to the next layer which is always an axial layer.
-    bool movingOutward = iSuperLayerStep > 0;
+    bool movingOutward = iSuperLayerStep * forwardBackwardInfo > 0;
     return getISuperLayerAfter(nextISuperLayer, movingOutward, forwardBackwardInfo);
   }
 

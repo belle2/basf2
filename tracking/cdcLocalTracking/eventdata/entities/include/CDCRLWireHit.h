@@ -137,11 +137,11 @@ namespace Belle2 {
       { return getWireHit().getISuperLayer(); }
 
       /// Same as getPerpS().
-      FloatType getStartPerpS(const CDCTrajectory2D& trajectory2D) const
+      FloatType getFrontPerpS(const CDCTrajectory2D& trajectory2D) const
       { return getPerpS(trajectory2D); }
 
       /// Same as getPerpS().
-      FloatType getEndPerpS(const CDCTrajectory2D& trajectory2D) const
+      FloatType getBackPerpS(const CDCTrajectory2D& trajectory2D) const
       { return getPerpS(trajectory2D); }
 
       /// Calculates the squared distance of the oriented hit to a circle as see from the transvers plane.

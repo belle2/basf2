@@ -41,11 +41,9 @@ namespace Belle2 {
       ///Empty destructor
       ~CDCRiemannFitter();
 
-      CDCTrajectory2D fit(const CDCRLWireHitTriple& rlWireHitTriple) const;
       CDCTrajectory2D fit(const CDCRecoSegment2D& recoSegment2D) const;
       CDCTrajectory2D fit(const CDCAxialAxialSegmentPair& axialAxialSegmentPair) const;
 
-      void update(CDCTrajectory2D& fit, const CDCRLWireHitTriple& rlWireHitTriple) const;
       void update(CDCTrajectory2D& fit, const CDCRecoSegment2D& recoSegment2D) const;
       void update(CDCTrajectory2D& fit, const CDCRecoSegment2D& firstRecoSegment2D, const CDCRecoSegment2D& secondRecoSegment2D) const;
       void update(CDCTrajectory2D& fit, const CDCAxialAxialSegmentPair& axialAxialSegmentPair) const;

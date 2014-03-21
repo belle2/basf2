@@ -71,38 +71,23 @@ CellWeight SimpleAxialAxialSegmentPairFilter::isGoodAxialAxialSegmentPair(const 
   const CDCTrajectory2D& startFit = getFittedTrajectory2D(startSegment);
   const CDCTrajectory2D& endFit = getFittedTrajectory2D(endSegment);
 
-  //B2DEBUG(100,"    startSegment.front() = " <<  startSegment.front() );
-  //B2DEBUG(100,"    startSegment.back()  = " <<  startSegment.back() );
-
-  //B2DEBUG(100,"    endSegment.front()   = " <<  endSegment.front() );
-  //B2DEBUG(100,"    endSegment.back()    = " <<  endSegment.back() );
-
-  //B2DEBUG(100,"    startSegment.getStartPerpS(startFit) = " <<  startSegment.getStartPerpS(startFit) );
-  //B2DEBUG(100,"    startSegment.getEndPerpS(startFit)   = " <<  startSegment.getEndPerpS(startFit) );
-
-  //B2DEBUG(100,"    endSegment.getStartPerpS(startFit)   = " <<  endSegment.getStartPerpS(startFit) );
-  //B2DEBUG(100,"    endSegment.getEndPerpS(startFit)     = " <<  endSegment.getEndPerpS(startFit) );
-
-  //B2DEBUG(100,"    Check startSegment isForwardFit " << startSegment.isForwardFit(startFit));
-  //B2DEBUG(100,"    Check endSegment isForwardFit " << endSegment.isForwardFit(startFit));
-
   //alignment cut - nonnegotiable
   if (not endSegment.isForwardTrajectory(startFit)) return NOT_A_CELL;
 
-  //FloatType distanceAverage = ( endSegment.getStartPerpS(startFit) +
-  //                              endSegment.getEndPerpS(startFit)    ) / 2;
+  //FloatType distanceAverage = ( endSegment.getFrontPerpS(startFit) +
+  //                              endSegment.getBackPerpS(startFit)    ) / 2;
 
 
   //check if end segment is in forward direction of startSegment
   //reference point was already set in the fit to the first hit of the startSegment
   //alignment cut - nonnegotiable
-  if (endSegment.getEndPerpS(startFit)   < startSegment.getEndPerpS(startFit) or
-      endSegment.getStartPerpS(startFit) < startSegment.getStartPerpS(startFit)) return NOT_A_CELL;
+  if (endSegment.getBackPerpS(startFit)   < startSegment.getBackPerpS(startFit) or
+      endSegment.getFrontPerpS(startFit) < startSegment.getFrontPerpS(startFit)) return NOT_A_CELL;
 
 
   //check if the last hit of the reco hit lies further in travel direction than the first
-  //FloatType distanceLastToFirst = endSegment.getEndPerpS(startFit) -
-  //                                endSegment.getStartPerpS(startFit) ;
+  //FloatType distanceLastToFirst = endSegment.getFrontPerpS(startFit) -
+  //                                endSegment.getBackPerpS(startFit) ;
 
   Vector2D startCOM = startSegment.getCenterOfMass2D();
   Vector2D endCOM   = endSegment.getCenterOfMass2D();

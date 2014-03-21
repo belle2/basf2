@@ -69,6 +69,16 @@ namespace Belle2 {
       FloatType calcPerpS(const Vector2D& point) const
       { return getGenCircle().lengthOnCurve(m_startPos2D, point); }
 
+
+      /// Calculate the travel distance between the two given positions
+      /** Returns the travel distance on the trajectory from the first given point to \n
+       *  the second given point. This is subjected to a discontinuity at the far point \n
+       *  of the circle. Hence the value return is in the range from -PI*radius to PI*radius \n
+       *  If you have a heavily curling track you have care about the feasibility of this \n
+       *  calculation. */
+      FloatType calcPerpSBetween(const Vector2D& fromPoint, const Vector2D& toPoint) const
+      { return getGenCircle().lengthOnCurve(fromPoint, toPoint); }
+
       /// Gives the three dimensional point which is on the skew line as well as on the circle in the xy projection
       /** This method makes the reconstruction of the z coordinate possble by using the skewness \n
        *  stereo layer of the stereo wires.  The point is determined such that it is on the given \n

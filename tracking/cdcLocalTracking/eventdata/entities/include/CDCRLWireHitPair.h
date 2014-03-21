@@ -74,12 +74,12 @@ namespace Belle2 {
 
 
       /// Estimate the transvers travel distance on the given circle to the first oriented wire hit
-      FloatType getStartPerpS(const CDCTrajectory2D& trajectory2D) const
-      { return getFromRLWireHit().getStartPerpS(trajectory2D); }
+      FloatType getFrontPerpS(const CDCTrajectory2D& trajectory2D) const
+      { return getFromRLWireHit().getFrontPerpS(trajectory2D); }
 
       /// Estimate the transvers travel distance on the given circle to the second oriented wire hit
-      FloatType getEndPerpS(const CDCTrajectory2D& trajectory2D) const
-      { return getToRLWireHit().getEndPerpS(trajectory2D); }
+      FloatType getBackPerpS(const CDCTrajectory2D& trajectory2D) const
+      { return getToRLWireHit().getBackPerpS(trajectory2D); }
 
       /// Calculates the squared distance of the two oriented wire hit to a circle as see from the transvers plane.
       /** Returns the sum of the squared distances to the two oriented wire hits */

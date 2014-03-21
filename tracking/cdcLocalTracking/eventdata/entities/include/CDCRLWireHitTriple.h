@@ -107,24 +107,18 @@ namespace Belle2 {
       /// Getter for the shape of this tiple if all three oriented wire hits are neighbors. Else INVALIDSHAPE
       Shape getShape() const;
 
-
-
       /// Estimate the transvers travel distance on the given circle to the first oriented wire hit
-      FloatType getStartPerpS(const CDCTrajectory2D& trajectory2D) const
-      { return getStartRLWireHit().getStartPerpS(trajectory2D); }
+      FloatType getFrontPerpS(const CDCTrajectory2D& trajectory2D) const
+      { return getStartRLWireHit().getFrontPerpS(trajectory2D); }
 
       /// Estimate the transvers travel distance on the given circle to the third oriented wire hit
-      FloatType getEndPerpS(const CDCTrajectory2D& trajectory2D) const
-      { return getRearRLWireHitPair().getEndPerpS(trajectory2D); }
+      FloatType getBackPerpS(const CDCTrajectory2D& trajectory2D) const
+      { return getRearRLWireHitPair().getBackPerpS(trajectory2D); }
 
       /// Calculates the squared distance of the three oriented wire hits to a circle as see from the transvers plane.
       /** Returns the sum of the squared distances to the three oriented wire hits */
       FloatType getSquaredDist2D(const CDCTrajectory2D& trajectory2D) const
       { return getStartRLWireHit().getSquaredDist2D(trajectory2D) + getRearRLWireHitPair().getSquaredDist2D(trajectory2D);}
-
-      /// Checks if the last oriented wire hit in the triple lies at greater travel distance than the first oriented wire hit
-      bool isForwardTrajectory(const CDCTrajectory2D& trajectory2D) const
-      { return getStartPerpS(trajectory2D) < getEndPerpS(trajectory2D); }
 
       /// Getter for the common superlayer id of the pair
       ILayerType getISuperLayer() const {

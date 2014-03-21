@@ -165,17 +165,29 @@ namespace Belle2 {
       // Methodes that explicitly use the order of the items as a feature of the storing vector.
       // meaning things that can not be done with the set
 
+      /// Getter for the first observed position projected to the given trajectory
+      Vector2D getFrontRecoPos2D(const CDCTrajectory2D& trajectory2D) const
+      { return this->front()->getFrontRecoPos2D(trajectory2D); }
+
+      /// Getter for the last observed position projected to the given trajectory
+      Vector2D getBackRecoPos2D(const CDCTrajectory2D& trajectory2D) const
+      { return this->back()->getBackRecoPos2D(trajectory2D); }
+
       /// Calculates the travel distance of the first track entity in the vector
-      FloatType getStartPerpS(const CDCTrajectory2D& trajectory2D) const
-      { return this->front()->getStartPerpS(trajectory2D); }
+      FloatType getFrontPerpS(const CDCTrajectory2D& trajectory2D) const
+      { return this->front()->getFrontPerpS(trajectory2D); }
 
       /// Calculates the travel distance of the last track entity in the vector
-      FloatType getEndPerpS(const CDCTrajectory2D& trajectory2D) const
-      { return this->back()->getEndPerpS(trajectory2D); }
+      FloatType getBackPerpS(const CDCTrajectory2D& trajectory2D) const
+      { return this->back()->getBackPerpS(trajectory2D); }
+
+      /// Calculate the total transvers travel distance traversed by this ordered sequence of hit entities
+      FloatType getTotalPerpS(const CDCTrajectory2D& trajectory2D) const
+      { return trajectory2D.calcPerpSBetween(getFrontRecoPos2D(trajectory2D), getBackRecoPos2D(trajectory2D)); }
 
       /// Checks if the last entity in the vector lies at greater travel distance than the first entity
       bool isForwardTrajectory(const CDCTrajectory2D& trajectory2D) const
-      { return getStartPerpS(trajectory2D) < getEndPerpS(trajectory2D); }
+      { return getTotalPerpS(trajectory2D) > 0.0; }
 
     private:
       /// ROOT Macro to make CDCGenHitVector a ROOT class.

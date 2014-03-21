@@ -194,6 +194,9 @@ namespace Belle2 {
       void snapToDriftCircle()
       { m_recoDisp2D.normalizeTo(getRLWireHit().getRefDriftLength()); }
 
+      /// Projects the hit's reconstructed position onto the given trajectory
+      Vector2D getRecoPos2D(const CDCTrajectory2D& trajectory2D) const;
+
       /// Estimate the transvers travel distance on the given circle.
       /** Uses the point of closest approach to the reconstructed position
        *  on the circle and calculates the arc length from the reference on the circle.
@@ -201,12 +204,20 @@ namespace Belle2 {
       FloatType getPerpS(const CDCTrajectory2D& trajectory2D) const
       { return trajectory2D.calcPerpS(getRecoPos2D()); }
 
+      /// Same as getRecoPos2D()
+      Vector2D getFrontRecoPos2D(const CDCTrajectory2D& trajectory2D) const
+      { return getRecoPos2D(trajectory2D); }
+
+      /// Same as getRecoPos2D()
+      Vector2D getBackRecoPos2D(const CDCTrajectory2D& trajectory2D) const
+      { return getRecoPos2D(trajectory2D); }
+
       /// Same as getPerpS().
-      FloatType getStartPerpS(const CDCTrajectory2D& trajectory2D) const
+      FloatType getFrontPerpS(const CDCTrajectory2D& trajectory2D) const
       { return getPerpS(trajectory2D); }
 
       /// Same as getPerpS().
-      FloatType getEndPerpS(const CDCTrajectory2D& trajectory2D) const
+      FloatType getBackPerpS(const CDCTrajectory2D& trajectory2D) const
       { return getPerpS(trajectory2D); }
 
       /// Center of mass is just the reconstructed position

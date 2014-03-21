@@ -200,6 +200,10 @@ namespace Belle2 {
       /// Getter for the 2d position of the hit
       const Vector2D& getRecoPos2D() const { return getRecoPos3D().xy(); }
 
+      /// Projects the hit's reconstructed position onto the given two dimensional trajectory
+      Vector2D getRecoPos2D(const CDCTrajectory2D& trajectory2D) const
+      { return trajectory2D.getClosest(getRecoPos2D()); }
+
       /// Adjust the travel distance by the given value.
       void shiftPerpS(FloatType perpSOffSet)
       { m_perpS += perpSOffSet; }
@@ -225,17 +229,23 @@ namespace Belle2 {
        *  No matter you have a pointer or an object access is given with '->'*/
       const CDCRecoHit3D* operator->() const { return this; }
 
-
-
       /// Getter for the center of mass. Center of mass is just the reconstructed position
       Vector2D getCenterOfMass2D() const { return getRecoPos2D(); }
 
+      /// Same as getRecoPos2D()
+      Vector2D getFrontRecoPos2D(const CDCTrajectory2D& trajectory2D) const
+      { return getRecoPos2D(trajectory2D); }
+
+      /// Same as getRecoPos2D()
+      Vector2D getBackRecoPos2D(const CDCTrajectory2D& trajectory2D) const
+      { return getRecoPos2D(trajectory2D); }
+
       /// Same as getPerpS().
-      FloatType getStartPerpS(const CDCTrajectory2D& trajectory2D) const
+      FloatType getFrontPerpS(const CDCTrajectory2D& trajectory2D) const
       { return getPerpS(trajectory2D); }
 
       /// Same as getPerpS().
-      FloatType getEndPerpS(const CDCTrajectory2D& trajectory2D) const
+      FloatType getBackPerpS(const CDCTrajectory2D& trajectory2D) const
       { return getPerpS(trajectory2D); }
 
       /// Calculates the squared distance of the reconstructed position to a circle as see from the transvers plane.

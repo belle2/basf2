@@ -113,10 +113,19 @@ namespace Belle2 {
       { return CDCRecoTangent(&(getMiddleRLWireHit()), &(getEndRLWireHit()), getMiddleToEndLine()); }
 
 
-      FloatType getStartPerpS(const CDCTrajectory2D& trajectory2D) const
+      /// Returns the start reconstucted position projected to the trajectory
+      Vector2D getFrontRecoPos2D(const CDCTrajectory2D& trajectory2D) const
+      { return trajectory2D.getClosest(getStartRecoPos2D()); }
+
+      /// Returns the end reconstucted position projected to the trajectory
+      Vector2D getBackRecoPos2D(const CDCTrajectory2D& trajectory2D) const
+      { return trajectory2D.getClosest(getEndRecoPos2D()); }
+
+
+      FloatType getFrontPerpS(const CDCTrajectory2D& trajectory2D) const
       { return trajectory2D.calcPerpS(getStartRecoPos2D()); }
 
-      FloatType getEndPerpS(const CDCTrajectory2D& trajectory2D) const
+      FloatType getBackPerpS(const CDCTrajectory2D& trajectory2D) const
       { return trajectory2D.calcPerpS(getEndRecoPos2D()); }
 
       FloatType getSquaredDist2D(const CDCTrajectory2D& trajectory2D) const;

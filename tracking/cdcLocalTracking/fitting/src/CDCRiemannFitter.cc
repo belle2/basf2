@@ -74,21 +74,6 @@ CDCRiemannFitter::~CDCRiemannFitter()
 
 
 
-
-
-
-
-
-
-
-CDCTrajectory2D CDCRiemannFitter::fit(const CDCRLWireHitTriple& rlWireHitTriple) const
-{
-  CDCTrajectory2D result;
-  update(result, rlWireHitTriple);
-  return result;
-}
-
-
 CDCTrajectory2D CDCRiemannFitter::fit(const CDCRecoSegment2D& recoSegment2D) const
 {
   CDCTrajectory2D result;
@@ -105,24 +90,6 @@ CDCTrajectory2D CDCRiemannFitter::fit(const CDCAxialAxialSegmentPair& axialAxial
 }
 
 
-void CDCRiemannFitter::update(CDCTrajectory2D& trajectory2D, const CDCRLWireHitTriple& rlWireHitTriple) const
-{
-
-  CDCObservations2D observations2D;
-  observations2D.append(rlWireHitTriple);
-  if (not isLineConstrained()) {
-    B2ERROR("CDCRiemannFitter ask to fit a oriented wire hit triple without line constraint.");
-  }
-  update(trajectory2D, observations2D);
-
-  //Set transverse s reference
-  trajectory2D.setStartPos2D(rlWireHitTriple.getStartWire().getRefPos2D());
-
-  //Check if fit is forward
-  if (not rlWireHitTriple.isForwardTrajectory(trajectory2D)) trajectory2D.reverse();
-  if (not rlWireHitTriple.isForwardTrajectory(trajectory2D)) B2WARNING("Fit cannot be oriented correctly");
-
-}
 
 void CDCRiemannFitter::update(CDCTrajectory2D& trajectory2D, const CDCRecoSegment2D& recoSegment2D) const
 {

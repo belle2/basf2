@@ -58,26 +58,25 @@ bool AxialAxialSegmentPairFilterTree::setValues(const CellWeight& mcWeight, cons
   setValue < NAMED("endSegment_isForwardTrajectory_endFit") > (endSegment.isForwardTrajectory(endFit));
   setValue < NAMED("endSegment_isForwardTrajectory_commonFit") > (endSegment.isForwardTrajectory(commonFit));
 
-  setValue < NAMED("startSegment_totalPerpS_startFit") > (startSegment.getEndPerpS(startFit) - startSegment.getStartPerpS(startFit));
-  setValue < NAMED("startSegment_totalPerpS_endFit") > (startSegment.getEndPerpS(endFit) - startSegment.getStartPerpS(endFit));
-  setValue < NAMED("startSegment_totalPerpS_commonFit") > (startSegment.getEndPerpS(commonFit) - startSegment.getStartPerpS(commonFit));
+  setValue < NAMED("startSegment_totalPerpS_startFit") > (startSegment.getTotalPerpS(startFit));
+  setValue < NAMED("startSegment_totalPerpS_endFit") > (startSegment.getTotalPerpS(endFit));
+  setValue < NAMED("startSegment_totalPerpS_commonFit") > (startSegment.getTotalPerpS(commonFit));
 
-  setValue < NAMED("endSegment_totalPerpS_startFit") > (endSegment.getEndPerpS(startFit) - endSegment.getStartPerpS(startFit));
-  setValue < NAMED("endSegment_totalPerpS_endFit") > (endSegment.getEndPerpS(endFit) - endSegment.getStartPerpS(endFit));
-  setValue < NAMED("endSegment_totalPerpS_commonFit") > (endSegment.getEndPerpS(commonFit) - endSegment.getStartPerpS(commonFit));
+  setValue < NAMED("endSegment_totalPerpS_startFit") > (endSegment.getTotalPerpS(startFit));
+  setValue < NAMED("endSegment_totalPerpS_endFit") > (endSegment.getTotalPerpS(endFit));
+  setValue < NAMED("endSegment_totalPerpS_commonFit") > (endSegment.getTotalPerpS(commonFit));
 
+  setValue < NAMED("perpS_gap_startFit") > (endSegment.getFrontPerpS(startFit) - startSegment.getBackPerpS(startFit));
+  setValue < NAMED("perpS_gap_endFit") > (endSegment.getFrontPerpS(endFit) - startSegment.getBackPerpS(endFit));
+  setValue < NAMED("perpS_gap_commonFit") > (endSegment.getFrontPerpS(commonFit) - startSegment.getBackPerpS(commonFit));
 
-  setValue < NAMED("perpS_gap_startFit") > (endSegment.getStartPerpS(startFit) - startSegment.getEndPerpS(startFit));
-  setValue < NAMED("perpS_gap_endFit") > (endSegment.getStartPerpS(endFit) - startSegment.getEndPerpS(endFit));
-  setValue < NAMED("perpS_gap_commonFit") > (endSegment.getStartPerpS(commonFit) - startSegment.getEndPerpS(commonFit));
+  setValue < NAMED("perpS_offset_startHits_startFit") > (endSegment.getFrontPerpS(startFit) - startSegment.getFrontPerpS(startFit));
+  setValue < NAMED("perpS_offset_startHits_endFit") > (endSegment.getFrontPerpS(endFit) - startSegment.getFrontPerpS(endFit));
+  setValue < NAMED("perpS_offset_startHits_commonFit") > (endSegment.getFrontPerpS(commonFit) - startSegment.getFrontPerpS(commonFit));
 
-  setValue < NAMED("perpS_offset_startHits_startFit") > (endSegment.getStartPerpS(startFit) - startSegment.getStartPerpS(startFit));
-  setValue < NAMED("perpS_offset_startHits_endFit") > (endSegment.getStartPerpS(endFit) - startSegment.getStartPerpS(endFit));
-  setValue < NAMED("perpS_offset_startHits_commonFit") > (endSegment.getStartPerpS(commonFit) - startSegment.getStartPerpS(commonFit));
-
-  setValue < NAMED("perpS_offset_endHits_startFit") > (endSegment.getEndPerpS(startFit) - startSegment.getEndPerpS(startFit));
-  setValue < NAMED("perpS_offset_endHits_endFit") > (endSegment.getEndPerpS(endFit) - startSegment.getEndPerpS(endFit));
-  setValue < NAMED("perpS_offset_endHits_commonFit") > (endSegment.getEndPerpS(commonFit) - startSegment.getEndPerpS(commonFit));
+  setValue < NAMED("perpS_offset_endHits_startFit") > (endSegment.getBackPerpS(startFit) - startSegment.getBackPerpS(startFit));
+  setValue < NAMED("perpS_offset_endHits_endFit") > (endSegment.getBackPerpS(endFit) - startSegment.getBackPerpS(endFit));
+  setValue < NAMED("perpS_offset_endHits_commonFit") > (endSegment.getBackPerpS(commonFit) - startSegment.getBackPerpS(commonFit));
 
   Vector2D startCOM = startSegment.getCenterOfMass2D();
   Vector2D endCOM = endSegment.getCenterOfMass2D();

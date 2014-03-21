@@ -140,3 +140,17 @@ CDCRecoHit2D CDCRecoHit2D::reversed() const
 {
   return CDCRecoHit2D(CDCWireHitTopology::getInstance().getReverseOf(getRLWireHit()), getRecoDisp2D());
 }
+
+Vector2D CDCRecoHit2D::getRecoPos2D(const CDCTrajectory2D& trajectory2D) const
+{
+
+  AxialType axialType = getAxialType();
+  if (axialType == AXIAL) {
+    return trajectory2D.getClosest(getRecoPos2D());
+  } else {
+    const BoundSkewLine skewLine = getSkewLine();
+    Vector3D recoPos3D = trajectory2D.reconstruct3D(skewLine);
+    return recoPos3D.xy();
+  }
+
+}

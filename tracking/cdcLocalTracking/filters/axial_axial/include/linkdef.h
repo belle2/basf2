@@ -8,6 +8,5 @@
 #pragma link C++ nestedclasses;
 
 #pragma link C++ class Belle2::CDCLocalTracking::MCAxialAxialSegmentPairFilter;
-#pragma link C++ class Belle2::CDCLocalTracking::AxialAxialSegmentPairFilterVars;
 
 #endif

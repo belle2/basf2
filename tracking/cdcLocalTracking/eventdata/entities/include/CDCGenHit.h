@@ -118,12 +118,20 @@ namespace Belle2 {
       { return getWire().getISuperLayer(); }
 
       /// Same as getPerpS().
-      FloatType getStartPerpS(const CDCTrajectory2D& trajectory2D) const
+      FloatType getFrontPerpS(const CDCTrajectory2D& trajectory2D) const
       { return getPerpS(trajectory2D); }
 
       /// Same as getPerpS().
-      FloatType getEndPerpS(const CDCTrajectory2D& trajectory2D) const
+      FloatType getBackPerpS(const CDCTrajectory2D& trajectory2D) const
       { return getPerpS(trajectory2D); }
+
+      /// Same as getRecoPos2D()
+      Vector2D getFrontRecoPos2D(const CDCTrajectory2D& trajectory2D) const
+      { return getRecoPos2D(trajectory2D); }
+
+      /// Same as getRecoPos2D()
+      Vector2D getBackRecoPos2D(const CDCTrajectory2D& trajectory2D) const
+      { return getRecoPos2D(trajectory2D); }
 
       /// Calculates the squared distance of the wire hit to a circle as see from the transvers plane
       FloatType getSquaredDist2D(const CDCTrajectory2D& trajectory2D) const {
@@ -135,6 +143,10 @@ namespace Belle2 {
       /// Estimate the transvers travel distance on the given circle to this hit.
       FloatType getPerpS(const CDCTrajectory2D& trajectory2D) const
       { return trajectory2D.calcPerpS(getDummyPos2D()); }
+
+      /// Reconstuct the wire reference position onto the given trajectory
+      Vector2D getRecoPos2D(const CDCTrajectory2D& trajectory2D) const
+      { return trajectory2D.getClosest(getDummyPos2D()); }
 
       /// Getter for the CDCWire the hit is located on.
       const CDCWire& getWire() const { return *m_wire; }

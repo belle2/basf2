@@ -133,7 +133,38 @@ namespace Belle2 {
 
       /// Checks if the given point is to the right or to the left of the trajectory
       SignType isRightOrLeft(const Vector2D& point) const
-      {  return getGenCircle().isRightOrLeft(point); }
+      { return getGenCircle().isRightOrLeft(point); }
+
+      /// Getter for the maximal distance from the origin
+      FloatType getMaximalPolarR() const
+      { return  getGenCircle().maximalPolarR(); }
+
+      /// Getter for the minimal distance from the origin - same as absolute value of the impact parameter
+      FloatType getMinimalPolarR() const
+      { return  getGenCircle().minimalPolarR(); }
+
+      /// Getter for the signed impact parameter of the trajectory
+      FloatType getImpact() const
+      { return  getGenCircle().impact(); }
+
+      /// Indicates if the trajectory is moving outwards or inwards (to or away from the origin) from the start point on
+      bool isMovingOutward() const
+      { return getStartUnitMom2D().dot(getStartPos2D()) > 0; }
+
+      /// Indicates which superlayer the trajectory traverses after the current one
+      ISuperLayerType getNextISuperLayer() const;
+
+      /// Indicates which axial superlayer the trajectory traverses after the current one
+      ISuperLayerType getNextAxialISuperLayer() const;
+
+      /// Indicates the maximal superlayer the trajectory traverses
+      ISuperLayerType getMaximalISuperLayer() const;
+
+      /// Indicates the maximal superlayer the trajectory traverses
+      ISuperLayerType getStartISuperLayer() const;
+
+      /// Indicates the minimal superlayer the trajectory traverses
+      ISuperLayerType getMinimalISuperLayer() const;
 
     private:
       // this class should not really be the provider of this information.
@@ -210,7 +241,11 @@ namespace Belle2 {
 
       /// Get the momentum at the start point of the trajectory
       inline Vector2D getStartMom2D() const
-      { return  getUnitMom2D(getStartPos2D()) *=  getAbsMom2D();  }
+      { return  getStartUnitMom2D() *= getAbsMom2D();  }
+
+      /// Get the unit momentum at the start point of the trajectory
+      inline Vector2D getStartUnitMom2D() const
+      { return  getUnitMom2D(getStartPos2D());  }
 
       /// Get the start point of the track
       const Vector2D& getStartPos2D() const

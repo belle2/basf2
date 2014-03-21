@@ -14,6 +14,7 @@
 #include <tracking/cdcLocalTracking/topology/CDCWireTopology.h>
 
 #include <cmath>
+#include <cassert>
 
 using namespace std;
 using namespace Belle2;
@@ -139,7 +140,107 @@ Vector2D CDCTrajectory2D::getExit() const
 
 }
 
+
+
+/// Indicates which superlayer the trajectory traverses after the current one
+ISuperLayerType CDCTrajectory2D::getNextISuperLayer() const
+{
+  bool movingOutward = isMovingOutward();
+
+  ISuperLayerType startISuperLayer = getStartISuperLayer();
+  if (startISuperLayer == INVALID_ISUPERLAYER) return INVALID_ISUPERLAYER;
+
+  if (startISuperLayer == INNER_ISUPERLAYER or startISuperLayer == OUTER_ISUPERLAYER) {
+    // no extrapolation from the outside in yet
+    return INVALID_ISUPERLAYER;
+  } else {
+    // Start position is inside the CDC
+    ISuperLayerType minimalISuperLayer = getMinimalISuperLayer();
+    ISuperLayerType maximalISuperLayer = getMaximalISuperLayer();
+
+    if (maximalISuperLayer == minimalISuperLayer) {
+      // Trajectory is limited to a single superlayer.
+      // There is no next superlayer.
+      return INVALID_ISUPERLAYER;
+
+    } else {
+      // Trajectory traverses several superlayers (including the logical INNER_ISUPERLAYER and OUTER_ISUPERLAYER
+      if (startISuperLayer == maximalISuperLayer) {
+        return startISuperLayer - 1;
+      } else if (startISuperLayer == minimalISuperLayer) {
+        return startISuperLayer + 1;
+      } else {
+        return movingOutward ? startISuperLayer + 1 : startISuperLayer - 1;
+      }
+
+    }
+  }
+}
+
+
+
+/// Indicates which axial superlayer the trajectory traverses after the current one
+ISuperLayerType CDCTrajectory2D::getNextAxialISuperLayer() const
+{
+  ISuperLayerType startISuperLayer = getStartISuperLayer();
+  if (startISuperLayer == INVALID_ISUPERLAYER) return INVALID_ISUPERLAYER;
+
+  ISuperLayerType nextISuperLayer =  getNextISuperLayer();
+  if (nextISuperLayer == INVALID_ISUPERLAYER) return INVALID_ISUPERLAYER;
+
+  ISuperLayerType iSuperLayerStep = nextISuperLayer - startISuperLayer;
+
+  assert(std::abs(iSuperLayerStep) == 1);
+
+  if (isAxialISuperLayer(nextISuperLayer)) return nextISuperLayer;
+  // do not try to attempt to come back from the outside
+  else if (nextISuperLayer == OUTER_ISUPERLAYER) return INVALID_ISUPERLAYER;
+  else if (nextISuperLayer == INNER_ISUPERLAYER) return 0;
+  else {
+    // nextISuperLayer is not axial nor does it refer to logical inner or outer layer
+    // Hence it is true stereo layer
+    // Evaluated if the trajectory is curling back in this superlayer
+    ISuperLayerType maximalISuperLayer = getMaximalISuperLayer();
+    if (maximalISuperLayer == INVALID_ISUPERLAYER) return INVALID_ISUPERLAYER;
+
+    ISuperLayerType minimalISuperLayer = getMinimalISuperLayer();
+    if (minimalISuperLayer == INVALID_ISUPERLAYER) return INVALID_ISUPERLAYER;
+
+    if (nextISuperLayer == maximalISuperLayer) return nextISuperLayer - 1;   // Curling back to inwards
+    else if (nextISuperLayer == minimalISuperLayer) return nextISuperLayer + 1;   // Curling back to outwards
+    else return nextISuperLayer + iSuperLayerStep ;
+  }
+}
+
+
+
+ISuperLayerType CDCTrajectory2D::getMaximalISuperLayer() const
+{
+  FloatType maximalPolarR = getMaximalPolarR();
+  return getISuperLayerAtPolarR(maximalPolarR);
+}
+
+
+ISuperLayerType CDCTrajectory2D::getStartISuperLayer() const
+{
+  FloatType startPolarR = getStartPos2D().polarR();
+  return getISuperLayerAtPolarR(startPolarR);
+}
+
+
+
+ISuperLayerType CDCTrajectory2D::getMinimalISuperLayer() const
+{
+  FloatType minimalPolarR = getMinimalPolarR();
+  return getISuperLayerAtPolarR(minimalPolarR);
+}
+
+
+
 const FloatType CDCTrajectory2D::c_bFieldZMagnitude = 1.5;
 const SignType CDCTrajectory2D::c_bFieldZSign = PLUS;
 const FloatType CDCTrajectory2D::c_bFieldZ = c_bFieldZSign * c_bFieldZMagnitude;
+
+
+
 

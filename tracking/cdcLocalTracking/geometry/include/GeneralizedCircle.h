@@ -272,6 +272,18 @@ namespace Belle2 {
       inline FloatType distanceToOrigin() const
       { return distance(Vector2D(0.0, 0.0)); }
 
+      /// Gives the signed distance of the origin to the circle
+      inline FloatType impact() const
+      { return distance(Vector2D(0.0, 0.0)); }
+
+      /// Gives the minimal polar r the circle reaches (unsigned)
+      inline FloatType minimalPolarR() const
+      { return std::fabs(impact()); }
+
+      /// Gives the maximal polar r the circle reaches
+      inline FloatType maximalPolarR() const
+      { return std::fabs(impact() + signedRadius()); }
+
       /// Gives the proper absolute distance of the point to the circle line.
       inline FloatType absoluteDistance(const Vector2D& point) const
       { return fabs(distance(point)); }

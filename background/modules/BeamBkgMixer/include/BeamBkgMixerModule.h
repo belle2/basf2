@@ -110,6 +110,15 @@ namespace Belle2 {
     std::vector<std::string> m_bkgTypes; /**< background type of each file */
     std::vector<BkgHits> m_bkgSimHits;  /**< input event buffer */
 
+    bool m_PXD; /**< true if found in m_components */
+    bool m_SVD; /**< true if found in m_components */
+    bool m_CDC; /**< true if found in m_components */
+    bool m_TOP; /**< true if found in m_components */
+    bool m_ARICH; /**< true if found in m_components */
+    bool m_ECL; /**< true if found in m_components */
+    bool m_BKLM; /**< true if found in m_components */
+    bool m_EKLM; /**< true if found in m_components */
+
     /**
      * functions that add background SimHits to those in the DataStore
      * @param simHits a reference to DataStore SimHits

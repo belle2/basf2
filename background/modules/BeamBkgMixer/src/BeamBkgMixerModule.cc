@@ -90,14 +90,14 @@ namespace Belle2 {
 
     // included components
     std::vector<std::string> components = m_components;
-    bool PXD = isComponentIncluded(components, "PXD");
-    bool SVD = isComponentIncluded(components, "SVD");
-    bool CDC = isComponentIncluded(components, "CDC");
-    bool TOP = isComponentIncluded(components, "TOP");
-    bool ARICH = isComponentIncluded(components, "ARICH");
-    bool ECL = isComponentIncluded(components, "ECL");
-    bool BKLM = isComponentIncluded(components, "BKLM");
-    bool EKLM = isComponentIncluded(components, "EKLM");
+    m_PXD = isComponentIncluded(components, "PXD");
+    m_SVD = isComponentIncluded(components, "SVD");
+    m_CDC = isComponentIncluded(components, "CDC");
+    m_TOP = isComponentIncluded(components, "TOP");
+    m_ARICH = isComponentIncluded(components, "ARICH");
+    m_ECL = isComponentIncluded(components, "ECL");
+    m_BKLM = isComponentIncluded(components, "BKLM");
+    m_EKLM = isComponentIncluded(components, "EKLM");
 
     // ignore these ones
     isComponentIncluded(components, "MagneticField2d");
@@ -188,14 +188,14 @@ namespace Belle2 {
       m_bkgSimHits.push_back(hits);
 
       unsigned i = m_bkgSimHits.size() - 1;
-      if (PXD) tree->SetBranchAddress("PXDSimHits", &m_bkgSimHits[i].PXD);
-      if (SVD) tree->SetBranchAddress("SVDSimHits", &m_bkgSimHits[i].SVD);
-      if (CDC) tree->SetBranchAddress("CDCSimHits", &m_bkgSimHits[i].CDC);
-      if (TOP) tree->SetBranchAddress("TOPSimHits", &m_bkgSimHits[i].TOP);
-      if (ARICH) tree->SetBranchAddress("ARICHSimHits", &m_bkgSimHits[i].ARICH);
-      if (ECL) tree->SetBranchAddress("ECLSimHits", &m_bkgSimHits[i].ECL);
-      if (BKLM) tree->SetBranchAddress("BKLMSimHits", &m_bkgSimHits[i].BKLM);
-      if (EKLM) tree->SetBranchAddress("EKLMSimHits", &m_bkgSimHits[i].EKLM);
+      if (m_PXD) tree->SetBranchAddress("PXDSimHits", &m_bkgSimHits[i].PXD);
+      if (m_SVD) tree->SetBranchAddress("SVDSimHits", &m_bkgSimHits[i].SVD);
+      if (m_CDC) tree->SetBranchAddress("CDCSimHits", &m_bkgSimHits[i].CDC);
+      if (m_TOP) tree->SetBranchAddress("TOPSimHits", &m_bkgSimHits[i].TOP);
+      if (m_ARICH) tree->SetBranchAddress("ARICHSimHits", &m_bkgSimHits[i].ARICH);
+      if (m_ECL) tree->SetBranchAddress("ECLSimHits", &m_bkgSimHits[i].ECL);
+      if (m_BKLM) tree->SetBranchAddress("BKLMSimHits", &m_bkgSimHits[i].BKLM);
+      if (m_EKLM) tree->SetBranchAddress("EKLMSimHits", &m_bkgSimHits[i].EKLM);
 
       // print INFO
       std::string unit(" ns");
@@ -236,6 +236,15 @@ namespace Belle2 {
     StoreArray<ECLSimHit> eclSimHits;
     StoreArray<BKLMSimHit> bklmSimHits;
     StoreArray<EKLMSimHit> eklmSimHits;
+
+    if (m_PXD && !pxdSimHits.isValid()) pxdSimHits.create();
+    if (m_SVD && !svdSimHits.isValid()) svdSimHits.create();
+    if (m_CDC && !cdcSimHits.isValid()) cdcSimHits.create();
+    if (m_TOP && !topSimHits.isValid()) topSimHits.create();
+    if (m_ARICH && !arichSimHits.isValid()) arichSimHits.create();
+    if (m_ECL && !eclSimHits.isValid()) eclSimHits.create();
+    if (m_BKLM && !bklmSimHits.isValid()) bklmSimHits.create();
+    if (m_EKLM && !eklmSimHits.isValid()) eklmSimHits.create();
 
     unsigned numBkg = m_trees.size();
     for (unsigned bkg = 0; bkg < numBkg; ++bkg) {

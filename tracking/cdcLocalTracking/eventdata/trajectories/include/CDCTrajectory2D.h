@@ -14,6 +14,7 @@
 
 #include <tracking/cdcLocalTracking/mockroot/MockRoot.h>
 #include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
+#include <tracking/cdcLocalTracking/typedefs/InfoTypes.h>
 
 #include <tracking/cdcLocalTracking/geometry/Vector2D.h>
 #include <tracking/cdcLocalTracking/geometry/Vector3D.h>
@@ -151,11 +152,29 @@ namespace Belle2 {
       bool isMovingOutward() const
       { return getStartUnitMom2D().dot(getStartPos2D()) > 0; }
 
-      /// Indicates which superlayer the trajectory traverses after the current one
+    private:
+      /// Indicates which superlayer is traversed after the given one, considering if you want to follow the trajectory in the forward or backward direction and if the trajectory is currently moving outward or inward (interpreted in the forward direction) or might curling back in the current layer.
+      ISuperLayerType getISuperLayerAfter(const ISuperLayerType& fromISuperLayer, bool movingOutward,  const ForwardBackwardInfo& forwardBackwardInfo) const;
+      /// Indicates which superlayer is traversed after the one, where the start point of the trajectory is located considering, if you want to follow the trajectory in the forward or backward direction.
+      ISuperLayerType getISuperLayerAfterStart(const ForwardBackwardInfo& forwardBackwardInfo) const;
+
+      /// Indicates which axial superlayer is traversed after the one, where the start point of the trajectory is located considering, if you want to follow the trajectory in the forward or backward direction.
+      ISuperLayerType getAxialISuperLayerAfterStart(const ForwardBackwardInfo& forwardBackwardInfo) const;
+
+    public:
+      /// Indicates which superlayer the trajectory traverses after the one, where the start point of the trajectory is located.
       ISuperLayerType getNextISuperLayer() const;
 
-      /// Indicates which axial superlayer the trajectory traverses after the current one
+      /// Indicates which superlayer the trajectory traverses before the one, where the start point of the trajectory is located.
+      ISuperLayerType getPreviousISuperLayer() const;
+
+      /// Indicates which axial superlayer the trajectory traverses after the one, where the start point of the trajectory is located.
       ISuperLayerType getNextAxialISuperLayer() const;
+
+      /// Indicates which axial superlayer the trajectory traverses before the one, where the start point of the trajectory is located.
+      ISuperLayerType getPreviousAxialISuperLayer() const;
+
+
 
       /// Indicates the maximal superlayer the trajectory traverses
       ISuperLayerType getMaximalISuperLayer() const;
@@ -221,10 +240,12 @@ namespace Belle2 {
     public:
 
       /// Gets the charge sign of the trajectory
-      SignType getChargeSign() const { return ccwInfoToChargeSign(getGenCircle().orientation()) ; }
+      SignType getChargeSign() const
+      { return ccwInfoToChargeSign(getGenCircle().orientation()) ; }
 
       /// Reverses the trajectory in place
-      void reverse() { m_genCircle.reverse(); }
+      void reverse()
+      { m_genCircle.reverse(); }
 
       /// Returns the reverse trajectory as a copy
       CDCTrajectory2D reversed()

@@ -237,7 +237,7 @@ static void findAssociatedHits(std::vector<struct HitData>::iterator hit,
 
   /* Fill EKLMK0L. */
   StoreArray<EKLMK0L> k0lArray;
-  k0l = new(k0lArray.nextFreeAddress()) EKLMK0L();
+  k0l = k0lArray.appendNew();
   k0l->setGlobalPosition(hitPos);
   k0l->setTime(mt);
   k0l->setLayers(nLayers);
@@ -248,16 +248,11 @@ static void findAssociatedHits(std::vector<struct HitData>::iterator hit,
   /* Fill cluster-hit relation array */
   StoreArray<EKLMHit2d> hits2d;
   RelationArray EKLMClustersToHits2d(k0lArray, hits2d);
-  for (std::vector<EKLMHit2d*>::iterator clusterPtr_it = cluster.begin(); clusterPtr_it != cluster.end(); ++clusterPtr_it) { //clusterPtr_it iterates over std::vector<EKLMHit2d*>
-    EKLMHit2d tmp = **clusterPtr_it;
-    for (int  hits2d_it = 0; hits2d_it != hits2d.getEntries(); hits2d_it++) // hits2d_it iterates over StoreArray<EKLMHit2d>
-      if (tmp == *(hits2d[hits2d_it]))
-
-      {
-        EKLMClustersToHits2d.add(k0lArray.getEntries() - 1, hits2d_it);
-        break;
-      }
+  for (const EKLMHit2d * eklmHit : cluster) {
+    k0l->addRelationTo(eklmHit);
+    std::cout << k0lArray.getEntries() << std::endl;
   }
+
 }
 
 

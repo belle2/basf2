@@ -31,6 +31,7 @@
 #include <top/dataobjects/TOPSimHit.h>
 #include <arich/dataobjects/ARICHSimHit.h>
 #include <ecl/dataobjects/ECLSimHit.h>
+#include <ecl/dataobjects/ECLHit.h>
 #include <bklm/dataobjects/BKLMSimHit.h>
 #include <eklm/dataobjects/EKLMSimHit.h>
 
@@ -59,7 +60,8 @@ namespace Belle2 {
   {
     // set module description (e.g. insert text)
     setDescription("Sets beam background tag variable in SimHits; returns true if at least one of the SimHit store arrays has entries. Return value can be used to discard empty events at output.");
-    setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
+
+    setPropertyFlags(c_ParallelProcessingCertified);
 
     // Add parameters
     addParam("backgroundType", m_backgroundType, "one of: Coulomb_LER, Coulomb_HER, RBB_LER, RBB_HER, Touschek_LER, Touschek_HER, twoPhoton, other");
@@ -107,6 +109,7 @@ namespace Belle2 {
     StoreArray<TOPSimHit>::optional();
     StoreArray<ARICHSimHit>::optional();
     StoreArray<ECLSimHit>::optional();
+    StoreArray<ECLHit>::optional();
     StoreArray<BKLMSimHit>::optional();
     StoreArray<EKLMSimHit>::optional();
   }
@@ -123,6 +126,7 @@ namespace Belle2 {
     StoreArray<TOPSimHit> topSimHits;
     StoreArray<ARICHSimHit> arichSimHits;
     StoreArray<ECLSimHit> eclSimHits;
+    StoreArray<ECLHit> eclHits;
     StoreArray<BKLMSimHit> bklmSimHits;
     StoreArray<EKLMSimHit> eklmSimHits;
 
@@ -132,6 +136,7 @@ namespace Belle2 {
     n += setBackgroundTag(topSimHits);
     n += setBackgroundTag(arichSimHits);
     n += setBackgroundTag(eclSimHits);
+    n += setBackgroundTag(eclHits);
     n += setBackgroundTag(bklmSimHits);
     n += setBackgroundTag(eklmSimHits);
 

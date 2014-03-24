@@ -46,7 +46,7 @@ output.param('branchNames', [
     'CDCSimHits',
     'TOPSimHits',
     'ARICHSimHits',
-    'ECLSimHits',
+    'ECLHits',
     'BKLMSimHits',
     'EKLMSimHits',
     ])

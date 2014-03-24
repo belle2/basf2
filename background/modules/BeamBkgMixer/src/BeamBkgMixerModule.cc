@@ -30,7 +30,7 @@
 #include <cdc/dataobjects/CDCSimHit.h>
 #include <top/dataobjects/TOPSimHit.h>
 #include <arich/dataobjects/ARICHSimHit.h>
-#include <ecl/dataobjects/ECLSimHit.h>
+#include <ecl/dataobjects/ECLHit.h>
 #include <bklm/dataobjects/BKLMSimHit.h>
 #include <eklm/dataobjects/EKLMSimHit.h>
 
@@ -60,7 +60,8 @@ namespace Belle2 {
   {
     // set module description (e.g. insert text)
     setDescription("Beam background mixer at SimHit level that uses beam background simulation output directly (collision files) and not ROF files. Each background event is shifted in time randomly within a time window given by minTime and maxTime.");
-    setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
+
+    setPropertyFlags(c_ParallelProcessingCertified);
 
     // Add parameters
     addParam("backgroundFiles", m_backgroundFiles,
@@ -193,7 +194,7 @@ namespace Belle2 {
       if (m_CDC) tree->SetBranchAddress("CDCSimHits", &m_bkgSimHits[i].CDC);
       if (m_TOP) tree->SetBranchAddress("TOPSimHits", &m_bkgSimHits[i].TOP);
       if (m_ARICH) tree->SetBranchAddress("ARICHSimHits", &m_bkgSimHits[i].ARICH);
-      if (m_ECL) tree->SetBranchAddress("ECLSimHits", &m_bkgSimHits[i].ECL);
+      if (m_ECL) tree->SetBranchAddress("ECLHits", &m_bkgSimHits[i].ECL);
       if (m_BKLM) tree->SetBranchAddress("BKLMSimHits", &m_bkgSimHits[i].BKLM);
       if (m_EKLM) tree->SetBranchAddress("EKLMSimHits", &m_bkgSimHits[i].EKLM);
 
@@ -216,7 +217,7 @@ namespace Belle2 {
     StoreArray<CDCSimHit>::optional();
     StoreArray<TOPSimHit>::optional();
     StoreArray<ARICHSimHit>::optional();
-    StoreArray<ECLSimHit>::optional();
+    StoreArray<ECLHit>::optional();
     StoreArray<BKLMSimHit>::optional();
     StoreArray<EKLMSimHit>::optional();
 
@@ -233,7 +234,7 @@ namespace Belle2 {
     StoreArray<CDCSimHit> cdcSimHits;
     StoreArray<TOPSimHit> topSimHits;
     StoreArray<ARICHSimHit> arichSimHits;
-    StoreArray<ECLSimHit> eclSimHits;
+    StoreArray<ECLHit> eclHits;
     StoreArray<BKLMSimHit> bklmSimHits;
     StoreArray<EKLMSimHit> eklmSimHits;
 
@@ -242,7 +243,7 @@ namespace Belle2 {
     if (m_CDC && !cdcSimHits.isValid()) cdcSimHits.create();
     if (m_TOP && !topSimHits.isValid()) topSimHits.create();
     if (m_ARICH && !arichSimHits.isValid()) arichSimHits.create();
-    if (m_ECL && !eclSimHits.isValid()) eclSimHits.create();
+    if (m_ECL && !eclHits.isValid()) eclHits.create();
     if (m_BKLM && !bklmSimHits.isValid()) bklmSimHits.create();
     if (m_EKLM && !eklmSimHits.isValid()) eklmSimHits.create();
 
@@ -260,7 +261,7 @@ namespace Belle2 {
         addSimHits(cdcSimHits, m_bkgSimHits[bkg].CDC, timeShift);
         addSimHits(topSimHits, m_bkgSimHits[bkg].TOP, timeShift);
         addSimHits(arichSimHits, m_bkgSimHits[bkg].ARICH, timeShift);
-        addSimHits(eclSimHits, m_bkgSimHits[bkg].ECL, timeShift);
+        addSimHits(eclHits, m_bkgSimHits[bkg].ECL, timeShift);
         addSimHits(bklmSimHits, m_bkgSimHits[bkg].BKLM, timeShift);
         addSimHits(eklmSimHits, m_bkgSimHits[bkg].EKLM, timeShift);
 

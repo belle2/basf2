@@ -17,7 +17,7 @@ using namespace Belle2;
 
 REG_MODULE(EKLMReconstructor)
 
-static const char MemErr[] = "Memory allocation error.";
+//static const char MemErr[] = "Memory allocation error.";
 
 EKLMReconstructorModule::EKLMReconstructorModule() : Module()
 {

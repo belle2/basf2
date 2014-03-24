@@ -44,30 +44,38 @@ namespace Belle2 {
       //RaveKinematicVertexFitter(std::string howToInterfaceRave);
       /** Destructor */
       ~RaveKinematicVertexFitter();
+
       /** add a track (in the format of a Belle2::Particle) to set of tracks that should be fitted to a vertex */
       void addTrack(const Particle* aParticlePtr);
+
       /** All daughters of the argument of this function will be used as input for the vertex fit. Writes back the result directly to the mother particle */
       void addMother(const Particle* aMotherParticlePtr);
+
       /** Set Mother particle for Vertex/momentum update. Not to be used with addMother */
       void setMother(const Particle* aMotherParticlePtr);
 
-      /** do the vertex fit with all tracks previously added with the addTrack or addMother function. The argument is a string determining the Rave fitting method. See https://rave.hepforge.org/trac/wiki/RaveMethods for the different methods
-       * The return value is the number of successfully found vertices (depending on the selected algorithm this can be more then one vertex). Return value 0 means the fit was not successful. -1 means not enough tracks were added*/
-      int fit(std::string options = "default");
+      /** do the kinematic vertex fit with all tracks previously added with the addTrack or addMother function.
+       * The return value is 1 if a vertex is successfully found. Return value 0 means the fit was not successful. -1 means not enough tracks were added*/
+      int fit();
 
-      /** get the position of the fitted vertex. If Rave was also used to find different vertices the user has to provide the index of that vertex */
-      TVector3 getPos(std::vector<int>::size_type vertexId = 0) ;
-      /** get the p value of the fitted vertex. If Rave was also used to find different vertices the user has to provide the index of that vertex */
-      double getPValue(std::vector<int>::size_type vertexId = 0);
+      /** get the position of the fitted vertex.  */
+      TVector3 getPos() ;
 
-      /** get the number of degrees of freedom (NDF) of the fitted vertex. If Rave was also used to find different vertices the user has to provide the index of that vertex */
-      double getNdf(std::vector<int>::size_type vertexId = 0);
+      /** get the p value of the fitted vertex.  */
+      double getPValue();
 
-      /** get the χ² of the fitted vertex. If Rave was also used to find different vertices the user has to provide the index of that vertex */
-      double getChi2(std::vector<int>::size_type vertexId = 0) ;
+      /** get the number of degrees of freedom (NDF) of the fitted vertex.  */
+      double getNdf();
 
-      /** get the covariance matrix (3x3) of the of the fitted vertex position. If Rave was also used to find different vertices the user has to provide the index of that vertex */
-      TMatrixDSym getCov(std::vector<int>::size_type vertexId = 0);
+      /** get the χ² of the fitted vertex. */
+      double getChi2() ;
+
+      /** get the covariance matrix (7x7).  */
+      TMatrixDSym getCov();
+
+      /** get the covariance matrix (3x3) of the of the fitted vertex position.  */
+      TMatrixDSym getVertexErrorMatrix();
+
       /** Overwrite the global option in ReveSetup that tells the fitter if beam spot info should be used or not. The beam spot pos and cov must still be set in the RaveSetup class if you what to use it */
       void useBeamSpot(bool beamSpot = true) {
         if (beamSpot == true) {
@@ -80,10 +88,12 @@ namespace Belle2 {
           m_useBeamSpot = false;
         }
       }
-      /** returns a pointer to the updated mother particle */
+
+      /** returns a pointer to the mother particle */
       Particle* getMother();
 
-
+      /** update the mother particle */
+      void updateMother();
 
       /** Delete all information of previously added tracks and fitted results*/
       void clearTracks() {
@@ -91,12 +101,11 @@ namespace Belle2 {
         m_motherParticlePtr = NULL;
       }
 
-
       /** Set mass constrained fit   */
       void setMassConstFit(bool isConstFit = true);
+
       /** Set vertex fit: set false in case of mass fit only */
       void setVertFit(bool isVertFit = true);
-
 
       /** Print all attributes of this object to terminal*/
       void Print() const {
@@ -112,7 +121,7 @@ namespace Belle2 {
       /** flag determines if the beam spot will be used or not. Overwrites the global flag in RaveSetup */
       bool m_useBeamSpot;
 
-      /** pointer to the mother particle who's  daughters will be used in the fit. the fit result will be written back to the mother particle */
+      /** pointer to the mother particle who's daughters will be used in the fit. the fit result will be written back to the mother particle */
       Particle* m_motherParticlePtr;
 
       /** Algorithm used by rave (kalman, avr, ...) */

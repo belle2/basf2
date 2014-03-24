@@ -89,7 +89,6 @@ namespace Belle2 {
       B2WARNING("KFITTER Constraints not implemented ");
 
     if (m_decayString.compare(std::string("")) != 0)
-      //B2WARNING("decayString not implemented. All daughters added to the vertex fit");
       m_decaydescriptor.init(m_decayString);
   }
 
@@ -280,7 +279,7 @@ namespace Belle2 {
         rf.setMother(mother);
       } else {
 
-        analysis::RaveVertexFitter rsf;
+        analysis::RaveKinematicVertexFitter rsf;
         bool mothSel = false;
         for (unsigned itrack = 0; itrack < tracksVertex.size(); itrack++) {
           if (tracksVertex[itrack] != mother) rsf.addTrack(tracksVertex[itrack]);
@@ -288,15 +287,15 @@ namespace Belle2 {
           if (tracksVertex[itrack] == mother) mothSel = true;
         }
 
-        int nvert = rsf.fit("kalman");
+        int nvert = rsf.fit();
 
         TVector3 pos;
         TMatrixDSym RerrMatrix(3);
 
         if (nvert > 0) {
-          pos = rsf.getPos(0);
-          RerrMatrix = rsf.getCov(0);
-          double prob = rsf.getPValue(0);
+          pos = rsf.getPos();
+          RerrMatrix = rsf.getVertexErrorMatrix();
+          double prob = rsf.getPValue();
           TLorentzVector mom(mother->getMomentum(), mother->getEnergy());
           TMatrixDSym errMatrix(7);
           for (int i = 0; i < 7; i++) {
@@ -312,7 +311,8 @@ namespace Belle2 {
         if (mothSel) {
           analysis::RaveSetup::getInstance()->setBeamSpot(pos, RerrMatrix);
           rf.addMother(mother);
-          int nKfit = rf.fit("kalman");
+          int nKfit = rf.fit();
+          rf.updateMother();
           analysis::RaveSetup::getInstance()->unsetBeamSpot();
 
           if (nKfit > 0) {return true;}
@@ -327,7 +327,8 @@ namespace Belle2 {
     bool okFT = false;
     if (m_fitType.compare(std::string("vertex")) == 0) {
       okFT = true;
-      nVert = rf.fit("kalman");
+      nVert = rf.fit();
+      rf.updateMother();
       if (nVert != 1) return false;
     }
     if (m_fitType.compare(std::string("mass")) == 0) {
@@ -335,13 +336,15 @@ namespace Belle2 {
       okFT = true;
       rf.setMassConstFit(true);
       rf.setVertFit(false);
-      nVert = rf.fit("kalman");
+      nVert = rf.fit();
+      rf.updateMother();
       if (nVert != 1) return false;
     };
     if (m_fitType.compare(std::string("massvertex")) == 0) {
       okFT = true;
       rf.setMassConstFit(true);
-      nVert = rf.fit("kalman");
+      nVert = rf.fit();
+      rf.updateMother();
       if (nVert != 1) return false;
     };
     if (!okFT) {

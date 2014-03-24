@@ -13,7 +13,8 @@
 
 /* External headers. */
 #include <CLHEP/Geometry/Point3D.h>
-#include <TObject.h>
+#include <framework/datastore/RelationsObject.h>
+
 
 /* Belle2 headers. */
 #include <eklm/dataobjects/EKLMHitGlobalCoord.h>
@@ -24,7 +25,7 @@ namespace Belle2 {
   /**
    * K0L data.
    */
-  class EKLMK0L : public TObject, public EKLMHitGlobalCoord,
+  class EKLMK0L : public RelationsObject, public EKLMHitGlobalCoord,
     public EKLMHitMomentum {
 
   public:

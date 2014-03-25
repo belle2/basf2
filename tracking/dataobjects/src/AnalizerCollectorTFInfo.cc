@@ -84,8 +84,8 @@ void AnalizerCollectorTFInfo::setAllParticleIDs(double boarder)
 
     // Detector Type for svd/pxd difference
     int particleID = -1;
-    bool is_real;
-    int pdgCode;
+    bool is_real = 0;
+    int pdgCode = 0;
 
     int detector_type = akt_cluster.getDetectorType();
     int pass_index = akt_cluster.getPassIndex();

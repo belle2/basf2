@@ -20,8 +20,7 @@
 
 namespace Belle2 {
 
-  class ClusterInfo; /**< predeclaration */
-
+  class ClusterInfo;
   /** The VXD Track Finder Hit class
    * This class stores all information needed for reconstructing track candidates within the VXDonlyTrackFinder.
    * VXDTFHits are generated individually for each pass.
@@ -44,7 +43,8 @@ namespace Belle2 {
       m_papaSector(0),
       m_VxdID(0),
       m_timeStamp(0),
-      m_attachedTrackCandidates(0) {}
+      m_attachedTrackCandidates(0),
+      m_collector_id(-1) {}
 
     /** Constructor.
      *      //      * @param hitPos contains Hit coordinates (global) and position errors (global).
@@ -67,7 +67,8 @@ namespace Belle2 {
       m_papaSector(papaSector),
       m_VxdID(aVxdID),
       m_timeStamp(timeStamp),
-      m_attachedTrackCandidates(0) {}
+      m_attachedTrackCandidates(0),
+      m_collector_id(-1) {}
 
     bool operator==(const VXDTFHit& b) const; /**< overloaded '=='-operator for sorting algorithms */
     bool operator<(const VXDTFHit& b) const; /**< overloaded '<'-operator for sorting algorithms */
@@ -133,6 +134,12 @@ namespace Belle2 {
     void addTrackCandidate() { m_attachedTrackCandidates++; } /**< counting them is enough to check their occupancy */
     void removeTrackCandidate() { m_attachedTrackCandidates--; } /**< decrease number of TCs using this hit */
 
+
+    int getCollectorID() { return m_collector_id; }
+    void setCollectorID(int value) { m_collector_id = value; }
+
+
+
     // isReserved
   protected:
     PositionInfo m_hit; /**< global hit position and x and y errors of hit (global)*/
@@ -150,6 +157,8 @@ namespace Belle2 {
     std::vector<int> m_attachedInnerCells; /**< contains links to segments/cells using this hit as outer end  */
     std::vector<int> m_attachedOuterCells; /**< contains links to segments/cells using this hit as inner end  */
     int m_attachedTrackCandidates; /**< number of trackCandidates using this hit */
+
+    int m_collector_id; /**< ID of the hit in the Collector */
   };
 } //Belle2 namespace
 #endif

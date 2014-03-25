@@ -41,7 +41,8 @@ namespace Belle2 {
       m_isPXD(false),
       m_reserved(false),
       m_pxdCluster(NULL),
-      m_svdCluster(NULL) {}
+      m_svdCluster(NULL),
+      m_collector_id(-1) {}
 
     /** Constructor. use this one, when having a sectormap (e.g. during track finding), use ThreeHitFilters when no sectormap is available */
     ClusterInfo(int clusterIndex, int ownIndex, bool isPXD, const PXDCluster* pCluster, const SVDCluster* sCluster):
@@ -51,7 +52,8 @@ namespace Belle2 {
       m_isPXD(isPXD),
       m_reserved(false),
       m_pxdCluster(pCluster),
-      m_svdCluster(sCluster) {}
+      m_svdCluster(sCluster),
+      m_collector_id(-1) {}
 
 
     /** Destructor. */
@@ -100,11 +102,15 @@ namespace Belle2 {
     /** is true, if the TC has already reserved this Cluster. This means that no other TC is allowed to use it any more */
     bool checkReserved(VXDTFTrackCandidate* newBossTC) const;
 
+    int getCollectorID() { return m_collector_id; }
+    void setCollectorID(int value) { m_collector_id = value; }
+
   protected:
     /** internal shortcut for comparing 2 track candidates */
     bool isSameTC(const VXDTFTrackCandidate* a1, const VXDTFTrackCandidate* a2) {
       if (a1 == a2) { return true; } else { return false; }
     }
+
 
     TcContainer m_attachedTCs; /**< contains pointers to all attached TCs added with addTrackCandidate-memberfunction */
     VXDTFTrackCandidate* m_bossTC; /**< if Cluster is reserved, here is the pointer to it stored. Is NULL, if not reserved */
@@ -114,6 +120,8 @@ namespace Belle2 {
     bool m_reserved; /**< means that an accepted TC uses this cluster and therefore no other TC is allowed to use it anymore */
     const PXDCluster* m_pxdCluster; /**< if isPXD = true, this member contains the pointer to the parenting PXDCluster */
     const SVDCluster* m_svdCluster; /**< if isPXD = false, this member contains the pointer to the parenting SVDCluster */
+
+    int m_collector_id; /**< Cluster in the Collector */
 
   }; //end class ClusterInfo
 } //end namespace Belle2

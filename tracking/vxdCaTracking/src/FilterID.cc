@@ -40,6 +40,24 @@ const string FilterID::nameHelixHighOccupancyFit = "HioChelixFit";
 const string FilterID::nameDeltapTHighOccupancy  = "HioCdeltaPt";
 const string FilterID::nameDeltaDistanceHighOccupancy2IP  = "HioCdeltaDist2IP";
 
+const string FilterID::nameNbFinderLost  = "NbFinderLost";
+const string FilterID::nameCellularAutomaton  = "CellularAutomaton";
+
+
+const string FilterID::nameHopfield = "Hopfield";
+const string FilterID::nameGreedy = "Greedy";
+const string FilterID::nameTcDuel = "TcDuel";
+const string FilterID::nameTcFinderCurr = "TcFinderCurr";
+const string FilterID::nameZiggZaggXY = "ZiggZaggXY";
+const string FilterID::nameZiggZaggRZ = "ZiggZaggRZ";
+const string FilterID::nameCalcQIbyKalman = "CalcQIbyKalman";
+const string FilterID::nameOverlapping = "Overlapping";
+const string FilterID::nameCirclefit = "Circlefit";
+
+
+const string FilterID::nameSilentTcc = "SilentTcc";
+const string FilterID::nameSilentHitFinder = "SilentHitFinder";
+const string FilterID::nameSilentSegFinder = "SilentSegFinder";
 
 const boost::array<string, FilterID::numFilters> FilterID::nameVector = { {
     nameAngles3D,
@@ -64,7 +82,22 @@ const boost::array<string, FilterID::numFilters> FilterID::nameVector = { {
     namePTHighOccupancy,
     nameHelixHighOccupancyFit,
     nameDeltapTHighOccupancy,
-    nameDeltaDistanceHighOccupancy2IP
+    nameDeltaDistanceHighOccupancy2IP,
+    nameNbFinderLost,
+    nameCellularAutomaton,
+
+    nameHopfield,
+    nameGreedy,
+    nameTcDuel,
+    nameTcFinderCurr,
+    nameZiggZaggXY,
+    nameZiggZaggRZ,
+    nameCalcQIbyKalman,
+    nameOverlapping,
+    nameCirclefit,
+    nameSilentTcc,
+    nameSilentHitFinder,
+    nameSilentSegFinder
   }
 };
 
@@ -92,7 +125,25 @@ const boost::array<FilterID::filterTypes, FilterID::numFilters> FilterID::enumVe
     FilterID::pTHighOccupancy,
     FilterID::helixHighOccupancyFit,
     FilterID::deltapTHighOccupancy,
-    FilterID::deltaDistanceHighOccupancy2IP
+    FilterID::deltaDistanceHighOccupancy2IP,
+    FilterID::nbFinderLost,
+    FilterID::cellularAutomaton,
+
+    FilterID::hopfield,
+    FilterID::greedy,
+    FilterID::tcDuel,
+    FilterID::tcFinderCurr,
+    FilterID::ziggZaggXY,
+    FilterID::ziggZaggRZ,
+    FilterID::calcQIbyKalman,
+    FilterID::overlapping,
+    FilterID::circlefit,
+
+    FilterID::silentTcc,
+    FilterID::silentHitFinder,
+    FilterID::silentSegFinder
+
+
   }
 };
 
@@ -145,6 +196,40 @@ FilterID::filterTypes FilterID::getFilterType(std::string filterString)
   {return deltapTHighOccupancy;}
   else if (filterString == nameDeltaDistanceHighOccupancy2IP)
   {return deltaDistanceHighOccupancy2IP;}
+  else if (filterString == nameNbFinderLost)
+  {return nbFinderLost;}
+  else if (filterString == nameCellularAutomaton)
+  {return cellularAutomaton;}
+
+  else if (filterString == nameHopfield)
+  {return hopfield;}
+  else if (filterString == nameGreedy)
+  {return greedy;}
+
+  else if (filterString == nameTcDuel)
+  {return tcDuel;}
+  else if (filterString == nameTcFinderCurr)
+  {return tcFinderCurr;}
+
+  else if (filterString == nameZiggZaggXY)
+  {return ziggZaggXY;}
+  else if (filterString == nameZiggZaggRZ)
+  {return ziggZaggRZ;}
+
+  else if (filterString == nameCalcQIbyKalman)
+  {return calcQIbyKalman;}
+  else if (filterString == nameOverlapping)
+  {return overlapping;}
+  else if (filterString == nameCirclefit)
+  {return circlefit;}
+
+  else if (filterString == nameSilentTcc)
+  {return silentTcc;}
+  else if (filterString == nameSilentHitFinder)
+  {return silentHitFinder;}
+  else if (filterString == nameSilentSegFinder)
+  {return silentSegFinder;}
+
   else {
     B2DEBUG(1, " FilterID::getFilterType. Input string is out of range, please check that...")
     return numFilters;

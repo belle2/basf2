@@ -53,6 +53,25 @@ namespace Belle2 {
       deltapTHighOccupancy, /**< string name of filter dPt high occupancy */
       deltaDistanceHighOccupancy2IP, /**< string name of filter dd2IP high occupancy */
 
+      //Collector FilterIDs
+      nbFinderLost, /**< Nb Finder filter */
+      cellularAutomaton, /**< CA filter */
+
+
+      hopfield,  /**< Hopfield filter */
+      greedy,  /**< Greedy filter */
+      tcDuel,  /**< TC Duel filter */
+      tcFinderCurr,  /**< TC Finder Curr filter */
+      ziggZaggXY,  /**< ziggZaggXY filter */
+      ziggZaggRZ,  /**< ziggZaggRZ filter */
+      calcQIbyKalman,  /**< calcQIbyKalman filter */
+      overlapping,  /**< overlapping filter */
+      circlefit,  /**< circlefit filter */
+
+      silentTcc,  /**< Silent Kill TCC filter */
+      silentHitFinder,  /**< Silent Kill HitFinder filter */
+      silentSegFinder,  /**< Silent Kill SefFinder filter */
+
       numFilters /**< knows number of filters existing. If a member returns this value, the input-value was wrong */
     };
 
@@ -80,6 +99,24 @@ namespace Belle2 {
     const static std::string nameHelixHighOccupancyFit; /**< string name of filter hFit high occupancy */
     const static std::string nameDeltapTHighOccupancy; /**< string name of filter dPt high occupancy */
     const static std::string nameDeltaDistanceHighOccupancy2IP; /**< string name of filter dd2IP high occupancy */
+
+    const static std::string nameNbFinderLost; /**< string name Nb Finder filter */
+    const static std::string nameCellularAutomaton; /**< string name CA filter */
+
+
+    const static std::string nameHopfield;  /**< string name Hopfield filter */
+    const static std::string nameGreedy;   /**< string name Greedy filter */
+    const static std::string nameTcDuel;   /**< string name TC Duel filter */
+    const static std::string nameTcFinderCurr;   /**< string name TC Finder Curr filter */
+    const static std::string nameZiggZaggXY;   /**< string name ZiggZaggXY filter */
+    const static std::string nameZiggZaggRZ;    /**< string name ZiggZaggRZ filter */
+    const static std::string nameCalcQIbyKalman;   /**< string name CalcQIbyKalman filter */
+    const static std::string nameOverlapping;   /**< string name Overlapping filter */
+    const static std::string nameCirclefit;     /**< string name Circlefit filter */
+
+    const static std::string nameSilentTcc;  /**< string name Silent Kill TCC filter */
+    const static std::string nameSilentHitFinder;   /**< string name Silent Kill Hit Finder filter */
+    const static std::string nameSilentSegFinder;    /**< string name Silent Kill Seg Finder filter */
 
     const static boost::array<std::string, numFilters> nameVector; /**< array storing all the strings where the enums can be used to access their position */
 

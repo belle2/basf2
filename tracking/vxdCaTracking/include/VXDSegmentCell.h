@@ -48,7 +48,7 @@ namespace Belle2 {
       m_pOuterHit(NULL),
       m_pInnerHit(NULL),
       m_pOuterSector(NULL),
-      m_pInnerSector(NULL) { m_state = 0; m_activated = true; m_seed = true; m_stateUpgrade = false; }
+      m_pInnerSector(NULL) { m_state = 0; m_activated = true; m_seed = true; m_stateUpgrade = false; m_collector_id = -1;}
 
     /** Constructor.
      *      //      * @param pOuterHit pointer to hit forming the outer end of the SegmentCell.
@@ -61,7 +61,7 @@ namespace Belle2 {
       m_pOuterHit(pOuterHit),
       m_pInnerHit(pInnerHit),
       m_pOuterSector(pOuterSector),
-      m_pInnerSector(pInnerSector) { m_state = 0; m_activated = true; m_seed = true; m_stateUpgrade = false; }
+      m_pInnerSector(pInnerSector) { m_state = 0; m_activated = true; m_seed = true; m_stateUpgrade = false; m_collector_id = -1; }
 #endif
 
     int getState() const { return m_state; } /**< returns state of Cell (CA-feature) */
@@ -90,6 +90,9 @@ namespace Belle2 {
     void addInnerNeighbour(VXDSegmentCell* aSegment) { m_innerNeighbours.push_back(aSegment); } /**< adds an inner neighbour-cell */
     void addOuterNeighbour(VXDSegmentCell* aSegment) { m_outerNeighbours.push_back(aSegment); } /**< adds an outer neighbour-cell */
 
+    int getCollectorID() { return m_collector_id; }
+    void setCollectorID(int value) { m_collector_id = value; }
+
   protected:
     VXDTFHit* m_pOuterHit; /**< pointer to hit forming the outer end of the SegmentCell. */
     VXDTFHit* m_pInnerHit; /**< pointer to hit forming the inner end of the SegmentCell. */
@@ -106,6 +109,7 @@ namespace Belle2 {
     std::list<VXDSegmentCell*> m_allInnerNeighbours; /**< carries full list of all inner neighbour-Cells. */
     std::list<VXDSegmentCell*> m_outerNeighbours; /**< carries list of outer neighbour-Cells */
 
+    int m_collector_id; /**< ID of the Cell in the Collector */
   };
 
   /** @}*/

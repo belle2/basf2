@@ -50,6 +50,7 @@ namespace Belle2 {
       m_attachedCells.reserve(10);
       m_pxdHitIndices.reserve(4);
       m_svdHitIndices.reserve(16);
+      m_collector_id = -1;
     }
 
     /**copy constructor**/
@@ -73,7 +74,8 @@ namespace Belle2 {
       m_trackNumber((*other).m_trackNumber),
       m_initialHit((*other).m_initialHit),
       m_initialMomentum((*other).m_initialMomentum),
-      m_initialValuesSet((*other).m_initialValuesSet) {
+      m_initialValuesSet((*other).m_initialValuesSet),
+      m_collector_id((*other).m_collector_id) {
       if (m_alive == true) { for (VXDTFHit * aHit : m_attachedHits) { aHit->addTrackCandidate(); } }  // each time it gets copied, its hits have to be informed about that step
       /*m_neuronValue = 0; m_overlapping = false; m_alive = true; m_qualityIndex = 1.0;*/
     }
@@ -276,6 +278,8 @@ namespace Belle2 {
 
     void clearRivals() { m_bookingRivals.clear(); } /**< deletes entries of the rivals vector */
 
+    int getCollectorID() { return m_collector_id; }
+    void setCollectorID(int value) { m_collector_id = value; }
 
   protected:
     std::vector<VXDTFHit*> m_attachedHits; /**< contains pointer to all VXDTFHits attached to current TC. Currently, the first hit in the vector is the outermost hit */
@@ -303,6 +307,7 @@ namespace Belle2 {
 
     bool m_initialValuesSet; /**< if false, no initial values for position and momentum are calculated yet */
 
+    int m_collector_id; /**< ID of the TC in the Collector*/
   };
 } //Belle2 namespace
 #endif

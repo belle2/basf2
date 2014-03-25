@@ -383,7 +383,7 @@ namespace Belle2 {
 
       const Track* trak1 = tagTracks[i];
 
-      const TrackFitResult* trak1Res;
+      const TrackFitResult* trak1Res = NULL;
       if (trak1) trak1Res = trak1->getTrackFitResult(Const::pion);
 
       TVector3 mom1;
@@ -395,7 +395,7 @@ namespace Belle2 {
 
         if (i != j) {
           const Track* trak2 = tagTracks[j];
-          const TrackFitResult* trak2Res;
+          const TrackFitResult* trak2Res = NULL;
           if (trak2) trak2Res = trak2->getTrackFitResult(Const::pion);
 
           TVector3 mom2;

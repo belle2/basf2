@@ -52,7 +52,7 @@ int HitTFInfo::changeUseCounterCell(std::vector<int> value)
 {
 
   if (value.size() < m_use_counter_cell.size()) {
-    B2DEBUG(1, "CollectorTFInfo: changeUseCounterCell too few input-values");
+    B2DEBUG(10, "CollectorTFInfo: changeUseCounterCell too few input-values");
   }
 
   // if the vector is too small (standard at start => to size 2)
@@ -83,7 +83,7 @@ bool HitTFInfo::isOverlappedByCellsOrTCs()
   // Search if hit is overlapped because of the cell
   for (auto & akt_cell : m_use_counter_cell) {
 
-    //B2INFO("Akt_cell" << akt_cell);
+    //B2DEBUG(100,"Akt_cell" << akt_cell);
 
     //if hit is used once per cell (inner, outer) => no overlap
     // if hit is used more then once per cell => overlap
@@ -91,7 +91,7 @@ bool HitTFInfo::isOverlappedByCellsOrTCs()
       is_overlapped = true;
       // Don't have to check other ones
 
-      B2INFO("HitTFInfo: isOverlappedByCellsOrTCs - Cell overlapped, akt_cell: " <<  akt_cell);
+      B2DEBUG(100, "HitTFInfo: isOverlappedByCellsOrTCs - Cell overlapped, akt_cell: " <<  akt_cell);
 
       return is_overlapped;
     }
@@ -109,7 +109,7 @@ bool HitTFInfo::isOverlappedByCellsOrTCs()
   if (all_ok_found_cells > 1 && m_use_TC_counter_IDs.size() > 1) {
     is_overlapped = true;
 
-    B2INFO("HitTFInfo: isOverlappedByCellsOrTCs - TC overlapped ");
+    B2DEBUG(100, "HitTFInfo: isOverlappedByCellsOrTCs - TC overlapped ");
 
   }
 
@@ -129,7 +129,7 @@ void HitTFInfo::push_back_UseCounterTCIDs(int newMember)
     if (found == m_use_TC_counter_IDs.end()) {
       m_use_TC_counter_IDs.push_back(newMember);
 
-      B2INFO("push_back_UseCounterTCIDs newMember " << newMember << " *******");
+      B2DEBUG(100, "push_back_UseCounterTCIDs newMember " << newMember << " *******");
     }
 
 
@@ -149,7 +149,7 @@ void HitTFInfo::push_back_AllCounterTCIDs(int newMember)
     if (found == m_all_TC_counter_IDs.end()) {
       m_all_TC_counter_IDs.push_back(newMember);
 
-      B2INFO("push_back_AllCounterTCIDs newMember " << newMember << " *******");
+      B2DEBUG(100, "push_back_AllCounterTCIDs newMember " << newMember << " *******");
     }
 
   }
@@ -168,7 +168,7 @@ void HitTFInfo::remove_UseCounterTCIDs(int oldMember)
     if (found != m_use_TC_counter_IDs.end()) {
       m_use_TC_counter_IDs.erase(found);
 
-      B2INFO("removed from m_use_TC_counter_IDs oldMember " << oldMember << " *******");
+      B2DEBUG(100, "removed from m_use_TC_counter_IDs oldMember " << oldMember << " *******");
     }
   }
 }

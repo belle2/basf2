@@ -79,7 +79,7 @@ CollectorTFInfo::~CollectorTFInfo()
 void CollectorTFInfo::initSectors(std::map< std::pair<unsigned int, unsigned int>, std::vector<int> > sectors, std::vector<double> secConfigU, std::vector<double> secConfigV)
 {
 
-  B2INFO("CollectorTFInfo: initSectors");
+  B2DEBUG(100, "CollectorTFInfo: initSectors");
 
   double sectorEdgeV1 = 0, sectorEdgeV2 = 0, uSizeAtv1 = 0, uSizeAtv2 = 0, sectorEdgeU1OfV1 = 0, sectorEdgeU1OfV2 = 0, sectorEdgeU2OfV1 = 0, sectorEdgeU2OfV2 = 0;
 
@@ -89,7 +89,7 @@ void CollectorTFInfo::initSectors(std::map< std::pair<unsigned int, unsigned int
 
   int sector_size = sectors.size();
 
-  B2INFO("CollectorTFInfo: initSectors, sector_size: " << sector_size);
+  B2DEBUG(100, "CollectorTFInfo: initSectors, sector_size: " << sector_size);
 
   for (auto & akt_sector : sectors)  {
 
@@ -155,7 +155,7 @@ void CollectorTFInfo::initSectors(std::map< std::pair<unsigned int, unsigned int
 /** registerPersistence (StoreArrays & RelationArray) for the Collector */
 void CollectorTFInfo::initPersistent()
 {
-  B2INFO("CollectorTFInfo: initPersistent");
+  B2DEBUG(100, "CollectorTFInfo: initPersistent");
 
   // Store Arrays for output
   StoreArray<ClusterTFInfo>::registerPersistent();
@@ -173,7 +173,7 @@ void CollectorTFInfo::initPersistent()
 /** Clear all vectors */
 void CollectorTFInfo::intEvent()  // Clear Vectors
 {
-  B2INFO("CollectorTFInfo: intEvent");
+  B2DEBUG(100, "CollectorTFInfo: intEvent");
 
   // Clear for new event
   m_clustersTF.clear();
@@ -188,7 +188,7 @@ void CollectorTFInfo::intEvent()  // Clear Vectors
 /** Import of a cluster */
 int CollectorTFInfo::importCluster(int pass_index, std::string died_at, int died_id, std::vector<int> accepted, std::vector<int> rejected, int detector_type, int relative_position)
 {
-  B2INFO("CollectorTFInfo: importCluster, pass_index: " << pass_index << ", diet_at: " << died_at << ", accepted-size: " << accepted.size() << ", rejected-size: " << rejected.size() << ", Detector Type: " << detector_type);
+  B2DEBUG(100, "CollectorTFInfo: importCluster, pass_index: " << pass_index << ", diet_at: " << died_at << ", accepted-size: " << accepted.size() << ", rejected-size: " << rejected.size() << ", Detector Type: " << detector_type);
 
   int cluster_id = m_clustersTF.size();
 
@@ -206,8 +206,8 @@ int CollectorTFInfo::importCluster(int pass_index, std::string died_at, int died
 
   m_clustersTF.push_back(newcluster);
 
-  // B2INFO("CollectorTFInfo: importCluster, startPositionID: " << newcluster.getStartPositionID() );
-  B2INFO("CollectorTFInfo: importCluster ClusterID: " << cluster_id);
+  // B2DEBUG(100,"CollectorTFInfo: importCluster, startPositionID: " << newcluster.getStartPositionID() );
+  B2DEBUG(100, "CollectorTFInfo: importCluster ClusterID: " << cluster_id);
 
 
   return cluster_id;
@@ -220,7 +220,7 @@ int CollectorTFInfo::importCluster(int pass_index, std::string died_at, int died
  Also checks Friends sectors (possible reload) */
 void CollectorTFInfo::updateSectors(int sector_ID, int pass_index, std::string died_at, int died_id, std::vector<int> accepted, std::vector<int> rejected, int deltaUseCounter)
 {
-  B2INFO("CollectorTFInfo: updateSectors, sector_ID: " << sector_ID << ", Pass Index: " << pass_index << ", diet_at: " << died_at << ", accepted-size: " << accepted.size() << ", rejected-size: " << rejected.size() << ", deltaUseCounter: " << deltaUseCounter);
+  B2DEBUG(100, "CollectorTFInfo: updateSectors, sector_ID: " << sector_ID << ", Pass Index: " << pass_index << ", diet_at: " << died_at << ", accepted-size: " << accepted.size() << ", rejected-size: " << rejected.size() << ", deltaUseCounter: " << deltaUseCounter);
 
   std::map<KeySectors, SectorTFInfo>::iterator it, it_friend;
 
@@ -236,13 +236,13 @@ void CollectorTFInfo::updateSectors(int sector_ID, int pass_index, std::string d
 
     if (it == m_sectorTF_all.end()) {
       // Not found in all Sectors
-      B2INFO("CollectorTFInfo: updateSectors - Sector not found !");
+      B2DEBUG(100, "CollectorTFInfo: updateSectors - Sector not found !");
       return;
 
     } else {
 
       // Found => Sector reload
-      B2INFO("Sector reload: sector_ID: " << sector_ID);
+      B2DEBUG(100, "Sector reload: sector_ID: " << sector_ID);
 
       // + Updates
       //Copy of sector => use for this event
@@ -260,7 +260,7 @@ void CollectorTFInfo::updateSectors(int sector_ID, int pass_index, std::string d
       akt_sector.insert_Accepted(accepted);
       akt_sector.insert_Rejected(rejected);
 
-      B2INFO("CollectorTFInfo: updateSectors - akt deltaUseCounter : " << akt_sector.getUseCounter());
+      B2DEBUG(100, "CollectorTFInfo: updateSectors - akt deltaUseCounter : " << akt_sector.getUseCounter());
 
       m_sectorTF.insert(make_pair(my_key, akt_sector));
 
@@ -279,10 +279,10 @@ void CollectorTFInfo::updateSectors(int sector_ID, int pass_index, std::string d
           // Reload Friend Sector
           if (it_friend == m_sectorTF_all.end()) {
             // Sector not found
-            B2INFO("NIX DA Sector-Friend");
+            B2DEBUG(100, "NIX DA Sector-Friend");
           } else {
 
-            B2INFO("Sector-Friend reload: sector_ID: " << akt_friend_sector);
+            B2DEBUG(100, "Sector-Friend reload: sector_ID: " << akt_friend_sector);
 
             //Copy of sector => use for this event
             SectorTFInfo akt_friend_sector_obj = it_friend->second;
@@ -318,7 +318,7 @@ void CollectorTFInfo::updateSectors(int sector_ID, int pass_index, std::string d
     akt_sector.insert_Accepted(accepted);
     akt_sector.insert_Rejected(rejected);
 
-    B2INFO("CollectorTFInfo: updateSectors - akt deltaUseCounter : " << akt_sector.getUseCounter());
+    B2DEBUG(100, "CollectorTFInfo: updateSectors - akt deltaUseCounter : " << akt_sector.getUseCounter());
 
   }
 
@@ -329,10 +329,10 @@ void CollectorTFInfo::updateSectors(int sector_ID, int pass_index, std::string d
 /** Cluster Update */
 void CollectorTFInfo::updateClusters(int cluster_id, std::string died_at, int died_id, std::vector<int> accepted, std::vector<int> rejected, int deltaUseCounter)   //Cluster Update
 {
-  B2INFO("CollectorTFInfo: updateClusters, cluster_id: " << cluster_id << ", diet_at: " << died_at << ", accepted-size: " << accepted.size() << ", rejected-size: " << rejected.size() << ", deltaUseCounter: " << deltaUseCounter);
+  B2DEBUG(100, "CollectorTFInfo: updateClusters, cluster_id: " << cluster_id << ", diet_at: " << died_at << ", accepted-size: " << accepted.size() << ", rejected-size: " << rejected.size() << ", deltaUseCounter: " << deltaUseCounter);
 
   if (cluster_id >= (int)m_clustersTF.size()) {
-    B2INFO("CollectorTFInfo: updateClusters - Cluster not found !");
+    B2DEBUG(100, "CollectorTFInfo: updateClusters - Cluster not found !");
     return;
   } else {
 
@@ -350,7 +350,7 @@ void CollectorTFInfo::updateClusters(int cluster_id, std::string died_at, int di
     akt_cluster.insert_Accepted(accepted);
     akt_cluster.insert_Rejected(rejected);
 
-    B2INFO("CollectorTFInfo: updateClusters - akt deltaUseCounter : " << akt_cluster.getUseCounter());
+    B2DEBUG(100, "CollectorTFInfo: updateClusters - akt deltaUseCounter : " << akt_cluster.getUseCounter());
   }
 
 
@@ -362,7 +362,7 @@ void CollectorTFInfo::updateClusters(int cluster_id, std::string died_at, int di
 /** Import Hit (return hitID) */
 int CollectorTFInfo::importHit(int pass_index, std::string died_at, int died_id, std::vector<int> accepted, std::vector<int> rejected, std::vector<int> assigned_Cluster_IDs, int sec_id, TVector3 hit_position, TVector3 hit_sigma)  // Hit import
 {
-  B2INFO("CollectorTFInfo: importHit, pass_index: " << pass_index << ", diet_at: " << died_at << ", accepted-size: " << accepted.size() << ", rejected-size: " << rejected.size() << ", sec_id: " << sec_id);
+  B2DEBUG(100, "CollectorTFInfo: importHit, pass_index: " << pass_index << ", diet_at: " << died_at << ", accepted-size: " << accepted.size() << ", rejected-size: " << rejected.size() << ", sec_id: " << sec_id);
 
   int hit_id = m_hitTF.size();
 
@@ -401,10 +401,10 @@ int CollectorTFInfo::importHit(int pass_index, std::string died_at, int died_id,
 // add_TCID, remove_TCID if -1 => no deltaUseCounter
 void CollectorTFInfo::updateHit(int hit_id, std::string died_at, int died_id, std::vector<int> accepted, std::vector<int> rejected, int add_TCID, int remove_TCID, std::vector<int> deltaUseCounter_cell)
 {
-  B2INFO("CollectorTFInfo: updateHit, hit_id: " << hit_id << ", diet_at: " << died_at << ", accepted-size: " << accepted.size() << ", rejected-size: " << rejected.size() << ", deltaUseCounter_cell - size: " << deltaUseCounter_cell.size());
+  B2DEBUG(100, "CollectorTFInfo: updateHit, hit_id: " << hit_id << ", diet_at: " << died_at << ", accepted-size: " << accepted.size() << ", rejected-size: " << rejected.size() << ", deltaUseCounter_cell - size: " << deltaUseCounter_cell.size());
 
   if (hit_id >= (int)m_hitTF.size() || hit_id == -1) {
-    B2INFO("CollectorTFInfo: updateHit - Hit not found !");
+    B2DEBUG(100, "CollectorTFInfo: updateHit - Hit not found !");
     return;
   } else {
 
@@ -417,7 +417,7 @@ void CollectorTFInfo::updateHit(int hit_id, std::string died_at, int died_id, st
 
     akt_hit.changeUseCounter(deltaUseCounter);
 
-    //B2INFO("CollectorTFInfo: akt deltaUseCounter: " << deltaUseCounter);
+    //B2DEBUG(100,"CollectorTFInfo: akt deltaUseCounter: " << deltaUseCounter);
 
     string died_at_akt;
     int died_id_akt;
@@ -456,7 +456,7 @@ void CollectorTFInfo::updateHit(int hit_id, std::string died_at, int died_id, st
       akt_hit.remove_UseCounterTCIDs(remove_TCID);
     }
 
-    B2INFO("CollectorTFInfo: INFO Hit id " << hit_id << ", akt UseCounter: " << akt_hit.getUseCounter() << ", died at: " << died_at);
+    B2DEBUG(100, "CollectorTFInfo: INFO Hit id " << hit_id << ", akt UseCounter: " << akt_hit.getUseCounter() << ", died at: " << died_at);
 
 
 
@@ -471,7 +471,7 @@ void CollectorTFInfo::updateHit(int hit_id, std::string died_at, int died_id, st
 /** Cell Import */
 int CollectorTFInfo::importCell(int pass_index, std::string died_at, int died_id, std::vector<int> accepted, std::vector<int> rejected, std::vector<int> assigned_Hit_IDs)
 {
-  B2INFO("CollectorTFInfo: importCell, pass_index: " << pass_index << ", diet_at: " << died_at << ", accepted-size: " << accepted.size() << ", rejected-size: " << rejected.size() << ", assigned_Hit_IDs - size: " << assigned_Hit_IDs.size());
+  B2DEBUG(100, "CollectorTFInfo: importCell, pass_index: " << pass_index << ", diet_at: " << died_at << ", accepted-size: " << accepted.size() << ", rejected-size: " << rejected.size() << ", assigned_Hit_IDs - size: " << assigned_Hit_IDs.size());
 
   int cellID = m_cellTF.size();
 
@@ -520,10 +520,10 @@ int CollectorTFInfo::importCell(int pass_index, std::string died_at, int died_id
 /** Update Cell */
 void CollectorTFInfo::updateCell(int cellID, std::string died_at, int died_id, std::vector<int> accepted, std::vector<int> rejected, int add_TCID, int remove_TCID, int cellstate, std::vector<int> neighbours)
 {
-  B2INFO("CollectorTFInfo: updateCell, cellID: " << cellID << ", diet_at: " << died_at << ", accepted-size: " << accepted.size() << ", rejected-size: " << rejected.size() << ", add_TCID: " << add_TCID << ", remove_TCID: " << remove_TCID << ", died_id: " << died_id);
+  B2DEBUG(100, "CollectorTFInfo: updateCell, cellID: " << cellID << ", diet_at: " << died_at << ", accepted-size: " << accepted.size() << ", rejected-size: " << rejected.size() << ", add_TCID: " << add_TCID << ", remove_TCID: " << remove_TCID << ", died_id: " << died_id);
 
   if (cellID >= (int)m_cellTF.size() || cellID == -1) {
-    B2INFO("CollectorTFInfo: updateCell - cell not found !");
+    B2DEBUG(100, "CollectorTFInfo: updateCell - cell not found !");
     return;
 
   } else {
@@ -608,7 +608,7 @@ void CollectorTFInfo::updateCell(int cellID, std::string died_at, int died_id, s
 /** TC Import, return = tc id */
 int CollectorTFInfo::importTC(int pass_index, std::string died_at, int died_id, std::vector<int> accepted, std::vector<int> rejected, std::vector<std::pair<int, unsigned int>> assigned_Cell_IDs)
 {
-  B2INFO("CollectorTFInfo: importTC, pass_index: " << pass_index << ", diet_at: " << died_at << ", accepted-size: " << accepted.size() << ", rejected-size: " << rejected.size() << ", assigned_Cell_IDs - size: " << assigned_Cell_IDs.size());
+  B2DEBUG(100, "CollectorTFInfo: importTC, pass_index: " << pass_index << ", diet_at: " << died_at << ", accepted-size: " << accepted.size() << ", rejected-size: " << rejected.size() << ", assigned_Cell_IDs - size: " << assigned_Cell_IDs.size());
 
   int tfcandID = m_tfCandTF.size();
 
@@ -636,10 +636,10 @@ int CollectorTFInfo::importTC(int pass_index, std::string died_at, int died_id, 
 /** update TCand */
 void CollectorTFInfo::updateTC(int tcid, std::string died_at, int died_id, std::vector<int> accepted, std::vector<int> rejected)  // TC Update
 {
-  B2INFO("CollectorTFInfo: updateTC, tcid: " << tcid << ", diet_at: " << died_at << ", accepted-size: " << accepted.size() << ", rejected-size: " << rejected.size());
+  B2DEBUG(100, "CollectorTFInfo: updateTC, tcid: " << tcid << ", diet_at: " << died_at << ", accepted-size: " << accepted.size() << ", rejected-size: " << rejected.size());
 
   if (tcid >= (int)m_tfCandTF.size() || tcid == -1) {
-    B2INFO("CollectorTFInfo: updateTC - TCCand not found !");
+    B2DEBUG(100, "CollectorTFInfo: updateTC - TCCand not found !");
     return;
 
   } else {
@@ -672,10 +672,10 @@ void CollectorTFInfo::updateTC(int tcid, std::string died_at, int died_id, std::
 /** Update Fit Information (fit_successful, probability_value, assigned_GTFC) of TC */
 void CollectorTFInfo::updateTCFitInformation(int tcid, bool fit_successful, double probability_value, int assigned_GTFC)  // TC Update
 {
-  B2INFO("CollectorTFInfo: updateTCFitInformation, tcid: " << tcid << ", fit_successful: " << fit_successful << ", probability_value: " << probability_value << ", assigned_GTFC: " << assigned_GTFC);
+  B2DEBUG(100, "CollectorTFInfo: updateTCFitInformation, tcid: " << tcid << ", fit_successful: " << fit_successful << ", probability_value: " << probability_value << ", assigned_GTFC: " << assigned_GTFC);
 
   if (tcid >= (int)m_tfCandTF.size()) {
-    B2INFO("CollectorTFInfo: updateTCFitInformation - TCCand not found !");
+    B2DEBUG(100, "CollectorTFInfo: updateTCFitInformation - TCCand not found !");
     return;
 
   } else {
@@ -700,7 +700,7 @@ void CollectorTFInfo::safeInformation()
 {
   StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
 
-  B2INFO("*******  CollectorTFInfo processing event number: " << eventMetaDataPtr->getEvent() << " *******");
+  B2DEBUG(100, "*******  CollectorTFInfo processing event number: " << eventMetaDataPtr->getEvent() << " *******");
 
   // Create Store Arrays for Output
 
@@ -712,8 +712,8 @@ void CollectorTFInfo::safeInformation()
     clusterTFInfo.appendNew(akt_cluster);
   }
 
-  B2INFO("*******  Cluster size: " << clusterTFInfo.getEntries() << " *******");
-  B2INFO("*******  akt Cluster size: " << m_clustersTF.size() << " *******");
+  B2DEBUG(100, "*******  Cluster size: " << clusterTFInfo.getEntries() << " *******");
+  B2DEBUG(100, "*******  akt Cluster size: " << m_clustersTF.size() << " *******");
 
   // SECTORS
   StoreArray<SectorTFInfo> sectorTFInfo("");
@@ -744,9 +744,9 @@ void CollectorTFInfo::safeInformation()
       // Sector Search in current Sectors
       if (it != m_sectorTF.end()) {
         relSectorSectorFriend.add(index_sector, std::distance(m_sectorTF.begin(), it));
-        B2INFO("pass_index: " << friend_key.first << "; Sector akt: " << index_sector << ", friend sector: " << std::distance(m_sectorTF.begin(), it) << ", sector id (akt/friend): " << akt_sector.second.getSectorID() << " / " << akt_friend);
+        B2DEBUG(100, "pass_index: " << friend_key.first << "; Sector akt: " << index_sector << ", friend sector: " << std::distance(m_sectorTF.begin(), it) << ", sector id (akt/friend): " << akt_sector.second.getSectorID() << " / " << akt_friend);
       } else {
-        B2INFO("Friend-Sector not found: " << akt_friend);
+        B2DEBUG(100, "Friend-Sector not found: " << akt_friend);
       }
 
       // same with sectorid; IDs = SectorIDs for akt. Sector and Friend sectors
@@ -754,10 +754,10 @@ void CollectorTFInfo::safeInformation()
     }
   }
 
-  B2INFO("*******  SECTORS size: " << sectorTFInfo.getEntries() << " *******");
-  B2INFO("*******  akt SECTORS size: " << m_sectorTF.size() << " *******");
+  B2DEBUG(100, "*******  SECTORS size: " << sectorTFInfo.getEntries() << " *******");
+  B2DEBUG(100, "*******  akt SECTORS size: " << m_sectorTF.size() << " *******");
 
-  B2INFO("*******  relSectorSectorFriend: " << relSectorSectorFriend.getEntries() << " *******");
+  B2DEBUG(100, "*******  relSectorSectorFriend: " << relSectorSectorFriend.getEntries() << " *******");
 
 
   // HITS
@@ -784,11 +784,11 @@ void CollectorTFInfo::safeInformation()
     // ID of cell/neighbours = Index of cell
     for (auto & akt_nb : akt_cell.getNeighbours()) {
       relCellNBCell.add(index_cell, akt_nb);
-      B2INFO("*******  relCellNBCell: index_cell: " << index_cell << ", akt_nb: " << akt_nb);
+      B2DEBUG(100, "*******  relCellNBCell: index_cell: " << index_cell << ", akt_nb: " << akt_nb);
     }
   }
 
-  B2INFO("*******  relCellNBCell: " << relCellNBCell.getEntries() << " *******");
+  B2DEBUG(100, "*******  relCellNBCell: " << relCellNBCell.getEntries() << " *******");
 
   // TFCAND
   StoreArray<TrackCandidateTFInfo> tfcandTFInfo("");
@@ -812,10 +812,10 @@ void CollectorTFInfo::safeInformation()
 void CollectorTFInfo::silentKill()  // Für alle folgenden Updates
 {
 
-  B2INFO("Start Silent kill");
+  B2DEBUG(100, "Start Silent kill");
 
 
-  B2INFO("Searching for dead clusters");
+  B2DEBUG(100, "Searching for dead clusters");
   // Searching for dead clusters
   // only if Hits and Clusters are already loaded
   if (m_hitTF.size() > 0 && m_clustersTF.size() > 0) {
@@ -852,7 +852,7 @@ void CollectorTFInfo::silentKill()  // Für alle folgenden Updates
 
 
 
-  B2INFO("Searching for dead hit");
+  B2DEBUG(100, "Searching for dead hit");
   // Searching for dead hit
   // only if Hits and Cells are already loaded
   if (m_hitTF.size() > 0 && m_cellTF.size() > 0) {
@@ -891,7 +891,7 @@ void CollectorTFInfo::silentKill()  // Für alle folgenden Updates
 
 
 
-  B2INFO("Searching for dead Cells");
+  B2DEBUG(100, "Searching for dead Cells");
 
   // Searching for dead Cells
   // only if TCs and Cells are already loaded
@@ -928,7 +928,7 @@ void CollectorTFInfo::silentKill()  // Für alle folgenden Updates
   }
 
 
-  B2INFO("End Silent kill");
+  B2DEBUG(100, "End Silent kill");
 
 }
 
@@ -942,10 +942,10 @@ bool CollectorTFInfo::isHitOverlapped(int hit_id)
 
   bool is_overlapped = false;
 
-  //B2INFO("CollectorTFInfo: isHitOverlapped, hit_id: " << hit_id );
+  //B2DEBUG(100,"CollectorTFInfo: isHitOverlapped, hit_id: " << hit_id );
 
   if (hit_id >= (int)m_hitTF.size()) {
-    B2INFO("CollectorTFInfo: isHitOverlapped - Hit not found !");
+    B2DEBUG(100, "CollectorTFInfo: isHitOverlapped - Hit not found !");
     return is_overlapped;
   }
 
@@ -960,7 +960,7 @@ bool CollectorTFInfo::isHitOverlapped(int hit_id)
   it = m_sectorTF.find(my_key);
 
   if (it == m_sectorTF.end()) {
-    B2INFO("CollectorTFInfo: isHitOverlapped - Sector not found : " << akt_hit.getSectorID());
+    B2DEBUG(100, "CollectorTFInfo: isHitOverlapped - Sector not found : " << akt_hit.getSectorID());
     return is_overlapped;
   }
 
@@ -969,7 +969,7 @@ bool CollectorTFInfo::isHitOverlapped(int hit_id)
   is_overlapped = akt_sector.isOverlapped();
   // if sector is overlapped => other checks not necessary
   if (is_overlapped) {
-    B2INFO("CollectorTFInfo: isHitOverlapped - Sector overlapped ");
+    B2DEBUG(100, "CollectorTFInfo: isHitOverlapped - Sector overlapped ");
     return is_overlapped;
 
   }
@@ -979,7 +979,7 @@ bool CollectorTFInfo::isHitOverlapped(int hit_id)
   for (auto & cluster_id : akt_hit.getAssignedCluster()) {
 
     if (cluster_id >= (int)m_clustersTF.size()) {
-      B2INFO("CollectorTFInfo: isHitOverlapped - Cluster not found !");
+      B2DEBUG(100, "CollectorTFInfo: isHitOverlapped - Cluster not found !");
       return is_overlapped;
     }
 
@@ -989,7 +989,7 @@ bool CollectorTFInfo::isHitOverlapped(int hit_id)
 
     // if cluster is overlapped => other checks not necessary
     if (is_overlapped) {
-      B2INFO("CollectorTFInfo: isHitOverlapped - Cluster overlapped ");
+      B2DEBUG(100, "CollectorTFInfo: isHitOverlapped - Cluster overlapped ");
       return is_overlapped;
     }
   }
@@ -1009,7 +1009,7 @@ bool CollectorTFInfo::isCellOverlapped(int cellID)
   bool is_overlapped = false;
 
   if (cellID >= (int)m_cellTF.size()) {
-    B2INFO("CollectorTFInfo: isCellOverlapped - cell not found !");
+    B2DEBUG(100, "CollectorTFInfo: isCellOverlapped - cell not found !");
     return is_overlapped;
   }
 
@@ -1037,7 +1037,7 @@ bool CollectorTFInfo::isTCOverlapped(int tcid)
   bool is_overlapped = false;
 
   if (tcid >= (int)m_tfCandTF.size()) {
-    B2INFO("CollectorTFInfo: isTCOverlapped - TCCand not found !");
+    B2DEBUG(100, "CollectorTFInfo: isTCOverlapped - TCCand not found !");
     return is_overlapped;
   }
 

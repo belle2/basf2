@@ -407,8 +407,17 @@ namespace Belle2 {
 
     gearbox::GBResult res;
 
-    for (auto & xp_single : xpath_parts) {
-      this->dispatchQuery(xp_single, res);
+
+    try {
+
+      for (auto & xp_single : xpath_parts) {
+        this->dispatchQuery(xp_single, res);
+      }
+
+
+    } catch (std::string& s) {
+      B2ERROR("Gearbox::query: Could not complete query " + xpath + ". Reason: " + s);
+      exit(1);
     }
 
     return res.getResultSetPtr();

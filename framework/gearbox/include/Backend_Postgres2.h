@@ -55,6 +55,13 @@ namespace Belle2 {
       void writeCommit(std::string comment);
 
 
+    protected:
+
+      /**
+      * Process BackendType-specific Backend-Initialization Parameters
+      */
+      void processParams();
+
     private:
 
       /**
@@ -89,6 +96,12 @@ namespace Belle2 {
       void buildAndAddNode1(pqxx::tuple row, GBResult& theGBResult);
       std::string generateQueryRead1(std::string nodename, std::string conditions, queryParams_t queryParameters);
 
+      /**
+       * Get the unique ID of a given node or attribute
+       * @param node the XML node whose unique ID is to be extracted
+       * @return the name of the node that is read
+       */
+      //std::string getUniqueId(pqxx::result::const_iterator, pqxx::result::const_iterator);
 
     }; // class Backend_Postgres2
 

@@ -53,6 +53,13 @@ namespace Belle2 {
        */
       bool checkPathExists(std::string path);
 
+    protected:
+
+      /**
+        * Process BackendType-specific Backend-Initialization Parameters
+        */
+      void processParams();
+
     private:
 
       /**

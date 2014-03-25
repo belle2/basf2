@@ -1,6 +1,7 @@
 #include "framework/gearbox/Backend_Postgres2.h"
 
 #include <boost/regex.hpp>
+#include <boost/algorithm/string.hpp>
 
 namespace Belle2 {
   namespace gearbox {
@@ -10,9 +11,12 @@ namespace Belle2 {
 
       this->DBConnection = new pqxx::connection(boost::get<std::string>(this->params["connectionString"]));
 
-      pqxx::work readTransaction(*this->DBConnection);
+      this->processParams();
 
-      pqxx::result res = readTransaction.exec("SELECT * FROM " + boost::get<std::string>(this->params["meta_table"]));
+      pqxx::read_transaction ta(*this->DBConnection);
+
+      pqxx::result res = ta.exec("SELECT * FROM " + boost::get<std::string>(this->params["meta_table"]));
+      ta.commit();
 
       for (pqxx::result::size_type i = 0; i != res.size(); ++i) {
 
@@ -39,6 +43,16 @@ namespace Belle2 {
 
       }
 
+      if (this->uniqueHash.empty()) {
+
+        this->uniqueHash = genRandomString(GEARBOX_BACKEND_UNIQUEHASH_AUTOLENGTH);
+
+        pqxx::work wta(*this->DBConnection);
+        wta.exec("INSERT INTO " + boost::get<std::string>(this->params["meta_table"]) + " (prop_type, key, value) VALUES ('unique_backend_hash','','" + this->uniqueHash + "')");
+        wta.commit();
+
+      }
+
 
     }
 
@@ -46,6 +60,49 @@ namespace Belle2 {
     {
       delete this->DBConnection;
     }
+
+
+
+    void Backend_Postgres2::processParams()
+    {
+
+      {
+
+        if (this->params.find("schema") == this->params.end()) {
+          this->params.insert(std::make_pair("schema", BackendConfigParam("public")));
+        }
+
+        pqxx::read_transaction ta(*this->DBConnection);
+        pqxx::result res = ta.exec("SELECT schema_name FROM information_schema.schemata WHERE schema_name = '" + boost::get<std::string>(this->params["schema"]) + "'");
+        ta.commit();
+
+        if (res.size() < 1) {
+          throw (std::string("Gearbox::Backend_Postgres2: schema '" + boost::get<std::string>(this->params["schema"]) + "' not found in database"));
+        }
+
+      }
+
+      this->DBConnection->set_variable("search_path", boost::get<std::string>(this->params["schema"]));
+
+      {
+
+        if (this->params.find("meta_table") == this->params.end()) {
+          this->params.insert(std::make_pair("meta_table", BackendConfigParam("config_t")));
+        }
+
+        pqxx::read_transaction ta(*this->DBConnection);
+        pqxx::result res = ta.exec("SELECT * FROM information_schema.tables WHERE table_schema = current_schema() and table_name = '" + boost::get<std::string>(this->params["meta_table"]) + "'");
+        ta.commit();
+
+        if (res.size() < 1) {
+          throw (std::string("Gearbox::Backend_Postgres2: backend configuration table '" + boost::get<std::string>(this->params["meta_table"]) + "' not found in database"));
+        }
+
+      }
+
+
+    }
+
 
     // TODO: merge write branch
     void Backend_Postgres2::writeCommit(std::string comment)
@@ -72,128 +129,141 @@ namespace Belle2 {
 
     }
 
-
-    std::string Backend_Postgres2::generateQueryRead1(std::string nodename, std::string conditions, queryParams_t /*queryParameters*/)
-    {
-
-      std::string tablename;
-      std::string valuecolumn;
-
-      std::string condString;
-
-      if (nodename.length() == 0 or nodename == "*") {
-        throw ("Backend_Postgres2::generateQueryRead1: Use join mode via table alias for multi table access");
-      }
-
-      if (!(this->aliasTablename.find(nodename) == this->aliasTablename.end()))
-        tablename = this->aliasTablename[nodename];
-      else
-        tablename = nodename;
-
-
-
-      if (conditions.length() > 0) {
-        //condString = "WHERE "+boost::replace_all(conditions,"@","");
-      }
-
-      return std::string("SELECT * FROM " + tablename + condString);
-
-    }
-
-    void Backend_Postgres2::query(const std::string& xPath, QryResultSet& /*connectNode*/, std::string /*internalUpToPath*/, GBResult& /*theGBResult*/)
+    void Backend_Postgres2::query(const std::string& xPath, QryResultSet& connectNode, std::string /*internalUpToPath*/, GBResult& theGBResult)
     {
 
       // all previous xpath labels are removed by the mount code -> remaining label corresponds to
       // table name and acts as "key" for query modifications
 
-      B2ERROR("Gearbox::Backend_Postgres2::query: '" + xPath + "'");
+      B2INFO("Gearbox::Backend_Postgres2::query: '" + xPath + "'");
 
-      std::string qry;
+      boost::regex expr("^/([^/\\[\\{]*)(/@(.+))?(\\[(.+)\\])?(\\{(.+)\\})?$");
       boost::smatch extraction;
+      /*
+       *  e.g. "/node/@attrib[conditions]{queryParams}" results in
+       *
+       * [1] node
+       * [2] /@attrib
+       * [3] attrib
+       * [4] [conditions]
+       * [5] conditions
+       * [6] {queryParams}
+       * [7] queryParams
+       *
+       */
+
+      if (!boost::regex_search(xPath, extraction, expr)) {
+        throw (std::string("Gearbox::Backend_Postgres2::query: Could not parse XPath"));
+      }
+
 
       std::string tables;
       std::string conditions;
       std::string columns;
 
-      std::string nodename;
-      std::string tablename;
+      auto queryParameters = this->parseQueryParams(extraction[7]);
 
-      std::string valuecolumn;
-      std::string uniqueIdentGroup;
+      // certain attribute requested?
+      // -> conditions should refer to attribute name
+      if (extraction[3].matched) {
 
-      boost::regex expr("^/(.*(/@(.+))?)(\\[(.+)\\])?(\\{.*\\})?$");
-
-      if (boost::regex_search(xPath, extraction, expr)) {
-
-        auto queryParameters = this->parseQueryParams(extraction[6]);
-
-        // TODO: Query Parameter parse
-
-        // certain attribute requested?
-        // -> conditions make sense regarding attribute name
-        if (extraction[3].length() > 0) {
-
-          // TODO: select certain attributes only
-
-        } else {
-
-          qry = this->generateQueryRead1(extraction[1], extraction[5], queryParameters);
-
-        }
-
-        nodename = extraction[1];
-        //conditions = boost::replace_all(extraction[3],"@","");
+        // TODO: select certain attributes only
+        // qry = this->generateQueryRead2(extraction[1], extraction[5], queryParameters);
 
       } else {
-        throw (std::string("Backend_Postgres2: Could not parse XPath"));
-      }
 
+        if (extraction[1].length() == 0 or extraction[1] == "*") {
+          throw ("Gearbox::Backend_Postgres2::query: Use join mode via table alias for multi table access");
+        }
+
+        // find out table names
+        if (!(this->aliasTablename.find(extraction[1]) == this->aliasTablename.end()))
+          tables = this->aliasTablename[extraction[1]];
+        else
+          tables = extraction[1];
+
+        // for now, we select node and all attributes => means all columns
+        columns = "*";
+
+        if (extraction[5].matched) {
+          conditions = " WHERE " + extraction[5];
+          // keep it simple -> better converter needed here for special xpath functions
+          boost::replace_all(conditions, "@", "");
+        }
+
+
+      }
 
 
       pqxx::work readTransaction(*this->DBConnection, "readTransaction");
 
-      // this query has to return the nodes in an order so that each node
-      // is before its children. From the recursive query, I can't see how
-      // a DB server could possibly return any other order.
-      // Should this ever change in the future, the logic to read the result
-      // has to be changed to handle nodes in any order.
-      pqxx::result res = readTransaction.exec(qry);
+      pqxx::result res = readTransaction.exec("SELECT " + columns + " FROM " + tables + conditions);
 
-      for (pqxx::result::const_iterator i = res.begin(); i != res.end(); ++i) {
+      std::string valuecolumn;
+      if (!(this->aliasValuecolumn.find(extraction[1]) == this->aliasValuecolumn.end()))
+        valuecolumn = this->aliasValuecolumn[extraction[1]];
+      else
+        valuecolumn = "value";
 
-        //res[i];
 
-        //this->buildAndAddNode1(res[i],theGBResult);
+      std::string uniqueID_base(this->uniqueHash);
+      if (!(this->uniqueIdentGroup.find(extraction[1]) == this->uniqueIdentGroup.end()))
+        uniqueID_base.append(this->uniqueIdentGroup[extraction[1]]);
+      else
+        uniqueID_base.append(extraction[1]);
+
+
+      std::string uniqueID_col("id");
+      if (!(this->uniqueIdentColumn.find(extraction[1]) == this->uniqueIdentColumn.end()))
+        uniqueID_col = this->uniqueIdentColumn[extraction[1]];
+
+      bool isAttrib;
+
+
+      for (auto rowIt = res.begin(); rowIt != res.end(); ++rowIt) {
+
+        // certain attribute requested?
+        if (extraction[3].matched) {
+
+          // res[i];
+          /*
+                   theGBResult.submitNode(connectNode,
+                                         nodeExistenceState::add,
+                                         extraction[3],
+                                         fieldIt->as<std::string>(),
+                                         this->getNodeId(rowIt,fielIt),rrt
+                                         "",
+                                         true
+                                        );
+
+                                    }
+          */
+
+
+        } else {
+
+          QryResultSet& thisnode = theGBResult.createEmptyNode(connectNode, extraction[1] , uniqueID_base + rowIt[uniqueID_col].as<std::string>());
+
+          for (auto fieldIt = rowIt->begin(); fieldIt != rowIt.end(); ++fieldIt) {
+
+            isAttrib = (std::strcmp(valuecolumn.c_str(), fieldIt->name()) ? true : false);
+
+            theGBResult.submitNode((isAttrib ? thisnode : connectNode),
+                                   nodeExistenceState::add,
+                                   std::string(fieldIt->name()),
+                                   (fieldIt->is_null() ? "<null>" : fieldIt->as<std::string>()),
+                                   uniqueID_base + rowIt[uniqueID_col].as<std::string>() + (isAttrib ? "_" + std::string(fieldIt->name()) : ""),
+                                   "",
+                                   isAttrib);
+
+          }
+
+
+        }
+
 
       }
 
-
-    }
-
-    void Backend_Postgres2::buildAndAddNode1(pqxx::tuple /*row*/, GBResult& /*theGBResult*/)
-    {
-
-      std::string valuecolumn;
-      std::string uniqueIdentGroup;
-      std::string uniqueIdentColumn;
-
-      /*
-            if (!(this->aliasValuecolumn.find(nodename) == this->aliasValuecolumn.end()))
-              valuecolumn = this->aliasValuecolumn[nodename];
-            else
-              valuecolumn = "value";
-
-            if (!(this->uniqueIdentGroup.find(nodename) == this->uniqueIdentGroup.end()))
-              uniqueIdentGroup = this->uniqueIdentGroup[nodename];
-            else
-              uniqueIdentGroup = nodename;
-
-            if (!(this->uniqueIdentColumn.find(nodename) == this->uniqueIdentColumn.end()))
-              uniqueIdentColumn = this->uniqueIdentColumn[nodename];
-            else
-              uniqueIdentColumn = "id";
-
-      */
 
     }
 

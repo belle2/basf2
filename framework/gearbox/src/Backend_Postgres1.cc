@@ -65,6 +65,11 @@ namespace Belle2 {
     }
 
 
+    void Backend_Postgres1::processParams()
+    {
+
+
+    }
 
     std::string Backend_Postgres1::convertXPath2LQuery(std::string xPath)
     {
@@ -99,10 +104,10 @@ namespace Belle2 {
 
 
       boost::smatch extraction;
-      boost::regex expr("^(.*)(\\{.*\\})?$");
+      boost::regex expr("^([^\\[]+)(\\[.*\\])?(\\{.*\\})?$");
       boost::regex_search(xPath, extraction, expr);
 
-      auto queryParams = this->parseQueryParams(extraction[2]);
+      auto queryParams = this->parseQueryParams(extraction[3]);
 
 
       std::string lQuery(this->convertXPath2LQuery(extraction[1]));

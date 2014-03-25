@@ -153,7 +153,7 @@ namespace Belle2 {
     unsigned short m_eWire;
 
     /** ROOT Macro.*/
-    ClassDef(WireID, 0);
+    ClassDef(WireID, 1);
   };
 }
 

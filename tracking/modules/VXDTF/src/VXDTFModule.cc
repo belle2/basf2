@@ -363,7 +363,7 @@ void VXDTFModule::initialize()
 
   // registerPersistence (StoreArrays & RelationArray) for the Collector
   if (m_display > 0) {
-    B2DEBUG(1, "VXDTF: Display: Module Collector initPersistent");
+    B2DEBUG(10, "VXDTF: Display: Module Collector initPersistent");
     m_collector.initPersistent();
   }
 
@@ -904,17 +904,17 @@ void VXDTFModule::beginRun()
       for (auto & mapEntry : newPass->sectorMap) { // looping through sectors
         const vector<unsigned int> currentFriends = mapEntry.second->getFriends();
         int nFriends = currentFriends.size();
-        B2DEBUG(2, "Opening sector " << mapEntry.first << "/" << FullSecID(mapEntry.first).getFullSecString() << " which has got " << nFriends << " friends"); // oldlevel 150
+        B2DEBUG(150, "Opening sector " << mapEntry.first << "/" << FullSecID(mapEntry.first).getFullSecString() << " which has got " << nFriends << " friends"); // oldlevel 150
         if (nFriends != mapEntry.second->getFriendMapSize()) {
           B2WARNING(" number of friends do not match in sector " << mapEntry.first << "/" << FullSecID(mapEntry.first).getFullSecString() << ": friends by friendVector vs nEntries in FriendMa: " << nFriends << "/" << mapEntry.second->getFriendMapSize())
         }
 
         for (auto friendName : currentFriends) {  // looping through friends
-          B2DEBUG(2, " > Opening sectorFriend " << friendName << "/" << FullSecID(friendName).getFullSecString() << "...");
+          B2DEBUG(175, " > Opening sectorFriend " << friendName << "/" << FullSecID(friendName).getFullSecString() << "...");
           currentCutOffTypes = mapEntry.second->getSupportedCutoffs(friendName); // oldLevel175
           for (auto cutOffType : currentCutOffTypes) { // looping through cutoffs
             const Belle2::Cutoff* aCutoff = mapEntry.second->getCutoff(cutOffType, friendName);
-            B2DEBUG(2, " cutoff is of type: " << FilterID().getFilterString(cutOffType) << ", min: " << aCutoff->getMinValue() << ", max:" << aCutoff->getMaxValue());
+            B2DEBUG(175, " cutoff is of type: " << FilterID().getFilterString(cutOffType) << ", min: " << aCutoff->getMinValue() << ", max:" << aCutoff->getMaxValue());
             cutoffTypesCtr++;
           }
           ++friendCtr;
@@ -963,7 +963,7 @@ void VXDTFModule::beginRun()
     std::vector<int> sectors_display_friends;
 
     for (uint i = 0; i < m_passSetupVector.size(); i++) {
-      B2DEBUG(1, "PassNr. " << i << "Size of Sector Map: " << m_passSetupVector.at(i)->sectorMap.size());
+      B2DEBUG(10, "PassNr. " << i << "Size of Sector Map: " << m_passSetupVector.at(i)->sectorMap.size());
 
       // Read Sector Map => into map
       for (auto & akt_sector : m_passSetupVector.at(i)->sectorMap) {
@@ -1207,7 +1207,7 @@ void VXDTFModule::the_real_event()
         // Import TC and updates the Fit-Information to it (for baseLineVertexHit)
         if (m_display > 0) {
 
-          B2DEBUG(1, "Import TC after generateGFTrackCand")
+          B2DEBUG(10, "Import TC after generateGFTrackCand")
 
           // int pass_index, std::string died_at, int accepted, int rejected, std::vector<int>& assigned_Cell_IDs)
           int tc_id = m_collector.importTC(passNumber, "", CollectorTFInfo::idAlive, vector<int>(), vector<int>(), vector<std::pair<int, unsigned int>>());
@@ -1227,7 +1227,7 @@ void VXDTFModule::the_real_event()
 
         if (m_TESTERexpandedTestingRoutines == true) {
 
-          B2DEBUG(1, "m_TESTERexpandedTestingRoutines == true 1")
+          //B2DEBUG(1, "m_TESTERexpandedTestingRoutines == true 1")
 
           VXDTFInfoBoard newBoard;
           StoreArray<VXDTFInfoBoard> extraInfo4GFTCs(m_PARAMinfoBoardName); // needed since I use it only within if-parenthesis
@@ -1952,7 +1952,7 @@ void VXDTFModule::the_real_event()
 
     if (m_TESTERexpandedTestingRoutines == true) {
 
-      B2DEBUG(1, "m_TESTERexpandedTestingRoutines == true 2");
+      //B2DEBUG(1, "m_TESTERexpandedTestingRoutines == true 2");
 
       VXDTFInfoBoard newBoard;
       StoreArray<VXDTFInfoBoard> extraInfo4GFTCs(m_PARAMinfoBoardName); // needed since I use it only within if-parenthesis
@@ -1966,7 +1966,7 @@ void VXDTFModule::the_real_event()
       newBoard.setProbValue(currentTC->getTrackQuality());
       extraInfo4GFTCs.appendNew(newBoard);
 
-      B2DEBUG(1, "OLD InfoBoard indexNumber: " << indexNumber << " ProbValue: " << currentTC->getTrackQuality() << "; isFitPossible: " << currentTC->getFitSucceeded());
+      //B2DEBUG(1, "OLD InfoBoard indexNumber: " << indexNumber << " ProbValue: " << currentTC->getTrackQuality() << "; isFitPossible: " << currentTC->getFitSucceeded());
 
     }
 
@@ -1977,7 +1977,7 @@ void VXDTFModule::the_real_event()
       int indexNumber = finalTrackCandidates.getEntries();
       int tc_id = currentTC->getCollectorID();
 
-      B2DEBUG(1, "NEW InfoBoard tc_id: " << tc_id << "ProbValue: " << currentTC->getTrackQuality() << ";  isFitPossible: " << currentTC->getFitSucceeded());
+      B2DEBUG(10, "NEW InfoBoard tc_id: " << tc_id << "ProbValue: " << currentTC->getTrackQuality() << ";  isFitPossible: " << currentTC->getFitSucceeded());
 
       //updateTCFitInformation (int tcid, bool fit_successful, double probability_value, int assigned_GTFC)
       m_collector.updateTCFitInformation(tc_id, currentTC->getFitSucceeded(), currentTC->getTrackQuality(), indexNumber);
@@ -3273,7 +3273,7 @@ int VXDTFModule::importCollectorCell(int pass_index, std::string died_at, int di
   std::vector<int> rejected_filters;
 
   for (auto entry : acceptedRejectedFilters) {
-    B2DEBUG(1, "acceptedRejected: " << entry.first << "; (T/F): " << entry.second);
+    B2DEBUG(10, "acceptedRejected: " << entry.first << "; (T/F): " << entry.second);
     if (entry.second == true) {
       accepted_filters.push_back(entry.first);
 
@@ -3635,7 +3635,7 @@ int VXDTFModule::neighbourFinder(PassData* currentPass)
 
       // Collector Cell died at NBFinder-lost
       if (m_display > 0) {
-        B2DEBUG(1, "nbFinderLost !!! " << currentSeg->getCollectorID());
+        B2DEBUG(10, "nbFinderLost !!! " << currentSeg->getCollectorID());
 
         m_collector.updateCell(currentSeg->getCollectorID(), CollectorTFInfo::nameNbFinder, CollectorTFInfo::idNbFinder, vector<int>(), {FilterID::nbFinderLost}, -1, -2, currentSeg->getState(), vector<int>());
       }
@@ -3662,14 +3662,14 @@ int VXDTFModule::neighbourFinder(PassData* currentPass)
 
     // Collector Cell update with Filters
     if (m_display > 0) {
-      B2DEBUG(1, "VXDTF: Display: Module Collector updateCell");
+      B2DEBUG(10, "VXDTF: Display: Module Collector updateCell");
 
       // Filters vectors for update
       std::vector<int> accepted_filters;
       std::vector<int> rejected_filters;
 
       for (auto entry : acceptedRejectedFilters) {
-        B2DEBUG(1, "acceptedRejected: " << entry.first << "; (T/F): " << entry.second);
+        B2DEBUG(10, "acceptedRejected: " << entry.first << "; (T/F): " << entry.second);
         if (entry.second == true) {
           accepted_filters.push_back(entry.first);
 

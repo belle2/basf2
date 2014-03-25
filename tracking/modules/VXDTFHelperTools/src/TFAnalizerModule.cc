@@ -27,6 +27,8 @@
 #include <framework/gearbox/Const.h>
 
 
+#include "tracking/dataobjects/AnalizerCollectorTFInfo.h"
+
 
 //C++-stuff
 #include <iostream>
@@ -118,6 +120,9 @@ void TFAnalizerModule::initialize()
   m_mcTrackVectorCounter = 0;
   m_wrongChargeSignCounter = 0;
   m_totalRealHits = 0;
+
+  // Collector (=> change to param?)
+  m_display = 1;
 
   if (m_PARAMwriteToRoot == true) {
     if ((m_PARAMrootFileName.size()) != 2) {
@@ -231,6 +236,9 @@ void TFAnalizerModule::event()
 
   StoreArray<VXDTFInfoBoard> extraInfos(m_PARAMinfoBoardName);
 
+  // DISPLAY
+  StoreArray<TrackCandidateTFInfo> tfcandTFInfo("");
+
   int numOfMcTCs = mcTrackCandidates.getEntries();
   int numOfCaTCs = caTrackCandidates.getEntries();
 //  int numOfInfoBoards = extraInfos.getEntries();
@@ -249,7 +257,7 @@ void TFAnalizerModule::event()
   for (int i = 0; i not_eq numOfMcTCs; ++i) {
     B2DEBUG(10, "--importing trackCandidate " << i << "...")
     genfit::TrackCand* aTC =  mcTrackCandidates[i];
-    extractHits(aTC, relPXDCluster2TrueHit, relSVDCluster2TrueHit, pxdClusters, svdClusters, extraInfos, mcTcVector, true, i);    /// extractHits
+    extractHits(aTC, relPXDCluster2TrueHit, relSVDCluster2TrueHit, pxdClusters, svdClusters, extraInfos, tfcandTFInfo, mcTcVector, true, i);    /// extractHits
     /// missing: export2File!
   }
   m_mcTrackVectorCounter += mcTcVector.size();
@@ -259,7 +267,7 @@ void TFAnalizerModule::event()
   for (int i = 0; i not_eq numOfCaTCs; ++i) {
     B2DEBUG(10, "--importing trackCandidate " << i << "...")
     genfit::TrackCand* aTC =  caTrackCandidates[i];
-    extractHits(aTC, relPXDCluster2TrueHit, relSVDCluster2TrueHit, pxdClusters, svdClusters, extraInfos, caTcVector, false, i); /// extractHits
+    extractHits(aTC, relPXDCluster2TrueHit, relSVDCluster2TrueHit, pxdClusters, svdClusters, extraInfos, tfcandTFInfo, caTcVector, false, i); /// extractHits
   }
 
   B2DEBUG(1, " before checking compatibility: there are " << mcTcVector.size() << "/" << caTcVector.size() << " mc/ca-tcs")
@@ -431,6 +439,39 @@ void TFAnalizerModule::event()
 
     m_treePtr->Fill();
   }
+
+  // Safe information collected from the Collector
+
+  if (m_display > 0) {
+    AnalizerCollectorTFInfo ana_collector;
+
+    ana_collector.setAllParticleIDs((double) 0.7);
+
+    std::ostringstream oss;
+    oss << "/home/stego/Hephy/testdata/all_my_hit_event_" << m_eventCounter << ".csv";
+    ana_collector.storeAllHitInformation(oss.str());
+    //ana_collector.storeHitInformation(oss.str(), 8);
+
+    std::ostringstream oss_cell;
+    oss_cell << "/home/stego/Hephy/testdata/all_my_cell_event_" << m_eventCounter << ".csv";
+    ana_collector.storeAllCellInformation(oss_cell.str());
+    //ana_collector.storeCellInformation(oss_cell.str(), 8);
+
+    std::ostringstream oss_tc;
+    oss_tc << "/home/stego/Hephy/testdata/all_my_tc_event_" << m_eventCounter << ".csv";
+    ana_collector.storeAllTCInformation(oss_tc.str());
+    //ana_collector.storeTCInformation(oss_tc.str(), 8);
+
+    std::ostringstream oss_clusters;
+    oss_clusters << "/home/stego/Hephy/testdata/all_my_cluster_event_" << m_eventCounter << ".csv";
+    ana_collector.storeClustersInformation(oss_clusters.str());
+
+    std::ostringstream oss_sectors;
+    oss_sectors << "/home/stego/Hephy/testdata/all_my_sector_event_" << m_eventCounter << ".csv";
+    ana_collector.storeSectorInformation(oss_sectors.str(), false);
+
+  }
+
   B2DEBUG(10, "-------------------------------------------------------------------------------")
 }
 
@@ -671,6 +712,7 @@ void TFAnalizerModule::extractHits(genfit::TrackCand* aTC,
                                    StoreArray<PXDCluster>& pxdClusters,
                                    StoreArray<SVDCluster>& svdClusters,
                                    StoreArray<VXDTFInfoBoard>& infoBoards,
+                                   StoreArray<TrackCandidateTFInfo>& infosTCs,
                                    vector<VXDTrackCandidate>& tcVector,
                                    bool isMCTC,
                                    int index)
@@ -836,9 +878,33 @@ void TFAnalizerModule::extractHits(genfit::TrackCand* aTC,
     newTC.qualityIndex = 0;
 
     /// read additional info:
-    int gfIndex = aTC->getMcTrackId();
-    newTC.probValue = infoBoards[gfIndex]->getProbValue();
-    newTC.survivedFit = infoBoards[gfIndex]->isFitPossible();
+    // TO DO
+    //int gfIndex = aTC->getCollectorID();
+
+    int gfIndex = -1;
+
+    B2DEBUG(10, "Index gfIndex read: " << gfIndex);
+
+    if (gfIndex != -1 && gfIndex < infosTCs.getEntries()) {
+
+      // new (Display)
+      newTC.probValue = infosTCs[gfIndex]->getProbValue();
+      newTC.survivedFit = infosTCs[gfIndex]->isFitPossible();
+
+      gfIndex = infosTCs[gfIndex]->getAssignedGFTC();
+      B2DEBUG(10, "* getAssignedGFTC: " << gfIndex);
+
+      if (gfIndex != -1 && gfIndex < infoBoards.getEntries()) {
+        // old => replace
+//     newTC.probValue = infoBoards[gfIndex]->getProbValue();
+//     newTC.survivedFit = infoBoards[gfIndex]->isFitPossible();
+
+        B2DEBUG(10, "New probValue: " << newTC.probValue << "Old probValue: " << infoBoards[gfIndex]->getProbValue());
+        B2DEBUG(10, "New survivedFit: " << newTC.survivedFit << "Old survivedFit: " << infoBoards[gfIndex]->isFitPossible());
+
+      }
+    }
+
   }
   tcVector.push_back(newTC);
   B2DEBUG(10, " end of extractHits. TC isMCTC: " << isMCTC << ", PDGCode: " << pdgCode << ", finalAssignedID: " << newTC.finalAssignedID << ", indexNumber: " << newTC.indexNumber << ", pValue: " << pValue << ", pT: " << pT << ", new tcVector.size(): " << tcVector.size())

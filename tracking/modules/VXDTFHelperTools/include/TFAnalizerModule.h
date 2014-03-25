@@ -24,6 +24,9 @@
 //genfit-stuff
 #include <genfit/TrackCand.h>
 
+#include <tracking/dataobjects/TrackCandidateTFInfo.h>
+
+
 //stl-stuff
 #include <string>
 #include <algorithm>
@@ -66,6 +69,10 @@ namespace Belle2 {
     public:
 
       typedef std::pair<int, double> foundIDentry; /**< .first: id of mcTC assigned, .second: qi of tc, the higher, the better */
+
+      // Member Variables for Collector/Display
+      int m_display;  /**< Collector operating flag: 0 = no collector, 1 = collect for display, 2 = collect for analysis */
+
 
       /** internal datastore for root export */
       struct RootVariables  {
@@ -192,6 +199,7 @@ namespace Belle2 {
                        StoreArray<PXDCluster>& pxdClusters,
                        StoreArray<SVDCluster>& svdClusters,
                        StoreArray<VXDTFInfoBoard>& infoBoards,
+                       StoreArray<TrackCandidateTFInfo>& infosTCs,
                        std::vector<VXDTrackCandidate>& tcVector,
                        bool isMCTC,
                        int index);

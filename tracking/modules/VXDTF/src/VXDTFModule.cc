@@ -21,6 +21,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 
+
 #include <svd/reconstruction/SVDRecoHit2D.h>
 #include <svd/reconstruction/SVDRecoHit.h>
 #include <pxd/reconstruction/PXDRecoHit.h>
@@ -131,26 +132,26 @@ VXDTFModule::VXDTFModule() : Module()
   vector<bool> activateDistance3D, activateDistanceXY, activateDistanceZ, activateSlopeRZ, activateNormedDistance3D, activateAngles3D, activateAnglesXY, activateAnglesRZ, activateDeltaSlopeRZ, activateDistance2IP, activatePT, activateHelixFit, activateAngles3DHioC, activateAnglesXYHioC, activateAnglesRZHioC, activateDeltaSlopeRZHioC, activateDistance2IPHioC, activatePTHioC, activateHelixFitHioC, activateZigZagXY, activateZigZagRZ, activateDeltaPt, activateDeltaDistance2IP, activateCircleFit, activateDeltaPtHioC, activateDeltaDistance2IPHioC;
   activateDistance3D.push_back(true);
   activateDistanceXY.push_back(true);
-  activateDistanceZ.push_back(false); //mod
-  activateSlopeRZ.push_back(false); //mod
-  activateNormedDistance3D.push_back(false); //mod
+  activateDistanceZ.push_back(true); //mod
+  activateSlopeRZ.push_back(true); //mod
+  activateNormedDistance3D.push_back(true); //mod
   activateAngles3D.push_back(true);
   activateAnglesXY.push_back(true);
-  activateAnglesRZ.push_back(false); // mod
+  activateAnglesRZ.push_back(true); // mod
   activateDeltaSlopeRZ.push_back(true); //mod
   activatePT.push_back(true);
-  activateHelixFit.push_back(false); // mod
-  activateDistance2IP.push_back(false); // mod
+  activateHelixFit.push_back(true); // mod
+  activateDistance2IP.push_back(true); // mod
   activateZigZagXY.push_back(true); // first pass
   activateZigZagXY.push_back(true); // second pass
-  activateZigZagXY.push_back(false); // third pass
-  activateZigZagRZ.push_back(false);
+  activateZigZagXY.push_back(true); // third pass
+  activateZigZagRZ.push_back(true);
   activateDeltaPt.push_back(true);
-  activateDeltaDistance2IP.push_back(false); // mod
+  activateDeltaDistance2IP.push_back(true); // mod
   activateCircleFit.push_back(true);
   activateAngles3DHioC.push_back(true);
   activateAnglesXYHioC.push_back(true);
-  activateAnglesRZHioC.push_back(false); // mod
+  activateAnglesRZHioC.push_back(true); // mod
   activateDeltaSlopeRZHioC.push_back(true);
   activatePTHioC.push_back(true);
   activateHelixFitHioC.push_back(true);
@@ -298,6 +299,8 @@ VXDTFModule::VXDTFModule() : Module()
   addParam("writeToRoot", m_PARAMwriteToRoot, "set true if you want to export the p-values of the fitters in a root file named by parameter 'rootFileName'", bool(false));
   addParam("rootFileName", m_PARAMrootFileName, "fileName used for p-value export. Will be ignored if parameter 'writeToRoot' is false (standard)", rootFileNameVals);
 
+  // Display Setting (=> To do: change to param)
+  m_display = 1;  // 0 = no display, 1 = display, 2 = analysis
 }
 
 
@@ -357,6 +360,13 @@ void VXDTFModule::initialize()
   if (m_TESTERexpandedTestingRoutines == true) {
     StoreArray<VXDTFInfoBoard>::registerPersistent(m_PARAMinfoBoardName);
   }
+
+  // registerPersistence (StoreArrays & RelationArray) for the Collector
+  if (m_display > 0) {
+    B2DEBUG(1, "VXDTF: Display: Module Collector initPersistent");
+    m_collector.initPersistent();
+  }
+
 
   StoreArray<PXDCluster>::optional();
   StoreArray<SVDCluster>::optional();
@@ -461,6 +471,7 @@ void VXDTFModule::beginRun()
   /// for each setup, fill parameters, calc numTotalLayers... TODO: failsafe implementation (currently no protection against bad user imputs) lacks of style, longterm goal, export that procedure into a function
   m_usePXDorSVDorVXDhits = 2; /// needed, since in theory some passes could use SVD+PXD and some SVD-only. =0, when only PXDhits, = 1, when only svd-hits, =-1 when both cases occur
   m_numOfSectorSetups = m_PARAMsectorSetup.size();
+
 
   for (int i = 0; i < m_numOfSectorSetups; ++i) {
 
@@ -943,6 +954,41 @@ void VXDTFModule::beginRun()
   m_errorContainer = getHitErrors();
 
 
+
+  //Import all Sectors for all events (Collector)
+  if (m_display > 0) {
+
+    //KeySectors dosn't function => so pair Int int
+    std::map<std::pair<unsigned int, unsigned int>, std::vector<int>> sectors_display_all_pass;
+    std::vector<int> sectors_display_friends;
+
+    for (uint i = 0; i < m_passSetupVector.size(); i++) {
+      B2DEBUG(1, "PassNr. " << i << "Size of Sector Map: " << m_passSetupVector.at(i)->sectorMap.size());
+
+      // Read Sector Map => into map
+      for (auto & akt_sector : m_passSetupVector.at(i)->sectorMap) {
+        sectors_display_friends.clear();
+
+        // Friends read and store in second vector
+        for (auto & akt_friend : akt_sector.second->getFriends()) {
+          sectors_display_friends.push_back(akt_friend);
+        }
+
+        sectors_display_all_pass.insert(std::make_pair(std::make_pair(i, akt_sector.second->getSecID()), sectors_display_friends));
+
+      }
+
+      // Init all Sectors, secConfigU & secConfigV used for PositionInfo
+      m_collector.initSectors(sectors_display_all_pass, m_passSetupVector.at(i)->secConfigU,
+                              m_passSetupVector.at(i)->secConfigV);
+
+    }
+
+
+
+  }
+
+
   /** Section 1 - end **/
   m_eventCounter = 0;
   m_badSectorRangeCounter = 0;
@@ -979,6 +1025,11 @@ void VXDTFModule::the_real_event()
   thisInfoPackage.evtNumber = m_eventCounter;
   B2DEBUG(3, "################## entering vxd CA track finder - event " << m_eventCounter << " ######################");
   /** cleaning will be done at the end of the event **/
+
+  // init once per event => Clear store Arrays
+  if (m_display > 0) {
+    m_collector.intEvent();
+  }
 
 
   /** Section 3 - importing hits and find their papaSectors.**/
@@ -1062,14 +1113,52 @@ void VXDTFModule::the_real_event()
     B2DEBUG(50, " clusterInfo: realIndex " << newCluster.getRealIndex() << ", ownIndex " << newCluster.getOwnIndex())
     clustersOfEvent[i] = newCluster;
     B2DEBUG(50, " PXDcluster " << i << " in position " << i << " stores real Cluster " << clustersOfEvent.at(i).getRealIndex() << " at indexPosition of own list (clustersOfEvent): " << clustersOfEvent.at(i).getOwnIndex() << " withClustersOfeventSize: " << clustersOfEvent.size())
+
   }
+
+
+  // 1. (PXD) Import of the Clusters (Collector)
+  if (m_display > 0) {
+
+    for (uint m = 0; m < m_passSetupVector.size(); m++) {
+      for (int i = 0; i < numOfPxdClusters; ++i) {
+
+        // importCluster (int pass_index, std::string died_at, int accepted, int rejected, int detector_type, int relative_position)
+        int clusterid = m_collector.importCluster(m, "", CollectorTFInfo::idAlive, vector<int>(), vector<int>(), Const::PXD, i);
+
+        // CollectorID safe to connect Cluster to Cluster in Collector
+        clustersOfEvent[i].setCollectorID(clusterid);
+
+      }
+    }
+  }
+
 
   for (int i = 0; i < numOfSvdClusters; ++i) {
     ClusterInfo newCluster(i, i + numOfPxdClusters, false, NULL, aSvdClusterArray[i]);
     B2DEBUG(50, " clusterInfo: realIndex " << newCluster.getRealIndex() << ", ownIndex " << newCluster.getOwnIndex())
     clustersOfEvent[i + numOfPxdClusters] = newCluster;
     B2DEBUG(50, " SVDcluster " << i << " in position " << i + numOfPxdClusters << " stores real Cluster " << clustersOfEvent.at(i + numOfPxdClusters).getRealIndex() << " at indexPosition of own list (clustersOfEvent): " << clustersOfEvent.at(i + numOfPxdClusters).getOwnIndex() << " withClustersOfeventSize: " << clustersOfEvent.size())
+
+
   } // the position in the vector is NOT the index it has stored (except if there are no PXDClusters)
+
+  // 2. (SVD) Import of the Clusters (Collector)
+  if (m_display > 0) {
+    for (uint m = 0; m < m_passSetupVector.size(); m++) {
+
+      for (int i = 0; i < numOfSvdClusters; ++i) {
+
+        // importCluster (int pass_index, std::string died_at, int accepted, int rejected, int detector_type, int relative_position)
+        int clusterid = m_collector.importCluster(m, "", CollectorTFInfo::idAlive, vector<int>(), vector<int>(), Const::SVD, i);
+
+        // CollectorID safe to connect Cluster to Cluster in Collector
+        clustersOfEvent[i].setCollectorID(clusterid);
+
+      }
+    }
+  }
+
 
   m_TESTERtimeConsumption.hitSorting += boost::chrono::duration_cast<boostNsec>(stopTimer - beginEvent);
   thisInfoPackage.sectionConsumption.hitSorting += boost::chrono::duration_cast<boostNsec>(stopTimer - beginEvent);
@@ -1114,7 +1203,32 @@ void VXDTFModule::the_real_event()
         nTotalIndices += aTC->getPXDHitIndices().size() + aTC->getSVDHitIndices().size();
         genfit::TrackCand gfTC = generateGFTrackCand(aTC);                                          /// generateGFTrackCand
 
+        // Collector replaces InfoBoard
+        // Import TC and updates the Fit-Information to it (for baseLineVertexHit)
+        if (m_display > 0) {
+
+          B2DEBUG(1, "Import TC after generateGFTrackCand")
+
+          // int pass_index, std::string died_at, int accepted, int rejected, std::vector<int>& assigned_Cell_IDs)
+          int tc_id = m_collector.importTC(passNumber, "", CollectorTFInfo::idAlive, vector<int>(), vector<int>(), vector<std::pair<int, unsigned int>>());
+
+          int indexNumber = finalTrackCandidates.getEntries();
+
+          baseLineVertexHit->setCollectorID(tc_id);
+
+          // TO DO
+          //gfTC.setCollectorID(indexNumber);
+
+          // Safe Information in the TC Object
+          //updateTCFitInformation (int tcid, bool fit_successful, double probability_value, int assigned_GTFC)
+          m_collector.updateTCFitInformation(tc_id, aTC->getFitSucceeded(), aTC->getTrackQuality(), indexNumber);
+
+        }
+
         if (m_TESTERexpandedTestingRoutines == true) {
+
+          B2DEBUG(1, "m_TESTERexpandedTestingRoutines == true 1")
+
           VXDTFInfoBoard newBoard;
           StoreArray<VXDTFInfoBoard> extraInfo4GFTCs(m_PARAMinfoBoardName); // needed since I use it only within if-parenthesis
 
@@ -1166,6 +1280,9 @@ void VXDTFModule::the_real_event()
 
   B2DEBUG(3, "VXDTF event " << m_eventCounter << ": size of arrays, PXDCluster: " << numOfPxdClusters << ", SVDCLuster: " << numOfSvdClusters << ", clustersOfEvent: " << clustersOfEvent.size());
 
+
+
+
   TVector3 hitLocal, transformedHitLocal, localSensorSize, hitSigma;
   PositionInfo hitInfo;
   double vSize, uSizeAtHit, uCoord, vCoord;
@@ -1203,7 +1320,13 @@ void VXDTFModule::the_real_event()
     B2DEBUG(175, "local pxd hit coordinates (u,v): (" << hitLocal[0] << "," << hitLocal[1] << ")");
 
     passNumber = 0; // why not using for at this point since I need a iteration number anyway? foreach is faster than for classic (better access to entries)
+
+
+
     for (PassData * currentPass : m_passSetupVector) {
+
+
+
       if (aLayerID > currentPass->highestAllowedLayer) { continue; }   // skip particle if True
       if (currentPass->detectorType not_eq Const::PXD && currentPass->detectorType not_eq Const::IR) { continue; }  // PXD is included in 0 & -1
 
@@ -1227,6 +1350,22 @@ void VXDTFModule::the_real_event()
       B2DEBUG(50, " PXDCluster: with posOfHit in StoreArray: " << iPart << " is found again within FullsecID (int/string)" << aSecID << "/" << FullSecID(aSecID).getFullSecString() << " using sectorSetup " << currentPass->sectorSetup);
 
       VXDTFHit* pTFHit = new VXDTFHit(hitInfo, passNumber, NULL, NULL, &clustersOfEvent[iPart], Const::PXD, aSecID, aVxdID, 0.0); // no timeInfo for PXDHits
+
+      // importHits 1.
+      if (m_display > 0) {
+
+        std::vector<int> assigned_IDs;
+
+        assigned_IDs.push_back(clustersOfEvent[iPart].getCollectorID());
+
+        //int pass_index, std::string died_at, int died_id, std::vector<int> accepted, std::vector<int> rejected, std::vector<int> assigned_Cluster_IDs, int sec_id, TVector3 hit_position, TVector3 hit_sigma
+
+        int hit_id = m_collector.importHit(passNumber, "", CollectorTFInfo::idAlive, vector<int>(), vector<int>(), assigned_IDs, aSecID, hitInfo.hitPosition, hitInfo.hitSigma);
+
+        // Connection Hit <=> Hit in Collector
+        pTFHit->setCollectorID(hit_id);
+
+      }
 
       currentPass->hitVector.push_back(pTFHit);
       secMapIter->second->addHit(pTFHit);
@@ -1361,6 +1500,24 @@ void VXDTFModule::the_real_event()
 
         VXDTFHit* pTFHit = new VXDTFHit(hitInfo, passNumber, uClusterInfo, vClusterInfo, NULL, Const::SVD, aSecID, aVxdID,  0.5 * (timeStampU + timeStampV));
 
+        // importHits 2.
+        if (m_display > 0) {
+
+          std::vector<int> assigned_IDs;
+
+          assigned_IDs.push_back(clusterIndexU);
+          assigned_IDs.push_back(clusterIndexV);
+
+          //int pass_index, std::string died_at, int died_id, std::vector<int> accepted, std::vector<int> rejected, std::vector<int> assigned_Cluster_IDs, int sec_id, TVector3 hit_position, TVector3 hit_sigma
+
+          int hit_id =  m_collector.importHit(passNumber, "", CollectorTFInfo::idAlive, vector<int>(), vector<int>(), assigned_IDs, aSecID, hitInfo.hitPosition, hitInfo.hitSigma);
+
+          // Connect Hit <=> Collector Hit
+          pTFHit->setCollectorID(hit_id);
+
+        }
+
+
         currentPass->hitVector.push_back(pTFHit);
         secMapIter->second->addHit(pTFHit);
         currentPass->sectorSequence.push_back(activatedSector);
@@ -1381,9 +1538,20 @@ void VXDTFModule::the_real_event()
   /** Section 3 - end **/
 
 
+
+  //clustersOfEvent
+
   /** Section 4 - SEGFINDER **/
   passNumber = 0;
   for (PassData * currentPass : m_passSetupVector) {
+
+    // Set current Pass Number for Collector
+    if (m_display > 0) {
+      m_aktpassNumber = passNumber;
+    }
+
+
+
     timeStamp = boostClock::now();
     int numPassHits = currentPass->hitVector.size();
     thisInfoPackage.numSVDHits += numPassHits;
@@ -1480,6 +1648,11 @@ void VXDTFModule::the_real_event()
     /** Section 6 - end **/
 
 
+    // Set current passNumber for Collector
+    if (m_display > 0) {
+      m_aktpassNumber = passNumber;
+    }
+
 
     /** Section 7 - Track Candidate Collector (TCC) **/
     timeStamp = boostClock::now();
@@ -1554,7 +1727,21 @@ void VXDTFModule::the_real_event()
       m_tcVector.push_back(currentTC);
 
       bool overbookedCheck = currentTC->checkOverlappingState();
-      if (overbookedCheck == true) { m_tcVectorOverlapped.push_back(currentTC); }
+      if (overbookedCheck == true) {
+        m_tcVectorOverlapped.push_back(currentTC);
+      }
+
+      // Collector TC Update for Overlapping
+      if (m_display > 0) {
+
+        if (overbookedCheck) {
+          // int tcid, std::string died_at, int accepted, int rejected
+          m_collector.updateTC(currentTC->getCollectorID(), "",  CollectorTFInfo::idAlive, {FilterID::overlapping}, vector<int>());
+        } else {
+          m_collector.updateTC(currentTC->getCollectorID(), "",  CollectorTFInfo::idAlive, vector<int>(), {FilterID::overlapping});
+        }
+      }
+
       countCurrentTCs++;
     }
     int totalOverlaps = m_tcVectorOverlapped.size();
@@ -1563,7 +1750,8 @@ void VXDTFModule::the_real_event()
     m_TESTERtimeConsumption.checkOverlap += boost::chrono::duration_cast<boostNsec>(stopTimer - timeStamp);
     thisInfoPackage.sectionConsumption.checkOverlap += boost::chrono::duration_cast<boostNsec>(stopTimer - timeStamp);
 
-    B2DEBUG(3, "event " << m_eventCounter << ": " << totalOverlaps << " overlapping track candidates found within " << countCurrentTCs << " new TCs of this pass alive")
+    //DISPLAY = 3
+    B2DEBUG(1, "event " << m_eventCounter << ": " << totalOverlaps << " overlapping track candidates found within " << countCurrentTCs << " new TCs of this pass alive")
     /** Section 9 - end */
 
 
@@ -1761,7 +1949,11 @@ void VXDTFModule::the_real_event()
 // #if 0
     genfit::TrackCand gfTC = generateGFTrackCand(currentTC);                          /// generateGFTrackCand
 
+
     if (m_TESTERexpandedTestingRoutines == true) {
+
+      B2DEBUG(1, "m_TESTERexpandedTestingRoutines == true 2");
+
       VXDTFInfoBoard newBoard;
       StoreArray<VXDTFInfoBoard> extraInfo4GFTCs(m_PARAMinfoBoardName); // needed since I use it only within if-parenthesis
 
@@ -1773,11 +1965,38 @@ void VXDTFModule::the_real_event()
       newBoard.fitIsPossible(currentTC->getFitSucceeded());
       newBoard.setProbValue(currentTC->getTrackQuality());
       extraInfo4GFTCs.appendNew(newBoard);
+
+      B2DEBUG(1, "OLD InfoBoard indexNumber: " << indexNumber << " ProbValue: " << currentTC->getTrackQuality() << "; isFitPossible: " << currentTC->getFitSucceeded());
+
     }
+
+
+    // Collector TC Fit Update (replaces VXDTFInfoBoard)
+    if (m_display > 0) {
+
+      int indexNumber = finalTrackCandidates.getEntries();
+      int tc_id = currentTC->getCollectorID();
+
+      B2DEBUG(1, "NEW InfoBoard tc_id: " << tc_id << "ProbValue: " << currentTC->getTrackQuality() << ";  isFitPossible: " << currentTC->getFitSucceeded());
+
+      //updateTCFitInformation (int tcid, bool fit_successful, double probability_value, int assigned_GTFC)
+      m_collector.updateTCFitInformation(tc_id, currentTC->getFitSucceeded(), currentTC->getTrackQuality(), indexNumber);
+
+      // TO DO
+      // Collector ID in gfTC to find the Object in the Collector
+      // gfTC.setCollectorID(tc_id);
+    }
+
+
     finalTrackCandidates.appendNew(gfTC);
+
 // #endif
 
   }
+
+
+
+
   int nTotalIndices = totalIndices.size();
 
   totalIndices.sort(); // should already be sorted, but just to be sure....
@@ -1815,6 +2034,15 @@ void VXDTFModule::the_real_event()
   /** Section 13 - end */
 
 
+
+  // Silent Kill = Mark not used objects as deleted
+  // Safe Information = Information into StoreArrays
+  if (m_display > 0) {
+
+    m_collector.silentKill();
+
+    m_collector.safeInformation();
+  }
 
   /** cleaning part **/
   for (PassData * currentPass : m_passSetupVector) {
@@ -2035,7 +2263,6 @@ void VXDTFModule::findTCs(TCsOfEvent& tcList,  VXDTFTrackCandidate* currentTC, s
     VXDSegmentCell* pNextSeg =  *nbIter;
     currentTC->addSegments(pNextSeg);
     currentTC->addHits(pNextSeg->getInnerHit()); // automatically informs current Hit that it got owned by a TC
-
     findTCs(tcList, currentTC, maxLayer);
 
   } else { // nbSize > 1
@@ -2124,6 +2351,11 @@ void VXDTFModule::hopfieldVectorized(TCsOfEvent& tcVector, double omega)
     for (int i = 0; i < numOfTCs; i++) {
       if (i != tempIndex) {
         tcVector[i]->setCondition(false);
+
+        // Update Collector TC - hopfield
+        if (m_display > 0) {
+          m_collector.updateTC(tcVector[i]->getCollectorID(), FilterID::nameHopfield, CollectorTFInfo::idHopfield, vector<int>(), {FilterID::hopfield});
+        }
       }
     }
     return; // leaving hopfield after chosing the last man standing
@@ -2212,8 +2444,20 @@ void VXDTFModule::hopfieldVectorized(TCsOfEvent& tcVector, double omega)
       B2DEBUG(50, "tc " << i << " - got final neuron value: " << xMatrix(0, i) << " while having " << int((tcVector.at(i)->getHits()).size()) << " hits and quality indicator " << tcVector.at(i)->getTrackQuality())
       if (xMatrix(0, i) > 0.7) { /// do we want to let this threshold hardcoded?
         tcVector[i]->setCondition(true);
+
+        // Update Collector TC - hopfield
+        if (m_display > 0) {
+          m_collector.updateTC(tcVector[i]->getCollectorID(), "", CollectorTFInfo::idAlive, {FilterID::hopfield}, vector<int>());
+        }
+
       } else {
         tcVector[i]->setCondition(false);
+
+        // Update Collector TC - hopfield
+        if (m_display > 0) {
+          m_collector.updateTC(tcVector[i]->getCollectorID(), CollectorTFInfo::nameHopfield, CollectorTFInfo::idHopfield, vector<int>(), {FilterID::hopfield});
+        }
+
       }
       tcVector[i]->setNeuronValue(xMatrix(0, i));
 
@@ -2369,6 +2613,13 @@ void VXDTFModule::hopfield(TCsOfEvent& tcVector, double omega)
     for (int i = 0; i < numOfTCs; i++) {
       if (i != tempIndex) {
         tcVector[i]->setCondition(false);
+
+        // Update Collector TC - hopfield
+        if (m_display > 0) {
+          m_collector.updateTC(tcVector[i]->getCollectorID(), CollectorTFInfo::nameHopfield, CollectorTFInfo::idHopfield, vector<int>(), {FilterID::hopfield});
+        }
+
+
       }
     }
     return; // leaving hopfield after chosing the last man standing
@@ -2459,8 +2710,20 @@ void VXDTFModule::hopfield(TCsOfEvent& tcVector, double omega)
       if (xMatrix(0, i) > 0.7) { /// do we want to let this threshold hardcoded?
         tcVector[i]->setCondition(true);
 
+        // Update Collector TC - hopfield
+        if (m_display > 0) {
+          m_collector.updateTC(tcVector[i]->getCollectorID(), "", CollectorTFInfo::idAlive, {FilterID::hopfield}, vector<int>());
+        }
+
+
       } else {
         tcVector[i]->setCondition(false);
+
+        // Update Collector TC - hopfield
+        if (m_display > 0) {
+          m_collector.updateTC(tcVector[i]->getCollectorID(), CollectorTFInfo::nameHopfield, CollectorTFInfo::idHopfield, vector<int>(), {FilterID::hopfield});
+        }
+
       }
       tcVector[i]->setNeuronValue(xMatrix(0, i));
 
@@ -2644,8 +2907,21 @@ void VXDTFModule::greedyRecursive(std::list< std::pair<double, VXDTFTrackCandida
 
     if (qi >= rival->getTrackQuality()) {
       rival->setCondition(false);
+
+      // Update Collector TC - hopfield
+      if (m_display > 0) {
+        m_collector.updateTC(rival->getCollectorID(), CollectorTFInfo::nameHopfield, CollectorTFInfo::idHopfield, vector<int>(), {FilterID::greedy});
+      }
+
     } else {
       tcEntry->second->setCondition(false);
+
+      // Update Collector TC - hopfield
+      if (m_display > 0) {
+        m_collector.updateTC(tcEntry->second->getCollectorID(),  CollectorTFInfo::nameHopfield, CollectorTFInfo::idHopfield, vector<int>(), {FilterID::greedy});
+      }
+
+
       break;
     }
   }
@@ -2670,7 +2946,22 @@ void VXDTFModule::tcDuel(TCsOfEvent& tcVector)
 {
   if (tcVector.at(0)->getTrackQuality() > tcVector.at(1)->getTrackQuality()) {
     tcVector.at(1)->setCondition(false);
-  } else { tcVector.at(0)->setCondition(false); }
+
+    // Update Collector TC - hopfield
+    if (m_display > 0) {
+      m_collector.updateTC(tcVector.at(1)->getCollectorID(), CollectorTFInfo::nameHopfield, CollectorTFInfo::idHopfield, vector<int>(), {FilterID::tcDuel});
+    }
+
+  } else {
+    tcVector.at(0)->setCondition(false);
+
+    // Update Collector TC - hopfield
+    if (m_display > 0) {
+      m_collector.updateTC(tcVector.at(0)->getCollectorID(), CollectorTFInfo::nameHopfield, CollectorTFInfo::idHopfield, vector<int>(), {FilterID::tcDuel});
+    }
+
+
+  }
   B2DEBUG(10, "2 overlapping Track Candidates found, tcDuel choses the last TC standing on its own")
 }
 
@@ -2887,6 +3178,15 @@ int VXDTFModule::segFinder(PassData* currentPass)
 
           discardedSegmentsCounter++;
           oldFriendID = currentFriendID;
+
+          // Collector Cells Import for not saved VXDSegmentCell
+          if (m_display > 0) {
+            /*int cell_id = */
+            importCollectorCell(m_aktpassNumber, "", CollectorTFInfo::idAlive, /*CollectorTFInfo::nameCellFinder, CollectorTFInfo::idCellFinder, */ acceptedRejectedFilters, ownHits[currentHit]->getCollectorID(), allFriendHits[friendHit]->getCollectorID());
+
+            // Cell ID not saved because no VXDSegmentCell created
+          }
+
           continue;
         }
 
@@ -2899,10 +3199,19 @@ int VXDTFModule::segFinder(PassData* currentPass)
               for (auto & entry : acceptedRejectedFilters) {
                 outputStream << FilterID().getFilterString(entry.first) << " " << entry.second << ", ";
               }
-              B2DEBUG(50, "SegFINDER: segment discarded! Outer/inner Segment: " << FullSecID(ownHits.at(currentHit)->getSectorName()).getFullSecString() << "/" << FullSecID(currentFriendID).getFullSecString() << endl << "FilterResults: " << outputStream.str() << ", needed threshold: " << currentPass->activatedSegFinderTests << "\n")
+              B2DEBUG(1, "SegFINDER: segment discarded! Outer/inner Segment: " << FullSecID(ownHits.at(currentHit)->getSectorName()).getFullSecString() << "/" << FullSecID(currentFriendID).getFullSecString() << endl << "FilterResults: " << outputStream.str() << ", needed threshold: " << currentPass->activatedSegFinderTests << "\n")
             }
             discardedSegmentsCounter++;
             oldFriendID = currentFriendID;
+
+            // Collector Cells Import for not saved VXDSegmentCell
+            if (m_display > 0) {
+              /* int cell_id = */
+              importCollectorCell(m_aktpassNumber, "", CollectorTFInfo::idAlive, /*CollectorTFInfo::nameCellFinder, CollectorTFInfo::idCellFinder, */ acceptedRejectedFilters, ownHits[currentHit]->getCollectorID(), allFriendHits[friendHit]->getCollectorID());
+
+              // Cell ID not saved because no VXDSegmentCell created
+            }
+
             continue;
           }
         }
@@ -2929,6 +3238,14 @@ int VXDTFModule::segFinder(PassData* currentPass)
         oldFriendID = currentFriendID;
         ++activatedSegmentsCounter;
 
+        // Collector Cells Import (Main)
+        if (m_display > 0) {
+          int cell_id = importCollectorCell(m_aktpassNumber, "", CollectorTFInfo::idAlive, acceptedRejectedFilters, ownHits[currentHit]->getCollectorID(), allFriendHits[friendHit]->getCollectorID());
+
+          // Collector Cell <=> Cell
+          pCell->setCollectorID(cell_id);
+        }
+
         if (activatedSegmentsCounter > m_PARAMkillEventForHighOccupancyThreshold) {
           B2DEBUG(1, "number of activated segments reached threshold " << activatedSegmentsCounter << ", stopping segFinder now")
           return discardedSegmentsCounter;
@@ -2939,6 +3256,39 @@ int VXDTFModule::segFinder(PassData* currentPass)
 
   return discardedSegmentsCounter;
 }
+
+
+
+
+// Imports Collector Cell (only for Collector)
+// changes acceptedRejectedFilters => accepted_filters, rejected_filters
+int VXDTFModule::importCollectorCell(int pass_index, std::string died_at, int died_id, std::vector<std::pair<int, bool>> acceptedRejectedFilters, int hit1, int hit2)
+{
+
+  std::vector<int> assigned_Hit_IDs;
+  assigned_Hit_IDs.push_back(hit1);
+  assigned_Hit_IDs.push_back(hit2);
+
+  std::vector<int> accepted_filters;
+  std::vector<int> rejected_filters;
+
+  for (auto entry : acceptedRejectedFilters) {
+    B2DEBUG(1, "acceptedRejected: " << entry.first << "; (T/F): " << entry.second);
+    if (entry.second == true) {
+      accepted_filters.push_back(entry.first);
+
+    } else {
+      rejected_filters.push_back(entry.first);
+    }
+
+  }
+
+  int cell_id = m_collector.importCell(pass_index, died_at, died_id, accepted_filters, rejected_filters, assigned_Hit_IDs);
+
+  return cell_id;
+}
+
+
 
 
 
@@ -3282,6 +3632,15 @@ int VXDTFModule::neighbourFinder(PassData* currentPass)
   for (VXDSegmentCell * currentSeg : currentPass->activeCellList) {
     if (currentSeg->getInnerNeighbours().size() == 0 && currentSeg->getOuterNeighbours().size() == 0) {
       currentSeg->setActivationState(false);
+
+      // Collector Cell died at NBFinder-lost
+      if (m_display > 0) {
+        B2DEBUG(1, "nbFinderLost !!! " << currentSeg->getCollectorID());
+
+        m_collector.updateCell(currentSeg->getCollectorID(), CollectorTFInfo::nameNbFinder, CollectorTFInfo::idNbFinder, vector<int>(), {FilterID::nbFinderLost}, -1, -2, currentSeg->getState(), vector<int>());
+      }
+
+
       NFdiscardedSegmentsCounter++;
     } else {
       currentSeg->copyNeighbourList(); /// IMPORTANT, without this step, no TCs can be found since all neighbours of each cell are erased from current list
@@ -3291,7 +3650,42 @@ int VXDTFModule::neighbourFinder(PassData* currentPass)
         currentSeg->increaseState();
       }
       if (currentSeg->isSeed() == true) { activatedSeedsCounter++; }
+
+      // Collector Cell ok at NBFinder-lost
+      if (m_display > 0) {
+
+        m_collector.updateCell(currentSeg->getCollectorID(), "", CollectorTFInfo::idAlive, {FilterID::nbFinderLost}, vector<int>(), -1, -1, currentSeg->getState(), vector<int>());
+      }
+
+
     }
+
+    // Collector Cell update with Filters
+    if (m_display > 0) {
+      B2DEBUG(1, "VXDTF: Display: Module Collector updateCell");
+
+      // Filters vectors for update
+      std::vector<int> accepted_filters;
+      std::vector<int> rejected_filters;
+
+      for (auto entry : acceptedRejectedFilters) {
+        B2DEBUG(1, "acceptedRejected: " << entry.first << "; (T/F): " << entry.second);
+        if (entry.second == true) {
+          accepted_filters.push_back(entry.first);
+
+        } else {
+          rejected_filters.push_back(entry.first);
+        }
+
+      }
+
+      // int cellID, std::string died_at, int died_id, std::vector<int> accepted, std::vector<int> rejected, int add_TCID, int remove_TCID, int cellstate, std::vector<int> neighbours
+
+      m_collector.updateCell(currentSeg->getCollectorID(), "", CollectorTFInfo::idAlive, accepted_filters, rejected_filters, -1, -1, currentSeg->getState(), vector<int>());
+
+    }
+
+
   }
   currentPass->activeCellList = newActiveList;
 
@@ -3394,7 +3788,23 @@ int VXDTFModule::cellularAutomaton(PassData* currentPass)
         currentSeg->allowStateUpgrade(true);
         activeCells++;
         B2DEBUG(50, "CAstep: accepted cell found!")
-      } else {currentSeg->setActivationState(false); deadCells++; }
+
+        // Collector Cell OK CA
+        if (m_display > 0) {
+          m_collector.updateCell(currentSeg->getCollectorID(), "", CollectorTFInfo::idAlive, {FilterID::cellularAutomaton}, vector<int>(), -1, -1, currentSeg->getState(), vector<int>());
+        }
+
+      } else {
+        currentSeg->setActivationState(false); deadCells++;
+
+        // Collector Cell died at CA
+        if (m_display > 0) {
+          m_collector.updateCell(currentSeg->getCollectorID(), "", CollectorTFInfo::idAlive, vector<int>(), {FilterID::cellularAutomaton}, -1, -1, currentSeg->getState(), vector<int>());
+        }
+
+
+
+      }
     }//CAStep
     B2DEBUG(10, "CA: before update-step: at round " << caRound << ", there are " << activeCells << " cells still alive, counted " << deadCells << " dead cells so far")
 
@@ -3471,6 +3881,27 @@ void VXDTFModule::tcCollector(PassData* currentPass)
 
       findTCs(currentPass->tcVector, pTC, currentPass->highestAllowedLayer);
       findTCsCounter++;
+
+      // Collector TC Import
+      if (m_display > 0) {
+
+        std::vector<std::pair<int, unsigned int>> all_segments;
+
+        // Connected Cells => vector for import
+        for (VXDSegmentCell * tf_currentSegment :  pTC->getSegments()) {
+          all_segments.push_back(make_pair(tf_currentSegment->getCollectorID(), tf_currentSegment->getState()));
+        }
+
+        // int pass_index, std::string died_at, int died_id, std::vector<int> accepted, std::vector<int> rejected, std::vector<std::pair<int, unsigned int>> assigned_Cell_IDs
+
+        int tc_id = m_collector.importTC(m_aktpassNumber, "", CollectorTFInfo::idAlive, vector<int>(), vector<int>(), all_segments);
+
+        // Connect Collector TC <=> TC
+        pTC->setCollectorID(tc_id);
+
+      }
+
+
     }
   }
   int numTCsafterTCC = currentPass->tcVector.size(); // total number of tc's
@@ -3503,12 +3934,25 @@ int VXDTFModule::tcFilter(PassData* currentPass, int passNumber)
       numOfCurrentHits = (*currentTC)->size();
       if (numOfCurrentHits < 3) {
         (*currentTC)->setCondition(false);
+
+        // Collector TC Update (tcFinderCurr)
+        if (m_display > 0) {
+          m_collector.updateTC((*currentTC)->getCollectorID(), CollectorTFInfo::nameTCC, CollectorTFInfo::idTCC, vector<int>(), {FilterID::tcFinderCurr});
+        }
+
+
         B2DEBUG(20, " tc " << tcCtr << " got " << numOfCurrentHits << " hits and therefore will be deleted");
         if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 1, PACKAGENAME()) == true) { killedList.push_back(make_pair(tcCtr, "not enough hits after removing virtual hit")); }
         continue;
       } else {
         goodTCIndices.push_back(currentTC); // we can not filter it, therefore we have to accept it
         B2DEBUG(20, " tc " << tcCtr << " got " << numOfCurrentHits << " hits and therefore won't be checked by TCC");
+
+        // Collector TC Update (tcFinderCurr)
+        if (m_display > 0) {
+          m_collector.updateTC((*currentTC)->getCollectorID(), "", CollectorTFInfo::idAlive, {FilterID::tcFinderCurr}, vector<int>());
+        }
+
       }
       tcCtr++;
       continue; // no further testing possible
@@ -3517,6 +3961,13 @@ int VXDTFModule::tcFilter(PassData* currentPass, int passNumber)
       if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 1, PACKAGENAME()) == true) { killedList.push_back(make_pair(tcCtr, "not enough hits")); }
       tcCtr++;
       (*currentTC)->setCondition(false);
+
+      // Collector TC Update (tcFinderCurr)
+      if (m_display > 0) {
+        m_collector.updateTC((*currentTC)->getCollectorID(), CollectorTFInfo::nameTCC, CollectorTFInfo::idTCC, vector<int>(), {FilterID::tcFinderCurr});
+      }
+
+
       continue;
     }
 
@@ -3548,9 +3999,21 @@ int VXDTFModule::tcFilter(PassData* currentPass, int passNumber)
         if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 1, PACKAGENAME()) == true) { killedList.push_back(make_pair(tcCtr, "ziggZaggXY")); }
         m_TESTERtriggeredZigZagXY++; tcCtr++;
         (*currentTC)->setCondition(false);
+
+        // Collector TC Update (updateTC)
+        if (m_display > 0) {
+          m_collector.updateTC((*currentTC)->getCollectorID(), CollectorTFInfo::nameTCC, CollectorTFInfo::idTCC, vector<int>(), {FilterID::ziggZaggXY});
+        }
+
         continue;
       }
       B2DEBUG(20, " TCC filter ziggZaggXY approved TC " << tcCtr);
+
+      // Collector TC Update (ziggZaggXY)
+      if (m_display > 0) {
+        m_collector.updateTC((*currentTC)->getCollectorID(), "", CollectorTFInfo::idAlive,  {FilterID::ziggZaggXY}, vector<int>());
+      }
+
     }
 
     if (currentPass->circleFit.first == true) {
@@ -3560,8 +4023,20 @@ int VXDTFModule::tcFilter(PassData* currentPass, int passNumber)
         if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 1, PACKAGENAME()) == true) { killedList.push_back(make_pair(tcCtr, "circleFit")); }
         m_TESTERtriggeredCircleFit++; tcCtr++;
         (*currentTC)->setCondition(false);
+
+        // Collector TC Update (circlefit)
+        if (m_display > 0) {
+          m_collector.updateTC((*currentTC)->getCollectorID(), CollectorTFInfo::nameTCC, CollectorTFInfo::idTCC, vector<int>(), {FilterID::circlefit});
+        }
+
         continue;
       }
+
+      // Collector TC Update (circlefit)
+      if (m_display > 0) {
+        m_collector.updateTC((*currentTC)->getCollectorID(), "", CollectorTFInfo::idAlive,  {FilterID::circlefit}, vector<int>());
+      }
+
     }
 
     int a = 0, b = 1, c = 2, d = 3;
@@ -3582,6 +4057,13 @@ int VXDTFModule::tcFilter(PassData* currentPass, int passNumber)
           B2DEBUG(20, "TCC filter: tc " << tcCtr << " rejected by deltaPt! ");
           m_TESTERtriggeredDpT++;
           (*currentTC)->setCondition(false);
+
+          // Collector TC Update (deltapT)
+          if (m_display > 0) {
+            m_collector.updateTC((*currentTC)->getCollectorID(), CollectorTFInfo::nameTCC, CollectorTFInfo::idTCC, vector<int>(), {FilterID::deltapT});
+          }
+
+
           if (m_PARAMDebugMode == true) {
             pair <double, double> cutoffs = currentPass->fourHitFilterBox.getCutoffs(FilterID::deltapT);
             B2WARNING("deltaPt - minCutoff: " << cutoffs.first << ", calcValue: " << currentPass->fourHitFilterBox.deltapT() << ", maxCutoff: " << cutoffs.second)
@@ -3595,6 +4077,13 @@ int VXDTFModule::tcFilter(PassData* currentPass, int passNumber)
           break;
         }
         B2DEBUG(20, " TCC filter deltaPt approved TC " << tcCtr);
+
+        // Collector TC Update (deltapT)
+        if (m_display > 0) {
+          m_collector.updateTC((*currentTC)->getCollectorID(), "", CollectorTFInfo::idAlive, {FilterID::deltapT}, vector<int>());
+        }
+
+
       }
       if (currentPass->deltaDistance2IP.first == true) {
         accepted = currentPass->fourHitFilterBox.checkDeltaDistCircleCenter(FilterID::deltaDistance2IP);
@@ -3602,6 +4091,13 @@ int VXDTFModule::tcFilter(PassData* currentPass, int passNumber)
           B2DEBUG(20, "TCC filter: tc " << tcCtr << " rejected by deltaDistance2IP! ");
           m_TESTERtriggeredDD2IP++;
           (*currentTC)->setCondition(false);
+
+          // Collector TC Update (deltaDistance2IP)
+          if (m_display > 0) {
+            m_collector.updateTC((*currentTC)->getCollectorID(), CollectorTFInfo::nameTCC, CollectorTFInfo::idTCC, vector<int>(), {FilterID::deltaDistance2IP});
+          }
+
+
           if (m_PARAMDebugMode == true) {
             pair <double, double> cutoffs = currentPass->fourHitFilterBox.getCutoffs(FilterID::deltaDistance2IP);
             B2WARNING("deltaDistance2IP - minCutoff: " << cutoffs.first << ", calcValue: " << currentPass->fourHitFilterBox.deltaDistCircleCenter() << ", maxCutoff: " << cutoffs.second)
@@ -3615,6 +4111,12 @@ int VXDTFModule::tcFilter(PassData* currentPass, int passNumber)
           break;
         }
         B2DEBUG(20, " TCC filter deltaDistance2IP approved TC " << tcCtr);
+
+        // Collector TC Update (deltaDistance2IP)
+        if (m_display > 0) {
+          m_collector.updateTC((*currentTC)->getCollectorID(), "", CollectorTFInfo::idAlive, {FilterID::deltaDistance2IP}, vector<int>());
+        }
+
       }
       a++; b++; c++; d++;
     }
@@ -3639,9 +4141,23 @@ int VXDTFModule::tcFilter(PassData* currentPass, int passNumber)
         if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 3, PACKAGENAME()) == true) { killedList.push_back(make_pair(tcCtr, "ziggZaggRZ")); }
         m_TESTERtriggeredZigZagRZ++; tcCtr++;
         (*currentTC)->setCondition(false);
+
+        // Collector TC Update (ziggZaggRZ)
+        if (m_display > 0) {
+          m_collector.updateTC((*currentTC)->getCollectorID(), CollectorTFInfo::nameTCC, CollectorTFInfo::idTCC, vector<int>(), {FilterID::ziggZaggRZ});
+        }
+
+
         continue;
       }
       B2DEBUG(20, " TCC filter ziggZaggRZ approved TC " << tcCtr);
+
+      // Collector TC Update (ziggZaggRZ)
+      if (m_display > 0) {
+        m_collector.updateTC((*currentTC)->getCollectorID(), "", CollectorTFInfo::idAlive, {FilterID::ziggZaggRZ}, vector<int>());
+      }
+
+
     }
     (*currentTC)->setPassIndex(passNumber);
     (*currentTC)->setCondition(true);
@@ -3658,11 +4174,19 @@ int VXDTFModule::tcFilter(PassData* currentPass, int passNumber)
     if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 3, PACKAGENAME()) == true) {
       stringstream deadTCs;
       deadTCs << " dead TCs are:";
-      for (auto entry : killedList) { deadTCs << " " << entry.first << ", reason: " << entry.second; }
+      for (auto entry : killedList) {
+//    deadTCs << " " << entry.first << ", reason: " << entry.second;
+      }
       B2DEBUG(3, std::endl << deadTCs.str())
     }
     currentPass->tcVector.clear();
-    for (TCsOfEvent::iterator goodTCIndex : goodTCIndices) { currentPass->tcVector.push_back((*goodTCIndex)); }
+    for (TCsOfEvent::iterator goodTCIndex : goodTCIndices) {
+      currentPass->tcVector.push_back((*goodTCIndex));
+
+      // int akt_index;
+
+
+    }
   }
 
   int numTC = 0;
@@ -3819,7 +4343,22 @@ void VXDTFModule::calcQIbyKalman(TCsOfEvent& tcVector, StoreArray<PXDCluster>& p
       //         std::cerr << e.what();
       B2WARNING("VXDTFModule::calcQIbyKalman event " << m_eventCounter << ":, processTrack failed with message: " << e.what() << "! skipping current TC")
       currentTC->setCondition(false); // do not store TCs with failed fits if param-flag is set to false
+
+      // Collector TC Update (calcQIbyKalman)
+      if (m_display > 0) {
+        std::vector<int> filter_calcQIbyKalman = {FilterID::calcQIbyKalman};
+
+        m_collector.updateTC(currentTC->getCollectorID(), CollectorTFInfo::nameQI, CollectorTFInfo::idQI, vector<int>(), filter_calcQIbyKalman);
+      }
+
       continue;
+    }
+
+    // Collector TC Update (calcQIbyKalman)
+    if (m_display > 0) {
+      std::vector<int> filter_calcQIbyKalman = {FilterID::calcQIbyKalman};
+
+      m_collector.updateTC(currentTC->getCollectorID(), "", CollectorTFInfo::idAlive, filter_calcQIbyKalman, vector<int>());
     }
 
     if (kalmanFilter.isTrackFitted(&track, trackRep)) {
@@ -3853,6 +4392,14 @@ void VXDTFModule::calcQIbyKalman(TCsOfEvent& tcVector, StoreArray<PXDCluster>& p
 
       if (m_PARAMstoreBrokenQI == false) {
         currentTC->setCondition(false); // do not store TCs with failed fits if param-flag is set to false
+
+        // Collector TC Update (calcQIbyKalman)
+        if (m_display > 0) {
+          std::vector<int> filter_calcQIbyKalman = {FilterID::calcQIbyKalman};
+
+          m_collector.updateTC(currentTC->getCollectorID(), CollectorTFInfo::nameQI, CollectorTFInfo::idQI, vector<int>(), filter_calcQIbyKalman);
+        }
+
       }
     }
   }
@@ -3971,11 +4518,38 @@ int VXDTFModule::cleanOverlappingSet(TCsOfEvent& tcVector)
         killedTCs++;
         if (aTC->getTrackQuality() > bTC->getTrackQuality()) {
           bTC->setCondition(false);
+
+          // Collector TC Update (overlapping)
+          if (m_display > 0) {
+            std::vector<int> filter_overlapping = {FilterID::overlapping};
+
+            m_collector.updateTC(bTC->getCollectorID(), CollectorTFInfo::nameOverlap, CollectorTFInfo::idOverlap, vector<int>(), filter_overlapping);
+          }
+
         } else {
           aTC->setCondition(false);
+
+          // Collector TC Update (overlapping)
+          if (m_display > 0) {
+            std::vector<int> filter_overlapping = {FilterID::overlapping};
+
+            m_collector.updateTC(aTC->getCollectorID(), CollectorTFInfo::nameOverlap, CollectorTFInfo::idOverlap, vector<int>(), filter_overlapping);
+          }
+
           break; // checkOverlappingSet only filters TCs where one is a complete subset of the other. breaking here means, that aTC is subset of bTC, which makes any further filtering using aTC useless. By definition, the bTC has not been the outer loop yet (both know each other through the clusters, therefore bTC would have killed aTC already)
         }
+
+        // Collector TC Update (overlapping)
+        if (m_display > 0) {
+          std::vector<int> filter_overlapping = {FilterID::overlapping};
+
+          m_collector.updateTC(bTC->getCollectorID(), "", CollectorTFInfo::idAlive, filter_overlapping, vector<int>());
+        }
+
+
       }
+
+
     }
   }
   m_TESTERfilteredOverlapsQI += killedTCs;
@@ -4195,6 +4769,14 @@ bool VXDTFModule::baselineTF(vector<ClusterInfo>& clusters, PassData* passInfo)
       B2DEBUG(3, m_PARAMnameOfInstance << " - event " << m_eventCounter << " baseline TF: tc rejected by ziggZaggXY! ");
       m_TESTERtriggeredZigZagXY++;
       newTC->setCondition(false);
+
+      // Collector TC Update (ziggZaggXY)
+      if (m_display > 0) {
+        std::vector<int> filter_ziggZaggXY = {FilterID::ziggZaggXY};
+
+        m_collector.updateTC(newTC->getCollectorID(), CollectorTFInfo::nameTCC, CollectorTFInfo::idTCC, vector<int>(), filter_ziggZaggXY);
+      }
+
       delete newTC;
       if (nBrokenSensors != 0) { m_TESTERrejectedBrokenHitsTrack++; }
       return false;
@@ -4449,6 +5031,14 @@ bool VXDTFModule::doTheCircleFit(PassData* thisPass, VXDTFTrackCandidate* aTc, i
     B2DEBUG(20, "TCC filter: tc " << tcCtr << " rejected by circleFit! ");
     m_TESTERtriggeredCircleFit++; tcCtr++;
     aTc->setCondition(false);
+
+    // Collector TC Update (circlefit)
+    if (m_display > 0) {
+      std::vector<int> filter_circleFit = {FilterID::circlefit};
+
+      m_collector.updateTC(aTc->getCollectorID(), CollectorTFInfo::nameTCC, CollectorTFInfo::idTCC, vector<int>(), filter_circleFit);
+    }
+
     writeToRootFile(probability, chi2, estimatedRadius, nHits - 3 + addDegreesOfFreedom);
     return false;
   }
@@ -4460,6 +5050,13 @@ bool VXDTFModule::doTheCircleFit(PassData* thisPass, VXDTFTrackCandidate* aTc, i
   }
   boostClock::time_point timer2 = boostClock::now();
   duration = boost::chrono::duration_cast<boostNsec>(timer2 - timer);
+
+  // Collector TC Update (circlefit)
+  if (m_display > 0) {
+    std::vector<int> filter_circleFit = {FilterID::circlefit};
+
+    m_collector.updateTC(aTc->getCollectorID(), "", CollectorTFInfo::idAlive, filter_circleFit, vector<int>());
+  }
 
   B2DEBUG(20, " TCC filter circleFit approved TC " << tcCtr << " with numOfHits: " <<  nHits << ", time consumption: " << duration.count() << " ns");
   return true;

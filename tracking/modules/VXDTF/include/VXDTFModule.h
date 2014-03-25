@@ -29,6 +29,10 @@
 #include "tracking/vxdCaTracking/SharedFunctions.h"
 #include "tracking/vxdCaTracking/PassData.h"
 
+// Includes for the Collector/Display
+#include <tracking/dataobjects/CollectorTFInfo.h>
+#include <tracking/dataobjects/ClusterTFInfo.h>
+
 
 //C++ base / C++ stl:
 #include <fstream>
@@ -91,7 +95,6 @@ namespace Belle2 {
     typedef boost::chrono::microseconds boostNsec; /**< defines time resolution (currently mictroseconds) */ // microseconds, milliseconds
 
     typedef boost::tuple<double, double, VXDTFHit*> HitExtraTuple; /**< get<0>: distance to origin, get<1>: distance to seedHit, get<2> pointer to hit. SeedHit is outermost hit of detector and will be used for cosmic search */
-
 
     /** SensorStruct needed for SVDCluster sorting, stores u and v clusters of Sensor  */
     struct SensorStruct {
@@ -380,6 +383,10 @@ namespace Belle2 {
 
 
 
+    // Methodes for Collector
+    int importCollectorCell(int pass_index, std::string died_at, int died_id, std::vector<std::pair<int, bool>> acceptedRejectedFilters, int hit1, int hit2);  /** generates Information and imports a Cell for the Collector */
+
+
 
   protected:
     TCsOfEvent m_tcVector; /**< carries links to all track candidates found within event (during tcc filter, bad ones get kicked, lateron they simply get deactivated) */
@@ -560,6 +567,13 @@ namespace Belle2 {
     int m_TESTERclustersPersSectorNotMatching; /**< counts number of times when numofUclusters and numOfVclusters per sensor do not match */
     int m_TESTERhighOccupancyCtr; /**< counts number of times when high occupancy mode was activated */
     int m_TESTERovercrowdedStrangeSensors; /**< counts number of times when there was a strange sensor (svd-only: mismatching number of u/v clusters) but too many hits on it to be able to try to rescue Clusters by forming 1D-VXDTFHits */
+
+
+    // Member Variables for Collector/Display
+    CollectorTFInfo m_collector; /**< Object that collectes all the Information needed for the collector*/
+    int m_display;  /**< Collector operating flag: 0 = no collector, 1 = collect for display, 2 = collect for analysis */
+    int m_aktpassNumber;  /**< Pass Number Information used for the collector */
+
 
   private:
 

@@ -122,7 +122,7 @@ void TFAnalizerModule::initialize()
   m_totalRealHits = 0;
 
   // Collector (=> change to param?)
-  m_display = 1;
+  m_display = 0;
 
   if (m_PARAMwriteToRoot == true) {
     if ((m_PARAMrootFileName.size()) != 2) {

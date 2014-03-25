@@ -44,7 +44,9 @@ namespace Belle2 {
       m_use_counter = 0;
       m_max_counter = 0;
       m_particleID = -1;
+      m_is_real = 0;
       n_relative_cluster_id = -1;
+      m_pdg_code = 0;
     }
 
     /** Standard constructor */
@@ -54,7 +56,9 @@ namespace Belle2 {
       m_use_counter = 0;
       m_max_counter = 0;
       m_particleID = -1;
+      m_is_real = 0;
       n_relative_cluster_id = -1;
+      m_pdg_code = 0;
     }
 
     /** getter - RealClusterID */

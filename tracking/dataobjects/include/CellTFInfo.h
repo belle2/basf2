@@ -48,6 +48,7 @@ namespace Belle2 {
       m_assigned_hits_ids.clear();
       m_use_counter = 0;
       m_max_counter = 0;
+      m_is_real = 0;
     };
 
 

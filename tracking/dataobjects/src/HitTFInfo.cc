@@ -30,6 +30,7 @@ HitTFInfo::HitTFInfo()
   m_max_counter = 0;
   m_use_counter_cell.clear();
   m_use_TC_counter_IDs.clear();
+  m_is_real = 0;
   m_hitPos.SetXYZ(0., 0., 0.);
   m_hitSigma.SetXYZ(0., 0., 0.);
 };
@@ -41,6 +42,7 @@ HitTFInfo::HitTFInfo(int par_pass_index, int par_sec_id, TVector3 par_position, 
   m_max_counter = 0;
   m_use_counter_cell.clear();
   m_use_TC_counter_IDs.clear();
+  m_is_real = 0;
   m_hitPos = par_position;
   m_hitSigma = par_hitsigma;
 };

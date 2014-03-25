@@ -43,6 +43,8 @@ namespace Belle2 {
       m_fitSuccessful = false;
       m_probValue = 0;
       m_assignedGFTC = -1;
+
+      m_is_real = 0;
     }
 
     /** Standard constructor */
@@ -53,6 +55,8 @@ namespace Belle2 {
       m_fitSuccessful = false;
       m_probValue = 0;
       m_assignedGFTC = -1;
+
+      m_is_real = 0;
     }
 
     /** getter - own_id */

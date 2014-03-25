@@ -420,7 +420,7 @@ void CollectorTFInfo::updateHit(int hit_id, std::string died_at, int died_id, st
     //B2DEBUG(100,"CollectorTFInfo: akt deltaUseCounter: " << deltaUseCounter);
 
     string died_at_akt;
-    int died_id_akt;
+    int died_id_akt = 0;
 
     int deltaUseHit = 0;
 

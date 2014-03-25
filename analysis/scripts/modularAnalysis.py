@@ -140,6 +140,16 @@ def fitVertex(
     with_constraint='',
     path=analysis_main,
     ):
+    """
+    Perform the vertex fit for each Particle in the given ParticleList:
+    
+    @param list_name: name of the input ParticleList
+    @param ConfidenceLevel: minimum value of the confidencelevel to accept the fit
+    @param VertexFitter: rave or kfit
+    @param withConstraint: no, mass or beam spot constraint
+    @param  decayString: select particles used for the vertex fit
+    @param path   modules are added to this path
+    """
 
     pvfit = register_module('ParticleVertexFitter')
     pvfit.set_name('ParticleVertexFitter_' + list_name)
@@ -232,5 +242,23 @@ def buildRestOfEvent(list_name, path=analysis_main):
     roeBuilder.set_name('ROEBuilder_' + list_name)
     roeBuilder.param('particleList', list_name)
     path.add_module(roeBuilder)
+
+
+def TagV(list_name, confidenceLevel, path=analysis_main):
+    """
+    For each Particle in the given Breco ParticleList:
+    perform the fit of tag side using the track list from the RestOfEvent dataobject
+    save the MC Btag in case of signal MC 
+
+    @param list_name name of the input Breco ParticleList
+    @param ConfidenceLevel minimum value of the ConfidenceLevel to accept the fit
+    @param path      modules are added to this path
+    """
+
+    tvfit = register_module('TagVertex')
+    tvfit.set_name('TagVertex_' + list_name)
+    tvfit.param('ListName', list_name)
+    tvfit.param('ConfidenceLevel', confidenceLevel)
+    path.add_module(tvfit)
 
 

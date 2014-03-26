@@ -45,10 +45,10 @@ CollectorTestModule::~CollectorTestModule()
 
 void CollectorTestModule::initialize()
 {
-  StoreArray<PXDCluster>::optional();
-  StoreArray<SVDCluster>::optional();
+  // StoreArray<PXDCluster>::optional();
+  // StoreArray<SVDCluster>::optional();
 
-  m_collector.initPersistent();
+// m_collector.initPersistent();
 
 }
 
@@ -58,83 +58,86 @@ void CollectorTestModule::beginRun()
   m_eventCounter = 0;
   m_pxdClusterCounter = 0;
   m_svdClusterCounter = 0;
-  B2INFO("################## collectortest enabled");
+  B2DEBUG(100, "################## collectortest enabled");
 }
 
 
 void CollectorTestModule::event()
 {
 
-  B2INFO("################## Event Run CollectorTestModule");
+  B2DEBUG(100, "################## Event Run CollectorTestModule");
+  /*
+    m_eventCounter++;
 
-  m_eventCounter++;
+    StoreArray<PXDCluster> aPxdClusterArray;
+    m_pxdClusterCounter += aPxdClusterArray.getEntries();
 
-  StoreArray<PXDCluster> aPxdClusterArray;
-  m_pxdClusterCounter += aPxdClusterArray.getEntries();
+    StoreArray<SVDCluster> aSvdClusterArray;
+    m_svdClusterCounter += aSvdClusterArray.getEntries();
 
-  StoreArray<SVDCluster> aSvdClusterArray;
-  m_svdClusterCounter += aSvdClusterArray.getEntries();
-
-  if (m_eventCounter % m_stepSize == 0) {
-    B2INFO("CollectorTestModule - Event: " << m_eventCounter);
-  }
+    if (m_eventCounter % m_stepSize == 0) {
+      B2DEBUG(100, "CollectorTestModule - Event: " << m_eventCounter);
+    }
 
 
-  testSilentKill();
-  testOverlapped();
-  testAllInformationLoop();
-  testAllInformationStandard();
-  m_collector.safeInformation();
+    testSilentKill();
+    testOverlapped();
+    testAllInformationLoop();
+    testAllInformationStandard();
+    m_collector.safeInformation();
 
-  // Test safeInformation
-  StoreArray<SectorTFInfo> sectorTFInfo("");
-  int nTFClusters = sectorTFInfo.getEntries();
-  if (nTFClusters == 0) {B2INFO("VXDTF: Display: Sector is empty!");}
+    // Test safeInformation
+    StoreArray<SectorTFInfo> sectorTFInfo("");
+    int nTFClusters = sectorTFInfo.getEntries();
+    if (nTFClusters == 0) {B2DEBUG(100, "VXDTF: Display: Sector is empty!");}
 
-  B2INFO("XXX VXDTF: Display: Sector Size: " << nTFClusters);
+    B2DEBUG(100, "XXX VXDTF: Display: Sector Size: " << nTFClusters);
 
-  for (auto & akt_sector : sectorTFInfo) {
-    B2INFO("((( Sector ID: " << akt_sector.getSectorID() << "; active: " << akt_sector.getActive() << ", died_at: " << akt_sector.getDiedAt() << "; is only friend: " <<
-           akt_sector.getIsOnlyFriend() << "; Friends - size: "
-           << akt_sector.getFriends().size() << "; use counter: " << akt_sector.getUseCounter());
-  }
+    for (auto & akt_sector : sectorTFInfo) {
+      B2DEBUG(100, "((( Sector ID: " << akt_sector.getSectorID() << "; active: " << akt_sector.getActive() << ", died_at: " << akt_sector.getDiedAt() << "; is only friend: " <<
+             akt_sector.getIsOnlyFriend() << "; Friends - size: "
+             << akt_sector.getFriends().size() << "; use counter: " << akt_sector.getUseCounter());
+    }
 
-  // Filename of Hit - Save - File
-  std::ostringstream oss;
-  oss << "all_my_hits_event_" << m_eventCounter << ".txt";
+    // Filename of Hit - Save - File
+    std::ostringstream oss;
+    oss << "all_my_hits_event_" << m_eventCounter << ".txt";
 
-  //  m_collector.storeHitInformation(oss.str());
+    //  m_collector.storeHitInformation(oss.str());
 
-  /*  Information for Sector Friends
-  [INFO] pass_index: 0; Sector akt: 1, friend sector: 1, sector id (akt/friend): 1 / 1
-  [INFO] pass_index: 0; Sector akt: 1, friend sector: 3, sector id (akt/friend): 1 / 3
-  [INFO] pass_index: 0; Sector akt: 1, friend sector: 6, sector id (akt/friend): 1 / 6
-  [INFO] pass_index: 0; Sector akt: 1, friend sector: 12, sector id (akt/friend): 1 / 17
+    Start Kommentar  Information for Sector Friends
+    [INFO] pass_index: 0; Sector akt: 1, friend sector: 1, sector id (akt/friend): 1 / 1
+    [INFO] pass_index: 0; Sector akt: 1, friend sector: 3, sector id (akt/friend): 1 / 3
+    [INFO] pass_index: 0; Sector akt: 1, friend sector: 6, sector id (akt/friend): 1 / 6
+    [INFO] pass_index: 0; Sector akt: 1, friend sector: 12, sector id (akt/friend): 1 / 17
 
-  [INFO] pass_index: 0; Sector akt: 2, friend sector: 2, sector id (akt/friend): 2 / 2
-  [INFO] pass_index: 0; Sector akt: 2, friend sector: 10, sector id (akt/friend): 2 / 12
-  [INFO] pass_index: 0; Sector akt: 2, friend sector: 11, sector id (akt/friend): 2 / 15
+    [INFO] pass_index: 0; Sector akt: 2, friend sector: 2, sector id (akt/friend): 2 / 2
+    [INFO] pass_index: 0; Sector akt: 2, friend sector: 10, sector id (akt/friend): 2 / 12
+    [INFO] pass_index: 0; Sector akt: 2, friend sector: 11, sector id (akt/friend): 2 / 15
 
-  1:
-    sectors_display_friends.push_back (1);
-    sectors_display_friends.push_back (3);
-    sectors_display_friends.push_back (6);
-    sectors_display_friends.push_back (17);
-  2:
-    sectors_display_friends.push_back (2);
-    sectors_display_friends.push_back (12);
-    sectors_display_friends.push_back (15);
+    1:
+      sectors_display_friends.push_back (1);
+      sectors_display_friends.push_back (3);
+      sectors_display_friends.push_back (6);
+      sectors_display_friends.push_back (17);
+    2:
+      sectors_display_friends.push_back (2);
+      sectors_display_friends.push_back (12);
+      sectors_display_friends.push_back (15);
 
-    */
+      */
 
 }
 
 
 void CollectorTestModule::endRun()
 {
-  if (m_eventCounter == 0) { m_eventCounter++; } // prevents division by zero
-  double invEvents = 1. / m_eventCounter;
-  B2INFO("CollectorTestModule: after " << m_eventCounter << " events there were " << m_pxdClusterCounter << "/" << m_svdClusterCounter << " pxd/svdClusters total and " << double(m_pxdClusterCounter)*invEvents << "/" << double(m_svdClusterCounter)*invEvents << " pxd/svdClusters per event");
+  /*
+   if (m_eventCounter == 0) { m_eventCounter++; } // prevents division by zero
+   double invEvents = 1. / m_eventCounter;
+   B2DEBUG(100, "CollectorTestModule: after " << m_eventCounter << " events there were " << m_pxdClusterCounter << "/" << m_svdClusterCounter << " pxd/svdClusters total and " << double(m_pxdClusterCounter)*invEvents << "/" << double(m_svdClusterCounter)*invEvents << " pxd/svdClusters per event");
+
+   */
 }
 
 
@@ -156,7 +159,7 @@ void CollectorTestModule::import_sectors_standard()
   std::map<std::pair<unsigned int, unsigned int>, std::vector<int>> sectors_display_all_pass;
   std::vector<int> sectors_display_friends;
 
-  B2INFO("PassNr. " << pass_sector_id_single << "Size of Sector Map: " << sector_map_size);
+  B2DEBUG(100, "PassNr. " << pass_sector_id_single << "Size of Sector Map: " << sector_map_size);
 
   sectors_display_friends.clear();
   sectors_display_all_pass.insert(std::make_pair(std::make_pair(pass_sector_id_single, 0), sectors_display_friends));
@@ -198,7 +201,7 @@ void CollectorTestModule::import_clusters_standard()
     // importCluster (int pass_index, std::string died_at, int accepted, int rejected, int detector_type)
     m_collector.importCluster(pass_sector_id_single, "", -1, vector<int>(), vector<int>(), Const::SVD, i);
 
-//     B2INFO ("AKT ID SVD: " << akt_id);
+//     B2DEBUG ("AKT ID SVD: " << akt_id);
 
   }
 
@@ -206,7 +209,7 @@ void CollectorTestModule::import_clusters_standard()
     // importCluster (int pass_index, std::string died_at, int accepted, int rejected, int detector_type)
     m_collector.importCluster(pass_sector_id_single, "", -1, vector<int>(), vector<int>(), Const::PXD, i);
 
-//     B2INFO ("AKT ID PXD: " << akt_id);
+//     B2DEBUG ("AKT ID PXD: " << akt_id);
   }
 
 
@@ -236,7 +239,7 @@ void CollectorTestModule::import_sectors_loop()
 
   for (uint i = 0; i < pass_sector_ids.size(); i++) {
 
-    B2DEBUG(1, "PassNr. " << i << "Size of Sector Map: " << sector_map.size());
+    B2DEBUG(100, "PassNr. " << i << "Size of Sector Map: " << sector_map.size());
 
     for (auto & akt_sector : sector_map) {
       sectors_display_friends.clear();
@@ -271,7 +274,7 @@ void CollectorTestModule::import_clusters_loop()
       // importCluster (int pass_index, std::string died_at, int accepted, int rejected, int detector_type)
       m_collector.importCluster(index, "", -1, vector<int>(), vector<int>(), Const::SVD, i);
 
-//     B2INFO ("AKT ID SVD: " << akt_id);
+//     B2DEBUG ("AKT ID SVD: " << akt_id);
 
     }
 
@@ -279,7 +282,7 @@ void CollectorTestModule::import_clusters_loop()
       // importCluster (int pass_index, std::string died_at, int accepted, int rejected, int detector_type)
       m_collector.importCluster(index, "", -1, vector<int>(), vector<int>(), Const::PXD, i);
 
-//     B2INFO ("AKT ID PXD: " << akt_id);
+//     B2DEBUG ("AKT ID PXD: " << akt_id);
     }
 
   }
@@ -345,7 +348,7 @@ void CollectorTestModule::import_hit_loop()
 
       m_collector.importHit(index, "", -1, vector<int>(), vector<int>(), vector<int>(), 1, TVector3(), TVector3());
 
-//     B2INFO ("HIT ID: " << akt_id);
+//     B2DEBUG ("HIT ID: " << akt_id);
     }
   }
 }
@@ -391,7 +394,7 @@ void CollectorTestModule::import_cell_loop()
 
       m_collector.importCell(index, "", -1, vector<int>(), vector<int>(), hits);
 
-//     B2INFO ("Cell ID: " << akt_id);
+//     B2DEBUG ("Cell ID: " << akt_id);
     }
   }
 }
@@ -433,7 +436,7 @@ void CollectorTestModule::import_tfc_loop()
 
 //     int akt_id = m_collector.importTC (index, "", vector<int>(), vector<int>(), cells);
 
-//     B2INFO ("TC ID: " << akt_id);
+//     B2DEBUG ("TC ID: " << akt_id);
     }
   }
 }
@@ -444,8 +447,8 @@ void CollectorTestModule::getAllCells()
 {
 
   for (uint i = 0; i <  m_collector.m_cellTF.size(); i++) {
-    B2INFO("* Cell ID: " << i << "; active: " << m_collector.m_cellTF[i].getActive() << ", died_at: " << m_collector.m_cellTF[i].getDiedAt() << "; m_assigned_hits_ids - size: " << m_collector.m_cellTF[i].getAssignedHits().size() << "; Neighbours - size: " << m_collector.m_cellTF[i].getNeighbours().size() << "; State: " << m_collector.m_cellTF[i].getState() <<
-           "; use counter: " << m_collector.m_cellTF[i].getUseCounter());
+    B2DEBUG(100, "* Cell ID: " << i << "; active: " << m_collector.m_cellTF[i].getActive() << ", died_at: " << m_collector.m_cellTF[i].getDiedAt() << "; m_assigned_hits_ids - size: " << m_collector.m_cellTF[i].getAssignedHits().size() << "; Neighbours - size: " << m_collector.m_cellTF[i].getNeighbours().size() << "; State: " << m_collector.m_cellTF[i].getState() <<
+            "; use counter: " << m_collector.m_cellTF[i].getUseCounter());
   }
 
 }
@@ -456,8 +459,8 @@ void CollectorTestModule::getAllHits()
 {
 
   for (uint i = 0; i <  m_collector.m_hitTF.size(); i++) {
-    B2INFO("* Hit ID: " << i << "; active: " << m_collector.m_hitTF[i].getActive() << ", died_at: " << m_collector.m_hitTF[i].getDiedAt() << "; m_assigned_cluster - size: " << m_collector.m_hitTF[i].getAssignedCluster().size() << "; UseTC IDs - size: " << m_collector.m_hitTF[i].getUseCounterTCIDs().size() <<
-           "; use counter: " << m_collector.m_hitTF[i].getUseCounter() << "; SectorID: " << m_collector.m_hitTF[i].getSectorID());
+    B2DEBUG(100, "* Hit ID: " << i << "; active: " << m_collector.m_hitTF[i].getActive() << ", died_at: " << m_collector.m_hitTF[i].getDiedAt() << "; m_assigned_cluster - size: " << m_collector.m_hitTF[i].getAssignedCluster().size() << "; UseTC IDs - size: " << m_collector.m_hitTF[i].getUseCounterTCIDs().size() <<
+            "; use counter: " << m_collector.m_hitTF[i].getUseCounter() << "; SectorID: " << m_collector.m_hitTF[i].getSectorID());
   }
 
 }
@@ -467,11 +470,11 @@ void CollectorTestModule::getAllClusters()
 {
 
   for (uint i = 0; i <  m_collector.m_clustersTF.size(); i++) {
-    B2INFO("* Cluster ID: " << i << "; active: " << m_collector.m_clustersTF[i].getActive() << ", died_at: " << m_collector.m_clustersTF[i].getDiedAt() << "; Real Cluster ID: " <<
-           m_collector.m_clustersTF[i].getRealClusterID() << "; Detector Type: "
-           << m_collector.m_clustersTF[i].getDetectorType() << "; use counter: " << m_collector.m_clustersTF[i].getUseCounter()
-           << "; ParticleID: " << m_collector.m_clustersTF[i].getParticleID()
-          );
+    B2DEBUG(100, "* Cluster ID: " << i << "; active: " << m_collector.m_clustersTF[i].getActive() << ", died_at: " << m_collector.m_clustersTF[i].getDiedAt() << "; Real Cluster ID: " <<
+            m_collector.m_clustersTF[i].getRealClusterID() << "; Detector Type: "
+            << m_collector.m_clustersTF[i].getDetectorType() << "; use counter: " << m_collector.m_clustersTF[i].getUseCounter()
+            << "; ParticleID: " << m_collector.m_clustersTF[i].getParticleID()
+           );
   }
 
 }
@@ -482,12 +485,12 @@ void CollectorTestModule::getAllTC()
 {
 
   for (uint i = 0; i <  m_collector.m_tfCandTF.size(); i++) {
-    B2INFO("* TC ID: " << i << "; active: " << m_collector.m_tfCandTF[i].getActive() << ", died_at: " << m_collector.m_tfCandTF[i].getDiedAt() << "; Own ID: " <<
-           m_collector.m_tfCandTF[i].getOwnID() << "; AssignedCells - size: " <<
-           m_collector.m_tfCandTF[i].getAssignedCell().size() <<
-           "; isFitPossible: " << m_collector.m_tfCandTF[i].isFitPossible() <<
-           "; assigned GTFC: " << m_collector.m_tfCandTF[i].getAssignedGFTC() <<
-           "; Prob Value: " << m_collector.m_tfCandTF[i].getProbValue());
+    B2DEBUG(100, "* TC ID: " << i << "; active: " << m_collector.m_tfCandTF[i].getActive() << ", died_at: " << m_collector.m_tfCandTF[i].getDiedAt() << "; Own ID: " <<
+            m_collector.m_tfCandTF[i].getOwnID() << "; AssignedCells - size: " <<
+            m_collector.m_tfCandTF[i].getAssignedCell().size() <<
+            "; isFitPossible: " << m_collector.m_tfCandTF[i].isFitPossible() <<
+            "; assigned GTFC: " << m_collector.m_tfCandTF[i].getAssignedGFTC() <<
+            "; Prob Value: " << m_collector.m_tfCandTF[i].getProbValue());
   }
 
 }
@@ -498,12 +501,12 @@ void CollectorTestModule::getAllTC()
 void CollectorTestModule::getAllSectors()
 {
 
-  B2INFO("* getAllSectors - Sectors size: " << m_collector.m_sectorTF.size());
+  B2DEBUG(100, "* getAllSectors - Sectors size: " << m_collector.m_sectorTF.size());
 
   for (auto & akt_sector : m_collector.m_sectorTF) {
-    B2INFO("* Sector ID: " << akt_sector.second.getSectorID() << "; active: " << akt_sector.second.getActive() << ", died_at: " << akt_sector.second.getDiedAt() << "; is only friend: " <<
-           akt_sector.second.getIsOnlyFriend() << "; Friends - size: "
-           << akt_sector.second.getFriends().size() << "; use counter: " << akt_sector.second.getUseCounter());
+    B2DEBUG(100, "* Sector ID: " << akt_sector.second.getSectorID() << "; active: " << akt_sector.second.getActive() << ", died_at: " << akt_sector.second.getDiedAt() << "; is only friend: " <<
+            akt_sector.second.getIsOnlyFriend() << "; Friends - size: "
+            << akt_sector.second.getFriends().size() << "; use counter: " << akt_sector.second.getUseCounter());
   }
 
 
@@ -527,7 +530,7 @@ void CollectorTestModule::testSilentKill()
   import_cell_standard();
 
 //     for (int i = 0; i <  m_collector.m_cellTF.size(); i++) {
-//  B2INFO ("cell => hits size: " << m_collector.m_cellTF[i].getAssignedHits().size() );
+//  B2DEBUG ("cell => hits size: " << m_collector.m_cellTF[i].getAssignedHits().size() );
 //
 //     }
 
@@ -538,20 +541,20 @@ void CollectorTestModule::testSilentKill()
   import_tfc_standard();
 
 //    for (int i = 0; i <  m_collector.m_tfCandTF.size(); i++) {
-//       B2INFO ("TfCand: " << i << "; active: " << m_collector.m_tfCandTF[i].getActive() << ", ass_cells - size: " << m_collector.m_tfCandTF[i].getAssignedCell().size() );
+//       B2DEBUG ("TfCand: " << i << "; active: " << m_collector.m_tfCandTF[i].getActive() << ", ass_cells - size: " << m_collector.m_tfCandTF[i].getAssignedCell().size() );
 //    }
 //
 
 //     for (int i = 0; i <  m_collector.m_cellTF.size(); i++) {
-//       B2INFO ("Before Silent Kill Cell ID: " << i << "; active: " << m_collector.m_cellTF[i].getActive() );
+//       B2DEBUG ("Before Silent Kill Cell ID: " << i << "; active: " << m_collector.m_cellTF[i].getActive() );
 //    }
 //
 //    for (int i = 0; i <  m_collector.m_hitTF.size(); i++) {
-//       B2INFO ("Before Silent Kill Hit ID: " << i << "; active: " << m_collector.m_hitTF[i].getActive());
+//       B2DEBUG ("Before Silent Kill Hit ID: " << i << "; active: " << m_collector.m_hitTF[i].getActive());
 //    }
 
 //   for (int i = 0; i <  m_collector.m_clustersTF.size(); i++) {
-//      B2INFO ("Before Silent Kill Cluster ID: " << i << "; active: " << m_collector.m_clustersTF[i].getActive() );
+//      B2DEBUG ("Before Silent Kill Cluster ID: " << i << "; active: " << m_collector.m_clustersTF[i].getActive() );
 //   }
 
   m_collector.silentKill();
@@ -560,17 +563,17 @@ void CollectorTestModule::testSilentKill()
 
   for (uint i = 0; i <  m_collector.m_cellTF.size(); i++) {
     cells_live += m_collector.m_cellTF[i].getActive();
-    // B2INFO ("After Silent Kill  Cell ID: " << i << "; active: " << m_collector.m_cellTF[i].getActive() );
+    // B2DEBUG ("After Silent Kill  Cell ID: " << i << "; active: " << m_collector.m_cellTF[i].getActive() );
   }
 
   int hit_live = 0;
   for (uint i = 0; i <  m_collector.m_hitTF.size(); i++) {
     hit_live += m_collector.m_hitTF[i].getActive();
-    // B2INFO ("After Silent Kill  Hit ID: " << i << "; active: " << m_collector.m_hitTF[i].getActive() << ", diet_at: " << m_collector.m_hitTF[i].getDiedAt() );
+    // B2DEBUG ("After Silent Kill  Hit ID: " << i << "; active: " << m_collector.m_hitTF[i].getActive() << ", diet_at: " << m_collector.m_hitTF[i].getDiedAt() );
   }
 
-  B2INFO("hit_live " << hit_live);
-  B2INFO("cells_live: " << cells_live);
+  B2DEBUG(100, "hit_live " << hit_live);
+  B2DEBUG(100, "cells_live: " << cells_live);
 
   // Active Hits after Silent Kill
   //ASSERT_EQ(10, hit_live );
@@ -579,7 +582,7 @@ void CollectorTestModule::testSilentKill()
   //ASSERT_EQ(7, cells_live );
 
 //     for (int i = 0; i <  m_collector.m_clustersTF.size(); i++) {
-//       B2INFO ("After Silent Kill  Cluster ID: " << i << "; active: " << m_collector.m_clustersTF[i].getActive() );
+//       B2DEBUG ("After Silent Kill  Cluster ID: " << i << "; active: " << m_collector.m_clustersTF[i].getActive() );
 //    }
 
 
@@ -614,7 +617,7 @@ void CollectorTestModule::testOverlapped()
      ASSERT_EQ(true, m_collector.isHitOverlapped(8) );
   */
   for (uint i = 0; i <  m_collector.m_hitTF.size(); i++) {
-    B2INFO("Hit ID: " << i << "; overlapped: " << m_collector.isHitOverlapped(i));
+    B2DEBUG(100, "Hit ID: " << i << "; overlapped: " << m_collector.isHitOverlapped(i));
   }
 
   // Cell IDs
@@ -628,7 +631,7 @@ void CollectorTestModule::testOverlapped()
   */
 
   for (uint i = 0; i <  m_collector.m_cellTF.size(); i++) {
-    B2INFO("Cell ID: " << i << "; overlapped: " << m_collector.isCellOverlapped(i));
+    B2DEBUG(100, "Cell ID: " << i << "; overlapped: " << m_collector.isCellOverlapped(i));
   }
 
   // TfCand
@@ -642,7 +645,7 @@ void CollectorTestModule::testOverlapped()
      ASSERT_EQ(true, m_collector.isTCOverlapped(4) );  */
 
   for (uint i = 0; i <  m_collector.m_tfCandTF.size(); i++) {
-    B2INFO("TC ID: " << i << "; overlapped: " << m_collector.isTCOverlapped(i));
+    B2DEBUG(100, "TC ID: " << i << "; overlapped: " << m_collector.isTCOverlapped(i));
   }
 
   getAllSectors();
@@ -652,7 +655,7 @@ void CollectorTestModule::testOverlapped()
   getAllTC();
 
   /* for (auto& akt_cluster:m_collector.m_cluster_start_info) {
-     B2INFO ("pass index : " << akt_cluster.first.first << "; Detector ID : " << akt_cluster.first.second << "; start at: " << akt_cluster.second);
+     B2DEBUG ("pass index : " << akt_cluster.first.first << "; Detector ID : " << akt_cluster.first.second << "; start at: " << akt_cluster.second);
    }*/
 
 }
@@ -673,7 +676,7 @@ void CollectorTestModule::testAllInformationStandard()
 
   import_hit_standard();
 
-  B2INFO("*** SECTOR AFTER HIT Import : ");
+  B2DEBUG(100, "*** SECTOR AFTER HIT Import : ");
   getAllSectors();
 
   m_collector.updateHit(1, "geloescht Hit ", 0, vector<int>(), vector<int>(), -1, -1, vector<int>());

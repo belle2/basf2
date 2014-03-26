@@ -46,14 +46,21 @@ namespace Belle2 {
       m_friends.clear();
       m_use_counter = 0;
       m_max_counter = 0;
+      is_only_friend = false;
     }
 
 
     /** Standard constructor */
     SectorTFInfo(int par_pass_index, int par_sectorid): BaseTFInfo(par_pass_index) {
       m_sectorID = par_sectorid;
+      m_points[0].SetXYZ(0., 0., 0.);
+      m_points[1].SetXYZ(0., 0., 0.);
+      m_points[2].SetXYZ(0., 0., 0.);
+      m_points[3].SetXYZ(0., 0., 0.);
+      m_sectorID = -1;
       m_use_counter = 0;
       m_max_counter = 0;
+      is_only_friend = false;
       m_friends.clear();
     }
 

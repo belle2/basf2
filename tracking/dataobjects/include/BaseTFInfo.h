@@ -33,8 +33,7 @@ namespace Belle2 {
   public:
 
     /** Default constructor for the ROOT IO. */
-    BaseTFInfo() {
-      m_died_at = "";
+    BaseTFInfo(): m_died_at("") {
       m_accepted.clear();
       m_rejected.clear();
       m_pass_index = -1;
@@ -42,8 +41,7 @@ namespace Belle2 {
     };
 
     // Standard constructor
-    BaseTFInfo(int par_pass_index) {
-      m_died_at = "";
+    BaseTFInfo(int par_pass_index): m_died_at("") {
       m_accepted.clear();
       m_rejected.clear();
       m_pass_index = par_pass_index;

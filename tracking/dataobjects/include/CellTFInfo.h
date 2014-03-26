@@ -39,6 +39,9 @@ namespace Belle2 {
     /** Default constructor for the ROOT IO. */
     CellTFInfo() {
       m_state = 0;
+      m_use_counter = 0;
+      m_max_counter = 0;
+      m_is_real = 0;
     };
 
     /** Standard constructor */

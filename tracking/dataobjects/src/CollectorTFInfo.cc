@@ -723,12 +723,11 @@ void CollectorTFInfo::safeInformation()
   // Friends of Sectors
   RelationArray relSectorSectorFriend(sectorTFInfo, sectorTFInfo);
 
-  int index_sector;
   std::map<KeySectors, SectorTFInfo>::iterator it;
   KeySectors friend_key;
 
   for (auto & akt_sector : m_sectorTF) {
-    index_sector = sectorTFInfo.getEntries();
+    int index_sector = sectorTFInfo.getEntries();
 
     sectorTFInfo.appendNew(akt_sector.second);
 
@@ -774,10 +773,8 @@ void CollectorTFInfo::safeInformation()
 
   RelationArray relCellNBCell(cellTFInfo, cellTFInfo);
 
-  int index_cell;
-
   for (auto & akt_cell : m_cellTF) {
-    index_cell = cellTFInfo.getEntries();
+    int index_cell = cellTFInfo.getEntries();
 
     cellTFInfo.appendNew(akt_cell);
 

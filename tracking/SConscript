@@ -10,7 +10,7 @@ env['LIBS'] = [
     'vxd', 'vxd_dataobjects', 
     'cdc', 'cdc_dataobjects',
     'simulation_dataobjects',
-    'geometry',
+#    'geometry',
     'mdst_dataobjects',
     'framework',
     'genfit2',

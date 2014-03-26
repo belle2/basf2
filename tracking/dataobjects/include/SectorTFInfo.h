@@ -131,6 +131,21 @@ namespace Belle2 {
       }
     }
 
+    /** returns the String for the display - Information */
+    TString getDisplayInformation() {
+
+      // NOT FINAL !!!
+
+      return TString::Format("Point 1: (%.3f, %.3f, %.3f)\n Point 2: (%.3f, %.3f, %.3f)\n Point 3: (%.3f, %.3f, %.3f)\n Point 4: (%.3f, %.3f, %.3f)\n Friend Only: %s\n Died_ID: %d ", m_points[0].X(), m_points[0].Y(), m_points[0].Z(), m_points[1].X(), m_points[1].Y(), m_points[1].Z(), m_points[2].X(), m_points[2].Y(), m_points[2].Z(), m_points[3].X(), m_points[3].Y(), m_points[3].Z(), is_only_friend ? "true" : "false", getDiedID());
+    }
+
+    /** returns the String for the display - AlternativeBox */
+    TString getDisplayAlternativeBox() {
+
+      std::string died_at = getDiedAt();
+
+      return TString::Format("SectorID: %d, PassIndex: %d\n Died_ID: %s, Count Friend Sectors: %d", m_sectorID, getPassIndex(), died_at.c_str(), sizeFriends());
+    }
 
 
   protected:

@@ -188,6 +188,27 @@ namespace Belle2 {
     /** returns size of used_particles */
     int sizeUsedParticles() { return m_used_particles.size(); }
 
+    /** returns the String for the display - Information */
+    TString getDisplayInformation() {
+
+      // NOT FINAL !!!
+
+      int outerHit = -1;
+      if (m_assigned_hits_ids.size() > 0) { outerHit = m_assigned_hits_ids[0]; }
+      int innerHit = -1;
+      if (m_assigned_hits_ids.size() > 1) { innerHit = m_assigned_hits_ids[1]; }
+
+      return TString::Format("OuterHit: %d, InnerHit: %d\n State: %d\n Died_ID: %d ", outerHit, innerHit, m_state, getDiedID());
+    }
+
+    /** returns the String for the display - AlternativeBox */
+    TString getDisplayAlternativeBox() {
+
+      std::pair<int, double> main_particle = getMainParticle();
+      std::string died_at = getDiedAt();
+
+      return TString::Format("State: %d, PassIndex: %d\n Died_ID: %s, IsReal: %d, ParticleID: %d, Purity: %.3f\n  Count NB-Cells: %d", m_state, getPassIndex(), died_at.c_str(), m_is_real, main_particle.first, main_particle.second, sizeNeighbours());
+    }
 
   protected:
 

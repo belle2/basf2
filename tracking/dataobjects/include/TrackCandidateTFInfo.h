@@ -151,6 +151,28 @@ namespace Belle2 {
     /** returns size of used_particles */
     int sizeUsedParticles() { return m_used_particles.size(); }
 
+    /** returns the String for the display - Information */
+    TString getDisplayInformation() {
+
+      // NOT FINAL !!!
+
+      int cell_1 = -1;
+      if (m_assigned_cell_ids.size() > 0) { cell_1 = m_assigned_cell_ids[0]; }
+      int cell_2 = -1;
+      if (m_assigned_cell_ids.size() > 1) { cell_2 = m_assigned_cell_ids[1]; }
+
+      return TString::Format("Cell 1: %d, Cell 2: %d\n IsReal: %d\n Died_ID: %d ", cell_1, cell_2, m_is_real, getDiedID());
+    }
+
+    /** returns the String for the display - AlternativeBox */
+    TString getDisplayAlternativeBox() {
+
+      std::pair<int, double> main_particle = getMainParticle();
+      std::string died_at = getDiedAt();
+
+      return TString::Format("PassIndex: %d\n Died_ID: %s, IsReal: %d, ParticleID: %d, Purity: %.3f\n  Probability: %.3f, GTFC: %d", getPassIndex(), died_at.c_str(), m_is_real, main_particle.first, main_particle.second, m_probValue, m_assignedGFTC);
+    }
+
   protected:
     int m_own_id; /**< Track Candidate ID */
 

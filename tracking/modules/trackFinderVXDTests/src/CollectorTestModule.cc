@@ -80,9 +80,9 @@ void CollectorTestModule::event()
   }
 
 
-  //testSilentKill();
-  //testOverlapped();
-  //testAllInformationLoop();
+  testSilentKill();
+  testOverlapped();
+  testAllInformationLoop();
   testAllInformationStandard();
   m_collector.safeInformation();
 
@@ -422,7 +422,7 @@ void CollectorTestModule::import_tfc_loop()
 {
 
   int anz_tfc = 10;
-  vector<int> cells = {1, 2, 3};
+// vector<int> cells = {1, 2, 3};
 
 
   for (uint index = 0; index < pass_sector_ids.size(); index++) {

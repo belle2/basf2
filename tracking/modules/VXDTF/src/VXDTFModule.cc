@@ -132,26 +132,26 @@ VXDTFModule::VXDTFModule() : Module()
   vector<bool> activateDistance3D, activateDistanceXY, activateDistanceZ, activateSlopeRZ, activateNormedDistance3D, activateAngles3D, activateAnglesXY, activateAnglesRZ, activateDeltaSlopeRZ, activateDistance2IP, activatePT, activateHelixFit, activateAngles3DHioC, activateAnglesXYHioC, activateAnglesRZHioC, activateDeltaSlopeRZHioC, activateDistance2IPHioC, activatePTHioC, activateHelixFitHioC, activateZigZagXY, activateZigZagRZ, activateDeltaPt, activateDeltaDistance2IP, activateCircleFit, activateDeltaPtHioC, activateDeltaDistance2IPHioC;
   activateDistance3D.push_back(true);
   activateDistanceXY.push_back(true);
-  activateDistanceZ.push_back(true); //mod
-  activateSlopeRZ.push_back(true); //mod
-  activateNormedDistance3D.push_back(true); //mod
+  activateDistanceZ.push_back(false);
+  activateSlopeRZ.push_back(false);
+  activateNormedDistance3D.push_back(false);
   activateAngles3D.push_back(true);
   activateAnglesXY.push_back(true);
-  activateAnglesRZ.push_back(true); // mod
-  activateDeltaSlopeRZ.push_back(true); //mod
+  activateAnglesRZ.push_back(false);
+  activateDeltaSlopeRZ.push_back(false);
   activatePT.push_back(true);
-  activateHelixFit.push_back(true); // mod
-  activateDistance2IP.push_back(true); // mod
+  activateHelixFit.push_back(false);
+  activateDistance2IP.push_back(false);
   activateZigZagXY.push_back(true); // first pass
   activateZigZagXY.push_back(true); // second pass
-  activateZigZagXY.push_back(true); // third pass
-  activateZigZagRZ.push_back(true);
+  activateZigZagXY.push_back(false); // third pass
+  activateZigZagRZ.push_back(false);
   activateDeltaPt.push_back(true);
-  activateDeltaDistance2IP.push_back(true); // mod
+  activateDeltaDistance2IP.push_back(false);
   activateCircleFit.push_back(true);
   activateAngles3DHioC.push_back(true);
   activateAnglesXYHioC.push_back(true);
-  activateAnglesRZHioC.push_back(true); // mod
+  activateAnglesRZHioC.push_back(false);
   activateDeltaSlopeRZHioC.push_back(true);
   activatePTHioC.push_back(true);
   activateHelixFitHioC.push_back(true);

@@ -3,7 +3,7 @@
  * Copyright(C) 2011 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Stefan Ferstl                     *
+ * Contributors: Stefan Ferstl                                            *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -12,6 +12,9 @@
 #include <framework/datastore/StoreArray.h>
 #include <pxd/dataobjects/PXDCluster.h>
 #include <svd/dataobjects/SVDCluster.h>
+#include <framework/gearbox/Const.h>
+#include <framework/logging/Logger.h>
+// #include <gtest/gtest.h>
 
 
 using namespace std;
@@ -29,10 +32,7 @@ REG_MODULE(CollectorTest)
 CollectorTestModule::CollectorTestModule() : Module()
 {
   //Set module properties
-  //setDescription("simply highlights current event");
-  //setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
 
-  //addParam("stepSize", m_stepSize, "e.g. 100 will highlight every 100th event", int(100));
   setDescription("simply tests the Collector of the TrackFinder");
 }
 
@@ -49,7 +49,11 @@ void CollectorTestModule::initialize()
   // StoreArray<SVDCluster>::optional();
 
 // m_collector.initPersistent();
-
+  pass_sector_id_single = 0;
+  pass_sector_ids.push_back(0);
+  pass_sector_ids.push_back(1);
+  pass_sector_ids.push_back(2);
+  m_collector = CollectorTFInfo();
 }
 
 
@@ -74,10 +78,6 @@ void CollectorTestModule::event()
 
     StoreArray<SVDCluster> aSvdClusterArray;
     m_svdClusterCounter += aSvdClusterArray.getEntries();
-
-    if (m_eventCounter % m_stepSize == 0) {
-      B2DEBUG(100, "CollectorTestModule - Event: " << m_eventCounter);
-    }
 
 
     testSilentKill();
@@ -132,12 +132,7 @@ void CollectorTestModule::event()
 
 void CollectorTestModule::endRun()
 {
-  /*
-   if (m_eventCounter == 0) { m_eventCounter++; } // prevents division by zero
-   double invEvents = 1. / m_eventCounter;
-   B2DEBUG(100, "CollectorTestModule: after " << m_eventCounter << " events there were " << m_pxdClusterCounter << "/" << m_svdClusterCounter << " pxd/svdClusters total and " << double(m_pxdClusterCounter)*invEvents << "/" << double(m_svdClusterCounter)*invEvents << " pxd/svdClusters per event");
 
-   */
 }
 
 

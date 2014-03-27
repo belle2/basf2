@@ -3,33 +3,26 @@
  * Copyright(C) 2011 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Stefan Ferstl                       *
+ * Contributors: Stefan Ferstl                                            *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-/* Additional Info:
-* This Module is in an early stage of developement. The comments are mainly for temporal purposes
-* and will be changed and corrected in later stages of developement. So please ignore them.
-*/
 
-#ifndef CollectorTestModule_H_
-#define CollectorTestModule_H_
+#pragma once
 
 #include <framework/core/Module.h>
 #include <tracking/dataobjects/CollectorTFInfo.h>
-#include <framework/gearbox/Const.h>
-#include <framework/logging/Logger.h>
-#include <gtest/gtest.h>
+//#include <gtest/gtest.h>
 
 // #include <fstream>
-#include <string>
+//#include <string>
 
 
 namespace Belle2 {
 
-  /** The event counter module
+  /** CollectorTestModule
    *
-   * this module simply counts the number of events (and prints every x-th event onto the screen, where x is user-defined). Useful when executing modules which do not provide this feature themselves
+   * simply tests the Collector (CollectorTFInfo and its ingredients) of the TrackFinder
    *
    */
   class CollectorTestModule : public Module {
@@ -95,14 +88,14 @@ namespace Belle2 {
 
 
   protected:
-    CollectorTFInfo m_collector = CollectorTFInfo();
+//    CollectorTFInfo m_collector = CollectorTFInfo();
+    CollectorTFInfo m_collector; /**< carries complete information about hits, cells and the whole rest */
     // Pass Ids
-    std::vector<int> pass_sector_ids = {0, 1, 2};
-    int pass_sector_id_single = 0;
-
+    std::vector<int> pass_sector_ids; /**< carries the IDs of the passes for fast access */
+    int pass_sector_id_single; /**< @ Stefan: please explain ;) */
 
     int m_eventCounter; /**< knows current event number */
-    int m_stepSize; /**< Informes the user that  event: (eventCounter-modulo(stepSize)) is currently executed */
+//   int m_stepSize; /**< Informes the user that  event: (eventCounter-modulo(stepSize)) is currently executed */
     int m_pxdClusterCounter; /**< counts total number of pxd clusters occured */
     int m_svdClusterCounter; /**< counts total number of pxd clusters occured */
 
@@ -110,5 +103,3 @@ namespace Belle2 {
 
   };
 }
-
-#endif /* CollectorTestModule_H_ */

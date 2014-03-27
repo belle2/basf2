@@ -1,12 +1,13 @@
-#pragma once
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2013  Belle II Collaboration                              *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Christian Pulvermacher                                   *
+ * Contributors: Jakob Lettenbichler                                      *
  *                                                                        *
  **************************************************************************/
+
+#pragma once
 
 #include <framework/core/Module.h>
 #include <tracking/spacePointCreation/SpacePoint.h>

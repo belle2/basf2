@@ -36,7 +36,7 @@ REG_MODULE(TestMap)
 TestMapModule::TestMapModule() : Module()
 {
   //Set module properties
-  setDescription("tests std::map for sectorMaps");
+  setDescription("tests std::map, boost::unordered_map and boost::flat_map for sectorMaps");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("numLayers", m_PARAMnumLayers, "sets how many layers are assumed (useful value: 4-6)", int(6));

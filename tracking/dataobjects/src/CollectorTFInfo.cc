@@ -674,13 +674,13 @@ void CollectorTFInfo::updateTCFitInformation(int tcid, bool fit_successful, doub
 {
   B2DEBUG(100, "CollectorTFInfo: updateTCFitInformation, tcid: " << tcid << ", fit_successful: " << fit_successful << ", probability_value: " << probability_value << ", assigned_GTFC: " << assigned_GTFC);
 
-  if (tcid >= (int)m_tfCandTF.size()) {
+  if (tcid >= int(m_tfCandTF.size())) {
     B2DEBUG(100, "CollectorTFInfo: updateTCFitInformation - TCCand not found !");
     return;
 
   } else {
     // Reference to change TFCand
-    TrackCandidateTFInfo& akt_tfcand = m_tfCandTF[tcid];
+    TrackCandidateTFInfo& akt_tfcand = m_tfCandTF.at(tcid);
 
     akt_tfcand.fitIsPossible(fit_successful);
     akt_tfcand.setProbValue(probability_value);
@@ -821,7 +821,7 @@ void CollectorTFInfo::silentKill()  // Für alle folgenden Updates
 
     // Set if the clusters are active / or not active
     for (uint i = 0; i < m_clustersTF.size(); i++) {
-      check_clusters[i] = m_clustersTF[i].getActive();
+      check_clusters.at(i) = m_clustersTF.at(i).getActive();
     }
 
     // Search for Hits not used
@@ -831,7 +831,7 @@ void CollectorTFInfo::silentKill()  // Für alle folgenden Updates
       // Only check active Cells, other Hits should already been deactivated
       if (akt_hit.getActive()) {
         for (auto & akt_cluster : akt_hit.getAssignedCluster()) {
-          check_clusters[akt_cluster] = false;
+          check_clusters.at(akt_cluster) = false;
         }
       }
 
@@ -839,7 +839,7 @@ void CollectorTFInfo::silentKill()  // Für alle folgenden Updates
 
     // if there are any clusters left => not used (check_clusters = true) => deactivate
     for (uint i = 0; i < check_clusters.size(); i++) {
-      if (check_clusters[i]) {
+      if (check_clusters.at(i)) {
         // Hit died at Hitfinder
         updateClusters(i, CollectorTFInfo::nameHitFinder, CollectorTFInfo::idHitFinder, vector<int>(), {FilterID::silentHitFinder}, -1);
       }
@@ -858,7 +858,7 @@ void CollectorTFInfo::silentKill()  // Für alle folgenden Updates
 
     // Set if the hits are active / or not active
     for (uint i = 0; i < m_hitTF.size(); i++) {
-      check_hit[i] = m_hitTF[i].getActive();
+      check_hit.at(i) = m_hitTF.at(i).getActive();
     }
 
     // Search for Hits not used
@@ -869,7 +869,7 @@ void CollectorTFInfo::silentKill()  // Für alle folgenden Updates
       if (akt_cell.getActive()) {
         for (auto & akt_hit : akt_cell.getAssignedHits()) {
           if (akt_hit < (int)m_hitTF.size() && akt_hit >= 0) {
-            check_hit[akt_hit] = false;
+            check_hit.at(akt_hit) = false;
           }
         }
       }
@@ -878,7 +878,7 @@ void CollectorTFInfo::silentKill()  // Für alle folgenden Updates
 
     // if there are any hits left => not used (check_hit = true) => deactivate
     for (uint i = 0; i < check_hit.size(); i++) {
-      if (check_hit[i]) {
+      if (check_hit.at(i)) {
         // Hit died at Segfinder
         updateHit(i, CollectorTFInfo::nameCellFinder, CollectorTFInfo::idCellFinder, vector<int>(), {FilterID::silentSegFinder}, -1, -1, vector<int>());
       }

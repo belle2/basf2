@@ -59,7 +59,6 @@ namespace Belle2 {
   {
     // set module description (e.g. insert text)
     setDescription("Reconstructs particle beta using extended maximum likelihood");
-    setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
 
     // Add parameters
     addParam("outputFileName", m_outputFileName, "Output file name",

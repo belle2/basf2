@@ -55,7 +55,6 @@ namespace Belle2 {
   {
     // set module description (e.g. insert text)
     setDescription("Performs alignment of the beam using maximum likelihood scan");
-    setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
 
     // Add parameters
     addParam("outputFileName", m_outputFileName, "Output file name",

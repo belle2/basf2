@@ -50,7 +50,7 @@ namespace Belle2 {
   {
     // set module description
     setDescription("Cosmic ray gun for TOP cosmics tests");
-    setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
+    setPropertyFlags(c_ParallelProcessingCertified);
 
     // Add parameters
     vector<double> defaultPad;

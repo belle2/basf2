@@ -48,7 +48,7 @@ namespace Belle2 {
   {
     // set module description (e.g. insert text)
     setDescription("Emulation of test beam trigger: returns true if trigger fires");
-    setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
+    setPropertyFlags(c_ParallelProcessingCertified);
 
     // Add parameters
     std::vector<int> defaultListInt;

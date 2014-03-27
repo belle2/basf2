@@ -50,7 +50,6 @@ namespace Belle2 {
   {
     // set module description
     setDescription("Raw data reader for TOP beam tests");
-    setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
 
     // Add parameters
     addParam("inputFileName", m_inputFileName, "Input file name (raw data format)",

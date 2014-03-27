@@ -50,7 +50,6 @@ namespace Belle2 {
   {
     // set module description (e.g. insert text)
     setDescription("Input of LEPS 2013 test beam data from a specific root ntuple (top tree)");
-    setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
 
     // Add parameters
     addParam("inputFileName", m_inputFileName, "Input file name",

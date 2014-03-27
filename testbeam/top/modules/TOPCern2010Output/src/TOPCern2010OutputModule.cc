@@ -47,7 +47,6 @@ namespace Belle2 {
   {
     // set module description
     setDescription("Output of CERN2010 test beam simulation to root ntuple (v20110331)");
-    setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
 
     // Add parameters
     addParam("outputFileName", m_outputFileName, "Output file name",

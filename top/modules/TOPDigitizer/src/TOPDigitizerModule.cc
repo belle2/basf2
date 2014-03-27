@@ -51,7 +51,7 @@ namespace Belle2 {
     {
       // Set description()
       setDescription("Digitize TOPSimHits");
-      setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
+      setPropertyFlags(c_ParallelProcessingCertified);
 
       // Add parameters
       addParam("inputSimHits", m_inputSimHits, "Input collection name (TOPSimHits)",

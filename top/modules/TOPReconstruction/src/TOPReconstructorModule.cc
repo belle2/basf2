@@ -71,7 +71,7 @@ namespace Belle2 {
       setDescription("Reconstruction for TOP counter. Uses reconstructed tracks extrapolated to TOP and TOPDigits to calculate log likelihoods for e, mu, pi, K, p.");
 
       // Set property flags
-      setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
+      setPropertyFlags(c_ParallelProcessingCertified);
 
       // Add parameters
       addParam("inputTracks", m_inputTracks, "Mdst tracks", string(""));

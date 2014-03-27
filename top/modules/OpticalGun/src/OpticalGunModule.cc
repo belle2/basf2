@@ -51,7 +51,7 @@ namespace Belle2 {
   {
     // set module description
     setDescription("Source of optical photons");
-    setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
+    setPropertyFlags(c_ParallelProcessingCertified);
 
     // Add parameters
     addParam("x", m_x, "position in x [cm]", 0.0);

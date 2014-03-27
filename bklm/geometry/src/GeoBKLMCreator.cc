@@ -748,7 +748,6 @@ namespace Belle2 {
       // Place two gas volumes inside electrodes
       sprintf(name, "BKLM.Layer%02d%sGasSolid", layer, (hasChimney ? "Chimney" : ""));
       const Hep3Vector gasHalfSize = m_GeoPar->getGasHalfSize(layer, hasChimney) * cm;
-      double dxGas = (m_GeoPar->getModuleGlassHeight() + 0.5 * m_GeoPar->getModuleGasHeight()) * cm;
       G4Box* gasBox =
         new G4Box(name,
                   gasHalfSize.x(), gasHalfSize.y(), gasHalfSize.z()
@@ -762,7 +761,7 @@ namespace Belle2 {
                             0 // no user limits
                            );
       gasLogical->SetVisAttributes(G4VisAttributes(true, G4Colour(1.0, 0.5, 0.0)));
-      new G4PVPlacement(G4TranslateX3D(-dxGas),
+      new G4PVPlacement(G4TranslateX3D(-0.5 * electrodeHalfSize.x()),
                         gasLogical,
                         physicalName(gasLogical),
                         electrodeLogical,
@@ -771,7 +770,7 @@ namespace Belle2 {
                         m_GeoPar->doOverlapCheck()
                        );
 
-      new G4PVPlacement(G4TranslateX3D(dxGas),
+      new G4PVPlacement(G4TranslateX3D(+0.5 * electrodeHalfSize.x()),
                         gasLogical,
                         physicalName(gasLogical),
                         electrodeLogical,

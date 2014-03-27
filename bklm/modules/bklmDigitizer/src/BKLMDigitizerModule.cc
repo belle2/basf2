@@ -36,7 +36,7 @@ BKLMDigitizerModule::BKLMDigitizerModule() : Module()
 {
 
   setDescription("Creates BKLMDigits from BKLMSimHits");
-  setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
+  setPropertyFlags(c_ParallelProcessingCertified);
   addParam("DiscriminatorThreshold", m_discriminatorThreshold,
            "Strip hits with NPE lower this value will be marked as bad",
            double(7.0));

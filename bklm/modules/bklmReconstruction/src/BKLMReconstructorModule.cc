@@ -40,7 +40,7 @@ REG_MODULE(BKLMReconstructor)
 BKLMReconstructorModule::BKLMReconstructorModule() : Module()
 {
   setDescription("BKLM reconstruction module of 1D and 2D hits");
-  setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
+  setPropertyFlags(c_ParallelProcessingCertified);
   addParam("Coincidence window (ns)", m_dtMax,
            "Strip hits whose time difference exceeds this value are independent",
            double(75.0));

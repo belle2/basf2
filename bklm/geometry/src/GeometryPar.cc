@@ -348,8 +348,14 @@ namespace Belle2 {
 
     double GeometryPar::getActiveMiddleRadius(int layer) const
     {
+      // place the active radius at the midplane of the innermost sensitive volume
+      // (same as inner-plane positioning in GeoBKLMCreator.cc)
       double r = getModuleMiddleRadius(layer);
-      if (hasRPCs(layer)) r += getPolystyreneOffsetX();
+      if (hasRPCs(layer)) {
+        r -= (getModuleGlassHeight() + 0.5 * getModuleGasHeight());
+      } else {
+        r -= (0.5 * m_ScintHeight - getPolystyreneOffsetX());
+      }
       return r;
     }
 

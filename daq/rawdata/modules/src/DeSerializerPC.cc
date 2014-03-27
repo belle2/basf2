@@ -396,6 +396,7 @@ void DeSerializerPCModule::reduceData(RawDataBlock* raw_datablk,
         PreRawCOPPER temp_prerawcpr;
         ReducedRawCOPPER temp_redrawcpr;
         int temp_malloc_flag = 0, temp_num_eve = 1, temp_num_nodes = 1;
+
         temp_prerawcpr.SetBuffer(raw_datablk->GetBuffer(entry_id),
                                  raw_datablk->GetBlockNwords(entry_id),
                                  temp_malloc_flag, temp_num_eve,
@@ -411,10 +412,11 @@ void DeSerializerPCModule::reduceData(RawDataBlock* raw_datablk,
   int* buf_to = getBuffer(reduced_nwords, malloc_flag_to);
 
 
+
   //
   // Reduce the buffer length
   //
-  int pos_nwords_from = 0, pos_nwords_to = 0;
+  int pos_nwords_to = 0;
   for (int k = 0; k < raw_datablk->GetNumEvents(); k++) {
     int num_nodes_in_sendblock = raw_datablk->GetNumNodes();
     for (int l = 0; l < num_nodes_in_sendblock; l++) {
@@ -426,21 +428,25 @@ void DeSerializerPCModule::reduceData(RawDataBlock* raw_datablk,
 
       } else {
         PreRawCOPPER temp_prerawcpr;
-        temp_prerawcpr.SetBuffer(raw_datablk->GetWholeBuffer(),
-                                 raw_datablk->TotalBufNwords(), 0, 1, 1);
+        temp_prerawcpr.SetBuffer(raw_datablk->GetBuffer(entry_id),
+                                 raw_datablk->GetBlockNwords(entry_id), 0, 1, 1);
         pos_nwords_to += temp_prerawcpr.CopyReducedBuffer(0, buf_to + pos_nwords_to);
+
       }
     }
   }
-  if (malloc_flag_from == 1) { delete buf_from;}
 
+  raw_datablk->SetBuffer(buf_to, pos_nwords_to, 0,
+                         raw_datablk->GetNumEvents(), raw_datablk->GetNumNodes());
+
+  if (malloc_flag_from == 1) { delete buf_from;}
 
   return ;
 
 }
 #endif // REDUCED_RAWCOPPER
 
-int* DeSerializerPCModule::checkData(RawDataBlock* raw_datablk, unsigned int* eve_copper_0)
+void DeSerializerPCModule::checkData(RawDataBlock* raw_datablk, unsigned int* eve_copper_0)
 {
 
   int data_size_copper_0 = -1;
@@ -611,7 +617,7 @@ int* DeSerializerPCModule::checkData(RawDataBlock* raw_datablk, unsigned int* ev
     m_prev_copper_ctr = cur_copper_ctr;
     m_prev_runsubrun_no = m_runsubrun_no;
   }
-  return temp_buf;
+  return;
 }
 
 
@@ -662,8 +668,9 @@ void DeSerializerPCModule::event()
     int malloc_flag_from = 0, malloc_flag_to = 0;
     RawDataBlock temp_rawdatablk;
     setRecvdBuffer(&temp_rawdatablk, &malloc_flag_from);
-    int* store_buf = checkData(&temp_rawdatablk, &eve_copper_0);
-#ifdef REDUCED_COPPER
+    checkData(&temp_rawdatablk, &eve_copper_0);
+
+#ifdef REDUCED_RAWCOPPER
     reduceData(&temp_rawdatablk, malloc_flag_from, &malloc_flag_to);
 #else
     malloc_flag_to = malloc_flag_from;
@@ -684,6 +691,9 @@ void DeSerializerPCModule::event()
   m_eventMetaDataPtr->setExperiment(1);
   m_eventMetaDataPtr->setRun(1);
   m_eventMetaDataPtr->setEvent(n_basf2evt);
+
+
+
 
   //
   // Shsared memory

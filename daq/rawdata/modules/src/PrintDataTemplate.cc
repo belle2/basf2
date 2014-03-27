@@ -114,7 +114,7 @@ void PrintDataTemplateModule::printFTSWEvent(RawDataBlock* raw_datablock, int i)
   return;
 }
 
-#ifndef REDUCED_COPPER
+#ifndef REDUCED_RAWCOPPER
 #else
 void PrintDataTemplateModule::printReducedCOPPEREvent(ReducedRawCOPPER* reduced_raw_copper, int i)
 {
@@ -125,7 +125,8 @@ void PrintDataTemplateModule::printReducedCOPPEREvent(ReducedRawCOPPER* reduced_
          reduced_raw_copper->GetBlockNwords(i) * sizeof(int));
 
   //#ifdef DEBUG
-  printf("******* Reduced RawCOPPER data block(including Detector Buffer)**********\n");
+  printf("******* Reduced RawCOPPER data block(including Detector Buffer)**********: %d words\n",
+         reduced_raw_copper->GetBlockNwords(i));
   printBuffer(reduced_raw_copper->GetBuffer(i), reduced_raw_copper->GetBlockNwords(i));
 
 //   if (!(reduced_raw_copper->CheckCOPPERMagic( i ))) {
@@ -146,7 +147,7 @@ void PrintDataTemplateModule::printReducedCOPPEREvent(ReducedRawCOPPER* reduced_
   // Print data from each FINESSE
   //
   if (reduced_raw_copper->Get1stDetectorNwords(i) > 0) {
-    printf("== Detector Buffer(FINESSE A)\n");
+    printf("== Detector Buffer(FINESSE A): nwords %d\n", reduced_raw_copper->Get1stDetectorNwords(i));
     printBuffer(reduced_raw_copper->Get1stDetectorBuffer(i), reduced_raw_copper->Get1stDetectorNwords(i));
   }
 
@@ -260,7 +261,7 @@ void PrintDataTemplateModule::event()
       } else if (raw_datablkarray[ i ]->CheckTLUID(j)) {
         // No operation
       } else {
-#ifndef REDUCED_COPPER
+#ifndef REDUCED_RAWCOPPER
         // COPPER data block
         printf("\n===== DataBlock( RawDataBlock(COPPER) ) : Block # %d ", i);
         RawCOPPER temp_raw_copper;

@@ -218,7 +218,7 @@ namespace Belle2 {
   {
     //    if (m_buffer == NULL || m_buffer[ POS_TERM_HEADER ] != MAGIC_WORD_TERM_HEADER) {
     if (m_buffer == NULL) {
-      printf("[DEBUG] m_buffer is NULL(%p) or magic word is invalid. Data is corrupted or header info has not yet filled. Exiting...", m_buffer);
+      printf("[DEBUG] m_buffer is NULL(%p). Data is corrupted or header info has not yet filled. Exiting...: %s %s %d", m_buffer, __FILE__, __PRETTY_FUNCTION__, __LINE__);
       /*       printf("[DEBUG] m_buffer is NULL(%p) or magic word is invalid(0x%x). Data is corrupted or header info has not yet filled. Exiting...", */
       /*              m_buffer, */
       /*              m_buffer[ POS_TERM_HEADER ] */
@@ -346,8 +346,9 @@ namespace Belle2 {
 
   inline int ReducedRawHeader::GetHdrNwords()
   {
-    CheckGetBuffer();
-    return m_buffer[ POS_HDR_NWORDS ];
+    /*     CheckGetBuffer(); */
+    /*     return m_buffer[ POS_HDR_NWORDS ]; */
+    return RAWHEADER_NWORDS;
   }
 
   inline int ReducedRawHeader::GetExpNo()

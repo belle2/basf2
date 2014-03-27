@@ -21,9 +21,9 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 
+#include <daq/rawdata/modules/DeSerializer.h>
 #include <daq/dataflow/EvtSocket.h>
 
-#define REDUCED_RAWCOPPER
 #ifndef REDUCED_RAWCOPPER
 #include <rawdata/dataobjects/RawCOPPER.h>
 #include <rawdata/dataobjects/RawCDC.h>
@@ -39,10 +39,8 @@
 
 #include <rawdata/dataobjects/RawFTSW.h>
 #include <rawdata/dataobjects/RawTLU.h>
-
 //#include <rawdata/RawROPC.h>
 #include <framework/dataobjects/EventMetaData.h>
-#include <daq/rawdata/modules/DeSerializer.h>
 
 #include <sys/socket.h>
 #include <sys/types.h>
@@ -86,9 +84,9 @@ namespace Belle2 {
     virtual void setRecvdBuffer(RawDataBlock* raw_datablk, int* malloc_flag);
 
     //! check data contents
-    virtual int* checkData(RawDataBlock* raw_datablk, unsigned int* eve_copper_0);
+    virtual void checkData(RawDataBlock* raw_datablk, unsigned int* eve_copper_0);
 
-#ifdef REDUCED_COPPER
+#ifdef REDUCED_RAWCOPPER
     //! check data contents
     virtual void reduceData(RawDataBlock* raw_datablk, const int malloc_flag_from,
                             int* malloc_flag_to);

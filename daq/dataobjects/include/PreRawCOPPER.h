@@ -15,6 +15,7 @@
 #include <sys/time.h>
 
 #include <rawdata/dataobjects/RawDataBlock.h>
+#include <daq/dataobjects/ReducedRawCOPPER.h>
 #include <daq/dataobjects/ReducedRawHeader.h>
 #include <daq/dataobjects/ReducedRawTrailer.h>
 #include <framework/datastore/DataStore.h>
@@ -363,8 +364,8 @@ namespace Belle2 {
 
   protected :
     //! copy data
-    void copyData(int* pos_nwords_to, const int copy_nwords, const int* buf_from,
-                  int* buf_to, const int nwords_buf_to);
+    void copyData(int* buf_to, int* pos_nwords_to, const int* buf_from,
+                  const int copy_nwords, const int nwords_buf_to);
 
 
     ClassDef(PreRawCOPPER, 2);

@@ -55,10 +55,10 @@ namespace Belle2 {
     ReducedRawCOPPER();
 
     //! Default constructor
-    ReducedRawCOPPER(PreRawCOPPER* raw_cpr);
+    //    ReducedRawCOPPER( PreRawCOPPER* raw_cpr);
 
     //! For data reduction
-    int calcReducedNwords(PreRawCOPPER* raw_cpr);
+    //    int calcReducedNwords(PreRawCOPPER* raw_cpr);
 
     //! For data reduction
     void copyData(int* cur_pos_to, const int copy_nwords, const int* buf_from,
@@ -304,7 +304,8 @@ namespace Belle2 {
 
     // Data Format : "B2Link FEE Header"
     enum {
-      SIZE_B2LFEE_HEADER = 0
+      POS_B2L_CTIME = 0,
+      SIZE_B2LFEE_HEADER = 1
     };
 
     // Data Format : B2Link FEE Trailer
@@ -313,18 +314,12 @@ namespace Belle2 {
     };
 
 
-    // New format
-    enum {
-      POS_FINESSE_BUF_NWORDS = 0,
-      POS_B2L_CTIME = 1,
-      SIZE_REDUCED_B2LFEE_HEADER = 2
-    };
+    ReducedRawHeader tmp_header;  //! Not record
 
+    ReducedRawTrailer tmp_trailer; //! Not record
 
   protected :
 
-    ReducedRawHeader tmp_header;  //! Not record
-    ReducedRawTrailer tmp_trailer; //! Not record
     ClassDef(ReducedRawCOPPER, 2);
     //ver.2 Change FEE format as presented at B2GM in Nov.2013 ( Nov.20, 2013)
   };

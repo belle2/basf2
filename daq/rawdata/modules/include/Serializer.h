@@ -30,7 +30,7 @@
 #include <daq/dataobjects/SendTrailer.h>
 #include <rawdata/dataobjects/RawDataBlock.h>
 
-#ifndef REDUCED_COPPER
+#ifndef REDUCED_RAWCOPPER
 #include <rawdata/dataobjects/RawHeader.h>
 #else
 #include <daq/dataobjects/ReducedRawHeader.h>

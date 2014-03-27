@@ -158,7 +158,7 @@ int ReducedRawCOPPER::GetDetectorNwords(int n, int finesse_num)
 {
   int nwords = 0;
   if (GetFINESSENwords(n, finesse_num) > 0) {
-    nwords = GetFINESSENwords(n, finesse_num) - SIZE_REDUCED_B2LFEE_HEADER;
+    nwords = GetFINESSENwords(n, finesse_num) - SIZE_B2LFEE_HEADER;
   }
   return nwords;
 }

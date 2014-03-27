@@ -29,7 +29,7 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <daq/rawdata/modules/DeSerializer.h>
 
-#define REDUCED_RAWCOPPER
+
 #ifndef REDUCED_RAWCOPPER
 #include <rawdata/dataobjects/RawCOPPER.h>
 #else

@@ -191,7 +191,7 @@ void SerializerModule::fillSendHeaderTrailer(SendHeader* hdr, SendTrailer* trl,
 
     //copy event # from a tonp COPPER block
     if (!(rawdblk->CheckFTSWID(i)) && !(rawdblk->CheckTLUID(i))) {
-#ifndef REDUCED_COPPER
+#ifndef REDUCED_RAWCOPPER
       RawHeader rawhdr;
 #else
       ReducedRawHeader rawhdr;

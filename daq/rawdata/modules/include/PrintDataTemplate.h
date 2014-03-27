@@ -24,7 +24,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/dataobjects/EventMetaData.h>
 
-#include <daq/rawdata/modules/DAQConsts.h>
+
 
 
 #include <rawdata/dataobjects/RawDataBlock.h>
@@ -38,7 +38,8 @@
 #include <rawdata/dataobjects/RawKLM.h>
 #include <rawdata/dataobjects/RawPXD.h>
 
-#ifndef REDUCED_COPPER
+#include <daq/rawdata/modules/DAQConsts.h>
+#ifndef REDUCED_RAWCOPPER
 #else
 #include <daq/dataobjects/ReducedRawCOPPER.h>
 #endif
@@ -81,7 +82,7 @@ namespace Belle2 {
     virtual void printBuffer(int* buf, int nwords);
     virtual void printPXDEvent(RawPXD* raw_pxd);
 
-#ifndef REDUCED_COPPER
+#ifndef REDUCED_RAWCOPPER
 #else
     void printReducedCOPPEREvent(ReducedRawCOPPER* reduced_raw_copper, int i);
 #endif

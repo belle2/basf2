@@ -828,11 +828,8 @@ unsigned int PreRawCOPPER::FillTopBlockRawHeader(unsigned int m_node_id, unsigne
 
     }
   }
-
   return cur_ftsw_eve32;
-
 }
-
 
 
 int PreRawCOPPER::CalcReducedNwords(int n)
@@ -840,15 +837,18 @@ int PreRawCOPPER::CalcReducedNwords(int n)
   int nwords_to = 0;
 
   //RawCOPPER header
-  nwords_to += tmp_header.GetNwords();
+  nwords_to += tmp_header.GetHdrNwords();
   for (int j = 0; j < 4; j++) {
-    //FINESSE buffer
-    nwords_to +=
-      GetFINESSENwords(n, j)
-      - SIZE_B2LHSLB_HEADER
-      - POS_B2L_CTIME
-      - SIZE_B2LFEE_TRAILER
-      - SIZE_B2LHSLB_TRAILER;
+    int finesse_nwords = GetFINESSENwords(n, j);
+    if (finesse_nwords > 0) {
+      //FINESSE buffer
+      nwords_to +=
+        finesse_nwords
+        - SIZE_B2LHSLB_HEADER
+        - POS_B2L_CTIME
+        - SIZE_B2LFEE_TRAILER
+        - SIZE_B2LHSLB_TRAILER;
+    }
   }
 
   //RawCOPPER Trailer
@@ -867,7 +867,7 @@ int PreRawCOPPER::CalcReducedNwords(int n)
 //   //
 //   // ReducedRawHeader part
 //   //
-//   copy_nwords = temp_header.GetHdrNwords();
+//   copy_nwords = tmp_header.GetHdrNwords();
 //   memcpy( buf_to + pos_nwords_to, buf_from + pos_nwords_to,
 //    copy_nwords * sizeof(int) );
 //   pos_nwords_to += copy_nwords;
@@ -880,7 +880,7 @@ int PreRawCOPPER::CalcReducedNwords(int n)
 //   //   memcpy( buf_to + pos_nwords_to, buf_from + pos_nwords_to,
 //   //     copy_nwords * sizeof(int) );
 //   //  pos_nwords_to += copy_nwords;
-//   pos_nwords_from += temp_header.SIZE_COPPER_HEADER;
+//   pos_nwords_from += tmp_header.SIZE_COPPER_HEADER;
 
 //   //
 //   // FINESSE part
@@ -889,7 +889,7 @@ int PreRawCOPPER::CalcReducedNwords(int n)
 //   int pos_nwords_finesse[ 4 ];
 //   for( int i = 0; i < 4; i++){
 //     pos_nwords_finesse[ i ] = pos_nwords_to;
-//     if( GetFINESSENwords( n, i ) != 0 )continue;
+//     if( GetFINESSENwords( n, i ) <= 0 )continue;
 //     int cur_header_nwrds = SIZE_B2LHSLB_HEADER + POS_B2L_CTIME;
 //     int cur_trailer_nwords = SIZE_B2LFEE_TRAILER;
 //     int reduced_nwords = cur_header_nwrds + cur_trailer_nwords;
@@ -908,12 +908,12 @@ int PreRawCOPPER::CalcReducedNwords(int n)
 //   //   memcpy( buf_to + pos_nwords_to, buf_from + pos_nwords_to,
 //   //     copy_nwords * sizeof(int) );
 //   //pos_nwords_to += copy_nwords;
-//   pos_nwords_from += temp_header.SIZE_COPPER_TRAILER;
+//   pos_nwords_from += tmp_header.SIZE_COPPER_TRAILER;
 
 //   //
 //   // ReducedRawTrailer part
 //   //
-//   copy_nwords = temp_header.GetTrlNwords();
+//   copy_nwords = tmp_header.GetTrlNwords();
 //   memcpy( buf_to + pos_nwords_to, buf_from + pos_nwords_to,
 //    copy_nwords * sizeof(int) );
 //   pos_nwords_to += copy_nwords;
@@ -924,11 +924,11 @@ int PreRawCOPPER::CalcReducedNwords(int n)
 //   // Apply changes followed by data size reduction
 //   //
 //   ReducedRawCOPPER reduced_rawcpr;
-//   *(buf_to + reduced_rawcpr.temp_header.POS_NWORDS) = pos_nwords_to;  //nwords info.
-//   *(buf_to + reduced_rawcpr.temp_header.POS_OFFSET_1ST_FINESSE ) = pos_nwords_finesse[ 0 ];
-//   *(buf_to + reduced_rawcpr.temp_header.POS_OFFSET_2ND_FINESSE ) = pos_nwords_finesse[ 1 ];
-//   *(buf_to + reduced_rawcpr.temp_header.POS_OFFSET_3RD_FINESSE ) = pos_nwords_finesse[ 2 ];
-//   *(buf_to + reduced_rawcpr.temp_header.POS_OFFSET_4TH_FINESSE ) = pos_nwords_finesse[ 3 ];
+//   *(buf_to + reduced_rawcpr.tmp_header.POS_NWORDS) = pos_nwords_to;  //nwords info.
+//   *(buf_to + reduced_rawcpr.tmp_header.POS_OFFSET_1ST_FINESSE ) = pos_nwords_finesse[ 0 ];
+//   *(buf_to + reduced_rawcpr.tmp_header.POS_OFFSET_2ND_FINESSE ) = pos_nwords_finesse[ 1 ];
+//   *(buf_to + reduced_rawcpr.tmp_header.POS_OFFSET_3RD_FINESSE ) = pos_nwords_finesse[ 2 ];
+//   *(buf_to + reduced_rawcpr.tmp_header.POS_OFFSET_4TH_FINESSE ) = pos_nwords_finesse[ 3 ];
 
 //   return;
 // }
@@ -945,25 +945,30 @@ int PreRawCOPPER::CopyReducedBuffer(int n, int* buf_to)
   //Header copy
   copy_nwords = tmp_header.GetHdrNwords();
   buf_from = GetBuffer(n);
-  copyData(&pos_nwords_to, copy_nwords, buf_from, buf_to, nwords_buf_to);
+  copyData(buf_to, &pos_nwords_to, buf_from, copy_nwords, nwords_buf_to);
 
   // copy FINESSE buffer
   int pos_nwords_finesse[ 4 ];
   for (int j = 0; j < 4; j++) {
     pos_nwords_finesse[ j ] = pos_nwords_to;
-    if (GetFINESSENwords(n, j) != 0)continue;
-    // copy body
-    buf_from =
-      GetFINESSEBuffer(n, j)
-      + SIZE_B2LHSLB_HEADER
-      + POS_B2L_CTIME;
-    copy_nwords =
-      GetFINESSENwords(n, j)
-      - SIZE_B2LHSLB_HEADER
-      - POS_B2L_CTIME
-      - SIZE_B2LFEE_TRAILER
-      - SIZE_B2LHSLB_TRAILER;
-    copyData(&pos_nwords_to, copy_nwords, buf_from, buf_to, nwords_buf_to);
+    if (GetFINESSENwords(n, j) > 0) {
+      // copy body
+      buf_from =
+        GetFINESSEBuffer(n, j)
+        + SIZE_B2LHSLB_HEADER
+        + POS_B2L_CTIME;
+      copy_nwords =
+        GetFINESSENwords(n, j)
+        - SIZE_B2LHSLB_HEADER
+        - POS_B2L_CTIME
+        - SIZE_B2LFEE_TRAILER
+        - SIZE_B2LHSLB_TRAILER;
+
+      //      printf("pos %d nwords %d  nwords to %d\n", pos_nwords_to, copy_nwords, nwords_buf_to );
+      copyData(buf_to, &pos_nwords_to, buf_from, copy_nwords, nwords_buf_to);
+
+
+    }
   }
 
   // copy RawCOPPER trailer
@@ -972,13 +977,48 @@ int PreRawCOPPER::CopyReducedBuffer(int n, int* buf_to)
     + GetBlockNwords(n)
     - tmp_trailer.GetTrlNwords();
   copy_nwords = tmp_trailer.GetTrlNwords();
-  copyData(&pos_nwords_to, copy_nwords, buf_from, buf_to, nwords_buf_to);
+  copyData(buf_to, &pos_nwords_to, buf_from, copy_nwords, nwords_buf_to);
 
   // length check
   if (pos_nwords_to != nwords_buf_to) {
-    perror("Buffer overflow. Exiting...");
+    printf("Buffer overflow. Exiting... %d %d\n", pos_nwords_to, nwords_buf_to);
+    fflush(stdout);
     exit(1);
   }
+
+  //
+  // Apply changes followed by data size reduction
+  //
+  ReducedRawCOPPER reduced_rawcpr;
+  *(buf_to + reduced_rawcpr.tmp_header.POS_NWORDS) = nwords_buf_to;
+  *(buf_to + reduced_rawcpr.tmp_header.POS_OFFSET_1ST_FINESSE) = pos_nwords_finesse[ 0 ];
+  *(buf_to + reduced_rawcpr.tmp_header.POS_OFFSET_2ND_FINESSE) = pos_nwords_finesse[ 1 ];
+  *(buf_to + reduced_rawcpr.tmp_header.POS_OFFSET_3RD_FINESSE) = pos_nwords_finesse[ 2 ];
+  *(buf_to + reduced_rawcpr.tmp_header.POS_OFFSET_4TH_FINESSE) = pos_nwords_finesse[ 3 ];
+
+
+
+//       printf("fROM =======================================\n");
+//       for (int k = 0; k < nwords_buf_to; k++) {
+//  printf(" %.8x", GetBuffer(n)[ k ]);
+//  if ( ( k + 1 ) % 10 == 0) {
+//    printf("\n");
+//  }
+//       }
+//       printf("\n");
+
+
+//       printf("tO   =======================================\n");
+//       for (int k = 0; k < nwords_buf_to; k++) {
+//  printf(" %.8x", buf_to[ k ]);
+//  if ( ( k + 1 ) % 10 == 0) {
+//    printf("\n");
+//  }
+//       }
+//       printf("\n");
+//       printf("=============================================\n");
+
+
 
   return pos_nwords_to;
 
@@ -986,14 +1026,16 @@ int PreRawCOPPER::CopyReducedBuffer(int n, int* buf_to)
 
 
 
-void PreRawCOPPER::copyData(int* pos_nwords_to, const int copy_nwords, const int* buf_from,
-                            int* buf_to, const int nwords_buf_to)
+void PreRawCOPPER::copyData(int* buf_to, int* pos_nwords_to, const int* buf_from,
+                            const int copy_nwords, const int nwords_buf_to)
 {
+
   if (*pos_nwords_to + copy_nwords > nwords_buf_to) {
     perror("Buffer overflow. Exiting...");
     exit(1);
   }
-  memcpy(buf_to + *pos_nwords_to, buf_from, sizeof(copy_nwords));
+
+  memcpy(buf_to + *pos_nwords_to, buf_from, copy_nwords * sizeof(int));
   *pos_nwords_to += copy_nwords;
   return;
 }

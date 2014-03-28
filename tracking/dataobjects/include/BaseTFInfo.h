@@ -40,7 +40,7 @@ namespace Belle2 {
       m_died_id = -1;
     };
 
-    // Standard constructor
+    /** Standard constructor */
     BaseTFInfo(int par_pass_index): m_died_at("") {
       m_accepted.clear();
       m_rejected.clear();
@@ -61,7 +61,6 @@ namespace Belle2 {
     std::string getDiedAt()  { return m_died_at; }
 
     /** setter - Died At */
-    // add all Strings for diedAt
     void setDiedAt(std::string value) {
 
       if (value.size() > 0) {
@@ -132,7 +131,7 @@ namespace Belle2 {
     std::string m_died_at; /**< Died at */
     int m_died_id; /**< ID of Died at Part */
 
-    std::vector<int> m_accepted;  /** filters accepted it */
+    std::vector<int> m_accepted;  /**< filters accepted it */
     std::vector<int> m_rejected;  /**< filters rejected it */
 
     ClassDef(BaseTFInfo, 1)

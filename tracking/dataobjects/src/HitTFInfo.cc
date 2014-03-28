@@ -64,8 +64,8 @@ int HitTFInfo::changeUseCounterCell(std::vector<int> value)
 
   int cell_change = 0;
   for (uint i = 0; i < value.size() ; i++) {
-    m_use_counter_cell[i] +=  value[i];
-    cell_change += value[i];
+    m_use_counter_cell.at(i) +=  value.at(i);
+    cell_change += value.at(i);
   }
 
   // Sum of delta changes to cells (could be negative)

@@ -26,13 +26,13 @@
 #include "tracking/vxdCaTracking/FilterID.h"
 
 
-
 //C++ std lib
 #include <utility>
 #include <string>
 #include <cmath>
 #include <iostream>
 #include <fstream>
+#include <array>
 
 using namespace std;
 using namespace Belle2;
@@ -178,23 +178,23 @@ void AnalizerCollectorTFInfo::setAllParticleIDs(double boarder)
   if (n_count == 0) {B2DEBUG(100, "VXDTF: Display: hitTFInfo is empty!");}
 
   for (int i = 0; i < hitTFInfo.getEntries(); i++) {
-    int akt_is_real[] = {0, 0};
+    std::array<int, 2 > akt_is_real {{0, 0}};
     std::vector<int> particle_ids;
 
     for (auto & akt_cluster : hitTFInfo[i]->getAssignedCluster()) {
-      akt_is_real[clusterTFInfo[akt_cluster]->getIsReal()]++;
+      akt_is_real.at(clusterTFInfo[akt_cluster]->getIsReal())++;
       particle_ids.push_back(clusterTFInfo[akt_cluster]->getParticleID());
     }
 
     // 0 = false, 1 = true, 2 = part true
     int is_real = 0;
-    if (akt_is_real[0] > 0) {
-      if (akt_is_real[1] == 0) {
+    if (akt_is_real.at(0) > 0) {
+      if (akt_is_real.at(1) == 0) {
         is_real = 0;  // false
       } else {
         is_real = 2;  // part
       }
-    } else if (akt_is_real[1] > 0) {
+    } else if (akt_is_real.at(1) > 0) {
       is_real = 1;    // true
     } else {
       is_real = 2;  // part
@@ -205,10 +205,10 @@ void AnalizerCollectorTFInfo::setAllParticleIDs(double boarder)
     // Particle List with purity
     for (uint z = 0; z < particle_ids.size(); z++) {
       // if not already added to the particle list
-      if (std::count(particle_ids.begin(), particle_ids.begin() + z, particle_ids[z]) == 0) {
-        int anz_particleid = std::count(particle_ids.begin(), particle_ids.end(), particle_ids[z]);
-        hitTFInfo[i]->push_back_UsedParticles(std::make_pair(particle_ids[z], ((double)anz_particleid / particle_ids.size())));
-        B2DEBUG(100, "ParticleID: " << particle_ids[z] << "; purity: " << ((double)anz_particleid / particle_ids.size()));
+      if (std::count(particle_ids.begin(), particle_ids.begin() + z, particle_ids.at(z)) == 0) {
+        int anz_particleid = std::count(particle_ids.begin(), particle_ids.end(), particle_ids.at(z));
+        hitTFInfo[i]->push_back_UsedParticles(std::make_pair(particle_ids.at(z), ((double)anz_particleid / particle_ids.size())));
+        B2DEBUG(100, "ParticleID: " << particle_ids.at(z) << "; purity: " << ((double)anz_particleid / particle_ids.size()));
       }
     }
 
@@ -222,17 +222,17 @@ void AnalizerCollectorTFInfo::setAllParticleIDs(double boarder)
   if (n_count == 0) {B2DEBUG(100, "VXDTF: Display: cellTFInfo is empty!");}
 
   for (int i = 0; i < cellTFInfo.getEntries(); i++) {
-    int akt_is_real[] = {0, 0};
+    std::array<int, 2 > akt_is_real {{0, 0}};
     std::vector<int> particle_ids;
 
     for (auto & akt_hits : cellTFInfo[i]->getAssignedHits()) {
       if (akt_hits != -1) {
 
         for (auto & akt_cluster : hitTFInfo[akt_hits]->getAssignedCluster()) {
-          akt_is_real[clusterTFInfo[akt_cluster]->getIsReal()]++;
+          akt_is_real.at(clusterTFInfo[akt_cluster]->getIsReal())++;
           particle_ids.push_back(clusterTFInfo[akt_cluster]->getParticleID());
 
-//    B2INFO ("* " << clusterTFInfo[akt_cluster]->getParticleID());
+//    B2INFO ("* " << clusterTFInfo.at(akt_cluster)->getParticleID());
         }
 
       }
@@ -240,13 +240,13 @@ void AnalizerCollectorTFInfo::setAllParticleIDs(double boarder)
 
     // 0 = false, 1 = true, 2 = part true
     uint is_real = 0;
-    if (akt_is_real[0] > 0) {
-      if (akt_is_real[1] == 0) {
+    if (akt_is_real.at(0) > 0) {
+      if (akt_is_real.at(1) == 0) {
         is_real = 0;  // false
       } else {
         is_real = 2;  // part
       }
-    } else if (akt_is_real[1] > 0) {
+    } else if (akt_is_real.at(1) > 0) {
       is_real = 1;    // true
     } else {
       is_real = 2;  // part
@@ -256,11 +256,11 @@ void AnalizerCollectorTFInfo::setAllParticleIDs(double boarder)
     // Particle List with purity
     for (uint z = 0; z < particle_ids.size(); z++) {
       // if not already added to the particle list
-//       B2INFO ("ParticleID ? " << particle_ids[z]);
-      if (std::count(particle_ids.begin(), particle_ids.begin() + z, particle_ids[z]) == 0) {
-        int anz_particleid = std::count(particle_ids.begin(), particle_ids.end(), particle_ids[z]);
-        cellTFInfo[i]->push_back_UsedParticles(std::make_pair(particle_ids[z], ((double)anz_particleid / particle_ids.size())));
-        B2DEBUG(100, "ParticleID: " << particle_ids[z] << "; purity: " << ((double)anz_particleid / particle_ids.size()));
+//       B2INFO ("ParticleID ? " << particle_ids.at(z));
+      if (std::count(particle_ids.begin(), particle_ids.begin() + z, particle_ids.at(z)) == 0) {
+        int anz_particleid = std::count(particle_ids.begin(), particle_ids.end(), particle_ids.at(z));
+        cellTFInfo[i]->push_back_UsedParticles(std::make_pair(particle_ids.at(z), ((double)anz_particleid / particle_ids.size())));
+        B2DEBUG(100, "ParticleID: " << particle_ids.at(z) << "; purity: " << ((double)anz_particleid / particle_ids.size()));
       }
     }
 
@@ -274,7 +274,7 @@ void AnalizerCollectorTFInfo::setAllParticleIDs(double boarder)
   if (n_count == 0) {B2DEBUG(100, "VXDTF: Display: tfcandTFInfo is empty!");}
 
   for (int i = 0; i < tfcandTFInfo.getEntries(); i++) {
-    int akt_is_real[] = {0, 0};
+    std::array<int, 2 > akt_is_real {{0, 0}};
     std::vector<int> particle_ids;
 
     for (auto & akt_cells : tfcandTFInfo[i]->getAssignedCell()) {
@@ -285,7 +285,7 @@ void AnalizerCollectorTFInfo::setAllParticleIDs(double boarder)
           if (akt_hits != -1) {
 
             for (auto & akt_cluster : hitTFInfo[akt_hits]->getAssignedCluster()) {
-              akt_is_real[clusterTFInfo[akt_cluster]->getIsReal()]++;
+              akt_is_real.at(clusterTFInfo[akt_cluster]->getIsReal())++;
               particle_ids.push_back(clusterTFInfo[akt_cluster]->getParticleID());
             }
           }
@@ -298,11 +298,11 @@ void AnalizerCollectorTFInfo::setAllParticleIDs(double boarder)
     // Particle List with purity
     for (uint z = 0; z < particle_ids.size(); z++) {
       // if not already added to the particle list
-      if (std::count(particle_ids.begin(), particle_ids.begin() + z, particle_ids[z]) == 0) {
-        int anz_particleid = std::count(particle_ids.begin(), particle_ids.end(), particle_ids[z]);
-        tfcandTFInfo[i]->push_back_UsedParticles(std::make_pair(particle_ids[z], ((double)anz_particleid / particle_ids.size())));
+      if (std::count(particle_ids.begin(), particle_ids.begin() + z, particle_ids.at(z)) == 0) {
+        int anz_particleid = std::count(particle_ids.begin(), particle_ids.end(), particle_ids.at(z));
+        tfcandTFInfo[i]->push_back_UsedParticles(std::make_pair(particle_ids.at(z), ((double)anz_particleid / particle_ids.size())));
 
-        B2DEBUG(100, "ParticleID: " << particle_ids[z] << "; purity: " << ((double)anz_particleid / particle_ids.size()));
+        B2DEBUG(100, "ParticleID: " << particle_ids.at(z) << "; purity: " << ((double)anz_particleid / particle_ids.size()));
       }
     }
 
@@ -311,8 +311,8 @@ void AnalizerCollectorTFInfo::setAllParticleIDs(double boarder)
     // 2 = contaminated TC
     uint real_state = 3;
 
-    if (akt_is_real[0] > 0) {
-      if (akt_is_real[1] == 0) {
+    if (akt_is_real.at(0) > 0) {
+      if (akt_is_real.at(1) == 0) {
         real_state = 0;   // ghost
       }
     } else if (particle_ids.size() == 1) {
@@ -437,13 +437,13 @@ void AnalizerCollectorTFInfo::storeHitInformation(std::string filename, int part
           }
       */
       for (uint u = 0; u < searchfilters.size(); u++) {
-        //B2DEBUG(100,"Filter ?: " << searchfilters[u]);
+        //B2DEBUG(100,"Filter ?: " << searchfilters.at(u));
         myfile << file_separator;
-        //B2DEBUG(100,"searchfilters: " << searchfilters[u]);
+        //B2DEBUG(100,"searchfilters: " << searchfilters.at(u));
 
-        if (std::find(accepted.begin(), accepted.end(), searchfilters[u]) != accepted.end()) {
+        if (std::find(accepted.begin(), accepted.end(), searchfilters.at(u)) != accepted.end()) {
           myfile << 1;      //true = accepted
-        } else if (std::find(rejected.begin(), rejected.end(), searchfilters[u]) != rejected.end()) {
+        } else if (std::find(rejected.begin(), rejected.end(), searchfilters.at(u)) != rejected.end()) {
           myfile << 0;      //false = rejected
         } else {
           //myfile << 2;     //not found
@@ -460,7 +460,7 @@ void AnalizerCollectorTFInfo::storeHitInformation(std::string filename, int part
       for (uint m = 0; m < 2; m++) {
 
         if (m < assignedclusters.size()) {
-          myfile << file_separator << assignedclusters[m];
+          myfile << file_separator << assignedclusters.at(m);
         } else {
           myfile << file_separator;
         }
@@ -562,12 +562,12 @@ void AnalizerCollectorTFInfo::storeCellInformation(std::string filename, int par
               accepted.size() << ", size rejected: " << rejected.size());
 
       for (uint u = 0; u < searchfilters.size(); u++) {
-        //B2DEBUG(100,"Filter ?: " << searchfilters[u]);
+        //B2DEBUG(100,"Filter ?: " << searchfilters.at(u));
         myfile << file_separator;
 
-        if (std::find(accepted.begin(), accepted.end(), searchfilters[u]) != accepted.end()) {
+        if (std::find(accepted.begin(), accepted.end(), searchfilters.at(u)) != accepted.end()) {
           myfile << 1;      //true = accepted
-        } else if (std::find(rejected.begin(), rejected.end(), searchfilters[u]) != rejected.end()) {
+        } else if (std::find(rejected.begin(), rejected.end(), searchfilters.at(u)) != rejected.end()) {
           myfile << 0;      //false = rejected
         } else {
           //myfile << 2;     //not found
@@ -576,8 +576,8 @@ void AnalizerCollectorTFInfo::storeCellInformation(std::string filename, int par
       }
 
       // outer hit  = Index 0, inner hit = Index 1
-      myfile << file_separator << cellTFInfo[i]->getAssignedHits()[0];
-      myfile << file_separator << cellTFInfo[i]->getAssignedHits()[1];
+      myfile << file_separator << cellTFInfo[i]->getAssignedHits().at(0);
+      myfile << file_separator << cellTFInfo[i]->getAssignedHits().at(1);
 
       myfile << endl;
 
@@ -675,12 +675,12 @@ void AnalizerCollectorTFInfo::storeTCInformation(std::string filename, int parti
               accepted.size() << ", size rejected: " << rejected.size());
 
       for (uint u = 0; u < searchfilters.size(); u++) {
-        //B2DEBUG(100,"Filter ?: " << searchfilters[u]);
+        //B2DEBUG(100,"Filter ?: " << searchfilters.at(u));
         myfile << file_separator;
 
-        if (std::find(accepted.begin(), accepted.end(), searchfilters[u]) != accepted.end()) {
+        if (std::find(accepted.begin(), accepted.end(), searchfilters.at(u)) != accepted.end()) {
           myfile << 1;      //true = accepted
-        } else if (std::find(rejected.begin(), rejected.end(), searchfilters[u]) != rejected.end()) {
+        } else if (std::find(rejected.begin(), rejected.end(), searchfilters.at(u)) != rejected.end()) {
           myfile << 0;      //false = rejected
         } else {
           //myfile << 2;     //not found
@@ -696,7 +696,7 @@ void AnalizerCollectorTFInfo::storeTCInformation(std::string filename, int parti
       for (uint m = 0; m < 10; m++) {
 
         if (m < assignedcells.size()) {
-          myfile << file_separator << assignedcells[m];
+          myfile << file_separator << assignedcells.at(m);
         } else {
           myfile << file_separator;
         }
@@ -792,7 +792,7 @@ void AnalizerCollectorTFInfo::storeSectorInformation(std::string filename, bool 
       for (uint m = 0; m < 15; m++) {
 
         if (m < friend_sectors.size()) {
-          myfile << file_separator << friend_sectors[m];
+          myfile << file_separator << friend_sectors.at(m);
         } else {
           myfile << file_separator;
         }

@@ -331,13 +331,13 @@ void CollectorTFInfo::updateClusters(int cluster_id, std::string died_at, int di
 {
   B2DEBUG(100, "CollectorTFInfo: updateClusters, cluster_id: " << cluster_id << ", diet_at: " << died_at << ", accepted-size: " << accepted.size() << ", rejected-size: " << rejected.size() << ", deltaUseCounter: " << deltaUseCounter);
 
-  if (cluster_id >= (int)m_clustersTF.size()) {
+  if (cluster_id >= int(m_clustersTF.size())) {
     B2DEBUG(100, "CollectorTFInfo: updateClusters - Cluster not found !");
     return;
   } else {
 
     //Reference => change cluster
-    ClusterTFInfo& akt_cluster = m_clustersTF[cluster_id];
+    ClusterTFInfo& akt_cluster = m_clustersTF.at(cluster_id);
 
     akt_cluster.changeUseCounter(deltaUseCounter);
 
@@ -403,13 +403,13 @@ void CollectorTFInfo::updateHit(int hit_id, std::string died_at, int died_id, st
 {
   B2DEBUG(100, "CollectorTFInfo: updateHit, hit_id: " << hit_id << ", diet_at: " << died_at << ", accepted-size: " << accepted.size() << ", rejected-size: " << rejected.size() << ", deltaUseCounter_cell - size: " << deltaUseCounter_cell.size());
 
-  if (hit_id >= (int)m_hitTF.size() || hit_id == -1) {
+  if (hit_id >= int(m_hitTF.size()) || hit_id == -1) {
     B2DEBUG(100, "CollectorTFInfo: updateHit - Hit not found !");
     return;
   } else {
 
     //Reference => change hit
-    HitTFInfo& akt_hit = m_hitTF[hit_id];
+    HitTFInfo& akt_hit = m_hitTF.at(hit_id);
 
     int deltaUseCounter = akt_hit.changeUseCounterCell(deltaUseCounter_cell);
 
@@ -498,13 +498,13 @@ int CollectorTFInfo::importCell(int pass_index, std::string died_at, int died_id
 
     // outer hit  = Index 0, inner hit = Index 1
     // Index = Posistion of akt_hit
-    cell_update[&akt_hit - &assigned_Hit_IDs[0]] = 1;
+    cell_update.at(&akt_hit - &assigned_Hit_IDs.at(0)) = 1;
 
     // no ID from TC => -1; deltaUseCounter for cell = 1
     updateHit(akt_hit, died_at, died_id, accepted, rejected, -1, -1, cell_update);
 
     // Index = Posistion of akt_hit
-    cell_update[(&akt_hit - &assigned_Hit_IDs[0])] = 0;
+    cell_update.at((&akt_hit - &assigned_Hit_IDs.at(0))) = 0;
 
   }
 
@@ -522,13 +522,13 @@ void CollectorTFInfo::updateCell(int cellID, std::string died_at, int died_id, s
 {
   B2DEBUG(100, "CollectorTFInfo: updateCell, cellID: " << cellID << ", diet_at: " << died_at << ", accepted-size: " << accepted.size() << ", rejected-size: " << rejected.size() << ", add_TCID: " << add_TCID << ", remove_TCID: " << remove_TCID << ", died_id: " << died_id);
 
-  if (cellID >= (int)m_cellTF.size() || cellID == -1) {
+  if (cellID >= int(m_cellTF.size()) || cellID == -1) {
     B2DEBUG(100, "CollectorTFInfo: updateCell - cell not found !");
     return;
 
   } else {
     // Reference to change Cell
-    CellTFInfo& akt_cell = m_cellTF[cellID];
+    CellTFInfo& akt_cell = m_cellTF.at(cellID);
 
     // set State (if cellstate = -1 => no change in CellState)
     if (cellstate != -1) {
@@ -590,13 +590,13 @@ void CollectorTFInfo::updateCell(int cellID, std::string died_at, int died_id, s
 
       // outer hit  = Index 0, inner hit = Index 1
       // Index = Posistion of akt_hit
-      cell_update[&akt_hit - &akt_cell.getAssignedHits()[0]] = deltaUseCounter;
+      cell_update.at(&akt_hit - &akt_cell.getAssignedHits().at(0)) = deltaUseCounter;
 
       // outer hit  = Index 0, inner hit = Index 1
       updateHit(akt_hit, akt_died_at, died_id, accepted, rejected, add_TCID, remove_TCID, cell_update);
 
       // Index = Posistion of akt_hit
-      cell_update[(&akt_hit - &akt_cell.getAssignedHits()[0])] = 0;
+      cell_update.at(&akt_hit - &akt_cell.getAssignedHits().at(0)) = 0;
 
 
     }
@@ -638,13 +638,13 @@ void CollectorTFInfo::updateTC(int tcid, std::string died_at, int died_id, std::
 {
   B2DEBUG(100, "CollectorTFInfo: updateTC, tcid: " << tcid << ", diet_at: " << died_at << ", accepted-size: " << accepted.size() << ", rejected-size: " << rejected.size());
 
-  if (tcid >= (int)m_tfCandTF.size() || tcid == -1) {
+  if (tcid >= int(m_tfCandTF.size()) || tcid == -1) {
     B2DEBUG(100, "CollectorTFInfo: updateTC - TCCand not found !");
     return;
 
   } else {
     // Reference to change TFCand
-    TrackCandidateTFInfo& akt_tfcand = m_tfCandTF[tcid];
+    TrackCandidateTFInfo& akt_tfcand = m_tfCandTF.at(tcid);
 
     // DiedAt = add to string
     akt_tfcand.setDiedAt(died_at);
@@ -674,8 +674,8 @@ void CollectorTFInfo::updateTCFitInformation(int tcid, bool fit_successful, doub
 {
   B2DEBUG(100, "CollectorTFInfo: updateTCFitInformation, tcid: " << tcid << ", fit_successful: " << fit_successful << ", probability_value: " << probability_value << ", assigned_GTFC: " << assigned_GTFC);
 
-  if (tcid >= int(m_tfCandTF.size())) {
-    B2DEBUG(100, "CollectorTFInfo: updateTCFitInformation - TCCand not found !");
+  if (tcid >= int(m_tfCandTF.size()) || tcid < 0) {
+    B2DEBUG(100, "CollectorTFInfo: updateTCFitInformation - TCCand not found !: " << tcid);
     return;
 
   } else {
@@ -868,7 +868,7 @@ void CollectorTFInfo::silentKill()  // Für alle folgenden Updates
       // Only check active Cells, other Hits should already been deactivated
       if (akt_cell.getActive()) {
         for (auto & akt_hit : akt_cell.getAssignedHits()) {
-          if (akt_hit < (int)m_hitTF.size() && akt_hit >= 0) {
+          if (akt_hit < int(m_hitTF.size()) && akt_hit >= 0) {
             check_hit.at(akt_hit) = false;
           }
         }
@@ -898,7 +898,7 @@ void CollectorTFInfo::silentKill()  // Für alle folgenden Updates
 
     // Set if the Cells are active / or not active
     for (uint i = 0; i < m_cellTF.size(); i++) {
-      check_cell[i] = m_cellTF[i].getActive();
+      check_cell.at(i) = m_cellTF.at(i).getActive();
     }
 
     // Search for Cells not used
@@ -908,7 +908,7 @@ void CollectorTFInfo::silentKill()  // Für alle folgenden Updates
       // Only check active TF, other cells should already been deactivated
       if (akt_tfcand.getActive()) {
         for (auto & akt_cell_id : akt_tfcand.getAssignedCell()) {
-          check_cell[akt_cell_id] = false;
+          check_cell.at(akt_cell_id) = false;
         }
       }
 
@@ -916,7 +916,7 @@ void CollectorTFInfo::silentKill()  // Für alle folgenden Updates
 
     // if there are any cells left => not used (check_cell = true) => deactivate
     for (uint i = 0; i < check_cell.size(); i++) {
-      if (check_cell[i]) {
+      if (check_cell.at(i)) {
         // Cell died at TCC
         updateCell(i, CollectorTFInfo::nameTCC, CollectorTFInfo::idTCC, vector<int>(), {FilterID::silentTcc}, -1, -2, -1, vector<int>());
       }
@@ -941,12 +941,12 @@ bool CollectorTFInfo::isHitOverlapped(int hit_id)
 
   //B2DEBUG(100,"CollectorTFInfo: isHitOverlapped, hit_id: " << hit_id );
 
-  if (hit_id >= (int)m_hitTF.size()) {
+  if (hit_id >= int(m_hitTF.size())) {
     B2DEBUG(100, "CollectorTFInfo: isHitOverlapped - Hit not found !");
     return is_overlapped;
   }
 
-  HitTFInfo& akt_hit = m_hitTF[hit_id];
+  HitTFInfo& akt_hit = m_hitTF.at(hit_id);
 
   // 1. Sector overlapped ?
   // Search Sector
@@ -975,12 +975,12 @@ bool CollectorTFInfo::isHitOverlapped(int hit_id)
   // Check all Clusters of the Hit
   for (auto & cluster_id : akt_hit.getAssignedCluster()) {
 
-    if (cluster_id >= (int)m_clustersTF.size()) {
+    if (cluster_id >= int(m_clustersTF.size())) {
       B2DEBUG(100, "CollectorTFInfo: isHitOverlapped - Cluster not found !");
       return is_overlapped;
     }
 
-    ClusterTFInfo& akt_cluster = m_clustersTF[cluster_id];
+    ClusterTFInfo& akt_cluster = m_clustersTF.at(cluster_id);
 
     is_overlapped = akt_cluster.isOverlapped();
 
@@ -1005,13 +1005,13 @@ bool CollectorTFInfo::isCellOverlapped(int cellID)
 
   bool is_overlapped = false;
 
-  if (cellID >= (int)m_cellTF.size()) {
+  if (cellID >= int(m_cellTF.size())) {
     B2DEBUG(100, "CollectorTFInfo: isCellOverlapped - cell not found !");
     return is_overlapped;
   }
 
   // Reference to change Cell
-  CellTFInfo& akt_cell = m_cellTF[cellID];
+  CellTFInfo& akt_cell = m_cellTF.at(cellID);
 
   for (auto & akt_hit : akt_cell.getAssignedHits()) {
 
@@ -1033,13 +1033,13 @@ bool CollectorTFInfo::isTCOverlapped(int tcid)
 
   bool is_overlapped = false;
 
-  if (tcid >= (int)m_tfCandTF.size()) {
+  if (tcid >= int(m_tfCandTF.size())) {
     B2DEBUG(100, "CollectorTFInfo: isTCOverlapped - TCCand not found !");
     return is_overlapped;
   }
 
   // Reference to change TFCand
-  TrackCandidateTFInfo& akt_tfcand = m_tfCandTF[tcid];
+  TrackCandidateTFInfo& akt_tfcand = m_tfCandTF.at(tcid);
 
   for (auto & akt_cell : akt_tfcand.getAssignedCell()) {
 

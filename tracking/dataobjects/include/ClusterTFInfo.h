@@ -137,7 +137,7 @@ namespace Belle2 {
     int m_real_cluster_id;    /**< Store Arrays ID */
     int n_relative_cluster_id;  /**< Relative Cluster ID in TF used Cluster Array */
 
-    int m_detectorType;  /** Detector Type */
+    int m_detectorType;  /**< Detector Type */
 
     int m_use_counter;  /**< Countes the Hits using this Cluster (alive and connected)  */
     int m_max_counter;  /**< max. m_use_counter */

@@ -115,24 +115,24 @@ namespace Belle2 {
       int max_pos = 0;
 
       for (uint i = 0; i < m_used_particles.size(); i++) {
-        if (m_used_particles[i].second > m_used_particles[max_pos].second) {
+        if (m_used_particles.at(i).second > m_used_particles.at(max_pos).second) {
           max_pos = i;
         }
       }
 
-      return m_used_particles[max_pos];
+      return m_used_particles.at(max_pos);
     }
 
     /** getter - gets Particle with particleID*/
     std::pair<int, double> getInfoParticle(int particleID)  {
 
       for (uint i = 0; i < m_used_particles.size(); i++) {
-        if (m_used_particles[i].first == particleID) {
-          return m_used_particles[i];
+        if (m_used_particles.at(i).first == particleID) {
+          return m_used_particles.at(i);
         }
       }
 
-      return m_used_particles[0];
+      return m_used_particles.at(0);
     }
 
 
@@ -140,7 +140,7 @@ namespace Belle2 {
     bool containsParticle(int particleID)  {
 
       for (uint i = 0; i < m_used_particles.size(); i++) {
-        if (m_used_particles[i].first == particleID) {
+        if (m_used_particles.at(i).first == particleID) {
           return true;
         }
       }
@@ -157,9 +157,9 @@ namespace Belle2 {
       // NOT FINAL !!!
 
       int cell_1 = -1;
-      if (m_assigned_cell_ids.size() > 0) { cell_1 = m_assigned_cell_ids[0]; }
+      if (m_assigned_cell_ids.size() > 0) { cell_1 = m_assigned_cell_ids.at(0); }
       int cell_2 = -1;
-      if (m_assigned_cell_ids.size() > 1) { cell_2 = m_assigned_cell_ids[1]; }
+      if (m_assigned_cell_ids.size() > 1) { cell_2 = m_assigned_cell_ids.at(1); }
 
       return TString::Format("Cell 1: %d, Cell 2: %d\n IsReal: %d\n Died_ID: %d ", cell_1, cell_2, m_is_real, getDiedID());
     }
@@ -176,7 +176,7 @@ namespace Belle2 {
   protected:
     int m_own_id; /**< Track Candidate ID */
 
-    std::vector<int> m_assigned_cell_ids;  /** IDs of the connected Cells */
+    std::vector<int> m_assigned_cell_ids;  /**< IDs of the connected Cells */
 
     bool m_fitSuccessful; /**< is true, when fit was successfull */
     double m_probValue; /**< probability-value calculated by kalman fit (probability that his TC is real track) */

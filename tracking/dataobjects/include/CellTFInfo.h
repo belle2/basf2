@@ -151,24 +151,24 @@ namespace Belle2 {
       int max_pos = 0;
 
       for (uint i = 0; i < m_used_particles.size(); i++) {
-        if (m_used_particles[i].second > m_used_particles[max_pos].second) {
+        if (m_used_particles.at(i).second > m_used_particles.at(max_pos).second) {
           max_pos = i;
         }
       }
 
-      return m_used_particles[max_pos];
+      return m_used_particles.at(max_pos);
     }
 
     /** getter - Particle with particleID*/
     std::pair<int, double> getInfoParticle(int particleID)  {
 
       for (uint i = 0; i < m_used_particles.size(); i++) {
-        if (m_used_particles[i].first == particleID) {
-          return m_used_particles[i];
+        if (m_used_particles.at(i).first == particleID) {
+          return m_used_particles.at(i);
         }
       }
 
-      return m_used_particles[0];
+      return m_used_particles.at(0);
     }
 
 
@@ -176,7 +176,7 @@ namespace Belle2 {
     bool containsParticle(int particleID)  {
 
       for (uint i = 0; i < m_used_particles.size(); i++) {
-        if (m_used_particles[i].first == particleID) {
+        if (m_used_particles.at(i).first == particleID) {
           return true;
         }
       }
@@ -194,9 +194,9 @@ namespace Belle2 {
       // NOT FINAL !!!
 
       int outerHit = -1;
-      if (m_assigned_hits_ids.size() > 0) { outerHit = m_assigned_hits_ids[0]; }
+      if (m_assigned_hits_ids.size() > 0) { outerHit = m_assigned_hits_ids.at(0); }
       int innerHit = -1;
-      if (m_assigned_hits_ids.size() > 1) { innerHit = m_assigned_hits_ids[1]; }
+      if (m_assigned_hits_ids.size() > 1) { innerHit = m_assigned_hits_ids.at(1); }
 
       return TString::Format("OuterHit: %d, InnerHit: %d\n State: %d\n Died_ID: %d ", outerHit, innerHit, m_state, getDiedID());
     }

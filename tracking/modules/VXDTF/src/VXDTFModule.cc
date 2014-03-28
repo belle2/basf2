@@ -298,9 +298,10 @@ VXDTFModule::VXDTFModule() : Module()
   addParam("TESTERexpandedTestingRoutines", m_TESTERexpandedTestingRoutines, "set true if you want to export expanded infos of TCs for further analysis (setting to false means that the DataObject called 'VXDTFInfoBoard' will not be stored)", bool(true));
   addParam("writeToRoot", m_PARAMwriteToRoot, "set true if you want to export the p-values of the fitters in a root file named by parameter 'rootFileName'", bool(false));
   addParam("rootFileName", m_PARAMrootFileName, "fileName used for p-value export. Will be ignored if parameter 'writeToRoot' is false (standard)", rootFileNameVals);
+  addParam("displayCollector", m_PARAMdisplayCollector, "Collector operating flag: 0 = no collector, 1 = collect for display, 2 = collect for analysis", int(0));
 
   // Display Setting (=> To do: change to param)
-  m_display = 1;  // 0 = no display, 1 = display, 2 = analysis
+//   m_display = 1;  // 0 = no display, 1 = display, 2 = analysis
 }
 
 
@@ -362,7 +363,7 @@ void VXDTFModule::initialize()
   }
 
   // registerPersistence (StoreArrays & RelationArray) for the Collector
-  if (m_display > 0) {
+  if (m_PARAMdisplayCollector > 0) {
     B2DEBUG(10, "VXDTF: Display: Module Collector initPersistent");
     m_collector.initPersistent();
   }
@@ -956,7 +957,7 @@ void VXDTFModule::beginRun()
 
 
   //Import all Sectors for all events (Collector)
-  if (m_display > 0) {
+  if (m_PARAMdisplayCollector > 0) {
 
     //KeySectors dosn't function => so pair Int int
     std::map<std::pair<unsigned int, unsigned int>, std::vector<int>> sectors_display_all_pass;
@@ -1027,7 +1028,7 @@ void VXDTFModule::the_real_event()
   /** cleaning will be done at the end of the event **/
 
   // init once per event => Clear store Arrays
-  if (m_display > 0) {
+  if (m_PARAMdisplayCollector > 0) {
     m_collector.intEvent();
   }
 
@@ -1118,7 +1119,7 @@ void VXDTFModule::the_real_event()
 
 
   // 1. (PXD) Import of the Clusters (Collector)
-  if (m_display > 0) {
+  if (m_PARAMdisplayCollector > 0) {
 
     for (uint m = 0; m < m_passSetupVector.size(); m++) {
       for (int i = 0; i < numOfPxdClusters; ++i) {
@@ -1144,7 +1145,7 @@ void VXDTFModule::the_real_event()
   } // the position in the vector is NOT the index it has stored (except if there are no PXDClusters)
 
   // 2. (SVD) Import of the Clusters (Collector)
-  if (m_display > 0) {
+  if (m_PARAMdisplayCollector > 0) {
     for (uint m = 0; m < m_passSetupVector.size(); m++) {
 
       for (int i = 0; i < numOfSvdClusters; ++i) {
@@ -1205,7 +1206,7 @@ void VXDTFModule::the_real_event()
 
         // Collector replaces InfoBoard
         // Import TC and updates the Fit-Information to it (for baseLineVertexHit)
-        if (m_display > 0) {
+        if (m_PARAMdisplayCollector > 0) {
 
           B2DEBUG(10, "Import TC after generateGFTrackCand")
 
@@ -1352,7 +1353,7 @@ void VXDTFModule::the_real_event()
       VXDTFHit* pTFHit = new VXDTFHit(hitInfo, passNumber, NULL, NULL, &clustersOfEvent[iPart], Const::PXD, aSecID, aVxdID, 0.0); // no timeInfo for PXDHits
 
       // importHits 1.
-      if (m_display > 0) {
+      if (m_PARAMdisplayCollector > 0) {
 
         std::vector<int> assigned_IDs;
 
@@ -1501,7 +1502,7 @@ void VXDTFModule::the_real_event()
         VXDTFHit* pTFHit = new VXDTFHit(hitInfo, passNumber, uClusterInfo, vClusterInfo, NULL, Const::SVD, aSecID, aVxdID,  0.5 * (timeStampU + timeStampV));
 
         // importHits 2.
-        if (m_display > 0) {
+        if (m_PARAMdisplayCollector > 0) {
 
           std::vector<int> assigned_IDs;
 
@@ -1546,7 +1547,7 @@ void VXDTFModule::the_real_event()
   for (PassData * currentPass : m_passSetupVector) {
 
     // Set current Pass Number for Collector
-    if (m_display > 0) {
+    if (m_PARAMdisplayCollector > 0) {
       m_aktpassNumber = passNumber;
     }
 
@@ -1649,7 +1650,7 @@ void VXDTFModule::the_real_event()
 
 
     // Set current passNumber for Collector
-    if (m_display > 0) {
+    if (m_PARAMdisplayCollector > 0) {
       m_aktpassNumber = passNumber;
     }
 
@@ -1732,7 +1733,7 @@ void VXDTFModule::the_real_event()
       }
 
       // Collector TC Update for Overlapping
-      if (m_display > 0) {
+      if (m_PARAMdisplayCollector > 0) {
 
         if (overbookedCheck) {
           // int tcid, std::string died_at, int accepted, int rejected
@@ -1972,7 +1973,7 @@ void VXDTFModule::the_real_event()
 
 
     // Collector TC Fit Update (replaces VXDTFInfoBoard)
-    if (m_display > 0) {
+    if (m_PARAMdisplayCollector > 0) {
 
       int indexNumber = finalTrackCandidates.getEntries();
       int tc_id = currentTC->getCollectorID();
@@ -2037,7 +2038,7 @@ void VXDTFModule::the_real_event()
 
   // Silent Kill = Mark not used objects as deleted
   // Safe Information = Information into StoreArrays
-  if (m_display > 0) {
+  if (m_PARAMdisplayCollector > 0) {
 
     m_collector.silentKill();
 
@@ -2353,7 +2354,7 @@ void VXDTFModule::hopfieldVectorized(TCsOfEvent& tcVector, double omega)
         tcVector[i]->setCondition(false);
 
         // Update Collector TC - hopfield
-        if (m_display > 0) {
+        if (m_PARAMdisplayCollector > 0) {
           m_collector.updateTC(tcVector[i]->getCollectorID(), FilterID::nameHopfield, CollectorTFInfo::idHopfield, vector<int>(), {FilterID::hopfield});
         }
       }
@@ -2446,7 +2447,7 @@ void VXDTFModule::hopfieldVectorized(TCsOfEvent& tcVector, double omega)
         tcVector[i]->setCondition(true);
 
         // Update Collector TC - hopfield
-        if (m_display > 0) {
+        if (m_PARAMdisplayCollector > 0) {
           m_collector.updateTC(tcVector[i]->getCollectorID(), "", CollectorTFInfo::idAlive, {FilterID::hopfield}, vector<int>());
         }
 
@@ -2454,7 +2455,7 @@ void VXDTFModule::hopfieldVectorized(TCsOfEvent& tcVector, double omega)
         tcVector[i]->setCondition(false);
 
         // Update Collector TC - hopfield
-        if (m_display > 0) {
+        if (m_PARAMdisplayCollector > 0) {
           m_collector.updateTC(tcVector[i]->getCollectorID(), CollectorTFInfo::nameHopfield, CollectorTFInfo::idHopfield, vector<int>(), {FilterID::hopfield});
         }
 
@@ -2615,7 +2616,7 @@ void VXDTFModule::hopfield(TCsOfEvent& tcVector, double omega)
         tcVector[i]->setCondition(false);
 
         // Update Collector TC - hopfield
-        if (m_display > 0) {
+        if (m_PARAMdisplayCollector > 0) {
           m_collector.updateTC(tcVector[i]->getCollectorID(), CollectorTFInfo::nameHopfield, CollectorTFInfo::idHopfield, vector<int>(), {FilterID::hopfield});
         }
 
@@ -2711,7 +2712,7 @@ void VXDTFModule::hopfield(TCsOfEvent& tcVector, double omega)
         tcVector[i]->setCondition(true);
 
         // Update Collector TC - hopfield
-        if (m_display > 0) {
+        if (m_PARAMdisplayCollector > 0) {
           m_collector.updateTC(tcVector[i]->getCollectorID(), "", CollectorTFInfo::idAlive, {FilterID::hopfield}, vector<int>());
         }
 
@@ -2720,7 +2721,7 @@ void VXDTFModule::hopfield(TCsOfEvent& tcVector, double omega)
         tcVector[i]->setCondition(false);
 
         // Update Collector TC - hopfield
-        if (m_display > 0) {
+        if (m_PARAMdisplayCollector > 0) {
           m_collector.updateTC(tcVector[i]->getCollectorID(), CollectorTFInfo::nameHopfield, CollectorTFInfo::idHopfield, vector<int>(), {FilterID::hopfield});
         }
 
@@ -2909,7 +2910,7 @@ void VXDTFModule::greedyRecursive(std::list< std::pair<double, VXDTFTrackCandida
       rival->setCondition(false);
 
       // Update Collector TC - hopfield
-      if (m_display > 0) {
+      if (m_PARAMdisplayCollector > 0) {
         m_collector.updateTC(rival->getCollectorID(), CollectorTFInfo::nameHopfield, CollectorTFInfo::idHopfield, vector<int>(), {FilterID::greedy});
       }
 
@@ -2917,7 +2918,7 @@ void VXDTFModule::greedyRecursive(std::list< std::pair<double, VXDTFTrackCandida
       tcEntry->second->setCondition(false);
 
       // Update Collector TC - hopfield
-      if (m_display > 0) {
+      if (m_PARAMdisplayCollector > 0) {
         m_collector.updateTC(tcEntry->second->getCollectorID(),  CollectorTFInfo::nameHopfield, CollectorTFInfo::idHopfield, vector<int>(), {FilterID::greedy});
       }
 
@@ -2948,7 +2949,7 @@ void VXDTFModule::tcDuel(TCsOfEvent& tcVector)
     tcVector.at(1)->setCondition(false);
 
     // Update Collector TC - hopfield
-    if (m_display > 0) {
+    if (m_PARAMdisplayCollector > 0) {
       m_collector.updateTC(tcVector.at(1)->getCollectorID(), CollectorTFInfo::nameHopfield, CollectorTFInfo::idHopfield, vector<int>(), {FilterID::tcDuel});
     }
 
@@ -2956,7 +2957,7 @@ void VXDTFModule::tcDuel(TCsOfEvent& tcVector)
     tcVector.at(0)->setCondition(false);
 
     // Update Collector TC - hopfield
-    if (m_display > 0) {
+    if (m_PARAMdisplayCollector > 0) {
       m_collector.updateTC(tcVector.at(0)->getCollectorID(), CollectorTFInfo::nameHopfield, CollectorTFInfo::idHopfield, vector<int>(), {FilterID::tcDuel});
     }
 
@@ -3180,7 +3181,7 @@ int VXDTFModule::segFinder(PassData* currentPass)
           oldFriendID = currentFriendID;
 
           // Collector Cells Import for not saved VXDSegmentCell
-          if (m_display > 0) {
+          if (m_PARAMdisplayCollector > 0) {
             /*int cell_id = */
             importCollectorCell(m_aktpassNumber, "", CollectorTFInfo::idAlive, /*CollectorTFInfo::nameCellFinder, CollectorTFInfo::idCellFinder, */ acceptedRejectedFilters, ownHits[currentHit]->getCollectorID(), allFriendHits[friendHit]->getCollectorID());
 
@@ -3205,7 +3206,7 @@ int VXDTFModule::segFinder(PassData* currentPass)
             oldFriendID = currentFriendID;
 
             // Collector Cells Import for not saved VXDSegmentCell
-            if (m_display > 0) {
+            if (m_PARAMdisplayCollector > 0) {
               /* int cell_id = */
               importCollectorCell(m_aktpassNumber, "", CollectorTFInfo::idAlive, /*CollectorTFInfo::nameCellFinder, CollectorTFInfo::idCellFinder, */ acceptedRejectedFilters, ownHits[currentHit]->getCollectorID(), allFriendHits[friendHit]->getCollectorID());
 
@@ -3239,7 +3240,7 @@ int VXDTFModule::segFinder(PassData* currentPass)
         ++activatedSegmentsCounter;
 
         // Collector Cells Import (Main)
-        if (m_display > 0) {
+        if (m_PARAMdisplayCollector > 0) {
           int cell_id = importCollectorCell(m_aktpassNumber, "", CollectorTFInfo::idAlive, acceptedRejectedFilters, ownHits[currentHit]->getCollectorID(), allFriendHits[friendHit]->getCollectorID());
 
           // Collector Cell <=> Cell
@@ -3634,7 +3635,7 @@ int VXDTFModule::neighbourFinder(PassData* currentPass)
       currentSeg->setActivationState(false);
 
       // Collector Cell died at NBFinder-lost
-      if (m_display > 0) {
+      if (m_PARAMdisplayCollector > 0) {
         B2DEBUG(10, "nbFinderLost !!! " << currentSeg->getCollectorID());
 
         m_collector.updateCell(currentSeg->getCollectorID(), CollectorTFInfo::nameNbFinder, CollectorTFInfo::idNbFinder, vector<int>(), {FilterID::nbFinderLost}, -1, -2, currentSeg->getState(), vector<int>());
@@ -3652,7 +3653,7 @@ int VXDTFModule::neighbourFinder(PassData* currentPass)
       if (currentSeg->isSeed() == true) { activatedSeedsCounter++; }
 
       // Collector Cell ok at NBFinder-lost
-      if (m_display > 0) {
+      if (m_PARAMdisplayCollector > 0) {
 
         m_collector.updateCell(currentSeg->getCollectorID(), "", CollectorTFInfo::idAlive, {FilterID::nbFinderLost}, vector<int>(), -1, -1, currentSeg->getState(), vector<int>());
       }
@@ -3661,7 +3662,7 @@ int VXDTFModule::neighbourFinder(PassData* currentPass)
     }
 
     // Collector Cell update with Filters
-    if (m_display > 0) {
+    if (m_PARAMdisplayCollector > 0) {
       B2DEBUG(10, "VXDTF: Display: Module Collector updateCell");
 
       // Filters vectors for update
@@ -3790,7 +3791,7 @@ int VXDTFModule::cellularAutomaton(PassData* currentPass)
         B2DEBUG(50, "CAstep: accepted cell found!")
 
         // Collector Cell OK CA
-        if (m_display > 0) {
+        if (m_PARAMdisplayCollector > 0) {
           m_collector.updateCell(currentSeg->getCollectorID(), "", CollectorTFInfo::idAlive, {FilterID::cellularAutomaton}, vector<int>(), -1, -1, currentSeg->getState(), vector<int>());
         }
 
@@ -3798,7 +3799,7 @@ int VXDTFModule::cellularAutomaton(PassData* currentPass)
         currentSeg->setActivationState(false); deadCells++;
 
         // Collector Cell died at CA
-        if (m_display > 0) {
+        if (m_PARAMdisplayCollector > 0) {
           m_collector.updateCell(currentSeg->getCollectorID(), "", CollectorTFInfo::idAlive, vector<int>(), {FilterID::cellularAutomaton}, -1, -1, currentSeg->getState(), vector<int>());
         }
 
@@ -3883,7 +3884,7 @@ void VXDTFModule::tcCollector(PassData* currentPass)
       findTCsCounter++;
 
       // Collector TC Import
-      if (m_display > 0) {
+      if (m_PARAMdisplayCollector > 0) {
 
         std::vector<std::pair<int, unsigned int>> all_segments;
 
@@ -3936,7 +3937,7 @@ int VXDTFModule::tcFilter(PassData* currentPass, int passNumber)
         (*currentTC)->setCondition(false);
 
         // Collector TC Update (tcFinderCurr)
-        if (m_display > 0) {
+        if (m_PARAMdisplayCollector > 0) {
           m_collector.updateTC((*currentTC)->getCollectorID(), CollectorTFInfo::nameTCC, CollectorTFInfo::idTCC, vector<int>(), {FilterID::tcFinderCurr});
         }
 
@@ -3949,7 +3950,7 @@ int VXDTFModule::tcFilter(PassData* currentPass, int passNumber)
         B2DEBUG(20, " tc " << tcCtr << " got " << numOfCurrentHits << " hits and therefore won't be checked by TCC");
 
         // Collector TC Update (tcFinderCurr)
-        if (m_display > 0) {
+        if (m_PARAMdisplayCollector > 0) {
           m_collector.updateTC((*currentTC)->getCollectorID(), "", CollectorTFInfo::idAlive, {FilterID::tcFinderCurr}, vector<int>());
         }
 
@@ -3963,7 +3964,7 @@ int VXDTFModule::tcFilter(PassData* currentPass, int passNumber)
       (*currentTC)->setCondition(false);
 
       // Collector TC Update (tcFinderCurr)
-      if (m_display > 0) {
+      if (m_PARAMdisplayCollector > 0) {
         m_collector.updateTC((*currentTC)->getCollectorID(), CollectorTFInfo::nameTCC, CollectorTFInfo::idTCC, vector<int>(), {FilterID::tcFinderCurr});
       }
 
@@ -4001,7 +4002,7 @@ int VXDTFModule::tcFilter(PassData* currentPass, int passNumber)
         (*currentTC)->setCondition(false);
 
         // Collector TC Update (updateTC)
-        if (m_display > 0) {
+        if (m_PARAMdisplayCollector > 0) {
           m_collector.updateTC((*currentTC)->getCollectorID(), CollectorTFInfo::nameTCC, CollectorTFInfo::idTCC, vector<int>(), {FilterID::ziggZaggXY});
         }
 
@@ -4010,7 +4011,7 @@ int VXDTFModule::tcFilter(PassData* currentPass, int passNumber)
       B2DEBUG(20, " TCC filter ziggZaggXY approved TC " << tcCtr);
 
       // Collector TC Update (ziggZaggXY)
-      if (m_display > 0) {
+      if (m_PARAMdisplayCollector > 0) {
         m_collector.updateTC((*currentTC)->getCollectorID(), "", CollectorTFInfo::idAlive,  {FilterID::ziggZaggXY}, vector<int>());
       }
 
@@ -4025,7 +4026,7 @@ int VXDTFModule::tcFilter(PassData* currentPass, int passNumber)
         (*currentTC)->setCondition(false);
 
         // Collector TC Update (circlefit)
-        if (m_display > 0) {
+        if (m_PARAMdisplayCollector > 0) {
           m_collector.updateTC((*currentTC)->getCollectorID(), CollectorTFInfo::nameTCC, CollectorTFInfo::idTCC, vector<int>(), {FilterID::circlefit});
         }
 
@@ -4033,7 +4034,7 @@ int VXDTFModule::tcFilter(PassData* currentPass, int passNumber)
       }
 
       // Collector TC Update (circlefit)
-      if (m_display > 0) {
+      if (m_PARAMdisplayCollector > 0) {
         m_collector.updateTC((*currentTC)->getCollectorID(), "", CollectorTFInfo::idAlive,  {FilterID::circlefit}, vector<int>());
       }
 
@@ -4059,7 +4060,7 @@ int VXDTFModule::tcFilter(PassData* currentPass, int passNumber)
           (*currentTC)->setCondition(false);
 
           // Collector TC Update (deltapT)
-          if (m_display > 0) {
+          if (m_PARAMdisplayCollector > 0) {
             m_collector.updateTC((*currentTC)->getCollectorID(), CollectorTFInfo::nameTCC, CollectorTFInfo::idTCC, vector<int>(), {FilterID::deltapT});
           }
 
@@ -4079,7 +4080,7 @@ int VXDTFModule::tcFilter(PassData* currentPass, int passNumber)
         B2DEBUG(20, " TCC filter deltaPt approved TC " << tcCtr);
 
         // Collector TC Update (deltapT)
-        if (m_display > 0) {
+        if (m_PARAMdisplayCollector > 0) {
           m_collector.updateTC((*currentTC)->getCollectorID(), "", CollectorTFInfo::idAlive, {FilterID::deltapT}, vector<int>());
         }
 
@@ -4093,7 +4094,7 @@ int VXDTFModule::tcFilter(PassData* currentPass, int passNumber)
           (*currentTC)->setCondition(false);
 
           // Collector TC Update (deltaDistance2IP)
-          if (m_display > 0) {
+          if (m_PARAMdisplayCollector > 0) {
             m_collector.updateTC((*currentTC)->getCollectorID(), CollectorTFInfo::nameTCC, CollectorTFInfo::idTCC, vector<int>(), {FilterID::deltaDistance2IP});
           }
 
@@ -4113,7 +4114,7 @@ int VXDTFModule::tcFilter(PassData* currentPass, int passNumber)
         B2DEBUG(20, " TCC filter deltaDistance2IP approved TC " << tcCtr);
 
         // Collector TC Update (deltaDistance2IP)
-        if (m_display > 0) {
+        if (m_PARAMdisplayCollector > 0) {
           m_collector.updateTC((*currentTC)->getCollectorID(), "", CollectorTFInfo::idAlive, {FilterID::deltaDistance2IP}, vector<int>());
         }
 
@@ -4143,7 +4144,7 @@ int VXDTFModule::tcFilter(PassData* currentPass, int passNumber)
         (*currentTC)->setCondition(false);
 
         // Collector TC Update (ziggZaggRZ)
-        if (m_display > 0) {
+        if (m_PARAMdisplayCollector > 0) {
           m_collector.updateTC((*currentTC)->getCollectorID(), CollectorTFInfo::nameTCC, CollectorTFInfo::idTCC, vector<int>(), {FilterID::ziggZaggRZ});
         }
 
@@ -4153,7 +4154,7 @@ int VXDTFModule::tcFilter(PassData* currentPass, int passNumber)
       B2DEBUG(20, " TCC filter ziggZaggRZ approved TC " << tcCtr);
 
       // Collector TC Update (ziggZaggRZ)
-      if (m_display > 0) {
+      if (m_PARAMdisplayCollector > 0) {
         m_collector.updateTC((*currentTC)->getCollectorID(), "", CollectorTFInfo::idAlive, {FilterID::ziggZaggRZ}, vector<int>());
       }
 
@@ -4345,7 +4346,7 @@ void VXDTFModule::calcQIbyKalman(TCsOfEvent& tcVector, StoreArray<PXDCluster>& p
       currentTC->setCondition(false); // do not store TCs with failed fits if param-flag is set to false
 
       // Collector TC Update (calcQIbyKalman)
-      if (m_display > 0) {
+      if (m_PARAMdisplayCollector > 0) {
         std::vector<int> filter_calcQIbyKalman = {FilterID::calcQIbyKalman};
 
         m_collector.updateTC(currentTC->getCollectorID(), CollectorTFInfo::nameQI, CollectorTFInfo::idQI, vector<int>(), filter_calcQIbyKalman);
@@ -4355,7 +4356,7 @@ void VXDTFModule::calcQIbyKalman(TCsOfEvent& tcVector, StoreArray<PXDCluster>& p
     }
 
     // Collector TC Update (calcQIbyKalman)
-    if (m_display > 0) {
+    if (m_PARAMdisplayCollector > 0) {
       std::vector<int> filter_calcQIbyKalman = {FilterID::calcQIbyKalman};
 
       m_collector.updateTC(currentTC->getCollectorID(), "", CollectorTFInfo::idAlive, filter_calcQIbyKalman, vector<int>());
@@ -4394,7 +4395,7 @@ void VXDTFModule::calcQIbyKalman(TCsOfEvent& tcVector, StoreArray<PXDCluster>& p
         currentTC->setCondition(false); // do not store TCs with failed fits if param-flag is set to false
 
         // Collector TC Update (calcQIbyKalman)
-        if (m_display > 0) {
+        if (m_PARAMdisplayCollector > 0) {
           std::vector<int> filter_calcQIbyKalman = {FilterID::calcQIbyKalman};
 
           m_collector.updateTC(currentTC->getCollectorID(), CollectorTFInfo::nameQI, CollectorTFInfo::idQI, vector<int>(), filter_calcQIbyKalman);
@@ -4520,7 +4521,7 @@ int VXDTFModule::cleanOverlappingSet(TCsOfEvent& tcVector)
           bTC->setCondition(false);
 
           // Collector TC Update (overlapping)
-          if (m_display > 0) {
+          if (m_PARAMdisplayCollector > 0) {
             std::vector<int> filter_overlapping = {FilterID::overlapping};
 
             m_collector.updateTC(bTC->getCollectorID(), CollectorTFInfo::nameOverlap, CollectorTFInfo::idOverlap, vector<int>(), filter_overlapping);
@@ -4530,7 +4531,7 @@ int VXDTFModule::cleanOverlappingSet(TCsOfEvent& tcVector)
           aTC->setCondition(false);
 
           // Collector TC Update (overlapping)
-          if (m_display > 0) {
+          if (m_PARAMdisplayCollector > 0) {
             std::vector<int> filter_overlapping = {FilterID::overlapping};
 
             m_collector.updateTC(aTC->getCollectorID(), CollectorTFInfo::nameOverlap, CollectorTFInfo::idOverlap, vector<int>(), filter_overlapping);
@@ -4540,7 +4541,7 @@ int VXDTFModule::cleanOverlappingSet(TCsOfEvent& tcVector)
         }
 
         // Collector TC Update (overlapping)
-        if (m_display > 0) {
+        if (m_PARAMdisplayCollector > 0) {
           std::vector<int> filter_overlapping = {FilterID::overlapping};
 
           m_collector.updateTC(bTC->getCollectorID(), "", CollectorTFInfo::idAlive, filter_overlapping, vector<int>());
@@ -4771,7 +4772,7 @@ bool VXDTFModule::baselineTF(vector<ClusterInfo>& clusters, PassData* passInfo)
       newTC->setCondition(false);
 
       // Collector TC Update (ziggZaggXY)
-      if (m_display > 0) {
+      if (m_PARAMdisplayCollector > 0) {
         std::vector<int> filter_ziggZaggXY = {FilterID::ziggZaggXY};
 
         m_collector.updateTC(newTC->getCollectorID(), CollectorTFInfo::nameTCC, CollectorTFInfo::idTCC, vector<int>(), filter_ziggZaggXY);
@@ -5033,7 +5034,7 @@ bool VXDTFModule::doTheCircleFit(PassData* thisPass, VXDTFTrackCandidate* aTc, i
     aTc->setCondition(false);
 
     // Collector TC Update (circlefit)
-    if (m_display > 0) {
+    if (m_PARAMdisplayCollector > 0) {
       std::vector<int> filter_circleFit = {FilterID::circlefit};
 
       m_collector.updateTC(aTc->getCollectorID(), CollectorTFInfo::nameTCC, CollectorTFInfo::idTCC, vector<int>(), filter_circleFit);
@@ -5052,7 +5053,7 @@ bool VXDTFModule::doTheCircleFit(PassData* thisPass, VXDTFTrackCandidate* aTc, i
   duration = boost::chrono::duration_cast<boostNsec>(timer2 - timer);
 
   // Collector TC Update (circlefit)
-  if (m_display > 0) {
+  if (m_PARAMdisplayCollector > 0) {
     std::vector<int> filter_circleFit = {FilterID::circlefit};
 
     m_collector.updateTC(aTc->getCollectorID(), "", CollectorTFInfo::idAlive, filter_circleFit, vector<int>());

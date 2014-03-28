@@ -36,8 +36,10 @@ ModuleManager& ModuleManager::Instance()
 void ModuleManager::registerModuleProxy(ModuleProxyBase* moduleProxy)
 {
   //Only register a module proxy if it was not yet registered.
-  if (m_registeredProxyMap.find(moduleProxy->getModuleName()) == m_registeredProxyMap.end()) {
+  if (m_registeredProxyMap.count(moduleProxy->getModuleName()) == 0) {
     m_registeredProxyMap.insert(make_pair(moduleProxy->getModuleName(), moduleProxy));
+  } else {
+    B2ERROR("There seems to more than one module called '" << moduleProxy->getModuleName() << "'. Since module names are unique, you must rename one of them!");
   }
 }
 
@@ -177,10 +179,17 @@ void ModuleManager::fillModuleNameLibMap(boost::filesystem::directory_entry& map
     //We expect exactly two result entries: [0] the string that matched the regular expression
     //                                      [1] the string that matched sub-expressions (here: the string inside the quotes)
     if (matchResult.size() == 2) {
+      string moduleName(matchResult[1].first, matchResult[1].second);
       //Add result to map
-      m_moduleNameLibMap.insert(make_pair(string(matchResult[1].first, matchResult[1].second), sharedLibPath));
-    } else B2ERROR("Regular expression did not work. Is the module map file well formatted?")
+      if (m_moduleNameLibMap.count(moduleName) == 0) {
+        m_moduleNameLibMap.insert(make_pair(moduleName, sharedLibPath));
+      } else {
+        B2ERROR("There seems to more than one module called '" << moduleName << "'. Since module names are unique, you must rename one of them!");
+      }
+    } else {
+      B2ERROR("Regular expression did not work. Is the module map file well formatted?")
     }
+  }
 
   //Close the map file
   mapFile.close();

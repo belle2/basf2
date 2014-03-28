@@ -300,8 +300,6 @@ VXDTFModule::VXDTFModule() : Module()
   addParam("rootFileName", m_PARAMrootFileName, "fileName used for p-value export. Will be ignored if parameter 'writeToRoot' is false (standard)", rootFileNameVals);
   addParam("displayCollector", m_PARAMdisplayCollector, "Collector operating flag: 0 = no collector, 1 = collect for display, 2 = collect for analysis", int(0));
 
-  // Display Setting (=> To do: change to param)
-//   m_display = 1;  // 0 = no display, 1 = display, 2 = analysis
 }
 
 
@@ -1751,8 +1749,7 @@ void VXDTFModule::the_real_event()
     m_TESTERtimeConsumption.checkOverlap += boost::chrono::duration_cast<boostNsec>(stopTimer - timeStamp);
     thisInfoPackage.sectionConsumption.checkOverlap += boost::chrono::duration_cast<boostNsec>(stopTimer - timeStamp);
 
-    //DISPLAY = 3
-    B2DEBUG(1, "event " << m_eventCounter << ": " << totalOverlaps << " overlapping track candidates found within " << countCurrentTCs << " new TCs of this pass alive")
+    B2DEBUG(3, "event " << m_eventCounter << ": " << totalOverlaps << " overlapping track candidates found within " << countCurrentTCs << " new TCs of this pass alive")
     /** Section 9 - end */
 
 
@@ -3182,8 +3179,11 @@ int VXDTFModule::segFinder(PassData* currentPass)
 
           // Collector Cells Import for not saved VXDSegmentCell
           if (m_PARAMdisplayCollector > 0) {
-            /*int cell_id = */
-            importCollectorCell(m_aktpassNumber, "", CollectorTFInfo::idAlive, /*CollectorTFInfo::nameCellFinder, CollectorTFInfo::idCellFinder, */ acceptedRejectedFilters, ownHits[currentHit]->getCollectorID(), allFriendHits[friendHit]->getCollectorID());
+            int cell_id =
+              importCollectorCell(m_aktpassNumber, "", CollectorTFInfo::idAlive, /* CollectorTFInfo::nameCellFinder, CollectorTFInfo::idCellFinder, */ acceptedRejectedFilters, ownHits[currentHit]->getCollectorID(), allFriendHits[friendHit]->getCollectorID());
+
+            // Seperate Update is necessary to mark it died (because of died_at of other Objects)
+            m_collector.updateCell(cell_id, CollectorTFInfo::nameCellFinder, CollectorTFInfo::idCellFinder, vector<int>(), vector<int>(), -1, -2, -1, vector<int>());
 
             // Cell ID not saved because no VXDSegmentCell created
           }
@@ -3207,9 +3207,11 @@ int VXDTFModule::segFinder(PassData* currentPass)
 
             // Collector Cells Import for not saved VXDSegmentCell
             if (m_PARAMdisplayCollector > 0) {
-              /* int cell_id = */
-              importCollectorCell(m_aktpassNumber, "", CollectorTFInfo::idAlive, /*CollectorTFInfo::nameCellFinder, CollectorTFInfo::idCellFinder, */ acceptedRejectedFilters, ownHits[currentHit]->getCollectorID(), allFriendHits[friendHit]->getCollectorID());
+              int cell_id =
+                importCollectorCell(m_aktpassNumber, "", CollectorTFInfo::idAlive, /* CollectorTFInfo::nameCellFinder, CollectorTFInfo::idCellFinder,*/  acceptedRejectedFilters, ownHits[currentHit]->getCollectorID(), allFriendHits[friendHit]->getCollectorID());
 
+              // Seperate Update is necessary to mark it died (because of died_at of other Objects)
+              m_collector.updateCell(cell_id, CollectorTFInfo::nameCellFinder, CollectorTFInfo::idCellFinder, vector<int>(), vector<int>(), -1, -2, -1, vector<int>());
               // Cell ID not saved because no VXDSegmentCell created
             }
 

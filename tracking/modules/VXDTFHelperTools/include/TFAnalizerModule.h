@@ -72,7 +72,8 @@ namespace Belle2 {
 
       // Member Variables for Collector/Display
       int m_display;  /**< Collector operating flag: 0 = no collector, 1 = collect for display, 2 = collect for analysis */
-
+      std::string m_collectorFilePath; /**< File Path for the Collector */
+      double m_collectorThreshold;  /**< Threshold for contaminated TC */
 
       /** internal datastore for root export */
       struct RootVariables  {
@@ -199,7 +200,7 @@ namespace Belle2 {
                        StoreArray<PXDCluster>& pxdClusters,
                        StoreArray<SVDCluster>& svdClusters,
                        StoreArray<VXDTFInfoBoard>& infoBoards,
-                       StoreArray<TrackCandidateTFInfo>& infosTCs,
+                       //  StoreArray<TrackCandidateTFInfo>& infosTCs,
                        std::vector<VXDTrackCandidate>& tcVector,
                        bool isMCTC,
                        int index);

@@ -38,7 +38,7 @@ namespace Belle2 {
       m_data_pxd.setBuffer(NULL);
     }
     ~DataStorePackage() {
-      delete m_buf;
+      delete[] m_buf;
     }
 
   public:

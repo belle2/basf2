@@ -52,7 +52,9 @@ using std::endl;
 
 using namespace Belle2;
 
-REG_MODULE(VXDSimpleClusterizer)
+//disabled because of duplication (macro string split because there is a regular expression parsing these)
+//RE
+//G_MODULE(VXDSimpleClusterizer)
 
 VXDSimpleClusterizerModule::VXDSimpleClusterizerModule() : Module()
 {

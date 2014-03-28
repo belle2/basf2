@@ -27,7 +27,9 @@ using namespace Tracking;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(TestMap)
+//disabled because of duplication (macro string split because there is a regular expression parsing these)
+//RE
+//G_MODULE(TestMap)
 
 //-----------------------------------------------------------------
 //                 Implementation

@@ -55,17 +55,22 @@ namespace Belle2 {
   //                 Implementation
   //-----------------------------------------------------------------
 
-  BeamBkgMixerModule::BeamBkgMixerModule() : Module()
-
+  BeamBkgMixerModule::BeamBkgMixerModule() : Module(),
+    m_PXD(false), m_SVD(false), m_CDC(false), m_TOP(false),
+    m_ARICH(false), m_ECL(false), m_BKLM(false), m_EKLM(false)
   {
     // set module description (e.g. insert text)
-    setDescription("Beam background mixer at SimHit level that uses beam background simulation output directly (collision files) and not ROF files. Each background event is shifted in time randomly within a time window given by minTime and maxTime.");
-
+    setDescription("Beam background mixer at SimHit level that uses beam background"
+                   " simulation output directly (collision files) and not ROF files. "
+                   "Each background event is shifted in time randomly within "
+                   "a time window given by minTime and maxTime.");
+    // set property flags
     setPropertyFlags(c_ParallelProcessingCertified);
 
     // Add parameters
     addParam("backgroundFiles", m_backgroundFiles,
-             "List of background (collision) files: one file per background type, wildcards possible (as in TChain)");
+             "List of background (collision) files: one file per background type, "
+             "wildcards possible (as in TChain)");
     addParam("minTime", m_minTime,
              "Time window lower edge in nano seconds", -1000.0);
     addParam("maxTime", m_maxTime,
@@ -157,8 +162,9 @@ namespace Belle2 {
       std::vector<unsigned> tags;
       for (unsigned k = 0; k < persistent.GetEntries(); k++) {
         persistent.GetEntry(k);
-        realTime += ((BackgroundMetaData*)bkgMetaData)->getRealTime();
-        tags.push_back(((BackgroundMetaData*)bkgMetaData)->getBackgroundTag());
+        BackgroundMetaData* bgMD = static_cast<BackgroundMetaData*>(bkgMetaData);
+        realTime += bgMD->getRealTime();
+        tags.push_back(bgMD->getBackgroundTag());
       }
       if (realTime <= 0) {
         B2ERROR(m_backgroundFiles[bkg] << ": invalid realTime: " << realTime);
@@ -171,7 +177,8 @@ namespace Belle2 {
           continue;
         }
       }
-      std::string bkgType = ((BackgroundMetaData*)bkgMetaData)->getBackgroundType();
+      std::string bkgType =
+        static_cast<BackgroundMetaData*>(bkgMetaData)->getBackgroundType();
 
       // define TChain for reading SimHits
       TChain* tree = new TChain("tree");
@@ -297,7 +304,7 @@ namespace Belle2 {
 
 
   bool BeamBkgMixerModule::isComponentIncluded(std::vector<std::string>& components,
-                                               const std::string component)
+                                               const std::string& component)
   {
     if (m_components.empty()) return true;
 

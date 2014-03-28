@@ -134,7 +134,7 @@ namespace Belle2 {
 
       int numEntries = cloneArray->GetEntriesFast();
       for (int i = 0; i < numEntries; i++) {
-        SIMHIT* bkgSimHit = (SIMHIT*)cloneArray->AddrAt(i);
+        SIMHIT* bkgSimHit = static_cast<SIMHIT*>(cloneArray->AddrAt(i));
         SIMHIT* simHit = simHits.appendNew();
         (*simHit) = (*bkgSimHit);
         simHit->shiftInTime(timeShift);
@@ -152,7 +152,7 @@ namespace Belle2 {
      * @return true if component found in components
      */
     bool isComponentIncluded(std::vector<std::string>& components,
-                             const std::string component);
+                             const std::string& component);
 
 
   };

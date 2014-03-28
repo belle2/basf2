@@ -5,8 +5,9 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
-#pragma link C++ class Belle2::VXD::SensorPlane;
-#pragma link C++ class Belle2::VXD::GeoCache;
-#pragma link C++ class Belle2::VXD::SensorInfoBase;
+#pragma link C++ class Belle2::VXD::SensorPlane+;
+//for PyROOT only
+#pragma link C++ class Belle2::VXD::GeoCache-;
+#pragma link C++ class Belle2::VXD::SensorInfoBase-;
 
 #endif

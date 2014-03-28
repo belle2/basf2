@@ -15,20 +15,20 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
-#pragma link C++ class Belle2::MCParticle;
-#pragma link C++ class vector<Belle2::MCParticle*>;
-#pragma link C++ class Belle2::PIDLikelihood;
-#pragma link C++ class Belle2::ECLCluster;
+#pragma link C++ class Belle2::MCParticle+;
+#pragma link C++ class vector<Belle2::MCParticle*>+;
+#pragma link C++ class Belle2::PIDLikelihood+;
+#pragma link C++ class Belle2::ECLCluster+;
 
-#pragma link C++ class Belle2::K0L;
+#pragma link C++ class Belle2::K0L+;
 
-#pragma link C++ class Belle2::Track;
-#pragma link C++ class Belle2::HitPatternCDC;
-#pragma link C++ class Belle2::HitPatternVXD;
-#pragma link C++ class Belle2::TrackFitResult;
+#pragma link C++ class Belle2::Track+;
+#pragma link C++ class Belle2::HitPatternCDC+;
+#pragma link C++ class Belle2::HitPatternVXD+;
+#pragma link C++ class Belle2::TrackFitResult+;
 
 
-#pragma link C++ class Belle2::TRGSummary;
-#pragma link C++ class Belle2::TRGTiming;
+#pragma link C++ class Belle2::TRGSummary+;
+#pragma link C++ class Belle2::TRGTiming+;
 
 #endif

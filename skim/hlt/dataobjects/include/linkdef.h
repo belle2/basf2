@@ -5,8 +5,8 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
-#pragma link C++ class Belle2::L3Tag;
-#pragma link C++ class Belle2::L3Track;
-#pragma link C++ class Belle2::L3Cluster;
+#pragma link C++ class Belle2::L3Tag+;
+#pragma link C++ class Belle2::L3Track+;
+#pragma link C++ class Belle2::L3Cluster+;
 
 #endif

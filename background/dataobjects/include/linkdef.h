@@ -15,7 +15,7 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
-#pragma link C++ class Belle2::BackgroundInfo;
-#pragma link C++ class Belle2::BackgroundMetaData;
+#pragma link C++ class Belle2::BackgroundInfo+;
+#pragma link C++ class Belle2::BackgroundMetaData+;
 
 #endif

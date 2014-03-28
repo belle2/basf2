@@ -9,10 +9,10 @@
 
 #ifdef CDCLOCALTRACKING_USE_ROOT
 
-#pragma link C++ class Belle2::CDCLocalTracking::CDCWire;
-#pragma link C++ class Belle2::CDCLocalTracking::CDCWireLayer;
-#pragma link C++ class Belle2::CDCLocalTracking::CDCWireSuperLayer;
-#pragma link C++ class Belle2::CDCLocalTracking::CDCWireTopology;
+#pragma link C++ class Belle2::CDCLocalTracking::CDCWire+;
+#pragma link C++ class Belle2::CDCLocalTracking::CDCWireLayer+;
+#pragma link C++ class Belle2::CDCLocalTracking::CDCWireSuperLayer+;
+#pragma link C++ class Belle2::CDCLocalTracking::CDCWireTopology+;
 
 #endif
 

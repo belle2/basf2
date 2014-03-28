@@ -9,7 +9,7 @@
 
 #ifdef CDCLOCALTRACKING_USE_ROOT
 
-#pragma link C++ class Belle2::CDCLocalTracking::CDCWireHitTopology;
+#pragma link C++ class Belle2::CDCLocalTracking::CDCWireHitTopology+;
 
 #endif
 

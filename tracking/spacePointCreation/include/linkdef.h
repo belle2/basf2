@@ -7,6 +7,6 @@
 #pragma link C++ nestedclasses;
 
 
-#pragma link C++ class Belle2::SpacePoint;
+#pragma link C++ class Belle2::SpacePoint+;
 
 #endif

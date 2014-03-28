@@ -6,11 +6,11 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
-#pragma link C++ class Belle2::TrackingOutput;
-#pragma link C++ class Belle2::ExtHit;
-#pragma link C++ class Belle2::Muid;
-#pragma link C++ class Belle2::MuidHit;
-#pragma link C++ class Belle2::VXDTFInfoBoard;
+#pragma link C++ class Belle2::TrackingOutput+;
+#pragma link C++ class Belle2::ExtHit+;
+#pragma link C++ class Belle2::Muid+;
+#pragma link C++ class Belle2::MuidHit+;
+#pragma link C++ class Belle2::VXDTFInfoBoard+;
 #pragma link C++ class Belle2::VXDTFSecMap+;
 // #pragma link C++ class pair< double, double >+;
 // #pragma link C++ class pair< unsigned int, pair< double, double > >+;
@@ -39,9 +39,9 @@
 #pragma link C++ class pair <string, Belle2::VXDTFRawSecMap >+;
 #pragma link C++ class vector < pair <string, Belle2::VXDTFRawSecMap > >+;
 #pragma link C++ class Belle2::SecMapVector+;
-#pragma link C++ class Belle2::ROIid;
-#pragma link C++ class Belle2::ROIpayload;
-#pragma link C++ class Belle2::PXDIntercept;
+#pragma link C++ class Belle2::ROIid+;
+#pragma link C++ class Belle2::ROIpayload+;
+#pragma link C++ class Belle2::PXDIntercept+;
 #pragma link C++ class Belle2::RelationsInterface<genfit::Track>+;
 #pragma link C++ class set < unsigned short >+;
 #pragma link C++ class Belle2::RecoTrack+;

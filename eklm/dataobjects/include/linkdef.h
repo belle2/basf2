@@ -6,22 +6,22 @@
 #pragma link C++ nestedclasses;
 
 /* Base classes. */
-#pragma link C++ class Belle2::EKLMHitBase;
-#pragma link C++ class Belle2::EKLMHitCoord;
-#pragma link C++ class Belle2::EKLMHitGlobalCoord;
-#pragma link C++ class Belle2::EKLMHitMCTime;
-#pragma link C++ class Belle2::EKLMHitMomentum;
+#pragma link C++ class Belle2::EKLMHitBase+;
+#pragma link C++ class Belle2::EKLMHitCoord+;
+#pragma link C++ class Belle2::EKLMHitGlobalCoord+;
+#pragma link C++ class Belle2::EKLMHitMCTime+;
+#pragma link C++ class Belle2::EKLMHitMomentum+;
 
 /* Geant stage. */
-#pragma link C++ class Belle2::EKLMSimHit;
+#pragma link C++ class Belle2::EKLMSimHit+;
 
 /* Digitization stage. */
-#pragma link C++ class Belle2::EKLMSim2Hit;
-#pragma link C++ class Belle2::EKLMDigit;
+#pragma link C++ class Belle2::EKLMSim2Hit+;
+#pragma link C++ class Belle2::EKLMDigit+;
 
 /* Reconstuction stage. */
-#pragma link C++ class Belle2::EKLMSectorHit;
-#pragma link C++ class Belle2::EKLMHit2d;
-#pragma link C++ class Belle2::EKLMK0L;
+#pragma link C++ class Belle2::EKLMSectorHit+;
+#pragma link C++ class Belle2::EKLMHit2d+;
+#pragma link C++ class Belle2::EKLMK0L+;
 
 #endif

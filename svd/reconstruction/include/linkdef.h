@@ -5,7 +5,7 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
-#pragma link C++ class Belle2::SVDRecoHit2D;
-#pragma link C++ class Belle2::SVDRecoHit;
+#pragma link C++ class Belle2::SVDRecoHit2D+;
+#pragma link C++ class Belle2::SVDRecoHit+;
 
 #endif

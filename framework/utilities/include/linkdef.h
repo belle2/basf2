@@ -6,6 +6,6 @@
 #pragma link C++ nestedclasses;
 
 //not really a class, but it doesn't complain
-#pragma link C++ class Belle2::Stream;
+#pragma link C++ class Belle2::Stream-;
 
 #endif

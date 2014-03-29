@@ -11,8 +11,7 @@ from ROOT import Belle2
 from ROOT import gROOT, AddressOf
 
 # Define a ROOT struct to hold output data in the TTree.
-gROOT.ProcessLine(
-'struct EventDataDigit {\
+gROOT.ProcessLine('struct EventDataDigit {\
     unsigned long exp;\
     unsigned long run;\
     unsigned long evt;\
@@ -27,7 +26,8 @@ gROOT.ProcessLine(
     int digit_uID;\
     int digit_vID;\
     float digit_charge;\
-};')
+};'
+                  )
 
 from ROOT import EventDataDigit
 
@@ -44,12 +44,12 @@ class PXDValidationTTreeDigit(Module):
         """Initialize the module"""
 
         super(PXDValidationTTreeDigit, self).__init__()
-        # # Output ROOT file.
-        self.file = \
-            ROOT.TFile('PXDValidationTTreeDigitOutput.root', 'recreate')
-        # # TTree for output data
+        ## Output ROOT file.
+        self.file = ROOT.TFile('PXDValidationTTreeDigitOutput.root', 'recreate'
+                               )
+        ## TTree for output data
         self.tree = ROOT.TTree('tree', 'Event data of PXD simulation')
-        # # Instance of EventData class
+        ## Instance of EventData class
         self.data = EventDataDigit()
         # Declare tree branches
         for key in EventDataDigit.__dict__.keys():
@@ -57,8 +57,8 @@ class PXDValidationTTreeDigit(Module):
                 formstring = '/F'
                 if isinstance(self.data.__getattribute__(key), int):
                     formstring = '/I'
-                self.tree.Branch(key, AddressOf(self.data, key),
-                                 key + formstring)
+                self.tree.Branch(key, AddressOf(self.data, key), key
+                                 + formstring)
 
     def beginRun(self):
         """ Does nothing """
@@ -70,22 +70,22 @@ class PXDValidationTTreeDigit(Module):
         # digits and truehits.
         pxd_clusters = Belle2.PyStoreArray('PXDClusters')
         for cluster in pxd_clusters:
-            cluster_truehits = cluster.getRelationsTo("PXDTrueHits")
+            cluster_truehits = cluster.getRelationsTo('PXDTrueHits')
 
             # Here we ask only for clusters with exactly one TrueHit.
             if len(cluster_truehits) != 1:
                 continue
 
-            cluster_digits = cluster.getRelationsTo("PXDDigits")
+            cluster_digits = cluster.getRelationsTo('PXDDigits')
             for digit in cluster_digits:
                 # Now let's store some data
                 # Event identification
-                self.data.exp = Belle2.PyStoreObj('EventMetaData').\
-                    obj().getExperiment()
-                self.data.run = Belle2.PyStoreObj('EventMetaData').\
-                    obj().getRun()
-                self.data.evt = Belle2.PyStoreObj('EventMetaData').\
-                    obj().getEvent()
+                self.data.exp = Belle2.PyStoreObj('EventMetaData'
+                        ).obj().getExperiment()
+                self.data.run = Belle2.PyStoreObj('EventMetaData'
+                        ).obj().getRun()
+                self.data.evt = Belle2.PyStoreObj('EventMetaData'
+                        ).obj().getEvent()
                 # Sesnor identification
                 vxd_id = digit.getSensorID()
                 self.data.vxd_id = vxd_id.getID()
@@ -96,9 +96,9 @@ class PXDValidationTTreeDigit(Module):
 #                    continue
 #                if vxd_id.getSensorNumber() == 2:
 #                    continue
-                #self.data.cluster_index = digit.getArrayIndex()
+                # self.data.cluster_index = digit.getArrayIndex()
                 self.data.cluster_index = cluster.getArrayIndex()
-                #self.data.cluster_index = truehit.getArrayIndex()
+                # self.data.cluster_index = truehit.getArrayIndex()
                 # Get sensor geometry information
                 sensor_info = Belle2.VXD.GeoCache.get(vxd_id)
                 thickness = sensor_info.getThickness()
@@ -127,3 +127,5 @@ class PXDValidationTTreeDigit(Module):
         self.file.cd()
         self.file.Write()
         self.file.Close()
+
+

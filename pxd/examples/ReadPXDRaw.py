@@ -12,7 +12,6 @@ input.param('inputFileName', '-path-to-/PXDRawHit.root')
 # Don't want anything but raw hits from the file
 input.param('branchNames', ['PXDRawHits'])
 
-
 # Histogram manager immediately after master module
 histo = register_module('HistoManager')
 histo.param('histoFileName', 'PXD-histo.root')  # File to save histograms
@@ -41,11 +40,10 @@ PXDRaw.param('acceptFake', True)
 PXDClust = register_module('PXDClusterizer')
 PXDClust.param('TanLorentz', 0.)
 
-
 # PXD DQM module
 PXDDQM = register_module('PXDDQM')
 
-#output
+# output
 output = register_module('RootOutput')
 output.param('outputFileName', 'runPXDoutput.root')
 

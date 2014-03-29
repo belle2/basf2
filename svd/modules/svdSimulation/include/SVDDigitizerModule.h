@@ -28,25 +28,6 @@
 namespace Belle2 {
   namespace SVD {
 
-    /**
-     * Enum to flag R-Phi vs. Z strips.
-     */
-    enum StripDirection {
-      stripRPhi = 0, /** for strips in R-Phi */
-      stripZ = 1     /** for strips in Z     */
-    };
-    /**
-     * Enum to flag charge carriers.
-     */
-    enum CarrierType {
-      electron = -1, /** electrons */
-      hole = +1      /** holes */
-    };
-
-    // FIXME: Has to go to Unit.h
-    /** The Fano factor for silicon. */
-    const double FanoFactorSi = 0.08;
-
     /** Map of all signals in one sensor. */
     typedef std::map<short int, SVDSignal> StripSignals;
 
@@ -73,37 +54,6 @@ namespace Belle2 {
 
       /** Process one SVDSimHit by dividing the step in smaller steps and drifting the charge */
       void processHit();
-
-      /** Calculate electron mobility at a given electric field.
-       * @param eField Electric field, V/cm
-       * @return electron mobility, cm*2/V.ns
-       */
-      double getElectronMobility(double E) const;
-
-      /** Calculate hole mobility at a given electric field.
-       * @param eField Electric field, V/cm
-       * @return hole mobility, cm*2/V.ns
-       */
-      double getHoleMobility(double E) const;
-
-      /** Model of the E field inside the sensor.
-       * @param point Desired position in local coordinates.
-       * @return The E field vector in local coordinates.
-       */
-      const TVector3 getEField(const TVector3& point) const;
-
-      /** Get B field value from the field map.
-       * @param point Desired position in local coordinates.
-       * @return The B field vector in local coordinates.
-       */
-      const TVector3 getBField(const TVector3& point) const;
-
-      /** Get drift velocity for electrons or holes at a given point.
-       * @param carrier Electron or hole.
-       * @param point The point in local coordinates.
-       * @result The vector of drift velocity in local coordinates.
-       */
-      const TVector3 getVelocity(CarrierType carrier, const TVector3& point) const;
 
       /** Drift the charge inside the silicon.
        * This method will drift the charge inside the silicon along the E/B fieldlines.
@@ -163,8 +113,6 @@ namespace Belle2 {
       std::string m_relDigitTrueHitName;
 
       // 2. Physics
-      /** Sensor operating temperature in Kelvins. */
-      double m_temperature;
       /** Max. Segment length to use for charge drifting */
       double m_segmentLength;
       /** Width of diffusion cloud for simple drift model (in sigmas) */

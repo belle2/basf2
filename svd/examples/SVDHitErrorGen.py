@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from basf2 import *
-from PXDHitErrorsTTree import PXDHitErrorsTTree
+from SVDHitErrorsTTree import SVDHitErrorsTTree
 logging.log_level = LogLevel.WARNING
 
 # Particle gun module
@@ -17,14 +17,14 @@ gearbox = register_module('Gearbox')
 geometry = register_module('Geometry')
 # Run simulation
 simulation = register_module('FullSim')
-# PXD digitization module
-pxddigi = register_module('PXDDigitizer')
-# PXD clustering module
-pxdclust = register_module('PXDClusterizer')
+# SVD digitization module
+svddigi = register_module('SVDDigitizer')
+# SVD clustering module
+svdclust = register_module('SVDClusterizer')
 # RootOutput
 output = register_module('RootOutput')
 
-analyze = PXDHitErrorsTTree()
+analyze = SVDHitErrorsTTree()
 
 # Specify number of events to generate
 eventinfosetter.param({'evtNumList': [10000], 'runList': [1]})
@@ -60,11 +60,10 @@ particlegun.param({  # Generate 5 tracks (on average)
     })
 
 # Select subdetectors to be built
-geometry.param('components', ['MagneticField', 'PXD'])
+geometry.param('components', ['MagneticField', 'PXD', 'SVD'])
 
-# pxddigi.param('statisticsFilename', 'digi.root')
-pxddigi.param('ElectronicEffects', True)
-pxddigi.param('SimpleDriftModel', False)
+# svddigi.param('statisticsFilename', 'digi.root')
+svddigi.param('ElectronicEffects', True)
 
 # create processing path
 main = create_path()
@@ -74,8 +73,8 @@ main.add_module(particlegun)
 main.add_module(gearbox)
 main.add_module(geometry)
 main.add_module(simulation)
-main.add_module(pxddigi)
-main.add_module(pxdclust)
+main.add_module(svddigi)
+main.add_module(svdclust)
 main.add_module(analyze)
 # main.add_module(output)
 

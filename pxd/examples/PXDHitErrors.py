@@ -32,11 +32,11 @@ class PXDHitErrors(Module):
     def beginRun(self):
         """ Write legend for file columns """
 
-        self.file.write('vxd.id layer ladder sensor truehit.index ' +
-                        'cluster.index ')
-        self.file.write('truehit.u truehit.v truehit.time truehit.charge ' +
-                        'theta.u theta.v ')
-        self.file.write('u v u.error v.error rho charge seed '\
+        self.file.write('vxd.id layer ladder sensor truehit.index '
+                        + 'cluster.index ')
+        self.file.write('truehit.u truehit.v truehit.time truehit.charge '
+                        + 'theta.u theta.v ')
+        self.file.write('u v u.error v.error rho charge seed '
                         + 'size u.size v.size u.pull v.pull\n')
 
     def event(self):
@@ -75,14 +75,13 @@ class PXDHitErrors(Module):
                 [layer, ladder, sensor] = self.decode(sensorID)
 
                 s_id = \
-                    '{sID} {layer} {ladder} {sensor} {indexT:4d} {indexC:4d} '\
-                    .format(
+                    '{sID} {layer} {ladder} {sensor} {indexT:4d} {indexC:4d} '.format(
                     sID=sensorID,
                     layer=layer,
                     ladder=ladder,
                     sensor=sensor,
                     indexT=truehit_index,
-                    indexC=cluster_index
+                    indexC=cluster_index,
                     )
                 s += s_id
                 # TrueHit information
@@ -91,49 +90,34 @@ class PXDHitErrors(Module):
                 thetaV = math.atan2(truehit.getExitV() - truehit.getEntryV(),
                                     0.0075)
                 s_th = \
-                    '{uTH:10.5f} {vTH:10.5f} {tTH:10.2f} {eTH:10.7f} '.format(
-                    uTH=truehit.getU(),
-                    vTH=truehit.getV(),
-                    tTH=truehit.getGlobalTime(),
-                    eTH=truehit.getEnergyDep()) + \
-                    '{thetaU:6.3f} {thetaV:6.3f} '.format(
-                    thetaU=thetaU,
-                    thetaV=thetaV)
+                    '{uTH:10.5f} {vTH:10.5f} {tTH:10.2f} {eTH:10.7f} '.format(uTH=truehit.getU(),
+                        vTH=truehit.getV(), tTH=truehit.getGlobalTime(),
+                        eTH=truehit.getEnergyDep()) \
+                    + '{thetaU:6.3f} {thetaV:6.3f} '.format(thetaU=thetaU,
+                        thetaV=thetaV)
                 s += s_th
                 # Cluster information
                 cluster_pull_u = 0
                 cluster_pull_v = 0
                 try:
-                    cluster_pull_u = (cluster.getU() - truehit.getU())\
-                            / cluster.getUSigma()
-                    cluster_pull_v = (cluster.getV() - truehit.getV())\
-                            / cluster.getVSigma()
-                except ZeroDivisionError as e:
+                    cluster_pull_u = (cluster.getU() - truehit.getU()) \
+                        / cluster.getUSigma()
+                    cluster_pull_v = (cluster.getV() - truehit.getV()) \
+                        / cluster.getVSigma()
+                except ZeroDivisionError, e:
                     if cluster.getUSigma() < 1.0e-8:
-                        B2ERROR('Zero error in u, clsize {cl}.'\
-                                .format(cl=cluster.getUSize()))
+                        B2ERROR('Zero error in u, clsize {cl}.'.format(cl=cluster.getUSize()))
                     else:
-                        B2ERROR('Zero error in v, clsize {cl}.'\
-                                .format(cl=cluster.getVSize()))
+                        B2ERROR('Zero error in v, clsize {cl}.'.format(cl=cluster.getVSize()))
 
                 s_cl = \
-                    '{u:10.5f} {v:10.5f} {uEr:10.5f} {vEr:10.5f} {rho:10.4f} '\
-                    .format(
-                    u=cluster.getU(),
-                    v=cluster.getV(),
-                    uEr=cluster.getUSigma(),
-                    vEr=cluster.getVSigma(),
-                    rho=cluster.getRho()
-                    ) + \
-                    '{eC:9.1f} {eSeed:9.1f} {size:5d} {uSize:5d} {vSize:5d} '\
-                    .format(
-                        eC=cluster.getCharge(),
-                        eSeed=cluster.getSeedCharge(),
-                        size=cluster.getSize(),
-                        uSize=cluster.getUSize(),
-                        vSize=cluster.getVSize()) \
-                    + '{uPull:10.3f} {vPull:10.3f}'.format(
-                        uPull=cluster_pull_u,
+                    '{u:10.5f} {v:10.5f} {uEr:10.5f} {vEr:10.5f} {rho:10.4f} '.format(u=cluster.getU(),
+                        v=cluster.getV(), uEr=cluster.getUSigma(),
+                        vEr=cluster.getVSigma(), rho=cluster.getRho()) \
+                    + '{eC:9.1f} {eSeed:9.1f} {size:5d} {uSize:5d} {vSize:5d} '.format(eC=cluster.getCharge(),
+                        eSeed=cluster.getSeedCharge(), size=cluster.getSize(),
+                        uSize=cluster.getUSize(), vSize=cluster.getVSize()) \
+                    + '{uPull:10.3f} {vPull:10.3f}'.format(uPull=cluster_pull_u,
                         vPull=cluster_pull_v)
                 s += s_cl
                 # NO DIGITS by now.
@@ -164,3 +148,5 @@ class PXDHitErrors(Module):
             vxdid = vxdid % f
 
         return result
+
+

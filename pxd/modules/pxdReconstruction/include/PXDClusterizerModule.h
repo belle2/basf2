@@ -13,6 +13,7 @@
 
 #include <framework/core/Module.h>
 #include <vxd/dataobjects/VxdID.h>
+#include <pxd/geometry/SensorInfo.h>
 #include <pxd/reconstruction/ClusterCache.h>
 #include <pxd/reconstruction/ClusterProjection.h>
 #include <pxd/reconstruction/NoiseMap.h>
@@ -31,7 +32,7 @@ namespace Belle2 {
     /** The PXDClusterizer module.
      *
      * This module is responsible to cluster all hits found in the PXD and
-     * write them to the apropriate collections. It does this in a "streaming" way:
+     * write them to the appropriate collections. It does this in a "streaming" way:
      * The hits are examined in an ordered way (sorted by row, then by column) and for each
      * pixel we only have to check the left neighbor and the three adjacent
      * hits in the last row. By caching the last row, each pixel gets examined
@@ -129,12 +130,12 @@ namespace Belle2 {
       int m_clusterCacheSize;
       /** cache of the last seen clusters to speed up clustering */
       std::unique_ptr<ClusterCache> m_cache;
-      /** Noisemap for the currently active sensor */
+      /** Noise map for the currently active sensor */
       NoiseMap m_noiseMap;
 
-      /** Lookuptable for PXDDigit->MCParticle relation */
+      /** Lookup table for PXDDigit->MCParticle relation */
       RelationLookup m_mcRelation;
-      /** Lookuptable for PXDDigit->PXDTrueHit relation */
+      /** Lookup table for PXDDigit->PXDTrueHit relation */
       RelationLookup m_trueRelation;
 
     };//end class declaration

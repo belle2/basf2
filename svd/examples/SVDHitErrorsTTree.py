@@ -12,11 +12,12 @@ from ROOT import Belle2
 from ROOT import gROOT, AddressOf
 
 # Define a ROOT struct to hold output data in the TTree.
-gROOT.ProcessLine('struct EventData {\
+gROOT.ProcessLine('struct SVDEventData {\
     int vxd_id;\
     int layer;\
     int ladder;\
     int sensor;\
+    int u_cluster;\
     int truehit_index;\
     int cluster_index;\
     float truehit_u;\
@@ -25,43 +26,37 @@ gROOT.ProcessLine('struct EventData {\
     float truehit_charge;\
     float theta_u;\
     float theta_v;\
-    float cluster_u;\
-    float cluster_v;\
-    float cluster_uError;\
-    float cluster_vError;\
-    float cluster_rho;\
+    float cluster_x;\
+    float cluster_xError;\
     float cluster_charge;\
     float cluster_seed;\
     float cluster_size;\
-    float cluster_uSize;\
-    float cluster_vSize;\
-    float cluster_uPull;\
-    float cluster_vPull;\
+    float cluster_xPull;\
 };'
                   )
 
-from ROOT import EventData
+from ROOT import SVDEventData
 
 
-class PXDHitErrorsTTree(Module):
+class SVDHitErrorsTTree(Module):
 
     """
-    A simple module to check the reconstruction of PXDTrueHits.
+    A simple module to check the reconstruction of SVDTrueHits.
     This module writes its output to a ROOT tree.
     """
 
     def __init__(self):
         """Initialize the module"""
 
-        super(PXDHitErrorsTTree, self).__init__()
+        super(SVDHitErrorsTTree, self).__init__()
         ## Output ROOT file.
-        self.file = ROOT.TFile('PXDHitErrorOutput.root', 'recreate')
+        self.file = ROOT.TFile('SVDHitErrorOutput.root', 'recreate')
         ## TTree for output data
-        self.tree = ROOT.TTree('tree', 'Event data of PXD simulation')
-        ## Instance of EventData class
-        self.data = EventData()
+        self.tree = ROOT.TTree('tree', 'Event data of SVD simulation')
+        ## Instance of SVDEventData class
+        self.data = SVDEventData()
         # Declare tree branches
-        for key in EventData.__dict__.keys():
+        for key in SVDEventData.__dict__.keys():
             if not '__' in key:
                 formstring = '/F'
                 if isinstance(self.data.__getattribute__(key), int):
@@ -73,14 +68,14 @@ class PXDHitErrorsTTree(Module):
         """ Does nothing """
 
     def event(self):
-        """Find clusters with a truehit and print some stats."""
+        """ Find clusters with a truehit and print some stats."""
 
-        clusters = Belle2.PyStoreArray('PXDClusters')
+        clusters = Belle2.PyStoreArray('SVDClusters')
 
         # Start with clusters and use the relation to get the corresponding
         # digits and truehits.
         for cluster in clusters:
-            cluster_truehits = cluster.getRelationsTo('PXDTrueHits')
+            cluster_truehits = cluster.getRelationsTo('SVDTrueHits')
 
             # Here we ask only for clusters with exactly one TrueHit.
             if len(cluster_truehits) != 1:
@@ -94,6 +89,10 @@ class PXDHitErrorsTTree(Module):
                 self.data.layer = vxd_id.getLayerNumber()
                 self.data.ladder = vxd_id.getLadderNumber()
                 self.data.sensor = vxd_id.getSensorNumber()
+                if cluster.isUCluster():
+                    self.data.u_cluster = 1
+                else:
+                    self.data.u_cluster = 0
                 self.data.truehit_index = truehit.getArrayIndex()
                 self.data.cluster_index = cluster.getArrayIndex()
 
@@ -111,20 +110,17 @@ class PXDHitErrorsTTree(Module):
                 self.data.theta_v = math.atan2(truehit.getExitV()
                         - truehit.getEntryV(), thickness)
                 # Cluster information
-                self.data.cluster_u = cluster.getU()
-                self.data.cluster_v = cluster.getV()
-                self.data.cluster_uError = cluster.getUSigma()
-                self.data.cluster_vError = cluster.getVSigma()
-                self.data.cluster_rho = cluster.getRho()
+                self.data.cluster_x = cluster.getPosition()
+                self.data.cluster_xError = cluster.getPositionSigma()
                 self.data.cluster_charge = cluster.getCharge()
                 self.data.cluster_seed = cluster.getSeedCharge()
                 self.data.cluster_size = cluster.getSize()
-                self.data.cluster_uSize = cluster.getUSize()
-                self.data.cluster_vSize = cluster.getVSize()
-                self.data.cluster_uPull = (cluster.getU() - truehit.getU()) \
-                    / cluster.getUSigma()
-                self.data.cluster_vPull = (cluster.getV() - truehit.getV()) \
-                    / cluster.getVSigma()
+                if cluster.isUCluster():
+                    self.data.cluster_xPull = (cluster.getPosition()
+                            - truehit.getU()) / cluster.getPositionSigma()
+                else:
+                    self.data.cluster_xPull = (cluster.getPosition()
+                            - truehit.getV()) / cluster.getPositionSigma()
                 self.file.cd()
                 self.tree.Fill()
 

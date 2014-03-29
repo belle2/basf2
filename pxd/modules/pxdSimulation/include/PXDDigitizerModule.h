@@ -99,30 +99,6 @@ namespace Belle2 {
 
       /** Process one PXDSimHit by dividing the step in smaller steps and drifting the charge */
       void processHit();
-      /** Calculate electron mobility at a given electric field.
-       * @param eField Electric field, V/cm
-       * @return electron mobility, cm*2/V.ns
-       */
-      double getElectronMobility(double E) const;
-      /** Model of the E field inside the sensor.
-       * @param point Desired position in local coordinates.
-       * @return The E field vector in local coordinates.
-       */
-      const TVector3 getEField(const TVector3& point) const;
-
-      /** Get B field value from the field map.
-       * @param point Desired position in local coordinates.
-       * @return The B field vector in local coordinates.
-       */
-      const TVector3 getBField(const TVector3& point) const;
-      /** Get drift velocity for electrons at a given point.
-       * The method assumes that the E-field causes the drift that makes electrons
-       * susceptible to Lorentz force.
-       * @param E Electric field at the desired position
-       * @param B Magnetic field at the desired position
-       * @result The vector of drift velocity in local coordinates.
-       */
-      const TVector3 getDriftVelocity(const TVector3& E, const TVector3& B) const;
       /** Drift the charge inside the silicon.
        * This method will drift the charge inside the silicon in two steps:
        * 1. Drift to the potential minimum plane by using vertical drift along the fieldlines
@@ -213,10 +189,6 @@ namespace Belle2 {
       double m_diffusionCoefficient;
       /** Tangent of the Lorentz angle for simple drift model */
       double m_tanLorentz;
-      /** Temperature of the sensor(s) */
-      double m_temperature;
-      /** Hall factor for electrons in Si (only depends on temperature */
-      double m_hallFactor;
 
       /** Structure containing all existing sensors */
       Sensors m_sensors;

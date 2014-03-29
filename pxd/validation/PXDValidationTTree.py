@@ -11,8 +11,7 @@ from ROOT import Belle2
 from ROOT import gROOT, AddressOf
 
 # Define a ROOT struct to hold output data in the TTree.
-gROOT.ProcessLine(
-'struct EventData {\
+gROOT.ProcessLine('struct EventData {\
     long exp;\
     long run;\
     unsigned long evt;\
@@ -46,7 +45,8 @@ gROOT.ProcessLine(
     float cluster_vSize;\
     float cluster_uPull;\
     float cluster_vPull;\
-};')
+};'
+                  )
 
 from ROOT import EventData
 
@@ -63,37 +63,37 @@ class PXDValidationTTree(Module):
         """Initialize the module"""
 
         super(PXDValidationTTree, self).__init__()
-        # # Output ROOT file.
+        ## Output ROOT file.
         self.file = ROOT.TFile('PXDValidationTTreeOutput.root', 'recreate')
-        # # TTree for output data
+        ## TTree for output data
         self.tree = ROOT.TTree('tree', 'Event data of PXD simulation')
         ## Histogram for constances
         self.h_consts = ROOT.TH1F('h_consts', 'Constances', 12, 0, 12)
-        self.h_consts.GetXaxis().SetBinLabel(1,
-             "Sensor thicknes [cm] (0.0075)")
+        self.h_consts.GetXaxis().SetBinLabel(1, 'Sensor thicknes [cm] (0.0075)'
+                )
         self.h_consts.GetXaxis().SetBinLabel(2,
-             "Pitch in u - all sensors [cm] (0.005)")
+                'Pitch in u - all sensors [cm] (0.005)')
         self.h_consts.GetXaxis().SetBinLabel(3,
-             "Pitch in v, layer 1 small pitch [cm] (0.0055)")
+                'Pitch in v, layer 1 small pitch [cm] (0.0055)')
         self.h_consts.GetXaxis().SetBinLabel(4,
-             "Pitch in v, layer 1 large pitch [cm] (0.006)")
+                'Pitch in v, layer 1 large pitch [cm] (0.006)')
         self.h_consts.GetXaxis().SetBinLabel(5,
-             "Pitch in v, layer 2 small pitch [cm] (0.007)")
+                'Pitch in v, layer 2 small pitch [cm] (0.007)')
         self.h_consts.GetXaxis().SetBinLabel(6,
-             "Pitch in v, layer 2 large pitch [cm] (0.0085)")
+                'Pitch in v, layer 2 large pitch [cm] (0.0085)')
         self.h_consts.GetXaxis().SetBinLabel(7,
-             "Number of cells in u, all layers (250)")
+                'Number of cells in u, all layers (250)')
         self.h_consts.GetXaxis().SetBinLabel(8,
-             "Number of cells in v, layer 1 small pitch (256)")
+                'Number of cells in v, layer 1 small pitch (256)')
         self.h_consts.GetXaxis().SetBinLabel(9,
-             "Number of cells in v, layer 1 large pitch (512)")
+                'Number of cells in v, layer 1 large pitch (512)')
         self.h_consts.GetXaxis().SetBinLabel(10,
-             "Number of cells in v, layer 2 small pitch (256)")
+                'Number of cells in v, layer 2 small pitch (256)')
         self.h_consts.GetXaxis().SetBinLabel(11,
-            "Number of cells in v, layer 2 large pitch (512)")
+                'Number of cells in v, layer 2 large pitch (512)')
         self.h_consts.GetXaxis().SetBinLabel(12,
-            "Noise of digits of sensors [electrons] (200)")
-        # # Instance of EventData class
+                'Noise of digits of sensors [electrons] (200)')
+        ## Instance of EventData class
         self.data = EventData()
         # Declare tree branches
         for key in EventData.__dict__.keys():
@@ -101,8 +101,8 @@ class PXDValidationTTree(Module):
                 formstring = '/F'
                 if isinstance(self.data.__getattribute__(key), int):
                     formstring = '/I'
-                self.tree.Branch(key, AddressOf(self.data, key),
-                                 key + formstring)
+                self.tree.Branch(key, AddressOf(self.data, key), key
+                                 + formstring)
 
     def beginRun(self):
         """ Does nothing """
@@ -121,7 +121,7 @@ class PXDValidationTTree(Module):
 #        belle2xml = belle2xmlFile.read()
 #        belle2xmlFile.close()
         for cluster in pxd_clusters:
-            cluster_truehits = cluster.getRelationsTo("PXDTrueHits")
+            cluster_truehits = cluster.getRelationsTo('PXDTrueHits')
 
             # Here we ask only for clusters with exactly one TrueHit.
             if len(cluster_truehits) != 1:
@@ -130,12 +130,12 @@ class PXDValidationTTree(Module):
             for truehit in cluster_truehits:
                 # Now let's store some data
                 # Event identification
-                self.data.exp = Belle2.PyStoreObj(\
-                    'EventMetaData').obj().getExperiment()
-                self.data.run = Belle2.PyStoreObj(\
-                    'EventMetaData').obj().getRun()
-                self.data.evt = Belle2.PyStoreObj(\
-                    'EventMetaData').obj().getEvent()
+                self.data.exp = Belle2.PyStoreObj('EventMetaData'
+                        ).obj().getExperiment()
+                self.data.run = Belle2.PyStoreObj('EventMetaData'
+                        ).obj().getRun()
+                self.data.evt = Belle2.PyStoreObj('EventMetaData'
+                        ).obj().getEvent()
                 # Sesnor identification
                 vxd_id = truehit.getSensorID()
                 self.data.vxd_id = vxd_id.getID()
@@ -149,33 +149,30 @@ class PXDValidationTTree(Module):
                     if vxd_id.getSensorNumber() == 1:
                         if WrtS1Pitch == 0:
                             self.h_consts.SetBinContent(1,
-                                sensor_info.getThickness())
+                                    sensor_info.getThickness())
                             self.h_consts.SetBinContent(2,
-                                sensor_info.getUPitch())
+                                    sensor_info.getUPitch())
                             self.h_consts.SetBinContent(3,
-                                sensor_info.getVPitch(-2.0))
+                                    sensor_info.getVPitch(-2.0))
                             self.h_consts.SetBinContent(4,
-                                sensor_info.getVPitch(+2.0))
+                                    sensor_info.getVPitch(+2.0))
                             self.h_consts.SetBinContent(7,
-                                sensor_info.getUCells())
-                            self.h_consts.SetBinContent(8,
-                                VCellsSplit)
+                                    sensor_info.getUCells())
+                            self.h_consts.SetBinContent(8, VCellsSplit)
                             self.h_consts.SetBinContent(9,
-                                sensor_info.getVCells() - VCellsSplit)
-                            self.h_consts.SetBinContent(12,
-                                DigitNoise)
+                                    sensor_info.getVCells() - VCellsSplit)
+                            self.h_consts.SetBinContent(12, DigitNoise)
                             WrtS1Pitch = 1
                 if vxd_id.getLayerNumber() == 2:
                     if vxd_id.getSensorNumber() == 1:
                         if WrtS2Pitch == 0:
                             self.h_consts.SetBinContent(5,
-                                sensor_info.getVPitch(-2.0))
+                                    sensor_info.getVPitch(-2.0))
                             self.h_consts.SetBinContent(6,
-                                sensor_info.getVPitch(+2.0))
-                            self.h_consts.SetBinContent(10,
-                                VCellsSplit)
+                                    sensor_info.getVPitch(+2.0))
+                            self.h_consts.SetBinContent(10, VCellsSplit)
                             self.h_consts.SetBinContent(11,
-                                sensor_info.getVCells() - VCellsSplit)
+                                    sensor_info.getVCells() - VCellsSplit)
                             WrtS2Pitch = 1
                 self.data.pixel_type = (vxd_id.getLayerNumber() - 1) * 2
                 if vxd_id.getLayerNumber() == 1:
@@ -196,16 +193,14 @@ class PXDValidationTTree(Module):
                 self.data.truehit_EntryW = truehit.getEntryW()
                 self.data.truehit_ExitW = truehit.getExitW()
                 self.data.truehit_LossMomentum = \
-                    truehit.getEntryMomentum().Mag() - \
-                        truehit.getExitMomentum().Mag()
+                    truehit.getEntryMomentum().Mag() \
+                    - truehit.getExitMomentum().Mag()
                 self.data.truehit_time = truehit.getGlobalTime()
                 self.data.truehit_charge = truehit.getEnergyDep()
-                self.data.theta_u = \
-                    math.atan2(truehit.getExitU() - truehit.getEntryU(), \
-                    thickness)
-                self.data.theta_v = \
-                    math.atan2(truehit.getExitV() - truehit.getEntryV(), \
-                    thickness)
+                self.data.theta_u = math.atan2(truehit.getExitU()
+                        - truehit.getEntryU(), thickness)
+                self.data.theta_v = math.atan2(truehit.getExitV()
+                        - truehit.getEntryV(), thickness)
                 # Cluster information
                 self.data.cluster_u = cluster.getU()
                 self.data.cluster_v = cluster.getV()
@@ -217,18 +212,16 @@ class PXDValidationTTree(Module):
                 self.data.cluster_size = cluster.getSize()
                 self.data.cluster_uSize = cluster.getUSize()
                 self.data.cluster_vSize = cluster.getVSize()
-                self.data.cluster_uEtaPosition = 0.5 + (cluster.getU()\
-                            - sensor_info.getUCellPosition(\
-                            sensor_info.getUCellID(cluster.getU())))\
-                            / UPitch
-                self.data.cluster_vEtaPosition = 0.5 + (cluster.getV()\
-                            - sensor_info.getVCellPosition(\
-                            sensor_info.getVCellID(cluster.getV())))\
-                            / VPitch
-                self.data.cluster_uPull = (cluster.getU() - truehit.getU())\
-                            / cluster.getUSigma()
-                self.data.cluster_vPull = (cluster.getV() - truehit.getV())\
-                            / cluster.getVSigma()
+                self.data.cluster_uEtaPosition = 0.5 + (cluster.getU()
+                        - sensor_info.getUCellPosition(sensor_info.getUCellID(cluster.getU()))) \
+                    / UPitch
+                self.data.cluster_vEtaPosition = 0.5 + (cluster.getV()
+                        - sensor_info.getVCellPosition(sensor_info.getVCellID(cluster.getV()))) \
+                    / VPitch
+                self.data.cluster_uPull = (cluster.getU() - truehit.getU()) \
+                    / cluster.getUSigma()
+                self.data.cluster_vPull = (cluster.getV() - truehit.getV()) \
+                    / cluster.getVSigma()
                 # Fill tree
                 self.file.cd()
                 self.tree.Fill()
@@ -236,14 +229,18 @@ class PXDValidationTTree(Module):
     def terminate(self):
         """ Close the output file."""
 
-        self.h_consts.GetListOfFunctions().Add(ROOT.TNamed("Description", \
-            "Transfer of some basic constances to root for later procesing."))
-        self.h_consts.GetListOfFunctions().Add(ROOT.TNamed("Check", \
-            "Validation: Check differences to reference plot, \
-            must be no change."))
+        self.h_consts.GetListOfFunctions().Add(ROOT.TNamed('Description',
+                'Transfer of some basic constances to root for later procesing.'
+                ))
+        self.h_consts.GetListOfFunctions().Add(ROOT.TNamed('Check',
+                "Validation: Check differences to reference plot, \
+            must be no change."
+                ))
 
         self.file.cd()
         self.file.Write()
     #    self.h_consts.Write()
         self.file.Flush()
         self.file.Close()
+
+

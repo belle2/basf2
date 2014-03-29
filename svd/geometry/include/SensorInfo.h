@@ -12,6 +12,7 @@
 #define SVD_SENSORINFO_H
 
 #include <vxd/geometry/SensorInfoBase.h>
+#include <TVector3.h>
 
 namespace Belle2 {
   /** Namespace to encapsulate code needed for simulation and reconstrucion of the SVD */
@@ -21,10 +22,20 @@ namespace Belle2 {
      */
     class SensorInfo: public VXD::SensorInfoBase {
     public:
+      /** The Fano factor for silicon. */
+      const double c_fanoFactorSi = 0.08;
+
       /** Enum for parametric access to sensor coordinates. */
       enum Coordinate {
         u = 0,
         v = 1
+      };
+      /**
+       * Enum to flag charge carriers.
+       */
+      enum CarrierType {
+        electron = -1, /** electrons */
+        hole = +1      /** holes */
       };
       // FIXME: Consolidate with similar enums in the digitizer.
       /** Constructor which automatically sets the SensorType to SensorInfo::SVD.
@@ -39,9 +50,10 @@ namespace Belle2 {
       SensorInfo(VxdID id = 0, float width = 0, float length = 0, float thickness = 0,
                  int uCells = 0, int vCells = 0, float width2 = 0):
         VXD::SensorInfoBase(SensorInfo::SVD, id, width, length, thickness, uCells, vCells, width2, -1, 0),
-        m_depletionVoltage(0), m_biasVoltage(0), m_backplaneCapacitance(0),
-        m_interstripCapacitance(0), m_couplingCapacitance(0)
-      {}
+        m_temperature(300), m_depletionVoltage(0), m_biasVoltage(0),
+        m_backplaneCapacitance(0), m_interstripCapacitance(0),
+        m_couplingCapacitance(0)
+      { }
 
       /** Change the SensorID. Useful to copy the SensorInfo from one sensor and use it for another.
        * @param id VxdID to be assigned to current sensor.
@@ -64,6 +76,8 @@ namespace Belle2 {
         m_couplingCapacitance = couplingCapacitance;
       }
 
+      /** Return the sensor temperature.*/
+      double getTemperature() const {return m_temperature; }
       /** Return the depletion voltage of the sensor. */
       double getDepletionVoltage() const { return m_depletionVoltage; }
       /** Return the bias voltage on the sensor. */
@@ -74,9 +88,70 @@ namespace Belle2 {
       double getInterstripCapacitance() const { return m_interstripCapacitance; }
       /** Return the coupling capacitance of the sensor strips */
       double getCouplingCapacitance() const { return m_couplingCapacitance; }
-      /** Return the zero suppression cut for the sensor. */
+      /** Calculate electron mobility at a given electric field.
+       * Based on C. Canali et al., IEEE, ED-22, (1975) 1045
+       * @param eField Electric field, V/cm
+       * @return electron mobility, cm*2/V.ns
+       */
+      double getElectronMobility(double E) const;
+      /** Calculate hole mobility at a given electric field.
+       * Based on C. Canali et al., IEEE, ED-22, (1975) 1045
+       * @param eField Electric field, V/cm
+       * @return hole mobility, cm*2/V.ns
+       */
+      double getHoleMobility(double E) const;
+
+      /** Model of the E field inside the sensor.
+       * @param point Desired position in local coordinates.
+       * @return The E field vector in local coordinates.
+       */
+      const TVector3 getEField(const TVector3& point) const;
+
+      /** Get B field value from the field map.
+       * @param point Desired position in local coordinates.
+       * @return The B field vector in local coordinates.
+       */
+      const TVector3& getBField(const TVector3& point) const;
+
+      /** Return Hall factor for the corresponding carrier type.
+       * @param carrier electron or hole, SVD::SensorInfo::CarrierType
+       * @return The Hall factor for the actual sensor temperature.
+       */
+      double getHallFactor(CarrierType carrier) const {
+        if (carrier == electron)
+          return (1.13 + 0.0008 * (m_temperature - 273));
+        else
+          return (0.72 - 0.0005 * (m_temperature - 273));
+      }
+
+      /** Get drift velocity for electrons or holes at a given point.
+       * @param carrier Electron or hole.
+       * @param point The point in local coordinates.
+       * @result The vector of drift velocity in local coordinates.
+       */
+      const TVector3 getVelocity(CarrierType carrier, const TVector3& point) const;
+
+      /** Calculate Lorentz shift along a given coordinate in a magnetic field at a given position.
+        * This method can only be used for a completely reconstructed 2D cluster.
+        * For 1D clusters, use the following method.
+        * @param u u coordinate where the shift is required
+        * @param v v coordinate where the shift is required
+        * @return TVector with Lorentz shift along u and v at the given position.
+        */
+      const TVector3& getLorentzShift(double u, double v) const;
+
+      /** Calculate mean Lorentz shift along a given coordinate, with B-field averaged
+       * along the corresponding strip.
+       * Use this for 1D clusters, where only one coordinate is known.
+       * @param uCoordinate True if u, false if v.
+       * @param position The position of the strip.
+       * @return Mean Lorentz shift along a given coordinate.
+       */
+      double getLorentzShift(bool uCoordinate, double position) const;
 
     protected:
+      /** Sensor temperature*/
+      double m_temperature;
       /** The depletion voltage of the Silicon sensor */
       double m_depletionVoltage;
       /** The bias voltage on the sensor */
@@ -87,6 +162,10 @@ namespace Belle2 {
       double m_interstripCapacitance;
       /** The coupling capacitance for the sensor. */
       double m_couplingCapacitance;
+      /** The electron Lorentz factor. */
+      double m_electronLorentzFactor;
+      /** The hole Lorentz factor. */
+      double m_holeLorentzFactor;
     }; // Class SVD::SensorInfo
 
   } // SVD namespace

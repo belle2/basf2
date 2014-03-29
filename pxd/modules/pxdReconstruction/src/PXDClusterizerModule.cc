@@ -17,7 +17,6 @@
 #include <framework/logging/Logger.h>
 
 #include <vxd/geometry/GeoCache.h>
-#include <pxd/geometry/SensorInfo.h>
 
 #include <mdst/dataobjects/MCParticle.h>
 #include <pxd/dataobjects/PXDDigit.h>
@@ -69,7 +68,7 @@ PXDClusterizerModule::PXDClusterizerModule() :
            string(""));
 
   addParam("TanLorentz", m_tanLorentzAngle, "Tangent of the Lorentz angle",
-           double(0.25));
+           double(-1.0));
 }
 
 void PXDClusterizerModule::initialize()
@@ -113,8 +112,12 @@ void PXDClusterizerModule::initialize()
   m_relDigitTrueHitName = relDigitTrueHits.getName();
   m_relDigitMCParticleName = relDigitMCParticles.getName();
 
-  B2INFO(
-    "PXDClusterizer Parameters (in default system units, *=cannot be set directly):");
+  //Warn if tanLorentz set
+  if (m_tanLorentzAngle > 0.0)
+    B2WARNING("The TanLorentz parameter is obsolete and has no effect!")
+
+    B2INFO(
+      "PXDClusterizer Parameters (in default system units, *=cannot be set directly):");
   B2INFO(" -->  ElectronicNoise:    " << m_elNoise);
   B2INFO(" -->  NoiseSN:            " << m_cutAdjacent);
   B2INFO(" -->  SeedSN:             " << m_cutSeed);
@@ -243,7 +246,7 @@ void PXDClusterizerModule::createRelationLookup(const RelationArray& relation, R
 
 void PXDClusterizerModule::fillRelationMap(const RelationLookup& lookup, std::map<unsigned int, float>& relation, unsigned int index)
 {
-  //If the lookuptable is not empty and the element is set
+  //If the lookup table is not empty and the element is set
   if (!lookup.empty() && lookup[index]) {
     const RelationElement& element = *lookup[index];
     const unsigned int size = element.getSize();
@@ -278,6 +281,7 @@ void PXDClusterizerModule::writeClusters(VxdID sensorID)
   map<unsigned int, float> mc_relations;
   map<unsigned int, float> truehit_relations;
   vector<pair<unsigned int, float> > digit_weights;
+
 
   for (ClusterCandidate & cls : *m_cache) {
     //Check for noise cuts
@@ -330,8 +334,10 @@ void PXDClusterizerModule::writeClusters(VxdID sensorID)
     //Calculate position and error with v as primary axis, possibly different pitch sizes
     calculatePositionError(cls, projV, projU, info.getVPitch(projV.getMinPos()), pitchV, info.getVPitch(projV.getMaxPos()));
 
-    //Lorentz shift correction FIXME: get from Bfield
-    projU.setPos(projU.getPos() - 0.5 * info.getThickness() * m_tanLorentzAngle);
+    TVector3 lorentzShift = info.getLorentzShift(projU.getPos(), projV.getPos());
+    projU.setPos(projU.getPos() - lorentzShift.X());
+    projV.setPos(projV.getPos() - lorentzShift.Y());
+    B2INFO("Lorentz shift: " << lorentzShift.X() << " " << lorentzShift.Y());
 
     //Store Cluster into Datastore ...
     int clsIndex = storeClusters.getEntries();

@@ -45,7 +45,7 @@ SVDClusterizerModule::SVDClusterizerModule() : Module(), m_elNoise(2000.0),
 {
   //Set module properties
   setDescription("Clusterize SVDDigits and reconstruct hits");
-  setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
+  setPropertyFlags(c_ParallelProcessingCertified);
 
   // 1. Collections.
   addParam("Digits", m_storeDigitsName,
@@ -63,9 +63,9 @@ SVDClusterizerModule::SVDClusterizerModule() : Module(), m_elNoise(2000.0),
   // FIXME: The mean Lorentz angles should be set sensor-wise, or at least
   // separately for slanted sensors.
   addParam("TanLorentz_electrons", m_tanLorentzAngle_electrons,
-           "Tangent of the Lorentz angle for electrons", double(0.0));
+           "Tangent of the Lorentz angle for electrons", double(-1.0));
   addParam("TanLorentz_holes", m_tanLorentzAngle_holes,
-           "Tangent of the Lorentz angle for holes", double(0.08));
+           "Tangent of the Lorentz angle for holes", double(-1.0));
 
   // 3. Noise
   addParam("ElectronicNoise", m_elNoise,
@@ -150,8 +150,11 @@ void SVDClusterizerModule::initialize()
     m_unitADC = (m_maxADC - m_minADC) / pow(2, m_bitsADC);
     m_elNoise = m_elNoise / m_unitADC;
   }
-  // Report:
-  B2INFO("SVDClusterizer Parameters (in default system unit, *=cannot be set directly):");
+  // Warn if tanLorentz set
+  if (m_tanLorentzAngle_holes > 0 or m_tanLorentzAngle_electrons > 0)
+    B2WARNING("The tanLorentz parameters are obsolete and have no effect!")
+    // Report:
+    B2INFO("SVDClusterizer Parameters (in default system unit, *=cannot be set directly):");
 
   B2INFO(" 1. COLLECTIONS:");
   B2INFO(" -->  MCParticles:        " << DataStore::arrayName<MCParticle>(m_storeMCParticlesName));
@@ -437,12 +440,8 @@ void SVDClusterizerModule::writeClusters(VxdID sensorID, int side)
     if (m_applyWindow && ((clusterTime < m_triggerTime) || (clusterTime > m_triggerTime + m_acceptance)))
       continue;
 
-    //Lorentz shift correction FIXME: get from Bfield
-    if (isU)
-      clusterPosition -= 0.5 * info.getThickness() * m_tanLorentzAngle_holes;
-    else
-      clusterPosition -= 0.5 * info.getThickness() * m_tanLorentzAngle_electrons;
-
+    //Lorentz shift correction
+    clusterPosition -= info.getLorentzShift(isU, clusterPosition);
 
     map<int, float> mc_relations;
     map<int, float> truehit_relations;

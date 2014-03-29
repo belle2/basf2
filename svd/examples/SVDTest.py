@@ -13,7 +13,6 @@
 
 from basf2 import *
 
-
 # show warnings during processing
 set_log_level(LogLevel.WARNING)
 
@@ -37,7 +36,7 @@ PXDDIGI = register_module('PXDDigitizer')
 SVDDIGI = register_module('SVDDigitizer')
 # SVD clusterizer
 SVDCLUST = register_module('SVDClusterizer')
-SVDCLUST.param('digitsSorted', False)
+SVDCLUST.param('digitsSorted', True)
 # Save output of simulation
 output = register_module('RootOutput')
 
@@ -52,10 +51,6 @@ particlegun.param('pdgCodes', [-11, 11])
 # ============================================================================
 # Setting the number of tracks to be generated per event:
 particlegun.param('nTracks', 1)
-
-# ============================================================================
-# Print the parameters of the particle gun
-print_params(particlegun)
 
 # Set the number of events to be processed (100 events)
 eventinfosetter.param({'evtNumList': [100], 'runList': [1]})

@@ -94,8 +94,10 @@ namespace Belle2 {
       std::string m_relClusterTrueHitName;
 
       // 2. Physics
-      /** Lorentz angle, electrons. FIXME: This is what one would use for reconstruction,
-       * some mean value rather than something determined directly from the B-Field */
+      /** Lorentz angle, electrons.
+       * FIXME: These parameters are no longer used to calculate Lorentz shifts,
+       * and will be removed shortly.
+       */
       double m_tanLorentzAngle_electrons;
       /** LorentzAngle, holes. */
       double m_tanLorentzAngle_holes;

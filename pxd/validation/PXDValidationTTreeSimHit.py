@@ -11,8 +11,7 @@ from ROOT import Belle2
 from ROOT import gROOT, AddressOf
 
 # Define a ROOT struct to hold output data in the TTree.
-gROOT.ProcessLine(
-'struct EventDataSimHit {\
+gROOT.ProcessLine('struct EventDataSimHit {\
     unsigned long exp;\
     unsigned long run;\
     unsigned long evt;\
@@ -37,7 +36,8 @@ gROOT.ProcessLine(
     float simhit_Theta;\
     float simhit_EnergyDep;\
     float simhit_GlobalTime;\
-};')
+};'
+                  )
 
 from ROOT import EventDataSimHit
 
@@ -54,12 +54,12 @@ class PXDValidationTTreeSimHit(Module):
         """Initialize the module"""
 
         super(PXDValidationTTreeSimHit, self).__init__()
-        # # Output ROOT file.
+        ## Output ROOT file.
         self.file = ROOT.TFile('PXDValidationTTreeSimHitOutput.root',
-            'recreate')
-        # # TTree for output data
+                               'recreate')
+        ## TTree for output data
         self.tree = ROOT.TTree('tree', 'Event data of PXD simulation')
-        # # Instance of EventData class
+        ## Instance of EventData class
         self.data = EventDataSimHit()
         # Declare tree branches
         for key in EventDataSimHit.__dict__.keys():
@@ -67,8 +67,8 @@ class PXDValidationTTreeSimHit(Module):
                 formstring = '/F'
                 if isinstance(self.data.__getattribute__(key), int):
                     formstring = '/I'
-                self.tree.Branch(key, AddressOf(self.data, key),
-                                 key + formstring)
+                self.tree.Branch(key, AddressOf(self.data, key), key
+                                 + formstring)
 
     def beginRun(self):
         """ Does nothing """
@@ -84,12 +84,12 @@ class PXDValidationTTreeSimHit(Module):
             for simhit in pxd_simhits:
                 # Now let's store some data
                 # Event identification
-                self.data.exp = \
-                    Belle2.PyStoreObj('EventMetaData').obj().getExperiment()
-                self.data.run = \
-                    Belle2.PyStoreObj('EventMetaData').obj().getRun()
-                self.data.evt = \
-                    Belle2.PyStoreObj('EventMetaData').obj().getEvent()
+                self.data.exp = Belle2.PyStoreObj('EventMetaData'
+                        ).obj().getExperiment()
+                self.data.run = Belle2.PyStoreObj('EventMetaData'
+                        ).obj().getRun()
+                self.data.evt = Belle2.PyStoreObj('EventMetaData'
+                        ).obj().getEvent()
                 # Sesnor identification
                 vxd_id = simhit.getSensorID()
                 self.data.vxd_id = vxd_id.getID()
@@ -116,8 +116,8 @@ class PXDValidationTTreeSimHit(Module):
                 self.data.simhit_PosOutX = simhit.getPosOut().X()
                 self.data.simhit_PosOutY = simhit.getPosOut().Y()
                 self.data.simhit_PosOutZ = simhit.getPosOut().Z()
-                self.data.simhit_Length = \
-                    (simhit.getPosOut() - simhit.getPosIn()).Mag()
+                self.data.simhit_Length = (simhit.getPosOut()
+                        - simhit.getPosIn()).Mag()
                 self.data.simhit_MomInX = simhit.getMomIn().X()
                 self.data.simhit_MomInY = simhit.getMomIn().Y()
                 self.data.simhit_MomInZ = simhit.getMomIn().Z()
@@ -134,3 +134,5 @@ class PXDValidationTTreeSimHit(Module):
         self.file.cd()
         self.file.Write()
         self.file.Close()
+
+

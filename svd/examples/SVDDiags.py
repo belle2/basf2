@@ -36,33 +36,35 @@ class Clusters2Truehits(Module):
         relClustersToTrueHits = \
             Belle2.PyRelationArray('SVDClustersToSVDTrueHits')
         nClusterRelations = relClustersToTrueHits.getEntries()
-        print 'Found {nT} TrueHits and {nC} Clusters, with {nRel} relations.'\
-            .format(nT=nTruehits,
+        print 'Found {nT} TrueHits and {nC} Clusters, with {nRel} relations.'.format(nT=nTruehits,
                 nC=nClusters, nRel=nClusterRelations)
         relDigitsToTrueHits = Belle2.PyRelationArray('SVDDigitsToSVDTrueHits')
         nDigitRelations = relDigitsToTrueHits.getEntries()
-        print 'Found {nT} TrueHits and {nD} Digits, with {nRel} relations.'\
-        .format(nT=nTruehits, nD=nDigits, nRel=nDigitRelations)
+        print 'Found {nT} TrueHits and {nD} Digits, with {nRel} relations.'.format(nT=nTruehits,
+                nD=nDigits, nRel=nDigitRelations)
         relClustersToDigits = Belle2.PyRelationArray('SVDClustersToSVDDIgits')
-        print 'Found {nR} relations between clusters and digits.'\
-        .format(nR=relClustersToDigits.getEntries())
+        print 'Found {nR} relations between clusters and digits.'.format(nR=relClustersToDigits.getEntries())
         # Define auxiliary print functions
         truehit_print = lambda index, truehit: \
-            'TrueHit {index}: u {u}, v {v}, charge {charge}'\
-            .format(index=index, u=truehit.getU(), v=truehit.getV(),
+            'TrueHit {index}: u {u}, v {v}, charge {charge}'.format(index=index,
+                u=truehit.getU(), v=truehit.getV(),
                 charge=truehit.getEnergyDep())
         cluster_print = lambda index, cluster: \
-            ('Cluster {index}: u-side {side}, position {pos}, ' + \
-             'positionError {posError}, time {time}, signal {signal}')\
-             .format(index=index,
-                side=cluster.isUCluster(), pos=cluster.getPosition(),
+            ('Cluster {index}: u-side {side}, position {pos}, '
+             + 'positionError {posError}, time {time}, signal {signal}'
+             ).format(
+                index=index,
+                side=cluster.isUCluster(),
+                pos=cluster.getPosition(),
                 posError=cluster.getPositionSigma(),
-                time=cluster.getClsTime(), signal=cluster.getCharge())
+                time=cluster.getClsTime(),
+                signal=cluster.getCharge(),
+                )
         digit_print = lambda index, digit: \
-            ('Digit {index}: u-side {side}, strip {pos}, time {time},' + \
-             'signal {signal}').format(index=index,
-                side=digit.isUStrip(), pos=digit.getCellID(),
-                time=digit.getTime(), signal=digit.getCharge())
+            ('Digit {index}: u-side {side}, strip {pos}, time {time},'
+             + 'signal {signal}').format(index=index, side=digit.isUStrip(),
+                pos=digit.getCellID(), time=digit.getTime(),
+                signal=digit.getCharge())
 
         # Use the relation to get cluster's digits and truehits.
         truehits_unused_u = set(range(nTruehits))
@@ -102,8 +104,7 @@ class Clusters2Truehits(Module):
             print
 
         print
-        print 'Truehits with no clusters in u: {n}'\
-            .format(n=len(truehits_unused_u))
+        print 'Truehits with no clusters in u: {n}'.format(n=len(truehits_unused_u))
         print truehits_unused_u
         for truehit_index in truehits_unused_u:
             print truehit_print(truehit_index, truehits[truehit_index])
@@ -121,8 +122,7 @@ class Clusters2Truehits(Module):
             print
 
         print
-        print 'Truehits with no clusters in v: {n}'\
-            .format(n=len(truehits_unused_v))
+        print 'Truehits with no clusters in v: {n}'.format(n=len(truehits_unused_v))
         print truehits_unused_v
         for truehit_index in truehits_unused_v:
             print truehit_print(truehit_index, truehits[truehit_index])

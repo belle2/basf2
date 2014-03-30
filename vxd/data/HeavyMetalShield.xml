@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <DetectorComponent name="HeavyMetalShield" xmlns:xi="http://www.w3.org/2001/XInclude">
-  <Creator library="ir">HeavyMetalShieldCreator</Creator>
+  <Creator library="vxd">HeavyMetalShieldCreator</Creator>
   <Content>
 
 <Box15>

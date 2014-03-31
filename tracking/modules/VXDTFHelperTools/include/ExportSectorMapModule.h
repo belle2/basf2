@@ -101,8 +101,8 @@ namespace Belle2 {
     std::vector< Belle2::VXDTFSecMap> m_importedSectorMaps; /**< contains all sectorMaps imported from file */
 
 
-
-    bool m_PARAMimportROOTorXML; /**< if true, sectorMap is imported via rootFile, if false, it is imported via XML-file */
+    /** if true, sectorMap is imported via rootFile, if false, it is imported via XML-file */
+    bool m_PARAMimportROOTorXML;
 
 
 

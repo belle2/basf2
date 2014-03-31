@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "tracking/modules/VXDTFHelperTools/TestMapModule.h"
+#include "tracking/modules/trackFinderVXDTests/TestMapModule.h"
 #include "tracking/vxdCaTracking/LittleHelper.h"
 #include "tracking/dataobjects/FullSecID.h"
 #include <framework/logging/Logger.h>

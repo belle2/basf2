@@ -460,7 +460,7 @@ void FilterCalculatorModule::event()
     }
     uniIDsOfTrack.sort();
     uniIDsOfTrack.unique();
-    if (uniIDsOfTrack.size() != thisTrack.size()) { // means that there were more than one hit per sensor
+    if (uniIDsOfTrack.size() != thisTrack.size() and m_PARAMtestBeam == true) { // means that there were more than one hit per sensor, a case which should not occur during test-beam case
       B2INFO("event " << m_eventCounter << ": track of particle " << iPart << " had number of hits/traversed sensors: " << thisTrack.size() << "/" << uniIDsOfTrack.size() << " - skipping track!")
       continue;
     }

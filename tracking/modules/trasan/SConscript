@@ -1,6 +1,6 @@
 Import('env')
 
-#2013/06/17 env['CONTINUE'] = False
+env['CONTINUE'] = False
 
 env['LIBS'] = [
     'CLHEP',
@@ -12,12 +12,12 @@ env['LIBS'] = [
     #'tracking_dataobjects',
     ]
 
-#env.Append(CPPDEFINES = {'TRASAN_WINDOW_GTK':None,
-#	                 'TRASAN_WINDOW_GTK_HOUGH':None,
-#	                 'TRASAN_WINDOW_GTK_SZ':None,
-#			 'TRASAN_DEBUG':None,
-#			 'TRASAN_DEBUG_DETAIL':None})
-#env.ParseConfig('pkg-config --cflags --libs gtkmm-2.4')
-#print env.Dump()
+env.Append(CPPDEFINES = {'TRASAN_WINDOW_GTK':None,
+	                 'TRASAN_WINDOW_GTK_HOUGH':None,
+	                 'TRASAN_WINDOW_GTK_SZ':None,
+			 'TRASAN_DEBUG':None,
+			 'TRASAN_DEBUG_DETAIL':None})
+env.ParseConfig('pkg-config --cflags --libs gtkmm-2.4')
+print env.Dump()
 
 Return('env')

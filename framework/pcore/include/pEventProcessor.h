@@ -42,6 +42,13 @@ namespace Belle2 {
     */
     void process(PathPtr spath, long maxEvent);
 
+    /** signal handler for Ctrl+C (async-safe)
+     *
+     *  When called the first time, does nothing (input process handles SIGINT by itself).
+     *  On subsequent calls, RingBuffers are cleared, discarding any events that have been partly
+     *  produced (mostly equivalent to previous behaviour on Ctrl+C)
+     * */
+    void gotSigINT();
 
   private:
     /*! Analyze given path */
@@ -64,6 +71,10 @@ namespace Belle2 {
      * needs to be called at the end of every process.
      */
     void clearFileList();
+
+    /** Insert a termination message at the end of the given RingBuffer. */
+    static void sendTerminationMessage(RingBuffer* rb);
+
 
     /** Extract modules to be initialized in main process */
     ModulePtrList init_modules_in_main(const ModulePtrList& modlist);

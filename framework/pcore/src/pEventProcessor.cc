@@ -31,18 +31,17 @@ using namespace Belle2;
 /** PID of sub-process killed by some signal. 0 if none. */
 static int s_PIDofKilledChild = 0;
 
+static pEventProcessor* g_pEventProcessor = NULL;
+
 static void signalHandler(int signal)
 {
   //signal handlers are called asynchronously, making many standard functions (including output) dangerous
   //write() is, however, safe, so we'll use that to write to stderr.
   if (signal == SIGSEGV) {
-    const char msg[] = "\nProcess died with SIGSEGV (Segmentation fault).\n";
-    const int len = sizeof(msg) / sizeof(char) - 1; //minus NULL byte
-
-    int rc = write(STDERR_FILENO, msg, len);
-    (void) rc; //ignore return value (there's nothing we can do about a failed write)
-
+    EventProcessor::writeToStdErr("\nProcess died with SIGSEGV (Segmentation fault).\n");
     abort();
+  } else if (signal == SIGINT) {
+    g_pEventProcessor->gotSigINT();
   } else if (signal == SIGCHLD) {
     if (s_PIDofKilledChild != 0)
       return; //only once
@@ -50,6 +49,7 @@ static void signalHandler(int signal)
     //which child died?
     int status;
     pid_t pid = waitpid(-1, &status, WNOHANG);
+    //B2WARNING("child died, pid " << pid << ", status " << status);
     if (pid <= 0 || !WIFSIGNALED(status))
       return; //process exited normally
 
@@ -57,11 +57,7 @@ static void signalHandler(int signal)
     s_PIDofKilledChild = pid;
     //int termsig = WTERMSIG(status);
 
-    const char msg[] = "\nOne of our child processes died, stopping execution...\n";
-    const int len = sizeof(msg) / sizeof(char) - 1; //minus NULL byte
-
-    int rc = write(STDERR_FILENO, msg, len);
-    (void) rc; //ignore return value (there's nothing we can do about a failed write)
+    EventProcessor::writeToStdErr("\nOne of our child processes died, stopping execution...\n");
 
     //pid=0: send signal to every process in our progress group (ourselves + children)
     kill(0, SIGTERM);
@@ -70,12 +66,46 @@ static void signalHandler(int signal)
 
 pEventProcessor::pEventProcessor(PathManager& pathManager) : EventProcessor(pathManager),
   m_procHandler(new ProcHandler())
-{ }
+{
+  g_pEventProcessor = this;
+}
 
 
 pEventProcessor::~pEventProcessor()
 {
   delete m_procHandler;
+}
+
+void pEventProcessor::sendTerminationMessage(RingBuffer* rb)
+{
+  EvtMessage term(NULL, 0, MSG_TERMINATE);
+  while (rb->insq((int*)term.buffer(), term.paddedSize()) < 0) {
+    usleep(20);
+  }
+}
+
+
+void pEventProcessor::gotSigINT()
+{
+  static int numSigInts = 0;
+  if (numSigInts == 0) {
+    EventProcessor::writeToStdErr("\nStopping basf2 after all events in buffer are processed. Press Ctrl+C a second time to discard half-processed events.\n");
+  } else {
+    EventProcessor::writeToStdErr("\nDiscarding pending events for quicker termination... \n");
+    //clear ringbuffers and add terminate message
+    const int numProcesses = Environment::Instance().getNumberProcesses();
+    for (RingBuffer * rb : m_rbinlist) {
+      rb->clear();
+      for (int i = 0; i < numProcesses; i++) {
+        sendTerminationMessage(rb);
+      }
+    }
+    for (RingBuffer * rb : m_rboutlist) {
+      rb->clear();
+      sendTerminationMessage(rb);
+    }
+  }
+  numSigInts++;
 }
 
 void pEventProcessor::clearFileList()
@@ -125,9 +155,11 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
   clearFileList();
 
   //If we crash after forking, ROOTs SIGSEGV handler could potentially use huge amounts of memory (scales with numProcesses)
+  /*
   if (signal(SIGSEGV, signalHandler) == SIG_ERR) {
     B2FATAL("Cannot setup SIGSEGV signal handler\n");
   }
+  */
 
   // 2. Analyze start path and split into parallel paths
   m_histoManagerFound = false;
@@ -153,10 +185,18 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
     dump_modules("processInitialize for ", procinitmodules);
     if (!procinitmodules.empty())
       processInitialize(procinitmodules);
+
+    setupSignalHandler();
     processCore(inpath, inpath_modules, maxEvent);
     processTerminate(inpath_modules);
     B2INFO("Input process finished.");
     exit(0);
+  }
+
+  // for all processes except the input process (already started by now)
+  // ignore SIGINT so we can do our own handling to ensure safe termination.
+  if (signal(SIGINT, SIG_IGN) == SIG_ERR) {
+    B2FATAL("Cannot ignore SIGINT signal handler\n");
   }
 
   // 4. Fork output path
@@ -203,9 +243,6 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
   if (m_procHandler->isFramework()) {
     //ignore some signals for framework (mother) process, so only child processes will handle them
     //once they are finished, the framework process will clean up IPC structures
-    if (signal(SIGINT, SIG_IGN) == SIG_ERR) {
-      B2FATAL("Cannot ignore SIGINT signal handler for main process\n");
-    }
     if (signal(SIGTERM, SIG_IGN) == SIG_ERR) {
       B2FATAL("Cannot ignore SIGTERM signal handler for main process\n");
     }
@@ -216,32 +253,25 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
     if (signal(SIGCHLD, signalHandler) == SIG_ERR) {
       B2FATAL("Cannot setup SIGCHLD signal handler\n");
     }
+    //first time: just print a message, afterwards tries to terminate more quickly
+    if (signal(SIGINT, signalHandler) == SIG_ERR) {
+      B2FATAL("Cannot set SIGINT signal handler\n");
+    }
 
     // 6.0 Build End of data message
-    EvtMessage term(NULL, 0, MSG_TERMINATE);
     // 6.1 Wait for input path to terminate
     m_procHandler->waitForInputProcesses();
     // 6.2 Send termination to event processes
     for (int i = 0; i < numProcesses; i++) {
-      for (std::vector<RingBuffer*>::iterator it = m_rbinlist.begin();
-           it != m_rbinlist.end(); ++it) {
-        RingBuffer* rbuf = *it;
-        while (rbuf->insq((int*)term.buffer(), term.paddedSize()) < 0) {
-          //          usleep(200);
-          usleep(20);
-        }
+      for (RingBuffer * rb : m_rbinlist) {
+        sendTerminationMessage(rb);
       }
     }
     // 6.3 Wait for event processes to terminate
     m_procHandler->waitForEventProcesses();
     // 6.4 Send termination to output processes
-    for (std::vector<RingBuffer*>::iterator it = m_rboutlist.begin();
-         it != m_rboutlist.end(); ++it) {
-      RingBuffer* rbuf = *it;
-      while (rbuf->insq((int*)term.buffer(), term.paddedSize()) < 0) {
-        //        usleep(200);
-        usleep(20);
-      }
+    for (RingBuffer * rb : m_rboutlist) {
+      sendTerminationMessage(rb);
     }
     m_procHandler->waitForOutputProcesses();
     B2INFO("All processes completed");
@@ -249,12 +279,10 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
     HistModule::mergeFiles();
 
     // 6.5 Remove all ring buffers
-    for (std::vector<RingBuffer*>::iterator it = m_rbinlist.begin();
-         it != m_rbinlist.end(); ++it)
-      delete *it;
-    for (std::vector<RingBuffer*>::iterator it = m_rboutlist.begin();
-         it != m_rboutlist.end(); ++it)
-      delete *it;
+    for (RingBuffer * rb : m_rbinlist)
+      delete rb;
+    for (RingBuffer * rb : m_rboutlist)
+      delete rb;
 
     B2INFO("Global process: completed");
 

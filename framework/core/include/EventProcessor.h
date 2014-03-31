@@ -55,6 +55,9 @@ namespace Belle2 {
      */
     void setProfileModuleName(const std::string& name) { m_profileModuleName = name; }
 
+    /** async-safe method to write something to STDERR. */
+    static void writeToStdErr(const char msg[]);
+
   protected:
 
     /**
@@ -106,6 +109,9 @@ namespace Belle2 {
      * @param modulePathList The list containing all module instances added to a path.
      */
     void processEndRun(const ModulePtrList& modulePathList);
+
+    /** Install signal handlers. */
+    void setupSignalHandler();
 
     PathManager& m_pathManager; /**< Reference to the path manager, which takes care of creating and handling paths. */
     const Module* m_master;  /**< The master module that determines the experiment/run/event number **/

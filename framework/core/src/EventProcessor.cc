@@ -46,11 +46,25 @@
 
 #include <signal.h>
 #include <unistd.h>
+#include <cstring>
 
 #include <TRandom.h>
 
 using namespace std;
 using namespace Belle2;
+
+void EventProcessor::writeToStdErr(const char msg[])
+{
+  //signal handlers are called asynchronously, making many standard functions (including output) dangerous
+  //write() is, however, safe, so we'll use that to write to stderr.
+
+  //strlen() not explicitly in safe list, but doesn't have any error handling routines that might alter global state
+  const int len = strlen(msg);
+
+  int rc = write(STDERR_FILENO, msg, len);
+  (void) rc; //ignore return value (there's nothing we can do about a failed write)
+
+}
 
 
 EventProcessor::EventProcessor(PathManager& pathManager) : m_pathManager(pathManager), m_master(NULL), m_mainRNG(NULL)
@@ -106,6 +120,7 @@ void EventProcessor::process(PathPtr startPath, long maxEvent)
   //Check if errors appeared. If yes, don't start the event processing.
   int numLogError = LogSystem::Instance().getMessageCounter(LogConfig::c_Error);
   if ((numLogError == 0) && m_master) {
+    setupSignalHandler();
     processCore(startPath, moduleList, maxEvent); //Do the event processing
 
   } else {
@@ -127,13 +142,7 @@ static void signalHandler(int)
 {
   ctrl_c = true;
 
-  //signal handlers are called asynchronously, making many standard functions (including output) dangerous
-  //write() is, however, safe, so we'll use that to write to stderr.
-  const char msg[] = "Received Ctrl+C, basf2 will exit safely. (Press Ctrl+\\ (SIGQUIT) to abort immediately - this may break output files.)\n";
-  const int len = sizeof(msg) / sizeof(char) - 1; //minus NULL byte
-
-  int rc = write(STDERR_FILENO, msg, len);
-  (void) rc; //ignore return value (there's nothing we can do about a failed write)
+  EventProcessor::writeToStdErr("Received Ctrl+C, basf2 will exit safely. (Press Ctrl+\\ (SIGQUIT) to abort immediately - this may break output files.)\n");
 }
 
 void EventProcessor::processInitialize(const ModulePtrList& modulePathList)
@@ -178,12 +187,15 @@ void EventProcessor::processInitialize(const ModulePtrList& modulePathList)
   stats.stopGlobal(ModuleStatistics::c_Init);
 }
 
-
-void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& modulePathList, long maxEvent)
+void EventProcessor::setupSignalHandler()
 {
   if (signal(SIGINT, signalHandler) == SIG_ERR) {
     B2FATAL("Cannot setup SIGINT signal handler\n");
   }
+}
+
+void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& modulePathList, long maxEvent)
+{
   LogSystem& logSystem = LogSystem::Instance();
 
   //Remember the previous event meta data, and identify end of data meta data

@@ -63,6 +63,9 @@ namespace Belle2 {
     // Set description()
     setDescription("This module calculates the ARICHLikelihood values for all particle id. hypotheses, for all tracks that enter ARICH in the event.");
 
+    // Set property flags
+    setPropertyFlags(c_ParallelProcessingCertified);
+
     std::vector<double> defMerit;
     defMerit.push_back(24.0);
     defMerit.push_back(24.0);

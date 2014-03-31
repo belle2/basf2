@@ -48,6 +48,8 @@ namespace Belle2 {
   {
     // set module description (e.g. insert text)
     setDescription("Creates relations between ARICHAeroHits and ExtHits. Allows to store simulation output without MCParticles");
+    // Set property flags
+    setPropertyFlags(c_ParallelProcessingCertified);
 
   }
 

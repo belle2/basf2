@@ -57,6 +57,9 @@ namespace Belle2 {
     // Set description()
     setDescription("This module creates ARICHDigits from ARICHSimHits. Here spatial digitization is done, channel-by-channel QE is applied, and readout time window cut is applied.");
 
+    // Set property flags
+    setPropertyFlags(c_ParallelProcessingCertified);
+
     // Add parameters
     addParam("InputColName", m_inColName, "ARICHSimHits collection name", string("ARICHSimHitArray"));
     addParam("OutputColName", m_outColName, "ARICHDigit collection name", string("ARICHDigitArray"));
@@ -136,7 +139,6 @@ namespace Belle2 {
       double qe_scale =  m_arichgp->getChannelQE(moduleID, channelID) / m_maxQE;
       if (qe_scale > 1) B2ERROR("Channel QE is higher than QE  applied in SensitiveDetector");
       if (gRandom->Uniform(1) > qe_scale) continue;
-
 
       // Check if channel already registered hit in this event (no multiple hits)
       bool newhit = true;

@@ -43,16 +43,16 @@ throw(IOException)
   unsigned int count = socket.read(_header, sizeof(BinHeader));
   if (_header->nword_in_header * 4 != sizeof(BinHeader)) {
     throw (IOException(__FILE__, __LINE__,
-                       StringUtil::form("unexpected header size %d words",
-                                        _header->nword_in_header)));
+                       Belle2::form("unexpected header size %d words",
+                                    _header->nword_in_header)));
   }
   const int nbytes_remains = getByteSize() - sizeof(BinHeader);
   count += socket.read(_body, nbytes_remains);
   _trailer = (BinTrailer*)(((char*)_body) + nbytes_remains - sizeof(BinTrailer));
   if (_trailer->magic != TRAILER_MAGIC) {
     throw (IOException(__FILE__, __LINE__,
-                       StringUtil::form("unexpected header trailer magic %08x",
-                                        _trailer->magic)));
+                       Belle2::form("unexpected header trailer magic %08x",
+                                    _trailer->magic)));
   }
   return count;
 }

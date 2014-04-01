@@ -9,5 +9,6 @@
 
 #pragma link C++ class Belle2::SectorMapFactory+;
 #pragma link C++ class Belle2::Sector+;
+#pragma link C++ class Belle2::ActivatedSector+;
 
 #endif

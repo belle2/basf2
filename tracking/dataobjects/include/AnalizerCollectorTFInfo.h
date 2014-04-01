@@ -52,28 +52,28 @@ namespace Belle2 {
     virtual void storeAllHitInformation(std::string filename);
 
     /** Stores Hit Information of 1 Particle in a file */
-    virtual void storeHitInformation(std::string filename, int particle_id_filter);
+    virtual void storeHitInformation(std::string filename, int particleIdFilter);
 
 
     /** Stores All Cell Information in a file */
     virtual void storeAllCellInformation(std::string filename);
 
     /** Stores Cell Information of 1 Particle in a file */
-    virtual void storeCellInformation(std::string filename, int particle_id_filter);
+    virtual void storeCellInformation(std::string filename, int particleIdFilter);
 
 
     /** Stores All TCand Information in a file */
     virtual void storeAllTCInformation(std::string filename);
 
     /** Stores Hit Information of 1 Particle in a file */
-    virtual void storeTCInformation(std::string filename, int particle_id_filter);
+    virtual void storeTCInformation(std::string filename, int particleIdFilter);
 
 
     /** Stores All Cluster Information in a file */
     virtual void storeClustersInformation(std::string filename);
 
     /** Stores All Sector Information in a file */
-    virtual void storeSectorInformation(std::string filename, bool with_friends);
+    virtual void storeSectorInformation(std::string filename, bool withFriends);
 
     /** Sets all Particle IDs and real-Information from all clusters */
     virtual void setAllParticleIDs(double boarder);
@@ -81,7 +81,7 @@ namespace Belle2 {
 
   private:
 
-    const static std::string file_separator; /**< Seperator for output-File */
+    const static std::string m_fileSeparator; /**< Seperator for output-File */
 
     ClassDef(AnalizerCollectorTFInfo, 1)
   };

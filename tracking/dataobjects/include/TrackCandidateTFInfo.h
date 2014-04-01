@@ -21,15 +21,15 @@ namespace Belle2 {
    *  This class is needed for information transport between the VXD Track Finder and the display.
    *
    *  Members:
-   *  m_own_id (int) = Track Candidate ID
-   *  m_assigned_cell_ids (< int >) =  IDs of the connected Cells
+   *  m_ownId (int) = Track Candidate ID
+   *  m_assignedCellIds (< int >) =  IDs of the connected Cells
    *
    *  m_fitSuccessful = is true, when fit was successfull
    *  m_probValue = probability-value calculated by kalman fit (probability that his TC is real track)
    *  m_assignedGFTC = index number of assigned genfit::TrackCand for unique identification
    *
-   *   m_is_real (int)  0 = Particle is not real; 1 = Particle is real; 2 = contaminated TC
-   *   m_used_particles (vector pair (int, double) ) = Vector of Particles (pair: 1. int ParticleID, 2. purity)
+   *   m_isReal (int)  0 = Particle is not real; 1 = Particle is real; 2 = contaminated TC
+   *   m_usedParticles (vector pair (int, double) ) = Vector of Particles (pair: 1. int ParticleID, 2. purity)
    */
 
   class TrackCandidateTFInfo: public BaseTFInfo {
@@ -37,44 +37,44 @@ namespace Belle2 {
 
     /** Default constructor for the ROOT IO. */
     TrackCandidateTFInfo() {
-      m_own_id = -1;
-      m_assigned_cell_ids.clear();
+      m_ownId = -1;
+      m_assignedCellIds.clear();
 
       m_fitSuccessful = false;
       m_probValue = 0;
       m_assignedGFTC = -1;
 
-      m_is_real = 0;
+      m_isReal = 0;
     }
 
     /** Standard constructor */
-    TrackCandidateTFInfo(int par_pass_index, int par_own_id): BaseTFInfo(par_pass_index) {
-      m_own_id = par_own_id;
-      m_assigned_cell_ids.clear();
+    TrackCandidateTFInfo(int parPassIndex, int parOwnId): BaseTFInfo(parPassIndex) {
+      m_ownId = parOwnId;
+      m_assignedCellIds.clear();
 
       m_fitSuccessful = false;
       m_probValue = 0;
       m_assignedGFTC = -1;
 
-      m_is_real = 0;
+      m_isReal = 0;
     }
 
     /** getter - own_id */
-    int getOwnID()  { return m_own_id; }
+    int getOwnID()  { return m_ownId; }
 
     /** setter - own_id */
-    void setOwnID(int value) { m_own_id = value; }
+    void setOwnID(int value) { m_ownId = value; }
 
     /** getter - getAssignedCell*/
-    std::vector<int>& getAssignedCell()  { return m_assigned_cell_ids; }
+    std::vector<int>& getAssignedCell()  { return m_assignedCellIds; }
 
     /** add new int to AssignedCell */
     void push_back_AssignedCell(int newMember) {
-      m_assigned_cell_ids.push_back(newMember);
+      m_assignedCellIds.push_back(newMember);
     }
 
     /** returns size of AssignedCell */
-    int sizeAssignedCell() { return m_assigned_cell_ids.size(); }
+    int sizeAssignedCell() { return m_assignedCellIds.size(); }
 
 
     /** getter - isFitPossible returns whether fit using GenFit within the VXDTFModule was possible or not */
@@ -96,51 +96,51 @@ namespace Belle2 {
     void setProbValue(double value) { m_probValue = value; }
 
     /** getter - isReal */
-    int getIsReal()  { return m_is_real; }
+    int getIsReal()  { return m_isReal; }
 
     /** setter - isReal */
-    void setIsReal(int value) { m_is_real = value; }
+    void setIsReal(int value) { m_isReal = value; }
 
     /** getter - used_particles*/
-    std::vector<std::pair<int, double>>& getUsedParticles()  { return m_used_particles; }
+    std::vector<std::pair<int, double>>& getUsedParticles()  { return m_usedParticles; }
 
     /** add new to used_particles */
     void push_back_UsedParticles(std::pair<int, double> newMember) {
-      m_used_particles.push_back(newMember);
+      m_usedParticles.push_back(newMember);
     }
 
     /** getter - Particle with highest purity*/
     std::pair<int, double> getMainParticle()  {
 
-      int max_pos = 0;
+      int maxPos = 0;
 
-      for (uint i = 0; i < m_used_particles.size(); i++) {
-        if (m_used_particles.at(i).second > m_used_particles.at(max_pos).second) {
-          max_pos = i;
+      for (uint i = 0; i < m_usedParticles.size(); i++) {
+        if (m_usedParticles.at(i).second > m_usedParticles.at(maxPos).second) {
+          maxPos = i;
         }
       }
 
-      return m_used_particles.at(max_pos);
+      return m_usedParticles.at(maxPos);
     }
 
     /** getter - gets Particle with particleID*/
     std::pair<int, double> getInfoParticle(int particleID)  {
 
-      for (uint i = 0; i < m_used_particles.size(); i++) {
-        if (m_used_particles.at(i).first == particleID) {
-          return m_used_particles.at(i);
+      for (uint i = 0; i < m_usedParticles.size(); i++) {
+        if (m_usedParticles.at(i).first == particleID) {
+          return m_usedParticles.at(i);
         }
       }
 
-      return m_used_particles.at(0);
+      return m_usedParticles.at(0);
     }
 
 
     /** containsParticle - if Particle with particleID here */
     bool containsParticle(int particleID)  {
 
-      for (uint i = 0; i < m_used_particles.size(); i++) {
-        if (m_used_particles.at(i).first == particleID) {
+      for (uint i = 0; i < m_usedParticles.size(); i++) {
+        if (m_usedParticles.at(i).first == particleID) {
           return true;
         }
       }
@@ -149,41 +149,41 @@ namespace Belle2 {
     }
 
     /** returns size of used_particles */
-    int sizeUsedParticles() { return m_used_particles.size(); }
+    int sizeUsedParticles() { return m_usedParticles.size(); }
 
     /** returns the String for the display - Information */
     TString getDisplayInformation() {
 
       // NOT FINAL !!!
 
-      int cell_1 = -1;
-      if (m_assigned_cell_ids.size() > 0) { cell_1 = m_assigned_cell_ids.at(0); }
-      int cell_2 = -1;
-      if (m_assigned_cell_ids.size() > 1) { cell_2 = m_assigned_cell_ids.at(1); }
+      int cell1 = -1;
+      if (m_assignedCellIds.size() > 0) { cell1 = m_assignedCellIds.at(0); }
+      int cell2 = -1;
+      if (m_assignedCellIds.size() > 1) { cell2 = m_assignedCellIds.at(1); }
 
-      return TString::Format("Cell 1: %d, Cell 2: %d\n IsReal: %d\n Died_ID: %d ", cell_1, cell_2, m_is_real, getDiedID());
+      return TString::Format("Cell 1: %d, Cell 2: %d\n IsReal: %d\n Died_ID: %d ", cell1, cell2, m_isReal, getDiedID());
     }
 
     /** returns the String for the display - AlternativeBox */
     TString getDisplayAlternativeBox() {
 
-      std::pair<int, double> main_particle = getMainParticle();
-      std::string died_at = getDiedAt();
+      std::pair<int, double> mainParticle = getMainParticle();
+      std::string diedAt = getDiedAt();
 
-      return TString::Format("PassIndex: %d\n Died_ID: %s, IsReal: %d, ParticleID: %d, Purity: %.3f\n  Probability: %.3f, GTFC: %d", getPassIndex(), died_at.c_str(), m_is_real, main_particle.first, main_particle.second, m_probValue, m_assignedGFTC);
+      return TString::Format("PassIndex: %d\n Died_ID: %s, IsReal: %d, ParticleID: %d, Purity: %.3f\n  Probability: %.3f, GTFC: %d", getPassIndex(), diedAt.c_str(), m_isReal, mainParticle.first, mainParticle.second, m_probValue, m_assignedGFTC);
     }
 
   protected:
-    int m_own_id; /**< Track Candidate ID */
+    int m_ownId; /**< Track Canrdidate ID */
 
-    std::vector<int> m_assigned_cell_ids;  /**< IDs of the connected Cells */
+    std::vector<int> m_assignedCellIds;  /**< IDs of the connected Cells */
 
     bool m_fitSuccessful; /**< is true, when fit was successfull */
     double m_probValue; /**< probability-value calculated by kalman fit (probability that his TC is real track) */
     int m_assignedGFTC; /**< index number of assigned genfit::TrackCand for unique identification */
 
-    int m_is_real;  /**< 0 = Particle is not real; 1 = Particle is real; 2 = contaminated TC */
-    std::vector<std::pair<int, double>> m_used_particles;   /**< Vector of Particles (pair: 1. int ParticleID, 2. purity */
+    int m_isReal;  /**< 0 = Particle is not real; 1 = Particle is real; 2 = contaminated TC */
+    std::vector<std::pair<int, double>> m_usedParticles;   /**< Vector of Particles (pair: 1. int ParticleID, 2. purity */
 
     ClassDef(TrackCandidateTFInfo, 1)
   };

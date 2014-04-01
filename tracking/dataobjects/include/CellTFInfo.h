@@ -22,14 +22,14 @@ namespace Belle2 {
    * Members:
    *  state (int) = State of the cell
    *  m_neighbours (< int >) = Positions of the Neighbour-Cells in the same Vector
-   *    m_assigned_hits_ids (< int >) = Assigned Hit IDs using this Cells, (outer hit  = Index 0, inner hit = Index 1)
-   *  m_use_counter (int) = Countes the TCs using this cell (alive and connected)
-   *  m_max_counter (int) = max. m_use_counter
-   *    m_is_real (int)  0 = Particle is not real; 1 = Particle is real; 2 = part
-   *    m_used_particles (vector pair (int, double) ) = Vector of Particles (pair: 1. int ParticleID, 2. purity)
+   *    m_assignedHitsIds (< int >) = Assigned Hit IDs using this Cells, (outer hit  = Index 0, inner hit = Index 1)
+   *  m_useCounter (int) = Countes the TCs using this cell (alive and connected)
+   *  m_maxCounter (int) = max. m_useCounter
+   *    m_isReal (int)  0 = Particle is not real; 1 = Particle is real; 2 = part
+   *    m_usedParticles (vector pair (int, double) ) = Vector of Particles (pair: 1. int ParticleID, 2. purity)
    *
    * Important Methodes:
-   *  isOverlappedByTC: returns true if = used more then one time by TCs = Cell is overlapped = m_use_counter > 1
+   *  isOverlappedByTC: returns true if = used more then one time by TCs = Cell is overlapped = m_useCounter > 1
    *
    */
 
@@ -39,19 +39,19 @@ namespace Belle2 {
     /** Default constructor for the ROOT IO. */
     CellTFInfo() {
       m_state = 0;
-      m_use_counter = 0;
-      m_max_counter = 0;
-      m_is_real = 0;
+      m_useCounter = 0;
+      m_maxCounter = 0;
+      m_isReal = 0;
     };
 
     /** Standard constructor */
-    CellTFInfo(int par_pass_index): BaseTFInfo(par_pass_index) {
+    CellTFInfo(int parPassIndex): BaseTFInfo(parPassIndex) {
       m_state = 0;
       m_neighbours.clear();
-      m_assigned_hits_ids.clear();
-      m_use_counter = 0;
-      m_max_counter = 0;
-      m_is_real = 0;
+      m_assignedHitsIds.clear();
+      m_useCounter = 0;
+      m_maxCounter = 0;
+      m_isReal = 0;
     };
 
 
@@ -87,43 +87,43 @@ namespace Belle2 {
 
 
     /** getter - getAssignedHits*/
-    std::vector<int>& getAssignedHits()  { return m_assigned_hits_ids; }
+    std::vector<int>& getAssignedHits()  { return m_assignedHitsIds; }
 
     /** add new int to Assigned Hits */
     void push_back_AssignedHits(int newMember) {
-      m_assigned_hits_ids.push_back(newMember);
+      m_assignedHitsIds.push_back(newMember);
     }
 
     /** returns size of Assigned Hits */
-    int sizeAssignedHits() { return m_assigned_hits_ids.size(); }
+    int sizeAssignedHits() { return m_assignedHitsIds.size(); }
 
 
     /** getter - UseCounter */
-    int getUseCounter()  { return m_use_counter; }
+    int getUseCounter()  { return m_useCounter; }
 
     /** getMaxCounter */
-    int getMaxCounter()  { return m_max_counter; }
+    int getMaxCounter()  { return m_maxCounter; }
 
     /** setter - UseCounter */
     void setUseCounter(int value) {
-      m_use_counter = value;
-      if (m_use_counter > m_max_counter) {
-        m_max_counter = m_use_counter;
+      m_useCounter = value;
+      if (m_useCounter > m_maxCounter) {
+        m_maxCounter = m_useCounter;
       }
     }
 
     /** UseCounte add / minus */
     void changeUseCounter(int value) {
-      m_use_counter = m_use_counter + value;
-      if (m_use_counter > m_max_counter) {
-        m_max_counter = m_use_counter;
+      m_useCounter = m_useCounter + value;
+      if (m_useCounter > m_maxCounter) {
+        m_maxCounter = m_useCounter;
       }
     }
 
     // Cell is overlapped if it is used more then one time by a TC
     /** if the Cell is overlaped */
     bool isOverlappedByTC()  {
-      if (m_use_counter > 1) {
+      if (m_useCounter > 1) {
         return true;
       } else {
         return false;
@@ -131,52 +131,52 @@ namespace Belle2 {
     }
 
     /** getter - isReal */
-    int getIsReal()  { return m_is_real; }
+    int getIsReal()  { return m_isReal; }
 
     /** setter - isReal */
-    void setIsReal(int value) { m_is_real = value; }
+    void setIsReal(int value) { m_isReal = value; }
 
 
     /** getter - used_particles*/
-    std::vector<std::pair<int, double>>& getUsedParticles()  { return m_used_particles; }
+    std::vector<std::pair<int, double>>& getUsedParticles()  { return m_usedParticles; }
 
     /** add new to used_particles */
     void push_back_UsedParticles(std::pair<int, double> newMember) {
-      m_used_particles.push_back(newMember);
+      m_usedParticles.push_back(newMember);
     }
 
     /** getter - Particle with highest purity*/
     std::pair<int, double> getMainParticle()  {
 
-      int max_pos = 0;
+      int maxPos = 0;
 
-      for (uint i = 0; i < m_used_particles.size(); i++) {
-        if (m_used_particles.at(i).second > m_used_particles.at(max_pos).second) {
-          max_pos = i;
+      for (uint i = 0; i < m_usedParticles.size(); i++) {
+        if (m_usedParticles.at(i).second > m_usedParticles.at(maxPos).second) {
+          maxPos = i;
         }
       }
 
-      return m_used_particles.at(max_pos);
+      return m_usedParticles.at(maxPos);
     }
 
     /** getter - Particle with particleID*/
     std::pair<int, double> getInfoParticle(int particleID)  {
 
-      for (uint i = 0; i < m_used_particles.size(); i++) {
-        if (m_used_particles.at(i).first == particleID) {
-          return m_used_particles.at(i);
+      for (uint i = 0; i < m_usedParticles.size(); i++) {
+        if (m_usedParticles.at(i).first == particleID) {
+          return m_usedParticles.at(i);
         }
       }
 
-      return m_used_particles.at(0);
+      return m_usedParticles.at(0);
     }
 
 
     /** containsParticle - Particle with particleID */
     bool containsParticle(int particleID)  {
 
-      for (uint i = 0; i < m_used_particles.size(); i++) {
-        if (m_used_particles.at(i).first == particleID) {
+      for (uint i = 0; i < m_usedParticles.size(); i++) {
+        if (m_usedParticles.at(i).first == particleID) {
           return true;
         }
       }
@@ -186,7 +186,7 @@ namespace Belle2 {
 
 
     /** returns size of used_particles */
-    int sizeUsedParticles() { return m_used_particles.size(); }
+    int sizeUsedParticles() { return m_usedParticles.size(); }
 
     /** returns the String for the display - Information */
     TString getDisplayInformation() {
@@ -194,9 +194,9 @@ namespace Belle2 {
       // NOT FINAL !!!
 
       int outerHit = -1;
-      if (m_assigned_hits_ids.size() > 0) { outerHit = m_assigned_hits_ids.at(0); }
+      if (m_assignedHitsIds.size() > 0) { outerHit = m_assignedHitsIds.at(0); }
       int innerHit = -1;
-      if (m_assigned_hits_ids.size() > 1) { innerHit = m_assigned_hits_ids.at(1); }
+      if (m_assignedHitsIds.size() > 1) { innerHit = m_assignedHitsIds.at(1); }
 
       return TString::Format("OuterHit: %d, InnerHit: %d\n State: %d\n Died_ID: %d ", outerHit, innerHit, m_state, getDiedID());
     }
@@ -204,10 +204,10 @@ namespace Belle2 {
     /** returns the String for the display - AlternativeBox */
     TString getDisplayAlternativeBox() {
 
-      std::pair<int, double> main_particle = getMainParticle();
-      std::string died_at = getDiedAt();
+      std::pair<int, double> mainParticle = getMainParticle();
+      std::string diedAt = getDiedAt();
 
-      return TString::Format("State: %d, PassIndex: %d\n Died_ID: %s, IsReal: %d, ParticleID: %d, Purity: %.3f\n  Count NB-Cells: %d", m_state, getPassIndex(), died_at.c_str(), m_is_real, main_particle.first, main_particle.second, sizeNeighbours());
+      return TString::Format("State: %d, PassIndex: %d\n Died_ID: %s, IsReal: %d, ParticleID: %d, Purity: %.3f\n  Count NB-Cells: %d", m_state, getPassIndex(), diedAt.c_str(), m_isReal, mainParticle.first, mainParticle.second, sizeNeighbours());
     }
 
   protected:
@@ -216,13 +216,13 @@ namespace Belle2 {
 
     std::vector<int> m_neighbours;  /**<Position of the Neighbour-Cells in the same Vector  */
 
-    std::vector<int> m_assigned_hits_ids; /**< Assigned Hit IDs using this Cells, (outer hit  = Index 0, inner hit = Index 1) */
+    std::vector<int> m_assignedHitsIds; /**< Assigned Hit IDs using this Cells, (outer hit  = Index 0, inner hit = Index 1) */
 
-    int m_use_counter;  /**< Countes the TC (alive and connected) */
-    int m_max_counter;  /**< Max. Counts of TC (max. m_use_counter)  */
+    int m_useCounter;  /**< Countes the TC (alive and connected) */
+    int m_maxCounter;  /**< Max. Counts of TC (max. m_useCounter)  */
 
-    int m_is_real;  /**< 0 = Particle is not real; 1 = Particle is real */
-    std::vector<std::pair<int, double>> m_used_particles;   /**< Vector of Particles (pair: 1. int ParticleID, 2. purity */
+    int m_isReal;  /**< 0 = Particle is not real; 1 = Particle is real */
+    std::vector<std::pair<int, double>> m_usedParticles;   /**< Vector of Particles (pair: 1. int ParticleID, 2. purity */
 
     ClassDef(CellTFInfo, 1)
   };

@@ -26,25 +26,25 @@ ClassImp(HitTFInfo)
 HitTFInfo::HitTFInfo()
 {
   m_sectorID = -1;
-  m_use_counter = 0;
-  m_max_counter = 0;
-  m_use_counter_cell.clear();
-  m_use_TC_counter_IDs.clear();
-  m_is_real = 0;
+  m_useCounter = 0;
+  m_maxCounter = 0;
+  m_useCounterCell.clear();
+  m_useTCCounterIDs.clear();
+  m_isReal = 0;
   m_hitPos.SetXYZ(0., 0., 0.);
   m_hitSigma.SetXYZ(0., 0., 0.);
 };
 
-HitTFInfo::HitTFInfo(int par_pass_index, int par_sec_id, TVector3 par_position, TVector3 par_hitsigma): BaseTFInfo(par_pass_index)
+HitTFInfo::HitTFInfo(int parPassIndex, int parSecId, TVector3 parPosition, TVector3 parHitsigma): BaseTFInfo(parPassIndex)
 {
-  m_sectorID = par_sec_id;
-  m_use_counter = 0;
-  m_max_counter = 0;
-  m_use_counter_cell.clear();
-  m_use_TC_counter_IDs.clear();
-  m_is_real = 0;
-  m_hitPos = par_position;
-  m_hitSigma = par_hitsigma;
+  m_sectorID = parSecId;
+  m_useCounter = 0;
+  m_maxCounter = 0;
+  m_useCounterCell.clear();
+  m_useTCCounterIDs.clear();
+  m_isReal = 0;
+  m_hitPos = parPosition;
+  m_hitSigma = parHitsigma;
 };
 
 
@@ -53,23 +53,23 @@ HitTFInfo::HitTFInfo(int par_pass_index, int par_sec_id, TVector3 par_position, 
 int HitTFInfo::changeUseCounterCell(std::vector<int> value)
 {
 
-  if (value.size() < m_use_counter_cell.size()) {
+  if (value.size() < m_useCounterCell.size()) {
     B2DEBUG(10, "CollectorTFInfo: changeUseCounterCell too few input-values");
   }
 
   // if the vector is too small (standard at start => to size 2)
-  while (value.size() > m_use_counter_cell.size()) {
+  while (value.size() > m_useCounterCell.size()) {
     push_back_UseCounterCell(0);
   }
 
-  int cell_change = 0;
+  int cellChange = 0;
   for (uint i = 0; i < value.size() ; i++) {
-    m_use_counter_cell.at(i) +=  value.at(i);
-    cell_change += value.at(i);
+    m_useCounterCell.at(i) +=  value.at(i);
+    cellChange += value.at(i);
   }
 
   // Sum of delta changes to cells (could be negative)
-  return cell_change;
+  return cellChange;
 }
 
 
@@ -77,30 +77,30 @@ int HitTFInfo::changeUseCounterCell(std::vector<int> value)
 /** if the Hit is overlaped */
 bool HitTFInfo::isOverlappedByCellsOrTCs()
 {
-  bool is_overlapped = false;
+  bool isOverlapped = false;
 
   // CELLS
-  int all_ok_found_cells = 0;
+  int allOkFoundCells = 0;
 
   // Search if hit is overlapped because of the cell
-  for (auto & akt_cell : m_use_counter_cell) {
+  for (auto & currentCell : m_useCounterCell) {
 
-    //B2DEBUG(100,"Akt_cell" << akt_cell);
+    //B2DEBUG(100,"Akt_cell" << currentCell);
 
     //if hit is used once per cell (inner, outer) => no overlap
     // if hit is used more then once per cell => overlap
-    if (akt_cell > 1) {
-      is_overlapped = true;
+    if (currentCell > 1) {
+      isOverlapped = true;
       // Don't have to check other ones
 
-      B2DEBUG(100, "HitTFInfo: isOverlappedByCellsOrTCs - Cell overlapped, akt_cell: " <<  akt_cell);
+      B2DEBUG(100, "HitTFInfo: isOverlappedByCellsOrTCs - Cell overlapped, currentCell: " <<  currentCell);
 
-      return is_overlapped;
+      return isOverlapped;
     }
 
     // Counter for ok used cells (once)
-    else if (akt_cell == 1) {
-      all_ok_found_cells ++;
+    else if (currentCell == 1) {
+      allOkFoundCells ++;
     }
   }
 
@@ -108,14 +108,14 @@ bool HitTFInfo::isOverlappedByCellsOrTCs()
 
   //if there is a inner an a outer cell use / but there are more TCs => overlap
   // same TC => no overlap
-  if (all_ok_found_cells > 1 && m_use_TC_counter_IDs.size() > 1) {
-    is_overlapped = true;
+  if (allOkFoundCells > 1 && m_useTCCounterIDs.size() > 1) {
+    isOverlapped = true;
 
     B2DEBUG(100, "HitTFInfo: isOverlappedByCellsOrTCs - TC overlapped ");
 
   }
 
-  return is_overlapped;
+  return isOverlapped;
 }
 
 
@@ -125,11 +125,11 @@ void HitTFInfo::push_back_UseCounterTCIDs(int newMember)
 
   // -1 => no new Member
   if (newMember != -1) {
-    std::vector<int>::iterator found = find(m_use_TC_counter_IDs.begin(), m_use_TC_counter_IDs.end(), newMember);
+    std::vector<int>::iterator found = find(m_useTCCounterIDs.begin(), m_useTCCounterIDs.end(), newMember);
 
     // Only add the new TCID if not allready in the vector
-    if (found == m_use_TC_counter_IDs.end()) {
-      m_use_TC_counter_IDs.push_back(newMember);
+    if (found == m_useTCCounterIDs.end()) {
+      m_useTCCounterIDs.push_back(newMember);
 
       B2DEBUG(100, "push_back_UseCounterTCIDs newMember " << newMember << " *******");
     }
@@ -145,11 +145,11 @@ void HitTFInfo::push_back_AllCounterTCIDs(int newMember)
 
   // -1 => no new Member
   if (newMember != -1) {
-    std::vector<int>::iterator found = find(m_all_TC_counter_IDs.begin(), m_all_TC_counter_IDs.end(), newMember);
+    std::vector<int>::iterator found = find(m_allTCCounterIDs.begin(), m_allTCCounterIDs.end(), newMember);
 
     // Only add the new TCID if not allready in the vector
-    if (found == m_all_TC_counter_IDs.end()) {
-      m_all_TC_counter_IDs.push_back(newMember);
+    if (found == m_allTCCounterIDs.end()) {
+      m_allTCCounterIDs.push_back(newMember);
 
       B2DEBUG(100, "push_back_AllCounterTCIDs newMember " << newMember << " *******");
     }
@@ -164,13 +164,13 @@ void HitTFInfo::remove_UseCounterTCIDs(int oldMember)
 
   // -1 => no old Member
   if (oldMember != -1) {
-    std::vector<int>::iterator found = find(m_use_TC_counter_IDs.begin(), m_use_TC_counter_IDs.end(), oldMember);
+    std::vector<int>::iterator found = find(m_useTCCounterIDs.begin(), m_useTCCounterIDs.end(), oldMember);
 
     // Only add the new TCID if not allready in the vector
-    if (found != m_use_TC_counter_IDs.end()) {
-      m_use_TC_counter_IDs.erase(found);
+    if (found != m_useTCCounterIDs.end()) {
+      m_useTCCounterIDs.erase(found);
 
-      B2DEBUG(100, "removed from m_use_TC_counter_IDs oldMember " << oldMember << " *******");
+      B2DEBUG(100, "removed from m_useTCCounterIDs oldMember " << oldMember << " *******");
     }
   }
 }

@@ -19,11 +19,11 @@ namespace Belle2 {
    *  This class is needed for information transport between the VXD Track Finder and the display.
    *
    *  Members:
-   *    pass_index (int) = Index of the Pass (to access object, unique for each pass)
-   *    died_at (string) = Information (Filter, ...) where the object died at
-   *  accepted (< int >) =  all Filter IDs accepted the object
-   *    rejected (< int >) =  all Filter IDs rejected the object
-   *  m_died_id (int) = ID of Died at Part
+   *    m_passIndex (int) = Index of the Pass (to access object, unique for each pass)
+   *    m_diedAt (string) = Information (Filter, ...) where the object died at
+   *    m_accepted (< int >) =  all Filter IDs accepted the object
+   *    m_rejected (< int >) =  all Filter IDs rejected the object
+   *    m_diedId (int) = ID of Died at Part
    *
    *  Important Methodes:
    *  getActive(): returns true if = object is still active = no Information at died_at
@@ -33,24 +33,24 @@ namespace Belle2 {
   public:
 
     /** Default constructor for the ROOT IO. */
-    BaseTFInfo(): m_died_at("") {
+    BaseTFInfo(): m_diedAt("") {
       m_accepted.clear();
       m_rejected.clear();
-      m_pass_index = -1;
-      m_died_id = -1;
+      m_passIndex = -1;
+      m_diedId = -1;
     };
 
     /** Standard constructor */
-    BaseTFInfo(int par_pass_index): m_died_at("") {
+    BaseTFInfo(int par_pass_index): m_diedAt("") {
       m_accepted.clear();
       m_rejected.clear();
-      m_pass_index = par_pass_index;
-      m_died_id = -1;
+      m_passIndex = par_pass_index;
+      m_diedId = -1;
     };
 
     /** getter - getActive Active*/
     bool getActive() {
-      if (m_died_at.size() == 0) {
+      if (m_diedAt.size() == 0) {
         return true;
       } else {
         return false;
@@ -58,7 +58,7 @@ namespace Belle2 {
     }
 
     /** getter - getDiedAt Died At */
-    std::string getDiedAt()  { return m_died_at; }
+    std::string getDiedAt()  { return m_diedAt; }
 
     /** setter - Died At */
     void setDiedAt(std::string value) {
@@ -66,13 +66,13 @@ namespace Belle2 {
       if (value.size() > 0) {
 
         // If same Died at is not already writen
-        if (m_died_at.find(value) == std::string::npos) {
+        if (m_diedAt.find(value) == std::string::npos) {
 
-          if (m_died_at.size() > 0) {
-            m_died_at.append("-");
+          if (m_diedAt.size() > 0) {
+            m_diedAt.append("-");
           }
 
-          m_died_at.append(value);
+          m_diedAt.append(value);
 
         }
       }
@@ -113,23 +113,23 @@ namespace Belle2 {
     }
 
     /** getter - getState Pass Index */
-    int getPassIndex()  { return m_pass_index; }
+    int getPassIndex()  { return m_passIndex; }
 
     /** setter - Pass Index */
-    void setPassIndex(int value) { m_pass_index = value; }
+    void setPassIndex(int value) { m_passIndex = value; }
 
     /** getter - getState Pass Index */
-    int getDiedID()  { return m_died_id; }
+    int getDiedID()  { return m_diedId; }
 
     /** setter - Pass Index */
-    void setDiedID(int value) { m_died_id = value; }
+    void setDiedID(int value) { m_diedId = value; }
 
 
   protected:
 
-    int m_pass_index; /**< Pass Index */
-    std::string m_died_at; /**< Died at */
-    int m_died_id; /**< ID of Died at Part */
+    int m_passIndex; /**< Pass Index */
+    std::string m_diedAt; /**< Died at */
+    int m_diedId; /**< ID of Died at Part */
 
     std::vector<int> m_accepted;  /**< filters accepted it */
     std::vector<int> m_rejected;  /**< filters rejected it */

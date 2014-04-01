@@ -21,16 +21,16 @@ namespace Belle2 {
    *  This class is needed for information transport between the VXD Track Finder and the display.
    *
    * Members:
-   *  m_real_cluster_id (int) = Cluster ID = Positon in the Store Array
-   *  n_relative_cluster_id (int) = Relative Cluster ID in TF used Cluster Array
+   *  m_realClusterId (int) = Cluster ID = Positon in the Store Array
+   *  m_relativeClusterId (int) = Relative Cluster ID in TF used Cluster Array
    *  m_detectorType (int) = Detector Type for svd/pxd difference
-   *  m_use_counter (int) = Countes the Hits using this Cluster (alive and connected)
-   *  m_max_counter (int) = max. m_use_counter
+   *  m_useCounter (int) = Countes the Hits using this Cluster (alive and connected)
+   *  m_maxCounter (int) = max. m_useCounter
    *    m_particleID (int) = Particle ID
-   *  m_is_real (int) => 0 = Particle is not real; 1 = Particle is real
+   *  m_isReal (int) => 0 = Particle is not real; 1 = Particle is real
    *
    * Important Methodes:
-   *  isOverlapped: returns true if = used more then one time by Hits = Cluster is overlapped = m_use_counter > 1
+   *  isOverlapped: returns true if = used more then one time by Hits = Cluster is overlapped = m_useCounter > 1
    *
    */
 
@@ -39,39 +39,39 @@ namespace Belle2 {
 
     /** Default constructor for the ROOT IO. */
     ClusterTFInfo() {
-      m_real_cluster_id = -1;
+      m_realClusterId = -1;
       m_detectorType = -1;
-      m_use_counter = 0;
-      m_max_counter = 0;
+      m_useCounter = 0;
+      m_maxCounter = 0;
       m_particleID = -1;
-      m_is_real = 0;
-      n_relative_cluster_id = -1;
-      m_pdg_code = 0;
+      m_isReal = 0;
+      m_relativeClusterId = -1;
+      m_pdgCode = 0;
     }
 
     /** Standard constructor */
     ClusterTFInfo(int par_pass_index, int par_cluster_id, int par_detector): BaseTFInfo(par_pass_index) {
-      m_real_cluster_id = par_cluster_id;
+      m_realClusterId = par_cluster_id;
       m_detectorType = par_detector;
-      m_use_counter = 0;
-      m_max_counter = 0;
+      m_useCounter = 0;
+      m_maxCounter = 0;
       m_particleID = -1;
-      m_is_real = 0;
-      n_relative_cluster_id = -1;
-      m_pdg_code = 0;
+      m_isReal = 0;
+      m_relativeClusterId = -1;
+      m_pdgCode = 0;
     }
 
     /** getter - RealClusterID */
-    int getRealClusterID()  { return m_real_cluster_id; }
+    int getRealClusterID()  { return m_realClusterId; }
 
     /** setter - RealClusterID */
-    void setRealClusterID(int value) { m_real_cluster_id = value; }
+    void setRealClusterID(int value) { m_realClusterId = value; }
 
     /** getter - RelativeClusterID */
-    int getRelativeClusterID()  { return n_relative_cluster_id; }
+    int getRelativeClusterID()  { return m_relativeClusterId; }
 
     /** setter - RelativeClusterID */
-    void setRelativeClusterID(int value) { n_relative_cluster_id = value; }
+    void setRelativeClusterID(int value) { m_relativeClusterId = value; }
 
     /** getter - Detector Type */
     int getDetectorType()  { return m_detectorType; }
@@ -81,31 +81,31 @@ namespace Belle2 {
 
 
     /** getter - UseCounter */
-    int getUseCounter()  { return m_use_counter; }
+    int getUseCounter()  { return m_useCounter; }
 
     /** getMaxCounter */
-    int getMaxCounter()  { return m_max_counter; }
+    int getMaxCounter()  { return m_maxCounter; }
 
     /** setter - UseCounter */
     void setUseCounter(int value) {
-      m_use_counter = value;
-      if (m_use_counter > m_max_counter) {
-        m_max_counter = m_use_counter;
+      m_useCounter = value;
+      if (m_useCounter > m_maxCounter) {
+        m_maxCounter = m_useCounter;
       }
     }
 
     /** UseCounte add / minus */
     void changeUseCounter(int value) {
-      m_use_counter = m_use_counter + value;
-      if (m_use_counter > m_max_counter) {
-        m_max_counter = m_use_counter;
+      m_useCounter = m_useCounter + value;
+      if (m_useCounter > m_maxCounter) {
+        m_maxCounter = m_useCounter;
       }
     }
 
     // Cluster is overlapped if it is used more then one time
     /** if the Cluster is overlaped */
     bool isOverlapped()  {
-      if (m_use_counter > 1) {
+      if (m_useCounter > 1) {
         return true;
       } else {
         return false;
@@ -119,33 +119,33 @@ namespace Belle2 {
     void setParticleID(int value) { m_particleID = value; }
 
     /** getter - isReal */
-    int getIsReal()  { return m_is_real; }
+    int getIsReal()  { return m_isReal; }
 
     /** setter - isReal */
-    void setIsReal(int value) { m_is_real = value; }
+    void setIsReal(int value) { m_isReal = value; }
 
     /** getter - isReal */
-    int getPDG()  { return m_pdg_code; }
+    int getPDG()  { return m_pdgCode; }
 
     /** setter - isReal */
-    void setPDG(int value) { m_pdg_code = value; }
+    void setPDG(int value) { m_pdgCode = value; }
 
 
 
   protected:
 
-    int m_real_cluster_id;    /**< Store Arrays ID */
-    int n_relative_cluster_id;  /**< Relative Cluster ID in TF used Cluster Array */
+    int m_realClusterId;    /**< Store Arrays ID */
+    int m_relativeClusterId;  /**< Relative Cluster ID in TF used Cluster Array */
 
     int m_detectorType;  /**< Detector Type */
 
-    int m_use_counter;  /**< Countes the Hits using this Cluster (alive and connected)  */
-    int m_max_counter;  /**< max. m_use_counter */
+    int m_useCounter;  /**< Countes the Hits using this Cluster (alive and connected)  */
+    int m_maxCounter;  /**< max. m_useCounter */
 
     int m_particleID;  /**< Particle ID */
-    int m_is_real;  /**< 0 = Particle is not real; 1 = Particle is real */
+    int m_isReal;  /**< 0 = Particle is not real; 1 = Particle is real */
 
-    int m_pdg_code;   /**< PDG Code */
+    int m_pdgCode;   /**< PDG Code */
 
     ClassDef(ClusterTFInfo, 1)
   };

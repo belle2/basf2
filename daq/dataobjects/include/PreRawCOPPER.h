@@ -13,12 +13,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/time.h>
+#include <limits.h>
 
 #include <rawdata/dataobjects/RawDataBlock.h>
+#include <rawdata/CRCCalculator.h>
 #include <daq/dataobjects/ReducedRawCOPPER.h>
 #include <daq/dataobjects/ReducedRawHeader.h>
 #include <daq/dataobjects/ReducedRawTrailer.h>
 #include <framework/datastore/DataStore.h>
+
 
 
 #include <TObject.h>
@@ -268,6 +271,9 @@ namespace Belle2 {
     //!
     int CopyReducedBuffer(int n, int* buf_to);
 
+    //!
+    int CheckB2LHSLBMagicWords(int* finesse_buf, int finesse_nwords);
+
 
     //
     // size of "COPPER front header" and "COPPER trailer"
@@ -319,12 +325,18 @@ namespace Belle2 {
       SIZE_B2LHSLB_HEADER = 1
     };
 
+
     //
     // Data Format : "B2Link HSLB Trailer"
     //
     enum {
       POS_CHKSUM_B2LHSLB = 0,
       SIZE_B2LHSLB_TRAILER = 1
+    };
+
+    enum {
+      B2LHSLB_HEADER_MAGIC = 0xFFAA0000,
+      B2LHSLB_TRAILER_MAGIC = 0xFF550000
     };
 
 
@@ -362,10 +374,12 @@ namespace Belle2 {
 
     ReducedRawTrailer tmp_trailer; //! Not record
 
+
   protected :
     //! copy data
     void copyData(int* buf_to, int* pos_nwords_to, const int* buf_from,
                   const int copy_nwords, const int nwords_buf_to);
+
 
 
     ClassDef(PreRawCOPPER, 2);

@@ -352,11 +352,13 @@ void PreRawCOPPER::CheckData(int n,
   // Check incrementation of event #
   //
   *cur_runsubrun_no = GetRunNoSubRunNo(n);
+  if (
 #ifdef WO_FIRST_EVENUM_CHECK
-  if (prev_evenum != 0xFFFFFFFF && *cur_evenum_rawcprhdr != 0)  {
+    prev_evenum != 0xFFFFFFFF && *cur_evenum_rawcprhdr != 0
 #else
-  if (prev_runsubrun_no == *cur_runsubrun_no && prev_runsubrun_no >= 0) {
+    prev_runsubrun_no == *cur_runsubrun_no && prev_runsubrun_no >= 0
 #endif
+  ) {
     if ((unsigned int)(prev_evenum + 1) != *cur_evenum_rawcprhdr) {
       sprintf(err_buf, "CORRUPTED DATA: Event # jump : i %d prev 0x%x cur 0x%x : Exiting...\n%s %s %d\n",
               n, prev_evenum, *cur_evenum_rawcprhdr,
@@ -367,11 +369,13 @@ void PreRawCOPPER::CheckData(int n,
 
 
   *cur_copper_ctr = GetCOPPERCounter(n);
+  if (
 #ifdef WO_FIRST_EVENUM_CHECK
-  if (prev_copper_ctr != 0xFFFFFFFF) {
+    prev_copper_ctr != 0xFFFFFFFF
 #else
-  if (true) {
+    true
 #endif
+  ) {
     if ((unsigned int)(prev_copper_ctr + 1) != *cur_copper_ctr) {
       sprintf(err_buf, "COPPER counter jump : i %d prev 0x%x cur 0x%x :\n%s %s %d\n",
               n, prev_copper_ctr, *cur_copper_ctr,
@@ -478,6 +482,7 @@ bool PreRawCOPPER::CheckCOPPERMagic(int n)
   return true;
 }
 
+
 void PreRawCOPPER::CheckUtimeCtimeTRGType(int n)
 {
 
@@ -541,8 +546,8 @@ double PreRawCOPPER::GetEventUnixTime(int n)
   exit(1);
   return 0.;
 #endif
-
 }
+
 
 
 unsigned int PreRawCOPPER::GetB2LHeaderWord(int n, int finesse_buffer_pos)
@@ -587,16 +592,16 @@ unsigned int PreRawCOPPER::GetB2LHeaderWord(int n, int finesse_buffer_pos)
     exit(-1);
 #endif
   }
-
   return ret_word;
-
 }
+
 
 
 unsigned int PreRawCOPPER::FillTopBlockRawHeader(unsigned int m_node_id, unsigned int m_data_type,
                                                  unsigned int m_trunc_mask, unsigned int prev_eve32,
                                                  int prev_runsubrun_no, int* cur_runsubrun_no)
 {
+
   const int cpr_id = 0;
   //
   // This function only fills ReducedRawHeader contents for the first datablock.
@@ -709,10 +714,10 @@ unsigned int PreRawCOPPER::FillTopBlockRawHeader(unsigned int m_node_id, unsigne
   //
   // Add node-info
   //
-//   if (m_buffer[ ReducedRawHeader::POS_NUM_NODES ] < ReducedRawHeader::NUM_MAX_NODES) {
-//     m_buffer[ ReducedRawHeader::POS_NODES_1 + m_buffer[ ReducedRawHeader::POS_NUM_NODES ] ] = m_node_id;
-//   }
-//   m_buffer[ ReducedRawHeader::POS_NUM_NODES ]++;
+  //   if (m_buffer[ ReducedRawHeader::POS_NUM_NODES ] < ReducedRawHeader::NUM_MAX_NODES) {
+  //     m_buffer[ ReducedRawHeader::POS_NODES_1 + m_buffer[ ReducedRawHeader::POS_NUM_NODES ] ] = m_node_id;
+  //   }
+  //   m_buffer[ ReducedRawHeader::POS_NUM_NODES ]++;
 
 
 
@@ -806,11 +811,13 @@ unsigned int PreRawCOPPER::FillTopBlockRawHeader(unsigned int m_node_id, unsigne
   //
   *cur_runsubrun_no = GetRunNoSubRunNo(cpr_id);
   if (prev_runsubrun_no == *cur_runsubrun_no && prev_runsubrun_no >= 0) {
+    if (
 #ifdef WO_FIRST_EVENUM_CHECK
-    if ((prev_eve32 + 1 != cur_ftsw_eve32) && (prev_eve32 != 0xFFFFFFFF && cur_ftsw_eve32 != 0)) {
+      (prev_eve32 + 1 != cur_ftsw_eve32) && (prev_eve32 != 0xFFFFFFFF && cur_ftsw_eve32 != 0)
 #else
-    if (prev_eve32 + 1 != cur_ftsw_eve32) {
+      prev_eve32 + 1 != cur_ftsw_eve32
 #endif
+    ) {
 
 #ifndef NO_DATA_CHECK
       char err_buf[500];
@@ -919,7 +926,6 @@ int PreRawCOPPER::CalcReducedNwords(int n)
 //   pos_nwords_to += copy_nwords;
 //   pos_nwords_from += copy_nwords;
 
-
 //   //
 //   // Apply changes followed by data size reduction
 //   //
@@ -929,9 +935,9 @@ int PreRawCOPPER::CalcReducedNwords(int n)
 //   *(buf_to + reduced_rawcpr.tmp_header.POS_OFFSET_2ND_FINESSE ) = pos_nwords_finesse[ 1 ];
 //   *(buf_to + reduced_rawcpr.tmp_header.POS_OFFSET_3RD_FINESSE ) = pos_nwords_finesse[ 2 ];
 //   *(buf_to + reduced_rawcpr.tmp_header.POS_OFFSET_4TH_FINESSE ) = pos_nwords_finesse[ 3 ];
-
 //   return;
 // }
+
 
 
 
@@ -942,23 +948,35 @@ int PreRawCOPPER::CopyReducedBuffer(int n, int* buf_to)
   int pos_nwords_to = 0;
   int copy_nwords = 0;
 
+  // copyt to ReducedRawCOPPER
+  ReducedRawCOPPER reduced_rawcpr;
+
   //Header copy
   copy_nwords = tmp_header.GetHdrNwords();
   buf_from = GetBuffer(n);
   copyData(buf_to, &pos_nwords_to, buf_from, copy_nwords, nwords_buf_to);
+
+  //Check Header
+  //  tmp_header.CheckHeader( buf_from );
+  reduced_rawcpr.tmp_header.CheckHeader(buf_to + pos_nwords_to - copy_nwords);
+
 
   // copy FINESSE buffer
   int pos_nwords_finesse[ 4 ];
   for (int j = 0; j < 4; j++) {
     pos_nwords_finesse[ j ] = pos_nwords_to;
     if (GetFINESSENwords(n, j) > 0) {
+      int* finesse_buf = GetFINESSEBuffer(n, j);
+      int finesse_nwords = GetFINESSENwords(n, j);
+      CheckB2LHSLBMagicWords(finesse_buf, finesse_nwords);
+
       // copy body
       buf_from =
-        GetFINESSEBuffer(n, j)
+        finesse_buf
         + SIZE_B2LHSLB_HEADER
         + POS_B2L_CTIME;
       copy_nwords =
-        GetFINESSENwords(n, j)
+        finesse_nwords
         - SIZE_B2LHSLB_HEADER
         - POS_B2L_CTIME
         - SIZE_B2LFEE_TRAILER
@@ -967,6 +985,8 @@ int PreRawCOPPER::CopyReducedBuffer(int n, int* buf_to)
       //      printf("pos %d nwords %d  nwords to %d\n", pos_nwords_to, copy_nwords, nwords_buf_to );
       copyData(buf_to, &pos_nwords_to, buf_from, copy_nwords, nwords_buf_to);
 
+      // check CRC data
+      CalcCRC16(0xFFFF, (char*)buf_to, copy_nwords);
 
     }
   }
@@ -989,7 +1009,6 @@ int PreRawCOPPER::CopyReducedBuffer(int n, int* buf_to)
   //
   // Apply changes followed by data size reduction
   //
-  ReducedRawCOPPER reduced_rawcpr;
   *(buf_to + reduced_rawcpr.tmp_header.POS_NWORDS) = nwords_buf_to;
   *(buf_to + reduced_rawcpr.tmp_header.POS_OFFSET_1ST_FINESSE) = pos_nwords_finesse[ 0 ];
   *(buf_to + reduced_rawcpr.tmp_header.POS_OFFSET_2ND_FINESSE) = pos_nwords_finesse[ 1 ];
@@ -997,34 +1016,26 @@ int PreRawCOPPER::CopyReducedBuffer(int n, int* buf_to)
   *(buf_to + reduced_rawcpr.tmp_header.POS_OFFSET_4TH_FINESSE) = pos_nwords_finesse[ 3 ];
 
 
+  //       printf("fROM =======================================\n");
+  //       for (int k = 0; k < nwords_buf_to; k++) {
+  //  printf(" %.8x", GetBuffer(n)[ k ]);
+  //  if ( ( k + 1 ) % 10 == 0) {
+  //    printf("\n");
+  //  }
+  //       }
+  //       printf("\n");
 
-//       printf("fROM =======================================\n");
-//       for (int k = 0; k < nwords_buf_to; k++) {
-//  printf(" %.8x", GetBuffer(n)[ k ]);
-//  if ( ( k + 1 ) % 10 == 0) {
-//    printf("\n");
-//  }
-//       }
-//       printf("\n");
-
-
-//       printf("tO   =======================================\n");
-//       for (int k = 0; k < nwords_buf_to; k++) {
-//  printf(" %.8x", buf_to[ k ]);
-//  if ( ( k + 1 ) % 10 == 0) {
-//    printf("\n");
-//  }
-//       }
-//       printf("\n");
-//       printf("=============================================\n");
-
-
-
+  //       printf("tO   =======================================\n");
+  //       for (int k = 0; k < nwords_buf_to; k++) {
+  //  printf(" %.8x", buf_to[ k ]);
+  //  if ( ( k + 1 ) % 10 == 0) {
+  //    printf("\n");
+  //  }
+  //       }
+  //       printf("\n");
+  //       printf("=============================================\n");
   return pos_nwords_to;
-
 }
-
-
 
 void PreRawCOPPER::copyData(int* buf_to, int* pos_nwords_to, const int* buf_from,
                             const int copy_nwords, const int nwords_buf_to)
@@ -1038,6 +1049,23 @@ void PreRawCOPPER::copyData(int* buf_to, int* pos_nwords_to, const int* buf_from
   memcpy(buf_to + *pos_nwords_to, buf_from, copy_nwords * sizeof(int));
   *pos_nwords_to += copy_nwords;
   return;
+}
+
+int PreRawCOPPER::CheckB2LHSLBMagicWords(int* finesse_buf, int finesse_nwords)
+{
+  if ((finesse_buf[ POS_MAGIC_B2LHSLB ] & 0xFFFF0000) == B2LHSLB_HEADER_MAGIC &&
+      ((finesse_buf[ finesse_nwords - SIZE_B2LHSLB_TRAILER + POS_CHKSUM_B2LHSLB ] & 0xFFFF0000)
+       == B2LHSLB_TRAILER_MAGIC)) {
+    return 1;
+  } else {
+    printf("Invalid B2LHSLB magic words 0x%x 0x%x. Exiting... :%s %s %d\n",
+           finesse_buf[ POS_MAGIC_B2LHSLB ],
+           finesse_buf[ finesse_nwords - SIZE_B2LHSLB_TRAILER + POS_CHKSUM_B2LHSLB ],
+           __FILE__, __PRETTY_FUNCTION__, __LINE__);
+    fflush(stdout);
+    exit(-1);
+    return -1;
+  }
 }
 
 
@@ -1092,5 +1120,3 @@ void PreRawCOPPER::CheckB2LFEEHeaderVersion(int n)
   return;
 }
 #endif
-
-

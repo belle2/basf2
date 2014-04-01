@@ -199,7 +199,6 @@ int DeSerializerPCModule::Connect()
   }
   printf("[DEBUG] Initialization finished\n");
   return 0;
-
 }
 
 
@@ -220,9 +219,6 @@ int* DeSerializerPCModule::recvData(int* malloc_flag, int* total_buf_nwords, int
   *total_buf_nwords = 0;
   *num_nodes_in_sendblock = 0;
   *num_events_in_sendblock = 0;
-
-
-
 
   //
   // Read Header and obtain data size
@@ -333,7 +329,6 @@ int* DeSerializerPCModule::recvData(int* malloc_flag, int* total_buf_nwords, int
   }
 
   return temp_buf;
-
 }
 
 
@@ -405,13 +400,10 @@ void DeSerializerPCModule::reduceData(RawDataBlock* raw_datablk,
       }
     }
   }
-
   //
   // allocate buffer
   //
   int* buf_to = getBuffer(reduced_nwords, malloc_flag_to);
-
-
 
   //
   // Reduce the buffer length
@@ -435,7 +427,6 @@ void DeSerializerPCModule::reduceData(RawDataBlock* raw_datablk,
       }
     }
   }
-
   raw_datablk->SetBuffer(buf_to, pos_nwords_to, 0,
                          raw_datablk->GetNumEvents(), raw_datablk->GetNumNodes());
 
@@ -446,9 +437,9 @@ void DeSerializerPCModule::reduceData(RawDataBlock* raw_datablk,
 }
 #endif // REDUCED_RAWCOPPER
 
+
 void DeSerializerPCModule::checkData(RawDataBlock* raw_datablk, unsigned int* eve_copper_0)
 {
-
   int data_size_copper_0 = -1;
   int data_size_copper_1 = -1;
 
@@ -723,6 +714,5 @@ void DeSerializerPCModule::event()
   }
 
   n_basf2evt++;
-
   return;
 }

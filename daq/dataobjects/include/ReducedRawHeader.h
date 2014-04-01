@@ -130,6 +130,8 @@ namespace Belle2 {
 
     void GetTTTimeVal(struct  timeval* tv);    //! get contents of header
 
+    void CheckHeader(int* buf);      //!
+
     // Get magic word to check the data corruption
     //    unsigned int GetMagicWordEntireHeader();
 

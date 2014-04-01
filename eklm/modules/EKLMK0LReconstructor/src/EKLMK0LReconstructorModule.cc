@@ -23,7 +23,7 @@
 #include <eklm/modules/EKLMK0LReconstructor/EKLMK0LReconstructorModule.h>
 
 
-#include <mdst/dataobjects/K0L.h>
+#include <mdst/dataobjects/KLMCluster.h>
 
 using namespace Belle2;
 
@@ -268,12 +268,12 @@ void EKLMK0LReconstructorModule::fillMdstDataobjects()
 
   /* Fill MDST dataobject */
   StoreArray<EKLMK0L> k0lArray;
-  StoreArray<K0L> k0lMdstArray;
+  StoreArray<KLMCluster> klmClusterMDST;
 
   for (int i = 0; i < k0lArray.getEntries(); i++) {
     HepGeom::Point3D<double> pos = k0lArray[i]->getGlobalPosition();
     CLHEP::HepLorentzVector momentum = k0lArray[i]->getMomentum();
-    new(k0lMdstArray.nextFreeAddress()) K0L(
+    new(klmClusterMDST.nextFreeAddress()) KLMCluster(
       pos.x(), pos.y(), pos.z(),
       k0lArray[i]->getTime(),
       k0lArray[i]->getLayers(),
@@ -314,7 +314,7 @@ void EKLMK0LReconstructorModule::initialize()
 {
   RelationArray::registerPersistent<EKLMK0L, EKLMHit2d>();
   StoreArray<EKLMK0L>::registerPersistent();
-  StoreArray<K0L>::registerPersistent();
+  StoreArray<KLMCluster>::registerPersistent();
 }
 
 void EKLMK0LReconstructorModule::beginRun()

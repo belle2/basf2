@@ -5,14 +5,14 @@
  * Author: The Belle II Collaboration                                     *
  * Contributors: Timofey Uglov                                            *
  *                                                                        *
- * K0L mdst class is a 'copy' of the EKLMK0L class                        *
+ * KLMCluster mdst class is a 'copy' of the EKLMKLMCluster class                        *
  * adopted to fit mdst requirements                                       *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef K0L_H
-#define K0L_H
+#ifndef KLMCluster_H
+#define KLMCluster_H
 
 // MDST classes could depend only on framework
 #include <framework/datastore/RelationsObject.h>
@@ -26,65 +26,101 @@
 namespace Belle2 {
 
   /**
-   * K0L data.
+   * KLMCluster data.
    */
-  class K0L: public RelationsObject  {
+  class KLMCluster: public RelationsObject  {
 
   public:
 
     /**
      * Default Constructor.
      */
-    K0L();
+    KLMCluster();
 
-    // it is very unlikely that users will create and use their own K0L objects. Thus it seems worth to remove all setters and use constructor instead
-
+    // it is very unlikely that users will create and use their own KLMCluster objects. Thus it seems worth to remove all setters and use constructor instead
+    // the only exception are inline setters for connected track and ecl cluster flags (Since these flags are seeted by another module)
     /**
      * Constructor with all information
      */
-    K0L(ROOT::Math::XYZPointF coordinates, float time, int nLayers, int nInnermostLayer, TVector3 momentum);
+    KLMCluster(ROOT::Math::XYZPointF coordinates, float time, int nLayers, int nInnermostLayer, TVector3 momentum);
 
     /**
      * Constructor with all information in floats
      */
-    K0L(float x, float y, float z, float time, int nLayers, int nInnermostLayer, float px, float py, float pz);
+    KLMCluster(float x, float y, float z, float time, int nLayers, int nInnermostLayer, float px, float py, float pz);
 
 
     /**
      * Destructor
      */
-    ~K0L();
+    ~KLMCluster();
 
 
     /**
      * Get time.
      * @return Time of decay.
      */
-    float getTime() const;
+    inline float getTime() const
+    {return m_time;}
 
     /**
      * Get number of layers with hits.
      * @return Number of layers.
      */
-    int getLayers() const;
+    inline int getLayers() const
+    { return m_layers;}
 
     /**
      * Get global position of the particle hit.
      * @return Hit coordinates.
      */
-    ROOT::Math::XYZPointF getGlobalPosition() const;
+    inline ROOT::Math::XYZPointF getGlobalPosition() const
+    {return ROOT::Math::XYZPointF(m_globalX, m_globalY, m_globalZ);}
 
     /**
      * Get global position (TVector3 version, for visualization).
      * @return Hit coordinates.
      */
-    TVector3 getPosition() const;
+    inline TVector3 getPosition() const
+    {return TVector3(m_globalX, m_globalY, m_globalZ);}
 
     /**
      * Get momentum,
      * @return 4-Momentum.
      */
-    TLorentzVector getMomentum() const;
+    inline TLorentzVector getMomentum() const
+    { return TLorentzVector(m_pX, m_pY, m_pZ, m_e);}
+
+
+    /**
+     * Get  ECL flag,
+     * @return ECL flag.
+     */
+    bool getAssociatedEclClusterFlag() const
+    {return m_eclClusterFound;}
+
+
+    /**
+     * Get  track flag,
+     * @return track flag.
+     */
+    bool getAssociatedTrackFlag() const
+    {return m_trackFound;}
+
+
+
+    /**
+     * Set ecl connected cluster flag
+     */
+    inline void setAssociatedEclClusterFlag()
+    {m_eclClusterFound = true;}
+
+    /**
+     * Set  connected track flag
+     */
+    inline void setAssociatedTrackFlag()
+    {m_trackFound = true;}
+
 
 
   private:
@@ -123,10 +159,15 @@ namespace Belle2 {
     /** Momentum Z component. */
     float m_pZ;
 
+    /** True if associated track is found */
+    bool m_trackFound;
+
+    /** True if associated ECL cluster is found */
+    bool m_eclClusterFound;
 
 
     /** Needed to make objects storable. */
-    ClassDef(Belle2::K0L, 1);
+    ClassDef(Belle2::KLMCluster, 1);
 
   };
 

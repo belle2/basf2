@@ -20,7 +20,7 @@
 #pragma link C++ class Belle2::PIDLikelihood+;
 #pragma link C++ class Belle2::ECLCluster+;
 
-#pragma link C++ class Belle2::K0L+;
+#pragma link C++ class Belle2::KLMCluster+;
 
 #pragma link C++ class Belle2::Track+;
 #pragma link C++ class Belle2::HitPatternCDC+;

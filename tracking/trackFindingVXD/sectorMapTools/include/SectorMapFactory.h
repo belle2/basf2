@@ -11,10 +11,11 @@
 #pragma once
 
 // includes - rootStuff:
-#include <TObject.h>
-
 // includes - stl:
 // includes - tf-related stuff:
+#include "SectorMap.h"
+#include "tracking/dataobjects/VXDTFSecMap.h"
+
 // includes - general fw stuff:
 
 
@@ -25,18 +26,17 @@ namespace Belle2 {
    * - imports it from a xml file carrying a root stream
    * - reads relations and creates internal links for faster access between related objects
    **/
-  class SectorMapFactory : public TObject {
+  class SectorMapFactory {
   public:
 
-    /** constructor ??? */
+    /** constructor */
     SectorMapFactory() {}
 
-    /** called each event - imports all spacePoints and fills them into activated sectors. */
-    void linkSpacePointsToActiveSectors() {}
+    /** called once per run - imports the root-Version of the sectorMap. */
+    void importRootMap(const VXDTFSecMap* rootSecMap) {}
 
 
   protected:
 
-    ClassDef(SectorMapFactory, 1)
   };
 } //Belle2 namespace

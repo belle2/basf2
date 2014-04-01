@@ -16,6 +16,7 @@
 using namespace std;
 using namespace Belle2;
 
+ClassImp(Sector);
 
 void Sector::segmentMaker()
 {

@@ -17,6 +17,7 @@
 using namespace std;
 using namespace Belle2;
 
+ClassImp(SectorFriendship)
 
 void SectorFriendship::applySegmentFilters()
 {

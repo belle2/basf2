@@ -27,9 +27,12 @@ namespace Belle2 {
 
   /** forward declaration of a friendship */
   class SectorFriendship;
+
+
   /** FilterBase is the baseClass for filters applied on (chains of) spacepoints.
    *
-   * - is used as the baseClass for a Strategy-pattern of Filters
+   * - is used as the baseClass for a Strategy-pattern of Filters.
+   * - these filters use very basic internal filters (like distance3D) to filter spacePoint-combinations
    **/
   class FilterBase : public TObject {
   public:
@@ -44,7 +47,7 @@ namespace Belle2 {
       m_maxCutoff(maxValue) {}
 
     /** called for each compatible sector-sector-combination inhabiting spacePoints */
-    virtual void checkSpacePoints(const SectorFriendship* thisFriendShip, CompatibilityTable& compatibilityTable) {}
+    virtual void checkSpacePoints(const SectorFriendship* thisFriendship, CompatibilityTable& compatibilityTable) {}
 
   protected:
 

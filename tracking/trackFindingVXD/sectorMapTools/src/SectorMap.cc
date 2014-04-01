@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "tracking/trackFindingVXD/sectorMapTools/ActivatedSector.h"
+#include "tracking/trackFindingVXD/sectorMapTools/SectorMap.h"
 
 #include <framework/logging/Logger.h>
 
@@ -16,4 +16,4 @@ using namespace std;
 using namespace Belle2;
 
 
-ClassImp(ActivatedSector)
+ClassImp(SectorMap);

@@ -16,12 +16,6 @@
 #include <map>
 #include <vector>
 
-namespace boost {
-  namespace interprocess {
-    class file_lock;
-  }
-}
-
 
 namespace Belle2 {
 
@@ -89,6 +83,34 @@ namespace Belle2 {
   private:
 
     /**
+     * Helper class for locking the file catalog
+     */
+    class Lock {
+    public:
+
+      /**
+       * Construct a Lock object for the given file
+       * @param fileName Name of the file to be locked
+       */
+      Lock(std::string fileName);
+
+      /**
+       * Destructor. Releases the lock
+       */
+      ~Lock();
+
+      /**
+       * Try to lock the file
+       * @param timeout Time in seconds until it is tried to get a lock
+       * @return True if the lock could be obtained
+       */
+      bool lock(int timeout = 20);
+
+    private:
+      int m_file;  /**< File descriptor of file to be locked */
+    };
+
+    /**
      * Constructor: locate local database file
      */
     FileCatalog();
@@ -123,7 +145,6 @@ namespace Belle2 {
     bool getParents(const FileMap& fileMap, int level, const FileMetaData& metaData, ParentMetaData& parentMetaData);
 
     std::string m_fileName;   /**< Name of the file catalog file. */
-    boost::interprocess::file_lock* m_lock;   /**< Lock of the file catalog. */
   };
 
 } //end of namespace Belle2

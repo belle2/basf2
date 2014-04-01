@@ -11,18 +11,43 @@
 #include <framework/core/FileCatalog.h>
 #include <framework/logging/Logger.h>
 #include <boost/filesystem.hpp>
-#include <boost/interprocess/sync/scoped_lock.hpp>
-#include <boost/interprocess/sync/sharable_lock.hpp>
-#include <boost/interprocess/sync/file_lock.hpp>
-#include <boost/date_time/posix_time/posix_time.hpp>
-#include <boost/algorithm/string.hpp>
 #include <fstream>
+#include <chrono>
+#include <random>
+#include <sys/file.h>
 
 
 using namespace Belle2;
 namespace fs = boost::filesystem;
-namespace pt = boost::posix_time;
-namespace ip = boost::interprocess;
+
+
+FileCatalog::Lock::Lock(std::string fileName)
+{
+  m_file = open(fileName.c_str(), O_RDWR | O_CREAT);
+}
+
+FileCatalog::Lock::~Lock()
+{
+  if (m_file >= 0) close(m_file);
+}
+
+bool FileCatalog::Lock::lock(int timeout)
+{
+  if (m_file < 0) return false;
+
+  auto const maxtime = std::chrono::steady_clock::now() + std::chrono::seconds(timeout);
+  std::default_random_engine random;
+  std::uniform_int_distribution<int> uniform(1, 100);
+
+  while (std::chrono::steady_clock::now() < maxtime) {
+    int lock = flock(m_file, LOCK_EX | LOCK_NB);
+    if (lock == 0) return true;
+    auto next = std::chrono::steady_clock::now() + std::chrono::milliseconds(uniform(random));
+    while (std::chrono::steady_clock::now() < next);
+  }
+
+  return false;
+}
 
 
 FileCatalog& FileCatalog::Instance()
@@ -32,7 +57,7 @@ FileCatalog& FileCatalog::Instance()
 }
 
 
-FileCatalog::FileCatalog() : m_lock(0)
+FileCatalog::FileCatalog() : m_fileName("")
 {
   // check for BELLE2_FILECATALOG environment variable
   const char* fileCatalog = getenv("BELLE2_FILECATALOG");
@@ -58,20 +83,20 @@ FileCatalog::FileCatalog() : m_lock(0)
   std::ifstream ifile(m_fileName.c_str());
   if (!ifile.good()) {
     B2INFO("Creating file catalog " << m_fileName);
+    Lock lock(m_fileName);
+    if (!lock.lock()) {
+      B2ERROR("Creation of file catalog " << m_fileName << " failed.");
+      m_fileName = "";
+    }
     std::ofstream ofile(m_fileName.c_str());
     if (!ofile.is_open()) {
       B2ERROR("Creation of file catalog " << m_fileName << " failed.");
-      fileCatalog = 0;
+      m_fileName = "";
     } else {
       ofile << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
       ofile << "<FileCatalog>\n";
       ofile << "</FileCatalog>\n";
     }
-  }
-
-  // create a lock object for the catalog
-  if (fileCatalog) {
-    m_lock = new ip::file_lock(m_fileName.c_str());
   }
 }
 
@@ -110,11 +135,11 @@ bool FileCatalog::writeCatalog(const FileCatalog::FileMap& fileMap)
 
 bool FileCatalog::registerFile(std::string fileName, FileMetaData& metaData)
 {
-  if (!m_lock) return false;
+  if (m_fileName.empty()) return false;
 
-  // get exclusive lock for write access to file catalog
-  ip::scoped_lock<ip::file_lock> lock(*m_lock, pt::second_clock::local_time() + pt::seconds(20));
-  if (!lock.owns()) {
+  // get lock for write access to file catalog
+  Lock lock(m_fileName);
+  if (!lock.lock()) {
     B2ERROR("Locking of file catalog " << m_fileName << " failed.");
     return false;
   }
@@ -158,11 +183,11 @@ bool FileCatalog::registerFile(std::string fileName, FileMetaData& metaData)
 bool FileCatalog::getMetaData(int id, FileMetaData& metaData)
 {
   new(&metaData) FileMetaData;
-  if (!m_lock) return false;
+  if (m_fileName.empty()) return false;
 
-  // get shared lock for read access to file catalog
-  ip::sharable_lock<ip::file_lock> lock(*m_lock, pt::second_clock::local_time() + pt::seconds(20));
-  if (!lock.owns()) {
+  // get lock for read access to file catalog
+  Lock lock(m_fileName);
+  if (!lock.lock()) {
     B2ERROR("Locking of file catalog " << m_fileName << " failed.");
     return false;
   }
@@ -186,11 +211,11 @@ bool FileCatalog::getMetaData(int id, FileMetaData& metaData)
 bool FileCatalog::getMetaData(std::string lfn, FileMetaData& metaData)
 {
   new(&metaData) FileMetaData;
-  if (!m_lock) return false;
+  if (m_fileName.empty()) return false;
 
-  // get shared lock for read access to file catalog
-  ip::sharable_lock<ip::file_lock> lock(*m_lock, pt::second_clock::local_time() + pt::seconds(20));
-  if (!lock.owns()) {
+  // get lock for read access to file catalog
+  Lock lock(m_fileName);
+  if (!lock.lock()) {
     B2ERROR("Locking of file catalog " << m_fileName << " failed.");
     return false;
   }
@@ -241,11 +266,10 @@ bool FileCatalog::getParentMetaData(int level, int id, FileMetaData& metaData, P
 {
   parentMetaData.resize(0);
   if (level == 0) return true;
-  if (!m_lock) return false;
 
-  // get shared lock for read access to file catalog
-  ip::sharable_lock<ip::file_lock> lock(*m_lock, pt::second_clock::local_time() + pt::seconds(20));
-  if (!lock.owns()) {
+  // get lock for read access to file catalog
+  Lock lock(m_fileName);
+  if (!lock.lock()) {
     B2ERROR("Locking of file catalog " << m_fileName << " failed.");
     return false;
   }

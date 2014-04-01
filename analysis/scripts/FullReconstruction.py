@@ -33,6 +33,7 @@ import ROOT
 import hashlib
 import os
 import collections
+import argparse
 
 
 class Particle(object):
@@ -545,12 +546,25 @@ def FullReconstruction(path, particles):
             # 3. Gather up the different ParticleLists for each channel, into a single ParticleList for the particle itself, depending on all channel ParticleLists
             # 4. If the particle isn't self conjugated we gather up the anti-particles as well, because anti-particles aren't handlet properly yet.  FIXME
             channelParticleLists = ['ParticleList_' + channel.name for channel in particle.channels]
-            seq.append(Function(ParticleList, path='Path', name='Name_' + particle.name, pdgcode='PDG_' + particle.name, particleLists=channelParticleLists))
+            seq.append(Function(ParticleList,
+                                path='Path',
+                                name='Name_' + particle.name,
+                                pdgcode='PDG_' + particle.name,
+                                particleLists=channelParticleLists))
             for channel in particle.channels:
-                seq.append(Function(ParticleListFromChannel, path='Path', pdgcode='PDG_' + particle.name, name='Name_' + channel.name, preCut='PreCut_' + channel.name,
-                                    inputLists=['ParticleList_' + daughter for daughter in channel.daughters], isIgnored='IsIgnored_' + channel.name))
+                seq.append(Function(ParticleListFromChannel,
+                                    path='Path',
+                                    pdgcode='PDG_' + particle.name,
+                                    name='Name_' + channel.name,
+                                    preCut='PreCut_' + channel.name,
+                                    inputLists=['ParticleList_' + daughter for daughter in channel.daughters],
+                                    isIgnored='IsIgnored_' + channel.name))
             if particle.name != name_conj:
-                seq.append(Function(ParticleList, path='Path', name='Name_' + name_conj, pdgcode='PDG_' + name_conj, particleLists=channelParticleLists))
+                seq.append(Function(ParticleList,
+                                    path='Path',
+                                    name='Name_' + name_conj,
+                                    pdgcode='PDG_' + name_conj,
+                                    particleLists=channelParticleLists))
 
             ############# PRECUT DETERMINATION ############
             # Intermediate PreCut part of FullReconstruction algorithm.
@@ -561,16 +575,28 @@ def FullReconstruction(path, particles):
             if particle.channels != []:
                 daughters = set([daughter for channel in particle.channels for daughter in channel.daughters])
                 if args.cp:
-                    seq.append(Function(CreatePreCutProbHistogram, path='Path', particle='Particle_' + particle.name,
+                    seq.append(Function(CreatePreCutProbHistogram,
+                                        path='Path',
+                                        particle='Particle_' + particle.name,
                                         daughterLists=['ParticleList_' + daughter for daughter in daughters],
                                         daughterSignalProbabilities=['SignalProbability_' + daughter for daughter in daughters]))
-                    seq.append(Function(PreCutProbDetermination, name='Name_' + particle.name, pdgcode='PDG_' + particle.name,
-                                        channels=['Name_' + channel.name for channel in particle.channels], preCut_Histogram='PreCutHistogram_' + particle.name, efficiency='Efficiency_' + particle.name))
+                    seq.append(Function(PreCutProbDetermination,
+                                        name='Name_' + particle.name,
+                                        pdgcode='PDG_' + particle.name,
+                                        channels=['Name_' + channel.name for channel in particle.channels],
+                                        preCut_Histogram='PreCutHistogram_' + particle.name,
+                                        efficiency='Efficiency_' + particle.name))
                 else:
-                    seq.append(Function(CreatePreCutMassHistogram, path='Path', particle='Particle_' + particle.name,
+                    seq.append(Function(CreatePreCutMassHistogram,
+                                        path='Path',
+                                        particle='Particle_' + particle.name,
                                         daughterLists=['ParticleList_' + daughter for daughter in daughters]))
-                    seq.append(Function(PreCutMassDetermination, name='Name_' + particle.name, pdgcode='PDG_' + particle.name,
-                                        channels=['Name_' + channel.name for channel in particle.channels], preCut_Histogram='PreCutHistogram_' + particle.name, efficiency='Efficiency_' + particle.name))
+                    seq.append(Function(PreCutMassDetermination,
+                                        name='Name_' + particle.name,
+                                        pdgcode='PDG_' + particle.name,
+                                        channels=['Name_' + channel.name for channel in particle.channels],
+                                        preCut_Histogram='PreCutHistogram_' + particle.name,
+                                        efficiency='Efficiency_' + particle.name))
 
             ########### SIGNAL PROBABILITY ACTORS #######
             # The classifier part of the FullReconstruction. Here one has to distinguish between [e+, mu+, pi+, K+, p], other FSPs and non-FSPs.
@@ -579,21 +605,35 @@ def FullReconstruction(path, particles):
             #                    To get a better spearation we train these particles against each other and combine the result later
             if args.fc and particle.channels == [] and particle.name in ['e+', 'e-', 'mu+', 'mu-', 'pi+', 'pi-', 'K+', 'K-', 'p+', 'p-']:
                 # Add charged FSP SignalProbability classifier
-                seq.append(Function(SignalProbabilityFSPCluster, path='Path', method='Method_' + particle.name, variables='Variables_' + particle.name,
-                                    name='Name_' + particle.name, pdg='PDG_' + particle.name, particleList='ParticleList_' + particle.name))
+                seq.append(Function(SignalProbabilityFSPCluster,
+                                    path='Path',
+                                    method='Method_' + particle.name,
+                                    variables='Variables_' + particle.name,
+                                    name='Name_' + particle.name,
+                                    pdg='PDG_' + particle.name,
+                                    particleList='ParticleList_' + particle.name))
 
             # Other FSP: Other FSP like gammas and pi0, are trained with a single classifier.
             elif particle.channels == []:
-                seq.append(Function(SignalProbability, path='Path', method='Method_' + particle.name, variables='Variables_' + particle.name,
-                                    name='Name_' + particle.name, particleList='ParticleList_' + particle.name))
+                seq.append(Function(SignalProbability,
+                                    path='Path',
+                                    method='Method_' + particle.name,
+                                    variables='Variables_' + particle.name,
+                                    name='Name_' + particle.name,
+                                    particleList='ParticleList_' + particle.name))
 
             # Non FSP:
             #   1. Train classifier for every decay channel of the particle.
             #   2. As soon as all SignalProbabilities for all channels are available the resoure SignalProbability_{particleName} is unlocked.
             elif particle.channels != []:
                 for channel in particle.channels:
-                    seq.append(Function(SignalProbability, path='Path', method='Method_' + particle.name, variables='Variables_' + channel.name,
-                                        name='Name_' + channel.name, particleList='ParticleList_' + channel.name, isIgnored='IsIgnored_' + channel.name))
+                    seq.append(Function(SignalProbability,
+                                        path='Path',
+                                        method='Method_' + particle.name,
+                                        variables='Variables_' + channel.name,
+                                        name='Name_' + channel.name,
+                                        particleList='ParticleList_' + channel.name,
+                                        isIgnored='IsIgnored_' + channel.name))
                 seq.append(Resource('SignalProbability_' + particle.name, 'Dummy', requires=['SignalProbability_' + channel.name for channel in particle.channels]))
 
             # If the classifiers provide the signal probability, they also provide the signal probability for the anti particles, so we add

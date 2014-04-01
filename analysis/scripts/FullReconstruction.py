@@ -43,7 +43,7 @@ class Particle(object):
     In total this class contains: name, method, variables, efficiency (of preCuts) and all decay channels of a particle.
     """
 
-    # Following line creates a new class called DecayChannel via namedtuple. namedtuples are like a struct in C with two members: name and daughters
+    ## Create new class called DecayChannel via namedtuple. namedtuples are like a struct in C with two members: name and daughters
     DecayChannel = collections.namedtuple('DecayChannel', 'name, daughters')
 
     def __init__(self, name, variables, method, efficiency=0.90):
@@ -247,7 +247,7 @@ def SignalProbability(path, method, variables, name, particleList, isIgnored=Fal
         return {}
 
 
-def SignalProbabilityFSP(path, method, variables, name, pdg, particleList):
+def SignalProbabilityFSPCluster(path, method, variables, name, pdg, particleList):
     """
     Calculates the SignalProbability of a ParticleList. If the needed experts aren't available they're created.
         @param path the basf2 path
@@ -321,7 +321,7 @@ def CreatePreCutMassHistogram(path, particle, daughterLists):
         histMaker = register_module('HistMaker')
         histMaker.set_name(filename)
         histMaker.param('file', filename)
-        histMaker.param('histVariables', [('M', 100, mass - mass * 1.0 / 20.0, mass + mass * 1.0 / 20.0)])
+        histMaker.param('histVariables', [('M', 100, mass - mass * 1.0 / 10.0, mass + mass * 1.0 / 10.0)])
         histMaker.param('truthVariable', 'isSignal')
         histMaker.param('listNames', [channel.name for channel in particle.channels])
         path.add_module(histMaker)
@@ -361,7 +361,7 @@ def CreatePreCutProbHistogram(path, particle, daughterLists, daughterSignalProba
                     print 'WARNING'
                 inputListNames += listName
             pmake.param('InputListNames', inputListNames)
-            pmake.param('MassCut', (mass - mass * 1.0 / 10.0, mass + mass * 1.0 / 10.0))
+            #pmake.param('MassCut', (mass - mass * 1.0 / 10.0, mass + mass * 1.0 / 10.0))
             pmake.param('cutsOnProduct', {'SignalProbability': (0.0001, 1.0)})
             path.add_module(pmake)
             modularAnalysis.matchMCTruth(channel.name, path=path)
@@ -428,10 +428,66 @@ def PreCutMassDetermination(name, pdgcode, channels, preCut_Histogram, efficienc
     # Return the calculates ChannelCuts
     result = {'PreCut_' + channel: {'variable': 'MassCut', 'range': ycut_to_xcuts(channel, ycut)} for channel in channels}
     result.update({'Hash': hash})
-    # TODO Add IsIgnored_{channel} = True, so SignalProbability and ParticleCombiner can test this flag
     for channel in channels:
         (a, b) = ycut_to_xcuts(channel, ycut)
         if abs(b - a) < ratio[channel].GetBinWidth(signal[channel].GetMaximumBin()) or signal[channel].Integral(signal[channel].FindBin(a), signal[channel].FindBin(b)) < 100 or bckgrd[channel].Integral(bckgrd[channel].FindBin(a), bckgrd[channel].FindBin(b)) < 100:
+            result.update({'IsIgnored_' + channel: True})
+    return result
+
+
+def PreCutProbDetermination(name, pdgcode, channels, preCut_Histogram, efficiency):
+    """
+    Determines the PreCuts for all the channels of a particle. The cuts are chosen as follows:
+        1. The ratio of signal/background child probability product preCut_Histogram is calculated and fitted with splines
+        2. A cut on the y-axis of S/B is performed, so that a certain signal efficiency is garantueed.
+        3. The cut on the y-axis is converted to a minimum cut on the x-axis for every channel.
+        @param name name of the particle
+        @param pdgcode pdgcode of the particle
+        @param channels list of the names of all the channels
+        @param preCut_Histogram filename of the histogram file created by PreCutDistribution
+        @param efficiency signal efficiency for this particle
+    """
+
+    # For every channel we get the signal and background histogram from the Reconstruction file,
+    # search the position of the peak of the signal histogram (this peak is used as the starting point for the cut search)
+    # and calculate the S/B ratio by cloning signal and dividing it by bckgrd.
+    hash = createHash(name, pdgcode, channels, preCut_Histogram, efficiency)
+    file = ROOT.TFile(preCut_Histogram, 'UPDATE')
+    signal = dict([(channel, file.Get(channel + '_prodChildProb_signal_histogram')) for channel in channels])
+    bckgrd = dict([(channel, file.Get(channel + '_prodChildProb_background_histogram')) for channel in channels])
+    ratio = dict([(channel, value.Clone(channel + '_prodChildProb_ratio_histogram')) for (channel, value) in signal.iteritems()])
+    for channel in channels:
+        ratio[channel].Divide(bckgrd[channel])
+        ratio[channel].Write('', ROOT.TObject.kOverwrite)
+
+    # Create a Spline fit of S/B ratio and wrap in a ROOT TF1 function, so we can perform GetX() on it
+    spline = dict([(channel, ROOT.TSpline3(value)) for (channel, value) in ratio.iteritems()])
+    spline_ROOT = dict([(channel, ROOT.TF1(hashlib.sha1(channel).hexdigest() + '_prodChildProb_func', lambda x, channel=channel: spline[channel].Eval(x[0]), 0, 100, 0)) for channel in channels])
+
+    # Calculate a cut on the y-axis, so that only at least nsignal * efficency signal events survive.
+    # Therefore create a function which calculates the number of signal events after a cut on the y-axis
+    # was performed and wrap it into a ROOT TF1 function, so we can perform GetX() on it.
+    nsignals = sum([value.Integral(0, value.GetNbinsX()) for value in signal.values()])
+
+    def ycut_to_xcut(channel, cut):
+        return spline_ROOT[channel].GetX(cut, 0, 1)
+
+    def nsignals_after_cut(cut):
+        nevents = 0
+        for channel in channels:
+            a = ycut_to_xcut(channel, cut[0])
+            nevents += signal[channel].Integral(signal[channel].FindBin(a), signal[channel].FindBin(1))
+        return nevents
+
+    nsignals_after_cut_ROOT = ROOT.TF1(hashlib.sha1(preCut_Histogram).hexdigest() + '_prodChildProb_cut_func', nsignals_after_cut, 0, 1, 0)
+    ycut = nsignals_after_cut_ROOT.GetX(nsignals * efficiency, 0.0, 1.0)
+
+    # Return the calculates ChannelCuts
+    result = {'PreCut_' + channel: {'variable': 'cutsOnProduct', 'range': ('SignalProbability', ycut_to_xcut(channel, ycut), 1)} for channel in channels}
+    result.update({'Hash': hash})
+    for channel in channels:
+        a = ycut_to_xcut(channel, ycut)
+        if a == 1 or signal[channel].Integral(signal[channel].FindBin(a), signal[channel].FindBin(1)) < 100 or bckgrd[channel].Integral(bckgrd[channel].FindBin(a), bckgrd[channel].FindBin(1)) < 100:
             result.update({'IsIgnored_' + channel: True})
     return result
 
@@ -446,6 +502,12 @@ def FullReconstruction(path, particles):
             @param path the basf2 module path
             @particles sequence of particle objects which shall be reconstructed by this algorithm
         """
+
+        parser = argparse.ArgumentParser()
+        parser.add_argument('-cp', '--cut-probability', dest='cp', action='store_true', help='Use cut on product of signal probability')
+        parser.add_argument('-cm', '--cut-mass', dest='cm', action='store_true', help='Use cut on invariant mass')
+        parser.add_argument('-fc', '--fsp-cluster', dest='fc', action='store_true', help='Cluster training for charged fsp particles')
+        args = parser.parse_args()
 
         # First add the basf2 module path
         seq = [Resource('Path', path)]
@@ -496,25 +558,28 @@ def FullReconstruction(path, particles):
             # The PreCuts are chosen, so that a user-defined total signal efficiency for this particle is met.
             # 1. Create Histograms with the invariant mass or signal probability distribution for each channel, as soon as all daughter ParticleLists and daughter SignalProbabilities are available.
             # 2. If the Histogram is available calculate the PreCuts with the PreCutDetermination function. As soon as the PreCuts are available the particle can be reconstructed.
-            # TODO Implement user choice -> Cut on invariant mass or cut on product of signal Probability
             if particle.channels != []:
                 daughters = set([daughter for channel in particle.channels for daughter in channel.daughters])
-                #seq.append(Function(CreatePreCutMassHistogram, path='Path', particle='Particle_' + particle.name,
-                #                    daughterLists=['ParticleList_' + daughter for daughter in daughters]))
-                seq.append(Function(CreatePreCutProbHistogram, path='Path', particle='Particle_' + particle.name,
-                                    daughterLists=['ParticleList_' + daughter for daughter in daughters],
-                                    daughterSignalProbabilities=['SignalProbability_' + daughter for daughter in daughters]))
-                seq.append(Function(PreCutMassDetermination, name='Name_' + particle.name, pdgcode='PDG_' + particle.name,
-                                    channels=['Name_' + channel.name for channel in particle.channels], preCut_Histogram='PreCutHistogram_' + particle.name, efficiency='Efficiency_' + particle.name))
+                if args.cp:
+                    seq.append(Function(CreatePreCutProbHistogram, path='Path', particle='Particle_' + particle.name,
+                                        daughterLists=['ParticleList_' + daughter for daughter in daughters],
+                                        daughterSignalProbabilities=['SignalProbability_' + daughter for daughter in daughters]))
+                    seq.append(Function(PreCutProbDetermination, name='Name_' + particle.name, pdgcode='PDG_' + particle.name,
+                                        channels=['Name_' + channel.name for channel in particle.channels], preCut_Histogram='PreCutHistogram_' + particle.name, efficiency='Efficiency_' + particle.name))
+                else:
+                    seq.append(Function(CreatePreCutMassHistogram, path='Path', particle='Particle_' + particle.name,
+                                        daughterLists=['ParticleList_' + daughter for daughter in daughters]))
+                    seq.append(Function(PreCutMassDetermination, name='Name_' + particle.name, pdgcode='PDG_' + particle.name,
+                                        channels=['Name_' + channel.name for channel in particle.channels], preCut_Histogram='PreCutHistogram_' + particle.name, efficiency='Efficiency_' + particle.name))
 
             ########### SIGNAL PROBABILITY ACTORS #######
             # The classifier part of the FullReconstruction. Here one has to distinguish between [e+, mu+, pi+, K+, p], other FSPs and non-FSPs.
             # All the classifiers depend on the method, variables and the ParticleList (either for the particle or for the channel).
             # [e+,mu+,pi+,K+,p]: All the tracks seen in the detector are generated by one of these particles.
             #                    To get a better spearation we train these particles against each other and combine the result later
-            if particle.channels == [] and particle.name in ['e+', 'e-', 'mu+', 'mu-', 'pi+', 'pi-', 'K+', 'K-', 'p']:
+            if args.fc and particle.channels == [] and particle.name in ['e+', 'e-', 'mu+', 'mu-', 'pi+', 'pi-', 'K+', 'K-', 'p+', 'p-']:
                 # Add charged FSP SignalProbability classifier
-                seq.append(Function(SignalProbabilityFSP, path='Path', method='Method_' + particle.name, variables='Variables_' + particle.name,
+                seq.append(Function(SignalProbabilityFSPCluster, path='Path', method='Method_' + particle.name, variables='Variables_' + particle.name,
                                     name='Name_' + particle.name, pdg='PDG_' + particle.name, particleList='ParticleList_' + particle.name))
 
             # Other FSP: Other FSP like gammas and pi0, are trained with a single classifier.

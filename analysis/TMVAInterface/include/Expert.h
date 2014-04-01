@@ -69,10 +69,10 @@ namespace Belle2 {
       std::vector<TMVA::Reader*> m_readers; /**< Vector of TMVA::Reader, which steers the booked TMVA method, foreach cluster */
       std::vector<float> m_input; /**< Pointers to the input variables */
       int m_signalCluster; /**< Number of the cluster which is considered as signal */
-      std::vector<Method*> m_methods; /** methods used by the expert to classify */
-      std::map<int, float> m_clusters; /** map of cluster id and cluster fraction */
-      std::vector<bool> m_reverse; /** true if signalCluster was considered background in the training */
-      std::vector<int> m_against; /** cluster ID against signalCluster was trained */
+      std::vector<Method*> m_methods; /**< methods used by the expert to classify */
+      std::map<int, float> m_clusters; /**< map of cluster id and cluster fraction */
+      std::vector<bool> m_reverse; /**< true if signalCluster was considered background in the training */
+      std::vector<int> m_against; /**< cluster ID against signalCluster was trained */
     };
   }
 }

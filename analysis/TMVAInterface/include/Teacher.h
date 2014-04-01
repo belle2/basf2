@@ -76,7 +76,7 @@ namespace Belle2 {
       std::vector<Method> m_methods; /**< Name, Type and Config of methods */
 
       TTree* m_tree; /**< holds training and test signal samples */
-      const VariableManager::Var* m_target_var; /** Variable Pointer to target variable */
+      const VariableManager::Var* m_target_var; /**< Variable Pointer to target variable */
       int m_target; /**< Storage for the target variable */
       std::vector<float> m_input; /**< Storage for input variables */
       std::map<int, unsigned int> m_cluster_count; /**< Number of events foreach identified cluster */

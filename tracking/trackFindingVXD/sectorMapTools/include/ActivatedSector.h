@@ -14,7 +14,7 @@
 // includes - stl:
 // includes - tf-related stuff
 #include "Sector.h"
-#include <tracking/spacePointCreation/SpacePoint.h>
+#include "tracking/spacePointCreation/SpacePoint.h"
 
 // includes - general fw stuff
 
@@ -40,6 +40,9 @@ namespace Belle2 {
 
     /** returns number of spacePoint inhabiting this ActivatedSector */
     unsigned int size() { return m_mySpacePoints.size(); }
+
+    /** returns a pointer to this ActivatedSector */
+    ActivatedSector* getMyPointer() { return this; }
 
   protected:
 

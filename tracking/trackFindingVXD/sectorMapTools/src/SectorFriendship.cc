@@ -8,8 +8,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "tracking/trackFindingVXD/sectorMapTools/Sector.h"
 #include "tracking/trackFindingVXD/sectorMapTools/SectorFriendship.h"
+
+#include "tracking/trackFindingVXD/trackSegmentTools/FilterBase.h"
 
 #include <framework/logging/Logger.h>
 
@@ -17,9 +18,21 @@ using namespace std;
 using namespace Belle2;
 
 
-void Sector::segmentMaker()
+void SectorFriendship::applySegmentFilters()
 {
-  for (SectorFriendship * aFriend : m_myFriends) {
-    aFriend->applySegmentFilters();
+  for (FilterBase * aFilter : m_myFilters) {
+    aFilter->checkSpacePoints(this, m_compatibilityTable);
+    if (checkCombinationsAlive() == 0) { break; }
   }
+}
+
+unsigned int SectorFriendship::checkCombinationsAlive()
+{
+  unsigned int counter = 0;
+  for (auto & aVector : m_compatibilityTable) {
+    for (auto & aValue : aVector) {
+      counter += aValue;
+    }
+  }
+  return counter;
 }

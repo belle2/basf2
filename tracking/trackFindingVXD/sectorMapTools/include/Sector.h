@@ -11,13 +11,12 @@
 #pragma once
 
 // includes - rootStuff:
-#include <framework/datastore/RelationsObject.h>
-
 // includes - stl:
 #include <vector>
 
 // includes - tf-related stuff
 // includes - general fw stuff
+#include <framework/datastore/RelationsObject.h>
 
 
 namespace Belle2 {
@@ -41,8 +40,8 @@ namespace Belle2 {
     /** constructor */
     Sector() {}
 
-    /** called each event - takes all spacePoints from the activated Sector and its friend Sector to produce segments */
-    void segmentMaker() {}
+    /** called each event - takes all spacePoints from the activated Sector and its friend Sectors to produce segments */
+    void segmentMaker();
 
     virtual void clear() { m_myActiveSector = NULL; }
 

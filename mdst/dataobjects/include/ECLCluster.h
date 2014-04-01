@@ -264,8 +264,44 @@ namespace Belle2 {
 
 
 
+    /*! Return TVector3 momentum (Px,Py,Pz)
+     */
+    TVector3 getMomentum() const {
+      return TVector3(m_Px, m_Py, m_Pz);
+    }
 
 
+    /*! Return 4Vector  (Px,Py,Pz,E)
+     */
+    TLorentzVector get4Vector() const {
+      return TLorentzVector(m_Px, m_Py, m_Pz, m_Energy);
+    }
+
+    /*! Return TMatrixFsym 4x4 error matrix for px,py,pz,E
+     */
+
+    TMatrixFSym getError4x4() const {
+      TMatrixFSym MomentumError;
+      MomentumError.ResizeTo(4, 4);
+      for (int i = 0; i < 4; i++) {
+        for (int j = 0; j <= i ; j++) {
+          MomentumError[i][j] = m_errorMatrix[i][j];
+        }
+      }
+      return MomentumError;
+    }
+
+
+    TMatrixFSym getError7x7() const {
+      TMatrixFSym Errormatrix;
+      Errormatrix.ResizeTo(7, 7);
+      for (int i = 0; i < 7; i++) {
+        for (int j = 0; j <= i ; j++) {
+          Errormatrix[i][j] = m_errorMatrix[i][j];
+        }
+      }
+      return Errormatrix;
+    }
 
 
 

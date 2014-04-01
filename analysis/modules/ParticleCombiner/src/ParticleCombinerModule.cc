@@ -216,7 +216,7 @@ namespace Belle2 {
       // store combination
       new(Particles.nextFreeAddress()) Particle(vec,
                                                 outputList->getPDG(chargeState),
-                                                outputList->getFlavorType(),
+                                                static_cast<Particle::EFlavorType>(outputList->getFlavorType()),
                                                 indices);
       int iparticle = Particles.getEntries() - 1;
       outputList->addParticle(iparticle, chargeState);

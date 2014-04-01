@@ -32,7 +32,7 @@ using namespace Belle2;
 
 Particle::Particle() :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
-  m_pValue(-1), m_flavorType(0), m_particleType(c_Undefined), m_mdstIndex(0),
+  m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0),
   m_arrayPointer(0)
 {
   resetErrorMatrix();
@@ -40,7 +40,7 @@ Particle::Particle() :
 
 Particle::Particle(const TLorentzVector& momentum, const int pdgCode) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
-  m_pValue(-1), m_flavorType(0), m_particleType(c_Undefined), m_mdstIndex(0),
+  m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0),
   m_arrayPointer(0)
 {
   m_pdgCode = pdgCode;
@@ -51,11 +51,11 @@ Particle::Particle(const TLorentzVector& momentum, const int pdgCode) :
 
 Particle::Particle(const TLorentzVector& momentum,
                    const int pdgCode,
-                   const unsigned flavorType,
+                   EFlavorType flavorType,
                    const EParticleType type,
                    const unsigned mdstIndex) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
-  m_pValue(-1), m_flavorType(0), m_particleType(c_Undefined), m_mdstIndex(0),
+  m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0),
   m_arrayPointer(0)
 {
   m_pdgCode = pdgCode;
@@ -68,10 +68,10 @@ Particle::Particle(const TLorentzVector& momentum,
 
 Particle::Particle(const TLorentzVector& momentum,
                    const int pdgCode,
-                   const unsigned flavorType,
+                   EFlavorType flavorType,
                    const std::vector<int>& daughterIndices) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
-  m_pValue(-1), m_flavorType(0), m_particleType(c_Undefined), m_mdstIndex(0),
+  m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0),
   m_arrayPointer(0)
 {
   m_pdgCode = pdgCode;
@@ -89,14 +89,14 @@ Particle::Particle(const TLorentzVector& momentum,
 Particle::Particle(const Track* track,
                    const Const::ChargedStable& chargedStable) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
-  m_pValue(-1), m_flavorType(0), m_particleType(c_Undefined), m_mdstIndex(0),
+  m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0),
   m_arrayPointer(0)
 {
   if (!track) return;
   const TrackFitResult* trackFit = track->getTrackFitResult(chargedStable);
   if (!trackFit) return;
 
-  m_flavorType = 1;
+  m_flavorType = c_Flavored; //tracks are charged
   m_particleType = c_Track;
 
   m_mdstIndex = track->getArrayIndex();
@@ -177,7 +177,7 @@ Particle::Particle(const Track* track,
 
 Particle::Particle(const ECLGamma* gamma) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
-  m_pValue(-1), m_flavorType(0), m_particleType(c_Undefined), m_mdstIndex(0),
+  m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0),
   m_arrayPointer(0)
 {
   if (!gamma) return;
@@ -204,7 +204,7 @@ Particle::Particle(const ECLGamma* gamma) :
 
 Particle::Particle(const ECLPi0* pi0) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
-  m_pValue(-1), m_flavorType(0), m_particleType(c_Undefined), m_mdstIndex(0),
+  m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0),
   m_arrayPointer(0)
 {
   if (!pi0) return;
@@ -234,7 +234,7 @@ Particle::Particle(const ECLPi0* pi0) :
 
 Particle::Particle(const MCParticle* mcParticle) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
-  m_pValue(-1), m_flavorType(0), m_particleType(c_Undefined), m_mdstIndex(0),
+  m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0),
   m_arrayPointer(0)
 {
   if (!mcParticle) return;
@@ -477,16 +477,16 @@ void Particle::fillFSPDaughters(std::vector<const Belle2::Particle*>& fspDaughte
 
 void Particle::setFlavorType()
 {
-  m_flavorType = 1; // flavored particle
+  m_flavorType = c_Flavored;
   if (m_pdgCode < 0) return;
-  if (m_pdgCode == 22) {m_flavorType = 0; return;} // gamma
-  if (m_pdgCode == 310) {m_flavorType = 0; return;} // K_s
-  if (m_pdgCode == 130) {m_flavorType = 0; return;} // K_L
+  if (m_pdgCode == 22) {m_flavorType = c_Unflavored; return;} // gamma
+  if (m_pdgCode == 310) {m_flavorType = c_Unflavored; return;} // K_s
+  if (m_pdgCode == 130) {m_flavorType = c_Unflavored; return;} // K_L
   int nnn = m_pdgCode / 10;
   int q3 = nnn % 10; nnn /= 10;
   int q2 = nnn % 10; nnn /= 10;
   int q1 = nnn % 10;
-  if (q1 == 0 && q2 == q3) m_flavorType = 0; // unflavored meson
+  if (q1 == 0 && q2 == q3) m_flavorType = c_Unflavored; // unflavored meson
 }
 
 

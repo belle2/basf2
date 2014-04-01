@@ -72,6 +72,10 @@ namespace Belle2 {
      * particle type enumerators (to be completed when all Mdst dataobjects are defined)
      */
     enum EParticleType {c_Undefined, c_Track, c_ECLShower, c_KLong , c_MCParticle, c_Composite};
+    enum EFlavorType {
+      c_Unflavored = 0, /**< Is its own antiparticle or we don't know wether it is a particle/antiparticle. */
+      c_Flavored = 1, /**< Is either particle or antiparticle. */
+    };
 
     /**
      * error matrix dimensions and size of 1D representation
@@ -111,7 +115,7 @@ namespace Belle2 {
      */
     Particle(const TLorentzVector& momentum,
              const int pdgCode,
-             const unsigned flavorType,
+             EFlavorType flavorType,
              const EParticleType particleType,
              const unsigned mdstIndex);
 
@@ -125,7 +129,7 @@ namespace Belle2 {
      */
     Particle(const TLorentzVector& momentum,
              const int pdgCode,
-             const unsigned flavorType,
+             EFlavorType flavorType,
              const std::vector<int>& daughterIndices);
 
     /**
@@ -257,7 +261,7 @@ namespace Belle2 {
      * Returns flavor type of the decay (for FS particles: flavor type of particle)
      * @return flavor type (0=unflavored, 1=flavored)
      */
-    int getFlavorType() const {
+    EFlavorType getFlavorType() const {
       return m_flavorType;
     }
 
@@ -513,7 +517,7 @@ namespace Belle2 {
     float m_errMatrix[c_SizeMatrix]; /**< error matrix (1D representation) */
     float m_pValue;   /**< chi^2 probability of the fit */
     std::vector<int> m_daughterIndices;  /**< daughter particle indices */
-    unsigned m_flavorType;  /**< flavor type: 0=unflavored, 1=flavored */
+    EFlavorType m_flavorType;  /**< flavor type. */
     EParticleType m_particleType;  /**< particle type */
     unsigned m_mdstIndex;  /**< 0-based index of MDST store array object */
 
@@ -568,7 +572,7 @@ namespace Belle2 {
      */
     void setFlavorType();
 
-    ClassDef(Particle, 4); /**< Class to store reconstructed particles. */
+    ClassDef(Particle, 5); /**< Class to store reconstructed particles. */
   };
 
 } // end namespace Belle2

@@ -8,5 +8,6 @@
 
 
 #pragma link C++ class Belle2::FilterBase+;
+#pragma link C++ class Belle2::AlwaysYesFilter+;
 
 #endif

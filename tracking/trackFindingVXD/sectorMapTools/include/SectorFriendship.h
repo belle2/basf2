@@ -49,7 +49,7 @@ namespace Belle2 {
     void applySegmentFilters();
 
     /** iterates through each combination of spacepoints and counts the number of combinations which are still allowed */
-    unsigned int checkCombinationsAlive();
+    unsigned int checkCombinationsAlive() const;
   protected:
 
     /** The mainSector is stored once per run and is a link to a compatible outer sector. */

@@ -8,32 +8,23 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "tracking/trackFindingVXD/sectorMapTools/SectorFriendship.h"
+#include "tracking/trackFindingVXD/trackSegmentTools/AlwaysYesFilter.h"
 
-#include "tracking/trackFindingVXD/trackSegmentTools/FilterBase.h"
+#include "tracking/trackFindingVXD/sectorMapTools/SectorFriendship.h"
 
 #include <framework/logging/Logger.h>
 
 using namespace std;
 using namespace Belle2;
 
-ClassImp(SectorFriendship)
+ClassImp(AlwaysYesFilter)
 
-void SectorFriendship::applySegmentFilters()
+void AlwaysYesFilter::checkSpacePoints(const SectorFriendship* thisFriendship, CompatibilityTable& compatibilityTable)
 {
-  for (FilterBase * aFilter : m_myFilters) {
-    aFilter->checkSpacePoints(this, m_compatibilityTable);
-    if (checkCombinationsAlive() == 0) { break; }
-  }
-}
-
-unsigned int SectorFriendship::checkCombinationsAlive() const
-{
-  unsigned int counter = 0;
-  for (const auto & aVector : m_compatibilityTable) {
-    for (const auto & aValue : aVector) {
-      counter += aValue;
+  for (auto & aVector : compatibilityTable) {
+    for (auto & aValue : aVector) {
+      B2DEBUG(1000, "there are currently " << thisFriendship->checkCombinationsAlive() << " alive");
+      aValue++;
     }
   }
-  return counter;
 }

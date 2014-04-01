@@ -1,6 +1,7 @@
 #include <framework/logging/Logger.h>
 #include <analysis/NtupleTools/NtupleToolList.h>
 #include <analysis/NtupleTools/NtupleKinematicsTool.h>
+#include <analysis/NtupleTools/NtupleCMSKinematicsTool.h>
 #include <analysis/NtupleTools/NtupleEventMetaDataTool.h>
 #include <analysis/NtupleTools/NtupleDeltaEMbcTool.h>
 #include <analysis/NtupleTools/NtupleMCTruthTool.h>
@@ -53,6 +54,7 @@ NtupleFlatTool* NtupleToolList::create(string strName, TTree* tree, DecayDescrip
   B2INFO("Options : " << strOption);
 
   if (strToolName.compare("Kinematics") == 0) return new NtupleKinematicsTool(tree, d);
+  else if (strToolName.compare("CMSKinematics") == 0) return new NtupleCMSKinematicsTool(tree, d);
   else if (strToolName.compare("EventMetaData") == 0) return new NtupleEventMetaDataTool(tree, d);
   else if (strToolName.compare("DeltaEMbc") == 0) return new NtupleDeltaEMbcTool(tree, d);
   else if (strToolName.compare("MCTruth") == 0) return new NtupleMCTruthTool(tree, d);

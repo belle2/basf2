@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "tracking/trackFindingVXD/sectorMapTools/SectorMapFactory.h"
+#include "tracking/trackFindingVXD/sectorMapTools/Sector.h"
 
 #include <framework/logging/Logger.h>
 

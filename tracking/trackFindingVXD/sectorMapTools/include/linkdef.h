@@ -7,6 +7,7 @@
 #pragma link C++ nestedclasses;
 
 
-#pragma link C++ class Belle2::SectorMapFactory;
+#pragma link C++ class Belle2::SectorMapFactory+;
+#pragma link C++ class Belle2::Sector+;
 
 #endif

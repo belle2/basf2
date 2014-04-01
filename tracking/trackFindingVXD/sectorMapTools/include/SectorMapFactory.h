@@ -10,16 +10,20 @@
 
 #pragma once
 
+// includes - rootStuff:
 #include <TObject.h>
 
-// #include <map>
-// #include <algorithm>
-// #include <vector>
+// includes - stl:
+// includes - tf-related stuff:
+// includes - general fw stuff:
+
 
 namespace Belle2 {
 
 
   /**SectorMapFactory - creates and handles a specific sectorMap.
+   * - imports it from a xml file carrying a root stream
+   * - reads relations and creates internal links for faster access between related objects
    **/
   class SectorMapFactory : public TObject {
   public:
@@ -27,14 +31,12 @@ namespace Belle2 {
     /** constructor ??? */
     SectorMapFactory() {}
 
+    /** called each event - imports all spacePoints and fills them into activated sectors. */
     void linkSpacePointsToActiveSectors() {}
-
-    /** Imports the spacePoints into the sector map after converting them
-     * into an internal hit type. */
-    void fillSpacePoints() {}
 
 
   protected:
 
+    ClassDef(SectorMapFactory, 1)
   };
 } //Belle2 namespace

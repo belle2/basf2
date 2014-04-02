@@ -25,7 +25,7 @@ namespace Belle2 {
     unsigned short sectorID = 15;
 
 
-//     B2INFO("creating FullSecIDs: ")
+    B2INFO("creating FullSecIDs: ")
 //     FullSecID aFullSecID = FullSecID(vxdID, subLayerID, sectorID);
 //     unsigned int aFullSecInt = static_cast<unsigned int>(aFullSecID);
 //

@@ -14,7 +14,6 @@
 // includes - stl:
 // includes - tf-related stuff:
 #include "SectorMap.h"
-#include "tracking/dataobjects/VXDTFSecMap.h"
 
 // includes - general fw stuff:
 
@@ -33,7 +32,7 @@ namespace Belle2 {
     SectorMapFactory() {}
 
     /** called once per run - imports the root-Version of the sectorMap. */
-    void importRootMap(const VXDTFSecMap* rootSecMap) {}
+    void importRootMap();
 
 
   protected:

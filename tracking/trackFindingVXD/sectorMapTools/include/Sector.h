@@ -24,8 +24,11 @@ namespace Belle2 {
 
   /** forward declaration for the ActivatedSector */
   class ActivatedSector;
+
+
   /** forward declaration for the SectorFriendship */
   class SectorFriendship;
+
 
   /** Sector is a central part of storing information for VXD trackFinders.
    *
@@ -37,13 +40,55 @@ namespace Belle2 {
   class Sector : public RelationsObject {
   public:
 
+
     /** constructor */
     Sector() {}
+
+
+    /** overloaded '<'-operator for sorting algorithms - sorts by distance2origin or fullSecID depending on setting */
+    bool operator<(const Sector& b)  const {
+      if (m_useDistance4sort == false) { return getSecID() < b.getSecID(); }
+      return getDistance() < b.getDistance();
+    }
+
+
+    /** overloaded '=='-operator for sorting algorithms - sorts by distance2origin or fullSecID depending on setting */
+    bool operator==(const Sector& b) const {
+      if (m_useDistance4sort == false) { return getSecID() == b.getSecID(); }
+      return getDistance() == b.getDistance();
+    }
+
+
+    /** overloaded '>'-operator for sorting algorithms - sorts by distance2origin or fullSecID depending on setting */
+    bool operator>(const Sector& b)  const {
+      if (m_useDistance4sort == false) { return getSecID() > b.getSecID(); }
+      return getDistance() > b.getDistance();
+    }
+
 
     /** called each event - takes all spacePoints from the activated Sector and its friend Sectors to produce segments */
     void segmentMaker();
 
+
+    /** removes link to activated sector. should be called at the end of each run. TODO: shall this activate the destructor of the activated sector too? */
     virtual void clear() { m_myActiveSector = NULL; }
+
+
+    /** getter - returns a pointer to the currently connected activatedSector */
+    ActivatedSector* getMyActiveSector() { return m_myActiveSector; }
+
+
+    /** setter - set distance of sector to origin defined by sectorMap */
+    void setDistance(double distance) { m_distance2Origin = distance; }
+
+
+    /** getter - get distance of sector to origin defined by sectorMap */
+    double getDistance() const { return m_distance2Origin; }
+
+
+    /** getter - getSecID returns the ID of the sector (for definition of secID, see m_sectorID). */
+    unsigned getSecID() const { return m_sectorID; }
+
 
   protected:
 
@@ -53,6 +98,26 @@ namespace Belle2 {
     /** This vector carries a pointer to each SectorFriendship for faster access during events */
     std::vector<SectorFriendship*> m_myFriends;
 
+    /** secID allows identification of sector.
+     *
+     * Current definition AB_C_D (more details can be found in FullSecID.h):
+     * A: layerNumber(1-7), -> 7 used for testing purposes
+     * B: subLayerNumber(0,1)-defines whether sector has friends on same layer (=1) or not (=0),
+     * C: uniID/complete VxdID-info,
+     * D: sectorID on sensor (0-X), whole info stored in an int, can be converted to human readable code by using FullSecID-class
+     */
+    unsigned m_sectorID;
+
+    /** carries info about the distance of the sector-center to the origin.
+     *
+     * The origin is a value depending on the sectorMap which represents the IP (does not have to be 0,0,0)
+     * especially relevant for testbeam- and other testing scenarios.
+     * Needed for the CA (directed graph) e.g. if layerNumbers are not consecutive
+     */
+    double m_distance2Origin;
+
+    /** if activated, sectors are sorted by distance to origin, if false, they are sorted by layerID. */
+    bool m_useDistance4sort;
     ClassDef(Sector, 1)
   };
 } //Belle2 namespace

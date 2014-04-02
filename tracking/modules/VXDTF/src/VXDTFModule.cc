@@ -958,27 +958,27 @@ void VXDTFModule::beginRun()
   if (m_PARAMdisplayCollector > 0) {
 
     //KeySectors dosn't function => so pair Int int
-    std::map<std::pair<unsigned int, unsigned int>, std::vector<int>> sectors_display_all_pass;
-    std::vector<int> sectors_display_friends;
+    std::vector< std::pair<std::pair<unsigned int, unsigned int>, std::vector<int> > > sectorsDisplayAllPass;
+    std::vector<int> sectorsDisplayFriends;
 
     for (uint i = 0; i < m_passSetupVector.size(); i++) {
       B2DEBUG(10, "PassNr. " << i << "Size of Sector Map: " << m_passSetupVector.at(i)->sectorMap.size());
 
       // Read Sector Map => into map
       for (auto & currentSector : m_passSetupVector.at(i)->sectorMap) {
-        sectors_display_friends.clear();
+        sectorsDisplayFriends.clear();
 
         // Friends read and store in second vector
         for (auto & currentFriend : currentSector.second->getFriends()) {
-          sectors_display_friends.push_back(currentFriend);
+          sectorsDisplayFriends.push_back(currentFriend);
         }
 
-        sectors_display_all_pass.insert(std::make_pair(std::make_pair(i, currentSector.second->getSecID()), sectors_display_friends));
+        sectorsDisplayAllPass.push_back(std::make_pair(std::make_pair(i, currentSector.second->getSecID()), sectorsDisplayFriends));
 
       }
 
       // Init all Sectors, secConfigU & secConfigV used for PositionInfo
-      m_collector.initSectors(sectors_display_all_pass, m_passSetupVector.at(i)->secConfigU,
+      m_collector.initSectors(sectorsDisplayAllPass, m_passSetupVector.at(i)->secConfigU,
                               m_passSetupVector.at(i)->secConfigV);
 
     }
@@ -1122,7 +1122,7 @@ void VXDTFModule::the_real_event()
     for (uint m = 0; m < m_passSetupVector.size(); m++) {
       for (int i = 0; i < numOfPxdClusters; ++i) {
 
-        // importCluster (int pass_index, std::string died_at, int accepted, int rejected, int detector_type, int relative_position)
+        // importCluster (int passIndex, std::string diedAt, int accepted, int rejected, int detectorType, int relativePosition)
         int clusterid = m_collector.importCluster(m, "", CollectorTFInfo::m_idAlive, vector<int>(), vector<int>(), Const::PXD, i);
 
         // CollectorID safe to connect Cluster to Cluster in Collector
@@ -1148,7 +1148,7 @@ void VXDTFModule::the_real_event()
 
       for (int i = 0; i < numOfSvdClusters; ++i) {
 
-        // importCluster (int pass_index, std::string died_at, int accepted, int rejected, int detector_type, int relative_position)
+        // importCluster (int passIndex, std::string diedAt, int accepted, int rejected, int detectorType, int relativePosition)
         int clusterid = m_collector.importCluster(m, "", CollectorTFInfo::m_idAlive, vector<int>(), vector<int>(), Const::SVD, i);
 
         // CollectorID safe to connect Cluster to Cluster in Collector
@@ -1208,19 +1208,19 @@ void VXDTFModule::the_real_event()
 
           B2DEBUG(10, "Import TC after generateGFTrackCand")
 
-          // int pass_index, std::string died_at, int accepted, int rejected, std::vector<int>& assigned_Cell_IDs)
-          int tc_id = m_collector.importTC(passNumber, "", CollectorTFInfo::m_idAlive, vector<int>(), vector<int>(), vector<std::pair<int, unsigned int>>());
+          // int pass_index, std::string diedAt, int accepted, int rejected, std::vector<int>& assignedCellIDs)
+          int tcId = m_collector.importTC(passNumber, "", CollectorTFInfo::m_idAlive, vector<int>(), vector<int>(), vector<std::pair<int, unsigned int>>());
 
           int indexNumber = finalTrackCandidates.getEntries();
 
-          baseLineVertexHit->setCollectorID(tc_id);
+          baseLineVertexHit->setCollectorID(tcId);
 
           // TO DO
           //gfTC.setCollectorID(indexNumber);
 
           // Safe Information in the TC Object
-          //updateTCFitInformation (int tcid, bool fit_successful, double probability_value, int assigned_GTFC)
-          m_collector.updateTCFitInformation(tc_id, aTC->getFitSucceeded(), aTC->getTrackQuality(), indexNumber);
+          //updateTCFitInformation (int tcid, bool fitSuccessful, double probabilityValue, int assignedGTFC)
+          m_collector.updateTCFitInformation(tcId, aTC->getFitSucceeded(), aTC->getTrackQuality(), indexNumber);
 
         }
 
@@ -1353,16 +1353,14 @@ void VXDTFModule::the_real_event()
       // importHits 1.
       if (m_PARAMdisplayCollector > 0) {
 
-        std::vector<int> assigned_IDs;
+        std::vector<int> assignedIDs;
 
-        assigned_IDs.push_back(clustersOfEvent[iPart].getCollectorID());
+        assignedIDs.push_back(clustersOfEvent[iPart].getCollectorID());
 
-        //int pass_index, std::string died_at, int died_id, std::vector<int> accepted, std::vector<int> rejected, std::vector<int> assigned_Cluster_IDs, int sec_id, TVector3 hit_position, TVector3 hit_sigma
-
-        int hit_id = m_collector.importHit(passNumber, "", CollectorTFInfo::m_idAlive, vector<int>(), vector<int>(), assigned_IDs, aSecID, hitInfo.hitPosition, hitInfo.hitSigma);
+        int hitId = m_collector.importHit(passNumber, "", CollectorTFInfo::m_idAlive, vector<int>(), vector<int>(), assignedIDs, aSecID, hitInfo.hitPosition, hitInfo.hitSigma);
 
         // Connection Hit <=> Hit in Collector
-        pTFHit->setCollectorID(hit_id);
+        pTFHit->setCollectorID(hitId);
 
       }
 
@@ -1502,14 +1500,14 @@ void VXDTFModule::the_real_event()
         // importHits 2.
         if (m_PARAMdisplayCollector > 0) {
 
-          std::vector<int> assigned_IDs;
+          std::vector<int> assignedIDs;
 
-          assigned_IDs.push_back(clusterIndexU);
-          assigned_IDs.push_back(clusterIndexV);
+          assignedIDs.push_back(clusterIndexU);
+          assignedIDs.push_back(clusterIndexV);
 
           //int pass_index, std::string died_at, int died_id, std::vector<int> accepted, std::vector<int> rejected, std::vector<int> assigned_Cluster_IDs, int sec_id, TVector3 hit_position, TVector3 hit_sigma
 
-          int hit_id =  m_collector.importHit(passNumber, "", CollectorTFInfo::m_idAlive, vector<int>(), vector<int>(), assigned_IDs, aSecID, hitInfo.hitPosition, hitInfo.hitSigma);
+          int hit_id =  m_collector.importHit(passNumber, "", CollectorTFInfo::m_idAlive, vector<int>(), vector<int>(), assignedIDs, aSecID, hitInfo.hitPosition, hitInfo.hitSigma);
 
           // Connect Hit <=> Collector Hit
           pTFHit->setCollectorID(hit_id);
@@ -1734,7 +1732,7 @@ void VXDTFModule::the_real_event()
       if (m_PARAMdisplayCollector > 0) {
 
         if (overbookedCheck) {
-          // int tcid, std::string died_at, int accepted, int rejected
+          // int tcid, std::string diedAt, int accepted, int rejected
           m_collector.updateTC(currentTC->getCollectorID(), "",  CollectorTFInfo::m_idAlive, {FilterID::overlapping}, vector<int>());
         } else {
           m_collector.updateTC(currentTC->getCollectorID(), "",  CollectorTFInfo::m_idAlive, vector<int>(), {FilterID::overlapping});
@@ -1973,16 +1971,16 @@ void VXDTFModule::the_real_event()
     if (m_PARAMdisplayCollector > 0) {
 
       int indexNumber = finalTrackCandidates.getEntries();
-      int tc_id = currentTC->getCollectorID();
+      int tcId = currentTC->getCollectorID();
 
-      B2DEBUG(10, "NEW InfoBoard tc_id: " << tc_id << "ProbValue: " << currentTC->getTrackQuality() << ";  isFitPossible: " << currentTC->getFitSucceeded());
+      B2DEBUG(10, "NEW InfoBoard tcId: " << tcId << "ProbValue: " << currentTC->getTrackQuality() << ";  isFitPossible: " << currentTC->getFitSucceeded());
 
       //updateTCFitInformation (int tcid, bool fit_successful, double probability_value, int assigned_GTFC)
-      m_collector.updateTCFitInformation(tc_id, currentTC->getFitSucceeded(), currentTC->getTrackQuality(), indexNumber);
+      m_collector.updateTCFitInformation(tcId, currentTC->getFitSucceeded(), currentTC->getTrackQuality(), indexNumber);
 
       // TO DO
       // Collector ID in gfTC to find the Object in the Collector
-      // gfTC.setCollectorID(tc_id);
+      // gfTC.setCollectorID(tcId);
     }
 
 
@@ -3180,7 +3178,7 @@ int VXDTFModule::segFinder(PassData* currentPass)
           // Collector Cells Import for not saved VXDSegmentCell
           if (m_PARAMdisplayCollector > 0) {
             int cell_id =
-              importCollectorCell(m_aktpassNumber, "", CollectorTFInfo::m_idAlive, /* CollectorTFInfo::m_nameCellFinder, CollectorTFInfo::m_idCellFinder, */ acceptedRejectedFilters, ownHits[currentHit]->getCollectorID(), allFriendHits[friendHit]->getCollectorID());
+              importCollectorCell(m_aktpassNumber, "", CollectorTFInfo::m_idAlive, acceptedRejectedFilters, ownHits[currentHit]->getCollectorID(), allFriendHits[friendHit]->getCollectorID());
 
             // Seperate Update is necessary to mark it died (because of died_at of other Objects)
             m_collector.updateCell(cell_id, CollectorTFInfo::m_nameCellFinder, CollectorTFInfo::m_idCellFinder, vector<int>(), vector<int>(), -1, -2, -1, vector<int>());
@@ -3208,7 +3206,7 @@ int VXDTFModule::segFinder(PassData* currentPass)
             // Collector Cells Import for not saved VXDSegmentCell
             if (m_PARAMdisplayCollector > 0) {
               int cell_id =
-                importCollectorCell(m_aktpassNumber, "", CollectorTFInfo::m_idAlive, /* CollectorTFInfo::m_nameCellFinder, CollectorTFInfo::m_idCellFinder,*/  acceptedRejectedFilters, ownHits[currentHit]->getCollectorID(), allFriendHits[friendHit]->getCollectorID());
+                importCollectorCell(m_aktpassNumber, "", CollectorTFInfo::m_idAlive, acceptedRejectedFilters, ownHits[currentHit]->getCollectorID(), allFriendHits[friendHit]->getCollectorID());
 
               // Seperate Update is necessary to mark it died (because of died_at of other Objects)
               m_collector.updateCell(cell_id, CollectorTFInfo::m_nameCellFinder, CollectorTFInfo::m_idCellFinder, vector<int>(), vector<int>(), -1, -2, -1, vector<int>());
@@ -3264,7 +3262,7 @@ int VXDTFModule::segFinder(PassData* currentPass)
 
 
 // Imports Collector Cell (only for Collector)
-// changes acceptedRejectedFilters => accepted_filters, rejected_filters
+// changes acceptedRejectedFilters => acceptedFilters, rejectedFilters
 int VXDTFModule::importCollectorCell(int pass_index, std::string died_at, int died_id, std::vector<std::pair<int, bool>> acceptedRejectedFilters, int hit1, int hit2)
 {
 
@@ -3272,21 +3270,21 @@ int VXDTFModule::importCollectorCell(int pass_index, std::string died_at, int di
   assigned_Hit_IDs.push_back(hit1);
   assigned_Hit_IDs.push_back(hit2);
 
-  std::vector<int> accepted_filters;
-  std::vector<int> rejected_filters;
+  std::vector<int> acceptedFilters;
+  std::vector<int> rejectedFilters;
 
   for (auto entry : acceptedRejectedFilters) {
     B2DEBUG(10, "acceptedRejected: " << entry.first << "; (T/F): " << entry.second);
     if (entry.second == true) {
-      accepted_filters.push_back(entry.first);
+      acceptedFilters.push_back(entry.first);
 
     } else {
-      rejected_filters.push_back(entry.first);
+      rejectedFilters.push_back(entry.first);
     }
 
   }
 
-  int cell_id = m_collector.importCell(pass_index, died_at, died_id, accepted_filters, rejected_filters, assigned_Hit_IDs);
+  int cell_id = m_collector.importCell(pass_index, died_at, died_id, acceptedFilters, rejectedFilters, assigned_Hit_IDs);
 
   return cell_id;
 }
@@ -3668,23 +3666,23 @@ int VXDTFModule::neighbourFinder(PassData* currentPass)
       B2DEBUG(10, "VXDTF: Display: Module Collector updateCell");
 
       // Filters vectors for update
-      std::vector<int> accepted_filters;
-      std::vector<int> rejected_filters;
+      std::vector<int> acceptedFilters;
+      std::vector<int> rejectedFilters;
 
       for (auto entry : acceptedRejectedFilters) {
         B2DEBUG(10, "acceptedRejected: " << entry.first << "; (T/F): " << entry.second);
         if (entry.second == true) {
-          accepted_filters.push_back(entry.first);
+          acceptedFilters.push_back(entry.first);
 
         } else {
-          rejected_filters.push_back(entry.first);
+          rejectedFilters.push_back(entry.first);
         }
 
       }
 
       // int cellID, std::string died_at, int died_id, std::vector<int> accepted, std::vector<int> rejected, int add_TCID, int remove_TCID, int cellstate, std::vector<int> neighbours
 
-      m_collector.updateCell(currentSeg->getCollectorID(), "", CollectorTFInfo::m_idAlive, accepted_filters, rejected_filters, -1, -1, currentSeg->getState(), vector<int>());
+      m_collector.updateCell(currentSeg->getCollectorID(), "", CollectorTFInfo::m_idAlive, acceptedFilters, rejectedFilters, -1, -1, currentSeg->getState(), vector<int>());
 
     }
 
@@ -3888,19 +3886,17 @@ void VXDTFModule::tcCollector(PassData* currentPass)
       // Collector TC Import
       if (m_PARAMdisplayCollector > 0) {
 
-        std::vector<std::pair<int, unsigned int>> all_segments;
+        std::vector<std::pair<int, unsigned int>> allSegments;
 
         // Connected Cells => vector for import
         for (VXDSegmentCell * tf_currentSegment :  pTC->getSegments()) {
-          all_segments.push_back(make_pair(tf_currentSegment->getCollectorID(), tf_currentSegment->getState()));
+          allSegments.push_back(make_pair(tf_currentSegment->getCollectorID(), tf_currentSegment->getState()));
         }
 
-        // int pass_index, std::string died_at, int died_id, std::vector<int> accepted, std::vector<int> rejected, std::vector<std::pair<int, unsigned int>> assigned_Cell_IDs
-
-        int tc_id = m_collector.importTC(m_aktpassNumber, "", CollectorTFInfo::m_idAlive, vector<int>(), vector<int>(), all_segments);
+        int tcId = m_collector.importTC(m_aktpassNumber, "", CollectorTFInfo::m_idAlive, vector<int>(), vector<int>(), allSegments);
 
         // Connect Collector TC <=> TC
-        pTC->setCollectorID(tc_id);
+        pTC->setCollectorID(tcId);
 
       }
 
@@ -5037,9 +5033,9 @@ bool VXDTFModule::doTheCircleFit(PassData* thisPass, VXDTFTrackCandidate* aTc, i
 
     // Collector TC Update (circlefit)
     if (m_PARAMdisplayCollector > 0) {
-      std::vector<int> filter_circleFit = {FilterID::circlefit};
+      std::vector<int> filterCircleFit = {FilterID::circlefit};
 
-      m_collector.updateTC(aTc->getCollectorID(), CollectorTFInfo::m_nameTCC, CollectorTFInfo::m_idTCC, vector<int>(), filter_circleFit);
+      m_collector.updateTC(aTc->getCollectorID(), CollectorTFInfo::m_nameTCC, CollectorTFInfo::m_idTCC, vector<int>(), filterCircleFit);
     }
 
     writeToRootFile(probability, chi2, estimatedRadius, nHits - 3 + addDegreesOfFreedom);
@@ -5056,9 +5052,9 @@ bool VXDTFModule::doTheCircleFit(PassData* thisPass, VXDTFTrackCandidate* aTc, i
 
   // Collector TC Update (circlefit)
   if (m_PARAMdisplayCollector > 0) {
-    std::vector<int> filter_circleFit = {FilterID::circlefit};
+    std::vector<int> filterCircleFit = {FilterID::circlefit};
 
-    m_collector.updateTC(aTc->getCollectorID(), "", CollectorTFInfo::m_idAlive, filter_circleFit, vector<int>());
+    m_collector.updateTC(aTc->getCollectorID(), "", CollectorTFInfo::m_idAlive, filterCircleFit, vector<int>());
   }
 
   B2DEBUG(20, " TCC filter circleFit approved TC " << tcCtr << " with numOfHits: " <<  nHits << ", time consumption: " << duration.count() << " ns");

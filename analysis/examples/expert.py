@@ -31,7 +31,7 @@ methods = ['Fisher', 'NeuroBayes', 'BDTGradient', 'PDEFoamBoost']
 
 for method in methods:
     expert = register_module('TMVAExpert')
-    expert.param('identifier', 'TMVA')
+    expert.param('prefix', 'TMVA')
     expert.param('method', method)
     expert.param('listNames', ['e-'])
     expert.param('signalProbabilityName', method + '_Probability')

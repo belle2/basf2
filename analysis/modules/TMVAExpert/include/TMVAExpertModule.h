@@ -17,7 +17,10 @@ namespace Belle2 {
   class Particle;
 
   /**
-   * This module fills the ExtraInfo of the Particle object with the value calculated by a TMVA method for every Particle in the given ParticleLists
+   * This module adds an ExtraInfo to the Particle objects in a given ParticleList.
+   * The ExtraInfo is calculated by a TMVA method and represents the SignalProbability
+   * of the particle with respect to the training. The desired TMVA method has to be
+   * trained via the TMVATeacherModule before one can use in this TMVAExpertModule.
    */
 
   class TMVAExpertModule : public Module {
@@ -66,12 +69,12 @@ namespace Belle2 {
   private:
 
     std::vector<std::string> m_listNames; /**< input particle list names */
-    std::string m_methodName; /**< used multivariate analysis method */
-    std::string m_identifier; /**< identifier name for the files created by the TMVA method */
+    std::string m_methodName; /**< name of the TMVA method specified in the training by TMVATeacher */
+    std::string m_methodPrefix; /**< common prefix for the methods trained by TMVATeacher */
     std::string m_workingDirectory; /**< Working directory in which the expert finds the config file and the weight file directory */
-    std::string m_signalProbabilityName /**< Name under which the signal probability is stored in the ExtraInfo of the Particle object. */;
+    std::string m_signalProbabilityName /**< Name under which the SignalProbability is stored in the ExtraInfo of the Particle object. */;
+    int m_signalCluster; /**< Number of the cluster which is considered signal.  */
     TMVAInterface::Expert* m_method; /**< Method used to calculate the target variable */
-    int m_signalCluster; /**< Number of the cluster which is considered signal */
 
   };
 

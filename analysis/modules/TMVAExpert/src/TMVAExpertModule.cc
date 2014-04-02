@@ -27,15 +27,21 @@ namespace Belle2 {
 
   TMVAExpertModule::TMVAExpertModule() : Module()
   {
-    setDescription("Fills ExtraInfo of Particle object with calculated TMVAExpert output. Requires existing training from running TMVATeacher.");
+    setDescription("Adds an ExtraInfo to the Particle objects in given ParticleLists. The ExtraInfo is calculated by a TMVA method "
+                   "and represents the SignalProbability of the Particle with respect to the training. "
+                   "Requires existing training for the specified method via TMVATeacher.");
     setPropertyFlags(c_ParallelProcessingCertified);
 
     addParam("listNames", m_listNames, "Input particle list names as list");
-    addParam("method", m_methodName, "Method which is used to calculate the target variable. For Plugin methods this name has to be identical to the method name");
-    addParam("identifier", m_identifier, "Identifier which is used by the TMVAInterface to read its configfile $identifier.config and by TMVA method itself to read the files weights/$identifier_$method.class.C and weights/$identifier_$method.weights.xml with additional information", std::string("TMVA"));
+    addParam("method", m_methodName, "Method name specified in the training via TMVATeacher.");
+    addParam("prefix", m_methodPrefix, "Common prefix for the methods trained by TMVATeacher. "
+             "The prefix is used by the TMVAInterface to read its configfile $prefix.config "
+             "and by TMVA method itself to read the files weights/$prefix_$method.class.C "
+             "and weights/$prefix_$method.weights.xml with additional information", std::string("TMVA"));
     addParam("workingDirectory", m_workingDirectory, "Working directory in which the expert finds the config file and the weight file directory", std::string("."));
     addParam("signalProbabilityName", m_signalProbabilityName, "Name under which the signal probability is stored in the ExtraInfo of the Particle object.");
-    addParam("signalCluster", m_signalCluster, "Number of the cluster which is considered as signal", 1);
+    addParam("signalCluster", m_signalCluster, "Number of the cluster which is considered as signal. e.g. the pdg of the Particle which is considered signal if "
+             "you trained the method with pdg as target variable. Or 1 if you trained with isSignal as target.", 1);
 
     m_method = nullptr;
   }
@@ -46,11 +52,12 @@ namespace Belle2 {
 
   void TMVAExpertModule::initialize()
   {
+    // All specified ParticleLists are required to exist
     for (auto & name : m_listNames) {
       StoreObjPtr<ParticleList>::required(name);
     }
 
-    m_method = new TMVAInterface::Expert(m_identifier, m_workingDirectory, m_methodName, m_signalCluster);
+    m_method = new TMVAInterface::Expert(m_methodPrefix, m_workingDirectory, m_methodName, m_signalCluster);
     VariableManager::Instance().registerParticleExtraInfoVariable(m_signalProbabilityName, "TMVA Expert SignalProbability Variable");
   }
 
@@ -76,7 +83,6 @@ namespace Belle2 {
   {
     for (auto & listName : m_listNames) {
       StoreObjPtr<ParticleList> list(listName);
-      // Calculate target Value for Particles [0, N_PARTICLE] and AntiParticles [N_PARTICLE, N_PARTICLE + N_ANTIPARTICLE]
       for (unsigned i = 0; i < list->getNumofParticles() + list->getNumofAntiParticles(); ++i) {
         Particle* particle = list->getParticle(i);
         float targetValue = m_method->analyse(particle);

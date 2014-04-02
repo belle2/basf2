@@ -125,7 +125,7 @@ void HitTFInfo::push_back_UseCounterTCIDs(int newMember)
 
   // -1 => no new Member
   if (newMember != -1) {
-    std::vector<int>::iterator found = find(m_useTCCounterIDs.begin(), m_useTCCounterIDs.end(), newMember);
+    auto found = find(m_useTCCounterIDs.begin(), m_useTCCounterIDs.end(), newMember);
 
     // Only add the new TCID if not allready in the vector
     if (found == m_useTCCounterIDs.end()) {
@@ -145,7 +145,7 @@ void HitTFInfo::push_back_AllCounterTCIDs(int newMember)
 
   // -1 => no new Member
   if (newMember != -1) {
-    std::vector<int>::iterator found = find(m_allTCCounterIDs.begin(), m_allTCCounterIDs.end(), newMember);
+    auto found = find(m_allTCCounterIDs.begin(), m_allTCCounterIDs.end(), newMember);
 
     // Only add the new TCID if not allready in the vector
     if (found == m_allTCCounterIDs.end()) {
@@ -164,7 +164,7 @@ void HitTFInfo::remove_UseCounterTCIDs(int oldMember)
 
   // -1 => no old Member
   if (oldMember != -1) {
-    std::vector<int>::iterator found = find(m_useTCCounterIDs.begin(), m_useTCCounterIDs.end(), oldMember);
+    auto found = find(m_useTCCounterIDs.begin(), m_useTCCounterIDs.end(), oldMember);
 
     // Only add the new TCID if not allready in the vector
     if (found != m_useTCCounterIDs.end()) {

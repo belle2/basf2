@@ -75,7 +75,7 @@ CollectorTFInfo::~CollectorTFInfo()
 
 // Run at End of beginn-Run / 1 x RUN
 /** Sectors safe for all events */
-void CollectorTFInfo::initSectors(const std::map< std::pair<unsigned int, unsigned int>, std::vector<int> >& sectors, const std::vector<double>& secConfigU, const std::vector<double>& secConfigV)
+void CollectorTFInfo::initSectors(const std::vector< std::pair <std::pair<unsigned int, unsigned int>, std::vector<int> > >& sectors, const std::vector<double>& secConfigU, const std::vector<double>& secConfigV)
 {
 
   B2DEBUG(100, "CollectorTFInfo: initSectors");
@@ -221,19 +221,19 @@ void CollectorTFInfo::updateSectors(int sectorID, int passIndex, std::string die
 {
   B2DEBUG(100, "CollectorTFInfo: updateSectors, sectorID: " << sectorID << ", Pass Index: " << passIndex << ", diet_at: " << diedAt << ", accepted-size: " << accepted.size() << ", rejected-size: " << rejected.size() << ", deltaUseCounter: " << deltaUseCounter);
 
-  std::map<KeySectors, SectorTFInfo>::iterator it, itFriend;
+  //std::map<KeySectors, SectorTFInfo>::iterator it, itFriend;
 
   // Key of the current Sector
   KeySectors myKey(passIndex, sectorID);
 
-  it = m_sectorTF.find(myKey);
+  auto itCurrentSector = m_sectorTF.find(myKey);
 
   // Sector Search in current Sectors
-  if (it == m_sectorTF.end()) {
+  if (itCurrentSector == m_sectorTF.end()) {
     // Not found => Search in all Sectors
-    it = m_sectorTFAll.find(myKey);
+    itCurrentSector = m_sectorTFAll.find(myKey);
 
-    if (it == m_sectorTFAll.end()) {
+    if (itCurrentSector == m_sectorTFAll.end()) {
       // Not found in all Sectors
       B2DEBUG(100, "CollectorTFInfo: updateSectors - Sector not found !");
       return;
@@ -245,7 +245,7 @@ void CollectorTFInfo::updateSectors(int sectorID, int passIndex, std::string die
 
       // + Updates
       //Copy of sector => use for this event
-      SectorTFInfo currentSector = it->second;
+      SectorTFInfo currentSector = itCurrentSector->second;
       currentSector.setIsOnlyFriend(false);
 
       currentSector.changeUseCounter(deltaUseCounter);
@@ -273,7 +273,7 @@ void CollectorTFInfo::updateSectors(int sectorID, int passIndex, std::string die
         if (m_sectorTF.find(friendKey) ==  m_sectorTF.end()) {
 
           // not found => search in all Sectors
-          itFriend = m_sectorTFAll.find(friendKey);
+          auto itFriend = m_sectorTFAll.find(friendKey);
 
           // Reload Friend Sector
           if (itFriend == m_sectorTFAll.end()) {
@@ -299,7 +299,7 @@ void CollectorTFInfo::updateSectors(int sectorID, int passIndex, std::string die
   } else {
 
     // Reference to change Sector Information
-    SectorTFInfo& currentSector = it->second;
+    SectorTFInfo& currentSector = itCurrentSector->second;
 
     //in Case it only was a sector friend before
     currentSector.setIsOnlyFriend(false);
@@ -493,8 +493,6 @@ int CollectorTFInfo::importCell(int passIndex, std::string diedAt, int diedId, s
 
   // standard = 2 Hits
   for (auto & currentHit : assignedHitIDs) {
-    newcell.push_back_AssignedHits(currentHit);
-
     // outer hit  = Index 0, inner hit = Index 1
     // Index = Posistion of currentHit
     cellUpdate.at(&currentHit - &assignedHitIDs.at(0)) = 1;
@@ -504,6 +502,12 @@ int CollectorTFInfo::importCell(int passIndex, std::string diedAt, int diedId, s
 
     // Index = Posistion of currentHit
     cellUpdate.at((&currentHit - &assignedHitIDs.at(0))) = 0;
+
+    // Assigned Hits store
+    // Coordinates for assigned Hits store
+    if (currentHit < int(m_hitTF.size()) && currentHit != -1) {
+      newcell.push_back_AssignedHits(currentHit, m_hitTF[currentHit].getPosition());
+    }
 
   }
 
@@ -605,7 +609,7 @@ void CollectorTFInfo::updateCell(int cellID, std::string diedAt, int diedId, std
 
 
 /** TC Import, return = tc id */
-int CollectorTFInfo::importTC(int passIndex, std::string diedAt, int diedId, std::vector<int> accepted, std::vector<int> rejected, std::vector<std::pair<int, unsigned int>> assignedCellIDs)
+int CollectorTFInfo::importTC(int passIndex, std::string diedAt, int diedId, std::vector<int> accepted, std::vector<int> rejected, const std::vector<std::pair<int, unsigned int>> assignedCellIDs)
 {
   B2DEBUG(100, "CollectorTFInfo: importTC, passIndex: " << passIndex << ", diet_at: " << diedAt << ", accepted-size: " << accepted.size() << ", rejected-size: " << rejected.size() << ", assignedCellIDs - size: " << assignedCellIDs.size());
 
@@ -620,7 +624,12 @@ int CollectorTFInfo::importTC(int passIndex, std::string diedAt, int diedId, std
   newtf.insert_Rejected(rejected);
 
   for (auto & currentCell : assignedCellIDs) {
-    newtf.push_back_AssignedCell(currentCell.first);
+
+    // Assigned Cell store
+    // Coordinates for assigned Cells store
+    if (currentCell.first < int(m_cellTF.size()) && currentCell.first != -1) {
+      newtf.push_back_AssignedCell(currentCell.first, m_cellTF[currentCell.first].getCoordinates());
+    }
 
     // vector<int>() = no new neighbours
     updateCell(currentCell.first, diedAt, diedId, accepted, rejected, tfcandID, -1, currentCell.second, vector<int>());   // ID vom TCCAND.-Filter fehlt
@@ -722,7 +731,7 @@ void CollectorTFInfo::safeInformation()
   // Friends of Sectors
   RelationArray relSectorSectorFriend(sectorTFInfo, sectorTFInfo);
 
-  std::map<KeySectors, SectorTFInfo>::iterator it;
+  //std::map<KeySectors, SectorTFInfo>::iterator it;
   KeySectors friendKey;
 
   for (auto & currentSector : m_sectorTF) {
@@ -737,12 +746,12 @@ void CollectorTFInfo::safeInformation()
       friendKey.first = currentSector.second.getPassIndex();
       friendKey.second = currentFriend;
 
-      it = m_sectorTF.find(friendKey);
+      auto itCurrentSector = m_sectorTF.find(friendKey);
 
       // Sector Search in current Sectors
-      if (it != m_sectorTF.end()) {
-        relSectorSectorFriend.add(indexSector, std::distance(m_sectorTF.begin(), it));
-        B2DEBUG(100, "passIndex: " << friendKey.first << "; Sector akt: " << indexSector << ", friend sector: " << std::distance(m_sectorTF.begin(), it) << ", sector id (akt/friend): " << currentSector.second.getSectorID() << " / " << currentFriend);
+      if (itCurrentSector != m_sectorTF.end()) {
+        relSectorSectorFriend.add(indexSector, std::distance(m_sectorTF.begin(), itCurrentSector));
+        B2DEBUG(100, "passIndex: " << friendKey.first << "; Sector akt: " << indexSector << ", friend sector: " << std::distance(m_sectorTF.begin(), itCurrentSector) << ", sector id (akt/friend): " << currentSector.second.getSectorID() << " / " << currentFriend);
       } else {
         B2DEBUG(100, "Friend-Sector not found: " << currentFriend);
       }
@@ -949,18 +958,18 @@ bool CollectorTFInfo::isHitOverlapped(int hitId)
 
   // 1. Sector overlapped ?
   // Search Sector
-  std::map<KeySectors, SectorTFInfo>::iterator it;
+  //std::map<KeySectors, SectorTFInfo>::iterator it;
 
   KeySectors myKey(currentHit.getPassIndex(), currentHit.getSectorID());
 
-  it = m_sectorTF.find(myKey);
+  auto itCurrentSector = m_sectorTF.find(myKey);
 
-  if (it == m_sectorTF.end()) {
+  if (itCurrentSector == m_sectorTF.end()) {
     B2DEBUG(100, "CollectorTFInfo: isHitOverlapped - Sector not found : " << currentHit.getSectorID());
     return isOverlapped;
   }
 
-  SectorTFInfo& currentSector = it->second;
+  SectorTFInfo& currentSector = itCurrentSector->second;
 
   isOverlapped = currentSector.isOverlapped();
   // if sector is overlapped => other checks not necessary

@@ -81,7 +81,7 @@ namespace Belle2 {
     void setOutputFlag(int value) { m_outputFlag = value; }
 
     /** Sectors safe for all events */
-    virtual void initSectors(const std::map< std::pair<unsigned int, unsigned int>, std::vector<int> >& sectors, const std::vector<double>& secConfigU, const std::vector<double>& secConfigV);
+    virtual void initSectors(const std::vector< std::pair< std::pair<unsigned int, unsigned int>, std::vector<int> > >& sectors, const std::vector<double>& secConfigU, const std::vector<double>& secConfigV);
 
     /** registerPersistence (StoreArrays & RelationArray) for the Collector */
     virtual void initPersistent();  // Init Persistence
@@ -113,7 +113,7 @@ namespace Belle2 {
     virtual void updateCell(int cellID, std::string diedAt, int diedId, std::vector<int> accepted, std::vector<int> rejected, int addTCID, int removeTCID, int changeCellState, std::vector<int> neighbours);  // Cell Update
 
     /** TC Import, return = tc id */
-    virtual int importTC(int passIndex, std::string diedAt, int diedId, std::vector<int> accepted, std::vector<int> rejected, std::vector<std::pair<int, unsigned int>> assignedCellIDs);  // TC Import
+    virtual int importTC(int passIndex, std::string diedAt, int diedId, std::vector<int> accepted, std::vector<int> rejected, const std::vector<std::pair<int, unsigned int>> assignedCellIDs);  // TC Import
 
     /** update TCand */
     virtual void updateTC(int tcid, std::string diedAt, int diedId, std::vector<int> accepted, std::vector<int> rejected);  // TC Update

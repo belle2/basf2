@@ -23,6 +23,7 @@ namespace Belle2 {
    *  state (int) = State of the cell
    *  m_neighbours (< int >) = Positions of the Neighbour-Cells in the same Vector
    *    m_assignedHitsIds (< int >) = Assigned Hit IDs using this Cells, (outer hit  = Index 0, inner hit = Index 1)
+   * m_assignedHitsCoordinates < TVector3 > = Assigned Hit Coordinates using this Cells
    *  m_useCounter (int) = Countes the TCs using this cell (alive and connected)
    *  m_maxCounter (int) = max. m_useCounter
    *    m_isReal (int)  0 = Particle is not real; 1 = Particle is real; 2 = part
@@ -49,6 +50,7 @@ namespace Belle2 {
       m_state = 0;
       m_neighbours.clear();
       m_assignedHitsIds.clear();
+      m_assignedHitsCoordinates.clear();
       m_useCounter = 0;
       m_maxCounter = 0;
       m_isReal = 0;
@@ -90,8 +92,9 @@ namespace Belle2 {
     std::vector<int>& getAssignedHits()  { return m_assignedHitsIds; }
 
     /** add new int to Assigned Hits */
-    void push_back_AssignedHits(int newMember) {
+    void push_back_AssignedHits(int newMember, TVector3 newCoordinates) {
       m_assignedHitsIds.push_back(newMember);
+      m_assignedHitsCoordinates.push_back(newCoordinates);
     }
 
     /** returns size of Assigned Hits */
@@ -191,8 +194,6 @@ namespace Belle2 {
     /** returns the String for the display - Information */
     TString getDisplayInformation() {
 
-      // NOT FINAL !!!
-
       int outerHit = -1;
       if (m_assignedHitsIds.size() > 0) { outerHit = m_assignedHitsIds.at(0); }
       int innerHit = -1;
@@ -200,6 +201,13 @@ namespace Belle2 {
 
       return TString::Format("OuterHit: %d, InnerHit: %d\n State: %d\n Died_ID: %d ", outerHit, innerHit, m_state, getDiedID());
     }
+
+
+    /** returns Coordinates of the Assigned Hits */
+    std::vector<TVector3> getCoordinates() {
+      return m_assignedHitsCoordinates;
+    }
+
 
     /** returns the String for the display - AlternativeBox */
     TString getDisplayAlternativeBox() {
@@ -217,6 +225,7 @@ namespace Belle2 {
     std::vector<int> m_neighbours;  /**<Position of the Neighbour-Cells in the same Vector  */
 
     std::vector<int> m_assignedHitsIds; /**< Assigned Hit IDs using this Cells, (outer hit  = Index 0, inner hit = Index 1) */
+    std::vector<TVector3> m_assignedHitsCoordinates; /**< Assigned Hit Coordinates using this Cells, (outer hit  = Index 0, inner hit = Index 1) */
 
     int m_useCounter;  /**< Countes the TC (alive and connected) */
     int m_maxCounter;  /**< Max. Counts of TC (max. m_useCounter)  */

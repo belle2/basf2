@@ -39,6 +39,7 @@ namespace Belle2 {
     TrackCandidateTFInfo() {
       m_ownId = -1;
       m_assignedCellIds.clear();
+      m_assignedCellCoordinates.clear();
 
       m_fitSuccessful = false;
       m_probValue = 0;
@@ -51,6 +52,7 @@ namespace Belle2 {
     TrackCandidateTFInfo(int parPassIndex, int parOwnId): BaseTFInfo(parPassIndex) {
       m_ownId = parOwnId;
       m_assignedCellIds.clear();
+      m_assignedCellCoordinates.clear();
 
       m_fitSuccessful = false;
       m_probValue = 0;
@@ -69,8 +71,9 @@ namespace Belle2 {
     std::vector<int>& getAssignedCell()  { return m_assignedCellIds; }
 
     /** add new int to AssignedCell */
-    void push_back_AssignedCell(int newMember) {
+    void push_back_AssignedCell(int newMember, std::vector<TVector3> newCoordinates) {
       m_assignedCellIds.push_back(newMember);
+      m_assignedCellCoordinates.insert(m_assignedCellCoordinates.end(), newCoordinates.begin(), newCoordinates.end());
     }
 
     /** returns size of AssignedCell */
@@ -151,10 +154,13 @@ namespace Belle2 {
     /** returns size of used_particles */
     int sizeUsedParticles() { return m_usedParticles.size(); }
 
+    /** returns Coordinates of the Assigned Cell */
+    std::vector<TVector3> getCoordinates() {
+      return m_assignedCellCoordinates;
+    }
+
     /** returns the String for the display - Information */
     TString getDisplayInformation() {
-
-      // NOT FINAL !!!
 
       int cell1 = -1;
       if (m_assignedCellIds.size() > 0) { cell1 = m_assignedCellIds.at(0); }
@@ -177,6 +183,8 @@ namespace Belle2 {
     int m_ownId; /**< Track Canrdidate ID */
 
     std::vector<int> m_assignedCellIds;  /**< IDs of the connected Cells */
+    std::vector<TVector3> m_assignedCellCoordinates; /**< Connected Cell Coordinates using this TCand */
+
 
     bool m_fitSuccessful; /**< is true, when fit was successfull */
     double m_probValue; /**< probability-value calculated by kalman fit (probability that his TC is real track) */

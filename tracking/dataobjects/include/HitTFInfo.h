@@ -198,10 +198,6 @@ namespace Belle2 {
       return false;
     }
 
-
-
-
-
     /** add new to used_particles */
     void push_back_UsedParticles(std::pair<int, double> newMember) {
       m_usedParticles.push_back(newMember);

@@ -134,9 +134,21 @@ namespace Belle2 {
     /** returns the String for the display - Information */
     TString getDisplayInformation() {
 
-      // NOT FINAL !!!
-
       return TString::Format("Point 1: (%.3f, %.3f, %.3f)\n Point 2: (%.3f, %.3f, %.3f)\n Point 3: (%.3f, %.3f, %.3f)\n Point 4: (%.3f, %.3f, %.3f)\n Friend Only: %s\n Died_ID: %d ", m_points[0].X(), m_points[0].Y(), m_points[0].Z(), m_points[1].X(), m_points[1].Y(), m_points[1].Z(), m_points[2].X(), m_points[2].Y(), m_points[2].Z(), m_points[3].X(), m_points[3].Y(), m_points[3].Z(), m_isOnlyFriend ? "true" : "false", getDiedID());
+
+    }
+
+    /** returns Coordinates of a Sector, Point 1 = Point 5 to draw Sector */
+    std::vector<TVector3> getCoordinates() {
+      std::vector<TVector3> coordinates;
+
+      for (auto & currentPoint : m_points) {
+        coordinates.insert(coordinates.end(), currentPoint);
+      }
+
+      coordinates.insert(coordinates.end(), m_points[0]);
+
+      return coordinates;
     }
 
     /** returns the String for the display - AlternativeBox */

@@ -4,5 +4,6 @@ enum  MCMatchStatus {
   c_MissGamma           = 4,  /**< bit 2: Photon (not FSR) is missing. */
   c_MissMassiveParticle = 8,  /**< bit 3: Massive particle is missing. */
   c_MissNeutrino        = 16, /**< bit 4: Neutrino is missing. */
-  c_MissKlong           = 32  /**< bit 5: Klong is missing. */
+  c_MissKlong           = 32, /**< bit 5: Klong is missing. */
+  c_ERROR               = 64  /**< bit 6: There was an error in MC matching. Not a valid match. */
 };

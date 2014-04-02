@@ -120,7 +120,7 @@ int getMCTruthStatus(const Particle* particle, const MCParticle* mcParticle)
   int status = 0;
 
   if (!mcParticle)
-    return -2;
+    return MCMatchStatus::c_ERROR;
 
   unsigned nChildren = particle->getNDaughters();
 
@@ -130,10 +130,11 @@ int getMCTruthStatus(const Particle* particle, const MCParticle* mcParticle)
     return status;
   }
 
-  int genMotherPDG = mcParticle->getPDG();
+  //int genMotherPDG = mcParticle->getPDG();
   // TODO: fix this (aim for no hard coded values)
-  if (genMotherPDG == 10022 || genMotherPDG == 300553 || genMotherPDG == 9000553)
-    return -1;
+  // TODO: is this neccessary ?
+  //if (genMotherPDG == 10022 || genMotherPDG == 300553 || genMotherPDG == 9000553)
+  //  return -1;
 
   // Ks doesn't have daughters in gen_hepevt table
   // TODO: is there any better way
@@ -152,10 +153,10 @@ int getMCTruthStatus(const Particle* particle, const MCParticle* mcParticle)
 
   // TODO: do something
   if (genFSPs.size() == 0)
-    return -2;
+    return MCMatchStatus::c_ERROR;
 
   if (recFSPs.size() > genFSPs.size())
-    return -3;
+    return MCMatchStatus::c_ERROR;
 
   // determine the status bits
   bool missFSR            = false;

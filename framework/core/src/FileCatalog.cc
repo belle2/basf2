@@ -23,7 +23,7 @@ namespace fs = boost::filesystem;
 
 FileCatalog::Lock::Lock(std::string fileName)
 {
-  m_file = open(fileName.c_str(), O_RDWR | O_CREAT);
+  m_file = open(fileName.c_str(), O_RDWR | O_CREAT, 0640);
 }
 
 FileCatalog::Lock::~Lock()

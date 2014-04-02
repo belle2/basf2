@@ -284,7 +284,7 @@ class Particle:
                 # anyway, so this won't make a difference)
                 teacher = register_module('TMVATeacher')
                 teacher.set_name('TMVATeacher_' + self.to_string(channel))
-                teacher.param('identifier', self.to_string(channel) + '_' + self.getWeightHash())
+                teacher.param('prefix', self.to_string(channel) + '_' + self.getWeightHash())
                 teacher.param('methods', self.methods)
                 teacher.param('factoryOption', '!V:!Silent:Color:DrawProgressBar:AnalysisType=Classification')
                 # Add child probability variables!
@@ -310,7 +310,7 @@ class Particle:
             for method in self.methods:
                 expert = register_module('TMVAExpert')
                 expert.set_name('TMVAEXPERT_' + self.to_string(channel) + '_' + method[0])
-                expert.param('identifier', self.to_string(channel) + '_' + self.getWeightHash())
+                expert.param('prefix', self.to_string(channel) + '_' + self.getWeightHash())
                 expert.param('method', method[0])
                 # TODO All methods use the same target variable at the moment
                 # we want to use different targets for different methods later

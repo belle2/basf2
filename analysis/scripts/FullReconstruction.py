@@ -229,7 +229,7 @@ def SignalProbability(path, method, variables, name, particleList, isIgnored=Fal
     if os.path.isfile(filename):
         expert = register_module('TMVAExpert')
         expert.set_name('TMVAExpert_' + particleList)
-        expert.param('identifier', particleList + '_' + hash)
+        expert.param('prefix', particleList + '_' + hash)
         expert.param('method', method[0])
         expert.param('signalProbabilityName', 'SignalProbability')
         expert.param('listNames', [particleList])
@@ -238,7 +238,7 @@ def SignalProbability(path, method, variables, name, particleList, isIgnored=Fal
     else:
         teacher = register_module('TMVATeacher')
         teacher.set_name('TMVATeacher_' + particleList)
-        teacher.param('identifier', particleList + '_' + hash)
+        teacher.param('prefix', particleList + '_' + hash)
         teacher.param('methods', [method])
         teacher.param('factoryOption', '!V:!Silent:Color:DrawProgressBar:AnalysisType=Classification')
         teacher.param('variables', variables)
@@ -264,7 +264,7 @@ def SignalProbabilityFSPCluster(path, method, variables, name, pdg, particleList
     if os.path.isfile(filename):
         expert = register_module('TMVAExpert')
         expert.set_name('TMVAExpert_' + particleList)
-        expert.param('identifier', particleList + '_' + hash)
+        expert.param('prefix', particleList + '_' + hash)
         expert.param('method', method[0])
         expert.param('signalProbabilityName', 'SignalProbability')
         expert.param('signalCluster', pdg)
@@ -274,7 +274,7 @@ def SignalProbabilityFSPCluster(path, method, variables, name, pdg, particleList
     else:
         teacher = register_module('TMVATeacher')
         teacher.set_name('TMVATeacher_' + particleList)
-        teacher.param('identifier', particleList + '_' + hash)
+        teacher.param('prefix', particleList + '_' + hash)
         teacher.param('methods', [method])
         teacher.param('factoryOption', '!V:!Silent:Color:DrawProgressBar:AnalysisType=Classification')
         teacher.param('variables', variables)
@@ -433,6 +433,7 @@ def PreCutMassDetermination(name, pdgcode, channels, preCut_Histogram, efficienc
         (a, b) = ycut_to_xcuts(channel, ycut)
         if abs(b - a) < ratio[channel].GetBinWidth(signal[channel].GetMaximumBin()) or signal[channel].Integral(signal[channel].FindBin(a), signal[channel].FindBin(b)) < 100 or bckgrd[channel].Integral(bckgrd[channel].FindBin(a), bckgrd[channel].FindBin(b)) < 100:
             result.update({'IsIgnored_' + channel: True})
+            B2WARNING("Ignoring channel " + channel + "!")
     return result
 
 
@@ -490,6 +491,7 @@ def PreCutProbDetermination(name, pdgcode, channels, preCut_Histogram, efficienc
         a = ycut_to_xcut(channel, ycut)
         if a == 1 or signal[channel].Integral(signal[channel].FindBin(a), signal[channel].FindBin(1)) < 100 or bckgrd[channel].Integral(bckgrd[channel].FindBin(a), bckgrd[channel].FindBin(1)) < 100:
             result.update({'IsIgnored_' + channel: True})
+            B2WARNING("Ignoring channel " + channel + "!")
     return result
 
 

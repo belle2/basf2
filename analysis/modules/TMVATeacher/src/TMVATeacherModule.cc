@@ -27,7 +27,7 @@ namespace Belle2 {
 
     addParam("listNames", m_listNames, "Input particle list names as list");
     addParam("methods", m_methods, "Vector of Tuples with (Name, Type, Config) of the methods. Valid types are: BDT, KNN, NeuroBayes, Fisher. The Config is passed to the TMVA Method and is documented in the TMVA UserGuide.");
-    addParam("identifier", m_identifier, "Identifier which is used by the TMVAInterface to store its configfile $identifier.config and by TMVA itself to write the files weights/$identifier_$method.class.C and weights/$identifier_$method.weights.xml with additional information", std::string("TMVA"));
+    addParam("prefix", m_identifier, "Prefix which is used by the TMVAInterface to store its configfile $prefix.config and by TMVA itself to write the files weights/$prefix_$method.class.C and weights/$prefix_$method.weights.xml with additional information", std::string("TMVA"));
     addParam("workingDirectory", m_workingDirectory, "Working directory in which the config file and the weight file directory is created", std::string("."));
     addParam("variables", m_variables, "Input variables used by the TMVA method");
     addParam("target", m_target, "Target used by the method");

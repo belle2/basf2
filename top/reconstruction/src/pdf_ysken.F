@@ -532,14 +532,15 @@ c--   Qbar with expansion volume at side LR, type Prism
       INTEGER I
 
       W=(A+B+C)/2
-      NT=IFIX(W/E_STEP)+1
-      IF(NT.LE.NSIZ) THEN
+      IF(W/E_STEP.LT.NSIZ) THEN
+         NT=IFIX(W/E_STEP)+1
          E=0.
          DO I=1,NT
             P(I)=CONV_SQUARES(E,A,B,C)*WY
             E=E+E_STEP
          ENDDO
       ELSE
+         NT=NSIZ+1
          P(1)=A
          P(2)=B
          P(3)=C

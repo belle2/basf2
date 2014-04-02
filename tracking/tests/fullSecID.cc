@@ -5,6 +5,7 @@
 // #include <TMatrixF.h>
 // #include <RKTrackRep.h>
 #include <gtest/gtest.h>
+#include <vector>
 
 using namespace std;
 
@@ -12,16 +13,16 @@ namespace Belle2 {
   /** command x should exit using B2FATAL. */
 #define EXPECT_FATAL(x) EXPECT_EXIT(x,::testing::KilledBySignal(SIGABRT),"");
 
-  /** Set up a few arrays and objects in the datastore */
+  /** Testing everything from FullSecID */
   class FullSecIDTest : public ::testing::Test {
   protected:
   };
 
   /** Test simple Setters and Getters. */
-  TEST_F(FullSecIDTest, simpleTest)
+  TEST_F(FullSecIDTest, constructorAndGetterTests)
   {
     // first, we need a usefull vxdID:
-    VxdID vxdID = VxdID(34624); // this should be a sensor on layer 3
+    VxdID vxdID = VxdID(34624); // this should be a sensor on layer 4
     int vxdIDInt = vxdID;
 
     EXPECT_EQ(4, vxdID.getLayerNumber());
@@ -94,5 +95,84 @@ namespace Belle2 {
     EXPECT_EQ(FullSecID(vxdID, false, sectorID).getSecID(), aFourthFullSecID.getSecID());
 
     EXPECT_NE(aSecIDString2.str(), aFourthFullSecID.getFullSecString()); // they should not be the same any more...
+
+
+    // testing copy constructor (and C++11 range based for-loops):
+    vector<FullSecID> testVector;
+    for (int i = 0; i < 5; ++i) {
+      testVector.push_back(aFullSecID);
+    }
+    for (auto aSecID : testVector) {
+      EXPECT_EQ(aFullSecID, aSecID);
+    }
+  }
+
+
+
+  TEST_F(FullSecIDTest, overloadedOperatorTests)
+  {
+    //preparing stuff (procedures copied from constructorAndGetterTest):
+    VxdID vxdID = VxdID(34624); // this should be a sensor on layer 4
+    bool subLayerID = true;
+    unsigned short sectorID = 15;
+    FullSecID aFullSecID = FullSecID(vxdID, subLayerID, sectorID);
+    stringstream aSecIDString;
+    aSecIDString << aFullSecID.getLayerID() << aFullSecID.getSubLayerID() << "_" << int(aFullSecID.getVxdID()) << "_" << aFullSecID.getSecID();
+
+    FullSecID aFullSecID2 = FullSecID(aSecIDString.str());
+
+    // now the checks:
+    EXPECT_EQ(static_cast<unsigned int>(aFullSecID), aFullSecID2);  // directly comparing to an int
+
+    EXPECT_EQ(aSecIDString.str(), string(aFullSecID2)); // directly comparing to an string - testing string cast
+
+    EXPECT_EQ(aFullSecID, aFullSecID2); // direct comparison
+
+
+    stringstream aSecIDStream, aSecIDStream2;
+    aSecIDStream << aFullSecID2;
+    aSecIDStream2 << aSecIDString.str();
+
+    EXPECT_EQ(aSecIDString.str(), aSecIDStream.str()); // testing stream operator overloading after string-conversion
+
+    EXPECT_EQ(aSecIDStream, aSecIDStream); // testing stream operator overloading by direct check
+
+
+    FullSecID aFullSecID3 = FullSecID(vxdID, false, sectorID); // same ID as above but now, the sublayerID is false instead of true
+
+    EXPECT_GT(aFullSecID2, aFullSecID3); // aFullSecID2 > aFullSecID3
+
+    for (int l1 = 7; l1 != 0; --l1) { // testing layerIDs
+      int l2 = l1;
+      l2--;
+      FullSecID biggerOne = FullSecID(l1, false, 0, 0);
+      FullSecID smallerOne = FullSecID(l2, false, 0, 0);
+      EXPECT_GT(biggerOne, smallerOne);
+    }
+    for (int s1 = 255; s1 != 0; --s1) { // testing sectorIDs
+      int s2 = s1;
+      s2--;
+      FullSecID biggerOne = FullSecID(6, false, 0, s1);
+      FullSecID smallerOne = FullSecID(6, false, 0, s2);
+      EXPECT_GT(biggerOne, smallerOne); // aFullSecID2 > aFullSecID3
+      int equalOne = smallerOne;
+      equalOne++;
+      EXPECT_EQ(int(biggerOne), equalOne);
+    }
+
+    EXPECT_GT(int(aFullSecID2), int(aFullSecID3));
+
+
+    FullSecID aFullSecID4 = aFullSecID;
+
+    EXPECT_EQ(aFullSecID4, aFullSecID); // testing assignment operator;
+  }
+
+
+
+  TEST_F(FullSecIDTest, bufferOverflowTest)
+  {
+    B2WARNING("TODO: FullSecIDTest:bufferOverflowTest should catch cases of bad user input")
+    // WARNING TODO should catch cases of bad user input
   }
 }  // namespace

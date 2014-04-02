@@ -42,7 +42,30 @@ namespace Belle2 {
 
 
     /** constructor */
-    Sector() {}
+    Sector():
+      m_sectorID(0),
+      m_distance2Origin(0),
+      m_useDistance4sort(false)
+    {}
+
+
+    /** useful constructor for cases where sectors are treated by fullSecID (parameter 1) */
+    Sector(unsigned int secID):
+      m_sectorID(secID),
+      m_distance2Origin(0),
+      m_useDistance4sort(false)
+    {}
+
+
+    /** useful constructor both cases of sector sorting:
+     * sectors treated by fullSecID (parameter 1) and distance2origin (parameter 2) if you use this constructor,
+     * sorting by distance is activated automatically but can be set by parameter 3
+     */
+    Sector(unsigned int secID, float distance2origin, bool sortByDistance = true):
+      m_sectorID(secID),
+      m_distance2Origin(distance2origin),
+      m_useDistance4sort(sortByDistance)
+    {}
 
 
     /** overloaded '<'-operator for sorting algorithms - sorts by distance2origin or fullSecID depending on setting */
@@ -79,11 +102,11 @@ namespace Belle2 {
 
 
     /** setter - set distance of sector to origin defined by sectorMap */
-    void setDistance(double distance) { m_distance2Origin = distance; }
+    void setDistance(float distance) { m_distance2Origin = distance; }
 
 
     /** getter - get distance of sector to origin defined by sectorMap */
-    double getDistance() const { return m_distance2Origin; }
+    float getDistance() const { return m_distance2Origin; }
 
 
     /** getter - getSecID returns the ID of the sector (for definition of secID, see m_sectorID). */
@@ -92,11 +115,14 @@ namespace Belle2 {
 
   protected:
 
+
     /** The activated sector is created each event where this sector inhabits a spacePoint. */
     ActivatedSector* m_myActiveSector;
 
+
     /** This vector carries a pointer to each SectorFriendship for faster access during events */
     std::vector<SectorFriendship*> m_myFriends;
+
 
     /** secID allows identification of sector.
      *
@@ -106,7 +132,8 @@ namespace Belle2 {
      * C: uniID/complete VxdID-info,
      * D: sectorID on sensor (0-X), whole info stored in an int, can be converted to human readable code by using FullSecID-class
      */
-    unsigned m_sectorID;
+    unsigned int m_sectorID;
+
 
     /** carries info about the distance of the sector-center to the origin.
      *
@@ -114,7 +141,8 @@ namespace Belle2 {
      * especially relevant for testbeam- and other testing scenarios.
      * Needed for the CA (directed graph) e.g. if layerNumbers are not consecutive
      */
-    double m_distance2Origin;
+    float m_distance2Origin;
+
 
     /** if activated, sectors are sorted by distance to origin, if false, they are sorted by layerID. */
     bool m_useDistance4sort;

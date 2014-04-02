@@ -76,6 +76,8 @@ namespace Belle2 {
      * particle type enumerators (to be completed when all Mdst dataobjects are defined)
      */
     enum EParticleType {c_Undefined, c_Track, c_ECLShower, c_KLong , c_MCParticle, c_Composite};
+
+    /** describes flavor type, see getFlavorType(). */
     enum EFlavorType {
       c_Unflavored = 0, /**< Is its own antiparticle or we don't know wether it is a particle/antiparticle. */
       c_Flavored = 1, /**< Is either particle or antiparticle. */

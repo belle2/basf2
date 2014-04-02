@@ -513,9 +513,9 @@ namespace Belle2 {
       if (!(status == 0 || status == c_MissFSR))
         return result;
 
-      if (part->getFlavorType() && mcPDGCode == part->getPDGCode())
+      if (part->getFlavorType() == Particle::c_Flavored && mcPDGCode == part->getPDGCode())
         result = 1.0;
-      else if (!part->getFlavorType() && abs(mcPDGCode) == abs(part->getPDGCode()))
+      else if (part->getFlavorType() == Particle::c_Unflavored && abs(mcPDGCode) == abs(part->getPDGCode()))
         result = 1.0;
 
       return result;

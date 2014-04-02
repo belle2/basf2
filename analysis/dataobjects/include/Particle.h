@@ -62,8 +62,12 @@ namespace Belle2 {
    *  - mdst index of an object from which the FS particle is created
    *  - type of the object from which the particle is created (see EParticleType)
    *  - flavor type (unflavored/flavored) of a decay or flavor type of FS particle
+   *
+   * Finally, it is possible to store user-defined floating-point values using addExtraInfo() and getExtraInfo(), identified by a string key.
+   * These are general purpose functions for collecting additional information about
+   * reconstructed particles that can not be included into any existing data object.
+   * Different Particle objects can store different sets of values, and there are no hard-coded limitations on the number of values stored.
    */
-
   class Particle : public RelationsObject {
 
   public:
@@ -486,7 +490,7 @@ namespace Belle2 {
     bool overlapsWith(const Particle* oParticle) const;
 
     /**
-     * Prints the contents of a Particle object to screen
+     * Prints the contents of a Particle object to standard output.
      */
     void print() const;
 

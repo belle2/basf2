@@ -206,7 +206,6 @@ namespace Belle2 {
 
       double distance = 0;
       G4ThreeVector posW(0, 0, 0);
-      G4int lr(1);
       HepPoint3D onTrack;
       HepPoint3D pOnTrack;
 
@@ -265,13 +264,13 @@ namespace Belle2 {
         const G4double xwf(fwd.x()), ywf(fwd.y()), zwf(fwd.z());
         const G4double xp(onTrack.x()), yp(onTrack.y()), zp(onTrack.z());
         const G4double px(pOnTrack.x()), py(pOnTrack.y()), pz(pOnTrack.z());
-        G4double q2[3] = {0.}, q1[3] = {0.};
+        G4double q2[3] = {0.}, q1[3] = {0.}, q3[3] = {0.};
         const G4int ntryMax(50);  //tentative; too large probably...
         G4double dist;
         G4int ntry(999);
         HELWIR(xwb, ywb, zwb, xwf, ywf, zwf,
                xp,   yp,   zp,   px,   py,   pz,
-               B_kG, charge, ntryMax, dist, q2, q1, ntry);
+               B_kG, charge, ntryMax, dist, q2, q1, q3, ntry);
 
 #if defined(CDC_DEBUG)
         std::cout << "ntry= " << ntry << std::endl;
@@ -285,7 +284,7 @@ namespace Belle2 {
             cdcg.getWirSagEffect(layerId, wires[i], q2[2], ywb_sag, ywf_sag);
             HELWIR(xwb, ywb_sag, zwb, xwf, ywf_sag, zwf,
                    xp,   yp,   zp,   px,   py,   pz,
-                   B_kG, charge, ntryMax, dist, q2, q1, ntry);
+                   B_kG, charge, ntryMax, dist, q2, q1, q3, ntry);
           }
           if (ntry <= ntryMax) {
             distance = dist;
@@ -295,12 +294,16 @@ namespace Belle2 {
             posW.setX(q2[0]);
             posW.setY(q2[1]);
             posW.setZ(q2[2]);
+            pOnTrack.setX(q3[0]);
+            pOnTrack.setY(q3[1]);
+            pOnTrack.setZ(q3[2]);
           }
 #if defined(CDC_DEBUG)
           std::cout << " " << std::endl;
           std::cout << "helix distance= " << distance << std::endl;
-          std::cout << "onTrack= " << onTrack << std::endl;
-          std::cout << "posW   = " << posW    << std::endl;
+          std::cout << "onTrack = " << onTrack  << std::endl;
+          std::cout << "posW    = " << posW     << std::endl;
+          std::cout << "pOnTrack= " << pOnTrack << std::endl;
           G4ThreeVector bwp(bck.x(), bck.y(), bck.z());
           G4ThreeVector fwp(fwd.x(), fwd.y(), fwd.z());
           G4ThreeVector hitPosition, wirePosition;
@@ -341,58 +344,40 @@ namespace Belle2 {
         posW.setX(wirePosition.x());
         posW.setY(wirePosition.y());
         posW.setZ(wirePosition.z());
+        //tentative setting
+        pOnTrack.setX(0.5 * (momIn.x() + momOut.x()) / GeV);
+        pOnTrack.setY(0.5 * (momIn.y() + momOut.y()) / GeV);
+        pOnTrack.setZ(0.5 * (momIn.z() + momOut.z()) / GeV);
       }  //end of magneticfiled on or off
 
 #if defined(CDC_DEBUG)
       std::cout << "af distance= " << distance << std::endl;
       std::cout << "onTrack    = " << onTrack  << std::endl;
       std::cout << "posW       = " << posW     << std::endl;
+      std::cout << "pOnTrack   = " << pOnTrack << std::endl;
       if (distance > 2.4) {
         std::cout << "toolargedriftl" << std::endl;
       }
 #endif
       distance *= cm;  onTrack *= cm;  posW *= cm;
+      pOnTrack *= GeV;
 
       G4ThreeVector posTrack(onTrack.x(), onTrack.y(), onTrack.z());
+      G4ThreeVector mom(pOnTrack.x(), pOnTrack.y(), pOnTrack.z());
 
-      lr = 1;
-      //      if ((posW.cross(posTrack)).z() < 0.) lr = 0;
-      double wCrossT = (posW.cross(posTrack)).z();
-      if (wCrossT < 0.) {
-        lr = 0;
-      } else if (wCrossT > 0.) {
-        lr = 1;
-      } else {
-        if ((posTrack - posW).perp() != 0.) {
-          G4ThreeVector mom(pOnTrack.x(), pOnTrack.y(), pOnTrack.z());
-          double wCrossP = (posW.cross(mom)).z();
-          if (wCrossP > 0.) {
-            if (posTrack.perp() > posW.perp()) {
-              lr = 0;
-            } else {
-              lr = 1;
-            }
-          } else if (wCrossP < 0.) {
-            if (posTrack.perp() < posW.perp()) {
-              lr = 0;
-            } else {
-              lr = 1;
-            }
-          } else {
-            lr = 1;
-          }
-        } else {
-          lr = 1;
-        }
-      }
-      //      if(lr != lrp) {
-      //        std::cout <<"lr,lrp=" << lr <<" " << lrp << std::endl;
-      //        exit(1);
-      //      }
+      const TVector3 tPosW(posW.x(), posW.y(), posW.z());
+      const TVector3 tPosTrack(posTrack.x(), posTrack.y(), posTrack.z());
+      const TVector3 tMom(mom.x(), mom.y(), mom.z());
+      G4int lr = cdcg.getOldLeftRight(tPosW, tPosTrack, tMom);
 
       if (nWires == 1) {
 
-        saveSimHit(layerId, wires[i], trackID, pid, distance, tofBefore, edep, s_in_layer * cm, momIn, posW, posIn, posOut, posTrack, lr, speed);
+        saveSimHit(layerId, wires[i], trackID, pid, distance, tofBefore, edep, s_in_layer * cm, pOnTrack, posW, posIn, posOut, posTrack, lr, speed);
+#if defined(CDC_DEBUG)
+        std::cout << "saveSimHit" << std::endl;
+        std::cout << "momIn    = " << momIn    << std::endl;
+        std::cout << "pOnTrack = " << pOnTrack << std::endl;
+#endif
 
       } else {
 
@@ -451,8 +436,12 @@ namespace Belle2 {
           const G4ThreeVector x_Out(xint[0]*cm, xint[1]*cm, xint[2]*cm);
           const G4ThreeVector p_In(momBefore * vent[3], momBefore * vent[4], momBefore * vent[5]);
 
-          //              saveIndex = saveSimHit(layerId, wires[i], trackID, pid, distance, tofBefore, edep_in_cell, (sint - s1) * cm, p_In, posW, x_In, x_Out, posTrack, lr, speed);
-          saveSimHit(layerId, wires[i], trackID, pid, distance, tofBefore, edep_in_cell, (sint - s1) * cm, p_In, posW, x_In, x_Out, posTrack, lr, speed);
+          saveSimHit(layerId, wires[i], trackID, pid, distance, tofBefore, edep_in_cell, (sint - s1) * cm, pOnTrack, posW, x_In, x_Out, posTrack, lr, speed);
+#if defined(CDC_DEBUG)
+          std::cout << "saveSimHit" << std::endl;
+          std::cout << "p_In    = " << p_In     << std::endl;
+          std::cout << "pOnTrack= " << pOnTrack << std::endl;
+#endif
           tofBefore += (sint - s1) / speedInCmPerNs;
           eLossInCell = eLoss * (sint - s1) / s_in_layer;
           kinEnergyBefore -= eLossInCell;
@@ -474,8 +463,12 @@ namespace Belle2 {
           const G4ThreeVector x_In(vent[0]*cm, vent[1]*cm, vent[2]*cm);
           const G4ThreeVector p_In(momBefore * vent[3], momBefore * vent[4], momBefore * vent[5]);
 
-          //              saveIndex = saveSimHit(layerId, wires[i], trackID, pid, distance, tofBefore, edep_in_cell, (s2 - sint) * cm, p_In, posW, x_In, posOut, posTrack, lr, speed);
-          saveSimHit(layerId, wires[i], trackID, pid, distance, tofBefore, edep_in_cell, (s2 - sint) * cm, p_In, posW, x_In, posOut, posTrack, lr, speed);
+          saveSimHit(layerId, wires[i], trackID, pid, distance, tofBefore, edep_in_cell, (s2 - sint) * cm, pOnTrack, posW, x_In, posOut, posTrack, lr, speed);
+#if defined(CDC_DEBUG)
+          std::cout << "saveSimHit" << std::endl;
+          std::cout << "p_In    = " << p_In     << std::endl;
+          std::cout << "pOnTrack= " << pOnTrack << std::endl;
+#endif
         }
       }
       //setSeenInDetectorFlag(aStep, MCParticle::c_SeenInCDC);
@@ -1232,6 +1225,7 @@ L10:
                                const G4double charge, const G4int ntryMax,
                                G4double& distance,
                                G4double q2[3], G4double q1[3],
+                               G4double q3[3],
                                G4int& ntry)
   {
     //~dead copy of gsim_cdc_hit.F in gsim-cdc for Belle (for tentaive use)
@@ -1261,7 +1255,7 @@ L10:
 
 
     G4double xwb, ywb, zwb, xwf, ywf, zwf;
-    G4double xw, yw, zw, xh, yh, zh;
+    G4double xw, yw, zw, xh, yh, zh, pxh, pyh, pzh;
     G4double fi, fi_corr;
 
     G4double dr, fi0, cpa, dz, tanl;
@@ -1275,16 +1269,13 @@ L10:
     G4double vx, vy, vz, vv, cx, cy, cz, tt[3][3];
     G4double tmp[3];
 
-    G4double xx[3], dxx[3], ddxx[3];
+    G4double xx[3], dxx[3], ddxx[3], pp[3];
     G4double xxtdxx, dxxtdxx, xxtddxx;
 
 
     G4double fst = 0.0;
     G4double f, fderiv, deltafi, fact, eval;
-    // Commented by M. U. June, 2nd, 2013
-    //    G4double fist;
     G4double dx1, dy1, dx2, dy2, crs, dot;
-
 
     G4int iflg;
 
@@ -1370,13 +1361,18 @@ line1:
     xx[0] = x0 + dr * cosfi0 + r * (cosfi0 - cosfi0fi);
     xx[1] = y0 + dr * sinfi0 + r * (sinfi0 - sinfi0fi);
     xx[2] = z0 + dz        - r * tanl * fi;
+    pp[0] = -pt * sinfi0fi;
+    pp[1] = pt * cosfi0fi;
+    pp[2] = pt * tanl;
 
     if (iflg  == 1) {
       q2[0] = xwb;    q2[1] = ywb;    q2[2] = xx[2];
       q1[0] = xx[0];  q1[1] = xx[1];  q1[2] = xx[2];
+      q3[0] = pp[0];  q3[1] = pp[1];  q3[2] = pp[2];
       //inverse rotation to lab. frame in case of non-uniform B
       Rotat(q1, -1);
       Rotat(q2, -1);
+      Rotat(q3, -1);
       distance = sqrt((q2[0] - q1[0]) * (q2[0] - q1[0]) +
                       (q2[1] - q1[1]) * (q2[1] - q1[1]) +
                       (q2[2] - q1[2]) * (q2[2] - q1[2]));
@@ -1446,6 +1442,7 @@ line1:
     goto line1;
 
     //check if zh is btw zwb and zwf; if not, set zh=zwb or zh=zwf.
+    //dead regions due to feed-throughs should be considered later.
 line100:
     zh  = z0 + dz - r * tanl * fi;
     fi_corr = 0.;
@@ -1459,6 +1456,9 @@ line100:
     xh  = x0 + dr * cosfi0 + r * (cosfi0 - cosfi0fi);
     yh  = y0 + dr * sinfi0 + r * (sinfi0 - sinfi0fi);
     zh  = z0 + dz        - r * tanl * fi;
+    pxh = -pt * sinfi0fi;
+    pyh = pt * cosfi0fi;
+    pzh = pt * tanl;
 
     //write(6,*) 'fi_corr, zh, zwb, zwf=', fi_corr, zh, zwb, zwf
     //write(6,*) 'zh = ', z0, dz, r, tanl, fi
@@ -1469,10 +1469,12 @@ line100:
 
     q2[0] = xw;  q2[1] = yw;  q2[2] = zw;
     q1[0] = xh;  q1[1] = yh;  q1[2] = zh;
+    q3[0] = pxh; q3[1] = pyh; q3[2] = pzh;
 
     //inverse rotation to lab. frame in case of non-uniform B
     Rotat(q1, -1);
     Rotat(q2, -1);
+    Rotat(q3, -1);
     distance = sqrt((q2[0] - q1[0]) * (q2[0] - q1[0]) +
                     (q2[1] - q1[1]) * (q2[1] - q1[1]) +
                     (q2[2] - q1[2]) * (q2[2] - q1[2]));

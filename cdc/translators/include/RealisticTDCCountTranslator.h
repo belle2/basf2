@@ -32,14 +32,23 @@ namespace Belle2 {
         m_eventTime = eventTime;
       }
 
-      /** */
       float getDriftLength(unsigned short tdcCount,
                            const WireID& wireID        = WireID(),
                            float timeOfFlightEstimator = 0,
                            bool leftRight = false,
                            float z = 0, float = static_cast<float>(TMath::Pi() / 2.));
 
-      /** */
+      /**
+       * Get Drift length.
+       * @parm tdcCount TDC value in nsec.
+       * @parm posOnWire Wire position of closest approach.
+       * @parm posOnTrack position at closest approach.
+       * @parm posOnTrack momentum at closest approach.
+       * @parm wireID encoded sense wire ID.
+       * @parm timeOfFlightEstimator Time of Flight in nsec.
+       *
+       */
+
       float getDriftLength(unsigned short tdcCount,
                            const TVector3& posOnWire,
                            const TVector3& posOnTrack,
@@ -48,9 +57,13 @@ namespace Belle2 {
                            float timeOfFlightEstimator = 0);
 
 
-      /** Uncertainty corresponding to drift length from getDriftLength of this class.
-       *
-       *  @return Uncertainty on the drift length.
+      /**
+       * Get position resolution.
+       * Uncertainty corresponding to drift length
+       * from getDriftLength of this class.
+       * @parm driftLength Drift length.
+       * @parm wireID encoded sense wire ID.
+       * @return Uncertainty on the drift length.
        */
       float getDriftLengthResolution(float driftLength,
                                      const WireID&,

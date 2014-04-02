@@ -204,15 +204,19 @@ namespace Belle2 {
       */
       void for_Rotat(const G4double bfld[3]);
 
-      //! Translation method
-      /*! Translates (x,y,z) in lab. to (x,y,z) in B-field frame (mode=1), or reverse
-        translation (mode=-1).
-      */
+      /**
+       * Translation method.
+       * Translates (x,y,z) in lab. to (x,y,z) in B-field frame (mode=1),
+       * or reverse translation (mode=-1).
+       */
+
       void Rotat(G4double& x, G4double& y,
                  G4double& z,
                  const int mode);
 
-      //! Overloaded translation method
+      /**
+       * Overloaded translation method.
+       */
       void Rotat(G4double x[3], const int mode);
 
       //! Calculate closest points between helix and wire.
@@ -224,6 +228,12 @@ namespace Belle2 {
         xwf4 : x of wire at forward  endplate   "
         ywf4 : y of wire at forward  endplate   "
         zwf4 : z of wire at forward  endplate   "
+        xp   : x of helix in lab.
+        yp   : y of helix   "
+        zp   : z of helix   "
+        px   : px of helix in lab.
+        py   : py of helix   "
+        pz   : pz of helix   "
 
         Output
         q2(1) : x of wire  at closest point in lab.
@@ -232,6 +242,7 @@ namespace Belle2 {
         q1(1) : x of helix at closest point   "
         q1(2) : y of helix at closest point   "
         q1(3) : z of helix at closest point   "
+        q3    : momentum of helix at closest point in lab.
         ntry  :
       */
       void HELWIR(const G4double xwb4,
@@ -250,7 +261,9 @@ namespace Belle2 {
                   const G4double charge,
                   const G4int ntryMax,
                   G4double& distance,
-                  G4double q2[3], G4double q1[3],
+                  G4double q2[3],
+                  G4double q1[3],
+                  G4double q3[3],
                   G4int& ntry);
 
       //! Calculate the result of a matrix times vector.

@@ -15,6 +15,7 @@
 
 #include <analysis/utility/VariableManager.h>
 #include <analysis/utility/mcParticleMatching.h>
+#include <analysis/utility/MCMatchStatus.h>
 
 // framework - DataStore
 #include <framework/datastore/DataStore.h>
@@ -509,7 +510,7 @@ namespace Belle2 {
       int mcPDGCode = mcparticle->getPDG();
       int status    = getMCTruthStatus(part, mcparticle);
 
-      if (!(status == 1 || status == 0))
+      if (!(status == 0 || status == c_MissFSR))
         return result;
 
       if (part->getFlavorType() && mcPDGCode == part->getPDGCode())

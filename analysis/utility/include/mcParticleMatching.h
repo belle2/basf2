@@ -162,6 +162,6 @@ bool missingKlong(vector<const MCParticle*> generated, std::vector<int> missP);
  *
  * @return whether (true) or not (false) any of the final state particles is mis-identified
  */
-bool isMissidentified(vector<const Particle*> reconstructed, vector<const MCParticle*> generated);
+bool isMisidentified(vector<const Particle*> reconstructed, vector<const MCParticle*> generated);
 
 #endif // MCPARTICLEMATCHING

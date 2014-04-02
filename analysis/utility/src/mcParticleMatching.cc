@@ -173,7 +173,7 @@ int getMCTruthStatus(const Particle* particle, const MCParticle* mcParticle)
     missKlong    = missingKlong(genFSPs, missingParticles);
   }
 
-  misID = isMissidentified(recFSPs, genFSPs);
+  misID = isMisidentified(recFSPs, genFSPs);
 
   if (missFSR)
     status |= MCMatchStatus::c_MissFSR;
@@ -364,7 +364,7 @@ bool missingKlong(vector<const MCParticle*> generated, std::vector<int> missP)
   return status;
 }
 
-bool isMissidentified(vector<const Particle*> reconstructed, vector<const MCParticle*> generated)
+bool isMisidentified(vector<const Particle*> reconstructed, vector<const MCParticle*> generated)
 {
   bool status = false;
 

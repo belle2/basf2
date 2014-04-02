@@ -10,6 +10,9 @@
 #include <svd/dataobjects/SVDDigit.h>
 #include <svd/dataobjects/SVDCluster.h>
 #include <testbeam/vxd/dataobjects/TelDigit.h>
+#ifdef MAKE_TELCLUSTERS
+#include <testbeam/vxd/dataobjects/TelCluster.h>
+#endif
 #include <pxd/dataobjects/PXDCluster.h>
 
 #include <set>
@@ -40,7 +43,7 @@ TelxVXDModule::TelxVXDModule() : HistoModule()
   setDescription("Tel x VXD DQM module adds some correlation plots between telescopes and nearest VXD sensors.");
   setPropertyFlags(c_ParallelProcessingCertified);  // specify this flag if you need parallel processing
   addParam("Clusters", m_storeTelClustersName, "Name of the telescopes cluster collection",
-           std::string("TelClusters")); // always be explicit about this, can cause trouble
+           std::string("")); // always be explicit about this in case you use PXDClusters
   addParam("histgramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed", std::string("tel-vxd"));
 
   //----------------------------------------------------------------
@@ -479,7 +482,11 @@ void TelxVXDModule::initialize()
 
   //Register collections
   StoreArray<PXDCluster> storePXDClusters(m_storePXDClustersName);
+#ifdef MAKE_TELCLUSTERS
+  StoreArray<TelCluster> storeTelClusters(m_storeTelClustersName);
+#else
   StoreArray<PXDCluster> storeTelClusters(m_storeTelClustersName);
+#endif
   StoreArray<SVDCluster> storeSVDClusters(m_storeSVDClustersName);
   StoreArray<SVDDigit> storeSVDDigits(m_storeSVDDigitsName);
   StoreArray<TelDigit> storeTelDigits(m_storeTelDigitsName);
@@ -533,7 +540,11 @@ void TelxVXDModule::event()
   const StoreArray<TelDigit> storeTelDigits(m_storeTelDigitsName);
   const StoreArray<SVDCluster> storeSVDClusters(m_storeSVDClustersName);
   const StoreArray<PXDCluster> storePXDClusters(m_storePXDClustersName);
+#ifdef MAKE_TELCLUSTERS
+  const StoreArray<TelCluster> storeTelClusters(m_storeTelClustersName);
+#else
   const StoreArray<PXDCluster> storeTelClusters(m_storeTelClustersName);
+#endif
 
   const RelationArray relSVDClusterDigits(storeSVDClusters, storeSVDDigits, m_relSVDClusterDigitName);
   const RelationArray relTelClusterDigits(storeTelClusters, storeTelDigits, m_relTelClusterDigitName);
@@ -563,7 +574,7 @@ void TelxVXDModule::event()
     }
   }
 //  m_chargeTel3, m_chargeTel4, m_hitMapTel3, m_hitMapTel4
-  for (const PXDCluster & cluster : storeTelClusters) {
+  for (auto cluster : storeTelClusters) {
     int iPlane = cluster.getSensorID().getLayerNumber();
     int iPlane2 = cluster.getSensorID().getSensorNumber();
     if (iPlane != 7) continue;
@@ -636,7 +647,7 @@ void TelxVXDModule::event()
     int iIsV1 = 0;
     int iPlane1 = 0;
     if (i1 < storePXDClusters.getEntries()) {  // PXD clusters:
-      const PXDCluster& clusterPXD1 = *storePXDClusters[i1];
+      auto clusterPXD1 = *storePXDClusters[i1];
       iPlane1 = clusterPXD1.getSensorID().getLayerNumber();
       if ((iPlane1 + 3 < c_firstPXDPlane) || (iPlane1 + 3 > c_lastPXDPlane)) continue;
       if ((clusterPXD1.getSeedCharge() < m_PXDCutSeedL) || (clusterPXD1.getSeedCharge() > m_PXDCutSeedH)) continue;
@@ -688,7 +699,7 @@ void TelxVXDModule::event()
       int iIsV2 = 0;
       int iPlane2 = 0;
       if (i2 < storePXDClusters.getEntries()) {  // PXD clusters:
-        const PXDCluster& clusterPXD2 = *storePXDClusters[i2];
+        auto clusterPXD2 = *storePXDClusters[i2];
         iPlane2 = clusterPXD2.getSensorID().getLayerNumber();
         if ((iPlane2 + 3 < c_firstPXDPlane) || (iPlane2 + 3 > c_lastPXDPlane)) continue;
         if ((clusterPXD2.getSeedCharge() < m_PXDCutSeedL) || (clusterPXD2.getSeedCharge() > m_PXDCutSeedH)) continue;
@@ -754,7 +765,7 @@ void TelxVXDModule::event()
     int iIsV1 = 0;
     int iPlane1 = 0;
     if (i1 < storePXDClusters.getEntries()) {  // PXD clusters:
-      const PXDCluster& clusterPXD1 = *storePXDClusters[i1];
+      auto clusterPXD1 = *storePXDClusters[i1];
       iPlane1 = clusterPXD1.getSensorID().getLayerNumber();
       if ((iPlane1 + 3 < c_firstPXDPlane) || (iPlane1 + 3 > c_lastPXDPlane)) continue;
       if ((clusterPXD1.getSeedCharge() < m_PXDCutSeedL) || (clusterPXD1.getSeedCharge() > m_PXDCutSeedH)) continue;
@@ -774,7 +785,7 @@ void TelxVXDModule::event()
         swap(iIsU1, iIsV1);
       }
     } else {                                  // Tel clusters:
-      const PXDCluster& clusterPXD1 = *storeTelClusters[i1 - storePXDClusters.getEntries()];
+      auto clusterPXD1 = *storeTelClusters[i1 - storePXDClusters.getEntries()];
       iPlane1 = clusterPXD1.getSensorID().getLayerNumber();
       int iPlane1s = clusterPXD1.getSensorID().getSensorNumber();
       if (iPlane1 != 7) continue;
@@ -805,7 +816,7 @@ void TelxVXDModule::event()
       int iIsV2 = 0;
       int iPlane2 = 0;
       if (i2 < storePXDClusters.getEntries()) {  // PXD clusters:
-        const PXDCluster& clusterPXD2 = *storePXDClusters[i2];
+        auto clusterPXD2 = *storePXDClusters[i2];
         iPlane2 = clusterPXD2.getSensorID().getLayerNumber();
         if ((iPlane2 + 3 < c_firstPXDPlane) || (iPlane2 + 3 > c_lastPXDPlane)) continue;
         if ((clusterPXD2.getSeedCharge() < m_PXDCutSeedL) || (clusterPXD2.getSeedCharge() > m_PXDCutSeedH)) continue;
@@ -825,7 +836,7 @@ void TelxVXDModule::event()
           swap(iIsU2, iIsV2);
         }
       } else {                                  // Tel clusters:
-        const PXDCluster& clusterPXD2 = *storeTelClusters[i2 - storePXDClusters.getEntries()];
+        auto clusterPXD2 = *storeTelClusters[i2 - storePXDClusters.getEntries()];
         iPlane2 = clusterPXD2.getSensorID().getLayerNumber();
         int iPlane2s = clusterPXD2.getSensorID().getSensorNumber();
         if (iPlane2 != 7) continue;
@@ -871,7 +882,7 @@ void TelxVXDModule::event()
     int iIsV1 = 0;
     int iPlane1 = 0;
     if (i1 < storeTelClusters.getEntries()) {  // Tel clusters:
-      const PXDCluster& clusterPXD1 = *storeTelClusters[i1];
+      auto clusterPXD1 = *storeTelClusters[i1];
       iPlane1 = clusterPXD1.getSensorID().getLayerNumber();
       int iPlane1s = clusterPXD1.getSensorID().getSensorNumber();
       if (iPlane1 != 7) continue;
@@ -928,7 +939,7 @@ void TelxVXDModule::event()
       int iIsV2 = 0;
       int iPlane2 = 0;
       if (i2 < storeTelClusters.getEntries()) {  // Tel clusters:
-        const PXDCluster& clusterPXD2 = *storeTelClusters[i2];
+        auto clusterPXD2 = *storeTelClusters[i2];
         iPlane2 = clusterPXD2.getSensorID().getLayerNumber();
         int iPlane2s = clusterPXD2.getSensorID().getSensorNumber();
         if (iPlane2 != 7) continue;
@@ -999,7 +1010,7 @@ void TelxVXDModule::event()
     int iIsV1 = 0;
     int iPlane1 = 0;
     if (i1 < storeTelClusters.getEntries()) {  // Tel clusters:
-      const PXDCluster& clusterPXD1 = *storeTelClusters[i1];
+      auto clusterPXD1 = *storeTelClusters[i1];
       iPlane1 = clusterPXD1.getSensorID().getLayerNumber();
       int iPlane1s = clusterPXD1.getSensorID().getSensorNumber();
       if (iPlane1 != 7) continue;
@@ -1056,7 +1067,7 @@ void TelxVXDModule::event()
       int iIsV2 = 0;
       int iPlane2 = 0;
       if (i2 < storeTelClusters.getEntries()) {  // Tel clusters:
-        const PXDCluster& clusterPXD2 = *storeTelClusters[i2];
+        auto clusterPXD2 = *storeTelClusters[i2];
         iPlane2 = clusterPXD2.getSensorID().getLayerNumber();
         int iPlane2s = clusterPXD2.getSensorID().getSensorNumber();
         if (iPlane2 != 7) continue;

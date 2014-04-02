@@ -2,6 +2,8 @@
 #define TelxVXDMODULE_H_
 
 #undef DQM
+#define MAKE_TELCLUSTERS
+
 #ifndef DQM
 #include <framework/core/HistoModule.h>
 #else

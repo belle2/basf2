@@ -7,7 +7,11 @@
 #include <framework/datastore/RelationArray.h>
 
 #include <testbeam/vxd/dataobjects/TelDigit.h>
+#ifdef MAKE_TELCLUSTERS
+#include <testbeam/vxd/dataobjects/TelCluster.h>
+#else
 #include <pxd/dataobjects/PXDCluster.h>
+#endif
 
 #include <vector>
 #include <set>
@@ -38,7 +42,7 @@ TelDQMModule::TelDQMModule() : HistoModule()
   setDescription("TEL DQM module");
   setPropertyFlags(c_ParallelProcessingCertified);  // specify this flag if you need parallel processing
   addParam("Clusters", m_storeClustersName, "Name of the telescopes cluster collection",
-           std::string("PXDClusters")); // always be explicit about this, can cause trouble
+           std::string("")); // always be explicit about this in case PXDClusters are used.
   addParam("histgramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed", std::string("eutel"));
 }
 
@@ -184,7 +188,11 @@ void TelDQMModule::initialize()
   REG_HISTOGRAM
 
   //Register collections
+#ifdef MAKE_TELCLUSTERS
+  StoreArray<TelCluster> storeClusters(m_storeClustersName);
+#else
   StoreArray<PXDCluster> storeClusters(m_storeClustersName);
+#endif
   StoreArray<TelDigit> storeDigits(m_storeDigitsName);
 
   //storeClusters.required();
@@ -220,8 +228,11 @@ void TelDQMModule::event()
 {
 
   const StoreArray<TelDigit> storeDigits(m_storeDigitsName);
+#ifdef MAKE_TELCLUSTERS
+  const StoreArray<TelCluster> storeClusters(m_storeClustersName);
+#else
   const StoreArray<PXDCluster> storeClusters(m_storeClustersName);
-
+#endif
   const RelationArray relClusterDigits(storeClusters, storeDigits, m_relClusterDigitName);
 
   // Fired pixels
@@ -238,7 +249,7 @@ void TelDQMModule::event()
   // Cluster counts - same as Pixels
   vector<int> cluster_count(c_nTELPlanes);
   for (int i = 0; i < c_nTELPlanes; i++) cluster_count[i] = 0;
-  for (const PXDCluster & cluster : storeClusters) {
+  for (auto cluster : storeClusters) {
     int iPlane = cluster.getSensorID().getSensorNumber();
     if ((iPlane < c_firstTELPlane) || (iPlane > c_lastTELPlane)) continue;
     int index = planeToIndex(iPlane);
@@ -249,7 +260,7 @@ void TelDQMModule::event()
   }
 
   // Hitmaps, Size
-  for (const PXDCluster & cluster : storeClusters) {
+  for (auto cluster : storeClusters) {
     int iPlane = cluster.getSensorID().getSensorNumber();
     if ((iPlane < c_firstTELPlane) || (iPlane > c_lastTELPlane)) continue;
     int index = planeToIndex(iPlane);
@@ -264,7 +275,7 @@ void TelDQMModule::event()
   // Correlations in U + V, 2D Hitmaps
   for (int i1 = 0; i1 < storeClusters.getEntries(); i1++) {
     // preparing of first value for correlation plots with postfix "1":
-    const PXDCluster& cluster1 = *storeClusters[i1];
+    auto cluster1 = *storeClusters[i1];
     int iPlaneL1 = cluster1.getSensorID().getLayerNumber();
     if (iPlaneL1 != 7) continue;
     int iPlane1 = cluster1.getSensorID().getSensorNumber();
@@ -275,7 +286,7 @@ void TelDQMModule::event()
     m_correlationsHitMaps[c_nTELPlanes * index1 + index1]->Fill(getInfo(index1).getUCellID(cluster1.getU()), getInfo(index1).getVCellID(cluster1.getV()));
     for (int i2 = 0; i2 < storeClusters.getEntries(); i2++) {
       // preparing of second value for correlation plots with postfix "2":
-      const PXDCluster& cluster2 = *storeClusters[i2];
+      auto cluster2 = *storeClusters[i2];
       int iPlaneL2 = cluster2.getSensorID().getLayerNumber();
       if (iPlaneL2 != 7) continue;
       int iPlane2 = cluster2.getSensorID().getSensorNumber();

@@ -11,6 +11,8 @@
 #ifndef TelClusterizerModule_H
 #define TelClusterizerModule_H
 
+#define MAKE_TELCLUSTERS
+
 #include <framework/core/Module.h>
 #include <vxd/dataobjects/VxdID.h>
 #include <testbeam/vxd/reconstruction/ClusterCache.h>
@@ -37,6 +39,7 @@ namespace Belle2 {
      * hits in the last row. By caching the last row, each pixel gets examined
      * only once and the 4 adjacent pixels are accessed in constant time.
      * @see ClusterCache
+     * Update April 2 2014: Added compiler switch to produce TelClusters.
      */
     class TelClusterizerModule : public Module {
 

@@ -13,29 +13,14 @@
 
 namespace Belle2 {
 
-//! Index for muon PDF
-#define MUID_MUON 0
-
-//! Index for pion PDF
-#define MUID_PION 1
-
-//! Index for kaon PDF
-#define MUID_KAON 2
-
-//! Index for proton PDF
-#define MUID_PROTON 3
-
-//! Index for electron PDF
-#define MUID_ELECTRON 4
-
 //! Maximum layer-difference index for array size
-#define MUID_MaxRange 16
+#define MUID_MaxRange 20
 
 //! Maximum reduced-chi-squared index for array size
-#define MUID_MaxReducedChiSquared 50
+#define MUID_MaxReducedChiSquared 250
 
 //! Maximum reduced-chi-squared value for transverse scattering
-#define MUID_ReducedChiSquaredLimit 10.0
+#define MUID_ReducedChiSquaredLimit 50.0
 
   //! Provides muid parameters (from Gearbox)
   class MuidPar {
@@ -49,7 +34,7 @@ namespace Belle2 {
     ~MuidPar();
 
     //! Get the PDF for a particular hypothesis
-    double getPDF(int, int, int, double) const;
+    double getPDF(int, int, int, int, double) const;
 
   private:
 
@@ -77,21 +62,17 @@ namespace Belle2 {
     //! Range-difference (longitudinal) probability density function
     double m_RangePDF[4][15][MUID_MaxRange];
 
-    //! Reduced chi-squared (transverse) probability density function
-    //! with one extra bin for all overflows
-    double m_ReducedChiSquaredPDF[4][MUID_MaxReducedChiSquared + 1];
+    //! Reduced chi-squared (transverse) probability density function (overflows in last bin)
+    double m_ReducedChiSquaredPDF[4][19][MUID_MaxReducedChiSquared];
 
     //! First derivative of reduced chi-squared PDF (for spline interpolation)
-    double m_ReducedChiSquaredD1[4][MUID_MaxReducedChiSquared + 1];
+    double m_ReducedChiSquaredD1[4][19][MUID_MaxReducedChiSquared];
 
     //! Second derivative of reduced chi-squared PDF (for spline interpolation)
-    double m_ReducedChiSquaredD2[4][MUID_MaxReducedChiSquared + 1];
+    double m_ReducedChiSquaredD2[4][19][MUID_MaxReducedChiSquared];
 
     //! Third derivative of reduced chi-squared PDF (for spline interpolation)
-    double m_ReducedChiSquaredD3[4][MUID_MaxReducedChiSquared + 1];
-
-    //! Normalization for each reduced chi-squared PDF slice
-    double m_ReducedChiSquaredNorm[4][15];
+    double m_ReducedChiSquaredD3[4][19][MUID_MaxReducedChiSquared];
 
     //! Status flag to indicate whether the PDF tables have been filled or not
     bool m_IsValid;

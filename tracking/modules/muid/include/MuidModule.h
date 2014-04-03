@@ -103,34 +103,31 @@ namespace Belle2 {
   protected:
 
     //! Minimum transverse momentum in GeV/c for extrapolation to be started
-    double m_minPt;
+    double m_MinPt;
 
     //! Minimum kinetic energy in GeV for extrapolation to continue
-    double m_minKE;
+    double m_MinKE;
 
     //! Maximum step size in cm (0 for no upper limit)
-    double m_maxStep;
+    double m_MaxStep;
 
     //! Flag for source (0 = beam, 1 = cosmic ray)
-    int    m_cosmic;
+    int    m_Cosmic;
 
     //! Name of the Track collection of the reconstructed tracks to be extrapolated
-    std::string m_tracksColName;
-
-    //! Name of the muidLikelihood collection of the muon identification information
-    std::string m_muidLikelihoodsColName;
+    std::string m_TracksColName;
 
     //! Name of the muid collection of the muon identification information
-    std::string m_muidsColName;
+    std::string m_MuidsColName;
 
     //! Name of the muidHit collection of the extrapolation hits
-    std::string m_muidHitsColName;
+    std::string m_MuidHitsColName;
 
     //! Name of the BKLM 2D hits collection
-    std::string m_bklmHitsColName;
+    std::string m_BKLMHitsColName;
 
     //! Name of the EKLM 2D hits collection
-    std::string m_eklmHitsColName;
+    std::string m_EKLMHitsColName;
 
   private:
 
@@ -145,10 +142,10 @@ namespace Belle2 {
     bool createHit(G4ErrorFreeTrajState*, int, int, StoreArray<MuidHit>&, RelationArray&);
 
     //! Find the intersection point of the track with the crossed BKLM plane
-    bool findBarrelIntersection(Point&, const TVector3&, const TVector3&);
+    bool findBarrelIntersection(const TVector3&, Point&);
 
     //! Find the intersection point of the track with the crossed EKLM plane
-    bool findEndcapIntersection(Point&, const TVector3&, const TVector3&);
+    bool findEndcapIntersection(const TVector3&, Point&);
 
     //! Find the matching BKLM 2D hit nearest the intersection point of the track with the crossed BKLM plane
     bool findMatchingBarrelHit(Point&);
@@ -159,11 +156,8 @@ namespace Belle2 {
     //! Nudge the track using the matching hit
     void adjustIntersection(Point&, const double*, const TVector3&);
 
-    //! Get the in-plane covariance
-    double getPlaneVariance(const Point&);
-
     //! Complete muon identification after end of track extrapolation
-    void finishTrack(Muid*);
+    void finishTrack(Muid*, int);
 
     //! Convert GEANT4e covariance to phase-space covariance
     TMatrixDSym fromG4eToPhasespace(const G4ErrorFreeTrajState*);
@@ -172,34 +166,34 @@ namespace Belle2 {
     G4ErrorTrajErr fromPhasespaceToG4e(const TVector3&, const TMatrixDSym&);
 
     //! Pointer to the ExtManager singleton
-    Simulation::ExtManager* m_extMgr;
+    Simulation::ExtManager* m_ExtMgr;
 
     //! Pointer to the simulation's G4RunManager (if any)
-    G4RunManager* m_runMgr;
+    G4RunManager* m_RunMgr;
 
     //! Pointer to the simulation's TrackingAction (if any)
-    G4UserTrackingAction* m_trk;
+    G4UserTrackingAction* m_TrackingAction;
 
     //! Pointer to the simulation's SteppingAction (if any)
-    G4UserSteppingAction* m_stp;
+    G4UserSteppingAction* m_SteppingAction;
 
     //! PDG code for the particle-ID hypotheses
-    std::vector<int> m_pdgCode;
+    std::vector<int> m_PDGCode;
 
     //!  ChargedStable hypotheses
-    std::vector<Const::ChargedStable> m_chargedStable;
+    std::vector<Const::ChargedStable> m_ChargedStable;
 
     //! Pointers to BKLM geant4 sensitive (physical) volumes
-    std::vector<G4VPhysicalVolume*>* m_bklm_enter;
+    std::vector<G4VPhysicalVolume*>* m_BKLMVolumes;
 
     //! Pointers to EKLM geant4 sensitive (physical) volumes
-    std::vector<G4VPhysicalVolume*>* m_eklm_enter;
+    std::vector<G4VPhysicalVolume*>* m_EKLMVolumes;
 
     //! Time of flight (ns) along the track from the interaction point
-    double m_tof;
+    double m_TOF;
 
     //! virtual "target" cylinder (boundary beyond which extrapolation ends)
-    Simulation::ExtCylSurfaceTarget* m_target;
+    Simulation::ExtCylSurfaceTarget* m_Target;
 
     //! offset (cm) along z axis of KLM midpoint from IP
     double m_OffsetZ;
@@ -228,11 +222,8 @@ namespace Belle2 {
     //! midpoint along z (cm) of the forward endcap from the KLM midpoint
     double m_EndcapMiddleZ;
 
-    //! user-defined maximum distance (cm) for matching hit to extrapolation
-    double m_maxDistCM;
-
-    //! user-defined maximum distance (sigmas) for matching hit to extrapolation
-    double m_maxDistSIGMA;
+    //! user-defined maximum squared-distance (#variances) for matching hit to extrapolation
+    double m_MaxDistSqInVariances;
 
     //! BKLM RPC phi-measuring strip position variance (cm^2) by layer
     double m_BarrelPhiStripVariance[NLAYER + 1];
@@ -258,71 +249,71 @@ namespace Belle2 {
     //! azimuthal unit vector of each barrel sector
     TVector3 m_BarrelSectorPhi[NSECTOR + 1];
 
-    //! flag to indicate that the extrapolated track had been in the barrel in the prior step
-    bool m_wasInBarrel;
+    //! flags to indicate that the extrapolated track had entered a barrel sensitive volume
+    bool m_EnteredBarrelSensitiveVolume[NLAYER + 1];
 
-    //! flag to indicate that the extrapolated track had been in the endcap in the prior step
-    bool m_wasInEndcap;
-
-    //! outermost barrel layer encountered by the extrapolated track in the prior steps
-    int m_firstBarrelLayer;
+    //! flags to indicate that the extrapolated track had entered an endcap sensitive volume
+    bool m_EnteredEndcapSensitiveVolume[NLAYER + 1];
 
     //! outermost barrel layer encountered by the extrapolated track in the prior steps
-    int m_firstEndcapLayer;
+    int m_FirstBarrelLayer;
 
-    //! detector-element in-barrel flag at the current extrapolation step
-    bool m_inBarrel;
-
-    //! detector-element forward-end flag at the current extrapolation step
-    bool m_isForward;
-
-    //! detector-element sector at the current extrapolation step (zero-based)
-    int m_sector;
-
-    //! detector-element layer at the current extrapolation step (zero-based)
-    int m_layer;
-
-    //! global position (cm) at the current extrapolation step
-    TVector3 m_position;
+    //! outermost barrel layer encountered by the extrapolated track in the prior steps
+    int m_FirstEndcapLayer;
 
     //! accumulated bit pattern of layers crossed by the extrapolated track
-    int m_extLayerPattern;
+    int m_ExtLayerPattern;
 
     //! accumulated bit pattern of layers with matching hits
-    int m_hitLayerPattern;
+    int m_HitLayerPattern;
 
     //! accumulated chi-squared of all in-plane transverse deviations between extrapolation and matching hit
-    double m_chi2;
+    double m_Chi2;
 
     //! accumulated number of points with matching 2D hits
-    int m_nPoint;
+    int m_NPoint;
 
     //! outermost barrel layer crossed by the extrapolated track
-    int m_lastBarrelExtLayer;
+    int m_LastBarrelExtLayer;
 
     //! outermost barrel layer with a matching hit
-    int m_lastBarrelHitLayer;
+    int m_LastBarrelHitLayer;
 
     //! outermost endcap layer crossed by the extrapolated track
-    int m_lastEndcapExtLayer;
+    int m_LastEndcapExtLayer;
 
     //! outermost endcap layer with a matching hit
-    int m_lastEndcapHitLayer;
+    int m_LastEndcapHitLayer;
 
-    //! probability density function for muon hypothesis
-    MuidPar* m_muonPar;
+    //! probability density function for positive-muon hypothesis
+    MuidPar* m_MuonPlusPar;
 
-    //! probability density function for pion hypothesis
-    MuidPar* m_pionPar;
+    //! probability density function for negative-muon hypothesis
+    MuidPar* m_MuonMinusPar;
 
-    //! probability density function for kaon hypothesis
-    MuidPar* m_kaonPar;
+    //! probability density function for positive-pion hypothesis
+    MuidPar* m_PionPlusPar;
+
+    //! probability density function for negative-pion hypothesis
+    MuidPar* m_PionMinusPar;
+
+    //! probability density function for positive-kaon hypothesis
+    MuidPar* m_KaonPlusPar;
+
+    //! probability density function for negative-kaon hypothesis
+    MuidPar* m_KaonMinusPar;
 
     //! probability density function for proton hypothesis
-    MuidPar* m_protonPar;
+    MuidPar* m_ProtonPar;
+
+    //! probability density function for antiproton hypothesis
+    MuidPar* m_AntiprotonPar;
 
     //! probability density function for electron hypothesis
-    MuidPar* m_electronPar;
+    MuidPar* m_ElectronPar;
+
+    //! probability density function for positron hypothesis
+    MuidPar* m_PositronPar;
 
   };
 

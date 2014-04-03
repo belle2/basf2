@@ -44,7 +44,6 @@
 #include <TMatrixD.h>
 #include <TVectorD.h>
 #include <TVector3.h>
-#include <TMath.h>
 
 #include <CLHEP/Units/SystemOfUnits.h>
 #include <CLHEP/Units/PhysicalConstants.h>
@@ -55,6 +54,9 @@
 
 #include <globals.hh>
 #include <G4PhysicalVolumeStore.hh>
+#include <G4VPhysicalVolume.hh>
+#include <G4VTouchable.hh>
+#include <G4TouchableHandle.hh>
 #include <G4UImanager.hh>
 #include <G4RunManager.hh>
 #include <G4ParticleTable.hh>
@@ -65,7 +67,6 @@
 #include <G4ErrorFreeTrajState.hh>
 #include <G4StateManager.hh>
 #include <G4TransportationManager.hh>
-#include <G4VPhysicalVolume.hh>
 #include <G4FieldManager.hh>
 
 using namespace std;
@@ -74,30 +75,26 @@ using namespace Belle2;
 
 #define TWOPI 6.283185482025146484375
 #define M_PI_8 0.3926990926265716552734
-
-#define Large 10.0E10
-
-#define MUON 0
-#define PION 1
-#define KAON 2
+#define DEPTH_RPC 9
 
 REG_MODULE(Muid)
 
-MuidModule::MuidModule() : Module(), m_extMgr(NULL)    // no ExtManager yet
+MuidModule::MuidModule() : Module(), m_ExtMgr(NULL)    // no ExtManager yet
 {
-  m_pdgCode.clear();
+  m_PDGCode.clear();
   setDescription("Identifies muons by extrapolating tracks from CDC to KLM using geant4e");
   setPropertyFlags(c_ParallelProcessingCertified);
-  addParam("pdgCodes", m_pdgCode, "Positive-charge PDG codes for extrapolation hypotheses", m_pdgCode);
-  addParam("BKLMHitsColName", m_bklmHitsColName, "Name of collection holding the reconstructed 2D hits in barrel KLM", string(""));
-  addParam("EKLMHitsColName", m_eklmHitsColName, "Name of collection holding the reconstructed 2D hits in endcap KLM", string(""));
-  addParam("TracksColName", m_tracksColName, "Name of collection holding the reconstructed tracks", string(""));
-  addParam("MuidsColName", m_muidsColName, "Name of collection holding the muon identification information from the extrapolation", string(""));
-  addParam("MuidHitsColName", m_muidHitsColName, "Name of collection holding the muidHits from the extrapolation", string(""));
-  addParam("MinPt", m_minPt, "[GeV/c] Minimum transverse momentum of a particle that will be extrapolated.", double(0.1));
-  addParam("MinKE", m_minKE, "[GeV] Minimum kinetic energy of a particle to continue extrapolation.", double(0.002));
-  addParam("MaxStep", m_maxStep, "[cm] Maximum step size during extrapolation (use 0 for infinity).", double(25.0));
-  addParam("Cosmic", m_cosmic, "Particle source (0 = beam, 1 = cosmic ray.", 0);
+  addParam("pdgCodes", m_PDGCode, "Positive-charge PDG codes for extrapolation hypotheses", m_PDGCode);
+  addParam("BKLMHitsColName", m_BKLMHitsColName, "Name of collection holding the reconstructed 2D hits in barrel KLM", string(""));
+  addParam("EKLMHitsColName", m_EKLMHitsColName, "Name of collection holding the reconstructed 2D hits in endcap KLM", string(""));
+  addParam("TracksColName", m_TracksColName, "Name of collection holding the reconstructed tracks", string(""));
+  addParam("MuidsColName", m_MuidsColName, "Name of collection holding the muon identification information from the extrapolation", string(""));
+  addParam("MuidHitsColName", m_MuidHitsColName, "Name of collection holding the muidHits from the extrapolation", string(""));
+  addParam("MinPt", m_MinPt, "[GeV/c] Minimum transverse momentum of a particle that will be extrapolated.", double(0.1));
+  addParam("MinKE", m_MinKE, "[GeV] Minimum kinetic energy of a particle to continue extrapolation.", double(0.002));
+  addParam("MaxStep", m_MaxStep, "[cm] Maximum step size during extrapolation (use 0 for infinity).", double(25.0));
+  addParam("MaxDistSigma", m_MaxDistSqInVariances, "[#sigmas] Maximum hit-to-extrapolation difference.", double(7.5));
+  addParam("Cosmic", m_Cosmic, "Particle source (0 = beam, 1 = cosmic ray.", 0);
 }
 
 MuidModule::~MuidModule()
@@ -108,22 +105,25 @@ void MuidModule::initialize()
 {
 
   // Convert from GeV to GEANT4 energy units (MeV); avoid negative values
-  m_minPt = max(0.0, m_minPt) * GeV;
-  m_minKE = max(0.0, m_minKE) * GeV;
+  m_MinPt = max(0.0, m_MinPt) * GeV;
+  m_MinKE = max(0.0, m_MinKE) * GeV;
+
+  // Square user's input value to get max number of variances for hit-to-extrapolation squared difference
+  m_MaxDistSqInVariances *= m_MaxDistSqInVariances;
 
   // Define the list of BKLM/EKLM sensitive volumes in the geant4 geometry
   registerVolumes();
 
   // Define the geant4e extrapolation Manager.
-  m_extMgr = Simulation::ExtManager::GetManager();
+  m_ExtMgr = Simulation::ExtManager::GetManager();
 
   // See if muid will coexist with geant4 simulation and/or ext extrapolation
-  if (m_extMgr->PrintG4State() == G4String("G4State_PreInit")) {
+  if (m_ExtMgr->PrintG4State() == G4String("G4State_PreInit")) {
     B2INFO("muid::initialize:  I will run without simulation")
-    m_runMgr = NULL;
-    m_trk    = NULL;
-    m_stp    = NULL;
-    if (m_extMgr->PrintExtState() == G4String("G4ErrorState_PreInit")) {
+    m_RunMgr = NULL;
+    m_TrackingAction = NULL;
+    m_SteppingAction = NULL;
+    if (m_ExtMgr->PrintExtState() == G4String("G4ErrorState_PreInit")) {
       B2INFO("muid::initialize:  I will call InitGeant4e")
       // Create the magnetic field for the geant4e extrapolation
       Simulation::MagneticField* magneticField = new Simulation::MagneticField();
@@ -131,22 +131,22 @@ void MuidModule::initialize()
       fieldManager->SetDetectorField(magneticField);
       fieldManager->CreateChordFinder(magneticField);
       // Tell geant4e about the detector and bare-bones physics list
-      m_extMgr->SetUserInitialization(new DetectorConstruction());
+      m_ExtMgr->SetUserInitialization(new DetectorConstruction());
       G4Region* region = (*(G4RegionStore::GetInstance()))[0];
       region->SetProductionCuts(G4ProductionCutsTable::GetProductionCutsTable()->GetDefaultProductionCuts());
-      m_extMgr->SetUserInitialization(new Simulation::ExtPhysicsList);
-      m_extMgr->InitGeant4e();
+      m_ExtMgr->SetUserInitialization(new Simulation::ExtPhysicsList);
+      m_ExtMgr->InitGeant4e();
     } else {
       B2INFO("muid::initialize:  I will not call InitGeant4e since it has already been initialized")
     }
   } else {
     B2INFO("muid::initialize:  I will coexist with simulation")
-    m_runMgr = G4RunManager::GetRunManager();
-    m_trk    = const_cast<G4UserTrackingAction*>(m_runMgr->GetUserTrackingAction());
-    m_stp    = const_cast<G4UserSteppingAction*>(m_runMgr->GetUserSteppingAction());
-    if (m_extMgr->PrintExtState() == G4String("G4ErrorState_PreInit")) {
+    m_RunMgr = G4RunManager::GetRunManager();
+    m_TrackingAction = const_cast<G4UserTrackingAction*>(m_RunMgr->GetUserTrackingAction());
+    m_SteppingAction = const_cast<G4UserSteppingAction*>(m_RunMgr->GetUserSteppingAction());
+    if (m_ExtMgr->PrintExtState() == G4String("G4ErrorState_PreInit")) {
       B2INFO("muid::initialize:  I will call InitGeant4e")
-      m_extMgr->InitGeant4e();
+      m_ExtMgr->InitGeant4e();
       G4StateManager::GetStateManager()->SetNewState(G4State_Idle);
     } else {
       B2INFO("muid::initialize:  I will not call InitGeant4e since it has already been initialized")
@@ -156,7 +156,7 @@ void MuidModule::initialize()
   // Redefine muid's step length, magnetic field step limitation (fraction of local curvature radius),
   // and kinetic energy loss limitation (maximum fractional energy loss) by communicating with
   // the geant4 UI.  (Commands were defined in ExtMessenger when physics list was set up.)
-  G4double maxStep = ((m_maxStep == 0.0) ? 10.0 : std::min(10.0, m_maxStep)) * cm;
+  G4double maxStep = ((m_MaxStep == 0.0) ? 10.0 : std::min(10.0, m_MaxStep)) * cm;
   char line[80];
   std::sprintf(line, "/geant4e/limits/stepLength %8.2f mm", maxStep);
   G4UImanager::GetUIpointer()->ApplyCommand(line);
@@ -171,8 +171,8 @@ void MuidModule::initialize()
   double minZ = m_OffsetZ - (m_BarrelHalfLength + 2.0 * m_EndcapHalfLength);
   double maxZ = m_OffsetZ + (m_BarrelHalfLength + 2.0 * m_EndcapHalfLength);
   double rMax = bklmContent.getLength("OuterRadius") * cm / cos(M_PI / bklmContent.getNumberNodes("Sectors/Forward/Sector"));
-  m_target = new Simulation::ExtCylSurfaceTarget(rMax, minZ, maxZ);
-  G4ErrorPropagatorData::GetErrorPropagatorData()->SetTarget(m_target);
+  m_Target = new Simulation::ExtCylSurfaceTarget(rMax, minZ, maxZ);
+  G4ErrorPropagatorData::GetErrorPropagatorData()->SetTarget(m_Target);
 
   m_BarrelHalfLength /= cm;  // in G4e units (cm)
   m_EndcapHalfLength /= cm;  // in G4e units (cm)
@@ -183,8 +183,6 @@ void MuidModule::initialize()
   m_EndcapMiddleZ = m_BarrelHalfLength + m_EndcapHalfLength;   // in G4e units (cm)
 
   // Measurement uncertainties and acceptance windows
-  m_maxDistCM = 25.0;         // in G4e units (cm) max distance between KLM hit and extrapolation crossing
-  m_maxDistSIGMA = 5.0;       // ditto (in sigmas)
   double width = eklmContent.getLength("Endcap/Layer/Sector/Plane/Strips/Width");
   m_EndcapScintVariance = width * width / 12.0;
   width = bklmContent.getLength("Module/Scintillator/Width"); // in G4e units (cm)
@@ -206,7 +204,10 @@ void MuidModule::initialize()
     m_BarrelModuleMiddleRadius[layer - 1] = bklm::GeometryPar::instance()->getActiveMiddleRadius(layer); // in G4e units (cm)
   }
   double dz(eklmContent.getLength("Endcap/Layer/ShiftZ")); // in G4e units (cm)
-  double z0(eklmContent.getLength("Endcap/PositionZ") - m_OffsetZ + dz - 0.5 * eklmContent.getLength("Endcap/Layer/Length")); // in G4e units (cm)
+  double z0(eklmContent.getLength("Endcap/PositionZ") - m_OffsetZ + dz
+            - 0.5 * eklmContent.getLength("Endcap/Layer/Length")
+            - 0.5 * eklmContent.getLength("Endcap/Layer/Sector/Plane/Strips/Thickness")
+            - 0.5 * eklmContent.getLength("Endcap/Layer/Sector/Plane/PlasticSheetWidth")); // in G4e units (cm)
   int nEndcapLayers = eklmContent.getInt("Endcap/nLayer");
   m_OutermostActiveEndcapLayer = nEndcapLayers - 1; // zero-based counting
   for (int layer = 1; layer <= nEndcapLayers; ++layer) {
@@ -223,8 +224,8 @@ void MuidModule::initialize()
   }
 
   // Hypotheses for extrapolation (default is muon only)
-  if (m_pdgCode.empty()) {
-    m_chargedStable.push_back(Const::muon);
+  if (m_PDGCode.empty()) {
+    m_ChargedStable.push_back(Const::muon);
   } else { // user defined
     std::vector<Const::ChargedStable> stack;
     stack.push_back(Const::pion);
@@ -232,21 +233,21 @@ void MuidModule::initialize()
     stack.push_back(Const::muon);
     stack.push_back(Const::kaon);
     stack.push_back(Const::proton);
-    for (unsigned i = 0; i < m_pdgCode.size(); ++i) {
+    for (unsigned i = 0; i < m_PDGCode.size(); ++i) {
       for (unsigned k = 0; k < stack.size(); ++k) {
-        if (abs(m_pdgCode[i]) == stack[k].getPDGCode()) {
-          m_chargedStable.push_back(stack[k]);
+        if (abs(m_PDGCode[i]) == stack[k].getPDGCode()) {
+          m_ChargedStable.push_back(stack[k]);
           stack.erase(stack.begin() + k);
           --k;
         }
       }
     }
-    if (m_chargedStable.empty()) B2ERROR("Module muid initialize(): no valid PDG codes for extrapolation")
+    if (m_ChargedStable.empty()) B2ERROR("Module muid initialize(): no valid PDG codes for extrapolation")
     }
 
-  for (unsigned i = 0; i < m_chargedStable.size(); ++i) {
+  for (unsigned i = 0; i < m_ChargedStable.size(); ++i) {
     B2INFO("Module muid initialize(): hypothesis for PDG code "
-           << m_chargedStable[i].getPDGCode() << " and its antiparticle will be extrapolated")
+           << m_ChargedStable[i].getPDGCode() << " and its antiparticle will be extrapolated")
   }
 
   // Register output and relation arrays' persistence
@@ -264,11 +265,16 @@ void MuidModule::beginRun()
   StoreObjPtr<EventMetaData> evtMetaData;
   int expNo = evtMetaData->getExperiment();
   B2INFO("Muid::beginRun(): experiment " << expNo << "  run " << evtMetaData->getRun())
-  m_muonPar = new MuidPar(expNo, "Muon");
-  m_pionPar = new MuidPar(expNo, "Pion");
-  m_kaonPar = new MuidPar(expNo, "Kaon");
-  m_protonPar = new MuidPar(expNo, "Proton");
-  m_electronPar = new MuidPar(expNo, "Electron");
+  m_MuonPlusPar = new MuidPar(expNo, "MuonPlus");
+  m_MuonMinusPar = new MuidPar(expNo, "MuonMinus");
+  m_PionPlusPar = new MuidPar(expNo, "PionPlus");
+  m_PionMinusPar = new MuidPar(expNo, "PionMinus");
+  m_KaonPlusPar = new MuidPar(expNo, "KaonPlus");
+  m_KaonMinusPar = new MuidPar(expNo, "KaonMinus");
+  m_ProtonPar = new MuidPar(expNo, "Proton");
+  m_AntiprotonPar = new MuidPar(expNo, "Antiproton");
+  m_ElectronPar = new MuidPar(expNo, "Electron");
+  m_PositronPar = new MuidPar(expNo, "Positron");
 
 }
 
@@ -276,17 +282,17 @@ void MuidModule::event()
 {
 
   // Disable simulation-specific actions temporarily while we extrapolate
-  if (m_runMgr) {
-    m_runMgr->SetUserAction((G4UserTrackingAction*)NULL);
-    m_runMgr->SetUserAction((G4UserSteppingAction*)NULL);
+  if (m_RunMgr) {
+    m_RunMgr->SetUserAction((G4UserTrackingAction*)NULL);
+    m_RunMgr->SetUserAction((G4UserSteppingAction*)NULL);
   }
 
   // Loop over the reconstructed tracks.
   // Do extrapolation for each hypotheses of each reconstructed track.
 
-  StoreArray<Track> tracks(m_tracksColName);
-  StoreArray<Muid> muids(m_muidsColName);
-  StoreArray<MuidHit> muidHits(m_muidHitsColName);
+  StoreArray<Track> tracks(m_TracksColName);
+  StoreArray<Muid> muids(m_MuidsColName);
+  StoreArray<MuidHit> muidHits(m_MuidHitsColName);
   RelationArray trackToMuid(tracks, muids);
   RelationArray trackToMuidHits(tracks, muidHits);
 
@@ -296,9 +302,9 @@ void MuidModule::event()
 
   for (int t = 0; t < tracks.getEntries(); ++t) {
 
-    for (unsigned int hypothesis = 0; hypothesis < m_chargedStable.size(); ++hypothesis) {
+    for (unsigned int hypothesis = 0; hypothesis < m_ChargedStable.size(); ++hypothesis) {
 
-      Const::ChargedStable chargedStable = m_chargedStable[hypothesis];
+      Const::ChargedStable chargedStable = m_ChargedStable[hypothesis];
       int pdgCode = chargedStable.getPDGCode();
       if (chargedStable == Const::electron || chargedStable == Const::muon) pdgCode = -pdgCode;
 
@@ -321,27 +327,27 @@ void MuidModule::event()
 
       pdgCode *= int(gfTrack->getFittedState().getCharge());
       muid->setPDGCode(pdgCode);
-
       getStartPoint(gfTrack, pdgCode, position, momentum, covG4e);
-      if (momentum.perp() <= m_minPt) continue;
-      if (m_target->GetDistanceFromPoint(position) < 0.0) continue;
+      muid->setMomentum(momentum.x(), momentum.y(), momentum.z());
+      if (momentum.perp() <= m_MinPt) continue;
+      if (m_Target->GetDistanceFromPoint(position) < 0.0) continue;
       G4ParticleDefinition* particle = G4ParticleTable::GetParticleTable()->FindParticle(pdgCode);
       string g4eName = "g4e_" + particle->GetParticleName();
       double mass = particle->GetPDGMass();
-      double minP = sqrt((mass + m_minKE) * (mass + m_minKE) - mass * mass);
+      double minP = sqrt((mass + m_MinKE) * (mass + m_MinKE) - mass * mass);
       G4ErrorFreeTrajState* state = new G4ErrorFreeTrajState(g4eName, position, momentum, covG4e);
-      m_extMgr->InitTrackPropagation();
+      m_ExtMgr->InitTrackPropagation();
       while (true) {
-        const G4int    errCode    = m_extMgr->PropagateOneStep(state, G4ErrorMode_PropForwards);
+        const G4int    errCode    = m_ExtMgr->PropagateOneStep(state, G4ErrorMode_PropForwards);
         G4Track*       track      = state->GetG4Track();
         const G4Step*  step       = track->GetStep();
         const G4double length     = step->GetStepLength();
         // Ignore the zero-length step by PropagateOneStep() at each boundary
         if (length > 0.0) {
-          m_tof += step->GetDeltaTime();
+          m_TOF += step->GetDeltaTime();
           if (createHit(state, t, pdgCode, muidHits, trackToMuidHits)) {
             // Force geant4e to update its G4Track from the Kalman-updated state
-            m_extMgr->GetPropagator()->SetStepN(0);
+            m_ExtMgr->GetPropagator()->SetStepN(0);
           }
         }
         // Post-step momentum too low?
@@ -349,24 +355,24 @@ void MuidModule::event()
           break;
         }
         // Reached the target boundary?
-        if (m_target->GetDistanceFromPoint(track->GetPosition()) < 0.0) {
+        if (m_Target->GetDistanceFromPoint(track->GetPosition()) < 0.0) {
           break;
         }
       } // track-extrapolation "infinite" loop
 
-      m_extMgr->EventTermination();
+      m_ExtMgr->EventTermination();
 
       delete state;
 
-      finishTrack(muid);
+      finishTrack(muid, int(gfTrack->getFittedState().getCharge()));
 
     } // hypothesis loop
 
   } // track loop
 
-  if (m_runMgr) {
-    m_runMgr->SetUserAction(m_trk);
-    m_runMgr->SetUserAction(m_stp);
+  if (m_RunMgr) {
+    m_RunMgr->SetUserAction(m_TrackingAction);
+    m_RunMgr->SetUserAction(m_SteppingAction);
   }
 
 }
@@ -378,19 +384,24 @@ void MuidModule::endRun()
 void MuidModule::terminate()
 {
 
-  if (m_runMgr) {
-    m_runMgr->SetUserAction(m_trk);
-    m_runMgr->SetUserAction(m_stp);
+  if (m_RunMgr) {
+    m_RunMgr->SetUserAction(m_TrackingAction);
+    m_RunMgr->SetUserAction(m_SteppingAction);
   }
-  delete m_target;
-  delete m_bklm_enter;
-  delete m_eklm_enter;
+  delete m_Target;
+  delete m_BKLMVolumes;
+  delete m_EKLMVolumes;
 
-  delete m_muonPar;
-  delete m_pionPar;
-  delete m_kaonPar;
-  delete m_protonPar;
-  delete m_electronPar;
+  delete m_MuonPlusPar;
+  delete m_MuonMinusPar;
+  delete m_PionPlusPar;
+  delete m_PionMinusPar;
+  delete m_KaonPlusPar;
+  delete m_KaonMinusPar;
+  delete m_ProtonPar;
+  delete m_AntiprotonPar;
+  delete m_ElectronPar;
+  delete m_PositronPar;
 
 }
 
@@ -403,8 +414,8 @@ void MuidModule::registerVolumes()
     B2FATAL("Module muid registerVolumes(): No geometry defined. Please create the geometry first.")
   }
 
-  m_bklm_enter = new vector<G4VPhysicalVolume*>;
-  m_eklm_enter = new vector<G4VPhysicalVolume*>;
+  m_BKLMVolumes = new vector<G4VPhysicalVolume*>;
+  m_EKLMVolumes = new vector<G4VPhysicalVolume*>;
   for (vector<G4VPhysicalVolume*>::iterator iVol = pvStore->begin();
        iVol != pvStore->end(); ++iVol) {
     const G4String name = (*iVol)->GetName();
@@ -414,13 +425,13 @@ void MuidModule::registerVolumes()
     if (name.substr(0, 5) == "BKLM.") {
       if ((name.find("ScintType") != string::npos) ||
           (name.find("GasPhysical") != string::npos)) {
-        m_bklm_enter->push_back(*iVol);
+        m_BKLMVolumes->push_back(*iVol);
       }
     }
-    // Endcap KLM: Endcap_{1,2} and
+    // Endcap KLM:
     // Sensitive_Strip_StripVolume_{1..75}_Plane_{1,2}_Sector_{1..4}_Layer_{1..14}_Endcap_{1,2}
-    if ((name.substr(0, 7) == "Endcap_") || (name.substr(0, 27) == "Sensitive_Strip_StripVolume")) {
-      m_eklm_enter->push_back(*iVol);
+    if (name.substr(0, 27) == "Sensitive_Strip_StripVolume") {
+      m_EKLMVolumes->push_back(*iVol);
     }
   }
 
@@ -492,7 +503,7 @@ void MuidModule::getStartPoint(const genfit::Track* gfTrack, int pdgCode,
     }
     double mass = G4ParticleTable::GetParticleTable()->FindParticle(pdgCode)->GetPDGMass() / GeV;
     // time of flight from I.P. (ns) at the last point on the Genfit track
-    m_tof = pathLength * (sqrt(lastMomMag * lastMomMag + mass * mass) / (lastMomMag * c_light / (cm / ns)));
+    m_TOF = pathLength * (sqrt(lastMomMag * lastMomMag + mass * mass) / (lastMomMag * c_light / (cm / ns)));
 
     covG4e = fromPhasespaceToG4e(lastMomentum, lastCov); // in Geant4e units (GeV/c, cm)
     position.setX(lastPosition.X()*cm); // in Geant4 units (mm)
@@ -512,25 +523,22 @@ void MuidModule::getStartPoint(const genfit::Track* gfTrack, int pdgCode,
   }
 
   // Keep track of geometrical state during one track's extrapolation
-  m_wasInBarrel = false;
-  m_wasInEndcap = false;
-  m_firstBarrelLayer = 0;            // ratchet outward when looking for matching barrel hits
-  m_firstEndcapLayer = 0;            // ratchet outward when looking for matching endcap hits
-  m_inBarrel = false;                // invalidate prior information about previous track-layer intersection
-  m_isForward = false;               // ditto
-  m_sector = -1;                     // ditto
-  m_layer = -1;                      // ditto
-  m_position = TVector3(0.0, 0.0, 0.0);
+  for (int layer = 0; layer <= NLAYER; ++layer) {
+    m_EnteredBarrelSensitiveVolume[layer] = false;
+    m_EnteredEndcapSensitiveVolume[layer] = false;
+  }
+  m_FirstBarrelLayer = 0;   // ratchets outward when looking for matching barrel hits
+  m_FirstEndcapLayer = 0;   // ratchets outward when looking for matching endcap hits
 
   // Quantities that will be written to StoreArray<Muid> at end of track
-  m_extLayerPattern = 0x00000000;
-  m_hitLayerPattern = 0x00000000;
-  m_chi2 = 0.0;
-  m_nPoint = 0;
-  m_lastBarrelExtLayer = -1;    // track hasn't crossed a barrel layer yet
-  m_lastBarrelHitLayer = -1;    // track hasn't crossed an endcap layer yet
-  m_lastEndcapExtLayer = -1;    // no matching hit in barrel layer yet
-  m_lastEndcapHitLayer = -1;    // no matching hit in endcap layer yet
+  m_ExtLayerPattern = 0x00000000;
+  m_HitLayerPattern = 0x00000000;
+  m_Chi2 = 0.0;
+  m_NPoint = 0;
+  m_LastBarrelExtLayer = -1;    // track hasn't crossed a barrel layer yet
+  m_LastBarrelHitLayer = -1;    // track hasn't crossed an endcap layer yet
+  m_LastEndcapExtLayer = -1;    // no matching hit in barrel layer yet
+  m_LastEndcapHitLayer = -1;    // no matching hit in endcap layer yet
 
   return;
 
@@ -538,221 +546,123 @@ void MuidModule::getStartPoint(const genfit::Track* gfTrack, int pdgCode,
 
 // Write another volume-entry point on track.
 // The track state will be modified here by the Kalman fitter.
+
 bool MuidModule::createHit(G4ErrorFreeTrajState* state, int trackID, int pdgCode,
                            StoreArray<MuidHit>& muidHits, RelationArray& trackToMuidHits)
 {
 
-  G4StepPoint* stepPoint = state->GetG4Track()->GetStep()->GetPreStepPoint();
-  TVector3 position(stepPoint->GetPosition().x() / cm, stepPoint->GetPosition().y() / cm, stepPoint->GetPosition().z() / cm);
-  double r = position.Perp();
-  double z = fabs(position.z() - m_OffsetZ);
+  Point point;
+  point.chi2 = -1.0;
+  point.position.SetX(state->GetPosition().x() / cm);
+  point.position.SetY(state->GetPosition().y() / cm);
+  point.position.SetZ(state->GetPosition().z() / cm);
+  point.momentum.SetX(state->GetMomentum().x() / GeV);
+  point.momentum.SetY(state->GetMomentum().y() / GeV);
+  point.momentum.SetZ(state->GetMomentum().z() / GeV);
+  G4ThreeVector prePos = state->GetG4Track()->GetStep()->GetPreStepPoint()->GetPosition() / cm;
+  TVector3 oldPosition(prePos.x(), prePos.y(), prePos.z());
+  double r = point.position.Perp();
+  double z = fabs(point.position.Z() - m_OffsetZ);
 
-  bool isInEndcap((r > m_EndcapMinR) && (fabs(z - m_EndcapMiddleZ) < m_EndcapHalfLength));
-  bool isInBarrel((r > m_BarrelMinR) && (z < m_BarrelHalfLength));
-
-  if (!(m_wasInEndcap || m_wasInBarrel || isInEndcap || isInBarrel)) {
-    m_position = position;
-    return false;
-  }
-
-  Point p;
-  p.chi2 = -1.0;
-
-  // Did the track cross a KLM detector layer?
-
-  if (m_wasInBarrel || isInBarrel) {
-    if (findBarrelIntersection(p, m_position, position)) {
-      p.momentum.SetX(stepPoint->GetMomentum().x() / GeV);
-      p.momentum.SetY(stepPoint->GetMomentum().y() / GeV);
-      p.momentum.SetZ(stepPoint->GetMomentum().z() / GeV);
-      p.covariance.ResizeTo(6, 6);
-      p.covariance = fromG4eToPhasespace(state);
-      if (findMatchingBarrelHit(p)) {
-        m_extLayerPattern |= (0x00000001 << p.layer);
-        if (m_lastBarrelExtLayer < p.layer) {
-          m_lastBarrelExtLayer = p.layer;
+  // Is the track in the barrel?
+  if ((r > m_BarrelMinR) && (z < m_BarrelHalfLength)) {
+    // Did the track cross the inner midplane of a detector module?
+    if (findBarrelIntersection(oldPosition, point)) {
+      point.covariance.ResizeTo(6, 6);
+      point.covariance = fromG4eToPhasespace(state);
+      if (findMatchingBarrelHit(point)) {
+        m_ExtLayerPattern |= (0x00000001 << point.layer);
+        if (m_LastBarrelExtLayer < point.layer) {
+          m_LastBarrelExtLayer = point.layer;
         }
-        m_hitLayerPattern |= (0x00000001 << p.layer);
-        if (m_lastBarrelHitLayer < p.layer) {
-          m_lastBarrelHitLayer = p.layer;
-        }
-        position = p.position;
-        m_inBarrel = p.inBarrel;
-        m_isForward = p.isForward;
-        m_sector = p.sector;
-        m_layer = p.layer;
-        // adjust geant4e's position, momentum and covariance based on matching hit
-        if (p.chi2 >= 0.0) {
-          G4Point3D newPos(p.position.X()*cm, p.position.Y()*cm, p.position.Z()*cm);
-          state->SetPosition(newPos);
-          G4Vector3D newMom(p.momentum.X()*GeV, p.momentum.Y()*GeV, p.momentum.Z()*GeV);
-          state->SetMomentum(newMom);
-          state->SetError(fromPhasespaceToG4e(p.momentum, p.covariance));
-          double extTime = m_tof;  // extrapolation time from IP (ns)
-          double hitTime = p.time;  // measured time in BKLMHit2d (ns)
-          new(muidHits.nextFreeAddress())
-          MuidHit(pdgCode, p.inBarrel, p.isForward, p.sector, p.layer, p.position, p.positionAtHitPlane, extTime, hitTime, p.chi2);
-          trackToMuidHits.add(trackID, muidHits.getEntries() - 1);
+        m_HitLayerPattern |= (0x00000001 << point.layer);
+        if (m_LastBarrelHitLayer < point.layer) {
+          m_LastBarrelHitLayer = point.layer;
         }
       } else {
-        // record the no-hit intersection if it was inside the sensitive volume
-        G4VPhysicalVolume* preVol = stepPoint->GetTouchableHandle()->GetVolume();
-        vector<G4VPhysicalVolume*>::iterator j;
-        for (j = m_bklm_enter->begin(); (j != m_bklm_enter->end()) && (*j != preVol); ++j) {}
-        if (j != m_bklm_enter->end()) {        // entered a BKLM sensitive volume?
-          m_extLayerPattern |= (0x00000001 << p.layer);
-          if (m_lastBarrelExtLayer < p.layer) {
-            m_lastBarrelExtLayer = p.layer;
+        // Record a no-hit track crossing if this step is strictly within a barrel sensitive volume
+        vector<G4VPhysicalVolume*>::iterator j = find(m_BKLMVolumes->begin(), m_BKLMVolumes->end(), state->GetG4Track()->GetVolume());
+        if (j != m_BKLMVolumes->end()) {
+          m_ExtLayerPattern |= (0x00000001 << point.layer);
+          if (m_LastBarrelExtLayer < point.layer) {
+            m_LastBarrelExtLayer = point.layer;
           }
         }
       }
     }
   }
 
-  if (m_wasInEndcap || isInEndcap) {
-    if (findEndcapIntersection(p, m_position, position)) {
-      p.momentum.SetX(stepPoint->GetMomentum().x() / GeV);
-      p.momentum.SetY(stepPoint->GetMomentum().y() / GeV);
-      p.momentum.SetZ(stepPoint->GetMomentum().z() / GeV);
-      p.covariance.ResizeTo(6, 6);
-      p.covariance = fromG4eToPhasespace(state);
-      if (findMatchingEndcapHit(p)) {
-        m_extLayerPattern |= (0x00008000 << p.layer);
-        if (m_lastEndcapExtLayer < p.layer) {
-          m_lastEndcapExtLayer = p.layer;
+  // Is the track in the endcap?
+  if ((r > m_EndcapMinR) && (fabs(z - m_EndcapMiddleZ) < m_EndcapHalfLength)) {
+    // Did the track cross the inner midplane of a detector module?
+    if (findEndcapIntersection(oldPosition, point)) {
+      point.covariance.ResizeTo(6, 6);
+      point.covariance = fromG4eToPhasespace(state);
+      if (findMatchingEndcapHit(point)) {
+        m_ExtLayerPattern |= (0x00008000 << point.layer);
+        if (m_LastEndcapExtLayer < point.layer) {
+          m_LastEndcapExtLayer = point.layer;
         }
-        m_hitLayerPattern |= (0x00008000 << p.layer);
-        if (m_lastEndcapHitLayer < p.layer) {
-          m_lastEndcapHitLayer = p.layer;
-        }
-        position = p.position;
-        m_inBarrel = p.inBarrel;
-        m_isForward = p.isForward;
-        m_sector = p.sector;
-        m_layer = p.layer;
-        // adjust geant4e's position, momentum and covariance based on matching hit
-        if (p.chi2 >= 0.0) {
-          G4Point3D newPos(p.position.X()*cm, p.position.Y()*cm, p.position.Z()*cm);
-          state->SetPosition(newPos);
-          G4Vector3D newMom(p.momentum.X()*GeV, p.momentum.Y()*GeV, p.momentum.Z()*GeV);
-          state->SetMomentum(newMom);
-          state->SetError(fromPhasespaceToG4e(p.momentum, p.covariance));
-          double extTime = m_tof;  // extrapolation time from IP (ns)
-          double hitTime = p.time;  // measured time in EKLMHit2d (ns)
-          new(muidHits.nextFreeAddress())
-          MuidHit(pdgCode, p.inBarrel, p.isForward, p.sector, p.layer, p.position, p.positionAtHitPlane, extTime, hitTime, p.chi2);
-          trackToMuidHits.add(trackID, muidHits.getEntries() - 1);
+        m_HitLayerPattern |= (0x00008000 << point.layer);
+        if (m_LastEndcapHitLayer < point.layer) {
+          m_LastEndcapHitLayer = point.layer;
         }
       } else {
-        // record the no-hit intersection if it was inside the sensitive volume
-        G4VPhysicalVolume* preVol = stepPoint->GetTouchableHandle()->GetVolume();
-        vector<G4VPhysicalVolume*>::iterator j;
-        for (j = m_eklm_enter->begin(); (j != m_eklm_enter->end()) && (*j != preVol); ++j) {}
-        if (j != m_eklm_enter->end()) {        // entered an EKLM sensitive volume?
-          m_extLayerPattern |= (0x00008000 << p.layer);
-          if (m_lastEndcapExtLayer < p.layer) {
-            m_lastEndcapExtLayer = p.layer;
+        // Record a no-hit track crossing if this step is strictly within an endcap sensitive volume
+        vector<G4VPhysicalVolume*>::iterator j = find(m_EKLMVolumes->begin(), m_EKLMVolumes->end(), state->GetG4Track()->GetVolume());
+        if (j != m_EKLMVolumes->end()) {
+          m_ExtLayerPattern |= (0x00008000 << point.layer);
+          if (m_LastEndcapExtLayer < point.layer) {
+            m_LastEndcapExtLayer = point.layer;
           }
         }
       }
     }
   }
 
-  m_position = position;
-  m_wasInBarrel = isInBarrel;
-  m_wasInEndcap = isInEndcap;
+  // Create a new MuidHit and RelationEntry between it and the track.
+  // Adjust geant4e's position, momentum and covariance based on matching hit and tell caller to update the geant4e state.
+  if (point.chi2 >= 0.0) {
+    new(muidHits.nextFreeAddress())
+    MuidHit(pdgCode, point.inBarrel, point.isForward, point.sector, point.layer, point.position, point.positionAtHitPlane, m_TOF, point.time, point.chi2);
+    trackToMuidHits.add(trackID, muidHits.getEntries() - 1);
+    G4Point3D newPos(point.position.X()*cm, point.position.Y()*cm, point.position.Z()*cm);
+    state->SetPosition(newPos);
+    G4Vector3D newMom(point.momentum.X()*GeV, point.momentum.Y()*GeV, point.momentum.Z()*GeV);
+    state->SetMomentum(newMom);
+    state->SetError(fromPhasespaceToG4e(point.momentum, point.covariance));
+    return true;
+  }
 
-  return (p.chi2 >= 0.0); // true if the track's state has been updated by the Kalman filter
+  // Tell caller that the geant4e state was not modified.
+  return false;
 
 }
 
-bool MuidModule::findBarrelIntersection(Point& p, const TVector3& oldPos, const TVector3& newPos)
+bool MuidModule::findBarrelIntersection(const TVector3& oldPosition, Point& point)
 {
 
   // Be generous: allow outward-moving intersection to be in the dead space between
   // largest sensitive-volume Z and m_BarrelHalfLength, not necessarily in a geant4 sensitive volume
 
-  if (fabs(newPos.z() - m_OffsetZ) > m_BarrelHalfLength) { return false; }
+  if (fabs(point.position.Z() - m_OffsetZ) > m_BarrelHalfLength) return false;
 
-  int sector[2];
-  double phi = oldPos.Phi();
+  double phi = point.position.Phi();
   if (phi < 0.0) { phi += TWOPI; }
   if (phi > TWOPI - M_PI_8) { phi -= TWOPI; }
-  sector[0] = (int)((phi + M_PI_8) / M_PI_4);
+  int sector = (int)((phi + M_PI_8) / M_PI_4);
 
-  phi = newPos.Phi();
-  if (phi < 0.0) { phi += TWOPI; }
-  if (phi > TWOPI - M_PI_8) { phi -= TWOPI; }
-  sector[1] = (int)((phi + M_PI_8) / M_PI_4);
+  double oldR = oldPosition * m_BarrelSectorPerp[sector];
+  double newR = point.position * m_BarrelSectorPerp[sector];
 
-  for (int j = 0; j < 2; j++) {
-    if ((j == 0) && (sector[0] == sector[1])) { continue; }
-    double oldR = oldPos * m_BarrelSectorPerp[sector[j]];
-    double newR = newPos * m_BarrelSectorPerp[sector[j]];
-    double diffR = newR - oldR;
-    for (int layer = m_firstBarrelLayer; layer <= m_OutermostActiveBarrelLayer; layer++) {
-      if (newR <  m_BarrelModuleMiddleRadius[layer]) { break; }
-      if (oldR <= m_BarrelModuleMiddleRadius[layer]) {
-        if (fabs(diffR) > 1.0E-12) {
-          p.position = oldPos + (newPos - oldPos) * ((m_BarrelModuleMiddleRadius[layer] - oldR) / diffR);
-        } else {
-          p.position = 0.5 * (oldPos + newPos);
-        }
-        phi = p.position.Phi();
-        if (phi < 0.0) { phi += TWOPI; }
-        if (phi > TWOPI - M_PI_8) { phi -= TWOPI; }
-        if (sector[j] == (int)((phi + M_PI_8) / M_PI_4)) {
-          m_firstBarrelLayer = layer + 1; // ratchet outward for next call's loop starting value
-          p.layer = layer;
-          p.sector = sector[j];
-          p.inBarrel = true;
-          p.isForward = p.position.Z() > m_OffsetZ;
-          return true;
-        }
-        break;
-      }
-    }
-  }
-
-  return false;
-
-}
-
-bool MuidModule::findEndcapIntersection(Point& p, const TVector3& oldPos, const TVector3& newPos)
-{
-
-  // Be generous: allow intersection to be in the dead space between m_EndcapMinR and innermost
-  // sensitive-volume radius or between outermost sensitive-volume radius and m_EndcapMaxR,
-  // not necessarily in a geant4 sensitive volume
-
-  if (oldPos.Perp() > m_EndcapMaxR) { return false; }
-  if (newPos.Perp() < m_EndcapMinR) { return false; }
-
-  double oldZ = fabs(oldPos.Z() - m_OffsetZ);
-  double newZ = fabs(newPos.Z() - m_OffsetZ);
-
-  for (int layer = m_firstEndcapLayer; layer <= m_OutermostActiveEndcapLayer; layer++) {
-    if (newZ <  m_EndcapModuleMiddleZ[layer]) { break; }
-    if (oldZ <= m_EndcapModuleMiddleZ[layer]) {
-      double diffZ = newZ - oldZ;
-      if (fabs(diffZ) > 1.0E-12) {
-        p.position = oldPos + (newPos - oldPos) * ((m_EndcapModuleMiddleZ[layer] - oldZ) / diffZ);
-      } else {
-        p.position = 0.5 * (oldPos + newPos);
-      }
-      m_firstEndcapLayer = layer + 1; // ratchet outward for next call's loop starting value
-      p.inBarrel = false;
-      p.isForward = p.position.Z() > m_OffsetZ;
-      p.layer = layer;
-      double phi = p.position.Phi();
-      if (phi < 0.0) { phi += TWOPI; }
-      if (p.isForward) {
-        phi = M_PI - phi;
-        if (phi < 0.0) { phi += TWOPI; }
-      }
-      p.sector = (int)(phi / M_PI_2); // my calculation; matches EKLM-geometry calculation
-      p.inBarrel = false;
-      p.isForward = p.position.Z() > m_OffsetZ;
+  for (int layer = m_FirstBarrelLayer; layer <= m_OutermostActiveBarrelLayer; ++layer) {
+    if (newR <  m_BarrelModuleMiddleRadius[layer]) break;
+    if (oldR <= m_BarrelModuleMiddleRadius[layer]) {
+      m_FirstBarrelLayer = layer + 1; // ratchet outward for next call's loop starting value
+      point.inBarrel = true;
+      point.isForward = point.position.Z() > m_OffsetZ;
+      point.layer = layer;
+      point.sector = sector;
       return true;
     }
   }
@@ -761,96 +671,124 @@ bool MuidModule::findEndcapIntersection(Point& p, const TVector3& oldPos, const 
 
 }
 
-bool MuidModule::findMatchingBarrelHit(Point& p)
+bool MuidModule::findEndcapIntersection(const TVector3& oldPosition, Point& point)
+{
+
+  // Be generous: allow intersection to be in the dead space between m_EndcapMinR and innermost
+  // sensitive-volume radius or between outermost sensitive-volume radius and m_EndcapMaxR,
+  // not necessarily in a geant4 sensitive volume
+
+  if (oldPosition.Perp() > m_EndcapMaxR) return false;
+  if (point.position.Perp() < m_EndcapMinR) return false;
+
+  double oldZ = fabs(oldPosition.Z() - m_OffsetZ);
+  double newZ = fabs(point.position.Z() - m_OffsetZ);
+
+  for (int layer = m_FirstEndcapLayer; layer <= m_OutermostActiveEndcapLayer; ++layer) {
+    if (newZ <  m_EndcapModuleMiddleZ[layer]) break;
+    if (oldZ <= m_EndcapModuleMiddleZ[layer]) {
+      m_FirstEndcapLayer = layer + 1; // ratchet outward for next call's loop starting value
+      point.inBarrel = false;
+      point.isForward = point.position.Z() > m_OffsetZ;
+      point.layer = layer;
+      double phi = point.position.Phi();
+      if (phi < 0.0) { phi += TWOPI; }
+      if (point.isForward) {
+        phi = M_PI - phi;
+        if (phi < 0.0) { phi += TWOPI; }
+      }
+      point.sector = (int)(phi / M_PI_2); // my calculation; matches EKLM-geometry calculation
+      return true;
+    }
+  }
+
+  return false;
+
+}
+
+bool MuidModule::findMatchingBarrelHit(Point& point)
 
 {
 
-  double diffBest = 1.0E12;
-  double localVariance[2] = {m_BarrelScintVariance, m_BarrelScintVariance};
+  TVector3 diffBest(1.0E12, 1.0E12, 1.0E12);
 
-  StoreArray<BKLMHit2d> bklmHits(m_bklmHitsColName);
-  BKLMHit2d* hitBest = NULL;
+  StoreArray<BKLMHit2d> bklmHits(m_BKLMHitsColName);
+  BKLMHit2d* bestHit = NULL;
   for (int h = 0; h < bklmHits.getEntries(); ++h) {
     BKLMHit2d* hit = bklmHits[h];
-    if (hit->getLayer() - 1 != p.layer) { continue; }
-    if (hit->getStatus() & STATUS_OUTOFTIME) { continue; }
-    TVector3 diff = hit->getGlobalPosition() - p.position;
-    // allow hit in adjacent sector but only if crossing is near this sector's edge
-    if (fabs(diff * m_BarrelSectorPerp[hit->getSector() - 1]) > 20.0) { continue; }
-    double diffMag = diff.Mag();
-    if (diffMag < diffBest) {
-      diffBest = diffMag;
-      hitBest = hit;
+    if (hit->getLayer() - 1 != point.layer) continue;
+    if (hit->getStatus() & STATUS_OUTOFTIME) continue;
+    TVector3 extDir(point.momentum.Unit());
+    TVector3 n(m_BarrelSectorPerp[hit->getSector() - 1]);
+    TVector3 diff(hit->getGlobalPosition() - point.position);
+    if (fabs(extDir * n) > 1.0E-6) diff -= extDir * ((diff * n) / (extDir * n));
+    if (diff.Mag() < diffBest.Mag()) {
+      diffBest = diff;
+      bestHit = hit;
     }
   }
 
-  if (hitBest == NULL) { return false; }
-
-  p.isForward = hitBest->isForward();
-  p.sector = hitBest->getSector() - 1;
-  double varTrack = getPlaneVariance(p);
-  double varHit = localVariance[0] + localVariance[1];
-  if (hitBest->isInRPC()) {
-    localVariance[0] = m_BarrelPhiStripVariance[p.layer];
-    localVariance[1] = m_BarrelZStripVariance[p.layer];
-  }
-  if (diffBest <= max(sqrt(varTrack + varHit) * m_maxDistSIGMA, m_maxDistCM)) {
-    p.time = hitBest->getTime();
-    adjustIntersection(p, localVariance, hitBest->getGlobalPosition());
-    if (p.chi2 >= 0.0) {
-      m_chi2 += p.chi2;
-      m_nPoint++;
+  if (bestHit != NULL) {
+    point.isForward = bestHit->isForward();
+    point.sector = bestHit->getSector() - 1;
+    point.time = bestHit->getTime();
+    double localVariance[2] = {m_BarrelScintVariance, m_BarrelScintVariance};
+    if (bestHit->isInRPC()) {
+      localVariance[0] = m_BarrelPhiStripVariance[point.layer];
+      localVariance[1] = m_BarrelZStripVariance[point.layer];
     }
-    hitBest->setStatus(STATUS_ONTRACK);
-    return true;
+    adjustIntersection(point, localVariance, bestHit->getGlobalPosition());
+    if (point.chi2 >= 0.0) {
+      m_Chi2 += point.chi2;
+      m_NPoint++;
+      bestHit->setStatus(STATUS_ONTRACK);
+      return true;
+    }
   }
-
   return false;
 
 }
 
-bool MuidModule::findMatchingEndcapHit(Point& p)
+bool MuidModule::findMatchingEndcapHit(Point& point)
 {
 
-  double diffBest = 1.0E12;
-  double localVariance[2] = {m_EndcapScintVariance, m_EndcapScintVariance};
+  TVector3 diffBest(1.0E12, 1.0E12, 1.0E12);
 
-  StoreArray<EKLMHit2d> eklmHits(m_eklmHitsColName);
-  EKLMHit2d* hitBest = NULL;
+  StoreArray<EKLMHit2d> eklmHits(m_EKLMHitsColName);
+  EKLMHit2d* bestHit = NULL;
   for (int h = 0; h < eklmHits.getEntries(); ++h) {
     EKLMHit2d* hit = eklmHits[h];
-    if (hit->getLayer() - 1 != p.layer) { continue; }
-    // DIVOT no getStatus() if (hit->getStatus() & STATUS_OUTOFTIME) { continue; }
-    TVector3 diff = hit->getPosition() - p.position;
-    double diffMag = diff.Mag();
-    if (diffMag < diffBest) {
-      diffBest = diffMag;
-      hitBest = hit;
+    if (hit->getLayer() - 1 != point.layer) continue;
+    // DIVOT no getStatus() if (hit->getStatus() & STATUS_OUTOFTIME) continue;
+    TVector3 hitPos(hit->getGlobalPosition());
+    TVector3 extDir(point.momentum.Unit());
+    TVector3 n(0.0, 0.0, (point.isForward ? 1.0 : -1.0));
+    TVector3 diff(hit->getPosition() - point.position);
+    if (fabs(extDir * n) > 1.0E-6) diff -= extDir * ((diff * n) / (extDir * n));
+    if (diff.Mag() < diffBest.Mag()) {
+      diffBest = diff;
+      bestHit = hit;
     }
   }
 
-  if (hitBest == NULL) { return false; }
-
-  p.isForward = (hitBest->getEndcap() == 1);
-  p.sector = hitBest->getSector() - 1;
-  double varTrack = getPlaneVariance(p);
-  double varHit = localVariance[0] + localVariance[1];
-  if (diffBest <= max(sqrt(varTrack + varHit) * m_maxDistSIGMA, m_maxDistCM)) {
-    p.time = hitBest->getTime();
-    adjustIntersection(p, localVariance, hitBest->getPosition());
-    if (p.chi2 >= 0.0) {
-      m_chi2 += p.chi2;
-      m_nPoint++;
+  if (bestHit != NULL) {
+    point.isForward = (bestHit->getEndcap() == 1);
+    point.sector = bestHit->getSector() - 1;
+    point.time = bestHit->getTime();
+    double localVariance[2] = {m_EndcapScintVariance, m_EndcapScintVariance};
+    adjustIntersection(point, localVariance, bestHit->getPosition());
+    if (point.chi2 >= 0.0) {
+      m_Chi2 += point.chi2;
+      m_NPoint++;
+      // DIVOT no setStatus() bestHit->setStatus(STATUS_ONTRACK);
+      return true;
     }
-    // DIVOT no setStatus() hitBest->setStatus(STATUS_ONTRACK);
-    return true;
   }
-
   return false;
 
 }
 
-void MuidModule::adjustIntersection(Point& p, const double localVariance[2], const TVector3& hitPos)
+void MuidModule::adjustIntersection(Point& point, const double localVariance[2], const TVector3& hitPos)
 {
 
 // Use the gain matrix formalism to get the corrected track parameters.
@@ -869,11 +807,11 @@ void MuidModule::adjustIntersection(Point& p, const double localVariance[2], con
 // r_k = residual[] 2 elements after filtering
 // Use the relation K*H*C = (C*H^T*R^-1)*H*C = C*(H^T*R^-1*H)*C^T
 
-  TVector3 extPos(p.position);
-  TVector3 extMom(p.momentum);
+  TVector3 extPos(point.position);
+  TVector3 extMom(point.momentum);
   TVector3 extDir(extMom.Unit());
   TVector3 diffPos(hitPos - extPos);
-  TMatrixDSym extCov(p.covariance);
+  TMatrixDSym extCov(point.covariance);
 
 // Track parameters (x,y,z,px,py,pz) before correction
 
@@ -888,12 +826,12 @@ void MuidModule::adjustIntersection(Point& p, const double localVariance[2], con
   TVector3 nA;  // unit vector normal to the readout plane
   TVector3 nB;  // unit vector along phi- or x-readout direction (for barrel or endcap)
   TVector3 nC;  // unit vector along z- or y-readout direction (for barrel or endcap)
-  if (p.inBarrel) {
-    nA = m_BarrelSectorPerp[p.sector];
-    nB = m_BarrelSectorPhi[p.sector];
+  if (point.inBarrel) {
+    nA = m_BarrelSectorPerp[point.sector];
+    nB = m_BarrelSectorPhi[point.sector];
     nC = TVector3(0.0, 0.0, 1.0);
   } else {
-    double out = (p.isForward ? 1.0 : -1.0);
+    double out = (point.isForward ? 1.0 : -1.0);
     nA = TVector3(0.0, 0.0, out);
     nB = TVector3(out, 0.0, 0.0);
     nC = TVector3(0.0, out, 0.0);
@@ -902,7 +840,7 @@ void MuidModule::adjustIntersection(Point& p, const double localVariance[2], con
 // Don't adjust the extrapolation if the track is nearly tangent to the readout plane.
 
   double extDirA = extDir * nA;
-  if (fabs(extDirA) < 1.0E-6) { return; }
+  if (fabs(extDirA) < 1.0E-6) return;
   double extDirBA = extDir * nB / extDirA;
   double extDirCA = extDir * nC / extDirA;
 
@@ -911,9 +849,9 @@ void MuidModule::adjustIntersection(Point& p, const double localVariance[2], con
   TVector3 move = extDir * ((diffPos * nA) / (extDir * nA));
   extPos += move;
   diffPos -= move;
-  p.positionAtHitPlane.SetX(extPos.X());
-  p.positionAtHitPlane.SetY(extPos.Y());
-  p.positionAtHitPlane.SetZ(extPos.Z());
+  point.positionAtHitPlane.SetX(extPos.X());
+  point.positionAtHitPlane.SetY(extPos.Y());
+  point.positionAtHitPlane.SetZ(extPos.Z());
 
 // Projection jacobian onto the nB-nC measurement plane
 
@@ -943,10 +881,14 @@ void MuidModule::adjustIntersection(Point& p, const double localVariance[2], con
   TMatrixDSym correction(extCov);  // 6x6
   correction = correction.Similarity(jacobian) + hitCov; // Similarity() changes correction to 2x2!
 
+// Ignore the best hit if it is too far from the extrapolated-track intersection in the hit's plane
+
+  if (residual[0] * residual[0] > correction[0][0] * m_MaxDistSqInVariances) return;
+  if (residual[1] * residual[1] > correction[1][1] * m_MaxDistSqInVariances) return;
+
   double determinant = 0.0;
   correction.Invert(&determinant);
-
-  if (determinant == 0.0) { return; }
+  if (determinant == 0.0) return;
 
   // Matrix inversion succeeeded
 
@@ -966,127 +908,75 @@ void MuidModule::adjustIntersection(Point& p, const double localVariance[2], con
   extMom.SetY(extPar[4]);
   extMom.SetZ(extPar[5]);
 
+// Calculate chi-squared increment
+
+  correction = extCov;
+  correction = hitCov - correction.Similarity(jacobian);
+  correction.Invert(&determinant);
+  if (determinant == 0.0) return;
+
+  diffPos = hitPos - extPos;
+  residual[0] = diffPos.X() * jacobian[0][0] + diffPos.Y() * jacobian[0][1] + diffPos.Z() * jacobian[0][2];
+  residual[1] = diffPos.X() * jacobian[1][0] + diffPos.Y() * jacobian[1][1] + diffPos.Z() * jacobian[1][2];
+  point.chi2 = correction.Similarity(residual);
+
 // Project the corrected extrapolation to the plane that is tangent
 // to the hit-point's plane but at the original extrapolation's position
 // to leave it in the same geometrical volume as it was originally.  Also,
 // the momentum magnitude is left unchanged (otherwise, it would vary by ~1%).
 
   extDir = extMom.Unit();
-  extPos += extDir * (((p.position - extPos) * nA) / (extDir * nA));
-  extMom = p.momentum.Mag() * extDir;
+  extPos += extDir * (((point.position - extPos) * nA) / (extDir * nA));
+  extMom = point.momentum.Mag() * extDir;
 
-// Update the position, momentum and covariance of the point; calculate chi2
+// Update the position, momentum and covariance of the point
 
-  p.position = extPos;
-  p.momentum = extMom;
-  p.covariance = extCov;
-
-// Calculate chi-squared increment
-
-  correction = extCov;
-  correction = hitCov - correction.Similarity(jacobian);
-  correction.Invert(&determinant);
-
-  if (determinant == 0.0) { return; }
-
-// Matrix inversion succeeded - calculate chi-squared increment
-
-  diffPos = hitPos - extPos;
-  residual[0] = diffPos.X() * jacobian[0][0] + diffPos.Y() * jacobian[0][1] + diffPos.Z() * jacobian[0][2];
-  residual[1] = diffPos.X() * jacobian[1][0] + diffPos.Y() * jacobian[1][1] + diffPos.Z() * jacobian[1][2];
-  p.chi2 = correction.Similarity(residual);
+  point.position = extPos;
+  point.momentum = extMom;
+  point.covariance = extCov;
 
 }
 
-double MuidModule::getPlaneVariance(const Point& p)
+void MuidModule::finishTrack(Muid* muid, int charge)
 {
 
-  TVector3 nA;  // unit vector normal to the readout plane
-  TVector3 nB;  // unit vector along phi- or x-readout direction (for barrel or endcap)
-  TVector3 nC;  // unit vector along z- or y-readout direction (for barrel or endcap)
-  if (p.inBarrel) {
-    nA = m_BarrelSectorPerp[p.sector];
-    nB = m_BarrelSectorPhi[p.sector];
-    nC = TVector3(0.0, 0.0, 1.0);
-  } else {
-    double out = (p.isForward ? 1.0 : -1.0);
-    nA = TVector3(0.0, 0.0, out);
-    nB = TVector3(out, 0.0, 0.0);
-    nC = TVector3(0.0, out, 0.0);
-  }
+  // Done with this track: compute likelihoods and fill the muid object
 
-// Don't adjust the extrapolation if the track is nearly tangent to the readout plane.
-
-  TVector3 extDir = p.momentum.Unit();
-  double extDirA = extDir * nA;
-  if (fabs(extDirA) < 1.0E-6) { return 1.0E24; }
-  double extDirBA = extDir * nB / extDirA;
-  double extDirCA = extDir * nC / extDirA;
-
-// Set up the projection jacobian onto the nB-nC measurement plane.
-
-  TMatrixD jacobian(2, 6);
-  jacobian[0][0] = nB.X()  - nA.X() * extDirBA;
-  jacobian[0][1] = nB.Y()  - nA.Y() * extDirBA;
-  jacobian[0][2] = nB.Z()  - nA.Z() * extDirBA;
-  jacobian[1][0] = nC.X()  - nA.X() * extDirCA;
-  jacobian[1][1] = nC.Y()  - nA.Y() * extDirCA;
-  jacobian[1][2] = nC.Z()  - nA.Z() * extDirCA;
-
-// Now get the combined covariance of the extrapolation covariance matrix
-
-  TMatrixDSym correction(p.covariance);  // 6x6
-  correction = correction.Similarity(jacobian); // Similarity() changes correction to 2x2!
-  return correction[0][0] + correction[1][1];
-
-}
-
-//------------------------------------------------------------------------------
-// finished with this track: compute likelihoods and fill the Muid structure
-
-void MuidModule::finishTrack(Muid* muid)
-{
-
-  m_nPoint += m_nPoint; // 2 independent measurements per detector plane
+  m_NPoint += m_NPoint; // 2 independent measurements per detector plane
 
   int outcome(0);
-  int layerExt(m_lastBarrelExtLayer);
-  if ((m_lastBarrelExtLayer >= 0) || (m_lastEndcapExtLayer >= 0)) {
-    if ((m_firstBarrelLayer > m_OutermostActiveBarrelLayer) || (m_firstEndcapLayer > m_OutermostActiveEndcapLayer)) {
+  int layerExt(m_LastBarrelExtLayer);
+  if ((m_LastBarrelExtLayer >= 0) || (m_LastEndcapExtLayer >= 0)) {
+    if ((m_FirstBarrelLayer > m_OutermostActiveBarrelLayer) || (m_FirstEndcapLayer > m_OutermostActiveEndcapLayer)) {
       outcome = 3;
-      if (m_lastEndcapExtLayer >= 0) {
+      if (m_LastEndcapExtLayer >= 0) {
         outcome = 4;
-        layerExt = m_lastEndcapExtLayer;
+        layerExt += m_LastEndcapExtLayer + 1;
       }
     } else {
       outcome = 1;
-      if (m_lastEndcapExtLayer >= 0) {
+      if (m_LastEndcapExtLayer >= 0) {
         outcome = 2;
-        layerExt = m_lastEndcapExtLayer;
+        layerExt += m_LastEndcapExtLayer + 1;
       }
     }
   }
 
   muid->setOutcome(outcome);
-  muid->setBarrelExtLayer(m_lastBarrelExtLayer);
-  muid->setEndcapExtLayer(m_lastEndcapExtLayer);
-  muid->setBarrelHitLayer(m_lastBarrelHitLayer);
-  muid->setEndcapHitLayer(m_lastEndcapHitLayer);
-  muid->setExtLayer(m_lastBarrelExtLayer + m_lastEndcapExtLayer + 1);
-  muid->setHitLayer((m_lastEndcapHitLayer == -1 ?
-                     m_lastBarrelHitLayer :
-                     m_lastBarrelExtLayer + m_lastEndcapHitLayer + 1));
-  muid->setChiSquared(m_chi2);
-  muid->setDegreesOfFreedom(m_nPoint);
-  muid->setExtLayerPattern(m_extLayerPattern);
-  muid->setHitLayerPattern(m_hitLayerPattern);
+  muid->setBarrelExtLayer(m_LastBarrelExtLayer);
+  muid->setEndcapExtLayer(m_LastEndcapExtLayer);
+  muid->setBarrelHitLayer(m_LastBarrelHitLayer);
+  muid->setEndcapHitLayer(m_LastEndcapHitLayer);
+  muid->setExtLayer(m_LastBarrelExtLayer + m_LastEndcapExtLayer + 1);
+  muid->setHitLayer((m_LastEndcapHitLayer == -1 ?
+                     m_LastBarrelHitLayer :
+                     m_LastBarrelExtLayer + m_LastEndcapHitLayer + 1));
+  muid->setChiSquared(m_Chi2);
+  muid->setDegreesOfFreedom(m_NPoint);
+  muid->setExtLayerPattern(m_ExtLayerPattern);
+  muid->setHitLayerPattern(m_HitLayerPattern);
 
   int layerDiff = muid->getExtLayer() - muid->getHitLayer();
-
-  double chiSquaredReduced = Large;
-  if (m_nPoint > 0) {
-    chiSquaredReduced = m_chi2 / m_nPoint;
-  }
 
 // Do likelihood calculation
 
@@ -1101,22 +991,29 @@ void MuidModule::finishTrack(Muid* muid)
   double logL_K = -1.0E200;
   double logL_p = -1.0E200;
   double logL_e = -1.0E200;
-  double chi2Prob = TMath::Prob(m_chi2, m_nPoint);
   if (outcome != 0) { // extrapolation reached KLM sensitive volume
-    muon = m_muonPar->getPDF(outcome, layerExt, layerDiff, chiSquaredReduced);
-    pion = m_pionPar->getPDF(outcome, layerExt, layerDiff, chiSquaredReduced);
-    kaon = m_kaonPar->getPDF(outcome, layerExt, layerDiff, chiSquaredReduced);
-    proton = m_protonPar->getPDF(outcome, layerExt, layerDiff, chiSquaredReduced);
-    electron = m_electronPar->getPDF(outcome, layerExt, layerDiff, chiSquaredReduced);
+    if (charge > 0.0) {
+      muon = m_MuonPlusPar->getPDF(outcome, layerExt, layerDiff, m_NPoint, m_Chi2);
+      pion = m_PionPlusPar->getPDF(outcome, layerExt, layerDiff, m_NPoint, m_Chi2);
+      kaon = m_KaonPlusPar->getPDF(outcome, layerExt, layerDiff, m_NPoint, m_Chi2);
+      proton = m_ProtonPar->getPDF(outcome, layerExt, layerDiff, m_NPoint, m_Chi2);
+      electron = m_PositronPar->getPDF(outcome, layerExt, layerDiff, m_NPoint, m_Chi2);
+    } else {
+      muon = m_MuonMinusPar->getPDF(outcome, layerExt, layerDiff, m_NPoint, m_Chi2);
+      pion = m_PionMinusPar->getPDF(outcome, layerExt, layerDiff, m_NPoint, m_Chi2);
+      kaon = m_KaonMinusPar->getPDF(outcome, layerExt, layerDiff, m_NPoint, m_Chi2);
+      proton = m_AntiprotonPar->getPDF(outcome, layerExt, layerDiff, m_NPoint, m_Chi2);
+      electron = m_ElectronPar->getPDF(outcome, layerExt, layerDiff, m_NPoint, m_Chi2);
+    }
     logL_mu   = (muon > 0.0 ? log(muon) : -1.0E200);
     logL_pi   = (pion > 0.0 ? log(pion) : -1.0E200);
     logL_K    = (kaon > 0.0 ? log(kaon) : -1.0E200);
     logL_p    = (proton > 0.0 ? log(proton) : -1.0E200);
     logL_e    = (electron > 0.0 ? log(electron) : -1.0E200);
     // now normalize the PDF values for the muon vs *meson* hypotheses
-    double denom = muon + 0.5 * (pion + kaon);
-    if (denom < 1.0E-200) {
-      junk = 1.0; // anomaly: should never happen!!
+    double denom = muon + pion + kaon;
+    if (denom < 1.0E-20) {
+      junk = 1.0; // anomaly: should be very rare
     } else {
       muon /= denom;
       pion /= denom;

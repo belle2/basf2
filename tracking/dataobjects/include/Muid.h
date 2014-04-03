@@ -11,6 +11,7 @@
 #pragma once
 
 #include <framework/datastore/RelationsObject.h>
+#include <TVector3.h>
 #include <TMatrixD.h>
 
 namespace Belle2 {
@@ -30,7 +31,10 @@ namespace Belle2 {
     virtual ~Muid() {}
 
     //! returns the PDG code of the hypothesis used for this extrapolation
-    int getPDGCode() const { return m_pdgCode; }
+    int getPDGCode() const { return m_PDGCode; }
+
+    //! returns the initial reconstructed momentum (MeV/c) used for this extrapolation
+    TVector3 getMomentum() const { return m_Momentum; }
 
     //! returns muon PDF value for this extrapolation (normalized with Pion & Kaon)
     double getMuonPDFValue() const { return m_MuonPDFValue; }
@@ -102,7 +106,10 @@ namespace Belle2 {
     unsigned int getHitLayerPattern() const { return m_HitLayerPattern; }
 
     //! assigns PDG code of the hypothesis used for this extrapolation
-    void setPDGCode(int pdgCode) { m_pdgCode = pdgCode; }
+    void setPDGCode(int pdgCode) { m_PDGCode = pdgCode; }
+
+    //! assigns initial momentum (MeV/c) used for this extrapolation
+    void setMomentum(double px, double py, double pz) { m_Momentum.SetX(px); m_Momentum.SetY(py); m_Momentum.SetZ(pz); }
 
     //! assigns muon PDF value for this extrapolation
     void setMuonPDFValue(double pdfValue) { m_MuonPDFValue = pdfValue; }
@@ -176,7 +183,10 @@ namespace Belle2 {
   private:
 
     //! PDG particleID hypothesis used for this extrapolation (typically muon)
-    int m_pdgCode;
+    int m_PDGCode;
+
+    //! initial reconstructed momentum (MeV/c) used for this extrapolation
+    TVector3 m_Momentum;
 
     //! Muon PDF value for this extrapolation (normalized with Pion & Kaon)
     double m_MuonPDFValue;
@@ -257,7 +267,7 @@ namespace Belle2 {
     unsigned int m_HitLayerPattern;
 
     //! Needed to make the ROOT object storable
-    ClassDef(Muid, 2)
+    ClassDef(Muid, 3)
 
   };
 }

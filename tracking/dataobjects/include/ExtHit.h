@@ -16,7 +16,10 @@
 
 namespace Belle2 {
 
+  //! Define state of extrapolation for each recorded hit
   enum ExtHitStatus { EXT_FIRST = -1, EXT_ENTER, EXT_EXIT, EXT_STOP, EXT_ESCAPE };
+
+  //! Define detector touched by each recorded hit
   enum ExtDetectorID { EXT_UNKNOWN = -1, EXT_PXD, EXT_SVD, EXT_CDC, EXT_TOP, EXT_ARICH, EXT_ECL, EXT_BKLM, EXT_EKLM };
 
   //! Store one Ext hit as a ROOT object

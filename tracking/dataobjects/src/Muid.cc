@@ -16,7 +16,8 @@ using namespace Belle2;
 ClassImp(Muid)
 
 Muid::Muid() :
-  m_pdgCode(0),
+  m_PDGCode(0),
+  m_Momentum(TVector3(0.0, 0.0, 0.0)),
   m_MuonPDFValue(0.0),
   m_PionPDFValue(0.0),
   m_KaonPDFValue(0.0),
@@ -43,7 +44,8 @@ Muid::Muid() :
 }
 
 Muid::Muid(int pdgCode) :
-  m_pdgCode(pdgCode),
+  m_PDGCode(pdgCode),
+  m_Momentum(TVector3(0.0, 0.0, 0.0)),
   m_MuonPDFValue(0.0),
   m_PionPDFValue(0.0),
   m_KaonPDFValue(0.0),

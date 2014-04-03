@@ -78,14 +78,14 @@ using namespace std;
 using namespace Belle2;
 using namespace CDC;
 
-REG_MODULE(GenFitter)
+REG_MODULE(GenFitterVXDTB)
 
-GenFitterModule::GenFitterModule() :
+GenFitterVXDTBModule::GenFitterVXDTBModule() :
   Module()
 {
 
   setDescription(
-    "Uses GenFit2 to fit tracks. Needs genfit::TrackCands as input and provides genfit::Tracks and Tracks as output.");
+    "Uses GenFit2 to fit tracks with support for EUDET telescopes. Needs genfit::TrackCands as input and provides genfit::Tracks and Tracks as output.");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   //input
@@ -130,11 +130,11 @@ GenFitterModule::GenFitterModule() :
   genfit::Exception::quiet(m_suppressGFExceptionOutput);
 }
 
-GenFitterModule::~GenFitterModule()
+GenFitterVXDTBModule::~GenFitterVXDTBModule()
 {
 }
 
-void GenFitterModule::initialize()
+void GenFitterVXDTBModule::initialize()
 {
 
   m_failedFitCounter = 0;
@@ -205,16 +205,16 @@ void GenFitterModule::initialize()
   CDCRecoHit::setTranslators(new LinearGlobalADCCountTranslator(), new IdealCDCGeometryTranslator(), new SimpleTDCCountTranslator());
 }
 
-void GenFitterModule::beginRun()
+void GenFitterVXDTBModule::beginRun()
 {
 
 }
 
-void GenFitterModule::event()
+void GenFitterVXDTBModule::event()
 {
   StoreObjPtr<EventMetaData> eventMetaDataPtr;
   int eventCounter = eventMetaDataPtr->getEvent();
-  B2DEBUG(100, "**********   GenFitterModule processing event number: " << eventCounter << " ************");
+  B2DEBUG(100, "**********   GenFitterVXDTBModule processing event number: " << eventCounter << " ************");
 
   StoreArray < MCParticle > mcParticles(m_mcParticlesColName);
   B2DEBUG(149, "GenFitter: total Number of MCParticles: " << mcParticles.getEntries());
@@ -716,7 +716,7 @@ void GenFitterModule::event()
   B2DEBUG(99, "GenFitter event summary: " << trackCounter + 1 << " tracks were processed");
 }
 
-void GenFitterModule::endRun()
+void GenFitterVXDTBModule::endRun()
 {
   B2INFO("----- GenFitter run summary")
   B2INFO("      " << m_successfulGFTrackCandFitCounter << " track candidates were fitted successfully");
@@ -727,7 +727,7 @@ void GenFitterModule::endRun()
   }
 }
 
-void GenFitterModule::terminate()
+void GenFitterVXDTBModule::terminate()
 {
   if (m_createTextFile) {
     HelixParam.close();

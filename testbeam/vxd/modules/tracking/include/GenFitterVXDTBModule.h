@@ -29,16 +29,16 @@ namespace Belle2 {
    *  Tracks (custom objects with only the important parameters we want to have at the end)
    *  are created.
    */
-  class GenFitterModule : public Module {
+  class GenFitterVXDTBModule : public Module {
 
   public:
     /** Constructor .
      */
-    GenFitterModule();
+    GenFitterVXDTBModule();
 
     /** Destructor.
      */
-    virtual ~GenFitterModule();
+    virtual ~GenFitterVXDTBModule();
 
     /** Initialize the Module.
      * This method is called only once before the actual event processing starts.

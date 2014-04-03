@@ -27,9 +27,6 @@
 #include <framework/gearbox/Const.h>
 
 
-#include "tracking/dataobjects/AnalizerCollectorTFInfo.h"
-
-
 //C++-stuff
 #include <iostream>
 #include <iomanip> // for setprecision on cout-doubles
@@ -239,11 +236,11 @@ void TFAnalizerModule::event()
 
   StoreArray<VXDTFInfoBoard> extraInfos(m_PARAMinfoBoardName);
 
-  //StoreArray<TrackCandidateTFInfo> tfcandTFInfo("");
+  StoreArray<TrackCandidateTFInfo> tfcandTFInfo("");
 
   int numOfMcTCs = mcTrackCandidates.getEntries();
   int numOfCaTCs = caTrackCandidates.getEntries();
-//  int numOfInfoBoards = extraInfos.getEntries();
+  //int numOfInfoBoards = extraInfos.getEntries();
 
   m_mcTrackCounter += numOfMcTCs;
   m_caTrackCounter += numOfCaTCs;
@@ -259,7 +256,7 @@ void TFAnalizerModule::event()
   for (int i = 0; i not_eq numOfMcTCs; ++i) {
     B2DEBUG(10, "--importing trackCandidate " << i << "...")
     genfit::TrackCand* aTC =  mcTrackCandidates[i];
-    extractHits(aTC, relPXDCluster2TrueHit, relSVDCluster2TrueHit, pxdClusters, svdClusters, extraInfos,  mcTcVector, true, i);    /// extractHits
+    extractHits(aTC, relPXDCluster2TrueHit, relSVDCluster2TrueHit, pxdClusters, svdClusters, extraInfos, tfcandTFInfo, mcTcVector, true, i);    /// extractHits
     /// missing: export2File!
   }
   m_mcTrackVectorCounter += mcTcVector.size();
@@ -269,7 +266,7 @@ void TFAnalizerModule::event()
   for (int i = 0; i not_eq numOfCaTCs; ++i) {
     B2DEBUG(10, "--importing trackCandidate " << i << "...")
     genfit::TrackCand* aTC =  caTrackCandidates[i];
-    extractHits(aTC, relPXDCluster2TrueHit, relSVDCluster2TrueHit, pxdClusters, svdClusters, extraInfos,  caTcVector, false, i); /// extractHits
+    extractHits(aTC, relPXDCluster2TrueHit, relSVDCluster2TrueHit, pxdClusters, svdClusters, extraInfos,  tfcandTFInfo, caTcVector, false, i); /// extractHits
   }
 
   B2DEBUG(1, " before checking compatibility: there are " << mcTcVector.size() << "/" << caTcVector.size() << " mc/ca-tcs")
@@ -448,8 +445,6 @@ void TFAnalizerModule::event()
 
 
   if (m_display == 1 && m_collectorFilePath.size() > 0) {
-    AnalizerCollectorTFInfo ana_collector;
-
     ana_collector.setAllParticleIDs(m_collectorThreshold);
 
     std::ostringstream oss;
@@ -722,7 +717,7 @@ void TFAnalizerModule::extractHits(genfit::TrackCand* aTC,
                                    StoreArray<PXDCluster>& pxdClusters,
                                    StoreArray<SVDCluster>& svdClusters,
                                    StoreArray<VXDTFInfoBoard>& infoBoards,
-                                   // StoreArray<TrackCandidateTFInfo>& infosTCs,
+                                   StoreArray<TrackCandidateTFInfo>& infosTCs,
                                    vector<VXDTrackCandidate>& tcVector,
                                    bool isMCTC,
                                    int index)
@@ -889,36 +884,25 @@ void TFAnalizerModule::extractHits(genfit::TrackCand* aTC,
 
     /// read additional info:
     int gfIndex = aTC->getMcTrackId();
+
+    // To be replaced
     newTC.probValue = infoBoards[gfIndex]->getProbValue();
     newTC.survivedFit = infoBoards[gfIndex]->isFitPossible();
 
-    /// read additional info:
-    // TO DO
-    //int gfIndex = aTC->getCollectorID();
+    if (m_display > 0) {
 
-    //int gfIndex = -1;
+      int currentTCID = ana_collector.getTcIDFromGfIndex(gfIndex);
 
-    // B2DEBUG(10, "Index gfIndex read: " << gfIndex << ", Size infoBoard: " << infoBoards.getEntries());
+      if (currentTCID != -1) {
+        newTC.probValue = infosTCs[currentTCID]->getProbValue();
+        newTC.survivedFit = infosTCs[currentTCID]->isFitPossible();
 
-    /*  if (gfIndex != -1 && gfIndex < infosTCs.getEntries()) {
+        B2DEBUG(10, "New probValue: " << newTC.probValue << ", Old probValue: " << infoBoards[gfIndex]->getProbValue());
 
-        // new (Display)
-        newTC.probValue = infosTCs[gfIndex]->getProbValue();
-        newTC.survivedFit = infosTCs[gfIndex]->isFitPossible();
+        B2DEBUG(10, "New survivedFit: " << newTC.survivedFit << ", Old survivedFit: " << infoBoards[gfIndex]->isFitPossible());
+      }
 
-        gfIndex = infosTCs[gfIndex]->getAssignedGFTC();
-        B2DEBUG(10, "* getAssignedGFTC: " << gfIndex);
-
-        if (gfIndex != -1 && gfIndex < infoBoards.getEntries()) {
-          // old => replace
-    //     newTC.probValue = infoBoards[gfIndex]->getProbValue();
-    //     newTC.survivedFit = infoBoards[gfIndex]->isFitPossible();
-
-          B2DEBUG(10, "New probValue: " << newTC.probValue << "Old probValue: " << infoBoards[gfIndex]->getProbValue());
-          B2DEBUG(10, "New survivedFit: " << newTC.survivedFit << "Old survivedFit: " << infoBoards[gfIndex]->isFitPossible());
-
-        }
-      }*/
+    }
 
   }
   tcVector.push_back(newTC);

@@ -21,6 +21,8 @@
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <tracking/dataobjects/VXDTFInfoBoard.h>
 
+#include <tracking/dataobjects/AnalizerCollectorTFInfo.h>
+
 //genfit-stuff
 #include <genfit/TrackCand.h>
 
@@ -72,6 +74,9 @@ namespace Belle2 {
 
       // Member Variables for Collector/Display
       int m_display;  /**< Collector operating flag: 0 = no collector, 1 = collect for display, 2 = collect for analysis */
+      AnalizerCollectorTFInfo ana_collector; /**< Object collectes/read all the Information needed for the collector*/
+
+
       std::string m_collectorFilePath; /**< File Path for the Collector */
       double m_collectorThreshold;  /**< Threshold for contaminated TC */
 
@@ -200,7 +205,7 @@ namespace Belle2 {
                        StoreArray<PXDCluster>& pxdClusters,
                        StoreArray<SVDCluster>& svdClusters,
                        StoreArray<VXDTFInfoBoard>& infoBoards,
-                       //  StoreArray<TrackCandidateTFInfo>& infosTCs,
+                       StoreArray<TrackCandidateTFInfo>& infosTCs,
                        std::vector<VXDTrackCandidate>& tcVector,
                        bool isMCTC,
                        int index);

@@ -1208,18 +1208,13 @@ void VXDTFModule::the_real_event()
 
           B2DEBUG(10, "Import TC after generateGFTrackCand")
 
-          // int pass_index, std::string diedAt, int accepted, int rejected, std::vector<int>& assignedCellIDs)
           int tcId = m_collector.importTC(passNumber, "", CollectorTFInfo::m_idAlive, vector<int>(), vector<int>(), vector<std::pair<int, unsigned int>>());
 
           int indexNumber = finalTrackCandidates.getEntries();
 
           baseLineVertexHit->setCollectorID(tcId);
 
-          // TO DO
-          //gfTC.setCollectorID(indexNumber);
-
           // Safe Information in the TC Object
-          //updateTCFitInformation (int tcid, bool fitSuccessful, double probabilityValue, int assignedGTFC)
           m_collector.updateTCFitInformation(tcId, aTC->getFitSucceeded(), aTC->getTrackQuality(), indexNumber);
 
         }
@@ -1326,7 +1321,26 @@ void VXDTFModule::the_real_event()
 
 
 
-      if (aLayerID > currentPass->highestAllowedLayer) { continue; }   // skip particle if True
+      if (aLayerID > currentPass->highestAllowedLayer) {
+
+        // importHits 1.
+        if (m_PARAMdisplayCollector > 0) {
+
+          std::vector<int> assignedIDs;
+
+          assignedIDs.push_back(clustersOfEvent[iPart].getCollectorID());
+
+          int hitID = m_collector.importHit(passNumber, CollectorTFInfo::m_nameHitFinder, CollectorTFInfo::m_idHitFinder, vector<int>(), vector<int>(), assignedIDs, aSecID, hitInfo.hitPosition, hitInfo.hitSigma);
+
+          // no hitid is saved because Hit is not used
+          B2DEBUG(100, "Hit imported = died at hitfinder (highestAllowedLayer): " << hitID);
+
+        }
+
+        continue;
+      }   // skip particle if True
+
+
       if (currentPass->detectorType not_eq Const::PXD && currentPass->detectorType not_eq Const::IR) { continue; }  // PXD is included in 0 & -1
 
       SectorNameAndPointerPair activatedSector = searchSector4Hit(aVxdID,
@@ -1343,6 +1357,22 @@ void VXDTFModule::the_real_event()
         B2DEBUG(10, "VXDTF - event " << m_eventCounter << ": pxdhit with vxdID/layerID " << aVxdID << "/" << aLayerID << " out of sector range (setup " << currentPass->sectorSetup << ", type  " << currentPass->chosenDetectorType << "). (" << FullSecID(activatedSector.first).getFullSecString() << " does not exist) Discarding hit...");
         badSectorRangeCtr++;
         m_TESTERbadSensors.push_back(FullSecID(aSecID).getFullSecString());
+
+        // importHits 2.
+        if (m_PARAMdisplayCollector > 0) {
+
+          std::vector<int> assignedIDs;
+
+          assignedIDs.push_back(clustersOfEvent[iPart].getCollectorID());
+
+          int hitID = m_collector.importHit(passNumber, CollectorTFInfo::m_nameHitFinder, CollectorTFInfo::m_idHitFinder, vector<int>(), vector<int>(), assignedIDs, aSecID, hitInfo.hitPosition, hitInfo.hitSigma);
+
+          // no hitid is saved because Hit is not used
+          B2DEBUG(100, "Hit imported = died at hitfinder: " << hitID);
+
+        }
+
+
         continue;
       }
 
@@ -1350,7 +1380,7 @@ void VXDTFModule::the_real_event()
 
       VXDTFHit* pTFHit = new VXDTFHit(hitInfo, passNumber, NULL, NULL, &clustersOfEvent[iPart], Const::PXD, aSecID, aVxdID, 0.0); // no timeInfo for PXDHits
 
-      // importHits 1.
+      // importHits 3.
       if (m_PARAMdisplayCollector > 0) {
 
         std::vector<int> assignedIDs;
@@ -1473,7 +1503,25 @@ void VXDTFModule::the_real_event()
 
       passNumber = 0;
       for (PassData * currentPass : m_passSetupVector) {
-        if (aLayerID > currentPass->highestAllowedLayer) { continue; }   // skip particle if True
+        if (aLayerID > currentPass->highestAllowedLayer) {
+
+          // importHits 4.
+          if (m_PARAMdisplayCollector > 0) {
+
+            std::vector<int> assignedIDs;
+
+            assignedIDs.push_back(clusterIndexU);
+            assignedIDs.push_back(clusterIndexV);
+
+            int hitID = m_collector.importHit(passNumber, CollectorTFInfo::m_nameHitFinder, CollectorTFInfo::m_idHitFinder, vector<int>(), vector<int>(), assignedIDs, aSecID, hitInfo.hitPosition, hitInfo.hitSigma);
+
+            // no hitid is saved because Hit is not used
+            B2DEBUG(100, "Hit imported = died at hitfinder (highestAllowedLayer): " << hitID);
+
+          }
+
+          continue;
+        }   // skip particle if True
         if (currentPass->detectorType == Const::PXD) { continue; }   // SVD is included in 1 & -1, but not in 0
 
         SectorNameAndPointerPair activatedSector = searchSector4Hit(aVxdID,
@@ -1490,6 +1538,22 @@ void VXDTFModule::the_real_event()
           B2DEBUG(10, "VXDTF - event " << m_eventCounter << ": svdhit with vxdID/layerID " << aVxdID << "/" << aLayerID << " out of sector range(setup " << currentPass->sectorSetup << ", type  " << currentPass->chosenDetectorType << "). (SecID (int/string) " << aSecID << "/" << FullSecID(aSecID).getFullSecString() << " does not exist) Discarding hit...");
           badSectorRangeCtr++;
           m_TESTERbadSensors.push_back(FullSecID(aSecID).getFullSecString());
+
+          // importHits 5.
+          if (m_PARAMdisplayCollector > 0) {
+
+            std::vector<int> assignedIDs;
+
+            assignedIDs.push_back(clusterIndexU);
+            assignedIDs.push_back(clusterIndexV);
+
+            int hitID = m_collector.importHit(passNumber, CollectorTFInfo::m_nameHitFinder, CollectorTFInfo::m_idHitFinder, vector<int>(), vector<int>(), assignedIDs, aSecID, hitInfo.hitPosition, hitInfo.hitSigma);
+
+            // no hitid is saved because Hit is not used
+            B2DEBUG(100, "Hit imported = died at hitfinder: " << hitID);
+
+          }
+
           continue;
         }
 
@@ -1497,15 +1561,13 @@ void VXDTFModule::the_real_event()
 
         VXDTFHit* pTFHit = new VXDTFHit(hitInfo, passNumber, uClusterInfo, vClusterInfo, NULL, Const::SVD, aSecID, aVxdID,  0.5 * (timeStampU + timeStampV));
 
-        // importHits 2.
+        // importHits 6.
         if (m_PARAMdisplayCollector > 0) {
 
           std::vector<int> assignedIDs;
 
           assignedIDs.push_back(clusterIndexU);
           assignedIDs.push_back(clusterIndexV);
-
-          //int pass_index, std::string died_at, int died_id, std::vector<int> accepted, std::vector<int> rejected, std::vector<int> assigned_Cluster_IDs, int sec_id, TVector3 hit_position, TVector3 hit_sigma
 
           int hit_id =  m_collector.importHit(passNumber, "", CollectorTFInfo::m_idAlive, vector<int>(), vector<int>(), assignedIDs, aSecID, hitInfo.hitPosition, hitInfo.hitSigma);
 
@@ -1975,12 +2037,8 @@ void VXDTFModule::the_real_event()
 
       B2DEBUG(10, "NEW InfoBoard tcId: " << tcId << "ProbValue: " << currentTC->getTrackQuality() << ";  isFitPossible: " << currentTC->getFitSucceeded());
 
-      //updateTCFitInformation (int tcid, bool fit_successful, double probability_value, int assigned_GTFC)
       m_collector.updateTCFitInformation(tcId, currentTC->getFitSucceeded(), currentTC->getTrackQuality(), indexNumber);
 
-      // TO DO
-      // Collector ID in gfTC to find the Object in the Collector
-      // gfTC.setCollectorID(tcId);
     }
 
 

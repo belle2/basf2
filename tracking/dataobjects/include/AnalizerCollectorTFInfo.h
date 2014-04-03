@@ -78,6 +78,10 @@ namespace Belle2 {
     /** Sets all Particle IDs and real-Information from all clusters */
     virtual void setAllParticleIDs(double boarder);
 
+    /** getter of the TCand-ID to a given gfIndex */
+    virtual int getTcIDFromGfIndex(int gfIndex);
+
+
 
   private:
 

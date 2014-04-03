@@ -590,6 +590,10 @@ void AnalizerCollectorTFInfo::storeCellInformation(std::string filename, int par
 
       myfile << endl;
 
+      for (auto & currentCoordinate : cellTFInfo[i]->getCoordinates()) {
+        B2DEBUG(100, "Cell " << i << " Coordinate: " << currentCoordinate.X() << "/" << currentCoordinate.Y() << "/" << currentCoordinate.Z());
+      }
+
     }
   }
 
@@ -715,6 +719,11 @@ void AnalizerCollectorTFInfo::storeTCInformation(std::string filename, int parti
       }
 
       myfile << endl;
+
+      for (auto & currentCoordinate : tfcandTFInfo[i]->getCoordinates()) {
+        B2DEBUG(100, "TC " << i << " Coordinate: " << currentCoordinate.X() << "/" << currentCoordinate.Y() << "/" << currentCoordinate.Z());
+      }
+
     }
   }
 
@@ -812,9 +821,44 @@ void AnalizerCollectorTFInfo::storeSectorInformation(std::string filename, bool 
 
       myfile << endl;
 
+      for (auto & currentCoordinate : sectorTFInfo[i]->getCoordinates()) {
+        B2DEBUG(100, "Sector " << i << " Coordinate: " << currentCoordinate.X() << "/" << currentCoordinate.Y() << "/" << currentCoordinate.Z());
+      }
+
     }
   }
 
   myfile.close();
 }
+
+
+
+/** getter of the TCand-ID to a given gfIndex */
+int AnalizerCollectorTFInfo::getTcIDFromGfIndex(int gfIndex)
+{
+  int tcIDCurrent = -1;
+
+  // no gfIndex
+  if (gfIndex == -1) { return tcIDCurrent; }
+
+  StoreArray<TrackCandidateTFInfo> tfcandTFInfo("");
+  int nCount = tfcandTFInfo.getEntries();
+  if (nCount == 0) {B2DEBUG(100, "getTcIDFromGfIndex: tfcandTFInfo is empty!");}
+
+  for (auto & currentTC : tfcandTFInfo) {
+
+    //Search for connected TrackCandidate
+    if (currentTC.getAssignedGFTC() == gfIndex) {
+      tcIDCurrent = currentTC.getOwnID();
+      continue;
+    }
+  }
+
+  return tcIDCurrent;
+
+}
+
+
+
+
 

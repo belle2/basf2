@@ -57,7 +57,6 @@ namespace Belle2 {
       m_points[1].SetXYZ(0., 0., 0.);
       m_points[2].SetXYZ(0., 0., 0.);
       m_points[3].SetXYZ(0., 0., 0.);
-      m_sectorID = -1;
       m_useCounter = 0;
       m_maxCounter = 0;
       m_isOnlyFriend = false;

@@ -47,6 +47,15 @@ namespace Belle2 {
 
     private:
 
+      /** Parameter dhhc<->dhh list, mapping from steering file */
+      std::vector< std::vector<int >> m_dhh_to_dhhc;
+
+//       /** mapping calculated from m_dhh_to_dhhc for easier handling */
+//       std::map <int, int> dhh_mapto_dhhc;
+
+      /** mapping calculated from m_dhh_to_dhhc for easier handling */
+      std::map <int, std::vector <int>> m_dhhc_mapto_dhh;
+
       /** Event counter */
       unsigned int m_packed_events;
       /** Trigger Nr */
@@ -72,7 +81,7 @@ namespace Belle2 {
 
       /** Pack one DHHC (several DHH) stored in one RawPXD object.
        */
-      void pack_dhhc(int dhhc_id, int dhh_mask);
+      void pack_dhhc(int dhhc_id, int dhh_mask, int* dhh_ids);
 
       /** Pack one DHH (several DHP) to buffer.
        */

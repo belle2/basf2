@@ -48,7 +48,8 @@ namespace Belle2 {
   //                 Implementation
   //-----------------------------------------------------------------
 
-  TagVertexModule::TagVertexModule() : Module()
+  TagVertexModule::TagVertexModule() : Module(),
+    m_Bfield(0), m_fitPval(0)
   {
     // Set module properties
     setDescription("Tag side Vertex Fitter for modular analysis");

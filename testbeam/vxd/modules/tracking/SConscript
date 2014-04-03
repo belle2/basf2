@@ -7,7 +7,7 @@ env['LIBS'] = [
     'pxd_dataobjects',
     'svd_dataobjects',
     'vxd_dataobjects',
-    'testbeam_dataobjects',
+    'testbeam_vxd_dataobjects',
     'cdc', 'cdc_dataobjects',
     'genfit2',
     ]

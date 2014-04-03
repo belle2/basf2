@@ -21,7 +21,7 @@ REG_MODULE(GFTrackSplitter)
 
 GFTrackSplitterModule::GFTrackSplitterModule() : Module()
 {
-  setDescription("This module unmerges GFtrack candidates separately in the CDC and the VXD for fitting purposes");
+  setDescription("VXDCDCTrackMerger helper module. This module splits an array of GFtracks in two arrays corresponding to the CDC and VXD track candidates respectively.");
   addParam("SiGFTracksColName",  m_SiGFTracksColName,  "Silicon GFTrack Ouput Collection");
   addParam("CDCGFTracksColName", m_CDCGFTracksColName, "CDC Track Output Collection");
   addParam("GFTracksColName", m_GFTracksColName, "Input GF Track Collection");

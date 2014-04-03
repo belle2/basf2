@@ -23,7 +23,7 @@ REG_MODULE(VXDCDCTrackMergerAnalysis)
 
 VXDCDCTrackMergerAnalysisModule::VXDCDCTrackMergerAnalysisModule() : Module()
 {
-  setDescription("This module merges tracks which are reconstructed, separately, in the silicon (PXD+VXD) and in the CDC");
+  setDescription("Analysis module for VXDCDCTrackMerger. This module merges tracks which are reconstructed, separately, in the silicon (PXD+VXD) and in the CDC and creates a root file.");
   addParam("CDC_wall_radius",    m_CDC_wall_radius,    "This parameters stands for either the inner or the outer CDC wall radius", double(100.0));
   //input tracks
   addParam("GFTracksColName",  m_GFTracksColName,  "Originary GFTrack collection");

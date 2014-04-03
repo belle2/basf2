@@ -18,7 +18,7 @@ REG_MODULE(TrackCandMerger)
 
 TrackCandMergerModule::TrackCandMergerModule() : Module()
 {
-  setDescription("This module merges track candidates reconstructed separately in the CDC and the VXD for fitting purposes");
+  setDescription("VXDCDCTrackMerger module helper. This module merges track candidates reconstructed separately in the CDC and the VXD for fitting purposes");
   addParam("SiTrackCandidatesColName",  m_SiTrackCandidatesColName,  "Silicon GFTrack Candidate Collection");
   addParam("CDCTrackCandidatesColName", m_CDCTrackCandidatesColName, "CDC Track Candidate Collection");
   addParam("TrackCandidatesCollection", m_TrackCandidatesCollection, "Output Track Candidate Collection");

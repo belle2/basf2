@@ -18,14 +18,17 @@
 namespace Belle2 {
 
   /**
-   * HistModule
+   * Takes care of accumulating and saving histograms, compatible with parallel processing.
+   * That is, if your module does not write into files itself, and handles all histograms using HistModule, you can set the Module::c_ParallelProcessingCertified flag.
+   *
    * Alternative to HistoModule
    * No need for an extra module in the Module Path.
-   * Inherit from this module, implement writeHists by calling Write() on your histograms in this method.
+   *
+   * Inherit from this module, implement writeHists() by calling Write() on your histograms in this method.
    * SetFilename in your initialize method.
    * Call saveHists() in terminate() of your module.
    *
-   * See HistMaker Module for an example.
+   * See HistMakerModule for an example.
    */
   class HistModule : public Module {
   public:
@@ -45,7 +48,7 @@ namespace Belle2 {
     virtual void writeHists() = 0;
 
     /**
-     * This static function is calld by the pEventProcessor to merge the histograms of different processes
+     * This static function is callied by the pEventProcessor to merge the histograms of different processes
      */
     static void mergeFiles();
 

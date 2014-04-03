@@ -34,12 +34,12 @@ namespace Belle2 {
 
     public:
       /**
-       * @param identifier which used to identify the outputted training files weights/$identifier_$method.class.C and weights/$identifier_$method.weights.xml
+       * @param prefix which used to identify the outputted training files weights/$prefix_$method.class.C and weights/$prefix_$method.weights.xml
        * @param workingDirectory where the config file and weight file directory is stored
        * @param target the name of the target variable (registered in VariableManager), which is used as expected output for the chosen TMVA method
        * @param methods vector of Method
        */
-      Teacher(std::string identifier, std::string workingDirectory, std::string target, std::vector<Method> methods);
+      Teacher(std::string prefix, std::string workingDirectory, std::string target, std::vector<Method> methods);
 
       /**
        * Disallow copy
@@ -71,7 +71,7 @@ namespace Belle2 {
 
 
     private:
-      std::string m_identifier; /**< used to identify the outputted training files weights/$identifier_$method.class.C and weights/$identifier_$method.weights.xml */
+      std::string m_prefix; /**< used to identify the outputted training files weights/$prefix_$method.class.C and weights/$prefix_$method.weights.xml */
       std::string m_workingDirectory; /**< workingDirectory where the config file and weight file directory is stored */
       std::vector<Method> m_methods; /**< Name, Type and Config of methods */
 

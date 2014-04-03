@@ -29,7 +29,7 @@ namespace Belle2 {
 
   namespace TMVAInterface {
 
-    Teacher::Teacher(std::string identifier, std::string workingDirectory, std::string target, std::vector<Method> methods) : m_identifier(identifier), m_workingDirectory(workingDirectory), m_methods(methods)
+    Teacher::Teacher(std::string prefix, std::string workingDirectory, std::string target, std::vector<Method> methods) : m_prefix(prefix), m_workingDirectory(workingDirectory), m_methods(methods)
     {
 
       const auto& variables = m_methods[0].getVariables();
@@ -44,7 +44,7 @@ namespace Belle2 {
       m_target = 0;
 
       // Create new tree which stores the niput and target variable
-      m_tree = new TTree((m_identifier + "_tree").c_str(), (m_identifier + "_tree").c_str());
+      m_tree = new TTree((m_prefix + "_tree").c_str(), (m_prefix + "_tree").c_str());
       for (unsigned int i = 0; i < variables.size(); ++i)
         m_tree->Branch(variables[i]->name.c_str(), &m_input[i]);
       m_tree->Branch(m_target_var->name.c_str(), &m_target);
@@ -111,15 +111,15 @@ namespace Belle2 {
           std::stringstream bckgrd;
           signal << x.first;
           bckgrd << y.first;
-          std::string identifier = m_identifier + "_" + signal.str() + "_vs_" + bckgrd.str();
+          std::string prefix = m_prefix + "_" + signal.str() + "_vs_" + bckgrd.str();
 
-          TFile* file = TFile::Open((identifier + ".root").c_str(), "RECREATE");
+          TFile* file = TFile::Open((prefix + ".root").c_str(), "RECREATE");
           {
 
             boost::property_tree::ptree node;
             // Intitialize TMVA and ROOT stuff
             TMVA::Tools::Instance();
-            TMVA::Factory factory(identifier, file, factoryOption);
+            TMVA::Factory factory(prefix, file, factoryOption);
 
             // Add variables to the factory
             for (auto & var : m_methods[0].getVariables()) {
@@ -136,7 +136,7 @@ namespace Belle2 {
               method_node.put("SignalID", x.first);
               method_node.put("BackgroundID", y.first);
               method_node.put("MethodName", method.getName());
-              method_node.put("Weightfile", std::string("weights/") + identifier + std::string("_") + method.getName() + std::string(".weights.xml"));
+              method_node.put("Weightfile", std::string("weights/") + prefix + std::string("_") + method.getName() + std::string(".weights.xml"));
               factory.BookMethod(method.getType(), method.getName(), method.getConfig());
               node.add_child("Methods.Method", method_node);
             }
@@ -154,7 +154,7 @@ namespace Belle2 {
       }
 
       boost::property_tree::xml_writer_settings<char> settings('\t', 1);
-      boost::property_tree::xml_parser::write_xml(m_identifier + ".config", pt, std::locale(), settings);
+      boost::property_tree::xml_parser::write_xml(m_prefix + ".config", pt, std::locale(), settings);
       gSystem->ChangeDirectory(oldDirectory.c_str());
     }
   }

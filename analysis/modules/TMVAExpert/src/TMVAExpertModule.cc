@@ -29,7 +29,8 @@ namespace Belle2 {
   {
     setDescription("Adds an ExtraInfo to the Particle objects in given ParticleLists. The ExtraInfo is calculated by a TMVA method "
                    "and represents the SignalProbability of the Particle with respect to the training. "
-                   "Requires existing training for the specified method via TMVATeacher.");
+                   "Requires existing training for the specified method via TMVATeacher. "
+                   "See also https://belle2.cc.kek.jp/~twiki/bin/view/Software/TMVA for detailed instructions.");
     setPropertyFlags(c_ParallelProcessingCertified);
 
     addParam("listNames", m_listNames, "Input particle list names as list");

@@ -17,7 +17,10 @@ namespace Belle2 {
   class TMVATeacher;
 
   /**
-   * This module trains a multivariate analysis method with the given particle lists as training samples
+   * This module trains a TMVA method with the given particle lists as training samples.  The target variable has to be a
+   * discrete integer valued variable (although the VariableManager returns the value as a float) which defines the clusters
+   * in the sample. All the clusters are trained against each other.
+   * You can apply a trained TMVAMethod with the TMVAExpertModule and calculate the SignalProbability for the Particles in a ParticleList.
    */
 
   class TMVATeacherModule : public Module {
@@ -63,9 +66,9 @@ namespace Belle2 {
 
     std::vector<std::string> m_listNames; /**< input particle list names */
     std::vector<std::string> m_variables; /**< input variables for the TMVA method */
-    std::string m_target; /**< target used by multivariate analysis method */
+    std::string m_target; /**< target used by multivariate analysis method has to be integer valued variable which defines clusters in the sample. */
     std::vector<std::tuple<std::string, std::string, std::string>> m_methods; /**< tuple(name, type, config) for every method */
-    std::string m_identifier; /**< identifier name for the files created by the TMVAInterface and the TMVA method */
+    std::string m_methodPrefix; /**< common prefix for the methods trained by TMVATeacher */
     std::string m_workingDirectory; /**< Working directory in which the config file and the weight file directory is created */
     std::string m_factoryOption; /**< Options which are passed to the TMVA Factory */
     std::string m_prepareOption; /**< Options which are passed to the TMVA Factory::PrepareTrainingAndTestTree */

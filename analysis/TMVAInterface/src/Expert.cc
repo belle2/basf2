@@ -26,7 +26,7 @@ namespace Belle2 {
 
   namespace TMVAInterface {
 
-    Expert::Expert(std::string identifier, std::string workingDirectory, std::string methodName, int signalCluster) : m_signalCluster(signalCluster)
+    Expert::Expert(std::string prefix, std::string workingDirectory, std::string methodName, int signalCluster) : m_signalCluster(signalCluster)
     {
 
       // Change directory to user defined working directory
@@ -37,7 +37,7 @@ namespace Belle2 {
       TMVA::Tools::Instance();
 
       // Open configfile
-      std::string configfile = identifier + ".config";
+      std::string configfile = prefix + ".config";
       std::ifstream configstream(configfile);
       if (not configstream.good()) {
         B2ERROR("Couldn't open configfile" << configfile)

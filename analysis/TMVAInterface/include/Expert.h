@@ -36,12 +36,12 @@ namespace Belle2 {
     public:
 
       /**
-       * @param identifier which used to identify the outputted training files weights/$identifier_$method.class.C and weights/$identifier_$method.weights.xml
+       * @param prefix which used to identify the outputted training files weights/$prefix_$method.class.C and weights/$prefix_$method.weights.xml
        * @param workingDirectory where the config file and weight file directory is stored
        * @param methodName name of the method which is used by this expert
        * @param signalCluster Number of the cluster which is considered as signal
        */
-      Expert(std::string identifier, std::string workingDirectory, std::string methodName, int signalCluster);
+      Expert(std::string prefix, std::string workingDirectory, std::string methodName, int signalCluster);
 
       /**
        * Disallow copy

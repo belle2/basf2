@@ -68,6 +68,8 @@ namespace Belle2 {
     std::string m_cdcHitsColName;                    /**< CDCHits collection name */
     std::string m_svdHitsColName;                    /**< SVDHits collection name */
     std::string m_pxdHitsColName;                    /**< PXDHits collection name */
+    std::string m_telHitsColName;                    /**< TelHits collection name */
+
     std::string m_gfTrackCandsColName;               /**< genfit::TrackCandidates collection name */
     std::string m_mcParticlesColName;                /**< MCParticles collection name */
 

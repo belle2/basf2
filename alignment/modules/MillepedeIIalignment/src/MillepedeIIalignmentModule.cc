@@ -63,10 +63,9 @@ bool MillepedeIIalignmentModule::MillepedeIIalignmentExecutePede()
         //positions << (unsigned int) id << ": x = " << detPos[0] << " y = " << detPos[1] << " z = " << detPos[2] << endl;
 
         const double* trans = geo.get(id).getTransformation().GetRotationMatrix();
-        TMatrixD R(3, 3);
         for (int i = 0; i < 3; i++) {
           for (int j = 0; j < 3; j++) {
-            R(i, j) = trans[i + j];
+            rotationT(i, j) = trans[3 * i + j];
           }
         }
         //R.Print();
@@ -75,15 +74,15 @@ bool MillepedeIIalignmentModule::MillepedeIIalignmentExecutePede()
         double zDet = detPos[2];
         double phi = atan2(yDet, xDet);
         //if (phi < 0.) phi = phi + TMath::Pi();
-        double sinPhi = sin(phi);
-        double cosPhi = cos(phi);
+        //double sinPhi = sin(phi);
+        //double cosPhi = cos(phi);
 
-        rotationT.Zero();
-        rotationT(0, 0) = - sinPhi;
-        rotationT(0, 2) = cosPhi;
-        rotationT(1, 0) = cosPhi;
-        rotationT(1, 2) = sinPhi;
-        rotationT(2, 1) = 1.;
+        //rotationT.Zero();
+        //rotationT(0, 0) = - sinPhi;
+        //rotationT(0, 2) = cosPhi;
+        //rotationT(1, 0) = cosPhi;
+        //rotationT(1, 2) = sinPhi;
+        //rotationT(2, 1) = 1.;
 
         offset.Zero();
         offset(0, 1) = - zDet;
@@ -205,8 +204,8 @@ bool MillepedeIIalignmentModule::MillepedeIIalignmentReadXML(const string& xml_f
 void MillepedeIIalignmentModule::readResWriteXml(const string& xml_filename, int type)
 {
 
-  double ranSigmaShift = 0.05;
-  double ranSigmaAngle = 0.005;
+  double ranSigmaShift = 0.01;
+  double ranSigmaAngle = 0.001;
 
   ofstream xml(xml_filename);
   string line;

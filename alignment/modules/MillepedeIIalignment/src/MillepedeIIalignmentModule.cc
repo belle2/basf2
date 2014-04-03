@@ -72,7 +72,7 @@ bool MillepedeIIalignmentModule::MillepedeIIalignmentExecutePede()
         double xDet = detPos[0];
         double yDet = detPos[1];
         double zDet = detPos[2];
-        double phi = atan2(yDet, xDet);
+        //double phi = atan2(yDet, xDet);
         //if (phi < 0.) phi = phi + TMath::Pi();
         //double sinPhi = sin(phi);
         //double cosPhi = cos(phi);
@@ -122,59 +122,6 @@ bool MillepedeIIalignmentModule::MillepedeIIalignmentExecutePede()
   }
   f.close();
 
-  /*
-   * Original python code from Claus Kleinwort (DESY):
-   p h*iSectors = det[0]
-   dphiSec = 2.0 * math.pi / phiSectors
-   zSectors = det[1]
-   dz = det[5]
-   zOff = det[7]
-   zLen = 0.5 * dz * zSectors
-   label = int(layer[0][-1]) * 100
-   #print layer[0], radius, phiSectors, zSectors, label
-   for iz in range(zSectors):
-     zDet = dz * (iz + 0.5) - zLen + zOff
-     for iphi in range(phiSectors):
-       phi = dphiSec * iphi
-       #print label + 20 * iz + iphi, radius, phi, zDet
-       # detector position
-       sinPhi = math.sin(phi)
-       cosPhi = math.cos(phi)
-       xDet = radius * cosPhi
-       yDet = radius * sinPhi
-       # (transposed) rotation matrix (of local system)
-       rotationT = np.zeros((3, 3))
-       rotationT[0, 0] = -sinPhi
-       rotationT[0, 2] = cosPhi
-       rotationT[1, 0] = cosPhi
-       rotationT[1, 2] = sinPhi
-       rotationT[2, 1] = 1.
-       # (rotation) offsets (of local system)
-       offset = np.zeros((3, 3))
-       offset[0, 1] = -zDet
-       offset[0, 2] = yDet
-       offset[1, 0] = zDet
-       offset[1, 2] = -xDet
-       offset[2, 0] = -yDet
-       offset[2, 1] = xDet
-       # transformation local to global (details: thesis Markus Stoye, Hamburg 2007)
-       loc2glo = np.zeros((6, 6))
-       loc2glo[0:3, 0:3] = rotationT
-       loc2glo[0:3, 3:6] = -np.dot(offset, rotationT)
-       loc2glo[3:6, 3:6] = rotationT
-       matList.append((label + 20 * iz + iphi, loc2glo))
-
-       f = open(textFile, 'w')
-       for iCon, comment in enumerate(["x-shift", "y-shift", "z-shift", "x-rot", "y-rot", "z-rot"]):
-         f.write('\n')
-         f.write("Constraint  0. ! {0}\n".format(comment))
-         for (l, mat) in matList:
-           for iPar in range(6):
-             if abs(mat[iCon, iPar]) > 1.0E-14:
-               f.write("{0} {1}\n".format(l * 10 + iPar + 1, mat[iCon, iPar]))
-               f.close()
-
-  */
   std::cout << "Starting Millepede II Alignment..." << std::endl;
   // store start time of processing
   // time(&MP2startTime);

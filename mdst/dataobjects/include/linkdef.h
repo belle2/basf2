@@ -29,6 +29,5 @@
 
 
 #pragma link C++ class Belle2::TRGSummary+;
-#pragma link C++ class Belle2::TRGTiming+;
 
 #endif

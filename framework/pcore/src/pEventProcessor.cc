@@ -65,7 +65,8 @@ static void signalHandler(int signal)
 }
 
 pEventProcessor::pEventProcessor(PathManager& pathManager) : EventProcessor(pathManager),
-  m_procHandler(new ProcHandler())
+  m_procHandler(new ProcHandler()),
+  m_enableRBClearing(true)
 {
   g_pEventProcessor = this;
 }
@@ -78,10 +79,12 @@ pEventProcessor::~pEventProcessor()
 
 void pEventProcessor::sendTerminationMessage(RingBuffer* rb)
 {
+  m_enableRBClearing = false;
   EvtMessage term(NULL, 0, MSG_TERMINATE);
   while (rb->insq((int*)term.buffer(), term.paddedSize()) < 0) {
     usleep(20);
   }
+  m_enableRBClearing = true;
 }
 
 
@@ -90,7 +93,9 @@ void pEventProcessor::gotSigINT()
   static int numSigInts = 0;
   if (numSigInts == 0) {
     EventProcessor::writeToStdErr("\nStopping basf2 after all events in buffer are processed. Press Ctrl+C a second time to discard half-processed events.\n");
-  } else {
+    //SIGINT is handled independently by input process, so we don't need to do anything special
+  } else if (m_enableRBClearing) {
+    m_enableRBClearing = false;
     EventProcessor::writeToStdErr("\nDiscarding pending events for quicker termination... \n");
     //clear ringbuffers and add terminate message
     const int numProcesses = Environment::Instance().getNumberProcesses();
@@ -104,6 +109,9 @@ void pEventProcessor::gotSigINT()
       rb->clear();
       sendTerminationMessage(rb);
     }
+    m_enableRBClearing = true;
+  } else {
+    //our process is currently using the RingBuffers, so don't do anything
   }
   numSigInts++;
 }
@@ -275,6 +283,11 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
     }
     m_procHandler->waitForOutputProcesses();
     B2INFO("All processes completed");
+
+    //finished, disable handler again
+    if (signal(SIGINT, SIG_IGN) == SIG_ERR) {
+      B2FATAL("Cannot ignore SIGINT signal handler\n");
+    }
 
     HistModule::mergeFiles();
 

@@ -73,7 +73,7 @@ namespace Belle2 {
     void clearFileList();
 
     /** Insert a termination message at the end of the given RingBuffer. */
-    static void sendTerminationMessage(RingBuffer* rb);
+    void sendTerminationMessage(RingBuffer* rb);
 
 
     /** Extract modules to be initialized in main process */
@@ -109,6 +109,12 @@ namespace Belle2 {
     bool m_histoManagerFound;
     /** Pointer to HistoManagerModule, if m_histoManagerFound is set */
     ModulePtr m_histoman;
+
+    /** if false, SIGINT handler will not clear RingBuffers.
+     *
+     * Only set to true in sections using only safe functions (see signal(7)), e.g. waitForProcesses() calls
+     */
+    bool m_enableRBClearing;
 
   };
 

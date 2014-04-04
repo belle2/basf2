@@ -13,7 +13,7 @@
 
 #include "skim/hlt/modules/level3/L3TriggerManager.h"
 #include "skim/hlt/dataobjects/L3Tag.h"
-#include "rawdata/dataobjects/HLTTag.h"
+#include "mdst/dataobjects/HLTTag.h"
 
 #include "skim/hlt/modules/level3/L3TrackTrigger.h"
 #include "skim/hlt/modules/level3/L3EnergyTrigger.h"

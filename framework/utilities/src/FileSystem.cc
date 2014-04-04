@@ -75,6 +75,9 @@ namespace Belle2 {
       //check in central release directory
       else if (reldir and fileExists(fullpath = (fs::path(reldir) / path).string()))
         return fullpath;
+      //check if this thing exists as normal path (absolute / relative to PWD)
+      else if (fileExists(fullpath = (fs::absolute(path).string())))
+        return fullpath;
       //nothing found
       else
         return string("");

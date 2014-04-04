@@ -190,7 +190,6 @@ void LogSystem::printErrorSummary()
   B2INFO("Error summary: " << numLogError << " errors and " << numLogWarn << " warnings occurred.");
 
 
-
   //start with 100 entries in hash map
   std::function<size_t (const LogMessage&)> hashFunction = &hash;
   std::unordered_map<LogMessage, int, decltype(hashFunction)> errorCount(100, hashFunction);
@@ -217,6 +216,7 @@ void LogSystem::printErrorSummary()
   }
   B2INFO("================================================================================\n");
 
+  m_printErrorSummary = false; // only do this once (e.g. not again when used through python)
   m_logConfig = oldConfig;
 }
 

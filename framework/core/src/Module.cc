@@ -91,6 +91,11 @@ void Module::if_false(boost::shared_ptr<Path> path, EAfterConditionPath afterCon
   if_value("<1", path, afterConditionPath);
 }
 
+void Module::if_true(boost::shared_ptr<Path> path, EAfterConditionPath afterConditionPath)
+{
+  if_value(">=1", path, afterConditionPath);
+}
+
 
 bool Module::evalCondition()
 {
@@ -201,6 +206,7 @@ boost::python::list _getParamInfoListPython(const Module* m)
 
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(if_value_overloads, if_value, 2, 3)
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(if_false_overloads, if_false, 1, 2)
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(if_true_overloads, if_true, 1, 2)
 
 
 void Module::exposePythonAPI()
@@ -222,6 +228,7 @@ void Module::exposePythonAPI()
   .def("package", &Module::getPackage, return_value_policy<copy_const_reference>())
   .def("if_value", &Module::if_value, if_value_overloads())
   .def("if_false", &Module::if_false, if_false_overloads())
+  .def("if_true", &Module::if_true, if_true_overloads())
   .def("param", &Module::setParamPython)
   .def("param", &Module::setParamPythonDict)
   .def("available_params", &_getParamInfoListPython)

@@ -105,7 +105,7 @@ main.add_module(returnfalse1)
 returnfalse2 = ReturnFalse()
 returnfalse2_condition_path = create_path()
 returnfalse2_condition_path.add_module(PrintName('ReturnFalse2Condition'))
-returnfalse2.if_value('>=1', returnfalse2_condition_path)
+returnfalse2.if_true(returnfalse2_condition_path)
 
 main.add_module(PrintName("final"))
 

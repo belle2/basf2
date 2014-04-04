@@ -259,6 +259,21 @@ namespace Belle2 {
     void if_false(boost::shared_ptr<Path> path, EAfterConditionPath afterConditionPath = EAfterConditionPath::c_End);
 
     /**
+     * A simplified version to set the condition of the module.
+     *
+     * Please be careful: Avoid creating cyclic paths, e.g. by linking a condition
+     * to a path which is processed before the path where this module is
+     * located in.
+     *
+     * It is equivalent to the if_value() method, using the expression ">=1".
+     * This method is meant to be used together with the setReturnValue(bool value) method.
+     *
+     * @param path Shared pointer to the Path which will be executed if the return value is _false_.
+     * @param afterConditionPath  What to do after executing 'path'.
+     */
+    void if_true(boost::shared_ptr<Path> path, EAfterConditionPath afterConditionPath = EAfterConditionPath::c_End);
+
+    /**
      * Returns true if a condition was set for the module.
      */
     bool hasCondition() const { return m_hasCondition; };

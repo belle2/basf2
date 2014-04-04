@@ -294,12 +294,12 @@ namespace Belle2 {
 
     TMatrixFSym getError4x4() const {
       TMatrixFSym errorecl(3);
-      errorecl[0][0] = m_Error[0];  //Energy
+      errorecl[0][0] = m_Error[0] * m_Error[0]; //Energy
       errorecl[1][0] = m_Error[1];
-      errorecl[1][1] = m_Error[2]; // Phi
+      errorecl[1][1] = m_Error[2] * m_Error[2]; // Phi
       errorecl[2][0] = m_Error[3];
       errorecl[2][1] = m_Error[4];
-      errorecl[2][2] = m_Error[5]; // Theta
+      errorecl[2][2] = m_Error[5] * m_Error[5]; // Theta
 
       TMatrixF  jacobian(4, 3);
       float  cosPhi = cos(m_Phi);
@@ -331,12 +331,12 @@ namespace Belle2 {
      */
     TMatrixFSym getError7x7() const {
       TMatrixFSym errorecl(3);
-      errorecl[0][0] = m_Error[0]; //Energy
+      errorecl[0][0] = m_Error[0] * m_Error[0]; //Energy
       errorecl[1][0] = m_Error[1];
-      errorecl[1][1] = m_Error[2]; // Phi
+      errorecl[1][1] = m_Error[2] * m_Error[2]; // Phi
       errorecl[2][0] = m_Error[3];
       errorecl[2][1] = m_Error[4];
-      errorecl[2][2] = m_Error[5]; // Theta
+      errorecl[2][2] = m_Error[5] * m_Error[5]; // Theta
 
       TMatrixFSym ErrorMatrix(7);
       TMatrixF  jacobian(4, 3);
@@ -381,12 +381,12 @@ namespace Belle2 {
 
     TMatrixFSym getError3x3() const {
       TMatrixFSym errorecl(3);
-      errorecl[0][0] = m_Error[0]; //Energy
+      errorecl[0][0] = m_Error[0] * m_Error[0]; //Energy
       errorecl[1][0] = m_Error[1];
-      errorecl[1][1] = m_Error[2]; // Phi
+      errorecl[1][1] = m_Error[2] * m_Error[2]; // Phi
       errorecl[2][0] = m_Error[3];
       errorecl[2][1] = m_Error[4];
-      errorecl[2][2] = m_Error[5]; // Theta
+      errorecl[2][2] = m_Error[5] * m_Error[5]; // Theta
       return errorecl;
     }
 

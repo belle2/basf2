@@ -13,7 +13,7 @@
 #include <vector>
 
 #include <framework/core/Module.h>
-#include <rawdata/dataobjects/HLTTag.h>
+#include <mdst/dataobjects/HLTTag.h>
 
 
 namespace Belle2 {

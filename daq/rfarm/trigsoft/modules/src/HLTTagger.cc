@@ -11,7 +11,7 @@
 
 #include "daq/rfarm/trigsoft/modules/HLTTagger.h"
 #include "framework/datastore/StoreObjPtr.h"
-#include "rawdata/dataobjects/HLTTag.h"
+#include "mdst/dataobjects/HLTTag.h"
 
 using namespace std;
 using namespace Belle2;

@@ -6,7 +6,8 @@
 // Date : 31 - Dec - 2013
 //-
 
-#include "rawdata/dataobjects/HLTTag.h"
+//#include "rawdata/dataobjects/HLTTag.h"
+#include "mdst/dataobjects/HLTTag.h"
 
 using namespace Belle2;
 using namespace std;

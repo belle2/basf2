@@ -20,6 +20,6 @@
 #pragma link C++ class Belle2::RawPXD+;
 
 
-#pragma link C++ class Belle2::HLTTag+;
+
 
 #endif

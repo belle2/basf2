@@ -302,6 +302,7 @@ unsigned int RawCOPPER::GetB2LFEE32bitEventNumber(int n)
 
 
 
+
 unsigned int  RawCOPPER::CalcXORChecksum(int* buf, int nwords)
 {
   unsigned int checksum = 0;

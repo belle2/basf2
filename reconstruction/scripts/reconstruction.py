@@ -197,7 +197,7 @@ def add_mdst_output(path, mc=True, filename='mdst.root'):
         'ECLPi0s',
         'ECLPi0sToECLGammas',
         'ECLClusters',
-        'TracksToECLClusters',
+        'ECLClustersToTracks',
         'K0Ls',
         'TRGSummary',
         ]

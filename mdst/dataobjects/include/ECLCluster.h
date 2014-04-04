@@ -166,6 +166,7 @@ namespace Belle2 {
     /*! Return Phi of Shower (radian)
      */
     float getPhi() const { return m_Phi;}
+
     /*! Return R
      */
     float getR() const { return m_R ; }
@@ -231,19 +232,19 @@ namespace Belle2 {
 
     /*! Return Px (GeV/c)
      */
-    float getPx() {
+    float getPx() const {
       return float(m_Energy * sin(m_Theta) * cos(m_Phi));
     }
 
     /*! Return Py (GeV/c)
      */
-    float getPy() {
+    float getPy() const {
       return float(m_Energy * sin(m_Theta) * sin(m_Phi));
     }
 
     /*! Return Pz (GeV/c)
      */
-    float getPz() {
+    float getPz() const {
       return float(m_Energy * cos(m_Theta));
     }
 
@@ -412,23 +413,23 @@ namespace Belle2 {
 
     /*! Return pi0Likelihood for a shower (for future, Not available now)
      */
-    float getpi0Likelihood() {
+    float getpi0Likelihood() const {
       return 0.5;
     }
     /*! Return etaLikelihood for a shower (for future, Not available now)
      */
-    float getetaLikelihood() {
+    float getetaLikelihood() const {
       return 0.5;
     }
 
     /*! Return deltaL for shower shape (for future, Not available now)
      */
-    float getdeltaL() {
+    float getdeltaL() const {
       return 0;
     }
     /*! Return beta for shower shape (for future, Not available now)
      */
-    float getbeta() {
+    float getbeta() const {
       return 0;
     }
 

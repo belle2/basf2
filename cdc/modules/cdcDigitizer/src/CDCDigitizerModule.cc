@@ -35,7 +35,7 @@ CDCDigitizerModule::CDCDigitizerModule() : Module()
 {
   // Set description
   setDescription("Creates CDCHits from CDCSimHits.");
-  setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
+  setPropertyFlags(c_ParallelProcessingCertified);
 
   // Add parameters
   // I/O

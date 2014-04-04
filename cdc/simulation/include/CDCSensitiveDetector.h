@@ -197,11 +197,13 @@ namespace Belle2 {
       */
       void GCUBS(const G4double x, const G4double y, const G4double d1, const G4double d2, G4double a[4]);
 
-      //! Calculates a rotation matrix in advance at a local position in lab.
-      /*!
-        The rotation is done about the coord. origin; lab.-frame to B-field
-        frame in which only Bz-comp. is non-zero.
-      */
+      /**
+       * Calculates a rotation matrix.
+       * Calculates a rotation matrix. in advance at a local position in lab.
+       * frame.
+       * The rotation is done about the coord. origin; lab.-frame to B-field
+       * frame in which only Bz-comp. is non-zero.
+       */
       void for_Rotat(const G4double bfld[3]);
 
       /**
@@ -282,7 +284,7 @@ namespace Belle2 {
       void Mvopr(const G4int ndim, const G4double b[3], const G4double m[3][3],
                  const G4double a[3], G4double c[3], const G4int mode);
 
-      //! Sort wire id
+      //! Sort wire id.
       std::vector<int>  WireId_in_hit_order(int id0, int id1, int nWires);
 
       /**
@@ -290,8 +292,8 @@ namespace Belle2 {
        * 0: uniform B field (1.5 T), 1: non-uniform B field.
        */
       G4int m_nonUniformField;
-      G4double alpha;       /**< Helix parameter alpha     */
-      G4double brot[3][3];
+      G4double alpha;       /*!< Helix parameter alpha.     */
+      G4double brot[3][3];  /*!< a rotation matrix. */
 
     private:
 

@@ -573,17 +573,17 @@ namespace Belle2 {
 
       double m_WirSagCoef[MAX_N_SLAYERS][MAX_N_SCELLS]; /*!< Wire sag coeffients for each layer and cell. */
 
-      double m_XT[MAX_N_SLAYERS][2][19][7][9];  /*! XT-relation coefficients for each layer, Left and Right etc. */
-      double m_Sigma[MAX_N_SLAYERS][7];      /*! position resulution for each layer */
-      double m_PropSpeedInv[MAX_N_SLAYERS];  /*! Inverse of propagation speed of the sense wire. */
+      double m_XT[MAX_N_SLAYERS][2][19][7][9];  /*!< XT-relation coefficients for each layer, Left/Right, entrance angle and polar angle.  */
+      double m_Sigma[MAX_N_SLAYERS][7];      /*!< position resulution for each layer. */
+      double m_PropSpeedInv[MAX_N_SLAYERS];  /*!< Inverse of propagation speed of the sense wire. */
 
-      unsigned short m_tdcOffset;  /*! TDC off set value (default = 0) .*/
-      double m_tdcBinWidth;        /*! TDC bin width (1 nsec/bin). */
-      double m_nominalDriftV;      /*! Nominal drift velocity (4.0x10^-3 cm/nsec). */
-      double m_nominalDriftVInv;   /*! Inverse of the nominal drift velocity. */
-      double m_nominalPropSpeed;   /*! Nominal propagation speed of the sense wire (27.25 cm/nsec). */
-      double m_nominalSpaceResol;  /*! Nominal spacial resolution (0.0130 cm). */
-      double m_maxSpaceResol;      /*! 10 times Nominal spacial resolution. */
+      unsigned short m_tdcOffset;  /*!< TDC off set value (default = 0).*/
+      double m_tdcBinWidth;        /*!< TDC bin width (1 nsec/bin). */
+      double m_nominalDriftV;      /*!< Nominal drift velocity (4.0x10^-3 cm/nsec). */
+      double m_nominalDriftVInv;   /*!< Inverse of the nominal drift velocity. */
+      double m_nominalPropSpeed;   /*!< Nominal propagation speed of the sense wire (27.25 cm/nsec). */
+      double m_nominalSpaceResol;  /*!< Nominal spacial resolution (0.0130 cm). */
+      double m_maxSpaceResol;      /*!< 10 times Nominal spacial resolution. */
 
       static CDCGeometryPar* m_B4CDCGeometryParDB; /*!< Pointer that saves the instance of this class. */
 

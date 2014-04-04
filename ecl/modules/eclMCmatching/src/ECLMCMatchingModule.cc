@@ -25,6 +25,7 @@
 #include <ecl/dataobjects/ECLGamma.h>
 #include <ecl/dataobjects/ECLPi0.h>
 
+#include <mdst/dataobjects/ECLCluster.h>
 
 #include <mdst/dataobjects/MCParticle.h>
 #include <framework/datastore/RelationArray.h>
@@ -81,8 +82,7 @@ void ECLMCMatchingModule::initialize()
   RelationArray::registerPersistent<ECLHit, MCParticle>("", "");
   RelationArray::registerPersistent<ECLDigit, MCParticle>("", "");
   RelationArray::registerPersistent<ECLShower, MCParticle>("", "");
-
-
+  RelationArray::registerPersistent<ECLCluster, MCParticle>("", "");
 
 }
 
@@ -234,6 +234,39 @@ void ECLMCMatchingModule::event()
       eclShowerToMCPart.add(showerId, PrimaryIndex);
     }
   }//ShowerNum
+
+
+  //... Related ECLClustertoMCParticle
+  //... First get relation of ECLCluster to ECLShower
+  //... Then exploit already available ECLShower relation to MCParticle
+  //... get the index of MCParticle from the relation of ECLShower
+  //... and use it to relate ECLCluster to MCParticle
+  //... ECLCLuster --> ECLShower --> getShowerId()
+  //... ECLShower(ShowerId() --> MCParticle --> getIndex();
+  //... ECLCluster -> related to --> MCParticle
+  //... Vishal
+
+  StoreArray<ECLCluster> eclClusterArray;
+  RelationArray ECLClustertoMCPart(eclClusterArray, mcParticles);
+
+
+  for (int imdst = 0; imdst < eclClusterArray.getEntries(); ++imdst) {
+    const ECLCluster* cluster = eclClusterArray[imdst];
+    for (auto eclShower : cluster->getRelationsTo<ECLShower>()) {
+      ECLShower* veclShower = eclRecShowerArray[eclShower.getShowerId()];
+      //const ECLShower *shower = ecl
+      for (auto MCpart : veclShower->getRelationsTo<MCParticle>()) {
+        ECLClustertoMCPart.add(imdst, MCpart.getIndex());
+      }
+    }
+  } // imdst
+
+  //.. End here ECLtoMCparticle relation
+
+
+
+
+
 
   /*
     StoreArray<ECLGamma> gammaArray;

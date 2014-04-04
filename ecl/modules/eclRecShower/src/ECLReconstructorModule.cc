@@ -85,6 +85,8 @@ void ECLReconstructorModule::initialize()
 
   StoreArray<ECLCluster>::registerPersistent();
   RelationArray::registerPersistent<ECLCluster, ECLShower>("", "");
+  RelationArray::registerPersistent<ECLCluster, Track>("", "");
+
 
 
 }
@@ -108,6 +110,8 @@ void ECLReconstructorModule::event()
   //Fill information with extrapolate..
   //.. Vishal
   readExtrapolate();
+  StoreArray<Track> Tracks;
+
 
 
   cout.unsetf(ios::scientific);
@@ -123,7 +127,7 @@ void ECLReconstructorModule::event()
     float FitEnergy    = (aECLDigi->getAmp()) / 20000.;//ADC count to GeV
     //float FitTime      =  (1520 - aECLDigi->getTimeFit())*24.*12/508/(3072/2) ;//in us
 
-    int cId          = (aECLDigi->getCellId() - 1);
+    int cId         = (aECLDigi->getCellId() - 1);
     if (FitEnergy < 0.) {continue;}
 
     cf.Accumulate(m_nEvent, FitEnergy, cId);
@@ -147,7 +151,17 @@ void ECLReconstructorModule::event()
       double v_HiEnergy = -9999999;
       double v_TIME = -10;
       // bool  i_extMatch = false;
-      int m_NofTracks = 0;
+      int v_NofTracks = 0;
+
+
+      //... This is where the ECLCluster dataobject is filled
+      //... i_Mdst is simply the number and used to relate with ECLShower
+      //... Vishal
+      StoreArray<ECLCluster> eclMdstArray;
+      if (!eclMdstArray) eclMdstArray.create();
+      new(eclMdstArray.nextFreeAddress()) ECLCluster();
+      int i_Mdst = eclMdstArray.getEntries() - 1;
+
 
       std::vector<MEclCFShowerHA> HAs = iSh.HitAssignment();
       for (std::vector<MEclCFShowerHA>::iterator iHA = HAs.begin();
@@ -161,10 +175,19 @@ void ECLReconstructorModule::event()
         eclHaArray[m_HANum]->setShowerId(nShower);
         eclHaArray[m_HANum]->setCellId(iHA->Id() + 1);
 
+
         //... Below simply check for the TrackCellid for particular id
         //... Based on tracks, it count the number of tracks
+        //... Also related to the id of the track which is filled to
+        //... m_TrackCellId[] in ECLReconstructorModule::readExtrapolate()
         //... Vishal
-        if (m_TrackCellId[iHA->Id() + 1] >= 0) { ++m_NofTracks; }
+
+        RelationArray ECLClustertoTracks(eclMdstArray, Tracks);
+        if (m_TrackCellId[iHA->Id() + 1] >= 0) {
+          ECLClustertoTracks.add(i_Mdst, m_TrackCellId[iHA->Id() + 1]);
+          ++v_NofTracks;
+        }
+
 
         //... To get ECLDigit information for particular shower
         //... in order to get FitEnergy and FitTime for each crystal
@@ -181,8 +204,8 @@ void ECLReconstructorModule::event()
             v_TIME = v_FitTime;
           }
         } // i_DigiLoop
-
       } // MEclCFShowerHA LOOP
+
 
       double energyBfCorrect = (*iShower).second.Energy();
       double preliminaryCalibration = correctionFactor(energyBfCorrect, (*iShower).second.Theta()) ;
@@ -216,8 +239,10 @@ void ECLReconstructorModule::event()
       eclRecShowerArray[m_hitNum]->setStatus((*iShower).second.Status());
       eclRecShowerArray[m_hitNum]->setGrade((*iShower).second.Grade());
       eclRecShowerArray[m_hitNum]->setUncEnergy((float)(*iShower).second.UncEnergy());
+
+
+
       double sTheta = (*iShower).second.Theta();
-      double sPhi   = (*iShower).second.Phi(); //...Vishal
       float ErrorMatrix[3] = {
         errorE(sEnergy),
         errorTheta(sEnergy, sTheta),
@@ -229,29 +254,40 @@ void ECLReconstructorModule::event()
       //... This is where the ECLCluster dataobject is filled
       //... i_Mdst is simply the number and used to relate with ECLShower
       //... Vishal
-      StoreArray<ECLCluster> eclMdstArray;
-      if (!eclMdstArray) eclMdstArray.create();
-      new(eclMdstArray.nextFreeAddress()) ECLCluster();
-      int i_Mdst = eclMdstArray.getEntries() - 1;
+
+
+      eclRecShowerArray[m_hitNum]->setTheta((float)(*iShower).second.Theta());
+      eclRecShowerArray[m_hitNum]->setPhi((float)(*iShower).second.Phi());
+      eclRecShowerArray[m_hitNum]->setR((float)(*iShower).second.Distance());
+
+      float Mdst_Error[6] = {
+        errorE(sEnergy),
+        0,
+        errorPhi(sEnergy, sTheta),
+        0,
+        0,
+        errorTheta(sEnergy, sTheta)
+      };
+
 
       //.. Fill ECLCluster here
       RelationArray ECLClustertoShower(eclMdstArray, eclRecShowerArray);
+      eclMdstArray[i_Mdst]->setError(Mdst_Error);
       eclMdstArray[i_Mdst]->setTiming((float) v_TIME);
       eclMdstArray[i_Mdst]->setEnergy((float) sEnergy);
+      eclMdstArray[i_Mdst]->setTheta((float)(*iShower).second.Theta());
+      eclMdstArray[i_Mdst]->setPhi((float)(*iShower).second.Phi());
+      eclMdstArray[i_Mdst]->setR((float)(*iShower).second.Distance());
       eclMdstArray[i_Mdst]->setE9oE25((float)(*iShower).second.E9oE25());
       eclMdstArray[i_Mdst]->setEnedepSum((float)(*iShower).second.UncEnergy());
-      eclMdstArray[i_Mdst]->setPx((float) Px(sEnergy, sTheta, sPhi));
-      eclMdstArray[i_Mdst]->setPy((float) Py(sEnergy, sTheta, sPhi));
-      eclMdstArray[i_Mdst]->setPz((float) Pz(sEnergy, sTheta));
-      eclMdstArray[i_Mdst]->setNofTracks((int)m_NofTracks);
+
+      // To check if matches with charged tracks or not
+      bool v_isTrack = false;
+      if (v_NofTracks > 0) {v_isTrack = true;}
+      else { v_isTrack = false;}
+      eclMdstArray[i_Mdst]->setisTrack(v_isTrack);
       eclMdstArray[i_Mdst]->setTiming((float) v_TIME);
       eclMdstArray[i_Mdst]->setHighestE((float)  HiEnergyinShower);
-
-      TMatrixFSym GammaMomentumErrorMatrix(7);
-
-      readErrorMatrix7x7(sEnergy, sTheta, sPhi, GammaMomentumErrorMatrix);
-
-      eclMdstArray[i_Mdst]->setErrorMatrix(GammaMomentumErrorMatrix);
 
       //... Relation of ECLCluster to ECLShower
       ECLClustertoShower.add(i_Mdst, m_hitNum);
@@ -261,13 +297,11 @@ void ECLReconstructorModule::event()
 
 
 
-
       nShower++;
 
     }//EclCFShowerMap
   }//vector<TEclCFCR>
 
-  //cout<<"Event "<< m_nEvent<<" Total output number of Shower Array "<<++m_hitNum<<endl;
   m_nEvent++;
 }
 

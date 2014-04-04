@@ -1330,7 +1330,7 @@ void VXDTFModule::the_real_event()
 
           assignedIDs.push_back(clustersOfEvent[iPart].getCollectorID());
 
-          int hitID = m_collector.importHit(passNumber, CollectorTFInfo::m_nameHitFinder, CollectorTFInfo::m_idHitFinder, vector<int>(), vector<int>(), assignedIDs, aSecID, hitInfo.hitPosition, hitInfo.hitSigma);
+          int hitID = m_collector.importHit(passNumber, CollectorTFInfo::m_nameHitFinder, CollectorTFInfo::m_idHitFinder, vector<int>(), vector<int>(), assignedIDs, -1, hitInfo.hitPosition, hitInfo.hitSigma);
 
           // no hitid is saved because Hit is not used
           B2DEBUG(100, "Hit imported = died at hitfinder (highestAllowedLayer): " << hitID);
@@ -1513,7 +1513,7 @@ void VXDTFModule::the_real_event()
             assignedIDs.push_back(clusterIndexU);
             assignedIDs.push_back(clusterIndexV);
 
-            int hitID = m_collector.importHit(passNumber, CollectorTFInfo::m_nameHitFinder, CollectorTFInfo::m_idHitFinder, vector<int>(), vector<int>(), assignedIDs, aSecID, hitInfo.hitPosition, hitInfo.hitSigma);
+            int hitID = m_collector.importHit(passNumber, CollectorTFInfo::m_nameHitFinder, CollectorTFInfo::m_idHitFinder, vector<int>(), vector<int>(), assignedIDs, -1, hitInfo.hitPosition, hitInfo.hitSigma);
 
             // no hitid is saved because Hit is not used
             B2DEBUG(100, "Hit imported = died at hitfinder (highestAllowedLayer): " << hitID);

@@ -233,13 +233,17 @@ TVector3 BFieldComponentQuad::calculate(const TVector3& point) const
   //assume point is given in [cm]
 
   //Conversion to LER/HER SAD coordinates
-  GearDir her("/Detector/SuperKEKB/HER/");
-  GearDir ler("/Detector/SuperKEKB/LER/");
-  double angle_HER = her.getDouble("angle"); //  0.0415
-  double angle_LER = ler.getDouble("angle"); // -0.0415
+  //GearDir her("/Detector/SuperKEKB/HER/");
+  //GearDir ler("/Detector/SuperKEKB/LER/");
+  //double angle_HER = her.getDouble("angle"); //  0.0415
+  //double angle_LER = ler.getDouble("angle"); // -0.0415
+  double angle_HER =  0.0415;
+  double angle_LER = -0.0415;
 
-  double p0_HER = her.getDouble("energy") / Unit::eV; // 7.0e+9 [eV]
-  double p0_LER = ler.getDouble("energy") / Unit::eV; // 4.0e+9 [eV]
+  //double p0_HER = her.getDouble("energy") / Unit::eV; // 7.0e+9 [eV]
+  //double p0_LER = ler.getDouble("energy") / Unit::eV; // 4.0e+9 [eV]
+  double p0_HER = 7.0e+9;
+  double p0_LER = 4.0e+9;
   double c = Const::speedOfLight / (Unit::m / Unit::s);  // 3.0e+8 [m/s]
 
   TVector3 pHER(point.X(), point.Y(), point.Z()); pHER.RotateY(-angle_HER); pHER.RotateX(M_PI);

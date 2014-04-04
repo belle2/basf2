@@ -10,10 +10,6 @@
  **************************************************************************/
 
 #include <simulation/kernel/ExtStepLengthLimitProcess.h>
-//#include <G4ThreeVector.hh>
-//#include <G4TransportationManager.hh>
-//#include <G4FieldManager.hh>
-//#include <G4Field.hh>
 #include <G4Track.hh>
 
 #include <framework/logging/Logger.h>
@@ -32,7 +28,6 @@ ExtStepLengthLimitProcess::~ExtStepLengthLimitProcess()
 {
 }
 
-// This method in G4VErrorLimitProcess has a memory leak so avoid inheriting from that class
 G4VParticleChange* ExtStepLengthLimitProcess::PostStepDoIt(const G4Track& track, const G4Step&)
 {
   aParticleChange.Initialize(track);

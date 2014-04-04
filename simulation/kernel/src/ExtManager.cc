@@ -50,13 +50,13 @@ void ExtManager::StartHelper()
   if (m_helper == NULL) {
     m_helper = new G4ErrorRunManagerHelper();
   }
-  B2DEBUG(200, "Module ext: ExtManager::StartHelper() done")
+  B2DEBUG(200, "Simulation::ExtManager::StartHelper() done")
 
 }
 
 void ExtManager::InitGeant4e()
 {
-  B2INFO("Module ext: ExtManager::InitGeant4e(): At entry, Geant4e state "
+  B2INFO("Simulation::ExtManager::InitGeant4e(): At entry, Geant4e state "
          << PrintExtState() << " Geant4 state " << PrintG4State())
   G4ApplicationState currentState = G4StateManager::GetStateManager()->GetCurrentState();
   if (G4ErrorPropagatorData::GetErrorPropagatorData()->GetState() == G4ErrorState_PreInit) {
@@ -64,18 +64,18 @@ void ExtManager::InitGeant4e()
       m_helper->InitializeGeometry();
       m_helper->InitializePhysics();
     }
-    B2DEBUG(200, "Module ext: ExtManager::InitGeant4e(): Geant4 state before RunInitialization() "
+    B2DEBUG(200, "Simulation::ExtManager::InitGeant4e(): Geant4 state before RunInitialization() "
             << G4StateManager::GetStateManager()->GetCurrentState())
     m_helper->RunInitialization();
-    B2DEBUG(200, "Module ext: ExtManager::InitGeant4e(): Geant4 state after RunInitialization() "
+    B2DEBUG(200, "Simulation::ExtManager::InitGeant4e(): Geant4 state after RunInitialization() "
             << G4StateManager::GetStateManager()->GetCurrentState())
     if (!m_propagator) m_propagator = new G4ErrorPropagator();    // currently the only propagator possible
     InitTrackPropagation();
   } else {
-    B2DEBUG(200, "Module ext: ExtManager::InitGeant4e(): Illegal Geant4e state  " << PrintExtState())
+    B2DEBUG(200, "Simulation::ExtManager::InitGeant4e(): Illegal Geant4e state  " << PrintExtState())
   }
   G4ErrorPropagatorData::GetErrorPropagatorData()->SetState(G4ErrorState_Init);
-  B2INFO("Module ext: ExtManager::InitGeant4e(): At exit, Geant4e state "
+  B2INFO("Simulation::ExtManager::InitGeant4e(): At exit, Geant4e state "
          << PrintExtState() << " Geant4 state " << PrintG4State())
 }
 
@@ -87,7 +87,7 @@ void ExtManager::InitTrackPropagation()
 
 G4bool ExtManager::InitFieldForBackwards()
 {
-  B2FATAL("Module ext: ExtManager::InitFieldForBackwards() should never be called")
+  B2FATAL("Simulation::ExtManager::InitFieldForBackwards() should never be called")
   return false;
 }
 

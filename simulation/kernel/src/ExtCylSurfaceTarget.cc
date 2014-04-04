@@ -27,7 +27,7 @@ ExtCylSurfaceTarget::ExtCylSurfaceTarget(const G4double& radius,
 {
   theType = G4ErrorTarget_CylindricalSurface;
   m_tolerance = 1000.0 * G4GeometryTolerance::GetInstance()->GetSurfaceTolerance();
-  B2INFO("Module ext: creating ExtCylSurfaceTarget with radius " << m_radius
+  B2INFO("Simulation::ExtCylSurfaceTarget created with radius " << m_radius
          << " zmin " << zmin << " zmax " << zmax)
   // Force a reference to unused functions to avoid cppcheck remarks. (always skipped)
   if (m_tolerance < 0.0) {
@@ -44,7 +44,7 @@ G4double ExtCylSurfaceTarget::GetDistanceFromPoint(const G4ThreeVector& point,
                                                    const G4ThreeVector& dir) const
 {
   if (fabs(dir.mag() - 1.0) > 1.0E-10) {
-    B2FATAL("Module ext: ExtCylSurfaceTarget::GetDistanceFromPoint() direction is not a unit vector: " << dir)
+    B2FATAL("Simulation::ExtCylSurfaceTarget::GetDistanceFromPoint() direction is not a unit vector: " << dir)
   }
 
   // Get distance to intersection point with the cylinder's curved surface
@@ -59,7 +59,7 @@ G4double ExtCylSurfaceTarget::GetDistanceFromPoint(const G4ThreeVector& point,
     dist = fmin(dist, (m_zmax - point.z()) / dirz);
   }
 
-  B2DEBUG(300, "Module ext: ExtCylSurfaceTarget::GetDistanceFromPoint():  Global point "
+  B2DEBUG(300, "Simulation::ExtCylSurfaceTarget::GetDistanceFromPoint():  Global point "
           << point << " dir " << dir << " distance " << dist)
 
   return dist;
@@ -72,7 +72,7 @@ G4double ExtCylSurfaceTarget::GetDistanceFromPoint(const G4ThreeVector& point) c
   dist = fmin(dist, point.z() - m_zmin);
   dist = fmin(dist, m_zmax - point.z());
 
-  B2DEBUG(300, "Module ext: ExtCylSurfaceTarget::GetDistanceFromPoint():  Global point "
+  B2DEBUG(300, "Simulation::ExtCylSurfaceTarget::GetDistanceFromPoint():  Global point "
           << point << " minimum distance " << dist)
 
   return dist;
@@ -97,13 +97,13 @@ G4ThreeVector ExtCylSurfaceTarget::IntersectLocal(const G4ThreeVector& localPoin
     if (eqb != 0.0) {
       intersection -= localDir * (eqc / eqb);
     } else {
-      B2WARNING("Module ext: ExtCylSurfaceTarget::IntersectLocal():  localPoint "
+      B2WARNING("Simulation::ExtCylSurfaceTarget::IntersectLocal():  localPoint "
                 << localPoint << " localDir " << localDir << " does not intersect with cylinder")
       intersection = localDir * kInfinity;
     }
   }
 
-  B2DEBUG(300, "Module ext: ExtCylSurfaceTarget::IntersectLocal(): localPoint "
+  B2DEBUG(300, "Simulation::ExtCylSurfaceTarget::IntersectLocal(): localPoint "
           << localPoint << " localDir " << localDir << " radial intersection " << intersection.perp())
 
   return intersection;
@@ -113,7 +113,7 @@ G4Plane3D ExtCylSurfaceTarget::GetTangentPlane(const G4ThreeVector& point) const
 {
   // check that point is at the cylinder's curved surface
   if (fabs(point.perp() - m_radius) > m_tolerance) {
-    B2ERROR("Module ext: ExtCylSurfaceTarget::GetTangentPlane(): point "
+    B2ERROR("Simulation::ExtCylSurfaceTarget::GetTangentPlane(): point "
             << point << " is not at surface; radial distance is " << point.perp() - m_radius)
   }
 

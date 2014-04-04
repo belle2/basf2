@@ -60,7 +60,6 @@ G4double ExtMagFieldLimitProcess::PostStepGetPhysicalInteractionLength(const G4T
   return stepLength;
 }
 
-// This method in G4VErrorLimitProcess has a memory leak so avoid inheriting from that class.
 G4VParticleChange* ExtMagFieldLimitProcess::PostStepDoIt(const G4Track& track, const G4Step&)
 {
   aParticleChange.Initialize(track);

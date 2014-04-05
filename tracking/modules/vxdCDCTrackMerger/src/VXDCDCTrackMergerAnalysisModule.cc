@@ -28,7 +28,7 @@ VXDCDCTrackMergerAnalysisModule::VXDCDCTrackMergerAnalysisModule() : Module()
   //input tracks
   addParam("GFTracksColName",  m_GFTracksColName,  "Originary GFTrack collection");
   addParam("SiGFTracksColName",  m_SiGFTracksColName,  "Silicon GFTrack collection");
-  addParam("CDCGFTracksColName", m_CDCGFTracksColName, "CDC GTTrack collection");
+  addParam("CDCGFTracksColName", m_CDCGFTracksColName, "CDC GFTrack collection");
   //addParam("MCParticlesColName", m_mcParticlesColName, "MCParticles collection");
   addParam("TrackCandColName", m_TrackCandColName, "CDC Track Cand collection");
 
@@ -48,6 +48,8 @@ void VXDCDCTrackMergerAnalysisModule::initialize()
 
   StoreArray<genfit::TrackCand>::required(m_TrackCandColName);
   StoreArray<genfit::Track>::required(m_GFTracksColName);
+
+  //std::map<genfit::Track*, genfit::Track*>* matched_tracks_map = new std::map<genfit::Track*, genfit::Track*>();
 
   //for global merging efficiency
   m_total_pairs         = 0;
@@ -230,14 +232,10 @@ void VXDCDCTrackMergerAnalysisModule::event()
       //  true_match++;
       //}
 
-      //root tree stuff
-      //if (m_produce_root_file) {
-      //matching status variable
       if (cdc_mcp_index == si_mcp_index) {
         m_pre_match_vec->push_back(1);
-      } else {
-        m_pre_match_vec->push_back(-1);
-      }
+      } //else {
+      //m_pre_match_vec->push_back(-1);
       //}
 
 
@@ -334,11 +332,11 @@ void VXDCDCTrackMergerAnalysisModule::event()
   }
 
   //if (m_produce_root_file) {
-  //number of si tracks, number of cdc tracks and number of track pairs
+  //number of si tracks, number of cdc tracks before merging and number of track pairs after merging
   m_nsi_trk = nSiTracks;
   m_ncdc_trk = nCDCTracks;
   m_npair = n_trk_pair;
-  //calculate the merging efficiency (in fact it's purity)
+  //that's the number of correctly merged tracks over all merged tracks per event
   m_trk_mrg_eff = double(true_match) / double(n_trk_pair);
 
   //for calculating global merging efficiency (in contast to event by event efficiency)
@@ -360,9 +358,9 @@ void VXDCDCTrackMergerAnalysisModule::terminate()
   //root stuff
   //if (m_produce_root_file) {
   //calculate the track merging efficiecny considering the whole number of simulated events
-  TVectorT<double>* global_trkmrg_eff = new  TVectorT<double>(1);
-  (*global_trkmrg_eff)[0] =  m_total_matched_pairs / m_total_pairs;
-  m_ttree->GetUserInfo()->Add(global_trkmrg_eff);
+  //TVectorT<double>* global_trkmrg_eff = new  TVectorT<double>(1);
+  //(*global_trkmrg_eff)[0] =  m_total_matched_pairs / m_total_pairs;
+  //m_ttree->GetUserInfo()->Add(global_trkmrg_eff);
   m_root_file->cd();
   m_ttree->Write();
   m_root_file->Close();

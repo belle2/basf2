@@ -92,7 +92,7 @@ namespace Belle2 {
     int m_innermostLayer;
 
     /** Needed to make objects storable. */
-    ClassDef(Belle2::EKLMK0L, 1);
+    ClassDef(Belle2::EKLMK0L, 2);
 
   };
 

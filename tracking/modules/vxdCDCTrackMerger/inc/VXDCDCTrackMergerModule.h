@@ -56,6 +56,9 @@ namespace Belle2 {
     //void insertTrackAndPositionInGrid(TVector3 position, genfit::Track* gftrack, std::vector<std::vector<std::vector<TVector3>*>*>* positions_grid,
     //                                   std::vector<std::vector<std::vector<genfit::Track*>*>*>* tracks_grid);
     double m_CDC_wall_radius;
+    double m_chi2_max;
+    std::string m_mergedSiGFTracksColName;
+    std::string m_mergedCDCGFTracksColName;
     std::string m_SiGFTracksColName;
     std::string m_CDCGFTracksColName;
     std::string m_GFTracksColName;

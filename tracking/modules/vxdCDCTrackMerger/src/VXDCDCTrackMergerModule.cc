@@ -26,9 +26,9 @@ VXDCDCTrackMergerModule::VXDCDCTrackMergerModule() : Module()
   //addParam("MCParticlesColName", m_mcParticlesColName, "MCParticles collection");
   addParam("TrackCandColName", m_TrackCandColName, "CDC Track Cand collection");
 
-  //root stuff
-  //addParam("produce_root_file", m_produce_root_file, "if yes, generate a local root file", bool(false));
-  //addParam("root_output_filename", m_root_output_filename, "ROOT file for tracks merger analysis", std::string("VXD_CDC_trackmerger.root"));
+  addParam("mergedSiGFTracksColName",  m_mergedSiGFTracksColName,  "Succesfully merged Silicon GFTrack collection");
+  addParam("mergedCDCGFTracksColName", m_mergedCDCGFTracksColName, "Succesfully merged CDC GFTrack collection");
+  addParam("chi2_max", m_chi2_max, "Maximum Chi^2 for matching", double(100.0));
 }
 
 
@@ -41,6 +41,11 @@ void VXDCDCTrackMergerModule::initialize()
 {
   StoreArray<genfit::TrackCand>::required(m_TrackCandColName);
   StoreArray<genfit::Track>::required(m_GFTracksColName);
+
+  StoreArray<genfit::Track>::registerPersistent(m_mergedCDCGFTracksColName);
+  //mergedCDCGFTracksColName.registerAsPersistent();
+  StoreArray<genfit::Track>::registerPersistent(m_mergedSiGFTracksColName);
+  //mergedSiGFTracksColName.registerAsPersistent();
 
   //for global merging efficiency
   m_total_pairs         = 0;
@@ -68,8 +73,9 @@ void VXDCDCTrackMergerModule::event()
   if (nCDCTracks == 0) B2WARNING("VXDCDCTrackMerger: CDCGFTracksCollection is empty!");
 
   StoreArray<genfit::Track> mcGFTracks(m_GFTracksColName);
-
   const StoreArray<genfit::TrackCand> TrackCand(m_TrackCandColName);
+  StoreArray<genfit::Track> mergedCDCGFTracks(m_mergedCDCGFTracksColName);
+  StoreArray<genfit::Track> mergedSiGFTracks(m_mergedSiGFTracksColName);
 
   TVector3 position(0., 0., 0.);
   TVector3 momentum(0., 0., 1.);
@@ -100,7 +106,7 @@ void VXDCDCTrackMergerModule::event()
       continue;
     }
 
-    double CHI2_MAX = 100;
+    double CHI2_MAX = m_chi2_max;
     mtch = 0;
     //loop on VXD Tracks
     for (unsigned int jtrack = 0; jtrack < nSiTracks; jtrack++) {
@@ -123,30 +129,15 @@ void VXDCDCTrackMergerModule::event()
         matched_track = jtrack;
       }
 
-      /*genfit::Track* GFTrk = mcGFTracks[itrack];
-      const genfit::TrackCand* cdc_TrkCandPtr = DataStore::getRelatedToObj<genfit::TrackCand>(GFTrk, m_TrackCandColName);
-      if (cdc_TrkCandPtr == NULL) {
-      continue;
-      }*/
-      //int cdc_mcp_index = cdc_TrkCandPtr->getMcTrackId();
-
-      /*    GFTrk = mcGFTracks[jtrack+nCDCTracks];
-      const genfit::TrackCand* si_TrkCandPtr = DataStore::getRelatedToObj<genfit::TrackCand>(GFTrk, m_TrackCandColName);
-      if (si_TrkCandPtr == NULL) {
-        continue;
-        }*/
-      //int si_mcp_index = si_TrkCandPtr->getMcTrackId();
-
     } //save matched tracks
     if (mtch == 1) {
       std::pair<genfit::Track*, genfit::Track*> matched_track_pair(cdc_mcGFTracks[itrack], si_mcGFTracks[matched_track]);
       matched_tracks_map->insert(matched_track_pair);
-      //si_trk_it[si_trk_idx]=matched_track+nCDCTracks;
-      //cdc_trk_it[si_trk_idx]=itrack;
-      //si_trk_idx++;
+      mergedCDCGFTracks.appendNew(*(cdc_mcGFTracks[itrack]));
+      mergedSiGFTracks.appendNew(*(si_mcGFTracks[matched_track]));
     }
   }
-  //  delete matched_tracks_map;
+  delete matched_tracks_map;
 }
 
 void VXDCDCTrackMergerModule::endRun()

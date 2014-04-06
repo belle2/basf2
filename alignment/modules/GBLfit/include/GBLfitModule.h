@@ -85,16 +85,11 @@ namespace Belle2 {
     int m_successfulGFTrackCandFitCounter;           /**< Number of genfit::TracksCands with successfully fitted tracks. */
 
     std::string m_filterId;                          /**< Select the filter: 'Kalman' for Kalman, 'DAF for DAF, 'simpleKalman' for the simple Kalman. */
-    int m_nMinIter;                                  /**< Minimum number of iterations for the Kalman filter. */
-    int m_nMaxIter;                                  /**< Maximum number of iterations for the Kalman filter. */
-    double m_probCut;                                /**< Probability cut for the DAF filter (0.001, 0.005, 0.01). */
 
-    bool m_storeFailed;                              /**< Boolean to mark if failed track fits should also be stored as Tracks. */
     bool m_useClusters;                              /**< Boolean to mark if PXD/SVD cluster hits should be used instead of true hits in the.*/
     std::vector<int> m_pdgCodes;                     /**< holds the PDG codes the user sets. If empty the PDG code from genfit::TrackCand will be written into it*/
     bool m_usePdgCodeFromTrackCand;                  /**< flag to indicate if PDG code will be taken from genfit::TrackCand or from user input in m_pdgCodes*/
     std::ofstream HelixParam;                        /**< Text output file name */
-    bool m_createTextFile;                           /**< Boolean to select if an output file with helix parameters should be created. */
     std::vector<double> m_dafTemperatures;           /**< holds the annealing scheme for the DAF. The number of vector elements is the number of DAF iterations */
     bool m_energyLossBetheBloch;                     /**< Determines if calculation of energy loss is on/off in Genfit */
     bool m_noiseBetheBloch;                          /**< Determines if calculation of energy loss variance is on/off in Genfit */

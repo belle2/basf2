@@ -141,7 +141,7 @@ track_splitter.param(track_splitter_param)
 
 # MERGING
 # track merger
-svd_cdcTracksMerger = register_module('VXDCDCTrackMergerAnalysis')
+svd_cdcTracksMerger = register_module('VXDCDCTrackMerger')
 trackMerger_param = {  # (in cm) use cdc inner wall
                        #    'CDC_wall_radius':        16.29,  #(in cm) use cdc outer wall
                        # default False
@@ -150,12 +150,30 @@ trackMerger_param = {  # (in cm) use cdc inner wall
     'CDCGFTracksColName': 'CDC_mcTracks',
     'GFTracksColName': 'mcGFTracks',
     'TrackCandColName': 'mcTracksCand',
+    'mergedCDCGFTracksColName': 'mergedCDC_Tracks',
+    'mergedSiGFTracksColName': 'mergedSi_Tracks',
     'CDC_wall_radius': 16.25,
-    'root_output_filename': 'VXD_CDC_trackmerger_test.root',
+    'chi2_max': 100,
     }
+#    'root_output_filename': 'VXD_CDC_trackmerger_test.root',
 
 svd_cdcTracksMerger.param(trackMerger_param)
 
+# MERGING ANALYSIS
+# track merger analysis
+svd_cdcTracksMergerAnalysis = register_module('VXDCDCTrackMergerAnalysis')
+trackMergerAnalysis_param = {  # (in cm) use cdc inner wall
+                               #    'CDC_wall_radius':        16.29,  #(in cm) use cdc outer wall
+                               # default False
+                               # 'MCParticlesColName': 'mcParticlesTruth',
+    'SiGFTracksColName': 'Si_mcTracks',
+    'CDCGFTracksColName': 'CDC_mcTracks',
+    'GFTracksColName': 'mcGFTracks',
+    'TrackCandColName': 'mcTracksCand',
+    'CDC_wall_radius': 16.25,
+    'root_output_filename': 'VXD_CDC_trackmerger_test.root',
+    }
+svd_cdcTracksMergerAnalysis.param(trackMergerAnalysis_param)
 # output
 # ---output = register_module('RootOutput')
 # ---output.param('outputFileName', 'SiCDCTrackMerger.root')
@@ -183,6 +201,7 @@ main.add_module(cand_merger)
 main.add_module(fitting)
 main.add_module(track_splitter)
 main.add_module(svd_cdcTracksMerger)
+main.add_module(svd_cdcTracksMergerAnalysis)
 # ---main.add_module(output)
 
 # Process events

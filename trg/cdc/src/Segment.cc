@@ -374,7 +374,7 @@ TCSegment::simulateWithClock(bool logicLUTFlag) {
 
       if ( logicLUTFlag == 0 ) {
         ////// TS logic Finder
-        bool tsL0,tsL1,tsL2,tsL3,tsL4=0;
+        bool tsL0=0,tsL1=0,tsL2=0,tsL3=0,tsL4=0;
         if(tsSize == 11) {
           //cout<<"Outer TS"<<endl;
           //...Simple simulation assuming 3:2:1:2:3 shape...

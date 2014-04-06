@@ -515,7 +515,10 @@ void TRGCDCHough3DFinder::doitFind(vector<TCTrack *> & trackList){
 
         // Get results of finder
         const TCSHit* p_bestTS[4]={0,0,0,0};
-        double bestZ0,bestCot,houghMax,minDiffHough = 0;
+        double bestZ0 = 0;
+        double bestCot = 0;
+        double houghMax = 0;
+        double minDiffHough = 0;
         double bestTS[4];
         vector<double> tempResult;
         m_Hough3DFinder->getValues("bestTSIndex",tempResult);

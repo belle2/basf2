@@ -256,7 +256,7 @@ void ECLMCMatchingModule::event()
       ECLShower* veclShower = eclRecShowerArray[eclShower.getShowerId()];
       //const ECLShower *shower = ecl
       for (auto MCpart : veclShower->getRelationsTo<MCParticle>()) {
-        ECLClustertoMCPart.add(imdst, MCpart.getIndex());
+        ECLClustertoMCPart.add(imdst, MCpart.getArrayIndex());
       }
     }
   } // imdst

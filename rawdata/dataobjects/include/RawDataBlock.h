@@ -18,6 +18,10 @@
 
 namespace Belle2 {
 
+  /**
+   * The RawDataBlock class
+   * Base class for rawdata handling
+   */
   class RawDataBlock : public TObject {
   public:
     //! Default constructor
@@ -83,21 +87,25 @@ namespace Belle2 {
     };
 
   protected :
-    int m_nwords; // number of words of buffer
+    // number of words of buffer
+    int m_nwords;
 
-    int m_num_nodes; // number of nodes in this object
+    // number of nodes in this object
+    int m_num_nodes;
 
-    int m_num_events; // number of events in this object
+    // number of events in this object
+    int m_num_events;
 
+    // Buffer
     int* m_buffer; //[m_nwords]
 
-    int m_use_prealloc_buf; //! flag for deleting m_buffer in destructer(1:delete, 0: not delete)
+    //! flag for deleting m_buffer in destructer(1:delete, 0: not delete)
+    int m_use_prealloc_buf;
 
-    int m_which_part; //! no longer used
+    //! no longer used
+    int m_which_part;
 
-
-
-
+    // To drive from TObject
     ClassDef(RawDataBlock, 1);
 
   };

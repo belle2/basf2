@@ -38,7 +38,8 @@ namespace Belle2 {
     //! Destructor
     virtual ~RawBPID();
 
-    ClassDef(RawBPID, 1); // not modified yet
+    // To derive from TObject
+    ClassDef(RawBPID, 1);
   };
 }
 

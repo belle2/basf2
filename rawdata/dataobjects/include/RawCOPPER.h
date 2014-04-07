@@ -346,9 +346,11 @@ namespace Belle2 {
       COPPER_MAGIC_DRIVER_TRAILER = 0x7FFF0009
     };
 
-    RawHeader tmp_header;  //! Not record
+    //! header ( not recorded )
+    RawHeader tmp_header;
 
-    RawTrailer tmp_trailer; //! Not record
+    //! trailer ( not recorded )
+    RawTrailer tmp_trailer;
 
   protected :
     ClassDef(RawCOPPER, 2);

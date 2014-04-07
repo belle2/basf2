@@ -38,28 +38,28 @@ namespace Belle2 {
     virtual ~RawTLU();
 
 
-    //!
+    //! Get # of words in this data packet
     int GetNwords(int n);
 
-    //!
+    //!Get the size of the header
     int GetNwordsHeader(int n);
 
-    //!
+    //! Get Node ID
     int GetNodeID(int n);
 
-    //!
+    //! Get Event #
     unsigned int GetEveNo(int n);
 
-    //!
+    //! Get Magic Trailer #
     unsigned int GetMagicTrailer(int n);
 
-    //!
+    //! Get Run #
     int GetRunNo(int n);
 
-    //!
+    //! Get TLU event tag
     unsigned int GetTLUEventTag(int n);
 
-    //!
+    //! check data contents
     void CheckData(int n, unsigned int prev_evenum, unsigned int* cur_evenum);
 
 
@@ -89,7 +89,7 @@ namespace Belle2 {
     };
 
   protected :
-
+    // To derive from TObject
     ClassDef(RawTLU, 1);
 
   };

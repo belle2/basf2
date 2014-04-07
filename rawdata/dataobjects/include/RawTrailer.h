@@ -77,10 +77,8 @@ namespace Belle2 {
     };
 
   private:
-
-    int* m_buffer; //! do not record buffer ( RawCOPPER includes buffer of RawHeader and RawTrailer )
-    //    unsigned int m_trailer[RAWCOPPER_TRAILER_SIZE];
-
+    //! do not record buffer ( RawCOPPER includes buffer of RawHeader and RawTrailer )
+    int* m_buffer;
 
     ClassDef(RawTrailer, 1);
   };

@@ -13,8 +13,8 @@ using namespace std;
 using namespace Belle2;
 
 //#define DESY
-#define NO_DATA_CHECK
-#define WO_FIRST_EVENUM_CHECK
+//#define NO_DATA_CHECK
+//#define WO_FIRST_EVENUM_CHECK
 
 ClassImp(RawCOPPER);
 
@@ -54,7 +54,7 @@ int RawCOPPER::GetBufferPos(int n)
       sprintf(err_buf, "CORRUPTED DATA: value of pos_nwords(%d) is larger than m_nwords(%d). Exiting...\n %s %s %d\n",
               pos_nwords, m_nwords, __FILE__, __PRETTY_FUNCTION__, __LINE__);
       string err_str = err_buf;     throw (err_str);
-      exit(1);
+      //      exit(1);
     }
   }
   return pos_nwords;
@@ -78,16 +78,15 @@ unsigned int RawCOPPER::CalcDriverChkSum(int n)
 int RawCOPPER::GetNumFINESSEBlock(int n)
 {
 
-  RawHeader hdr;
   int cnt = 0;
-  int pos_nwords = GetBufferPos(n) + POS_CH_A_DATA_LENGTH + hdr.RAWHEADER_NWORDS;
+  int pos_nwords = GetBufferPos(n) + POS_CH_A_DATA_LENGTH + tmp_header.RAWHEADER_NWORDS;
   if (m_buffer[ pos_nwords ] > 0) cnt++;
-  pos_nwords = GetBufferPos(n) + POS_CH_B_DATA_LENGTH + hdr.RAWHEADER_NWORDS;
-  if (m_buffer[ POS_CH_B_DATA_LENGTH + tmp_header.RAWHEADER_NWORDS ] > 0) cnt++;
-  pos_nwords = GetBufferPos(n) + POS_CH_C_DATA_LENGTH + hdr.RAWHEADER_NWORDS;
-  if (m_buffer[ POS_CH_C_DATA_LENGTH + tmp_header.RAWHEADER_NWORDS ] > 0) cnt++;
-  pos_nwords = GetBufferPos(n) + POS_CH_D_DATA_LENGTH + hdr.RAWHEADER_NWORDS;
-  if (m_buffer[ POS_CH_D_DATA_LENGTH + tmp_header.RAWHEADER_NWORDS ] > 0) cnt++;
+  pos_nwords = GetBufferPos(n) + POS_CH_B_DATA_LENGTH + tmp_header.RAWHEADER_NWORDS;
+  if (m_buffer[ pos_nwords ] > 0) cnt++;
+  pos_nwords = GetBufferPos(n) + POS_CH_C_DATA_LENGTH + tmp_header.RAWHEADER_NWORDS;
+  if (m_buffer[ pos_nwords ] > 0) cnt++;
+  pos_nwords = GetBufferPos(n) + POS_CH_D_DATA_LENGTH + tmp_header.RAWHEADER_NWORDS;
+  if (m_buffer[ pos_nwords ] > 0) cnt++;
   return cnt;
 }
 
@@ -114,9 +113,9 @@ int RawCOPPER::GetDetectorNwords(int n, int finesse_num)
   sprintf(err_buf, "Specifined FINESSE number( = %d ) is invalid. Exiting...\n %s %s %d\n", finesse_num,
           __FILE__, __PRETTY_FUNCTION__, __LINE__);
   string err_str = err_buf; throw (err_str);
-  sleep(12345678);
-  exit(-1);
-  return 0;
+//   sleep(12345678);
+//   exit(-1);
+//   return 0;
 }
 
 
@@ -143,9 +142,9 @@ int RawCOPPER::GetFINESSENwords(int n, int finesse_num)
   sprintf(err_buf, "Specifined FINESSE number( = %d ) is invalid. Exiting...\n %s %s %d\n",
           finesse_num, __FILE__, __PRETTY_FUNCTION__, __LINE__);
   string err_str = err_buf; throw (err_str);
-  sleep(12345678);
-  exit(-1);
-  return 0;
+//   sleep(12345678);
+//   exit(-1);
+//   return 0;
 
 }
 
@@ -174,9 +173,9 @@ int RawCOPPER::GetOffsetFINESSE(int n, int finesse_num)
   sprintf(err_buf, "Specifined FINESSE number( = %d ) is invalid. Exiting...\n%s %s %d\n", finesse_num,
           __FILE__, __PRETTY_FUNCTION__, __LINE__);
   string err_str = err_buf; throw (err_str);
-  sleep(12345678);
-  exit(-1);
-  return 0;
+//   sleep(12345678);
+//   exit(-1);
+//   return 0;
 
 }
 
@@ -206,9 +205,9 @@ int* RawCOPPER::GetFINESSEBuffer(int n, int finesse_num)
   sprintf(err_buf, "Specifined FINESSE number( = %d ) is invalid. Exiting...\n%s %s %d\n", finesse_num,
           __FILE__, __PRETTY_FUNCTION__, __LINE__);
   string err_str = err_buf; throw (err_str);
-  sleep(12345678);
-  exit(-1);
-  return 0;
+//   sleep(12345678);
+//   exit(-1);
+//   return 0;
 }
 
 
@@ -235,9 +234,9 @@ int* RawCOPPER::GetDetectorBuffer(int n, int finesse_num)
   sprintf(err_buf, "Specifined FINESSE number( = %d ) is invalid. Exiting...\n%s %s %d\n", finesse_num,
           __FILE__, __PRETTY_FUNCTION__, __LINE__);
   string err_str = err_buf; throw (err_str);
-  sleep(12345678);
-  exit(-1);
-  return 0;
+//   sleep(12345678);
+//   exit(-1);
+//   return 0;
 }
 
 
@@ -266,8 +265,8 @@ unsigned int RawCOPPER::GetB2LFEE32bitEventNumber(int n)
     sprintf(err_buf, "No HSLB data in COPPER data. Exiting...\n%s %s %d\n",
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     string err_str = err_buf; throw (err_str);
-    sleep(12345678);
-    exit(-1);
+//     sleep(12345678);
+//     exit(-1);
   }
 
   if (err_flag == 1) {
@@ -279,9 +278,9 @@ unsigned int RawCOPPER::GetB2LFEE32bitEventNumber(int n)
     printf("[DEBUG] [ERROR] %s\n", err_buf);
 #ifndef NO_DATA_CHECK
     string err_str = err_buf; throw (err_str);
+//     sleep(12345678);
+//     exit(-1);
 
-    sleep(12345678);
-    exit(-1);
 #endif //NO_DATA_CHECK
   }
   return eve_num;
@@ -292,9 +291,9 @@ unsigned int RawCOPPER::GetB2LFEE32bitEventNumber(int n)
   sprintf(err_buf, "You need comment out READ_OLD_B2LFEE_FORMAT_FILE if you are handling a new data format\n%s %s %d\n",
           __FILE__, __PRETTY_FUNCTION__, __LINE__);
   string err_str = err_buf; throw (err_str);
-  sleep(12345678);
-  exit(1);
-  return 0;
+//   sleep(12345678);
+//   exit(1);
+//   return 0;
 
 #endif // READ_OLD_B2LFEE_FORMAT_FILE
 
@@ -453,8 +452,8 @@ void RawCOPPER::CheckData(int n,
     PrintData(GetBuffer(n), GetBlockNwords(n));
     string err_str = err_buf;
     throw (err_str);
-    sleep(1234567);
-    exit(-1);
+//     sleep(1234567);
+//     exit(-1);
   }
 
   return;
@@ -516,8 +515,8 @@ void RawCOPPER::CheckUtimeCtimeTRGType(int n)
     sprintf(err_buf, "CORRUPTED DATA: mismatch over FINESSEs. Exiting...\n %s %s %d\n",
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     string err_str = err_buf; throw (err_str);
-    sleep(1234567);
-    exit(1);
+//     sleep(1234567);
+//     exit(1);
   }
   return;
 }
@@ -565,8 +564,8 @@ unsigned int RawCOPPER::GetB2LHeaderWord(int n, int finesse_buffer_pos)
     sprintf(err_buf, "No HSLB data in COPPER data. Exiting...\n %s %s %d\n",
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     string err_str = err_buf; throw (err_str);
-    sleep(12345678);
-    exit(-1);
+//     sleep(12345678);
+//     exit(-1);
   }
 
 
@@ -580,8 +579,8 @@ unsigned int RawCOPPER::GetB2LHeaderWord(int n, int finesse_buffer_pos)
 #ifndef NO_DATA_CHECK
     string err_str = err_buf; throw (err_str);
 
-    sleep(12345678);
-    exit(-1);
+//     sleep(12345678);
+//     exit(-1);
 #endif
   }
 
@@ -631,8 +630,8 @@ unsigned int RawCOPPER::FillTopBlockRawHeader(unsigned int m_node_id, unsigned i
             "No FINESSE data in a copper data block. Exiting...\n %s %s %d\n",
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     string err_str = err_buf; throw (err_str);
-    sleep(12345678);
-    exit(-1);
+//     sleep(12345678);
+//     exit(-1);
   }
 
   //
@@ -656,8 +655,8 @@ unsigned int RawCOPPER::FillTopBlockRawHeader(unsigned int m_node_id, unsigned i
             m_nwords, m_buffer[ RawHeader::POS_NWORDS ],
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     string err_str = err_buf; throw (err_str);
-    sleep(12345678);
-    exit(-1);
+//     sleep(12345678);
+//     exit(-1);
   }
 
   //
@@ -747,8 +746,8 @@ unsigned int RawCOPPER::FillTopBlockRawHeader(unsigned int m_node_id, unsigned i
             chksum_body, m_buffer[ body_end ],
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     string err_str = err_buf; throw (err_str);
-    sleep(12345678);
-    exit(-1);
+//     sleep(12345678);
+//     exit(-1);
   }
 
   //
@@ -794,8 +793,8 @@ unsigned int RawCOPPER::FillTopBlockRawHeader(unsigned int m_node_id, unsigned i
 #ifndef NO_DATA_CHECK
     string err_str = err_buf; throw (err_str);
 
-    sleep(12345678);
-    exit(-1);
+//     sleep(12345678);
+//     exit(-1);
 #endif
   }
 
@@ -821,7 +820,7 @@ unsigned int RawCOPPER::FillTopBlockRawHeader(unsigned int m_node_id, unsigned i
       printf("[DEBUG] i= %d : num entries %d : Tot words %d\n", 0 , GetNumEntries(), TotalBufNwords());
       PrintData(GetBuffer(cpr_id), TotalBufNwords());
       throw (err_str);
-      exit(-1);
+      //      exit(-1);
 #endif
 
     }
@@ -836,7 +835,7 @@ unsigned int RawCOPPER::FillTopBlockRawHeader(unsigned int m_node_id, unsigned i
 #ifdef USE_B2LFEE_FORMAT_BOTH_VER1_AND_2
 void RawCOPPER::CheckB2LFEEHeaderVersion(int n)
 {
-  int flag = 0;
+
   int* temp_buf;
 
   for (int i = 0; i < 4; i++) {
@@ -845,7 +844,7 @@ void RawCOPPER::CheckB2LFEEHeaderVersion(int n)
       if ((temp_buf[ 3 ] & 0x40000000) == 0) {
 #ifdef TEMP
         // this word for exp/run
-        flag = 1; // old one (ver.1) used for SPring8 test in 2013
+        // old one (ver.1) used for SPring8 test in 2013
         printf("[DEBUG] \033[31m");
         printf("[DEBUG] ===Firmware ver. ERROR===\n ");
         printf("[DEBUG] FTSW and b2tt firmwares was updated on Nov.22, 2013 and the header format attached by B2link was changed in the new firmwares.\n");
@@ -860,12 +859,12 @@ void RawCOPPER::CheckB2LFEEHeaderVersion(int n)
         sprintf(err_buf, "FTSW and b2tt firmwares are old. Exiting...\n %s %s %d\n",
                 __FILE__, __PRETTY_FUNCTION__, __LINE__);
         string err_str = err_buf; throw (err_str);
-        sleep(12345678);
-        exit(-1);
+//         sleep(12345678);
+//         exit(-1);
 #endif
       } else {
         // this word for 32bit unixtime
-        flag = 2; // new one (ver.2)
+        // new one (ver.2)
         break;
       }
     }
@@ -876,8 +875,8 @@ void RawCOPPER::CheckB2LFEEHeaderVersion(int n)
       sprintf(err_buf, "RawCOPPER contains no FINESSE data. Exiting...\n %s %s %d\n",
               __FILE__, __PRETTY_FUNCTION__, __LINE__);
       string err_str = err_buf; throw (err_str);
-      sleep(12345678);
-      exit(-1);
+//       sleep(12345678);
+//      exit(-1);
 #endif
     }
   }

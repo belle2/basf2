@@ -190,10 +190,10 @@ namespace Belle2 {
     };
 
   private:
+    //! do not record buffer ( RawCOPPER includes buffer of RawHeader and RawTrailer )
+    int* m_buffer;
 
-    int* m_buffer; //! do not record buffer ( RawCOPPER includes buffer of RawHeader and RawTrailer )
-    //    unsigned int m_header[HEADER_SIZE];
-
+    // To derive from TObject
     ClassDef(RawHeader, 1);
   };
 

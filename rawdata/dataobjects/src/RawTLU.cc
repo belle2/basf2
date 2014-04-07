@@ -105,8 +105,8 @@ void RawTLU::CheckData(int n,
     }
     fflush(stderr);
     string err_str = err_buf; throw (err_str);
-    sleep(1234567);
-    exit(-1);
+//     sleep(1234567);
+//     exit(-1);
   }
 
   return;

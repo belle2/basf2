@@ -55,7 +55,7 @@ int RawDataBlock::GetBufferPos(int n)
       sprintf(err_buf, "CORRUPTED DATA: value of pos_nwords(%d) is larger than m_nwords(%d). Exiting...\n %s %s %d\n",
               pos_nwords, m_nwords, __FILE__, __PRETTY_FUNCTION__, __LINE__);
       string err_str = err_buf;     throw (err_str);
-      exit(1);
+      //      exit(1);
     }
   }
   return pos_nwords;

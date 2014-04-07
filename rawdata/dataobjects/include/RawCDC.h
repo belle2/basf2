@@ -36,7 +36,7 @@ namespace Belle2 {
     RawCDC();
     //! Destructor
     virtual ~RawCDC();
-
+    // To derive from TObject
     ClassDef(RawCDC, 1);
   };
 }

@@ -35,7 +35,7 @@ namespace Belle2 {
     RawECL();
     //! Destructor
     virtual ~RawECL();
-
+    // To derive from TObject
     ClassDef(RawECL, 1);
   };
 }

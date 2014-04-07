@@ -470,12 +470,20 @@ void CDCLegendreFastHough::MaxFastHoughHighPt(const std::vector<CDCLegendreTrack
   int nhitsToReserve;
   nhitsToReserve = 2 * hits.size();
   //voting plane
-  std::vector<CDCLegendreTrackHit*> voted_hits[nbins_theta][nbins_r];
-  for (int i = 0; i < nbins_theta; ++i)
+  /*  std::vector<CDCLegendreTrackHit*> voted_hits[nbins_theta][nbins_r];
+    for (int i = 0; i < nbins_theta; ++i)
+      for (int j = 0; j < nbins_r; ++j)
+        voted_hits[i][j].reserve(nhitsToReserve);
+  */
+  std::vector<CDCLegendreTrackHit*>** voted_hits;
+  voted_hits = new std::vector<CDCLegendreTrackHit*>* [nbins_theta];
+  for (int i = 0; i < nbins_theta; ++i) {
+    voted_hits[i] = new std::vector<CDCLegendreTrackHit*>[nbins_r];
     for (int j = 0; j < nbins_r; ++j)
       voted_hits[i][j].reserve(nhitsToReserve);
+  }
 
-  //B2DEBUG(100, "CREATING distance arrays");
+//B2DEBUG(100, "CREATING distance arrays");
 
   double r_temp, r_1, r_2;
 
@@ -583,8 +591,14 @@ void CDCLegendreFastHough::MaxFastHoughHighPt(const std::vector<CDCLegendreTrack
                                            + thetaBin[t_index + 1]) / 2. * m_PI / m_nbinsTheta;
 
         if (not m_reconstructCurler
-            && fabs((r[r_index] + r[r_index + 1]) / 2) > m_rc)
+            && fabs((r[r_index] + r[r_index + 1]) / 2) > m_rc) {
+          for (int i = 0; i < nbins_theta; ++i) {
+            delete[] voted_hits[i];
+          }
+          delete[] voted_hits;
+
           return;
+        }
 
         voted_hits[t_index][r_index].erase(std::remove_if(voted_hits[t_index][r_index].begin(), voted_hits[t_index][r_index].end(), [](CDCLegendreTrackHit * hit) {return hit->isUsed() != CDCLegendreTrackHit::not_used;}), voted_hits[t_index][r_index].end());
 
@@ -609,4 +623,11 @@ void CDCLegendreFastHough::MaxFastHoughHighPt(const std::vector<CDCLegendreTrack
       }
     }
   }
+
+  for (int i = 0; i < nbins_theta; ++i) {
+    delete[] voted_hits[i];
+  }
+  delete[] voted_hits;
+
+
 }

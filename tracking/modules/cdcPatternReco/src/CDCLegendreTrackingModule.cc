@@ -404,7 +404,6 @@ void CDCLegendreTrackingModule::terminate()
   delete m_cdcLegendreFastHough;
   delete m_cdcLegendreTrackMerger;
   delete m_cdcLegendreTrackCreator;
-  delete m_cdcLegendreQuadTree;
 }
 
 

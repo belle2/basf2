@@ -260,7 +260,7 @@ namespace Belle2 {
       const TVector3 wireForwardPosition(int layerId, int cellId) const;
 
       /** Same function taking different wire number parametrization. */
-      const TVector3 wireForwardPosition(const WireID wireID) const {
+      const TVector3 wireForwardPosition(const WireID& wireID) const {
         return wireForwardPosition(wireID.getICLayer(), wireID.getIWire());
       }
 
@@ -273,7 +273,7 @@ namespace Belle2 {
       const TVector3 wireBackwardPosition(int layerId, int cellId) const;
 
       /** Same function taking different wire number parametrization. */
-      const TVector3 wireBackwardPosition(const WireID wireID) const {
+      const TVector3 wireBackwardPosition(const WireID& wireID) const {
         return wireBackwardPosition(wireID.getICLayer(), wireID.getIWire());
       }
 

@@ -372,7 +372,7 @@ namespace Belle2 {
 
       if (nWires == 1) {
 
-        saveSimHit(layerId, wires[i], trackID, pid, distance, tofBefore, edep, s_in_layer * cm, pOnTrack, posW, posIn, posOut, posTrack, lr, speed);
+        saveSimHit(layerId, wires[i], trackID, pid, distance, tofBefore, edep, s_in_layer * cm, momIn, posW, posIn, posOut, posTrack, lr, speed);
 #if defined(CDC_DEBUG)
         std::cout << "saveSimHit" << std::endl;
         std::cout << "momIn    = " << momIn    << std::endl;
@@ -436,7 +436,7 @@ namespace Belle2 {
           const G4ThreeVector x_Out(xint[0]*cm, xint[1]*cm, xint[2]*cm);
           const G4ThreeVector p_In(momBefore * vent[3], momBefore * vent[4], momBefore * vent[5]);
 
-          saveSimHit(layerId, wires[i], trackID, pid, distance, tofBefore, edep_in_cell, (sint - s1) * cm, pOnTrack, posW, x_In, x_Out, posTrack, lr, speed);
+          saveSimHit(layerId, wires[i], trackID, pid, distance, tofBefore, edep_in_cell, (sint - s1) * cm, p_In, posW, x_In, x_Out, posTrack, lr, speed);
 #if defined(CDC_DEBUG)
           std::cout << "saveSimHit" << std::endl;
           std::cout << "p_In    = " << p_In     << std::endl;
@@ -463,7 +463,7 @@ namespace Belle2 {
           const G4ThreeVector x_In(vent[0]*cm, vent[1]*cm, vent[2]*cm);
           const G4ThreeVector p_In(momBefore * vent[3], momBefore * vent[4], momBefore * vent[5]);
 
-          saveSimHit(layerId, wires[i], trackID, pid, distance, tofBefore, edep_in_cell, (s2 - sint) * cm, pOnTrack, posW, x_In, posOut, posTrack, lr, speed);
+          saveSimHit(layerId, wires[i], trackID, pid, distance, tofBefore, edep_in_cell, (s2 - sint) * cm, p_In, posW, x_In, posOut, posTrack, lr, speed);
 #if defined(CDC_DEBUG)
           std::cout << "saveSimHit" << std::endl;
           std::cout << "p_In    = " << p_In     << std::endl;

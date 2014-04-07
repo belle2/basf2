@@ -510,16 +510,19 @@ Helix::operator = (const Helix& i)
 void
 Helix::updateCache(void)
 {
+
 #if defined(BELLE_DEBUG)
   checkValid();
   if (m_helixValid) {
 #endif
+
     //
     //   Calculate Helix center( xc, yc ).
     //
     //   xc = x0 + (dr + (alpha / kappa)) * cos(phi0)  (cm)
     //   yc = y0 + (dr + (alpha / kappa)) * sin(phi0)  (cm)
     //
+
     m_ac[0] = m_a[0];
     m_ac[1] = m_a[1];
     m_ac[2] = m_a[2];

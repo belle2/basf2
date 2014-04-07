@@ -118,24 +118,61 @@ namespace Belle2 {
       HepLorentzVector momentum(double dPhi, double mass, HepPoint3D& x, HepSymMatrix& Emx) const;
 
     public:
+
       // Parametrization dependent functions.
       // Prepared for tracking codes.
       // Users should not use them.
-      //
 
-      double dr(void) const;      /// Return helix parameter dr.
-      double phi0(void) const;    /// Return helix parameter phi0.
-      double kappa(void) const;   /// Return helix parameter kappa.
-      double dz(void) const;      /// Return helix parameter dz.
-      double tanl(void) const;    /// Return helix parameter tangent lambda.
-      double curv(void) const;    /// Return curvature of helix.
-      double sinPhi0(void) const; /// Return sin phi0.
-      double cosPhi0(void) const; /// Return cos phi0.
+      /**
+       * Return helix parameter dr.
+       */
 
-      /// Returns helix parameters.
+      double dr(void) const;
+
+      /**
+       * Return helix parameter phi0.
+       */
+      double phi0(void) const;
+
+      /**
+       * Return helix parameter kappa.
+       */
+      double kappa(void) const;
+
+      /**
+       * Return helix parameter dz.
+       */
+      double dz(void) const;
+
+      /**
+       * Return helix parameter tangent lambda.
+       */
+      double tanl(void) const;
+
+      /**
+       * Return curvature of helix.
+       */
+      double curv(void) const;
+
+      /**
+       * Return sin phi0.
+       */
+
+      double sinPhi0(void) const;
+
+      /**
+       * Return cos phi0.
+       */
+      double cosPhi0(void) const;
+
+      /**
+       * Returns helix parameters.
+       */
       const HepVector& a(void) const;
 
-      /// Returns error matrix.
+      /**
+       * Returns error matrix.
+       */
       const HepSymMatrix& Ea(void) const;
 
     public:// Modifiers
@@ -194,11 +231,12 @@ namespace Belle2 {
       static bool ms_throw_exception; /// Throw exception flag.
 
 
-    public:// Operators
+    public: // Operators
 
       Helix& operator = (const Helix&);       /// Copy operator.
 
-    public:// Mathmatical functions
+    public: // Mathmatical functions
+
       HepMatrix delApDelA(const HepVector& ap) const;
       HepMatrix delXDelA(double phi) const;
       HepMatrix delMDelA(double phi) const;
@@ -206,6 +244,7 @@ namespace Belle2 {
       HepMatrix del4MXDelA(double phi, double mass) const;
 
     private:
+
       void updateCache(void);
 
       /**

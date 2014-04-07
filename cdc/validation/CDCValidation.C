@@ -180,17 +180,6 @@ void SetLayerID()
 }
 
 
-void SetHistoSizes(TH1D *h)
-{
-  h->GetXaxis()->SetLabelSize(0.06);
-  h->GetYaxis()->SetLabelSize(0.06);
-  h->GetXaxis()->SetTitleSize(0.08);
-  h->GetYaxis()->SetTitleSize(0.08);
-  h->GetXaxis()->SetTitleOffset(0.7);
-  h->GetYaxis()->SetTitleOffset(0.5);
-}
-
-
 void SetPadMargin()
 {
   gPad->SetLeftMargin(0.14);

@@ -49,7 +49,7 @@ namespace Belle2 {
     //! Step length of this hit.
     double m_stepLength;
 
-    //! The momentum at closest point.
+    //! The momentum of pre-step.
     TVector3 m_momentum;
 
     //! The position on wire which is closest to this hit.

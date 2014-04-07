@@ -36,7 +36,7 @@ namespace Belle2 {
     RawEPID();
     //! Destructor
     virtual ~RawEPID();
-    // To derive from TObject
+    /// To derive from TObject
     ClassDef(RawEPID, 1);
   };
 }

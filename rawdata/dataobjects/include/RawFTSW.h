@@ -151,8 +151,8 @@ namespace Belle2 {
     };
 
   protected :
-    // To derive from TObject
-    // ver.2 Remove m_FTSW_header and introduce a new data format on Nov. 20, 2013
+    /// To derive from TObject
+    /// ver.2 Remove m_FTSW_header and introduce a new data format on Nov. 20, 2013
     ClassDef(RawFTSW, 2);
 
   };

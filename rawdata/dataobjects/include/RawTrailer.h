@@ -80,6 +80,7 @@ namespace Belle2 {
     //! do not record buffer ( RawCOPPER includes buffer of RawHeader and RawTrailer )
     int* m_buffer;
 
+    /// To derive from TObject
     ClassDef(RawTrailer, 1);
   };
 

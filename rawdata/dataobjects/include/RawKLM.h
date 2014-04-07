@@ -36,7 +36,7 @@ namespace Belle2 {
     RawKLM();
     //! Destructor
     virtual ~RawKLM();
-    // To derive from TObject
+    /// To derive from TObject
     ClassDef(RawKLM, 1);
   };
 }

@@ -35,7 +35,7 @@ namespace Belle2 {
     RawSVD();
     //! Destructor
     virtual ~RawSVD();
-    // To derive from TObject
+    /// To derive from TObject
     ClassDef(RawSVD, 1);
   };
 }

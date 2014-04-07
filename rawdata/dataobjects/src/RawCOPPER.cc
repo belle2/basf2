@@ -594,6 +594,7 @@ unsigned int RawCOPPER::FillTopBlockRawHeader(unsigned int m_node_id, unsigned i
                                               int prev_runsubrun_no, int* cur_runsubrun_no)
 {
   const int cpr_id = 0;
+  //  m_temp_value = 12345678;
   //
   // This function only fills RawHeader contents for the first datablock.
   // # of block should be 1

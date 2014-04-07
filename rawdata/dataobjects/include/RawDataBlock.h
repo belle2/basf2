@@ -105,7 +105,7 @@ namespace Belle2 {
     //! no longer used
     int m_which_part;
 
-    // To drive from TObject
+    /// To drive from TObject
     ClassDef(RawDataBlock, 1);
 
   };

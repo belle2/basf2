@@ -89,7 +89,7 @@ namespace Belle2 {
     };
 
   protected :
-    // To derive from TObject
+    /// To derive from TObject
     ClassDef(RawTLU, 1);
 
   };

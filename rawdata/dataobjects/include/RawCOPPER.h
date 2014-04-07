@@ -353,8 +353,9 @@ namespace Belle2 {
     RawTrailer tmp_trailer;
 
   protected :
+    ///ver.2 Change FEE format as presented at B2GM in Nov.2013 ( Nov.20, 2013)
     ClassDef(RawCOPPER, 2);
-    //ver.2 Change FEE format as presented at B2GM in Nov.2013 ( Nov.20, 2013)
+
   };
 
 

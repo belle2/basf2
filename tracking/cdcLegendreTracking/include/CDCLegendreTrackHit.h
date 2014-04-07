@@ -34,7 +34,7 @@ namespace Belle2 {
     /** Constructor to create a CDCTrackHit from a CDCHit object.
      * Some member variables of CDCHit are copied and other to CDCTrackHit specific variables are initialized (e.g. the position of the hit wire in normal space and in the conformal plane).
      */
-    CDCLegendreTrackHit(CDCHit* hit, int iHit, int nbinsTheta);
+    CDCLegendreTrackHit(CDCHit* hit, int iHit);
 
     /** Copy constructor.
      *
@@ -116,30 +116,7 @@ namespace Belle2 {
      */
     void setUsed(int is_used) {m_is_used = is_used;};
 
-    /**
-     * Return information about "r" in Legendre space
-     */
-    inline double getRValue(int bin) {return m_rValues[bin];};
 
-    /**
-     * Write information about "r" in Legendre space
-     */
-    void setRValue(int bin, double rValue);
-
-    /**
-     * Check if information about "r" in Legendre space stored in current object
-     */
-    inline bool checkRValue(int bin) {return m_rValuesBool[bin];};
-
-    /**
-     * Memory clean-up
-     */
-    void clearPointers();
-
-    /*    inline bool operator==(const CDCLegendreTrackHit& lhs, const CDCLegendreTrackHit& rhs){
-          return lhs.getStoreIndex() == rhs.getStoreIndex();
-        }
-    */
   private:
 
     int m_storeID;                     /**< ID of the original CDCHit in the store array*/
@@ -160,10 +137,6 @@ namespace Belle2 {
     TVector3 m_wirePositionOrig;           /**< Original Coordinates of the center (!) of the hit wire. */
 
     static constexpr double m_zReference = 25.852;  /**< Reference z position for wire position determination*/
-
-    double* m_rValues; /**< Holds information about "r" in Legendre space */
-    bool* m_rValuesBool; /**< Sets True when "r" value is stored */
-    int m_nbinsTheta; /**< Number of theta bins in Legendre space */
 
     int m_is_used; /**< Indicates whether hit was used */
 

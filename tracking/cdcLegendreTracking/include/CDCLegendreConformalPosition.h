@@ -14,23 +14,35 @@
 
 namespace Belle2 {
 
-  class CDCLegendreTrackCandidate;
-
   class CDCLegendreConformalPosition {
   public:
 
-    CDCLegendreConformalPosition(int ninsTheta);
+    CDCLegendreConformalPosition();
 
+    ~CDCLegendreConformalPosition();
 
-    static CDCLegendreConformalPosition& Instance(int ninsTheta);
+    void clearPointers();
+
+    static CDCLegendreConformalPosition& Instance();
+
+    static CDCLegendreConformalPosition& InstanceTrusted();
+
+    inline double getConformalR(int layerId, int wireId, int binTheta) const { return m_lookupR[layerId][wireId][binTheta]; };
 
 
   private:
 
+    double* m_sin_theta; /**< Lookup array for calculation of sin */
+    double* m_cos_theta; /**< Lookup array for calculation of cos */
+    static constexpr double m_PI = 3.1415926535897932384626433832795; /**< pi is exactly three*/
+
+    static const int nLayers_max = 56;
+    static const int nWires_max = 384;
+    static const int m_nbinsTheta = 8192;
+
+    double m_lookupR[nLayers_max][nWires_max][(m_nbinsTheta + 1)]; /**< Lookup table for holding information about r value, used in FastHogh algorithm. */
+
     static CDCLegendreConformalPosition* s_cdcLegendreConformalPosition;
-
-    int m_ninsTheta;
-
 
   };
 

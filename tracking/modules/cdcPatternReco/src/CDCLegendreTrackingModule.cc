@@ -25,6 +25,7 @@
 #include <tracking/cdcLegendreTracking/CDCLegendreFastHough.h>
 #include <tracking/cdcLegendreTracking/CDCLegendreTrackDrawer.h>
 #include <tracking/cdcLegendreTracking/CDCLegendreQuadTree.h>
+#include <tracking/cdcLegendreTracking/CDCLegendreConformalPosition.h>
 
 #include "genfit/TrackCand.h"
 
@@ -76,7 +77,7 @@ CDCLegendreTrackingModule::CDCLegendreTrackingModule() :
            2.);
 
   addParam("MaxLevel", m_maxLevel,
-           "Maximal level of recursive calling of FastHough algorithm", 12);
+           "Maximal level of recursive calling of FastHough algorithm", 10);
 
   addParam("Reconstruct Curler", m_reconstructCurler,
            "Flag, whether curlers should be reconstructed", false);
@@ -134,6 +135,10 @@ void CDCLegendreTrackingModule::initialize()
 
   m_cdcLegendreTrackCreator = new CDCLegendreTrackCreator(m_AxialHitList, m_trackList, m_appendHits, m_cdcLegendreTrackFitter, m_cdcLegendreTrackDrawer);
 
+  m_cdcLegendreConformalPosition = new CDCLegendreConformalPosition();
+
+  CDCLegendreConformalPosition& m_cdcLegendreConformalPosition_temp __attribute__((unused)) = CDCLegendreConformalPosition::Instance();
+
 //  m_cdcLegendreQuadTree = new CDCLegendreQuadTree(-1.*m_rc, m_rc, 0, m_nbinsTheta, 0, NULL);
 }
 
@@ -149,6 +154,7 @@ void CDCLegendreTrackingModule::event()
 
   B2INFO("**********   CDCTrackingModule  ************");
 
+  B2DEBUG(100, "Initializing hits");
   //StoreArray with digitized CDCHits, should already be created by CDCDigitizer module
   StoreArray<CDCHit> cdcHits(m_cdcHitsColName);
   B2DEBUG(100,
@@ -163,13 +169,14 @@ void CDCLegendreTrackingModule::event()
 
   //Convert CDCHits to own Hit class
   for (int iHit = 0; iHit < cdcHits.getEntries(); iHit++) {
-    CDCLegendreTrackHit* trackHit = new CDCLegendreTrackHit(cdcHits[iHit],
-                                                            iHit, m_nbinsTheta);
+    CDCLegendreTrackHit* trackHit = new CDCLegendreTrackHit(cdcHits[iHit], iHit);
     if (trackHit->getIsAxial())
       m_AxialHitList.push_back(trackHit);
     else
       m_StereoHitList.push_back(trackHit);
   }
+
+  B2DEBUG(100, "Perform track finding");
 
   //perform track finding
   DoSteppedTrackFinding();
@@ -204,6 +211,8 @@ void CDCLegendreTrackingModule::DoSteppedTrackFinding()
 
   //Start loop, where tracks are searched for
   do {
+    B2DEBUG(100, "Copying hits set");
+
     std::vector<CDCLegendreTrackHit*> hits_vector;
     std::copy_if(hits_set.begin(), hits_set.end(), std::back_inserter(hits_vector), [](CDCLegendreTrackHit * hit) {return (hit->isUsed() == CDCLegendreTrackHit::not_used);});
     if (not m_multipleCandidateSearch) {
@@ -238,12 +247,14 @@ void CDCLegendreTrackingModule::DoSteppedTrackFinding()
 
       int level = 0;
 
+      B2DEBUG(100, "Perform FastHough");
+
       m_cdcLegendreFastHough->initializeCandidatesVector(&candidates);
       m_cdcLegendreFastHough->setLimit(limit);
       m_cdcLegendreFastHough->setAxialHits(hits_vector);
-      m_cdcLegendreFastHough->MaxFastHough(hits_vector, 0, 0, m_nbinsTheta, m_rMin, m_rMax);
+//      m_cdcLegendreFastHough->MaxFastHough(hits_vector, 0, 0, m_nbinsTheta, m_rMin, m_rMax);
 //      m_cdcLegendreFastHough->MaxFastHoughHighPtHeap(hits_vector, 0, m_nbinsTheta, m_rMin, m_rMax, level);
-//      m_cdcLegendreFastHough->MaxFastHoughHighPtStack(hits_vector, 0, m_nbinsTheta, -0.01667, 0.01667, level);
+      m_cdcLegendreFastHough->MaxFastHoughHighPtStack(hits_vector, 0, m_nbinsTheta, -0.01667, 0.01667, level);
       if (candidates.size() == 0) {
         limit *= m_stepScale;
         n_hits = 999;
@@ -317,11 +328,17 @@ void CDCLegendreTrackingModule::AsignStereoHits()
 
 void CDCLegendreTrackingModule::endRun()
 {
-
 }
 
 void CDCLegendreTrackingModule::terminate()
 {
+  delete m_cdcLegendreConformalPosition;
+//  delete m_cdcLegendreTrackFitter;
+  delete m_cdcLegendreTrackDrawer;
+  delete m_cdcLegendrePatternChecker;
+  delete m_cdcLegendreFastHough;
+  delete m_cdcLegendreTrackMerger;
+  delete m_cdcLegendreTrackCreator;
 }
 
 
@@ -329,13 +346,11 @@ void CDCLegendreTrackingModule::clear_pointer_vectors()
 {
 
   for (CDCLegendreTrackHit * hit : m_AxialHitList) {
-    hit->clearPointers();
     delete hit;
   }
   m_AxialHitList.clear();
 
   for (CDCLegendreTrackHit * hit : m_StereoHitList) {
-    hit->clearPointers();
     delete hit;
   }
   m_StereoHitList.clear();

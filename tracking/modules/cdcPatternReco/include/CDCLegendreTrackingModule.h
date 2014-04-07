@@ -36,6 +36,7 @@ namespace Belle2 {
   class CDCLegendreTrackCreator;
   class CDCLegendreTrackDrawer;
   class CDCLegendreQuadTree;
+  class CDCLegendreConformalPosition;
 
   class CDCNiceDrawingModule;
 
@@ -100,6 +101,7 @@ namespace Belle2 {
     CDCLegendreTrackMerger* m_cdcLegendreTrackMerger;
     CDCLegendreTrackCreator* m_cdcLegendreTrackCreator;
     CDCLegendreQuadTree* m_cdcLegendreQuadTree;
+    CDCLegendreConformalPosition* m_cdcLegendreConformalPosition;
 
     int m_threshold; /**< Threshold for votes in the legendre plane, parameter of the module*/
     double m_thresholdUnique; /**< Threshold of unique TrackHits for track building*/

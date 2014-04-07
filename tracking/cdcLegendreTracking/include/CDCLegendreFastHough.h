@@ -16,11 +16,14 @@ namespace Belle2 {
 
   class CDCLegendreTrackHit;
   class CDCLegendreQuadTree;
+  class CDCLegendreConformalPosition;
 
   class CDCLegendreFastHough {
   public:
 
     CDCLegendreFastHough(bool useHitPrecalculatedR, bool reconstructCurler, int maxLevel, int nbinsTheta, double rMin, double rMax);
+
+    ~CDCLegendreFastHough();
 
     /**
      * @brief small helper function, to check if four values have the same sign
@@ -109,6 +112,7 @@ namespace Belle2 {
     double Rcell;
 
     std::vector< std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> > >* m_candidates; /**< Holds list of track candidates */
+//    CDCLegendreConformalPosition &m_cdcLegendreConformalPosition;
 
 
   };

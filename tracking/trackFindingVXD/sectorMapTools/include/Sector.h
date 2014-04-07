@@ -13,6 +13,7 @@
 // includes - rootStuff:
 // includes - stl:
 #include <vector>
+#include <string>
 
 // includes - tf-related stuff
 // includes - general fw stuff
@@ -68,6 +69,15 @@ namespace Belle2 {
     {}
 
 
+    /** overloaded assignment operator */
+    Sector& operator=(const Sector& aSector) {
+      m_sectorID = aSector.getSecID();
+      m_distance2Origin = aSector.getDistance();
+      m_useDistance4sort = aSector.useDistance4sort();
+      return *this;
+    }
+
+
     /** overloaded '<'-operator for sorting algorithms - sorts by distance2origin or fullSecID depending on setting */
     bool operator<(const Sector& b)  const {
       if (m_useDistance4sort == false) { return getSecID() < b.getSecID(); }
@@ -77,14 +87,14 @@ namespace Belle2 {
 
     /** overloaded '=='-operator for sorting algorithms - sorts by distance2origin or fullSecID depending on setting */
     bool operator==(const Sector& b) const {
-      if (m_useDistance4sort == false) { return getSecID() == b.getSecID(); }
+      if (useDistance4sort() == false) { return getSecID() == b.getSecID(); }
       return getDistance() == b.getDistance();
     }
 
 
     /** overloaded '>'-operator for sorting algorithms - sorts by distance2origin or fullSecID depending on setting */
     bool operator>(const Sector& b)  const {
-      if (m_useDistance4sort == false) { return getSecID() > b.getSecID(); }
+      if (useDistance4sort() == false) { return getSecID() > b.getSecID(); }
       return getDistance() > b.getDistance();
     }
 
@@ -111,6 +121,18 @@ namespace Belle2 {
 
     /** getter - getSecID returns the ID of the sector (for definition of secID, see m_sectorID). */
     unsigned getSecID() const { return m_sectorID; }
+
+
+    /** printing member, delivers string of interesting features of current sector */
+    std::string printSector();
+
+
+    /** if true, usingDistance for sector sorting is activated, if false, the sectorID is used */
+    bool useDistance4sort() const { return m_useDistance4sort; }
+
+
+    /** if you pass a true here, the sorting will be set to using the distance to origind instead of the sectorID. If you set to false, it's the other way round */
+    void setDistance4sort(bool sortByDistance) { m_useDistance4sort = sortByDistance; }
 
 
   protected:
@@ -146,6 +168,8 @@ namespace Belle2 {
 
     /** if activated, sectors are sorted by distance to origin, if false, they are sorted by layerID. */
     bool m_useDistance4sort;
+
+
     ClassDef(Sector, 1)
   };
 } //Belle2 namespace

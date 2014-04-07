@@ -50,20 +50,20 @@ CDCLegendreFastHough::~CDCLegendreFastHough()
   delete[] m_cos_theta;
 }
 
-
+/*
 inline bool CDCLegendreFastHough::sameSign(double n1, double n2,
                                            double n3, double n4)
 {
-  /*  if (n1 > 0 && n2 > 0 && n3 > 0 && n4 > 0)
-      return true;
-    else if (n1 < 0 && n2 < 0 && n3 < 0 && n4 < 0)
-      return true;
-    else
-      return false;
-      */
+//    if (n1 > 0 && n2 > 0 && n3 > 0 && n4 > 0)
+//      return true;
+//    else if (n1 < 0 && n2 < 0 && n3 < 0 && n4 < 0)
+//      return true;
+//    else
+//      return false;
+
   return ((n1 > 0 && n2 > 0 && n3 > 0 && n4 > 0) || (n1 < 0 && n2 < 0 && n3 < 0 && n4 < 0));
 }
-
+*/
 
 void CDCLegendreFastHough::FastHoughNormal(
   std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> >* candidate,

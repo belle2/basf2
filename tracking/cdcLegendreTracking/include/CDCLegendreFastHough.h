@@ -28,7 +28,8 @@ namespace Belle2 {
     /**
      * @brief small helper function, to check if four values have the same sign
      */
-    static inline bool sameSign(double, double, double, double);
+    static inline bool sameSign(double n1, double n2, double n3, double n4)
+    {return ((n1 > 0 && n2 > 0 && n3 > 0 && n4 > 0) || (n1 < 0 && n2 < 0 && n3 < 0 && n4 < 0));};
 
     /**
      * @brief Recursively called function to perform the Fast Hough algorithm, modified to only deliver the candidate with the most contributing hits

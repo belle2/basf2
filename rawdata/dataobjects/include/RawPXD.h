@@ -51,6 +51,7 @@ namespace Belle2 {
 
   private:
     int m_nwords;/**< Number of (32bit) Words stored in the buffer. There might be unsused bytes in the last word.*/
+    /// Raw dump of ONSEN data. buffer of size m_nwords (32bit int)
     int* m_buffer; //[m_nwords] /**< Buffer of size m_nwords  */
     bool m_allocated;/**< copied over flag*/
 

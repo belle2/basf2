@@ -26,6 +26,7 @@
 #include <tracking/cdcLegendreTracking/CDCLegendreTrackDrawer.h>
 #include <tracking/cdcLegendreTracking/CDCLegendreQuadTree.h>
 #include <tracking/cdcLegendreTracking/CDCLegendreConformalPosition.h>
+#include <tracking/cdcLegendreTracking/CDCLegendreQuadTreeCandidateCreator.h>
 
 #include "genfit/TrackCand.h"
 
@@ -140,6 +141,10 @@ void CDCLegendreTrackingModule::initialize()
   CDCLegendreConformalPosition& m_cdcLegendreConformalPosition_temp __attribute__((unused)) = CDCLegendreConformalPosition::Instance();
 
 //  m_cdcLegendreQuadTree = new CDCLegendreQuadTree(-1.*m_rc, m_rc, 0, m_nbinsTheta, 0, NULL);
+  m_cdcLegendreQuadTree = new CDCLegendreQuadTree(m_rMin, m_rMax,  /*-1.*m_rc, m_rc,*/ 0, m_nbinsTheta, 0, NULL);
+
+  m_cdcLegendreQuadTreeCandidateCreator = new CDCLegendreQuadTreeCandidateCreator();
+  CDCLegendreQuadTreeCandidateCreator m_cdcLegendreQuadTreeCandidateCreator_temp __attribute__((unused)) =  CDCLegendreQuadTreeCandidateCreator::Instance();
 }
 
 void CDCLegendreTrackingModule::beginRun()
@@ -179,7 +184,8 @@ void CDCLegendreTrackingModule::event()
   B2DEBUG(100, "Perform track finding");
 
   //perform track finding
-  DoSteppedTrackFinding();
+//  DoSteppedTrackFinding();
+  DoTreeTrackFinding();
 //  MergeTracks();
 //    MergeCurler();
 //  AsignStereoHits();
@@ -206,7 +212,7 @@ void CDCLegendreTrackingModule::DoSteppedTrackFinding()
     it = hits_set.insert(it, trackHit);
   }
 
-  int n_hits = 999;
+  unsigned int n_hits = 999;
   double limit = m_initialAxialHits;
 
   //Start loop, where tracks are searched for
@@ -229,7 +235,7 @@ void CDCLegendreTrackingModule::DoSteppedTrackFinding()
         n_hits = 999;
       }
       // if track is found and has enough hits
-      else if (n_hits >= m_threshold) {
+      else if (n_hits >= (unsigned) m_threshold) {
 
         std::pair<double, double> ref_point = std::make_pair(0., 0.);
 
@@ -245,7 +251,7 @@ void CDCLegendreTrackingModule::DoSteppedTrackFinding()
     } else {
       std::vector< std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> > > candidates;
 
-      int level = 0;
+      int level __attribute__((unused)) = 0;
 
       B2DEBUG(100, "Perform FastHough");
 
@@ -260,7 +266,7 @@ void CDCLegendreTrackingModule::DoSteppedTrackFinding()
         n_hits = 999;
       } else {
         for (std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> > candidate_temp : candidates) {
-          if (candidate_temp.first.size() >= m_threshold) {
+          if (candidate_temp.first.size() >= (unsigned) m_threshold) {
             std::pair<double, double> ref_point = std::make_pair(0., 0.);
 
             bool merged = false;
@@ -274,6 +280,64 @@ void CDCLegendreTrackingModule::DoSteppedTrackFinding()
         limit = limit * m_stepScale;
       }
     }
+
+    //perform search until found track has too few hits or threshold is too small and no tracks are found
+  } while (limit >= m_threshold
+           && (limit / m_stepScale >= m_threshold || n_hits != 999)
+           && hits_set.size() >= (unsigned) m_threshold);
+
+
+  std::vector<CDCLegendreTrackHit*> hits_vector; //temporary array;
+  m_cdcLegendreTrackDrawer->finalizeROOTFile(hits_vector);
+
+}
+
+
+void CDCLegendreTrackingModule::DoTreeTrackFinding()
+{
+  std::sort(m_AxialHitList.begin(), m_AxialHitList.end());
+
+  std::set<CDCLegendreTrackHit*> hits_set;
+  std::set<CDCLegendreTrackHit*>::iterator it = hits_set.begin();
+  for (CDCLegendreTrackHit * trackHit : m_AxialHitList) {
+    it = hits_set.insert(it, trackHit);
+  }
+
+  unsigned int n_hits = 999;
+  double limit = m_initialAxialHits;
+  m_cdcLegendreQuadTree->provideHitSet(hits_set);
+
+
+//  Start loop, where tracks are searched for
+  do {
+    m_cdcLegendreQuadTree->setThreshold(limit);
+    m_cdcLegendreQuadTree->startFillingTree();
+    B2INFO("Number of candidates: " << m_cdcLegendreQuadTree->getNCands());
+//    CDCLegendreQuadTreeCandidateCreator::Instance().createCandidates();
+
+    std::vector< std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> > >& candidates =
+      CDCLegendreQuadTreeCandidateCreator::Instance().getCandidates();
+
+    if (candidates.size() == 0) {
+      limit *= m_stepScale;
+      n_hits = 999;
+    } else {
+      for (std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> > candidate_temp : candidates) {
+        if (candidate_temp.first.size() >= (unsigned) m_threshold) {
+          std::pair<double, double> ref_point = std::make_pair(0., 0.);
+
+          bool merged = false;
+          if (m_mergeTracksEarly) merged = m_cdcLegendreTrackMerger->earlyCandidateMerge(candidate_temp, hits_set, m_fitTracksEarly);
+
+          if (!merged) m_cdcLegendreTrackCreator->createLegendreTrackCandidate(candidate_temp, &hits_set, ref_point);
+
+          if (m_drawCandidates) m_cdcLegendreTrackDrawer->showPicture();
+        }
+      }
+      limit = limit * m_stepScale;
+    }
+
+    CDCLegendreQuadTreeCandidateCreator::Instance().clearCandidates();
 
     //perform search until found track has too few hits or threshold is too small and no tracks are found
   } while (limit >= m_threshold
@@ -339,11 +403,15 @@ void CDCLegendreTrackingModule::terminate()
   delete m_cdcLegendreFastHough;
   delete m_cdcLegendreTrackMerger;
   delete m_cdcLegendreTrackCreator;
+  delete m_cdcLegendreQuadTree;
 }
 
 
 void CDCLegendreTrackingModule::clear_pointer_vectors()
 {
+  m_cdcLegendreQuadTree->clearTree();
+  CDCLegendreQuadTreeCandidateCreator::Instance().clearNodes();
+  CDCLegendreQuadTreeCandidateCreator::Instance().clearCandidates();
 
   for (CDCLegendreTrackHit * hit : m_AxialHitList) {
     delete hit;

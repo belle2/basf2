@@ -10,125 +10,297 @@
 
 #include <tracking/cdcLegendreTracking/CDCLegendreQuadTree.h>
 #include <tracking/cdcLegendreTracking/CDCLegendreTrackHit.h>
+#include <tracking/cdcLegendreTracking/CDCLegendreFastHough.h>
+#include <tracking/cdcLegendreTracking/CDCLegendreQuadTreeCandidateCreator.h>
 
 #include <cmath>
+#include <cstdlib>
+#include <iomanip>
+#include <string>
 
+#include <boost/foreach.hpp>
+#include <boost/tuple/tuple.hpp>
+#include <boost/utility.hpp>
+
+#include <iostream>
+#include <sstream>
+#include <algorithm>
+#include <memory>
+#include <cmath>
+
+using namespace std;
 using namespace Belle2;
+
+double* CDCLegendreQuadTree::s_sin_theta;
+double* CDCLegendreQuadTree::s_cos_theta;
+bool CDCLegendreQuadTree::s_sin_lookup_created;
+int CDCLegendreQuadTree::s_nbinsTheta;
+unsigned int CDCLegendreQuadTree::s_hitsThreshold;
+int CDCLegendreQuadTree::s_nCands;
+
+/*
+ * TODO: How to organise it? we can fill tree, then check, if hit was used twice or more times; in that case mark it as "multipleused" and don't include it to any track.
+ * then create track cands (using criteria on number of hits) and mark (?) that hits again as good ones (might be appended to the good candidate)
+ *
+ * Lits of nodes with candidates should be provided as output of whole algorithm; then another class can create candidates using pointer to the node
+ */
+CDCLegendreQuadTree::CDCLegendreQuadTree():
+  m_rMin(0), m_rMax(0), m_thetaMin(0), m_thetaMax(0), m_level(0)
+{
+
+}
+
 
 CDCLegendreQuadTree::CDCLegendreQuadTree(double rMin, double rMax, int thetaMin, int thetaMax, int level, CDCLegendreQuadTree* parent) :
   m_rMin(rMin), m_rMax(rMax), m_thetaMin(thetaMin), m_thetaMax(thetaMax), m_level(level)
 {
-  if (level > 0) {
+  m_filled = false;
+
+  if (m_level > 0) {
     m_parent = parent;
+  } else {
+    m_parent = NULL;
+    s_sin_lookup_created = false;
+    s_nCands = 0;
   }
-  /*  m_northWest = 0;
-    m_northEast = 0;
-    m_southWest = 0;
-    m_southEast = 0;
-  */
+
   Rcell = 2. * m_PI * 60. / 384.;
 
   m_deltaR = 4. * Rcell / (4. / ((m_rMax + m_rMin) * (m_rMax + m_rMin)) - 4.*Rcell * Rcell);
 
   m_lastLevel = checkLimitsR();
 
-//  B2INFO("CREATED node:" << m_thetaMin<< "x" << m_thetaMax << "x" << m_rMin << "x" << m_rMax << " dr=" << delta_r << " level:" << m_level);
+  if (not m_lastLevel) initialize();
 
+//  B2INFO("CREATED node:" << m_thetaMin<< "x" << m_thetaMax << "x" << m_rMin << "x" << m_rMax << " dr=" << m_deltaR << " level:" << m_level);
 }
 
-void CDCLegendreQuadTree::insert(CDCLegendreTrackHit* hit)
+
+CDCLegendreQuadTree::~CDCLegendreQuadTree()
 {
-  /*  // Ignore objects which do not belong in this quad tree
-     if (!boundary.containsPoint(p))
-       return false; // object cannot be added
-
-     // If there is space in this quad tree, add the object here
-     if (points.size < QT_NODE_CAPACITY)
-     {
-       points.append(p);
-       return true;
-     }
-
-     // Otherwise, we need to subdivide then add the point to whichever node will accept it
-     if (northWest == null)
-       subdivide();
-
-     if (northWest->insert(p)) return true;
-     if (northEast->insert(p)) return true;
-     if (southWest->insert(p)) return true;
-     if (southEast->insert(p)) return true;
-
-     // Otherwise, the point cannot be inserted for some unknown reason (which should never happen)
-     return false;
-  */
-
-  /*
-    double r_temp;
-    if (hit->checkRValue(m_thetaMin)) r_temp = hit->getRValue(m_thetaMin);
-    else {
-      r_temp = hit->getConformalX() * m_cos_theta[m_thetaMin] +
-               hit->getConformalY() * m_sin_theta[m_thetaMin];
-      hit->setRValue(m_thetaMin, r_temp);
-    }
-
-
-    r_1 = r_temp + hit->getConformalDriftTime();
-    r_2 = r_temp - hit->getConformalDriftTime();
-
-    //calculate distances of lines to horizontal bin border
-    for (int r_index = 0; r_index < 3; ++r_index) {
-      dist_1[t_index][r_index] = r[r_index] - r_1;
-      dist_2[t_index][r_index] = r[r_index] - r_2;
-    }
-  }
-
-  //actual voting, based on the distances (test, if line is passing though the bin)
-  for (int t_index = 0; t_index < 2; ++t_index)
-  {
-    for (int r_index = 0; r_index < 2; ++r_index) {
-      //curves are assumed to be straight lines, might be a reasonable assumption locally
-      if ((!sameSign(dist_1[t_index][r_index], dist_1[t_index][r_index + 1], dist_1[t_index + 1][r_index], dist_1[t_index + 1][r_index + 1])) &&
-          (hit->isUsed() == CDCLegendreTrackHit::not_used))
-        voted_hits[t_index][r_index].push_back(hit);
-      else if ((!sameSign(dist_2[t_index][r_index], dist_2[t_index][r_index + 1], dist_2[t_index + 1][r_index], dist_2[t_index + 1][r_index + 1])) &&
-               (hit->isUsed() == CDCLegendreTrackHit::not_used))
-        voted_hits[t_index][r_index].push_back(hit);
-    }
-  }
-
-
-  if (!m_lastLevel)
-  {
-    for (int ii = 0; ii < 2; ii++) {
-      for (int jj = 0; jj < 2; jj++) {
-        if (m_children[ii] != 0) {
-          m_children[ii][jj]->insert(hit);
-        } else {
-          if (m_lastLevel) {
-            m_children[ii][jj] = 0;
-          } else {
-            double dr = fabs(m_rMax - m_rMin) / 2.;
-            int dtheta = (m_thetaMax - m_thetaMin) / 2 ;
-            m_children[ii][jj] = new CDCLegendreQuadTree(m_rMin + dr * ii, m_rMin + dr * (ii + 1), m_thetaMin + dtheta * jj, m_thetaMin + dtheta * (jj + 1), m_level + 1, this);
-          }
-        }
+  if (not m_lastLevel) {
+    for (int t_index = 0; t_index < m_nbins_theta; ++t_index) {
+      for (int r_index = 0; r_index < m_nbins_r; ++r_index) {
+        delete m_children[t_index][r_index];
       }
+      delete[] m_children[t_index];
     }
-  } else
-    m_hits.push_back(hit);
+    delete[] m_r;
+    delete[] m_thetaBin;
+    delete[] m_children;
+  }
 
-  */
+  if ((m_level == 0) && (s_sin_lookup_created)) {
+    delete[] s_sin_theta;
+    delete[] s_cos_theta;
+  }
+
 }
 
 bool CDCLegendreQuadTree::checkLimitsR()
 {
 
-  if (m_level == 11)
+  if (m_level == 10)
     return true;
 
-  if (fabs(m_rMax - m_rMin) < m_deltaR) {
-    return true;
-  }
+//  if (fabs(m_rMax - m_rMin) < m_deltaR) {
+//    return true;
+//  }
 
   return false;
 }
+
+
+void CDCLegendreQuadTree::initialize()
+{
+  if (not s_sin_lookup_created) {
+    //B2INFO("Create lookup table");
+    s_nbinsTheta = 8192;
+    double bin_width = m_PI / s_nbinsTheta;
+    s_sin_theta = new double[s_nbinsTheta + 1];
+    s_cos_theta = new double[s_nbinsTheta + 1];
+
+    for (int i = 0; i <= s_nbinsTheta; ++i) {
+      s_sin_theta[i] = sin(i * bin_width);
+      s_cos_theta[i] = cos(i * bin_width);
+    }
+
+    s_sin_lookup_created = true;
+  }
+
+  //B2DEBUG(100, "DELTA r: " << delta_r << "; r_max-r_min: " << fabs(r_max - r_min));
+
+  //calculate bin borders of 2x2 bin "histogram"
+  if (not m_lastLevel) {
+    //B2DEBUG(100, "NORMAL binning");
+    m_nbins_r = 2;
+    m_nbins_theta = 2;
+
+    m_r = new double[3];
+    m_r[0] = m_rMin;
+    m_r[1] = m_rMin + 0.5 * (m_rMax - m_rMin);
+    m_r[2] = m_rMax;
+
+    m_thetaBin = new int[3];
+    m_thetaBin[0] = m_thetaMin;
+    m_thetaBin[1] = m_thetaMin + (m_thetaMax - m_thetaMin) / 2;
+    m_thetaBin[2] = m_thetaMax;
+  } else {
+    //B2DEBUG(100, "1xN binning");
+    m_nbins_r = 1;
+
+    m_r = new double[2];
+    m_r[0] = m_rMin;
+    m_r[1] = m_rMax;
+
+    m_nbins_theta = (m_thetaMax - m_thetaMin) / 8;
+    m_thetaBin = new int[m_nbins_theta + 1];
+    for (int t_index = 0; t_index < m_nbins_theta + 1; t_index++) {
+      m_thetaBin[t_index] = m_thetaMin + t_index;
+    }
+  }
+
+  //B2DEBUG(100, "Number of bins: " << nbins_r << "x" << nbins_theta);
+  //B2DEBUG(100, "CREATING voting plane");
+
+  m_children = new CDCLegendreQuadTree** [m_nbins_theta];
+  for (int i = 0; i < m_nbins_theta; ++i) {
+    m_children[i] = new CDCLegendreQuadTree*[m_nbins_r];
+    for (int j = 0; j < m_nbins_r; ++j) {
+      m_children[i][j] = new CDCLegendreQuadTree(m_r[j], m_r[j + 1], m_thetaBin[i], m_thetaBin[i + 1], m_level + 1, this);
+    }
+  }
+
+}
+
+void CDCLegendreQuadTree::provideHitSet(const std::set<CDCLegendreTrackHit*>& hits_set)
+{
+  m_hits.clear();
+  std::copy_if(hits_set.begin(), hits_set.end(), std::back_inserter(m_hits), [](CDCLegendreTrackHit * hit) {return (hit->isUsed() == CDCLegendreTrackHit::not_used);});
+}
+
+void CDCLegendreQuadTree::cleanHitsInNode()
+{
+  m_hits.erase(std::remove_if(m_hits.begin(), m_hits.end(), [](CDCLegendreTrackHit * hit) {return hit->isUsed() != CDCLegendreTrackHit::not_used;}), m_hits.end());
+}
+
+void CDCLegendreQuadTree::clearTree()
+{
+  clearNode();
+  if (checkFilled()) {
+    for (int t_index = 0; t_index < m_nbins_theta; ++t_index) {
+      for (int r_index = 0; r_index < m_nbins_r; ++r_index) {
+        m_children[t_index][r_index]->clearTree();
+      }
+    }
+  }
+  m_filled = false;
+  s_nCands = 0;
+}
+
+void CDCLegendreQuadTree::startFillingTree()
+{
+  if (m_hits.size() < s_hitsThreshold) return;
+  if (m_lastLevel) {
+//    B2INFO("Last level! Not filling children. Level = " << m_level << "; bin " << m_rMin << "-" << m_rMax << "x" << m_thetaMin << "-" << m_thetaMax);
+//    B2INFO("Candidate: " << m_rMin << "-" << m_rMax << "x" << m_thetaMin << "-" << m_thetaMax << "; nhits=" << m_hits.size());
+    s_nCands++;
+    CDCLegendreQuadTreeCandidateCreator::Instance().addNode(this);
+    CDCLegendreQuadTreeCandidateCreator::Instance().createCandidate(this);
+    return;
+  }
+
+  if (!checkFilled()) fillChildren();
+//  else cleanHitsInNode();
+
+
+
+  bool binUsed[m_nbins_theta][m_nbins_r];
+  for (int ii = 0; ii < m_nbins_theta; ii++)
+    for (int jj = 0; jj < m_nbins_r; jj++)
+      binUsed[ii][jj] = false;
+
+//Processing, which bins are further investigated
+  for (int bin_loop = 0; bin_loop < m_nbins_theta * m_nbins_r; bin_loop++) {
+    int t_index = 0;
+    int r_index = 0;
+    double max_value_temp = 0;
+    for (int t_index_temp = 0; t_index_temp < m_nbins_theta; ++t_index_temp) {
+      for (int r_index_temp = 0; r_index_temp < m_nbins_r; ++r_index_temp) {
+        if ((max_value_temp  < m_children[t_index_temp][r_index_temp]->getNHits()) && (!binUsed[t_index_temp][r_index_temp])) {
+          max_value_temp = m_children[t_index_temp][r_index_temp]->getNHits();
+          t_index = t_index_temp;
+          r_index = r_index_temp;
+        }
+      }
+    }
+
+    binUsed[t_index][r_index] = true;
+
+    m_children[t_index][r_index]->startFillingTree();
+
+  }
+}
+
+void CDCLegendreQuadTree::fillChildren(/*const std::vector<CDCLegendreTrackHit*>& hits*/)
+{
+
+  double r_temp, r_1, r_2;
+
+  double dist_1[m_nbins_theta + 1][m_nbins_r + 1];
+  double dist_2[m_nbins_theta + 1][m_nbins_r + 1];
+
+  //B2DEBUG(100, "VOTING");
+
+  for (int t_index = 0; t_index < m_nbins_theta; ++t_index) {
+    for (int r_index = 0; r_index < m_nbins_r; ++r_index) {
+      m_children[t_index][r_index]->reserveHitsArray(2 * m_hits.size());
+    }
+  }
+
+  //Voting within the four bins
+  for (CDCLegendreTrackHit * hit : m_hits) {
+    //B2DEBUG(100, "PROCCESSING hit " << hit_counter << " of " << nhitsToReserve);
+    if (hit->isUsed() != CDCLegendreTrackHit::not_used) continue;
+    for (int t_index = 0; t_index < m_nbins_theta + 1; ++t_index) {
+
+      if (hit->checkRValue(m_thetaBin[t_index])) r_temp = hit->getRValue(m_thetaBin[t_index]);
+      else {
+        r_temp = hit->getConformalX() * s_cos_theta[m_thetaBin[t_index]] +
+                 hit->getConformalY() * s_sin_theta[m_thetaBin[t_index]];
+        hit->setRValue(m_thetaBin[t_index], r_temp);
+      }
+      /*      r_temp = hit->getConformalX() * s_cos_theta[m_thetaBin[t_index]] +
+                     hit->getConformalY() * s_sin_theta[m_thetaBin[t_index]];
+      */
+      r_1 = r_temp + hit->getConformalDriftTime();
+      r_2 = r_temp - hit->getConformalDriftTime();
+
+      //calculate distances of lines to horizontal bin border
+      for (int r_index = 0; r_index < m_nbins_r + 1; ++r_index) {
+        dist_1[t_index][r_index] = m_r[r_index] - r_1;
+        dist_2[t_index][r_index] = m_r[r_index] - r_2;
+      }
+    }
+
+    //B2DEBUG(100, "VOTING for hit " << hit_counter << " of " << nhitsToReserve);
+    //actual voting, based on the distances (test, if line is passing though the bin)
+    for (int t_index = 0; t_index < m_nbins_theta; ++t_index) {
+      for (int r_index = 0; r_index < m_nbins_r; ++r_index) {
+        //curves are assumed to be straight lines, might be a reasonable assumption locally
+        if (!CDCLegendreFastHough::sameSign(dist_1[t_index][r_index], dist_1[t_index][r_index + 1], dist_1[t_index + 1][r_index], dist_1[t_index + 1][r_index + 1])) {
+          //B2DEBUG(100, "INSERT hit in " << t_index << ";" << r_index << " bin");
+          m_children[t_index][r_index]->insertHit(hit);
+        } else if (!CDCLegendreFastHough::sameSign(dist_2[t_index][r_index], dist_2[t_index][r_index + 1], dist_2[t_index + 1][r_index], dist_2[t_index + 1][r_index + 1])) {
+          //B2DEBUG(100, "INSERT hit in " << t_index << ";" << r_index << " bin");
+          m_children[t_index][r_index]->insertHit(hit);
+        }
+      }
+    }
+    //B2DEBUG(100, "MOVING to next hit");
+  }
+
+  setFilled();
+
+}
+

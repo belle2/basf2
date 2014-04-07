@@ -37,6 +37,7 @@ namespace Belle2 {
   class CDCLegendreTrackDrawer;
   class CDCLegendreQuadTree;
   class CDCLegendreConformalPosition;
+  class CDCLegendreQuadTreeCandidateCreator;
 
   class CDCNiceDrawingModule;
 
@@ -102,6 +103,7 @@ namespace Belle2 {
     CDCLegendreTrackCreator* m_cdcLegendreTrackCreator;
     CDCLegendreQuadTree* m_cdcLegendreQuadTree;
     CDCLegendreConformalPosition* m_cdcLegendreConformalPosition;
+    CDCLegendreQuadTreeCandidateCreator* m_cdcLegendreQuadTreeCandidateCreator;
 
     int m_threshold; /**< Threshold for votes in the legendre plane, parameter of the module*/
     double m_thresholdUnique; /**< Threshold of unique TrackHits for track building*/
@@ -136,6 +138,11 @@ namespace Belle2 {
      * Function used in the event function, which contains the search for tracks, calling multiply the Fast Hough algorithm, always just searching for one track and afterwards removin the according hits from the hit list.
      */
     void DoSteppedTrackFinding();
+
+    /**
+     * Function used in the event function, which contains the search for tracks, calling multiply the Fast Hough algorithm, always just searching for one track and afterwards removin the according hits from the hit list.
+     */
+    void DoTreeTrackFinding();
 
     /**
      * In this function, the stereo hits are assigned to the track candidates.

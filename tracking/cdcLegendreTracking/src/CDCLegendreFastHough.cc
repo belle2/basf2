@@ -54,12 +54,14 @@ CDCLegendreFastHough::~CDCLegendreFastHough()
 inline bool CDCLegendreFastHough::sameSign(double n1, double n2,
                                            double n3, double n4)
 {
-  if (n1 > 0 && n2 > 0 && n3 > 0 && n4 > 0)
-    return true;
-  else if (n1 < 0 && n2 < 0 && n3 < 0 && n4 < 0)
-    return true;
-  else
-    return false;
+  /*  if (n1 > 0 && n2 > 0 && n3 > 0 && n4 > 0)
+      return true;
+    else if (n1 < 0 && n2 < 0 && n3 < 0 && n4 < 0)
+      return true;
+    else
+      return false;
+      */
+  return ((n1 > 0 && n2 > 0 && n3 > 0 && n4 > 0) || (n1 < 0 && n2 < 0 && n3 < 0 && n4 < 0));
 }
 
 
@@ -468,9 +470,9 @@ void CDCLegendreFastHough::MaxFastHoughHighPtHeap(const std::vector<CDCLegendreT
   //voting plane
   std::vector<CDCLegendreTrackHit*>** voted_hits;
   voted_hits = new std::vector<CDCLegendreTrackHit*>* [nbins_theta];
-  for (unsigned int i = 0; i < nbins_theta; ++i) {
+  for (int i = 0; i < nbins_theta; ++i) {
     voted_hits[i] = new std::vector<CDCLegendreTrackHit*>[nbins_r];
-    for (unsigned int j = 0; j < nbins_r; ++j) {
+    for (int j = 0; j < nbins_r; ++j) {
       voted_hits[i][j].reserve(nhitsToReserve);
     }
   }
@@ -561,7 +563,7 @@ void CDCLegendreFastHough::MaxFastHoughHighPtHeap(const std::vector<CDCLegendreT
 
 
     //"trick" which allows to use wider bins for higher r values (lower pt tracks)
-    int level_diff = 0;
+    int level_diff __attribute__((unused)) = 0;
     if (fabs(r[r_index] + (r[r_index + 1] - r[r_index]) / 2.) > (m_rMax / 4.)) level_diff = 3;
     else if ((fabs(r[r_index] + (r[r_index + 1] - r[r_index]) / 2.) < (m_rMax / 4.)) && (fabs(r[r_index] + (r[r_index + 1] - r[r_index]) / 2.) > (2.*m_rMax / 3.)))
       level_diff = 2;
@@ -707,8 +709,8 @@ void CDCLegendreFastHough::MaxFastHoughHighPtStack(const std::vector<CDCLegendre
   nhitsToReserve = 2 * hits.size();
   //voting plane
   std::vector<CDCLegendreTrackHit*> voted_hits[nbins_theta][nbins_r];
-  for (unsigned int i = 0; i < nbins_theta; ++i)
-    for (unsigned int j = 0; j < nbins_r; ++j)
+  for (int i = 0; i < nbins_theta; ++i)
+    for (int j = 0; j < nbins_r; ++j)
       voted_hits[i][j].reserve(nhitsToReserve);
 
   //B2DEBUG(100, "CREATING distance arrays");

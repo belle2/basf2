@@ -20,6 +20,7 @@ namespace Belle2 {
   class HLTTag : public TObject {
 
   public:
+    // Trigger algorism
     enum HLTTrigAlgo { Global, Level3,
                        Hadronic, Tautau, LowMulti,
                        Bhabha, Mumu,
@@ -37,29 +38,39 @@ namespace Belle2 {
     // Access Functions
     //! HLT's Event ID
     int HLTEventID();
+    //! Set HLT's Event ID
     void HLTEventID(int id);
 
     //! HLT's unit ID
     int HLTUnitID();
+    //! Set HLT's unit ID
     void HLTUnitID(int id);
 
     //! Processed time at HLT
     time_t HLTTime();
+    //! Set time at HLT
     void HLTTime(time_t tm);
+    //! Set current time
     void HLTSetCurrentTime();
 
     //! Access functions to Summary word
     bool Accepted(HLTTrigAlgo algo = Global);
+    //! Access functions to Summary word
     bool Discarded(HLTTrigAlgo algo = Global);
 
+    //! Access functions to Summary word
     void Accept(HLTTrigAlgo algo = Global);
+    //! Access functions to Summary word
     void Discard(HLTTrigAlgo algo = Global);
 
+    //! Get Summary word
     int GetSummaryWord();
+    //! Set Summary word
     void SetSummaryWord(int summary);
 
     //! Access functions to each algorithm word
     int GetAlgoInfo(HLTTrigAlgo algo);
+    //! Access functions to each algorithm word
     void SetAlgoInfo(HLTTrigAlgo algo, int infobits);
 
   private:
@@ -89,7 +100,7 @@ namespace Belle2 {
     //  * Usage dependent on each algorithm
     int m_HLTAlgoInfo[MAXALGO];
 
-    //
+    // To derive from TObject
     ClassDef(HLTTag, 1);
   };
 }

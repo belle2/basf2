@@ -26,14 +26,14 @@ namespace Belle2 {
     /** DecayDescriptor for this tree. */
     DecayDescriptor m_decaydescriptor;
     /** Option for this tool. */
-    string m_strOption;
+    std::string m_strOption;
     /** Create branches in m_tree - this function should be called by the constructor only. */
     virtual void setupTree() = 0;
   public:
     /** Constructor. */
     NtupleFlatTool(TTree* tree, DecayDescriptor& decaydescriptor);
     /** Constructor with option. */
-    NtupleFlatTool(TTree* tree, DecayDescriptor& decaydescriptor, string strOption);
+    NtupleFlatTool(TTree* tree, DecayDescriptor& decaydescriptor, std::string strOption);
     /** Destructor. */
     virtual ~NtupleFlatTool() {}
     /** Calculate branch variables from provided Particle. */

@@ -21,6 +21,8 @@ namespace Belle2 {
   class CDCLegendreTrackFitter;
 
 
+  /* TODO: Check whether track overlaps with other tracks; may be try to sort tracks according to number of inresections/overlappings, some weights might be applied
+   * if track sharing more than, for example, 50% of hits, that track should be definitely splitted into few*/
   class CDCLegendreTrackMerger {
   public:
 

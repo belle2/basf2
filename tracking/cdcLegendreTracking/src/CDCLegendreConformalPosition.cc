@@ -96,7 +96,7 @@ CDCLegendreConformalPosition::CDCLegendreConformalPosition()
       for (int binTheta = 0; binTheta <= m_nbinsTheta; ++binTheta) {
         double r_temp = x_con * m_cos_theta[binTheta] +
                         y_con * m_sin_theta[binTheta];
-        m_lookupR[/*layerId*nLayers_max*nWires_max + wireId*nWires_max + binTheta*/layerId][wireId][binTheta] = r_temp;
+        m_lookupR[layerId][wireId][binTheta] = r_temp;
       }
     }
   }

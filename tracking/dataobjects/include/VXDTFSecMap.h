@@ -92,12 +92,12 @@ namespace Belle2 {
 
 
     /** returns size of stored SecMapCopy */
-    int size() { return m_sectorMap.size(); }
+    int size() const { return m_sectorMap.size(); }
 
 
 
     /** returns size of stored SecMap, same as size() */
-    int getNumOfSectors() { return size(); }
+    int getNumOfSectors() const { return size(); }
 
 
 
